@@ -22,6 +22,7 @@
 #include "imesh/object.h"
 #include "csutil/mmapio.h"
 #include "ivaria/reporter.h"
+#include "iengine/light.h"
 #include "qsqrt.h"
 #include "nterrain.h"
 
@@ -54,7 +55,7 @@ void nTerrain::SetVariance(nBlock &b)
 
 float nTerrain::BuildTreeNode(FILE *f, unsigned int level, 
 	unsigned int parent_index, unsigned int child_num, nRect bounds, 
-	float *heightmap, unsigned int w)
+	float *heightmap, csVector3 *norms, unsigned int w)
 {
   unsigned int my_index = (parent_index<<2) + child_num + NTERRAIN_QUADTREE_ROOT;
   unsigned int mid = bounds.w>>1;
@@ -68,16 +69,22 @@ float nTerrain::BuildTreeNode(FILE *f, unsigned int level,
   b.sw = 10 * heightmap[bounds.x + bounds.w-1 + ((bounds.y + bounds.h-1) * w)];
   b.center = 10 * heightmap[bounds.x +  mid  +  ((bounds.y + mid) * w)];
 
+  b.ne_norm = norms[bounds.x +              (bounds.y * w)];
+  b.nw_norm = norms[bounds.x + bounds.w-1 + (bounds.y * w)];
+  b.se_norm = norms[bounds.x +              ((bounds.y + bounds.h-1) * w)];
+  b.sw_norm = norms[bounds.x + bounds.w-1 + ((bounds.y + bounds.h-1) * w)];
+  b.center_norm = norms[bounds.x +  mid  +  ((bounds.y + mid) * w)];
+
   // Set the variance for this block (the difference between the highest and lowest points.)
   SetVariance(b);
 
   // Expand the quadtree until we get to the max resolution.
   if (level<max_levels)
   {
-    float var1 = BuildTreeNode(f, level+1, my_index, 0, nRect(bounds.x,bounds.y,cw,cw), heightmap, w);
-    float var2 = BuildTreeNode(f, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,cw,cw), heightmap, w);
-    float var3 = BuildTreeNode(f, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,cw,cw), heightmap, w);
-    float var4 = BuildTreeNode(f, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,cw,cw), heightmap, w);
+    float var1 = BuildTreeNode(f, level+1, my_index, 0, nRect(bounds.x,bounds.y,cw,cw), heightmap, norms, w);
+    float var2 = BuildTreeNode(f, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,cw,cw), heightmap, norms, w);
+    float var3 = BuildTreeNode(f, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,cw,cw), heightmap, norms, w);
+    float var4 = BuildTreeNode(f, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,cw,cw), heightmap, norms, w);
 
     b.variance = (var1 > b.variance) ? var1 : b.variance;
     b.variance = (var2 > b.variance) ? var2 : b.variance;
@@ -86,13 +93,42 @@ float nTerrain::BuildTreeNode(FILE *f, unsigned int level,
   }
   /* midh was set to low */
   b.midh += b.variance/2.0;
-  b.radius = qsqrt(b.variance*b.variance + bounds.w*bounds.w/4.0);
+  float wid = (float)bounds.w;
+  b.radius = qsqrt(b.variance*b.variance/4.0 + wid*wid/2.0);
 
   // Store the block in the file.
   fseek(f, my_index*nBlockLen, SEEK_SET);
   fwrite(&b, nBlockLen, 1, f);
 
   return b.variance;
+}
+
+csColor nTerrain::CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n)
+{
+  csColor color (0.0, 0.0, 0.0);
+  float sq_dist = csSquaredDist::PointPoint (li->GetCenter(), v);
+  if (sq_dist < li->GetSquaredRadius ()) {
+    csVector3 light_dir = v - li->GetCenter ();
+    
+    csColor light_color = li->GetColor () * (256.0 / CS_NORMAL_LIGHT_LEVEL)
+      * li->GetBrightnessAtDistance (qsqrt (sq_dist));
+
+    float cosinus;
+    if (sq_dist < SMALL_EPSILON) 
+      cosinus = 1.0;
+    else
+      cosinus = light_dir * n;
+
+    if (cosinus > 0) {
+      if (sq_dist >= SMALL_EPSILON) 
+        cosinus *= qisqrt (sq_dist);
+      if (cosinus < 1)
+        color += light_color * cosinus;
+      else
+        color += light_color;
+    }
+  } 
+  return color;
 }
 
 void nTerrain::BufferTreeNode(nBlock *b, nRect bounds)
@@ -103,11 +139,6 @@ void nTerrain::BufferTreeNode(nBlock *b, nRect bounds)
       se = info->vertices.Push(csVector3(bounds.x-mid, b->se, bounds.y+bounds.h-1-mid)),
       sw = info->vertices.Push(csVector3(bounds.x+bounds.w-1-mid, b->sw, bounds.y+bounds.h-1-mid)),
       center = info->vertices.Push(csVector3(bounds.x+bounds.h/2.0-mid, b->center, bounds.y+bounds.h/2.0-mid));
-// printf ("ne %d %f %d\n", bounds.x-mid, b->ne, bounds.y-mid);
-// printf ("nw %d %f %d\n", bounds.x+bounds.w-1-mid, b->nw, bounds.y-mid);
-// printf ("se %d %f %d\n", bounds.x-mid, b->se, bounds.y+bounds.h-1-mid);
-// printf ("sw %d %f %d\n", bounds.x+bounds.w-1-mid, b->sw, bounds.y+bounds.h-1-mid);
-// printf ("center %f %f %f\n", bounds.x+bounds.h/2.0-mid, b->center, bounds.y+bounds.h/2.0-mid);
 
   float wid = (float)terrain_w;
   info->texels.Push(csVector2(bounds.x/wid, bounds.y/wid));
@@ -116,11 +147,37 @@ void nTerrain::BufferTreeNode(nBlock *b, nRect bounds)
   info->texels.Push(csVector2((bounds.x+bounds.w-1)/wid, (bounds.y+bounds.h-1)/wid));
   info->texels.Push(csVector2((bounds.x+bounds.h/2.0)/wid, (bounds.y+bounds.h/2.0)/wid));
 
-  info->colors.Push(csColor(0.8,0.5,0.2));
-  info->colors.Push(csColor(0.2,0.5,0.8));
-  info->colors.Push(csColor(0.2,0.5,0.2));
-  info->colors.Push(csColor(0.8,0.5,0.8));
-  info->colors.Push(csColor(0.5,0.5,0.5));
+  csColor nec, nwc, sec, swc, centerc;
+
+  if (info->num_lights > 0) {
+    for (int i = 0; i < info->num_lights; i ++) {
+      iLight* li = info->light_list[i];
+
+      nec += CalculateLightIntensity (li, ne, b->ne_norm);
+      nwc += CalculateLightIntensity (li, nw, b->nw_norm);
+      sec += CalculateLightIntensity (li, se, b->se_norm);
+      swc += CalculateLightIntensity (li, sw, b->sw_norm);
+      centerc += CalculateLightIntensity (li, center, b->center_norm);
+    }
+  } else {
+    nec = csColor (1.0, 1.0, 1.0);
+    nwc = csColor (1.0, 1.0, 1.0);
+    sec = csColor (1.0, 1.0, 1.0);
+    swc = csColor (1.0, 1.0, 1.0);
+    centerc = csColor (1.0, 1.0, 1.0);
+  }
+
+  nec.Clamp (2., 2., 2.);
+  nwc.Clamp (2., 2., 2.);
+  sec.Clamp (2., 2., 2.);
+  swc.Clamp (2., 2., 2.);
+  centerc.Clamp (2., 2., 2.);
+
+  info->colors.Push (nec);
+  info->colors.Push (nwc);
+  info->colors.Push (sec);
+  info->colors.Push (swc);
+  info->colors.Push (centerc);
 
   /** Build triangle stacks, for each block output four triangles.
    * No need to merge and split because each block is at full resolution,
@@ -167,9 +224,6 @@ void nTerrain::ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int
     float error_metric = b->variance / distance;
 
     if (error_metric<=error_metric_tolerance) {
-// printf ("%d early cull\n", level);
-// printf ("distance = %f\n", distance);
-// printf ("error = %f\n", error_metric);
       render_this=true;
     } 
   }
@@ -188,7 +242,7 @@ void nTerrain::ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int
 
 }
 
-void nTerrain::BuildTree(FILE *f, float *heightmap, unsigned int w)
+void nTerrain::BuildTree(FILE *f, float *heightmap, csVector3 *norms, unsigned int w)
 {
   terrain_w = w-1;
   max_levels = ilogb(w-1) - 1;
@@ -204,21 +258,27 @@ void nTerrain::BuildTree(FILE *f, float *heightmap, unsigned int w)
   b.sw = 10 * heightmap[w-1 + (w-1) * w];
   b.center = 10 * heightmap[mid + mid * w];
 
+  b.ne_norm = norms[0];
+  b.nw_norm = norms[w-1];
+  b.se_norm = norms[(w-1)*w];
+  b.sw_norm = norms[w-1 + (w-1) * w];
+  b.center_norm = norms[mid + mid * w];
+
   SetVariance(b);
 
   b.midh = w; /* for this first block the w is encoded into midh */
 
-  float var1 = BuildTreeNode(f, 1, 0, 0, nRect(x,y,cw,cw), heightmap, w);
-  float var2 = BuildTreeNode(f, 1, 0, 1, nRect(x+mid,y,cw,cw), heightmap, w);
-  float var3 = BuildTreeNode(f, 1, 0, 2, nRect(x,y+mid,cw,cw), heightmap, w);
-  float var4 = BuildTreeNode(f, 1, 0, 3, nRect(x+mid,y+mid,cw,cw), heightmap, w);
+  float var1 = BuildTreeNode(f, 1, 0, 0, nRect(x,y,cw,cw), heightmap, norms, w);
+  float var2 = BuildTreeNode(f, 1, 0, 1, nRect(x+mid,y,cw,cw), heightmap, norms, w);
+  float var3 = BuildTreeNode(f, 1, 0, 2, nRect(x,y+mid,cw,cw), heightmap, norms, w);
+  float var4 = BuildTreeNode(f, 1, 0, 3, nRect(x+mid,y+mid,cw,cw), heightmap, norms, w);
 
   b.variance = (var1 > b.variance) ? var1 : b.variance;
   b.variance = (var2 > b.variance) ? var2 : b.variance;
   b.variance = (var3 > b.variance) ? var3 : b.variance;
   b.variance = (var4 > b.variance) ? var4 : b.variance;
 
-  b.radius = qsqrt(b.variance*b.variance + w*w/4.0);
+  b.radius = qsqrt(b.variance*b.variance/4.0 + w*w/2.0);
 
   fseek (f, 0, SEEK_SET); 
   fwrite (&b, nBlockLen, 1, f);
@@ -242,14 +302,16 @@ void nTerrain::AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
   csSphere bs (csVector3 (0, b->variance/2.0, 0), b->radius);
   if (!rv->TestBSphere(obj2cam, bs)) return;
 
+  /*
   float distance = ((cam-bs.GetCenter()).Norm())+0.0001;
-
   float error_metric = b->variance / distance;
 
-  /* TODO: LOD doesn't currently work */
-  if (error_metric <= error_metric_tolerance) {
-    BufferTreeNode (b, nRect (0, 0, terrain_w+1, terrain_w+1));
-  } else {
+  if (error_metric <= error_metric_tolerance) 
+  */
+  // This is a really bad hack to overcome the large error glitches, but it works
+  BufferTreeNode (b, nRect (0, 0, terrain_w+1, terrain_w+1));
+
+  // else {
 
   // Buffer entire viewable terrain by first doing view culling on the block, then checking for the
   // error metric.  If the error metric fails, then we need to drop down another level. Begin that
@@ -259,8 +321,9 @@ void nTerrain::AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
   ProcessTreeNode(rv, 1, 0, 1, nRect(x+mid,y,cw,cw));
   ProcessTreeNode(rv, 1, 0, 2, nRect(x,y+mid,cw,cw));
   ProcessTreeNode(rv, 1, 0, 3, nRect(x+mid,y+mid,cw,cw));
+  
+  // }
 
-  }
 }
 
 void nTerrain::SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
@@ -396,14 +459,14 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
 	"Unable to read from input file\n");
     return false;
   }
-  csRef<iImage> image (imageio->Load (raw, input->GetSize(), CS_IMGFMT_ANY));
+  iImage *image (imageio->Load (raw, input->GetSize(), CS_IMGFMT_ANY));
+  delete raw;
   if (!image) {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
     	"crystalspace.mesh.object.terrbig", 
 	"Unable to load image file\n");
     return false;
   }
-printf ("image w,h (%d, %d)\n", image->GetWidth(), image->GetHeight());
   if (image->GetWidth () != image->GetHeight ()) {
     image->Rescale (image->GetWidth (), image->GetWidth ());
   }
@@ -414,7 +477,9 @@ printf ("image w,h (%d, %d)\n", image->GetWidth(), image->GetHeight());
 	"Unable to open %s for writing\n", hm);
     return false;
   }
-  float *heightmap = new float[image->GetSize ()];
+  int size = image->GetSize ();
+  int width = image->GetWidth ();
+  float *heightmap = new float[size];
   if (image->GetFormat () & CS_IMGFMT_PALETTED8) {
     csRGBpixel *palette = image->GetPalette ();
     uint8 *data = (uint8 *)image->GetImageData ();
@@ -427,12 +492,30 @@ printf ("image w,h (%d, %d)\n", image->GetWidth(), image->GetHeight());
       heightmap[i] = ((float)data[i].Intensity()) / 255.0;
     }
   }
+  image->DecRef ();
+  csVector3 *norms = new csVector3[image->GetSize ()];
+  for  (int i = 0; i < size; i ++) {
+    int ind = i - width;
+    csVector3 curr (0, heightmap[i], 0);
+    csVector3 up = csVector3(0, (ind < 0) ? 0 : heightmap[ind], 1) - curr;
+    ind = i + width;
+    csVector3 dn = csVector3(0, (ind >= image->GetSize ()) ? 0 : heightmap[ind], -1) - curr;
+    ind = i - 1;
+    csVector3 lt = csVector3(-1, 
+        (i%width - ind%width != 1) ? 0 : heightmap[ind], 0) - curr;
+    ind = i + 1;
+    csVector3 rt = csVector3(1, 
+        (ind%width - i%width != 1) ? 0 : heightmap[ind], 0) - curr;
+
+    norms[i] = (up + dn + lt + rt) / 4.0;
+    norms[i].Normalize ();
+  }
   if (!terrain) {
     terrain = new nTerrain;
   }
-  terrain->BuildTree (hmfp, heightmap, image->GetWidth());
-
+  terrain->BuildTree (hmfp, heightmap, norms, width);
   delete [] heightmap;
+  delete [] norms;
   fclose (hmfp);
 
   terrain->SetHeightMapFile (hm);
@@ -467,22 +550,21 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
  
   if (nTextures) {
  
-  info->mesh = new G3DTriangleMesh[nTextures];
-  info->triq = new nTerrainInfo::triangle_queue[nTextures];
+    info->mesh = new G3DTriangleMesh[nTextures];
+    info->triq = new nTerrainInfo::triangle_queue[nTextures];
+    info->num_lights = 0;
+	info->light_list = NULL;
 
-  for(i=0; i<nTextures; ++i)
-  {
-    info->mesh[i].morph_factor = 0;
-    info->mesh[i].num_vertices_pool = 1;
-    info->mesh[i].use_vertex_color = 0;
-	info->mesh[i].do_mirror = false;
-    info->mesh[i].do_morph_texels = false;
-    info->mesh[i].do_morph_colors = false;
-    info->mesh[i].do_fog = false;
-    info->mesh[i].vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-    info->mesh[i].mixmode = 0 /* CS_FX_GOURAUD */;
+    for(i=0; i<nTextures; ++i)
+    {
+      info->mesh[i].morph_factor = 0;
+      info->mesh[i].num_vertices_pool = 1;
+      info->mesh[i].do_morph_texels = false;
+      info->mesh[i].do_morph_colors = false;
+      info->mesh[i].do_fog = false;
+      info->mesh[i].vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+    }
   }
-}
 }  
 
 bool 
@@ -500,6 +582,19 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
     terrain->SetCameraOrigin(cam->GetTransform().GetOrigin());
     terrain->AssembleTerrain(rview, info);
 
+	int i;
+    for(i=0; i<nTextures; ++i)
+    {
+	  info->mesh[i].do_mirror = rview->GetCamera()->IsMirrored();
+      if (info->num_lights > 0) {
+        info->mesh[i].use_vertex_color = 1;
+        info->mesh[i].mixmode = CS_FX_COPY | CS_FX_GOURAUD;
+      } else {
+        info->mesh[i].use_vertex_color = 0;
+        info->mesh[i].mixmode = 0;
+      }
+    }
+
     return true;
   }
 
@@ -507,9 +602,17 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 }
 
 void 
-csBigTerrainObject::UpdateLighting (iLight** lights, int num_lights, iMovable* movable)
+csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable* movable)
 {
-  return;
+  /*
+  if (info->light_list) {
+    delete [] info->light_list;
+  }
+
+  info->num_lights = num_lights;
+  info->light_list = new iLight*[num_lights];
+  memcpy (info->light_list, lis, sizeof (iLight *) * num_lights);
+  */
 }
 
 bool 
@@ -548,7 +651,7 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable* movable, csZBufMode zbuf
     info->mesh[i].num_triangles = info->triq[i].triangles.Length();
     rview->CalculateFogMesh( pG3D->GetObjectToCamera(), info->mesh[i] );
     pG3D->DrawTriangleMesh(info->mesh[i]);
-		delete[] info->mesh[i].vertex_fog;
+    delete[] info->mesh[i].vertex_fog;
   }
 
   vbufmgr->UnlockBuffer(vbuf);

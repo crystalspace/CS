@@ -22,6 +22,7 @@
 struct iMeshObject;
 struct iVertexBufferManager;
 struct iImageIO;
+struct iLight;
 
 const int NTERRAIN_QUADTREE_ROOT=1;
 
@@ -64,7 +65,7 @@ struct nRect
 
 
 /// The length of the nBlock structure
-unsigned const nBlockLen=34;
+unsigned const nBlockLen=94;
 
 typedef unsigned short ti_type;
 
@@ -75,6 +76,9 @@ struct nBlock
 {
   /// Height for vertices
   float ne, nw, se, sw, center;
+
+  /// Normal based on surrounding vertices
+  csVector3 ne_norm, nw_norm, se_norm, sw_norm, center_norm;
 
   /// Variance for block
   float variance;
@@ -170,6 +174,8 @@ struct nTerrainInfo
     CS_DECLARE_GROWING_ARRAY (texels, csVector2);
     CS_DECLARE_GROWING_ARRAY (tindexes, ti_type);
     CS_DECLARE_GROWING_ARRAY (colors, csColor);
+	int num_lights;
+    iLight **light_list;
 };
 
 
@@ -230,7 +236,10 @@ class nTerrain
   void SetVariance(nBlock &b);
 
   /// Does the work of tree building, heightmap is the height data (0..1), w is the edge length of the heightmap, which must be square.
-  float BuildTreeNode(FILE *f, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds, float *heightmap, unsigned int w);
+  float BuildTreeNode(FILE *f, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds, float *heightmap, csVector3 *norms, unsigned int w);
+
+  /// Calculates the insensity and color at a given vertex for a given light
+  csColor nTerrain::CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n);
 
   /// Buffers the node passed into it for later drawing, bounds are needed to generate all the verts.
   void BufferTreeNode(nBlock *b, nRect bounds);
@@ -249,7 +258,7 @@ public:
    *  heightmap is the data, w is the width and height (map must be square
    *  and MUST be a power of two + 1, e.g. 129x129, 257x257, 513x513.)
    */
-  void BuildTree(FILE *f, float *heightmap, unsigned int w);
+  void BuildTree(FILE *f, float *heightmap, csVector3 *norms, unsigned int w);
 
   /// Assembles the terrain into the buffer when called by the engine.  
   void AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo);
@@ -283,7 +292,7 @@ public:
 
   nTerrain(csMemoryMappedIO *phm=NULL):max_levels(0), 
 			 /* this is 4 pixel accuracy on 800x600 */
-             error_metric_tolerance(0.0025), 
+             error_metric_tolerance(0.005), 
 	     info(NULL), hm(phm), materials(NULL), 
 	     map_scale(0), map_mode(0) {}
 
