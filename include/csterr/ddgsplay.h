@@ -19,8 +19,7 @@
 #ifndef _ddgSplay_Class_
 #define _ddgSplay_Class_
 
-#include "csterr/ddgerror.h"
-
+#include "csterr/ddg.h"
 /**
  * This class defines the data element stored by the ddgSplay tree.
  * this class can be subclassed with other members which map to
@@ -237,10 +236,6 @@ public:
 	inline ddgSplayIndex null(void) { return _nullNode; }
 	/// Return if the given node is null.
 	inline bool isnull(ddgSplayIndex n) { return _nullNode == n; }
-#ifdef _DEBUG
-	/// Print the current content of the tree.
-	int printTree( ddgSplayIndex n );
-#endif
 };
 
 /**
@@ -274,7 +269,6 @@ public:
 		_current = _ddgSplaytree->root();
 		// find smallest (leftmost) or largest (rightmost) entry.
 		while (_current != _ddgSplaytree->null()) {
-			asserts(_depth < stackMax, "ddgSplay Iterator ran out of stack space");
 #ifdef _DEBUG
 			if (_depth > _maxDepth) _maxDepth = _depth;
 #endif
@@ -307,7 +301,6 @@ public:
 				// If there is a left child, go to it.
 				if (_current != _ddgSplaytree->null())
 				{ 
-					asserts(_depth < stackMax, "ddgSplay Iterator ran out of stack space");
 #ifdef _DEBUG
 			        if (_depth > _maxDepth) _maxDepth = _depth;
 #endif
@@ -344,7 +337,6 @@ public:
 				// If there is a right child, go to it.
 				if (_current != _ddgSplaytree->null())
 				{ 
-					asserts(_depth < stackMax, "ddgSplay Iterator ran out of stack space");
 #ifdef _DEBUG
 			        if (_depth > _maxDepth) _maxDepth = _depth;
 #endif
