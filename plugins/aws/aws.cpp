@@ -1,7 +1,7 @@
 #include "cssysdef.h"
-#include "aws.h"
-#include "awsprefs.h"
-#include "awsslot.h"
+#include "aws/aws.h"
+#include "aws/awsprefs.h"
+#include "aws/awsslot.h"
 
 CS_IMPLEMENT_PLUGIN
 

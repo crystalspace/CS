@@ -3,6 +3,9 @@
 #include "aws/awsadler.h"
 #include <string.h>
 
+#define callRefMemberFunction(object,ptrToMember)  ((object).*(ptrToMember))
+#define callPtrMemberFunction(object,ptrToMember)  ((object)->*(ptrToMember))
+
 static unsigned long 
 NameToId(char *n)
 {
@@ -95,20 +98,17 @@ awsSink::GetTriggerID(char *_name)
 }
 
 void
-awsSink::HandleTrigger(int trigger, iAwsSource &source)
+awsSink::HandleTrigger(int trigger, iAwsSource *source)
 {
-
   if (triggers.Length() == 0) return;
   
-  // Get trigger.
-  void (iBase::*Trigger)(iAwsSource &source) = ((TriggerMap *)(triggers[trigger]))->trigger;
+  void (*Trigger)(iAwsSink *, iAwsSource *) = (((TriggerMap *)(triggers[trigger]))->trigger);
 
-  // Activate trigger.
-  (this->*Trigger)(source);
+  (Trigger)(this, source);  
 }
 
 void 
-awsSink::RegisterTrigger(char *name, void (iBase::*Trigger)(iAwsSource &source))
+awsSink::RegisterTrigger(char *name, void (*Trigger)(iAwsSink *, iAwsSource *))
 {
   triggers.Push(new TriggerMap(NameToId(name), Trigger));
 }
@@ -266,7 +266,7 @@ awsSlot::Emit(iAwsSource &source, unsigned long signal)
         SignalTriggerMap *stm = (SignalTriggerMap *)stmap[i];
 
         if (stm->signal==signal)
-          sink->HandleTrigger(stm->trigger, source);
+          sink->HandleTrigger(stm->trigger, &source);
       }
       
     }

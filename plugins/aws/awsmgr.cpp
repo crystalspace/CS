@@ -292,10 +292,11 @@ awsManager::Print(iGraphics3D *g3d)
   for(i=0; i<updatestore.Count(); ++i)
   {
     csRect r(updatestore.RectAt(i));
-    g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
-      		  r.xmin,r.ymin,r.xmax-r.xmin,r.ymax-r.ymin,
-		  r.xmin,r.ymin,r.xmax-r.xmin,r.ymax-r.ymin,
-                  0);
+    g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(),
+                    r.xmin,r.ymin,r.xmax-r.xmin+1,r.ymax-r.ymin+1,
+                    r.xmin,r.ymin,r.xmax-r.xmin+1,r.ymax-r.ymin+1,
+                    0);
+
   }
 
 /*
