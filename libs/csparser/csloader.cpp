@@ -22,6 +22,7 @@
 #include "csparser/csloader.h"
 #include "csengine/sysitf.h"
 #include "csengine/basic/cscoll.h"
+#include "csengine/basic/triangle.h"
 #include "csengine/sector.h"
 #include "csengine/objects/thing.h"
 #include "csengine/objects/thingtpl.h"
@@ -3834,7 +3835,7 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
         {
           int a, b, c;
           ScanStr (params, "%d,%d,%d", &a, &b, &c);
-          stemp->GetBaseLOD ()->AddTriangle (a, b, c);
+          stemp->GetBaseMesh ()->AddTriangle (a, b, c);
         }
         break;
     }
@@ -3846,7 +3847,7 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
     fatal_exit (0, false);
   }
 
-  stemp->GenerateLOD (1, 50);
+  stemp->GenerateLOD ();
 
   return true;
 }

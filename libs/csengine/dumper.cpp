@@ -29,6 +29,7 @@
 #include "csengine/polygon/pol2d.h"
 #include "csengine/polygon/polytext.h"
 #include "csengine/basic/polyset.h"
+#include "csengine/basic/triangle.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/objects/cssprite.h"
@@ -184,7 +185,7 @@ void Dumper::dump (csSpriteTemplate* s)
   CsPrintf (MSG_DEBUG_0, "Dump sprite template '%s' id=%ld:\n", 
             csNameObject::GetName(*s), s->GetID ());
   CsPrintf (MSG_DEBUG_0, "%d vertices.\n", s->num_vertices);
-  CsPrintf (MSG_DEBUG_0, "%d triangles.\n", s->GetBaseLOD ()->GetNumTriangles ());
+  CsPrintf (MSG_DEBUG_0, "%d triangles.\n", s->GetBaseMesh ()->GetNumTriangles ());
   CsPrintf (MSG_DEBUG_0, "%d frames.\n", s->GetNumFrames ());
   CsPrintf (MSG_DEBUG_0, "%d actions.\n", s->GetNumActions ());
 }

@@ -146,7 +146,7 @@ class csCollider
   void Activate (bool on);
 
   /// Get objects name.
-  char* GetName ();
+  const char* GetName ();
 
   /// Delete and free memory of this objects oriented bounding box.
   void DestroyBbox ();

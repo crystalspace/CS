@@ -20,6 +20,7 @@
 #include "sysdef.h"
 #include "csengine/colldet/collp.h"
 #include "csengine/colldet/collider.h"
+#include "csengine/basic/triangle.h"
 #include "csobject/nameobj.h"
 
 int CD_num_cols_alloced = 0;
@@ -109,13 +110,13 @@ csCollider::csCollider( csSprite3D *sp )
   // correct frame (some global CD outline or else we need to do it
   // for every frame which is too expensive.
   csFrame *cf = _sp->cur_action->GetFrame (_sp->cur_frame);
-  csSpriteLOD* lod = _sp->tpl->GetBaseLOD ();
-  for (int i = 0; i < lod->GetNumTriangles (); i++)
+  csTriangleMesh* mesh = _sp->tpl->GetBaseMesh ();
+  for (int i = 0; i < mesh->GetNumTriangles (); i++)
     {
     int v[3];
-    v[0] = lod->GetTriangles ()[i].a;
-    v[1] = lod->GetTriangles ()[i].b;
-    v[2] = lod->GetTriangles ()[i].c;
+    v[0] = mesh->GetTriangles ()[i].a;
+    v[1] = mesh->GetTriangles ()[i].b;
+    v[2] = mesh->GetTriangles ()[i].c;
     _rm->addTriangle(cf->GetVertex (v[0]),cf->GetVertex (v[1]),cf->GetVertex (v[2]),i);
     }
 
@@ -144,7 +145,7 @@ void csCollider::Activate(bool on)
 }
 
 // Return object's name.
-char *csCollider::GetName ()
+const char *csCollider::GetName ()
 {
   if (_type == POLYGONSET) return csNameObject::GetName(*_ps);
   if (_type == SPRITE3D)   return csNameObject::GetName(*_sp);
