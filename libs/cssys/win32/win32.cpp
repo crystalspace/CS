@@ -195,18 +195,6 @@ static inline bool AddToPathEnv (char *dir, char **pathEnv)
 bool csPlatformStartup(iObjectRegistry* r)
 {
   /*
-    Load the exception handler DLL. In case of an OS exception
-    (e.g. Access Violation) this DLL creates a report about
-    where the crash happened. After that, the "Application Error"
-    boy is shown as usual.
-
-    The DLL is contained in the "mingw-utils" package and works
-    for both MinGW and VC compiled binaries.
-   */
-  exceptHandlerDLL = LoadLibraryEx ("exchndl.dll", 0, 
-    LOAD_WITH_ALTERED_SEARCH_PATH);
-
-  /*
     When it isn't already in the PATH environment,
     the CS directory will be put there in front of all
     other paths.
@@ -264,6 +252,18 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   EventOutlet (0)
 {
   SCF_CONSTRUCT_IBASE(0);
+
+  /*
+    Load the exception handler DLL. In case of an OS exception
+    (e.g. Access Violation) this DLL creates a report about
+    where the crash happened. After that, the "Application Error"
+    boy is shown as usual.
+
+    The DLL is contained in the "mingw-utils" package and works
+    for both MinGW and VC compiled binaries.
+   */
+  exceptHandlerDLL = LoadLibraryEx ("exchndl.dll", 0, 
+    LOAD_WITH_ALTERED_SEARCH_PATH);
 
   ModuleHandle = GetModuleHandle(0);
   STARTUPINFO startupInfo;
@@ -410,6 +410,7 @@ Win32Assistant::~Win32Assistant ()
   SetConsoleOutputCP (oldCP);
   if (!is_console_app && (console_window || cmdline_help_wanted))
     FreeConsole();
+  FreeLibrary (exceptHandlerDLL);
 }
 
 void Win32Assistant::Shutdown()
