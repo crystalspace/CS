@@ -795,6 +795,28 @@ void csGraphics2D::SetRGB (int i, int r, int g, int b)
   if (ofscb) ofscb->SetRGB (this, i, r, g, b);
 }
 
+void csGraphics2D::GetRGB (int color, int& r, int& g, int& b)
+{
+  if (Depth == 8)
+  {
+    r = Palette[color].red;
+    g = Palette[color].green;
+    b = Palette[color].blue;
+  }
+  else
+  {
+    r = (color & pfmt.RedMask) >> pfmt.RedShift;
+    g = (color & pfmt.GreenMask) >> pfmt.GreenShift;
+    b = (color & pfmt.BlueMask) >> pfmt.BlueShift;
+  }
+}
+
+void csGraphics2D::GetRGB (int color, int& r, int& g, int& b, int& a)
+{
+  a = 255 -  (color >> 24);
+  GetRGB (color & 0x00ffffff, r, g, b);
+}
+
 void csGraphics2D::Write (iFont *font, int x, int y, int fg, int bg, 
 			  const char *text, uint flags) 
 { 

@@ -202,6 +202,17 @@ public:
        would be "opaque white". However, -1 is the color
        index for "transparent text background". */
   }
+  virtual void GetRGB (int color, int& r, int& g, int& b)
+  {
+    r = (color >> 16) & 0xff;
+    g = (color >> 8) & 0xff;
+    b = color & 0xff;
+  }
+  virtual void GetRGB (int color, int& r, int& g, int& b, int& a)
+  {
+    a = 255 - (color >> 24);
+    GetRGB (color, r, g, b);
+  }
 
   /// Draw a line
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color);

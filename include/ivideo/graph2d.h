@@ -150,7 +150,7 @@ struct iOffscreenCanvasCallback : public iBase
   virtual void SetRGB (iGraphics2D* canvas, int idx, int r, int g, int b) = 0;
 };
 
-SCF_VERSION (iGraphics2D, 2, 5, 1);
+SCF_VERSION (iGraphics2D, 2, 6, 0);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -239,6 +239,15 @@ struct iGraphics2D : public iBase
    */
   virtual int FindRGB (int r, int g, int b, int a = 255) = 0;
 
+  /**
+   * Retrieve the R,G,B tuple for a given color index.
+   */
+  virtual void GetRGB (int color, int& r, int& g, int& b) = 0;
+  /**
+   * Retrieve the R,G,B,A tuple for a given color index.
+   */
+  virtual void GetRGB (int color, int& r, int& g, int& b, int& a) = 0;
+  
   /**
    * Set clipping rectangle.
    * The clipping rectangle is inclusive the top and left edges and exclusive

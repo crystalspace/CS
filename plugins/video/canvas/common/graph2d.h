@@ -214,6 +214,8 @@ public:
        would be "opaque white". However, -1 is the color
        index for "transparent text background". */
   }
+  virtual void GetRGB (int color, int& r, int& g, int& b);
+  virtual void GetRGB (int color, int& r, int& g, int& b, int& a);
   /// Write a text string into the back buffer
   virtual void Write (iFont *font , int x, int y, int fg, int bg,
     const char *text, uint flags = 0);
