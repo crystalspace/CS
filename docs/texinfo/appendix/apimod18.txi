@@ -327,8 +327,8 @@ Old syntax (sprite template):
 @example
 SPRITE 'mySpriteTmpl' (
   TEXNR ('xxx.gif')
-  FRAME (@dots{...})
-  @dots{...}
+  FRAME (@dots{})
+  @dots{}
 )
 @end example
 
