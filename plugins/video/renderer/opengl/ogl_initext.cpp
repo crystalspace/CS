@@ -100,7 +100,7 @@ void csGraphics3DOGLCommon::Init_ARB_texture_compression(iOpenGLInterface *G2DGL
 #define INITMORE_ARB_texture_env_combine
 #endif
 
-void csGraphics3DOGLCommon::Init_ARB_texture_env_combine(iOpenGLInterface*) 
+void csGraphics3DOGLCommon::Init_ARB_texture_env_combine(iOpenGLInterface *G2DGL) 
 { 
   #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_combine) 
   bool &allFound = ARB_texture_env_combine;	  	  
@@ -127,7 +127,7 @@ void csGraphics3DOGLCommon::Init_ARB_texture_env_combine(iOpenGLInterface*)
 #define INITMORE_ARB_texture_env_dot3
 #endif
 
-void csGraphics3DOGLCommon::Init_ARB_texture_env_dot3(iOpenGLInterface*) 
+void csGraphics3DOGLCommon::Init_ARB_texture_env_dot3(iOpenGLInterface *G2DGL) 
 { 
   #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_dot3) 
   bool &allFound = ARB_texture_env_dot3;	  	  
@@ -149,6 +149,7 @@ void csGraphics3DOGLCommon::Init_ARB_texture_env_dot3(iOpenGLInterface*)
 #undef INITMORE_ARB_texture_env_dot3
 
 // -----------------------
+
 #ifndef INITMORE_ARB_vertex_program
 #define INITMORE_ARB_vertex_program
 #endif
@@ -164,7 +165,7 @@ void csGraphics3DOGLCommon::Init_ARB_vertex_program(iOpenGLInterface *G2DGL)
   #undef CSGL_ARB_vertex_program
   if (!allFound)
     Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Could not get all function addresses for %s", "GL_NV_vertex_program");
+      "Could not get all function addresses for %s", "GL_ARB_vertex_program");
   else
   {
     INITMORE_ARB_vertex_program
@@ -180,7 +181,7 @@ void csGraphics3DOGLCommon::Init_ARB_vertex_program(iOpenGLInterface *G2DGL)
 #define INITMORE_EXT_texture_env_combine
 #endif
 
-void csGraphics3DOGLCommon::Init_EXT_texture_env_combine(iOpenGLInterface*) 
+void csGraphics3DOGLCommon::Init_EXT_texture_env_combine(iOpenGLInterface *G2DGL) 
 { 
   #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_EXT_texture_env_combine) 
   bool &allFound = EXT_texture_env_combine;	  	  
@@ -207,7 +208,7 @@ void csGraphics3DOGLCommon::Init_EXT_texture_env_combine(iOpenGLInterface*)
 #define INITMORE_EXT_texture_env_dot3
 #endif
 
-void csGraphics3DOGLCommon::Init_EXT_texture_env_dot3(iOpenGLInterface*) 
+void csGraphics3DOGLCommon::Init_EXT_texture_env_dot3(iOpenGLInterface *G2DGL) 
 { 
   #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_EXT_texture_env_dot3) 
   bool &allFound = EXT_texture_env_dot3;	  	  
@@ -288,7 +289,7 @@ void csGraphics3DOGLCommon::Init_NV_vertex_program(iOpenGLInterface *G2DGL)
 #define INITMORE_SGIS_generate_mipmap
 #endif
 
-void csGraphics3DOGLCommon::Init_SGIS_generate_mipmap(iOpenGLInterface*)
+void csGraphics3DOGLCommon::Init_SGIS_generate_mipmap(iOpenGLInterface *G2DGL) 
 { 
   #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_SGIS_generate_mipmap) 
   bool &allFound = SGIS_generate_mipmap;	  	  
@@ -308,5 +309,32 @@ void csGraphics3DOGLCommon::Init_SGIS_generate_mipmap(iOpenGLInterface*)
 }
 
 #undef INITMORE_SGIS_generate_mipmap
+
+// -----------------------
+
+#ifndef INITMORE_EXT_texture_filter_anisotropic
+#define INITMORE_EXT_texture_filter_anisotropic
+#endif
+
+void csGraphics3DOGLCommon::Init_EXT_texture_filter_anisotropic(iOpenGLInterface *G2DGL) 
+{ 
+  #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_EXT_texture_filter_anisotropic) 
+  bool &allFound = EXT_texture_filter_anisotropic;	  	  
+  allFound = true;			  
+  #define _CSGLEXT_
+  #define CSGL_EXT_texture_filter_anisotropic
+  #include "csglext.h"
+  #undef CSGL_EXT_texture_filter_anisotropic
+  if (!allFound)
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Could not get all function addresses for %s", "GL_EXT_texture_filter_anisotropic");
+  else
+  {
+    INITMORE_EXT_texture_filter_anisotropic
+  }
+  #endif
+}
+
+#undef INITMORE_EXT_texture_filter_anisotropic
 
 #undef CSGL_FUNCTION

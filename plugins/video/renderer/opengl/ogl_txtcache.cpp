@@ -208,6 +208,11 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
       rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
   }
+  if (g3d->EXT_texture_filter_anisotropic)
+  {
+    glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+      g3d->txtmgr->texture_filter_anisotropy);
+  }
 
   for (int i=0; i < txt_mm->vTex.Length (); i++)
   {

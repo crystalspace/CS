@@ -173,6 +173,9 @@ public:
   int sharpen_mipmaps;
   /// downsample textures?
   int texture_downsample;
+  /// texture filtering anisotropy
+  float texture_filter_anisotropy;
+
   static formatDescription glformats [];
   ///
   csTextureManagerOpenGL (iObjectRegistry* object_reg,

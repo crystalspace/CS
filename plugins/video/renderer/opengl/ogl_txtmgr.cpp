@@ -685,9 +685,11 @@ csTextureManagerOpenGL::~csTextureManagerOpenGL ()
 void csTextureManagerOpenGL::read_config (iConfigFile *config)
 {
   sharpen_mipmaps = config->GetInt
-        ("Video.OpenGL.SharpenMipmaps", 0);
+    ("Video.OpenGL.SharpenMipmaps", 0);
   texture_downsample = config->GetInt
-        ("Video.OpenGL.TextureDownsample", 0);
+    ("Video.OpenGL.TextureDownsample", 0);
+  texture_filter_anisotropy = config->GetFloat
+    ("Video.OpenGL.TextureFilterAnisotropy", 1.0);	
 
   csRef<iConfigIterator> it (config->Enumerate ("Video.OpenGL.TargetFormat"));
   while (it->Next ())
@@ -728,7 +730,8 @@ void csTextureManagerOpenGL::AlterTargetFormat (const char *oldTarget, const cha
 	compressedFormat = GL_COMPRESSED_INTENSITY_ARB;
 	break;
       default:
-	printf ("%s is not compressable !\n", oldTarget);
+	G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "%s is not compressable !", oldTarget);
 	return;
       }
       glformats[theOld].compressedFormat = compressedFormat;
@@ -746,8 +749,9 @@ void csTextureManagerOpenGL::AlterTargetFormat (const char *oldTarget, const cha
 	  glformats[theOld].forcedFormat = glformats[theNew].targetFormat;
 	else
 	{
-	  printf ("You can only force a new targetFormat if both, old and new targetFormat,"
-	    " have the same sourceFormat\n");
+	  G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    "You can only force a new targetFormat if both, old and new targetFormat,"
+	    " have the same sourceFormat");
 	}
     }
   }
