@@ -856,10 +856,11 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
   csRef<iEmitBox> ebox (SCF_QUERY_INTERFACE(emit, iEmitBox));
   if(ebox)
   {
+    csBox3 x(a,b);
     ebox->GetContent(a, b);
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitbox");
-    synldr->WriteBox(node, &csBox3(a,b));
+    synldr->WriteBox(node, &x);
     return true;
   }
   csRef<iEmitCone> econe (SCF_QUERY_INTERFACE(emit, iEmitCone));
@@ -895,19 +896,21 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
   csRef<iEmitLine> eline (SCF_QUERY_INTERFACE(emit, iEmitLine));
   if(eline)
   {
+    csBox3 x(a,b);
     eline->GetContent(a, b);
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitline");
-    synldr->WriteBox(node, &csBox3(a,b));
+    synldr->WriteBox(node, &x);
     return true;
   }
   csRef<iEmitCylinder> ecyl (SCF_QUERY_INTERFACE(emit, iEmitCylinder));
   if(ecyl) 
   {
+    csBox3 x(a,b);
     ecyl->GetContent(a, b, p, q);
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitcylinder");
-    synldr->WriteBox(node, &csBox3(a,b));
+    synldr->WriteBox(node, &x);
     node->SetAttributeAsFloat("p",p);
     node->SetAttributeAsFloat("q",q);
     return true;
@@ -915,10 +918,11 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
   csRef<iEmitCylinderTangent> ecyltan (SCF_QUERY_INTERFACE(emit, iEmitCylinderTangent));
   if(ecyltan)
   {
+    csBox3 x(a,b);
     ecyltan->GetContent(a, b, p, q);
     csRef<iDocumentNode> node = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     node->SetValue("emitcylindertangent");
-    synldr->WriteBox(node, &csBox3(a,b));
+    synldr->WriteBox(node, &x);
     node->SetAttributeAsFloat("p",p);
     node->SetAttributeAsFloat("q",q);
     return true;

@@ -16,6 +16,7 @@ chronological order.
 	  usable. (The <cmath> change which was made at the same time is
 	  retained since it prevents problems resulting from clients including
 	  <cmath> after cosf() and cousins are faked-up.)
+	- Eric Sunshine eliminated compilation warnings throughout project.
 7-Aug-2004
 	- Jorrit added a test (debug mode only) in the generic render step
 	  to print when a material or material handle is missing.

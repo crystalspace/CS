@@ -1609,7 +1609,8 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   }
   if (failed > 0)
   {
-    Warn ("Couldn't load cached lighting for %d object(s):", failed);
+    Warn ("Couldn't load cached lighting for %lu object(s):",
+	  (unsigned long)failed);
     size_t i;
     for (i = 0 ; i < failed_meshes.Length () ; i++)
     {

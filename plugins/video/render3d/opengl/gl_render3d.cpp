@@ -861,7 +861,7 @@ bool csGLGraphics3D::Open ()
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Point sprites are NOT supported.");
 
   {
-    int abits;
+    GLint abits;
     glGetIntegerv (GL_ALPHA_BITS, &abits);
     rendercaps.DestinationAlpha = abits > 0;
   }
@@ -876,7 +876,7 @@ bool csGLGraphics3D::Open ()
 
   stencil_shadow_mask = 127;
   {
-    int sbits;
+    GLint sbits;
     glGetIntegerv (GL_STENCIL_BITS, &sbits);
 
     stencil_clipping_available = sbits > 0;
@@ -985,7 +985,7 @@ bool csGLGraphics3D::Open ()
   {
     if (ext->CS_GL_ARB_multitexture)
     {
-      int texUnits;
+      GLint texUnits;
       glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
       for (int u = texUnits - 1; u >= 0; u--)
       {
