@@ -14,6 +14,8 @@ PLUGINS+= sound/loader/mp3
 PLUGINS+=net/driver/ensocket
 #PLUGINS.DYNAMIC += mesh/impexp/3ds
 #PLUGINS.DYNAMIC += font/server/freefnt2
+#PLUGINS+=video/format/avi
+#PLUGINS+=video/format/codecs/opendivx
 
 # if u have the following line uncommented make sure one
 # LIBS.OPENGL.SYSTEM is set below or you have a custom
