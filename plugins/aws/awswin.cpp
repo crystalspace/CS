@@ -403,7 +403,11 @@ awsWindow::OnMouseUp(int button, int x, int y)
   if (max_down && (frame_options & foZoom) && maxp.Contains(x, y))
   {
     max_down=false;
+    csRect insets;
 
+    if (Layout())
+      insets=getInsets();
+    
     // Zoom/de-zoom window
     if (is_zoomed)
     {
@@ -425,7 +429,7 @@ awsWindow::OnMouseUp(int button, int x, int y)
 	RecursiveLayoutChildren(this);
 
        // Fix kids
-      MoveChildren(unzoomed_frame.xmin, delta_y);
+      MoveChildren(unzoomed_frame.xmin+insets.xmin, delta_y+insets.ymin);
 
       // Fix redraw zone
       todraw_dirty=true;
@@ -447,10 +451,13 @@ awsWindow::OnMouseUp(int button, int x, int y)
       closep.Move(delta_x, delta_y);
 
       if (Layout())
+      {
 	RecursiveLayoutChildren(this);
-
-      // Fix kids
-      MoveChildren(-unzoomed_frame.xmin, delta_y);
+	MoveChildren(insets.xmin, insets.ymin);
+      }
+      else
+	// Fix kids
+	MoveChildren(-unzoomed_frame.xmin, delta_y);
 
       // Fix redraw zone
       todraw_dirty=true;
