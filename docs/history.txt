@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Feb-2004
+	- Norman Kraemer added an ALSA sound driver. It can be used 
+	  if you disabled OSS emulation in your ALSA configuration.
+	- Norman Kraemer changed the software renderer to check the
+	  commandline for the -sounddriver option. If that ain't 
+	  given, the configuration will be checked for Sound.Driver
+	  entry to contain a sounddriver to use. If that fails as 
+	  well, the default system driver (CS_SOUND_DRIVER) is tried.
+	- Norman also changed unix.mak to include the alsa plugin if
+          available as well as the configure.ac to check for the alsa
+          requisites.
 13-Feb-2004
 	- Jorrit updated the todo_newrenderer.txt document and added a list
 	  of visual differences between walktest/NR and walktest/OR.
