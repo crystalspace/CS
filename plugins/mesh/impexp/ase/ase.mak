@@ -38,7 +38,7 @@ endif
 INC.ASEIE = $(wildcard plugins/mesh/impexp/ase/*.h)
 SRC.ASEIE = $(wildcard plugins/mesh/impexp/ase/*.cpp)
 OBJ.ASEIE = $(addprefix $(OUT),$(notdir $(SRC.ASEIE:.cpp=$O)))
-DEP.ASEIE = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.ASEIE = CSGEOM CSUTIL CSSYS CSTOOL CSGEOM CSUTIL
 
 MSVC.DSP += ASEIE
 DSP.ASEIE.NAME = aseie
