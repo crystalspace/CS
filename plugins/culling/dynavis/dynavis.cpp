@@ -71,6 +71,11 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csDynaVis::DebugHelper)
   SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+// This function defines the amount to use for keeping
+// an object/node visible after it was marked visible
+// for some other reason.
+#define RAND_HISTORY (4+((rand ()>>3)&0x3))
+
 csDynaVis::csDynaVis (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
@@ -285,16 +290,32 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   const csBox3& node_bbox = treenode->GetNodeBBox ();
   const csVector3& pos = data->pos;
 
+  csVisibilityObjectHistory* hist = (csVisibilityObjectHistory*)
+  	treenode->GetUserObject ();
+  if (!hist)
+  {
+    hist = new csVisibilityObjectHistory ();
+    treenode->SetUserObject (hist);
+    hist->DecRef ();
+  }
+
   // For coverage testing.
   csBox2 sbox;
   float min_depth = 0;
 
-  csVisReason reason = VISIBLE;
   bool vis = true;
+
+  if (do_cull_history && hist->vis_cnt > 0)
+  {
+    hist->reason = VISIBLE_HISTORY;
+    hist->vis_cnt--;
+    goto end;
+  }
 
   if (node_bbox.Contains (pos))
   {
-    reason = VISIBLE_INSIDE;
+    hist->reason = VISIBLE_INSIDE;
+    hist->vis_cnt = RAND_HISTORY;
     goto end;
   }
 
@@ -304,7 +325,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     if (!csIntersect3::BoxFrustum (node_bbox, data->frustum, data->frustum_mask,
     	new_mask))
     {
-      reason = INVISIBLE_FRUSTUM;
+      hist->reason = INVISIBLE_FRUSTUM;
       vis = false;
       goto end;
     }
@@ -328,12 +349,15 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 
       if (!rc)
       {
-        reason = INVISIBLE_TESTRECT;
+        hist->reason = INVISIBLE_TESTRECT;
         vis = false;
         goto end;
       }
     }
   }
+
+  hist->reason = VISIBLE;
+  hist->vis_cnt = RAND_HISTORY;
 
 end:
   if (do_state_dump)
@@ -341,19 +365,19 @@ end:
     printf ("Node (%g,%g,%g)-(%g,%g,%g) %s\n",
     	node_bbox.MinX (), node_bbox.MinY (), node_bbox.MinZ (),
     	node_bbox.MaxX (), node_bbox.MaxY (), node_bbox.MaxZ (),
-	reason == INVISIBLE_FRUSTUM ? "outside frustum" :
-	reason == INVISIBLE_TESTRECT ? "covered" :
-	reason == VISIBLE_INSIDE ? "visible inside" :
-	reason == VISIBLE ? "visible" :
+	hist->reason == INVISIBLE_FRUSTUM ? "outside frustum" :
+	hist->reason == INVISIBLE_TESTRECT ? "covered" :
+	hist->reason == VISIBLE_INSIDE ? "visible inside" :
+	hist->reason == VISIBLE ? "visible" :
 	"?"
 	);
-    if (reason != INVISIBLE_FRUSTUM && reason != VISIBLE_INSIDE)
+    if (hist->reason != INVISIBLE_FRUSTUM && hist->reason != VISIBLE_INSIDE)
     {
       printf ("  (%g,%g)-(%g,%g) min_depth=%g\n",
       	sbox.MinX (), sbox.MinY (),
       	sbox.MaxX (), sbox.MaxY (), min_depth);
     }
-    if (reason != VISIBLE && reason != VISIBLE_INSIDE)
+    if (hist->reason != VISIBLE && hist->reason != VISIBLE_INSIDE)
     {
       printf ("  ");
       treenode->Front2Back (data->pos, PrintObjects, NULL);
@@ -625,7 +649,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     const csVector3& pos = data->pos;
     if (obj_bbox.Contains (pos))
     {
-      obj->MarkVisible (VISIBLE_INSIDE, 1+((rand ()>>3)&0x3));
+      obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY);
       do_write_object = true;
       goto end;
     }
@@ -719,7 +743,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     //---------------------------------------------------------------
 
     // Object is visible so we should write it to the coverage buffer.
-    obj->MarkVisible (VISIBLE, 1+((rand ()>>3)&0x3));
+    obj->MarkVisible (VISIBLE, RAND_HISTORY);
     do_write_object = true;
   }
 

@@ -27,6 +27,7 @@
 #include "csgeom/plane3.h"
 #include "iengine/viscull.h"
 #include "dmodel.h"
+#include "dhistmgr.h"
 
 class csKDTree;
 class csKDTreeChild;
@@ -37,17 +38,6 @@ struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
 struct iBugPlug;
-
-enum csVisReason
-{
-  INVISIBLE_PARENT = 0,	// Invisible because some parent node is invisible.
-  INVISIBLE_FRUSTUM,	// Invisible because object outside frustum.
-  INVISIBLE_TESTRECT,	// Invisible because covbuf->TestRectangle() failed.
-  VISIBLE,		// Just visible.
-  VISIBLE_INSIDE,	// Visible because camera is inside bbox.
-  VISIBLE_HISTORY,	// Visible because it was visible last frame.
-  LAST_REASON
-};
 
 #define VIEWMODE_STATS 0
 #define VIEWMODE_STATSOVERLAY 1
@@ -62,26 +52,6 @@ enum csVisReason
 #define COVERAGE_OUTLINE 2
 
 struct VisTest_Front2BackData;
-
-/**
- * This class holds all historical data relevant to visibility
- * culling from previous frame. It is used both for regular objects
- * as for kdtree nodes.
- */
-class csVisibilityObjectHistory
-{
-public:
-  csVisReason reason;	// Reason object is visible/invisible.
-
-  // If the folloging counter > 0 then the object will be assumed visible
-  // automatically. The counter will be decremented then.
-  int vis_cnt;
-
-  csVisibilityObjectHistory ()
-  {
-    vis_cnt = 0;
-  }
-};
 
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
@@ -102,7 +72,7 @@ public:
   }
   ~csVisibilityObjectWrapper ()
   {
-    delete history;
+    history->DecRef ();
   }
 
   void MarkVisible (csVisReason reason, int cnt)

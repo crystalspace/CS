@@ -128,6 +128,8 @@ private:
   csKDTree* child2;		// also be not NULL.
   csKDTree* parent;		// NULL if this is the root.
 
+  iBase* userobject;		// An optional user object for this node.
+
   bool obj_bbox_valid;		// If false obj_bbox is not valid.
   csBox3 obj_bbox;		// Bbox of all objects in this node.
   csBox3 node_bbox;		// Bbox of the node itself.
@@ -215,6 +217,16 @@ public:
   void Clear ();
 
   SCF_DECLARE_IBASE;
+
+  /// Get the user object attached to this node.
+  iBase* GetUserObject () const { return userobject; }
+
+  /**
+   * Set the user object for this node. Can be NULL to clear
+   * it. The old user object will be DecRef'ed and the (optional)
+   * new one will be IncRef'ed.
+   */
+  void SetUserObject (iBase* userobj);
 
   /**
    * Add an object to this kd-tree node.

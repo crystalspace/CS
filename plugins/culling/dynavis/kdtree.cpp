@@ -139,11 +139,20 @@ csKDTree::csKDTree (csKDTree* parent)
   node_bbox.Set (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
   	-CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE,
 	CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE);
+
+  userobject = NULL;
 }
 
 csKDTree::~csKDTree ()
 {
   Clear ();
+}
+
+void csKDTree::SetUserObject (iBase* userobj)
+{
+  if (userobj) userobj->IncRef ();
+  if (userobject) userobject->DecRef ();
+  userobject = userobj;
 }
 
 void csKDTree::Clear ()
@@ -165,6 +174,7 @@ void csKDTree::Clear ()
   disallow_distribute = false;
   obj_bbox_valid = true;
   obj_bbox.StartBoundingBox ();
+  SetUserObject (NULL);
 }
 
 void csKDTree::AddObject (csKDTreeChild* obj)

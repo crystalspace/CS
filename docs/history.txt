@@ -23,6 +23,15 @@ The history order is reversed so that new features are at the top.
 	  object (and in the future also kdtree node). The reason
 	  for this seperation is to make it easier later on to redesign
 	  this to support multiple camera positions.
+	- csVisibilityObjectHistory is now an SCF class so that it can
+	  be embedded more generally in the csKDTree.
+	- Every tree node also has a history object now. This way history
+	  based culling (i.e. marking a node as visible if it was visible
+	  previous frame) is now possible. In future this can also be
+	  used for VTP (Visible Point Tracking). This optimization improved
+	  Dynavis a bit again :-)
+	- Increased the time objects are considered visible (for history
+	  culling).
 19-Jun-2002
 	- Clarified an API comment to indicate that the OFTEN moving
 	  option for things doesn't work yet.
