@@ -74,6 +74,9 @@ chronological order.
 	    - Generalized the -I/usr/local/include and -L/usr/local/lib checks
 	      so that the results apply to all subsequent checks automatically
 	      rather than having to be applied manually to selected checks.
+	- Eric Sunshine made some minor Texinfo mark-up corrections to
+	  levbuilding.txi.  Also eliminated several 'hbox' warnings emitted by
+	  TeX.
 17-Feb-2004
 	- Jorrit fixed a bug in csPolygonMeshTools::Triangulate(). It would
 	  try to allocate a 0 size array in some cases.

@@ -118,9 +118,10 @@ The @cite{Public @sc{api} Reference Manual} and @cite{Developer's API
 Reference Manual} can be converted to @sc{html} format by invoking the
 @samp{apihtml} and @samp{apidevhtml} makefile targets, respectively.
 
-These makefile targets place the generated output in subdirectories of
-@file{$@{builddir@}/out/docs}.  The hierarchy of subdirectories mirrors that of
-@file{CS/docs} where the master copies of these documents are kept.
+These makefile targets place the generated output in appropriately named
+subdirectories of @file{$@{builddir@}/out/docs}.  The hierarchy of
+subdirectories mirrors that of @file{CS/docs} where the master copies of these
+documents are kept.
 
 @node Mailing Lists, Internet Relay Chat (IRC), Where to Get, CS Introduction
 @section Mailing Lists
