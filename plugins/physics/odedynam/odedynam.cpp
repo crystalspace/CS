@@ -1099,7 +1099,8 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
   dSpaceID space = dynsys->GetSpaceID();
   dGeomID id = dCreatePlane (space, -plane.A(), -plane.B(), -plane.C(), plane.D());
 
-  dGeomSetBody (id, bodyID);
+  //causes non=placeable geom run-time error w/debug build of ode.
+  //dGeomSetBody (id, bodyID); 
 
   float *f = new float[3];
   f[0] = friction;

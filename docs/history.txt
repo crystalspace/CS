@@ -17,6 +17,8 @@ chronological order.
 	- Eric Sunshine fixed glosx2d makefile and Jamfile so that the plugin
 	  now links against csgeom.  This is necessary as a result of recent
 	  changes (probably the recent work on the font caching machinery).
+	- Troy in odedynam.cpp removed call to dGeomSetBody in 
+	  AttachColliderPlane to prevent 'non-placeable geom' error.
 16-Aug-2003
 	- Jorrit added more features with references to parts of the
 	  documentation.
