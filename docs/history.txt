@@ -51,6 +51,7 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine removed the dead cygnus.mak makefile.
 	- Eric Sunshine eliminated several compilation warnings from
 	  crysball.cpp.
+	- Eric Sunshine added missing RequestPlugin(FontServer) to simplep.cpp.
 5-Dec-2000
 	- Wouter Wijngaards created csBox3::SquaredOriginDist which returns
 	  a float with the squared distance of the box to (0,0,0). It
