@@ -55,10 +55,10 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
   DemoSequenceManager::demo = demo;
   demoseq = this;
   iObjectRegistry* object_reg = demo->object_reg;
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   seqmgr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.sequence",
   	iSequenceManager);
-  plugin_mgr->DecRef ();
   if (!seqmgr)
   {
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -70,7 +70,6 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
   fade_value = 0;
   suspended = true;
   suspend_one_frame = false;
-  main_sequence = NULL;
 }
 
 DemoSequenceManager::~DemoSequenceManager ()
@@ -83,8 +82,6 @@ DemoSequenceManager::~DemoSequenceManager ()
     delete np;
   }
   paths.DeleteAll ();
-  if (seqmgr) seqmgr->DecRef ();
-  if (main_sequence) main_sequence->DecRef ();
 }
 
 void DemoSequenceManager::Clear ()
@@ -100,7 +97,6 @@ void DemoSequenceManager::Clear ()
   for (i = 0 ; i < meshRotation.Length () ; i++)
   {
     MeshRotation* mrot = (MeshRotation*)meshRotation[i];
-    if (mrot->particle) mrot->particle->DecRef ();
     delete mrot;
   }
   meshRotation.DeleteAll ();
@@ -108,11 +104,9 @@ void DemoSequenceManager::Clear ()
 
 void DemoSequenceManager::Setup (const char* sequenceFileName)
 {
-  if (main_sequence) main_sequence->DecRef ();
   DemoSequenceLoader* loader = new DemoSequenceLoader (
   	DemoSequenceManager::demo, this, seqmgr, sequenceFileName);
   main_sequence = loader->GetSequence ("main");
-  main_sequence->IncRef ();
   seqmgr->RunSequence (0, main_sequence);
   seqmgr->Resume ();
   suspended = false;
@@ -149,7 +143,7 @@ void DemoSequenceManager::Restart (const char* sequenceFileName)
     delete np;
   }
   paths.DeleteAll ();
-  if (main_sequence) { main_sequence->DecRef (); main_sequence = NULL; }
+  main_sequence = NULL;
   do_fade = false;
   fade_value = 0;
   suspended = true;
@@ -351,7 +345,6 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
     MeshRotation* mrot = (MeshRotation*)meshRotation[i];
     if (current_time > mrot->start_time + mrot->total_time)
     {
-      if (mrot->particle) mrot->particle->DecRef ();
       delete mrot;
       meshRotation.Delete (i);
       len--;

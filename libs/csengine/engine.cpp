@@ -2486,7 +2486,7 @@ csPtr<iStatLight> csEngine::CreateLight (
   return csPtr<iStatLight> (il);
 }
 
-iDynLight *csEngine::CreateDynLight (
+csPtr<iDynLight> csEngine::CreateDynLight (
   const csVector3 &pos,
   float radius,
   const csColor &color)
@@ -2503,7 +2503,7 @@ iDynLight *csEngine::CreateDynLight (
 
   iDynLight *il = SCF_QUERY_INTERFACE (light, iDynLight);
   il->DecRef ();
-  return il;
+  return csPtr<iDynLight> (il);
 }
 
 void csEngine::RemoveDynLight (iDynLight *light)

@@ -79,12 +79,9 @@ csRotatingObject::csRotatingObject (iObject* p)
   tparent = p;
   angles.Set (90, 0, 0);
   remaining = 0;
-  iMeshWrapper *mw = SCF_QUERY_INTERFACE (p, iMeshWrapper);
+  csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (p, iMeshWrapper));
   if (mw)
-  {
     movable = mw->GetMovable ();
-    mw->DecRef ();
-  }
 }
 
 void csRotatingObject::Activate ()

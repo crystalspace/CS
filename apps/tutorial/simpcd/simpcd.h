@@ -38,21 +38,21 @@ class Simple
 {
 private:
   iObjectRegistry* object_reg;
-  iEngine* engine;
-  iLoader* loader;
-  iGraphics3D* g3d;
-  iKeyboardDriver* kbd;
-  iVirtualClock* vc;
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
   iSector* room;
-  iView* view;
-  iCollideSystem* cdsys;
+  csRef<iView> view;
+  csRef<iCollideSystem> cdsys;
 
-  iMeshWrapper* parent_sprite;
+  csRef<iMeshWrapper> parent_sprite;
   float rot1_direction;
-  iMeshWrapper* sprite1;
+  csRef<iMeshWrapper> sprite1;
   iCollider* sprite1_col;
   float rot2_direction;
-  iMeshWrapper* sprite2;
+  csRef<iMeshWrapper> sprite2;
   iCollider* sprite2_col;
 
   static bool SimpleEventHandler (iEvent& ev);
@@ -65,7 +65,7 @@ public:
   Simple ();
   ~Simple ();
 
-  bool Initialize (int argc, const char* const argv[]);
+  bool Initialize (iObjectRegistry* object_reg);
   void Start ();
 };
 

@@ -125,9 +125,9 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   char buf[50];
   sprintf (buf, "r%d_%d_%d", x, y, z);
   iSector* room = engine->CreateSector (buf);
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState));
   float dx, dy, dz;
   dx = 2.0*(float)x;
   dy = 2.0*(float)y;
@@ -149,13 +149,12 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   create_one_side (walls_state, "c", t, t2, dx-s,dy+s,dz-s,  dx+s,dy+s,dz-s,
 		   dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-.1,0);
 
-  iStatLight* light = engine->CreateLight ("",
+  csRef<iStatLight> light (engine->CreateLight ("",
   	csVector3 (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s)),
 	1+rand1 (3),
   	csColor (rand1 (1), rand1 (1), rand1 (1)),
-	false);
+	false));
   room->GetLights ()->Add (light->QueryLight ());
-  light->DecRef ();
 
   InfRoomData* ird = new InfRoomData ();
   ird->x = x;
@@ -168,8 +167,6 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   csDataObject* irddata = new csDataObject (ird);
   room->QueryObject ()->ObjAdd (irddata);
   irddata->DecRef ();
-  walls->DecRef ();
-  walls_state->DecRef ();
 
   return ird;
 }
@@ -207,14 +204,13 @@ InfPortalCS::InfPortalCS ()
 
 bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
 {
-  iFrustumView* fv;
+  csRef<iFrustumView> fv;
   if (context) fv = SCF_QUERY_INTERFACE (context, iFrustumView);
-  else fv = NULL;
   if (fv)
   {
     iFrustumViewUserdata* ud = fv->GetUserdata ();
-    iLightingProcessInfo* linfo = SCF_QUERY_INTERFACE (ud,
-    	iLightingProcessInfo);
+    csRef<iLightingProcessInfo> linfo (SCF_QUERY_INTERFACE (ud,
+    	iLightingProcessInfo));
     if (linfo)
     {
       if (false && !linfo->IsDynamic ())
@@ -228,9 +224,7 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
         // Make a copy of the current context and remember it.
         lv->ctxt = fv->CopyFrustumContext ();
       }
-      linfo->DecRef ();
     }
-    fv->DecRef ();
     return false;
   }
   else
@@ -251,25 +245,19 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
     for (i = 0 ; i < ml->GetCount () ; i++)
     {
       iMeshWrapper* mesh = ml->Get (i);
-      iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-      	iLightingInfo);
+      csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+      	iLightingInfo));
       if (linfo)
-      {
         linfo->InitializeDefault ();
-	linfo->DecRef ();
-      }
     }
     s->ShineLights ();
     for (i = 0 ; i < ml->GetCount () ; i++)
     {
       iMeshWrapper* mesh = ml->Get (i);
-      iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-      	iLightingInfo);
+      csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+      	iLightingInfo));
       if (linfo)
-      {
         linfo->PrepareLighting ();
-	linfo->DecRef ();
-      }
     }
 
     while (lviews)
@@ -287,14 +275,13 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
       delete lviews;
       lviews = n;
     }
-    iPolygonMesh* mesh = SCF_QUERY_INTERFACE (ird->walls->GetMeshObject (),
-  	iPolygonMesh);
-    iObject* io = SCF_QUERY_INTERFACE (ird->walls, iObject);
-    csColliderWrapper *cw = new csColliderWrapper (io, Sys->collide_system, mesh);
+    csRef<iPolygonMesh> mesh (SCF_QUERY_INTERFACE (ird->walls->GetMeshObject (),
+  	iPolygonMesh));
+    csRef<iObject> io (SCF_QUERY_INTERFACE (ird->walls, iObject));
+    csColliderWrapper *cw = new csColliderWrapper (
+    	io, Sys->collide_system, mesh);
     cw->SetName ("inf maze");
     cw->DecRef ();
-    io->DecRef ();
-    mesh->DecRef ();
     return true;
   }
 }

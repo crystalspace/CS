@@ -88,8 +88,8 @@ CS_IMPLEMENT_APPLICATION
 #if defined(BLOCKS_NETWORKING)
 static bool do_network = false;
 // Maybe move these into Blocks class.
-static iNetworkListener* Listener = NULL;
-static iNetworkConnection* Connection = NULL;
+static csRef<iNetworkListener> Listener;
+static csRef<iNetworkConnection> Connection;
 // static long LastAcceptTime = 0;
 static long LastConnectTime = 0;
 #endif
@@ -101,11 +101,10 @@ void Blocks::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.application.blocks", msg, arg);
-    rep->DecRef ();
   }
   else
   {
@@ -324,17 +323,6 @@ char* TextEntryMenu::GetSelectedEntry ()
 //-----------------------------------------------------------------------------
 Blocks::Blocks ()
 {
-  vc = NULL;
-  engine = NULL;
-  view = NULL;
-  LevelLoader = NULL;
-  myG2D = NULL;
-  myG3D = NULL;
-  myVFS = NULL;
-  myNetDrv = NULL;
-  backsound = NULL;
-  thing_type = NULL;
-
   full_rotate_x = create_rotate_x (HALF_PI);
   full_rotate_y = create_rotate_y (HALF_PI);
   full_rotate_z = create_rotate_z (HALF_PI);
@@ -375,7 +363,6 @@ Blocks::Blocks ()
 
   initscreen = true;
   screen = SCREEN_STARTUP;
-  dynlight = NULL;
 
 #if defined(BLOCKS_NETWORKING)
   // Network stuff.
@@ -402,43 +389,15 @@ Blocks::Blocks ()
   menu_hor_new_x_dst = 0.0;
 
   menu_hor_old_menu = NULL;
-  cube_tmpl = NULL;
-  hrast_tmpl = NULL;
-  vrast_tmpl = NULL;
-  pillar_tmpl = NULL;
-  for (int i=0; i < MAX_MENUS; i++) src_menus[i] = NULL;
-  arrow_left = arrow_right = NULL;
 }
 
 Blocks::~Blocks ()
 {
-  if (arrow_left) arrow_left->DecRef ();
-  if (arrow_right) arrow_right->DecRef ();
-  if (cube_tmpl) cube_tmpl->DecRef ();
-  if (hrast_tmpl) hrast_tmpl->DecRef ();
-  if (vrast_tmpl) vrast_tmpl->DecRef ();
-  if (pillar_tmpl) pillar_tmpl->DecRef ();
-  if (dynlight) dynlight->DecRef ();
-  if (thing_type) thing_type->DecRef ();
-  if (engine)
-  {
-    engine->DeleteAll ();
-    engine->DecRef ();
-  }
-  if (view) view->DecRef ();
-  if (vc) vc->DecRef ();
   delete keyconf_menu;
   delete player1;
 #if defined(BLOCKS_NETWORKING)
   TerminateConnection();
 #endif
-  SCF_DEC_REF (font);
-  if (LevelLoader) LevelLoader->DecRef();
-  if (myNetDrv) myNetDrv->DecRef ();
-  if (myG2D) myG2D->DecRef ();
-  if (myG3D) myG3D->DecRef ();
-  if (myVFS) myVFS->DecRef ();
-  if (backsound) backsound->Stop ();
 }
 
 static bool BlocksEventHandler (iEvent& ev)
@@ -491,8 +450,8 @@ void Blocks::InitGame ()
 
 static void reset_vertex_colors (iMeshWrapper* th)
 {
-  iThingState* thing_state = SCF_QUERY_INTERFACE (th->GetMeshObject (),
-  	iThingState);
+  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (th->GetMeshObject (),
+  	iThingState));
   int i;
   for (i = 0 ; i < thing_state->GetPolygonCount () ; i++)
   {
@@ -500,7 +459,6 @@ static void reset_vertex_colors (iMeshWrapper* th)
     p->UpdateVertexLighting (NULL, csColor (0, 0, 0), true, true);
     p->UpdateVertexLighting (NULL, csColor (0, 0, 0), false, true);
   }
-  thing_state->DecRef ();
 }
 
 csMatrix3 Blocks::create_rotate_x (float angle)
@@ -548,30 +506,30 @@ iPolygon3D* add_polygon_template (iThingState* tmpl,
   return p;
 }
 
-static iMeshFactoryWrapper* CreateMeshFactoryWrapper (
+static csRef<iMeshFactoryWrapper> CreateMeshFactoryWrapper (
 	const char* name)
 {
   csRef<iMeshObjectFactory> thing_fact (Sys->thing_type->NewFactory ());
-  iMeshFactoryWrapper *wrap = Sys->engine->CreateMeshFactory (name);
+  csRef<iMeshFactoryWrapper> wrap = Sys->engine->CreateMeshFactory (name);
   wrap->SetMeshObjectFactory (thing_fact);
   return wrap;
 }
 
-static iMeshWrapper* CreateMeshWrapper (const char* name)
+static csRef<iMeshWrapper> CreateMeshWrapper (const char* name)
 {
   csRef<iMeshObjectFactory> thing_fact (Sys->thing_type->NewFactory ());
   csRef<iMeshObject> mesh_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
 
-  iMeshWrapper *wrap = Sys->engine->CreateMeshWrapper (name);
+  csRef<iMeshWrapper> wrap (Sys->engine->CreateMeshWrapper (name));
   wrap->SetMeshObject (mesh_obj);
   return wrap;
 }
 
-static iMeshWrapper* CreateMeshFromFactory (iMeshFactoryWrapper* fact,
+static csRef<iMeshWrapper> CreateMeshFromFactory (iMeshFactoryWrapper* fact,
 	const char* name)
 {
   csRef<iMeshObject> mesh_obj (fact->GetMeshObjectFactory ()->NewInstance ());
-  iMeshWrapper *wrap = Sys->engine->CreateMeshWrapper (name);
+  csRef<iMeshWrapper> wrap (Sys->engine->CreateMeshWrapper (name));
   wrap->SetMeshObject (mesh_obj);
   return wrap;
 }
@@ -581,8 +539,8 @@ void Blocks::add_pillar_template ()
 {
   pillar_tmpl = CreateMeshFactoryWrapper ("pillar");
   float dim = CUBE_DIM/2.;
-  iThingState* thing_state = SCF_QUERY_INTERFACE (
-  	pillar_tmpl->GetMeshObjectFactory (), iThingState);
+  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (
+  	pillar_tmpl->GetMeshObjectFactory (), iThingState));
   thing_state->CreateVertex (csVector3 (-dim, 0, dim));
   thing_state->CreateVertex (csVector3 (dim, 0, dim));
   thing_state->CreateVertex (csVector3 (dim, 0, -dim));
@@ -632,16 +590,14 @@ void Blocks::add_pillar_template ()
   csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (6), thing_state->GetVertex (5), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
-
-  thing_state->DecRef ();
 }
 
 void Blocks::add_vrast_template ()
 {
   vrast_tmpl = CreateMeshFactoryWrapper ("vrast");
   float dim = RAST_DIM;
-  iThingState* thing_state = SCF_QUERY_INTERFACE (
-  	vrast_tmpl->GetMeshObjectFactory (), iThingState);
+  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (
+  	vrast_tmpl->GetMeshObjectFactory (), iThingState));
   thing_state->CreateVertex (csVector3 (-dim, 0, dim));
   thing_state->CreateVertex (csVector3 (dim, 0, dim));
   thing_state->CreateVertex (csVector3 (-dim, ZONE_HEIGHT*CUBE_DIM, dim));
@@ -667,15 +623,14 @@ void Blocks::add_vrast_template ()
 	norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 #endif
-  thing_state->DecRef ();
 }
 
 void Blocks::add_hrast_template ()
 {
   hrast_tmpl = CreateMeshFactoryWrapper ("hrast");
   float dim = RAST_DIM;
-  iThingState* thing_state = SCF_QUERY_INTERFACE (
-  	hrast_tmpl->GetMeshObjectFactory (), iThingState);
+  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (
+  	hrast_tmpl->GetMeshObjectFactory (), iThingState));
 
   thing_state->CreateVertex (csVector3 ((-(float)ZONE_DIM/2.)*CUBE_DIM,
   	.02, -dim));
@@ -706,13 +661,11 @@ void Blocks::add_hrast_template ()
 	norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 #endif
-
-  thing_state->DecRef ();
 }
 
 void Blocks::add_pillar (int x, int y)
 {
-  iMeshWrapper* pillar = CreateMeshFromFactory (pillar_tmpl, "pillar");
+  csRef<iMeshWrapper> pillar (CreateMeshFromFactory (pillar_tmpl, "pillar"));
   pillar->GetMovable ()->SetSector (room);
 
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0,
@@ -720,53 +673,50 @@ void Blocks::add_pillar (int x, int y)
   pillar->HardTransform (csTransform (csMatrix3 (), v));
   pillar->GetMovable ()->SetSector (room);
   pillar->GetMovable ()->UpdateMove ();
-  pillar->DecRef ();
 }
 
 void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
 {
-  iMeshWrapper* vrast = CreateMeshFromFactory (vrast_tmpl, "vrast");
+  csRef<iMeshWrapper> vrast (CreateMeshFromFactory (vrast_tmpl, "vrast"));
   vrast->GetMovable ()->SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
   vrast->HardTransform (csTransform (rot, v));
   vrast->GetMovable ()->UpdateMove ();
-  vrast->DecRef ();
 }
 
 void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
 {
-  iMeshWrapper* hrast = CreateMeshFromFactory (hrast_tmpl, "hrast");
+  csRef<iMeshWrapper> hrast (CreateMeshFromFactory (hrast_tmpl, "hrast"));
   hrast->GetMovable ()->SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
   hrast->HardTransform (csTransform (rot, v));
   hrast->GetMovable ()->UpdateMove ();
-  hrast->DecRef ();
 }
 
 void Blocks::ChangeThingMaterial (iMeshWrapper* thing,
 	iMaterialWrapper* mat)
 {
-  iThingState* thing_state = SCF_QUERY_INTERFACE (thing->GetMeshObject (),
-  	iThingState);
+  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (thing->GetMeshObject (),
+  	iThingState));
   int i;
   for (i = 0 ; i < thing_state->GetPolygonCount () ; i++)
   {
     iPolygon3D* p = thing_state->GetPolygon (i);
     p->SetMaterial (mat);
   }
-  thing_state->DecRef ();
 }
 
 void Blocks::add_cube_template ()
 {
   float dim = CUBE_DIM/2.;
   cube_tmpl = CreateMeshFactoryWrapper ("cube");
-  iThingState* cube_state = SCF_QUERY_INTERFACE (cube_tmpl->GetMeshObjectFactory (),
-  	iThingState);
+  csRef<iThingState> cube_state (
+  	SCF_QUERY_INTERFACE (cube_tmpl->GetMeshObjectFactory (),
+  	iThingState));
   cube_state->CreateVertex (csVector3 (-dim, -dim, dim));
   cube_state->CreateVertex (csVector3 (dim, -dim, dim));
   cube_state->CreateVertex (csVector3 (dim, -dim, -dim));
@@ -809,8 +759,6 @@ void Blocks::add_cube_template ()
   p->SetTextureSpace (tx_matrix, tx_vector);
   p = add_polygon_template (cube_state, "r2", cube_mat, 6, 1, 2);
   p->SetTextureSpace (tx_matrix, tx_vector);
-
-  cube_state->DecRef ();
 }
 
 void set_uv (iPolygon3D* p, float u1, float v1, float u2, float v2,
@@ -818,28 +766,26 @@ void set_uv (iPolygon3D* p, float u1, float v1, float u2, float v2,
 {
   p->SetTextureType (POLYTXT_GOURAUD);
   iPolyTexType* ptt = p->GetPolyTexType ();
-  iPolyTexGouraud* gs = SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud);
-  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
+  csRef<iPolyTexGouraud> gs (SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud));
+  csRef<iPolyTexFlat> fs (SCF_QUERY_INTERFACE (ptt, iPolyTexFlat));
   gs->Setup (p);
   fs->SetUV (0, u1, v1);
   fs->SetUV (1, u2, v2);
   fs->SetUV (2, u3, v3);
-  fs->DecRef ();
-  gs->DecRef ();
 }
 
 // dx,dy,dz are logical coordinates (Z vertical).
-iMeshWrapper* Blocks::create_cube_thing (float dx, float dy, float dz,
+csRef<iMeshWrapper> Blocks::create_cube_thing (float dx, float dy, float dz,
 	iMeshFactoryWrapper* tmpl)
 {
-  iMeshWrapper* cube = CreateMeshFromFactory (tmpl, "cubexxx");
+  csRef<iMeshWrapper> cube (CreateMeshFromFactory (tmpl, "cubexxx"));
   cube->GetMovable ()->SetSector (room);
   csVector3 shift (
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
 	(dy-shift_rotate.y)*CUBE_DIM);
-  iThingState* thing_state = SCF_QUERY_INTERFACE (cube->GetMeshObject (),
-  	iThingState);
+  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (cube->GetMeshObject (),
+  	iThingState));
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL); // @@@ should be OFTEN!
 
   iPolygon3D* p;
@@ -856,7 +802,6 @@ iMeshWrapper* Blocks::create_cube_thing (float dx, float dy, float dz,
   p = thing_state->GetPolygon ("r1"); set_uv (p, 0, 0, 1, 0, 1, 1);
   p = thing_state->GetPolygon ("r2"); set_uv (p, 0, 0, 1, 1, 0, 1);
 
-  thing_state->DecRef ();
   cube->HardTransform (csTransform (csMatrix3 (), shift));//@@@@@@@@@@@@@@
   return cube;
 }
@@ -865,38 +810,35 @@ iMeshWrapper* Blocks::create_cube_thing (float dx, float dy, float dz,
 void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z,
 	iMeshFactoryWrapper* tmpl)
 {
-  iMeshWrapper* cube = add_cube_thing (room, dx, dy, dz,
+  csRef<iMeshWrapper> cube (add_cube_thing (room, dx, dy, dz,
   	(x-(player1->zone_dim)/2+shift_rotate.x)*CUBE_DIM,
 	(z+shift_rotate.z)*CUBE_DIM+CUBE_DIM/2,
-  	(y-(player1->zone_dim)/2+shift_rotate.y)*CUBE_DIM, tmpl);
+  	(y-(player1->zone_dim)/2+shift_rotate.y)*CUBE_DIM, tmpl));
   cube_info[num_cubes].thing = cube;
   cube_info[num_cubes].dx = dx;
   cube_info[num_cubes].dy = dy;
   cube_info[num_cubes].dz = dz;
   num_cubes++;
-  cube->DecRef ();
 }
 
 // dx,dy,dz are logical coordinates (Z vertical).
 // x,y,z are physical coordinates (Y vertical).
-iMeshWrapper* Blocks::add_cube_thing (iSector* sect,
+csRef<iMeshWrapper> Blocks::add_cube_thing (iSector* sect,
 	float dx, float dy, float dz,
 	float x, float y, float z, iMeshFactoryWrapper* tmpl)
 {
-  iMeshWrapper* cube = create_cube_thing (dx, dy, dz, tmpl);
-  iThingState* cube_state = SCF_QUERY_INTERFACE (cube->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> cube (create_cube_thing (dx, dy, dz, tmpl));
+  csRef<iThingState> cube_state (SCF_QUERY_INTERFACE (cube->GetMeshObject (),
+  	iThingState));
   cube->GetMovable ()->SetSector (sect);
   csVector3 v (x, y, z);
   cube->GetMovable ()->SetPosition (sect, v);
   cube->GetMovable ()->UpdateMove ();
-  cube_state->DecRef ();
-  iLightingInfo* linfo = SCF_QUERY_INTERFACE (cube->GetMeshObject (),
-  	iLightingInfo);
+  csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (cube->GetMeshObject (),
+  	iLightingInfo));
   linfo->InitializeDefault ();
   room->ShineLights (cube);
   linfo->PrepareLighting ();
-  linfo->DecRef ();
   return cube;
 }
 
@@ -1053,70 +995,70 @@ void Blocks::start_demo_shape (BlShapeType type, float x, float y, float z)
   switch (type)
   {
     case SHAPE_DEMO_B:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl);
       break;
     case SHAPE_DEMO_L:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0,  -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0,  -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  -2, x, y, z, cube_tmpl);
       break;
     case SHAPE_DEMO_O:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
       break;
     case SHAPE_DEMO_C:
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
       break;
     case SHAPE_DEMO_K:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0, -1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0,  1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
       break;
     case SHAPE_DEMO_S:
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
       break;
     default: break;
   }
@@ -1505,11 +1447,10 @@ void Blocks::HandleDemoKey (int key, bool /*shf*/, bool /*alt*/, bool /*ctl*/)
 	  // Finish networking stuff.
 #endif
 	  iObjectRegistry* object_reg = Sys->object_reg;
-	  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+	  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
 	  if (q)
 	  {
 	    q->GetEventOutlet()->Broadcast (cscmdQuit);
-	    q->DecRef ();
 	  }
 	  break;
       }
@@ -1991,9 +1932,10 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 {
   iMaterialWrapper* tm_front = engine->GetMaterialList ()->FindByName (mat);
 
-  iMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
-  iThingState* thing_state = SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper ("menu"));
+  csRef<iThingState> thing_state (
+  	SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
+  	iThingState));
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
   thing_state->CreateVertex (csVector3 (-1, .25, 0));
@@ -2021,19 +1963,18 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
   p->SetTextureSpace (tx_matrix, tx_vector);
   set_uv (p, 1, 0, 1, 1, 0, 1);
 
-  thing_state->DecRef ();
-
   src_menus[menu_nr] = thing_wrap;
-  thing_wrap->DecRef ();
 }
 
-iMeshWrapper* Blocks::CreateMenuArrow (bool left)
+csRef<iMeshWrapper> Blocks::CreateMenuArrow (bool left)
 {
-  iMaterialWrapper* tm_front = engine->GetMaterialList ()->FindByName ("menu_back");
+  iMaterialWrapper* tm_front = engine->GetMaterialList ()
+  	->FindByName ("menu_back");
 
-  iMeshWrapper* thing_wrap = CreateMeshWrapper ("menu");
-  iThingState* thing_state = SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper ("menu"));
+  csRef<iThingState> thing_state (
+  	SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
+  	iThingState));
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
   float pointx;
@@ -2073,7 +2014,6 @@ iMeshWrapper* Blocks::CreateMenuArrow (bool left)
   }
   p->SetTextureSpace (tx_matrix, tx_vector);
   set_uv (p, 0, 0, 1, 0, 0, 1);
-  thing_state->DecRef ();
 
   return thing_wrap;
 }
@@ -2121,25 +2061,19 @@ void Blocks::ChangePlaySize (int new_size)
   for (i = 0 ; i < ml->GetCount () ; i++)
   {
     iMeshWrapper* mesh = ml->Get (i);
-    iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-    	iLightingInfo);
+    csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iLightingInfo));
     if (linfo)
-    {
       linfo->InitializeDefault ();
-      linfo->DecRef ();
-    }
   }
   room->ShineLights ();
   for (i = 0 ; i < ml->GetCount () ; i++)
   {
     iMeshWrapper* mesh = ml->Get (i);
-    iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-    	iLightingInfo);
+    csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iLightingInfo));
     if (linfo)
-    {
       linfo->PrepareLighting ();
-      linfo->DecRef ();
-    }
   }
 }
 
@@ -2178,9 +2112,10 @@ void Blocks::InitGameRoom ()
 {
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("room");
   room = Sys->engine->CreateSector ("room");
-  iMeshWrapper* walls = Sys->engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (
+  	Sys->engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState));
   Sys->set_cube_room (room);
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
@@ -2222,8 +2157,6 @@ void Blocks::InitGameRoom ()
   p->CreateVertex (csVector3 (-5, 0, -5));
   p->CreateVertex (csVector3 (5, 0, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-  walls_state->DecRef ();
-  walls->DecRef ();
 
   Sys->add_cube_template ();
   Sys->add_pillar_template ();
@@ -2279,9 +2212,10 @@ void Blocks::InitDemoRoom ()
 {
   iMaterialWrapper* demo_tm = engine->GetMaterialList ()->FindByName ("clouds");
   demo_room = Sys->engine->CreateSector ("room");
-  iMeshWrapper* walls = Sys->engine->CreateSectorWallsMesh (demo_room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (
+  	Sys->engine->CreateSectorWallsMesh (demo_room, "walls"));
+  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState));
 
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
@@ -2291,9 +2225,6 @@ void Blocks::InitDemoRoom ()
   p->CreateVertex (csVector3 (50, -50, 50));
   p->CreateVertex (csVector3 (-50, -50, 50));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 100);
-
-  walls_state->DecRef ();
-  walls->DecRef ();
 
   csRef<iStatLight> light;
   light = engine->CreateLight (NULL, csVector3 (0, 0, -2),
@@ -2333,20 +2264,16 @@ void Blocks::InitEngine ()
   InitDemoRoom ();
   Sys->engine->Prepare ();
 
-  iSoundRender *snd = CS_QUERY_REGISTRY (object_reg, iSoundRender);
+  csRef<iSoundRender> snd (CS_QUERY_REGISTRY (object_reg, iSoundRender));
   if (snd)
   {
     // Load the blocks.zip library where sound refs are stored
     LevelLoader->LoadLibraryFile ("/data/blocks/Library");
 
-    iSoundWrapper* w = CS_GET_NAMED_CHILD_OBJECT (
-      engine->QueryObject (), iSoundWrapper, "background.wav");
+    csRef<iSoundWrapper> w (CS_GET_NAMED_CHILD_OBJECT (
+      engine->QueryObject (), iSoundWrapper, "background.wav"));
     if (w)
-    {
-      backsound = w->GetSound ()->Play (true);
-      w->DecRef ();
-    }
-    snd->DecRef ();
+      backsound = csPtr<iSoundSource> (w->GetSound ()->Play (true));
   }
 }
 
@@ -2358,7 +2285,6 @@ void Blocks::StartDemo ()
   dynlight_y = 3;
   dynlight_z = 0;
   dynlight_dx = 3;
-  if (dynlight) dynlight->DecRef ();
   dynlight = Sys->engine->CreateDynLight (
     csVector3(dynlight_x, dynlight_y, dynlight_z), 7, csColor(3, 0, 0));
   dynlight->QueryLight ()->SetSector (demo_room);
@@ -2396,7 +2322,6 @@ void Blocks::StartNewGame ()
   if (player1->new_zone_dim != player1->zone_dim)
     ChangePlaySize (player1->new_zone_dim);
 
-  if (dynlight) dynlight->DecRef ();
   dynlight = NULL;
 
   // First delete all cubes that may still be in the engine.
@@ -2408,7 +2333,6 @@ void Blocks::StartNewGame ()
     if (!strncmp (cube->QueryObject ()->GetName (), "cube", 4))
     {
       ml->Remove (cube);
-      //cube->DecRef ();
     }
     else
       i++;
@@ -2537,9 +2461,8 @@ void Blocks::HandleLoweringPlanes (csTicks elapsed_time)
           t->GetMovable ()->MovePosition (csVector3 (0, -elapsed_fall, 0));
           t->GetMovable ()->UpdateMove ();
           reset_vertex_colors (t);
-	  iMeshWrapper* it = SCF_QUERY_INTERFACE (t, iMeshWrapper);
+	  csRef<iMeshWrapper> it (SCF_QUERY_INTERFACE (t, iMeshWrapper));
           room->ShineLights (it);
-	  it->DecRef ();
 	}
       }
 }
@@ -2601,7 +2524,7 @@ void Blocks::SetupFrame ()
         {
           LastConnectTime = System->Time();
 
-          Connection = Listener->Accept();
+          Connection = csPtr<iNetworkConnection> (Listener->Accept());
 	  // These slow down blocks too much.
 	  if (Connection != NULL)
 	    Report (CS_REPORTER_SEVERITY_NOTIFY, "Connection accepted");
@@ -2882,7 +2805,7 @@ const char* Blocks::KeyName (const KeyMapping& map)
 void Blocks::ReadConfig ()
 {
   iObjectRegistry* object_reg = Sys->object_reg;
-  iConfigFile* keys = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csRef<iConfigFile> keys (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   NamedKey (keys->GetStr ("Blocks.Keys.Up", "up"), key_up);
   NamedKey (keys->GetStr ("Blocks.Keys.Down", "down"), key_down);
   NamedKey (keys->GetStr ("Blocks.Keys.Left", "left"), key_left);
@@ -2912,24 +2835,24 @@ void Blocks::ReadConfig ()
       char key[50];
       for (i = 0 ; i < 10 ; i++)
       {
-        sprintf (key, "Blocks.HighScores.Score%d_%dx%d_%d", level, size, size, i);
+        sprintf (key, "Blocks.HighScores.Score%d_%dx%d_%d",
+		level, size, size, i);
         highscores[level][size-3].Set (i, keys->GetInt (key, -1));
-        sprintf (key, "Blocks.HighScores.Name%d_%dx%d_%d", level, size, size, i);
-        highscores[level][size-3].SetName (i,
-	  keys->GetStr (key, NULL));
+        sprintf (key, "Blocks.HighScores.Name%d_%dx%d_%d",
+		level, size, size, i);
+        highscores[level][size-3].SetName (i, keys->GetStr (key, NULL));
       }
     }
 #if defined(BLOCKS_NETWORKING)
   // Network stuff.
   IsServer = Config->GetYesNo ("Blocks.Network.Server", false);
 #endif
-  keys->DecRef ();
 }
 
 void Blocks::WriteConfig ()
 {
   iObjectRegistry* object_reg = Sys->object_reg;
-  iConfigFile* keys = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csRef<iConfigFile> keys (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   keys->SetStr ("Blocks.Keys.Up", KeyName (key_up));
   keys->SetStr ("Blocks.Keys.Down", KeyName (key_down));
   keys->SetStr ("Blocks.Keys.Left", KeyName (key_left));
@@ -2959,14 +2882,15 @@ void Blocks::WriteConfig ()
       for (i = 0 ; i < 10 ; i++)
         if (highscores[level][size-3].Get (i) != -1)
         {
-          sprintf (key, "Blocks.HighScores.Score%d_%dx%d_%d", level, size, size, i);
+          sprintf (key, "Blocks.HighScores.Score%d_%dx%d_%d",
+	  	level, size, size, i);
           keys->SetInt (key, highscores[level][size-3].Get (i));
-          sprintf (key, "Blocks.HighScores.Name%d_%dx%d_%d", level, size, size, i);
+          sprintf (key, "Blocks.HighScores.Name%d_%dx%d_%d",
+	  	level, size, size, i);
 	  keys->SetStr(key,highscores[level][size-3].GetName (i));
         }
     }
   keys->Save ();
-  keys->DecRef ();
 }
 
 // -----------------------------------------------------------------
@@ -3022,7 +2946,6 @@ void Blocks::ClientCheckConnection()
     if (err != CS_NET_ERR_NO_ERROR)
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Receive error %d", err);
-      Connection->DecRef();
       Connection = NULL;
     }
   }
@@ -3060,7 +2983,6 @@ void Blocks::ServerCheckConnection()
     if (err != CS_NET_ERR_NO_ERROR)
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Receive error %d", err);
-      Connection->DecRef();
       Connection = NULL;
     }
 
@@ -3092,7 +3014,8 @@ bool Blocks::InitNet()
     const char source[] = "2222";
 
     if (!myNetDrv) return false;
-    Listener = myNetDrv->NewListener (source, true, false, false);
+    Listener = csPtr<iNetworkListener> (
+    	myNetDrv->NewListener (source, true, false, false));
     if (Listener != NULL)
       Report  (CS_REPORTER_SEVERITY_NOTIFY, "Listening on port %s", source);
     else
@@ -3112,10 +3035,10 @@ bool Blocks::InitNet()
 void Blocks::Connect ()
 {
   const char target[] = "localhost:2222";
-  Connection = NULL;
   if (!myNetDrv) return;
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Attempting connection to %s...", target);
-  Connection = myNetDrv->NewConnection(target, true, false);
+  Connection = csPtr<iNetworkConnection> (
+  	myNetDrv->NewConnection(target, true, false));
   if (Connection == NULL)
     Report  (CS_REPORTER_SEVERITY_NOTIFY,"Error %d", myNetDrv->GetLastError());
   else
@@ -3128,13 +3051,11 @@ void Blocks::TerminateConnection()
   if (Connection != NULL)
   {
     Connection->Terminate();
-    Connection->DecRef();
     Connection = NULL;
   }
   if (Listener != NULL)
   {
     Listener->Terminate();
-    Listener->DecRef();
     Listener = NULL;
   }
 }
@@ -3224,13 +3145,13 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   Sys->thing_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.thing", iMeshObjectType);
   if (!Sys->thing_type)
     Sys->thing_type = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.mesh.object.thing", iMeshObjectType);
-  plugin_mgr->DecRef ();
   if (!Sys->thing_type)
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No thing mesh plugin!");
@@ -3241,7 +3162,7 @@ int main (int argc, char* argv[])
   Sys->myNetDrv = CS_QUERY_REGISTRY (object_reg, iNetworkDriver);
 
   // Get a font handle
-  Sys->font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
+  Sys->font = csPtr<iFont> (Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE));
 
   // Get the level loader
   Sys->LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
@@ -3266,7 +3187,7 @@ int main (int argc, char* argv[])
   // manually creating a camera and a clipper but it makes things a little
   // easier.
 
-  Sys->view = new csView (Sys->engine, Gfx3D);
+  Sys->view = csPtr<iView> (new csView (Sys->engine, Gfx3D));
 
   // Create our world.
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
@@ -3275,9 +3196,8 @@ int main (int argc, char* argv[])
   // Change to virtual directory where Blocks data is stored
   //if (!)
 
-  iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csRef<iConfigManager> config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   csString world_file(config->GetStr ("Blocks.Data", "/data/blocks"));
-  config->DecRef ();
   world_file.Append("/");
   if (!Sys->myVFS->Exists (world_file.GetData()))
   {

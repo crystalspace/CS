@@ -72,14 +72,14 @@ void WalkTest::CreateColliders ()
 {
   iPolygon3D *p;
   csRef<iPolygonMesh> mesh;
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iMeshObjectType* ThingType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iMeshObjectType> ThingType (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType));
   if (!ThingType)
     ThingType = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.mesh.object.thing", iMeshObjectType);
 
-  plugin_mgr->DecRef ();
   csRef<iMeshObjectFactory> thing_fact (ThingType->NewFactory ());
   csRef<iMeshObject> mesh_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
   plbody = Engine->CreateMeshWrapper (mesh_obj, "Player's Body");
@@ -130,7 +130,6 @@ void WalkTest::CreateColliders ()
   plbody->GetRadius (body_radius, body_center);
 
   thing_fact = ThingType->NewFactory ();
-  ThingType->DecRef ();
   mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   pllegs = Engine->CreateMeshWrapper (mesh_obj, "Player's Legs");
   thing_state = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
@@ -200,14 +199,13 @@ int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
   int c = 0;
   // @@@ Avoid this sqrt somehow? i.e. by having it in the objects.
   float size = qsqrt (d.x * d.x + d.y * d.y + d.z * d.z);
-  iSectorIterator* it = Sys->Engine->GetNearbySectors (s, v, size);
+  csRef<iSectorIterator> it (Sys->Engine->GetNearbySectors (s, v, size));
   iSector* sector;
   while ((sector = it->Fetch ()) != NULL)
   {
     sa[c++] = sector;
     if (c >= MAXSECTORSOCCUPIED) break;
   }
-  it->DecRef ();
   return c;
 }
 
@@ -220,18 +218,17 @@ int CollisionDetect (iEngine* Engine, csColliderWrapper *c, iSector* sp,
   // Check collision with this sector.
   csCollisionPair* CD_contact;
 
-  iObjectIterator* objit = Engine->GetNearbyObjects (sp,
-	cdt->GetOrigin (), 3);		// 3 should be enough for moving around.
+  csRef<iObjectIterator> objit (Engine->GetNearbyObjects (sp,
+	cdt->GetOrigin (), 3));		// 3 should be enough for moving around.
   while (!objit->IsFinished ())
   {
     iObject* mw_obj = objit->GetObject ();
-    iMeshWrapper* mw = SCF_QUERY_INTERFACE (mw_obj, iMeshWrapper);
+    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (mw_obj, iMeshWrapper));
     if (mw)
     {
       Sys->collide_system->ResetCollisionPairs ();
       if (c->Collide (mw_obj, cdt,
     	  &mw->GetMovable ()->GetTransform ())) hit++;
-      mw->DecRef ();
 
       CD_contact = Sys->collide_system->GetCollisionPairs ();
       for (j=0 ; j<Sys->collide_system->GetCollisionPairCount () ; j++)
@@ -243,7 +240,6 @@ int CollisionDetect (iEngine* Engine, csColliderWrapper *c, iSector* sp,
     }
     objit->Next ();
   }
-  objit->DecRef ();
 
   return hit;
 }
@@ -279,13 +275,10 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
       for (i = 0 ; i < ml->GetCount () ; i++)
       {
 	iMeshWrapper* terrain = ml->Get (i);
-	iTerrFuncState* state = SCF_QUERY_INTERFACE (terrain
-		->GetMeshObject (), iTerrFuncState);
+	csRef<iTerrFuncState> state (SCF_QUERY_INTERFACE (terrain
+		->GetMeshObject (), iTerrFuncState));
 	if (state)
-	{
 	  hits += state->CollisionDetect( &test );
-	  state->DecRef ();
-        }
       }
     }
   }

@@ -13,6 +13,13 @@ The history order is reversed so that new features are at the top.
 	  curly braces.
 	- Eliminated a lot of DecRef()'s in walktest by using
 	  csRef.
+	- iEngine->CreateDynLight() returns a csPtr now.
+	- Removed all calls to DecRef() in Blocks application. Uses
+	  csRef now.
+	- Removed (almost) all calls to DecRef() in csdemo.
+	- Removed all calls to DecRef() in vsh.
+	- Removed all calls to DecRef() in simpcd tutorial.
+	- Removed a few more DecRef() calls in some other apps.
 5-Sep-2002
 	- Fixed a very subtle bug in the csRef assignement operators.
 	  It is very important FIRST to assign the new value to the

@@ -245,11 +245,10 @@ void WalkTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.system", msg, arg);
-    rep->DecRef ();
   }
   else
   {
@@ -261,14 +260,14 @@ void WalkTest::Report (int severity, const char* msg, ...)
 
 void WalkTest::SetDefaults ()
 {
-  iConfigManager* Config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csRef<iConfigManager> Config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   do_fps = Config->GetBool ("Walktest.Settings.FPS", true);
   do_stats = Config->GetBool ("Walktest.Settings.Stats", false);
   do_cd = Config->GetBool ("Walktest.Settings.Colldet", true);
   do_logo = Config->GetBool ("Walktest.Settings.DrawLogo", true);
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
 
   const char *val;
   if (!(val = cmdline->GetName ()))
@@ -365,13 +364,11 @@ void WalkTest::SetDefaults ()
     do_logo = false;
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo disabled.");
   }
-  cmdline->DecRef ();
-  Config->DecRef ();
 }
 
 void WalkTest::Help ()
 {
-  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   printf ("Options for WalkTest:\n");
   printf ("  -exec=<script>     execute given script at startup\n");
   printf ("  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
@@ -382,7 +379,6 @@ void WalkTest::Help ()
   printf ("  -bots              allow random generation of bots\n");
   printf ("  <path>             load map from VFS <path> (default '%s')\n",
         cfg->GetStr ("Walktest.Settings.WorldFile", "world"));
-  cfg->DecRef ();
 }
 
 //-----------------------------------------------------------------------------
@@ -479,15 +475,14 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
   // Move the directional light if any.
   if (anim_dirlight)
   {
-    iTerrFuncState* state = SCF_QUERY_INTERFACE (
+    csRef<iTerrFuncState> state (SCF_QUERY_INTERFACE (
     	anim_dirlight->GetMeshObject (),
-	iTerrFuncState);
+	iTerrFuncState));
     csVector3 pos = state->GetDirLightPosition ();
     csColor col = state->GetDirLightColor ();
     csYRotMatrix3 mat (.05 * TWO_PI * (float)elapsed_time/1000.);
     pos = mat * pos;
     state->SetDirLight (pos, col);
-    state->DecRef ();
   }
   // Animate the psuedo-dynamic light if any.
   if (anim_dynlight)
@@ -1109,16 +1104,17 @@ void CaptureScreen ()
     return;
   }
 
-  iImage *img = Gfx2D->ScreenShot ();
+  csRef<iImage> img (csPtr<iImage> (Gfx2D->ScreenShot ()));
   if (!img)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "The 2D graphics driver does not support screen shots");
     return;
   }
-  iImageIO *imageio = CS_QUERY_REGISTRY (Sys->object_reg, iImageIO);
+  csRef<iImageIO> imageio (CS_QUERY_REGISTRY (Sys->object_reg, iImageIO));
   if (imageio)
   {
-    iDataBuffer *db = imageio->Save (img, "image/png");
+    csRef<iDataBuffer> db (csPtr<iDataBuffer> (
+    	imageio->Save (img, "image/png")));
     if (db)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name);
@@ -1128,11 +1124,8 @@ void CaptureScreen ()
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"There was an error while writing screen shot");
       }
-      db->DecRef ();
     }
-    imageio->DecRef ();
   }
-  img->DecRef ();
 }
 
 /*---------------------------------------------
@@ -1178,7 +1171,7 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
 
-    iPolygonMesh* mesh;
+    csRef<iPolygonMesh> mesh;
     // Initialize all mesh objects for collision detection.
     int i;
     iMeshList* meshes = engine->GetMeshes ();
@@ -1193,7 +1186,6 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 						       collide_system, mesh);
 	cw->SetName (sp->QueryObject ()->GetName());
 	cw->DecRef ();
-	mesh->DecRef ();
       }
     }
   }
@@ -1266,7 +1258,7 @@ bool WalkTest::SetMapDir (const char* map_dir)
 {
   char tmp[512];
   sprintf (tmp, "%s/", map_dir);
-  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   if (!myVFS->Exists (map_dir))
   {
     char *name = strrchr (map_dir, '/');
@@ -1297,7 +1289,6 @@ bool WalkTest::SetMapDir (const char* map_dir)
       myVFS->Mount (map_dir, tmp);
     }
   }
-  cfg->DecRef ();
   if (!myVFS->ChDir (map_dir))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "The directory on VFS for map file does not exist!");
@@ -1383,7 +1374,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Created by Jorrit Tyberghein and others...");
 
   // Get all collision detection and movement config file parameters.
-  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   cfg_jumpspeed = cfg->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08);
   cfg_walk_accelerate = cfg->GetFloat ("Walktest.CollDet.WalkAccelerate", 0.007);
   cfg_walk_maxspeed = cfg->GetFloat ("Walktest.CollDet.WalkMaxSpeed", 0.1);
@@ -1402,7 +1393,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Load the default font name
   const char * cfg_font = cfg->GetStr("Walktest.Font.Default", CSFONT_LARGE);
-  cfg->DecRef ();
 
   #ifdef CS_DEBUG
     // enable all kinds of useful FPU exceptions on a x86

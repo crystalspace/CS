@@ -434,9 +434,9 @@ void load_thing (iSector* sector, csVector3 position,
     return;
   }
 
-  iObjectIterator* it2= Model->QueryObject()->GetIterator();
+  csRef<iObjectIterator> it2 (csPtr<iObjectIterator> (
+  	Model->QueryObject()->GetIterator()));
   GenerateThing(it2,mat,spriteName,sector,position, ParseScaleFactor(it));
-  it2->DecRef();
   Model->DecRef();
 }
 
@@ -2341,13 +2341,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "clrlights"))
   {
     RECORD_CMD (cmd);
-    iLightIterator* lit = Sys->view->GetEngine ()->GetLightIterator ();
+    csRef<iLightIterator> lit (Sys->view->GetEngine ()->GetLightIterator ());
     iLight* l;
     while ((l = lit->Fetch ()) != NULL)
     {
       l->SetColor (csColor (0, 0, 0));
     }
-    lit->DecRef ();
   }
   else if (!strcasecmp (cmd, "setlight"))
   {

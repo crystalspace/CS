@@ -127,7 +127,6 @@ DemoSequenceLoader::~DemoSequenceLoader ()
   {
     NamedSequence* ns = (NamedSequence*)sequences[i];
     delete[] ns->name;
-    if (ns->sequence) ns->sequence->DecRef ();
   }
 }
 
@@ -414,7 +413,7 @@ void DemoSequenceLoader::LoadSequences (iDocumentNode* node)
 	  newseq = seqmgr->NewSequence ();
 	  NamedSequence* ns = new NamedSequence ();
 	  ns->name = csStrNew (child->GetAttributeValue ("name"));
-	  ns->sequence = newseq;
+	  ns->sequence = csPtr<iSequence> (newseq);
 	  sequences.Push (ns);
 	}
         break;
@@ -427,7 +426,7 @@ void DemoSequenceLoader::LoadSequences (iDocumentNode* node)
           newseq = seqmgr->NewSequence ();
 	  NamedSequence* ns = new NamedSequence ();
 	  ns->name = csStrNew (child->GetAttributeValue ("name"));
-	  ns->sequence = newseq;
+	  ns->sequence = csPtr<iSequence> (newseq);
 	  sequences.Push (ns);
 	}
 	else if (!newseq->IsEmpty ())

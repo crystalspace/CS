@@ -65,16 +65,6 @@ Simple *simple;
 
 Simple::Simple ()
 {
-  engine = NULL;
-  loader = NULL;
-  g3d = NULL;
-  kbd = NULL;
-  vc = NULL;
-  view = NULL;
-  cdsys = NULL;
-  parent_sprite = NULL;
-  sprite1 = NULL;
-  sprite2 = NULL;
   rot1_direction = 1;
   rot2_direction = -1;
   sprite1_col = NULL;
@@ -84,15 +74,6 @@ Simple::Simple ()
 
 Simple::~Simple ()
 {
-  if (parent_sprite) parent_sprite->DecRef ();
-  if (vc) vc->DecRef ();
-  if (engine) engine->DecRef ();
-  if (loader) loader->DecRef();
-  if (g3d) g3d->DecRef ();
-  if (kbd) kbd->DecRef ();
-  if (view) view->DecRef ();
-  if (cdsys) cdsys->DecRef ();
-  csInitializer::DestroyApplication (object_reg);
 }
 
 void Simple::SetupFrame ()
@@ -194,12 +175,9 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
 
@@ -213,13 +191,12 @@ bool Simple::SimpleEventHandler (iEvent& ev)
 
 iCollider* Simple::InitCollider (iMeshWrapper* mesh)
 {
-  iPolygonMesh* polmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iPolygonMesh);
+  csRef<iPolygonMesh> polmesh (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  	iPolygonMesh));
   if (polmesh)
   {
     csColliderWrapper* wrap = new csColliderWrapper
     	(mesh->QueryObject (), cdsys, polmesh);
-    polmesh->DecRef ();
     wrap->DecRef ();
     return wrap->GetCollider ();
   }
@@ -232,10 +209,9 @@ iCollider* Simple::InitCollider (iMeshWrapper* mesh)
   }
 }
 
-bool Simple::Initialize (int argc, const char* const argv[])
+bool Simple::Initialize (iObjectRegistry* object_reg)
 {
-  object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
+  Simple::object_reg = object_reg;
 
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
@@ -351,9 +327,9 @@ bool Simple::Initialize (int argc, const char* const argv[])
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -403,30 +379,24 @@ bool Simple::Initialize (int argc, const char* const argv[])
   p->CreateVertex (csVector3 (5, 0, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  walls_state->DecRef ();
-  walls->DecRef ();
-
-  iStatLight* light;
+  csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   engine->Prepare ();
 
-  view = new csView (engine, g3d);
+  view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -6));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -449,8 +419,8 @@ bool Simple::Initialize (int argc, const char* const argv[])
   //---------
   // Load a sprite template from disk.
   //---------
-  iMeshFactoryWrapper* imeshfact = loader->LoadMeshObjectFactory (
-  	"/lib/std/sprite2");
+  csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory (
+  	"/lib/std/sprite2"));
   if (imeshfact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -465,7 +435,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
   // ('sprite1' and 'sprite2'). Later on we will rotate the two children
   // and also rotate the entire hierarchical mesh.
   //---------
-  iSprite3DState* spstate;
+  csRef<iSprite3DState> spstate;
 
   // First create the parent sprite.
   parent_sprite = engine->CreateMeshWrapper (
@@ -474,7 +444,6 @@ bool Simple::Initialize (int argc, const char* const argv[])
   spstate = SCF_QUERY_INTERFACE (parent_sprite->GetMeshObject (),
   	iSprite3DState);
   spstate->SetAction ("default");
-  spstate->DecRef ();
   parent_sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   parent_sprite->GetMovable ()->Transform (csZRotMatrix3 (PI/2.));
   parent_sprite->GetMovable ()->UpdateMove ();
@@ -486,9 +455,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
   sprite1->GetMovable ()->UpdateMove ();
   spstate = SCF_QUERY_INTERFACE (sprite1->GetMeshObject (), iSprite3DState);
   spstate->SetAction ("default");
-  spstate->DecRef ();
   parent_sprite->GetChildren ()->Add (sprite1);
-  sprite1->DecRef ();
 
   // Now create the second child.
   sprite2 = engine->CreateMeshWrapper (imeshfact, "Rotater2");
@@ -497,11 +464,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
   sprite2->GetMovable ()->UpdateMove ();
   spstate = SCF_QUERY_INTERFACE (sprite2->GetMeshObject (), iSprite3DState);
   spstate->SetAction ("default");
-  spstate->DecRef ();
   parent_sprite->GetChildren ()->Add (sprite2);
-  sprite2->DecRef ();
-
-  imeshfact->DecRef ();
 
   //---------
   // We only do collision detection for the rotating children
@@ -525,11 +488,17 @@ void Simple::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return false;
+
   simple = new Simple ();
 
-  if (simple->Initialize (argc, argv))
+  if (simple->Initialize (object_reg))
     simple->Start ();
 
   delete simple;
+
+  csInitializer::DestroyApplication (object_reg);
+
   return 0;
 }

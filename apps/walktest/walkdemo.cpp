@@ -95,30 +95,29 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
   csBox3 bbox;
   sector->CalculateSectorBBox (bbox, true);
 
-  iMeshFactoryWrapper *mfw = Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.rain", "rain");
+  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
+    CreateMeshFactory ("crystalspace.mesh.object.rain", "rain"));
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom rain", sector,
-								  csVector3 (0, 0, 0));
-  mfw->DecRef ();
+  csRef<iMeshWrapper> exp (
+  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom rain", sector,
+					  csVector3 (0, 0, 0)));
 
   exp->SetZBufMode(CS_ZBUF_TEST);
 
-  iParticleState* partstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState);
+  csRef<iParticleState> partstate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
   partstate->SetColor (csColor (.25,.25,.25));
-  partstate->DecRef ();
 
-  iRainState* rainstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iRainState);
+  csRef<iRainState> rainstate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iRainState));
   rainstate->SetParticleCount (num);
   rainstate->SetDropSize (.3/50., .3);
   rainstate->SetLighting (false);
   rainstate->SetBox (bbox.Min (), bbox.Max ());
   rainstate->SetFallSpeed (csVector3 (0, -speed, 0));
-  rainstate->DecRef ();
-  exp->DecRef ();
 }
 
 //===========================================================================
@@ -138,31 +137,30 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
   csBox3 bbox;
   sector->CalculateSectorBBox (bbox, true);
 
-  iMeshFactoryWrapper *mfw = Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.snow", "snow");
+  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
+    CreateMeshFactory ("crystalspace.mesh.object.snow", "snow"));
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom snow", sector,
-								  csVector3 (0, 0, 0));
-  mfw->DecRef ();
+  csRef<iMeshWrapper> exp (
+  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom snow", sector,
+	csVector3 (0, 0, 0)));
 
   exp->SetZBufMode(CS_ZBUF_TEST);
 
-  iParticleState* partstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState);
+  csRef<iParticleState> partstate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
   partstate->SetColor (csColor (.25,.25,.25));
-  partstate->DecRef ();
 
-  iSnowState* snowstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iSnowState);
+  csRef<iSnowState> snowstate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iSnowState));
   snowstate->SetParticleCount (num);
   snowstate->SetDropSize (.07, .07);
   snowstate->SetLighting (false);
   snowstate->SetBox (bbox.Min (), bbox.Max ());
   snowstate->SetFallSpeed (csVector3 (0, -speed, 0));
   snowstate->SetSwirl (0.2);
-  snowstate->DecRef ();
-  exp->DecRef ();
 }
 
 //===========================================================================
@@ -180,22 +178,23 @@ void add_particles_fire (iSector* sector, char* matname, int num,
     return;
   }
 
-  iMeshFactoryWrapper *mfw = Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.fire", "fire");
+  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
+    CreateMeshFactory ("crystalspace.mesh.object.fire", "fire"));
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom fire", sector,
-								  origin);
-  mfw->DecRef ();
+  csRef<iMeshWrapper> exp (
+  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom fire", sector,
+	origin));
 
   exp->SetZBufMode(CS_ZBUF_TEST);
 
-  iParticleState* partstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState);
+  csRef<iParticleState> partstate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
-  partstate->DecRef ();
 
-  iFireState* firestate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iFireState);
+  csRef<iFireState> firestate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iFireState));
   firestate->SetParticleCount (num);
   //firestate->SetDropSize (.02, .04);
   firestate->SetDropSize (.04, .08);
@@ -205,8 +204,6 @@ void add_particles_fire (iSector* sector, char* matname, int num,
   firestate->SetDirection (csVector3 (0, 1., 0));
   firestate->SetSwirl (1.6);
   firestate->SetColorScale (0.2);
-  firestate->DecRef ();
-  exp->DecRef ();
 }
 
 //===========================================================================
@@ -224,24 +221,24 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
     return;
   }
 
-  iMeshFactoryWrapper *mfw = Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.fountain", "fountain");
+  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
+    CreateMeshFactory ("crystalspace.mesh.object.fountain", "fountain"));
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom fountain", sector,
-								  origin);
-  mfw->DecRef ();
-
+  csRef<iMeshWrapper> exp (
+  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom fountain",
+	sector, origin));
   exp->SetZBufMode(CS_ZBUF_TEST);
 
-  iParticleState* partstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState);
+  csRef<iParticleState> partstate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
   partstate->SetColor (csColor (.25, .35, .55));
   partstate->SetChangeRotation (7.5);
-  partstate->DecRef ();
 
-  iFountainState* fountstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iFountainState);
+  csRef<iFountainState> fountstate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iFountainState));
   fountstate->SetParticleCount (num);
   fountstate->SetDropSize (.1, .1);
   fountstate->SetOrigin (csVector3 (0, 0, 0));
@@ -251,8 +248,6 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
   fountstate->SetElevation (3.1415926/2.);
   fountstate->SetAzimuth (0);
   fountstate->SetOpening (.2);
-  fountstate->DecRef ();
-  exp->DecRef ();
 }
 
 //===========================================================================
@@ -269,27 +264,28 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
     return;
   }
 
-  iMeshFactoryWrapper *mfw = Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.explosion", "explosion");
+  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
+    CreateMeshFactory ("crystalspace.mesh.object.explosion", "explosion"));
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom explosion", sector,
-								  center);
-  mfw->DecRef ();
+  csRef<iMeshWrapper> exp (
+  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom explosion",
+	sector, center));
 
   exp->SetZBufMode(CS_ZBUF_TEST);
   exp->SetRenderPriority(4); // @@@ alpha, most of the cases. should be queried from engine
 
-  iParticleState* partstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState);
+  csRef<iParticleState> partstate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_SETALPHA (0.50));
   partstate->SetColor (csColor (1, 1, 0));
   partstate->SetChangeRotation (5.0);
   partstate->SetChangeSize (1.25);
   partstate->SetSelfDestruct (3000);
-  partstate->DecRef ();
 
-  iExplosionState* expstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iExplosionState);
+  csRef<iExplosionState> expstate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iExplosionState));
   expstate->SetParticleCount (100);
   expstate->SetCenter (csVector3 (0, 0, 0));
   expstate->SetPush (csVector3 (0, 0, 0));
@@ -301,8 +297,6 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
   expstate->SetSpreadAcceleration (2.);
   expstate->SetFadeSprites (500);
   expstate->AddLight (Sys->Engine, sector, 1000);
-  expstate->DecRef ();
-  exp->DecRef ();
 
   exp->PlaceMesh ();
 }
@@ -321,28 +315,27 @@ void add_particles_spiral (iSector* sector, const csVector3& bottom, char* matna
     return;
   }
 
-  iMeshFactoryWrapper *mfw = Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.spiral", "spiral");
+  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
+    CreateMeshFactory ("crystalspace.mesh.object.spiral", "spiral"));
   if (!mfw) return;
 
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom spiral", sector,
-								  bottom);
-  mfw->DecRef ();
+  csRef<iMeshWrapper> exp (
+  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom spiral",
+	sector, bottom));
 
   exp->SetZBufMode(CS_ZBUF_TEST);
 
-  iParticleState* partstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState);
+  csRef<iParticleState> partstate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
   partstate->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_SETALPHA (0.50));
   partstate->SetColor (csColor (1, 1, 0));
   partstate->SetChangeColor (csColor(+0.01,0.,-0.012));
-  partstate->DecRef ();
 
-  iSpiralState* spirstate = SCF_QUERY_INTERFACE (exp->GetMeshObject (), iSpiralState);
+  csRef<iSpiralState> spirstate (
+  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iSpiralState));
   spirstate->SetParticleCount (500);
   spirstate->SetSource (csVector3 (0, 0, 0));
-  spirstate->DecRef ();
-  exp->DecRef ();
 }
 
 //===========================================================================
@@ -415,10 +408,9 @@ void add_tree_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
                                                  csXRotMatrix3(.15);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
-    iSkeletonLimb* ilimb = SCF_QUERY_INTERFACE (con, iSkeletonLimb);
+    csRef<iSkeletonLimb> ilimb (SCF_QUERY_INTERFACE (con, iSkeletonLimb));
     add_tree_limbs (state, frame, ilimb,
     	vertex_idx, par_vertex_idx, maxdepth, width, recursion+1);
-    ilimb->DecRef ();
   }
 }
 
@@ -428,10 +420,9 @@ iSkeleton* create_skeltree (iSprite3DFactoryState* state, iSpriteFrame* frame,
 {
   state->EnableSkeletalAnimation ();
   iSkeleton* skel = state->GetSkeleton ();
-  iSkeletonLimb* ilimb = SCF_QUERY_INTERFACE (skel, iSkeletonLimb);
+  csRef<iSkeletonLimb> ilimb (SCF_QUERY_INTERFACE (skel, iSkeletonLimb));
   add_tree_limbs (state, frame, ilimb,
   	vertex_idx, 0, maxdepth, width, 0);
-  ilimb->DecRef ();
   return skel;
 }
 
@@ -495,9 +486,9 @@ void animate_skeleton_tree (iSkeletonLimbState* limb)
     	csZRotMatrix3 (o->z_angle + o->z_angle_base) *
 	csXRotMatrix3 (o->x_angle + o->x_angle_base);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
-    iSkeletonConnectionState* con = SCF_QUERY_INTERFACE (child, iSkeletonConnectionState);
+    csRef<iSkeletonConnectionState> con (
+    	SCF_QUERY_INTERFACE (child, iSkeletonConnectionState));
     con->SetTransformation (trans);
-    con->DecRef ();
     animate_skeleton_tree (child);
     child = child->GetNextSibling ();
   }
@@ -523,12 +514,11 @@ AnimSkelTree::AnimSkelTree ()
 bool AnimSkelTree::BeforeDrawing (iMeshWrapper* spr, iRenderView* /*rview*/)
 {
   iMeshObject* obj = spr->GetMeshObject ();
-  iSprite3DState* state = SCF_QUERY_INTERFACE (obj, iSprite3DState);
+  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (obj, iSprite3DState));
   iSkeletonState* sk_state = state->GetSkeletonState ();
-  iSkeletonLimbState *limb = SCF_QUERY_INTERFACE (sk_state, iSkeletonLimbState);
+  csRef<iSkeletonLimbState> limb (
+  	SCF_QUERY_INTERFACE (sk_state, iSkeletonLimbState));
   animate_skeleton_tree (limb);
-  limb->DecRef ();
-  state->DecRef ();
   return true;
 }
 
@@ -539,8 +529,8 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
 {
   char skelname[50];
   sprintf (skelname, "__skeltree__%d,%d\n", depth, width);
-  iMeshFactoryWrapper* tmpl = Sys->Engine->GetMeshFactories ()
-  	->FindByName (skelname);
+  csRef<iMeshFactoryWrapper> tmpl (Sys->Engine->GetMeshFactories ()
+  	->FindByName (skelname));
   if (!tmpl)
   {
     tmpl = Sys->Engine->CreateMeshFactory (
@@ -552,8 +542,8 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
       return;
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
-    iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (fact,
-    	iSprite3DFactoryState);
+    csRef<iSprite3DFactoryState> state (SCF_QUERY_INTERFACE (fact,
+    	iSprite3DFactoryState));
     state->SetMaterialWrapper (Sys->Engine->GetMaterialList ()->
 			       FindByName ("white"));
     int vertex_idx = 0;
@@ -563,7 +553,6 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
     act->SetName ("a");
     act->AddFrame (fr, 100);
     create_skeltree (state, fr, vertex_idx, depth, width);
-    state->DecRef ();
 
     iMeshWrapper* spr = add_meshobj (skelname, "__skeltree__",
 	     where,
@@ -571,7 +560,6 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
     AnimSkelTree* cb = new AnimSkelTree ();
     spr->SetDrawCallback (cb);
     cb->DecRef ();
-    tmpl->DecRef ();
   }
 }
 
@@ -671,11 +659,10 @@ void add_ghost_limbs (iSprite3DFactoryState* state, iSpriteFrame* frame,
 	csXRotMatrix3 (.15);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
-    iSkeletonLimb* ilimb = SCF_QUERY_INTERFACE (con, iSkeletonLimb);
+    csRef<iSkeletonLimb> ilimb (SCF_QUERY_INTERFACE (con, iSkeletonLimb));
     add_ghost_limbs (state, frame, ilimb,
     	vertex_idx, par_vertex_idx,
     	maxdepth, 1, recursion+1, dim * .7);
-    ilimb->DecRef ();
   }
 }
 
@@ -685,10 +672,9 @@ iSkeleton* create_skelghost (iSprite3DFactoryState* state, iSpriteFrame* frame,
 {
   state->EnableSkeletalAnimation ();
   iSkeleton* skel = state->GetSkeleton ();
-  iSkeletonLimb* ilimb = SCF_QUERY_INTERFACE (skel, iSkeletonLimb);
+  csRef<iSkeletonLimb> ilimb (SCF_QUERY_INTERFACE (skel, iSkeletonLimb));
   add_ghost_limbs (state, frame, ilimb,
   	vertex_idx, 0, maxdepth, width, 0, .2);
-  ilimb->DecRef ();
   return skel;
 }
 
@@ -737,9 +723,9 @@ void animate_skeleton_ghost (iSkeletonLimbState* limb)
     	csZRotMatrix3 (o->z_angle + o->z_angle_base) *
 	csXRotMatrix3 (o->x_angle + o->x_angle_base);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
-    iSkeletonConnectionState* con = SCF_QUERY_INTERFACE (child, iSkeletonConnectionState);
+    csRef<iSkeletonConnectionState> con (
+    	SCF_QUERY_INTERFACE (child, iSkeletonConnectionState));
     con->SetTransformation (trans);
-    con->DecRef ();
     animate_skeleton_ghost (child);
     child = child->GetNextSibling ();
   }
@@ -765,13 +751,11 @@ AnimSkelGhost::AnimSkelGhost ()
 bool AnimSkelGhost::BeforeDrawing (iMeshWrapper* spr, iRenderView* /*rview*/)
 {
   iMeshObject* obj = spr->GetMeshObject ();
-  iSprite3DState* state = SCF_QUERY_INTERFACE (obj, iSprite3DState);
+  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (obj, iSprite3DState));
   iSkeletonState* sk_state = state->GetSkeletonState ();
-  iSkeletonLimbState* isk_limb = SCF_QUERY_INTERFACE (sk_state,
-  	iSkeletonLimbState);
+  csRef<iSkeletonLimbState> isk_limb (SCF_QUERY_INTERFACE (sk_state,
+  	iSkeletonLimbState));
   animate_skeleton_ghost (isk_limb);
-  isk_limb->DecRef ();
-  state->DecRef ();
   return true;
 }
 
@@ -781,7 +765,7 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
 	int width)
 {
   const char *skelname = "__skelghost__\n";
-  iMeshFactoryWrapper* tmpl;
+  csRef<iMeshFactoryWrapper> tmpl;
   tmpl = Sys->Engine->GetMeshFactories ()->FindByName (skelname);
   if (!tmpl)
   {
@@ -794,8 +778,8 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
       return;
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
-    iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (fact,
-    	iSprite3DFactoryState);
+    csRef<iSprite3DFactoryState> fstate (SCF_QUERY_INTERFACE (fact,
+    	iSprite3DFactoryState));
     fstate->SetMaterialWrapper (Sys->Engine->GetMaterialList ()->
 			       FindByName ("green"));
     int vertex_idx = 0;
@@ -805,28 +789,22 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
     act->SetName ("a");
     act->AddFrame (fr, 100);
     create_skelghost (fstate, fr, vertex_idx, maxdepth, width);
-    fstate->DecRef ();
-    tmpl->DecRef ();
   }
 
   iMeshWrapper* spr = add_meshobj (skelname, "__skelghost__", where, pos, 1);
   iMeshObject* obj = spr->GetMeshObject ();
-  iSprite3DState* state = SCF_QUERY_INTERFACE (obj, iSprite3DState);
+  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (obj, iSprite3DState));
   state->SetMixMode (CS_FX_SETALPHA (0.75));
-  iPolygonMesh* mesh = SCF_QUERY_INTERFACE (obj, iPolygonMesh);
-  iObject* sprobj = SCF_QUERY_INTERFACE (spr, iObject);
+  csRef<iPolygonMesh> mesh (SCF_QUERY_INTERFACE (obj, iPolygonMesh));
+  csRef<iObject> sprobj (SCF_QUERY_INTERFACE (spr, iObject));
   (new csColliderWrapper (sprobj, Sys->collide_system, mesh))->DecRef ();
   GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
-  iObject* iobj = SCF_QUERY_INTERFACE (gh_info, iObject);
+  csRef<iObject> iobj (SCF_QUERY_INTERFACE (gh_info, iObject));
   sprobj->ObjAdd (iobj);
   gh_info->dir = 1;
   AnimSkelGhost* cb = new AnimSkelGhost ();
   spr->SetDrawCallback (cb);
   cb->DecRef ();
-  iobj->DecRef ();
-  sprobj->DecRef ();
-  mesh->DecRef ();
-  state->DecRef ();
 }
 
 #define MAXSECTORSOCCUPIED  20
@@ -888,8 +866,8 @@ void move_ghost (iMeshWrapper* spr)
   }
 
   // Turn around at random intervals.
-  GhostSpriteInfo* gh_info = CS_GET_CHILD_OBJECT (spr->QueryObject (),
-						      GhostSpriteInfo);
+  csRef<GhostSpriteInfo> gh_info (CS_GET_CHILD_OBJECT (spr->QueryObject (),
+						      GhostSpriteInfo));
   if (rand () % 40 == 1) gh_info->dir = -gh_info->dir;
 
   // OpenStep compiler bug prevents Transform(GetYRotation()), which is why
@@ -912,7 +890,6 @@ void move_ghost (iMeshWrapper* spr)
     spr->GetMovable ()->Transform (m);
   }
   spr->GetMovable ()->UpdateMove ();
-  gh_info->DecRef ();
 }
 
 //===========================================================================
@@ -949,9 +926,8 @@ void add_bot (float size, iSector* where, csVector3 const& pos,
   bot->set_bot_move (pos);
   bot->set_bot_sector (where);
   bot->GetMovable ().UpdateMove ();
-  iSprite3DState* state = SCF_QUERY_INTERFACE (botmesh, iSprite3DState);
+  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (botmesh, iSprite3DState));
   state->SetAction ("default");
-  state->DecRef ();
   bot->next = first_bot;
   bot->light = dyn;
   first_bot = bot;
@@ -1020,8 +996,7 @@ struct RandomLight
 void HandleDynLight (iDynLight* dyn)
 {
   LightStruct* ls = (LightStruct*)(csDataObject::GetData(dyn->QueryObject ()));
-  iLight* l = SCF_QUERY_INTERFACE (dyn, iLight);
-  l->DecRef ();
+  csRef<iLight> l (SCF_QUERY_INTERFACE (dyn, iLight));
   switch (ls->type)
   {
     case DYN_TYPE_MISSILE:
@@ -1051,9 +1026,9 @@ void HandleDynLight (iDynLight* dyn)
 	  ms->sprite->GetMovable ()->ClearSectors ();
 	  Sys->view->GetEngine ()->GetMeshes ()->Remove (ms->sprite);
 	}
-	iDataObject *ido = CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject);
+	csRef<iDataObject> ido (
+		CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject));
         dyn->QueryObject ()->ObjRemove (ido->QueryObject ());
-	ido->DecRef ();
         if (ms->snd)
         {
           ms->snd->Stop();
@@ -1102,9 +1077,9 @@ void HandleDynLight (iDynLight* dyn)
         es->radius -= 2;
 	if (es->radius < 1)
 	{
-	  iDataObject *ido = CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject);
+	  csRef<iDataObject> ido (
+	  	CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject));
 	  dyn->QueryObject ()->ObjRemove (ido->QueryObject ());
-	  ido->DecRef ();
 	  delete es;
           Sys->view->GetEngine ()->RemoveDynLight (dyn);
           dyn->DecRef ();
@@ -1206,8 +1181,8 @@ void light_statics ()
   for (i = 0 ; i < meshes->GetCount () ; i++)
   {
     iMeshWrapper* sp = meshes->Get (i);
-    iSprite3DState* state = SCF_QUERY_INTERFACE (sp->GetMeshObject (),
-    	iSprite3DState);
+    csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (sp->GetMeshObject (),
+    	iSprite3DState));
     if (state != NULL)
     {
       if (state->GetSkeletonState ())
@@ -1215,7 +1190,6 @@ void light_statics ()
         const char* name = sp->QueryObject ()->GetName ();
         if (!strcmp (name, "__skelghost__")) move_ghost (sp);
       }
-      state->DecRef ();
     }
     sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
@@ -1225,17 +1199,15 @@ void light_statics ()
 
 static iMeshWrapper* CreateMeshWrapper (const char* name)
 {
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (Sys->object_reg,
-  	iPluginManager);
-  iMeshObjectType* ThingType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (Sys->object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> ThingType (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType));
   if (!ThingType)
     ThingType = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.mesh.object.thing", iMeshObjectType);
-  plugin_mgr->DecRef ();
 
   csRef<iMeshObjectFactory> thing_fact (ThingType->NewFactory ());
-  ThingType->DecRef ();
   csRef<iMeshObject> mesh_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
 
   iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshWrapper (mesh_obj, name);
@@ -1246,8 +1218,8 @@ iMeshWrapper* CreatePortalThing (const char* name, iSector* room,
     	iMaterialWrapper* tm, iPolygon3D*& portalPoly)
 {
   iMeshWrapper* thing = CreateMeshWrapper (name);
-  iThingState* thing_state = SCF_QUERY_INTERFACE (thing->GetMeshObject (),
-  	iThingState);
+  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (thing->GetMeshObject (),
+  	iThingState));
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   thing->GetMovable ()->SetSector (room);
   float dx = 1, dy = 3, dz = .3;
@@ -1435,14 +1407,12 @@ iMeshWrapper* CreatePortalThing (const char* name, iSector* room,
       p->GetVertex (1), csVector2 (1, 0),
       p->GetVertex (2), csVector2 (1, 1));
   portalPoly = p;
-  thing_state->DecRef ();
 
-  iLightingInfo* linfo = SCF_QUERY_INTERFACE (thing->GetMeshObject (),
-    iLightingInfo);
+  csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (thing->GetMeshObject (),
+    iLightingInfo));
   linfo->InitializeDefault ();
   room->ShineLights (thing);
   linfo->PrepareLighting ();
-  linfo->DecRef ();
 
   return thing;
 }

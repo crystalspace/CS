@@ -73,7 +73,7 @@ class MeshRotation
 {
 public:
   iMeshWrapper* mesh;
-  iParticle* particle;
+  csRef<iParticle> particle;
   csTicks total_time;
   csTicks start_time;
   float angle_speed;
@@ -89,8 +89,8 @@ public:
   static DemoSequenceManager* demoseq;
 
 private:
-  iSequenceManager* seqmgr;
-  iSequence* main_sequence;
+  csRef<iSequenceManager> seqmgr;
+  csRef<iSequence> main_sequence;
   bool suspended;
   bool suspend_one_frame;
   csTicks main_start_time;

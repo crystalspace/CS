@@ -539,7 +539,7 @@ struct iEngine : public iBase
    */
   virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = NULL) = 0;
   /// Create a dynamic light.
-  virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
+  virtual csPtr<iDynLight> CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color) = 0;
   /// Remove a dynamic light.
   virtual void RemoveDynLight (iDynLight*) = 0;

@@ -53,7 +53,7 @@ private:
    * If this variable is non-NULL there is a running script from
    * which commands are read and executed (one command every frame).
    */
-  static iFile* script;
+  static csRef<iFile> script;
 
 public:
   /// Call this first.

@@ -1040,7 +1040,7 @@ public:
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
     const;
   /// Create a dynamic light.
-  virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
+  virtual csPtr<iDynLight> CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color);
   /// Remove a dynamic light.
   virtual void RemoveDynLight (iDynLight*);

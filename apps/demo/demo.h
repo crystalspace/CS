@@ -47,20 +47,20 @@ class csTransform;
 class Demo
 {
 public:
-  iEngine* engine;
+  csRef<iEngine> engine;
   iSector* room;
-  iView* view;
-  iGraphics3D *myG3D;
-  iGraphics2D *myG2D;
-  iVFS *myVFS;
-  iKeyboardDriver* kbd;
-  iConsoleOutput* myConsole;
+  csRef<iView> view;
+  csRef<iGraphics3D> myG3D;
+  csRef<iGraphics2D> myG2D;
+  csRef<iVFS> myVFS;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iConsoleOutput> myConsole;
   iObjectRegistry* object_reg;
-  iVirtualClock* vc;
-  iLoader* loader;
+  csRef<iVirtualClock> vc;
+  csRef<iLoader> loader;
 
   DemoSequenceManager* seqmgr;
-  iFont* font;
+  csRef<iFont> font;
   int col_red, col_blue, col_white, col_black;
   int col_yellow, col_cyan, col_green, col_gray;
   char message[255];

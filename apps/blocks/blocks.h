@@ -100,7 +100,7 @@ enum BlShapeType
 
 struct CubeInfo
 {
-  iMeshWrapper* thing;
+  csRef<iMeshWrapper> thing;
   float dx, dy, dz;
 };
 
@@ -163,10 +163,10 @@ public:
 class Blocks
 {
 private:
-  iMeshFactoryWrapper* cube_tmpl;
-  iMeshFactoryWrapper* pillar_tmpl;
-  iMeshFactoryWrapper* vrast_tmpl;
-  iMeshFactoryWrapper* hrast_tmpl;
+  csRef<iMeshFactoryWrapper> cube_tmpl;
+  csRef<iMeshFactoryWrapper> pillar_tmpl;
+  csRef<iMeshFactoryWrapper> vrast_tmpl;
+  csRef<iMeshFactoryWrapper> hrast_tmpl;
   iMaterialWrapper* cube_mat;
   iMaterialWrapper* cubef1_mat;
   iMaterialWrapper* cubef2_mat;
@@ -176,7 +176,7 @@ private:
   iMaterialWrapper* raster_mat;
   iSector* room;
   iSector* demo_room;
-  iDynLight* dynlight;
+  csRef<iDynLight> dynlight;
   float dynlight_dx;
   float dynlight_x;
   float dynlight_y;
@@ -201,9 +201,9 @@ private:
   iMeshWrapper* menus[MAX_MENUS];
   int idx_menus[MAX_MENUS];
   bool leftright_menus[MAX_MENUS];
-  iMeshWrapper* src_menus[MENU_TOTAL];
-  iMeshWrapper* arrow_left;
-  iMeshWrapper* arrow_right;
+  csRef<iMeshWrapper> src_menus[MENU_TOTAL];
+  csRef<iMeshWrapper> arrow_left;
+  csRef<iMeshWrapper> arrow_right;
   int cur_menu;
   int old_cur_menu;
   float menu_todo;
@@ -310,24 +310,24 @@ private:
   KeyMapping key_zoomout;
 
 public:
-  iMeshObjectType* thing_type;
-  iEngine* engine;
-  iView* view;
+  csRef<iMeshObjectType> thing_type;
+  csRef<iEngine> engine;
+  csRef<iView> view;
   iTextureManager* txtmgr;
-  iGraphics2D *myG2D;
-  iGraphics3D *myG3D;
+  csRef<iGraphics2D> myG2D;
+  csRef<iGraphics3D> myG3D;
   int FrameWidth, FrameHeight;
-  iVFS *myVFS;
-  iNetworkDriver *myNetDrv;
-  iSoundSource *backsound;
-  iVirtualClock* vc;
+  csRef<iVFS> myVFS;
+  csRef<iNetworkDriver> myNetDrv;
+  csRef<iSoundSource> backsound;
+  csRef<iVirtualClock> vc;
+  csRef<iLoader> LevelLoader;
   iObjectRegistry* object_reg;
 
   static int white, black, red;
 
   // The font we are typing with
-  iFont *font;
-  iLoader *LevelLoader;
+  csRef<iFont> font;
 
 public:
   Blocks ();
@@ -352,7 +352,7 @@ public:
   void set_cube_room (iSector* s) { room = s; }
   void InitGame ();
   void CreateMenuEntry (const char* txt, int menu_nr);
-  iMeshWrapper* CreateMenuArrow (bool left);
+  csRef<iMeshWrapper> CreateMenuArrow (bool left);
   void ChangePlaySize (int new_size);
 
   void ReadConfig ();
@@ -378,9 +378,10 @@ public:
   void HandleHighscoresKey (int key, bool shift, bool alt, bool ctrl);
 
   // Creating cubes and other geometry.
-  iMeshWrapper* create_cube_thing (float dx, float dy, float dz,
+  csRef<iMeshWrapper> create_cube_thing (float dx, float dy, float dz,
   	iMeshFactoryWrapper* tmpl);
-  iMeshWrapper* add_cube_thing (iSector* sect, float dx, float dy, float dz,
+  csRef<iMeshWrapper> add_cube_thing (iSector* sect,
+  	float dx, float dy, float dz,
   	float x, float y, float z, iMeshFactoryWrapper* tmpl);
   void add_cube (float dx, float dy, float dz, float x, float y, float z,
   	iMeshFactoryWrapper* tmpl);

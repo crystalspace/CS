@@ -53,7 +53,7 @@ iCamera* csCommandProcessor::camera = NULL;
 iGraphics3D* csCommandProcessor::g3d = NULL;
 iConsoleOutput* csCommandProcessor::console = NULL;
 iObjectRegistry* csCommandProcessor::object_reg = NULL;
-iFile* csCommandProcessor::script = NULL;
+csRef<iFile> csCommandProcessor::script;
 // Additional command handler
 csCommandProcessor::CmdHandler csCommandProcessor::ExtraHandler = NULL;
 
@@ -312,12 +312,9 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
 
   if (!strcasecmp (cmd, "quit"))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
   }
   else if (!strcasecmp (cmd, "help"))
   {
@@ -369,7 +366,8 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     change_float (arg, &csPolyTexture::cfg_cosinus_factor, "cosinus factor", -1, 1);
   else if (!strcasecmp (cmd, "lod"))
   {
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csRef<iPluginManager> plugin_mgr (
+    	CS_QUERY_REGISTRY (object_reg, iPluginManager));
     iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
     	"crystalspace.mesh.object.sprite.3d", iMeshObjectType);
     csVariant lod_level;
@@ -378,11 +376,11 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     change_float (arg, &f, "LOD detail", -1, 1000000);
     lod_level.SetFloat (f);
     SetConfigOption (type, "sprlod", lod_level);
-    plugin_mgr->DecRef ();
   }
   else if (!strcasecmp (cmd, "sprlight"))
   {
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csRef<iPluginManager> plugin_mgr (
+    	CS_QUERY_REGISTRY (object_reg, iPluginManager));
     iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
     	"crystalspace.mesh.object.sprite.3d", iMeshObjectType);
     csVariant lqual;
@@ -391,7 +389,6 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     change_long (arg, &l, "sprite lighting quality", 0, 3);
     lqual.SetLong (l);
     SetConfigOption (type, "sprlq", lqual);
-    plugin_mgr->DecRef ();
   }
   else if (!strcasecmp (cmd, "dnl"))
     Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "");
@@ -402,7 +399,8 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
       if (start_script (arg) && console)
         console->SetVisible (true);
     }
-    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Please specify the name of the script!");
+    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Please specify the name of the script!");
   }
   else if (!strcasecmp (cmd, "portals"))
     change_boolean (arg, &csSector::do_portals, "portals");
@@ -484,20 +482,18 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
 bool csCommandProcessor::start_script (const char* scr)
 {
   bool ok = false;
-  iVFS* v = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> v (CS_QUERY_REGISTRY (object_reg, iVFS));
   if (v)
   {
-    v->DecRef ();
     if (v->Exists (scr))
     {
-      iFile* f = v->Open (scr, VFS_FILE_READ);
+      csRef<iFile> f (v->Open (scr, VFS_FILE_READ));
       if (!f)
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Could not open script file '%s'!", scr);
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Could not open script file '%s'!", scr);
       else
       {
         // Replace possible running script with this one.
-        if (script)
-          script->DecRef();
         script = f;
         ok = true;
       }
@@ -518,7 +514,6 @@ bool csCommandProcessor::get_script_line (char* buf, int nbytes)
 
   if (script->AtEOF())
   {
-    script->DecRef();
     script = NULL;
     return false;
   }

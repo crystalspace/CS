@@ -55,7 +55,7 @@ static void Test (iBase* obj, const char* name)
     fflush (stdout);
     return;
   }
-  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (obj, iDebugHelper);
+  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (obj, iDebugHelper));
   if (dbghelp && (dbghelp->GetSupportedTests () & CS_DBGHELP_UNITTEST))
   {
     iString* str = dbghelp->UnitTest ();
@@ -69,7 +69,6 @@ static void Test (iBase* obj, const char* name)
     {
       printf ("%s unit testing succeeded!\n", name);
     }
-    dbghelp->DecRef ();
   }
   else
     printf ("%s unit test not performed (object doesn't support it).\n", name);
@@ -84,12 +83,11 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
     fflush (stdout);
     return;
   }
-  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (obj, iDebugHelper);
+  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (obj, iDebugHelper));
   if (dbghelp && (dbghelp->GetSupportedTests () & CS_DBGHELP_BENCHMARK))
   {
     csTicks t = dbghelp->Benchmark (num_iterations);
     printf ("Benchmarking %s: %d ms\n", name, t);
-    dbghelp->DecRef ();
   }
   else
     printf ("%s benchmark not performed (object doesn't support it).\n", name);
@@ -117,7 +115,8 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  iPluginManager* plugmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugmgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   if (!plugmgr)
   {
     csInitializer::DestroyApplication (object_reg);
@@ -126,16 +125,14 @@ int main (int argc, char* argv[])
 
   printf ("================================================================\n");
 
-  iCollideSystem* cdsys = CS_LOAD_PLUGIN (plugmgr,
-  	"crystalspace.collisiondetection.rapid", iCollideSystem);
+  csRef<iCollideSystem> cdsys (CS_LOAD_PLUGIN (plugmgr,
+  	"crystalspace.collisiondetection.rapid", iCollideSystem));
   Test (cdsys, "Rapid");
-  if (cdsys) cdsys->DecRef ();
 
   printf ("================================================================\n");
 
-  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   Test (engine, "Engine");
-  if (engine) engine->DecRef ();
 
   printf ("================================================================\n");
 
@@ -151,22 +148,19 @@ int main (int argc, char* argv[])
 
   printf ("================================================================\n");
 
-  iSyntaxService* syntax = CS_LOAD_PLUGIN (plugmgr,
-	"crystalspace.syntax.loader.service.text", iSyntaxService);
+  csRef<iSyntaxService> syntax (CS_LOAD_PLUGIN (plugmgr,
+	"crystalspace.syntax.loader.service.text", iSyntaxService));
   Test (syntax, "Syntax Services");
-  if (syntax) syntax->DecRef ();
 
   printf ("================================================================\n");
 
-  iVisibilityCuller* viscull = CS_LOAD_PLUGIN (plugmgr,
-  	"crystalspace.culling.dynavis", iVisibilityCuller);
+  csRef<iVisibilityCuller> viscull (CS_LOAD_PLUGIN (plugmgr,
+  	"crystalspace.culling.dynavis", iVisibilityCuller));
   Test (viscull, "DynaVis");
   //Benchmark (viscull, "DynaVis", 100);
-  if (viscull) viscull->DecRef ();
 
   printf ("================================================================\n");
 
-  plugmgr->DecRef ();
   csInitializer::DestroyApplication (object_reg);
   return 0;
 }

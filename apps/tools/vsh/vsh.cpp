@@ -34,8 +34,8 @@
 
 CS_IMPLEMENT_APPLICATION
 
-static iVFS *VFS;
-static iConfigManager *Cfg;
+static csRef<iVFS> VFS;
+static csRef<iConfigManager> Cfg;
 static bool ShutDown = false;
 
 // forward declaration for command handlers
@@ -192,7 +192,7 @@ static void cmd_cat (char *args)
 
   if (onepass)
   {
-    iDataBuffer *data = VFS->ReadFile (args);
+    csRef<iDataBuffer> data (VFS->ReadFile (args));
     if (!data)
     {
       fprintf (stderr, "cat: cannot read file \"%s\"\n", args);
@@ -200,11 +200,10 @@ static void cmd_cat (char *args)
     }
 
     fwrite (**data, data->GetSize (), 1, stdout);
-    data->DecRef ();
   }
   else
   {
-    iFile *F = VFS->Open (args, VFS_FILE_READ);
+    csRef<iFile> F (VFS->Open (args, VFS_FILE_READ));
     if (!F)
     {
       fprintf (stderr, "cat: cannot open file \"%s\" for reading\n", args);
@@ -218,13 +217,12 @@ static void cmd_cat (char *args)
       buff [len] = 0;
       printf ("%s", buff);
     }
-    F->DecRef ();
   }
 }
 
 static void cmd_creat (char *args)
 {
-  iFile *F = VFS->Open (args, VFS_FILE_WRITE);
+  csRef<iFile> F (VFS->Open (args, VFS_FILE_WRITE));
   if (!F)
   {
     fprintf (stderr, "creat: cannot create or open for writing file \"%s\"\n", args);
@@ -245,7 +243,6 @@ static void cmd_creat (char *args)
     }
   }
   printf ("done, closing file\n");
-  F->DecRef ();
 }
 
 static void cmd_ls (char *args)
@@ -254,7 +251,7 @@ static void cmd_ls (char *args)
   get_option (args, fullpath);
 
   const char *dir;
-  iDataBuffer *xpath = NULL;
+  csRef<iDataBuffer> xpath;
   if (args)
   {
     xpath = VFS->ExpandPath (args);
@@ -304,9 +301,6 @@ static void cmd_ls (char *args)
   }
   else
     printf ("ls: no files to display\n");
-
-  if (xpath)
-    xpath->DecRef ();
 }
 
 static void cmd_cp (char *args)
@@ -343,7 +337,7 @@ static void cmd_cp (char *args)
 
     if (onepass)
     {
-      iDataBuffer *data = VFS->ReadFile (src);
+      csRef<iDataBuffer> data (VFS->ReadFile (src));
       if (!data)
       {
         fprintf (stderr, "cp: cannot read file \"%s\"\n", src);
@@ -352,21 +346,18 @@ static void cmd_cp (char *args)
 
       if (!VFS->WriteFile (dst, **data, data->GetSize ()))
         fprintf (stderr, "cp: error writing to file \"%s\"\n", dst);
-
-      data->DecRef ();
     }
     else
     {
-      iFile *dF = VFS->Open (dst, VFS_FILE_WRITE);
+      csRef<iFile> dF (VFS->Open (dst, VFS_FILE_WRITE));
       if (!dF)
       {
         fprintf (stderr, "cp: cannot open destination file \"%s\"\n", dst);
         return;
       }
-      iFile *sF = VFS->Open (src, VFS_FILE_READ);
+      csRef<iFile> sF (VFS->Open (src, VFS_FILE_READ));
       if (!sF)
       {
-        dF->DecRef ();
         fprintf (stderr, "cp: cannot open source file \"%s\"\n", src);
         return;
       }
@@ -380,8 +371,6 @@ static void cmd_cp (char *args)
           break;
         }
       }
-      sF->DecRef ();
-      dF->DecRef ();
     }
   }
 }
@@ -427,7 +416,8 @@ static void cmd_conf (char *args)
 {
   bool real_fs;
   get_option (args, real_fs);
-  iVFS *CfgVFS = real_fs ? NULL : VFS;
+  iVFS *CfgVFS;
+  if (real_fs) CfgVFS = NULL; else CfgVFS = VFS;
 
   iConfigFile *config = Cfg->AddDomain (args, CfgVFS, iConfigManager::ConfigPriorityCmdLine);
 
@@ -437,7 +427,8 @@ static void cmd_conf (char *args)
     return;
   }
 
-  iConfigIterator *iter = config->Enumerate ("VFS.Mount.");
+  csRef<iConfigIterator> iter = csPtr<iConfigIterator> (
+  	config->Enumerate ("VFS.Mount."));
   while (iter->Next ())
   {
     const char *rpath = iter->GetKey (true);
@@ -445,7 +436,6 @@ static void cmd_conf (char *args)
     if (!VFS->Mount (rpath, vpath))
       fprintf (stderr, "conf: mount: cannot mount \"%s\" to \"%s\"\n", rpath, vpath);
   }
-  iter->DecRef ();
 }
 
 static void cmd_sync (char *)
@@ -507,7 +497,7 @@ static void cmd_rpath (char *args)
     return;
   }
 
-  iDataBuffer *db = VFS->GetRealPath (args);
+  csRef<iDataBuffer> db (VFS->GetRealPath (args));
   if (!db)
   {
     fprintf (stderr, "rpath: no real-world path corresponding to `%s'\n", args);
@@ -515,7 +505,6 @@ static void cmd_rpath (char *args)
   }
 
   puts ((char *)db->GetData ());
-  db->DecRef ();
 }
 
 static bool execute (char *command)
@@ -594,7 +583,5 @@ int main (int argc, char *argv [])
     }
   }
 
-  Cfg->DecRef ();
-  VFS->DecRef ();
   return 0;
 }

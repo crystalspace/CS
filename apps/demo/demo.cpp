@@ -79,11 +79,10 @@ void Demo::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.application.demo", msg, arg);
-    rep->DecRef ();
   }
   else
   {
@@ -95,30 +94,12 @@ void Demo::Report (int severity, const char* msg, ...)
 
 Demo::Demo ()
 {
-  vc = NULL;
-  engine = NULL;
   seqmgr = NULL;
-  loader = NULL;
-  myG3D = NULL;
-  myG2D = NULL;
-  myVFS = NULL;
-  kbd = NULL;
-  view = NULL;
   message[0] = 0;
-  font = NULL;
 }
 
 Demo::~Demo ()
 {
-  if (vc) vc->DecRef ();
-  if (font) font->DecRef ();
-  if (view) view->DecRef ();
-  if (engine) engine->DecRef ();
-  if (myG3D) myG3D->DecRef ();
-  if (myG2D) myG2D->DecRef ();
-  if (myVFS) myVFS->DecRef ();
-  if (kbd) kbd->DecRef ();
-  if (loader) loader->DecRef ();
   delete seqmgr;
 }
 
@@ -150,11 +131,10 @@ static bool DemoEventHandler (iEvent& ev)
 
 static void TestDemoFile (const char* zip, iVFS* myVFS, csStrVector& demos)
 {
-  iDataBuffer* realpath_db = myVFS->GetRealPath (zip);
+  csRef<iDataBuffer> realpath_db (myVFS->GetRealPath (zip));
   char* realpath = (char*)(realpath_db->GetData ());
   char* testpath = new char [strlen (realpath)+3];
   strcpy (testpath, realpath);
-  realpath_db->DecRef ();
   if (testpath[strlen (testpath)-1] == '/')
   {
     // We have a directory.
@@ -307,7 +287,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   txtmgr->ResetPalette ();
   txtmgr->SetPalette ();
 
-  font = myG2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
+  font = csPtr<iFont> (myG2D->GetFontServer ()->LoadFont (CSFONT_LARGE));
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -317,8 +297,8 @@ bool Demo::Initialize (int argc, const char* const argv[],
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   // Check the demo file and mount it if required.
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
   const char *val;
   if ((val = cmdline->GetName ()) != NULL)
   {
@@ -348,8 +328,6 @@ bool Demo::Initialize (int argc, const char* const argv[],
     }
     myVFS->Unmount ("/tmp/csdemo_datadir", NULL);
   }
-
-  cmdline->DecRef ();
 
   txtmgr->SetPalette ();
   col_red = txtmgr->FindRGB (255, 0, 0);
@@ -715,12 +693,9 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     {
       if (Event.Key.Code == CSKEY_ESC)
       {
-	iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
 	if (q)
-	{
 	  q->GetEventOutlet()->Broadcast (cscmdQuit);
-	  q->DecRef ();
-	}
         return true;
       }
     }
@@ -1008,15 +983,14 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	    strcpy (backup, buf);
 	    strcat (backup, ".bak");
 	    myVFS->DeleteFile (backup);
-	    iDataBuffer* dbuf = myVFS->ReadFile (buf);
+	    csRef<iDataBuffer> dbuf (myVFS->ReadFile (buf));
 	    if (dbuf)
 	    {
 	      if (dbuf->GetSize ())
 	        myVFS->WriteFile (backup, **dbuf, dbuf->GetSize ());
-	      dbuf->DecRef ();
 	    }
 
-	    iFile* fp = myVFS->Open (buf, VFS_FILE_WRITE);
+	    csRef<iFile> fp (myVFS->Open (buf, VFS_FILE_WRITE));
 	    if (fp)
 	    {
 	      int i, num = np->GetPointCount ();
@@ -1050,7 +1024,6 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	        FileWrite (fp, "      V (%g,%g,%g)\n", v.x, v.y, v.z);
 	      }
 	      FileWrite (fp, "    )\n");
-	      fp->DecRef ();
 	      ShowMessage ("Wrote path to file '%s'", buf);
 	    }
 	    else
@@ -1256,12 +1229,9 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       //==============================
       if (Event.Key.Code == CSKEY_ESC)
       {
-	iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
 	if (q)
-	{
 	  q->GetEventOutlet()->Broadcast (cscmdQuit);
-	  q->DecRef ();
-	}
         return true;
       }
       switch (Event.Key.Char)

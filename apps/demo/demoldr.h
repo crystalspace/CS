@@ -36,7 +36,7 @@ class csNamedPath;
 struct NamedSequence
 {
   char* name;
-  iSequence* sequence;
+  csRef<iSequence> sequence;
 };
 
 /**

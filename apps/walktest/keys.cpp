@@ -650,11 +650,10 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
       Sys->selected_polygon = sel;
 
     iThingState* ps = sel->GetParent ();
-    iObject* psobj = SCF_QUERY_INTERFACE (ps, iObject);
+    csRef<iObject> psobj (SCF_QUERY_INTERFACE (ps, iObject));
     Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit polygon '%s/%s'",
     	psobj->GetName (), sel->QueryObject ()->GetName ());
     //Dumper::dump (sel);
-    psobj->DecRef ();
   }
 
   extern csVector2 coord_check_vector;
