@@ -753,18 +753,17 @@ void SysSystemDriver::Sleep (int SleepTime)
 void SysSystemDriver::SetSystemDefaults (iConfigManager *Config)
 {
   csSystemDriver::SetSystemDefaults (Config);
-  need_console = Config->GetBool ("System.Win32.DebugConsole", false);
-  if (GetOptionCL ("console"))
-    need_console = true;
-  else if (GetOptionCL ("noconsole"))
-    need_console = false;
+
+#ifdef CS_DEBUG
+  need_console = true;
 
   if (need_console)
   {
-    AllocConsole();
-    freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
-    freopen("CONOUT$", "a", stdout); // Redirect stdout to console   
+	AllocConsole();
+	freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
+	freopen("CONOUT$", "a", stdout); // Redirect stdout to console   
   }
+#endif
 }
 
 void SysSystemDriver::Help ()
