@@ -96,8 +96,8 @@ class ddgSplayNode;
 typedef ddgSplayNode *ddgSplayIndex;
 class WEXP ddgSplayNode
 {
-	friend ddgSplayTree;
-	friend ddgSplayIterator;
+	friend class ddgSplayTree;
+	friend class ddgSplayIterator;
 	/// The Implementation specific Data stored by a ddgSplay tree entry.
 	ddgSplayKey		_key;
 	/// The left child (also used by the free list to point to next free node).
