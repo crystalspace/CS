@@ -38,7 +38,6 @@
 #include "imap/loader.h"
 #include "imap/saver.h"
 #include "iutil/evdefs.h"
-#include "iutil/fontserv.h"
 #include "iutil/vfs.h"
 #include "ivaria/conout.h"
 #include "ivaria/reporter.h"
