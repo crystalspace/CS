@@ -251,6 +251,7 @@ int CollisionDetect (iEngine* Engine, csColliderWrapper *c, iSector* sp,
     }
     objit->Next ();
   }
+  objit->DecRef ();
 
   return hit;
 }
