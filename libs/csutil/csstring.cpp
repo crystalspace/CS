@@ -351,11 +351,7 @@ csString &csString::FormatV (const char *format, va_list args)
     // Buffer was big enough for entire string?
     if (rc >= 0 && rc < (int)MaxSize)
       break;
-    // Some vsnprintf()s return -1 on failure, others return desired capacity.
-    if (rc >= 0)
-      SetCapacity(rc); // SetCapacity() ensures room for null byte.
-    else
-      SetCapacity(MaxSize * 2);
+    SetCapacity(MaxSize * 2);
   }
   Size = rc;
   return *this;

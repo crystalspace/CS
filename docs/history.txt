@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Dec-2003
+	- Jorrit fixed a serious bug in csString::FormatV. A comment in that
+	  routine incorrectly stated the following:
+		// Some vsnprintf()s return -1 on failure, others return
+		// desired capacity.
+	  However, on MSYS neither happens. Instead the size of the input
+	  buffer is returned in case of failure.
 30-Nov-2003
 	- Eric Sunshine clarified and corrected comments in crystal.m4.  Also
 	  cleaned up m4 mis-quoting issues and generally improved formatting.
