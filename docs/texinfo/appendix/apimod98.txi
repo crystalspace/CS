@@ -990,3 +990,89 @@ At initialization time, @sc{vfs} now searches for its configuration file,
 (@code{csGetConfigPath()}).  The first @file{vfs.cfg} file found during this
 search is the one used to initialize the facility.  In the past, @sc{vfs}
 searched for @file{vfs.cfg} only in the Crystal Space installation diretory.
+
+@subheading Internationalization
+
+Some work to improve internationalization in CS has been done. This includes:
+
+@subsubheading Unicode helpers
+The @code{csUnicodeTransform} class provides functions to deal with and convert 
+between UTF-8, UTF-16 and UTF-32 encoded strings.
+
+@subsubheading UTF-8 strings
+Several APIs in CrystalSpace now accept UTF-8 strings. Those include:
+
+@itemize @bullet
+@item
+@code{csPrintf[V]},code{csFPutErr} for console output.
+@item
+@code{iGraphics2D->Write},@code{iGraphics2D->WriteBaseline}.
+@item
+@code{csReport[V]},@code{iReporter->Report[V]}.
+@item
+@code{iNativeWindowManager->Alert[V]},@code{iNativeWindow->SetTitle}.
+@end itemize
+
+@subheading Keyboard events
+
+Keyboard events in the CVS have changed. The event data is not stored in a 
+struct inside the iEvent any more, but rather inside iEvent's property bag. 
+That means the way to access the event data has slightly changed; you can now 
+either query the iEvent via Find() to get a specific property, or with 
+the csKeyEventHelper class.
+
+Another change is that the csevKeyDown and csevKeyUp events have been 
+collapsed to a single csevKeyboard event; the up/down information is 
+transported along with the event data.
+
+The notion of `scan code' and `characters' has been replaced with `raw' and 
+`cooked' codes. Basically, the raw code identifies the key uniquely, while the 
+`cooked' code is a processed version of it. An important aspect of this is 
+that both the `raw' and `cooked' codes are Unicode characters. Special keys
+(such as function keys) are encoded as characters from a Unicode private use
+area.
+
+You can find some more information here in the Public API Documentation 
+(Module @samp{Event handling}, section @samp{Keyboard events} - 
+@uref{http://crystal.sourceforge.net/docs/online/pubapi/group__event__handling.php#Keyboard}).
+
+With those changes, code like this:
+@example
+  if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
+@end example
+has to be changed to:
+@example
+  if ((Event.Type == csevKeyboard) &&
+    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
+    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
+@end example
+
+Another example:
+@example
+  switch (Event.Type)
+  {
+    case csevKeyDown:
+      Foo ();
+      break;
+    case csevKeyUp:
+      Bar ();
+      break;
+  }
+@end example
+needs to be changed to:
+@example
+  switch (Event.Type)
+  {
+    case csevKeyboard:
+      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
+      {
+        Foo ();
+      }
+      else
+      {
+        Bar ();
+      }
+      break;
+  }
+@end example
+

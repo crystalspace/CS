@@ -33,6 +33,8 @@ chronological order.
 	    for single argument ops if the arg wasn't an atom.
 	  - Fixed a bug in the single-arg op dispatcher, to resolve accum
 	    references.
+	- res updated apimod98.txi with paragraphs on the new i18n stuff and
+	  the keyboard event changes.
 17-Oct-2003
 	- res added some files he forgot with his recent commit.
 	- Jorrit fixed the engine sequence manager a better way. With
