@@ -38,10 +38,10 @@ public:
   using csArrayBase<T*>::Length;
   using csArrayBase<T*>::Capacity;
   using csArrayBase<T*>::Find;
+  using csArrayBase<T*>::Sort;
+  using csArrayBase<T*>::Get;
+  using csArrayBase<T*>::operator[];
 
-  /// This function prototype is used for Sort()
-  typedef int ArraySortCompareFunction (void const* item1,
-	void const* item2);
   /// This function prototype is used for csPDelArray::InsertSorted()
   typedef int ArrayCompareFunction (T const* item1, T const* item2);
   /// This function prototype is used for csPDelArray::FindKey()
@@ -85,6 +85,16 @@ public:
   }
 
   /**
+   * Remove all elements.  Similar to DeleteAll(), but does not release memory
+   * used by the array itself, thus making it more efficient for cases when the
+   * number of contained elements will fluctuate.
+   */
+  void Empty ()
+  {
+    Truncate (0);
+  }
+
+  /**
    * Destroy the container.
    */
   ~csPDelArray ()
@@ -122,20 +132,6 @@ public:
       SetLengthUnsafe (n);
       memset (root+old_len, 0, (n-old_len)*sizeof (T*));
     }
-  }
-
-  /// Get a pointer.
-  T* Get (int n) const
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    return root[n];
-  }
-
-  /// Get a pointer.
-  T* operator [] (int n) const
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    return root[n];
   }
 
   /// Put a pointer.
@@ -325,14 +321,6 @@ public:
     if (equal_index) *equal_index = -1;
     Insert (m, item);
     return m;
-  }
-
-  /**
-   * Sort array.
-   */
-  void Sort (ArraySortCompareFunction* compare)
-  {
-    qsort (root, Length (), sizeof (T*), compare);
   }
 };
 

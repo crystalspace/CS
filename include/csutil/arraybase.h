@@ -84,6 +84,10 @@ protected:
   }
 
 public:
+  /// This function prototype is used for Sort()
+  typedef int ArraySortCompareFunction (void const* item1,
+	void const* item2);
+
   /// return the number of elements in the Array
   int Length () const
   {
@@ -104,6 +108,28 @@ public:
       if (root[i] == which)
         return i;
     return -1;
+  }
+
+  /**
+   * Sort array.
+   */
+  void Sort (ArraySortCompareFunction* compare)
+  {
+    qsort (root, Length (), sizeof (T), compare);
+  }
+
+  /// Get an element (const).
+  T const& Get (int n) const
+  {
+    CS_ASSERT (n >= 0 && n < count);
+    return root[n];
+  }
+
+  /// Get a const reference.
+  T const& operator [] (int n) const
+  {
+    CS_ASSERT (n >= 0 && n < count);
+    return root[n];
   }
 };
 

@@ -54,10 +54,10 @@ public:
   using csArrayBase<T>::Length;
   using csArrayBase<T>::Capacity;
   using csArrayBase<T>::Find;
+  using csArrayBase<T>::Sort;
+  using csArrayBase<T>::Get;
+  using csArrayBase<T>::operator[];
 
-  /// This function prototype is used for Sort()
-  typedef int ArraySortCompareFunction (void const* item1,
-	void const* item2);
   /// This function prototype is used for csArray::InsertSorted()
   typedef int ArrayCompareFunction (T const& item1, T const& item2);
   /// This function prototype is used for csArray::FindKey()
@@ -166,9 +166,10 @@ public:
    * used by the array itself, thus making it more efficient for cases when the
    * number of contained elements will fluctuate.
    */
-  void Empty()
-  { Truncate(0); }
-
+  void Empty ()
+  {
+    Truncate (0);
+  }
 
   /// Destroy the container.
   ~csArray ()
@@ -206,24 +207,11 @@ public:
     }
   }
 
-  /// Get an element (const).
-  T const& Get (int n) const
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    return root[n];
-  }
-
   /// Get an element (non-const).
   T& Get (int n)
   {
     CS_ASSERT (n >= 0 && n < count);
     return root[n];
-  }
-
-  /// Get an element (const).
-  T const& operator [] (int n) const
-  {
-    return Get(n);
   }
 
   /// Get an element (non-const).
@@ -427,14 +415,6 @@ public:
     if (equal_index) *equal_index = -1;
     Insert (m, item);
     return m;
-  }
-
-  /**
-   * Sort array.
-   */
-  void Sort (ArraySortCompareFunction* compare)
-  {
-    qsort (root, Length (), sizeof (T), compare);
   }
 
   /** Iterator for the Array object */

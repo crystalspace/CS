@@ -49,6 +49,12 @@ chronological order.
 	  csPDelArray. Doesn't make sense to compare pointers.
 	- Jorrit removed all DefaultCompare() functions from csRefArray.
 	  Doesn't make sense to compare pointers.
+	- Jorrit moved Sort() implementations to csArrayBase. Only
+	  csRefArray has its own implementation.
+	- Jorrit added csArray::Empty() to csRefArray, csPDelArray, and
+	  csStringArray.
+	- Jorrit moved const Get() and [] operator implementations to
+	  csArrayBase.
 3-Aug-2003
 	- Paul G. implemented a very nasty (and hopefully very temporary) hack
 	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for

@@ -25,7 +25,6 @@
 #include "csutil/arraybase.h"
 
 typedef int csStringArrayCompareFunction (char const* item1, char const* item2);
-typedef int csStringArraySortFunction (void const* item1, void const* item2);
 
 /**
  * An array of strings. This array will properly make copies of the strings
@@ -39,6 +38,9 @@ public:
   using csArrayBase<char*>::Length;
   using csArrayBase<char*>::Capacity;
   // using csArrayBase<char*>::Find; We have our own version
+  using csArrayBase<char*>::Sort;
+  using csArrayBase<char*>::Get;
+  using csArrayBase<char*>::operator[];
 
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
@@ -102,6 +104,16 @@ public:
     }
   }
 
+  /**
+   * Remove all elements.  Similar to DeleteAll(), but does not release memory
+   * used by the array itself, thus making it more efficient for cases when the
+   * number of contained elements will fluctuate.
+   */
+  void Empty ()
+  {
+    Truncate (0);
+  }
+
   /// Set vector length to n.
   void SetLength (int n)
   {
@@ -115,20 +127,6 @@ public:
       SetLengthUnsafe (n);
       memset (root+old_len, 0, (n-old_len)*sizeof (char*));
     }
-  }
-
-  /// Get a string.
-  char const* Get (int n) const
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    return root[n];
-  }
-
-  /// Get a string.
-  char const* operator [] (int n) const
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    return root[n];
   }
 
   /// Make a copy of a string and remember it.
@@ -401,14 +399,6 @@ public:
   int InsertSortedCase (char const* item)
   {
     return InsertSorted (item, CaseInsensitiveCompare);
-  }
-
-  /**
-   * Sort array.
-   */
-  void Sort (csStringArraySortFunction* compare)
-  {
-    qsort (root, Length (), sizeof (char*), compare);
   }
 
   /**

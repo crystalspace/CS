@@ -34,7 +34,10 @@ public:
   // make them public here.
   using csArrayBase<csRef<T> >::Length;
   using csArrayBase<csRef<T> >::Capacity;
-  //using csArrayBase<csRef<T> >::Find;	We have our own Find.
+  //using csArrayBase<csRef<T> >::Find;
+  //using csArrayBase<csRef<T> >::Sort;
+  using csArrayBase<csRef<T> >::Get;
+  using csArrayBase<csRef<T> >::operator[];
 
   typedef int ArrayCompareFunction (T* item1, T* item2);
   typedef int ArrayCompareKeyFunction (T* item, void* key);
@@ -128,6 +131,7 @@ public:
     }
   }
 
+#if 0
   /// Get a const reference.
   const csRef<T>& Get (int n) const
   {
@@ -141,6 +145,7 @@ public:
     CS_ASSERT (n >= 0 && n < count);
     return root[n];
   }
+#endif
 
   /// Get a reference.
   csRef<T>& operator [] (int n)
