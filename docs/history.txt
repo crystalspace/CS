@@ -1,6 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
 17-Aug-2000
+	- Norman Kramer added a /lib/csws entry to a zip containing csws
+	  textures in power of 2 sizes (almost all - not the toolbar tho).
 	- Did some cleanup on terrain.cpp and also started support
 	  for directional lights. i.e. a directional light is a light
 	  with no position (only a direction) and infinite radius.
@@ -12,7 +14,16 @@ The history order has been reversed so that new features are at the top.
 	- Some fixes to csphyzik from Michael Ewert.
 	- Increased far clipping plane in csTerrain::SetDetail() and
 	  decreased near clipping plane.
-	- Wyatt Miler updated the Mac project files.
+	- Wyatt Miler updated the Mac project files and fixed a compile
+	  bug in dtsimple.
+	- Wouter Wijngaards:
+	    In addition to adding the install_dir to the shared library
+	    search path, now also the install_dir/lib/ is added to the
+	    shared library search path. So that files in that dir may
+	    also be found.
+	- Wouter also changed install so that it will install html docs
+	  as well.
+	- Martin Geisse updated the MSVC project files.
 16-Aug-2000
 	- Norman Kamer fixed scfreg.mak.
 	- Alex Pfaffe fixed a bug in the terrain engine where it would
