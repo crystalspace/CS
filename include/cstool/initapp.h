@@ -19,6 +19,14 @@
 #ifndef __CS_INITAPP_H__
 #define __CS_INITAPP_H__
 
+/**\file
+ * Application initialization helper class
+ */
+ 
+/**
+ * \addtogroup addframe
+ * @{ */
+
 #include "cstypes.h"
 #include "iutil/evdefs.h"
 
@@ -31,35 +39,52 @@ struct iVirtualClock;
 struct iCommandLineParser;
 struct iConfigManager;
 
-// Utility macros to select what plugins you want to have loaded.
+/**\name Plugin request macros
+ * Utility macros to select what plugins you want to have loaded.
+ * @{ */
+/// Request a plugin.
 #define CS_REQUEST_PLUGIN(Name,Interface) \
   Name, #Interface, iSCF::SCF->GetInterfaceID(#Interface), Interface##_VERSION
+/// Marker for the end of the requested plugins list.
 #define CS_REQUEST_END \
   NULL
+/// Request VFS plugin.
 #define CS_REQUEST_VFS \
   CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
+/// Request default font server.
 #define CS_REQUEST_FONTSERVER \
   CS_REQUEST_PLUGIN("crystalspace.font.server.default", iFontServer)
+/// Request default image loader.
 #define CS_REQUEST_IMAGELOADER \
   CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplex", iImageIO)
+/// Request null 3D renderer
 #define CS_REQUEST_NULL3D \
   CS_REQUEST_PLUGIN("crystalspace.graphics3d.null",iGraphics3D)
+/// Request software 3D renderer.
 #define CS_REQUEST_SOFTWARE3D \
   CS_REQUEST_PLUGIN("crystalspace.graphics3d.software",iGraphics3D)
+/// Request OpenGL 3D renderer
 #define CS_REQUEST_OPENGL3D \
   CS_REQUEST_PLUGIN("crystalspace.graphics3d.opengl", iGraphics3D)
+/// Request 3D engine.
 #define CS_REQUEST_ENGINE \
   CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)
+/// Request map loader.
 #define CS_REQUEST_LEVELLOADER \
   CS_REQUEST_PLUGIN("crystalspace.level.loader", iLoader)
+/// Request map writer.
 #define CS_REQUEST_LEVELSAVER \
   CS_REQUEST_PLUGIN("crystalspace.level.saver", iSaver)
+/// Request reporter.
 #define CS_REQUEST_REPORTER \
   CS_REQUEST_PLUGIN("crystalspace.utilities.reporter", iReporter)
+/// Request default reporter listener.
 #define CS_REQUEST_REPORTERLISTENER \
   CS_REQUEST_PLUGIN("crystalspace.utilities.stdrep", iStandardReporterListener)
+/// Request simple console output.
 #define CS_REQUEST_CONSOLEOUT \
   CS_REQUEST_PLUGIN("crystalspace.console.output.simple", iConsoleOutput)
+/** @} */
 
 /**
  * Function to handle events for apps.
@@ -172,7 +197,7 @@ public:
    * The variable arguments should contain three entries for every
    * plugin you want to load: name, scfID, and version. To make this
    * easier it is recommended you use one of the CS_REQUEST_xxx macros
-   * above. <b>WARNING</b> Make sure to end the list with CS_REQUEST_END!
+   * above. <b>WARNING</b> Make sure to end the list with #CS_REQUEST_END!
    */
   static bool RequestPlugins (iObjectRegistry*, ...);
 
@@ -226,5 +251,7 @@ public:
    */
   static void DestroyApplication (iObjectRegistry*);
 };
+
+/** @} */
 
 #endif // __CS_INITAPP_H__
