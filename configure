@@ -1377,7 +1377,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 ac_aux_dir=
-for ac_dir in bin $srcdir/bin; do
+for ac_dir in mk/autoconf $srcdir/mk/autoconf; do
   if test -f $ac_dir/install-sh; then
     ac_aux_dir=$ac_dir
     ac_install_sh="$ac_aux_dir/install-sh -c"
@@ -1393,8 +1393,8 @@ for ac_dir in bin $srcdir/bin; do
   fi
 done
 if test -z "$ac_aux_dir"; then
-  { { echo "$as_me:$LINENO: error: cannot find install-sh or install.sh in bin $srcdir/bin" >&5
-echo "$as_me: error: cannot find install-sh or install.sh in bin $srcdir/bin" >&2;}
+  { { echo "$as_me:$LINENO: error: cannot find install-sh or install.sh in mk/autoconf $srcdir/mk/autoconf" >&5
+echo "$as_me: error: cannot find install-sh or install.sh in mk/autoconf $srcdir/mk/autoconf" >&2;}
    { (exit 1); exit 1; }; }
 fi
 ac_config_guess="$SHELL $ac_aux_dir/config.guess"
@@ -9324,7 +9324,10 @@ fi
 # flags are used if available.  We check for Windows opengl32 first because
 # Cygwin users often have Mesa installed, and Mesa's OpenGL library is compiled
 # without the __stdcall flags which results in link errors, whereas Microsoft's
-# native opengl32 works fine.
+# native opengl32 works fine.  Finally, many OpenGL libraries on Unix already
+# contain GLX, so there is no separate GLX library, thus we first check for GLX
+# using the discovered OpenGL library before attempting to locate a separate
+# GLX-specific library.  The same logic is also applied to GLU and GLUT checks.
 #------------------------------------------------------------------------------
 
 
@@ -9747,6 +9750,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     for cs_build_item in `echo @@@-lopengl32 | sed 'y% %#%'` \
     `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
     `echo @@@-lGL | sed 'y% %#%'` \
+    `echo @@@-lgl | sed 'y% %#%'` \
     $cs_mesa_gl
     do
 
@@ -9901,6 +9905,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     for cs_build_item in `echo @@@-lopengl32 | sed 'y% %#%'` \
     `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
     `echo @@@-lGL | sed 'y% %#%'` \
+    `echo @@@-lgl | sed 'y% %#%'` \
     $cs_mesa_gl
     do
 
@@ -10066,11 +10071,7 @@ fi
 
 
 if test $cs_cv_libgl = yes; then
-  cs_gl_plat_cflags="$cs_gl_plat_cflags $cs_cv_libgl_cflags"
-    cs_gl_plat_lflags="$cs_gl_plat_lflags $cs_cv_libgl_lflags"
-    cs_gl_plat_libs="$cs_gl_plat_libs $cs_cv_libgl_libs"
-
-    # Check for GLU.
+  # Check for GLU.
     if test "" != yes; then
   echo "$as_me:$LINENO: checking for GLU" >&5
 echo $ECHO_N "checking for GLU... $ECHO_C" >&6
@@ -10088,9 +10089,11 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lglu32 | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+	`echo @@@-lglu32 | sed 'y% %#%'` \
 	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
 	`echo @@@-lGLU | sed 'y% %#%'` \
+	`echo @@@-lglu | sed 'y% %#%'` \
 	$cs_mesa_glu
     do
 
@@ -10147,9 +10150,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_gl_plat_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_gl_plat_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_gl_plat_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -10214,9 +10217,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_gl_plat_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_gl_plat_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_gl_plat_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libglu=yes
 		cs_cv_libglu_cflags=$cs_build_cflags
 		cs_cv_libglu_lflags=$cs_build_lflags
@@ -10242,9 +10245,11 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lglu32 | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+	`echo @@@-lglu32 | sed 'y% %#%'` \
 	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
 	`echo @@@-lGLU | sed 'y% %#%'` \
+	`echo @@@-lglu | sed 'y% %#%'` \
 	$cs_mesa_glu
     do
 
@@ -10301,9 +10306,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_gl_plat_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_gl_plat_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_gl_plat_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -10368,9 +10373,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_gl_plat_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_gl_plat_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_gl_plat_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libglu=yes
 		cs_cv_libglu_cflags=$cs_build_cflags
 		cs_cv_libglu_lflags=$cs_build_lflags
@@ -10409,10 +10414,10 @@ else
 fi
 
 
-    # Check for glut.
+    # Check for GLUT.
     if test "" != yes; then
-  echo "$as_me:$LINENO: checking for glut" >&5
-echo $ECHO_N "checking for glut... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for GLUT" >&5
+echo $ECHO_N "checking for GLUT... $ECHO_C" >&6
 if test "${cs_cv_libglut+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -10427,8 +10432,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lglut32 | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+	`echo @@@-lglut32 | sed 'y% %#%'` \
 	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'` \
+	`echo @@@-lGLUT | sed 'y% %#%'` \
 	`echo @@@-lglut | sed 'y% %#%'`
     do
 
@@ -10485,9 +10492,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_gl_plat_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_gl_plat_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_gl_plat_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -10552,9 +10559,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_gl_plat_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_gl_plat_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_gl_plat_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libglut=yes
 		cs_cv_libglut_cflags=$cs_build_cflags
 		cs_cv_libglut_lflags=$cs_build_lflags
@@ -10567,8 +10574,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_libglut" >&5
 echo "${ECHO_T}$cs_cv_libglut" >&6
 else
-  echo "$as_me:$LINENO: checking for glut" >&5
-echo $ECHO_N "checking for glut... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for GLUT" >&5
+echo $ECHO_N "checking for GLUT... $ECHO_C" >&6
 	    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -10580,8 +10587,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lglut32 | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+	`echo @@@-lglut32 | sed 'y% %#%'` \
 	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'` \
+	`echo @@@-lGLUT | sed 'y% %#%'` \
 	`echo @@@-lglut | sed 'y% %#%'`
     do
 
@@ -10638,9 +10647,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_gl_plat_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_gl_plat_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_gl_plat_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -10705,9 +10714,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_gl_plat_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_gl_plat_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_gl_plat_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libglut=yes
 		cs_cv_libglut_cflags=$cs_build_cflags
 		cs_cv_libglut_lflags=$cs_build_lflags
@@ -10764,7 +10773,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lGLX | sed 'y% %#%'` $cs_mesa_glx
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+	`echo @@@-lGLX | sed 'y% %#%'` \
+	`echo @@@-lglx | sed 'y% %#%'` \
+	$cs_mesa_glx
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -10820,9 +10832,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_gl_plat_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_gl_plat_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_gl_plat_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -10872,9 +10884,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_gl_plat_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_gl_plat_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_gl_plat_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libglx=yes
 		cs_cv_libglx_cflags=$cs_build_cflags
 		cs_cv_libglx_lflags=$cs_build_lflags
@@ -10900,7 +10912,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lGLX | sed 'y% %#%'` $cs_mesa_glx
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+	`echo @@@-lGLX | sed 'y% %#%'` \
+	`echo @@@-lglx | sed 'y% %#%'` \
+	$cs_mesa_glx
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -10956,9 +10971,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_gl_plat_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_gl_plat_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_gl_plat_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -11008,9 +11023,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_gl_plat_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_gl_plat_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_gl_plat_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libglx=yes
 		cs_cv_libglx_cflags=$cs_build_cflags
 		cs_cv_libglx_lflags=$cs_build_lflags

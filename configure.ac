@@ -566,7 +566,7 @@ AC_DEFUN([CS_MAKEFILE_BUILD_FLAGS],
 AC_INIT([Crystal Space], [cs_version_number],
     [crystal-main@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([libs/cssys/cssys.mak])
-AC_CONFIG_AUX_DIR([bin])
+AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_PREFIX_DEFAULT([cs_install_dir_default])
 AC_CANONICAL_HOST
 
@@ -1170,7 +1170,10 @@ AS_IF([test "$no_x" != yes],
 # flags are used if available.  We check for Windows opengl32 first because
 # Cygwin users often have Mesa installed, and Mesa's OpenGL library is compiled
 # without the __stdcall flags which results in link errors, whereas Microsoft's
-# native opengl32 works fine.
+# native opengl32 works fine.  Finally, many OpenGL libraries on Unix already
+# contain GLX, so there is no separate GLX library, thus we first check for GLX
+# using the discovered OpenGL library before attempting to locate a separate
+# GLX-specific library.  The same logic is also applied to GLU and GLUT checks.
 #------------------------------------------------------------------------------
 m4_define([cs_define_int32],
     [@%:@if !HAVE_TYPE_INT32
@@ -1241,42 +1244,46 @@ CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
     [CS_CREATE_TUPLE([],[],[-lopengl32]) \
     CS_CREATE_TUPLE([-DCS_OPENGL_PATH=OpenGL],[],[-framework OpenGL]) \
     CS_CREATE_TUPLE([],[],[-lGL]) \
+    CS_CREATE_TUPLE([],[],[-lgl]) \
     $cs_mesa_gl], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libgl], [GL])], [], [],
     [$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
 
 AS_IF([test $cs_cv_libgl = yes],
-    [cs_gl_plat_cflags="$cs_gl_plat_cflags $cs_cv_libgl_cflags"
-    cs_gl_plat_lflags="$cs_gl_plat_lflags $cs_cv_libgl_lflags"
-    cs_gl_plat_libs="$cs_gl_plat_libs $cs_cv_libgl_libs"
-
-    # Check for GLU.
+    [# Check for GLU.
     CS_CHECK_BUILD([for GLU], [cs_cv_libglu],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GL_PATH],[GL],[glu.h])], [gluNewQuadric()])],
-	[CS_CREATE_TUPLE([],[],[-lglu32]) \
+	[CS_CREATE_TUPLE() \
+	CS_CREATE_TUPLE([],[],[-lglu32]) \
 	CS_CREATE_TUPLE([-DCS_GL_PATH=OpenGL],[],[-framework OpenGL]) \
 	CS_CREATE_TUPLE([],[],[-lGLU]) \
+	CS_CREATE_TUPLE([],[],[-lglu]) \
 	$cs_mesa_glu], [],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglu], [GLU])], [], [],
-	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
+	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
 
-    # Check for glut.
-    CS_CHECK_BUILD([for glut], [cs_cv_libglut],
+    # Check for GLUT.
+    CS_CHECK_BUILD([for GLUT], [cs_cv_libglut],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GLUT_PATH],[GL],[glut.h])], [glutSwapBuffers])],
-	[CS_CREATE_TUPLE([],[],[-lglut32]) \
+	[CS_CREATE_TUPLE() \
+	CS_CREATE_TUPLE([],[],[-lglut32]) \
 	CS_CREATE_TUPLE([-DCS_GLUT_PATH=GLUT],[],[-framework GLUT]) \
+	CS_CREATE_TUPLE([],[],[-lGLUT]) \
 	CS_CREATE_TUPLE([],[],[-lglut])], [],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglut], [GLUT])], [], [],
-	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
+	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
 
     # Check for GLX.
     CS_CHECK_BUILD([for GLX], [cs_cv_libglx],
 	[AC_LANG_PROGRAM([#include <GL/glx.h>], [glXWaitGL()])],
-	[CS_CREATE_TUPLE([],[],[-lGLX]) $cs_mesa_glx], [],
+	[CS_CREATE_TUPLE() \
+	CS_CREATE_TUPLE([],[],[-lGLX]) \
+	CS_CREATE_TUPLE([],[],[-lglx]) \
+	$cs_mesa_glx], [],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglx], [GLX])], [], [],
-	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
+	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
 
     # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
     # present.

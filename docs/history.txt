@@ -13,6 +13,30 @@ The history order is reversed so that new features are at the top.
 	- Started working on OpenGL version of OpenPortal() (unfinished).
 	- Eric Sunshine added French translation for texi2html titles and
 	  month names contributed by Vincent K <vince@iefr.ath.cx>.
+	- Eric Sunshine made the following changes to project configuration:
+	    - Fixed configure.ac bug: Was adding cs_gl_plat_cflags,
+	      cs_gl_plat_lflags, and cs_gl_plat_libs flags one time extra for
+	      GLU, GLUT, and GLX tests.
+	    - Made the OpenGL-related checks in configure.ac more orthogonal.
+	      Previously, there was no clear distinction as to whether it was
+	      checking for existence of a library (libglx, libglu, etc.) or
+	      existence of a facility (GLX, GLU, etc.).  Now, all tests check
+	      for existence of a facility and will correctly recognize
+	      facilities even if built into the OpenGL library.  For example,
+	      GLX is usually built into libGL.a these days.  Previously, the
+	      GLX check would fail because there was no separate libglx.a, but
+	      now the GLX check will succeed.  This change also fixes a problem
+	      where the GLX "extensions" check failed to run if GLX was built
+	      into libGL.a.
+	    - Now that GLX.AVAIALBLE has a meaningful value even when GLX is
+	      built into libGL.a, this variable is used to control building of
+	      glx2d rather than GL.AVAIALBLE.
+	    - Now checks for upper- and lowercase OpenGL-related library names
+	      rather than assuming that GL, GLU, and GLX should be uppercase.
+	      This should help to identify these libraries on platforms where
+	      they appear as libgl.a, libglu.a, and libglx.a.
+	    - Moved config.guess, config.sub, and install-sh from CS/bin to
+	      CS/mk/autoconf.
 23-Mar-2003
 	- Jonathan Tarbox Added initial Flatten/Unflatten code, don't
 	  expect it to work just yet.

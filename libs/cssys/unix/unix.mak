@@ -18,10 +18,8 @@ ifeq ($(X11.AVAILABLE),yes)
   ifeq ($(USE_XFREE86VM),yes)
     PLUGINS += video/canvas/xextf86vm
   endif
-
-  ifeq ($(GL.AVAILABLE),yes)
+  ifeq ($(GLX.AVAILABLE),yes)
     PLUGINS += video/canvas/openglx
-    PLUGINS += video/renderer/opengl-ext
   endif
 endif
 
