@@ -26,6 +26,8 @@ chronological order.
 	  As Eric points out, csArray::Section() is perfectly safe for
 	  csPDelArray because it returns a csArray and not another
 	  csPDelArray.
+        - Philip Wyett changed sprcal3d plugin to link with cal3d lib and
+          not the ode lib under MSVC as it was previously.
 9-Aug-2003
         - Philip Wyett moved int j out of 'for' loop within
           csSpriteCal3DMeshObject::DetachCoreMesh () and fixed compile error.
