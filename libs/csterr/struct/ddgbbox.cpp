@@ -232,7 +232,7 @@ Return Values:
 ddgVis ddgBBox::isVisible(ddgPlane *planes, int n )
 {
 	ddgAssert(n > 0 && n < 20);
-	ddgVector3 minPt, maxPt;
+	ddgVector3 minPt(0,0,0), maxPt(0,0,0);
 	bool bIntersecting = false;	// Assume all points are inside.
 
 	for (int i = 0; i < n; i++)   // For each plane.
