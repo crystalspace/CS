@@ -1165,7 +1165,7 @@ bool csEngine::Prepare (iProgressMeter *meter)
 
 #ifndef CS_USE_NEW_RENDERER
   G3D->ClearCache ();
-
+#else
   csRef<iShaderManager> shadermgr = 
     CS_QUERY_REGISTRY(object_reg, iShaderManager);
   shadermgr->PrepareShaders ();
