@@ -407,6 +407,8 @@ void csXWindow::SetTitle (const char* title)
   delete [] win_title;
   win_title = new char [strlen (title) + 1];
   strcpy (win_title, title);
+  if(dpy && wm_win)   
+      XStoreName(dpy, wm_win, win_title);
 }
 
 void csXWindow::AllowResize (bool iAllow)
