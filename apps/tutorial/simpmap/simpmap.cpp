@@ -22,39 +22,69 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-// The global pointer to simple
-Simple *simple;
-
-Simple::Simple (iObjectRegistry* object_reg)
+Simple::Simple ()
 {
-  Simple::object_reg = object_reg;
+  SetApplicationName ("Simple Map");
 }
 
 Simple::~Simple ()
 {
 }
 
-void Simple::SetupFrame ()
+void Simple::ProcessFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
-
   // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
+  float speed = (elapsed_time / 1000.0) * (0.06 * 20);
 
   iCamera* c = view->GetCamera();
-  if (kbd->GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-  if (kbd->GetKeyState (CSKEY_PGUP))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (CS_VEC_FORWARD * 4 * speed);
-  if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (CS_VEC_BACKWARD * 4 * speed);
+
+  if (kbd->GetKeyState (CSKEY_SHIFT))
+  {
+    // If the user is holding down shift, the arrow keys will cause
+    // the camera to strafe up, down, left or right from it's
+    // current position.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      c->Move (CS_VEC_RIGHT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      c->Move (CS_VEC_LEFT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_UP * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_DOWN * 4 * speed);
+  }
+  else
+  {
+    // left and right cause the camera to rotate on the global Y
+    // axis; page up and page down cause the camera to rotate on the
+    // _camera's_ X axis (more on this in a second) and up and down
+    // arrows cause the camera to go forwards and backwards.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      rotY += speed;
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      rotY -= speed;
+    if (kbd->GetKeyState (CSKEY_PGUP))
+      rotX += speed;
+    if (kbd->GetKeyState (CSKEY_PGDN))
+      rotX -= speed;
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_FORWARD * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_BACKWARD * 4 * speed);
+  }
+
+  // We now assign a new rotation transformation to the camera.  You
+  // can think of the rotation this way: starting from the zero
+  // position, you first rotate "rotY" radians on your Y axis to get
+  // the first rotation.  From there you rotate "rotX" radians on the
+  // your X axis to get the final rotation.  We multiply the
+  // individual rotations on each axis together to get a single
+  // rotation matrix.  The rotations are applied in right to left
+  // order .
+  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  c->SetTransform (ot);
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -66,49 +96,117 @@ void Simple::SetupFrame ()
 
 void Simple::FinishFrame ()
 {
+  // Just tell the 3D renderer that everything has been rendered.
   g3d->FinishDraw ();
   g3d->Print (0);
 }
 
-bool Simple::HandleEvent (iEvent& ev)
+bool Simple::OnKeyboard(iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  // We got a keyboard event.
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
   {
-    simple->SetupFrame ();
-    return true;
-  }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
-  {
-    simple->FinishFrame ();
-    return true;
-  }
-  else if ((ev.Type == csevKeyboard) && 
-    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown))
-  {
-    if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
+    // The user pressed a key (as opposed to releasing it).
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    if (code == CSKEY_ESC)
     {
-      csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-      if (q)
-	q->GetEventOutlet()->Broadcast (cscmdQuit);
-      return true;
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'l')
-    {
-      csDebuggingGraph::Dump (0);
-      engine->DeleteAll ();
-      csDebuggingGraph::Dump (0);
-      csDebuggingGraph::Clear (0);
-      LoadMap ();
-      return true;
+      // The user pressed escape to exit the application.
+      // The proper way to quit a Crystal Space application
+      // is by broadcasting a cscmdQuit event. That will cause the
+      // main runloop to stop. To do that we get the event queue from
+      // the object registry and then post the event.
+      csRef<iEventQueue> q = 
+        CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
     }
   }
-
   return false;
 }
 
-bool Simple::SimpleEventHandler (iEvent& ev)
+bool Simple::OnInitialize(int argc, char* argv[])
 {
-  return simple->HandleEvent (ev);
+  // RequestPlugins() will load all plugins we specify. In addition
+  // it will also check if there are plugins that need to be loaded
+  // from the config system (both the application config and CS or
+  // global configs). In addition it also supports specifying plugins
+  // on the commandline.
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+    CS_REQUEST_VFS,
+    CS_REQUEST_OPENGL3D,
+    CS_REQUEST_ENGINE,
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_IMAGELOADER,
+    CS_REQUEST_LEVELLOADER,
+    CS_REQUEST_REPORTER,
+    CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
+
+  // Now we need to setup an event handler for our application.
+  // Crystal Space is fully event-driven. Everything (except for this
+  // initialization) happens in an event.
+  if (!RegisterQueue(GetObjectRegistry()))
+    return ReportError("Failed to set up event handler!");
+
+  return true;
+}
+
+void Simple::OnExit()
+{
+}
+
+bool Simple::Application()
+{
+  // Open the main system. This will open all the previously loaded plug-ins.
+  // i.e. all windows will be opened.
+  if (!OpenApplication(GetObjectRegistry()))
+    return ReportError("Error opening system!");
+
+  // Now get the pointer to various modules we need. We fetch them
+  // from the object registry. The RequestPlugins() call we did earlier
+  // registered all loaded plugins with the object registry.
+  // The virtual clock.
+  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+
+  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+
+  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
+  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+
+  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+
+  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
+  if (!loader) return ReportError("Failed to locate Loader!");
+
+  // We need a View to the virtual world.
+  view = csPtr<iView> (new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  // We use the full window to draw the world.
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  // Here we load our world from a map file.
+  if (!LoadMap ()) return false;
+
+  // Let the engine prepare all lightmaps for use and also free all images 
+  // that were loaded for the texture manager.
+  engine->Prepare ();
+
+  // these are used store the current orientation of the camera
+  rotY = rotX = 0;
+
+  // Now we need to position the camera in our world.
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (pos);
+
+  // This calls the default runloop. This will basically just keep
+  // broadcasting process events to keep the game going.
+  Run();
+
+  return true;
 }
 
 bool Simple::LoadMap ()
@@ -118,16 +216,9 @@ bool Simple::LoadMap ()
   VFS->ChDir ("/lev/partsys");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpmap",
-    	"Couldn't load level!");
-    return false;
-  }
-  engine->Prepare ();
+    ReportError("Error couldn't load level!");
 
   // Find the starting position in this level.
-  csVector3 pos (0, 0, 0);
   if (engine->GetCameraPositions ()->GetCount () > 0)
   {
     // There is a valid starting position defined in the level file.
@@ -140,123 +231,12 @@ bool Simple::LoadMap ()
     // We didn't find a valid starting position. So we default
     // to going to room called 'room' at position (0,0,0).
     room = engine->GetSectors ()->FindByName ("room");
+    pos = csVector3 (0, 0, 0);
   }
   if (!room)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpmap",
-      	"Can't find a valid starting position!");
-    return false;
-  }
+    ReportError("Can't find a valid starting position!");
 
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (pos);
   return true;
-}
-
-bool Simple::Initialize ()
-{
-  csDebuggingGraph::SetupGraph (object_reg);
-
-  if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-	CS_REQUEST_OPENGL3D,
-	CS_REQUEST_ENGINE,
-	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_IMAGELOADER,
-	CS_REQUEST_LEVELLOADER,
-	CS_REQUEST_REPORTER,
-	CS_REQUEST_REPORTERLISTENER,
-	CS_REQUEST_END))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpmap",
-	"Can't initialize plugins!");
-    return false;
-  }
-
-  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpmap",
-	"Can't initialize event handler!");
-    return false;
-  }
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    csCommandLineHelper::Help (object_reg);
-    return false;
-  }
-
-  // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  if (!vc)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpmap",
-	"Can't find the virtual clock!");
-    return false;
-  }
-
-  // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  if (!engine)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpmap",
-	"No iEngine plugin!");
-    return false;
-  }
-
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (!loader)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpmap",
-    	"No iLoader plugin!");
-    return false;
-  }
-
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  if (!g3d)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpmap",
-    	"No iGraphics3D plugin!");
-    return false;
-  }
-
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
-  if (!kbd)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpmap",
-    	"No iKeyboardDriver plugin!");
-    return false;
-  }
-
-  // Open the main system. This will open all the previously loaded plug-ins.
-  if (!csInitializer::OpenApplication (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpmap",
-    	"Error opening system!");
-    return false;
-  }
-
-  view = csPtr<iView> (new csView (engine, g3d));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  if (!LoadMap ()) return false;
-  return true;
-}
-
-void Simple::Start ()
-{
-  csDefaultRunLoop (object_reg);
 }
 
 /*---------------------------------------------------------------------*
@@ -264,15 +244,5 @@ void Simple::Start ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return -1;
-  simple = new Simple (object_reg);
-
-  if (simple->Initialize ())
-    simple->Start ();
-
-  delete simple;
-
-  csInitializer::DestroyApplication (object_reg);
-  return 0;
+  return Simple().Main(argc, argv);
 }

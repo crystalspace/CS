@@ -16,6 +16,7 @@ chronological order.
 	- Eric Sunshine upgraded the FreeType2 check so that it is capable of
 	  locating the Fink-installed `freetype-config' in the unusual location
 	  /sw/lib/freetype2/bin on MacOS/X.
+	- PK changed the simple tutorials to use csApplicationFramework.
 17-Nov-2004
 	- Eric Sunshine fixed a bogus string comparison in
 	  csSpriteCal3DMeshObject::FindAnimCycleNamePos() which generally

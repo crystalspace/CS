@@ -53,27 +53,41 @@ To make this example a little more interesting the material is going to be
 loaded @emph{after} the other setup of the texture manager has been done.
 This is not really needed but it illustrates how a game might load materials
 dynamically later when the application is already running.  So first we edit
-@file{simple.cpp} and add the following in @code{Simple::Initialize()}
+@file{simple.h}:
+@example
+@dots{}
+class Simple
+@{
+private:
+  @dots{}
+  void CreateSprites ();
+  @dots{}
+@end example
+
+
+Then we edit @file{simple.cpp} and add the following in
+@code{Simple::Application()} and @code{Simple::CreateSprites()}
 (before @samp{return true}):
 
 @example
-bool Simple::Initialize()
+bool Simple::Application()
 @{
   @dots{}
+  CreateSprites();
+  @dots{}
+  return true;
+@}
 
+@dots{}
+
+void Simple::CreateSprites()
+@{
   // Load a texture for our sprite.
   iTextureManager* txtmgr = g3d->GetTextureManager ();
   iTextureWrapper* txt = loader->LoadTexture ("spark",
         "/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
   if (txt == 0)
-  @{
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.simple",
-        "Error loading texture!");
-    return false;
-  @}
-
-  return true;
+    ReportError("Error loading texture!");
 @}
 @end example
 
@@ -116,25 +130,18 @@ textures.
 
 Now that we have our material we can use it to load the mesh factory.
 Edit @file{simple.cpp} and add the following code in
-@code{Simple::Initialize()} (before @samp{return true} and after
+@code{Simple::CreateSprites()} (before @samp{return true} and after
 the code we just added to load the material):
 
 @example
-bool Simple::Initialize ()
+void Simple::CreateSprites ()
 @{
   @dots{}
   // Load a sprite template from disk.
   csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory (
         "/lib/std/sprite1"));
   if (imeshfact == 0)
-  @{
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.simple1",
-        "Error loading mesh object factory!");
-    return false;
-  @}
-
-  return true;
+    ReportError("Error loading mesh object factory!");
 @}
 @end example
 
@@ -152,11 +159,11 @@ in the next section.
 @cindex Simple Creating Mesh, Tutorial
 
 To create a mesh just add the following code in
-@code{Simple::Initialize()} (before @samp{return true} and after
+@code{Simple::CreateSprites()} (before @samp{return true} and after
 the code we just added to load the mesh factory):
 
 @example
-bool Simple::Initialize ()
+void Simple::CreateSprites ()
 @{
   @dots{}
 
@@ -172,8 +179,6 @@ bool Simple::Initialize ()
   spstate->SetAction ("default");
   sprite->SetZBufMode (CS_ZBUF_USE);
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
-
-  return true;
 @}
 @end example
 
