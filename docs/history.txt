@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+11-Apr-2000
+	- Andrew Zabolotny added a SciTech MGL 2D driver (unfinished, won't
+	  compile).
 10-Apr-2000
 	- Added 'DETAIL' keyword for THING and SIXFACE and CS_ENTITY_DETAIL
 	  flag to csThing. With this keyword you can indicate detail objects
@@ -37,6 +40,11 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed texinfo/anatomy/depend.txi so that it works with
 	  TeX, which was not able to deal with @itemize lists formatted with
 	  @w even though @w is perfectly legal Texinfo.
+	- Finally fixed the bug in the dynamic object support for
+	  polygon trees. Sprites are now finally working correctly in
+	  STATBSP levels.
+	- Fixed a memory leak as well so that the polygon stubs are
+	  correctly freed when a sprite is removed.
 9-Apr-2000
 	- Drasticly improved octree building but NOT with the solid
 	  space splitter. I still need to investigate that one.

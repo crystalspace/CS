@@ -37,6 +37,8 @@ class csBspPolygonFactory : public csPolygonIntFactory
 {
   /// Create a csBspPolygon.
   virtual csPolygonInt* Create ();
+  /// Initialize a csBspPolygon.
+  virtual void Init (csPolygonInt* pi);
 };
 
 /**
@@ -189,7 +191,7 @@ public:
   virtual ~csPolyTreeBBox ();
 
   /// Get the base set of polygons.
-  virtual csPolygonStub* GetBaseStub () { base_stub->IncRef (); return base_stub; }
+  virtual csPolygonStub* GetBaseStub () { return base_stub; }
 
   /// Remove polygons from a stub.
   virtual void RemovePolygons (csPolygonStub* stub);

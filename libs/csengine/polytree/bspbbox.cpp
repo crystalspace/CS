@@ -33,6 +33,14 @@ csPolygonInt* csBspPolygonFactory::Create ()
   return (csPolygonInt*)pol;
 }
 
+void csBspPolygonFactory::Init (csPolygonInt* pi)
+{
+  csBspPolygon* pol = (csBspPolygon*)pi;
+  pol->polygon.MakeEmpty ();
+  pol->parent = NULL;
+  pol->originator = NULL;
+}
+
 //---------------------------------------------------------------------------
 
 void csBspPolygon::Dump ()

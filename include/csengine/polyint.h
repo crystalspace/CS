@@ -231,13 +231,16 @@ public:
  * An abstract factory class to create specific instances of csPolygonInt.
  * To create a real factory you need to subclass this factory.
  * In addition to creation this factory also manages the reference
- * counter.
+ * counter and a function to initialize a given polygon as managed
+ * by this factory.
  */
 class csPolygonIntFactory
 {
 public:
   /// Create a csPolygonInt.
   virtual csPolygonInt* Create () = 0;
+  /// Initialize a csPolygonInt known to this factory.
+  virtual void Init (csPolygonInt* p) = 0;
 };
 
 /**
@@ -304,6 +307,7 @@ public:
       CHK (pnew = new PoolObj ());
       pnew->pi = poly_fact->Create ();
     }
+    poly_fact->Init (pnew->pi);
     pnew->next = alloced;
     alloced = pnew;
     pnew->pi->ref_count = 1;
