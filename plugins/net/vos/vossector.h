@@ -30,7 +30,8 @@
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
-class csVosSector : public iVosSector, public iVosApi
+class csVosSector : public iVosSector, public iVosApi, 
+                    public VOS::ChildChangeListener
 {
 private:
   char* url;
@@ -39,6 +40,12 @@ private:
   csRef<iSector> sector;
   csVosA3DL* vosa3dl;
   VOS::vRef<A3DL::Sector> sectorvobj;
+
+  bool isLit;
+
+  virtual void notifyChildInserted (VOS::VobjectEvent &event);
+  virtual void notifyChildRemoved (VOS::VobjectEvent &event);
+  virtual void notifyChildReplaced (VOS::VobjectEvent &event);
 
 public:
   SCF_DECLARE_IBASE;
@@ -52,6 +59,7 @@ public:
   virtual VOS::vRef<VOS::Vobject> GetVobject();
 
   friend class LoadSectorTask;
+  friend class RelightTask;
 };
 
 #endif

@@ -29,6 +29,7 @@
 
 #include "inetwork/vosa3dl.h"
 #include "iengine/mesh.h"
+#include "ivaria/dynamics.h"
 
 #include "csvosa3dl.h"
 #include "vossector.h"
@@ -37,6 +38,7 @@ class csVosObject3D : public iVosObject3D, public iVosApi
 {
 private:
   csRef<iMeshWrapper> meshwrapper;
+  csRef<iRigidBody> collider;
   VOS::vRef<A3DL::Object3D> object3d;
 public:
   SCF_DECLARE_IBASE;
@@ -48,12 +50,16 @@ public:
 
   void SetMeshWrapper(iMeshWrapper* mw);
 
+  virtual csRef<iRigidBody> GetCollider();
+
+  void SetCollider (iRigidBody *col);
+
   virtual VOS::vRef<VOS::Vobject> GetVobject();
 };
 
 class csMetaObject3D : public virtual A3DL::Object3D,
                        public VOS::PropertyListener,
-             public VOS::ChildChangeListener
+                       public VOS::ChildChangeListener
 {
 protected:
   csRef<csVosObject3D> csvobj3d;

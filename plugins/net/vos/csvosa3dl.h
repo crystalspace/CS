@@ -34,15 +34,19 @@
 #include "iutil/eventh.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
+#include "ivaria/dynamics.h"
 
 class csVosA3DL : public iComponent, public iEventHandler,
-	public iVosA3DL, public iVosApi
+    public iVosA3DL, public iVosApi
 {
 private:
   csRef<iEventQueue> eventq;
+  csRef<iDynamicSystem> dynsys;
+
   iObjectRegistry *objreg;
 
   VOS::vRef<VOS::Site> localsite;
+ 
 public:
   SCF_DECLARE_IBASE;
 
@@ -58,6 +62,11 @@ public:
   csRef<iObjectRegistry> GetObjectRegistry()
   {
     return objreg;
+  }
+
+  csRef<iDynamicSystem> GetDynSys ()
+  {
+    return dynsys;
   }
 
   virtual VOS::vRef<VOS::Vobject> GetVobject();

@@ -130,6 +130,18 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   localsite.assign(new Site(true), false);
   localsite->addSiteExtension(new LocalSocketSiteExtension());
 
+  csRef<iDynamics> dynamics = CS_QUERY_REGISTRY (objreg, iDynamics);
+  if (dynamics)
+  {
+  	LOG("csVosA3DL", 2, "Initializing dynamics system");
+	dynsys = dynamics->CreateSystem();
+  }
+  else
+  {
+  	LOG("csVosA3DL", 2, "Not using dynamics system");
+	dynsys = NULL;
+  }
+
   return true;
 }
 

@@ -44,6 +44,8 @@ csVosObject3D::csVosObject3D(A3DL::Object3D* obj3d)
   : object3d(obj3d, true)
 {
   SCF_CONSTRUCT_IBASE (0);
+  meshwrapper = NULL;
+  collider = NULL;
 }
 
 csVosObject3D::~csVosObject3D()
@@ -59,6 +61,16 @@ csRef<iMeshWrapper> csVosObject3D::GetMeshWrapper()
 void csVosObject3D::SetMeshWrapper(iMeshWrapper* mw)
 {
   meshwrapper = mw;
+}
+
+csRef<iRigidBody> csVosObject3D::GetCollider ()
+{
+  return collider;
+}
+
+void csVosObject3D::SetCollider (iRigidBody *col)
+{
+  collider = col;
 }
 
 VOS::vRef<VOS::Vobject> csVosObject3D::GetVobject()

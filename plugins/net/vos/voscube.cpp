@@ -41,9 +41,11 @@ public:
   vRef<csMetaCube> cube;
   std::string name;
   csRef<iSector> sector;
+  csRef<iDynamicSystem> dynsys;
+  csVector3 size;
 
-  ConstructCubeTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
-                    csMetaCube* c, std::string n, iSector *s);
+  ConstructCubeTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat, 
+                      csMetaCube* c, std::string n, iSector *s);
   virtual ~ConstructCubeTask();
   virtual void doTask();
 };
@@ -80,6 +82,23 @@ void ConstructCubeTask::doTask()
 
     csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (
                     cube_factory, name.c_str(), sector, csVector3(0, 0, 0));
+
+    if (dynsys)
+    {
+      csRef<iRigidBody> collider = dynsys->CreateBody ();
+      collider->SetProperties (1, csVector3 (0), csMatrix3 ());
+      collider->SetPosition (csVector3(0, 0, 0));
+      collider->AttachMesh (meshwrapper);
+      //collider->SetMoveCallback(this);
+      const csMatrix3 tm;
+      const csVector3 tv (0);
+      csOrthoTransform t (tm, tv);
+
+      collider->AttachColliderBox (size, t, 0, 1, 0);
+      //if(isRemote()) collider->MakeStatic();
+	  cube->GetCSinterface()->SetCollider (collider);
+    }
+
     cube->GetCSinterface()->SetMeshWrapper(meshwrapper);
   }
 }
@@ -94,7 +113,7 @@ csMetaCube::csMetaCube(VobjectBase* superobject)
 }
 
 MetaObject* csMetaCube::new_csMetaCube(VobjectBase* superobject,
-	const std::string& type)
+    const std::string& type)
 {
   return new csMetaCube(superobject);
 }
@@ -105,11 +124,23 @@ void csMetaCube::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());
   LOG("csMetaCube", 3, "getting material " << mat.isValid());
   mat->Setup(vosa3dl);
-  LOG("csMetaCube", 3, "setting up cube");
-  vosa3dl->mainThreadTasks.push(new ConstructCubeTask(
-  	vosa3dl->GetObjectRegistry(), mat, this, getURLstr(),
-	sect->GetSector()));
 
+  LOG("csMetaCube", 3, "setting up cube");
+  ConstructCubeTask *t = new ConstructCubeTask(vosa3dl->GetObjectRegistry(), 
+                                    mat, this, getURLstr(), sect->GetSector());
+
+  t->dynsys = vosa3dl->GetDynSys();
+  double x = 1, y = 1, z = 1;
+  try
+  {
+    getScaling (x, y, z);
+  }
+  catch (NoSuchObjectError) 
+  {
+  }
+  t->size = csVector3 (x,y,z);
+
+  vosa3dl->mainThreadTasks.push(t);
   LOG("csMetaCube", 3, "calling csMetaObject3D::setup");
   csMetaObject3D::Setup(vosa3dl, sect);
 }
