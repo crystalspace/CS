@@ -65,7 +65,7 @@ csGLShaderFFP::csGLShaderFFP(csGLShader_FIXED* shaderPlug)
   SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 }
 
-csGLShaderFFP::~csGLShaderFFP ();
+csGLShaderFFP::~csGLShaderFFP ()
 {
   Deactivate();
   if(programstring) delete programstring;

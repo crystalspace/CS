@@ -16,6 +16,11 @@ chronological order.
 	  less of a pain to use an external message loop. 2 of those functions
 	  are for setting/getting a state wether CS should use its MSG loop, the
 	  third function is to send Win32 messages to CS.
+	- Anders Stenberg removed a ; in Fixed fP the kept it from compiling;
+	- Anders Stenberg made a better "draw the last pixel of the line"-fix
+	  in the 2D renderer.
+	- Anders Stenberg re-enabled DrawPixmap in NR, since it by some reason
+	  was disabled. (Probably my fault. :)
 20-Dec-2003
 	- Andreas Busch added Yield() to csThread for posix and win32.
 	- res made some changes to GL proc texes and the GL canvas to work

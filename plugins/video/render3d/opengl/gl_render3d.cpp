@@ -1733,7 +1733,6 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, 
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
-  return;
   // If original dimensions are different from current dimensions (because
   // image has been scaled to conform to OpenGL texture size restrictions)
   // we correct the input coordinates here.

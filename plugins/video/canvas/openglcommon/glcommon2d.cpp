@@ -323,7 +323,7 @@ void csGraphics2DGLCommon::DrawLine (
 
     // opengl doesn't draw the last pixel of a line, but we
     // want that pixel anyway, add the pixel.
-    if(y1==y2){ // horizontal lines
+    /*if(y1==y2){ // horizontal lines
       if(x2>x1) x2++;
       else if(x1>x2) x1++;
     }
@@ -335,6 +335,17 @@ void csGraphics2DGLCommon::DrawLine (
     {
       if(x2>x1) x2++;
       else if(x1>x2) x1++;
+    }*/
+
+    // This extends the line enough to get the last pixel of the line on GL
+    // Note! If this doesn't work in OR, just revert to old way for OR and
+    // not for NR. It's tested (at least a bit :) and seems to work in NR.
+    csVector2 delta (x2-x1, y2-y1);
+    if (delta.SquaredNorm ()>EPSILON*EPSILON)
+    {
+      delta *= 1.4142135623731/delta.Norm ();
+      x2 += delta.x;
+      y2 += delta.y;
     }
 
     // This is a workaround for a hard-to-really fix problem with OpenGL:
