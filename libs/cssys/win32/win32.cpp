@@ -421,10 +421,16 @@ private:
   bool cmdline_help_wanted;
   HCURSOR m_hCursor;
   csRef<iEventOutlet> EventOutlet;
+
+  const char* msgOkMsg;
+  HHOOK msgBoxOkChanger;
+
   void SetWinCursor (HCURSOR);
   iEventOutlet* GetEventOutlet();
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
+  static LRESULT CALLBACK CBTProc (int nCode, WPARAM wParam, LPARAM lParam);
+
 #ifdef DO_DINPUT_KEYBOARD
   HANDLE m_hEvent;
   HANDLE m_hThread;
@@ -1109,6 +1115,30 @@ void Win32Assistant::DisableConsole ()
   printf("====== %s", asctime(now));
 }
 
+LRESULT Win32Assistant::CBTProc (int nCode, WPARAM wParam, LPARAM lParam)
+{
+  switch (nCode)
+  {
+    // when the MB is first activated we change the button text
+  case HCBT_ACTIVATE:
+    {
+      // The MBs we request always have just ibe button (OK)
+      HWND Button = FindWindowEx ((HWND)wParam, 0, "Button", NULL);
+      if (Button)
+        SetWindowText (Button, GLOBAL_ASSISTANT->msgOkMsg);
+      LRESULT ret = CallNextHookEx (GLOBAL_ASSISTANT->msgBoxOkChanger,
+	nCode, wParam, lParam);
+      // The work is done, remove the hook.
+      UnhookWindowsHookEx (GLOBAL_ASSISTANT->msgBoxOkChanger);
+      GLOBAL_ASSISTANT->msgBoxOkChanger = 0;
+      return ret;
+    }
+    break;
+  }
+  return CallNextHookEx (GLOBAL_ASSISTANT->msgBoxOkChanger,
+    nCode, wParam, lParam);
+}
+
 void Win32Assistant::AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args)
 {
@@ -1121,9 +1151,30 @@ void Win32Assistant::AlertV (HWND window, int type, const char* title,
   else if (type == CS_ALERT_NOTE)
     style |= MB_ICONINFORMATION;
 
+  msgBoxOkChanger = 0;
+  /*
+    To change the text of the "OK" button, we somehow have to get
+    a handle to it, preferably before the user sees anything of
+    the message. So a hook is set up.
+   */
+  if (okMsg != 0)
+  {
+    msgOkMsg = okMsg;
+    msgBoxOkChanger = SetWindowsHookEx (WH_CBT,
+      &CBTProc, ModuleHandle, GetCurrentThreadId());
+  }
+
   char buf[4096];
   vsprintf(buf, msg, args);
   MessageBox (window, buf, title, style);
+
+  /*
+    Clean up in case it isn't already.
+   */
+  if (msgBoxOkChanger != 0)
+  {
+    UnhookWindowsHookEx (msgBoxOkChanger);
+  }
 }
 
 //@@@ somewhat ugly.

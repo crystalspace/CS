@@ -32,6 +32,9 @@ The history order is reversed so that new features are at the top.
 	    - Eliminated unportable ussage of "echo -e" from static.jam.
 	- Eric Sunshine fixed macosx/cocoa/Jamfile so that it now links with
 	  the canvascommon library target.
+	- res augmented the Win32 Alert() facility (i.e. message boxes) to 
+	  honor okMsg (that is, you can now give the OK button a different 
+	  text.)
 29-May-2003
 	- Oktal removed the clean target from from swig.jam as it was deleting
 	  the Swig-generated Python and Perl source files.
