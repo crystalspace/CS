@@ -20,6 +20,7 @@
 #include "csutil/scf.h"
 #include "glbe2d.h"
 #include "CrystGLWindow.h"
+#include "cssys/be/csbe.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include <Screen.h>
@@ -57,6 +58,7 @@ bool csGraphics2DGLBe::Initialize(iObjectRegistry* p)
       reporter->DecRef ();
     }
     // Get current screen information.
+    printf("BScreen call\n");
     BScreen screen(B_MAIN_SCREEN_ID);
     screen_frame = screen.Frame();
     curr_color_space = screen.ColorSpace();
@@ -92,10 +94,6 @@ bool csGraphics2DGLBe::Open()
     window->Unlock();
   }
   window->Flush();
-  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
-  CS_ASSERT (behelper != NULL);
-  behelper->BeginUI ();
-  behelper->DecRef ();
 
   return superclass::Open();
 }
@@ -137,16 +135,17 @@ void csGraphics2DGLBe::Print(csRect*)
 
 bool csGraphics2DGLBe::SetMouseCursor(csMouseCursorID shape)
 {
-  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
-  CS_ASSERT (behelper != NULL);
-  bool rc = behelper->SetCursor (shape);
-  behelper->DecRef ();
+  iBeAssistant* beassistant = CS_QUERY_REGISTRY (object_reg, iBeAssistant);
+  CS_ASSERT (beassistant != NULL);
+  bool rc = beassistant->SetCursor (shape);
+  beassistant->DecRef ();
   return rc;
 }
 
 void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)
 {
   unsigned long RedMask, GreenMask, BlueMask;
+  printf("color space = %d\n", cs);
   switch (cs)
   {
     case B_RGB15:

@@ -65,7 +65,7 @@ CFLAGS.INCLUDE=$(CFLAGS.I). $(CFLAGS.I)include $(CFLAGS.I)libs \
  $(CFLAGS.I)apps $(CFLAGS.I)support $(CFLAGS.I)libs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall -Wno-multichar -Wno-ctor-dtor-privacy
+CFLAGS.GENERAL=-Wall -Wno-multichar -Wno-ctor-dtor-privacy 
 
 # Flags for the compiler which are used when optimizing.
 # *NOTE* Must disable schedule-insns2 optimization since it causes QInt() to
@@ -136,3 +136,11 @@ SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 SYSCONFIG += $(NEWLINE)echo CS_BUILTIN_SIZED_TYPES = yes>>config.tmp
 
 endif # rootdefines & config
+
+ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/volatile)
+
+MAKE_VOLATILE_H += \
+  $(NEWLINE)echo $"\#define CS_SYSDEF_PROVIDE_PATH$">>volatile.tmp \
+  $(NEWLINE)echo $"\#include <SupportDefs.h>$">>volatile.tmp
+
+endif # ifeq ($(ROOTCONFIG),volatile)

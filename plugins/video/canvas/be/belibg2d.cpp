@@ -24,7 +24,7 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include <Screen.h>
-#include "cssys/be/behelp.h"
+#include "cssys/be/csbe.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -53,7 +53,7 @@ bool csGraphics2DBeLib::Initialize(iObjectRegistry* object_reg)
     	"crystalspace.canvas.be",
       	"Crystal Space BeOS 2D Driver.");
 
-    // Get current screen information.
+	// Get current screen information.
     BScreen screen(B_MAIN_SCREEN_ID);
     screen_frame = screen.Frame();
     curr_color_space = screen.ColorSpace();
@@ -89,7 +89,7 @@ bool csGraphics2DBeLib::Open()
 
     view = new CrystView(BRect(0, 0, vw, vh), object_reg, bitmap);
     window = new CrystWindow(win_rect, win_title, view, object_reg, this);
-
+	
     window->Show();
     if (window->Lock())
     {
@@ -97,12 +97,8 @@ bool csGraphics2DBeLib::Open()
       window->Unlock();
     }
     window->Flush();
-
+	
     Memory = (unsigned char*)bitmap->Bits();
-    iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
-    CS_ASSERT (behelper != NULL);
-    behelper->BeginUI ();
-    behelper->DecRef ();
   }
   return ok;
 }
@@ -135,10 +131,10 @@ void csGraphics2DBeLib::Print(csRect* cr)
 
 bool csGraphics2DBeLib::SetMouseCursor(csMouseCursorID shape)
 {
-  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
-  CS_ASSERT (behelper != NULL);
-  bool rc = behelper->SetCursor (shape);
-  behelper->DecRef ();
+  iBeAssistant* beassistant = CS_QUERY_REGISTRY (object_reg, iBeAssistant);
+  CS_ASSERT (beassistant != NULL);
+  bool rc = beassistant->SetCursor (shape);
+  beassistant->DecRef ();
   return rc;
 }
 
@@ -147,7 +143,7 @@ void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)
   unsigned long RedMask, GreenMask, BlueMask;
   switch (cs)
   {
-    case B_RGB15:
+    case B_RGB15: 
       Depth	= 15;
       RedMask   = 0x1f << 10;
       GreenMask = 0x1f << 5;

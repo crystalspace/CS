@@ -88,12 +88,14 @@ static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 
   if (FAILED(hRes))
   {
-    DWORD dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
+    DWORD dwResult = FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER
+    	| FORMAT_MESSAGE_FROM_SYSTEM, NULL, hRes,  MAKELANGID(LANG_NEUTRAL,
+	SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
 
     if (dwResult != 0)
     {
-      szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str) + strlen(szStdMessage) + 1];
+      szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str)
+      	+ strlen(szStdMessage) + 1];
       strcpy( szMsg, str );
       strcat( szMsg, szStdMessage );
       strcat( szMsg, (const char*)lpMsgBuf );
@@ -257,7 +259,7 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
 
   m_piWin32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
   if (!m_piWin32Assistant)
-      SystemFatalError ("csGraphics2DDDraw3::Open(QI) -- system passed does not support iWin32Assistant.");
+    SystemFatalError ("csGraphics2DDDraw3::Open(QI) -- system passed does not support iWin32Assistant.");
 
   // Get the creation parameters //
   m_hInstance = m_piWin32Assistant->GetInstance();
@@ -313,7 +315,8 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
   if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE)
     SystemFatalError ("SetPixelFormat failed.");
 
-  if (DescribePixelFormat(hDC, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
+  if (DescribePixelFormat (hDC, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR),
+  	&pfd) == 0)
     SystemFatalError ("DescribePixelFormat failed.");
 }
 
@@ -374,37 +377,38 @@ bool csGraphics2DOpenGL::Open()
 
   if (FullScreen)
   {
-	  m_hWnd = CreateWindowEx(exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title,
+    m_hWnd = CreateWindowEx(exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title,
 		WS_POPUP, 0, 0, Width, Height,
 		NULL, NULL, m_hInstance, NULL);
   }
   else
   {
-	  int wwidth,wheight;
-	  wwidth=Width+2*GetSystemMetrics(SM_CXFIXEDFRAME);
-	  wheight=Height+2*GetSystemMetrics(SM_CYFIXEDFRAME)+GetSystemMetrics(SM_CYCAPTION);
-	  m_hWnd = CreateWindowEx(exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style,
-		(GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
-		(GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
-		wwidth, wheight, NULL, NULL, m_hInstance, NULL );
+    int wwidth,wheight;
+    wwidth=Width+2*GetSystemMetrics(SM_CXFIXEDFRAME);
+    wheight=Height+2*GetSystemMetrics(SM_CYFIXEDFRAME)
+    	+GetSystemMetrics(SM_CYCAPTION);
+    m_hWnd = CreateWindowEx (exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title,
+    	style,
+	(GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
+	(GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
+	wwidth, wheight, NULL, NULL, m_hInstance, NULL );
   }
 
-  if( !m_hWnd )
+  if (!m_hWnd)
     SystemFatalError ("Cannot create Crystal Space window", GetLastError());
 
-  ShowWindow( m_hWnd, m_nCmdShow );
-  UpdateWindow( m_hWnd );
-  SetForegroundWindow(m_hWnd);
-  SetFocus( m_hWnd );
+  ShowWindow (m_hWnd, m_nCmdShow);
+  UpdateWindow (m_hWnd);
+  SetForegroundWindow (m_hWnd);
+  SetFocus (m_hWnd);
 
-
-  hDC = GetDC(m_hWnd);
+  hDC = GetDC (m_hWnd);
   CalcPixelFormat ();
 
-  hGLRC = wglCreateContext(hDC);
-  wglMakeCurrent(hDC, hGLRC);
+  hGLRC = wglCreateContext (hDC);
+  wglMakeCurrent (hDC, hGLRC);
 
-  if (!csGraphics2DGLCommon::Open())
+  if (!csGraphics2DGLCommon::Open ())
     return false;
 
   if (Depth == 8)
@@ -418,28 +422,28 @@ bool csGraphics2DOpenGL::Open()
 
 bool csGraphics2DOpenGL::RestoreDisplayMode ()
 {
-	if (is_open)
-	{
-		ChangeDisplaySettings(NULL, 0);
-		is_open = false;
-		return true;
-	}
-	return false;
+  if (is_open)
+  {
+    ChangeDisplaySettings (NULL, 0);
+    is_open = false;
+    return true;
+  }
+  return false;
 }
 
-void csGraphics2DOpenGL::Close(void)
+void csGraphics2DOpenGL::Close (void)
 {
   if (!is_open) return;
 
   if (hGLRC)
   {
-	wglDeleteContext (hGLRC);
+    wglDeleteContext (hGLRC);
     wglMakeCurrent (NULL, NULL);
   }
 
   ReleaseDC (m_hWnd, hDC);
 
-  RestoreDisplayMode();
+  RestoreDisplayMode ();
 
   csGraphics2D::Close ();
 }
@@ -458,7 +462,7 @@ HRESULT csGraphics2DOpenGL::SetColorPalette()
   {
     m_bPaletteChanged = false;
 
-   if(!FullScreen)
+    if(!FullScreen)
     {
       HPALETTE oldPal;
       HDC dc = GetDC(NULL);
@@ -492,19 +496,21 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
 {
   HCURSOR hCursor;
 
-  if (!m_bHardwareCursor) {
-    SetCursor(NULL);
+  if (!m_bHardwareCursor)
+  {
+    SetCursor (NULL);
     return false;
   }
 
-  switch(iShape)
+  switch (iShape)
   {
     case csmcNone:     hCursor = NULL; break;
     case csmcArrow:    hCursor = LoadCursor (NULL, IDC_ARROW);    break;
     case csmcMove:     hCursor = LoadCursor (NULL, IDC_SIZEALL);  break;
     case csmcCross:    hCursor = LoadCursor (NULL, IDC_CROSS);	  break;
     //case csmcPen:      hCursor = LoadCursor (NULL, IDC_PEN);	  break;
-    case csmcPen:      hCursor = LoadCursor (NULL, MAKEINTRESOURCE(32631));	  break;
+    case csmcPen:      hCursor = LoadCursor (NULL, MAKEINTRESOURCE(32631));
+    		       break;
     case csmcSizeNWSE: hCursor = LoadCursor (NULL, IDC_SIZENWSE); break;
     case csmcSizeNESW: hCursor = LoadCursor (NULL, IDC_SIZENESW); break;
     case csmcSizeNS:   hCursor = LoadCursor (NULL, IDC_SIZENS);   break;
@@ -514,16 +520,16 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
     default: hCursor = NULL;		//return false;
   }
 
-	if (hCursor)
-	{
-		SetCursor(hCursor);
-		return true;
-	}
-	else
-	{
-		SetCursor(NULL);
-		return false;
-	}
+  if (hCursor)
+  {
+    SetCursor (hCursor);
+    return true;
+  }
+  else
+  {
+    SetCursor (NULL);
+    return false;
+  }
 }
 
 bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
@@ -546,10 +552,12 @@ bool csGraphics2DOpenGL::PerformExtensionV (char const* command, va_list args)
   {
     // Ugly hack needed to work around an interference between the 3dfx opengl
     // driver on voodoo cards <= 2 and the win32 console window
-    if (GetFullScreen() && config->GetBool("Video.OpenGL.Win32.DisableConsoleWindow", false) )
+    if (GetFullScreen() && config->GetBool (
+    	"Video.OpenGL.Win32.DisableConsoleWindow", false) )
     {
       m_piWin32Assistant->DisableConsole();
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "*** Disabled Win32 console window to avoid OpenGL interference.");
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"*** Disabled Win32 console window to avoid OpenGL interference.");
     }
     csGraphics2DGLCommon::PerformExtensionV (command, args);
     return true;

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1999-2000 by Eric Sunshine <sunshine@sunshineco.com>
-
+  
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-
+  
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-
+  
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -29,42 +29,48 @@
 #include <MessageQueue.h>
 #include "cssys/be/behelp.h"
 
-class SysSystemDriver;
-struct iObjectRegistry;
-struct iEvent;
 
-/**
- * Implementation class for iBeHelper.
- */
-class BeHelper : public iBeHelper
-{
-private:
-  SysSystemDriver* sys;
+SCF_VERSION (iBeAssistant, 0, 0, 1);
 
-public:
-  BeHelper (SysSystemDriver* sys);
-  virtual ~BeHelper ();
+struct iBeAssistant : public iBase {
+  /**
+   * A user action (probably sent from the subthread), such as keypress
+   * or mouse action, in the form of a BMessage.  The BMessage is
+   * placed in a thread-safe message queue and later processed by the
+   * Crystal Space event-loop running in the main thread.
+   */
+  virtual bool UserAction (BMessage*) = 0;
 
-  SCF_DECLARE_IBASE;
-  virtual bool UserAction (BMessage* msg);
-  virtual bool SetCursor (csMouseCursorID id);
-  virtual bool BeginUI ();
-  virtual bool Quit ();
-  virtual bool ContextClose (iGraphics2D* g2d);
+  /**
+   * Set the mouse pointer to one of the pre-defined Crystal Space
+   * mouse shapes.
+   */
+  virtual bool SetCursor(csMouseCursorID) = 0;
+
+  /**
+   * Spawn a thread in which to run the BApplication and invokes its
+   * Run() method.  If the application is already running in the
+   * subthread, then this method does nothing.  This extension is
+   * requested by 2D driver modules when they are about to place a
+   * window on-screen, at which point the BeOS event-loop should be
+   * running (independently of whether or not the Crystal Space
+   * event-loop is running) so that they can respond to user actions.
+   */
+  //virtual bool BeginUI() = 0;
+
+  /** 
+   * Ask the Crystal Space event-loop to terminate.
+   */
+  virtual bool Quit() = 0;
+
+  /**
+   * Notify Crystal Space that a 2D graphics context is closing.
+   */
+  virtual bool ContextClose(iGraphics2D*) = 0;
 };
 
-class SysSystemDriver :
-  public csSystemDriver, public iEventPlug, public BHandler
-{
-  typedef csSystemDriver superclass;
-
-public:
-  // Public functions for BeHelper.
-  bool SetMouse(csMouseCursorID shape);
-  bool RunBeApp();
-  bool QueueMessage(BMessage*);
-  bool QueueMessage(uint32, void const* = 0);
-
+class BeAssistant : public iBeAssistant, public BHandler {
+//typedef iBeAssistant superclass
 protected:
   enum { CSBE_MOUSE_BUTTON_COUNT = 3 };
 
@@ -78,6 +84,8 @@ protected:
   bool real_mouse;
   bool mouse_moved;
   BPoint mouse_point;
+  iObjectRegistry *object_reg;
+  iEventQueue *event_queue;
 
   static int32 ThreadEntry(void*);
   void HideMouse();
@@ -99,24 +107,40 @@ protected:
   virtual void MessageReceived(BMessage*); // BHandler override.
 
 public:
-  SCF_DECLARE_IBASE_EXT(csSystemDriver);
+  BeAssistant(iObjectRegistry*);
+  virtual ~BeAssistant();
 
-  SysSystemDriver(iObjectRegistry* object_reg);
-  ~SysSystemDriver();
+  bool HandleEvent(iEvent& e);
+  virtual bool UserAction (BMessage*);
+  virtual bool SetCursor(csMouseCursorID);
+  virtual bool Quit();
+  virtual bool ContextClose(iGraphics2D*);
 
-  // Implementation of the system.
-  virtual bool Initialize();
-  bool HandleEvent(iEvent& ev);
+  bool SetMouse(csMouseCursorID shape);
+  bool RunBeApp();
+  bool QueueMessage(BMessage*);
+  bool QueueMessage(uint32, void const* = 0);
 
-  // Implementation of iEventPlug.
-  virtual unsigned int GetPotentiallyConflictingEvents();
-  virtual unsigned int QueryEventPriority(unsigned int);
+  struct eiEventPlug : public iEventPlug
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(BeAssistant);
+    virtual uint GetPotentiallyConflictingEvents();
+    virtual uint QueryEventPriority(uint type);
+  } scfiEventPlug;
 
   struct eiEventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE (SysSystemDriver);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent (e); }
+    SCF_DECLARE_EMBEDDED_IBASE (BeAssistant);
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiEventHandler;
+
+  SCF_DECLARE_IBASE;
+};
+
+class SysSystemDriver : public csSystemDriver
+{
+public:
+  SysSystemDriver(iObjectRegistry* r) : csSystemDriver(r) {}
 };
 
 #endif // __CS_CSBE_H__

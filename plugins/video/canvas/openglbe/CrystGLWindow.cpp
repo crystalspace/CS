@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
-
+  
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-
+  
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-
+  
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -23,7 +23,7 @@
 #include "iutil/event.h"
 #include "ivideo/graph2d.h"
 #include "CrystGLWindow.h"
-#include "cssys/be/behelp.h"
+#include "cssys/be/csbe.h"
 #include "iutil/objreg.h"
 
 CrystGLView::CrystGLView(BRect frame, iObjectRegistry* objreg) :
@@ -38,10 +38,10 @@ CrystGLView::~CrystGLView()
 
 void CrystGLView::UserAction() const
 {
-  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
-  CS_ASSERT (behelper != NULL);
-  behelper->UserAction (Looper()->CurrentMessage());
-  behelper->DecRef ();
+  iBeAssistant* beassistant = CS_QUERY_REGISTRY (object_reg, iBeAssistant);
+  CS_ASSERT (beassistant != NULL);
+  beassistant->UserAction (Looper()->CurrentMessage());
+  beassistant->DecRef ();
 }
 
 void CrystGLView::KeyDown(char const* bytes, int32 numBytes)
@@ -73,8 +73,8 @@ void CrystGLView::MouseUp(BPoint)
 
 void CrystGLView::AttachedToWindow()
 {
-  LockGL();
-  BGLView::AttachedToWindow();
+  LockGL(); 
+  BGLView::AttachedToWindow(); 
   UnlockGL();
 }
 
@@ -109,11 +109,11 @@ void CrystGLWindow::DirectConnected(direct_buffer_info* info)
 
 bool CrystGLWindow::QuitRequested()
 {
-  iBeHelper* behelper = CS_QUERY_REGISTRY (object_reg, iBeHelper);
-  CS_ASSERT (behelper != NULL);
-  behelper->ContextClose(g2d);
-  behelper->Quit ();
-  behelper->DecRef ();
+  iBeAssistant* beassistant = CS_QUERY_REGISTRY (object_reg, iBeAssistant);
+  CS_ASSERT (beassistant != NULL);
+  beassistant->ContextClose(g2d);
+  beassistant->Quit ();
+  beassistant->DecRef ();
   return false; // Allow Crystal Space to close window itself.
 }
 

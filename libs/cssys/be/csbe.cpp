@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
-
+  
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-
+  
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-
+  
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -22,6 +22,8 @@
 #include <time.h>
 #include <unistd.h>
 #include <Application.h>
+#include <Roster.h>
+#include <Path.h>
 #include <Beep.h>
 #include <UTF8.h>
 #include <View.h>
@@ -33,12 +35,17 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 
-SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
-  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE(BeAssistant)
+  SCF_IMPLEMENTS_INTERFACE(iBeAssistant)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventPlug)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_EXT_END
+SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (SysSystemDriver::eiEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE (BeAssistant::eiEventPlug)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (BeAssistant::eiEventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
@@ -52,157 +59,104 @@ enum
   CS_BE_CONTEXT_CLOSE = 'CSCL'
 };
 
+//-----------------------------------------------------------------------------
+//  BeAssistant Constructor: setup the iEventPlug, iEventHandler, BHandler,
+//  BApplication, and it's thread.
+//-----------------------------------------------------------------------------
+BeAssistant::BeAssistant(iObjectRegistry* r) : running(false),
+  event_outlet(0), shift_down(false), alt_down(false), ctrl_down(false),
+  real_mouse(true), mouse_moved(false), mouse_point(0,0), object_reg(r) {
+  
+  SCF_CONSTRUCT_IBASE(0);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 
-//-----------------------------------------------------------------------------
-// Constructor
-//-----------------------------------------------------------------------------
-SysSystemDriver::SysSystemDriver(iObjectRegistry* object_reg) :
-  csSystemDriver(object_reg), running(false), event_outlet(0),
-  shift_down(false), alt_down(false), ctrl_down(false),
-  real_mouse(true), mouse_moved(false), mouse_point(0,0)
-{
   int i;
   for (i = CSBE_MOUSE_BUTTON_COUNT; i-- > 0; )
     button_state[i] = false;
-  BeHelper* behelper = new BeHelper (this);
-  if (!object_reg->Register (behelper, "iBeHelper"))
-  {
-    printf ("Could not register the BeHelper!\n");
-    exit (0);
-  }
+
+  char path[CS_MAXPATHLEN];		// *1*
+  char name[CS_MAXPATHLEN];
+
+  event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  CS_ASSERT (event_queue != NULL);
+  event_outlet = event_queue->CreateEventOutlet(&scfiEventPlug);
+  event_queue->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+
+  if (be_app == 0) {			// *2*
+    printf("BApplication object not found, creating one.\n");
+    (void)new BApplication("application/x-vnd.xsware-crystal");
+  } else
+  	printf("BApplication object found, using that one.\n");
+
+  set_thread_priority(find_thread(0), B_DISPLAY_PRIORITY);
+  be_app->Unlock(); // Allow sub-thread to lock BAapplication before Run().
+  thread_id const ident = spawn_thread (ThreadEntry, "BeThread", B_NORMAL_PRIORITY, this);
+  resume_thread(ident);
+
+  while (be_app->IsLaunching()) { };
+  be_app->Lock();
+  be_app->AddHandler(this);		// *3*
+  be_app->SetPreferredHandler(this);
+
+  app_info info;
+  be_app->GetAppInfo(&info);
+  BPath app_path(&info.ref);
+  csSplitPath(app_path.Path(), path, sizeof(path), name, sizeof(name));
+  if (strlen(path) > 0)
+    chdir(path);
+  be_app->Unlock();
 }
 
-
 //-----------------------------------------------------------------------------
-// Destructor
-//
-// *DELETE*
-//	Unfortunately, we can not delete 'be_app' here even though we probably
-//	created it.  The problem is that the architecture of the system is
-//	such that plugin modules get cleaned up by ~csSystemDriver() only
-//	_after_ this destructor is invoked.  When the BeOS 2D drivers clean up
-//	their windows and bitmaps, be_app must exist.  (This is a requirement
-//	of the InterfaceKit and ApplicationKit.)
+//  BeAssistant Destructor: remove the iEventPlug, iEventHandler, BHandler,
+//  BApplication, and it's thread.
 //-----------------------------------------------------------------------------
-SysSystemDriver::~SysSystemDriver()
-{
-  if (be_app != 0)
-  {
-    if (be_app->Lock())
-    {
+BeAssistant::~BeAssistant() {
+  if (be_app != 0) {
+    if (be_app->Lock()) {
       ShowMouse();
-      if (running)
-      {
+      if (running) {
         be_app->Quit();
         status_t err_code, exit_value;
         err_code = wait_for_thread(find_thread("BeThread"), &exit_value);
 #if defined(CS_DEBUG)
-	printf("BeThread termination code: %lx, exit value: %lx \n",
-	  err_code, exit_value);
+        printf("BeThread termination code: %lx, exit value: %lx \n", err_code, exit_value);
 #endif
       }
       be_app->SetPreferredHandler(0);
       be_app->RemoveHandler(this);
       be_app->Unlock();
     }
-    // delete app;	// *DELETE*
   }
   if (event_outlet != 0)
     event_outlet->DecRef();
 
-  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  CS_ASSERT (q != NULL);
-  q->RemoveListener (&scfiEventHandler);
-  q->DecRef ();
+  //iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  CS_ASSERT (event_queue != NULL);
+  event_queue->RemoveListener (&scfiEventHandler);
+  event_queue->DecRef ();
 }
 
-
 //-----------------------------------------------------------------------------
-// Initialize the system driver.
-//
-// *1*
-//	Determine the path of the executable and set it as the "current
-//	working directory".  This allows Crystal Space applications to easily
-//	locate the common resource files, such as scf.cfg and vfs.cfg which,
-//	it expects to find in the current directory, even when launched via
-//	double-clicking the application from the Tracker.
-// *2*
-//	Only instantiate a BApplication object if one has not already been
-//	instantiated.  This allows a BeOS-specific Crystal Space client to
-//	easily employ a custom BApplication subclass by instantiating it prior
-//	to calling system::Initialize().
-// *3*
-//	Sets the system driver as the application's preferred message handler
-//	so that it can intercept common BeOS messages and forward appropriate
-//	ones to the Crystal Space event-loop which runs in the main thread.
+// BeAssistant::ThreadEntry - This is the thread that runs the BApplication looper
 //-----------------------------------------------------------------------------
-bool SysSystemDriver::Initialize ()
-{
-  char path[CS_MAXPATHLEN];		// *1*
-  char name[CS_MAXPATHLEN];
-  csSplitPath(argv[0], path, sizeof(path), name, sizeof(name));
-  if (strlen(path) > 0)
-    chdir(path);
-
-  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  CS_ASSERT (q != NULL);
-  event_outlet = q->CreateEventOutlet(this);
-  q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
-  q->DecRef ();
-
-  if (be_app == 0)			// *2*
-    (void)new BApplication("application/x-vnd.xsware-crystal");
-  be_app->AddHandler(this);		// *3*
-  be_app->SetPreferredHandler(this);
-
-  return superclass::Initialize ();
-}
-
-
-//-----------------------------------------------------------------------------
-// Entry-point function for the subthread in which the BApplication runs.
-//-----------------------------------------------------------------------------
-int32 SysSystemDriver::ThreadEntry(void* p)
-{
-  SysSystemDriver* sys = (SysSystemDriver*)p;
+int32 BeAssistant::ThreadEntry(void* p) {
+  BeAssistant* sys = (BeAssistant*)p;
   be_app->Lock();		 // Thread invoking Run() must hold lock.
   be_app->Run();
   sys->QueueMessage (CS_BE_QUIT);// BApplication terminated, so ask CS to quit.
   return 0;
 }
 
-
 //-----------------------------------------------------------------------------
-// Whenever a 2D driver (canvas) is about to place a window on-screen, it asks
-// the system driver -- via PerformExtension("BeginUI") -- to ensure that the
-// BeOS event loop is active so that it can respond to events in window.  This
-// method runs the BApplication in a subthread the first time "BeginUI" is
-// requested.
+// BeAssistant::HandleEvent - This is the handler for the iEventHandler struct
 //-----------------------------------------------------------------------------
-bool SysSystemDriver::RunBeApp()
-{
-  if (!running)
-  {
-    running = true;
-    set_thread_priority(find_thread(0), B_DISPLAY_PRIORITY);
-    be_app->Unlock(); // Allow sub-thread to lock BAapplication before Run().
-    thread_id const ident = spawn_thread (ThreadEntry, "BeThread",
-      B_NORMAL_PRIORITY, this);
-    resume_thread(ident);
-  }
-  return true;
-}
-
-
-bool SysSystemDriver::HandleEvent (iEvent& e)
-{
-  if (e.Type == csevBroadcast && e.Command.Code == cscmdPreProcess)
-  {
-    if (message_queue.Lock())
-    {
+bool BeAssistant::HandleEvent (iEvent& e) {
+  if (e.Type == csevBroadcast && e.Command.Code == cscmdPreProcess) {
+    if (message_queue.Lock()) {
       BMessage* m;
-      while ((m = message_queue.NextMessage()) != 0)
-      {
+      while ((m = message_queue.NextMessage()) != 0) {
         DispatchMessage(m);
         delete m;
       }
@@ -215,34 +169,35 @@ bool SysSystemDriver::HandleEvent (iEvent& e)
 }
 
 //-----------------------------------------------------------------------------
-// iEventPlug Implementation.
+// BeAssistant::GetPotentiallyConflictingEvents
+// BeAssistant::QueryEventPriority
+//  - iEventPlug stuff, I'll assume what the last BeOS port dev did was correct
+//    (for now).
 //-----------------------------------------------------------------------------
-unsigned int SysSystemDriver::GetPotentiallyConflictingEvents()
-  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
-
-unsigned int SysSystemDriver::QueryEventPriority(unsigned int)
-  { return 150; }
+unsigned int BeAssistant::eiEventPlug::GetPotentiallyConflictingEvents() { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+unsigned int BeAssistant::eiEventPlug::QueryEventPriority(unsigned int)  { return 150; }
 
 
-//-----------------------------------------------------------------------------
-// Hide the mouse.
-//-----------------------------------------------------------------------------
-void SysSystemDriver::HideMouse()
+void BeAssistant::HideMouse()
 {
   CS_ASSERT(be_app != 0);
+  be_app->Lock();
   if (!be_app->IsCursorHidden())
     be_app->HideCursor();
+  be_app->Unlock();
 }
 
 
 //-----------------------------------------------------------------------------
 // Show the mouse.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::ShowMouse()
+void BeAssistant::ShowMouse()
 {
   CS_ASSERT(be_app != 0);
+  be_app->Lock();
   if (be_app->IsCursorHidden())
     be_app->ShowCursor();
+  be_app->Unlock();
 }
 
 
@@ -251,13 +206,15 @@ void SysSystemDriver::ShowMouse()
 // Returns 'true' if the pointer shape is directly supported; else 'false' if
 // Crystal Space must simulate the mouse pointer for this shape.
 //-----------------------------------------------------------------------------
-bool SysSystemDriver::SetMouse(csMouseCursorID shape)
+bool BeAssistant::SetMouse(csMouseCursorID shape)
 {
   real_mouse = false;
   if (shape == csmcArrow)
   {
     CS_ASSERT(be_app != 0);
+    be_app->Lock();
     be_app->SetCursor(B_HAND_CURSOR);
+    be_app->Unlock();
     real_mouse = true;
   }
 
@@ -275,7 +232,7 @@ bool SysSystemDriver::SetMouse(csMouseCursorID shape)
 // subthread running the BApplication.  Queue them up for processing by
 // csSystemDriver::Loop() which is running in the main thread.
 //-----------------------------------------------------------------------------
-bool SysSystemDriver::QueueMessage(BMessage* m)
+bool BeAssistant::QueueMessage(BMessage* m)
 {
   bool const ok = message_queue.Lock();
   if (ok)
@@ -290,7 +247,7 @@ bool SysSystemDriver::QueueMessage(BMessage* m)
 //-----------------------------------------------------------------------------
 // Queue up a custom, port-specific message for processing by the main thread.
 //-----------------------------------------------------------------------------
-bool SysSystemDriver::QueueMessage(uint32 code, void const* data)
+bool BeAssistant::QueueMessage(uint32 code, void const* data)
 {
   BMessage m(code);
   if (data != 0)
@@ -304,8 +261,8 @@ bool SysSystemDriver::QueueMessage(uint32 code, void const* data)
 // the BApplication's preferred message handler, it is called by the
 // BApplication object running in the subthread.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::MessageReceived(BMessage* m)
-{
+void BeAssistant::MessageReceived(BMessage* m)
+{	
   switch(m->what)
   {
     case B_KEY_DOWN:
@@ -326,8 +283,8 @@ void SysSystemDriver::MessageReceived(BMessage* m)
 // Dispatch a message which was received from the subthread and queued for
 // processing in the main thread.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::DispatchMessage(BMessage* m)
-{
+void BeAssistant::DispatchMessage(BMessage* m)
+{	
   switch(m->what)
   {
     case B_KEY_DOWN:
@@ -359,7 +316,7 @@ void SysSystemDriver::DispatchMessage(BMessage* m)
 //-----------------------------------------------------------------------------
 // Broadcast a context-close message via the Crystal Space event loop.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::DoContextClose(BMessage* m)
+void BeAssistant::DoContextClose(BMessage* m)
 {
   void* p = 0;
   if (m->FindPointer("data", &p) == B_OK)
@@ -373,7 +330,7 @@ void SysSystemDriver::DoContextClose(BMessage* m)
 //-----------------------------------------------------------------------------
 // Queue a mouse-related event to the Crystal Space event loop.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::QueueMouseEvent(int button, bool down, BPoint where)
+void BeAssistant::QueueMouseEvent(int button, bool down, BPoint where)
 {
   if (where.x >= 0 && where.y >= 0)
     event_outlet->Mouse(button, down, where.x, where.y);
@@ -384,7 +341,7 @@ void SysSystemDriver::QueueMouseEvent(int button, bool down, BPoint where)
 // If the mouse moved, queue a mouse-moved event to the Crystal Space event
 // loop.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::CheckMouseMoved()
+void BeAssistant::CheckMouseMoved()
 {
   if (mouse_moved)
   {
@@ -398,7 +355,7 @@ void SysSystemDriver::CheckMouseMoved()
 // If a mouse button's state changed, queue a mouse event to the Crystal Space
 // event-loop.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::CheckButton(
+void BeAssistant::CheckButton(
   int button, int32 buttons, int32 mask, BPoint where)
 {
   if (button < CSBE_MOUSE_BUTTON_COUNT)
@@ -417,7 +374,7 @@ void SysSystemDriver::CheckButton(
 //-----------------------------------------------------------------------------
 // Check for mouse button state changes.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::CheckButtons(BMessage* m)
+void BeAssistant::CheckButtons(BMessage* m)
 {
   BPoint where;
   int32 buttons;
@@ -435,7 +392,7 @@ void SysSystemDriver::CheckButtons(BMessage* m)
 // If a modifier key's state changed, queue a keyboard event to the Crystal
 // Space event-loop.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::CheckModifier(
+void BeAssistant::CheckModifier(
   long flags, long mask, int tag, bool& state) const
 {
   bool const new_state = (flags & mask) != 0;
@@ -450,7 +407,7 @@ void SysSystemDriver::CheckModifier(
 //-----------------------------------------------------------------------------
 // Check keyboard modifiers (shift, alternate, control) for state changes.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::CheckModifiers(BMessage* m)
+void BeAssistant::CheckModifiers(BMessage* m)
 {
   int32 flags;
   if (m->FindInt32("modifiers", &flags) == B_OK)
@@ -465,7 +422,7 @@ void SysSystemDriver::CheckModifiers(BMessage* m)
 //-----------------------------------------------------------------------------
 // Classify mouse related events.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::DoMouseAction(BMessage* m)
+void BeAssistant::DoMouseAction(BMessage* m)
 {
   CheckModifiers(m);
   CheckButtons(m);
@@ -476,7 +433,7 @@ void SysSystemDriver::DoMouseAction(BMessage* m)
 // Handle mouse movement events, taking into special account whether or not
 // the mouse has left or entered the canvas' window.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::DoMouseMotion(BMessage* m)
+void BeAssistant::DoMouseMotion(BMessage* m)
 {
   CheckModifiers(m);
   int32 transit;
@@ -505,7 +462,7 @@ void SysSystemDriver::DoMouseMotion(BMessage* m)
 //-----------------------------------------------------------------------------
 // Classify keyboard-related events.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::DoKeyAction(BMessage* m)
+void BeAssistant::DoKeyAction(BMessage* m)
 {
   CheckModifiers(m);
 
@@ -526,7 +483,7 @@ void SysSystemDriver::DoKeyAction(BMessage* m)
 //-----------------------------------------------------------------------------
 // BeOS to Crystal Space function key translation.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::ClassifyFunctionKey(
+void BeAssistant::ClassifyFunctionKey(
   BMessage* m, int& cs_key, int& cs_char) const
 {
   cs_key = 0;
@@ -556,7 +513,7 @@ void SysSystemDriver::ClassifyFunctionKey(
 //-----------------------------------------------------------------------------
 // BeOS to Crystal Space non-function key translation.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::ClassifyNormalKey(
+void BeAssistant::ClassifyNormalKey(
   int c, BMessage* m, int& cs_key, int& cs_char) const
 {
   cs_char = -1;
@@ -599,7 +556,7 @@ void SysSystemDriver::ClassifyNormalKey(
 //	Convert the 2-byte Unicode byte string into an endian-correct Unicode
 //	16-bit numeric value.
 //-----------------------------------------------------------------------------
-int SysSystemDriver::ClassifyUnicodeKey(BMessage* m) const
+int BeAssistant::ClassifyUnicodeKey(BMessage* m) const
 {
   int cs_char = -1;
   void const* data;
@@ -624,44 +581,53 @@ int SysSystemDriver::ClassifyUnicodeKey(BMessage* m) const
   return cs_char;
 }
 
-//---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (BeHelper)
-  SCF_IMPLEMENTS_INTERFACE (iBeHelper)
-SCF_IMPLEMENT_IBASE_END
-
-BeHelper::BeHelper (SysSystemDriver* sys)
+bool BeAssistant::UserAction (BMessage* msg)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  BeHelper::sys = sys;
+  return QueueMessage (msg);
 }
 
-BeHelper::~BeHelper ()
+bool BeAssistant::SetCursor (csMouseCursorID id)
 {
+  return SetMouse (id);
 }
 
-bool BeHelper::UserAction (BMessage* msg)
+bool BeAssistant::Quit ()
 {
-  return sys->QueueMessage (msg);
+  return QueueMessage (CS_BE_QUIT);
 }
 
-bool BeHelper::SetCursor (csMouseCursorID id)
+bool BeAssistant::ContextClose (iGraphics2D* g2d)
 {
-  return sys->SetMouse (id);
+  return QueueMessage (CS_BE_CONTEXT_CLOSE, g2d);
 }
 
-bool BeHelper::BeginUI ()
+//-----------------------------------------------------------------------------
+// csPlatformStartup
+//	Platform-specific startup.
+//-----------------------------------------------------------------------------
+bool csPlatformStartup(iObjectRegistry* r)
 {
-  return sys->RunBeApp ();
+  printf("Crystal Space for %s\n", CS_PLATFORM_NAME);
+  printf("Maintained by Jonathan Tarbox <jtarbox@sbcglobal.net>\n\n");
+  iBeAssistant* a = new BeAssistant(r);
+  r->Register(a, "iBeAssistant");
+  a->DecRef();
+  return true;
 }
 
-bool BeHelper::Quit ()
-{
-  return sys->QueueMessage (CS_BE_QUIT);
-}
 
-bool BeHelper::ContextClose (iGraphics2D* g2d)
+//-----------------------------------------------------------------------------
+// csPlatformShutdown
+//	Platform-specific shutdown.
+//-----------------------------------------------------------------------------
+bool csPlatformShutdown(iObjectRegistry* r)
 {
-  return sys->QueueMessage (CS_BE_CONTEXT_CLOSE, g2d);
+  iBeAssistant* a = CS_QUERY_REGISTRY(r, iBeAssistant);
+  if (a != 0)
+  {
+    r->Unregister(a, "iBeAssistant"); // DecRefs() assistant as a side-effect.
+    a->DecRef ();
+  }
+  return true;
 }
-
