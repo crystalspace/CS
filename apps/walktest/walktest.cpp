@@ -432,9 +432,9 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
     }
     if (current_time > next_bot_at)
     {
-      extern void add_bot (float size, csSector* where, csVector3 const& pos,
+      extern void add_bot (float size, iSector* where, csVector3 const& pos,
 	                        float dyn_radius);
-      add_bot (2, view->GetCamera ()->GetSector ()->GetPrivateObject (),
+      add_bot (2, view->GetCamera ()->GetSector (),
                view->GetCamera ()->GetTransform ().GetOrigin (), 0);
       next_bot_at = current_time+1000*10;
     }
@@ -737,9 +737,9 @@ void WalkTest::DrawFrame3D (int drawflags, cs_time /*current_time*/)
   csDynLight* dyn = engine->GetFirstDynLight ();
   while (dyn)
   {
-    extern void HandleDynLight (csDynLight*);
+    extern void HandleDynLight (iDynLight*);
     csDynLight* dn = dyn->GetNext ();
-    if (dyn->GetChild (csDataObject::Type)) HandleDynLight (dyn);
+    if (dyn->GetChild (csDataObject::Type)) HandleDynLight (&(dyn->scfiDynLight));
     dyn = dn;
   }
   // Apply lighting to all meshes
