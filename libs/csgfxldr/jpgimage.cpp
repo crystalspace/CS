@@ -190,7 +190,7 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
   jerr.pub.error_exit = my_error_exit;
   if (setjmp (jerr.setjmp_buffer))
   {
-#if 1
+#if 0
     // We dont actually need this as we want to know
     // just whenever a error occured or not
     char errmsg [256];
