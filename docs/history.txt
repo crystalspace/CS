@@ -9,6 +9,8 @@ chronological order.
 13-Oct-2003
 	- Eric Sunshine eliminated several compilation warnings from Walktest.
 	- Jorrit fixed phystut for the latest polygon changes.
+	- Jorrit fixed relighting of lightmaps for thing. It was broken since
+	  my latest changes.
 	- Eric Sunshine eliminated compilation warning in glshader_fvp.cpp.
 	- Eric Sunshine fixed bug in csString::FindLast() prototype where the
 	  incoming pos argument defaulted to 0 but should have defaulted to -1.

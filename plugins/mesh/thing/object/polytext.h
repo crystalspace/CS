@@ -287,6 +287,7 @@ public:
   ~csPolyTexture ();
 
   void SetTextureMapping (csPolyTextureMapping* mapping);
+  void SetLightMapMapping (csPolyLightMapMapping* mapping);
   void SetRendererLightmap (iRendererLightmap* rlm);
 
   /**

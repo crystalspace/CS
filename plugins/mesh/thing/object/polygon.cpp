@@ -1008,6 +1008,7 @@ void csPolygon3D::RefreshFromStaticData ()
   {
     txt_info = static_data->thing_static->thing_type->blk_polytex.Alloc ();
     txt_info->SetTextureMapping (static_data->GetTextureMapping ());
+    txt_info->SetLightMapMapping (static_data->GetLightMapMapping ());
     txt_info->m_world2tex = static_data->GetTextureMapping ()->m_obj2tex;
     txt_info->v_world2tex = static_data->GetTextureMapping ()->v_obj2tex;
   }

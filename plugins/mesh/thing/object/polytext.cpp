@@ -96,6 +96,11 @@ void csPolyTexture::SetTextureMapping (csPolyTextureMapping* mapping)
   csPolyTexture::tmapping = mapping;
 }
 
+void csPolyTexture::SetLightMapMapping (csPolyLightMapMapping* mapping)
+{
+  csPolyTexture::mapping = mapping;
+}
+
 void csPolyTexture::SetRendererLightmap (iRendererLightmap* rlm)
 {
   csPolyTexture::rlm = rlm;
