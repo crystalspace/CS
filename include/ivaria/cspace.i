@@ -213,6 +213,7 @@
 	INTERFACE_APPLY(iMeshWrapper)
 	INTERFACE_APPLY(iMeshWrapperIterator)
 	INTERFACE_APPLY(iModelConverter)
+	INTERFACE_APPLY(iMouseDriver)
 	INTERFACE_APPLY(iMovable)
 	INTERFACE_APPLY(iMovableListener)
 	INTERFACE_APPLY(iObject)
@@ -754,6 +755,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "csgeom/math2d.h"
 
 %ignore csPoly2D::operator[];
+%ignore csPoly2D::GetVertices (); // Non-const.
 %include "csgeom/poly2d.h"
 
 %include "csgeom/math3d.h"
@@ -792,6 +794,10 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csBox3::operator< (const csVector3& point, const csBox3& box);
 %include "csgeom/box.h"
 
+%ignore csSegment2::Start (); // Non-const.
+%ignore csSegment2::End ();   // Non-const.
+%ignore csSegment3::Start (); // Non-const.
+%ignore csSegment3::End ();   // Non-const.
 %include "csgeom/segment.h"
 
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
@@ -799,6 +805,7 @@ TYPEMAP_OUT_csWrapPtr
 #endif // CS_MINI_SWIG
 
 %ignore csGetPlatformConfig;
+%ignore csPrintfV;
 %include "csutil/sysfunc.h"
 
 %ignore csInitializer::RequestPlugins(iObjectRegistry*, ...);
@@ -929,9 +936,13 @@ TYPEMAP_OUT_csWrapPtr
 #endif // CS_MINI_SWIG
 
 #ifndef CS_MICRO_SWIG
-%include "ivideo/graph3d.h"
+%ignore iGraphics2D::PerformExtensionV;
 %include "ivideo/graph2d.h"
+%include "ivideo/graph3d.h"
 %include "ivideo/cursor.h"
+
+%ignore iNativeWindowManager::AlertV;
+%include "ivideo/natwin.h"
 
 %ignore GetGlyphSize(uint8, int &, int &);
 %ignore GetGlyphBitmap(uint8, int &, int &);
@@ -950,7 +961,6 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivideo/txtmgr.h"
 %include "ivideo/vbufmgr.h"
 %include "ivideo/material.h"
-%include "ivideo/natwin.h"
 
 %immutable csStreamDescription::name;
 %include "ivideo/codec.h"
@@ -965,11 +975,14 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csReporterHelper::ReportV;
 %include "ivaria/reporter.h"
 
+%ignore iConsoleOutput::PutTextV;
+%ignore iConsoleOutput::PerformExtensionV;
+%include "ivaria/conout.h"
+
 %include "ivaria/stdrep.h"
 %include "ivaria/view.h"
 %include "ivaria/collider.h"
 %include "ivaria/dynamics.h"
-%include "ivaria/conout.h"
 %include "ivaria/engseq.h"
 
 %rename(IntCall) *::Call(const char*, int&, const char*, ...);
