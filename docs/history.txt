@@ -25,6 +25,9 @@ chronological order.
 	  and unused.
 	- Eric Sunshine upgraded configure.ac so that it demands the very
 	  latest CVS version of cal3d.
+	- Eric Sunshine enhanced snapshot.py so that it generates a checksum
+	  file for each archiver directory. The checksum file contains MD5
+	  checksums of all packages exported by that directory.
 22-Mar-2005
 	- Jorrit removed the slow RAPID and memory consuming collision
 	  detection plugin. OPCODE is now a lot better.

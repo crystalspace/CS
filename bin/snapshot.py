@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    CVS Snapshot Generation Script
-#    Copyright (C) 2000-2004 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2005 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -59,11 +59,11 @@
 import commands, glob, grp, os, re, string, sys, tempfile, time
 
 prog_name = "snapshot.py"
-prog_version = "14"
+prog_version = "15"
 author_name = "Eric Sunshine"
 author_email = "sunshine@sunshineco.com"
 author_info = author_name + " <" + author_email + ">"
-copyright = "Copyright (C) 2000-2004 by " + author_info
+copyright = "Copyright (C) 2000-2005 by " + author_info
 
 #------------------------------------------------------------------------------
 # Configuration Section
@@ -83,6 +83,13 @@ copyright = "Copyright (C) 2000-2004 by " + author_info
 #    packprefix - Prefix used to compose the final package name of the form
 #        prefix-YYYY-MM-DD-HHMMSS.ext".
 #    snapdir - Directory where snapshot packages will be placed.
+#    checksumfile - Name of checksum file which will be placed in each archiver
+#        subdirectory. This file will contain checksums for all the published
+#        packages in the directory.
+#    checksumprog - Name of program to compute checksums of packages. The
+#        program should accept a list of filenames for which it should compute
+#        checksums. It should also emit a report on its standard-output stream
+#        which can be redirected to 'checksumfile'.
 #    keepsnaphots - Number of historical snapshots to retain.
 #    keepdiffs - Number of historical 'diffs' to retain.
 #    keeplogs - Number of historical log files to retain.
@@ -112,6 +119,8 @@ moduledir = "CS"
 ownergroup = "crystal"
 packprefix = "cs-"
 snapdir = "/home/groups/c/cr/crystal/htdocs/cvs-snapshots"
+checksumfile = "checksums.md5"
+checksumprog = "md5sum"
 keepsnapshots = 1
 keepdiffs = 14
 keeplogs = 14
@@ -373,12 +382,34 @@ class Snapshot:
                               self.linkbase + self.diffext)
             self.dirstack.popdir()
 
+    def checksum(self, files):
+        self.removefile(checksumfile)
+        if len(files) > 0:
+            self.run(checksumprog + ' "' + '" "'.join(files) + '" > ' +
+                     checksumfile)
+
+    def checksums(self):
+        for dict in archivers:
+            name = dict["name"]
+            extd = "." + dict["dir"]["ext"]
+            extf = "." + dict["file"]["ext"]
+            self.log("Generating checksums for '" + name + "' packages")
+            self.dirstack.pushdir(os.path.join(snapdir, name))
+            files = []
+            files.extend(glob.glob(self.packtemplate + extd))
+            files.extend(glob.glob(self.packtemplate + self.diffext + extf))
+            files.extend(glob.glob(self.linkbase + extd))
+            files.extend(glob.glob(self.linkbase + self.diffext + extf))
+            self.checksum(files)
+            self.dirstack.popdir()
+
     def dobulk(self):
         if self.checkout(self.timestamp, self.builddir):
             self.gendiff()
             self.genpackages()
             self.makelinks()
             self.purgeold()
+            self.checksums()
 
     def doall(self):
         self.makedirectory(snapdir)
