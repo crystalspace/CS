@@ -7,6 +7,8 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a bug with the software renderer which was introduced
 	  by me yesterday. The bug caused DrawPolygonFX to give incorrect
 	  results in some cases.
+	- Fixed a small bug in the copy constructor of csFrustumContext.
+	  The field first_time was not copied.
 17-Apr-2001
 	- Martin Geisse eliminated some warnings in the function terrain
 	  loader.

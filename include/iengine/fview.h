@@ -156,6 +156,7 @@ public:
     shared = c.shared;
     cleanup = c.cleanup;
     mirror = c.mirror;
+    first_time = c.first_time;
     light_frustum = c.light_frustum;
     lighting_info = c.lighting_info;
     return *this;
