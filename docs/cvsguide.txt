@@ -34,8 +34,8 @@ Here are some steps you should go through before committing files:
 	output, to see if you really checked in everything.
 - Do another rebuild the ensure your changes didn't collide with somebody
 	others recent changes.
-- Post a description of your changes to crystal@list.linux.it, so other
-	developers will not have to _guess_ what you did.  CVS is no
+- Post a description of your changes to crystal-cvs@onelist.com, so
+	other developers will not have to _guess_ what you did.  CVS is no
 	replacement for developer communication.
 
 This might look overdone to some people, but you will have to remember that
