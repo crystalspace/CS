@@ -198,7 +198,7 @@ public:
 
   /// Divide this vector by a scalar.
   inline csVector3& operator/= (float f)
-  { float inv_f = 1 / f; x *= inv_f; y *= inv_f; z *= inv_f; return *this; }
+  { f = 1.0f / f; x *= f; y *= f; z *= f; return *this; }
 
   /// Unary + operator.
   inline csVector3 operator+ () const { return *this; }

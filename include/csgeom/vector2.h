@@ -70,7 +70,7 @@ public:
   csVector2& operator*= (float f) { x *= f;  y *= f;  return *this; }
 
   /// Divide this vector by a scalar.
-  csVector2& operator/= (float f) { x /= f;  y /= f;  return *this; }
+  csVector2& operator/= (float f) { f = 1.0f / f; x *= f;  y *= f;  return *this; }
 
   /// Unary + operator.
   inline csVector2 operator+ () const { return *this; }

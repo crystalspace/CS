@@ -57,7 +57,7 @@ csVector2 operator* (float f, const csVector2& v)
 { return csVector2(v.x*f, v.y*f); }
 
 csVector2 operator/ (const csVector2& v, float f)
-{ return csVector2(v.x/f, v.y/f); }
+{ f = 1.0f / f; return csVector2(v.x * f, v.y * f); }
 
 bool operator== (const csVector2& v1, const csVector2& v2)
 { return (v1.x==v2.x) && (v1.y==v2.y); }
