@@ -230,7 +230,7 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 }
 
 // Remove this for old fog
-#define USE_EXP_FOG
+//#define USE_EXP_FOG
 
 // After such number of values fog density coefficient can be considered 0.
 #define FOG_EXP_TABLE_SIZE 1600
@@ -406,7 +406,8 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
       }
       else
         dist1 = 0;
-      if (fog_info->has_outgoing_plane)
+      //@@@ assume all FX polygons have no outgoing plane
+      if (!rview->added_fog_info)
       {
         const csPlane& pl = fog_info->outgoing_plane;
         float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
