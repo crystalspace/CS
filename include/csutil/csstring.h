@@ -253,6 +253,10 @@ public:
   /// Check if two strings are equal
   bool operator == (const csString &iStr) const
   { return Compare (iStr); }
+
+  /// Detach the contents from the csString
+  char *Detach ()
+  { char *d = Data; Data = NULL; Size = MaxSize = 0; return d; }
 };
 
 /// Concatenate a csString with an ASCIIZ and return resulting csString

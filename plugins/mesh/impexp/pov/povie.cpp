@@ -21,6 +21,9 @@
 #include "iutil/objreg.h"
 #include "imesh/mdlconv.h"
 #include "cstool/mdldata.h"
+#include "csutil/csstring.h"
+#include "csutil/databuf.h"
+#include "csutil/objiter.h"
 
 class csModelConverterPOV : iModelConverter
 {
@@ -71,6 +74,12 @@ SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 
+SCF_DECLARE_FAST_INTERFACE (iModelDataObject);
+SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
+
+CS_DECLARE_OBJECT_ITERATOR (csModelDataObjectIterator, iModelDataObject);
+CS_DECLARE_OBJECT_ITERATOR (csModelDataPolygonIterator, iModelDataPolygon);
+
 csModelConverterPOV::csModelConverterPOV (iBase *pBase)
 {
   SCF_CONSTRUCT_IBASE (pBase);
@@ -100,15 +109,175 @@ const csModelConverterFormat *csModelConverterPOV::GetFormat (int idx) const
   return (idx == 0) ? &FormatInfo : NULL;
 }
 
+static void WriteVertex (csString &out, iModelDataVertices *Vertices,
+  int VertexNum, int NormalNum)
+{
+  csVector3 v = Vertices->GetVertex (VertexNum);
+  csVector3 n = Vertices->GetNormal (NormalNum);
+
+  csString s;
+  s << "    <" << v.x << ',' << v.y << ',' << v.z << ">, <";
+  s << n.x << ',' << n.y << ',' << n.z << '>';
+  out << s;
+}
+
 iModelData *csModelConverterPOV::Load (UByte * /*Buffer*/, ULong /*Size*/)
 {
   return NULL;
 }
+
+/*
+  Purpose:
+
+    ::Save writes graphics information to a POV file.
+
+  Example:
+
+    // cone.pov created by IVCON.
+    // Original data in cone.iv
+
+    #version 3.0
+    #include "colors.inc"
+    #include "shapes.inc"
+    global_settings { assumed_gamma 2.2 }
+
+    camera {
+     right < 4/3, 0, 0>
+     up < 0, 1, 0 >
+     sky < 0, 1, 0 >
+     angle 20
+     location < 0, 0, -300 >
+     look_at < 0, 0, 0>
+    }
+
+    light_source { < 20, 50, -100 > color White }
+
+    background { color SkyBlue }
+
+    #declare RedText = texture {
+      pigment { color rgb < 0.8, 0.2, 0.2> }
+      finish { ambient 0.2 diffuse 0.5 }
+    }
+
+    #declare BlueText = texture {
+      pigment { color rgb < 0.2, 0.2, 0.8> }
+      finish { ambient 0.2 diffuse 0.5 }
+    }
+    mesh {
+      smooth_triangle {
+        < 0.29, -0.29, 0.0>, < 0.0, 0.0, -1.0 >,
+        < 38.85, 10.03, 0.0>, < 0.0, 0.0, -1.0 >,
+        < 40.21, -0.29, 0.0>, <  0.0, 0.0, -1.0 >
+        texture { RedText } }
+        ...
+      smooth_triangle {
+        <  0.29, -0.29, 70.4142 >, < 0.0,  0.0, 1.0 >,
+        <  8.56,  -2.51, 70.4142 >, < 0.0,  0.0, 1.0 >,
+        <  8.85, -0.29, 70.4142 >, < 0.0,  0.0, 1.0 >
+        texture { BlueText } }
+    }
+
+  Modified:
+
+    08 October 1998
+    17 August 2001
+
+  Author:
+
+    John Burkardt
+
+  Modified by Martin Geisse to work with the new converter system. Removed
+  (IMO useless) logging.
+
+*/
 
 iDataBuffer *csModelConverterPOV::Save (iModelData *Data, const char *Format)
 {
   if (strcasecmp (Format, "pov"))
     return NULL;
 
-  return NULL;
+  csString out;
+  out << "// This file was created by csModelConverterPOV from Crystal Space.\n";
+
+/*
+  Initial declarations.
+*/
+  out << "\n";
+  out << "#version 3.0\n";
+  out << "#include \"colors.inc\"\n";
+  out << "#include \"shapes.inc\"\n";
+  out << "global_settings { assumed_gamma 2.2 }\n";
+  out << "\n";
+  out << "camera {\n";
+  out << " right < 4/3, 0, 0>\n";
+  out << " up < 0, 1, 0 >\n";
+  out << " sky < 0, 1, 0 >\n";
+  out << " angle 20\n";
+  out << " location < 0, 0, -300 >\n";
+  out << " look_at < 0, 0, 0>\n";
+  out << "}\n";
+  out << "\n";
+  out << "light_source { < 20, 50, -100 > color White }\n";
+  out << "\n";
+  out << "background { color SkyBlue }\n";
+
+/*
+  Declare RGB textures.
+*/
+  out << "\n";
+  out << "#declare RedText = texture {\n";
+  out << "  pigment { color rgb < 0.8, 0.2, 0.2> }\n";
+  out << "  finish { ambient 0.2 diffuse 0.5 }\n";
+  out << "}\n";
+  out << "\n";
+  out << "#declare GreenText = texture {\n";
+  out << "  pigment { color rgb < 0.2, 0.8, 0.2> }\n";
+  out << "  finish { ambient 0.2 diffuse 0.5 }\n";
+  out << "}\n";
+  out << "\n";
+  out << "#declare BlueText = texture {\n";
+  out << "  pigment { color rgb < 0.2, 0.2, 0.8> }\n";
+  out << "  finish { ambient 0.2 diffuse 0.5 }\n";
+  out << "}\n\n";
+
+  int TextureNum = 0;
+  csModelDataObjectIterator it (Data->QueryObject ());
+  while (!it.IsFinished ())
+  {
+    iModelDataObject *Object = it.Get ();
+    out << "mesh {\n";
+
+    csModelDataPolygonIterator it2 (Object->QueryObject ());
+    while (!it2.IsFinished ())
+    {
+      iModelDataPolygon *Polygon = it2.Get ();
+
+      for (int i=2; i<Polygon->GetVertexCount (); i++)
+      {
+        /* @@@ is the vertex order correct ??? */
+        out << "  smooth_triangle {\n";
+	WriteVertex (out, Object->GetDefaultVertices (),
+	  Polygon->GetVertex (0), Polygon->GetNormal (0));
+	out << ",\n";
+	WriteVertex (out, Object->GetDefaultVertices (),
+	  Polygon->GetVertex (i-1), Polygon->GetNormal (i-1));
+	out << ",\n";
+	WriteVertex (out, Object->GetDefaultVertices (),
+	  Polygon->GetVertex (i), Polygon->GetNormal (i));
+	out << "\n";
+	if (TextureNum == 0) out << "    texture { RedText }\n";
+	else if (TextureNum == 1) out << "    texture { GreenText }\n";
+	else if (TextureNum == 2) out << "    texture { BlueText }\n";
+        out << "  }\n";
+	TextureNum = (TextureNum + 1) % 3;
+      }
+      it2.Next ();
+    }
+    out << "}\n";
+    it.Next ();
+  }
+
+  int Length = out.Length () + 1;
+  char *FileData = out.Detach ();
+  return new csDataBuffer (FileData, Length);
 }
