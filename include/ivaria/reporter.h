@@ -171,69 +171,84 @@ struct iReporter : public iBase
   virtual bool FindReporterListener (iReporterListener* listener) = 0;
 
   //----------------------------------------------------------------------
-  // Conveniance functions, these are not to be implemented.
+  // Conveniance functions, these are not to be implemented in the plugin.
   //----------------------------------------------------------------------
 
   /**
    * Report error.
    */
-  void CS_GNUC_PRINTF (3, 4)
-      ReportError (const char* msgId, const char* description, ...)
-  {
-    va_list arg;
-    va_start (arg, description);
-    ReportV (CS_REPORTER_SEVERITY_ERROR, msgId, description, arg);
-    va_end (arg);
-  }
+  inline void ReportError (const char* msgId, const char* description, ...)
+    CS_GNUC_PRINTF (3, 4);
 
   /**
    * Report warning.
    */
-  void CS_GNUC_PRINTF (3, 4)
-      ReportWarning (const char* msgId, const char* description, ...)
-  {
-    va_list arg;
-    va_start (arg, description);
-    ReportV (CS_REPORTER_SEVERITY_WARNING, msgId, description, arg);
-    va_end (arg);
-  }
+  inline void ReportWarning (const char* msgId, const char* description, ...)
+    CS_GNUC_PRINTF (3, 4);
 
   /**
    * Report notification.
    */
-  void CS_GNUC_PRINTF (3, 4)
-      ReportNotify (const char* msgId, const char* description, ...)
-  {
-    va_list arg;
-    va_start (arg, description);
-    ReportV (CS_REPORTER_SEVERITY_NOTIFY, msgId, description, arg);
-    va_end (arg);
-  }
+  inline void ReportNotify (const char* msgId, const char* description, ...)
+    CS_GNUC_PRINTF (3, 4);
 
   /**
    * Report bug.
    */
-  void CS_GNUC_PRINTF (3, 4)
-      ReportBug (const char* msgId, const char* description, ...)
-  {
-    va_list arg;
-    va_start (arg, description);
-    ReportV (CS_REPORTER_SEVERITY_BUG, msgId, description, arg);
-    va_end (arg);
-  }
+  inline void ReportBug (const char* msgId, const char* description, ...)
+    CS_GNUC_PRINTF (3, 4);
 
   /**
    * Report debug.
    */
-  void CS_GNUC_PRINTF (3, 4)
-      ReportDebug (const char* msgId, const char* description, ...)
-  {
-    va_list arg;
-    va_start (arg, description);
-    ReportV (CS_REPORTER_SEVERITY_DEBUG, msgId, description, arg);
-    va_end (arg);
-  }
+  inline void ReportDebug (const char* msgId, const char* description, ...)
+    CS_GNUC_PRINTF (3, 4);
 };
+
+inline void iReporter::ReportError
+  (const char* msgId, const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+  ReportV (CS_REPORTER_SEVERITY_ERROR, msgId, description, arg);
+  va_end (arg);
+}
+
+inline void iReporter::ReportWarning
+  (const char* msgId, const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+  ReportV (CS_REPORTER_SEVERITY_WARNING, msgId, description, arg);
+  va_end (arg);
+}
+
+inline void iReporter::ReportNotify
+  (const char* msgId, const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+  ReportV (CS_REPORTER_SEVERITY_NOTIFY, msgId, description, arg);
+  va_end (arg);
+}
+
+inline void iReporter::ReportBug
+  (const char* msgId, const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+  ReportV (CS_REPORTER_SEVERITY_BUG, msgId, description, arg);
+  va_end (arg);
+}
+
+inline void iReporter::ReportDebug
+  (const char* msgId, const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+  ReportV (CS_REPORTER_SEVERITY_DEBUG, msgId, description, arg);
+  va_end (arg);
+}
 
 
 /**
@@ -245,32 +260,38 @@ struct iReporter : public iBase
 class csReporterHelper
 {
 public:
-  static void CS_GNUC_PRINTF (4, 0)
-      ReportV(iObjectRegistry* reg, int severity, char const* msgId,
-      char const* description, va_list args)
-  {
-    csRef<iReporter> reporter (CS_QUERY_REGISTRY (reg, iReporter));
-    if (reporter)
-      reporter->ReportV(severity, msgId, description, args);
-    else
-    {
-      csPrintfV(description, args);
-      csPrintf("\n");
-    }
-  }
+  static inline void ReportV(iObjectRegistry* reg, int severity,
+    char const* msgId, char const* description, va_list args)
+    CS_GNUC_PRINTF (4, 0);
 
-  static void CS_GNUC_PRINTF (4, 5)
-      Report(iObjectRegistry* reg, int severity, char const* msgId,
-      char const* description, ...)
-  {
-    va_list arg;
-    va_start(arg, description);
-
-    ReportV(reg,severity,msgId,description,arg);
-
-    va_end (arg);
-  }
+  static inline void Report(iObjectRegistry* reg, int severity,
+    char const* msgId, char const* description, ...)
+    CS_GNUC_PRINTF (4, 5);
 };
+
+inline void csReporterHelper::ReportV(iObjectRegistry* reg, int severity,
+  char const* msgId, char const* description, va_list args)
+{
+  csRef<iReporter> reporter (CS_QUERY_REGISTRY (reg, iReporter));
+  if (reporter)
+    reporter->ReportV(severity, msgId, description, args);
+  else
+  {
+    csPrintfV(description, args);
+    csPrintf("\n");
+  }
+}
+
+inline void csReporterHelper::Report(iObjectRegistry* reg, int severity,
+  char const* msgId, char const* description, ...)
+{
+  va_list arg;
+  va_start(arg, description);
+
+  ReportV(reg,severity,msgId,description,arg);
+
+  va_end (arg);
+}
 
 /**
  * Helper function to use a reporter easily.  This function will also work if

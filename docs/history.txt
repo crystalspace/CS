@@ -3,6 +3,14 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+28-May-2003
+	- Oktal reorganised the convenience functions in iReporter and
+	  csReporterHelper in reporter.h, for more compatible use of the GCC
+	  keyword __attribute__. It was being used in an improper place in
+	  the function declaration line, which was causing warnings and
+	  causing it to be ignored by some versions of GCC. The fix reqires
+	  these functions to be declared inline to avoid syntax errors and
+	  linking errors.
 27-May-2003
 	- Boyan made the following changes:
 	    - Fixed kyboard focusing component bug in AWS 
