@@ -56,9 +56,10 @@ char* csExpandPath (const char* path)
 
 char* csGetAppPath ()
 {
-  // FIXME const char* app = csStrNew (__argv[0]);
   char cwd[PATH_MAX];
-  const char *app = csStrNew (getcwd(cwd, PATH_MAX));
+  return (csStrNew (getcwd (cwd, PATH_MAX)));
+#if 0
+  // FIXME const char* app = csStrNew (__argv[0]);
   char* fullPath = 0;
 
   if (!app) return 0;
@@ -113,6 +114,7 @@ char* csGetAppPath ()
   delete[] app;
 
   return fullPath;
+#endif
 }
 
 bool csPathsIdentical (const char* path1, const char* path2)
