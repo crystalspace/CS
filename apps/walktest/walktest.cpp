@@ -1430,6 +1430,13 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       Engine->Prepare (meter);
       delete meter;
     }
+    else
+    {
+      // Here we free all loaded images. Normally engine->Prepare()
+      // will do that for us.
+      iTextureManager *txtmgr = Gfx3D->GetTextureManager ();
+      txtmgr->FreeImages ();
+    }
 
     if (cmdline->GetOption ("prepare"))
     {
@@ -1597,4 +1604,36 @@ int main (int argc, char* argv[])
 
   return 1;
 }
+
+#if 0
+#undef new
+void* operator new (size_t s, void* filename, int line)
+{
+  void* rc = (void*)malloc (s);
+  //printf ("+ %p %s %d %d\n", rc, filename, line, s); fflush (stdout);
+  return rc;
+}
+void* operator new[] (size_t s, void* filename, int line)
+{
+  void* rc = (void*)malloc (s);
+  //printf ("+ %p %s %d %d\n", rc, filename, line, s); fflush (stdout);
+  return rc;
+}
+void operator delete (void* p)
+{
+  if (p)
+  {
+    //printf ("- %p\n", p); fflush (stdout);
+    free (p);
+  }
+}
+void operator delete[] (void* p)
+{
+  if (p)
+  {
+    //printf ("- %p\n", p); fflush (stdout);
+    free (p);
+  }
+}
+#endif
 

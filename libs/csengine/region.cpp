@@ -228,7 +228,10 @@ bool csRegion::PrepareTextures ()
           iter->GetObject (),
           iTextureWrapper));
       if (csth)
+      {
         if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
+        if (!csth->KeepImage ()) csth->SetImageFile (NULL);
+      }
     }
   }
 
