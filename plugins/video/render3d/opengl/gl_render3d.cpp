@@ -212,7 +212,7 @@ void csGLGraphics3D::SetGlOrtho (bool inverted)
   else
   {*/
     if (inverted)
-      glOrtho (0., (GLdouble) viewwidth,
+      glOrtho (0., (GLdouble) viewwidth, 
       (GLdouble) viewheight, 0., -1.0, 10.0);
     else
       glOrtho (0., (GLdouble) viewwidth, 0.,
@@ -652,8 +652,23 @@ void csGLGraphics3D::SetupProjection ()
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  SetGlOrtho (false);
-  glTranslatef (asp_center_x, asp_center_y, 0);
+  SetGlOrtho (render_target);
+  if (render_target)
+  {
+    int txt_w, txt_h;
+    render_target->GetMipMapDimensions (0, txt_w, txt_h);
+
+    /*
+      Need a different translation for PTs, they are in the upper left.
+      @@@ Not very nice to have that here,
+      @@@ furthermore, the perspective center Y coordinate is effectively
+          hardcoded
+     */
+
+    glTranslatef (asp_center_x, (txt_h / 2), 0);
+  }
+  else
+    glTranslatef (asp_center_x, asp_center_y, 0);
 
   GLfloat matrixholder[16];
   for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
@@ -1127,6 +1142,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     glViewport (0, 0, viewwidth, viewheight);
     needProjectionUpdate = true;
 
+    glCullFace (render_target ? GL_BACK : GL_FRONT);
+
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
     object2camera = csReversibleTransform();
@@ -1149,7 +1166,19 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    SetGlOrtho (false);
+    if (render_target)
+    {
+      int txt_w, txt_h;
+      render_target->GetMipMapDimensions (0, txt_w, txt_h);
+      /*
+	Render target: draw everything in top-left corner, but flipped.
+      */
+      glOrtho (0., (GLdouble) viewwidth, (GLdouble) (2 * viewheight - txt_h), 
+	(GLdouble) (viewheight - txt_h), -1.0, 10.0);
+      glCullFace (GL_BACK);
+    }
+    else
+      SetGlOrtho (false);
     //glViewport (0, 0, viewwidth, viewheight);
     glViewport (0, 0, viewwidth, viewheight);
 
@@ -1174,8 +1203,6 @@ void csGLGraphics3D::FinishDraw ()
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
 
-  current_drawflags = 0;
-
   if (render_target)
   {
     if (rt_cliprectset)
@@ -1186,6 +1213,12 @@ void csGLGraphics3D::FinishDraw ()
       glLoadIdentity ();
       glOrtho (0., viewwidth, 0., viewheight, -1.0, 10.0);
       glViewport (0, 0, viewwidth, viewheight);
+    }
+
+    if ((current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)) == 
+      CSDRAW_2DGRAPHICS)
+    {
+      glCullFace (GL_FRONT);
     }
 
     if (rt_onscreen)
@@ -1272,6 +1305,7 @@ void csGLGraphics3D::FinishDraw ()
     }
   }
   render_target = 0;
+  current_drawflags = 0;
 }
 
 void csGLGraphics3D::Print (csRect const* area)
@@ -1808,44 +1842,6 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
     th = (int)(th * (float)bitmapheight / (float)oheight);
   }
 
-  int ClipX1, ClipY1, ClipX2, ClipY2;
-  G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
-
-  // Texture coordinates (floats)
-  float _tx = tx, _ty = ty, _tw = tw, _th = th;
-
-  // Clipping
-  if ((sx >= ClipX2) || (sy >= ClipY2) ||
-      (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
-    return;                             // Sprite is totally invisible
-  if (sx < ClipX1)                      // Left margin crossed?
-  {
-    int nw = sw - (ClipX1 - sx);        // New width
-    _tx += (ClipX1 - sx) * _tw / sw;    // Adjust X coord on texture
-    _tw = (_tw * nw) / sw;              // Adjust width on texture
-    sw = nw; sx = ClipX1;
-  }
-  if (sx + sw > ClipX2)                 // Right margin crossed?
-  {
-    int nw = ClipX2 - sx;               // New width
-    _tw = (_tw * nw) / sw;              // Adjust width on texture
-    sw = nw;
-  }
-  if (sy < ClipY1)                      // Top margin crossed?
-  {
-    int nh = sh - (ClipY1 - sy);        // New height
-    _ty += (ClipY1 - sy) * _th / sh;    // Adjust Y coord on texture
-    _th = (_th * nh) / sh;              // Adjust height on texture
-    sh = nh; sy = ClipY1;
-  }
-  if (sy + sh > ClipY2)                 // Bottom margin crossed?
-  {
-    int nh = ClipY2 - sy;               // New height
-    _th = (_th * nh) / sh;              // Adjust height on texture
-    sh = nh;
-  }
-
-
   // cache the texture if we haven't already.
   txtcache->Cache (hTex);
 
@@ -1869,10 +1865,10 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   // convert texture coords given above to normalized (0-1.0) texture
   // coordinates
   float ntx1,nty1,ntx2,nty2;
-  ntx1 = (_tx      ) / bitmapwidth;
-  ntx2 = (_tx + _tw) / bitmapwidth;
-  nty1 = (_ty      ) / bitmapheight;
-  nty2 = (_ty + _th) / bitmapheight;
+  ntx1 = ((float)tx            ) / bitmapwidth;
+  ntx2 = ((float)tx + (float)tw) / bitmapwidth;
+  nty1 = ((float)ty            ) / bitmapheight;
+  nty2 = ((float)ty + (float)th) / bitmapheight;
 
   // draw the bitmap
   glBegin (GL_QUADS);

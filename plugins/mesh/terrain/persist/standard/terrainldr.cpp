@@ -51,7 +51,8 @@ enum
   XMLTOKEN_MATERIALMAP,
   XMLTOKEN_LODDISTANCE,
   XMLTOKEN_ERRORTOLERANCE,
-  XMLTOKEN_STATICLIGHTING
+  XMLTOKEN_STATICLIGHTING,
+  XMLTOKEN_CASTSHADOWS
 };
 
 SCF_IMPLEMENT_IBASE (csTerrainFactoryLoader)
@@ -273,6 +274,7 @@ bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("loddistance", XMLTOKEN_LODDISTANCE);
   xmltokens.Register ("errortolerance", XMLTOKEN_ERRORTOLERANCE);
   xmltokens.Register ("staticlighting", XMLTOKEN_STATICLIGHTING);
+  xmltokens.Register ("castshadows", XMLTOKEN_CASTSHADOWS);
   return true;
 }
 
@@ -405,6 +407,14 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
 	  if (!synldr->ParseBool (child, staticLighting, false))
 	    return false;
 	  state->SetStaticLighting (staticLighting);
+	}
+	break;
+      case XMLTOKEN_CASTSHADOWS:
+	{
+	  bool castShadows;
+	  if (!synldr->ParseBool (child, castShadows, false))
+	    return false;
+	  state->SetCastShadows (castShadows);
 	}
 	break;
       default:

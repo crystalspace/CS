@@ -727,6 +727,7 @@ SCF_IMPLEMENT_IBASE (csChunkLodTerrainObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowReceiver)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowCaster)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csChunkLodTerrainObject::eiTerrainObjectState)
@@ -745,6 +746,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csChunkLodTerrainObject::ShadowReceiver)
   SCF_IMPLEMENTS_INTERFACE (iShadowReceiver)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csChunkLodTerrainObject::ShadowCaster)
+  SCF_IMPLEMENTS_INTERFACE (iShadowCaster)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csChunkLodTerrainObject::csChunkLodTerrainObject (csChunkLodTerrainFactory* p)
 	: logparent (p), pFactory (p), returnMeshesHolder (false)
 {
@@ -753,11 +758,13 @@ csChunkLodTerrainObject::csChunkLodTerrainObject (csChunkLodTerrainFactory* p)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver)
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster)
 
   error_tolerance = 1.0;
   lod_distance = 200.0;
 
   staticLighting = false;
+  castShadows = false;
   colorVersion = 0;
   dynamic_ambient.Set (0.0f, 0.0f, 0.0f);
   staticLights.SetLength (pFactory->hm_x * pFactory->hm_y);
@@ -769,6 +776,7 @@ csChunkLodTerrainObject::~csChunkLodTerrainObject ()
 {
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver)
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowCaster)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrainObjectState)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel)
   SCF_DESTRUCT_IBASE ()
@@ -1496,6 +1504,11 @@ void csChunkLodTerrainObject::CastShadows (iMovable* movable,
     {
       continue;
     }
+    
+    float vrt_sq_dist = csSquaredDist::PointPoint (obj_light_pos,
+      data.pos);
+    if (vrt_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
+    
     bool inShadow = false;
     shadowIt->Reset ();
     while (shadowIt->HasNext ())
@@ -1508,10 +1521,7 @@ void csChunkLodTerrainObject::CastShadows (iMovable* movable,
       }
     }
     if (inShadow) continue;
-
-    float vrt_sq_dist = csSquaredDist::PointPoint (obj_light_pos,
-      data.pos);
-    if (vrt_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
+        
     float in_vrt_dist =
       (vrt_sq_dist >= SMALL_EPSILON) ? qisqrt (vrt_sq_dist) : 1.0f;
 
@@ -1538,6 +1548,75 @@ void csChunkLodTerrainObject::CastShadows (iMovable* movable,
 	col = light_color * bright;
 	staticLights[i] += col;
       }
+    }
+  }
+}
+
+void csChunkLodTerrainObject::AppendShadowTri (const csVector3& a, 
+					       const csVector3& b, 
+					       const csVector3& c, 
+					       iShadowBlock* list,
+					       const csVector3& origin)
+{
+  csPlane3 pl (c, b, a);
+  float clas = pl.Classify (origin);
+  if (ABS (clas) < EPSILON) return;
+  if (clas > 0) return;
+
+  pl.DD += origin * pl.norm;
+  pl.Invert ();
+  csFrustum* frust = list->AddShadow (origin, 0, 3, pl);
+  frust->GetVertex (0).Set (a - origin);
+  frust->GetVertex (1).Set (b - origin);
+  frust->GetVertex (2).Set (c - origin);
+}
+
+void csChunkLodTerrainObject::AppendShadows (iMovable* movable, 
+					     iShadowBlockList* shadows,
+					     const csVector3& origin)
+{
+  if (!castShadows) return;
+
+  csReversibleTransform o2w (movable->GetFullTransform ());
+  bool need_tf = !o2w.IsIdentity();
+
+  const csArray<csChunkLodTerrainFactory::Data>& datamap = 
+    pFactory->datamap;
+  const int w = pFactory->hm_x;
+  const int h = pFactory->hm_y;
+  int x, y;
+
+  CS_ALLOC_STACK_ARRAY(csVector3, worldVertices, w * h);
+  for (y = 0; y < h; y++)
+  {
+    for (x = 0; x < w; x++)
+    {
+      int pos = (y * w) + x;
+
+      if (need_tf)
+	worldVertices[pos] = o2w.This2Other (datamap[pos].pos);
+      else
+	worldVertices[pos] = datamap[pos].pos;
+    }
+  }
+
+  iShadowBlock *list = shadows->NewShadowBlock (w * h * 4);
+  for (y = 0; y < h - 1; y++)
+  {
+    for (x = 0; x < w - 1; x++)
+    {
+      int pos = (y * w) + x;
+      
+      const csVector3& v1 = worldVertices[pos];
+      const csVector3& v2 = worldVertices[pos + 1];
+      const csVector3& v3 = worldVertices[pos + w];
+      const csVector3& v4 = worldVertices[pos + w + 1];
+
+      csVector3 middle ((v1 + v2 + v3 + v4) * 0.25f);
+      AppendShadowTri (v1, v2, middle, list, origin);
+      AppendShadowTri (v2, v3, middle, list, origin);
+      AppendShadowTri (v3, v4, middle, list, origin);
+      AppendShadowTri (v4, v1, middle, list, origin);
     }
   }
 }

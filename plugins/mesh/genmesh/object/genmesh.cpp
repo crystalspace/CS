@@ -700,6 +700,11 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
     {
       continue;
     }
+    
+    float vrt_sq_dist = csSquaredDist::PointPoint (obj_light_pos,
+      vertices[i]);
+    if (vrt_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
+    
     bool inShadow = false;
     shadowIt->Reset ();
     while (shadowIt->HasNext ())
@@ -713,9 +718,6 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
     }
     if (inShadow) continue;
 
-    float vrt_sq_dist = csSquaredDist::PointPoint (obj_light_pos,
-      vertices[i]);
-    if (vrt_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
     float in_vrt_dist =
       (vrt_sq_dist >= SMALL_EPSILON) ? qisqrt (vrt_sq_dist) : 1.0f;
 

@@ -309,6 +309,7 @@ private:
   int tricount;
   csFlags flags;
   bool staticLighting;
+  bool castShadows;
 
   class MeshTreeNodeWrapper : public iBase
   {
@@ -438,6 +439,10 @@ public:
   { staticLighting = enable; }
   bool GetStaticLighting ()
   { return staticLighting; }
+  void SetCastShadows (bool enable)
+  { castShadows = enable; }
+  bool GetCastShadows ()
+  { return castShadows; }
 
   char* GenerateCacheName ();
   void InitializeDefault (bool clear);
@@ -448,7 +453,11 @@ public:
   const csColor& GetDynamicAmbientLight ();
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);
-  virtual void CastShadows (iMovable* movable, iFrustumView* fview);
+  void CastShadows (iMovable* movable, iFrustumView* fview);
+  void AppendShadowTri (const csVector3& a, const csVector3& b, 
+    const csVector3& c, iShadowBlock* list, const csVector3& origin);
+  void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
+    const csVector3& origin);
 
   struct eiTerrainObjectState : public iTerrainObjectState
   {
@@ -479,6 +488,10 @@ public:
     { scfParent->SetStaticLighting (enable); }
     virtual bool GetStaticLighting ()
     { return scfParent->GetStaticLighting (); }
+    virtual void SetCastShadows (bool enable)
+    { scfParent->SetCastShadows (enable); }
+    virtual bool GetCastShadows ()
+    { return scfParent->GetCastShadows (); }
   } scfiTerrainObjectState;
   friend struct eiTerrainObjectState;
 
@@ -502,6 +515,18 @@ public:
     }
   } scfiShadowReceiver;
   friend struct ShadowReceiver;
+
+  //-------------------- iShadowCaster interface implementation ----------
+  struct ShadowCaster : public iShadowCaster
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csChunkLodTerrainObject);
+    virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
+    	const csVector3& origin)
+    {
+      scfParent->AppendShadows (movable, shadows, origin);
+    }
+  } scfiShadowCaster;
+  friend struct ShadowCaster;
 
   //------------------------- iLightingInfo interface -------------------------
   struct LightingInfo : public iLightingInfo
