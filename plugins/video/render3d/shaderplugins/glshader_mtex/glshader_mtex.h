@@ -119,18 +119,11 @@ private:
   struct mtexlayer
   {
     //remember which vars to reset on deactivate
-    bool doCArr, doTCArr, doTexture;
+    bool doTexture;
 
     //texturenumber to use
     int texnum;
-
-    //where to get color
-    COLORSOURCE ccsource;
-    char* colorstream;
-
-    //where to get texturecoords
-    TEXCOORDSOURCE tcoordsource;
-    char* tcoordstream;
+    csRef<iTextureHandle> texturehandle;
 
     //colorsource
     int colorsource[3];
@@ -147,14 +140,14 @@ private:
     int alphap;
 
     // rgb scale
-    float scale_rgb[3];
+    float scale_rgb;
     // alpha scale
     float scale_alpha;
     mtexlayer()
     {
       texnum = -1;
-      ccsource = CS_COLORSOURCE_MESH;
-      tcoordsource = CS_TEXCOORDSOURCE_MESH;
+      doTexture = false;
+
       colorsource[0] = GL_PREVIOUS_ARB; colorsource[1] = GL_TEXTURE; colorsource[2] = -1;
       colormod[0] = GL_SRC_COLOR; colormod[1] = GL_SRC_COLOR; colormod[2] = GL_SRC_COLOR;
       colorp = GL_MODULATE;
@@ -163,17 +156,8 @@ private:
       alphamod[0] = GL_SRC_ALPHA; alphamod[1] = GL_SRC_ALPHA; alphamod[2] = GL_SRC_ALPHA;
       alphap = GL_MODULATE;
 
-      scale_rgb[0] = scale_rgb[1] = scale_rgb[2] = 1.0f;
+      scale_rgb = 1.0f;
       scale_alpha = 1.0f;
-
-      colorstream = tcoordstream = NULL;
-      doCArr = doTCArr = doTexture = false;
-    }
-
-    ~mtexlayer()
-    {
-      if(colorstream) delete colorstream;
-      if(tcoordstream) delete tcoordstream;
     }
   };
 

@@ -29,6 +29,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/vector3.h"
 #include "csutil/xmltiny.h"
 
+#include "iengine/engine.h"
 #include "iutil/document.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
@@ -151,7 +152,6 @@ void csShaderGLMTEX::BuildTokenHash()
   xmltokens.Register ("coloroperation", XMLTOKEN_COLOROP);
   xmltokens.Register ("colorsource", XMLTOKEN_COLORSOURCE);
   xmltokens.Register ("texturesource", XMLTOKEN_TEXTURESOURCE);
-  xmltokens.Register ("texturecoordinate", XMLTOKEN_TEXCOORDSOURCE);
   xmltokens.Register ("layer", XMLTOKEN_LAYER);
   xmltokens.Register ("environment", XMLTOKEN_ENVIRONMENT);
 
@@ -224,6 +224,7 @@ bool csShaderGLMTEX::LoadLayer(mtexlayer* layer, iDocumentNode* node)
     return false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes();
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   while(it->HasNext())
   {
@@ -234,48 +235,16 @@ bool csShaderGLMTEX::LoadLayer(mtexlayer* layer, iDocumentNode* node)
     {
     case XMLTOKEN_TEXTURESOURCE:
       {
-        int tnum = child->GetAttributeValueAsInt("number");
-        if(tnum < 0) continue;
-        layer->texnum = tnum;
-      }
-      break;
-    case XMLTOKEN_TEXCOORDSOURCE:
-      {
-        const char* tcs = child->GetAttributeValue("source");
-        if(strncmp(tcs, "mesh", 4) == 0)
+        const char* texname = child->GetAttributeValue("name");
+        if (texname)
         {
-          layer->tcoordsource = CS_TEXCOORDSOURCE_MESH;
-        }
-        else if (strncmp(tcs, "stream", 5) == 0)
-        {
-          layer->tcoordsource = CS_TEXCOORDSOURCE_STREAM;
-          int ln = strlen(child->GetAttributeValue("stream"));
-          layer->tcoordstream = new char[ln+1];
-          strcpy(layer->tcoordstream, child->GetAttributeValue("stream"));
-        }
-        else
-        {
-          layer->tcoordsource = CS_TEXCOORDSOURCE_NONE;
-        }
-      }
-      break;
-    case XMLTOKEN_COLORSOURCE:
-      {
-        const char* cs = child->GetAttributeValue("source");
-        if(strncmp(cs, "mesh", 4) == 0)
-        {
-          layer->ccsource = CS_COLORSOURCE_MESH;
-        }
-        else if(strncmp(cs, "stream", 5) == 0)
-        {
-          layer->ccsource = CS_COLORSOURCE_STREAM;
-          int ln = strlen(child->GetAttributeValue("stream"));
-          layer->colorstream = new char[ln+1];
-          strcpy(layer->colorstream, child->GetAttributeValue("stream"));
-        } 
-        else
-        {
-          layer->ccsource = CS_COLORSOURCE_NONE;
+          if (engine)
+            layer->texturehandle = 
+              engine->FindTexture (texname)->GetTextureHandle ();
+        } else {
+          int tnum = child->GetAttributeValueAsInt("number");
+          if(tnum < 0) continue;
+          layer->texnum = tnum;
         }
       }
       break;
@@ -403,59 +372,22 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
     mtexlayer* layer = (mtexlayer*) texlayers.Get(i);
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
     ext->glClientActiveTextureARB( GL_TEXTURE0_ARB + i);
-/*
-    if(layer->ccsource == CS_COLORSOURCE_MESH)
-    {
-      csRef<iRenderBuffer> cbuf = ss->GetBuffer(strset->Request("COLOR"));
-      if(cbuf)
-      {
-        glColorPointer(4,GL_FLOAT,0,cbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER) );
-        glEnableClientState( GL_COLOR_ARRAY);
-        layer->doCArr = true;
-      }
-    } else if (layer->ccsource == CS_COLORSOURCE_STREAM && layer->colorstream )
-    {
-      csRef<iRenderBuffer> cbuf = ss->GetBuffer(strset->Request(layer->colorstream));
-      if(cbuf)
-      {
-        glColorPointer(4,GL_FLOAT,0,cbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER) );
-        glEnableClientState( GL_COLOR_ARRAY);
-        layer->doCArr = true;
-      }
-    }
 
-    if(layer->tcoordsource == CS_COLORSOURCE_MESH)
-    {
-      csRef<iRenderBuffer> tbuf = ss->GetBuffer(strset->Request("texture coordinates"));
-      if(tbuf)
-      {
-        glTexCoordPointer(2,GL_FLOAT,0,tbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER) );
-        glEnableClientState( GL_TEXTURE_COORD_ARRAY);
-        layer->doTCArr = true;
-      }
-    } else if (layer->tcoordsource == CS_COLORSOURCE_STREAM && layer->colorstream )
-    {
-      csRef<iRenderBuffer> tbuf = ss->GetBuffer(strset->Request(layer->colorstream));
-      if(tbuf)
-      {
-        glColorPointer(2,GL_FLOAT,0,tbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER) );
-        glEnableClientState( GL_TEXTURE_COORD_ARRAY);
-        layer->doTCArr = true;
-      }
-    }
-  */  
     GLuint texturehandle = 0;
-    iTextureHandle* txt_handle = NULL;
+    iTextureHandle* txt_handle = layer->texturehandle;
 
-    csRef<csMaterialHandle> mathand ((csMaterialHandle*)(mesh->GetMaterialHandle ()));
-    if(layer->texnum == 0)
+    if (!txt_handle)
     {
-      txt_handle = mathand->GetTexture();
-    }
-    else if(layer->texnum > 0 && layer->texnum <= mathand->GetTextureLayerCount() )
-    {
-      csTextureLayer* matlayer = mathand->GetTextureLayer(layer->texnum-1);
-      txt_handle = matlayer->txt_handle;
+      csRef<csMaterialHandle> mathand ((csMaterialHandle*)(mesh->GetMaterialHandle ()));
+      if(layer->texnum == 0)
+      {
+        txt_handle = mathand->GetTexture();
+      }
+      else if(layer->texnum > 0 && layer->texnum <= mathand->GetTextureLayerCount() )
+      {
+        csTextureLayer* matlayer = mathand->GetTextureLayer(layer->texnum-1);
+        txt_handle = matlayer->txt_handle;
+      }
     }
     
     if(txt_handle)
@@ -466,8 +398,20 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
 
       texturehandle = cachedata->Handle;
 
-      statecache->SetTexture(GL_TEXTURE_2D, texturehandle, i);
-      statecache->Enable_GL_TEXTURE_2D (i);
+      if (txt_gl->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
+      {
+        // @@@ SHOULD BE CACHED
+        glEnable (GL_TEXTURE_CUBE_MAP);
+        glBindTexture (GL_TEXTURE_CUBE_MAP, texturehandle);
+      } else if (txt_gl->target == iTextureHandle::CS_TEX_IMG_3D)
+      {
+        // @@@ SHOULD BE CACHED
+        glEnable (GL_TEXTURE_3D);
+        glBindTexture (GL_TEXTURE_3D, texturehandle);
+      } else{
+        statecache->Enable_GL_TEXTURE_2D (i);
+        statecache->SetTexture (GL_TEXTURE_2D, texturehandle, i);
+      }
 
       layer->doTexture = true;
     }
@@ -492,7 +436,7 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
         else if (ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3)
           glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
 
-	glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer->scale_rgb[0]);
+	glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer->scale_rgb);
 
         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, layer->alphasource[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, layer->alphamod[0]);
@@ -524,6 +468,9 @@ void csShaderGLMTEX::Deactivate(iShaderPass* current, csRenderMesh* mesh)
     ext->glActiveTextureARB (GL_TEXTURE0_ARB+i);
     ext->glClientActiveTextureARB (GL_TEXTURE0_ARB+i);
     statecache->Disable_GL_TEXTURE_2D (i);
+    // @@@ HACK
+    glDisable (GL_TEXTURE_3D);
+    glDisable (GL_TEXTURE_CUBE_MAP);
     statecache->SetTexture (GL_TEXTURE_2D, -1, i); //should not be necessary
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   }
