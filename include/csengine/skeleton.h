@@ -114,7 +114,7 @@ public:
  * A connection. This is basically a transformation with a limb that
  * is controlled by the transformation.
  */
-class csSkeletonConnection : public csSkeletonLimb, public iSkeletonConnection
+class csSkeletonConnection : public csSkeletonLimb
 {
 private:
   /// A transformation with respect to the parent limb.
@@ -140,16 +140,25 @@ public:
   virtual csSkeletonLimbState* CreateState ();
 
   DECLARE_IBASE_EXT (csSkeletonLimb);
+
+  struct SkeletonConnection : public iSkeletonConnection
+  {
+    DECLARE_EMBEDDED_IBASE (csSkeletonConnection);
+    virtual void SetTransformation (const csTransform& t)
+      { scfParent->SetTransformation(t); }
+    virtual csTransform& GetTransformation ()
+      { return scfParent->GetTransformation(); }
+  } scfiSkeletonConnection;
 };
 
 /**
  * The base skeleton class (or the 'body').
  */
-class csSkeleton : public csSkeletonLimb, public iSkeleton
+class csSkeleton : public csSkeletonLimb
 {
 public:
   /// Create an empty skeleton.
-  csSkeleton () { }
+  csSkeleton ();
 
   /// Destructor.
   virtual ~csSkeleton () { }
@@ -158,6 +167,11 @@ public:
   virtual csSkeletonLimbState* CreateState ();
 
   DECLARE_IBASE_EXT (csSkeletonLimb);
+
+  struct Skeleton : public iSkeleton
+  {
+    DECLARE_EMBEDDED_IBASE (csSkeleton);
+  } scfiSkeleton;
 };
 
 /**
@@ -244,8 +258,7 @@ public:
  * This is basicly a transformation with a limb that
  * is controlled by the transformation.
  */
-class csSkeletonConnectionState : public csSkeletonLimbState,
-	public iSkeletonConnectionState
+class csSkeletonConnectionState : public csSkeletonLimbState
 {
   friend class csSkeletonConnection;
 
@@ -305,6 +318,11 @@ public:
     }
   } scfiSkeletonBone;
   friend struct SkeletonBone;
+
+  struct SkeletonConnectionState : iSkeletonConnectionState
+  {
+    DECLARE_EMBEDDED_IBASE (csSkeletonConnectionState);
+  } scfiSkeletonConnectionState;
 };
 
 /**
@@ -315,7 +333,7 @@ public:
  * version. There is one csSkeletonState for every csSprite3D which
  * uses a skeleton.
  */
-class csSkeletonState : public csSkeletonLimbState, public iSkeletonState
+class csSkeletonState : public csSkeletonLimbState
 {
   friend class csSkeleton;
 
@@ -363,6 +381,11 @@ public:
 
   } scfiSkeletonBone;
   friend struct SkeletonBone;
+
+  struct SkeletonState : public iSkeletonState
+  {
+    DECLARE_EMBEDDED_IBASE (csSkeletonState);
+  } scfiSkeletonState;
 };
 
 #endif /*SKELETON_H*/

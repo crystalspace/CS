@@ -41,6 +41,13 @@ The history order has been reversed so that new features are at the top.
 	      are actually displayed in the output rather than being eaten by
 	      the conversion process.
 	    - Minor rewriting and enhancement of various topics.
+	- Eric Sunshine changed the following classes so that they embed
+	  particular SCF interfaces, rather than inheriting them, in order to
+	  be NextStep-friendly:
+	    csSkeleton                -> iSkeleton
+	    csSkeletonState           -> iSkeletonState
+	    csSkeletonConnection      -> iSkeletonConnection
+	    csSkeletonConnectionState -> iSkeletonConnectionState
 16-Jan-2001
 	- Eric Sunshine changed the image-copying rule in docs.mak so that it
 	  should once again work on Windows/DOS.  (It used to work, but the

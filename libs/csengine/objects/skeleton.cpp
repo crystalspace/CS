@@ -19,9 +19,6 @@
 #include "cssysdef.h"
 #include "csengine/skeleton.h"
 
-
-//---------------------------------------------------------------------------
-
 IMPLEMENT_IBASE (csSkeletonLimb)
   IMPLEMENTS_INTERFACE (iSkeletonLimb)
 IMPLEMENT_IBASE_END
@@ -160,16 +157,30 @@ csSkeletonLimbState* csSkeleton::CreateState ()
 //---------------------------------------------------------------------------
 
 IMPLEMENT_IBASE_EXT (csSkeletonConnection)
-  IMPLEMENTS_INTERFACE (iSkeletonConnection)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonConnection)
 IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csSkeletonConnection::SkeletonConnection)
+  IMPLEMENTS_INTERFACE (iSkeletonConnection)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 csSkeletonConnection::csSkeletonConnection ()
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonConnection);
 }
 
 IMPLEMENT_IBASE_EXT (csSkeleton)
-  IMPLEMENTS_INTERFACE (iSkeleton)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeleton)
 IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csSkeleton::Skeleton)
+  IMPLEMENTS_INTERFACE (iSkeleton)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+csSkeleton::csSkeleton ()
+{
+CONSTRUCT_EMBEDDED_IBASE (scfiSkeleton);
+}
 
 //---------------------------------------------------------------------------
 
@@ -194,7 +205,8 @@ csSkeletonLimbState::~csSkeletonLimbState ()
   }
 }
 
-void csSkeletonLimbState::Transform (const csTransform& tr, csVector3* source, csVector3* dest)
+void csSkeletonLimbState::Transform (const csTransform& tr, csVector3* source,
+  csVector3* dest)
 {
   csSkeletonLimbState* c = children;
   while (c)
@@ -214,8 +226,8 @@ void csSkeletonLimbState::SetName (const char *newname)
   name = strdup (newname);
 }
 
-void csSkeletonConnectionState::Transform (const csTransform& tr, csVector3* source,
-	csVector3* dest)
+void csSkeletonConnectionState::Transform (const csTransform& tr,
+  csVector3* source, csVector3* dest)
 {
   csTransform tr_new = tr * trans;
   csSkeletonLimbState::Transform (tr_new, source, dest);
@@ -247,9 +259,13 @@ void csSkeletonLimbState::ComputeBoundingBox (const csTransform& tr,
 }
 
 IMPLEMENT_IBASE_EXT (csSkeletonConnectionState)
-  IMPLEMENTS_INTERFACE (iSkeletonConnectionState)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonConnectionState)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
 IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csSkeletonConnectionState::SkeletonConnectionState)
+  IMPLEMENTS_INTERFACE (iSkeletonConnectionState)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE (csSkeletonConnectionState::SkeletonBone)
   IMPLEMENTS_INTERFACE (iSkeletonBone)
@@ -258,8 +274,8 @@ IMPLEMENT_EMBEDDED_IBASE_END
 csSkeletonConnectionState::csSkeletonConnectionState ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
+  CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonConnectionState);
 }
-
 
 void csSkeletonConnectionState::ComputeBoundingBox (const csTransform& tr,
 	csBox3& box)
@@ -269,9 +285,13 @@ void csSkeletonConnectionState::ComputeBoundingBox (const csTransform& tr,
 }
 
 IMPLEMENT_IBASE_EXT (csSkeletonState)
-  IMPLEMENTS_INTERFACE (iSkeletonState)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonState)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
 IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csSkeletonState::SkeletonState)
+  IMPLEMENTS_INTERFACE (iSkeletonState)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE (csSkeletonState::SkeletonBone)
   IMPLEMENTS_INTERFACE (iSkeletonBone)
@@ -279,6 +299,7 @@ IMPLEMENT_EMBEDDED_IBASE_END
 
 csSkeletonState::csSkeletonState ()
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonState);
   CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
 }
 
@@ -288,4 +309,3 @@ void csSkeletonState::ComputeBoundingBox (const csTransform& tr,
   box.StartBoundingBox ();
   csSkeletonLimbState::ComputeBoundingBox (tr, box);
 }
-
