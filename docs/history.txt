@@ -3,6 +3,9 @@ The history order is reversed so that new features are at the top.
 25-Sep-2002
 	- Eric Sunshine fixed spoofdir.php so that synthesis valid URLs for
 	  pathnames containing embedded spaces and other special characters.
+	- Eric Sunshine changed the Mingw port so that the CC and CXX compiler
+	  settings are determined dynamically via the comptest.sh script,
+	  rather than being hard-coded in the makefile.
 	- Eric Sunshine augmented the Mingw port so that it determines
 	  dynamically if the -fvtable-thunks compiler option should be used,
 	  rather than hard-coding it into the makefile.  Although this option
