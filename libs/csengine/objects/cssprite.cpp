@@ -341,6 +341,19 @@ csSpriteAction* csSpriteTemplate::FindAction (const char *n)
   return NULL;
 }
 
+void csSpriteTemplate::HardTransform (const csReversibleTransform& t)
+{
+  int num = GetNumVertices ();
+  int numf = GetNumFrames ();
+  int i, j;
+  for (i = 0 ; i < numf ; i++)
+  {
+    csVector3* verts = GetVertices (i);
+    for (j = 0 ; j < num ; j++)
+      verts[j] = t.This2Other (verts[j]);
+  }
+}
+
 //=============================================================================
 
 IMPLEMENT_CSOBJTYPE (csSprite, csObject)

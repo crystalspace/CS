@@ -312,6 +312,15 @@ public:
    */
   void ComputeNormals (csFrame* frame, csVector3* object_verts);
 
+  /**
+   * Do a hard transform of the sprite vertices.
+   * This transformation and the original coordinates are not
+   * remembered but the object space coordinates are directly
+   * computed (world space coordinates are set to the object space
+   * coordinates by this routine).
+   */
+  void HardTransform (const csReversibleTransform& t);
+
   CSOBJTYPE;
 };
 

@@ -4,6 +4,9 @@ The history order has been reversed so that new features are at the top.
 	- Wyatt Miler added perfstat plugin to the shared lib project file.
 	  Updated cspython, however, it still doesn't link.
 	- Martin Geisse updated the msvc project files.
+	- Implemented csSprite3D::HardTransform similar to csPolygonSet.
+	  With this you can move all sprite vertices so that (for example)
+	  the origin is at another place.
 11-Sep-2000
 	- Eric Sunshine made the following changes to worlfmt.txi, the Crystal
 	  Space World File Format description documentation:
