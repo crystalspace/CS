@@ -14,7 +14,7 @@ const int aws3DFrame:: fsBevel = _3dfsBevel;
 const int aws3DFrame:: fsThick = _3dfsThick;
 const int aws3DFrame:: fsBitmap = _3dfsBitmap;
 const int aws3DFrame:: fsSmallRaised = _3dfsSmallRaised;
-const int aws3DFrame::fsSmallSunken = _3dfsSmallSunken;
+const int aws3DFrame:: fsSmallSunken = _3dfsSmallSunken;
 const int aws3DFrame:: fsMask  = _3dfsMask;
 
 aws3DFrame::aws3DFrame ()
