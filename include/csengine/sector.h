@@ -35,6 +35,7 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 #include "iengine/viscull.h"
+#include "iengine/portalcontainer.h"
 
 class csEngine;
 class csProgressPulse;
@@ -91,6 +92,38 @@ public:
   virtual void PrepareMesh (iMeshWrapper* item);
   /// Override FreeMesh
   virtual void FreeMesh (iMeshWrapper* item);
+};
+
+/**
+ * List of portal containers. This class implements
+ * iPortalContainerList.
+ */
+class csPortalContainerList : public iPortalContainerList
+{
+private:
+  csRefArrayObject<iPortalContainer> list;
+  csSector* sector;
+
+public:
+  SCF_DECLARE_IBASE;
+
+  /// constructor
+  csPortalContainerList ();
+  virtual ~csPortalContainerList ();
+
+  void PreparePortalContainer (iPortalContainer* pc);
+  void FreePortalContainer (iPortalContainer* pc);
+  /// Set the sector.
+  void SetSector (csSector* sec) { sector = sec; }
+
+  virtual int GetCount () const { return list.Length () ; }
+  virtual iPortalContainer *Get (int n) const { return list.Get (n); }
+  virtual int Add (iPortalContainer *obj);
+  virtual bool Remove (iPortalContainer *obj);
+  virtual bool Remove (int n);
+  virtual void RemoveAll ();
+  virtual int Find (iPortalContainer *obj) const;
+  virtual iPortalContainer *FindByName (const char *Name) const;
 };
 
 SCF_VERSION (csSector, 0, 0, 2);

@@ -9,7 +9,7 @@
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
 #include "csutil/scanstr.h"
-#include "csutil/csrgbvct.h"
+#include "csgfx/csrgbvct.h"
 #include "iutil/vfs.h"
 #include "iutil/comp.h"
 #include "ivideo/graph3d.h"

@@ -42,6 +42,40 @@ struct iPortalContainer : public iBase
   virtual iObject *QueryObject () = 0;
 };
 
+SCF_VERSION (iPortalContainerList, 0, 0, 1);
+
+/**
+ * A list of portal containers.
+ */
+struct iPortalContainerList : public iBase
+{
+  /// Return the number of portal containers in this list.
+  virtual int GetCount () const = 0;
+
+  /// Return a portal container by index.
+  virtual iPortalContainer *Get (int n) const = 0;
+
+  /// Add a portal container.
+  virtual int Add (iPortalContainer *obj) = 0;
+
+  /// Remove a portal container.
+  virtual bool Remove (iPortalContainer *obj) = 0;
+
+  /// Remove the nth portal container.
+  virtual bool Remove (int n) = 0;
+
+  /// Remove all portal containers.
+  virtual void RemoveAll () = 0;
+
+  /// Find a portal container and return its index.
+  virtual int Find (iPortalContainer *obj) const = 0;
+
+  /**
+   * Find a portal container by name.
+   */
+  virtual iPortalContainer *FindByName (const char *Name) const = 0;
+};
+
 
 /** @} */
 

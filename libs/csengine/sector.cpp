@@ -89,7 +89,78 @@ void csSectorLightList::FreeLight (iLight* item)
   csLightList::FreeLight (item);
 }
 
+//--------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csPortalContainerList)
+  SCF_IMPLEMENTS_INTERFACE(iPortalContainerList)
+SCF_IMPLEMENT_IBASE_END
+
+csPortalContainerList::csPortalContainerList ()
+{
+  SCF_CONSTRUCT_IBASE (0);
+  sector = 0;
+}
+
+csPortalContainerList::~csPortalContainerList ()
+{
+  RemoveAll ();
+}
+
+void csPortalContainerList::PreparePortalContainer (iPortalContainer* item)
+{
+  CS_ASSERT (sector != 0);
+  //sector->PrepareMesh (item);
+}
+
+void csPortalContainerList::FreePortalContainer (iPortalContainer* item)
+{
+  CS_ASSERT (sector != 0);
+  //sector->UnprepareMesh (item);
+}
+
+int csPortalContainerList::Add (iPortalContainer *obj)
+{
+  PreparePortalContainer (obj);
+  list.Push (obj);
+  return true;
+}
+
+bool csPortalContainerList::Remove (iPortalContainer *obj)
+{
+  FreePortalContainer (obj);
+  list.Delete (obj);
+  return true;
+}
+
+bool csPortalContainerList::Remove (int n)
+{
+  FreePortalContainer (list[n]);
+  list.DeleteIndex (n);
+  return true;
+}
+
+void csPortalContainerList::RemoveAll ()
+{
+  int i;
+  for (i = 0 ; i < list.Length () ; i++)
+  {
+    FreePortalContainer (list[i]);
+  }
+  list.DeleteAll ();
+}
+
+int csPortalContainerList::Find (iPortalContainer *obj) const
+{
+  return list.Find (obj);
+}
+
+iPortalContainer *csPortalContainerList::FindByName (const char *Name) const
+{
+  return list.FindByName (Name);
+}
+
 //---------------------------------------------------------------------------
+
 csSectorMeshList::csSectorMeshList ()
 {
   sector = 0;
@@ -136,6 +207,7 @@ csSector::csSector (csEngine *engine) : csObject()
   draw_busy = 0;
   dynamic_ambient_color.Set(0,0,0);
   meshes.SetSector (this);
+  //portal_containers.SetSector (this);
   lights.SetSector (this);
 
   current_visnr = 1;
