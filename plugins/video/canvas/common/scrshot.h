@@ -87,6 +87,9 @@ public:
   /// sharpen the image
   virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength)
   { transp = 0; strength = 0; return 0; }
+
+  virtual int HasMipmaps ()
+  { return 0; }
 };
 
 #endif // __CS_SCRSHOT_H__

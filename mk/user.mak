@@ -46,6 +46,7 @@ endif
 ifeq ($(JPEG.AVAILABLE),yes)
 PLUGINS += video/loader/jpg
 endif
+PLUGINS += video/loader/dds
 PLUGINS += video/loader/bmp
 PLUGINS += video/loader/tga
 PLUGINS += video/effects

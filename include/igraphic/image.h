@@ -60,7 +60,7 @@
 
 struct csRGBpixel;
 
-SCF_VERSION (iImage, 1, 0, 2);
+SCF_VERSION (iImage, 1, 0, 3);
 
 /**
  * The iImage interface is used to work with image files
@@ -149,6 +149,11 @@ struct iImage : public iBase
    * used.
    */
   virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) = 0;
+
+  /** Returns the number of mipmaps contained in the image (in case there
+   * exist any precalculated mipmaps.
+   */
+  virtual int HasMipmaps () = 0;
 };
 
 /** @} */

@@ -39,7 +39,7 @@ protected:
   /// Height of image.
   int Height;
   /// The image data.
-  void *Image;
+  void* Image;
   /// The image palette or NULL
   csRGBpixel *Palette;
   /// The alpha map
@@ -101,7 +101,7 @@ protected:
   /**
    * Free all image data: pixels and palette. Takes care of image data format.
    */
-  void FreeImage ();
+  virtual void FreeImage ();
 
   /// Return the closest color index to given. Fails if image has no palette.
   int closest_index (csRGBpixel *iColor);
@@ -167,6 +167,7 @@ public:
   virtual void GetKeycolor (int &r, int &g, int &b);
   /// Create a sharpened copy of the image
   virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength);
+  virtual int HasMipmaps ();
 };
 
 #endif // __CS_IMAGE_H__

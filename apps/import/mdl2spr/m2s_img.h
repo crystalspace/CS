@@ -49,6 +49,7 @@ public:
   virtual bool HasKeycolor () { return 0; }
   virtual void GetKeycolor (int &r, int &g, int &b) { r=0;g=0;b=0; }
   virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength);
+  virtual int HasMipmaps() { return 0;}
   SCF_DECLARE_IBASE;
 };
 

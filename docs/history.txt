@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+25-Fev-2003
+	-Matze Braun added a .dds image file loader (only loading so far)
+	 and extended iImage with a HasMipmaps functions which indicates if
+	 the image contains precalculated mipmaps.
 24-Feb-2003
 	- Mårten Svanfeldt made these changes:
 	    - Modified the light/shadow culling algoritm.
