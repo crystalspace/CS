@@ -246,7 +246,7 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
       tile_full = true;	// Assume full for now.
       csBits64* cc = coverage_cache;
       csBits64* c = coverage;
-#ifdef _X86_
+#ifdef PROC_X86
       if (csTiledCoverageBuffer::use_mmx)
       {
 
@@ -392,7 +392,7 @@ fillCol:
       csBits64* cc = coverage_cache;
       csBits64* c = coverage;      
 
-#ifdef _X86_
+#ifdef PROC_X86
       if (csTiledCoverageBuffer::use_mmx)
       {
         
@@ -935,7 +935,7 @@ csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h)
   bugplug = 0;
 
   Setup (w, h);
-#ifdef _X86_
+#ifdef PROC_X86
   use_mmx = csProcessorCapability::HasMMX ();
   //printf ("use_mmx=%d\n", use_mmx); fflush (stdout);
 #endif
