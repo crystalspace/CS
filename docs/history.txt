@@ -20,6 +20,8 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed the ensocket documentation to use csRef.
 	- Jorrit replaced several NULL occurances with 0 throughout the
 	  CS sources.
+	- Philip Wyett removed some old LUA link related code from
+	  win32 gcc makefile.
 20-Jul-2003
 	- Jorrit forgot to link the new howto into the howto chapter.
 	- Jorrit fixed a small note about curves in the thing mesh object

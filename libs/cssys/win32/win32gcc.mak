@@ -32,7 +32,7 @@ LIB_PREFIX=lib
 # Extra libraries needed on this system (beside drivers)
 # LIBS.SYSTEM comes from the local config.mak and is set up by the Autoconf
 # configure script.
-LIBS.EXE = \
+LIBS.EXE += \
   $(LFLAGS.L)/usr/lib/w32api \
   $(LFLAGS.l)gdi32 \
   $(LIBS.SYSTEM) \
@@ -40,9 +40,6 @@ LIBS.EXE = \
 
 # Sound library
 LIBS.SOUND.SYSTEM = $(LFLAGS.l)dsound $(LFLAGS.l)winmm
-
-# Lua library
-LIBS.CSLUA.SYSTEM = $(LFLAGS.l)lua $(LFLAGS.l)lualib
 
 # Freetype library
 LIBS.FREETYPE.SYSTEM = $(LFLAGS.l)ttf
