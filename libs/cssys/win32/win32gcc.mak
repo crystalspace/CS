@@ -17,6 +17,7 @@ PLUGINS.DYNAMIC += font/server/freefnt2
 PLUGINS+=video/format/avi
 PLUGINS+=video/format/codecs/opendivx
 PLUGINS+=physics/odedynam
+#PLUGINS+=video/loader/jng
 
 # if u have the following line uncommented make sure one
 # LIBS.OPENGL.SYSTEM is set below or you have a custom
@@ -89,6 +90,8 @@ PNG_LIBS=$(LFLAGS.l)png
 
 # Where can the JPG library be found on this system?
 JPG_LIBS=$(LFLAGS.l)jpeg
+
+MNG_LIBS=$(LFLAGS.l)mng
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
