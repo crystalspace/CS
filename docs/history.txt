@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+7-Feb-2003
+	- Fixed levtool so that by default it now gives usage information
+	  instead of the -list option. That way people will not forget
+	  to add -dynavis.
+	- Possibly fixed the bug in map2cs which adds <moveable /> to the
+	  same object that has <vistree />. Wasn't able to test this due
+	  to not having a map file.
+	- Possibly fixed the bug in cs2xml with converting of LEN keyword
+	  in a polygon. Didn't test this yet.
 6-Feb-2003
 	- Removed Video.OpenGL.Caps.MaxTexWidth, MaxTexHeight, MinTexWidth,
 	  and MinTexHeight options in opengl.cfg. Instead there is now the

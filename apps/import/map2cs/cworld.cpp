@@ -319,13 +319,15 @@ void CCSWorld::WriteSky()
   if (pEntity->GetValueOfKey("skybox"))
   {
     WriteSkybox();
+    WriteIndent();
+    fprintf(m_fd, "MOVEABLE()\n");
   }
   else if (pEntity->GetValueOfKey("skydome"))
   {
     WriteSkydome();
+    WriteIndent();
+    fprintf(m_fd, "MOVEABLE()\n");
   }
-  WriteIndent();
-  fprintf(m_fd, "MOVEABLE()\n");
 }
 
 void CCSWorld::WriteSkydome()

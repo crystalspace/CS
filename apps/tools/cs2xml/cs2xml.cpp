@@ -111,6 +111,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (KEY)
   CS_TOKEN_DEF (LIBRARY)
   CS_TOKEN_DEF (LIGHT)
+  CS_TOKEN_DEF (LEN)
   CS_TOKEN_DEF (LOD)
   CS_TOKEN_DEF (LODCOST)
   CS_TOKEN_DEF (LODDIST)
@@ -1343,6 +1344,39 @@ void Cs2Xml::ParseTriangles (char const* parent_token, csParser* parser,
   }
 }
 
+void Cs2Xml::ParseLen (char const* parent_token, csParser* parser,
+	csRef<iDocumentNode>& parent, char*& name, char* params,
+	char const* tokname)
+{
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
+  if (!strcmp (parent_token, "p"))
+  {
+    csRef<iDocumentNode> child = parent->GetNode ("texmap");
+    if (!child)
+    {
+      child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+      child->SetValue ("texmap");
+    }
+    if (name && *name) child->SetAttribute ("name", name);
+    float len;
+    csScanStr (params, "%f", &len);
+    CreateValueNodeAsFloat (child, "len", len);
+  }
+  else
+  {
+    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+      CS_NODE_ELEMENT, NULL);
+    child->SetValue ("len");
+    if (name && *name) child->SetAttribute ("name", name);
+    ParseGeneral ("len", parser, child, params);
+  }
+}
+
 void Cs2Xml::ParseTexture (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
@@ -1355,9 +1389,13 @@ void Cs2Xml::ParseTexture (char const* parent_token, csParser* parser,
   (void)tokname;
   if (!strcmp (parent_token, "p"))
   {
-    csRef<iDocumentNode> child = parent->CreateNodeBefore (
-      CS_NODE_ELEMENT, NULL);
-    child->SetValue ("texmap");
+    csRef<iDocumentNode> child = parent->GetNode ("texmap");
+    if (!child)
+    {
+      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+        CS_NODE_ELEMENT, NULL);
+      child->SetValue ("texmap");
+    }
     if (name && *name) child->SetAttribute ("name", name);
     ParseGeneral ("texmap", parser, child, params);
   }
@@ -2780,6 +2818,9 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	break;
       case CS_TOKEN_TRIANGLES:
 	ParseTriangles (parent_token, parser, parent, name, params, tokname);
+	break;
+      case CS_TOKEN_LEN:
+	ParseLen (parent_token, parser, parent, name, params, tokname);
 	break;
       case CS_TOKEN_TEXTURE:
 	ParseTexture (parent_token, parser, parent, name, params, tokname);

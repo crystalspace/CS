@@ -38,6 +38,7 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
+#define OP_HELP 0
 #define OP_LIST 1
 #define OP_DYNAVIS 2
 #define OP_VALIDATE 3
@@ -1417,9 +1418,23 @@ void LevTool::Main ()
   cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
-  int op = OP_LIST;
+  int op = OP_HELP;
 
-  if (cmdline->GetOption ("help"))
+  if (cmdline->GetOption ("dynavis")) op = OP_DYNAVIS;
+  if (cmdline->GetOption ("list")) op = OP_LIST;
+  if (cmdline->GetOption ("analyze")) op = OP_ANALYZE;
+  if (cmdline->GetOption ("analyzep")) op = OP_ANALYZEP;
+  if (cmdline->GetOption ("validate")) op = OP_VALIDATE;
+  if (cmdline->GetOption ("splitunit")) op = OP_SPLITUNIT;
+  if (cmdline->GetOption ("splitgeom")) op = OP_SPLITGEOM;
+  if (cmdline->GetOption ("splitpoly")) op = OP_SPLITPOLY;
+  if (cmdline->GetOption ("compress")) op = OP_COMPRESS;
+  if (cmdline->GetOption ("flagclear")) op = OP_FLAGCLEAR;
+  if (cmdline->GetOption ("flaggood")) op = OP_FLAGGOOD;
+  if (cmdline->GetOption ("flagbad")) op = OP_FLAGBAD;
+  if (cmdline->GetOption ("help")) op = OP_HELP;
+
+  if (op == OP_HELP)
   {
     printf ("levtool <options> <zipfile>\n");
     printf ("  -list:      List world contents.\n");
@@ -1465,19 +1480,6 @@ void LevTool::Main ()
     printf ("              -maxpoly=<number>: maximum number of polygons (default 1000000000).\n");
     exit (0);
   }
-
-  if (cmdline->GetOption ("dynavis")) op = OP_DYNAVIS;
-  if (cmdline->GetOption ("list")) op = OP_LIST;
-  if (cmdline->GetOption ("analyze")) op = OP_ANALYZE;
-  if (cmdline->GetOption ("analyzep")) op = OP_ANALYZEP;
-  if (cmdline->GetOption ("validate")) op = OP_VALIDATE;
-  if (cmdline->GetOption ("splitunit")) op = OP_SPLITUNIT;
-  if (cmdline->GetOption ("splitgeom")) op = OP_SPLITGEOM;
-  if (cmdline->GetOption ("splitpoly")) op = OP_SPLITPOLY;
-  if (cmdline->GetOption ("compress")) op = OP_COMPRESS;
-  if (cmdline->GetOption ("flagclear")) op = OP_FLAGCLEAR;
-  if (cmdline->GetOption ("flaggood")) op = OP_FLAGGOOD;
-  if (cmdline->GetOption ("flagbad")) op = OP_FLAGBAD;
 
   int minsize, maxsize;
   int minpoly, maxpoly;
