@@ -33,9 +33,20 @@
  */ 
 
 #include <sys/types.h>
-#include <sys/socket.h>
 
-#if defined (OS_UNIX)
+#if defined(OS_WIN32)
+#  include <winsock.h>
+#  ifndef socklen_t
+     typedef int socklen_t;
+#  endif
+#  define CS_NET_SOCKET_INVALID INVALID_SOCKET
+#  define CS_IOCTLSOCKET ioctlsocket
+#  define CS_CLOSESOCKET closesocket
+#  define EWOULDBLOCK WSAEWOULDBLOCK
+#  define CS_GETSOCKETERROR ::WSAGetLastError()
+#  undef CS_SYSDEF_PROVIDE_SOCKETS
+#elif defined (OS_UNIX)
+#  include <sys/socket.h>
 #  include <unistd.h>
 #  define BSD_COMP 1
 #  include <sys/ioctl.h>
@@ -43,9 +54,9 @@
 #    include <arpa/inet.h>
 #    include <sys/time.h>
 #  endif
+#  include <netinet/in.h>
+#  include <netdb.h>
 #endif
-#include <netinet/in.h>
-#include <netdb.h>
 #if !defined (CS_IOCTLSOCKET)
 #  define CS_IOCTLSOCKET ioctl
 #endif

@@ -59,21 +59,6 @@
 
 CS_IMPLEMENT_APPLICATION
 
-const char* someptr = "Everything is ok!\n";
-void sighandler (int a)
-{
-        printf ("Enter Handler:\n");
-	    printf ("%s\n", someptr);
-	        signal (a, sighandler);
-		    alarm(1);
-}
-
-void setupsig ()
-{
-        signal (SIGALRM, sighandler);
-	    alarm (1);
-}
-
 //-----------------------------------------------------------------------------
 
 // The global pointer to simple
