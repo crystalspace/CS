@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.tutmap = Crystal Space tutorial part three (map loading)
+DESCRIPTION.tutmap = Crystal Space tutorial part three, map loading
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

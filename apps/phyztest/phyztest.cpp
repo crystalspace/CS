@@ -33,6 +33,7 @@
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
+#include "iutil/eventq.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/graph3d.h"
@@ -129,7 +130,6 @@ iMeshWrapper *add_test_mesh( iMeshFactoryWrapper *tmpl, iSector *aroom, iView *v
 
 Phyztest::Phyztest ()
 {
-  debug_level = 1;
   view = NULL;
   engine = NULL;
   dynlight = NULL;
@@ -263,7 +263,8 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   if (!LevelLoader->LoadLibraryFile ("/lib/std/library" ) )
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY, "LIBRARY NOT LOADED!...");
-    Shutdown = true;
+    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return false;
   }
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
@@ -628,7 +629,8 @@ bool Phyztest::HandleEvent (iEvent &Event)
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    Shutdown = true;
+    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
   if ((Event.Type == csevBroadcast) && 

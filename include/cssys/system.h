@@ -40,6 +40,7 @@ struct iGraphics2D;
 struct iConfig;
 struct iConfigManager;
 struct iEventQueue;
+class csPluginList;
 
 /**
  * This is the interface to operating system.<p>
@@ -58,6 +59,8 @@ struct iEventQueue;
  */
 class csSystemDriver : public iSystem
 {
+  friend class csPluginList;
+
 private:
   /*
    * This is a private structure used to keep the list of plugins.
@@ -146,7 +149,7 @@ protected:
   // The object registry.
   csObjectRegistry object_reg;
 
-public:
+private: //@@@
   /// Print something to the reporter.
   void ReportSys (int severity, const char* msg, ...);
 
@@ -164,6 +167,7 @@ public:
   /// List of all options for all plug-in modules.
   CS_DECLARE_TYPED_VECTOR (csOptionVector, csPluginOption) OptionList;
 
+public:
   /// Initialize system-dependent data
   csSystemDriver ();
   /// Deinitialize system-dependent parts

@@ -57,8 +57,9 @@
 #include "igraphic/imageio.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
-#include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/eventq.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
@@ -601,7 +602,9 @@ bool BumpTest::HandleEvent (iEvent &Event)
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    Shutdown = true;
+    iObjectRegistry* object_reg = GetObjectRegistry ();
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
 

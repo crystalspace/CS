@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.tutsimp2 = Crystal Space tutorial part two (sprite)
+DESCRIPTION.tutsimp2 = Crystal Space tutorial part two, sprite
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

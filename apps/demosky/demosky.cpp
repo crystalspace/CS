@@ -42,8 +42,9 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "ivaria/reporter.h"
-#include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/eventq.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
@@ -400,7 +401,8 @@ bool DemoSky::HandleEvent (iEvent &Event)
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    Shutdown = true;
+    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
 

@@ -314,9 +314,8 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
 
   if (!strcasecmp (cmd, "quit"))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(csCommandProcessor::object_reg, iEventQueue);
-    if (q != 0)
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
   }
   else if (!strcasecmp (cmd, "help"))
   {

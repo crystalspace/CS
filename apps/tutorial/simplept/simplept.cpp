@@ -22,6 +22,7 @@
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "simplept.h"
+#include "iutil/eventq.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"
@@ -274,7 +275,8 @@ bool Simple::HandleEvent (iEvent& Event)
 
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
-    Shutdown = true;
+    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
 

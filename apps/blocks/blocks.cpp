@@ -40,6 +40,7 @@
 #include "isys/vfs.h"
 #include "isys/plugin.h"
 #include "iutil/eventh.h"
+#include "iutil/eventq.h"
 #include "iutil/comp.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/event.h"
@@ -1479,7 +1480,9 @@ void Blocks::HandleDemoKey (int key, bool /*shf*/, bool /*alt*/, bool /*ctl*/)
 	  TerminateConnection ();
 	  // Finish networking stuff.
 #endif
-	  Shutdown = true;
+	  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+	  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+	  if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
 	  break;
       }
       break;

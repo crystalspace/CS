@@ -22,6 +22,7 @@
 #include "isomesh.h"
 #include "csutil/scf.h"
 #include "ivideo/graph3d.h"
+#include "csgeom/sphere.h"
 #include "csgeom/math2d.h"
 #include "csgeom/polyclip.h"
 #include "ivideo/material.h"
@@ -183,17 +184,14 @@ public:
     mesh.do_fog = false;
   }
   virtual bool ClipBSphere (const csReversibleTransform& o2c,
-	const csVector3& center, float radius,
+	const csSphere& sphere,
 	int& clip_portal, int& clip_plane, int& clip_z_plane)
   {
     clip_plane = CS_CLIP_NOT;
 
-    csVector3 tr_center = o2c.Other2This (center);
-    csVector3 v_radius (radius);
-    v_radius = o2c.Other2ThisRelative (v_radius);
-    radius = v_radius.x;
-    if (radius < v_radius.y) radius = v_radius.y;
-    if (radius < v_radius.z) radius = v_radius.z;
+    csSphere tr_sphere = o2c.Other2This (sphere);
+    const csVector3& tr_center = tr_sphere.GetCenter ();
+    float radius = tr_sphere.GetRadius ();
 
     float sx = fakecam->GetShiftX ();
     float sy = fakecam->GetShiftY ();

@@ -114,6 +114,7 @@ In the source file @file{simple.cpp} we place the following:
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "apps/simple/simple.h"
+#include "iutil/eventq.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
@@ -359,8 +360,11 @@ virtual bool HandleEvent (iEvent&);
 
 HandleEvent() is inherited from the system driver and is automatically called
 as each event is received, several of which can accumulate between frames.
-Our version checks if the @key{ESC} key has been pressed, and sets
-Shutdown to true if so.  Now add this code to @file{simple.cpp}:
+Our version checks if the @key{ESC} key has been pressed. If so it
+will use the object registry to find the global event queue object. Using
+@code{Broadcast} it will then broadcast the @code{cscmdQuit} message
+to all interested parties. This will cause the application to quit.
+Now add this code to @file{simple.cpp}:
 
 @example
 bool Simple::HandleEvent (iEvent& Event)
@@ -370,7 +374,8 @@ bool Simple::HandleEvent (iEvent& Event)
 
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   @{
-    Shutdown = true;
+    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   @}
 

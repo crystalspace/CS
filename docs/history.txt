@@ -3,10 +3,23 @@ The history order is reversed so that new features are at the top.
 30-Aug-2001
 	- Added full transformation capabilities to csTransform and
 	  csReversibleTransform for the new csSphere class.
-	- Changed the ClipBSphere to work with csSphere instead of
+	- Changed iRenderView::ClipBSphere to work with csSphere instead of
 	  a center and a radius.
 	- Fixed iMeshWrapper::PlaceMesh() so that it now also works
 	  with transformations that scale the object.
+	- Made a number of methods and fields private in csSystemDriver
+	  to ensure that applications are not using them. This includes
+	  the 'Shutdown' field which some of the applications were using.
+	  Instead of 'Shutdown' you should use:
+		iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+		if (q) q->GetEventOutlet ()->Broadcast (cscmdQuit);
+	- Fixed the isometric engine for the change to iRenderView.
+	- Norman Kramer did the following:
+	    - Squawk: iKeyboardDriver was demanded from pluginmanager
+	      instead of objectregistry.
+	    - Squawk.cfg: added convertor plugin.
+	    - Update scf.cfg to reflect the dependency of level.loader on
+	      model.converter.
 29-Aug-2001
 	- Andrew Zabolotny reports: OS/2 port strikes back :-)
 	    - Fixed csdive plugin.

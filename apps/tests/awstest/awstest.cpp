@@ -52,6 +52,7 @@
 #include "imap/parser.h"
 #include "iengine/material.h"
 #include "ivaria/reporter.h"
+#include "iutil/eventq.h"
 #include "qsqrt.h"
 
 #include "awstest.h"
@@ -352,7 +353,8 @@ awsTest::HandleEvent (iEvent &Event)
 
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
-    Shutdown = true;
+    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
   
