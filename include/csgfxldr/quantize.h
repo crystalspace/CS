@@ -46,8 +46,8 @@
  * <dt>dither<dd>Use/do not use Floyd-Steinberg dithering
  * </dl>
  */
-extern void csQuantizeRGB (RGBPixel *image, int pixels, int pixperline,
-  UByte *&outimage, RGBPixel *&outpalette, int &maxcolors, bool dither);
+extern void csQuantizeRGB (csRGBpixel *image, int pixels, int pixperline,
+  UByte *&outimage, csRGBpixel *&outpalette, int &maxcolors, bool dither);
 
 /**
  * The following routines can be used to split the quantization process
@@ -98,9 +98,9 @@ extern void csQuantizeRGB (RGBPixel *image, int pixels, int pixperline,
  * for example you may want to use it to create a relatively uniform palette
  * that is somewhat biased towards the colors contained in some picture(s).
  *<p>
- * Some routines accept an additional parameter (RGBPixel *transp). If it is
+ * Some routines accept an additional parameter (csRGBpixel *transp). If it is
  * NULL, nothing special is performed. If it is non-NULL, it should point
- * to an valid RGBPixel object; the color of that pixel will be treated in
+ * to an valid csRGBpixel object; the color of that pixel will be treated in
  * a special way: csQuantizeCount() will ignore pixels of that color,
  * csQuantizePalette() will allocate color index 0 for that color, and
  * csQuantizeRemap will map all such pixel values to index 0.
@@ -111,18 +111,18 @@ extern void csQuantizeBegin ();
 /// Finish quantization
 extern void csQuantizeEnd ();
 /// Count the colors in a image and update the color histogram
-extern void csQuantizeCount (RGBPixel *image, int pixels,
-  RGBPixel *transp = NULL);
+extern void csQuantizeCount (csRGBpixel *image, int pixels,
+  csRGBpixel *transp = NULL);
 /// Bias the color histogram towards given colors (weight = 0..100)
-extern void csQuantizeBias (RGBPixel *colors, int count, int weight);
+extern void csQuantizeBias (csRGBpixel *colors, int count, int weight);
 /// Compute the optimal palette for all images passed to QuantizeCount()
-extern void csQuantizePalette (RGBPixel *&outpalette, int &maxcolors,
-  RGBPixel *transp = NULL);
+extern void csQuantizePalette (csRGBpixel *&outpalette, int &maxcolors,
+  csRGBpixel *transp = NULL);
 /// Remap a image to the palette computed by csQuantizePalette()
-extern void csQuantizeRemap (RGBPixel *image, int pixels,
-  UByte *&outimage, RGBPixel *transp = NULL);
+extern void csQuantizeRemap (csRGBpixel *image, int pixels,
+  UByte *&outimage, csRGBpixel *transp = NULL);
 /// Same but apply Floyd-Steinberg dithering for nicer (but slower) results
-extern void csQuantizeRemapDither (RGBPixel *image, int pixels, int pixperline,
-  RGBPixel *palette, int colors, UByte *&outimage, RGBPixel *transp = NULL);
+extern void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
+  csRGBpixel *palette, int colors, UByte *&outimage, csRGBpixel *transp = NULL);
 
 #endif // __QUANTIZE_H__

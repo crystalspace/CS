@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/csevent.h"
 #include "cssys/csinput.h"
 #include "csws/cswindow.h"
 #include "csws/csdialog.h"
@@ -71,7 +70,7 @@ void csDialog::Draw ()
   csComponent::Draw ();
 }
 
-bool csDialog::HandleEvent (csEvent &Event)
+bool csDialog::HandleEvent (iEvent &Event)
 {
   if (csComponent::HandleEvent (Event))
     return true;

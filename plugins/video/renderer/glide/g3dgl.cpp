@@ -811,7 +811,7 @@ void csGraphics3DGlide::DrawPolygon (G3DPolygonDP& poly)
   if ( poly.alpha )
   {
     is_transparent = true;
-    a = 255 - (int)(( poly.alpha / 100.f ) * 255.f);
+    a = 255 - poly.alpha;
     GlideLib_grDepthMask( FXFALSE );
   }
  

@@ -84,7 +84,7 @@ public:
   virtual void Draw ();
 
   /// Handle external events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Override SetState method to redraw input line when it is switched
   virtual void SetState (int mask, bool enable);

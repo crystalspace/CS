@@ -60,7 +60,7 @@ public:
   csTimer (csComponent *iParent, unsigned iPeriod);
 
   /// Handle external events and generate timeouts
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Stop timer
   void Stop ();

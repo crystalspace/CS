@@ -137,7 +137,7 @@ void Dumper::dump (csPolygon3D* p)
   }
   if (p->GetTextureType () == POLYTXT_LIGHTMAP)
   {
-    csLightMapped* lmi = p->GetLightMapInfo ();
+    csPolyTexLightMap* lmi = p->GetLightMapInfo ();
     dump (lmi->GetTxtPlane ());
     if (lmi->GetPolyTex ()) dump (lmi->GetPolyTex (), "PolyTexture");
   }
@@ -737,11 +737,11 @@ long Dumper::Memory (csPolygon3D* p, int verbose_level, csHashSet* done)
   itemmem = sizeof (csMaterial);
   memory += itemmem;
 
-  csLightMapped* lmi = p->GetLightMapInfo ();
+  csPolyTexLightMap* lmi = p->GetLightMapInfo ();
   if (lmi && !done->In (lmi))
   {
     done->Add (lmi);
-    itemmem = sizeof (csLightMapped);
+    itemmem = sizeof (csPolyTexLightMap);
     itemmem += sizeof (csPolyTexture);
     itemmem += sizeof (csPolyTxtPlane);
     memory += itemmem;
@@ -769,11 +769,11 @@ long Dumper::Memory (csPolygon3D* p, int verbose_level, csHashSet* done)
 	  itemmem);
     }
   }
-  csGouraudShaded* gs = p->GetGouraudInfo ();
+  csPolyTexGouraud* gs = p->GetGouraudInfo ();
   if (gs && !done->In (gs))
   {
     done->Add (gs);
-    itemmem = sizeof (csGouraudShaded);
+    itemmem = sizeof (csPolyTexGouraud);
     if (gs->GetUVCoords ()) itemmem += p->GetNumVertices () * sizeof (csVector2);
     if (gs->GetColors ()) itemmem += p->GetNumVertices () * sizeof (csColor);
     if (gs->GetStaticColors ()) itemmem += p->GetNumVertices () * sizeof (csColor);

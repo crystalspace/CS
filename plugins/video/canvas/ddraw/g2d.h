@@ -93,7 +93,7 @@ protected:
   HRESULT InitFail (HRESULT hRet, LPCTSTR szError);
 
   void ClearSystemPalette ();
-  bool CreateIdentityPalette (RGBPixel *p);
+  bool CreateIdentityPalette (csRGBpixel *p);
   // Check if palette has changed and if so, realize it
   void SetColorPalette ();
   // Refresh a rectangle on client area from back buffer

@@ -28,7 +28,6 @@
 #include "igraph2d.h"
 
 class csApp;
-class csEvent;
 class csStrVector;
 
 /// Component state flags
@@ -108,7 +107,7 @@ enum
  *     </ul>
  *   <li>0x80000000 ... 0xFFFFFFFF: Reserved for user class-specific messages
  * </ul>
- * All commands receives a input parameter in the Command.Info field of csEvent
+ * All commands receives a input parameter in the Command.Info field of iEvent
  * object. They can reply to the message by assigning to Command.Info a value.
  * In the description of messages below they are marked by 'IN' (the value
  * is initially passed to object) and 'OUT' (the value is expected to be filled
@@ -399,7 +398,7 @@ public:
   void SetApp (csApp *newapp);
 
   /// Handle a event and return true if processed
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /**
    * Handle a event BEFORE all others. You will receive ALL events
@@ -407,12 +406,12 @@ public:
    * even if object is not visible. A object should take care not to block
    * events expected by other objects.
    */
-  virtual bool PreHandleEvent (csEvent &Event);
+  virtual bool PreHandleEvent (iEvent &Event);
 
   /// Handle a event if nobody eaten it.
-  virtual bool PostHandleEvent (csEvent &Event);
+  virtual bool PostHandleEvent (iEvent &Event);
 
-  /// Send a command to this window and returns the Info field of csEvent object
+  /// Send a command to this window and returns the Info field of iEvent object
   void *SendCommand (int CommandCode, void *Info = NULL);
 
   /// Find the 'default' child
@@ -541,7 +540,7 @@ public:
    *   }
    * </pre>
    */
-  bool HandleDragEvent (csEvent &Event, int BorderW, int BorderH);
+  bool HandleDragEvent (iEvent &Event, int BorderW, int BorderH);
 
   /// Fix new window position before assigning to component
   virtual void FixPosition (int &newX, int &newY);
@@ -660,7 +659,7 @@ protected:
     int iColor);
 
   /// Check if the keyboard event fits given hot key
-  bool CheckHotKey (csEvent &iEvent, char iHotKey);
+  bool CheckHotKey (iEvent &iEvent, char iHotKey);
 
   /// Utility functions: return position one word left from StartPos
   static int WordLeft (const char *iText, int StartPos);

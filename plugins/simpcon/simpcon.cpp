@@ -453,7 +453,7 @@ const char *csSimpleConsole::GetLine (int iLine) const
   return Line [iLine < 0 ? LineNumber : iLine];
 }
 
-bool csSimpleConsole::HandleEvent (csEvent &Event)
+bool csSimpleConsole::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

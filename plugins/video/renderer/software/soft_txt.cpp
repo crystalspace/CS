@@ -25,7 +25,6 @@
 #include "csgfxldr/quantize.h"
 #include "csutil/scanstr.h"
 #include "csutil/inifile.h"
-#include "cssys/csevent.h"
 #include "ievent.h"
 #include "isystem.h"
 #include "iimage.h"
@@ -166,7 +165,7 @@ void csTextureMMSoftware::ApplyGamma (UByte *GammaTable)
     return;
 
   UByte *src = orig_palette;
-  RGBPixel *dst = palette;
+  csRGBpixel *dst = palette;
   for (int i = palette_size; i > 0; i--)
   {
     dst->red   = GammaTable [*src++];
@@ -188,18 +187,18 @@ void csTextureMMSoftware::ComputeMeanColor ()
   // Compute a common palette for all three mipmaps
   csQuantizeBegin ();
 
-  RGBPixel *tc = transp ? &transp_color : NULL;
+  csRGBpixel *tc = transp ? &transp_color : NULL;
 
   for (i = 0; i < 4; i++)
     if (tex [i])
     {
       csTextureSoftware *t = (csTextureSoftware *)tex [i];
       if (!t->image) break;
-      csQuantizeCount ((RGBPixel *)t->image->GetImageData (),
+      csQuantizeCount ((csRGBpixel *)t->image->GetImageData (),
         t->get_size (), tc);
     }
 
-  RGBPixel *pal = palette;
+  csRGBpixel *pal = palette;
   palette_size = 256;
   csQuantizePalette (pal, palette_size, tc);
 
@@ -209,16 +208,16 @@ void csTextureMMSoftware::ComputeMeanColor ()
       csTextureSoftware *t = (csTextureSoftware *)tex [i];
       if (!t->image) break;
       if (texman->dither_textures || (flags & CS_TEXTURE_DITHER))
-        csQuantizeRemapDither ((RGBPixel *)t->image->GetImageData (),
+        csQuantizeRemapDither ((csRGBpixel *)t->image->GetImageData (),
           t->get_size (), t->get_width (), pal, palette_size, t->bitmap, tc);
       else
-        csQuantizeRemap ((RGBPixel *)t->image->GetImageData (),
+        csQuantizeRemap ((csRGBpixel *)t->image->GetImageData (),
           t->get_size (), t->bitmap, tc);
 
       // Get the alpha map for the texture, if present
       if (t->image->GetFormat () & CS_IMGFMT_ALPHA)
       {
-        RGBPixel *srcimg = (RGBPixel *)t->image->GetImageData ();
+        csRGBpixel *srcimg = (csRGBpixel *)t->image->GetImageData ();
         size_t imgsize = t->get_size ();
         uint8 *dstalpha = t->alphamap = new uint8 [imgsize];
         // In 8- and 16-bit modes we limit the alpha to 5 bits (32 values)
@@ -249,11 +248,11 @@ void csTextureMMSoftware::SetupFromPalette ()
 {
   int i;
   // Compute the mean color from the palette
-  RGBPixel *src = palette;
+  csRGBpixel *src = palette;
   unsigned r = 0, g = 0, b = 0;
   for (i = palette_size; i > 0; i--)
   {
-    RGBPixel pix = *src++;
+    csRGBpixel pix = *src++;
     r += pix.red;
     g += pix.green;
     b += pix.blue;
@@ -276,11 +275,11 @@ void csTextureMMSoftware::SetupFromPalette ()
   }
 }
 
-void csTextureMMSoftware::GetOriginalColormap (RGBPixel *oPalette, int &oCount)
+void csTextureMMSoftware::GetOriginalColormap (csRGBpixel *oPalette, int &oCount)
 {
   oCount = palette_size;
   UByte *src = orig_palette;
-  RGBPixel *dst = oPalette;
+  csRGBpixel *dst = oPalette;
   for (int i = palette_size; i > 0; i--)
   {
     dst->red   = *src++;
@@ -334,10 +333,10 @@ void csTextureMMSoftware::RemapProcToGlobalPalette (csTextureManagerSoftware *tx
 
   // This texture manager is fully 8bit and is either managing all the textures in
   // the system or just a set of proc textures.
-  RGBPixel *src = (RGBPixel *)t->image->GetImageData ();
+  csRGBpixel *src = (csRGBpixel *)t->image->GetImageData ();
   uint8 *dst = t->bitmap;
   // Copy the global palette to the texture palette
-  memcpy (palette, &txtmgr->cmap.palette[0], sizeof(RGBPixel)*256);
+  memcpy (palette, &txtmgr->cmap.palette[0], sizeof(csRGBpixel)*256);
   // Remap image according to new palette if persistent
   if ((flags & CS_TEXTURE_PROC_PERSISTENT) == CS_TEXTURE_PROC_PERSISTENT) 
     for (int i = 0; i < t->get_size (); i++, dst++, src++)
@@ -609,17 +608,17 @@ void csTextureManagerSoftware::compute_palette ()
     csTextureMMSoftware *txt = (csTextureMMSoftware *)textures [t];
     if ((txt->GetFlags() & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
       continue;
-    RGBPixel colormap [256];
+    csRGBpixel colormap [256];
     int colormapsize;
     txt->GetOriginalColormap (colormap, colormapsize);
-    RGBPixel *cmap = colormap;
+    csRGBpixel *cmap = colormap;
     if (txt->GetKeyColor ())
       cmap++, colormapsize--;
     csQuantizeCount (cmap, colormapsize);
   }
 
   // Introduce the uniform colormap bias into the histogram
-  RGBPixel new_cmap [256];
+  csRGBpixel new_cmap [256];
   int ci, colors = 0;
   for (ci = 0; ci < 256; ci++)
     if (!locked [ci] && cmap.alloc [ci])
@@ -631,7 +630,7 @@ void csTextureManagerSoftware::compute_palette ()
   colors = 0;
   for (ci = 0; ci < 256; ci++)
     if (!locked [ci]) colors++;
-  RGBPixel *cmap_p = new_cmap;
+  csRGBpixel *cmap_p = new_cmap;
   csQuantizePalette (cmap_p, colors);
 
   // Finally, put the computed colors back into the colormap
@@ -738,8 +737,8 @@ void csTextureManagerSoftware::ResetPalette ()
   memset (&locked, 0, sizeof (locked));
   locked [0] = true;
   locked [255] = true;
-  cmap [0] = RGBcolor (0, 0, 0);
-  cmap [255] = RGBcolor (255, 255, 255);
+  cmap [0] = csRGBcolor (0, 0, 0);
+  cmap [255] = csRGBcolor (255, 255, 255);
   memcpy (cmap.alloc, locked, sizeof(locked));
   palette_ok = false;
 }

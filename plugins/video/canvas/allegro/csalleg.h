@@ -60,7 +60,7 @@ public:
   virtual void Print (csRect *area = NULL);
 
   virtual void SetRGB(int i, int r, int g, int b);
-  virtual bool HandleEvent (csEvent &/*Event*/);
+  virtual bool HandleEvent (iEvent &/*Event*/);
 
   virtual bool BeginDraw () { return (Memory != NULL); }
   virtual bool DoubleBuffer (bool /*Enable*/) { return true; }

@@ -174,7 +174,7 @@ public:
   /// Draw the notebook
   virtual void Draw ();
   /// Handle external events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Reposition knobs on resize
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);

@@ -75,7 +75,7 @@ bool csApp::csAppPlugIn::Initialize (iSystem *System)
   return System->CallOnEvents (this, unsigned (-1));
 }
 
-bool csApp::csAppPlugIn::HandleEvent (csEvent &Event)
+bool csApp::csAppPlugIn::HandleEvent (iEvent &Event)
 {
   // If this is a pre-process or post-process event,
   // do the respective work ...
@@ -443,7 +443,7 @@ void csApp::FinishFrame ()
   InFrame = false;
 }
 
-bool csApp::PreHandleEvent (csEvent &Event)
+bool csApp::PreHandleEvent (iEvent &Event)
 {
   if (MouseOwner && IS_MOUSE_EVENT (Event))
   {
@@ -465,7 +465,7 @@ bool csApp::PreHandleEvent (csEvent &Event)
     return csComponent::PreHandleEvent (Event);
 }
 
-bool csApp::PostHandleEvent (csEvent &Event)
+bool csApp::PostHandleEvent (iEvent &Event)
 {
   if (MouseOwner && IS_MOUSE_EVENT (Event))
   {
@@ -487,7 +487,7 @@ bool csApp::PostHandleEvent (csEvent &Event)
     return csComponent::PostHandleEvent (Event);
 }
 
-bool csApp::HandleEvent (csEvent &Event)
+bool csApp::HandleEvent (iEvent &Event)
 {
   // Mouse should always receive events
   // to reflect current mouse position

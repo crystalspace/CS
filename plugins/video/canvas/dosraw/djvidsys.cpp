@@ -914,7 +914,7 @@ void VideoSystem::Flush (int x, int y, int w, int h)
   } /* endif */
 }
 
-void VideoSystem::GetPalette (RGBPixel *Palette, int Colors)
+void VideoSystem::GetPalette (csRGBpixel *Palette, int Colors)
 {
   int i;
 
@@ -927,7 +927,7 @@ void VideoSystem::GetPalette (RGBPixel *Palette, int Colors)
   }
 }
 
-void VideoSystem::SetPalette (RGBPixel *Palette, int Colors)
+void VideoSystem::SetPalette (csRGBpixel *Palette, int Colors)
 {
   int i;
 

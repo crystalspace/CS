@@ -41,7 +41,7 @@ csBumpMap::csBumpMap (iImage* src, int fmt)
   }
 
   /// Now create the height bumpmap using the grayscale data of the image.
-  RGBPixel *rgbdata = (RGBPixel *)rgbimage->GetImageData ();
+  csRGBpixel *rgbdata = (csRGBpixel *)rgbimage->GetImageData ();
   uint8 *heightdata = new uint8 [width * height];
   for (u = 0; u < width * height; u++)
     heightdata [u] = rgbdata [u].Intensity ();

@@ -193,7 +193,7 @@ struct iGraphics2D : public iPlugIn
   virtual int GetNumPalEntries () = 0;
 
   /// Get the palette (if there is one)
-  virtual RGBPixel *GetPalette () = 0;
+  virtual csRGBpixel *GetPalette () = 0;
 
   /// Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b) = 0;
@@ -309,7 +309,7 @@ struct iGraphics2D : public iPlugIn
   /// Create an Off Screen Canvas
   virtual iGraphics2D *CreateOffScreenCanvas 
   (int width, int height, void *buffer, bool alone_hint, 
-   csPixelFormat *ipfmt, RGBPixel *palette = NULL, int pal_size = 0) = 0;
+   csPixelFormat *ipfmt, csRGBpixel *palette = NULL, int pal_size = 0) = 0;
 };
 
 #endif // __IGRAPH2D_H__

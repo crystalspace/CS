@@ -710,62 +710,65 @@ csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_8_Alpha
 {
   csAlphaTables *alpha_tables = This->texman->alpha_tables;
 
-  if (alpha < 13)
+  if (alpha < 32)
     return NULL;
-  if (alpha < 37)
+  else if (alpha < 96)
   {
     Scan.AlphaMap = alpha_tables->alpha_map25;
     return csScan_8_scan_map_fixalpha2;
   }
-  if (alpha >= 37 && alpha < 63)
+  else if (alpha < 160)
   {
     Scan.AlphaMap = alpha_tables->alpha_map50;
     return csScan_8_scan_map_fixalpha1;
   }
-  if (alpha >= 63 && alpha < 87)
+  else if (alpha < 224)
   {
     Scan.AlphaMap = alpha_tables->alpha_map25;
     return csScan_8_scan_map_fixalpha1;
   }
-  // completely opaque
-  return csScan_8_scan_map_zfil;
+  else
+    // completely opaque
+    return csScan_8_scan_map_zfil;
 }
 
 csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_16_Alpha
   (csGraphics3DSoftwareCommon *This, int alpha)
 {
   Scan.AlphaMask = This->alpha_mask;
-  Scan.AlphaFact = (alpha * 256) / 100;
+  Scan.AlphaFact = alpha;
+
+  // In 16 bits mode we can get max 32 levels of transparency
 
   // completely transparent?
-  if (alpha <= 100/32)
+  if (alpha <= 256/32)
     return NULL;
   // approximate alpha from 47% to 53% with fast 50% routine
-  if ((alpha >= 50 - 100/32) && (alpha <= 50 + 100/32))
+  if ((alpha >= 128 - 256/32) && (alpha <= 128 + 256/32))
     return csScan_16_scan_map_fixalpha50;
   // completely opaque?
-  if (alpha >= 100 - 100/32)
+  if (alpha >= 256 - 256/32)
     return csScan_16_scan_map_zfil;
   // general case
   if (This->pfmt.GreenBits == 5)
     return csScan_16_555_scan_map_fixalpha;
-  else
-    return csScan_16_565_scan_map_fixalpha;
+  // General case
+  return csScan_16_565_scan_map_fixalpha;
 }
 
 csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_32_Alpha
   (csGraphics3DSoftwareCommon* /*This*/, int alpha)
 {
-  Scan.AlphaFact = (alpha * 256) / 100;
+  Scan.AlphaFact = alpha;
 
   // completely transparent?
   if (alpha <= 1)
     return NULL;
   // for 50% use fast routine
-  if (alpha == 50)
+  else if (alpha >= 127 && alpha <= 129)
     return csScan_32_scan_map_fixalpha50;
   // completely opaque?
-  if (alpha >= 99)
+  else if (alpha >= 254)
     return csScan_32_scan_map_zfil;
   // general case
   return csScan_32_scan_map_fixalpha;
@@ -1114,9 +1117,12 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
     lm = tex->GetLightMap ();
   }
 
-  UByte mean_r, mean_g, mean_b;
-  iTextureHandle* txt_handle = poly.mat_handle->GetTexture ();
-  txt_handle->GetMeanColor (mean_r, mean_g, mean_b);
+  csRGBpixel color;
+  iTextureHandle *txt_handle = poly.mat_handle->GetTexture ();
+  if (txt_handle)
+    txt_handle->GetMeanColor (color.red, color.green, color.blue);
+  else
+    poly.mat_handle->GetFlatColor (color);
 
   if (lm)
   {
@@ -1131,16 +1137,16 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
     lb = lb << 1; if (lb > 255) lb = 255;
 
     if (pfmt.PixelBytes >= 2)
-      Scan.FlatColor = texman->encode_rgb ((mean_r * lr) >> 8,
-        (mean_g * lg) >> 8, (mean_b * lb) >> 8);
+      Scan.FlatColor = texman->encode_rgb ((color.red * lr) >> 8,
+        (color.green * lg) >> 8, (color.blue * lb) >> 8);
     else
-      Scan.FlatColor = texman->find_rgb ((mean_r * lr) >> 8,
-        (mean_g * lg) >> 8, (mean_b * lb) >> 8);
+      Scan.FlatColor = texman->find_rgb ((color.red * lr) >> 8,
+        (color.green * lg) >> 8, (color.blue * lb) >> 8);
   }
   else if (pfmt.PixelBytes >= 2)
-    Scan.FlatColor = texman->encode_rgb (mean_r, mean_g, mean_b);
+    Scan.FlatColor = texman->encode_rgb (color.red, color.green, color.blue);
   else
-    Scan.FlatColor = texman->find_rgb (mean_r, mean_g, mean_b);
+    Scan.FlatColor = texman->find_rgb (color.red, color.green, color.blue);
 
   Scan.M = M;
 
@@ -1284,7 +1290,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
     return;
   }
 
-  if (!do_textured)
+  if (!do_textured || !poly.mat_handle->GetTexture ())
   {
     DrawPolygonFlat (poly);
     return;
@@ -2172,6 +2178,7 @@ inline long round16 (long f)
 // The static global variable that holds current PolygonQuick settings
 static struct
 {
+  iMaterialHandle *mat_handle;
   int redFact, greenFact, blueFact;
   int max_r, max_g, max_b;
   int twfp, thfp;
@@ -2193,10 +2200,11 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
   if (!do_gouraud || !do_lighting)
     mode &= ~CS_FX_GOURAUD;
 
-  if (handle)
+  pqinfo.mat_handle = handle;
+
+  iTextureHandle *txt_handle = handle ? handle->GetTexture () : NULL;
+  if (txt_handle)
   {
-    csMaterialMM* mat = (csMaterialMM*)handle;
-    iTextureHandle* txt_handle = mat->GetTexture ();
     csTextureMMSoftware *tex_mm = (csTextureMMSoftware*)txt_handle->GetPrivateObject ();
     csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (0);
     pqinfo.bm = txt_unl->get_bitmap ();
@@ -2243,7 +2251,7 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
       case CS_FX_ALPHA:
       {
         int alpha = mode & CS_FX_MASK_ALPHA;
-        if (alpha < 12)
+        if (alpha < 32)
           mode = (mode & ~CS_FX_MASK_MIXMODE) | CS_FX_COPY;
         else if (alpha < 96)
           Scan.BlendTable = Scan.BlendingTable [BLENDTABLE_ALPHA25];
@@ -2325,20 +2333,21 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   if ((last == poly.num) || (dd == 0))
     return;
 
-  int flat_r, flat_g, flat_b;
   if (pqinfo.textured)
-    flat_r = flat_g = flat_b = 255;
+    Scan.FlatRGB.Set (255, 255, 255);
   else
   {
-    flat_r = poly.flat_color_r;
-    flat_g = poly.flat_color_g;
-    flat_b = poly.flat_color_b;
+    if (pqinfo.mat_handle)
+      pqinfo.mat_handle->GetFlatColor (Scan.FlatRGB);
+    else
+      Scan.FlatRGB.Set (poly.flat_color_r, poly.flat_color_g, poly.flat_color_b);
   }
-  Scan.FlatRGB = RGBPixel (flat_r, flat_g, flat_b);
   if (pfmt.PixelBytes >= 2)
-    Scan.FlatColor = texman->encode_rgb (flat_r, flat_g, flat_b);
+    Scan.FlatColor = texman->encode_rgb (Scan.FlatRGB.red, Scan.FlatRGB.green,
+      Scan.FlatRGB.blue);
   else
-    Scan.FlatColor = texman->find_rgb (flat_r, flat_g, flat_b);
+    Scan.FlatColor = texman->find_rgb (Scan.FlatRGB.red, Scan.FlatRGB.green,
+      Scan.FlatRGB.blue);
 
   //-----
   // Get the values from the polygon for more conveniant local access.
@@ -2358,13 +2367,13 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     iz[i] = poly.vertices [i].z;
     if (poly.vertices [i].r > 2.0) poly.vertices [i].r = 2.0;
     if (poly.vertices [i].r < 0.0) poly.vertices [i].r = 0.0;
-    rr[i] = poly.vertices [i].r * pqinfo.redFact   * flat_r;
+    rr[i] = poly.vertices [i].r * pqinfo.redFact   * Scan.FlatRGB.red;
     if (poly.vertices [i].g > 2.0) poly.vertices [i].g = 2.0;
     if (poly.vertices [i].g < 0.0) poly.vertices [i].g = 0.0;
-    gg[i] = poly.vertices [i].g * pqinfo.greenFact * flat_g;
+    gg[i] = poly.vertices [i].g * pqinfo.greenFact * Scan.FlatRGB.green;
     if (poly.vertices [i].b > 2.0) poly.vertices [i].b = 2.0;
     if (poly.vertices [i].b < 0.0) poly.vertices [i].b = 0.0;
-    bb[i] = poly.vertices [i].b * pqinfo.blueFact  * flat_b;
+    bb[i] = poly.vertices [i].b * pqinfo.blueFact  * Scan.FlatRGB.blue;
     if (poly.vertices [i].sy > top_y)
       top_y = poly.vertices [top = i].sy;
     if (poly.vertices [i].sy < bot_y)

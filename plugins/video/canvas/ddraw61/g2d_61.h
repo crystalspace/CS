@@ -104,7 +104,7 @@ protected:
   HRESULT InitFail (HRESULT hRet, LPCTSTR szError);
   HRESULT ChangeCoopLevel ();
   void ClearSystemPalette ();
-  bool CreateIdentityPalette (RGBPixel *p);
+  bool CreateIdentityPalette (csRGBpixel *p);
   // Refresh a rectangle on client area from back buffer
   void Refresh (RECT &rect);
 };

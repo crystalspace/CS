@@ -49,7 +49,7 @@ public:
   funConsole (iBase *base);
   virtual ~funConsole ();
   virtual bool Initialize (iSystem *);
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
   virtual void PutText (int iMode, const char *iText);
   virtual void Draw3D (csRect *rect);
   virtual void SetTransparency (bool)

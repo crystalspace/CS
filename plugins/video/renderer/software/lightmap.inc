@@ -69,7 +69,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   int mipmap_delta = (1 << mipmap);
 
   csTextureSoftware *tx = (csTextureSoftware *)texmm->get_texture (mipmap);
-  RGBPixel *tx_palette = texmm->GetColorMap ();
+  csRGBpixel *tx_palette = texmm->GetColorMap ();
   UByte *tx_bitmap = tx->get_bitmap ();
 
   int pt_min_u = pt->GetIMinU () >> mipmap;
@@ -208,7 +208,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
         for (; uu < end_uu; uu++)
         {
-          RGBPixel pix = tx_palette [tx_bitmap [tx_idx + (uu & tx_andw)]];
+          csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + (uu & tx_andw)]];
 	  *out++ =
 #if defined (PI_INDEX8)
             inv_cmap [

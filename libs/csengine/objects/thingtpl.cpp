@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "csengine/thingtpl.h"
 #include "csengine/polyset.h"
+#include "ipolygon.h"
 
 //---------------------------------------------------------------------------
 
@@ -29,9 +30,6 @@ IMPLEMENT_CSOBJTYPE (csThingTemplate,csObject);
 csThingTemplate::csThingTemplate () : csObject (),
   polygons (32, 32), curves (16, 16)
 {
-  num_vertices = max_vertices = 0;
-  vertices = NULL;
-
   num_curve_vertices = max_curve_vertices = 0;
   curves_center.x = curves_center.y = curves_center.z = 0.0;
   curves_scale = 40;
@@ -43,46 +41,33 @@ csThingTemplate::csThingTemplate () : csObject (),
 
 csThingTemplate::~csThingTemplate ()
 {
-  delete [] vertices;
   delete [] curve_vertices;
   delete [] curve_texels;
 }
 
 void csThingTemplate::AddVertex (float x, float y, float z)
 {
-  if (!vertices)
-  {
-    max_vertices = 10;
-    vertices = new csVector3 [max_vertices];
-  }
-  while (num_vertices >= max_vertices)
-  {
-    max_vertices += 10;
-    csVector3* new_vertices = new csVector3 [max_vertices];
-    memcpy (new_vertices, vertices, sizeof (csVector3)*num_vertices);
-    delete [] vertices;
-    vertices = new_vertices;
-  }
+  int num = vertices.Length ();
+  vertices.SetLength (num + 1, 16);
 
-  vertices[num_vertices].x = x;
-  vertices[num_vertices].y = y;
-  vertices[num_vertices].z = z;
-  num_vertices++;
+  vertices [num].x = x;
+  vertices [num].y = y;
+  vertices [num].z = z;
 }
 
 void csThingTemplate::AddCurveVertex (csVector3& v, csVector2& t)
 {
   if (!curve_vertices)
   {
-    max_curve_vertices = 10;
+    max_curve_vertices = 16;
     curve_vertices = new csVector3 [max_curve_vertices];
     curve_texels   = new csVector2 [max_curve_vertices];
   }
   while (num_curve_vertices >= max_curve_vertices)
   {
-    max_curve_vertices += 10;
+    max_curve_vertices += 16;
     csVector3* new_vertices = new csVector3 [max_curve_vertices];
-    csVector2* new_texels   = new csVector2 [max_curve_vertices];
+    csVector2* new_texels = new csVector2 [max_curve_vertices];
     memcpy (new_vertices, curve_vertices, sizeof (csVector3)*num_curve_vertices);
     memcpy (new_texels,   curve_texels,   sizeof (csVector2)*num_curve_vertices);
     delete [] curve_vertices;
@@ -100,59 +85,46 @@ void csThingTemplate::AddCurveVertex (csVector3& v, csVector2& t)
 
 csPolygonTemplate::csPolygonTemplate (csThingTemplate* iParent, char* iName,
   csMaterialHandle* iMaterial)
+  : flags (CS_POLY_LIGHTING | CS_POLYTPL_TEXMODE_LIGHTMAP | CS_POLYTPL_TEXMODE_LIGHTMAP)
 {
-  vertices_idx = NULL;
-  max_vertices = num_vertices = 0;
-
   parent = iParent;
   name = strnew (iName);
   material = iMaterial;
-
-  no_lighting = false;
-
-  use_flat_color = false;
-  use_gouraud = false;
   uv_coords = NULL;
-  colldet = 0;
+  colors = NULL;
 }
 
 csPolygonTemplate::~csPolygonTemplate ()
 {
   delete [] name;
-  delete [] vertices_idx;
+  delete [] colors;
   delete [] uv_coords;
 }
 
 void csPolygonTemplate::AddVertex (int v)
 {
-  if (!vertices_idx)
-  {
-    max_vertices = 4;
-    vertices_idx = new int [max_vertices];
-  }
-  while (num_vertices >= max_vertices)
-  {
-    max_vertices += 2;
-    int* new_vertices_idx = new int [max_vertices];
-    memcpy (new_vertices_idx, vertices_idx, sizeof (int)*num_vertices);
-    delete [] vertices_idx;
-    vertices_idx = new_vertices_idx;
-  }
-
-  vertices_idx[num_vertices++] = v;
+  int num = vertices.Length ();
+  vertices.SetLength (num + 1);
+  vertices [num] = v;
 }
 
 void csPolygonTemplate::SetUV (int i, float u, float v)
 {
-  if (!uv_coords) uv_coords = new csVector2 [num_vertices];
-  uv_coords[i].x = u;
-  uv_coords[i].y = v;
+  if (!uv_coords) uv_coords = new csVector2 [vertices.Length ()];
+  uv_coords [i].x = u;
+  uv_coords [i].y = v;
 }
 
 void csPolygonTemplate::ResetUV ()
 {
   delete [] uv_coords;
   uv_coords = NULL;
+}
+
+void csPolygonTemplate::SetColor (int i, const csColor &iCol)
+{
+  if (!colors) colors = new csColor [vertices.Length ()];
+  colors [i] = iCol;
 }
 
 void csPolygonTemplate::PlaneNormal (float* A, float* B, float* C)
@@ -163,15 +135,15 @@ void csPolygonTemplate::PlaneNormal (float* A, float* B, float* C)
   int i, i1;
   float x1, y1, z1, x, y, z;
 
-  i1 = num_vertices-1;
-  for (i = 0 ; i < num_vertices ; i++)
+  i1 = vertices.Length ()-1;
+  for (i = 0 ; i < vertices.Length () ; i++)
   {
-    x = parent->Vtex (vertices_idx[i]).x;
-    y = parent->Vtex (vertices_idx[i]).y;
-    z = parent->Vtex (vertices_idx[i]).z;
-    x1 = parent->Vtex (vertices_idx[i1]).x;
-    y1 = parent->Vtex (vertices_idx[i1]).y;
-    z1 = parent->Vtex (vertices_idx[i1]).z;
+    x = parent->Vtex (vertices [i]).x;
+    y = parent->Vtex (vertices [i]).y;
+    z = parent->Vtex (vertices [i]).z;
+    x1 = parent->Vtex (vertices [i1]).x;
+    y1 = parent->Vtex (vertices [i1]).y;
+    z1 = parent->Vtex (vertices [i1]).z;
     ayz += (z1+z) * (y-y1);
     azx += (x1+x) * (z-z1);
     axy += (y1+y) * (x-x1);

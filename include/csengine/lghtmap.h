@@ -171,7 +171,7 @@ private:
    * Mean lighting value of this lightmap.
    * (only for static lighting currently).
    */
-  RGBPixel mean_color;
+  csRGBpixel mean_color;
 
   /// The hicolor cache ptr.
   void *cachedata;

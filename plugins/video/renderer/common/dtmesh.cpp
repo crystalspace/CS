@@ -305,8 +305,9 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
 
   // Fill flat color if renderer decide to paint it flat-shaded
   iTextureHandle* txt_handle = mesh.mat_handle[0]->GetTexture ();
-  txt_handle->GetMeanColor (poly.flat_color_r,
-    poly.flat_color_g, poly.flat_color_b);
+  if (txt_handle)
+    txt_handle->GetMeanColor (poly.flat_color_r,
+      poly.flat_color_g, poly.flat_color_b);
 
   poly.use_fog = mesh.do_fog;
 

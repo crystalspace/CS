@@ -54,7 +54,7 @@ public:
   virtual void SetRGB (int i, int r, int g, int b);
 
   /// Called on every frame by system driver
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   //------------------------- iEventPlug interface ---------------------------//
 

@@ -38,14 +38,14 @@ public:
   }
 };
 
-struct RGBPixel {
+struct csRGBpixel {
   unsigned char red, green, blue, alpha;
 };
 
 //***** Interfaces
 struct iPlugIn:public iBase {
   bool Initialize(iSystem *iSys);
-  bool HandleEvent(csEvent&);
+  bool HandleEvent(iEvent&);
   void SuspendResume(bool);
 };
 
@@ -158,11 +158,11 @@ struct iImage : public iBase
   int GetHeight ();
   int GetSize ();
   void Rescale (int NewWidth, int NewHeight);
-  iImage *MipMap (int step, RGBPixel *transp);
+  iImage *MipMap (int step, csRGBpixel *transp);
   void SetName (const char *iName);
   const char *GetName ();
   int GetFormat ();
-  RGBPixel *GetPalette ();
+  csRGBpixel *GetPalette ();
   UByte *GetAlpha ();
   void SetFormat (int iFormat);
   iImage *Clone ();

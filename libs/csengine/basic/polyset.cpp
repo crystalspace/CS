@@ -523,7 +523,7 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
     // @@@ ONLY lightmapped polygons right now.
     // This function needs support for DrawTriangleMesh if gouraud
     // shaded polygons are used.
-    csLightMapped* lmi = p->GetLightMapInfo ();
+    csPolyTexLightMap *lmi = p->GetLightMapInfo ();
     if (!lmi)
     {
       printf ("INTERNAL ERROR! Don't use gouraud shaded polygons on DETAIL objects right now!\n");

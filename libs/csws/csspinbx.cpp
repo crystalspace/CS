@@ -89,7 +89,7 @@ void csSpinBox::Draw ()
     SpinBoxSize, SpinBoxSize);
 }
 
-bool csSpinBox::HandleEvent (csEvent &Event)
+bool csSpinBox::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

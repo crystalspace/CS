@@ -22,11 +22,11 @@
 #include "version.h"
 #include "csutil/scf.h"
 #include "perfstat.h"
-#include "cssys/csevent.h"
 #include "isystem.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
 #include "ivfs.h"
+#include "ievent.h"
 
 #include "iworld.h"
 //  #include "csengine/stats.h"
@@ -59,6 +59,8 @@ csPerfStats::csPerfStats (iBase *iParent)
   frame_by_frame = false;
   break_frame = -1;
   paused = false;
+  frame_start = 0;
+  frame_count = 0;
   ResetStats ();
 }
 
@@ -79,7 +81,7 @@ bool csPerfStats::Initialize (iSystem *system)
     return false;
   sub_section = super_section = NULL;
   // default resolution
-  cnt = resolution = 10;
+  resolution = 500;
   name = NULL;
   head_section = this;
 
@@ -89,7 +91,7 @@ bool csPerfStats::Initialize (iSystem *system)
   return true;
 }
 
-bool csPerfStats::HandleEvent (csEvent &event)
+bool csPerfStats::HandleEvent (iEvent &event)
 {
   if (event.Type != csevBroadcast
    || event.Command.Code != cscmdPostProcess)
@@ -97,32 +99,30 @@ bool csPerfStats::HandleEvent (csEvent &event)
 
   if (!paused)
   {
-    cs_time elapsed_time, current_time;
-    System->GetElapsedTime (elapsed_time, current_time);
-    if (!elapsed_time)
-    {
-      time0 = current_time;
-      return true; // whatever
-    }
+    frame_count++;
 
-    AccumulateTotals (elapsed_time);
+    cs_time current_time = System->GetTime ();
+    int elapsed_time = current_time - frame_start;
+
+    AccumulateTotals (current_time - frame_start);
     float new_fps = -1;
-    if (cnt <= 0)
+    if (elapsed_time > resolution)
     {
-      frame->fps = new_fps = resolution*1000.0f / (float)(current_time - time0);
+      frame->fps = new_fps = frame_count ?
+        frame_count * 1000.0f / elapsed_time :
+        0;
       CalculateFpsStats ();
-      time0 = current_time;
-      cnt = resolution;
+      frame_start = current_time;
+      frame_count = 0;
 
       if (frame_by_frame)
       {
-	framevec->Push (frame);
-	FrameEntry *fe = frame;
-	frame = new FrameEntry ();
-	frame->fps = fe->fps;
+        framevec->Push (frame);
+        FrameEntry *fe = frame;
+        frame = new FrameEntry ();
+        frame->fps = fe->fps;
       }
     }
-    cnt--;
 
     if (sub_section)
       sub_section->SubsectionNextFrame (elapsed_time, new_fps);
@@ -138,9 +138,8 @@ bool csPerfStats::Pause (bool pause)
   paused = pause;
   if (!paused && ret)
   {
-    cs_time elapsed_time;
-    System->GetElapsedTime (elapsed_time, time0);
-    cnt = resolution;
+    frame_start = System->GetTime ();
+    frame_count = 0;
   }
   return ret;
 }
@@ -162,11 +161,13 @@ void csPerfStats::ResetStats ()
   frame->fps = 0;
 }
 
-void csPerfStats::SetResolution (int res)
+void csPerfStats::SetResolution (int iMilSecs)
 { 
-  resolution = cnt = res; 
+  resolution = iMilSecs;
+  frame_start = System->GetTime ();
+  frame_count = 0;
   if (sub_section)
-    sub_section->SetResolution (res);
+    sub_section->SetResolution (iMilSecs);
 }
 
 void csPerfStats::SubsectionNextFrame (cs_time elapsed_time, float fps)
@@ -190,7 +191,7 @@ void csPerfStats::AccumulateTotals (cs_time elapsed_time)
     DEBUG_BREAK;
 #endif
   total_time += elapsed_time;
-  mean_fps = frame_num/(total_time/1000.0);
+  mean_fps = frame_num * 1000.0f / total_time;
 //    total_polygons_considered += Stats::polygons_considered;
 //    total_polygons_rejected += Stats::polygons_rejected;
  

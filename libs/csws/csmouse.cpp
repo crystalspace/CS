@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
-#include "cssys/csevent.h"
 #include "csws/csmouse.h"
 #include "csws/csapp.h"
 
@@ -110,7 +109,7 @@ void csMouse::Setup ()
   Texture = app->GetTexture (MOUSE_TEXTURE_NAME);
 }
 
-bool csMouse::HandleEvent (csEvent &Event)
+bool csMouse::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

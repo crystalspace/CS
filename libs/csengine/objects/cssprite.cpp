@@ -436,7 +436,7 @@ csNamedObjVector& csSprite::GetSectors ()
 }
 
 /// The list of lights that hit the sprite
-static DECLARE_GROWING_ARRAY (light_worktable, csLight*);
+static DECLARE_GROWING_ARRAY_REF (light_worktable, csLight*);
 
 void csSprite::UpdateDeferedLighting (const csVector3& pos)
 {
@@ -513,15 +513,15 @@ IMPLEMENT_EMBEDDED_IBASE (csSprite3D::PolyMesh)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 /// Static vertex array.
-static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
+static DECLARE_GROWING_ARRAY_REF (tr_verts, csVector3);
 /// Static uv array.
-static DECLARE_GROWING_ARRAY (uv_verts, csVector2);
+static DECLARE_GROWING_ARRAY_REF (uv_verts, csVector2);
 /// The list of fog vertices
-static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
+static DECLARE_GROWING_ARRAY_REF (fog_verts, G3DFogInfo);
 /// The list of object vertices.
-static DECLARE_GROWING_ARRAY (obj_verts, csVector3);
+static DECLARE_GROWING_ARRAY_REF (obj_verts, csVector3);
 /// The list of tween vertices.
-static DECLARE_GROWING_ARRAY (tween_verts, csVector3);
+static DECLARE_GROWING_ARRAY_REF (tween_verts, csVector3);
 
 csSprite3D::csSprite3D (csObject* theParent) : csSprite (theParent), bbox (NULL)
 {

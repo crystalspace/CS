@@ -23,7 +23,6 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
-#include "cssys/csevent.h"
 #include "video/canvas/common/scancode.h"
 #include "video/canvas/common/os2-keys.h"
 #include "isystem.h"
@@ -128,7 +127,7 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
   return true;
 }
 
-bool csGraphics2DOS2GL::HandleEvent (csEvent &Event)
+bool csGraphics2DOS2GL::HandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdCommandLineHelp)

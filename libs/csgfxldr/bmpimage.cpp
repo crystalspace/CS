@@ -143,8 +143,8 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
   if (BITCOUNT(iBuffer) == _256Color && BICLRUSED(iBuffer))
   {
     UByte    *buffer  = new UByte [bmp_size];
-    RGBPixel *palette = new RGBPixel [256];
-    RGBPixel *pwork   = palette;
+    csRGBpixel *palette = new csRGBpixel [256];
+    csRGBpixel *pwork   = palette;
     UByte    *inpal   = BIPALETTE(iBuffer);
 
     for (int color = 0; color < 256; color++, pwork++)
@@ -226,11 +226,11 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
   }
   else if (!BICLRUSED(iBuffer) && BITCOUNT(iBuffer) == TRUECOLOR24)
   {
-    RGBPixel *buffer = new RGBPixel [bmp_size];
+    csRGBpixel *buffer = new csRGBpixel [bmp_size];
 
     while (iPtr < iBuffer + iSize && buffer_y >= 0)
     {
-      RGBPixel *d = buffer + buffer_y;
+      csRGBpixel *d = buffer + buffer_y;
       for (int x = Width; x; x--)
       {
         d->blue    = *iPtr++;

@@ -106,7 +106,7 @@ static bool do_select (csComponent *child, void *param)
   return true;
 }
 
-bool csWindowList::HandleEvent (csEvent &Event)
+bool csWindowList::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
@@ -538,7 +538,7 @@ public:
   char *path;
   cspFileDialog (csComponent *iParent);
   virtual ~cspFileDialog ();
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
   void Reread ();
   // set file path
   bool SetPath (const char *iPath);
@@ -583,7 +583,7 @@ cspFileDialog::~cspFileDialog ()
     delete [] path;
 }
 
-bool cspFileDialog::HandleEvent (csEvent &Event)
+bool cspFileDialog::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
@@ -918,7 +918,7 @@ class cspColorDialog : public csDialog
 public:
   cspColorDialog (csComponent *iParent);
   virtual ~cspColorDialog ();
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
   void SetColor (int iColor);
   int GetColor ()
   { return color; }
@@ -992,7 +992,7 @@ void cspColorDialog::UpdateInfo (bool UpdateSlider)
 void cspColorDialog::SetColor (int iColor)
 {
   csPixelFormat *pfmt = app->GetG2D ()->GetPixelFormat ();
-  RGBPixel *palette = app->GetG2D ()->GetPalette ();
+  csRGBpixel *palette = app->GetG2D ()->GetPalette ();
   if (pfmt->PalEntries)
   {
     r = float (palette [iColor].red) / 255;
@@ -1032,7 +1032,7 @@ void cspColorDialog::SetHLSmode (bool Enable)
   UpdateInfo (true);
 }
 
-bool cspColorDialog::HandleEvent (csEvent &Event)
+bool cspColorDialog::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

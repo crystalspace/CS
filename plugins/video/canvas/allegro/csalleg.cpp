@@ -319,7 +319,7 @@ void csGraphics2DAlleg::SetRGB (int i, int r, int g, int b)
   PaletteChanged = true;
 }
 
-bool csGraphics2DAlleg::HandleEvent (csEvent &/*Event*/)
+bool csGraphics2DAlleg::HandleEvent (iEvent &/*Event*/)
 {
   int scancode, keycode, c;
   

@@ -205,14 +205,14 @@ void csStatic::Draw ()
   csComponent::Draw ();
 }
 
-bool csStatic::IsHotKey (csEvent &Event)
+bool csStatic::IsHotKey (iEvent &Event)
 {
   return ((underline_pos >= 0)
        && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
        && (UPPERCASE (Event.Key.Code) == UPPERCASE (text [underline_pos])));
 }
 
-bool csStatic::HandleEvent (csEvent &Event)
+bool csStatic::HandleEvent (iEvent &Event)
 {
   CheckUp ();
 
@@ -264,7 +264,7 @@ bool csStatic::HandleEvent (csEvent &Event)
   return csComponent::HandleEvent (Event);
 }
 
-bool csStatic::PostHandleEvent (csEvent &Event)
+bool csStatic::PostHandleEvent (iEvent &Event)
 {
   CheckUp ();
   if ((style == csscsLabel)

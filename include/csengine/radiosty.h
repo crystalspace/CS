@@ -295,11 +295,10 @@ private:
 protected:
   /// return the material handle for this polygon
   virtual csMaterialHandle* GetMaterialHandle()
-  { return polygon->GetCsMaterialHandle(); }
+  { return polygon->GetCsMaterialHandle (); }
 
   /// return the flat color for the polygons texture
-  virtual csColor GetFlatColor() const 
-  { return polygon->GetFlatColor(); }
+  virtual csColor GetFlatColor() const;
 
   // setup some necessary values
   virtual void Setup();

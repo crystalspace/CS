@@ -343,7 +343,7 @@ public:
 
   // Handling of basic events and frame drawing.
   virtual void NextFrame ();
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
   void HandleKey (int key, bool shift, bool alt, bool ctrl);
   void HandleGameKey (int key, bool shift, bool alt, bool ctrl);
   void HandleGameOverKey (int key, bool shift, bool alt, bool ctrl);

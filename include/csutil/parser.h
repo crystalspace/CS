@@ -75,7 +75,7 @@ struct csTokenDesc
 #define TOKEN_DEF_START			\
   enum					\
   {					\
-    TOKEN_NONE = 0,
+    TOKEN_EMPTY = 0,
 #define TOKEN_DEF(name)			\
     TOKEN_ ## name,
 #define TOKEN_DEF_END			\

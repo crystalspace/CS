@@ -208,7 +208,7 @@ class csGridView : public csComponent
   csGridView (const csGridView& view, int iStyle=0);
 
   virtual void Draw ();
-  virtual bool HandleEvent (csEvent& Event);
+  virtual bool HandleEvent (iEvent& Event);
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);
   virtual void FixSize (int &newW, int &newH);
   virtual void SuggestSize (int &w, int &h);
@@ -264,7 +264,7 @@ class csGrid : public csComponent
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);
   virtual void FixSize (int &newW, int &newH);
   virtual void SuggestSize (int &w, int &h);
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   void CreateRegion (csRect& rc, csGridCell *cell);
   csGridView* GetRootView () { return (csGridView*)vViews.Get (0); }

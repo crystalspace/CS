@@ -176,7 +176,7 @@ void PySimple::NextFrame ()
   G3D->Print (NULL);
 }
 
-bool PySimple::HandleEvent (csEvent &Event)
+bool PySimple::HandleEvent (iEvent &Event)
 {
   if (superclass::HandleEvent (Event))
     return true;

@@ -101,7 +101,7 @@ public:
   virtual bool Initialize (iSystem *iSys);
 
   /// Intercept events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   //-------------------------- iConsole interface ----------------------------//
 

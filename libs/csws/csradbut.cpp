@@ -70,7 +70,7 @@ void csRadioButton::SetRadioButtonState (bool iNewState)
   } /* endswitch */
 }
 
-bool csRadioButton::HandleEvent (csEvent &Event)
+bool csRadioButton::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

@@ -40,7 +40,7 @@ public:
   /// Initialize the console
   virtual bool Initialize (iSystem *);
   /// Handle broadcast events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /**
    * Put some text to the console. Console acts like a simple
@@ -171,8 +171,8 @@ protected:
   iPlugIn *Client;
 
   //  Foreground and background colors
-  RGBcolor fg_rgb;
-  RGBcolor bg_rgb;
+  csRGBcolor fg_rgb;
+  csRGBcolor bg_rgb;
   // The texture manager codes for the colors
   int fg, bg;
 };

@@ -538,7 +538,7 @@ void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
     view->GetCamera ()->Rotate (VEC_TILT_RIGHT, speed * .2);
 }
 
-void WalkTest::eatkeypress (csEvent &Event)
+void WalkTest::eatkeypress (iEvent &Event)
 {
   int key = Event.Key.Code;
   int status = (Event.Type == csevKeyDown);
@@ -594,14 +594,14 @@ void WalkTest::eatkeypress (csEvent &Event)
 
 
 // left mouse button
-void WalkTest::MouseClick1Handler(csEvent &Event)
+void WalkTest::MouseClick1Handler(iEvent &Event)
 {
   (void)Event;
   move_forward = true;
 }
 
 // middle mouse button
-void WalkTest::MouseClick2Handler(csEvent &Event)
+void WalkTest::MouseClick2Handler(iEvent &Event)
 {
   csVector3 v;
   v.z = System->G3D->GetZBuffValue(Event.Mouse.x, Event.Mouse.y);
@@ -638,7 +638,7 @@ void WalkTest::MouseClick2Handler(csEvent &Event)
 }
 
 // right mouse button
-void WalkTest::MouseClick3Handler(csEvent &Event)
+void WalkTest::MouseClick3Handler(iEvent &Event)
 {
   csVector2   screenPoint;
   csSprite3D *closestSprite;
@@ -653,7 +653,7 @@ void WalkTest::MouseClick3Handler(csEvent &Event)
 }
 
 
-bool WalkTest::HandleEvent (csEvent &Event)
+bool WalkTest::HandleEvent (iEvent &Event)
 {
   // First pass the event to all plugins
   if (SysSystemDriver::HandleEvent (Event))

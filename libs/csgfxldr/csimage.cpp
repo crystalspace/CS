@@ -191,7 +191,7 @@ int csImageFile::GetFormat ()
   return Format;
 }
 
-RGBPixel *csImageFile::GetPalette ()
+csRGBpixel *csImageFile::GetPalette ()
 {
   return Palette;
 }
@@ -213,7 +213,7 @@ void csImageFile::FreeImage ()
   switch (Format & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_TRUECOLOR:
-      delete [] (RGBPixel *)Image;
+      delete [] (csRGBpixel *)Image;
       break;
     case CS_IMGFMT_PALETTED8:
       delete [] (UByte *)Image;
@@ -259,7 +259,7 @@ void csImageFile::Rescale (int newwidth, int newheight)
   switch (Format & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_TRUECOLOR:
-      RESIZE (RGBPixel, Image)
+      RESIZE (csRGBpixel, Image)
       break;
     case CS_IMGFMT_PALETTED8:
       RESIZE (UByte, Image)
@@ -272,7 +272,7 @@ void csImageFile::Rescale (int newwidth, int newheight)
   Height = newheight;
 }
 
-iImage *csImageFile::MipMap (int steps, RGBPixel *transp)
+iImage *csImageFile::MipMap (int steps, csRGBpixel *transp)
 {
   if ((steps < 0) || (steps > 3))
     return NULL;
@@ -280,7 +280,7 @@ iImage *csImageFile::MipMap (int steps, RGBPixel *transp)
   csImageFile* nimg = new csImageFile (Format);
   nimg->set_dimensions (Width >> steps, Height >> steps);
 
-  RGBPixel *mipmap = new RGBPixel [nimg->Width * nimg->Height];
+  csRGBpixel *mipmap = new csRGBpixel [nimg->Width * nimg->Height];
   if (Alpha)
     nimg->Alpha = new UByte [nimg->Width * nimg->Height];
 
@@ -331,24 +331,24 @@ iImage *csImageFile::MipMap (int steps, RGBPixel *transp)
       if (!transp)
       {
 	if (steps == 0)
-	  mipmap_0 (Width, Height, (RGBPixel *)Image, mipmap);
+	  mipmap_0 (Width, Height, (csRGBpixel *)Image, mipmap);
 	else if (steps == 1)
-	  mipmap_1 (Width, Height, (RGBPixel *)Image, mipmap);
+	  mipmap_1 (Width, Height, (csRGBpixel *)Image, mipmap);
 	else if (steps == 2)
-	  mipmap_2 (Width, Height, (RGBPixel *)Image, mipmap);
+	  mipmap_2 (Width, Height, (csRGBpixel *)Image, mipmap);
 	else
-	  mipmap_3 (Width, Height, (RGBPixel *)Image, mipmap);
+	  mipmap_3 (Width, Height, (csRGBpixel *)Image, mipmap);
       }
       else
       {
 	if (steps == 0)
-	  mipmap_0_t (Width, Height, (RGBPixel *)Image, mipmap, *transp);
+	  mipmap_0_t (Width, Height, (csRGBpixel *)Image, mipmap, *transp);
 	else if (steps == 1)
-	  mipmap_1_t (Width, Height, (RGBPixel *)Image, mipmap, *transp);
+	  mipmap_1_t (Width, Height, (csRGBpixel *)Image, mipmap, *transp);
 	else if (steps == 2)
-	  mipmap_2_t (Width, Height, (RGBPixel *)Image, mipmap, *transp);
+	  mipmap_2_t (Width, Height, (csRGBpixel *)Image, mipmap, *transp);
 	else
-	  mipmap_3_t (Width, Height, (RGBPixel *)Image, mipmap, *transp);
+	  mipmap_3_t (Width, Height, (csRGBpixel *)Image, mipmap, *transp);
       }
       break;
   }
@@ -363,7 +363,7 @@ static inline unsigned sqr (int x)
   return (x * x);
 }
 
-int csImageFile::closest_index (RGBPixel *iColor)
+int csImageFile::closest_index (csRGBpixel *iColor)
 {
   if (!Palette)
     return -1;
@@ -408,7 +408,7 @@ void csImageFile::CheckAlpha ()
       break;
     case CS_IMGFMT_TRUECOLOR:
       for (i = 0; i < pixels; i++)
-        if (((RGBPixel *)Image) [i].alpha != 255)
+        if (((csRGBpixel *)Image) [i].alpha != 255)
         {
           noalpha = false;
           break;
@@ -423,7 +423,7 @@ void csImageFile::CheckAlpha ()
   }
 }
 
-void csImageFile::convert_rgba (RGBPixel *iImage)
+void csImageFile::convert_rgba (csRGBpixel *iImage)
 {
   int pixels = Width * Height;
 
@@ -458,7 +458,7 @@ void csImageFile::convert_rgba (RGBPixel *iImage)
   }
 }
 
-void csImageFile::convert_pal8 (UByte *iImage, RGBPixel *iPalette,
+void csImageFile::convert_pal8 (UByte *iImage, csRGBpixel *iPalette,
   int /*nPalColors*/)
 {
   int pixels = Width * Height;
@@ -479,11 +479,11 @@ void csImageFile::convert_pal8 (UByte *iImage, RGBPixel *iPalette,
     case CS_IMGFMT_TRUECOLOR:
     {
       UByte *in = iImage;
-      RGBPixel *out;
+      csRGBpixel *out;
       if (Image)
-        out = (RGBPixel *)Image;
+        out = (csRGBpixel *)Image;
       else
-        Image = out = new RGBPixel [pixels];
+        Image = out = new csRGBpixel [pixels];
 
       if ((Format & CS_IMGFMT_ALPHA) && Alpha)
       {
@@ -510,10 +510,10 @@ void csImageFile::convert_pal8 (UByte *iImage, RGBPixel *iPalette,
     Format &= ~CS_IMGFMT_ALPHA;
 }
 
-void csImageFile::convert_pal8 (UByte *iImage, RGBcolor *iPalette, int nPalColors)
+void csImageFile::convert_pal8 (UByte *iImage, csRGBcolor *iPalette, int nPalColors)
 {
-  RGBPixel *newpal = new RGBPixel [256];
-  for (int i = 0; i < nPalColors; i++) // Default RGBPixel constructor ensures
+  csRGBpixel *newpal = new csRGBpixel [256];
+  for (int i = 0; i < nPalColors; i++) // Default csRGBpixel constructor ensures
     newpal [i] = iPalette [i];         // palette past nPalColors is sane.
   convert_pal8 (iImage, newpal);
 }
@@ -527,7 +527,7 @@ void csImageFile::SetFormat (int iFormat)
   Format = iFormat;
 
   if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
-    convert_rgba ((RGBPixel *)oldimage);
+    convert_rgba ((csRGBpixel *)oldimage);
   else if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
   {
     if ((Format & CS_IMGFMT_ALPHA) && !Alpha)
@@ -541,7 +541,7 @@ void csImageFile::SetFormat (int iFormat)
     if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
       Image = new UByte [pixels];
     else if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
-      Image = new RGBPixel [pixels];
+      Image = new csRGBpixel [pixels];
   }
 }
 
@@ -565,8 +565,8 @@ iImage *csImageFile::Clone ()
 
   if (Palette)
   {
-    nimg->Palette = new RGBPixel [256];
-    memcpy (nimg->Palette, Palette, 256 * sizeof (RGBPixel));
+    nimg->Palette = new csRGBpixel [256];
+    memcpy (nimg->Palette, Palette, 256 * sizeof (csRGBpixel));
   }
 
   if (Image)
@@ -580,8 +580,8 @@ iImage *csImageFile::Clone ()
         memcpy (nimg->Image, Image, pixels);
         break;
       case CS_IMGFMT_TRUECOLOR:
-        nimg->Image = new RGBPixel [pixels];
-        memcpy (nimg->Image, Image, pixels * sizeof (RGBPixel));
+        nimg->Image = new csRGBpixel [pixels];
+        memcpy (nimg->Image, Image, pixels * sizeof (csRGBpixel));
         break;
     }
   }
@@ -612,8 +612,8 @@ iImage *csImageFile::Crop ( int x, int y, int width, int height )
 
   if (Palette)
   {
-    nimg->Palette = new RGBPixel [256];
-    memcpy (nimg->Palette, Palette, 256 * sizeof (RGBPixel));
+    nimg->Palette = new csRGBpixel [256];
+    memcpy (nimg->Palette, Palette, 256 * sizeof (csRGBpixel));
   }
 
   if (Image)
@@ -628,9 +628,9 @@ iImage *csImageFile::Crop ( int x, int y, int width, int height )
           memcpy ( (UByte*)nimg->Image + i*width, (UByte*)Image + (i+y)*Width + x, width);
         break;
       case CS_IMGFMT_TRUECOLOR:
-        nimg->Image = new RGBPixel [pixels];
+        nimg->Image = new csRGBpixel [pixels];
         for ( i=0; i<height; i++ )
-          memcpy ( (RGBPixel*)nimg->Image + i*width, (RGBPixel*)Image + (i+y)*Width + x, width * sizeof (RGBPixel));
+          memcpy ( (csRGBpixel*)nimg->Image + i*width, (csRGBpixel*)Image + (i+y)*Width + x, width * sizeof (csRGBpixel));
         break;
     }
   }

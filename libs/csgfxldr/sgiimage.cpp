@@ -70,7 +70,7 @@ bool ImageSGIFile::Load (UByte* iBuffer, ULong iSize)
     return false;
 
   set_dimensions (header.Width, header.Height);
-  RGBPixel *buffer = new RGBPixel [Width * Height];
+  csRGBpixel *buffer = new csRGBpixel [Width * Height];
 
   UByte *line = new UByte [Width];
 
@@ -104,7 +104,7 @@ bool ImageSGIFile::Load (UByte* iBuffer, ULong iSize)
       iBuffer += header.Width;
     }
 
-    RGBPixel *d;
+    csRGBpixel *d;
     int comp;
     if (header.Dimension == 3)
     {

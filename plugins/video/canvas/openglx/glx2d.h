@@ -104,7 +104,7 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
   /// Called on every frame by system driver
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /**
    * Helper function, attempts to create a visual/context with the 

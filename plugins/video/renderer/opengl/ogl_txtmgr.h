@@ -79,8 +79,8 @@ public:
   /// Destroy the texture
   virtual ~csTextureOpenGL ();
   /// Get image data
-  RGBPixel *get_image_data ()
-  { return (RGBPixel *)image->GetImageData (); }
+  csRGBpixel *get_image_data ()
+  { return (csRGBpixel *)image->GetImageData (); }
   /// Get the image object
   iImage *get_image ()
   { return image; }

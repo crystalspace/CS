@@ -132,21 +132,21 @@ static const double FOG_MAXVALUE = FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE;
 // dynamic textures will utilise multiple instances of csGraphics3DOGLCommon
 
 /// Static vertex array.
-static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
+static DECLARE_GROWING_ARRAY_REF (tr_verts, csVector3);
 /// Static uv array.
-static DECLARE_GROWING_ARRAY (uv_verts, csVector2);
+static DECLARE_GROWING_ARRAY_REF (uv_verts, csVector2);
 /// The perspective corrected vertices.
-//static DECLARE_GROWING_ARRAY (persp, csVector3);
+//static DECLARE_GROWING_ARRAY_REF (persp, csVector3);
 /// Array which indicates which vertices are visible and which are not.
-//static DECLARE_GROWING_ARRAY (visible, bool);
+//static DECLARE_GROWING_ARRAY_REF (visible, bool);
 /// Array with colors.
-static DECLARE_GROWING_ARRAY (color_verts, csColor);
+static DECLARE_GROWING_ARRAY_REF (color_verts, csColor);
 /// Array with RGBA colors.
-static DECLARE_GROWING_ARRAY (rgba_verts, GLfloat);
+static DECLARE_GROWING_ARRAY_REF (rgba_verts, GLfloat);
 /// Array with fog values.
-static DECLARE_GROWING_ARRAY (fog_intensities, float);
+static DECLARE_GROWING_ARRAY_REF (fog_intensities, float);
 /// Array with fog colors
-static DECLARE_GROWING_ARRAY (fog_color_verts, csColor);
+static DECLARE_GROWING_ARRAY_REF (fog_color_verts, csColor);
 
 /*=========================================================================
  Method implementations
@@ -657,8 +657,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   }
 
   iPolygonTexture *tex = poly.poly_texture;
-  csMaterialMM* mat = (csMaterialMM*)poly.mat_handle;
-  iTextureHandle* txt_handle = mat->GetTexture ();
+  iTextureHandle* txt_handle = poly.mat_handle->GetTexture ();
   csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) txt_handle->GetPrivateObject ();
 
   // find lightmap information, if any
@@ -812,7 +811,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
       glEnable (GL_BLEND);
       if (poly_alpha > 0)
-        glColor4f (flat_r, flat_g, flat_b, 1.0 - (float) poly_alpha / 100.0);
+        glColor4f (flat_r, flat_g, flat_b, 1.0 - (float) poly_alpha / 255.0);
       else
         glColor4f (flat_r, flat_g, flat_b, 1.0);
     }
@@ -849,7 +848,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable (GL_BLEND);
     if (poly_alpha > 0)
-      glColor4f (flat_r, flat_g, flat_b, 1.0 - (float) poly_alpha / 100.0);
+      glColor4f (flat_r, flat_g, flat_b, 1.0 - (float) poly_alpha / 255.0);
     else
     {
       glColor4f (flat_r, flat_g, flat_b, 1.0);
@@ -1888,8 +1887,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   }
 
   tex = poly.poly_texture;
-  csMaterialMM* mat = (csMaterialMM*)poly.mat_handle;
-  iTextureHandle* txt_handle = mat->GetTexture ();
+  iTextureHandle* txt_handle = poly.mat_handle->GetTexture ();
   csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) txt_handle->GetPrivateObject ();
 
   // find lightmap information, if any
@@ -1957,7 +1955,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable (GL_BLEND);
     if (poly_alpha > 0)
-      glColor4f (flat_r, flat_g, flat_b, 1.0 - (float) poly_alpha / 100.0);
+      glColor4f (flat_r, flat_g, flat_b, 1.0 - (float) poly_alpha / 255.0);
     else
       glColor4f (flat_r, flat_g, flat_b, 1.0);
   }

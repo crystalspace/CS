@@ -40,13 +40,6 @@ class csColor;
  */
 #define CS_POLY_LIGHTING	0x00000001
 
-/**
- * If CS_POLY_FLATSHADING is set for a polygon then the polygon will not
- * be texture mapped but instead it will be flat shaded (possibly with gouraud).
- * It is unset by default.
- */
-#define CS_POLY_FLATSHADING	0x00000002
-
 SCF_VERSION (iPolygon3D, 0, 1, 3);
 
 /**
@@ -109,8 +102,6 @@ struct iPolygon3D : public iBase
   /// Set any number of flags for this polygon
   virtual void SetFlags (unsigned iMask, unsigned iValue) = 0;
 
-  /// Set flat color for polygon
-  virtual void SetFlatColor (csColor &iColor) = 0;
   /// Set Gouraud vs lightmap polygon lighting
   virtual void SetLightingMode (bool iGouraud) = 0;
 

@@ -83,7 +83,7 @@ void csListBoxItem::SuggestSize (int &w, int &h)
   h += LISTBOXITEM_YSPACE * 2;
 }
 
-bool csListBoxItem::HandleEvent (csEvent &Event)
+bool csListBoxItem::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
@@ -443,7 +443,7 @@ static bool do_findtext (csComponent *child, void *param)
   return (strcmp (child->GetText (), (char *)param) == 0);
 }
 
-bool csListBox::HandleEvent (csEvent &Event)
+bool csListBox::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

@@ -136,7 +136,7 @@ public:
   virtual void Draw ();
 
   /// Handle input events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Set window border width and height
   void SetBorderSize (int w, int h);

@@ -682,9 +682,8 @@ void set_uv (csPolygon3D* p, float u1, float v1, float u2, float v2,
 	float u3, float v3)
 {
   p->SetTextureType (POLYTXT_GOURAUD);
-  csGouraudShaded* gs = p->GetGouraudInfo ();
-  gs->Setup (p->GetVertices ().GetNumVertices ());
-  gs->EnableGouraud (true);
+  csPolyTexGouraud* gs = p->GetGouraudInfo ();
+  gs->Setup (p);
   gs->SetUV (0, u1, v1);
   gs->SetUV (1, u2, v2);
   gs->SetUV (2, u3, v3);
@@ -2505,7 +2504,7 @@ void Blocks::NextFrame ()
   Gfx3D->Print (NULL);
 }
 
-bool Blocks::HandleEvent (csEvent &Event)
+bool Blocks::HandleEvent (iEvent &Event)
 {
   if (SysSystemDriver::HandleEvent (Event))
     return false;

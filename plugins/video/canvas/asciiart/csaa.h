@@ -63,7 +63,7 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
   virtual iGraphics2D *CreateOffScreenCanvas (int /*width*/, int /*height*/, 
-     csPixelFormat */*pfmt*/, void */*buffer*/, RGBPixel */*palette*/, int /*pal_size*/)
+     csPixelFormat */*pfmt*/, void */*buffer*/, csRGBpixel */*palette*/, int /*pal_size*/)
   { return NULL; }
 };
 

@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "glidex2d.h"
 #include "csutil/scf.h"
-#include "cssys/csevent.h"
 #include "cssys/csinput.h"
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
@@ -315,7 +314,7 @@ static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
   return True;
 }
 
-bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
+bool csGraphics2DGlideX::HandleEvent (iEvent &/*Event*/)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   XEvent event;

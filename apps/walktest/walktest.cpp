@@ -564,8 +564,8 @@ void WalkTest::DrawFrameConsole ()
   {
     if (do_fps)
     {
-      GfxWrite(11, FRAME_HEIGHT-11, 0, -1, "FPS=%f", timeFPS);
-      GfxWrite(10, FRAME_HEIGHT-10, fgcolor_stats, -1, "FPS=%f", timeFPS);
+      GfxWrite(11, FRAME_HEIGHT-11, 0, -1, "FPS=%.2f", timeFPS);
+      GfxWrite(10, FRAME_HEIGHT-10, fgcolor_stats, -1, "FPS=%.2f", timeFPS);
     }
     if (do_stats)
     {
@@ -695,8 +695,7 @@ void WalkTest::DrawFrameMap ()
 	}
 	if (clip->ClipAgainst (clipper))
 	{
-  	  if (p->GetTextureType () == POLYTXT_GOURAUD
-   	    || p->flags.Check (CS_POLY_FLATSHADING))
+  	  if (p->GetTextureType () != POLYTXT_LIGHTMAP)
   	  {
 	    // @@@ Unsupported for now.
 	  }

@@ -55,6 +55,19 @@ extern "C" {
 #undef bool
 }
 
+// Upon initialization add the OS_NEXT_PLUGIN_DIR to the
+// list of paths searched for plugins
+class __loadlib_init
+    {
+    public:
+    __loadlib_init ()
+        {
+        extern bool findlib_search_nodir;
+        findlib_search_nodir = false;
+        csAddLibraryPath (OS_NEXT_PLUGIN_DIR);
+        }
+    } __loadlib_init_dummy;
+
 //-----------------------------------------------------------------------------
 // handle_collision
 //-----------------------------------------------------------------------------
@@ -79,35 +92,32 @@ static void initialize_loader()
         }
     }
 
+csLibraryHandle csFindLoadLibrary (const char *iName)
+    {
+    return csFindLoadLibrary (NULL, iName, OS_NEXT_PLUGIN_EXT);
+    }
+
 //-----------------------------------------------------------------------------
 // csLoadLibrary
 //-----------------------------------------------------------------------------
 csLibraryHandle csLoadLibrary( char const* lib )
     {
-//@@TODO: use csFindLibrary
-    char* file = new char[strlen(lib) + sizeof(OS_NEXT_PLUGIN_DIR) +
-	sizeof(OS_NEXT_PLUGIN_EXT)]; // Includes '\0'.
-    strcpy( file, OS_NEXT_PLUGIN_DIR );
-    strcat( file, lib );
-    strcat( file, OS_NEXT_PLUGIN_EXT );
-
     initialize_loader();
     csLibraryHandle handle = 0;
     NSObjectFileImage image = 0;
     NSObjectFileImageReturnCode rc =
-	NSCreateObjectFileImageFromFile( file, &image );
+	NSCreateObjectFileImageFromFile( lib, &image );
     if (rc == NSObjectFileImageSuccess)
 	{
-	NSModule const module = NSLinkModule( image, file, TRUE );
+	NSModule const module = NSLinkModule( image, lib, TRUE );
 	if (module != 0)
 	    handle = (csLibraryHandle)module;
 	else
-	    fprintf( stderr, "Unable to link library '%s'.\n", file );
+	    fprintf( stderr, "Unable to link library '%s'.\n", lib );
 	}
     else
-	fprintf( stderr, "Unable to load library '%s' (%d).\n", file, rc );
+	fprintf( stderr, "Unable to load library '%s' (%d).\n", lib, rc );
 
-    delete[] file;
     return handle;
     }
 

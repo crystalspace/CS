@@ -206,7 +206,7 @@ void PerfTest::NextFrame ()
   G3D->Print (NULL);
 }
 
-bool PerfTest::HandleEvent (csEvent &Event)
+bool PerfTest::HandleEvent (iEvent &Event)
 {
   if (superclass::HandleEvent (Event))
     return true;

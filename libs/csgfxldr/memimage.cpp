@@ -26,12 +26,12 @@ csImageMemory::csImageMemory (int width, int height)
   CONSTRUCT_IBASE (NULL);
   Width = width;
   Height = height;
-  Image = (void*) new RGBPixel[Width*Height];
+  Image = (void*) new csRGBpixel[Width*Height];
   short_cut = true;
   destroy_image = true;
 }
 
-csImageMemory::csImageMemory (int width, int height, RGBPixel *buffer, bool destroy)
+csImageMemory::csImageMemory (int width, int height, csRGBpixel *buffer, bool destroy)
   : csImageFile (CS_IMGFMT_TRUECOLOR)
 {
   CONSTRUCT_IBASE (NULL);
@@ -48,7 +48,7 @@ csImageMemory::~csImageMemory ()
     Image = NULL;
 }
 
-void csImageMemory::Clear (const RGBPixel &colour)
+void csImageMemory::Clear (const csRGBpixel &colour)
 {
   ULong *src = (ULong*) &colour;
   ULong *dst = (ULong*)Image;
@@ -63,8 +63,8 @@ void csImageMemory::Rescale (int NewWidth, int NewHeight)
   {
     Width = NewWidth;
     Height = NewHeight;
-    delete [] (RGBPixel *) Image;
-    Image = (void*) new RGBPixel[Width*Height];
+    delete [] (csRGBpixel *) Image;
+    Image = (void*) new csRGBpixel[Width*Height];
   }
   else
     csImageFile::Rescale (NewWidth, NewHeight);

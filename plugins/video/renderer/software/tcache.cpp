@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "qint.h"
-#include "csutil/garray.h"
 #include "csutil/util.h"
 #include "tcache.h"
 #include "soft_g3d.h"

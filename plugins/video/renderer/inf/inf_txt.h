@@ -33,7 +33,7 @@ class csTextureMMInfinite : public csTextureMM
 {
 protected:
   /// The private palette
-  RGBPixel palette [256];
+  csRGBpixel palette [256];
 
   /// Number of used colors in palette
   int palette_size;
@@ -51,7 +51,7 @@ public:
   virtual ~csTextureMMInfinite ();
 
   /// Query the private texture colormap
-  RGBPixel *GetColorMap () { return palette; }
+  csRGBpixel *GetColorMap () { return palette; }
   /// Query the number of colors in the colormap
   int GetColorMapSize () { return palette_size; }
 };

@@ -526,8 +526,8 @@ bool csSystemDriver::Open (const char *Title)
       return false;
 
   // Now pass the open event to all plugins
-  csEvent e (GetTime (), csevBroadcast, cscmdSystemOpen);
-  HandleEvent (e);
+  csEvent Event (GetTime (), csevBroadcast, cscmdSystemOpen);
+  HandleEvent (Event);
 
   return true;
 }
@@ -535,8 +535,8 @@ bool csSystemDriver::Open (const char *Title)
 void csSystemDriver::Close ()
 {
   // Warn all plugins the system is going down
-  csEvent e (GetTime (), csevBroadcast, cscmdSystemClose);
-  HandleEvent (e);
+  csEvent Event (GetTime (), csevBroadcast, cscmdSystemClose);
+  HandleEvent (Event);
 
   if (Sound)
     Sound->Close ();
@@ -591,16 +591,16 @@ void csSystemDriver::NextFrame ()
     csPlugIn *plugin = PlugIns.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)
     {
-      csEvent e (Time (), csevBroadcast, cscmdPreProcess);
-      plugin->PlugIn->HandleEvent (e);
+      csEvent Event (Time (), csevBroadcast, cscmdPreProcess);
+      plugin->PlugIn->HandleEvent (Event);
     }
   }
 
-  csEvent *ev;
+  iEvent *ev;
   while ((ev = EventQueue.Get ()))
   {
     HandleEvent (*ev);
-    delete ev;
+    ev->DecRef ();
   }
 
 //@@@@@@@@@@@@@ TO DO @@@@@@@@@@@@@@@
@@ -620,8 +620,8 @@ void csSystemDriver::NextFrame ()
     csPlugIn *plugin = PlugIns.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)
     {
-      csEvent e (Time (), csevBroadcast, cscmdPostProcess);
-      plugin->PlugIn->HandleEvent (e);
+      csEvent Event (Time (), csevBroadcast, cscmdPostProcess);
+      plugin->PlugIn->HandleEvent (Event);
     }
   }
 }
@@ -633,7 +633,7 @@ void csSystemDriver::Loop ()
   ExitLoop = false;
 }
 
-bool csSystemDriver::HandleEvent (csEvent &Event)
+bool csSystemDriver::HandleEvent (iEvent &Event)
 {
   if (Event.Type == csevBroadcast)
     switch (Event.Command.Code)
@@ -657,7 +657,7 @@ bool csSystemDriver::HandleEvent (csEvent &Event)
     }
 
   int evmask = 1 << Event.Type;
-  bool canstop = (Event.Type != csevBroadcast);
+  bool canstop = !(Event.Flags & CSEF_BROADCAST);
   for (int i = 0; i < PlugIns.Length (); i++)
   {
     csPlugIn *plugin = PlugIns.Get (i);

@@ -70,7 +70,7 @@ public:
     CSBS_DEFAULTRADIOBUTTON);
 
   /// Handle external events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
 protected:
   /// Emulate a button press (generate command)

@@ -130,7 +130,7 @@ struct csScanSetup
   /// Mean color value.
   int FlatColor;
   /// R/G/B components of flatcolor
-  RGBPixel FlatRGB;
+  csRGBpixel FlatRGB;
 
   /// Alpha mask for 16-bit renderer.
   unsigned int AlphaMask;
@@ -160,7 +160,7 @@ struct csScanSetup
   int min_v;
 
   /// Actual texture palette
-  RGBPixel *TexturePalette;
+  csRGBpixel *TexturePalette;
   /// 8-bit to native pixel format conversion table
   void *PaletteTable;
   /// Set up by poly renderer to alpha blending table

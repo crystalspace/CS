@@ -24,7 +24,7 @@
 #include "iperstat.h"
 
 struct iSystem;
-class csWorld;
+struct iWorld;
 
 // For more complete comments see iperfstat.h For usage see walktest
 
@@ -74,7 +74,7 @@ protected:
   //------------------------------------------------------------------------
 
   iSystem *System;
-  csWorld *World;
+  iWorld *World;
   /// The name of the sub/section utilised within an output file
   char *name;
   /// The name of the file to be outputted
@@ -119,8 +119,8 @@ protected:
 /*    int total_polygons_drawn; */
 /*    int total_portals_drawn; */
 
-  int cnt;
-  cs_time time0;
+  cs_time frame_start;
+  int frame_count;
 
   // Convenience functions.
   void AccumulateTotals (cs_time elapsed_time);
@@ -142,7 +142,7 @@ protected:
   ///
   virtual bool Initialize (iSystem *system);
   /// This is set to receive the once per frame nothing  event
-  virtual bool HandleEvent (csEvent &event);
+  virtual bool HandleEvent (iEvent &event);
 
   /// Set whether paused. Returns previous status
   virtual bool Pause (bool pause);
@@ -150,7 +150,7 @@ protected:
   virtual void FinishSection ();
   /// Reset all accumulated statistics back to zero
   virtual void ResetStats ();
-  virtual void SetResolution (int res);
+  virtual void SetResolution (int iMilSecs);
 
   virtual void SetName (const char *Name)
   { name = strnew (Name); }

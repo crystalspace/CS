@@ -88,7 +88,7 @@ static struct
   false
 };
 // Dont move inside the struct!
-static RGBPixel transpcolor;
+static csRGBpixel transpcolor;
 
 static int display_help ()
 {
@@ -132,7 +132,7 @@ static bool SavePNM (const char *fname, void *image, int w, int h, bool rgb)
     for (int i = w * h; i > 0; i--)
     {
       fwrite (image, 1, 3, f);
-      image = ((RGBPixel *)image) + 1;
+      image = ((csRGBpixel *)image) + 1;
     }
   else
     fwrite (image, 1, w * h, f);
@@ -165,13 +165,13 @@ static bool display_picture (iImage *ifile)
 {
   static char imgchr [] = " .,;+*oO";
   ifile->Rescale (opt.displayW, opt.displayH);
-  RGBPixel *rgb = ifile->GetPalette ();
+  csRGBpixel *rgb = ifile->GetPalette ();
   UByte *idx = (UByte *)ifile->GetImageData ();
   for (int y = 0; y < opt.displayH; y++)
   {
     for (int x = 0; x < opt.displayW; x++)
     {
-      RGBPixel &src = rgb [*idx++];
+      csRGBpixel &src = rgb [*idx++];
       int gray = int (sqrt (src.red * src.red + src.green * src.green +
         src.blue * src.blue) * 8 / 442);
       putc (imgchr [gray], stdout);
@@ -204,7 +204,7 @@ static bool output_heightmap (const char *fname, iImage *ifile)
   uint8 *img = (uint8 *)ifile->GetImageData ();
 
   int height [257], tc = 0;
-  RGBPixel *pal = ifile->GetPalette ();
+  csRGBpixel *pal = ifile->GetPalette ();
   height [256] = transpcolor.Intensity ();
   for (int i = 0; i < 256; i++)
     if (opt.transp && transpcolor.eq (pal [i]))

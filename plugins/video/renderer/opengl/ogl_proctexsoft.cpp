@@ -28,7 +28,6 @@
 #include "itxtmgr.h"
 #include "ipolygon.h"
 #include "ievent.h"
-#include "cssys/csevent.h"
 
 IMPLEMENT_IBASE (csOpenGLProcSoftware)
   IMPLEMENTS_INTERFACE (iGraphics3D)
@@ -64,7 +63,12 @@ public:
   iTextureHandle* handle;
   dummyMaterial ();
   DECLARE_IBASE;
-  virtual iTextureHandle* GetTexture () { return handle; }
+  virtual iTextureHandle* GetTexture ()
+  { return handle; }
+  virtual void GetFlatColor (csRGBpixel &oColor)
+  { oColor.Set (0,0,0); }
+  virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection)
+  { oDiffuse = oAmbient = oReflection = 0; }
 };
 
 IMPLEMENT_IBASE (dummyMaterial)

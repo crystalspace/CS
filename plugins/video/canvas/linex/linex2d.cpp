@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
-#include "cssys/csevent.h"
 #include "video/canvas/linex/linex2d.h"
 #include "video/canvas/common/scancode.h"
 #include "csutil/csrect.h"
@@ -548,7 +547,7 @@ static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
   return True;
 }
 
-bool csGraphics2DLineXLib::HandleEvent (csEvent &Event)
+bool csGraphics2DLineXLib::HandleEvent (iEvent &Event)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   XEvent event;

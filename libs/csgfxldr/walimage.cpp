@@ -91,7 +91,7 @@ bool ImageWALFile::Load (UByte* iBuffer, ULong iSize)
   UByte *buffer = new UByte [Width * Height];
 
   memcpy (buffer, iBuffer + head.offsets[0], Width * Height);
-  convert_pal8 (buffer, (RGBcolor *)&WALpalette);
+  convert_pal8 (buffer, (csRGBcolor *)&WALpalette);
 
   return true;
 }

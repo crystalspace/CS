@@ -136,7 +136,7 @@ public:
   virtual void Draw ();
 
   /// Handle scroll button notifications
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Set scroll button positions on resize
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);

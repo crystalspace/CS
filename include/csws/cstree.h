@@ -67,7 +67,7 @@ public:
   virtual ~csTreeItem ();
 
   /// Handle input events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Draw the tree item
   virtual void Draw ();
@@ -327,7 +327,7 @@ public:
   virtual ~csTreeCtrl () 
   { delete treeroot; }
   /// Handle external events and generate timeouts
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Draw the tree
   virtual void Draw ();

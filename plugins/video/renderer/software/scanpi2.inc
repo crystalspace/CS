@@ -45,10 +45,10 @@
 #if defined (PI_GOURAUD) || defined (PI_BLEND)
   #if defined (PI_FLAT)
     #if defined (PI_BLEND)
-        RGBPixel rgbtexel = Scan.FlatRGB;
+        csRGBpixel rgbtexel = Scan.FlatRGB;
     #endif
   #else
-        RGBPixel rgbtexel = Scan.TexturePalette [texel];
+        csRGBpixel rgbtexel = Scan.TexturePalette [texel];
   #endif
 #endif
 #if defined (PI_BLEND)

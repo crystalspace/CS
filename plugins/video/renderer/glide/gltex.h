@@ -70,8 +70,8 @@ public:
   void *get_bitmap () 
   { return (void *) raw; }
   /// 
-  RGBPixel *get_image_data ()
-  { return (RGBPixel*)image->GetImageData (); }
+  csRGBpixel *get_image_data ()
+  { return (csRGBpixel*)image->GetImageData (); }
   iImage *get_image ()
   { return image; }
   bool GetAlphaMap ()

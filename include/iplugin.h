@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 
 struct iSystem;
-class csEvent;
+struct iEvent;
 
 SCF_VERSION (iPlugIn, 0, 0, 1);
 
@@ -46,7 +46,7 @@ struct iPlugIn : public iBase
    * and want the event to not be passed further for processing by
    * other plugins.
    */
-  virtual bool HandleEvent (csEvent &/*Event*/)
+  virtual bool HandleEvent (iEvent &/*Event*/)
   { return false; }
 };
 

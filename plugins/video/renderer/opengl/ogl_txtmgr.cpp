@@ -154,12 +154,12 @@ void csTextureMMOpenGL::ComputeMeanColor ()
   if (!tex) return;
 
   int pixels = tex->get_width () * tex->get_height ();
-  RGBPixel *src = tex->get_image_data ();
+  csRGBpixel *src = tex->get_image_data ();
   unsigned r = 0, g = 0, b = 0;
   int count = pixels;
   while (count--)
   {
-    RGBPixel pix = *src++;
+    csRGBpixel pix = *src++;
     r += pix.red;
     g += pix.green;
     b += pix.blue;

@@ -43,7 +43,7 @@
 /// Do we need alpha channel or not
 #define CS_IMGFMT_ALPHA		0x00010000
 
-struct RGBPixel;
+struct csRGBpixel;
 
 SCF_VERSION (iImage, 1, 0, 1);
 
@@ -56,8 +56,8 @@ SCF_VERSION (iImage, 1, 0, 1);
 struct iImage : public iBase
 {
   /**
-   * Get image data: returns either (RGBPixel *) or (unsigned char *)
-   * depending on format. Note that for RGBA images the RGBPixel structure
+   * Get image data: returns either (csRGBpixel *) or (unsigned char *)
+   * depending on format. Note that for RGBA images the csRGBpixel structure
    * contains the alpha channel as well, so GetAlpha (see below) method
    * will return NULL (because alpha is not stored separately, as for
    * paletted images).
@@ -82,7 +82,7 @@ struct iImage : public iBase
    * a pointer to a transparent color, the texels of that color are handled
    * differently.
    */
-  virtual iImage *MipMap (int step, RGBPixel *transp) = 0;
+  virtual iImage *MipMap (int step, csRGBpixel *transp) = 0;
 
   /// Set image file name
   virtual void SetName (const char *iName) = 0;
@@ -92,7 +92,7 @@ struct iImage : public iBase
   /// Qyery image format (see CS_IMGFMT_XXX above)
   virtual int GetFormat () = 0;
   /// Get image palette (or NULL if no palette)
-  virtual RGBPixel *GetPalette () = 0;
+  virtual csRGBpixel *GetPalette () = 0;
   /**
    * Get alpha map for 8-bit paletted image.
    * RGBA images contains alpha within themself.
@@ -106,7 +106,8 @@ struct iImage : public iBase
    * it was not allocated before. For example, you can use this
    * method to add alpha channel to paletted images, to allocate
    * a image for CS_IMGFMT_NONE alphamaps or vice versa, to remove
-   * the image and leave alphamap alone.
+   * the image and leave alphamap alone. This routine may be used
+   * as well for removing alpha channel.
    */
   virtual void SetFormat (int iFormat) = 0;
 

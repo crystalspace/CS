@@ -89,7 +89,7 @@ public:
   ~csMouse ();
 
   /// Handle a event and return true if processed
-  bool HandleEvent (csEvent &Event);
+  bool HandleEvent (iEvent &Event);
 
   /// Set mouse cursor position
   void Move (int x, int y);

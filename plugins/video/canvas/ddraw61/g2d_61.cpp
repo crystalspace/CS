@@ -742,7 +742,7 @@ void csGraphics2DDDraw6::ClearSystemPalette ()
   ReleaseDC (NULL, hdc);
 }
 
-bool csGraphics2DDDraw6::CreateIdentityPalette (RGBPixel *p)
+bool csGraphics2DDDraw6::CreateIdentityPalette (csRGBpixel *p)
 {
   int i;
   LOGPALETTE Palette = { 0x300, 256 };

@@ -232,10 +232,6 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
 
     if (alpha)
     {
-      //float a = alpha;
-      //new_lview.r = (a * lview.r + (100-a) * filter_r) / 100.;
-      //new_lview.g = (a * lview.g + (100-a) * filter_g) / 100.;
-      //new_lview.b = (a * lview.b + (100-a) * filter_b) / 100.;
       float fr, fg, fb;
       if (filter_texture)
       {

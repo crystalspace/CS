@@ -190,7 +190,7 @@ bool csMenuItem::SetRect (int xmin, int ymin, int xmax, int ymax)
   return ret;
 }
 
-bool csMenuItem::HandleEvent (csEvent &Event)
+bool csMenuItem::HandleEvent (iEvent &Event)
 {
   // If we have a child menu and it is visible, pass mouse & keyboard events
   if (focused
@@ -604,7 +604,7 @@ bool csMenu::ExecuteKey (int key)
   return true;
 }
 
-bool csMenu::CurrentHandleEvent (csEvent &Event)
+bool csMenu::CurrentHandleEvent (iEvent &Event)
 {
   bool ret = false;
   if (current)
@@ -627,7 +627,7 @@ bool csMenu::CurrentHandleEvent (csEvent &Event)
 
 static bool do_findmouse (csComponent *child, void *param)
 {
-  csEvent *Event = (csEvent *)param;
+  iEvent *Event = (iEvent *)param;
   if (child->GetState (CSS_SELECTABLE) == 0)
     return false;
   return child->bound.Contains (Event->Mouse.x, Event->Mouse.y);
@@ -635,10 +635,10 @@ static bool do_findmouse (csComponent *child, void *param)
 
 static bool do_forall (csComponent *child, void *param)
 {
-  return child->HandleEvent (*((csEvent *)param));
+  return child->HandleEvent (*((iEvent *)param));
 }
 
-bool csMenu::HandleEvent (csEvent &Event)
+bool csMenu::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
@@ -781,7 +781,7 @@ bool csMenu::HandleEvent (csEvent &Event)
   return csComponent::HandleEvent (Event);
 }
 
-bool csMenu::PreHandleEvent (csEvent &Event)
+bool csMenu::PreHandleEvent (iEvent &Event)
 {
   if (parent->GetState (CSS_FOCUSED)
    && GetState (CSS_VISIBLE)

@@ -21,7 +21,7 @@
 #include "cssysdef.h"
 #include "csws/cscomp.h"
 #include "csws/csttlbar.h"
-#include "cssys/csevent.h"
+#include "ievent.h"
 
 csTitleBar::csTitleBar (csComponent *iParent, char *iText)
   : csComponent (iParent)
@@ -64,7 +64,7 @@ void csTitleBar::Draw ()
   csComponent::Draw ();
 }
 
-bool csTitleBar::HandleEvent (csEvent &Event)
+bool csTitleBar::HandleEvent (iEvent &Event)
 {
   bool retc = csComponent::HandleEvent (Event);
   switch (Event.Type)

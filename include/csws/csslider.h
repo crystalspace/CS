@@ -45,7 +45,7 @@ class csSlider : public csComponent
   csSlider (csComponent *pParent);
 
   virtual void Draw ();
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
   bool SetRect (int xmin, int ymin, int xmax, int ymax);
   void GetLastMousePos (int &x, int &y){ x = mx; y = my; }
 

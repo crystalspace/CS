@@ -80,7 +80,7 @@ public:
   virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
 private:
   static void KeyboardHandlerStub (void *Self, unsigned char ScanCode,

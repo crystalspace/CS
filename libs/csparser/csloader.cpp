@@ -105,6 +105,7 @@ TOKEN_DEF_START
   TOKEN_DEF (ACTIVE)
   TOKEN_DEF (ADD)
   TOKEN_DEF (ALPHA)
+  TOKEN_DEF (AMBIENT)
   TOKEN_DEF (ATTENUATION)
   TOKEN_DEF (AZIMUTH)
   TOKEN_DEF (BECOMING_ACTIVE)
@@ -130,10 +131,11 @@ TOKEN_DEF_START
   TOKEN_DEF (CURVECONTROL)
   TOKEN_DEF (CURVESCALE)
   TOKEN_DEF (DETAIL)
+  TOKEN_DEF (DIFFUSE)
   TOKEN_DEF (DIM)
   TOKEN_DEF (DITHER)
-  TOKEN_DEF (DYNAMIC)
   TOKEN_DEF (DROPSIZE)
+  TOKEN_DEF (DYNAMIC)
   TOKEN_DEF (ELEVATION)
   TOKEN_DEF (F)
   TOKEN_DEF (FALLTIME)
@@ -142,6 +144,7 @@ TOKEN_DEF_START
   TOKEN_DEF (FIRE)
   TOKEN_DEF (FIRST)
   TOKEN_DEF (FIRST_LEN)
+  TOKEN_DEF (FLAT)
   TOKEN_DEF (FLATCOL)
   TOKEN_DEF (FLOOR)
   TOKEN_DEF (FLOOR_CEIL)
@@ -156,6 +159,7 @@ TOKEN_DEF_START
   TOKEN_DEF (HALO)
   TOKEN_DEF (HARDMOVE)
   TOKEN_DEF (HEIGHT)
+  TOKEN_DEF (HEIGHTMAP)
   TOKEN_DEF (IDENTITY)
   TOKEN_DEF (KEY)
   TOKEN_DEF (KEYCOLOR)
@@ -163,6 +167,7 @@ TOKEN_DEF_START
   TOKEN_DEF (LIBRARY)
   TOKEN_DEF (LIGHT)
   TOKEN_DEF (LIGHTING)
+  TOKEN_DEF (LIGHTMAP)
   TOKEN_DEF (LIGHTX)
   TOKEN_DEF (LIMB)
   TOKEN_DEF (MATERIAL)
@@ -180,6 +185,7 @@ TOKEN_DEF_START
   TOKEN_DEF (MULTIPLY)
   TOKEN_DEF (MULTIPLY2)
   TOKEN_DEF (NODE)
+  TOKEN_DEF (NONE)
   TOKEN_DEF (NUMBER)
   TOKEN_DEF (OPENING)
   TOKEN_DEF (ORIG)
@@ -194,6 +200,7 @@ TOKEN_DEF_START
   TOKEN_DEF (PROCEDURAL)
   TOKEN_DEF (RADIUS)
   TOKEN_DEF (RAIN)
+  TOKEN_DEF (REFLECTION)
   TOKEN_DEF (ROOM)
   TOKEN_DEF (ROT)
   TOKEN_DEF (ROT_X)
@@ -227,7 +234,6 @@ TOKEN_DEF_START
   TOKEN_DEF (SWIRL)
   TOKEN_DEF (TEMPLATE)
   TOKEN_DEF (TERRAIN)
-  TOKEN_DEF (HEIGHTMAP)
   TOKEN_DEF (TEX)
   TOKEN_DEF (TEXLEN)
   TOKEN_DEF (TEXNR)
@@ -236,6 +242,7 @@ TOKEN_DEF_START
   TOKEN_DEF (TEXTURE_LIGHTING)
   TOKEN_DEF (TEXTURE_MIPMAP)
   TOKEN_DEF (TEXTURE_SCALE)
+  TOKEN_DEF (TEXTURING)
   TOKEN_DEF (TEX_SET)
   TOKEN_DEF (TEX_SET_SELECT)
   TOKEN_DEF (THING)
@@ -247,12 +254,12 @@ TOKEN_DEF_START
   TOKEN_DEF (TWEEN)
   TOKEN_DEF (UV)
   TOKEN_DEF (UVA)
-  TOKEN_DEF (UV_SHIFT)
   TOKEN_DEF (UVEC)
-  TOKEN_DEF (VVEC)
+  TOKEN_DEF (UV_SHIFT)
   TOKEN_DEF (V)
   TOKEN_DEF (VERTEX)
   TOKEN_DEF (VERTICES)
+  TOKEN_DEF (VVEC)
   TOKEN_DEF (W)
   TOKEN_DEF (WARP)
   TOKEN_DEF (WORLD)
@@ -361,6 +368,16 @@ bool csLoader::load_matrix (char* buf, csMatrix3 &m)
 bool csLoader::load_vector (char* buf, csVector3 &v)
 {
   ScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
+  return true;
+}
+
+bool csLoader::load_color (char *buf, csRGBcolor &c)
+{
+  float r, g, b;
+  ScanStr (buf, "%f,%f,%f", &r, &g, &b);
+  c.red   = QInt (r * 255.99);
+  c.green = QInt (g * 255.99);
+  c.blue  = QInt (b * 255.99);
   return true;
 }
 
@@ -610,7 +627,7 @@ UInt ParseMixmode (char* buf)
 	float alpha;
 	int ialpha;
         ScanStr (params, "%f", &alpha);
-	ialpha = QInt (alpha*255.5);
+	ialpha = QInt (alpha * 255.99);
 	Mixmode |= CS_FX_SETALPHA(ialpha);
 	break;
       case TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
@@ -1280,6 +1297,8 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info,
       break;
 
     case TOKEN_TEXNR:
+      //@@OBSOLETE, retained for backward compatibility
+    case TOKEN_MATERIAL:
       ScanStr (params, "%s", str);
       info.default_material = World->GetMaterials ()->FindByName (str);
       if (info.default_material == NULL)
@@ -1611,6 +1630,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
     TOKEN_TABLE (BEZIER)
     TOKEN_TABLE (TEX_SET_SELECT)
     TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MATERIAL)
     TOKEN_TABLE (TEXLEN)
     TOKEN_TABLE (TRIGGER)
     TOKEN_TABLE (ACTIVATE)
@@ -1757,18 +1777,19 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MATERIAL)
     TOKEN_TABLE (LIGHTING)
     TOKEN_TABLE (MIPMAP)
     TOKEN_TABLE (PORTAL)
     TOKEN_TABLE (WARP)
     TOKEN_TABLE (LIGHTX)
     TOKEN_TABLE (TEXTURE)
+    TOKEN_TABLE (TEXTURING)
     TOKEN_TABLE (VERTICES)
     TOKEN_TABLE (UVA)
     TOKEN_TABLE (UV)
     TOKEN_TABLE (COLORS)
     TOKEN_TABLE (COLLDET)
-    TOKEN_TABLE (FLATCOL)
     TOKEN_TABLE (ALPHA)
     TOKEN_TABLE (FOG)
     TOKEN_TABLE (COSFACT)
@@ -1801,6 +1822,13 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     TOKEN_TABLE (CLIP)
   TOKEN_TABLE_END
 
+  TOKEN_TABLE_START (texturing_commands)
+    TOKEN_TABLE (NONE)
+    TOKEN_TABLE (FLAT)
+    TOKEN_TABLE (GOURAUD)
+    TOKEN_TABLE (LIGHTMAP)
+  TOKEN_TABLE_END
+
   char* name;
   int i;
   long cmd;
@@ -1825,7 +1853,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   float u_shift = 0, v_shift = 0;
 
   bool do_mirror = false;
-  csLightMapped* pol_lm = poly3d->GetLightMapInfo ();
+  csPolyTexLightMap* pol_lm = poly3d->GetLightMapInfo ();
   if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
   int set_colldet = 0; // If 1 then set, if -1 then reset, else default.
 
@@ -1841,6 +1869,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     switch (cmd)
     {
       case TOKEN_TEXNR:
+        //@@OBSOLETE, retained for backward compatibility
+      case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
         mat = World->GetMaterials ()->FindByName (str);
         if (mat == NULL)
@@ -1871,7 +1901,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
         {
           int alpha;
           ScanStr (params, "%d", &alpha);
-          poly3d->SetAlpha (alpha);
+          poly3d->SetAlpha (alpha * 655 / 256);
         }
         break;
       case TOKEN_FOG:
@@ -2031,45 +2061,56 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 	  }
         }
         break;
-      case TOKEN_FLATCOL:
-        {
-          float r, g, b;
-          ScanStr (params, "%f,%f,%f", &r, &g, &b);
-          poly3d->SetFlatColor (r, g, b);
-        }
+      case TOKEN_TEXTURING:
+        while ((cmd = csGetObject (&params, texturing_commands, &name, &params2)) > 0)
+          switch (cmd)
+          {
+            case TOKEN_NONE:
+              poly3d->SetTextureType (POLYTXT_NONE);
+              break;
+            case TOKEN_FLAT:
+              poly3d->SetTextureType (POLYTXT_FLAT);
+              break;
+            case TOKEN_GOURAUD:
+              poly3d->SetTextureType (POLYTXT_GOURAUD);
+              break;
+            case TOKEN_LIGHTMAP:
+              poly3d->SetTextureType (POLYTXT_LIGHTMAP);
+              break;
+          }
         break;
       case TOKEN_GOURAUD:
-        poly3d->SetTextureType (POLYTXT_GOURAUD);
-	poly3d->GetGouraudInfo ()->Setup (poly3d->GetVertices ().GetNumVertices ());
-	poly3d->GetGouraudInfo ()->EnableGouraud (true);
+        //@@OBSOLETE, see above
         break;
       case TOKEN_MIXMODE:
         {
           UInt mixmode = ParseMixmode (params);
-	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
-	  if (gs) gs->SetMixmode (mixmode);
+          csPolyTexNone *notex = poly3d->GetNoTexInfo ();
+	  if (notex) notex->SetMixmode (mixmode);
+          if (mixmode & CS_FX_MASK_ALPHA)
+            poly3d->SetAlpha (mixmode & CS_FX_MASK_ALPHA);
           break;
 	}
       case TOKEN_UV:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
-	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
+	  csPolyTexFlat* fs = poly3d->GetFlatInfo ();
           int num, nv = poly3d->GetVertices ().GetNumVertices ();
-	  gs->Setup (nv);
+	  fs->Setup (poly3d);
           float list [2 * 100];
           ScanStr (params, "%F", list, &num);
           if (num > nv) num = nv;
 	  int j;
           for (j = 0; j < num; j++)
-            gs->SetUV (j, list [j * 2], list [j * 2 + 1]);
+            fs->SetUV (j, list [j * 2], list [j * 2 + 1]);
         }
         break;
       case TOKEN_COLORS:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
-	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
+	  csPolyTexGouraud* gs = poly3d->GetGouraudInfo ();
           int num, nv = poly3d->GetVertices ().GetNumVertices ();
-	  gs->Setup (nv);
+	  gs->Setup (poly3d);
           float list [3 * 100];
           ScanStr (params, "%F", list, &num);
           if (num > nv) num = nv;
@@ -2081,9 +2122,9 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
       case TOKEN_UVA:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
-	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
+	  csPolyTexFlat* fs = poly3d->GetFlatInfo ();
           int num, nv = poly3d->GetVertices ().GetNumVertices ();
-	  gs->Setup (nv);
+	  fs->Setup (poly3d);
           float list [3 * 100];
           ScanStr (params, "%F", list, &num);
           if (num > nv) num = nv;
@@ -2091,7 +2132,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
           for (j = 0; j < num; j++)
           {
             float a = list [j * 3] * 2 * M_PI / 360.;
-            gs->SetUV (j, cos (a) * list [j * 3 + 1] + list [j * 3 + 2],
+            fs->SetUV (j, cos (a) * list [j * 3 + 1] + list [j * 3 + 2],
                           sin (a) * list [j * 3 + 1] + list [j * 3 + 2]);
           }
         }
@@ -2104,14 +2145,16 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     fatal_exit (0, false);
   }
 
-  if (poly3d->GetNumVertices() < 3)
+  if (poly3d->GetNumVertices () < 3)
   {
     CsPrintf (MSG_WARNING, "Polygon in line %d contains just %d vertices!\n", parser_line, poly3d->GetNumVertices());
     return NULL;
   }
 
-  if (set_colldet == 1) poly3d->flags.Set (CS_POLY_COLLDET);
-  else if (set_colldet == -1) poly3d->flags.Reset (CS_POLY_COLLDET);
+  if (set_colldet == 1)
+    poly3d->flags.Set (CS_POLY_COLLDET);
+  else if (set_colldet == -1)
+    poly3d->flags.Reset (CS_POLY_COLLDET);
 
   if (tx1_given)
     if (tx2_given)
@@ -2158,7 +2201,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   else
     poly3d->SetTextureSpace (tx_matrix, tx_vector);
 
-  if (uv_shift_given)
+  if (uv_shift_given && poly3d->GetLightMapInfo ())
   {
     poly3d->GetLightMapInfo ()->GetTxtPlane ()->
     	GetTextureSpace (tx_matrix, tx_vector);
@@ -2185,6 +2228,7 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MATERIAL)
     TOKEN_TABLE (TEXTURE)
     TOKEN_TABLE (VERTICES)
   TOKEN_TABLE_END
@@ -2240,7 +2284,9 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
     }
     switch (cmd)
     {
-      case TOKEN_TEXNR: //@@@MAT
+      case TOKEN_TEXNR:
+        //@@OBSOLETE, retained for backward compatibility
+      case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
         mat = World->GetMaterials ()->FindByName (str);
         if (mat == NULL)
@@ -2498,25 +2544,58 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   material->DecRef ();
 
   if (do_transp)
-    tex->SetKeyColor (QInt (transp.red * 255.2),
-      QInt (transp.green * 255.2), QInt (transp.blue * 255.2));
+    tex->SetKeyColor (QInt (transp.red * 255.99),
+      QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
 }
 
 void csLoader::mat_process (char *name, char* buf)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXTURE)
+    TOKEN_TABLE (COLOR)
+    TOKEN_TABLE (DIFFUSE)
+    TOKEN_TABLE (AMBIENT)
+    TOKEN_TABLE (REFLECTION)
   TOKEN_TABLE_END
 
   long cmd;
   char *params;
+  char str [255];
+  float tmp;
+
+  csMaterial* material = new csMaterial ();
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
       case TOKEN_TEXTURE:
-        // ...
+      {
+        ScanStr (params, "%s", str);
+        csTextureHandle *texh = World->GetTextures ()->FindByName (str);
+        if (texh)
+          material->SetTextureHandle (texh);
+        else
+        {
+          CsPrintf (MSG_FATAL_ERROR, "Cannot find texture `%s' for material `%s'\n", str, name);
+          fatal_exit (0, false);
+        }
+        break;
+      }
+      case TOKEN_COLOR:
+        load_color (params, material->GetFlatColor ());
+        break;
+      case TOKEN_DIFFUSE:
+        ScanStr (params, "%f", &tmp);
+        material->SetDiffuse (tmp);
+        break;
+      case TOKEN_AMBIENT:
+        ScanStr (params, "%f", &tmp);
+        material->SetAmbient (tmp);
+        break;
+      case TOKEN_REFLECTION:
+        ScanStr (params, "%f", &tmp);
+        material->SetReflection (tmp);
         break;
     }
   }
@@ -2527,13 +2606,9 @@ void csLoader::mat_process (char *name, char* buf)
     fatal_exit (0, false);
   }
 
-  csMaterial* material = new csMaterial ();
-  if (!material)
-    return;
-
-  csMaterialHandle* mat = World->GetMaterials ()->NewMaterial (material);
+  csMaterialHandle *mat = World->GetMaterials ()->NewMaterial (material);
   mat->SetName (name);
-  // dereference image pointer since tex already incremented it
+  // dereference material since mat already incremented it
   material->DecRef ();
 }
 
@@ -2545,6 +2620,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MATERIAL)
     TOKEN_TABLE (LIGHTING)
     TOKEN_TABLE (MIPMAP)
     TOKEN_TABLE (TEXTURE)
@@ -2552,6 +2628,8 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
     TOKEN_TABLE (FLATCOL)
     TOKEN_TABLE (GOURAUD)
     TOKEN_TABLE (COLLDET)
+    TOKEN_TABLE (TEXTURING)
+    TOKEN_TABLE (COLORS)
   TOKEN_TABLE_END
 
   TOKEN_TABLE_START (tex_commands)
@@ -2566,6 +2644,13 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
     TOKEN_TABLE (VVEC)
     TOKEN_TABLE (V)
     TOKEN_TABLE (UV_SHIFT)
+  TOKEN_TABLE_END
+
+  TOKEN_TABLE_START (texturing_commands)
+    TOKEN_TABLE (NONE)
+    TOKEN_TABLE (FLAT)
+    TOKEN_TABLE (GOURAUD)
+    TOKEN_TABLE (LIGHTMAP)
   TOKEN_TABLE_END
 
   char* name;
@@ -2601,6 +2686,8 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
     switch (cmd)
     {
       case TOKEN_TEXNR:
+        //@@OBSOLETE, retained for backward compatibility
+      case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
         mat = World->GetMaterials ()->FindByName (str);
         if (mat == NULL)
@@ -2610,33 +2697,47 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
         }
         ptemplate->SetMaterial (mat);
         break;
-      case TOKEN_GOURAUD:
-        ptemplate->SetGouraud ();
+      case TOKEN_TEXTURING:
+        while ((cmd = csGetObject (&params, texturing_commands, &name, &params2)) > 0)
+          switch (cmd)
+          {
+            case TOKEN_NONE:
+              ptemplate->flags.Set (CS_POLYTPL_TEXMODE, CS_POLYTPL_TEXMODE_NONE);
+              break;
+            case TOKEN_FLAT:
+              ptemplate->flags.Set (CS_POLYTPL_TEXMODE, CS_POLYTPL_TEXMODE_FLAT);
+              break;
+            case TOKEN_GOURAUD:
+              ptemplate->flags.Set (CS_POLYTPL_TEXMODE, CS_POLYTPL_TEXMODE_GOURAUD);
+              break;
+            case TOKEN_LIGHTMAP:
+              ptemplate->flags.Set (CS_POLYTPL_TEXMODE, CS_POLYTPL_TEXMODE_LIGHTMAP);
+              break;
+          }
         break;
-      case TOKEN_COLLDET:
-        {
-          int do_colldet;
-          ScanStr (params, "%b", &do_colldet);
-	  if (do_colldet) ptemplate->SetCollDet (1);
-	  else ptemplate->SetCollDet (-1);
-        }
+      case TOKEN_GOURAUD:
+        //@@OBSOLETE, see above
         break;
       case TOKEN_FLATCOL:
-        {
-          float r, g, b;
-          ScanStr (params, "%f,%f,%f", &r, &g, &b);
-          ptemplate->SetFlatColor (r, g, b);
-        }
+        //@@OBSOLETE, flat color belongs to material not to polygon
+        break;
+      case TOKEN_MIPMAP:
+        //@@@ OBSOLETE
         break;
       case TOKEN_LIGHTING:
         {
           int do_lighting;
           ScanStr (params, "%b", &do_lighting);
-          ptemplate->SetLighting (do_lighting);
+          ptemplate->flags.SetBool (CS_POLY_LIGHTING, do_lighting);
         }
         break;
-      case TOKEN_MIPMAP:
-        //@@@ OBSOLETE
+      case TOKEN_COLLDET:
+        {
+          int do_colldet;
+          ScanStr (params, "%b", &do_colldet);
+          ptemplate->flags.SetBool (CS_POLYTPL_COLLDET,
+            do_colldet ? CS_POLYTPL_COLLDET_ENABLE : CS_POLYTPL_COLLDET_DISABLE);
+        }
         break;
       case TOKEN_TEXTURE:
         while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
@@ -2713,6 +2814,17 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
           for (i = 0 ; i < num ; i++) ptemplate->AddVertex (list[i]);
         }
         break;
+      case TOKEN_COLORS:
+        {
+          ptemplate->flags.Set (CS_POLYTPL_TEXMODE, CS_POLYTPL_TEXMODE_GOURAUD);
+	  int num, nv = ptemplate->GetNumVertices ();
+	  float list [3 * 100];
+          ScanStr (params, "%F", list, &num);
+          if (num > nv) num = nv;
+          for (int j = 0; j < num; j++)
+            ptemplate->SetColor (j, list [j * 3], list [j * 3 + 1], list [j * 3 + 2]);
+        }
+        break;
     }
   }
   if (cmd == PARSERR_TOKENNOTFOUND)
@@ -2764,6 +2876,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MATERIAL)
     TOKEN_TABLE (TEXTURE)
     TOKEN_TABLE (VERTICES)
   TOKEN_TABLE_END
@@ -2818,6 +2931,8 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
     switch (cmd)
     {
       case TOKEN_TEXNR:
+        //@@OBSOLETE, retained for backward compatibility
+      case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
         mat = World->GetMaterials ()->FindByName (str);
         if (mat == NULL)
@@ -2927,6 +3042,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
     TOKEN_TABLE (POLYGON)
     TOKEN_TABLE (BEZIER)
     TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MATERIAL)
     TOKEN_TABLE (TEXLEN)
     TOKEN_TABLE (FOG)
     TOKEN_TABLE (MOVE)
@@ -3035,6 +3151,8 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
         break;
 
       case TOKEN_TEXNR:
+        //@@OBSOLETE, retained for backward compatibility
+      case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
         default_material = World->GetMaterials ()->FindByName (str);
         if (default_material == NULL)
@@ -3789,6 +3907,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
                 break;
               case TOKEN_ALPHA:
                 ScanStr (params2, "%d", &portals[num_portals].alpha);
+                portals[num_portals].alpha = portals[num_portals].alpha * 655 / 256;
                 break;
               case TOKEN_WARP:
                 {
@@ -4003,7 +4122,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
       else
         p->SetTextureSpace ((csPolyTxtPlane*)World->planes.FindByName (colors[idx].plane));
       p->flags.Set (CS_POLY_LIGHTING, (no_lighting ? 0 : CS_POLY_LIGHTING));
-      csLightMapped* pol_lm = p->GetLightMapInfo ();
+      csPolyTexLightMap* pol_lm = p->GetLightMapInfo ();
       if (pol_lm) pol_lm->SetUniformDynLight (todo[done].light);
     }
     done++;
@@ -4034,7 +4153,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
                         portals[i].v_warp_after);
       p->GetPortal ()->flags.SetBool (CS_PORTAL_STATICDEST, portals[i].do_static);
     }
-    p->SetAlpha (portals[i].alpha);
+    p->SetAlpha (portals [i].alpha);
   }
 
   if (!(flags & CS_LOADER_NOCOMPRESS))
@@ -4052,6 +4171,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     TOKEN_TABLE (CIRCLE)
     TOKEN_TABLE (POLYGON)
     TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MATERIAL)
     TOKEN_TABLE (TEXLEN)
     TOKEN_TABLE (TRIGGER)
     TOKEN_TABLE (ACTIVATE)
@@ -4155,7 +4275,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         sector->AddLight ( load_statlight(name, params) );
         break;
       case TOKEN_NODE:
-        sector->ObjAdd ( load_node(name, params, sector) ); 
+        sector->ObjAdd ( load_node(name, params, sector) );
         break;
       case TOKEN_KEY:
       {
@@ -4197,7 +4317,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
   float radius = 0.0f;
   int i, j;
   int num = 0;
-  csGouraudShaded* gs;
+  csPolyTexGouraud* gs;
 
   // Previous vertices.
   int prev_vertices[60];        // @@@ HARDCODED!
@@ -4302,8 +4422,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->AddVertex (new_vertices[j]);
       p->SetTextureType (POLYTXT_GOURAUD);
       gs = p->GetGouraudInfo ();
-      gs->Setup (p->GetVertices ().GetNumVertices ());
-      gs->EnableGouraud (true);
+      gs->Setup (p);
       gs->SetUV (0, prev_u[j], prev_v[j]);
       gs->SetUV (1, new_u[(j+1)%num], new_v[(j+1)%num]);
       gs->SetUV (2, new_u[j], new_v[j]);
@@ -4323,8 +4442,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->AddVertex (new_vertices[(j+1)%num]);
       p->SetTextureType (POLYTXT_GOURAUD);
       gs = p->GetGouraudInfo ();
-      gs->Setup (p->GetVertices ().GetNumVertices ());
-      gs->EnableGouraud (true);
+      gs->Setup (p);
       gs->SetUV (0, prev_u[j], prev_v[j]);
       gs->SetUV (1, prev_u[(j+1)%num], prev_v[(j+1)%num]);
       gs->SetUV (2, new_u[(j+1)%num], new_v[(j+1)%num]);
@@ -4366,8 +4484,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
     p->AddVertex (prev_vertices[(j+1)%num]);
     p->SetTextureType (POLYTXT_GOURAUD);
     gs = p->GetGouraudInfo ();
-    gs->Setup (p->GetVertices ().GetNumVertices ());
-    gs->EnableGouraud (true);
+    gs->Setup (p);
     gs->SetUV (0, top_u, top_v);
     gs->SetUV (1, prev_u[j], prev_v[j]);
     gs->SetUV (2, prev_u[(j+1)%num], prev_v[(j+1)%num]);
@@ -5124,6 +5241,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MATERIAL)
     TOKEN_TABLE (FRAME)
     TOKEN_TABLE (ACTION)
     TOKEN_TABLE (MERGE_NORMALS)
@@ -5158,7 +5276,9 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_TEXNR://@@@MAT
+      case TOKEN_TEXNR:
+        //@@OBSOLETE, retained for backward compatibility
+      case TOKEN_MATERIAL:
         {
           ScanStr (params, "%s", str);
           stemp->SetMaterial (World->GetMaterials (), str);
@@ -5327,6 +5447,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
     TOKEN_TABLE (VERTICES)
     TOKEN_TABLE (UV)
     TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MATERIAL)
     TOKEN_TABLE (MIXMODE)
     TOKEN_TABLE (MOVE)
     TOKEN_TABLE (COLORS)
@@ -5415,7 +5536,9 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 	}
         break;
 
-      case TOKEN_TEXNR://@@@MAT
+      case TOKEN_TEXNR:
+        //@@OBSOLETE, retained for backward compatibility
+      case TOKEN_MATERIAL:
         {
           ScanStr (params, "%s", str);
           csMaterialHandle* mat = World->GetMaterials ()->FindByName (str);
@@ -5444,6 +5567,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
     TOKEN_TABLE (MIXMODE)
     TOKEN_TABLE (TEMPLATE)
     TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MATERIAL)
     TOKEN_TABLE (MOVE)
     TOKEN_TABLE (TWEEN)
   TOKEN_TABLE_END
@@ -5529,7 +5653,9 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
 	}
 	break;
 
-      case TOKEN_TEXNR://@@@MAT
+      case TOKEN_TEXNR:
+        //@@OBSOLETE, retained for backward compatibility
+      case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
         spr->SetMaterial (str, World->GetMaterials ());
         // unset_texture ();

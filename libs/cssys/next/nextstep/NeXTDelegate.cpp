@@ -23,7 +23,6 @@
 #include "cssysdef.h"
 #include "NeXTDelegate.h"
 #include "NeXTSystemDriver.h"
-#include "cssys/csevent.h"
 extern "Objective-C" {
 #import <appkit/Application.h>
 #import <appkit/View.h>

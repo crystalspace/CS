@@ -21,7 +21,6 @@
 #define __CSDIVE_H__
 
 #include "video/canvas/common/graph2d.h"
-#include "cssys/csevent.h"
 #include "ievent.h"
 
 // avoid including os2.h
@@ -95,7 +94,7 @@ public:
   virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   //------------------------- iEventPlug interface ---------------------------//
 

@@ -38,7 +38,7 @@ void csSlider::Draw ()
     Box (0, 0, bound.Width (), bound.Height (), CSPAL_SLIDER_FILL);
 }
 
-bool csSlider::HandleEvent (csEvent &Event)
+bool csSlider::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

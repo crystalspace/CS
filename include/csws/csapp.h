@@ -96,7 +96,7 @@ protected:
     virtual bool Initialize (iSystem *System);
 
     /// Handle a event and return true if processed; called by system driver
-    virtual bool HandleEvent (csEvent &Event);
+    virtual bool HandleEvent (iEvent &Event);
   } scfiPlugIn;
   friend class csAppPlugIn;
 
@@ -144,11 +144,11 @@ public:
   void FlushEvents ();
 
   /// Create a new event object: NEVER create event objects with `new'
-  csEvent *CreateEvent ()
+  iEvent *CreateEvent ()
   { return EventOutlet->CreateEvent (); }
 
   /// Add a previously created event to event queue
-  void PutEvent (csEvent *Event)
+  void PutEvent (iEvent *Event)
   { EventOutlet->PutEvent (Event); }
 
   /// Shut down the program
@@ -232,13 +232,13 @@ public:
   void Dismiss (int iCode = cscmdCancel);
 
   /// Handle a event before all others
-  virtual bool PreHandleEvent (csEvent &Event);
+  virtual bool PreHandleEvent (iEvent &Event);
 
   /// Send event to all childs and return processed status
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Handle a event if nobody eaten it.
-  virtual bool PostHandleEvent (csEvent &Event);
+  virtual bool PostHandleEvent (iEvent &Event);
 
 /*
  * The following methods are simple redirectors to csGraphicsPipeline

@@ -24,7 +24,18 @@ extern "C" {
 #include <streams/streams.h>
 }
 
-//@@TODO: upon startup call csAddLibraryPath (OS_NEXT_PLUGIN_DIR)
+// Upon initialization add the OS_NEXT_PLUGIN_DIR to the
+// list of paths searched for plugins
+class __loadlib_init
+{
+public:
+  __loadlib_init ()
+  {
+    extern bool findlib_search_nodir;
+    findlib_search_nodir = false;
+    csAddLibraryPath (OS_NEXT_PLUGIN_DIR);
+  }
+} __loadlib_init_dummy;
 
 csLibraryHandle csFindLoadLibrary (const char *iName)
 {
@@ -43,7 +54,7 @@ csLibraryHandle csLoadLibrary( char const* lib )
     if (objc_loadModules( (char**)files, stream, 0, &header, 0 ) == 0)
 	handle = (csLibraryHandle)header;
     else
-	NXPrintf( stream, "Unable to load library '%s'.\n", file );
+	NXPrintf( stream, "Unable to load library '%s'.\n", lib );
     NXClose( stream );
 
     return handle;

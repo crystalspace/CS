@@ -67,9 +67,9 @@ protected:
   /// Does color 0 mean "transparent" for this texture?
   bool transp;
   /// The transparent color
-  RGBPixel transp_color;
+  csRGBpixel transp_color;
   /// Mean color used when texture mapping is disabled.
-  RGBPixel mean_color;
+  csRGBpixel mean_color;
 
 public:
   ///
@@ -97,7 +97,7 @@ public:
   void AdjustSizePo2 ();
 
   /// Get the transparent color as a RGB pixel
-  RGBPixel *get_transparent ()
+  csRGBpixel *get_transparent ()
   { return &transp_color; }
 
   /// Create a new texture object (should be implemented by heirs)
@@ -215,31 +215,46 @@ public:
  * Stub implementation only at the moment. Materials are not
  * yet implemented.
  */
-class csMaterialMM : public iMaterialHandle
+class csMaterialHandle : public iMaterialHandle
 {
 protected:
   /// A texture.
-  iTextureHandle* texture;
+  iTextureHandle *texture;
+  /// The flat color of the material
+  csRGBpixel flat_color;
+  /// Material reflection parameters
+  float diffuse, ambient, reflection;
   /// Original material.
-  iMaterial* material;
+  iMaterial *material;
 
 public:
   ///
-  csMaterialMM (iMaterial* material);
+  csMaterialHandle (iMaterial* material);
   ///
-  virtual ~csMaterialMM ();
+  csMaterialHandle (iTextureHandle* texture);
+  ///
+  virtual ~csMaterialHandle ();
 
   /// Release the original material (iMaterial).
   void FreeMaterial ();
 
-  ///
-  void SetTexture (iTextureHandle* texture) { csMaterialMM::texture = texture; }
-
   ///---------------------- iMaterialHandle implementation ----------------------
   DECLARE_IBASE;
 
-  ///
-  virtual iTextureHandle* GetTexture () { return texture; }
+  /**
+   * Get a texture from the material.
+   */
+  virtual iTextureHandle *GetTexture () { return texture; }
+  /**
+   * Get the flat color. If the material has a texture assigned, this
+   * will return the mean texture color.
+   */
+  virtual void GetFlatColor (csRGBpixel &oColor) { oColor = flat_color; }
+  /**
+   * Get light reflection parameters for this material.
+   */
+  virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection)
+  { oDiffuse = diffuse; oAmbient = ambient; oReflection = reflection; }
 };
 
 /**
@@ -277,7 +292,7 @@ protected:
   /// List of textures.
   csTexVector textures;
 
-  // Private class used to keep a list of objects derived from csMaterialMM
+  // Private class used to keep a list of objects derived from csMaterialHandle
   class csMatVector : public csVector
   {
   public:
@@ -288,16 +303,16 @@ protected:
     virtual ~csMatVector ()
     { DeleteAll (); }
     // Shortcut to avoid typecasts
-    csMaterialMM *Get (int index)
-    { return (csMaterialMM *)csVector::Get (index); }
+    csMaterialHandle *Get (int index)
+    { return (csMaterialHandle *)csVector::Get (index); }
     // Free a single texture
     virtual bool FreeItem (csSome Item)
     {
-      if (Item) ((csMaterialMM *)Item)->DecRef ();
+      if (Item) ((csMaterialHandle *)Item)->DecRef ();
       return true;
     }
     // Add a material to this list
-    int Push (csMaterialMM *what)
+    int Push (csMaterialHandle *what)
     { what->IncRef (); return csVector::Push (what); }
   };
 

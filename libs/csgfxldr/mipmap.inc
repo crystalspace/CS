@@ -56,14 +56,14 @@ static void MIPMAP_NAME (unsigned w, unsigned h
 #if defined (MIPMAP_ALPHA)
   , UByte *src, UByte *dst
 #elif defined (MIPMAP_PALETTED)
-  , UByte *src, RGBPixel *dst, RGBPixel *pal
+  , UByte *src, csRGBpixel *dst, csRGBpixel *pal
 #  ifdef MIPMAP_TRANSPARENT
   , UByte transp
 #  endif
 #else
-  , RGBPixel *src, RGBPixel *dst
+  , csRGBpixel *src, csRGBpixel *dst
 #  ifdef MIPMAP_TRANSPARENT
-  , RGBPixel transp
+  , csRGBpixel transp
 #  endif
 #endif
   )

@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/csevent.h"
+#include "ievent.h"
 
 unsigned short ScanCodeToChar [128] =
 {

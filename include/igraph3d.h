@@ -38,7 +38,7 @@ struct iTextureManager;
 struct iTextureHandle;
 struct iMaterialHandle;
 struct iHalo;
-struct RGBPixel;
+struct csRGBpixel;
 struct csPixelFormat;
 
 #define CS_FOG_FRONT		0
@@ -61,7 +61,7 @@ struct csPixelFormat;
 #define CS_FX_MASK_ALPHA	0x000000FF	// alpha = 0..FF (opaque..transparent)
 
 /// Macro for easier setting of alpha bits into mixmode
-#define CS_FX_SETALPHA(alpha)	(CS_FX_ALPHA | UInt (alpha * CS_FX_MASK_ALPHA))
+#define CS_FX_SETALPHA(alpha)	(CS_FX_ALPHA | uint (alpha * CS_FX_MASK_ALPHA))
 
 /// Vertex Structure for use with G3DPolygonDP and G3DPolygonDFP
 class G3DVertex
@@ -164,8 +164,8 @@ struct G3DPolygonDP : public G3DPolygonDFP
   iPolygonTexture* poly_texture;
 
   /**
-   * AlphaValue of the polygon. Ranges from 0 to 100. 0 means opaque, 100 is 
-   * completely transparent.
+   * AlphaValue of the polygon. Ranges from 0 to 255.
+   * 0 means opaque, 255 is completely transparent.
    */
   int alpha;
 

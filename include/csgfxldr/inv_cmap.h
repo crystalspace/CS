@@ -83,7 +83,7 @@
  * if red is bigger). Thus it is adviced to use same resolution for R and G.
  * If someone can find out why it happens, he is free to do it -- A.Z.
  */
-extern void csInverseColormap (int colors, RGBPixel *colormap,
+extern void csInverseColormap (int colors, csRGBpixel *colormap,
   int rbits, int gbits, int bbits, UByte *&rgbmap,
   ULong *dist_buf = NULL);
 

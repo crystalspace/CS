@@ -24,7 +24,6 @@
 #include "ogl_g3dcom.h"
 #include "csgeom/polyclip.h"
 #include "ievent.h"
-#include "cssys/csevent.h"
 
 IMPLEMENT_IBASE (csOpenGLProcBackBuffer)
   IMPLEMENTS_INTERFACE (iGraphics3D)
@@ -254,7 +253,7 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
       glReadPixels (0,0, width, height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
 		    buffer);
 
-      RGBPixel *dst = tex_0->get_image_data();
+      csRGBpixel *dst = tex_0->get_image_data();
       UShort bb = 8 - pfmt.BlueBits;
       UShort gb = 8 - pfmt.GreenBits;
       UShort rb = 8 - pfmt.RedBits;

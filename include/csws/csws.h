@@ -28,8 +28,6 @@
  *   |--[ csVector ]            	// Vector of some objects (FreeItem = NOP)
  *   |    |--[ csStrVector ]    	// Vector of strings (FreeItem = delete[])
  *   |    +--[ csObjVector ]    	// ... csBase heirs (FreeItem = delete (csBase *))
- *   |--[ csEvent ]             	// Windowing System event
- *   |--[ csEventQueue ]        	// Event queue class
  *   |--[ csGraphicsPipeline ]  	// Deferred drawing pipeline
  *   +--[ csComponent ]         	// Windowing System component
  *        |--[ csMouse ]		// Mouse cursor
@@ -60,7 +58,6 @@ class csRect;
 class csVector;
 class csStrVector;
 class csObjVector;
-class csEvent;
 class csEventQueue;
 class csGraphicsPipeline;
 class csComponent;
@@ -81,6 +78,7 @@ class csApp;
 struct iVFS;
 struct iGraphics2D;
 struct iGraphics3D;
+struct iEvent;
 
 // CrystalSpace headers
 #include "cswsaux.h"

@@ -85,7 +85,7 @@ public:
   virtual void SetText (const char *iText);
 
   /// Handle input events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Draw the menu item
   virtual void Draw ();
@@ -243,13 +243,13 @@ public:
   virtual void Draw ();
 
   /// Handle input events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Pre-handle keyboard events to catch hotkeys
-  virtual bool PreHandleEvent (csEvent &Event);
+  virtual bool PreHandleEvent (iEvent &Event);
 
   /// Pass a event to current item
-  bool CurrentHandleEvent (csEvent &Event);
+  bool CurrentHandleEvent (iEvent &Event);
 
   /// Recalculate menu size (called after each menu item insertion)
   virtual void PlaceItems ();

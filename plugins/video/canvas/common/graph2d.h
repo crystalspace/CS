@@ -62,7 +62,7 @@ public:
   /// True if visual is full-screen
   bool FullScreen;
   /// 256-color palette
-  RGBPixel *Palette;
+  csRGBpixel *Palette;
   /// true if some palette entry is already allocated
   bool PaletteAlloc[256];
   // The counter that is incremented inside BeginDraw and decremented in FinishDraw
@@ -227,7 +227,7 @@ public:
   { return FullScreen; }
 
   /// Get the palette (if there is one)
-  virtual RGBPixel *GetPalette ()
+  virtual csRGBpixel *GetPalette ()
   { return pfmt.PalEntries ? Palette : NULL; }
 
   /// Query pixel R,G,B at given screen location
@@ -245,7 +245,7 @@ public:
   /// Create an off screen canvas
   virtual iGraphics2D *CreateOffScreenCanvas
   (int width, int height, void *buffer, bool alone_hint, 
-   csPixelFormat *pfmt = NULL, RGBPixel *palette = NULL, int pal_size = 0);
+   csPixelFormat *pfmt = NULL, csRGBpixel *palette = NULL, int pal_size = 0);
 
 
 protected:

@@ -25,15 +25,13 @@
 #include "csutil/csbase.h"
 #include "cssys/csevent.h"
 
-// Default event queue size
+// Default event queue size: the queue will automatically grow
+// when the queue will overflow.
 #define DEF_EVENT_QUEUE_LENGTH  256
 
 /**
- * This class represents a windowing system event queue.<p>
- * Each application have its own event queue. Any component can
- * manipulate event queue via its app field, since event queue
- * can be reached through csApp::EventQueue() method (for example,
- * to clear event queue (caution!) call app->EventQueue()->Clear()).
+ * This class represents a general system event queue.
+ * The system driver contains an object of this class.
  * <p>
  * The implemented event queue is limited thread-safe. There are some
  * primitive spinlocks acquired/released in critical sections.
@@ -41,7 +39,7 @@
 class csEventQueue : public csBase
 {
   /// The queue itself
-  volatile csEvent **EventQueue;
+  volatile iEvent **EventQueue;
   /// Queue head and tail pointers
   volatile size_t evqHead, evqTail;
   /// The maximum queue length
@@ -56,9 +54,9 @@ public:
   virtual ~csEventQueue ();
 
   /// Put a event into queue
-  void Put (csEvent *Event);
+  void Put (iEvent *Event);
   /// Get next event from queue or NULL
-  csEvent *Get ();
+  iEvent *Get ();
   /// Clear event queue
   void Clear ();
   /// Query if queue is empty

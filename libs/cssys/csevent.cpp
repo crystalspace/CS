@@ -21,11 +21,16 @@
 #include "cssysdef.h"
 #include "cssys/csevent.h"
 
+IMPLEMENT_IBASE (csEvent)
+  IMPLEMENTS_INTERFACE (iEvent)
+IMPLEMENT_IBASE_END
+
 csEvent::csEvent (cs_time iTime, int eType, int kCode, int kChar, int kModifiers)
 {
+  CONSTRUCT_IBASE (NULL);
   Time = iTime;
   Type = eType;
-  Category = SubCategory = UnusedField = 0;
+  Category = SubCategory = Flags = 0;
   Key.Code = kCode;
   Key.Char = kChar;
   Key.Modifiers = kModifiers;
@@ -34,9 +39,10 @@ csEvent::csEvent (cs_time iTime, int eType, int kCode, int kChar, int kModifiers
 csEvent::csEvent (cs_time iTime, int eType, int mx, int my,
   int mButton, int mModifiers)
 {
+  CONSTRUCT_IBASE (NULL);
   Time = iTime;
   Type = eType;
-  Category = SubCategory = UnusedField = 0;
+  Category = SubCategory = Flags = 0;
   Mouse.x = mx;
   Mouse.y = my;
   Mouse.Button = mButton;
@@ -46,9 +52,10 @@ csEvent::csEvent (cs_time iTime, int eType, int mx, int my,
 csEvent::csEvent (cs_time iTime, int eType, int jn, int jx, int jy,
   int jButton, int jModifiers)
 {
+  CONSTRUCT_IBASE (NULL);
   Time = iTime;
   Type = eType;
-  Category = SubCategory = UnusedField = 0;
+  Category = SubCategory = Flags = 0;
   Joystick.number = jn;
   Joystick.x = jx;
   Joystick.y = jy;
@@ -58,9 +65,16 @@ csEvent::csEvent (cs_time iTime, int eType, int jn, int jx, int jy,
 
 csEvent::csEvent (cs_time iTime, int eType, int cCode, void *cInfo)
 {
+  CONSTRUCT_IBASE (NULL);
   Time = iTime;
   Type = eType;
-  Category = SubCategory = UnusedField = 0;
+  Category = SubCategory = Flags = 0;
   Command.Code = cCode;
   Command.Info = cInfo;
+  if (eType == csevBroadcast)
+    Flags = CSEF_BROADCAST;
+}
+
+csEvent::~csEvent ()
+{
 }

@@ -65,38 +65,38 @@ class csVector3Ptr(csVector3):
 
 csVector3.__str__ = new.instancemethod(cspacec.csVector3___str__, None, csVector3)
 
-class RGBPixel:
+class csRGBpixel:
     def __init__(self,this):
         self.this = this
 
     __setmethods__ = {
-        "red" : cspacec.RGBPixel_red_set,
-        "green" : cspacec.RGBPixel_green_set,
-        "blue" : cspacec.RGBPixel_blue_set,
-        "alpha" : cspacec.RGBPixel_alpha_set,
+        "red" : cspacec.csRGBpixel_red_set,
+        "green" : cspacec.csRGBpixel_green_set,
+        "blue" : cspacec.csRGBpixel_blue_set,
+        "alpha" : cspacec.csRGBpixel_alpha_set,
     }
     def __setattr__(self,name,value):
         if (name == "this") or (name == "thisown"): self.__dict__[name] = value; return
-        method = RGBPixel.__setmethods__.get(name,None)
+        method = csRGBpixel.__setmethods__.get(name,None)
         if method: return method(self,value)
         self.__dict__[name] = value
     __getmethods__ = {
-        "red" : cspacec.RGBPixel_red_get,
-        "green" : cspacec.RGBPixel_green_get,
-        "blue" : cspacec.RGBPixel_blue_get,
-        "alpha" : cspacec.RGBPixel_alpha_get,
+        "red" : cspacec.csRGBpixel_red_get,
+        "green" : cspacec.csRGBpixel_green_get,
+        "blue" : cspacec.csRGBpixel_blue_get,
+        "alpha" : cspacec.csRGBpixel_alpha_get,
     }
     def __getattr__(self,name):
-        method = RGBPixel.__getmethods__.get(name,None)
+        method = csRGBpixel.__getmethods__.get(name,None)
         if method: return method(self)
         raise AttributeError,name
     def __repr__(self):
-        return "<C RGBPixel instance at %s>" % (self.this,)
-class RGBPixelPtr(RGBPixel):
+        return "<C csRGBpixel instance at %s>" % (self.this,)
+class csRGBpixelPtr(csRGBpixel):
     def __init__(self,this):
         self.this = this
         self.thisown = 0
-        self.__class__ = RGBPixel
+        self.__class__ = csRGBpixel
 
 
 
@@ -336,7 +336,7 @@ class iImage(iBase):
         return val
     def GetPalette(*args):
         val = apply(cspacec.iImage_GetPalette,args)
-        if val: val = RGBPixelPtr(val) 
+        if val: val = csRGBpixelPtr(val) 
         return val
     def Clone(*args):
         val = apply(cspacec.iImage_Clone,args)

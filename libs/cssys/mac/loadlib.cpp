@@ -41,9 +41,8 @@ csLibraryHandle csLoadLibrary (const char *iName)
   theError = GetSharedLibrary (theLibName, kPowerPCCFragArch, kReferenceCFrag,
     &libID, (Ptr*)&pfnDllInitialize, errorString);
 
-  if (theError == noErr)
-    if (pfnDllInitialize)
-      (*pfnDllInitialize) ();
+  if ((theError == noErr) && pfnDllInitialize)
+    pfnDllInitialize ();
 
   return (csLibraryHandle)libID;
 }

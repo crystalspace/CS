@@ -67,7 +67,7 @@ void csTextureMM::CreateMipmaps ()
 {
   if (!image) return;
 
-  RGBPixel *tc = transp ? &transp_color : (RGBPixel *)NULL;
+  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
 
   image->IncRef ();
 
@@ -154,33 +154,51 @@ void csTextureMM::AdjustSizePo2 ()
     image->Rescale (newwidth, newheight);
 }
 
-//---------------------------------------------------------- csMaterialMM -----//
+//----------------------------------------------------- csMaterialHandle -----//
 
-IMPLEMENT_IBASE (csMaterialMM)
+IMPLEMENT_IBASE (csMaterialHandle)
   IMPLEMENTS_INTERFACE (iMaterialHandle)
 IMPLEMENT_IBASE_END
 
-csMaterialMM::csMaterialMM (iMaterial* material)
+csMaterialHandle::csMaterialHandle (iMaterial* material)
 {
   CONSTRUCT_IBASE (NULL);
-  csMaterialMM::material = material;
-  if (material)
+  if ((csMaterialHandle::material = material))
   {
     material->IncRef ();
     texture = material->GetTexture ();
+    if (texture) texture->IncRef ();
+    material->GetReflection (diffuse, ambient, reflection);
+    material->GetFlatColor (flat_color);
   }
 }
 
-csMaterialMM::~csMaterialMM ()
+csMaterialHandle::csMaterialHandle (iTextureHandle* texture)
+{
+  CONSTRUCT_IBASE (NULL);
+  material = NULL;
+  diffuse = 0.7; ambient = 0; reflection = 0;
+  if ((csMaterialHandle::texture = texture))
+    texture->IncRef ();
+}
+
+csMaterialHandle::~csMaterialHandle ()
 {
   FreeMaterial ();
 }
 
-void csMaterialMM::FreeMaterial ()
+void csMaterialHandle::FreeMaterial ()
 {
-  if (!material) return;
-  material->DecRef ();
-  material = NULL;
+  if (material)
+  {
+    material->DecRef ();
+    material = NULL;
+  }
+  if (texture)
+  {
+    texture->DecRef ();
+    texture = NULL;
+  }
 }
 
 //------------------------------------------------------------ csTexture -----//
@@ -254,7 +272,7 @@ void csTextureManager::ResetPalette ()
 iMaterialHandle* csTextureManager::RegisterMaterial (iMaterial* material)
 {
   if (!material) return NULL;
-  csMaterialMM* mat = new csMaterialMM (material);
+  csMaterialHandle *mat = new csMaterialHandle (material);
   materials.Push (mat);
   return mat;
 }
@@ -262,15 +280,14 @@ iMaterialHandle* csTextureManager::RegisterMaterial (iMaterial* material)
 iMaterialHandle* csTextureManager::RegisterMaterial (iTextureHandle* txthandle)
 {
   if (!txthandle) return NULL;
-  csMaterialMM* mat = new csMaterialMM (NULL);
-  mat->SetTexture (txthandle);
+  csMaterialHandle *mat = new csMaterialHandle (txthandle);
   materials.Push (mat);
   return mat;
 }
 
 void csTextureManager::UnregisterMaterial (iMaterialHandle* handle)
 {
-  csMaterialMM* mat = (csMaterialMM*)handle;
+  csMaterialHandle* mat = (csMaterialHandle*)handle;
   int idx = materials.Find (mat);
   if (idx >= 0) materials.Delete (idx);
 }

@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "glide2common2d.h"
 #include "csutil/scf.h"
-#include "cssys/csevent.h"
 #include "cssys/csinput.h"
 #if defined(OS_BE)	// dh: is this OS-dependence necessary? 
 #include "cssys/be/beitf.h"
@@ -108,7 +107,7 @@ void csGraphics2DGlideCommon::SetRGB(int i, int r, int g, int b)
 void csGraphics2DGlideCommon::SetTMUPalette(int tmu)
 {
   GuTexPalette p;
-  RGBPixel pal;
+  csRGBpixel pal;
   
   for(int i=0; i<256; i++)
   {

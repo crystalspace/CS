@@ -374,8 +374,8 @@
 #      define CS_ASSERT(x)						\
          if (!(x))							\
          {								\
-           fprintf (stderr, __FILE__ ":%d: failed assertion '" #x "'\n",	\
-           int(__LINE__));						\
+           fprintf (stderr, __FILE__ ":%d: failed assertion '" #x "'\n",\
+             int(__LINE__));						\
            DEBUG_BREAK;							\
          }
 #    endif

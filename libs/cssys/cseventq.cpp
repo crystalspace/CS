@@ -37,7 +37,7 @@ csEventQueue::~csEventQueue ()
     delete[] EventQueue;
 }
 
-void csEventQueue::Put (csEvent *Event)
+void csEventQueue::Put (iEvent *Event)
 {
 again:
   Lock ();
@@ -57,7 +57,7 @@ again:
   Unlock ();
 }
 
-csEvent *csEventQueue::Get ()
+iEvent *csEventQueue::Get ()
 {
   if (IsEmpty ())
     return NULL;
@@ -67,7 +67,7 @@ csEvent *csEventQueue::Get ()
     size_t oldTail = evqTail++;
     if (evqTail == Length)
       evqTail = 0;
-    csEvent *ev = (csEvent *)EventQueue [oldTail];
+    iEvent *ev = (iEvent *)EventQueue [oldTail];
     Unlock ();
     return ev;
   } /* endif */
@@ -75,7 +75,7 @@ csEvent *csEventQueue::Get ()
 
 void csEventQueue::Clear ()
 {
-  csEvent *ev;
+  iEvent *ev;
   while ((ev = Get()) != NULL)
     { delete ev; }
 }
@@ -90,8 +90,8 @@ void csEventQueue::Resize (size_t iLength)
 
   Lock ();
   // Remember old event queue and allocate a new one
-  volatile csEvent **oldEventQueue = EventQueue;
-  EventQueue = (volatile csEvent**) new csEvent *[iLength];
+  volatile iEvent **oldEventQueue = EventQueue;
+  EventQueue = (volatile iEvent**) new iEvent *[iLength];
   // Remember old values of head & tail and set both to 0
   size_t oldHead = evqHead, oldTail = evqTail;
   evqHead = evqTail = 0;

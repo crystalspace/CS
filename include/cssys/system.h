@@ -33,7 +33,6 @@
 #include "iproto.h"
 #include "iauth.h"
 
-class csEventQueue;
 class csKeyboardDriver;
 class csMouseDriver;
 class csIniFile;
@@ -186,9 +185,9 @@ class csSystemDriver : public iSystem
     virtual ~csEventOutlet ();
 
     // Create a event object on behalf of the system driver.
-    virtual csEvent *CreateEvent ();
+    virtual iEvent *CreateEvent ();
     // Put a previously created event into system event queue.
-    virtual void PutEvent (csEvent *Event);
+    virtual void PutEvent (iEvent *Event);
     // Put a keyboard event into event queue.
     virtual void Key (int iKey, int iChar, bool iDown);
     // Put a mouse event into event queue.
@@ -323,7 +322,7 @@ public:
   virtual void NextFrame ();
 
   /// Pass a single event to all plugins until one eats it
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Sleep for given number of 1/1000 seconds (very inacurate)
   virtual void Sleep (int /*SleepTime*/) {}

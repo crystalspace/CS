@@ -37,7 +37,7 @@ public:
   virtual void Draw ();
 
   /// Handle input events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 };
 
 #endif // __CSTTLBAR_H__

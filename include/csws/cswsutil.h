@@ -54,7 +54,7 @@ public:
   virtual void SetState (int mask, bool enable);
 
   /// Handle input events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
 protected:
   /// Rebuild window list

@@ -224,7 +224,7 @@ void csButton::Draw ()
   csComponent::Draw ();
 }
 
-bool csButton::HandleEvent (csEvent &Event)
+bool csButton::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
@@ -246,13 +246,13 @@ bool csButton::HandleEvent (csEvent &Event)
           return true;
         case cscmdStaticHotKeyEvent:
         {
-          csEvent *ev = (csEvent *)Event.Command.Info;
+          iEvent *ev = (iEvent *)Event.Command.Info;
           ev->Key.Code = CSKEY_SPACE;
           return csButton::HandleEvent (*ev);
         }
         case cscmdStaticMouseEvent:
         {
-          csEvent *ev = (csEvent *)Event.Command.Info;
+          iEvent *ev = (iEvent *)Event.Command.Info;
           if (app->MouseOwner)
           {
             int dX = 0, dY = 0;
@@ -339,7 +339,7 @@ bool csButton::HandleEvent (csEvent &Event)
   return csComponent::HandleEvent (Event);
 }
 
-bool csButton::PostHandleEvent (csEvent &Event)
+bool csButton::PostHandleEvent (iEvent &Event)
 {
   if (parent->GetState (CSS_FOCUSED)
    && GetState (CSS_VISIBLE)
@@ -348,7 +348,7 @@ bool csButton::PostHandleEvent (csEvent &Event)
   return csComponent::PostHandleEvent (Event);
 }
 
-bool csButton::HandleKeyPress (csEvent &Event)
+bool csButton::HandleKeyPress (iEvent &Event)
 {
   // Check hot key
   if (!GetState (CSS_DISABLED))

@@ -102,7 +102,7 @@ void csTreeItem::SuggestSize (int &w, int &h)
   h += TREEITEM_YSPACE * 2;
 }
 
-bool csTreeItem::HandleEvent (csEvent &Event)
+bool csTreeItem::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
@@ -578,7 +578,7 @@ static bool do_findtext (csComponent *child, void *param)
   return (strcmp (child->GetText (), (char *)param) == 0);
 }
 
-bool csTreeCtrl::HandleEvent (csEvent &Event)
+bool csTreeCtrl::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

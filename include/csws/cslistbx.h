@@ -63,7 +63,7 @@ public:
   virtual ~csListBoxItem ();
 
   /// Handle input events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Draw the menu item
   virtual void Draw ();
@@ -278,7 +278,7 @@ public:
     csListBoxFrameStyle iFrameStyle = cslfsThickRect);
 
   /// Handle external events and generate timeouts
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Draw the list box
   virtual void Draw ();

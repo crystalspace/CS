@@ -138,7 +138,7 @@ void csScrollBar::Draw ()
   return;
 }
 
-bool csScrollBar::HandleEvent (csEvent &Event)
+bool csScrollBar::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

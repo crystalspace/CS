@@ -48,8 +48,8 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
   else
   {
     Format = CS_IMGFMT_TRUECOLOR;
-    Data = new RGBPixel [Width * Height];
-    RGBPixel *dst = (RGBPixel *)Data;
+    Data = new csRGBpixel [Width * Height];
+    csRGBpixel *dst = (csRGBpixel *)Data;
     Palette = NULL;
     int rs = 8 - pfmt->RedBits;
     int gs = 8 - pfmt->GreenBits;
@@ -94,5 +94,5 @@ csScreenShot::~csScreenShot ()
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
     delete [] (UByte *)Data;
   else
-    delete [] (RGBPixel *)Data;
+    delete [] (csRGBpixel *)Data;
 }

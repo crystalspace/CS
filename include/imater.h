@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 
 struct iTextureHandle;
+struct csRGBpixel;
 
 SCF_VERSION (iMaterial, 0, 0, 1);
 
@@ -29,15 +30,22 @@ SCF_VERSION (iMaterial, 0, 0, 1);
  * This class represents a material as seen from the engine
  * view. You need to register this to the texture manager to get
  * a handle to an internal compiled material.
- * This interface is a stub for later implementation. Currently
- * the only function is to get a texture from it.
  */
 struct iMaterial : public iBase
 {
   /**
-   * Get a texture from the material (stub).
+   * Get a texture from the material.
    */
-  virtual iTextureHandle* GetTexture () = 0;
+  virtual iTextureHandle *GetTexture () = 0;
+  /**
+   * Get the flat color. If the material has a texture assigned, this
+   * will return the mean texture color.
+   */
+  virtual void GetFlatColor (csRGBpixel &oColor) = 0;
+  /**
+   * Get light reflection parameters for this material.
+   */
+  virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection) = 0;
 };
 
 SCF_VERSION (iMaterialHandle, 0, 0, 1);
@@ -45,15 +53,22 @@ SCF_VERSION (iMaterialHandle, 0, 0, 1);
 /**
  * This class represents a material handle (compiled material)
  * for the 3D rasterizer.
- * This interface is a stub for later implementation. Currently
- * the only function is to get a texture from it.
  */
 struct iMaterialHandle : public iBase
 {
   /**
-   * Get a texture from the material (stub).
+   * Get a texture from the material.
    */
-  virtual iTextureHandle* GetTexture () = 0;
+  virtual iTextureHandle *GetTexture () = 0;
+  /**
+   * Get the flat color. If the material has a texture assigned, this
+   * will return the mean texture color.
+   */
+  virtual void GetFlatColor (csRGBpixel &oColor) = 0;
+  /**
+   * Get light reflection parameters for this material.
+   */
+  virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection) = 0;
 };
 
 #endif // __IMATER_H__

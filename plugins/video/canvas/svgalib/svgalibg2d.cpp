@@ -214,7 +214,7 @@ void csGraphics2DSVGALib::Close(void)
   csGraphics2D::Close ();
 }
 
-bool csGraphics2DSVGALib::HandleEvent (csEvent &/*Event*/)
+bool csGraphics2DSVGALib::HandleEvent (iEvent &/*Event*/)
 {
   static int mouse_button_mask [3] =
   { MOUSE_LEFTBUTTON, MOUSE_RIGHTBUTTON, MOUSE_MIDDLEBUTTON };

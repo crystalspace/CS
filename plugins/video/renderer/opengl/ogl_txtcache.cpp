@@ -366,10 +366,10 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
 		   rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
 
-  RGBPixel *src;
+  csRGBpixel *src;
   iImage *img = NULL;
   int tw, th;
-  RGBPixel *transp;
+  csRGBpixel *transp;
 
   if ((txt_mm->GetFlags () & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) 
       == CS_TEXTURE_3D)
@@ -410,7 +410,7 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 	  if ( (previmg->GetWidth() == 1) || (previmg->GetHeight() == 1) )
 	  {
 	    img=previmg;
-	    src = (RGBPixel *)previmg->GetImageData();
+	    src = (csRGBpixel *)previmg->GetImageData();
 	    int totalnewpixels = ( previmg->GetWidth() * previmg->GetHeight() ) / 2;
 	    for (int skippixel = 0; skippixel < totalnewpixels; skippixel ++)
 	      src[skippixel] = src[skippixel*2];
@@ -437,7 +437,7 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 	}
 	tw = img->GetWidth ();
 	th = img->GetHeight ();
-	src = (RGBPixel *)img->GetImageData ();
+	src = (csRGBpixel *)img->GetImageData ();
       }
 
       if (twhack || thhack)
@@ -449,10 +449,10 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
       if (transp)
       {
 	int pixels = tw * th;
-	RGBPixel *_src = src;
+	csRGBpixel *_src = src;
 	while (pixels--)
 	{
-	  // By default, every RGBPixel initializes its alpha component to 255.
+	  // By default, every csRGBpixel initializes its alpha component to 255.
 	  // Thus, we should just drop to zero alpha for transparent pixels, 
 	  // if any
 	  if (transp->eq (*_src))
@@ -489,10 +489,10 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
       if (transp)
       {
 	int pixels = tw * th;
-	RGBPixel *_src = src;
+	csRGBpixel *_src = src;
 	while (pixels--)
 	{
-	  // By default, every RGBPixel initializes its alpha component to 255.
+	  // By default, every csRGBpixel initializes its alpha component to 255.
 	  // Thus, we should just drop to zero alpha for transparent pixels,
 	  // if any
 	  if (transp->eq (*_src))

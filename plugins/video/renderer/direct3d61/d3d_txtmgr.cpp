@@ -50,8 +50,8 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
   int bsr = For2d ? iG3D->ScreenBsr : iG3D->TextureBsr;
 
   Image->SetFormat(CS_IMGFMT_TRUECOLOR);
-  RGBPixel* pPixels   = (RGBPixel *)Image->GetImageData();
-  int       NumPixels = get_size ();
+  csRGBpixel *pPixels   = (csRGBpixel *)Image->GetImageData();
+  int NumPixels = get_size ();
 
   bool transp = Parent->GetKeyColor ();
   UByte Transp_Red   = 0;
@@ -182,11 +182,11 @@ csTexture *csTextureMMDirect3D::NewTexture (iImage *Image)
 void csTextureMMDirect3D::ComputeMeanColor ()
 {
   int pixels = image->GetWidth () * image->GetHeight ();
-  RGBPixel *src = (RGBPixel *)image->GetImageData ();
+  csRGBpixel *src = (csRGBpixel *)image->GetImageData ();
   unsigned r = 0, g = 0, b = 0;
   for (int count = pixels; count; count--)
   {
-    RGBPixel pix = *src++;
+    csRGBpixel pix = *src++;
     r += pix.red;
     g += pix.green;
     b += pix.blue;
@@ -198,7 +198,7 @@ void csTextureMMDirect3D::ComputeMeanColor ()
     mean_color.blue  = b / pixels;
   }
   else
-    mean_color = RGBPixel (0, 0, 0);
+    mean_color = csRGBpixel (0, 0, 0);
 }
 
 void csTextureMMDirect3D::CreateMipmaps ()
@@ -216,7 +216,7 @@ void csTextureMMDirect3D::CreateMipmaps ()
   else
     m_pTexture2d = NULL;
 
-  RGBPixel *tc = transp ? &transp_color : (RGBPixel *)NULL;
+  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
 
   if (flags & CS_TEXTURE_3D)
   {

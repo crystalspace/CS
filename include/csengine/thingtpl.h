@@ -19,10 +19,12 @@
 #ifndef THINGTPL_H
 #define THINGTPL_H
 
+#include "csutil/cscolor.h"
+#include "csutil/garray.h"
+#include "csutil/flags.h"
 #include "csgeom/vector2.h"
 #include "csgeom/matrix3.h"
 #include "csobject/csobject.h"
-#include "csutil/cscolor.h"
 #include "csengine/arrays.h"
 #include "igraph3d.h"
 
@@ -38,11 +40,7 @@ class csThingTemplate : public csObject
 {
 private:
   /// Vertices of this template.
-  csVector3* vertices;
-  /// Number of vertices.
-  int num_vertices;
-  /// Maximum number of vertices.
-  int max_vertices;
+  DECLARE_GROWING_ARRAY (vertices, csVector3);
 
   /// List of polygontemplates.
   csPolygonTemplateArray polygons;
@@ -69,8 +67,10 @@ private:
    */
   /// Center of thing to determine distance from
   csVector3 curves_center;
-  /// scale param (the larger this param it, the more 
-  /// the curves are tesselated)
+  /**
+   * Curves scale parameter (the larger this param it, the more 
+   * the curves are tesselated).
+   */
   float curves_scale;  
 
 public:
@@ -113,7 +113,7 @@ public:
 
   ///
   int GetNumVertices ()
-  { return num_vertices; }
+  { return vertices.Length (); }
   ///
   csVector3& Vtex (int i)
   { return vertices[i]; }
@@ -135,28 +135,41 @@ public:
 };
 
 /**
+ * Polygon template flags; "normal" polygon flags
+ * such as CS_POLY_LIGHTING or CS_POLY_COLLDET
+ * are applicable as well. WARNING: make sure these
+ * flags don't use same bits as CS_POLY_XXX (as defined
+ * in ipolygon.h and csengine/polygon.h)
+ */
+/// Collision detection state mask for this polygon
+#define CS_POLYTPL_COLLDET		0x000c0000
+/// Enable collision detection
+#define CS_POLYTPL_COLLDET_ENABLE	0x00040000
+/// Disable collision detection
+#define CS_POLYTPL_COLLDET_DISABLE	0x00080000
+/// Polygon texturing mode mask
+#define CS_POLYTPL_TEXMODE		0x00030000
+/// No texturing
+#define CS_POLYTPL_TEXMODE_NONE		0x00000000
+/// Flat lighted texture
+#define CS_POLYTPL_TEXMODE_FLAT		0x00010000
+/// Gouraud lighted texture
+#define CS_POLYTPL_TEXMODE_GOURAUD	0x00020000
+/// Lightmapped texture
+#define CS_POLYTPL_TEXMODE_LIGHTMAP	0x00030000
+
+/**
  * A csPolygonTemplate is used by a ThingTemplate to describe a
  * template for a polygon.
  */
 class csPolygonTemplate
 {
 private:
-  /// A table of indices into the vertices of the parent Polygon
-  int* vertices_idx;
-  /// Number of vertices for this polygon.
-  int num_vertices;
-  /// Maximum number of vertices.
-  int max_vertices;
   /// Polygon name
   char *name;
+  /// A table of indices into the vertices of the parent thing template
+  DECLARE_GROWING_ARRAY (vertices, int);
 
-  /// Should this polygon be lighted?
-  int no_lighting;
-  /**
-   * Should this polygon have collision detection?
-   * 0 = default from polygon, 1 = yes, -1 = no
-   */
-  int colldet;
   /// The material used for this polygon.
   csMaterialHandle* material;
   /// The transformation from object space to texture space.
@@ -164,32 +177,26 @@ private:
   /// The transformation from object space to texture space.
   csVector3 v_obj2tex;
   /// Optional uv coordinates.
-  csVector2* uv_coords;
+  csVector2 *uv_coords;
+  /// Optional vertex colors
+  csColor *colors;
 
-  ///
+  /// Parent template object
   csThingTemplate* parent;
 
-  /// Flat color to use instead of texture map.
-  csColor flat_color;
-
-  /// True if flat_color should be used.
-  bool use_flat_color;
-
-  /// True if gouraud shading used.
-  bool use_gouraud;
-
 public:
+  /// Polygon flags
+  csFlags flags;
+
   ///
   csPolygonTemplate (csThingTemplate* iParent, char* iName, csMaterialHandle* iMaterial = NULL);
   ///
   virtual ~csPolygonTemplate ();
 
   ///
-  int GetMaxVertices () { return max_vertices; }
+  int GetNumVertices () { return vertices.Length (); }
   ///
-  int GetNumVertices () { return num_vertices; }
-  ///
-  int* GetVerticesIdx () { return vertices_idx; }
+  int* GetVerticesIdx () { return vertices.GetArray (); }
   ///
   void AddVertex (int v);
   ///
@@ -204,43 +211,15 @@ public:
   /// Get the pointer to the vertex uv coordinates.
   csVector2* GetUVCoords () { return uv_coords; }
 
-  /**
-   * Should this polygon have collision detection?
-   * 0 = default from polygon, 1 = yes, -1 = no
-   */
-  void SetCollDet (int cd) { colldet = cd; }
+  /// Set color value for specified vertex.
+  void SetColor (int i, const csColor &iCol);
 
-  /**
-   * Get the colldet value.
-   */
-  int GetCollDet () { return colldet; }
+  /// Same but given separate R,G,B values
+  void SetColor (int i, float iR, float iG, float iB)
+  { SetColor (i, csColor (iR, iG, iB)); }
 
-  /// Return true if flat color is used (instead of texture).
-  bool UseFlatColor () { return use_flat_color; }
-
-  /// Get the flat color for this polygon.
-  csColor& GetFlatColor () { return flat_color; }
-
-  /// Enable gouraud shading.
-  void SetGouraud () { use_gouraud = true; }
-
-  /// Is gouraud shading used?
-  bool UseGouraud () { return use_gouraud; }
-
-  /// Set the flat color for this polygon.
-  void SetFlatColor (float r, float g, float b)
-  {
-    flat_color.red = r;
-    flat_color.green = g;
-    flat_color.blue = b;
-    use_flat_color = true;
-  }
-
-  /// Set the flat color for this polygon.
-  void SetFlatColor (csColor& fc) { flat_color = fc; use_flat_color = true; }
-
-  /// Reset flat color (i.e. use texturing again).
-  void ResetFlatColor () { use_flat_color = false; }
+  /// Get the pointer to the vertex uv coordinates.
+  csColor* GetColors () { return colors; }
 
   /// Compute the plane normal of this polygon.
   void PlaneNormal (float* A, float* B, float* C);
@@ -257,11 +236,6 @@ public:
   csMatrix3& GetTextureMatrix () { return m_obj2tex; }
   ///
   csVector3& GetTextureVector () { return v_obj2tex; }
-
-  ///
-  void SetLighting (int yes) { no_lighting = !yes; }
-  ///
-  int IsLighted () { return !no_lighting; }
 };
 
 #endif /*THINGTPL_H*/

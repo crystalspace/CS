@@ -154,7 +154,7 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
   return true;
 }
 
-bool csGraphics2DOS2DIVE::HandleEvent (csEvent &Event)
+bool csGraphics2DOS2DIVE::HandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdCommandLineHelp)

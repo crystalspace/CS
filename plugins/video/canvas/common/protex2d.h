@@ -30,7 +30,7 @@ public:
   DECLARE_IBASE;
 
   // For 16bit procedural textures sharing texture manager
-  RGBPixel *image_buffer;
+  csRGBpixel *image_buffer;
 
   // Under certain circumstances, this class allocates its own memory, this flag
   // indicates whether or not this is the case and hence our responsibility.
@@ -47,7 +47,7 @@ public:
 
   virtual iGraphics2D *CreateOffScreenCanvas 
   (int width, int height, void *buffer, bool use8bit, 
-   csPixelFormat *ipfmt, RGBPixel *palette = NULL, int pal_size = 0);
+   csPixelFormat *ipfmt, csRGBpixel *palette = NULL, int pal_size = 0);
 };
 
 #endif // __PROTEX2D_H__

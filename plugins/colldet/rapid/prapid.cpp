@@ -72,7 +72,7 @@
 #define CD_MAX_COLLISION    1000
 
 // This array contains the colliding pairs
-static DECLARE_GROWING_ARRAY (CD_contact, csCollisionPair);
+static DECLARE_GROWING_ARRAY_REF (CD_contact, csCollisionPair);
 
 static int hits = 0;
 // Array of hits.

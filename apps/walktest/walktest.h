@@ -380,7 +380,7 @@ public:
   virtual void Create2DSprites(void);
 
   ///
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Override SetSystemDefaults to handle additional configuration defaults.
   virtual void SetSystemDefaults (csIniFile*);
@@ -434,12 +434,12 @@ public:
   ///
   void handle_key_pgdn (float, bool shift, bool alt, bool ctrl);
   ///
-  void eatkeypress (csEvent &Event);
+  void eatkeypress (iEvent &Event);
 
   /// Handle mouse click events
-  virtual void MouseClick1Handler(csEvent &Event);
-  virtual void MouseClick2Handler(csEvent &Event);
-  virtual void MouseClick3Handler(csEvent &Event);
+  virtual void MouseClick1Handler(iEvent &Event);
+  virtual void MouseClick2Handler(iEvent &Event);
+  virtual void MouseClick3Handler(iEvent &Event);
 
   void GfxWrite (int x, int y, int fg, int bg, char *str, ...);
 };

@@ -193,7 +193,7 @@ void csInputLine::Draw ()
   } /* endif */
 }
 
-bool csInputLine::HandleEvent (csEvent &Event)
+bool csInputLine::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

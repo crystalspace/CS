@@ -19,10 +19,10 @@
 
 #include "cssysdef.h"
 #include "csutil/util.h"
-#include "cssys/csevent.h"
 #include "simpinp.h"
 #include "iconsole.h"
 #include "isystem.h"
+#include "ievent.h"
 
 IMPLEMENT_IBASE (csSimpleInput)
   IMPLEMENTS_INTERFACE (iPlugIn)
@@ -66,7 +66,7 @@ bool csSimpleInput::Initialize (iSystem *iSys)
   return true;
 }
 
-bool csSimpleInput::HandleEvent (csEvent &Event)
+bool csSimpleInput::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

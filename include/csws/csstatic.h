@@ -70,14 +70,14 @@ enum
    * Sent by a label to its link when a "hot key pressed/depressed"
    * event is detected
    * <pre>
-   * IN:  (csEvent *)Event
+   * IN:  (iEvent *)Event
    * </pre>
    */
   cscmdStaticHotKeyEvent = 0x00000700,
   /**
    * Sent by a label to its link when a mouse event is detected
    * <pre>
-   * IN:  (csEvent *)Event
+   * IN:  (iEvent *)Event
    * </pre>
    */
   cscmdStaticMouseEvent,
@@ -151,10 +151,10 @@ public:
   virtual void Draw ();
 
   /// Handle input events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Pre-handle input events
-  virtual bool PostHandleEvent (csEvent &Event);
+  virtual bool PostHandleEvent (iEvent &Event);
 
   /// Return the recommended minimal size of static object
   virtual void SuggestSize (int &w, int &h);
@@ -171,7 +171,7 @@ protected:
   // Common part of constructors
   void Init (csStaticStyle iStyle);
   // Check if event is a hotkey event
-  bool IsHotKey (csEvent &Event);
+  bool IsHotKey (iEvent &Event);
   // Check if focused status of link has changed
   void CheckUp ();
 };

@@ -56,7 +56,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   if (!FontServer)
     return false;
 
-  Palette = new RGBPixel [256];
+  Palette = new csRGBpixel [256];
   pfmt.PalEntries = 256;
   pfmt.PixelBytes = 1;
   // Initialize pointers to default drawing methods
@@ -563,7 +563,7 @@ iImage *csGraphics2D::ScreenShot ()
 
 iGraphics2D *csGraphics2D::CreateOffScreenCanvas  
   (int width, int height, void *buffer, bool alone_hint, 
-   csPixelFormat *pfmt, RGBPixel *palette, int pal_size)
+   csPixelFormat *pfmt, csRGBpixel *palette, int pal_size)
 {
   // default return a software canvas
   csProcTextureSoft2D *tex = new csProcTextureSoft2D (System);

@@ -165,7 +165,7 @@ nomem2:
   // Allocate the memory to hold the image
   set_dimensions (Width, Height);
   if (ImageType == imgRGB)
-    exp_rowbytes = Width * sizeof (RGBPixel);
+    exp_rowbytes = Width * sizeof (csRGBpixel);
   else if (ImageType == imgPALALPHA)
     exp_rowbytes = Width * 2;
   else
@@ -185,7 +185,7 @@ nomem2:
 
   void *NewImage = NULL;
   if (ImageType == imgRGB)
-    NewImage = new RGBPixel [Width * Height];
+    NewImage = new csRGBpixel [Width * Height];
   else if (ImageType == imgPALALPHA)
     NewImage = new UByte [Width * Height * 2];
   else
@@ -203,11 +203,11 @@ nomem2:
   png_read_end (png, (png_infop)NULL);
 
   if (ImageType == imgRGB)
-    convert_rgba ((RGBPixel *)NewImage);
+    convert_rgba ((csRGBpixel *)NewImage);
   else if (ImageType == imgPAL)
   {
-    RGBcolor graypal [256];
-    RGBcolor *palette = NULL;
+    csRGBcolor graypal [256];
+    csRGBcolor *palette = NULL;
     int colors;
     if (!png_get_PLTE (png, info, (png_colorp *)&palette, &colors))
     {
@@ -224,7 +224,7 @@ nomem2:
   else // grayscale + alpha
   {
     // This is a grayscale image, build a grayscale palette
-    RGBPixel *palette = new RGBPixel [256];
+    csRGBpixel *palette = new csRGBpixel [256];
     int i, entries = (1 << bit_depth) - 1;
     for (i = 0; i <= entries; i++)
       palette [i].red = palette [i].green = palette [i].blue =

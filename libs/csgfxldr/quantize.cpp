@@ -80,7 +80,7 @@
 #  define B_BIT		8
 #endif
 
-// The mask for extracting just R/G/B from an ULong or RGBPixel
+// The mask for extracting just R/G/B from an ULong or csRGBpixel
 #ifdef CS_BIG_ENDIAN
 #  define RGB_MASK 0xffffff00
 #else
@@ -256,7 +256,7 @@ struct csColorBox
    * weight, i.e. number of pixels with this color. Thus resulting palette
    * is biased towards most often used colors.
    */
-  void GetMeanColor (RGBPixel &color)
+  void GetMeanColor (csRGBpixel &color)
   {
     unsigned rs = 0, gs = 0, bs = 0;
     unsigned count = 0;
@@ -279,7 +279,7 @@ struct csColorBox
     // we can end here with count == 0; avoid division by zero
     if (!count)
     {
-      color = RGBPixel (0, 0, 0);
+      color = csRGBpixel (0, 0, 0);
       return;
     }
     color.red   = ((rs + count / 2) << (8 - HIST_R_BITS)) / count;
@@ -342,7 +342,7 @@ void csQuantizeEnd ()
   delete [] hist; hist = NULL;
 }
 
-void csQuantizeCount (RGBPixel *image, int pixels, RGBPixel *transp)
+void csQuantizeCount (csRGBpixel *image, int pixels, csRGBpixel *transp)
 {
   // Sanity check
   if (!pixels || qState != qsCount)
@@ -376,7 +376,7 @@ void csQuantizeCount (RGBPixel *image, int pixels, RGBPixel *transp)
     }
 }
 
-void csQuantizeBias (RGBPixel *colors, int count, int weight)
+void csQuantizeBias (csRGBpixel *colors, int count, int weight)
 {
   // Sanity check
   if (!count || qState != qsCount)
@@ -403,7 +403,7 @@ void csQuantizeBias (RGBPixel *colors, int count, int weight)
   }
 }
 
-void csQuantizePalette (RGBPixel *&outpalette, int &maxcolors, RGBPixel *transp)
+void csQuantizePalette (csRGBpixel *&outpalette, int &maxcolors, csRGBpixel *transp)
 {
   // Sanity check
   if (qState != qsCount || !maxcolors)
@@ -554,11 +554,11 @@ void csQuantizePalette (RGBPixel *&outpalette, int &maxcolors, RGBPixel *transp)
 
   // Allocate the palette, if not already allocated
   if (!outpalette)
-    outpalette = new RGBPixel [maxcolors + delta];
+    outpalette = new csRGBpixel [maxcolors + delta];
 
   // Fill the unused colormap entries with zeros
   memset (&outpalette [boxcount + delta], 0,
-    (maxcolors - boxcount) * sizeof (RGBPixel));
+    (maxcolors - boxcount) * sizeof (csRGBpixel));
 
   // Now compute the mean color for each box
   for (count = 0; count < boxcount; count++)
@@ -570,14 +570,14 @@ void csQuantizePalette (RGBPixel *&outpalette, int &maxcolors, RGBPixel *transp)
     for (count = boxcount; count; count--)
       color_index [count] = color_index [count - 1] + 1;
     color_index [0] = 0;
-    outpalette [0] = RGBPixel (0, 0, 0);
+    outpalette [0] = csRGBpixel (0, 0, 0);
   }
 
   maxcolors = boxcount + delta;
 }
 
-void csQuantizeRemap (RGBPixel *image, int pixels,
-  UByte *&outimage, RGBPixel *transp)
+void csQuantizeRemap (csRGBpixel *image, int pixels,
+  UByte *&outimage, csRGBpixel *transp)
 {
   // Sanity check
   if (qState != qsCount && qState != qsRemap)
@@ -627,8 +627,8 @@ void csQuantizeRemap (RGBPixel *image, int pixels,
     }
 }
 
-void csQuantizeRemapDither (RGBPixel *image, int pixels, int pixperline,
-  RGBPixel *palette, int colors, UByte *&outimage, RGBPixel *transp)
+void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
+  csRGBpixel *palette, int colors, UByte *&outimage, csRGBpixel *transp)
 {
   // Sanity check
   if (qState != qsCount && qState != qsRemap)
@@ -658,7 +658,7 @@ void csQuantizeRemapDither (RGBPixel *image, int pixels, int pixperline,
   // Allocate the picture and the palette
   if (!outimage) outimage = new UByte [pixels];
 
-  RGBPixel *src = image;
+  csRGBpixel *src = image;
   UByte *dst = outimage;
   count = pixels;
 
@@ -677,7 +677,7 @@ void csQuantizeRemapDither (RGBPixel *image, int pixels, int pixperline,
     //
     // Even lines are traversed left to right, odd lines backwards.
 
-    RGBPixel *cursrc;
+    csRGBpixel *cursrc;
     UByte *curdst;
     int *curerr, *nexterr;
     int dir;
@@ -715,7 +715,7 @@ void csQuantizeRemapDither (RGBPixel *image, int pixels, int pixperline,
       cursrc += dir, curdst += dir,
       curerr += dir3, nexterr += dir3)
     {
-      RGBPixel srcpix = *cursrc;
+      csRGBpixel srcpix = *cursrc;
 
       if (transp && transp->eq (srcpix))
       {
@@ -741,7 +741,7 @@ void csQuantizeRemapDither (RGBPixel *image, int pixels, int pixperline,
                          ((b >> (8 - HIST_B_BITS)))];
       *curdst = pix;
 
-      RGBPixel realcolor = palette [pix];
+      csRGBpixel realcolor = palette [pix];
 
       err10r = r - realcolor.red;
       nexterr [0] = err01r + err10r * 3;		// * 3
@@ -773,8 +773,8 @@ void csQuantizeRemapDither (RGBPixel *image, int pixels, int pixperline,
   }
 }
 
-void csQuantizeRGB (RGBPixel *image, int pixels, int pixperline,
-  UByte *&outimage, RGBPixel *&outpalette, int &maxcolors, bool dither)
+void csQuantizeRGB (csRGBpixel *image, int pixels, int pixperline,
+  UByte *&outimage, csRGBpixel *&outpalette, int &maxcolors, bool dither)
 {
   csQuantizeBegin ();
 

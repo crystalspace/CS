@@ -24,6 +24,7 @@
 #include "csparser/loadinfo.h"
 
 struct iImage;
+struct csRGBcolor;
 class csTextureHandle;
 class csMaterialHandle;
 class csSkeletonLimb;
@@ -65,6 +66,8 @@ class csLoader
   static bool load_matrix (char* buf, csMatrix3 &m);
   /// Parse a vector definition
   static bool load_vector (char* buf, csVector3 &v);
+  /// Parse a color definition
+  static bool load_color (char *buf, csRGBcolor &c);
   /// Parse a polygon plane definition and return a new object
   static csPolyTxtPlane* load_polyplane (char* buf, char* name = NULL);
   /// Parse a collection definition and return a new object

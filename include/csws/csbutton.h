@@ -164,10 +164,10 @@ public:
   virtual void Draw ();
 
   /// Handle external events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Pre-handle keyboard events
-  virtual bool PostHandleEvent (csEvent &Event);
+  virtual bool PostHandleEvent (iEvent &Event);
 
   /// Override SetState method to redraw button if it is default
   virtual void SetState (int mask, bool enable);
@@ -191,7 +191,7 @@ protected:
   virtual void Press ();
 
   /// Handle a key down event (called for HandleEvent and PreHandleEvent)
-  bool HandleKeyPress (csEvent &Event);
+  bool HandleKeyPress (iEvent &Event);
 
   /// Deselect all button's neightbours in his group
   void DeselectNeighbours ();

@@ -23,7 +23,6 @@
 #define SYSDEF_CASE
 #include "cssysdef.h"
 #include "csengine/cspixmap.h"
-#include "cssys/csevent.h"
 #include "cssys/csinput.h"
 #include "qint.h"
 #include "igraph2d.h"
@@ -339,7 +338,7 @@ csRect csComponent::dragBound;
 
 bool csComponent::do_handle_event (csComponent *child, void *param)
 {
-  csEvent *Event = (csEvent *)param;
+  iEvent *Event = (iEvent *)param;
 
   switch (Event->Type)
   {
@@ -383,7 +382,7 @@ bool csComponent::do_handle_event (csComponent *child, void *param)
   } /* endswitch */
 }
 
-bool csComponent::HandleEvent (csEvent &Event)
+bool csComponent::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
@@ -550,7 +549,7 @@ AbortDrag:
 
 static bool do_prehandle_event (csComponent *child, void *param)
 {
-  csEvent *Event = (csEvent *)param;
+  iEvent *Event = (iEvent *)param;
 
   if (IS_MOUSE_EVENT (*Event))
   {
@@ -566,14 +565,14 @@ static bool do_prehandle_event (csComponent *child, void *param)
     return child->PreHandleEvent (*Event);
 }
 
-bool csComponent::PreHandleEvent (csEvent &Event)
+bool csComponent::PreHandleEvent (iEvent &Event)
 {
   return !!(ForEach (do_prehandle_event, &Event, IS_MOUSE_EVENT (Event)));
 }
 
 static bool do_posthandle_event (csComponent *child, void *param)
 {
-  csEvent *Event = (csEvent *)param;
+  iEvent *Event = (iEvent *)param;
 
   if (IS_MOUSE_EVENT (*Event))
   {
@@ -589,7 +588,7 @@ static bool do_posthandle_event (csComponent *child, void *param)
     return child->PostHandleEvent (*Event);
 }
 
-bool csComponent::PostHandleEvent (csEvent &Event)
+bool csComponent::PostHandleEvent (iEvent &Event)
 {
   return !!(ForEach (do_posthandle_event, &Event, IS_MOUSE_EVENT (Event)));
 }
@@ -1397,7 +1396,7 @@ bool csComponent::GetMousePosition (int &x, int &y)
   return bound.ContainsRel (x, y);
 }
 
-bool csComponent::HandleDragEvent (csEvent &Event, int BorderW, int BorderH)
+bool csComponent::HandleDragEvent (iEvent &Event, int BorderW, int BorderH)
 {
   switch (Event.Type)
   {
@@ -1663,7 +1662,7 @@ void csComponent::FindMaxFreeRect (csRect &area)
   SetMouse (oldMouse);
 }
 
-bool csComponent::CheckHotKey (csEvent &iEvent, char iHotKey)
+bool csComponent::CheckHotKey (iEvent &iEvent, char iHotKey)
 {
   if ((iEvent.Key.Modifiers & CSMASK_CTRL)
    || !(iEvent.Key.Modifiers & CSMASK_FIRST))

@@ -65,7 +65,7 @@ public:
   virtual bool Initialize (iSystem *iSys);
 
   /// Handle an input event
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Bind to a console
   virtual void Bind (iConsole *iCon);

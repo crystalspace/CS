@@ -35,7 +35,7 @@ public:
   csWsTest (iSystem *SysDriver);
 
   ///
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   virtual bool InitialSetup ();
 };
@@ -66,7 +66,7 @@ class cspExtDialog : public csDialog
 public:
   cspExtDialog (csComponent *iParent) : csDialog (iParent)
   { SetColor (CSPAL_DIALOG_BACKGROUND, cs_Color_Brown_L); }
-  virtual bool HandleEvent (csEvent &Event)
+  virtual bool HandleEvent (iEvent &Event)
   {
     csNotebook *nb = (csNotebook *)parent;
     if (Event.Type == csevCommand)
@@ -510,7 +510,7 @@ void csWsTest::NotebookDialog ()
   delete window;
 }
 
-bool csWsTest::HandleEvent (csEvent &Event)
+bool csWsTest::HandleEvent (iEvent &Event)
 {
   static csMouseCursorID mousecursors [] =
   {

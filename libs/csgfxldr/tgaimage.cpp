@@ -97,12 +97,12 @@ typedef char ImageIDField[256];
 
 static int mapped, rlencoded;
 
-static RGBPixel ColorMap[MAXCOLORS];
+static csRGBpixel ColorMap[MAXCOLORS];
 static int RLE_count = 0, RLE_flag = 0;
 
 static void readtga (UByte*& ptr, struct TGAheader* tgaP);
-static void get_map_entry (UByte*& ptr, RGBPixel* Value, int Size, bool alpha);
-static void get_pixel (UByte*& ptr, RGBPixel* dest, int Size, bool alpha);
+static void get_map_entry (UByte*& ptr, csRGBpixel* Value, int Size, bool alpha);
+static void get_pixel (UByte*& ptr, csRGBpixel* dest, int Size, bool alpha);
 
 bool ImageTgaFile::Load (UByte* iBuffer, ULong iSize)
 {
@@ -204,7 +204,7 @@ bool ImageTgaFile::Load (UByte* iBuffer, ULong iSize)
 
   // @@todo: avoid converting colormapped images into RGB,
   // instead pass a pointer to convert_pal8
-  RGBPixel *pixels = new RGBPixel [Width * Height];
+  csRGBpixel *pixels = new csRGBpixel [Width * Height];
 
   truerow = 0;
   baserow = 0;
@@ -268,7 +268,7 @@ static void readtga (UByte*& iBuffer, TGAheader* tgaP)
     iBuffer += tgaP->IDLength;
 }
 
-static void get_map_entry (UByte*& iBuffer, RGBPixel* Value, int Size, bool alpha)
+static void get_map_entry (UByte*& iBuffer, csRGBpixel* Value, int Size, bool alpha)
 {
   unsigned char j, k;
 
@@ -305,7 +305,7 @@ static void get_map_entry (UByte*& iBuffer, RGBPixel* Value, int Size, bool alph
   }
 }
 
-static void get_pixel (UByte*& iBuffer, RGBPixel* dest, int Size, bool alpha)
+static void get_pixel (UByte*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
 {
   static int Red, Grn, Blu, Alpha;
   static unsigned int l;

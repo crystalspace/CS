@@ -44,12 +44,12 @@ public:
    * these dimensions. If destroy is set to true then the supplied buffer
    * will be destroyed when the interfaces are.
    */ 
-  csImageMemory (int width, int height, RGBPixel *buffer, bool destroy);
+  csImageMemory (int width, int height, csRGBpixel *buffer, bool destroy);
 
   virtual ~csImageMemory ();
 
   /// Clears image to colour
-  void Clear (const RGBPixel &colour);
+  void Clear (const csRGBpixel &colour);
 
   /// Rescale the image to the given size
   virtual void Rescale (int NewWidth, int NewHeight);
@@ -58,7 +58,7 @@ public:
   virtual int GetFormat ()
   { return CS_IMGFMT_TRUECOLOR; }
   /// Get image palette (or NULL if no palette)
-  virtual RGBPixel *GetPalette ()
+  virtual csRGBpixel *GetPalette ()
   { return NULL; }
   /// Get alpha map for 8-bit paletted image.
   virtual UByte *GetAlpha ()

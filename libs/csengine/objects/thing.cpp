@@ -563,51 +563,83 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     p = NewPolygon (pt->GetMaterial ());
     p->SetName (pt->GetName());
     if (!pt->GetMaterial ()) p->SetMaterial (default_material);
-    csLightMapped* pol_lm = p->GetLightMapInfo ();
-    if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
     int* idx = pt->GetVerticesIdx ();
     for (j = 0 ; j < pt->GetNumVertices () ; j++)
       p->AddVertex (merge_vertices[idx[j]]);
-    p->flags.Set (CS_POLY_LIGHTING|CS_POLY_FLATSHADING,
-      (pt->IsLighted () ? CS_POLY_LIGHTING : 0) |
-      (pt->UseFlatColor () ? CS_POLY_FLATSHADING : 0));
-    if (pt->GetCollDet () == -1) p->flags.Reset (CS_POLY_COLLDET);
-    else if (pt->GetCollDet () == 1) p->flags.Set (CS_POLY_COLLDET);
-    if (pt->GetUVCoords ())
+
+    // Copy some of the flags from polygon template
+    p->flags.Set (CS_POLY_LIGHTING, pt->flags.Get ());
+
+    // Set collision detection flags, if needed
+    if ((pt->flags.Get () & CS_POLYTPL_COLLDET) == CS_POLYTPL_COLLDET_DISABLE)
+      p->flags.Reset (CS_POLY_COLLDET);
+    else if ((pt->flags.Get () & CS_POLYTPL_COLLDET) == CS_POLYTPL_COLLDET_ENABLE)
+      p->flags.Set (CS_POLY_COLLDET);
+
+    // Set polygon texture type
+    switch (pt->flags.Get () & CS_POLYTPL_TEXMODE)
     {
-      p->SetTextureType (POLYTXT_GOURAUD);
-      csGouraudShaded* gs = p->GetGouraudInfo ();
-      gs->Setup (p->GetVertices ().GetNumVertices ());
-      for (j = 0 ; j < pt->GetNumVertices () ; j++)
-        gs->SetUV (j, pt->GetUVCoords ()[j].x, pt->GetUVCoords ()[j].y);
-      if (pt->UseGouraud ())
-        gs->EnableGouraud (true);
+      case CS_POLYTPL_TEXMODE_NONE:
+        p->SetTextureType (POLYTXT_NONE);
+        break;
+      case CS_POLYTPL_TEXMODE_FLAT:
+        p->SetTextureType (POLYTXT_FLAT);
+        break;
+      case CS_POLYTPL_TEXMODE_GOURAUD:
+        p->SetTextureType (POLYTXT_GOURAUD);
+        break;
+      case CS_POLYTPL_TEXMODE_LIGHTMAP:
+      {
+        p->SetTextureType (POLYTXT_LIGHTMAP);
+        csPolyTexLightMap* pol_lm = p->GetLightMapInfo ();
+        if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
+        break;
+      }
     }
-    if (pt->UseFlatColor ()){
-      p->SetFlatColor( pt->GetFlatColor().red, pt->GetFlatColor().green, pt->GetFlatColor().blue);
+
+    csVector2 *uv_coords = pt->GetUVCoords ();
+    if (uv_coords)
+    {
+      csPolyTexFlat *fs = p->GetFlatInfo ();
+      if (fs)
+      {
+        fs->Setup (p);
+        for (j = 0; j < pt->GetNumVertices (); j++)
+          fs->SetUV (j, uv_coords [j].x, uv_coords [j].y);
+      }
     }
-    
+
+    csColor *colors = pt->GetColors ();
+    if (colors)
+    {
+      csPolyTexGouraud *gs = p->GetGouraudInfo ();
+      if (gs)
+      {
+        gs->Setup (p);
+        for (j = 0; j < pt->GetNumVertices (); j++)
+          gs->SetColor (j, colors [j]);
+      }
+    }
+
+    // This is unused for anything else than POLYTXT_LIGHTMAP;
+    // however it won't hurt even if it is not of this type.
     p->SetTextureSpace (pt->GetTextureMatrix (), pt->GetTextureVector ());
   }
 
-  for (i=0;i< tpl->GetNumCurveVertices();i++)
-  {
-    AddCurveVertex (tpl->CurveVertex (i),tpl->CurveTexel (i));
-  }
+  for (i = 0; i < tpl->GetNumCurveVertices (); i++)
+    AddCurveVertex (tpl->CurveVertex (i), tpl->CurveTexel (i));
 
-  for (i = 0 ; i < tpl->GetNumCurves () ; i++)
+  for (i = 0; i < tpl->GetNumCurves (); i++)
   {
-    csCurveTemplate* pt = tpl->GetCurve (i);
-    csCurve* p = pt->MakeCurve ();
+    csCurveTemplate *pt = tpl->GetCurve (i);
+    csCurve *p = pt->MakeCurve ();
     p->SetName(pt->GetName ());
     p->SetParent (this);
     p->SetSector( GetSector() );
 
     if (!pt->GetMaterialHandle ()) p->SetMaterialHandle (default_material);
     for (j = 0 ; j < pt->NumVertices () ; j++)
-    {
       p->SetControlPoint (j, pt->GetVertex (j));
-    }
     AddCurve (p);
   }
 

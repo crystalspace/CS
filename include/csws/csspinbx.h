@@ -121,7 +121,7 @@ public:
   virtual void Draw ();
 
   /// Handle external events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /// Set spin box type to numerical and set spin limits
   void SetLimits (int iMin, int iMax, char *iFormat = "%d");

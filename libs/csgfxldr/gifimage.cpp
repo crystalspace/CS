@@ -169,7 +169,7 @@ public:
 class GIFPalette
 {
 private:
-  RGBcolor palette[256];
+  csRGBcolor palette[256];
   int pal_size;
   int bitmask;
 
@@ -188,13 +188,13 @@ public:
     }
   }
 
-  RGBcolor operator () (int i) 
+  csRGBcolor operator () (int i) 
   { return palette [i & bitmask]; }
 
   int get_size () const { return pal_size; }
   int get_mask () const { return bitmask; }
 
-  RGBcolor *get_palette () { return palette; }
+  csRGBcolor *get_palette () { return palette; }
 };
 
 //---------------------------------------------------------------------------

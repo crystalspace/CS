@@ -19,7 +19,7 @@
 #ifndef __CS_MATERIAL_H__
 #define __CS_MATERIAL_H__
 
-#include "csutil/cscolor.h"
+#include "csgfxldr/rgbpixel.h"
 #include "csobject/csobject.h"
 #include "csobject/nobjvec.h"
 #include "imater.h"
@@ -36,7 +36,7 @@ class csMaterial : public iMaterial
 {
 private:
   /// flat shading color
-  csColor flat_color;
+  csRGBcolor flat_color;
   /// the texture of the material (can be NULL)
   csTextureHandle *texture;
 
@@ -46,7 +46,6 @@ private:
   float ambient;
   /// The reflectiveness of the material
   float reflection;
-
 
 public:
   /**
@@ -63,16 +62,15 @@ public:
    */
   virtual ~csMaterial ();
 
-
   /// Get the flat shading color
-  inline const csColor& GetFlatColor () const {return flat_color;}
+  inline csRGBcolor& GetFlatColor () { return flat_color; }
   /// Set the flat shading color
-  inline void SetFlatColor (const csColor& col) {flat_color = col;}
+  inline void SetFlatColor (const csRGBcolor& col) { flat_color = col; }
 
   /// Get the texture (if none NULL is returned)
-  inline csTextureHandle *GetTextureHandle () const {return texture;}
+  inline csTextureHandle *GetTextureHandle () const { return texture; }
   /// Set the texture (pass NULL to set no texture)
-  inline void SetTextureHandle (csTextureHandle *tex) {texture = tex;}
+  inline void SetTextureHandle (csTextureHandle *tex) { texture = tex; }
 
   /// Get diffuse reflection constant for the material
   inline float GetDiffuse () const { return diffuse; }
@@ -93,6 +91,10 @@ public:
   DECLARE_IBASE;
   ///
   virtual iTextureHandle* GetTexture ();
+  ///
+  virtual void GetFlatColor (csRGBpixel &oColor);
+  ///
+  virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection);
 };
 
 /**

@@ -263,7 +263,7 @@ int csGraphics2DGGI::translate_key (ggi_event *ev)
   return -1;
 }
 
-bool csGraphics2DGGI::HandleEvent (csEvent &/*Event*/)
+bool csGraphics2DGGI::HandleEvent (iEvent &/*Event*/)
 {
   ggi_event ev;
   struct timeval tv;

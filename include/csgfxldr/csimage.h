@@ -41,7 +41,7 @@ protected:
   /// The image data.
   void *Image;
   /// The image palette or NULL
-  RGBPixel *Palette;
+  csRGBpixel *Palette;
   /// The alpha map
   UByte *Alpha;
   /// Image file name
@@ -70,14 +70,14 @@ protected:
    * Used to convert an truecolor RGB image into requested format.
    * If the image loader cannot handle conversion itself, and the image
    * file is in a format that is different from the requested one,
-   * load the image in RGBPixel format and pass the pointer to this
+   * load the image in csRGBpixel format and pass the pointer to this
    * function which will handle the RGB -> target format conversion.
-   * NOTE: the pointer should be allocated with new RGBPixel [] and you should
+   * NOTE: the pointer should be allocated with new csRGBpixel [] and you should
    * not free it after calling this function: the function will free
    * the buffer itself if it is appropiate (or wont if the buffer
    * size/contents are appropiate for target format).
    */
-  void convert_rgba (RGBPixel *iImage);
+  void convert_rgba (csRGBpixel *iImage);
 
   /**
    * Used to convert an 8-bit indexed image into requested format.
@@ -87,14 +87,14 @@ protected:
    * the buffer itself if it is appropiate (or wont if the buffer
    * size/contents are appropiate for target format). Same about palette.
    */
-  void convert_pal8 (UByte *iImage, RGBPixel *iPalette, int nPalColors = 256);
+  void convert_pal8 (UByte *iImage, csRGBpixel *iPalette, int nPalColors = 256);
 
   /**
-   * Same as above but accepts an array of RGBcolor's as palette.
-   * The RGBcolor array is never freed, so its your responsability
+   * Same as above but accepts an array of csRGBcolor's as palette.
+   * The csRGBcolor array is never freed, so its your responsability
    * if you did it.
    */
-  void convert_pal8 (UByte *iImage, RGBcolor *iPalette, int nPalColors = 256);
+  void convert_pal8 (UByte *iImage, csRGBcolor *iPalette, int nPalColors = 256);
 
   /**
    * Free all image data: pixels and palette. Takes care of image data format.
@@ -102,7 +102,7 @@ protected:
   void FreeImage ();
 
   /// Return the closest color index to given. Fails if image has no palette.
-  int closest_index (RGBPixel *iColor);
+  int closest_index (csRGBpixel *iColor);
 
 public:
   DECLARE_IBASE;
@@ -112,8 +112,8 @@ public:
 
   /**************************** iImage interface *****************************/
   /**
-   * Get image data: returns either (RGBPixel *) or (unsigned char *)
-   * depending on format. Note that for RGBA images the RGBPixel structure
+   * Get image data: returns either (csRGBpixel *) or (unsigned char *)
+   * depending on format. Note that for RGBA images the csRGBpixel structure
    * contains the alpha channel as well, so GetAlpha (see below) method
    * will return NULL (because alpha is not stored separately, as for
    * paletted images).
@@ -138,7 +138,7 @@ public:
    * a pointer to a transparent color, the texels of that color are handled
    * differently.
    */
-  virtual iImage *MipMap (int step, RGBPixel *transp);
+  virtual iImage *MipMap (int step, csRGBpixel *transp);
 
   /// Set image file name
   virtual void SetName (const char *iName);
@@ -147,7 +147,7 @@ public:
   /// Get image format
   virtual int GetFormat ();
   /// Get image palette (or NULL if no palette)
-  virtual RGBPixel *GetPalette ();
+  virtual csRGBpixel *GetPalette ();
   /// Get alpha map for image
   virtual UByte *GetAlpha ();
   /// Convert the image to another format

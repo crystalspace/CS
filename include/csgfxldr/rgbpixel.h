@@ -21,29 +21,29 @@
 // Implementation Note: Eric Sunshine <sunshine@sunshineco.com>      1999/02/09
 //
 // Certain portions of the Crystal Space code have strict requirements about
-// the sizes of the structures RGBcolor, RGBPixel, and RGBPalEntry.  In
+// the sizes of the structures csRGBcolor, csRGBpixel, and RGBPalEntry.  In
 // particular, some pieces of code make these assumptions:
 //
-//    sizeof(RGBcolor) == 3       (byte:rgb)
-//    sizeof(RGBPixel) == 4       (byte:rgb + byte:alpha)
+//    sizeof(csRGBcolor) == 3       (byte:rgb)
+//    sizeof(csRGBpixel) == 4       (byte:rgb + byte:alpha)
 //    sizeof(RGBPalEntry) == 8    (byte:rgb + long:count)
 //
-// Originally, RGBPixel and RGBPalEntry were implemented as subclasses of
-// RGBcolor.  RGBPixel added a byte-sized "alpha" variable, and RGBPalEntry added
+// Originally, csRGBpixel and RGBPalEntry were implemented as subclasses of
+// csRGBcolor.  csRGBpixel added a byte-sized "alpha" variable, and RGBPalEntry added
 // a longword-sized "count" variable.  Thus, the original implementation made
-// the assumption that the compiler would not pad out the RGBcolor structure.
+// the assumption that the compiler would not pad out the csRGBcolor structure.
 //
 // Unfortunately in some environments (such as the NextStep compiler on m68k
-// hardware) the compiler does pad RGBcolor thus breaking the original
-// assumptions about structure sizes.  In such cases, RGBcolor is padded out
-// to 4 bytes instead of 3 and RGBPixel is padded out to 6 bytes instead of 4.
+// hardware) the compiler does pad csRGBcolor thus breaking the original
+// assumptions about structure sizes.  In such cases, csRGBcolor is padded out
+// to 4 bytes instead of 3 and csRGBpixel is padded out to 6 bytes instead of 4.
 //
 // This padding results in problems in code which makes assumptions about the
 // sizes of each structure.  In practice, problems were observed in code which
-// expected RGBPixel to be 4 bytes.
+// expected csRGBpixel to be 4 bytes.
 //
-// To work around this problem, I re-implemented RGBPixel and RGBPalEntry such
-// that they are no longer derived from RGBcolor.  An unfortunate side-effect
+// To work around this problem, I re-implemented csRGBpixel and RGBPalEntry such
+// that they are no longer derived from csRGBcolor.  An unfortunate side-effect
 // of this re-implementation is that code is no longer inherited, and is thus
 // duplicated in each class.  However, except for this minor point, the size of
 // each structure should now be more stable between various compilers.
@@ -59,20 +59,20 @@
  * An RGB color. This class is used whenever we need just R, G and B
  * information, such as when defining a color palette.
  */
-struct RGBcolor
+struct csRGBcolor
 {
   unsigned char red, green, blue;
-  RGBcolor () : red(0), green(0), blue(0) {}
-  RGBcolor (unsigned char r, unsigned char g, unsigned char b) :
+  csRGBcolor () : red(0), green(0), blue(0) {}
+  csRGBcolor (unsigned char r, unsigned char g, unsigned char b) :
     red(r), green(g), blue(b) {}
   void Set (unsigned char r, unsigned char g, unsigned char b)
   { red = r; green = g; blue = b; }
-  bool operator == (const RGBcolor& c) const
+  bool operator == (const csRGBcolor& c) const
   { return (c.red == red) && (c.green == green) && (c.blue == blue); }
-  bool operator != (const RGBcolor& c) const
+  bool operator != (const csRGBcolor& c) const
   { return !operator == (c); }
-  RGBcolor operator + (const RGBcolor& c) const
-  { return RGBcolor (c.red + red, c.green + green, c.blue + blue); }
+  csRGBcolor operator + (const csRGBcolor& c) const
+  { return csRGBcolor (c.red + red, c.green + green, c.blue + blue); }
 };
 
 // For optimized performance, we sometimes handle all R/G/B values simultaneously
@@ -87,45 +87,54 @@ struct RGBcolor
  * contains the Alpha channel component, which is used in images
  * (that potentially have an alpha channel).
  */
-struct RGBPixel
+struct csRGBpixel
 {
   /// The red, green, blue and alpha components
   unsigned char red, green, blue, alpha;
   /// Constructor (initialize to zero, alpha to 255)
-  RGBPixel () /* : red(0), green(0), blue(0), alpha(255) {} */
+  csRGBpixel () /* : red(0), green(0), blue(0), alpha(255) {} */
   { *(ULong *)this = (ULong)~RGB_MASK; }
   /// Copy constructor
-  RGBPixel (const RGBPixel& p)
+  csRGBpixel (const csRGBpixel& p)
   /* : red (p.red), green (p.green), blue (p.blue), alpha (p.alpha) {} */
   { *(ULong *)this = *(ULong *)&p; }
   /// Yet another copy constructor
-  RGBPixel (const RGBcolor& c) :
+  csRGBpixel (const csRGBcolor& c) :
     red (c.red), green (c.green), blue (c.blue), alpha (255) {}
   /// Initialize the pixel with some R/G/B value
-  RGBPixel (int r, int g, int b) :
+  csRGBpixel (int r, int g, int b) :
     red (r), green (g), blue (b), alpha (255) {}
-  /// Compare with an RGBcolor
-  bool operator == (const RGBcolor& c) const
+  /// Compare with an csRGBcolor
+  bool operator == (const csRGBcolor& c) const
   { return (c.red == red) && (c.green == green) && (c.blue == blue); }
-  /// Compare with an RGBPixel (including alpha value)
-  bool operator == (const RGBPixel& p) const
+  /// Compare with an csRGBpixel (including alpha value)
+  bool operator == (const csRGBpixel& p) const
   /* { return (p.red == red) && (p.green == green) && (p.blue == blue); } */
   { return *(ULong *)this == *(ULong *)&p; }
-  /// Check if the RGBPixel is not equal to an RGBcolor
-  bool operator != (const RGBcolor& c) const
+  /// Check if the csRGBpixel is not equal to an csRGBcolor
+  bool operator != (const csRGBcolor& c) const
   { return !operator == (c); }
-  /// Check if the RGBPixel is not equal to another RGBPixel (including alpha)
-  bool operator != (const RGBPixel& p) const
+  /// Check if the csRGBpixel is not equal to another csRGBpixel (including alpha)
+  bool operator != (const csRGBpixel& p) const
   { return !operator == (p); }
-  /// Construct an RGBcolor from this RGBPixel
-  operator RGBcolor () const
-  { return RGBcolor (red, green, blue); }
-  /// Compare with another RGBPixel, but don't take alpha into account
-  bool eq (const RGBPixel& p) const
+  /// Construct an csRGBcolor from this csRGBpixel
+  operator csRGBcolor () const
+  { return csRGBcolor (red, green, blue); }
+  /// Compare with another csRGBpixel, but don't take alpha into account
+  bool eq (const csRGBpixel& p) const
   { return ((*(ULong *)this) & RGB_MASK) == ((*(ULong *)&p) & RGB_MASK); }
   /// Get the pixel intensity
   int Intensity ()
   { return (red + green + blue) / 3; }
+  /// Assign given red/green/blue values to this pixel
+  void Set (const int r, const int g, const int b)
+  { red = r; green = g; blue = b; alpha = 255; }
+  /// Assign given red/green/blue/alpha values to this pixel
+  void Set (const int r, const int g, const int b, const int a)
+  { red = r; green = g; blue = b; alpha = a; }
+  void Set (const csRGBpixel& p)
+  /* : red (p.red), green (p.green), blue (p.blue), alpha (p.alpha) {} */
+  { *(ULong *)this = *(ULong *)&p; }
 };
 
 // We don't need RGB_MASK anymore

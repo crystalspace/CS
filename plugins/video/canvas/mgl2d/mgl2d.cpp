@@ -20,7 +20,6 @@
 #include "qint.h"
 #include "isystem.h"
 #include "csutil/csrect.h"
-#include "cssys/csevent.h"
 #include "plugins/video/canvas/common/scancode.h"
 #include "mgl2d.h"
 
@@ -378,7 +377,7 @@ int csGraphics2DMGL::TranslateKey (int mglKey)
   }
 }
 
-bool csGraphics2DMGL::HandleEvent (csEvent &/*Event*/)
+bool csGraphics2DMGL::HandleEvent (iEvent &/*Event*/)
 {
   event_t evt;
 

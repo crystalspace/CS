@@ -401,7 +401,7 @@ void csGridView::Draw()
   csComponent::Draw ();
 }
 
-bool csGridView::HandleEvent (csEvent& Event)
+bool csGridView::HandleEvent (iEvent& Event)
 {
   switch (Event.Type){
   case csevCommand:
@@ -553,7 +553,7 @@ void csGrid::Draw ()
   csComponent::Draw (); // views are children, so they are drawn here
 }
 
-bool csGrid::HandleEvent (csEvent &Event)
+bool csGrid::HandleEvent (iEvent &Event)
 {
   switch (Event.Type){
   case csevCommand:

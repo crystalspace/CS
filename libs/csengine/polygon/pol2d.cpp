@@ -211,7 +211,7 @@ void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 #undef INTERPOLATE1
 
 void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
-	int num_vertices, csVector2* orig_triangle, bool gouraud)
+  int num_vertices, csVector2* orig_triangle, bool gouraud)
 {
   // Note: Assumes clockwise vertices, otherwise wouldn't be visible :).
   // 'was_clipped' will be true if the triangle was clipped.
@@ -273,7 +273,7 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
       orig_triangle[_vbr].x -= EPSILON;
 
   for (j = 0 ; j < g3dpoly->num ; j++)
-    {
+  {
     float x = g3dpoly->vertices [j].sx;
     float y = g3dpoly->vertices [j].sy;
 
@@ -728,12 +728,11 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
   rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
     use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
-  if (poly->GetTextureType () == POLYTXT_GOURAUD
-   || poly->flags.Check (CS_POLY_FLATSHADING))
+  if (poly->GetTextureType () != POLYTXT_LIGHTMAP)
   {
-    // We have a gouraud shaded polygon.
+    // We are going to use DrawPolygonFX
     // Add all dynamic lights if polygon is dirty.
-    csPolygon3D* unsplit;
+    csPolygon3D *unsplit;
     unsplit = poly->GetBasePolygon ();
     const bool do_light = poly->flags.Check (CS_POLY_LIGHTING);
     if (do_light)
@@ -766,21 +765,21 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     }
 
     static G3DPolygonDPFX g3dpolyfx;
-    csVector2 orig_triangle[3];
-    csGouraudShaded* gs = poly->GetGouraudInfo ();
+
+    csPolyTexNone *ns = poly->GetNoTexInfo ();
+    csPolyTexFlat *fs = poly->GetFlatInfo ();
+    csPolyTexGouraud *gs = poly->GetGouraudInfo ();
 
     g3dpolyfx.num = num_vertices;
     g3dpolyfx.mat_handle = poly->GetMaterialHandle ();
     g3dpolyfx.inv_aspect = rview->GetInvFOV ();
 
-    csColor* po_colors = do_light && gs ? gs->GetColors () : NULL;
-    if (poly->flags.Check (CS_POLY_FLATSHADING)) g3dpolyfx.mat_handle = NULL;
+    csColor *po_colors = do_light && gs ? gs->GetColors () : NULL;
 
-    // We are going to use DrawPolygonFX.
     // Here we have to do a little messy thing because PreparePolygonFX()
     // still requires the original triangle that was valid before clipping.
-    float iz;
-    iz = 1. / unsplit->Vcam (0).z;
+    csVector2 orig_triangle[3];
+    float iz = 1. / unsplit->Vcam (0).z;
     g3dpolyfx.vertices[0].z = iz;
     iz *= rview->GetFOV ();
     orig_triangle[0].x = unsplit->Vcam (0).x * iz + rview->GetShiftX ();
@@ -798,41 +797,32 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     orig_triangle[2].x = unsplit->Vcam (2).x * iz + rview->GetShiftX ();
     orig_triangle[2].y = unsplit->Vcam (2).y * iz + rview->GetShiftY ();
 
-    if (g3dpolyfx.mat_handle)
+    if (g3dpolyfx.mat_handle->GetTexture () && fs)
     {
-      g3dpolyfx.vertices[0].u = gs->GetUVCoords ()[0].x;
-      g3dpolyfx.vertices[0].v = gs->GetUVCoords ()[0].y;
-      g3dpolyfx.vertices[1].u = gs->GetUVCoords ()[1].x;
-      g3dpolyfx.vertices[1].v = gs->GetUVCoords ()[1].y;
-      g3dpolyfx.vertices[2].u = gs->GetUVCoords ()[2].x;
-      g3dpolyfx.vertices[2].v = gs->GetUVCoords ()[2].y;
-      g3dpolyfx.mat_handle->GetTexture ()->GetMeanColor (g3dpolyfx.flat_color_r,
-        g3dpolyfx.flat_color_g, g3dpolyfx.flat_color_b);
+      g3dpolyfx.vertices[0].u = fs->GetUVCoords () [0].x;
+      g3dpolyfx.vertices[0].v = fs->GetUVCoords () [0].y;
+      g3dpolyfx.vertices[1].u = fs->GetUVCoords () [1].x;
+      g3dpolyfx.vertices[1].v = fs->GetUVCoords () [1].y;
+      g3dpolyfx.vertices[2].u = fs->GetUVCoords () [2].x;
+      g3dpolyfx.vertices[2].v = fs->GetUVCoords () [2].y;
     }
-    else
-    {
-      g3dpolyfx.flat_color_r = QRound (255 * poly->GetFlatColor ().red);
-      g3dpolyfx.flat_color_g = QRound (255 * poly->GetFlatColor ().green);
-      g3dpolyfx.flat_color_b = QRound (255 * poly->GetFlatColor ().blue);
-    }
+
     if (po_colors)
     {
-      g3dpolyfx.vertices[0].r = po_colors[0].red;
-      g3dpolyfx.vertices[0].g = po_colors[0].green;
-      g3dpolyfx.vertices[0].b = po_colors[0].blue;
-      g3dpolyfx.vertices[1].r = po_colors[1].red;
-      g3dpolyfx.vertices[1].g = po_colors[1].green;
-      g3dpolyfx.vertices[1].b = po_colors[1].blue;
-      g3dpolyfx.vertices[2].r = po_colors[2].red;
-      g3dpolyfx.vertices[2].g = po_colors[2].green;
-      g3dpolyfx.vertices[2].b = po_colors[2].blue;
+      g3dpolyfx.vertices[0].r = po_colors [0].red;
+      g3dpolyfx.vertices[0].g = po_colors [0].green;
+      g3dpolyfx.vertices[0].b = po_colors [0].blue;
+      g3dpolyfx.vertices[1].r = po_colors [1].red;
+      g3dpolyfx.vertices[1].g = po_colors [1].green;
+      g3dpolyfx.vertices[1].b = po_colors [1].blue;
+      g3dpolyfx.vertices[2].r = po_colors [2].red;
+      g3dpolyfx.vertices[2].g = po_colors [2].green;
+      g3dpolyfx.vertices[2].b = po_colors [2].blue;
     }
     PreparePolygonFX (&g3dpolyfx, vertices, num_vertices,
-    	orig_triangle, po_colors != NULL);
-    UInt mixmode = CS_FX_COPY;
-    if (gs) mixmode = gs->GetMixmode ();
+      orig_triangle, po_colors != NULL);
     rview->g3d->StartPolygonFX (g3dpolyfx.mat_handle,
-    	mixmode | ( po_colors ? CS_FX_GOURAUD : 0));
+      ns->GetMixmode () | (po_colors ? CS_FX_GOURAUD : 0));
     CalculateFogPolygon (rview, g3dpolyfx);
     rview->g3d->DrawPolygonFX (g3dpolyfx);
     rview->g3d->FinishPolygonFX ();

@@ -43,12 +43,12 @@ csSystemDriver::csEventOutlet::~csEventOutlet ()
   }
 }
 
-csEvent *csSystemDriver::csEventOutlet::CreateEvent ()
+iEvent *csSystemDriver::csEventOutlet::CreateEvent ()
 {
   return new csEvent ();
 }
 
-void csSystemDriver::csEventOutlet::PutEvent (csEvent *Event)
+void csSystemDriver::csEventOutlet::PutEvent (iEvent *Event)
 {
   if ((1 << Event->Type) & EnableMask)
     System->EventQueue.Put (Event);

@@ -552,7 +552,7 @@ bool csConsole::ConsoleExtension (const char *iCommand, ...)
   return rc;
 }
 
-bool csConsole::HandleEvent (csEvent &Event)
+bool csConsole::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

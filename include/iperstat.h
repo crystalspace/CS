@@ -21,6 +21,11 @@
 
 SCF_VERSION(iPerfStats, 0, 0, 1);
 
+/**
+ * The performance and statistics plugin.
+ * This plugin tracks and records all kinds of useful information
+ * while the program is running.
+ */
 struct iPerfStats : public iPlugIn
 {
   /// Set whether paused. Returns previous status
@@ -30,24 +35,26 @@ struct iPerfStats : public iPlugIn
   /// Reset all statistics back to zero
   virtual void ResetStats () = 0;
   /**
-   * The frames per second is really the resolution number of frames divided by 
-   * the time taken to complete them. Set to -1 to disable (the default)
+   * The frames per second is really the resolution number of frames
+   * divided by the time taken to complete them. Set to -1 to disable
+   * (the default). The resolution is the time interval in milliseconds
+   * in which a frames-per-second value is computed.
    */
-  virtual void SetResolution (int res) = 0;
+  virtual void SetResolution (int iMilSecs) = 0;
   /**
-   * Set the name of this section, which will be utilised if the stats are printed
-   * to file
+   * Set the name of this section, which will be utilised if the stats are
+   * printed to file.
    */
   virtual void SetName (const char *Name) = 0;
   /// Output stats to named file. If summary is true, you'll get a summary.
-  virtual void SetOutputFile (const char *Name,  bool summary) = 0;
+  virtual void SetOutputFile (const char *Name, bool summary) = 0;
 
   /// Get the current fps
   virtual float GetFPS () = 0;
   /**
-   * Start a new set of performance statistics as a subsection, with an optional
-   * name. If you intend to print all the stats to file then this name will
-   * identify the subsection.
+   * Start a new set of performance statistics as a subsection, with an
+   * optional name. If you intend to print all the stats to file then this
+   * name will identify the subsection.
    */
   virtual iPerfStats *StartNewSubsection (const char *name) = 0;
 
@@ -73,9 +80,4 @@ struct iPerfStats : public iPlugIn
    * load this plugin last (like in walktest) then set frame_num to one less.
    */
   virtual void DebugSetBreak (int frame_num) = 0;
-
-  //-------------------- iPlugIn implementation-----------------------------
-  virtual bool Initialize (iSystem *system) = 0;
-  /// This is set to receive the once per frame nothing  event
-  virtual bool HandleEvent (csEvent &event) = 0;
 };

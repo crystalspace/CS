@@ -80,7 +80,7 @@ void csTextureMMGlide::ComputeMeanColor ()
 {
   csTextureGlide *tex;
   int i, pixels;
-  RGBPixel *src;
+  csRGBpixel *src;
   unsigned r = 0, g = 0, b = 0;
   
   // find smallest mipmap around
@@ -96,7 +96,7 @@ void csTextureMMGlide::ComputeMeanColor ()
   
   while (i--)
   {
-    RGBPixel pix = *src++;
+    csRGBpixel pix = *src++;
     r += pix.red;
     g += pix.green;
     b += pix.blue;
@@ -110,7 +110,7 @@ void csTextureMMGlide::remap_mm ()
 {
   csTextureGlide *tex;
   int w, h, i;
-  RGBPixel* src;
+  csRGBpixel* src;
   UShort *dest;
   int x, y;
 

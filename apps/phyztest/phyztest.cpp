@@ -440,7 +440,7 @@ void Phyztest::NextFrame ()
   G3D->Print (NULL);
 }
 
-bool Phyztest::HandleEvent (csEvent &Event)
+bool Phyztest::HandleEvent (iEvent &Event)
 {
   if (superclass::HandleEvent (Event))
     return true;

@@ -29,9 +29,8 @@ IMPLEMENT_IBASE_END
 csMaterial::csMaterial ()
 {
   CONSTRUCT_IBASE (NULL);
-  // set defaults
-  // black flat shaded.
-  flat_color.Set(0.f,0.f,0.f);
+  // set default state to white flat shaded.
+  flat_color.Set (255, 255, 255);
   texture = NULL;
   diffuse = 0.7;
   ambient = 0.0;
@@ -49,9 +48,26 @@ csMaterial::~csMaterial ()
 //  delete texture;
 }
 
-iTextureHandle* csMaterial::GetTexture ()
+iTextureHandle *csMaterial::GetTexture ()
 {
-  return GetTextureHandle ()->GetTextureHandle ();
+  return texture ? texture->GetTextureHandle () : NULL;
+}
+
+void csMaterial::GetFlatColor (csRGBpixel &oColor)
+{
+  oColor = flat_color;
+  if (texture)
+  {
+    iTextureHandle *th = texture->GetTextureHandle ();
+    if (th) th->GetMeanColor (oColor.red, oColor.green, oColor.blue);
+  }
+}
+
+void csMaterial::GetReflection (float &oDiffuse, float &oAmbient, float &oReflection)
+{
+  oDiffuse = diffuse;
+  oAmbient = ambient;
+  oReflection = reflection;
 }
 
 //---------------------------------------------------------------------------

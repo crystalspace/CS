@@ -52,7 +52,7 @@ csColorWheel::~csColorWheel ()
   Bitmap = NULL;
 }
 
-bool csColorWheel::HandleEvent (csEvent &Event)
+bool csColorWheel::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

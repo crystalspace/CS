@@ -163,7 +163,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *parent_texman, csTe
       // In order to keep the palette synchronised we register ourselves with
       // this texture manager.
       iImage *im = (iImage*) new csImageMemory (width, height, 
-						(RGBPixel*) buffer, false);
+						(csRGBpixel*) buffer, false);
       dummy_soft_tex_mm = (csTextureMMSoftware *)
 	texman->RegisterTexture (im, CS_TEXTURE_2D | CS_TEXTURE_PROC);
       texman->PrepareTexture (dummy_soft_tex_mm);
@@ -231,7 +231,7 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
   // We set the 'destroy' parameter for csImageMemory to false as these buffers 
   // are destroyed else where.
   iImage *tex_image = new csImageMemory (width, height, 
-					 (RGBPixel*)buffer, false);
+					 (csRGBpixel*)buffer, false);
 
   soft_tex_mm = (csTextureMMSoftware *) texman->RegisterTexture (tex_image,
 						 CS_TEXTURE_PROC | CS_TEXTURE_2D);

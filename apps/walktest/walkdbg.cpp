@@ -886,7 +886,7 @@ void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int 
 	    thing->AddVertex (v3);
 	    thing->AddVertex (v4);
 	    csPolygon3D* p;
-	    csGouraudShaded* gs;
+	    csPolyTexGouraud* gs;
 	    csMatrix3 tx_matrix;
 	    csVector3 tx_vector;
 
@@ -895,8 +895,7 @@ void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int 
 	    p->SetTextureSpace (tx_matrix, tx_vector);
 	    p->SetTextureType (POLYTXT_GOURAUD);
 	    gs = p->GetGouraudInfo ();
-  	    gs->Setup (p->GetVertices ().GetNumVertices ());
-  	    gs->EnableGouraud (true);
+  	    gs->Setup (p);
   	    gs->SetUV (0, 0, 0); gs->SetUV (1, 1, 0); gs->SetUV (2, 1, 1);
 	    gs->AddColor (0, 1, 0, 0); gs->AddColor (1, 0, 1, 0); gs->AddColor (2, 0, 0, 1);
 	    p = thing->NewPolygon (white);
@@ -904,8 +903,7 @@ void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int 
 	    p->SetTextureSpace (tx_matrix, tx_vector);
 	    p->SetTextureType (POLYTXT_GOURAUD);
 	    gs = p->GetGouraudInfo ();
-  	    gs->Setup (p->GetVertices ().GetNumVertices ());
-  	    gs->EnableGouraud (true);
+  	    gs->Setup (p);
   	    gs->SetUV (0, 0, 0); gs->SetUV (1, 1, 0); gs->SetUV (2, 1, 1);
 	    gs->AddColor (0, 1, 0, 0); gs->AddColor (1, 0, 1, 0); gs->AddColor (2, 0, 0, 1);
 
@@ -914,8 +912,7 @@ void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int 
 	    p->SetTextureSpace (tx_matrix, tx_vector);
 	    p->SetTextureType (POLYTXT_GOURAUD);
 	    gs = p->GetGouraudInfo ();
-  	    gs->Setup (p->GetVertices ().GetNumVertices ());
-  	    gs->EnableGouraud (true);
+  	    gs->Setup (p);
   	    gs->SetUV (0, 0, 0); gs->SetUV (1, 1, 0); gs->SetUV (2, 1, 1);
 	    gs->AddColor (0, 1, 0, 0); gs->AddColor (1, 0, 1, 0); gs->AddColor (2, 0, 0, 1);
 	    p = thing->NewPolygon (white);
@@ -923,8 +920,7 @@ void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int 
 	    p->SetTextureSpace (tx_matrix, tx_vector);
 	    p->SetTextureType (POLYTXT_GOURAUD);
 	    gs = p->GetGouraudInfo ();
-  	    gs->Setup (p->GetVertices ().GetNumVertices ());
-  	    gs->EnableGouraud (true);
+  	    gs->Setup (p);
   	    gs->SetUV (0, 0, 0); gs->SetUV (1, 1, 0); gs->SetUV (2, 1, 1);
 	    gs->AddColor (0, 1, 0, 0); gs->AddColor (1, 0, 1, 0); gs->AddColor (2, 0, 0, 1);
 

@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "protex2d.h"
 #include "csutil/scf.h"
-#include "cssys/csevent.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 #include "ievent.h"
@@ -50,7 +49,7 @@ csProcTextureSoft2D::~csProcTextureSoft2D ()
 
 iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas 
   (int width, int height, void *buffer, bool use8bit, 
-   csPixelFormat *ipfmt, RGBPixel *palette, int pal_size)
+   csPixelFormat *ipfmt, csRGBpixel *palette, int pal_size)
 {
   Width = width;
   Height = height;
@@ -106,12 +105,12 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 
       // Here we are in a software context while sharing the texture manager
       // We therefor render to a 16bit frame buffer and then unpack into an 
-      // RGBPixel format from which the texture manager recalculates the 
+      // csRGBpixel format from which the texture manager recalculates the 
       // texture
       destroy_memory = true;
       Memory = new unsigned char[width*height*2];
 
-      image_buffer = (RGBPixel*) buffer;
+      image_buffer = (csRGBpixel*) buffer;
 
       UShort *dst = (UShort*)Memory;
       UShort bb = 8 - pfmt.BlueBits;
@@ -132,7 +131,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 
       destroy_memory = true;
       Memory = new unsigned char[width*height*4];
-      image_buffer = (RGBPixel*) buffer;
+      image_buffer = (csRGBpixel*) buffer;
       ULong *dst = (ULong*) Memory;
       for (int i = 0; i < width*height; i++, dst++)
 	*dst = (image_buffer[i].red << pfmt.RedShift) +
@@ -161,7 +160,7 @@ void csProcTextureSoft2D::Print (csRect *area)
 {
   if (image_buffer)
   {
-    RGBPixel *dst = image_buffer;
+    csRGBpixel *dst = image_buffer;
     if (pfmt.PixelBytes == 2)
     {
       // As we are in 16bit mode we unpack the 16 bit frame buffer into 

@@ -49,7 +49,7 @@ public:
    * An RGB value has four bytes: R, G, B, unused.
    * So there are 256*4 bytes in this array.
    */
-  RGBPixel palette [256];
+  csRGBpixel palette [256];
 
   /// Colors which are allocated.
   bool alloc [256];
@@ -65,7 +65,7 @@ public:
   int alloc_rgb (int r, int g, int b, int dist);
 
   /// Get a palette entry
-  inline RGBPixel &operator [] (int idx)
+  inline csRGBpixel &operator [] (int idx)
   { return palette [idx]; }
 
   /// Compute number of free palette entries
@@ -88,7 +88,7 @@ protected:
   void *pal2glob;
 
   /// The private palette
-  RGBPixel palette [256];
+  csRGBpixel palette [256];
 
   /// Number of used colors in palette
   int palette_size;
@@ -114,7 +114,7 @@ public:
   void remap_texture (csTextureManager *texman);
 
   /// Query the private texture colormap
-  RGBPixel *GetColorMap () { return palette; }
+  csRGBpixel *GetColorMap () { return palette; }
   /// Query the number of colors in the colormap
   int GetColorMapSize () { return palette_size; }
 

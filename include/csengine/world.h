@@ -987,7 +987,7 @@ public:
   virtual bool Initialize (iSystem* sys);
 
   /// We need to handle some events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   //--------------------- iWorld interface implementation ---------------------
 

@@ -107,7 +107,7 @@ error2:
       break;
     case CS_IMGFMT_TRUECOLOR:
       colortype = (format & CS_IMGFMT_ALPHA) ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB;
-      rowlen = Image->GetWidth () * sizeof (RGBPixel);
+      rowlen = Image->GetWidth () * sizeof (csRGBpixel);
       break;
     default:
       // unknown format
@@ -119,7 +119,7 @@ error2:
   /* set the palette if there is one. */
   if (colortype & PNG_COLOR_MASK_PALETTE)
   {
-    RGBPixel *pal = Image->GetPalette ();
+    csRGBpixel *pal = Image->GetPalette ();
     png_colorp palette = (png_colorp)malloc (256 * sizeof (png_color));
     for (int i = 0; i < 256; i++)
     {

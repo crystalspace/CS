@@ -26,7 +26,7 @@ class csScreenShot : public iImage
 {
   int Format;
   void *Data;
-  RGBPixel *Palette;
+  csRGBpixel *Palette;
   int Width, Height;
 public:
   DECLARE_IBASE;
@@ -49,7 +49,7 @@ public:
   virtual void Rescale (int NewWidth, int NewHeight)
   { (void) NewWidth; (void) NewHeight; }
   /// Create a new iImage which is a mipmapped version of this one.
-  virtual iImage *MipMap (int step, RGBPixel *transp)
+  virtual iImage *MipMap (int step, csRGBpixel *transp)
   { (void)step; (void)transp; return NULL; }
   /// Set image file name
   virtual void SetName (const char *iName)
@@ -61,7 +61,7 @@ public:
   virtual int GetFormat ()
   { return Format; }
   /// Get image palette (or NULL if no palette)
-  virtual RGBPixel *GetPalette ()
+  virtual csRGBpixel *GetPalette ()
   { return Palette; }
   /// Get alpha map for 8-bit paletted image.
   virtual UByte *GetAlpha ()

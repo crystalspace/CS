@@ -47,7 +47,7 @@ public:
   /// Destroy the color wheel object
   virtual ~csColorWheel ();
   /// Handle input events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
   /// Draw the wheel
   virtual void Draw ();
   /// Set H and S components

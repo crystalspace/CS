@@ -69,6 +69,14 @@ typedef unsigned int uint32;
 typedef int int32;
 #endif
 
+//------------------------------
+// Shortcuts for normal C types
+//------------------------------
+typedef unsigned char uchar;
+typedef unsigned short ushort;
+typedef unsigned int uint;	// AKA simply 'unsigned'
+typedef unsigned long ulong;
+
 // Time in milli (1/1000) seconds
 typedef unsigned long cs_time;
 

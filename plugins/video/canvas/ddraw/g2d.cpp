@@ -21,7 +21,6 @@
 #include "csutil/csstring.h"
 #include "video/canvas/ddraw/g2d.h"
 #include "cssys/win32/directdetection.h"
-#include "cssys/csevent.h"
 #include "csutil/csrect.h"
 #include "csutil/util.h"
 #include "isystem.h"
@@ -719,7 +718,7 @@ void csGraphics2DDDraw3::ClearSystemPalette ()
   ReleaseDC (NULL, hdc);
 }
 
-bool csGraphics2DDDraw3::CreateIdentityPalette (RGBPixel *p)
+bool csGraphics2DDDraw3::CreateIdentityPalette (csRGBpixel *p)
 {
   int i;
   LOGPALETTE Palette = { 0x300, 256 };

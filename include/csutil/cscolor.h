@@ -21,7 +21,7 @@
 
 /**
  * A class used to represent a color in RGB space.
- * This class is similar to RGBPixel and RGBcolor except that
+ * This class is similar to csRGBpixel and csRGBcolor except that
  * it uses floating-point values to store R,G,B values.
  */
 class csColor

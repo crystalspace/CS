@@ -258,7 +258,7 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
   int txtw = rgbimage->GetWidth();
   int txth = rgbimage->GetHeight();
   
-  RGBPixel *rgb = (RGBPixel *) rgbimage->GetImageData();
+  csRGBpixel *rgb = (csRGBpixel *) rgbimage->GetImageData();
 
   int lightcell_size = csLightMap::lightcell_size;
   int lightcell_shift = csLightMap::lightcell_shift;
@@ -441,10 +441,17 @@ void csRadPoly::Setup()
   lumel_y_axis -= lumel_origin;
 }
 
-void csRadPoly :: Lumel2World(csVector3& res, int x, int y)
+void csRadPoly::Lumel2World(csVector3& res, int x, int y)
 {
   // Quick getting lumel to world coords
   res = lumel_origin + x* lumel_x_axis + y * lumel_y_axis;
+}
+
+csColor csRadPoly::GetFlatColor() const
+{
+  csRGBpixel color;
+  polygon->GetMaterialHandle ()->GetFlatColor (color);
+  return csColor (color.red / 255.0, color.green / 255.0, color.blue / 255.0);
 }
 
 //--------------- csRadCurve -------------------------------------

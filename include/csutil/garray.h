@@ -20,35 +20,12 @@
 #ifndef __CS_GARRAY_H__
 #define __CS_GARRAY_H__
 
-/**
- * This is a macro that will declare a growable array variable that is able to 
- * contain a number of elements of given type.  It has an reference count, so 
- * if you do an IncRef each time you make use of it and an DecRef when you're 
- * done, the array will be automatically freed when there are no more 
- * references to it.<p> 
- * Methods:
- * <ul>
- * <li>void SetLimit (int) - set max number of values the array can hold
- * <li>int Limit () - query max number of values the array can hold
- * <li>void SetLength (int) - set the amount of elements that are actually used
- * <li>int Length () - query the amount of elements that are actually used
- * <li>void IncRef ()/void DecRef () - Reference counter management
- * <li>operator [] (int) - return a reference to Nth element of the array
- * </ul>
- * Usage examples:
- * <pre>
- * TYPEDEF_GROWING_ARRAY (csLightArray, csLight*);
- * TYPEDEF_GROWING_ARRAY (csIntArray, int);
- * static csLightArray la;
- * static csIntArray ia;
- * </pre>
- */
-#define TYPEDEF_GROWING_ARRAY(Name, Type)				\
+// Common macro for declarations below
+#define TYPEDEF_GROWING_ARRAY_EXT(Name, Type, ExtraConstructor, Extra)	\
   class Name								\
   {									\
     Type *root;								\
     int limit;								\
-    int RefCount;							\
     int length;								\
   public:								\
     int Limit () const							\
@@ -62,7 +39,7 @@
       { if (root) { free (root); root = NULL; } }			\
     }									\
     Name ()								\
-    { limit = length = RefCount = 0; root = NULL; }			\
+    { limit = length = 0; root = NULL; ExtraConstructor; }		\
     ~Name ()								\
     { SetLimit (0); }							\
     int Length () const							\
@@ -72,13 +49,6 @@
       length = iLength;							\
       int newlimit = ((length + (iGrowStep - 1)) / iGrowStep) * iGrowStep;\
       if (newlimit != limit) SetLimit (newlimit);			\
-    }									\
-    void IncRef ()							\
-    { RefCount++; }							\
-    void DecRef ()							\
-    {									\
-      if (RefCount == 1) SetLimit (0);					\
-      RefCount--;							\
     }									\
     Type &operator [] (int n)						\
     { return root [n]; }						\
@@ -93,7 +63,52 @@
       SetLength (length + 1, iGrowStep);				\
       memcpy (root + length - 1, &val, sizeof (Type));			\
     }									\
+    Extra								\
   }
+
+/**
+ * This is a macro that will declare a growable array variable that is able to 
+ * contain a number of elements of given type.<p>
+ * Methods:
+ * <ul>
+ * <li>void SetLimit (int) - set max number of values the array can hold
+ * <li>int Limit () - query max number of values the array can hold
+ * <li>void SetLength (int) - set the amount of elements that are actually used
+ * <li>int Length () - query the amount of elements that are actually used
+ * <li>operator [] (int) - return a reference to Nth element of the array
+ * </ul>
+ * Usage examples:
+ * <pre>
+ * TYPEDEF_GROWING_ARRAY (csLightArray, csLight*);
+ * TYPEDEF_GROWING_ARRAY (csIntArray, int);
+ * static csLightArray la;
+ * static csIntArray ia;
+ * </pre>
+ */
+#define TYPEDEF_GROWING_ARRAY(Name, Type)				\
+  TYPEDEF_GROWING_ARRAY_EXT (Name, Type, , )
+
+/**
+ * Same as TYPEDEF_GROWING_ARRAY but contains additionally an reference
+ * counter, so that the object can be shared among different clients.
+ * If you do an IncRef each time you make use of it and an DecRef when you're 
+ * done, the array will be automatically freed when there are no more 
+ * references to it.<p> 
+ * Methods:
+ * <ul>
+ * <li>void IncRef ()/void DecRef () - Reference counter management
+ * </ul>
+ */
+#define TYPEDEF_GROWING_ARRAY_REF(Name, Type)				\
+  TYPEDEF_GROWING_ARRAY_EXT (Name, Type, RefCount = 0,			\
+    int RefCount;							\
+    void IncRef ()							\
+    { RefCount++; }							\
+    void DecRef ()							\
+    {									\
+      if (RefCount == 1) SetLimit (0);					\
+      RefCount--;							\
+    })
 
 /**
  * This is a shortcut for above to declare a dummy class and a single
@@ -107,5 +122,11 @@
  */
 #define DECLARE_GROWING_ARRAY(Name, Type)				\
   TYPEDEF_GROWING_ARRAY(__##Name,Type) Name
+
+/**
+ * Same as above but declares an object which has a reference counter.
+ */
+#define DECLARE_GROWING_ARRAY_REF(Name, Type)				\
+  TYPEDEF_GROWING_ARRAY_REF(__##Name,Type) Name
 
 #endif // __CS_GARRAY_H__

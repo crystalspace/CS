@@ -60,7 +60,7 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   /// Does the user expect the buffer to seem to remain intact between frames?
   bool persistent;
 
-  /// Temporarty buffer to convert glReadPixels to RGBPixel
+  /// Temporarty buffer to convert glReadPixels to csRGBpixel
   char *buffer;
 
  public:
@@ -217,7 +217,7 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   virtual int GetNumPalEntries ()
   { return g2d->GetNumPalEntries (); }
 
-  virtual RGBPixel *GetPalette ()
+  virtual csRGBpixel *GetPalette ()
   { return g2d->GetPalette (); }
 
   virtual int GetTextWidth (int FontID, const char *text)
@@ -233,7 +233,7 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
 
   virtual iGraphics2D *CreateOffScreenCanvas 
   (int /*width*/, int /*height*/, void* /*buffer*/, bool /*hint*/, 
-   csPixelFormat* /*ipfmt = NULL*/, RGBPixel* /*palette = NULL*/, 
+   csPixelFormat* /*ipfmt = NULL*/, csRGBpixel* /*palette = NULL*/, 
    int /*pal_size = 0*/)
   { return NULL; }
 

@@ -23,7 +23,13 @@
 #include "csutil/csvector.h"
 #include "cscomp.h"
 
-///
+class csEvent;
+
+/**
+ * A keyboard accelerator is a invisible component which monitors
+ * all events and if it sees a keyboard event which matches one of
+ * the predefined combinations it emmits a corresponding event.
+ */
 class csKeyboardAccelerator : public csComponent
 {
   class csAccVector : public csVector
@@ -47,14 +53,14 @@ public:
   virtual ~csKeyboardAccelerator ();
 
   /// Insert a key->event conversion table element
-  void Event (int iKey, int iShifts, csEvent &iEvent);
+  void Event (int iKey, int iShifts, csEvent &iEv);
   /// Insert a key->command event conversion table element
   void Command (int iKey, int iShifts, int iCommand, void *iInfo = NULL);
   /// Insert a key->broadcast event conversion table element
   void Broadcast (int iKey, int iShifts, int iCommand, void *iInfo = NULL);
 
   /// The "core" function
-  virtual bool PostHandleEvent (csEvent &Event);
+  virtual bool PostHandleEvent (iEvent &Event);
 };
 
 #endif // __CSKEYACC_H__

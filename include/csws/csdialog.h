@@ -77,7 +77,7 @@ public:
   virtual void Draw ();
 
   /// Handle input events
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 
   /**
    * Enable/disable(dx<0||dy<0) automatic control placement in a grid fashion.

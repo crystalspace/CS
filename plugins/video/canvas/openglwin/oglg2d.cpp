@@ -139,7 +139,7 @@ void ClearSystemPalette()
 }
 
 
-void CreateIdentityPalette(RGBPixel *p)
+void CreateIdentityPalette(csRGBpixel *p)
 {
   int i;
   struct {

@@ -251,7 +251,7 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
     Image = new UByte [pixelcount];
   else
-    Image = new RGBPixel [pixelcount];
+    Image = new csRGBpixel [pixelcount];
 
   /* JSAMPLEs per row in output buffer */
   row_stride = cinfo.output_width * cinfo.output_components;
@@ -280,7 +280,7 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
         memcpy (((UByte *)Image) + bufp, buffer [0], row_stride);
       else
       { /* Grayscale image */
-        RGBPixel *out = ((RGBPixel *)Image) + bufp;
+        csRGBpixel *out = ((csRGBpixel *)Image) + bufp;
         for (i = 0; i < (int)cinfo.output_width; i++)
         {
           out->red = out->green = out->blue = buffer [0][i];
@@ -289,7 +289,7 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
       }
     else
     { /* rgb triplets */
-      RGBPixel *out = ((RGBPixel *)Image) + bufp;
+      csRGBpixel *out = ((csRGBpixel *)Image) + bufp;
       for (i = 0; i < (int)cinfo.output_width; i++)
         memcpy (out++, buffer [0] + i * 3, 3);
     }
@@ -299,7 +299,7 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
   /* Get palette */
   if (cinfo.quantize_colors)
   {
-    Palette = new RGBPixel [256];
+    Palette = new csRGBpixel [256];
     int cshift = 8 - cinfo.data_precision;
     for (i = 0; i < cinfo.actual_number_of_colors; i++)
     {

@@ -32,7 +32,7 @@ csTimer::csTimer (csComponent *iParent, unsigned iPeriod)
     start = app->GetCurrentTime ();
 }
 
-bool csTimer::HandleEvent (csEvent &Event)
+bool csTimer::HandleEvent (iEvent &Event)
 {
   if (!Stopped
    && (Event.Type == csevBroadcast)

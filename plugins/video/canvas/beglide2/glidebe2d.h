@@ -87,7 +87,7 @@ public:
 */
 protected:
   /// Called on every frame by system driver
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
   
   /// This method is used for GlideInWindow...
   void FXgetImage();

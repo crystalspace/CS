@@ -25,7 +25,7 @@
 #include "isystem.h"
 #include "itxtmgr.h"
 #include "imater.h"
-#include "cssys/csevent.h"
+#include "ievent.h"
 #include "csutil/csrect.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
@@ -72,7 +72,7 @@ bool funConsole::Initialize (iSystem *system)
   return succ;
 }
 
-bool funConsole::HandleEvent (csEvent &Event)
+bool funConsole::HandleEvent (iEvent &Event)
 {
   if (Event.Type == csevBroadcast
    && Event.Command.Code == cscmdSystemOpen

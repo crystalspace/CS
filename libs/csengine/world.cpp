@@ -53,7 +53,6 @@
 #include "csengine/radiosty.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
-#include "cssys/csevent.h"
 #include "csgfxldr/csimage.h"
 #include "csutil/util.h"
 #include "csutil/halogen.h"
@@ -62,6 +61,7 @@
 #include "ihalo.h"
 #include "itxtmgr.h"
 #include "igraph3d.h"
+#include "ievent.h"
 
 //---------------------------------------------------------------------------
 
@@ -636,7 +636,7 @@ bool csWorld::Initialize (iSystem* sys)
 }
 
 // Handle some system-driver broadcasts
-bool csWorld::HandleEvent (csEvent &Event)
+bool csWorld::HandleEvent (iEvent &Event)
 {
   if (Event.Type == csevBroadcast)
     switch (Event.Command.Code)

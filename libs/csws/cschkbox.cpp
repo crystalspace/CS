@@ -94,7 +94,7 @@ void csCheckBox::SetCheckBoxState (csCheckBoxState iNewState)
     parent->SendCommand (cscmdCheckBoxSwitched, (void *)this);
 }
 
-bool csCheckBox::HandleEvent (csEvent &Event)
+bool csCheckBox::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

@@ -49,7 +49,7 @@ public:
   virtual bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
   virtual void NextFrame ();
-  virtual bool HandleEvent (csEvent &Event);
+  virtual bool HandleEvent (iEvent &Event);
 };
 
 #endif // PHYZTEST_H

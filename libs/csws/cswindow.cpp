@@ -321,7 +321,7 @@ void csWindow::SetBorderSize (int w, int h)
   csComponent::SetRect (bound);
 }
 
-bool csWindow::HandleEvent (csEvent &Event)
+bool csWindow::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

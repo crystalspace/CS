@@ -122,18 +122,12 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
   p->AddVertex (p3);
 
   p->SetTextureType (POLYTXT_GOURAUD);
-  csGouraudShaded* gs = p->GetGouraudInfo ();
-  gs->Setup (p->GetVertices ().GetNumVertices ());
-  gs->EnableGouraud (true);
+  csPolyTexGouraud *gs = p->GetGouraudInfo ();
+  gs->Setup (p);
   gs->SetUV (0, 0, 0);
   gs->SetUV (1, 1, 0);
   gs->SetUV (2, 0, 1);
-  if (txt == 0)
-    p->SetFlatColor (
-    	rand1 (wall_max_red-wall_min_red)+wall_min_red,
-    	rand1 (wall_max_green-wall_min_green)+wall_min_green,
-    	rand1 (wall_max_blue-wall_min_blue)+wall_min_blue);
-
+  // this is not needed anyway?
   p->SetTextureSpace (t_m, t_v);
 
   return p;

@@ -161,7 +161,7 @@ static int blueloop (int);
  * changed.
  */
 
-void csInverseColormap (int colors, RGBPixel *colormap,
+void csInverseColormap (int colors, csRGBpixel *colormap,
   int rbits, int gbits, int bbits, UByte *&rgbmap, ULong *dist_buf)
 {
   int rnbits = 8 - rbits;

@@ -29,8 +29,8 @@ private:
   unsigned flags;
 
 public:
-  /// Constructor.
-  csFlags () : flags (0) { }
+  /// Constructor
+  csFlags (int Value = 0) : flags (Value) { }
 
   /// Initialize all flags to the given mask.
   void SetAll (unsigned value)

@@ -567,7 +567,7 @@ bool csNotebook::InsideTab (int iIndex, int x, int y)
     return true;
 }
 
-bool csNotebook::HandleEvent (csEvent &Event)
+bool csNotebook::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

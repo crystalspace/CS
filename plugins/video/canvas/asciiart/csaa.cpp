@@ -23,9 +23,9 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
-#include "cssys/csevent.h"
 #include "csutil/inifile.h"
 #include "isystem.h"
+#include "ievent.h"
 #include "qint.h"
 
 #include "csaa.h"

@@ -52,18 +52,18 @@ void csTextureMMInfinite::ComputeMeanColor ()
   // Compute a common palette for all three mipmaps
   csQuantizeBegin ();
 
-  RGBPixel *tc = transp ? &transp_color : NULL;
+  csRGBpixel *tc = transp ? &transp_color : NULL;
 
   for (i = 0; i < 4; i++)
     if (tex [i])
     {
       csTextureInfinite *t = (csTextureInfinite *)tex [i];
       if (!t->image) break;
-      csQuantizeCount ((RGBPixel *)t->image->GetImageData (),
+      csQuantizeCount ((csRGBpixel *)t->image->GetImageData (),
         t->get_size (), tc);
     }
 
-  RGBPixel *pal = palette;
+  csRGBpixel *pal = palette;
   palette_size = 256;
   csQuantizePalette (pal, palette_size, tc);
 
@@ -73,7 +73,7 @@ void csTextureMMInfinite::ComputeMeanColor ()
       csTextureInfinite *t = (csTextureInfinite *)tex [i];
       if (!t->image) break;
 
-      csQuantizeRemap ((RGBPixel *)t->image->GetImageData (),
+      csQuantizeRemap ((csRGBpixel *)t->image->GetImageData (),
         t->get_size (), t->bitmap, tc);
 
       // Very well. Now we don'tex need the iImage anymore, so free it
