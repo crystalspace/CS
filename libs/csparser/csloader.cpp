@@ -3919,6 +3919,7 @@ bool csLoader::LoadLibrary (char* buf)
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (TEXTURES)
     CS_TOKEN_TABLE (MATERIALS)
+    CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (THING)
     CS_TOKEN_TABLE (SPRITE)
     CS_TOKEN_TABLE (SOUNDS)
@@ -3962,6 +3963,18 @@ bool csLoader::LoadLibrary (char* buf)
         case CS_TOKEN_SOUNDS:
           if (!LoadSounds (params))
             return false;
+          break;
+        case CS_TOKEN_MESHOBJ:
+          {
+            csMeshFactoryWrapper* t = (csMeshFactoryWrapper*)Engine->meshobj_factories.FindByName (name);
+            if (!t)
+            {
+              t = new csMeshFactoryWrapper ();
+              t->SetName (name);
+              Engine->meshobj_factories.Push (t);
+            }
+            LoadMeshObjectFactory (t, params);
+          }
           break;
         case CS_TOKEN_SPRITE:
           {
@@ -4238,9 +4251,18 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	{
 	  iBase* mof = plug->Parse (params,
 	      (iEngine*)QUERY_INTERFACE (csEngine::current_engine, iEngine));
-	  iMeshObjectFactory* mof2 = QUERY_INTERFACE (mof, iMeshObjectFactory);
-	  stemp->SetMeshObjectFactory (mof2);
-	  mof2->DecRef ();
+	  if (!mof)
+	  {
+	    CsPrintf (MSG_FATAL_ERROR, "Plugin '%s' did not return a factory!\n",
+	    	str);
+	    fatal_exit (0, false);
+	  }
+	  else
+	  {
+	    iMeshObjectFactory* mof2 = QUERY_INTERFACE (mof, iMeshObjectFactory);
+	    stemp->SetMeshObjectFactory (mof2);
+	    mof2->DecRef ();
+	  }
 	}
         break;
 

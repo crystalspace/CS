@@ -41,7 +41,7 @@ struct iSystem;
 /**
  * A frame for 3D sprite animation.
  */
-class csFrame : public iSpriteFrame
+class csSpriteFrame : public iSpriteFrame
 {
 private:
   int animation_index;
@@ -56,9 +56,9 @@ private:
 
 public:
   ///
-  csFrame (int anm_idx, int tex_idx);
+  csSpriteFrame (int anm_idx, int tex_idx);
   ///
-  virtual ~csFrame ();
+  virtual ~csSpriteFrame ();
 
   ///
   void SetTexIndex (int tex_idx) { texturing_index = tex_idx; }
@@ -95,16 +95,16 @@ public:
 /**
  * An action frameset for a 3D sprite animation.
  */
-class csSpriteAction : public iSpriteAction
+class csSpriteAction2 : public iSpriteAction
 {
 public:
   /// Initialize a action object
-  csSpriteAction ();
+  csSpriteAction2 ();
   /// Destroy this action object
-  virtual ~csSpriteAction ();
+  virtual ~csSpriteAction2 ();
 
   /// Add a frame to this action @@@ OBSOLETE WHEN MOVED TO MESH SYSTEM
-  void AddCsFrame (csFrame* frame, int delay);
+  void AddCsFrame (csSpriteFrame* frame, int delay);
   /// Add a frame to this action
   virtual void AddFrame (iSpriteFrame* frame, int delay);
   /// Set action name
@@ -115,17 +115,17 @@ public:
   /// Get total number of frames in this action
   virtual int GetNumFrames () { return frames.Length (); }
   /// Query the frame number f. @@@ OBSOLETE WHEN MOVED TO MESH SYSTEM
-  csFrame* GetCsFrame (int f)
-  { return (f < frames.Length ()) ? (csFrame *)frames [f] : (csFrame*)NULL; }
+  csSpriteFrame* GetCsFrame (int f)
+  { return (f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL; }
   /// Returns the looping frame after frame number f. @@@ OBSOLETE WHEN MOVED TO MESH SYSTEM
-  csFrame* GetCsNextFrame (int f)
-  { f++; return f<frames.Length() ? (csFrame*)frames[f]:(csFrame*)frames[0]; }
+  csSpriteFrame* GetCsNextFrame (int f)
+  { f++; return f<frames.Length() ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[0]; }
   /// Query the frame number f.
   virtual iSpriteFrame* GetFrame (int f)
-  { return (iSpriteFrame*)((f < frames.Length ()) ? (csFrame *)frames [f] : (csFrame*)NULL); }
+  { return (iSpriteFrame*)((f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL); }
   /// Returns the looping frame after frame number f.
   virtual iSpriteFrame* GetNextFrame (int f)
-  { f++; return (iSpriteFrame*)(f<frames.Length() ? (csFrame*)frames[f]:(csFrame*)frames[0]); }
+  { f++; return (iSpriteFrame*)(f<frames.Length() ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[0]); }
   /// Get delay for frame number f
   virtual int GetFrameDelay (int f)
   { return (int)delays [f]; }
@@ -141,11 +141,11 @@ private:
 /**
  * A vector for frames which knows how to clean them up.
  */
-class csFrameVector : public csVector
+class csSpriteFrameVector : public csVector
 {
 public:
   /// Delete all inserted objects before deleting the object itself.
-  virtual ~csFrameVector ();
+  virtual ~csSpriteFrameVector ();
 
   /// Free a item as a frame.
   virtual bool FreeItem (csSome Item);
@@ -154,11 +154,11 @@ public:
 /**
  * A vector for actions which knows how to clean them up.
  */
-class csActionVector : public csVector
+class csSpriteActionVector : public csVector
 {
 public:
   /// Delete all inserted objects before deleting the object itself.
-  virtual ~csActionVector ();
+  virtual ~csSpriteActionVector ();
 
   /// Free a item as an action.
   virtual bool FreeItem (csSome Item);
@@ -181,7 +181,7 @@ private:
   iMaterialWrapper* cstxt;
 
   /// An optional skeleton.
-  csSkeleton* skeleton;
+  csSkel* skeleton;
 
   /**
    * The order in which to introduce levels in order to get to a higher LOD.
@@ -193,9 +193,9 @@ private:
   int* emerge_from;
 
   /// The frames
-  csFrameVector frames;
-  /// The actions (a vector of csSpriteAction objects)
-  csActionVector actions;
+  csSpriteFrameVector frames;
+  /// The actions (a vector of csSpriteAction2 objects)
+  csSpriteActionVector actions;
 
   /// Enable tweening.
   bool do_tweening;
@@ -225,7 +225,7 @@ private:
   int lod_level_config;
  
   /// The base mesh is also the texture alignment mesh.
-  csTriangleMesh* texel_mesh;
+  csTriangleMesh2* texel_mesh;
   /// The array of texels
   DECLARE_TYPED_VECTOR (csTexelsVector,csPoly2D) texels;
   /// The vertices
@@ -238,7 +238,7 @@ private:
    * Also contains temporary vertex position information
    * for one sprite (@@@this should be avoided!!!!)
    */
-  csTriangleVertices* tri_verts;
+  csTriangleVertices2* tri_verts;
 
 public:
   iSystem* System;
@@ -250,10 +250,10 @@ public:
   virtual ~csSprite3DMeshObjectFactory ();
 
   /// Set the skeleton for this sprite template.
-  void SetSkeleton (csSkeleton* sk);
+  void SetSkeleton (csSkel* sk);
 
   /// Get the skeleton for this sprite template.
-  csSkeleton* GetSkeleton () { return skeleton; }
+  csSkel* GetSkeleton () { return skeleton; }
 
   /// Get the 'emerge_from' array from which you can construct triangles.
   int* GetEmergeFrom () { return emerge_from; }
@@ -329,7 +329,7 @@ public:
   void ComputeBoundingBox ();
 
   ///
-  csTriangleMesh* GetTexelMesh () {return texel_mesh;}
+  csTriangleMesh2* GetTexelMesh () {return texel_mesh;}
 
   /// Add some vertices, normals, and texels
   void AddVertices (int num);
@@ -376,28 +376,28 @@ public:
   int GetNumTriangles ()         { return texel_mesh->GetNumTriangles(); }
 
   /// Create and add a new frame to the sprite.
-  csFrame* AddFrame ();
+  csSpriteFrame* AddFrame ();
   /// find a named frame into the sprite.
-  csFrame* FindFrame (const char * name);
+  csSpriteFrame* FindFrame (const char * name);
   /// Query the number of frames
   int GetNumFrames () { return frames.Length (); }
   /// Query the frame number f
-  csFrame* GetFrame (int f)
-  { return (f < frames.Length ()) ? (csFrame *)frames [f] : (csFrame*)NULL; }
+  csSpriteFrame* GetFrame (int f)
+  { return (f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL; }
 
   /// Create and add a new action frameset to the sprite.
-  csSpriteAction* AddAction ();
+  csSpriteAction2* AddAction ();
   /// find a named action into the sprite.
-  csSpriteAction* FindAction (const char * name);
+  csSpriteAction2* FindAction (const char * name);
   /// Get the first action.
-  csSpriteAction* GetFirstAction ()
-  { return (csSpriteAction *)actions [0]; }
+  csSpriteAction2* GetFirstAction ()
+  { return (csSpriteAction2 *)actions [0]; }
   /// Get number of actions in sprite
   int GetNumActions ()
   { return actions.Length (); }
   /// Get action number No
-  csSpriteAction* GetAction (int No)
-  { return (csSpriteAction *)actions [No]; }
+  csSpriteAction2* GetAction (int No)
+  { return (csSpriteAction2 *)actions [No]; }
 
   /// Get the material
   iMaterialWrapper* GetMaterial () const
@@ -411,7 +411,7 @@ public:
   /**
    * Compute all normals in a frame.
    */
-  void ComputeNormals (csFrame* frame);
+  void ComputeNormals (csSpriteFrame* frame);
 
   /**
    * Smooth out the gouraud shading by merging the precalculated
@@ -793,7 +793,7 @@ private:
    * change every frame anyway. We hold it static also since
    * we don't want to allocate it again every time.
    */
-  static csTriangleMesh mesh;
+  static csTriangleMesh2 mesh;
 
   /// Mixmode for the triangles/polygons of the sprite.
   UInt MixMode;
@@ -813,7 +813,7 @@ private:
   /// The current frame number.
   int cur_frame;
   /// The current action.
-  csSpriteAction* cur_action;
+  csSpriteAction2* cur_action;
 
   /// The last frame time action.
   cs_time last_time;
@@ -828,7 +828,7 @@ private:
   bool force_otherskin;
 
   /// Skeleton state (optional).
-  csSkeletonState* skeleton_state;
+  csSkelState* skeleton_state;
 
   csMeshCallback* vis_cb;
   void* vis_cbData;
@@ -895,7 +895,7 @@ public:
   csSprite3DMeshObjectFactory* GetFactory () { return factory; }
 
   /// Get the skeleton state for this sprite.
-  csSkeletonState* GetSkeletonState () { return skeleton_state; }
+  csSkelState* GetSkeletonState () { return skeleton_state; }
 
   /// Force a new material skin other than default
   void SetMaterial (iMaterialWrapper *material);
@@ -988,7 +988,7 @@ public:
   /**
    * Get the current frame number.
    */
-  csSpriteAction* GetCurAction () { return cur_action; }
+  csSpriteAction2* GetCurAction () { return cur_action; }
 
   /**
    * Get the number of frames.
@@ -1000,7 +1000,7 @@ public:
    */
   bool SetAction (const char * name)
   {
-    csSpriteAction *act;
+    csSpriteAction2 *act;
     if ((act = factory->FindAction (name)) != NULL)
     {
       cur_action = act;
@@ -1026,7 +1026,7 @@ public:
    * points to a private static array in the sprite class and can be reused
    * if other calls to the sprite happen.
    */
-  csVector3* GetObjectVerts (csFrame* fr);
+  csVector3* GetObjectVerts (csSpriteFrame* fr);
 
   /**
    * Check if this sprite is hit by this object space vector.

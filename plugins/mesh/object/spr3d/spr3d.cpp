@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -42,11 +42,11 @@
 
 //--------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csFrame)
+IMPLEMENT_IBASE (csSpriteFrame)
   IMPLEMENTS_INTERFACE (iSpriteFrame)
 IMPLEMENT_IBASE_END
 
-csFrame::csFrame (int anm_idx, int tex_idx)
+csSpriteFrame::csSpriteFrame (int anm_idx, int tex_idx)
 {
   CONSTRUCT_IBASE (NULL);
   name = NULL;
@@ -55,12 +55,12 @@ csFrame::csFrame (int anm_idx, int tex_idx)
   normals_calculated = false;
 }
 
-csFrame::~csFrame ()
+csSpriteFrame::~csSpriteFrame ()
 {
   delete [] name;
 }
 
-void csFrame::SetName (char const* n)
+void csSpriteFrame::SetName (char const* n)
 {
   delete [] name;
   if (n)
@@ -74,22 +74,22 @@ void csFrame::SetName (char const* n)
 
 //--------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSpriteAction)
+IMPLEMENT_IBASE (csSpriteAction2)
   IMPLEMENTS_INTERFACE (iSpriteAction)
 IMPLEMENT_IBASE_END
 
-csSpriteAction::csSpriteAction() : frames (8, 8), delays (8, 8)
+csSpriteAction2::csSpriteAction2() : frames (8, 8), delays (8, 8)
 {
   CONSTRUCT_IBASE (NULL);
   name = NULL;
 }
 
-csSpriteAction::~csSpriteAction()
+csSpriteAction2::~csSpriteAction2()
 {
   delete [] name;
 }
 
-void csSpriteAction::SetName (char const* n)
+void csSpriteAction2::SetName (char const* n)
 {
   delete [] name;
   if (n)
@@ -101,38 +101,38 @@ void csSpriteAction::SetName (char const* n)
     name = 0;
 }
 
-void csSpriteAction::AddCsFrame (csFrame * f, int d)
+void csSpriteAction2::AddCsFrame (csSpriteFrame * f, int d)
 {
   frames.Push (f);
   delays.Push ((csSome)d);
 }
 
-void csSpriteAction::AddFrame (iSpriteFrame * f, int d)
+void csSpriteAction2::AddFrame (iSpriteFrame * f, int d)
 {
-  frames.Push ((csFrame*)f);
+  frames.Push ((csSpriteFrame*)f);
   delays.Push ((csSome)d);
 }
 
 //--------------------------------------------------------------------------
 
-bool csFrameVector::FreeItem (csSome Item)
+bool csSpriteFrameVector::FreeItem (csSome Item)
 {
-  delete (csFrame *) Item;
+  delete (csSpriteFrame *) Item;
   return true;
 }
 
-csFrameVector::~csFrameVector ()
+csSpriteFrameVector::~csSpriteFrameVector ()
 {
   DeleteAll ();
 }
 
-bool csActionVector::FreeItem (csSome Item)
+bool csSpriteActionVector::FreeItem (csSome Item)
 {
-  delete (csSpriteAction *) Item;
+  delete (csSpriteAction2 *) Item;
   return true;
 }
 
-csActionVector::~csActionVector ()
+csSpriteActionVector::~csSpriteActionVector ()
 {
   DeleteAll ();
 }
@@ -157,7 +157,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory () :
   emerge_from = NULL;
   skeleton = NULL;
 
-  texel_mesh = new csTriangleMesh ();
+  texel_mesh = new csTriangleMesh2 ();
 
   tri_verts = NULL;
   do_tweening = true;
@@ -193,7 +193,7 @@ void csSprite3DMeshObjectFactory::AddTriangle (int a, int b, int c)
   texel_mesh->AddTriangle (a, b, c);
 }
 
-void csSprite3DMeshObjectFactory::SetSkeleton (csSkeleton* sk)
+void csSprite3DMeshObjectFactory::SetSkeleton (csSkel* sk)
 {
   delete skeleton;
   skeleton = sk;
@@ -225,15 +225,15 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
   for (i = 0; i < GetNumTexels(); i++)
     v[i] = GetVertex (lod_base_frame, i);
 
-  csTriangleVertices* verts = new csTriangleVertices (texel_mesh, v, GetNumTexels());
+  csTriangleVertices2* verts = new csTriangleVertices2 (texel_mesh, v, GetNumTexels());
   delete [] v;
 
   delete [] emerge_from;
   emerge_from = new int [GetNumTexels()];
   int* translate = new int [GetNumTexels()];
-  csTriangleMesh* new_mesh = new csTriangleMesh (*texel_mesh);
+  csTriangleMesh2* new_mesh = new csTriangleMesh2 (*texel_mesh);
 
-  csLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
+  csSpriteLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
 
   for (i = 0 ; i < texels.Length () ; i++)
   {
@@ -296,9 +296,9 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
     // @@@ should the base frame for the skeleton be a variable?
 }
 
-csFrame* csSprite3DMeshObjectFactory::AddFrame ()
+csSpriteFrame* csSprite3DMeshObjectFactory::AddFrame ()
 {
-  csFrame* fr = new csFrame (frames.Length(), texels.Length());
+  csSpriteFrame* fr = new csSpriteFrame (frames.Length(), texels.Length());
   csPoly3D* nr = new csPoly3D ();
   csPoly2D* tx = new csPoly2D ();
   csPoly3D* vr = new csPoly3D ();
@@ -318,7 +318,7 @@ csFrame* csSprite3DMeshObjectFactory::AddFrame ()
   return fr;
 }
 
-csFrame* csSprite3DMeshObjectFactory::FindFrame (const char *n)
+csSpriteFrame* csSprite3DMeshObjectFactory::FindFrame (const char *n)
 {
   for (int i = GetNumFrames () - 1; i >= 0; i--)
     if (strcmp (GetFrame (i)->GetName (), n) == 0)
@@ -327,9 +327,9 @@ csFrame* csSprite3DMeshObjectFactory::FindFrame (const char *n)
   return NULL;
 }
 
-csSpriteAction* csSprite3DMeshObjectFactory::AddAction ()
+csSpriteAction2* csSprite3DMeshObjectFactory::AddAction ()
 {
-  csSpriteAction* a = new csSpriteAction ();
+  csSpriteAction2* a = new csSpriteAction2 ();
   actions.Push (a);
   return a;
 }
@@ -339,7 +339,7 @@ void csSprite3DMeshObjectFactory::SetMaterial (iMaterialWrapper *material)
   cstxt = material;
 }
 
-void csSprite3DMeshObjectFactory::ComputeNormals (csFrame* frame)
+void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
 {
   int i, j;
 
@@ -353,7 +353,7 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csFrame* frame)
 
   if (!tri_verts)
   {
-    tri_verts = new csTriangleVertices (texel_mesh, object_verts, GetNumTexels());
+    tri_verts = new csTriangleVertices2 (texel_mesh, object_verts, GetNumTexels());
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();
@@ -434,7 +434,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
   if (!tri_verts)
   {
-    tri_verts = new csTriangleVertices (texel_mesh, obj_verts, GetNumTexels());
+    tri_verts = new csTriangleVertices2 (texel_mesh, obj_verts, GetNumTexels());
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();
@@ -472,10 +472,10 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   }
 
   // create a mesh which only uses the vertex indices in the table
-  csTriangleMesh merge_mesh;
+  csTriangleMesh2 merge_mesh;
   for (i = 0; i < num_triangles; i++)
     merge_mesh.AddTriangle (merge[tris[i].a], merge[tris[i].b], merge[tris[i].c]);
-  csTriangleVertices * tv = new csTriangleVertices (&merge_mesh, obj_verts, GetNumTexels());
+  csTriangleVertices2 * tv = new csTriangleVertices2 (&merge_mesh, obj_verts, GetNumTexels());
 
   // calculate vertex normals, by averaging connected triangle normals
   for (i = 0; i < GetNumTexels(); i++)
@@ -506,7 +506,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 }
 
 
-csSpriteAction* csSprite3DMeshObjectFactory::FindAction (const char *n)
+csSpriteAction2* csSprite3DMeshObjectFactory::FindAction (const char *n)
 {
   for (int i = GetNumActions () - 1; i >= 0; i--)
     if (strcmp (GetAction (i)->GetName (), n) == 0)
@@ -530,7 +530,7 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
 
 void csSprite3DMeshObjectFactory::Sprite3DFactoryState::EnableSkeletalAnimation ()
 {
-  csSkeleton* skel = new csSkeleton ();
+  csSkel* skel = new csSkel ();
   scfParent->SetSkeleton (skel);
 }
 
@@ -614,7 +614,7 @@ void csSprite3DMeshObject::SetFactory (csSprite3DMeshObjectFactory* tmpl)
   delete skeleton_state;
   skeleton_state = NULL;
   if (tmpl->GetSkeleton ())
-    skeleton_state = (csSkeletonState*)tmpl->GetSkeleton ()->CreateState ();
+    skeleton_state = (csSkelState*)tmpl->GetSkeleton ()->CreateState ();
   EnableTweening (tmpl->IsTweeningEnabled ());
 }
 
@@ -678,13 +678,13 @@ void csSprite3DMeshObject::FixVertexColors ()
       vertex_colors [i].Clamp (2., 2., 2.);
 }
 
-csTriangleMesh csSprite3DMeshObject::mesh;
+csTriangleMesh2 csSprite3DMeshObject::mesh;
 float csSprite3DMeshObject::global_lod_level = DEFAULT_LOD;
 
 // Set the default lighting quality.
 int csSprite3DMeshObject::global_lighting_quality = DEFAULT_LIGHTING;
 
-int map (int* emerge_from, int idx, int num_verts)
+static int map (int* emerge_from, int idx, int num_verts)
 {
   if (num_verts <= 0) return 0;
   while (idx >= num_verts)
@@ -713,7 +713,7 @@ int csSprite3DMeshObject::GetNumVertsToLight ()
 void csSprite3DMeshObject::GenerateSpriteLOD (int num_vts)
 {
   int* emerge_from = factory->GetEmergeFrom ();
-  csTriangleMesh* base_mesh = factory->GetTexelMesh ();
+  csTriangleMesh2* base_mesh = factory->GetTexelMesh ();
   mesh.Reset ();
   int i;
   int a, b, c;
@@ -757,7 +757,7 @@ void csSprite3DMeshObject::GetTransformedBoundingBox (
   }
   else
   {
-    csFrame* cframe = cur_action->GetCsFrame (cur_frame);
+    csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
     csBox3 box;
     cframe->GetBoundingBox (box);
     camera_bbox.StartBoundingBox (trans * box.GetCorner (0));
@@ -828,7 +828,7 @@ void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b, bool /*accurate*/)
   }
   else
   {
-    csFrame* cframe = cur_action->GetCsFrame (cur_frame);
+    csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
     cframe->GetBoundingBox (b);
   }
 }
@@ -857,7 +857,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (!factory->cstxt)
   {
     factory->System->Printf (MSG_FATAL_ERROR, "Error! Trying to draw a sprite with no material!\n");
-    fatal_exit (0, false);
+    exit (0); //fatal_exit (0, false);
   }
  
   iGraphics3D* g3d = rview->GetGraphics3D ();
@@ -896,10 +896,10 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 // The sprite is visible now but we first calculate LOD so that
 // lighting can use it.
 
-  csFrame * cframe = cur_action->GetCsFrame (cur_frame);
+  csSpriteFrame * cframe = cur_action->GetCsFrame (cur_frame);
 
   // Get next frame for animation tweening.
-  csFrame * next_frame;
+  csSpriteFrame * next_frame;
   if (cur_frame + 1 < cur_action->GetNumFrames())
     next_frame = cur_action->GetCsFrame (cur_frame + 1);
   else
@@ -950,7 +950,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // Calculate the right LOD level for this sprite.
 
   // Select the appropriate mesh.
-  csTriangleMesh* m;
+  csTriangleMesh2* m;
   int* emerge_from = NULL;
 
   float fnum = 0.0f;
@@ -1099,7 +1099,7 @@ void csSprite3DMeshObject::InitSprite ()
   if (!factory)
   {
     factory->System->Printf (MSG_FATAL_ERROR, "There is no defined template for this sprite!\n");
-    fatal_exit (0, false);
+    exit (0); //fatal_exit (0, false);
   }
 
   if (!cur_action) { SetFrame (0); cur_action = factory->GetFirstAction (); }
@@ -1159,7 +1159,7 @@ bool csSprite3DMeshObject::OldNextFrame (cs_time current_time, bool onestep, boo
   return ret;
 }
 
-csVector3* csSprite3DMeshObject::GetObjectVerts (csFrame* fr)
+csVector3* csSprite3DMeshObject::GetObjectVerts (csSpriteFrame* fr)
 {
   UpdateWorkTables (factory->GetNumTexels ());
   int fr_idx = fr->GetAnmIndex();
@@ -1516,7 +1516,7 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start, const csVector
   csSegment3 seg (start, end);
   if (!csIntersect3::BoxSegment (b, seg, isect, pr))
     return false;
-  csFrame* cframe = cur_action->GetCsFrame (cur_frame);
+  csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
   csVector3* verts = GetObjectVerts (cframe);
   csTriangle* tris = factory->GetTriangles ();
   int i;

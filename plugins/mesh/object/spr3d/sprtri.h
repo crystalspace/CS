@@ -27,7 +27,7 @@
  * if used in combination with a vertex or edge table. Every triangle is then
  * a set of three indices in that table.
  */
-class csTriangleMesh
+class csTriangleMesh2
 {
 private:
   /// The triangles.
@@ -37,11 +37,11 @@ private:
 
 public:
   ///
-  csTriangleMesh () : triangles (NULL), num_triangles (0), max_triangles (0) { }
+  csTriangleMesh2 () : triangles (NULL), num_triangles (0), max_triangles (0) { }
   ///
-  csTriangleMesh (const csTriangleMesh& mesh);
+  csTriangleMesh2 (const csTriangleMesh2& mesh);
   ///
-  ~csTriangleMesh ();
+  ~csTriangleMesh2 ();
 
   /// Add a triangle to the mesh.
   void AddTriangle (int a, int b, int c);
@@ -58,7 +58,7 @@ public:
   void Reset ();
 };
 
-class csTriangleVertices;
+class csTriangleVertices2;
 
 /**
  * The representation of a vertex in a triangle mesh.
@@ -110,7 +110,7 @@ public:
    * Calculate the minimal cost of collapsing this vertex to some other.
    * Also remember which other vertex was selected for collapsing to.
    */
-  void CalculateCost (csTriangleVertices* vertices);
+  void CalculateCost (csTriangleVertices2* vertices);
 };
 
 /**
@@ -119,7 +119,7 @@ public:
  * for LOD generation since every vertex contains information which
  * helps selecting the best vertices for collapsing.
  */
-class csTriangleVertices
+class csTriangleVertices2
 {
 private:
   csTriangleVertex* vertices;
@@ -127,9 +127,9 @@ private:
 
 public:
   /// Build vertex table for a triangle mesh.
-  csTriangleVertices (csTriangleMesh* mesh, csVector3* verts, int num_verts);
+  csTriangleVertices2 (csTriangleMesh2* mesh, csVector3* verts, int num_verts);
   ///
-  ~csTriangleVertices ();
+  ~csTriangleVertices2 ();
   /// Update vertex table for a given set of vertices (with the same number as at init).
   void UpdateVertices (csVector3* verts);
 
@@ -152,7 +152,7 @@ public:
  * A static class which performs the calculation
  * of the best order to do the collapsing.
  */
-class csLOD
+class csSpriteLOD
 {
 public:
   /**
@@ -170,7 +170,7 @@ public:
    * Note. The given 'mesh' and 'verts' objects are no longer valid after
    * calling this function. Don't expect anything useful information here.
    */
-  static void CalculateLOD (csTriangleMesh* mesh, csTriangleVertices* verts,
+  static void CalculateLOD (csTriangleMesh2* mesh, csTriangleVertices2* verts,
   	int* translate, int* emerge_from);
 };
 

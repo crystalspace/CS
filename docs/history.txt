@@ -1,8 +1,34 @@
 The history order has been reversed so that new features are at the top.
 
+7-Feb-2001
+	- Converted the missile in walktest to use the new mesh object
+	  spr3d plugin instead of csSprite3D. Also modified standard.zip
+	  accordingly.
 6-Feb-2001
+	- Continue implementation of spr3d loader plugin. The factory
+	  loader should work now.
+	- Added support for loading MESHOBJ factories in library files.
+	- Also added spr2d and spr2dldr to walkall because the explosion
+	  needs it.
+	- Eric and Jorrit fixed a bad bug in spr3d which caused the entire
+	  system driver to be included in the plugin. Plugins should not
+	  link with plugins. But if they do then can only use iSystem and
+	  not anything inside cssys (like fatal_exit in this case).
 	- Eric Sunshine fixed a couple copy/paste errors in linex2d.mak which
 	  were pointed out by Jan Dvorak <johnydog@go.cz>.
+	- Martin Geisse did the following changes to cspixmap and
+	  csanimation2d:
+	    - Moved both from csengine to csfx.
+	    - csPixmap is now a more general interface-like class.
+	    - csSimplePixmap is now what csPixmap was before.
+	    - Changed the animation system to work on a template-instance
+	      basis.  Templates are called csAnimationTemplate and instances
+	      of a template are called csAnimatedPixmap. These instances
+	      inherit from csPixmap.
+	    - Animations can now handle frames with different delay values.
+	- Wouter Wijngaards fixed a bug in csfedit where the mouse would draw
+	  on the character when the mouse was not down.
+	- Norman Kramer fixed a scaling bug in the AVI plugin.
 5-Feb-2001
 	- Eric Sunshine eliminated a couple compilation warnings in
 	  csfedit.cpp.
@@ -20,6 +46,7 @@ The history order has been reversed so that new features are at the top.
 	  Each time you draw the correct frame of the animation is
 	  substituted, and drawn. Use like a csPixmap, and redraw each frame
 	  (if not already a 2d overdraw).
+	- Wouter removed the already present csAnimation2D in csengine.
 	- Norman Kramer did the following:
 	    - Fixed bug in the c yuv2rgba routine: u,v values were taken
 	      for 4 sequential pixel, instead the were meant for a 2x2

@@ -21,7 +21,7 @@
 
 //---------------------------------------------------------------------------
 
-csTriangleMesh::csTriangleMesh (const csTriangleMesh& mesh)
+csTriangleMesh2::csTriangleMesh2 (const csTriangleMesh2& mesh)
 {
   max_triangles = mesh.max_triangles;
   num_triangles = mesh.num_triangles;
@@ -29,23 +29,23 @@ csTriangleMesh::csTriangleMesh (const csTriangleMesh& mesh)
   memcpy (triangles, mesh.triangles, sizeof (csTriangle)*max_triangles);
 }
 
-csTriangleMesh::~csTriangleMesh ()
+csTriangleMesh2::~csTriangleMesh2 ()
 {
   Clear ();
 }
 
-void csTriangleMesh::Clear ()
+void csTriangleMesh2::Clear ()
 {
   delete [] triangles;
   num_triangles = max_triangles = 0;
 }
 
-void csTriangleMesh::Reset ()
+void csTriangleMesh2::Reset ()
 {
   num_triangles = 0;
 }
 
-void csTriangleMesh::AddTriangle (int a, int b, int c)
+void csTriangleMesh2::AddTriangle (int a, int b, int c)
 {
   if (num_triangles >= max_triangles)
   {
@@ -126,7 +126,7 @@ void csTriangleVertex::ReplaceVertex (int old, int replace)
   if (DelVertex (old)) AddVertex (replace);
 }
 
-void csTriangleVertex::CalculateCost (csTriangleVertices* vertices)
+void csTriangleVertex::CalculateCost (csTriangleVertices2* vertices)
 {
   int i;
   to_vertex = -1;
@@ -152,7 +152,7 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices)
   cost = min_sq_dist;
 }
 
-csTriangleVertices::csTriangleVertices (csTriangleMesh* mesh, csVector3* verts, int num_verts)
+csTriangleVertices2::csTriangleVertices2 (csTriangleMesh2* mesh, csVector3* verts, int num_verts)
 {
   vertices = new csTriangleVertex [num_verts];
   num_vertices = num_verts;
@@ -175,19 +175,19 @@ csTriangleVertices::csTriangleVertices (csTriangleMesh* mesh, csVector3* verts, 
   }
 }
 
-csTriangleVertices::~csTriangleVertices ()
+csTriangleVertices2::~csTriangleVertices2 ()
 {
   delete [] vertices;
 }
 
-void csTriangleVertices::UpdateVertices (csVector3* verts)
+void csTriangleVertices2::UpdateVertices (csVector3* verts)
 {
   int i;
   for (i = 0 ; i < num_vertices ; i++)
     vertices[i].pos = verts[i];
 }
 
-int csTriangleVertices::GetMinimalCostVertex ()
+int csTriangleVertices2::GetMinimalCostVertex ()
 {
   int i;
   int min_idx = -1;
@@ -201,14 +201,14 @@ int csTriangleVertices::GetMinimalCostVertex ()
   return min_idx;
 }
 
-void csTriangleVertices::CalculateCost ()
+void csTriangleVertices2::CalculateCost ()
 {
   int i;
   for (i = 0 ; i < num_vertices ; i++)
     vertices[i].CalculateCost (this);
 }
 
-void csTriangleVertices::Dump ()
+void csTriangleVertices2::Dump ()
 {
   printf ("=== Dump ===\n");
   int i, j;
@@ -231,7 +231,7 @@ void csTriangleVertices::Dump ()
 
 //---------------------------------------------------------------------------
 
-void csLOD::CalculateLOD (csTriangleMesh* mesh, csTriangleVertices* verts,
+void csSpriteLOD::CalculateLOD (csTriangleMesh2* mesh, csTriangleVertices2* verts,
 	int* translate, int* emerge_from)
 {
   int i;

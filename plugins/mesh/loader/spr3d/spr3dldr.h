@@ -23,6 +23,7 @@
 
 struct iEngine;
 struct iSystem;
+struct iSkeletonLimb;
 
 /**
  * Sprite 3D factory loader.
@@ -31,6 +32,9 @@ class csSprite3DFactoryLoader : public iLoaderPlugIn
 {
 private:
   iSystem* sys;
+
+  // Load a skeleton.
+  bool LoadSkeleton (iSkeletonLimb* limb, char* buf);
 
 public:
   /// Constructor.

@@ -18,6 +18,8 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
+#include "csgeom/matrix3.h"
+#include "csgeom/transfrm.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "spr3dldr.h"
@@ -25,6 +27,7 @@
 #include "iengine.h"
 #include "isystem.h"
 #include "imspr3d.h"
+#include "iskel.h"
 #include "igraph3d.h"
 #include "qint.h"
 
@@ -37,9 +40,30 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MULTIPLY)
   CS_TOKEN_DEF (TRANSPARENT)
 
+  CS_TOKEN_DEF (ACTION)
+  CS_TOKEN_DEF (F)
   CS_TOKEN_DEF (FACTORY)
+  CS_TOKEN_DEF (FRAME)
+  CS_TOKEN_DEF (IDENTITY)
+  CS_TOKEN_DEF (LIMB)
   CS_TOKEN_DEF (MATERIAL)
+  CS_TOKEN_DEF (MATRIX)
   CS_TOKEN_DEF (MIXMODE)
+  CS_TOKEN_DEF (ROT)
+  CS_TOKEN_DEF (ROT_X)
+  CS_TOKEN_DEF (ROT_Y)
+  CS_TOKEN_DEF (ROT_Z)
+  CS_TOKEN_DEF (SCALE)
+  CS_TOKEN_DEF (SCALE_X)
+  CS_TOKEN_DEF (SCALE_Y)
+  CS_TOKEN_DEF (SCALE_Z)
+  CS_TOKEN_DEF (SKELETON)
+  CS_TOKEN_DEF (SMOOTH)
+  CS_TOKEN_DEF (TRANSFORM)
+  CS_TOKEN_DEF (TRIANGLE)
+  CS_TOKEN_DEF (TWEEN)
+  CS_TOKEN_DEF (V)
+  CS_TOKEN_DEF (VERTICES)
 CS_TOKEN_DEF_END
 
 IMPLEMENT_IBASE (csSprite3DFactoryLoader)
@@ -74,6 +98,104 @@ csSprite3DFactoryLoader::~csSprite3DFactoryLoader ()
 bool csSprite3DFactoryLoader::Initialize (iSystem* system)
 {
   sys = system;
+  return true;
+}
+
+static bool load_matrix (char* buf, csMatrix3 &m)
+{
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE (IDENTITY)
+    CS_TOKEN_TABLE (ROT_X)
+    CS_TOKEN_TABLE (ROT_Y)
+    CS_TOKEN_TABLE (ROT_Z)
+    CS_TOKEN_TABLE (ROT)
+    CS_TOKEN_TABLE (SCALE_X)
+    CS_TOKEN_TABLE (SCALE_Y)
+    CS_TOKEN_TABLE (SCALE_Z)
+    CS_TOKEN_TABLE (SCALE)
+  CS_TOKEN_TABLE_END
+
+  char* params;
+  int cmd, num;
+  float angle;
+  float scaler;
+  float list[30];
+  const csMatrix3 identity;
+
+  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
+  {
+    switch (cmd)
+    {
+      case CS_TOKEN_IDENTITY:
+        m = identity;
+        break;
+      case CS_TOKEN_ROT_X:
+        ScanStr (params, "%f", &angle);
+        m *= csXRotMatrix3 (angle);
+        break;
+      case CS_TOKEN_ROT_Y:
+        ScanStr (params, "%f", &angle);
+        m *= csYRotMatrix3 (angle);
+        break;
+      case CS_TOKEN_ROT_Z:
+        ScanStr (params, "%f", &angle);
+        m *= csZRotMatrix3 (angle);
+        break;
+      case CS_TOKEN_ROT:
+        ScanStr (params, "%F", list, &num);
+        if (num == 3)
+        {
+          m *= csXRotMatrix3 (list[0]);
+          m *= csZRotMatrix3 (list[2]);
+          m *= csYRotMatrix3 (list[1]);
+        }
+        //else
+	  //@@@ Error handling!: CsPrintf (MSG_WARNING, "Badly formed rotation: '%s'\n", params);
+        break;
+      case CS_TOKEN_SCALE_X:
+        ScanStr (params, "%f", &scaler);
+        m *= csXScaleMatrix3(scaler);
+        break;
+      case CS_TOKEN_SCALE_Y:
+        ScanStr (params, "%f", &scaler);
+        m *= csYScaleMatrix3(scaler);
+        break;
+      case CS_TOKEN_SCALE_Z:
+        ScanStr (params, "%f", &scaler);
+        m *= csZScaleMatrix3(scaler);
+        break;
+      case CS_TOKEN_SCALE:
+        ScanStr (params, "%F", list, &num);
+        if (num == 1)      // One scaler; applied to entire matrix.
+	  m *= list[0];
+        else if (num == 3) // Three scalers; applied to X, Y, Z individually.
+	  m *= csMatrix3 (list[0],0,0,0,list[1],0,0,0,list[2]);
+        //else
+	  //@@@ Error handling!: CsPrintf (MSG_WARNING, "Badly formed scale: '%s'\n", params);
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
+    // or the nine values of a 3x3 matrix.
+    ScanStr (buf, "%F", list, &num);
+    if (num == 1)
+      m = csMatrix3 () * list[0];
+    else if (num == 9)
+      m = csMatrix3 (
+        list[0], list[1], list[2],
+        list[3], list[4], list[5],
+        list[6], list[7], list[8]);
+    //else
+      //@@@ Error handling!: CsPrintf (MSG_WARNING, "Badly formed matrix '%s'\n", buf);
+  }
+  return true;
+}
+
+static bool load_vector (char* buf, csVector3 &v)
+{
+  ScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
   return true;
 }
 
@@ -128,16 +250,128 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
+bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (LIMB)
+    CS_TOKEN_TABLE (VERTICES)
+    CS_TOKEN_TABLE (TRANSFORM)
+  CS_TOKEN_TABLE_END
+
+  CS_TOKEN_TABLE_START (tok_matvec)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  char* xname;
+
+  long cmd;
+  char* params;
+
+  iSkeletonConnection* con = QUERY_INTERFACE (limb, iSkeletonConnection);
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      //@@@ Error handling!
+      //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      //fatal_exit (0, false);
+      return false;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_LIMB:
+        {
+          iSkeletonConnection* newcon = limb->CreateConnection ();
+	  iSkeletonLimb* newlimb = QUERY_INTERFACE (newcon, iSkeletonLimb);
+	  if (name) newlimb->SetName (name);
+	  if (!LoadSkeleton (newlimb, params)) return false;
+	}
+        break;
+      case CS_TOKEN_TRANSFORM:
+        if (con)
+        {
+          char* params2;
+	  csMatrix3 m;
+	  csVector3 v (0, 0, 0);
+          while ((cmd = csGetObject (&params, tok_matvec, &xname, &params2)) > 0)
+          {
+    	    if (!params2)
+    	    {
+	      //@@@ Error handling!
+      	      //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+      	      //fatal_exit (0, false);
+	      return false;
+    	    }
+            switch (cmd)
+            {
+              case CS_TOKEN_MATRIX:
+                load_matrix (params2, m);
+		break;
+              case CS_TOKEN_V:
+                load_vector (params2, v);
+		break;
+            }
+          }
+	  csTransform tr (m, -m.GetInverse () * v);
+	  con->SetTransformation (tr);
+        }
+	else
+	{
+	  //@@@ Error handling!
+	  //CsPrintf (MSG_FATAL_ERROR, "TRANSFORM not valid for this type of skeleton limb!\n");
+	  //fatal_exit (0, false);
+	  return false;
+	}
+	break;
+      case CS_TOKEN_VERTICES:
+        {
+          int list[1000], num;	//@@@ HARDCODED!!!
+          ScanStr (params, "%D", list, &num);
+          for (int i = 0 ; i < num ; i++) limb->AddVertex (list[i]);
+        }
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    //@@@ Error handling!
+    //CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite skeleton!\n",
+        //csGetLastOffender ());
+    //fatal_exit (0, false);
+    return false;
+  }
+
+  return true;
+}
+
 iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 {
   // @@@ Implement MIXMODE
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (FRAME)
+    CS_TOKEN_TABLE (ACTION)
+    CS_TOKEN_TABLE (SMOOTH)
+    CS_TOKEN_TABLE (TRIANGLE)
+    CS_TOKEN_TABLE (SKELETON)
+    CS_TOKEN_TABLE (TWEEN)
+  CS_TOKEN_TABLE_END
+
+  CS_TOKEN_TABLE_START (tok_frame)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
+
+  CS_TOKEN_TABLE_START (tok_frameset)
+    CS_TOKEN_TABLE (F)
   CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
   char* params;
+  char* params2;
   char str[255];
 
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
@@ -173,9 +407,147 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	  spr3dLook->SetMaterialWrapper (mat);
 	}
 	break;
+      case CS_TOKEN_SKELETON:
+	{
+	  spr3dLook->EnableSkeletalAnimation ();
+	  iSkeleton* skeleton = spr3dLook->GetSkeleton ();
+	  iSkeletonLimb* skellimb = QUERY_INTERFACE (skeleton, iSkeletonLimb);
+	  if (name) skellimb->SetName (name);
+	  if (!LoadSkeleton (skellimb, params))
+	  {
+	    // @@@ Error handling!
+	    fact->DecRef ();
+	    return NULL;
+	  }
+	}
+        break;
+
+      case CS_TOKEN_ACTION:
+        {
+          iSpriteAction* act = spr3dLook->AddAction ();
+          act->SetName (name);
+          int d;
+          char fn[64];
+          while ((cmd = csGetObject (&params, tok_frameset, &name, &params2)) > 0)
+          {
+            if (!params2)
+            {
+	      //@@@ Error handling!
+              //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+	      fact->DecRef ();
+	      return NULL;
+            }
+            switch (cmd)
+            {
+              case CS_TOKEN_F:
+                ScanStr (params2, "%s,%d", fn, &d);
+                iSpriteFrame* ff = spr3dLook->FindFrame (fn);
+                if (!ff)
+                {
+	          //@@@ Error handling!
+                  //CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add a unknown frame '%s' in %s action !\n",
+                        //fn, act->GetName ());
+		  fact->DecRef ();
+                  return NULL;
+                }
+                act->AddFrame (ff, d);
+                break;
+            }
+          }
+        }
+        break;
+
+      case CS_TOKEN_FRAME:
+        {
+          iSpriteFrame* fr = spr3dLook->AddFrame ();
+          fr->SetName (name);
+          int anm_idx = fr->GetAnmIndex ();
+          int tex_idx = fr->GetTexIndex ();
+          int i = 0;
+          float x, y, z, u, v;
+          while ((cmd = csGetObject (&params, tok_frame, &name, &params2)) > 0)
+          {
+            if (!params2)
+            {
+	      //@@@ Error handling!
+              //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+	      fact->DecRef ();
+	      return NULL;
+            }
+            switch (cmd)
+            {
+              case CS_TOKEN_V:
+                ScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
+                // check if it's the first frame
+                if (spr3dLook->GetNumFrames () == 1)
+                {
+                  spr3dLook->AddVertices (1);
+                }
+                else if (i >= spr3dLook->GetNumTexels ())
+                {
+		  //@@@ Error handling!
+                  //CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
+                    //fr->GetName ());
+		  fact->DecRef ();
+		  return NULL;
+                }
+                spr3dLook->GetVertex (anm_idx, i) = csVector3 (x, y, z);
+                spr3dLook->GetTexel  (tex_idx, i) = csVector2 (u, v);
+                i++;
+                break;
+            }
+          }
+          if (cmd == CS_PARSERR_TOKENNOTFOUND)
+          {
+	    //@@@ Error handling!
+            //CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing frame '%s'!\n",
+                //fr->GetName (), csGetLastOffender ());
+	    fact->DecRef ();
+	    return NULL;
+          }
+          if (i < spr3dLook->GetNumTexels ())
+          {
+	    //@@@ Error handling!
+            //CsPrintf (MSG_FATAL_ERROR, "Error! Too few vertices in frame '%s'! (%d %d)\n",
+                //fr->GetName (), i, state->GetNumTexels ());
+	    fact->DecRef ();
+	    return NULL;
+          }
+        }
+        break;
+
+      case CS_TOKEN_TRIANGLE:
+        {
+          int a, b, c;
+          ScanStr (params, "%d,%d,%d", &a, &b, &c);
+          spr3dLook->AddTriangle (a, b, c);
+        }
+        break;
+
+      case CS_TOKEN_SMOOTH:
+        {
+          int num, list[30];
+          ScanStr (params, "%D", list, &num);
+          switch (num)
+          {
+            case 0  :  spr3dLook->MergeNormals ();                  break;
+            case 1  :  spr3dLook->MergeNormals (list[0]);           break;
+            case 2  :  spr3dLook->MergeNormals (list[0], list[1]);  break;
+            //default :  CsPrintf (MSG_WARNING, "Confused by SMOOTH options: '%s'\n", params);
+                       //CsPrintf (MSG_WARNING, "no smoothing performed\n");
+          }
+        }
+        break;
+
+      case CS_TOKEN_TWEEN:
+	{
+	  bool do_tween;
+          ScanStr (params, "%b", &do_tween);
+          spr3dLook->EnableTweening (do_tween);
+	}
+	break;
     }
   }
-
   return fact;
 }
 

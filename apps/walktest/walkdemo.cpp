@@ -84,7 +84,7 @@ void RandomColor (float& r, float& g, float& b)
 
 extern csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
 	csVector3 const& pos, float size);
-extern void move_sprite (csSprite3D* sprite, csSector* where,
+extern void move_sprite (csSprite* sprite, csSector* where,
 	csVector3 const& pos);
 
 //===========================================================================
@@ -982,7 +982,7 @@ struct MissileStruct
 {
   int type;		// type == DYN_TYPE_MISSILE
   csOrthoTransform dir;
-  csSprite3D* sprite;
+  csMeshWrapper* sprite;
   iSoundSource *snd;
 };
 
@@ -1138,13 +1138,13 @@ void fire_missile ()
   char misname[10];
   sprintf (misname, "missile%d", ((rand () >> 3) & 1)+1);
 
-  csSpriteTemplate* tmpl = (csSpriteTemplate*)
-  	Sys->view->GetEngine ()->sprite_templates.FindByName (misname);
+  csMeshFactoryWrapper* tmpl = (csMeshFactoryWrapper*)
+  	Sys->view->GetEngine ()->meshobj_factories.FindByName (misname);
   if (!tmpl)
-    Sys->Printf (MSG_CONSOLE, "Could not find '%s' sprite template!\n", misname);
+    Sys->Printf (MSG_CONSOLE, "Could not find '%s' sprite factory!\n", misname);
   else
   {
-    csSprite3D* sp = tmpl->NewSprite (Sys->view->GetEngine ());
+    csMeshWrapper* sp = tmpl->NewMeshObject (Sys->view->GetEngine ());
     sp->SetName ("missile");
     Sys->view->GetEngine ()->sprites.Push (sp);
     sp->GetMovable ().SetSector (Sys->view->GetCamera ()->GetSector ());
@@ -1175,18 +1175,31 @@ void AttachRandomLight (csDynLight* light)
 // not test if the sprite is visible or not.
 void light_statics ()
 {
-  csEngine *e = Sys->view->GetEngine ();
+  csEngine* e = Sys->view->GetEngine ();
   for (int i = 0 ; i < e->sprites.Length () ; i++)
   {
-    csSprite *sp = (csSprite*)e->sprites [i];
+    csSprite* sp = (csSprite*)e->sprites [i];
     if (sp->GetType () == csSprite3D::Type)
     {
-      csSprite3D *sp3d = (csSprite3D *)sp;
+      csSprite3D* sp3d = (csSprite3D *)sp;
       csSkeletonState* sk_state = sp3d->GetSkeletonState ();
       if (sk_state)
       {
         const char* name = sp3d->GetName ();
         if (!strcmp (name, "__skelghost__")) move_ghost (sp3d);
+      }
+    }
+    else if (sp->GetType () == csMeshWrapper::Type)
+    {
+      csMeshWrapper* wrap = (csMeshWrapper*)sp;
+      iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
+      if (state != NULL)
+      {
+        if (state->GetSkeletonState ())
+	{
+          const char* name = wrap->GetName ();
+          //@@@if (!strcmp (name, "__skelghost__")) move_ghost (wrap);
+	}
       }
     }
     sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);

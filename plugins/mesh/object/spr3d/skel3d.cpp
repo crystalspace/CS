@@ -19,29 +19,29 @@
 #include "cssysdef.h"
 #include "plugins/mesh/object/spr3d/spr3d.h"
 
-IMPLEMENT_IBASE (csSkeletonLimb)
+IMPLEMENT_IBASE (csSkelLimb)
   IMPLEMENTS_INTERFACE (iSkeletonLimb)
 IMPLEMENT_IBASE_END
 
-csSkeletonLimb::csSkeletonLimb ()
+csSkelLimb::csSkelLimb ()
   : next (NULL), vertices (NULL), num_vertices (0), children (NULL), name(NULL)
 {
   CONSTRUCT_IBASE (NULL);
 }
 
-csSkeletonLimb::~csSkeletonLimb ()
+csSkelLimb::~csSkelLimb ()
 {
   delete [] vertices;
   while (children)
   {
-    csSkeletonLimb* n = children->GetNext ();
+    csSkelLimb* n = children->GetNext ();
     delete children;
     children = n;
   }
   if (name) free (name);
 }
 
-void csSkeletonLimb::AddVertex (int v)
+void csSkelLimb::AddVertex (int v)
 {
   // We allocate 16 vertices at a time.
   int max_vertices = (num_vertices+15) & ~0xf;
@@ -56,25 +56,25 @@ void csSkeletonLimb::AddVertex (int v)
   vertices[num_vertices++] = v;
 }
 
-void csSkeletonLimb::AddChild (csSkeletonLimb* child)
+void csSkelLimb::AddChild (csSkelLimb* child)
 {
   child->SetNext (children);
   children = child;
 }
 
-void csSkeletonLimbState::AddChild (csSkeletonLimbState* child)
+void csSkelLimbState::AddChild (csSkelLimbState* child)
 {
   child->SetNext (children);
   children = child;
 }
 
-void csSkeletonLimb::UpdateState (csSkeletonLimbState* limb)
+void csSkelLimb::UpdateState (csSkelLimbState* limb)
 {
   if (name) limb->SetName (name);
   limb->vertices = vertices;
   limb->num_vertices = num_vertices;
   limb->tmpl = this;
-  csSkeletonLimb* c = children;
+  csSkelLimb* c = children;
   while (c)
   {
     limb->AddChild (c->CreateState ());
@@ -82,7 +82,7 @@ void csSkeletonLimb::UpdateState (csSkeletonLimbState* limb)
   }
 }
 
-void csSkeletonLimb::RemapVertices (int* mapping)
+void csSkelLimb::RemapVertices (int* mapping)
 {
   if (num_vertices)
   {
@@ -91,7 +91,7 @@ void csSkeletonLimb::RemapVertices (int* mapping)
       vertices[i] = mapping[vertices[i]];
   }
 
-  csSkeletonLimb* c = children;
+  csSkelLimb* c = children;
   while (c)
   {
     c->RemapVertices (mapping);
@@ -99,7 +99,7 @@ void csSkeletonLimb::RemapVertices (int* mapping)
   }
 }
 
-void csSkeletonLimb::ComputeBoundingBox (csPoly3D* source)
+void csSkelLimb::ComputeBoundingBox (csPoly3D* source)
 {
   if (num_vertices)
   {
@@ -111,7 +111,7 @@ void csSkeletonLimb::ComputeBoundingBox (csPoly3D* source)
     }
   }
 
-  csSkeletonLimb* c = children;
+  csSkelLimb* c = children;
   while (c)
   {
     c->ComputeBoundingBox (source);
@@ -119,96 +119,96 @@ void csSkeletonLimb::ComputeBoundingBox (csPoly3D* source)
   }
 }
 
-void csSkeletonLimb::SetName (const char *newname)
+void csSkelLimb::SetName (const char *newname)
 {
   if (name) free (name);
   name = strdup (newname);
 }
 
-iSkeletonConnection* csSkeletonLimb::CreateConnection ()
+iSkeletonConnection* csSkelLimb::CreateConnection ()
 {
-  csSkeletonConnection* con = new csSkeletonConnection ();
+  csSkelConnection* con = new csSkelConnection ();
   AddChild (con);
   return QUERY_INTERFACE (con, iSkeletonConnection);
 }
 
-csSkeletonLimbState* csSkeletonLimb::CreateState ()
+csSkelLimbState* csSkelLimb::CreateState ()
 {
-  csSkeletonLimbState* limb = new csSkeletonLimbState ();
+  csSkelLimbState* limb = new csSkelLimbState ();
   UpdateState (limb);
   return limb;
 }
 
-csSkeletonLimbState* csSkeletonConnection::CreateState ()
+csSkelLimbState* csSkelConnection::CreateState ()
 {
-  csSkeletonConnectionState* con = new csSkeletonConnectionState ();
-  UpdateState ((csSkeletonLimbState*)con);
+  csSkelConnectionState* con = new csSkelConnectionState ();
+  UpdateState ((csSkelLimbState*)con);
   con->SetTransformation (trans);
-  return (csSkeletonLimbState*)con;
+  return (csSkelLimbState*)con;
 }
 
-csSkeletonLimbState* csSkeleton::CreateState ()
+csSkelLimbState* csSkel::CreateState ()
 {
-  csSkeletonState* skel = new csSkeletonState ();
-  UpdateState ((csSkeletonLimbState*)skel);
-  return (csSkeletonLimbState*)skel;
+  csSkelState* skel = new csSkelState ();
+  UpdateState ((csSkelLimbState*)skel);
+  return (csSkelLimbState*)skel;
 }
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csSkeletonConnection)
+IMPLEMENT_IBASE_EXT (csSkelConnection)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonConnection)
 IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkeletonConnection::SkeletonConnection)
+IMPLEMENT_EMBEDDED_IBASE (csSkelConnection::SkeletonConnection)
   IMPLEMENTS_INTERFACE (iSkeletonConnection)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSkeletonConnection::csSkeletonConnection ()
+csSkelConnection::csSkelConnection ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonConnection);
 }
 
-IMPLEMENT_IBASE_EXT (csSkeleton)
+IMPLEMENT_IBASE_EXT (csSkel)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSkeleton)
 IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkeleton::Skeleton)
+IMPLEMENT_EMBEDDED_IBASE (csSkel::Skeleton)
   IMPLEMENTS_INTERFACE (iSkeleton)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSkeleton::csSkeleton ()
+csSkel::csSkel ()
 {
 CONSTRUCT_EMBEDDED_IBASE (scfiSkeleton);
 }
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csSkeletonLimbState)
+IMPLEMENT_IBASE (csSkelLimbState)
   IMPLEMENTS_INTERFACE (iSkeletonLimbState)
 IMPLEMENT_IBASE_END
 
-csSkeletonLimbState::csSkeletonLimbState (): 
+csSkelLimbState::csSkelLimbState (): 
   next (NULL), vertices (NULL), num_vertices (0), children (NULL),
   data (NULL)
 {
   CONSTRUCT_IBASE (NULL);
 }
 
-csSkeletonLimbState::~csSkeletonLimbState ()
+csSkelLimbState::~csSkelLimbState ()
 {
   while (children)
   {
-    csSkeletonLimbState* n = children->GetNext ();
+    csSkelLimbState* n = children->GetNext ();
     delete children;
     children = n;
   }
 }
 
-void csSkeletonLimbState::Transform (const csTransform& tr, csVector3* source,
+void csSkelLimbState::Transform (const csTransform& tr, csVector3* source,
   csVector3* dest)
 {
-  csSkeletonLimbState* c = children;
+  csSkelLimbState* c = children;
   while (c)
   {
     c->Transform (tr, source, dest);
@@ -220,20 +220,20 @@ void csSkeletonLimbState::Transform (const csTransform& tr, csVector3* source,
     dest [vertices [i]] = tr * source[vertices [i]];
 }
 
-void csSkeletonLimbState::SetName (const char *newname)
+void csSkelLimbState::SetName (const char *newname)
 {
   if (name) free (name);
   name = strdup (newname);
 }
 
-void csSkeletonConnectionState::Transform (const csTransform& tr,
+void csSkelConnectionState::Transform (const csTransform& tr,
   csVector3* source, csVector3* dest)
 {
   csTransform tr_new = tr * trans;
-  csSkeletonLimbState::Transform (tr_new, source, dest);
+  csSkelLimbState::Transform (tr_new, source, dest);
 }
 
-void csSkeletonLimbState::ComputeBoundingBox (const csTransform& tr,
+void csSkelLimbState::ComputeBoundingBox (const csTransform& tr,
 	csBox3& box)
 {
   if (num_vertices)
@@ -250,7 +250,7 @@ void csSkeletonLimbState::ComputeBoundingBox (const csTransform& tr,
     box.AddBoundingVertexSmart (tr * b.GetCorner (7));
   }
 
-  csSkeletonLimbState* c = children;
+  csSkelLimbState* c = children;
   while (c)
   {
     c->ComputeBoundingBox (tr, box);
@@ -258,54 +258,54 @@ void csSkeletonLimbState::ComputeBoundingBox (const csTransform& tr,
   }
 }
 
-IMPLEMENT_IBASE_EXT (csSkeletonConnectionState)
+IMPLEMENT_IBASE_EXT (csSkelConnectionState)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonConnectionState)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
 IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkeletonConnectionState::SkeletonConnectionState)
+IMPLEMENT_EMBEDDED_IBASE (csSkelConnectionState::SkeletonConnectionState)
   IMPLEMENTS_INTERFACE (iSkeletonConnectionState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkeletonConnectionState::SkeletonBone)
+IMPLEMENT_EMBEDDED_IBASE (csSkelConnectionState::SkeletonBone)
   IMPLEMENTS_INTERFACE (iSkeletonBone)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSkeletonConnectionState::csSkeletonConnectionState ()
+csSkelConnectionState::csSkelConnectionState ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
   CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonConnectionState);
 }
 
-void csSkeletonConnectionState::ComputeBoundingBox (const csTransform& tr,
+void csSkelConnectionState::ComputeBoundingBox (const csTransform& tr,
 	csBox3& box)
 {
   csTransform tr_new = tr * trans;
-  csSkeletonLimbState::ComputeBoundingBox (tr_new, box);
+  csSkelLimbState::ComputeBoundingBox (tr_new, box);
 }
 
-IMPLEMENT_IBASE_EXT (csSkeletonState)
+IMPLEMENT_IBASE_EXT (csSkelState)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonState)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSkeletonBone)
 IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkeletonState::SkeletonState)
+IMPLEMENT_EMBEDDED_IBASE (csSkelState::SkeletonState)
   IMPLEMENTS_INTERFACE (iSkeletonState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSkeletonState::SkeletonBone)
+IMPLEMENT_EMBEDDED_IBASE (csSkelState::SkeletonBone)
   IMPLEMENTS_INTERFACE (iSkeletonBone)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSkeletonState::csSkeletonState ()
+csSkelState::csSkelState ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonState);
   CONSTRUCT_EMBEDDED_IBASE (scfiSkeletonBone);
 }
 
-void csSkeletonState::ComputeBoundingBox (const csTransform& tr,
+void csSkelState::ComputeBoundingBox (const csTransform& tr,
 	csBox3& box)
 {
   box.StartBoundingBox ();
-  csSkeletonLimbState::ComputeBoundingBox (tr, box);
+  csSkelLimbState::ComputeBoundingBox (tr, box);
 }

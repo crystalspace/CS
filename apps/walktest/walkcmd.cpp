@@ -284,7 +284,7 @@ bool LoadCamera (iVFS* vfs, const char *fName)
   return true;
 }
 
-void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
+void move_sprite (csSprite* sprite, csSector* where, csVector3 const& pos)
 {
   sprite->GetMovable ().SetPosition (pos);
   sprite->GetMovable ().SetSector (where);
