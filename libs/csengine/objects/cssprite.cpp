@@ -43,8 +43,6 @@ csSprite::csSprite (csObject* theParent) : csPObject ()
   MixMode = CS_FX_COPY;
   defered_num_lights = 0;
   defered_lighting_flags = 0;
-  draw_callback = NULL;
-  draw_callback2 = NULL;
   is_visible = false;
   camera_cookie = 0;
   ptree_obj = NULL;

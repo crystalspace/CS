@@ -34,8 +34,6 @@ class csPolygon3D;
 class Polygon2D;
 class csCamera;
 class csDynLight;
-class csSprite3D;
-class csSprite;
 class Dumper;
 class csPolygonTree;
 class csPolygon2DQueue;

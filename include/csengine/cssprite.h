@@ -43,16 +43,9 @@ class csMaterialWrapper;
 class csLightHitsSprite;
 class csSkeleton;
 class csSkeletonState;
-class csSprite3D;
 class csBspContainer;
 class csRandomGen;
 struct iTextureHandle;
-
-/// A callback function for csSprite3D::Draw().
-typedef void (csSpriteCallback) (csSprite3D* spr, csRenderView* rview);
-/// A callback function for csSprite3D::Draw().
-typedef void (csSpriteCallback2)
-  (csSprite3D* spr, csRenderView* rview, csObject *callbackData);
 
 /**
  * The base class for all types of sprites.
@@ -90,12 +83,6 @@ protected:
 
   /// Flags to use for defered lighting.
   int defered_lighting_flags;
-
-  /// The callback which is called just before drawing.
-  csSpriteCallback* draw_callback;
-
-  /// This callback is only called if the sprite is actually drawn.
-  csSpriteCallback2* draw_callback2;
 
   /**
    * Flag which is set to true when the sprite is visible.
@@ -188,32 +175,6 @@ public:
 
   /// Gets the mode that is used, when drawing that sprite.
   virtual UInt GetMixmode () { return MixMode; }
-
-  /**
-   * Set a callback which is called just before the sprite is drawn.
-   * This is useful to do some expensive computations which only need
-   * to be done on a visible sprite.
-   */
-  void SetDrawCallback (csSpriteCallback* callback)
-  { draw_callback = callback; }
-
-  /**
-   * Set a callback which is called only if the sprite is actually drawn.
-   */
-  void SetDrawCallback2 (csSpriteCallback2* callback)
-  { draw_callback2 = callback; }
-
-  /**
-   * Get the draw callback. If there are multiple draw callbacks you can
-   * use this function to chain.
-   */
-  csSpriteCallback* GetDrawCallback () { return draw_callback; }
-
-  /**
-   * Get the draw callback. If there are multiple draw callbacks you can
-   * use this function to chain.
-   */
-  csSpriteCallback2* GetDrawCallback2 () { return draw_callback2; }
 
   /**
    * Light sprite according to the given array of lights (i.e.
