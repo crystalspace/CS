@@ -4,6 +4,17 @@ The history order has been reversed so that new features are at the top.
 	- Converted the missile in walktest to use the new mesh object
 	  spr3d plugin instead of csSprite3D. Also modified standard.zip
 	  accordingly.
+	- Finished support for spr3dldr (added support for TWEEN and
+	  ACTION). Now it can correctly load sprites.
+	- Added SCF interface iMeshWrapper which is the SCF version of
+	  csMeshWrapper. Also put a few functions in there so that it
+	  is possible to actually use it.
+	- Added CreateMeshFactory() and CreateMeshObject() conveniance
+	  functions to iEngine. The first one creates a factory and the
+	  second one will create a mesh object given a factory and place
+	  it correctly in the world.
+	- Updated simple to use the new conveniance functions.
+	- Norman Kramer started optimizing AVI plugin using u/v pipe.
 6-Feb-2001
 	- Continue implementation of spr3d loader plugin. The factory
 	  loader should work now.

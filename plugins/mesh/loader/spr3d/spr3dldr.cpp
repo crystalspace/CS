@@ -389,6 +389,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
     if (!params)
     {
       // @@@ Error handling!
+      printf ("No params!\n");
       fact->DecRef ();
       return NULL;
     }
@@ -401,6 +402,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	  if (!mat)
 	  {
             // @@@ Error handling!
+	    printf ("Can't find material!\n");
             fact->DecRef ();
             return NULL;
 	  }
@@ -416,6 +418,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	  if (!LoadSkeleton (skellimb, params))
 	  {
 	    // @@@ Error handling!
+	    printf ("Bad skeleton!\n");
 	    fact->DecRef ();
 	    return NULL;
 	  }
@@ -434,6 +437,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
             {
 	      //@@@ Error handling!
               //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+	      printf ("Bad action!\n");
 	      fact->DecRef ();
 	      return NULL;
             }
@@ -447,6 +451,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	          //@@@ Error handling!
                   //CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add a unknown frame '%s' in %s action !\n",
                         //fn, act->GetName ());
+		  printf ("Bad frame!\n");
 		  fact->DecRef ();
                   return NULL;
                 }
@@ -471,6 +476,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
             {
 	      //@@@ Error handling!
               //CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+	      printf ("Error\n");
 	      fact->DecRef ();
 	      return NULL;
             }
@@ -488,6 +494,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 		  //@@@ Error handling!
                   //CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
                     //fr->GetName ());
+	      	  printf ("Too many vertices!\n");
 		  fact->DecRef ();
 		  return NULL;
                 }
@@ -502,6 +509,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	    //@@@ Error handling!
             //CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing frame '%s'!\n",
                 //fr->GetName (), csGetLastOffender ());
+	    printf ("Token not found!\n");
 	    fact->DecRef ();
 	    return NULL;
           }
@@ -510,6 +518,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
 	    //@@@ Error handling!
             //CsPrintf (MSG_FATAL_ERROR, "Error! Too few vertices in frame '%s'! (%d %d)\n",
                 //fr->GetName (), i, state->GetNumTexels ());
+	    printf ("Too few vertices!\n");
 	    fact->DecRef ();
 	    return NULL;
           }
@@ -571,9 +580,11 @@ bool csSprite3DLoader::Initialize (iSystem* system)
 iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ACTION)
     CS_TOKEN_TABLE (FACTORY)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (TWEEN)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -601,12 +612,17 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine)
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
+	    printf ("Can't find factory!\n");
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           spr3dLook = QUERY_INTERFACE (mesh, iSprite3DState);
 	}
 	break;
+      case CS_TOKEN_ACTION:
+        ScanStr (params, "%s", str);
+	spr3dLook->SetAction (str);
+        break;
       case CS_TOKEN_MATERIAL:
 	{
           ScanStr (params, "%s", str);
@@ -614,6 +630,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine)
 	  if (!mat)
 	  {
             // @@@ Error handling!
+	    printf ("Can't find material!\n");
             mesh->DecRef ();
             return NULL;
 	  }
@@ -623,6 +640,14 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine)
       case CS_TOKEN_MIXMODE:
         spr3dLook->SetMixMode (ParseMixmode (params));
 	break;
+      case CS_TOKEN_TWEEN:
+	{
+	  bool do_tween;
+          ScanStr (params, "%b", &do_tween);
+          spr3dLook->EnableTweening (do_tween);
+	}
+	break;
+
     }
   }
 
@@ -630,5 +655,4 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine)
 }
 
 //---------------------------------------------------------------------------
-
 

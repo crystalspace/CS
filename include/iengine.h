@@ -34,6 +34,7 @@ struct iDynLight;
 struct iThing;
 struct iSprite;
 struct iSpriteTemplate;
+struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iMaterialWrapper;
 struct iTextureWrapper;
@@ -43,7 +44,7 @@ struct iView;
 struct iGraphics3D;
 struct iTransformationManager;
 
-SCF_VERSION (iEngine, 0, 1, 9);
+SCF_VERSION (iEngine, 0, 1, 10);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -226,6 +227,29 @@ struct iEngine : public iPlugIn
 
   /// Get the transformation manager.
   virtual iTransformationManager* GetTransformationManager () = 0;
+
+  /**
+   * Conveniance function to create a mesh factory from a given type.
+   * The type plugin will only be loaded if needed. 'classId' is the
+   * SCF name of the plugin (like 'crystalspace.mesh.object.cube').
+   * Returns NULL on failure. The factory will be registered with the engine
+   * under the given name. If there is already a factory with that name
+   * no new factory will be created but the found one is returned instead.
+   * If the name is NULL then no name will be set and no check will happen
+   * if the factory already exists.
+   */
+  virtual iMeshFactoryWrapper* CreateMeshFactory (const char* classId,
+  	const char* name) = 0;
+
+  /**
+   * Conveniance function to create a mesh object for a given factory.
+   * If 'sector' is NULL then the mesh object will not be set to a position.
+   * Returns NULL on failure. The object will be given the specified name.
+   * 'name' can be NULL if no name is wanted. Different mesh objects can
+   * have the same name (in contrast with factory objects).
+   */
+  virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
+  	const char* name, iSector* sector, const csVector3& pos) = 0;
 };
 
 #endif // __IENGINE_H__

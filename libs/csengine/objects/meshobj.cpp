@@ -24,9 +24,18 @@
 
 IMPLEMENT_CSOBJTYPE (csMeshWrapper, csSprite)
 
+IMPLEMENT_IBASE (csMeshWrapper)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iMeshWrapper)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshWrapper)
+  IMPLEMENTS_INTERFACE (iMeshWrapper)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
 	: csSprite (theParent), bbox (NULL)
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
   bbox.SetOwner (this);
   ptree_obj = &bbox;
   csMeshWrapper::mesh = mesh;
@@ -37,6 +46,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
 csMeshWrapper::csMeshWrapper (csObject* theParent)
 	: csSprite (theParent), bbox (NULL)
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiMeshWrapper);
   bbox.SetOwner (this);
   ptree_obj = &bbox;
   csMeshWrapper::mesh = NULL;
@@ -180,6 +190,10 @@ void csMeshWrapper::HardTransform (const csReversibleTransform& t)
   }
 }
 
+iMovable* csMeshWrapper::MeshWrapper::GetMovable ()
+{
+  return QUERY_INTERFACE (&(scfParent->GetMovable ()), iMovable);
+}
 
 //--------------------------------------------------------------------------
 

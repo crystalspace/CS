@@ -2143,6 +2143,44 @@ iTransformationManager* csEngine::GetTransformationManager ()
   return QUERY_INTERFACE (&tr_manager, iTransformationManager);
 }
 
+iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
+	const char* name)
+{
+  if (name != NULL)
+  {
+    iMeshFactoryWrapper* factwrap = FindMeshFactory (name);
+    if (factwrap != NULL) return factwrap;
+  }
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, classId, "MeshObj", iMeshObjectType);
+  if (!type) type = LOAD_PLUGIN (System, classId, "MeshObj", iMeshObjectType);
+  if (!type) return NULL;
+  iMeshObjectFactory* fact = type->NewFactory ();
+  if (!fact) return NULL;
+  csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper (fact);
+  if (name) mfactwrap->SetName (name);
+  meshobj_factories.Push (mfactwrap);
+  return QUERY_INTERFACE (mfactwrap, iMeshFactoryWrapper);
+}
+
+iMeshWrapper* csEngine::CreateMeshObject (iMeshFactoryWrapper* factory,
+  	const char* name, iSector* sector, const csVector3& pos)
+{
+  iMeshObjectFactory* fact = factory->GetMeshObjectFactory ();
+  iMeshObject* mesh = fact->NewInstance ();
+  csMeshWrapper* meshwrap = new csMeshWrapper (this, mesh);
+  mesh->DecRef ();
+  if (name) meshwrap->SetName (name);
+  sprites.Push (meshwrap);
+  if (sector)
+  {
+    meshwrap->GetMovable ().SetSector (sector->GetPrivateObject ());
+    meshwrap->GetMovable ().SetPosition (pos);
+    meshwrap->GetMovable ().UpdateMove ();
+  }
+  return QUERY_INTERFACE (meshwrap, iMeshWrapper);
+}
+
+
 //----------------Begin-Multi-Context-Support------------------------------
 
 void csEngine::Resize ()

@@ -1209,6 +1209,13 @@ public:
   /// Remove a dynamic light.
   virtual void RemoveDynLight (iDynLight*);
 
+  /// Create mesh factory.
+  virtual iMeshFactoryWrapper* CreateMeshFactory (const char* classId,
+  	const char* name);
+  /// Create mesh object.
+  virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
+  	const char* name, iSector* sector, const csVector3& pos);
+
   //--------------------- iConfig interface implementation --------------------
 
   csEngineConfig scfiConfig;

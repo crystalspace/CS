@@ -165,6 +165,58 @@ struct iMeshObjectType : public iPlugIn
   virtual iMeshObjectFactory* NewFactory () = 0;
 };
 
+SCF_VERSION (iMeshWrapper, 0, 0, 1);
+
+/**
+ * This interface corresponds to the object in the engine
+ * that holds reference to the real iMeshObject.
+ */
+struct iMeshWrapper : public iBase
+{
+  /// Get the iMeshObject.
+  virtual iMeshObject* GetMeshObject () = 0;
+
+  /**
+   * Update lighting as soon as the object becomes visible.
+   * This will call engine->GetNearestLights with the supplied
+   * parameters.
+   */
+  virtual void DeferUpdateLighting (int flags, int num_lights) = 0;
+
+  /**
+   * Light object according to the given array of lights (i.e.
+   * fill the vertex color array).
+   * No shadow calculation will be done. This is assumed to have
+   * been done earlier. This is a primitive lighting process
+   * based on the lights which hit one point of the sprite (usually
+   * the center). More elaborate lighting systems are possible
+   * but this will do for now.
+   */
+  virtual void UpdateLighting (iLight** lights, int num_lights) = 0;
+
+  /**
+   * Get the movable instance for this object.
+   * It is very important to call GetMovable()->UpdateMove()
+   * after doing any kind of modification to this movable
+   * to make sure that internal data structures are
+   * correctly updated.
+   */
+  virtual iMovable* GetMovable () = 0;
+
+  /**
+   * Check if this object is hit by this object space vector.
+   * Return the collision point in object space coordinates.
+   */
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr) = 0;
+  /**
+   * Check if this object is hit by this world space vector.
+   * Return the collision point in world space coordinates.
+   */
+  virtual bool HitBeam (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr) = 0;
+};
+
 SCF_VERSION (iMeshFactoryWrapper, 0, 0, 1);
 
 /**

@@ -149,6 +149,39 @@ public:
   void HardTransform (const csReversibleTransform& t);
 
   CSOBJTYPE;
+  DECLARE_IBASE_EXT (csSprite);
+
+  //--------------------- iMeshWrapper implementation --------------------//
+  struct MeshWrapper : public iMeshWrapper
+  {
+    DECLARE_EMBEDDED_IBASE (csMeshWrapper);
+    virtual iMeshObject* GetMeshObject ()
+    {
+      return scfParent->GetMeshObject ();
+    }
+    virtual void DeferUpdateLighting (int flags, int num_lights)
+    {
+      scfParent->DeferUpdateLighting (flags, num_lights);
+    }
+    virtual void UpdateLighting (iLight** lights, int num_lights)
+    {
+      (void)lights; (void)num_lights;
+      printf ("UpdateLighting in iMeshWrapper DOES NOT WORK YET!\n");
+      // @@@ TODO!!!
+      //scfParent->UpdateLighting (lights, num_lights);
+    }
+    virtual iMovable* GetMovable ();
+    virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr)
+    {
+      return scfParent->HitBeamObject (start, end, isect, pr);
+    }
+    virtual bool HitBeam (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr)
+    {
+      return scfParent->HitBeam (start, end, isect, pr);
+    }
+  } scfiMeshWrapper;
 };
 
 /**
