@@ -125,6 +125,8 @@ static struct
     0x00,0x00,0x00,0x00,0x83,0x05,0x5d,0x28,0x00,0x63,0xba,0xe3,0xff}}
 };
 
+static unsigned short *VESAModes;
+
 static void SetXmode (int XMode)
 {
   // Set up plain VGA 320x200x256 mode
@@ -187,6 +189,31 @@ VideoSystem::VideoSystem ()
     dosmemget (__tb, sizeof (VESAInformation), &vi);
     VESAversion = vi.Version;
     VideoRAM = vi.VideoRAM * 64;
+    // now get the list of supported VESA modes
+    if (vi.VideoModeList)
+    {
+      int vmcount = 0;
+      unsigned short mode;
+      unsigned long vmaddr = ((vi.VideoModeList & 0xffff0000) >> 12) +
+        (vi.VideoModeList & 0xffff);
+      while (1)
+      {
+        dosmemget (vmaddr + vmcount * 2, sizeof (unsigned short), &mode);
+        vmcount++;
+        if (mode == 0xffff)
+          break;
+      }
+      VESAModes = new unsigned short [vmcount];
+      dosmemget (vmaddr, vmcount * sizeof (unsigned short), VESAModes);
+    }
+    else
+    {
+      // build a dummy videomode list
+      VESAModes = new unsigned short [0x40 + 1];
+      for (int i = 0; i < 0x40; i++)
+        VESAModes [i] = 0x100 + i;
+      VESAModes [0x40] = 0xffff;
+    }
   }
   else
   {
@@ -230,11 +257,12 @@ bool VideoSystem::FindMode (int Width, int Height, int Depth, int &PaletteSize,
 
   // Check VESA mode list
   if ((!bestmode)
-   && (VESAversion >= 0x0100))
-    for (i = 0x100; i < 0x140; i++)
+   && (VESAversion >= 0x0100)
+   && VESAModes)
+    for (i = 0; VESAModes [i] != 0xffff; i++)
     {
       regs.x.ax = 0x4f01;
-      regs.x.cx = i;
+      regs.x.cx = VESAModes [i];
       regs.x.es = __tb >> 4;
       regs.x.di = 0;
 
@@ -261,7 +289,7 @@ bool VideoSystem::FindMode (int Width, int Height, int Depth, int &PaletteSize,
         RedMask = maskbits [mb.RedMaskBits] << mb.RedMaskShift;
         GreenMask = maskbits [mb.GreenMaskBits] << mb.GreenMaskShift;
         BlueMask = maskbits [mb.BlueMaskBits] << mb.BlueMaskShift;
-        bestmode = i;
+        bestmode = VESAModes [i];
         break;
       } /* endif */
     } /* endfor */
@@ -857,7 +885,7 @@ void VideoSystem::Flush (int x, int y, int w, int h)
     } /* endwhile */
 
     // Flip pages
-    if (UseDoubleBuffering)
+    if ((VideoPages > 1) && UseDoubleBuffering)
     {
       VESASetPage (VideoPage);
       VideoPage ^= 1;
@@ -865,29 +893,29 @@ void VideoSystem::Flush (int x, int y, int w, int h)
   } /* endif */
 }
 
-void VideoSystem::GetPalette (csVGApalette &Palette)
+void VideoSystem::GetPalette (RGBpaletteEntry *Palette, int Colors)
 {
   int i;
 
   outportb (0x3c7, 0);
-  for (i = 0; i < 256; i++)
+  for (i = 0; i < Colors; i++)
   {
-    Palette [i].r = inportb (0x3c9);
-    Palette [i].g = inportb (0x3c9);
-    Palette [i].b = inportb (0x3c9);
+    Palette [i].red = inportb (0x3c9);
+    Palette [i].green = inportb (0x3c9);
+    Palette [i].blue = inportb (0x3c9);
   }
 }
 
-void VideoSystem::SetPalette (csVGApalette &Palette)
+void VideoSystem::SetPalette (RGBpaletteEntry *Palette, int Colors)
 {
   int i;
 
   outportb (0x3c8, 0);
-  for (i = 0; i < 256; i++)
+  for (i = 0; i < Colors; i++)
   {
-    outportb (0x3c9, Palette [i].r);
-    outportb (0x3c9, Palette [i].g);
-    outportb (0x3c9, Palette [i].b);
+    outportb (0x3c9, Palette [i].red >> 2);
+    outportb (0x3c9, Palette [i].green >> 2);
+    outportb (0x3c9, Palette [i].blue >> 2);
   }
 }
 

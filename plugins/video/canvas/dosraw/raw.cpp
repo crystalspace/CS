@@ -279,6 +279,7 @@ void csGraphics2DDOSRAW::Close ()
 
 void csGraphics2DDOSRAW::Print (csRect *area)
 {
+#if USE_ALLEGRO
   if (PaletteChanged && pfmt.PalEntries)
   {
     outportb (0x3c8, 0);
@@ -290,7 +291,6 @@ void csGraphics2DDOSRAW::Print (csRect *area)
     } /* endfor */
     PaletteChanged = false;
   }
-#if USE_ALLEGRO
   if (area)
     blit (_vdata, screen, area->xmin, area->ymin, area->xmin, area->ymin,
       area->Width (), area->Height ());
@@ -301,6 +301,11 @@ void csGraphics2DDOSRAW::Print (csRect *area)
             please check above "if" for correctness
                     then remove this text
 #else
+  if (PaletteChanged && pfmt.PalEntries)
+  {
+    VS.SetPalette (Palette, 256);
+    PaletteChanged = false;
+  }
   if (area)
     VS.Flush (area->xmin, area->ymin, area->Width (), area->Height ());
   else

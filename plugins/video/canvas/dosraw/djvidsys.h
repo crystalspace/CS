@@ -36,14 +36,9 @@
 #include <go32.h>
 #include <pc.h>
 
+#include "cs2d/common/graph2d.h"
+
 #pragma pack (1)
-
-struct csRGB
-{
-  unsigned char r, g, b;
-};
-
-typedef csRGB csVGApalette[256];
 
 // VESA information structure
 struct VESAInformation
@@ -59,7 +54,7 @@ struct VESAInformation
                                         //  1        non-VGA controller
                                         //  2        programmed DAC with blank bit
                                         //  3-31        reserved
-  void *VideoModeList;                  // pointer to list of supported video modes
+  unsigned long VideoModeList;          // pointer to list of supported video modes
   unsigned short VideoRAM;              // total amount of video memory in 64K blocks
 //---- only for VESA 2.0
   unsigned short OEMVersion;            // OEM software version
@@ -157,9 +152,9 @@ public:
   /// Flushes double buffer out to VRAM
   void Flush (int x, int y, int w, int h);
   /// Puts current pal in Palette
-  void GetPalette (csVGApalette &Palette);
+  void GetPalette (RGBpaletteEntry *Palette, int iColors);
   /// Writes out Palette
-  void SetPalette (csVGApalette &Palette);
+  void SetPalette (RGBpaletteEntry *Palette, int iColors);
   /// Clear current buffer
   void Clear (int Color);
   /// Open graphics screen; return error code
