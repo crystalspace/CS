@@ -559,6 +559,7 @@ const char* plugin_compiler()                                          \
 
 #endif // !CS_STATIC_LINKED
 
+#ifndef CS_NO_STDIO_REPLACEMENTS
 // printf() replacements, to deal with UTF-8 correctly on all Windowses
 #define		printf		_cs_printf
 #define		vprintf		_cs_vprintf
@@ -571,5 +572,6 @@ extern int _cs_printf (const char* format, ...);
 extern int _cs_fputs (const char* string, FILE* stream);
 extern int _cs_vfprintf (FILE* stream, const char* format, va_list args);
 extern int _cs_fprintf (FILE* stream, const char* format, ...);
+#endif
 
 #endif // __CS_CSOSDEFS_H__

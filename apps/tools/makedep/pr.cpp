@@ -26,6 +26,7 @@
 
  */
 
+#define CS_NO_STDIO_REPLACEMENTS
 #include "cssysdef.h"
 #include "def.h"
 #include <string.h>

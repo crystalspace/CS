@@ -50,6 +50,11 @@ chronological order.
 	  a subclass of csArray<csRef<T> > in order to provide a more efficient
 	  Push(T*) that avoids the extra IncRef() that happens with
 	  csArray<csRef<T> >.
+	- res further worked on the Jam msvcgen. Now, metadata is added to the
+	  generated .rc file as well. 
+	- res worked around the makedep compile problems on MinGW: in case a
+	  "CS_NO_STDIO_REPLACEMENTS" macro is defined, Win32 csosdefs.h won't
+	  so the stdio aliasing alias.
 4-Aug-2003
 	- Oktal added the following to csutil:
 	    - A template class, csHash<T>, intended to replace csHashMap soon.
