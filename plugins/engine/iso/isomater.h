@@ -116,12 +116,12 @@ public:
   }
 
   // @@@NR@@@
-  virtual void SetShader (csStringID, iShader*) { }
+  virtual void SetShader (csStringID, iShader*) {}
   virtual iShader* GetShader (csStringID) { return 0; }
   virtual void AddVariable (csShaderVariable *variable) {}
   virtual csShaderVariable* GetVariable (csStringID name) const { return 0; }
-  virtual csShaderVariable* GetVariableRecursive (csStringID name) const { return 0; }
-  virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const {return 0; }
+  virtual void PushVariables (CS_SHADERVAR_STACK &stacks) const {}
+  virtual void PopVariables (CS_SHADERVAR_STACK &stacks) const {}
 };
 
 /**

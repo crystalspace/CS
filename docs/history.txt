@@ -7,10 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 26-Feb-2004
-	- Eric Sunshine fixed the old renderer's gl3d, soft3d, and null3d
-	  plugins so that they once again build successfully following Anders
-	  Stenberg's rewrite of the shader variable system.  Also eliminated
-	  some related compilation warnings.
+	- Eric Sunshine fixed the old renderer gl3d, soft3d, null3d, and the
+	  ISO engine plugins so that they once again build successfully
+	  following Anders Stenberg's rewrite of the shader variable system.
+	  Also eliminated some related compilation warnings.
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights
