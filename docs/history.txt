@@ -16,6 +16,10 @@ Short-term cleanups that need to be done:
 	- Michael Dale Long added support for configurable colors using
 	  the iTextureManager to iConsole.  He also removed all dependencies
 	  on the 3D graphics driver from the csConsole plugin.
+	- Eric Sunshine changed the CVS snapshot script so that it also
+	  creates a symbolic link to the most recent 'diff' file in addition
+	  to creating a link to the most recent package.  (This feature was
+	  requested by a user.)
 7-Jan-2000
 	- Fixed colored static lighting for OpenGL and Direct3D.
 	- Some fixes on lightmap deallocation. Now use DecRef()
@@ -26,6 +30,8 @@ Short-term cleanups that need to be done:
 	  (walktest, csgame) to use it instead of the old csConsole.
 	  The new cscon still needs a lot of work, so csSimpleConsole
 	  will continue to work as before.
+	- Eric Sunshine fixed several minor problems which cropped up with
+	  the introduction of the new iConsole and cscon.
 6-Jan-2000
 	- Thomas Hieber added iterators for nodes and keys.
 	  Added simplified access to keys and node by name and classname.
