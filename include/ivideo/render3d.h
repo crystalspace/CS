@@ -34,7 +34,7 @@ class csRect;
 class csReversibleTransform;
 class csStringSet;
 class csPlane3;
-
+class csVector3;
 
 class csRenderMesh;
 
