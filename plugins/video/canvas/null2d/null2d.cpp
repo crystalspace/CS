@@ -47,9 +47,10 @@ bool csGraphics2DNull::Initialize (iObjectRegistry* object_reg)
     if (!csGraphics2D::Initialize(object_reg))
 	return false;
 
-    pfmt.RedMask = 0xf800;
+    pfmt.RedMask   = 0xf800;
     pfmt.GreenMask = 0x07e0;
-    pfmt.BlueMask = 0x001f;
+    pfmt.BlueMask  = 0x001f;
+    pfmt.AlphaMask = 0x0000;
 
     pfmt.complete ();
     pfmt.PalEntries = 0;
