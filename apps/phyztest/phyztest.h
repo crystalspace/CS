@@ -23,6 +23,7 @@
 #include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "cstool/collider.h"
 
 struct iSector;
 struct iView;
@@ -32,6 +33,7 @@ struct iCollideSystem;
 struct iFont;
 struct iLoader;
 struct iKeyboardDriver;
+class csRigidSpaceTimeObj;
 
 enum TextAlignmentModes {ALIGN_LEFT,ALIGN_RIGHT,ALIGN_CENTER};
 
@@ -52,6 +54,8 @@ public:
   iGraphics2D* myG2D;
   iGraphics3D* myG3D;
   iKeyboardDriver* kbd;
+  csColliderWrapper *room_collwrap;
+  csRigidSpaceTimeObj *bot_sto;
 
   void WriteShadow (int align, int x, int y, int fg, char *str,...);
   void Write (int align, int x, int y, int fg, int bg, char *str,...);

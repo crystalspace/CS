@@ -50,7 +50,8 @@ public:
 
   ctCollidingContact *contact;
 
-  csRigidSpaceTimeObj( iCollideSystem* cdsys, iMeshWrapper *psprt, ctRigidBody *prb );
+  csRigidSpaceTimeObj (iCollideSystem* cdsys, iMeshWrapper *psprt, ctRigidBody *prb );
+  ~csRigidSpaceTimeObj ();
 
 protected:
   static void update_space();
