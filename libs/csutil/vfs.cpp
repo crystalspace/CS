@@ -1084,7 +1084,7 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 csVFS::~csVFS ()
 {
   CHK (delete config);
-  CHK (delete cwd);
+  CHK (delete [] cwd);
   CHK (delete ArchiveCache);
 }
 

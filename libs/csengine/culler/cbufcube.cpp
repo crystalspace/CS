@@ -156,7 +156,7 @@ bool csCBufferCube::IsFull ()
 
 bool csCBufferCube::InsertPolygon (csVector3* verts, int num_verts)
 {
-  csVector3 cam[40];	// @@@ HARDCODED! BAD!
+  csVector3 cam[60];	// @@@ HARDCODED! BAD!
   int i;
   bool rc1, rc2, rc3, rc4, rc5, rc6;
 
@@ -241,7 +241,7 @@ bool csCBufferCube::InsertPolygon (csVector3* verts, int num_verts)
 
 bool csCBufferCube::TestPolygon (csVector3* verts, int num_verts)
 {
-  csVector3 cam[40];	// @@@ HARDCODED! BAD!
+  csVector3 cam[60];	// @@@ HARDCODED! BAD!
   int i;
 
   // -> Z

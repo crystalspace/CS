@@ -68,7 +68,7 @@ void csCBufferLine::MakeFull ()
     parent->FreeSpan (first_span);
     first_span = n;
   }
-  last_span=NULL;
+  last_span = NULL;
 }
 
 bool csCBufferLine::TestSpan (int startx, int endx)

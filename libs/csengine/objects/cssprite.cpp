@@ -377,7 +377,7 @@ void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
         n /= norm;
     }
   }
-  CHK (delete tri_normals);
+  CHK (delete[] tri_normals);
 }
 
 

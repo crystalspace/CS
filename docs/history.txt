@@ -1,6 +1,25 @@
 The history order has been reversed so that new features are at the top.
 
+4-Apr-2000
+	- Fixed several occurances of 'delete' that should be 'delete[]'.
+	  Reported by Paul Snively <psnively@earthlink.net>.
+	- Restored DrawPixmap in OpenGL which Gary Haussmann accidently
+	  removed.
+	- Some further debugging on the c-buffer cube.
+3-Apr-2000
+	- Andrew Zabolotny did the following changes:
+	    - Fixed the problem with gfxldr crashing in plugins. Removing
+	      the default (empty) destructor of csImageLoader helped. It
+	      seems that during static object creation the destructor is
+	      registered with atexit() which crashes because the shared
+	      libs are no longer present in memory.
+	    - Re-implemented the csendian.h file. Now it depends on the
+	      CS_XXX_ENDIAN macros and are inline (thus much faster). The
+	      file csendian.cpp is not longer required.
+	    - Added the outline of iLoader interface.
 2-Apr-2000
+	- Norman Kramer moved cursor creation to happen in windowed mode
+	  only (Glide).
 	- Further work on c-buffer cube (i.e. debugging).
 	- Implemented csPoly3D::Project?Plane with ? X, Y, and Z. These
 	  functions will project a 3D polygon onto an x-aligned plane
@@ -19,6 +38,26 @@ The history order has been reversed so that new features are at the top.
 	  a system independent way) to find ways to break the hardware
 	  permanently. I implemented this for Linux and Unix in general
 	  and provided a dummy empty function for the other ports.
+	- Gary Haussmann added empty DrawPixmap() definition to fix
+	  'non-defined' loader errors. Did Andrew add this to the declaration?
+	  (editors note, there must have been a mistake here because Andrew
+	  not only added this to the declaration but also provided a
+	  full working implementation which Gary now destroyed).
+	- Gary also pushed part of the geometry transform (the perspective
+	  projection part) into the OpenGL transform matrix, so the
+	  perspective projection will be hardware accelerated if possible.
+	  Still need to push the world->camera transform into hardware,
+	  however. Also, no clipping is done so meshes may look odd. Fog is
+	  also semi-broken.
+	- Norman Kramer fixed a glide2/3 version clash.
+	- Paul Garceau did another updated for Cygnus/Win32:
+	    - Added 'if defined(__CYGWIN32__) to enable
+	      Unix path separator for Cygwin.
+	    - Added 'if defined' to enable  COMP_GCC/OS_WIN32
+	      memory allocation <malloc.h>.
+	    - Disabled  __NEED_OPENDIR_PROTOTYPE for
+	      COMP_GCC. COMP_GCC doesn't need it.
+	    - Enabled __NEED_GENERIC_ISDIR for Cygnus for OS_WIN32 (Cygwin32)
 31-Mar-2000
 	- Greatly simplified the new infinite renderer. Also removed
 	  a unix dependency.

@@ -40,11 +40,8 @@ csSoundData::~csSoundData()
 
 void csSoundData::Clean()
 {
-  if(Data) 
-  {
-    CHKB (delete (UByte *)Data);
-    Data = NULL;
-  }
+  CHKB (delete [] (UByte *)Data);
+  Data = NULL;
   Size = 0;
   Frequency = 0;
   Bit16 = false;

@@ -103,7 +103,7 @@ HighScore::~HighScore ()
 {
   int i;
   for (i = 0 ; i < 10 ; i++)
-    delete names[i];
+    delete[] names[i];
 }
 
 bool HighScore::RegisterScore (const char* name, int score)

@@ -1783,9 +1783,93 @@ void csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP & poly)
   DrawPolygonSingleTexture (poly);
 }
 
-/// Draw a 2D sprite
-void csGraphics3DOpenGL::DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
+void csGraphics3DOpenGL::DrawPixmap (iTextureHandle *hTex,
+  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
+  /// Retrieve clipping rectangle
+  int ClipX1, ClipY1, ClipX2, ClipY2;
+  G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
+
+  // Texture coordinates (floats)
+  float _tx = tx, _ty = ty, _tw = tw, _th = th;
+
+  // Clipping
+  if ((sx >= ClipX2) || (sy >= ClipY2) ||
+      (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
+    return;                             // Sprite is totally invisible
+  if (sx < ClipX1)                      // Left margin crossed?
+  {
+    int nw = sw - (ClipX1 - sx);        // New width
+    _tx += (ClipX1 - sx) * _tw / sw;    // Adjust X coord on texture
+    _tw = (_tw * nw) / sw;              // Adjust width on texture
+    sw = nw; sx = ClipX1;
+  } /* endif */
+  if (sx + sw > ClipX2)                 // Right margin crossed?
+  {
+    int nw = ClipX2 - sx;               // New width
+    _tw = (_tw * nw) / sw;              // Adjust width on texture
+    sw = nw;
+  } /* endif */
+  if (sy < ClipY1)                      // Top margin crossed?
+  {
+    int nh = sh - (ClipY1 - sy);        // New height
+    _ty += (ClipY1 - sy) * _th / sh;    // Adjust Y coord on texture
+    _th = (_th * nh) / sh;              // Adjust height on texture
+    sh = nh; sy = ClipY1;
+  } /* endif */
+  if (sy + sh > ClipY2)                 // Bottom margin crossed?
+  {
+    int nh = ClipY2 - sy;               // New height
+    _th = (_th * nh) / sh;              // Adjust height on texture
+    sh = nh;
+  } /* endif */
+
+  // cache the texture if we haven't already.
+  texture_cache->cache_texture (hTex);
+
+  // Get texture handle
+  csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *)hTex->GetPrivateObject ();
+  GLuint texturehandle = ((csGLCacheData *)txt_mm->GetCacheData ())->Handle;
+
+  // as we are drawing in 2D, we disable some of the commonly used features
+  // for fancy 3D drawing
+  glShadeModel (GL_FLAT);
+  glDisable (GL_DEPTH_TEST);
+  glDepthMask (GL_FALSE);
+
+  // if the texture has transparent bits, we have to tweak the
+  // OpenGL blend mode so that it handles the transparent pixels correctly
+  if (hTex->GetTransparent ())
+  {
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  }
+  else
+    glDisable (GL_BLEND);
+
+  glEnable (GL_TEXTURE_2D);
+  glColor4f (1.,1.,1.,1.);
+  glBindTexture (GL_TEXTURE_2D, texturehandle);
+  
+  int bitmapwidth = 0, bitmapheight = 0;
+  hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);
+
+  // convert texture coords given above to normalized (0-1.0) texture coordinates
+  float ntx1,nty1,ntx2,nty2;
+  ntx1 = (_tx      ) / bitmapwidth;
+  ntx2 = (_tx + _tw) / bitmapwidth;
+  nty1 = (_ty      ) / bitmapheight;
+  nty2 = (_ty + _th) / bitmapheight;
+
+  // draw the bitmap
+  glBegin (GL_QUADS);
+  glTexCoord2f (ntx1, nty1);
+  glVertex2i (sx, height - sy - 1);
+  glTexCoord2f (ntx2, nty1);
+  glVertex2i (sx + sw, height - sy - 1);
+  glTexCoord2f (ntx2, nty2);
+  glVertex2i (sx + sw, height - sy - sh - 1);
+  glTexCoord2f (ntx1, nty2);
+  glVertex2i (sx, height - sy - sh - 1);
+  glEnd ();
 }
-
-

@@ -205,7 +205,7 @@ public:
    * Note that this function will work with both clockwise and anti-
    * clockwise oriented polygons and will assume both orientations
    * are visible. Backface culling needs to be done elsewhere.
-   * If 'negative' is true the polygons in inserted inverted.
+   * If 'negative' is true the polygon is inserted inverted.
    */
   bool InsertPolygon (csVector2* verts, int num_verts, bool negative = false);
 

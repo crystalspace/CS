@@ -1030,10 +1030,8 @@ void* CalculateLightingPolygonsFB (csSector*,
       if (cb) vis = cb->TestPolygon (poly, p->GetNumVertices ());
       else vis = cc->TestPolygon (poly, p->GetNumVertices ());
     else
-      if (cb)
-        vis = cb->InsertPolygon (poly, p->GetNumVertices ());
-      else
-        vis = cc->InsertPolygon (poly, p->GetNumVertices ());
+      if (cb) vis = cb->InsertPolygon (poly, p->GetNumVertices ());
+      else vis = cc->InsertPolygon (poly, p->GetNumVertices ());
 #endif
     if (vis)
     {
@@ -1107,6 +1105,12 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
   {
     count_cull_dist++;
     return false;
+  }
+
+  if (ABS (dist) < EPSILON)
+  {
+    // We are in the node.
+    return true;
   }
 
   // Test node against quad-tree.
