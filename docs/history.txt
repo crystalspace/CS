@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Jan-2005
+	- Andrew Mann fixed bugs in the software sound renderer which prevented
+	  looping from working, and which caused a gap in the looping process.
 27-Jan-2005
 	- Marten rewrote the VBO support. It now uses a fixed cache and only 
 	  a few VBO-allocated buffers together with a slot-cache algorithm.

@@ -621,7 +621,7 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
 
       if (Num == 0)
       {
-        if (!(PlayMethod & SOUND_LOOP))
+        if (!SoundHandle->LoopStream)
         {
           Active = false;
           break;
@@ -629,6 +629,7 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
         if (wait == 0)
         {
           Restart();
+	  SoundHandle->ProcessReset(); 
           wait++;
         }
         else
