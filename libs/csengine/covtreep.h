@@ -85,6 +85,16 @@ public:
   	float* dxdy, float* dydx,
   	int hor_offs, int ver_offs);
 
+  /**
+   * Test if a polygon is not empty for the given area on the
+   * coverage mask tree without actually looking at the contents
+   * of the tree. This is useful for testing polygon in empty
+   * parts of the tree which are not defined.
+   */
+  bool TestPolygonNotEmpty (csVector2* poly, int num_verts,
+  	float* dxdy, float* dydx,
+  	int hor_offs, int ver_offs) const;
+
   /// Return the vertical number of pixels for this node.
   static int GetVerticalSize ()
   {
@@ -138,6 +148,16 @@ public:
   bool UpdatePolygon (csVector2* poly, int num_verts,
   	float* dxdy, float* dydx,
   	int hor_offs, int ver_offs);
+
+  /**
+   * Test if a polygon is not empty for the given area on the
+   * coverage mask tree without actually looking at the contents
+   * of the tree. This is useful for testing polygon in empty
+   * parts of the tree which are not defined.
+   */
+  bool TestPolygonNotEmpty (csVector2* poly, int num_verts,
+  	float* dxdy, float* dydx,
+  	int hor_offs, int ver_offs) const;
 
   /**
    * Do a graphical dump of the coverage mask tree

@@ -21,6 +21,68 @@
 #include "csgeom/math2d.h"
 #include "csengine/covmask.h"
 #include "csengine/sysitf.h"
+#include "igraph2d.h"
+
+void csCovMask::Dump () const
+{
+  char st[3] = ".#";
+  int i;
+  for (i = 0 ; i < CS_CM_BITS ; i++)
+  {
+    printf ("%c", st[GetState (i)]);
+    if ((i+1) % CS_CM_HOR == 0) printf ("\n");
+  }
+}
+
+void csCovMask::GfxDump (iGraphics2D* ig2d, int xoffs, int yoffs) const
+{
+  int i, col, row, st;
+  int x, y;
+  for (i = 0 ; i < CS_CM_BITS ; i++)
+  {
+    col = xoffs + 16 * (i & CS_CM_HORMASK);
+    row = yoffs + 16 * (i >> CS_CM_HORSHIFT);
+    st = GetState (i) ? 0xf800 : 0x8410;
+    for (x = 0 ; x < 15 ; x++)
+      for (y = 0 ; y < 15 ; y++)
+        ig2d->DrawPixel (col+x, row+y, st);
+  }
+}
+
+void csCovMaskTriage::Dump () const
+{
+  char st[5] = "*#.?";
+  int i;
+  for (i = 0 ; i < CS_CM_BITS ; i++)
+  {
+    printf ("%c", st[GetState (i)]);
+    if ((i+1) % CS_CM_HOR == 0) printf ("\n");
+  }
+}
+
+void csCovMaskTriage::GfxDump (iGraphics2D* ig2d, int xoffs, int yoffs) const
+{
+  int i, col, row, st;
+  int x, y;
+  for (i = 0 ; i < CS_CM_BITS ; i++)
+  {
+    col = xoffs + 16 * (i & CS_CM_HORMASK);
+    row = yoffs + 16 * (i >> CS_CM_HORSHIFT);
+    st = GetState (i);
+    switch (st)
+    {
+      case 0: st = 0x001f; break;
+      case 1: st = 0xf800; break;
+      case 2: st = 0x8410; break;
+      case 3: st = 0x07e0; break;
+    }
+    for (x = 0 ; x < 15 ; x++)
+      for (y = 0 ; y < 15 ; y++)
+        ig2d->DrawPixel (col+x, row+y, st);
+  }
+}
+
+//--------------------------------------------------------------------------
 
 csCovMaskLUT::csCovMaskLUT (int dimension)
 {
@@ -200,15 +262,32 @@ void csCovMaskLUT::BuildTables ()
       // and mark if they are left of L1 and/or right of L2.
       int dimhor1 = CS_CM_HOR+1;
       float fdim = (float)dimension;
-// @@@ BUG! What if from1 and to1 are equal? (and from2 and to2).
       for (ix = 0 ; ix <= CS_CM_HOR ; ix++)
         for (iy = 0 ; iy <= CS_CM_VER ; iy++)
 	{
 	  csVector2 p (
 	  	((float)ix) * fdim / (float)CS_CM_HOR,
 	  	((float)iy) * fdim / (float)CS_CM_VER);
-	  right[iy*dimhor1+ix] = csMath2::WhichSide2D (p, from1, to1) < 0;
-	  left[iy*dimhor1+ix] = csMath2::WhichSide2D (p, from2, to2) > 0;
+	  if (ABS (from1.x-to1.x) < EPSILON &&
+	  	ABS (from1.y-to1.y) < EPSILON)
+	  {
+	    csVector2 t1;
+	    t1.x = from1.x + (to2.x-from2.x);
+	    t1.y = from1.y + (to2.y-from2.y);
+	    left[iy*dimhor1+ix] = csMath2::WhichSide2D (p, from1, t1) > 0;
+	  }
+	  else
+	    left[iy*dimhor1+ix] = csMath2::WhichSide2D (p, from1, to1) > 0;
+	  if (ABS (from2.x-to2.x) < EPSILON &&
+	  	ABS (from2.y-to2.y) < EPSILON)
+	  {
+	    csVector2 t2;
+	    t2.x = from2.x + (to1.x-from1.x);
+	    t2.y = from2.y + (to1.y-from1.y);
+	    right[iy*dimhor1+ix] = csMath2::WhichSide2D (p, from2, t2) < 0;
+	  }
+	  else
+	    right[iy*dimhor1+ix] = csMath2::WhichSide2D (p, from2, to2) < 0;
 	}
 
       // Now we are going to calculate the normal and single coverage
@@ -232,9 +311,17 @@ void csCovMaskLUT::BuildTables ()
 	// mask that are completely right of L2.
 	int s = right[iy*dimhor1+ix] || right[iy*dimhor1+ix+1] ||
 		right[(iy+1)*dimhor1+ix] || right[(iy+1)*dimhor1+ix+1];
+	//int s = (!left[iy*dimhor1+ix]) || (!left[iy*dimhor1+ix+1]) ||
+		//(!left[(iy+1)*dimhor1+ix]) || (!left[(iy+1)*dimhor1+ix+1]);
 	triage_masks[mask_idx].SetState (bit, so, si);
-	masks[mask_idx].SetState (bit, s);
+	//masks[mask_idx].SetState (bit, s);
+	masks[mask_idx].SetState (bit, !so);
       }
+
+if (mask_idx == 353)
+{
+  triage_masks[mask_idx].Dump ();
+}
     }
   }
 
@@ -263,8 +350,8 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
   float x_top=0, x_bot=0;
   float y_left=0, y_right=0;
   int from = 0, to = 0;
-  csVector2 sta (start.x-fhor_offs, start.y-fver_offs);
-  csVector2 sto (stop.x-fhor_offs, stop.y-fver_offs);
+  csVector2 sta (start.x-fhor_offs, (480-start.y)-fver_offs);
+  csVector2 sto (stop.x-fhor_offs, (480-stop.y)-fver_offs);
 
   // We're going to create a bitmask with four bits to represent
   // all intersections. The bits are tblr (top, bottom, left,
@@ -323,12 +410,6 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
     case 0xd:
     // Bottom, left, and right side.
     case 0x7:
-printf ("fhor_offs=%f fver_offs=%f fbox_hor=%f fbox_ver=%f fdim=%f\n",
-fhor_offs, fver_offs, fbox_hor, fbox_ver, fdim);
-printf ("sta=(%f,%f) sto=(%f,%f)\n", sta.x, sta.y, sto.x, sto.y);
-printf ("x_top=%f, x_bot=%f y_left=%f y_right=%f\n",
-x_top, x_bot, y_left, y_right);
-printf ("dxdy=%f dydx=%f mask=%x\n", dxdy, dydx, mask);
       CsPrintf (MSG_INTERNAL_ERROR,
       	"ERROR: Three intersections in csCovMaskLUT::GetIndex()!\n");
       break;

@@ -20,9 +20,9 @@
 #define COVMASK_H
 
 // Define one of the three below to set the coverage mask size.
-//#define CS_CM_4x4
+#define CS_CM_4x4
 //#define CS_CM_8x4
-#define CS_CM_8x8
+//#define CS_CM_8x8
 
 #if defined(CS_CM_4x4)
 #   define CS_CM_HOR 4
@@ -48,6 +48,8 @@ typedef ULong csMask;
 #endif
 #define CS_CM_BITS (CS_CM_HOR*CS_CM_VER)
 #define CS_CM_MASKBITS (sizeof (csMask)*8)
+
+struct iGraphics2D;
 
 /**
  * Class representing one end-point coverage mask.
@@ -128,19 +130,11 @@ public:
 #   endif
   }
 
-  /**
-   * Dump state of this mask.
-   */
-  void Dump () const
-  {
-    char st[3] = ".#";
-    int i;
-    for (i = 0 ; i < CS_CM_BITS ; i++)
-    {
-      printf ("%c", st[GetState (i)]);
-      if ((i+1) % CS_CM_HOR == 0) printf ("\n");
-    }
-  }
+  /// Dump state of this mask.
+  void Dump () const;
+
+  /// Graphics dump of this mask.
+  void GfxDump (iGraphics2D* ig2d, int xoffs, int yoffs) const;
 
   /**
    * Return true if this mask is completely full (i.e. all in
@@ -295,19 +289,11 @@ public:
 #   endif
   }
 
-  /**
-   * Dump state of this mask.
-   */
-  void Dump () const
-  {
-    char st[5] = "*#.?";
-    int i;
-    for (i = 0 ; i < CS_CM_BITS ; i++)
-    {
-      printf ("%c", st[GetState (i)]);
-      if ((i+1) % CS_CM_HOR == 0) printf ("\n");
-    }
-  }
+  /// Dump state of this mask.
+  void Dump () const;
+
+  /// Graphics dump of this mask.
+  void GfxDump (iGraphics2D* ig2d, int xoffs, int yoffs) const;
 
   /**
    * Return true if this mask is completely full (i.e. all in
