@@ -936,7 +936,7 @@ cspColorDialog::~cspColorDialog ()
 
 void cspColorDialog::UpdateInfo (bool UpdateSlider)
 {
-  float tr = 255, tg = 255, tb = 255;
+  int tr = 255, tg = 255, tb = 255;
   if (r > 0.5) tr = 0;
   if (g > 0.5) tg = 0;
   if (b > 0.5) tb = 0;
