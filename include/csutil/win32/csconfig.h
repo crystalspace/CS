@@ -69,6 +69,7 @@
 #define CS_WCHAR_T_SIZE 2
 
 #if defined(CS_COMPILER_BCC)
+#define CS_HAVE_STDINT_H
 #define CS_HAVE_INTPTR_T
 #endif
 
