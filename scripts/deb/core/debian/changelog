@@ -1,12 +1,58 @@
+crystalspace (0.96-20030912-7) unstable; urgency=low
+
+  * Removed support of libode an lib3ds for s390 
+
+ -- Christian Bayle <bayle@debian.org>  Sat, 18 Oct 2003 23:41:20 +0200
+
+crystalspace (0.96-20030912-6) unstable; urgency=low
+
+  * Removed swigpygen
+  * Build internal libs with -fPIC on ia64
+
+ -- Christian Bayle <bayle@debian.org>  Sat, 18 Oct 2003 17:57:24 +0200
+
+crystalspace (0.96-20030912-5) unstable; urgency=low
+
+  * Removed support for lib3ds for ia64 since there is no dynamic
+    version of lib3ds that makes fail build on ia64 since a static
+    lib compiled without -fPIC can't be linked in a dynamic lib
+    compiled with -fPIC (Closes: bug#216275)
+  * Removed python plugin support for s390 and powerpc because of
+    broken swig or g++
+
+ -- Christian Bayle <bayle@debian.org>  Fri, 17 Oct 2003 21:51:55 +0200
+
+crystalspace (0.96-20030912-4) unstable; urgency=low
+
+  * Insert dh_buildinfo to get info at autobuid as
+  adviced by Yann Dirson http://ydirson.free.fr/en/software/buildinfo.html
+
+ -- Christian Bayle <bayle@debian.org>  Fri, 17 Oct 2003 15:10:18 +0200
+
+crystalspace (0.96-20030912-3) unstable; urgency=low
+
+  * Move the place where swipythgen is done
+  * Now depends on swig1.3 instead of swig
+
+ -- Christian Bayle <bayle@debian.org>  Thu, 16 Oct 2003 20:08:39 +0200
+
+crystalspace (0.96-20030912-2) unstable; urgency=low
+
+  * Added a dependancy on swig and make swigpygen 
+  * Corrected a typo not to build lib3ds stuffs on hppa
+  * Removed blocks from menu (this is not part of CS cvs now)
+
+ -- Christian Bayle <bayle@debian.org>  Wed, 15 Oct 2003 21:11:16 +0200
+
 crystalspace (0.96-20030912-1) unstable; urgency=low
 
   * Go to a new cvs snapshot, compatible with VOS packaging
-  * CS is under heavy developpment and it's difficult to get a version 
+  * CS is under heavy developpment and it's difficult to get a version
   available for all software using it, last release is rather old now
   I will try to find good snapshot date to get Planeshift work with
   this CS version.
 
- -- Christian Bayle <bayle@debian.org>  Mon, 29 Sep 2003 22:39:31 +0200
+ -- Christian Bayle <bayle@debian.org>  Tue, 14 Oct 2003 23:27:04 +0200
 
 crystalspace (0.96-20030714-2) unstable; urgency=low
 

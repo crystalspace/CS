@@ -25,16 +25,21 @@ ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
 	INSTALL_PROGRAM += -s
 endif
 
-ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), hppa))
-	CONFFLAG = --without-lib3d --without-libode
+ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), ia64))
+	CONFFLAG = --without-lib3ds --without-libode
 endif
-ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), alpha))
-	CONFFLAG = --without-lib3d --without-libode
+ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), hppa))
+	CONFFLAG = --without-lib3ds --without-libode
+endif
+ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), s390))
+	CONFFLAG = --without-lib3ds --without-libode
 endif
 
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
+	# Autobuild debugging stuff
+	dh_buildinfo generate cat
 	# Add here commands to configure the package.
 	# Activate all plugins
 	# @@@ FIXME: This does not handle plugins protected by ifeq/ifneq.
@@ -43,14 +48,22 @@ configure-stamp:
 	#perl -pi -e "s/^PLUGINS(.*render3.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	perl -pi -e "s/^PLUGINS(.*glshader_cg$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# Temp? remove of cslua
-#	perl -pi -e "s/^PLUGINS(.*cslua.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+	#perl -pi -e "s/^PLUGINS(.*cslua.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# Temp? remove of openal
 	#perl -pi -e "s/^PLUGINS(.*openal.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+	# Remove broken support of python because of swig or g++ on s390 and powerpc
+ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), s390))
+	perl -pi -e "s/^PLUGINS(.*cspython.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+endif
+ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), powerpc))
+	perl -pi -e "s/^PLUGINS(.*cspython.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+endif
 	# --disable-qsqrt was added for a gcc3.2 bug
 	#  then removed and I had to replace with cs_cv_cxx_qsqrt_ok=no ./configure
 	#  then a correct test was added in configure
 	#  this is adding #define CS_NO_QSQRT in CS/include/volatile.h
 	# Don't support until this is dynamic lib
+	# --enable-meta-info-embedding was by default before (enbed .csplugin info)
 	cd CS; ./configure --prefix=/usr --disable-cpu-specific-instructions $(CONFFLAG)
 
 	# Install as much as possible
@@ -73,6 +86,9 @@ build: build-arch build-indep
 build-arch: build-arch-stamp
 build-arch-stamp: configure-stamp
 
+	# In case this would solve some problem 
+#	cd $(CURDIR)/CS; $(MAKE) swigpythgen
+	#
 	# Add here commands to compile the package.
 	# For arm, powerpc, s390
 ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), arm))
@@ -88,10 +104,12 @@ ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), hppa))
 	echo "CFLAGS.SYSTEM += -fsigned-char"  >> $(CURDIR)/CS/config.mak 
 endif
 
-	# Compile static libs without -fPIC (except for hppa and alpha)
+	# Compile static libs without -fPIC (except for ia64, hppa and alpha)
+ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), ia64))
 ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), hppa))
 ifneq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), alpha))
 	cd $(CURDIR)/CS; $(MAKE) libs
+endif
 endif
 endif
 	# Force -fPIC as compiling/linking option
@@ -103,8 +121,9 @@ endif
 	# not yet usable
 #	cd $(CURDIR)/CS; $(MAKE) libs USE_SHARED_LIBS=yes
 	# Build the rest
+	# Blocks is not anymore in CS CVS
 	# Ok this is rather dirty but i didn't find where to put this for blocks (only for dyn lib in fact)
-	echo "LIBS.EXE += -lz"  >> $(CURDIR)/CS/config.mak 
+	#echo "LIBS.EXE += -lz"  >> $(CURDIR)/CS/config.mak 
 	cd $(CURDIR)/CS; $(MAKE) all
 	# should be too something like this $(MAKE) all USE_SHARED_LIBS=yes
 
@@ -239,6 +258,8 @@ binary-common:
 	dh_testroot
 #	dh_installdebconf	
 	dh_installdocs
+	# Autobuild debugging stuffs
+	dh_buildinfo install
 	dh_installexamples
 	dh_installmenu
 #	dh_installemacsen

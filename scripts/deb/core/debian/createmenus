@@ -7,13 +7,14 @@ rm -f $CURDIR/debian/crystalspace-demos.menu
 for videotype in software opengl
 do
 
+# Blocks removed
+#?package(crystalspace-demos):needs=X11 \\
+#  section="Games/Tetris-like" \\
+#  hints="CrystalSpace,Demos,$videotype" \\
+#  title="Blocks $videotype" \\
+#  command="/usr/games/blocks -video=$videotype" \\
+#  icon="/usr/share/pixmaps/blocks.xpm"
 cat >> $CURDIR/debian/crystalspace-demos.menu <<-FIN
-?package(crystalspace-demos):needs=X11 \\
-  section="Games/Tetris-like" \\
-  hints="CrystalSpace,Demos,$videotype" \\
-  title="Blocks $videotype" \\
-  command="/usr/games/blocks -video=$videotype" \\
-  icon="/usr/share/pixmaps/blocks.xpm"
 ?package(crystalspace-demos):needs=X11 \\
   section="Games/Arcade/CrystalSpace" \\
   hints="Demos,$videotype" \\

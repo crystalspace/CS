@@ -15,7 +15,7 @@ default:
 	@echo "=============================================================="
 
 # BUILD FROM CVS EXPORT
-fromcvs: start cvsexportdate debfiles debbuild
+fromcvs: start cvsexportdate makeorig debfiles debcopy debbuild
 # BUILD FROM LOCAL COPY
 # just binaries
 justbin: start copy debfiles debcopy debclean debconfigure debbinary
@@ -41,6 +41,11 @@ cvslogin: $(BUILDDIR)
 	cd $(BUILDDIR) && cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/crystal login
 
 # If you want to export a special date
+makeorig: $(BUILDDIR) $(BUILDDIR)/makeorig-stamp
+$(BUILDDIR)/makeorig-stamp: 
+	cd $(BUILDDIR); tar cvzf crystalspace_$(VERSION)-$(DATE).orig.tar.gz crystalspace-$(VERSION).$(DATE)
+	touch $(BUILDDIR)/makeorig-stamp
+
 cvsexportdate: $(BUILDDIR) $(BUILDDIR)/cvsexportdate-stamp
 $(BUILDDIR)/cvsexportdate-stamp: 
 	mkdir -p $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)
@@ -64,7 +69,7 @@ $(BUILDDIR)/debfile-stamp:
 	touch $(BUILDDIR)/debfile-stamp
 
 debcopy:
-	cd core ; find . | cpio -pdumvB $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)/
+	cd core ; find . | grep -v CVS | cpio -pdumvB $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)/
 
 debclean:
 	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE); fakeroot debian/rules clean
