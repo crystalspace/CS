@@ -64,6 +64,7 @@ The history order is reversed so that new features are at the top.
 	  new objects arrive and the main thread can query to add those
 	  objects to the engine as they are loaded in the loading thread.
 	  Work on the interfaces alone at this moment.
+	- res added a new "Application Framework" module to the API docs.
 15-Apr-2003
 	- Fixed a bug in the thing plugin.  If the dynavis culler was already
 	  mentioned before all other objects in the sector then this could

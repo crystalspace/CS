@@ -20,8 +20,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __CS_CSAPPLICATIONFRAMEWORK_H__
 
 /**\file 
-* Application framework class
-*/
+ * Application framework class
+ */
+
+/**
+ * \addtogroup appframe
+ * @{ */
 
 #include <cstool/initapp.h>
 #include <iutil/objreg.h>
@@ -305,5 +309,7 @@ public:
       description);
   }
 };
+
+/** @} */
 
 #endif //__CS_CSAPPLICATIONFRAMEWORK_H__

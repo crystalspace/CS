@@ -48,6 +48,10 @@
 	 */
  
 /** @} */
+
+/**
+ * \defgroup appframe Application Framework
+ */
  
 /**
  * \defgroup csws Crystal Space Windowing System
