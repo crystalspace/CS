@@ -171,6 +171,7 @@ public:
   virtual ~csDebugGraph ()
   {
     Clear ();
+    delete[] els;
   }
   void Clear ()
   {
