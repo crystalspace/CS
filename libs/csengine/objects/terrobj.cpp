@@ -23,14 +23,39 @@
 #include "csengine/engine.h"
 #include "csengine/light.h"
 
-IMPLEMENT_IBASE_EXT (csTerrainWrapper)
+IMPLEMENT_IBASE_EXT_QUERY (csTerrainWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainWrapper)
-IMPLEMENT_IBASE_EXT_END
+IMPLEMENT_IBASE_EXT_QUERY_END
+IMPLEMENT_IBASE_EXT_INCREF(csTerrainWrapper)
+
+// We implement a custom DecRef() in order to work around a shortcoming of the
+// NextStep compiler.  The UnlinkTerrain(this) invocation which appears here
+// used to appear in the destructor of this class.  During the processing of
+// UnlinkTerrain(), QueryInterface(iMeshWrapper) is invoked on this object.
+// Unfortunately, the NextStep compiler modifies the `vptr' of this object to
+// point at its superclass' `vtbl' as soon as the destructor is entered, rather
+// than modifying it after the destructor has completed, which is how all other
+// compilers behave.  This early vptr modification, thus transmogrifies this
+// object into its superclass (csPObject) too early; before
+// QueryInterface(iMeshWrapper) is invoked.  As a result, by the time
+// UnlinkTerrain(this) was being called, the object already appeared to be a
+// csPObject and failed to respond positively to QueryInterface(iMeshWrapper).
+// To work around this problem, the UnlinkTerrain() invocation was moved out of
+// the destructor and into DecRef(), thus it is now called prior to the
+// undesirable transmogrification.  Note that the csTerrainWrapper destructor
+// is now private, thus it is ensured that terrain wrappers can only be
+// destroyed via DecRef(), which is public.
+
+void csTerrainWrapper::DecRef()
+{
+  if (scfRefCount <= 1) // About to be deleted...
+    csEngine::current_engine->UnlinkTerrain (this);
+  __scf_superclass::DecRef();
+}
 
 IMPLEMENT_EMBEDDED_IBASE (csTerrainWrapper::TerrainWrapper)
   IMPLEMENTS_INTERFACE (iTerrainWrapper)
 IMPLEMENT_EMBEDDED_IBASE_END
-
 
 csTerrainWrapper::csTerrainWrapper( iEngine *pEng, iTerrainObject *pTerr )
 	: csObject ()
@@ -64,17 +89,16 @@ void csTerrainWrapper::SetTerrainObject( iTerrainObject *pObj )
 
 csTerrainWrapper::~csTerrainWrapper ()
 {
-  if( pTerrObj )
+  if (pTerrObj)
     pTerrObj->DecRef();
-  csEngine::current_engine->UnlinkTerrain (this);
 }
 
 void csTerrainWrapper::AddSector( csSector *pSector )
 {
-  if( !pSector )
+  if (!pSector)
     return;
 
-  sectors.Push( pSector );
+  sectors.Push(pSector);
 }
 
 void csTerrainWrapper::ClearSectors()
@@ -120,7 +144,8 @@ IMPLEMENT_EMBEDDED_IBASE (csTerrainFactoryWrapper::TerrainFactoryWrapper)
   IMPLEMENTS_INTERFACE (iTerrainFactoryWrapper)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csTerrainFactoryWrapper::csTerrainFactoryWrapper (iTerrainObjectFactory *pFactory)
+csTerrainFactoryWrapper::csTerrainFactoryWrapper (
+  iTerrainObjectFactory *pFactory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiTerrainFactoryWrapper);
   csTerrainFactoryWrapper::pTerrFact = pFactory;
@@ -139,7 +164,8 @@ csTerrainFactoryWrapper::~csTerrainFactoryWrapper ()
     pTerrFact->DecRef();
 }
 
-void csTerrainFactoryWrapper::SetTerrainObjectFactory (iTerrainObjectFactory *pFactory)
+void csTerrainFactoryWrapper::SetTerrainObjectFactory (
+  iTerrainObjectFactory *pFactory)
 {
   if( pFactory )
     pFactory->DecRef ();
@@ -156,4 +182,3 @@ csTerrainWrapper* csTerrainFactoryWrapper::NewTerrainObject( iEngine *pEngine )
   pTerrain->SetFactory( this );
   return pTerrain;
 }
-

@@ -25,11 +25,45 @@
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
 
-IMPLEMENT_IBASE_EXT (csMeshWrapper)
+IMPLEMENT_IBASE_EXT_QUERY (csMeshWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityObject)
   IMPLEMENTS_INTERFACE (csMeshWrapper)
-IMPLEMENT_IBASE_EXT_END
+IMPLEMENT_IBASE_EXT_QUERY_END
+
+IMPLEMENT_IBASE_EXT_INCREF(csMeshWrapper)
+
+// We implement a custom DecRef() in order to work around a shortcoming of the
+// NextStep compiler.  The UnlinkMesh(this) invocation which appears here used
+// to appear in the destructor of this class.  During the processing of
+// UnlinkMesh(), QueryInterface(iMeshWrapper) is invoked on this object.
+// Unfortunately, the NextStep compiler modifies the `vptr' of this object to
+// point at its superclass' `vtbl' as soon as the destructor is entered, rather
+// than modifying it after the destructor has completed, which is how all other
+// compilers behave.  This early vptr modification, thus transmogrifies this
+// object into its superclass (csPObject) too early; before
+// QueryInterface(iMeshWrapper) is invoked.  As a result, by the time
+// UnlinkMesh(this) was being called, the object already appeared to be a
+// csPObject and failed to respond positively to QueryInterface(iMeshWrapper).
+// To work around this problem, the UnlinkMesh() invocation was moved out of
+// the destructor and into DecRef(), thus it is now called prior to the
+// undesirable transmogrification.  Note that the csMeshWrapper destructor is
+// now private, thus it is ensured that terrain wrappers can only be destroyed
+// via DecRef(), which is public.
+
+void csMeshWrapper::DecRef()
+{
+  if (scfRefCount <= 1) // About to be deleted...
+  {
+    iEngine *engine = QUERY_INTERFACE_FAST (parent, iEngine);
+    if (engine)
+    {
+      engine->GetCsEngine ()->UnlinkMesh (this);
+      engine->DecRef ();
+    }
+  }
+  __scf_superclass::DecRef();
+}
 
 IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshWrapper)
   IMPLEMENTS_INTERFACE (iMeshWrapper)
@@ -58,7 +92,8 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   iMeshWrapper *sparent = QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)
   {
-    movable.SetParent (((csMovable::eiMovable*)sparent->GetMovable ())->scfParent);
+    movable.SetParent(
+      ((csMovable::eiMovable*)sparent->GetMovable())->scfParent);
     sparent->DecRef ();
   }
 
@@ -90,7 +125,8 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   iMeshWrapper *sparent = QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)
   {
-    movable.SetParent (((csMovable::eiMovable*)sparent->GetMovable ())->scfParent);
+    movable.SetParent(
+      ((csMovable::eiMovable*)sparent->GetMovable())->scfParent);
     sparent->DecRef ();
   }
 
@@ -111,14 +147,8 @@ void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
 
 csMeshWrapper::~csMeshWrapper ()
 {
-  if (mesh) mesh->DecRef ();
-
-  iEngine *engine = QUERY_INTERFACE_FAST (parent, iEngine);
-  if (engine)
-  {
-    engine->GetCsEngine ()->UnlinkMesh (this);
-    engine->DecRef ();
-  }
+  if (mesh)
+    mesh->DecRef ();
 }
 
 void csMeshWrapper::UpdateMove ()
@@ -454,7 +484,8 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
 void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory* meshFact)
 {
   if (meshFact) meshFact->IncRef ();
-  if (csMeshFactoryWrapper::meshFact) csMeshFactoryWrapper::meshFact->DecRef ();
+  if (csMeshFactoryWrapper::meshFact)
+    csMeshFactoryWrapper::meshFact->DecRef ();
   csMeshFactoryWrapper::meshFact = meshFact;
 }
 

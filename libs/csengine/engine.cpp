@@ -1358,7 +1358,7 @@ void csEngine::NextFrame (cs_time current_time)
   {
     csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
     if (sp->WantToDie ())
-      delete sp;
+      sp->DecRef();
     i--;
   }
 }
@@ -1421,7 +1421,7 @@ void csEngine::RemoveMesh (csMeshWrapper* mesh)
   if (idx == -1) return;
   meshes[idx] = NULL;
   meshes.Delete (idx);
-  delete mesh;
+  mesh->DecRef();
 }
 
 void csEngine::UnlinkTerrain (csTerrainWrapper* terr)
@@ -1440,7 +1440,7 @@ void csEngine::RemoveTerrain (csTerrainWrapper* terr)
   if (idx == -1) return;
   terrains[idx] = NULL;
   terrains.Delete (idx);
-  delete terr;
+  terr->DecRef();
 }
 
 void csEngine::UnlinkCollection (csCollection* collection)
@@ -2222,7 +2222,7 @@ iMeshWrapper* csEngine::LoadMeshObject (
   char* buf = **input;
   iBase* mof = plug->Parse (buf, this, imw);
   plug->DecRef ();
-  if (!mof) { delete meshwrap; return NULL; }
+  if (!mof) { meshwrap->DecRef(); return NULL; }
   meshwrap->SetMeshObject ((iMeshObject*)mof);
 
   return imw;

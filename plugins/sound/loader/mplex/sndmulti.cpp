@@ -23,6 +23,8 @@
 #include "isys/vfs.h"
 #include "isound/data.h"
 
+#define MY_CLASSNAME "crystalspace.sound.loader.multiplexer"
+
 class csSoundLoaderMultiplexer : public iSoundLoader {
 private:
   csVector Loaders;
@@ -47,8 +49,7 @@ IMPLEMENT_FACTORY(csSoundLoaderMultiplexer);
 
 EXPORT_CLASS_TABLE (sndplex)
 EXPORT_CLASS_DEP (csSoundLoaderMultiplexer,
-  "crystalspace.sound.loader.multiplexer", "Sound Loader Multiplexer",
-  "crystalspace.sound.loader.")
+  MY_CLASSNAME, "Sound Loader Multiplexer", "crystalspace.sound.loader.")
 EXPORT_CLASS_TABLE_END;
 
 IMPLEMENT_IBASE(csSoundLoaderMultiplexer)
@@ -69,27 +70,36 @@ csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer() {
 
 bool csSoundLoaderMultiplexer::Initialize(iSystem *sys) 
 {
-  sys->Printf(MSG_INITIALIZATION, "Initializing sound loading multiplexer...\n");
-  sys->Printf(MSG_INITIALIZATION, "  Looking for sound loader modules:\n");
+  sys->Printf(MSG_INITIALIZATION,
+    "Initializing sound loading multiplexer...\n"
+    "  Looking for sound loader modules:\n");
 
-  csVector list;
-  iSCF::SCF->QueryClassList ("crystalspace.sound.loader.", list);
-  for (long i=0; i<list.Length (); i++)
+  int nmatches;
+  char const** list =
+    iSCF::SCF->QueryClassList ("crystalspace.sound.loader.", nmatches);
+  if (list)
   {
-    const char *classname = (const char *)list.Get (i);
-    if (strcasecmp (classname, "crystalspace.sound.loader.multiplexer"))
+    for (int i = 0; i < nmatches; i++)
     {
-      sys->Printf(MSG_INITIALIZATION, "  soundloader: %s\n", classname);
-      iSoundLoader *ldr = LOAD_PLUGIN (sys, classname, 0, iSoundLoader);
-      if (ldr)
-	Loaders.Push(ldr);
+      char const* classname = list[i];
+      if (strcasecmp (classname, MY_CLASSNAME))
+      {
+        sys->Printf(MSG_INITIALIZATION, "  %s\n", classname);
+        iSoundLoader *ldr = LOAD_PLUGIN (sys, classname, 0, iSoundLoader);
+        if (ldr)
+	  Loaders.Push(ldr);
+      }
     }
+    free(list);
   }
   return true;
 }
 
-iSoundData *csSoundLoaderMultiplexer::LoadSound(void *Data, unsigned long Size) const {
-  for (long i=0;i<Loaders.Length();i++) {
+iSoundData*
+csSoundLoaderMultiplexer::LoadSound(void *Data, unsigned long Size) const
+{
+  for (long i=0;i<Loaders.Length();i++)
+  {
     iSoundLoader *Ldr=(iSoundLoader*)(Loaders.Get(i));
     iSoundData *snd=Ldr->LoadSound(Data, Size);
     if (snd) return snd;

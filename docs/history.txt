@@ -1,39 +1,107 @@
 The history order is reversed so that new features are at the top.
 
 5-Jun-2001
-	- Reduced the optimization level in linux.mak from -O6 to -O2.
-	  This will probably not do much anyway and -O6 seems to give problems
-	  with gcc 2.96. I hope -O2 works well enough.
+	- Reduced the optimization level in linux.mak from -O6 to -O2.  This
+	  will probably not do much anyway and -O6 seems to give problems with
+	  gcc 2.96.  I hope -O2 works well enough.
 	- Removed 'sndload' from 'make walkall'.
-	- Norman Kramer says:
-	  The Sound, VFS, G3D, G2D, MotionMan, Config and NetDrv variables of
-	  the csSystemDriver class are now private. If you want to access the
-	  plugins represented by those variables first do a QUERY_PLUGIN to
-	  get a pointer to them.
-	  Norman did a lot of changes everywhere to accomodate the changes
-	  above.
-	- Added a lot of 'const' qualifiers to many functions in csEngine
-	  and iEngine.
+	- Norman Kramer made the Sound, VFS, G3D, G2D, MotionMan, Config and
+	  NetDrv variables of csSystemDriver private.  If you want to access
+	  the plugins represented by those variables first do a QUERY_PLUGIN to
+	  get a pointer to them.  Also changed code in remainder of project to
+	  accomodate this change.
+	- Added a lot of 'const' qualifiers to many functions in csEngine and
+	  iEngine.
 	- Removed a few obsolete functions from iEngine having to do with
 	  polygon texture planes.
 	- Added 'const' to functions in csNamedObjVector.
 	- Removed iSector::GetID().
 	- Added iObject::GetID().
-	- Added a lot of 'const' qualifiers to many functions in csSector
-	  and iSector.
+	- Added a lot of 'const' qualifiers to many functions in csSector and
+	  iSector.
 	- Fixed a warning in keyval.
-	- Wouter Wijngaards fixed the isometric transform. It has a LOT less
-	  distortion now. The cube is exactly 1x1x1 now, and you can see,
+	- Wouter Wijngaards fixed the isometric transform.  It has a LOT less
+	  distortion now.  The cube is exactly 1x1x1 now, and you can see,
 	  while changing the view that it stays in shape.
-	- Philip Wyett fixed MSVC project files which were committed as ascii.
-	- Avoids the bug with levels with multiple sectors and bsp trees.
-	  The level itself will now be rendered ok. But the bug isn't gone
-	  for real though. Objects are still culled wrongly.
-	- Started cleaning everything other than the c-buffer culler from
-	  CS engine. The rest isn't working either and is only useful for
-	  reference (which CVS will hold). This simplifies the engine
+	- Philip Wyett fixed MSVC project files which were committed as ASCII.
+	- Avoids the bug with levels with multiple sectors and bsp trees.  The
+	  level itself will now be rendered ok.  But the bug isn't gone for
+	  real though.  Objects are still culled wrongly.
+	- Started cleaning everything other than the c-buffer culler from CS
+	  engine.  The rest isn't working either and is only useful for
+	  reference (which CVS will hold).  This simplifies the engine
 	  considerably.
 	- Removed 'culler' command from WalkTest.
+	- Eric Sunshine made the following changes to SCF.
+	    - Further optimized IncRef(), DecRef(), and QueryInterface() for
+	      embedded interface.  No longer checks for non-null scfParent.
+	      scfParent is now always assumed non-null for embedded interfaces.
+	    - Added a new opaque type `scfInterfaceID' which represents a
+	      registered SCF interface name.  This is used in place of the bare
+	      `uint32' which represented registered names in the past.
+	    - Added a bunch of new macros for providing finer control over the
+	      implementation of the standard iBase methods.  These macros make
+	      it easier to implement custom IncRef(), DecRef(), or
+	      QueryInterface() calls while still providing automatic
+	      implementations of functions which are not specially customized.
+	      The new macros are:
+		IMPLEMENT_IBASE_INCREF()
+		IMPLEMENT_IBASE_DECREF()
+		IMPLEMENT_IBASE_QUERY()
+		IMPLEMENT_IBASE_QUERY_END
+		IMPLEMENT_EMBEDDED_IBASE_INCREF()
+		IMPLEMENT_EMBEDDED_IBASE_DECREF()
+		IMPLEMENT_EMBEDDED_IBASE_QUERY()
+		IMPLEMENT_EMBEDDED_IBASE_QUERY_END
+		IMPLEMENT_IBASE_EXT_INCREF()
+		IMPLEMENT_IBASE_EXT_DECREF()
+		IMPLEMENT_IBASE_EXT_QUERY()
+		IMPLEMENT_IBASE_EXT_QUERY_END
+	      These macros are now employed by the higher-level convenience
+	      macros IMPLEMENT_IBASE(), IMPLEMENT_IBASE_END,
+	      IMPLEMENT_EMBEDDED_IBASE(), IMPLEMENT_EMBEDDED_IBASE_END,
+	      IMPLEMENT_IBASE_EXT(), and IMPLEMENT_IBASE_EXT_END.
+	    - Changed the prototype for iSCF::QueryClassList() so that it no
+	      longer returns the array of matching class names via a csVector.
+	      It didn't seem correct for the SCF header file (scf.h) to rely on
+	      a high-level class such as csVector considering that scf.h is
+	      intended to be extremely bare-bones and low-level.  Now the array
+	      of matching class names is returned as a (char const**).  Also
+	      rewrote and simplified QueryClassList().
+	- Eric Sunshine worked around a nasty problem on NextStep where
+	  csMeshWrapper and csTerrainWrapper objects were not being removed
+	  from their containing sector(s) when either of these objects was
+	  deleted.  When a C++ object is destroyed, its destructor is invoked.
+	  After the destructor completes, the object's `vptr' is modified to
+	  point at the `vtbl' of its immediate superclass, and then the
+	  destructor for that class is invoked.  This process repeats until the
+	  destructors of all superclasses are invoked.  In this way, an object
+	  transmogrifies into each of its superclasses until the raw memory for
+	  the object is finally freed.  This transmogrification into an
+	  object's superclass is supposed to occur _after_ the destructor for
+	  the current class is finished.  Unfortunately, the NextStep compiler
+	  performs the transmogrification immediately _before_ the destructor
+	  for the current object is invoked.  This means that virtual methods
+	  which are invoked in an object's destructor will actually invoke
+	  methods from its superclass instead of correctly invoking its own
+	  methods.  In the case of csMeshWrapper and csTerrainWrapper, their
+	  destructors were invoking an engine method to remove themselves from
+	  their occupied sectors, and those methods were invoking the virtual
+	  QueryInterface(iMeshObject) method of each of these objects.
+	  Unfortunately, since these objects had already been transmogrified
+	  into their superclass (csPObject) by the time
+	  QueryInterface(iMeshObject) was invoked, they were unable to respond
+	  with an iMeshObject (since csPObject does not implement iMeshObject).
+	  The failure to respond with an iMeshObject resulted in these objects
+	  not being removed from the containing sectors, which later resulted
+	  in a crash since the objects themselves had been deleted (thus the
+	  sectors had dangling pointers to these objects).  To work around this
+	  problem, it was necessary to invoke the code for removing the objects
+	  from the sector(s) prior to destruction time.  This was accomplished
+	  by writing a custom DecRef() method for each class and having that
+	  method perform the removal.  Since these objects must now be detroyed
+	  via DecRef() rather than via `delete', their destructors were also
+	  made private.
 4-Jun-2001
 	- Added csTransform This2OtherRelative() and Other2ThisRelative()
 	  which operate on csPlane3.

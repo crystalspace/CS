@@ -23,7 +23,6 @@
 #include "cssys/csshlib.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
-#include "csutil/csvector.h"
 #include "csutil/csobjvec.h"
 #include "csutil/cfgfile.h"
 #include "csutil/strset.h"
@@ -61,9 +60,9 @@ public:
   virtual bool RegisterClassList (scfClassInfo *iClassInfo);
   virtual bool UnregisterClass (const char *iClassID);
   virtual void UnloadUnusedModules ();
-  virtual uint32 GetInterfaceID (const char *iInterface);
+  virtual scfInterfaceID GetInterfaceID (const char *iInterface);
   virtual void Finish ();
-  virtual void QueryClassList (const char *substring, csVector &vList);
+  virtual char const** QueryClassList (char const* pattern, int& nmatches);
 };
 
 #ifndef CS_STATIC_LINKED
@@ -318,7 +317,7 @@ void scfFactory::DecRef ()
 #endif
 }
 
-void *scfFactory::QueryInterface (uint32 iInterfaceID, int iVersion)
+void *scfFactory::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 {
   IMPLEMENTS_INTERFACE (iFactory);
   return NULL;
@@ -554,27 +553,31 @@ bool csSCF::ClassRegistered (const char *iClassID)
   return (ClassRegistry->FindKey (iClassID) >= 0);
 }
 
-uint32 csSCF::GetInterfaceID (const char *iInterface)
+scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)
 {
-  return InterfaceRegistry.Request (iInterface);
+  return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
 }
 
-void csSCF::QueryClassList (const char *substring, csVector &vList)
+char const** csSCF::QueryClassList (char const* pattern, int& nmatches)
 {
-  // wade through the ClassRegistry to find what we are looking for
-  if (substring)
+  char const** matches = 0;
+  nmatches = 0;
+  int const rlen = ClassRegistry->Length();
+  if (rlen != 0)
   {
-    int len = strlen (substring);
-    for (int i=0; i<ClassRegistry->Length (); i++)
+    int const plen = (pattern ? strlen(pattern) : 0);
+    matches = (char const**)malloc(rlen * sizeof(matches[0]));
+    for (int i = 0; i < rlen; i++)
     {
-      iFactory *fact = (iFactory *)ClassRegistry->Get(i);
-      if (!strncasecmp (substring, fact->QueryClassID (), len))
-	vList.Push ((csSome)fact->QueryClassID ());
+      char const* s = ((iFactory*)ClassRegistry->Get(i))->QueryClassID();
+      if (plen == 0 || strncasecmp(pattern, s, plen) == 0)
+        matches[nmatches++] = s;
+    }
+    if (nmatches == 0)
+    {
+      free(matches);
+      matches = 0;
     }
   }
-  else
-  {
-    for (int i=0; i<ClassRegistry->Length (); i++)
-      vList.Push ((csSome)((iFactory *)ClassRegistry->Get(i))->QueryClassID ());
-  }
+  return matches;
 }

@@ -149,13 +149,17 @@ protected:
    */
   void DrawInt (iRenderView* rview);
 
+  /**
+   * Destructor.  This is private in order to force clients to use DecRef()
+   * for object destruction.
+   */
+  virtual ~csMeshWrapper ();
+
 public:
   /// Constructor.
   csMeshWrapper (csObject* theParent, iMeshObject* mesh);
   /// Constructor.
   csMeshWrapper (csObject* theParent);
-  /// Destructor.
-  virtual ~csMeshWrapper ();
 
   /// Set owner (actor) for this object.
   void SetMyOwner (csObject* newOwner) { myOwner = newOwner; }
@@ -488,7 +492,7 @@ public:
 
   DECLARE_IBASE_EXT (csObject);
 
-  //--------------------- iMeshFactoryWrapper implementation --------------------//
+  //----------------- iMeshFactoryWrapper implementation --------------------//
   struct MeshFactoryWrapper : public iMeshFactoryWrapper
   {
     DECLARE_EMBEDDED_IBASE (csMeshFactoryWrapper);

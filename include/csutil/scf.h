@@ -20,11 +20,14 @@
 #ifndef __CSSCF_H__
 #define __CSSCF_H__
 
-class csVector;
-
 /*
     PLEASE USE 8-SPACE TAB WIDTH WHEN EDITING THIS FILE!
 */
+
+/**
+ * Type of registered interface handle used by iBase::QueryInterface().
+ */
+typedef uint32 scfInterfaceID;
 
 /**
  * Macro for typing debug strings: Add #define SCF_DEBUG at the top
@@ -84,12 +87,12 @@ struct iBase
   /// Decrement the reference count.
   virtual void DecRef () = 0;
   /// Query a particular interface embedded into this object.
-  virtual void *QueryInterface (uint32 iInterfaceID, int iVersion) = 0;
+  virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion) = 0;
   /**
    * Query a particular interface embedded into an object.
    * This version will test if 'ibase' is NULL.
    */
-  static void* QueryInterfaceSafe (iBase* ibase, uint32 iInterfaceID,
+  static void* QueryInterfaceSafe (iBase* ibase, scfInterfaceID iInterfaceID,
   	int iVersion)
   {
     if (ibase == NULL) return NULL;
@@ -121,7 +124,7 @@ public:									\
   OuterClass *scfParent;	/* The parent object */			\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
-  virtual void *QueryInterface (uint32 iInterfaceID, int iVersion)
+  virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 
 /**
  * The CONSTRUCT_IBASE macro should be invoked inside the constructor
@@ -145,16 +148,23 @@ public:									\
   Interface.scfParent = this;
 
 /**
- * The following macro should be used within the C++ source module that
- * implements a interface derived from iBase. Of course, you can still
- * implement those methods manually, if you desire ...
+ * The IMPLEMENT_IBASE_INCREF() macro implements the IncRef() method for a
+ * class in a C++ source module.  Typically, this macro is automatically
+ * employed by the IMPLEMENT_IBASE() convenience macro.
  */
-#define IMPLEMENT_IBASE(Class)						\
+#define IMPLEMENT_IBASE_INCREF(Class)					\
 void Class::IncRef ()							\
 {									\
   SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfRefCount + 1));\
   scfRefCount++;							\
-}									\
+}
+
+/**
+ * The IMPLEMENT_IBASE_DECREF() macro implements the DecRef() method for a
+ * class in a C++ source module.  Typically, this macro is automatically
+ * employed by the IMPLEMENT_IBASE() convenience macro.
+ */
+#define IMPLEMENT_IBASE_DECREF(Class)					\
 void Class::DecRef ()							\
 {									\
   scfRefCount--;							\
@@ -167,47 +177,110 @@ void Class::DecRef ()							\
   }									\
   else									\
     SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, scfRefCount));\
-}									\
-void *Class::QueryInterface (uint32 iInterfaceID, int iVersion)		\
-{									\
-  SCF_TRACE (("  (%s *)%p->QueryInterface (%lu, %08X)\n",		\
-    #Class, this, iInterfaceID, iVersion));				\
+}
 
 /**
- * IMPLEMENT_EMBEDDED_IBASE should be used to implement embedded
- * interfaces derived from iBase. It differs from IMPLEMENT_IBASE
- * because embedded interface don't have reference counts themselves, but
- * instead use the reference count of their parent object.
+ * The IMPLEMENT_IBASE_QUERY() macro implements the opening boilerplate for the
+ * QueryInterface() method for a class in a C++ source module.  Typically, this
+ * macro is automatically employed by the IMPLEMENT_IBASE() convenience macro.
  */
-#define IMPLEMENT_EMBEDDED_IBASE(Class)					\
-void Class::IncRef ()							\
-{									\
-  SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfRefCount + 1));\
-  if (scfParent)							\
-    scfParent->IncRef ();						\
-}									\
-void Class::DecRef ()							\
-{									\
-  if (scfParent)							\
-    scfParent->DecRef ();						\
-  SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, scfRefCount));	\
-}									\
-void *Class::QueryInterface (uint32 iInterfaceID, int iVersion)		\
+#define IMPLEMENT_IBASE_QUERY(Class)					\
+void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 {									\
   SCF_TRACE (("  (%s *)%p->QueryInterface (%lu, %08X)\n",		\
-    #Class, this, iInterfaceID, iVersion));				\
+    #Class, this, iInterfaceID, iVersion));
 
 /**
- * This macro is used to finish an IMPLEMENT_IBASE definition
+ * The IMPLEMENT_IBASE_QUERY_END macro implements the closing boilerplate for
+ * the QueryInterface() method for a class in a C++ source module.  Typically,
+ * this macro is automatically employed by the IMPLEMENT_IBASE_END convenience
+ * macro.
  */
-#define IMPLEMENT_IBASE_END						\
+#define IMPLEMENT_IBASE_QUERY_END					\
   return scfParent ?							\
     scfParent->QueryInterface (iInterfaceID, iVersion) : NULL;		\
 }
 
-/// Same as IMPLEMENT_IBASE_END
+/**
+ * The IMPLEMENT_IBASE() macro should be used within the C++ source module that
+ * implements a interface derived from iBase.  Of course, you can still
+ * implement those methods manually, if you desire ...
+ */
+#define IMPLEMENT_IBASE(Class)						\
+  IMPLEMENT_IBASE_INCREF(Class)						\
+  IMPLEMENT_IBASE_DECREF(Class)						\
+  IMPLEMENT_IBASE_QUERY(Class)
+
+/**
+ * The IMPLEMENT_IBASE_END macro is used to finish an IMPLEMENT_IBASE
+ * definition
+ */
+#define IMPLEMENT_IBASE_END						\
+  IMPLEMENT_IBASE_QUERY_END
+
+/**
+ * The IMPLEMENT_EMBEDDED_IBASE_INCREF() macro implements the IncRef() method
+ * for an embedded class in a C++ source module.  Typically, this macro is
+ * automatically employed by the IMPLEMENT_EMBEDDED_IBASE() convenience macro.
+ */
+#define IMPLEMENT_EMBEDDED_IBASE_INCREF(Class)				\
+void Class::IncRef ()							\
+{									\
+  SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfRefCount + 1));\
+  scfParent->IncRef ();							\
+}
+
+/**
+ * The IMPLEMENT_EMBEDDED_IBASE_DECREF() macro implements the DecRef() method
+ * for an embedded class in a C++ source module.  Typically, this macro is
+ * automatically employed by the IMPLEMENT_EMBEDDED_IBASE() convenience macro.
+ */
+#define IMPLEMENT_EMBEDDED_IBASE_DECREF(Class)				\
+void Class::DecRef ()							\
+{									\
+  scfParent->DecRef ();							\
+  SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, scfRefCount));	\
+}
+
+/**
+ * The IMPLEMENT_EMBEDDED_IBASE_QUERY() macro implements the opening
+ * boilerplate for the QueryInterface() method for an embedded class in a C++
+ * source module.  Typically, this macro is automatically employed by the
+ * IMPLEMENT_EMBEDDED_IBASE() convenience macro.
+ */
+#define IMPLEMENT_EMBEDDED_IBASE_QUERY(Class)				\
+void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
+{									\
+  SCF_TRACE (("  (%s *)%p->QueryInterface (%lu, %08X)\n",		\
+    #Class, this, iInterfaceID, iVersion));
+
+/**
+ * The IMPLEMENT_EMBEDDED_IBASE_QUERY_END macro implements the closing
+ * boilerplate for the QueryInterface() method for a class in an embedded C++
+ * source module.  Typically, this macro is automatically employed by the
+ * IMPLEMENT_EMBEDDED_IBASE_END convenience macro.
+ */
+#define IMPLEMENT_EMBEDDED_IBASE_QUERY_END				\
+  return scfParent->QueryInterface (iInterfaceID, iVersion);		\
+}
+
+/**
+ * IMPLEMENT_EMBEDDED_IBASE should be used to implement embedded interfaces
+ * derived from iBase.  It differs from IMPLEMENT_IBASE because embedded
+ * interface don't have reference counts themselves, but instead use the
+ * reference count of their parent object.
+ */
+#define IMPLEMENT_EMBEDDED_IBASE(Class)					\
+  IMPLEMENT_EMBEDDED_IBASE_INCREF(Class)				\
+  IMPLEMENT_EMBEDDED_IBASE_DECREF(Class)				\
+  IMPLEMENT_EMBEDDED_IBASE_QUERY(Class)
+
+/**
+ * The IMPLEMENT_EMBEDDED_IBASE_END macro is used to finish an
+ * IMPLEMENT_EMBEDDED_IBASE definition
+ */
 #define IMPLEMENT_EMBEDDED_IBASE_END					\
-  IMPLEMENT_IBASE_END
+  IMPLEMENT_EMBEDDED_IBASE_QUERY_END
 
 /**
  * The IMPLEMENT_INTERFACE macro is used inside QueryInterface function
@@ -229,8 +302,8 @@ void *Class::QueryInterface (uint32 iInterfaceID, int iVersion)		\
  * This is a common macro used in all IMPLEMENTS_XXX_INTERFACE macros
  */
 #define IMPLEMENTS_INTERFACE_COMMON(Interface,Object)			\
-  static uint32 scfID_##Interface = (uint32)-1;				\
-  if (scfID_##Interface == (uint32)-1)					\
+  static scfInterfaceID scfID_##Interface = (scfInterfaceID)-1;		\
+  if (scfID_##Interface == (scfInterfaceID)-1)				\
     scfID_##Interface = iSCF::SCF->GetInterfaceID (#Interface);		\
   if (iInterfaceID == scfID_##Interface &&				\
     scfCompatibleVersion (iVersion, VERSION_##Interface))		\
@@ -240,44 +313,80 @@ void *Class::QueryInterface (uint32 iInterfaceID, int iVersion)		\
   }
 
 /**
- * The following macro is used in "expansion SCF classes". An expansion class
- * is a class that extends the functionality of another SCF class. For example,
- * suppose a class TheWolf that implements the iWolf interface. Separately
- * it is a useful class per se, but if you want to implement an additional
- * class TheDog that is a subclass of TheWolf and which implements an
- * additional interface iDog in theory you should just override the
- * QueryInterface method and return the corresponding pointer when asked.
- * The following macro makes such overrides simpler to write.
+ * The following macro is used in "expansion SCF classes".  An expansion class
+ * is a class that extends the functionality of another SCF class.  For
+ * example, suppose a class TheWolf that implements the iWolf interface.
+ * Separately it is a useful class per se, but if you want to implement an
+ * additional class TheDog that is a subclass of TheWolf and which implements
+ * an additional interface iDog in theory you should just override the
+ * QueryInterface method and return the corresponding pointer when asked.  The
+ * following macro makes such overrides simpler to write.
  */
 #define DECLARE_IBASE_EXT(ParentClass)					\
   typedef ParentClass __scf_superclass;					\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
-  virtual void *QueryInterface (uint32 iInterfaceID, int iVersion)
+  virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
+
+/**
+ * The IMPLEMENT_IBASE_EXT_INCREF() macro implements the IncRef() method for a
+ * class extending another SCF class in a C++ source module.  Typically, this
+ * macro is automatically employed by the IMPLEMENT_IBASE_EXT() convenience
+ * macro.
+ */
+#define IMPLEMENT_IBASE_EXT_INCREF(Class)				\
+void Class::IncRef ()							\
+{									\
+  __scf_superclass::IncRef ();						\
+}
+
+/**
+ * The IMPLEMENT_IBASE_EXT_DECREF() macro implements the DecRef() method for a
+ * class extending another SCF class in a C++ source module.  Typically, this
+ * macro is automatically employed by the IMPLEMENT_IBASE_EXT() convenience
+ * macro.
+ */
+#define IMPLEMENT_IBASE_EXT_DECREF(Class)				\
+void Class::DecRef ()							\
+{									\
+  __scf_superclass::DecRef ();						\
+}
+
+/**
+ * The IMPLEMENT_IBASE_EXT_QUERY() macro implements the opening boilerplate for
+ * the QueryInterface() method for a class extending another SCF class in a C++
+ * source module.  Typically, this macro is automatically employed by the
+ * IMPLEMENT_IBASE_EXT() convenience macro.
+ */
+#define IMPLEMENT_IBASE_EXT_QUERY(Class)				\
+void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
+{
+
+/**
+ * The IMPLEMENT_IBASE_EXT_QUERY_END macro implements the closing boilerplate
+ * for the QueryInterface() method for a class extending another SCF class in a
+ * C++ source module.  Typically, this macro is automatically employed by the
+ * IMPLEMENT_IBASE_EXT_END convenience macro.
+ */
+#define IMPLEMENT_IBASE_EXT_QUERY_END					\
+  return __scf_superclass::QueryInterface (iInterfaceID, iVersion);	\
+}
 
 /**
  * This macro implements same functionality as IMPLEMENT_IBASE
  * except that it should be used for expansion SCF classes.
  */
 #define IMPLEMENT_IBASE_EXT(Class)					\
-void Class::IncRef ()							\
-{									\
-  __scf_superclass::IncRef ();						\
-}									\
-void Class::DecRef ()							\
-{									\
-  __scf_superclass::DecRef ();						\
-}									\
-void *Class::QueryInterface (uint32 iInterfaceID, int iVersion)		\
-{
+  IMPLEMENT_IBASE_EXT_INCREF(Class)					\
+  IMPLEMENT_IBASE_EXT_DECREF(Class)					\
+  IMPLEMENT_IBASE_EXT_QUERY(Class)
 
 /**
  * This macro implements same functionality as IMPLEMENT_IBASE_END
  * except that it is used for expansion SCF classes.
  */
 #define IMPLEMENT_IBASE_EXT_END						\
-  return __scf_superclass::QueryInterface (iInterfaceID, iVersion);	\
-}
+  IMPLEMENT_IBASE_EXT_QUERY_END
 
 /**
  * The IMPLEMENT_FACTORY macro is used to define a factory for one of
@@ -381,7 +490,7 @@ SCF_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		\
   public:								\
     __##LibraryName##_Init ()						\
     { if (!iSCF::SCF) scfInitialize ();					\
-      iSCF::SCF->RegisterClassList (LibraryName##_scfInitialize (iSCF::SCF)); }	\
+      iSCF::SCF->RegisterClassList(LibraryName##_scfInitialize(iSCF::SCF)); }\
   } __##LibraryName##_dummy;
 
 /**
@@ -448,7 +557,8 @@ struct iConfigFile;
  * This is a simple wrapper around scfCreateInstance.
  */
 #define CREATE_INSTANCE(ClassID,Interface)				\
-  (Interface *)iSCF::SCF->CreateInstance (ClassID, #Interface, VERSION_##Interface)
+  (Interface *)iSCF::SCF->CreateInstance (				\
+  ClassID, #Interface, VERSION_##Interface)
 
 /**
  * Shortcut macro to query given interface from given object.
@@ -466,7 +576,7 @@ struct iConfigFile;
  * and INITIALIZE_INTERFACE_VAR for details).
  */
 #define QUERY_INTERFACE_FAST(Object,Interface)				\
-  (Interface *)(Object)->QueryInterface (scfID_##Interface, VERSION_##Interface)
+  (Interface*)(Object)->QueryInterface (scfID_##Interface, VERSION_##Interface)
 
 /**
  * Shortcut macro to query given interface from given object.
@@ -483,7 +593,7 @@ struct iConfigFile;
  * to put the definition into a header file.
  */
 #define INTERFACE_ID_VAR(iInterface)					\
-  uint32 scfID_##iInterface;
+  scfInterfaceID scfID_##iInterface;
 
 /**
  * Use this macro to initialize the ID container variables declared with
@@ -541,20 +651,19 @@ struct iSCF : public iBase
   virtual bool ClassRegistered (const char *iClassID) = 0;
 
   /**
-   * Create an instance of a class that supports given interface.
-   * The function returns NULL either if such a class ID is not found in
-   * class registry, or a object of given class does not support given
-   * interface or supports an incompatible version of given interface.
-   * If you want to make a difference between these error conditions,
-   * you can check whenever such a class exists using scfClassRegistered()
-   * function.
+   * Create an instance of a class that supports given interface.  The function
+   * returns NULL either if such a class ID is not found in class registry, or
+   * a object of given class does not support given interface or supports an
+   * incompatible version of given interface.  If you want to make a difference
+   * between these error conditions, you can check whenever such a class exists
+   * using scfClassRegistered() function.
    * <p>
-   * If you specify NULL as iInterfaceID, you'll receive a pointer to the
-   * basic interface, no matter what it is. <b>The reference count will be zero
-   * thus you should increment it yourself if you use this approach.</b>
-   * You can treat the pointer returned just as an iBase*, not more.
-   * If you need more, do QueryInterface() on received pointer (this will also
-   * increment the reference counter).
+   * If you specify NULL as iInterfaceID, you'll receive a pointer to the basic
+   * interface, no matter what it is.  <b>The reference count will be zero thus
+   * you should increment it yourself if you use this approach.</b> You can
+   * treat the pointer returned just as an iBase*, not more.  If you need more,
+   * do QueryInterface() on received pointer (this will also increment the
+   * reference counter).
    */
   virtual void *CreateInstance (const char *iClassID,
 	const char *iInterface, int iVersion) = 0;
@@ -575,35 +684,37 @@ struct iSCF : public iBase
 
   /**
    * Unload all unused shared libraries (also called inside scfCreateInstance).
-   * If you want to be sure that all unused shared libraries are unloaded,
-   * call this function. It is automatically invoked inside scfCreateInstance(),
+   * If you want to be sure that all unused shared libraries are unloaded, call
+   * this function.  It is automatically invoked inside scfCreateInstance(),
    * thus it is called from time to time if you constantly create new objects.
    */
   virtual void UnloadUnusedModules () = 0;
   
   /**
-   * Register a single dynamic class (implemented in a shared library).
-   * This function tells SCF kernel that a specific class is implemented within
-   * a specific shared library. There can be multiple classes within a single
-   * shared library. You also can provide an application-specific dependency
+   * Register a single dynamic class (implemented in a shared library).  This
+   * function tells SCF kernel that a specific class is implemented within a
+   * specific shared library.  There can be multiple classes within a single
+   * shared library.  You also can provide an application-specific dependency
    * list.
    */
   virtual bool RegisterClass (const char *iClassID,
 	const char *iLibraryName, const char *Dependencies = NULL) = 0;
 
   /**
-   * Register a single static class (that is, implemented in SCF client module).
-   * This function is similar to scfRegisterClass but is intended to be used
-   * with statically linked classes (that is, not located in a shared library)
+   * Register a single static class (that is, implemented in SCF client
+   * module).  This function is similar to scfRegisterClass but is intended to
+   * be used with statically linked classes (that is, not located in a shared
+   * library)
    */
   virtual bool RegisterStaticClass (scfClassInfo *iClassInfo) = 0;
 
   /**
    * Register a set of static classes (used with static linking).
    * If you design a SCF module that contains a number of SCF classes, and you
-   * want that module to be usable when using either static and dynamic linkage,
-   * you can use scfRegisterClassList (or the SCF_REGISTER_STATIC_LIBRARY macro)
-   * to register the export class table with the SCF kernel.
+   * want that module to be usable when using either static and dynamic
+   * linkage, you can use scfRegisterClassList (or the
+   * SCF_REGISTER_STATIC_LIBRARY macro) to register the export class table with
+   * the SCF kernel.
    */
   virtual bool RegisterClassList (scfClassInfo *iClassInfo) = 0;
 
@@ -620,23 +731,34 @@ struct iSCF : public iBase
    * If the interface is unknown, a new ID is allocated. This number can be
    * used to quickly determine whether two interfaces are equal.
    */
-  virtual uint32 GetInterfaceID (const char *iInterface) = 0;
+  virtual scfInterfaceID GetInterfaceID (const char *iInterface) = 0;
 
   /**
    * This function should be called to finish working with SCF.
-   * (this won't free shared objects but they couldn't be used anymore
-   * because this will do a forced free of all loaded shared libraries).
+   * This will not free shared objects but they should not be used anymore
+   * after calling this function since this will do a forced free of all loaded
+   * shared libraries.
    */
   virtual void Finish () = 0;
 
   /**
-   * Retrieve a list of classnames that start with a specific string.
-   * So for instance QueryClassList ("crystalspace.sound.loader") will retrieve
-   * all the sound loader plugins like aiff, iff, wav, etc.
-   * The returning csVector is a vector of (const char*).
-   * If substring equals NULL a list of all classes will be returned.
+   * Retrieve a list of class names whose prefix matches a pattern string.
+   * For example, QueryClassList("crystalspace.sound.loader.", nmatches) will
+   * return a list of class names which begin with the string
+   * "crystalspace.sound.loader.".  If pattern is zero length or the null
+   * pointer, then all registered class names are returned.  The number of
+   * matches is returned by reference via the nmatches argument.  If no class
+   * names match the pattern string, then NULL is returned and nmatches is set
+   * to zero.  If any class names match the pattern, then the return value is
+   * an array of pointers to constant C-strings.  It is the caller's
+   * responsibility to free the returned pointer if non-NULL, but not the
+   * strings which the array references.  The strings themselves are owned by
+   * the SCF mechanism.  The caller should not rely upon the returned strings
+   * remaining valid following operations which may alter the database of
+   * registered SCF class names.  If the caller needs to maintain access to the
+   * returned strings, then the caller should make a copy of them.
    */
-  virtual void QueryClassList (const char *substring, csVector &vList) = 0;
+  virtual char const** QueryClassList (char const* pattern, int& nmatches) = 0;
 };
 
 //-------------------------------------------- System-dependent defines -----//

@@ -21,6 +21,20 @@
 #include "csgfx/csimage.h"
 #include "imgplex.h"
 
+#define MY_CLASSNAME "crystalspace.graphic.image.io.multiplex"
+
+IMPLEMENT_IBASE(csMultiplexImageIO);
+  IMPLEMENTS_INTERFACE(iImageIO);
+  IMPLEMENTS_INTERFACE(iPlugIn);
+IMPLEMENT_IBASE_END;
+
+IMPLEMENT_FACTORY(csMultiplexImageIO);
+
+EXPORT_CLASS_TABLE (imgplex)
+  EXPORT_CLASS (csMultiplexImageIO,
+    MY_CLASSNAME, "Image file format multiplex plug-in.")
+EXPORT_CLASS_TABLE_END
+
 csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
 {
   CONSTRUCT_IBASE (pParent);
@@ -28,8 +42,7 @@ csMultiplexImageIO::csMultiplexImageIO (iBase *pParent)
 
 csMultiplexImageIO::~csMultiplexImageIO ()
 {
-  int i;
-  for (i=0; i < list.Length (); i++)
+  for (int i=0; i < list.Length (); i++)
     ((iImageIO*)list.Get (i))->DecRef ();
 }
 
@@ -37,25 +50,33 @@ bool csMultiplexImageIO::Initialize (iSystem *pSystem)
 {
   if (pSystem)
   {
-    csVector classlist;
-    iSCF::SCF->QueryClassList ("crystalspace.graphic.image.io.", classlist);
-    for (long i=0; i<classlist.Length (); i++)
+    pSystem->Printf(MSG_INITIALIZATION,
+      "Initializing image loading multiplexer...\n"
+      "  Looking for image loader modules:\n");
+
+    int nmatches;
+    char const** classlist =
+      iSCF::SCF->QueryClassList ("crystalspace.graphic.image.io.", nmatches);
+    if (classlist)
     {
-      const char *classname = (const char *)classlist.Get (i);
-      if (strcasecmp (classname, "crystalspace.graphic.image.io.multiplex"))
+      for (int i = 0; i < nmatches; i++)
       {
-	pSystem->Printf(MSG_INITIALIZATION, "  imageloader: %s\n", classname);
-	iImageIO *plugin = LOAD_PLUGIN (pSystem, classname, NULL, iImageIO);
-	if (plugin)
-	{
-	  // remember the plugin
-	  list.Push (plugin);
-	  // and load its description, since we gonna return it on request
-	  StoreDesc (plugin->GetDescription ());
-	}
+	char const* classname = classlist[i];
+        if (strcasecmp (classname, MY_CLASSNAME))
+        {
+	  pSystem->Printf(MSG_INITIALIZATION,"  %s\n",classname);
+	  iImageIO *plugin = LOAD_PLUGIN (pSystem, classname, NULL, iImageIO);
+	  if (plugin)
+	  {
+	    // remember the plugin
+	    list.Push (plugin);
+	    // and load its description, since we gonna return it on request
+	    StoreDesc (plugin->GetDescription ());
+	  }
+        }
       }
     }
-    return list.Length () > 0;
+    return (list.Length() > 0);
   }
   return false;
 }
@@ -97,7 +118,8 @@ void csMultiplexImageIO::SetDithering (bool iEnable)
   csImage_dither = iEnable;
 }
 
-iDataBuffer *csMultiplexImageIO::Save (iImage *image, iImageIO::FileFormatDescription *format)
+iDataBuffer *csMultiplexImageIO::Save (
+  iImage *image, iImageIO::FileFormatDescription *format)
 {
   int i;
   for (i=0; i<list.Length(); i++)
@@ -120,15 +142,3 @@ iDataBuffer *csMultiplexImageIO::Save (iImage *image, const char *mime)
   }
   return NULL;
 }
-
-IMPLEMENT_IBASE(csMultiplexImageIO);
-  IMPLEMENTS_INTERFACE(iImageIO);
-  IMPLEMENTS_INTERFACE(iPlugIn);
-IMPLEMENT_IBASE_END;
-
-IMPLEMENT_FACTORY(csMultiplexImageIO);
-
-EXPORT_CLASS_TABLE (imgplex)
-  EXPORT_CLASS (csMultiplexImageIO, "crystalspace.graphic.image.io.multiplex",
-		"Image file format multiplex plug-in.")
-EXPORT_CLASS_TABLE_END

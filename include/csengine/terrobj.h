@@ -55,13 +55,17 @@ private:
   /// Optional reference to the parent csTerrainFactoryWrapper.
   csTerrainFactoryWrapper *pFactory;
 
+  /**
+   * Destructor.  This is private in order to force clients to use DecRef()
+   * for object destruction.
+   */
+  virtual ~csTerrainWrapper ();
+
 public:
   /// Constructor.
   csTerrainWrapper (iEngine *pEng, iTerrainObject *pTerr);
   /// Constructor.
   csTerrainWrapper (iEngine *pEng );
-  /// Destructor.
-  virtual ~csTerrainWrapper ();
 
   /// Set the terrain factory.
   void SetFactory (csTerrainFactoryWrapper* factory)
