@@ -272,10 +272,19 @@ bool NeXTAssistant::eiEventHandler::HandleEvent(iEvent& e)
 //-----------------------------------------------------------------------------
 bool csDefaultRunLoop(iObjectRegistry* r)
 {
-  iNeXTAssistantLocal* a = CS_QUERY_REGISTRY(r, iNeXTAssistantLocal);
+  bool ok = false;
+  iNeXTAssistant* a = CS_QUERY_REGISTRY(r, iNeXTAssistant);
   if (a != 0)
-    a->start_event_loop();
-  return (a != 0);
+  {
+    iNeXTAssistantLocal* al = SCF_QUERY_INTERFACE(a, iNeXTAssistantLocal);
+    if (al != 0)
+    {
+      al->start_event_loop();
+      al->DecRef();
+      ok = true;
+    }
+  }
+  return ok;
 }
 
 

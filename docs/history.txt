@@ -104,6 +104,15 @@ The history order is reversed so that new features are at the top.
 	  from linking into an application with USE_PLUGINS=no.
 	- Eric Sunshine eliminated an "unused variable" compilation warning
 	  from isotest.cpp, mdltest.cpp, and sqksystm.cpp.
+	- Eric Sunshine updated NeXTAssistant.cpp to take into account today's
+	  semantic change to shared-object registry queries where the argument
+	  to CS_QUERY_REGISTRY() is now compared against the registered `tag'
+	  before being compared against the actual registered SCF type.
+	  Unfortunately, the semantic change broke code which accessed
+	  NeXTAssistant since, although the assistant is published with the
+	  object-registry under a single name, it implements multiple SCF
+	  interfaces.  (It is no longer possible to query the registry for an
+	  object based solely upon an SCF interface.)
 14-Oct-2001
 	- The 'stdrep' plugin now depends on output console and
 	  reporter plugins in SCF. This means that it will be loaded
