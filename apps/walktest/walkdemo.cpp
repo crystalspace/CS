@@ -1070,7 +1070,7 @@ void HandleDynLight (iDynLight* dyn)
 	{
 	  delete es;
           Sys->view->GetEngine ()->GetCsEngine ()->RemoveDynLight (dyn);
-          delete dyn;
+          dyn->DecRef ();
 	  return;
 	}
       }
