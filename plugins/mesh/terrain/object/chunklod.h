@@ -263,6 +263,8 @@ private:
   int meshppsize;
   csReversibleTransform tr_o2c;
   int tricount;
+  csFlags flags;
+
 public: 
   SCF_DECLARE_IBASE;
 
@@ -271,6 +273,8 @@ public:
 
   /// Returns a point to the factory that made this
   iMeshObjectFactory* GetFactory () const { return (iMeshObjectFactory*)pFactory; }
+
+  virtual csFlags& GetFlags () { return flags; }
 
   /**
    * Does all pre-render calculation.  Determines which LOD children in the 

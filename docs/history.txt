@@ -77,6 +77,9 @@ chronological order.
 	- Eric Sunshine made some minor Texinfo mark-up corrections to
 	  levbuilding.txi.  Also eliminated several 'hbox' warnings emitted by
 	  TeX.
+	- Fritz Elfert fixed a trivial compile error, introduced by the
+	  addition of the pure virtual GetFlags() earlier today:
+	  Implementation was missing in csChunkLodTerrainObject.
 17-Feb-2004
 	- Jorrit fixed a bug in csPolygonMeshTools::Triangulate(). It would
 	  try to allocate a 0 size array in some cases.
