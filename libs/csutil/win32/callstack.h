@@ -35,22 +35,28 @@ public:
 
   struct CS_CSUTIL_EXPORT StackEntry
   {
-    uint64 instrPtr;
+    uintptr_t instrPtr;
 
     struct Param
     {
       csStringID name;
       uint32 value;
     };
-    bool hasParams;
-    csArray<Param> params;
+    Param* params;
+
+    StackEntry() : instrPtr (~0), params(0) {}
+    ~StackEntry() { delete[] params; }
   };
 
-  csArray<StackEntry> entries;
+  StackEntry* entries;
   static BOOL CALLBACK EnumSymCallback (SYMBOL_INFO* pSymInfo, 
     ULONG SymbolSize, PVOID UserContext);
 
-  void AddFrame (const STACKFRAME64& frame);
+  void AddFrame (const STACKFRAME64& frame, 
+    csDirtyAccessArray<StackEntry>& entries);
+
+  cswinCallStack() : csCallStack(), entries(0) {}
+  virtual ~cswinCallStack() { delete[] entries; }
 
   virtual size_t GetEntryCount ();
   virtual bool GetFunctionName (size_t num, csString& str);

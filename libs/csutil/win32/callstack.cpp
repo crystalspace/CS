@@ -18,6 +18,7 @@
 */	
 
 #include "cssysdef.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/util.h"
 #include "csutil/sysfunc.h"
 #include "csutil/csstring.h"
@@ -120,7 +121,7 @@ static void RescanModules ()
 
 struct SymCallbackInfo
 {
-  csArray<cswinCallStack::StackEntry::Param>* params;
+  csDirtyAccessArray<cswinCallStack::StackEntry::Param>* params;
   uint8* paramOffset;
 };
 
@@ -143,7 +144,8 @@ BOOL CALLBACK cswinCallStack::EnumSymCallback (SYMBOL_INFO* pSymInfo,
   return TRUE;
 }
 
-void cswinCallStack::AddFrame (const STACKFRAME64& frame)
+void cswinCallStack::AddFrame (const STACKFRAME64& frame, 
+			       csDirtyAccessArray<StackEntry>& entries)
 {
   csString str;
   StackEntry& entry = entries.GetExtend (entries.Length ());
@@ -164,7 +166,6 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame)
   stackFrame.Params[3] = frame.Params[3];
   stackFrame.Virtual = frame.Virtual;
 
-  entry.hasParams = false;
   SetLastError (ERROR_SUCCESS);
   bool result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
     &stackFrame, 0);
@@ -181,14 +182,18 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame)
   {
     str.Clear ();
     SymCallbackInfo callbackInfo;
-    callbackInfo.params = &entry.params;
+    csDirtyAccessArray<StackEntry::Param> params;
+    callbackInfo.params = &params;
     callbackInfo.paramOffset = (uint8*)(LONG_PTR)(frame.AddrStack.Offset - 8);
     if (DbgHelp::SymEnumSymbols (symInit.GetSymProcessHandle (), 
       0
       /*DbgHelp::SymGetModuleBase64(GetCurrentProcess(),frame.AddrPC.Offset)*/,
       "*", &EnumSymCallback, &callbackInfo))
     {
-      entry.hasParams = true;
+      const size_t n = params.Length();
+      entry.params = new StackEntry::Param[n + 1];
+      memcpy (entry.params, params.GetArray(), n * sizeof (StackEntry::Param));
+      entry.params[n].name = 0;
     }
   }
   else
@@ -201,7 +206,10 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame)
 
 size_t cswinCallStack::GetEntryCount ()
 {
-  return entries.Length();
+  if (entries == 0) return 0;
+  size_t n = 0;
+  while (entries[n].instrPtr != (uintptr_t)~0) n++;
+  return n;
 }
 
 bool cswinCallStack::GetFunctionName (size_t num, csString& str)
@@ -267,18 +275,21 @@ bool cswinCallStack::GetLineNumber (size_t num, csString& str)
 
 bool cswinCallStack::GetParameters (size_t num, csString& str)
 {
-  if (!entries[num].hasParams) return false;
+  if (entries[num].params == 0) return false;
 
   str.Clear();
-  for (size_t i = 0; i < entries[num].params.Length(); i++)
+  StackEntry::Param* param = entries[num].params;
+  bool first = true;
+  while (param->name != 0)
   {
-    if (i > 0) str << ", ";
-    str << strings.Request (entries[num].params[i].name);
+    if (!first) { str << ", "; } else { first = false; }
+    str << strings.Request (param->name);
     str << " = ";
     char tmp[23];
-    uint32 data = entries[num].params[i].value;
+    uint32 data = param->value;
     sprintf (tmp, "%d(0x%.8x)", data, data);
     str << tmp;
+    param++;
   }
   return true;
 }
@@ -337,7 +348,7 @@ CurrentThreadContextHelper::~CurrentThreadContextHelper ()
   the shipped dbghelp.dll can't grok the kernel stack, so we work around this
   by avoiding the kernel stack :P However, the approach uses some dubious
   home-grown thread synchronization, so a safe version is supplied (and 
-  activate by not #defining AVOID_CONTEXT_IN_KERNEL).
+  activate by not #defining AVOID_CONTEXT_IN_KERNEL). 
  */
 #define AVOID_CONTEXT_IN_KERNEL
 
@@ -375,7 +386,7 @@ DWORD CurrentThreadContextHelper::ContextThread (LPVOID lpParameter)
 
 static CurrentThreadContextHelper contextHelper;
 
-csCallStack* csCallStackHelper::CreateCallStack (int skip)
+csCallStack* cswinCallStackHelper::CreateCallStackThreaded (int skip)
 {
   const int currentContextSkip = 
 #ifdef AVOID_CONTEXT_IN_KERNEL
@@ -445,9 +456,9 @@ csCallStack* csCallStackHelper::CreateCallStack (int skip)
       return 0;
     }
 
+  #ifdef AVOID_CONTEXT_IN_KERNEL
     contextGettingState = 1;
 
-  #ifdef AVOID_CONTEXT_IN_KERNEL
     do
     {
     }
@@ -461,8 +472,76 @@ csCallStack* csCallStackHelper::CreateCallStack (int skip)
     ReleaseMutex (contextHelper.mutex);
   }
 
-  return cswinCallStackHelper::CreateCallStack (hProc, hThread, context, 
-    skip + currentContextSkip); 
+  return CreateCallStack (hProc, hThread, context, skip + currentContextSkip); 
+}
+
+class CriticalSectionWrapper
+{
+  CRITICAL_SECTION cs;
+public:
+  CriticalSectionWrapper()
+  { InitializeCriticalSection (&cs); }
+  ~CriticalSectionWrapper()
+  { DeleteCriticalSection (&cs); }
+  void Enter()  
+  { EnterCriticalSection (&cs); }
+  void Leave()  
+  { LeaveCriticalSection (&cs); }
+};
+
+static CriticalSectionWrapper ExceptStackSection;
+static CONTEXT* currentContextPtr;
+
+static LONG WINAPI ExceptionFilter (struct _EXCEPTION_POINTERS* ExceptionInfo)
+{
+  *((CONTEXT*)ExceptionInfo->ExceptionRecord->ExceptionInformation[0]) = 
+    *(ExceptionInfo->ContextRecord);
+  return EXCEPTION_CONTINUE_EXECUTION;
+}
+
+/* A slightly odd method to get a thread context, deliberately raising an exception
+ * to get to the exception handler... but a bit quicker than the "use 2nd thread"
+ * method. */
+csCallStack* cswinCallStackHelper::CreateCallStackExcept (int skip)
+{
+  ExceptStackSection.Enter();
+    
+  CONTEXT context;
+  memset (&context, 0, sizeof (context));
+  currentContextPtr = &context;
+
+  LPTOP_LEVEL_EXCEPTION_FILTER oldFilter = 
+    SetUnhandledExceptionFilter (&ExceptionFilter);
+  ULONG_PTR contextPtr = (ULONG_PTR)&context;
+
+  RaiseException (0, 0, 1, &contextPtr);
+  SetUnhandledExceptionFilter (oldFilter);
+
+  ExceptStackSection.Leave();
+
+  HANDLE hProc = symInit.GetSymProcessHandle ();
+  HANDLE hThread = GetCurrentThread ();
+  return CreateCallStack (hProc, hThread, context, skip + 3); 
+};
+
+typedef BOOL (WINAPI* PFNISDEBUGGERPRESENT)();
+
+csCallStack* csCallStackHelper::CreateCallStack (int skip)
+{
+  static PFNISDEBUGGERPRESENT IsDebuggerPresent = 0;
+  static HMODULE hKernel32 = 0;
+
+  if (hKernel32 == 0)
+  {
+    hKernel32 = GetModuleHandle ("kernel32.dll");
+    IsDebuggerPresent = (PFNISDEBUGGERPRESENT)GetProcAddress (hKernel32,
+      "IsDebuggerPresent");
+  }
+
+  if (!IsDebuggerPresent || IsDebuggerPresent())
+    return cswinCallStackHelper::CreateCallStackThreaded (skip);
+  else
+    return cswinCallStackHelper::CreateCallStackExcept (skip);
 }
 
 csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
@@ -512,13 +591,21 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
 #endif // CS_PROCESSOR_FOO
 
   int count = 0;
+  csDirtyAccessArray<cswinCallStack::StackEntry> entries;
   cswinCallStack* stack = new cswinCallStack;
   while (DbgHelp::StackWalk64 (machineType, hProc,
     hThread, &frame, &context, 0, DbgHelp::SymFunctionTableAccess64, 
     DbgHelp::SymGetModuleBase64, 0))
   {
     count++;
-    if (count > skip) stack->AddFrame (frame);
+    if (count > skip) stack->AddFrame (frame, entries);
+  }
+  const size_t n = entries.Length();
+  if (n > 0)
+  {
+    stack->entries = new cswinCallStack::StackEntry[n + 1];
+    memcpy (stack->entries, entries.GetArray(), 
+      sizeof (cswinCallStack::StackEntry) * n);
   }
 
   return stack;

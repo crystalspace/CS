@@ -25,6 +25,7 @@
  */
 
 #include "csextern.h"
+#include "reftrackeraccess.h"
 
 /**
  * This is a class which provides basic reference-counting semantics.  It can
@@ -47,17 +48,28 @@ protected:
     delete this;
   }
 
-  virtual ~csRefCount () {}
+  virtual ~csRefCount () 
+  {
+    csRefTrackerAccess::TrackDestruction (this, ref_count);
+  }
 
 public:
   /// Initialize object and set reference to 1.
-  csRefCount () : ref_count (1) {}
+  csRefCount () : ref_count (1) 
+  {
+    csRefTrackerAccess::TrackConstruction (this);
+  }
 
   /// Increase the number of references to this object.
-  void IncRef () { ref_count++; }
+  void IncRef () 
+  { 
+    csRefTrackerAccess::TrackIncRef (this, ref_count); 
+    ref_count++; 
+  }
   /// Decrease the number of references to this object.
   void DecRef ()
   {
+    csRefTrackerAccess::TrackDecRef (this, ref_count);
     ref_count--;
     if (ref_count <= 0)
       Delete ();

@@ -366,18 +366,18 @@ public:
   { return activeTech->svcontext.GetShaderVariables(); }
 
   /**
-  * Push the variables of this context onto the variable stacks
-  * supplied in the "stacks" argument
-  */
+   * Push the variables of this context onto the variable stacks
+   * supplied in the "stacks" argument
+   */
   void PushVariables (csShaderVarStack &stacks) const
   { 
     GetUsedSVContext().PushVariables (stacks); 
   }
 
   /**
-  * Pop the variables of this context off the variable stacks
-  * supplied in the "stacks" argument
-  */
+   * Pop the variables of this context off the variable stacks
+   * supplied in the "stacks" argument
+   */
   void PopVariables (csShaderVarStack &stacks) const
   { 
     GetUsedSVContext().PopVariables (stacks); 
@@ -389,7 +389,7 @@ public:
 public:
   //Holders
   csXMLShaderCompiler* compiler;
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
   csWeakRef<iShaderManager> shadermgr;
   char* filename;
 

@@ -20,6 +20,14 @@ chronological order.
 	  For printing out a 2D vector or a 2D box you can use %2b and
 	  %2v. Unfortunatelly using %b and %v cause compiler warnings.
 	  Don't know how to avoid that yet.
+	- res made csXMLShader only keep a weak ref to iGraphics3D; otherwise,
+	  a circular ref was created.
+	- res made csSector::UnlinkObjects() also unlink lights (fixes a leak).
+	- res scraped a few bytes off Win32 callstacks.
+	- res added an alternative (faster) way to obtain the thread context 
+	  needed to create a call stack. It uses exception handling and is
+	  only used if the program is not debugged.
+	- res changed csRefCount to also use the ref tracker.
 17-Feb-2005
 	- Jorrit added csPoly3D::ClassifyAxis().
 	- Jorrit added constants CS_AXIS_X, CS_AXIS_Y, and CS_AXIS_Z, to

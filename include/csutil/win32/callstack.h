@@ -37,6 +37,11 @@
  */
 class CS_CSUTIL_EXPORT cswinCallStackHelper
 {
+  friend class csCallStackHelper;
+  /// Create a callstack by obtaining the context via a 2nd thread
+  static csCallStack* CreateCallStackThreaded (int skip);
+  /// Create a callstack by obtaining the context via the exception handler
+  static csCallStack* CreateCallStackExcept (int skip);
 public:
   /**
    * Create a call stack.

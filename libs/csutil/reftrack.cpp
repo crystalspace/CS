@@ -59,7 +59,10 @@ csRefTracker::~csRefTracker ()
     }
   }
 
-  mutex->DecRef();
+  csMutex* tehMutex = mutex;
+  mutex = 0; 
+    // Set mutex to 0 as mutex DecRef() will cause RefTracker call
+  tehMutex->DecRef();
   SCF_DESTRUCT_IBASE();
 }
 
@@ -77,6 +80,7 @@ csRefTracker::RefInfo& csRefTracker::GetObjRefInfo (void* obj)
 
 void csRefTracker::TrackIncRef (void* object, int refCount)
 {
+  if (!mutex) return;
   csScopedMutexLock lock (mutex);
 
   RefInfo& refInfo = GetObjRefInfo (object);
@@ -90,6 +94,7 @@ void csRefTracker::TrackIncRef (void* object, int refCount)
 
 void csRefTracker::TrackDecRef (void* object, int refCount)
 {
+  if (!mutex) return;
   csScopedMutexLock lock (mutex);
 
   RefInfo& refInfo = GetObjRefInfo (object);
@@ -103,6 +108,7 @@ void csRefTracker::TrackDecRef (void* object, int refCount)
 
 void csRefTracker::TrackConstruction (void* object)
 {
+  if (!mutex) return;
   csScopedMutexLock lock (mutex);
 
   /*
@@ -126,6 +132,7 @@ void csRefTracker::TrackConstruction (void* object)
 
 void csRefTracker::TrackDestruction (void* object, int refCount)
 {
+  if (!mutex) return;
   csScopedMutexLock lock (mutex);
 
   RefInfo& refInfo = GetObjRefInfo (object);
@@ -139,6 +146,7 @@ void csRefTracker::TrackDestruction (void* object, int refCount)
 
 void csRefTracker::MatchIncRef (void* object, int refCount, void* tag)
 {
+  if (!mutex) return;
   csScopedMutexLock lock (mutex);
 
   RefInfo& refInfo = GetObjRefInfo (object);
@@ -170,6 +178,7 @@ void csRefTracker::MatchIncRef (void* object, int refCount, void* tag)
 
 void csRefTracker::MatchDecRef (void* object, int refCount, void* tag)
 {
+  if (!mutex) return;
   csScopedMutexLock lock (mutex);
 
   RefInfo& refInfo = GetObjRefInfo (object);
@@ -215,6 +224,7 @@ void csRefTracker::MatchDecRef (void* object, int refCount, void* tag)
 
 void csRefTracker::AddAlias (void* obj, void* mapTo)
 {
+  if (!mutex) return;
   csScopedMutexLock lock (mutex);
 
   if (obj == mapTo) return;
@@ -223,6 +233,7 @@ void csRefTracker::AddAlias (void* obj, void* mapTo)
 
 void csRefTracker::RemoveAlias (void* obj, void* mapTo)
 {
+  if (!mutex) return;
   csScopedMutexLock lock (mutex);
 
   if (obj == mapTo) return;
@@ -231,6 +242,7 @@ void csRefTracker::RemoveAlias (void* obj, void* mapTo)
 
 void csRefTracker::SetDescription (void* obj, const char* description)
 {
+  if (!mutex) return;
   csScopedMutexLock lock (mutex);
 
   RefInfo& refInfo = GetObjRefInfo (obj);
@@ -264,6 +276,7 @@ void csRefTracker::ReportOnObj (void* obj, RefInfo* info)
 
 void csRefTracker::Report ()
 {
+  if (!mutex) return;
   csScopedMutexLock lock (mutex);
 
   for (size_t i = 0; i < oldData.Length(); i++)

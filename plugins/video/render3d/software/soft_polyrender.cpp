@@ -33,6 +33,7 @@ csSoftPolygonRenderer::csSoftPolygonRenderer (
   csSoftwareGraphics3DCommon* parent)
 {
   SCF_CONSTRUCT_IBASE(0);
+  csRefTrackerAccess::AddAlias (CS_STATIC_CAST(iRenderBuffer*, this), this);
   csSoftPolygonRenderer::parent = parent;
   renderBufferNum = ~0;
   polysNum = 0;

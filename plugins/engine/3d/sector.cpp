@@ -150,6 +150,13 @@ void csSector::UnlinkObjects ()
     sl->Remove (&scfiSector);
     m->GetMovable ()->UpdateMove ();
   }
+  for (i = 0; i < lights.GetCount (); i++)
+  {
+    iLight* l = lights.Get (i);
+    iSectorList* sl = l->GetMovable ()->GetSectors ();
+    sl->Remove (&scfiSector);
+    l->GetMovable ()->UpdateMove ();
+  }
 }
 
 //----------------------------------------------------------------------

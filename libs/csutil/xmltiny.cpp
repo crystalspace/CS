@@ -157,6 +157,7 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_IBASE_INCREF(csTinyXmlNode)
 void csTinyXmlNode::DecRef ()
 {
+  csRefTrackerAccess::TrackDecRef (this, scfRefCount);
   scfRefCount--;
   if (scfRefCount <= 0)
   {
