@@ -4509,6 +4509,12 @@ class iMeshFactoryWrapper(iBase):
     def GetStaticLOD(*args): return _cspace.iMeshFactoryWrapper_GetStaticLOD(*args)
     def AddFactoryToStaticLOD(*args): return _cspace.iMeshFactoryWrapper_AddFactoryToStaticLOD(*args)
     def RemoveFactoryFromStaticLOD(*args): return _cspace.iMeshFactoryWrapper_RemoveFactoryFromStaticLOD(*args)
+    def SetZBufMode(*args): return _cspace.iMeshFactoryWrapper_SetZBufMode(*args)
+    def GetZBufMode(*args): return _cspace.iMeshFactoryWrapper_GetZBufMode(*args)
+    def SetZBufModeRecursive(*args): return _cspace.iMeshFactoryWrapper_SetZBufModeRecursive(*args)
+    def SetRenderPriority(*args): return _cspace.iMeshFactoryWrapper_SetRenderPriority(*args)
+    def GetRenderPriority(*args): return _cspace.iMeshFactoryWrapper_GetRenderPriority(*args)
+    def SetRenderPriorityRecursive(*args): return _cspace.iMeshFactoryWrapper_SetRenderPriorityRecursive(*args)
     def __del__(self, destroy=_cspace.delete_iMeshFactoryWrapper):
         try:
             if self.thisown: destroy(self)
@@ -5347,6 +5353,7 @@ class iSprite2DState(iSprite2DFactoryState):
         return "<C iSprite2DState instance at %s>" % (self.this,)
     def CreateRegularVertices(*args): return _cspace.iSprite2DState_CreateRegularVertices(*args)
     def SetUVAnimation(*args): return _cspace.iSprite2DState_SetUVAnimation(*args)
+    def GetUVAnimation(*args): return _cspace.iSprite2DState_GetUVAnimation(*args)
     def StopUVAnimation(*args): return _cspace.iSprite2DState_StopUVAnimation(*args)
     def PlayUVAnimation(*args): return _cspace.iSprite2DState_PlayUVAnimation(*args)
     def __del__(self, destroy=_cspace.delete_iSprite2DState):
