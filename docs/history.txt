@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Sep-2004
+	- Eric Sunshine repaired some outdated references to
+	  /usr/local/crystal, the old GNU-make-based installation location, in
+	  the CS manual.
 10-Sep-2004
 	- Eric Sunshine fixed bugs in walktest/Jamfile where it unconditionally
 	  attempted to add several optional modules to the "walkall" compile

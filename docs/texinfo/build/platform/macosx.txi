@@ -6,7 +6,7 @@
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
 @copyright{} 1999, 2000, 2001, 2002, 2003, 2004 by Eric Sunshine.  Last updated
-2 May 2004.}
+18 September 2004.}
 
 Crystal Space was ported to MacOS/X by Eric Sunshine.  If you have questions or
 comments about this port, please contact Eric Sunshine at
@@ -173,9 +173,22 @@ typing the following command from within the root @file{CS} directory:
 @end example
 
 At configuration time, you can also specify where Crystal Space should be
-installed.  By default, it is installed in @file{/usr/local/crystal}, but you
-can specify another location if desired.  This setting is remembered and
-automatically applied later when you install the project.  For example:
+installed.  By default, it is installed in several subdirectories of
+@file{/usr/local}:
+
+@example
+/usr/local/bin
+/usr/local/etc/crystalspace
+/usr/local/include/crystalspace
+/usr/local/lib
+/usr/local/lib/crystalspace
+/usr/local/share/crystalspace
+/usr/local/share/docs/crystalspace-x.xx
+@end example
+
+You can, however, specify a different location if desired.  This setting is
+remembered and automatically applied later when you install the project.  For
+example:
 
 @example
 ./configure --prefix=/Library/CrystalSpace
@@ -268,8 +281,8 @@ installed since they are not required for development.  Installing the @sc{sdk}
 is optional, though recommended.  If you simply wish to run the example
 programs, then you need not invoke the installation phase.
 
-By default, Crystal Space is installed in @file{/usr/local/crystal}, however
-you can specify a different location when you configure the project, as
+By default, Crystal Space is installed in subdirectories of @file{/usr/local},
+however you can specify a different location when you configure the project, as
 explained above.  Installation can be performed with the following command:
 
 @example
@@ -301,7 +314,7 @@ you can tell programs where to find their resources by invoking the following
 configuration command from the command-line:
 
 @example
-defaults write NSGlobalDomain CrystalSpaceRoot "/usr/local/crystal"
+defaults write NSGlobalDomain CrystalSpaceRoot "/usr/local"
 @end example
 
 If necessary, it is possible to configure @samp{CrystalSpaceRoot} for a
