@@ -954,28 +954,28 @@ static int _wrap_csRGBpixel_alpha_get(lua_State *lua_state) {
 }
     return 1;
 }
-static void *SwigiPlugInToiBase(void *ptr) {
-    iPlugIn *src;
+static void *SwigiPluginToiBase(void *ptr) {
+    iPlugin *src;
     iBase *dest;
-    src = (iPlugIn *) ptr;
+    src = (iPlugin *) ptr;
     dest = (iBase *) src;
     return (void *) dest;
 }
 
-#define iPlugIn_Initialize(_swigobj,_swigarg0)  (_swigobj->Initialize(_swigarg0))
-static int _wrap_iPlugIn_Initialize(lua_State *lua_state) {
+#define iPlugin_Initialize(_swigobj,_swigarg0)  (_swigobj->Initialize(_swigarg0))
+static int _wrap_iPlugin_Initialize(lua_State *lua_state) {
 
     bool  _result;
-    iPlugIn * _arg0;
+    iPlugin * _arg0;
     iSystem * _arg1;
 
 {
 #ifdef LUA_MS
   if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPlugIn *) lua_touserdata (lua_state,  1 );
+    _arg0 = (iPlugin *) lua_touserdata (lua_state,  1 );
   else _arg0 = NULL;
 #else
-  if (!lua_isnil ( 1 )) _arg0 = (iPlugIn *) lua_touserdata ( 1 );
+  if (!lua_isnil ( 1 )) _arg0 = (iPlugin *) lua_touserdata ( 1 );
   else _arg0 = NULL;
 #endif
 }
@@ -989,7 +989,7 @@ static int _wrap_iPlugIn_Initialize(lua_State *lua_state) {
   else _arg1 = NULL;
 #endif
 }
-    _result = (bool )iPlugIn_Initialize(_arg0,_arg1);
+    _result = (bool )iPlugin_Initialize(_arg0,_arg1);
 {
 #ifdef LUA_MS
   lua_pushnumber (lua_state, (double) _result);
@@ -999,20 +999,20 @@ static int _wrap_iPlugIn_Initialize(lua_State *lua_state) {
 }
     return 1;
 }
-#define iPlugIn_HandleEvent(_swigobj,_swigarg0)  (_swigobj->HandleEvent(_swigarg0))
-static int _wrap_iPlugIn_HandleEvent(lua_State *lua_state) {
+#define iPlugin_HandleEvent(_swigobj,_swigarg0)  (_swigobj->HandleEvent(_swigarg0))
+static int _wrap_iPlugin_HandleEvent(lua_State *lua_state) {
 
     bool  _result;
-    iPlugIn * _arg0;
+    iPlugin * _arg0;
     iEvent * _arg1;
 
 {
 #ifdef LUA_MS
   if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPlugIn *) lua_touserdata (lua_state,  1 );
+    _arg0 = (iPlugin *) lua_touserdata (lua_state,  1 );
   else _arg0 = NULL;
 #else
-  if (!lua_isnil ( 1 )) _arg0 = (iPlugIn *) lua_touserdata ( 1 );
+  if (!lua_isnil ( 1 )) _arg0 = (iPlugin *) lua_touserdata ( 1 );
   else _arg0 = NULL;
 #endif
 }
@@ -1026,7 +1026,7 @@ static int _wrap_iPlugIn_HandleEvent(lua_State *lua_state) {
   else _arg1 = NULL;
 #endif
 }
-    _result = (bool )iPlugIn_HandleEvent(_arg0,*_arg1);
+    _result = (bool )iPlugin_HandleEvent(_arg0,*_arg1);
 {
 #ifdef LUA_MS
   lua_pushnumber (lua_state, (double) _result);
@@ -1414,11 +1414,11 @@ static int _wrap_iMaterialWrapper_GetMaterialHandle(lua_State *lua_state) {
 }
     return 1;
 }
-static void *SwigiGraphics3DToiPlugIn(void *ptr) {
+static void *SwigiGraphics3DToiPlugin(void *ptr) {
     iGraphics3D *src;
-    iPlugIn *dest;
+    iPlugin *dest;
     src = (iGraphics3D *) ptr;
-    dest = (iPlugIn *) src;
+    dest = (iPlugin *) src;
     return (void *) dest;
 }
 
@@ -4766,11 +4766,11 @@ static int _wrap_iPolygonTexture_SetCacheData(lua_State *lua_state) {
     iPolygonTexture_SetCacheData(_arg0,_arg1,_arg2);
     return 1;
 }
-static void *SwigiEngineToiPlugIn(void *ptr) {
+static void *SwigiEngineToiPlugin(void *ptr) {
     iEngine *src;
-    iPlugIn *dest;
+    iPlugin *dest;
     src = (iEngine *) ptr;
-    dest = (iPlugIn *) src;
+    dest = (iPlugin *) src;
     return (void *) dest;
 }
 
@@ -5445,8 +5445,8 @@ void cspace_init (lua_State *lua_state) {
 	 lua_register (lua_state, "csRGBpixel_blue_get",_wrap_csRGBpixel_blue_get);
 	 lua_register (lua_state, "csRGBpixel_alpha_set",_wrap_csRGBpixel_alpha_set);
 	 lua_register (lua_state, "csRGBpixel_alpha_get",_wrap_csRGBpixel_alpha_get);
-	 lua_register (lua_state, "iPlugIn_Initialize",_wrap_iPlugIn_Initialize);
-	 lua_register (lua_state, "iPlugIn_HandleEvent",_wrap_iPlugIn_HandleEvent);
+	 lua_register (lua_state, "iPlugin_Initialize",_wrap_iPlugin_Initialize);
+	 lua_register (lua_state, "iPlugin_HandleEvent",_wrap_iPlugin_HandleEvent);
 	 lua_register (lua_state, "iTextureHandle_GetMipMapDimensions",_wrap_iTextureHandle_GetMipMapDimensions);
 	 lua_register (lua_state, "iTextureHandle_GetMeanColor",_wrap_iTextureHandle_GetMeanColor);
 	 lua_register (lua_state, "iTextureHandle_GetCacheData",_wrap_iTextureHandle_GetCacheData);
@@ -5488,7 +5488,7 @@ void cspace_init (lua_State *lua_state) {
 	 lua_register (lua_state, "iGraphics3D_GetTextureManager",_wrap_iGraphics3D_GetTextureManager);
 	 lua_register (lua_state, "iGraphics3D_CreateHalo",_wrap_iGraphics3D_CreateHalo);
 	 lua_register (lua_state, "iGraphics3D_DrawPixmap",_wrap_iGraphics3D_DrawPixmap);
-	 lua_register (lua_state, "iGraphics3D_HandleEvent",_wrap_iPlugIn_HandleEvent);
+	 lua_register (lua_state, "iGraphics3D_HandleEvent",_wrap_iPlugin_HandleEvent);
 	 lua_register (lua_state, "iCamera_GetFOV",_wrap_iCamera_GetFOV);
 	 lua_register (lua_state, "iCamera_GetInvFOV",_wrap_iCamera_GetInvFOV);
 	 lua_register (lua_state, "iSector_CreateBSP",_wrap_iSector_CreateBSP);
@@ -5574,8 +5574,8 @@ void cspace_init (lua_State *lua_state) {
 	 lua_register (lua_state, "iEngine_GetSector",_wrap_iEngine_GetSector);
 	 lua_register (lua_state, "iEngine_CreateThing",_wrap_iEngine_CreateThing);
 	 lua_register (lua_state, "iEngine_FindMaterial",_wrap_iEngine_FindMaterial);
-	 lua_register (lua_state, "iEngine_Initialize",_wrap_iPlugIn_Initialize);
-	 lua_register (lua_state, "iEngine_HandleEvent",_wrap_iPlugIn_HandleEvent);
+	 lua_register (lua_state, "iEngine_Initialize",_wrap_iPlugin_Initialize);
+	 lua_register (lua_state, "iEngine_HandleEvent",_wrap_iPlugin_HandleEvent);
 	 lua_register (lua_state, "iSystem_Query_iEngine",_wrap_iSystem_Query_iEngine);
 	 lua_register (lua_state, "iSystem_Query_iGraphics3D",_wrap_iSystem_Query_iGraphics3D);
 	 lua_register (lua_state, "iSystem_Print",_wrap_iSystem_Print);
@@ -5584,11 +5584,11 @@ void cspace_init (lua_State *lua_state) {
  * (Used by the SWIG pointer type-checker).
  */
 	 SWIG_RegisterMapping("_signed_long","_long",0);
-	 SWIG_RegisterMapping("_struct_iPlugIn","_struct_iEngine",SwigiEngineToiPlugIn);
-	 SWIG_RegisterMapping("_struct_iPlugIn","_iEngine",SwigiEngineToiPlugIn);
-	 SWIG_RegisterMapping("_struct_iPlugIn","_struct_iGraphics3D",SwigiGraphics3DToiPlugIn);
-	 SWIG_RegisterMapping("_struct_iPlugIn","_iGraphics3D",SwigiGraphics3DToiPlugIn);
-	 SWIG_RegisterMapping("_struct_iPlugIn","_iPlugIn",0);
+	 SWIG_RegisterMapping("_struct_iPlugin","_struct_iEngine",SwigiEngineToiPlugin);
+	 SWIG_RegisterMapping("_struct_iPlugin","_iEngine",SwigiEngineToiPlugin);
+	 SWIG_RegisterMapping("_struct_iPlugin","_struct_iGraphics3D",SwigiGraphics3DToiPlugin);
+	 SWIG_RegisterMapping("_struct_iPlugin","_iGraphics3D",SwigiGraphics3DToiPlugin);
+	 SWIG_RegisterMapping("_struct_iPlugin","_iPlugin",0);
 	 SWIG_RegisterMapping("_iEngine","_struct_iEngine",0);
 	 SWIG_RegisterMapping("_struct_iSystem","_iSystem",0);
 	 SWIG_RegisterMapping("_long","_unsigned_long",0);
@@ -5625,11 +5625,11 @@ void cspace_init (lua_State *lua_state) {
 	 SWIG_RegisterMapping("_class_csVector3","_csVector3",0);
 	 SWIG_RegisterMapping("_iThing","_struct_iThing",0);
 	 SWIG_RegisterMapping("_iPolygonTexture","_struct_iPolygonTexture",0);
-	 SWIG_RegisterMapping("_iPlugIn","_struct_iEngine",SwigiEngineToiPlugIn);
-	 SWIG_RegisterMapping("_iPlugIn","_iEngine",SwigiEngineToiPlugIn);
-	 SWIG_RegisterMapping("_iPlugIn","_struct_iGraphics3D",SwigiGraphics3DToiPlugIn);
-	 SWIG_RegisterMapping("_iPlugIn","_iGraphics3D",SwigiGraphics3DToiPlugIn);
-	 SWIG_RegisterMapping("_iPlugIn","_struct_iPlugIn",0);
+	 SWIG_RegisterMapping("_iPlugin","_struct_iEngine",SwigiEngineToiPlugin);
+	 SWIG_RegisterMapping("_iPlugin","_iEngine",SwigiEngineToiPlugin);
+	 SWIG_RegisterMapping("_iPlugin","_struct_iGraphics3D",SwigiGraphics3DToiPlugin);
+	 SWIG_RegisterMapping("_iPlugin","_iGraphics3D",SwigiGraphics3DToiPlugin);
+	 SWIG_RegisterMapping("_iPlugin","_struct_iPlugin",0);
 	 SWIG_RegisterMapping("_struct_iTextureManager","_iTextureManager",0);
 	 SWIG_RegisterMapping("_iTextureManager","_struct_iTextureManager",0);
 	 SWIG_RegisterMapping("_struct_iPolygon3D","_iPolygon3D",0);
@@ -5666,8 +5666,8 @@ void cspace_init (lua_State *lua_state) {
 	 SWIG_RegisterMapping("_struct_iBase","_iTextureHandle",SwigiTextureHandleToiBase);
 	 SWIG_RegisterMapping("_struct_iBase","_struct_iTextureWrapper",SwigiTextureWrapperToiBase);
 	 SWIG_RegisterMapping("_struct_iBase","_iTextureWrapper",SwigiTextureWrapperToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iPlugIn",SwigiPlugInToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iPlugIn",SwigiPlugInToiBase);
+	 SWIG_RegisterMapping("_struct_iBase","_struct_iPlugin",SwigiPluginToiBase);
+	 SWIG_RegisterMapping("_struct_iBase","_iPlugin",SwigiPluginToiBase);
 	 SWIG_RegisterMapping("_struct_iBase","_struct_iSCF",SwigiSCFToiBase);
 	 SWIG_RegisterMapping("_struct_iBase","_iSCF",SwigiSCFToiBase);
 	 SWIG_RegisterMapping("_struct_iBase","_iBase",0);
@@ -5700,8 +5700,8 @@ void cspace_init (lua_State *lua_state) {
 	 SWIG_RegisterMapping("_iBase","_iTextureHandle",SwigiTextureHandleToiBase);
 	 SWIG_RegisterMapping("_iBase","_struct_iTextureWrapper",SwigiTextureWrapperToiBase);
 	 SWIG_RegisterMapping("_iBase","_iTextureWrapper",SwigiTextureWrapperToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iPlugIn",SwigiPlugInToiBase);
-	 SWIG_RegisterMapping("_iBase","_iPlugIn",SwigiPlugInToiBase);
+	 SWIG_RegisterMapping("_iBase","_struct_iPlugin",SwigiPluginToiBase);
+	 SWIG_RegisterMapping("_iBase","_iPlugin",SwigiPluginToiBase);
 	 SWIG_RegisterMapping("_iBase","_struct_iSCF",SwigiSCFToiBase);
 	 SWIG_RegisterMapping("_iBase","_iSCF",SwigiSCFToiBase);
 	 SWIG_RegisterMapping("_iBase","_struct_iBase",0);

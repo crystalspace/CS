@@ -421,7 +421,7 @@ public:
    * pointer to call RemoveConfig() later.
    */
   virtual iConfigFile *AddConfig(const char *iFileName,
-    bool iVFS = true, int Priority = ConfigPriorityPlugIn);
+    bool iVFS = true, int Priority = ConfigPriorityPlugin);
   /// Remove a config file that was added with AddConfig()
   virtual void RemoveConfig(iConfigFile *ConfigFile);
   /**

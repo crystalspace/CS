@@ -1332,7 +1332,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   view = new csView (Engine, Gfx3D);
 
   // Get the collide system plugin.
-  const char* p = GetConfig()->GetStr ("Walktest.Settings.CollDetPlugIn",
+  const char* p = GetConfig()->GetStr ("Walktest.Settings.CollDetPlugin",
   	"crystalspace.collisiondetection.rapid");
   collide_system = CS_LOAD_PLUGIN (Sys, p, "CollDet", iCollideSystem);
   if (!collide_system)

@@ -86,9 +86,9 @@ csRGBpixel_alpha_get
 1.5.  class iPlugin
 -------------------
 
-iPlugIn_Initialize
+iPlugin_Initialize
 
-iPlugIn_HandleEvent
+iPlugin_HandleEvent
 
 1.6.  class iTextureWrapper
 ---------------------------

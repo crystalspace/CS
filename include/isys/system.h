@@ -64,10 +64,10 @@
  * the secondary video driver for example).
  *<p>
  * The functionality ID is given in the system config file as left
- * side of assignment in "PlugIns" section. For example, in the
+ * side of assignment in "Plugins" section. For example, in the
  * following line:
  * <pre>
- * [PlugIns]
+ * [Plugins]
  * VideoDriver = crystal.graphics3d.software
  * </pre>
  * "VideoDriver" is functionality identifier, and "crystal.graphics3d.software"
@@ -177,7 +177,7 @@ SCF_VERSION (iSystem, 4, 0, 1);
  * miscelaneous settings. It also serves as a way for plug-ins to print
  * through Crystal Space's printing interfaces.
  *<p>
- * Notes on plugin support: the list of plugins is queried from the [PlugIns]
+ * Notes on plugin support: the list of plugins is queried from the [Plugins]
  * section in the config file. The plugins are loaded in the order they come
  * in the .cfg file.
  *<p>
@@ -317,7 +317,7 @@ struct iSystem : public iBase
   enum
   {
     // plug-in priority
-    ConfigPriorityPlugIn        = iConfigManager::PriorityVeryLow,
+    ConfigPriorityPlugin        = iConfigManager::PriorityVeryLow,
     // application priority
     ConfigPriorityApplication   = iConfigManager::PriorityLow,
     // user priority (application-neutral)
@@ -335,7 +335,7 @@ struct iSystem : public iBase
    * pointer to call RemoveConfig() later.
    */
   virtual iConfigFile *AddConfig(const char *iFileName,
-    bool iVFS = true, int Priority = ConfigPriorityPlugIn) = 0;
+    bool iVFS = true, int Priority = ConfigPriorityPlugin) = 0;
   /// Remove a config file that was added with AddConfig()
   virtual void RemoveConfig(iConfigFile *ConfigFile) = 0;
   /**

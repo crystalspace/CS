@@ -75,7 +75,7 @@ bool csLoader::csLoadedPluginVector::FreeItem (csSome Item)
   return true;
 }
 
-csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPlugInRec (
+csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPluginRec (
 	const char* name)
 {
   int i;
@@ -98,20 +98,20 @@ iLoaderPlugin* csLoader::csLoadedPluginVector::GetPluginFromRec (
   return rec->Plugin;
 }
 
-iLoaderPlugin* csLoader::csLoadedPluginVector::FindPlugIn (
+iLoaderPlugin* csLoader::csLoadedPluginVector::FindPlugin (
 	const char* Name, const char* FuncID)
 {
   // look if there is already a loading record for this plugin
-  csLoaderPluginRec* pl = FindPlugInRec (Name);
+  csLoaderPluginRec* pl = FindPluginRec (Name);
   if (pl)
     return GetPluginFromRec(pl, FuncID);
 
   // create a new loading record
-  NewPlugIn (NULL, Name);
+  NewPlugin (NULL, Name);
   return GetPluginFromRec((csLoaderPluginRec*)Get(Length()-1), FuncID);
 }
 
-void csLoader::csLoadedPluginVector::NewPlugIn
+void csLoader::csLoadedPluginVector::NewPlugin
 	(const char *ShortName, const char *ClassID)
 {
   Push (new csLoaderPluginRec (ShortName, ClassID, NULL));

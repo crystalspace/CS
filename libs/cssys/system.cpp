@@ -453,7 +453,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   }
 
   // Now load and initialize all plugins
-  iConfigIterator *plugin_list = Config->Enumerate ("System.PlugIns.");
+  iConfigIterator *plugin_list = Config->Enumerate ("System.Plugins.");
   if (plugin_list)
   {
     while (plugin_list->Next ())

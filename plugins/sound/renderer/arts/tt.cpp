@@ -79,10 +79,10 @@ int main(int argc, const char* const args[])
   sys.RequestPlugin ("crystalspace.kernel.vfs:VFS");
   sys.RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
   sys.RequestPlugin ("crystalspace.sound.loader.multiplexer:SoundLoader");
-  sys.RequestPlugin ("crystalspace.sound.loader.aiff:System.PlugIns.SoundAIFF");
-  sys.RequestPlugin ("crystalspace.sound.loader.au:System.PlugIns.SoundAU");
-  sys.RequestPlugin ("crystalspace.sound.loader.iff:System.PlugIns.SoundIFF");
-  sys.RequestPlugin ("crystalspace.sound.loader.wav:System.PlugIns.SoundWAV");
+  sys.RequestPlugin ("crystalspace.sound.loader.aiff:System.Plugins.SoundAIFF");
+  sys.RequestPlugin ("crystalspace.sound.loader.au:System.Plugins.SoundAU");
+  sys.RequestPlugin ("crystalspace.sound.loader.iff:System.Plugins.SoundIFF");
+  sys.RequestPlugin ("crystalspace.sound.loader.wav:System.Plugins.SoundWAV");
   sys.RequestPlugin ("crystalspace.sound.render.arts:SoundRender");
 
   sys.RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");

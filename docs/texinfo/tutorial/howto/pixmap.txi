@@ -20,7 +20,7 @@ ways to make sure you have this plugin in your application. You can put
 a line in your config file like this:
 
 @example
-System.PlugIns.ImageLoader = crystalspace.graphic.image.io.multiplex
+System.Plugins.ImageLoader = crystalspace.graphic.image.io.multiplex
 @end example
 
 Or you can put the following line in your @code{main} routine right

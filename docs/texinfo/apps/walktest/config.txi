@@ -40,7 +40,7 @@ library. It is enabled by default (@samp{yes}) and can also be controled
 with the @code{-colldet}/@code{-nocolldet} commandline options or the
 @samp{colldet} console command.
 
-@item Walktest.Settings.CollDetPlugIn = <plugin name>
+@item Walktest.Settings.CollDetPlugin = <plugin name>
 Set the plug-in module that is used for collision detection.
 
 @item Walktest.CollDet.JumpSpeed = <value> (default 0.08)

@@ -77,7 +77,7 @@ class csLoader : public iLoader
   {
   private:
     // Find a loader plugin record
-    struct csLoaderPluginRec* FindPlugInRec (const char* name);
+    struct csLoaderPluginRec* FindPluginRec (const char* name);
     // Return the loader plugin from a record, possibly loading the plugin now
     iLoaderPlugin* GetPluginFromRec (csLoaderPluginRec*, const char *FuncID);
   public:
@@ -90,9 +90,9 @@ class csLoader : public iLoader
     // delete a plugin record
     virtual bool FreeItem (csSome Item);
     // find a plugin by its name or load it if it doesn't exist
-    iLoaderPlugin* FindPlugIn (const char* Name, const char* FuncID);
+    iLoaderPlugin* FindPlugin (const char* Name, const char* FuncID);
     // add a new plugin record
-    void NewPlugIn (const char* ShortName, const char* ClassID);
+    void NewPlugin (const char* ShortName, const char* ClassID);
   };
   
   /// List of loaded plugins

@@ -24,7 +24,7 @@ another system.
 To load a collision detection system you can use the following code:
 
 @example
-const char* p = Config->GetStr ("MyGame.Settings.CollDetPlugIn",
+const char* p = Config->GetStr ("MyGame.Settings.CollDetPlugin",
   	"crystalspace.collisiondetection.rapid");
 iCollideSystem* cd_sys =
   CS_LOAD_PLUGIN (System, p, "CollDet", iCollideSystem);

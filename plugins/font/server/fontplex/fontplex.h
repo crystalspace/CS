@@ -35,7 +35,7 @@
  * identifier to this server, and "FontServer.1", "FontServer.2" and so on
  * to auxiliary font servers. Example extract from config file:
  * <code>
- * [PlugIns]
+ * [Plugins]
  * ...
  * FontServer = crystalspace.font.server.multiplexor
  * FontServer.1 = crystalspace.font.server.default

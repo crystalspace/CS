@@ -185,7 +185,7 @@ the 3d engine
 
 Now how can you actually load the plug-in if you know the functionality
 identifier and the name? There are three ways how to do this (they can also
-be mixed). The first way is to add the following line in the @code{[PlugIns]}
+be mixed). The first way is to add the following line in the @code{[Plugins]}
 section in your config file: @samp{@var{FuncID} = @var{PluginName}}. This is
 used in most cases.
 

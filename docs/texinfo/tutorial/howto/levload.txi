@@ -26,7 +26,7 @@ ways to make sure you have this plugin in your application. You can put
 a line in your config file like this:
 
 @example
-  System.PlugIns.LevelLoader = crystalspace.level.loader
+  System.Plugins.LevelLoader = crystalspace.level.loader
 @end example
 
 Or you can put the following line in your @code{main} routine right

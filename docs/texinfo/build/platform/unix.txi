@@ -140,7 +140,7 @@ to recompile the program.
 
 To select another 3D rasterizer you need to edit the application's
 configuration file (such as @file{walktest.cfg}) and change the
-@samp{System.PlugIns.VideoDriver} setting.  Or else you can run Crystal Space
+@samp{System.Plugins.VideoDriver} setting.  Or else you can run Crystal Space
 as follows:
 
 @example

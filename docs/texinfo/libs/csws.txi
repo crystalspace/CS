@@ -748,7 +748,7 @@ configuration file which contains the list of all plugins to be loaded, in
 addition to other things.  You can use the @file{cswstest.cfg} file as a
 template.  You can also pass @samp{NULL} as the file name, in which case you
 will have to manually tell to the system driver which plug-ins to load (via the
-@code{iSystem::RequestPlugIn()} method).
+@code{iSystem::RequestPlugin()} method).
 
 @item
 Second, it creates a @samp{csApp} object called @samp{app}.  To initialize the

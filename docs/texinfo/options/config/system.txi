@@ -11,9 +11,9 @@ except the list of plug-in modules, for which no default exists.
 The most important part of the system configuration is the list of plug-in
 modules to load. A plug-in module is loaded with the following line:
 @example
-System.PlugIns.FuncID = PlugInName
+System.Plugins.FuncID = PluginName
 @end example
-@samp{System.PlugIns.} is obligatory and tells the system to load a plug-in
+@samp{System.Plugins.} is obligatory and tells the system to load a plug-in
 now. The @samp{FuncID} (functionality identifier) defines the purpose the
 plug-in is used for. For example the functionality identifier
 @samp{VideoDriver} means that this plug-in is used for graphics output.
@@ -22,7 +22,7 @@ applications use this identifier to look for the module for graphics output.
 See below for a list of all standardized identifiers. Note that it is not
 possible to load more than one module with the same functionality identifier.
 
-Finally, @samp{PlugInName} determines which plug-in to load. It is the name
+Finally, @samp{PluginName} determines which plug-in to load. It is the name
 of the plug-in under which it is known in the @sc{scf} registry. You can see
 a list of all plug-in modules in @file{CS/scf.cfg}. The plug-in you load here
 must be made for the purpose you try to use it for. For example, if you
@@ -36,7 +36,7 @@ usually fail to initialize.
 
 Here is an example of a line from the config file:
 @example
-System.PlugIns.VideoDriver = crystalspace.graphics3d.opengl
+System.Plugins.VideoDriver = crystalspace.graphics3d.opengl
 @end example
 This line loads the module @samp{crystalspace.graphics3d.opengl} (the OpenGL
 graphics driver) and assigns it to the functionality identifier
