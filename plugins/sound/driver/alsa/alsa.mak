@@ -1,7 +1,3 @@
-# This is a subinclude file used to define the rules needed
-# to build the AdvancedLinuxSoundArchitecture driver -- alsadrv
-
-# Driver description
 DESCRIPTION.alsadrv = Crystal Space ALSA sound driver
 
 #------------------------------------------------------------- rootdefines ---#
@@ -9,7 +5,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make alsadrv       Make the $(DESCRIPTION.alsadrv)$"
+  $(NEWLINE)echo $"  make alsadrv      Make the $(DESCRIPTION.alsadrv)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -31,7 +27,6 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp $(SRCDIR)/plugins/sound/driver/alsa
 
-# The ALSA sound driver
 ifeq ($(USE_PLUGINS),yes)
   ALSADRV = $(OUTDLL)/alsadrv$(DLL)
   LIB.ALSADRV = $(foreach d,$(DEP.ALSADRV),$($d.LIB))
@@ -45,10 +40,10 @@ else
 endif
 
 INF.ALSADRV = $(SRCDIR)/plugins/sound/driver/alsa/alsadrv.csplugin
-INC.ALSADRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/alsa/*.h))
-SRC.ALSADRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/alsa/*.cpp))
+INC.ALSADRV = $(wildcard $(SRCDIR)/plugins/sound/driver/alsa/*.h)
+SRC.ALSADRV = $(wildcard $(SRCDIR)/plugins/sound/driver/alsa/*.cpp)
 OBJ.ALSADRV = $(addprefix $(OUT)/,$(notdir $(SRC.ALSADRV:.cpp=$O)))
-DEP.ALSADRV = CSUTIL CSUTIL
+DEP.ALSADRV = CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
