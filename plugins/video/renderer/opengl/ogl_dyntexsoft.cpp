@@ -83,7 +83,7 @@ void csOpenGLDynamicSoftware::Print (csRect * /*area*/)
 }
 
 iGraphics3D *csOpenGLDynamicSoftware::CreateOffScreenRenderer 
-  (iGraphics2D * /*parent_g2d*/, int width, int height, csPixelFormat *pfmt, 
+  (iGraphics3D * /*parent_g2d*/, int width, int height, csPixelFormat *pfmt, 
    void *buffer, RGBPixel *palette, int pal_size)
 {
   g3d = LOAD_PLUGIN (system, 
@@ -95,7 +95,7 @@ iGraphics3D *csOpenGLDynamicSoftware::CreateOffScreenRenderer
   }
 
   this->buffer = (char*) buffer;
-  return g3d->CreateOffScreenRenderer (g2d, width, height, pfmt, 
+  return g3d->CreateOffScreenRenderer ((iGraphics3D*)this, width, height, pfmt, 
 				       buffer, palette, pal_size); 
 }
 

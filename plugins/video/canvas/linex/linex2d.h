@@ -28,6 +28,7 @@
 #include <X11/Xutil.h>
 #include <X11/keysymdef.h>
 #include <X11/cursorfont.h>
+#include <X11/Xatom.h>
 
 #ifdef DO_SHM
 #  include <X11/extensions/XShm.h>
@@ -43,6 +44,8 @@ class csGraphics2DLineXLib : public csGraphics2D
   int screen_num;
   int display_width, display_height;
   Window window;
+  Window leader_window;
+  Window root_window;
   Pixmap back;
   GC gc, gc_back;
   Visual *visual;
@@ -98,6 +101,11 @@ public:
 
   /// Called on every frame by system driver
   virtual bool HandleEvent (csEvent &Event);
+
+  /// helper function which allocates buffers
+  bool AllocateMemory ();
+  /// helper function which deallocates buffers
+  void DeAllocateMemory ();
 };
 
 #endif // __LINEX2D_H__

@@ -35,6 +35,7 @@ csDynamicTextureSoft2D::csDynamicTextureSoft2D (iSystem *isys) :
 {
   CONSTRUCT_IBASE (NULL);
   System = isys;
+  image_buffer = NULL;
 }
 
 csDynamicTextureSoft2D::~csDynamicTextureSoft2D ()
@@ -42,15 +43,18 @@ csDynamicTextureSoft2D::~csDynamicTextureSoft2D ()
 
 }
 
-iGraphics2D *csDynamicTextureSoft2D::CreateOffScreenCanvas (int width, int height, 
-    csPixelFormat *ipfmt, void *buffer,  RGBPixel *palette, int pal_size)
+iGraphics2D *csDynamicTextureSoft2D::CreateOffScreenCanvas 
+  (int width, int height, csPixelFormat *ipfmt, void *buffer,  
+   RGBPixel *palette, int pal_size, int flags)
 {
   Width = width;
   Height = height;
   Font = 0;
   FullScreen = false;
-
-  if (palette)
+  Memory = (unsigned char*) buffer;
+  // If flags is set then we are sharing the texture manager and so we can't 
+  // render in 8-bit unless screen depth is also 8-bit
+  if (!flags || (ipfmt->PixelBytes == 1))
   {
     Depth = 8;
     pfmt.PalEntries = pal_size;
@@ -66,11 +70,21 @@ iGraphics2D *csDynamicTextureSoft2D::CreateOffScreenCanvas (int width, int heigh
     pfmt.GreenMask = 0;
     pfmt.BlueMask = 0;
 
-    for (int i = 0; i < 256; i++)
-      PaletteAlloc [i] = false;
+    Palette = palette;
+
+    if (!flags)
+      for (int i = 0; i < 256; i++)
+	PaletteAlloc [i] = false;
+    else
+      for (int i = 0; i < 256; i++)
+	PaletteAlloc [i] = true;
   }
   else
   {
+    pfmt.PalEntries = 0;
+    pfmt.RedMask = ipfmt->RedMask;
+    pfmt.GreenMask = ipfmt->GreenMask;
+    pfmt.BlueMask = ipfmt->RedMask;
     // For other than software renderer falling back on software texture 
     // buffers
     if (ipfmt->PixelBytes == 2)
@@ -80,23 +94,30 @@ iGraphics2D *csDynamicTextureSoft2D::CreateOffScreenCanvas (int width, int heigh
       _DrawPixel = DrawPixel16;
       _WriteChar = WriteChar16;
       _GetPixelAt = GetPixelAt16;
-    }
+
+      if (flags)
+      {
+	// Here we are in a software context while sharing the texture manager
+	// We therefor render to a 16bit frame buffer and then unpack into an 
+	// RGBPixel format from which the texture manager recalculates the 
+	// texture
+	Memory = new unsigned char[width*height*2];
+	image_buffer = (RGBPixel*) buffer;
+      }
+    } 
     else
     {
+      Depth = 32;
       pfmt.PixelBytes = 4;
       _DrawPixel = DrawPixel32;
       _WriteChar = WriteChar32;
       _GetPixelAt = GetPixelAt32;
     }
-    pfmt.PalEntries = 0;
-    pfmt.RedMask = ipfmt->RedMask;
-    pfmt.GreenMask = ipfmt->GreenMask;
-    pfmt.BlueMask = ipfmt->RedMask;
   }
 
   pfmt.complete ();
 
-  Memory = (unsigned char*) buffer;
+
 
   // Get the font server
   const char *p = System->ConfigGetStr ("FontServer", CS_FUNCID_FONT, 
@@ -129,5 +150,19 @@ void csDynamicTextureSoft2D::Close ()
 
 void csDynamicTextureSoft2D::Print (csRect*)
 {
-  // do nothing as its not buffered
+  if (image_buffer)
+  {
+    // Here we unpack the frame buffer into the image_buffer
+    UShort *mem = (UShort*) Memory;
+    RGBPixel *im = image_buffer;
+    for (int i = 0; i < Width*Height; i++, im++, mem++)
+    {
+      im->red = ((*mem & pfmt.RedMask) >> pfmt.RedShift) << (8 - pfmt.RedBits);
+      im->green = ((*mem & pfmt.GreenMask) >> pfmt.GreenShift) 
+					   << (8 - pfmt.GreenBits);
+      im->blue = ((*mem & pfmt.BlueMask) >> pfmt.BlueShift) 
+					 << (8 - pfmt.BlueBits);
+      
+    }
+  }
 }

@@ -98,8 +98,10 @@ void Dumper::dump (csPolyTxtPlane* p)
 void Dumper::dump (csPolygon3D* p)
 {
   csPolygonSet* ps = (csPolygonSet*)p->GetParent ();
-  CsPrintf (MSG_DEBUG_0, "Dump polygon '%s/%s' id=%ld:\n", ps->GetName (),
-  	p->GetName (), p->GetID ());
+  const char* ps_name = ps->GetName ();
+  const char* p_name = p->GetName ();
+  CsPrintf (MSG_DEBUG_0, "Dump polygon '%s/%s' id=%ld:\n", ps_name ? ps_name :
+  	"null", p_name ? p_name : "null", p->GetID ());
   if (p->GetUnsplitPolygon ())
   {
     CsPrintf (MSG_DEBUG_0, "    Split from polygon with id=%ld\n",

@@ -641,7 +641,7 @@ struct iGraphics3D : public iPlugIn
     int tx, int ty, int tw, int th) = 0;
 
   /// Create an Off Screen Renderer
-  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics2D *parent_g2d, 
+  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics3D *parent_g3d, 
     int width, int height, csPixelFormat *pfmt, void *buffer, 
     RGBPixel *palette, int pal_size) = 0;
 };

@@ -30,6 +30,9 @@ class csDynamicTextureSoft2D : public csGraphics2D
 public:
   DECLARE_IBASE;
 
+  // For 16bit dynamic textures sharing texture manager
+  RGBPixel *image_buffer;
+
   csDynamicTextureSoft2D (iSystem *isys);
   virtual ~csDynamicTextureSoft2D ();
 
@@ -41,7 +44,8 @@ public:
   virtual void Print (csRect *area = NULL);
 
   virtual iGraphics2D *CreateOffScreenCanvas (int width, int height, 
-     csPixelFormat *ipfmt, void *buffer, RGBPixel *palette, int pal_size);
+     csPixelFormat *ipfmt, void *buffer, RGBPixel *palette, int pal_size, 
+     int flags);
 
 };
 

@@ -264,6 +264,8 @@ public:
   csTransformationManager tr_manager;
   /// The 3D driver
   iGraphics3D* G3D;
+  /// The 2D driver
+  iGraphics2D* G2D;
   /// The fog mode this G3D implements
   G3D_FOGMETHOD fogmethod;
   /// Does the 3D driver require power-of-two lightmaps?
@@ -334,9 +336,6 @@ private:
   bool freeze_pvs;
   /// Frozen PVS position.
   csVector3 freeze_pvs_pos;
-
-  /// Flag set when window resized.
-  bool resize;
 
 public:
   /**
@@ -776,6 +775,72 @@ public:
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
   } scfiConfig;
+
+  //----------------Begin-Multi-Context-Support------------------------------
+
+  /// Redirecting wrapper around the main Draw function.
+  void SetContext (iGraphics3D* g3d);
+
+private:
+  /// Resizes frame width and height dependent data members
+  void Resize ();
+  /// Flag set when window requires resizing.
+  bool resize;
+  /**
+   * Private class which keeps state information about the world specific to 
+   * each context.
+   */
+
+  class csWorldState
+  {
+  public:
+    csWorld *world;
+    bool resize;
+    iGraphics2D *G2D;
+    csCBuffer* c_buffer;
+    csCoverageMaskTree* covtree;
+    csSolidBsp* solidbsp;
+    /// Creates a world state by copying the relevant data members
+    csWorldState (csWorld *this_world);
+
+    /// Destroys buffers and trees
+    virtual ~csWorldState ();
+
+    /// Swaps state into world and deals with resizing issues.
+    void ActivateState ();
+  };
+
+  friend class csWorldState;
+
+  class csWorldStateVector : public csVector
+  {
+  public:
+     // Constructor
+    csWorldStateVector () : csVector (8, 8) {}
+    // Destructor
+    virtual ~csWorldStateVector () { DeleteAll (); }
+    // Free an item from array
+    virtual bool FreeItem (csSome Item)
+    { delete (csWorldState *)Item; return true; }
+    // Find a state by referenced g2d
+    virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+    { return ((csWorldState *)Item)->G2D == (iGraphics2D *)Key ? 0 : -1; }
+    // Get world state according to index
+    inline csWorldState *Get (int n) const
+    { return (csWorldState *)csVector::Get (n); }
+
+    // Mark world state to be resized
+    void Resize (iGraphics2D *g2d);
+
+    // Dispose of world state dependent on g2d
+    void Close (iGraphics2D *g2d);
+
+  };
+
+  csWorldStateVector *world_states;
+
+  //------------End-Multi-Context-Support-------------------------------------
+
 };
 
 // This is a global replacement for printf ()

@@ -22,18 +22,26 @@
 
 #include "sft3dcom.h"
 
+class csTextureMMSoftware;
+
 class csDynamicTextureSoft3D : public csGraphics3DSoftwareCommon
 {
 public:
   DECLARE_IBASE;
 
+  csTextureMMSoftware *tex_mm;
+
   csDynamicTextureSoft3D (iBase *iParent);
   virtual ~csDynamicTextureSoft3D () {};
 
   virtual bool Initialize (iSystem *iSys);
-  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics2D *parent_g2d, 
+  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics3D *parent_g3d, 
      int width, int height, csPixelFormat *pfmt, void *buffer, 
      RGBPixel *palette, int pal_size);
+
+  virtual void Print (csRect *area);
+
+  void SetTarget (csTextureMMSoftware *tex_mm);
 };
 
 #endif // __CS_SOFTEX3D_H__

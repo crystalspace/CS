@@ -72,11 +72,23 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   // Query system settings
   UnixSystem->GetExtSettings (sim_depth, do_shm, do_hwmouse);
 
+
   screen_num = DefaultScreen (dpy);
+  root_window = RootWindow (dpy, screen_num);
   screen_ptr = DefaultScreenOfDisplay (dpy);
   display_width = DisplayWidth (dpy, screen_num);
   display_height = DisplayHeight (dpy, screen_num);
 
+  leader_window = XCreateSimpleWindow(dpy, root_window,
+					  10, 10, 10, 10, 0, 0 , 0);
+  XClassHint *class_hint = XAllocClassHint();
+  class_hint->res_name = "Xsoft Crystal Space";
+  class_hint->res_class = "Crystal Space";
+  XmbSetWMProperties (dpy, leader_window,
+                      NULL, NULL, NULL, 0, 
+                      NULL, NULL, class_hint);
+
+//    XFree (class_hint);
   // Determine visual information.
   // Try in order:
   //   screen depth
@@ -275,7 +287,7 @@ bool csGraphics2DXLib::Open(const char *Title)
 			  Width, Height, 4, vinfo.depth, InputOutput, visual,
 			  CWBackPixel | CWBorderPixel | CWBitGravity | 
 			  (cmap ? CWColormap : 0), &swa);
-  XMapWindow (dpy, window);
+
   XStoreName (dpy, window, Title);
 
   XGCValues values;
@@ -297,6 +309,30 @@ bool csGraphics2DXLib::Open(const char *Title)
   // (Needed to catch user using window manager "delete window" button)
   wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
   XSetWMProtocols (dpy, window, &wm_delete_window, 1);
+
+  XSizeHints normal_hints;
+  normal_hints.flags = PSize | PResizeInc;
+  normal_hints.width = Width;
+  normal_hints.height = Height;
+  normal_hints.width_inc = 1;
+  normal_hints.height_inc = 1;
+  XSetWMNormalHints (dpy, window, &normal_hints);
+
+  XWMHints wm_hints;
+  wm_hints.flags = InputHint | StateHint | WindowGroupHint;
+  wm_hints.input = True;
+  wm_hints.window_group = leader_window;
+  wm_hints.initial_state = NormalState;
+  XSetWMHints (dpy, window, &wm_hints);
+
+  Atom wm_client_leader = XInternAtom (dpy, "WM_CLIENT_LEADER", False);
+  XChangeProperty (dpy, window, wm_client_leader, XA_WINDOW, 32, 
+		   PropModeReplace, (const unsigned char*)&leader_window, 1);
+  XmbSetWMProperties (dpy, window, Title, Title,
+                      NULL, 0, NULL, NULL, NULL);
+
+  XRaiseWindow (dpy, window);
+  XMapWindow (dpy, window);
 
   // Create mouse cursors
   XColor Black;
@@ -1057,6 +1093,7 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
       case ClientMessage:
 	if (static_cast<Atom>(event.xclient.data.l[0]) == wm_delete_window)
 	{
+	  System->QueueContextCloseEvent ((void*)this);
 	  System->StartShutdown();
 	}
 	break;
@@ -1168,9 +1205,9 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
 	}
 	break; 
       default:
-        //if (event.type == CompletionType) shm_busy = 0;
         break;
     }
+
   if (resize)
   { 
     if (!ReallocateMemory ())
@@ -1178,6 +1215,7 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
       CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory on resize!\n");
       System->StartShutdown ();
     }
+    System->QueueContextResizeEvent ((void*)this);
   }
   return false;
 }
@@ -1201,6 +1239,9 @@ bool csGraphics2DXLib::ReallocateMemory ()
     CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory!\n");
     return false;
   }
+
+  // Warning: reallocating memory from  csGraphics2D...need to promote 
+  // this eventually
   delete [] LineAddress;
   LineAddress = new int [Height];
   if (LineAddress == NULL) return false;

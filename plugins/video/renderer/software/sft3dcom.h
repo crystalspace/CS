@@ -238,9 +238,22 @@ public:
 
   virtual ~csGraphics3DSoftwareCommon ();
 
-  virtual bool Initialize (iSystem *iSys);
+  /// Initialize new state from config file
+  void NewInitialize ();
+
+  /// Initialize state from other driver (used when there are multiple contexts
+  /// in the system).
+  void SharedInitialize (csGraphics3DSoftwareCommon *p);
 
   virtual bool Open (const char *Title);
+
+  /// Helper function. Gathers all that has to be done when opening from 
+  /// scratch. 
+  bool NewOpen (const char *Title);
+
+  /// Used when multiple contexts are in system, opens borrowing from other 
+  /// driver
+  void SharedOpen (csGraphics3DSoftwareCommon* p);
 
   void ScanSetup ();
   ///

@@ -547,9 +547,9 @@ iImage *csGraphics2D::ScreenShot ()
 }
 
 iGraphics2D *csGraphics2D::CreateOffScreenCanvas (int width, int height, 
-	   csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
+  csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size, int flags)
 {
   csDynamicTextureSoft2D *tex = new csDynamicTextureSoft2D (System);
   return tex->CreateOffScreenCanvas (width, height, pfmt, buffer, 
-				     palette, pal_size);
+				     palette, pal_size, flags);
 }

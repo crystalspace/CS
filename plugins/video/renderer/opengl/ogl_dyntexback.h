@@ -97,7 +97,7 @@ class csOpenGLDynamicBackBuffer : public iGraphics3D
   virtual iHalo *CreateHalo (float iR, float iG, float iB, unsigned char *iAlpha, int iWidth, int iHeight);
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
 			     int tx, int ty, int tw, int th);
-  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics2D *parent_g2d, 
+  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics3D *parent_g3d, 
     int width, int height, csPixelFormat *pfmt, void *buffer, 
     RGBPixel *palette, int pal_size);
 

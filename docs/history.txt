@@ -19,6 +19,53 @@ The history order has been reversed so that new features are at the top.
 	  with the plane of a polygon.
 	- Wyatt Miler did a few fixes to terrain engine as well.
 	- Debugging version of radiosity from Wouter Wijngaards.
+	- Got a large patch from Samuel Humphreys with the following changes:
+	    - Adds a couple of new walls, bots and another dynamic texture
+	      to dtsimple. The new dynamic texture is rendered by the engine
+	      as the bots point of view, or as a manually configurable view
+	      from (0,0,0). Only works with the software drivers currently
+	      in 8, 16 & 32 bit modes. The opengl software texture version
+	      will not work...it will crash. The backbuffer opengl version
+	      will not work, but won't crash. I think the glide version will
+	      work, can't test this though.
+	    - Added new flag to iTextureManager: CS_DYNAMIC_TEXTURE_SHARE_HINT.
+	      See explanation there.
+	    - Added many more keys to fiddle with in dtsimple.
+	    - Added another software dynamic texture implementation to the
+	      software drivers. This implementation shares the texture manager
+	      with the parent context. This allows you to render to it with
+	      textures that you have already registered with the parent
+	      context i.e. a map view courtesy of the engine.
+	    - In pursuit of this added functions to the software 3d drivers
+	      which allows the initialisation and opening of the driver
+	      according to another driver while sharing resources. The
+	      sharing software dynamic texture utilises these functions.
+	      This is also in preparation for the window manager...coming
+	      soon!
+	    - Pluggified metaballs and updated metademo and dtsimple as
+	      appropriate.
+	    - Added more parameters to vary to see what happens in metademo.
+	    - Added a couple more functions to iSystem, which are implemented
+	      in system.h/cpp, so shouldnt break anything. These are queuing
+	      functions for two new windows messages.
+	    - Added two new windows messages. ..ContextResize and
+	      ..ContextClose.
+	    - Updated the engine to deal with new messages
+	    - 'Multiplexed' the engine. Added new function
+	      csWorld->SetContext(iGraphics3D *g3d). This allows the engine
+	      to swap states according to g3d. The new dynamic texture
+	      demonstrates this.
+	    - Fixed the annoying bug in the Xlib software drivers where on a
+	      fresh Xserver session the window placement wouldn't behave for
+	      the first three or four times. Borrowed the trick from gdk :).
+	      Much more window manager friendly now...i.e. Crystal Space is
+	      beginnning to behave politely!
+	    - Migrated XLib changes into the line drivers.
+	    - Added resizing to the line drivers.
+	    - Got rid of a static file scope variable in the software
+	      texture manager.
+	    - Small makefile fixes for blocks and csauth.
+	- Did a fix to dump(csPolygon3D*) for polygons with no name.
 	- Eric Sunshine removed the Crystal Space-specific includes and macros
 	  which had been added to ddgutil.cpp.  In general, we want to keep
 	  the terrain files as free of CS stuff as possible so that the same

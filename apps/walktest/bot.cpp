@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "walktest/walktest.h"
+//#include "walktest/walktest.h"
 #include "walktest/bot.h"
 #include "csengine/sector.h"
 #include "csengine/light.h"
@@ -25,8 +25,9 @@
 
 IMPLEMENT_CSOBJTYPE (Bot,csSprite3D);
 
-Bot::Bot (csSpriteTemplate* tmpl) : csSprite3D ()
+Bot::Bot (csSpriteTemplate* tmpl, csWorld *World) : csSprite3D ()
 {
+  world = World;
   SetTemplate (tmpl);
   do
   {
@@ -92,7 +93,7 @@ void Bot::move (time_t elapsed_time)
   {
     MoveToSector (s);
     csLight* lights[2];
-    int num_lights = Sys->world->GetNearbyLights (s, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+    int num_lights = world->GetNearbyLights (s, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     UpdateLighting (lights, num_lights);
     if (light)
     {

@@ -648,7 +648,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
   csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate ("bot");
   if (!tmpl) return;
   Bot* bot;
-  bot = new Bot (tmpl);
+  bot = new Bot (tmpl, Sys->view->GetWorld());
   bot->SetName ("bot");
   Sys->view->GetWorld ()->sprites.Push (bot);
   bot->MoveToSector (where);

@@ -23,6 +23,7 @@
 #include "video/renderer/common/txtmgr.h"
 #include "iimage.h"
 
+class csDynamicTextureSoft3D;
 class csTextureManagerSoftware;
 
 /**
@@ -105,7 +106,7 @@ protected:
 
   /// The private palette (with gamma applied)
   RGBPixel palette [256];
-
+/*    RGBPixel *palette; */
   /// Number of used colors in palette
   int palette_size;
 
@@ -115,9 +116,12 @@ protected:
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor ();
 
+  csTextureManagerSoftware *texman;
+
 public:
   /// Create the mipmapped texture object
-  csTextureMMSoftware (iImage *image, int flags);
+  csTextureMMSoftware (csTextureManagerSoftware *texman, iImage *image, 
+		       int flags);
   /// Destroy the object and free all associated storage
   virtual ~csTextureMMSoftware ();
 
@@ -127,7 +131,7 @@ public:
    * colormap and the global colormap; in truecolor modes we just build
    * a [color index] -> [truecolor value] conversion table.
    */
-  void remap_texture (csTextureManagerSoftware *texman);
+  void remap_texture ();
 
   /// Query the private texture colormap
   RGBPixel *GetColorMap () { return palette; }
@@ -142,12 +146,16 @@ public:
   /// Apply gamma correction to private palette
   void ApplyGamma (UByte *GammaTable);
 
-  void CreateDynamicTexture(csTextureManagerSoftware *texman, 
-    iGraphics3D *parentG3D, csPixelFormat *PixelFormat);
+  void CreateDynamicTexture (iGraphics3D *parentG3D, csPixelFormat *pfmt,
+                             RGBPixel *pal_8bit, bool share_hint);
 
   virtual iGraphics3D *GetDynamicTextureInterface ();
 
   virtual void DynamicTextureSyncPalette ();
+
+  /// Called when dynamic texture shares texture manager with parent context
+  /// and in either 16 or 32bit. The 8bit version doesn't require repreparing.
+  void RePrepareDynamicTexture ();
 };
 
 /**
@@ -193,8 +201,8 @@ public:
 class csTextureSoftwareDynamic : public csTextureSoftware
 {
 public:
-  iGraphics3D *texG3D;
-  csTextureManagerSoftware *texman;
+  csDynamicTextureSoft3D *texG3D;
+
 
   csTextureSoftwareDynamic (csTextureMM *Parent, iImage *Image)
     : csTextureSoftware (Parent, Image)
@@ -203,9 +211,9 @@ public:
   virtual ~csTextureSoftwareDynamic ();
 
 
-  void CreateInterfaces (csTextureManagerSoftware *texman, 
-   iGraphics3D *parentG3D, csPixelFormat *pfmt,  RGBPixel *palette, 
-   int palette_size);
+  void CreateInterfaces (csTextureMMSoftware *tex_mm, iGraphics3D *parentG3D, 
+			 csPixelFormat *pfmt,  
+			 RGBPixel *palette, int palette_size, bool share_hint);
 };
 
 /**

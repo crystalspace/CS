@@ -213,6 +213,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   System = NULL;
   VFS = NULL;
   G3D = NULL;
+  G2D = NULL;
   textures = NULL;
   c_buffer = NULL;
   solidbsp = NULL;
@@ -226,7 +227,8 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   use_pvs_only = false;
   freeze_pvs = false;
   Library = NULL;
- 
+  world_states = NULL;
+
   if (!covtree_lut)
   {
     covtree_lut = new csCovMaskLUT (16);
@@ -240,6 +242,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   lightpatch_pool = new csLightPatchPool ();
 
   BuildSqrtTable ();
+  resize = false;
 }
 
 // @@@ Hack
@@ -284,6 +287,8 @@ bool csWorld::Initialize (iSystem* sys)
   if (!(VFS = QUERY_PLUGIN (sys, iVFS)))
     return false;
 
+  G2D = G3D->GetDriver2D ();
+
   // Tell system driver that we want to handle broadcast events
   if (!System->CallOnEvents (this, CSMASK_Broadcast))
     return false;
@@ -324,6 +329,28 @@ bool csWorld::HandleEvent (csEvent &Event)
 
         return true;
       } /* endif */
+      case cscmdContextResize:
+      {
+	if (world_states)
+	  world_states->Resize ((iGraphics2D*) Event.Command.Info);
+	else
+	  if (((iGraphics2D*) Event.Command.Info) == G2D)
+	    resize = true;
+	return false;
+      }
+      case cscmdContextClose:
+      {
+	if (world_states)
+	{
+	  world_states->Close ((iGraphics2D*) Event.Command.Info);
+	  if (!world_states->Length())
+	  {
+	    delete world_states;
+	    world_states = NULL;
+	  }
+	}
+	return false;
+      }
     } /* endswitch */
 
   return false;
@@ -895,24 +922,18 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   Stats::polygons_rejected = 0;
   Stats::polygons_accepted = 0;
 
-  iGraphics2D *G2D = G3D->GetDriver2D ();
-
-  if ((G2D->GetWidth() != frame_width) || (G2D->GetHeight() != frame_height))
-  {
-    frame_width = G2D->GetWidth ();
-    frame_height = G2D->GetHeight ();
-    if (c_buffer) { EnableCBuffer (false); EnableCBuffer (true); EnableSolidBsp (false); }
-    if (covtree) { EnableCovtree (false); EnableCovtree (true); EnableSolidBsp (false); }
-    if (solidbsp) { EnableSolidBsp (true); }
-  }
-
   current_camera = c;
 
-  // When window is resized need to update the camera. 
-  // This is bad to do it here, but is required for leftx etc below
-  // Need a better way. 
-  c->shift_x = frame_width/2;
-  c->shift_y = frame_height/2;
+  // This flag is set in HandleEvent on a NativeWindowResize event
+  if (resize) 
+  {
+    resize = false;
+    Resize ();
+  }
+  // when many cameras per context, need to make sure each camera has updated
+  // shift_* fields, after resizing.
+  current_camera->shift_x = frame_width/2;
+  current_camera->shift_y = frame_height/2;
 
   top_clipper = view;
 
@@ -989,7 +1010,17 @@ void csWorld::Draw (csCamera* c, csClipper* view)
 void csWorld::DrawFunc (csCamera* c, csClipper* view,
 	csDrawFunc* callback, void* callback_data)
 {
-  iGraphics2D* G2D = G3D->GetDriver2D ();
+  // This flag is set in HandleEvent on a NativeWindowResize event
+  if (resize) 
+  {
+    resize = false;
+    Resize ();
+  }
+  // when many cameras per context, need to make sure each camera has updated
+  // shift_* fields, after resizing.
+  current_camera->shift_x = frame_width/2;
+  current_camera->shift_y = frame_height/2;
+
   csRenderView rview (*c, view, G3D, G2D);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
   rview.callback = callback;
@@ -1572,3 +1603,104 @@ iThing *csWorld::CreateThing (const char *iName, iSector *iParent)
   thing->DecRef ();
   return p;
 }
+
+
+//----------------Begin-Multi-Context-Support------------------------------
+
+void csWorld::Resize ()
+{
+  frame_width = G2D->GetWidth ();
+  frame_height = G2D->GetHeight ();
+
+  if (c_buffer) 
+  { 
+    EnableCBuffer (false); 
+    EnableCBuffer (true);  
+    EnableSolidBsp (false); 
+  }
+  if (covtree) 
+  { 
+    EnableCovtree (false); 
+    EnableCovtree (true); 
+    EnableSolidBsp (false); 
+  }
+  if (solidbsp) 
+  { 
+    EnableSolidBsp (true); 
+  }
+}
+
+csWorld::csWorldState::csWorldState (csWorld *w)
+{
+  world    = w;
+  c_buffer = w->c_buffer;
+  covtree  = w->covtree;
+  solidbsp = w->solidbsp;
+  G2D      = w->G2D;
+  resize   = false;
+}
+
+csWorld::csWorldState::~csWorldState ()
+{
+  if (c_buffer) delete c_buffer;
+  if (covtree)  delete covtree;
+  if (solidbsp) delete solidbsp;
+}
+
+void csWorld::csWorldState::ActivateState ()
+{
+  world->c_buffer     = c_buffer;
+  world->covtree      = covtree;
+  world->frame_width  = G2D->GetWidth ();
+  world->frame_height = G2D->GetHeight ();
+
+  if (resize)
+  {
+    world->Resize ();
+
+    c_buffer = world->c_buffer;
+    covtree  = world->covtree;
+    solidbsp = world->solidbsp;
+    resize   = false;
+  }
+}
+
+void csWorld::csWorldStateVector::Close (iGraphics2D *g2d)
+{
+  int idx = FindKey (g2d);
+  if (idx > -1)
+    Delete (idx); 
+}
+
+void csWorld::csWorldStateVector::Resize (iGraphics2D *g2d)
+{ 
+  int idx = FindKey (g2d);
+  if (idx > -1)
+    ((csWorldState*)Get(idx))->resize = true; 
+}
+
+void csWorld::SetContext (iGraphics3D* g3d)
+{
+  G2D = g3d->GetDriver2D ();
+  if (g3d != G3D)
+  {
+    G3D->DecRef ();
+    if (!world_states) world_states = new csWorldStateVector();
+    int idg2d = world_states->FindKey (G2D);
+    if (idg2d < 0)
+    {
+      G3D = g3d;
+      Resize ();
+      world_states->Push (new csWorldState (this));
+    }
+    else
+    {
+      G3D = g3d;
+      csWorldState *state = (csWorldState *)world_states->Get (idg2d);
+      state->ActivateState ();
+    }
+    G3D->IncRef ();
+  }
+}  
+
+//-------------------End-Multi-Context-Support--------------------------------

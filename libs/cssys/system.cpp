@@ -1105,6 +1105,20 @@ void csSystemDriver::QueueFocusEvent (bool Enable)
   }
 }
 
+void csSystemDriver::QueueContextResizeEvent (void *info)
+{
+
+  EventQueue.Put (new csEvent (Time(), csevBroadcast, 
+			       cscmdContextResize, info));
+}
+
+void csSystemDriver::QueueContextCloseEvent (void *info)
+{
+
+  EventQueue.Put (new csEvent (Time(), csevBroadcast, 
+			       cscmdContextClose, info));
+}
+
 bool csSystemDriver::GetKeyState (int key)
 {
   return Keyboard.GetKeyState (key);

@@ -60,17 +60,21 @@ csGraphics3DSoftware::~csGraphics3DSoftware ()
 
 bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 {
-  if (!csGraphics3DSoftwareCommon::Initialize (iSys))
-    return false;
+  (System = iSys)->IncRef ();
 
-  const char *driver = config->GetStr ("Hardware", "Driver2D", SOFTWARE_2D_DRIVER);
+  NewInitialize ();
+
+  const char *driver = config->GetStr ("Hardware", "Driver2D", 
+				       SOFTWARE_2D_DRIVER);
+
   G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
 
   return G2D ? true : false;
 }
+
 bool csGraphics3DSoftware::Open (const char *Title)
 {
-  if (!csGraphics3DSoftwareCommon::Open (Title))
+  if (!csGraphics3DSoftwareCommon::Open (NULL) || !NewOpen (Title))
     return false;
 
   bool bFullScreen = G2D->GetFullScreen ();
@@ -90,14 +94,14 @@ bool csGraphics3DSoftware::Open (const char *Title)
 }
 
 iGraphics3D *csGraphics3DSoftware::CreateOffScreenRenderer 
-  (iGraphics2D* /*parent_g2d*/, int width, int height, csPixelFormat *pfmt, 
+  (iGraphics3D* parent_g3d, int width, int height, csPixelFormat *pfmt, 
    void *buffer, RGBPixel *palette, int pal_size)
 {
   csDynamicTextureSoft3D *tex3d =  
        new csDynamicTextureSoft3D (NULL);
   tex3d->Initialize (System);
-  return tex3d->CreateOffScreenRenderer (G2D, width, height, pfmt, buffer, 
-				       palette, pal_size);
+  return tex3d->CreateOffScreenRenderer (parent_g3d, width, height, pfmt, 
+					 buffer, palette, pal_size);
 }
 
 //---------------------------------------------------------------------------

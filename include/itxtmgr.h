@@ -42,12 +42,22 @@ struct iTextureHandle;
 #define CS_TEXTURE_3D			0x00000002
 /**
  * Create a dynamic texture.
- * The texture manager should be able to hand you a pointer to some buffer
- * containing texture image and a format description. You can change the
- * contents of that buffer and then hand it back to the texture manager.
- * Then texture manager recompute that texture from the image buffer.
+ * After the texture is prepared call 
+ * iTextureHangle->GetDynamicTextureInterface to retrieve an iGraphics3D
+ * interface to the texture. Render as usual.
  */
 #define CS_TEXTURE_DYNAMIC		0x00000004
+
+/**
+ * Hints to the texture manager which dynamic texture implementation to utilise.
+ * This flag must be set if you wish to use textures registered to the main 
+ * texture manager with the dynamic texture interfaces. This is useful so that 
+ * textures can be written to by csWorld for example.  Usually not setting this
+ * flag and registering textures to be rendered on textures with its own 
+ * texture manager  will be faster.
+ */
+#define CS_TEXTURE_DYNAMIC_SHARE_HINT   0x00000008
+
 /**
  * Create mipmaps for this texture?<p>
  * Sometimes we know in advance that some texture will need just one
@@ -57,7 +67,7 @@ struct iTextureHandle;
  * Note that if texture is not registered for 3D usage (i.e. if CS_TEXTURE_3D
  * is not set) this flag does not matter - 2D textures do not use mipmaps.
  */
-#define CS_TEXTURE_NOMIPMAPS		0x00000008
+#define CS_TEXTURE_NOMIPMAPS		0x00000010
 /**
  * Dither texture or not.<p>
  * Some renderers may use dithering while converting textures to internal
@@ -66,7 +76,7 @@ struct iTextureHandle;
  * relatively bad after being converted. In this case you can enable this
  * per-texture flag.
  */
-#define CS_TEXTURE_DITHER		0x00000010
+#define CS_TEXTURE_DITHER		0x00000020
 
 SCF_VERSION (iTextureManager, 1, 0, 0);
 

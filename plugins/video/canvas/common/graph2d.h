@@ -246,7 +246,8 @@ public:
 
   /// Create an off screen canvas
   virtual iGraphics2D *CreateOffScreenCanvas (int width, int height, 
-     csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size);
+     csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size, 
+     int flags);
 
 protected:
   /**

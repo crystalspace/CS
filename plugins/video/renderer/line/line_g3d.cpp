@@ -192,6 +192,9 @@ void csGraphics3DLine::SetClipper (csVector2* vertices, int num_vertices)
 
 bool csGraphics3DLine::BeginDraw (int DrawFlags)
 {
+  if ((G2D->GetWidth() != width) || 
+      (G2D->GetHeight() != height)) 
+    SetDimensions (G2D->GetWidth(), G2D->GetHeight());
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
    && (!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))

@@ -285,7 +285,8 @@ struct iGraphics2D : public iPlugIn
 
   /// Create an Off Screen Canvas
   virtual iGraphics2D *CreateOffScreenCanvas (int width, int height, 
-     csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size) = 0;
+     csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size,
+     int flags) = 0;
 };
 
 #endif // __IGRAPH2D_H__

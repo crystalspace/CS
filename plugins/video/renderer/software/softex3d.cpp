@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
-    Written by Samuel Humphreys
+  if (texman->pfmt.PixelBytes != 1)
+  {    Written by Samuel Humphreys
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,6 +22,7 @@
 #include "softex3d.h"
 #include "isystem.h"
 #include "igraph2d.h"
+#include "soft_txt.h"
 
 DECLARE_FACTORY (csDynamicTextureSoft3D)
 
@@ -33,31 +35,79 @@ csDynamicTextureSoft3D::csDynamicTextureSoft3D (iBase *iParent)
   : csGraphics3DSoftwareCommon ()
 {
   CONSTRUCT_IBASE (iParent);
+  tex_mm = NULL;
 }
 
 bool csDynamicTextureSoft3D::Initialize (iSystem *iSys)
 {
-  (System = iSys)->IncRef ();
+  // This gets IncRef() when csGraphics3DSoftwareCommon::Initialize (System)
+  // gets called below, after the G2D driver is created
+  (System = iSys)->IncRef();
   return true;
 }
 
-iGraphics3D *csDynamicTextureSoft3D::CreateOffScreenRenderer 
-    ( iGraphics2D *parent_g2d, int width, int height, csPixelFormat *pfmt, void *buffer, 
-      RGBPixel *palette, int pal_size )
+void csDynamicTextureSoft3D::SetTarget (csTextureMMSoftware *tex_mm)
 {
-  G2D = parent_g2d->CreateOffScreenCanvas (width, height, pfmt, buffer, 
-					palette, pal_size);
+  this->tex_mm = tex_mm;
+}
+
+
+iGraphics3D *csDynamicTextureSoft3D::CreateOffScreenRenderer 
+    ( iGraphics3D *parent_g3d, int width, int height, csPixelFormat *ipfmt, 
+      void *buffer, RGBPixel *palette, int pal_size)
+{
+  iGraphics2D *parent_g2d = parent_g3d->GetDriver2D ();
+  G2D = parent_g2d->CreateOffScreenCanvas (width, height, ipfmt, buffer, 
+					palette, pal_size, tex_mm != NULL);
   if (!G2D)
   {
     System->Printf (MSG_FATAL_ERROR, "Error opening Graphics2D texture context.\n");
     return NULL;
   }
 
-  if (!csGraphics3DSoftwareCommon::Initialize (System))
-    return NULL;
+  // Presence of tex_mm currently indicates merely whether we are going to
+  // share resources or not.
 
-  if (!Open (NULL))
-    return NULL;
+  if (tex_mm)
+  {
+    SharedInitialize ((csGraphics3DSoftwareCommon*)parent_g3d);
+    if (!Open (NULL))
+      return NULL;
+    SharedOpen ((csGraphics3DSoftwareCommon*)parent_g3d);
+//      if (pfmt.PixelBytes == 4)
+//        pixel_shift = 2;
+//      else if (pfmt.PixelBytes == 2)
+//        pixel_shift = 1;
+//      else
+//        pixel_shift = 0;
 
+//  #ifdef TOP8BITS_R8G8B8_USED
+//      if (pfmt.PixelBytes == 4)
+//        pixel_adjust = (pfmt.RedShift && pfmt.GreenShift && pfmt.BlueShift) ? 8 : 0;
+//  #endif
+//      alpha_mask = 0;
+//      alpha_mask |= 1 << (pfmt.RedShift);
+//      alpha_mask |= 1 << (pfmt.GreenShift);
+//      alpha_mask |= 1 << (pfmt.BlueShift);
+//      alpha_mask = ~alpha_mask;
+    G2D->Open (NULL);
+  }
+  else
+  {
+    NewInitialize ();
+
+    if (!Open (NULL) || !NewOpen (NULL))
+      return NULL;
+  }
   return (iGraphics3D*)this;
+}
+
+void csDynamicTextureSoft3D::Print (csRect *area)
+{
+  csGraphics3DSoftwareCommon::Print (area);
+  if (tex_mm && pfmt.PixelBytes != 1)
+  {
+    // This might break Carmak/AndyZ texture cache optimisation
+    tex_mm->RePrepareDynamicTexture ();
+  }
 }

@@ -76,9 +76,19 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   UnixSystem->GetExtSettings (sim_depth, do_shm, do_hwmouse);
 
   screen_num = DefaultScreen (dpy);
+  root_window = RootWindow (dpy, screen_num);
   screen_ptr = DefaultScreenOfDisplay (dpy);
   display_width = DisplayWidth (dpy, screen_num);
   display_height = DisplayHeight (dpy, screen_num);
+
+  leader_window = XCreateSimpleWindow(dpy, root_window,
+					  10, 10, 10, 10, 0, 0 , 0);
+  XClassHint *class_hint = XAllocClassHint();
+  class_hint->res_name = "XLine Crystal Space";
+  class_hint->res_class = "Crystal Space";
+  XmbSetWMProperties (dpy, leader_window,
+                      NULL, NULL, NULL, 0, 
+                      NULL, NULL, class_hint);
 
   // Determine visual information.
   // Try in order:
@@ -171,10 +181,11 @@ bool csGraphics2DLineXLib::Open(const char *Title)
   swa.background_pixel = 0;
   swa.border_pixel = 0;
   swa.colormap = cmap;
+  swa.bit_gravity = CenterGravity;
   window = XCreateWindow (dpy, DefaultRootWindow(dpy), 64, 16,
     Width, Height, 4, vinfo.depth, InputOutput, visual,
-    CWBackPixel | CWBorderPixel | (cmap ? CWColormap : 0), &swa);
-  XMapWindow (dpy, window);
+    CWBackPixel | CWBorderPixel | CWBitGravity | (cmap ? CWColormap : 0), &swa);
+
   XStoreName (dpy, window, Title);
 
   XGCValues values;
@@ -185,22 +196,42 @@ bool csGraphics2DLineXLib::Open(const char *Title)
 
   XSetWindowAttributes attr;
   attr.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-    FocusChangeMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask;
+    FocusChangeMask | PointerMotionMask | ButtonPressMask | 
+    ButtonReleaseMask | StructureNotifyMask;
+
   XChangeWindowAttributes (dpy, window, CWEventMask, &attr);
 
   if (cmap)
     XSetWindowColormap (dpy, window, cmap);
 
-  back = XCreatePixmap (dpy, DefaultRootWindow (dpy), Width, Height, vinfo.depth);
-  XGCValues values_back;
-  gc_back = XCreateGC (dpy, back, 0, &values_back);
-  XSetForeground (dpy, gc_back, BlackPixel (dpy, screen_num));
-  XSetLineAttributes (dpy, gc_back, 0, LineSolid, CapButt, JoinMiter);
-
   // Intern WM_DELETE_WINDOW and set window manager protocol
   // (Needed to catch user using window manager "delete window" button)
   wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
   XSetWMProtocols (dpy, window, &wm_delete_window, 1);
+
+  XSizeHints normal_hints;
+  normal_hints.flags = PSize | PResizeInc;
+  normal_hints.width = Width;
+  normal_hints.height = Height;
+  normal_hints.width_inc = 1;
+  normal_hints.height_inc = 1;
+  XSetWMNormalHints (dpy, window, &normal_hints);
+
+  XWMHints wm_hints;
+  wm_hints.flags = InputHint | StateHint | WindowGroupHint;
+  wm_hints.input = True;
+  wm_hints.window_group = leader_window;
+  wm_hints.initial_state = NormalState;
+  XSetWMHints (dpy, window, &wm_hints);
+
+  Atom wm_client_leader = XInternAtom (dpy, "WM_CLIENT_LEADER", False);
+  XChangeProperty (dpy, window, wm_client_leader, XA_WINDOW, 32, 
+		   PropModeReplace, (const unsigned char*)&leader_window, 1);
+  XmbSetWMProperties (dpy, window, Title, Title,
+                      NULL, 0, NULL, NULL, NULL);
+
+  XRaiseWindow (dpy, window);
+  XMapWindow (dpy, window);
 
   // Create mouse cursors
   XColor Black;
@@ -235,10 +266,41 @@ bool csGraphics2DLineXLib::Open(const char *Title)
       break;
   }
 
-  Memory = new unsigned char [Width*Height*pfmt.PixelBytes];
+  if (!AllocateMemory())
+    return false;
 
   Clear (0);
   return true;
+}
+
+bool csGraphics2DLineXLib::AllocateMemory ()
+{
+  back = XCreatePixmap (dpy, root_window, Width, Height, vinfo.depth);
+  XGCValues values_back;
+  gc_back = XCreateGC (dpy, back, 0, &values_back);
+  XSetForeground (dpy, gc_back, BlackPixel (dpy, screen_num));
+  XSetLineAttributes (dpy, gc_back, 0, LineSolid, CapButt, JoinMiter);
+
+  Memory = new unsigned char [Width*Height*pfmt.PixelBytes];
+
+  if (!Memory)
+    return false;
+
+  return true;
+}
+
+void csGraphics2DLineXLib::DeAllocateMemory ()
+{
+  if (back)
+  {
+    XFreePixmap (dpy, back);
+    back = 0;
+  }
+  if (Memory)
+  {
+    delete [] Memory;
+    Memory = NULL;
+  }
 }
 
 void csGraphics2DLineXLib::Close ()
@@ -328,7 +390,7 @@ bool csGraphics2DLineXLib::BeginDraw ()
   return true;
 }
 
-void csGraphics2DLineXLib::Print (csRect *area)
+void csGraphics2DLineXLib::Print (csRect* /*area*/)
 {
   usleep (5000);
   if (nr_segments)
@@ -420,7 +482,7 @@ bool csGraphics2DLineXLib::SetMouseCursor (csMouseCursorID iShape)
   } /* endif */
 }
 
-static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
+static Bool CheckKeyPress (Display* /*dpy*/, XEvent *event, XPointer arg)
 {
   XEvent *curevent = (XEvent *)arg;
   if ((event->type == KeyPress)
@@ -441,13 +503,24 @@ bool csGraphics2DLineXLib::HandleEvent (csEvent &/*Event*/)
   XEvent event;
   int state, key;
   bool down;
+  bool resize = false;
 
   while (XCheckIfEvent (dpy, &event, AlwaysTruePredicate, 0))
     switch (event.type)
     {
+      case ConfigureNotify:
+	if ((Width  != event.xconfigure.width) ||
+	    (Height != event.xconfigure.height))
+	{
+	  Width = event.xconfigure.width;
+	  Height = event.xconfigure.height;
+	  resize = true;
+	}
+	break;
       case ClientMessage:
 	if (static_cast<Atom>(event.xclient.data.l[0]) == wm_delete_window)
 	{
+	  System->QueueContextCloseEvent ((void*)this);
 	  System->StartShutdown();
 	}
 	break;
@@ -540,14 +613,41 @@ bool csGraphics2DLineXLib::HandleEvent (csEvent &/*Event*/)
         break;
       case Expose:
       {
-        csRect rect (event.xexpose.x, event.xexpose.y,
-	  event.xexpose.x + event.xexpose.width, event.xexpose.y + event.xexpose.height);
-	Print (&rect);
+	if (!resize)
+	{
+	  csRect rect (event.xexpose.x, event.xexpose.y,
+		       event.xexpose.x + event.xexpose.width, 
+		       event.xexpose.y + event.xexpose.height);
+	  Print (&rect);
+	}
         break;
       }
       default:
-        //if (event.type == CompletionType) shm_busy = 0;
         break;
     }
+
+  if (resize)
+  { 
+    DeAllocateMemory ();
+    if (!AllocateMemory ())
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory on resize!\n");
+      System->StartShutdown ();
+    }
+    System->QueueContextResizeEvent ((void*)this);
+
+    // WARNING the following deallocates and reallocates memory managed
+    // by csGraphics2D,...need to promote this eventually.
+    delete [] LineAddress;
+    LineAddress = new int [Height];
+    if (!LineAddress) return false;
+ 
+    // ReInitialize scanline address array
+    int i,addr,bpl = Width * pfmt.PixelBytes;
+    for (i = 0, addr = 0; i < Height; i++, addr += bpl)
+      LineAddress[i] = addr;
+ 
+    SetClipRect (0, 0, Width, Height);
+  }
   return false;
 }

@@ -255,10 +255,10 @@ void csOpenGLDynamicBackBuffer::DrawPixmap (iTextureHandle *hTex, int sx,
 }
 
 iGraphics3D *csOpenGLDynamicBackBuffer::CreateOffScreenRenderer 
-  (iGraphics2D *parent_g2d, int width, int height, csPixelFormat *pfmt, 
+  (iGraphics3D *parent_g3d, int width, int height, csPixelFormat *pfmt, 
    void *buffer, RGBPixel *palette, int pal_size)
 { 
-  return g3d->CreateOffScreenRenderer (parent_g2d, width, height, pfmt, 
+  return g3d->CreateOffScreenRenderer (parent_g3d, width, height, pfmt, 
 				       buffer, palette, pal_size); 
 }
 

@@ -1897,7 +1897,7 @@ void csGraphics3DOpenGL::DrawPixmap (iTextureHandle *hTex,
 }
 
 iGraphics3D *csGraphics3DOpenGL::CreateOffScreenRenderer 
-  (iGraphics2D * /*parent_g2d*/, int width, int height,  csPixelFormat *pfmt, 
+  (iGraphics3D * /*parent_g2d*/, int width, int height,  csPixelFormat *pfmt, 
     void *buffer, RGBPixel * /*palette*/, int /*pal_size*/)
 {
 #ifdef USE_OLD_SOFTWARE_TEXTURES

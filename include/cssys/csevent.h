@@ -214,7 +214,15 @@ enum
    * This event is broadcasted to all plugins inside csSystemDriver::Close
    * right before starting to close all drivers.
    */
-  cscmdSystemClose
+  cscmdSystemClose,
+  /**
+   * This event is broadcast on a context resize event
+   */
+  cscmdContextResize,
+  /**
+   * This event is broadcast on a context close event
+   */
+  cscmdContextClose
 };
 
 /**

@@ -200,6 +200,10 @@ struct iSystem : public iBase
   virtual void QueueJoystickEvent (int iNumber, int iButton, bool iDown, int x, int y) = 0;
   /// Put a focus event into event queue 
   virtual void QueueFocusEvent (bool Enable) = 0;
+  /// Put a native window resizing event into queue
+  virtual void QueueContextResizeEvent (void *info) = 0;
+  /// Put a native window closure event into queue.
+  virtual void QueueContextCloseEvent (void *info) = 0;
   /// Register the plugin to receive specific events
   virtual bool CallOnEvents (iPlugIn *iObject, unsigned int iEventMask) = 0;
   /// Query current state for given key

@@ -23,6 +23,7 @@ ifndef PLUGINS
   PLUGINS += netspace/nstp netspace/nsmgr 
   PLUGINS += csauth/simple 
   PLUGINS += colldet/rapid
+  PLUGINS += metaball
   PLUGINS += $(DETECTED_PLUGINS)
 endif
 

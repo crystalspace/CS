@@ -28,6 +28,8 @@
 #include <X11/Xutil.h>
 #include <X11/keysymdef.h>
 #include <X11/cursorfont.h>
+#include <X11/Xatom.h>
+
 
 #ifdef DO_SHM
 #  include <X11/extensions/XShm.h>
@@ -43,6 +45,8 @@ class csGraphics2DXLib : public csGraphics2D
   int screen_num;
   int display_width, display_height;
   Window window;
+  Window leader_window;
+  Window root_window;
   XImage* xim;
   GC gc;
   Visual *visual;

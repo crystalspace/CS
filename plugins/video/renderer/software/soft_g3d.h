@@ -36,7 +36,7 @@ public:
   /// Open
   virtual bool Open (const char *Title);
   /// Create an off screen renderer
-  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics2D *parent_g2d, 
+  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics3D *parent_g3d, 
      int width, int height, csPixelFormat *pfmt, void *buffer, 
      RGBPixel *palette, int pal_size);
 

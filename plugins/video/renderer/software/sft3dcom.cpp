@@ -147,6 +147,7 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
   Caps.fog = G3DFOGMETHOD_ZBUFFER;
   Caps.NeedsPO2Maps = false;
   Caps.MaxAspectRatio = 32768;
+  width = height = -1;
 }
 
 csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
@@ -157,19 +158,12 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
   if (System) System->DecRef ();
 }
 
-bool csGraphics3DSoftwareCommon::Initialize (iSystem *iSys)
+void csGraphics3DSoftwareCommon::NewInitialize ()
 {
-  (System = iSys)->IncRef ();
-
   iVFS* v = System->GetVFS();
   config = new csIniFile (v, "/config/soft3d.cfg");
   v->DecRef(); v = NULL;
 
-  width = height = -1;
-
-#ifdef DO_MMX
-  do_mmx = config->GetYesNo ("Hardware", "MMX", true);
-#endif
   do_smaller_rendering = config->GetYesNo ("Hardware", "SMALLER", false);
   mipmap_coef = config->GetFloat ("TextureManager", "MIPMAP_COEF", 1.3);
   do_interlaced = config->GetYesNo ("Hardware", "INTERLACING", false) ? 0 : -1;
@@ -179,7 +173,153 @@ bool csGraphics3DSoftwareCommon::Initialize (iSystem *iSys)
   float fGamma;
   sscanf (gamma, "%f", &fGamma);
   Gamma = QInt16 (fGamma);
+
+#ifdef DO_MMX
+  do_mmx = config->GetYesNo ("Hardware", "MMX", true);
+#endif
+}
+
+void csGraphics3DSoftwareCommon::SharedInitialize(csGraphics3DSoftwareCommon *p)
+{
+  // Avoid reading in a config file from the hard-drive
+  do_smaller_rendering = p->do_smaller_rendering;
+  mipmap_coef = p->mipmap_coef;
+  do_interlaced = p->do_interlaced;
+  Gamma = p->Gamma;
+#ifdef DO_MMX
+  do_mmx = p->do_mmx;
+#endif
+}
+
+bool csGraphics3DSoftwareCommon::Open (const char* /*Title*/)
+{
+  pfmt = *G2D->GetPixelFormat ();
+  DrawMode = 0;
+  SetDimensions (G2D->GetWidth (), G2D->GetHeight ());
+  z_buf_mode = CS_ZBUF_NONE;
+
+  for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
+    fog_tables [i].table = NULL;
+
   return true;
+}
+
+bool csGraphics3DSoftwareCommon::NewOpen (const char *Title)
+{
+  if (!G2D->Open (Title))
+  {
+      SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
+      // set "not opened" flag
+      width = height = -1;
+      return false;
+  }
+
+  pfmt = *G2D->GetPixelFormat ();
+  if (pfmt.PalEntries)
+  {
+    // If we don't have truecolor we simulate 5:6:5 bits
+    // for R:G:B in the masks anyway because we still need the
+    // 16-bit format for our light mixing
+    pfmt.RedShift   = RGB2PAL_BITS_G + RGB2PAL_BITS_B;
+    pfmt.GreenShift = RGB2PAL_BITS_B;
+    pfmt.BlueShift  = 0;
+    pfmt.RedMask    = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.RedShift;
+    pfmt.GreenMask  = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.GreenShift;
+    pfmt.BlueMask   = ((1 << RGB2PAL_BITS_B) - 1);
+    pfmt.RedBits    = RGB2PAL_BITS_R;
+    pfmt.GreenBits  = RGB2PAL_BITS_G;
+    pfmt.BlueBits   = RGB2PAL_BITS_B;
+  }
+
+  if (pfmt.PixelBytes == 4)
+    pixel_shift = 2;
+  else if (pfmt.PixelBytes == 2)
+    pixel_shift = 1;
+  else
+    pixel_shift = 0;
+
+#ifdef TOP8BITS_R8G8B8_USED
+  if (pfmt.PixelBytes == 4)
+    pixel_adjust = (pfmt.RedShift && pfmt.GreenShift && pfmt.BlueShift) ? 8 : 0;
+#endif
+
+  // Create the texture manager
+  texman = new csTextureManagerSoftware (System, this, config);
+  texman->SetPixelFormat (pfmt);
+
+  tcache = new csTextureCacheSoftware (texman);
+  const char *cache_size = config->GetStr ("TextureManager", "CACHE", NULL);
+  int csize = DEFAULT_CACHE_SIZE;
+  if (cache_size)
+  {
+    char suffix [100];
+    sscanf (cache_size, "%d%s", &csize, suffix);
+    if (!strcasecmp (suffix, "KP"))
+      csize *= 1024 * pfmt.PixelBytes;
+    else if (!strcasecmp (suffix, "MP"))
+      csize *= 1024 * 1024 * pfmt.PixelBytes;
+    else if (!strcasecmp (suffix, "KB"))
+      csize *= 1024;
+    else if (!strcasecmp (suffix, "MB"))
+      csize *= 1024 * 1024;
+    else
+      csize = 0;
+
+    if (!csize)
+    {
+      SysPrintf (MSG_INITIALIZATION, "Invalid cache size specified, using default\n");
+      csize = DEFAULT_CACHE_SIZE;
+    }
+  }
+  tcache->set_cache_size (csize);
+
+#if defined (DO_MMX)
+  int family, features;
+  char vendor [13];
+  csDetectCPU (&family, vendor, &features);
+  cpu_mmx = (features & CPUx86_FEATURE_MMX) != 0;
+  SysPrintf (MSG_INITIALIZATION, "%d %s CPU detected; FPU (%s) MMX (%s) CMOV (%s)\n",
+    family, vendor,
+    (features & CPUx86_FEATURE_FPU) ? "yes" : "no",
+    (features & CPUx86_FEATURE_MMX) ? "yes" : "no",
+    (features & CPUx86_FEATURE_CMOV) ? "yes" : "no");
+#endif
+
+  alpha_mask = 0;
+  alpha_mask |= 1 << (pfmt.RedShift);
+  alpha_mask |= 1 << (pfmt.GreenShift);
+  alpha_mask |= 1 << (pfmt.BlueShift);
+  alpha_mask = ~alpha_mask;
+
+  z_buf_mode = CS_ZBUF_NONE;
+  fog_buffers = NULL;
+  for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
+    fog_tables [i].table = NULL;
+
+  ScanSetup ();
+
+  SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
+  SetRenderState (G3DRENDERSTATE_GAMMACORRECTION, Gamma);
+
+  return true;
+}
+
+void csGraphics3DSoftwareCommon::SharedOpen (csGraphics3DSoftwareCommon* p)
+{
+  texman = p->texman;
+  tcache = p->tcache;
+  pixel_shift = p->pixel_shift;
+  fog_buffers = p->fog_buffers;
+  alpha_mask = p->alpha_mask;
+
+#if defined (DO_MMX)
+  cpu_mmx = p->cpu_mmx;
+#endif
+
+  ScanSetup ();
+
+  SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
+  SetRenderState (G3DRENDERSTATE_GAMMACORRECTION, Gamma);
 }
 
 void csGraphics3DSoftwareCommon::ScanSetup ()
@@ -449,111 +589,7 @@ csDrawScanline* csGraphics3DSoftwareCommon::ScanProc_32_Alpha
   return csScan_32_draw_scanline_map_alpha;
 }
 
-bool csGraphics3DSoftwareCommon::Open (const char *Title)
-{
-  DrawMode = 0;
 
-  if (!G2D->Open (Title))
-  {
-      SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
-      // set "not opened" flag
-      width = height = -1;
-      return false;
-  }
-
-  // Create the texture manager
-  texman = new csTextureManagerSoftware (System, this, config);
-
-  int nWidth = G2D->GetWidth ();
-  int nHeight = G2D->GetHeight ();
-  pfmt = *G2D->GetPixelFormat ();
-  if (pfmt.PalEntries)
-  {
-    // If we don't have truecolor we simulate 5:6:5 bits
-    // for R:G:B in the masks anyway because we still need the
-    // 16-bit format for our light mixing
-    pfmt.RedShift   = RGB2PAL_BITS_G + RGB2PAL_BITS_B;
-    pfmt.GreenShift = RGB2PAL_BITS_B;
-    pfmt.BlueShift  = 0;
-    pfmt.RedMask    = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.RedShift;
-    pfmt.GreenMask  = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.GreenShift;
-    pfmt.BlueMask   = ((1 << RGB2PAL_BITS_B) - 1);
-    pfmt.RedBits    = RGB2PAL_BITS_R;
-    pfmt.GreenBits  = RGB2PAL_BITS_G;
-    pfmt.BlueBits   = RGB2PAL_BITS_B;
-  }
-  texman->SetPixelFormat (pfmt);
-
-  if (pfmt.PixelBytes == 4)
-    pixel_shift = 2;
-  else if (pfmt.PixelBytes == 2)
-    pixel_shift = 1;
-  else
-    pixel_shift = 0;
-
-#ifdef TOP8BITS_R8G8B8_USED
-  if (pfmt.PixelBytes == 4)
-    pixel_adjust = (pfmt.RedShift && pfmt.GreenShift && pfmt.BlueShift) ? 8 : 0;
-#endif
-
-  SetDimensions (nWidth, nHeight);
-
-  tcache = new csTextureCacheSoftware (texman);
-  const char *cache_size = config->GetStr ("TextureManager", "CACHE", NULL);
-  int csize = DEFAULT_CACHE_SIZE;
-  if (cache_size)
-  {
-    char suffix [100];
-    sscanf (cache_size, "%d%s", &csize, suffix);
-    if (!strcasecmp (suffix, "KP"))
-      csize *= 1024 * pfmt.PixelBytes;
-    else if (!strcasecmp (suffix, "MP"))
-      csize *= 1024 * 1024 * pfmt.PixelBytes;
-    else if (!strcasecmp (suffix, "KB"))
-      csize *= 1024;
-    else if (!strcasecmp (suffix, "MB"))
-      csize *= 1024 * 1024;
-    else
-      csize = 0;
-
-    if (!csize)
-    {
-      SysPrintf (MSG_INITIALIZATION, "Invalid cache size specified, using default\n");
-      csize = DEFAULT_CACHE_SIZE;
-    }
-  }
-  tcache->set_cache_size (csize);
-
-#if defined (DO_MMX)
-  int family, features;
-  char vendor [13];
-  csDetectCPU (&family, vendor, &features);
-  cpu_mmx = (features & CPUx86_FEATURE_MMX) != 0;
-  SysPrintf (MSG_INITIALIZATION, "%d %s CPU detected; FPU (%s) MMX (%s) CMOV (%s)\n",
-    family, vendor,
-    (features & CPUx86_FEATURE_FPU) ? "yes" : "no",
-    (features & CPUx86_FEATURE_MMX) ? "yes" : "no",
-    (features & CPUx86_FEATURE_CMOV) ? "yes" : "no");
-#endif
-
-  alpha_mask = 0;
-  alpha_mask |= 1 << (pfmt.RedShift);
-  alpha_mask |= 1 << (pfmt.GreenShift);
-  alpha_mask |= 1 << (pfmt.BlueShift);
-  alpha_mask = ~alpha_mask;
-
-  z_buf_mode = CS_ZBUF_NONE;
-  fog_buffers = NULL;
-  for (int i = 0; i < MAX_INDEXED_FOG_TABLES; i++)
-    fog_tables [i].table = NULL;
-
-  ScanSetup ();
-
-  SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
-  SetRenderState (G3DRENDERSTATE_GAMMACORRECTION, Gamma);
-
-  return true;
-}
 
 void csGraphics3DSoftwareCommon::Close()
 {

@@ -394,6 +394,10 @@ public:
   virtual void QueueJoystickEvent (int iNumber, int iButton, bool iDown, int x, int y);
   /// Put a focus event into event queue 
   virtual void QueueFocusEvent (bool Enable);
+  /// Put a native window resizing event into queue
+  virtual void QueueContextResizeEvent (void *info);
+  /// Put a native window closure event into queue.
+  virtual void QueueContextCloseEvent (void *info);
   /// Register the plugin to receive specific events
   virtual bool CallOnEvents (iPlugIn *iObject, unsigned int iEventMask);
   /// Query current state for given key
