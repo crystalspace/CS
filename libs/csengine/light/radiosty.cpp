@@ -1744,7 +1744,7 @@ void csRadiosity::ShootPatch (int rx, int ry, int ruv)
   //  src_lumel_color);
   gloss *= source_patch_area * visibility / sqdistance;
 
-  // add gloss seperately -- too much light this way
+  // add gloss separately -- too much light this way
 
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss, trajectory_color );
   shoot_dest->AddToDelta (ruv, gloss * delta_color);

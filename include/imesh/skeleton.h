@@ -53,7 +53,7 @@ SCF_VERSION (iSkeletonConnection, 0, 0, 1);
 
 /**
  * This interface describes the API for a connection in the skeleton system.
- * A connection is also a limb but is implemented in a seperate interface.
+ * A connection is also a limb but is implemented in a separate interface.
  */
 struct iSkeletonConnection : public iBase
 {
@@ -67,7 +67,7 @@ SCF_VERSION (iSkeleton, 0, 0, 1);
 
 /**
  * This interface describes the API for the main skeleton itself.
- * A skeleton is also a limb but is implemented in a seperate interface.
+ * A skeleton is also a limb but is implemented in a separate interface.
  */
 struct iSkeleton : public iBase
 {

@@ -1,4 +1,4 @@
-- Seperate the outline info from csObjectModel. An outline is not attached
+- Separate the outline info from csObjectModel. An outline is not attached
   to a model but to an instance of a model (perhaps make
   csObjectModelInstance?).
 	OR
@@ -19,7 +19,7 @@
 
 - Also process history and VPT for kdtree nodes.
 
-- Seperate all camera dependend/history data so we can use Dynavis
+- Separate all camera dependend/history data so we can use Dynavis
   for multiple camera positions. In fact all information related to an
   object can be split into three classes:
   	- Information on the model itself. This is independent of where

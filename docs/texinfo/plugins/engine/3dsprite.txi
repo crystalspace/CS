@@ -75,14 +75,14 @@ Third Vertex Index
 @subsubsection Texturing
 
 Our next challenge is texturing the sprite.  To apply a two dimensional
-texture to the 3D sprite we need to flatten it.  If we have 288 seperate
+texture to the 3D sprite we need to flatten it.  If we have 288 separate
 vertices (@pxref{3D Sprites Example 1}), we can flatten the sprite any way we
-want, but when the triangles are sharing vertices we cannot seperate them,
+want, but when the triangles are sharing vertices we cannot separate them,
 and a flattened cylinder is sometimes difficult to texture.  Either the sides
 will be curved or the ends will be flattened.
 
 We probably want to texture the sides as a single rectangular area and
-each end as a rough circle.  So we Seperate the ends from the sides.  This
+each end as a rough circle.  So we Separate the ends from the sides.  This
 doubles the number of vertices.  Cutting one edge of the sides so it can be
 unwrapped adds two more vertices.
 

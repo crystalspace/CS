@@ -16,7 +16,7 @@ Crystal Space.
 The notion of curve templates has been reworked. @samp{iCurveTemplate} has
 been removed and it's functionality has moved to @samp{iCurve} itself.
 As a consequence of this change the bezier addon loader has been removed.
-Also curves have been seperated from the thing plugin and now live in the
+Also curves have been separated from the thing plugin and now live in the
 @file{bezier} plugin. So, a curve like this in the past:
 
 @example
@@ -162,8 +162,8 @@ have moved to @samp{iThingFactoryState}.
 
 It is no longer possible to set mixmode and alpha for individual polygons
 Instead use the new @code{iThingState::SetMixMode()} function to set the
-mixmode globally.  If needed you will have to seperate the transparent polygon
-in a seperate thing mesh.
+mixmode globally.  If needed you will have to separate the transparent polygon
+in a separate thing mesh.
 
 It is also no longer possible to get camera space information from polygons.
 
@@ -206,7 +206,7 @@ Several methods in @samp{iPortal} have changed slightly. For example,
 In the map loader the syntax for specifying warp vectors for portals has
 changed from @samp{v} to @samp{wv} and @samp{w} to @samp{ww}.
 
-Portals in thing have been removed completely! Instead there is now a seperate
+Portals in thing have been removed completely! Instead there is now a separate
 portal container object which belongs in the engine (otherwise it is just
 a mesh like any other mesh). To create a portal you can use the conveniance
 functions @code{iEngine::CreatePortal()} and

@@ -1634,7 +1634,7 @@ void csBCTerrObject::UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
 
 /*
  * todo:
- * make 2 seperate for loops
+ * make 2 separate for loops
  * 1 -> sys dist
  * 2 -> normal checks
  * remove visibilty system for terrblock

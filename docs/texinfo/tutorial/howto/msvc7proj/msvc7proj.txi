@@ -189,7 +189,7 @@ the @emph{Properties} dialog box, which can be seen in the image below.
 Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
 definitions in the @emph{Preprocessor Definitions} text box i.e.  for a debug
 build @code{WIN32_VOLATILE}, @code{__CRYSTAL_SPACE__} and @code{CS_DEBUG},
-making sure to seperate with semi-colons.  Alternatively, you can click the
+making sure to separate with semi-colons.  Alternatively, you can click the
 elipsis (@dots{}) button to pull up an easier view.  An example of the ones
 entered for a debug build can be seen in the image below.
 
@@ -200,7 +200,7 @@ entered for a debug build can be seen in the image below.
 Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
 definitions in the @emph{Preprocessor Definitions} text box i.e.  for a release
 build @code{WIN32_VOLATILE}, @code{__CRYSTAL_SPACE__} and @code{CS_RELEASE},
-making sure to seperate with semi-colons.  Alternatively, you can click the
+making sure to separate with semi-colons.  Alternatively, you can click the
 elipsis (@dots{}) button to pull up an easier view.  An example the ones
 entered for a release build can be seen in the image below.
 

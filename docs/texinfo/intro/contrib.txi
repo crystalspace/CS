@@ -394,7 +394,7 @@ lot of bugs with portals and clipping.  Ivan also enhanced the image loader
 classes to make it possible to dynamically add new image formats even with a
 pre-compiled Crystal Space library.  He also rewrote the loader routines and
 added the @code{csObject} library which is now used in Crystal Space.  He also
-seperated the scripting stuff from the engine.
+separated the scripting stuff from the engine.
 
 @item
 Slavik Levtchenko (@email{Smirnov@@bbs.math.spbu.ru})

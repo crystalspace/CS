@@ -320,7 +320,7 @@ void WalkTest::Help ()
   printf ("  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
   printf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
   printf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
-  printf ("  -regions           load every map in a seperate region (default off)\n");
+  printf ("  -regions           load every map in a separate region (default off)\n");
   printf ("  -dupes             check for duplicate objects in multiple maps (default off)\n");
   printf ("  -prepare           after loading, pre-prepare all things (default off)\n");
   printf ("  -infinite          special infinite level generation (ignores map file!)\n");
@@ -1406,7 +1406,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading multiple maps '%s', ...",
       	first_map->map_dir);
 
-    // Check if we have to load every seperate map in a seperate region.
+    // Check if we have to load every separate map in a separate region.
     csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
     	iCommandLineParser);
     bool do_regions = false;

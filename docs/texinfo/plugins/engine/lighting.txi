@@ -92,7 +92,7 @@ system described above.  Pseudo-dynamic lights can not move but you can change
 the intensity or color.  When some light is made pseudo-dynamic (a simple
 flag) the processing is a bit different.  The shadow-computation remains the
 same but every polygon that is hit by the pseudo-dynamic light needs to have
-seperate lightmaps for every pseudo-dynamic light that hits the polygon.  So
+separate lightmaps for every pseudo-dynamic light that hits the polygon.  So
 in the end all the polygons that are only hit by static lights have just one
 lightmap (for the three tables) for all static lighting information.  Every
 polygon that is hit by one or more pseudo-dynamic lights will have one or more

@@ -354,7 +354,7 @@ public:
   csPolygon3DStatic *GetPolygon3DStatic (int idx)
   { return static_polygons.Get (idx); }
 
-  /// Clone this static data in a seperate instance.
+  /// Clone this static data in a separate instance.
   csPtr<csThingStatic> Clone ();
 
   /**

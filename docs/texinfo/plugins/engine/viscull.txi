@@ -111,7 +111,7 @@ objects. Polygons on things can also be portals to other areas.
 @cindex Visibility of Curved Surfaces
 @cindex Curved Surfaces, Visibility
 
-Curved surfaces are implemented in a seperate mesh object. They are usually
+Curved surfaces are implemented in a separate mesh object. They are usually
 considered as detail objects.
 
 @subsubheading Terrain Surfaces
@@ -134,7 +134,7 @@ thing which is convex and makes up the outer hull of the sector. Sectors
 don't have to be defined like this but this is very common. You can then
 make a maze like structure with convex rooms connected to other convex
 rooms with portals. Non-convex attributes of the rooms can be added
-as seperate detail objects.
+as separate detail objects.
 
 @node VIS visibility culling, VIS view frustum culling, VIS sector structure, Visibility Culling
 @subsubsection Visibility Culling

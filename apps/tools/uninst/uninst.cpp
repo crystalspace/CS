@@ -24,7 +24,7 @@
 	read install.log at the pathname given as argument.
 
 	install.log contains the pathnames of the files that are installed
-	(and will be deleted) seperated by whitespace. Duplicates will be
+	(and will be deleted) separated by whitespace. Duplicates will be
 	removed.
 
 	(include install.log and uninst.exe pathnames into install.log

@@ -2539,7 +2539,7 @@ void csSoftwareGraphics3DCommon::DrawFogPolygon (CS_ID id,
   if ((scan_index < 0) || !(dscan = ScanProc [scan_index]))
     return;   // Nothing to do.
 
-  //@@@ Optimization note! We should have a seperate loop for CS_FOG_VIEW
+  //@@@ Optimization note! We should have a separate loop for CS_FOG_VIEW
   // as that is much simpler and does not require the calculations for z.
   // This would make things more efficient.
 

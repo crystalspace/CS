@@ -91,7 +91,7 @@ private:
   csPolygonMeshEdge* edges;
   int num_edges;
 
-  // Outline information (may in future move to a seperate class).
+  // Outline information (may in future move to a separate class).
   csOutlineInfo outline_info;
 
   csDynavisObjectModel ();

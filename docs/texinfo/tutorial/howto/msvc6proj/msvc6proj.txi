@@ -237,7 +237,7 @@ Once you have clicked on @emph{Settings...}. You will then be presented with the
 Select the @emph{C/C++} tab and insert the appropriate definitions in the
 @emph{Preprocessor definitions} text box i.e. for a debug build
 @emph{@sc{win32_volatile}},  @emph{@sc{__crystal_space__}} and
-@emph{@sc{cs_debug}}, making sure to seperate with commas.  An example the
+@emph{@sc{cs_debug}}, making sure to separate with commas.  An example the
 ones entered for a debug build can be seen in the image below.
 
 @ifnotinfo
@@ -247,7 +247,7 @@ ones entered for a debug build can be seen in the image below.
 Select the @emph{C/C++} tab and insert the appropriate definitions in the
 @emph{Preprocessor definitions} text box i.e. for a release build
 @emph{@sc{win32_volatile}},  @emph{@sc{__crystal_space__}} and
-@emph{@sc{cs_release}}, making sure to seperate with commas.  An example the
+@emph{@sc{cs_release}}, making sure to separate with commas.  An example the
 ones entered for a release build can be seen in the image below.
 
 @ifnotinfo

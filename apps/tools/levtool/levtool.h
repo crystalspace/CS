@@ -150,7 +150,7 @@ private:
   int max_obj_number;
 
   /**
-   * Used by SplitThingSeperateUnits(). Will fill the given object number
+   * Used by SplitThingSeparateUnits(). Will fill the given object number
    * in all polygons connected to this one.
    */
   void PaintConnectedPolygons (ltPolygon* sweep, int obj_number);
@@ -220,19 +220,19 @@ public:
 
   /**
    * Warning! Call this function AFTER CreateVertexInfo().
-   * This function will split this thing in seperate units.
+   * This function will split this thing in separate units.
    * A unit is defined as a group of polygons that is not
    * connected to other groups of polygons in the thing.
    * This splitting will happen by setting obj_number variable
    * to the appropriate sub-part.
    */
-  void SplitThingSeperateUnits ();
+  void SplitThingSeparateUnits ();
 
   /**
-   * Use this instead of SplitThingSeperateUnits() if you don't want to
+   * Use this instead of SplitThingSeparateUnits() if you don't want to
    * split.
    */
-  void DoNotSplitThingSeperateUnits ();
+  void DoNotSplitThingSeparateUnits ();
 
   /**
    * Create a mapping to map the current vertex id's to the

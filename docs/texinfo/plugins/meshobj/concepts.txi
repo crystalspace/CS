@@ -67,7 +67,7 @@ values that you use often and create Mesh Objects from the factory of choice.
 In still other cases the factory actually contains the characteristics used by
 all Mesh Objects created from it.  Changing the factory characteristics will
 actually modify the characteristics for all Mesh Objects instantly.  In this
-case you will have to use a seperate factory for all Mesh Objects sharing the
+case you will have to use a separate factory for all Mesh Objects sharing the
 same characteristics.
 @end enumerate
 

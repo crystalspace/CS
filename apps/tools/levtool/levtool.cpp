@@ -542,7 +542,7 @@ void ltThing::SplitThingInCenter ()
   }
 }
 
-void ltThing::SplitThingSeperateUnits ()
+void ltThing::SplitThingSeparateUnits ()
 {
   max_obj_number = -1;
   int i;
@@ -575,7 +575,7 @@ void ltThing::SplitThingSeperateUnits ()
   printf ("Found %d sub-objects\n", max_obj_number); fflush (stdout);
 }
 
-void ltThing::DoNotSplitThingSeperateUnits ()
+void ltThing::DoNotSplitThingSeparateUnits ()
 {
   max_obj_number = 0;
   int i;
@@ -1672,7 +1672,7 @@ void LevTool::Main ()
     printf ("     old style octree culler and convert it to Dynavis.\n");
     printf ("     All objects will be split in their logical parts.\n");
     printf ("  -splitunit:\n");       
-    printf ("     Split large things into seperate units. A seperate unit\n");
+    printf ("     Split large things into separate units. A separate unit\n");
     printf ("     is defined as a collection of connected polygons that doesn't\n");
     printf ("     connect with any other polygon from the thing.\n");
     printf ("     This option will first do -compress.\n");
@@ -1981,7 +1981,7 @@ void LevTool::Main ()
 	{
 	  ltThing* th = things.Get (i);
 	  th->CreateVertexInfo ();
-	  th->DoNotSplitThingSeperateUnits ();
+	  th->DoNotSplitThingSeparateUnits ();
 	}
 
 	CloneAndSplitDynavis (doc, newdoc, true);
@@ -2008,7 +2008,7 @@ void LevTool::Main ()
 	  th->RemoveUnusedVertices ();
 	  th->RemoveDuplicateVertices ();
 	  th->CreateVertexInfo ();
-	  th->DoNotSplitThingSeperateUnits ();
+	  th->DoNotSplitThingSeparateUnits ();
 	}
 
 	CloneAndSplitDynavis (doc, newdoc, false);
@@ -2056,9 +2056,9 @@ void LevTool::Main ()
 	  area = pow (area, 1.0f/3.0f);
 	  int where = int (100 * (area / global_area));
 	  if (where >= minsize)
-	    th->SplitThingSeperateUnits ();
+	    th->SplitThingSeparateUnits ();
 	  else
-	    th->DoNotSplitThingSeperateUnits ();
+	    th->DoNotSplitThingSeparateUnits ();
         }
 
 	CloneAndSplitDynavis (doc, newdoc, false);
@@ -2107,7 +2107,7 @@ void LevTool::Main ()
 	    th->SplitThingInCenter ();
 	  }
 	  else
-	    th->DoNotSplitThingSeperateUnits ();
+	    th->DoNotSplitThingSeparateUnits ();
         }
 
 	CloneAndSplitDynavis (doc, newdoc, false);

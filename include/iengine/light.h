@@ -138,13 +138,13 @@ SCF_VERSION (iLight, 0, 0, 9);
  *     all static lights is collected in one static lightmap.
  * <li>Pseudo-dynamic light. This is a static light that still cannot
  *     move but the intensity/color can change. The shadow information
- *     from every pseudo-dynamic light is kept in a seperate shadow-map.
+ *     from every pseudo-dynamic light is kept in a separate shadow-map.
  *     Shadowing is very accurate with pseudo-dynamic lights since they
  *     use the same algorithm as static lights.
  * <li>Dynamic light. This is a light that can move and change
  *     intensity/color. These lights are the most flexible. All lighting
  *     information from all dynamic lights is collected in one dynamic
- *     lightmap (seperate from the pseudo-dynamic shadow-maps).
+ *     lightmap (separate from the pseudo-dynamic shadow-maps).
  *     Shadows for dynamic lights will be less accurate because things
  *     will not cast accurate shadows (due to computation speed limitations).
  * </ul>

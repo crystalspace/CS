@@ -93,7 +93,7 @@ capped to a maximum).  So the above solution would really only be useful for
 doors that once opened, remain open for the rest of the game.  But maybe we
 have another solution.  When the engine knows that a portal can open/close we
 can do the static lighting calculations as usual but store all lighting
-information that came through that portal in seperate static lightmaps.  That
+information that came through that portal in separate static lightmaps.  That
 would be surprisingly easy to do.  What this means is that polygons may have
 several series of static lightmaps which are conditionally used depending on
 the state of nearby portals.  Another big advantage of this approach is that

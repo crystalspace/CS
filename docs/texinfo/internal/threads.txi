@@ -36,7 +36,7 @@ the concept of the current directory is not really valid with threads.
 
 @item
 The TinyXML, XMLRead, and BinaryXML parsers are thread safe in the sense
-that it is okay to create and work on seperate documents in seperate threads.
+that it is okay to create and work on separate documents in separate threads.
 However it is @emph{not} okay to work on the same document in different
 threads.
 

@@ -30,7 +30,7 @@ struct iShadowBlock;
  * A light patch. This is a 3D polygon which fits on a world level 3D
  * polygon and defines where the light hits the polygon.
  * There is a list of light patches in every polygon (all dynamic lights
- * hitting a polygon will give rise to a seperate light patch) and there
+ * hitting a polygon will give rise to a separate light patch) and there
  * is a list of light patches in every dynamic light (representing all
  * polygons that are hit by that particular light).
  */

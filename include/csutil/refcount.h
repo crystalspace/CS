@@ -32,7 +32,7 @@ class csRefCount
 protected:
   int ref_count;
 
-  // To avoid a problem with MSVC and multiple DLLs (with seperate memory
+  // To avoid a problem with MSVC and multiple DLLs (with separate memory
   // space) we have to use a virtual destructor.
   // @@@ Another alternative is to force this function to be non-inline, as
   // doing so will most likely achieve the same result.

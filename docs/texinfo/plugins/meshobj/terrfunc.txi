@@ -24,7 +24,7 @@ selection happens on a block level. i.e. every block is shown at one level
 of @sc{lod} independent from the other blocks. The second reason is that
 visibility culling for terrain engine also works on block granularity (also
 the visibility algo itself goes deeper for doing the actual tests). The
-last reason for the blocks is that every block can have a seperate texture.
+last reason for the blocks is that every block can have a separate texture.
 This is important because some hardware has texture limitations and you
 often want to overlay a very big texture on a landscape. Since very block
 has its own texture you can do this easily.
