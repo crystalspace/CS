@@ -438,7 +438,7 @@ struct iAwsComponent : public iAwsSource
     * If it returns false then the component was not able to initialize properly and
     * shouldn't be used.
     **/
-  virtual bool Create(iAws* mgr, iAwsComponent* parent, awsComponentNode* settings);
+  virtual bool Create(iAws* mgr, iAwsComponent* parent, awsComponentNode* settings)=0;
 
   /// Sets up a component.
   virtual bool Setup(iAws *wmgr, awsComponentNode *settings)=0;
