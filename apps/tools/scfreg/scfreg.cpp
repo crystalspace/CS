@@ -157,6 +157,9 @@ static bool RegisterServer (char *SharedLibraryFilename, bool Register,
   
   csConfigFile cfg (configfile);
 
+  if (!usescfcfg)
+    cfg.SetInt (".scfVersion", 1);
+
   scfClassInfo *ClassTable = func (NULL);
   while (ClassTable->ClassID)
   {
