@@ -857,6 +857,11 @@ void Demo::NextFrame ()
   superclass::NextFrame ();
   cs_time elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
+
+  // since no time has passed, the animated screen image stays the same.
+  // avoid drawing this, it will only fill up queues and cause jerky
+  // movement on some hardware/drivers. 
+  if(elapsed_time == 0) return;
  
   // Now rotate the camera according to keyboard state
   csReversibleTransform& camtrans = view->GetCamera ()->GetTransform ();
