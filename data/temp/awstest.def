@@ -9,6 +9,8 @@ skin "Normal Windows"
   TextBackColor:        255,255,255
   ButtonTextColor:	0,0,192
   OverlayTextureAlpha:	128
+  ScrollBarHeight:	16
+  ScrollBarWidth:	16
   WindowMin:		"/aws/minimize.png"
   WindowZoom:		"/aws/zoom.png"
   WindowClose:		"/aws/close.png"
