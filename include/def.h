@@ -75,6 +75,8 @@
 // COMP_ flags) and the processor (one of the PROC_ flags).
 //---------------------------------------------------------------
 
+#ifndef HAVE_CONFIG_H
+
 #if (defined(OS_SOLARIS) || defined(OS_LINUX) || defined(OS_IRIX) || defined(OS_BSD) || defined(OS_BE) || defined(OS_NEXT)) && !defined(OS_UNIX)
 #  define OS_UNIX
 #endif
@@ -89,6 +91,8 @@
 
 #if !defined(PROC_INTEL) && !defined(PROC_SPARC) && !defined(PROC_MIPS) && !defined(PROC_UNKNOWN) && !defined(PROC_POWERPC) && !defined(PROC_M68K) && !defined(PROC_HPPA) && !defined(PROC_ALPHA)
 #  error "Please specify the processor in the makefile! (PROC=...)"
+#endif
+
 #endif
 
 //---------------------------------------------------------------
