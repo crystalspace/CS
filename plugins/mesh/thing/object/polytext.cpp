@@ -1369,15 +1369,10 @@ void csShadowBitmap::UpdateLightMap (
 	  // a: Start
 	  // b: End
 	  // c: point
-	  csVector3 v_a = seg.Start ();
-	  csVector3 v_b = seg.End ();
-	  csVector3 v_c = v;
-	  float dt_a = (v_c.x - v_a.x) * (v_b.x - v_a.x) + 
-		(v_c.y - v_a.y) * (v_b.y - v_a.y) +
-		(v_c.z - v_a.z) * (v_b.z - v_a.z);
-	  float dt_b = (v_c.x - v_b.x) * (v_a.x - v_b.x) + 
-		(v_c.y - v_b.y) * (v_a.y - v_b.y) +
-		(v_c.z - v_b.z) * (v_a.z - v_b.z);
+	  csVector3& v_a = seg.Start ();
+	  csVector3& v_b = seg.End ();
+	  csVector3& v_c = v;
+	  float dt_a = (v_c - v_a) * (v_b - v_a);
 
 	  csVector3 nearest;
 	  if (dt_a <= 0)
@@ -1386,6 +1381,7 @@ void csShadowBitmap::UpdateLightMap (
 	  }
 	  else
 	  {
+	    float dt_b = (v_c - v_b) * (v_a - v_b);
 	    if (dt_b <= 0)
 	      nearest = v_b;
 	    else
