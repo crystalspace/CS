@@ -15,6 +15,13 @@ chronological order.
 	- res augmented stdrep to allow retrieval of the debug log file name.
 	- res added a Win32-only variant of csCallStackHelper that allows a
 	  bit more control over the call stack creation.
+	- Jorrit fixed a bug in the NR rendermesh sorter. The back2front
+	  and front2back sorting (used for alpha render priority) were
+	  not correctly sorting. The fix makes the sorter sligthly less
+	  efficient though but this shouldn't be too hard since it should
+	  only happen for objects in alpha render priority. Nevertheless in the
+	  future we should consider precomputing the z information so we
+	  don't have to calculate it in the sort routine itself.
 6-Apr-2004
 	- Jorrit finished the implementation of csBSPTree.
 	- Jorrit implemented back2front for genmesh. This new feature works
