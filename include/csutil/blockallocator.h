@@ -235,7 +235,7 @@ public:
       }
     }
 
-    return new (ptr) T ();
+    return new (ptr) T;
   }
 
   /**
