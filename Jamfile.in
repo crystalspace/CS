@@ -32,8 +32,7 @@ Clean distclean : Jamconfig Jamfile
 		  [ Wildcard *.cex ] ;
 CleanDir distclean : autom4te.cache ;
 Depends distclean : clean ;
-Description distclean : "Remove configuration information and built targets" :
-  verbatim ;
+Help distclean : "Remove configuration information and built targets" ;
 
 Clean maintainerclean : aclocal.m4 configure configure.scan ;
 Depends maintainerclean : distclean ;
