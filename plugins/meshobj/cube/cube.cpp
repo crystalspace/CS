@@ -281,7 +281,7 @@ void csCubeMeshObject::UpdateLighting (iLight** lights, int num_lights,
     colors[i].Clamp (2., 2., 2.);
 }
 
-bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* movable)
+bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
 {
 // @@@ TODO:
 //     - Z fill vs Z use

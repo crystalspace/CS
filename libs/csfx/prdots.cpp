@@ -76,7 +76,7 @@ void csProcDots::Animate (cs_time current_time)
   last_cur_time = current_time;
 
   if (!ptG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-  int i;
+  cs_time i;
   for (i = 0 ; i < elapsed / 10 ; i++)
     ptG2D->DrawPixel (GetRandom (mat_w), GetRandom (mat_h), palette[GetRandom (255)]);
   ptG3D->FinishDraw ();

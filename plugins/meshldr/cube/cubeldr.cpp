@@ -153,7 +153,7 @@ iBase* csCubeLoader::Parse (const char* string, iEngine* engine)
   char* params;
   char str[255];
 
-  iMeshObject* mesh;
+  iMeshObject* mesh = 0;
 
   char* buf = (char*)string;
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)

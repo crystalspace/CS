@@ -376,13 +376,13 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
 
     // Consider a ray between (0,0,0) and v and calculate the thickness of every
     // fogged sector in between.
-    csFogInfo* fog_info = fog_info;
-    while (fog_info)
+    csFogInfo* finfo = fog_info;
+    while (finfo)
     {
       float dist1, dist2;
-      if (fog_info->has_incoming_plane)
+      if (finfo->has_incoming_plane)
       {
-	const csPlane3& pl = fog_info->incoming_plane;
+	const csPlane3& pl = finfo->incoming_plane;
 	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
 	//dist1 = v.Norm () * (-pl.DD / denom);
         dist1 = v.z * (-pl.DD / denom);
@@ -392,7 +392,7 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
       //@@@ assume all FX polygons have no outgoing plane
       if (!added_fog_info)
       {
-        const csPlane3& pl = fog_info->outgoing_plane;
+        const csPlane3& pl = finfo->outgoing_plane;
         float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
         //dist2 = v.Norm () * (-pl.DD / denom);
         dist2 = v.z * (-pl.DD / denom);
@@ -402,14 +402,14 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
 
 #ifdef USE_EXP_FOG
       // Implement semi-exponential fog (linearily approximated)
-      UInt table_index = QRound ((100 * ABS (dist2 - dist1)) * fog_info->fog->density);
+      UInt table_index = QRound ((100 * ABS (dist2 - dist1)) * finfo->fog->density);
       float I2;
       if (table_index < FOG_EXP_TABLE_SIZE)
         I2 = fog_exp_table [table_index];
       else
         I2 = fog_exp_table[FOG_EXP_TABLE_SIZE-1];
 #else
-      float I2 = ABS (dist2 - dist1) * fog_info->fog->density;
+      float I2 = ABS (dist2 - dist1) * finfo->fog->density;
 #endif
 
       if (mesh.vertex_fog[i].intensity)
@@ -425,19 +425,19 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
 	float I1 = mesh.vertex_fog[i].intensity;
 	mesh.vertex_fog[i].intensity = I1 + I2 - I1*I2;
 	float fact = 1. / (I1 + I2 - I1*I2);
-	mesh.vertex_fog[i].r = (I2*fog_info->fog->red + I1*mesh.vertex_fog[i].r + I1*I2*mesh.vertex_fog[i].r) * fact;
-	mesh.vertex_fog[i].g = (I2*fog_info->fog->green + I1*mesh.vertex_fog[i].g + I1*I2*mesh.vertex_fog[i].g) * fact;
-	mesh.vertex_fog[i].b = (I2*fog_info->fog->blue + I1*mesh.vertex_fog[i].b + I1*I2*mesh.vertex_fog[i].b) * fact;
+	mesh.vertex_fog[i].r = (I2*finfo->fog->red + I1*mesh.vertex_fog[i].r + I1*I2*mesh.vertex_fog[i].r) * fact;
+	mesh.vertex_fog[i].g = (I2*finfo->fog->green + I1*mesh.vertex_fog[i].g + I1*I2*mesh.vertex_fog[i].g) * fact;
+	mesh.vertex_fog[i].b = (I2*finfo->fog->blue + I1*mesh.vertex_fog[i].b + I1*I2*mesh.vertex_fog[i].b) * fact;
       }
       else
       {
         // The first fog level.
         mesh.vertex_fog[i].intensity = I2;
-        mesh.vertex_fog[i].r = fog_info->fog->red;
-        mesh.vertex_fog[i].g = fog_info->fog->green;
-        mesh.vertex_fog[i].b = fog_info->fog->blue;
+        mesh.vertex_fog[i].r = finfo->fog->red;
+        mesh.vertex_fog[i].g = finfo->fog->green;
+        mesh.vertex_fog[i].b = finfo->fog->blue;
       }
-      fog_info = fog_info->next;
+      finfo = fog_info->next;
     }
   }
 }

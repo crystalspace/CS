@@ -1,5 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
+31-Dec-2000
+	- Eric Sunshine fixed compilation warnings in engine.cpp, rview.cpp,
+	  meshobj.cpp, prdots.cpp, prfire.cpp, proctex.cpp, cubeldr.cpp, and
+	  cube.cpp.
+	- Eric Sunshine fixed a bizarre bug in csRenderView's
+	  CalculateFogMesh() where a local `fog_info' variable was incorrectly
+	  initialized.  (There is no way that this code could have ever worked
+	  correctly prior to being repaired.)
+	- Eric Sunshine fixed a bug in cspython.mak where it would potentially
+	  try to compile cs_pyth.cpp twice.
+	- Eric Sunshine modified the Python plug-in makefile so that
+	  compilation warnings are disabled for the Swig-generated cs_pyth.cpp
+	  source file.  This was done since cs_pyth.cpp is known to spew many
+	  compilation warnings, yet because it is auto-generated, it is out of
+	  our control to eliminate the warnings.
+	- Eric Sunshine fixed the broken `linex2dclean' makefile target.
 30-Dec-2000
 	- Philip Wyett fixed some of the 3D renderers that Jorrit forgot
 	  to fix yesterday.
@@ -53,7 +69,7 @@ The history order has been reversed so that new features are at the top.
 29-Dec-2000
 	- Added iRenderView::ClipBBox() to test if a screen bounding box
 	  is visible and needs to be clipped. In addition it does far plane
-	  clipping. Thus is provides a quick and easy way for a mesh object
+	  clipping. Thus it provides a quick and easy way for a mesh object
 	  plugin to test if some object is visible and needs to be clipped.
 	  The code is a straight copy from the code that was in csSprite3D.
 	  csSprite3D now also uses this function.
@@ -64,23 +80,23 @@ The history order has been reversed so that new features are at the top.
 	  testing quick visibility. Draw() will do the real work. In between
 	  UpdateLighting() can optionally be called.
 	- Added IsMirrored() to iCamera.
-	- Fixed the python plugin for the change of GetAspect() to GetFOV().
-	- Changed iGraphics3D::GetObjectToCamera so that it returns a
+	- Fixed the Python plugin for the change of GetAspect() to GetFOV().
+	- Changed iGraphics3D::GetObjectToCamera() so that it returns a
 	  reference to the transformation. Modified all the 3D drivers
 	  accordingly.
 	- Extended iLight SCF structure to make it useful for calculating
 	  lighting in the cube plugin.
 	- Changed csLight to let it implement iLight through embedding
 	  instead of inheritance.
-	- Fixed UpdateLighting for csMeshObject.
-	- Added SetMixMode and GetMixMode to iCubeMeshObject interface.
+	- Fixed UpdateLighting() for csMeshObject.
+	- Added SetMixMode() and GetMixMode() to iCubeMeshObject interface.
 	- Did some cleanup to various of the SCF include files (comments
 	  and CS code style).
 	- All the above changes accomplish the following for the cube plugin:
 	    - Lighting works now (similarly to how sprite lighting works but
 	      a bit simpler).
-	    - Cube will correctly be rendered through a mirror.
-	    - Changed simple so that the new cube is moved around at the
+	    - Cube will be correctly rendered through a mirror.
+	    - Changed Simple so that the new cube moves around at the
 	      same rate as the dynamic light at the top of the room.
 	      That way you can see how the lighting is dynamically updated.
 	    - Cube now uses the plasma procedural texture.
@@ -91,10 +107,10 @@ The history order has been reversed so that new features are at the top.
 	      8-bit textures) overwrites the blend tables for the 16/32-bit
 	      render mode as well.
 28-Dec-2000
-	- Philip Wyett did a small fix to the cube plugin header.
+	- Philip Wyett made a small fix to the cube plugin header.
 	- Seth Galbraith added more error checking to the MD2 importer.
 	- Added Visit() to iMaterialWrapper.
-	- Cube plugin now renders using DrawTriangleMesh.
+	- Cube plugin now renders using DrawTriangleMesh().
 	- Added CalculateFogMesh() and CalculateFogPolygon() to iRenderView.
 	  Mesh object plugins can call this function to update the fog
 	  information in the mesh or poly object. Removed the badly
@@ -115,7 +131,7 @@ The history order has been reversed so that new features are at the top.
 	- Added GetMaterialHandle() to iMaterialWrapper interface.
 	- Extended Draw() in iMeshObject with an iMovable parameter.
 	- Added GetTransform() in iCamera.
-	- Made QUERY_INTERFACE macro a tiny bit safer.
+	- Made QUERY_INTERFACE macro a wee bit safer.
 	- Fixed a bug in csCamera. One of the constructors didn't properly
 	  initialize the SCF stuff for iCamera. Also changed csCamera
 	  so that iCamera is now implemented through embedding instead
@@ -130,23 +146,22 @@ The history order has been reversed so that new features are at the top.
 26-Dec-2000
 	- Samuel Humphreys did the following:
 	    - Little clean up of ptlab.
-	    - Fixed the proc textures after AndyZ's recent changes.
-	    - Removed Jorrits additional PrepareTextures in protex3d.cpp
-	    - Fixed Simple to display ProcTextures properly with the
+	    - Fixed procedural textures after AndyZ's recent changes.
+	    - Removed Jorrit's additional PrepareTextures() from protex3d.cpp.
+	    - Fixed Simple to display procedural textures properly with the
 	      global palette properly communicated.
-	    - Cleaned up csphyzik library.
-	- csparser no longer deletes all textures and materials in
-	  the MATERIALS and TEXTURES statement. This caused bad
-	  crashes with the portal command. The portal command is now working
-	  properly again.
+	    - Cleaned up csphyzik library file formatting.
+	- csParser no longer deletes all textures and materials in the
+	  MATERIALS and TEXTURES statement. This caused bad crashes with the
+	  portal command. The portal command is now working properly again.
 	- Added iRenderView and let csRenderView implement this through
 	  embedding.
 	- Added iClipper2D and let csClipper implement this through
 	  inheritance.
 	- Removed csClipper::IsInside(x,y) so that only the csVector2 version
 	  remains.
-	- Renamed the inplace clipper called 'Clip' to 'ClipInPlace' to
-	  avoid C++ inheritance clashes.
+	- Renamed the in-place clipper from 'Clip' to 'ClipInPlace' to avoid
+	  C++ inheritance clashes.
 	- Added iMeshObject interface which will eventually be used
 	  to move sprites, and particle systems outside the engine as plugins.
 	- Additionally added iMeshObjectFactory plugin. This is a plugin
@@ -155,19 +170,20 @@ The history order has been reversed so that new features are at the top.
 	- Added csCubeMeshObject as a plugin (in plugins/meshobj/cube) which
 	  represents a simple cube that is going to be used as a test-base
 	  for the new iMeshObject system. Only when csCubeMeshObject is
-	  working properly am I going to port csSprite3D and csParticleSystem
+	  working properly; I am going to port csSprite3D and csParticleSystem
 	  to iMeshObject.
-	- Added csMeshObject which is the engine holder for iMeshObject
-	  plugin objects. csMeshObject is eventually going to replace csSprite.
+	- Added csMeshObject which is the engine's implementation of
+	  iMeshObject. csMeshObject is eventually going to replace csSprite.
 	  It will controll all aspects of mesh objects which are global and
 	  pass them on to the various implementations of iMeshObject.
-	- Added code to simple to query this new cube plugin.
+	- Added code to Simple to query this new cube plugin.
 25-Dec-2000
-	- Norman Kramer changes pixmap so that they incref and decref
-	  the texturehandle it has in use. (just came across this when
-	  someone added engine->startengine to LoadMapFile - all my pixmaps
-	  that held texturehandles created via LoadTexture before LoadMapFile
-	  were invalid).
+	- Norman Kramer changed csPixmap so that it calls IncRef() and
+	  DecRef() on the contained iTextureHandle.  He states that he came
+	  across this issue when someone added an `engine->StartEngine()'
+	  invocation to LoadMapFile(); all his pixmaps that held
+	  iTextureHandles created via LoadTexture() before LoadMapFile() was
+	  invoked became invalid.
 24-Dec-2000
 	- Norman Kramer added CSFX lib to several of the makefiles.
 	- Eric Sunshine made a slight modification to handling of the Backspace

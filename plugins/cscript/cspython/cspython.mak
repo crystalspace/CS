@@ -52,11 +52,13 @@ else
 # TO_INSTALL.STATIC_LIBS += $(CSPYTHON)
 endif
 
-SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
 SWIG.INTERFACE = plugins/cscript/common/cs.i
+SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
+SWIG.CSPYTHON.OBJ = $(addprefix $(OUT),$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
 
 INC.CSPYTHON = $(wildcard plugins/cscript/cspython/*.h)
-SRC.CSPYTHON = $(wildcard plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON)
+SRC.CSPYTHON = \
+  $(sort $(wildcard plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON))
 OBJ.CSPYTHON = $(addprefix $(OUT),$(notdir $(SRC.CSPYTHON:.cpp=$O)))
 DEP.CSPYTHON = CSGEOM CSSYS CSUTIL CSSYS
 
@@ -75,6 +77,9 @@ ifeq ($(MAKESECTION),targets)
 all: $(CSPYTHON.LIB)
 cspython: $(OUTDIRS) $(CSPYTHON)
 clean: cspythonclean
+
+$(SWIG.CSPYTHON.OBJ): $(SWIG.CSPYTHON)
+	$(filter-out -W -Wunused -Wall,$(DO.COMPILE.CPP) $(CFLAGS.PYTHON))
 
 $(OUT)%$O: plugins/cscript/cspython/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PYTHON)

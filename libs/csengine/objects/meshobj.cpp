@@ -64,7 +64,7 @@ void csMeshWrapper::ScaleBy (float factor)
 }
 
 
-void csMeshWrapper::Rotate (float angle)
+void csMeshWrapper::Rotate (float /*angle*/)
 {
   //csZRotMatrix3 rotz (angle);
   //movable.Transform (rotz);
@@ -74,14 +74,14 @@ void csMeshWrapper::Rotate (float angle)
 }
 
 
-void csMeshWrapper::SetColor (const csColor& col)
+void csMeshWrapper::SetColor (const csColor& /*col*/)
 {
   //for (int i=0; i<tpl->GetNumTexels (); i++)
     //SetVertexColor (i, col);
 }
 
 
-void csMeshWrapper::AddColor (const csColor& col)
+void csMeshWrapper::AddColor (const csColor& /*col*/)
 {
   //for (int i=0; i<tpl->GetNumTexels (); i++)
     //AddVertexColor (i, col);
@@ -123,8 +123,8 @@ void csMeshWrapper::UpdateLighting (csLight** lights, int num_lights)
 }
 
 
-bool csMeshWrapper::HitBeamObject (const csVector3& start, const csVector3& end,
-	csVector3& isect, float* pr)
+bool csMeshWrapper::HitBeamObject (const csVector3& /*start*/,
+  const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
 {
   return false;
 }

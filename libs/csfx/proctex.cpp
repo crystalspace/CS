@@ -53,7 +53,7 @@ csProcTexture::~csProcTexture ()
 {
 }
 
-void csProcTexture::ProcCallback (csTextureWrapper* txt, void* data)
+void csProcTexture::ProcCallback (csTextureWrapper*, void* data)
 {
   csProcTexture* pt = (csProcTexture*)data;
   cs_time elapsed_time, current_time;

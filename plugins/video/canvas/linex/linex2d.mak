@@ -74,7 +74,7 @@ $(LINEX2D): $(OBJ.LINEX2D) $(LIB.LINEX2D)
 	$(DO.PLUGIN) $(LIB.LINEX2D.SPECIAL)
 
 clean: linelibxclean
-linelibxclean:
+linex2dclean:
 	$(RM) $(LINEX2D) $(OBJ.LINEX2D) $(OUTOS)linex2d.dep
 
 ifdef DO_DEPEND

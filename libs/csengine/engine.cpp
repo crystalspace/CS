@@ -1452,7 +1452,7 @@ csStatLight* csEngine::FindLight (CS_ID id)
   return NULL;
 }
 
-csStatLight* csEngine::FindLight (const char* name, bool regionOnly)
+csStatLight* csEngine::FindLight (const char* name, bool /*regionOnly*/)
 {
   //@@@### regionOnly
   csStatLight* l;
