@@ -317,6 +317,51 @@ inline char* __VfsCheckVar(const char* VarName)
    }
 #endif // CS_SYSDEF_PROVIDE_TEMP
 
+// Microsoft Visual C++ compiler includes a very in-efficient 'memcpy'.
+// This also replaces the older 'better_memcpy',which was also not as
+// efficient as it could be ergo...heres a better solution.
+#ifdef COMP_VC
+#include <memory.h>
+#define memcpy fast_mem_copy
+static inline void* fast_mem_copy (void *dest, const void *src, int count)
+{
+    __asm
+    {
+      mov		eax, count
+      mov		esi, src
+      mov		edi, dest
+      xor		ecx, ecx
+
+      // Check for 'short' moves
+      cmp		eax, 16
+      jl		do_short
+		
+      // Move enough bytes to align 'dest'
+      sub		ecx, edi
+      and		ecx, 3
+      je		skip
+      sub		eax, ecx
+      rep		movsb
+
+      skip:
+        mov		ecx, eax
+        and		eax, 3
+        shr		ecx, 2
+        rep		movsd
+        test	eax, eax
+        je		end
+
+      do_short:
+        mov		ecx, eax
+        rep		movsb
+
+      end:
+    }
+
+    return dest;
+}
+#endif
+
 #ifdef COMP_BC
 // Major hack due to pow failures in CS for Borland, removing this
 // causes millions of strings to print out -- Brandon Ehle
