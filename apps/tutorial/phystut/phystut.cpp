@@ -533,9 +533,6 @@ iRigidBody* Simple::CreateSphere (void)
 
 iJoint* Simple::CreateJointed (void)
 {
-  // Use the camera transform.
-  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
-
   // Create and position objects.
   iRigidBody* rb1 = CreateBox();
   rb1->SetPosition (rb1->GetPosition () +
