@@ -25,6 +25,8 @@
 #include "csgeom/pmtools.h"
 #include "igeom/objmodel.h"
 #include "igeom/polymesh.h"
+#include "iengine/mesh.h"
+#include "iutil/object.h"
 #include "dmodel.h"
 
 //---------------------------------------------------------------------------
@@ -150,7 +152,8 @@ void csObjectModelManager::ReleaseObjectModel (csObjectModel* model)
   model->ref_cnt--;
 }
 
-bool csObjectModelManager::CheckObjectModel (csObjectModel* model)
+bool csObjectModelManager::CheckObjectModel (csObjectModel* model,
+	iMeshWrapper* mw)
 {
   CS_ASSERT (model->ref_cnt > 0);
   if (model->imodel->GetShapeNumber () != model->shape_number)
@@ -173,6 +176,22 @@ bool csObjectModelManager::CheckObjectModel (csObjectModel* model)
       	mesh, model->num_edges);
       csPolygonMeshTools::CheckActiveEdges (model->edges, model->num_edges,
       	model->planes);
+
+      // Here we scan all edges and see if there are edges that have only
+      // one adjacent polygon. If we find such an edge then we will not use
+      // outline based culling for this object. This is not good as it will
+      // slow down culling so you should try to avoid this situation in levels.
+      model->use_outline_filler = true;
+      int i;
+      for (i = 0 ; i < model->num_edges ; i++)
+        if (model->edges[i].poly2 == -1)
+	{
+	  model->use_outline_filler = false;
+	  printf ("WARNING! Object '%s' is not closed!\n", mw != NULL ?
+	  	mw->QueryObject ()->GetName () : "<no mesh>");
+	  fflush (stdout);
+	  break;
+	}
     }
     return true;
   }

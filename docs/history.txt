@@ -11,6 +11,11 @@ The history order is reversed so that new features are at the top.
 	- Keith Fulton submitted a small fix for csFont length measurement
 	  which was using the same width for all characters even in
 	  proportional fonts.
+	- Added a hack to Dynavis so it will detect objects that are not
+	  closed (i.e. objects that have holes in them). Dynavis cannot
+	  properly work with these kinds of objects so it is best to fix
+	  them. When Dynavis encounters such objects it will switch
+	  to a slower culling method (for those objects only).
 4-Nov-2002
 	- Significantly optimized walking around in walktest in sectors
 	  with a huge number of objects. Walktest was doing QUERY_INTERFACE

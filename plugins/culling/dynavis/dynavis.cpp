@@ -278,11 +278,6 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   visobj_wrap->model = model_mgr->CreateObjectModel (
 		  visobj->GetObjectModel ());
   visobj_wrap->shape_number = visobj_wrap->model->GetShapeNumber ();
-  model_mgr->CheckObjectModel (visobj_wrap->model);
-
-  csBox3 bbox;
-  CalculateVisObjBBox (visobj, bbox);
-  visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
 
   csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (visobj, iMeshWrapper));
   visobj_wrap->mesh = mesh;
@@ -295,6 +290,11 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
     visobj_wrap->thing_state = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
 	iThingState);
   }
+  model_mgr->CheckObjectModel (visobj_wrap->model, mesh);
+
+  csBox3 bbox;
+  CalculateVisObjBBox (visobj, bbox);
+  visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
 
   // Only add the listeners at the very last moment to prevent them to
   // be called by the calls above (i.e. especially the calculation of
@@ -333,7 +333,7 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
 {
   iVisibilityObject* visobj = visobj_wrap->visobj;
   iMovable* movable = visobj->GetMovable ();
-  model_mgr->CheckObjectModel (visobj_wrap->model);
+  model_mgr->CheckObjectModel (visobj_wrap->model, visobj_wrap->mesh);
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
   kdtree->MoveObject (visobj_wrap->child, bbox);
@@ -751,6 +751,10 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   csBox2 sbox;
   float min_depth = 0;
 
+  bool cull_coverage = do_cull_coverage;
+  if (!obj->model->CanUseOutlineFiller ())
+    cull_coverage = COVERAGE_POLYGON;
+
   csVisibilityObjectHistory* hist = obj->history;
 
   if (obj->visobj->GetVisibilityNumber () != current_visnr)
@@ -782,7 +786,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       goto end;
     }
 
-    if (do_cull_coverage != COVERAGE_NONE)
+    if (cull_coverage != COVERAGE_NONE)
     {
       iCamera* camera = data->rview->GetCamera ();
       iMovable* movable = obj->visobj->GetMovable ();
@@ -835,7 +839,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	    do
 	    {
 	      // Yes! We found such an object. Insert it now.
-	      if (do_cull_coverage == COVERAGE_POLYGON)
+	      if (cull_coverage == COVERAGE_POLYGON)
 		  UpdateCoverageBuffer (data->rview->GetCamera (), qobj->visobj,
 		    qobj->model);
 	      else
@@ -876,7 +880,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   }
 
 end:
-  if (do_write_object && do_cull_coverage != COVERAGE_NONE &&
+  if (do_write_object && cull_coverage != COVERAGE_NONE &&
   	obj->visobj->GetObjectModel ()->GetSmallerPolygonMesh ())
   {
     // Object is visible.
@@ -890,8 +894,8 @@ end:
     else
     {
       // Let it update the coverage buffer if we
-      // are using do_cull_coverage.
-      if (do_cull_coverage == COVERAGE_POLYGON)
+      // are using cull_coverage.
+      if (cull_coverage == COVERAGE_POLYGON)
         UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
     	    obj->model);
       else

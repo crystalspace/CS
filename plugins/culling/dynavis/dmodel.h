@@ -27,6 +27,7 @@ struct iObjectModel;
 class csObjectModel;
 class csObjectModelManager;
 struct csPolygonMeshEdge;
+struct iMeshWrapper;
 
 /**
  * Outline information.
@@ -82,6 +83,11 @@ private:
   bool has_obb;		// If false then this model doesn't have an obb.
   csOBB obb;		// OBB for this model.
 
+  // If true then we can use the outline filler for this model.
+  // Otherwise this object has bad edges (edges with only one polygon
+  // attached) in which case we use the polygon based culler.
+  bool use_outline_filler;
+
   csPolygonMeshEdge* edges;
   int num_edges;
 
@@ -107,6 +113,9 @@ public:
 
   /// Return true if this model has an OBB.
   bool HasOBB ();
+
+  /// Return true if this model can use outline filler.
+  bool CanUseOutlineFiller () const { return use_outline_filler; }
   
   /// Get the OBB for this model.
   const csOBB& GetOBB ();
@@ -143,7 +152,7 @@ public:
    * of the object it represents has changed). Returns true if the
    * object has been changed.
    */
-  bool CheckObjectModel (csObjectModel* model);
+  bool CheckObjectModel (csObjectModel* model, iMeshWrapper* mesh);
 };
 
 #endif // __CS_DMODEL_H__
