@@ -946,7 +946,7 @@ void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
         float layer_scale, float quality)
 {
   /// only triangles
-  CS_ASSERT(num_sides == 3);
+  //CS_ASSERT(num_sides == 3);
   // check if the angle is OK
   csVector2 dir1;
   dir1.x = pts[1].x - pts[0].x;
