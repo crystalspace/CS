@@ -6170,17 +6170,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_enable_warnings=$cs_build_cflags
-else
-  cs_cv_prog_cxx_enable_warnings=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_enable_warnings" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_enable_warnings" >&6
-    if test "$cs_cv_prog_cxx_enable_warnings" != no; then
-
-	cs_build_prop_val=`echo x$cs_cv_prog_cxx_enable_warnings | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_enable_warnings=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_build_prop_val=`echo x$cs_cv_prog_cxx_enable_warnings | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
 "
@@ -6188,10 +6179,15 @@ echo "${ECHO_T}$cs_cv_prog_cxx_enable_warnings" >&6
 "
 fi
 
+	    :
 else
-  :
+  cs_cv_prog_cxx_enable_warnings=no
+		:
 fi
 
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_enable_warnings" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_enable_warnings" >&6
 
 
 
@@ -6467,17 +6463,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_disable_pragma_warnings=$cs_build_cflags
-else
-  cs_cv_prog_cxx_disable_pragma_warnings=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_disable_pragma_warnings" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_disable_pragma_warnings" >&6
-    if test "$cs_cv_prog_cxx_disable_pragma_warnings" != no; then
-
-	cs_build_prop_val=`echo x$cs_cv_prog_cxx_disable_pragma_warnings | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_disable_pragma_warnings=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_build_prop_val=`echo x$cs_cv_prog_cxx_disable_pragma_warnings | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
 "
@@ -6485,10 +6472,15 @@ echo "${ECHO_T}$cs_cv_prog_cxx_disable_pragma_warnings" >&6
 "
 fi
 
+	    :
 else
-  :
+  cs_cv_prog_cxx_disable_pragma_warnings=no
+		:
 fi
 
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_disable_pragma_warnings" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_disable_pragma_warnings" >&6
 
 
 
@@ -6622,17 +6614,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_disable_exceptions=$cs_build_cflags
-else
-  cs_cv_prog_cxx_disable_exceptions=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_disable_exceptions" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_disable_exceptions" >&6
-    if test "$cs_cv_prog_cxx_disable_exceptions" != no; then
-
-	cs_build_prop_val=`echo x$cs_cv_prog_cxx_disable_exceptions | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_disable_exceptions=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_build_prop_val=`echo x$cs_cv_prog_cxx_disable_exceptions | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CXXFLAGS.SYSTEM += $cs_build_prop_val
 "
@@ -6640,10 +6623,15 @@ echo "${ECHO_T}$cs_cv_prog_cxx_disable_exceptions" >&6
 "
 fi
 
+	    :
 else
-  :
+  cs_cv_prog_cxx_disable_exceptions=no
+		:
 fi
 
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_disable_exceptions" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_disable_exceptions" >&6
 
 
 
@@ -6780,17 +6768,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_link_suppress_multiple=$cs_build_lflags
-else
-  cs_cv_prog_link_suppress_multiple=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_link_suppress_multiple" >&5
-echo "${ECHO_T}$cs_cv_prog_link_suppress_multiple" >&6
-    if test "$cs_cv_prog_link_suppress_multiple" != no; then
-
-	cs_build_prop_val=`echo x$cs_cv_prog_link_suppress_multiple | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_link_suppress_multiple=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_build_prop_val=`echo x$cs_cv_prog_link_suppress_multiple | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}MACOSX.LFLAGS.CONFIG += $cs_build_prop_val
 "
@@ -6798,10 +6777,336 @@ echo "${ECHO_T}$cs_cv_prog_link_suppress_multiple" >&6
 "
 fi
 
+	    :
 else
-  :
+  cs_cv_prog_link_suppress_multiple=no
+		:
 fi
 
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_link_suppress_multiple" >&5
+echo "${ECHO_T}$cs_cv_prog_link_suppress_multiple" >&6
+
+
+
+#------------------------------------------------------------------------------
+# Check if the linker recognizes "-force_cpusubtype_ALL".  This is required on
+# MacOS/X since the Crystal Space's PowerPC implementation of qsqrt() uses the
+# `frsqrte' instruction which is only valid when the -force_cpusubtype_ALL flag
+# is present.
+#------------------------------------------------------------------------------
+
+
+echo "$as_me:$LINENO: checking if -force_cpusubtype_ALL is needed" >&5
+echo $ECHO_N "checking if -force_cpusubtype_ALL is needed... $ECHO_C" >&6
+if test "${cs_cv_prog_cxx_force_cpusubtype_all+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@-force_cpusubtype_ALL@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_force_cpusubtype_all=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		:
+else
+  cs_cv_prog_cxx_force_cpusubtype_all=no
+		:
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_force_cpusubtype_all" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_force_cpusubtype_all" >&6
+if test $cs_cv_prog_cxx_force_cpusubtype_all != no; then
+  cs_build_prop_val=`echo x$cs_cv_prog_cxx_force_cpusubtype_all | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# Check if the MacOS/X compiler recognizes "-fno-common".  This flag is needed
+# when building plugin modules (and the libraries which are linked into
+# plugins) prior to Apple's introduction of the two-level namespace symbol
+# scheme in order to ensure that each plugin module gets its own copy of
+# uninitialized global variables.
+#------------------------------------------------------------------------------
+
+
+
+    case $host_os in
+	darwin*)
+	    echo "$as_me:$LINENO: checking if -fno-common is needed" >&5
+echo $ECHO_N "checking if -fno-common is needed... $ECHO_C" >&6
+if test "${cs_cv_prog_cxx_no_common+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@-fno-common@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_no_common=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_build_prop_val=`echo x$cs_cv_prog_cxx_no_common | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+"
+fi
+
+	    :
+else
+  cs_cv_prog_cxx_no_common=no
+		:
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_no_common" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_no_common" >&6
+	    ;;
+    esac
 
 
 
@@ -6944,17 +7249,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_vtable_thunks=-fvtable-thunks
-else
-  cs_cv_prog_cxx_vtable_thunks=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_vtable_thunks" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_vtable_thunks" >&6
-    if test "$cs_cv_prog_cxx_vtable_thunks" != no; then
-
-	cs_build_prop_val=`echo x$cs_cv_prog_cxx_vtable_thunks | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_vtable_thunks=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_build_prop_val=`echo x-fvtable-thunks | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CXXFLAGS.SYSTEM += $cs_build_prop_val
 "
@@ -6963,9 +7259,13 @@ echo "${ECHO_T}$cs_cv_prog_cxx_vtable_thunks" >&6
 fi
 
 else
-  :
+  cs_cv_prog_cxx_vtable_thunks=no
+		:
 fi
 
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_vtable_thunks" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_vtable_thunks" >&6
 	    ;;
     esac
 
@@ -7101,17 +7401,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_pipe=$cs_build_cflags
-else
-  cs_cv_prog_cxx_pipe=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_pipe" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_pipe" >&6
-    if test "$cs_cv_prog_cxx_pipe" != no; then
-
-	cs_build_prop_val=`echo x$cs_cv_prog_cxx_pipe | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_pipe=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_build_prop_val=`echo x$cs_cv_prog_cxx_pipe | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
 "
@@ -7119,10 +7410,15 @@ echo "${ECHO_T}$cs_cv_prog_cxx_pipe" >&6
 "
 fi
 
+	    :
 else
-  :
+  cs_cv_prog_cxx_pipe=no
+		:
 fi
 
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_pipe" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_pipe" >&6
 
 
 
@@ -8465,17 +8761,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_optimize=$cs_build_cflags
-else
-  cs_cv_prog_cxx_optimize=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_optimize" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_optimize" >&6
-    if test "$cs_cv_prog_cxx_optimize" != no; then
-  cs_optimize_flags="$cs_optimize_flags $cs_cv_prog_cxx_optimize"
-	cs_build_prop_val=`echo x$cs_cv_prog_cxx_optimize | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_optimize=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_build_prop_val=`echo x$cs_cv_prog_cxx_optimize | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.optimize += $cs_build_prop_val
 "
@@ -8483,10 +8770,15 @@ echo "${ECHO_T}$cs_cv_prog_cxx_optimize" >&6
 "
 fi
 
+	    cs_optimize_flags="$cs_optimize_flags $cs_cv_prog_cxx_optimize"
 else
-  :
+  cs_cv_prog_cxx_optimize=no
+		:
 fi
 
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_optimize" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_optimize" >&6
 
     echo "$as_me:$LINENO: checking if $CXX recognizes -fomit-frame-pointer" >&5
 echo $ECHO_N "checking if $CXX recognizes -fomit-frame-pointer... $ECHO_C" >&6
@@ -8615,18 +8907,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_omit_frame_pointer=$cs_build_cflags
-else
-  cs_cv_prog_cxx_omit_frame_pointer=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_omit_frame_pointer" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_omit_frame_pointer" >&6
-    if test "$cs_cv_prog_cxx_omit_frame_pointer" != no; then
-  cs_optimize_flags="$cs_optimize_flags \
-	    $cs_cv_prog_cxx_omit_frame_pointer"
-	cs_build_prop_val=`echo x$cs_cv_prog_cxx_omit_frame_pointer | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_omit_frame_pointer=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_build_prop_val=`echo x$cs_cv_prog_cxx_omit_frame_pointer | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.optimize += $cs_build_prop_val
 "
@@ -8634,10 +8916,16 @@ echo "${ECHO_T}$cs_cv_prog_cxx_omit_frame_pointer" >&6
 "
 fi
 
+	    cs_optimize_flags="$cs_optimize_flags \
+	    $cs_cv_prog_cxx_omit_frame_pointer"
 else
-  :
+  cs_cv_prog_cxx_omit_frame_pointer=no
+		:
 fi
 
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_omit_frame_pointer" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_omit_frame_pointer" >&6
 
     echo "$as_me:$LINENO: checking if $CXX recognizes -ffast-math" >&5
 echo $ECHO_N "checking if $CXX recognizes -ffast-math... $ECHO_C" >&6
@@ -8766,17 +9054,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_fast_math=$cs_build_cflags
-else
-  cs_cv_prog_cxx_fast_math=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_fast_math" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_fast_math" >&6
-    if test "$cs_cv_prog_cxx_fast_math" != no; then
-  cs_optimize_flags="$cs_optimize_flags $cs_cv_prog_cxx_fast_math"
-	cs_build_prop_val=`echo x$cs_cv_prog_cxx_fast_math | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_fast_math=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_build_prop_val=`echo x$cs_cv_prog_cxx_fast_math | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.optimize += $cs_build_prop_val
 "
@@ -8784,10 +9063,15 @@ echo "${ECHO_T}$cs_cv_prog_cxx_fast_math" >&6
 "
 fi
 
+	    cs_optimize_flags="$cs_optimize_flags $cs_cv_prog_cxx_fast_math"
 else
-  :
+  cs_cv_prog_cxx_fast_math=no
+		:
 fi
 
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_fast_math" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_fast_math" >&6
 
 
 
@@ -8921,17 +9205,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_debug=$cs_build_cflags
-else
-  cs_cv_prog_cxx_debug=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_debug" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_debug" >&6
-    if test "$cs_cv_prog_cxx_debug" != no; then
-
-	cs_build_prop_val=`echo x$cs_cv_prog_cxx_debug | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_debug=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_build_prop_val=`echo x$cs_cv_prog_cxx_debug | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.debug += $cs_build_prop_val
 "
@@ -8939,10 +9214,15 @@ echo "${ECHO_T}$cs_cv_prog_cxx_debug" >&6
 "
 fi
 
+	    :
 else
-  :
+  cs_cv_prog_cxx_debug=no
+		:
 fi
 
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_debug" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_debug" >&6
 if test $cs_cv_prog_cxx_debug != no; then
   cs_build_prop_val=`echo x$cs_cv_prog_cxx_debug | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -26386,11 +26666,14 @@ fi
 #	content, but also buggy versions which fail with an internal error on
 #	this file (such as the RedHat 7 gcc).  Furthermore, it is reported that
 #	some versions of gcc 3.2.x cause qsqrt() to return bogus results when
-#	compiled in optimize mode.  It is reported that this same compiler
-#	crashes with an internal error when -fPIC is used, so we use -fPIC as a
-#	way to detect this buggy compiler.  Sets the shell variable
-#	cs_cv_cxx_qsqrt_ok to "yes" if qsqrt.h is usable, otherwise "no".
+#	compiled in optimize mode on Intel hardware.  It is reported that this
+#	same compiler crashes with an internal error when -fPIC is used, so we
+#	use -fPIC as a way to detect this buggy compiler.  The MacOS/X PowerPC
+#	version of qsqrt() requires the -force_cpusubtype_ALL flag, so we use
+#	that flag when available.  Sets the shell variable cs_cv_cxx_qsqrt_ok
+#	to "yes" if qsqrt.h is usable, otherwise "no".
 #------------------------------------------------------------------------------
+
 
 
 
@@ -26540,6 +26823,10 @@ else
   cs_qsqrt_cflags="$cs_optimize_flags"
 	    if test $cs_cv_prog_cxx_fpic != no; then
   cs_qsqrt_cflags="$cs_qsqrt_cflags $cs_cv_prog_cxx_fpic"
+fi
+
+	    if test $cs_cv_prog_cxx_force_cpusubtype_all != no; then
+  cs_qsqrt_cflags="$cs_cv_prog_cxx_force_cpusubtype_all"
 fi
 
 	    ac_ext=cc

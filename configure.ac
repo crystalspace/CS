@@ -127,8 +127,8 @@ AC_DEFUN([CS_EMIT_BUILD_RESULT],
 
 #------------------------------------------------------------------------------
 # CS_EMIT_BUILD_FLAGS(MESSAGE, CACHE-VAR, FLAGS, [LANGUAGE],
-#                     MAKEFILE-VARIABLE, [APPEND], [CACHE-VALUE],
-#                     [ACTION-IF-RECOGNIED], [ACTION-IF-NOT-RECOGNIED])
+#                     MAKEFILE-VARIABLE, [APPEND], [ACTION-IF-RECOGNIZED],
+#                     [ACTION-IF-NOT-RECOGNIZED])
 #	Check if the compiler or linker recognizes a command-line option.
 #	MESSAGE is the "checking" message.  CACHE-VAR is the shell cache
 #	variable which receives the flag recognized by the compiler or linker,
@@ -150,13 +150,10 @@ AC_DEFUN([CS_EMIT_BUILD_RESULT],
 #	invoked.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_BUILD_FLAGS],
-    [AC_CACHE_CHECK([$1], [$2],
-	[CS_BUILD_IFELSE([], [$3], [$4],
-	    [$2=m4_default([$7],[$cs_build_cflags])], [$2=no])])
-    AS_IF([test "$$2" != no],
-	[$8
-	CS_BUILD_PROPERTY([$5], [$$2], [$6])],
-	[m4_default([$9],[:])])])
+    [CS_CHECK_BUILD_FLAGS([$1], [$2], [$3], [$4],
+	[CS_BUILD_PROPERTY([$5], [$$2], [$6])
+	    m4_default([$7],[:])],
+	[m4_default([$8],[:])])])
 
 
 
@@ -686,9 +683,48 @@ CS_EMIT_BUILD_FLAGS([how to disable C++ exceptions],
 # Objective-C.
 #------------------------------------------------------------------------------
 CS_EMIT_BUILD_FLAGS([if -multiply_defined suppress is needed],
-    [cs_cv_prog_link_suppress_multiple],
-    [CS_CREATE_TUPLE([], [-multiply_defined suppress])], [],
-    [MACOSX.LFLAGS.CONFIG], [+], [$cs_build_lflags])
+    [cs_cv_prog_link_suppress_multiple], [CS_CREATE_TUPLE([],
+    [-multiply_defined suppress])], [], [MACOSX.LFLAGS.CONFIG], [+])
+
+
+
+#------------------------------------------------------------------------------
+# Check if the linker recognizes "-force_cpusubtype_ALL".  This is required on
+# MacOS/X since the Crystal Space's PowerPC implementation of qsqrt() uses the
+# `frsqrte' instruction which is only valid when the -force_cpusubtype_ALL flag
+# is present.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_FORCE_CPUSUBTYPE_ALL],
+    [CS_CHECK_BUILD_FLAGS([if -force_cpusubtype_ALL is needed],
+	[cs_cv_prog_cxx_force_cpusubtype_all],
+	[CS_CREATE_TUPLE([], [-force_cpusubtype_ALL])])])
+    
+CS_CHECK_FORCE_CPUSUBTYPE_ALL
+AS_IF([test $cs_cv_prog_cxx_force_cpusubtype_all != no],
+    [CS_BUILD_PROPERTY([CFLAGS.SYSTEM],
+	[$cs_cv_prog_cxx_force_cpusubtype_all], [+])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if the MacOS/X compiler recognizes "-fno-common".  This flag is needed
+# when building plugin modules (and the libraries which are linked into
+# plugins) prior to Apple's introduction of the two-level namespace symbol
+# scheme in order to ensure that each plugin module gets its own copy of
+# uninitialized global variables.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_NO_COMMON],
+    [AC_REQUIRE([AC_CANONICAL_HOST])
+    case $host_os in
+	darwin*)
+	    CS_EMIT_BUILD_FLAGS([if -fno-common is needed],
+		[cs_cv_prog_cxx_no_common],
+		[CS_CREATE_TUPLE([], [-fno-common])], [C++],
+		[CFLAGS.SYSTEM], [+])
+	    ;;
+    esac])
+
+CS_CHECK_NO_COMMON
 
 
 
@@ -703,10 +739,10 @@ AC_DEFUN([CS_CHECK_VTABLE_THUNKS],
     [AC_REQUIRE([AC_CANONICAL_HOST])
     case $host_os in
 	mingw*|cygwin*)
-	    CS_EMIT_BUILD_FLAGS([if -fvtable-thunks is needed],
+	    CS_CHECK_BUILD_FLAGS([if -fvtable-thunks is needed],
 		[cs_cv_prog_cxx_vtable_thunks],
-		[CS_CREATE_TUPLE([-fvtable-thunks -Werror])],
-		[C++], [CXXFLAGS.SYSTEM], [+], [-fvtable-thunks])
+		[CS_CREATE_TUPLE([-fvtable-thunks -Werror])], [C++],
+		[CS_BUILD_PROPERTY([CXXFLAGS.SYSTEM], [-fvtable-thunks], [+])])
 	    ;;
     esac])
 
@@ -807,19 +843,19 @@ AC_DEFUN([CS_CHECK_OPTIMIZE_FLAGS],
     CS_EMIT_BUILD_FLAGS([how to enable optimizations],
 	[cs_cv_prog_cxx_optimize],
 	[CS_CREATE_TUPLE([-O3]) CS_CREATE_TUPLE([-O2]) CS_CREATE_TUPLE([-O])],
-	[C++], [CFLAGS.optimize], [+], [],
+	[C++], [CFLAGS.optimize], [+],
 	[cs_optimize_flags="$cs_optimize_flags $cs_cv_prog_cxx_optimize"])
 
     CS_EMIT_BUILD_FLAGS([if $CXX recognizes -fomit-frame-pointer],
 	[cs_cv_prog_cxx_omit_frame_pointer],
 	[CS_CREATE_TUPLE([-fomit-frame-pointer])],
-	[C++], [CFLAGS.optimize], [+], [],
+	[C++], [CFLAGS.optimize], [+],
 	[cs_optimize_flags="$cs_optimize_flags \
 	    $cs_cv_prog_cxx_omit_frame_pointer"])
 
     CS_EMIT_BUILD_FLAGS([if $CXX recognizes -ffast-math],
 	[cs_cv_prog_cxx_fast_math],
-	[CS_CREATE_TUPLE([-ffast-math])], [C++], [CFLAGS.optimize], [+], [],
+	[CS_CREATE_TUPLE([-ffast-math])], [C++], [CFLAGS.optimize], [+],
 	[cs_optimize_flags="$cs_optimize_flags $cs_cv_prog_cxx_fast_math"])])
 
 CS_CHECK_OPTIMIZE_FLAGS
@@ -1840,15 +1876,18 @@ AS_IF([test $cs_cv_cxx_new_casts = no],
 #	content, but also buggy versions which fail with an internal error on
 #	this file (such as the RedHat 7 gcc).  Furthermore, it is reported that
 #	some versions of gcc 3.2.x cause qsqrt() to return bogus results when
-#	compiled in optimize mode.  It is reported that this same compiler
-#	crashes with an internal error when -fPIC is used, so we use -fPIC as a
-#	way to detect this buggy compiler.  Sets the shell variable
-#	cs_cv_cxx_qsqrt_ok to "yes" if qsqrt.h is usable, otherwise "no".
+#	compiled in optimize mode on Intel hardware.  It is reported that this
+#	same compiler crashes with an internal error when -fPIC is used, so we
+#	use -fPIC as a way to detect this buggy compiler.  The MacOS/X PowerPC
+#	version of qsqrt() requires the -force_cpusubtype_ALL flag, so we use
+#	that flag when available.  Sets the shell variable cs_cv_cxx_qsqrt_ok
+#	to "yes" if qsqrt.h is usable, otherwise "no".
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_QSQRT],
     [AC_REQUIRE([CS_CHECK_HOST_CPU])
     AC_REQUIRE([AC_PROG_CXX])
     AC_REQUIRE([CS_CHECK_OPTIMIZE_FLAGS])
+    AC_REQUIRE([CS_CHECK_FORCE_CPUSUBTYPE_ALL])
     AS_IF([test $ac_compiler_gnu = yes],
 	[AC_CACHE_CHECK([if $CXX recognizes -fPIC], [cs_cv_prog_cxx_fpic],
 	    [CS_BUILD_IFELSE([], [CS_CREATE_TUPLE([-fPIC])], [C++],
@@ -1857,6 +1896,8 @@ AC_DEFUN([CS_CHECK_QSQRT],
 	    [cs_qsqrt_cflags="$cs_optimize_flags"
 	    AS_IF([test $cs_cv_prog_cxx_fpic != no],
 		[cs_qsqrt_cflags="$cs_qsqrt_cflags $cs_cv_prog_cxx_fpic"])
+	    AS_IF([test $cs_cv_prog_cxx_force_cpusubtype_all != no],
+		[cs_qsqrt_cflags="$cs_cv_prog_cxx_force_cpusubtype_all"])
 	    CS_BUILD_IFELSE(
 		[AC_LANG_PROGRAM(
 		    [#define PROC_$cs_host_cpu_normalized

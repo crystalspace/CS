@@ -151,3 +151,31 @@ AC_DEFUN([CS_CHECK_BUILD],
 	$2_lflags=''
 	$2_libs=''
 	m4_default([$7],[:])])])
+
+
+
+#------------------------------------------------------------------------------
+# CS_CHECK_BUILD_FLAGS(MESSAGE, CACHE-VAR, FLAGS, [LANGUAGE],
+#                     [ACTION-IF-RECOGNIZED], [ACTION-IF-NOT-RECOGNIZED])
+#	Like CS_CHECK_BUILD(), but checks only if the compiler or linker
+#	recognizes a command-line option or options.  MESSAGE is the "checking"
+#	message.  CACHE-VAR is the shell cache variable which receives the flag
+#	or flags recognized by the compiler or linker.  FLAGS is a
+#	whitespace-delimited list of build tuples created with
+#	CS_CREATE_TUPLE().  Each tuple from FLAGS is attempted in order until
+#	one is found which is recognized by the compiler.  After that, no
+#	further flags are checked.  LANGUAGE is typically either C or C++ and
+#	specifies which compiler to use for the test.  If LANGUAGE is omitted,
+#	C is used.  If a command-line option is recognized, then CACHE-VAR is
+#	set to the composite value of $cs_build_cflags, $cs_build_lflags, and
+#	$cs_build_libs of the FLAGS element which succeeded, and
+#	ACTION-IF-RECOGNIZED is invoked.  If no options are recognized, then
+#	CACHE-VAR is set to "no", and ACTION-IF-NOT-RECOGNIZED is invoked.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_BUILD_FLAGS],
+    [AC_CACHE_CHECK([$1], [$2],
+	[CS_BUILD_IFELSE([], [$3], [$4],
+	    [$2=CS_TRIM([$cs_build_cflags $cs_build_lflags $cs_build_libs])
+		m4_default([$5],[:])],
+	    [$2=no
+		m4_default([$6],[:])])])])

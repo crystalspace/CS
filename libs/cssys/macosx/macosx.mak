@@ -76,11 +76,9 @@ CFLAGS.INCLUDE = $(addprefix $(CFLAGS.I),$(MACOSX.SOURCE_PATHS))
 # flags are determined at configuration time and come from CS/config.mak.
 # <cs-config>
 CFLAGS.GENERAL = \
-  -force_cpusubtype_ALL \
   $(MACOSX.CFLAGS.CONFIG) \
   $(CFLAGS.SYSTEM) \
-  $(CSTHREAD.CFLAGS) \
-  -Wno-precomp -fno-common
+  $(CSTHREAD.CFLAGS)
 # </cs-config>
 
 # Special option for the software 3D renderer to force it to ARGB mode

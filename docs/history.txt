@@ -6,6 +6,29 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Oct-2003
+	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
+	- Eric Sunshine made the following configuration-related changes:
+	    - Added CS_CHECK_BUILD_FLAGS() to checkbuild.m4.  This is similar
+	      to CS_CHECK_BUILD(), except that it checks only if the build
+	      tools recognize particular options, rather than checking if a
+	      test program can be built.
+	    - Rewrote CS_EMIT_BUILD_FLAGS() in configure.ac to utilize the new
+	      CS_CHECK_BUILD_FLAGS().  Also dropped the somewhat hacky
+	      CACHE-VALUE argument from CS_EMIT_BUILD_FLAGS().  This type of
+	      functionality can now be accomplished more cleanly by calling
+	      CS_CHECK_BUILD_FLAGS() directly.  Callers which were using the
+	      CACHE-VALUE hack have been rewritten to use
+	      CS_CHECK_BUILD_FLAGS() instead.
+	    - Added a check for -force_cpusubtype_ALL to configure.ac.  This
+	      flag is needed on MacOS/X when building the PowerPC version of
+	      qsqrt() which uses the `frsqrte' instruction.
+	    - Fixed the qsqrt() check in configure.ac so that it employs
+	      -force_cpusubtype_ALL when applicable.  This allows the qsqrt()
+	      check to succeed on MacOS/X.
+	    - Added a check for -fno-common to configure.ac for MacOS/X.
+	    - Fixed bug: Jam build on MacOS/X failed to utilize
+	      -force_cpusubtype_ALL and -fno-common.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.
@@ -29,8 +52,8 @@ chronological order.
 	  will now correctly return true for "foo" and "foo/bar".  Previously,
 	  it would return false.  Eric also applied a bit of cleanup to the
 	  patch to reduce coupling and increase safety.
-	- res fixed problems in the handling of the Pad+, Pad-, Pad* and 
-	  PadDecimal keys on Win32, as pointed out by Fritz Elfert 
+	- res fixed problems in the handling of the Pad+, Pad-, Pad* and
+	  PadDecimal keys on Win32, as pointed out by Fritz Elfert
 	  <felfert@to.com>.
         - Philip Wyett corrected DIR.WATERDEMO path in apps makefile and
           eliminated make depend failure when --enable-new-renderer is used.
@@ -42,35 +65,34 @@ chronological order.
 	- Eric Sunshine worked around MSVC6 crasher reported by Fritz Elfert
 	  <felfert@to.com> in sequence.cpp where compiler couldn't deal with
 	  `if ((*seq) != 0)' where `seq' is a `csWeakRef<csSequence>*'.
-	- jamest changed the swig wrapper to support the new polygon creation 
+	- jamest changed the swig wrapper to support the new polygon creation
 	  and manipulation API (AddInsideBox).  The python samples have been
-	  updated to reflect the new API.  added iShaderBranch to the wrapper 
+	  updated to reflect the new API.  added iShaderBranch to the wrapper
 	  to eliminate a warning/ignore during swigpythgen.
-	- jamest removed css.h references to the recently removed metaball, 
+	- jamest removed css.h references to the recently removed metaball,
 	  metagen, and csTesselator.
 	- Rhad did some more work on partedit.  Initial position UI and
-	  attractor UI are now complete.  Some pretty nice effects can be 
-	  seen with just these two sections.
-	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
+	  attractor UI are now complete.  Some pretty nice effects can be seen
+	  with just these two sections.
 19-Oct-2003
-	- res fixed a bug in the OR polygon buffers: when two polygons 
+	- res fixed a bug in the OR polygon buffers: when two polygons
 	  subsequently passed into AddPolygon() would have different lightmaps,
 	  they would later not be drawn together, even if they could. But as
 	  distinct polys always have distinct lightmaps, this basically caused
 	  the polybuffers to be ineffective. Now, not the polygon's lightmap,
-	  but the super lightmap it is on is considered, and polys on the 
+	  but the super lightmap it is on is considered, and polys on the
 	  same SLM will be drawn together.
 	- res updated the OS/X CG2D for the latest keyboard event changes.
 	- Rhad fixed a typo in the aws group frame documentation.
-	- jamest updated cspace.i for latest keyboard event changes. 
-          updated the the python module samples to reflect latest 
+	- jamest updated cspace.i for latest keyboard event changes.
+          updated the the python module samples to reflect latest
           keyboard event changes.
 	- res added an updated version of csParseKeyDef().
 	- res changed the logic when a key state is set; now it is set after
 	  the event is emitted for Down resp. before the event for Up events.
-	- Rhad changed signals for button presses on radio buttons 
-	  (signalRadButtonClicked) and checkboxes (signalCheckBoxClicked) 
-	  in AWS to occur AFTER the state change associated with them.  
+	- Rhad changed signals for button presses on radio buttons
+	  (signalRadButtonClicked) and checkboxes (signalCheckBoxClicked)
+	  in AWS to occur AFTER the state change associated with them.
 	  This makes these signals actually useful in a consistant manner.
 	- Rhad commited a partial rework of the partedit tool.  Still a lot
 	  of UI work and cleanup to do.
@@ -103,19 +125,19 @@ chronological order.
 	    references.
 	- res updated apimod98.txi with paragraphs on the new i18n stuff and
 	  the keyboard event changes.
-	- Rhad fixed a documentation error regarding awsListBox. The 
-	  "selectable" property applies to the entire row and not each column. 
-	- res enhanced csSubRectangles2 with the ability to enlarge the 
+	- Rhad fixed a documentation error regarding awsListBox. The
+	  "selectable" property applies to the entire row and not each column.
+	- res enhanced csSubRectangles2 with the ability to enlarge the
 	  region.
 	- res augmented the Thing lightmap layouter with the ability to enlarge
-	  an existing super lightmap. This is done if the lightmaps to be 
+	  an existing super lightmap. This is done if the lightmaps to be
 	  distributed would fit onto the enlarged super lightmap and less than
 	  a specified area of the SLM would be unused.
 	- Rhad added code to call existing signalListBoxScrolled.  Added
 	  signalListBoxStateChanged called when the state of a stateful
 	  column is changed.  Added documentation for both signals as well
 	  as the existing implemented signalListBoxFocused.
-	- DeSigna implemented dot, cross, norm and vec-len ops for 
+	- DeSigna implemented dot, cross, norm and vec-len ops for
 	  csShaderExpression.
 17-Oct-2003
 	- res added some files he forgot with his recent commit.
@@ -171,7 +193,7 @@ chronological order.
 	    removed once the shaderexps are complete).
 	  - Fixed initializer problem in csShaderExpression::Parse(), MSVC6
 	    doesn't accept the constant initializer for an oper_arg struct.
-	  - Added some extra comments to csShaderExpression::eval_const() and 
+	  - Added some extra comments to csShaderExpression::eval_const() and
 	    csShaderExpression::compile_cons().
 16-Oct-2003
 	- Jorrit fixed a big memory leak related to the engine sequence
@@ -225,14 +247,14 @@ chronological order.
 	      the access.) The idea of 'scan codes' and 'char codes' has been
 	      replaced with 'raw codes' and 'cooked codes.' Also, there's only
 	      one keyboard event now, and the information whether the key was
-	      pressed or released is now part of the event data. A couple of 
-	      features have been added as well, for example, CS can now 
-	      distinguish between left/right modifiers or keypad and 
+	      pressed or released is now part of the event data. A couple of
+	      features have been added as well, for example, CS can now
+	      distinguish between left/right modifiers or keypad and
 	      non-keypad keys.
 	- res fixed a few files to compile again after his latest changes.
 	- res reverted an accidential change to md32spr.
-	- DeSigna wrote the csShaderExpression class in csgfx for Dentoid's 
-	  csShaderVariables. It is not yet integrated into the XML parser's 
+	- DeSigna wrote the csShaderExpression class in csgfx for Dentoid's
+	  csShaderVariables. It is not yet integrated into the XML parser's
 	  syntxldr service or shader variables, and it is missing S-expression
 	  support.
 15-Oct-2003
@@ -367,11 +389,11 @@ chronological order.
 	- Eric Sunshine brought vfs.txi in the user manual up to date.  Also
 	  added mention of new $@, $*, and $^ pseudo-variables.
 	- res made the following changes:
-	    - Added some functions to csUnicodeTransform helper class to 
+	    - Added some functions to csUnicodeTransform helper class to
 	      determine how many encoding characters a Unicode character from
 	      an encoded string occupies.
 	    - Fixed some cats from size_t to int in csUnicodeTransform.
-	    - Added a version of Insert() to csString that accepts a const 
+	    - Added a version of Insert() to csString that accepts a const
 	      char*.
 	    - csReport(V) won't attempt to query a reporter from the registry
 	      if the supplied pointer to the object registry is 0. Instead,
