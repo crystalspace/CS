@@ -353,8 +353,10 @@ void csFrustum::ClipToPlane (csVector3* vertices, int& num_vertices,
   {
     clip_cw.type = CS_CLIPINFO_INSIDE;
     clip_cw.inside.r = dist_cw;
-    clip_cw.inside.ci1 = new csClipInfo (clipinfo[cw_offset]);
-    clip_cw.inside.ci2 = new csClipInfo (clipinfo[i]);
+    clip_cw.inside.ci1 = new csClipInfo ();
+    clip_cw.inside.ci1->Copy (clipinfo[cw_offset]);
+    clip_cw.inside.ci2 = new csClipInfo ();
+    clip_cw.inside.ci2->Copy (clipinfo[i]);
   }
   else
   {
@@ -371,8 +373,10 @@ void csFrustum::ClipToPlane (csVector3* vertices, int& num_vertices,
   {
     clip_ccw.type = CS_CLIPINFO_INSIDE;
     clip_ccw.inside.r = dist_ccw;
-    clip_ccw.inside.ci1 = new csClipInfo (clipinfo[ccw_offset]);
-    clip_ccw.inside.ci2 = new csClipInfo (clipinfo[ccw_offset + 1]);
+    clip_ccw.inside.ci1 = new csClipInfo ();
+    clip_ccw.inside.ci1->Copy (clipinfo[ccw_offset]);
+    clip_ccw.inside.ci2 = new csClipInfo ();
+    clip_ccw.inside.ci2->Copy (clipinfo[ccw_offset + 1]);
   }
   else
   {
@@ -388,7 +392,7 @@ void csFrustum::ClipToPlane (csVector3* vertices, int& num_vertices,
     for (i = 0; i < ccw_offset - cw_offset + 1; i++)
     {
       vertices[i] = vertices[i + cw_offset];
-      clipinfo[i] = clipinfo[i + cw_offset];
+      clipinfo[i].Copy (clipinfo[i + cw_offset]);
     }
     vertices[i] = isect_ccw;
     clipinfo[i].Move (clip_ccw);
@@ -402,13 +406,13 @@ void csFrustum::ClipToPlane (csVector3* vertices, int& num_vertices,
       for (i = 0; i < num_vertices - ccw_offset - 1; i++)
       {
         vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
-	clipinfo[cw_offset + 2 + i] = clipinfo[ccw_offset + 1 + i];
+	clipinfo[cw_offset + 2 + i].Copy (clipinfo[ccw_offset + 1 + i]);
       }
     else if (cw_offset + 1 > ccw_offset)
       for (i = num_vertices - 2 - ccw_offset;i >= 0; i--)
       {
         vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
-	clipinfo[cw_offset + 2 + i] = clipinfo[ccw_offset + 1 + i];
+	clipinfo[cw_offset + 2 + i].Copy (clipinfo[ccw_offset + 1 + i]);
       }
 
     vertices[cw_offset] = isect_cw;

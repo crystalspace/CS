@@ -59,20 +59,6 @@ struct csClipInfo
   };
 
   csClipInfo () : type (CS_CLIPINFO_ORIGINAL) { }
-  csClipInfo (const csClipInfo& other)
-  {
-    type = other.type;
-    if (type == CS_CLIPINFO_INSIDE)
-    {
-      inside.ci1 = new csClipInfo (*other.inside.ci1);
-      inside.ci2 = new csClipInfo (*other.inside.ci2);
-      inside.r = other.inside.r;
-    }
-    else if (type == CS_CLIPINFO_ORIGINAL)
-      original.idx = other.original.idx;
-    else
-      onedge = other.onedge;
-  }
   void Clear ()
   {
     if (type == CS_CLIPINFO_INSIDE)
@@ -83,26 +69,30 @@ struct csClipInfo
   }
   ~csClipInfo () { Clear (); }
 
-  csClipInfo& operator= (const csClipInfo& other)
+  /// Copy the information from another clipinfo instance to this one.
+  void Copy (csClipInfo& other)
   {
+    if (&other == this) return;
     Clear ();
     type = other.type;
     if (type == CS_CLIPINFO_INSIDE)
     {
-      inside.ci1 = new csClipInfo (*other.inside.ci1);
-      inside.ci2 = new csClipInfo (*other.inside.ci2);
       inside.r = other.inside.r;
+      inside.ci1 = new csClipInfo ();
+      inside.ci1->Copy (*other.inside.ci1);
+      inside.ci2 = new csClipInfo ();
+      inside.ci2->Copy (*other.inside.ci2);
     }
     else if (type == CS_CLIPINFO_ORIGINAL)
       original.idx = other.original.idx;
     else
       onedge = other.onedge;
-    return *this;
   }
 
-  // Move the information from another clipinfo instance to this one.
+  /// Move the information from another clipinfo instance to this one.
   void Move (csClipInfo& other)
   {
+    if (&other == this) return;
     Clear ();
     type = other.type;
     if (type == CS_CLIPINFO_INSIDE)
@@ -112,6 +102,30 @@ struct csClipInfo
     else
       onedge = other.onedge;
     other.type = CS_CLIPINFO_ORIGINAL;
+  }
+
+  void Dump (int indent)
+  {
+    char ind[255];
+    int i;
+    for (i = 0 ; i < indent ; i++) ind[i] = ' ';
+    ind[i] = 0;
+    switch (type)
+    {
+      case CS_CLIPINFO_ORIGINAL:
+        printf ("%s ORIGINAL idx=%d\n", ind, original.idx);
+	break;
+      case CS_CLIPINFO_ONEDGE:
+        printf ("%s ONEDGE i1=%d i2=%d r=%g\n", ind, onedge.i1, onedge.i2,
+		onedge.r);
+        break;
+      case CS_CLIPINFO_INSIDE:
+        printf ("%s INSIDE r=%g\n", ind, inside.r);
+	inside.ci1->Dump (indent+2);
+	inside.ci2->Dump (indent+2);
+	break;
+    }
+    fflush (stdout);
   }
 };
 

@@ -587,12 +587,12 @@ void csGraphics3DOGLCommon::PerfTest ()
       j++;
     }
   }
-  SysPrintf(MSG_INITIALIZATION, "    Video.OpenGL.ClipOuter = %c%c%c\n", clip_outer[0],
-  	clip_outer[1], clip_outer[2]);
-  SysPrintf(MSG_INITIALIZATION, "    Video.OpenGL.ClipRequired = %c%c%c\n", clip_required[0],
-  	clip_required[1], clip_required[2]);
-  SysPrintf(MSG_INITIALIZATION, "    Video.OpenGL.ClipOptional = %c%c%c\n", clip_optional[0],
-  	clip_optional[1], clip_optional[2]);
+  SysPrintf (MSG_INITIALIZATION, "    Video.OpenGL.ClipOuter = %c%c%c\n",
+  	clip_outer[0], clip_outer[1], clip_outer[2]);
+  SysPrintf (MSG_INITIALIZATION, "    Video.OpenGL.ClipRequired = %c%c%c\n",
+  	clip_required[0], clip_required[1], clip_required[2]);
+  SysPrintf (MSG_INITIALIZATION, "    Video.OpenGL.ClipOptional = %c%c%c\n",
+  	clip_optional[0], clip_optional[1], clip_optional[2]);
 
   SetClipper (NULL, CS_CLIPPER_NONE);
 
@@ -1842,7 +1842,6 @@ static void ResolveVertex (
   switch (ci->type)
   {
     case CS_CLIPINFO_ORIGINAL:
-//printf ("  ORIGINAL idx=%d\n", ci->original.idx); fflush (stdout);
       texel = otexels[ci->original.idx];
       if (ocolors) color = ocolors[ci->original.idx];
       if (ofog) fog = ofog[ci->original.idx];
@@ -1852,7 +1851,6 @@ static void ResolveVertex (
       int i1 = ci->onedge.i1;
       int i2 = ci->onedge.i2;
       float r = ci->onedge.r;
-//printf ("  ONEDGE i1=%d i2=%d r=%g\n", i1, i2, r); fflush (stdout);
       texel = otexels[i1] * (1-r) + otexels[i2] * r;
       if (ocolors)
       {
@@ -1871,7 +1869,6 @@ static void ResolveVertex (
     }
     case CS_CLIPINFO_INSIDE:
     {
-//printf ("  INSIDE r=%g\n", ci->inside.r); fflush (stdout);
       csVector2 texel1, texel2;
       csColor color1, color2;
       G3DFogInfo fog1, fog2;
@@ -2112,7 +2109,6 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 	}
         else
 	{
-//printf ("================= j=%d\n", j); fflush (stdout);
 	  ResolveVertex (&clipinfo[j], clipped_translate.GetArray (),
 	  	vertices, texels, vertex_colors, vertex_fog,
 		clipped_texels.GetArray ()[num_clipped_vertices],
