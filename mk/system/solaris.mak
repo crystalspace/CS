@@ -62,7 +62,7 @@ SOUND_LIBS=
 CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall
+CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-O -fomit-frame-pointer
