@@ -72,7 +72,7 @@ NEXT.SOURCE_PATHS=$(addprefix libs/cssys/next/,$(NEXT.SEARCH_PATH))
 EXE=
 
 # Typical extension for dynamic libraries on this system.
-DLL=.dylib
+DLL=.so
 
 # Typical extension for static libraries
 LIB=.a
@@ -117,7 +117,7 @@ CFLAGS.debug=-g $(NEXT.CFLAGS.DEBUG)
 CFLAGS.profile=-pg -O -g
 
 # Flags for the compiler which are used when building a shared library.
-CFLAGS.DLL=-dynamic
+CFLAGS.DLL=$(NEXT.CFLAGS.DLL)
 
 # General flags for the linker which are used in any case.
 LFLAGS.GENERAL=$(NEXT.ARCH_FLAGS) $(NEXT.LFLAGS.GENERAL)
@@ -128,8 +128,15 @@ LFLAGS.debug=-g
 # Flags for the linker which are used when profiling.
 LFLAGS.profile=-pg
 
+# Flags for the linker which are used when building a graphical executable.
+LFLAGS.EXE= $(NEXT.LFLAGS.EXE)
+
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL= -dynamiclib
+LFLAGS.DLL= $(NEXT.LFLAGS.DLL)
+
+# Inhibit linking $(LIBS) into a DLL (otherwise the dynamic loader complains).
+# Non-NeXT platforms, though, seem to thrive on linking with $(LIBS).
+INHIBIT_DLL_LIBS=yes
 
 # System-dependent flags to pass to NASM
 NASMFLAGS.SYSTEM=
@@ -222,9 +229,6 @@ endif # ifeq ($(MAKESECTION),confighelp)
 ifeq ($(MAKESECTION),rootdefines) # Makefile includes us twice with valid
 ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 
-# Currently this port does not support dynamic libraries
-override USE_DLL = no
-
 SYSCONFIG += $(NEWLINE)bin/booltest.sh "cc -ObjC++" >> config.tmp
 SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 ifneq ($(strip $(TARGET_ARCHS)),)
@@ -235,9 +239,9 @@ endif # ifeq ($(ROOTCONFIG),config)
 
 ifeq ($(ROOTCONFIG),volatile)
 
-# Add required defines to volatile.h
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp
+MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define CS_NO_MODULE_LOCKING$">>volatile.tmp
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define USGISH$">>volatile.tmp
 
 endif # ifeq ($(ROOTCONFIG),volatile)
