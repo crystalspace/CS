@@ -7,7 +7,7 @@
 static char *names[10] = { "Yellow", "Green", "Blue", "Orange", "Purple", "Red", "White", "Teal", "Black" };
 static int   namec = 0;
 
-awsTestSink::awsTestSink():sink(NULL)
+awsTestSink::awsTestSink():sink(NULL), user(NULL), pass(NULL)
 {  
 }
 
@@ -28,6 +28,9 @@ awsTestSink::SetSink(iAwsSink *s)
    sink->RegisterTrigger("RedClicked", &RedClicked);
    sink->RegisterTrigger("BlueClicked", &BlueClicked);
    sink->RegisterTrigger("GreenClicked", &GreenClicked);
+   sink->RegisterTrigger("SetUserName", &SetUser);
+   sink->RegisterTrigger("SetPassword", &SetPass);
+   sink->RegisterTrigger("Login", &Login);
  }
 }
 
@@ -56,3 +59,34 @@ awsTestSink::GreenClicked(void *sink, iAwsSource *source)
   printf("awstest: green button clicked, source: %p, owner: %p\n", source, sink);
 }
 
+void 
+awsTestSink::SetPass(void *sk, iAwsSource *source)
+{
+  awsTestSink *sink = (awsTestSink *)sk;
+  if (sink->pass) sink->pass->DecRef();
+
+  iAwsComponent *comp = source->GetComponent();
+  comp->GetProperty("Text", (void**)&sink->pass); 
+}
+
+void 
+awsTestSink::SetUser(void *sk, iAwsSource *source)
+{
+  awsTestSink *sink = (awsTestSink *)sk;
+  if (sink->user) sink->user->DecRef();
+
+  iAwsComponent *comp = source->GetComponent();
+  comp->GetProperty("Text", (void**)&sink->user); 
+}
+
+void 
+awsTestSink::Login(void *sk, iAwsSource *source)
+{
+  awsTestSink *sink = (awsTestSink *)sk;
+  if (sink->user==NULL || sink->pass==NULL)
+    printf("awstest: You must enter a username AND password.\n");
+
+  else
+    printf("awstest: Logging in as %s with password: %s  (not really.)\n", sink->user->GetData(), sink->pass->GetData());
+
+}

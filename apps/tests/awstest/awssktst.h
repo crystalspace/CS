@@ -3,16 +3,23 @@
 
 #include "aws/iaws.h"
 #include "aws/awsslot.h"
+#include "iutil/string.h"
 
 class awsTestSink 
 {
 
   iAwsSink *sink;
-
+  iString  *user;
+  iString  *pass;
+  
 private:
   static void RedClicked(void *sink,   iAwsSource *source);
   static void BlueClicked(void *sink,  iAwsSource *source);
   static void GreenClicked(void *sink, iAwsSource *source);
+
+  static void SetPass(void *sink, iAwsSource *source);
+  static void SetUser(void *sink, iAwsSource *source);
+  static void Login(void *sink, iAwsSource *source);
 
 public:
   awsTestSink();
