@@ -86,7 +86,7 @@ class csTextureHandleOpenGL : public csTextureHandle
  protected:
   csTextureManagerOpenGL *txtmgr;
   int formatidx;
-  GLint sourceFormat, targetFormat;
+  GLenum sourceFormat, targetFormat;
   GLenum sourceType; // what size does each fragment have ? e.g. GL_UNSIGNED_BYTE
   int bpp; 
   bool FindFormatType ();
@@ -111,7 +111,7 @@ public:
   long size;
 
   /// Initialize the object
-  csTextureHandleOpenGL (iImage *image, int flags, GLint sourceFormat, int bpp, 
+  csTextureHandleOpenGL (iImage *image, int flags, GLenum sourceFormat, int bpp, 
 			 csGraphics3DOGLCommon *iG3D);
   /// Delete the texture object
   virtual ~csTextureHandleOpenGL ();
@@ -151,8 +151,8 @@ public:
   virtual void Clear ();
 
   GLenum SourceType (){return sourceType;}
-  GLint SourceFormat (){return sourceFormat;}
-  GLint TargetFormat (){return targetFormat;}
+  GLenum SourceFormat (){return sourceFormat;}
+  GLenum TargetFormat (){return targetFormat;}
 
   iImage *get_image (){return image;}
 };
@@ -166,12 +166,12 @@ class csTextureManagerOpenGL : public csTextureManager
  protected:
   struct formatDescription 
   {
-    GLint targetFormat;
+    GLenum targetFormat;
     char *name;
-    GLint sourceFormat;
+    GLenum sourceFormat;
     int components; // number of components in texture
     GLint compressedFormat;
-    GLint forcedFormat;
+    GLenum forcedFormat;
     int texelbytes;
   };
 
@@ -216,10 +216,10 @@ class csTextureManagerOpenGL : public csTextureManager
 csTextureManagerOpenGL::formatDescription var[] = {
 
 #define CS_GL_FORMAT(dsttype, srctype, size, texelsize) \
-{dsttype, #dsttype, srctype, size, 0, 0, texelsize},
+{dsttype, #dsttype, srctype, size, 0, (GLenum)0, texelsize},
 
 #define CS_GL_FORMAT_TABLE_END \
-{0, NULL, (GLenum)0, 0, 0, 0, 0}};
+{(GLenum)0, NULL, (GLenum)0, 0, 0, (GLenum)0, 0}};
 
 
 #endif // TXTMGR_OPENGL_H

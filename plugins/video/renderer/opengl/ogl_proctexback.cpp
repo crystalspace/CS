@@ -250,8 +250,8 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
   else
   {
     printf ("not cached \n");
-    glReadPixels (0,0, width, height, tex_mm->SourceFormat (), tex_mm->SourceType (),
-		  tex_0->get_image_data ());
+    glReadPixels (0,0, width, height, tex_mm->SourceFormat (), 
+		  tex_mm->SourceType (), tex_0->get_image_data ());
 #ifdef GL_VERSION_1_2x
     // Not in cache.
     if (pfmt.PixelBytes == 2)

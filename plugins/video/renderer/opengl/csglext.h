@@ -1595,2725 +1595,2725 @@ CS_PREP_GL_FUNCTION (csPFNGLTEXTURECOLORMASKSGISPROC, glTextureColorMaskSGIS);
 #undef CSGL_FOR_ALL
 
 #ifndef GL_CONSTANT_COLOR                 
-#define GL_CONSTANT_COLOR                 0x8001
+#define GL_CONSTANT_COLOR                 (GLenum)0x8001
 #endif
 #ifndef GL_ONE_MINUS_CONSTANT_COLOR       
-#define GL_ONE_MINUS_CONSTANT_COLOR       0x8002
+#define GL_ONE_MINUS_CONSTANT_COLOR       (GLenum)0x8002
 #endif
 #ifndef GL_CONSTANT_ALPHA                 
-#define GL_CONSTANT_ALPHA                 0x8003
+#define GL_CONSTANT_ALPHA                 (GLenum)0x8003
 #endif
 #ifndef GL_ONE_MINUS_CONSTANT_ALPHA       
-#define GL_ONE_MINUS_CONSTANT_ALPHA       0x8004
+#define GL_ONE_MINUS_CONSTANT_ALPHA       (GLenum)0x8004
 #endif
 #ifndef GL_BLEND_COLOR                    
-#define GL_BLEND_COLOR                    0x8005
+#define GL_BLEND_COLOR                    (GLenum)0x8005
 #endif
 #ifndef GL_FUNC_ADD                       
-#define GL_FUNC_ADD                       0x8006
+#define GL_FUNC_ADD                       (GLenum)0x8006
 #endif
 #ifndef GL_MIN                            
-#define GL_MIN                            0x8007
+#define GL_MIN                            (GLenum)0x8007
 #endif
 #ifndef GL_MAX                            
-#define GL_MAX                            0x8008
+#define GL_MAX                            (GLenum)0x8008
 #endif
 #ifndef GL_BLEND_EQUATION                 
-#define GL_BLEND_EQUATION                 0x8009
+#define GL_BLEND_EQUATION                 (GLenum)0x8009
 #endif
 #ifndef GL_FUNC_SUBTRACT                  
-#define GL_FUNC_SUBTRACT                  0x800A
+#define GL_FUNC_SUBTRACT                  (GLenum)0x800A
 #endif
 #ifndef GL_FUNC_REVERSE_SUBTRACT          
-#define GL_FUNC_REVERSE_SUBTRACT          0x800B
+#define GL_FUNC_REVERSE_SUBTRACT          (GLenum)0x800B
 #endif
 #ifndef GL_CONVOLUTION_1D                 
-#define GL_CONVOLUTION_1D                 0x8010
+#define GL_CONVOLUTION_1D                 (GLenum)0x8010
 #endif
 #ifndef GL_CONVOLUTION_2D                 
-#define GL_CONVOLUTION_2D                 0x8011
+#define GL_CONVOLUTION_2D                 (GLenum)0x8011
 #endif
 #ifndef GL_SEPARABLE_2D                   
-#define GL_SEPARABLE_2D                   0x8012
+#define GL_SEPARABLE_2D                   (GLenum)0x8012
 #endif
 #ifndef GL_CONVOLUTION_BORDER_MODE        
-#define GL_CONVOLUTION_BORDER_MODE        0x8013
+#define GL_CONVOLUTION_BORDER_MODE        (GLenum)0x8013
 #endif
 #ifndef GL_CONVOLUTION_FILTER_SCALE       
-#define GL_CONVOLUTION_FILTER_SCALE       0x8014
+#define GL_CONVOLUTION_FILTER_SCALE       (GLenum)0x8014
 #endif
 #ifndef GL_CONVOLUTION_FILTER_BIAS        
-#define GL_CONVOLUTION_FILTER_BIAS        0x8015
+#define GL_CONVOLUTION_FILTER_BIAS        (GLenum)0x8015
 #endif
 #ifndef GL_REDUCE                         
-#define GL_REDUCE                         0x8016
+#define GL_REDUCE                         (GLenum)0x8016
 #endif
 #ifndef GL_CONVOLUTION_FORMAT             
-#define GL_CONVOLUTION_FORMAT             0x8017
+#define GL_CONVOLUTION_FORMAT             (GLenum)0x8017
 #endif
 #ifndef GL_CONVOLUTION_WIDTH              
-#define GL_CONVOLUTION_WIDTH              0x8018
+#define GL_CONVOLUTION_WIDTH              (GLenum)0x8018
 #endif
 #ifndef GL_CONVOLUTION_HEIGHT             
-#define GL_CONVOLUTION_HEIGHT             0x8019
+#define GL_CONVOLUTION_HEIGHT             (GLenum)0x8019
 #endif
 #ifndef GL_MAX_CONVOLUTION_WIDTH          
-#define GL_MAX_CONVOLUTION_WIDTH          0x801A
+#define GL_MAX_CONVOLUTION_WIDTH          (GLenum)0x801A
 #endif
 #ifndef GL_MAX_CONVOLUTION_HEIGHT         
-#define GL_MAX_CONVOLUTION_HEIGHT         0x801B
+#define GL_MAX_CONVOLUTION_HEIGHT         (GLenum)0x801B
 #endif
 #ifndef GL_POST_CONVOLUTION_RED_SCALE     
-#define GL_POST_CONVOLUTION_RED_SCALE     0x801C
+#define GL_POST_CONVOLUTION_RED_SCALE     (GLenum)0x801C
 #endif
 #ifndef GL_POST_CONVOLUTION_GREEN_SCALE   
-#define GL_POST_CONVOLUTION_GREEN_SCALE   0x801D
+#define GL_POST_CONVOLUTION_GREEN_SCALE   (GLenum)0x801D
 #endif
 #ifndef GL_POST_CONVOLUTION_BLUE_SCALE    
-#define GL_POST_CONVOLUTION_BLUE_SCALE    0x801E
+#define GL_POST_CONVOLUTION_BLUE_SCALE    (GLenum)0x801E
 #endif
 #ifndef GL_POST_CONVOLUTION_ALPHA_SCALE   
-#define GL_POST_CONVOLUTION_ALPHA_SCALE   0x801F
+#define GL_POST_CONVOLUTION_ALPHA_SCALE   (GLenum)0x801F
 #endif
 #ifndef GL_POST_CONVOLUTION_RED_BIAS      
-#define GL_POST_CONVOLUTION_RED_BIAS      0x8020
+#define GL_POST_CONVOLUTION_RED_BIAS      (GLenum)0x8020
 #endif
 #ifndef GL_POST_CONVOLUTION_GREEN_BIAS    
-#define GL_POST_CONVOLUTION_GREEN_BIAS    0x8021
+#define GL_POST_CONVOLUTION_GREEN_BIAS    (GLenum)0x8021
 #endif
 #ifndef GL_POST_CONVOLUTION_BLUE_BIAS     
-#define GL_POST_CONVOLUTION_BLUE_BIAS     0x8022
+#define GL_POST_CONVOLUTION_BLUE_BIAS     (GLenum)0x8022
 #endif
 #ifndef GL_POST_CONVOLUTION_ALPHA_BIAS    
-#define GL_POST_CONVOLUTION_ALPHA_BIAS    0x8023
+#define GL_POST_CONVOLUTION_ALPHA_BIAS    (GLenum)0x8023
 #endif
 #ifndef GL_HISTOGRAM                      
-#define GL_HISTOGRAM                      0x8024
+#define GL_HISTOGRAM                      (GLenum)0x8024
 #endif
 #ifndef GL_PROXY_HISTOGRAM                
-#define GL_PROXY_HISTOGRAM                0x8025
+#define GL_PROXY_HISTOGRAM                (GLenum)0x8025
 #endif
 #ifndef GL_HISTOGRAM_WIDTH                
-#define GL_HISTOGRAM_WIDTH                0x8026
+#define GL_HISTOGRAM_WIDTH                (GLenum)0x8026
 #endif
 #ifndef GL_HISTOGRAM_FORMAT               
-#define GL_HISTOGRAM_FORMAT               0x8027
+#define GL_HISTOGRAM_FORMAT               (GLenum)0x8027
 #endif
 #ifndef GL_HISTOGRAM_RED_SIZE             
-#define GL_HISTOGRAM_RED_SIZE             0x8028
+#define GL_HISTOGRAM_RED_SIZE             (GLenum)0x8028
 #endif
 #ifndef GL_HISTOGRAM_GREEN_SIZE           
-#define GL_HISTOGRAM_GREEN_SIZE           0x8029
+#define GL_HISTOGRAM_GREEN_SIZE           (GLenum)0x8029
 #endif
 #ifndef GL_HISTOGRAM_BLUE_SIZE            
-#define GL_HISTOGRAM_BLUE_SIZE            0x802A
+#define GL_HISTOGRAM_BLUE_SIZE            (GLenum)0x802A
 #endif
 #ifndef GL_HISTOGRAM_ALPHA_SIZE           
-#define GL_HISTOGRAM_ALPHA_SIZE           0x802B
+#define GL_HISTOGRAM_ALPHA_SIZE           (GLenum)0x802B
 #endif
 #ifndef GL_HISTOGRAM_LUMINANCE_SIZE       
-#define GL_HISTOGRAM_LUMINANCE_SIZE       0x802C
+#define GL_HISTOGRAM_LUMINANCE_SIZE       (GLenum)0x802C
 #endif
 #ifndef GL_HISTOGRAM_SINK                 
-#define GL_HISTOGRAM_SINK                 0x802D
+#define GL_HISTOGRAM_SINK                 (GLenum)0x802D
 #endif
 #ifndef GL_MINMAX                         
-#define GL_MINMAX                         0x802E
+#define GL_MINMAX                         (GLenum)0x802E
 #endif
 #ifndef GL_MINMAX_FORMAT                  
-#define GL_MINMAX_FORMAT                  0x802F
+#define GL_MINMAX_FORMAT                  (GLenum)0x802F
 #endif
 #ifndef GL_MINMAX_SINK                    
-#define GL_MINMAX_SINK                    0x8030
+#define GL_MINMAX_SINK                    (GLenum)0x8030
 #endif
 #ifndef GL_TABLE_TOO_LARGE                
-#define GL_TABLE_TOO_LARGE                0x8031
+#define GL_TABLE_TOO_LARGE                (GLenum)0x8031
 #endif
 #ifndef GL_UNSIGNED_BYTE_3_3_2            
-#define GL_UNSIGNED_BYTE_3_3_2            0x8032
+#define GL_UNSIGNED_BYTE_3_3_2            (GLenum)0x8032
 #endif
 #ifndef GL_UNSIGNED_SHORT_4_4_4_4         
-#define GL_UNSIGNED_SHORT_4_4_4_4         0x8033
+#define GL_UNSIGNED_SHORT_4_4_4_4         (GLenum)0x8033
 #endif
 #ifndef GL_UNSIGNED_SHORT_5_5_5_1         
-#define GL_UNSIGNED_SHORT_5_5_5_1         0x8034
+#define GL_UNSIGNED_SHORT_5_5_5_1         (GLenum)0x8034
 #endif
 #ifndef GL_UNSIGNED_INT_8_8_8_8           
-#define GL_UNSIGNED_INT_8_8_8_8           0x8035
+#define GL_UNSIGNED_INT_8_8_8_8           (GLenum)0x8035
 #endif
 #ifndef GL_UNSIGNED_INT_10_10_10_2        
-#define GL_UNSIGNED_INT_10_10_10_2        0x8036
+#define GL_UNSIGNED_INT_10_10_10_2        (GLenum)0x8036
 #endif
 #ifndef GL_RESCALE_NORMAL                 
-#define GL_RESCALE_NORMAL                 0x803A
+#define GL_RESCALE_NORMAL                 (GLenum)0x803A
 #endif
 #ifndef GL_UNSIGNED_BYTE_2_3_3_REV        
-#define GL_UNSIGNED_BYTE_2_3_3_REV        0x8362
+#define GL_UNSIGNED_BYTE_2_3_3_REV        (GLenum)0x8362
 #endif
 #ifndef GL_UNSIGNED_SHORT_5_6_5           
-#define GL_UNSIGNED_SHORT_5_6_5           0x8363
+#define GL_UNSIGNED_SHORT_5_6_5           (GLenum)0x8363
 #endif
 #ifndef GL_UNSIGNED_SHORT_5_6_5_REV       
-#define GL_UNSIGNED_SHORT_5_6_5_REV       0x8364
+#define GL_UNSIGNED_SHORT_5_6_5_REV       (GLenum)0x8364
 #endif
 #ifndef GL_UNSIGNED_SHORT_4_4_4_4_REV     
-#define GL_UNSIGNED_SHORT_4_4_4_4_REV     0x8365
+#define GL_UNSIGNED_SHORT_4_4_4_4_REV     (GLenum)0x8365
 #endif
 #ifndef GL_UNSIGNED_SHORT_1_5_5_5_REV     
-#define GL_UNSIGNED_SHORT_1_5_5_5_REV     0x8366
+#define GL_UNSIGNED_SHORT_1_5_5_5_REV     (GLenum)0x8366
 #endif
 #ifndef GL_UNSIGNED_INT_8_8_8_8_REV       
-#define GL_UNSIGNED_INT_8_8_8_8_REV       0x8367
+#define GL_UNSIGNED_INT_8_8_8_8_REV       (GLenum)0x8367
 #endif
 #ifndef GL_UNSIGNED_INT_2_10_10_10_REV    
-#define GL_UNSIGNED_INT_2_10_10_10_REV    0x8368
+#define GL_UNSIGNED_INT_2_10_10_10_REV    (GLenum)0x8368
 #endif
 #ifndef GL_COLOR_MATRIX                   
-#define GL_COLOR_MATRIX                   0x80B1
+#define GL_COLOR_MATRIX                   (GLenum)0x80B1
 #endif
 #ifndef GL_COLOR_MATRIX_STACK_DEPTH       
-#define GL_COLOR_MATRIX_STACK_DEPTH       0x80B2
+#define GL_COLOR_MATRIX_STACK_DEPTH       (GLenum)0x80B2
 #endif
 #ifndef GL_MAX_COLOR_MATRIX_STACK_DEPTH   
-#define GL_MAX_COLOR_MATRIX_STACK_DEPTH   0x80B3
+#define GL_MAX_COLOR_MATRIX_STACK_DEPTH   (GLenum)0x80B3
 #endif
 #ifndef GL_POST_COLOR_MATRIX_RED_SCALE    
-#define GL_POST_COLOR_MATRIX_RED_SCALE    0x80B4
+#define GL_POST_COLOR_MATRIX_RED_SCALE    (GLenum)0x80B4
 #endif
 #ifndef GL_POST_COLOR_MATRIX_GREEN_SCALE  
-#define GL_POST_COLOR_MATRIX_GREEN_SCALE  0x80B5
+#define GL_POST_COLOR_MATRIX_GREEN_SCALE  (GLenum)0x80B5
 #endif
 #ifndef GL_POST_COLOR_MATRIX_BLUE_SCALE   
-#define GL_POST_COLOR_MATRIX_BLUE_SCALE   0x80B6
+#define GL_POST_COLOR_MATRIX_BLUE_SCALE   (GLenum)0x80B6
 #endif
 #ifndef GL_POST_COLOR_MATRIX_ALPHA_SCALE  
-#define GL_POST_COLOR_MATRIX_ALPHA_SCALE  0x80B7
+#define GL_POST_COLOR_MATRIX_ALPHA_SCALE  (GLenum)0x80B7
 #endif
 #ifndef GL_POST_COLOR_MATRIX_RED_BIAS     
-#define GL_POST_COLOR_MATRIX_RED_BIAS     0x80B8
+#define GL_POST_COLOR_MATRIX_RED_BIAS     (GLenum)0x80B8
 #endif
 #ifndef GL_POST_COLOR_MATRIX_GREEN_BIAS   
-#define GL_POST_COLOR_MATRIX_GREEN_BIAS   0x80B9
+#define GL_POST_COLOR_MATRIX_GREEN_BIAS   (GLenum)0x80B9
 #endif
 #ifndef GL_POST_COLOR_MATRIX_BLUE_BIAS    
-#define GL_POST_COLOR_MATRIX_BLUE_BIAS    0x80BA
+#define GL_POST_COLOR_MATRIX_BLUE_BIAS    (GLenum)0x80BA
 #endif
 #ifndef GL_COLOR_TABLE                    
-#define GL_COLOR_TABLE                    0x80D0
+#define GL_COLOR_TABLE                    (GLenum)0x80D0
 #endif
 #ifndef GL_POST_CONVOLUTION_COLOR_TABLE   
-#define GL_POST_CONVOLUTION_COLOR_TABLE   0x80D1
+#define GL_POST_CONVOLUTION_COLOR_TABLE   (GLenum)0x80D1
 #endif
 #ifndef GL_POST_COLOR_MATRIX_COLOR_TABLE  
-#define GL_POST_COLOR_MATRIX_COLOR_TABLE  0x80D2
+#define GL_POST_COLOR_MATRIX_COLOR_TABLE  (GLenum)0x80D2
 #endif
 #ifndef GL_PROXY_COLOR_TABLE              
-#define GL_PROXY_COLOR_TABLE              0x80D3
+#define GL_PROXY_COLOR_TABLE              (GLenum)0x80D3
 #endif
 #ifndef GL_PROXY_POST_CONVOLUTION_COLOR_TABLE 
-#define GL_PROXY_POST_CONVOLUTION_COLOR_TABLE 0x80D4
+#define GL_PROXY_POST_CONVOLUTION_COLOR_TABLE (GLenum)0x80D4
 #endif
 #ifndef GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE 
-#define GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE 0x80D5
+#define GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE (GLenum)0x80D5
 #endif
 #ifndef GL_COLOR_TABLE_SCALE              
-#define GL_COLOR_TABLE_SCALE              0x80D6
+#define GL_COLOR_TABLE_SCALE              (GLenum)0x80D6
 #endif
 #ifndef GL_COLOR_TABLE_BIAS               
-#define GL_COLOR_TABLE_BIAS               0x80D7
+#define GL_COLOR_TABLE_BIAS               (GLenum)0x80D7
 #endif
 #ifndef GL_COLOR_TABLE_FORMAT             
-#define GL_COLOR_TABLE_FORMAT             0x80D8
+#define GL_COLOR_TABLE_FORMAT             (GLenum)0x80D8
 #endif
 #ifndef GL_COLOR_TABLE_WIDTH              
-#define GL_COLOR_TABLE_WIDTH              0x80D9
+#define GL_COLOR_TABLE_WIDTH              (GLenum)0x80D9
 #endif
 #ifndef GL_COLOR_TABLE_RED_SIZE           
-#define GL_COLOR_TABLE_RED_SIZE           0x80DA
+#define GL_COLOR_TABLE_RED_SIZE           (GLenum)0x80DA
 #endif
 #ifndef GL_COLOR_TABLE_GREEN_SIZE         
-#define GL_COLOR_TABLE_GREEN_SIZE         0x80DB
+#define GL_COLOR_TABLE_GREEN_SIZE         (GLenum)0x80DB
 #endif
 #ifndef GL_COLOR_TABLE_BLUE_SIZE          
-#define GL_COLOR_TABLE_BLUE_SIZE          0x80DC
+#define GL_COLOR_TABLE_BLUE_SIZE          (GLenum)0x80DC
 #endif
 #ifndef GL_COLOR_TABLE_ALPHA_SIZE         
-#define GL_COLOR_TABLE_ALPHA_SIZE         0x80DD
+#define GL_COLOR_TABLE_ALPHA_SIZE         (GLenum)0x80DD
 #endif
 #ifndef GL_COLOR_TABLE_LUMINANCE_SIZE     
-#define GL_COLOR_TABLE_LUMINANCE_SIZE     0x80DE
+#define GL_COLOR_TABLE_LUMINANCE_SIZE     (GLenum)0x80DE
 #endif
 #ifndef GL_COLOR_TABLE_INTENSITY_SIZE     
-#define GL_COLOR_TABLE_INTENSITY_SIZE     0x80DF
+#define GL_COLOR_TABLE_INTENSITY_SIZE     (GLenum)0x80DF
 #endif
 #ifndef GL_CLAMP_TO_EDGE                  
-#define GL_CLAMP_TO_EDGE                  0x812F
+#define GL_CLAMP_TO_EDGE                  (GLenum)0x812F
 #endif
 #ifndef GL_TEXTURE_MIN_LOD                
-#define GL_TEXTURE_MIN_LOD                0x813A
+#define GL_TEXTURE_MIN_LOD                (GLenum)0x813A
 #endif
 #ifndef GL_TEXTURE_MAX_LOD                
-#define GL_TEXTURE_MAX_LOD                0x813B
+#define GL_TEXTURE_MAX_LOD                (GLenum)0x813B
 #endif
 #ifndef GL_TEXTURE_BASE_LEVEL             
-#define GL_TEXTURE_BASE_LEVEL             0x813C
+#define GL_TEXTURE_BASE_LEVEL             (GLenum)0x813C
 #endif
 #ifndef GL_TEXTURE_MAX_LEVEL              
-#define GL_TEXTURE_MAX_LEVEL              0x813D
+#define GL_TEXTURE_MAX_LEVEL              (GLenum)0x813D
 #endif
 #ifndef GL_TEXTURE0_ARB                   
-#define GL_TEXTURE0_ARB                   0x84C0
+#define GL_TEXTURE0_ARB                   (GLenum)0x84C0
 #endif
 #ifndef GL_TEXTURE1_ARB                   
-#define GL_TEXTURE1_ARB                   0x84C1
+#define GL_TEXTURE1_ARB                   (GLenum)0x84C1
 #endif
 #ifndef GL_TEXTURE2_ARB                   
-#define GL_TEXTURE2_ARB                   0x84C2
+#define GL_TEXTURE2_ARB                   (GLenum)0x84C2
 #endif
 #ifndef GL_TEXTURE3_ARB                   
-#define GL_TEXTURE3_ARB                   0x84C3
+#define GL_TEXTURE3_ARB                   (GLenum)0x84C3
 #endif
 #ifndef GL_TEXTURE4_ARB                   
-#define GL_TEXTURE4_ARB                   0x84C4
+#define GL_TEXTURE4_ARB                   (GLenum)0x84C4
 #endif
 #ifndef GL_TEXTURE5_ARB                   
-#define GL_TEXTURE5_ARB                   0x84C5
+#define GL_TEXTURE5_ARB                   (GLenum)0x84C5
 #endif
 #ifndef GL_TEXTURE6_ARB                   
-#define GL_TEXTURE6_ARB                   0x84C6
+#define GL_TEXTURE6_ARB                   (GLenum)0x84C6
 #endif
 #ifndef GL_TEXTURE7_ARB                   
-#define GL_TEXTURE7_ARB                   0x84C7
+#define GL_TEXTURE7_ARB                   (GLenum)0x84C7
 #endif
 #ifndef GL_TEXTURE8_ARB                   
-#define GL_TEXTURE8_ARB                   0x84C8
+#define GL_TEXTURE8_ARB                   (GLenum)0x84C8
 #endif
 #ifndef GL_TEXTURE9_ARB                   
-#define GL_TEXTURE9_ARB                   0x84C9
+#define GL_TEXTURE9_ARB                   (GLenum)0x84C9
 #endif
 #ifndef GL_TEXTURE10_ARB                  
-#define GL_TEXTURE10_ARB                  0x84CA
+#define GL_TEXTURE10_ARB                  (GLenum)0x84CA
 #endif
 #ifndef GL_TEXTURE11_ARB                  
-#define GL_TEXTURE11_ARB                  0x84CB
+#define GL_TEXTURE11_ARB                  (GLenum)0x84CB
 #endif
 #ifndef GL_TEXTURE12_ARB                  
-#define GL_TEXTURE12_ARB                  0x84CC
+#define GL_TEXTURE12_ARB                  (GLenum)0x84CC
 #endif
 #ifndef GL_TEXTURE13_ARB                  
-#define GL_TEXTURE13_ARB                  0x84CD
+#define GL_TEXTURE13_ARB                  (GLenum)0x84CD
 #endif
 #ifndef GL_TEXTURE14_ARB                  
-#define GL_TEXTURE14_ARB                  0x84CE
+#define GL_TEXTURE14_ARB                  (GLenum)0x84CE
 #endif
 #ifndef GL_TEXTURE15_ARB                  
-#define GL_TEXTURE15_ARB                  0x84CF
+#define GL_TEXTURE15_ARB                  (GLenum)0x84CF
 #endif
 #ifndef GL_TEXTURE16_ARB                  
-#define GL_TEXTURE16_ARB                  0x84D0
+#define GL_TEXTURE16_ARB                  (GLenum)0x84D0
 #endif
 #ifndef GL_TEXTURE17_ARB                  
-#define GL_TEXTURE17_ARB                  0x84D1
+#define GL_TEXTURE17_ARB                  (GLenum)0x84D1
 #endif
 #ifndef GL_TEXTURE18_ARB                  
-#define GL_TEXTURE18_ARB                  0x84D2
+#define GL_TEXTURE18_ARB                  (GLenum)0x84D2
 #endif
 #ifndef GL_TEXTURE19_ARB                  
-#define GL_TEXTURE19_ARB                  0x84D3
+#define GL_TEXTURE19_ARB                  (GLenum)0x84D3
 #endif
 #ifndef GL_TEXTURE20_ARB                  
-#define GL_TEXTURE20_ARB                  0x84D4
+#define GL_TEXTURE20_ARB                  (GLenum)0x84D4
 #endif
 #ifndef GL_TEXTURE21_ARB                  
-#define GL_TEXTURE21_ARB                  0x84D5
+#define GL_TEXTURE21_ARB                  (GLenum)0x84D5
 #endif
 #ifndef GL_TEXTURE22_ARB                  
-#define GL_TEXTURE22_ARB                  0x84D6
+#define GL_TEXTURE22_ARB                  (GLenum)0x84D6
 #endif
 #ifndef GL_TEXTURE23_ARB                  
-#define GL_TEXTURE23_ARB                  0x84D7
+#define GL_TEXTURE23_ARB                  (GLenum)0x84D7
 #endif
 #ifndef GL_TEXTURE24_ARB                  
-#define GL_TEXTURE24_ARB                  0x84D8
+#define GL_TEXTURE24_ARB                  (GLenum)0x84D8
 #endif
 #ifndef GL_TEXTURE25_ARB                  
-#define GL_TEXTURE25_ARB                  0x84D9
+#define GL_TEXTURE25_ARB                  (GLenum)0x84D9
 #endif
 #ifndef GL_TEXTURE26_ARB                  
-#define GL_TEXTURE26_ARB                  0x84DA
+#define GL_TEXTURE26_ARB                  (GLenum)0x84DA
 #endif
 #ifndef GL_TEXTURE27_ARB                  
-#define GL_TEXTURE27_ARB                  0x84DB
+#define GL_TEXTURE27_ARB                  (GLenum)0x84DB
 #endif
 #ifndef GL_TEXTURE28_ARB                  
-#define GL_TEXTURE28_ARB                  0x84DC
+#define GL_TEXTURE28_ARB                  (GLenum)0x84DC
 #endif
 #ifndef GL_TEXTURE29_ARB                  
-#define GL_TEXTURE29_ARB                  0x84DD
+#define GL_TEXTURE29_ARB                  (GLenum)0x84DD
 #endif
 #ifndef GL_TEXTURE30_ARB                  
-#define GL_TEXTURE30_ARB                  0x84DE
+#define GL_TEXTURE30_ARB                  (GLenum)0x84DE
 #endif
 #ifndef GL_TEXTURE31_ARB                  
-#define GL_TEXTURE31_ARB                  0x84DF
+#define GL_TEXTURE31_ARB                  (GLenum)0x84DF
 #endif
 #ifndef GL_ACTIVE_TEXTURE_ARB             
-#define GL_ACTIVE_TEXTURE_ARB             0x84E0
+#define GL_ACTIVE_TEXTURE_ARB             (GLenum)0x84E0
 #endif
 #ifndef GL_CLIENT_ACTIVE_TEXTURE_ARB      
-#define GL_CLIENT_ACTIVE_TEXTURE_ARB      0x84E1
+#define GL_CLIENT_ACTIVE_TEXTURE_ARB      (GLenum)0x84E1
 #endif
 #ifndef GL_MAX_TEXTURE_UNITS_ARB          
-#define GL_MAX_TEXTURE_UNITS_ARB          0x84E2
+#define GL_MAX_TEXTURE_UNITS_ARB          (GLenum)0x84E2
 #endif
 #ifndef GL_TRANSPOSE_MODELVIEW_MATRIX_ARB 
-#define GL_TRANSPOSE_MODELVIEW_MATRIX_ARB 0x84E3
+#define GL_TRANSPOSE_MODELVIEW_MATRIX_ARB (GLenum)0x84E3
 #endif
 #ifndef GL_TRANSPOSE_PROJECTION_MATRIX_ARB 
-#define GL_TRANSPOSE_PROJECTION_MATRIX_ARB 0x84E4
+#define GL_TRANSPOSE_PROJECTION_MATRIX_ARB (GLenum)0x84E4
 #endif
 #ifndef GL_TRANSPOSE_TEXTURE_MATRIX_ARB   
-#define GL_TRANSPOSE_TEXTURE_MATRIX_ARB   0x84E5
+#define GL_TRANSPOSE_TEXTURE_MATRIX_ARB   (GLenum)0x84E5
 #endif
 #ifndef GL_TRANSPOSE_COLOR_MATRIX_ARB     
-#define GL_TRANSPOSE_COLOR_MATRIX_ARB     0x84E6
+#define GL_TRANSPOSE_COLOR_MATRIX_ARB     (GLenum)0x84E6
 #endif
 #ifndef GL_MULTISAMPLE_ARB                
-#define GL_MULTISAMPLE_ARB                0x809D
+#define GL_MULTISAMPLE_ARB                (GLenum)0x809D
 #endif
 #ifndef GL_SAMPLE_ALPHA_TO_COVERAGE_ARB   
-#define GL_SAMPLE_ALPHA_TO_COVERAGE_ARB   0x809E
+#define GL_SAMPLE_ALPHA_TO_COVERAGE_ARB   (GLenum)0x809E
 #endif
 #ifndef GL_SAMPLE_ALPHA_TO_ONE_ARB        
-#define GL_SAMPLE_ALPHA_TO_ONE_ARB        0x809F
+#define GL_SAMPLE_ALPHA_TO_ONE_ARB        (GLenum)0x809F
 #endif
 #ifndef GL_SAMPLE_COVERAGE_ARB            
-#define GL_SAMPLE_COVERAGE_ARB            0x80A0
+#define GL_SAMPLE_COVERAGE_ARB            (GLenum)0x80A0
 #endif
 #ifndef GL_SAMPLE_BUFFERS_ARB             
-#define GL_SAMPLE_BUFFERS_ARB             0x80A8
+#define GL_SAMPLE_BUFFERS_ARB             (GLenum)0x80A8
 #endif
 #ifndef GL_SAMPLES_ARB                    
-#define GL_SAMPLES_ARB                    0x80A9
+#define GL_SAMPLES_ARB                    (GLenum)0x80A9
 #endif
 #ifndef GL_SAMPLE_COVERAGE_VALUE_ARB      
-#define GL_SAMPLE_COVERAGE_VALUE_ARB      0x80AA
+#define GL_SAMPLE_COVERAGE_VALUE_ARB      (GLenum)0x80AA
 #endif
 #ifndef GL_SAMPLE_COVERAGE_INVERT_ARB     
-#define GL_SAMPLE_COVERAGE_INVERT_ARB     0x80AB
+#define GL_SAMPLE_COVERAGE_INVERT_ARB     (GLenum)0x80AB
 #endif
 #ifndef GL_MULTISAMPLE_BIT_ARB            
-#define GL_MULTISAMPLE_BIT_ARB            0x20000000
+#define GL_MULTISAMPLE_BIT_ARB            (GLenum)0x20000000
 #endif
 #ifndef GL_NORMAL_MAP_ARB                 
-#define GL_NORMAL_MAP_ARB                 0x8511
+#define GL_NORMAL_MAP_ARB                 (GLenum)0x8511
 #endif
 #ifndef GL_REFLECTION_MAP_ARB             
-#define GL_REFLECTION_MAP_ARB             0x8512
+#define GL_REFLECTION_MAP_ARB             (GLenum)0x8512
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_ARB           
-#define GL_TEXTURE_CUBE_MAP_ARB           0x8513
+#define GL_TEXTURE_CUBE_MAP_ARB           (GLenum)0x8513
 #endif
 #ifndef GL_TEXTURE_BINDING_CUBE_MAP_ARB   
-#define GL_TEXTURE_BINDING_CUBE_MAP_ARB   0x8514
+#define GL_TEXTURE_BINDING_CUBE_MAP_ARB   (GLenum)0x8514
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB 
-#define GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB 0x8515
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB (GLenum)0x8515
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB 
-#define GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB 0x8516
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB (GLenum)0x8516
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB 
-#define GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB 0x8517
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB (GLenum)0x8517
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB 
-#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB 0x8518
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB (GLenum)0x8518
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB 
-#define GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB 0x8519
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB (GLenum)0x8519
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB 
-#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB 0x851A
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB (GLenum)0x851A
 #endif
 #ifndef GL_PROXY_TEXTURE_CUBE_MAP_ARB     
-#define GL_PROXY_TEXTURE_CUBE_MAP_ARB     0x851B
+#define GL_PROXY_TEXTURE_CUBE_MAP_ARB     (GLenum)0x851B
 #endif
 #ifndef GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB  
-#define GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB  0x851C
+#define GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB  (GLenum)0x851C
 #endif
 #ifndef GL_COMPRESSED_ALPHA_ARB           
-#define GL_COMPRESSED_ALPHA_ARB           0x84E9
+#define GL_COMPRESSED_ALPHA_ARB           (GLenum)0x84E9
 #endif
 #ifndef GL_COMPRESSED_LUMINANCE_ARB       
-#define GL_COMPRESSED_LUMINANCE_ARB       0x84EA
+#define GL_COMPRESSED_LUMINANCE_ARB       (GLenum)0x84EA
 #endif
 #ifndef GL_COMPRESSED_LUMINANCE_ALPHA_ARB 
-#define GL_COMPRESSED_LUMINANCE_ALPHA_ARB 0x84EB
+#define GL_COMPRESSED_LUMINANCE_ALPHA_ARB (GLenum)0x84EB
 #endif
 #ifndef GL_COMPRESSED_INTENSITY_ARB       
-#define GL_COMPRESSED_INTENSITY_ARB       0x84EC
+#define GL_COMPRESSED_INTENSITY_ARB       (GLenum)0x84EC
 #endif
 #ifndef GL_COMPRESSED_RGB_ARB             
-#define GL_COMPRESSED_RGB_ARB             0x84ED
+#define GL_COMPRESSED_RGB_ARB             (GLenum)0x84ED
 #endif
 #ifndef GL_COMPRESSED_RGBA_ARB            
-#define GL_COMPRESSED_RGBA_ARB            0x84EE
+#define GL_COMPRESSED_RGBA_ARB            (GLenum)0x84EE
 #endif
 #ifndef GL_TEXTURE_COMPRESSION_HINT_ARB   
-#define GL_TEXTURE_COMPRESSION_HINT_ARB   0x84EF
+#define GL_TEXTURE_COMPRESSION_HINT_ARB   (GLenum)0x84EF
 #endif
 #ifndef GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB         
-#define GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB         0x86A0
+#define GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB         (GLenum)0x86A0
 #endif
 #ifndef GL_TEXTURE_COMPRESSED_ARB         
-#define GL_TEXTURE_COMPRESSED_ARB         0x86A1
+#define GL_TEXTURE_COMPRESSED_ARB         (GLenum)0x86A1
 #endif
 #ifndef GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB 
-#define GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB 0x86A2
+#define GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB (GLenum)0x86A2
 #endif
 #ifndef GL_COMPRESSED_TEXTURE_FORMATS_ARB 
-#define GL_COMPRESSED_TEXTURE_FORMATS_ARB 0x86A3
+#define GL_COMPRESSED_TEXTURE_FORMATS_ARB (GLenum)0x86A3
 #endif
 #ifndef GL_ABGR_EXT                       
-#define GL_ABGR_EXT                       0x8000
+#define GL_ABGR_EXT                       (GLenum)0x8000
 #endif
 #ifndef GL_CONSTANT_COLOR_EXT             
-#define GL_CONSTANT_COLOR_EXT             0x8001
+#define GL_CONSTANT_COLOR_EXT             (GLenum)0x8001
 #endif
 #ifndef GL_ONE_MINUS_CONSTANT_COLOR_EXT   
-#define GL_ONE_MINUS_CONSTANT_COLOR_EXT   0x8002
+#define GL_ONE_MINUS_CONSTANT_COLOR_EXT   (GLenum)0x8002
 #endif
 #ifndef GL_CONSTANT_ALPHA_EXT             
-#define GL_CONSTANT_ALPHA_EXT             0x8003
+#define GL_CONSTANT_ALPHA_EXT             (GLenum)0x8003
 #endif
 #ifndef GL_ONE_MINUS_CONSTANT_ALPHA_EXT   
-#define GL_ONE_MINUS_CONSTANT_ALPHA_EXT   0x8004
+#define GL_ONE_MINUS_CONSTANT_ALPHA_EXT   (GLenum)0x8004
 #endif
 #ifndef GL_BLEND_COLOR_EXT                
-#define GL_BLEND_COLOR_EXT                0x8005
+#define GL_BLEND_COLOR_EXT                (GLenum)0x8005
 #endif
 #ifndef GL_POLYGON_OFFSET_EXT             
-#define GL_POLYGON_OFFSET_EXT             0x8037
+#define GL_POLYGON_OFFSET_EXT             (GLenum)0x8037
 #endif
 #ifndef GL_POLYGON_OFFSET_FACTOR_EXT      
-#define GL_POLYGON_OFFSET_FACTOR_EXT      0x8038
+#define GL_POLYGON_OFFSET_FACTOR_EXT      (GLenum)0x8038
 #endif
 #ifndef GL_POLYGON_OFFSET_BIAS_EXT        
-#define GL_POLYGON_OFFSET_BIAS_EXT        0x8039
+#define GL_POLYGON_OFFSET_BIAS_EXT        (GLenum)0x8039
 #endif
 #ifndef GL_ALPHA4_EXT                     
-#define GL_ALPHA4_EXT                     0x803B
+#define GL_ALPHA4_EXT                     (GLenum)0x803B
 #endif
 #ifndef GL_ALPHA8_EXT                     
-#define GL_ALPHA8_EXT                     0x803C
+#define GL_ALPHA8_EXT                     (GLenum)0x803C
 #endif
 #ifndef GL_ALPHA12_EXT                    
-#define GL_ALPHA12_EXT                    0x803D
+#define GL_ALPHA12_EXT                    (GLenum)0x803D
 #endif
 #ifndef GL_ALPHA16_EXT                    
-#define GL_ALPHA16_EXT                    0x803E
+#define GL_ALPHA16_EXT                    (GLenum)0x803E
 #endif
 #ifndef GL_LUMINANCE4_EXT                 
-#define GL_LUMINANCE4_EXT                 0x803F
+#define GL_LUMINANCE4_EXT                 (GLenum)0x803F
 #endif
 #ifndef GL_LUMINANCE8_EXT                 
-#define GL_LUMINANCE8_EXT                 0x8040
+#define GL_LUMINANCE8_EXT                 (GLenum)0x8040
 #endif
 #ifndef GL_LUMINANCE12_EXT                
-#define GL_LUMINANCE12_EXT                0x8041
+#define GL_LUMINANCE12_EXT                (GLenum)0x8041
 #endif
 #ifndef GL_LUMINANCE16_EXT                
-#define GL_LUMINANCE16_EXT                0x8042
+#define GL_LUMINANCE16_EXT                (GLenum)0x8042
 #endif
 #ifndef GL_LUMINANCE4_ALPHA4_EXT          
-#define GL_LUMINANCE4_ALPHA4_EXT          0x8043
+#define GL_LUMINANCE4_ALPHA4_EXT          (GLenum)0x8043
 #endif
 #ifndef GL_LUMINANCE6_ALPHA2_EXT          
-#define GL_LUMINANCE6_ALPHA2_EXT          0x8044
+#define GL_LUMINANCE6_ALPHA2_EXT          (GLenum)0x8044
 #endif
 #ifndef GL_LUMINANCE8_ALPHA8_EXT          
-#define GL_LUMINANCE8_ALPHA8_EXT          0x8045
+#define GL_LUMINANCE8_ALPHA8_EXT          (GLenum)0x8045
 #endif
 #ifndef GL_LUMINANCE12_ALPHA4_EXT         
-#define GL_LUMINANCE12_ALPHA4_EXT         0x8046
+#define GL_LUMINANCE12_ALPHA4_EXT         (GLenum)0x8046
 #endif
 #ifndef GL_LUMINANCE12_ALPHA12_EXT        
-#define GL_LUMINANCE12_ALPHA12_EXT        0x8047
+#define GL_LUMINANCE12_ALPHA12_EXT        (GLenum)0x8047
 #endif
 #ifndef GL_LUMINANCE16_ALPHA16_EXT        
-#define GL_LUMINANCE16_ALPHA16_EXT        0x8048
+#define GL_LUMINANCE16_ALPHA16_EXT        (GLenum)0x8048
 #endif
 #ifndef GL_INTENSITY_EXT                  
-#define GL_INTENSITY_EXT                  0x8049
+#define GL_INTENSITY_EXT                  (GLenum)0x8049
 #endif
 #ifndef GL_INTENSITY4_EXT                 
-#define GL_INTENSITY4_EXT                 0x804A
+#define GL_INTENSITY4_EXT                 (GLenum)0x804A
 #endif
 #ifndef GL_INTENSITY8_EXT                 
-#define GL_INTENSITY8_EXT                 0x804B
+#define GL_INTENSITY8_EXT                 (GLenum)0x804B
 #endif
 #ifndef GL_INTENSITY12_EXT                
-#define GL_INTENSITY12_EXT                0x804C
+#define GL_INTENSITY12_EXT                (GLenum)0x804C
 #endif
 #ifndef GL_INTENSITY16_EXT                
-#define GL_INTENSITY16_EXT                0x804D
+#define GL_INTENSITY16_EXT                (GLenum)0x804D
 #endif
 #ifndef GL_RGB2_EXT                       
-#define GL_RGB2_EXT                       0x804E
+#define GL_RGB2_EXT                       (GLenum)0x804E
 #endif
 #ifndef GL_RGB4_EXT                       
-#define GL_RGB4_EXT                       0x804F
+#define GL_RGB4_EXT                       (GLenum)0x804F
 #endif
 #ifndef GL_RGB5_EXT                       
-#define GL_RGB5_EXT                       0x8050
+#define GL_RGB5_EXT                       (GLenum)0x8050
 #endif
 #ifndef GL_RGB8_EXT                       
-#define GL_RGB8_EXT                       0x8051
+#define GL_RGB8_EXT                       (GLenum)0x8051
 #endif
 #ifndef GL_RGB10_EXT                      
-#define GL_RGB10_EXT                      0x8052
+#define GL_RGB10_EXT                      (GLenum)0x8052
 #endif
 #ifndef GL_RGB12_EXT                      
-#define GL_RGB12_EXT                      0x8053
+#define GL_RGB12_EXT                      (GLenum)0x8053
 #endif
 #ifndef GL_RGB16_EXT                      
-#define GL_RGB16_EXT                      0x8054
+#define GL_RGB16_EXT                      (GLenum)0x8054
 #endif
 #ifndef GL_RGBA2_EXT                      
-#define GL_RGBA2_EXT                      0x8055
+#define GL_RGBA2_EXT                      (GLenum)0x8055
 #endif
 #ifndef GL_RGBA4_EXT                      
-#define GL_RGBA4_EXT                      0x8056
+#define GL_RGBA4_EXT                      (GLenum)0x8056
 #endif
 #ifndef GL_RGB5_A1_EXT                    
-#define GL_RGB5_A1_EXT                    0x8057
+#define GL_RGB5_A1_EXT                    (GLenum)0x8057
 #endif
 #ifndef GL_RGBA8_EXT                      
-#define GL_RGBA8_EXT                      0x8058
+#define GL_RGBA8_EXT                      (GLenum)0x8058
 #endif
 #ifndef GL_RGB10_A2_EXT                   
-#define GL_RGB10_A2_EXT                   0x8059
+#define GL_RGB10_A2_EXT                   (GLenum)0x8059
 #endif
 #ifndef GL_RGBA12_EXT                     
-#define GL_RGBA12_EXT                     0x805A
+#define GL_RGBA12_EXT                     (GLenum)0x805A
 #endif
 #ifndef GL_RGBA16_EXT                     
-#define GL_RGBA16_EXT                     0x805B
+#define GL_RGBA16_EXT                     (GLenum)0x805B
 #endif
 #ifndef GL_TEXTURE_RED_SIZE_EXT           
-#define GL_TEXTURE_RED_SIZE_EXT           0x805C
+#define GL_TEXTURE_RED_SIZE_EXT           (GLenum)0x805C
 #endif
 #ifndef GL_TEXTURE_GREEN_SIZE_EXT         
-#define GL_TEXTURE_GREEN_SIZE_EXT         0x805D
+#define GL_TEXTURE_GREEN_SIZE_EXT         (GLenum)0x805D
 #endif
 #ifndef GL_TEXTURE_BLUE_SIZE_EXT          
-#define GL_TEXTURE_BLUE_SIZE_EXT          0x805E
+#define GL_TEXTURE_BLUE_SIZE_EXT          (GLenum)0x805E
 #endif
 #ifndef GL_TEXTURE_ALPHA_SIZE_EXT         
-#define GL_TEXTURE_ALPHA_SIZE_EXT         0x805F
+#define GL_TEXTURE_ALPHA_SIZE_EXT         (GLenum)0x805F
 #endif
 #ifndef GL_TEXTURE_LUMINANCE_SIZE_EXT     
-#define GL_TEXTURE_LUMINANCE_SIZE_EXT     0x8060
+#define GL_TEXTURE_LUMINANCE_SIZE_EXT     (GLenum)0x8060
 #endif
 #ifndef GL_TEXTURE_INTENSITY_SIZE_EXT     
-#define GL_TEXTURE_INTENSITY_SIZE_EXT     0x8061
+#define GL_TEXTURE_INTENSITY_SIZE_EXT     (GLenum)0x8061
 #endif
 #ifndef GL_REPLACE_EXT                    
-#define GL_REPLACE_EXT                    0x8062
+#define GL_REPLACE_EXT                    (GLenum)0x8062
 #endif
 #ifndef GL_PROXY_TEXTURE_1D_EXT           
-#define GL_PROXY_TEXTURE_1D_EXT           0x8063
+#define GL_PROXY_TEXTURE_1D_EXT           (GLenum)0x8063
 #endif
 #ifndef GL_PROXY_TEXTURE_2D_EXT           
-#define GL_PROXY_TEXTURE_2D_EXT           0x8064
+#define GL_PROXY_TEXTURE_2D_EXT           (GLenum)0x8064
 #endif
 #ifndef GL_TEXTURE_TOO_LARGE_EXT          
-#define GL_TEXTURE_TOO_LARGE_EXT          0x8065
+#define GL_TEXTURE_TOO_LARGE_EXT          (GLenum)0x8065
 #endif
 #ifndef GL_PACK_SKIP_IMAGES               
-#define GL_PACK_SKIP_IMAGES               0x806B
+#define GL_PACK_SKIP_IMAGES               (GLenum)0x806B
 #endif
 #ifndef GL_PACK_SKIP_IMAGES_EXT           
-#define GL_PACK_SKIP_IMAGES_EXT           0x806B
+#define GL_PACK_SKIP_IMAGES_EXT           (GLenum)0x806B
 #endif
 #ifndef GL_PACK_IMAGE_HEIGHT              
-#define GL_PACK_IMAGE_HEIGHT              0x806C
+#define GL_PACK_IMAGE_HEIGHT              (GLenum)0x806C
 #endif
 #ifndef GL_PACK_IMAGE_HEIGHT_EXT          
-#define GL_PACK_IMAGE_HEIGHT_EXT          0x806C
+#define GL_PACK_IMAGE_HEIGHT_EXT          (GLenum)0x806C
 #endif
 #ifndef GL_UNPACK_SKIP_IMAGES             
-#define GL_UNPACK_SKIP_IMAGES             0x806D
+#define GL_UNPACK_SKIP_IMAGES             (GLenum)0x806D
 #endif
 #ifndef GL_UNPACK_SKIP_IMAGES_EXT         
-#define GL_UNPACK_SKIP_IMAGES_EXT         0x806D
+#define GL_UNPACK_SKIP_IMAGES_EXT         (GLenum)0x806D
 #endif
 #ifndef GL_UNPACK_IMAGE_HEIGHT            
-#define GL_UNPACK_IMAGE_HEIGHT            0x806E
+#define GL_UNPACK_IMAGE_HEIGHT            (GLenum)0x806E
 #endif
 #ifndef GL_UNPACK_IMAGE_HEIGHT_EXT        
-#define GL_UNPACK_IMAGE_HEIGHT_EXT        0x806E
+#define GL_UNPACK_IMAGE_HEIGHT_EXT        (GLenum)0x806E
 #endif
 #ifndef GL_TEXTURE_3D                     
-#define GL_TEXTURE_3D                     0x806F
+#define GL_TEXTURE_3D                     (GLenum)0x806F
 #endif
 #ifndef GL_TEXTURE_3D_EXT                 
-#define GL_TEXTURE_3D_EXT                 0x806F
+#define GL_TEXTURE_3D_EXT                 (GLenum)0x806F
 #endif
 #ifndef GL_PROXY_TEXTURE_3D               
-#define GL_PROXY_TEXTURE_3D               0x8070
+#define GL_PROXY_TEXTURE_3D               (GLenum)0x8070
 #endif
 #ifndef GL_PROXY_TEXTURE_3D_EXT           
-#define GL_PROXY_TEXTURE_3D_EXT           0x8070
+#define GL_PROXY_TEXTURE_3D_EXT           (GLenum)0x8070
 #endif
 #ifndef GL_TEXTURE_DEPTH                  
-#define GL_TEXTURE_DEPTH                  0x8071
+#define GL_TEXTURE_DEPTH                  (GLenum)0x8071
 #endif
 #ifndef GL_TEXTURE_DEPTH_EXT              
-#define GL_TEXTURE_DEPTH_EXT              0x8071
+#define GL_TEXTURE_DEPTH_EXT              (GLenum)0x8071
 #endif
 #ifndef GL_TEXTURE_WRAP_R                 
-#define GL_TEXTURE_WRAP_R                 0x8072
+#define GL_TEXTURE_WRAP_R                 (GLenum)0x8072
 #endif
 #ifndef GL_TEXTURE_WRAP_R_EXT             
-#define GL_TEXTURE_WRAP_R_EXT             0x8072
+#define GL_TEXTURE_WRAP_R_EXT             (GLenum)0x8072
 #endif
 #ifndef GL_MAX_3D_TEXTURE_SIZE            
-#define GL_MAX_3D_TEXTURE_SIZE            0x8073
+#define GL_MAX_3D_TEXTURE_SIZE            (GLenum)0x8073
 #endif
 #ifndef GL_MAX_3D_TEXTURE_SIZE_EXT        
-#define GL_MAX_3D_TEXTURE_SIZE_EXT        0x8073
+#define GL_MAX_3D_TEXTURE_SIZE_EXT        (GLenum)0x8073
 #endif
 #ifndef GL_FILTER4_SGIS                   
-#define GL_FILTER4_SGIS                   0x8146
+#define GL_FILTER4_SGIS                   (GLenum)0x8146
 #endif
 #ifndef GL_TEXTURE_FILTER4_SIZE_SGIS      
-#define GL_TEXTURE_FILTER4_SIZE_SGIS      0x8147
+#define GL_TEXTURE_FILTER4_SIZE_SGIS      (GLenum)0x8147
 #endif
 #ifndef GL_HISTOGRAM_EXT                  
-#define GL_HISTOGRAM_EXT                  0x8024
+#define GL_HISTOGRAM_EXT                  (GLenum)0x8024
 #endif
 #ifndef GL_PROXY_HISTOGRAM_EXT            
-#define GL_PROXY_HISTOGRAM_EXT            0x8025
+#define GL_PROXY_HISTOGRAM_EXT            (GLenum)0x8025
 #endif
 #ifndef GL_HISTOGRAM_WIDTH_EXT            
-#define GL_HISTOGRAM_WIDTH_EXT            0x8026
+#define GL_HISTOGRAM_WIDTH_EXT            (GLenum)0x8026
 #endif
 #ifndef GL_HISTOGRAM_FORMAT_EXT           
-#define GL_HISTOGRAM_FORMAT_EXT           0x8027
+#define GL_HISTOGRAM_FORMAT_EXT           (GLenum)0x8027
 #endif
 #ifndef GL_HISTOGRAM_RED_SIZE_EXT         
-#define GL_HISTOGRAM_RED_SIZE_EXT         0x8028
+#define GL_HISTOGRAM_RED_SIZE_EXT         (GLenum)0x8028
 #endif
 #ifndef GL_HISTOGRAM_GREEN_SIZE_EXT       
-#define GL_HISTOGRAM_GREEN_SIZE_EXT       0x8029
+#define GL_HISTOGRAM_GREEN_SIZE_EXT       (GLenum)0x8029
 #endif
 #ifndef GL_HISTOGRAM_BLUE_SIZE_EXT        
-#define GL_HISTOGRAM_BLUE_SIZE_EXT        0x802A
+#define GL_HISTOGRAM_BLUE_SIZE_EXT        (GLenum)0x802A
 #endif
 #ifndef GL_HISTOGRAM_ALPHA_SIZE_EXT       
-#define GL_HISTOGRAM_ALPHA_SIZE_EXT       0x802B
+#define GL_HISTOGRAM_ALPHA_SIZE_EXT       (GLenum)0x802B
 #endif
 #ifndef GL_HISTOGRAM_LUMINANCE_SIZE_EXT   
-#define GL_HISTOGRAM_LUMINANCE_SIZE_EXT   0x802C
+#define GL_HISTOGRAM_LUMINANCE_SIZE_EXT   (GLenum)0x802C
 #endif
 #ifndef GL_HISTOGRAM_SINK_EXT             
-#define GL_HISTOGRAM_SINK_EXT             0x802D
+#define GL_HISTOGRAM_SINK_EXT             (GLenum)0x802D
 #endif
 #ifndef GL_MINMAX_EXT                     
-#define GL_MINMAX_EXT                     0x802E
+#define GL_MINMAX_EXT                     (GLenum)0x802E
 #endif
 #ifndef GL_MINMAX_FORMAT_EXT              
-#define GL_MINMAX_FORMAT_EXT              0x802F
+#define GL_MINMAX_FORMAT_EXT              (GLenum)0x802F
 #endif
 #ifndef GL_MINMAX_SINK_EXT                
-#define GL_MINMAX_SINK_EXT                0x8030
+#define GL_MINMAX_SINK_EXT                (GLenum)0x8030
 #endif
 #ifndef GL_TABLE_TOO_LARGE_EXT            
-#define GL_TABLE_TOO_LARGE_EXT            0x8031
+#define GL_TABLE_TOO_LARGE_EXT            (GLenum)0x8031
 #endif
 #ifndef GL_CONVOLUTION_1D_EXT             
-#define GL_CONVOLUTION_1D_EXT             0x8010
+#define GL_CONVOLUTION_1D_EXT             (GLenum)0x8010
 #endif
 #ifndef GL_CONVOLUTION_2D_EXT             
-#define GL_CONVOLUTION_2D_EXT             0x8011
+#define GL_CONVOLUTION_2D_EXT             (GLenum)0x8011
 #endif
 #ifndef GL_SEPARABLE_2D_EXT               
-#define GL_SEPARABLE_2D_EXT               0x8012
+#define GL_SEPARABLE_2D_EXT               (GLenum)0x8012
 #endif
 #ifndef GL_CONVOLUTION_BORDER_MODE_EXT    
-#define GL_CONVOLUTION_BORDER_MODE_EXT    0x8013
+#define GL_CONVOLUTION_BORDER_MODE_EXT    (GLenum)0x8013
 #endif
 #ifndef GL_CONVOLUTION_FILTER_SCALE_EXT   
-#define GL_CONVOLUTION_FILTER_SCALE_EXT   0x8014
+#define GL_CONVOLUTION_FILTER_SCALE_EXT   (GLenum)0x8014
 #endif
 #ifndef GL_CONVOLUTION_FILTER_BIAS_EXT    
-#define GL_CONVOLUTION_FILTER_BIAS_EXT    0x8015
+#define GL_CONVOLUTION_FILTER_BIAS_EXT    (GLenum)0x8015
 #endif
 #ifndef GL_REDUCE_EXT                     
-#define GL_REDUCE_EXT                     0x8016
+#define GL_REDUCE_EXT                     (GLenum)0x8016
 #endif
 #ifndef GL_CONVOLUTION_FORMAT_EXT         
-#define GL_CONVOLUTION_FORMAT_EXT         0x8017
+#define GL_CONVOLUTION_FORMAT_EXT         (GLenum)0x8017
 #endif
 #ifndef GL_CONVOLUTION_WIDTH_EXT          
-#define GL_CONVOLUTION_WIDTH_EXT          0x8018
+#define GL_CONVOLUTION_WIDTH_EXT          (GLenum)0x8018
 #endif
 #ifndef GL_CONVOLUTION_HEIGHT_EXT         
-#define GL_CONVOLUTION_HEIGHT_EXT         0x8019
+#define GL_CONVOLUTION_HEIGHT_EXT         (GLenum)0x8019
 #endif
 #ifndef GL_MAX_CONVOLUTION_WIDTH_EXT      
-#define GL_MAX_CONVOLUTION_WIDTH_EXT      0x801A
+#define GL_MAX_CONVOLUTION_WIDTH_EXT      (GLenum)0x801A
 #endif
 #ifndef GL_MAX_CONVOLUTION_HEIGHT_EXT     
-#define GL_MAX_CONVOLUTION_HEIGHT_EXT     0x801B
+#define GL_MAX_CONVOLUTION_HEIGHT_EXT     (GLenum)0x801B
 #endif
 #ifndef GL_POST_CONVOLUTION_RED_SCALE_EXT 
-#define GL_POST_CONVOLUTION_RED_SCALE_EXT 0x801C
+#define GL_POST_CONVOLUTION_RED_SCALE_EXT (GLenum)0x801C
 #endif
 #ifndef GL_POST_CONVOLUTION_GREEN_SCALE_EXT 
-#define GL_POST_CONVOLUTION_GREEN_SCALE_EXT 0x801D
+#define GL_POST_CONVOLUTION_GREEN_SCALE_EXT (GLenum)0x801D
 #endif
 #ifndef GL_POST_CONVOLUTION_BLUE_SCALE_EXT 
-#define GL_POST_CONVOLUTION_BLUE_SCALE_EXT 0x801E
+#define GL_POST_CONVOLUTION_BLUE_SCALE_EXT (GLenum)0x801E
 #endif
 #ifndef GL_POST_CONVOLUTION_ALPHA_SCALE_EXT 
-#define GL_POST_CONVOLUTION_ALPHA_SCALE_EXT 0x801F
+#define GL_POST_CONVOLUTION_ALPHA_SCALE_EXT (GLenum)0x801F
 #endif
 #ifndef GL_POST_CONVOLUTION_RED_BIAS_EXT  
-#define GL_POST_CONVOLUTION_RED_BIAS_EXT  0x8020
+#define GL_POST_CONVOLUTION_RED_BIAS_EXT  (GLenum)0x8020
 #endif
 #ifndef GL_POST_CONVOLUTION_GREEN_BIAS_EXT 
-#define GL_POST_CONVOLUTION_GREEN_BIAS_EXT 0x8021
+#define GL_POST_CONVOLUTION_GREEN_BIAS_EXT (GLenum)0x8021
 #endif
 #ifndef GL_POST_CONVOLUTION_BLUE_BIAS_EXT 
-#define GL_POST_CONVOLUTION_BLUE_BIAS_EXT 0x8022
+#define GL_POST_CONVOLUTION_BLUE_BIAS_EXT (GLenum)0x8022
 #endif
 #ifndef GL_POST_CONVOLUTION_ALPHA_BIAS_EXT 
-#define GL_POST_CONVOLUTION_ALPHA_BIAS_EXT 0x8023
+#define GL_POST_CONVOLUTION_ALPHA_BIAS_EXT (GLenum)0x8023
 #endif
 #ifndef GL_COLOR_MATRIX_SGI               
-#define GL_COLOR_MATRIX_SGI               0x80B1
+#define GL_COLOR_MATRIX_SGI               (GLenum)0x80B1
 #endif
 #ifndef GL_COLOR_MATRIX_STACK_DEPTH_SGI   
-#define GL_COLOR_MATRIX_STACK_DEPTH_SGI   0x80B2
+#define GL_COLOR_MATRIX_STACK_DEPTH_SGI   (GLenum)0x80B2
 #endif
 #ifndef GL_MAX_COLOR_MATRIX_STACK_DEPTH_SGI 
-#define GL_MAX_COLOR_MATRIX_STACK_DEPTH_SGI 0x80B3
+#define GL_MAX_COLOR_MATRIX_STACK_DEPTH_SGI (GLenum)0x80B3
 #endif
 #ifndef GL_POST_COLOR_MATRIX_RED_SCALE_SGI 
-#define GL_POST_COLOR_MATRIX_RED_SCALE_SGI 0x80B4
+#define GL_POST_COLOR_MATRIX_RED_SCALE_SGI (GLenum)0x80B4
 #endif
 #ifndef GL_POST_COLOR_MATRIX_GREEN_SCALE_SGI 
-#define GL_POST_COLOR_MATRIX_GREEN_SCALE_SGI 0x80B5
+#define GL_POST_COLOR_MATRIX_GREEN_SCALE_SGI (GLenum)0x80B5
 #endif
 #ifndef GL_POST_COLOR_MATRIX_BLUE_SCALE_SGI 
-#define GL_POST_COLOR_MATRIX_BLUE_SCALE_SGI 0x80B6
+#define GL_POST_COLOR_MATRIX_BLUE_SCALE_SGI (GLenum)0x80B6
 #endif
 #ifndef GL_POST_COLOR_MATRIX_ALPHA_SCALE_SGI 
-#define GL_POST_COLOR_MATRIX_ALPHA_SCALE_SGI 0x80B7
+#define GL_POST_COLOR_MATRIX_ALPHA_SCALE_SGI (GLenum)0x80B7
 #endif
 #ifndef GL_POST_COLOR_MATRIX_RED_BIAS_SGI 
-#define GL_POST_COLOR_MATRIX_RED_BIAS_SGI 0x80B8
+#define GL_POST_COLOR_MATRIX_RED_BIAS_SGI (GLenum)0x80B8
 #endif
 #ifndef GL_POST_COLOR_MATRIX_GREEN_BIAS_SGI 
-#define GL_POST_COLOR_MATRIX_GREEN_BIAS_SGI 0x80B9
+#define GL_POST_COLOR_MATRIX_GREEN_BIAS_SGI (GLenum)0x80B9
 #endif
 #ifndef GL_POST_COLOR_MATRIX_BLUE_BIAS_SGI 
-#define GL_POST_COLOR_MATRIX_BLUE_BIAS_SGI 0x80BA
+#define GL_POST_COLOR_MATRIX_BLUE_BIAS_SGI (GLenum)0x80BA
 #endif
 #ifndef GL_POST_COLOR_MATRIX_ALPHA_BIAS_SGI 
-#define GL_POST_COLOR_MATRIX_ALPHA_BIAS_SGI 0x80BB
+#define GL_POST_COLOR_MATRIX_ALPHA_BIAS_SGI (GLenum)0x80BB
 #endif
 #ifndef GL_COLOR_TABLE_SGI                
-#define GL_COLOR_TABLE_SGI                0x80D0
+#define GL_COLOR_TABLE_SGI                (GLenum)0x80D0
 #endif
 #ifndef GL_POST_CONVOLUTION_COLOR_TABLE_SGI 
-#define GL_POST_CONVOLUTION_COLOR_TABLE_SGI 0x80D1
+#define GL_POST_CONVOLUTION_COLOR_TABLE_SGI (GLenum)0x80D1
 #endif
 #ifndef GL_POST_COLOR_MATRIX_COLOR_TABLE_SGI 
-#define GL_POST_COLOR_MATRIX_COLOR_TABLE_SGI 0x80D2
+#define GL_POST_COLOR_MATRIX_COLOR_TABLE_SGI (GLenum)0x80D2
 #endif
 #ifndef GL_PROXY_COLOR_TABLE_SGI          
-#define GL_PROXY_COLOR_TABLE_SGI          0x80D3
+#define GL_PROXY_COLOR_TABLE_SGI          (GLenum)0x80D3
 #endif
 #ifndef GL_PROXY_POST_CONVOLUTION_COLOR_TABLE_SGI 
-#define GL_PROXY_POST_CONVOLUTION_COLOR_TABLE_SGI 0x80D4
+#define GL_PROXY_POST_CONVOLUTION_COLOR_TABLE_SGI (GLenum)0x80D4
 #endif
 #ifndef GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE_SGI 
-#define GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE_SGI 0x80D5
+#define GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE_SGI (GLenum)0x80D5
 #endif
 #ifndef GL_COLOR_TABLE_SCALE_SGI          
-#define GL_COLOR_TABLE_SCALE_SGI          0x80D6
+#define GL_COLOR_TABLE_SCALE_SGI          (GLenum)0x80D6
 #endif
 #ifndef GL_COLOR_TABLE_BIAS_SGI           
-#define GL_COLOR_TABLE_BIAS_SGI           0x80D7
+#define GL_COLOR_TABLE_BIAS_SGI           (GLenum)0x80D7
 #endif
 #ifndef GL_COLOR_TABLE_FORMAT_SGI         
-#define GL_COLOR_TABLE_FORMAT_SGI         0x80D8
+#define GL_COLOR_TABLE_FORMAT_SGI         (GLenum)0x80D8
 #endif
 #ifndef GL_COLOR_TABLE_WIDTH_SGI          
-#define GL_COLOR_TABLE_WIDTH_SGI          0x80D9
+#define GL_COLOR_TABLE_WIDTH_SGI          (GLenum)0x80D9
 #endif
 #ifndef GL_COLOR_TABLE_RED_SIZE_SGI       
-#define GL_COLOR_TABLE_RED_SIZE_SGI       0x80DA
+#define GL_COLOR_TABLE_RED_SIZE_SGI       (GLenum)0x80DA
 #endif
 #ifndef GL_COLOR_TABLE_GREEN_SIZE_SGI     
-#define GL_COLOR_TABLE_GREEN_SIZE_SGI     0x80DB
+#define GL_COLOR_TABLE_GREEN_SIZE_SGI     (GLenum)0x80DB
 #endif
 #ifndef GL_COLOR_TABLE_BLUE_SIZE_SGI      
-#define GL_COLOR_TABLE_BLUE_SIZE_SGI      0x80DC
+#define GL_COLOR_TABLE_BLUE_SIZE_SGI      (GLenum)0x80DC
 #endif
 #ifndef GL_COLOR_TABLE_ALPHA_SIZE_SGI     
-#define GL_COLOR_TABLE_ALPHA_SIZE_SGI     0x80DD
+#define GL_COLOR_TABLE_ALPHA_SIZE_SGI     (GLenum)0x80DD
 #endif
 #ifndef GL_COLOR_TABLE_LUMINANCE_SIZE_SGI 
-#define GL_COLOR_TABLE_LUMINANCE_SIZE_SGI 0x80DE
+#define GL_COLOR_TABLE_LUMINANCE_SIZE_SGI (GLenum)0x80DE
 #endif
 #ifndef GL_COLOR_TABLE_INTENSITY_SIZE_SGI 
-#define GL_COLOR_TABLE_INTENSITY_SIZE_SGI 0x80DF
+#define GL_COLOR_TABLE_INTENSITY_SIZE_SGI (GLenum)0x80DF
 #endif
 #ifndef GL_PIXEL_TEXTURE_SGIS             
-#define GL_PIXEL_TEXTURE_SGIS             0x8353
+#define GL_PIXEL_TEXTURE_SGIS             (GLenum)0x8353
 #endif
 #ifndef GL_PIXEL_FRAGMENT_RGB_SOURCE_SGIS 
-#define GL_PIXEL_FRAGMENT_RGB_SOURCE_SGIS 0x8354
+#define GL_PIXEL_FRAGMENT_RGB_SOURCE_SGIS (GLenum)0x8354
 #endif
 #ifndef GL_PIXEL_FRAGMENT_ALPHA_SOURCE_SGIS 
-#define GL_PIXEL_FRAGMENT_ALPHA_SOURCE_SGIS 0x8355
+#define GL_PIXEL_FRAGMENT_ALPHA_SOURCE_SGIS (GLenum)0x8355
 #endif
 #ifndef GL_PIXEL_GROUP_COLOR_SGIS         
-#define GL_PIXEL_GROUP_COLOR_SGIS         0x8356
+#define GL_PIXEL_GROUP_COLOR_SGIS         (GLenum)0x8356
 #endif
 #ifndef GL_PIXEL_TEX_GEN_SGIX             
-#define GL_PIXEL_TEX_GEN_SGIX             0x8139
+#define GL_PIXEL_TEX_GEN_SGIX             (GLenum)0x8139
 #endif
 #ifndef GL_PIXEL_TEX_GEN_MODE_SGIX        
-#define GL_PIXEL_TEX_GEN_MODE_SGIX        0x832B
+#define GL_PIXEL_TEX_GEN_MODE_SGIX        (GLenum)0x832B
 #endif
 #ifndef GL_PACK_SKIP_VOLUMES_SGIS         
-#define GL_PACK_SKIP_VOLUMES_SGIS         0x8130
+#define GL_PACK_SKIP_VOLUMES_SGIS         (GLenum)0x8130
 #endif
 #ifndef GL_PACK_IMAGE_DEPTH_SGIS          
-#define GL_PACK_IMAGE_DEPTH_SGIS          0x8131
+#define GL_PACK_IMAGE_DEPTH_SGIS          (GLenum)0x8131
 #endif
 #ifndef GL_UNPACK_SKIP_VOLUMES_SGIS       
-#define GL_UNPACK_SKIP_VOLUMES_SGIS       0x8132
+#define GL_UNPACK_SKIP_VOLUMES_SGIS       (GLenum)0x8132
 #endif
 #ifndef GL_UNPACK_IMAGE_DEPTH_SGIS        
-#define GL_UNPACK_IMAGE_DEPTH_SGIS        0x8133
+#define GL_UNPACK_IMAGE_DEPTH_SGIS        (GLenum)0x8133
 #endif
 #ifndef GL_TEXTURE_4D_SGIS                
-#define GL_TEXTURE_4D_SGIS                0x8134
+#define GL_TEXTURE_4D_SGIS                (GLenum)0x8134
 #endif
 #ifndef GL_PROXY_TEXTURE_4D_SGIS          
-#define GL_PROXY_TEXTURE_4D_SGIS          0x8135
+#define GL_PROXY_TEXTURE_4D_SGIS          (GLenum)0x8135
 #endif
 #ifndef GL_TEXTURE_4DSIZE_SGIS            
-#define GL_TEXTURE_4DSIZE_SGIS            0x8136
+#define GL_TEXTURE_4DSIZE_SGIS            (GLenum)0x8136
 #endif
 #ifndef GL_TEXTURE_WRAP_Q_SGIS            
-#define GL_TEXTURE_WRAP_Q_SGIS            0x8137
+#define GL_TEXTURE_WRAP_Q_SGIS            (GLenum)0x8137
 #endif
 #ifndef GL_MAX_4D_TEXTURE_SIZE_SGIS       
-#define GL_MAX_4D_TEXTURE_SIZE_SGIS       0x8138
+#define GL_MAX_4D_TEXTURE_SIZE_SGIS       (GLenum)0x8138
 #endif
 #ifndef GL_TEXTURE_4D_BINDING_SGIS        
-#define GL_TEXTURE_4D_BINDING_SGIS        0x814F
+#define GL_TEXTURE_4D_BINDING_SGIS        (GLenum)0x814F
 #endif
 #ifndef GL_TEXTURE_COLOR_TABLE_SGI        
-#define GL_TEXTURE_COLOR_TABLE_SGI        0x80BC
+#define GL_TEXTURE_COLOR_TABLE_SGI        (GLenum)0x80BC
 #endif
 #ifndef GL_PROXY_TEXTURE_COLOR_TABLE_SGI  
-#define GL_PROXY_TEXTURE_COLOR_TABLE_SGI  0x80BD
+#define GL_PROXY_TEXTURE_COLOR_TABLE_SGI  (GLenum)0x80BD
 #endif
 #ifndef GL_CMYK_EXT                       
-#define GL_CMYK_EXT                       0x800C
+#define GL_CMYK_EXT                       (GLenum)0x800C
 #endif
 #ifndef GL_CMYKA_EXT                      
-#define GL_CMYKA_EXT                      0x800D
+#define GL_CMYKA_EXT                      (GLenum)0x800D
 #endif
 #ifndef GL_PACK_CMYK_HINT_EXT             
-#define GL_PACK_CMYK_HINT_EXT             0x800E
+#define GL_PACK_CMYK_HINT_EXT             (GLenum)0x800E
 #endif
 #ifndef GL_UNPACK_CMYK_HINT_EXT           
-#define GL_UNPACK_CMYK_HINT_EXT           0x800F
+#define GL_UNPACK_CMYK_HINT_EXT           (GLenum)0x800F
 #endif
 #ifndef GL_TEXTURE_PRIORITY_EXT           
-#define GL_TEXTURE_PRIORITY_EXT           0x8066
+#define GL_TEXTURE_PRIORITY_EXT           (GLenum)0x8066
 #endif
 #ifndef GL_TEXTURE_RESIDENT_EXT           
-#define GL_TEXTURE_RESIDENT_EXT           0x8067
+#define GL_TEXTURE_RESIDENT_EXT           (GLenum)0x8067
 #endif
 #ifndef GL_TEXTURE_1D_BINDING_EXT         
-#define GL_TEXTURE_1D_BINDING_EXT         0x8068
+#define GL_TEXTURE_1D_BINDING_EXT         (GLenum)0x8068
 #endif
 #ifndef GL_TEXTURE_2D_BINDING_EXT         
-#define GL_TEXTURE_2D_BINDING_EXT         0x8069
+#define GL_TEXTURE_2D_BINDING_EXT         (GLenum)0x8069
 #endif
 #ifndef GL_TEXTURE_3D_BINDING_EXT         
-#define GL_TEXTURE_3D_BINDING_EXT         0x806A
+#define GL_TEXTURE_3D_BINDING_EXT         (GLenum)0x806A
 #endif
 #ifndef GL_DETAIL_TEXTURE_2D_SGIS         
-#define GL_DETAIL_TEXTURE_2D_SGIS         0x8095
+#define GL_DETAIL_TEXTURE_2D_SGIS         (GLenum)0x8095
 #endif
 #ifndef GL_DETAIL_TEXTURE_2D_BINDING_SGIS 
-#define GL_DETAIL_TEXTURE_2D_BINDING_SGIS 0x8096
+#define GL_DETAIL_TEXTURE_2D_BINDING_SGIS (GLenum)0x8096
 #endif
 #ifndef GL_LINEAR_DETAIL_SGIS             
-#define GL_LINEAR_DETAIL_SGIS             0x8097
+#define GL_LINEAR_DETAIL_SGIS             (GLenum)0x8097
 #endif
 #ifndef GL_LINEAR_DETAIL_ALPHA_SGIS       
-#define GL_LINEAR_DETAIL_ALPHA_SGIS       0x8098
+#define GL_LINEAR_DETAIL_ALPHA_SGIS       (GLenum)0x8098
 #endif
 #ifndef GL_LINEAR_DETAIL_COLOR_SGIS       
-#define GL_LINEAR_DETAIL_COLOR_SGIS       0x8099
+#define GL_LINEAR_DETAIL_COLOR_SGIS       (GLenum)0x8099
 #endif
 #ifndef GL_DETAIL_TEXTURE_LEVEL_SGIS      
-#define GL_DETAIL_TEXTURE_LEVEL_SGIS      0x809A
+#define GL_DETAIL_TEXTURE_LEVEL_SGIS      (GLenum)0x809A
 #endif
 #ifndef GL_DETAIL_TEXTURE_MODE_SGIS       
-#define GL_DETAIL_TEXTURE_MODE_SGIS       0x809B
+#define GL_DETAIL_TEXTURE_MODE_SGIS       (GLenum)0x809B
 #endif
 #ifndef GL_DETAIL_TEXTURE_FUNC_POINTS_SGIS 
-#define GL_DETAIL_TEXTURE_FUNC_POINTS_SGIS 0x809C
+#define GL_DETAIL_TEXTURE_FUNC_POINTS_SGIS (GLenum)0x809C
 #endif
 #ifndef GL_LINEAR_SHARPEN_SGIS            
-#define GL_LINEAR_SHARPEN_SGIS            0x80AD
+#define GL_LINEAR_SHARPEN_SGIS            (GLenum)0x80AD
 #endif
 #ifndef GL_LINEAR_SHARPEN_ALPHA_SGIS      
-#define GL_LINEAR_SHARPEN_ALPHA_SGIS      0x80AE
+#define GL_LINEAR_SHARPEN_ALPHA_SGIS      (GLenum)0x80AE
 #endif
 #ifndef GL_LINEAR_SHARPEN_COLOR_SGIS      
-#define GL_LINEAR_SHARPEN_COLOR_SGIS      0x80AF
+#define GL_LINEAR_SHARPEN_COLOR_SGIS      (GLenum)0x80AF
 #endif
 #ifndef GL_SHARPEN_TEXTURE_FUNC_POINTS_SGIS 
-#define GL_SHARPEN_TEXTURE_FUNC_POINTS_SGIS 0x80B0
+#define GL_SHARPEN_TEXTURE_FUNC_POINTS_SGIS (GLenum)0x80B0
 #endif
 #ifndef GL_UNSIGNED_BYTE_3_3_2_EXT        
-#define GL_UNSIGNED_BYTE_3_3_2_EXT        0x8032
+#define GL_UNSIGNED_BYTE_3_3_2_EXT        (GLenum)0x8032
 #endif
 #ifndef GL_UNSIGNED_SHORT_4_4_4_4_EXT     
-#define GL_UNSIGNED_SHORT_4_4_4_4_EXT     0x8033
+#define GL_UNSIGNED_SHORT_4_4_4_4_EXT     (GLenum)0x8033
 #endif
 #ifndef GL_UNSIGNED_SHORT_5_5_5_1_EXT     
-#define GL_UNSIGNED_SHORT_5_5_5_1_EXT     0x8034
+#define GL_UNSIGNED_SHORT_5_5_5_1_EXT     (GLenum)0x8034
 #endif
 #ifndef GL_UNSIGNED_INT_8_8_8_8_EXT       
-#define GL_UNSIGNED_INT_8_8_8_8_EXT       0x8035
+#define GL_UNSIGNED_INT_8_8_8_8_EXT       (GLenum)0x8035
 #endif
 #ifndef GL_UNSIGNED_INT_10_10_10_2_EXT    
-#define GL_UNSIGNED_INT_10_10_10_2_EXT    0x8036
+#define GL_UNSIGNED_INT_10_10_10_2_EXT    (GLenum)0x8036
 #endif
 #ifndef GL_TEXTURE_MIN_LOD_SGIS           
-#define GL_TEXTURE_MIN_LOD_SGIS           0x813A
+#define GL_TEXTURE_MIN_LOD_SGIS           (GLenum)0x813A
 #endif
 #ifndef GL_TEXTURE_MAX_LOD_SGIS           
-#define GL_TEXTURE_MAX_LOD_SGIS           0x813B
+#define GL_TEXTURE_MAX_LOD_SGIS           (GLenum)0x813B
 #endif
 #ifndef GL_TEXTURE_BASE_LEVEL_SGIS        
-#define GL_TEXTURE_BASE_LEVEL_SGIS        0x813C
+#define GL_TEXTURE_BASE_LEVEL_SGIS        (GLenum)0x813C
 #endif
 #ifndef GL_TEXTURE_MAX_LEVEL_SGIS         
-#define GL_TEXTURE_MAX_LEVEL_SGIS         0x813D
+#define GL_TEXTURE_MAX_LEVEL_SGIS         (GLenum)0x813D
 #endif
 #ifndef GL_MULTISAMPLE_SGIS               
-#define GL_MULTISAMPLE_SGIS               0x809D
+#define GL_MULTISAMPLE_SGIS               (GLenum)0x809D
 #endif
 #ifndef GL_SAMPLE_ALPHA_TO_MASK_SGIS      
-#define GL_SAMPLE_ALPHA_TO_MASK_SGIS      0x809E
+#define GL_SAMPLE_ALPHA_TO_MASK_SGIS      (GLenum)0x809E
 #endif
 #ifndef GL_SAMPLE_ALPHA_TO_ONE_SGIS       
-#define GL_SAMPLE_ALPHA_TO_ONE_SGIS       0x809F
+#define GL_SAMPLE_ALPHA_TO_ONE_SGIS       (GLenum)0x809F
 #endif
 #ifndef GL_SAMPLE_MASK_SGIS               
-#define GL_SAMPLE_MASK_SGIS               0x80A0
+#define GL_SAMPLE_MASK_SGIS               (GLenum)0x80A0
 #endif
 #ifndef GL_1PASS_SGIS                     
-#define GL_1PASS_SGIS                     0x80A1
+#define GL_1PASS_SGIS                     (GLenum)0x80A1
 #endif
 #ifndef GL_2PASS_0_SGIS                   
-#define GL_2PASS_0_SGIS                   0x80A2
+#define GL_2PASS_0_SGIS                   (GLenum)0x80A2
 #endif
 #ifndef GL_2PASS_1_SGIS                   
-#define GL_2PASS_1_SGIS                   0x80A3
+#define GL_2PASS_1_SGIS                   (GLenum)0x80A3
 #endif
 #ifndef GL_4PASS_0_SGIS                   
-#define GL_4PASS_0_SGIS                   0x80A4
+#define GL_4PASS_0_SGIS                   (GLenum)0x80A4
 #endif
 #ifndef GL_4PASS_1_SGIS                   
-#define GL_4PASS_1_SGIS                   0x80A5
+#define GL_4PASS_1_SGIS                   (GLenum)0x80A5
 #endif
 #ifndef GL_4PASS_2_SGIS                   
-#define GL_4PASS_2_SGIS                   0x80A6
+#define GL_4PASS_2_SGIS                   (GLenum)0x80A6
 #endif
 #ifndef GL_4PASS_3_SGIS                   
-#define GL_4PASS_3_SGIS                   0x80A7
+#define GL_4PASS_3_SGIS                   (GLenum)0x80A7
 #endif
 #ifndef GL_SAMPLE_BUFFERS_SGIS            
-#define GL_SAMPLE_BUFFERS_SGIS            0x80A8
+#define GL_SAMPLE_BUFFERS_SGIS            (GLenum)0x80A8
 #endif
 #ifndef GL_SAMPLES_SGIS                   
-#define GL_SAMPLES_SGIS                   0x80A9
+#define GL_SAMPLES_SGIS                   (GLenum)0x80A9
 #endif
 #ifndef GL_SAMPLE_MASK_VALUE_SGIS         
-#define GL_SAMPLE_MASK_VALUE_SGIS         0x80AA
+#define GL_SAMPLE_MASK_VALUE_SGIS         (GLenum)0x80AA
 #endif
 #ifndef GL_SAMPLE_MASK_INVERT_SGIS        
-#define GL_SAMPLE_MASK_INVERT_SGIS        0x80AB
+#define GL_SAMPLE_MASK_INVERT_SGIS        (GLenum)0x80AB
 #endif
 #ifndef GL_SAMPLE_PATTERN_SGIS            
-#define GL_SAMPLE_PATTERN_SGIS            0x80AC
+#define GL_SAMPLE_PATTERN_SGIS            (GLenum)0x80AC
 #endif
 #ifndef GL_RESCALE_NORMAL_EXT             
-#define GL_RESCALE_NORMAL_EXT             0x803A
+#define GL_RESCALE_NORMAL_EXT             (GLenum)0x803A
 #endif
 #ifndef GL_VERTEX_ARRAY_EXT               
-#define GL_VERTEX_ARRAY_EXT               0x8074
+#define GL_VERTEX_ARRAY_EXT               (GLenum)0x8074
 #endif
 #ifndef GL_NORMAL_ARRAY_EXT               
-#define GL_NORMAL_ARRAY_EXT               0x8075
+#define GL_NORMAL_ARRAY_EXT               (GLenum)0x8075
 #endif
 #ifndef GL_COLOR_ARRAY_EXT                
-#define GL_COLOR_ARRAY_EXT                0x8076
+#define GL_COLOR_ARRAY_EXT                (GLenum)0x8076
 #endif
 #ifndef GL_INDEX_ARRAY_EXT                
-#define GL_INDEX_ARRAY_EXT                0x8077
+#define GL_INDEX_ARRAY_EXT                (GLenum)0x8077
 #endif
 #ifndef GL_TEXTURE_COORD_ARRAY_EXT        
-#define GL_TEXTURE_COORD_ARRAY_EXT        0x8078
+#define GL_TEXTURE_COORD_ARRAY_EXT        (GLenum)0x8078
 #endif
 #ifndef GL_EDGE_FLAG_ARRAY_EXT            
-#define GL_EDGE_FLAG_ARRAY_EXT            0x8079
+#define GL_EDGE_FLAG_ARRAY_EXT            (GLenum)0x8079
 #endif
 #ifndef GL_VERTEX_ARRAY_SIZE_EXT          
-#define GL_VERTEX_ARRAY_SIZE_EXT          0x807A
+#define GL_VERTEX_ARRAY_SIZE_EXT          (GLenum)0x807A
 #endif
 #ifndef GL_VERTEX_ARRAY_TYPE_EXT          
-#define GL_VERTEX_ARRAY_TYPE_EXT          0x807B
+#define GL_VERTEX_ARRAY_TYPE_EXT          (GLenum)0x807B
 #endif
 #ifndef GL_VERTEX_ARRAY_STRIDE_EXT        
-#define GL_VERTEX_ARRAY_STRIDE_EXT        0x807C
+#define GL_VERTEX_ARRAY_STRIDE_EXT        (GLenum)0x807C
 #endif
 #ifndef GL_VERTEX_ARRAY_COUNT_EXT         
-#define GL_VERTEX_ARRAY_COUNT_EXT         0x807D
+#define GL_VERTEX_ARRAY_COUNT_EXT         (GLenum)0x807D
 #endif
 #ifndef GL_NORMAL_ARRAY_TYPE_EXT          
-#define GL_NORMAL_ARRAY_TYPE_EXT          0x807E
+#define GL_NORMAL_ARRAY_TYPE_EXT          (GLenum)0x807E
 #endif
 #ifndef GL_NORMAL_ARRAY_STRIDE_EXT        
-#define GL_NORMAL_ARRAY_STRIDE_EXT        0x807F
+#define GL_NORMAL_ARRAY_STRIDE_EXT        (GLenum)0x807F
 #endif
 #ifndef GL_NORMAL_ARRAY_COUNT_EXT         
-#define GL_NORMAL_ARRAY_COUNT_EXT         0x8080
+#define GL_NORMAL_ARRAY_COUNT_EXT         (GLenum)0x8080
 #endif
 #ifndef GL_COLOR_ARRAY_SIZE_EXT           
-#define GL_COLOR_ARRAY_SIZE_EXT           0x8081
+#define GL_COLOR_ARRAY_SIZE_EXT           (GLenum)0x8081
 #endif
 #ifndef GL_COLOR_ARRAY_TYPE_EXT           
-#define GL_COLOR_ARRAY_TYPE_EXT           0x8082
+#define GL_COLOR_ARRAY_TYPE_EXT           (GLenum)0x8082
 #endif
 #ifndef GL_COLOR_ARRAY_STRIDE_EXT         
-#define GL_COLOR_ARRAY_STRIDE_EXT         0x8083
+#define GL_COLOR_ARRAY_STRIDE_EXT         (GLenum)0x8083
 #endif
 #ifndef GL_COLOR_ARRAY_COUNT_EXT          
-#define GL_COLOR_ARRAY_COUNT_EXT          0x8084
+#define GL_COLOR_ARRAY_COUNT_EXT          (GLenum)0x8084
 #endif
 #ifndef GL_INDEX_ARRAY_TYPE_EXT           
-#define GL_INDEX_ARRAY_TYPE_EXT           0x8085
+#define GL_INDEX_ARRAY_TYPE_EXT           (GLenum)0x8085
 #endif
 #ifndef GL_INDEX_ARRAY_STRIDE_EXT         
-#define GL_INDEX_ARRAY_STRIDE_EXT         0x8086
+#define GL_INDEX_ARRAY_STRIDE_EXT         (GLenum)0x8086
 #endif
 #ifndef GL_INDEX_ARRAY_COUNT_EXT          
-#define GL_INDEX_ARRAY_COUNT_EXT          0x8087
+#define GL_INDEX_ARRAY_COUNT_EXT          (GLenum)0x8087
 #endif
 #ifndef GL_TEXTURE_COORD_ARRAY_SIZE_EXT   
-#define GL_TEXTURE_COORD_ARRAY_SIZE_EXT   0x8088
+#define GL_TEXTURE_COORD_ARRAY_SIZE_EXT   (GLenum)0x8088
 #endif
 #ifndef GL_TEXTURE_COORD_ARRAY_TYPE_EXT   
-#define GL_TEXTURE_COORD_ARRAY_TYPE_EXT   0x8089
+#define GL_TEXTURE_COORD_ARRAY_TYPE_EXT   (GLenum)0x8089
 #endif
 #ifndef GL_TEXTURE_COORD_ARRAY_STRIDE_EXT 
-#define GL_TEXTURE_COORD_ARRAY_STRIDE_EXT 0x808A
+#define GL_TEXTURE_COORD_ARRAY_STRIDE_EXT (GLenum)0x808A
 #endif
 #ifndef GL_TEXTURE_COORD_ARRAY_COUNT_EXT  
-#define GL_TEXTURE_COORD_ARRAY_COUNT_EXT  0x808B
+#define GL_TEXTURE_COORD_ARRAY_COUNT_EXT  (GLenum)0x808B
 #endif
 #ifndef GL_EDGE_FLAG_ARRAY_STRIDE_EXT     
-#define GL_EDGE_FLAG_ARRAY_STRIDE_EXT     0x808C
+#define GL_EDGE_FLAG_ARRAY_STRIDE_EXT     (GLenum)0x808C
 #endif
 #ifndef GL_EDGE_FLAG_ARRAY_COUNT_EXT      
-#define GL_EDGE_FLAG_ARRAY_COUNT_EXT      0x808D
+#define GL_EDGE_FLAG_ARRAY_COUNT_EXT      (GLenum)0x808D
 #endif
 #ifndef GL_VERTEX_ARRAY_POINTER_EXT       
-#define GL_VERTEX_ARRAY_POINTER_EXT       0x808E
+#define GL_VERTEX_ARRAY_POINTER_EXT       (GLenum)0x808E
 #endif
 #ifndef GL_NORMAL_ARRAY_POINTER_EXT       
-#define GL_NORMAL_ARRAY_POINTER_EXT       0x808F
+#define GL_NORMAL_ARRAY_POINTER_EXT       (GLenum)0x808F
 #endif
 #ifndef GL_COLOR_ARRAY_POINTER_EXT        
-#define GL_COLOR_ARRAY_POINTER_EXT        0x8090
+#define GL_COLOR_ARRAY_POINTER_EXT        (GLenum)0x8090
 #endif
 #ifndef GL_INDEX_ARRAY_POINTER_EXT        
-#define GL_INDEX_ARRAY_POINTER_EXT        0x8091
+#define GL_INDEX_ARRAY_POINTER_EXT        (GLenum)0x8091
 #endif
 #ifndef GL_TEXTURE_COORD_ARRAY_POINTER_EXT 
-#define GL_TEXTURE_COORD_ARRAY_POINTER_EXT 0x8092
+#define GL_TEXTURE_COORD_ARRAY_POINTER_EXT (GLenum)0x8092
 #endif
 #ifndef GL_EDGE_FLAG_ARRAY_POINTER_EXT    
-#define GL_EDGE_FLAG_ARRAY_POINTER_EXT    0x8093
+#define GL_EDGE_FLAG_ARRAY_POINTER_EXT    (GLenum)0x8093
 #endif
 #ifndef GL_GENERATE_MIPMAP_SGIS           
-#define GL_GENERATE_MIPMAP_SGIS           0x8191
+#define GL_GENERATE_MIPMAP_SGIS           (GLenum)0x8191
 #endif
 #ifndef GL_GENERATE_MIPMAP_HINT_SGIS      
-#define GL_GENERATE_MIPMAP_HINT_SGIS      0x8192
+#define GL_GENERATE_MIPMAP_HINT_SGIS      (GLenum)0x8192
 #endif
 #ifndef GL_LINEAR_CLIPMAP_LINEAR_SGIX     
-#define GL_LINEAR_CLIPMAP_LINEAR_SGIX     0x8170
+#define GL_LINEAR_CLIPMAP_LINEAR_SGIX     (GLenum)0x8170
 #endif
 #ifndef GL_TEXTURE_CLIPMAP_CENTER_SGIX    
-#define GL_TEXTURE_CLIPMAP_CENTER_SGIX    0x8171
+#define GL_TEXTURE_CLIPMAP_CENTER_SGIX    (GLenum)0x8171
 #endif
 #ifndef GL_TEXTURE_CLIPMAP_FRAME_SGIX     
-#define GL_TEXTURE_CLIPMAP_FRAME_SGIX     0x8172
+#define GL_TEXTURE_CLIPMAP_FRAME_SGIX     (GLenum)0x8172
 #endif
 #ifndef GL_TEXTURE_CLIPMAP_OFFSET_SGIX    
-#define GL_TEXTURE_CLIPMAP_OFFSET_SGIX    0x8173
+#define GL_TEXTURE_CLIPMAP_OFFSET_SGIX    (GLenum)0x8173
 #endif
 #ifndef GL_TEXTURE_CLIPMAP_VIRTUAL_DEPTH_SGIX 
-#define GL_TEXTURE_CLIPMAP_VIRTUAL_DEPTH_SGIX 0x8174
+#define GL_TEXTURE_CLIPMAP_VIRTUAL_DEPTH_SGIX (GLenum)0x8174
 #endif
 #ifndef GL_TEXTURE_CLIPMAP_LOD_OFFSET_SGIX 
-#define GL_TEXTURE_CLIPMAP_LOD_OFFSET_SGIX 0x8175
+#define GL_TEXTURE_CLIPMAP_LOD_OFFSET_SGIX (GLenum)0x8175
 #endif
 #ifndef GL_TEXTURE_CLIPMAP_DEPTH_SGIX     
-#define GL_TEXTURE_CLIPMAP_DEPTH_SGIX     0x8176
+#define GL_TEXTURE_CLIPMAP_DEPTH_SGIX     (GLenum)0x8176
 #endif
 #ifndef GL_MAX_CLIPMAP_DEPTH_SGIX         
-#define GL_MAX_CLIPMAP_DEPTH_SGIX         0x8177
+#define GL_MAX_CLIPMAP_DEPTH_SGIX         (GLenum)0x8177
 #endif
 #ifndef GL_MAX_CLIPMAP_VIRTUAL_DEPTH_SGIX 
-#define GL_MAX_CLIPMAP_VIRTUAL_DEPTH_SGIX 0x8178
+#define GL_MAX_CLIPMAP_VIRTUAL_DEPTH_SGIX (GLenum)0x8178
 #endif
 #ifndef GL_NEAREST_CLIPMAP_NEAREST_SGIX   
-#define GL_NEAREST_CLIPMAP_NEAREST_SGIX   0x844D
+#define GL_NEAREST_CLIPMAP_NEAREST_SGIX   (GLenum)0x844D
 #endif
 #ifndef GL_NEAREST_CLIPMAP_LINEAR_SGIX    
-#define GL_NEAREST_CLIPMAP_LINEAR_SGIX    0x844E
+#define GL_NEAREST_CLIPMAP_LINEAR_SGIX    (GLenum)0x844E
 #endif
 #ifndef GL_LINEAR_CLIPMAP_NEAREST_SGIX    
-#define GL_LINEAR_CLIPMAP_NEAREST_SGIX    0x844F
+#define GL_LINEAR_CLIPMAP_NEAREST_SGIX    (GLenum)0x844F
 #endif
 #ifndef GL_TEXTURE_COMPARE_SGIX           
-#define GL_TEXTURE_COMPARE_SGIX           0x819A
+#define GL_TEXTURE_COMPARE_SGIX           (GLenum)0x819A
 #endif
 #ifndef GL_TEXTURE_COMPARE_OPERATOR_SGIX  
-#define GL_TEXTURE_COMPARE_OPERATOR_SGIX  0x819B
+#define GL_TEXTURE_COMPARE_OPERATOR_SGIX  (GLenum)0x819B
 #endif
 #ifndef GL_TEXTURE_LEQUAL_R_SGIX          
-#define GL_TEXTURE_LEQUAL_R_SGIX          0x819C
+#define GL_TEXTURE_LEQUAL_R_SGIX          (GLenum)0x819C
 #endif
 #ifndef GL_TEXTURE_GEQUAL_R_SGIX          
-#define GL_TEXTURE_GEQUAL_R_SGIX          0x819D
+#define GL_TEXTURE_GEQUAL_R_SGIX          (GLenum)0x819D
 #endif
 #ifndef GL_CLAMP_TO_EDGE_SGIS             
-#define GL_CLAMP_TO_EDGE_SGIS             0x812F
+#define GL_CLAMP_TO_EDGE_SGIS             (GLenum)0x812F
 #endif
 #ifndef GL_CLAMP_TO_BORDER_SGIS           
-#define GL_CLAMP_TO_BORDER_SGIS           0x812D
+#define GL_CLAMP_TO_BORDER_SGIS           (GLenum)0x812D
 #endif
 #ifndef GL_FUNC_ADD_EXT                   
-#define GL_FUNC_ADD_EXT                   0x8006
+#define GL_FUNC_ADD_EXT                   (GLenum)0x8006
 #endif
 #ifndef GL_MIN_EXT                        
-#define GL_MIN_EXT                        0x8007
+#define GL_MIN_EXT                        (GLenum)0x8007
 #endif
 #ifndef GL_MAX_EXT                        
-#define GL_MAX_EXT                        0x8008
+#define GL_MAX_EXT                        (GLenum)0x8008
 #endif
 #ifndef GL_BLEND_EQUATION_EXT             
-#define GL_BLEND_EQUATION_EXT             0x8009
+#define GL_BLEND_EQUATION_EXT             (GLenum)0x8009
 #endif
 #ifndef GL_FUNC_SUBTRACT_EXT              
-#define GL_FUNC_SUBTRACT_EXT              0x800A
+#define GL_FUNC_SUBTRACT_EXT              (GLenum)0x800A
 #endif
 #ifndef GL_FUNC_REVERSE_SUBTRACT_EXT      
-#define GL_FUNC_REVERSE_SUBTRACT_EXT      0x800B
+#define GL_FUNC_REVERSE_SUBTRACT_EXT      (GLenum)0x800B
 #endif
 #ifndef GL_INTERLACE_SGIX                 
-#define GL_INTERLACE_SGIX                 0x8094
+#define GL_INTERLACE_SGIX                 (GLenum)0x8094
 #endif
 #ifndef GL_PIXEL_TILE_BEST_ALIGNMENT_SGIX 
-#define GL_PIXEL_TILE_BEST_ALIGNMENT_SGIX 0x813E
+#define GL_PIXEL_TILE_BEST_ALIGNMENT_SGIX (GLenum)0x813E
 #endif
 #ifndef GL_PIXEL_TILE_CACHE_INCREMENT_SGIX 
-#define GL_PIXEL_TILE_CACHE_INCREMENT_SGIX 0x813F
+#define GL_PIXEL_TILE_CACHE_INCREMENT_SGIX (GLenum)0x813F
 #endif
 #ifndef GL_PIXEL_TILE_WIDTH_SGIX          
-#define GL_PIXEL_TILE_WIDTH_SGIX          0x8140
+#define GL_PIXEL_TILE_WIDTH_SGIX          (GLenum)0x8140
 #endif
 #ifndef GL_PIXEL_TILE_HEIGHT_SGIX         
-#define GL_PIXEL_TILE_HEIGHT_SGIX         0x8141
+#define GL_PIXEL_TILE_HEIGHT_SGIX         (GLenum)0x8141
 #endif
 #ifndef GL_PIXEL_TILE_GRID_WIDTH_SGIX     
-#define GL_PIXEL_TILE_GRID_WIDTH_SGIX     0x8142
+#define GL_PIXEL_TILE_GRID_WIDTH_SGIX     (GLenum)0x8142
 #endif
 #ifndef GL_PIXEL_TILE_GRID_HEIGHT_SGIX    
-#define GL_PIXEL_TILE_GRID_HEIGHT_SGIX    0x8143
+#define GL_PIXEL_TILE_GRID_HEIGHT_SGIX    (GLenum)0x8143
 #endif
 #ifndef GL_PIXEL_TILE_GRID_DEPTH_SGIX     
-#define GL_PIXEL_TILE_GRID_DEPTH_SGIX     0x8144
+#define GL_PIXEL_TILE_GRID_DEPTH_SGIX     (GLenum)0x8144
 #endif
 #ifndef GL_PIXEL_TILE_CACHE_SIZE_SGIX     
-#define GL_PIXEL_TILE_CACHE_SIZE_SGIX     0x8145
+#define GL_PIXEL_TILE_CACHE_SIZE_SGIX     (GLenum)0x8145
 #endif
 #ifndef GL_DUAL_ALPHA4_SGIS               
-#define GL_DUAL_ALPHA4_SGIS               0x8110
+#define GL_DUAL_ALPHA4_SGIS               (GLenum)0x8110
 #endif
 #ifndef GL_DUAL_ALPHA8_SGIS               
-#define GL_DUAL_ALPHA8_SGIS               0x8111
+#define GL_DUAL_ALPHA8_SGIS               (GLenum)0x8111
 #endif
 #ifndef GL_DUAL_ALPHA12_SGIS              
-#define GL_DUAL_ALPHA12_SGIS              0x8112
+#define GL_DUAL_ALPHA12_SGIS              (GLenum)0x8112
 #endif
 #ifndef GL_DUAL_ALPHA16_SGIS              
-#define GL_DUAL_ALPHA16_SGIS              0x8113
+#define GL_DUAL_ALPHA16_SGIS              (GLenum)0x8113
 #endif
 #ifndef GL_DUAL_LUMINANCE4_SGIS           
-#define GL_DUAL_LUMINANCE4_SGIS           0x8114
+#define GL_DUAL_LUMINANCE4_SGIS           (GLenum)0x8114
 #endif
 #ifndef GL_DUAL_LUMINANCE8_SGIS           
-#define GL_DUAL_LUMINANCE8_SGIS           0x8115
+#define GL_DUAL_LUMINANCE8_SGIS           (GLenum)0x8115
 #endif
 #ifndef GL_DUAL_LUMINANCE12_SGIS          
-#define GL_DUAL_LUMINANCE12_SGIS          0x8116
+#define GL_DUAL_LUMINANCE12_SGIS          (GLenum)0x8116
 #endif
 #ifndef GL_DUAL_LUMINANCE16_SGIS          
-#define GL_DUAL_LUMINANCE16_SGIS          0x8117
+#define GL_DUAL_LUMINANCE16_SGIS          (GLenum)0x8117
 #endif
 #ifndef GL_DUAL_INTENSITY4_SGIS           
-#define GL_DUAL_INTENSITY4_SGIS           0x8118
+#define GL_DUAL_INTENSITY4_SGIS           (GLenum)0x8118
 #endif
 #ifndef GL_DUAL_INTENSITY8_SGIS           
-#define GL_DUAL_INTENSITY8_SGIS           0x8119
+#define GL_DUAL_INTENSITY8_SGIS           (GLenum)0x8119
 #endif
 #ifndef GL_DUAL_INTENSITY12_SGIS          
-#define GL_DUAL_INTENSITY12_SGIS          0x811A
+#define GL_DUAL_INTENSITY12_SGIS          (GLenum)0x811A
 #endif
 #ifndef GL_DUAL_INTENSITY16_SGIS          
-#define GL_DUAL_INTENSITY16_SGIS          0x811B
+#define GL_DUAL_INTENSITY16_SGIS          (GLenum)0x811B
 #endif
 #ifndef GL_DUAL_LUMINANCE_ALPHA4_SGIS     
-#define GL_DUAL_LUMINANCE_ALPHA4_SGIS     0x811C
+#define GL_DUAL_LUMINANCE_ALPHA4_SGIS     (GLenum)0x811C
 #endif
 #ifndef GL_DUAL_LUMINANCE_ALPHA8_SGIS     
-#define GL_DUAL_LUMINANCE_ALPHA8_SGIS     0x811D
+#define GL_DUAL_LUMINANCE_ALPHA8_SGIS     (GLenum)0x811D
 #endif
 #ifndef GL_QUAD_ALPHA4_SGIS               
-#define GL_QUAD_ALPHA4_SGIS               0x811E
+#define GL_QUAD_ALPHA4_SGIS               (GLenum)0x811E
 #endif
 #ifndef GL_QUAD_ALPHA8_SGIS               
-#define GL_QUAD_ALPHA8_SGIS               0x811F
+#define GL_QUAD_ALPHA8_SGIS               (GLenum)0x811F
 #endif
 #ifndef GL_QUAD_LUMINANCE4_SGIS           
-#define GL_QUAD_LUMINANCE4_SGIS           0x8120
+#define GL_QUAD_LUMINANCE4_SGIS           (GLenum)0x8120
 #endif
 #ifndef GL_QUAD_LUMINANCE8_SGIS           
-#define GL_QUAD_LUMINANCE8_SGIS           0x8121
+#define GL_QUAD_LUMINANCE8_SGIS           (GLenum)0x8121
 #endif
 #ifndef GL_QUAD_INTENSITY4_SGIS           
-#define GL_QUAD_INTENSITY4_SGIS           0x8122
+#define GL_QUAD_INTENSITY4_SGIS           (GLenum)0x8122
 #endif
 #ifndef GL_QUAD_INTENSITY8_SGIS           
-#define GL_QUAD_INTENSITY8_SGIS           0x8123
+#define GL_QUAD_INTENSITY8_SGIS           (GLenum)0x8123
 #endif
 #ifndef GL_DUAL_TEXTURE_SELECT_SGIS       
-#define GL_DUAL_TEXTURE_SELECT_SGIS       0x8124
+#define GL_DUAL_TEXTURE_SELECT_SGIS       (GLenum)0x8124
 #endif
 #ifndef GL_QUAD_TEXTURE_SELECT_SGIS       
-#define GL_QUAD_TEXTURE_SELECT_SGIS       0x8125
+#define GL_QUAD_TEXTURE_SELECT_SGIS       (GLenum)0x8125
 #endif
 #ifndef GL_SPRITE_SGIX                    
-#define GL_SPRITE_SGIX                    0x8148
+#define GL_SPRITE_SGIX                    (GLenum)0x8148
 #endif
 #ifndef GL_SPRITE_MODE_SGIX               
-#define GL_SPRITE_MODE_SGIX               0x8149
+#define GL_SPRITE_MODE_SGIX               (GLenum)0x8149
 #endif
 #ifndef GL_SPRITE_AXIS_SGIX               
-#define GL_SPRITE_AXIS_SGIX               0x814A
+#define GL_SPRITE_AXIS_SGIX               (GLenum)0x814A
 #endif
 #ifndef GL_SPRITE_TRANSLATION_SGIX        
-#define GL_SPRITE_TRANSLATION_SGIX        0x814B
+#define GL_SPRITE_TRANSLATION_SGIX        (GLenum)0x814B
 #endif
 #ifndef GL_SPRITE_AXIAL_SGIX              
-#define GL_SPRITE_AXIAL_SGIX              0x814C
+#define GL_SPRITE_AXIAL_SGIX              (GLenum)0x814C
 #endif
 #ifndef GL_SPRITE_OBJECT_ALIGNED_SGIX     
-#define GL_SPRITE_OBJECT_ALIGNED_SGIX     0x814D
+#define GL_SPRITE_OBJECT_ALIGNED_SGIX     (GLenum)0x814D
 #endif
 #ifndef GL_SPRITE_EYE_ALIGNED_SGIX        
-#define GL_SPRITE_EYE_ALIGNED_SGIX        0x814E
+#define GL_SPRITE_EYE_ALIGNED_SGIX        (GLenum)0x814E
 #endif
 #ifndef GL_TEXTURE_MULTI_BUFFER_HINT_SGIX 
-#define GL_TEXTURE_MULTI_BUFFER_HINT_SGIX 0x812E
+#define GL_TEXTURE_MULTI_BUFFER_HINT_SGIX (GLenum)0x812E
 #endif
 #ifndef GL_POINT_SIZE_MIN_EXT             
-#define GL_POINT_SIZE_MIN_EXT             0x8126
+#define GL_POINT_SIZE_MIN_EXT             (GLenum)0x8126
 #endif
 #ifndef GL_POINT_SIZE_MIN_SGIS            
-#define GL_POINT_SIZE_MIN_SGIS            0x8126
+#define GL_POINT_SIZE_MIN_SGIS            (GLenum)0x8126
 #endif
 #ifndef GL_POINT_SIZE_MAX_EXT             
-#define GL_POINT_SIZE_MAX_EXT             0x8127
+#define GL_POINT_SIZE_MAX_EXT             (GLenum)0x8127
 #endif
 #ifndef GL_POINT_SIZE_MAX_SGIS            
-#define GL_POINT_SIZE_MAX_SGIS            0x8127
+#define GL_POINT_SIZE_MAX_SGIS            (GLenum)0x8127
 #endif
 #ifndef GL_POINT_FADE_THRESHOLD_SIZE_EXT  
-#define GL_POINT_FADE_THRESHOLD_SIZE_EXT  0x8128
+#define GL_POINT_FADE_THRESHOLD_SIZE_EXT  (GLenum)0x8128
 #endif
 #ifndef GL_POINT_FADE_THRESHOLD_SIZE_SGIS 
-#define GL_POINT_FADE_THRESHOLD_SIZE_SGIS 0x8128
+#define GL_POINT_FADE_THRESHOLD_SIZE_SGIS (GLenum)0x8128
 #endif
 #ifndef GL_DISTANCE_ATTENUATION_EXT       
-#define GL_DISTANCE_ATTENUATION_EXT       0x8129
+#define GL_DISTANCE_ATTENUATION_EXT       (GLenum)0x8129
 #endif
 #ifndef GL_DISTANCE_ATTENUATION_SGIS      
-#define GL_DISTANCE_ATTENUATION_SGIS      0x8129
+#define GL_DISTANCE_ATTENUATION_SGIS      (GLenum)0x8129
 #endif
 #ifndef GL_INSTRUMENT_BUFFER_POINTER_SGIX 
-#define GL_INSTRUMENT_BUFFER_POINTER_SGIX 0x8180
+#define GL_INSTRUMENT_BUFFER_POINTER_SGIX (GLenum)0x8180
 #endif
 #ifndef GL_INSTRUMENT_MEASUREMENTS_SGIX   
-#define GL_INSTRUMENT_MEASUREMENTS_SGIX   0x8181
+#define GL_INSTRUMENT_MEASUREMENTS_SGIX   (GLenum)0x8181
 #endif
 #ifndef GL_POST_TEXTURE_FILTER_BIAS_SGIX  
-#define GL_POST_TEXTURE_FILTER_BIAS_SGIX  0x8179
+#define GL_POST_TEXTURE_FILTER_BIAS_SGIX  (GLenum)0x8179
 #endif
 #ifndef GL_POST_TEXTURE_FILTER_SCALE_SGIX 
-#define GL_POST_TEXTURE_FILTER_SCALE_SGIX 0x817A
+#define GL_POST_TEXTURE_FILTER_SCALE_SGIX (GLenum)0x817A
 #endif
 #ifndef GL_POST_TEXTURE_FILTER_BIAS_RANGE_SGIX 
-#define GL_POST_TEXTURE_FILTER_BIAS_RANGE_SGIX 0x817B
+#define GL_POST_TEXTURE_FILTER_BIAS_RANGE_SGIX (GLenum)0x817B
 #endif
 #ifndef GL_POST_TEXTURE_FILTER_SCALE_RANGE_SGIX 
-#define GL_POST_TEXTURE_FILTER_SCALE_RANGE_SGIX 0x817C
+#define GL_POST_TEXTURE_FILTER_SCALE_RANGE_SGIX (GLenum)0x817C
 #endif
 #ifndef GL_FRAMEZOOM_SGIX                 
-#define GL_FRAMEZOOM_SGIX                 0x818B
+#define GL_FRAMEZOOM_SGIX                 (GLenum)0x818B
 #endif
 #ifndef GL_FRAMEZOOM_FACTOR_SGIX          
-#define GL_FRAMEZOOM_FACTOR_SGIX          0x818C
+#define GL_FRAMEZOOM_FACTOR_SGIX          (GLenum)0x818C
 #endif
 #ifndef GL_MAX_FRAMEZOOM_FACTOR_SGIX      
-#define GL_MAX_FRAMEZOOM_FACTOR_SGIX      0x818D
+#define GL_MAX_FRAMEZOOM_FACTOR_SGIX      (GLenum)0x818D
 #endif
 #ifndef GL_REFERENCE_PLANE_SGIX           
-#define GL_REFERENCE_PLANE_SGIX           0x817D
+#define GL_REFERENCE_PLANE_SGIX           (GLenum)0x817D
 #endif
 #ifndef GL_REFERENCE_PLANE_EQUATION_SGIX  
-#define GL_REFERENCE_PLANE_EQUATION_SGIX  0x817E
+#define GL_REFERENCE_PLANE_EQUATION_SGIX  (GLenum)0x817E
 #endif
 #ifndef GL_DEPTH_COMPONENT16_SGIX         
-#define GL_DEPTH_COMPONENT16_SGIX         0x81A5
+#define GL_DEPTH_COMPONENT16_SGIX         (GLenum)0x81A5
 #endif
 #ifndef GL_DEPTH_COMPONENT24_SGIX         
-#define GL_DEPTH_COMPONENT24_SGIX         0x81A6
+#define GL_DEPTH_COMPONENT24_SGIX         (GLenum)0x81A6
 #endif
 #ifndef GL_DEPTH_COMPONENT32_SGIX         
-#define GL_DEPTH_COMPONENT32_SGIX         0x81A7
+#define GL_DEPTH_COMPONENT32_SGIX         (GLenum)0x81A7
 #endif
 #ifndef GL_FOG_FUNC_SGIS                  
-#define GL_FOG_FUNC_SGIS                  0x812A
+#define GL_FOG_FUNC_SGIS                  (GLenum)0x812A
 #endif
 #ifndef GL_FOG_FUNC_POINTS_SGIS           
-#define GL_FOG_FUNC_POINTS_SGIS           0x812B
+#define GL_FOG_FUNC_POINTS_SGIS           (GLenum)0x812B
 #endif
 #ifndef GL_MAX_FOG_FUNC_POINTS_SGIS       
-#define GL_MAX_FOG_FUNC_POINTS_SGIS       0x812C
+#define GL_MAX_FOG_FUNC_POINTS_SGIS       (GLenum)0x812C
 #endif
 #ifndef GL_FOG_OFFSET_SGIX                
-#define GL_FOG_OFFSET_SGIX                0x8198
+#define GL_FOG_OFFSET_SGIX                (GLenum)0x8198
 #endif
 #ifndef GL_FOG_OFFSET_VALUE_SGIX          
-#define GL_FOG_OFFSET_VALUE_SGIX          0x8199
+#define GL_FOG_OFFSET_VALUE_SGIX          (GLenum)0x8199
 #endif
 #ifndef GL_IMAGE_SCALE_X_HP               
-#define GL_IMAGE_SCALE_X_HP               0x8155
+#define GL_IMAGE_SCALE_X_HP               (GLenum)0x8155
 #endif
 #ifndef GL_IMAGE_SCALE_Y_HP               
-#define GL_IMAGE_SCALE_Y_HP               0x8156
+#define GL_IMAGE_SCALE_Y_HP               (GLenum)0x8156
 #endif
 #ifndef GL_IMAGE_TRANSLATE_X_HP           
-#define GL_IMAGE_TRANSLATE_X_HP           0x8157
+#define GL_IMAGE_TRANSLATE_X_HP           (GLenum)0x8157
 #endif
 #ifndef GL_IMAGE_TRANSLATE_Y_HP           
-#define GL_IMAGE_TRANSLATE_Y_HP           0x8158
+#define GL_IMAGE_TRANSLATE_Y_HP           (GLenum)0x8158
 #endif
 #ifndef GL_IMAGE_ROTATE_ANGLE_HP          
-#define GL_IMAGE_ROTATE_ANGLE_HP          0x8159
+#define GL_IMAGE_ROTATE_ANGLE_HP          (GLenum)0x8159
 #endif
 #ifndef GL_IMAGE_ROTATE_ORIGIN_X_HP       
-#define GL_IMAGE_ROTATE_ORIGIN_X_HP       0x815A
+#define GL_IMAGE_ROTATE_ORIGIN_X_HP       (GLenum)0x815A
 #endif
 #ifndef GL_IMAGE_ROTATE_ORIGIN_Y_HP       
-#define GL_IMAGE_ROTATE_ORIGIN_Y_HP       0x815B
+#define GL_IMAGE_ROTATE_ORIGIN_Y_HP       (GLenum)0x815B
 #endif
 #ifndef GL_IMAGE_MAG_FILTER_HP            
-#define GL_IMAGE_MAG_FILTER_HP            0x815C
+#define GL_IMAGE_MAG_FILTER_HP            (GLenum)0x815C
 #endif
 #ifndef GL_IMAGE_MIN_FILTER_HP            
-#define GL_IMAGE_MIN_FILTER_HP            0x815D
+#define GL_IMAGE_MIN_FILTER_HP            (GLenum)0x815D
 #endif
 #ifndef GL_IMAGE_CUBIC_WEIGHT_HP          
-#define GL_IMAGE_CUBIC_WEIGHT_HP          0x815E
+#define GL_IMAGE_CUBIC_WEIGHT_HP          (GLenum)0x815E
 #endif
 #ifndef GL_CUBIC_HP                       
-#define GL_CUBIC_HP                       0x815F
+#define GL_CUBIC_HP                       (GLenum)0x815F
 #endif
 #ifndef GL_AVERAGE_HP                     
-#define GL_AVERAGE_HP                     0x8160
+#define GL_AVERAGE_HP                     (GLenum)0x8160
 #endif
 #ifndef GL_IMAGE_TRANSFORM_2D_HP          
-#define GL_IMAGE_TRANSFORM_2D_HP          0x8161
+#define GL_IMAGE_TRANSFORM_2D_HP          (GLenum)0x8161
 #endif
 #ifndef GL_POST_IMAGE_TRANSFORM_COLOR_TABLE_HP 
-#define GL_POST_IMAGE_TRANSFORM_COLOR_TABLE_HP 0x8162
+#define GL_POST_IMAGE_TRANSFORM_COLOR_TABLE_HP (GLenum)0x8162
 #endif
 #ifndef GL_PROXY_POST_IMAGE_TRANSFORM_COLOR_TABLE_HP 
-#define GL_PROXY_POST_IMAGE_TRANSFORM_COLOR_TABLE_HP 0x8163
+#define GL_PROXY_POST_IMAGE_TRANSFORM_COLOR_TABLE_HP (GLenum)0x8163
 #endif
 #ifndef GL_IGNORE_BORDER_HP               
-#define GL_IGNORE_BORDER_HP               0x8150
+#define GL_IGNORE_BORDER_HP               (GLenum)0x8150
 #endif
 #ifndef GL_CONSTANT_BORDER_HP             
-#define GL_CONSTANT_BORDER_HP             0x8151
+#define GL_CONSTANT_BORDER_HP             (GLenum)0x8151
 #endif
 #ifndef GL_REPLICATE_BORDER_HP            
-#define GL_REPLICATE_BORDER_HP            0x8153
+#define GL_REPLICATE_BORDER_HP            (GLenum)0x8153
 #endif
 #ifndef GL_CONVOLUTION_BORDER_COLOR_HP    
-#define GL_CONVOLUTION_BORDER_COLOR_HP    0x8154
+#define GL_CONVOLUTION_BORDER_COLOR_HP    (GLenum)0x8154
 #endif
 #ifndef GL_TEXTURE_ENV_BIAS_SGIX          
-#define GL_TEXTURE_ENV_BIAS_SGIX          0x80BE
+#define GL_TEXTURE_ENV_BIAS_SGIX          (GLenum)0x80BE
 #endif
 #ifndef GL_VERTEX_DATA_HINT_PGI           
-#define GL_VERTEX_DATA_HINT_PGI           0x1A22A
+#define GL_VERTEX_DATA_HINT_PGI           (GLenum)0x1A22A
 #endif
 #ifndef GL_VERTEX_CONSISTENT_HINT_PGI     
-#define GL_VERTEX_CONSISTENT_HINT_PGI     0x1A22B
+#define GL_VERTEX_CONSISTENT_HINT_PGI     (GLenum)0x1A22B
 #endif
 #ifndef GL_MATERIAL_SIDE_HINT_PGI         
-#define GL_MATERIAL_SIDE_HINT_PGI         0x1A22C
+#define GL_MATERIAL_SIDE_HINT_PGI         (GLenum)0x1A22C
 #endif
 #ifndef GL_MAX_VERTEX_HINT_PGI            
-#define GL_MAX_VERTEX_HINT_PGI            0x1A22D
+#define GL_MAX_VERTEX_HINT_PGI            (GLenum)0x1A22D
 #endif
 #ifndef GL_COLOR3_BIT_PGI                 
-#define GL_COLOR3_BIT_PGI                 0x00010000
+#define GL_COLOR3_BIT_PGI                 (GLenum)0x00010000
 #endif
 #ifndef GL_COLOR4_BIT_PGI                 
-#define GL_COLOR4_BIT_PGI                 0x00020000
+#define GL_COLOR4_BIT_PGI                 (GLenum)0x00020000
 #endif
 #ifndef GL_EDGEFLAG_BIT_PGI               
-#define GL_EDGEFLAG_BIT_PGI               0x00040000
+#define GL_EDGEFLAG_BIT_PGI               (GLenum)0x00040000
 #endif
 #ifndef GL_INDEX_BIT_PGI                  
-#define GL_INDEX_BIT_PGI                  0x00080000
+#define GL_INDEX_BIT_PGI                  (GLenum)0x00080000
 #endif
 #ifndef GL_MAT_AMBIENT_BIT_PGI            
-#define GL_MAT_AMBIENT_BIT_PGI            0x00100000
+#define GL_MAT_AMBIENT_BIT_PGI            (GLenum)0x00100000
 #endif
 #ifndef GL_MAT_AMBIENT_AND_DIFFUSE_BIT_PGI 
-#define GL_MAT_AMBIENT_AND_DIFFUSE_BIT_PGI 0x00200000
+#define GL_MAT_AMBIENT_AND_DIFFUSE_BIT_PGI (GLenum)0x00200000
 #endif
 #ifndef GL_MAT_DIFFUSE_BIT_PGI            
-#define GL_MAT_DIFFUSE_BIT_PGI            0x00400000
+#define GL_MAT_DIFFUSE_BIT_PGI            (GLenum)0x00400000
 #endif
 #ifndef GL_MAT_EMISSION_BIT_PGI           
-#define GL_MAT_EMISSION_BIT_PGI           0x00800000
+#define GL_MAT_EMISSION_BIT_PGI           (GLenum)0x00800000
 #endif
 #ifndef GL_MAT_COLOR_INDEXES_BIT_PGI      
-#define GL_MAT_COLOR_INDEXES_BIT_PGI      0x01000000
+#define GL_MAT_COLOR_INDEXES_BIT_PGI      (GLenum)0x01000000
 #endif
 #ifndef GL_MAT_SHININESS_BIT_PGI          
-#define GL_MAT_SHININESS_BIT_PGI          0x02000000
+#define GL_MAT_SHININESS_BIT_PGI          (GLenum)0x02000000
 #endif
 #ifndef GL_MAT_SPECULAR_BIT_PGI           
-#define GL_MAT_SPECULAR_BIT_PGI           0x04000000
+#define GL_MAT_SPECULAR_BIT_PGI           (GLenum)0x04000000
 #endif
 #ifndef GL_NORMAL_BIT_PGI                 
-#define GL_NORMAL_BIT_PGI                 0x08000000
+#define GL_NORMAL_BIT_PGI                 (GLenum)0x08000000
 #endif
 #ifndef GL_TEXCOORD1_BIT_PGI              
-#define GL_TEXCOORD1_BIT_PGI              0x10000000
+#define GL_TEXCOORD1_BIT_PGI              (GLenum)0x10000000
 #endif
 #ifndef GL_TEXCOORD2_BIT_PGI              
-#define GL_TEXCOORD2_BIT_PGI              0x20000000
+#define GL_TEXCOORD2_BIT_PGI              (GLenum)0x20000000
 #endif
 #ifndef GL_TEXCOORD3_BIT_PGI              
-#define GL_TEXCOORD3_BIT_PGI              0x40000000
+#define GL_TEXCOORD3_BIT_PGI              (GLenum)0x40000000
 #endif
 #ifndef GL_TEXCOORD4_BIT_PGI              
-#define GL_TEXCOORD4_BIT_PGI              0x80000000
+#define GL_TEXCOORD4_BIT_PGI              (GLenum)0x80000000
 #endif
 #ifndef GL_VERTEX23_BIT_PGI               
-#define GL_VERTEX23_BIT_PGI               0x00000004
+#define GL_VERTEX23_BIT_PGI               (GLenum)0x00000004
 #endif
 #ifndef GL_VERTEX4_BIT_PGI                
-#define GL_VERTEX4_BIT_PGI                0x00000008
+#define GL_VERTEX4_BIT_PGI                (GLenum)0x00000008
 #endif
 #ifndef GL_PREFER_DOUBLEBUFFER_HINT_PGI   
-#define GL_PREFER_DOUBLEBUFFER_HINT_PGI   0x1A1F8
+#define GL_PREFER_DOUBLEBUFFER_HINT_PGI   (GLenum)0x1A1F8
 #endif
 #ifndef GL_CONSERVE_MEMORY_HINT_PGI       
-#define GL_CONSERVE_MEMORY_HINT_PGI       0x1A1FD
+#define GL_CONSERVE_MEMORY_HINT_PGI       (GLenum)0x1A1FD
 #endif
 #ifndef GL_RECLAIM_MEMORY_HINT_PGI        
-#define GL_RECLAIM_MEMORY_HINT_PGI        0x1A1FE
+#define GL_RECLAIM_MEMORY_HINT_PGI        (GLenum)0x1A1FE
 #endif
 #ifndef GL_NATIVE_GRAPHICS_HANDLE_PGI     
-#define GL_NATIVE_GRAPHICS_HANDLE_PGI     0x1A202
+#define GL_NATIVE_GRAPHICS_HANDLE_PGI     (GLenum)0x1A202
 #endif
 #ifndef GL_NATIVE_GRAPHICS_BEGIN_HINT_PGI 
-#define GL_NATIVE_GRAPHICS_BEGIN_HINT_PGI 0x1A203
+#define GL_NATIVE_GRAPHICS_BEGIN_HINT_PGI (GLenum)0x1A203
 #endif
 #ifndef GL_NATIVE_GRAPHICS_END_HINT_PGI   
-#define GL_NATIVE_GRAPHICS_END_HINT_PGI   0x1A204
+#define GL_NATIVE_GRAPHICS_END_HINT_PGI   (GLenum)0x1A204
 #endif
 #ifndef GL_ALWAYS_FAST_HINT_PGI           
-#define GL_ALWAYS_FAST_HINT_PGI           0x1A20C
+#define GL_ALWAYS_FAST_HINT_PGI           (GLenum)0x1A20C
 #endif
 #ifndef GL_ALWAYS_SOFT_HINT_PGI           
-#define GL_ALWAYS_SOFT_HINT_PGI           0x1A20D
+#define GL_ALWAYS_SOFT_HINT_PGI           (GLenum)0x1A20D
 #endif
 #ifndef GL_ALLOW_DRAW_OBJ_HINT_PGI        
-#define GL_ALLOW_DRAW_OBJ_HINT_PGI        0x1A20E
+#define GL_ALLOW_DRAW_OBJ_HINT_PGI        (GLenum)0x1A20E
 #endif
 #ifndef GL_ALLOW_DRAW_WIN_HINT_PGI        
-#define GL_ALLOW_DRAW_WIN_HINT_PGI        0x1A20F
+#define GL_ALLOW_DRAW_WIN_HINT_PGI        (GLenum)0x1A20F
 #endif
 #ifndef GL_ALLOW_DRAW_FRG_HINT_PGI        
-#define GL_ALLOW_DRAW_FRG_HINT_PGI        0x1A210
+#define GL_ALLOW_DRAW_FRG_HINT_PGI        (GLenum)0x1A210
 #endif
 #ifndef GL_ALLOW_DRAW_MEM_HINT_PGI        
-#define GL_ALLOW_DRAW_MEM_HINT_PGI        0x1A211
+#define GL_ALLOW_DRAW_MEM_HINT_PGI        (GLenum)0x1A211
 #endif
 #ifndef GL_STRICT_DEPTHFUNC_HINT_PGI      
-#define GL_STRICT_DEPTHFUNC_HINT_PGI      0x1A216
+#define GL_STRICT_DEPTHFUNC_HINT_PGI      (GLenum)0x1A216
 #endif
 #ifndef GL_STRICT_LIGHTING_HINT_PGI       
-#define GL_STRICT_LIGHTING_HINT_PGI       0x1A217
+#define GL_STRICT_LIGHTING_HINT_PGI       (GLenum)0x1A217
 #endif
 #ifndef GL_STRICT_SCISSOR_HINT_PGI        
-#define GL_STRICT_SCISSOR_HINT_PGI        0x1A218
+#define GL_STRICT_SCISSOR_HINT_PGI        (GLenum)0x1A218
 #endif
 #ifndef GL_FULL_STIPPLE_HINT_PGI          
-#define GL_FULL_STIPPLE_HINT_PGI          0x1A219
+#define GL_FULL_STIPPLE_HINT_PGI          (GLenum)0x1A219
 #endif
 #ifndef GL_CLIP_NEAR_HINT_PGI             
-#define GL_CLIP_NEAR_HINT_PGI             0x1A220
+#define GL_CLIP_NEAR_HINT_PGI             (GLenum)0x1A220
 #endif
 #ifndef GL_CLIP_FAR_HINT_PGI              
-#define GL_CLIP_FAR_HINT_PGI              0x1A221
+#define GL_CLIP_FAR_HINT_PGI              (GLenum)0x1A221
 #endif
 #ifndef GL_WIDE_LINE_HINT_PGI             
-#define GL_WIDE_LINE_HINT_PGI             0x1A222
+#define GL_WIDE_LINE_HINT_PGI             (GLenum)0x1A222
 #endif
 #ifndef GL_BACK_NORMALS_HINT_PGI          
-#define GL_BACK_NORMALS_HINT_PGI          0x1A223
+#define GL_BACK_NORMALS_HINT_PGI          (GLenum)0x1A223
 #endif
 #ifndef GL_COLOR_INDEX1_EXT               
-#define GL_COLOR_INDEX1_EXT               0x80E2
+#define GL_COLOR_INDEX1_EXT               (GLenum)0x80E2
 #endif
 #ifndef GL_COLOR_INDEX2_EXT               
-#define GL_COLOR_INDEX2_EXT               0x80E3
+#define GL_COLOR_INDEX2_EXT               (GLenum)0x80E3
 #endif
 #ifndef GL_COLOR_INDEX4_EXT               
-#define GL_COLOR_INDEX4_EXT               0x80E4
+#define GL_COLOR_INDEX4_EXT               (GLenum)0x80E4
 #endif
 #ifndef GL_COLOR_INDEX8_EXT               
-#define GL_COLOR_INDEX8_EXT               0x80E5
+#define GL_COLOR_INDEX8_EXT               (GLenum)0x80E5
 #endif
 #ifndef GL_COLOR_INDEX12_EXT              
-#define GL_COLOR_INDEX12_EXT              0x80E6
+#define GL_COLOR_INDEX12_EXT              (GLenum)0x80E6
 #endif
 #ifndef GL_COLOR_INDEX16_EXT              
-#define GL_COLOR_INDEX16_EXT              0x80E7
+#define GL_COLOR_INDEX16_EXT              (GLenum)0x80E7
 #endif
 #ifndef GL_TEXTURE_INDEX_SIZE_EXT         
-#define GL_TEXTURE_INDEX_SIZE_EXT         0x80ED
+#define GL_TEXTURE_INDEX_SIZE_EXT         (GLenum)0x80ED
 #endif
 #ifndef GL_CLIP_VOLUME_CLIPPING_HINT_EXT  
-#define GL_CLIP_VOLUME_CLIPPING_HINT_EXT  0x80F0
+#define GL_CLIP_VOLUME_CLIPPING_HINT_EXT  (GLenum)0x80F0
 #endif
 #ifndef GL_LIST_PRIORITY_SGIX             
-#define GL_LIST_PRIORITY_SGIX             0x8182
+#define GL_LIST_PRIORITY_SGIX             (GLenum)0x8182
 #endif
 #ifndef GL_IR_INSTRUMENT1_SGIX            
-#define GL_IR_INSTRUMENT1_SGIX            0x817F
+#define GL_IR_INSTRUMENT1_SGIX            (GLenum)0x817F
 #endif
 #ifndef GL_CALLIGRAPHIC_FRAGMENT_SGIX     
-#define GL_CALLIGRAPHIC_FRAGMENT_SGIX     0x8183
+#define GL_CALLIGRAPHIC_FRAGMENT_SGIX     (GLenum)0x8183
 #endif
 #ifndef GL_TEXTURE_LOD_BIAS_S_SGIX        
-#define GL_TEXTURE_LOD_BIAS_S_SGIX        0x818E
+#define GL_TEXTURE_LOD_BIAS_S_SGIX        (GLenum)0x818E
 #endif
 #ifndef GL_TEXTURE_LOD_BIAS_T_SGIX        
-#define GL_TEXTURE_LOD_BIAS_T_SGIX        0x818F
+#define GL_TEXTURE_LOD_BIAS_T_SGIX        (GLenum)0x818F
 #endif
 #ifndef GL_TEXTURE_LOD_BIAS_R_SGIX        
-#define GL_TEXTURE_LOD_BIAS_R_SGIX        0x8190
+#define GL_TEXTURE_LOD_BIAS_R_SGIX        (GLenum)0x8190
 #endif
 #ifndef GL_SHADOW_AMBIENT_SGIX            
-#define GL_SHADOW_AMBIENT_SGIX            0x80BF
+#define GL_SHADOW_AMBIENT_SGIX            (GLenum)0x80BF
 #endif
 #ifndef GL_INDEX_MATERIAL_EXT             
-#define GL_INDEX_MATERIAL_EXT             0x81B8
+#define GL_INDEX_MATERIAL_EXT             (GLenum)0x81B8
 #endif
 #ifndef GL_INDEX_MATERIAL_PARAMETER_EXT   
-#define GL_INDEX_MATERIAL_PARAMETER_EXT   0x81B9
+#define GL_INDEX_MATERIAL_PARAMETER_EXT   (GLenum)0x81B9
 #endif
 #ifndef GL_INDEX_MATERIAL_FACE_EXT        
-#define GL_INDEX_MATERIAL_FACE_EXT        0x81BA
+#define GL_INDEX_MATERIAL_FACE_EXT        (GLenum)0x81BA
 #endif
 #ifndef GL_INDEX_TEST_EXT                 
-#define GL_INDEX_TEST_EXT                 0x81B5
+#define GL_INDEX_TEST_EXT                 (GLenum)0x81B5
 #endif
 #ifndef GL_INDEX_TEST_FUNC_EXT            
-#define GL_INDEX_TEST_FUNC_EXT            0x81B6
+#define GL_INDEX_TEST_FUNC_EXT            (GLenum)0x81B6
 #endif
 #ifndef GL_INDEX_TEST_REF_EXT             
-#define GL_INDEX_TEST_REF_EXT             0x81B7
+#define GL_INDEX_TEST_REF_EXT             (GLenum)0x81B7
 #endif
 #ifndef GL_IUI_V2F_EXT                    
-#define GL_IUI_V2F_EXT                    0x81AD
+#define GL_IUI_V2F_EXT                    (GLenum)0x81AD
 #endif
 #ifndef GL_IUI_V3F_EXT                    
-#define GL_IUI_V3F_EXT                    0x81AE
+#define GL_IUI_V3F_EXT                    (GLenum)0x81AE
 #endif
 #ifndef GL_IUI_N3F_V2F_EXT                
-#define GL_IUI_N3F_V2F_EXT                0x81AF
+#define GL_IUI_N3F_V2F_EXT                (GLenum)0x81AF
 #endif
 #ifndef GL_IUI_N3F_V3F_EXT                
-#define GL_IUI_N3F_V3F_EXT                0x81B0
+#define GL_IUI_N3F_V3F_EXT                (GLenum)0x81B0
 #endif
 #ifndef GL_T2F_IUI_V2F_EXT                
-#define GL_T2F_IUI_V2F_EXT                0x81B1
+#define GL_T2F_IUI_V2F_EXT                (GLenum)0x81B1
 #endif
 #ifndef GL_T2F_IUI_V3F_EXT                
-#define GL_T2F_IUI_V3F_EXT                0x81B2
+#define GL_T2F_IUI_V3F_EXT                (GLenum)0x81B2
 #endif
 #ifndef GL_T2F_IUI_N3F_V2F_EXT            
-#define GL_T2F_IUI_N3F_V2F_EXT            0x81B3
+#define GL_T2F_IUI_N3F_V2F_EXT            (GLenum)0x81B3
 #endif
 #ifndef GL_T2F_IUI_N3F_V3F_EXT            
-#define GL_T2F_IUI_N3F_V3F_EXT            0x81B4
+#define GL_T2F_IUI_N3F_V3F_EXT            (GLenum)0x81B4
 #endif
 #ifndef GL_ARRAY_ELEMENT_LOCK_FIRST_EXT   
-#define GL_ARRAY_ELEMENT_LOCK_FIRST_EXT   0x81A8
+#define GL_ARRAY_ELEMENT_LOCK_FIRST_EXT   (GLenum)0x81A8
 #endif
 #ifndef GL_ARRAY_ELEMENT_LOCK_COUNT_EXT   
-#define GL_ARRAY_ELEMENT_LOCK_COUNT_EXT   0x81A9
+#define GL_ARRAY_ELEMENT_LOCK_COUNT_EXT   (GLenum)0x81A9
 #endif
 #ifndef GL_CULL_VERTEX_EXT                
-#define GL_CULL_VERTEX_EXT                0x81AA
+#define GL_CULL_VERTEX_EXT                (GLenum)0x81AA
 #endif
 #ifndef GL_CULL_VERTEX_EYE_POSITION_EXT   
-#define GL_CULL_VERTEX_EYE_POSITION_EXT   0x81AB
+#define GL_CULL_VERTEX_EYE_POSITION_EXT   (GLenum)0x81AB
 #endif
 #ifndef GL_CULL_VERTEX_OBJECT_POSITION_EXT 
-#define GL_CULL_VERTEX_OBJECT_POSITION_EXT 0x81AC
+#define GL_CULL_VERTEX_OBJECT_POSITION_EXT (GLenum)0x81AC
 #endif
 #ifndef GL_YCRCB_422_SGIX                 
-#define GL_YCRCB_422_SGIX                 0x81BB
+#define GL_YCRCB_422_SGIX                 (GLenum)0x81BB
 #endif
 #ifndef GL_YCRCB_444_SGIX                 
-#define GL_YCRCB_444_SGIX                 0x81BC
+#define GL_YCRCB_444_SGIX                 (GLenum)0x81BC
 #endif
 #ifndef GL_FRAGMENT_LIGHTING_SGIX         
-#define GL_FRAGMENT_LIGHTING_SGIX         0x8400
+#define GL_FRAGMENT_LIGHTING_SGIX         (GLenum)0x8400
 #endif
 #ifndef GL_FRAGMENT_COLOR_MATERIAL_SGIX   
-#define GL_FRAGMENT_COLOR_MATERIAL_SGIX   0x8401
+#define GL_FRAGMENT_COLOR_MATERIAL_SGIX   (GLenum)0x8401
 #endif
 #ifndef GL_FRAGMENT_COLOR_MATERIAL_FACE_SGIX 
-#define GL_FRAGMENT_COLOR_MATERIAL_FACE_SGIX 0x8402
+#define GL_FRAGMENT_COLOR_MATERIAL_FACE_SGIX (GLenum)0x8402
 #endif
 #ifndef GL_FRAGMENT_COLOR_MATERIAL_PARAMETER_SGIX 
-#define GL_FRAGMENT_COLOR_MATERIAL_PARAMETER_SGIX 0x8403
+#define GL_FRAGMENT_COLOR_MATERIAL_PARAMETER_SGIX (GLenum)0x8403
 #endif
 #ifndef GL_MAX_FRAGMENT_LIGHTS_SGIX       
-#define GL_MAX_FRAGMENT_LIGHTS_SGIX       0x8404
+#define GL_MAX_FRAGMENT_LIGHTS_SGIX       (GLenum)0x8404
 #endif
 #ifndef GL_MAX_ACTIVE_LIGHTS_SGIX         
-#define GL_MAX_ACTIVE_LIGHTS_SGIX         0x8405
+#define GL_MAX_ACTIVE_LIGHTS_SGIX         (GLenum)0x8405
 #endif
 #ifndef GL_CURRENT_RASTER_NORMAL_SGIX     
-#define GL_CURRENT_RASTER_NORMAL_SGIX     0x8406
+#define GL_CURRENT_RASTER_NORMAL_SGIX     (GLenum)0x8406
 #endif
 #ifndef GL_LIGHT_ENV_MODE_SGIX            
-#define GL_LIGHT_ENV_MODE_SGIX            0x8407
+#define GL_LIGHT_ENV_MODE_SGIX            (GLenum)0x8407
 #endif
 #ifndef GL_FRAGMENT_LIGHT_MODEL_LOCAL_VIEWER_SGIX 
-#define GL_FRAGMENT_LIGHT_MODEL_LOCAL_VIEWER_SGIX 0x8408
+#define GL_FRAGMENT_LIGHT_MODEL_LOCAL_VIEWER_SGIX (GLenum)0x8408
 #endif
 #ifndef GL_FRAGMENT_LIGHT_MODEL_TWO_SIDE_SGIX 
-#define GL_FRAGMENT_LIGHT_MODEL_TWO_SIDE_SGIX 0x8409
+#define GL_FRAGMENT_LIGHT_MODEL_TWO_SIDE_SGIX (GLenum)0x8409
 #endif
 #ifndef GL_FRAGMENT_LIGHT_MODEL_AMBIENT_SGIX 
-#define GL_FRAGMENT_LIGHT_MODEL_AMBIENT_SGIX 0x840A
+#define GL_FRAGMENT_LIGHT_MODEL_AMBIENT_SGIX (GLenum)0x840A
 #endif
 #ifndef GL_FRAGMENT_LIGHT_MODEL_NORMAL_INTERPOLATION_SGIX 
-#define GL_FRAGMENT_LIGHT_MODEL_NORMAL_INTERPOLATION_SGIX 0x840B
+#define GL_FRAGMENT_LIGHT_MODEL_NORMAL_INTERPOLATION_SGIX (GLenum)0x840B
 #endif
 #ifndef GL_FRAGMENT_LIGHT0_SGIX           
-#define GL_FRAGMENT_LIGHT0_SGIX           0x840C
+#define GL_FRAGMENT_LIGHT0_SGIX           (GLenum)0x840C
 #endif
 #ifndef GL_FRAGMENT_LIGHT1_SGIX           
-#define GL_FRAGMENT_LIGHT1_SGIX           0x840D
+#define GL_FRAGMENT_LIGHT1_SGIX           (GLenum)0x840D
 #endif
 #ifndef GL_FRAGMENT_LIGHT2_SGIX           
-#define GL_FRAGMENT_LIGHT2_SGIX           0x840E
+#define GL_FRAGMENT_LIGHT2_SGIX           (GLenum)0x840E
 #endif
 #ifndef GL_FRAGMENT_LIGHT3_SGIX           
-#define GL_FRAGMENT_LIGHT3_SGIX           0x840F
+#define GL_FRAGMENT_LIGHT3_SGIX           (GLenum)0x840F
 #endif
 #ifndef GL_FRAGMENT_LIGHT4_SGIX           
-#define GL_FRAGMENT_LIGHT4_SGIX           0x8410
+#define GL_FRAGMENT_LIGHT4_SGIX           (GLenum)0x8410
 #endif
 #ifndef GL_FRAGMENT_LIGHT5_SGIX           
-#define GL_FRAGMENT_LIGHT5_SGIX           0x8411
+#define GL_FRAGMENT_LIGHT5_SGIX           (GLenum)0x8411
 #endif
 #ifndef GL_FRAGMENT_LIGHT6_SGIX           
-#define GL_FRAGMENT_LIGHT6_SGIX           0x8412
+#define GL_FRAGMENT_LIGHT6_SGIX           (GLenum)0x8412
 #endif
 #ifndef GL_FRAGMENT_LIGHT7_SGIX           
-#define GL_FRAGMENT_LIGHT7_SGIX           0x8413
+#define GL_FRAGMENT_LIGHT7_SGIX           (GLenum)0x8413
 #endif
 #ifndef GL_RASTER_POSITION_UNCLIPPED_IBM  
-#define GL_RASTER_POSITION_UNCLIPPED_IBM  0x19262
+#define GL_RASTER_POSITION_UNCLIPPED_IBM  (GLenum)0x19262
 #endif
 #ifndef GL_TEXTURE_LIGHTING_MODE_HP       
-#define GL_TEXTURE_LIGHTING_MODE_HP       0x8167
+#define GL_TEXTURE_LIGHTING_MODE_HP       (GLenum)0x8167
 #endif
 #ifndef GL_TEXTURE_POST_SPECULAR_HP       
-#define GL_TEXTURE_POST_SPECULAR_HP       0x8168
+#define GL_TEXTURE_POST_SPECULAR_HP       (GLenum)0x8168
 #endif
 #ifndef GL_TEXTURE_PRE_SPECULAR_HP        
-#define GL_TEXTURE_PRE_SPECULAR_HP        0x8169
+#define GL_TEXTURE_PRE_SPECULAR_HP        (GLenum)0x8169
 #endif
 #ifndef GL_MAX_ELEMENTS_VERTICES_EXT      
-#define GL_MAX_ELEMENTS_VERTICES_EXT      0x80E8
+#define GL_MAX_ELEMENTS_VERTICES_EXT      (GLenum)0x80E8
 #endif
 #ifndef GL_MAX_ELEMENTS_INDICES_EXT       
-#define GL_MAX_ELEMENTS_INDICES_EXT       0x80E9
+#define GL_MAX_ELEMENTS_INDICES_EXT       (GLenum)0x80E9
 #endif
 #ifndef GL_PHONG_WIN                      
-#define GL_PHONG_WIN                      0x80EA
+#define GL_PHONG_WIN                      (GLenum)0x80EA
 #endif
 #ifndef GL_PHONG_HINT_WIN                 
-#define GL_PHONG_HINT_WIN                 0x80EB
+#define GL_PHONG_HINT_WIN                 (GLenum)0x80EB
 #endif
 #ifndef GL_FOG_SPECULAR_TEXTURE_WIN       
-#define GL_FOG_SPECULAR_TEXTURE_WIN       0x80EC
+#define GL_FOG_SPECULAR_TEXTURE_WIN       (GLenum)0x80EC
 #endif
 #ifndef GL_FRAGMENT_MATERIAL_EXT          
-#define GL_FRAGMENT_MATERIAL_EXT          0x8349
+#define GL_FRAGMENT_MATERIAL_EXT          (GLenum)0x8349
 #endif
 #ifndef GL_FRAGMENT_NORMAL_EXT            
-#define GL_FRAGMENT_NORMAL_EXT            0x834A
+#define GL_FRAGMENT_NORMAL_EXT            (GLenum)0x834A
 #endif
 #ifndef GL_FRAGMENT_COLOR_EXT             
-#define GL_FRAGMENT_COLOR_EXT             0x834C
+#define GL_FRAGMENT_COLOR_EXT             (GLenum)0x834C
 #endif
 #ifndef GL_ATTENUATION_EXT                
-#define GL_ATTENUATION_EXT                0x834D
+#define GL_ATTENUATION_EXT                (GLenum)0x834D
 #endif
 #ifndef GL_SHADOW_ATTENUATION_EXT         
-#define GL_SHADOW_ATTENUATION_EXT         0x834E
+#define GL_SHADOW_ATTENUATION_EXT         (GLenum)0x834E
 #endif
 #ifndef GL_TEXTURE_APPLICATION_MODE_EXT   
-#define GL_TEXTURE_APPLICATION_MODE_EXT   0x834F
+#define GL_TEXTURE_APPLICATION_MODE_EXT   (GLenum)0x834F
 #endif
 #ifndef GL_TEXTURE_LIGHT_EXT              
-#define GL_TEXTURE_LIGHT_EXT              0x8350
+#define GL_TEXTURE_LIGHT_EXT              (GLenum)0x8350
 #endif
 #ifndef GL_TEXTURE_MATERIAL_FACE_EXT      
-#define GL_TEXTURE_MATERIAL_FACE_EXT      0x8351
+#define GL_TEXTURE_MATERIAL_FACE_EXT      (GLenum)0x8351
 #endif
 #ifndef GL_TEXTURE_MATERIAL_PARAMETER_EXT 
-#define GL_TEXTURE_MATERIAL_PARAMETER_EXT 0x8352
+#define GL_TEXTURE_MATERIAL_PARAMETER_EXT (GLenum)0x8352
 #endif
 #ifndef GL_ALPHA_MIN_SGIX                 
-#define GL_ALPHA_MIN_SGIX                 0x8320
+#define GL_ALPHA_MIN_SGIX                 (GLenum)0x8320
 #endif
 #ifndef GL_ALPHA_MAX_SGIX                 
-#define GL_ALPHA_MAX_SGIX                 0x8321
+#define GL_ALPHA_MAX_SGIX                 (GLenum)0x8321
 #endif
 #ifndef GL_BGR_EXT                        
-#define GL_BGR_EXT                        0x80E0
+#define GL_BGR_EXT                        (GLenum)0x80E0
 #endif
 #ifndef GL_BGRA_EXT                       
-#define GL_BGRA_EXT                       0x80E1
+#define GL_BGRA_EXT                       (GLenum)0x80E1
 #endif
 #ifndef GL_PARALLEL_ARRAYS_INTEL          
-#define GL_PARALLEL_ARRAYS_INTEL          0x83F4
+#define GL_PARALLEL_ARRAYS_INTEL          (GLenum)0x83F4
 #endif
 #ifndef GL_VERTEX_ARRAY_PARALLEL_POINTERS_INTEL 
-#define GL_VERTEX_ARRAY_PARALLEL_POINTERS_INTEL 0x83F5
+#define GL_VERTEX_ARRAY_PARALLEL_POINTERS_INTEL (GLenum)0x83F5
 #endif
 #ifndef GL_NORMAL_ARRAY_PARALLEL_POINTERS_INTEL 
-#define GL_NORMAL_ARRAY_PARALLEL_POINTERS_INTEL 0x83F6
+#define GL_NORMAL_ARRAY_PARALLEL_POINTERS_INTEL (GLenum)0x83F6
 #endif
 #ifndef GL_COLOR_ARRAY_PARALLEL_POINTERS_INTEL 
-#define GL_COLOR_ARRAY_PARALLEL_POINTERS_INTEL 0x83F7
+#define GL_COLOR_ARRAY_PARALLEL_POINTERS_INTEL (GLenum)0x83F7
 #endif
 #ifndef GL_TEXTURE_COORD_ARRAY_PARALLEL_POINTERS_INTEL 
-#define GL_TEXTURE_COORD_ARRAY_PARALLEL_POINTERS_INTEL 0x83F8
+#define GL_TEXTURE_COORD_ARRAY_PARALLEL_POINTERS_INTEL (GLenum)0x83F8
 #endif
 #ifndef GL_OCCLUSION_TEST_HP              
-#define GL_OCCLUSION_TEST_HP              0x8165
+#define GL_OCCLUSION_TEST_HP              (GLenum)0x8165
 #endif
 #ifndef GL_OCCLUSION_TEST_RESULT_HP       
-#define GL_OCCLUSION_TEST_RESULT_HP       0x8166
+#define GL_OCCLUSION_TEST_RESULT_HP       (GLenum)0x8166
 #endif
 #ifndef GL_PIXEL_TRANSFORM_2D_EXT         
-#define GL_PIXEL_TRANSFORM_2D_EXT         0x8330
+#define GL_PIXEL_TRANSFORM_2D_EXT         (GLenum)0x8330
 #endif
 #ifndef GL_PIXEL_MAG_FILTER_EXT           
-#define GL_PIXEL_MAG_FILTER_EXT           0x8331
+#define GL_PIXEL_MAG_FILTER_EXT           (GLenum)0x8331
 #endif
 #ifndef GL_PIXEL_MIN_FILTER_EXT           
-#define GL_PIXEL_MIN_FILTER_EXT           0x8332
+#define GL_PIXEL_MIN_FILTER_EXT           (GLenum)0x8332
 #endif
 #ifndef GL_PIXEL_CUBIC_WEIGHT_EXT         
-#define GL_PIXEL_CUBIC_WEIGHT_EXT         0x8333
+#define GL_PIXEL_CUBIC_WEIGHT_EXT         (GLenum)0x8333
 #endif
 #ifndef GL_CUBIC_EXT                      
-#define GL_CUBIC_EXT                      0x8334
+#define GL_CUBIC_EXT                      (GLenum)0x8334
 #endif
 #ifndef GL_AVERAGE_EXT                    
-#define GL_AVERAGE_EXT                    0x8335
+#define GL_AVERAGE_EXT                    (GLenum)0x8335
 #endif
 #ifndef GL_PIXEL_TRANSFORM_2D_STACK_DEPTH_EXT 
-#define GL_PIXEL_TRANSFORM_2D_STACK_DEPTH_EXT 0x8336
+#define GL_PIXEL_TRANSFORM_2D_STACK_DEPTH_EXT (GLenum)0x8336
 #endif
 #ifndef GL_MAX_PIXEL_TRANSFORM_2D_STACK_DEPTH_EXT 
-#define GL_MAX_PIXEL_TRANSFORM_2D_STACK_DEPTH_EXT 0x8337
+#define GL_MAX_PIXEL_TRANSFORM_2D_STACK_DEPTH_EXT (GLenum)0x8337
 #endif
 #ifndef GL_PIXEL_TRANSFORM_2D_MATRIX_EXT  
-#define GL_PIXEL_TRANSFORM_2D_MATRIX_EXT  0x8338
+#define GL_PIXEL_TRANSFORM_2D_MATRIX_EXT  (GLenum)0x8338
 #endif
 #ifndef GL_SHARED_TEXTURE_PALETTE_EXT     
-#define GL_SHARED_TEXTURE_PALETTE_EXT     0x81FB
+#define GL_SHARED_TEXTURE_PALETTE_EXT     (GLenum)0x81FB
 #endif
 #ifndef GL_LIGHT_MODEL_COLOR_CONTROL_EXT  
-#define GL_LIGHT_MODEL_COLOR_CONTROL_EXT  0x81F8
+#define GL_LIGHT_MODEL_COLOR_CONTROL_EXT  (GLenum)0x81F8
 #endif
 #ifndef GL_SINGLE_COLOR_EXT               
-#define GL_SINGLE_COLOR_EXT               0x81F9
+#define GL_SINGLE_COLOR_EXT               (GLenum)0x81F9
 #endif
 #ifndef GL_SEPARATE_SPECULAR_COLOR_EXT    
-#define GL_SEPARATE_SPECULAR_COLOR_EXT    0x81FA
+#define GL_SEPARATE_SPECULAR_COLOR_EXT    (GLenum)0x81FA
 #endif
 #ifndef GL_COLOR_SUM_EXT                  
-#define GL_COLOR_SUM_EXT                  0x8458
+#define GL_COLOR_SUM_EXT                  (GLenum)0x8458
 #endif
 #ifndef GL_CURRENT_SECONDARY_COLOR_EXT    
-#define GL_CURRENT_SECONDARY_COLOR_EXT    0x8459
+#define GL_CURRENT_SECONDARY_COLOR_EXT    (GLenum)0x8459
 #endif
 #ifndef GL_SECONDARY_COLOR_ARRAY_SIZE_EXT 
-#define GL_SECONDARY_COLOR_ARRAY_SIZE_EXT 0x845A
+#define GL_SECONDARY_COLOR_ARRAY_SIZE_EXT (GLenum)0x845A
 #endif
 #ifndef GL_SECONDARY_COLOR_ARRAY_TYPE_EXT 
-#define GL_SECONDARY_COLOR_ARRAY_TYPE_EXT 0x845B
+#define GL_SECONDARY_COLOR_ARRAY_TYPE_EXT (GLenum)0x845B
 #endif
 #ifndef GL_SECONDARY_COLOR_ARRAY_STRIDE_EXT 
-#define GL_SECONDARY_COLOR_ARRAY_STRIDE_EXT 0x845C
+#define GL_SECONDARY_COLOR_ARRAY_STRIDE_EXT (GLenum)0x845C
 #endif
 #ifndef GL_SECONDARY_COLOR_ARRAY_POINTER_EXT 
-#define GL_SECONDARY_COLOR_ARRAY_POINTER_EXT 0x845D
+#define GL_SECONDARY_COLOR_ARRAY_POINTER_EXT (GLenum)0x845D
 #endif
 #ifndef GL_SECONDARY_COLOR_ARRAY_EXT      
-#define GL_SECONDARY_COLOR_ARRAY_EXT      0x845E
+#define GL_SECONDARY_COLOR_ARRAY_EXT      (GLenum)0x845E
 #endif
 #ifndef GL_PERTURB_EXT                    
-#define GL_PERTURB_EXT                    0x85AE
+#define GL_PERTURB_EXT                    (GLenum)0x85AE
 #endif
 #ifndef GL_TEXTURE_NORMAL_EXT             
-#define GL_TEXTURE_NORMAL_EXT             0x85AF
+#define GL_TEXTURE_NORMAL_EXT             (GLenum)0x85AF
 #endif
 #ifndef GL_FOG_COORDINATE_SOURCE_EXT      
-#define GL_FOG_COORDINATE_SOURCE_EXT      0x8450
+#define GL_FOG_COORDINATE_SOURCE_EXT      (GLenum)0x8450
 #endif
 #ifndef GL_FOG_COORDINATE_EXT             
-#define GL_FOG_COORDINATE_EXT             0x8451
+#define GL_FOG_COORDINATE_EXT             (GLenum)0x8451
 #endif
 #ifndef GL_FRAGMENT_DEPTH_EXT             
-#define GL_FRAGMENT_DEPTH_EXT             0x8452
+#define GL_FRAGMENT_DEPTH_EXT             (GLenum)0x8452
 #endif
 #ifndef GL_CURRENT_FOG_COORDINATE_EXT     
-#define GL_CURRENT_FOG_COORDINATE_EXT     0x8453
+#define GL_CURRENT_FOG_COORDINATE_EXT     (GLenum)0x8453
 #endif
 #ifndef GL_FOG_COORDINATE_ARRAY_TYPE_EXT  
-#define GL_FOG_COORDINATE_ARRAY_TYPE_EXT  0x8454
+#define GL_FOG_COORDINATE_ARRAY_TYPE_EXT  (GLenum)0x8454
 #endif
 #ifndef GL_FOG_COORDINATE_ARRAY_STRIDE_EXT 
-#define GL_FOG_COORDINATE_ARRAY_STRIDE_EXT 0x8455
+#define GL_FOG_COORDINATE_ARRAY_STRIDE_EXT (GLenum)0x8455
 #endif
 #ifndef GL_FOG_COORDINATE_ARRAY_POINTER_EXT 
-#define GL_FOG_COORDINATE_ARRAY_POINTER_EXT 0x8456
+#define GL_FOG_COORDINATE_ARRAY_POINTER_EXT (GLenum)0x8456
 #endif
 #ifndef GL_FOG_COORDINATE_ARRAY_EXT       
-#define GL_FOG_COORDINATE_ARRAY_EXT       0x8457
+#define GL_FOG_COORDINATE_ARRAY_EXT       (GLenum)0x8457
 #endif
 #ifndef GL_SCREEN_COORDINATES_REND        
-#define GL_SCREEN_COORDINATES_REND        0x8490
+#define GL_SCREEN_COORDINATES_REND        (GLenum)0x8490
 #endif
 #ifndef GL_INVERTED_SCREEN_W_REND         
-#define GL_INVERTED_SCREEN_W_REND         0x8491
+#define GL_INVERTED_SCREEN_W_REND         (GLenum)0x8491
 #endif
 #ifndef GL_TANGENT_ARRAY_EXT              
-#define GL_TANGENT_ARRAY_EXT              0x8439
+#define GL_TANGENT_ARRAY_EXT              (GLenum)0x8439
 #endif
 #ifndef GL_BINORMAL_ARRAY_EXT             
-#define GL_BINORMAL_ARRAY_EXT             0x843A
+#define GL_BINORMAL_ARRAY_EXT             (GLenum)0x843A
 #endif
 #ifndef GL_CURRENT_TANGENT_EXT            
-#define GL_CURRENT_TANGENT_EXT            0x843B
+#define GL_CURRENT_TANGENT_EXT            (GLenum)0x843B
 #endif
 #ifndef GL_CURRENT_BINORMAL_EXT           
-#define GL_CURRENT_BINORMAL_EXT           0x843C
+#define GL_CURRENT_BINORMAL_EXT           (GLenum)0x843C
 #endif
 #ifndef GL_TANGENT_ARRAY_TYPE_EXT         
-#define GL_TANGENT_ARRAY_TYPE_EXT         0x843E
+#define GL_TANGENT_ARRAY_TYPE_EXT         (GLenum)0x843E
 #endif
 #ifndef GL_TANGENT_ARRAY_STRIDE_EXT       
-#define GL_TANGENT_ARRAY_STRIDE_EXT       0x843F
+#define GL_TANGENT_ARRAY_STRIDE_EXT       (GLenum)0x843F
 #endif
 #ifndef GL_BINORMAL_ARRAY_TYPE_EXT        
-#define GL_BINORMAL_ARRAY_TYPE_EXT        0x8440
+#define GL_BINORMAL_ARRAY_TYPE_EXT        (GLenum)0x8440
 #endif
 #ifndef GL_BINORMAL_ARRAY_STRIDE_EXT      
-#define GL_BINORMAL_ARRAY_STRIDE_EXT      0x8441
+#define GL_BINORMAL_ARRAY_STRIDE_EXT      (GLenum)0x8441
 #endif
 #ifndef GL_TANGENT_ARRAY_POINTER_EXT      
-#define GL_TANGENT_ARRAY_POINTER_EXT      0x8442
+#define GL_TANGENT_ARRAY_POINTER_EXT      (GLenum)0x8442
 #endif
 #ifndef GL_BINORMAL_ARRAY_POINTER_EXT     
-#define GL_BINORMAL_ARRAY_POINTER_EXT     0x8443
+#define GL_BINORMAL_ARRAY_POINTER_EXT     (GLenum)0x8443
 #endif
 #ifndef GL_MAP1_TANGENT_EXT               
-#define GL_MAP1_TANGENT_EXT               0x8444
+#define GL_MAP1_TANGENT_EXT               (GLenum)0x8444
 #endif
 #ifndef GL_MAP2_TANGENT_EXT               
-#define GL_MAP2_TANGENT_EXT               0x8445
+#define GL_MAP2_TANGENT_EXT               (GLenum)0x8445
 #endif
 #ifndef GL_MAP1_BINORMAL_EXT              
-#define GL_MAP1_BINORMAL_EXT              0x8446
+#define GL_MAP1_BINORMAL_EXT              (GLenum)0x8446
 #endif
 #ifndef GL_MAP2_BINORMAL_EXT              
-#define GL_MAP2_BINORMAL_EXT              0x8447
+#define GL_MAP2_BINORMAL_EXT              (GLenum)0x8447
 #endif
 #ifndef GL_COMBINE_EXT                    
-#define GL_COMBINE_EXT                    0x8570
+#define GL_COMBINE_EXT                    (GLenum)0x8570
 #endif
 #ifndef GL_COMBINE_ARB                    
 #define GL_COMBINE_ARB                    GL_COMBINE_EXT
 #endif
 #ifndef GL_COMBINE_RGB_EXT                
-#define GL_COMBINE_RGB_EXT                0x8571
+#define GL_COMBINE_RGB_EXT                (GLenum)0x8571
 #endif
 #ifndef GL_COMBINE_RGB_ARB                
 #define GL_COMBINE_RGB_ARB                GL_COMBINE_RGB_EXT
 #endif
 #ifndef GL_COMBINE_ALPHA_EXT              
-#define GL_COMBINE_ALPHA_EXT              0x8572
+#define GL_COMBINE_ALPHA_EXT              (GLenum)0x8572
 #endif
 #ifndef GL_COMBINE_ALPHA_ARB              
 #define GL_COMBINE_ALPHA_ARB              GL_COMBINE_ALPHA_EXT
 #endif
 #ifndef GL_RGB_SCALE_EXT                  
-#define GL_RGB_SCALE_EXT                  0x8573
+#define GL_RGB_SCALE_EXT                  (GLenum)0x8573
 #endif
 #ifndef GL_RGB_SCALE_ARB                  
 #define GL_RGB_SCALE_ARB                  GL_RGB_SCALE_EXT
 #endif
 #ifndef GL_ADD_SIGNED_EXT                 
-#define GL_ADD_SIGNED_EXT                 0x8574
+#define GL_ADD_SIGNED_EXT                 (GLenum)0x8574
 #endif
 #ifndef GL_ADD_SIGNED_ARB                 
 #define GL_ADD_SIGNED_ARB                 GL_ADD_SIGNED_EXT
 #endif
 #ifndef GL_INTERPOLATE_EXT                
-#define GL_INTERPOLATE_EXT                0x8575
+#define GL_INTERPOLATE_EXT                (GLenum)0x8575
 #endif
 #ifndef GL_INTERPOLATE_ARB                
 #define GL_INTERPOLATE_ARB                GL_INTERPOLATE_EXT
 #endif
 #ifndef GL_CONSTANT_EXT                   
-#define GL_CONSTANT_EXT                   0x8576
+#define GL_CONSTANT_EXT                   (GLenum)0x8576
 #endif
 #ifndef GL_CONSTANT_ARB                   
 #define GL_CONSTANT_ARB                   GL_CONSTANT_EXT
 #endif
 #ifndef GL_PRIMARY_COLOR_EXT              
-#define GL_PRIMARY_COLOR_EXT              0x8577
+#define GL_PRIMARY_COLOR_EXT              (GLenum)0x8577
 #endif
 #ifndef GL_PRIMARY_COLOR_ARB              
 #define GL_PRIMARY_COLOR_ARB              GL_PRIMARY_COLOR_EXT
 #endif
 #ifndef GL_PREVIOUS_EXT                   
-#define GL_PREVIOUS_EXT                   0x8578
+#define GL_PREVIOUS_EXT                   (GLenum)0x8578
 #endif
 #ifndef GL_PREVIOUS_ARB                   
 #define GL_PREVIOUS_ARB  GL_PREVIOUS_EXT                   
 #endif
 #ifndef GL_SOURCE0_RGB_EXT                
-#define GL_SOURCE0_RGB_EXT                0x8580
+#define GL_SOURCE0_RGB_EXT                (GLenum)0x8580
 #endif
 #ifndef GL_SOURCE0_RGB_ARB                
 #define GL_SOURCE0_RGB_ARB  GL_SOURCE0_RGB_EXT                
 #endif
 #ifndef GL_SOURCE1_RGB_EXT                
-#define GL_SOURCE1_RGB_EXT                0x8581
+#define GL_SOURCE1_RGB_EXT                (GLenum)0x8581
 #endif
 #ifndef GL_SOURCE1_RGB_ARB                
 #define GL_SOURCE1_RGB_ARB  GL_SOURCE1_RGB_EXT                
 #endif
 #ifndef GL_SOURCE2_RGB_EXT                
-#define GL_SOURCE2_RGB_EXT                0x8582
+#define GL_SOURCE2_RGB_EXT                (GLenum)0x8582
 #endif
 #ifndef GL_SOURCE2_RGB_ARB                
 #define GL_SOURCE2_RGB_ARB  GL_SOURCE2_RGB_EXT                
 #endif
 #ifndef GL_SOURCE3_RGB_EXT                
-#define GL_SOURCE3_RGB_EXT                0x8583
+#define GL_SOURCE3_RGB_EXT                (GLenum)0x8583
 #endif
 #ifndef GL_SOURCE3_RGB_ARB                
 #define GL_SOURCE3_RGB_ARB  GL_SOURCE3_RGB_EXT                
 #endif
 #ifndef GL_SOURCE4_RGB_EXT                
-#define GL_SOURCE4_RGB_EXT                0x8584
+#define GL_SOURCE4_RGB_EXT                (GLenum)0x8584
 #endif
 #ifndef GL_SOURCE4_RGB_ARB                
 #define GL_SOURCE4_RGB_ARB  GL_SOURCE4_RGB_EXT                
 #endif
 #ifndef GL_SOURCE5_RGB_EXT                
-#define GL_SOURCE5_RGB_EXT                0x8585
+#define GL_SOURCE5_RGB_EXT                (GLenum)0x8585
 #endif
 #ifndef GL_SOURCE5_RGB_ARB                
 #define GL_SOURCE5_RGB_ARB  GL_SOURCE5_RGB_EXT                
 #endif
 #ifndef GL_SOURCE6_RGB_EXT                
-#define GL_SOURCE6_RGB_EXT                0x8586
+#define GL_SOURCE6_RGB_EXT                (GLenum)0x8586
 #endif
 #ifndef GL_SOURCE6_RGB_ARB                
 #define GL_SOURCE6_RGB_ARB  GL_SOURCE6_RGB_EXT                
 #endif
 #ifndef GL_SOURCE7_RGB_EXT                
-#define GL_SOURCE7_RGB_EXT                0x8587
+#define GL_SOURCE7_RGB_EXT                (GLenum)0x8587
 #endif
 #ifndef GL_SOURCE7_RGB_ARB                
 #define GL_SOURCE7_RGB_ARB  GL_SOURCE7_RGB_EXT                
 #endif
 #ifndef GL_SOURCE0_ALPHA_EXT              
-#define GL_SOURCE0_ALPHA_EXT              0x8588
+#define GL_SOURCE0_ALPHA_EXT              (GLenum)0x8588
 #endif
 #ifndef GL_SOURCE0_ALPHA_ARB              
 #define GL_SOURCE0_ALPHA_ARB  GL_SOURCE0_ALPHA_EXT              
 #endif
 #ifndef GL_SOURCE1_ALPHA_EXT              
-#define GL_SOURCE1_ALPHA_EXT              0x8589
+#define GL_SOURCE1_ALPHA_EXT              (GLenum)0x8589
 #endif
 #ifndef GL_SOURCE1_ALPHA_ARB              
 #define GL_SOURCE1_ALPHA_ARB  GL_SOURCE1_ALPHA_EXT              
 #endif
 #ifndef GL_SOURCE2_ALPHA_EXT              
-#define GL_SOURCE2_ALPHA_EXT              0x858A
+#define GL_SOURCE2_ALPHA_EXT              (GLenum)0x858A
 #endif
 #ifndef GL_SOURCE2_ALPHA_ARB              
 #define GL_SOURCE2_ALPHA_ARB  GL_SOURCE2_ALPHA_EXT              
 #endif
 #ifndef GL_SOURCE3_ALPHA_EXT              
-#define GL_SOURCE3_ALPHA_EXT              0x858B
+#define GL_SOURCE3_ALPHA_EXT              (GLenum)0x858B
 #endif
 #ifndef GL_SOURCE3_ALPHA_ARB              
 #define GL_SOURCE3_ALPHA_ARB  GL_SOURCE3_ALPHA_EXT              
 #endif
 #ifndef GL_SOURCE4_ALPHA_EXT              
-#define GL_SOURCE4_ALPHA_EXT              0x858C
+#define GL_SOURCE4_ALPHA_EXT              (GLenum)0x858C
 #endif
 #ifndef GL_SOURCE4_ALPHA_ARB              
 #define GL_SOURCE4_ALPHA_ARB  GL_SOURCE4_ALPHA_EXT              
 #endif
 #ifndef GL_SOURCE5_ALPHA_EXT              
-#define GL_SOURCE5_ALPHA_EXT              0x858D
+#define GL_SOURCE5_ALPHA_EXT              (GLenum)0x858D
 #endif
 #ifndef GL_SOURCE5_ALPHA_ARB              
 #define GL_SOURCE5_ALPHA_ARB  GL_SOURCE5_ALPHA_EXT              
 #endif
 #ifndef GL_SOURCE6_ALPHA_EXT              
-#define GL_SOURCE6_ALPHA_EXT              0x858E
+#define GL_SOURCE6_ALPHA_EXT              (GLenum)0x858E
 #endif
 #ifndef GL_SOURCE6_ALPHA_ARB              
 #define GL_SOURCE6_ALPHA_ARB  GL_SOURCE6_ALPHA_EXT              
 #endif
 #ifndef GL_SOURCE7_ALPHA_EXT              
-#define GL_SOURCE7_ALPHA_EXT              0x858F
+#define GL_SOURCE7_ALPHA_EXT              (GLenum)0x858F
 #endif
 #ifndef GL_SOURCE7_ALPHA_ARB              
 #define GL_SOURCE7_ALPHA_ARB  GL_SOURCE7_ALPHA_EXT              
 #endif
 #ifndef GL_OPERAND0_RGB_EXT               
-#define GL_OPERAND0_RGB_EXT               0x8590
+#define GL_OPERAND0_RGB_EXT               (GLenum)0x8590
 #endif
 #ifndef GL_OPERAND0_RGB_ARB               
 #define GL_OPERAND0_RGB_ARB  GL_OPERAND0_RGB_EXT               
 #endif
 #ifndef GL_OPERAND1_RGB_EXT               
-#define GL_OPERAND1_RGB_EXT               0x8591
+#define GL_OPERAND1_RGB_EXT               (GLenum)0x8591
 #endif
 #ifndef GL_OPERAND1_RGB_ARB               
 #define GL_OPERAND1_RGB_ARB  GL_OPERAND1_RGB_EXT               
 #endif
 #ifndef GL_OPERAND2_RGB_EXT               
-#define GL_OPERAND2_RGB_EXT               0x8592
+#define GL_OPERAND2_RGB_EXT               (GLenum)0x8592
 #endif
 #ifndef GL_OPERAND2_RGB_ARB               
 #define GL_OPERAND2_RGB_ARB  GL_OPERAND2_RGB_EXT               
 #endif
 #ifndef GL_OPERAND3_RGB_EXT               
-#define GL_OPERAND3_RGB_EXT               0x8593
+#define GL_OPERAND3_RGB_EXT               (GLenum)0x8593
 #endif
 #ifndef GL_OPERAND3_RGB_ARB               
 #define GL_OPERAND3_RGB_ARB  GL_OPERAND3_RGB_EXT               
 #endif
 #ifndef GL_OPERAND4_RGB_EXT               
-#define GL_OPERAND4_RGB_EXT               0x8594
+#define GL_OPERAND4_RGB_EXT               (GLenum)0x8594
 #endif
 #ifndef GL_OPERAND4_RGB_ARB               
 #define GL_OPERAND4_RGB_ARB  GL_OPERAND4_RGB_EXT               
 #endif
 #ifndef GL_OPERAND5_RGB_EXT               
-#define GL_OPERAND5_RGB_EXT               0x8595
+#define GL_OPERAND5_RGB_EXT               (GLenum)0x8595
 #endif
 #ifndef GL_OPERAND5_RGB_ARB               
 #define GL_OPERAND5_RGB_ARB  GL_OPERAND5_RGB_EXT               
 #endif
 #ifndef GL_OPERAND6_RGB_EXT               
-#define GL_OPERAND6_RGB_EXT               0x8596
+#define GL_OPERAND6_RGB_EXT               (GLenum)0x8596
 #endif
 #ifndef GL_OPERAND6_RGB_ARB               
 #define GL_OPERAND6_RGB_ARB  GL_OPERAND6_RGB_EXT               
 #endif
 #ifndef GL_OPERAND7_RGB_EXT               
-#define GL_OPERAND7_RGB_EXT               0x8597
+#define GL_OPERAND7_RGB_EXT               (GLenum)0x8597
 #endif
 #ifndef GL_OPERAND7_RGB_ARB               
 #define GL_OPERAND7_RGB_ARB  GL_OPERAND7_RGB_EXT               
 #endif
 #ifndef GL_OPERAND0_ALPHA_EXT             
-#define GL_OPERAND0_ALPHA_EXT             0x8598
+#define GL_OPERAND0_ALPHA_EXT             (GLenum)0x8598
 #endif
 #ifndef GL_OPERAND0_ALPHA_ARB             
 #define GL_OPERAND0_ALPHA_ARB  GL_OPERAND0_ALPHA_EXT             
 #endif
 #ifndef GL_OPERAND1_ALPHA_EXT             
-#define GL_OPERAND1_ALPHA_EXT             0x8599
+#define GL_OPERAND1_ALPHA_EXT             (GLenum)0x8599
 #endif
 #ifndef GL_OPERAND1_ALPHA_ARB             
 #define GL_OPERAND1_ALPHA_ARB  GL_OPERAND1_ALPHA_EXT             
 #endif
 #ifndef GL_OPERAND2_ALPHA_EXT             
-#define GL_OPERAND2_ALPHA_EXT             0x859A
+#define GL_OPERAND2_ALPHA_EXT             (GLenum)0x859A
 #endif
 #ifndef GL_OPERAND2_ALPHA_ARB             
 #define GL_OPERAND2_ALPHA_ARB  GL_OPERAND2_ALPHA_EXT             
 #endif
 #ifndef GL_OPERAND3_ALPHA_EXT             
-#define GL_OPERAND3_ALPHA_EXT             0x859B
+#define GL_OPERAND3_ALPHA_EXT             (GLenum)0x859B
 #endif
 #ifndef GL_OPERAND3_ALPHA_ARB             
 #define GL_OPERAND3_ALPHA_ARB  GL_OPERAND3_ALPHA_EXT             
 #endif
 #ifndef GL_OPERAND4_ALPHA_EXT             
-#define GL_OPERAND4_ALPHA_EXT             0x859C
+#define GL_OPERAND4_ALPHA_EXT             (GLenum)0x859C
 #endif
 #ifndef GL_OPERAND4_ALPHA_ARB             
 #define GL_OPERAND4_ALPHA_ARB  GL_OPERAND4_ALPHA_EXT             
 #endif
 #ifndef GL_OPERAND5_ALPHA_EXT             
-#define GL_OPERAND5_ALPHA_EXT             0x859D
+#define GL_OPERAND5_ALPHA_EXT             (GLenum)0x859D
 #endif
 #ifndef GL_OPERAND5_ALPHA_ARB             
 #define GL_OPERAND5_ALPHA_ARB  GL_OPERAND5_ALPHA_EXT             
 #endif
 #ifndef GL_OPERAND6_ALPHA_EXT             
-#define GL_OPERAND6_ALPHA_EXT             0x859E
+#define GL_OPERAND6_ALPHA_EXT             (GLenum)0x859E
 #endif
 #ifndef GL_OPERAND6_ALPHA_ARB             
 #define GL_OPERAND6_ALPHA_ARB  GL_OPERAND6_ALPHA_EXT             
 #endif
 #ifndef GL_OPERAND7_ALPHA_EXT             
-#define GL_OPERAND7_ALPHA_EXT             0x859F
+#define GL_OPERAND7_ALPHA_EXT             (GLenum)0x859F
 #endif
 #ifndef GL_OPERAND7_ALPHA_ARB             
 #define GL_OPERAND7_ALPHA_ARB  GL_OPERAND7_ALPHA_EXT             
 #endif
 #ifndef GL_LIGHT_MODEL_SPECULAR_VECTOR_APPLE 
-#define GL_LIGHT_MODEL_SPECULAR_VECTOR_APPLE 0x85B0
+#define GL_LIGHT_MODEL_SPECULAR_VECTOR_APPLE (GLenum)0x85B0
 #endif
 #ifndef GL_TRANSFORM_HINT_APPLE           
-#define GL_TRANSFORM_HINT_APPLE           0x85B1
+#define GL_TRANSFORM_HINT_APPLE           (GLenum)0x85B1
 #endif
 #ifndef GL_FOG_SCALE_SGIX                 
-#define GL_FOG_SCALE_SGIX                 0x81FC
+#define GL_FOG_SCALE_SGIX                 (GLenum)0x81FC
 #endif
 #ifndef GL_FOG_SCALE_VALUE_SGIX           
-#define GL_FOG_SCALE_VALUE_SGIX           0x81FD
+#define GL_FOG_SCALE_VALUE_SGIX           (GLenum)0x81FD
 #endif
 #ifndef GL_UNPACK_CONSTANT_DATA_SUNX      
-#define GL_UNPACK_CONSTANT_DATA_SUNX      0x81D5
+#define GL_UNPACK_CONSTANT_DATA_SUNX      (GLenum)0x81D5
 #endif
 #ifndef GL_TEXTURE_CONSTANT_DATA_SUNX     
-#define GL_TEXTURE_CONSTANT_DATA_SUNX     0x81D6
+#define GL_TEXTURE_CONSTANT_DATA_SUNX     (GLenum)0x81D6
 #endif
 #ifndef GL_GLOBAL_ALPHA_SUN               
-#define GL_GLOBAL_ALPHA_SUN               0x81D9
+#define GL_GLOBAL_ALPHA_SUN               (GLenum)0x81D9
 #endif
 #ifndef GL_GLOBAL_ALPHA_FACTOR_SUN        
-#define GL_GLOBAL_ALPHA_FACTOR_SUN        0x81DA
+#define GL_GLOBAL_ALPHA_FACTOR_SUN        (GLenum)0x81DA
 #endif
 #ifndef GL_RESTART_SUN                    
-#define GL_RESTART_SUN                    0x01
+#define GL_RESTART_SUN                    (GLenum)0x01
 #endif
 #ifndef GL_REPLACE_MIDDLE_SUN             
-#define GL_REPLACE_MIDDLE_SUN             0x02
+#define GL_REPLACE_MIDDLE_SUN             (GLenum)0x02
 #endif
 #ifndef GL_REPLACE_OLDEST_SUN             
-#define GL_REPLACE_OLDEST_SUN             0x03
+#define GL_REPLACE_OLDEST_SUN             (GLenum)0x03
 #endif
 #ifndef GL_TRIANGLE_LIST_SUN              
-#define GL_TRIANGLE_LIST_SUN              0x81D7
+#define GL_TRIANGLE_LIST_SUN              (GLenum)0x81D7
 #endif
 #ifndef GL_REPLACEMENT_CODE_SUN           
-#define GL_REPLACEMENT_CODE_SUN           0x81D8
+#define GL_REPLACEMENT_CODE_SUN           (GLenum)0x81D8
 #endif
 #ifndef GL_REPLACEMENT_CODE_ARRAY_SUN     
-#define GL_REPLACEMENT_CODE_ARRAY_SUN     0x85C0
+#define GL_REPLACEMENT_CODE_ARRAY_SUN     (GLenum)0x85C0
 #endif
 #ifndef GL_REPLACEMENT_CODE_ARRAY_TYPE_SUN 
-#define GL_REPLACEMENT_CODE_ARRAY_TYPE_SUN 0x85C1
+#define GL_REPLACEMENT_CODE_ARRAY_TYPE_SUN (GLenum)0x85C1
 #endif
 #ifndef GL_REPLACEMENT_CODE_ARRAY_STRIDE_SUN 
-#define GL_REPLACEMENT_CODE_ARRAY_STRIDE_SUN 0x85C2
+#define GL_REPLACEMENT_CODE_ARRAY_STRIDE_SUN (GLenum)0x85C2
 #endif
 #ifndef GL_REPLACEMENT_CODE_ARRAY_POINTER_SUN 
-#define GL_REPLACEMENT_CODE_ARRAY_POINTER_SUN 0x85C3
+#define GL_REPLACEMENT_CODE_ARRAY_POINTER_SUN (GLenum)0x85C3
 #endif
 #ifndef GL_R1UI_V3F_SUN                   
-#define GL_R1UI_V3F_SUN                   0x85C4
+#define GL_R1UI_V3F_SUN                   (GLenum)0x85C4
 #endif
 #ifndef GL_R1UI_C4UB_V3F_SUN              
-#define GL_R1UI_C4UB_V3F_SUN              0x85C5
+#define GL_R1UI_C4UB_V3F_SUN              (GLenum)0x85C5
 #endif
 #ifndef GL_R1UI_C3F_V3F_SUN               
-#define GL_R1UI_C3F_V3F_SUN               0x85C6
+#define GL_R1UI_C3F_V3F_SUN               (GLenum)0x85C6
 #endif
 #ifndef GL_R1UI_N3F_V3F_SUN               
-#define GL_R1UI_N3F_V3F_SUN               0x85C7
+#define GL_R1UI_N3F_V3F_SUN               (GLenum)0x85C7
 #endif
 #ifndef GL_R1UI_C4F_N3F_V3F_SUN           
-#define GL_R1UI_C4F_N3F_V3F_SUN           0x85C8
+#define GL_R1UI_C4F_N3F_V3F_SUN           (GLenum)0x85C8
 #endif
 #ifndef GL_R1UI_T2F_V3F_SUN               
-#define GL_R1UI_T2F_V3F_SUN               0x85C9
+#define GL_R1UI_T2F_V3F_SUN               (GLenum)0x85C9
 #endif
 #ifndef GL_R1UI_T2F_N3F_V3F_SUN           
-#define GL_R1UI_T2F_N3F_V3F_SUN           0x85CA
+#define GL_R1UI_T2F_N3F_V3F_SUN           (GLenum)0x85CA
 #endif
 #ifndef GL_R1UI_T2F_C4F_N3F_V3F_SUN       
-#define GL_R1UI_T2F_C4F_N3F_V3F_SUN       0x85CB
+#define GL_R1UI_T2F_C4F_N3F_V3F_SUN       (GLenum)0x85CB
 #endif
 #ifndef GL_BLEND_DST_RGB_EXT              
-#define GL_BLEND_DST_RGB_EXT              0x80C8
+#define GL_BLEND_DST_RGB_EXT              (GLenum)0x80C8
 #endif
 #ifndef GL_BLEND_SRC_RGB_EXT              
-#define GL_BLEND_SRC_RGB_EXT              0x80C9
+#define GL_BLEND_SRC_RGB_EXT              (GLenum)0x80C9
 #endif
 #ifndef GL_BLEND_DST_ALPHA_EXT            
-#define GL_BLEND_DST_ALPHA_EXT            0x80CA
+#define GL_BLEND_DST_ALPHA_EXT            (GLenum)0x80CA
 #endif
 #ifndef GL_BLEND_SRC_ALPHA_EXT            
-#define GL_BLEND_SRC_ALPHA_EXT            0x80CB
+#define GL_BLEND_SRC_ALPHA_EXT            (GLenum)0x80CB
 #endif
 #ifndef GL_RED_MIN_CLAMP_INGR             
-#define GL_RED_MIN_CLAMP_INGR             0x8560
+#define GL_RED_MIN_CLAMP_INGR             (GLenum)0x8560
 #endif
 #ifndef GL_GREEN_MIN_CLAMP_INGR           
-#define GL_GREEN_MIN_CLAMP_INGR           0x8561
+#define GL_GREEN_MIN_CLAMP_INGR           (GLenum)0x8561
 #endif
 #ifndef GL_BLUE_MIN_CLAMP_INGR            
-#define GL_BLUE_MIN_CLAMP_INGR            0x8562
+#define GL_BLUE_MIN_CLAMP_INGR            (GLenum)0x8562
 #endif
 #ifndef GL_ALPHA_MIN_CLAMP_INGR           
-#define GL_ALPHA_MIN_CLAMP_INGR           0x8563
+#define GL_ALPHA_MIN_CLAMP_INGR           (GLenum)0x8563
 #endif
 #ifndef GL_RED_MAX_CLAMP_INGR             
-#define GL_RED_MAX_CLAMP_INGR             0x8564
+#define GL_RED_MAX_CLAMP_INGR             (GLenum)0x8564
 #endif
 #ifndef GL_GREEN_MAX_CLAMP_INGR           
-#define GL_GREEN_MAX_CLAMP_INGR           0x8565
+#define GL_GREEN_MAX_CLAMP_INGR           (GLenum)0x8565
 #endif
 #ifndef GL_BLUE_MAX_CLAMP_INGR            
-#define GL_BLUE_MAX_CLAMP_INGR            0x8566
+#define GL_BLUE_MAX_CLAMP_INGR            (GLenum)0x8566
 #endif
 #ifndef GL_ALPHA_MAX_CLAMP_INGR           
-#define GL_ALPHA_MAX_CLAMP_INGR           0x8567
+#define GL_ALPHA_MAX_CLAMP_INGR           (GLenum)0x8567
 #endif
 #ifndef GL_INTERLACE_READ_INGR            
-#define GL_INTERLACE_READ_INGR            0x8568
+#define GL_INTERLACE_READ_INGR            (GLenum)0x8568
 #endif
 #ifndef GL_INCR_WRAP_EXT                  
-#define GL_INCR_WRAP_EXT                  0x8507
+#define GL_INCR_WRAP_EXT                  (GLenum)0x8507
 #endif
 #ifndef GL_DECR_WRAP_EXT                  
-#define GL_DECR_WRAP_EXT                  0x8508
+#define GL_DECR_WRAP_EXT                  (GLenum)0x8508
 #endif
 #ifndef GL_422_EXT                        
-#define GL_422_EXT                        0x80CC
+#define GL_422_EXT                        (GLenum)0x80CC
 #endif
 #ifndef GL_422_REV_EXT                    
-#define GL_422_REV_EXT                    0x80CD
+#define GL_422_REV_EXT                    (GLenum)0x80CD
 #endif
 #ifndef GL_422_AVERAGE_EXT                
-#define GL_422_AVERAGE_EXT                0x80CE
+#define GL_422_AVERAGE_EXT                (GLenum)0x80CE
 #endif
 #ifndef GL_422_REV_AVERAGE_EXT            
-#define GL_422_REV_AVERAGE_EXT            0x80CF
+#define GL_422_REV_AVERAGE_EXT            (GLenum)0x80CF
 #endif
 #ifndef GL_NORMAL_MAP_NV                  
-#define GL_NORMAL_MAP_NV                  0x8511
+#define GL_NORMAL_MAP_NV                  (GLenum)0x8511
 #endif
 #ifndef GL_REFLECTION_MAP_NV              
-#define GL_REFLECTION_MAP_NV              0x8512
+#define GL_REFLECTION_MAP_NV              (GLenum)0x8512
 #endif
 #ifndef GL_NORMAL_MAP_EXT                 
-#define GL_NORMAL_MAP_EXT                 0x8511
+#define GL_NORMAL_MAP_EXT                 (GLenum)0x8511
 #endif
 #ifndef GL_REFLECTION_MAP_EXT             
-#define GL_REFLECTION_MAP_EXT             0x8512
+#define GL_REFLECTION_MAP_EXT             (GLenum)0x8512
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_EXT           
-#define GL_TEXTURE_CUBE_MAP_EXT           0x8513
+#define GL_TEXTURE_CUBE_MAP_EXT           (GLenum)0x8513
 #endif
 #ifndef GL_TEXTURE_BINDING_CUBE_MAP_EXT   
-#define GL_TEXTURE_BINDING_CUBE_MAP_EXT   0x8514
+#define GL_TEXTURE_BINDING_CUBE_MAP_EXT   (GLenum)0x8514
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_X_EXT 
-#define GL_TEXTURE_CUBE_MAP_POSITIVE_X_EXT 0x8515
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_X_EXT (GLenum)0x8515
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_X_EXT 
-#define GL_TEXTURE_CUBE_MAP_NEGATIVE_X_EXT 0x8516
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_X_EXT (GLenum)0x8516
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_Y_EXT 
-#define GL_TEXTURE_CUBE_MAP_POSITIVE_Y_EXT 0x8517
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Y_EXT (GLenum)0x8517
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_EXT 
-#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_EXT 0x8518
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_EXT (GLenum)0x8518
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_Z_EXT 
-#define GL_TEXTURE_CUBE_MAP_POSITIVE_Z_EXT 0x8519
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Z_EXT (GLenum)0x8519
 #endif
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_EXT 
-#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_EXT 0x851A
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_EXT (GLenum)0x851A
 #endif
 #ifndef GL_PROXY_TEXTURE_CUBE_MAP_EXT     
-#define GL_PROXY_TEXTURE_CUBE_MAP_EXT     0x851B
+#define GL_PROXY_TEXTURE_CUBE_MAP_EXT     (GLenum)0x851B
 #endif
 #ifndef GL_MAX_CUBE_MAP_TEXTURE_SIZE_EXT  
-#define GL_MAX_CUBE_MAP_TEXTURE_SIZE_EXT  0x851C
+#define GL_MAX_CUBE_MAP_TEXTURE_SIZE_EXT  (GLenum)0x851C
 #endif
 #ifndef GL_WRAP_BORDER_SUN                
-#define GL_WRAP_BORDER_SUN                0x81D4
+#define GL_WRAP_BORDER_SUN                (GLenum)0x81D4
 #endif
 #ifndef GL_MAX_TEXTURE_LOD_BIAS_EXT       
-#define GL_MAX_TEXTURE_LOD_BIAS_EXT       0x84FD
+#define GL_MAX_TEXTURE_LOD_BIAS_EXT       (GLenum)0x84FD
 #endif
 #ifndef GL_TEXTURE_FILTER_CONTROL_EXT     
-#define GL_TEXTURE_FILTER_CONTROL_EXT     0x8500
+#define GL_TEXTURE_FILTER_CONTROL_EXT     (GLenum)0x8500
 #endif
 #ifndef GL_TEXTURE_LOD_BIAS_EXT           
-#define GL_TEXTURE_LOD_BIAS_EXT           0x8501
+#define GL_TEXTURE_LOD_BIAS_EXT           (GLenum)0x8501
 #endif
 #ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT     
-#define GL_TEXTURE_MAX_ANISOTROPY_EXT     0x84FE
+#define GL_TEXTURE_MAX_ANISOTROPY_EXT     (GLenum)0x84FE
 #endif
 #ifndef GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 
-#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
+#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT (GLenum)0x84FF
 #endif
 #ifndef GL_MODELVIEW0_STACK_DEPTH_EXT     
 #define GL_MODELVIEW0_STACK_DEPTH_EXT     GL_MODELVIEW_STACK_DEPTH
 #endif
 #ifndef GL_MODELVIEW1_STACK_DEPTH_EXT     
-#define GL_MODELVIEW1_STACK_DEPTH_EXT     0x8502
+#define GL_MODELVIEW1_STACK_DEPTH_EXT     (GLenum)0x8502
 #endif
 #ifndef GL_MODELVIEW0_MATRIX_EXT          
 #define GL_MODELVIEW0_MATRIX_EXT          GL_MODELVIEW_MATRIX
 #endif
 #ifndef GL_MODELVIEW_MATRIX1_EXT          
-#define GL_MODELVIEW_MATRIX1_EXT          0x8506
+#define GL_MODELVIEW_MATRIX1_EXT          (GLenum)0x8506
 #endif
 #ifndef GL_VERTEX_WEIGHTING_EXT           
-#define GL_VERTEX_WEIGHTING_EXT           0x8509
+#define GL_VERTEX_WEIGHTING_EXT           (GLenum)0x8509
 #endif
 #ifndef GL_MODELVIEW0_EXT                 
 #define GL_MODELVIEW0_EXT                 GL_MODELVIEW
 #endif
 #ifndef GL_MODELVIEW1_EXT                 
-#define GL_MODELVIEW1_EXT                 0x850A
+#define GL_MODELVIEW1_EXT                 (GLenum)0x850A
 #endif
 #ifndef GL_CURRENT_VERTEX_WEIGHT_EXT      
-#define GL_CURRENT_VERTEX_WEIGHT_EXT      0x850B
+#define GL_CURRENT_VERTEX_WEIGHT_EXT      (GLenum)0x850B
 #endif
 #ifndef GL_VERTEX_WEIGHT_ARRAY_EXT        
-#define GL_VERTEX_WEIGHT_ARRAY_EXT        0x850C
+#define GL_VERTEX_WEIGHT_ARRAY_EXT        (GLenum)0x850C
 #endif
 #ifndef GL_VERTEX_WEIGHT_ARRAY_SIZE_EXT   
-#define GL_VERTEX_WEIGHT_ARRAY_SIZE_EXT   0x850D
+#define GL_VERTEX_WEIGHT_ARRAY_SIZE_EXT   (GLenum)0x850D
 #endif
 #ifndef GL_VERTEX_WEIGHT_ARRAY_TYPE_EXT   
-#define GL_VERTEX_WEIGHT_ARRAY_TYPE_EXT   0x850E
+#define GL_VERTEX_WEIGHT_ARRAY_TYPE_EXT   (GLenum)0x850E
 #endif
 #ifndef GL_VERTEX_WEIGHT_ARRAY_STRIDE_EXT 
-#define GL_VERTEX_WEIGHT_ARRAY_STRIDE_EXT 0x850F
+#define GL_VERTEX_WEIGHT_ARRAY_STRIDE_EXT (GLenum)0x850F
 #endif
 #ifndef GL_VERTEX_WEIGHT_ARRAY_POINTER_EXT 
-#define GL_VERTEX_WEIGHT_ARRAY_POINTER_EXT 0x8510
+#define GL_VERTEX_WEIGHT_ARRAY_POINTER_EXT (GLenum)0x8510
 #endif
 #ifndef GL_MAX_SHININESS_NV               
-#define GL_MAX_SHININESS_NV               0x8504
+#define GL_MAX_SHININESS_NV               (GLenum)0x8504
 #endif
 #ifndef GL_MAX_SPOT_EXPONENT_NV           
-#define GL_MAX_SPOT_EXPONENT_NV           0x8505
+#define GL_MAX_SPOT_EXPONENT_NV           (GLenum)0x8505
 #endif
 #ifndef GL_VERTEX_ARRAY_RANGE_NV          
-#define GL_VERTEX_ARRAY_RANGE_NV          0x851D
+#define GL_VERTEX_ARRAY_RANGE_NV          (GLenum)0x851D
 #endif
 #ifndef GL_VERTEX_ARRAY_RANGE_LENGTH_NV   
-#define GL_VERTEX_ARRAY_RANGE_LENGTH_NV   0x851E
+#define GL_VERTEX_ARRAY_RANGE_LENGTH_NV   (GLenum)0x851E
 #endif
 #ifndef GL_VERTEX_ARRAY_RANGE_VALID_NV    
-#define GL_VERTEX_ARRAY_RANGE_VALID_NV    0x851F
+#define GL_VERTEX_ARRAY_RANGE_VALID_NV    (GLenum)0x851F
 #endif
 #ifndef GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_NV 
-#define GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_NV 0x8520
+#define GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_NV (GLenum)0x8520
 #endif
 #ifndef GL_VERTEX_ARRAY_RANGE_POINTER_NV  
-#define GL_VERTEX_ARRAY_RANGE_POINTER_NV  0x8521
+#define GL_VERTEX_ARRAY_RANGE_POINTER_NV  (GLenum)0x8521
 #endif
 #ifndef GL_REGISTER_COMBINERS_NV          
-#define GL_REGISTER_COMBINERS_NV          0x8522
+#define GL_REGISTER_COMBINERS_NV          (GLenum)0x8522
 #endif
 #ifndef GL_VARIABLE_A_NV                  
-#define GL_VARIABLE_A_NV                  0x8523
+#define GL_VARIABLE_A_NV                  (GLenum)0x8523
 #endif
 #ifndef GL_VARIABLE_B_NV                  
-#define GL_VARIABLE_B_NV                  0x8524
+#define GL_VARIABLE_B_NV                  (GLenum)0x8524
 #endif
 #ifndef GL_VARIABLE_C_NV                  
-#define GL_VARIABLE_C_NV                  0x8525
+#define GL_VARIABLE_C_NV                  (GLenum)0x8525
 #endif
 #ifndef GL_VARIABLE_D_NV                  
-#define GL_VARIABLE_D_NV                  0x8526
+#define GL_VARIABLE_D_NV                  (GLenum)0x8526
 #endif
 #ifndef GL_VARIABLE_E_NV                  
-#define GL_VARIABLE_E_NV                  0x8527
+#define GL_VARIABLE_E_NV                  (GLenum)0x8527
 #endif
 #ifndef GL_VARIABLE_F_NV                  
-#define GL_VARIABLE_F_NV                  0x8528
+#define GL_VARIABLE_F_NV                  (GLenum)0x8528
 #endif
 #ifndef GL_VARIABLE_G_NV                  
-#define GL_VARIABLE_G_NV                  0x8529
+#define GL_VARIABLE_G_NV                  (GLenum)0x8529
 #endif
 #ifndef GL_CONSTANT_COLOR0_NV             
-#define GL_CONSTANT_COLOR0_NV             0x852A
+#define GL_CONSTANT_COLOR0_NV             (GLenum)0x852A
 #endif
 #ifndef GL_CONSTANT_COLOR1_NV             
-#define GL_CONSTANT_COLOR1_NV             0x852B
+#define GL_CONSTANT_COLOR1_NV             (GLenum)0x852B
 #endif
 #ifndef GL_PRIMARY_COLOR_NV               
-#define GL_PRIMARY_COLOR_NV               0x852C
+#define GL_PRIMARY_COLOR_NV               (GLenum)0x852C
 #endif
 #ifndef GL_SECONDARY_COLOR_NV             
-#define GL_SECONDARY_COLOR_NV             0x852D
+#define GL_SECONDARY_COLOR_NV             (GLenum)0x852D
 #endif
 #ifndef GL_SPARE0_NV                      
-#define GL_SPARE0_NV                      0x852E
+#define GL_SPARE0_NV                      (GLenum)0x852E
 #endif
 #ifndef GL_SPARE1_NV                      
-#define GL_SPARE1_NV                      0x852F
+#define GL_SPARE1_NV                      (GLenum)0x852F
 #endif
 #ifndef GL_DISCARD_NV                     
-#define GL_DISCARD_NV                     0x8530
+#define GL_DISCARD_NV                     (GLenum)0x8530
 #endif
 #ifndef GL_E_TIMES_F_NV                   
-#define GL_E_TIMES_F_NV                   0x8531
+#define GL_E_TIMES_F_NV                   (GLenum)0x8531
 #endif
 #ifndef GL_SPARE0_PLUS_SECONDARY_COLOR_NV 
-#define GL_SPARE0_PLUS_SECONDARY_COLOR_NV 0x8532
+#define GL_SPARE0_PLUS_SECONDARY_COLOR_NV (GLenum)0x8532
 #endif
 #ifndef GL_UNSIGNED_IDENTITY_NV           
-#define GL_UNSIGNED_IDENTITY_NV           0x8536
+#define GL_UNSIGNED_IDENTITY_NV           (GLenum)0x8536
 #endif
 #ifndef GL_UNSIGNED_INVERT_NV             
-#define GL_UNSIGNED_INVERT_NV             0x8537
+#define GL_UNSIGNED_INVERT_NV             (GLenum)0x8537
 #endif
 #ifndef GL_EXPAND_NORMAL_NV               
-#define GL_EXPAND_NORMAL_NV               0x8538
+#define GL_EXPAND_NORMAL_NV               (GLenum)0x8538
 #endif
 #ifndef GL_EXPAND_NEGATE_NV               
-#define GL_EXPAND_NEGATE_NV               0x8539
+#define GL_EXPAND_NEGATE_NV               (GLenum)0x8539
 #endif
 #ifndef GL_HALF_BIAS_NORMAL_NV            
-#define GL_HALF_BIAS_NORMAL_NV            0x853A
+#define GL_HALF_BIAS_NORMAL_NV            (GLenum)0x853A
 #endif
 #ifndef GL_HALF_BIAS_NEGATE_NV            
-#define GL_HALF_BIAS_NEGATE_NV            0x853B
+#define GL_HALF_BIAS_NEGATE_NV            (GLenum)0x853B
 #endif
 #ifndef GL_SIGNED_IDENTITY_NV             
-#define GL_SIGNED_IDENTITY_NV             0x853C
+#define GL_SIGNED_IDENTITY_NV             (GLenum)0x853C
 #endif
 #ifndef GL_SIGNED_NEGATE_NV               
-#define GL_SIGNED_NEGATE_NV               0x853D
+#define GL_SIGNED_NEGATE_NV               (GLenum)0x853D
 #endif
 #ifndef GL_SCALE_BY_TWO_NV                
-#define GL_SCALE_BY_TWO_NV                0x853E
+#define GL_SCALE_BY_TWO_NV                (GLenum)0x853E
 #endif
 #ifndef GL_SCALE_BY_FOUR_NV               
-#define GL_SCALE_BY_FOUR_NV               0x853F
+#define GL_SCALE_BY_FOUR_NV               (GLenum)0x853F
 #endif
 #ifndef GL_SCALE_BY_ONE_HALF_NV           
-#define GL_SCALE_BY_ONE_HALF_NV           0x8540
+#define GL_SCALE_BY_ONE_HALF_NV           (GLenum)0x8540
 #endif
 #ifndef GL_BIAS_BY_NEGATIVE_ONE_HALF_NV   
-#define GL_BIAS_BY_NEGATIVE_ONE_HALF_NV   0x8541
+#define GL_BIAS_BY_NEGATIVE_ONE_HALF_NV   (GLenum)0x8541
 #endif
 #ifndef GL_COMBINER_INPUT_NV              
-#define GL_COMBINER_INPUT_NV              0x8542
+#define GL_COMBINER_INPUT_NV              (GLenum)0x8542
 #endif
 #ifndef GL_COMBINER_MAPPING_NV            
-#define GL_COMBINER_MAPPING_NV            0x8543
+#define GL_COMBINER_MAPPING_NV            (GLenum)0x8543
 #endif
 #ifndef GL_COMBINER_COMPONENT_USAGE_NV    
-#define GL_COMBINER_COMPONENT_USAGE_NV    0x8544
+#define GL_COMBINER_COMPONENT_USAGE_NV    (GLenum)0x8544
 #endif
 #ifndef GL_COMBINER_AB_DOT_PRODUCT_NV     
-#define GL_COMBINER_AB_DOT_PRODUCT_NV     0x8545
+#define GL_COMBINER_AB_DOT_PRODUCT_NV     (GLenum)0x8545
 #endif
 #ifndef GL_COMBINER_CD_DOT_PRODUCT_NV     
-#define GL_COMBINER_CD_DOT_PRODUCT_NV     0x8546
+#define GL_COMBINER_CD_DOT_PRODUCT_NV     (GLenum)0x8546
 #endif
 #ifndef GL_COMBINER_MUX_SUM_NV            
-#define GL_COMBINER_MUX_SUM_NV            0x8547
+#define GL_COMBINER_MUX_SUM_NV            (GLenum)0x8547
 #endif
 #ifndef GL_COMBINER_SCALE_NV              
-#define GL_COMBINER_SCALE_NV              0x8548
+#define GL_COMBINER_SCALE_NV              (GLenum)0x8548
 #endif
 #ifndef GL_COMBINER_BIAS_NV               
-#define GL_COMBINER_BIAS_NV               0x8549
+#define GL_COMBINER_BIAS_NV               (GLenum)0x8549
 #endif
 #ifndef GL_COMBINER_AB_OUTPUT_NV          
-#define GL_COMBINER_AB_OUTPUT_NV          0x854A
+#define GL_COMBINER_AB_OUTPUT_NV          (GLenum)0x854A
 #endif
 #ifndef GL_COMBINER_CD_OUTPUT_NV          
-#define GL_COMBINER_CD_OUTPUT_NV          0x854B
+#define GL_COMBINER_CD_OUTPUT_NV          (GLenum)0x854B
 #endif
 #ifndef GL_COMBINER_SUM_OUTPUT_NV         
-#define GL_COMBINER_SUM_OUTPUT_NV         0x854C
+#define GL_COMBINER_SUM_OUTPUT_NV         (GLenum)0x854C
 #endif
 #ifndef GL_MAX_GENERAL_COMBINERS_NV       
-#define GL_MAX_GENERAL_COMBINERS_NV       0x854D
+#define GL_MAX_GENERAL_COMBINERS_NV       (GLenum)0x854D
 #endif
 #ifndef GL_NUM_GENERAL_COMBINERS_NV       
-#define GL_NUM_GENERAL_COMBINERS_NV       0x854E
+#define GL_NUM_GENERAL_COMBINERS_NV       (GLenum)0x854E
 #endif
 #ifndef GL_COLOR_SUM_CLAMP_NV             
-#define GL_COLOR_SUM_CLAMP_NV             0x854F
+#define GL_COLOR_SUM_CLAMP_NV             (GLenum)0x854F
 #endif
 #ifndef GL_COMBINER0_NV                   
-#define GL_COMBINER0_NV                   0x8550
+#define GL_COMBINER0_NV                   (GLenum)0x8550
 #endif
 #ifndef GL_COMBINER1_NV                   
-#define GL_COMBINER1_NV                   0x8551
+#define GL_COMBINER1_NV                   (GLenum)0x8551
 #endif
 #ifndef GL_COMBINER2_NV                   
-#define GL_COMBINER2_NV                   0x8552
+#define GL_COMBINER2_NV                   (GLenum)0x8552
 #endif
 #ifndef GL_COMBINER3_NV                   
-#define GL_COMBINER3_NV                   0x8553
+#define GL_COMBINER3_NV                   (GLenum)0x8553
 #endif
 #ifndef GL_COMBINER4_NV                   
-#define GL_COMBINER4_NV                   0x8554
+#define GL_COMBINER4_NV                   (GLenum)0x8554
 #endif
 #ifndef GL_COMBINER5_NV                   
-#define GL_COMBINER5_NV                   0x8555
+#define GL_COMBINER5_NV                   (GLenum)0x8555
 #endif
 #ifndef GL_COMBINER6_NV                   
-#define GL_COMBINER6_NV                   0x8556
+#define GL_COMBINER6_NV                   (GLenum)0x8556
 #endif
 #ifndef GL_COMBINER7_NV                   
-#define GL_COMBINER7_NV                   0x8557
+#define GL_COMBINER7_NV                   (GLenum)0x8557
 #endif
 #ifndef GL_FOG_DISTANCE_MODE_NV           
-#define GL_FOG_DISTANCE_MODE_NV           0x855A
+#define GL_FOG_DISTANCE_MODE_NV           (GLenum)0x855A
 #endif
 #ifndef GL_EYE_RADIAL_NV                  
-#define GL_EYE_RADIAL_NV                  0x855B
+#define GL_EYE_RADIAL_NV                  (GLenum)0x855B
 #endif
 #ifndef GL_EYE_PLANE_ABSOLUTE_NV          
-#define GL_EYE_PLANE_ABSOLUTE_NV          0x855C
+#define GL_EYE_PLANE_ABSOLUTE_NV          (GLenum)0x855C
 #endif
 #ifndef GL_EMBOSS_LIGHT_NV                
-#define GL_EMBOSS_LIGHT_NV                0x855D
+#define GL_EMBOSS_LIGHT_NV                (GLenum)0x855D
 #endif
 #ifndef GL_EMBOSS_CONSTANT_NV             
-#define GL_EMBOSS_CONSTANT_NV             0x855E
+#define GL_EMBOSS_CONSTANT_NV             (GLenum)0x855E
 #endif
 #ifndef GL_EMBOSS_MAP_NV                  
-#define GL_EMBOSS_MAP_NV                  0x855F
+#define GL_EMBOSS_MAP_NV                  (GLenum)0x855F
 #endif
 #ifndef GL_COMBINE4_NV                    
-#define GL_COMBINE4_NV                    0x8503
+#define GL_COMBINE4_NV                    (GLenum)0x8503
 #endif
 #ifndef GL_SOURCE3_RGB_NV                 
-#define GL_SOURCE3_RGB_NV                 0x8583
+#define GL_SOURCE3_RGB_NV                 (GLenum)0x8583
 #endif
 #ifndef GL_SOURCE3_ALPHA_NV               
-#define GL_SOURCE3_ALPHA_NV               0x858B
+#define GL_SOURCE3_ALPHA_NV               (GLenum)0x858B
 #endif
 #ifndef GL_OPERAND3_RGB_NV                
-#define GL_OPERAND3_RGB_NV                0x8593
+#define GL_OPERAND3_RGB_NV                (GLenum)0x8593
 #endif
 #ifndef GL_OPERAND3_ALPHA_NV              
-#define GL_OPERAND3_ALPHA_NV              0x859B
+#define GL_OPERAND3_ALPHA_NV              (GLenum)0x859B
 #endif
 #ifndef GL_COMPRESSED_RGB_S3TC_DXT1_EXT   
-#define GL_COMPRESSED_RGB_S3TC_DXT1_EXT   0x83F0
+#define GL_COMPRESSED_RGB_S3TC_DXT1_EXT   (GLenum)0x83F0
 #endif
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT1_EXT  
-#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT  0x83F1
+#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT  (GLenum)0x83F1
 #endif
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT3_EXT  
-#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT  0x83F2
+#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT  (GLenum)0x83F2
 #endif
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT5_EXT  
-#define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT  0x83F3
+#define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT  (GLenum)0x83F3
 #endif
 #ifndef GL_CULL_VERTEX_IBM                
 #define GL_CULL_VERTEX_IBM                103050
@@ -4367,151 +4367,151 @@ CS_PREP_GL_FUNCTION (csPFNGLTEXTURECOLORMASKSGISPROC, glTextureColorMaskSGIS);
 #define GL_SECONDARY_COLOR_ARRAY_LIST_STRIDE_IBM 103087
 #endif
 #ifndef GL_PACK_SUBSAMPLE_RATE_SGIX       
-#define GL_PACK_SUBSAMPLE_RATE_SGIX       0x85A0
+#define GL_PACK_SUBSAMPLE_RATE_SGIX       (GLenum)0x85A0
 #endif
 #ifndef GL_UNPACK_SUBSAMPLE_RATE_SGIX     
-#define GL_UNPACK_SUBSAMPLE_RATE_SGIX     0x85A1
+#define GL_UNPACK_SUBSAMPLE_RATE_SGIX     (GLenum)0x85A1
 #endif
 #ifndef GL_PIXEL_SUBSAMPLE_4444_SGIX      
-#define GL_PIXEL_SUBSAMPLE_4444_SGIX      0x85A2
+#define GL_PIXEL_SUBSAMPLE_4444_SGIX      (GLenum)0x85A2
 #endif
 #ifndef GL_PIXEL_SUBSAMPLE_2424_SGIX      
-#define GL_PIXEL_SUBSAMPLE_2424_SGIX      0x85A3
+#define GL_PIXEL_SUBSAMPLE_2424_SGIX      (GLenum)0x85A3
 #endif
 #ifndef GL_PIXEL_SUBSAMPLE_4242_SGIX      
-#define GL_PIXEL_SUBSAMPLE_4242_SGIX      0x85A4
+#define GL_PIXEL_SUBSAMPLE_4242_SGIX      (GLenum)0x85A4
 #endif
 #ifndef GL_YCRCB_SGIX                     
-#define GL_YCRCB_SGIX                     0x8318
+#define GL_YCRCB_SGIX                     (GLenum)0x8318
 #endif
 #ifndef GL_YCRCBA_SGIX                    
-#define GL_YCRCBA_SGIX                    0x8319
+#define GL_YCRCBA_SGIX                    (GLenum)0x8319
 #endif
 #ifndef GL_DEPTH_PASS_INSTRUMENT_SGIX     
-#define GL_DEPTH_PASS_INSTRUMENT_SGIX     0x8310
+#define GL_DEPTH_PASS_INSTRUMENT_SGIX     (GLenum)0x8310
 #endif
 #ifndef GL_DEPTH_PASS_INSTRUMENT_COUNTERS_SGIX 
-#define GL_DEPTH_PASS_INSTRUMENT_COUNTERS_SGIX 0x8311
+#define GL_DEPTH_PASS_INSTRUMENT_COUNTERS_SGIX (GLenum)0x8311
 #endif
 #ifndef GL_DEPTH_PASS_INSTRUMENT_MAX_SGIX 
-#define GL_DEPTH_PASS_INSTRUMENT_MAX_SGIX 0x8312
+#define GL_DEPTH_PASS_INSTRUMENT_MAX_SGIX (GLenum)0x8312
 #endif
 #ifndef GL_COMPRESSED_RGB_FXT1_3DFX       
-#define GL_COMPRESSED_RGB_FXT1_3DFX       0x86B0
+#define GL_COMPRESSED_RGB_FXT1_3DFX       (GLenum)0x86B0
 #endif
 #ifndef GL_COMPRESSED_RGBA_FXT1_3DFX      
-#define GL_COMPRESSED_RGBA_FXT1_3DFX      0x86B1
+#define GL_COMPRESSED_RGBA_FXT1_3DFX      (GLenum)0x86B1
 #endif
 #ifndef GL_MULTISAMPLE_3DFX               
-#define GL_MULTISAMPLE_3DFX               0x86B2
+#define GL_MULTISAMPLE_3DFX               (GLenum)0x86B2
 #endif
 #ifndef GL_SAMPLE_BUFFERS_3DFX            
-#define GL_SAMPLE_BUFFERS_3DFX            0x86B3
+#define GL_SAMPLE_BUFFERS_3DFX            (GLenum)0x86B3
 #endif
 #ifndef GL_SAMPLES_3DFX                   
-#define GL_SAMPLES_3DFX                   0x86B4
+#define GL_SAMPLES_3DFX                   (GLenum)0x86B4
 #endif
 #ifndef GL_MULTISAMPLE_BIT_3DFX           
-#define GL_MULTISAMPLE_BIT_3DFX           0x20000000
+#define GL_MULTISAMPLE_BIT_3DFX           (GLenum)0x20000000
 #endif
 #ifndef GL_MULTISAMPLE_EXT                
-#define GL_MULTISAMPLE_EXT                0x809D
+#define GL_MULTISAMPLE_EXT                (GLenum)0x809D
 #endif
 #ifndef GL_SAMPLE_ALPHA_TO_MASK_EXT       
-#define GL_SAMPLE_ALPHA_TO_MASK_EXT       0x809E
+#define GL_SAMPLE_ALPHA_TO_MASK_EXT       (GLenum)0x809E
 #endif
 #ifndef GL_SAMPLE_ALPHA_TO_ONE_EXT        
-#define GL_SAMPLE_ALPHA_TO_ONE_EXT        0x809F
+#define GL_SAMPLE_ALPHA_TO_ONE_EXT        (GLenum)0x809F
 #endif
 #ifndef GL_SAMPLE_MASK_EXT                
-#define GL_SAMPLE_MASK_EXT                0x80A0
+#define GL_SAMPLE_MASK_EXT                (GLenum)0x80A0
 #endif
 #ifndef GL_1PASS_EXT                      
-#define GL_1PASS_EXT                      0x80A1
+#define GL_1PASS_EXT                      (GLenum)0x80A1
 #endif
 #ifndef GL_2PASS_0_EXT                    
-#define GL_2PASS_0_EXT                    0x80A2
+#define GL_2PASS_0_EXT                    (GLenum)0x80A2
 #endif
 #ifndef GL_2PASS_1_EXT                    
-#define GL_2PASS_1_EXT                    0x80A3
+#define GL_2PASS_1_EXT                    (GLenum)0x80A3
 #endif
 #ifndef GL_4PASS_0_EXT                    
-#define GL_4PASS_0_EXT                    0x80A4
+#define GL_4PASS_0_EXT                    (GLenum)0x80A4
 #endif
 #ifndef GL_4PASS_1_EXT                    
-#define GL_4PASS_1_EXT                    0x80A5
+#define GL_4PASS_1_EXT                    (GLenum)0x80A5
 #endif
 #ifndef GL_4PASS_2_EXT                    
-#define GL_4PASS_2_EXT                    0x80A6
+#define GL_4PASS_2_EXT                    (GLenum)0x80A6
 #endif
 #ifndef GL_4PASS_3_EXT                    
-#define GL_4PASS_3_EXT                    0x80A7
+#define GL_4PASS_3_EXT                    (GLenum)0x80A7
 #endif
 #ifndef GL_SAMPLE_BUFFERS_EXT             
-#define GL_SAMPLE_BUFFERS_EXT             0x80A8
+#define GL_SAMPLE_BUFFERS_EXT             (GLenum)0x80A8
 #endif
 #ifndef GL_SAMPLES_EXT                    
-#define GL_SAMPLES_EXT                    0x80A9
+#define GL_SAMPLES_EXT                    (GLenum)0x80A9
 #endif
 #ifndef GL_SAMPLE_MASK_VALUE_EXT          
-#define GL_SAMPLE_MASK_VALUE_EXT          0x80AA
+#define GL_SAMPLE_MASK_VALUE_EXT          (GLenum)0x80AA
 #endif
 #ifndef GL_SAMPLE_MASK_INVERT_EXT         
-#define GL_SAMPLE_MASK_INVERT_EXT         0x80AB
+#define GL_SAMPLE_MASK_INVERT_EXT         (GLenum)0x80AB
 #endif
 #ifndef GL_SAMPLE_PATTERN_EXT             
-#define GL_SAMPLE_PATTERN_EXT             0x80AC
+#define GL_SAMPLE_PATTERN_EXT             (GLenum)0x80AC
 #endif
 #ifndef GL_VERTEX_PRECLIP_SGIX            
-#define GL_VERTEX_PRECLIP_SGIX            0x83EE
+#define GL_VERTEX_PRECLIP_SGIX            (GLenum)0x83EE
 #endif
 #ifndef GL_VERTEX_PRECLIP_HINT_SGIX       
-#define GL_VERTEX_PRECLIP_HINT_SGIX       0x83EF
+#define GL_VERTEX_PRECLIP_HINT_SGIX       (GLenum)0x83EF
 #endif
 #ifndef GL_CONVOLUTION_HINT_SGIX          
-#define GL_CONVOLUTION_HINT_SGIX          0x8316
+#define GL_CONVOLUTION_HINT_SGIX          (GLenum)0x8316
 #endif
 #ifndef GL_PACK_RESAMPLE_SGIX             
-#define GL_PACK_RESAMPLE_SGIX             0x842C
+#define GL_PACK_RESAMPLE_SGIX             (GLenum)0x842C
 #endif
 #ifndef GL_UNPACK_RESAMPLE_SGIX           
-#define GL_UNPACK_RESAMPLE_SGIX           0x842D
+#define GL_UNPACK_RESAMPLE_SGIX           (GLenum)0x842D
 #endif
 #ifndef GL_RESAMPLE_REPLICATE_SGIX        
-#define GL_RESAMPLE_REPLICATE_SGIX        0x842E
+#define GL_RESAMPLE_REPLICATE_SGIX        (GLenum)0x842E
 #endif
 #ifndef GL_RESAMPLE_ZERO_FILL_SGIX        
-#define GL_RESAMPLE_ZERO_FILL_SGIX        0x842F
+#define GL_RESAMPLE_ZERO_FILL_SGIX        (GLenum)0x842F
 #endif
 #ifndef GL_RESAMPLE_DECIMATE_SGIX         
-#define GL_RESAMPLE_DECIMATE_SGIX         0x8430
+#define GL_RESAMPLE_DECIMATE_SGIX         (GLenum)0x8430
 #endif
 #ifndef GL_EYE_DISTANCE_TO_POINT_SGIS     
-#define GL_EYE_DISTANCE_TO_POINT_SGIS     0x81F0
+#define GL_EYE_DISTANCE_TO_POINT_SGIS     (GLenum)0x81F0
 #endif
 #ifndef GL_OBJECT_DISTANCE_TO_POINT_SGIS  
-#define GL_OBJECT_DISTANCE_TO_POINT_SGIS  0x81F1
+#define GL_OBJECT_DISTANCE_TO_POINT_SGIS  (GLenum)0x81F1
 #endif
 #ifndef GL_EYE_DISTANCE_TO_LINE_SGIS      
-#define GL_EYE_DISTANCE_TO_LINE_SGIS      0x81F2
+#define GL_EYE_DISTANCE_TO_LINE_SGIS      (GLenum)0x81F2
 #endif
 #ifndef GL_OBJECT_DISTANCE_TO_LINE_SGIS   
-#define GL_OBJECT_DISTANCE_TO_LINE_SGIS   0x81F3
+#define GL_OBJECT_DISTANCE_TO_LINE_SGIS   (GLenum)0x81F3
 #endif
 #ifndef GL_EYE_POINT_SGIS                 
-#define GL_EYE_POINT_SGIS                 0x81F4
+#define GL_EYE_POINT_SGIS                 (GLenum)0x81F4
 #endif
 #ifndef GL_OBJECT_POINT_SGIS              
-#define GL_OBJECT_POINT_SGIS              0x81F5
+#define GL_OBJECT_POINT_SGIS              (GLenum)0x81F5
 #endif
 #ifndef GL_EYE_LINE_SGIS                  
-#define GL_EYE_LINE_SGIS                  0x81F6
+#define GL_EYE_LINE_SGIS                  (GLenum)0x81F6
 #endif
 #ifndef GL_OBJECT_LINE_SGIS               
-#define GL_OBJECT_LINE_SGIS               0x81F7
+#define GL_OBJECT_LINE_SGIS               (GLenum)0x81F7
 #endif
 #ifndef GL_TEXTURE_COLOR_WRITEMASK_SGIS   
-#define GL_TEXTURE_COLOR_WRITEMASK_SGIS   0x81EF
+#define GL_TEXTURE_COLOR_WRITEMASK_SGIS   (GLenum)0x81EF
 #endif
 
 #endif

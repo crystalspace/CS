@@ -127,7 +127,7 @@ bool csTextureHandleOpenGL::FindFormatType ()
   if (csTextureManagerOpenGL::glformats[formatidx].sourceFormat == GL_RGB 
       || csTextureManagerOpenGL::glformats[formatidx].sourceFormat == GL_RGBA)
   {
-    static GLint formats [13][4] = {
+    static GLenum formats [13][4] = {
       {GL_RGBA,     GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_BYTE         },
       {GL_RGBA8,    GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_BYTE         },
       {GL_RGB5_A1,  GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_5_5_5_1, GL_UNSIGNED_BYTE         },
@@ -324,7 +324,7 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
   return true;
 }
 
-csTextureHandleOpenGL::csTextureHandleOpenGL (iImage *image, int flags, GLint sourceFormat, int bpp,
+csTextureHandleOpenGL::csTextureHandleOpenGL (iImage *image, int flags, GLenum sourceFormat, int bpp,
 					      csGraphics3DOGLCommon *iG3D) 
   : csTextureHandle (image, flags)
 {

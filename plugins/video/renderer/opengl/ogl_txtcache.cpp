@@ -185,7 +185,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
       glTexImage2D (GL_TEXTURE_2D, i, txt_mm->TargetFormat (), togl->get_width (), togl->get_height (),
 		    0, txt_mm->SourceFormat (), txt_mm->SourceType (), togl->image_data);
     else
-      csGraphics3DOGLCommon::glCompressedTexImage2DARB (GL_TEXTURE_2D, i, togl->internalFormat, 
+      csGraphics3DOGLCommon::glCompressedTexImage2DARB (GL_TEXTURE_2D, i, (GLenum)togl->internalFormat, 
 							togl->get_width (), togl->get_height (), 0, 
 							togl->size, togl->image_data); 
   }
