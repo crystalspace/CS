@@ -117,7 +117,7 @@ bool csPython::Store(const char* name, void* data, void* tag)
 {
   swig_type_info * ti = SWIG_TypeQuery((char*)tag);
   PyObject * obj = SWIG_NewPointerObj(data, ti, 0);
-  char mod_name[strlen(name)];
+  ALLOC_STACK_ARRAY (mod_name, char, strlen(name));
   strcpy(mod_name, name);
   char * var_name = strrchr(mod_name, '.');
   if(!var_name)
