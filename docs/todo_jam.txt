@@ -22,7 +22,6 @@ W - Wishlist (the build also works without this feature)
     tree upon explicit request so that they can be committed to the CVS
     respository if desired.
 
-[M] Add a Jamfile for cscript/csjava.
 [M] Figure out how to create MSVC project files for the pure Python and pure
     Perl extension modules.
 [M] Write complete documentation about the Jam build system for the CS user
@@ -30,9 +29,9 @@ W - Wishlist (the build also works without this feature)
 [M] Write a tutorial (maybe we could just link to the text in the RoboRun
     project?).  Another interesting topic would be integrating Crystal Space
     with other build systems like Automake or Ant.
-[M] Re-work the provided m4 scripts to provide functionality like CS_CHECK_HOST
-    and INITJAMFILE. Would be also nice to extract more of the detection
-    scripts in CS (perl, python, nasm, problematic cflags?)
+[M] Re-work the provided m4 scripts to provide functionality like
+    CS_CHECK_HOST.  Would be also nice to extract more of the detection scripts
+    in CS (perl, nasm, problematic cflags?)
 [M] Add a generic "Defines" rule which works similar to the CFlags rule, but is
     specifically geared for specifying preprocessor defines. Special-case tools
     may take advantage of this extra knowledge. For example, msvcgen can fill
@@ -80,10 +79,8 @@ W - Wishlist (the build also works without this feature)
     cs-unix.{dvi,ps,pdf} rather than crystalspace.{dvi,ps,pdf}.
 [L] The info rule names the resulting file crystal.info, rather than
     crystalspace.info.
-[L] Add support to create Microsoft CHM format documentation packages.
 
-[W] See if there's a way to create some suitable MSVC templates for external
-    projects, so that we autogenrate msvc-makefiles there too.
+[W] Add support to create Microsoft CHM format documentation packages.
 [W] Finish the tool for extracting the documentation from the rules files.
 [W] Create templates for some IDEs.  Generating a template for KDevelop3.x is
     very easy, in theory, as it comes with a great plugin architecture allowing
@@ -106,6 +103,7 @@ W - Wishlist (the build also works without this feature)
     MacOS/X. We need to determine the correct file extension expected by Java
     and use that. (For instance, the CS configure script gleans this sort of
     information for Python and Perl in order to avoid this same problem.)
+[*] Add a Jamfile for cscript/csjava.
 [*] msvcgen.jam: The overriding LinkWith rule is not properly resolving the
     library dependencies for a target.  For instance, if "LibDepends D : A B C"
     has been invoked, then all generated project files which depend upon D
