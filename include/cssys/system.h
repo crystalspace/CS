@@ -85,8 +85,6 @@ public:
  */
 class csSystemDriver : public iSystem
 {
-	DECLARE_IBASE;
-
   // This is a private structure used to keep the list of plugins
   class csPlugIn : public csBase
   {
@@ -325,12 +323,6 @@ protected:
    * FrameWidth and FrameHeight from the given mode string.
    */
   void SetMode (const char* mode);
-
-  /**
-   * System-dependent code should call this to emit 'focus changed' events.
-   * Initially system assumes that CrystalSpace window is active.
-   */
-  void do_focus (int enable);
 
 public:
   /**************************** iSystem interface ****************************/
