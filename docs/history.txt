@@ -13,6 +13,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+16-Nov-1999
+	- Eric Sunshine worked around some additional severe bugs in the
+	  NextStep compiler which were triggered by the SCF conversion.  The
+	  NextStep port is once again on par with the other ports (including
+	  OpenStep).
 15-Nov-1999
 	- Eric Sunshine renamed the Python test program from cspythontest to
 	  pytest in order to appease DOS's 8.3 requirement.
@@ -39,8 +44,8 @@ Short-term cleanups that need to be done:
 	  correctly (again) on stdout.
 	- Eric Sunshine worked around a couple NextStep compiler bugs which
 	  were triggered by the global SCF conversion.
-	- Eric Sunshine fixed Blocks so that it compiles again (following
-	  some changes by Andrew today).
+	- Thomas Hieber and Eric Sunshine fixed Blocks so that it compiles
+	  again (following some changes by Andrew).
 14-Nov-1999
 	- Updates to CrystalClear from Michael Dale Long and fixes for SCF to
 	  cctest.
