@@ -10,6 +10,8 @@ The history order is reversed so that new features are at the top.
 	- Prepared some classes in csThing in order to be able to generate
 	  an edge table so that adjacent polygons can be easily detected.
 	  Unimplemented at the moment.
+	- Changed the shadow caster not to cast shadows from meshes with
+	  the CAMERA option set.
 11-Jul-2001
 	- Removed csLight::CorrectForNoColor() since it is obsolete.
 	- Added a virtual destructor to mdldata.h.
