@@ -44,6 +44,9 @@ rm -f conftest.asm conftest.o
 # Find the X11 directory
 . ${UNIX_DIR}/chkxfree.sh
 
+# does this opengl have glXGetProcAddressARB
+. ${UNIX_DIR}/chkogl.sh
+
 # test for endianess
 . ${BIN_DIR}/endtest.sh
 
