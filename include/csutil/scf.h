@@ -691,7 +691,7 @@ typedef void* (*scfFactoryFunc)(iBase*);
     ClassID, #Interface, Interface##_VERSION))
 
 /**
- * SCF_VERSION can be used as a shorter way to define an interface version;
+ * SCF_VERSION can be used to define an interface's version number;
  * you should specify interface name and major, minor and micro version
  * components. This way:
  * <pre>
@@ -703,14 +703,55 @@ typedef void* (*scfFactoryFunc)(iBase*);
  * </pre>
  */
 #define SCF_VERSION(Name,Major,Minor,Micro)				\
-  const int Name##_VERSION = SCF_CONSTRUCT_VERSION (Major, Minor, Micro); \
-inline static scfInterfaceID Name##_scfGetID ()				\
+int const Name##_VERSION = SCF_CONSTRUCT_VERSION(Major, Minor, Micro);	\
+inline static scfInterfaceID Name##_scfGetID()				\
 {									\
   static scfInterfaceID ID = (scfInterfaceID)-1;			\
   if (ID == (scfInterfaceID)(-1))					\
-    ID = iSCF::SCF->GetInterfaceID (#Name);				\
+    ID = iSCF::SCF->GetInterfaceID(#Name);				\
   return ID;								\
-}
+}									\
+struct Name;								\
+class scfInterface<Name>						\
+{									\
+public:									\
+  static int GetVersion()						\
+  {									\
+    return SCF_CONSTRUCT_VERSION(Major, Minor, Micro);			\
+  }									\
+  static scfInterfaceID GetID()						\
+  {									\
+    static scfInterfaceID ID = (scfInterfaceID)-1;			\
+    if (ID == (scfInterfaceID)(-1))					\
+      ID = iSCF::SCF->GetInterfaceID(#Name);				\
+    return ID;								\
+  }									\
+};
+
+/**
+ * Interface query class.  This template class allows you to query static
+ * information about SCF interfaces, such as an interface's current version
+ * number.  For example, to find out the version number of the iFooBar SCF
+ * interface, you would invoke scfInterface<iFooBar>::GetVersion().
+ */
+template <class T> class scfInterface
+{
+public:
+  /**
+   * Retrieve the interface's current version number which was specified with
+   * SCF_VERSION().
+   */
+  static int GetVersion() { return 0; }
+
+  /**
+   * Retrieve the interface's identifier.  This is a unique identifier by
+   * which SCF recognizes the interface.  Although human's prefer to identify
+   * interfaces symbolically via name, SCF perfers to identify them, for
+   * performance reasons, by scfInterfaceID, which is typically a small
+   * integer.
+   */
+  static scfInterfaceID GetID() { return (scfInterfaceID)(-1); }
+};
 
 /**
  * Shortcut macro to query given interface from given object.

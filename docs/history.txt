@@ -18,6 +18,27 @@ chronological order.
 	  dynavis target.
 	- Jorrit did a slight optimization in the stencil renderloop plugin.
 	  Using memcpy instead of manual copy.
+	- Eric Sunshine added a new templated scfInterface<> class to scf.h.
+	  This class can be used to perform queries for static information
+	  relating to SCF interfaces.  The following information is supplied
+	  by this class:
+	    - GetVersion(): Retrieves an interface's current version number.
+	      This is the same as the value of the global constant
+	      name_VERSION, where `name' is the interface's name (such as
+	      iVFS_VERSION).
+	    - GetID(): Retrieves an interface's unique identifier as an
+	      scfInterfaceID.  This is the same as the value returned by the
+	      global function name_scfGetID(), where `name' is the interface's
+	      name (such as iVFS_scfGetID()).
+	  As an example of use, to retrieve the version number of the iFooBar
+	  interface, the following code can be used:
+	      int ver = scfInterface<iFooBar>::GetVersion();
+	  An important benefit of scfInterface<> is that it allows template
+	  authors to retrieve static information about an interface even though
+	  the template might know an interface only by the opaque tag `T'.  For
+	  instance scfInterface<T>::GetVersion() will work as expected from
+	  within a template class.
+	- Eric Sunshine eliminated bogus metaball reference from features.txi.
 21-Oct-2003
 	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
 	- Eric Sunshine made the following configuration-related changes:
