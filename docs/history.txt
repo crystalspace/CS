@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	  is not locked.
 	- Did a similar change to the reporter. There is now also a
 	  iReporter->GetMessageIterator().
+	- Removed the loaderthread.h header again. This is going to be done
+	  differently.
 22-Apr-2003
 	- Eric Sunshine added links for the new CrystalDoc translation project
 	  to the Crystal Space web site.  Also cleaned up the web site's main
