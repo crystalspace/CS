@@ -55,8 +55,14 @@ class awsBarChart :
     iString *label;
   };
 
-  /// Keeps track of all chart items
-  csBasicVector items;
+  /// Keeps track of all chart items (fifo buffer)
+  BarItem *items;
+
+  /// Number of items in chart
+  int count_items;
+
+  /// Size of items buffer
+  int items_buffer_size;
 
   /// Maximum number of items to include in chart
   int max_items;
@@ -177,6 +183,14 @@ public:
 
   /// Triggered when the keyboard focus is gained
   virtual bool OnGainFocus ();
+
+protected:
+  /// Add a new item to the top
+  void Push(BarItem &i, bool normal=true);
+
+  /// Kill an item from the bottom 
+  void Pop(bool normal=true);
+
 };
 
 class awsBarChartFactory :

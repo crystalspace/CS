@@ -52,6 +52,9 @@ awsBarChart::awsBarChart () :
   caption(NULL),
   yText(NULL),
   xText(NULL),
+  items(NULL),
+  count_items(0),
+  items_buffer_size(0),
   max_items(0),
   bar_color(0)
 {
@@ -122,6 +125,12 @@ bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)
       chart_sink->GetTriggerID ("Tick"));
   }
 
+  if (max_items)
+  {
+    items = new BarItem[max_items+1];
+    items_buffer_size=max_items+1;
+  }
+
   return true;
 }
 
@@ -176,41 +185,33 @@ bool awsBarChart::Execute (char *action, iAwsParmList &parmlist)
 
   if (strcmp(action, "AddItem")==0)
   {
-    BarItem *i = new BarItem;
-    BarItem *old=NULL;
-
-    parmlist.GetFloat("value", &i->value);
-    parmlist.GetString("label", &i->label);
+    BarItem i;
+    
+    parmlist.GetFloat("value", &i.value);
+    parmlist.GetString("label", &i.label);
 
     if (chart_options & coRolling)
     {
       if (chart_options & coRollRight)
       {
-	if (items.Length() >= max_items)
-	{
-	  old=(BarItem *)items[items.Length()-1];
-	  items.Delete(old);
-	  delete old;
-	}
-
-	items.Push(i);
+	if (count_items >= max_items)
+	  Pop(false);
+	
+	Push(i, false);
 	  
       } // end if chart should roll right
       else
       {
-	if (items.Length() >= max_items)
-	{
-	  old=(BarItem *)items.Pop();
-	  delete old;
-        }
-
-        items.Insert(items.Length(), i);
-  
+	if (count_items >= max_items)
+	  Pop();
+       
+	Push(i);
+         
       } // end else chart rolls left
     } // end if the chart rolls
     else
     {
-      items.Push(i);      
+     Push(i);      
     } // end else chart grows.
 
     Invalidate();
@@ -300,14 +301,8 @@ void awsBarChart::OnDraw (csRect clip)
   inner_frame.ymin+=insets.ymin+2;
   inner_frame.xmax-=insets.xmax+2;
   inner_frame.ymax-=insets.ymax+2;
-
-  frame3d.Draw (
-      WindowManager (),
-      Window (),
-      inner_frame,
-      inner_frame_style,
-      bkg,
-      alpha_level);
+ 
+  if (count_items<1) return;
 
   // Now draw chart!
   int tw=0, th=0;
@@ -315,9 +310,9 @@ void awsBarChart::OnDraw (csRect clip)
   float max=0.0001;
   char buf[32];
 
-  for(i=0; i<items.Length(); ++i)
+  for(i=0; i<count_items; ++i)
   {
-    BarItem *bi = (BarItem *)items[i];
+    BarItem *bi = &items[i];
 
     if (max < bi->value) 
     {
@@ -331,12 +326,7 @@ void awsBarChart::OnDraw (csRect clip)
         tw, 
         th);
 
-  if (items.Length()<1) return;
-
-  // Setup some variables
-  int bw = inner_frame.Width() / items.Length();
-  int bh = inner_frame.Height() / items.Length();
-
+   
   if (!(chart_options & coVerticalChart))
   {    
     inner_frame.xmin += tw+4;
@@ -365,12 +355,23 @@ void awsBarChart::OnDraw (csRect clip)
     }
 
     inner_frame.xmin+=2;
-    bw = inner_frame.Width() / items.Length();
   }
 
-  for(i=0; i<items.Length(); ++i)
+   frame3d.Draw (
+      WindowManager (),
+      Window (),
+      inner_frame,
+      inner_frame_style,
+      bkg,
+      alpha_level);
+
+  // Setup some variables
+  int bw = inner_frame.Width() /  (max_items==0 ? count_items : max_items);
+  int bh = inner_frame.Height() / (max_items==0 ? count_items : max_items);
+
+  for(i=count_items-1; i>=0; --i)
   {
-    BarItem *bi = (BarItem *)items[i];
+    BarItem *bi = &items[i];
 
     if (chart_options & coVerticalChart)
     {
@@ -394,7 +395,7 @@ void awsBarChart::OnDraw (csRect clip)
       float vp = bi->value / max;
 
       if (vp<1.0)
-	sy = sy + (int)((float)(ey-sy) * vp);
+	sy = sy + (int)((float)(ey-sy) * (1.0-vp));
 
       g2d->DrawBox(x, sy, bw-1, ey-sy, bar_color); 
     }
@@ -471,6 +472,69 @@ csRect awsBarChart::getInsets()
     return csRect(0,0,0,0);
   }
 }
+
+
+void 
+awsBarChart::Push(BarItem &i, bool normal)
+{
+  if (items_buffer_size <= count_items+1)
+  {
+    BarItem *tmp = new BarItem[items_buffer_size+16];
+    if (items)
+    {
+      if (!normal)
+      {
+	// Leave zeroth hole open for new insert to front
+	memcpy(tmp+1, items, items_buffer_size*sizeof(BarItem));
+	tmp[0]=i;	
+      }
+      else
+      {
+	// Insert new item on back
+	memcpy(tmp, items, items_buffer_size*sizeof(BarItem));
+	tmp[count_items]=i;
+      }
+
+      delete items;
+      items=tmp;
+      items_buffer_size+=16;
+      count_items++;
+    } // end if items
+    else
+    {
+      items=tmp;
+      items[0]=i;
+    }
+  } // end if not enough space
+  else
+  {
+    if (!normal)
+      {
+	// Leave zeroth hole open for new insert to front
+	memmove(items+1, items, count_items*sizeof(BarItem));
+	items[0]=i;	
+	count_items++;
+      }
+      else
+      {
+	// Insert new item on back
+	items[count_items++]=i;
+      }
+  } // end else enough space
+}
+
+void 
+awsBarChart::Pop(bool normal)
+{
+  if (!normal)
+    --count_items;
+  else
+  {
+    // Copy all to the bottom.  count_items decremented as a side-effect.
+    memmove(items, items+1, (--count_items)*sizeof(BarItem));    
+  }
+}
+
 
 /************************************* Command Button Factory ****************/
 SCF_IMPLEMENT_IBASE(awsBarChartFactory)
