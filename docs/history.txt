@@ -13,6 +13,8 @@ chronological order.
 	  for now.
 	- Anders Stenberg fixed a bug in SimpleFormer which made it reallocate
 	  texture data on each access, i.e. leak enormous amounts of memory.
+	- Jorrit disabled the use of VBO in the new renderer since this doesn't
+	  appear to be working right at the moment.
 19-Mar-2004
 	- res fixed compilation of the aseie plugin.
 	- duhprey overrided the correct Write in null2d (from Jorrit)
