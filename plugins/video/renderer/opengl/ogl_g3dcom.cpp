@@ -54,6 +54,8 @@
 #include "qsqrt.h"
 #include "video/canvas/openglcommon/iogl.h"
 
+#include "GL/glext.h"
+
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
 /*=========================================================================

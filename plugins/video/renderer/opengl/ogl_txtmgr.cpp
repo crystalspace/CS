@@ -28,6 +28,12 @@
 #include "iutil/cfgfile.h"
 #include "igraphic/image.h"
 
+#include "GL/glext.h"
+
+#ifndef GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB
+  #define GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB	0x86A0
+#endif
+
 //---------------------------------------------------------------------------
 
 csTextureOpenGL::csTextureOpenGL (csTextureHandle *Parent, iImage *Image)
@@ -225,7 +231,7 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
     image_data = new uint8 [n];
     h = (uint8*)data;
     h += i;
-    for (int k=0; k<n; k++, h += 4)
+    for (i=0; i<n; i++, h += 4)
       *image_data++ = *h;
     break;
   case GL_INTENSITY:
