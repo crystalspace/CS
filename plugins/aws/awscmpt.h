@@ -27,7 +27,8 @@
 #include "csgeom/transfrm.h"
 #include "video/renderer/null/null_txt.h"
 #include "video/renderer/common/polybuf.h"
-#include "awssmpt.h"
+#include "awscspt.h"
+#include "awscmpt.h"
 
 class awsMultiProctexCanvas : public iAwsCanvas
 {

@@ -510,6 +510,8 @@ void awsMultiProctexCanvas::awscG3D::DrawPixmap (iTextureHandle *hTex,
 awsMultiProctexCanvas::awsMultiProctexCanvas(int w, int h, iObjectRegistry* object_reg, iEngine* engine,
                                              iTextureManager* txtmgr/*, iGraphics3D *myG3D*/): canvas_list(0), rect_list(0)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
+
   const int DesiredCanvasWidth = w;
   const int DesiredCanvasHeight = h;
 

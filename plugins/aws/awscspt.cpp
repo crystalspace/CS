@@ -93,14 +93,14 @@ awsSingleProctexCanvas::Animate (csTicks current_time)
 
 void awsSingleProctexCanvas::Show (csRect *area)
 {
-  //canvas->G3D()->Print(area);
+  canvas->G3D()->Print(area);
 
-  if (rG3D)
+/*  if (rG3D)
   {
     rG3D->DrawPixmap(canvas->GetTextureWrapper()->GetTextureHandle(),
                      area->xmin,area->ymin,area->Width(),area->Height(),
                      area->xmin,area->ymin,area->Width(),area->Height(),
                      0);
-  }
+  }*/
 }
 
