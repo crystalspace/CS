@@ -166,6 +166,11 @@ The history order is reversed so that new features are at the top.
 	  IncRef() to the shared event queue which it caches even though it was
 	  sending DecRef() at destruction time (thus stealing some other
 	  object's reference to the event queue).
+	- Eric Sunshine fixed the Apple/NeXT ports so that applications which
+	  utilize a 3D renderer no longer crash at launch time.  The problem
+	  was that csPlatformStartup() was getting invoked too late in the
+	  initialization process, with the result that the platform-specific
+	  "helper" object, NeXTAssistant was not available at plugin load time.
 11-Oct-2001
 	- Moved the plugin manager implementation out of the system driver
 	  into csPluginManager (in csutil/plugmgr.h). Modified
