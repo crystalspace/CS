@@ -25,6 +25,23 @@ chronological order.
 	      pk3 file (will add support for other archive types later).
 	      This will essentially exclude the need for the .cfg (for now
 	      at least) I will be adding more options in the future.
+	- Jorrit added the following persons to the contributors document:
+	    - Aren Blondahl
+	    - Frank Richter
+	    - John Harger
+	    - Daniel Fryer
+	    - Reed Hedges
+	    - Vincent Knecht
+	    - Fritz Elfert
+	    - Luca Cappa
+	    - Andrew Craig
+	    - Bjorn Hansen
+	    - James Thompson
+	    - Chris Matuszewski
+	    - Andrew Mann
+	    - Andreas Busch
+	    - Andrew Topp
+	  Also updated a few other entries.
 7-Apr-2004
 	- res added a small helper class to create minidumps on Win32.
 	- res augmented the Win32 assistant to allow user-defined exception

@@ -4,7 +4,7 @@
 @cindex Contributors
 
 @c ---------------------------------------------
-@c This document was last updated on Aug 12 2001
+@c This document was last updated on Apr 8 2004
 @c ---------------------------------------------
 
 This is a list of people who have contributed to Crystal Space in one way or
@@ -29,11 +29,71 @@ specific implementation issues.  Jorrit's home address is Schoonstraat 11,
 @c *********************************************************************
 
 @item
+Andrew Topp (@email{talmakion@@yahoo.com.au})
+
+Andrew did various things in CS: worked on shader expressions,
+SCF_CREATE_INSTANCE, picogui, some other stuff, @dots{}
+
+@item
+Andreas Busch (@email{nobita@@t-online.de})
+
+Andreas did various fixes to CS (python, documentation, threads, @dots{})
+
+@item
+Andrew Mann (@email{amann@@tccgi.com})
+
+Andrew did several fixes and optimizations in CS. Andrew also made partedit.
+
+@item
+Chris Matuszewski (@email{ganamide@@yahoo.com})
+
+Chris fixed some issues with intersecting triangles, fixed a few bugs
+in AWS, and a few other issues.
+
+@item
+James Thompson (@email{jamesthom@@users.sourceforge.net})
+
+James did various fixes to the python plugin in CS.
+
+@item
+Bjorn Hansen (@email{holomorph@@users.sourceforge.net})
+
+Bjorn did some event related fixes.
+
+@item
+Andrew Craig (@email{acraig@@paqrat.com})
+
+Andrew worked a bit on the sprcal3d mesh object, and also did lots of other
+smaller fixes.
+
+@item
+Luca Cappa (@email{groton@@gmx.net})
+
+Luca did some various smaller fixes (engine lights, AWS, @dots{}).
+
+@item
+Fritz Elfert (@email{fritz.elfert@@millenux.com})
+
+Fritz fixed some bugs in sprcal3d, map2cs, null renderer, VFS,
+csStringArray, @dots{}.
+
+@item
+Vincent Knecht (@email{vince@@iefr.ath.cx})
+
+Vincent worked on making RPM's for Crystal Space.
+
+@item
+Aren Blondahl (@email{{rean@@pathcom.ca})
+
+Aren applied some patches to map2cs.
+
+@item
 Keith Fulton (@email{keith@@paqrat.com})
 
 Keith added the ability for rain drops to do collision detection with
 the surrounding. He also worked on various other systems in CS like the
-sequence manager. In addition he also fixed various bugs.
+sequence manager. In addition he also fixed various bugs. Lately he also
+worked a lot on the sprcal3d mesh object plugin.
 
 @item
 Anders Reggestad (@email{anders@@pvv.ntnu.no})
@@ -180,7 +240,7 @@ Steven Geens (@email{old_belge@@hotmail.com})
 
 Steven made a MilkShape to CS sprite convertor which also supports
 skeletal animation. Steven also fixed a very bad bug in the collision
-detection system.
+detection system. Steven also worked on sprcal3d mesh object.
 
 @item
 Steve Israelson (@email{pfhorte@@rogers.wave.ca})
@@ -220,10 +280,10 @@ faster (but he forgot to rename it to @code{find_rgb_slow_somewhat_faster()}.
 Anders Stenberg
 
 Anders added the ODE based dynamics plugin to CS.
-He also wrote the effectsystem which is the first integration of more advanced
-OpenGL features into Crystal Space.
+He also wrote the original (and now obsolete) effectsystem which is the
+first integration of more advanced OpenGL features into Crystal Space.
 Anders was also one of the initiators and main contributors to the new advanced
-rendering systems.
+rendering system. He also worked on the now obsolete picogui plugin.
 
 
 @item
@@ -348,6 +408,14 @@ other parts of Crystal Space.
 @item
 He wrote a nice memory debugger.
 @end itemize
+
+@item
+John Harger (@email{john_h@@selectpath.com})
+
+John worked on the new renderer particle system. Also fixed various
+other issues in CS (mostly related to the new renderer) and worked on
+support for dynamic loading of the base Crystal Space libraries with MSVC.
+John also worked on the PS1 shader plugin.
 
 @item
 John Lilley (@email{jlilley@@empathy.com})
@@ -640,6 +708,8 @@ ones are: cs-config scripting facility, documentation annotation system,
 several bug fixes, enhancements and fixes to Map2CS, new null canvas for the
 null3d renderer, cygwin port, viewmesh enhancements, @sc{vfs} support for
 csFileDialog, @dots{}
+
+Matze also worked on the @sc{jam} build system.
 
 @item
 Serguei ``Snaar'' Narojnyi (@email{snaar@@idirect.ca})
@@ -975,12 +1045,20 @@ fixes to @sc{aws}, fixes to image loaders, @sc{vfs} enhancements, mouse pointer
 support in Windows canvases, @dots{}
 
 @item
+Reed Hedges (@email{reed@@zerohour.net})
+
+Reed did various things in Crystal Space: he worked on the VOS networking
+plugin together with Peter Amstutz. He also worked a lot on the MacOS/X
+port of Crystal Space. And he did various other smaller things.
+
+@item
 Peter Amstutz (@email{tetron@@student.umass.edu})
 
 Peter gave us a patch which speeds up loading of 3D sprites a lot.
 In addition it also speeds up @sc{cs} in general a little. Peter also worked
 together with Brendan Burns on the memory canvas. Also added two canvas
 related broadcast events. Peter also sent in a few smaller patches.
+Peter also created the VOS networking plugin.
 
 @item
 Peter Donald (@email{donaldp@@lion.cs.latrobe.edu.au})
@@ -1046,6 +1124,12 @@ Jonathan Hudson (@email{nathanoj@@realmail.2ndmail.com})
 Jonathan implemented visibility testing for particle systems.
 
 @item
+Daniel Fryer (@email{dfryer@@uvic.ca})
+
+Daniel found and fixed two bugs in CS: one memory leak and one
+wrong calculation of vertex count.
+
+@item
 Daniel Fannar Gudbjartsson (@email{dfg@@decode.is})
 
 Daniel helped work on the physics engine and collision detection.
@@ -1056,7 +1140,8 @@ Daniel Duhprey (@email{duhprey@@yahoo.com})
 Daniel made the csOBB class in Crystal Space (Oriented Bounding Box).
 He also made the terrbig plugin and helped develop the ODE dynamics library.
 He have also made a great deal of work on the new rendering system, and
-especially the shadowsystem.
+especially the shadowsystem. He also worked on the new terrain engine
+in CS (for new renderer).
 
 @item
 Desmond Fletcher (@email{desmond.fletcher@@usm.edu})
@@ -1094,6 +1179,14 @@ He also worked on visibility culling in the terrain engine and on the terrain
 texture generator. He added a test application for a new bump-mapping feature,
 and a test application for a procedural sky texture. He added the @samp{flare}
 halo and several minor patches. He also added the @samp{make install} target.
+
+@item
+Frank Richter (@email{resqu@@gmx.ch})
+
+Too much to mention. Frank has worked a great deal an almost every part
+of Crystal Space. He has done a lot on the new renderer architecture and
+he constantly manages to break^H^H^H^H^Himprove Crystal Space in various
+ways.
 
 @item
 Frank O'Connor (@email{frank@@oconnors.org})
@@ -1174,7 +1267,7 @@ Luca Pancallo (@email{lpancallo@@ptc.com})
 
 Luca extended the @sc{ase} importer in impexp and added a Crystal Space sprite
 exporter.  He also sent a patch for @file{mdl2spr} and made various fixes
-on @code{3ds2lev}.
+on @code{3ds2lev}. Luca also contributed the 3DSMax exporter script.
 
 @item
 Mike Bond (@email{mbond@@cox.rr.com})
@@ -1234,7 +1327,8 @@ motion manager and contributed a shuttle model for ``csdemo''.
 Mathew Sutcliffe (Oktal)
 
 Oktal added new functions to parse input (keyboard, mouse, joystick)
-into ascii form and vice versa.
+into ascii form and vice versa. Oktal also worked on the Perl scripting
+plugin. Also did various other smaller things.
 
 @item
 Sebastian Duell (@email{wastel7@@gmx.de})
@@ -1290,7 +1384,8 @@ also made a few updates to the map2cs tutorial.
 Neil Mosafi (@email{nmosafi@@totalise.co.uk})
 
 Neil contributed a custom cursor plugin which allows use of arbitary
-@samp{iImage}s as mouse cursors.
+@samp{iImage}s as mouse cursors. Neil also worked on the VOS networking
+plugin.
 @end itemize
 
 @noindent
