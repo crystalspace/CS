@@ -2521,6 +2521,7 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
 
 void csThing::InitializeDefault (bool clear)
 {
+  if (clear) Unprepare();
   Prepare ();
 
   int i;
@@ -2933,6 +2934,7 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   engine = e;	// We don't want a real ref here to avoid circular refs.
   csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   G3D = g;
+  if (!g) return false;
 
   lightpatch_pool = new csLightPatchPool ();
 
