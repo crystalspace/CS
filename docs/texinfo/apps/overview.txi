@@ -34,7 +34,7 @@ A @emph{TrueType} to Crystal Space font converter.
 @cindex @file{csvid}
 @cindex Applications, @file{csvid}
 @item csvid
-A test application for the OpenDivX video plugin.
+A test application for the Open DivX video plugin.
 
 @cindex @file{cswstest}
 @cindex Applications, @file{cswstest}
@@ -58,6 +58,11 @@ The Crystal Space canvas plugin test application.
 @cindex Applications, @file{gfxtest}
 @item gfxtest
 The Crystal Space image manipulator.
+
+@cindex @file{isotest}
+@cindex Applications, @file{isotest}
+@item isotest
+An application demonstrating the Crystal Space ISO engine.
 
 @cindex @file{map2cs}
 @cindex Applications, @file{map2cs}
