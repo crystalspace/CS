@@ -19,9 +19,41 @@
 #ifndef __PVSCALC_H__
 #define __PVSCALC_H__
 
-#include <crystalspace.h>
+#include "cssysdef.h"
+#include "csgeom/poly3d.h"
+#include "csgeom/polyclip.h"
+#include "csgeom/tcovbuf.h"
+#include "cstool/csapplicationframework.h"
+#include "csutil/csbaseeventh.h"
+#include "csutil/csstring.h"
+#include "csutil/hash.h"
+#include "csutil/strhash.h"
+#include "iengine/engine.h"
+#include "imap/loader.h"
+#include "imap/reader.h"
+#include "imap/services.h"
+#include "iutil/csinput.h"
+#include "iutil/virtclk.h"
+#include "ivideo/graph3d.h"
+
+#include "csgeom/chainhull2d.h"
+#include "csgeom/pmtools.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/sector.h"
+#include "iengine/viscull.h"
+#include "igeom/objmodel.h"
+#include "imesh/object.h"
+#include "iutil/cmdline.h"
+#include "ivaria/pvstree.h"
 
 class PVSCalc;
+struct iDocumentNode;
+struct iLoaderContext;
+struct iMeshWrapper;
+struct iPVSCuller;
+struct iSector;
+struct iStaticPVSTree;
 
 /// Dimension of the coverage buffer.
 #define DIM_COVBUFFER 512

@@ -1242,7 +1242,7 @@ void G2DTestSystemDriver::DrawTextTest ()
   const char *text = "Crystal Space rulez";
   int tw, th;
   font->GetDimensions (text, tw, th);
-  int cc = strlen (text);
+  size_t cc = strlen (text);
 
   // Test text drawing performance for 1/4 seconds
   int colors [4] = { red, green, blue, yellow };
@@ -1250,7 +1250,7 @@ void G2DTestSystemDriver::DrawTextTest ()
   sy += 10; sh -= 20 + th;
   csRandomGen rng (csGetTicks ());
   csTicks start_time = csGetTicks (), delta_time;
-  int char_count = 0;
+  size_t char_count = 0;
   do
   {
     for (i = 0; i < 2000; i++)
@@ -1293,7 +1293,7 @@ void G2DTestSystemDriver::DrawTextTest2 ()
   const char *text = "Crystal Space rulez";
   int tw,th;
   font->GetDimensions (text, tw, th);
-  int cc = strlen (text);
+  size_t cc = strlen (text);
 
   // Test text drawing performance for 1/4 seconds
   int colors [4] = { red, green, blue, yellow };
@@ -1301,7 +1301,7 @@ void G2DTestSystemDriver::DrawTextTest2 ()
   sy += 10; sh -= 20 + th;
   csRandomGen rng (csGetTicks ());
   csTicks start_time = csGetTicks (), delta_time;
-  int char_count = 0;
+  size_t char_count = 0;
   do
   {
 	int i;

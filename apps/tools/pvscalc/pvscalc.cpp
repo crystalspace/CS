@@ -297,9 +297,9 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
  */
 static void SlicePolygon (const csPoly3D& poly, csPoly2D& slice, int axis)
 {
-  size_t j;
-  slice.SetVertexCount (poly.GetVertexCount ());
-  for (j = 0 ; j < poly.GetVertexCount () ; j++)
+  size_t const vcount = poly.GetVertexCount();
+  slice.SetVertexCount (vcount);
+  for (size_t j = 0 ; j < vcount ; j++)
   {
     const csVector3& v = poly[j];
     switch (axis)
@@ -314,15 +314,19 @@ static void SlicePolygon (const csPoly3D& poly, csPoly2D& slice, int axis)
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 static bool csPoly2D_In (const csPoly2D& poly, const csVector2 &v)
 {
-  int i, i1;
-  i1 = poly.GetVertexCount () - 1;
+  size_t const n = poly.GetVertexCount();
+  if (n == 0)
+    return false;
+
+  size_t i, i1;
+  i1 = n - 1;
   bool left;
   if (csMath2::WhichSide2D (v, poly[i1], poly[0]) < 0)
     left = true;
   else
     left = false;
   i1 = 0;
-  for (i = 1 ; i < poly.GetVertexCount () ; i++)
+  for (i = 1 ; i < n ; i++)
   {
     if (csMath2::WhichSide2D (v, poly[i1], poly[i]) < 0)
     {
@@ -385,8 +389,8 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     // Now count the number of objects that are completely
     // on the left and the number of objects completely on the right
     // side. The remaining objects are cut by this position.
-    int left = 0;
-    int right = 0;
+    size_t left = 0;
+    size_t right = 0;
     for (j = 0 ; j < boxlist.Length () ; j++)
     {
       const csBox3& bbox = boxlist[j];
@@ -394,7 +398,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
       if (bbox.Max (axis) < a-.0001) left++;
       else if (bbox.Min (axis) > a+.0001) right++;
     }
-    int cut = boxlist.Length ()-left-right;
+    size_t cut = boxlist.Length ()-left-right;
     // If we have no object on the left or right then this is a bad
     // split which we should never take.
     float qual;
@@ -402,7 +406,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     {
       qual = -1.0;
     }
-    else if (left == (int)boxlist.Length () || right == (int)boxlist.Length ())
+    else if (left == boxlist.Length () || right == boxlist.Length ())
     {
       qual = -1.0;
     }
@@ -505,7 +509,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
 float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
 	const csBox3& node_bbox, const csArray<csPoly3DBox*>& polylist)
 {
-  size_t i, j;
+  size_t i;
 
   // Calculate minimum and maximum value along the axis.
   float mina = polylist[0]->GetBBox ().Min (axis);
@@ -535,16 +539,16 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     // Now count the number of objects that are completely
     // on the left and the number of objects completely on the right
     // side. The remaining objects are cut by this position.
-    int left = 0;
-    int right = 0;
-    for (j = 0 ; j < polylist.Length () ; j++)
+    size_t left = 0;
+    size_t right = 0;
+    for (size_t j = 0 ; j < polylist.Length () ; j++)
     {
       const csBox3& bbox = polylist[j]->GetBBox ();
       // The .0001 is for safety.
       if (bbox.Max (axis) < a-.0001) left++;
       else if (bbox.Min (axis) > a+.0001) right++;
     }
-    int cut = polylist.Length ()-left-right;
+    size_t cut = polylist.Length ()-left-right;
     // If we have no object on the left or right then this is a bad
     // split which we should never take.
     float qual;
@@ -870,7 +874,7 @@ void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
     // Increase stats for static objects.
     staticcount++;
     staticbox += mbox;
-    staticpcount += polybase->GetPolygonCount ();
+    staticpcount += (int)polybase->GetPolygonCount ();
     csReversibleTransform trans = mesh->GetMovable ()->GetFullTransform ();
     csVector3* vertices = polybase->GetVertices ();
     csMeshedPolygon* mp = polybase->GetPolygons ();
@@ -1178,7 +1182,7 @@ bool PVSCalcSector::CastShadow (const csPoly3D& polygon)
   // that they match coverage buffer coordinates.
   csVector2* pi_verts = poly.GetVertices ();
   DB(("    -> covbuf poly:"));
-  int i;
+  size_t i;
   for (i = 0 ; i < poly.GetVertexCount () ; i++)
   {
     pi_verts[i].x = (pi_verts[i].x-plane.offset.x) * plane.scale.x;
@@ -1221,7 +1225,7 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
 
   // Now we continue calculating projections for the remaining 7 box
   // corners and we intersect those with poly_intersect.
-  int i;
+  size_t i;
   for (i = 1 ; i < 8 ; i++)
   {
     if (!polygon.ProjectAxisPlane (source.GetCorner (i),
@@ -1616,9 +1620,9 @@ void PVSCalcSector::Calculate (bool do_quick)
   int allcount = 0, staticcount = 0;
   int allpcount = 0, staticpcount = 0;
   iMeshList* ml = sector->GetMeshes ();
-  for (i = 0 ; i < (size_t)(ml->GetCount ()) ; i++)
+  for (i = 0 ; i < (size_t)ml->GetCount () ; i++)
   {
-    iMeshWrapper* m = ml->Get (i);
+    iMeshWrapper* m = ml->Get ((int)i);
     CollectGeometry (m, allbox, staticbox,
 	allcount, staticcount,
 	allpcount, staticpcount);
@@ -1881,7 +1885,7 @@ bool PVSCalc::LoadMap ()
   const char* mapfile = cmdline->GetName (0);
   if (!mapfile)
   {
-    ReportError ("Required parameters: <mapdir/zip> [-quick] [ <sectorname> ]!");
+    ReportError("Required parameters: <mapdir/zip> [-quick] [<sectorname>]!");
     return false;
   }
 
