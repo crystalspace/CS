@@ -19,6 +19,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
@@ -5245,7 +5246,7 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
 
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
-#if 1
+#if 0
   // The new effects support is atm not perfect. it supports not everything
   // correctly yet (like, transparency in mixmode) and thus
   // is faster, but looks worse than OldDrawTriangleMesh().
@@ -5262,8 +5263,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   }
 
   iMaterial* material = ((csMaterialHandle*)(mesh.mat_handle))->GetMaterial();
-  iEffectTechnique* technique = effectserver->SelectAppropriateTechnique(
-  	material->GetEffect() );
+
+  iEffectDefinition* effect = material->GetEffect();
+  iEffectTechnique* technique = effectserver->SelectAppropriateTechnique( effect );
+
   if( !technique )
   {
     technique = GetStockTechnique( mesh );
@@ -5609,48 +5612,24 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       	GL_IDENTITY_NV );
       csEffectVector4 vec;
       //set all constants
-      vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_1);
-      glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 4, vec.x, vec.y,
-      	vec.z, vec.w );
-
-      vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_2);
-      glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 5, vec.x, vec.y,
-      	vec.z, vec.w );
-
-      vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_3);
-      glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 6, vec.x, vec.y,
-      	vec.z, vec.w );
-
-      vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_4);
-      glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 7, vec.x, vec.y,
-      	vec.z, vec.w );
-
-      vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_5);
-      glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 8, vec.x, vec.y,
-      	vec.z, vec.w );
-
-      vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_6);
-      glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 9, vec.x, vec.y,
-        vec.z, vec.w );
-
-      vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_7);
-      glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 10, vec.x, vec.y,
-      	vec.z, vec.w );
-
-      vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_8);
-      glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 11, vec.x, vec.y,
-      	vec.z, vec.w );
-
-      vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_9);
-      glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 12, vec.x, vec.y,
-      	vec.z, vec.w );
-
-      vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_10);
-      glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 13, vec.x, vec.y,
-      	vec.z, vec.w );
-
+      for(int i = 0; i<pass_data->vertex_constants.Length(); i++)
+      {
+        csOpenGlVPConstant* c = (csOpenGlVPConstant*)pass_data->vertex_constants[i];
+        if( c->efvariableType == CS_EFVARIABLETYPE_FLOAT )
+        {
+          //set a float
+          float var = effect->GetVariableFloat(c->variableID);
+          glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, c->constantNumber, var, var, var, var);
+        }
+        else if ( c->efvariableType == CS_EFVARIABLETYPE_VECTOR4 )
+        { 
+          //set a vec4
+          csEffectVector4 vec = effect->GetVariableVector4(c->variableID);
+          glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, c->constantNumber, vec.x, vec.y, vec.z, vec.w );
+        }
+      }
       glBindProgramNV( GL_VERTEX_PROGRAM_NV, pass_data->vertex_program );
-      glEnable( GL_VERTEX_PROGRAM_NV);
+      statecache->EnableState( GL_VERTEX_PROGRAM_NV);
     }
 
     if( pass_data->doblending )
@@ -5684,6 +5663,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
       csRef<csOpenGlEffectLayerData> layer_data = SCF_QUERY_INTERFACE(
       	layer->GetRendererData(), csOpenGlEffectLayerData);
+
 
       //int colorsource[4] = { GL_PREVIOUS_ARB, GL_TEXTURE, -1, -1 };
       //int colormod[4] = { GL_SRC_COLOR, GL_SRC_COLOR,
@@ -5782,7 +5762,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
-    if(pass_data->vertex_program > 0) glDisable(GL_VERTEX_PROGRAM_NV);
+
+	if(pass_data->vertex_program > 0)
+	  statecache->DisableState (GL_VERTEX_PROGRAM_NV);
+
   }
   if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))
   {
@@ -7174,7 +7157,7 @@ bool csGraphics3DOGLCommon::IsLightmapOK (iPolygonTexture* poly_texture)
 
 ///@@@EXPERIMENTAL!!
 ///CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Mårten Svanfeldt
-bool csGraphics3DOGLCommon::Validate (iEffectTechnique* technique)
+bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechnique* technique )
 {
   int p, l;
   for( p=0; p<technique->GetPassCount(); p++ )
@@ -7212,97 +7195,103 @@ bool csGraphics3DOGLCommon::Validate (iEffectTechnique* technique)
       {
         pass_statestring = pass->GetStateString( pass_state );
         if( pass_statestring == csEffectStrings::destination_color )
-	  pass_data->sblend = GL_DST_COLOR;
-	else if(pass_statestring == csEffectStrings::inverted_destination_color)
-	  pass_data->sblend = GL_ONE_MINUS_DST_COLOR;
-	else if( pass_statestring == csEffectStrings::source_alpha )
-	  pass_data->sblend = GL_SRC_ALPHA;
-	else if( pass_statestring == csEffectStrings::inverted_source_alpha )
-	  pass_data->sblend = GL_ONE_MINUS_SRC_ALPHA;
-	else if( pass_statestring == csEffectStrings::destination_alpha )
-	  pass_data->sblend = GL_DST_ALPHA;
-	else if(pass_statestring == csEffectStrings::inverted_destination_alpha)
-	  pass_data->sblend = GL_ONE_MINUS_DST_ALPHA;
-	else if( pass_statestring == csEffectStrings::saturated_source_alpha )
-	  pass_data->sblend = GL_SRC_ALPHA_SATURATE;
-	else if( pass_statestring == csEffectStrings::one )
-	  pass_data->sblend = GL_ONE;
-	else if( pass_statestring == csEffectStrings::zero )
-	  pass_data->sblend = GL_ZERO;
-	else return false;
+	      pass_data->sblend = GL_DST_COLOR;
+	    else if(pass_statestring == csEffectStrings::inverted_destination_color)
+  	      pass_data->sblend = GL_ONE_MINUS_DST_COLOR;
+	    else if( pass_statestring == csEffectStrings::source_alpha )
+	      pass_data->sblend = GL_SRC_ALPHA;
+	    else if( pass_statestring == csEffectStrings::inverted_source_alpha )
+	      pass_data->sblend = GL_ONE_MINUS_SRC_ALPHA;
+	    else if( pass_statestring == csEffectStrings::destination_alpha )
+	      pass_data->sblend = GL_DST_ALPHA;
+	    else if(pass_statestring == csEffectStrings::inverted_destination_alpha)
+	      pass_data->sblend = GL_ONE_MINUS_DST_ALPHA;
+	    else if( pass_statestring == csEffectStrings::saturated_source_alpha )
+	      pass_data->sblend = GL_SRC_ALPHA_SATURATE;
+	    else if( pass_statestring == csEffectStrings::one )
+	      pass_data->sblend = GL_ONE;
+	    else if( pass_statestring == csEffectStrings::zero )
+	      pass_data->sblend = GL_ZERO;
+	    else return false;
       }
       else if( pass_state == csEffectStrings::destination_blend_mode )
       {
         pass_statestring = pass->GetStateString( pass_state );
-	if( pass_statestring == csEffectStrings::source_color )
-	  pass_data->dblend = GL_SRC_COLOR;
-	else if( pass_statestring == csEffectStrings::inverted_source_color )
-	  pass_data->dblend = GL_ONE_MINUS_SRC_COLOR;
-	else if( pass_statestring == csEffectStrings::source_alpha )
-	  pass_data->dblend = GL_SRC_ALPHA;
-	else if( pass_statestring == csEffectStrings::inverted_source_alpha )
-	  pass_data->dblend = GL_ONE_MINUS_SRC_ALPHA;
-	else if( pass_statestring == csEffectStrings::destination_alpha )
-	  pass_data->dblend = GL_DST_ALPHA;
-	else if(pass_statestring == csEffectStrings::inverted_destination_alpha)
-	  pass_data->dblend = GL_ONE_MINUS_DST_ALPHA;
-	else if( pass_statestring == csEffectStrings::one )
-	  pass_data->dblend = GL_ONE;
-	else if( pass_statestring == csEffectStrings::zero )
-	  pass_data->dblend = GL_ZERO;
-	else return false;
-	break;
+	    if( pass_statestring == csEffectStrings::source_color )
+	      pass_data->dblend = GL_SRC_COLOR;
+	    else if( pass_statestring == csEffectStrings::inverted_source_color )
+	      pass_data->dblend = GL_ONE_MINUS_SRC_COLOR;
+	    else if( pass_statestring == csEffectStrings::source_alpha )
+	      pass_data->dblend = GL_SRC_ALPHA;
+	    else if( pass_statestring == csEffectStrings::inverted_source_alpha )
+	      pass_data->dblend = GL_ONE_MINUS_SRC_ALPHA;
+	    else if( pass_statestring == csEffectStrings::destination_alpha )
+	      pass_data->dblend = GL_DST_ALPHA;
+	    else if(pass_statestring == csEffectStrings::inverted_destination_alpha)
+	      pass_data->dblend = GL_ONE_MINUS_DST_ALPHA;
+	    else if( pass_statestring == csEffectStrings::one )
+	      pass_data->dblend = GL_ONE;
+	    else if( pass_statestring == csEffectStrings::zero )
+	      pass_data->dblend = GL_ZERO;
+	    else return false;
+    	break;
       }
       else if( (pass_state == csEffectStrings::vertex_color_source) )
       {
         pass_statestring = pass->GetStateString( pass_state );
-	if(pass_statestring == csEffectStrings::fog)
-	  pass_data->vcsource = ED_VC_SOURCE_FOG;
-	else if(pass_statestring == csEffectStrings::mesh)
-	  pass_data->vcsource = ED_VC_SOURCE_MESH;
-	else return false;
+	    if(pass_statestring == csEffectStrings::fog)
+	      pass_data->vcsource = ED_VC_SOURCE_FOG;
+	    else if(pass_statestring == csEffectStrings::mesh)
+	      pass_data->vcsource = ED_VC_SOURCE_MESH;
+	    else return false;
       }
       else if ( pass_state == csEffectStrings::nvvertex_program_gl )
       {
 	if( (!NV_vertex_program) || !(glBindProgramNV && glGenProgramsNV
 		&& glDeleteProgramsNV && glLoadProgramNV))
           return false;
-	csStringID vp_s = pass->GetStateString(pass_state);
-	unsigned char* vp;
-	if(vp_s != csInvalidStringID)
-	{
-	  //get a program
-	  vp = (unsigned char*)effectserver->RequestString(vp_s);
-	}
-	else
-	{
-	  vp = (unsigned char*)pass->GetStateOpaque(pass_state);
-	}
-	if (!vp) return false;
-	//create and load vertex program
-	glGenProgramsNV(1, &pass_data->vertex_program);
-	glLoadProgramNV(GL_VERTEX_PROGRAM_NV, pass_data->vertex_program,
-		strlen((const char*)vp), vp);
-	if(glGetError() != GL_NO_ERROR)
-	{
-	  return false;
-	}
-      }
-      else if ( (pass_state == csEffectStrings::nvvertex_const_1) ||
-      		(pass_state == csEffectStrings::nvvertex_const_2) ||
-		(pass_state == csEffectStrings::nvvertex_const_3) ||
-		(pass_state == csEffectStrings::nvvertex_const_4) ||
-		(pass_state == csEffectStrings::nvvertex_const_5) ||
-		(pass_state == csEffectStrings::nvvertex_const_6) ||
-		(pass_state == csEffectStrings::nvvertex_const_7) ||
-		(pass_state == csEffectStrings::nvvertex_const_8) ||
-		(pass_state == csEffectStrings::nvvertex_const_9) ||
-		(pass_state == csEffectStrings::nvvertex_const_10))
-      {
-	if(!NV_vertex_program) return false;
+	    csStringID vp_s = pass->GetStateString(pass_state);
+	    unsigned char* vp;
+	    if(vp_s != csInvalidStringID)
+	    {
+	      //get a program
+	      vp = (unsigned char*)effectserver->RequestString(vp_s);
+	    }
+	    else
+	    {
+	      vp = (unsigned char*)pass->GetStateOpaque(pass_state);
+	    }
+	    if (!vp) return false;
+	    //create and load vertex program
+	    glGenProgramsNV(1, &pass_data->vertex_program);
+	    glLoadProgramNV(GL_VERTEX_PROGRAM_NV, pass_data->vertex_program,
+	    strlen((const char*)vp), vp);
+	    if(glGetError() != GL_NO_ERROR)
+	    {
+	      return false;
+	    }
       }
       else
-	return false;
+      {
+        if(_strnicmp(effectserver->RequestString(pass_state), "vertex program constant", 23) == 0)
+        {
+          //this is a vertexconstant
+          char* constname = (char*) effectserver->RequestString(pass_state);
+          if ( strlen(constname) < 24) return false; //must contain which constant
+          constname += 24;
+          int constnum = atoi(constname);
+          if ( (constnum < 4) ||(constnum > 96) ) return false;
+          
+          int varnum = effect->GetVariableID(pass->GetStateString(pass_state), false);
+          char vartype = effect->GetVariableType(varnum);
+          
+          if(vartype == 0) return false;
+
+          pass_data->vertex_constants.Push(new csOpenGlVPConstant(constnum,  varnum, vartype));
+
+        } else
+	      return false;
+      }
       pass_state = pass->GetNextState();
     }
     if( ARB_multitexture &&
