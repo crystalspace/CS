@@ -1013,12 +1013,12 @@ void CaptureScreen (void)
 
   if (pPalette)
   {
-	  for (i=0; i<256; i++)
-	  {
-		  *pal++ = pPalette[i].red;
-		  *pal++ = pPalette[i].green;
-		  *pal++ = pPalette[i].blue;
-	  }
+    for (i=0; i<256; i++)
+    {
+      *pal++ = pPalette[i].red;
+      *pal++ = pPalette[i].green;
+      *pal++ = pPalette[i].blue;
+    }
   }
 
   extern void WritePCX (char *name, unsigned char *data, UByte *pal,
@@ -1123,17 +1123,24 @@ void start_demo ()
   Gfx3D->GetTextureManager (&txtmgr);
 //Gfx2D->DoubleBuffer (false);
   demo_info->world->Initialize (GetISystemFromSystem (System), System->piGI, config);
+
+  // Initialize the texture manager
+  txtmgr->Initialize ();
+
+  // Allocate a uniformly distributed in R,G,B space palette for console
+  int r,g,b;
+  for (r = 0; r < 8; r++)
+    for (g = 0; g < 8; g++)
+      for (b = 0; b < 4; b++)
+        txtmgr->ReserveColor (r * 32, g * 32, b * 64);
+
   txtmgr->Prepare ();
+  txtmgr->AllocPalette ();
+
   ((SimpleConsole *)System->Console)->SetupColors (txtmgr);
   ((SimpleConsole *)System->Console)->SetMaxLines (1000);       // Some arbitrary high value.
   ((SimpleConsole *)System->Console)->SetTransparent (0);
-  txtmgr->AllocPalette ();
 
-  if (Gfx2D->BeginDraw() == S_OK)
-  {
-    Gfx2D->Print (NULL);
-    Gfx2D->FinishDraw ();
-  }
   System->DemoReady = true;
 }
 

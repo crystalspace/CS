@@ -865,7 +865,7 @@ static bool CommandHandler (char *cmd, char *arg)
 char WalkTest::world_file[100];
 bool WalkTest::move_3d = false;
 
-WalkTest::WalkTest () : pos (0, 0, 0), velocity (0, 0, 0), SysSystemDriver ()
+WalkTest::WalkTest () : SysSystemDriver (), pos (0, 0, 0), velocity (0, 0, 0)
 {
   Command::ExtraHandler = CommandHandler;
   auto_script = NULL;
