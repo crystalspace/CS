@@ -3,7 +3,7 @@
 @subsection Creating an External Application using KDevelop
 
 @emph{Written by Andreas Busch, @email{nobita@@t-online.de}.  Last updated
-1 November 2002.}
+1 April 2004.}
 
 This @sc{howto} is a step by step guide for creating a Crystal Space
 application using KDevelop as your integrated development environment outside
@@ -68,14 +68,20 @@ Options}.  @emph{Add} a new @emph{Configuration} and call it
 
 @subsubheading KDevelop External Step 5
 
-Copy the @file{cs-config} script which you made with @samp{make csconfig}
-inside your Crystal Space tree to the root directory of your new project, and
-make sure it is executable.  Be sure to include the backticks in the field
-@emph{@sc{cflags}} and @emph{@sc{cxxflags}} for the @file{cs-config} script to
-be automatically executed in the @emph{Flags and Warnings} tab, otherwise you
-will get an error message that your C-compiler cannot create executables.  The
-@emph{@sc{cflags}} field should contain @samp{`./cs-config --cflags`}, and the
-@emph{@sc{cxxflags}} field should contain @samp{`./cs-config --cxxflags`}.
+When you installed Crystal Space, the script @file{cs-config} should have been
+placed in the @file{bin/} installation directory, and this directory should be
+mentioned by your @samp{PATH} environment variable,so that you can invoke
+@file{cs-config} as you would any other program simply by typing its name.  If
+you did not install Crystal Space, then you may want to copy @file{cs-config}
+into the top directory of your new project, or alter your @samp{PATH} variable
+so that it points at the directory containing @file{cs-config} (the Crystal
+Space build directory, for instance).  In the examples below which invoke
+@file{cs-config}, be sure to include the backticks in the fields
+@emph{@sc{cflags}} and @emph{@sc{cxxflags}} in the @emph{Flags and Warnings}
+tab for the @file{cs-config} script to be executed properly, otherwise you will
+get an error message that your C-compiler cannot create executables.  The
+@emph{@sc{cflags}} field should contain @samp{`./cs-config --cflags`}, and
+@emph{@sc{cxxflags}} should contain @samp{`./cs-config --cxxflags`}.
 @ifnotinfo
 
 @picturesss{tutorial,howto,kdevproj,snap4}
@@ -84,10 +90,10 @@ will get an error message that your C-compiler cannot create executables.  The
 @subsubheading KDevelop External Step 6
 
 The same applies to the field @emph{Additional flags} in the @emph{Linker
-Flags} tab.  After @samp{cs-config --libs} you have to add the Crystal Space
-standard libraries @file{cstool}, @file{gsgfx}, @file{csgeom}, @file{csutil},
-so that the entire content of the @emph{Additional flags} field should be
-@samp{./cs-config --libs cstool csgfx csgeom csutil}.
+Flags} tab.  After @samp{`cs-config --libs`} you have to add the Crystal Space
+standard libraries @file{cstool}, @file{gsgfx}, @file{csgeom}, @file{csutil};
+thus, the entire content of the @emph{Additional flags} field should be
+@samp{`./cs-config --libs cstool csgfx csgeom csutil`}.
 @ifnotinfo
 
 @picturesss{tutorial,howto,kdevproj,snap5}
@@ -96,9 +102,7 @@ so that the entire content of the @emph{Additional flags} field should be
 @subsubheading KDevelop External Step 7
 
 Now over to the @emph{Linker Options}.  Include your additional libraries here
-as needed.  Be sure to link @samp{-libpthread} here as I experienced error-free
-compiled applications with mysterious segmentation faults on execution without
-this. (Should be fixed and automatically included  with newer cs-config.)
+as needed.  Many platforms will require @samp{-lpthread} in this field.
 @ifnotinfo
 
 @picturesss{tutorial,howto,kdevproj,snap6}
@@ -107,9 +111,9 @@ this. (Should be fixed and automatically included  with newer cs-config.)
 @subsubheading KDevelop External Step 8
 
 In the @emph{Make Options} dialog you need to set the include directory for
-Crystal Space.  Don't forget the backticks for automatic execution on make.
-The @emph{additional options} field should contain @samp{-I`./cs-config
---includedir`}.
+Crystal Space.  Don't forget the backticks for automatic execution upon build.
+The @emph{additional options} field should contain
+@code{-I`./cs-config --includedir`}.
 @ifnotinfo
 
 @picturesss{tutorial,howto,kdevproj,snap7}
@@ -138,13 +142,13 @@ You may want to uncheck the @code{insert templates} box to keep the files
 unmodified.
 
 These files can be found within the Crystal Space source code tree at the
-following location.
+following location:
 
 @noindent
 @file{CS/apps/tutorial/simple1}
 
 Alternately, you can type in your own Crystal Space program, but for the sake
-of this tutorial, using the existing @file{simple1} application is simpler.
+of this tutorial, using the existing @file{simple1} application is easier.
 
 The resulting KDevelop project session file @file{kdevelopcs.kdevses} will look
 like this.  (You do not need to edit this file by hand; it is shown here for
@@ -159,11 +163,11 @@ illustrative purposes only.)
    <Architecture>i386</Architecture>
    <Platform>linux</Platform>
    <VPATHSubdir>/compile/kdevelopcs</VPATHSubdir>
-   <CFLAGS>'./cs-config --cflags'</CFLAGS>
+   <CFLAGS>`./cs-config --cflags`</CFLAGS>
    <CPPFLAGS></CPPFLAGS>
    <CXXFLAGS>-O0 -g3 -Wall</CXXFLAGS>
-   <AdditCXXFLAGS>'./cs-config --cxxflags'</AdditCXXFLAGS>
-   <LDFLAGS>'./cs-config --libs'</LDFLAGS>
+   <AdditCXXFLAGS>`./cs-config --cxxflags`</AdditCXXFLAGS>
+   <LDFLAGS>`./cs-config --libs`</LDFLAGS>
    <ConfigureArgs>--build=i386-linux --host=i386-linux \
     --target=i386-linux</ConfigureArgs>
   </CrystalSpace>

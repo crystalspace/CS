@@ -34,6 +34,9 @@ chronological order.
 	- Jorrit added a rule to gldrivers.xml to disable VBO for the 3.2.8
 	  ATI drivers on linux. I haven't yet tested the more recent ATI
 	  drivers so I don't know if the rule has to be applied there too.
+	- Eric Sunshine updated outdated information in the KDevelop HOWTO and
+	  fixed some incorrect examples.  Also updated the snap5 screenshot so
+	  that it no longer mentions the obsolete cssys library.
 31-Mar-2004
 	- Jorrit fixed a bug with iSector->HitBeamPortals(). It would not
 	  be able to register hits on meshes that don't return a polygon
