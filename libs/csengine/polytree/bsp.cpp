@@ -117,6 +117,14 @@ void csBspTree::Build (csPolygonInt** polygons, int num)
   delete [] new_polygons;
 }
 
+#define BSPDB 0
+
+#if BSPDB
+#  define DB(msg) CsPrintf##msg;
+#else
+#  define DB(msg)
+#endif
+
 int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
 {
   int i, j, poly_idx;
@@ -194,6 +202,8 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
         ii = rand () % num;
       else
         ii = i;
+      const csPlane3& poly_plane = *polygons[ii]->GetPolyPlane ();
+DB((MSG_DEBUG_0, "SP: pl=%.3f,%.3f,%.3f,%.3f\n", poly_plane.A(),poly_plane.B(),poly_plane.C(),poly_plane.D()));
       int front = 0, back = 0;
       int splits = 0;
       for (j = 0 ; j < n ; j++)
@@ -202,7 +212,17 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
           jj = rand () % num;
 	else
 	  jj = j;
-        int c = polygons[jj]->Classify (*polygons [ii]->GetPolyPlane ());
+        int c = polygons[jj]->Classify (poly_plane);
+#if BSPDB
+{
+int kk;
+csPolygon3D* p = (csPolygon3D*)polygons[jj];
+for (kk = 0 ; kk < p->GetNumVertices (); kk++)
+CsPrintf (MSG_DEBUG_0, "    %d: %.3f,%.3f,%.3f\n", kk, p->Vwor(kk).x,
+p->Vwor(kk).y, p->Vwor(kk).z);
+}
+#endif
+DB((MSG_DEBUG_0, "    RC %d\n", c));
 	if (c == POL_FRONT) front++;
 	else if (c == POL_BACK) back++;
 	else if (c == POL_SPLIT_NEEDED) splits++;
@@ -226,22 +246,14 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
   return poly_idx;
 }
 
-#define BSPDB 0
-
-#if BSPDB
-#  define DB(msg) CsPrintf##msg;
-#else
-#  define DB(msg)
-#endif
-
 void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
 	int num)
 {
-DB((MSG_DEBUG_0, "csBspTree::Build (num=%d)\n", num))
+DB((MSG_DEBUG_0, "Build (num=%d)\n", num))
   int i;
   if (!Covers (polygons, num))
   {
-DB((MSG_DEBUG_0, "  polygons_on_splitter=false\n"))
+DB((MSG_DEBUG_0, "  !Covers\n"))
     // We have a convex set.
     node->polygons_on_splitter = false;
     for (i = 0 ; i < num ; i++)
@@ -251,7 +263,7 @@ DB((MSG_DEBUG_0, "  polygons_on_splitter=false\n"))
 
   csPolygonInt* split_poly = polygons[SelectSplitter (polygons, num)];
   node->splitter = *(split_poly->GetPolyPlane ());
-DB((MSG_DEBUG_0, "  splitter plane=%f,%f,%f,%f\n", node->splitter.A (),
+DB((MSG_DEBUG_0, "  sp plane=%.3f,%.3f,%.3f,%.3f\n", node->splitter.A (),
 	node->splitter.B (), node->splitter.C (), node->splitter.D ()))
 
   // Now we split the node according to the plane of that polygon.
@@ -262,13 +274,13 @@ DB((MSG_DEBUG_0, "  splitter plane=%f,%f,%f,%f\n", node->splitter.A (),
   for (i = 0 ; i < num ; i++)
   {
     int c = polygons[i]->Classify (node->splitter);
-DB((MSG_DEBUG_0, "  classify polygon %d -> %d\n", i, c))
+DB((MSG_DEBUG_0, "  cl pol %d -> %d\n", i, c))
 #if BSPDB
 {
 int j;
 csPolygon3D* p = (csPolygon3D*)polygons[i];
 for (j = 0 ; j < p->GetNumVertices () ; j++)
-CsPrintf (MSG_DEBUG_0, "    %d: %f,%f,%f\n", j, p->Vwor (j).x,
+CsPrintf (MSG_DEBUG_0, "    %d: %.3f,%.3f,%.3f\n", j, p->Vwor (j).x,
 p->Vwor (j).y, p->Vwor (j).z);
 }
 #endif
