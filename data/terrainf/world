@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<world>
+  <plugins>
+    <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
+    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+    <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
+    <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain</plugin>
+    <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
+    <plugin name="ballFact">crystalspace.mesh.loader.factory.ball</plugin>
+    <plugin name="ball">crystalspace.mesh.loader.ball</plugin>
+  </plugins>
+
+  <textures>
+    <texture name="andrew_marble4.jpg">
+      <file>/lib/stdtex/andrew_marble4.jpg</file>
+    </texture>
+    <texture name="blobbyDOT3.png">
+      <file>/lib/stdtex/blobbyDOT3.png</file>
+    </texture>
+    <texture name="stone4.gif">
+      <file>/lib/std/stone4.gif</file>
+    </texture>
+    <texture name="stone2DOT3.png">
+      <file>/lev/terrain/stone2DOT3.png</file>
+    </texture>
+    <texture name="grass.png">
+      <file>/lev/terrain/grass.png</file>
+    </texture>
+    <texture name="grassDOT3.png">
+      <file>/lev/terrain/grassDOT3.png</file>
+    </texture>
+    <texture name="materialmap_base.png">
+      <file>/lev/terrain/materialmap_base.png</file>
+    </texture>
+  </textures>
+
+  <shaders>
+    <shader><file>/shader/terrain_fixed_base.xml</file></shader>
+    <shader><file>/shader/terrain_fixed_splatting.xml</file></shader>
+  </shaders>
+
+  <materials>
+    <material name="ScatterSky">
+      <color red="0" green="0" blue="0" /> 
+    </material>
+    <material name="Base">
+      <texture>materialmap_base.png</texture>
+      <shader type="ambient">terrain_fixed_base</shader>
+    </material>
+    <material name="Marble">
+      <texture>andrew_marble4.jpg</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+    <material name="Stone">
+      <texture>stone4.gif</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+    <material name="Grass">
+      <texture>grass.png</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+  </materials>
+
+  <renderpriorities>
+    <priority name="sky">
+      <level>1</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="mirror">
+      <level>2</level>
+      <sort>FRONT2BACK</sort>
+    </priority>
+    <priority name="wall">
+      <level>3</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="object">
+      <level>4</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="alpha">
+      <level>5</level>
+      <sort>BACK2FRONT</sort>
+    </priority>
+  </renderpriorities>
+
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <params>
+      <name>myLoop</name>
+      <steps>
+        <!-- ambient lighting -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>ambient</shadertype>
+          <zoffset>yes</zoffset>
+	  <portaltraversal/>
+          <zuse />
+        </step>
+        <!-- draws terrain splatting -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>terrain splat</shadertype>
+          <zoffset>no</zoffset>
+          <zuse />
+        </step>
+        <!-- draws geometry -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>OR compatibility</shadertype>
+          <zoffset>no</zoffset>
+          <zuse />
+        </step>
+      </steps>
+    </params>
+  </addon>
+    
+  <settings>
+    <clearzbuf>yes</clearzbuf>
+    <lightmapcellsize>16</lightmapcellsize>
+    <renderloop>myLoop</renderloop>
+  </settings>
+
+  <start>
+    <sector>room</sector>
+    <position x="0" y="30" z="0" />
+    <forward x="0" y="0" z="1" />
+    <up x="0" y="1" z="0" />
+  </start>
+
+  <meshfact name="skydome">
+    <plugin>ballFact</plugin>
+    <params />
+  </meshfact>
+
+  <meshfact name="TerrainFact">
+    <plugin>terrainFact</plugin>
+    <params>
+      <plugin>crystalspace.mesh.object.terrain.chunklod</plugin>
+      <scale x="1" y="30" z="1" />
+      <heightmap image="/lev/terrain/heightmap_257x257.png"/>
+      <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
+    </params>
+  </meshfact>
+
+  <sector name="room">
+     <light name="sun">
+       <center x="0" y="86030" z="0" />
+       <color red="0.85903" green="0.80995" blue="0.70420" />
+       <radius>1000000</radius>
+     </light>
+
+    <meshobj name="sky">
+      <plugin>ball</plugin>
+      <params>
+        <factory>skydome</factory>
+        <radius x="500000" y="500000" z="500000" />
+        <numrim>8</numrim>
+        <reversed>yes</reversed>
+        <material>ScatterSky</material>
+        <color red="0" green="0" blue="0" />
+      </params>
+      <zfill />
+      <priority>sky</priority>
+      <camera />
+      <polymesh> <colldet/> </polymesh>
+    </meshobj>
+
+    <meshobj name="Terrain">
+      <plugin>terrain</plugin>
+      <params>
+        <factory>TerrainFact</factory>
+        <material>Base</material>
+	<materialpalette>
+	  <material>Grass</material>
+	  <material>Marble</material>
+	  <material>Stone</material>
+	</materialpalette>
+	<loddistance>200</loddistance>
+	<errortolerance>1</errortolerance>
+	<materialmap image="/lev/terrain/materialmap.png" />
+      </params>
+      <move> 
+        <v x="0" y="0" z="0" /> 
+      </move>
+    </meshobj>
+
+  </sector>
+</world>
