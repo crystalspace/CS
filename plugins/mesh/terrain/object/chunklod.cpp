@@ -927,6 +927,8 @@ csChunkLodTerrainObject::csChunkLodTerrainObject (csChunkLodTerrainFactory* p)
 
 csChunkLodTerrainObject::~csChunkLodTerrainObject ()
 {
+  delete[] polymesh_vertices;
+  delete[] polymesh_triangles;
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowCaster)
@@ -1111,8 +1113,9 @@ bool csChunkLodTerrainObject::SetMaterialMap (const csArray<char>& data,
 	"crystalspace.shared.stringset", iStringSet);
   csRef<iTextureManager> mgr = pFactory->r3d->GetTextureManager ();
 
-  csRef<csShaderVariable> lod_var = 
-    new csShaderVariable (strings->Request ("texture lod distance"));
+  csRef<csShaderVariable> lod_var;
+  lod_var.AttachNew (new csShaderVariable (
+    strings->Request ("texture lod distance")));
   lod_var->SetType (csShaderVariable::VECTOR3);
   lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
   matwrap->GetMaterial()->AddVariable (lod_var); 

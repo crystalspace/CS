@@ -181,6 +181,9 @@ csBugPlug::~csBugPlug ()
   delete[] captureFormat;
   delete[] spider_args;
 
+  delete spider;
+  delete shadow;
+
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiBugPlug);
   SCF_DESTRUCT_IBASE ();
 }

@@ -264,6 +264,9 @@ csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
   delete tri_verts;
   delete[] cachename;
   ClearLODListeners ();
+#ifdef CS_USE_NEW_RENDERER
+  delete anon_buffers;
+#endif
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);

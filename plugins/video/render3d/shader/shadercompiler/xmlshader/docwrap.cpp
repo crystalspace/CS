@@ -35,22 +35,24 @@ SCF_IMPLEMENT_IBASE_END
 
 CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
 
-csWrappedDocumentNode::csWrappedDocumentNode (iObjectRegistry* objreg,
+csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared,
 					      iDocumentNode* wrappedNode,
 					      iConditionResolver* resolver)
 {
   SCF_CONSTRUCT_IBASE(0);
 
-  csWrappedDocumentNode::objreg = objreg;
+  csWrappedDocumentNode::objreg = shared->objreg;
   csWrappedDocumentNode::wrappedNode = wrappedNode;
   csWrappedDocumentNode::resolver = resolver;
   CS_ASSERT (resolver);
+  csWrappedDocumentNode::shared = shared;
 
   ProcessWrappedNode ();
 }
 
 csWrappedDocumentNode::csWrappedDocumentNode (iDocumentNode* wrappedNode,
-					      csWrappedDocumentNode* parent)
+					      csWrappedDocumentNode* parent,
+					      csWrappedDocumentNodeFactory* shared)
 {
   SCF_CONSTRUCT_IBASE(0);
 
@@ -58,6 +60,7 @@ csWrappedDocumentNode::csWrappedDocumentNode (iDocumentNode* wrappedNode,
   csWrappedDocumentNode::parent = parent;
   resolver = parent->resolver;
   objreg = parent->objreg;
+  csWrappedDocumentNode::shared = shared;
 
   ProcessWrappedNode ();
 }
@@ -115,6 +118,8 @@ struct WrapperStackEntry
     currentCondNode = 0;
   }
 };
+
+//#define DUMP_CONDITION_IDS
 
 void csWrappedDocumentNode::ProcessWrappedNode ()
 {
@@ -181,6 +186,11 @@ void csWrappedDocumentNode::ProcessWrappedNode ()
 		  result);
 		newWrapper.child->condition = csCondAlwaysFalse;
 	      }
+#ifdef DUMP_CONDITION_IDS
+	      csPrintf ("condition %s = %lu\n", 
+		csString().Append (valStart, valLen).GetDataSafe (),
+		newWrapper.child->condition);
+#endif
     	  
 	      resolver->AddNode (
 		currentWrapper.condNodes[currentWrapper.currentCondNode], 
@@ -313,7 +323,7 @@ void csWrappedDocumentNode::ProcessWrappedNode ()
       {
 	WrappedChild* newWrapper = new WrappedChild;
 	newWrapper->childNode.AttachNew (new csWrappedDocumentNode (node,
-	  this));
+	  this, shared));
 	currentWrapper.child->childrenWrappers.Push (newWrapper);
       }
     }
@@ -371,15 +381,17 @@ const char* csWrappedDocumentNode::GetValue ()
 
 csRef<iDocumentNodeIterator> csWrappedDocumentNode::GetNodes ()
 {
-  return csPtr<iDocumentNodeIterator> (
-    new csWrappedDocumentNodeIterator (this, 0));
+  csWrappedDocumentNodeIterator* iter = shared->iterPool.Alloc ();
+  iter->SetData (this, 0);
+  return csPtr<iDocumentNodeIterator> (iter);
 }
 
 csRef<iDocumentNodeIterator> csWrappedDocumentNode::GetNodes (
   const char* value)
 {
-  return csPtr<iDocumentNodeIterator> (
-    new csWrappedDocumentNodeIterator (this, value));
+  csWrappedDocumentNodeIterator* iter = shared->iterPool.Alloc ();
+  iter->SetData (this, value);
+  return csPtr<iDocumentNodeIterator> (iter);
 }
 
 csRef<iDocumentNode> csWrappedDocumentNode::GetNode (const char* value)
@@ -468,6 +480,16 @@ bool csWrappedDocumentNode::GetAttributeValueAsBool (const char* name,
 csWrappedDocumentNode::WrapperWalker::WrapperWalker (
   csPDelArray<WrappedChild>& wrappedChildren, iConditionResolver* resolver)
 {
+  SetData (wrappedChildren, resolver);
+}
+    
+csWrappedDocumentNode::WrapperWalker::WrapperWalker ()
+{
+}
+
+void csWrappedDocumentNode::WrapperWalker::SetData (
+  csPDelArray<WrappedChild>& wrappedChildren, iConditionResolver* resolver)
+{
   currentPos = &posStack.GetExtend (0);
   currentPos->currentIndex = 0;
   currentPos->currentWrappers = &wrappedChildren;
@@ -529,47 +551,68 @@ iDocumentNode* csWrappedDocumentNode::WrapperWalker::Next ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csTextNodeWrapper)
+SCF_IMPLEMENT_IBASE_POOLED(csTextNodeWrapper)
   SCF_IMPLEMENTS_INTERFACE(iDocumentNode)
 SCF_IMPLEMENT_IBASE_END
 
-csTextNodeWrapper::csTextNodeWrapper (iDocumentNode* realMe, const char* text)
+csTextNodeWrapper::csTextNodeWrapper (Pool* pool)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
-  csTextNodeWrapper::realMe = realMe;
-  nodeText = csStrNew (text);
+  SCF_CONSTRUCT_IBASE_POOLED(pool);
 }
 
 csTextNodeWrapper::~csTextNodeWrapper ()
 {
-  delete[] nodeText;
   SCF_DESTRUCT_IBASE();
+}
+
+void csTextNodeWrapper::SetData (iDocumentNode* realMe, const char* text)
+{
+  csTextNodeWrapper::realMe = realMe;
+  nodeText = csStrNew (text);
+}
+
+void csTextNodeWrapper::PoolRecycle ()
+{
+  delete[] nodeText;
+  realMe = 0;
 }
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csWrappedDocumentNodeIterator)
+SCF_IMPLEMENT_IBASE_POOLED(csWrappedDocumentNodeIterator)
   SCF_IMPLEMENTS_INTERFACE(iDocumentNodeIterator)
 SCF_IMPLEMENT_IBASE_END
 
 CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNodeIterator);
 
-csWrappedDocumentNodeIterator::csWrappedDocumentNodeIterator (
-  csWrappedDocumentNode* node, const char* filter) : 
-  walker (node->wrappedChildren, node->resolver)
+csWrappedDocumentNodeIterator::csWrappedDocumentNodeIterator (Pool* pool)
 {
-  SCF_CONSTRUCT_IBASE(0);
+  SCF_CONSTRUCT_IBASE_POOLED(pool);
 
-  csWrappedDocumentNodeIterator::filter = csStrNew (filter);
-
-  SeekNext();
+  filter = 0;
 }
 
 csWrappedDocumentNodeIterator::~csWrappedDocumentNodeIterator ()
 {
-  delete[] filter;
   SCF_DESTRUCT_IBASE();
+}
+
+void csWrappedDocumentNodeIterator::SetData (csWrappedDocumentNode* node, 
+					     const char* filter)
+{
+  delete[] csWrappedDocumentNodeIterator::filter;
+  csWrappedDocumentNodeIterator::filter = csStrNew (filter);
+  parentNode = node;
+
+  walker.SetData (parentNode->wrappedChildren, parentNode->resolver);
+
+  SeekNext();
+}
+
+void csWrappedDocumentNodeIterator::PoolRecycle ()
+{
+  delete[] filter; filter = 0;
+  next = 0;
 }
 
 void csWrappedDocumentNodeIterator::SeekNext()
@@ -590,7 +633,9 @@ void csWrappedDocumentNodeIterator::SeekNext()
     csString str;
     str.Append (next->GetValue ());
     csWrappedDocumentNode::AppendNodeText (walker, str);
-    next.AttachNew (new csTextNodeWrapper (next, str));
+    csTextNodeWrapper* textNode = parentNode->shared->textNodePool.Alloc ();
+    textNode->SetData (next, str);
+    next.AttachNew (textNode);
   }
 }
 
@@ -606,3 +651,16 @@ csRef<iDocumentNode> csWrappedDocumentNodeIterator::Next ()
   return ret;
 }
 
+//---------------------------------------------------------------------------
+
+csWrappedDocumentNodeFactory::csWrappedDocumentNodeFactory (
+  iObjectRegistry* objreg)
+{
+  csWrappedDocumentNodeFactory::objreg = objreg;
+}
+
+csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
+  iDocumentNode* wrappedNode, iConditionResolver* resolver)
+{
+  return new csWrappedDocumentNode (this, wrappedNode, resolver);
+}

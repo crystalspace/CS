@@ -23,6 +23,7 @@
 #include "csutil/csstring.h"
 #include "csutil/leakguard.h"
 #include "csutil/parray.h"
+#include "csutil/pooledscfclass.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
@@ -37,6 +38,7 @@ const csConditionID csCondAlwaysFalse = ~0;
 const csConditionID csCondAlwaysTrue = ~1;
 
 struct csConditionNode;
+class csWrappedDocumentNodeFactory;
 
 /**
  * Callback to parse and evaluate conditions, used by
@@ -71,12 +73,14 @@ class csWrappedDocumentNode : public iDocumentNode
   friend class csWrappedDocumentNodeIterator;
   friend struct WrapperStackEntry;
   friend class csTextNodeWrapper;
+  friend class csWrappedDocumentNodeFactory;
 
   csRef<iDocumentNode> wrappedNode;
   csWeakRef<csWrappedDocumentNode> parent;
   iConditionResolver* resolver;
   iObjectRegistry* objreg;
   csString contents;
+  csWrappedDocumentNodeFactory* shared;
 
   /**
    * Contains all the consecutive children that are dependant on the same
@@ -114,9 +118,12 @@ class csWrappedDocumentNode : public iDocumentNode
     csRef<iDocumentNode> next;
     iConditionResolver* resolver;
 
-    void SeekNext();
+    void SeekNext ();
   public:
     WrapperWalker (csPDelArray<WrappedChild>& wrappedChildren,
+      iConditionResolver* resolver);
+    WrapperWalker ();
+    void SetData (csPDelArray<WrappedChild>& wrappedChildren,
       iConditionResolver* resolver);
 
     bool HasNext ();
@@ -129,14 +136,15 @@ class csWrappedDocumentNode : public iDocumentNode
   static void AppendNodeText (WrapperWalker& walker, csString& text);
 
   csWrappedDocumentNode (iDocumentNode* wrappedNode,
-    csWrappedDocumentNode* parent);
+    csWrappedDocumentNode* parent,
+    csWrappedDocumentNodeFactory* shared);
+  csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared,
+    iDocumentNode* wrappedNode,
+    iConditionResolver* resolver);
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNode);
   SCF_DECLARE_IBASE;
 
-  csWrappedDocumentNode (iObjectRegistry* objreg,
-    iDocumentNode* wrappedNode,
-    iConditionResolver* resolver);
   virtual ~csWrappedDocumentNode ();
 
   virtual csDocumentNodeType GetType ()
@@ -185,10 +193,11 @@ class csTextNodeWrapper : public iDocumentNode
   char* nodeText;
   csRef<iDocumentNode> realMe;
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_POOLED(csTextNodeWrapper);
 
-  csTextNodeWrapper (iDocumentNode* realMe, const char* text);
+  csTextNodeWrapper (Pool* pool);
   virtual ~csTextNodeWrapper ();
+  void SetData (iDocumentNode* realMe, const char* text);
 
   virtual csDocumentNodeType GetType ()
   { return CS_NODE_TEXT; }
@@ -252,19 +261,36 @@ class csWrappedDocumentNodeIterator : public iDocumentNodeIterator
 {
   char* filter;
 
+  csWrappedDocumentNode* parentNode;
   csWrappedDocumentNode::WrapperWalker walker;
   csRef<iDocumentNode> next;
   void SeekNext();
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNodeIterator);
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_POOLED(csWrappedDocumentNodeIterator);
 
-  csWrappedDocumentNodeIterator (csWrappedDocumentNode* node, 
-    const char* filter);
+  csWrappedDocumentNodeIterator (Pool* pool);
   virtual ~csWrappedDocumentNodeIterator ();
+
+  void SetData (csWrappedDocumentNode* node, const char* filter);
 
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
+};
+
+class csWrappedDocumentNodeFactory
+{
+  friend class csWrappedDocumentNode;
+  friend class csWrappedDocumentNodeIterator;
+
+  iObjectRegistry* objreg;
+  csTextNodeWrapper::Pool textNodePool;
+  csWrappedDocumentNodeIterator::Pool iterPool;
+public:
+  csWrappedDocumentNodeFactory (iObjectRegistry* objreg);
+
+  csWrappedDocumentNode* CreateWrapper (iDocumentNode* wrappedNode,
+    iConditionResolver* resolver);
 };
 
 #endif // __DOCWRAP_H__

@@ -9,6 +9,9 @@ chronological order.
 4-Oct-2004
 	- res fixed xmlshader to correctly deal with shader conditionals 
 	  in text.
+	- res made some optimizations to the XML shader conditionals.
+	- res fixed leaks in chunklod, the engine, the Win32 callstack code,
+	  spr3d, bugplug, csparser, csconin.
 3-Oct-2004
 	- Jorrit added iTextureHandle->Blit() for new renderer. Only the
 	  NR OpenGL renderer implements this. This is a faster way to

@@ -327,6 +327,8 @@ CurrentThreadContextHelper::~CurrentThreadContextHelper ()
     CloseHandle (evStartWork);
   if (evFinishedWork != 0)
     CloseHandle (evFinishedWork);
+  if (mutex != 0)
+    CloseHandle (mutex);
 }
 
 /*

@@ -880,6 +880,12 @@ void csShaderConditionResolver::AddToRealNode (csRealConditionNode* realNode,
   {
     /* There's no variant assigned, recursively add condition
       to T&F children */
+    if (realNode->condition == condition)
+    {
+      trueNode->nodes.Push (realNode->trueNode);
+      falseNode->nodes.Push (realNode->falseNode);
+      return;
+    }
     AddToRealNode (realNode->trueNode, condition, trueNode, falseNode);
     AddToRealNode (realNode->falseNode, condition, trueNode, falseNode);
   }
@@ -926,16 +932,8 @@ void csShaderConditionResolver::AddNode (csConditionNode* parent,
     const size_t n = parent->nodes.Length ();
     for (size_t i = 0; i < n; i++)
     {
-      if (parent->nodes[i]->condition == condition)
-      {
-	trueNode->nodes.Push (parent->nodes[i]->trueNode);
-	falseNode->nodes.Push (parent->nodes[i]->falseNode);
-      }
-      else
-      {
-	AddToRealNode (parent->nodes[i], condition, 
-	  trueNode, falseNode);
-      }
+      AddToRealNode (parent->nodes[i], condition, 
+	trueNode, falseNode);
     }
   }
 }
@@ -980,6 +978,47 @@ size_t csShaderConditionResolver::GetVariant ()
   }
 }
 
+void csShaderConditionResolver::DumpConditionTree ()
+{
+  if (rootNode == 0)
+    return;
+
+  CS_ASSERT (rootNode->nodes.Length () == 1);
+  DumpConditionNode (rootNode->nodes[0], 0);
+}
+
+static void Indent (int n)
+{
+  for (int i = 0; i < n; i++)
+    csPrintf (" ");
+}
+
+void csShaderConditionResolver::DumpConditionNode (csRealConditionNode* node, 
+						   int level)
+{
+  if (node == 0)
+  {
+    Indent (level);
+    csPrintf ("<none>\n");
+  }
+  else
+  {
+    Indent (level);
+    if (node->variant != csArrayItemNotFound)
+      csPrintf ("variant: %lu\n", node->variant);
+    else
+    {
+      csPrintf ("condition: %lu\n", node->condition);
+      Indent (level);
+      csPrintf ("True node: ");
+      DumpConditionNode (node->trueNode, level + 1);
+      Indent (level);
+      csPrintf ("False node: ");
+      DumpConditionNode (node->falseNode, level + 1);
+    }
+  }
+}
+
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_FACTORY (csXMLShaderCompiler)
@@ -992,11 +1031,13 @@ SCF_IMPLEMENT_IBASE_END
 csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
+  wrapperFact = 0;
   init_token_table (xmltokens);
 }
 
 csXMLShaderCompiler::~csXMLShaderCompiler()
 {
+  delete wrapperFact;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -1012,6 +1053,8 @@ void csXMLShaderCompiler::Report (int severity, const char* msg, ...)
 bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
 {
   objectreg = object_reg;
+
+  wrapperFact = new csWrappedDocumentNodeFactory (objectreg);
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
       object_reg, iPluginManager);
@@ -1183,6 +1226,8 @@ SCF_IMPLEMENT_IBASE_EXT(csXMLShader)
   SCF_IMPLEMENTS_INTERFACE(iShader)
 SCF_IMPLEMENT_IBASE_EXT_END
 
+//#define DUMP_SHADER_COND_TREE
+
 csXMLShader::csXMLShader (csXMLShaderCompiler* compiler, 
 			  iDocumentNode* source,
 			  int forcepriority)
@@ -1200,8 +1245,12 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
 
   resolver = new csShaderConditionResolver (compiler);
   csRef<iDocumentNode> wrappedNode;
-  wrappedNode.AttachNew (new csWrappedDocumentNode (compiler->objectreg, 
-    source, resolver));
+  wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
+    resolver));
+#ifdef DUMP_SHADER_COND_TREE
+  csPrintf ("Condition tree for %s: ", source->GetAttributeValue ("name"));
+  resolver->DumpConditionTree ();
+#endif
   shaderSource = wrappedNode;
   vfsStartDir = csStrNew (compiler->vfs->GetCwd ());
 

@@ -200,6 +200,7 @@ class csShaderConditionResolver : public iConditionResolver
   
   void AddToRealNode (csRealConditionNode* node, csConditionID condition, 
     csConditionNode* trueNode, csConditionNode* falseNode);
+  void DumpConditionNode (csRealConditionNode* node, int level);
 public:
   csShaderConditionResolver (csXMLShaderCompiler* compiler);
   virtual ~csShaderConditionResolver ();
@@ -216,6 +217,7 @@ public:
   size_t GetVariant ();
   size_t GetVariantCount () const
   { return nextVariant; }
+  void DumpConditionTree ();
 };
 
 class csXMLShader : public iShader, public csObject
@@ -425,6 +427,7 @@ public:
   csWeakRef<iGraphics3D> g3d;
   csRef<iSyntaxService> synldr;
   csRef<iVFS> vfs;
+  csWrappedDocumentNodeFactory* wrapperFact;
 
 #define CS_TOKEN_ITEM_FILE \
   "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"

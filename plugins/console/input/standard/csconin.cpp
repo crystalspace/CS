@@ -59,7 +59,7 @@ csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
   Prompt = csStrNew ("# ");
   PromptLen = strlen(Prompt);
   HistoryPos = 0;
-  History.Push (csStrNew (""));
+  History.Push ("");
   line.Replace ("");
   InsertMode = true;
   MaxLines = 50;

@@ -879,6 +879,7 @@ csEngine::~csEngine ()
   delete textures;
   delete shared_variables;
   delete renderLoopManager;
+  FreeSectorIteratorPool ();
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);

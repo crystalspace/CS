@@ -2565,6 +2565,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       break;
     case XMLTOKEN_PRIORITY:
+      delete[] priority;
       priority = csStrNew (child->GetContentsValue ());
       if (recursive)
         mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
