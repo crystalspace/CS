@@ -1767,7 +1767,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
 
 
   const uint mixmode = mymesh->mixmode;
-  //statecache->SetShadeModel ((mixmode & CS_FX_GOURAUD) ? GL_SMOOTH : GL_FLAT);
+  statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
   statecache->SetShadeModel (GL_SMOOTH);
 
   void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);

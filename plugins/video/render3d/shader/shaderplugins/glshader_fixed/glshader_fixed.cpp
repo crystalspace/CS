@@ -98,8 +98,8 @@ bool csGLShader_FIXED::SupportType(const char* type)
 
 csPtr<iShaderProgram> csGLShader_FIXED::CreateProgram(const char* type)
 {
-  /*if (!enable)
-    return 0;*/
+  if (!enable)
+    return 0;
   if( strcasecmp(type, "fp") == 0)
     return csPtr<iShaderProgram>(new csGLShaderFFP (this));
   else if( strcasecmp(type, "vp") == 0)
@@ -181,8 +181,6 @@ bool csGLShader_FIXED::Initialize(iObjectRegistry* reg)
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
       f->QueryClassID ()) == 0)
     enable = true;
-  else
-    return false;
 
   ext = 0;
   r->GetDriver2D()->PerformExtension ("getextmanager", &ext);

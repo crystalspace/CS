@@ -46,6 +46,7 @@ class csSoftPolygonRenderer : public iPolygonRenderer,
   void PrepareBuffers (uint& indexStart, uint& indexEnd);
 public:
   csArray<csPolygonRenderData*> polys;
+  csArray<int> rlmIDs;
 
   SCF_DECLARE_IBASE;
 

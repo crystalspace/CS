@@ -229,6 +229,7 @@ protected:
   csStringID string_colors;
   csStringID string_indices;
   csStringID string_texture_diffuse;
+  csStringID string_texture_lightmap;
 
   csRef<iShaderManager> shadermgr;
 

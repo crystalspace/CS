@@ -899,7 +899,7 @@ bool csBezierMesh::DrawCurves (
     mesh.vertex_fog = fog_verts.GetArray ();
 
     bool gouraud = !!c->LightMap;
-    mesh.mixmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);
+    mesh.mixmode = CS_FX_COPY | (gouraud ? 0 : CS_FX_FLAT);
     mesh.use_vertex_color = gouraud;
     if (mesh.mat_handle == 0)
     {

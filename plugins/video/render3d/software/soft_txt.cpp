@@ -44,7 +44,7 @@ csSoftwareTextureHandle::csSoftwareTextureHandle (
   pal2glob = 0;
   if (flags & CS_TEXTURE_3D)
     AdjustSizePo2 ();
-  (this->texman = texman)->IncRef ();
+  this->texman = texman;
   use_332_palette = false;
   update_number = ~0;
   is_palette_init = false;
@@ -52,8 +52,7 @@ csSoftwareTextureHandle::csSoftwareTextureHandle (
 
 csSoftwareTextureHandle::~csSoftwareTextureHandle ()
 {
-  texman->UnregisterTexture (this);
-  texman->DecRef ();
+  if (texman) texman->UnregisterTexture (this);
   delete [] (uint8 *)pal2glob;
 }
 
@@ -396,15 +395,6 @@ csSoftRendererLightmap::~csSoftRendererLightmap ()
   SCF_DESTRUCT_IBASE();
 }
 
-void csSoftRendererLightmap::GetRendererCoords (float& lm_u1, float& lm_v1, 
-                                                float &lm_u2, float& lm_v2)
-{
-  lm_u1 = u1;
-  lm_v1 = v1;
-  lm_u2 = u2;
-  lm_v2 = v2;
-}
-
 void csSoftRendererLightmap::GetSLMCoords (int& left, int& top, 
                                            int& width, int& height)
 {
@@ -440,6 +430,8 @@ csSoftSuperLightmap::csSoftSuperLightmap (int width, int height) : RLMs(32)
   SCF_CONSTRUCT_IBASE (0);
   w = width;
   h = height;
+  tex.AttachNew (new csSoftwareTextureHandle (0, 0, 0));
+  tex->SetCacheData (this);
 }
 
 csSoftSuperLightmap::~csSoftSuperLightmap ()
@@ -454,8 +446,18 @@ void csSoftSuperLightmap::FreeRLM (csSoftRendererLightmap* rlm)
   // causing an assertion in block allocator (due to how BA frees items and
   // the safety assertions on BA destruction.)
   scfRefCount++;
+  int id = idmap.GetKey (rlm, ~0);
+  if (id != ~0)
+  {
+    idmap.Delete (id, rlm);
+  }
   RLMs.Free (rlm);
   DecRef ();
+}
+
+csSoftRendererLightmap* csSoftSuperLightmap::GetRlmForID (int id)
+{
+  return idmap.Get (id, 0);
 }
 
 csPtr<iRendererLightmap> csSoftSuperLightmap::RegisterLightmap (int left, int top, 
@@ -470,6 +472,8 @@ csPtr<iRendererLightmap> csSoftSuperLightmap::RegisterLightmap (int left, int to
   rlm->u2 = left + width;
   rlm->v2 = top  + height;
 
+  idmap.Put (((left + top) * (left + top + 1)) / 2, rlm);
+
   return csPtr<iRendererLightmap> (rlm);
 }
 
@@ -480,7 +484,7 @@ csPtr<iImage> csSoftSuperLightmap::Dump ()
 
 iTextureHandle* csSoftSuperLightmap::GetTexture ()
 {
-  return 0;
+  return tex;
 }
 
 
@@ -574,7 +578,8 @@ void csSoftwareTextureManager::PrepareTextures ()
   // Create mipmaps for all textures
   for (i = 0; i < textures.Length (); i++)
   {
-    csSoftwareTextureHandle* txt = (csSoftwareTextureHandle*)textures.Get (i);
+    csSoftwareTextureHandle* txt = 
+      (csSoftwareTextureHandle*)((iTextureHandle*)textures.Get (i));
     if (txt) 
     {
       txt->CreateMipmaps ();
@@ -634,6 +639,8 @@ void csSoftwareTextureManager::GetLightmapRendererCoords (
 {
   lm_u1 = lm_x1;
   lm_v1 = lm_y1;
-  lm_u2 = lm_x2 + 1;
+  /*lm_u2 = lm_x2 + 1;
   lm_v2 = lm_y2 + 1;
+  lm_u1 = lm_x1;
+  lm_v1 =*/ lm_u2 = lm_v2 = 0.0f;
 }

@@ -22,8 +22,9 @@
 
 #include "csutil/blockallocator.h"
 #include "csutil/debug.h"
+#include "csutil/hashr.h"
 #include "csgeom/csrect.h"
-#include "video/renderer/common/txtmgr.h"
+#include "video/render3d/common/txtmgr.h"
 #include "igraphic/image.h"
 #include "ivideo/graph2d.h"
 
@@ -120,11 +121,10 @@ protected:
   void SetupFromPalette ();
 
   /// the texture manager
-  csSoftwareTextureManager *texman;
+  csRef<csSoftwareTextureManager> texman;
 
   /// Reference to internal canvas.
   csRef<iGraphics2D> canvas;
-
 public:
   /// Create the mipmapped texture object
   csSoftwareTextureHandle (csSoftwareTextureManager *texman, iImage *image,
@@ -230,9 +230,6 @@ public:
   csSoftRendererLightmap ();
   virtual ~csSoftRendererLightmap ();
 
-  virtual void GetRendererCoords (float& lm_u1, float& lm_v1, 
-    float &lm_u2, float& lm_v2);
-
   virtual void GetSLMCoords (int& left, int& top, 
     int& width, int& height);
 
@@ -250,8 +247,13 @@ class csSoftSuperLightmap : public iSuperLightmap
 
   csBlockAllocator<csSoftRendererLightmap> RLMs;
 
+  csRef<iTextureHandle> tex;
   void FreeRLM (csSoftRendererLightmap* rlm);
+
+  csHashReversible<csSoftRendererLightmap*, int> idmap;
 public:
+  csSoftRendererLightmap* GetRlmForID (int id);
+
   SCF_DECLARE_IBASE;
 
   csSoftSuperLightmap (int width, int height);

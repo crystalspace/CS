@@ -330,6 +330,7 @@ bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
   string_colors = strings->Request ("colors");
   string_indices = strings->Request ("indices");
   string_texture_diffuse = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
+  string_texture_lightmap = strings->Request ("tex lightmap");
 
   return true;
 }
@@ -1471,7 +1472,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   Dc = poly.normal.D ();
 
   float M, N, O;
-  if (ABS (Dc) < SMALL_D) Dc = -SMALL_D;
+  if (ABS (Dc) < SMALL_D) Dc = (float)-SMALL_D;
   if (ABS (Dc) < SMALL_D)
   {
     // The Dc component of the plane normal is too small. This means that
@@ -1748,7 +1749,7 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
   Dc = poly.normal.D ();
 
   float M, N, O;
-  if (ABS (Dc) < SMALL_D) Dc = -SMALL_D;
+  if (ABS (Dc) < SMALL_D) Dc = (float)-SMALL_D;
   if (ABS (Dc) < SMALL_D)
   {
     // The Dc component of the plane normal is too small. This means that
@@ -2062,10 +2063,10 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
     sy = fyL = fyR = QRound (poly.vertices [scanL2].y);
 
     // Find the largest texture rectangle that is going to be displayed
-    float u_min = +99999999;
-    float v_min = +99999999;
-    float u_max = -99999999;
-    float v_max = -99999999;
+    float u_min = +99999999.0f;
+    float v_min = +99999999.0f;
+    float u_max = -99999999.0f;
+    float v_max = -99999999.0f;
 
     // Do a quick polygon scan at the edges to find mi/max u and v
     for ( ; ; )
@@ -2722,7 +2723,7 @@ void csSoftwareGraphics3DCommon::RealStartPolygonFX (iMaterialHandle* handle,
   else return;
 
   if (!do_gouraud || !do_lighting)
-    mode &= ~CS_FX_GOURAUD;
+    mode |= CS_FX_FLAT;
 
   pqinfo.mat_handle = handle;
 
@@ -2793,7 +2794,7 @@ void csSoftwareGraphics3DCommon::RealStartPolygonFX (iMaterialHandle* handle,
     }
     case CS_FX_TRANSPARENT:
 zfill_only:
-      mode &= ~CS_FX_GOURAUD;
+      mode |= CS_FX_FLAT;
       pqinfo.drawline = (z_buf_mode == CS_ZBUF_USE)
       	? 0
 	: csScan_scan_pi_zfil;
@@ -2817,7 +2818,7 @@ zfill_only:
     scan_index += 8;
   if (!pqinfo.drawline)
     pqinfo.drawline = ScanProcPI [scan_index];
-  if (mode & CS_FX_GOURAUD)
+  if (!(mode & CS_FX_FLAT))
     pqinfo.drawline_gouraud = ScanProcPIG [scan_index];
 
   pqinfo.mixmode = mode;
@@ -2937,7 +2938,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 
   // Decide whenever we should use Gouraud or flat (faster) routines
   bool do_gouraud = (pqinfo.drawline_gouraud != 0)
-    && (pqinfo.mixmode & CS_FX_GOURAUD);
+    && (!(pqinfo.mixmode & CS_FX_FLAT));
 
   //-----
   // Main scanline loop.
@@ -2978,7 +2979,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             R.dudy = QInt16 ((uu [(int)R.fv] - uu [(int)R.sv]) * inv_dyR);
             R.dvdy = QInt16 ((vv [(int)R.fv] - vv [(int)R.sv]) * inv_dyR);
           }
-          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             R.drdy = QRound ((rr [(int)R.fv] - rr [(int)R.sv]) * inv_dyR);
             R.dgdy = QRound ((gg [(int)R.fv] - gg [(int)R.sv]) * inv_dyR);
@@ -3002,7 +3003,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             R.v = QInt16 (vv [(int)R.sv] + (vv [(int)R.fv] - vv [(int)R.sv]) * Factor);
           }
           R.z = QInt24 (iz [(int)R.sv] + (iz [(int)R.fv] - iz [(int)R.sv]) * Factor);
-          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             R.r = QRound (rr [(int)R.sv] + (rr [(int)R.fv] - rr [(int)R.sv]) * Factor);
             R.g = QRound (gg [(int)R.sv] + (gg [(int)R.fv] - gg [(int)R.sv]) * Factor);
@@ -3036,7 +3037,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             L.dudy = QInt16 ((uu [(int)L.fv] - uu [(int)L.sv]) * inv_dyL);
             L.dvdy = QInt16 ((vv [(int)L.fv] - vv [(int)L.sv]) * inv_dyL);
           }
-          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             L.drdy = QRound ((rr [(int)L.fv] - rr [(int)L.sv]) * inv_dyL);
             L.dgdy = QRound ((gg [(int)L.fv] - gg [(int)L.sv]) * inv_dyL);
@@ -3060,7 +3061,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             L.v = QInt16 (vv [(int)L.sv] + (vv [(int)L.fv] - vv [(int)L.sv]) * Factor);
           }
           L.z = QInt24 (iz [(int)L.sv] + (iz [(int)L.fv] - iz [(int)L.sv]) * Factor);
-          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             L.r = QRound (rr [(int)L.sv] + (rr [(int)L.fv] - rr [(int)L.sv]) * Factor);
             L.g = QRound (gg [(int)L.sv] + (gg [(int)L.fv] - gg [(int)L.sv]) * Factor);
@@ -3132,7 +3133,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
           // will be neutralized by our "clamp to 1.0" circuit.
           int rr = 0, drr = 0, gg = 0, dgg = 0, bb = 0, dbb = 0;
           bool clamp = false;
-          if (pqinfo.mixmode & CS_FX_GOURAUD)
+          if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             int span_r = R.r - L.r;
             int span_g = R.g - L.g;
@@ -3174,7 +3175,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
       if (pqinfo.textured)
         L.u += L.dudy, L.v += L.dvdy,
         R.u += R.dudy, R.v += R.dvdy;
-      if (pqinfo.mixmode & CS_FX_GOURAUD)
+      if (!(pqinfo.mixmode & CS_FX_FLAT))
         L.r += L.drdy, L.g += L.dgdy, L.b += L.dbdy,
         R.r += R.drdy, R.g += R.dgdy, R.b += R.dbdy;
 
@@ -4190,12 +4191,23 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
   
   csSoftPolygonRenderer* polyRender = (csSoftPolygonRenderer*)indexbuf;
 
-  CS_ASSERT (string_texture_diffuse < (csStringID)stacks.Length ()
-      && stacks[string_texture_diffuse].Length () > 0);
+  CS_ASSERT (("'tex diffuse' SV does not exist.",
+    string_texture_diffuse < (csStringID)stacks.Length ()
+      && stacks[string_texture_diffuse].Length () > 0));
   csShaderVariable* texDiffuseSV = stacks[string_texture_diffuse].Top ();
   iTextureHandle* texh = 0;
   texDiffuseSV->GetValue (texh);
-  CS_ASSERT(texh);
+  CS_ASSERT(("A material has no diffuse texture attached.", texh));
+
+  CS_ASSERT (("'tex lightmap' SV does not exist.",
+    string_texture_lightmap < (csStringID)stacks.Length ()
+      && stacks[string_texture_lightmap].Length () > 0));
+  csShaderVariable* texLightmapSV = stacks[string_texture_lightmap].Top ();
+  iTextureHandle* lmh = 0;
+  texLightmapSV->GetValue (lmh);
+  CS_ASSERT(("Mesh did not supply lightmap", lmh));
+  csSoftSuperLightmap* slm = 
+    (csSoftSuperLightmap*)((csSoftwareTextureHandle*)lmh->GetCacheData());
 
   /*uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_NORMAL);
 
@@ -4234,9 +4246,9 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
 
   G3DPolygonDP poly;
   poly.use_fog = false;
-  poly.rlm = 0;
   poly.do_fullbright = false;
   poly.mixmode = mesh->mixmode;
+  z_buf_mode = mesh->z_buf_mode;
 
   for (i = 0; i < polyRender->polys.Length (); i++)
   {
@@ -4281,6 +4293,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
       poly.z_value = camVerts[0].z;
       poly.normal = plane_cam;
       poly.txt_handle = texh;
+      poly.rlm = slm->GetRlmForID (polyRender->rlmIDs[i]);
       //@@@@@ poly.mat_handle = spoly->material;
       // Adding the material handle to csPolygonRenderData is not
       // really an option but we need the material here. Perhaps use
@@ -4301,6 +4314,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
       //csReversibleTransform obj2tex (m_o2t, v_o2t);
 
       csReversibleTransform obj2world; // @@@ 
+      obj2world = w2c / mesh->object2camera;
 
       csMatrix3 m_world2tex = m_o2t;
       m_world2tex *= obj2world.GetO2T ();
@@ -4376,7 +4390,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh,
   bool lazyclip = false;
 
   //SetObjectToCamera (&mesh->object2camera);
-  z_buf_mode = CS_ZBUF_USE;
+  //z_buf_mode = CS_ZBUF_USE;
+  z_buf_mode = mesh->z_buf_mode;
 
   const unsigned int numBuffers =
     sizeof (activebuffers) / sizeof (iRenderBuffer*);
@@ -4465,7 +4480,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh,
   G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
   poly.mat_handle = mesh->material->GetMaterialHandle ();
-  poly.mixmode = mesh->mixmode | CS_FX_TILING;
+  poly.mixmode = mesh->mixmode | CS_FX_TILING |
+    (!work_col ? CS_FX_FLAT : 0);
 
   // Fill flat color if renderer decide to paint it flat-shaded
   iTextureHandle* txt_handle = mesh->material->GetMaterialHandle ()->GetTexture ();
@@ -4605,8 +4621,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh,
       //=====
 
       // The following com_iz is valid for all points on Z-plane.
-      float com_zv = 1. / (SMALL_Z*10);
-      float com_iz = aspect * (1. / (SMALL_Z*10));
+      float com_zv = 1.0f / (SMALL_Z*10);
+      float com_iz = aspect * (1.0f / (SMALL_Z*10));
 
       csVector3 va = work_verts[a];
       csVector3 vb = work_verts[b];

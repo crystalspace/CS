@@ -51,6 +51,11 @@ chronological order.
 	  up the grammar and performed some re-writing to make the discussion
 	  more idiomatic.
 	- Jorrit worked a bit further on the internal engine document.
+	- res updated the NR software renderer so that simple1 and 2 work.
+	- res replaced CS_FX_GOURAUD with CS_FX_FLAT, which is doing the 
+	  opposite. Nowadays, gouraud shading is common and flat shading the
+	  exception, so it makes more sense to have the latter explicitly
+	  specified.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.

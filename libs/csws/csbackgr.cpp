@@ -79,7 +79,7 @@ void csBackground::Draw (csComponent &This, int x, int y, int w, int h,
       poly.flat_color_r = poly.flat_color_g = poly.flat_color_b = 255;
 
       This.app->SetZbufferMode (CS_ZBUF_NONE);
-      This.Polygon3D (poly, ((type == csbgGradient) ? CS_FX_GOURAUD : 0) |
+      This.Polygon3D (poly, ((type == csbgGradient) ? 0 : CS_FX_FLAT) |
         (iAlpha ? (CS_FX_ALPHA | iAlpha) : CS_FX_COPY));
       break;
     }

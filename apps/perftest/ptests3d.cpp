@@ -70,7 +70,7 @@ void SetupPolygonDPFX (iGraphics3D* /*g3d*/, G3DPolygonDPFX& poly,
   poly.flat_color_r = 255;
   poly.flat_color_g = 255;
   poly.flat_color_b = 255;
-  poly.mixmode = CS_FX_COPY | CS_FX_GOURAUD;
+  poly.mixmode = CS_FX_COPY;
 }
 
 //-----------------------------------------------------------------------------
@@ -123,7 +123,7 @@ void SinglePolygonTesterAlpha::Setup (iGraphics3D* g3d, PerfTest* perftest)
   draw = 0;
   SetupPolygonDPFX (g3d, poly, 10, 10, g3d->GetWidth ()-10, g3d->GetHeight ()-10);
   poly.mat_handle = perftest->GetMaterial (0);
-  poly.mixmode = CS_FX_SETALPHA(.5) | CS_FX_GOURAUD;
+  poly.mixmode = CS_FX_SETALPHA(.5);
 }
 
 void SinglePolygonTesterAlpha::Draw (iGraphics3D* g3d)
@@ -153,7 +153,7 @@ void MultiPolygonTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       	10+y*h/NUM_MULTIPOLTEST,
       	10+(x+1)*w/NUM_MULTIPOLTEST, 10+(y+1)*h/NUM_MULTIPOLTEST);
       poly[x][y].mat_handle = perftest->GetMaterial (0);
-      poly[x][y].mixmode = CS_FX_COPY | CS_FX_GOURAUD;
+      poly[x][y].mixmode = CS_FX_COPY;
     }
 }
 
@@ -187,7 +187,7 @@ void MultiPolygon2Tester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       	10+y*h/NUM_MULTIPOLTEST,
       	10+(x+1)*w/NUM_MULTIPOLTEST, 10+(y+1)*h/NUM_MULTIPOLTEST);
       poly[x][y].mat_handle = perftest->GetMaterial (0);
-      poly[x][y].mixmode = CS_FX_COPY | CS_FX_GOURAUD;
+      poly[x][y].mixmode = CS_FX_COPY;
     }
 }
 

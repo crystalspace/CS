@@ -251,7 +251,7 @@ bool csStuffObject::Draw(iRenderView *rview, iMovable*, csZBufMode zbufmode)
   material->Visit ();
   mesh.mat_handle = mat;
   mesh.use_vertex_color =true;
-  mesh.mixmode = MixMode | CS_FX_GOURAUD;
+  mesh.mixmode = MixMode;
   CS_ASSERT (!vbuf->IsLocked ());
   vbufmgr->LockBuffer (vbuf,vertices, texels, colors, num_vertices, 0,
   	object_bbox);

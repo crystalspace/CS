@@ -278,13 +278,13 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   {
     /// delay drawing, put into buckets
     //printf("Drawing index %d \n", wrapindex->GetIndex());
-    rview->AddPolyFX(wrapindex->GetIndex(), &g3dpolyfx,
-    	g3dpolyfx.mixmode|CS_FX_GOURAUD);
+    rview->AddPolyFX (wrapindex->GetIndex(), &g3dpolyfx,
+    	g3dpolyfx.mixmode);
     return;
   }
   // for non-iso-engine created materials, we have to draw them now.
   //rview->CalculateFogPolygon (g3dpolyfx);
-  g3dpolyfx.mixmode = g3dpolyfx.mixmode | CS_FX_GOURAUD;
+  g3dpolyfx.mixmode = g3dpolyfx.mixmode;
   g3d->DrawPolygonFX (g3dpolyfx);
 
   return;// true;

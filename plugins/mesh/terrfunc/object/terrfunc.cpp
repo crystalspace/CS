@@ -291,7 +291,7 @@ void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
   m.mesh.do_morph_colors = false;
   m.mesh.do_fog = false;
   m.mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-  m.mesh.mixmode = CS_FX_GOURAUD;
+  m.mesh.mixmode = CS_FX_COPY;
   /// can use vbuf[0]
   m.mesh.buffers[0] = vbuf[0];
   m.mesh.buffers[1] = 0;
@@ -1350,7 +1350,7 @@ void csTerrFuncObject::InitMesh (G3DTriangleMesh& mesh,
   mesh.do_morph_colors = false;
   mesh.do_fog = false;
   mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-  mesh.mixmode = CS_FX_GOURAUD;
+  mesh.mixmode = CS_FX_COPY;
 }
 
 void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh,

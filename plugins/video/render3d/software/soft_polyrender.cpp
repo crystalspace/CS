@@ -106,4 +106,9 @@ void csSoftPolygonRenderer::AddPolygon (csPolygonRenderData* poly)
 {
   polys.Push (poly);
   polysNum++;
+
+  float u1, v1, u2, v2;
+  poly->tmapping->GetCoordsOnSuperLM (u1, v1, u2, v2);
+  const int m = (int)u1, n = (int)v1;
+  rlmIDs.Push (((m + n) * (m + n + 1)) / 2);
 }

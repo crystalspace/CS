@@ -273,8 +273,8 @@ enum G3D_FOGMETHOD
 #define CS_FX_MESH	   0xf0000000
 /// color 0 is transparent
 #define CS_FX_KEYCOLOR     0x08000000 
-/// Gouraud shading
-#define CS_FX_GOURAUD      0x04000000 
+/// Flat shading
+#define CS_FX_FLAT         0x04000000 
 /// Tiling
 #define CS_FX_TILING       0x02000000 
 /// alpha = 0..FF (opaque..transparent)

@@ -54,7 +54,7 @@ csTextureHandle::csTextureHandle (iImage* Image, int Flags)
   DG_ADDI (this, 0);
   DG_TYPE (this, "csTextureHandle");
 
-  (image = Image)->IncRef ();
+  image = Image;
   DG_LINK (this, image);
   flags = Flags;
 
@@ -63,7 +63,7 @@ csTextureHandle::csTextureHandle (iImage* Image, int Flags)
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
 
-  if (image->HasKeycolor ())
+  if (image.IsValid() && image->HasKeycolor ())
   {
     int r,g,b;
     image->GetKeycolor (r,g,b);
@@ -92,7 +92,6 @@ void csTextureHandle::FreeImage ()
 {
   if (!image) return;
   DG_UNLINK (this, image);
-  image->DecRef ();
   image = 0;
 }
 

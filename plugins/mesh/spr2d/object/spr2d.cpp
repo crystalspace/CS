@@ -436,7 +436,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
     	clipped_vtstats, vertices.Length (), true);
 
   rview->CalculateFogPolygon (g3dpolyfx);
-  g3dpolyfx.mixmode = MixMode | CS_FX_GOURAUD;
+  g3dpolyfx.mixmode = MixMode;
   g3d->DrawPolygonFX (g3dpolyfx);
   return true;
 }

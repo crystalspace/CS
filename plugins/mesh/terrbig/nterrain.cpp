@@ -771,7 +771,7 @@ bool csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
     if (info->num_lights > 0)
     {
       info->GetMesh()->use_vertex_color = 1;
-      info->GetMesh()->mixmode = CS_FX_COPY | CS_FX_GOURAUD;
+      info->GetMesh()->mixmode = CS_FX_COPY;
     }
     else
     {

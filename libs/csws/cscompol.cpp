@@ -132,8 +132,7 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
             vt = vstats  [j].Vertex;
             poly.z [j] = orig_poly_z [vt];
             poly.texels [j] = orig_poly_texels [vt];
-            if (mode & CS_FX_GOURAUD)
-              poly.colors [j] = orig_poly_colors [vt];
+            poly.colors [j] = orig_poly_colors [vt];
             break;
           case CS_VERTEX_ONEDGE:
             vt = vstats [j].Vertex;
@@ -142,7 +141,7 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
             INTERPOLATE1_S (z);
             INTERPOLATE1 (texels,x);
             INTERPOLATE1 (texels,y);
-            if (mode & CS_FX_GOURAUD)
+            if (!(mode & CS_FX_FLAT))
             {
               INTERPOLATE1 (colors,red);
               INTERPOLATE1 (colors,green);
@@ -186,7 +185,7 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
             INTERPOLATE_S (z);
             INTERPOLATE (texels,x);
             INTERPOLATE (texels,y);
-            if (mode & CS_FX_GOURAUD)
+            if (!(mode & CS_FX_FLAT))
             {
               INTERPOLATE (colors,red);
               INTERPOLATE (colors,green);

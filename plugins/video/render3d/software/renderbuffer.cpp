@@ -51,6 +51,8 @@ csSoftRenderBuffer::csSoftRenderBuffer
   csSoftRenderBuffer::comptype = comptype;
   csSoftRenderBuffer::compcount = compcount;
 
+  offset = stride = 0;
+
   compSize = compSizes [comptype];
 
   csSoftRenderBuffer::buffer = buffer;

@@ -74,18 +74,18 @@ bool csSoftShader::SupportType(const char* type)
 {
   if (!enable)
     return false;
-  if( strcasecmp(type, "soft_vp") == 0)
+  if( strcasecmp(type, "vp") == 0)
     return true;
-  if( strcasecmp(type, "soft_fp") == 0)
+  if( strcasecmp(type, "fp") == 0)
     return true;
   return false;
 }
 
 csPtr<iShaderProgram> csSoftShader::CreateProgram(const char* type)
 {
-  if( strcasecmp(type, "soft_vp") == 0)
+  if( strcasecmp(type, "vp") == 0)
     return csPtr<iShaderProgram>(new csSoftShader_VP(object_reg));
-  else if( strcasecmp(type, "soft_fp") == 0)
+  else if( strcasecmp(type, "fp") == 0)
     return csPtr<iShaderProgram>(new csSoftShader_FP(object_reg));
   else return 0;
 }
