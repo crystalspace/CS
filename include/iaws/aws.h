@@ -552,6 +552,9 @@ struct iAwsWindow : public iAwsComponent
   /// Sets the engine view for this window
   virtual void SetEngineView(iView *_view)=0;
 
+  /// Gets a child component by name, returns NULL on failure.
+  virtual iAwsComponent *FindChild(char *name)=0;
+
   /// Moves the window and all associated items (including children)
   virtual void Move(int delta_x, int delta_y)=0;
 
