@@ -624,11 +624,121 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** p
   return NULL;
 }
 
+csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
+{
+  csFrustrum* lf = lview.light_frustrum;
+  bool infinite = lf->IsInfinite ();
+  csVector3& center = lf->GetOrigin ();
+  csThing* sp;
+  csPolygonSetBBox* bbox;
+  bool vis;
+
+  // csThingArray is a subclass of csCleanable which is registered
+  // to csWorld.cleanup.
+  class csThingArray : public csCleanable
+  {
+  public:
+    csThing** array;
+    int size;
+    csThingArray () : array (NULL), size (0) { }
+    virtual ~csThingArray () { CHK (delete [] array); }
+  };
+  // This is a static vector array which is adapted to the
+  // right size everytime it is used. In the beginning it means
+  // that this array will grow a lot but finally it will
+  // stabilize to a maximum size (not big). The advantage of
+  // this approach is that we don't have a static array which can
+  // overflow. And we don't have to do allocation every time we
+  // come here. We register this memory to the 'cleanup' array
+  // in csWorld so that it will be freed later.
+  static csThingArray* cleanable = NULL;
+
+  if (!cleanable)
+  {
+    CHK (cleanable = new csThingArray ());
+    csWorld::current_world->cleanup.Push (cleanable);
+  }
+
+  num_things = 0;
+  sp = first_thing;
+  while (sp)
+  {
+    // If the light frustrum is infinite then every thing
+    // in this sector is of course visible.
+    if (infinite) vis = true;
+    else if (sp->GetNumCurves () > 0)
+    {
+      //@@@ Currently the bounding box doesn't check curved
+      // surfaces. This means that we can't use
+      // the bounding box for any optimization if curves are present
+      vis = true;
+    }
+    else
+    {
+      bbox = sp->GetBoundingBox ();
+      if (bbox)
+      {
+        // First we check if any of the vertices of the bounding
+	// box is in the frustrum. If so then it is certainly visible.
+	if (lf->Contains (sp->Vwor (bbox->i1)-center) ||
+	    lf->Contains (sp->Vwor (bbox->i2)-center) ||
+	    lf->Contains (sp->Vwor (bbox->i3)-center) ||
+	    lf->Contains (sp->Vwor (bbox->i4)-center) ||
+	    lf->Contains (sp->Vwor (bbox->i5)-center) ||
+	    lf->Contains (sp->Vwor (bbox->i6)-center) ||
+	    lf->Contains (sp->Vwor (bbox->i7)-center) ||
+	    lf->Contains (sp->Vwor (bbox->i8)-center))
+	  vis = true;
+	else
+	{
+	  // None of the vertices of the bounding box is in the
+	  // light frustrum. In this case it is still possible
+	  // that the light frustrum passes through the bounding box.
+	  // To test this we consider all six faces of the bounding
+	  // box and see if a single ray from the light frustrum passes
+	  // through any of those faces.
+	  csVector3& ray = lf->GetVertex (0);
+	  // Unfinished!!! Here we need some more code but I'm not sure
+	  // how to do this efficiently.
+	  //@@@@@@@@@@@@@@@@@@
+	  vis = true;
+	}
+      }
+      else
+      {
+        CsPrintf (MSG_WARNING, "Bounding box for thing not found!\n");
+	vis = true;
+      }
+    }
+
+    if (vis)
+    {
+      num_things++;
+      if (num_things > cleanable->size)
+      {
+        CHK (csThing** new_array = new csThing* [cleanable->size+5]);
+	if (cleanable->array)
+	{
+	  memcpy (new_array, cleanable->array, sizeof (csThing*)*cleanable->size);
+          CHK (delete [] cleanable->array);
+	}
+	cleanable->array = new_array;
+	cleanable->size += 5;
+      }
+      cleanable->array[num_things-1] = sp;
+    }
+
+    sp = (csThing*)(sp->GetNext ());
+  }
+  return cleanable->array;
+}
+
 void csSector::CalculateLighting (csLightView& lview)
 {
   if (draw_busy > cfg_reflections) return;
-
   draw_busy++;
+
+  int i;
   csVector3* old;
   csThing* sp;
 
@@ -647,24 +757,26 @@ void csSector::CalculateLighting (csLightView& lview)
   }
   else lview.gouroud_color_reset = false;
 
-  // If we are not doing a dynamic light then we also calculate
-  // a list of all shadow frustrums which is going to be used
+  // First mark all things which are visible in the current
+  // frustrum.
+  int num_visible_things;
+  csThing** visible_things = MarkVisibleThings (lview, num_visible_things);
+
+  // If we are doing shadow casting for things then we also calculate
+  // a list of all shadow frustrums which are going to be used
   // in the lighting calculations. This list is appended to the
-  // one given in 'lview'. After returning the list in 'lview'
+  // one given in 'lview'. After returning, the list in 'lview'
   // will be restored.
   csShadowFrustrum* previous_last = lview.shadows.GetLast ();
   csFrustrumList* shadows;
   if (lview.l->GetFlags () & CS_LIGHT_THINGSHADOWS)
-  {
-    sp = first_thing;
-    while (sp)
+    for (i = 0 ; i < num_visible_things ; i++)
     {
+      sp = visible_things[i];
       shadows = sp->GetShadows (center);
       lview.shadows.AppendList (shadows);
       CHK (delete shadows);
-      sp = (csThing*)(sp->GetNext ());
     }
-  }
 
   // @@@ Here we would like to do an optimization pass on all
   // the generated shadow frustrums. In essence this pass would try to
@@ -672,6 +784,9 @@ void csSector::CalculateLighting (csLightView& lview)
   //	- outside the current light frustrum and thus are not relevant
   //	- completely inside another shadow frustrum and thus do not
   //	  contribute to the shadow
+  // Note that we already do something similar when finally mapping
+  // the light on a polygon but doing it here would eliminate the
+  // frustrums earlier in the process.
 
   // Calculate lighting for all polygons in this sector.
   if (bsp)
@@ -681,11 +796,10 @@ void csSector::CalculateLighting (csLightView& lview)
 
   // Calculate lighting for all things in the current sector.
   if (static_thing) static_thing->CalculateLighting (lview);
-  sp = first_thing;
-  while (sp)
+  for (i = 0 ; i < num_visible_things ; i++)
   {
+    sp = visible_things[i];
     if (!sp->IsMerged ()) sp->CalculateLighting (lview);
-    sp = (csThing*)(sp->GetNext ());
   }
 
   // Restore the shadow list in 'lview' and then delete

@@ -240,6 +240,14 @@ public:
   void CalculateLighting (csLightView& lview);
 
   /**
+   * Mark all things which are visible in the given frustrum.
+   * Return an array to pointers to visible things. This array
+   * is guaranteed to remain unchanged and valid until the next
+   * call to MarkVisibleThings().
+   */
+  csThing** MarkVisibleThings (csLightView& lview, int& num_things);
+
+  /**
    * This is a debugging function that will show the outlines
    * on all polygons that are hit by a light in this sector.
    * It will draw perspective correct outlines so it is meant to
