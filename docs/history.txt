@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Nov-2004
+	- Eric Sunshine fixed problem in csStencilShadowCacheEntry where it was
+	  treating its `csArray<> face_normals' as if it was a
+	  csDirtyAccessArray<>.  Although this "works" today, it is considered
+	  illegal and may not work in the future.
 7-Nov-2004
 	- Eric Sunshine made the following Python-related changes:
 	    - Fixed cspython plugin so that it works correctly when installed.
@@ -157,10 +162,10 @@ chronological order.
 	  iDocument::Parse() had a potentially negative impact. These places
 	  now request Parse() to (once again) condense whitespace.
 29-Oct-2004
-    - Bjorn Hansen fixed sprcal3d->SetVelocity so that animations blend 
-      correctly and allow multiple animations with the same base velocity to 
-      blend.  Also updated the documentation to more clearly reflect what the 
-      function does
+	- Bjorn Hansen fixed sprcal3d->SetVelocity() so that animations blend
+	  correctly and allow multiple animations with the same base velocity
+	  to blend.  Also updated the documentation to more clearly reflect
+	  what the function does.
 	- Rhad changed the software renderer to account for the OSS driver
 	  blocking for long periods on calls to UnlockMemory().
 28-Oct-2004
