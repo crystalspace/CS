@@ -339,6 +339,37 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   meshspr->SetPosition( csVector3(10, 0, 8) );
   world->AddSprite(meshspr);
 
+  // create second grid
+  iIsoGrid *grid2 = world->CreateGrid(20, 10);
+  grid2->SetSpace(10, 10, -1.0, +10.0);
+  grid2->SetGroundMult(multx, multy);
+  for(y=10; y<20; y++)
+    for(x=10; x<30; x++)
+    {
+      // put tiles on the floor
+      sprite = engine->CreateFloorSprite(csVector3(y,0,x), 1.0, 1.0);
+      sprite->SetMaterialWrapper(math2);
+      world->AddSprite(sprite);
+      for(my=0; my<multy; my++)
+        for(mx=0; mx<multx; mx++)
+          grid2->SetGroundValue(x-10, y-10, mx, my, 0.0);
+    }
+
+  // add a light
+  scenelight = engine->CreateLight();
+  scenelight->SetPosition(csVector3(13,2,26));
+  scenelight->SetGrid(grid2);
+  scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
+  scenelight->SetRadius(5.0);
+  scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+  // add the light to both grids to make it look right.
+  scenelight = engine->CreateLight();
+  scenelight->SetPosition(csVector3(13,2,26));
+  scenelight->SetGrid(grid);
+  scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
+  scenelight->SetRadius(5.0);
+  scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+
   // prepare texture manager
   txtmgr->PrepareTextures ();
   txtmgr->PrepareMaterials ();

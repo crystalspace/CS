@@ -107,7 +107,7 @@ void csIsoGrid::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
     sprite->ForcePosition(oldpos);
     return;
   }
-  printf("Grid: Sprite moved to new grid\n");
+  //printf("Grid: Sprite moved to new grid\n");
   GetCell(oldpos)->RemoveSprite(sprite, oldpos);
   sprite->SetGrid(newgrid);
   newgrid->AddSprite(sprite, newpos);
@@ -463,14 +463,18 @@ bool csIsoGroundMap::HitBeam(const csVector3& gsrc, const csVector3& gdest)
   pos.x *= float(multy);
   pos.z -= mingridx*multx;
   pos.x -= mingridy*multy;
+  int x,z;
   while(steps--)
   {
     //x = QInt(pos.z) - multminx;
     //y = QInt(pos.x) - multminy;
     //printf("Checking %d,%d (%g,%g,%g) %g\n", x,y, pos.x, pos.y, pos.z,
       //GetGround(x,y));
-    if(pos.y <= GetGround(QInt(pos.z), QInt(pos.x))) 
-      return false;
+    z = QInt(pos.z);
+    x = QInt(pos.x);
+    if(x >= 0 && z >= 0 && z<width && x<height)
+      if(pos.y <= GetGround(QInt(pos.z), QInt(pos.x))) 
+        return false;
     pos += m;
   }
   return true;
