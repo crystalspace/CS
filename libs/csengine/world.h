@@ -22,6 +22,7 @@
 #include "cscom/com.h"
 #include "csgeom/math3d.h"
 #include "csengine/basic/csobjvec.h"
+#include "csengine/rview.h"
 #include "csobject/csobj.h"
 #include "csutil/cleanup.h"
 
@@ -48,16 +49,12 @@ class csTextureHandle;
 class csHaloInformation;
 class csIniFile;
 class csEngineConfig;
+class csRenderView;
 interface IHaloRasterizer;
 interface IGraphics3D;
 interface IGraphicsInfo;
 interface ISystem;
 interface IConfig;
-
-// Several map modes. @@@ This is application specific, should move outside world!
-#define MAP_OFF 0
-#define MAP_OVERLAY 1
-#define MAP_ON 2
 
 /**
  * Flag for GetNearbyLights().
@@ -83,7 +80,6 @@ interface IConfig;
  * Also check lights in nearby sectors (not implemented yet).
  */
 #define CS_NLIGHT_NEARBYSECTORS 8
-
 
 /**
  * The world! This class basicly represents the 3D engine.
@@ -198,11 +194,6 @@ private:
   void CreateLightmaps (IGraphics3D* g3d);
 
 public:
-  /// A WireFrame object for the map. @@@ DOES NOT BELONG IN WORLD
-  csWireFrameCam* wf;
-  /// Map mode. @@@ DOES NOT BELONG IN WORLD
-  int map_mode;
-
   /**
    * The starting sector for the camera as specified in the world file.
    * This is optional. If the world file does not have a starting sector
@@ -401,13 +392,14 @@ public:
   void Draw (IGraphics3D* g3d, csCamera* c, csClipper* clipper);
 
   /**
-   * For debugging purposes: set the polygon that should
-   * be hilighted.
+   * This function is similar to Draw. It will do all the stuff
+   * that Draw would do except for one important thing: it will
+   * not draw anything. Instead it will call a callback function for
+   * every entity that it was planning to draw. This allows you to show
+   * or draw debugging information (2D egdes for example).
    */
-  void SetHilight (csPolygon3D* hi);
-
-  /// Get the hilighted polygon.
-  csPolygon3D* GetHilight ();
+  void DrawFunc (IGraphics3D* g3d, csCamera* c, csClipper* clipper,
+  	csDrawFunc* callback, void* callback_data = NULL);
 
   /**
    * Locate the first static light which is closer than 'dist' to the

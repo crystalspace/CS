@@ -34,7 +34,6 @@
 #include "csengine/library.h"
 #include "csengine/texture.h"
 #include "csengine/light/lghtmap.h"
-#include "csengine/wirefrm.h"
 #include "csengine/stats.h"
 #include "csengine/config.h"
 #include "csengine/scripts/primscri.h"
@@ -61,14 +60,11 @@ csWorld* csWorld::current_world = NULL;
 
 CSOBJTYPE_IMPL(csWorld,csObject);
 
-csWorld::csWorld () : csObject()
+csWorld::csWorld () : start_vec (0, 0, 0), csObject()
 {
   first_dyn_lights = NULL;
   world_file = NULL;
-  wf = NULL;
-  map_mode = MAP_OFF;
   start_sector = NULL;
-  start_vec.x = start_vec.y = start_vec.z = 0;
   piHR = NULL;
   textures = NULL;
   CHK (cfg_engine = new csEngineConfig ());
@@ -78,7 +74,6 @@ csWorld::csWorld () : csObject()
 csWorld::~csWorld ()
 {
   Clear ();
-  CHK (delete wf);
   if (piHR) { FINAL_RELEASE (piHR); piHR = NULL; }
   CHK (delete textures);
   CHK (delete cfg_engine);
@@ -235,8 +230,7 @@ csThing* csWorld::GetThing (const char* name)
 
 void csWorld::TriggerActivate (csCamera& c)
 {
-  csVector3 where;
-  where = c.This2Other (3*VEC_FORWARD);
+  csVector3 where = c.This2Other (3*VEC_FORWARD);
   csPolygon3D* p = c.GetHit (where);
   if (p)
   {
@@ -525,8 +519,8 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
   g3d->Get2dDriver (&g2d);
   csRenderView rview (*c, view, g3d, g2d);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
+  rview.callback = NULL;
 
-  if (map_mode != MAP_OFF) wf->GetWireframe ()->Clear ();
   csSector* s = c->GetSector ();
   s->Draw (rview);
 
@@ -607,10 +601,20 @@ supports_halos = false;
         pinfo->pLight->AddReference();
   }   
   if (piHR) piHR->Release();
+}
 
-  // DAN: this is commneted out until we figure out where light selection logic should go.
-/*  if (g3d->do_light_frust && g3d->selected_light)
-    g3d->selected_light->dump_frustrum (*c); */
+void csWorld::DrawFunc (IGraphics3D* g3d, csCamera* c, csClipper* view,
+	csDrawFunc* callback, void* callback_data)
+{
+  IGraphics2D* g2d;
+  g3d->Get2dDriver (&g2d);
+  csRenderView rview (*c, view, g3d, g2d);
+  rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
+  rview.callback = callback;
+  rview.callback_data = callback_data;
+
+  csSector* s = c->GetSector ();
+  s->Draw (rview);
 }
 
 void csWorld::AddHalo (csHaloInformation* pinfo)
@@ -689,16 +693,6 @@ void csWorld::ReadConfig (csIniFile* config)
   csPolyTexture::cfg_cosinus_factor = config->GetFloat ("Lighting", "COSINUS_FACTOR", csPolyTexture::cfg_cosinus_factor);
   //@@@
   //Textures::Gamma = config->GetFloat ("TextureMapper", "GAMMA", 1.0);
-}
-
-void csWorld::SetHilight (csPolygon3D* hi)
-{
-  csPolygon3D::hilight = hi;
-}
-
-csPolygon3D* csWorld::GetHilight ()
-{
-  return csPolygon3D::hilight;
 }
 
 void csWorld::UnlinkSprite (csSprite3D* sprite)
