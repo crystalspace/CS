@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2003 by Keith Fulton
+Copyright (C) 2003 by Keith Fulton
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -58,39 +58,39 @@ enum
 };
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSpriteCal3DFactoryLoader)
@@ -127,23 +127,23 @@ bool csSpriteCal3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 
 csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
-				          iLoaderContext* ldr_context, 
-				          iBase* context)
+						iLoaderContext* ldr_context, 
+						iBase* context)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
+    iPluginManager));
   csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.cal3d", iMeshObjectType));
+    "crystalspace.mesh.object.sprite.cal3d", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.cal3d",
-    	iMeshObjectType);
+      iMeshObjectType);
   }
   if (!type)
   {
     synldr->ReportError (
-		"crystalspace.spritecal3dfactoryloader.setup.objecttype",
-		node, "Could not load the sprite.cal3d mesh object plugin!");
+      "crystalspace.spritecal3dfactoryloader.setup.objecttype",
+      node, "Could not load the sprite.cal3d mesh object plugin!");
     return 0;
   }
 
@@ -159,12 +159,12 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
     fact = type->NewFactory ();
 
   csRef<iSpriteCal3DFactoryState> newspr (
-  	SCF_QUERY_INTERFACE (fact, iSpriteCal3DFactoryState));
+    SCF_QUERY_INTERFACE (fact, iSpriteCal3DFactoryState));
 
   if (!newspr->Create("dummy"))
   {
-      newspr->ReportLastError();
-      return 0; // failed
+    newspr->ReportLastError();
+    return 0; // failed
   }
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -176,35 +176,35 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_PATH:
+    case XMLTOKEN_PATH:
       {
 	const char *path = child->GetAttributeValue("dir");
 	if (path)
 	  newspr->SetBasePath(path);
 	else
 	{
-	    synldr->ReportError (
-		  "crystalspace.spritecal3dfactoryloader.parse.badpath",
-		  child,"dir is a required attribute of <path> token in cal3d files.");
+	  synldr->ReportError (
+	    "crystalspace.spritecal3dfactoryloader.parse.badpath",
+	    child,"dir is a required attribute of <path> token in cal3d files.");
 	  return 0;
 	}
 	break;
       }
-      case XMLTOKEN_SCALE:
+    case XMLTOKEN_SCALE:
       {
 	float scale = child->GetAttributeValueAsFloat("value");
 	if (scale)
 	  newspr->SetRenderScale(scale);
 	else
 	{
-	    synldr->ReportError (
-		  "crystalspace.spritecal3dfactoryloader.parse.badvalue",
-		  child,"value is a required attribute of <scale> token in cal3d files.");
+	  synldr->ReportError (
+	    "crystalspace.spritecal3dfactoryloader.parse.badvalue",
+	    child,"value is a required attribute of <scale> token in cal3d files.");
 	  return 0;
 	}
 	break;
       }
-      case XMLTOKEN_SKELETON:
+    case XMLTOKEN_SKELETON:
       {
 	const char *file = child->GetAttributeValue("file");
 	if (file)
@@ -217,22 +217,22 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	}
 	else
 	{
-	    synldr->ReportError (
-		  "crystalspace.spritecal3dfactoryloader.parse.badfile",
-		  child,"file is a required attribute of <skeleton> token in cal3d files.");
+	  synldr->ReportError (
+	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
+	    child,"file is a required attribute of <skeleton> token in cal3d files.");
 	  return 0;
 	}
 	break;
       }
-      case XMLTOKEN_ANIMATION:
+    case XMLTOKEN_ANIMATION:
       {
 	const char *file = child->GetAttributeValue("file");
 	const char *name = child->GetAttributeValue("name");
 	if (!name)
 	{
 	  synldr->ReportError (
-		  "crystalspace.spritecal3dfactoryloader.parse.badfile",
-		  child,"name is a required attribute of <animation> token in cal3d files.");
+	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
+	    child,"name is a required attribute of <animation> token in cal3d files.");
 	  return 0;
 	}
 	int type = child->GetAttributeValueAsInt("type");
@@ -242,11 +242,11 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	if (file)
 	{
 	  int animID = newspr->LoadCoreAnimation(file,
-						 name,
-						 type,
-						 base_vel,
-						 min_vel,
-						 max_vel);
+	    name,
+	    type,
+	    base_vel,
+	    min_vel,
+	    max_vel);
 	  if (animID == -1)
 	  {
 	    newspr->ReportLastError();
@@ -255,23 +255,23 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	}
 	else
 	{
-	    synldr->ReportError (
-		  "crystalspace.spritecal3dfactoryloader.parse.badfile",
-		  child,"file is a required attribute of <animation> token in cal3d files.");
+	  synldr->ReportError (
+	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
+	    child,"file is a required attribute of <animation> token in cal3d files.");
 	  return 0;
 	}
 	break;
       }
-      case XMLTOKEN_MESH:
+    case XMLTOKEN_MESH:
       {
 	const char *file = child->GetAttributeValue("file");
 	const char *name = child->GetAttributeValue("name");
 	bool      attach;
 	const char *a = child->GetAttributeValue("attach");
 	if (a && *a == 'n')
-	    attach = false;
+	  attach = false;
 	else
-	    attach = true;
+	  attach = true;
 	const char *def_matl = child->GetAttributeValue("material");
 
 	if (file)
@@ -279,7 +279,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	  iMaterialWrapper *mat=0;
 	  if (def_matl)
 	  {
-	      mat = LoadMaterialTag(newspr,child,ldr_context,def_matl);
+	    mat = LoadMaterialTag(newspr,child,ldr_context,def_matl);
 	  }
 	  int mesh_index = newspr->LoadCoreMesh(file,name,attach,mat);
           if (mesh_index == -1)
@@ -315,24 +315,24 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	}
 	else
 	{
-	    synldr->ReportError (
-		  "crystalspace.spritecal3dfactoryloader.parse.badfile",
-		  child,"file is a required attribute of <mesh> token in cal3d files.");
+	  synldr->ReportError (
+	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
+	    child,"file is a required attribute of <mesh> token in cal3d files.");
 	  return 0;
 	}
 	break;
       }
-      case XMLTOKEN_MATERIAL:
+    case XMLTOKEN_MATERIAL:
       {
 	const char *file = child->GetAttributeValue("file");
 	if (!LoadMaterialTag(newspr,child,ldr_context,file))
-	    return 0;
+	  return 0;
 	break;
       }
 
-      default:
-	synldr->ReportBadToken (child);
-        return 0;
+    default:
+      synldr->ReportBadToken (child);
+      return 0;
     }
   }
   // Wrapup cal3d initialization
@@ -346,27 +346,27 @@ iMaterialWrapper *csSpriteCal3DFactoryLoader::LoadMaterialTag(iSpriteCal3DFactor
 							      iLoaderContext* ldr_context,
 							      const char *file)
 {
-    iMaterialWrapper* mat=0;
-    if (file)
+  iMaterialWrapper* mat=0;
+  if (file)
+  {
+    mat = ldr_context->FindMaterial (file);
+    if (!mat)
     {
-	mat = ldr_context->FindMaterial (file);
-	if (!mat)
-	{
-	    synldr->ReportError (
-		"crystalspace.spritecal3dfactoryloader.parse.unknownmaterial",
-		child, "Couldn't find material named '%s'", file);
-	    return 0;
-	}
-	newspr->AddCoreMaterial(mat);
+      synldr->ReportError (
+	"crystalspace.spritecal3dfactoryloader.parse.unknownmaterial",
+	child, "Couldn't find material named '%s'", file);
+      return 0;
     }
-    else
-    {
-	synldr->ReportError (
-	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
-	    child,"file is a required attribute of <material> token in cal3d files.");
-	return 0;
-    }
-    return mat;
+    newspr->AddCoreMaterial(mat);
+  }
+  else
+  {
+    synldr->ReportError (
+      "crystalspace.spritecal3dfactoryloader.parse.badfile",
+      child,"file is a required attribute of <material> token in cal3d files.");
+    return 0;
+  }
+  return mat;
 }
 
 
@@ -434,7 +434,7 @@ bool csSpriteCal3DLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase*)
+					 iLoaderContext* ldr_context, iBase*)
 {
 #if 0
   csRef<iMeshObject> mesh;
@@ -449,182 +449,182 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_FACTORY:
+    case XMLTOKEN_FACTORY:
+      {
+	const char* factname = child->GetContentsValue ();
+	iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	if (!fact)
 	{
-	  const char* factname = child->GetContentsValue ();
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	  if (!fact)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.unknownfactory",
-		child, "Couldn't find factory '%s'!", factname);
-	    return 0;
-	  }
-	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          spr3dLook = SCF_QUERY_INTERFACE (mesh, iSprite3DState);
-	}
-	break;
-      case XMLTOKEN_ACTION:
-	if (!spr3dLook)
-	{
-      	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
-		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
+	  synldr->ReportError (
+	    "crystalspace.sprite3dloader.parse.unknownfactory",
+	    child, "Couldn't find factory '%s'!", factname);
 	  return 0;
 	}
-	spr3dLook->SetAction (child->GetContentsValue ());
-        break;
-      case XMLTOKEN_BASECOLOR:
-	if (!spr3dLook)
-	{
-      	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
-		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
-	  return 0;
-	}
-	else
-	{
-	  csColor col;
-	  if (!synldr->ParseColor (child, col))
-	    return 0;
-	  spr3dLook->SetBaseColor (col);
-	}
-        break;
-      case XMLTOKEN_LIGHTING:
-	if (!spr3dLook)
-	{
-      	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
-		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
-	  return 0;
-	}
-	else
-	{
-	  bool do_lighting;
-	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return 0;
-	  spr3dLook->SetLighting (do_lighting);
-	}
-        break;
-      case XMLTOKEN_MATERIAL:
-	if (!spr3dLook)
-	{
-      	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
-		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
-	  return 0;
-	}
-	else
-	{
-	  const char* matname = child->GetContentsValue ();
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.unknownmaterial",
-		child, "Couldn't find material '%s'!", matname);
-            return 0;
-	  }
-	  spr3dLook->SetMaterialWrapper (mat);
-	}
-	break;
-      case XMLTOKEN_MIXMODE:
-	if (!spr3dLook)
-	{
-      	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
-		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
-	  return 0;
-	}
-	else
-        {
-	  uint mm;
-	  if (!synldr->ParseMixmode (child, mm))
-	    return 0;
-          spr3dLook->SetMixMode (mm);
-	}
-	break;
-      case XMLTOKEN_APPLYMOTION:
-	{
-	  const char* motname = child->GetContentsValue ();
-	  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-	  	iPluginManager));
-	  csRef<iMotionManager> motman (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-		"crystalspace.motion.manager.default",
-		iMotionManager));
-	  if (!motman)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.setup.motion.motionmanager",
-		child, "Could not find motion manager!");
-	    return 0;
-	  }
-	  if (!spr3dLook)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
-		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
-	    return 0;
-	  }
-	  iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
-	  csRef<iSkeletonLimbState> limb (SCF_QUERY_INTERFACE (skel_state,
-	  	iSkeletonLimbState));
-	  limb = limb->GetChildren ();
-	  if (!limb)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.nochildren",
-		child, "Skeleton has no libs. Cannot apply motion!");
-	    return 0;
-	  }
-	  csRef<iSkeletonConnectionState> con (SCF_QUERY_INTERFACE (limb,
-	  	iSkeletonConnectionState));
-	  csRef<iSkeletonBone> bone (SCF_QUERY_INTERFACE (con, iSkeletonBone));
-	  if (!bone)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.nobones",
-		child, "The skeleton has no bones!");
-	    return 0;
-	  }
-          iMotionTemplate* motion = motman->FindMotionByName (motname);
-	  if (!motion)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.nomotion",
-		child, "The motion '%s' does not exist!", motname);
-	    return 0;
-	  }
-          iMotionController* mc = motman->AddController (bone);
-          mc->SetMotion (motion);
-	}
-	break;
-      case XMLTOKEN_TWEEN:
-	if (!spr3dLook)
-	{
-      	  synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.motion.missingfactory",
-		child,
-		"No Factory! Please define 'factory' before 'applymotion'!");
-	  return 0;
-	}
-	else
-	{
-	  bool do_tween;
-	  if (!synldr->ParseBool (child, do_tween, true))
-	    return 0;
-          spr3dLook->EnableTweening (do_tween);
-	}
-	break;
-      default:
-	synldr->ReportBadToken (child);
+	mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+	spr3dLook = SCF_QUERY_INTERFACE (mesh, iSprite3DState);
+      }
+      break;
+    case XMLTOKEN_ACTION:
+      if (!spr3dLook)
+      {
+	synldr->ReportError (
+	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
+	  child,
+	  "No Factory! Please define 'factory' before 'applymotion'!");
 	return 0;
+      }
+      spr3dLook->SetAction (child->GetContentsValue ());
+      break;
+    case XMLTOKEN_BASECOLOR:
+      if (!spr3dLook)
+      {
+	synldr->ReportError (
+	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
+	  child,
+	  "No Factory! Please define 'factory' before 'applymotion'!");
+	return 0;
+      }
+      else
+      {
+	csColor col;
+	if (!synldr->ParseColor (child, col))
+	  return 0;
+	spr3dLook->SetBaseColor (col);
+      }
+      break;
+    case XMLTOKEN_LIGHTING:
+      if (!spr3dLook)
+      {
+	synldr->ReportError (
+	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
+	  child,
+	  "No Factory! Please define 'factory' before 'applymotion'!");
+	return 0;
+      }
+      else
+      {
+	bool do_lighting;
+	if (!synldr->ParseBool (child, do_lighting, true))
+	  return 0;
+	spr3dLook->SetLighting (do_lighting);
+      }
+      break;
+    case XMLTOKEN_MATERIAL:
+      if (!spr3dLook)
+      {
+	synldr->ReportError (
+	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
+	  child,
+	  "No Factory! Please define 'factory' before 'applymotion'!");
+	return 0;
+      }
+      else
+      {
+	const char* matname = child->GetContentsValue ();
+	iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	if (!mat)
+	{
+	  synldr->ReportError (
+	    "crystalspace.sprite3dloader.parse.unknownmaterial",
+	    child, "Couldn't find material '%s'!", matname);
+	  return 0;
+	}
+	spr3dLook->SetMaterialWrapper (mat);
+      }
+      break;
+    case XMLTOKEN_MIXMODE:
+      if (!spr3dLook)
+      {
+	synldr->ReportError (
+	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
+	  child,
+	  "No Factory! Please define 'factory' before 'applymotion'!");
+	return 0;
+      }
+      else
+      {
+	uint mm;
+	if (!synldr->ParseMixmode (child, mm))
+	  return 0;
+	spr3dLook->SetMixMode (mm);
+      }
+      break;
+    case XMLTOKEN_APPLYMOTION:
+      {
+	const char* motname = child->GetContentsValue ();
+	csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+	  iPluginManager));
+	csRef<iMotionManager> motman (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+	  "crystalspace.motion.manager.default",
+	  iMotionManager));
+	if (!motman)
+	{
+	  synldr->ReportError (
+	    "crystalspace.sprite3dloader.setup.motion.motionmanager",
+	    child, "Could not find motion manager!");
+	  return 0;
+	}
+	if (!spr3dLook)
+	{
+	  synldr->ReportError (
+	    "crystalspace.sprite3dloader.parse.motion.missingfactory",
+	    child,
+	    "No Factory! Please define 'factory' before 'applymotion'!");
+	  return 0;
+	}
+	iSkeletonState *skel_state = spr3dLook->GetSkeletonState();
+	csRef<iSkeletonLimbState> limb (SCF_QUERY_INTERFACE (skel_state,
+	  iSkeletonLimbState));
+	limb = limb->GetChildren ();
+	if (!limb)
+	{
+	  synldr->ReportError (
+	    "crystalspace.sprite3dloader.parse.motion.nochildren",
+	    child, "Skeleton has no libs. Cannot apply motion!");
+	  return 0;
+	}
+	csRef<iSkeletonConnectionState> con (SCF_QUERY_INTERFACE (limb,
+	  iSkeletonConnectionState));
+	csRef<iSkeletonBone> bone (SCF_QUERY_INTERFACE (con, iSkeletonBone));
+	if (!bone)
+	{
+	  synldr->ReportError (
+	    "crystalspace.sprite3dloader.parse.motion.nobones",
+	    child, "The skeleton has no bones!");
+	  return 0;
+	}
+	iMotionTemplate* motion = motman->FindMotionByName (motname);
+	if (!motion)
+	{
+	  synldr->ReportError (
+	    "crystalspace.sprite3dloader.parse.motion.nomotion",
+	    child, "The motion '%s' does not exist!", motname);
+	  return 0;
+	}
+	iMotionController* mc = motman->AddController (bone);
+	mc->SetMotion (motion);
+      }
+      break;
+    case XMLTOKEN_TWEEN:
+      if (!spr3dLook)
+      {
+	synldr->ReportError (
+	  "crystalspace.sprite3dloader.parse.motion.missingfactory",
+	  child,
+	  "No Factory! Please define 'factory' before 'applymotion'!");
+	return 0;
+      }
+      else
+      {
+	bool do_tween;
+	if (!synldr->ParseBool (child, do_tween, true))
+	  return 0;
+	spr3dLook->EnableTweening (do_tween);
+      }
+      break;
+    default:
+      synldr->ReportBadToken (child);
+      return 0;
     }
   }
 

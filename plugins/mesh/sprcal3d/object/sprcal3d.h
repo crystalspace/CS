@@ -155,6 +155,7 @@ public:
   csVector3* GetVertices () { return 0; }
   int GetTriangleCount () { return 0; }
   csMeshedPolygon* GetPolygons () { return 0; }
+  csTriangle* GetTriangles () { return 0; }
 
   struct PolyMesh : public iPolygonMesh
   {

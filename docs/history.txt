@@ -46,6 +46,8 @@ chronological order.
 	- res fixed another problem with mode switching back on app exit.
 	- res did some small cleanups in graph2d.cpp (removed some commented
 	  out statements, removed a printf.)
+	- Keith added fix for missing GetTriangles() in sprcal3d.  Still is 
+	  not 100% correct but will work well enough for viewmesh.
 29-Sep-2003
 	- Jorrit moved ParseTextureMapping() and ParsePoly3d() from syntax
 	  services to thing loader. It doesn't make much sense to make those
