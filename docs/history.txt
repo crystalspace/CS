@@ -1,5 +1,176 @@
 The history order has been reversed so that new features are at the top.
 
+6-Nov-2000
+	- Eric Sunshine made the following changes to the project:
+	    - Visual-C++ DSW and DSP project files are now automatically
+	      generated and updated.  Information gleaned from GNU makefiles,
+	      project-wide, is used to synthesize DSW and DSP files on-the-fly.
+	      The project file synthesis procedure attempts to enforce the
+	      invariant that if a module builds correctly via the GNU makefile,
+	      then the same module should build correctly via the Visual-C++
+	      project file which was built from information gleaned from the
+	      makefile.  Thus, the headache associated with manual maintenance
+	      of the Visual-C++ project files should be a thing of the past.
+	    - Added a new directory, CS/mk/msvcgen, in which all resources
+	      related to automatic generation of Visual-C++ project files
+	      reside.
+	    - Added msvcgen.pl, which is a Perl script capable of generating
+	      Visual-C++ DSW and DSP files based upon input arguments and a set
+	      of template files.  The script accepts a useful array of options
+	      for controlling several aspects of the synthesis process, and is
+	      also independent of Crystal Space, thus it may be useful in other
+	      arenas as well.  A copious amount of documentation related to the
+	      generation of DSW and DSP files, including a description of the
+	      special variables which may appear in template files, may be
+	      viewed by invoking msvcgen.pl with the --help option.
+	    - Added the directory CS/mk/msvcgen/template, which contains
+	      template files used by msvcgen.pl during the synthesis of
+	      Visual-C++ DSW and DSP project files.  The master level templates
+	      are appgui.tpl, appcon.tpl, group.tpl, library.tpl, and
+	      plugin.tpl, which represent the five different types of DSP files
+	      which can be generated.  These templates are supplemented by the
+	      template-include files dspgroup.tpi and dspfile.tpi, which
+	      combine to form resource groups within each DSP.  The master
+	      level template dsw.tpl is used for synthesizing DSW files and is
+	      supplemented by dswgroup.tpi and dswdep.tpi, which combine to
+	      form dependency groups within the DSW.  Refer to the --help
+	      output of msvcgen.pl for a description of the special variables
+	      which may appear in each of the template files.
+	    - Added msvcgen.mak, which is the Crystal Space-specific makefile
+	      responsible for generating, and optionally installing, Visual-C++
+	      DSW and DSP project files.  It performs this task by gleaning
+	      information from GNU makefiles throughout the project and then
+	      invoking msvcgen.pl with the appropriate arguments to synthesize
+	      each DSP file represented by a makefile, as well as the master
+	      DSW file, csall.dsw.  Also added the supplemental makefiles
+	      win32.mak and required.mak.  The first, win32.mak, contains
+	      additional Windows-specific DSP targets (such as grpall,
+	      grpplugins, libcswin32dll, etc.) which are not otherwise
+	      represented by makefiles.  The second, required.mak, supplements
+	      the normal PLUGINS makefile variable with a list of modules for
+	      which DSP files must be generated regardless of the platform
+	      which is performing the project file generation procedure.  This
+	      allows any platform (such as Unix) to generate the complete set
+	      of Visual-C++ project files.
+	    - Added two makefile targets which are specific to Visual-C++
+	      project file generation and installation.
+		* 'msvcgen' builds the entire set of DSW and DSP files
+		  represented by the GNU makefiles, project-wide.  The
+		  generated files are placed in CS/out/mk/visualc.
+		* 'msvcinst' copies the DSW and DSP files from
+		  CS/out/mk/visualc to their official location at
+		  CS/mk/visualc.  Furthermore, this target instructs the user
+		  as to exactly which CVS commands must be invoked in order to
+		  properly commit the newly generated files to the CVS
+		  repository.  For instance, if a new plugin named "foo" is
+		  added and an old library named "bar" is dropped, the
+		  'msvcinst' target will instruct the user to invoke the
+		  commands "cvs add -kb plgfoo.dsp", "cvs remove libbar.dsp",
+		  and "cvs commit" in order to make the changes permanent.  The
+		  'msvcinst' target automatically invokes the 'msvcgen' target,
+		  so the synthesis and installation procedures can be performed
+		  as one operation.
+	    - Added support for automated Visual-C++ DSW and DSP project file
+	      generation to all of the GNU makefiles, project-wide.  Project
+	      file synthesis is performed by gleaning the values from some
+	      existing makefile variables as well as some newly added ones.  In
+	      the following discussion, assume that "PROJECT" is the core name
+	      of the module represented by a particular makefile.
+		* In addition to the existing makefile variable SRC.PROJECT,
+		  the following new general-purpose variables were added to
+		  support Visual-C++ project file creation:
+		    o INC.PROJECT -- Complements SRC.PROJECT, but lists header
+		      files related to this project.
+		    o DEP.PROJECT -- Although this variable already existed in
+		      some makefiles, its meaning has been altered slightly.
+		      The value of this variable is the list of projects
+		      (typically library projects) upon which this module
+		      depends.  Each item in this list is the core name of some
+		      other module, such as "CSGEOM", "CSUTIL", or "CSSYS".
+		    o LIB.PROJECT -- This variable now assumes the roll which
+		      DEP.PROJECT used to play in some makefiles.  It lists the
+		      libraries upon which this module depends.  The value of
+		      this variable is normally derived automatically from
+		      DEP.PROJECT, but may be specified manually in very
+		      special cases if necessary (though doing so is frowned
+		      upon).  If specified manually, each entry should be of
+		      the form "$(PROJECT.LIB)".
+		    o CFG.PROJECT -- List of configuration files related to
+		      this module.
+		* Furthermore, the following new variables specifically control
+		  DSW and DSP project file creation.  These variables should
+		  only appear in makefiles for which a corresponding DSP file
+		  should be generated.
+		    o MSVC.DSP -- This is the master list of modules for which
+		      project files should be generated.  Entries must be
+		      *appended* to this list with the "+=" operator.  Each
+		      entry is the core name of a module as used within its
+		      makefile.  For example, soft3d.mak, ensures that a
+		      project file is created for the 3D software renderer by
+		      invoking "MSVC.DSP += SOFT3D".
+		    o DSP.PROJECT.NAME -- Base name (such as "soft3d") for the
+		      generated project and target.  This name is used to
+		      compose the DSP file name, the end target (such as
+		      "soft3d.dll"), and the displayed project name in the
+		      Visual-C++ IDE.  In general, it should be identical to
+		      the base name of the target which is generated for
+		      non-Windows platforms.
+		    o DSP.PROJECT.TYPE -- The module's type.  It should be one
+		      of "appgui", "appcon", "library", "plugin", or "group",
+		      which stand for GUI application, console application,
+		      static library, plug-in module, and pseudo-dependency
+		      group, respectively.
+		    o DSP.PROJECT.RESOURCES -- Lists any extra human-readable
+		      resources related to this module which are not covered by
+		      CFG.PROJECT.  These resources may be browsed in the
+		      Visual-C++ IDE as a convenience to the user.  Some good
+		      candidates, among others, for this variable are files
+		      having the suffixes .inc, .y (yacc), .l (lex), and .txt.
+		    o DSP.PROJECT.DEPEND -- Lists extra dependencies for this
+		      module.  Entries in this list have the same format as
+		      those in the DEP.PROJECT list.  This variable is
+		      generally only used for pseudo-dependency group projects
+		      (see win32.mak).
+	    - Renamed docproc.pl to jobber.pl and modified it to also rebuild
+	      and commit Visual-C++ DSW and DSP project files in addition to
+	      its normal duties of rebuilding and publishing project
+	      documentation.  The script is automatically invoked twice daily.
+	      As always, the script is smart enough to add new project files,
+	      and remove obsolete project files from the CVS repository in
+	      addition to committing those which were only modified.  It also
+	      takes special are to use the "-kb" option when adding Visual-C++
+	      project files to the repository in order to preserve the CRLF
+	      line terminators (which Microsoft requires).  Also, when scanning
+	      directories to determine which files to add and remove from the
+	      repository, ".cvsignore" files are now ignored (along with all
+	      other CVS administrative files which have always been ignored).
+	    - Performed significant unification and clean-up of makefiles
+	      throughout the project.  Simplified several makefiles which had
+	      unnecessarily complicated innards.  Also added missing makefiles:
+	      snda3d.mak, sndds3d.mak.
+	    - Changed suffix of OpenGL extension-detection files from .cpp to
+	      .inc since they are use as include-files rather than stand-alone
+	      sources.  Also performed much clean-up of these files.
+	    - The standard system-dependent makefiles now define the additional
+	      utility command definitions CD, PWD, and PERL (in addition to
+	      other existing definitions such as RM, MV, CC, etc.).  The
+	      default definitions are specified in unix.mak and dos.mak.
+	    - The makefile fragment common.mak now specially defines $" and $|
+	      if they are not already defined.  This allows recursive 'make'
+	      invocations to use these variables with "echo" commands within
+	      targets in exactly the same way as top-level makefile targets can
+	      do so.
+	    - Fixed the makefile 'clean' targets of all library modules so that
+	      they also remove the generated dependency (.dep) file.  (Other
+	      makefiles around the project had already been repaired in this
+	      manner.)
+	    - Removed obsolete memory-debugger support from cssys.mak.  Andrew
+	      had removed the remainder of this cruft from the rest of the
+	      project on 2000/10/30 but missed cssys.mak.
+	    - Added better documentation and more correct protection to ddg.h's
+	      inclusion of cssysdef.h.
+	    - Removed references to obsolete "null" sound driver from makefiles
+	      and documentation.
 31-Oct-2000
 	- Philip Wyett fixed the CSWS VC project file after Andrew's
 	  changes.
