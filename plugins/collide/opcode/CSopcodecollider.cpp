@@ -71,7 +71,6 @@ csOPCODECollider::csOPCODECollider (iPolygonMesh* mesh)
   transform.m[2][3] = 0;
   transform.m[3][3] = 1;  
   GeometryInitialize (mesh);
-  mesh->Cleanup ();
 }
 
 inline float min3 (float a, float b, float c)

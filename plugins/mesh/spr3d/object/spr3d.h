@@ -668,8 +668,9 @@ public:
       return factory->GetTriangles ();
     }
 
-    virtual void Cleanup () { delete[] polygons; polygons = 0; }
-    
+    virtual void Lock () { } //PM@@@
+    virtual void Unlock () { }
+ 
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
@@ -678,6 +679,7 @@ public:
       SCF_CONSTRUCT_IBASE (0);
     }
     virtual ~PolyMesh () { Cleanup (); }
+    void Cleanup () { delete[] polygons; polygons = 0; }
 
     csMeshedPolygon* polygons;
   } scfiPolygonMesh;
@@ -1712,13 +1714,15 @@ public:
       return fact->GetTriangles ();
     }
 
-    virtual void Cleanup () { delete[] polygons; polygons = 0; }
-    
+    virtual void Lock () { }
+    virtual void Unlock () { }
+
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
     PolyMesh () : polygons (0) { }
     virtual ~PolyMesh () { Cleanup (); }
+    void Cleanup () { delete[] polygons; polygons = 0; }
 
     csMeshedPolygon* polygons;
   } scfiPolygonMesh;

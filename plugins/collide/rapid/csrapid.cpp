@@ -139,7 +139,8 @@ struct TriPolygonMesh : public iPolygonMesh
   virtual csMeshedPolygon* GetPolygons () { return poly; }
   virtual int GetTriangleCount () { return 1; }
   virtual csTriangle* GetTriangles () { return &triangle; }
-  virtual void Cleanup () { }
+  virtual void Lock () { }
+  virtual void Unlock () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return 0; }
 };

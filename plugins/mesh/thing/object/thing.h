@@ -84,13 +84,23 @@ struct RepMaterial
 class PolyMeshHelper : public iPolygonMesh
 {
 public:
+  SCF_DECLARE_IBASE_WEAK (PolyMeshHelper);
+
   /**
    * Make a polygon mesh helper which will accept polygons which match
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
   PolyMeshHelper (uint32 flag) :
-  	polygons (0), vertices (0), poly_flag (flag), triangles (0) { }
-  virtual ~PolyMeshHelper () { Cleanup (); }
+  	polygons (0), vertices (0), poly_flag (flag), triangles (0),
+	locked (0)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+  }
+  virtual ~PolyMeshHelper ()
+  {
+    RemoveRefOwners ();
+    Cleanup ();
+  }
 
   void Setup ();
   void SetThing (csThingStatic* thing);
@@ -125,10 +135,13 @@ public:
     Triangulate ();
     return triangles;
   }
-  virtual void Cleanup ();
-  
+  virtual void Lock () { locked++; }
+  virtual void Unlock ();
+ 
   virtual csFlags& GetFlags () { return flags;  }
   virtual uint32 GetChangeNumber() const { return 0; }
+
+  void Cleanup ();
 
 private:
   csThingStatic* thing;
@@ -141,6 +154,7 @@ private:
   csFlags flags;
   csTriangle* triangles;
   int tri_count;
+  int locked;
 
   void Triangulate ()
   {
@@ -459,20 +473,9 @@ public:
   virtual iBase* GetLogicalParent () const { return logparent; }
 
   //-------------------- iPolygonMesh interface implementation ---------------
-  struct PolyMesh : public PolyMeshHelper
-  {
-    SCF_DECLARE_IBASE;
-    PolyMesh ();
-  } scfiPolygonMesh;
-
+  PolyMeshHelper scfiPolygonMesh;
   //------------------- Lower detail iPolygonMesh implementation ---------------
-  struct PolyMeshLOD : public PolyMeshHelper
-  {
-    PolyMeshLOD ();
-    // @@@ Not embedded because we can't have two iPolygonMesh implementations
-    // in csThing.
-    SCF_DECLARE_IBASE;
-  } scfiPolygonMeshLOD;
+  PolyMeshHelper scfiPolygonMeshLOD;
 
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public csObjectModel
@@ -1051,20 +1054,9 @@ public:
   friend struct LightingInfo;
 
   //-------------------- iPolygonMesh interface implementation ---------------
-  struct PolyMesh : public PolyMeshHelper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    PolyMesh () : PolyMeshHelper (CS_POLY_COLLDET) { }
-  } scfiPolygonMesh;
-
+  PolyMeshHelper scfiPolygonMesh;
   //------------------- Lower detail iPolygonMesh implementation ---------------
-  struct PolyMeshLOD : public PolyMeshHelper
-  {
-    PolyMeshLOD ();
-    // @@@ Not embedded because we can't have two iPolygonMesh implementations
-    // in csThing.
-    SCF_DECLARE_IBASE;
-  } scfiPolygonMeshLOD;
+  PolyMeshHelper scfiPolygonMeshLOD;
 
   //-------------------- iShadowCaster interface implementation ----------
   struct ShadowCaster : public iShadowCaster

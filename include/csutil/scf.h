@@ -130,6 +130,7 @@ struct iBase
   csArray<Class**> weak_ref_owners;					\
   virtual void AddRefOwner (Class** ref_owner);				\
   virtual void RemoveRefOwner (Class** ref_owner);			\
+  virtual void RemoveRefOwners ();					\
   SCF_DECLARE_IBASE
 
 /**
@@ -211,11 +212,7 @@ void Class::DecRef ()							\
 {									\
   if (scfRefCount == 1)							\
   {									\
-    for (int i = 0 ; i < weak_ref_owners.Length () ; i++)		\
-    {									\
-      Class** p = weak_ref_owners[i];					\
-      *p = 0;								\
-    }									\
+    RemoveRefOwners ();							\
     SCF_TRACE ((" delete (%s *)%p\n", #Class, this));			\
     if (scfParent)							\
       scfParent->DecRef ();						\
@@ -223,6 +220,15 @@ void Class::DecRef ()							\
     return;								\
   }									\
   scfRefCount--;							\
+}									\
+void Class::RemoveRefOwners ()						\
+{									\
+  for (int i = 0 ; i < weak_ref_owners.Length () ; i++)			\
+  {									\
+    Class** p = weak_ref_owners[i];					\
+    *p = 0;								\
+  }									\
+  weak_ref_owners.DeleteAll ();						\
 }
 
 /**

@@ -49,6 +49,8 @@
 #include "csutil/array.h"
 #include "csutil/garray.h"
 #include "csutil/cfgacc.h"
+#include "csutil/timer.h"
+#include "csutil/weakref.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/vbufmgr.h"
 #include "ivideo/texture.h"
@@ -85,22 +87,6 @@ SCF_IMPLEMENT_IBASE(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowReceiver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObject)
-  {
-    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
-    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
-      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
-    if (iInterfaceID == iPolygonMesh_scfID &&				
-      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
-    {
-#ifdef CS_DEBUG
-      printf ("Deprecated feature use: iPolygonMesh queried from Thing "
-	"object; use iMeshObject->GetObjectModel()->"
-	"GetPolygonMeshColldet() instead.\n");
-#endif
-      (&scfiPolygonMesh)->IncRef ();						
-      return STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);				
-    }
-  }
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ThingState)
@@ -109,10 +95,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::LightingInfo)
   SCF_IMPLEMENTS_INTERFACE(iLightingInfo)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ShadowCaster)
@@ -127,6 +109,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::MeshObject)
   SCF_IMPLEMENTS_INTERFACE(iMeshObject)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+
 int csThing:: last_thing_id = 0;
 
 //----------------------------------------------------------------------------
@@ -138,22 +121,6 @@ SCF_IMPLEMENT_IBASE(csThingStatic)
 #ifdef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_INTERFACE(iRenderBufferSource)
 #endif
-  {
-    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
-    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
-      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
-    if (iInterfaceID == iPolygonMesh_scfID &&				
-      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
-    {
-#ifdef CS_DEBUG
-      printf ("Deprecated feature use: iPolygonMesh queried from Thing "
-	"factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
-#endif
-      iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
-      (Object)->IncRef ();						
-      return STATIC_CAST(iPolygonMesh*, Object);				
-    }
-  }
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThingStatic::ObjectModel)
@@ -171,7 +138,8 @@ csStringID csThingStatic::binormal_name = csInvalidStringID;
 #endif
 
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
-	: static_polygons (32, 64)
+	: static_polygons (32, 64), scfiPolygonMesh (CS_POLY_COLLDET),
+	scfiPolygonMeshLOD (CS_POLY_VISCULL)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
@@ -1387,29 +1355,8 @@ void csThingStatic::FillRenderMeshes (
 
 //----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csThingStatic::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
-
-csThingStatic::PolyMesh::PolyMesh () : PolyMeshHelper (CS_POLY_COLLDET) 
-{ 
-  SCF_CONSTRUCT_IBASE (0);
-}
-
-//----------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE(csThingStatic::PolyMeshLOD)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
-
-csThingStatic::PolyMeshLOD::PolyMeshLOD () : PolyMeshHelper (CS_POLY_VISCULL)
-{
-  SCF_CONSTRUCT_IBASE (0);
-}
-
-//-------------------------------------------------------------------------
-
-csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64)
+csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64),
+	scfiPolygonMesh (CS_POLY_COLLDET), scfiPolygonMeshLOD (CS_POLY_VISCULL)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
@@ -2365,16 +2312,32 @@ void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
 
 //-------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csThing::PolyMeshLOD)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
+struct PolyMeshTimerEvent : public iTimerEvent
+{
+  csWeakRef<PolyMeshHelper> pmh;
+  PolyMeshTimerEvent (PolyMeshHelper* pmh)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    PolyMeshTimerEvent::pmh = pmh;
+  }
+  virtual ~PolyMeshTimerEvent () { }
+  SCF_DECLARE_IBASE;
+  virtual bool Perform (iTimerEvent*)
+  {
+    if (pmh) pmh->Cleanup ();
+    return false;
+  }
+};
+
+SCF_IMPLEMENT_IBASE(PolyMeshTimerEvent)
+  SCF_IMPLEMENTS_INTERFACE(iTimerEvent)
 SCF_IMPLEMENT_IBASE_END
 
-csThing::PolyMeshLOD::PolyMeshLOD () : PolyMeshHelper (CS_POLY_VISCULL)
-{
-  SCF_CONSTRUCT_IBASE (0);
-}
-
 //-------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE_WEAK (PolyMeshHelper)
+  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
+SCF_IMPLEMENT_IBASE_WEAK_END
 
 void PolyMeshHelper::SetThing (csThingStatic* thing)
 {
@@ -2433,10 +2396,31 @@ void PolyMeshHelper::Setup ()
       }
     }
   }
+
+  csRef<iEventTimer> timer = csEventTimer::GetStandardTimer (
+  	thing->thing_type->object_reg);
+  PolyMeshTimerEvent* te = new PolyMeshTimerEvent (this);
+  timer->AddTimerEvent (te, 10000);
+  te->DecRef ();
+}
+
+void PolyMeshHelper::Unlock ()
+{
+  locked--;
+  CS_ASSERT (locked >= 0);
+  if (locked <= 0)
+  {
+    csRef<iEventTimer> timer = csEventTimer::GetStandardTimer (
+  	thing->thing_type->object_reg);
+    PolyMeshTimerEvent* te = new PolyMeshTimerEvent (this);
+    timer->AddTimerEvent (te, 1000);
+    te->DecRef ();
+  }
 }
 
 void PolyMeshHelper::Cleanup ()
 {
+  if (locked) return;
   delete[] polygons;
   polygons = 0;
   vertices = 0;

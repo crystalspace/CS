@@ -192,7 +192,8 @@ public:
     Triangulate ();
     return triangles;
   }
-  virtual void Cleanup () { }
+  virtual void Lock () { }
+  virtual void Unlock () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return change_nr; }
 };
@@ -283,7 +284,8 @@ public:
   virtual csMeshedPolygon* GetPolygons () { return polygons; }
   virtual int GetTriangleCount () { return 12; }
   virtual csTriangle* GetTriangles ();
-  virtual void Cleanup () { }
+  virtual void Lock () { }
+  virtual void Unlock () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return change_nr; }
 };

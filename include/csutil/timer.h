@@ -39,7 +39,7 @@ class csEventTimer : public iEventTimer
 private:
   iObjectRegistry* object_reg;
   csArray<timerevent> timerevents;
-  csRef<iEventHandler> handler;
+  iEventHandler* handler;
   csRef<iVirtualClock> vc;
 
   int FindTimerEvent (iTimerEvent* ev);
@@ -47,7 +47,8 @@ private:
   // Optimization: to prevent having to loop over all timer events
   // all the time we keep the minimum time needed before the first
   // event is triggered.
-  csTicks minimum_time;
+  int32 minimum_time;
+  int32 accumulate_elapsed;
 
 public:
   csEventTimer (iObjectRegistry* object_reg);
@@ -60,6 +61,13 @@ public:
   virtual void AddTimerEvent (iTimerEvent* ev, csTicks delay);
   virtual void RemoveTimerEvent (iTimerEvent* ev);
   virtual void RemoveAllTimerEvents ();
+
+  /**
+   * This is a static method to easily get the standard
+   * global timer (name 'crystalspace.timer.standard' in the object
+   * registry). If that timer doesn't exist yet it will be created.
+   */
+  static csPtr<iEventTimer> GetStandardTimer (iObjectRegistry* object_reg);
 };
 
 #endif // __CS_TIMER_H__

@@ -406,6 +406,7 @@ public:
       ball = Ball;
       flags.SetAll (CS_POLYMESH_CLOSED | CS_POLYMESH_CONVEX);
     }
+    void Cleanup ();
 
     virtual int GetVertexCount ();
     virtual csVector3* GetVertices ();
@@ -423,7 +424,8 @@ public:
       return ball->top_mesh.triangles;
 #endif
     }
-    virtual void Cleanup ();
+    virtual void Lock () { }
+    virtual void Unlock () { }
     
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }

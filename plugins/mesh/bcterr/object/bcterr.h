@@ -173,10 +173,8 @@ public:
     }
     return 0;
   }
-  virtual void Cleanup () 
-  {
-    return;
-  }
+  virtual void Lock () { }
+  virtual void Unlock () { }
  
   virtual csFlags& GetFlags () { return flags;  }
   virtual uint32 GetChangeNumber() const { return 0; }

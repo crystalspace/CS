@@ -39,12 +39,15 @@ csDynavisObjectModel::csDynavisObjectModel ()
   num_edges = -1;
   dirty_obb = true;
   has_obb = false;
+  imodel = 0;
 }
 
 csDynavisObjectModel::~csDynavisObjectModel ()
 {
   delete[] planes;
   delete[] edges;
+  if (imodel && imodel->GetPolygonMeshViscull ())
+    imodel->GetPolygonMeshViscull ()->Unlock ();
 }
 
 void csDynavisObjectModel::UpdateOutline (const csVector3& pos)
@@ -121,9 +124,11 @@ csObjectModelManager::~csObjectModelManager ()
   }
 }
 
-csDynavisObjectModel* csObjectModelManager::CreateObjectModel (iObjectModel* imodel)
+csDynavisObjectModel* csObjectModelManager::CreateObjectModel (
+	iObjectModel* imodel)
 {
-  csDynavisObjectModel* model = (csDynavisObjectModel*)models.Get ((csHashKey)imodel);
+  csDynavisObjectModel* model = (csDynavisObjectModel*)models.Get (
+  	(csHashKey)imodel);
   if (model)
   {
     model->ref_cnt++;
@@ -135,6 +140,8 @@ csDynavisObjectModel* csObjectModelManager::CreateObjectModel (iObjectModel* imo
     model->imodel = imodel;
     // To make sure we will recalc we set shape_number to one less.
     model->shape_number = imodel->GetShapeNumber ()-1;
+    if (imodel->GetPolygonMeshViscull ())
+      imodel->GetPolygonMeshViscull ()->Lock ();
   }
   return model;
 }

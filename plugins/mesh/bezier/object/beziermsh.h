@@ -66,6 +66,7 @@ public:
   BezierPolyMeshHelper () :
   	polygons (0), vertices (0), triangles (0) { }
   virtual ~BezierPolyMeshHelper () { Cleanup (); }
+  void Cleanup ();
 
   void Setup ();
   void SetThing (csBezierMesh* thing) { BezierPolyMeshHelper::thing = thing; }
@@ -102,7 +103,9 @@ public:
     Triangulate ();
     return triangles;
   }
-  virtual void Cleanup ();
+
+  virtual void Lock () { }
+  virtual void Unlock () { }
   
   virtual csFlags& GetFlags () { return flags;  }
   virtual uint32 GetChangeNumber() const { return 0; }

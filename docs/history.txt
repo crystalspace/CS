@@ -40,6 +40,21 @@ chronological order.
 	  can schedule operations to be performed later. It is a very low
 	  overhead scheduler since it will actually only check all events
 	  if needed.
+	- Jorrit added csEventTimer::GetStandardTimer() conveniance function.
+	  This gets (or creates) the standard timer with id
+	  'crystalspace.timer.standard' from the object registry.
+	- Jorrit fixed SCF_IMPLEMENT_IBASE_WEAK_DECREF so that it now also
+	  adds a RemoveRefOwners() function that you can use in the
+	  destructor of some object to clean all ref owners.
+	- Jorrit fixed some bugs in csTimerEvent so that it actually works.
+	- Jorrit removed iPolygonMesh->Cleanup() and added iPolygonMesh->Lock()
+	  and iPolygonMesh->Unlock() instead. The reasoning is that cleanup
+	  should not be called by the modules using iPolygonMesh because they
+	  don't know if another module isn't going to need the data later.
+	  Instead the new timer is used to register events that will clean
+	  up the polygon mesh data later provided none of the modules is
+	  locking it.
+	- The thing mesh object now implements this way of cleanup.
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer

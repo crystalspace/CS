@@ -895,7 +895,8 @@ public:
   virtual csMeshedPolygon* GetPolygons () { return poly; }
   virtual int GetTriangleCount () { return 12; }
   virtual csTriangle* GetTriangles () { return triangles; }
-  virtual void Cleanup () { }
+  virtual void Lock () { }
+  virtual void Unlock () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return 0; }
 };

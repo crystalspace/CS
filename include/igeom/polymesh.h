@@ -85,7 +85,7 @@ struct csMeshedPolygon
 class csVector3;
 struct csTriangle;
 
-SCF_VERSION (iPolygonMesh, 0, 4, 0);
+SCF_VERSION (iPolygonMesh, 0, 5, 0);
 
 /**
  * This interface reprents a mesh of polygons. It is useful to communicate
@@ -117,11 +117,14 @@ struct iPolygonMesh : public iBase
   /// Get the triangle table for this mesh.
   virtual csTriangle* GetTriangles () = 0;
   /**
-   * Cleanup: this is called by the polygon mesh user
-   * when it is ready extracting the data from the iPolygonMesh.
-   * This gives the polygon mesh a chance to clean up some stuff.
+   * Lock the polygon mesh. This prevents the polygon and triangle
+   * data from being cleaned up.
    */
-  virtual void Cleanup () = 0;
+  virtual void Lock () = 0;
+  /**
+   * Unlock the polygon mesh. This allows clean up again.
+   */
+  virtual void Unlock () = 0;
 
   /**
    * Get flags for this polygon mesh. This is zero or more of the
