@@ -2571,7 +2571,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "farplane disabled");
 	return true;
     }
-    csPlane3 farplane(0,0,1,distance);
+    csPlane3 farplane(0,0,-1,distance);
     Sys->view->GetCamera()->SetFarPlane(&farplane);
     // turn on zclear to be sure
     Sys->Engine->SetClearZBuf(true);
