@@ -3,7 +3,7 @@
 #include "csutil/scf.h"
 #include "csutil/cfgfile.h"
 #include "ivaria/reporter.h"
-#include "iaws/iaws.h"
+#include "iaws/aws.h"
 #include "awstest.h"
 
 #include <stdio.h>

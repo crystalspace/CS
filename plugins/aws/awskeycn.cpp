@@ -3,7 +3,7 @@
 #include "csutil/scfstr.h"
 #include "csgeom/csrect.h"
 #include "csutil/csdllist.h"
-#include "iaws/iaws.h"
+#include "iaws/aws.h"
 #include "awsprefs.h"
 #include "awsadler.h"
 

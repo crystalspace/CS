@@ -1,5 +1,22 @@
-#ifndef __IVARIA_AWS_H__
-#define __IVARIA_AWS_H__
+#ifndef __IAWS_AWS_H__
+#define __IAWS_AWS_H__
+/**************************************************************************
+    Copyright (C) 2001 by Christopher Nelson 
+    
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*****************************************************************************/
 
 #include "csutil/scf.h"
 #include "csgeom/csrect.h"
@@ -109,7 +126,6 @@ SCF_VERSION (iAwsPrefManager, 0, 0, 1);
 struct iAwsPrefManager : public iBase
 {
 public:
-
   /// Performs whatever initialization is needed
   virtual void Setup(iObjectRegistry *object_reg)=0;   
 
@@ -203,8 +219,8 @@ public:
 
   /** Allows a component to retrieve the value of a constant, or the parser as well. */
   virtual int  GetConstantValue(char *name)=0;
-
 };
+
 
 SCF_VERSION (iAwsSinkManager, 0, 0, 1);
 
@@ -219,6 +235,7 @@ struct iAwsSinkManager : public iBase
   /// Create a new embeddable sink, with parm as the void * passed into the triggers.
   virtual iAwsSink *CreateSink(void *parm)=0;
 };
+
 
 SCF_VERSION (iAwsSink, 0, 0, 1);
 
@@ -257,7 +274,6 @@ SCF_VERSION (iAwsSlot, 0, 0, 1);
 
 struct iAwsSlot : public iBase
 {
-    
   /** Connect sets us up to receive signals from some other component.  You can connect to as many different sources 
    * and signals as you'd like.  You may connect to multiple signals from the same source.
    */
@@ -278,161 +294,163 @@ SCF_VERSION (iAwsComponent, 0, 0, 1);
 
 struct iAwsComponent : public iAwsSource
 {
-    /// Sets up a component.
-    virtual bool Setup(iAws *wmgr, awsComponentNode *settings)=0;
-   
-    /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
-    virtual bool HandleEvent(iEvent& Event)=0;
+  /// Sets up a component.
+  virtual bool Setup(iAws *wmgr, awsComponentNode *settings)=0;
 
-    /// Gets a copy of the property, put it in parm.  Returns false if the property does not exist.
-    virtual bool GetProperty(char *name, void **parm)=0;
+  /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
+  virtual bool HandleEvent(iEvent& Event)=0;
 
-    /// Sets the property specified to whatever is in parm. Returns false if there's no such property.
-    virtual bool SetProperty(char *name, void *parm)=0;
+  /// Gets a copy of the property, put it in parm.  Returns false if the property does not exist.
+  virtual bool GetProperty(char *name, void **parm)=0;
 
-    /// Executes a scriptable action
-    virtual bool Execute(char *action, iAwsParmList &parmlist)=0;
+  /// Sets the property specified to whatever is in parm. Returns false if there's no such property.
+  virtual bool SetProperty(char *name, void *parm)=0;
 
-    /// Invalidation routine: allow the component to be redrawn when you call this
-    virtual void Invalidate()=0;
+  /// Executes a scriptable action
+  virtual bool Execute(char *action, iAwsParmList &parmlist)=0;
 
-    /// Invalidation routine: allow component to be redrawn, but only part of it
-    virtual void Invalidate(csRect area)=0;
+  /// Invalidation routine: allow the component to be redrawn when you call this
+  virtual void Invalidate()=0;
 
-    /// Get this component's frame
-    virtual csRect& Frame()=0;
+  /// Invalidation routine: allow component to be redrawn, but only part of it
+  virtual void Invalidate(csRect area)=0;
 
-    /// Returns the named TYPE of the component, like "Radio Button", etc.
-    virtual char *Type()=0;
+  /// Get this component's frame
+  virtual csRect& Frame()=0;
 
-    /// Sets the flag (can handle multiple simultaneous sets)
-    virtual void SetFlag(unsigned int flag)=0;
+  /// Returns the named TYPE of the component, like "Radio Button", etc.
+  virtual char *Type()=0;
 
-    /// Clears the flag (can handle multiple simultaneous clears)
-    virtual void ClearFlag(unsigned int flag)=0;
+  /// Sets the flag (can handle multiple simultaneous sets)
+  virtual void SetFlag(unsigned int flag)=0;
 
-    /// Returns the current state of the flags
-    virtual unsigned int Flags()=0;
+  /// Clears the flag (can handle multiple simultaneous clears)
+  virtual void ClearFlag(unsigned int flag)=0;
 
-    /// Gets the window that this component resides in.
-    virtual iAwsWindow *Window()=0;
+  /// Returns the current state of the flags
+  virtual unsigned int Flags()=0;
 
-    /// Gets the parent component of this component;
-    virtual iAwsComponent *Parent()=0;
+  /// Gets the window that this component resides in.
+  virtual iAwsWindow *Window()=0;
 
-    /// Sets the window that this component resides in.
-    virtual void SetWindow(iAwsWindow *win)=0;
+  /// Gets the parent component of this component;
+  virtual iAwsComponent *Parent()=0;
 
-    /// Sets the parent component of this component;
-    virtual void SetParent(iAwsComponent *parent)=0;
+  /// Sets the window that this component resides in.
+  virtual void SetWindow(iAwsWindow *win)=0;
 
-    /// Returns true if this window overlaps the given rect.
-    virtual bool Overlaps(csRect &r)=0;
+  /// Sets the parent component of this component;
+  virtual void SetParent(iAwsComponent *parent)=0;
 
-    /// Returns the state of the hidden flag
-    virtual bool isHidden()=0;
+  /// Returns true if this window overlaps the given rect.
+  virtual bool Overlaps(csRect &r)=0;
 
-    /// Hides a component
-    virtual void Hide()=0;
+  /// Returns the state of the hidden flag
+  virtual bool isHidden()=0;
 
-    /// Shows a component
-    virtual void Show()=0;
+  /// Hides a component
+  virtual void Hide()=0;
 
-    /// Get's the unique id of this component.
-    virtual unsigned long GetID()=0;
+  /// Shows a component
+  virtual void Show()=0;
 
-    /// Set's the unique id of this component. Note: only to be used by window manager.
-    virtual void SetID(unsigned long _id)=0;
+  /// Get's the unique id of this component.
+  virtual unsigned long GetID()=0;
 
-    /// Recursively moves children (and all nested children) by relative amount given.
-    virtual void MoveChildren(int delta_x, int delta_y)=0;
+  /// Set's the unique id of this component. Note: only to be used by window manager.
+  virtual void SetID(unsigned long _id)=0;
 
-    /// Adds a child into this component.   
-    virtual void AddChild(iAwsComponent* child, bool owner=true)=0;
+  /// Recursively moves children (and all nested children) by relative amount given.
+  virtual void MoveChildren(int delta_x, int delta_y)=0;
 
-    /// Removes a child from this component. 
-    virtual void RemoveChild(iAwsComponent *child)=0;
+  /// Adds a child into this component.   
+  virtual void AddChild(iAwsComponent* child, bool owner=true)=0;
 
-    /// Get's the number of children
-    virtual int GetChildCount()=0;
+  /// Removes a child from this component. 
+  virtual void RemoveChild(iAwsComponent *child)=0;
 
-    /// Get's a specific child
-    virtual iAwsComponent *GetChildAt(int i)=0;
+  /// Get's the number of children
+  virtual int GetChildCount()=0;
+
+  /// Get's a specific child
+  virtual iAwsComponent *GetChildAt(int i)=0;
     
-    /// Returns true if this component has children
-    virtual bool HasChildren()=0;
+  /// Returns true if this component has children
+  virtual bool HasChildren()=0;
 
-    /// Triggered when the component needs to draw
-    virtual void OnDraw(csRect clip)=0;
+  /// Triggered when the component needs to draw
+  virtual void OnDraw(csRect clip)=0;
 
-    /// Triggered when the user presses a mouse button down
-    virtual bool OnMouseDown(int button, int x, int y)=0;
+  /// Triggered when the user presses a mouse button down
+  virtual bool OnMouseDown(int button, int x, int y)=0;
     
-    /// Triggered when the user unpresses a mouse button 
-    virtual bool OnMouseUp(int button, int x, int y)=0;
+  /// Triggered when the user unpresses a mouse button 
+  virtual bool OnMouseUp(int button, int x, int y)=0;
     
-    /// Triggered when the user moves the mouse
-    virtual bool OnMouseMove(int button, int x, int y)=0;
+  /// Triggered when the user moves the mouse
+  virtual bool OnMouseMove(int button, int x, int y)=0;
 
-    /// Triggered when the user clicks the mouse
-    virtual bool OnMouseClick(int button, int x, int y)=0;
+  /// Triggered when the user clicks the mouse
+  virtual bool OnMouseClick(int button, int x, int y)=0;
 
-    /// Triggered when the user double clicks the mouse
-    virtual bool OnMouseDoubleClick(int button, int x, int y)=0;
+  /// Triggered when the user double clicks the mouse
+  virtual bool OnMouseDoubleClick(int button, int x, int y)=0;
 
-    /// Triggered when this component loses mouse focus
-    virtual bool OnMouseExit()=0;
+  /// Triggered when this component loses mouse focus
+  virtual bool OnMouseExit()=0;
 
-    /// Triggered when this component gains mouse focus
-    virtual bool OnMouseEnter()=0;
+  /// Triggered when this component gains mouse focus
+  virtual bool OnMouseEnter()=0;
 
-    /// Triggered when the user presses a key
-    virtual bool OnKeypress(int key, int modifiers)=0;
+  /// Triggered when the user presses a key
+  virtual bool OnKeypress(int key, int modifiers)=0;
     
-    /// Triggered when the keyboard focus is lost
-    virtual bool OnLostFocus()=0;
+  /// Triggered when the keyboard focus is lost
+  virtual bool OnLostFocus()=0;
 
-    /// Triggered when the keyboard focus is gained
-    virtual bool OnGainFocus()=0;
+  /// Triggered when the keyboard focus is gained
+  virtual bool OnGainFocus()=0;
 };
+
 
 SCF_VERSION (iAwsWindow, 0, 0, 1);
 
 struct iAwsWindow : public iAwsComponent
 {
-    /// Sets the value of the redraw tag
-    virtual void SetRedrawTag(unsigned int tag)=0;
+  /// Sets the value of the redraw tag
+  virtual void SetRedrawTag(unsigned int tag)=0;
 
-    /// Gets the value of the redraw tag
-    virtual unsigned int RedrawTag()=0;
+  /// Gets the value of the redraw tag
+  virtual unsigned int RedrawTag()=0;
   
-    /// Raises a window to the top.
-    virtual void Raise()=0;
+  /// Raises a window to the top.
+  virtual void Raise()=0;
 
-    /// Lowers a window to the bottom.
-    virtual void Lower()=0;
+  /// Lowers a window to the bottom.
+  virtual void Lower()=0;
 
-    /// Get's the window above this one, NULL if there is none.
-    virtual iAwsWindow *WindowAbove()=0;
+  /// Get's the window above this one, NULL if there is none.
+  virtual iAwsWindow *WindowAbove()=0;
 
-    /// Get's the window below this one, NULL if there is none.
-    virtual iAwsWindow *WindowBelow()=0;
+  /// Get's the window below this one, NULL if there is none.
+  virtual iAwsWindow *WindowBelow()=0;
 
-    /// Set's the window above this one
-    virtual void SetWindowAbove(iAwsWindow *win)=0;
+  /// Set's the window above this one
+  virtual void SetWindowAbove(iAwsWindow *win)=0;
     
-    /// Set's the window below this one
-    virtual void SetWindowBelow(iAwsWindow *win)=0;
+  /// Set's the window below this one
+  virtual void SetWindowBelow(iAwsWindow *win)=0;
 
-    /// Does some additional setup for windows, including linking into the window hierarchy.
-    virtual bool Setup(iAws *_wmgr, awsComponentNode *settings)=0;
+  /// Does some additional setup for windows, including linking into the window hierarchy.
+  virtual bool Setup(iAws *_wmgr, awsComponentNode *settings)=0;
 
-    /// Event triggered when a window is about to be raised
-    virtual void OnRaise()=0;
+  /// Event triggered when a window is about to be raised
+  virtual void OnRaise()=0;
 
-    /// Event triggered when a window is about to be lowered
-    virtual void OnLower()=0;
+  /// Event triggered when a window is about to be lowered
+  virtual void OnLower()=0;
 };
+
 
 SCF_VERSION (iAwsComponentFactory, 0, 0, 1);
 
@@ -448,5 +466,4 @@ struct iAwsComponentFactory : public iBase
   virtual void RegisterConstant(char *name, int value)=0;
 };
 
-
-#endif // __IVARIA_AWS_H__
+#endif // __IAWS_AWS_H__

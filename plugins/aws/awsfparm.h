@@ -1,7 +1,7 @@
 #ifndef __AWS_FLEXIBLE_PARAMETER_LIST__
 #define __AWS_FLEXIBLE_PARAMETER_LIST__
 
-#include "iaws/iawsparm.h"
+#include "iaws/awsparm.h"
 #include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
 #include "csutil/scfstr.h"

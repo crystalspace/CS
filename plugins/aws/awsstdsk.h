@@ -9,7 +9,7 @@
  may not be privy to.
  ************************************************************************************/
 
-#include "iaws/iaws.h"
+#include "iaws/aws.h"
 #include "awsslot.h"
 
 class awsStandardSink : public awsSink

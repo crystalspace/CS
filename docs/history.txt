@@ -20,6 +20,8 @@ The history order is reversed so that new features are at the top.
 	  automatically override the setting of EXTENSIVE_MEMDEBUG in order to
 	  disable it, since the extensive memory debugger's overloaded `new'
 	  operators are incompatible with those platforms.
+	- Eric Sunshine stripped the "i" prefix off of the following filenames
+	  in the CS/include/iaws directory: iaws.h, iawsdefs.h, iawsparm.h
 5-Nov-2001
 	- Fixed a bug in bin/chkheadr.sh which caused that test to always
 	  fail with the result that CS_USE_FAKE_SOCKLEN_TYPE would always

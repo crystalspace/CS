@@ -1,7 +1,7 @@
 #ifndef __AWS_SINK_TEST_H
 #define __AWS_SINK_TEST_H
 
-#include "iaws/iaws.h"
+#include "iaws/aws.h"
 #include "iutil/string.h"
 
 class awsTestSink 

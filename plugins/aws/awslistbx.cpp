@@ -504,7 +504,7 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, b
   // Draw columns
   for(i=0; i<ncolumns; ++i)
     {
-      int tw=0, th=0, tx, ty, mcc;
+      int tw=0, th=0, tx=0, ty=0, mcc;
       int cw;
 
       int iw=0, ih=0; // stateful image width and height

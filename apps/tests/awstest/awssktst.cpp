@@ -1,7 +1,7 @@
 #include "cssysdef.h"
 #include "awssktst.h"
 #include "csutil/scfstr.h"
-#include "iaws/iawsparm.h"
+#include "iaws/awsparm.h"
 
 #include <stdio.h>
 
@@ -189,13 +189,14 @@ awsTestSink::Login(void *sk, iAwsSource *source)
   else {
     printf("awstest: Logging in as %s with password: %s  (not really.)\n", sink->user->GetData(), sink->pass->GetData());
     iAwsComponent *comp = source->GetComponent();
-    iAwsParmList *pl;
 
-    if (sink->wmgr) pl = sink->wmgr->CreateParmList();
+    if (sink->wmgr) {
+      iAwsParmList *pl = sink->wmgr->CreateParmList();
 
-    comp->Execute("HideWindow", *pl);
-    if (sink->test) sink->test->Show();
+      comp->Execute("HideWindow", *pl);
+      if (sink->test) sink->test->Show();
 
-    pl->DecRef();
+      pl->DecRef();
+    }
   }
 }

@@ -5,7 +5,7 @@
 #include "awsfparm.h"
 #include "iutil/event.h"
 #include "csutil/scfstr.h"
-#include "iaws/iawsdefs.h"
+#include "iaws/awsdefs.h"
 
 #include <stdio.h>
 #include <string.h>
