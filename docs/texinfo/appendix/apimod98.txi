@@ -649,7 +649,7 @@ treating all incoming events identically.  It never hijacks ownership of the
 event by stealing the caller's reference.  Instead, @code{Post()} uniformly
 invokes @code{IncRef()} on each incoming event in order to claim its own
 reference.  This means that callers are no longer burdened by having to
-determine whether or not the callers's reference is going to be hijacked.
+determine whether or not the caller's reference is going to be hijacked.
 Thus, the above code should now be re-written as:
 
 @example
