@@ -354,22 +354,31 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
  ****************************************************************************/
 %typemap(in) (int argc, char const* const argv[])
 {
+  // Convert incoming Perl array reference to argc/argv[].  Note that we
+  // manually determine and prepend the script name to the incoming @ARGV array
+  // since C functions expect argv[0] to be the program name, whereas the Perl
+  // @ARGV array is filled only with script arguments.
   AV *av = (AV *) SvRV ($input);
   if (SvTYPE (av) != SVt_PVAV)
     croak ("%s", "Argument must be an array reference");
-  $1 = av_len (av) + 1;
-  $2 = new (char *)[$1];
-  for (int i = 0; i < $1; i++)
+  $1 = av_len (av) + 2; // +1 to get actual array length; +1 for script name
+  $2 = new (char*)[$1];
+  $2[0] = SvPV_nolen(get_sv("0", 0));
+  for (int i = 1; i < $1; i++)
   {
-    SV *sv = av_shift (av);
-    $2[i] = SvPV_nolen (sv);
-    SvREFCNT_dec (sv);
+    SV **sv = av_fetch (av, i - 1, 0);
+    $2[i] = SvPV_nolen (*sv);
   }
 }
 
-%typemap(freearg) (int argc, const char * argv[])
+%typemap(freearg) (int argc, char const* const argv[])
 {
-  delete [] $2;
+  delete[] $2;
+
+  // Let caller know that we consumed the entire array (i.e. we `shifted'
+  // all elements). It is safe to do this only after all usage of $2[]
+  // since $2[] contains live references to strings in $input.
+  av_clear((AV*)SvRV($input));
 }
 
 /****************************************************************************

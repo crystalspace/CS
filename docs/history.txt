@@ -6,6 +6,24 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Nov-2004
+	- Eric Sunshine added capability to cscript/csperl5/Jamfile to create
+	  pure-Perl extension module `cspace' (Jam target `perl5mod'). This
+	  revives the long-dead pure-Perl scripting interface for CS.
+	- Eric Sunshine fixed problem in Perl5 `freearg' typemap for
+	  argc/argv[] in perlpre.i which resulted in the typemap never being
+	  applied, thus allocations made by the `in' typemap were never freed.
+	- Eric Sunshine fixed nasty bug in Perl5 `in' typemap for argc/argv[]
+	  in perlpre.i where it was filling the synthesized argv[] array with
+	  pointers to strings which it freed before ever calling the wrapped
+	  C/C++ function, thus the wrapped function was receiving garbage.
+	- Eric Sunshine changed behavior of Perl5 `in' typemap for argc/argv[]
+	  in perlpre.i so that, as a convenience, it now automatically inserts
+	  the script name as argv[0]. This fixes the common case where the Perl
+	  programmer would pass in only @ARGV, which does not contain the
+	  script name; yet C/C++ functions accepting argc/argv[] always expect
+	  argv[0] to be the script/program name, thus the bare @ARGV was not
+	  interpreted as the Perl programmer would expect.
 25-Nov-2004
 	- Eric Sunshine enhanced SCF so that it now recognizes the --verbose
 	  command-line option. When enabled, it emits the following additional
