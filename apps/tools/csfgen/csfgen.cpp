@@ -105,7 +105,7 @@ static bool Display (iFontServer *fs, iFont *font)
   utf32_char c;
   for (c = opt.first; c < lastglyph; c++)
   {
-    iFont::BitmapMetrics metrics;
+    csBitmapMetrics metrics;
     csRef<iDataBuffer> bitmap = font->GetGlyphBitmap (c, metrics);
     if (!bitmap)
       continue;
@@ -231,7 +231,7 @@ public:
 	printf ("%d%s", c, (c < lastglyph - 1) ? "," : "\n");
       }
 
-      iFont::GlyphMetrics gMetrics;
+      csGlyphMetrics gMetrics;
       font->GetGlyphMetrics (c, gMetrics);
 
       if (opt.sourcecode)
@@ -247,7 +247,7 @@ public:
       }
 
       // get bitmap
-      iFont::BitmapMetrics metrics;
+      csBitmapMetrics metrics;
       csRef<iDataBuffer> bitmap = font->GetGlyphBitmap (c, metrics);
 
       if (bitmap)
