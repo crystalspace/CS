@@ -13,6 +13,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine applied patch from Mark <mark@gossage.cjb.net> for
 	  csMatrix2 and csMatrix3 which supplies missing implementations of
 	  operator/=(float).
+	- Eric Sunshine worked around a compilation problem reported by
+	  Frank Schoep <fschoep@zeelandnet.nl> where the compiler refused to
+	  convert a temporary csColor to a csColor& in prsseq.cpp.
 23-Dec-2002
 	- Andreas Busch cleaned up multiple-include-protection in header files
 	  and renamed some defines to be more CS coding-style compliant.  All

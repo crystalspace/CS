@@ -500,7 +500,8 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
 	  r = child->GetAttributeValueAsFloat ("red");
 	  g = child->GetAttributeValueAsFloat ("green");
 	  b = child->GetAttributeValueAsFloat ("blue");
-	  trigger->AddConditionLightChange (light, oper, csColor(r,g,b) );
+	  csColor const c(r,g,b);
+	  trigger->AddConditionLightChange (light, oper, c);
 	}
 	break;
       case XMLTOKEN_MANUAL:
