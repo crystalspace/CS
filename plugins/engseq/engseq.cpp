@@ -40,6 +40,14 @@
 #include "iengine/movable.h"
 #include "iengine/camera.h"
 #include "iengine/rview.h"
+#include "imesh/object.h"
+#include "imesh/ball.h"
+#include "imesh/genmesh.h"
+#include "imesh/sprite3d.h"
+#include "imesh/clothmesh.h"
+#include "imesh/partsys.h"
+#include "imesh/stars.h"
+#include "imesh/terrfunc.h"
 #include "engseq.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -258,6 +266,173 @@ SCF_IMPLEMENT_IBASE_EXT (OpFadeLight)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (OpFadeLight::SequenceTimedOperation)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+//---------------------------------------------------------------------------
+
+#define TYPE_GENMESH 0
+#define TYPE_BALL 1
+#define TYPE_SPRITE3D 2
+#define TYPE_PARTSYS 3
+#define TYPE_CLOTH 4
+#define TYPE_TERRFUNC 5
+#define TYPE_STARS 6
+#define TYPE_UNKNOWN 7
+
+/**
+ * Set mesh color operation.
+ */
+class OpSetMeshColor : public OpStandard
+{
+private:
+  csRef<iMeshWrapper> mesh;
+  csRef<iGeneralMeshState> genmesh;
+  csRef<iBallState> ball;
+  csRef<iSprite3DState> sprite3d;
+  csRef<iParticleState> partsys;
+  csRef<iClothMeshState> cloth;
+  csRef<iTerrFuncState> terrfunc;
+  csRef<iStarsState> stars;
+  int type;
+  csColor color;
+
+public:
+  OpSetMeshColor (iMeshWrapper* mesh, const csColor& color)
+  {
+    OpSetMeshColor::mesh = mesh;
+    OpSetMeshColor::color = color;
+    type = TYPE_GENMESH;
+    genmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
+    if (genmesh) return; type++;
+    ball = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState);
+    if (ball) return; type++;
+    sprite3d = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iSprite3DState);
+    if (sprite3d) return; type++;
+    partsys = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iParticleState);
+    if (partsys) return; type++;
+    cloth = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iClothMeshState);
+    if (cloth) return; type++;
+    terrfunc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iTerrFuncState);
+    if (terrfunc) return; type++;
+    stars = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iStarsState);
+    if (stars) return; type++;
+  }
+
+  virtual void Do (csTicks dt)
+  {
+    switch (type)
+    {
+      case TYPE_GENMESH: genmesh->SetColor (color); break;
+      case TYPE_BALL: ball->SetColor (color); break;
+      case TYPE_SPRITE3D: sprite3d->SetBaseColor (color); break;
+      case TYPE_PARTSYS: partsys->SetColor (color); break;
+      case TYPE_CLOTH: cloth->SetColor (color); break;
+      case TYPE_TERRFUNC: terrfunc->SetColor (color); break;
+      case TYPE_STARS: stars->SetColor (color); break;
+      case TYPE_UNKNOWN: break;
+    }
+  }
+};
+
+/**
+ * Fade mesh operation.
+ */
+class OpFadeMeshColor : public OpStandard
+{
+private:
+  csRef<iMeshWrapper> mesh;
+  csRef<iGeneralMeshState> genmesh;
+  csRef<iBallState> ball;
+  csRef<iSprite3DState> sprite3d;
+  csRef<iParticleState> partsys;
+  csRef<iClothMeshState> cloth;
+  csRef<iTerrFuncState> terrfunc;
+  csRef<iStarsState> stars;
+  int type;
+  csColor start_col, end_col;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
+
+public:
+  OpFadeMeshColor (iMeshWrapper* mesh, const csColor& color,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  {
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTimedOperation);
+    OpFadeMeshColor::mesh = mesh;
+    OpFadeMeshColor::end_col = color;
+    OpFadeMeshColor::duration = duration;
+    OpFadeMeshColor::eseqmgr = eseqmgr;
+    type = TYPE_GENMESH;
+    genmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
+    if (genmesh) return; type++;
+    ball = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState);
+    if (ball) return; type++;
+    sprite3d = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iSprite3DState);
+    if (sprite3d) return; type++;
+    partsys = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iParticleState);
+    if (partsys) return; type++;
+    cloth = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iClothMeshState);
+    if (cloth) return; type++;
+    terrfunc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iTerrFuncState);
+    if (terrfunc) return; type++;
+    stars = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iStarsState);
+    if (stars) return; type++;
+  }
+
+  virtual void Do (csTicks dt)
+  {
+    switch (type)
+    {
+      case TYPE_GENMESH: start_col = genmesh->GetColor (); break;
+      case TYPE_BALL: start_col = ball->GetColor (); break;
+      case TYPE_SPRITE3D: sprite3d->GetBaseColor (start_col); break;
+      case TYPE_PARTSYS: start_col = partsys->GetColor (); break;
+      case TYPE_CLOTH: start_col = cloth->GetColor (); break;
+      case TYPE_TERRFUNC: start_col = terrfunc->GetColor (); break;
+      case TYPE_STARS: start_col = stars->GetColor (); break;
+      case TYPE_UNKNOWN: break;
+    }
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation);
+  }
+
+  void DoTimed (float time)
+  {
+    csColor color;
+    color.red = (1-time) * start_col.red + time * end_col.red;
+    color.green = (1-time) * start_col.green + time * end_col.green;
+    color.blue = (1-time) * start_col.blue + time * end_col.blue;
+    switch (type)
+    {
+      case TYPE_GENMESH: genmesh->SetColor (color); break;
+      case TYPE_BALL: ball->SetColor (color); break;
+      case TYPE_SPRITE3D: sprite3d->SetBaseColor (color); break;
+      case TYPE_PARTSYS: partsys->SetColor (color); break;
+      case TYPE_CLOTH: cloth->SetColor (color); break;
+      case TYPE_TERRFUNC: terrfunc->SetColor (color); break;
+      case TYPE_STARS: stars->SetColor (color); break;
+      case TYPE_UNKNOWN: break;
+    }
+  }
+
+  SCF_DECLARE_IBASE_EXT (OpStandard);
+
+  struct SequenceTimedOperation : public iSequenceTimedOperation
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (OpFadeMeshColor);
+    virtual void Do (float time)
+    {
+      scfParent->DoTimed (time);
+    }
+  } scfiSequenceTimedOperation;
+  friend struct SequenceTimedOperation;
+};
+
+SCF_IMPLEMENT_IBASE_EXT (OpFadeMeshColor)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (OpFadeMeshColor::SequenceTimedOperation)
   SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
@@ -545,6 +720,22 @@ void csSequenceWrapper::AddOperationFadeLight (csTicks time,
 	iLight* light, const csColor& color, csTicks duration)
 {
   OpFadeLight* op = new OpFadeLight (light, color, duration, eseqmgr);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationSetMeshColor (csTicks time,
+	iMeshWrapper* mesh, const csColor& color)
+{
+  OpSetMeshColor* op = new OpSetMeshColor (mesh, color);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
+}
+
+void csSequenceWrapper::AddOperationFadeMeshColor (csTicks time,
+	iMeshWrapper* mesh, const csColor& color, csTicks duration)
+{
+  OpFadeMeshColor* op = new OpFadeMeshColor (mesh, color, duration, eseqmgr);
   sequence->AddOperation (time, op);
   op->DecRef ();
 }

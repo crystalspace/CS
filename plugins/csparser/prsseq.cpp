@@ -343,6 +343,46 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 		offset, duration);
 	}
 	break;
+      case XMLTOKEN_FADECOLOR:
+        {
+	  const char* meshname = child->GetAttributeValue ("mesh");
+	  iMeshWrapper* mesh = Engine->FindMeshObject (meshname);
+	  if (!mesh)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find mesh '%s' in sequence '%s'!", meshname,
+		seqname);
+	    return NULL;
+	  }
+	  csColor col;
+	  col.red = child->GetAttributeValueAsFloat ("red");
+	  col.green = child->GetAttributeValueAsFloat ("green");
+	  col.blue = child->GetAttributeValueAsFloat ("blue");
+	  int duration = child->GetAttributeValueAsInt ("duration");
+	  sequence->AddOperationFadeMeshColor (cur_time, mesh, col,
+	  	duration);
+	}
+	break;
+      case XMLTOKEN_SETCOLOR:
+        {
+	  const char* meshname = child->GetAttributeValue ("mesh");
+	  iMeshWrapper* mesh = Engine->FindMeshObject (meshname);
+	  if (!mesh)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find mesh '%s' in sequence '%s'!", meshname,
+		seqname);
+	    return NULL;
+	  }
+	  csColor col;
+	  col.red = child->GetAttributeValueAsFloat ("red");
+	  col.green = child->GetAttributeValueAsFloat ("green");
+	  col.blue = child->GetAttributeValueAsFloat ("blue");
+	  sequence->AddOperationSetMeshColor (cur_time, mesh, col);
+	}
+        break;
       case XMLTOKEN_FADELIGHT:
         {
 	  const char* lightname = child->GetAttributeValue ("light");

@@ -49,6 +49,10 @@ public:
 		  const csColor& color);
   void AddOperationFadeLight (csTicks time, iLight* light,
 		  const csColor& color, csTicks duration);
+  void AddOperationSetMeshColor (csTicks time, iMeshWrapper* mesh,
+		  const csColor& color);
+  void AddOperationFadeMeshColor (csTicks time, iMeshWrapper* mesh,
+		  const csColor& color, csTicks duration);
   void AddOperationSetFog (csTicks time, iSector* sector,
 		  const csColor& color, float density);
   void AddOperationFadeFog (csTicks time, iSector* sector,
@@ -102,6 +106,16 @@ public:
 		  const csColor& color, csTicks duration)
     {
       scfParent->AddOperationFadeLight (time, light, color, duration);
+    }
+    virtual void AddOperationSetMeshColor (csTicks time, iMeshWrapper* mesh,
+		  const csColor& color)
+    {
+      scfParent->AddOperationSetMeshColor (time, mesh, color);
+    }
+    virtual void AddOperationFadeMeshColor (csTicks time, iMeshWrapper* mesh,
+		  const csColor& color, csTicks duration)
+    {
+      scfParent->AddOperationFadeMeshColor (time, mesh, color, duration);
     }
     virtual void AddOperationSetFog (csTicks time, iSector* sector,
 		  const csColor& color, float density)

@@ -70,6 +70,18 @@ struct iSequenceWrapper : public iBase
 		  const csColor& color, csTicks duration) = 0;
 
   /**
+   * Operation: set a mesh color.
+   */
+  virtual void AddOperationSetMeshColor (csTicks time, iMeshWrapper* mesh,
+		  const csColor& color) = 0;
+
+  /**
+   * Operation: fade a mesh to some color during some time.
+   */
+  virtual void AddOperationFadeMeshColor (csTicks time, iMeshWrapper* mesh,
+		  const csColor& color, csTicks duration) = 0;
+
+  /**
    * Operation: set a fog color and density.
    */
   virtual void AddOperationSetFog (csTicks time, iSector* sector,

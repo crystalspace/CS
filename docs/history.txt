@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+27-Sep-2002
+	- Added new set and fade color operations to the engine
+	  sequence manager. Also added the appropriate commands
+	  to the sequence parser. These new commands are able to
+	  change the color of genmesh, ball, sprite3d, cloth,
+	  terrfunc, stars, and particle systems.
 26-Sep-2002
 	- Keith Fulton added optimization at Jorrit's request which
 	  uses integer add for non-overflow addition of pixels
@@ -21,7 +27,7 @@ The history order is reversed so that new features are at the top.
 	  A few still remain.
 	- Fixed several memory leaks with functions returning
 	  a csPtr casted from csRef and which still assumed that a
-	  DecRef() would happen (which it doesn't know because there
+	  DecRef() would happen (which it doesn't now because there
 	  is a constructor for csPtr from csRef which does an IncRef).
 	- Added the ability to start a trigger disabled in the trigger
 	  loader.
