@@ -12,8 +12,12 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+17-Jan-2000
+	- Eric Sunshine fixed a couple termination-time crashers in the BeOS
+	  2D drivers which resulted from invalid calls to virtual functions
+	  from within the destructor.
 16-Jan-2000
-	- Norman Kramer added a new quaternion library to csgeom.
+	- Norman Kramer added a new quaternion class to csgeom.
 	- Noah L. Gibbs did some further work on the csPhyzik library.
 15-Jan-2000
 	- Fundamental change to the polygon tree class structure (i.e.
@@ -46,6 +50,7 @@ Short-term cleanups that need to be done:
 	- Further work on dynamic objects in polygon trees.
 	- Andrew Zabolotny updated his memory debugger so that it now works
 	  on Linux/ELF, DJGPP, and any other platform with GCC >= 2.8.0.
+	- Eric Sunshine upgraded documentation for the snapshot.py script.
 13-Jan-2000
 	- Some further work on dynamic objects in polygon trees.
 	- Eric Sunshine made a fairly major change to the CVS snapshot
