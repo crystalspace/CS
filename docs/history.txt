@@ -94,6 +94,8 @@ chronological order.
 	    demosky     --> DEMOSKY_OBSOLETE
 	    demosky2    --> DEMOSKY_OBSOLETE
 	    simplecloth --> CLOTH_OBSOLETE
+	- res added a note about the CS_FX_GOURAUD removal to the API 
+	  modification appendix.
 1-May-2004
 	- Jorrit added a new data/terrainf/world which is a variant of
 	  data/terrain/world that uses the fixed shaders. Keep in mind that you

@@ -1554,3 +1554,9 @@ Meshes that use the @code{CS_ENTITY_CAMERA} flag no longer have to be placed
 in a render priority that has the @samp{camera} flag set. This render
 priority flag is no longer required (but @code{CS_ENTITY_CAMERA} still is!).
 
+@subheading CS_FX_GOURAUD removed
+@cindex @code{CS_FX_GOURAUD}
+
+Gouraud is much more commonly used than flat shading and is thus the default 
+now. To achieve the opposite behaviour (ie the behaviour when 
+@code{CS_FX_GOURAUD} was not present), use the @code{CS_FX_FLAT} flag.
