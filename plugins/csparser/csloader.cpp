@@ -4058,7 +4058,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 {
   if (!Engine) return NULL;
 
-  const char* priority;
+  const char* priority = '\0';
 
   Stats->meshes_loaded++;
   iMeshWrapper* mesh = NULL;

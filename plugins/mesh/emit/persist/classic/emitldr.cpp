@@ -416,7 +416,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 {
   iEmitGen3D* result = NULL;
   iEmitMix *emix = NULL;
-  csVector3 a,b;
+  csVector3 a;
   float p,q,r,s,t;
   if (weight) *weight = 1.;
 

@@ -561,7 +561,7 @@ HRESULT csGraphics2DDDraw3::ReleaseAllObjects ()
 //-----------------------------------------------------------------------------
 HRESULT csGraphics2DDDraw3::InitSurfaces ()
 {
-  HRESULT hRet;
+  HRESULT hRet = 0;
   DDSURFACEDESC ddsd;
   DDSCAPS ddscaps;
   DDPIXELFORMAT ddpf;
