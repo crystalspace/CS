@@ -155,27 +155,11 @@ AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 
 
 #------------------------------------------------------------------------------
-# Determine how to make a directory tree.  We need to know the exact commands,
-# so that we can emit them to the makefile, thus the AS_MKDIR_P function is not
-# what we want to use here.  First try "mkdir -p", then try the older "mkdirs".
-# Finally, if the mkdir command failed to recognize -p, then it might have
-# created a directory named "-p", so clean up that bogus directory.
+# Determine how to make a directory tree.
 #------------------------------------------------------------------------------
-AC_CACHE_CHECK([how to create a directory], [cs_cv_shell_mkdir],
-    [cs_cv_shell_mkdir='mkdir'])
-CS_EMIT_BUILD_PROPERTY([CMD.MKDIR], [$cs_cv_shell_mkdir])
-
-AC_CACHE_CHECK([how to create a directory tree], [cs_cv_shell_mkdir_p],
-    [if $cs_cv_shell_mkdir -p . 2>/dev/null; then
-	cs_cv_shell_mkdir_p='mkdir -p'
-    elif mkdirs . 2>/dev/null; then
-	cs_cv_shell_mkdir_p='mkdirs'
-    fi
-    test -d ./-p && rmdir ./-p])
-
-AS_VAR_SET_IF([cs_cv_shell_mkdir_p],
-    [CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$cs_cv_shell_mkdir_p])],
-    [CS_MSG_ERROR([do not know how to create a directory tree])])
+CS_CHECK_MKDIR
+CS_EMIT_BUILD_PROPERTY([CMD.MKDIR], [$MKDIR])
+CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$MKDIRS])
 
 
 

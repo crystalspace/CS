@@ -20,6 +20,39 @@
 AC_PREREQ([2.56])
 
 #------------------------------------------------------------------------------
+# CS_CHECK_MKDIR
+#	Determine how to create a directory and a directory tree. Sets the
+#	shell variable MKDIR to the command which creates a directory, and
+#	MKDIRS to the command which creates a directory tree. Invokes
+#	AC_SUBST() for MKDIR and MKDIRS.
+#
+# IMPLEMENTATION NOTES
+#	We need to know the exact commands, so that we can emit them, thus the
+#	AS_MKDIR_P function is not what we want to use here since it does not
+#	provide access to the commands (and might not even discover suitable
+#	commands).  First try "mkdir -p", then try the older "mkdirs".
+#	Finally, if the mkdir command failed to recognize -p, then it might
+#	have created a directory named "-p", so clean up that bogus directory.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_MKDIR],
+    [AC_CACHE_CHECK([how to create a directory], [cs_cv_shell_mkdir],
+	[cs_cv_shell_mkdir='mkdir'])
+    AC_SUBST([MKDIR], [$cs_cv_shell_mkdir])
+
+    AC_CACHE_CHECK([how to create a directory tree], [cs_cv_shell_mkdir_p],
+	[if $cs_cv_shell_mkdir -p . 2>/dev/null; then
+	    cs_cv_shell_mkdir_p='mkdir -p'
+	elif mkdirs . 2>/dev/null; then
+	    cs_cv_shell_mkdir_p='mkdirs'
+	fi
+	test -d ./-p && rmdir ./-p])
+    AS_VAR_SET_IF([cs_cv_shell_mkdir_p],
+	[AC_SUBST([MKDIRS], [$cs_cv_shell_mkdir_p])],
+	[CS_MSG_ERROR([do not know how to create a directory tree])])])
+
+
+
+#------------------------------------------------------------------------------
 # Replacement for AS_MKDIR_P() from m4sugar/m4sh.m4 which fixes two problems
 # which are present in Autoconf 2.57 and probably all earlier 2.5x versions.
 # This bug, along with a patch, was submitted to the Autoconf GNATS database by

@@ -313,7 +313,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEX BISON DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIG JAM MAKE LIBTOOL_TEST ac_ct_LIBTOOL_TEST LIBTOOL_PATH LIBTOOL ac_ct_LIBTOOL CS_LT_APPLE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM PERL PYTHON JAVA JAVAC ANT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2CONFIG ac_ct_FT2CONFIG SDLCONFIG ac_ct_SDLCONFIG PKGCONFIG ac_ct_PKGCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEX BISON DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIG JAM MAKE MKDIR MKDIRS LIBTOOL_TEST ac_ct_LIBTOOL_TEST LIBTOOL_PATH LIBTOOL ac_ct_LIBTOOL CS_LT_APPLE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG NASM ac_ct_NASM PERL PYTHON JAVA JAVAC ANT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2CONFIG ac_ct_FT2CONFIG SDLCONFIG ac_ct_SDLCONFIG PKGCONFIG ac_ct_PKGCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -4011,11 +4011,7 @@ done
 
 
 #------------------------------------------------------------------------------
-# Determine how to make a directory tree.  We need to know the exact commands,
-# so that we can emit them to the makefile, thus the AS_MKDIR_P function is not
-# what we want to use here.  First try "mkdir -p", then try the older "mkdirs".
-# Finally, if the mkdir command failed to recognize -p, then it might have
-# created a directory named "-p", so clean up that bogus directory.
+# Determine how to make a directory tree.
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking how to create a directory" >&5
 echo $ECHO_N "checking how to create a directory... $ECHO_C" >&6
@@ -4026,36 +4022,25 @@ else
 fi
 echo "$as_me:$LINENO: result: $cs_cv_shell_mkdir" >&5
 echo "${ECHO_T}$cs_cv_shell_mkdir" >&6
-cs_build_prop_val="$cs_cv_shell_mkdir"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIR ?= \"$cs_build_prop_val\" ;
-"
-fi
+    MKDIR=$cs_cv_shell_mkdir
 
 
-echo "$as_me:$LINENO: checking how to create a directory tree" >&5
+    echo "$as_me:$LINENO: checking how to create a directory tree" >&5
 echo $ECHO_N "checking how to create a directory tree... $ECHO_C" >&6
 if test "${cs_cv_shell_mkdir_p+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   if $cs_cv_shell_mkdir -p . 2>/dev/null; then
-	cs_cv_shell_mkdir_p='mkdir -p'
-    elif mkdirs . 2>/dev/null; then
-	cs_cv_shell_mkdir_p='mkdirs'
-    fi
-    test -d ./-p && rmdir ./-p
+	    cs_cv_shell_mkdir_p='mkdir -p'
+	elif mkdirs . 2>/dev/null; then
+	    cs_cv_shell_mkdir_p='mkdirs'
+	fi
+	test -d ./-p && rmdir ./-p
 fi
 echo "$as_me:$LINENO: result: $cs_cv_shell_mkdir_p" >&5
 echo "${ECHO_T}$cs_cv_shell_mkdir_p" >&6
-
-if test "${cs_cv_shell_mkdir_p+set}" = set; then
-  cs_build_prop_val="$cs_cv_shell_mkdir_p"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIRS ?= \"$cs_build_prop_val\" ;
-"
-fi
+    if test "${cs_cv_shell_mkdir_p+set}" = set; then
+  MKDIRS=$cs_cv_shell_mkdir_p
 
 else
   cat >confcache <<\_ACEOF
@@ -4115,6 +4100,20 @@ rm -f confcache
     { { echo "$as_me:$LINENO: error: do not know how to create a directory tree" >&5
 echo "$as_me: error: do not know how to create a directory tree" >&2;}
    { (exit 1); exit 1; }; }
+fi
+
+cs_build_prop_val="$MKDIR"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIR ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+cs_build_prop_val="$MKDIRS"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIRS ?= \"$cs_build_prop_val\" ;
+"
 fi
 
 
@@ -36449,6 +36448,8 @@ s,@INSTALL@,$INSTALL,;t t
 s,@SWIG@,$SWIG,;t t
 s,@JAM@,$JAM,;t t
 s,@MAKE@,$MAKE,;t t
+s,@MKDIR@,$MKDIR,;t t
+s,@MKDIRS@,$MKDIRS,;t t
 s,@LIBTOOL_TEST@,$LIBTOOL_TEST,;t t
 s,@ac_ct_LIBTOOL_TEST@,$ac_ct_LIBTOOL_TEST,;t t
 s,@LIBTOOL_PATH@,$LIBTOOL_PATH,;t t
