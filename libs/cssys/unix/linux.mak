@@ -71,13 +71,12 @@ include mk/unix.mak
 
 # Extra libraries needed on this system.
 LIBS.EXE+=$(LFLAGS.l)dl $(LFLAGS.l)m 
-#$(LFLAGS.l)gcc
 
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=$(CFLAGS.SYSTEM) $(CFLAGS.CSTHREAD)
+CFLAGS.GENERAL=$(CFLAGS.SYSTEM) $(CFLAGS.CSTHREAD) -DCS_HAS_SYS_SOUNDCARD_H
 
 # Flags for the compiler which are used when optimizing.
 ifeq ($(PROC),X86)

@@ -62,7 +62,7 @@ LIBS.EXE+=$(LFLAGS.L)/usr/local/lib $(LFLAGS.l)m
 CFLAGS.INCLUDE=$(CFLAGS.I)/usr/local/include
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=$(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS)
+CFLAGS.GENERAL=$(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -DCS_HAS_MACHINE_SOUNDCARD_H
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-O6 -fomit-frame-pointer -malign-loops=2 -malign-jumps=2 \

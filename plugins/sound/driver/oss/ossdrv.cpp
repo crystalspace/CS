@@ -29,12 +29,12 @@
 #include <signal.h>
 
 #include "cssysdef.h"
-#if defined(__NetBSD__)
-#  include <soundcard.h>
-#elif defined(OS_BSD)
+#if defined(CS_HAS_MACHINE_SOUNDCARD_H)
 #  include <machine/soundcard.h>
-#else
+#elif defined(CS_HAS_SYS_SOUNDCARD_H)
 #  include <sys/soundcard.h>
+#else // CS_HAS_SOUNDCARD_H
+#  include <soundcard.h>
 #endif
 #include "csutil/scf.h"
 #include "ossdrv.h"
