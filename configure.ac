@@ -237,27 +237,6 @@ AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 AC_PROG_MAKE_SET
 
 #------------------------------------------------------------------------------
-# The cslibs package is a convenience archive made available to Windows users
-# of Crystal Space.  It contains common libraries, headers, and tools usable by
-# MSVC, Mingw/MSYS, and Cygwin users.
-#------------------------------------------------------------------------------
-AC_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
-AC_CACHE_CHECK([for cslibs package], [cs_cv_cslibs],
-    [AS_IF([test -n "$CSLIBS_CONFIG"],
-	[cs_cv_cslibs=yes
-	cs_cv_cslibs_cflags=`AC_RUN_LOG([$CSLIBS_CONFIG --cflags])`
-	cs_cv_cslibs_lflags=`AC_RUN_LOG([$CSLIBS_CONFIG --lflags])`
-	cs_cv_cslibs_binpath=`AC_RUN_LOG([$CSLIBS_CONFIG --binpath])`],
-	[cs_cv_cslibs=no])])
-AS_IF([test $cs_cv_cslibs = yes],
-    [CFLAGS="$CFLAGS $cs_cv_cslibs_cflags"
-    CPPFLAGS="$CPPFLAGS $cs_cv_cslibs_cflags"
-    LDFLAGS="$LDFLAGS $cs_cv_cslibs_lflags"
-    PATH="$cs_cv_cslibs_binpath:$PATH"])
-
-
-
-#------------------------------------------------------------------------------
 # Determine how to make a directory tree.  We need to know the exact commands,
 # so that we can emit them to the makefile, thus the AS_MKDIR_P function is not
 # what we want to use here.  First try "mkdir -p", then try the older "mkdirs".
@@ -279,6 +258,70 @@ AC_CACHE_CHECK([how to create a directory tree], [cs_cv_shell_mkdir_p],
 AS_VAR_SET_IF([cs_cv_shell_mkdir_p],
     [CS_BUILD_PROPERTY([CMD.MKDIRS], [$cs_cv_shell_mkdir_p])],
     [CS_MSG_ERROR([do not know how to create a directory tree])])
+
+
+
+#------------------------------------------------------------------------------
+# Find and identify the various implementations of libtool.  In particular, we
+# are aware of GNU libtool and Apple's libtool (which serves a completely
+# different purpose).  On MacOS/X, GNU libtool is typically named glibtool,
+# however a user might also use Fink to install the unadorned libtool; and the
+# Fink-installed version might shadow Apple's own libtool if it appears in the
+# PATH before the Apple tool.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_LIBTOOL_GNU_IFELSE],
+    [AS_IF([AC_RUN_LOG([$1 --version 1>&2])], [$2], [$3])])
+
+AC_DEFUN([CS_LIBTOOL_CLASSIFY],
+    [AS_IF([test -n "$1"],
+	[AC_MSG_CHECKING([classification of $1])
+	CS_LIBTOOL_GNU_IFELSE([$1],
+	    [AC_MSG_RESULT([gnu])
+	    $2],
+	    [AC_MSG_RESULT([apple])
+	    $3])])])
+
+# GNU: Search for libtool before glibtool since Fink version is likely newer.
+m4_define([cs_lt_path_gnu],
+    [/sw/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR$PATH])
+AS_IF([test -z "$LIBTOOL"],
+    [AC_CHECK_TOOLS([LIBTOOL_TEST], [libtool glibtool gnulibtool], [],
+	[cs_lt_path_gnu])
+    AS_IF([test -n "$LIBTOOL_TEST"],
+	[AC_PATH_PROG([LIBTOOL_PATH], [$LIBTOOL_TEST], [], [cs_lt_path_gnu])
+	CS_LIBTOOL_CLASSIFY([$LIBTOOL_PATH],
+	    [LIBTOOL="$LIBTOOL_PATH"],
+	    [AS_IF([test -z "$APPLE_LIBTOOL"], [APPLE_LIBTOOL="$LIBTOOL_PATH"])
+	    AC_CHECK_TOOLS([LIBTOOL], [glibtool gnulibtool])])])])
+CS_BUILD_PROPERTY([LIBTOOL], [$LIBTOOL])
+
+# Apple: Ensure that Apple libtool will be found before GNU libtool from Fink.
+m4_define([cs_lt_path_apple],[/bin$PATH_SEPARATOR/usr/bin$PATH_SEPARATOR$PATH])
+AS_IF([test -z "$APPLE_LIBTOOL"],
+    [AC_PATH_PROG([CS_LT_APPLE], [libtool], [], [cs_lt_path_apple])
+    CS_LIBTOOL_CLASSIFY([$CS_LT_APPLE], [],
+	[APPLE_LIBTOOL="$CS_LT_APPLE"])])
+CS_BUILD_PROPERTY([APPLE_LIBTOOL], [$APPLE_LIBTOOL])
+
+
+#------------------------------------------------------------------------------
+# The cslibs package is a convenience archive made available to Windows users
+# of Crystal Space.  It contains common libraries, headers, and tools usable by
+# MSVC, Mingw/MSYS, and Cygwin users.
+#------------------------------------------------------------------------------
+AC_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
+AC_CACHE_CHECK([for cslibs package], [cs_cv_cslibs],
+    [AS_IF([test -n "$CSLIBS_CONFIG"],
+	[cs_cv_cslibs=yes
+	cs_cv_cslibs_cflags=`AC_RUN_LOG([$CSLIBS_CONFIG --cflags])`
+	cs_cv_cslibs_lflags=`AC_RUN_LOG([$CSLIBS_CONFIG --lflags])`
+	cs_cv_cslibs_binpath=`AC_RUN_LOG([$CSLIBS_CONFIG --binpath])`],
+	[cs_cv_cslibs=no])])
+AS_IF([test $cs_cv_cslibs = yes],
+    [CFLAGS="$CFLAGS $cs_cv_cslibs_cflags"
+    CPPFLAGS="$CPPFLAGS $cs_cv_cslibs_cflags"
+    LDFLAGS="$LDFLAGS $cs_cv_cslibs_lflags"
+    PATH="$cs_cv_cslibs_binpath$PATH_SEPARATOR$PATH"])
 
 
 
@@ -772,8 +815,8 @@ AC_DEFUN([CS_JAVA_HEADER_PATH],
 	[cs_java_inc="-I/System/Library/Frameworks/JavaVM.framework/Headers"],
 	[AS_IF([test -n "$JAVA_HOME"],
 	    [cs_java_dir="$JAVA_HOME"],
-	    [AS_IF([test -n "$$1"],
-		[cs_java_dir=`AS_DIRNAME([$$1])`
+	    [AS_IF([test -n "$1"],
+		[cs_java_dir=`AS_DIRNAME([$1])`
 		cs_java_dir=`AS_DIRNAME([$cs_java_dir])`],
 		[cs_java_dir=''])])
 	AS_IF([test -n "$cs_java_dir"],
@@ -787,10 +830,12 @@ AC_DEFUN([CS_JAVA_HEADER_PATH],
 		[cs_java_inc=\
 		    "$cs_java_inc $cs_java_inc/$cs_java_platform"])])])])
 
-AC_PATH_PROGS([JAVA], [java], [], [$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin])
+AC_PATH_PROGS([JAVA], [java], [],
+    [$PATH$PATH_SEPARATOR$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin])
 CS_BUILD_PROPERTY([JAVA], [$JAVA])
 
-AC_PATH_PROGS([JAVAC], [javac], [], [$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin])
+AC_PATH_PROGS([JAVAC], [javac], [],
+    [$PATH$PATH_SEPARATOR$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin])
 CS_BUILD_PROPERTY([JAVAC], [$JAVAC])
 
 AC_ARG_WITH([java], [AC_HELP_STRING([--with-java],
@@ -798,7 +843,7 @@ AC_ARG_WITH([java], [AC_HELP_STRING([--with-java],
 AS_IF([test -z "$with_java"], [with_java=yes])
 
 AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
-    [CS_JAVA_HEADER_PATH([JAVAC])
+    [CS_JAVA_HEADER_PATH([$JAVAC])
     CS_CHECK_BUILD([if Java2 SDK is usable], [cs_cv_java],
 	[AC_LANG_PROGRAM(
 	    [[#include <jni.h>
@@ -806,7 +851,7 @@ AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
 	[CS_CREATE_TUPLE() CS_CREATE_TUPLE([$cs_java_inc])], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
 
-AC_PATH_PROGS([ANT], [ant], [], [$PATH:$ANT_HOME/bin])
+AC_PATH_PROGS([ANT], [ant], [], [$PATH$PATH_SEPARATOR$ANT_HOME/bin])
 CS_BUILD_PROPERTY([ANT], [$ANT])
 
 

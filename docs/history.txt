@@ -35,6 +35,11 @@ chronological order.
 	  than trying to impose some sort of organization.  More sophisticated
 	  users, of course, are probably Makefile-wise and will know enough
 	  to edit the makefile to suit their needs.
+	- Eric Sunshine added libtool check to configure.ac.  This check is
+	  smart enough to identify GNU libtool and Apple's own libtool (which
+	  is unrelated to the GNU command, and which serves a totally different
+	  purpose).  The check will be able to identify Apple's libtool even if
+	  a GNU's libtool appears in PATH before Apple's libtool.
 22-Mar-2004
 	- Anders Stenberg fixed several places where mesh objects would
 	  return "false" from GetRenderMeshes (which is supposed to return

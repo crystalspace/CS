@@ -139,7 +139,11 @@ OUTDLL =
 
 # The library (archive) manager
 # <cs-config>
-AR = libtool
+ifneq (,$(APPLE_LIBTOOL))
+AR = $(APPLE_LIBTOOL)
+else
+AR = /usr/bin/libtool
+endif
 ARFLAGS = -static -o
 # </cs-config>
 
