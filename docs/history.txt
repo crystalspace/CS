@@ -1,5 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
+20-Jul-2000
+	- Alex Pfaffe did an update to the terrain engine. Should now
+	  be faster since less vertices are sent to the 3D rasterizer.
+	- Because Alex forgot to commit some files I disabled the terrain
+	  engine for now.
+	- Wouter Wijngaards improved the csQuadTree3D code. Faster and
+	  more reliable for TestPolygon.
+	- Norman Kramer fixed csFrustum::Classify(): corrected the
+	  CS_FRUST_PART, still in #if 0 - i guess jorrit want to double
+	  check this :)
 19-Jul-2000
 	- Updated 'simple' tutorial and 'simple' application a little bit.
 	- Extended 'simple' application to load a 'sprite1' template from
@@ -15,6 +25,8 @@ The history order has been reversed so that new features are at the top.
 	  are using it, and it works.
 	- Wyatt also updated the Macintosh project files.
 	- Wouter Wijngaards disabled some debug prints in csQuadTree3D.
+	- Wouter also set radiosity.stoppriority from 25.0 to 0.1 now,
+	  since radiosity is fixed by the Classify changes.
 18-Jul-2000
 	- Did an optimization in csFrustum::Classify() as suggested
 	  by Norman Kramer.
