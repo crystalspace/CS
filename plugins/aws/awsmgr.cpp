@@ -663,7 +663,6 @@ void awsManager::Redraw ()
       && dirty.Count () == 0 
       && !(flags & AWSF_AlwaysRedrawWindows)
      )
-
     return ;
 
 
@@ -689,9 +688,9 @@ void awsManager::Redraw ()
     oldwin = curwin;
     curwin = curwin->ComponentBelow ();
   }
-
-    dirty.ClipTo (clip);
-    erase.ClipTo (clip);
+  
+  dirty.ClipTo (clip);
+  erase.ClipTo (clip);
 
   /*  At this point in time, oldwin points to the bottom most window.  That means that we take curwin, set it
    * equal to oldwin, and then follow the chain up to the top, redrawing on the way.  This makes sure that we
@@ -708,66 +707,66 @@ void awsManager::Redraw ()
         redraw_tag);
 #endif
 
-    if (redraw_tag == curwin->RedrawTag ())
-    {
+  if (redraw_tag == curwin->RedrawTag ())
+  {
 #ifdef DEBUG_MANAGER
-      printf ("aws-debug: window is dirty, redraw.\n");
+    printf ("aws-debug: window is dirty, redraw.\n");
 #endif
 
-      // Setup our dirty gathering rect.
-      csRect cr;
-      cr.MakeEmpty ();
+    // Setup our dirty gathering rect.
+    csRect cr;
+    cr.MakeEmpty ();
 
-      for (i = 0; i < dirty.Count (); ++i)
-      {
-        csRect dr (dirty.RectAt (i));
-        dr.Intersect(curwin->Frame());
-        cr.Union (dr);
-      }
-
-      // cr is now the smallest possible rect that
-      // contains all the dirty area over the window
-      RedrawWindow (curwin, cr);
-    }         // end if this window is dirty
-    curwin = curwin->ComponentAbove ();
+    for (i = 0; i < dirty.Count (); ++i)
+    {
+      csRect dr (dirty.RectAt (i));
+      dr.Intersect(curwin->Frame());
+      cr.Union (dr);
+    }
+    
+    // cr is now the smallest possible rect that
+    // contains all the dirty area over the window
+    RedrawWindow (curwin, cr);
+  }         // end if this window is dirty
+  curwin = curwin->ComponentAbove ();
   }           // end iterate all windows
-
+  
   //int i;
-
+  
   // Debug code: draw boxes around dirty regions
   /* for(i=0; i<dirty.Count(); ++i)
-  {
-         csRect dr(dirty.RectAt(i));
-         ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmax, dr.ymin, GetPrefMgr()->GetColor(AC_WHITE));
-         ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmin, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
-         ptG2D->DrawLine(dr.xmin, dr.ymax, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
-         ptG2D->DrawLine(dr.xmax, dr.ymin, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
-  } */
-
-
+     {
+     csRect dr(dirty.RectAt(i));
+     ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmax, dr.ymin, GetPrefMgr()->GetColor(AC_WHITE));
+     ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmin, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+     ptG2D->DrawLine(dr.xmin, dr.ymax, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+     ptG2D->DrawLine(dr.xmax, dr.ymin, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+     } */
+  
+  
   // Clear clipping bounds when done.
   ptG2D->SetClipRect (0, 0, ptG2D->GetWidth (), ptG2D->GetHeight ());
-
+  
   // This draws all of the erasure areas.
   if (flags & AWSF_AlwaysEraseWindows)
   {
     UpdateStore();
     for(i = 0; i < updatestore.Count(); i++)
       MaskEraser(updatestore.RectAt(i));
-
+    
     for (i = 0; i < erase.Count (); ++i)
     {
       csRect r (erase.RectAt (i));
       G2D()->DrawBox (r.xmin, r.ymin, r.Width (), r.Height (), erasefill);
     }
   }
-
+  
   // This only needs to happen when drawing to the default context.
-  ptG3D->FinishDraw ();
+  // XXX: Matze: Applications do this, so is shouldn't be needed here
+  //ptG3D->FinishDraw ();
 
   // Reset the dirty region
   dirty.makeEmpty ();
-
   // done with the redraw!
 }
 

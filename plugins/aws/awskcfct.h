@@ -102,7 +102,7 @@ public:
   /// Get the base node
   awsConnectionNode *GetThisNode ();
 
-  friend awsKeyFactory;
+  friend class awsKeyFactory;
  };
 
 #endif
