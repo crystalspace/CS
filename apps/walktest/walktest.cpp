@@ -40,6 +40,7 @@
 #include "csengine/scripts/csscript.h"
 #include "csengine/scripts/intscri.h"
 #include "csengine/colldet/being.h"
+#include "csengine/2d/csspr2d.h"
 #include "csutil/sparse3d.h"
 #include "csutil/inifile.h"
 #include "csobject/nameobj.h"
@@ -191,6 +192,14 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
       Gfx2D->Write(8-1, FRAME_HEIGHT-21, 0, -1, buffer);
       Gfx2D->Write(8, FRAME_HEIGHT-20, scon->get_fg (), -1, buffer);
     } /* endif */
+
+    int w  = cslogo->Width()  * FRAME_WIDTH  / 640;
+    int h  = cslogo->Height() * FRAME_HEIGHT / 480;
+
+    if (cslogo)
+    {
+      cslogo->Draw(Gfx2D, 2,2,w,h);
+    }
   } /* endif */
 
   // Drawing code ends here
@@ -608,9 +617,25 @@ int main (int argc, char* argv[])
       fatal_exit (0, false);
     }
 
+    //Find the Crystal Space logo and set the renderer Flag to for_2d, to allow 
+    //the use in the 2D part.
+    csTextureList *texlist = world->GetTextures ();
+    ASSERT(texlist);
+    csTextureHandle *texh = texlist->GetTextureMM ("cslogo.gif");
+    if (texh)
+    {
+      texh->for_2d = true;
+    }
+
     // Prepare the world. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
     world->Prepare (Gfx3D);
+
+    //Create a 2D sprite for the Logo
+    int w, h;
+    ITextureHandle* phTex = texh->GetTextureHandle();
+    phTex->GetBitmapDimensions(w,h);
+    Sys->cslogo = new csSprite2D (texh, 0, 0, w, h);
 
     // Look for the start sector in this world.
     char* strt = (char*)(world->start_sector ? world->start_sector : "room");

@@ -30,6 +30,7 @@ class csView;
 class InfiniteMaze;
 class csSoundBuffer;
 class csWorld;
+class csSprite2D;
 
 ///
 struct csKeyMap
@@ -62,6 +63,9 @@ public:
 
   /// The view on the world.
   csView* view;
+
+  /// A sprite to display the Crystal Space Logo
+  csSprite2D* cslogo;
 
   /// Our infinite maze object if used.
   InfiniteMaze* infinite_maze;
