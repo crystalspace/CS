@@ -1,6 +1,7 @@
 SubDir TOP plugins video canvas sdl ;
 
-if $(SDL.AVAILABLE) = "yes" 
+# disabled for now
+if $(SDL.AVAILABLE) = "yes" && !DISABLED
 {
 Plugin sdl2d
 	: [ Wildcard *.cpp *.h ]
