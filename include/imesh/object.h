@@ -32,9 +32,9 @@ struct iPolygonMesh;
 struct iObjectModel;
 struct iMaterialWrapper;
 struct iPortal;
+struct csRenderMesh;
 class csColor;
 class csReversibleTransform;
-class csRenderMesh;
 
 SCF_VERSION (iMeshObjectDrawCallback, 0, 0, 1);
 
