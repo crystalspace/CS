@@ -40,6 +40,7 @@
 #include "csutil/token.h"
 #include "csutil/archive.h"
 #include "csutil/inifile.h"
+#include "csutil/util.h"
 #include "cssndldr/sndload.h"
 #include "csparser/sndbufo.h"
 #include "csgfxldr/csimage.h"
@@ -3660,35 +3661,12 @@ bool CSLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world,
 
           //Now we check the size of the loaded image. Having an image, that
           //is not a power of two will result in strange errors while 
-          //rendering it is by far better to check the format of all textures
+          //rendering. It is by far better to check the format of all textures
           //already while loading them.
           int Width  = image->get_width();
           int Height = image->get_height();
-          bool TextureSizeIsIllegal = false;
 
-          int AllowedWidth = 1;
-          while (Width!=AllowedWidth)
-          {
-            AllowedWidth <<= 1;
-            if (AllowedWidth>0x10000000)
-            {
-              TextureSizeIsIllegal = true;
-              break;
-            }
-          }
-              
-          int AllowedHeight = 1;
-          while (Height!=AllowedHeight)
-          {
-            AllowedHeight <<= 1;
-            if (AllowedHeight>0x10000000)
-            {
-              TextureSizeIsIllegal = true;
-              break;
-            }
-          }
-
-          if (TextureSizeIsIllegal)
+          if (!IsPowerOf2(Width) || !IsPowerOf2(Height))
           {
             CsPrintf (MSG_WARNING, 
                       "Texture '%s' probably has an illegal format!\n" 
@@ -3697,16 +3675,6 @@ bool CSLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world,
                       name, Width, Height);
           }
 
-          if (Height>256 || Width>256)
-          {
-            CsPrintf (MSG_WARNING, 
-                      "Texture '%s' may not be usable on 3DFX based cards.\n" 
-                      "The Width and Height for these cards may not be larger than 256\n"
-                      "actual size is w:%d h:%d\n",
-                      name, Width, Height);
-          }
-
-          
           tex = textures->NewTexture (image);
           csNameObject::AddName(*tex,name);
           //if (!tex->loaded_correctly ())
