@@ -42,7 +42,6 @@ class csMatrix3;
 class csVector3;
 class csVector2;
 class csColor;
-class csThing;
 
 SCF_VERSION (csLightingPolyTexQueue, 0, 0, 1);
 
@@ -241,10 +240,6 @@ class csPolyTexture : public iPolygonTexture
 private:
   /// The corresponding polygon.
   csPolygon3D* polygon;
-  /// The parent thing.
-  csThing* thing;
-  /// SCF pointer.
-  iPolygon3D* ipolygon;
 
   /// The corresponding unlighted material.
   iMaterialHandle* mat_handle;
@@ -295,7 +290,7 @@ private:
   csShadowBitmap* shadow_bitmap;
 
   /// Internally used by (software) texture cache
-  void *cache_data [4];
+  void **cache_data;
 
   /**
    * Compared against csThing ambient version to know whether lightmap needs
@@ -326,7 +321,7 @@ public:
   /**
    * Set the corresponding polygon for this polytexture.
    */
-  void SetPolygon (csPolygon3D* p, csThing* th);
+  void SetPolygon (csPolygon3D* p);
 
   /**
    * Return the polygon corresponding to this texture
@@ -402,11 +397,6 @@ public:
   ///
   virtual int GetOriginalWidth () { return w_orig; }
 
-  ///
-  virtual iPolygon3D *GetPolygon ()
-  {
-    return ipolygon;
-  }
   /// Check if dynamic lighting information should be recalculated
   virtual bool DynamicLightsDirty ();
   /**
@@ -425,9 +415,9 @@ public:
   virtual int GetLightCellShift ();
 
   /// Get data used internally by texture cache
-  virtual void *GetCacheData (int idx) { return cache_data[idx]; }
+  virtual void *GetCacheData (int idx);
   /// Set data used internally by texture cache
-  virtual void SetCacheData (int idx, void *d) { cache_data[idx] = d; }
+  virtual void SetCacheData (int idx, void *d);
 };
 
 #endif // __CS_POLYTEXT_H__

@@ -268,7 +268,8 @@ void csPortal::WarpSpace (csReversibleTransform &t, bool &mirror) const
 bool csPortal::Draw (
   csPolygon2D *new_clipper,
   iPolygon3D *portal_polygon,
-  iRenderView *rview)
+  iRenderView *rview,
+  const csPlane3& camera_plane)
 {
   if (!CompleteSector (rview)) return false;
   if (sector->GetRecLevel () >= max_sector_visit)
@@ -288,7 +289,7 @@ bool csPortal::Draw (
 #endif // CS_USE_NEW_RENDERER
   rview->SetPortalPolygon (portal_polygon);
   rview->SetPreviousSector (rview->GetThisSector ());
-  rview->SetClipPlane (portal_polygon->GetCameraPlane ());
+  rview->SetClipPlane (camera_plane);
   rview->GetClipPlane ().Invert ();
   if (flags.Check (CS_PORTAL_CLIPDEST))
   {

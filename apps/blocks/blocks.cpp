@@ -63,7 +63,6 @@
 #include "isound/handle.h"
 #include "isound/wrapper.h"
 #include "isound/source.h"
-#include "imesh/thing/ptextype.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "iengine/sector.h"
@@ -763,19 +762,6 @@ void Blocks::add_cube_template ()
   genmesh->CalculateNormals ();
 }
 
-void set_uv (iPolygon3D* p, float u1, float v1, float u2, float v2,
-	float u3, float v3)
-{
-  p->SetTextureType (POLYTXT_GOURAUD);
-  iPolyTexType* ptt = p->GetPolyTexType ();
-  csRef<iPolyTexGouraud> gs (SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud));
-  csRef<iPolyTexFlat> fs (SCF_QUERY_INTERFACE (ptt, iPolyTexFlat));
-  gs->Setup (p);
-  fs->SetUV (0, u1, v1);
-  fs->SetUV (1, u2, v2);
-  fs->SetUV (2, u3, v3);
-}
-
 // dx,dy,dz are logical coordinates (Z vertical).
 csRef<iMeshWrapper> Blocks::create_cube_thing (float dx, float dy, float dz,
 	iMeshFactoryWrapper* tmpl)
@@ -815,17 +801,10 @@ csRef<iMeshWrapper> Blocks::add_cube_thing (iSector* sect,
   csRef<iGeneralMeshState> gm_state = SCF_QUERY_INTERFACE (
   	cube->GetMeshObject (), iGeneralMeshState);
   gm_state->SetShadowReceiving (true);
-  //csRef<iThingState> cube_state (SCF_QUERY_INTERFACE (cube->GetMeshObject (),
-  	//iThingState));
   cube->GetMovable ()->SetSector (sect);
   csVector3 v (x, y, z);
   cube->GetMovable ()->SetPosition (sect, v);
   cube->GetMovable ()->UpdateMove ();
-  //csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (cube->GetMeshObject (),
-  	//iLightingInfo));
-  //linfo->InitializeDefault ();
-  //room->ShineLights (cube);
-  //linfo->PrepareLighting ();
   return cube;
 }
 
@@ -1960,24 +1939,17 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
   thing_state->CreateVertex (csVector3 (-1, -.25, 0));
 
   iPolygon3D* p;
-  csMatrix3 tx_matrix;
-  csVector3 tx_vector;
 
   p = thing_state->CreatePolygon ();
   p->SetMaterial (tm_front);
   p->CreateVertex (0);
   p->CreateVertex (1);
-  p->CreateVertex (3);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  set_uv (p, 0, 0, 1, 0, 0, 1);
-
-  p = thing_state->CreatePolygon ();
-  p->SetMaterial (tm_front);
-  p->CreateVertex (1);
   p->CreateVertex (2);
   p->CreateVertex (3);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  set_uv (p, 1, 0, 1, 1, 0, 1);
+  p->SetTextureSpace (
+  	p->GetVertex (0), csVector2 (0, 0),
+  	p->GetVertex (1), csVector2 (1, 0),
+  	p->GetVertex (3), csVector2 (0, 1));
 
   src_menus[menu_nr] = thing_wrap;
 }
@@ -2011,8 +1983,6 @@ csRef<iMeshWrapper> Blocks::CreateMenuArrow (bool left)
   thing_state->CreateVertex (csVector3 (rearx, -.25, 0));
 
   iPolygon3D* p;
-  csMatrix3 tx_matrix;
-  csVector3 tx_vector;
 
   p = thing_state->CreatePolygon ();
   p->SetMaterial (tm_front);
@@ -2028,8 +1998,10 @@ csRef<iMeshWrapper> Blocks::CreateMenuArrow (bool left)
     p->CreateVertex (1);
     p->CreateVertex (0);
   }
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  set_uv (p, 0, 0, 1, 0, 0, 1);
+  p->SetTextureSpace (
+  	p->GetVertex (0), csVector2 (0, 0),
+  	p->GetVertex (1), csVector2 (1, 0),
+  	p->GetVertex (2), csVector2 (0, 1));
 
   return thing_wrap;
 }

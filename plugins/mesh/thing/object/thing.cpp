@@ -132,7 +132,6 @@ csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
 
   last_thing_id++;
   thing_id = last_thing_id;
-  last_polygon_id = 0;
   logparent = NULL;
 
   curves_center.x = curves_center.y = curves_center.z = 0;
@@ -185,6 +184,7 @@ csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
   obj_normals = NULL;
   smoothed = false;
   current_visnr = 1;
+  cosinus_factor = -1;
 }
 
 csThing::~csThing ()
@@ -461,7 +461,7 @@ void csThing::CalculateNormals()
   {
     csPolygon3D* p = polygons.Get(j);
     vertIndices = p->GetVertexIndices();
-    csVector3 normal = p->GetPlane()->GetWorldPlane().Normal();
+    csVector3 normal = p->GetPolyPlane ().Normal();
 
     // Add the normal to all the vertexs of the polygon
     int vertCount = p->GetVertexCount();
@@ -1163,31 +1163,25 @@ void csThing::HardTransform (const csReversibleTransform &t)
         if (lmi && lmi->GetPolyTxtPlane () == pl)
         {
           lmi->SetTxtPlane (new_pl->GetPrivateObject ());
-          lmi->Setup (p, this, p->GetMaterialWrapper ());
+          lmi->Setup (p, p->GetMaterialWrapper ());
         }
       }
     }
   }
 
   delete hashit;
+  planes.DeleteAll ();
 
   //-------
+  // Now transform the normal planes.
   //-------
-  // Now do a similar thing for the normal planes.
-  planes.DeleteAll ();
   for (i = 0; i < polygons.Length (); i++)
   {
     csPolygon3D *p = GetPolygon3D (i);
-    csPolyPlane *pl = p->GetPlane ();
-    if (!planes.In (pl))
-    {
-      planes.Add (pl);
-
-      csPlane3 new_plane;
-      t.This2Other (pl->GetObjectPlane (), p->Vobj (0), new_plane);
-      pl->GetObjectPlane () = new_plane;
-      pl->GetWorldPlane () = new_plane;
-    }
+    csPlane3 new_plane;
+    t.This2Other (p->GetObjectPlane (), p->Vobj (0), new_plane);
+    p->GetObjectPlane () = new_plane;
+    p->GetWorldPlane () = new_plane;
   }
 
   //-------
@@ -1330,7 +1324,8 @@ void csThing::DrawOnePolygon (
   csPolygon3D *p,
   csPolygon2D *poly,
   iRenderView *d,
-  csZBufMode zMode)
+  csZBufMode zMode,
+  const csPlane3& camera_plane)
 {
   iCamera *icam = d->GetCamera ();
 
@@ -1339,7 +1334,7 @@ void csThing::DrawOnePolygon (
     // If fog info was added then we are dealing with vertex fog and
     // the current sector has fog. This means we have to complete the
     // fog_info structure with the plane of the current polygon.
-    d->GetFirstFogInfo ()->outgoing_plane = p->GetPlane ()->GetCameraPlane ();
+    d->GetFirstFogInfo ()->outgoing_plane = camera_plane;
   }
 
   csPortal *po = p->GetPortal ();
@@ -1355,20 +1350,19 @@ void csThing::DrawOnePolygon (
     // to keep the texture plane so that it can be drawn after the sector has
     // been drawn. The texture plane needs to be kept because this polygon
     // may be rendered again (through mirrors) possibly overwriting the plane.
-    csPolyPlane *keep_plane = NULL;
-    if (
-      d->GetGraphics3D ()->GetRenderState (
+    csPlane3 keep_plane;
+    if (d->GetGraphics3D ()->GetRenderState (
           G3DRENDERSTATE_TRANSPARENCYENABLE))
       filtered = p->IsTransparent ();
     if (filtered || is_this_fog || (po && po->flags.Check (CS_PORTAL_ZFILL)))
     {
-      keep_plane = new csPolyPlane (*(p->GetPlane ()));
+      keep_plane = camera_plane;
     }
 
     // Draw through the portal. If this fails we draw the original polygon
     // instead. Drawing through a portal can fail because we have reached
     // the maximum number that a sector is drawn (for mirrors).
-    if (po->Draw (poly, &(p->scfiPolygon3D), d))
+    if (po->Draw (poly, &(p->scfiPolygon3D), d, keep_plane))
     {
       if (filtered) poly->DrawFilled (d, p, keep_plane, zMode);
       if (is_this_fog)
@@ -1389,13 +1383,10 @@ void csThing::DrawOnePolygon (
         poly->FillZBuf (d, p, keep_plane);
     }
     else
-      poly->DrawFilled (d, p, p->GetPlane (), zMode);
-
-    // Cleanup.
-    if (keep_plane) keep_plane->DecRef ();
+      poly->DrawFilled (d, p, camera_plane, zMode);
   }
   else
-    poly->DrawFilled (d, p, p->GetPlane (), zMode);
+    poly->DrawFilled (d, p, camera_plane, zMode);
 }
 
 void csThing::DrawPolygonArray (
@@ -1442,14 +1433,16 @@ void csThing::DrawPolygonArray (
         csPoly3D::Classify (*plclip, verts, num_verts) != CS_POL_FRONT)
       {
         clip = (csPolygon2D *) (render_pool->Alloc ());
+	csPlane3 plane_cam;
+        p->WorldToCameraPlane (camtrans, verts[0], plane_cam);
         if (
           p->DoPerspective (
               verts, num_verts,
-              clip, mirrored, fov, shift_x, shift_y) &&
+              clip, mirrored, fov, shift_x, shift_y,
+	      plane_cam) &&
           clip->ClipAgainst (d->GetClipper ()))
         {
-          p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
-          DrawOnePolygon (p, clip, d, zMode);
+          DrawOnePolygon (p, clip, d, zMode, plane_cam);
         }
 
         render_pool->Free (clip);
@@ -1558,7 +1551,7 @@ void csThing::PreparePolygonBuffer ()
       polybuf->AddPolygon (
           poly->GetVertexIndices (),
           poly->GetVertexCount (),
-          poly->GetPlane ()->GetObjectPlane (),
+          poly->GetObjectPlane (),
           matpol[i].mat_index,
           *m_obj2tex,
           *v_obj2tex,
@@ -1571,7 +1564,7 @@ void csThing::PreparePolygonBuffer ()
       polybuf->AddPolygon (
           poly->GetVertexIndices (),
           poly->GetVertexCount (),
-          poly->GetPlane ()->GetObjectPlane (),
+          poly->GetObjectPlane (),
           matpol[i].mat_index,
           m_obj2tex,
           v_obj2tex,
@@ -1719,18 +1712,6 @@ void csThing::DrawPolygonArrayDPM (
 }
 #endif // CS_USE_NEW_RENDERER
 
-#ifdef CS_DEBUG
-bool viscnt_enabled;
-int viscnt_vis_poly;
-int viscnt_invis_poly;
-int viscnt_vis_node;
-int viscnt_invis_node;
-int viscnt_vis_obj;
-int viscnt_invis_obj;
-float viscnt_vis_node_vol;
-float viscnt_invis_node_vol;
-#endif
-
 // @@@ We need a more clever algorithm here. We should try
 // to recognize convex sub-parts of a polygonset and return
 // convex shadow frustums for those. This will significantly
@@ -1764,11 +1745,11 @@ void csThing::AppendShadows (
     if (p->GetPortal ()) continue;  // No portals
 
     //if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
-    float clas = p->GetPlane ()->GetWorldPlane ().Classify (origin);
+    float clas = p->GetWorldPlane ().Classify (origin);
     if (ABS (clas) < EPSILON) continue;
     if ((clas <= 0) != cw) continue;
 
-    csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
+    csPlane3 pl = p->GetWorldPlane ();
     pl.DD += origin * pl.norm;
     pl.Invert ();
     frust = list->AddShadow (
@@ -2237,7 +2218,7 @@ csPolygon3D *csThing::IntersectSphere (
   {
     p = GetPolygon3D (i);
 
-    const csPlane3 &wpl = p->GetPlane ()->GetObjectPlane ();
+    const csPlane3 &wpl = p->GetObjectPlane ();
     d = wpl.Distance (center);
     if (d < min_d && csMath3::Visible (center, wpl))
     {
@@ -2554,7 +2535,7 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
       if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
       clip = (csPolygon2D *) (render_pool->Alloc ());
 
-      const csPlane3 &wplane = p->GetPlane ()->GetWorldPlane ();
+      const csPlane3 &wplane = p->GetWorldPlane ();
       bool front = csMath3::Visible (camtrans.GetOrigin (), wplane);
 
       csPlane3 clip_plane, *pclip_plane;
@@ -2563,28 +2544,25 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
         pclip_plane = &clip_plane;
       else
         pclip_plane = NULL;
-      if (
-        !front &&
-        p->ClipToPlane (
-            pclip_plane,
-            camtrans.GetOrigin (),
+      if (!front && p->ClipToPlane (pclip_plane, camtrans.GetOrigin (),
             verts,
             num_verts,
-            false) &&
-        p->DoPerspective (
-            verts, num_verts,
-            clip, mirrored, fov, shift_x, shift_y) &&
-        clip->ClipAgainst (d->GetClipper ()))
+            false))
       {
-        p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
-
-        clip->AddFogPolygon (
-            d->GetGraphics3D (),
-            p,
-            p->GetPlane (),
-            icam->IsMirrored (),
-            GetID (),
-            CS_FOG_BACK);
+	csPlane3 plane_cam;
+        p->WorldToCameraPlane (camtrans, verts[0], plane_cam);
+	if (p->DoPerspective (verts, num_verts, clip, mirrored,
+		fov, shift_x, shift_y, plane_cam) &&
+          clip->ClipAgainst (d->GetClipper ()))
+        {
+          clip->AddFogPolygon (
+              d->GetGraphics3D (),
+              p,
+              plane_cam,
+              icam->IsMirrored (),
+              GetID (),
+              CS_FOG_BACK);
+        }
       }
 
       render_pool->Free (clip);
@@ -2598,7 +2576,7 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
       if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
       clip = (csPolygon2D *) (render_pool->Alloc ());
 
-      const csPlane3 &wplane = p->GetPlane ()->GetWorldPlane ();
+      const csPlane3 &wplane = p->GetWorldPlane ();
       bool front = csMath3::Visible (camtrans.GetOrigin (), wplane);
 
       csPlane3 clip_plane, *pclip_plane;
@@ -2607,28 +2585,24 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
         pclip_plane = &clip_plane;
       else
         pclip_plane = NULL;
-      if (
-        front &&
-        p->ClipToPlane (
-            pclip_plane,
-            camtrans.GetOrigin (),
-            verts,
-            num_verts,
-            true) &&
-        p->DoPerspective (
-            verts, num_verts,
-            clip, mirrored, fov, shift_x, shift_y) &&
-        clip->ClipAgainst (d->GetClipper ()))
+      if (front && p->ClipToPlane (
+            pclip_plane, camtrans.GetOrigin (),
+            verts, num_verts, true))
       {
-        p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
-
-        clip->AddFogPolygon (
-            d->GetGraphics3D (),
-            p,
-            p->GetPlane (),
-            icam->IsMirrored (),
-            GetID (),
-            CS_FOG_FRONT);
+	csPlane3 plane_cam;
+        p->WorldToCameraPlane (camtrans, verts[0], plane_cam);
+        if (p->DoPerspective (verts, num_verts, clip, mirrored,
+		fov, shift_x, shift_y, plane_cam) &&
+            clip->ClipAgainst (d->GetClipper ()))
+        {
+          clip->AddFogPolygon (
+              d->GetGraphics3D (),
+              p,
+              plane_cam,
+              icam->IsMirrored (),
+              GetID (),
+              CS_FOG_FRONT);
+        }
       }
 
       render_pool->Free (clip);

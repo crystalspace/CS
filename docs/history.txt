@@ -1,5 +1,38 @@
 The history order is reversed so that new features are at the top.
 
+5-Mar-2003
+	- Worked a bit further on blocks: now no longer uses gouraud shaded
+	  polygons.
+	- Completely changed the way polygons can be shaded. Now it is only
+	  possible to use lightmaps. Previously it was also possible to use
+	  gouraud shading but for that it is better to use genmesh (this
+	  support was never very good anyway). The <shading> keyword
+	  has been changed to accept a boolean instead of NONE, FLAT, GOURAUD,
+	  and LIGHTMAP. With this you can enable/disable texture mapping.
+	  Several API calls in iPolygon3D has been modified for this.
+	  Additionally all iPolyTex* interfaces have been removed.
+	  The functions from iPolyTexNone and iPolyTexLightMap have moved
+	  to iPolygon3D.
+	- Did some further optimizations in the polygon class with regards to
+	  memory usage and also time efficiency. A single polygon now
+	  takes considerably less memory.
+	- Removed iPolygon3D->GetPolygonID() since this ID was not used
+	  and not useful. Also removed iCurve->GetCurveID().
+	- Removed cosinus factor API calls from iPolygon3D and moved them
+	  to iThingState instead. Now it is only possible to control this
+	  on a per-thing level. This change also reflects in the thing
+	  loader.
+	- Remove csPolyPlane and merged all planes into the polygon class.
+	  This saves on object creation and speed (less pointer indirection).
+	- Removed some fields from csPolyTexture.
+	- Cache data in csPolyTexture is now allocated on demand. This
+	  makes the structure smaller at the expense of a little more
+	  memory usage for software renderer alone. Only the software renderer
+	  uses this cache data.
+	- Also removed the camera space plane from the polygon structure.
+	  This camera space plane is now computed as needed (this was
+	  happening anyway).
+	- Created new API doc appendix for 0.96 to 0.98.
 4-Mar-2003
         - Andrew Craig fixed coordshow text drawing in walktest.  If you had 
           a long sector name it was often cut off.  

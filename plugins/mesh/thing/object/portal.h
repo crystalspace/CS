@@ -216,7 +216,7 @@ public:
    * can be drawn through a mirror).
    */
   bool Draw (csPolygon2D* new_clipper, iPolygon3D* portal_polygon,
-  	iRenderView* rview);
+  	iRenderView* rview, const csPlane3& camera_plane);
 
   /**
    * Follow a beam through this portal and return the polygon

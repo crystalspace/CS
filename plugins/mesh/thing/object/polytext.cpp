@@ -24,7 +24,6 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/frustum.h"
 #include "polytext.h"
-#include "polyplan.h"
 #include "polytmap.h"
 #include "polygon.h"
 #include "lppool.h"
@@ -54,10 +53,8 @@ csPolyTexture::csPolyTexture ()
   DG_ADDI (this, NULL);
   DG_TYPE (this, "csPolyTexture");
   lm = NULL;
-  cache_data[0] = cache_data[1] = cache_data[2] = cache_data[3] = NULL;
-  thing = NULL;
+  cache_data = NULL;
   polygon = NULL;
-  ipolygon = NULL;
   shadow_bitmap = NULL;
   ambient_version = 0;
   light_version = 0;
@@ -72,10 +69,14 @@ csPolyTexture::~csPolyTexture ()
     if (G3D) G3D->RemoveFromCache (this);
   }
 #endif // CS_USE_NEW_RENDERER
-  CS_ASSERT (cache_data[0] == NULL);
-  CS_ASSERT (cache_data[1] == NULL);
-  CS_ASSERT (cache_data[2] == NULL);
-  CS_ASSERT (cache_data[3] == NULL);
+  if (cache_data)
+  {
+    CS_ASSERT (cache_data[0] == NULL);
+    CS_ASSERT (cache_data[1] == NULL);
+    CS_ASSERT (cache_data[2] == NULL);
+    CS_ASSERT (cache_data[3] == NULL);
+    delete[] cache_data;
+  }
   delete shadow_bitmap;
   if (lm)
   {
@@ -84,6 +85,32 @@ csPolyTexture::~csPolyTexture ()
   }
 
   DG_REM (this);
+}
+
+void* csPolyTexture::GetCacheData (int idx)
+{
+  if (!cache_data)
+  {
+    cache_data = new void*[4];
+    cache_data[0] = 0;
+    cache_data[1] = 0;
+    cache_data[2] = 0;
+    cache_data[3] = 0;
+  }
+  return cache_data[idx];
+}
+
+void csPolyTexture::SetCacheData (int idx, void *d)
+{
+  if (!cache_data)
+  {
+    cache_data = new void*[4];
+    cache_data[0] = 0;
+    cache_data[1] = 0;
+    cache_data[2] = 0;
+    cache_data[3] = 0;
+  }
+  cache_data[idx] = d;
 }
 
 void csPolyTexture::SetLightMap (csLightMap *lightmap)
@@ -164,7 +191,8 @@ bool csPolyTexture::RecalculateDynamicLights ()
   if (!lm) return false;
 
   // first combine the static and pseudo-dynamic lights
-  csColor amb = polygon->GetParent()->GetDynamicAmbientLight();
+  csThing* thing = polygon->GetParent ();
+  csColor amb = thing->GetDynamicAmbientLight();
 
   if (!lm->UpdateRealLightMap (amb.red,
       amb.green,
@@ -459,11 +487,11 @@ void csPolyTexture::FillLightMap (
 
       // Check if planes of two polygons are equal
       // (@@@ should be precalculated).
-      csPlane3 base_pl = *(base_poly->GetPolyPlane ());
+      const csPlane3& base_pl = base_poly->GetPolyPlane ();
       csPlane3 shad_pl;
       if (shad_poly)
       {
-        shad_pl = *(shad_poly->GetPolyPlane ());
+        shad_pl = shad_poly->GetPolyPlane ();
       }
       else
       {
@@ -529,7 +557,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
   mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
 
   csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
-  float cosfact = polygon->GetCosinusFactor ();
+  float cosfact = polygon->GetParent ()->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
   // From: T = Mwt * (W - Vwt)
@@ -750,7 +778,7 @@ b:
           d = qsqrt (d);
 
           float cosinus = (v2 - lightpos) *
-            polygon->GetPolyPlane ()->Normal ();
+            polygon->GetPolyPlane ().Normal ();
           cosinus /= d;
           cosinus += cosfact;
           if (cosinus < 0)
@@ -838,7 +866,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
   csVector3 &v_t2w = txt_pl->v_world2tex;
 
   // Cosinus factor
-  float cosfact = polygon->GetCosinusFactor ();
+  float cosfact = polygon->GetParent ()->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
   if (dyn)
@@ -918,17 +946,14 @@ void csPolyTexture::GetTextureBox (
   fMaxV = Fmax_v;
 }
 
-void csPolyTexture::SetPolygon (csPolygon3D *p, csThing* thing)
+void csPolyTexture::SetPolygon (csPolygon3D *p)
 {
-  csRef<iPolygon3D> ipoly (SCF_QUERY_INTERFACE (p, iPolygon3D));
-  ipolygon = ipoly;
-  polygon = p;	// ipoly will DecRef here.
-  csPolyTexture::thing = thing;
+  polygon = p;
 }
 
 bool csPolyTexture::DynamicLightsDirty ()
 {
-  return thing->GetLightVersion () != light_version;
+  return polygon->GetParent ()->GetLightVersion () != light_version;
 }
 
 iLightMap *csPolyTexture::GetLightMap ()
@@ -1318,7 +1343,7 @@ void csShadowBitmap::UpdateLightMap (
       d = qsqrt (d);
 
       // Initialize normal with the flat one
-      csVector3 normal = poly->GetPolyPlane()->Normal ();
+      csVector3 normal = poly->GetPolyPlane().Normal ();
       if (poly->GetParent ()->GetSmoothingFlag())
       {
 	int* vertexs = poly->GetVertexIndices ();
@@ -1510,7 +1535,7 @@ bool csShadowBitmap::UpdateShadowMap (
 
       d = qsqrt (d);
 
-      csVector3 normal = poly->GetPolyPlane()->Normal ();
+      csVector3 normal = poly->GetPolyPlane().Normal ();
       if ( poly->GetParent ()->GetSmoothingFlag() ) 
       {
 	int* vertexs = poly->GetVertexIndices ();

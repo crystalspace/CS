@@ -646,7 +646,9 @@ void csSector::Draw (iRenderView *rview)
       iPolygon3D *ipoly3d = rview->GetPortalPolygon ();
       if (ipoly3d)
       {
-        fog_info->incoming_plane = ipoly3d->GetCameraPlane ();
+        ipoly3d->ComputeCameraPlane (icam->GetTransform (),
+		fog_info->incoming_plane);
+        //fog_info->incoming_plane = ipoly3d->GetCameraPlane ();
         fog_info->incoming_plane.Invert ();
         fog_info->has_incoming_plane = true;
       }

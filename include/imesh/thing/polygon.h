@@ -28,6 +28,7 @@ struct iMaterialWrapper;
 struct iPolygon3D;
 struct iPolyTxtPlane;
 struct iPolygonTexture;
+struct iPolyTexLightMap;
 struct iLight;
 struct iLightMap;
 struct iPortal;
@@ -36,6 +37,8 @@ struct iThingState;
 struct iPolyTexType;
 struct iObject;
 
+class csReversibleTransform;
+class csPlane3;
 class csPolygon3D;
 class csVector3;
 class csVector2;
@@ -59,7 +62,7 @@ class csColor;
 #define CS_POLY_VISCULL	0x00000004
 
 
-SCF_VERSION (iPolygon3D, 0, 1, 14);
+SCF_VERSION (iPolygon3D, 0, 2, 1);
 
 /**
  * This is the interface to 3D polygons.
@@ -85,8 +88,8 @@ struct iPolygon3D : public iBase
   /**
    * Set the material for this polygon. WARNING: if you initially
    * created the polygon with a material without texture then
-   * POLYTXT_NONE will be used for this polygon. In that case
-   * you need to call SetTextureType(POLYTXT_LIGHTMAP) again to
+   * texture mapping will be disabled for this polygon.
+   * You need to call EnableTextureMapping(true) again to
    * really enable texture mapping.
    */
   virtual void SetMaterial (iMaterialWrapper* mat) = 0;
@@ -126,9 +129,6 @@ struct iPolygon3D : public iBase
 
   /// Set polygon flags (see CS_POLY_... values above)
   virtual csFlags& GetFlags () = 0;
-
-  /// Set Gouraud vs lightmap polygon lighting
-  virtual void SetLightingMode (bool iGouraud) = 0;
 
   /**
    * Create a null pointer pointing to no sector.
@@ -191,12 +191,14 @@ struct iPolygon3D : public iBase
   virtual void SetTextureSpace (iPolyTxtPlane* plane) = 0;
 
   /**
-   * Set type of texturing to use for this polygon (one of
-   * the POLYTXT_??? flags). POLYTXT_LIGHTMAP is default.
-   * This function is guaranteed not to do anything if the type is
-   * already correct.
+   * Disable or enable texture mapping. Doesn't do anything if nothing
+   * has changed.
    */
-  virtual void SetTextureType (int type) = 0;
+  virtual void EnableTextureMapping (bool enable) = 0;
+  /**
+   * Check if texture mapping is enabled.
+   */
+  virtual bool IsTextureMappingEnabled () const = 0;
   /**
    * Copy texture type settings from another polygon.
    * (this will not copy the actual material that is used, just the
@@ -204,57 +206,25 @@ struct iPolygon3D : public iBase
    */
   virtual void CopyTextureType (iPolygon3D* other_polygon) = 0;
 
-  /**
-   * Get the polygon texture type (one of POLYTXT_XXX values).
-   */
-  virtual int GetTextureType () = 0;
-
   /// Get world space plane.
   virtual const csPlane3& GetWorldPlane () = 0;
   /// Get object space plane.
   virtual const csPlane3& GetObjectPlane () = 0;
-  /// Get camera space plane.
-  virtual const csPlane3& GetCameraPlane () = 0;
+  /// Compute the camera plane based on the camera transform.
+  virtual void ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& pl) = 0;
 
   /**
    * Return true if this polygon or the texture it uses is transparent.
    */
   virtual bool IsTransparent () = 0;
 
-  /**
-   * Get cosinus factor.
-   */
-  virtual float GetCosinusFactor () = 0;
-  /**
-   * Set cosinus factor.
-   */
-  virtual void SetCosinusFactor (float cosfact) = 0;
-  /**
-   * Get the polygon texture type.
-   */
-  virtual iPolyTexType* GetPolyTexType () = 0;
-
-  /**
-   * Update vertex lighting for this polygon. Only works if the
-   * polygon uses gouraud shading or is flat-shaded.
-   * 'dynamic' is true for a dynamic light.
-   * 'reset' is true if the light values need to be reset to 0.
-   * 'lcol' is the color of the light. It is given seperately
-   * because the color of the light may be modified by portals and
-   * other effects.<br>
-   * 'light' can be NULL in which case this function is useful
-   * for resetting dynamic light values to the static lights ('reset'
-   * must be equal to true then).
-   * @@@ TEMPORARY FUNCTION: it is better to use the mesh object lighting
-   * system for this!
-   */
-  virtual void UpdateVertexLighting (iLight* light, const csColor& lcol,
-  	bool dynamic, bool reset) = 0;
-  /**
-   * Get a unique ID for this polygon. This is only unique relative
-   * to the polygon parent.
-   */
-  virtual unsigned long GetPolygonID () = 0;
+  /// Sets the mode that is used for drawing.
+  virtual void SetMixMode (uint m) = 0;
+  /// Gets the mode that is used for drawing.
+  virtual uint GetMixMode () = 0;
+  /// Get the poly texture plane (or NULL if no texture mapping).
+  virtual iPolyTxtPlane* GetPolyTxtPlane () const = 0;
 
   /**
    * Intersect object-space segment with this polygon. Return
@@ -299,7 +269,7 @@ struct iPolygon3D : public iBase
   virtual bool PointOnPolygon (const csVector3& v) = 0;
 };
 
-SCF_VERSION (iPolygonTexture, 1, 0, 0);
+SCF_VERSION (iPolygonTexture, 1, 0, 1);
 
 /**
  * This is a interface to an object responsible for containing
@@ -331,8 +301,6 @@ struct iPolygonTexture : public iBase
   /// Get original width.
   virtual int GetOriginalWidth () = 0;
 
-  /// Get polygon.
-  virtual iPolygon3D *GetPolygon () = 0;
   /// Check if dynamic lighting information should be recalculated
   virtual bool DynamicLightsDirty () = 0;
   /**

@@ -25,17 +25,14 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
-#include "polyplan.h"
 #include "portal.h"
 #include "thing.h"
 #include "polytext.h"
 #include "iengine/sector.h"
-#include "imesh/thing/ptextype.h"
 #include "imesh/thing/polygon.h"
 
 class csFrustumView;
 class csFrustumContext;
-class csPolyPlane;
 class csPolyTxtPlane;
 class csPolygon2D;
 class csPolygon3D;
@@ -51,38 +48,14 @@ struct iCacheManager;
 struct iMaterialWrapper;
 
 /**
- * Structure containing lighting information valid
- * for all types of polygons.
+ * Structure containing all required information
+ * for lightmapped polygons.
  */
-struct csPolygonLightInfo
-{
-  /**
-   * This field describes how the light hitting this polygon is affected
-   * by the angle by which the beam hits the polygon. If this value is
-   * equal to -1 (default) then the global csPolyTexture::cfg_cosinus_factor
-   * will be used.
-   */
-  float cosinus_factor;
-
-  /**
-   * List of light patches for this polygon.
-   */
-  csLightPatch *lightpatches;
-};
-
-/*---------------------------------------------------------------------------*/
-
-/**
- * Kind of texturing that is used for a 3D polygon.
- * This is the base class with subclasses depending on the kind
- * of texturing that is used for a polygon. Also this class contains
- * all the information required for POLYTXT_NONE texture type.
- */
-class csPolyTexType : public iPolyTexType
+class csPolyTexLightMap
 {
   friend class csPolygon3D;
 
-protected:
+private:
   /**
    * 0 is no alpha, 25 is 25% see through and 75% texture and so on.
    * Valid values are from 0 to 100; some renderers in some modes will
@@ -98,236 +71,6 @@ protected:
    */
   uint MixMode;
 
-  /// Common constructor for derived classes
-  csPolyTexType ();
-  /// Destructor is virtual to be able to delete derived objects
-  virtual ~csPolyTexType ();
-
-public:
-  /// Return a type for the kind of texturing used.
-  virtual int GetTextureType () { return POLYTXT_NONE; }
-
-  /// Get the alpha value for this polygon
-  int GetAlpha () { return Alpha; }
-  /// Set the alpha value for this polygon
-  void SetAlpha (int a) { Alpha = a; }
-
-  /// Sets the mode that is used for DrawPolygonFX.
-  virtual void SetMixMode (uint m) { MixMode = m & ~CS_FX_MASK_ALPHA; }
-
-  /// Gets the mode that is used for DrawPolygonFX.
-  virtual uint GetMixMode () { return (MixMode | Alpha); }
-
-  SCF_DECLARE_IBASE;
-};
-
-/**
- * This structure contains all required information for
- * flat-shaded (do not mix with flat-colored!) texture mapped
- * (or flat-shaded) polygons.
- */
-class csPolyTexFlat : public csPolyTexType
-{
-  friend class csPolygon3D;
-
-private:
-  /**
-   * The following array specifies the u,v coordinates for every vertex
-   * of the polygon.
-   */
-  csVector2* uv_coords;
-
-protected:
-  /// Constructor.
-  csPolyTexFlat () : csPolyTexType ()
-  { SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexFlat); uv_coords = NULL; }
-
-  /// Destructor.
-  virtual ~csPolyTexFlat ();
-
-public:
-  /// Return a type for the kind of texturing used.
-  virtual int GetTextureType () { return POLYTXT_FLAT; }
-
-  /**
-   * Setup this lighting structure with the right number of vertices,
-   * taken from parent object. The contents of U/V array are not destroyed,
-   * if it was previously allocated.
-   */
-  void Setup (csPolygon3D *iParent);
-
-  /**
-   * Setup this lighting structure with the right number of vertices,
-   * taken from parent object. The contents of U/V array are not destroyed,
-   * if it was previously allocated.
-   */
-  virtual void Setup (iPolygon3D *iParent);
-
-  /**
-   * Set an (u,v) texture coordinate for the specified vertex
-   * of this polygon. This function may only be called after all
-   * vertices have been added. As soon as this function is used
-   * this polygon will be rendered using a different technique
-   * (perspective incorrect texture mapping and Gouroud shading).
-   * This is useful for triangulated objects for which the triangles
-   * are very small and also for drawing very far away polygons
-   * for which perspective correctness is not needed (sky polygons for
-   * example).
-   */
-  virtual void SetUV (int i, float u, float v);
-
-  /**
-   * Clear all (u,v) coordinates.
-   */
-  virtual void ClearUV ();
-
-  /// Get the pointer to the vertex uv coordinates.
-  virtual csVector2 *GetUVCoords () { return uv_coords; }
-
-  SCF_DECLARE_IBASE_EXT (csPolyTexType);
-
-  struct eiPolyTexFlat : public iPolyTexFlat
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csPolyTexFlat);
-    virtual void Setup (iPolygon3D *p) { scfParent->Setup(p); }
-    virtual void SetUV (int i, float u, float v) { scfParent->SetUV(i,u,v); }
-    virtual void ClearUV () { scfParent->ClearUV(); }
-    virtual csVector2 *GetUVCoords () { return scfParent->GetUVCoords(); }
-  } scfiPolyTexFlat;
-};
-
-/**
- * Structure containing information about texture mapping
- * and vertex colors for Gouraud-shaded polygons.
- */
-class csPolyTexGouraud : public csPolyTexFlat
-{
-  friend class csPolygon3D;
-
-private:
-  /**
-   * If uv_coords is given then this can be an optional array of vertex
-   * colors. If this array is given then gouraud shading is used. Otherwise
-   * flatshading.
-   */
-  csColor *colors;
-
-  /**
-   * This array contains the static colors. It is used in combination with
-   * 'colors'.  'colors=static_colors+dynamic_lights'.
-   */
-  csColor *static_colors;
-
-  /**
-   * This bool indicates if the gouraud shading (static colors)
-   * is up-to-date (read from the cache). If set to false the polygon
-   * still needs to be lit.
-   */
-  bool gouraud_up_to_date;
-
-protected:
-  /// Constructor.
-  csPolyTexGouraud () : csPolyTexFlat ()
-  {
-    SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexGouraud);
-    colors = static_colors = 0;
-    gouraud_up_to_date = false;
-  }
-
-  /// Destructor.
-  virtual ~csPolyTexGouraud ();
-
-public:
-  /// Return a type for the kind of texturing used.
-  virtual int GetTextureType () { return POLYTXT_GOURAUD; }
-
-  /**
-   * Setup this lighting structure with the rignt number of vertices,
-   * taken from parent object. The contents of U/V array are not destroyed,
-   * if it was previously allocated.
-   */
-  void Setup (csPolygon3D *iParent);
-
-  /**
-   * Setup this lighting structure with the rignt number of vertices,
-   * taken from parent object. The contents of U/V array are not destroyed,
-   * if it was previously allocated.
-   */
-  virtual void Setup (iPolygon3D *iParent);
-
-  /**
-   * Clear all color information.
-   */
-  virtual void ClearColors ();
-
-  /// Get the pointer to the vertex color table.
-  virtual csColor *GetColors () { return colors; }
-
-  /// Get the pointer to the static vertex color table.
-  virtual csColor *GetStaticColors () { return static_colors; }
-
-  /**
-   * Add a color to the static color array.
-   */
-  void AddColor (int i, float r, float g, float b);
-
-  /**
-   * Add a color to the dynamic color array.
-   */
-  void AddDynamicColor (int i, float r, float g, float b);
-
-  /**
-   * Set a color in the dynamic array.
-   */
-  void SetDynamicColor (int i, float r, float g, float b);
-
-  /**
-   * Reset a dynamic color to the static values.
-   */
-  virtual void ResetDynamicColor (int i);
-
-  /**
-   * Set a color in the dynamic array.
-   */
-  virtual void SetDynamicColor (int i, const csColor& c)
-  { SetDynamicColor (i, c.red, c.green, c.blue); }
-
-  /**
-   * Set a color in the static array.
-   */
-  void SetColor (int i, float r, float g, float b);
-
-  /**
-   * Set a color in the static array.
-   */
-  virtual void SetColor (int i, const csColor& c)
-  { SetColor (i, c.red, c.green, c.blue); }
-
-  SCF_DECLARE_IBASE_EXT (csPolyTexFlat);
-
-  struct eiPolyTexGouraud : public iPolyTexGouraud
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csPolyTexGouraud);
-    virtual void Setup (iPolygon3D *p) { scfParent->Setup(p); }
-    virtual void ClearColors () { scfParent->ClearColors(); }
-    virtual csColor *GetColors () { return scfParent->GetColors(); }
-    virtual csColor *GetStaticColors() { return scfParent->GetStaticColors(); }
-    virtual void ResetDynamicColor (int i) { scfParent->ResetDynamicColor(i); }
-    virtual void SetDynamicColor (int i, const csColor& c)
-    { scfParent->SetDynamicColor(i,c); }
-    virtual void SetColor(int i,const csColor& c) { scfParent->SetColor(i,c); }
-  } scfiPolyTexGouraud;
-};
-
-/**
- * Structure containing all required information
- * for lightmapped polygons.
- */
-class csPolyTexLightMap : public csPolyTexType
-{
-  friend class csPolygon3D;
-
-private:
   /// The transformed texture for this polygon.
   csPolyTexture *tex;
 
@@ -347,14 +90,11 @@ private:
   csPolyTexLightMap ();
 
   /// Destructor.
-  virtual ~csPolyTexLightMap ();
+  ~csPolyTexLightMap ();
 
 public:
   /// Setup for the given polygon and material.
-  void Setup (csPolygon3D* poly3d, csThing* thing, iMaterialWrapper* math);
-
-  /// Return a type for the kind of texturing used.
-  virtual int GetTextureType () { return POLYTXT_LIGHTMAP; }
+  void Setup (csPolygon3D* poly3d, iMaterialWrapper* math);
 
   /// Get the polytexture (lighted texture)
   csPolyTexture* GetPolyTex ();
@@ -366,7 +106,18 @@ public:
   /**
    * Return the texture plane of this polygon.
    */
-  virtual iPolyTxtPlane* GetPolyTxtPlane () const;
+  iPolyTxtPlane* GetPolyTxtPlane () const;
+
+  /// Get the alpha value for this polygon
+  int GetAlpha () { return Alpha; }
+  /// Set the alpha value for this polygon
+  void SetAlpha (int a) { Alpha = a; }
+
+  /// Sets the mode that is used for DrawPolygonFX.
+  void SetMixMode (uint m) { MixMode = m & ~CS_FX_MASK_ALPHA; }
+
+  /// Gets the mode that is used for DrawPolygonFX.
+  uint GetMixMode () { return (MixMode | Alpha); }
 
   /**
    * Set the texture plane.
@@ -382,15 +133,6 @@ public:
    * Get the lightmap belonging with this polygon.
    */
   iLightMap* GetLightMap () { return tex->GetLightMap (); }
-
-  SCF_DECLARE_IBASE_EXT (csPolyTexType);
-
-  struct eiPolyTexLightMap : public iPolyTexLightMap
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csPolyTexLightMap);
-    virtual iPolyTxtPlane* GetPolyTxtPlane () const
-    { return scfParent->GetPolyTxtPlane(); }
-  } scfiPolyTexLightMap;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -441,8 +183,7 @@ public:
  * Polygons have a texture and lie on a plane. The plane does not
  * define the orientation of the polygon but is derived from it. The plane
  * does define how the texture is scaled and translated accross the surface
- * of the polygon (in case we are talking about lightmapped polygons, gouraud
- * shaded polygons have u,v coordinates at every vertex).
+ * of the polygon (in case we are talking about lightmapped polygons).
  * Several planes can be shared for different polygons. As a result of this
  * their textures will be correctly aligned.
  *<p>
@@ -457,9 +198,6 @@ class csPolygon3D : public csObject
   friend class csPolyTexture;
 
 private:
-  /// ID for this polygon relative to the parent (will be >0).
-  unsigned long polygon_id;
-
   /*
    * A table of indices into the vertices of the parent csThing
    * (container).
@@ -486,10 +224,10 @@ private:
    */
   csPortal* portal;
 
-  /**
-   * The PolygonPlane for this polygon.
-   */
-  csPolyPlane* plane;
+  /// The object space plane equation (this is fixed).
+  csPlane3 plane_obj;
+  /// The world space plane equation.
+  csPlane3 plane_wor;
 
   /**
    * The material, this contains the texture handle,
@@ -498,21 +236,15 @@ private:
   iMaterialWrapper* material;
 
   /**
-   * General lighting information for this polygon.
+   * List of light patches for this polygon.
    */
-  csPolygonLightInfo light_info;
+  csLightPatch *lightpatches;
 
   /**
-   * Texture type specific information for this polygon. Can be either
-   * csPolyTexLightMap or csPolyTexGouraud.
+   * Texture type specific information for this polygon. Can be
+   * csPolyTexLightMap.
    */
-  csPolyTexType *txt_info;
-
-  /**
-   * Visibility number. If equal to csOctreeNode::pvs_cur_vis_nr then
-   * this object is visible.
-   */
-  uint32 pvs_vis_nr;
+  csPolyTexLightMap *txt_info;
 
   /**
    * Return twice the signed area of the polygon in world space coordinates
@@ -549,40 +281,17 @@ public:
   csPolygon3D (iMaterialWrapper *mat);
 
   /**
-   * Construct a new polygon and copy from the given polygon.
-   * Note! Several fields will reflect that a copy was made!
-   * New polytextures will be allocated. This is mainly used when
-   * a BSP tree splits a polygon.
-   */
-  csPolygon3D (csPolygon3D& poly);
-
-  /**
    * Delete everything related to this polygon. Less is
    * deleted if this polygon is a copy of another one (because
    * some stuff is shared).
    */
   virtual ~csPolygon3D ();
 
-  /// Get the ID of this polygon relative to the parent (will be >0).
-  unsigned long GetPolygonID ()
-  {
-    CS_ASSERT (polygon_id != 0);
-    return polygon_id;
-  }
-
   /**
-   * Set type of texturing to use for this polygon (one of
-   * the POLYTXT_??? flags). POLYTXT_LIGHTMAP is default.
-   * This function is guaranteed not to do anything if the type is
-   * already correct.
+   * Enable or disable texture mapping.
    */
-  void SetTextureType (int type);
-
-  /**
-   * Get the polygon texture type (one of POLYTXT_XXX values).
-   */
-  int GetTextureType ()
-  { return txt_info->GetTextureType (); }
+  void EnableTextureMapping (bool enabled);
+  bool IsTextureMappingEnabled () const { return txt_info != NULL; }
 
   /**
    * Copy texture type settings from another polygon.
@@ -592,62 +301,9 @@ public:
   void CopyTextureType (iPolygon3D* other_polygon);
 
   /**
-   * Get the general texture type information structure.
+   * Get the lightmap information.
    */
-  csPolyTexType *GetTextureTypeInfo () { return txt_info; }
-
-  /**
-   * This is a conveniance function to get the lightmap information
-   * structure. If this polygon is not POLYTXT_LIGHTMAP it will return NULL.
-   */
-  csPolyTexLightMap *GetLightMapInfo ()
-  {
-    if (txt_info && txt_info->GetTextureType () == POLYTXT_LIGHTMAP)
-      return (csPolyTexLightMap *)txt_info;
-    else
-      return NULL;
-  }
-
-  /**
-   * This is a conveniance function to get the gouraud information
-   * structure. If this polygon is not POLYTXT_GOURAUD it will return NULL.
-   */
-  csPolyTexGouraud *GetGouraudInfo ()
-  {
-    if (txt_info && txt_info->GetTextureType () == POLYTXT_GOURAUD)
-      return (csPolyTexGouraud*)txt_info;
-    else
-      return NULL;
-  }
-
-  /**
-   * This is a conveniance function to get the flat shaded information
-   * structure. If this polygon is not POLYTXT_FLAT or POLYTXT_GOURAUD
-   * it will return NULL, GOURAUD is derived from the FLAT structure.
-   */
-  csPolyTexFlat *GetFlatInfo ()
-  {
-    if (txt_info
-     && (txt_info->GetTextureType () == POLYTXT_FLAT
-      || txt_info->GetTextureType () == POLYTXT_GOURAUD))
-      return (csPolyTexFlat*)txt_info;
-    else
-      return NULL;
-  }
-
-  /**
-   * This is a conveniance function to get the "type" texturing type
-   * information structure. It returns NULL only if the polygon texture
-   * type is lightmapped, because all other texturing types are subclassed
-   * from NONE.
-   */
-  csPolyTexType *GetNoTexInfo ()
-  {
-    if (txt_info && txt_info->GetTextureType () != POLYTXT_LIGHTMAP)
-      return (csPolyTexType *)txt_info;
-    else
-      return NULL;
-  }
+  csPolyTexLightMap *GetLightMapInfo () { return txt_info; }
 
   /**
    * Clear the polygon (remove all vertices).
@@ -730,12 +386,39 @@ public:
    * csPolyPlane which encapsulates object, world, and camera space planes as
    * well as the texture transformation.
    */
-  csPolyPlane* GetPlane () { return plane; }
+  //csPolyPlane* GetPlane () { return plane; }
 
   /**
    * Return the world-space plane of this polygon.
    */
-  csPlane3* GetPolyPlane () { return &plane->GetWorldPlane (); }
+  const csPlane3& GetPolyPlane () const { return plane_wor; }
+
+  /**
+   * Return the world-space plane of this polygon.
+   */
+  csPlane3& GetWorldPlane () { return plane_wor; }
+
+  /**
+   * Return the object-space plane of this polygon.
+   */
+  csPlane3& GetObjectPlane () { return plane_obj; }
+
+  /**
+   * Transform the plane of this polygon from world space to camera space using
+   * the given matrices. One vertex on the plane is also given so
+   * that we can more easily recompute the 'D' component of the plane.
+   * The given vertex should be in camera space.
+   */
+  void WorldToCameraPlane (
+  	const csReversibleTransform& t,
+	const csVector3& vertex1,
+	csPlane3& camera_plane);
+
+  /**
+   * Other version which computes the camera space vertex itself.
+   */
+  void ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& pl);
 
   /**
    * Get the vertices.
@@ -830,18 +513,6 @@ public:
 
   /// Calculates the area of the polygon in object space.
   float GetArea ();
-
-  /**
-   * Get the cosinus factor. This factor is used
-   * for lighting.
-   */
-  float GetCosinusFactor () { return light_info.cosinus_factor; }
-
-  /**
-   * Set the cosinus factor. This factor is used
-   * for lighting.
-   */
-  void SetCosinusFactor (float f) { light_info.cosinus_factor = f; }
 
   /**
    * One of the SetTextureSpace functions should be called after
@@ -953,7 +624,7 @@ public:
   /**
    * Get the list of light patches for this polygon.
    */
-  csLightPatch* GetLightpatches () { return light_info.lightpatches; }
+  csLightPatch* GetLightpatches () { return lightpatches; }
 
   /**
    * Clip a polygon against a plane (in camera space).
@@ -1021,20 +692,6 @@ public:
    */
   void FillLightMapStatic (iFrustumView* lview, csLightingPolyTexQueue* lptq,
   	bool vis);
-
-  /**
-   * Update vertex lighting for this polygon. Only works if the
-   * polygon uses gouraud shading or is flat-shaded.
-   * 'dynamic' is true for a dynamic light.
-   * 'lcol' is the color of the light. It is given seperately
-   * because the color of the light may be modified by portals and
-   * other effects.<br>
-   * 'light' can be NULL in which case this function is useful
-   * for resetting dynamic light values to the static lights ('reset'
-   * must be equal to true then).
-   */
-  void UpdateVertexLighting (iLight* light, const csColor& lcol,
-  	bool dynamic, bool reset);
 
   /**
    * Check all shadow frustums and mark all relevant ones. A shadow
@@ -1118,7 +775,8 @@ public:
    */
   bool DoPerspective (csVector3* source,
   	int num_verts, csPolygon2D* dest, bool mirror,
-	int fov, float shift_x, float shift_y);
+	int fov, float shift_x, float shift_y,
+	const csPlane3& plane_cam);
 
   /**
    * Classify this polygon with regards to a plane (in object space).  If this
@@ -1139,20 +797,17 @@ public:
   int ClassifyZ (float z);
 
   /**
-   * Split this polygon with the given plane (A,B,C,D) and return the
-   * two resulting new polygons in 'front' and 'back'. The new polygons will
-   * mimic the behaviour of the parent polygon as good as possible.
-   * This function is mainly used by the BSP splitter. Note that splitting
-   * happens in object space.
-   */
-  void SplitWithPlane (csPolygon3D** front, csPolygon3D** back,
-  	const csPlane3& plane);
-
-  /**
    * Check if this polygon (partially) overlaps the other polygon
    * from some viewpoint in space. This function works in object space.
    */
   bool Overlaps (csPolygon3D* overlapped);
+
+  /**
+   * Intersect object-space segment with the plane of this polygon. Return
+   * true if it intersects and the intersection point in world coordinates.
+   */
+  bool IntersectSegmentPlane (const csVector3& start, const csVector3& end,
+                          csVector3& isect, float* pr = NULL) const;
 
   /**
    * Intersect object-space segment with this polygon. Return
@@ -1196,8 +851,8 @@ public:
   bool PointOnPolygon (const csVector3& v);
 
   /// Get the alpha transparency value for this polygon.
-  virtual int GetAlpha ()
-  { return txt_info->GetAlpha (); }
+  int GetAlpha ()
+  { return txt_info ? txt_info->GetAlpha () : 0; }
 
   /**
    * Set the alpha transparency value for this polygon (only if
@@ -1206,16 +861,28 @@ public:
    * 75, and 100 will always work but other values may give
    * only the closest possible to one of the above.
    */
-  virtual void SetAlpha (int iAlpha)
-  { txt_info->SetAlpha (iAlpha); }
+  void SetAlpha (int iAlpha)
+  { if (txt_info) txt_info->SetAlpha (iAlpha); }
 
   /// Get the material handle for the texture manager.
-  virtual iMaterialHandle *GetMaterialHandle ();
+  iMaterialHandle *GetMaterialHandle ();
   /// Get the handle to the polygon texture object
-  virtual iPolygonTexture *GetTexture ()
+  iPolygonTexture *GetTexture ()
   {
-    csPolyTexLightMap *lm = GetLightMapInfo ();
-    return lm ? lm->GetPolyTex () : (iPolygonTexture*)NULL;
+    return txt_info ? txt_info->GetPolyTex () : (iPolygonTexture*)NULL;
+  }
+
+  void SetMixMode (uint m)
+  {
+    if (txt_info) txt_info->SetMixMode (m);
+  }
+  uint GetMixMode ()
+  {
+    return txt_info ? txt_info->GetMixMode () : 0;
+  }
+  iPolyTxtPlane* GetPolyTxtPlane () const
+  {
+    return txt_info ? txt_info->GetPolyTxtPlane () : NULL;
   }
 
   SCF_DECLARE_IBASE_EXT (csObject);
@@ -1231,7 +898,7 @@ public:
     virtual iThingState *GetParent ();
     virtual iLightMap *GetLightMap ()
     {
-      csPolyTexLightMap *lm = scfParent->GetLightMapInfo ();
+      csPolyTexLightMap *lm = scfParent->txt_info;
       return lm ? lm->GetLightMap () : (iLightMap*)NULL;
     }
     virtual iPolygonTexture *GetTexture () { return scfParent->GetTexture(); }
@@ -1272,9 +939,6 @@ public:
 
     virtual csFlags& GetFlags ()
     { return scfParent->flags; }
-
-    virtual void SetLightingMode (bool iGouraud)
-    { scfParent->SetTextureType(iGouraud ? POLYTXT_GOURAUD:POLYTXT_LIGHTMAP); }
 
     virtual iPortal* CreateNullPortal ()
     {
@@ -1320,13 +984,13 @@ public:
     }
     virtual void SetTextureSpace (iPolyTxtPlane* plane);
 
-    virtual void SetTextureType (int type)
+    virtual void EnableTextureMapping (bool enabled)
     {
-      scfParent->SetTextureType (type);
+      scfParent->EnableTextureMapping (enabled);
     }
-    virtual int GetTextureType ()
+    virtual bool IsTextureMappingEnabled () const
     {
-      return scfParent->GetTextureType ();
+      return scfParent->IsTextureMappingEnabled ();
     }
     virtual void CopyTextureType (iPolygon3D* other_polygon)
     {
@@ -1335,37 +999,32 @@ public:
 
     virtual const csPlane3& GetWorldPlane ()
     {
-      return scfParent->plane->GetWorldPlane ();
+      return scfParent->plane_wor;
     }
     virtual const csPlane3& GetObjectPlane ()
     {
-      return scfParent->plane->GetObjectPlane ();
+      return scfParent->plane_obj;
     }
-    virtual const csPlane3& GetCameraPlane ()
+    virtual void ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& pl)
     {
-      return scfParent->plane->GetCameraPlane ();
+      scfParent->ComputeCameraPlane (t, pl);
     }
     virtual bool IsTransparent ()
     {
       return scfParent->IsTransparent ();
     }
-    virtual float GetCosinusFactor ()
+    virtual void SetMixMode (uint m)
     {
-      return scfParent->GetCosinusFactor ();
+      scfParent->SetMixMode (m);
     }
-    virtual void SetCosinusFactor (float cosfact)
+    virtual uint GetMixMode ()
     {
-      scfParent->SetCosinusFactor (cosfact);
+      return scfParent->GetMixMode ();
     }
-    virtual iPolyTexType* GetPolyTexType ();
-    virtual void UpdateVertexLighting (iLight* light, const csColor& lcol,
-  	bool dynamic, bool reset)
+    virtual iPolyTxtPlane* GetPolyTxtPlane () const
     {
-      scfParent->UpdateVertexLighting (light, lcol, dynamic, reset);
-    }
-    virtual unsigned long GetPolygonID ()
-    {
-      return scfParent->GetPolygonID ();
+      return scfParent->GetPolyTxtPlane ();
     }
     virtual bool IntersectSegment (const csVector3& start, const csVector3& end,
                           csVector3& isect, float* pr = NULL)

@@ -47,7 +47,6 @@
 #include "imesh/sprite3d.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
-#include "imesh/thing/ptextype.h"
 #include "imap/parser.h"
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
@@ -171,7 +170,6 @@ bool BumpTest::InitProcDemo ()
   /// the bumpoverlay
   // this does not work - the texture is flat shaded too.
   p = thing_state->CreatePolygon ();
-  p->SetTextureType(POLYTXT_LIGHTMAP);
   p->GetFlags().Set(CS_POLY_LIGHTING, 0); // the overlay is not lit
   p->SetMaterial (imatBump);
   p->CreateVertex (csVector3 (-dx, +dy, -dz)+overdist);
@@ -180,9 +178,7 @@ bool BumpTest::InitProcDemo ()
   p->CreateVertex (csVector3 (-dx, -dy, -dz)+overdist);
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
 
-  iPolyTexType *ipn = p->GetPolyTexType();
-  if(!ipn) printf("No PolyTexNone info!\n");
-  else ipn->SetMixMode(CS_FX_MULTIPLY2);
+  p->SetMixMode(CS_FX_MULTIPLY2);
 
   ////// copy of bumps for debug
   p = thing_state->CreatePolygon ();

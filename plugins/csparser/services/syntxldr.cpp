@@ -38,7 +38,6 @@
 #include "iengine/texture.h"
 #include "ivideo/material.h"
 #include "imesh/thing/thing.h"
-#include "imesh/thing/ptextype.h"
 #include "imesh/thing/polytmap.h"
 #include "imesh/thing/portal.h"
 #include "imesh/thing/polygon.h"
@@ -104,8 +103,6 @@ enum
   XMLTOKEN_KEYCOLOR,
   XMLTOKEN_TILING,
   XMLTOKEN_NONE,
-  XMLTOKEN_FLAT,
-  XMLTOKEN_GOURAUD,
   XMLTOKEN_LIGHTMAP,
   XMLTOKEN_MATERIAL,
   XMLTOKEN_LIGHTING,
@@ -113,12 +110,10 @@ enum
   XMLTOKEN_WARP,
   XMLTOKEN_TEXMAP,
   XMLTOKEN_SHADING,
-  XMLTOKEN_UVA,
   XMLTOKEN_UV,
   XMLTOKEN_COLOR,
   XMLTOKEN_COLORS,
   XMLTOKEN_COLLDET,
-  XMLTOKEN_COSFACT,
   XMLTOKEN_MAXVISIT,
   XMLTOKEN_MIXMODE,
   XMLTOKEN_LEN,
@@ -185,8 +180,6 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("keycolor", XMLTOKEN_KEYCOLOR);
   xmltokens.Register ("tiling", XMLTOKEN_TILING);
   xmltokens.Register ("none", XMLTOKEN_NONE);
-  xmltokens.Register ("flat", XMLTOKEN_FLAT);
-  xmltokens.Register ("gouraud", XMLTOKEN_GOURAUD);
   xmltokens.Register ("lightmap", XMLTOKEN_LIGHTMAP);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
@@ -194,12 +187,10 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("warp", XMLTOKEN_WARP);
   xmltokens.Register ("texmap", XMLTOKEN_TEXMAP);
   xmltokens.Register ("shading", XMLTOKEN_SHADING);
-  xmltokens.Register ("uva", XMLTOKEN_UVA);
   xmltokens.Register ("uv", XMLTOKEN_UV);
   xmltokens.Register ("color", XMLTOKEN_COLOR);
   xmltokens.Register ("colors", XMLTOKEN_COLORS);
   xmltokens.Register ("colldet", XMLTOKEN_COLLDET);
-  xmltokens.Register ("cosfact", XMLTOKEN_COSFACT);
   xmltokens.Register ("maxvisit", XMLTOKEN_MAXVISIT);
   xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
   xmltokens.Register ("len", XMLTOKEN_LEN);
@@ -229,8 +220,8 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 
 void csTextSyntaxService::OptimizePolygon (iPolygon3D *p)
 {
-  if (!p->GetPortal () || p->GetAlpha ()
-  	|| p->GetPolyTexType ()->GetMixMode () != 0)
+  if (!p->GetPortal () || p->GetAlpha () || !p->IsTextureMappingEnabled () ||
+  	p->GetMixMode () != 0)
     return;
   iMaterialWrapper *mat = p->GetMaterial ();
   if (mat)
@@ -241,7 +232,7 @@ void csTextSyntaxService::OptimizePolygon (iPolygon3D *p)
       return;
   }
 
-  p->SetTextureType (POLYTXT_NONE);
+  p->EnableTextureMapping (false);
 }
 
 class MissingSectorCallback : public iPortalCallback
@@ -888,12 +879,6 @@ bool csTextSyntaxService::ParsePoly3d (
   int set_colldet = 0; // If 1 then set, if -1 then reset, else default.
   int set_viscull = 0; // If 1 then set, if -1 then reset, else default.
 
-  bool init_gouraud_poly = false;
-  csRef<iPolyTexFlat> fs;
-  csRef<iPolyTexGouraud> gs;
-  int num_uv = 0;
-  int num_col = 0;
-
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -921,9 +906,6 @@ bool csTextSyntaxService::ParsePoly3d (
           poly3d->GetFlags ().Set (CS_POLY_LIGHTING,
 	  	do_lighting ? CS_POLY_LIGHTING : 0);
         }
-        break;
-      case XMLTOKEN_COSFACT:
-        poly3d->SetCosinusFactor (child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_ALPHA:
         poly3d->SetAlpha (child->GetContentsValueAsInt () * 655 / 256);
@@ -1012,23 +994,10 @@ bool csTextSyntaxService::ParsePoly3d (
         break;
       case XMLTOKEN_SHADING:
 	{
-	  int shading;
-	  const char* shad = child->GetContentsValue ();
-          if (!strcasecmp (shad, "none"))
-	    shading = POLYTXT_NONE;
-	  else if (!strcasecmp (shad, "flat"))
-	    shading = POLYTXT_FLAT;
-	  else if (!strcasecmp (shad, "gouraud"))
-	    shading = POLYTXT_GOURAUD;
-	  else if (!strcasecmp (shad, "lightmap"))
-	    shading = POLYTXT_LIGHTMAP;
-	  else
-	  {
-	    ReportError ("crystalspace.syntax.polygon", child,
-	      "Bad 'shading' specification '%s'!", shad);
-            return false;
-	  }
-          poly3d->SetTextureType (shading);
+	  bool shading;
+	  if (!ParseBool (child, shading, true))
+	    return false;
+	  poly3d->EnableTextureMapping (shading);
 	}
         break;
       case XMLTOKEN_MIXMODE:
@@ -1036,91 +1005,15 @@ bool csTextSyntaxService::ParsePoly3d (
           uint mixmode;
 	  if (ParseMixmode (child, mixmode))
 	  {
-	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
-            ptt->SetMixMode (mixmode);
-	    if (mixmode & CS_FX_MASK_ALPHA)
-	      poly3d->SetAlpha (mixmode & CS_FX_MASK_ALPHA);
+	    if (poly3d->IsTextureMappingEnabled ())
+	    {
+              poly3d->SetMixMode (mixmode);
+	      if (mixmode & CS_FX_MASK_ALPHA)
+	        poly3d->SetAlpha (mixmode & CS_FX_MASK_ALPHA);
+	    }
 	  }
 	}
         break;
-      case XMLTOKEN_UV:
-        {
-	  float u = child->GetAttributeValueAsFloat ("u");
-	  float v = child->GetAttributeValueAsFloat ("v");
-	  if (!init_gouraud_poly)
-	  {
-            poly3d->SetTextureType (POLYTXT_GOURAUD);
-	    init_gouraud_poly = true;
-	  }
-	  if (!fs)
-	  {
-	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	    fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
-	    fs->Setup (poly3d);
-	  }
-	  if (num_uv >= poly3d->GetVertexCount ())
-	  {
-	    ReportError ("crystalspace.syntax.polygon", child,
-	      "Too many <uv> statements in polygon!");
-	    return false;
-	  }
-	  fs->SetUV (num_uv, u, v);
-	  num_uv++;
-	}
-	break;
-      case XMLTOKEN_UVA:
-        {
-	  float angle = child->GetAttributeValueAsFloat ("angle");
-	  float scale = child->GetAttributeValueAsFloat ("scale");
-	  float shift = child->GetAttributeValueAsFloat ("shift");
-	  if (!init_gouraud_poly)
-	  {
-            poly3d->SetTextureType (POLYTXT_GOURAUD);
-	    init_gouraud_poly = true;
-	  }
-	  if (!fs)
-	  {
-	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	    fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
-	    fs->Setup (poly3d);
-	  }
-	  if (num_uv >= poly3d->GetVertexCount ())
-	  {
-	    ReportError ("crystalspace.syntax.polygon", child,
-	      "Too many <uva> statements in polygon!");
-	    return false;
-	  }
-          float a = angle * TWO_PI / 360.;
-          fs->SetUV (num_uv, cos (a) * scale + shift, sin (a) * scale + shift);
-	  num_uv++;
-	}
-	break;
-      case XMLTOKEN_COLOR:
-        {
-	  float r = child->GetAttributeValueAsFloat ("red");
-	  float g = child->GetAttributeValueAsFloat ("green");
-	  float b = child->GetAttributeValueAsFloat ("blue");
-	  if (!init_gouraud_poly)
-	  {
-            poly3d->SetTextureType (POLYTXT_GOURAUD);
-	    init_gouraud_poly = true;
-	  }
-	  if (!gs)
-	  {
-	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	    gs = SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud);
-	    gs->Setup (poly3d);
-	  }
-	  if (num_col >= poly3d->GetVertexCount ())
-	  {
-	    ReportError ("crystalspace.syntax.polygon", child,
-	      "Too many <color> statements in polygon!");
-	    return false;
-	  }
-	  gs->SetColor (num_col, csColor (r, g, b));
-	  num_col++;
-	}
-	break;
       default:
         ReportBadToken (child);
         return false;
@@ -1280,11 +1173,9 @@ bool csTextSyntaxService::ParsePoly3d (
 
   if (texspec & CSTEX_UV_SHIFT)
   {
-    iPolyTexType* ptt = poly3d->GetPolyTexType ();
-    csRef<iPolyTexLightMap> plm (SCF_QUERY_INTERFACE (ptt, iPolyTexLightMap));
-    if (plm)
+    if (poly3d->IsTextureMappingEnabled ())
     {
-      plm->GetPolyTxtPlane ()->GetTextureSpace (tx_matrix, tx_vector);
+      poly3d->GetPolyTxtPlane ()->GetTextureSpace (tx_matrix, tx_vector);
       // T = Mot * (O - Vot)
       // T = Mot * (O - Vot) + Vuv      ; Add shift Vuv to final texture map
       // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv

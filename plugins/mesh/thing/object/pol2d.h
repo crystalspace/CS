@@ -26,7 +26,6 @@
 #include "ivideo/graph3d.h"
 
 class csPolygon3D;
-class csPolyPlane;
 struct iRenderView;
 struct iGraphics2D;
 struct iGraphics3D;
@@ -73,21 +72,22 @@ public:
    * space).
    * 'poly' is only used for debugging. The plane and vertices are not used.
    */
-  void DrawFilled (iRenderView* rview, csPolygon3D* poly, csPolyPlane* plane,
-	csZBufMode zbufMode = CS_ZBUF_FILL);
+  void DrawFilled (iRenderView* rview, csPolygon3D* poly,
+  	const csPlane3& camera_plane, csZBufMode zbufMode = CS_ZBUF_FILL);
 
   /**
    * Z fill the Z buffer for this polygon.
    * Nothing else is rendered.
    */
-  void FillZBuf (iRenderView* rview, csPolygon3D* poly, csPolyPlane* plane);
+  void FillZBuf (iRenderView* rview, csPolygon3D* poly,
+  	const csPlane3& camera_plane);
 
   /**
    * Add this polygon as a back or front polygon of a fog object.
    * NOTE! Don't forget to open the fog object first with g3d->OpenFogObject ();
    */
-  void AddFogPolygon (iGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane,
-  	bool mirror, CS_ID id, int fog_type);
+  void AddFogPolygon (iGraphics3D* g3d, csPolygon3D* poly,
+  	const csPlane3& camera_plane, bool mirror, CS_ID id, int fog_type);
 #endif // CS_USE_NEW_RENDERER
 };
 
@@ -107,16 +107,6 @@ public:
 
 struct G3DPolygonDPFX;
 struct csVertexStatus;
-
-/**
- * Prepare a filled in G3DPolygonDPFX structure for drawing via
- * g3d->DrawPolygonFX
- */
-extern void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_poly,
-  int num_vertices, csVector2 *orig_triangle, bool gouraud);
-extern void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly, csVector2* clipped_poly,
-  int num_vertices, csVertexStatus* clipped_vtstats,
-  int orig_num_vertices, bool gouraud);
 
 /**
  * An element for the polygon queue.

@@ -498,24 +498,21 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   iPolygon3D* poly = NULL;
   iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &poly);
   const char* poly_name;
-  unsigned long poly_id;
   if (poly)
   {
     poly_name = poly->QueryObject ()->GetName ();
-    poly_id = poly->GetPolygonID ();
     Dump (poly);
   }
   else
   {
     poly_name = NULL;
-    poly_id = 0;
   }
 
   vw = isect;
   v = camera->GetTransform ().Other2This (vw);
   Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'/%d",
-    v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>", poly_id);
+    "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'",
+    v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>");
 
   if (sel)
   {
@@ -1855,9 +1852,8 @@ void csBugPlug::Dump (iPolygon3D* poly)
 {
   const char* poly_name = poly->QueryObject ()->GetName ();
   if (!poly_name) poly_name = "<noname>";
-  unsigned long poly_id = poly->GetPolygonID ();
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Polygon '%s' (id=%ld)",
-  	poly_name, poly_id);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Polygon '%s'",
+  	poly_name);
   int nv = poly->GetVertexCount ();
   int i;
   int* idx = poly->GetVertexIndices ();

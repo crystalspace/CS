@@ -32,7 +32,6 @@
 #include "iengine/mesh.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/curve.h"
-#include "imesh/thing/ptextype.h"
 #include "imesh/thing/polytmap.h"
 
 //---------------------------------------------------------------------------

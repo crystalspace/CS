@@ -20,7 +20,6 @@
 #include "polygon.h"
 #include "pol2d.h"
 #include "polytext.h"
-#include "polyplan.h"
 #include "polytmap.h"
 #include "lghtmap.h"
 #include "portal.h"
@@ -61,59 +60,21 @@ typedef csGrowingArray<csVector3> engine3d_VectorArray;
 CS_IMPLEMENT_STATIC_VAR (GetStaticVectorArray, engine3d_VectorArray,())
 
 static engine3d_VectorArray *VectorArray = NULL;
+
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csPolyTexType)
-  SCF_IMPLEMENTS_INTERFACE(iPolyTexType)
-SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_IBASE_EXT (csPolyTexFlat)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolyTexFlat)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPolyTexFlat::eiPolyTexFlat)
-  SCF_IMPLEMENTS_INTERFACE(iPolyTexFlat)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE_EXT (csPolyTexGouraud)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolyTexGouraud)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPolyTexGouraud::eiPolyTexGouraud)
-  SCF_IMPLEMENTS_INTERFACE(iPolyTexGouraud)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE_EXT (csPolyTexLightMap)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolyTexLightMap)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPolyTexLightMap::eiPolyTexLightMap)
-  SCF_IMPLEMENTS_INTERFACE(iPolyTexLightMap)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csPolyTexType::csPolyTexType ()
+csPolyTexLightMap::csPolyTexLightMap ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   DG_ADDI (this, NULL);
-  DG_TYPE (this, "csPolyTexType");
-  Alpha = 0;
-#ifndef CS_USE_NEW_RENDERER
-  MixMode = CS_FX_COPY;
-#endif // CS_USE_NEW_RENDERER
-}
-
-csPolyTexType::~csPolyTexType ()
-{
-  DG_REM (this);
-}
-
-csPolyTexLightMap::csPolyTexLightMap () :
-  csPolyTexType()
-{
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolyTexLightMap);
+  DG_TYPE (this, "csPolyTexLightMap");
   txt_plane = NULL;
   tex = new csPolyTexture ();
   DG_LINK (this, tex);
   lightmap_up_to_date = false;
+  Alpha = 0;
+#ifndef CS_USE_NEW_RENDERER
+  MixMode = CS_FX_COPY;
+#endif // CS_USE_NEW_RENDERER
 }
 
 csPolyTexLightMap::~csPolyTexLightMap ()
@@ -125,12 +86,12 @@ csPolyTexLightMap::~csPolyTexLightMap ()
   }
 
   if (txt_plane) txt_plane->DecRef ();
+  DG_REM (this);
 }
 
-void csPolyTexLightMap::Setup (csPolygon3D *poly3d, csThing* thing,
-		iMaterialWrapper *mat)
+void csPolyTexLightMap::Setup (csPolygon3D *poly3d, iMaterialWrapper *mat)
 {
-  tex->SetPolygon (poly3d, thing);
+  tex->SetPolygon (poly3d);
   tex->SetMaterialHandle (mat->GetMaterialHandle ());
   tex->CreateBoundingTextureBox ();
 }
@@ -159,126 +120,6 @@ void csPolyTexLightMap::NewTxtPlane (csThingObjectType* thing_type)
 }
 
 //---------------------------------------------------------------------------
-csPolyTexFlat::~csPolyTexFlat ()
-{
-  ClearUV ();
-}
-
-void csPolyTexFlat::ClearUV ()
-{
-  if (uv_coords)
-  {
-    free (uv_coords);
-    uv_coords = NULL;
-  }
-}
-
-void csPolyTexFlat::Setup (csPolygon3D *iParent)
-{
-  uv_coords = (csVector2 *)realloc (
-      uv_coords,
-      iParent->GetVertices ().GetVertexCount () * sizeof (csVector2));
-}
-
-void csPolyTexFlat::Setup (iPolygon3D *iParent)
-{
-  uv_coords = (csVector2 *)realloc (
-      uv_coords,
-      iParent->GetVertexCount () * sizeof (csVector2));
-}
-
-void csPolyTexFlat::SetUV (int i, float u, float v)
-{
-  uv_coords[i].x = u;
-  uv_coords[i].y = v;
-}
-
-//---------------------------------------------------------------------------
-csPolyTexGouraud::~csPolyTexGouraud ()
-{
-  ClearUV ();
-  ClearColors ();
-}
-
-void csPolyTexGouraud::ClearColors ()
-{
-  if (colors)
-  {
-    free (colors);
-    colors = NULL;
-  }
-
-  if (static_colors)
-  {
-    free (static_colors);
-    static_colors = NULL;
-  }
-}
-
-void csPolyTexGouraud::Setup (csPolygon3D *iParent)
-{
-  csPolyTexFlat::Setup (iParent);
-
-  int nv = iParent->GetVertices ().GetVertexCount ();
-  bool init = !colors;
-  colors = (csColor *)realloc (colors, nv * sizeof (csColor));
-  if (init) memset (colors, 0, nv * sizeof (csColor));
-  init = !static_colors;
-  static_colors = (csColor *)realloc (static_colors, nv * sizeof (csColor));
-  if (init) memset (static_colors, 0, nv * sizeof (csColor));
-}
-
-void csPolyTexGouraud::Setup (iPolygon3D *iParent)
-{
-  csPolyTexFlat::Setup (iParent);
-
-  int nv = iParent->GetVertexCount ();
-  bool init = !colors;
-  colors = (csColor *)realloc (colors, nv * sizeof (csColor));
-  if (init) memset (colors, 0, nv * sizeof (csColor));
-  init = !static_colors;
-  static_colors = (csColor *)realloc (static_colors, nv * sizeof (csColor));
-  if (init) memset (static_colors, 0, nv * sizeof (csColor));
-}
-
-void csPolyTexGouraud::AddColor (int i, float r, float g, float b)
-{
-  r += static_colors[i].red;
-  if (r > 2) r = 2;
-  g += static_colors[i].green;
-  if (g > 2) g = 2;
-  b += static_colors[i].blue;
-  if (b > 2) b = 2;
-  static_colors[i].Set (r, g, b);
-}
-
-void csPolyTexGouraud::AddDynamicColor (int i, float r, float g, float b)
-{
-  r += colors[i].red;
-  if (r > 2) r = 2;
-  g += colors[i].green;
-  if (g > 2) g = 2;
-  b += colors[i].blue;
-  if (b > 2) b = 2;
-  colors[i].Set (r, g, b);
-}
-
-void csPolyTexGouraud::SetColor (int i, float r, float g, float b)
-{
-  static_colors[i].Set (r, g, b);
-}
-
-void csPolyTexGouraud::ResetDynamicColor (int i)
-{
-  colors[i] = static_colors[i];
-}
-
-void csPolyTexGouraud::SetDynamicColor (int i, float r, float g, float b)
-{
-  colors[i].Set (r, g, b);
-}
-
-//---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csPolygon3D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygon3D)
 SCF_IMPLEMENT_IBASE_EXT_END
@@ -295,72 +136,18 @@ csPolygon3D::csPolygon3D (iMaterialWrapper *material) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
   DG_TYPE ((csObject *)this, "csPolygon3D");
   thing = NULL;
-  polygon_id = 0;
 
   csPolygon3D::material = material;
 
   txt_info = NULL;
 
-  plane = NULL;
   portal = NULL;
 
   flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET | CS_POLY_VISCULL);
 
-  light_info.cosinus_factor = -1;
-  light_info.lightpatches = NULL;
+  lightpatches = NULL;
 
-  SetTextureType (POLYTXT_LIGHTMAP);
-
-  VectorArray->IncRef ();
-#ifdef DO_HW_UVZ
-  uvz = NULL;
-  isClipped = false;
-#endif
-}
-
-csPolygon3D::csPolygon3D (csPolygon3D &poly) :
-  csObject(),
-  vertices(4)
-{
-  VectorArray = GetStaticVectorArray();
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
-  DG_TYPE ((csObject *)this, "csPolygon3D");
-
-  const char *tname = poly.GetName ();
-  if (tname) SetName (tname);
-
-  thing = poly.thing;
-  if (thing)
-    polygon_id = thing->GetNewPolygonID ();
-  else
-    polygon_id = 0;
-
-  portal = poly.portal;
-  if (portal && thing)
-  {
-    thing->AddPortalPolygon (this);
-  }
-
-  plane = poly.plane;
-  plane->IncRef ();
-
-  material = poly.material;
-
-  poly.flags.Set (CS_POLY_SPLIT);
-
-  // Share txt_info with original polygon.
-  txt_info = poly.txt_info;
-  if (txt_info)
-  {
-    txt_info->IncRef ();
-    DG_LINK ((csObject *)this, txt_info);
-  }
-
-  flags = poly.flags;
-  flags.Reset (CS_POLY_SPLIT | CS_POLY_DELETE_PORTAL);
-
-  light_info.cosinus_factor = poly.light_info.cosinus_factor;
-  light_info.lightpatches = NULL;
+  EnableTextureMapping (true);
 
   VectorArray->IncRef ();
 #ifdef DO_HW_UVZ
@@ -374,14 +161,8 @@ csPolygon3D::~csPolygon3D ()
   if (txt_info)
   {
     DG_UNLINK ((csObject *)this, txt_info);
-    txt_info->DecRef ();
+    delete txt_info;
     txt_info = NULL;
-  }
-
-  if (plane)
-  {
-    plane->DecRef ();
-    plane = NULL;
   }
 
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
@@ -394,17 +175,17 @@ csPolygon3D::~csPolygon3D ()
 
   if (thing)
   {
-    while (light_info.lightpatches)
+    while (lightpatches)
     {
-      iDynLight* dl = light_info.lightpatches->GetLight ();
+      iDynLight* dl = lightpatches->GetLight ();
       if (dl)
         dl->RemoveAffectedLightingInfo (&(thing->scfiLightingInfo));
-      thing->thing_type->lightpatch_pool->Free (light_info.lightpatches);
+      thing->thing_type->lightpatch_pool->Free (lightpatches);
     }
   }
   VectorArray->DecRef ();
 #ifdef DO_HW_UVZ
-  if (uvz) delete[] uvz;
+  delete[] uvz;
 #endif
 }
 
@@ -414,64 +195,31 @@ void csPolygon3D::SetParent (csThing *thing)
   if (csPolygon3D::thing && portal)
     csPolygon3D::thing->RemovePortalPolygon (this);
   csPolygon3D::thing = thing;
-  polygon_id = thing->GetNewPolygonID ();
   if (portal) thing->AddPortalPolygon (this);
 }
 
-void csPolygon3D::SetTextureType (int type)
+void csPolygon3D::EnableTextureMapping (bool enable)
 {
-  if (txt_info)
-  {
-    if (txt_info->GetTextureType () == type) return ; // Already that type
-    else
-    {
-      DG_UNLINK ((csObject *)this, txt_info);
-      txt_info->DecRef ();
-      txt_info = NULL;
-    }
-  }
+  if (enable && txt_info != NULL) return;
+  if (!enable && txt_info == NULL) return;
 
-  switch (type)
+  if (enable)
   {
-    case POLYTXT_NONE:      txt_info = new csPolyTexType (); break;
-    case POLYTXT_FLAT:      txt_info = new csPolyTexFlat (); break;
-    case POLYTXT_GOURAUD:   txt_info = new csPolyTexGouraud (); break;
-    case POLYTXT_LIGHTMAP:  txt_info = new csPolyTexLightMap (); break;
-    default:                CS_ASSERT (false);
+    txt_info = new csPolyTexLightMap ();
+    DG_LINK ((csObject *)this, txt_info);
   }
-
-  DG_LINK ((csObject *)this, txt_info);
+  else
+  {
+    DG_UNLINK ((csObject *)this, txt_info);
+    delete txt_info;
+    txt_info = NULL;
+  }
 }
 
 void csPolygon3D::CopyTextureType (iPolygon3D *ipt)
 {
-  int j;
   csPolygon3D *pt = ipt->GetPrivateObject ();
-  SetTextureType (pt->GetTextureType ());
-
-  csPolyTexFlat *txtflat_src = pt->GetFlatInfo ();
-  if (txtflat_src)
-  {
-    csPolyTexFlat *txtflat_dst = GetFlatInfo ();
-    txtflat_dst->Setup (this);
-
-    csVector2 *uv_coords = txtflat_src->GetUVCoords ();
-    if (uv_coords)
-      for (j = 0; j < pt->GetVertexCount (); j++)
-        txtflat_dst->SetUV (j, uv_coords[j].x, uv_coords[j].y);
-  }
-
-  csPolyTexGouraud *txtgour_src = pt->GetGouraudInfo ();
-  if (txtgour_src)
-  {
-    csPolyTexGouraud *txtgour_dst = GetGouraudInfo ();
-    txtgour_dst->Setup (this);
-
-    csColor *col = txtgour_src->GetColors ();
-    if (col)
-      for (j = 0; j < pt->GetVertexCount (); j++)
-        txtgour_dst->SetColor (j, col[j]);
-  }
+  EnableTextureMapping (pt->IsTextureMappingEnabled ());
 
   csMatrix3 m;
   csVector3 v (0);
@@ -537,85 +285,6 @@ void csPolygon3D::SetPortal (csPortal *prt)
   if (thing) thing->AddPortalPolygon (this);
 }
 
-void csPolygon3D::SplitWithPlane (
-  csPolygon3D **poly1,
-  csPolygon3D **poly2,
-  const csPlane3 &plane)
-{
-  csPolygon3D *np1 = new csPolygon3D (*this);
-  csPolygon3D *np2 = new csPolygon3D (*this);
-  *poly1 = np1;                 // Front
-  *poly2 = np2;                 // Back
-  np1->Reset ();
-  np2->Reset ();
-  GetParent ()->AddPolygon (np1);
-  GetParent ()->AddPolygon (np2);
-
-  csVector3 ptB;
-  float sideA, sideB;
-  csVector3 ptA = Vobj (GetVertices ().GetVertexCount () - 1);
-  sideA = plane.Classify (ptA);
-  if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
-
-  int i;
-  for (i = -1; ++i < GetVertices ().GetVertexCount ();)
-  {
-    ptB = Vobj (i);
-    sideB = plane.Classify (ptB);
-    if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
-    if (sideB > 0)
-    {
-      if (sideA < 0)
-      {
-        // Compute the intersection point of the line
-        // from point A to point B with the partition
-        // plane. This is a simple ray-plane intersection.
-        csVector3 v = ptB;
-        v -= ptA;
-
-        float sect = -plane.Classify (ptA) / (plane.Normal () * v);
-        v *= sect;
-        v += ptA;
-        np1->AddVertex (v);
-        np2->AddVertex (v);
-      }
-
-      np2->AddVertex (ptB);
-    }
-    else if (sideB < 0)
-    {
-      if (sideA > 0)
-      {
-        // Compute the intersection point of the line
-        // from point A to point B with the partition
-        // plane. This is a simple ray-plane intersection.
-        csVector3 v = ptB;
-        v -= ptA;
-
-        float sect = -plane.Classify (ptA) / (plane.Normal () * v);
-        v *= sect;
-        v += ptA;
-        np1->AddVertex (v);
-        np2->AddVertex (v);
-      }
-
-      np1->AddVertex (ptB);
-    }
-    else
-    {
-      np1->AddVertex (ptB);
-      np2->AddVertex (ptB);
-    }
-
-    ptA = ptB;
-    sideA = sideB;
-  }
-
-  //@@@ Not needed?
-  //np1->Finish ();
-  //np2->Finish ();
-}
-
 bool csPolygon3D::Overlaps (csPolygon3D *overlapped)
 {
   csPolygon3D *totest = overlapped;
@@ -628,8 +297,8 @@ bool csPolygon3D::Overlaps (csPolygon3D *overlapped)
   // itself not facing away from this polygon. To test that we see if
   // there is a vertex of this polygon that is in front of the 'totest'
   // polygon. If that is the case then we return true.
-  csPlane3 &this_plane = plane->GetObjectPlane ();
-  csPlane3 &test_plane = totest->plane->GetObjectPlane ();
+  csPlane3 &this_plane = plane_obj;
+  csPlane3 &test_plane = totest->plane_obj;
   int i;
   for (i = 0; i < totest->vertices.GetVertexCount (); i++)
   {
@@ -666,11 +335,6 @@ void csPolygon3D::eiPolygon3D::SetTextureSpace (iPolyTxtPlane *plane)
   scfParent->SetTextureSpace (plane->GetPrivateObject ());
 }
 
-iPolyTexType *csPolygon3D::eiPolygon3D::GetPolyTexType ()
-{
-  return (iPolyTexType *)scfParent->GetTextureTypeInfo ();
-}
-
 iThingState *csPolygon3D::eiPolygon3D::GetParent ()
 {
   return &(scfParent->GetParent ()->scfiThingState);
@@ -693,6 +357,7 @@ bool csPolygon3D::eiPolygon3D::SetPlane (const char *iName)
 
 bool csPolygon3D::IsTransparent ()
 {
+  if (!txt_info) return true;
   if (GetAlpha ()) return true;
 #ifndef CS_USE_NEW_RENDERER
   if (txt_info->GetMixMode () != CS_FX_COPY) return true;
@@ -704,8 +369,8 @@ bool csPolygon3D::IsTransparent ()
 
 int csPolygon3D::Classify (const csPlane3 &pl)
 {
-  if (GetPolyPlane () == &pl) return CS_POL_SAME_PLANE;
-  if (csMath3::PlanesEqual (pl, *GetPolyPlane ())) return CS_POL_SAME_PLANE;
+  if (&GetPolyPlane () == &pl) return CS_POL_SAME_PLANE;
+  if (csMath3::PlanesEqual (pl, GetPolyPlane ())) return CS_POL_SAME_PLANE;
 
   int i;
   int front = 0, back = 0;
@@ -791,21 +456,38 @@ void csPolygon3D::ComputeNormal ()
   PlaneNormal (&A, &B, &C);
   D = -A * Vobj (0).x - B * Vobj (0).y - C * Vobj (0).z;
 
-  if (!plane) plane = new csPolyPlane ();
-
   // By default the world space normal is equal to the object space normal.
-  plane->GetObjectPlane ().Set (A, B, C, D);
-  plane->GetWorldPlane ().Set (A, B, C, D);
+  plane_obj.Set (A, B, C, D);
+  plane_wor.Set (A, B, C, D);
+}
+
+void csPolygon3D::WorldToCameraPlane (
+  const csReversibleTransform &t,
+  const csVector3 &vertex1,
+  csPlane3& plane_cam)
+{
+  t.Other2This (plane_wor, vertex1, plane_cam);
+}
+
+void csPolygon3D::ComputeCameraPlane (const csReversibleTransform& t,
+  	csPlane3& pl)
+{
+  csVector3 cam_vert = t.Other2This (Vwor (0));
+  WorldToCameraPlane (t, cam_vert, pl);
 }
 
 void csPolygon3D::ObjectToWorld (
   const csReversibleTransform &t,
   const csVector3 &vwor)
 {
-  plane->ObjectToWorld (t, vwor);
+  t.This2Other (plane_obj, vwor, plane_wor);
+  // This is not efficient and only needed in those cases where the
+  // thing is really scaled. We have to see if this is a problem. Normally
+  // it is a good thing to avoid calling csThing::Transform() to often.
+  // So normally it should not be a problem.
+  plane_wor.Normalize ();
 
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  if (lmi) lmi->GetTxtPlane ()->ObjectToWorld (t);
+  if (txt_info) txt_info->GetTxtPlane ()->ObjectToWorld (t);
   if (portal) portal->ObjectToWorld (t);
 }
 
@@ -833,49 +515,28 @@ void csPolygon3D::Finish ()
   if (thing->flags.Check (CS_ENTITY_NOLIGHTING))
     flags.Reset (CS_POLY_LIGHTING);
 
-  switch (GetTextureType ())
+  if (IsTextureMappingEnabled ())
   {
-    case POLYTXT_NONE:
+    if (!material->GetMaterialHandle ()->GetTexture ())
+    {
+      EnableTextureMapping (false);
       return ;
-    case POLYTXT_FLAT:
-      // Ensure the respective arrays are allocated
-      GetFlatInfo ()->Setup (this);
-      return ;
-    case POLYTXT_GOURAUD:
-      // Ensure the respective arrays are allocated
-      GetGouraudInfo ()->Setup (this);
-      return ;
-    case POLYTXT_LIGHTMAP:
-      // If material has no texture, switch our type to POLYTXT_NONE
-      if (!material->GetMaterialHandle ()->GetTexture ())
-      {
-        uint mixmode = scfiPolygon3D.GetPolyTexType ()->GetMixMode ();
-        SetTextureType (POLYTXT_NONE);
-        scfiPolygon3D.GetPolyTexType ()->SetMixMode (mixmode);
-        return ;
-      }
-      break;
-    default:
-      CS_ASSERT (0);
-      return ;
+    }
+  }
+  else
+  {
+    return;
   }
 
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  if (!lmi)
-  {
-    thing->thing_type->Bug ("No txt_info in polygon!");
-    return ;
-  }
-
-  lmi->Setup (this, thing, material);
-  lmi->tex->SetLightMap (NULL);
+  txt_info->Setup (this, material);
+  txt_info->tex->SetLightMap (NULL);
   if (portal)
     portal->SetFilter (material->GetMaterialHandle ()->GetTexture ());
 
   if (flags.Check (CS_POLY_LIGHTING))
   {
-    int lmw = csLightMap::CalcLightMapWidth (lmi->tex->w_orig);
-    int lmh = csLightMap::CalcLightMapHeight (lmi->tex->h);
+    int lmw = csLightMap::CalcLightMapWidth (txt_info->tex->w_orig);
+    int lmh = csLightMap::CalcLightMapHeight (txt_info->tex->h);
     int max_lmw, max_lmh;
     thing->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
     if ((lmw > max_lmw) || (lmh > max_lmh))
@@ -887,16 +548,16 @@ void csPolygon3D::Finish ()
     else
     {
       csLightMap *lm = new csLightMap ();
-      lmi->tex->SetLightMap (lm);
+      txt_info->tex->SetLightMap (lm);
 
       csColor ambient;
       thing->thing_type->engine->GetAmbientLight (ambient);
-      lm->Alloc (lmi->tex->w_orig, lmi->tex->h,
+      lm->Alloc (txt_info->tex->w_orig, txt_info->tex->h,
       	int(ambient.red * 255.0f),
       	int(ambient.green * 255.0f),
       	int(ambient.blue * 255.0f));
 
-      if (!thing->thing_type->G3D->IsLightmapOK (lmi->GetPolyTex()))
+      if (!thing->thing_type->G3D->IsLightmapOK (txt_info->GetPolyTex()))
       {
 	thing->thing_type->Notify ("Renderer can't handle lightmap "
 	  "for polygon '%s'", GetName());
@@ -920,8 +581,7 @@ void csPolygon3D::SetupHWUV ()
   csMatrix3 m_o2t;
   int i;
 
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  lmi->txt_plane->GetTextureSpace (m_o2t, v_o2t);
+  txt_info->txt_plane->GetTextureSpace (m_o2t, v_o2t);
   uvz = new csVector3[GetVertexCount ()];
 
   for (i = 0; i < GetVertexCount (); i++)
@@ -944,21 +604,18 @@ float csPolygon3D::GetArea ()
 void csPolygon3D::SetTextureSpace (csPolyTxtPlane *txt_pl)
 {
   ComputeNormal ();
-  if (GetTextureType () == POLYTXT_LIGHTMAP)
+  if (IsTextureMappingEnabled ())
   {
-    csPolyTexLightMap *lmi = GetLightMapInfo ();
-    if (lmi) lmi->SetTxtPlane (txt_pl);
+    txt_info->SetTxtPlane (txt_pl);
   }
 }
 
 void csPolygon3D::SetTextureSpace (csPolygon3D *copy_from)
 {
   ComputeNormal ();
-  if (GetTextureType () == POLYTXT_LIGHTMAP)
+  if (IsTextureMappingEnabled ())
   {
-    csPolyTexLightMap *lmi = GetLightMapInfo ();
-    if (lmi)
-      lmi->SetTxtPlane (copy_from->GetLightMapInfo ()->GetTxtPlane ());
+    txt_info->SetTxtPlane (copy_from->GetLightMapInfo ()->GetTxtPlane ());
   }
 }
 
@@ -967,14 +624,10 @@ void csPolygon3D::SetTextureSpace (
   const csVector3 &tx_vector)
 {
   ComputeNormal ();
-  if (GetTextureType () == POLYTXT_LIGHTMAP)
+  if (IsTextureMappingEnabled ())
   {
-    csPolyTexLightMap *lmi = GetLightMapInfo ();
-    if (lmi)
-    {
-      lmi->NewTxtPlane (thing->thing_type);
-      lmi->GetTxtPlane ()->SetTextureSpace (tx_matrix, tx_vector);
-    }
+    txt_info->NewTxtPlane (thing->thing_type);
+    txt_info->GetTxtPlane ()->SetTextureSpace (tx_matrix, tx_vector);
   }
 }
 
@@ -1064,22 +717,14 @@ void csPolygon3D::SetTextureSpace (
   float len1)
 {
   ComputeNormal ();
-  if (GetTextureType () == POLYTXT_LIGHTMAP)
+  if (IsTextureMappingEnabled ())
   {
-    csPolyTexLightMap *lmi = GetLightMapInfo ();
-    if (lmi)
-    {
-      lmi->NewTxtPlane (thing->thing_type);
-      lmi->GetTxtPlane ()->SetTextureSpace (
-          plane->GetObjectPlane (),
-          xo,
-          yo,
-          zo,
-          x1,
-          y1,
-          z1,
+    txt_info->NewTxtPlane (thing->thing_type);
+    txt_info->GetTxtPlane ()->SetTextureSpace (
+          plane_obj,
+          xo, yo, zo,
+          x1, y1, z1,
           len1);
-    }
   }
 }
 
@@ -1091,14 +736,10 @@ void csPolygon3D::SetTextureSpace (
   float len2)
 {
   ComputeNormal ();
-  if (GetTextureType () == POLYTXT_LIGHTMAP)
+  if (IsTextureMappingEnabled ())
   {
-    csPolyTexLightMap *lmi = GetLightMapInfo ();
-    if (lmi)
-    {
-      lmi->NewTxtPlane (thing->thing_type);
-      lmi->GetTxtPlane ()->SetTextureSpace (v_orig, v1, len1, v2, len2);
-    }
+    txt_info->NewTxtPlane (thing->thing_type);
+    txt_info->GetTxtPlane ()->SetTextureSpace (v_orig, v1, len1, v2, len2);
   }
 }
 
@@ -1125,7 +766,7 @@ void csPolygon3D::SetTextureSpace (
 
 void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
 {
-  csLightPatch* lp = light_info.lightpatches;
+  csLightPatch* lp = lightpatches;
   while (lp)
   {
     csLightPatch* lpnext = lp->GetNext ();
@@ -1137,12 +778,12 @@ void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
 
 void csPolygon3D::UnlinkLightpatch (csLightPatch *lp)
 {
-  lp->RemoveList (light_info.lightpatches);
+  lp->RemoveList (lightpatches);
 }
 
 void csPolygon3D::AddLightpatch (csLightPatch *lp)
 {
-  lp->AddList (light_info.lightpatches);
+  lp->AddList (lightpatches);
   lp->SetPolyCurve (this);
 }
 
@@ -1350,7 +991,7 @@ bool csPolygon3D::ClipToPlane (
   // Perform backface culling.
   // Note! The plane normal needs to be correctly calculated for this
   // to work!
-  const csPlane3 &wplane = plane->GetWorldPlane ();
+  const csPlane3 &wplane = plane_wor;
   float cl = wplane.Classify (v_w2c);
   if (cw)
   {
@@ -1451,7 +1092,8 @@ bool csPolygon3D::DoPerspective (
   int num_verts,
   csPolygon2D *dest,
   bool mirror,
-  int fov, float shift_x, float shift_y)
+  int fov, float shift_x, float shift_y,
+  const csPlane3& plane_cam)
 {
   csVector3 *ind, *end = source + num_verts;
 
@@ -1482,8 +1124,6 @@ bool csPolygon3D::DoPerspective (
   // we stop here because the triangle is only visible if all
   // vertices are visible (this is not exactly true but it is
   // easier this way! @@@ CHANGE IN FUTURE).
-  //    if (GetTextureType () != POLYTXT_LIGHTMAP)
-  //      return false;
 #ifdef DO_HW_UVZ
   isClipped = true;
 #endif
@@ -1579,8 +1219,8 @@ bool csPolygon3D::DoPerspective (
     {
       // Uncommon special case:  polygon passes through origin.
       //plane->WorldToCamera (trans, source[0]);  //@@@ Why is this needed???
-      ex = plane->GetCameraPlane ().A ();
-      ey = plane->GetCameraPlane ().B ();
+      ex = plane_cam.A ();
+      ey = plane_cam.B ();
       if (ABS (ex) < SMALL_EPSILON && ABS (ey) < SMALL_EPSILON)
       {
         // Downright rare case:  polygon near parallel with viewscreen.
@@ -1630,8 +1270,8 @@ bool csPolygon3D::DoPerspective (
     {
       // Uncommon special case:  polygon passes through origin.
       //plane->WorldToCamera (trans, source[0]);  //@@@ Why is this needed?
-      rx = plane->GetCameraPlane ().A ();
-      ry = plane->GetCameraPlane ().B ();
+      rx = plane_cam.A ();
+      ry = plane_cam.B ();
       if (ABS (rx) < SMALL_EPSILON && ABS (ry) < SMALL_EPSILON)
       {
         // Downright rare case:  polygon near parallel with viewscreen.
@@ -1757,7 +1397,7 @@ bool csPolygon3D::DoPerspective (
 bool csPolygon3D::PointOnPolygon (const csVector3 &v)
 {
   // First check if point is on the plane.
-  csPlane3 &pl = plane->GetObjectPlane ();
+  csPlane3 &pl = plane_obj;
   float dot = pl.D () + pl.A () * v.x + pl.B () * v.y + pl.C () * v.z;
   if (ABS (dot) >= EPSILON) return false;
 
@@ -1784,7 +1424,7 @@ bool csPolygon3D::IntersectRay (const csVector3 &start, const csVector3 &end)
   // First we do backface culling on the polygon with respect to
 
   // the starting point of the beam.
-  csPlane3 &pl = plane->GetObjectPlane ();
+  csPlane3 &pl = plane_obj;
   float dot1 = pl.D () +
     pl.A () *
     start.x +
@@ -1825,9 +1465,8 @@ bool csPolygon3D::IntersectRayNoBackFace (
   const csVector3 &end)
 {
   // If this vector is perpendicular to the plane of the polygon we
-
   // need to catch this case here.
-  csPlane3 &pl = plane->GetObjectPlane ();
+  csPlane3 &pl = plane_obj;
   float dot1 = pl.D () +
     pl.A () *
     start.x +
@@ -1876,7 +1515,59 @@ bool csPolygon3D::IntersectSegment (
   float *pr)
 {
   if (!IntersectRay (start, end)) return false;
-  return plane->IntersectSegment (start, end, isect, pr);
+  return IntersectSegmentPlane (start, end, isect, pr);
+}
+
+bool csPolygon3D::IntersectSegmentPlane (
+  const csVector3 &start,
+  const csVector3 &end,
+  csVector3 &isect,
+  float *pr) const
+{
+  float x1 = start.x;
+  float y1 = start.y;
+  float z1 = start.z;
+  float x2 = end.x;
+  float y2 = end.y;
+  float z2 = end.z;
+  float r, num, denom;
+
+  // So now we have the plane equation of the polygon:
+  // A*x + B*y + C*z + D = 0
+  //
+  // We also have the parameter line equations of the ray
+  // going through 'start' and 'end':
+  // x = r*(x2-x1)+x1
+  // y = r*(y2-y1)+y1
+  // z = r*(z2-z1)+z1
+  //
+  // =>   A*(r*(x2-x1)+x1) + B*(r*(y2-y1)+y1) + C*(r*(z2-z1)+z1) + D = 0
+  // Set *pr to -1 to indicate error if we return false now.
+  if (pr) *pr = -1;
+
+  denom = plane_obj.A () * (x2 - x1) +
+    plane_obj.B () * (y2 - y1) +
+    plane_obj.C () * (z2 - z1);
+  if (ABS (denom) < SMALL_EPSILON) return false;  // Lines are parallel
+  num = -(plane_obj.A () * x1 +
+	  plane_obj.B () * y1 +
+	  plane_obj.C () * z1 +
+	  plane_obj.D ());
+  r = num / denom;
+
+  // Calculate 'r' and 'isect' even if the intersection point is
+  // not on the segment. That way we can use this function for testing
+  // with rays as well.
+  if (pr) *pr = r;
+
+  isect.x = r * (x2 - x1) + x1;
+  isect.y = r * (y2 - y1) + y1;
+  isect.z = r * (z2 - z1) + z1;
+
+  // If r is not in [0,1] the intersection point is not on the segment.
+  if (r < 0 /*-SMALL_EPSILON*/ || r > 1) return false;
+
+  return true;
 }
 
 bool csPolygon3D::IntersectRayPlane (
@@ -1885,81 +1576,39 @@ bool csPolygon3D::IntersectRayPlane (
   csVector3 &isect)
 {
   float r;
-  plane->IntersectSegment (start, end, isect, &r);
+  IntersectSegmentPlane (start, end, isect, &r);
   return r >= 0;
 }
 
 void csPolygon3D::InitializeDefault ()
 {
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  if (lmi)
+  if (txt_info)
   {
-    if (lmi->tex->lm == NULL) return ;
-    lmi->tex->InitLightMaps ();
-    lmi->lightmap_up_to_date = false;
-    return ;
-  }
-
-  csPolyTexGouraud *goi = GetGouraudInfo ();
-  if (goi)
-  {
-    goi->gouraud_up_to_date = false;
+    if (txt_info->tex->lm == NULL) return ;
+    txt_info->tex->InitLightMaps ();
+    txt_info->lightmap_up_to_date = false;
     return ;
   }
 }
 
 const char* csPolygon3D::ReadFromCache (iFile* file)
 {
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  if (lmi)
+  if (txt_info)
   {
-    if (lmi->tex->lm == NULL) return NULL;
-    const char* error = lmi->tex->lm->ReadFromCache (
+    if (txt_info->tex->lm == NULL) return NULL;
+    const char* error = txt_info->tex->lm->ReadFromCache (
           file,
-          lmi->tex->w_orig,
-          lmi->tex->h,
+          txt_info->tex->w_orig,
+          txt_info->tex->h,
           this,
           true,
 	  thing->thing_type->engine);
     if (error != NULL)
     {
-      lmi->tex->InitLightMaps ();
+      txt_info->tex->InitLightMaps ();
     }
-    lmi->lightmap_up_to_date = true;
+    txt_info->lightmap_up_to_date = true;
     return error;
-  }
-
-  csPolyTexGouraud *goi = GetGouraudInfo ();
-  if (goi)
-  {
-    char type[5];
-    if (file->Read (type, 4) != 4)
-      return "File too short to read gouraud shading info!";
-    type[4] = 0;
-    if (strcmp (type, "lmpg") != 0)
-      return "File doesn't appear to be gouraud info (magic number mismatch)!";
-
-    uint16 num_vts;
-    if (file->Read ((char*)&num_vts, sizeof (num_vts)) != sizeof (num_vts))
-      return "File too short to read gouraud shading info!";
-    num_vts = convert_endian (num_vts);
-    if (num_vts != GetVertexCount ())
-      return "Number of vertices doesn't match for gouraud shading info!";
-
-    float colors[3];
-    int i;
-    for (i = 0; i < num_vts; i++)
-    {
-      if (file->Read ((char*)colors, sizeof (float)*3) != sizeof (float)*3)
-        return "File too short to read gouraud shading data!";
-      colors[0] = convert_endian (colors[0]);
-      colors[1] = convert_endian (colors[1]);
-      colors[2] = convert_endian (colors[2]);
-      goi->SetColor (i, colors[0], colors[1], colors[2]);
-    }
-
-    goi->gouraud_up_to_date = true;
-    return NULL;
   }
 
   return NULL;
@@ -1967,44 +1616,15 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
 
 bool csPolygon3D::WriteToCache (iFile* file)
 {
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  if (lmi)
+  if (txt_info)
   {
-    if (lmi->tex->lm == NULL) return true;
-    lmi->lightmap_up_to_date = true;
+    if (txt_info->tex->lm == NULL) return true;
+    txt_info->lightmap_up_to_date = true;
     if (thing->thing_type->engine->GetLightingCacheMode ()
     	& CS_ENGINE_CACHE_WRITE)
-      lmi->tex->lm->Cache (file, this, NULL,
+      txt_info->tex->lm->Cache (file, this, NULL,
 	  thing->thing_type->engine);
     return true;
-  }
-
-  csPolyTexGouraud *goi = GetGouraudInfo ();
-  if (goi)
-  {
-    goi->gouraud_up_to_date = true;
-
-    if (thing->thing_type->engine->GetLightingCacheMode ()
-          & CS_ENGINE_CACHE_WRITE)
-    {
-      file->Write ("lmpg", 4);
-      csColor *sc = goi->GetStaticColors ();
-
-      uint16 num_verts = convert_endian ((uint16) GetVertexCount ());
-      file->Write ((char *) &num_verts, sizeof (num_verts));
-
-      int i;
-      float r, g, b;
-      for (i = 0; i < num_verts; i++)
-      {
-        r = convert_endian (sc[i].red);
-        g = convert_endian (sc[i].green);
-        b = convert_endian (sc[i].blue);
-        file->Write ((char *) &r, sizeof (r));
-        file->Write ((char *) &g, sizeof (g));
-        file->Write ((char *) &b, sizeof (b));
-      }
-    }
   }
 
   return true;
@@ -2012,65 +1632,11 @@ bool csPolygon3D::WriteToCache (iFile* file)
 
 void csPolygon3D::PrepareLighting ()
 {
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  if (!lmi || !lmi->tex->lm) return ;
-  lmi->tex->lm->ConvertToMixingMode ();
-  lmi->tex->lm->ConvertFor3dDriver (
+  if (!txt_info || !txt_info->tex->lm) return ;
+  txt_info->tex->lm->ConvertToMixingMode ();
+  txt_info->tex->lm->ConvertFor3dDriver (
       thing->thing_type->engine->GetLightmapsRequirePO2 (),
       thing->thing_type->engine->GetMaxLightmapAspectRatio ());
-}
-
-void csPolygon3D::UpdateVertexLighting (
-  iLight *light,
-  const csColor &lcol,
-  bool dynamic,
-  bool reset)
-{
-  if (GetTextureType () != POLYTXT_GOURAUD) return ;
-
-  csColor poly_color (0, 0, 0), vert_color;
-  if (light) poly_color = lcol;
-
-  int i;
-  float cosfact = light_info.cosinus_factor;
-  if (cosfact == -1) cosfact = csPolyTexture::cfg_cosinus_factor;
-
-  csPolyTexGouraud *gs = GetGouraudInfo ();
-
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
-  {
-    if (reset)
-    {
-      if (dynamic)
-        gs->ResetDynamicColor (i);
-      else
-        gs->SetColor (i, 0, 0, 0);
-    }
-
-    if (light)
-    {
-      float d = csSquaredDist::PointPoint (light->GetCenter (), Vwor (i));
-      if (d >= light->GetSquaredRadius ()) continue;
-      d = qsqrt (d);
-
-      float cosinus = (Vwor (i) - light->GetCenter ()) *
-        GetPolyPlane ()->Normal ();
-      cosinus /= d;
-      cosinus += cosfact;
-      if (cosinus < 0)
-        cosinus = 0;
-      else if (cosinus > 1)
-        cosinus = 1;
-      vert_color = poly_color * cosinus * light->GetBrightnessAtDistance (d);
-      if (!dynamic)
-        gs->AddColor (i, vert_color.red, vert_color.green, vert_color.blue);
-      gs->AddDynamicColor (
-          i,
-          vert_color.red,
-          vert_color.green,
-          vert_color.blue);
-    }
-  }
 }
 
 void csPolygon3D::FillLightMapDynamic (iFrustumView* lview)
@@ -2213,7 +1779,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
 	    // if it intersects.
 	    csVector3 isect;
 	    float dist;
-	    if (!csIntersect3::Plane (center, Vwor (0), *(sfp->GetPolyPlane ()),
+	    if (!csIntersect3::Plane (center, Vwor (0), sfp->GetPolyPlane (),
 	    	isect, dist))
 	    {
               shadow_it->MarkRelevant (false);
@@ -2232,7 +1798,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
 
 bool csPolygon3D::MarkRelevantShadowFrustums (iFrustumView* lview)
 {
-  csPlane3 poly_plane = *GetPolyPlane ();
+  csPlane3 poly_plane = GetPolyPlane ();
 
   // First translate plane to center of frustum.
   poly_plane.DD += poly_plane.norm * lview->GetFrustumContext ()
@@ -2247,11 +1813,11 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview)
   const csVector3 &center = light_frustum->GetOrigin ();
 
   // If plane is not visible then return (backface culling).
-  if (!csMath3::Visible (center, plane->GetWorldPlane ())) return ;
+  if (!csMath3::Visible (center, plane_wor)) return ;
 
   // Compute the distance from the center of the light
   // to the plane of the polygon.
-  float dist_to_plane = GetPolyPlane ()->Distance (center);
+  float dist_to_plane = GetPolyPlane ().Distance (center);
 
   // If distance is too small or greater than the radius of the light
   // then we have a trivial case (no hit).
@@ -2348,7 +1914,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   const csVector3 &center = light_frustum->GetOrigin ();
 
   // If plane is not visible then return (backface culling).
-  if (!csMath3::Visible (center, plane->GetWorldPlane ())) 
+  if (!csMath3::Visible (center, plane_wor)) 
     if (do_smooth)
       maybeItsVisible = true;
     else
@@ -2356,7 +1922,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
 
   // Compute the distance from the center of the light
   // to the plane of the polygon.
-  float dist_to_plane = GetPolyPlane ()->Distance (center);
+  float dist_to_plane = GetPolyPlane ().Distance (center);
 
   // If distance is too small or greater than the radius of the light
   // then we have a trivial case (no hit).
@@ -2380,18 +1946,12 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   // well.
   // @@@ TODO: Optimization. Precalculated edge-table to detect polygons
   // that are adjacent.
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
   bool calc_lmap;
-  if (lmi)
-    calc_lmap = lmi->tex && lmi->tex->lm && !lmi->lightmap_up_to_date;
+  if (txt_info)
+    calc_lmap = txt_info->tex && txt_info->tex->lm
+    	&& !txt_info->lightmap_up_to_date;
   else
-  {
-    csPolyTexGouraud *goi = GetGouraudInfo ();
-    if (goi)
-      calc_lmap = !goi->gouraud_up_to_date;
-    else
-      calc_lmap = true;
-  }
+    calc_lmap = true;
 
   // Update the lightmap given light and shadow frustums in lview.
   if (calc_lmap)
@@ -2442,25 +2002,10 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
 void csPolygon3D::FillLightMapStatic (iFrustumView *lview,
 	csLightingPolyTexQueue* lptq, bool vis)
 {
-  csPolyTexGouraud *goi = GetGouraudInfo ();
-  if (goi)
+  if (txt_info)
   {
-    // We are working for a vertex lighted polygon.
-    if (goi->gouraud_up_to_date) return ;
-
-    iFrustumViewUserdata* fvud = lview->GetUserdata ();
-    iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
-    const csColor &col = lpi->GetColor ();
-    iLight *il = lpi->GetLight ();
-    UpdateVertexLighting (il, col, false, false);
-    return ;
-  }
-
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  if (lmi)
-  {
-    if (lmi->lightmap_up_to_date) return ;
-    lmi->tex->FillLightMap (lview, lptq, vis, this);
+    if (txt_info->lightmap_up_to_date) return ;
+    txt_info->tex->FillLightMap (lview, lptq, vis, this);
   }
 }
 

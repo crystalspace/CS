@@ -1,0 +1,35 @@
+@c -*-texinfo-*-
+@node API Modifications 98, API Modifications 94, API Modifications, API Modifications
+@appendixsec @sc{api} Changes from 0.96 to 0.98
+@cindex @sc{api} Changes
+
+This section documents the major changes between versions 0.96 and 0.98 of of
+Crystal Space.
+
+@subheading Polygon Texture Mapping Changes
+@cindex @code{iPolygon3D}
+@cindex @code{iPolyTexNone}
+@cindex @code{iPolyTexGouraud}
+@cindex @code{iPolyTexFlat}
+@cindex @code{iPolyTexLightMap}
+@cindex shading
+
+The following interfaces have been removed: @code{iPolyTexNone},
+@code{iPolyTexGouraud}, @code{iPolyTexFlat}, and  @code{iPolyTexLightMap}.
+The combined @sc{api} from @code{iPolyTexNone} and the @code{iPolyTexLightMap}
+have moved to @code{iPolygon3D} itself.
+
+@code{iPolygon3D->SetTextureType()} has been removed (and also
+@code{GetTextureType()}. Instead there is now
+@code{iPolygon3D->EnableTextureMapping()} and
+@code{iPolygon3D->IsTextureMappingEnabled()}.
+
+@code{iPolygon3D->GetPolyTexType()} has been removed.
+
+The @code{shading} keyword in polygons now accepts a boolean value
+instead of @samp{NONE}, @samp{FLAT}, @samp{GOURAUD}, or @samp{LIGHTMAP}.
+With this you can enable/disable lightmapping.
+
+If you want gouraud shaded polygons you should use the @samp{genmesh}
+mesh object plugin instead.
+

@@ -121,11 +121,6 @@ class csCurve : public csObject
 private:
   csThingObjectType* thing_type;
 
-  /// ID for this curve.
-  unsigned long CurveID;
-  /// Last used ID.
-  static unsigned long LastCurveID;
-
   /// Material for this curve
   csRef<iMaterialWrapper> Material;
 
@@ -195,9 +190,6 @@ public:
   csCurve (csCurveTemplate* parent_tmpl, csThingObjectType* thing_type);
   /// Destructor
   virtual ~csCurve ();
-
-  /// Get the ID of this curve.
-  inline unsigned long GetCurveID () const;
 
 #ifndef CS_USE_NEW_RENDERER
   /// Get the vertex buffer for this curve.
@@ -502,8 +494,6 @@ inline csTriangle& csCurveTesselated::GetTriangle (int i)
 inline bool csCurveTesselated::AreColorsValid () const
 { return ColorsValid; }
 
-inline unsigned long csCurve::GetCurveID () const
-{ return CurveID; }
 inline iMaterialHandle* csCurve::GetMaterialHandle () const
 { return Material ? Material->GetMaterialHandle() : NULL; }
 inline iMaterialWrapper* csCurve::GetMaterial () const

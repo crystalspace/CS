@@ -48,7 +48,6 @@
 #include "iengine/material.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
-#include "imesh/thing/ptextype.h"
 #include "imesh/particle.h"
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"

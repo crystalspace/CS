@@ -39,7 +39,6 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
 #include "imesh/thing/polytmap.h"
-#include "imesh/thing/ptextype.h"
 #include "imesh/thing/curve.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
@@ -56,6 +55,7 @@ CS_IMPLEMENT_PLUGIN
 enum
 {
   XMLTOKEN_CLONE = 1,
+  XMLTOKEN_COSFACT,
   XMLTOKEN_CURVE,
   XMLTOKEN_CURVECENTER,
   XMLTOKEN_CURVECONTROL,
@@ -188,6 +188,7 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
   xmltokens.Register ("clone", XMLTOKEN_CLONE);
+  xmltokens.Register ("cosfact", XMLTOKEN_COSFACT);
   xmltokens.Register ("curve", XMLTOKEN_CURVE);
   xmltokens.Register ("curvecenter", XMLTOKEN_CURVECENTER);
   xmltokens.Register ("curvecontrol", XMLTOKEN_CURVECONTROL);
@@ -240,6 +241,16 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
 	  printf ("'vistree' no longer supported! Convert your level to Dynavis using 'levtool'!\n");
 	  return false;
 	}
+        break;
+      case XMLTOKEN_COSFACT:
+        if (!isParent)
+	{
+	  synldr->ReportError (
+	    "crystalspace.thingloader.parse.fastmesh",
+	    child, "'cosfact' flag only for top-level thing!");
+	  return false;
+	}
+        else thing_state->SetCosinusFactor (child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_FASTMESH:
         if (!isParent)

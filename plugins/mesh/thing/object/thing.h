@@ -179,8 +179,6 @@ private:
   unsigned int thing_id;
   /// Last used ID.
   static int last_thing_id;
-  /// Last used polygon ID.
-  unsigned long last_polygon_id;
   /// Current visibility number.
   uint32 current_visnr;
 
@@ -205,6 +203,14 @@ private:
 
   /// Normals in object space
   csVector3* obj_normals;
+
+  /**
+   * This field describes how the light hitting polygons of this thing is
+   * affected by the angle by which the beam hits the polygon. If this value is
+   * equal to -1 (default) then the global csPolyTexture::cfg_cosinus_factor
+   * will be used.
+   */
+  float cosinus_factor;
 
   /// Smooth flag
   bool smoothed;
@@ -392,7 +398,7 @@ private:
    * and clipped version of the 3D polygon.
    */
   static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
-	iRenderView* d, csZBufMode zMode);
+	iRenderView* d, csZBufMode zMode, const csPlane3& camera_plane);
 
   /**
    * Utility function to be called whenever movable changes so the
@@ -529,15 +535,6 @@ public:
 
   /// Get the entire array of polygons.
   csPolygonArray& GetPolygonArray () { return polygons; }
-
-  /**
-   * Get a new polygon ID. This is used by the polygon constructor.
-   */
-  unsigned long GetNewPolygonID ()
-  {
-    last_polygon_id++;
-    return last_polygon_id;
-  }
 
   /// Find a polygon index.
   int FindPolygonIndex (iPolygon3D* polygon) const;
@@ -794,6 +791,11 @@ public:
 
   /// Marks the whole object as it is affected by any light.
   void MarkLightmapsDirty ();
+
+  /// Get cosinus setting.
+  float GetCosinusFactor () const { return cosinus_factor; }
+  /// Set cosinus factor.
+  void SetCosinusFactor (float c) { cosinus_factor = c; }
 
   //----------------------------------------------------------------------
   // Utility functions
@@ -1110,6 +1112,15 @@ public:
       scfParent->Prepare ();
       if (scfParent->flags.Check (CS_THING_FASTMESH))
         scfParent->PreparePolygonBuffer ();
+    }
+
+    virtual float GetCosinusFactor () const
+    {
+      return scfParent->GetCosinusFactor ();
+    }
+    virtual void SetCosinusFactor (float cosfact)
+    {
+      scfParent->SetCosinusFactor (cosfact);
     }
   } scfiThingState;
   friend struct ThingState;

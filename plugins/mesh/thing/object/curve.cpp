@@ -163,8 +163,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::eiVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif // CS_USE_NEW_RENDERER
 
-unsigned long csCurve:: LastCurveID = 0;
-
 csCurve::csCurve (csCurveTemplate *parent_tmpl, csThingObjectType* thing_type) :
   csObject(),
   CurveTemplate(parent_tmpl),
@@ -183,7 +181,6 @@ csCurve::csCurve (csCurveTemplate *parent_tmpl, csThingObjectType* thing_type) :
 
   csCurve::thing_type = thing_type;
 
-  CurveID = LastCurveID++;
 #ifndef CS_USE_NEW_RENDERER
   vbufmgr = NULL;
   SetupVertexBuffer ();

@@ -259,8 +259,6 @@ const char* csLightMap::ReadFromCache (
 
   SetSize (w, h);
 
-  uint32 uid;
-
   strcpy (pswanted.header, LMMAGIC);
   if (poly)
   {
@@ -270,11 +268,6 @@ const char* csLightMap::ReadFromCache (
     pswanted.x2 = convert_endian (float2short (poly->Vobj (1).x));
     pswanted.y2 = convert_endian (float2short (poly->Vobj (1).y));
     pswanted.z2 = convert_endian (float2short (poly->Vobj (1).z));
-    uid = poly->GetPolygonID ();
-  }
-  else
-  {
-    uid = curve->GetCurveID ();
   }
 
   pswanted.lm_size = convert_endian (lm_size);
@@ -455,8 +448,6 @@ void csLightMap::Cache (
 
   PolySave ps;
 
-  uint32 uid;
-
   strcpy (ps.header, LMMAGIC);
   if (poly)
   {
@@ -466,11 +457,6 @@ void csLightMap::Cache (
     ps.x2 = convert_endian (float2short (poly->Vobj (1).x));
     ps.y2 = convert_endian (float2short (poly->Vobj (1).y));
     ps.z2 = convert_endian (float2short (poly->Vobj (1).z));
-    uid = poly->GetPolygonID ();
-  }
-  else
-  {
-    uid = curve->GetCurveID ();
   }
 
   if (file->Write ("lmpn", 4) != 4)

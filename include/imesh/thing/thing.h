@@ -292,6 +292,17 @@ struct iThingState : public iBase
    * decrease the time need to setup things later.
    */
   virtual void Prepare () = 0;
+
+  /**
+   * Get cosinus factor.
+   */
+  virtual float GetCosinusFactor () const = 0;
+  /**
+   * Set cosinus factor. This cosinus factor controls how lighting affects
+   * the polygon relative to the angle. If no value is set here then the
+   * default is used.
+   */
+  virtual void SetCosinusFactor (float cosfact) = 0;
 };
 
 SCF_VERSION (iThingEnvironment, 0, 1, 1);
