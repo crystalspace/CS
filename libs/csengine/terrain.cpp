@@ -80,6 +80,7 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
   mesh->init (context);
 
   vbuf->size((mesh->absMaxDetail()*3*11)/10);
+  vbuf->renderMode(true,false,false);
   vbuf->init ();
   vbuf->reset ();
 
@@ -104,33 +105,31 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 	if ( !bt->visible(tvc))
 		return ddgFailure;
 
-    static ddgVector3 p1, p2, p3;
-    static ddgColor3 c1, c2, c3;
-    static ddgVector2 t1, t2, t3;
-    unsigned int i1 = 0, i2 = 0, i3 = 0;
+    static ddgVector3 p[3];
+    static ddgColor3 c[3];
+    static ddgVector2 t[3];
+    ddgVBIndex i[3] = {0,0,0};
 
-    ddgTriIndex 
-		tva = bt->parent(tvc),
-		tv1 = mesh->v0(tvc),
-		tv0 = mesh->v1(tvc);
+    ddgTriIndex tv[3];
+	tv[0] = bt->parent(tvc),
+	tv[2] = mesh->v0(tvc),
+	tv[1] = mesh->v1(tvc);
 
-    i1 = bt->vertex(tva,&p1);
-    i2 = bt->vertex(tv0,&p2);
-    i3 = bt->vertex(tv1,&p3);
+	int cnt;
+	for (cnt = 0; cnt < 3; cnt++)
+	{
+		i[cnt] = bt->vbufferIndex(tv[cnt]);
 
-	if (!i1) bt->textureC(tva,&t1);
-	if (!i2) bt->textureC(tv0,&t2);
-	if (!i3) bt->textureC(tv1,&t3);
-
-    if (!i1) i1 = vbuf->pushVT(&p1,&t1);
-    if (!i2) i2 = vbuf->pushVT(&p2,&t2);
-    if (!i3) i3 = vbuf->pushVT(&p3,&t3);
-
+		if (!i[cnt])
+		{
+			bt->vertex(tv[cnt],&p[cnt]);
+			bt->textureC(tv[cnt],&t[cnt]);
+			i[cnt] = vbuf->pushVT(&p[cnt],&t[cnt]);
+			bt->vbufferIndex(tv[cnt],i[cnt]);
+		}
+	}
     // Record that these vertices are in the buffer.
-    bt->vbufferIndex(tva,i1);
-    bt->vbufferIndex(tv0,i2);
-    bt->vbufferIndex(tv1,i3);
-    vbuf->pushTriangle(i1,i2,i3);
+    vbuf->pushTriangle(i[0],i[1],i[2]);
 
     return ddgSuccess;
 }
@@ -206,76 +205,75 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 
   // If our orientation has changed, reload the buffer.
   if (modified)
-	{
-		vbuf->reset();
-		// Update the vertex buffers.
-		ddgCacheIndex ci = 0;
-		while (i < mesh->getBinTreeNo())
-		{
-			if ((bt = mesh->getBinTree(i)))
-			{
-				s = 0;
-				// Render each triangle.
-				ci = bt->chain();
-				// Render each triangle.
-				while (ci)
-				{
-					ddgTNode *tn = (ddgTNode*) mesh->tcache()->get(ci);
- 					if (drawTriangle(bt, tn->tindex(), vbuf) == ddgSuccess)
-						s++;
-					ci = tn->next();
-				}
-				bt->visTriangle(s);
-			}
-			i++;
-		}
-
-	}
-
-    // Setup the structure for DrawTriangleMesh.
-    static G3DTriangleMesh g3dmesh;
-	static bool init = false;
-	if (!init)
-	{
-		g3dmesh.vertex_colors[0] = NULL;			 // pointer to array of csColor for color information.
-		g3dmesh.morph_factor = 0;
-		g3dmesh.num_vertices_pool = 1;
-		g3dmesh.num_textures = 1;
-		g3dmesh.use_vertex_color = false;
-		g3dmesh.do_clip = true;	// DEBUG THIS LATER
-		g3dmesh.do_mirror = rview.IsMirrored ();
-		g3dmesh.do_morph_texels = false;
-		g3dmesh.do_morph_colors = false;
-		g3dmesh.vertex_fog = NULL;
-		g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-		g3dmesh.fxmode = 0;//CS_FX_GOURAUD;
-		init = true;
-	}
-    g3dmesh.num_vertices = vbuf->num();	  // number of shared vertices for all triangles
-    // All the three below arrays have num_vertices elements.
-    g3dmesh.vertices[0] = (csVector3*) vbuf->vbuf; // pointer to array of csVector3 for all those verts
-    g3dmesh.texels[0][0] = (csVector2*) vbuf->tbuf;	 // pointer to array of csVector2 for uv coordinates
-
-	// Render the vertex buffer piece by piece (per texture).
-	i = 0;
-	s = 0;
+  {
+	vbuf->reset();
+	// Update the vertex buffers.
+	ddgCacheIndex ci = 0;
 	while (i < mesh->getBinTreeNo())
 	{
-	  if (_textureMap && (i%2 == 0) && _textureMap[i/2])
-		g3dmesh.txt_handle[0] = _textureMap[i/2]->GetTextureHandle ();
-
-	  if ((bt = mesh->getBinTree(i)) && (bt->visTriangle() > 0))
+	  if ((bt = mesh->getBinTree(i)))
+	  {
+	    s = 0;
+		// Render each triangle.
+		ci = bt->chain();
+		// Render each triangle.
+		while (ci)
 		{
-			// Render this bintree.
-            g3dmesh.num_triangles = bt->visTriangle(); // number of triangles
-            g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);	// pointer to array of csTriangle for all triangles
-
-            rview.g3d->DrawTriangleMesh (g3dmesh);
-
-			s = s+bt->visTriangle();
+		  ddgTNode *tn = (ddgTNode*) mesh->tcache()->get(ci);
+ 		  if (drawTriangle(bt, tn->tindex(), vbuf) == ddgSuccess)
+		    s++;
+		  ci = tn->next();
 		}
-		i++;
+		bt->visTriangle(s);
+	  }
+	  i++;
 	}
+  }
+
+  // Setup the structure for DrawTriangleMesh.
+  static G3DTriangleMesh g3dmesh;
+  static bool init = false;
+  if (!init)
+  {
+	g3dmesh.vertex_colors[0] = NULL;			 // pointer to array of csColor for color information.
+	g3dmesh.morph_factor = 0;
+	g3dmesh.num_vertices_pool = 1;
+	g3dmesh.num_textures = 1;
+	g3dmesh.use_vertex_color = false;
+	g3dmesh.do_clip = true;	// DEBUG THIS LATER
+	g3dmesh.do_mirror = rview.IsMirrored ();
+	g3dmesh.do_morph_texels = false;
+	g3dmesh.do_morph_colors = false;
+	g3dmesh.vertex_fog = NULL;
+	g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+	g3dmesh.fxmode = 0;//CS_FX_GOURAUD;
+	init = true;
+  }
+  g3dmesh.num_vertices = vbuf->num();	  // number of shared vertices for all triangles
+  // All the three below arrays have num_vertices elements.
+  g3dmesh.vertices[0] = (csVector3*) vbuf->vbuf; // pointer to array of csVector3 for all those verts
+  g3dmesh.texels[0][0] = (csVector2*) vbuf->tbuf;	 // pointer to array of csVector2 for uv coordinates
+
+  // Render the vertex buffer piece by piece (per texture).
+  i = 0;
+  s = 0;
+  while (i < mesh->getBinTreeNo())
+  {
+	if (_textureMap && (i%2 == 0) && _textureMap[i/2])
+	  g3dmesh.txt_handle[0] = _textureMap[i/2]->GetTextureHandle ();
+
+	if ((bt = mesh->getBinTree(i)) && (bt->visTriangle() > 0))
+	{
+	  // Render this bintree.
+      g3dmesh.num_triangles = bt->visTriangle(); // number of triangles
+      g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);	// pointer to array of csTriangle for all triangles
+
+      rview.g3d->DrawTriangleMesh (g3dmesh);
+	  // Increment the starting offset by the number of triangles that were in this block.
+	  s = s+bt->visTriangle();
+	}
+	i++;
+  }
 
 }
 
