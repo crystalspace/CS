@@ -246,14 +246,9 @@ float ddgTBinTree::heightByPos(unsigned int r, unsigned int c)
 	return _mesh->wheight(_rawHeight[tindex]);
 }
 
-unsigned int ddgTBinTree::vertex(ddgTriIndex tindex, ddgVector3 *vout)
+void ddgTBinTree::vertex(ddgTriIndex tindex, ddgVector3 *vout)
 {
 	*vout = ddgVector3(mrow(tindex),_mesh->wheight(_rawHeight[tindex]),mcol(tindex));
-
-    if (vbufferIndex(tindex))
-		return 0;
-
-    return vbufferIndex(tindex);
 }
 
 /// Get triangle row in the bin tree.
@@ -296,7 +291,7 @@ void ddgTBinTree::insertSQ(ddgTriIndex tindex, ddgPriority pp, ddgCacheIndex ci,
 	tn->tindex(tindex);
 	// Record its value
 	tn->vis(v);
-	tn->vbufferIndex(0xFFFF);
+	tn->vbufferIndex(0);
 	tn->qscacheIndex(0);
 	tn->qmcacheIndex(0);
 
@@ -784,7 +779,11 @@ ddgVisState ddgTBinTree::visibilityTriangle(ddgTriIndex tindex)
 	  ||c[1] > _farClip || c[1] < - _farClip
 	  ||c.sizesq() > _farClipSQ)
 		return ddgOUT;
-/*
+
+#ifdef __CRYSTAL_SPACE__
+// For debugging CRYSTAL SPACE
+	return ddgIN;
+#else
 	int r0 = mrow(tv0), r1 = mrow(tv1), ra = mrow(tva), rmin, rmax;
 	int c0 = mcol(tv0), c1 = mcol(tv1), ca = mcol(tva), cmin, cmax;
 	// Bounding box is defined by points tva, v0 and v1.
@@ -805,9 +804,7 @@ ddgVisState ddgTBinTree::visibilityTriangle(ddgTriIndex tindex)
 	bbox._min.v[2] = cmin;
 	bbox._max.v[2] = cmax;
 	return bbox.isVisible(_ctx->frustrum(),5);
-*/
-// For debugging CRYSTAL SPACE
-	return ddgIN;
+#endif
 }
 
 

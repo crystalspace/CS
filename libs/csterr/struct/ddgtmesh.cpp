@@ -53,7 +53,7 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	tn->tindex(0);
 	tn->priority(0);
 	tn->vis(0);
-	tn->vbufferIndex(0xFFFF);
+	tn->vbufferIndex(0);
 	// Allocate scratch entry.
 	_tcache.allocNode();
 
@@ -498,8 +498,8 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 	unsigned int count = 0;
 
 	ddgQNode *qn;
-	ddgTBinTree *sbt = 0, *mbt = 0;
-	ddgTriIndex si = 0, mi = 0;
+	ddgTBinTree *sbt, *mbt;
+	ddgTriIndex si, mi;
 	ddgPriority sp, mp;
 	ddgCacheIndex csi, cmi;
 	while (!done)

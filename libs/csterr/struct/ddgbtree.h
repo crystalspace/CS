@@ -337,7 +337,7 @@ public:
      */
     float treeHeight(unsigned int r, unsigned int c, float dx, float dz);
     /// Get vertex location in world space from the cache, return the cache index if we have it.
-    unsigned int vertex(ddgTriIndex tindex, ddgVector3 *vout);
+    void vertex(ddgTriIndex tindex, ddgVector3 *vout);
 
     /// Get texture coord data, as a value from 0 to 1 on the bintree.
     void textureC(unsigned int tindex, ddgVector2 *vout)

@@ -35,6 +35,8 @@ class ddgContext;
 typedef unsigned int ddgTriIndex;
 typedef unsigned int ddgTreeIndex;
 typedef unsigned short ddgPriority;
+typedef int ddgVBIndex;
+
 typedef enum { eINNER = 0, eTOP = 1, eLEFT = 2, eDIAG = 3} Edge;
 /**
  * The information in this class is the same for each TBinTree and can
@@ -94,8 +96,8 @@ private:
 	 * Only 2 bits are currently used.
 	 */
 	ddgVisState _vis;
-	/// Index into the render buffer.					(2 byte)
-	unsigned short	_vbufferIndex;
+	/// Index into the render buffer.					(4 byte)
+	ddgVBIndex	_vbufferIndex;
 	/// Index into the split queue cache if applicable.	(2 byte)
 	ddgCacheIndex	_qscacheIndex;
 	/// Index into the merge queue cache if applicable. (2 byte)
@@ -135,9 +137,9 @@ public:
 	inline ddgVisState vis(void) { return _vis; }
 
 	///
-	inline void vbufferIndex(unsigned int p ) { _vbufferIndex = p; }
+	inline void vbufferIndex(ddgVBIndex p ) { _vbufferIndex = p; }
 	///
-	inline unsigned int vbufferIndex(void) { return _vbufferIndex; }
+	inline ddgVBIndex vbufferIndex(void) { return _vbufferIndex; }
 	///
 	inline void priorityFactor(float pf) { _priorityFactor = pf; }
 	///
