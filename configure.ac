@@ -1486,7 +1486,7 @@ AC_CHECK_FT2([2.0],
 #------------------------------------------------------------------------------
 # Check for libxml2
 #------------------------------------------------------------------------------
-PKG_CHECK_MODULES(LIBXML2, xml2,
+PKG_CHECK_MODULES(LIBXML2, libxml-2.0,
     [CS_MAKEFILE_PROPERTY([LIBXML2.AVAILABLE], [yes])
     CS_MAKEFILE_PROPERTY([LIBXML2.LFLAGS], [$LIBXML2_LIBS])
     CS_MAKEFILE_PROPERTY([LIBXML2.CFLAGS], [$LIBXML2_CFLAGS])])

@@ -16920,27 +16920,27 @@ fi
   if test "$PKG_CONFIG" != "no" ; then
      PKG_CONFIG_MIN_VERSION=0.9.0
      if $PKG_CONFIG --atleast-pkgconfig-version $PKG_CONFIG_MIN_VERSION; then
-        echo "$as_me:$LINENO: checking for xml2" >&5
-echo $ECHO_N "checking for xml2... $ECHO_C" >&6
+        echo "$as_me:$LINENO: checking for libxml-2.0" >&5
+echo $ECHO_N "checking for libxml-2.0... $ECHO_C" >&6
 
-        if $PKG_CONFIG --exists "xml2" ; then
+        if $PKG_CONFIG --exists "libxml-2.0" ; then
             echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
             succeeded=yes
 
 	    #AC_MSG_CHECKING(LIBXML2_CFLAGS)
-	    LIBXML2_CFLAGS=`$PKG_CONFIG --cflags "xml2"`
+	    LIBXML2_CFLAGS=`$PKG_CONFIG --cflags "libxml-2.0"`
 	    #AC_MSG_RESULT($LIBXML2_CFLAGS)
 
 	    #AC_MSG_CHECKING(LIBXML2_LIBS)
-	    LIBXML2_LIBS=`$PKG_CONFIG --libs "xml2"`
+	    LIBXML2_LIBS=`$PKG_CONFIG --libs "libxml-2.0"`
 	    #AC_MSG_RESULT($LIBXML2_LIBS)
         else
             LIBXML2_CFLAGS=""
             LIBXML2_LIBS=""
             ## If we have a custom action on failure, don't print errors, but
             ## do set a variable so people can do so.
-            LIBXML2_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "xml2"`
+            LIBXML2_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libxml-2.0"`
             echo $LIBXML2_PKG_ERRORS
         fi
 

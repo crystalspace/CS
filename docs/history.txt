@@ -8,6 +8,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a memory leak in csGetPluginPaths() for MacOS/X.
 	  An invocation of csStrNew(), which should have been eliminated in the
 	  previous commit, was left in place.
+	- Matze changes pkg-config test to look for libxml-2.0 instead of xml2.
 	- Marten Svanfeldt added a fix which improves quality in new renderer
 	  by texture-mipmap level biasing.
 	- Eric Sunshine converted the ISO engine makefile so that object-files
