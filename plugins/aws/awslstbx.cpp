@@ -404,6 +404,7 @@ void awsListBox::InsertItem (void *owner, iAwsParmList &parmlist)
   memset (row->cols, 0, sizeof (awsListItem) * lb->ncolumns);
 
   parmlist.GetInt ("parent", (int *) &(row->parent));
+  row->selectable = true;
   parmlist.GetBool ("selectable", &(row->selectable));
 
   /* Fill in the columns by looking for several parameters:
@@ -475,13 +476,24 @@ void awsListBox::DeleteItem (void *owner, iAwsParmList &parmlist)
   i = DoFindItem (&lb->rows, str, true);
   if (i == selidx && selidx > -1)
   {
+    int startidx=selidx;
+    while (selidx < lb->rows.Length () && !((awsListRow*)lb->rows[selidx])->selectable)
+      selidx++;
+
     if (selidx >= lb->rows.Length ())
-      selidx = lb->rows.Length ()-1;
-    if (selidx > -1)
+    {
+      selidx = MIN (startidx, lb->rows.Length ()-1);
+      while (selidx >= 0 && !((awsListRow*)lb->rows[selidx])->selectable)
+        selidx--;
+    }
+
+    if (selidx > -1 && selidx < lb->rows.Length ())
+    {
       lb->sel = (awsListRow*) lb->rows[selidx];
+      lb->Broadcast (awsListBox::signalSelected);
+    }
     else
       lb->sel = NULL;
-    lb->Broadcast (awsListBox::signalSelected);
     lb->Invalidate ();
   }
   // Pass back the result, in case they want it
@@ -1338,9 +1350,12 @@ bool awsListBox::OnMouseDown (int
         case hsRow:
           {
             awsListRow *row = (awsListRow *)hs->obj;
-            sel = row;
-            Broadcast (awsListBox::signalSelected);
-            Invalidate ();
+            if (row->selectable)
+            {
+              sel = row;
+              Broadcast (awsListBox::signalSelected);
+              Invalidate ();
+            }
             return true;
           }
           break;
