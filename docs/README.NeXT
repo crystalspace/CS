@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/08/06
+    1999/09/02
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -555,6 +555,8 @@ This is a list of items which are planned for future releases of this project.
 -------
 This is a list of known problems with the current release of this project.
 
+    o Using the -nolight option causes WalkTest to crash very early in 
+      csScan_CalcBlendTables().
     o The NextStep compiler generates invalid code at locations which make COM
       queries for the IID_IHaloRasterizer module.  This is the only COM module
       which is derived with multiple-inheritance, and it is the only module
