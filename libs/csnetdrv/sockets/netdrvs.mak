@@ -28,18 +28,18 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 ifeq ($(NEED_SOCKET_LIB),yes)
-  LIBS._NETDRVS=$(LFLAGS.l)socket
+  LIBS.LOCAL.NETDRVS=$(LFLAGS.l)socket
 endif
 
 # The NULL Network driver
 ifeq ($(USE_DLL),yes)
   NETDRVS=$(OUTDLL)netdrvs$(DLL)
-  LIBS.NETDRVS=$(LIBS._NETDRVS)
+  LIBS.NETDRVS=$(LIBS.LOCAL.NETDRVS)
   DEP.NETDRVS=$(CSCOM.LIB) $(CSSYS.LIB) $(CSUTIL.LIB)
 else
   NETDRVS=$(OUT)$(LIB_PREFIX)netdrvs$(LIB)
   DEP.EXE+=$(NETDRVS)
-  LIBS.EXE+=$(LIBS._NETDRVS)
+  LIBS.EXE+=$(LIBS.LOCAL.NETDRVS)
   CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_NETSOCKS
 endif
 DESCRIPTION.$(NETDRVS) = $(DESCRIPTION.netdrvs)
