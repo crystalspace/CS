@@ -96,7 +96,7 @@
         <!-- ambient lighting -->
         <step plugin="crystalspace.renderloop.step.generic">
           <shadertype>ambient</shadertype>
-          <!--zoffset>yes</zoffset-->
+          <zoffset>yes</zoffset>
 	  <portaltraversal/>
           <zuse />
         </step>
@@ -104,7 +104,7 @@
         <step plugin="crystalspace.renderloop.step.generic">
           <shadertype>terrain splat</shadertype>
           <zoffset>no</zoffset>
-	  <zequal />
+	  <zuse />
         </step>
         <!-- draws geometry -->
         <step plugin="crystalspace.renderloop.step.generic">
@@ -191,12 +191,13 @@
 	  <material>Stone</material>
 	</materialpalette>
 	<lodvalue name="splatting distance">200</lodvalue>
-  <!--For chunklod-->
+  	<!--For chunklod-->
 	<lodvalue name="error tolerance">1</lodvalue>
 	<!--For bruteblock-->
-  <lodvalue name="block resolution">16</lodvalue>
-  <lodvalue name="block split distance">8</lodvalue>
-  <lodvalue name="minimum block size">32</lodvalue>
+  	<lodvalue name="block resolution">16</lodvalue>
+  	<lodvalue name="block split distance">8</lodvalue>
+  	<lodvalue name="minimum block size">32</lodvalue>
+  	<lodvalue name="cd resolution">256</lodvalue>
 	<materialmap image="/lev/terrain/materialmap.png" />
 	<staticlighting>yes</staticlighting>
 	<castshadows>yes</castshadows>

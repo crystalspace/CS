@@ -315,6 +315,15 @@ private:
   bool staticLighting;
   bool castShadows;
 
+  // Data for the colldet polygon mesh.
+  bool polymesh_valid;
+  csVector3* polymesh_vertices;
+  int polymesh_vertex_count;
+  csTriangle* polymesh_triangles;
+  int polymesh_tri_count;
+  csMeshedPolygon* polymesh_polygons;
+  void SetupPolyMeshData ();
+
   class MeshTreeNodeWrapper : public iBase
   {
     csRef<MeshTreeNodeWrapper> children[4];
@@ -496,6 +505,41 @@ public:
   } scfiTerrainObjectState;
   friend struct eiTerrainObjectState;
 
+  //------------------ iPolygonMesh interface implementation ----------------//
+  struct PolyMesh : public iPolygonMesh
+  {
+  private:
+    csChunkLodTerrainObject* terrain;
+    csFlags flags;
+  public:
+    SCF_DECLARE_IBASE;
+
+    void SetTerrain (csChunkLodTerrainObject* t)
+    {
+      terrain = t;
+      flags.SetAll (CS_POLYMESH_TRIANGLEMESH);
+    }
+    void Cleanup ();
+
+    virtual int GetVertexCount ();
+    virtual csVector3* GetVertices ();
+    virtual int GetPolygonCount ();
+    virtual csMeshedPolygon* GetPolygons ();
+    virtual int GetTriangleCount ();
+    virtual csTriangle* GetTriangles ();
+    virtual void Lock () { }
+    virtual void Unlock () { }
+
+    virtual csFlags& GetFlags () { return flags;  }
+    virtual uint32 GetChangeNumber() const { return 0; }
+
+    PolyMesh ()
+    { SCF_CONSTRUCT_IBASE (0); }
+    virtual ~PolyMesh ()
+    { SCF_DESTRUCT_IBASE (); }
+  } scfiPolygonMesh;
+
+  //------------------ iObjectModel interface implementation ----------------//
   struct eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csChunkLodTerrainObject);

@@ -197,7 +197,9 @@ void FillEdge (bool halfres, int res, uint16* indices, int &indexcount,
     {
       indices[indexcount++] = offs+x*xadd+zadd;
       indices[indexcount++] = offs+x*xadd;
-    } else {
+    }
+    else
+    {
       indices[indexcount++] = offs+x*xadd;
       indices[indexcount++] = offs+x*xadd;
       indices[indexcount++] = offs+x*xadd;
@@ -213,7 +215,9 @@ void FillEdge (bool halfres, int res, uint16* indices, int &indexcount,
     {
       indices[indexcount++] = offs+(x+2)*xadd+zadd;
       indices[indexcount++] = offs+(x+2)*xadd;
-    } else {
+    }
+    else
+    {
       indices[indexcount++] = offs+(x+2)*xadd;
       indices[indexcount++] = offs+(x+2)*xadd;
       indices[indexcount++] = offs+(x+2)*xadd;
@@ -265,7 +269,9 @@ void csTerrBlock::Split ()
       children[1]->neighbours[0] = neighbours[0]->children[3];
       children[0]->neighbours[0]->neighbours[3] = children[0];
       children[1]->neighbours[0]->neighbours[3] = children[1];
-    } else {
+    }
+    else
+    {
       children[0]->neighbours[0] = neighbours[0];
       children[1]->neighbours[0] = neighbours[0];
       neighbours[0]->neighbours[3] = this;
@@ -277,7 +283,9 @@ void csTerrBlock::Split ()
       children[3]->neighbours[1] = neighbours[1]->children[2];
       children[1]->neighbours[1]->neighbours[2] = children[1];
       children[3]->neighbours[1]->neighbours[2] = children[3];
-    } else {
+    }
+    else
+    {
       children[1]->neighbours[1] = neighbours[1];
       children[3]->neighbours[1] = neighbours[1];
       neighbours[1]->neighbours[2] = this;
@@ -289,7 +297,9 @@ void csTerrBlock::Split ()
       children[2]->neighbours[2] = neighbours[2]->children[3];
       children[0]->neighbours[2]->neighbours[1] = children[0];
       children[2]->neighbours[2]->neighbours[1] = children[2];
-    } else {
+    }
+    else
+    {
       children[0]->neighbours[2] = neighbours[2];
       children[2]->neighbours[2] = neighbours[2];
       neighbours[2]->neighbours[1] = this;
@@ -301,7 +311,9 @@ void csTerrBlock::Split ()
       children[3]->neighbours[3] = neighbours[3]->children[1];
       children[2]->neighbours[3]->neighbours[0] = children[2];
       children[3]->neighbours[3]->neighbours[0] = children[3];
-    } else {
+    }
+    else
+    {
       children[2]->neighbours[3] = neighbours[3];
       children[3]->neighbours[3] = neighbours[3];
       neighbours[3]->neighbours[0] = this;
@@ -380,7 +392,9 @@ void csTerrBlock::CalcLOD (iRenderView *rview)
   {
     if (IsLeaf ())
       Split ();
-  } else {
+  }
+  else
+  {
     if (!IsLeaf ())
       Merge ();
   }
@@ -574,38 +588,94 @@ bool csTerrBlock::IsMaterialUsed (int index)
 
 // ---------------------------------------------------------------
 
+void csTerrainObject::SetupPolyMeshData ()
+{
+  if (polymesh_valid) return;
+  SetupObject ();
+  polymesh_valid = true;
+  delete[] polymesh_vertices;
+  delete[] polymesh_triangles;
+  delete[] polymesh_polygons; polymesh_polygons = 0;
+
+  int res = cd_resolution;
+  csRef<iTerraSampler> terrasampler = terraformer->GetSampler (
+      csBox2 (rootblock->center.x - rootblock->size / 2.0,
+      	      rootblock->center.z - rootblock->size / 2.0, 
+	      rootblock->center.x + rootblock->size / 2.0,
+	      rootblock->center.z + rootblock->size / 2.0), res);
+  polymesh_vertices = new csVector3 [res * res];
+  polymesh_vertex_count = res * res;
+  memcpy (polymesh_vertices, terrasampler->SampleVector3 (vertices_name),
+    res * res * sizeof (csVector3));
+  terrasampler->Cleanup ();
+
+  polymesh_tri_count = 2 * (res-1) * (res-1);
+  polymesh_triangles = new csTriangle [polymesh_tri_count];
+
+  int x, y;
+  csTriangle* tri = polymesh_triangles;
+  for (y = 0 ; y < res-1 ; y++)
+  {
+    int yr = y * res;
+    for (x = 0 ; x < res-1 ; x++)
+    {
+      (tri++)->Set (yr + x, yr+res + x, yr + x+1);
+      (tri++)->Set (yr + x+1, yr+res + x, yr+res + x+1);
+    }
+  }
+}
+
 void csTerrainObject::PolyMesh::Cleanup ()
 {
 }
 
+csMeshedPolygon* csTerrainObject::PolyMesh::GetPolygons ()
+{
+  terrain->SetupPolyMeshData ();
+  if (!terrain->polymesh_polygons)
+  {
+    int pcnt = terrain->polymesh_tri_count;
+    terrain->polymesh_polygons = new csMeshedPolygon [pcnt];
+    csTriangle* tris = terrain->polymesh_triangles;
+    int i;
+    for (i = 0 ; i < pcnt ; i++)
+    {
+      terrain->polymesh_polygons[i].num_vertices = 3;
+      terrain->polymesh_polygons[i].vertices = &tris[i].a;
+    }
+  }
+
+  return terrain->polymesh_polygons;
+}
+
 int csTerrainObject::PolyMesh::GetVertexCount ()
 {
-  return 0;
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_vertex_count;
 }
 
 csVector3* csTerrainObject::PolyMesh::GetVertices ()
 {
-  return 0;
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_vertices;
 }
 
 int csTerrainObject::PolyMesh::GetPolygonCount ()
 {
-  return 0;
-}
-
-csMeshedPolygon* csTerrainObject::PolyMesh::GetPolygons ()
-{
-  return 0;
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_tri_count;
 }
 
 int csTerrainObject::PolyMesh::GetTriangleCount ()
 {
-  return 0;
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_tri_count;
 }
 
 csTriangle* csTerrainObject::PolyMesh::GetTriangles ()
 {
-  return 0;
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_triangles;
 }
 
 //----------------------------------------------------------------------
@@ -622,12 +692,17 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   csTerrainObject::pFactory = pFactory;
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
-  scfiObjectModel.SetPolygonMeshBase (0);
-  scfiObjectModel.SetPolygonMeshColldet (0);
-  //scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
-  //scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshViscull (0);
   scfiObjectModel.SetPolygonMeshShadows (0);
+  scfiPolygonMesh.SetTerrain (this);
+
+  polymesh_valid = false;
+  polymesh_vertices = 0;
+  polymesh_triangles = 0;
+  polymesh_polygons = 0;
+  cd_resolution = 256;
 
   logparent = 0;
   initialized = false;
@@ -645,11 +720,6 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   lod_qcoeff = 0;
   block_maxsize = region.MaxX () - region.MinX ();
   block_minsize = block_maxsize;
-
-  scfiObjectModel.SetPolygonMeshBase (0);
-  scfiObjectModel.SetPolygonMeshColldet (0);
-  scfiObjectModel.SetPolygonMeshViscull (0);
-  scfiObjectModel.SetPolygonMeshShadows (0);
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
@@ -675,6 +745,8 @@ csTerrainObject::~csTerrainObject ()
 {
   //builder->Stop ();
   if (vis_cb) vis_cb->DecRef ();
+  delete[] polymesh_vertices;
+  delete[] polymesh_triangles;
 }
 
 void csTerrainObject::FireListeners ()
@@ -773,7 +845,8 @@ bool csTerrainObject::SetMaterialPalette (
   const csArray<iMaterialWrapper*>& pal)
 {
   palette.SetLength (pal.Length());
-  for (int i = 0; i < pal.Length(); i++) {
+  for (int i = 0; i < pal.Length(); i++)
+  {
     palette[i] = pal[i];
   }
 
@@ -871,20 +944,27 @@ bool csTerrainObject::SetLODValue (const char* parameter, float value)
   {
     lod_distance = value;
     return true;
-  } else if (strcmp (parameter, "block split distance") == 0)
+  }
+  else if (strcmp (parameter, "block split distance") == 0)
   {
     lod_lcoeff = value;
     return true;
-  } else if (strcmp (parameter, "minimum block size") == 0)
+  }
+  else if (strcmp (parameter, "minimum block size") == 0)
   {
     block_minsize = value;
     return true;
-  } else if (strcmp (parameter, "block resolution") == 0)
+  }
+  else if (strcmp (parameter, "block resolution") == 0)
   {
     // Make the resolution conform to n^2
     block_res = csLog2 ((int) value);
     block_res = (int) pow (2, block_res);
     return true;
+  }
+  else if (strcmp (parameter, "cd resolution") == 0)
+  {
+    cd_resolution = int (value);
   }
   return false;
 }
@@ -894,15 +974,22 @@ float csTerrainObject::GetLODValue (const char* parameter)
   if (strcmp (parameter, "splatting distance") == 0)
   {
     return lod_distance;
-  } else if (strcmp (parameter, "block split distance") == 0)
+  }
+  else if (strcmp (parameter, "block split distance") == 0)
   {
     return lod_lcoeff;
-  } else if (strcmp (parameter, "minimum block size") == 0)
+  }
+  else if (strcmp (parameter, "minimum block size") == 0)
   {
     return block_minsize;
-  } else if (strcmp (parameter, "block resolution") == 0)
+  }
+  else if (strcmp (parameter, "block resolution") == 0)
   {
     return block_res;
+  }
+  else if (strcmp (parameter, "cd resolution") == 0)
+  {
+    return float (cd_resolution);
   }
   return 0;
 }

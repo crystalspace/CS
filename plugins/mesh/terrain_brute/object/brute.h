@@ -272,18 +272,21 @@ private:
   bool staticlighting;
   bool castshadows;
 
+  // Data for the colldet polygon mesh.
+  bool polymesh_valid;
+  csVector3* polymesh_vertices;
+  int polymesh_vertex_count;
+  csTriangle* polymesh_triangles;
+  int polymesh_tri_count;
+  csMeshedPolygon* polymesh_polygons;
+  void SetupPolyMeshData ();
+  int cd_resolution;
+
   /**
   * Do the setup of the entire terrain. This will compute the base
   * mesh, the LOD meshes, normals, ...
   */
   void SetupObject ();
-
-  /**
-  * Test if this bounding box is visible in the given clipper.
-  * Computed flags are for DrawTriangleMesh.
-  */
-  /*bool BBoxVisible (const csBox3& bbox, iRenderView* rview, iCamera* camera,
-    int& clip_portal, int& clip_plane, int& clip_z_plane);*/
 
 public:
   /// Constructor.

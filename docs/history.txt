@@ -12,6 +12,19 @@ chronological order.
 	- Jorrit fixed iEngine->GetNearbyObjects() and GetNearbyMeshes() so
 	  that they correctly work for space warping portals too. This is
 	  untested!
+	- Jorrit did an optimization to the OPCODE plugin. Instead of
+	  requesting polygons and triangulating it will now directly request
+	  the triangles. This is more optimal because many meshes actually
+	  support triangle meshes more efficiently then polygon meshes.
+	- Jorrit implemented support for real collision detection (using
+	  iPolygonMesh) for both chunklod and bruteblock terrain engines.
+	  Also removed the specialized support for collision detection in
+	  walktest as that is no longer needed.
+	- Jorrit added a new 'cd resolution' lod value for bruteblock which
+	  controls the resolution of the collision detection mesh.
+	  By default it will be 256x256.
+	- Jorrit reverted a change to data/terrainf/world as it causes
+	  huge z-fighting on GF4 Go.
 24-Jun-2004
 	- Jorrit fixed a bug in the GL renderer where it would fail to test
 	  for the existance of a clipper in some cases.

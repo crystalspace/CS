@@ -32,6 +32,7 @@
 #include "qint.h"
 #include "csutil/garray.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/tri.h"
 #include "CSopcodecollider.h"
 #include "igeom/polymesh.h"
 #include "ivaria/collider.h"
@@ -68,20 +69,13 @@ inline float max3(float a, float b, float c)
 void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
 {
   OPCODECREATE OPCC;
-  int i, v;
-  int tri_count = 0;
+  int i;
   // first, count the number of triangles polyset contains
   csVector3* vertices = mesh->GetVertices ();
   int vertcount = mesh->GetVertexCount ();
-  csMeshedPolygon* polygons = mesh->GetPolygons ();
-  int polycnt = mesh->GetPolygonCount ();
+  csTriangle* triangles = mesh->GetTriangles ();
+  int tri_count = mesh->GetTriangleCount ();
   
-  for (i = 0; i < polycnt; i++)
-  {
-    csMeshedPolygon& p = polygons[i];
-    tri_count += p.num_vertices - 2;
-  }
-
   if (tri_count>=1)
   {
     m_pCollisionModel = new Opcode::Model;
@@ -96,19 +90,12 @@ void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
       vertholder[i].Set (vertices[i].x , vertices[i].y , vertices[i].z);
     }
     
-    int* vidx;
     int index = 0;
-    for (i = 0; i < polycnt; i++)
+    for (i = 0 ; i < tri_count ; i++)
     {
-      csMeshedPolygon& p = polygons[i];
-      vidx = p.vertices;
-     
-      for (v = 2; v < p.num_vertices; v++) //triangulation
-      {
-        indexholder[index++] = vidx[0];
-        indexholder[index++] = vidx[v - 1];
-        indexholder[index++] = vidx[v];
-      }
+      indexholder[index++] = triangles[i].a;
+      indexholder[index++] = triangles[i].b;
+      indexholder[index++] = triangles[i].c;
     }
    
     opcMeshInt.SetNbTriangles (tri_count);

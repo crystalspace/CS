@@ -765,6 +765,98 @@ void csChunkLodTerrainFactory::MeshTreeNode::ProcessEdge (int start, int end,
   }
 }
 
+//---------------------------------------------------------------
+
+void csChunkLodTerrainObject::SetupPolyMeshData ()
+{
+  if (polymesh_valid) return;
+  polymesh_valid = true;
+  delete[] polymesh_vertices;
+  delete[] polymesh_triangles;
+  delete[] polymesh_polygons; polymesh_polygons = 0;
+
+  int res = pFactory->hm_x;
+  //int res = 256;
+  //csRef<iTerraSampler> terrasampler = terraform->GetSampler (
+      //csBox2 (rootblock->center.x - rootblock->size / 2.0,
+      	      //rootblock->center.z - rootblock->size / 2.0, 
+	      //rootblock->center.x + rootblock->size / 2.0,
+	      //rootblock->center.z + rootblock->size / 2.0), res);
+  polymesh_vertices = new csVector3 [res * res];
+  polymesh_vertex_count = res * res;
+  memcpy (polymesh_vertices, pFactory->fullsample->SampleVector3 (
+  	pFactory->vertex_name), res * res * sizeof (csVector3));
+  pFactory->fullsample->Cleanup ();
+
+  polymesh_tri_count = 2 * (res-1) * (res-1);
+  polymesh_triangles = new csTriangle [polymesh_tri_count];
+
+  int x, y;
+  csTriangle* tri = polymesh_triangles;
+  for (y = 0 ; y < res-1 ; y++)
+  {
+    int yr = y * res;
+    for (x = 0 ; x < res-1 ; x++)
+    {
+      (tri++)->Set (yr + x, yr+res + x, yr + x+1);
+      (tri++)->Set (yr + x+1, yr+res + x, yr+res + x+1);
+    }
+  }
+}
+
+void csChunkLodTerrainObject::PolyMesh::Cleanup ()
+{
+}
+
+csMeshedPolygon* csChunkLodTerrainObject::PolyMesh::GetPolygons ()
+{
+  terrain->SetupPolyMeshData ();
+  if (!terrain->polymesh_polygons)
+  {
+    int pcnt = terrain->polymesh_tri_count;
+    terrain->polymesh_polygons = new csMeshedPolygon [pcnt];
+    csTriangle* tris = terrain->polymesh_triangles;
+    int i;
+    for (i = 0 ; i < pcnt ; i++)
+    {
+      terrain->polymesh_polygons[i].num_vertices = 3;
+      terrain->polymesh_polygons[i].vertices = &tris[i].a;
+    }
+  }
+
+  return terrain->polymesh_polygons;
+}
+
+int csChunkLodTerrainObject::PolyMesh::GetVertexCount ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_vertex_count;
+}
+
+csVector3* csChunkLodTerrainObject::PolyMesh::GetVertices ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_vertices;
+}
+
+int csChunkLodTerrainObject::PolyMesh::GetPolygonCount ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_tri_count;
+}
+
+int csChunkLodTerrainObject::PolyMesh::GetTriangleCount ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_tri_count;
+}
+
+csTriangle* csChunkLodTerrainObject::PolyMesh::GetTriangles ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_triangles;
+}
+
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csChunkLodTerrainObject)
@@ -796,6 +888,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csChunkLodTerrainObject::ShadowCaster)
   SCF_IMPLEMENTS_INTERFACE (iShadowCaster)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_IBASE (csChunkLodTerrainObject::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
 csChunkLodTerrainObject::csChunkLodTerrainObject (csChunkLodTerrainFactory* p)
 	: logparent (p), pFactory (p), returnMeshesHolder (false)
 {
@@ -805,6 +901,17 @@ csChunkLodTerrainObject::csChunkLodTerrainObject (csChunkLodTerrainFactory* p)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster)
+
+  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshViscull (0);
+  scfiObjectModel.SetPolygonMeshShadows (0);
+  scfiPolygonMesh.SetTerrain (this);
+
+  polymesh_valid = false;
+  polymesh_vertices = 0;
+  polymesh_triangles = 0;
+  polymesh_polygons = 0;
 
   error_tolerance = 1.0;
   lod_distance = 200.0;
