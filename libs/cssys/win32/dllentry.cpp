@@ -20,6 +20,7 @@
 #include "csutil/scf.h"
 
 HINSTANCE ModuleHandle;
+int ApplicationShow;
 
 // Main DLL entry point... should be called when we're loaded.
 extern "C" BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/)
