@@ -33,6 +33,7 @@
 #include "ogl_g3dcom.h"
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
+#include "plugins/video/renderer/common/polybuf.h"
 #include "ogl_polybuf.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
@@ -97,6 +98,8 @@ CS_IMPLEMENT_STATIC_VAR (Get_clipped_triangles, ogl_g3dcom_clipped_triangles, ()
 /// Array for clipping.
 typedef csGrowingArray<int> ogl_g3dcom_clipped_translate;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_translate, ogl_g3dcom_clipped_translate, ())
+typedef csGrowingArray<int> ogl_g3dcom_clipped_plane;
+CS_IMPLEMENT_STATIC_VAR (Get_clipped_plane, ogl_g3dcom_clipped_plane, ())
 /// Array for clipping.
 typedef csGrowingArray<csVector3> ogl_g3dcom_clipped_vertices;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_vertices, ogl_g3dcom_clipped_vertices, ())
@@ -141,6 +144,7 @@ static ogl_g3dcom_color_verts *color_verts = NULL;
 static ogl_g3dcom_rgba_verts *rgba_verts = NULL;
 static ogl_g3dcom_clipped_triangles *clipped_triangles = NULL;
 static ogl_g3dcom_clipped_translate *clipped_translate = NULL;
+static ogl_g3dcom_clipped_plane *clipped_plane = NULL;
 static ogl_g3dcom_clipped_vertices *clipped_vertices = NULL;
 static ogl_g3dcom_clipped_texels *clipped_texels = NULL;
 static ogl_g3dcom_clipped_colors *clipped_colors = NULL;
@@ -246,6 +250,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
     rgba_verts = Get_rgba_verts ();
     clipped_triangles = Get_clipped_triangles ();
     clipped_translate = Get_clipped_translate ();
+    clipped_plane = Get_clipped_plane ();
     clipped_vertices = Get_clipped_vertices ();
     clipped_texels = Get_clipped_texels ();
     clipped_colors = Get_clipped_colors ();
@@ -276,6 +281,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   rgba_verts->IncRef ();
   clipped_triangles->IncRef ();
   clipped_translate->IncRef ();
+  clipped_plane->IncRef ();
   clipped_vertices->IncRef ();
   clipped_texels->IncRef ();
   clipped_colors->IncRef ();
@@ -307,6 +313,7 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   rgba_verts->DecRef ();
   clipped_triangles->DecRef ();
   clipped_translate->DecRef ();
+  clipped_plane->DecRef ();
   clipped_vertices->DecRef ();
   clipped_texels->DecRef ();
   clipped_colors->DecRef ();
@@ -852,6 +859,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
   G2D->PerformExtension("configureopengl");
 
   vbufmgr = new csTriangleArrayVertexBufferManager (object_reg);
+  //vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
   m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
 
@@ -2519,6 +2527,440 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   }
 }
 
+static bool dp_flatlighting = false;
+static float dp_alpha = 0;
+void csGraphics3DOGLCommon::DrawPolygonStartMaterial (
+	iMaterialHandle* mat_handle, uint mixmode)
+{
+  float flat_r = 1., flat_g = 1., flat_b = 1.;
+
+  iTextureHandle *txt = mat_handle?mat_handle->GetTexture():NULL;
+  dp_alpha = ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)?
+    (mixmode & CS_FX_MASK_ALPHA)/255.0f:1.0f;
+
+  dp_flatlighting = ((txt && txt->GetAlphaMap() &&
+    !(txt->GetKeyColor() && (dp_alpha >= OPENGL_KEYCOLOR_MIN_ALPHA) ))
+    || (dp_alpha != 1.0f ) );
+
+  bool tex_transp = false;
+  bool multimat = false;
+  csMaterialHandle* cs_mat_handle = (csMaterialHandle*)mat_handle;
+  iTextureHandle* txt_handle = NULL;
+  csTextureHandleOpenGL *txt_mm = NULL;
+  csTxtCacheData *texturecache_data = NULL;
+  GLuint texturehandle = 0;
+
+  if (cs_mat_handle)
+  {
+    multimat = cs_mat_handle->GetTextureLayerCount () > 0;
+    txt_handle = cs_mat_handle->GetTexture ();
+    if (txt_handle)
+    {
+      txt_mm = (csTextureHandleOpenGL *)txt_handle->GetPrivateObject ();
+      tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
+      // Initialize our static drawing information and cache
+      // the texture in the texture cache (if this is not already the case).
+      CacheTexture (mat_handle);
+      texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
+      texturehandle = texturecache_data->Handle;
+    }
+  }
+
+  dp_alpha = BYTE_TO_FLOAT (mixmode & CS_FX_MASK_ALPHA);
+  dp_alpha = SetupBlend (mixmode, dp_alpha, tex_transp);
+
+  if (m_renderstate.textured && txt_handle)
+  {
+    statecache->Enable_GL_TEXTURE_2D ();
+    if (txt_mm->GetKeyColor() && !(dp_alpha < OPENGL_KEYCOLOR_MIN_ALPHA))
+    {
+      statecache->Enable_GL_ALPHA_TEST ();
+      statecache->SetAlphaFunc (GL_GEQUAL, OPENGL_KEYCOLOR_MIN_ALPHA);
+      SetupBlend (mixmode, 1.0f, false);
+    }
+    else
+    {
+      statecache->Disable_GL_ALPHA_TEST ();
+    }
+  }
+  else
+  {
+    statecache->Disable_GL_TEXTURE_2D ();
+    csRGBpixel color;
+    if (txt_handle)
+    {
+      txt_handle->GetMeanColor (color.red, color.green, color.blue);
+      flat_r = BYTE_TO_FLOAT (color.red);
+      flat_g = BYTE_TO_FLOAT (color.green);
+      flat_b = BYTE_TO_FLOAT (color.blue);
+    }
+    else if (cs_mat_handle)
+    {
+      cs_mat_handle->GetFlatColor (color);
+      flat_r = BYTE_TO_FLOAT (color.red);
+      flat_g = BYTE_TO_FLOAT (color.green);
+      flat_b = BYTE_TO_FLOAT (color.blue);
+    }
+  }
+
+  SetGLZBufferFlags (z_buf_mode);
+
+  if (txt_handle)
+    statecache->SetTexture (GL_TEXTURE_2D, texturehandle);
+
+  statecache->SetShadeModel (GL_FLAT);
+
+  SetClientStates (CS_CLIENTSTATE_VT);
+
+  if (!dp_flatlighting)
+  {
+    glColor4f (flat_r, flat_g, flat_b, dp_alpha);
+  }
+}
+
+void csGraphics3DOGLCommon::DrawPolygonMaterialOnly (G3DPolygonDP& poly)
+{
+  if (poly.num < 3) return;
+
+  int i;
+
+  // count 'real' number of vertices
+  int num_vertices = 1;
+  for (i = 1; i < poly.num; i++)
+  {
+    if ((ABS (poly.vertices[i].x - poly.vertices[i - 1].x)
+   + ABS (poly.vertices[i].y - poly.vertices[i - 1].y))
+    > VERTEX_NEAR_THRESHOLD)
+      num_vertices++;
+  }
+  // if this is a 'degenerate' polygon, skip it
+  if (num_vertices < 3)
+    return;
+
+  float flat_r = 1., flat_g = 1., flat_b = 1.;
+
+  // The following attempt to speed up only hits for about 10% in flarge,
+  // so maybe its prolly not woth it. However, for highly triangulized cases
+  // it may be worth to rethink. - norman
+  //  if (prevPolyPlane.norm != poly.normal.norm || prevPolyPlane.DD != poly.normal.DD
+  //      || prevTexMatrix != *poly.plane.m_cam2tex || prevTexVector != *poly.plane.v_cam2tex)
+  {
+    //    prevPolyPlane = poly.normal;
+    //    prevTexMatrix = *poly.plane.m_cam2tex;
+    //    prevTexVector = *poly.plane.v_cam2tex;
+
+    // Get the plane normal of the polygon. Using this we can calculate
+    // '1/z' at every screen space point.
+    float Ac, Bc, Cc, Dc;
+    Ac = poly.normal.A ();
+    Bc = poly.normal.B ();
+    Cc = poly.normal.C ();
+    Dc = poly.normal.D ();
+
+    if (ABS (Dc) < SMALL_D)
+    {
+      // The Dc component of the plane normal is too small. This means
+      // that  the plane of the polygon is almost perpendicular to the
+      // eye of the viewer. In this case, nothing much can be seen of
+      // the plane anyway so we just take one value for the entire
+      // polygon.
+      M = 0;
+      N = 0;
+      // For O choose the transformed z value of one vertex.
+      // That way Z buffering should at least work.
+      O = 1 / poly.z_value;
+    }
+    else
+    {
+      float inv_Dc = 1 / Dc;
+      M = -Ac * inv_Dc * inv_aspect;
+      N = -Bc * inv_Dc * inv_aspect;
+      O = -Cc * inv_Dc;
+    }
+
+    // @@@ The texture transform matrix is currently written as
+    // T = M*(C-V)
+    // (with V being the transform vector, M the transform matrix, and C
+    // the position in camera space coordinates. It would be better (more
+    // suitable for the following calculations) if it would be written
+    // as T = M*C - V.
+    float P1, P2, P3, P4;
+    float Q1, Q2, Q3, Q4;
+    P1 = poly.plane.m_cam2tex->m11;
+    P2 = poly.plane.m_cam2tex->m12;
+    P3 = poly.plane.m_cam2tex->m13;
+    P4 = -(P1 * poly.plane.v_cam2tex->x
+     + P2 * poly.plane.v_cam2tex->y
+     + P3 * poly.plane.v_cam2tex->z);
+    Q1 = poly.plane.m_cam2tex->m21;
+    Q2 = poly.plane.m_cam2tex->m22;
+    Q3 = poly.plane.m_cam2tex->m23;
+    Q4 = -(Q1 * poly.plane.v_cam2tex->x
+     + Q2 * poly.plane.v_cam2tex->y
+     + Q3 * poly.plane.v_cam2tex->z);
+
+    // Precompute everything so that we can calculate (u,v) (texture space
+    // coordinates) for every (sx,sy) (screen space coordinates). We make
+    // use of the fact that 1/z, u/z and v/z are linear in screen space.
+    if (ABS (Dc) < SMALL_D)
+    {
+      // The Dc component of the plane of the polygon is too small.
+      J1 = J2 = J3 = 0;
+      K1 = K2 = K3 = 0;
+    }
+    else
+    {
+      J1 = P1 * inv_aspect + P4 * M;
+      J2 = P2 * inv_aspect + P4 * N;
+      J3 = P3 + P4 * O;
+      K1 = Q1 * inv_aspect + Q4 * M;
+      K2 = Q2 * inv_aspect + Q4 * N;
+      K3 = Q3 + Q4 * O;
+    }
+  }
+
+  float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
+
+  if (dp_flatlighting)
+  {
+    int ir = 255, ig = 255, ib = 255;
+    //@@@
+    //if (lm)
+    //{
+      //tex->RecalculateDynamicLights ();
+      //lm->GetMeanLighting(ir, ig, ib);
+    //}
+    flat_r = ir/128.0f;
+    flat_g = ig/128.0f;
+    flat_b = ib/128.0f;
+    glColor4f (flat_r, flat_g, flat_b, dp_alpha);
+  }
+
+  //=================
+  // Setup: calculate the polygon and texture information.
+  //=================
+
+  static GLfloat glverts[100*4];
+  static GLfloat gltxt[100*2];
+  static GLfloat gltxttrans[100*2];
+
+  GLfloat* glv = glverts, * glt = gltxt;
+  for (i = 0; i < poly.num; i++)
+  {
+    sx = poly.vertices[i].x - asp_center_x;
+    sy = poly.vertices[i].y - asp_center_y;
+    one_over_sz = M * sx + N * sy + O;
+    sz = 1.0 / one_over_sz;
+    u_over_sz = (J1 * sx + J2 * sy + J3);
+    v_over_sz = (K1 * sx + K2 * sy + K3);
+    // Modified to use homogenous object space coordinates instead
+    // of homogenous texture space coordinates.
+    *glt++ = u_over_sz * sz;
+    *glt++ = v_over_sz * sz;
+    *glv++ = poly.vertices[i].x * sz;
+    *glv++ = poly.vertices[i].y * sz;
+    *glv++ = -1.0;
+    *glv++ = sz;
+  }
+
+  //=================
+  // Pass 1: The unlit texture
+  //=================
+
+  glVertexPointer (4, GL_FLOAT, 0, glverts);
+  glTexCoordPointer (2, GL_FLOAT, 0, gltxt);
+  glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
+}
+
+void csGraphics3DOGLCommon::DrawPolygonLightmapOnly (G3DPolygonDP& poly)
+{
+  if (poly.num < 3) return;
+
+  iPolygonTexture *tex = poly.poly_texture;
+  iLightMap* lm = tex->GetLightMap ();
+  if (!lm) return;
+
+  int i;
+
+  // count 'real' number of vertices
+  int num_vertices = 1;
+  for (i = 1; i < poly.num; i++)
+  {
+    if ((ABS (poly.vertices[i].x - poly.vertices[i - 1].x)
+   + ABS (poly.vertices[i].y - poly.vertices[i - 1].y))
+    > VERTEX_NEAR_THRESHOLD)
+      num_vertices++;
+  }
+  // if this is a 'degenerate' polygon, skip it
+  if (num_vertices < 3)
+    return;
+
+  // The following attempt to speed up only hits for about 10% in flarge,
+  // so maybe its prolly not woth it. However, for highly triangulized cases
+  // it may be worth to rethink. - norman
+  //  if (prevPolyPlane.norm != poly.normal.norm || prevPolyPlane.DD != poly.normal.DD
+  //      || prevTexMatrix != *poly.plane.m_cam2tex || prevTexVector != *poly.plane.v_cam2tex)
+  {
+    //    prevPolyPlane = poly.normal;
+    //    prevTexMatrix = *poly.plane.m_cam2tex;
+    //    prevTexVector = *poly.plane.v_cam2tex;
+
+    // Get the plane normal of the polygon. Using this we can calculate
+    // '1/z' at every screen space point.
+    float Ac, Bc, Cc, Dc;
+    Ac = poly.normal.A ();
+    Bc = poly.normal.B ();
+    Cc = poly.normal.C ();
+    Dc = poly.normal.D ();
+
+    if (ABS (Dc) < SMALL_D)
+    {
+      // The Dc component of the plane normal is too small. This means
+      // that  the plane of the polygon is almost perpendicular to the
+      // eye of the viewer. In this case, nothing much can be seen of
+      // the plane anyway so we just take one value for the entire
+      // polygon.
+      M = 0;
+      N = 0;
+      // For O choose the transformed z value of one vertex.
+      // That way Z buffering should at least work.
+      O = 1 / poly.z_value;
+    }
+    else
+    {
+      float inv_Dc = 1 / Dc;
+      M = -Ac * inv_Dc * inv_aspect;
+      N = -Bc * inv_Dc * inv_aspect;
+      O = -Cc * inv_Dc;
+    }
+
+    // @@@ The texture transform matrix is currently written as
+    // T = M*(C-V)
+    // (with V being the transform vector, M the transform matrix, and C
+    // the position in camera space coordinates. It would be better (more
+    // suitable for the following calculations) if it would be written
+    // as T = M*C - V.
+    float P1, P2, P3, P4;
+    float Q1, Q2, Q3, Q4;
+    P1 = poly.plane.m_cam2tex->m11;
+    P2 = poly.plane.m_cam2tex->m12;
+    P3 = poly.plane.m_cam2tex->m13;
+    P4 = -(P1 * poly.plane.v_cam2tex->x
+     + P2 * poly.plane.v_cam2tex->y
+     + P3 * poly.plane.v_cam2tex->z);
+    Q1 = poly.plane.m_cam2tex->m21;
+    Q2 = poly.plane.m_cam2tex->m22;
+    Q3 = poly.plane.m_cam2tex->m23;
+    Q4 = -(Q1 * poly.plane.v_cam2tex->x
+     + Q2 * poly.plane.v_cam2tex->y
+     + Q3 * poly.plane.v_cam2tex->z);
+
+    // Precompute everything so that we can calculate (u,v) (texture space
+    // coordinates) for every (sx,sy) (screen space coordinates). We make
+    // use of the fact that 1/z, u/z and v/z are linear in screen space.
+    if (ABS (Dc) < SMALL_D)
+    {
+      // The Dc component of the plane of the polygon is too small.
+      J1 = J2 = J3 = 0;
+      K1 = K2 = K3 = 0;
+    }
+    else
+    {
+      J1 = P1 * inv_aspect + P4 * M;
+      J2 = P2 * inv_aspect + P4 * N;
+      J3 = P3 + P4 * O;
+      K1 = Q1 * inv_aspect + Q4 * M;
+      K2 = Q2 * inv_aspect + Q4 * N;
+      K3 = Q3 + Q4 * O;
+    }
+  }
+
+  float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
+
+  statecache->SetShadeModel (GL_FLAT);
+
+  //=================
+  // Setup: calculate the polygon and texture information.
+  //=================
+
+  static GLfloat glverts[100*4];
+  static GLfloat gltxt[100*2];
+  static GLfloat gltxttrans[100*2];
+
+  GLfloat* glv = glverts, * glt = gltxt;
+  for (i = 0; i < poly.num; i++)
+  {
+    sx = poly.vertices[i].x - asp_center_x;
+    sy = poly.vertices[i].y - asp_center_y;
+    one_over_sz = M * sx + N * sy + O;
+    sz = 1.0 / one_over_sz;
+    u_over_sz = (J1 * sx + J2 * sy + J3);
+    v_over_sz = (K1 * sx + K2 * sy + K3);
+    // Modified to use homogenous object space coordinates instead
+    // of homogenous texture space coordinates.
+    *glt++ = u_over_sz * sz;
+    *glt++ = v_over_sz * sz;
+    *glv++ = poly.vertices[i].x * sz;
+    *glv++ = poly.vertices[i].y * sz;
+    *glv++ = -1.0;
+    *glv++ = sz;
+  }
+
+  SetGLZBufferFlagsPass2 (z_buf_mode, true);
+  statecache->Enable_GL_TEXTURE_2D ();
+  glVertexPointer (4, GL_FLOAT, 0, glverts);  // No need to set.
+
+  //=================
+  // Pass 3: Lightmaps
+  //=================
+    glColor4f (1, 1, 1, 0);
+    SetupBlend (CS_FX_SRCDST, 0, false);
+
+    GLuint TempHandle = lightmap_cache->GetTempHandle ();
+    tex->RecalculateDynamicLights ();
+    statecache->SetTexture (GL_TEXTURE_2D, TempHandle);
+    int lmwidth = lm->GetWidth ();
+    int lmheight = lm->GetHeight ();
+    csRGBpixel* lm_data = lm->GetMapData ();
+    glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0,
+	lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
+
+    float lm_offset_u, lm_offset_v, lm_high_u, lm_high_v;
+    float lm_scale_u, lm_scale_v;
+    tex->GetTextureBox (lm_offset_u, lm_offset_v, lm_high_u, lm_high_v);
+
+    // lightmap fudge factor
+    if (lm_high_u <= lm_offset_u)
+      lm_scale_u = 1.;       // @@@ Is this right?
+    else
+      lm_scale_u = 1. / (lm_high_u - lm_offset_u);
+
+    if (lm_high_v <= lm_offset_v)
+      lm_scale_v = 1.;       // @@@ Is this right?
+    else
+      lm_scale_v = 1. / (lm_high_v - lm_offset_v);
+
+    lm_offset_u -= .75 / (float (lmwidth) * lm_scale_u);
+    lm_high_u += .75 / (float (lmwidth) * lm_scale_u);
+
+    lm_offset_v -= .75 / (float (lmheight) * lm_scale_v);
+    lm_high_v += .75 / (float (lmheight) * lm_scale_v);
+
+    lm_scale_u = float (lmwidth) / (256. * (lm_high_u - lm_offset_u));
+    lm_scale_v = float (lmheight) / (256. * (lm_high_v - lm_offset_v));
+
+    glt = gltxt;
+    GLfloat* gltt = gltxttrans;
+    for (i = 0; i < poly.num; i++)
+    {
+      *gltt++ = (*(glt++) - lm_offset_u) * lm_scale_u;
+      *gltt++ = (*(glt++) - lm_offset_v) * lm_scale_v;
+    }
+    //glVertexPointer (4, GL_FLOAT, 0, glverts);  // No need to set.
+    glTexCoordPointer (2, GL_FLOAT, 0, gltxttrans);
+    glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
+  }
+
 void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
 {
   if (poly.num < 3)
@@ -2851,21 +3293,11 @@ static void ResolveVertex (
   }
 }
 
-void csGraphics3DOGLCommon::ClipTriangleMesh (
-    int num_triangles,
-    int num_vertices,
-    csTriangle* triangles,
-    csVector3* vertices,
-    csVector2* texels,
-    csColor* vertex_colors,
-    float** userarrays,
-    int* userarraycomponents,
-    G3DFogInfo* vertex_fog,
-    int& num_clipped_triangles,
-    int& num_clipped_vertices,
+void csGraphics3DOGLCommon::SetupClippingPlanes (
+    csPlane3* frustum_planes, int& num_planes,
+    csVector3& frust_origin,
     bool transform,
     bool mirror,
-    bool exact_clipping,
     bool plane_clipping,
     bool z_plane_clipping,
     bool frustum_clipping)
@@ -2874,10 +3306,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   if (frustum_clipping)
     CalculateFrustum ();
 
-  csPlane3 frustum_planes[100]; // @@@ Arbitrary limit
-  csPlane3 diagonal_planes[50]; // @@@ Arbitrary number.
   int num_frust = 0;
-  int num_diagonal_planes = 0;
 
   int i, j, j1;
   if (frustum_clipping)
@@ -2902,29 +3331,11 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       frustum_planes[j].Set (csVector3 (0), obj_frustum[j1], obj_frustum[j]);
       j1 = j;
     }
-
-    // In addition to the frustum planes itself we also calculate all
-    // diagonal planes which go from one side of the frustum to the other.
-    // These are going to be used to detect the special case of a triangle
-    // that has none of its vertices in the frustum. But this triangle can
-    // still be visible. To detect this we test if there is one of these
-    // extra planes that cuts the triangle in two. Since the number of diagonal
-    // planes is half the number of frustum planes we can save some
-    // calculation here.
-    if (num_frust > 3)
-      // Use (num_frust+1)/2 to make sure that odd frustums get one extra plane.
-      for (j = 0 ; j < (num_frust+1) / 2 ; j++)
-      {
-        j1 = j + (num_frust+1) / 2;
-        j1 = j1 % num_frust;
-        diagonal_planes[num_diagonal_planes++].Set
-          (csVector3 (0), obj_frustum[j], obj_frustum[j1]);
-      }
   }
 
   // num_planes is the number of planes to test with. If there is no
   // near clipping plane then this will be equal to num_frust.
-  int num_planes = num_frust;
+  num_planes = num_frust;
   if (plane_clipping)
   {
   //@@@ If mirror???
@@ -2947,17 +3358,40 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     num_planes++;
   }
 
-  csVector3 frust_origin;
   if (transform)
     frust_origin = o2c.This2Other (csVector3 (0));
   else
     frust_origin.Set (0, 0, 0);
+}
 
-  ClipTriangleMesh (num_triangles, num_vertices, triangles, vertices,
-    texels, vertex_colors, userarrays, userarraycomponents, vertex_fog,
-    num_clipped_triangles, num_clipped_vertices, exact_clipping,
-    frust_origin, frustum_planes, num_planes,
-    diagonal_planes, num_diagonal_planes);
+void csGraphics3DOGLCommon::ClassifyForClipTriangleMesh (
+    int num_vertices,
+    csVector3* vertices,
+    const csVector3& frust_origin, csPlane3* planes, int num_planes)
+{
+  int i, j;
+
+  if (num_vertices > clipped_plane->Length ())
+    clipped_plane->SetLength (num_vertices); // Used for original vertices.
+
+  int* ct = clipped_plane->GetArray ();
+
+  // Check all original vertices and see if they are in frustum.
+  // If not we set clipped_plane to the plane which causes the
+  // vertex to go outside. If yes then clipped_plane = -1.
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    const csVector3& v = vertices[i];
+    ct[i] = -1;
+    for (j = 0 ; j < num_planes ; j++)
+    {
+      if (planes[j].Classify (v-frust_origin) >= 0)
+      {
+	ct[i] = j;
+	break;  // Not inside.
+      }
+    }
+  }
 }
 
 void csGraphics3DOGLCommon::ClipTriangleMesh (
@@ -2965,17 +3399,9 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     int num_vertices,
     csTriangle* triangles,
     csVector3* vertices,
-    csVector2* texels,
-    csColor* vertex_colors,
-    float** userarrays,
-    int* userarraycomponents,
-    G3DFogInfo* vertex_fog,
     int& num_clipped_triangles,
-    int& num_clipped_vertices,
-    bool exact_clipping,
     const csVector3& frust_origin,
-    csPlane3* planes, int num_planes,
-    csPlane3* diag_planes, int num_diag_planes)
+    csPlane3* planes, int num_planes)
 {
   int i, j;
 
@@ -2986,8 +3412,67 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     // Use two times as many triangles. Hopefully this is enough.
     clipped_triangles->SetLength (num_tri);
   }
+
+  int* ct = clipped_plane->GetArray ();
+  csTriangle* cliptri = clipped_triangles->GetArray ();
+
+  num_clipped_triangles = 0;
+
+  // Now clip all triangles.
+  for (i = 0 ; i < num_triangles ; i++)
+  {
+    csTriangle& tri = triangles[i];
+    int cnt = int (ct[tri.a] == -1)
+        + int (ct[tri.b] == -1)
+	+ int (ct[tri.c] == -1);
+    if (cnt == 0)
+    {
+      //=====
+      // All three vertices are outside the frustum. It is still
+      // possible that the triangle itself intersects the frustum though.
+      // To eliminate that case we test if all three vertices are on the
+      // same side of some plane. In that case we can safely assume the
+      // triangle is not visible.
+      //=====
+      if (ct[tri.a] != ct[tri.b] || ct[tri.a] != ct[tri.c])
+        cnt = 1;
+    }
+
+    if (cnt == 0)
+    {
+      //=====
+      // Easiest case: triangle is not visible.
+      //=====
+    }
+    else
+    {
+      //=====
+      // Easy case: the triangle is fully or partially in view.
+      //=====
+      cliptri[num_clipped_triangles] = tri;
+      num_clipped_triangles++;
+    }
+  }
+}
+
+void csGraphics3DOGLCommon::ClassifyForClipTriangleMeshExact (
+    int num_vertices,
+    csVector3* vertices,
+    csVector2* texels,
+    csColor* vertex_colors,
+    float** userarrays,
+    int* userarraycomponents,
+    G3DFogInfo* vertex_fog,
+    int& num_clipped_vertices,
+    const csVector3& frust_origin,
+    csPlane3* planes, int num_planes)
+{
+  int i, j;
+
   if (num_vertices > clipped_translate->Length ())
     clipped_translate->SetLength (num_vertices); // Used for original vertices.
+  if (num_vertices > clipped_plane->Length ())
+    clipped_plane->SetLength (num_vertices); // Used for original vertices.
   int num_vts = num_vertices*2+100;
   if (num_vts > clipped_vertices->Length ())
   {
@@ -2999,8 +3484,14 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       clipped_user[i]->SetLength (num_vts);
   }
 
-  num_clipped_triangles = 0;
   num_clipped_vertices = 0;
+
+  int* clip_translate = clipped_translate->GetArray ();
+  int* clip_plane = clipped_plane->GetArray ();
+  csVector3* clip_vertices = clipped_vertices->GetArray ();
+  csVector2* clip_texels = clipped_texels->GetArray ();
+  csColor* clip_colors = clipped_colors->GetArray ();
+  G3DFogInfo* clip_fog = clipped_fog->GetArray ();
 
   // Check all original vertices and see if they are in frustum.
   // If yes we set clipped_translate to the new position in the transformed
@@ -3009,80 +3500,96 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   {
     const csVector3& v = vertices[i];
     bool inside = true;
+    clip_plane[i] = -1;
     for (j = 0 ; j < num_planes ; j++)
     {
       if (planes[j].Classify (v-frust_origin) >= 0)
       {
 	inside = false;
+	clip_plane[i] = j;
 	break;  // Not inside.
       }
     }
     if (inside)
     {
-      if (exact_clipping)
+      clip_translate[i] = num_clipped_vertices;
+      clip_vertices[num_clipped_vertices] = v;
+      clip_texels[num_clipped_vertices] = texels[i];
+      if (vertex_colors)
+        clip_colors[num_clipped_vertices] = vertex_colors[i];
+      if (vertex_fog)
+        clip_fog[num_clipped_vertices] = vertex_fog[i];
+      if (userarrays)
       {
-        (*clipped_translate)[i] = num_clipped_vertices;
-        (*clipped_vertices)[num_clipped_vertices] = v;
-        (*clipped_texels)[num_clipped_vertices] = texels[i];
-        if (vertex_colors)
-          (*clipped_colors)[num_clipped_vertices] = vertex_colors[i];
-        if (vertex_fog)
-          (*clipped_fog)[num_clipped_vertices] = vertex_fog[i];
-        if (userarrays)
-        {
-          for (int u=0; u<CS_VBUF_TOTAL_USERA; u++)
-            if (userarrays[u] != NULL)
-            {
-              for (int c=0; c<userarraycomponents[u]; c++)
-                (*clipped_user[u])[num_clipped_vertices] =
-                  (userarrays[u])[i*userarraycomponents[u]+c];
-            }
-        }
-        num_clipped_vertices++;
+        for (int u=0; u<CS_VBUF_TOTAL_USERA; u++)
+          if (userarrays[u] != NULL)
+          {
+            for (int c=0; c<userarraycomponents[u]; c++)
+              (*clipped_user[u])[num_clipped_vertices] =
+                (userarrays[u])[i*userarraycomponents[u]+c];
+          }
       }
-      else
-        (*clipped_translate)[i] = i;
+      num_clipped_vertices++;
     }
     else
-      (*clipped_translate)[i] = -1;
+      clip_translate[i] = -1;
+  }
+}
+
+void csGraphics3DOGLCommon::ClipTriangleMeshExact (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector3* vertices,
+    csVector2* texels,
+    csColor* vertex_colors,
+    float** userarrays,
+    int* userarraycomponents,
+    G3DFogInfo* vertex_fog,
+    int& num_clipped_triangles,
+    int& num_clipped_vertices,
+    const csVector3& frust_origin,
+    csPlane3* planes, int num_planes)
+{
+  int i, j;
+
+  // Make sure our worktables are big enough for the clipped mesh.
+  int num_tri = num_triangles*2+50;
+  if (num_tri > clipped_triangles->Length ())
+  {
+    // Use two times as many triangles. Hopefully this is enough.
+    clipped_triangles->SetLength (num_tri);
   }
 
-  // If we have lazy clipping then the number of vertices remains the same.
-  if (!exact_clipping)
-    num_clipped_vertices = num_vertices;
+  num_clipped_triangles = 0;
+
+  csTriangle* clip_triangles = clipped_triangles->GetArray ();
+  int* clip_translate = clipped_translate->GetArray ();
+  int* clip_plane = clipped_plane->GetArray ();
+  csVector3* clip_vertices = clipped_vertices->GetArray ();
+  csVector2* clip_texels = clipped_texels->GetArray ();
+  csColor* clip_colors = clipped_colors->GetArray ();
+  G3DFogInfo* clip_fog = clipped_fog->GetArray ();
 
   // Now clip all triangles.
   for (i = 0 ; i < num_triangles ; i++)
   {
     csTriangle& tri = triangles[i];
-    int cnt = int ((*clipped_translate)[tri.a] != -1)
-        + int ((*clipped_translate)[tri.b] != -1)
-	+ int ((*clipped_translate)[tri.c] != -1);
+    int cnt = int (clip_translate[tri.a] != -1)
+        + int (clip_translate[tri.b] != -1)
+	+ int (clip_translate[tri.c] != -1);
     if (cnt == 0)
     {
       //=====
-      // Here we have a special case where we need to test if the
-      // triangle is cut by the diagonal planes. If yes then we have
-      // to clip anyway.
+      // All three vertices are outside the frustum. It is still
+      // possible that the triangle itself intersects the frustum though.
+      // To eliminate that case we test if all three vertices are on the
+      // same side of some plane. In that case we can safely assume the
+      // triangle is not visible.
       //=====
-      // @@@ WARNING: This test is not 100% correct and it is possible
-      // to reproduce this problem fairly easily. Especially if the
-      // clipper is a triangle in which case this test will not even
-      // function.
-      for (j = 0 ; j < num_diag_planes ; j++)
-      {
-        csPlane3& pl = diag_planes[j];
-        csVector3 v0 = vertices[tri.a] - frust_origin;
-        csVector3 v1 = vertices[tri.b] - frust_origin;
-        csVector3 v2 = vertices[tri.c] - frust_origin;
-	float c0 = pl.Classify (v0);
-	float c1 = pl.Classify (v1);
-	// Set cnt to 1 so that we will clip in the next part.
-	if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
-	float c2 = pl.Classify (v2);
-	if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
-	if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
-      }
+      if (clip_plane[tri.a] != clip_plane[tri.b]
+      		|| clip_plane[tri.a] != clip_plane[tri.c])
+        cnt = 1;
     }
 
     if (cnt == 0)
@@ -3096,9 +3603,9 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //=====
       // Easy case: the triangle is fully in view.
       //=====
-      (*clipped_triangles)[num_clipped_triangles].a = (*clipped_translate)[tri.a];
-      (*clipped_triangles)[num_clipped_triangles].b = (*clipped_translate)[tri.b];
-      (*clipped_triangles)[num_clipped_triangles].c = (*clipped_translate)[tri.c];
+      clip_triangles[num_clipped_triangles].a = clip_translate[tri.a];
+      clip_triangles[num_clipped_triangles].b = clip_translate[tri.b];
+      clip_triangles[num_clipped_triangles].c = clip_translate[tri.c];
       num_clipped_triangles++;
     }
     else
@@ -3106,16 +3613,6 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //=====
       // Difficult case: clipping will result in several triangles.
       //=====
-      if (!exact_clipping)
-      {
-        // If we have lazy clipping then we just add the triangle.
-        (*clipped_triangles)[num_clipped_triangles].a = tri.a;
-        (*clipped_triangles)[num_clipped_triangles].b = tri.b;
-        (*clipped_triangles)[num_clipped_triangles].c = tri.c;
-        num_clipped_triangles++;
-	continue;
-      }
-
       csVector3 poly[100];  // @@@ Arbitrary limit
       static csClipInfo *clipinfo = GetStaticClipInfo1 ();
       poly[0] = vertices[tri.a] - frust_origin;
@@ -3149,22 +3646,22 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
 	{
 	  clipinfo[j].original.idx =
-		(*clipped_translate)[clipinfo[j].original.idx];
+		clip_translate[clipinfo[j].original.idx];
 	}
         else
 	{
 	  float* clipped_userpointers[CS_VBUF_TOTAL_USERA];
 	  for (int u=0; u<CS_VBUF_TOTAL_USERA; u++)
 	    clipped_userpointers[u] = clipped_user[u]->GetArray ();
-	  ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
+	  ResolveVertex (&clipinfo[j], clip_translate,
 	    vertices, texels, vertex_colors,
 	    userarrays, userarraycomponents, vertex_fog,
 	    num_clipped_vertices,
-	    clipped_texels->GetArray (),
-	    clipped_colors->GetArray (),
+	    clip_texels,
+	    clip_colors,
 	    clipped_userpointers,
-	    vertex_fog != NULL ? clipped_fog->GetArray () : NULL);
-	  (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
+	    vertex_fog != NULL ? clip_fog : NULL);
+	  clip_vertices[num_clipped_vertices] = poly[j]+frust_origin;
 	  clipinfo[j].original.idx = num_clipped_vertices;
 	  num_clipped_vertices++;
 	}
@@ -3175,9 +3672,9 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //-----
       for (j = 2 ; j < num_poly ; j++)
       {
-        (*clipped_triangles)[num_clipped_triangles].a = clipinfo[0].original.idx;
-        (*clipped_triangles)[num_clipped_triangles].b = clipinfo[j-1].original.idx;
-        (*clipped_triangles)[num_clipped_triangles].c = clipinfo[j].original.idx;
+        clip_triangles[num_clipped_triangles].a = clipinfo[0].original.idx;
+        clip_triangles[num_clipped_triangles].b = clipinfo[j-1].original.idx;
+        clip_triangles[num_clipped_triangles].c = clipinfo[j].original.idx;
         num_clipped_triangles++;
       }
     }
@@ -3187,9 +3684,537 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 
 ////////////////////////////////////////////////////////////////////
 
+//@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
+/// Static vertex array.
+typedef csGrowingArray<csVector3> dpmesh_tr_verts;
+CS_IMPLEMENT_STATIC_VAR (Get_dpmesh_tr_verts, dpmesh_tr_verts, ())
+/// The perspective corrected vertices.
+typedef csGrowingArray<csVector2> dpmesh_persp;
+CS_IMPLEMENT_STATIC_VAR (Get_dpmesh_persp, dpmesh_persp, ())
+/// Array which indicates which vertices are visible and which are not.
+typedef csGrowingArray<bool> dpmesh_visible;
+CS_IMPLEMENT_STATIC_VAR (Get_dpmesh_visible, dpmesh_visible, ())
+
+static dpmesh_tr_verts *dp_tr_verts = NULL;
+static dpmesh_persp *dp_persp = NULL;
+static dpmesh_visible *dp_visible = NULL;
+
+static void PlaneZ (
+  const csVector3 &u,
+  const csVector3 &v,
+  float z,
+  csVector3 &isect)
+{
+  float denom;
+  csVector3 vu = v - u;
+
+  denom = vu.z;
+  if (denom == 0)
+  {
+    // they are parallel
+    isect = v;
+    return;
+  }
+  float dist = -(u.z + (-z)) / denom;
+  if (dist < -SMALL_EPSILON || dist > 1 + SMALL_EPSILON) return;
+
+  isect = u + dist * vu;
+}
+
+static void PlaneZ (
+  const csVector3 &u,
+  const csVector3 &v,
+  const G3DFogInfo& fu,
+  const G3DFogInfo& fv,
+  float z,
+  csVector3 &isect,
+  G3DFogInfo &fisect)
+{
+  float denom;
+  csVector3 vu = v - u;
+
+  denom = vu.z;
+  if (denom == 0)
+  {
+    // they are parallel
+    isect = v;
+    fisect = fv;
+    return;
+  }
+  float dist = -(u.z + (-z)) / denom;
+  if (dist < -SMALL_EPSILON || dist > 1 + SMALL_EPSILON) return;
+
+  isect = u + dist * vu;
+  fisect.r = fu.r + dist * (fv.r - fu.r);
+  fisect.g = fu.g + dist * (fv.g - fu.g);
+  fisect.b = fu.b + dist * (fv.b - fu.b);
+  fisect.intensity = fu.intensity + dist * (fv.intensity - fu.intensity);
+  fisect.intensity2 = fu.intensity2 + dist * (fv.intensity2 - fu.intensity2);
+}
+
+static bool ClipPolygonZ (
+  csVector3* pverts,
+  csVector3* verts,
+  int &num_verts)
+{
+  int i, i1, num_vertices = num_verts;
+  bool zs, z1s;
+  bool vis[100];
+
+  float z = 0.01;
+
+  for (i = 0; i < num_vertices; i++)
+  {
+    vis[i] = pverts[i].z >= z;
+  }
+
+  // This routine assumes clipping is needed.
+  num_verts = 0;
+
+  i1 = num_vertices - 1;
+
+  for (i = 0; i < num_vertices; i++)
+  {
+    zs = vis[i];
+    z1s = vis[i1];
+
+    if (!z1s && zs)
+    {
+      PlaneZ (pverts[i1], pverts[i], z, verts[num_verts]);
+      num_verts++;
+      verts[num_verts++] = pverts[i];
+    }
+    else if (z1s && !zs)
+    {
+      PlaneZ (pverts[i1], pverts[i], z, verts[num_verts]);
+      num_verts++;
+    }
+    else if (z1s && zs)
+    {
+      verts[num_verts++] = pverts[i];
+    }
+
+    i1 = i;
+  }
+
+  return true;
+}
+
+static bool ClipPolygonZ (
+  csVector3* pverts,
+  csVector3* verts,
+  G3DFogInfo* pfog,
+  G3DFogInfo* fog,
+  int &num_verts)
+{
+  int i, i1, num_vertices = num_verts;
+  bool zs, z1s;
+  bool vis[100];
+
+  float z = 0.01;
+
+  for (i = 0; i < num_vertices; i++)
+  {
+    vis[i] = pverts[i].z >= z;
+  }
+
+  // This routine assumes clipping is needed.
+  num_verts = 0;
+
+  i1 = num_vertices - 1;
+
+  for (i = 0; i < num_vertices; i++)
+  {
+    zs = vis[i];
+    z1s = vis[i1];
+
+    if (!z1s && zs)
+    {
+      PlaneZ (pverts[i1], pverts[i], pfog[i1], pfog[i], z,
+      	verts[num_verts], fog[num_verts]);
+      num_verts++;
+      verts[num_verts] = pverts[i];
+      fog[num_verts] = pfog[i];
+      num_verts++;
+    }
+    else if (z1s && !zs)
+    {
+      PlaneZ (pverts[i1], pverts[i], pfog[i1], pfog[i], z,
+      	verts[num_verts], fog[num_verts]);
+      num_verts++;
+    }
+    else if (z1s && zs)
+    {
+      verts[num_verts] = pverts[i];
+      fog[num_verts] = pfog[i];
+      num_verts++;
+    }
+
+    i1 = i;
+  }
+
+  return true;
+}
+
+struct DTM_Info
+{
+  // For clipping:
+  bool stencil_enabled;
+  bool clip_planes_enabled;
+  int reserved_planes;
+  char how_clip;
+  bool use_lazy_clipping;
+  bool do_plane_clipping;
+  bool do_z_plane_clipping;
+  csPlane3 frustum_planes[100];
+  csVector3 frust_origin;
+  int num_planes;
+  // For effect/technique:
+  iEffectTechnique* technique;
+  iEffectDefinition* effect;
+  // Clipping:
+  int num_clipped_vertices;
+};
+static DTM_Info ci;
+
 
 void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 {
+#if 0
+  FlushDrawPolygon ();
+  csPolArrayPolygonBuffer* polbuf = (csPolArrayPolygonBuffer*)mesh.polybuf;
+
+  if (!dp_tr_verts)
+  {
+    dp_tr_verts = Get_dpmesh_tr_verts ();
+    dp_persp = Get_dpmesh_persp ();
+    dp_visible = Get_dpmesh_visible ();
+  }
+
+  int num_vertices = polbuf->GetVertexCount ();
+  int num_polygons = polbuf->GetPolygonCount ();
+
+  // Update work arrays
+  if (num_vertices > dp_tr_verts->Limit ())
+  {
+    dp_tr_verts->SetLimit (num_vertices);
+    dp_persp->SetLimit (num_vertices);
+    dp_visible->SetLimit (num_vertices);
+  }
+
+  csVector3 *f1 = polbuf->GetVertices ();
+  csVector3 *work_verts;
+  int i;
+
+  // Perform vertex transforms if necessary
+  if (mesh.vertex_mode == G3DPolygonMesh::VM_WORLDSPACE)
+  {
+    for (i = 0 ; i < num_vertices ; i++)
+      (*dp_tr_verts)[i] = o2c * f1[i];
+    work_verts = dp_tr_verts->GetArray();
+  }
+  else
+    work_verts = f1;
+
+  // Perspective project the vertices
+  int width2 = width >> 1;
+  int height2 = height >> 1;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    if (work_verts[i].z >= SMALL_Z)
+    {
+      float iz = aspect / work_verts[i].z;
+      (*dp_persp)[i].x = work_verts[i].x * iz + width2;
+      (*dp_persp)[i].y = work_verts[i].y * iz + height2;
+      (*dp_visible)[i] = true;
+    }
+    else
+      (*dp_visible)[i] = false;
+  }
+
+  csMatrix3 m_cam2tex;
+  csVector3 v_cam2tex;
+
+  G3DPolygonDP poly;
+  poly.mixmode = mesh.mixmode;
+  poly.use_fog = mesh.do_fog;
+  poly.do_fullbright = false;
+  poly.plane.m_cam2tex = &m_cam2tex;
+  poly.plane.v_cam2tex = &v_cam2tex;
+
+iMaterialHandle* prev_mh = NULL;
+uint prev_mixmode = ~0;
+
+  // @@@ We need to restructure a bit here to avoid
+  // unneeded copy of data.
+  for (i = 0 ; i < num_polygons ; i++)
+  {
+    const csPolArrayPolygon& pol = polbuf->GetPolygon (i);
+    poly.num = pol.num_vertices;
+    CS_ASSERT (pol.mat_index >= 0 && pol.mat_index
+    	< polbuf->GetMaterialCount ());
+    poly.mat_handle = polbuf->GetMaterial (pol.mat_index);
+
+    // Transform object to texture transform to
+    // camera to texture transformation here.
+    m_cam2tex = pol.m_obj2tex * o2c.GetT2O ();
+    v_cam2tex = o2c.Other2This (pol.v_obj2tex);
+
+    poly.poly_texture = pol.poly_texture;
+    int j;
+    // @@@ Support mirror here.
+    int vis_cnt = 0;
+    for (j = 0 ; j < poly.num ; j++)
+    {
+      int vidx = pol.vertices[j];
+      if ((*dp_visible)[vidx]) vis_cnt++;
+    }
+    if (vis_cnt == 0) continue;
+    if (vis_cnt < poly.num)
+    {
+      csVector3 p[100];
+      G3DFogInfo f[100];
+      csVector3 clip_p[100];
+      G3DFogInfo clip_f[100];
+      // We need some kind of clipping.
+      for (j = 0 ; j < poly.num ; j++)
+      {
+        int vidx = pol.vertices[j];
+        p[j] = work_verts[vidx];
+	if (mesh.vertex_fog)
+	  f[j] = mesh.vertex_fog[vidx];
+      }
+      if (mesh.vertex_fog)
+        ClipPolygonZ (p, clip_p, f, clip_f, poly.num);
+      else
+        ClipPolygonZ (p, clip_p, poly.num);
+      for (j = 0 ; j < poly.num ; j++)
+      {
+        float iz = aspect / clip_p[j].z;
+        poly.vertices[j].x = clip_p[j].x * iz + width2;
+        poly.vertices[j].y = clip_p[j].y * iz + height2;
+        if (mesh.vertex_fog)
+          poly.fog_info[j] = clip_f[j];
+      }
+    }
+    else
+    {
+      for (j = 0 ; j < poly.num ; j++)
+      {
+        int vidx = pol.vertices[j];
+        poly.vertices[j].x = (*dp_persp)[vidx].x;
+        poly.vertices[j].y = (*dp_persp)[vidx].y;
+        if (mesh.vertex_fog)
+          poly.fog_info[j] = mesh.vertex_fog[vidx];
+      }
+    }
+
+    // Clip polygon. Note that the clipper doesn't care about the
+    // orientation of the polygon vertices. It works just as well in
+    // mirrored mode.
+    if (clipper)
+    {
+      csVector2 clipped_poly[100];
+      int clipped_num;
+      uint8 clip_result;
+      if (mesh.vertex_fog)
+      {
+        csVertexStatus clipped_status[100];
+        clip_result = clipper->Clip (poly.vertices, poly.num,
+      	  clipped_poly, clipped_num, clipped_status);
+        if (clip_result == CS_CLIP_OUTSIDE) continue;
+	if (clip_result != CS_CLIP_INSIDE)
+	{
+#undef INTERPOLATE
+#define INTERPOLATE(comp) fi.comp=f1.comp+t*(f2.comp-f1.comp)
+#define INTERPOLATE2(comp) \
+{ \
+  float v1 = f [edge_from [0]].comp + \
+    t1 * (f [edge_to [0]].comp - f [edge_from [0]].comp); \
+  float v2 = f [edge_from [1]].comp + \
+    t2 * (f [edge_to [1]].comp - f [edge_from [1]].comp); \
+  fi.comp = v1 + t * (v2 - v1); \
+}
+	  G3DFogInfo f[100];
+	  memcpy (f, poly.fog_info, poly.num * sizeof (G3DFogInfo));
+	  for (j = 0 ; j < clipped_num ; j++)
+	  {
+	    G3DFogInfo& fi = poly.fog_info[j];
+	    switch (clipped_status[j].Type)
+	    {
+	      case CS_VERTEX_ORIGINAL:
+	        fi = f[clipped_status[j].Vertex];
+	        break;
+	      case CS_VERTEX_ONEDGE:
+	        {
+		  int vt = clipped_status[j].Vertex;
+		  float t = clipped_status[j].Pos;
+		  const G3DFogInfo& f1 = f[vt];
+		  const G3DFogInfo& f2 = f[(vt+1) % poly.num];
+		  INTERPOLATE (r);
+		  INTERPOLATE (g);
+		  INTERPOLATE (b);
+		  INTERPOLATE (intensity);
+		  INTERPOLATE (intensity2);
+		}
+	        break;
+	      case CS_VERTEX_INSIDE:
+	        {
+        	  float x = clipped_poly[j].x;
+        	  float y = clipped_poly[j].y;
+        	  int edge_from[2], edge_to[2];
+		  int edge = 0;
+		  int k, k1;
+		  k1 = poly.num - 1;
+		  for (k = 0 ; k < poly.num ; k++)
+		  {
+		    if ((y >= poly.vertices[k].y && y <= poly.vertices[k1].y) ||
+			(y <= poly.vertices[k].y && y >= poly.vertices[k1].y))
+		    {
+		      edge_from[edge] = k;
+		      edge_to[edge] = k1;
+		      edge++;
+		      if (edge >= 2) break;
+		    }
+		    k1 = k;
+		  }
+		  if (edge == 1)
+		  {
+		    // Safety if we only found one edge.
+		    edge_from[1] = edge_from[0];
+		    edge_to[1] = edge_to[0];
+		  }
+		  csVector2& A = poly.vertices[edge_from [0]];
+		  csVector2& B = poly.vertices[edge_to [0]];
+		  csVector2& C = poly.vertices[edge_from [1]];
+		  csVector2& D = poly.vertices[edge_to [1]];
+		  float t1 = (y - A.y) / (B.y - A.y);
+		  float t2 = (y - C.y) / (D.y - C.y);
+		  float x1 = A.x + t1 * (B.x - A.x);
+		  float x2 = C.x + t2 * (D.x - C.x);
+		  float t = (x - x1) / (x2 - x1);
+		  INTERPOLATE2 (r);
+		  INTERPOLATE2 (g);
+		  INTERPOLATE2 (b);
+		  INTERPOLATE2 (intensity);
+		  INTERPOLATE2 (intensity2);
+		}
+	        break;
+	    }
+	  }
+#undef INTERPOLATE
+#undef INTERPOLATE2
+	}
+      }
+      else
+      {
+        clip_result = clipper->Clip (poly.vertices, poly.num,
+      	  clipped_poly, clipped_num);
+        if (clip_result == CS_CLIP_OUTSIDE) continue;
+      }
+      if (clip_result != CS_CLIP_INSIDE)
+      {
+        // We need to copy the clipped polygon.
+	memcpy (poly.vertices, clipped_poly, sizeof (csVector2)*2*clipped_num);
+        poly.num = clipped_num;
+      }
+    }
+
+    csVector3& vertex0 = work_verts[pol.vertices[0]];
+    poly.z_value = vertex0.z;
+    o2c.Other2This (pol.normal, vertex0, poly.normal);
+
+    // Draw the polygon
+#if 1
+    if (poly.mixmode != prev_mixmode || poly.mat_handle != prev_mh)
+    {
+      prev_mixmode = poly.mixmode;
+      prev_mh = poly.mat_handle;
+      DrawPolygonStartMaterial (prev_mh, prev_mixmode);
+    }
+    DrawPolygonMaterialOnly (poly);
+#else
+    DrawPolygon (poly);
+#endif
+  }
+  // @@@ We need to restructure a bit here to avoid
+  // unneeded copy of data.
+  for (i = 0 ; i < num_polygons ; i++)
+  {
+    const csPolArrayPolygon& pol = polbuf->GetPolygon (i);
+    poly.num = pol.num_vertices;
+    CS_ASSERT (pol.mat_index >= 0 && pol.mat_index
+    	< polbuf->GetMaterialCount ());
+    poly.mat_handle = polbuf->GetMaterial (pol.mat_index);
+
+    // Transform object to texture transform to
+    // camera to texture transformation here.
+    m_cam2tex = pol.m_obj2tex * o2c.GetT2O ();
+    v_cam2tex = o2c.Other2This (pol.v_obj2tex);
+
+    poly.poly_texture = pol.poly_texture;
+    int j;
+    // @@@ Support mirror here.
+    int vis_cnt = 0;
+    for (j = 0 ; j < poly.num ; j++)
+    {
+      int vidx = pol.vertices[j];
+      if ((*dp_visible)[vidx]) vis_cnt++;
+    }
+    if (vis_cnt == 0) continue;
+    if (vis_cnt < poly.num)
+    {
+      csVector3 p[100];
+      csVector3 clip_p[100];
+      // We need some kind of clipping.
+      for (j = 0 ; j < poly.num ; j++)
+      {
+        int vidx = pol.vertices[j];
+        p[j] = work_verts[vidx];
+      }
+      ClipPolygonZ (p, clip_p, poly.num);
+      for (j = 0 ; j < poly.num ; j++)
+      {
+        float iz = aspect / clip_p[j].z;
+        poly.vertices[j].x = clip_p[j].x * iz + width2;
+        poly.vertices[j].y = clip_p[j].y * iz + height2;
+      }
+    }
+    else
+    {
+      for (j = 0 ; j < poly.num ; j++)
+      {
+        int vidx = pol.vertices[j];
+        poly.vertices[j].x = (*dp_persp)[vidx].x;
+        poly.vertices[j].y = (*dp_persp)[vidx].y;
+      }
+    }
+
+    // Clip polygon. Note that the clipper doesn't care about the
+    // orientation of the polygon vertices. It works just as well in
+    // mirrored mode.
+    if (clipper)
+    {
+      csVector2 clipped_poly[100];
+      int clipped_num;
+      uint8 clip_result = clipper->Clip (poly.vertices, poly.num,
+      	  clipped_poly, clipped_num);
+      if (clip_result == CS_CLIP_OUTSIDE) continue;
+      if (clip_result != CS_CLIP_INSIDE)
+      {
+        // We need to copy the clipped polygon.
+	memcpy (poly.vertices, clipped_poly, sizeof (csVector2)*2*clipped_num);
+        poly.num = clipped_num;
+      }
+    }
+
+    csVector3& vertex0 = work_verts[pol.vertices[0]];
+    poly.z_value = vertex0.z;
+    o2c.Other2This (pol.normal, vertex0, poly.normal);
+
+    DrawPolygonLightmapOnly (poly);
+  }
+#else
   csRef<iVertexBufferManager> vbman = GetVertexBufferManager();
   csRef<iVertexBuffer> vb = vbman->CreateBuffer (0);
 
@@ -3215,10 +4240,17 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   else
     trimesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
 
-  SetupDTMTransforms (trimesh.vertex_mode);
+  bool setup = false;
  
   // Loop over all sub-meshes. Every sub-mesh represents a different material.
+  int total_verts_count = polbuf->GetTotalVertexCount ();
+  csVector3* total_verts = polbuf->GetTotalVertices ();
+  csVector2* total_texels = polbuf->GetTotalTexels ();
+  csVector2* total_lumels = polbuf->GetTotalLumels ();
+
   TrianglesNode *t = polbuf->GetFirst ();
+  vbman->LockBuffer (vb, total_verts, total_texels, NULL,
+      total_verts_count, 0);
   while (t != NULL)
   {
     csTrianglesPerMaterial* tpm = t->info;
@@ -3228,17 +4260,53 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     tpm->ClearVertexArray ();
 
     trimesh.mat_handle = polbuf->GetMaterialPolygon (t);
-    vbman->LockBuffer (vb,
-      tpm->verticesPoints.GetArray (),
-      tpm->texels.GetArray (),
-      NULL,
-      tpm->numVertices, 0);
+    if (!setup)
+    {
+      setup = true;
+      // We need at least one material. That's why we do this here.
+      SetupDTMEffect (trimesh);
+      SetupDTMClipping (trimesh);
+      SetupDTMTransforms (trimesh.vertex_mode);
+      csVector3* work_verts = trimesh.buffers[0]->GetVertices ();
+      csVector2* work_uv_verts = trimesh.buffers[0]->GetTexels ();
+      csColor* work_colors = trimesh.buffers[0]->GetColors ();
+      G3DFogInfo* work_fog = trimesh.vertex_fog;
+      float* work_userarrays[CS_VBUF_TOTAL_USERA];
+      int userarraycomponents[CS_VBUF_TOTAL_USERA];
+      int i;
+      for (i=0; i<CS_VBUF_TOTAL_USERA; i++)
+      {
+        work_userarrays[i] = trimesh.buffers[0]->GetUserArray (i);
+        userarraycomponents[i] = trimesh.buffers[0]->GetUserArrayComponentCount (i);
+      }
+      if (ci.how_clip == '0' || ci.use_lazy_clipping
+        || ci.do_plane_clipping || ci.do_z_plane_clipping)
+      {
+        //ci.use_lazy_clipping = true;//@@@
+        if (ci.use_lazy_clipping)
+        {
+          ClassifyForClipTriangleMesh (
+            total_verts_count, work_verts,
+            ci.frust_origin, ci.frustum_planes, ci.num_planes);
+        }
+        else
+        {
+          ClassifyForClipTriangleMeshExact (
+            total_verts_count,
+            work_verts, work_uv_verts, work_colors, work_userarrays,
+            userarraycomponents,
+            mesh.do_fog ? work_fog : NULL,
+            ci.num_clipped_vertices,
+            ci.frust_origin, ci.frustum_planes, ci.num_planes);
+        }
+      }
+    }
     trimesh.triangles = tpm->triangles.GetArray ();
     trimesh.num_triangles = tpm->numTriangles;
     EffectDrawTriangleMesh (trimesh, false);
-    vbman->UnlockBuffer (vb);
     t = t->next;
   }
+  vbman->UnlockBuffer (vb);
 
   switch (z_buf_mode)
   {
@@ -3253,9 +4321,12 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 
   trimesh.use_vertex_color = false;
   trimesh.mat_handle = NULL;
-  if (m_renderstate.lighting)
+  SetupDTMEffect (trimesh);
+  TrianglesSuperLightmapNode *sln = polbuf->GetFirstTrianglesSLM ();
+  if (m_renderstate.lighting && sln)
   {
-    TrianglesSuperLightmapNode *sln = polbuf->GetFirstTrianglesSLM ();
+    vbman->LockBuffer (vb, total_verts, total_lumels, NULL,
+          total_verts_count, 0);
     bool dirty = polbuf->superLM.GetLightmapsDirtyState ();
     bool modified = false;
     while (sln != NULL)
@@ -3265,20 +4336,14 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       lightmap_cache->Cache (tplm, dirty, &modified);
       if (!tplm->cacheData->IsUnlit ())
       {
-        vbman->LockBuffer (vb,
-	  tplm->vec_vertices.GetArray (),
-	  tplm->texels.GetArray (),
-          NULL,
-	  tplm->numVertices, 0);
-
         trimesh.triangles = tplm->triangles.GetArray ();
         trimesh.num_triangles = tplm->numTriangles;
 
         EffectDrawTriangleMesh (trimesh, false, tplm->cacheData->Handle);
-        vbman->UnlockBuffer (vb);
       }
       sln = sln->prev;
     }
+    vbman->UnlockBuffer (vb);
     polbuf->superLM.ClearLightmapsDirty ();
   }
 
@@ -3298,6 +4363,8 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   }
 
   RestoreDTMTransforms ();
+  RestoreDTMClipping ();
+#endif
 }
 
 csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
@@ -3730,75 +4797,9 @@ void csGraphics3DOGLCommon::RestoreDTMTransforms ()
   glPopMatrix ();
 }
 
-void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
+void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
 {
-#if 0
-  // The new effects support is atm not perfect. it supports not everything
-  // correctly yet (like, transparency in mixmode) and thus
-  // is faster, but looks worse than OldDrawTriangleMesh().
-  OldDrawTriangleMesh (mesh);
-  return;
-#else
-  EffectDrawTriangleMesh (mesh);
-#endif
-}
-
-void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
-  G3DTriangleMesh& mesh, bool setup_trans,
-  GLuint lightmap, csVector2* lightmapcoords)
-{
-  if (mesh.do_fog)
-  {
-    // Because EffectDrawTriangleMesh doesn't seem to work properly with
-    // fog I switch back to OldDrawTriangleMesh in case of fog.
-    OldDrawTriangleMesh (mesh, setup_trans);
-    return;
-  }
-
-  if (!lightmap)
-  {
-    if (!mesh.mat_handle)
-    {
-      // If there is no material (which is legal) we temporarily use
-      // OldDrawTriangleMesh().
-      OldDrawTriangleMesh (mesh, setup_trans);
-      return;
-    }
-  }
-  int i, l;
-
-  iMaterial* material = NULL;
-  iEffectDefinition* effect = NULL;
-  iEffectTechnique* technique = NULL;
-  if (mesh.mat_handle)
-  {
-    material = ((csMaterialHandle*)(mesh.mat_handle))->GetMaterial();
-    effect = material->GetEffect();
-    technique = effectserver->SelectAppropriateTechnique (effect);
-  }
-  else
-  {
-    effect = SeparateLightmapStockEffect;
-    technique = effectserver->SelectAppropriateTechnique (effect);
-  }
-
-  if (!technique)
-  {
-    technique = GetStockTechnique (mesh);
-    if (!technique)
-    {
-      OldDrawTriangleMesh (mesh, setup_trans); // Should never get here.
-      return;
-    }
-  }
-
-  FlushDrawPolygon ();
-
-  int num_vertices = mesh.buffers[0]->GetVertexCount ();
-  int num_triangles = mesh.num_triangles;
-
-  bool stencil_enabled = false;
-  bool clip_planes_enabled = false;
+  int i;
 
   //===========
   // First we are going to find out what kind of clipping (if any)
@@ -3808,16 +4809,16 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   // the current z-buf render mode is, and what the settings are to use
   // for the clipper on the current type of hardware (the clip_... arrays).
   //===========
-  char how_clip = OPENGL_CLIP_NONE;
-  bool use_lazy_clipping = false;
-  bool do_plane_clipping = false;
-  bool do_z_plane_clipping = false;
+  ci.how_clip = OPENGL_CLIP_NONE;
+  ci.use_lazy_clipping = false;
+  ci.do_plane_clipping = false;
+  ci.do_z_plane_clipping = false;
 
   // First we see how many additional planes we might need because of
   // z-plane clipping and/or near-plane clipping. These additional planes
   // will not be usable for portal clipping (if we're using OpenGL plane
   // clipping).
-  int reserved_planes =
+  ci.reserved_planes =
     int (do_near_plane && mesh.clip_plane != CS_CLIP_NOT) +
     int (mesh.clip_z_plane != CS_CLIP_NOT);
 
@@ -3827,8 +4828,9 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
     // In some z-buf modes we cannot use clipping modes that depend on
     // zbuffer ('n','N', 'z', or 'Z').
-    bool no_zbuf_clipping = (technique->GetClientFlags()
-      & EFFECTFLAG_RUINSZCLIPPING)
+    bool no_zbuf_clipping =
+    	(ci.technique
+		&& (ci.technique->GetClientFlags() & EFFECTFLAG_RUINSZCLIPPING))
       || (z_buf_mode == CS_ZBUF_NONE || z_buf_mode == CS_ZBUF_FILL ||
       z_buf_mode == CS_ZBUF_FILLONLY);
 
@@ -3856,66 +4858,182 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         continue;
       // We cannot use s or S if effect uses stencil.
       if ((c == 's' || c == 'S')
-          && (technique->GetClientFlags() & EFFECTFLAG_RUINSSCLIPPING))
+          && (ci.technique
+	  && (ci.technique->GetClientFlags() & EFFECTFLAG_RUINSSCLIPPING)))
         continue;
       // We cannot use p or P if the clipper has more vertices than the
       // number of hardware planes minus one (for the view plane).
       if ((c == 'p' || c == 'P') &&
           clipper->GetVertexCount ()
-	  >= GLCaps.nr_hardware_planes-reserved_planes)
+	  >= GLCaps.nr_hardware_planes-ci.reserved_planes)
         continue;
-      how_clip = c;
+      ci.how_clip = c;
       break;
     }
-    if (how_clip != '0' && toupper (how_clip) == how_clip)
+    if (ci.how_clip != '0' && toupper (ci.how_clip) == ci.how_clip)
     {
-      use_lazy_clipping = true;
-      how_clip = tolower (how_clip);
+      ci.use_lazy_clipping = true;
+      ci.how_clip = tolower (ci.how_clip);
     }
   }
 
   // Check for the near-plane.
   if (do_near_plane && mesh.clip_plane != CS_CLIP_NOT)
   {
-    do_plane_clipping = true;
+    ci.do_plane_clipping = true;
     // If we must do clipping to the near plane then we cannot use
     // lazy clipping.
-    use_lazy_clipping = false;
+    ci.use_lazy_clipping = false;
     // If we are doing plane clipping already then we don't have
     // to do additional software plane clipping as the OpenGL plane
     // clipper can do this too.
-    if (how_clip == 'p')
+    if (ci.how_clip == 'p')
     {
-      do_plane_clipping = false;
+      ci.do_plane_clipping = false;
     }
   }
 
   // Check for the z-plane.
   if (mesh.clip_z_plane != CS_CLIP_NOT)
   {
-    do_z_plane_clipping = true;
+    ci.do_z_plane_clipping = true;
     // If hardware requires clipping to the z-plane (because it
     // crashes otherwise) we have to disable lazy clipping.
     // @@@
     if (true)
     {
-      use_lazy_clipping = false;
+      ci.use_lazy_clipping = false;
     }
     else
     {
       // If we are doing plane clipping already then we don't have
       // to do additional software plane clipping as the OpenGL plane
       // clipper can do this too.
-      if (how_clip == 'p')
+      if (ci.how_clip == 'p')
       {
-        do_z_plane_clipping = false;
+        ci.do_z_plane_clipping = false;
       }
     }
   }
 
   //===========
+  // Here we perform lazy or software clipping if needed.
+  //===========
+  if (ci.how_clip == '0' || ci.use_lazy_clipping
+    || ci.do_plane_clipping || ci.do_z_plane_clipping)
+  {
+    SetupClippingPlanes (ci.frustum_planes, ci.num_planes,
+	ci.frust_origin,
+	mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE,
+	mesh.do_mirror, ci.do_plane_clipping, ci.do_z_plane_clipping,
+	ci.how_clip == '0' || ci.use_lazy_clipping);
+  }
+
+  //===========
+  // First setup the clipper that we need.
+  //===========
+  if (ci.how_clip == 's')
+  {
+    SetupStencil ();
+    ci.stencil_enabled = true;
+    // Use the stencil area.
+    statecache->Enable_GL_STENCIL_TEST ();
+    statecache->SetStencilFunc (GL_EQUAL, 1, 1);
+    statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+  }
+  else if (ci.how_clip == 'p')
+  {
+    SetupClipPlanes (do_near_plane && mesh.clip_plane != CS_CLIP_NOT,
+      mesh.clip_z_plane != CS_CLIP_NOT);
+    ci.clip_planes_enabled = true;
+    for (i = 0 ; i < frustum.GetVertexCount ()+ci.reserved_planes ; i++)
+      glEnable ((GLenum)(GL_CLIP_PLANE0+i));
+  }
+}
+
+void csGraphics3DOGLCommon::RestoreDTMClipping ()
+{
+  int i;
+  if (ci.stencil_enabled)
+    statecache->Disable_GL_STENCIL_TEST ();
+  if (ci.clip_planes_enabled)
+    for (i = 0 ; i < frustum.GetVertexCount ()+ci.reserved_planes ; i++)
+      glDisable ((GLenum)(GL_CLIP_PLANE0+i));
+}
+
+void csGraphics3DOGLCommon::SetupDTMEffect (G3DTriangleMesh& mesh)
+{
+  if (mesh.mat_handle)
+  {
+    iMaterial* material = ((csMaterialHandle*)(mesh.mat_handle))->GetMaterial();
+    ci.effect = material->GetEffect();
+    ci.technique = effectserver->SelectAppropriateTechnique (ci.effect);
+  }
+  else
+  {
+    ci.effect = SeparateLightmapStockEffect;
+    ci.technique = effectserver->SelectAppropriateTechnique (ci.effect);
+  }
+
+  if (!ci.technique)
+  {
+    ci.technique = GetStockTechnique (mesh);
+  }
+}
+
+void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
+{
+#if 0
+  // The new effects support is atm not perfect. it supports not everything
+  // correctly yet (like, transparency in mixmode) and thus
+  // is faster, but looks worse than OldDrawTriangleMesh().
+  OldDrawTriangleMesh (mesh);
+  return;
+#else
+  EffectDrawTriangleMesh (mesh);
+#endif
+}
+
+void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
+  G3DTriangleMesh& mesh, bool setup,
+  GLuint lightmap, csVector2* lightmapcoords)
+{
+  if (mesh.do_fog)
+  {
+    // Because EffectDrawTriangleMesh doesn't seem to work properly with
+    // fog I switch back to OldDrawTriangleMesh in case of fog.
+    OldDrawTriangleMesh (mesh, setup);
+    return;
+  }
+
+  if (!lightmap)
+  {
+    if (!mesh.mat_handle)
+    {
+      // If there is no material (which is legal) we temporarily use
+      // OldDrawTriangleMesh().
+      OldDrawTriangleMesh (mesh, setup);
+      return;
+    }
+  }
+  int i, l;
+
+  if (setup) SetupDTMEffect (mesh);
+  if (!ci.technique)
+  {
+    OldDrawTriangleMesh (mesh, setup); // Should never get here.
+    return;
+  }
+
+  FlushDrawPolygon ();
+
+  if (setup) SetupDTMClipping (mesh);
+
+  //===========
   // Update work tables.
   //===========
+  int num_vertices = mesh.buffers[0]->GetVertexCount ();
+  int num_triangles = mesh.num_triangles;
   if (num_vertices > tr_verts->Length ())
   {
     tr_verts->SetLength (num_vertices);
@@ -3986,29 +5104,39 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   //===========
   // Here we perform lazy or software clipping if needed.
   //===========
-  if (how_clip == '0' || use_lazy_clipping
-    || do_plane_clipping || do_z_plane_clipping)
+  if (ci.how_clip == '0' || ci.use_lazy_clipping
+    || ci.do_plane_clipping || ci.do_z_plane_clipping)
   {
-    ClipTriangleMesh (
-      num_triangles,
-      num_vertices,
-      triangles,
-      work_verts,
-      work_uv_verts,
-      work_colors,
-      work_userarrays,
-      userarraycomponents,
-      mesh.do_fog ? work_fog : NULL,
-      num_triangles,
-      num_vertices,
-      mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE,
-      mesh.do_mirror,
-      !use_lazy_clipping,
-      do_plane_clipping,
-      do_z_plane_clipping,
-      how_clip == '0' || use_lazy_clipping);
-    if (!use_lazy_clipping)
+    //ci.use_lazy_clipping = true;//@@@
+    if (ci.use_lazy_clipping)
     {
+      if (setup) ClassifyForClipTriangleMesh (
+        num_vertices, work_verts,
+        ci.frust_origin, ci.frustum_planes, ci.num_planes);
+      ClipTriangleMesh (
+        num_triangles, num_vertices, triangles,
+        work_verts, num_triangles,
+        ci.frust_origin, ci.frustum_planes, ci.num_planes);
+    }
+    else
+    {
+      if (setup)
+        ClassifyForClipTriangleMeshExact (
+          num_vertices,
+          work_verts, work_uv_verts, work_colors, work_userarrays,
+          userarraycomponents,
+          mesh.do_fog ? work_fog : NULL,
+          ci.num_clipped_vertices,
+          ci.frust_origin, ci.frustum_planes, ci.num_planes);
+      int old_num_vertices = num_vertices;
+      num_vertices = ci.num_clipped_vertices;
+      ClipTriangleMeshExact (
+        num_triangles, old_num_vertices, triangles,
+        work_verts, work_uv_verts, work_colors, work_userarrays,
+        userarraycomponents,
+        mesh.do_fog ? work_fog : NULL,
+        num_triangles, num_vertices,
+        ci.frust_origin, ci.frustum_planes, ci.num_planes);
       work_verts = clipped_vertices->GetArray ();
       work_uv_verts = clipped_texels->GetArray ();
       work_colors = clipped_colors->GetArray ();
@@ -4026,30 +5154,9 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   }
 
   //===========
-  // First setup the clipper that we need.
-  //===========
-  if (how_clip == 's')
-  {
-    SetupStencil ();
-    stencil_enabled = true;
-    // Use the stencil area.
-    statecache->Enable_GL_STENCIL_TEST ();
-    statecache->SetStencilFunc (GL_EQUAL, 1, 1);
-    statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-  }
-  else if (how_clip == 'p')
-  {
-    SetupClipPlanes (do_near_plane && mesh.clip_plane != CS_CLIP_NOT,
-      mesh.clip_z_plane != CS_CLIP_NOT);
-    clip_planes_enabled = true;
-    for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
-      glEnable ((GLenum)(GL_CLIP_PLANE0+i));
-  }
-
-  //===========
   // Setup transforms.
   //===========
-  if (setup_trans) SetupDTMTransforms (mesh.vertex_mode);
+  if (setup) SetupDTMTransforms (mesh.vertex_mode);
   SetMirrorMode (mesh.do_mirror);
 
   //===========
@@ -4065,9 +5172,9 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   //CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Mårten Svanfeldt
 
   int maxlayers = 0;
-  for (int p=0 ; p<technique->GetPassCount () ; p++)
+  for (int p=0 ; p<ci.technique->GetPassCount () ; p++)
   {
-    iEffectPass* pass = technique->GetPass (p);
+    iEffectPass* pass = ci.technique->GetPass (p);
 
     //get rendererdata to use
     csRef<csOpenGlEffectPassData> pass_data =
@@ -4090,7 +5197,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         if (c->efvariableType == CS_EFVARIABLETYPE_FLOAT)
         {
           //set a float
-          float var = effect->GetVariableFloat(c->variableID);
+          float var = ci.effect->GetVariableFloat(c->variableID);
           glProgramLocalParameter4fARB( GL_VERTEX_PROGRAM_ARB,
             c->constantNumber, var, var, var, var);
 
@@ -4098,7 +5205,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         else if  (c->efvariableType == CS_EFVARIABLETYPE_VECTOR4)
         {
           //set a vec4
-          csEffectVector4 vec = effect->GetVariableVector4(c->variableID);
+          csEffectVector4 vec = ci.effect->GetVariableVector4(c->variableID);
           glProgramLocalParameter4fARB( GL_VERTEX_PROGRAM_ARB,
               c->constantNumber, vec.x, vec.y, vec.z, vec.w);
         }
@@ -4290,20 +5397,18 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     }
   }
 
-  if (stencil_enabled)
-    statecache->Disable_GL_STENCIL_TEST ();
-  if (clip_planes_enabled)
-    for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
-      glDisable ((GLenum)(GL_CLIP_PLANE0+i));
-
-  if (setup_trans) RestoreDTMTransforms ();
+  if (setup)
+  {
+    RestoreDTMClipping ();
+    RestoreDTMTransforms ();
+  }
 
   //glPopClientAttrib();
   //glPopAttrib();
 }
 
 void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
-		bool setup_trans)
+		bool setup)
 {
 #if CS_DEBUG
   // Check if the vertex buffers are locked.
@@ -4319,115 +5424,11 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
   FlushDrawPolygon ();
   //iTextureHandle *tex = mesh.mat_handle?mesh.mat_handle->GetTexture():NULL;
 
-  bool stencil_enabled = false;
-  bool clip_planes_enabled = false;
-
-  //===========
-  // First we are going to find out what kind of clipping (if any)
-  // we need. This depends on various factors including what the engine
-  // says about the mesh (the clip_portal and clip_plane flags in the
-  // mesh), what the current clipper is (the current cliptype), what
-  // the current z-buf render mode is, and what the settings are to use
-  // for the clipper on the current type of hardware (the clip_... arrays).
-  //===========
-  char how_clip = OPENGL_CLIP_NONE;
-  bool use_lazy_clipping = false;
-  bool do_plane_clipping = false;
-  bool do_z_plane_clipping = false;
-
-  // First we see how many additional planes we might need because of
-  // z-plane clipping and/or near-plane clipping. These additional planes
-  // will not be usable for portal clipping (if we're using OpenGL plane
-  // clipping).
-  int reserved_planes =
-    int (do_near_plane && mesh.clip_plane != CS_CLIP_NOT) +
-  int (mesh.clip_z_plane != CS_CLIP_NOT);
-
-  if (mesh.clip_portal != CS_CLIP_NOT)
+  if (setup)
   {
-    // Some clipping may be required.
-
-    // In some z-buf modes we cannot use clipping modes that depend on
-    // zbuffer ('n','N', 'z', or 'Z').
-    bool no_zbuf_clipping = (z_buf_mode == CS_ZBUF_NONE
-      || z_buf_mode == CS_ZBUF_FILL || z_buf_mode == CS_ZBUF_FILLONLY);
-
-    // Select the right clipping mode variable depending on the
-    // type of clipper.
-    int ct = cliptype;
-    // If clip_portal in the mesh indicates that we might need toplevel
-    // clipping then we do as if the current clipper type is toplevel.
-    if (mesh.clip_portal == CS_CLIP_TOPLEVEL) ct = CS_CLIPPER_TOPLEVEL;
-    char* clip_modes;
-    switch (ct)
-    {
-      case CS_CLIPPER_OPTIONAL: clip_modes = clip_optional; break;
-      case CS_CLIPPER_REQUIRED: clip_modes = clip_required; break;
-      case CS_CLIPPER_TOPLEVEL: clip_modes = clip_outer; break;
-      default: clip_modes = clip_optional;
-    }
-
-    // Go through all the modes and select the first one that is appropriate.
-    int i;
-    for (i = 0 ; i < 3 ; i++)
-    {
-      char c = clip_modes[i];
-      // We cannot use n,N,z, or Z if no_zbuf_clipping is true.
-      if ((c == 'n' || c == 'N' || c == 'z' || c == 'Z') && no_zbuf_clipping)
-        continue;
-      // We cannot use p or P if the clipper has more vertices than the
-      // number of hardware planes minus one (for the view plane).
-      if ((c == 'p' || c == 'P') &&
-          clipper->GetVertexCount ()
-      >= GLCaps.nr_hardware_planes-reserved_planes)
-        continue;
-      how_clip = c;
-      break;
-    }
-    if (how_clip != '0' && toupper (how_clip) == how_clip)
-    {
-      use_lazy_clipping = true;
-      how_clip = tolower (how_clip);
-    }
-  }
-
-  // Check for the near-plane.
-  if (do_near_plane && mesh.clip_plane != CS_CLIP_NOT)
-  {
-    do_plane_clipping = true;
-    // If we must do clipping to the near plane then we cannot use
-    // lazy clipping.
-    use_lazy_clipping = false;
-    // If we are doing plane clipping already then we don't have
-    // to do additional software plane clipping as the OpenGL plane
-    // clipper can do this too.
-    if (how_clip == 'p')
-    {
-      do_plane_clipping = false;
-    }
-  }
-
-  // Check for the z-plane.
-  if (mesh.clip_z_plane != CS_CLIP_NOT)
-  {
-    do_z_plane_clipping = true;
-    // If hardware requires clipping to the z-plane (because it
-    // crashes otherwise) we have to disable lazy clipping.
-    // @@@
-    if (true)
-    {
-      use_lazy_clipping = false;
-    }
-    else
-    {
-      // If we are doing plane clipping already then we don't have
-      // to do additional software plane clipping as the OpenGL plane
-      // clipper can do this too.
-      if (how_clip == 'p')
-      {
-        do_z_plane_clipping = false;
-      }
-    }
+    ci.technique = NULL;
+    ci.effect = NULL;
+    SetupDTMClipping (mesh);
   }
 
   int i, k;
@@ -4498,29 +5499,38 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
   //===========
   // Here we perform lazy or software clipping if needed.
   //===========
-  if (how_clip == '0' || use_lazy_clipping
-    || do_plane_clipping || do_z_plane_clipping)
+  if (ci.how_clip == '0' || ci.use_lazy_clipping
+    || ci.do_plane_clipping || ci.do_z_plane_clipping)
   {
-    ClipTriangleMesh (
-	num_triangles,
-	num_vertices,
-	triangles,
-	work_verts,
-	work_uv_verts,
-	work_colors,
-	NULL,
-	NULL,
-	mesh.do_fog ? work_fog : NULL,
-	num_triangles,
-	num_vertices,
-	mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE,
-	mesh.do_mirror,
-	!use_lazy_clipping,
-	do_plane_clipping,
-	do_z_plane_clipping,
-	how_clip == '0' || use_lazy_clipping);
-    if (!use_lazy_clipping)
+    //ci.use_lazy_clipping = true;//@@@
+    if (ci.use_lazy_clipping)
     {
+      if (setup) ClassifyForClipTriangleMesh (
+        num_vertices, work_verts,
+        ci.frust_origin, ci.frustum_planes, ci.num_planes);
+      ClipTriangleMesh (
+	num_triangles, num_vertices, triangles,
+	work_verts, num_triangles,
+        ci.frust_origin, ci.frustum_planes, ci.num_planes);
+    }
+    else
+    {
+      if (setup)
+        ClassifyForClipTriangleMeshExact (
+          num_vertices,
+          work_verts, work_uv_verts, work_colors, NULL,
+          NULL,
+          mesh.do_fog ? work_fog : NULL,
+          ci.num_clipped_vertices,
+          ci.frust_origin, ci.frustum_planes, ci.num_planes);
+      int old_num_vertices = num_vertices;
+      num_vertices = ci.num_clipped_vertices;
+      ClipTriangleMeshExact (
+	num_triangles, old_num_vertices, triangles,
+	work_verts, work_uv_verts, work_colors, NULL, NULL,
+	mesh.do_fog ? work_fog : NULL,
+	num_triangles, num_vertices,
+        ci.frust_origin, ci.frustum_planes, ci.num_planes);
       work_verts = clipped_vertices->GetArray ();
       work_uv_verts = clipped_texels->GetArray ();
       work_colors = clipped_colors->GetArray ();
@@ -4531,30 +5541,9 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
   }
 
   //===========
-  // First setup the clipper that we need.
-  //===========
-  if (how_clip == 's')
-  {
-    SetupStencil ();
-    stencil_enabled = true;
-    // Use the stencil area.
-    statecache->Enable_GL_STENCIL_TEST ();
-    statecache->SetStencilFunc (GL_EQUAL, 1, 1);
-    statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-  }
-  else if (how_clip == 'p')
-  {
-    SetupClipPlanes (do_near_plane && mesh.clip_plane != CS_CLIP_NOT,
-      mesh.clip_z_plane != CS_CLIP_NOT);
-    clip_planes_enabled = true;
-    for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
-      glEnable ((GLenum)(GL_CLIP_PLANE0+i));
-  }
-
-  //===========
   // set up world->camera transform, if needed
   //===========
-  if (setup_trans) SetupDTMTransforms (mesh.vertex_mode);
+  if (setup) SetupDTMTransforms (mesh.vertex_mode);
   SetMirrorMode (mesh.do_mirror);
 
   //===========
@@ -4835,16 +5824,11 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
       statecache->SetShadeModel (GL_FLAT);
   }
 
-  if (setup_trans) RestoreDTMTransforms ();
-
-  //===========
-  // Disable/cleanup all clipping stuff.
-  //===========
-  if (stencil_enabled)
-    statecache->Disable_GL_STENCIL_TEST ();
-  if (clip_planes_enabled)
-    for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
-      glDisable ((GLenum)(GL_CLIP_PLANE0+i));
+  if (setup)
+  {
+    RestoreDTMTransforms ();
+    RestoreDTMClipping ();
+  }
 
   if (debug_edges)
     DrawTriangleMeshEdges (mesh);
@@ -4857,123 +5841,18 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
 }
 
 void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
-		bool setup_trans)
+		bool setup)
 {
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
 
   FlushDrawPolygon ();
 
-  bool stencil_enabled = false;
-  bool clip_planes_enabled = false;
-
-  //===========
-  // First we are going to find out what kind of clipping (if any)
-  // we need. This depends on various factors including what the engine
-  // says about the mesh (the clip_portal and clip_plane flags in the
-  // mesh), what the current clipper is (the current cliptype), what
-  // the current z-buf render mode is, and what the settings are to use
-  // for the clipper on the current type of hardware (the clip_... arrays).
-  //===========
-  char how_clip = OPENGL_CLIP_NONE;
-  bool use_lazy_clipping = false;
-  bool do_plane_clipping = false;
-  bool do_z_plane_clipping = false;
-
-  // First we see how many additional planes we might need because of
-  // z-plane clipping and/or near-plane clipping. These additional planes
-  // will not be usable for portal clipping (if we're using OpenGL plane
-  // clipping).
-  int reserved_planes =
-    int (do_near_plane && mesh.clip_plane != CS_CLIP_NOT) +
-  int (mesh.clip_z_plane != CS_CLIP_NOT);
-
-  if (mesh.clip_portal != CS_CLIP_NOT)
+  if (setup)
   {
-    // Some clipping may be required.
-
-    // In some z-buf modes we cannot use clipping modes that depend on
-    // zbuffer ('n','N', 'z', or 'Z').
-    bool no_zbuf_clipping = (z_buf_mode == CS_ZBUF_NONE
-      || z_buf_mode == CS_ZBUF_FILL || z_buf_mode == CS_ZBUF_FILLONLY);
-
-    // Select the right clipping mode variable depending on the
-    // type of clipper.
-    int ct = cliptype;
-    // If clip_portal in the mesh indicates that we might need toplevel
-    // clipping then we do as if the current clipper type is toplevel.
-    if (mesh.clip_portal == CS_CLIP_TOPLEVEL) ct = CS_CLIPPER_TOPLEVEL;
-    char* clip_modes;
-    switch (ct)
-    {
-      case CS_CLIPPER_OPTIONAL: clip_modes = clip_optional; break;
-      case CS_CLIPPER_REQUIRED: clip_modes = clip_required; break;
-      case CS_CLIPPER_TOPLEVEL: clip_modes = clip_outer; break;
-      default: clip_modes = clip_optional;
-    }
-
-    // Go through all the modes and select the first one that is appropriate.
-    int i;
-    for (i = 0 ; i < 3 ; i++)
-    {
-      char c = clip_modes[i];
-      // We cannot use n,N,z, or Z if no_zbuf_clipping is true.
-      if ((c == 'n' || c == 'N' || c == 'z' || c == 'Z') && no_zbuf_clipping)
-        continue;
-      // We cannot use p or P if the clipper has more vertices than the
-      // number of hardware planes minus one (for the view plane).
-      if ((c == 'p' || c == 'P') &&
-          clipper->GetVertexCount ()
-      >= GLCaps.nr_hardware_planes-reserved_planes)
-        continue;
-      how_clip = c;
-      break;
-    }
-    if (how_clip != '0' && toupper (how_clip) == how_clip)
-    {
-      use_lazy_clipping = true;
-      how_clip = tolower (how_clip);
-    }
+    ci.technique = NULL;
+    ci.effect = NULL;
+    SetupDTMClipping (mesh);
   }
-
-  // Check for the near-plane.
-  if (do_near_plane && mesh.clip_plane != CS_CLIP_NOT)
-  {
-    do_plane_clipping = true;
-    // If we must do clipping to the near plane then we cannot use
-    // lazy clipping.
-    use_lazy_clipping = false;
-    // If we are doing plane clipping already then we don't have
-    // to do additional software plane clipping as the OpenGL plane
-    // clipper can do this too.
-    if (how_clip == 'p')
-    {
-      do_plane_clipping = false;
-    }
-  }
-
-  // Check for the z-plane.
-  if (mesh.clip_z_plane != CS_CLIP_NOT)
-  {
-    do_z_plane_clipping = true;
-    // If hardware requires clipping to the z-plane (because it
-    // crashes otherwise) we have to disable lazy clipping.
-    // @@@
-    if (true)
-    {
-      use_lazy_clipping = false;
-    }
-    else
-    {
-      // If we are doing plane clipping already then we don't have
-      // to do additional software plane clipping as the OpenGL plane
-      // clipper can do this too.
-      if (how_clip == 'p')
-      {
-        do_z_plane_clipping = false;
-      }
-    }
-  }
-
   int i;
 
   //===========
@@ -5002,29 +5881,38 @@ void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
   //===========
   // Here we perform lazy or software clipping if needed.
   //===========
-  if (how_clip == '0' || use_lazy_clipping
-    || do_plane_clipping || do_z_plane_clipping)
+  if (ci.how_clip == '0' || ci.use_lazy_clipping
+    || ci.do_plane_clipping || ci.do_z_plane_clipping)
   {
-    ClipTriangleMesh (
-	num_triangles,
-	num_vertices,
-	triangles,
-	work_verts,
-	work_uv_verts,
-	work_colors,
-	NULL,
-	NULL,
-	mesh.do_fog ? work_fog : NULL,
-	num_triangles,
-	num_vertices,
-	mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE,
-	mesh.do_mirror,
-	!use_lazy_clipping,
-	do_plane_clipping,
-	do_z_plane_clipping,
-	how_clip == '0' || use_lazy_clipping);
-    if (!use_lazy_clipping)
+    //ci.use_lazy_clipping = true;//@@@
+    if (ci.use_lazy_clipping)
     {
+      if (setup) ClassifyForClipTriangleMesh (
+        num_vertices, work_verts,
+        ci.frust_origin, ci.frustum_planes, ci.num_planes);
+      ClipTriangleMesh (
+	num_triangles, num_vertices, triangles,
+	work_verts, num_triangles,
+        ci.frust_origin, ci.frustum_planes, ci.num_planes);
+    }
+    else
+    {
+      if (setup)
+        ClassifyForClipTriangleMeshExact (
+          num_vertices,
+          work_verts, work_uv_verts, work_colors, NULL,
+          NULL,
+          mesh.do_fog ? work_fog : NULL,
+          ci.num_clipped_vertices,
+          ci.frust_origin, ci.frustum_planes, ci.num_planes);
+      int old_num_vertices = num_vertices;
+      num_vertices = ci.num_clipped_vertices;
+      ClipTriangleMeshExact (
+	num_triangles, old_num_vertices, triangles,
+	work_verts, work_uv_verts, work_colors, NULL, NULL,
+	mesh.do_fog ? work_fog : NULL,
+	num_triangles, num_vertices,
+        ci.frust_origin, ci.frustum_planes, ci.num_planes);
       work_verts = clipped_vertices->GetArray ();
       work_uv_verts = clipped_texels->GetArray ();
       work_colors = clipped_colors->GetArray ();
@@ -5035,30 +5923,9 @@ void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
   }
 
   //===========
-  // First setup the clipper that we need.
-  //===========
-  if (how_clip == 's')
-  {
-    SetupStencil ();
-    stencil_enabled = true;
-    // Use the stencil area.
-    statecache->Enable_GL_STENCIL_TEST ();
-    statecache->SetStencilFunc (GL_EQUAL, 1, 1);
-    statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-  }
-  else if (how_clip == 'p')
-  {
-    SetupClipPlanes (do_near_plane && mesh.clip_plane != CS_CLIP_NOT,
-      mesh.clip_z_plane != CS_CLIP_NOT);
-    clip_planes_enabled = true;
-    for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
-      glEnable ((GLenum)(GL_CLIP_PLANE0+i));
-  }
-
-  //===========
   // set up world->camera transform, if needed
   //===========
-  if (setup_trans) SetupDTMTransforms (mesh.vertex_mode);
+  if (setup) SetupDTMTransforms (mesh.vertex_mode);
   SetMirrorMode (mesh.do_mirror);
 
   SetGLZBufferFlagsPass2 (z_buf_mode, true);
@@ -5075,16 +5942,11 @@ void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
   glColorPointer (3, GL_FLOAT, sizeof (G3DFogInfo), &work_fog[0].r);
   glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
-  if (setup_trans) RestoreDTMTransforms ();
-
-  //===========
-  // Disable/cleanup all clipping stuff.
-  //===========
-  if (stencil_enabled)
-    statecache->Disable_GL_STENCIL_TEST ();
-  if (clip_planes_enabled)
-    for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
-      glDisable ((GLenum)(GL_CLIP_PLANE0+i));
+  if (setup)
+  {
+    RestoreDTMTransforms ();
+    RestoreDTMClipping ();
+  }
 
   SetMirrorMode (false);
 }

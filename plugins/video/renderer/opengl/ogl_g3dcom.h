@@ -36,6 +36,7 @@
 #include "csutil/cfgacc.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
+#include "plugins/video/renderer/common/polybuf.h"
 #include "ogl_polybuf.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/poly3d.h"
@@ -291,27 +292,23 @@ private:
   void PerfTest ();
 
   /**
-   * Given information from a mesh, clip the mesh to the frustum.
-   * The clipped mesh will be put in the clipped_??? arrays.
+   * Setup planes for clipping. Used for ClipTriangleMesh().
    */
-  void ClipTriangleMesh (
-    int num_triangles,
-    int num_vertices,
-    csTriangle* triangles,
-    csVector3* vertices,
-    csVector2* texels,
-    csColor* vertex_colors,
-    float** userarrays,
-    int* userarraycomponents,
-    G3DFogInfo* vertex_fog,
-    int& num_clipped_triangles,
-    int& num_clipped_vertices,
+  void SetupClippingPlanes (
+    csPlane3* frustum_planes, int& num_planes,
+    csVector3& frust_origin,
     bool transform,
     bool mirror,
-    bool exact_clipping,
     bool plane_clipping,  // Clip to the near plane
     bool z_plane_clipping,  // Clip to the z plane
     bool frustum_clipping); // Clip to the frustum planes
+
+  /**
+   * Classify all vertices from a mesh for clipping (ClipTriangleMesh).
+   */
+  void ClassifyForClipTriangleMesh (
+    int num_vertices, csVector3* vertices,
+    const csVector3& frust_origin, csPlane3* planes, int num_planes);
 
   /**
    * Given information from a mesh, clip the mesh to the frustum.
@@ -322,6 +319,34 @@ private:
     int num_vertices,
     csTriangle* triangles,
     csVector3* vertices,
+    int& num_clipped_triangles,
+    const csVector3& frust_origin,
+    csPlane3* planes, int num_planes);
+
+  /**
+   * Classify all vertices from a mesh for clipping (ClipTriangleMeshExact).
+   */
+  void ClassifyForClipTriangleMeshExact (
+    int num_vertices,
+    csVector3* vertices,
+    csVector2* texels,
+    csColor* vertex_colors,
+    float** userarrays,
+    int* userarraycomponents,
+    G3DFogInfo* vertex_fog,
+    int& num_clipped_vertices,
+    const csVector3& frust_origin,
+    csPlane3* planes, int num_planes);
+
+  /**
+   * Given information from a mesh, clip the mesh to the frustum.
+   * The clipped mesh will be put in the clipped_??? arrays.
+   */
+  void ClipTriangleMeshExact (
+    int num_triangles,
+    int num_vertices,
+    csTriangle* triangles,
+    csVector3* vertices,
     csVector2* texels,
     csColor* vertex_colors,
     float** userarrays,
@@ -329,10 +354,8 @@ private:
     G3DFogInfo* vertex_fog,
     int& num_clipped_triangles,
     int& num_clipped_vertices,
-    bool exact_clipping,
     const csVector3& frust_origin,
-    csPlane3* planes, int num_planes,
-    csPlane3* diag_planes, int num_diag_planes);
+    csPlane3* planes, int num_planes);
 
 
   /**
@@ -542,6 +565,7 @@ public:
   csTextureManagerOpenGL* txtmgr;
   /// The vertex buffer manager.
   csTriangleArrayVertexBufferManager* vbufmgr;
+  //csPolArrayVertexBufferManager* vbufmgr;
 
   /// The lightmap cache.
   OpenGLLightmapCache* lightmap_cache;
@@ -713,17 +737,23 @@ public:
   void SetupDTMTransforms (int vertex_mode);
   /// Restore OpenGL transforms after DrawTriangleMesh().
   void RestoreDTMTransforms ();
+  /// Setup clipping for DrawTriangleMesh().
+  void SetupDTMClipping (G3DTriangleMesh& mesh);
+  /// Restore clipping.
+  void RestoreDTMClipping ();
+  /// Setup effects for EffectDrawTriangleMesh().
+  void SetupDTMEffect (G3DTriangleMesh& mesh);
 
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
   /**
-   * If setup_trans == true then this function will call SetupDTMTransforms()
-   * and RestoreDTMTransforms().
+   * If setup == true then this function will call SetupDTM...()
+   * and RestoreDTM...().
    */
-  void OldDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup_trans = true);
-  void EffectDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup_trans = true,
+  void OldDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup = true);
+  void EffectDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup = true,
     GLuint lightmap = 0, csVector2* lightmapcoords = 0);
-  void FogDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup_trans = true);
+  void FogDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup = true);
 
   /**
    * Debug version that draws outlines only. Is automatically
@@ -808,6 +838,11 @@ public:
    * Flush the DrawPolygon queue if needed.
    */
   void FlushDrawPolygon ();
+
+  // EXPERIMENTAL@@@
+  void DrawPolygonStartMaterial (iMaterialHandle* mat_handle, uint mixmode);
+  void DrawPolygonMaterialOnly (G3DPolygonDP &poly);
+  void DrawPolygonLightmapOnly (G3DPolygonDP &poly);
 
   /**
    * Draw a fully-featured polygon assuming one has an OpenGL renderer
