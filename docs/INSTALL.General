@@ -1,7 +1,7 @@
 This file contains general installation instructions for Crystal Space
 when using the GNU make system.  These instructions may be applicable to
-the Unix, Linux, BeOS, OS/2, NextStep, OpenStep, Rhapsody (MacOS/X
-Server), and DOS/DJGPP ports of Crystal Space.
+the Unix, Solaris, Irix, Linux, BeOS, OS/2, MacOS/X Server, OpenStep,
+NextStep, and DOS/DJGPP ports of Crystal Space.
 
 Be sure to also read the platform-specific installation instructions for
 your platform if such instructions exist.  These instructions can be found
@@ -13,10 +13,10 @@ by consulting the following table.
     FreeBSD                     INSTALL.Unix
     Linux                       INSTALL.Unix
     Macintosh                   INSTALL.Mac
-    NextStep                    INSTALL.NeXT
+    MacOS/X Server              INSTALL.NeXT
     OpenStep                    INSTALL.NeXT
+    NextStep                    INSTALL.NeXT
     OS/2                        NOTES.OS2
-    Rhapsody (MacOS/X Server)   INSTALL.NeXT
     Solaris                     INSTALL.Unix
     Unix                        INSTALL.Unix
     Windows 95 / Visual C++     INSTALL.Win
@@ -167,14 +167,16 @@ can set USE_DLL=no. That will generate one big executable.
 Other options you have here are:
 	linux
 	solaris
+	irix
 	freebsd
 	beos
 	os2gcc
 	os2wcc
 	djgpp (only with USE_DLL=no)
-	nextstep
+	macosxs
 	openstep
-	rhapsody
+	nextstep
+	win32vc
 
 Optionally you can now do:
 

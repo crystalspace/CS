@@ -6,9 +6,8 @@ Crystal Space is work in progress. Expect these problems to go away
 in the future.
 
 
-
-With the exception of NextStep, OpenStep, and Rhapsody (MacOS/X Server) 
-DR2, all ports of Crystal Space require an 8-bit, 15-bit, 16-bit, or 
+With the exception of MacOS/X Server, OpenStep, and NextStep,
+all ports of Crystal Space require an 8-bit, 15-bit, 16-bit, or 
 32-bit display to run.  It will NOT work on 24-bit displays.  
 
 DJGPP: If you have gcc 2.8.1 then you must disabled optimization

@@ -21,10 +21,10 @@ document as indicated below.
     FreeBSD                     INSTALL.Unix
     Linux                       INSTALL.Unix
     Macintosh                   INSTALL.Mac
-    NextStep                    INSTALL.NeXT
+    MacOS/X Server              INSTALL.NeXT
     OpenStep                    INSTALL.NeXT
+    NextStep                    INSTALL.NeXT
     OS/2                        INSTALL.General NOTES.OS2
-    Rhapsody (MacOS/X Server)   INSTALL.NeXT
     Solaris                     INSTALL.Unix
     Unix                        INSTALL.Unix
     Windows 95 / Visual C++     INSTALL.Win

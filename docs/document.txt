@@ -50,8 +50,8 @@ Currently Crystal Space has the following features:
 	- Curved surfaces (unlighted currently).
 	- General sound system. Currently drivers are made for Linux,
 	  Macintosh, and Windows.
-	- General networking system on Linux, Windows, BeOS, NextStep,
-	  OpenStep, Rhapsody (MacOS/X Server) and OS/2.
+	- General networking system on Linux, Windows, BeOS, MacOS/X Server,
+	  OpenStep, NextStep, and OS/2.
 	- Powerful world file format allows you to easily redefine
 	  the world (but a real editor would be better).
 	- ZIP archive format to pack the world file, the textures and
