@@ -28,13 +28,13 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp apps/tests/g2dtest
 
 G2DTEST.EXE = g2dtest$(EXE)
-INC.G2DTEST =
-SRC.G2DTEST = apps/tests/g2dtest/g2dtest.cpp
+#INC.G2DTEST =
+SRC.G2DTEST = $(wildcard apps/tests/g2dtest/*.cpp)
 OBJ.G2DTEST = $(addprefix $(OUT),$(notdir $(SRC.G2DTEST:.cpp=$O)))
 DEP.G2DTEST = CSSYS CSUTIL CSGEOM
 LIB.G2DTEST = $(foreach d,$(DEP.G2DTEST),$($d.LIB))
 
-TO_INSTALL.EXE += $(G2DTEST.EXE)
+#TO_INSTALL.EXE += $(G2DTEST.EXE)
 
 MSVC.DSP += G2DTEST
 DSP.G2DTEST.NAME = g2dtest
