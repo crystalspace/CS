@@ -19,6 +19,18 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+16-Jun-99:
+	- Added CHK macro to many 'new' and 'delete' commands.
+	- Fixed memory debugger so that it works again.
+	- World is deleted when quitting (this may cause crashes at exit
+	  but those crashes have to be solved, not avoided).
+	- Fixed small memory leak in engine texture manager (but there
+	  are many more left).
+	- I added a new csShadowFrustrum class which is now used by the
+	  lighting routines. This is a completely different way to check for
+	  shadows for things. I will test this new system very well and if it
+	  works good I will remove the old support (like removing BlockingThings).
+	- I removed BlockingThings and CheckForThings to make things simpler.
 15-Jun-99:
 	- Applied patch from Or Siu Hang for MazeD. Changes are:
 		- Zip file creation/edit/saving is enabled: You may now
@@ -40,6 +52,14 @@ Short-term cleanups that need to be done:
 		  file is text or binary.
 	- I changed an error to a warning for texture loading (test on
 	  power of two) because MazeD will not work otherwise.
+	- Denis Dmitriev fixed some bugs in halo handling and also changed
+	  the looks of halos (for software and Direct3D).
+	- Denis also added a cast to fix compilation on Windows.
+	- Added GetShadows() function to csPolygonSet. This is going to be
+	  used in the new lighting calculation routines.
+	- The lighting routines also calculate shadow frustrums
+	  for things now. All the calculations are present but the final
+	  shadow frustrums are not yet used.
 14-Jun-99:
 	- Gary Haussmann added basic 2D functionality for OpenGL in a common
 	  directory. Currently only the X OpenGL port uses this but other
