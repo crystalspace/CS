@@ -758,7 +758,14 @@ struct csSimpleRenderMesh
   csZBufMode z_buf_mode;
   /// (Optional) Mix mode. Defaults to CS_FX_COPY.
   uint mixmode;
-  /// (Optional) Transform to apply to the mesh.
+  /**
+   * (Optional) Transform to apply to the mesh.
+   * \remark This transform is initialized to an identity transform.
+   *  This effectively means that geometry is drawn in eye space.
+   *  To draw in screen space, supply the \a csSimpleMeshScreenspace
+   *  flag to DrawSimpleMesh(). For anything else supply an appropriate
+   *  transformation.
+   */
   csReversibleTransform object2camera;
 
   csSimpleRenderMesh () : colors(0), texture (0), shader (0), dynDomain (0), 
