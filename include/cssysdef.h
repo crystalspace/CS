@@ -647,6 +647,11 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  define CS_GNUC_SCANF( format_idx, arg_idx )
 #endif
 
+// remove __attribute__ on non GNUC compilers
+#ifndef __GNUC__
+#define __attribute__(x)
+#endif
+
 // Support for alignment and packing of structures.
 #if !defined(CS_STRUCT_ALIGN_4BYTE_BEGIN)
 #  if defined(__GNUC__) && defined(CS_STRICT_ALIGNMENT)
