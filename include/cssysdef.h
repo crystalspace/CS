@@ -301,13 +301,20 @@
 #  define CS_INITIALIZE_PLATFORM_APPLICATION
 #endif
 
+#if !defined(CS_BUILD_SHARED_LIBS)
+# define CS_STATIC_VAR_EXTERN
+#else
+# define CS_STATIC_VAR_EXTERN	CS_CSUTIL_EXPORT
+#endif
+
 #ifndef CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION
 #  define CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION cs_static_var_cleanup
 #endif
 
 #ifndef CS_DECLARE_STATIC_VARIABLE_REGISTRATION
 #  define CS_DECLARE_STATIC_VARIABLE_REGISTRATION \
-void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)());
+    CS_STATIC_VAR_EXTERN void \
+    CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)());
 #endif
 
 #ifndef CS_DECLARE_STATIC_VARIABLE_CLEANUP
@@ -317,7 +324,8 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)());
 
 #ifndef CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
 #  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION                    \
-void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
+CS_STATIC_VAR_EXTERN void 					       \
+CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())             \
 {                                                                      \
   static void (**a)() = 0;                                             \
   static int lastEntry = 0;                                            \
@@ -360,7 +368,7 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
  * of the plugin module with any special implementation details required by the
  * platform.
  */
-#if defined(CS_STATIC_LINKED)
+#if defined(CS_STATIC_LINKED) || defined(CS_BUILD_SHARED_LIBS)
 
 #  ifndef CS_IMPLEMENT_PLUGIN
 #  define CS_IMPLEMENT_PLUGIN        \
@@ -386,9 +394,14 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
  * platform.
  */
 #ifndef CS_IMPLEMENT_APPLICATION
+# if !defined(CS_BUILD_SHARED_LIBS)
 #  define CS_IMPLEMENT_APPLICATION       \
    CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP  \
    CS_IMPLEMENT_PLATFORM_APPLICATION 
+# else
+#  define CS_IMPLEMENT_APPLICATION       \
+   CS_IMPLEMENT_PLATFORM_APPLICATION 
+# endif
 #endif
 
 /**\def CS_REGISTER_STATIC_FOR_DESTRUCTION
