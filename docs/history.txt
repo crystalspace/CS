@@ -45,6 +45,7 @@ chronological order.
 	  improve GLX support in the wxgl canvas, after removing some code that
 	  created another GLX context (which should be done by the wxgl 
 	  canvas).
+	- res fixed gfxtest to let the csDataBuffer delete[] read file data.
 24-Jan-2005
 	- Jorrit reverted a fix from res2k in walktest/keys.cpp which changes
 	  the way keys are parsed. This fix breaks parsing of keys with

@@ -258,11 +258,15 @@ static bool process_file (const char *fname)
   if (opt.verbose)
     printf ("Reading %ld bytes from file\n", (long)fsize);
 
-  char* buffer = new char[fsize];
-  if (fread (buffer, 1, fsize, f) < fsize)
+  csRef<iDataBuffer> buf;
   {
-    printf ("%s: unexpected EOF while reading file %s\n", programname, fname);
-    return false;
+    char* buffer = new char[fsize];
+    if (fread (buffer, 1, fsize, f) < fsize)
+    {
+      printf ("%s: unexpected EOF while reading file %s\n", programname, fname);
+      return false;
+    }
+    buf.AttachNew (new csDataBuffer (buffer, fsize, true));
   }
 
   fclose (f);
@@ -276,11 +280,7 @@ static bool process_file (const char *fname)
   else
     fmt = CS_IMGFMT_ANY;
 
-  csRef<iDataBuffer> buf;
-  buf.AttachNew (new csDataBuffer (buffer, fsize, false));
-  csRef<iImage> ifile (
-  	ImageLoader->Load (buf, fmt | CS_IMGFMT_ALPHA));
-  delete [] buffer;
+  csRef<iImage> ifile = ImageLoader->Load (buf, fmt | CS_IMGFMT_ALPHA);
   if (!ifile)
   {
     printf ("%s: failed to recognise image format for %s\n",
