@@ -3088,7 +3088,7 @@ csPtr<iCurveTemplate> csThingObjectType::CreateBezierTemplate (const char *name)
   if (name) ptemplate->SetName (name);
   csRef<iCurveTemplate> tmp = SCF_QUERY_INTERFACE (ptemplate, iCurveTemplate);
   curve_templates.Push (tmp);
-  tmp->DecRef ();
+  //tmp->DecRef ();
   return tmp;
 }
 
