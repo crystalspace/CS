@@ -599,6 +599,17 @@ void csSystemDriver::NextFrame ()
   if (NetMan)
     NetMan->Update();
 //@@@@@@@@@@@@@@ END @@@@@@@@@@@@@@@@
+
+  // If a plugin has set CSMASK_Nothing, it receives cscmdPostProcess events too
+  for (int i = 0; i < PlugIns.Length (); i++)
+  {
+    csPlugIn *plugin = PlugIns.Get (i);
+    if (plugin->EventMask & CSMASK_Nothing)
+    {
+      csEvent e (Time (), csevBroadcast, cscmdPostProcess);
+      plugin->PlugIn->HandleEvent (e);
+    }
+  }
 }
 
 void csSystemDriver::Loop ()
