@@ -133,9 +133,10 @@ public:
 
   /**
    * Create a new csImageFile which is a mipmapped version of this one.
-   * 'step' indicates how much the mipmap should be scaled down. Only
-   * steps 0, 1, 2, and 3 are supported. Step 0 returns the blended version
-   * of the image without image being scaled down.
+   * 'step' indicates how much the mipmap should be scaled down. Step 0 
+   * returns a blurred version of the image without image being scaled down.
+   * Step 1 scales the image down to 1/2. Steps &gt; 1 repeat this 
+   * <i>'step'</i> times.
    * The new image will have same format as the original one. If you pass
    * a pointer to a transparent color, the texels of that color are handled
    * differently.
@@ -164,6 +165,8 @@ public:
   virtual bool HasKeycolor ();
   /// get the keycolour stored with the image.
   virtual void GetKeycolor (int &r, int &g, int &b);
+  /// Create a sharpened copy of the image
+  virtual iImage *Sharpen (csRGBpixel *transp, int strength);
 };
 
 #endif // __CS_IMAGE_H__

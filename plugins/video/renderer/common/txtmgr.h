@@ -107,7 +107,7 @@ public:
   { return &transp_color; }
 
   /// Create a new texture object (should be implemented by heirs)
-  virtual csTexture* NewTexture (iImage *Image) = 0;
+  virtual csTexture* NewTexture (iImage *Image, bool ismipmap = false) = 0;
 
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor () = 0;
@@ -326,7 +326,6 @@ protected:
 
   /// Read configuration values from config file.
   virtual void read_config (iConfigFile *config);
-
 public:
   /// Pixel format.
   csPixelFormat pfmt;

@@ -48,6 +48,7 @@ public:
   virtual iImage *Crop (int x, int y, int width, int height);
   virtual bool HasKeycolor () { return 0; }
   virtual void GetKeycolor (int &r, int &g, int &b) { r=0;g=0;b=0; }
+  virtual iImage *Sharpen (csRGBpixel *transp, int strength) { return NULL; }
   SCF_DECLARE_IBASE;
 };
 

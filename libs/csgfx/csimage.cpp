@@ -80,56 +80,6 @@
 #define MIPMAP_ALPHA
 #include "mipmap.inc"
 
-#define MIPMAP_NAME	mipmap_2
-#define MIPMAP_LEVEL	2
-#include "mipmap.inc"
-
-#define MIPMAP_NAME	mipmap_2_t
-#define MIPMAP_LEVEL	2
-#define MIPMAP_TRANSPARENT
-#include "mipmap.inc"
-
-#define MIPMAP_NAME	mipmap_2_p
-#define MIPMAP_LEVEL	2
-#define MIPMAP_PALETTED
-#include "mipmap.inc"
-
-#define MIPMAP_NAME	mipmap_2_pt
-#define MIPMAP_LEVEL	2
-#define MIPMAP_PALETTED
-#define MIPMAP_TRANSPARENT
-#include "mipmap.inc"
-
-#define MIPMAP_NAME	mipmap_2_a
-#define MIPMAP_LEVEL	2
-#define MIPMAP_ALPHA
-#include "mipmap.inc"
-
-#define MIPMAP_NAME	mipmap_3
-#define MIPMAP_LEVEL	3
-#include "mipmap.inc"
-
-#define MIPMAP_NAME	mipmap_3_t
-#define MIPMAP_LEVEL	3
-#define MIPMAP_TRANSPARENT
-#include "mipmap.inc"
-
-#define MIPMAP_NAME	mipmap_3_p
-#define MIPMAP_LEVEL	3
-#define MIPMAP_PALETTED
-#include "mipmap.inc"
-
-#define MIPMAP_NAME	mipmap_3_pt
-#define MIPMAP_LEVEL	3
-#define MIPMAP_PALETTED
-#define MIPMAP_TRANSPARENT
-#include "mipmap.inc"
-
-#define MIPMAP_NAME	mipmap_3_a
-#define MIPMAP_LEVEL	3
-#define MIPMAP_ALPHA
-#include "mipmap.inc"
-
 //-----------------------------------------------------------------------------
 
 // Apply dithering while converting to 8-bits?
@@ -282,137 +232,164 @@ void csImageFile::Rescale (int newwidth, int newheight)
 
 iImage *csImageFile::MipMap (int steps, csRGBpixel *transp)
 {
-  if ((steps < 0) || (steps > 3))
+  if (steps < 0)
     return NULL;
 
-  csImageFile* nimg = new csImageFile (Format);
-  if (steps == 1 && (Width < 2 || Height < 2) && (Width > 1 || Height > 1))
-    nimg->set_dimensions (MAX (1, Width >> steps), MAX( 1, Height >> steps));
-  else
-    nimg->set_dimensions (Width >> steps, Height >> steps);
-
-  csRGBpixel *mipmap = new csRGBpixel [nimg->Width * nimg->Height];
-  if (Alpha)
-    nimg->Alpha = new uint8 [nimg->Width * nimg->Height];
-
-  if (Width == 1 || Height == 1)
+  if ( (Width == 1) && (Height == 1) )
   {
-    // @@@@@
-    // This is a work around for a bug in mipmap code defined in mipmap.inc.
-    // It seems that if one of the dimensions is 1 the code in mipmap.inc
-    // will read past image boundaries. I don't understand the code of
-    // mipmap.inc at the moment so I will try to work around the bug for
-    // now. This needs further investigation later. Note that this bug triggers
-    // when non-square textures are mipmapped.
-    int longdim;
-    if (Width == 1) longdim = Height;
-    else longdim = Width;
+    // no remapping needed
+    return Clone ();
+  }
+
+  csImageFile* nimg;
+
+  if (steps == 0)
+  {
+    nimg = new csImageFile (Format);
+    nimg->set_dimensions (Width, Height);
+
+    csRGBpixel *mipmap = new csRGBpixel [nimg->Width * nimg->Height];
+
+    int transpidx = -1;
+    if (transp && Palette)
+      transpidx = closest_index (transp);
+
     switch (Format & CS_IMGFMT_MASK)
     {
       case CS_IMGFMT_NONE:
       case CS_IMGFMT_PALETTED8:
-	// @@@ Currently not supported!
+	if (Image)
+	  if (transpidx < 0)
+	    mipmap_0_p (Width, Height, (uint8 *)Image, mipmap, Palette);
+	  else
+	    mipmap_0_pt(Width,Height,(uint8*)Image,mipmap,Palette,transpidx);
+	nimg->convert_rgba (mipmap);
+	if (Alpha)
+	{
+	  mipmap_0_a (Width, Height, (uint8 *)Alpha, nimg->Alpha);
+	}
 	break;
       case CS_IMGFMT_TRUECOLOR:
-	if (Image)
-	{
-	  csRGBpixel* dest = mipmap;
-	  csRGBpixel* src = (csRGBpixel*)Image;
-	  for (int i = 0 ; i < (longdim >> steps) ; i++)
-	  {
-	    *dest++ = *src;
-	    src += 1<<steps;
-	  }
-	}
- 	if (Alpha)
-	{
-	  uint8* dest = nimg->Alpha;
-	  uint8* src = (uint8*)Alpha;
-	  for (int i = 0 ; i < (longdim >> steps) ; i++)
-	  {
-	    *dest++ = *src;
-	    src += 1<<steps;
-	  }
-	}
+	if (!transp)
+	  mipmap_0 (Width, Height, (csRGBpixel *)Image, mipmap);
+	else
+	  mipmap_0_t (Width, Height, (csRGBpixel *)Image, mipmap, *transp);
+	nimg->convert_rgba (mipmap);
 	break;
     }
-
-    nimg->convert_rgba (mipmap);
-    return nimg;
   }
-  
-  int transpidx = -1;
-  if (transp && Palette)
-    transpidx = closest_index (transp);
-
-  switch (Format & CS_IMGFMT_MASK)
+  else
   {
-    case CS_IMGFMT_NONE:
-    case CS_IMGFMT_PALETTED8:
-      if (Image)
-        if (transpidx < 0)
-	{
-	  if (steps == 0)
-	    mipmap_0_p (Width, Height, (uint8 *)Image, mipmap, Palette);
-	  else if (steps == 1)
-	    mipmap_1_p (Width, Height, (uint8 *)Image, mipmap, Palette);
-	  else if (steps == 2)
-	    mipmap_2_p (Width, Height, (uint8 *)Image, mipmap, Palette);
-	  else
-	    mipmap_3_p (Width, Height, (uint8 *)Image, mipmap, Palette);
-	}
-        else
-	{
-	  if (steps == 0)
-	    mipmap_0_pt(Width,Height,(uint8*)Image,mipmap,Palette,transpidx);
-	  else if (steps == 1)
-	    mipmap_1_pt(Width,Height,(uint8*)Image,mipmap,Palette,transpidx);
-	  else if (steps == 2)
-	    mipmap_2_pt(Width,Height,(uint8*)Image,mipmap,Palette,transpidx);
-	  else
-	    mipmap_3_pt(Width,Height,(uint8*)Image,mipmap,Palette,transpidx);
-	}
-      if (Alpha)
-      {
-	  if (steps == 0)
-	    mipmap_0_a (Width, Height, (uint8 *)Alpha, nimg->Alpha);
-	  else if (steps == 1)
-	    mipmap_1_a (Width, Height, (uint8 *)Alpha, nimg->Alpha);
-	  else if (steps == 2)
-	    mipmap_2_a (Width, Height, (uint8 *)Alpha, nimg->Alpha);
-	  else
-	    mipmap_3_a (Width, Height, (uint8 *)Alpha, nimg->Alpha);
-      }
-      break;
-    case CS_IMGFMT_TRUECOLOR:
-      if (!transp)
-      {
-	if (steps == 0)
-	  mipmap_0 (Width, Height, (csRGBpixel *)Image, mipmap);
-	else if (steps == 1)
-	  mipmap_1 (Width, Height, (csRGBpixel *)Image, mipmap);
-	else if (steps == 2)
-	  mipmap_2 (Width, Height, (csRGBpixel *)Image, mipmap);
-	else
-	  mipmap_3 (Width, Height, (csRGBpixel *)Image, mipmap);
-      }
-      else
-      {
-	if (steps == 0)
-	  mipmap_0_t (Width, Height, (csRGBpixel *)Image, mipmap, *transp);
-	else if (steps == 1)
-	  mipmap_1_t (Width, Height, (csRGBpixel *)Image, mipmap, *transp);
-	else if (steps == 2)
-	  mipmap_2_t (Width, Height, (csRGBpixel *)Image, mipmap, *transp);
-	else
-	  mipmap_3_t (Width, Height, (csRGBpixel *)Image, mipmap, *transp);
-      }
-      break;
-  }
+    csImageFile* simg = this;
+    simg->IncRef();
 
-  nimg->convert_rgba (mipmap);
+    int cur_w = Width;
+    int cur_h = Height;
+
+    while (steps && !((cur_w == 1) && (cur_h == 1)) )
+    {
+      nimg = new csImageFile (Format);
+      nimg->set_dimensions (MAX(1, cur_w >> 1), MAX(1, cur_h >> 1));
+
+      csRGBpixel *mipmap = new csRGBpixel [nimg->Width * nimg->Height];
+
+      int transpidx = -1;
+      if (transp && simg->GetPalette ())
+	transpidx = simg->closest_index (transp);
+
+      switch (Format & CS_IMGFMT_MASK)
+      {
+	case CS_IMGFMT_NONE:
+	case CS_IMGFMT_PALETTED8:
+	  if (Image)
+	    if (transpidx < 0)
+	      mipmap_1_p (cur_w, cur_h, (uint8 *)simg->GetImageData (), mipmap, simg->GetPalette ());
+	    else
+	      mipmap_1_pt(cur_w,cur_h,(uint8*)simg->GetImageData (),mipmap,simg->GetPalette (),transpidx);
+	  nimg->convert_rgba (mipmap);
+	  if (Alpha)
+	  {
+	    mipmap_1_a (cur_w, cur_h, (uint8 *)simg->GetAlpha (), nimg->Alpha);
+	  }
+	  break;
+	case CS_IMGFMT_TRUECOLOR:
+	  if (!transp)
+	    mipmap_1 (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap);
+	  else
+	    mipmap_1_t (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap, *transp);
+	  nimg->convert_rgba (mipmap);
+	  break;
+      }
+
+      simg->DecRef ();
+      simg = nimg;
+      steps--;
+      cur_w = nimg->Width;
+      cur_h = nimg->Height;
+    }
+  }
 
   return nimg;
+}
+
+iImage *csImageFile::Sharpen (csRGBpixel *transp, int strength)
+{
+/*
+
+  How it works:
+
+  The algorithm is known as 'Unsharp Mask'. 
+  Expressed as a formula:
+
+  sharpened image = original image + 
+    strength * (original image - smoothed image)
+
+  You may try
+    http://www.dai.ed.ac.uk/HIPR2/unsharp.htm
+  for some more information.
+
+*/
+
+  if (strength <= 0) 
+    return Clone ();
+
+  // we need an RGB version of ourselves
+  iImage *original = Clone ();
+  original->SetFormat (CS_IMGFMT_TRUECOLOR | (Alpha?CS_IMGFMT_ALPHA:0) );
+  iImage *blurry = original->MipMap (0, transp);
+  
+  csRGBpixel *result = new csRGBpixel [Width * Height];
+  csRGBpixel *src_o = (csRGBpixel*)original->GetImageData ();
+  csRGBpixel *src_b = (csRGBpixel*)blurry->GetImageData ();
+  csRGBpixel *dest = result;
+  
+  for (int n = Width * Height; n > 0; n--)
+  {
+    int v;
+    #define DO(comp)  \
+      v = src_o->comp + ((strength * (src_o->comp - src_b->comp)) >> 8);  \
+      dest->comp = (v>255)?255:((v<0)?0:v);
+
+    DO(red)
+    DO(green)
+    DO(blue)
+    DO(alpha)
+
+    #undef DO
+
+    dest++;
+    src_o++;
+    src_b++;
+  }
+
+  csImageFile *resimg = new csImageFile (Format);
+  resimg->set_dimensions (Width, Height);
+  resimg->convert_rgba (result);
+
+  original->DecRef ();
+  blurry->DecRef ();
+
+  return resimg;
 }
 
 static inline unsigned sqr (int x)
@@ -570,8 +547,8 @@ void csImageFile::convert_pal8 (uint8 *iImage, csRGBpixel *iPalette,
         while (pixels--)
           *out++ = iPalette [*in++];
       delete [] Alpha; Alpha = NULL;
-      delete [] iImage;
-      delete [] iPalette;
+      delete [] iImage; 
+      delete [] iPalette; 
       break;
     }
   }
@@ -605,6 +582,7 @@ void csImageFile::SetFormat (int iFormat)
     if ((Format & CS_IMGFMT_ALPHA) && !Alpha)
       Alpha = new uint8 [pixels];
     convert_pal8 ((uint8 *)oldimage, Palette);
+    Palette = NULL;  
   }
   else if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_NONE)
   {

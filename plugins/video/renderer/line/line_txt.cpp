@@ -136,7 +136,7 @@ csTextureHandleLine::~csTextureHandleLine ()
   texman->DecRef ();
 }
 
-csTexture *csTextureHandleLine::NewTexture (iImage *Image)
+csTexture *csTextureHandleLine::NewTexture (iImage *Image, bool ismipmap)
 {
   return new csTextureLine (this, Image);
 }

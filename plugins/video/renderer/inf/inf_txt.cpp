@@ -40,7 +40,7 @@ csTextureHandleInfinite::~csTextureHandleInfinite ()
   texman->DecRef ();
 }
 
-csTexture *csTextureHandleInfinite::NewTexture (iImage *Image)
+csTexture *csTextureHandleInfinite::NewTexture (iImage *Image, bool ismipma)
 {
   return new csTextureInfinite (this, Image);
 }

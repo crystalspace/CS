@@ -184,7 +184,7 @@ protected:
   int palette_size;
 
   /// Create a new texture object
-  virtual csTexture *NewTexture (iImage *Image);
+  virtual csTexture *NewTexture (iImage *Image, bool ismipmap);
 
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor ();
@@ -296,6 +296,9 @@ public:
 
   /// Apply dithering to textures while reducing from 24-bit to 8-bit paletted?
   bool dither_textures;
+
+  /// Sharpen mipmaps?
+  int sharpen_mipmaps;
 
   /// The global colormap (used in 256-color modes)
   csColorMap cmap;

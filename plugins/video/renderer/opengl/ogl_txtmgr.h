@@ -127,7 +127,7 @@ public:
   }
 
   /// Create a new texture object
-  virtual csTexture *NewTexture (iImage *Image);
+  virtual csTexture *NewTexture (iImage *Image, bool ismipmap);
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor (){}
   void ComputeMeanColor (int w, int h, csRGBpixel *src);
@@ -182,6 +182,8 @@ class csTextureManagerOpenGL : public csTextureManager
   csGraphics3DOGLCommon *G3D;
   int max_tex_size;
   csGLProcTexType proc_tex_type;
+  /// Sharpen mipmaps?
+  int sharpen_mipmaps;
   // The first instance of a sharing software texture
   csOpenGLProcSoftware *head_soft_proc_tex;
   static formatDescription glformats [];

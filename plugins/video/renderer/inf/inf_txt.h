@@ -42,7 +42,7 @@ protected:
   csTextureManagerInfinite *texman;
 
   /// Create a new texture object
-  virtual csTexture *NewTexture (iImage *Image);
+  virtual csTexture *NewTexture (iImage *Image, bool ismipma);
 
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor ();

@@ -25,13 +25,24 @@
 
     MIPMAP_NAME		- the name for the mipmapping function
     MIPMAP_LEVEL	- Mipmap filter level: level zero filter means to
-			  perform blending; level one to three scales down.
+			  perform bluring; level one scales down to 1/2 the width/height.
     MIPMAP_PALETTED	- Source bitmap is a 8-bit paletted image
     MIPMAP_ALPHA	- Process image as alpha channel (i.e. like paletted
 			  image without an actual palette).
     MIPMAP_TRANSPARENT	- Accept an additional parameter that specifies an
 			  transparent color. Key colors are handled
 			  in a special way.
+			  
+	When scaling down a non-transparent image, one destination pixel is 
+	calculated by averaging 4 source pixels.
+	Transparent images work the same; however, the number of transparent
+	and non-transparent pixels are counted. The resulting pixel is transparent 
+	if more than 2 source pixels are transparent, otherwise the non-transparent
+	pixels are averaged.
+	
+	When blurring an image, a destination pixel is calculated from 9 source 
+	pixels. Transparent images work analogue to scaling down an image. 
+	Transparency will NOT change.
 */
 
 #ifndef __MIPMAP_INC__
@@ -44,7 +55,11 @@
 #endif // __MIPMAP_INC__
 
 #define MIPMAP_STEP	(1 << MIPMAP_LEVEL)
-#define MIPMAP_DIVIDER	(MIPMAP_STEP * MIPMAP_STEP)
+#if MIPMAP_LEVEL == 0
+# define MIPMAP_DIVIDER (1+2+1+2+4+2+1+2+1)
+#else
+# define MIPMAP_DIVIDER	(MIPMAP_STEP * MIPMAP_STEP)
+#endif
 
 #if defined (MIPMAP_PALETTED) || defined (MIPMAP_ALPHA)
 #  define MIPMAP_PIXTYPE	uint8
@@ -52,88 +67,98 @@
 #  define MIPMAP_PIXTYPE	uint32
 #endif
 
-static void MIPMAP_NAME (unsigned w, unsigned h
 #if defined (MIPMAP_ALPHA)
-  , uint8 *src, uint8 *dst
+static void MIPMAP_NAME (unsigned w, unsigned h, uint8 *src, uint8 *dst)
 #elif defined (MIPMAP_PALETTED)
-  , uint8 *src, csRGBpixel *dst, csRGBpixel *pal
 #  ifdef MIPMAP_TRANSPARENT
-  , uint8 transp
+static void MIPMAP_NAME (unsigned w, unsigned h, uint8 *src, csRGBpixel *dst, csRGBpixel *pal, uint8 transp)
+#  else
+static void MIPMAP_NAME (unsigned w, unsigned h, uint8 *src, csRGBpixel *dst, csRGBpixel *pal)
 #  endif
 #else
-  , csRGBpixel *src, csRGBpixel *dst
 #  ifdef MIPMAP_TRANSPARENT
-  , csRGBpixel transp
+static void MIPMAP_NAME (unsigned w, unsigned h, csRGBpixel *src, csRGBpixel *dst, csRGBpixel transp)
+#  else
+static void MIPMAP_NAME (unsigned w, unsigned h, csRGBpixel *src, csRGBpixel *dst)
 #  endif
 #endif
-  )
 {
   unsigned x, y;
 
+#ifndef MIPMAP_ALPHA
+# ifdef MIPMAP_PALETTED
+  // retrieve a source pixel as RGB
+#  define MIPMAP_RGB(p)		(*(uint32 *)&pal [(uint8)p])
+  // check if source pixel is transparent
+#  define MIPMAP_ISKEY(p)	((uint8)p == transp)
+# else
+#  define MIPMAP_RGB(p)		*(uint32 *)&p
+#  define MIPMAP_ISKEY(p)	(*(uint32 *)&p == *(uint32 *)&transp)
+# endif 
+#endif
+
+// ACCUMULATE_PIXEL - retrieve a source pixel
 #if defined (MIPMAP_ALPHA)
 #    define ACCUMULATE_PIXEL(p, m)					\
      a += p * m;
-#elif defined (MIPMAP_PALETTED)
-#  if defined (MIPMAP_TRANSPARENT) && (MIPMAP_LEVEL == 0)
-#    define ACCUMULATE_PIXEL(p, m)					\
-     {									\
-       uint8 pix = p;							\
-       if (pix == transp) { *dst++ = pal [src2 [1]]; FINALLY; continue; }\
-       uint32 rgb = *(uint32 *)&pal [pix];				\
-       rb += (rgb & 0x00ff00ff) * m;					\
-       ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
-     }
-#  elif defined (MIPMAP_TRANSPARENT)
-#    define ACCUMULATE_PIXEL(p, m)					\
-     {									\
-       uint8 pix = p;							\
-       uint32 rgb = *(uint32 *)&pal [pix];				\
-       if (pix == transp) { *(uint32 *)dst++ = rgb; FINALLY; continue; }	\
-       rb += (rgb & 0x00ff00ff) * m;					\
-       ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
-     }
-#  else
-#    define ACCUMULATE_PIXEL(p, m)					\
-     {									\
-       uint32 rgb = *(uint32 *)&pal [p];					\
-       rb += (rgb & 0x00ff00ff) * m;					\
-       ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
-     }
-#  endif
 #else
-#  if defined (MIPMAP_TRANSPARENT) && (MIPMAP_LEVEL == 0)
-#    define ACCUMULATE_PIXEL(p, m)		    			\
-     {									\
-       uint32 rgb = *(uint32 *)&p;					\
-       if (rgb == *(uint32 *)&transp) { *(uint32 *)dst++ = src2 [1]; FINALLY; continue; }\
-       rb += (rgb & 0x00ff00ff) * m;					\
-       ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
-     }
-#  elif defined (MIPMAP_TRANSPARENT)
-#    define ACCUMULATE_PIXEL(p, m)		    			\
-     {									\
-       uint32 rgb = *(uint32 *)&p;					\
-       if (rgb == *(uint32 *)&transp) { *(uint32 *)dst++ = rgb; FINALLY; continue; }\
-       rb += (rgb & 0x00ff00ff) * m;					\
-       ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
+#  if defined (MIPMAP_TRANSPARENT)
+#    define ACCUMULATE_PIXEL(p, m)						\
+     {													\
+       if (MIPMAP_ISKEY(p))								\
+       {												\
+		 transcnt += m;									\
+       }												\
+       else												\
+       {												\
+         uint32 rgb = MIPMAP_RGB(p);					\
+         rb += (rgb & 0x00ff00ff) * m;					\
+         ga += ((rgb >> 8) & 0x00ff00ff) * m;			\
+       }												\
      }
 #  else
-#    define ACCUMULATE_PIXEL(p, m)		    			\
-     {									\
-       uint32 rgb = *(uint32 *)&p;					\
+#    define ACCUMULATE_PIXEL(p, m)						\
+     {													\
+       uint32 rgb = MIPMAP_RGB(p);						\
        rb += (rgb & 0x00ff00ff) * m;					\
        ga += ((rgb >> 8) & 0x00ff00ff) * m;				\
      }
 #  endif
 #endif
 
+// MIPMAP_OUTPUT - calculates destination pixel 
 #if defined (MIPMAP_ALPHA)
 #define MIPMAP_OUTPUT							\
     *dst++ = a / MIPMAP_DIVIDER;
 #else
-#define MIPMAP_OUTPUT							\
+# ifdef MIPMAP_TRANSPARENT											
+# define MIPMAP_OUTPUT												\
+	if (transcnt)													\
+	{																\
+	  if (transcnt <= (MIPMAP_DIVIDER / 2))							\
+	  {																\
+		int div = (MIPMAP_DIVIDER - transcnt);						\
+		/* need to treat every component separately...  */			\
+	    *(uint32 *)dst++ =  (((rb & 0x0000ffff) / div) |						\
+						     ((rb / div) & 0x00ff0000)) |						\
+						  (((((ga & 0x0000ffff) / div) |						\
+						     ((ga / div)& 0x00ff0000)) << 8) & 0xff00ff00);		\
+	  }																\
+	  else															\
+	  {																\
+	    *(uint32 *)dst++ = MIPMAP_RGB(transp);						\
+	  }																\
+	}																\
+	else															\
+	{																\
+	  *(uint32 *)dst++ = ((rb / (MIPMAP_DIVIDER)) & 0x00ff00ff) |		\
+	  				     (((ga / (MIPMAP_DIVIDER)) << 8) & 0xff00ff00); \
+	}
+# else
+# define MIPMAP_OUTPUT							\
     *(uint32 *)dst++ = ((rb / MIPMAP_DIVIDER) & 0x00ff00ff) |		\
                       (((ga / MIPMAP_DIVIDER) << 8) & 0xff00ff00);
+# endif
 #endif
 
 #define ACCUMULATE_2X2(delta)						\
@@ -146,61 +171,34 @@ static void MIPMAP_NAME (unsigned w, unsigned h
   ACCUMULATE_PIXEL (src [delta], 1);					\
   ACCUMULATE_PIXEL (src [delta + 1], 1);
 
-// We could call ACCUMULATE_2X2 four times, but
-// this way its faster by about 10%...
-#define ACCUMULATE_4X4(delta)						\
-  ACCUMULATE_PIXEL (src [delta], 1);					\
-  ACCUMULATE_PIXEL (src [delta + 1], 1);				\
-  ACCUMULATE_PIXEL (src [delta + 2], 1);				\
-  ACCUMULATE_PIXEL (src [delta + 3], 1);				\
-  ACCUMULATE_PIXEL (src [delta + w], 1);				\
-  ACCUMULATE_PIXEL (src [delta + w + 1], 1);				\
-  ACCUMULATE_PIXEL (src [delta + w + 2], 1);				\
-  ACCUMULATE_PIXEL (src [delta + w + 3], 1);				\
-  ACCUMULATE_PIXEL (src [delta + w * 2], 1);				\
-  ACCUMULATE_PIXEL (src [delta + w * 2 + 1], 1);			\
-  ACCUMULATE_PIXEL (src [delta + w * 2 + 2], 1);			\
-  ACCUMULATE_PIXEL (src [delta + w * 2 + 3], 1);			\
-  ACCUMULATE_PIXEL (src [delta + w * 3], 1);				\
-  ACCUMULATE_PIXEL (src [delta + w * 3 + 1], 1);			\
-  ACCUMULATE_PIXEL (src [delta + w * 3 + 2], 1);			\
-  ACCUMULATE_PIXEL (src [delta + w * 3 + 3], 1);			\
-
-// Well... if we do it the way above it should consist of 64 lines...
-// Besides, it rises performance just a little (if even ...)
-#define ACCUMULATE_8X8(delta)						\
-  ACCUMULATE_4X4 (delta);						\
-  ACCUMULATE_4X4 (delta + 4);						\
-  ACCUMULATE_4X4 (delta + w * 4);					\
-  ACCUMULATE_4X4 (delta + w * 4 + 4);
-
 #if MIPMAP_LEVEL == 0
   MIPMAP_PIXTYPE * const srcorg = (MIPMAP_PIXTYPE *)src;
   MIPMAP_PIXTYPE * const srcmax = (MIPMAP_PIXTYPE *)src + w * (h - 1);
 #endif
 
-  const unsigned nh = h >> MIPMAP_LEVEL;
   // Compute the adjusted width of mipmap
   const unsigned w1 = (w & ~((1 << MIPMAP_LEVEL) - 1)) - 1;
-
+  const unsigned nh = h >> MIPMAP_LEVEL;
+  
 #if MIPMAP_LEVEL == 1
   const unsigned nw = w >> MIPMAP_LEVEL;
   if (nh == 0 && nw == 0) return;
+  // special case: just one row or column
   if (nh == 0 || nw == 0)
   {
-#undef FINALLY
-#define FINALLY
-    unsigned int n = MAX (1, nh) * MAX (1, nw);
-    for (x = 0; x <= n; x += MIPMAP_STEP)
+    unsigned int n = h * w;
+    for (x = 0; x < n; x += MIPMAP_STEP)
     {
 #ifndef MIPMAP_ALPHA
       unsigned rb = 0, ga = 0;
+# ifdef MIPMAP_TRANSPARENT
+	  int transcnt = 0;
+# endif
 #else
       unsigned a = 0;
 #endif
       ACCUMULATE_1X2 (x)
       MIPMAP_OUTPUT;
-      src += 2;
     }
     return;
   }
@@ -210,9 +208,7 @@ static void MIPMAP_NAME (unsigned w, unsigned h
   for (y = 0; y < nh; y++)
   {
 #if MIPMAP_LEVEL == 0
-#undef MIPMAP_DIVIDER
-#define MIPMAP_DIVIDER (1+2+1+2+4+2+1+2+1)
-#define MIPMAP_PROCESS(d1,d2,d3)					\
+# define MIPMAP_PROCESS(d1,d2,d3)					\
     {									\
       ACCUMULATE_PIXEL (src1 [d1], 1);					\
       ACCUMULATE_PIXEL (src1 [d2], 2);					\
@@ -229,72 +225,55 @@ static void MIPMAP_NAME (unsigned w, unsigned h
     MIPMAP_PIXTYPE * src1 = (y == 0) ? srcmax : (MIPMAP_PIXTYPE *)src - w;
     MIPMAP_PIXTYPE * src2 = (MIPMAP_PIXTYPE *)src;
     MIPMAP_PIXTYPE * src3 = (y == nh - 1) ? srcorg : (MIPMAP_PIXTYPE *)src + w;
-
-    // Process first and last column separately since they wrap around
-#ifndef MIPMAP_ALPHA
-    unsigned rb = 0, ga = 0;
-#else
-    unsigned a = 0;
-#endif
-#define FINALLY goto startloop;
-    MIPMAP_PROCESS (w1, 0, 1);
-    MIPMAP_OUTPUT;
-
-#ifdef MIPMAP_TRANSPARENT
-startloop:
 #endif
 
-    for (x = 1; x < w1; x++)
-#else
     for (x = 0; x <= w1; x += MIPMAP_STEP)
-#endif
     {
 #ifndef MIPMAP_ALPHA
       unsigned rb = 0, ga = 0;
+# ifdef MIPMAP_TRANSPARENT
+	  unsigned transcnt = 0;
+# endif
 #else
       unsigned a = 0;
 #endif
 
-#undef FINALLY
-#define FINALLY
 #if MIPMAP_LEVEL == 0
-#  undef FINALLY
-#  define FINALLY src1++; src2++; src3++;
-      MIPMAP_PROCESS (0, 1, 2);
-      FINALLY;
+	  // Process first and last column separately since they wrap around
+# ifdef MIPMAP_TRANSPARENT
+	  if (MIPMAP_ISKEY(src2[0]))
+	  {
+	    *(uint32 *)dst++ = MIPMAP_RGB(src2[0]);
+		src1++; src2++; src3++;
+		continue;
+	  }
+# endif
+	  if (x == 0)
+	  {
+		MIPMAP_PROCESS (w1, 0, 1);
+	  } 
+	  else if (x == w1)
+	  {
+		MIPMAP_PROCESS (-1, 0, -w1);
+	  }
+	  else
+	  {
+        MIPMAP_PROCESS (-1, 0, 1);
+      }
+	  src1++; src2++; src3++;
 #elif MIPMAP_LEVEL == 1
       ACCUMULATE_2X2 (x);
-#elif MIPMAP_LEVEL == 2
-      ACCUMULATE_4X4 (x);
-#elif MIPMAP_LEVEL == 3
-      ACCUMULATE_8X8 (x);
 #endif
 
       MIPMAP_OUTPUT;
     }
-
-#undef FINALLY
-#define FINALLY src += w * MIPMAP_STEP;
-
-#if MIPMAP_LEVEL == 0
-    // Process last pixel in column
-#ifndef MIPMAP_ALPHA
-    rb = ga = 0;
-#else
-    a = 0;
-#endif
-    MIPMAP_PROCESS (0, 1, 0-(w - 2));
-    MIPMAP_OUTPUT;
-#endif
-
-    FINALLY;
-#undef FINALLY
+    src += w * MIPMAP_STEP;
   }
 }
 
+#undef MIPMAP_RGB
+#undef MIPMAP_ISKEY
 #undef ACCUMULATE_2X2
-#undef ACCUMULATE_4X4
-#undef ACCUMULATE_8X8
 #undef ACCUMULATE_PIXEL
 #undef MIPMAP_NAME
 #undef MIPMAP_LEVEL

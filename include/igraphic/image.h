@@ -51,12 +51,12 @@
 
 struct csRGBpixel;
 
-SCF_VERSION (iImage, 1, 0, 1);
+SCF_VERSION (iImage, 1, 0, 2);
 
 /**
  * The iImage interface is used to work with image files
  * (what did you expect?). Crystal Space supports loading of images in
- * GIF, JPEG, PNG, SGI, TIFF etc formats, you can work with any image
+ * GIF, JPEG, PNG, SGI etc formats, you can work with any image
  * through this interface.
  */
 struct iImage : public iBase
@@ -81,9 +81,10 @@ struct iImage : public iBase
 
   /**
    * Create a new iImage which is a mipmapped version of this one.
-   * 'step' indicates how much the mipmap should be scaled down. Only
-   * steps 0, 1, 2, and 3 are supported. Step 0 returns the blended version
-   * of the image without image being scaled down.
+   * 'step' indicates how much the mipmap should be scaled down. Step 0 
+   * returns a blurred version of the image without image being scaled down.
+   * Step 1 scales the image down to 1/2. Steps &gt; 1 repeat this 
+   * <i>'step'</i> times.
    * The new image will have same format as the original one. If you pass
    * a pointer to a transparent color, the texels of that color are handled
    * differently.
@@ -131,6 +132,14 @@ struct iImage : public iBase
 
   /// get the keycolour stored with the image.
   virtual void GetKeycolor (int &r, int &g, int &b) = 0;
+
+  /**
+   * Create a sharpened copy of the image.
+   * The effect of 'strength' differs from image to image. Values around 128-512 
+   * give good results. On really blurry images values up to 1024 or 2048 can be 
+   * used.
+   */
+  virtual iImage *Sharpen (csRGBpixel *transp, int strength) = 0;
 };
 
 #endif // __IGRAPHIC_IMAGE_H__

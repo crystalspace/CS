@@ -466,7 +466,7 @@ void csTextureHandleOpenGL::Clear ()
   }
 }
 
-csTexture *csTextureHandleOpenGL::NewTexture (iImage *Image)
+csTexture *csTextureHandleOpenGL::NewTexture (iImage *Image, bool ismipmap)
 {
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
     return new csTextureProcOpenGL (this, Image);
@@ -571,7 +571,7 @@ void csTextureHandleOpenGL::CreateMipmaps ()
 
   size = 0;
   //  printf ("push 0\n");
-  csTexture* ntex = NewTexture (image);
+  csTexture* ntex = NewTexture (image, false);
   vTex.Push (ntex);
   DG_LINK (this, ntex);
 
@@ -601,8 +601,14 @@ void csTextureHandleOpenGL::CreateMipmaps ()
       nTex++;
       //  printf ("make mipmap %d\n", nTex);
       thisImage = prevImage->MipMap (1, tc);
+      if (txtmgr->sharpen_mipmaps)
+      {
+	iImage *nimg = thisImage->Sharpen (tc, txtmgr->sharpen_mipmaps);
+	thisImage->DecRef ();
+	thisImage = nimg;
+      }
       //  printf ("push %d\n", nTex);
-      csTexture* ntex = NewTexture (thisImage);
+      csTexture* ntex = NewTexture (thisImage, true);
       vTex.Push (ntex);
       DG_LINK (this, ntex);
       //  printf ("transform %d\n", nTex);
@@ -694,6 +700,9 @@ void csTextureManagerOpenGL::read_config (iConfigFile *config)
     proc_tex_type = AUXILIARY_BUFFER_TEXTURE;
   else // default
     proc_tex_type = BACK_BUFFER_TEXTURE;
+
+  sharpen_mipmaps = config->GetInt
+        ("Video.OpenGL.SharpenMipmaps", 0);
 
   iConfigIterator *it = config->Enumerate ("Video.OpenGL.TargetFormat");
   while (it->Next ())

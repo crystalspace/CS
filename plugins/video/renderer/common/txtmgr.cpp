@@ -129,13 +129,13 @@ void csTextureHandle::CreateMipmaps ()
     iImage *i2 = i1->MipMap (1, tc);
     iImage *i3 = i2->MipMap (1, tc);
 
-    tex [1] = NewTexture (i1);
+    tex [1] = NewTexture (i1, true);
     DG_LINK (this, tex[1]);
     i1->DecRef ();
-    tex [2] = NewTexture (i2);
+    tex [2] = NewTexture (i2, true);
     DG_LINK (this, tex[2]);
     i2->DecRef ();
-    tex [3] = NewTexture (i3);
+    tex [3] = NewTexture (i3, true);
     DG_LINK (this, tex[3]);
     i3->DecRef ();
   }
@@ -331,7 +331,7 @@ csTextureManager::csTextureManager (iObjectRegistry* object_reg,
 csTextureManager::~csTextureManager()
 {
   Clear ();
-    printf("Texture manager now going bye byes...\n"); //@@@ Debugging. MHV
+  //printf("Texture manager now going bye byes...\n"); //@@@ Debugging. MHV
 }
 
 void csTextureManager::read_config (iConfigFile* /*config*/)

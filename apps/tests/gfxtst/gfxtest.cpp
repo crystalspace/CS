@@ -64,6 +64,7 @@ static struct option long_options[] =
   {"heightmap", optional_argument, 0, 'H'},
   {"info", no_argument, 0, 'I'},
   {"strip-alpha", no_argument, 0, 'a'},
+  {"sharpen", required_argument, 0, 'p'},
   {0, no_argument, 0, 0}
 };
 
@@ -81,6 +82,7 @@ static struct
   float hmscale;
   bool info;
   bool stripalpha;
+  int sharpen;
 } opt =
 {
   false,
@@ -94,7 +96,8 @@ static struct
   0,
   1/500.0,
   false,
-  false
+  false,
+  0
 };
 // Dont move inside the struct!
 static csRGBpixel transpcolor;
@@ -109,7 +112,7 @@ static int display_help ()
   printf ("Usage: %s {option/s} [image file] [...]\n\n", programname);
   printf ("  -d   --dither        Apply Floyd-Steinberg dithering when reducing to 8 bpp\n");
   printf ("  -s   --scale=#[,#]   Re-scale the image to given size #\n");
-  printf ("  -m   --mipmap=#      Create mipmap level # (=0,1,2,3) from image\n");
+  printf ("  -m   --mipmap=#      Create mipmap level # (>=0) from image\n");
   printf ("  -t   --transp=#,#,#  Treat color (R,G,B) as transparent\n");
   printf ("  -8   --paletted      Convert image to 8 bits-per-pixel paletted format\n");
   printf ("  -c   --truecolor     Convert image to truecolor format\n");
@@ -117,6 +120,7 @@ static int display_help ()
   printf ("  -v   --verbose       Comment on what's happening\n");
   printf ("  -V   --version       Display program version\n");
   printf ("  -a   --strip-alpha   Remove alpha channel, if present\n");
+  printf ("  -p   --sharpen=#     Sharpen the image, strength #\n");
   printf ("------------------- Output options (reciprocally exclusive): ------------------\n");
   printf ("  -S   --save[=#]      Output a PNG output image (default)\n");
   printf ("  -P   --prefix=#      Add prefix before output filename\n");
@@ -443,6 +447,14 @@ static bool process_file (const char *fname)
     }
   }
 
+  if (opt.sharpen)
+  {
+    printf ("Sharpening image with strength %d\n", opt.sharpen);
+    iImage *ifile2 = ifile->Sharpen (opt.transp ? &transpcolor : NULL, opt.sharpen);
+    ifile->DecRef ();
+    ifile = ifile2;
+  }
+
   bool success = false;
   switch (opt.outputmode)
   {
@@ -505,7 +517,7 @@ int main (int argc, char *argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cdas:m:t:D:S:P:U::H::IhvV", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cdas:m:t:p:D:S:P:U::H::IhvV", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
@@ -582,12 +594,12 @@ int main (int argc, char *argv[])
       case 'm':
         if (sscanf (optarg, "%d", &opt.mipmap) != 1)
         {
-          printf ("%s: expecting <mipmap level> which is one of 0,1,2,3 after -m\n", programname);
+          printf ("%s: expecting <mipmap level> which is >=0 after -m\n", programname);
           return -1;
         }
-        if (opt.mipmap < 0 || opt.mipmap > 3)
+        if (opt.mipmap < 0)
         {
-          printf ("%s: bad mipmap level (%d): should be one of 0,1,2,3\n", programname, opt.mipmap);
+          printf ("%s: bad mipmap level (%d): should be >=0\n", programname, opt.mipmap);
           return -1;
         }
         break;
@@ -615,6 +627,13 @@ int main (int argc, char *argv[])
         printf ("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n");
         printf ("GNU Library General Public License for more details.\n");
         return 0;
+      case 'p':
+        if (sscanf (optarg, "%d", &opt.sharpen) != 1)
+        {
+          printf ("%s: expecting <sharpening strength> after -p\n", programname);
+          return -1;
+        }
+	break;
     } /* endswitch */
 
   if (optind >= argc)
