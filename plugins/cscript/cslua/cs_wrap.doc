@@ -45,362 +45,573 @@ functions in inner loops or other intensive operations.
 1.1.  class iBase
 -----------------
 
+
+
 1.2.  class iSCF
 ----------------
 
-iSCF_scfCreateInstance
+
 
 ----------
 
-MakeVersion
+
 
 1.3.  class csVector3
 ---------------------
 
-csVector3_x_set
-csVector3_x_get
 
-csVector3_y_set
-csVector3_y_get
 
-csVector3_z_set
-csVector3_z_get
 
-new_csVector3
+
+
+
+
+
+
+
+
+
 
 1.4.  class csRGBpixel
 ----------------------
 
-csRGBpixel_red_set
-csRGBpixel_red_get
 
-csRGBpixel_green_set
-csRGBpixel_green_get
 
-csRGBpixel_blue_set
-csRGBpixel_blue_get
 
-csRGBpixel_alpha_set
-csRGBpixel_alpha_get
 
-1.5.  class iPlugin
--------------------
 
-iPlugin_Initialize
 
-iPlugin_HandleEvent
 
-1.6.  class iTextureWrapper
----------------------------
 
-1.7.  class iTextureHandle
---------------------------
 
-iTextureHandle_GetMipMapDimensions
 
-iTextureHandle_GetMeanColor
 
-iTextureHandle_GetCacheData
 
-iTextureHandle_SetCacheData
+1.5.  class csPixelFormat
+-------------------------
 
-iTextureHandle_GetPrivateObject
 
-1.8.  class iMaterialHandle
----------------------------
 
-iMaterialHandle_GetTexture
 
-iMaterialHandle_GetFlatColor
 
-iMaterialHandle_GetReflection
 
-iMaterialHandle_Prepare
 
-1.9.  class iMaterialWrapper
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.6.  class csGraphics3DCaps
 ----------------------------
 
-iMaterialWrapper_GetMaterialHandle
 
-1.10.  class iGraphics3D
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.7.  class csImageArea
+-----------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.8.  class iPlugin
+-------------------
+
+
+
+
+
+1.9.  class iTextureWrapper
+---------------------------
+
+1.10.  class iTextureHandle
+---------------------------
+
+
+
+
+
+
+
+
+
+
+
+1.11.  class iMaterialHandle
+----------------------------
+
+
+
+
+
+
+
+
+
+1.12.  class iMaterialWrapper
+-----------------------------
+
+
+
+1.13.  class iFont
+------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+         typedef void (*DeleteNotify) (iFont *, void *);
+         virtual void AddDeleteCallback (DeleteNotify func, void *databag) = 0;
+         virtual bool RemoveDeleteCallback (DeleteNotify func, void *databag) = 0;
+        
+1.14.  class iFontServer
 ------------------------
 
-iGraphics3D_Initialize
 
-iGraphics3D_Open
 
-iGraphics3D_Close
 
-iGraphics3D_SetDimensions
 
-iGraphics3D_BeginDraw
 
-iGraphics3D_FinishDraw
 
-iGraphics3D_Print
+1.15.  class iGraphics2D
+------------------------
 
-iGraphics3D_DrawPolygon
 
-iGraphics3D_DrawPolygonDebug
 
-iGraphics3D_DrawLine
-        oid StartPolygonFX (iTextureHandle* handle, UInt mode);
-        oid FinishPolygonFX ();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+         virtual bool PerformExtension (char const* command, ...) = 0;
+         virtual bool PerformExtensionV (char const* command, va_list) = 0;
+        
+
+
+
+
+
+
+1.16.  class iHalo
+------------------
+
+
+
+
+
+
+
+
+
+
+
+1.17.  class iGraphics3D
+------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         oid DrawPolygonFX (G3DPolygonDPFX& poly);
         
-iGraphics3D_DrawTriangleMesh
 
-iGraphics3D_DrawPolygonMesh
 
-iGraphics3D_OpenFogObject
 
-iGraphics3D_DrawFogPolygon
 
-iGraphics3D_CloseFogObject
+
+
+
+
+
         ool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
         ong GetRenderState (G3D_RENDERSTATEOPTION op);
         
-iGraphics3D_GetCaps
 
-iGraphics3D_GetZBuffAt
 
-iGraphics3D_GetZBuffValue
 
-iGraphics3D_DumpCache
 
-iGraphics3D_ClearCache
 
-iGraphics3D_RemoveFromCache
 
-iGraphics3D_GetWidth
 
-iGraphics3D_GetHeight
 
-iGraphics3D_SetPerspectiveCenter
 
-iGraphics3D_SetPerspectiveAspect
 
-iGraphics3D_SetObjectToCamera
 
-iGraphics3D_SetClipper
 
-iGraphics3D_GetDriver2D
 
-iGraphics3D_GetTextureManager
 
-iGraphics3D_CreateHalo
 
-iGraphics3D_DrawPixmap
 
-1.11.  class iCamera
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.18.  class iCamera
 --------------------
 
-iCamera_GetFOV
 
-iCamera_GetInvFOV
 
-1.12.  class iSector
+
+
+1.19.  class iSector
 --------------------
 
-iSector_CreateBSP
+1.20.  class iThingState
+------------------------
 
-1.13.  class iThing
--------------------
 
-iThing_GetName
 
-iThing_SetName
+1.21.  class iMeshObject
+------------------------
 
-iThing_CompressVertices
 
-iThing_GetPolygonCount
 
-iThing_GetPolygon
+1.22.  class iMeshWrapper
+-------------------------
 
-iThing_CreatePolygon
 
-iThing_GetVertexCount
 
-iThing_GetVertex
+1.23.  class iLightMap
+----------------------
 
-iThing_GetVertexW
 
-iThing_GetVertexC
 
-iThing_CreateVertex
 
-iThing_CreateKey
 
-1.14.  class iPolygon3D
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.24.  class iPolygon3D
 -----------------------
 
-iPolygon3D_GetName
 
-iPolygon3D_SetName
 
-iPolygon3D_GetLightMap
 
-iPolygon3D_GetMaterialHandle
 
-iPolygon3D_SetMaterial
+
         PolygonTexture *GetTexture ();
         TextureHandle *GetTextureHandle ();
         
-iPolygon3D_GetVertexCount
 
-iPolygon3D_GetVertex
 
-iPolygon3D_GetVertexW
 
-iPolygon3D_GetVertexC
 
-iPolygon3D_CreateVertexByIndex
 
-iPolygon3D_CreateVertex
 
-iPolygon3D_GetAlpha
 
-iPolygon3D_SetAlpha
 
-iPolygon3D_CreatePlane
 
-iPolygon3D_SetPlane
 
-iPolygon3D_SetTextureSpace
 
-1.15.  class iImage
+
+
+
+
+
+
+
+
+
+
+
+1.25.  class iImage
 -------------------
 
-iImage_GetImageData
 
-iImage_GetWidth
 
-iImage_GetHeight
 
-iImage_GetSize
 
-iImage_Rescale
 
-iImage_MipMap
 
-iImage_SetName
 
-iImage_GetName
 
-iImage_GetFormat
 
-iImage_GetPalette
 
-iImage_GetAlpha
 
-iImage_SetFormat
 
-iImage_Clone
 
-iImage_Crop
 
-1.16.  class iTextureManager
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.26.  class iTextureManager
 ----------------------------
 
-iTextureManager_RegisterTexture
 
-iTextureManager_PrepareTextures
 
-iTextureManager_FreeImages
 
-iTextureManager_ResetPalette
 
-iTextureManager_ReserveColor
 
-iTextureManager_FindRGB
 
-iTextureManager_SetPalette
 
-iTextureManager_SetVerbose
 
-iTextureManager_GetTextureFormat
 
-1.17.  class iPolygonTexture
+
+
+
+
+
+
+
+
+
+1.27.  class iPolygonTexture
 ----------------------------
 
-iPolygonTexture_GetMaterialHandle
+
         TextureHandle *GetTextureHandle ();
         
-iPolygonTexture_GetFDU
 
-iPolygonTexture_GetFDV
 
-iPolygonTexture_GetWidth
 
-iPolygonTexture_GetHeight
 
-iPolygonTexture_GetShiftU
 
-iPolygonTexture_GetIMinU
 
-iPolygonTexture_GetIMinV
 
-iPolygonTexture_GetTextureBox
 
-iPolygonTexture_GetOriginalWidth
 
-iPolygonTexture_GetPolygon
 
-iPolygonTexture_DynamicLightsDirty
 
-iPolygonTexture_RecalculateDynamicLights
 
-iPolygonTexture_GetLightMap
 
-iPolygonTexture_GetLightCellSize
 
-iPolygonTexture_GetLightCellShift
 
-iPolygonTexture_GetCacheData
 
-iPolygonTexture_SetCacheData
 
-1.18.  class iEngine
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.28.  class iCameraPosition
+----------------------------
+
+1.29.  class iSectorList
+------------------------
+
+
+
+
+
+
+
+
+
+
+
+1.30.  class iEngine
 --------------------
 
-iEngine_GetTextureFormat
 
-iEngine_SelectLibrary
 
-iEngine_DeleteLibrary
 
-iEngine_DeleteAll
 
-iEngine_CreateTexture
 
-iEngine_CreateCamera
 
-iEngine_CreateKey
 
-iEngine_CreatePlane
 
-iEngine_CreateSector
 
-iEngine_FindSector
 
-iEngine_GetSector
 
-iEngine_CreateThing
 
-iEngine_FindMaterial
 
-1.19.  class iSystem
+
+
+
+
+
+
+
+
+
+
+
+1.31.  class iSystem
 --------------------
 
-iSystem_Query_iEngine
 
-iSystem_Query_iGraphics3D
 
-iSystem_Print
 
-----------
 
-GetSystem
 
-GetMyPtr
 

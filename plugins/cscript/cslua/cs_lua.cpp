@@ -16,336 +16,72 @@
 
 
 #define SWIGCODE
-/* Implementation : Lua */
+#define SWIG_SHADOW_CLASSES
+/* -*- c -*-
+ * 
+ * lua40.swg
+ * 
+ * Copyright (C) 2000 Didier Jorand <didier.jorand@free.fr>
+ * 
+ * This code is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This code is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this code; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ * 
+ */
 
-#define LUA_MS
-
+#ifdef __cplusplus
 extern "C" {
-#include <lua.h>
-}
-#include <string.h>
-
-/*****************************************************************************
- * $Header$
- *
- * swigptr.swg
- *
- * This file contains supporting code for the SWIG run-time type checking
- * mechanism.  The following functions are available :
- *
- * SWIG_RegisterMapping(char *origtype, char *newtype, void *(*cast)(void *));
- *
- *      Registers a new type-mapping with the type-checker.  origtype is the
- *      original datatype and newtype is an equivalent type.  cast is optional
- *      pointer to a function to cast pointer values between types (this
- *      is typically used to cast pointers from derived classes to base classes in C++)
- *      
- * SWIG_MakePtr(char *buffer, void *ptr, char *typestring);
- *     
- *      Makes a pointer string from a pointer and typestring.  The result is returned
- *      in buffer which is assumed to hold enough space for the result.
- *
- * char * SWIG_GetPtr(char *buffer, void **ptr, char *type)
- *
- *      Gets a pointer value from a string.  If there is a type-mismatch, returns
- *      a character string to the received type.  On success, returns NULL.
- *
- *
- * You can remap these functions by making a file called "swigptr.swg" in
- * your the same directory as the interface file you are wrapping.
- *
- * These functions are normally declared static, but this file can be
- * can be used in a multi-module environment by redefining the symbol
- * SWIGSTATIC.
- *****************************************************************************/
-
+#endif
+    
 #include <stdlib.h>
 
-#ifdef SWIG_GLOBAL
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#include <luadebug.h>
+
+extern int const_ptr_tag;
+extern int const_string_tag;
+extern int const_integer_tag;
+extern int const_float_tag;
+extern int const_double_tag;
+extern int ptr_tag;
+extern int string_tag;
+extern int integer_tag;
+extern int float_tag;
+extern int double_tag;
+
+extern int pointer_tag;
+    
+extern void swig_lua_init(lua_State *L);
+
 #ifdef __cplusplus
-#define SWIGSTATIC extern "C"
-#else
-#define SWIGSTATIC
-#endif
+}
 #endif
 
-#ifndef SWIGSTATIC
-#define SWIGSTATIC static
+/*
+ * end of lua40.swg
+ */
+    
+    
+#ifdef __cplusplus
+extern "C" {
 #endif
-
-
-/* SWIG pointer structure */
-
-typedef struct SwigPtrType {
-  char               *name;               /* Datatype name                  */
-  int                 len;                /* Length (used for optimization) */
-  void               *(*cast)(void *);    /* Pointer casting function       */
-  struct SwigPtrType *next;               /* Linked list pointer            */
-} SwigPtrType;
-
-/* Pointer cache structure */
-
-typedef struct {
-  int                 stat;               /* Status (valid) bit             */
-  SwigPtrType        *tp;                 /* Pointer to type structure      */
-  char                name[256];          /* Given datatype name            */
-  char                mapped[256];        /* Equivalent name                */
-} SwigCacheType;
-
-/* Some variables  */
-
-static int SwigPtrMax  = 64;           /* Max entries that can be currently held */
-                                       /* This value may be adjusted dynamically */
-static int SwigPtrN    = 0;            /* Current number of entries              */
-static int SwigPtrSort = 0;            /* Status flag indicating sort            */
-static int SwigStart[256];             /* Starting positions of types            */
-
-/* Pointer table */
-static SwigPtrType *SwigPtrTable = 0;  /* Table containing pointer equivalences  */
-
-/* Cached values */
-
-#define SWIG_CACHESIZE  8
-#define SWIG_CACHEMASK  0x7
-static SwigCacheType SwigCache[SWIG_CACHESIZE];  
-static int SwigCacheIndex = 0;
-static int SwigLastCache = 0;
-
-/* Sort comparison function */
-static int swigsort(const void *data1, const void *data2) {
-	SwigPtrType *d1 = (SwigPtrType *) data1;
-	SwigPtrType *d2 = (SwigPtrType *) data2;
-	return strcmp(d1->name,d2->name);
+int cspace_initialize(lua_State *L);
+#ifdef __cplusplus
 }
-
-/* Binary Search function */
-static int swigcmp(const void *key, const void *data) {
-  char *k = (char *) key;
-  SwigPtrType *d = (SwigPtrType *) data;
-  return strncmp(k,d->name,d->len);
-}
-
-/* Register a new datatype with the type-checker */
-
-SWIGSTATIC 
-void SWIG_RegisterMapping(char *origtype, char *newtype, void *(*cast)(void *)) {
-
-  int i;
-  SwigPtrType *t = 0,*t1;
-
-  /* Allocate the pointer table if necessary */
-
-  if (!SwigPtrTable) {     
-    SwigPtrTable = (SwigPtrType *) malloc(SwigPtrMax*sizeof(SwigPtrType));
-    SwigPtrN = 0;
-  }
-  /* Grow the table */
-  if (SwigPtrN >= SwigPtrMax) {
-    SwigPtrMax = 2*SwigPtrMax;
-    SwigPtrTable = (SwigPtrType *) realloc((char *) SwigPtrTable,SwigPtrMax*sizeof(SwigPtrType));
-  }
-  for (i = 0; i < SwigPtrN; i++)
-    if (strcmp(SwigPtrTable[i].name,origtype) == 0) {
-      t = &SwigPtrTable[i];
-      break;
-    }
-  if (!t) {
-    t = &SwigPtrTable[SwigPtrN];
-    t->name = origtype;
-    t->len = strlen(t->name);
-    t->cast = 0;
-    t->next = 0;
-    SwigPtrN++;
-  }
-
-  /* Check for existing entry */
-
-  while (t->next) {
-    if ((strcmp(t->name,newtype) == 0)) {
-      if (cast) t->cast = cast;
-      return;
-    }
-    t = t->next;
-  }
-  
-  /* Now place entry (in sorted order) */
-
-  t1 = (SwigPtrType *) malloc(sizeof(SwigPtrType));
-  t1->name = newtype;
-  t1->len = strlen(t1->name);
-  t1->cast = cast;
-  t1->next = 0;            
-  t->next = t1;           
-  SwigPtrSort = 0;
-}
-
-/* Make a pointer value string */
-
-SWIGSTATIC 
-void SWIG_MakePtr(char *_c, const void *_ptr, char *type) {
-  static char _hex[16] =
-  {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-   'a', 'b', 'c', 'd', 'e', 'f'};
-  unsigned long _p, _s;
-  char _result[20], *_r;    /* Note : a 64-bit hex number = 16 digits */
-  _r = _result;
-  _p = (unsigned long) _ptr;
-  if (_p > 0) {
-    while (_p > 0) {
-      _s = _p & 0xf;
-      *(_r++) = _hex[_s];
-      _p = _p >> 4;
-    }
-    *_r = '_';
-    while (_r >= _result)
-      *(_c++) = *(_r--);
-  } else {
-    strcpy (_c, "NULL");
-  }
-  if (_ptr)
-    strcpy (_c, type);
-}
-
-/* Define for backwards compatibility */
-
-#define _swig_make_hex   SWIG_MakePtr 
-
-/* Function for getting a pointer value */
-
-SWIGSTATIC 
-char *SWIG_GetPtr(char *_c, void **ptr, char *_t)
-{
-  unsigned long _p;
-  char temp_type[256];
-  char *name;
-  int  i, len;
-  SwigPtrType *sp,*tp;
-  SwigCacheType *cache;
-  int  start, end;
-  _p = 0;
-
-  /* Pointer values must start with leading underscore */
-  if (*_c == '_') {
-      _c++;
-      /* Extract hex value from pointer */
-      while (*_c) {
-	  if ((*_c >= '0') && (*_c <= '9'))
-	    _p = (_p << 4) + (*_c - '0');
-	  else if ((*_c >= 'a') && (*_c <= 'f'))
-	    _p = (_p << 4) + ((*_c - 'a') + 10);
-	  else
-	    break;
-	  _c++;
-      }
-
-      if (_t) {
-	if (strcmp(_t,_c)) { 
-	  if (!SwigPtrSort) {
-	    qsort((void *) SwigPtrTable, SwigPtrN, sizeof(SwigPtrType), swigsort); 
-	    for (i = 0; i < 256; i++) {
-	      SwigStart[i] = SwigPtrN;
-	    }
-	    for (i = SwigPtrN-1; i >= 0; i--) {
-	      SwigStart[(int) (SwigPtrTable[i].name[1])] = i;
-	    }
-	    for (i = 255; i >= 1; i--) {
-	      if (SwigStart[i-1] > SwigStart[i])
-		SwigStart[i-1] = SwigStart[i];
-	    }
-	    SwigPtrSort = 1;
-	    for (i = 0; i < SWIG_CACHESIZE; i++)  
-	      SwigCache[i].stat = 0;
-	  }
-	  
-	  /* First check cache for matches.  Uses last cache value as starting point */
-	  cache = &SwigCache[SwigLastCache];
-	  for (i = 0; i < SWIG_CACHESIZE; i++) {
-	    if (cache->stat) {
-	      if (strcmp(_t,cache->name) == 0) {
-		if (strcmp(_c,cache->mapped) == 0) {
-		  cache->stat++;
-		  *ptr = (void *) _p;
-		  if (cache->tp->cast) *ptr = (*(cache->tp->cast))(*ptr);
-		  return (char *) 0;
-		}
-	      }
-	    }
-	    SwigLastCache = (SwigLastCache+1) & SWIG_CACHEMASK;
-	    if (!SwigLastCache) cache = SwigCache;
-	    else cache++;
-	  }
-	  /* We have a type mismatch.  Will have to look through our type
-	     mapping table to figure out whether or not we can accept this datatype */
-
-	  start = SwigStart[(int) _t[1]];
-	  end = SwigStart[(int) _t[1]+1];
-	  sp = &SwigPtrTable[start];
-	  while (start < end) {
-	    if (swigcmp(_t,sp) == 0) break;
-	    sp++;
-	    start++;
-	  }
-	  if (start >= end) sp = 0;
-	  /* Try to find a match for this */
-	  if (sp) {
-	    while (swigcmp(_t,sp) == 0) {
-	      name = sp->name;
-	      len = sp->len;
-	      tp = sp->next;
-	      /* Try to find entry for our given datatype */
-	      while(tp) {
-		if (tp->len >= 255) {
-		  return _c;
-		}
-		strcpy(temp_type,tp->name);
-		strncat(temp_type,_t+len,255-tp->len);
-		if (strcmp(_c,temp_type) == 0) {
-		  
-		  strcpy(SwigCache[SwigCacheIndex].mapped,_c);
-		  strcpy(SwigCache[SwigCacheIndex].name,_t);
-		  SwigCache[SwigCacheIndex].stat = 1;
-		  SwigCache[SwigCacheIndex].tp = tp;
-		  SwigCacheIndex = SwigCacheIndex & SWIG_CACHEMASK;
-		  
-		  /* Get pointer value */
-		  *ptr = (void *) _p;
-		  if (tp->cast) *ptr = (*(tp->cast))(*ptr);
-		  return (char *) 0;
-		}
-		tp = tp->next;
-	      }
-	      sp++;
-	      /* Hmmm. Didn't find it this time */
-	    }
-	  }
-	  /* Didn't find any sort of match for this data.  
-	     Get the pointer value and return the received type */
-	  *ptr = (void *) _p;
-	  return _c;
-	} else {
-	  /* Found a match on the first try.  Return pointer value */
-	  *ptr = (void *) _p;
-	  return (char *) 0;
-	}
-      } else {
-	/* No type specified.  Good luck */
-	*ptr = (void *) _p;
-	return (char *) 0;
-      }
-  } else {
-    if (strcmp (_c, "NULL") == 0) {
-	*ptr = (void *) 0;
-	return (char *) 0;
-    }
-    *ptr = (void *) 0;	
-    return _c;
-  }
-}
-
-/* Compatibility mode */
-
-#define _swig_get_hex  SWIG_GetPtr
-
+#endif
 
   #include "css.h"
 //***** SCF Wrappers
@@ -355,84 +91,103 @@ char *SWIG_GetPtr(char *_c, void **ptr, char *_t)
   }
 
 #include "isys/system.h"
-#include "csparser/csloader.h"
+#include "iengine/camera.h"
+#include "iengine/campos.h"
+#include "imesh/object.h"
+#include "imesh/thing/thing.h"
+#include "imesh/thing/lightmap.h"
+#include "imap/parser.h"
 #include "plugins/cscript/cspython/cspython.h"
-iSystem* GetSystem()
+#include "ivideo/graph2d.h"
+#include "ivideo/fontserv.h"
+#include "ivideo/halo.h"
+
+int iBase_tag;
+int iSCF_tag;
+int csVector3_tag;
+int csRGBpixel_tag;
+int csPixelFormat_tag;
+int csGraphics3DCaps_tag;
+int csImageArea_tag;
+int iPlugin_tag;
+int iTextureWrapper_tag;
+int iTextureHandle_tag;
+int iMaterialHandle_tag;
+int iMaterialWrapper_tag;
+int iFont_tag;
+int iFontServer_tag;
+int iGraphics2D_tag;
+int iHalo_tag;
+int iGraphics3D_tag;
+int iCamera_tag;
+int iSector_tag;
+int iThingState_tag;
+int iMeshObject_tag;
+int iMeshWrapper_tag;
+int iLightMap_tag;
+int iPolygon3D_tag;
+int iImage_tag;
+int iTextureManager_tag;
+int iPolygonTexture_tag;
+int iCameraPosition_tag;
+int iSectorList_tag;
+int iEngine_tag;
+int iSystem_tag;
+static int
+wrap_MakeVersion(lua_State *L)
 {
-  return thisclass->Sys;
-}
-
-void* GetMyPtr() { return NULL; }
-static int _wrap_MakeVersion(lua_State *lua_state) {
-
     int  _result;
     int  _arg0;
     int  _arg1;
     int  _arg2;
 
 {
-#ifdef LUA_MS
-  _arg0 = (int ) lua_tonumber (lua_state,  1 );
-#else
-  _arg0 = (int ) lua_tonumber ( 1 );
-#endif
+	if(!lua_isnumber(L, 1)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg0 = (int )lua_tonumber(L, 1);
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
 }
+	lua_settop(L, 0);
     _result = (int )MakeVersion(_arg0,_arg1,_arg2);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-static int _wrap_GetSystem(lua_State *lua_state) {
 
-    iSystem * _result;
-
-    _result = (iSystem *)GetSystem();
+#define iBase_DecRef(_swigobj)  (_swigobj->DecRef())
+static int
+wrap_iBase_DecRef(lua_State *L)
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
-}
-    return 1;
-}
-static int _wrap_GetMyPtr(lua_State *lua_state) {
+    iBase * _arg0;
 
-    void * _result;
-
-    _result = (void *)GetMyPtr();
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iBase *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
-    return 1;
+	lua_settop(L, 0);
+    iBase_DecRef(_arg0);
+	return 0;
 }
+
 static void *SwigiSCFToiBase(void *ptr) {
     iSCF *src;
     iBase *dest;
@@ -441,9 +196,10 @@ static void *SwigiSCFToiBase(void *ptr) {
     return (void *) dest;
 }
 
-#define iSCF_scfCreateInstance(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->scfCreateInstance(_swigarg0,_swigarg1,_swigarg2))
-static int _wrap_iSCF_scfCreateInstance(lua_State *lua_state) {
-
+#define iSCF_CreateInstance(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->CreateInstance(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iSCF_CreateInstance(lua_State *L)
+{
     void * _result;
     iSCF * _arg0;
     char * _arg1;
@@ -451,509 +207,1943 @@ static int _wrap_iSCF_scfCreateInstance(lua_State *lua_state) {
     int  _arg3;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iSCF *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iSCF *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iSCF *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg2 = (char*) lua_tostring (lua_state,  3 );
-#else
-  _arg2 = (char*) lua_tostring ( 3 );
-#endif
+	if((lua_isnull(L, 3)) || (lua_isnil(L, 3))) {
+		_arg2 = NULL;
+	} else if(lua_isstring(L, 3)) {
+		_arg2 = (char *)lua_tostring(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg2 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg3 = (int ) lua_tonumber (lua_state,  4 );
-#else
-  _arg3 = (int ) lua_tonumber ( 4 );
-#endif
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
 }
-    _result = (void *)iSCF_scfCreateInstance(_arg0,_arg1,_arg2,_arg3);
+	lua_settop(L, 0);
+    _result = (void *)iSCF_CreateInstance(_arg0,_arg1,_arg2,_arg3);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushuserdata(L, (void*)_result);
+    }
 }
-    return 1;
+	return 1;
 }
-#define csVector3_x_set(_swigobj,_swigval) (_swigobj->x = _swigval,_swigval)
-static int _wrap_csVector3_x_set(lua_State *lua_state) {
 
+#define csVector3_x_set(_swigobj,_swigval) (_swigobj->x = _swigval,_swigval)
+static int
+wrap_csVector3_x_set(lua_State *L)
+{
     float  _result;
     csVector3 * _arg0;
     float  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csVector3 *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csVector3 *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csVector3 *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (float ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (float ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg1 = (float )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     _result = (float )csVector3_x_set(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csVector3_x_get(_swigobj) ((float ) _swigobj->x)
-static int _wrap_csVector3_x_get(lua_State *lua_state) {
 
+#define csVector3_x_get(_swigobj) ((float ) _swigobj->x)
+static int
+wrap_csVector3_x_get(lua_State *L)
+{
     float  _result;
     csVector3 * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csVector3 *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csVector3 *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csVector3 *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (float )csVector3_x_get(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csVector3_y_set(_swigobj,_swigval) (_swigobj->y = _swigval,_swigval)
-static int _wrap_csVector3_y_set(lua_State *lua_state) {
 
+#define csVector3_y_set(_swigobj,_swigval) (_swigobj->y = _swigval,_swigval)
+static int
+wrap_csVector3_y_set(lua_State *L)
+{
     float  _result;
     csVector3 * _arg0;
     float  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csVector3 *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csVector3 *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csVector3 *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (float ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (float ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg1 = (float )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     _result = (float )csVector3_y_set(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csVector3_y_get(_swigobj) ((float ) _swigobj->y)
-static int _wrap_csVector3_y_get(lua_State *lua_state) {
 
+#define csVector3_y_get(_swigobj) ((float ) _swigobj->y)
+static int
+wrap_csVector3_y_get(lua_State *L)
+{
     float  _result;
     csVector3 * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csVector3 *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csVector3 *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csVector3 *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (float )csVector3_y_get(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csVector3_z_set(_swigobj,_swigval) (_swigobj->z = _swigval,_swigval)
-static int _wrap_csVector3_z_set(lua_State *lua_state) {
 
+#define csVector3_z_set(_swigobj,_swigval) (_swigobj->z = _swigval,_swigval)
+static int
+wrap_csVector3_z_set(lua_State *L)
+{
     float  _result;
     csVector3 * _arg0;
     float  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csVector3 *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csVector3 *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csVector3 *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (float ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (float ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg1 = (float )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     _result = (float )csVector3_z_set(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csVector3_z_get(_swigobj) ((float ) _swigobj->z)
-static int _wrap_csVector3_z_get(lua_State *lua_state) {
 
+#define csVector3_z_get(_swigobj) ((float ) _swigobj->z)
+static int
+wrap_csVector3_z_get(lua_State *L)
+{
     float  _result;
     csVector3 * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csVector3 *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csVector3 *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csVector3 *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (float )csVector3_z_get(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define new_csVector3(_swigarg0,_swigarg1,_swigarg2) (new csVector3(_swigarg0,_swigarg1,_swigarg2))
-static int _wrap_new_csVector3(lua_State *lua_state) {
 
+#define new_csVector3(_swigarg0,_swigarg1,_swigarg2) (new csVector3(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_new_csVector3(lua_State *L)
+{
     csVector3 * _result;
     float  _arg0;
     float  _arg1;
     float  _arg2;
 
 {
-#ifdef LUA_MS
-  _arg0 = (float ) lua_tonumber (lua_state,  1 );
-#else
-  _arg0 = (float ) lua_tonumber ( 1 );
-#endif
+	if(!lua_isnumber(L, 1)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg0 = (float )lua_tonumber(L, 1);
 }
 {
-#ifdef LUA_MS
-  _arg1 = (float ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (float ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg1 = (float )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (float ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (float ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg2 = (float )lua_tonumber(L, 3);
 }
+	lua_settop(L, 0);
     _result = (csVector3 *)new_csVector3(_arg0,_arg1,_arg2);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, csVector3_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define csRGBpixel_red_set(_swigobj,_swigval) (_swigobj->red = _swigval,_swigval)
-static int _wrap_csRGBpixel_red_set(lua_State *lua_state) {
 
+#define delete_csVector3(_swigobj) (delete _swigobj)
+static int
+wrap_delete_csVector3(lua_State *L)
+{
+    csVector3 * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csVector3 *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    delete_csVector3(_arg0);
+	return 0;
+}
+
+#define csRGBpixel_red_set(_swigobj,_swigval) (_swigobj->red = _swigval,_swigval)
+static int
+wrap_csRGBpixel_red_set(lua_State *L)
+{
     unsigned char  _result;
     csRGBpixel * _arg0;
     unsigned char  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csRGBpixel *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csRGBpixel *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csRGBpixel *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (unsigned char ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (unsigned char ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `unsigned char ' expected");
+	}
+	_arg1 = (unsigned char )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     _result = (unsigned char )csRGBpixel_red_set(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csRGBpixel_red_get(_swigobj) ((unsigned char ) _swigobj->red)
-static int _wrap_csRGBpixel_red_get(lua_State *lua_state) {
 
+#define csRGBpixel_red_get(_swigobj) ((unsigned char ) _swigobj->red)
+static int
+wrap_csRGBpixel_red_get(lua_State *L)
+{
     unsigned char  _result;
     csRGBpixel * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csRGBpixel *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csRGBpixel *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csRGBpixel *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (unsigned char )csRGBpixel_red_get(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csRGBpixel_green_set(_swigobj,_swigval) (_swigobj->green = _swigval,_swigval)
-static int _wrap_csRGBpixel_green_set(lua_State *lua_state) {
 
+#define csRGBpixel_green_set(_swigobj,_swigval) (_swigobj->green = _swigval,_swigval)
+static int
+wrap_csRGBpixel_green_set(lua_State *L)
+{
     unsigned char  _result;
     csRGBpixel * _arg0;
     unsigned char  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csRGBpixel *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csRGBpixel *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csRGBpixel *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (unsigned char ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (unsigned char ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `unsigned char ' expected");
+	}
+	_arg1 = (unsigned char )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     _result = (unsigned char )csRGBpixel_green_set(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csRGBpixel_green_get(_swigobj) ((unsigned char ) _swigobj->green)
-static int _wrap_csRGBpixel_green_get(lua_State *lua_state) {
 
+#define csRGBpixel_green_get(_swigobj) ((unsigned char ) _swigobj->green)
+static int
+wrap_csRGBpixel_green_get(lua_State *L)
+{
     unsigned char  _result;
     csRGBpixel * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csRGBpixel *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csRGBpixel *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csRGBpixel *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (unsigned char )csRGBpixel_green_get(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csRGBpixel_blue_set(_swigobj,_swigval) (_swigobj->blue = _swigval,_swigval)
-static int _wrap_csRGBpixel_blue_set(lua_State *lua_state) {
 
+#define csRGBpixel_blue_set(_swigobj,_swigval) (_swigobj->blue = _swigval,_swigval)
+static int
+wrap_csRGBpixel_blue_set(lua_State *L)
+{
     unsigned char  _result;
     csRGBpixel * _arg0;
     unsigned char  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csRGBpixel *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csRGBpixel *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csRGBpixel *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (unsigned char ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (unsigned char ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `unsigned char ' expected");
+	}
+	_arg1 = (unsigned char )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     _result = (unsigned char )csRGBpixel_blue_set(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csRGBpixel_blue_get(_swigobj) ((unsigned char ) _swigobj->blue)
-static int _wrap_csRGBpixel_blue_get(lua_State *lua_state) {
 
+#define csRGBpixel_blue_get(_swigobj) ((unsigned char ) _swigobj->blue)
+static int
+wrap_csRGBpixel_blue_get(lua_State *L)
+{
     unsigned char  _result;
     csRGBpixel * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csRGBpixel *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csRGBpixel *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csRGBpixel *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (unsigned char )csRGBpixel_blue_get(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csRGBpixel_alpha_set(_swigobj,_swigval) (_swigobj->alpha = _swigval,_swigval)
-static int _wrap_csRGBpixel_alpha_set(lua_State *lua_state) {
 
+#define csRGBpixel_alpha_set(_swigobj,_swigval) (_swigobj->alpha = _swigval,_swigval)
+static int
+wrap_csRGBpixel_alpha_set(lua_State *L)
+{
     unsigned char  _result;
     csRGBpixel * _arg0;
     unsigned char  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csRGBpixel *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csRGBpixel *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csRGBpixel *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (unsigned char ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (unsigned char ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `unsigned char ' expected");
+	}
+	_arg1 = (unsigned char )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     _result = (unsigned char )csRGBpixel_alpha_set(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define csRGBpixel_alpha_get(_swigobj) ((unsigned char ) _swigobj->alpha)
-static int _wrap_csRGBpixel_alpha_get(lua_State *lua_state) {
 
+#define csRGBpixel_alpha_get(_swigobj) ((unsigned char ) _swigobj->alpha)
+static int
+wrap_csRGBpixel_alpha_get(lua_State *L)
+{
     unsigned char  _result;
     csRGBpixel * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (csRGBpixel *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (csRGBpixel *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csRGBpixel *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (unsigned char )csRGBpixel_alpha_get(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
+
+#define csPixelFormat_RedMask_set(_swigobj,_swigval) (_swigobj->RedMask = _swigval,_swigval)
+static int
+wrap_csPixelFormat_RedMask_set(lua_State *L)
+{
+    unsigned long  _result;
+    csPixelFormat * _arg0;
+    unsigned long  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `unsigned long ' expected");
+	}
+	_arg1 = (unsigned long )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (unsigned long )csPixelFormat_RedMask_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_RedMask_get(_swigobj) ((unsigned long ) _swigobj->RedMask)
+static int
+wrap_csPixelFormat_RedMask_get(lua_State *L)
+{
+    unsigned long  _result;
+    csPixelFormat * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (unsigned long )csPixelFormat_RedMask_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_GreenMask_set(_swigobj,_swigval) (_swigobj->GreenMask = _swigval,_swigval)
+static int
+wrap_csPixelFormat_GreenMask_set(lua_State *L)
+{
+    unsigned long  _result;
+    csPixelFormat * _arg0;
+    unsigned long  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `unsigned long ' expected");
+	}
+	_arg1 = (unsigned long )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (unsigned long )csPixelFormat_GreenMask_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_GreenMask_get(_swigobj) ((unsigned long ) _swigobj->GreenMask)
+static int
+wrap_csPixelFormat_GreenMask_get(lua_State *L)
+{
+    unsigned long  _result;
+    csPixelFormat * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (unsigned long )csPixelFormat_GreenMask_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_BlueMask_set(_swigobj,_swigval) (_swigobj->BlueMask = _swigval,_swigval)
+static int
+wrap_csPixelFormat_BlueMask_set(lua_State *L)
+{
+    unsigned long  _result;
+    csPixelFormat * _arg0;
+    unsigned long  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `unsigned long ' expected");
+	}
+	_arg1 = (unsigned long )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (unsigned long )csPixelFormat_BlueMask_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_BlueMask_get(_swigobj) ((unsigned long ) _swigobj->BlueMask)
+static int
+wrap_csPixelFormat_BlueMask_get(lua_State *L)
+{
+    unsigned long  _result;
+    csPixelFormat * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (unsigned long )csPixelFormat_BlueMask_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_RedShift_set(_swigobj,_swigval) (_swigobj->RedShift = _swigval,_swigval)
+static int
+wrap_csPixelFormat_RedShift_set(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_RedShift_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_RedShift_get(_swigobj) ((int ) _swigobj->RedShift)
+static int
+wrap_csPixelFormat_RedShift_get(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_RedShift_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_GreenShift_set(_swigobj,_swigval) (_swigobj->GreenShift = _swigval,_swigval)
+static int
+wrap_csPixelFormat_GreenShift_set(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_GreenShift_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_GreenShift_get(_swigobj) ((int ) _swigobj->GreenShift)
+static int
+wrap_csPixelFormat_GreenShift_get(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_GreenShift_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_BlueShift_set(_swigobj,_swigval) (_swigobj->BlueShift = _swigval,_swigval)
+static int
+wrap_csPixelFormat_BlueShift_set(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_BlueShift_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_BlueShift_get(_swigobj) ((int ) _swigobj->BlueShift)
+static int
+wrap_csPixelFormat_BlueShift_get(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_BlueShift_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_RedBits_set(_swigobj,_swigval) (_swigobj->RedBits = _swigval,_swigval)
+static int
+wrap_csPixelFormat_RedBits_set(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_RedBits_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_RedBits_get(_swigobj) ((int ) _swigobj->RedBits)
+static int
+wrap_csPixelFormat_RedBits_get(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_RedBits_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_GreenBits_set(_swigobj,_swigval) (_swigobj->GreenBits = _swigval,_swigval)
+static int
+wrap_csPixelFormat_GreenBits_set(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_GreenBits_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_GreenBits_get(_swigobj) ((int ) _swigobj->GreenBits)
+static int
+wrap_csPixelFormat_GreenBits_get(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_GreenBits_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_BlueBits_set(_swigobj,_swigval) (_swigobj->BlueBits = _swigval,_swigval)
+static int
+wrap_csPixelFormat_BlueBits_set(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_BlueBits_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_BlueBits_get(_swigobj) ((int ) _swigobj->BlueBits)
+static int
+wrap_csPixelFormat_BlueBits_get(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_BlueBits_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_PalEntries_set(_swigobj,_swigval) (_swigobj->PalEntries = _swigval,_swigval)
+static int
+wrap_csPixelFormat_PalEntries_set(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_PalEntries_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_PalEntries_get(_swigobj) ((int ) _swigobj->PalEntries)
+static int
+wrap_csPixelFormat_PalEntries_get(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_PalEntries_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_PixelBytes_set(_swigobj,_swigval) (_swigobj->PixelBytes = _swigval,_swigval)
+static int
+wrap_csPixelFormat_PixelBytes_set(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_PixelBytes_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csPixelFormat_PixelBytes_get(_swigobj) ((int ) _swigobj->PixelBytes)
+static int
+wrap_csPixelFormat_PixelBytes_get(lua_State *L)
+{
+    int  _result;
+    csPixelFormat * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csPixelFormat *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csPixelFormat_PixelBytes_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_CanClip_set(_swigobj,_swigval) (_swigobj->CanClip = _swigval,_swigval)
+static int
+wrap_csGraphics3DCaps_CanClip_set(lua_State *L)
+{
+    bool  _result;
+    csGraphics3DCaps * _arg0;
+    bool  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `bool ' expected");
+	}
+	_arg1 = (bool )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (bool )csGraphics3DCaps_CanClip_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_CanClip_get(_swigobj) ((bool ) _swigobj->CanClip)
+static int
+wrap_csGraphics3DCaps_CanClip_get(lua_State *L)
+{
+    bool  _result;
+    csGraphics3DCaps * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (bool )csGraphics3DCaps_CanClip_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_minTexHeight_set(_swigobj,_swigval) (_swigobj->minTexHeight = _swigval,_swigval)
+static int
+wrap_csGraphics3DCaps_minTexHeight_set(lua_State *L)
+{
+    int  _result;
+    csGraphics3DCaps * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csGraphics3DCaps_minTexHeight_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_minTexHeight_get(_swigobj) ((int ) _swigobj->minTexHeight)
+static int
+wrap_csGraphics3DCaps_minTexHeight_get(lua_State *L)
+{
+    int  _result;
+    csGraphics3DCaps * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csGraphics3DCaps_minTexHeight_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_minTexWidth_set(_swigobj,_swigval) (_swigobj->minTexWidth = _swigval,_swigval)
+static int
+wrap_csGraphics3DCaps_minTexWidth_set(lua_State *L)
+{
+    int  _result;
+    csGraphics3DCaps * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csGraphics3DCaps_minTexWidth_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_minTexWidth_get(_swigobj) ((int ) _swigobj->minTexWidth)
+static int
+wrap_csGraphics3DCaps_minTexWidth_get(lua_State *L)
+{
+    int  _result;
+    csGraphics3DCaps * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csGraphics3DCaps_minTexWidth_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_maxTexHeight_set(_swigobj,_swigval) (_swigobj->maxTexHeight = _swigval,_swigval)
+static int
+wrap_csGraphics3DCaps_maxTexHeight_set(lua_State *L)
+{
+    int  _result;
+    csGraphics3DCaps * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csGraphics3DCaps_maxTexHeight_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_maxTexHeight_get(_swigobj) ((int ) _swigobj->maxTexHeight)
+static int
+wrap_csGraphics3DCaps_maxTexHeight_get(lua_State *L)
+{
+    int  _result;
+    csGraphics3DCaps * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csGraphics3DCaps_maxTexHeight_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_maxTexWidth_set(_swigobj,_swigval) (_swigobj->maxTexWidth = _swigval,_swigval)
+static int
+wrap_csGraphics3DCaps_maxTexWidth_set(lua_State *L)
+{
+    int  _result;
+    csGraphics3DCaps * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csGraphics3DCaps_maxTexWidth_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_maxTexWidth_get(_swigobj) ((int ) _swigobj->maxTexWidth)
+static int
+wrap_csGraphics3DCaps_maxTexWidth_get(lua_State *L)
+{
+    int  _result;
+    csGraphics3DCaps * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csGraphics3DCaps_maxTexWidth_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_fog_set(_swigobj,_swigval) (_swigobj->fog = _swigval,_swigval)
+static int
+wrap_csGraphics3DCaps_fog_set(lua_State *L)
+{
+    G3D_FOGMETHOD  _result;
+    csGraphics3DCaps * _arg0;
+    G3D_FOGMETHOD  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `G3D_FOGMETHOD ' expected");
+	}
+	_arg1 = (G3D_FOGMETHOD )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (G3D_FOGMETHOD )csGraphics3DCaps_fog_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_fog_get(_swigobj) ((G3D_FOGMETHOD ) _swigobj->fog)
+static int
+wrap_csGraphics3DCaps_fog_get(lua_State *L)
+{
+    G3D_FOGMETHOD  _result;
+    csGraphics3DCaps * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (G3D_FOGMETHOD )csGraphics3DCaps_fog_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_NeedsPO2Maps_set(_swigobj,_swigval) (_swigobj->NeedsPO2Maps = _swigval,_swigval)
+static int
+wrap_csGraphics3DCaps_NeedsPO2Maps_set(lua_State *L)
+{
+    bool  _result;
+    csGraphics3DCaps * _arg0;
+    bool  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `bool ' expected");
+	}
+	_arg1 = (bool )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (bool )csGraphics3DCaps_NeedsPO2Maps_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_NeedsPO2Maps_get(_swigobj) ((bool ) _swigobj->NeedsPO2Maps)
+static int
+wrap_csGraphics3DCaps_NeedsPO2Maps_get(lua_State *L)
+{
+    bool  _result;
+    csGraphics3DCaps * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (bool )csGraphics3DCaps_NeedsPO2Maps_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_MaxAspectRatio_set(_swigobj,_swigval) (_swigobj->MaxAspectRatio = _swigval,_swigval)
+static int
+wrap_csGraphics3DCaps_MaxAspectRatio_set(lua_State *L)
+{
+    int  _result;
+    csGraphics3DCaps * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csGraphics3DCaps_MaxAspectRatio_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csGraphics3DCaps_MaxAspectRatio_get(_swigobj) ((int ) _swigobj->MaxAspectRatio)
+static int
+wrap_csGraphics3DCaps_MaxAspectRatio_get(lua_State *L)
+{
+    int  _result;
+    csGraphics3DCaps * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csGraphics3DCaps *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csGraphics3DCaps_MaxAspectRatio_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csImageArea_x_set(_swigobj,_swigval) (_swigobj->x = _swigval,_swigval)
+static int
+wrap_csImageArea_x_set(lua_State *L)
+{
+    int  _result;
+    csImageArea * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csImageArea *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csImageArea_x_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csImageArea_x_get(_swigobj) ((int ) _swigobj->x)
+static int
+wrap_csImageArea_x_get(lua_State *L)
+{
+    int  _result;
+    csImageArea * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csImageArea *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csImageArea_x_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csImageArea_y_set(_swigobj,_swigval) (_swigobj->y = _swigval,_swigval)
+static int
+wrap_csImageArea_y_set(lua_State *L)
+{
+    int  _result;
+    csImageArea * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csImageArea *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csImageArea_y_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csImageArea_y_get(_swigobj) ((int ) _swigobj->y)
+static int
+wrap_csImageArea_y_get(lua_State *L)
+{
+    int  _result;
+    csImageArea * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csImageArea *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csImageArea_y_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csImageArea_w_set(_swigobj,_swigval) (_swigobj->w = _swigval,_swigval)
+static int
+wrap_csImageArea_w_set(lua_State *L)
+{
+    int  _result;
+    csImageArea * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csImageArea *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csImageArea_w_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csImageArea_w_get(_swigobj) ((int ) _swigobj->w)
+static int
+wrap_csImageArea_w_get(lua_State *L)
+{
+    int  _result;
+    csImageArea * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csImageArea *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csImageArea_w_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csImageArea_h_set(_swigobj,_swigval) (_swigobj->h = _swigval,_swigval)
+static int
+wrap_csImageArea_h_set(lua_State *L)
+{
+    int  _result;
+    csImageArea * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csImageArea *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (int )csImageArea_h_set(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define csImageArea_h_get(_swigobj) ((int ) _swigobj->h)
+static int
+wrap_csImageArea_h_get(lua_State *L)
+{
+    int  _result;
+    csImageArea * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csImageArea *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )csImageArea_h_get(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+static char * csImageArea_data_set(csImageArea *obj, char *val) {
+    if (obj->data) delete [] obj->data;
+    obj->data = new char[strlen(val)+1];
+    strcpy(obj->data,val);
+    return val;
+}
+static int
+wrap_csImageArea_data_set(lua_State *L)
+{
+    char * _result;
+    csImageArea * _arg0;
+    char * _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csImageArea *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (char *)csImageArea_data_set(_arg0,_arg1);
+{
+    if(_result == NULL) {
+		lua_pushstring(L, "");
+    } else {
+		lua_pushstring(L, _result);
+    }
+}
+	return 1;
+}
+
+#define csImageArea_data_get(_swigobj) ((char *) _swigobj->data)
+static int
+wrap_csImageArea_data_get(lua_State *L)
+{
+    char * _result;
+    csImageArea * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (csImageArea *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (char *)csImageArea_data_get(_arg0);
+{
+    if(_result == NULL) {
+		lua_pushstring(L, "");
+    } else {
+		lua_pushstring(L, _result);
+    }
+}
+	return 1;
+}
+
+#define new_csImageArea(_swigarg0,_swigarg1,_swigarg2,_swigarg3) (new csImageArea(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
+static int
+wrap_new_csImageArea(lua_State *L)
+{
+    csImageArea * _result;
+    int  _arg0;
+    int  _arg1;
+    int  _arg2;
+    int  _arg3;
+
+{
+	if(!lua_isnumber(L, 1)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg0 = (int )lua_tonumber(L, 1);
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+{
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
+}
+	lua_settop(L, 0);
+    _result = (csImageArea *)new_csImageArea(_arg0,_arg1,_arg2,_arg3);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, csImageArea_tag );
+    }
+}
+	return 1;
+}
+
 static void *SwigiPluginToiBase(void *ptr) {
     iPlugin *src;
     iBase *dest;
@@ -963,79 +2153,77 @@ static void *SwigiPluginToiBase(void *ptr) {
 }
 
 #define iPlugin_Initialize(_swigobj,_swigarg0)  (_swigobj->Initialize(_swigarg0))
-static int _wrap_iPlugin_Initialize(lua_State *lua_state) {
-
+static int
+wrap_iPlugin_Initialize(lua_State *L)
+{
     bool  _result;
     iPlugin * _arg0;
     iSystem * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPlugin *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPlugin *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPlugin *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (iSystem *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (iSystem *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (iSystem *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (bool )iPlugin_Initialize(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPlugin_HandleEvent(_swigobj,_swigarg0)  (_swigobj->HandleEvent(_swigarg0))
-static int _wrap_iPlugin_HandleEvent(lua_State *lua_state) {
 
+#define iPlugin_HandleEvent(_swigobj,_swigarg0)  (_swigobj->HandleEvent(_swigarg0))
+static int
+wrap_iPlugin_HandleEvent(lua_State *L)
+{
     bool  _result;
     iPlugin * _arg0;
     iEvent * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPlugin *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPlugin *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPlugin *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (iEvent *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (iEvent *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (iEvent *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (bool )iPlugin_HandleEvent(_arg0,*_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
+
 static void *SwigiTextureWrapperToiBase(void *ptr) {
     iTextureWrapper *src;
     iBase *dest;
@@ -1053,8 +2241,9 @@ static void *SwigiTextureHandleToiBase(void *ptr) {
 }
 
 #define iTextureHandle_GetMipMapDimensions(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->GetMipMapDimensions(_swigarg0,_swigarg1,_swigarg2))
-static int _wrap_iTextureHandle_GetMipMapDimensions(lua_State *lua_state) {
-
+static int
+wrap_iTextureHandle_GetMipMapDimensions(lua_State *L)
+{
     bool  _result;
     iTextureHandle * _arg0;
     int  _arg1;
@@ -1062,188 +2251,193 @@ static int _wrap_iTextureHandle_GetMipMapDimensions(lua_State *lua_state) {
     int * _arg3;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureHandle *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureHandle *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureHandle *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (int *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (int *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (int *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  4 ))
-    _arg3 = (int *) lua_touserdata (lua_state,  4 );
-  else _arg3 = NULL;
-#else
-  if (!lua_isnil ( 4 )) _arg3 = (int *) lua_touserdata ( 4 );
-  else _arg3 = NULL;
-#endif
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (int *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (bool )iTextureHandle_GetMipMapDimensions(_arg0,_arg1,*_arg2,*_arg3);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
+
 #define iTextureHandle_GetMeanColor(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->GetMeanColor(_swigarg0,_swigarg1,_swigarg2))
-static int _wrap_iTextureHandle_GetMeanColor(lua_State *lua_state) {
-
+static int
+wrap_iTextureHandle_GetMeanColor(lua_State *L)
+{
     iTextureHandle * _arg0;
-    UByte * _arg1;
-    UByte * _arg2;
-    UByte * _arg3;
+    unsigned char * _arg1;
+    unsigned char * _arg2;
+    unsigned char * _arg3;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureHandle *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureHandle *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureHandle *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (UByte *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (UByte *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (unsigned char *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (UByte *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (UByte *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (unsigned char *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  4 ))
-    _arg3 = (UByte *) lua_touserdata (lua_state,  4 );
-  else _arg3 = NULL;
-#else
-  if (!lua_isnil ( 4 )) _arg3 = (UByte *) lua_touserdata ( 4 );
-  else _arg3 = NULL;
-#endif
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (unsigned char *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iTextureHandle_GetMeanColor(_arg0,*_arg1,*_arg2,*_arg3);
-    return 1;
+	return 0;
 }
-#define iTextureHandle_GetCacheData(_swigobj)  (_swigobj->GetCacheData())
-static int _wrap_iTextureHandle_GetCacheData(lua_State *lua_state) {
 
+#define iTextureHandle_GetCacheData(_swigobj)  (_swigobj->GetCacheData())
+static int
+wrap_iTextureHandle_GetCacheData(lua_State *L)
+{
     void * _result;
     iTextureHandle * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureHandle *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureHandle *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureHandle *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (void *)iTextureHandle_GetCacheData(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushuserdata(L, (void*)_result);
+    }
 }
-    return 1;
+	return 1;
 }
-#define iTextureHandle_SetCacheData(_swigobj,_swigarg0)  (_swigobj->SetCacheData(_swigarg0))
-static int _wrap_iTextureHandle_SetCacheData(lua_State *lua_state) {
 
+#define iTextureHandle_SetCacheData(_swigobj,_swigarg0)  (_swigobj->SetCacheData(_swigarg0))
+static int
+wrap_iTextureHandle_SetCacheData(lua_State *L)
+{
     iTextureHandle * _arg0;
     void * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureHandle *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureHandle *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureHandle *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (void *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (void *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (void *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (void*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iTextureHandle_SetCacheData(_arg0,_arg1);
-    return 1;
+	return 0;
 }
-#define iTextureHandle_GetPrivateObject(_swigobj)  (_swigobj->GetPrivateObject())
-static int _wrap_iTextureHandle_GetPrivateObject(lua_State *lua_state) {
 
+#define iTextureHandle_GetPrivateObject(_swigobj)  (_swigobj->GetPrivateObject())
+static int
+wrap_iTextureHandle_GetPrivateObject(lua_State *L)
+{
     void * _result;
     iTextureHandle * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureHandle *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureHandle *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureHandle *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (void *)iTextureHandle_GetPrivateObject(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushuserdata(L, (void*)_result);
+    }
 }
-    return 1;
+	return 1;
 }
+
 static void *SwigiMaterialHandleToiBase(void *ptr) {
     iMaterialHandle *src;
     iBase *dest;
@@ -1253,131 +2447,141 @@ static void *SwigiMaterialHandleToiBase(void *ptr) {
 }
 
 #define iMaterialHandle_GetTexture(_swigobj)  (_swigobj->GetTexture())
-static int _wrap_iMaterialHandle_GetTexture(lua_State *lua_state) {
-
+static int
+wrap_iMaterialHandle_GetTexture(lua_State *L)
+{
     iTextureHandle * _result;
     iMaterialHandle * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iMaterialHandle *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iMaterialHandle *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iMaterialHandle *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iTextureHandle *)iMaterialHandle_GetTexture(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iTextureHandle_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iMaterialHandle_GetFlatColor(_swigobj,_swigarg0)  (_swigobj->GetFlatColor(_swigarg0))
-static int _wrap_iMaterialHandle_GetFlatColor(lua_State *lua_state) {
 
+#define iMaterialHandle_GetFlatColor(_swigobj,_swigarg0)  (_swigobj->GetFlatColor(_swigarg0))
+static int
+wrap_iMaterialHandle_GetFlatColor(lua_State *L)
+{
     iMaterialHandle * _arg0;
     csRGBpixel * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iMaterialHandle *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iMaterialHandle *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iMaterialHandle *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (csRGBpixel *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (csRGBpixel *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (csRGBpixel *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iMaterialHandle_GetFlatColor(_arg0,*_arg1);
-    return 1;
+	return 0;
 }
-#define iMaterialHandle_GetReflection(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->GetReflection(_swigarg0,_swigarg1,_swigarg2))
-static int _wrap_iMaterialHandle_GetReflection(lua_State *lua_state) {
 
+#define iMaterialHandle_GetReflection(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->GetReflection(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iMaterialHandle_GetReflection(lua_State *L)
+{
     iMaterialHandle * _arg0;
     float * _arg1;
     float * _arg2;
     float * _arg3;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iMaterialHandle *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iMaterialHandle *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iMaterialHandle *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (float *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (float *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (float *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (float *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (float *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (float *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  4 ))
-    _arg3 = (float *) lua_touserdata (lua_state,  4 );
-  else _arg3 = NULL;
-#else
-  if (!lua_isnil ( 4 )) _arg3 = (float *) lua_touserdata ( 4 );
-  else _arg3 = NULL;
-#endif
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (float *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iMaterialHandle_GetReflection(_arg0,*_arg1,*_arg2,*_arg3);
-    return 1;
+	return 0;
 }
-#define iMaterialHandle_Prepare(_swigobj)  (_swigobj->Prepare())
-static int _wrap_iMaterialHandle_Prepare(lua_State *lua_state) {
 
+#define iMaterialHandle_Prepare(_swigobj)  (_swigobj->Prepare())
+static int
+wrap_iMaterialHandle_Prepare(lua_State *L)
+{
     iMaterialHandle * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iMaterialHandle *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iMaterialHandle *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iMaterialHandle *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iMaterialHandle_Prepare(_arg0);
-    return 1;
+	return 0;
 }
+
 static void *SwigiMaterialWrapperToiBase(void *ptr) {
     iMaterialWrapper *src;
     iBase *dest;
@@ -1387,39 +2591,2135 @@ static void *SwigiMaterialWrapperToiBase(void *ptr) {
 }
 
 #define iMaterialWrapper_GetMaterialHandle(_swigobj)  (_swigobj->GetMaterialHandle())
-static int _wrap_iMaterialWrapper_GetMaterialHandle(lua_State *lua_state) {
-
+static int
+wrap_iMaterialWrapper_GetMaterialHandle(lua_State *L)
+{
     iMaterialHandle * _result;
     iMaterialWrapper * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iMaterialWrapper *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iMaterialWrapper *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iMaterialWrapper *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iMaterialHandle *)iMaterialWrapper_GetMaterialHandle(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iMaterialHandle_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-static void *SwigiGraphics3DToiPlugin(void *ptr) {
-    iGraphics3D *src;
-    iPlugin *dest;
-    src = (iGraphics3D *) ptr;
-    dest = (iPlugin *) src;
+
+static void *SwigiFontToiBase(void *ptr) {
+    iFont *src;
+    iBase *dest;
+    src = (iFont *) ptr;
+    dest = (iBase *) src;
     return (void *) dest;
+}
+
+#define iFont_SetSize(_swigobj,_swigarg0)  (_swigobj->SetSize(_swigarg0))
+static int
+wrap_iFont_SetSize(lua_State *L)
+{
+    iFont * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iFont *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    iFont_SetSize(_arg0,_arg1);
+	return 0;
+}
+
+#define iFont_GetSize(_swigobj)  (_swigobj->GetSize())
+static int
+wrap_iFont_GetSize(lua_State *L)
+{
+    int  _result;
+    iFont * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iFont *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iFont_GetSize(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iFont_GetMaxSize(_swigobj,_swigarg0,_swigarg1)  (_swigobj->GetMaxSize(_swigarg0,_swigarg1))
+static int
+wrap_iFont_GetMaxSize(lua_State *L)
+{
+    iFont * _arg0;
+    int * _arg1;
+    int * _arg2;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iFont *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (int *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (int *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iFont_GetMaxSize(_arg0,*_arg1,*_arg2);
+	return 0;
+}
+
+#define iFont_GetGlyphSize(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->GetGlyphSize(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iFont_GetGlyphSize(lua_State *L)
+{
+    bool  _result;
+    iFont * _arg0;
+    unsigned char  _arg1;
+    int * _arg2;
+    int * _arg3;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iFont *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `unsigned char ' expected");
+	}
+	_arg1 = (unsigned char )lua_tonumber(L, 2);
+}
+{
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (int *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (int *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (bool )iFont_GetGlyphSize(_arg0,_arg1,*_arg2,*_arg3);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iFont_GetGlyphBitmap(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->GetGlyphBitmap(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iFont_GetGlyphBitmap(lua_State *L)
+{
+    void * _result;
+    iFont * _arg0;
+    unsigned char  _arg1;
+    int * _arg2;
+    int * _arg3;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iFont *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `unsigned char ' expected");
+	}
+	_arg1 = (unsigned char )lua_tonumber(L, 2);
+}
+{
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (int *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (int *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (void *)iFont_GetGlyphBitmap(_arg0,_arg1,*_arg2,*_arg3);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushuserdata(L, (void*)_result);
+    }
+}
+	return 1;
+}
+
+#define iFont_GetDimensions(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->GetDimensions(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iFont_GetDimensions(lua_State *L)
+{
+    iFont * _arg0;
+    char * _arg1;
+    int * _arg2;
+    int * _arg3;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iFont *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (int *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (int *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iFont_GetDimensions(_arg0,_arg1,*_arg2,*_arg3);
+	return 0;
+}
+
+#define iFont_GetLength(_swigobj,_swigarg0,_swigarg1)  (_swigobj->GetLength(_swigarg0,_swigarg1))
+static int
+wrap_iFont_GetLength(lua_State *L)
+{
+    int  _result;
+    iFont * _arg0;
+    char * _arg1;
+    int  _arg2;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iFont *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+	lua_settop(L, 0);
+    _result = (int )iFont_GetLength(_arg0,_arg1,_arg2);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+static void *SwigiFontServerToiBase(void *ptr) {
+    iFontServer *src;
+    iBase *dest;
+    src = (iFontServer *) ptr;
+    dest = (iBase *) src;
+    return (void *) dest;
+}
+
+#define iFontServer_LoadFont(_swigobj,_swigarg0)  (_swigobj->LoadFont(_swigarg0))
+static int
+wrap_iFontServer_LoadFont(lua_State *L)
+{
+    iFont * _result;
+    iFontServer * _arg0;
+    char * _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iFontServer *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (iFont *)iFontServer_LoadFont(_arg0,_arg1);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iFont_tag );
+    }
+}
+	return 1;
+}
+
+#define iFontServer_GetFontCount(_swigobj)  (_swigobj->GetFontCount())
+static int
+wrap_iFontServer_GetFontCount(lua_State *L)
+{
+    int  _result;
+    iFontServer * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iFontServer *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iFontServer_GetFontCount(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iFontServer_GetFont(_swigobj,_swigarg0)  (_swigobj->GetFont(_swigarg0))
+static int
+wrap_iFontServer_GetFont(lua_State *L)
+{
+    iFont * _result;
+    iFontServer * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iFontServer *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (iFont *)iFontServer_GetFont(_arg0,_arg1);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iFont_tag );
+    }
+}
+	return 1;
+}
+
+static void *SwigiGraphics2DToiBase(void *ptr) {
+    iGraphics2D *src;
+    iBase *dest;
+    src = (iGraphics2D *) ptr;
+    dest = (iBase *) src;
+    return (void *) dest;
+}
+
+#define iGraphics2D_Open(_swigobj,_swigarg0)  (_swigobj->Open(_swigarg0))
+static int
+wrap_iGraphics2D_Open(lua_State *L)
+{
+    bool  _result;
+    iGraphics2D * _arg0;
+    char * _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (bool )iGraphics2D_Open(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_Close(_swigobj)  (_swigobj->Close())
+static int
+wrap_iGraphics2D_Close(lua_State *L)
+{
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iGraphics2D_Close(_arg0);
+	return 0;
+}
+
+#define iGraphics2D_GetWidth(_swigobj)  (_swigobj->GetWidth())
+static int
+wrap_iGraphics2D_GetWidth(lua_State *L)
+{
+    int  _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iGraphics2D_GetWidth(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_GetHeight(_swigobj)  (_swigobj->GetHeight())
+static int
+wrap_iGraphics2D_GetHeight(lua_State *L)
+{
+    int  _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iGraphics2D_GetHeight(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_GetFullScreen(_swigobj)  (_swigobj->GetFullScreen())
+static int
+wrap_iGraphics2D_GetFullScreen(lua_State *L)
+{
+    bool  _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (bool )iGraphics2D_GetFullScreen(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_GetPage(_swigobj)  (_swigobj->GetPage())
+static int
+wrap_iGraphics2D_GetPage(lua_State *L)
+{
+    int  _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iGraphics2D_GetPage(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_DoubleBuffer(_swigobj,_swigarg0)  (_swigobj->DoubleBuffer(_swigarg0))
+static int
+wrap_iGraphics2D_DoubleBuffer(lua_State *L)
+{
+    bool  _result;
+    iGraphics2D * _arg0;
+    bool  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `bool ' expected");
+	}
+	_arg1 = (bool )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (bool )iGraphics2D_DoubleBuffer(_arg0,_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_GetDoubleBufferState(_swigobj)  (_swigobj->GetDoubleBufferState())
+static int
+wrap_iGraphics2D_GetDoubleBufferState(lua_State *L)
+{
+    bool  _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (bool )iGraphics2D_GetDoubleBufferState(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_GetPixelFormat(_swigobj)  (_swigobj->GetPixelFormat())
+static int
+wrap_iGraphics2D_GetPixelFormat(lua_State *L)
+{
+    csPixelFormat * _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (csPixelFormat *)iGraphics2D_GetPixelFormat(_arg0);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, csPixelFormat_tag );
+    }
+}
+	return 1;
+}
+
+#define iGraphics2D_GetPixelBytes(_swigobj)  (_swigobj->GetPixelBytes())
+static int
+wrap_iGraphics2D_GetPixelBytes(lua_State *L)
+{
+    int  _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iGraphics2D_GetPixelBytes(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_GetPalEntryCount(_swigobj)  (_swigobj->GetPalEntryCount())
+static int
+wrap_iGraphics2D_GetPalEntryCount(lua_State *L)
+{
+    int  _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iGraphics2D_GetPalEntryCount(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_GetPalette(_swigobj)  (_swigobj->GetPalette())
+static int
+wrap_iGraphics2D_GetPalette(lua_State *L)
+{
+    csRGBpixel * _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (csRGBpixel *)iGraphics2D_GetPalette(_arg0);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, csRGBpixel_tag );
+    }
+}
+	return 1;
+}
+
+#define iGraphics2D_SetRGB(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->SetRGB(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
+static int
+wrap_iGraphics2D_SetRGB(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    int  _arg1;
+    int  _arg2;
+    int  _arg3;
+    int  _arg4;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+{
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
+}
+{
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg4 = (int )lua_tonumber(L, 5);
+}
+	lua_settop(L, 0);
+    iGraphics2D_SetRGB(_arg0,_arg1,_arg2,_arg3,_arg4);
+	return 0;
+}
+
+#define iGraphics2D_SetClipRect(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->SetClipRect(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
+static int
+wrap_iGraphics2D_SetClipRect(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    int  _arg1;
+    int  _arg2;
+    int  _arg3;
+    int  _arg4;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+{
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
+}
+{
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg4 = (int )lua_tonumber(L, 5);
+}
+	lua_settop(L, 0);
+    iGraphics2D_SetClipRect(_arg0,_arg1,_arg2,_arg3,_arg4);
+	return 0;
+}
+
+#define iGraphics2D_GetClipRect(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->GetClipRect(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
+static int
+wrap_iGraphics2D_GetClipRect(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    int * _arg1;
+    int * _arg2;
+    int * _arg3;
+    int * _arg4;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (int *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (int *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (int *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 5)) || (lua_isnil(L, 5)) ) {
+		_arg4 = NULL;
+	} else if(lua_isuserdata(L, 5)) {
+		_arg4 = (int *)lua_touserdata(L, 5);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg4 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iGraphics2D_GetClipRect(_arg0,*_arg1,*_arg2,*_arg3,*_arg4);
+	return 0;
+}
+
+#define iGraphics2D_BeginDraw(_swigobj)  (_swigobj->BeginDraw())
+static int
+wrap_iGraphics2D_BeginDraw(lua_State *L)
+{
+    bool  _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (bool )iGraphics2D_BeginDraw(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_FinishDraw(_swigobj)  (_swigobj->FinishDraw())
+static int
+wrap_iGraphics2D_FinishDraw(lua_State *L)
+{
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iGraphics2D_FinishDraw(_arg0);
+	return 0;
+}
+
+#define iGraphics2D_Print(_swigobj,_swigarg0)  (_swigobj->Print(_swigarg0))
+static int
+wrap_iGraphics2D_Print(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    csRect * _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (csRect *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iGraphics2D_Print(_arg0,_arg1);
+	return 0;
+}
+
+#define iGraphics2D_Clear(_swigobj,_swigarg0)  (_swigobj->Clear(_swigarg0))
+static int
+wrap_iGraphics2D_Clear(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    iGraphics2D_Clear(_arg0,_arg1);
+	return 0;
+}
+
+#define iGraphics2D_ClearAll(_swigobj,_swigarg0)  (_swigobj->ClearAll(_swigarg0))
+static int
+wrap_iGraphics2D_ClearAll(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    iGraphics2D_ClearAll(_arg0,_arg1);
+	return 0;
+}
+
+#define iGraphics2D_DrawLine(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4)  (_swigobj->DrawLine(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4))
+static int
+wrap_iGraphics2D_DrawLine(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    float  _arg1;
+    float  _arg2;
+    float  _arg3;
+    float  _arg4;
+    int  _arg5;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg1 = (float )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg2 = (float )lua_tonumber(L, 3);
+}
+{
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg3 = (float )lua_tonumber(L, 4);
+}
+{
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg4 = (float )lua_tonumber(L, 5);
+}
+{
+	if(!lua_isnumber(L, 6)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg5 = (int )lua_tonumber(L, 6);
+}
+	lua_settop(L, 0);
+    iGraphics2D_DrawLine(_arg0,_arg1,_arg2,_arg3,_arg4,_arg5);
+	return 0;
+}
+
+#define iGraphics2D_DrawBox(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4)  (_swigobj->DrawBox(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4))
+static int
+wrap_iGraphics2D_DrawBox(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    int  _arg1;
+    int  _arg2;
+    int  _arg3;
+    int  _arg4;
+    int  _arg5;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+{
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
+}
+{
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg4 = (int )lua_tonumber(L, 5);
+}
+{
+	if(!lua_isnumber(L, 6)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg5 = (int )lua_tonumber(L, 6);
+}
+	lua_settop(L, 0);
+    iGraphics2D_DrawBox(_arg0,_arg1,_arg2,_arg3,_arg4,_arg5);
+	return 0;
+}
+
+#define iGraphics2D_ClipLine(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6,_swigarg7)  (_swigobj->ClipLine(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6,_swigarg7))
+static int
+wrap_iGraphics2D_ClipLine(lua_State *L)
+{
+    bool  _result;
+    iGraphics2D * _arg0;
+    float * _arg1;
+    float * _arg2;
+    float * _arg3;
+    float * _arg4;
+    int  _arg5;
+    int  _arg6;
+    int  _arg7;
+    int  _arg8;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (float *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (float *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (float *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 5)) || (lua_isnil(L, 5)) ) {
+		_arg4 = NULL;
+	} else if(lua_isuserdata(L, 5)) {
+		_arg4 = (float *)lua_touserdata(L, 5);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg4 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 6)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg5 = (int )lua_tonumber(L, 6);
+}
+{
+	if(!lua_isnumber(L, 7)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg6 = (int )lua_tonumber(L, 7);
+}
+{
+	if(!lua_isnumber(L, 8)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg7 = (int )lua_tonumber(L, 8);
+}
+{
+	if(!lua_isnumber(L, 9)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg8 = (int )lua_tonumber(L, 9);
+}
+	lua_settop(L, 0);
+    _result = (bool )iGraphics2D_ClipLine(_arg0,*_arg1,*_arg2,*_arg3,*_arg4,_arg5,_arg6,_arg7,_arg8);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_DrawPixel(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->DrawPixel(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iGraphics2D_DrawPixel(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    int  _arg1;
+    int  _arg2;
+    int  _arg3;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+{
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
+}
+	lua_settop(L, 0);
+    iGraphics2D_DrawPixel(_arg0,_arg1,_arg2,_arg3);
+	return 0;
+}
+
+#define iGraphics2D_GetPixelAt(_swigobj,_swigarg0,_swigarg1)  (_swigobj->GetPixelAt(_swigarg0,_swigarg1))
+static int
+wrap_iGraphics2D_GetPixelAt(lua_State *L)
+{
+    void * _result;
+    iGraphics2D * _arg0;
+    int  _arg1;
+    int  _arg2;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+	lua_settop(L, 0);
+    _result = (void *)iGraphics2D_GetPixelAt(_arg0,_arg1,_arg2);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushuserdata(L, (void*)_result);
+    }
+}
+	return 1;
+}
+
+#define iGraphics2D_GetPixel(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4)  (_swigobj->GetPixel(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4))
+static int
+wrap_iGraphics2D_GetPixel(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    int  _arg1;
+    int  _arg2;
+    unsigned char * _arg3;
+    unsigned char * _arg4;
+    unsigned char * _arg5;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+{
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (unsigned char *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 5)) || (lua_isnil(L, 5)) ) {
+		_arg4 = NULL;
+	} else if(lua_isuserdata(L, 5)) {
+		_arg4 = (unsigned char *)lua_touserdata(L, 5);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg4 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 6)) || (lua_isnil(L, 6)) ) {
+		_arg5 = NULL;
+	} else if(lua_isuserdata(L, 6)) {
+		_arg5 = (unsigned char *)lua_touserdata(L, 6);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg5 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iGraphics2D_GetPixel(_arg0,_arg1,_arg2,*_arg3,*_arg4,*_arg5);
+	return 0;
+}
+
+#define iGraphics2D_SaveArea(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->SaveArea(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
+static int
+wrap_iGraphics2D_SaveArea(lua_State *L)
+{
+    csImageArea * _result;
+    iGraphics2D * _arg0;
+    int  _arg1;
+    int  _arg2;
+    int  _arg3;
+    int  _arg4;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+{
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
+}
+{
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg4 = (int )lua_tonumber(L, 5);
+}
+	lua_settop(L, 0);
+    _result = (csImageArea *)iGraphics2D_SaveArea(_arg0,_arg1,_arg2,_arg3,_arg4);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, csImageArea_tag );
+    }
+}
+	return 1;
+}
+
+#define iGraphics2D_RestoreArea(_swigobj,_swigarg0,_swigarg1)  (_swigobj->RestoreArea(_swigarg0,_swigarg1))
+static int
+wrap_iGraphics2D_RestoreArea(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    csImageArea * _arg1;
+    bool  _arg2;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (csImageArea *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `bool ' expected");
+	}
+	_arg2 = (bool )lua_tonumber(L, 3);
+}
+	lua_settop(L, 0);
+    iGraphics2D_RestoreArea(_arg0,_arg1,_arg2);
+	return 0;
+}
+
+#define iGraphics2D_FreeArea(_swigobj,_swigarg0)  (_swigobj->FreeArea(_swigarg0))
+static int
+wrap_iGraphics2D_FreeArea(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    csImageArea * _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (csImageArea *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iGraphics2D_FreeArea(_arg0,_arg1);
+	return 0;
+}
+
+#define iGraphics2D_Write(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5)  (_swigobj->Write(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5))
+static int
+wrap_iGraphics2D_Write(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    iFont * _arg1;
+    int  _arg2;
+    int  _arg3;
+    int  _arg4;
+    int  _arg5;
+    char * _arg6;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (iFont *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+{
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
+}
+{
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg4 = (int )lua_tonumber(L, 5);
+}
+{
+	if(!lua_isnumber(L, 6)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg5 = (int )lua_tonumber(L, 6);
+}
+{
+	if((lua_isnull(L, 7)) || (lua_isnil(L, 7))) {
+		_arg6 = NULL;
+	} else if(lua_isstring(L, 7)) {
+		_arg6 = (char *)lua_tostring(L, 7);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg6 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iGraphics2D_Write(_arg0,_arg1,_arg2,_arg3,_arg4,_arg5,_arg6);
+	return 0;
+}
+
+#define iGraphics2D_GetFontServer(_swigobj)  (_swigobj->GetFontServer())
+static int
+wrap_iGraphics2D_GetFontServer(lua_State *L)
+{
+    iFontServer * _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (iFontServer *)iGraphics2D_GetFontServer(_arg0);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iFontServer_tag );
+    }
+}
+	return 1;
+}
+
+#define iGraphics2D_SetMousePosition(_swigobj,_swigarg0,_swigarg1)  (_swigobj->SetMousePosition(_swigarg0,_swigarg1))
+static int
+wrap_iGraphics2D_SetMousePosition(lua_State *L)
+{
+    bool  _result;
+    iGraphics2D * _arg0;
+    int  _arg1;
+    int  _arg2;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+	lua_settop(L, 0);
+    _result = (bool )iGraphics2D_SetMousePosition(_arg0,_arg1,_arg2);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_SetMouseCursor(_swigobj,_swigarg0)  (_swigobj->SetMouseCursor(_swigarg0))
+static int
+wrap_iGraphics2D_SetMouseCursor(lua_State *L)
+{
+    bool  _result;
+    iGraphics2D * _arg0;
+    csMouseCursorID * _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (csMouseCursorID *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (bool )iGraphics2D_SetMouseCursor(_arg0,*_arg1);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iGraphics2D_ScreenShot(_swigobj)  (_swigobj->ScreenShot())
+static int
+wrap_iGraphics2D_ScreenShot(lua_State *L)
+{
+    iImage * _result;
+    iGraphics2D * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (iImage *)iGraphics2D_ScreenShot(_arg0);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iImage_tag );
+    }
+}
+	return 1;
+}
+
+#define iGraphics2D_CreateOffScreenCanvas(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6)  (_swigobj->CreateOffScreenCanvas(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6))
+static int
+wrap_iGraphics2D_CreateOffScreenCanvas(lua_State *L)
+{
+    iGraphics2D * _result;
+    iGraphics2D * _arg0;
+    int  _arg1;
+    int  _arg2;
+    void * _arg3;
+    bool  _arg4;
+    csPixelFormat * _arg5;
+    csRGBpixel * _arg6 = NULL;
+    int  _arg7 = 0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
+}
+{
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (void *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (void*)");
+		_arg3 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `bool ' expected");
+	}
+	_arg4 = (bool )lua_tonumber(L, 5);
+}
+{
+	if( (lua_isnull(L, 6)) || (lua_isnil(L, 6)) ) {
+		_arg5 = NULL;
+	} else if(lua_isuserdata(L, 6)) {
+		_arg5 = (csPixelFormat *)lua_touserdata(L, 6);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg5 = NULL;
+	}
+}
+{
+	if((lua_isnull(L, 7)) || (lua_isnil(L, 7))) {
+		_arg6 = (csRGBpixel *)NULL;
+	} else if(lua_isuserdata(L, 7)) {
+		_arg6 = (csRGBpixel *)lua_touserdata(L, 7);
+	} else {
+		lua_error(L, "error in parameter type, `csRGBpixel *' expected");
+	}
+}
+{
+	if(lua_isnull(L, 8)) {
+		_arg7 = (int )0;
+	} else if(lua_isnumber(L, 8)) {
+		_arg7 = (int )lua_tonumber(L, 8);
+	} else {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+}
+	lua_settop(L, 0);
+    _result = (iGraphics2D *)iGraphics2D_CreateOffScreenCanvas(_arg0,_arg1,_arg2,_arg3,_arg4,_arg5,_arg6,_arg7);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iGraphics2D_tag );
+    }
+}
+	return 1;
+}
+
+#define iGraphics2D_AllowCanvasResize(_swigobj,_swigarg0)  (_swigobj->AllowCanvasResize(_swigarg0))
+static int
+wrap_iGraphics2D_AllowCanvasResize(lua_State *L)
+{
+    iGraphics2D * _arg0;
+    bool  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics2D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `bool ' expected");
+	}
+	_arg1 = (bool )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    iGraphics2D_AllowCanvasResize(_arg0,_arg1);
+	return 0;
+}
+
+static void *SwigiHaloToiBase(void *ptr) {
+    iHalo *src;
+    iBase *dest;
+    src = (iHalo *) ptr;
+    dest = (iBase *) src;
+    return (void *) dest;
+}
+
+#define iHalo_GetWidth(_swigobj)  (_swigobj->GetWidth())
+static int
+wrap_iHalo_GetWidth(lua_State *L)
+{
+    int  _result;
+    iHalo * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iHalo *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iHalo_GetWidth(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iHalo_GetHeight(_swigobj)  (_swigobj->GetHeight())
+static int
+wrap_iHalo_GetHeight(lua_State *L)
+{
+    int  _result;
+    iHalo * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iHalo *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iHalo_GetHeight(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iHalo_SetColor(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->SetColor(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iHalo_SetColor(lua_State *L)
+{
+    iHalo * _arg0;
+    float * _arg1;
+    float * _arg2;
+    float * _arg3;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iHalo *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (float *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (float *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (float *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iHalo_SetColor(_arg0,*_arg1,*_arg2,*_arg3);
+	return 0;
+}
+
+#define iHalo_GetColor(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->GetColor(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iHalo_GetColor(lua_State *L)
+{
+    iHalo * _arg0;
+    float * _arg1;
+    float * _arg2;
+    float * _arg3;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iHalo *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (float *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (float *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (float *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iHalo_GetColor(_arg0,*_arg1,*_arg2,*_arg3);
+	return 0;
+}
+
+#define iHalo_Draw(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6)  (_swigobj->Draw(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6))
+static int
+wrap_iHalo_Draw(lua_State *L)
+{
+    iHalo * _arg0;
+    float  _arg1;
+    float  _arg2;
+    float  _arg3;
+    float  _arg4;
+    float  _arg5;
+    csVector2 * _arg6;
+    int  _arg7;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iHalo *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg1 = (float )lua_tonumber(L, 2);
+}
+{
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg2 = (float )lua_tonumber(L, 3);
+}
+{
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg3 = (float )lua_tonumber(L, 4);
+}
+{
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg4 = (float )lua_tonumber(L, 5);
+}
+{
+	if(!lua_isnumber(L, 6)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg5 = (float )lua_tonumber(L, 6);
+}
+{
+	if( (lua_isnull(L, 7)) || (lua_isnil(L, 7)) ) {
+		_arg6 = NULL;
+	} else if(lua_isuserdata(L, 7)) {
+		_arg6 = (csVector2 *)lua_touserdata(L, 7);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg6 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 8)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg7 = (int )lua_tonumber(L, 8);
+}
+	lua_settop(L, 0);
+    iHalo_Draw(_arg0,_arg1,_arg2,_arg3,_arg4,_arg5,_arg6,_arg7);
+	return 0;
 }
 
 static void *SwigiGraphics3DToiBase(void *ptr) {
@@ -1430,271 +4730,251 @@ static void *SwigiGraphics3DToiBase(void *ptr) {
     return (void *) dest;
 }
 
-#define iGraphics3D_Initialize(_swigobj,_swigarg0)  (_swigobj->Initialize(_swigarg0))
-static int _wrap_iGraphics3D_Initialize(lua_State *lua_state) {
-
-    bool  _result;
-    iGraphics3D * _arg0;
-    iSystem * _arg1;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (iSystem *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (iSystem *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
-}
-    _result = (bool )iGraphics3D_Initialize(_arg0,_arg1);
-{
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
-}
-    return 1;
-}
 #define iGraphics3D_Open(_swigobj,_swigarg0)  (_swigobj->Open(_swigarg0))
-static int _wrap_iGraphics3D_Open(lua_State *lua_state) {
-
+static int
+wrap_iGraphics3D_Open(lua_State *L)
+{
     bool  _result;
     iGraphics3D * _arg0;
     char * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (bool )iGraphics3D_Open(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iGraphics3D_Close(_swigobj)  (_swigobj->Close())
-static int _wrap_iGraphics3D_Close(lua_State *lua_state) {
 
+#define iGraphics3D_Close(_swigobj)  (_swigobj->Close())
+static int
+wrap_iGraphics3D_Close(lua_State *L)
+{
     iGraphics3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_Close(_arg0);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_SetDimensions(_swigobj,_swigarg0,_swigarg1)  (_swigobj->SetDimensions(_swigarg0,_swigarg1))
-static int _wrap_iGraphics3D_SetDimensions(lua_State *lua_state) {
 
+#define iGraphics3D_SetDimensions(_swigobj,_swigarg0,_swigarg1)  (_swigobj->SetDimensions(_swigarg0,_swigarg1))
+static int
+wrap_iGraphics3D_SetDimensions(lua_State *L)
+{
     iGraphics3D * _arg0;
     int  _arg1;
     int  _arg2;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
 }
+	lua_settop(L, 0);
     iGraphics3D_SetDimensions(_arg0,_arg1,_arg2);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_BeginDraw(_swigobj,_swigarg0)  (_swigobj->BeginDraw(_swigarg0))
-static int _wrap_iGraphics3D_BeginDraw(lua_State *lua_state) {
 
+#define iGraphics3D_BeginDraw(_swigobj,_swigarg0)  (_swigobj->BeginDraw(_swigarg0))
+static int
+wrap_iGraphics3D_BeginDraw(lua_State *L)
+{
     bool  _result;
     iGraphics3D * _arg0;
     int  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     _result = (bool )iGraphics3D_BeginDraw(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iGraphics3D_FinishDraw(_swigobj)  (_swigobj->FinishDraw())
-static int _wrap_iGraphics3D_FinishDraw(lua_State *lua_state) {
 
+#define iGraphics3D_FinishDraw(_swigobj)  (_swigobj->FinishDraw())
+static int
+wrap_iGraphics3D_FinishDraw(lua_State *L)
+{
     iGraphics3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_FinishDraw(_arg0);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_Print(_swigobj,_swigarg0)  (_swigobj->Print(_swigarg0))
-static int _wrap_iGraphics3D_Print(lua_State *lua_state) {
 
+#define iGraphics3D_Print(_swigobj,_swigarg0)  (_swigobj->Print(_swigarg0))
+static int
+wrap_iGraphics3D_Print(lua_State *L)
+{
     iGraphics3D * _arg0;
     csRect * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (csRect *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (csRect *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (csRect *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_Print(_arg0,_arg1);
-    return 1;
+	return 0;
 }
+
 #define iGraphics3D_DrawPolygon(_swigobj,_swigarg0)  (_swigobj->DrawPolygon(_swigarg0))
-static int _wrap_iGraphics3D_DrawPolygon(lua_State *lua_state) {
-
+static int
+wrap_iGraphics3D_DrawPolygon(lua_State *L)
+{
     iGraphics3D * _arg0;
     G3DPolygonDP * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (G3DPolygonDP *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (G3DPolygonDP *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (G3DPolygonDP *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_DrawPolygon(_arg0,*_arg1);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_DrawPolygonDebug(_swigobj,_swigarg0)  (_swigobj->DrawPolygonDebug(_swigarg0))
-static int _wrap_iGraphics3D_DrawPolygonDebug(lua_State *lua_state) {
 
+#define iGraphics3D_DrawPolygonDebug(_swigobj,_swigarg0)  (_swigobj->DrawPolygonDebug(_swigarg0))
+static int
+wrap_iGraphics3D_DrawPolygonDebug(lua_State *L)
+{
     iGraphics3D * _arg0;
     G3DPolygonDP * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (G3DPolygonDP *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (G3DPolygonDP *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (G3DPolygonDP *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_DrawPolygonDebug(_arg0,*_arg1);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_DrawLine(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->DrawLine(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
-static int _wrap_iGraphics3D_DrawLine(lua_State *lua_state) {
 
+#define iGraphics3D_DrawLine(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->DrawLine(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
+static int
+wrap_iGraphics3D_DrawLine(lua_State *L)
+{
     iGraphics3D * _arg0;
     csVector3 * _arg1;
     csVector3 * _arg2;
@@ -1702,643 +4982,633 @@ static int _wrap_iGraphics3D_DrawLine(lua_State *lua_state) {
     int  _arg4;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (csVector3 *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (csVector3 *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (csVector3 *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (csVector3 *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (csVector3 *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (csVector3 *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg3 = (float ) lua_tonumber (lua_state,  4 );
-#else
-  _arg3 = (float ) lua_tonumber ( 4 );
-#endif
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg3 = (float )lua_tonumber(L, 4);
 }
 {
-#ifdef LUA_MS
-  _arg4 = (int ) lua_tonumber (lua_state,  5 );
-#else
-  _arg4 = (int ) lua_tonumber ( 5 );
-#endif
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg4 = (int )lua_tonumber(L, 5);
 }
+	lua_settop(L, 0);
     iGraphics3D_DrawLine(_arg0,*_arg1,*_arg2,_arg3,_arg4);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_DrawTriangleMesh(_swigobj,_swigarg0)  (_swigobj->DrawTriangleMesh(_swigarg0))
-static int _wrap_iGraphics3D_DrawTriangleMesh(lua_State *lua_state) {
 
+#define iGraphics3D_DrawTriangleMesh(_swigobj,_swigarg0)  (_swigobj->DrawTriangleMesh(_swigarg0))
+static int
+wrap_iGraphics3D_DrawTriangleMesh(lua_State *L)
+{
     iGraphics3D * _arg0;
     G3DTriangleMesh * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (G3DTriangleMesh *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (G3DTriangleMesh *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (G3DTriangleMesh *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_DrawTriangleMesh(_arg0,*_arg1);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_DrawPolygonMesh(_swigobj,_swigarg0)  (_swigobj->DrawPolygonMesh(_swigarg0))
-static int _wrap_iGraphics3D_DrawPolygonMesh(lua_State *lua_state) {
 
+#define iGraphics3D_DrawPolygonMesh(_swigobj,_swigarg0)  (_swigobj->DrawPolygonMesh(_swigarg0))
+static int
+wrap_iGraphics3D_DrawPolygonMesh(lua_State *L)
+{
     iGraphics3D * _arg0;
     G3DPolygonMesh * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (G3DPolygonMesh *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (G3DPolygonMesh *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (G3DPolygonMesh *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_DrawPolygonMesh(_arg0,*_arg1);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_OpenFogObject(_swigobj,_swigarg0,_swigarg1)  (_swigobj->OpenFogObject(_swigarg0,_swigarg1))
-static int _wrap_iGraphics3D_OpenFogObject(lua_State *lua_state) {
 
+#define iGraphics3D_OpenFogObject(_swigobj,_swigarg0,_swigarg1)  (_swigobj->OpenFogObject(_swigarg0,_swigarg1))
+static int
+wrap_iGraphics3D_OpenFogObject(lua_State *L)
+{
     iGraphics3D * _arg0;
     CS_ID * _arg1;
     csFog * _arg2;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (CS_ID *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (CS_ID *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (CS_ID *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (csFog *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (csFog *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (csFog *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_OpenFogObject(_arg0,*_arg1,_arg2);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_DrawFogPolygon(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->DrawFogPolygon(_swigarg0,_swigarg1,_swigarg2))
-static int _wrap_iGraphics3D_DrawFogPolygon(lua_State *lua_state) {
 
+#define iGraphics3D_DrawFogPolygon(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->DrawFogPolygon(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iGraphics3D_DrawFogPolygon(lua_State *L)
+{
     iGraphics3D * _arg0;
     CS_ID * _arg1;
     G3DPolygonDFP * _arg2;
     int  _arg3;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (CS_ID *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (CS_ID *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (CS_ID *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (G3DPolygonDFP *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (G3DPolygonDFP *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (G3DPolygonDFP *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg3 = (int ) lua_tonumber (lua_state,  4 );
-#else
-  _arg3 = (int ) lua_tonumber ( 4 );
-#endif
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
 }
+	lua_settop(L, 0);
     iGraphics3D_DrawFogPolygon(_arg0,*_arg1,*_arg2,_arg3);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_CloseFogObject(_swigobj,_swigarg0)  (_swigobj->CloseFogObject(_swigarg0))
-static int _wrap_iGraphics3D_CloseFogObject(lua_State *lua_state) {
 
+#define iGraphics3D_CloseFogObject(_swigobj,_swigarg0)  (_swigobj->CloseFogObject(_swigarg0))
+static int
+wrap_iGraphics3D_CloseFogObject(lua_State *L)
+{
     iGraphics3D * _arg0;
     CS_ID * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (CS_ID *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (CS_ID *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (CS_ID *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_CloseFogObject(_arg0,*_arg1);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_GetCaps(_swigobj)  (_swigobj->GetCaps())
-static int _wrap_iGraphics3D_GetCaps(lua_State *lua_state) {
 
+#define iGraphics3D_GetCaps(_swigobj)  (_swigobj->GetCaps())
+static int
+wrap_iGraphics3D_GetCaps(lua_State *L)
+{
     csGraphics3DCaps * _result;
     iGraphics3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (csGraphics3DCaps *)iGraphics3D_GetCaps(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, csGraphics3DCaps_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iGraphics3D_GetZBuffAt(_swigobj,_swigarg0,_swigarg1)  (_swigobj->GetZBuffAt(_swigarg0,_swigarg1))
-static int _wrap_iGraphics3D_GetZBuffAt(lua_State *lua_state) {
 
-    unsigned long * _result;
+#define iGraphics3D_GetZBuffAt(_swigobj,_swigarg0,_swigarg1)  (_swigobj->GetZBuffAt(_swigarg0,_swigarg1))
+static int
+wrap_iGraphics3D_GetZBuffAt(lua_State *L)
+{
+    void * _result;
     iGraphics3D * _arg0;
     int  _arg1;
     int  _arg2;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
 }
-    _result = (unsigned long *)iGraphics3D_GetZBuffAt(_arg0,_arg1,_arg2);
+	lua_settop(L, 0);
+    _result = (void *)iGraphics3D_GetZBuffAt(_arg0,_arg1,_arg2);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushuserdata(L, (void*)_result);
+    }
 }
-    return 1;
+	return 1;
 }
-#define iGraphics3D_GetZBuffValue(_swigobj,_swigarg0,_swigarg1)  (_swigobj->GetZBuffValue(_swigarg0,_swigarg1))
-static int _wrap_iGraphics3D_GetZBuffValue(lua_State *lua_state) {
 
+#define iGraphics3D_GetZBuffValue(_swigobj,_swigarg0,_swigarg1)  (_swigobj->GetZBuffValue(_swigarg0,_swigarg1))
+static int
+wrap_iGraphics3D_GetZBuffValue(lua_State *L)
+{
     float  _result;
     iGraphics3D * _arg0;
     int  _arg1;
     int  _arg2;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
 }
+	lua_settop(L, 0);
     _result = (float )iGraphics3D_GetZBuffValue(_arg0,_arg1,_arg2);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
+
 #define iGraphics3D_DumpCache(_swigobj)  (_swigobj->DumpCache())
-static int _wrap_iGraphics3D_DumpCache(lua_State *lua_state) {
-
+static int
+wrap_iGraphics3D_DumpCache(lua_State *L)
+{
     iGraphics3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_DumpCache(_arg0);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_ClearCache(_swigobj)  (_swigobj->ClearCache())
-static int _wrap_iGraphics3D_ClearCache(lua_State *lua_state) {
 
+#define iGraphics3D_ClearCache(_swigobj)  (_swigobj->ClearCache())
+static int
+wrap_iGraphics3D_ClearCache(lua_State *L)
+{
     iGraphics3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_ClearCache(_arg0);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_RemoveFromCache(_swigobj,_swigarg0)  (_swigobj->RemoveFromCache(_swigarg0))
-static int _wrap_iGraphics3D_RemoveFromCache(lua_State *lua_state) {
 
+#define iGraphics3D_RemoveFromCache(_swigobj,_swigarg0)  (_swigobj->RemoveFromCache(_swigarg0))
+static int
+wrap_iGraphics3D_RemoveFromCache(lua_State *L)
+{
     iGraphics3D * _arg0;
     iPolygonTexture * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (iPolygonTexture *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (iPolygonTexture *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (iPolygonTexture *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_RemoveFromCache(_arg0,_arg1);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_GetWidth(_swigobj)  (_swigobj->GetWidth())
-static int _wrap_iGraphics3D_GetWidth(lua_State *lua_state) {
 
+#define iGraphics3D_GetWidth(_swigobj)  (_swigobj->GetWidth())
+static int
+wrap_iGraphics3D_GetWidth(lua_State *L)
+{
     int  _result;
     iGraphics3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iGraphics3D_GetWidth(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iGraphics3D_GetHeight(_swigobj)  (_swigobj->GetHeight())
-static int _wrap_iGraphics3D_GetHeight(lua_State *lua_state) {
 
+#define iGraphics3D_GetHeight(_swigobj)  (_swigobj->GetHeight())
+static int
+wrap_iGraphics3D_GetHeight(lua_State *L)
+{
     int  _result;
     iGraphics3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iGraphics3D_GetHeight(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iGraphics3D_SetPerspectiveCenter(_swigobj,_swigarg0,_swigarg1)  (_swigobj->SetPerspectiveCenter(_swigarg0,_swigarg1))
-static int _wrap_iGraphics3D_SetPerspectiveCenter(lua_State *lua_state) {
 
+#define iGraphics3D_SetPerspectiveCenter(_swigobj,_swigarg0,_swigarg1)  (_swigobj->SetPerspectiveCenter(_swigarg0,_swigarg1))
+static int
+wrap_iGraphics3D_SetPerspectiveCenter(lua_State *L)
+{
     iGraphics3D * _arg0;
     int  _arg1;
     int  _arg2;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
 }
+	lua_settop(L, 0);
     iGraphics3D_SetPerspectiveCenter(_arg0,_arg1,_arg2);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_SetPerspectiveAspect(_swigobj,_swigarg0)  (_swigobj->SetPerspectiveAspect(_swigarg0))
-static int _wrap_iGraphics3D_SetPerspectiveAspect(lua_State *lua_state) {
 
+#define iGraphics3D_SetPerspectiveAspect(_swigobj,_swigarg0)  (_swigobj->SetPerspectiveAspect(_swigarg0))
+static int
+wrap_iGraphics3D_SetPerspectiveAspect(lua_State *L)
+{
     iGraphics3D * _arg0;
     float  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (float ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (float ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg1 = (float )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     iGraphics3D_SetPerspectiveAspect(_arg0,_arg1);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_SetObjectToCamera(_swigobj,_swigarg0)  (_swigobj->SetObjectToCamera(_swigarg0))
-static int _wrap_iGraphics3D_SetObjectToCamera(lua_State *lua_state) {
 
+#define iGraphics3D_SetObjectToCamera(_swigobj,_swigarg0)  (_swigobj->SetObjectToCamera(_swigarg0))
+static int
+wrap_iGraphics3D_SetObjectToCamera(lua_State *L)
+{
     iGraphics3D * _arg0;
     csReversibleTransform * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (csReversibleTransform *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (csReversibleTransform *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (csReversibleTransform *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iGraphics3D_SetObjectToCamera(_arg0,_arg1);
-    return 1;
+	return 0;
 }
-#define iGraphics3D_SetClipper(_swigobj,_swigarg0,_swigarg1)  (_swigobj->SetClipper(_swigarg0,_swigarg1))
-static int _wrap_iGraphics3D_SetClipper(lua_State *lua_state) {
 
-    iGraphics3D * _arg0;
-    csVector2 * _arg1;
-    int  _arg2;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (csVector2 *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (csVector2 *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
-}
-    iGraphics3D_SetClipper(_arg0,_arg1,_arg2);
-    return 1;
-}
 #define iGraphics3D_GetDriver2D(_swigobj)  (_swigobj->GetDriver2D())
-static int _wrap_iGraphics3D_GetDriver2D(lua_State *lua_state) {
-
+static int
+wrap_iGraphics3D_GetDriver2D(lua_State *L)
+{
     iGraphics2D * _result;
     iGraphics3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iGraphics2D *)iGraphics3D_GetDriver2D(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iGraphics2D_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iGraphics3D_GetTextureManager(_swigobj)  (_swigobj->GetTextureManager())
-static int _wrap_iGraphics3D_GetTextureManager(lua_State *lua_state) {
 
+#define iGraphics3D_GetTextureManager(_swigobj)  (_swigobj->GetTextureManager())
+static int
+wrap_iGraphics3D_GetTextureManager(lua_State *L)
+{
     iTextureManager * _result;
     iGraphics3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iTextureManager *)iGraphics3D_GetTextureManager(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iTextureManager_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iGraphics3D_CreateHalo(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5)  (_swigobj->CreateHalo(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5))
-static int _wrap_iGraphics3D_CreateHalo(lua_State *lua_state) {
 
+#define iGraphics3D_CreateHalo(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5)  (_swigobj->CreateHalo(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5))
+static int
+wrap_iGraphics3D_CreateHalo(lua_State *L)
+{
     iHalo * _result;
     iGraphics3D * _arg0;
     float  _arg1;
@@ -2349,75 +5619,71 @@ static int _wrap_iGraphics3D_CreateHalo(lua_State *lua_state) {
     int  _arg6;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (float ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (float ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg1 = (float )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (float ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (float ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg2 = (float )lua_tonumber(L, 3);
 }
 {
-#ifdef LUA_MS
-  _arg3 = (float ) lua_tonumber (lua_state,  4 );
-#else
-  _arg3 = (float ) lua_tonumber ( 4 );
-#endif
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg3 = (float )lua_tonumber(L, 4);
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  5 ))
-    _arg4 = (unsigned char *) lua_touserdata (lua_state,  5 );
-  else _arg4 = NULL;
-#else
-  if (!lua_isnil ( 5 )) _arg4 = (unsigned char *) lua_touserdata ( 5 );
-  else _arg4 = NULL;
-#endif
+	if( (lua_isnull(L, 5)) || (lua_isnil(L, 5)) ) {
+		_arg4 = NULL;
+	} else if(lua_isuserdata(L, 5)) {
+		_arg4 = (unsigned char *)lua_touserdata(L, 5);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg4 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg5 = (int ) lua_tonumber (lua_state,  6 );
-#else
-  _arg5 = (int ) lua_tonumber ( 6 );
-#endif
+	if(!lua_isnumber(L, 6)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg5 = (int )lua_tonumber(L, 6);
 }
 {
-#ifdef LUA_MS
-  _arg6 = (int ) lua_tonumber (lua_state,  7 );
-#else
-  _arg6 = (int ) lua_tonumber ( 7 );
-#endif
+	if(!lua_isnumber(L, 7)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg6 = (int )lua_tonumber(L, 7);
 }
+	lua_settop(L, 0);
     _result = (iHalo *)iGraphics3D_CreateHalo(_arg0,_arg1,_arg2,_arg3,_arg4,_arg5,_arg6);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iHalo_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iGraphics3D_DrawPixmap(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6,_swigarg7,_swigarg8)  (_swigobj->DrawPixmap(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6,_swigarg7,_swigarg8))
-static int _wrap_iGraphics3D_DrawPixmap(lua_State *lua_state) {
 
+#define iGraphics3D_DrawPixmap(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6,_swigarg7,_swigarg8)  (_swigobj->DrawPixmap(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4,_swigarg5,_swigarg6,_swigarg7,_swigarg8))
+static int
+wrap_iGraphics3D_DrawPixmap(lua_State *L)
+{
     iGraphics3D * _arg0;
     iTextureHandle * _arg1;
     int  _arg2;
@@ -2430,84 +5696,78 @@ static int _wrap_iGraphics3D_DrawPixmap(lua_State *lua_state) {
     int  _arg9;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iGraphics3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iGraphics3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iGraphics3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (iTextureHandle *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (iTextureHandle *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (iTextureHandle *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
 }
 {
-#ifdef LUA_MS
-  _arg3 = (int ) lua_tonumber (lua_state,  4 );
-#else
-  _arg3 = (int ) lua_tonumber ( 4 );
-#endif
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
 }
 {
-#ifdef LUA_MS
-  _arg4 = (int ) lua_tonumber (lua_state,  5 );
-#else
-  _arg4 = (int ) lua_tonumber ( 5 );
-#endif
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg4 = (int )lua_tonumber(L, 5);
 }
 {
-#ifdef LUA_MS
-  _arg5 = (int ) lua_tonumber (lua_state,  6 );
-#else
-  _arg5 = (int ) lua_tonumber ( 6 );
-#endif
+	if(!lua_isnumber(L, 6)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg5 = (int )lua_tonumber(L, 6);
 }
 {
-#ifdef LUA_MS
-  _arg6 = (int ) lua_tonumber (lua_state,  7 );
-#else
-  _arg6 = (int ) lua_tonumber ( 7 );
-#endif
+	if(!lua_isnumber(L, 7)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg6 = (int )lua_tonumber(L, 7);
 }
 {
-#ifdef LUA_MS
-  _arg7 = (int ) lua_tonumber (lua_state,  8 );
-#else
-  _arg7 = (int ) lua_tonumber ( 8 );
-#endif
+	if(!lua_isnumber(L, 8)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg7 = (int )lua_tonumber(L, 8);
 }
 {
-#ifdef LUA_MS
-  _arg8 = (int ) lua_tonumber (lua_state,  9 );
-#else
-  _arg8 = (int ) lua_tonumber ( 9 );
-#endif
+	if(!lua_isnumber(L, 9)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg8 = (int )lua_tonumber(L, 9);
 }
 {
-#ifdef LUA_MS
-  _arg9 = (int ) lua_tonumber (lua_state,  10 );
-#else
-  _arg9 = (int ) lua_tonumber ( 10 );
-#endif
+	if(!lua_isnumber(L, 10)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg9 = (int )lua_tonumber(L, 10);
 }
+	lua_settop(L, 0);
     iGraphics3D_DrawPixmap(_arg0,_arg1,_arg2,_arg3,_arg4,_arg5,_arg6,_arg7,_arg8,_arg9);
-    return 1;
+	return 0;
 }
+
 static void *SwigiCameraToiBase(void *ptr) {
     iCamera *src;
     iBase *dest;
@@ -2517,57 +5777,55 @@ static void *SwigiCameraToiBase(void *ptr) {
 }
 
 #define iCamera_GetFOV(_swigobj)  (_swigobj->GetFOV())
-static int _wrap_iCamera_GetFOV(lua_State *lua_state) {
-
+static int
+wrap_iCamera_GetFOV(lua_State *L)
+{
     float  _result;
     iCamera * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iCamera *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iCamera *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iCamera *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (float )iCamera_GetFOV(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iCamera_GetInvFOV(_swigobj)  (_swigobj->GetInvFOV())
-static int _wrap_iCamera_GetInvFOV(lua_State *lua_state) {
 
+#define iCamera_GetInvFOV(_swigobj)  (_swigobj->GetInvFOV())
+static int
+wrap_iCamera_GetInvFOV(lua_State *L)
+{
     float  _result;
     iCamera * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iCamera *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iCamera *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iCamera *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (float )iCamera_GetInvFOV(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
+
 static void *SwigiSectorToiBase(void *ptr) {
     iSector *src;
     iBase *dest;
@@ -2576,416 +5834,407 @@ static void *SwigiSectorToiBase(void *ptr) {
     return (void *) dest;
 }
 
-#define iSector_CreateBSP(_swigobj)  (_swigobj->CreateBSP())
-static int _wrap_iSector_CreateBSP(lua_State *lua_state) {
-
-    iSector * _arg0;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iSector *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iSector *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-    iSector_CreateBSP(_arg0);
-    return 1;
-}
-static void *SwigiThingToiBase(void *ptr) {
-    iThing *src;
+static void *SwigiThingStateToiBase(void *ptr) {
+    iThingState *src;
     iBase *dest;
-    src = (iThing *) ptr;
+    src = (iThingState *) ptr;
     dest = (iBase *) src;
     return (void *) dest;
 }
 
-#define iThing_GetName(_swigobj)  (_swigobj->GetName())
-static int _wrap_iThing_GetName(lua_State *lua_state) {
-
-    char * _result;
-    iThing * _arg0;
-
+#define iThingState_CreatePolygon(_swigobj,_swigarg0)  (_swigobj->CreatePolygon(_swigarg0))
+static int
+wrap_iThingState_CreatePolygon(lua_State *L)
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-    _result = (char *)iThing_GetName(_arg0);
-{
-#ifdef LUA_MS
-  lua_pushstring (lua_state, _result);
-#else
-  lua_pushstring (_result);
-#endif
-}
-    return 1;
-}
-#define iThing_SetName(_swigobj,_swigarg0)  (_swigobj->SetName(_swigarg0))
-static int _wrap_iThing_SetName(lua_State *lua_state) {
-
-    iThing * _arg0;
-    char * _arg1;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
-}
-    iThing_SetName(_arg0,_arg1);
-    return 1;
-}
-#define iThing_CompressVertices(_swigobj)  (_swigobj->CompressVertices())
-static int _wrap_iThing_CompressVertices(lua_State *lua_state) {
-
-    iThing * _arg0;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-    iThing_CompressVertices(_arg0);
-    return 1;
-}
-#define iThing_GetPolygonCount(_swigobj)  (_swigobj->GetPolygonCount())
-static int _wrap_iThing_GetPolygonCount(lua_State *lua_state) {
-
-    int  _result;
-    iThing * _arg0;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-    _result = (int )iThing_GetPolygonCount(_arg0);
-{
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
-}
-    return 1;
-}
-#define iThing_GetPolygon(_swigobj,_swigarg0)  (_swigobj->GetPolygon(_swigarg0))
-static int _wrap_iThing_GetPolygon(lua_State *lua_state) {
-
     iPolygon3D * _result;
-    iThing * _arg0;
-    int  _arg1;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
-}
-    _result = (iPolygon3D *)iThing_GetPolygon(_arg0,_arg1);
-{
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
-}
-    return 1;
-}
-#define iThing_CreatePolygon(_swigobj,_swigarg0)  (_swigobj->CreatePolygon(_swigarg0))
-static int _wrap_iThing_CreatePolygon(lua_State *lua_state) {
-
-    iPolygon3D * _result;
-    iThing * _arg0;
+    iThingState * _arg0;
     char * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iThingState *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
-    _result = (iPolygon3D *)iThing_CreatePolygon(_arg0,_arg1);
+	lua_settop(L, 0);
+    _result = (iPolygon3D *)iThingState_CreatePolygon(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iPolygon3D_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iThing_GetVertexCount(_swigobj)  (_swigobj->GetVertexCount())
-static int _wrap_iThing_GetVertexCount(lua_State *lua_state) {
 
+static void *SwigiMeshObjectToiBase(void *ptr) {
+    iMeshObject *src;
+    iBase *dest;
+    src = (iMeshObject *) ptr;
+    dest = (iBase *) src;
+    return (void *) dest;
+}
+
+static iThingState * iMeshObject_Query_iThingState(iMeshObject *self) {
+      return SCF_QUERY_INTERFACE(self, iThingState);
+    }
+static int
+wrap_iMeshObject_Query_iThingState(lua_State *L)
+{
+    iThingState * _result;
+    iMeshObject * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iMeshObject *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (iThingState *)iMeshObject_Query_iThingState(_arg0);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iThingState_tag );
+    }
+}
+	return 1;
+}
+
+static void *SwigiMeshWrapperToiBase(void *ptr) {
+    iMeshWrapper *src;
+    iBase *dest;
+    src = (iMeshWrapper *) ptr;
+    dest = (iBase *) src;
+    return (void *) dest;
+}
+
+#define iMeshWrapper_GetMeshObject(_swigobj)  (_swigobj->GetMeshObject())
+static int
+wrap_iMeshWrapper_GetMeshObject(lua_State *L)
+{
+    iMeshObject * _result;
+    iMeshWrapper * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iMeshWrapper *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (iMeshObject *)iMeshWrapper_GetMeshObject(_arg0);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iMeshObject_tag );
+    }
+}
+	return 1;
+}
+
+static void *SwigiLightMapToiBase(void *ptr) {
+    iLightMap *src;
+    iBase *dest;
+    src = (iLightMap *) ptr;
+    dest = (iBase *) src;
+    return (void *) dest;
+}
+
+#define iLightMap_GetMapData(_swigobj)  (_swigobj->GetMapData())
+static int
+wrap_iLightMap_GetMapData(lua_State *L)
+{
+    void * _result;
+    iLightMap * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iLightMap *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (void *)iLightMap_GetMapData(_arg0);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushuserdata(L, (void*)_result);
+    }
+}
+	return 1;
+}
+
+#define iLightMap_GetWidth(_swigobj)  (_swigobj->GetWidth())
+static int
+wrap_iLightMap_GetWidth(lua_State *L)
+{
     int  _result;
-    iThing * _arg0;
+    iLightMap * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iLightMap *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
-    _result = (int )iThing_GetVertexCount(_arg0);
+	lua_settop(L, 0);
+    _result = (int )iLightMap_GetWidth(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iThing_GetVertex(_swigobj,_swigarg0)  (_swigobj->GetVertex(_swigarg0))
-static int _wrap_iThing_GetVertex(lua_State *lua_state) {
 
-    csVector3 * _result;
-    iThing * _arg0;
-    int  _arg1;
-
+#define iLightMap_GetHeight(_swigobj)  (_swigobj->GetHeight())
+static int
+wrap_iLightMap_GetHeight(lua_State *L)
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
-}
-    csVector3 & _result_ref = iThing_GetVertex(_arg0,_arg1);
-    _result = (csVector3 *) &_result_ref;
-{
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
-}
-    return 1;
-}
-#define iThing_GetVertexW(_swigobj,_swigarg0)  (_swigobj->GetVertexW(_swigarg0))
-static int _wrap_iThing_GetVertexW(lua_State *lua_state) {
-
-    csVector3 * _result;
-    iThing * _arg0;
-    int  _arg1;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
-}
-    csVector3 & _result_ref = iThing_GetVertexW(_arg0,_arg1);
-    _result = (csVector3 *) &_result_ref;
-{
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
-}
-    return 1;
-}
-#define iThing_GetVertexC(_swigobj,_swigarg0)  (_swigobj->GetVertexC(_swigarg0))
-static int _wrap_iThing_GetVertexC(lua_State *lua_state) {
-
-    csVector3 * _result;
-    iThing * _arg0;
-    int  _arg1;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
-}
-    csVector3 & _result_ref = iThing_GetVertexC(_arg0,_arg1);
-    _result = (csVector3 *) &_result_ref;
-{
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
-}
-    return 1;
-}
-#define iThing_CreateVertex(_swigobj,_swigarg0)  (_swigobj->CreateVertex(_swigarg0))
-static int _wrap_iThing_CreateVertex(lua_State *lua_state) {
-
     int  _result;
-    iThing * _arg0;
-    csVector3 * _arg1;
+    iLightMap * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iLightMap *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
+    _result = (int )iLightMap_GetHeight(_arg0);
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (csVector3 *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (csVector3 *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    _result = (int )iThing_CreateVertex(_arg0,*_arg1);
-{
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	return 1;
 }
-    return 1;
-}
-#define iThing_CreateKey(_swigobj,_swigarg0,_swigarg1)  (_swigobj->CreateKey(_swigarg0,_swigarg1))
-static int _wrap_iThing_CreateKey(lua_State *lua_state) {
 
-    bool  _result;
-    iThing * _arg0;
-    char * _arg1;
-    char * _arg2;
+#define iLightMap_GetRealWidth(_swigobj)  (_swigobj->GetRealWidth())
+static int
+wrap_iLightMap_GetRealWidth(lua_State *L)
+{
+    int  _result;
+    iLightMap * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iThing *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iThing *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iLightMap *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iLightMap_GetRealWidth(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iLightMap_GetRealHeight(_swigobj)  (_swigobj->GetRealHeight())
+static int
+wrap_iLightMap_GetRealHeight(lua_State *L)
+{
+    int  _result;
+    iLightMap * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iLightMap *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iLightMap_GetRealHeight(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iLightMap_GetCacheData(_swigobj)  (_swigobj->GetCacheData())
+static int
+wrap_iLightMap_GetCacheData(lua_State *L)
+{
+    void * _result;
+    iLightMap * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iLightMap *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (void *)iLightMap_GetCacheData(_arg0);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushuserdata(L, (void*)_result);
+    }
+}
+	return 1;
+}
+
+#define iLightMap_SetCacheData(_swigobj,_swigarg0)  (_swigobj->SetCacheData(_swigarg0))
+static int
+wrap_iLightMap_SetCacheData(lua_State *L)
+{
+    iLightMap * _arg0;
+    void * _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iLightMap *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (void *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (void*)");
+		_arg1 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iLightMap_SetCacheData(_arg0,_arg1);
+	return 0;
+}
+
+#define iLightMap_GetMeanLighting(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->GetMeanLighting(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iLightMap_GetMeanLighting(lua_State *L)
+{
+    iLightMap * _arg0;
+    int * _arg1;
+    int * _arg2;
+    int * _arg3;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iLightMap *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg2 = (char*) lua_tostring (lua_state,  3 );
-#else
-  _arg2 = (char*) lua_tostring ( 3 );
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (int *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
-    _result = (bool )iThing_CreateKey(_arg0,_arg1,_arg2);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (int *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
-    return 1;
+{
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (int *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
 }
+	lua_settop(L, 0);
+    iLightMap_GetMeanLighting(_arg0,*_arg1,*_arg2,*_arg3);
+	return 0;
+}
+
+#define iLightMap_GetSize(_swigobj)  (_swigobj->GetSize())
+static int
+wrap_iLightMap_GetSize(lua_State *L)
+{
+    long  _result;
+    iLightMap * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iLightMap *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (long )iLightMap_GetSize(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
 static void *SwigiPolygon3DToiBase(void *ptr) {
     iPolygon3D *src;
     iBase *dest;
@@ -2994,525 +6243,482 @@ static void *SwigiPolygon3DToiBase(void *ptr) {
     return (void *) dest;
 }
 
-#define iPolygon3D_GetName(_swigobj)  (_swigobj->GetName())
-static int _wrap_iPolygon3D_GetName(lua_State *lua_state) {
-
-    char * _result;
-    iPolygon3D * _arg0;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-    _result = (char *)iPolygon3D_GetName(_arg0);
-{
-#ifdef LUA_MS
-  lua_pushstring (lua_state, _result);
-#else
-  lua_pushstring (_result);
-#endif
-}
-    return 1;
-}
-#define iPolygon3D_SetName(_swigobj,_swigarg0)  (_swigobj->SetName(_swigarg0))
-static int _wrap_iPolygon3D_SetName(lua_State *lua_state) {
-
-    iPolygon3D * _arg0;
-    char * _arg1;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
-}
-    iPolygon3D_SetName(_arg0,_arg1);
-    return 1;
-}
 #define iPolygon3D_GetLightMap(_swigobj)  (_swigobj->GetLightMap())
-static int _wrap_iPolygon3D_GetLightMap(lua_State *lua_state) {
-
+static int
+wrap_iPolygon3D_GetLightMap(lua_State *L)
+{
     iLightMap * _result;
     iPolygon3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iLightMap *)iPolygon3D_GetLightMap(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iLightMap_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iPolygon3D_GetMaterialHandle(_swigobj)  (_swigobj->GetMaterialHandle())
-static int _wrap_iPolygon3D_GetMaterialHandle(lua_State *lua_state) {
 
+#define iPolygon3D_GetMaterialHandle(_swigobj)  (_swigobj->GetMaterialHandle())
+static int
+wrap_iPolygon3D_GetMaterialHandle(lua_State *L)
+{
     iMaterialHandle * _result;
     iPolygon3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iMaterialHandle *)iPolygon3D_GetMaterialHandle(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iMaterialHandle_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iPolygon3D_SetMaterial(_swigobj,_swigarg0)  (_swigobj->SetMaterial(_swigarg0))
-static int _wrap_iPolygon3D_SetMaterial(lua_State *lua_state) {
 
+#define iPolygon3D_SetMaterial(_swigobj,_swigarg0)  (_swigobj->SetMaterial(_swigarg0))
+static int
+wrap_iPolygon3D_SetMaterial(lua_State *L)
+{
     iPolygon3D * _arg0;
     iMaterialWrapper * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (iMaterialWrapper *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (iMaterialWrapper *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (iMaterialWrapper *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iPolygon3D_SetMaterial(_arg0,_arg1);
-    return 1;
+	return 0;
 }
-#define iPolygon3D_GetVertexCount(_swigobj)  (_swigobj->GetVertexCount())
-static int _wrap_iPolygon3D_GetVertexCount(lua_State *lua_state) {
 
+#define iPolygon3D_GetVertexCount(_swigobj)  (_swigobj->GetVertexCount())
+static int
+wrap_iPolygon3D_GetVertexCount(lua_State *L)
+{
     int  _result;
     iPolygon3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iPolygon3D_GetVertexCount(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygon3D_GetVertex(_swigobj,_swigarg0)  (_swigobj->GetVertex(_swigarg0))
-static int _wrap_iPolygon3D_GetVertex(lua_State *lua_state) {
 
+#define iPolygon3D_GetVertex(_swigobj,_swigarg0)  (_swigobj->GetVertex(_swigarg0))
+static int
+wrap_iPolygon3D_GetVertex(lua_State *L)
+{
     csVector3 * _result;
     iPolygon3D * _arg0;
     int  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     csVector3 & _result_ref = iPolygon3D_GetVertex(_arg0,_arg1);
     _result = (csVector3 *) &_result_ref;
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, csVector3_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iPolygon3D_GetVertexW(_swigobj,_swigarg0)  (_swigobj->GetVertexW(_swigarg0))
-static int _wrap_iPolygon3D_GetVertexW(lua_State *lua_state) {
 
+#define iPolygon3D_GetVertexW(_swigobj,_swigarg0)  (_swigobj->GetVertexW(_swigarg0))
+static int
+wrap_iPolygon3D_GetVertexW(lua_State *L)
+{
     csVector3 * _result;
     iPolygon3D * _arg0;
     int  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     csVector3 & _result_ref = iPolygon3D_GetVertexW(_arg0,_arg1);
     _result = (csVector3 *) &_result_ref;
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, csVector3_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iPolygon3D_GetVertexC(_swigobj,_swigarg0)  (_swigobj->GetVertexC(_swigarg0))
-static int _wrap_iPolygon3D_GetVertexC(lua_State *lua_state) {
 
+#define iPolygon3D_GetVertexC(_swigobj,_swigarg0)  (_swigobj->GetVertexC(_swigarg0))
+static int
+wrap_iPolygon3D_GetVertexC(lua_State *L)
+{
     csVector3 * _result;
     iPolygon3D * _arg0;
     int  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     csVector3 & _result_ref = iPolygon3D_GetVertexC(_arg0,_arg1);
     _result = (csVector3 *) &_result_ref;
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, csVector3_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iPolygon3D_CreateVertexByIndex(_swigobj,_swigarg0)  (_swigobj->CreateVertex(_swigarg0))
-static int _wrap_iPolygon3D_CreateVertexByIndex(lua_State *lua_state) {
 
+#define iPolygon3D_CreateVertexByIndex(_swigobj,_swigarg0)  (_swigobj->CreateVertex(_swigarg0))
+static int
+wrap_iPolygon3D_CreateVertexByIndex(lua_State *L)
+{
     int  _result;
     iPolygon3D * _arg0;
     int  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     _result = (int )iPolygon3D_CreateVertexByIndex(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygon3D_CreateVertex(_swigobj,_swigarg0)  (_swigobj->CreateVertex(_swigarg0))
-static int _wrap_iPolygon3D_CreateVertex(lua_State *lua_state) {
 
+#define iPolygon3D_CreateVertex(_swigobj,_swigarg0)  (_swigobj->CreateVertex(_swigarg0))
+static int
+wrap_iPolygon3D_CreateVertex(lua_State *L)
+{
     int  _result;
     iPolygon3D * _arg0;
     csVector3 * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (csVector3 *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (csVector3 *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (csVector3 *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iPolygon3D_CreateVertex(_arg0,*_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygon3D_GetAlpha(_swigobj)  (_swigobj->GetAlpha())
-static int _wrap_iPolygon3D_GetAlpha(lua_State *lua_state) {
 
+#define iPolygon3D_GetAlpha(_swigobj)  (_swigobj->GetAlpha())
+static int
+wrap_iPolygon3D_GetAlpha(lua_State *L)
+{
     int  _result;
     iPolygon3D * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iPolygon3D_GetAlpha(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygon3D_SetAlpha(_swigobj,_swigarg0)  (_swigobj->SetAlpha(_swigarg0))
-static int _wrap_iPolygon3D_SetAlpha(lua_State *lua_state) {
 
+#define iPolygon3D_SetAlpha(_swigobj,_swigarg0)  (_swigobj->SetAlpha(_swigarg0))
+static int
+wrap_iPolygon3D_SetAlpha(lua_State *L)
+{
     iPolygon3D * _arg0;
     int  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     iPolygon3D_SetAlpha(_arg0,_arg1);
-    return 1;
+	return 0;
 }
-#define iPolygon3D_CreatePlane(_swigobj,_swigarg0,_swigarg1)  (_swigobj->CreatePlane(_swigarg0,_swigarg1))
-static int _wrap_iPolygon3D_CreatePlane(lua_State *lua_state) {
 
+#define iPolygon3D_CreatePlane(_swigobj,_swigarg0,_swigarg1)  (_swigobj->CreatePlane(_swigarg0,_swigarg1))
+static int
+wrap_iPolygon3D_CreatePlane(lua_State *L)
+{
     iPolygon3D * _arg0;
     csVector3 * _arg1;
     csMatrix3 * _arg2;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (csVector3 *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (csVector3 *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (csVector3 *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (csMatrix3 *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (csMatrix3 *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (csMatrix3 *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iPolygon3D_CreatePlane(_arg0,*_arg1,*_arg2);
-    return 1;
+	return 0;
 }
-#define iPolygon3D_SetPlane(_swigobj,_swigarg0)  (_swigobj->SetPlane(_swigarg0))
-static int _wrap_iPolygon3D_SetPlane(lua_State *lua_state) {
 
+#define iPolygon3D_SetPlane(_swigobj,_swigarg0)  (_swigobj->SetPlane(_swigarg0))
+static int
+wrap_iPolygon3D_SetPlane(lua_State *L)
+{
     bool  _result;
     iPolygon3D * _arg0;
     char * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (bool )iPolygon3D_SetPlane(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygon3D_SetTextureSpace(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->SetTextureSpace(_swigarg0,_swigarg1,_swigarg2))
-static int _wrap_iPolygon3D_SetTextureSpace(lua_State *lua_state) {
 
+#define iPolygon3D_SetTextureSpace(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->SetTextureSpace(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iPolygon3D_SetTextureSpace(lua_State *L)
+{
     iPolygon3D * _arg0;
     csVector3 * _arg1;
     csVector3 * _arg2;
     float  _arg3;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygon3D *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygon3D *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygon3D *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (csVector3 *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (csVector3 *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (csVector3 *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (csVector3 *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (csVector3 *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (csVector3 *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg3 = (float ) lua_tonumber (lua_state,  4 );
-#else
-  _arg3 = (float ) lua_tonumber ( 4 );
-#endif
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `float ' expected");
+	}
+	_arg3 = (float )lua_tonumber(L, 4);
 }
+	lua_settop(L, 0);
     iPolygon3D_SetTextureSpace(_arg0,*_arg1,*_arg2,_arg3);
-    return 1;
+	return 0;
 }
+
 static void *SwigiImageToiBase(void *ptr) {
     iImage *src;
     iBase *dest;
@@ -3522,383 +6728,396 @@ static void *SwigiImageToiBase(void *ptr) {
 }
 
 #define iImage_GetImageData(_swigobj)  (_swigobj->GetImageData())
-static int _wrap_iImage_GetImageData(lua_State *lua_state) {
-
+static int
+wrap_iImage_GetImageData(lua_State *L)
+{
     void * _result;
     iImage * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (void *)iImage_GetImageData(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushuserdata(L, (void*)_result);
+    }
 }
-    return 1;
+	return 1;
 }
-#define iImage_GetWidth(_swigobj)  (_swigobj->GetWidth())
-static int _wrap_iImage_GetWidth(lua_State *lua_state) {
 
+#define iImage_GetWidth(_swigobj)  (_swigobj->GetWidth())
+static int
+wrap_iImage_GetWidth(lua_State *L)
+{
     int  _result;
     iImage * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iImage_GetWidth(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iImage_GetHeight(_swigobj)  (_swigobj->GetHeight())
-static int _wrap_iImage_GetHeight(lua_State *lua_state) {
 
+#define iImage_GetHeight(_swigobj)  (_swigobj->GetHeight())
+static int
+wrap_iImage_GetHeight(lua_State *L)
+{
     int  _result;
     iImage * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iImage_GetHeight(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iImage_GetSize(_swigobj)  (_swigobj->GetSize())
-static int _wrap_iImage_GetSize(lua_State *lua_state) {
 
+#define iImage_GetSize(_swigobj)  (_swigobj->GetSize())
+static int
+wrap_iImage_GetSize(lua_State *L)
+{
     int  _result;
     iImage * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iImage_GetSize(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iImage_Rescale(_swigobj,_swigarg0,_swigarg1)  (_swigobj->Rescale(_swigarg0,_swigarg1))
-static int _wrap_iImage_Rescale(lua_State *lua_state) {
 
+#define iImage_Rescale(_swigobj,_swigarg0,_swigarg1)  (_swigobj->Rescale(_swigarg0,_swigarg1))
+static int
+wrap_iImage_Rescale(lua_State *L)
+{
     iImage * _arg0;
     int  _arg1;
     int  _arg2;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
 }
+	lua_settop(L, 0);
     iImage_Rescale(_arg0,_arg1,_arg2);
-    return 1;
+	return 0;
 }
-#define iImage_MipMap(_swigobj,_swigarg0,_swigarg1)  (_swigobj->MipMap(_swigarg0,_swigarg1))
-static int _wrap_iImage_MipMap(lua_State *lua_state) {
 
+#define iImage_MipMap(_swigobj,_swigarg0,_swigarg1)  (_swigobj->MipMap(_swigarg0,_swigarg1))
+static int
+wrap_iImage_MipMap(lua_State *L)
+{
     iImage * _result;
     iImage * _arg0;
     int  _arg1;
     csRGBpixel * _arg2;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (csRGBpixel *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (csRGBpixel *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (csRGBpixel *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iImage *)iImage_MipMap(_arg0,_arg1,_arg2);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iImage_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iImage_SetName(_swigobj,_swigarg0)  (_swigobj->SetName(_swigarg0))
-static int _wrap_iImage_SetName(lua_State *lua_state) {
 
+#define iImage_SetName(_swigobj,_swigarg0)  (_swigobj->SetName(_swigarg0))
+static int
+wrap_iImage_SetName(lua_State *L)
+{
     iImage * _arg0;
     char * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iImage_SetName(_arg0,_arg1);
-    return 1;
+	return 0;
 }
-#define iImage_GetName(_swigobj)  (_swigobj->GetName())
-static int _wrap_iImage_GetName(lua_State *lua_state) {
 
+#define iImage_GetName(_swigobj)  (_swigobj->GetName())
+static int
+wrap_iImage_GetName(lua_State *L)
+{
     char * _result;
     iImage * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (char *)iImage_GetName(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushstring (lua_state, _result);
-#else
-  lua_pushstring (_result);
-#endif
+    if(_result == NULL) {
+		lua_pushstring(L, "");
+    } else {
+		lua_pushstring(L, _result);
+    }
 }
-    return 1;
+	return 1;
 }
-#define iImage_GetFormat(_swigobj)  (_swigobj->GetFormat())
-static int _wrap_iImage_GetFormat(lua_State *lua_state) {
 
+#define iImage_GetFormat(_swigobj)  (_swigobj->GetFormat())
+static int
+wrap_iImage_GetFormat(lua_State *L)
+{
     int  _result;
     iImage * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iImage_GetFormat(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iImage_GetPalette(_swigobj)  (_swigobj->GetPalette())
-static int _wrap_iImage_GetPalette(lua_State *lua_state) {
 
+#define iImage_GetPalette(_swigobj)  (_swigobj->GetPalette())
+static int
+wrap_iImage_GetPalette(lua_State *L)
+{
     csRGBpixel * _result;
     iImage * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (csRGBpixel *)iImage_GetPalette(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, csRGBpixel_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iImage_GetAlpha(_swigobj)  (_swigobj->GetAlpha())
-static int _wrap_iImage_GetAlpha(lua_State *lua_state) {
 
-    UByte * _result;
+#define iImage_GetAlpha(_swigobj)  (_swigobj->GetAlpha())
+static int
+wrap_iImage_GetAlpha(lua_State *L)
+{
+    void * _result;
     iImage * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
-    _result = (UByte *)iImage_GetAlpha(_arg0);
+	lua_settop(L, 0);
+    _result = (void *)iImage_GetAlpha(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushuserdata(L, (void*)_result);
+    }
 }
-    return 1;
+	return 1;
 }
-#define iImage_SetFormat(_swigobj,_swigarg0)  (_swigobj->SetFormat(_swigarg0))
-static int _wrap_iImage_SetFormat(lua_State *lua_state) {
 
+#define iImage_SetFormat(_swigobj,_swigarg0)  (_swigobj->SetFormat(_swigarg0))
+static int
+wrap_iImage_SetFormat(lua_State *L)
+{
     iImage * _arg0;
     int  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     iImage_SetFormat(_arg0,_arg1);
-    return 1;
+	return 0;
 }
-#define iImage_Clone(_swigobj)  (_swigobj->Clone())
-static int _wrap_iImage_Clone(lua_State *lua_state) {
 
+#define iImage_Clone(_swigobj)  (_swigobj->Clone())
+static int
+wrap_iImage_Clone(lua_State *L)
+{
     iImage * _result;
     iImage * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iImage *)iImage_Clone(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iImage_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iImage_Crop(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->Crop(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
-static int _wrap_iImage_Crop(lua_State *lua_state) {
 
+#define iImage_Crop(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->Crop(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
+static int
+wrap_iImage_Crop(lua_State *L)
+{
     iImage * _result;
     iImage * _arg0;
     int  _arg1;
@@ -3907,55 +7126,51 @@ static int _wrap_iImage_Crop(lua_State *lua_state) {
     int  _arg4;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iImage *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iImage *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iImage *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
 }
 {
-#ifdef LUA_MS
-  _arg3 = (int ) lua_tonumber (lua_state,  4 );
-#else
-  _arg3 = (int ) lua_tonumber ( 4 );
-#endif
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
 }
 {
-#ifdef LUA_MS
-  _arg4 = (int ) lua_tonumber (lua_state,  5 );
-#else
-  _arg4 = (int ) lua_tonumber ( 5 );
-#endif
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg4 = (int )lua_tonumber(L, 5);
 }
+	lua_settop(L, 0);
     _result = (iImage *)iImage_Crop(_arg0,_arg1,_arg2,_arg3,_arg4);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iImage_tag );
+    }
 }
-    return 1;
+	return 1;
 }
+
 static void *SwigiTextureManagerToiBase(void *ptr) {
     iTextureManager *src;
     iBase *dest;
@@ -3965,151 +7180,161 @@ static void *SwigiTextureManagerToiBase(void *ptr) {
 }
 
 #define iTextureManager_RegisterTexture(_swigobj,_swigarg0,_swigarg1)  (_swigobj->RegisterTexture(_swigarg0,_swigarg1))
-static int _wrap_iTextureManager_RegisterTexture(lua_State *lua_state) {
-
+static int
+wrap_iTextureManager_RegisterTexture(lua_State *L)
+{
     iTextureHandle * _result;
     iTextureManager * _arg0;
     iImage * _arg1;
     int  _arg2;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureManager *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureManager *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureManager *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (iImage *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (iImage *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (iImage *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
 }
+	lua_settop(L, 0);
     _result = (iTextureHandle *)iTextureManager_RegisterTexture(_arg0,_arg1,_arg2);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iTextureHandle_tag );
+    }
 }
-    return 1;
+	return 1;
 }
+
 #define iTextureManager_PrepareTextures(_swigobj)  (_swigobj->PrepareTextures())
-static int _wrap_iTextureManager_PrepareTextures(lua_State *lua_state) {
-
+static int
+wrap_iTextureManager_PrepareTextures(lua_State *L)
+{
     iTextureManager * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureManager *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureManager *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureManager *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iTextureManager_PrepareTextures(_arg0);
-    return 1;
+	return 0;
 }
+
 #define iTextureManager_FreeImages(_swigobj)  (_swigobj->FreeImages())
-static int _wrap_iTextureManager_FreeImages(lua_State *lua_state) {
-
+static int
+wrap_iTextureManager_FreeImages(lua_State *L)
+{
     iTextureManager * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureManager *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureManager *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureManager *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iTextureManager_FreeImages(_arg0);
-    return 1;
+	return 0;
 }
-#define iTextureManager_ResetPalette(_swigobj)  (_swigobj->ResetPalette())
-static int _wrap_iTextureManager_ResetPalette(lua_State *lua_state) {
 
+#define iTextureManager_ResetPalette(_swigobj)  (_swigobj->ResetPalette())
+static int
+wrap_iTextureManager_ResetPalette(lua_State *L)
+{
     iTextureManager * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureManager *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureManager *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureManager *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iTextureManager_ResetPalette(_arg0);
-    return 1;
+	return 0;
 }
-#define iTextureManager_ReserveColor(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->ReserveColor(_swigarg0,_swigarg1,_swigarg2))
-static int _wrap_iTextureManager_ReserveColor(lua_State *lua_state) {
 
+#define iTextureManager_ReserveColor(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->ReserveColor(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iTextureManager_ReserveColor(lua_State *L)
+{
     iTextureManager * _arg0;
     int  _arg1;
     int  _arg2;
     int  _arg3;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureManager *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureManager *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureManager *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
 }
 {
-#ifdef LUA_MS
-  _arg3 = (int ) lua_tonumber (lua_state,  4 );
-#else
-  _arg3 = (int ) lua_tonumber ( 4 );
-#endif
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
 }
+	lua_settop(L, 0);
     iTextureManager_ReserveColor(_arg0,_arg1,_arg2,_arg3);
-    return 1;
+	return 0;
 }
-#define iTextureManager_FindRGB(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->FindRGB(_swigarg0,_swigarg1,_swigarg2))
-static int _wrap_iTextureManager_FindRGB(lua_State *lua_state) {
 
+#define iTextureManager_FindRGB(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->FindRGB(_swigarg0,_swigarg1,_swigarg2))
+static int
+wrap_iTextureManager_FindRGB(lua_State *L)
+{
     int  _result;
     iTextureManager * _arg0;
     int  _arg1;
@@ -4117,116 +7342,115 @@ static int _wrap_iTextureManager_FindRGB(lua_State *lua_state) {
     int  _arg3;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureManager *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureManager *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureManager *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (int ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (int ) lua_tonumber ( 3 );
-#endif
+	if(!lua_isnumber(L, 3)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg2 = (int )lua_tonumber(L, 3);
 }
 {
-#ifdef LUA_MS
-  _arg3 = (int ) lua_tonumber (lua_state,  4 );
-#else
-  _arg3 = (int ) lua_tonumber ( 4 );
-#endif
+	if(!lua_isnumber(L, 4)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg3 = (int )lua_tonumber(L, 4);
 }
+	lua_settop(L, 0);
     _result = (int )iTextureManager_FindRGB(_arg0,_arg1,_arg2,_arg3);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iTextureManager_SetPalette(_swigobj)  (_swigobj->SetPalette())
-static int _wrap_iTextureManager_SetPalette(lua_State *lua_state) {
 
+#define iTextureManager_SetPalette(_swigobj)  (_swigobj->SetPalette())
+static int
+wrap_iTextureManager_SetPalette(lua_State *L)
+{
     iTextureManager * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureManager *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureManager *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureManager *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iTextureManager_SetPalette(_arg0);
-    return 1;
+	return 0;
 }
-#define iTextureManager_SetVerbose(_swigobj,_swigarg0)  (_swigobj->SetVerbose(_swigarg0))
-static int _wrap_iTextureManager_SetVerbose(lua_State *lua_state) {
 
+#define iTextureManager_SetVerbose(_swigobj,_swigarg0)  (_swigobj->SetVerbose(_swigarg0))
+static int
+wrap_iTextureManager_SetVerbose(lua_State *L)
+{
     iTextureManager * _arg0;
     bool  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureManager *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureManager *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureManager *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (bool ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (bool ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `bool ' expected");
+	}
+	_arg1 = (bool )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     iTextureManager_SetVerbose(_arg0,_arg1);
-    return 1;
+	return 0;
 }
-#define iTextureManager_GetTextureFormat(_swigobj)  (_swigobj->GetTextureFormat())
-static int _wrap_iTextureManager_GetTextureFormat(lua_State *lua_state) {
 
+#define iTextureManager_GetTextureFormat(_swigobj)  (_swigobj->GetTextureFormat())
+static int
+wrap_iTextureManager_GetTextureFormat(lua_State *L)
+{
     int  _result;
     iTextureManager * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iTextureManager *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iTextureManager *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iTextureManager *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iTextureManager_GetTextureFormat(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
+
 static void *SwigiPolygonTextureToiBase(void *ptr) {
     iPolygonTexture *src;
     iBase *dest;
@@ -4236,218 +7460,213 @@ static void *SwigiPolygonTextureToiBase(void *ptr) {
 }
 
 #define iPolygonTexture_GetMaterialHandle(_swigobj)  (_swigobj->GetMaterialHandle())
-static int _wrap_iPolygonTexture_GetMaterialHandle(lua_State *lua_state) {
-
+static int
+wrap_iPolygonTexture_GetMaterialHandle(lua_State *L)
+{
     iMaterialHandle * _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iMaterialHandle *)iPolygonTexture_GetMaterialHandle(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iMaterialHandle_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetFDU(_swigobj)  (_swigobj->GetFDU())
-static int _wrap_iPolygonTexture_GetFDU(lua_State *lua_state) {
 
+#define iPolygonTexture_GetFDU(_swigobj)  (_swigobj->GetFDU())
+static int
+wrap_iPolygonTexture_GetFDU(lua_State *L)
+{
     float  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (float )iPolygonTexture_GetFDU(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetFDV(_swigobj)  (_swigobj->GetFDV())
-static int _wrap_iPolygonTexture_GetFDV(lua_State *lua_state) {
 
+#define iPolygonTexture_GetFDV(_swigobj)  (_swigobj->GetFDV())
+static int
+wrap_iPolygonTexture_GetFDV(lua_State *L)
+{
     float  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (float )iPolygonTexture_GetFDV(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetWidth(_swigobj)  (_swigobj->GetWidth())
-static int _wrap_iPolygonTexture_GetWidth(lua_State *lua_state) {
 
+#define iPolygonTexture_GetWidth(_swigobj)  (_swigobj->GetWidth())
+static int
+wrap_iPolygonTexture_GetWidth(lua_State *L)
+{
     int  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iPolygonTexture_GetWidth(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetHeight(_swigobj)  (_swigobj->GetHeight())
-static int _wrap_iPolygonTexture_GetHeight(lua_State *lua_state) {
 
+#define iPolygonTexture_GetHeight(_swigobj)  (_swigobj->GetHeight())
+static int
+wrap_iPolygonTexture_GetHeight(lua_State *L)
+{
     int  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iPolygonTexture_GetHeight(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetShiftU(_swigobj)  (_swigobj->GetShiftU())
-static int _wrap_iPolygonTexture_GetShiftU(lua_State *lua_state) {
 
+#define iPolygonTexture_GetShiftU(_swigobj)  (_swigobj->GetShiftU())
+static int
+wrap_iPolygonTexture_GetShiftU(lua_State *L)
+{
     int  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iPolygonTexture_GetShiftU(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetIMinU(_swigobj)  (_swigobj->GetIMinU())
-static int _wrap_iPolygonTexture_GetIMinU(lua_State *lua_state) {
 
+#define iPolygonTexture_GetIMinU(_swigobj)  (_swigobj->GetIMinU())
+static int
+wrap_iPolygonTexture_GetIMinU(lua_State *L)
+{
     int  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iPolygonTexture_GetIMinU(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetIMinV(_swigobj)  (_swigobj->GetIMinV())
-static int _wrap_iPolygonTexture_GetIMinV(lua_State *lua_state) {
 
+#define iPolygonTexture_GetIMinV(_swigobj)  (_swigobj->GetIMinV())
+static int
+wrap_iPolygonTexture_GetIMinV(lua_State *L)
+{
     int  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iPolygonTexture_GetIMinV(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetTextureBox(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->GetTextureBox(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
-static int _wrap_iPolygonTexture_GetTextureBox(lua_State *lua_state) {
 
+#define iPolygonTexture_GetTextureBox(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->GetTextureBox(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
+static int
+wrap_iPolygonTexture_GetTextureBox(lua_State *L)
+{
     iPolygonTexture * _arg0;
     float * _arg1;
     float * _arg2;
@@ -4455,323 +7674,497 @@ static int _wrap_iPolygonTexture_GetTextureBox(lua_State *lua_state) {
     float * _arg4;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  2 ))
-    _arg1 = (float *) lua_touserdata (lua_state,  2 );
-  else _arg1 = NULL;
-#else
-  if (!lua_isnil ( 2 )) _arg1 = (float *) lua_touserdata ( 2 );
-  else _arg1 = NULL;
-#endif
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (float *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (float *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (float *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (float *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  4 ))
-    _arg3 = (float *) lua_touserdata (lua_state,  4 );
-  else _arg3 = NULL;
-#else
-  if (!lua_isnil ( 4 )) _arg3 = (float *) lua_touserdata ( 4 );
-  else _arg3 = NULL;
-#endif
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (float *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  5 ))
-    _arg4 = (float *) lua_touserdata (lua_state,  5 );
-  else _arg4 = NULL;
-#else
-  if (!lua_isnil ( 5 )) _arg4 = (float *) lua_touserdata ( 5 );
-  else _arg4 = NULL;
-#endif
+	if( (lua_isnull(L, 5)) || (lua_isnil(L, 5)) ) {
+		_arg4 = NULL;
+	} else if(lua_isuserdata(L, 5)) {
+		_arg4 = (float *)lua_touserdata(L, 5);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg4 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iPolygonTexture_GetTextureBox(_arg0,*_arg1,*_arg2,*_arg3,*_arg4);
-    return 1;
+	return 0;
 }
-#define iPolygonTexture_GetOriginalWidth(_swigobj)  (_swigobj->GetOriginalWidth())
-static int _wrap_iPolygonTexture_GetOriginalWidth(lua_State *lua_state) {
 
+#define iPolygonTexture_GetOriginalWidth(_swigobj)  (_swigobj->GetOriginalWidth())
+static int
+wrap_iPolygonTexture_GetOriginalWidth(lua_State *L)
+{
     int  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iPolygonTexture_GetOriginalWidth(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetPolygon(_swigobj)  (_swigobj->GetPolygon())
-static int _wrap_iPolygonTexture_GetPolygon(lua_State *lua_state) {
 
+#define iPolygonTexture_GetPolygon(_swigobj)  (_swigobj->GetPolygon())
+static int
+wrap_iPolygonTexture_GetPolygon(lua_State *L)
+{
     iPolygon3D * _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iPolygon3D *)iPolygonTexture_GetPolygon(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iPolygon3D_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_DynamicLightsDirty(_swigobj)  (_swigobj->DynamicLightsDirty())
-static int _wrap_iPolygonTexture_DynamicLightsDirty(lua_State *lua_state) {
 
+#define iPolygonTexture_DynamicLightsDirty(_swigobj)  (_swigobj->DynamicLightsDirty())
+static int
+wrap_iPolygonTexture_DynamicLightsDirty(lua_State *L)
+{
     bool  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (bool )iPolygonTexture_DynamicLightsDirty(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_RecalculateDynamicLights(_swigobj)  (_swigobj->RecalculateDynamicLights())
-static int _wrap_iPolygonTexture_RecalculateDynamicLights(lua_State *lua_state) {
 
+#define iPolygonTexture_RecalculateDynamicLights(_swigobj)  (_swigobj->RecalculateDynamicLights())
+static int
+wrap_iPolygonTexture_RecalculateDynamicLights(lua_State *L)
+{
     bool  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (bool )iPolygonTexture_RecalculateDynamicLights(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetLightMap(_swigobj)  (_swigobj->GetLightMap())
-static int _wrap_iPolygonTexture_GetLightMap(lua_State *lua_state) {
 
+#define iPolygonTexture_GetLightMap(_swigobj)  (_swigobj->GetLightMap())
+static int
+wrap_iPolygonTexture_GetLightMap(lua_State *L)
+{
     iLightMap * _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iLightMap *)iPolygonTexture_GetLightMap(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iLightMap_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetLightCellSize(_swigobj)  (_swigobj->GetLightCellSize())
-static int _wrap_iPolygonTexture_GetLightCellSize(lua_State *lua_state) {
 
+#define iPolygonTexture_GetLightCellSize(_swigobj)  (_swigobj->GetLightCellSize())
+static int
+wrap_iPolygonTexture_GetLightCellSize(lua_State *L)
+{
     int  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iPolygonTexture_GetLightCellSize(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetLightCellShift(_swigobj)  (_swigobj->GetLightCellShift())
-static int _wrap_iPolygonTexture_GetLightCellShift(lua_State *lua_state) {
 
+#define iPolygonTexture_GetLightCellShift(_swigobj)  (_swigobj->GetLightCellShift())
+static int
+wrap_iPolygonTexture_GetLightCellShift(lua_State *L)
+{
     int  _result;
     iPolygonTexture * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iPolygonTexture_GetLightCellShift(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_GetCacheData(_swigobj,_swigarg0)  (_swigobj->GetCacheData(_swigarg0))
-static int _wrap_iPolygonTexture_GetCacheData(lua_State *lua_state) {
 
+#define iPolygonTexture_GetCacheData(_swigobj,_swigarg0)  (_swigobj->GetCacheData(_swigarg0))
+static int
+wrap_iPolygonTexture_GetCacheData(lua_State *L)
+{
     void * _result;
     iPolygonTexture * _arg0;
     int  _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
+	lua_settop(L, 0);
     _result = (void *)iPolygonTexture_GetCacheData(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushuserdata(L, (void*)_result);
+    }
 }
-    return 1;
+	return 1;
 }
-#define iPolygonTexture_SetCacheData(_swigobj,_swigarg0,_swigarg1)  (_swigobj->SetCacheData(_swigarg0,_swigarg1))
-static int _wrap_iPolygonTexture_SetCacheData(lua_State *lua_state) {
 
+#define iPolygonTexture_SetCacheData(_swigobj,_swigarg0,_swigarg1)  (_swigobj->SetCacheData(_swigarg0,_swigarg1))
+static int
+wrap_iPolygonTexture_SetCacheData(lua_State *L)
+{
     iPolygonTexture * _arg0;
     int  _arg1;
     void * _arg2;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iPolygonTexture *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iPolygonTexture *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iPolygonTexture *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (void *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (void *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (void *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (void*)");
+		_arg2 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iPolygonTexture_SetCacheData(_arg0,_arg1,_arg2);
-    return 1;
+	return 0;
 }
-static void *SwigiEngineToiPlugin(void *ptr) {
-    iEngine *src;
-    iPlugin *dest;
-    src = (iEngine *) ptr;
-    dest = (iPlugin *) src;
+
+static void *SwigiCameraPositionToiBase(void *ptr) {
+    iCameraPosition *src;
+    iBase *dest;
+    src = (iCameraPosition *) ptr;
+    dest = (iBase *) src;
     return (void *) dest;
+}
+
+static void *SwigiSectorListToiBase(void *ptr) {
+    iSectorList *src;
+    iBase *dest;
+    src = (iSectorList *) ptr;
+    dest = (iBase *) src;
+    return (void *) dest;
+}
+
+#define iSectorList_GetSectorCount(_swigobj)  (_swigobj->GetSectorCount())
+static int
+wrap_iSectorList_GetSectorCount(lua_State *L)
+{
+    int  _result;
+    iSectorList * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iSectorList *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (int )iSectorList_GetSectorCount(_arg0);
+{
+	lua_pushnumber(L, (double)_result);
+}
+	return 1;
+}
+
+#define iSectorList_GetSector(_swigobj,_swigarg0)  (_swigobj->GetSector(_swigarg0))
+static int
+wrap_iSectorList_GetSector(lua_State *L)
+{
+    iSector * _result;
+    iSectorList * _arg0;
+    int  _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iSectorList *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
+}
+	lua_settop(L, 0);
+    _result = (iSector *)iSectorList_GetSector(_arg0,_arg1);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iSector_tag );
+    }
+}
+	return 1;
+}
+
+#define iSectorList_AddSector(_swigobj,_swigarg0)  (_swigobj->AddSector(_swigarg0))
+static int
+wrap_iSectorList_AddSector(lua_State *L)
+{
+    iSectorList * _arg0;
+    iSector * _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iSectorList *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (iSector *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iSectorList_AddSector(_arg0,_arg1);
+	return 0;
+}
+
+#define iSectorList_RemoveSector(_swigobj,_swigarg0)  (_swigobj->RemoveSector(_swigarg0))
+static int
+wrap_iSectorList_RemoveSector(lua_State *L)
+{
+    iSectorList * _arg0;
+    iSector * _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iSectorList *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (iSector *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    iSectorList_RemoveSector(_arg0,_arg1);
+	return 0;
+}
+
+#define iSectorList_FindByName(_swigobj,_swigarg0)  (_swigobj->FindByName(_swigarg0))
+static int
+wrap_iSectorList_FindByName(lua_State *L)
+{
+    iSector * _result;
+    iSectorList * _arg0;
+    char * _arg1;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iSectorList *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (iSector *)iSectorList_FindByName(_arg0,_arg1);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iSector_tag );
+    }
+}
+	return 1;
 }
 
 static void *SwigiEngineToiBase(void *ptr) {
@@ -4783,112 +8176,123 @@ static void *SwigiEngineToiBase(void *ptr) {
 }
 
 #define iEngine_GetTextureFormat(_swigobj)  (_swigobj->GetTextureFormat())
-static int _wrap_iEngine_GetTextureFormat(lua_State *lua_state) {
-
+static int
+wrap_iEngine_GetTextureFormat(lua_State *L)
+{
     int  _result;
     iEngine * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (int )iEngine_GetTextureFormat(_arg0);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iEngine_SelectLibrary(_swigobj,_swigarg0)  (_swigobj->SelectLibrary(_swigarg0))
-static int _wrap_iEngine_SelectLibrary(lua_State *lua_state) {
 
+#define iEngine_SelectLibrary(_swigobj,_swigarg0)  (_swigobj->SelectLibrary(_swigarg0))
+static int
+wrap_iEngine_SelectLibrary(lua_State *L)
+{
     iEngine * _arg0;
     char * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iEngine_SelectLibrary(_arg0,_arg1);
-    return 1;
+	return 0;
 }
-#define iEngine_DeleteLibrary(_swigobj,_swigarg0)  (_swigobj->DeleteLibrary(_swigarg0))
-static int _wrap_iEngine_DeleteLibrary(lua_State *lua_state) {
 
+#define iEngine_DeleteLibrary(_swigobj,_swigarg0)  (_swigobj->DeleteLibrary(_swigarg0))
+static int
+wrap_iEngine_DeleteLibrary(lua_State *L)
+{
     bool  _result;
     iEngine * _arg0;
     char * _arg1;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (bool )iEngine_DeleteLibrary(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iEngine_DeleteAll(_swigobj)  (_swigobj->DeleteAll())
-static int _wrap_iEngine_DeleteAll(lua_State *lua_state) {
 
+#define iEngine_DeleteAll(_swigobj)  (_swigobj->DeleteAll())
+static int
+wrap_iEngine_DeleteAll(lua_State *L)
+{
     iEngine * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iEngine_DeleteAll(_arg0);
-    return 1;
+	return 0;
 }
-#define iEngine_CreateTexture(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->CreateTexture(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
-static int _wrap_iEngine_CreateTexture(lua_State *lua_state) {
 
+#define iEngine_CreateTexture(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3)  (_swigobj->CreateTexture(_swigarg0,_swigarg1,_swigarg2,_swigarg3))
+static int
+wrap_iEngine_CreateTexture(lua_State *L)
+{
     iTextureWrapper * _result;
     iEngine * _arg0;
     char * _arg1;
@@ -4897,62 +8301,68 @@ static int _wrap_iEngine_CreateTexture(lua_State *lua_state) {
     int  _arg4;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg2 = (char*) lua_tostring (lua_state,  3 );
-#else
-  _arg2 = (char*) lua_tostring ( 3 );
-#endif
+	if((lua_isnull(L, 3)) || (lua_isnil(L, 3))) {
+		_arg2 = NULL;
+	} else if(lua_isstring(L, 3)) {
+		_arg2 = (char *)lua_tostring(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg2 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  4 ))
-    _arg3 = (csColor *) lua_touserdata (lua_state,  4 );
-  else _arg3 = NULL;
-#else
-  if (!lua_isnil ( 4 )) _arg3 = (csColor *) lua_touserdata ( 4 );
-  else _arg3 = NULL;
-#endif
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (csColor *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg4 = (int ) lua_tonumber (lua_state,  5 );
-#else
-  _arg4 = (int ) lua_tonumber ( 5 );
-#endif
+	if(!lua_isnumber(L, 5)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg4 = (int )lua_tonumber(L, 5);
 }
+	lua_settop(L, 0);
     _result = (iTextureWrapper *)iEngine_CreateTexture(_arg0,_arg1,_arg2,_arg3,_arg4);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iTextureWrapper_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iEngine_CreateCamera(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4)  (_swigobj->CreateCamera(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4))
-static int _wrap_iEngine_CreateCamera(lua_State *lua_state) {
 
-    bool  _result;
+#define iEngine_CreateCameraPosition(_swigobj,_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4)  (_swigobj->CreateCameraPosition(_swigarg0,_swigarg1,_swigarg2,_swigarg3,_swigarg4))
+static int
+wrap_iEngine_CreateCameraPosition(lua_State *L)
+{
+    iCameraPosition * _result;
     iEngine * _arg0;
     char * _arg1;
     char * _arg2;
@@ -4961,114 +8371,81 @@ static int _wrap_iEngine_CreateCamera(lua_State *lua_state) {
     csVector3 * _arg5;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg2 = (char*) lua_tostring (lua_state,  3 );
-#else
-  _arg2 = (char*) lua_tostring ( 3 );
-#endif
+	if((lua_isnull(L, 3)) || (lua_isnil(L, 3))) {
+		_arg2 = NULL;
+	} else if(lua_isstring(L, 3)) {
+		_arg2 = (char *)lua_tostring(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg2 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  4 ))
-    _arg3 = (csVector3 *) lua_touserdata (lua_state,  4 );
-  else _arg3 = NULL;
-#else
-  if (!lua_isnil ( 4 )) _arg3 = (csVector3 *) lua_touserdata ( 4 );
-  else _arg3 = NULL;
-#endif
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (csVector3 *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  5 ))
-    _arg4 = (csVector3 *) lua_touserdata (lua_state,  5 );
-  else _arg4 = NULL;
-#else
-  if (!lua_isnil ( 5 )) _arg4 = (csVector3 *) lua_touserdata ( 5 );
-  else _arg4 = NULL;
-#endif
+	if( (lua_isnull(L, 5)) || (lua_isnil(L, 5)) ) {
+		_arg4 = NULL;
+	} else if(lua_isuserdata(L, 5)) {
+		_arg4 = (csVector3 *)lua_touserdata(L, 5);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg4 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  6 ))
-    _arg5 = (csVector3 *) lua_touserdata (lua_state,  6 );
-  else _arg5 = NULL;
-#else
-  if (!lua_isnil ( 6 )) _arg5 = (csVector3 *) lua_touserdata ( 6 );
-  else _arg5 = NULL;
-#endif
+	if( (lua_isnull(L, 6)) || (lua_isnil(L, 6)) ) {
+		_arg5 = NULL;
+	} else if(lua_isuserdata(L, 6)) {
+		_arg5 = (csVector3 *)lua_touserdata(L, 6);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg5 = NULL;
+	}
 }
-    _result = (bool )iEngine_CreateCamera(_arg0,_arg1,_arg2,*_arg3,*_arg4,*_arg5);
+	lua_settop(L, 0);
+    _result = (iCameraPosition *)iEngine_CreateCameraPosition(_arg0,_arg1,_arg2,*_arg3,*_arg4,*_arg5);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iCameraPosition_tag );
+    }
 }
-    return 1;
+	return 1;
 }
-#define iEngine_CreateKey(_swigobj,_swigarg0,_swigarg1)  (_swigobj->CreateKey(_swigarg0,_swigarg1))
-static int _wrap_iEngine_CreateKey(lua_State *lua_state) {
 
-    bool  _result;
-    iEngine * _arg0;
-    char * _arg1;
-    char * _arg2;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
-}
-{
-#ifdef LUA_MS
-  _arg2 = (char*) lua_tostring (lua_state,  3 );
-#else
-  _arg2 = (char*) lua_tostring ( 3 );
-#endif
-}
-    _result = (bool )iEngine_CreateKey(_arg0,_arg1,_arg2);
-{
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
-}
-    return 1;
-}
 #define iEngine_CreatePlane(_swigobj,_swigarg0,_swigarg1,_swigarg2)  (_swigobj->CreatePlane(_swigarg0,_swigarg1,_swigarg2))
-static int _wrap_iEngine_CreatePlane(lua_State *lua_state) {
-
+static int
+wrap_iEngine_CreatePlane(lua_State *L)
+{
     bool  _result;
     iEngine * _arg0;
     char * _arg1;
@@ -5076,251 +8453,283 @@ static int _wrap_iEngine_CreatePlane(lua_State *lua_state) {
     csMatrix3 * _arg3;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (csVector3 *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (csVector3 *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
+	if( (lua_isnull(L, 3)) || (lua_isnil(L, 3)) ) {
+		_arg2 = NULL;
+	} else if(lua_isuserdata(L, 3)) {
+		_arg2 = (csVector3 *)lua_touserdata(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg2 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  4 ))
-    _arg3 = (csMatrix3 *) lua_touserdata (lua_state,  4 );
-  else _arg3 = NULL;
-#else
-  if (!lua_isnil ( 4 )) _arg3 = (csMatrix3 *) lua_touserdata ( 4 );
-  else _arg3 = NULL;
-#endif
+	if( (lua_isnull(L, 4)) || (lua_isnil(L, 4)) ) {
+		_arg3 = NULL;
+	} else if(lua_isuserdata(L, 4)) {
+		_arg3 = (csMatrix3 *)lua_touserdata(L, 4);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg3 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (bool )iEngine_CreatePlane(_arg0,_arg1,*_arg2,*_arg3);
 {
-#ifdef LUA_MS
-  lua_pushnumber (lua_state, (double) _result);
-#else
-  lua_pushnumber ((double) _result);
-#endif
+	lua_pushnumber(L, (double)_result);
 }
-    return 1;
+	return 1;
 }
-#define iEngine_CreateSector(_swigobj,_swigarg0)  (_swigobj->CreateSector(_swigarg0))
-static int _wrap_iEngine_CreateSector(lua_State *lua_state) {
 
+#define iEngine_CreateSector(_swigobj,_swigarg0,_swigarg1)  (_swigobj->CreateSector(_swigarg0,_swigarg1))
+static int
+wrap_iEngine_CreateSector(lua_State *L)
+{
     iSector * _result;
     iEngine * _arg0;
     char * _arg1;
+    bool  _arg2 = true;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
-    _result = (iSector *)iEngine_CreateSector(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+	if(lua_isnull(L, 3)) {
+		_arg2 = (bool )true;
+	} else if(lua_isnumber(L, 3)) {
+		_arg2 = (bool )lua_tonumber(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `bool ' expected");
+	}
 }
-    return 1;
+	lua_settop(L, 0);
+    _result = (iSector *)iEngine_CreateSector(_arg0,_arg1,_arg2);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iSector_tag );
+    }
 }
-#define iEngine_FindSector(_swigobj,_swigarg0)  (_swigobj->FindSector(_swigarg0))
-static int _wrap_iEngine_FindSector(lua_State *lua_state) {
+	return 1;
+}
 
+#define iEngine_FindSector(_swigobj,_swigarg0,_swigarg1)  (_swigobj->FindSector(_swigarg0,_swigarg1))
+static int
+wrap_iEngine_FindSector(lua_State *L)
+{
     iSector * _result;
     iEngine * _arg0;
     char * _arg1;
+    bool  _arg2 = false;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
-    _result = (iSector *)iEngine_FindSector(_arg0,_arg1);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+	if(lua_isnull(L, 3)) {
+		_arg2 = (bool )false;
+	} else if(lua_isnumber(L, 3)) {
+		_arg2 = (bool )lua_tonumber(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `bool ' expected");
+	}
 }
-    return 1;
+	lua_settop(L, 0);
+    _result = (iSector *)iEngine_FindSector(_arg0,_arg1,_arg2);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iSector_tag );
+    }
 }
-#define iEngine_GetSector(_swigobj,_swigarg0)  (_swigobj->GetSector(_swigarg0))
-static int _wrap_iEngine_GetSector(lua_State *lua_state) {
+	return 1;
+}
 
-    iSector * _result;
-    iEngine * _arg0;
-    int  _arg1;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
-}
-    _result = (iSector *)iEngine_GetSector(_arg0,_arg1);
-{
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
-}
-    return 1;
-}
-#define iEngine_CreateThing(_swigobj,_swigarg0,_swigarg1)  (_swigobj->CreateThing(_swigarg0,_swigarg1))
-static int _wrap_iEngine_CreateThing(lua_State *lua_state) {
-
-    iThing * _result;
-    iEngine * _arg0;
-    char * _arg1;
-    iSector * _arg2;
-
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
-}
-{
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
-}
-{
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  3 ))
-    _arg2 = (iSector *) lua_touserdata (lua_state,  3 );
-  else _arg2 = NULL;
-#else
-  if (!lua_isnil ( 3 )) _arg2 = (iSector *) lua_touserdata ( 3 );
-  else _arg2 = NULL;
-#endif
-}
-    _result = (iThing *)iEngine_CreateThing(_arg0,_arg1,_arg2);
-{
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
-}
-    return 1;
-}
 #define iEngine_FindMaterial(_swigobj,_swigarg0,_swigarg1)  (_swigobj->FindMaterial(_swigarg0,_swigarg1))
-static int _wrap_iEngine_FindMaterial(lua_State *lua_state) {
-
+static int
+wrap_iEngine_FindMaterial(lua_State *L)
+{
     iMaterialWrapper * _result;
     iEngine * _arg0;
     char * _arg1;
-    bool  _arg2;
+    bool  _arg2 = false;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iEngine *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iEngine *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (char*) lua_tostring (lua_state,  2 );
-#else
-  _arg1 = (char*) lua_tostring ( 2 );
-#endif
+	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
+		_arg1 = NULL;
+	} else if(lua_isstring(L, 2)) {
+		_arg1 = (char *)lua_tostring(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg1 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg2 = (bool ) lua_tonumber (lua_state,  3 );
-#else
-  _arg2 = (bool ) lua_tonumber ( 3 );
-#endif
+	if(lua_isnull(L, 3)) {
+		_arg2 = (bool )false;
+	} else if(lua_isnumber(L, 3)) {
+		_arg2 = (bool )lua_tonumber(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `bool ' expected");
+	}
 }
+	lua_settop(L, 0);
     _result = (iMaterialWrapper *)iEngine_FindMaterial(_arg0,_arg1,_arg2);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iMaterialWrapper_tag );
+    }
 }
-    return 1;
+	return 1;
 }
+
+#define iEngine_CreateSectorWallsMesh(_swigobj,_swigarg0,_swigarg1)  (_swigobj->CreateSectorWallsMesh(_swigarg0,_swigarg1))
+static int
+wrap_iEngine_CreateSectorWallsMesh(lua_State *L)
+{
+    iMeshWrapper * _result;
+    iEngine * _arg0;
+    iSector * _arg1;
+    char * _arg2;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+{
+	if( (lua_isnull(L, 2)) || (lua_isnil(L, 2)) ) {
+		_arg1 = NULL;
+	} else if(lua_isuserdata(L, 2)) {
+		_arg1 = (iSector *)lua_touserdata(L, 2);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg1 = NULL;
+	}
+}
+{
+	if((lua_isnull(L, 3)) || (lua_isnil(L, 3))) {
+		_arg2 = NULL;
+	} else if(lua_isstring(L, 3)) {
+		_arg2 = (char *)lua_tostring(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg2 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (iMeshWrapper *)iEngine_CreateSectorWallsMesh(_arg0,_arg1,_arg2);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iMeshWrapper_tag );
+    }
+}
+	return 1;
+}
+
+#define iEngine_GetSectors(_swigobj)  (_swigobj->GetSectors())
+static int
+wrap_iEngine_GetSectors(lua_State *L)
+{
+    iSectorList * _result;
+    iEngine * _arg0;
+
+{
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iEngine *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
+}
+	lua_settop(L, 0);
+    _result = (iSectorList *)iEngine_GetSectors(_arg0);
+{
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iSectorList_tag );
+    }
+}
+	return 1;
+}
+
 static void *SwigiSystemToiBase(void *ptr) {
     iSystem *src;
     iBase *dest;
@@ -5332,377 +8741,509 @@ static void *SwigiSystemToiBase(void *ptr) {
 static iEngine * iSystem_Query_iEngine(iSystem *self) {
       return CS_QUERY_PLUGIN(self, iEngine);
     }
-static int _wrap_iSystem_Query_iEngine(lua_State *lua_state) {
-
+static int
+wrap_iSystem_Query_iEngine(lua_State *L)
+{
     iEngine * _result;
     iSystem * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iSystem *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iSystem *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iSystem *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iEngine *)iSystem_Query_iEngine(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iEngine_tag );
+    }
 }
-    return 1;
+	return 1;
 }
+
 static iGraphics3D * iSystem_Query_iGraphics3D(iSystem *self) {
       return CS_QUERY_PLUGIN(self, iGraphics3D);
     }
-static int _wrap_iSystem_Query_iGraphics3D(lua_State *lua_state) {
-
+static int
+wrap_iSystem_Query_iGraphics3D(lua_State *L)
+{
     iGraphics3D * _result;
     iSystem * _arg0;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iSystem *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iSystem *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iSystem *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
+	lua_settop(L, 0);
     _result = (iGraphics3D *)iSystem_Query_iGraphics3D(_arg0);
 {
-#ifdef LUA_MS
-  if (_result != NULL) lua_pushuserdata (lua_state, _result);
-  else lua_pushnil (lua_state);
-#else
-  if (_result != NULL) lua_pushuserdata (_result);
-  else lua_pushnil ();
-#endif
+    if(_result == NULL) {
+		lua_pushnil(L);
+    } else {
+		lua_pushusertag(L, (void*)_result, iGraphics3D_tag );
+    }
 }
-    return 1;
+	return 1;
 }
+
 static void  iSystem_Print(iSystem *self,int  mode,const char * format) {
       self->Printf(mode, format); 
     }
-static int _wrap_iSystem_Print(lua_State *lua_state) {
-
+static int
+wrap_iSystem_Print(lua_State *L)
+{
     iSystem * _arg0;
     int  _arg1;
     char * _arg2;
 
 {
-#ifdef LUA_MS
-  if (!lua_isnil (lua_state,  1 ))
-    _arg0 = (iSystem *) lua_touserdata (lua_state,  1 );
-  else _arg0 = NULL;
-#else
-  if (!lua_isnil ( 1 )) _arg0 = (iSystem *) lua_touserdata ( 1 );
-  else _arg0 = NULL;
-#endif
+	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
+		_arg0 = NULL;
+	} else if(lua_isuserdata(L, 1)) {
+		_arg0 = (iSystem *)lua_touserdata(L, 1);
+	} else {
+		lua_error(L, "error in parameter type, `userdata' expected (user*)");
+		_arg0 = NULL;
+	}
 }
 {
-#ifdef LUA_MS
-  _arg1 = (int ) lua_tonumber (lua_state,  2 );
-#else
-  _arg1 = (int ) lua_tonumber ( 2 );
-#endif
+	if(!lua_isnumber(L, 2)) {
+		lua_error(L, "error in parameter type, `int ' expected");
+	}
+	_arg1 = (int )lua_tonumber(L, 2);
 }
 {
-#ifdef LUA_MS
-  _arg2 = (char*) lua_tostring (lua_state,  3 );
-#else
-  _arg2 = (char*) lua_tostring ( 3 );
-#endif
+	if((lua_isnull(L, 3)) || (lua_isnil(L, 3))) {
+		_arg2 = NULL;
+	} else if(lua_isstring(L, 3)) {
+		_arg2 = (char *)lua_tostring(L, 3);
+	} else {
+		lua_error(L, "error in parameter type, `char *' expected");
+		_arg2 = NULL;
+	}
 }
+	lua_settop(L, 0);
     iSystem_Print(_arg0,_arg1,_arg2);
-    return 1;
+	return 0;
 }
-void cspace_init (lua_State *lua_state) {
-	 lua_register (lua_state, "MakeVersion",_wrap_MakeVersion);
-	 lua_register (lua_state, "GetSystem",_wrap_GetSystem);
-	 lua_register (lua_state, "GetMyPtr",_wrap_GetMyPtr);
-	 lua_register (lua_state, "iSCF_scfCreateInstance",_wrap_iSCF_scfCreateInstance);
-	 lua_register (lua_state, "csVector3_x_set",_wrap_csVector3_x_set);
-	 lua_register (lua_state, "csVector3_x_get",_wrap_csVector3_x_get);
-	 lua_register (lua_state, "csVector3_y_set",_wrap_csVector3_y_set);
-	 lua_register (lua_state, "csVector3_y_get",_wrap_csVector3_y_get);
-	 lua_register (lua_state, "csVector3_z_set",_wrap_csVector3_z_set);
-	 lua_register (lua_state, "csVector3_z_get",_wrap_csVector3_z_get);
-	 lua_register (lua_state, "new_csVector3",_wrap_new_csVector3);
-	 lua_register (lua_state, "csRGBpixel_red_set",_wrap_csRGBpixel_red_set);
-	 lua_register (lua_state, "csRGBpixel_red_get",_wrap_csRGBpixel_red_get);
-	 lua_register (lua_state, "csRGBpixel_green_set",_wrap_csRGBpixel_green_set);
-	 lua_register (lua_state, "csRGBpixel_green_get",_wrap_csRGBpixel_green_get);
-	 lua_register (lua_state, "csRGBpixel_blue_set",_wrap_csRGBpixel_blue_set);
-	 lua_register (lua_state, "csRGBpixel_blue_get",_wrap_csRGBpixel_blue_get);
-	 lua_register (lua_state, "csRGBpixel_alpha_set",_wrap_csRGBpixel_alpha_set);
-	 lua_register (lua_state, "csRGBpixel_alpha_get",_wrap_csRGBpixel_alpha_get);
-	 lua_register (lua_state, "iPlugin_Initialize",_wrap_iPlugin_Initialize);
-	 lua_register (lua_state, "iPlugin_HandleEvent",_wrap_iPlugin_HandleEvent);
-	 lua_register (lua_state, "iTextureHandle_GetMipMapDimensions",_wrap_iTextureHandle_GetMipMapDimensions);
-	 lua_register (lua_state, "iTextureHandle_GetMeanColor",_wrap_iTextureHandle_GetMeanColor);
-	 lua_register (lua_state, "iTextureHandle_GetCacheData",_wrap_iTextureHandle_GetCacheData);
-	 lua_register (lua_state, "iTextureHandle_SetCacheData",_wrap_iTextureHandle_SetCacheData);
-	 lua_register (lua_state, "iTextureHandle_GetPrivateObject",_wrap_iTextureHandle_GetPrivateObject);
-	 lua_register (lua_state, "iMaterialHandle_GetTexture",_wrap_iMaterialHandle_GetTexture);
-	 lua_register (lua_state, "iMaterialHandle_GetFlatColor",_wrap_iMaterialHandle_GetFlatColor);
-	 lua_register (lua_state, "iMaterialHandle_GetReflection",_wrap_iMaterialHandle_GetReflection);
-	 lua_register (lua_state, "iMaterialHandle_Prepare",_wrap_iMaterialHandle_Prepare);
-	 lua_register (lua_state, "iMaterialWrapper_GetMaterialHandle",_wrap_iMaterialWrapper_GetMaterialHandle);
-	 lua_register (lua_state, "iGraphics3D_Initialize",_wrap_iGraphics3D_Initialize);
-	 lua_register (lua_state, "iGraphics3D_Open",_wrap_iGraphics3D_Open);
-	 lua_register (lua_state, "iGraphics3D_Close",_wrap_iGraphics3D_Close);
-	 lua_register (lua_state, "iGraphics3D_SetDimensions",_wrap_iGraphics3D_SetDimensions);
-	 lua_register (lua_state, "iGraphics3D_BeginDraw",_wrap_iGraphics3D_BeginDraw);
-	 lua_register (lua_state, "iGraphics3D_FinishDraw",_wrap_iGraphics3D_FinishDraw);
-	 lua_register (lua_state, "iGraphics3D_Print",_wrap_iGraphics3D_Print);
-	 lua_register (lua_state, "iGraphics3D_DrawPolygon",_wrap_iGraphics3D_DrawPolygon);
-	 lua_register (lua_state, "iGraphics3D_DrawPolygonDebug",_wrap_iGraphics3D_DrawPolygonDebug);
-	 lua_register (lua_state, "iGraphics3D_DrawLine",_wrap_iGraphics3D_DrawLine);
-	 lua_register (lua_state, "iGraphics3D_DrawTriangleMesh",_wrap_iGraphics3D_DrawTriangleMesh);
-	 lua_register (lua_state, "iGraphics3D_DrawPolygonMesh",_wrap_iGraphics3D_DrawPolygonMesh);
-	 lua_register (lua_state, "iGraphics3D_OpenFogObject",_wrap_iGraphics3D_OpenFogObject);
-	 lua_register (lua_state, "iGraphics3D_DrawFogPolygon",_wrap_iGraphics3D_DrawFogPolygon);
-	 lua_register (lua_state, "iGraphics3D_CloseFogObject",_wrap_iGraphics3D_CloseFogObject);
-	 lua_register (lua_state, "iGraphics3D_GetCaps",_wrap_iGraphics3D_GetCaps);
-	 lua_register (lua_state, "iGraphics3D_GetZBuffAt",_wrap_iGraphics3D_GetZBuffAt);
-	 lua_register (lua_state, "iGraphics3D_GetZBuffValue",_wrap_iGraphics3D_GetZBuffValue);
-	 lua_register (lua_state, "iGraphics3D_DumpCache",_wrap_iGraphics3D_DumpCache);
-	 lua_register (lua_state, "iGraphics3D_ClearCache",_wrap_iGraphics3D_ClearCache);
-	 lua_register (lua_state, "iGraphics3D_RemoveFromCache",_wrap_iGraphics3D_RemoveFromCache);
-	 lua_register (lua_state, "iGraphics3D_GetWidth",_wrap_iGraphics3D_GetWidth);
-	 lua_register (lua_state, "iGraphics3D_GetHeight",_wrap_iGraphics3D_GetHeight);
-	 lua_register (lua_state, "iGraphics3D_SetPerspectiveCenter",_wrap_iGraphics3D_SetPerspectiveCenter);
-	 lua_register (lua_state, "iGraphics3D_SetPerspectiveAspect",_wrap_iGraphics3D_SetPerspectiveAspect);
-	 lua_register (lua_state, "iGraphics3D_SetObjectToCamera",_wrap_iGraphics3D_SetObjectToCamera);
-	 lua_register (lua_state, "iGraphics3D_SetClipper",_wrap_iGraphics3D_SetClipper);
-	 lua_register (lua_state, "iGraphics3D_GetDriver2D",_wrap_iGraphics3D_GetDriver2D);
-	 lua_register (lua_state, "iGraphics3D_GetTextureManager",_wrap_iGraphics3D_GetTextureManager);
-	 lua_register (lua_state, "iGraphics3D_CreateHalo",_wrap_iGraphics3D_CreateHalo);
-	 lua_register (lua_state, "iGraphics3D_DrawPixmap",_wrap_iGraphics3D_DrawPixmap);
-	 lua_register (lua_state, "iGraphics3D_HandleEvent",_wrap_iPlugin_HandleEvent);
-	 lua_register (lua_state, "iCamera_GetFOV",_wrap_iCamera_GetFOV);
-	 lua_register (lua_state, "iCamera_GetInvFOV",_wrap_iCamera_GetInvFOV);
-	 lua_register (lua_state, "iSector_CreateBSP",_wrap_iSector_CreateBSP);
-	 lua_register (lua_state, "iThing_GetName",_wrap_iThing_GetName);
-	 lua_register (lua_state, "iThing_SetName",_wrap_iThing_SetName);
-	 lua_register (lua_state, "iThing_CompressVertices",_wrap_iThing_CompressVertices);
-	 lua_register (lua_state, "iThing_GetPolygonCount",_wrap_iThing_GetPolygonCount);
-	 lua_register (lua_state, "iThing_GetPolygon",_wrap_iThing_GetPolygon);
-	 lua_register (lua_state, "iThing_CreatePolygon",_wrap_iThing_CreatePolygon);
-	 lua_register (lua_state, "iThing_GetVertexCount",_wrap_iThing_GetVertexCount);
-	 lua_register (lua_state, "iThing_GetVertex",_wrap_iThing_GetVertex);
-	 lua_register (lua_state, "iThing_GetVertexW",_wrap_iThing_GetVertexW);
-	 lua_register (lua_state, "iThing_GetVertexC",_wrap_iThing_GetVertexC);
-	 lua_register (lua_state, "iThing_CreateVertex",_wrap_iThing_CreateVertex);
-	 lua_register (lua_state, "iThing_CreateKey",_wrap_iThing_CreateKey);
-	 lua_register (lua_state, "iPolygon3D_GetName",_wrap_iPolygon3D_GetName);
-	 lua_register (lua_state, "iPolygon3D_SetName",_wrap_iPolygon3D_SetName);
-	 lua_register (lua_state, "iPolygon3D_GetLightMap",_wrap_iPolygon3D_GetLightMap);
-	 lua_register (lua_state, "iPolygon3D_GetMaterialHandle",_wrap_iPolygon3D_GetMaterialHandle);
-	 lua_register (lua_state, "iPolygon3D_SetMaterial",_wrap_iPolygon3D_SetMaterial);
-	 lua_register (lua_state, "iPolygon3D_GetVertexCount",_wrap_iPolygon3D_GetVertexCount);
-	 lua_register (lua_state, "iPolygon3D_GetVertex",_wrap_iPolygon3D_GetVertex);
-	 lua_register (lua_state, "iPolygon3D_GetVertexW",_wrap_iPolygon3D_GetVertexW);
-	 lua_register (lua_state, "iPolygon3D_GetVertexC",_wrap_iPolygon3D_GetVertexC);
-	 lua_register (lua_state, "iPolygon3D_CreateVertexByIndex",_wrap_iPolygon3D_CreateVertexByIndex);
-	 lua_register (lua_state, "iPolygon3D_CreateVertex",_wrap_iPolygon3D_CreateVertex);
-	 lua_register (lua_state, "iPolygon3D_GetAlpha",_wrap_iPolygon3D_GetAlpha);
-	 lua_register (lua_state, "iPolygon3D_SetAlpha",_wrap_iPolygon3D_SetAlpha);
-	 lua_register (lua_state, "iPolygon3D_CreatePlane",_wrap_iPolygon3D_CreatePlane);
-	 lua_register (lua_state, "iPolygon3D_SetPlane",_wrap_iPolygon3D_SetPlane);
-	 lua_register (lua_state, "iPolygon3D_SetTextureSpace",_wrap_iPolygon3D_SetTextureSpace);
-	 lua_register (lua_state, "iImage_GetImageData",_wrap_iImage_GetImageData);
-	 lua_register (lua_state, "iImage_GetWidth",_wrap_iImage_GetWidth);
-	 lua_register (lua_state, "iImage_GetHeight",_wrap_iImage_GetHeight);
-	 lua_register (lua_state, "iImage_GetSize",_wrap_iImage_GetSize);
-	 lua_register (lua_state, "iImage_Rescale",_wrap_iImage_Rescale);
-	 lua_register (lua_state, "iImage_MipMap",_wrap_iImage_MipMap);
-	 lua_register (lua_state, "iImage_SetName",_wrap_iImage_SetName);
-	 lua_register (lua_state, "iImage_GetName",_wrap_iImage_GetName);
-	 lua_register (lua_state, "iImage_GetFormat",_wrap_iImage_GetFormat);
-	 lua_register (lua_state, "iImage_GetPalette",_wrap_iImage_GetPalette);
-	 lua_register (lua_state, "iImage_GetAlpha",_wrap_iImage_GetAlpha);
-	 lua_register (lua_state, "iImage_SetFormat",_wrap_iImage_SetFormat);
-	 lua_register (lua_state, "iImage_Clone",_wrap_iImage_Clone);
-	 lua_register (lua_state, "iImage_Crop",_wrap_iImage_Crop);
-	 lua_register (lua_state, "iTextureManager_RegisterTexture",_wrap_iTextureManager_RegisterTexture);
-	 lua_register (lua_state, "iTextureManager_PrepareTextures",_wrap_iTextureManager_PrepareTextures);
-	 lua_register (lua_state, "iTextureManager_FreeImages",_wrap_iTextureManager_FreeImages);
-	 lua_register (lua_state, "iTextureManager_ResetPalette",_wrap_iTextureManager_ResetPalette);
-	 lua_register (lua_state, "iTextureManager_ReserveColor",_wrap_iTextureManager_ReserveColor);
-	 lua_register (lua_state, "iTextureManager_FindRGB",_wrap_iTextureManager_FindRGB);
-	 lua_register (lua_state, "iTextureManager_SetPalette",_wrap_iTextureManager_SetPalette);
-	 lua_register (lua_state, "iTextureManager_SetVerbose",_wrap_iTextureManager_SetVerbose);
-	 lua_register (lua_state, "iTextureManager_GetTextureFormat",_wrap_iTextureManager_GetTextureFormat);
-	 lua_register (lua_state, "iPolygonTexture_GetMaterialHandle",_wrap_iPolygonTexture_GetMaterialHandle);
-	 lua_register (lua_state, "iPolygonTexture_GetFDU",_wrap_iPolygonTexture_GetFDU);
-	 lua_register (lua_state, "iPolygonTexture_GetFDV",_wrap_iPolygonTexture_GetFDV);
-	 lua_register (lua_state, "iPolygonTexture_GetWidth",_wrap_iPolygonTexture_GetWidth);
-	 lua_register (lua_state, "iPolygonTexture_GetHeight",_wrap_iPolygonTexture_GetHeight);
-	 lua_register (lua_state, "iPolygonTexture_GetShiftU",_wrap_iPolygonTexture_GetShiftU);
-	 lua_register (lua_state, "iPolygonTexture_GetIMinU",_wrap_iPolygonTexture_GetIMinU);
-	 lua_register (lua_state, "iPolygonTexture_GetIMinV",_wrap_iPolygonTexture_GetIMinV);
-	 lua_register (lua_state, "iPolygonTexture_GetTextureBox",_wrap_iPolygonTexture_GetTextureBox);
-	 lua_register (lua_state, "iPolygonTexture_GetOriginalWidth",_wrap_iPolygonTexture_GetOriginalWidth);
-	 lua_register (lua_state, "iPolygonTexture_GetPolygon",_wrap_iPolygonTexture_GetPolygon);
-	 lua_register (lua_state, "iPolygonTexture_DynamicLightsDirty",_wrap_iPolygonTexture_DynamicLightsDirty);
-	 lua_register (lua_state, "iPolygonTexture_RecalculateDynamicLights",_wrap_iPolygonTexture_RecalculateDynamicLights);
-	 lua_register (lua_state, "iPolygonTexture_GetLightMap",_wrap_iPolygonTexture_GetLightMap);
-	 lua_register (lua_state, "iPolygonTexture_GetLightCellSize",_wrap_iPolygonTexture_GetLightCellSize);
-	 lua_register (lua_state, "iPolygonTexture_GetLightCellShift",_wrap_iPolygonTexture_GetLightCellShift);
-	 lua_register (lua_state, "iPolygonTexture_GetCacheData",_wrap_iPolygonTexture_GetCacheData);
-	 lua_register (lua_state, "iPolygonTexture_SetCacheData",_wrap_iPolygonTexture_SetCacheData);
-	 lua_register (lua_state, "iEngine_GetTextureFormat",_wrap_iEngine_GetTextureFormat);
-	 lua_register (lua_state, "iEngine_SelectLibrary",_wrap_iEngine_SelectLibrary);
-	 lua_register (lua_state, "iEngine_DeleteLibrary",_wrap_iEngine_DeleteLibrary);
-	 lua_register (lua_state, "iEngine_DeleteAll",_wrap_iEngine_DeleteAll);
-	 lua_register (lua_state, "iEngine_CreateTexture",_wrap_iEngine_CreateTexture);
-	 lua_register (lua_state, "iEngine_CreateCamera",_wrap_iEngine_CreateCamera);
-	 lua_register (lua_state, "iEngine_CreateKey",_wrap_iEngine_CreateKey);
-	 lua_register (lua_state, "iEngine_CreatePlane",_wrap_iEngine_CreatePlane);
-	 lua_register (lua_state, "iEngine_CreateSector",_wrap_iEngine_CreateSector);
-	 lua_register (lua_state, "iEngine_FindSector",_wrap_iEngine_FindSector);
-	 lua_register (lua_state, "iEngine_GetSector",_wrap_iEngine_GetSector);
-	 lua_register (lua_state, "iEngine_CreateThing",_wrap_iEngine_CreateThing);
-	 lua_register (lua_state, "iEngine_FindMaterial",_wrap_iEngine_FindMaterial);
-	 lua_register (lua_state, "iEngine_Initialize",_wrap_iPlugin_Initialize);
-	 lua_register (lua_state, "iEngine_HandleEvent",_wrap_iPlugin_HandleEvent);
-	 lua_register (lua_state, "iSystem_Query_iEngine",_wrap_iSystem_Query_iEngine);
-	 lua_register (lua_state, "iSystem_Query_iGraphics3D",_wrap_iSystem_Query_iGraphics3D);
-	 lua_register (lua_state, "iSystem_Print",_wrap_iSystem_Print);
-/*
- * These are the pointer type-equivalency mappings. 
- * (Used by the SWIG pointer type-checker).
- */
-	 SWIG_RegisterMapping("_signed_long","_long",0);
-	 SWIG_RegisterMapping("_struct_iPlugin","_struct_iEngine",SwigiEngineToiPlugin);
-	 SWIG_RegisterMapping("_struct_iPlugin","_iEngine",SwigiEngineToiPlugin);
-	 SWIG_RegisterMapping("_struct_iPlugin","_struct_iGraphics3D",SwigiGraphics3DToiPlugin);
-	 SWIG_RegisterMapping("_struct_iPlugin","_iGraphics3D",SwigiGraphics3DToiPlugin);
-	 SWIG_RegisterMapping("_struct_iPlugin","_iPlugin",0);
-	 SWIG_RegisterMapping("_iEngine","_struct_iEngine",0);
-	 SWIG_RegisterMapping("_struct_iSystem","_iSystem",0);
-	 SWIG_RegisterMapping("_long","_unsigned_long",0);
-	 SWIG_RegisterMapping("_long","_signed_long",0);
-	 SWIG_RegisterMapping("_csRGBpixel","_struct_csRGBpixel",0);
-	 SWIG_RegisterMapping("_struct_iTextureHandle","_iTextureHandle",0);
-	 SWIG_RegisterMapping("_iSCF","_struct_iSCF",0);
-	 SWIG_RegisterMapping("_iCamera","_struct_iCamera",0);
-	 SWIG_RegisterMapping("_struct_iSector","_iSector",0);
-	 SWIG_RegisterMapping("_struct_iMaterialWrapper","_iMaterialWrapper",0);
-	 SWIG_RegisterMapping("_struct_csRGBpixel","_csRGBpixel",0);
-	 SWIG_RegisterMapping("_struct_iEngine","_iEngine",0);
-	 SWIG_RegisterMapping("_iMaterialWrapper","_struct_iMaterialWrapper",0);
-	 SWIG_RegisterMapping("_struct_iSCF","_iSCF",0);
-	 SWIG_RegisterMapping("_struct_iThing","_iThing",0);
-	 SWIG_RegisterMapping("_unsigned_long","_long",0);
-	 SWIG_RegisterMapping("_struct_iCamera","_iCamera",0);
-	 SWIG_RegisterMapping("_iGraphics3D","_struct_iGraphics3D",0);
-	 SWIG_RegisterMapping("_signed_int","_int",0);
-	 SWIG_RegisterMapping("_struct_iTextureWrapper","_iTextureWrapper",0);
-	 SWIG_RegisterMapping("_iTextureWrapper","_struct_iTextureWrapper",0);
-	 SWIG_RegisterMapping("_unsigned_short","_short",0);
-	 SWIG_RegisterMapping("_iTextureHandle","_struct_iTextureHandle",0);
-	 SWIG_RegisterMapping("_csVector3","_class_csVector3",0);
-	 SWIG_RegisterMapping("_struct_iImage","_iImage",0);
-	 SWIG_RegisterMapping("_signed_short","_short",0);
-	 SWIG_RegisterMapping("_iPolygon3D","_struct_iPolygon3D",0);
-	 SWIG_RegisterMapping("_unsigned_int","_int",0);
-	 SWIG_RegisterMapping("_short","_unsigned_short",0);
-	 SWIG_RegisterMapping("_short","_signed_short",0);
-	 SWIG_RegisterMapping("_struct_iPolygonTexture","_iPolygonTexture",0);
-	 SWIG_RegisterMapping("_int","_unsigned_int",0);
-	 SWIG_RegisterMapping("_int","_signed_int",0);
-	 SWIG_RegisterMapping("_class_csVector3","_csVector3",0);
-	 SWIG_RegisterMapping("_iThing","_struct_iThing",0);
-	 SWIG_RegisterMapping("_iPolygonTexture","_struct_iPolygonTexture",0);
-	 SWIG_RegisterMapping("_iPlugin","_struct_iEngine",SwigiEngineToiPlugin);
-	 SWIG_RegisterMapping("_iPlugin","_iEngine",SwigiEngineToiPlugin);
-	 SWIG_RegisterMapping("_iPlugin","_struct_iGraphics3D",SwigiGraphics3DToiPlugin);
-	 SWIG_RegisterMapping("_iPlugin","_iGraphics3D",SwigiGraphics3DToiPlugin);
-	 SWIG_RegisterMapping("_iPlugin","_struct_iPlugin",0);
-	 SWIG_RegisterMapping("_struct_iTextureManager","_iTextureManager",0);
-	 SWIG_RegisterMapping("_iTextureManager","_struct_iTextureManager",0);
-	 SWIG_RegisterMapping("_struct_iPolygon3D","_iPolygon3D",0);
-	 SWIG_RegisterMapping("_iSystem","_struct_iSystem",0);
-	 SWIG_RegisterMapping("_struct_iMaterialHandle","_iMaterialHandle",0);
-	 SWIG_RegisterMapping("_iMaterialHandle","_struct_iMaterialHandle",0);
-	 SWIG_RegisterMapping("_struct_iGraphics3D","_iGraphics3D",0);
-	 SWIG_RegisterMapping("_iImage","_struct_iImage",0);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iSystem",SwigiSystemToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iSystem",SwigiSystemToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iEngine",SwigiEngineToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iEngine",SwigiEngineToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iPolygonTexture",SwigiPolygonTextureToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iPolygonTexture",SwigiPolygonTextureToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iTextureManager",SwigiTextureManagerToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iTextureManager",SwigiTextureManagerToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iImage",SwigiImageToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iImage",SwigiImageToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iPolygon3D",SwigiPolygon3DToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iPolygon3D",SwigiPolygon3DToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iThing",SwigiThingToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iThing",SwigiThingToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iSector",SwigiSectorToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iSector",SwigiSectorToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iCamera",SwigiCameraToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iCamera",SwigiCameraToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iGraphics3D",SwigiGraphics3DToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iGraphics3D",SwigiGraphics3DToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iMaterialWrapper",SwigiMaterialWrapperToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iMaterialWrapper",SwigiMaterialWrapperToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iMaterialHandle",SwigiMaterialHandleToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iMaterialHandle",SwigiMaterialHandleToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iTextureHandle",SwigiTextureHandleToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iTextureHandle",SwigiTextureHandleToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iTextureWrapper",SwigiTextureWrapperToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iTextureWrapper",SwigiTextureWrapperToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iPlugin",SwigiPluginToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iPlugin",SwigiPluginToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_struct_iSCF",SwigiSCFToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iSCF",SwigiSCFToiBase);
-	 SWIG_RegisterMapping("_struct_iBase","_iBase",0);
-	 SWIG_RegisterMapping("_iSector","_struct_iSector",0);
-	 SWIG_RegisterMapping("_iBase","_struct_iSystem",SwigiSystemToiBase);
-	 SWIG_RegisterMapping("_iBase","_iSystem",SwigiSystemToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iEngine",SwigiEngineToiBase);
-	 SWIG_RegisterMapping("_iBase","_iEngine",SwigiEngineToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iPolygonTexture",SwigiPolygonTextureToiBase);
-	 SWIG_RegisterMapping("_iBase","_iPolygonTexture",SwigiPolygonTextureToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iTextureManager",SwigiTextureManagerToiBase);
-	 SWIG_RegisterMapping("_iBase","_iTextureManager",SwigiTextureManagerToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iImage",SwigiImageToiBase);
-	 SWIG_RegisterMapping("_iBase","_iImage",SwigiImageToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iPolygon3D",SwigiPolygon3DToiBase);
-	 SWIG_RegisterMapping("_iBase","_iPolygon3D",SwigiPolygon3DToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iThing",SwigiThingToiBase);
-	 SWIG_RegisterMapping("_iBase","_iThing",SwigiThingToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iSector",SwigiSectorToiBase);
-	 SWIG_RegisterMapping("_iBase","_iSector",SwigiSectorToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iCamera",SwigiCameraToiBase);
-	 SWIG_RegisterMapping("_iBase","_iCamera",SwigiCameraToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iGraphics3D",SwigiGraphics3DToiBase);
-	 SWIG_RegisterMapping("_iBase","_iGraphics3D",SwigiGraphics3DToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iMaterialWrapper",SwigiMaterialWrapperToiBase);
-	 SWIG_RegisterMapping("_iBase","_iMaterialWrapper",SwigiMaterialWrapperToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iMaterialHandle",SwigiMaterialHandleToiBase);
-	 SWIG_RegisterMapping("_iBase","_iMaterialHandle",SwigiMaterialHandleToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iTextureHandle",SwigiTextureHandleToiBase);
-	 SWIG_RegisterMapping("_iBase","_iTextureHandle",SwigiTextureHandleToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iTextureWrapper",SwigiTextureWrapperToiBase);
-	 SWIG_RegisterMapping("_iBase","_iTextureWrapper",SwigiTextureWrapperToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iPlugin",SwigiPluginToiBase);
-	 SWIG_RegisterMapping("_iBase","_iPlugin",SwigiPluginToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iSCF",SwigiSCFToiBase);
-	 SWIG_RegisterMapping("_iBase","_iSCF",SwigiSCFToiBase);
-	 SWIG_RegisterMapping("_iBase","_struct_iBase",0);
-}
+
+int
+cspace_initialize(lua_State *L)
+{
+	swig_lua_init(L);
+
+	lua_register(L, "MakeVersion", wrap_MakeVersion);
+	lua_register(L, "iBase_DecRef", wrap_iBase_DecRef);
+	iBase_tag = lua_newtag(L);
+	lua_pushnumber(L, iBase_tag);
+	lua_setglobal(L, "iBase_tag");
+
+	lua_register(L, "iSCF_CreateInstance", wrap_iSCF_CreateInstance);
+	lua_register(L, "iSCF_DecRef", wrap_iBase_DecRef);
+	iSCF_tag = lua_newtag(L);
+	lua_pushnumber(L, iSCF_tag);
+	lua_setglobal(L, "iSCF_tag");
+
+	lua_register(L, "csVector3_x_set", wrap_csVector3_x_set);
+	lua_register(L, "csVector3_x_get", wrap_csVector3_x_get);
+	lua_register(L, "csVector3_y_set", wrap_csVector3_y_set);
+	lua_register(L, "csVector3_y_get", wrap_csVector3_y_get);
+	lua_register(L, "csVector3_z_set", wrap_csVector3_z_set);
+	lua_register(L, "csVector3_z_get", wrap_csVector3_z_get);
+	lua_register(L, "new_csVector3", wrap_new_csVector3);
+	lua_register(L, "delete_csVector3", wrap_delete_csVector3);
+	csVector3_tag = lua_newtag(L);
+	lua_pushnumber(L, csVector3_tag);
+	lua_setglobal(L, "csVector3_tag");
+
+	lua_register(L, "csRGBpixel_red_set", wrap_csRGBpixel_red_set);
+	lua_register(L, "csRGBpixel_red_get", wrap_csRGBpixel_red_get);
+	lua_register(L, "csRGBpixel_green_set", wrap_csRGBpixel_green_set);
+	lua_register(L, "csRGBpixel_green_get", wrap_csRGBpixel_green_get);
+	lua_register(L, "csRGBpixel_blue_set", wrap_csRGBpixel_blue_set);
+	lua_register(L, "csRGBpixel_blue_get", wrap_csRGBpixel_blue_get);
+	lua_register(L, "csRGBpixel_alpha_set", wrap_csRGBpixel_alpha_set);
+	lua_register(L, "csRGBpixel_alpha_get", wrap_csRGBpixel_alpha_get);
+	csRGBpixel_tag = lua_newtag(L);
+	lua_pushnumber(L, csRGBpixel_tag);
+	lua_setglobal(L, "csRGBpixel_tag");
+
+	lua_register(L, "csPixelFormat_RedMask_set", wrap_csPixelFormat_RedMask_set);
+	lua_register(L, "csPixelFormat_RedMask_get", wrap_csPixelFormat_RedMask_get);
+	lua_register(L, "csPixelFormat_GreenMask_set", wrap_csPixelFormat_GreenMask_set);
+	lua_register(L, "csPixelFormat_GreenMask_get", wrap_csPixelFormat_GreenMask_get);
+	lua_register(L, "csPixelFormat_BlueMask_set", wrap_csPixelFormat_BlueMask_set);
+	lua_register(L, "csPixelFormat_BlueMask_get", wrap_csPixelFormat_BlueMask_get);
+	lua_register(L, "csPixelFormat_RedShift_set", wrap_csPixelFormat_RedShift_set);
+	lua_register(L, "csPixelFormat_RedShift_get", wrap_csPixelFormat_RedShift_get);
+	lua_register(L, "csPixelFormat_GreenShift_set", wrap_csPixelFormat_GreenShift_set);
+	lua_register(L, "csPixelFormat_GreenShift_get", wrap_csPixelFormat_GreenShift_get);
+	lua_register(L, "csPixelFormat_BlueShift_set", wrap_csPixelFormat_BlueShift_set);
+	lua_register(L, "csPixelFormat_BlueShift_get", wrap_csPixelFormat_BlueShift_get);
+	lua_register(L, "csPixelFormat_RedBits_set", wrap_csPixelFormat_RedBits_set);
+	lua_register(L, "csPixelFormat_RedBits_get", wrap_csPixelFormat_RedBits_get);
+	lua_register(L, "csPixelFormat_GreenBits_set", wrap_csPixelFormat_GreenBits_set);
+	lua_register(L, "csPixelFormat_GreenBits_get", wrap_csPixelFormat_GreenBits_get);
+	lua_register(L, "csPixelFormat_BlueBits_set", wrap_csPixelFormat_BlueBits_set);
+	lua_register(L, "csPixelFormat_BlueBits_get", wrap_csPixelFormat_BlueBits_get);
+	lua_register(L, "csPixelFormat_PalEntries_set", wrap_csPixelFormat_PalEntries_set);
+	lua_register(L, "csPixelFormat_PalEntries_get", wrap_csPixelFormat_PalEntries_get);
+	lua_register(L, "csPixelFormat_PixelBytes_set", wrap_csPixelFormat_PixelBytes_set);
+	lua_register(L, "csPixelFormat_PixelBytes_get", wrap_csPixelFormat_PixelBytes_get);
+	csPixelFormat_tag = lua_newtag(L);
+	lua_pushnumber(L, csPixelFormat_tag);
+	lua_setglobal(L, "csPixelFormat_tag");
+
+	lua_register(L, "csGraphics3DCaps_CanClip_set", wrap_csGraphics3DCaps_CanClip_set);
+	lua_register(L, "csGraphics3DCaps_CanClip_get", wrap_csGraphics3DCaps_CanClip_get);
+	lua_register(L, "csGraphics3DCaps_minTexHeight_set", wrap_csGraphics3DCaps_minTexHeight_set);
+	lua_register(L, "csGraphics3DCaps_minTexHeight_get", wrap_csGraphics3DCaps_minTexHeight_get);
+	lua_register(L, "csGraphics3DCaps_minTexWidth_set", wrap_csGraphics3DCaps_minTexWidth_set);
+	lua_register(L, "csGraphics3DCaps_minTexWidth_get", wrap_csGraphics3DCaps_minTexWidth_get);
+	lua_register(L, "csGraphics3DCaps_maxTexHeight_set", wrap_csGraphics3DCaps_maxTexHeight_set);
+	lua_register(L, "csGraphics3DCaps_maxTexHeight_get", wrap_csGraphics3DCaps_maxTexHeight_get);
+	lua_register(L, "csGraphics3DCaps_maxTexWidth_set", wrap_csGraphics3DCaps_maxTexWidth_set);
+	lua_register(L, "csGraphics3DCaps_maxTexWidth_get", wrap_csGraphics3DCaps_maxTexWidth_get);
+	lua_register(L, "csGraphics3DCaps_fog_set", wrap_csGraphics3DCaps_fog_set);
+	lua_register(L, "csGraphics3DCaps_fog_get", wrap_csGraphics3DCaps_fog_get);
+	lua_register(L, "csGraphics3DCaps_NeedsPO2Maps_set", wrap_csGraphics3DCaps_NeedsPO2Maps_set);
+	lua_register(L, "csGraphics3DCaps_NeedsPO2Maps_get", wrap_csGraphics3DCaps_NeedsPO2Maps_get);
+	lua_register(L, "csGraphics3DCaps_MaxAspectRatio_set", wrap_csGraphics3DCaps_MaxAspectRatio_set);
+	lua_register(L, "csGraphics3DCaps_MaxAspectRatio_get", wrap_csGraphics3DCaps_MaxAspectRatio_get);
+	csGraphics3DCaps_tag = lua_newtag(L);
+	lua_pushnumber(L, csGraphics3DCaps_tag);
+	lua_setglobal(L, "csGraphics3DCaps_tag");
+
+	lua_register(L, "csImageArea_x_set", wrap_csImageArea_x_set);
+	lua_register(L, "csImageArea_x_get", wrap_csImageArea_x_get);
+	lua_register(L, "csImageArea_y_set", wrap_csImageArea_y_set);
+	lua_register(L, "csImageArea_y_get", wrap_csImageArea_y_get);
+	lua_register(L, "csImageArea_w_set", wrap_csImageArea_w_set);
+	lua_register(L, "csImageArea_w_get", wrap_csImageArea_w_get);
+	lua_register(L, "csImageArea_h_set", wrap_csImageArea_h_set);
+	lua_register(L, "csImageArea_h_get", wrap_csImageArea_h_get);
+	lua_register(L, "csImageArea_data_set", wrap_csImageArea_data_set);
+	lua_register(L, "csImageArea_data_get", wrap_csImageArea_data_get);
+	lua_register(L, "new_csImageArea", wrap_new_csImageArea);
+	csImageArea_tag = lua_newtag(L);
+	lua_pushnumber(L, csImageArea_tag);
+	lua_setglobal(L, "csImageArea_tag");
+
+	lua_register(L, "iPlugin_Initialize", wrap_iPlugin_Initialize);
+	lua_register(L, "iPlugin_HandleEvent", wrap_iPlugin_HandleEvent);
+	lua_register(L, "iPlugin_DecRef", wrap_iBase_DecRef);
+	iPlugin_tag = lua_newtag(L);
+	lua_pushnumber(L, iPlugin_tag);
+	lua_setglobal(L, "iPlugin_tag");
+
+	lua_register(L, "iTextureWrapper_DecRef", wrap_iBase_DecRef);
+	iTextureWrapper_tag = lua_newtag(L);
+	lua_pushnumber(L, iTextureWrapper_tag);
+	lua_setglobal(L, "iTextureWrapper_tag");
+
+	lua_register(L, "iTextureHandle_GetMipMapDimensions", wrap_iTextureHandle_GetMipMapDimensions);
+	lua_register(L, "iTextureHandle_GetMeanColor", wrap_iTextureHandle_GetMeanColor);
+	lua_register(L, "iTextureHandle_GetCacheData", wrap_iTextureHandle_GetCacheData);
+	lua_register(L, "iTextureHandle_SetCacheData", wrap_iTextureHandle_SetCacheData);
+	lua_register(L, "iTextureHandle_GetPrivateObject", wrap_iTextureHandle_GetPrivateObject);
+	lua_register(L, "iTextureHandle_DecRef", wrap_iBase_DecRef);
+	iTextureHandle_tag = lua_newtag(L);
+	lua_pushnumber(L, iTextureHandle_tag);
+	lua_setglobal(L, "iTextureHandle_tag");
+
+	lua_register(L, "iMaterialHandle_GetTexture", wrap_iMaterialHandle_GetTexture);
+	lua_register(L, "iMaterialHandle_GetFlatColor", wrap_iMaterialHandle_GetFlatColor);
+	lua_register(L, "iMaterialHandle_GetReflection", wrap_iMaterialHandle_GetReflection);
+	lua_register(L, "iMaterialHandle_Prepare", wrap_iMaterialHandle_Prepare);
+	lua_register(L, "iMaterialHandle_DecRef", wrap_iBase_DecRef);
+	iMaterialHandle_tag = lua_newtag(L);
+	lua_pushnumber(L, iMaterialHandle_tag);
+	lua_setglobal(L, "iMaterialHandle_tag");
+
+	lua_register(L, "iMaterialWrapper_GetMaterialHandle", wrap_iMaterialWrapper_GetMaterialHandle);
+	lua_register(L, "iMaterialWrapper_DecRef", wrap_iBase_DecRef);
+	iMaterialWrapper_tag = lua_newtag(L);
+	lua_pushnumber(L, iMaterialWrapper_tag);
+	lua_setglobal(L, "iMaterialWrapper_tag");
+
+	lua_register(L, "iFont_SetSize", wrap_iFont_SetSize);
+	lua_register(L, "iFont_GetSize", wrap_iFont_GetSize);
+	lua_register(L, "iFont_GetMaxSize", wrap_iFont_GetMaxSize);
+	lua_register(L, "iFont_GetGlyphSize", wrap_iFont_GetGlyphSize);
+	lua_register(L, "iFont_GetGlyphBitmap", wrap_iFont_GetGlyphBitmap);
+	lua_register(L, "iFont_GetDimensions", wrap_iFont_GetDimensions);
+	lua_register(L, "iFont_GetLength", wrap_iFont_GetLength);
+	lua_register(L, "iFont_DecRef", wrap_iBase_DecRef);
+	iFont_tag = lua_newtag(L);
+	lua_pushnumber(L, iFont_tag);
+	lua_setglobal(L, "iFont_tag");
+
+	lua_register(L, "iFontServer_LoadFont", wrap_iFontServer_LoadFont);
+	lua_register(L, "iFontServer_GetFontCount", wrap_iFontServer_GetFontCount);
+	lua_register(L, "iFontServer_GetFont", wrap_iFontServer_GetFont);
+	lua_register(L, "iFontServer_DecRef", wrap_iBase_DecRef);
+	iFontServer_tag = lua_newtag(L);
+	lua_pushnumber(L, iFontServer_tag);
+	lua_setglobal(L, "iFontServer_tag");
+
+	lua_register(L, "iGraphics2D_Open", wrap_iGraphics2D_Open);
+	lua_register(L, "iGraphics2D_Close", wrap_iGraphics2D_Close);
+	lua_register(L, "iGraphics2D_GetWidth", wrap_iGraphics2D_GetWidth);
+	lua_register(L, "iGraphics2D_GetHeight", wrap_iGraphics2D_GetHeight);
+	lua_register(L, "iGraphics2D_GetFullScreen", wrap_iGraphics2D_GetFullScreen);
+	lua_register(L, "iGraphics2D_GetPage", wrap_iGraphics2D_GetPage);
+	lua_register(L, "iGraphics2D_DoubleBuffer", wrap_iGraphics2D_DoubleBuffer);
+	lua_register(L, "iGraphics2D_GetDoubleBufferState", wrap_iGraphics2D_GetDoubleBufferState);
+	lua_register(L, "iGraphics2D_GetPixelFormat", wrap_iGraphics2D_GetPixelFormat);
+	lua_register(L, "iGraphics2D_GetPixelBytes", wrap_iGraphics2D_GetPixelBytes);
+	lua_register(L, "iGraphics2D_GetPalEntryCount", wrap_iGraphics2D_GetPalEntryCount);
+	lua_register(L, "iGraphics2D_GetPalette", wrap_iGraphics2D_GetPalette);
+	lua_register(L, "iGraphics2D_SetRGB", wrap_iGraphics2D_SetRGB);
+	lua_register(L, "iGraphics2D_SetClipRect", wrap_iGraphics2D_SetClipRect);
+	lua_register(L, "iGraphics2D_GetClipRect", wrap_iGraphics2D_GetClipRect);
+	lua_register(L, "iGraphics2D_BeginDraw", wrap_iGraphics2D_BeginDraw);
+	lua_register(L, "iGraphics2D_FinishDraw", wrap_iGraphics2D_FinishDraw);
+	lua_register(L, "iGraphics2D_Print", wrap_iGraphics2D_Print);
+	lua_register(L, "iGraphics2D_Clear", wrap_iGraphics2D_Clear);
+	lua_register(L, "iGraphics2D_ClearAll", wrap_iGraphics2D_ClearAll);
+	lua_register(L, "iGraphics2D_DrawLine", wrap_iGraphics2D_DrawLine);
+	lua_register(L, "iGraphics2D_DrawBox", wrap_iGraphics2D_DrawBox);
+	lua_register(L, "iGraphics2D_ClipLine", wrap_iGraphics2D_ClipLine);
+	lua_register(L, "iGraphics2D_DrawPixel", wrap_iGraphics2D_DrawPixel);
+	lua_register(L, "iGraphics2D_GetPixelAt", wrap_iGraphics2D_GetPixelAt);
+	lua_register(L, "iGraphics2D_GetPixel", wrap_iGraphics2D_GetPixel);
+	lua_register(L, "iGraphics2D_SaveArea", wrap_iGraphics2D_SaveArea);
+	lua_register(L, "iGraphics2D_RestoreArea", wrap_iGraphics2D_RestoreArea);
+	lua_register(L, "iGraphics2D_FreeArea", wrap_iGraphics2D_FreeArea);
+	lua_register(L, "iGraphics2D_Write", wrap_iGraphics2D_Write);
+	lua_register(L, "iGraphics2D_GetFontServer", wrap_iGraphics2D_GetFontServer);
+	lua_register(L, "iGraphics2D_SetMousePosition", wrap_iGraphics2D_SetMousePosition);
+	lua_register(L, "iGraphics2D_SetMouseCursor", wrap_iGraphics2D_SetMouseCursor);
+	lua_register(L, "iGraphics2D_ScreenShot", wrap_iGraphics2D_ScreenShot);
+	lua_register(L, "iGraphics2D_CreateOffScreenCanvas", wrap_iGraphics2D_CreateOffScreenCanvas);
+	lua_register(L, "iGraphics2D_AllowCanvasResize", wrap_iGraphics2D_AllowCanvasResize);
+	lua_register(L, "iGraphics2D_DecRef", wrap_iBase_DecRef);
+	iGraphics2D_tag = lua_newtag(L);
+	lua_pushnumber(L, iGraphics2D_tag);
+	lua_setglobal(L, "iGraphics2D_tag");
+
+	lua_register(L, "iHalo_GetWidth", wrap_iHalo_GetWidth);
+	lua_register(L, "iHalo_GetHeight", wrap_iHalo_GetHeight);
+	lua_register(L, "iHalo_SetColor", wrap_iHalo_SetColor);
+	lua_register(L, "iHalo_GetColor", wrap_iHalo_GetColor);
+	lua_register(L, "iHalo_Draw", wrap_iHalo_Draw);
+	lua_register(L, "iHalo_DecRef", wrap_iBase_DecRef);
+	iHalo_tag = lua_newtag(L);
+	lua_pushnumber(L, iHalo_tag);
+	lua_setglobal(L, "iHalo_tag");
+
+	lua_register(L, "iGraphics3D_Open", wrap_iGraphics3D_Open);
+	lua_register(L, "iGraphics3D_Close", wrap_iGraphics3D_Close);
+	lua_register(L, "iGraphics3D_SetDimensions", wrap_iGraphics3D_SetDimensions);
+	lua_register(L, "iGraphics3D_BeginDraw", wrap_iGraphics3D_BeginDraw);
+	lua_register(L, "iGraphics3D_FinishDraw", wrap_iGraphics3D_FinishDraw);
+	lua_register(L, "iGraphics3D_Print", wrap_iGraphics3D_Print);
+	lua_register(L, "iGraphics3D_DrawPolygon", wrap_iGraphics3D_DrawPolygon);
+	lua_register(L, "iGraphics3D_DrawPolygonDebug", wrap_iGraphics3D_DrawPolygonDebug);
+	lua_register(L, "iGraphics3D_DrawLine", wrap_iGraphics3D_DrawLine);
+	lua_register(L, "iGraphics3D_DrawTriangleMesh", wrap_iGraphics3D_DrawTriangleMesh);
+	lua_register(L, "iGraphics3D_DrawPolygonMesh", wrap_iGraphics3D_DrawPolygonMesh);
+	lua_register(L, "iGraphics3D_OpenFogObject", wrap_iGraphics3D_OpenFogObject);
+	lua_register(L, "iGraphics3D_DrawFogPolygon", wrap_iGraphics3D_DrawFogPolygon);
+	lua_register(L, "iGraphics3D_CloseFogObject", wrap_iGraphics3D_CloseFogObject);
+	lua_register(L, "iGraphics3D_GetCaps", wrap_iGraphics3D_GetCaps);
+	lua_register(L, "iGraphics3D_GetZBuffAt", wrap_iGraphics3D_GetZBuffAt);
+	lua_register(L, "iGraphics3D_GetZBuffValue", wrap_iGraphics3D_GetZBuffValue);
+	lua_register(L, "iGraphics3D_DumpCache", wrap_iGraphics3D_DumpCache);
+	lua_register(L, "iGraphics3D_ClearCache", wrap_iGraphics3D_ClearCache);
+	lua_register(L, "iGraphics3D_RemoveFromCache", wrap_iGraphics3D_RemoveFromCache);
+	lua_register(L, "iGraphics3D_GetWidth", wrap_iGraphics3D_GetWidth);
+	lua_register(L, "iGraphics3D_GetHeight", wrap_iGraphics3D_GetHeight);
+	lua_register(L, "iGraphics3D_SetPerspectiveCenter", wrap_iGraphics3D_SetPerspectiveCenter);
+	lua_register(L, "iGraphics3D_SetPerspectiveAspect", wrap_iGraphics3D_SetPerspectiveAspect);
+	lua_register(L, "iGraphics3D_SetObjectToCamera", wrap_iGraphics3D_SetObjectToCamera);
+	lua_register(L, "iGraphics3D_GetDriver2D", wrap_iGraphics3D_GetDriver2D);
+	lua_register(L, "iGraphics3D_GetTextureManager", wrap_iGraphics3D_GetTextureManager);
+	lua_register(L, "iGraphics3D_CreateHalo", wrap_iGraphics3D_CreateHalo);
+	lua_register(L, "iGraphics3D_DrawPixmap", wrap_iGraphics3D_DrawPixmap);
+	lua_register(L, "iGraphics3D_DecRef", wrap_iBase_DecRef);
+	iGraphics3D_tag = lua_newtag(L);
+	lua_pushnumber(L, iGraphics3D_tag);
+	lua_setglobal(L, "iGraphics3D_tag");
+
+	lua_register(L, "iCamera_GetFOV", wrap_iCamera_GetFOV);
+	lua_register(L, "iCamera_GetInvFOV", wrap_iCamera_GetInvFOV);
+	lua_register(L, "iCamera_DecRef", wrap_iBase_DecRef);
+	iCamera_tag = lua_newtag(L);
+	lua_pushnumber(L, iCamera_tag);
+	lua_setglobal(L, "iCamera_tag");
+
+	lua_register(L, "iSector_DecRef", wrap_iBase_DecRef);
+	iSector_tag = lua_newtag(L);
+	lua_pushnumber(L, iSector_tag);
+	lua_setglobal(L, "iSector_tag");
+
+	lua_register(L, "iThingState_CreatePolygon", wrap_iThingState_CreatePolygon);
+	lua_register(L, "iThingState_DecRef", wrap_iBase_DecRef);
+	iThingState_tag = lua_newtag(L);
+	lua_pushnumber(L, iThingState_tag);
+	lua_setglobal(L, "iThingState_tag");
+
+	lua_register(L, "iMeshObject_Query_iThingState", wrap_iMeshObject_Query_iThingState);
+	lua_register(L, "iMeshObject_DecRef", wrap_iBase_DecRef);
+	iMeshObject_tag = lua_newtag(L);
+	lua_pushnumber(L, iMeshObject_tag);
+	lua_setglobal(L, "iMeshObject_tag");
+
+	lua_register(L, "iMeshWrapper_GetMeshObject", wrap_iMeshWrapper_GetMeshObject);
+	lua_register(L, "iMeshWrapper_DecRef", wrap_iBase_DecRef);
+	iMeshWrapper_tag = lua_newtag(L);
+	lua_pushnumber(L, iMeshWrapper_tag);
+	lua_setglobal(L, "iMeshWrapper_tag");
+
+	lua_register(L, "iLightMap_GetMapData", wrap_iLightMap_GetMapData);
+	lua_register(L, "iLightMap_GetWidth", wrap_iLightMap_GetWidth);
+	lua_register(L, "iLightMap_GetHeight", wrap_iLightMap_GetHeight);
+	lua_register(L, "iLightMap_GetRealWidth", wrap_iLightMap_GetRealWidth);
+	lua_register(L, "iLightMap_GetRealHeight", wrap_iLightMap_GetRealHeight);
+	lua_register(L, "iLightMap_GetCacheData", wrap_iLightMap_GetCacheData);
+	lua_register(L, "iLightMap_SetCacheData", wrap_iLightMap_SetCacheData);
+	lua_register(L, "iLightMap_GetMeanLighting", wrap_iLightMap_GetMeanLighting);
+	lua_register(L, "iLightMap_GetSize", wrap_iLightMap_GetSize);
+	lua_register(L, "iLightMap_DecRef", wrap_iBase_DecRef);
+	iLightMap_tag = lua_newtag(L);
+	lua_pushnumber(L, iLightMap_tag);
+	lua_setglobal(L, "iLightMap_tag");
+
+	lua_register(L, "iPolygon3D_GetLightMap", wrap_iPolygon3D_GetLightMap);
+	lua_register(L, "iPolygon3D_GetMaterialHandle", wrap_iPolygon3D_GetMaterialHandle);
+	lua_register(L, "iPolygon3D_SetMaterial", wrap_iPolygon3D_SetMaterial);
+	lua_register(L, "iPolygon3D_GetVertexCount", wrap_iPolygon3D_GetVertexCount);
+	lua_register(L, "iPolygon3D_GetVertex", wrap_iPolygon3D_GetVertex);
+	lua_register(L, "iPolygon3D_GetVertexW", wrap_iPolygon3D_GetVertexW);
+	lua_register(L, "iPolygon3D_GetVertexC", wrap_iPolygon3D_GetVertexC);
+	lua_register(L, "iPolygon3D_CreateVertexByIndex", wrap_iPolygon3D_CreateVertexByIndex);
+	lua_register(L, "iPolygon3D_CreateVertex", wrap_iPolygon3D_CreateVertex);
+	lua_register(L, "iPolygon3D_GetAlpha", wrap_iPolygon3D_GetAlpha);
+	lua_register(L, "iPolygon3D_SetAlpha", wrap_iPolygon3D_SetAlpha);
+	lua_register(L, "iPolygon3D_CreatePlane", wrap_iPolygon3D_CreatePlane);
+	lua_register(L, "iPolygon3D_SetPlane", wrap_iPolygon3D_SetPlane);
+	lua_register(L, "iPolygon3D_SetTextureSpace", wrap_iPolygon3D_SetTextureSpace);
+	lua_register(L, "iPolygon3D_DecRef", wrap_iBase_DecRef);
+	iPolygon3D_tag = lua_newtag(L);
+	lua_pushnumber(L, iPolygon3D_tag);
+	lua_setglobal(L, "iPolygon3D_tag");
+
+	lua_register(L, "iImage_GetImageData", wrap_iImage_GetImageData);
+	lua_register(L, "iImage_GetWidth", wrap_iImage_GetWidth);
+	lua_register(L, "iImage_GetHeight", wrap_iImage_GetHeight);
+	lua_register(L, "iImage_GetSize", wrap_iImage_GetSize);
+	lua_register(L, "iImage_Rescale", wrap_iImage_Rescale);
+	lua_register(L, "iImage_MipMap", wrap_iImage_MipMap);
+	lua_register(L, "iImage_SetName", wrap_iImage_SetName);
+	lua_register(L, "iImage_GetName", wrap_iImage_GetName);
+	lua_register(L, "iImage_GetFormat", wrap_iImage_GetFormat);
+	lua_register(L, "iImage_GetPalette", wrap_iImage_GetPalette);
+	lua_register(L, "iImage_GetAlpha", wrap_iImage_GetAlpha);
+	lua_register(L, "iImage_SetFormat", wrap_iImage_SetFormat);
+	lua_register(L, "iImage_Clone", wrap_iImage_Clone);
+	lua_register(L, "iImage_Crop", wrap_iImage_Crop);
+	lua_register(L, "iImage_DecRef", wrap_iBase_DecRef);
+	iImage_tag = lua_newtag(L);
+	lua_pushnumber(L, iImage_tag);
+	lua_setglobal(L, "iImage_tag");
+
+	lua_register(L, "iTextureManager_RegisterTexture", wrap_iTextureManager_RegisterTexture);
+	lua_register(L, "iTextureManager_PrepareTextures", wrap_iTextureManager_PrepareTextures);
+	lua_register(L, "iTextureManager_FreeImages", wrap_iTextureManager_FreeImages);
+	lua_register(L, "iTextureManager_ResetPalette", wrap_iTextureManager_ResetPalette);
+	lua_register(L, "iTextureManager_ReserveColor", wrap_iTextureManager_ReserveColor);
+	lua_register(L, "iTextureManager_FindRGB", wrap_iTextureManager_FindRGB);
+	lua_register(L, "iTextureManager_SetPalette", wrap_iTextureManager_SetPalette);
+	lua_register(L, "iTextureManager_SetVerbose", wrap_iTextureManager_SetVerbose);
+	lua_register(L, "iTextureManager_GetTextureFormat", wrap_iTextureManager_GetTextureFormat);
+	lua_register(L, "iTextureManager_DecRef", wrap_iBase_DecRef);
+	iTextureManager_tag = lua_newtag(L);
+	lua_pushnumber(L, iTextureManager_tag);
+	lua_setglobal(L, "iTextureManager_tag");
+
+	lua_register(L, "iPolygonTexture_GetMaterialHandle", wrap_iPolygonTexture_GetMaterialHandle);
+	lua_register(L, "iPolygonTexture_GetFDU", wrap_iPolygonTexture_GetFDU);
+	lua_register(L, "iPolygonTexture_GetFDV", wrap_iPolygonTexture_GetFDV);
+	lua_register(L, "iPolygonTexture_GetWidth", wrap_iPolygonTexture_GetWidth);
+	lua_register(L, "iPolygonTexture_GetHeight", wrap_iPolygonTexture_GetHeight);
+	lua_register(L, "iPolygonTexture_GetShiftU", wrap_iPolygonTexture_GetShiftU);
+	lua_register(L, "iPolygonTexture_GetIMinU", wrap_iPolygonTexture_GetIMinU);
+	lua_register(L, "iPolygonTexture_GetIMinV", wrap_iPolygonTexture_GetIMinV);
+	lua_register(L, "iPolygonTexture_GetTextureBox", wrap_iPolygonTexture_GetTextureBox);
+	lua_register(L, "iPolygonTexture_GetOriginalWidth", wrap_iPolygonTexture_GetOriginalWidth);
+	lua_register(L, "iPolygonTexture_GetPolygon", wrap_iPolygonTexture_GetPolygon);
+	lua_register(L, "iPolygonTexture_DynamicLightsDirty", wrap_iPolygonTexture_DynamicLightsDirty);
+	lua_register(L, "iPolygonTexture_RecalculateDynamicLights", wrap_iPolygonTexture_RecalculateDynamicLights);
+	lua_register(L, "iPolygonTexture_GetLightMap", wrap_iPolygonTexture_GetLightMap);
+	lua_register(L, "iPolygonTexture_GetLightCellSize", wrap_iPolygonTexture_GetLightCellSize);
+	lua_register(L, "iPolygonTexture_GetLightCellShift", wrap_iPolygonTexture_GetLightCellShift);
+	lua_register(L, "iPolygonTexture_GetCacheData", wrap_iPolygonTexture_GetCacheData);
+	lua_register(L, "iPolygonTexture_SetCacheData", wrap_iPolygonTexture_SetCacheData);
+	lua_register(L, "iPolygonTexture_DecRef", wrap_iBase_DecRef);
+	iPolygonTexture_tag = lua_newtag(L);
+	lua_pushnumber(L, iPolygonTexture_tag);
+	lua_setglobal(L, "iPolygonTexture_tag");
+
+	lua_register(L, "iCameraPosition_DecRef", wrap_iBase_DecRef);
+	iCameraPosition_tag = lua_newtag(L);
+	lua_pushnumber(L, iCameraPosition_tag);
+	lua_setglobal(L, "iCameraPosition_tag");
+
+	lua_register(L, "iSectorList_GetSectorCount", wrap_iSectorList_GetSectorCount);
+	lua_register(L, "iSectorList_GetSector", wrap_iSectorList_GetSector);
+	lua_register(L, "iSectorList_AddSector", wrap_iSectorList_AddSector);
+	lua_register(L, "iSectorList_RemoveSector", wrap_iSectorList_RemoveSector);
+	lua_register(L, "iSectorList_FindByName", wrap_iSectorList_FindByName);
+	lua_register(L, "iSectorList_DecRef", wrap_iBase_DecRef);
+	iSectorList_tag = lua_newtag(L);
+	lua_pushnumber(L, iSectorList_tag);
+	lua_setglobal(L, "iSectorList_tag");
+
+	lua_register(L, "iEngine_GetTextureFormat", wrap_iEngine_GetTextureFormat);
+	lua_register(L, "iEngine_SelectLibrary", wrap_iEngine_SelectLibrary);
+	lua_register(L, "iEngine_DeleteLibrary", wrap_iEngine_DeleteLibrary);
+	lua_register(L, "iEngine_DeleteAll", wrap_iEngine_DeleteAll);
+	lua_register(L, "iEngine_CreateTexture", wrap_iEngine_CreateTexture);
+	lua_register(L, "iEngine_CreateCameraPosition", wrap_iEngine_CreateCameraPosition);
+	lua_register(L, "iEngine_CreatePlane", wrap_iEngine_CreatePlane);
+	lua_register(L, "iEngine_CreateSector", wrap_iEngine_CreateSector);
+	lua_register(L, "iEngine_FindSector", wrap_iEngine_FindSector);
+	lua_register(L, "iEngine_FindMaterial", wrap_iEngine_FindMaterial);
+	lua_register(L, "iEngine_CreateSectorWallsMesh", wrap_iEngine_CreateSectorWallsMesh);
+	lua_register(L, "iEngine_GetSectors", wrap_iEngine_GetSectors);
+	lua_register(L, "iEngine_DecRef", wrap_iBase_DecRef);
+	iEngine_tag = lua_newtag(L);
+	lua_pushnumber(L, iEngine_tag);
+	lua_setglobal(L, "iEngine_tag");
+
+	lua_register(L, "iSystem_Query_iEngine", wrap_iSystem_Query_iEngine);
+	lua_register(L, "iSystem_Query_iGraphics3D", wrap_iSystem_Query_iGraphics3D);
+	lua_register(L, "iSystem_Print", wrap_iSystem_Print);
+	lua_register(L, "iSystem_DecRef", wrap_iBase_DecRef);
+	iSystem_tag = lua_newtag(L);
+	lua_pushnumber(L, iSystem_tag);
+	lua_setglobal(L, "iSystem_tag");
+
+	return 0;
+} /* end of cspace_initialize */
+

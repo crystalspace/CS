@@ -43,42 +43,51 @@ SCF_EXPORT_CLASS_TABLE(cslua)
     "Crystal Space Script Lua")
 SCF_EXPORT_CLASS_TABLE_END
 
-csLua *thisclass=NULL;
+csLua* csLua::shared_instance = NULL;
 
-csLua::csLua(iBase *iParent) :Sys(NULL), Mode(CS_MSG_INITIALIZATION)
+csLua::csLua(iBase *iParent) :Sys(NULL), Mode(CS_MSG_INITIALIZATION), lua_state(NULL)
 {
   SCF_CONSTRUCT_IBASE(iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
+  shared_instance = this;
 }
 
-lua_State *L = NULL;
+#define LUA_STATE() ((lua_State*)lua_state)
+
 csLua::~csLua()
 {
   Mode=CS_MSG_INTERNAL_ERROR;
-  lua_close(L);
+  lua_close(LUA_STATE());
+  lua_state=NULL;
   Sys=NULL;
-  thisclass=NULL;
 }
 
-void cspace_init (lua_State *lua_state);
+extern "C" {
+  int cspace_initialize(lua_State *L);
+}
+extern int iSystem_tag;
 bool csLua::Initialize(iSystem* iSys)
 {
   Sys=iSys;
-  thisclass=this;
 
-  L = lua_open(0); //Stacksize is 0, is there a better value?
+  LUA_STATE() = lua_open(0); //Stacksize is 0, is there a better value?
 
 //Userinit start
-  lua_baselibopen(L);
-  lua_iolibopen(L);
-  lua_strlibopen(L);
-  lua_mathlibopen(L);
-  lua_dblibopen(L);
+  lua_baselibopen(LUA_STATE());
+  lua_iolibopen(LUA_STATE());
+  lua_strlibopen(LUA_STATE());
+  lua_mathlibopen(LUA_STATE());
+  lua_dblibopen(LUA_STATE());
 //Userinit end
 
-  cspace_init(L);
+  cspace_initialize(LUA_STATE());
 
   Mode=CS_MSG_STDOUT;
+
+  // Store the system pointer in 'cspace.system'.
+  lua_pushusertag(LUA_STATE(), (void*)Sys, iSystem_tag);
+  lua_setglobal(LUA_STATE(), "system");
+
   return true;
 }
 
@@ -89,9 +98,9 @@ void csLua::ShowError()
 
 bool csLua::RunText(const char* Text)
 {
-  int top = lua_gettop(L);
-  int res = lua_dostring(L, Text);  /* dostring | dofile */
-  lua_settop(L, top);  /* remove eventual results */
+  int top = lua_gettop(LUA_STATE());
+  int res = lua_dostring(LUA_STATE(), Text);  /* dostring | dofile */
+  lua_settop(LUA_STATE(), top);  /* remove eventual results */
 
   if (res == LUA_ERRMEM) {
     Print(1, "lua: memory allocation error");
@@ -123,4 +132,10 @@ void csLua::Print(bool Error, const char *msg)
     Sys->Printf(CS_MSG_FATAL_ERROR, "CrystalScript Error: %s\n", msg);
   else
     Sys->Printf(Mode, "%s", msg);
+}
+
+extern "C" {
+  extern void swig_lua_init(lua_State *L) {
+    //BNE We are already initialized by this time so this is a no-op
+  }
 }

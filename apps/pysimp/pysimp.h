@@ -44,6 +44,7 @@ public:
   PySimple ();
   virtual ~PySimple ();
 
+  virtual void Help ();
   virtual bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
   virtual void NextFrame ();

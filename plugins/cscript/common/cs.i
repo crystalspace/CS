@@ -35,10 +35,13 @@
 #include "iengine/campos.h"
 #include "imesh/object.h"
 #include "imesh/thing/thing.h"
+#include "imesh/thing/lightmap.h"
 #include "imap/parser.h"
 #include "plugins/cscript/cspython/cspython.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/fontserv.h"
+#include "ivideo/halo.h"
 
-void* GetMyPtr() { return NULL; }
 %}
 
 %include pointer.i
@@ -62,11 +65,43 @@ class csVector3
 public:
   float x,y,z;
   csVector3(float x, float y, float z);
+  ~csVector3();
 };
 
 struct csRGBpixel
 {
   unsigned char red, green, blue, alpha;
+};
+
+struct csPixelFormat
+{
+  unsigned long RedMask, GreenMask, BlueMask;
+  int RedShift, GreenShift, BlueShift;
+  int RedBits, GreenBits, BlueBits;
+  int PalEntries;
+  int PixelBytes;
+};
+
+enum G3D_FOGMETHOD
+{
+};
+
+struct csGraphics3DCaps
+{
+  bool CanClip;
+  int minTexHeight, minTexWidth;
+  int maxTexHeight, maxTexWidth;
+  G3D_FOGMETHOD fog;
+  bool NeedsPO2Maps;
+  int MaxAspectRatio;
+};
+
+struct csImageArea
+{
+  int x, y, w, h;
+  char *data;
+
+  csImageArea (int sx, int sy, int sw, int sh);
 };
 
 //***** Interfaces
@@ -83,7 +118,7 @@ struct iTextureWrapper : public iBase
 struct iTextureHandle : public iBase
 {
   bool GetMipMapDimensions (int mipmap, int &mw, int &mh);
-  void GetMeanColor (UByte &red, UByte &green, UByte &blue);
+  void GetMeanColor (unsigned char &red, unsigned char &green, unsigned char &blue);
   void *GetCacheData ();
   void SetCacheData (void *d);
   void *GetPrivateObject ();
@@ -101,6 +136,84 @@ struct iMaterialWrapper : public iBase
 {
 public:
   virtual iMaterialHandle* GetMaterialHandle () = 0;
+};
+
+struct iFont : public iBase
+{
+  virtual void SetSize (int iSize) = 0;
+  virtual int GetSize () = 0;
+  virtual void GetMaxSize (int &oW, int &oH) = 0;
+  virtual bool GetGlyphSize (unsigned char c, int &oW, int &oH) = 0;
+  virtual void *GetGlyphBitmap (unsigned char c, int &oW, int &oH) = 0;
+  virtual void GetDimensions (const char *text, int &oW, int &oH) = 0;
+  virtual int GetLength (const char *text, int maxwidth) = 0;
+//  typedef void (*DeleteNotify) (iFont *, void *);
+//  virtual void AddDeleteCallback (DeleteNotify func, void *databag) = 0;
+//  virtual bool RemoveDeleteCallback (DeleteNotify func, void *databag) = 0;
+};
+
+
+struct iFontServer : public iBase
+{
+  virtual iFont *LoadFont (const char *filename) = 0;
+  virtual int GetFontCount () = 0;
+  virtual iFont *GetFont (int iIndex) = 0;
+};
+
+struct iGraphics2D : public iBase
+{
+  virtual bool Open (const char *Title) = 0;
+  virtual void Close () = 0;
+  virtual int GetWidth () = 0;
+  virtual int GetHeight () = 0;
+  virtual bool GetFullScreen () = 0;
+  virtual int GetPage () = 0;
+  virtual bool DoubleBuffer (bool Enable) = 0;
+  virtual bool GetDoubleBufferState () = 0;
+  virtual csPixelFormat *GetPixelFormat () = 0;
+  virtual int GetPixelBytes () = 0;
+  virtual int GetPalEntryCount () = 0;
+  virtual csRGBpixel *GetPalette () = 0;
+  virtual void SetRGB (int i, int r, int g, int b) = 0;
+  virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY) = 0;
+  virtual void GetClipRect(int& nMinX, int& nMinY, int& nMaxX, int& nMaxY) = 0;
+  virtual bool BeginDraw () = 0;
+  virtual void FinishDraw () = 0;
+  virtual void Print (csRect *pArea) = 0;
+  virtual void Clear (int color) = 0;
+  virtual void ClearAll (int color) = 0;
+  virtual void DrawLine(float x1, float y1, float x2, float y2, int color) = 0;
+  virtual void DrawBox (int x, int y, int w, int h, int color) = 0;
+  virtual bool ClipLine (float& x1, float& y1, float& x2, float& y2,
+    int xmin, int ymin, int xmax, int ymax) = 0;
+  virtual void DrawPixel (int x, int y, int color) = 0;
+  virtual void *GetPixelAt (int x, int y) = 0;
+  virtual void GetPixel (int x, int y, unsigned char &oR, unsigned char &oG, unsigned char &oB) = 0;
+  virtual csImageArea *SaveArea (int x, int y, int w, int h) = 0;
+  virtual void RestoreArea (csImageArea *Area, bool Free) = 0;
+  virtual void FreeArea (csImageArea *Area) = 0;
+  virtual void Write (iFont *font, int x, int y, int fg, int bg,
+    const char *str) = 0;
+  virtual iFontServer *GetFontServer () = 0;
+  virtual bool SetMousePosition (int x, int y) = 0;
+  virtual bool SetMouseCursor (csMouseCursorID iShape) = 0;
+//  virtual bool PerformExtension (char const* command, ...) = 0;
+//  virtual bool PerformExtensionV (char const* command, va_list) = 0;
+  virtual iImage *ScreenShot () = 0;
+  virtual iGraphics2D *CreateOffScreenCanvas (int width, int height,
+     void *buffer, bool alone_hint, csPixelFormat *ipfmt,
+     csRGBpixel *palette = NULL, int pal_size = 0) = 0;
+  virtual void AllowCanvasResize (bool iAllow) = 0;
+};
+
+struct iHalo : public iBase
+{
+  virtual int GetWidth () = 0;
+  virtual int GetHeight () = 0;
+  virtual void SetColor (float &iR, float &iG, float &iB) = 0;
+  virtual void GetColor (float &oR, float &oG, float &oB) = 0;
+  virtual void Draw (float x, float y, float w, float h, float iIntensity,
+    csVector2 *iVertices, int iVertCount) = 0;
 };
 
 struct iGraphics3D:public iBase
@@ -124,7 +237,7 @@ struct iGraphics3D:public iBase
 //bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
 //long GetRenderState (G3D_RENDERSTATEOPTION op);
   csGraphics3DCaps *GetCaps ();
-  unsigned long *GetZBuffAt (int x, int y);
+  void *GetZBuffAt (int x, int y);
   float GetZBuffValue (int x, int y);
   void DumpCache ();
   void ClearCache ();
@@ -173,6 +286,19 @@ struct iMeshWrapper : public iBase
   virtual iMeshObject* GetMeshObject ();
 };
 
+struct iLightMap : public iBase
+{
+  virtual void *GetMapData () = 0;
+  virtual int GetWidth () = 0;
+  virtual int GetHeight () = 0;
+  virtual int GetRealWidth () = 0;
+  virtual int GetRealHeight () = 0;
+  virtual void *GetCacheData () = 0;
+  virtual void SetCacheData (void *d) = 0;
+  virtual void GetMeanLighting (int& r, int& g, int& b) = 0;
+  virtual long GetSize () = 0;
+};
+
 struct iPolygon3D : public iBase
 {
   iLightMap *GetLightMap ();
@@ -206,7 +332,7 @@ struct iImage : public iBase
   const char *GetName ();
   int GetFormat ();
   csRGBpixel *GetPalette ();
-  UByte *GetAlpha ();
+  void *GetAlpha ();
   void SetFormat (int iFormat);
   iImage *Clone ();
   iImage *Crop (int x, int y, int width, int height);
@@ -304,4 +430,3 @@ public:
   }
 };
 
-void* GetMyPtr();

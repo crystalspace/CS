@@ -91,7 +91,8 @@ $(OUT)%$O: plugins/cscript/cslua/%.c
 	$(DO.COMPILE.C) $(CFLAGS.LUA)
 
 $(SWIG.CSLUA): $(SWIG.INTERFACE)
-	swiglua -multistate -c++ -o $(SWIG.CSLUA) $(SWIG.INTERFACE)
+	luaswig -shadow -c++ -o $(SWIG.CSLUA) $(SWIG.INTERFACE)
+	mv plugins/cscript/cslua/cspace.lua scripts/lua/
 
 $(CSLUA): $(OBJ.CSLUA) $(LIB.CSLUA)
 	$(DO.PLUGIN.PREAMBLE) \
@@ -116,3 +117,4 @@ endif
 
 endif # ifeq ($(MAKESECTION),targets)
 endif # ifneq (,$(findstring cslua,$(PLUGINS)))
+

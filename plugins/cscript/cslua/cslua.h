@@ -31,9 +31,12 @@ public:
   csLua(iBase *iParent);
   virtual ~csLua();
 
+  static csLua* shared_instance;
   iSystem* Sys;
   int Mode;
   void* Storage;
+
+  void* lua_state;
 
   bool Initialize(iSystem* iSys);
   bool RunText(const char *Text);
@@ -52,8 +55,6 @@ public:
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };
-
-extern csLua *thisclass;
 #endif
 
 

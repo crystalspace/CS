@@ -8,7 +8,7 @@ except:
     	print "WARNING: Failed to import module cspace"
 
 def CreateRoom(matname):
-	print 'Start creating polygons...'
+	print 'Start creating polygons from Python script...'
 	engine = system.Query_iEngine()
 	room = engine.FindSector("room")
 	walls = engine.CreateSectorWallsMesh(room,"walls")

@@ -179,6 +179,8 @@ self.z
 
 csVector3(x,y,z)
 
+del this
+
 1.4.  class csRGBpixel
 ----------------------
 
@@ -190,18 +192,77 @@ self.blue
 
 self.alpha
 
-1.5.  class iPlugin
+1.5.  class csPixelFormat
+-------------------------
+
+self.RedMask
+
+self.GreenMask
+
+self.BlueMask
+
+self.RedShift
+
+self.GreenShift
+
+self.BlueShift
+
+self.RedBits
+
+self.GreenBits
+
+self.BlueBits
+
+self.PalEntries
+
+self.PixelBytes
+
+1.6.  class csGraphics3DCaps
+----------------------------
+
+self.CanClip
+
+self.minTexHeight
+
+self.minTexWidth
+
+self.maxTexHeight
+
+self.maxTexWidth
+
+self.fog
+
+self.NeedsPO2Maps
+
+self.MaxAspectRatio
+
+1.7.  class csImageArea
+-----------------------
+
+self.x
+
+self.y
+
+self.w
+
+self.h
+
+self.data
+
+csImageArea(sx,sy,sw,sh)
+
+1.8.  class iPlugin
 -------------------
 
 Initialize(iSys)
 
 HandleEvent(iEvent *)
 
-1.6.  class iTextureWrapper
+1.9.  class iTextureWrapper
 ---------------------------
 
-1.7.  class iTextureHandle
---------------------------
+1.10.  class iTextureHandle
+---------------------------
 
 GetMipMapDimensions(mipmap,mw,mh)
 
@@ -213,8 +274,8 @@ SetCacheData(d)
 
 GetPrivateObject()
 
-1.8.  class iMaterialHandle
----------------------------
+1.11.  class iMaterialHandle
+----------------------------
 
 GetTexture()
 
@@ -224,12 +285,131 @@ GetReflection(oDiffuse,oAmbient,oReflection)
 
 Prepare()
 
-1.9.  class iMaterialWrapper
-----------------------------
+1.12.  class iMaterialWrapper
+-----------------------------
 
 GetMaterialHandle()
 
-1.10.  class iGraphics3D
+1.13.  class iFont
+------------------
+
+SetSize(iSize)
+
+GetSize()
+
+GetMaxSize(oW,oH)
+
+GetGlyphSize(c,oW,oH)
+
+GetGlyphBitmap(c,oW,oH)
+
+GetDimensions(text,oW,oH)
+
+GetLength(text,maxwidth)
+         typedef void (*DeleteNotify) (iFont *, void *);
+         virtual void AddDeleteCallback (DeleteNotify func, void *databag) = 0;
+         virtual bool RemoveDeleteCallback (DeleteNotify func, void *databag) = 0;
+        
+1.14.  class iFontServer
+------------------------
+
+LoadFont(filename)
+
+GetFontCount()
+
+GetFont(iIndex)
+
+1.15.  class iGraphics2D
+------------------------
+
+Open(Title)
+
+Close()
+
+GetWidth()
+
+GetHeight()
+
+GetFullScreen()
+
+GetPage()
+
+DoubleBuffer(Enable)
+
+GetDoubleBufferState()
+
+GetPixelFormat()
+
+GetPixelBytes()
+
+GetPalEntryCount()
+
+GetPalette()
+
+SetRGB(i,r,g,b)
+
+SetClipRect(nMinX,nMinY,nMaxX,nMaxY)
+
+GetClipRect(nMinX,nMinY,nMaxX,nMaxY)
+
+BeginDraw()
+
+FinishDraw()
+
+Print(pArea)
+
+Clear(color)
+
+ClearAll(color)
+
+DrawLine(x1,y1,x2,y2,color)
+
+DrawBox(x,y,w,h,color)
+
+ClipLine(x1,y1,x2,y2,xmin,ymin,xmax,ymax)
+
+DrawPixel(x,y,color)
+
+GetPixelAt(x,y)
+
+GetPixel(x,y,oR,oG,oB)
+
+SaveArea(x,y,w,h)
+
+RestoreArea(Area,Free)
+
+FreeArea(Area)
+
+Write(font,x,y,fg,bg,str)
+
+GetFontServer()
+
+SetMousePosition(x,y)
+
+SetMouseCursor(iShape)
+         virtual bool PerformExtension (char const* command, ...) = 0;
+         virtual bool PerformExtensionV (char const* command, va_list) = 0;
+        
+ScreenShot()
+
+CreateOffScreenCanvas(width,height,buffer,alone_hint,ipfmt,palette,pal_size)
+
+AllowCanvasResize(iAllow)
+
+1.16.  class iHalo
+------------------
+
+GetWidth()
+
+GetHeight()
+
+SetColor(iR,iG,iB)
+
+GetColor(oR,oG,oB)
+
+Draw(x,y,w,h,iIntensity,iVertices,iVertCount)
+
+1.17.  class iGraphics3D
 ------------------------
 
 Open(Title)
@@ -293,32 +473,53 @@ CreateHalo(iR,iG,iB,iAlpha,iWidth,iHeight)
 
 DrawPixmap(hTex,sx,sy,sw,sh,tx,ty,tw,th)
 
-1.11.  class iCamera
+1.18.  class iCamera
 --------------------
 
 GetFOV()
 
 GetInvFOV()
 
-1.12.  class iSector
+1.19.  class iSector
 --------------------
 
-1.13.  class iThingState
+1.20.  class iThingState
 ------------------------
 
 CreatePolygon(name)
 
-1.14.  class iMeshObject
+1.21.  class iMeshObject
 ------------------------
 
 Query_iThingState()
 
-1.15.  class iMeshWrapper
+1.22.  class iMeshWrapper
 -------------------------
 
 GetMeshObject()
 
-1.16.  class iPolygon3D
+1.23.  class iLightMap
+----------------------
+
+GetMapData()
+
+GetWidth()
+
+GetHeight()
+
+GetRealWidth()
+
+GetRealHeight()
+
+GetCacheData()
+
+SetCacheData(d)
+
+GetMeanLighting(r,g,b)
+
+GetSize()
+
+1.24.  class iPolygon3D
 -----------------------
 
 GetLightMap()
@@ -351,7 +552,7 @@ SetPlane(iName)
 
 SetTextureSpace(v_orig,v1,len1)
 
-1.17.  class iImage
+1.25.  class iImage
 -------------------
 
 GetImageData()
@@ -382,7 +583,7 @@ Clone()
 
 Crop(x,y,width,height)
 
-1.18.  class iTextureManager
+1.26.  class iTextureManager
 ----------------------------
 
 RegisterTexture(image,flags)
@@ -403,7 +604,7 @@ SetVerbose(vb)
 
 GetTextureFormat()
 
-1.19.  class iPolygonTexture
+1.27.  class iPolygonTexture
 ----------------------------
 
 GetMaterialHandle()
@@ -443,10 +644,10 @@ GetCacheData(idx)
 
 SetCacheData(idx,d)
 
-1.20.  class iCameraPosition
+1.28.  class iCameraPosition
 ----------------------------
 
-1.21.  class iSectorList
+1.29.  class iSectorList
 ------------------------
 
 GetSectorCount()
@@ -459,7 +660,7 @@ RemoveSector(sec)
 
 FindByName(name)
 
-1.22.  class iEngine
+1.30.  class iEngine
 --------------------
 
 GetTextureFormat()
@@ -486,7 +687,7 @@ CreateSectorWallsMesh(sector,name)
 
 GetSectors()
 
-1.23.  class iSystem
+1.31.  class iSystem
 --------------------
 
 Query_iEngine()
@@ -494,8 +695,4 @@ Query_iEngine()
 Query_iGraphics3D()
 
 Print(mode,format)
-
-----------
-
-GetMyPtr()
 

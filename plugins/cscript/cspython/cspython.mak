@@ -32,7 +32,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+# For custom compiled python with tk/tcl
 #TCLTK=-ltk8.0 -ltcl8.0 -L/usr/X11R6/lib -lX11
+
+# For python 2.0+
+#LIBUTIL=-lutil
+
 ifneq ($(OS),NEXT)
 PTHREAD=-lpthread
 endif
@@ -52,7 +57,7 @@ ifneq (,$(strip $(PYTHON_LIB)))
   # "libpython1.5.a".
   LIBS.CSPYTHON.SYSTEM = \
     $(LFLAGS.L)$(PYTHON_LIB)/config $(LFLAGS.L)$(PYTHON_LIB) \
-    $(LFLAGS.l)$(notdir $(PYTHON_LIB)) $(TCLTK) $(PTHREAD)
+    $(LFLAGS.l)$(notdir $(PYTHON_LIB)) $(TCLTK) $(PTHREAD) $(LIBUTIL)
 endif
 endif
 
