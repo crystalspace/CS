@@ -45,6 +45,9 @@
 #elif defined(OS_LINUX) && defined(COMP_GCC)
 #include "ext_mesa.inc"
 
+#elif defined(OS_MACOS)
+#include "ext_mesa.inc"
+
 // Default no extensions...
 #else
 #undef USE_EXTENSIONS
