@@ -202,7 +202,12 @@ void csBugPlug::SetupPlugin ()
 
   if (!Engine) Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
+#ifdef CS_USE_NEW_RENDERER
+  if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iRender3D);
+#else
   if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+#endif
+
   if (!G3D)
   {
     initialized = true;
@@ -367,6 +372,7 @@ void csBugPlug::HideSpider (iCamera* camera)
   }
 }
 
+#ifndef CS_USE_NEW_RENDERER
 void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
 {
   if (!G3D) return;
@@ -384,6 +390,7 @@ void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
     	name);
   }
 }
+#endif
 
 void csBugPlug::MouseButton1 (iCamera*)
 {
@@ -746,6 +753,7 @@ bool csBugPlug::EatKey (iEvent& event)
         Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug %s screen clearing.",
 	  	do_clear ? "enabled" : "disabled");
         break;
+#ifndef CS_USE_NEW_RENDERER
       case DEBUGCMD_EDGES:
         ToggleG3DState (G3DRENDERSTATE_EDGES, "edge drawing");
         break;
@@ -816,6 +824,7 @@ bool csBugPlug::EatKey (iEvent& event)
           EnterEditMode (cmd, "Enter new gamma:", buf);
 	}
         break;
+#endif
       case DEBUGCMD_DBLBUFF:
         {
 	  bool state = G2D->GetDoubleBufferState ();
@@ -1084,8 +1093,10 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
   if (visculler)
   {
     csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (visculler, iDebugHelper));
+#ifndef CS_USE_NEW_RENDERER   
     if (dbghelp)
       dbghelp->Dump (G3D);
+#endif
   }
 
   if (debug_sector.show)

@@ -177,7 +177,9 @@ private:
   void Report (int severity, const char* msg, ...);
 
   /// Toggle a G3D boolean option.
+#ifndef CS_USE_NEW_RENDERER
   void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
+#endif
 
   /// The selected mesh.
   iMeshWrapper* selected_mesh;
