@@ -36,6 +36,12 @@ chronological order.
 	  configure to configure.ac where it belongs so that it won't get
 	  clobbered the next time someone re-generates configure from
 	  configure.ac.
+	- Eric Sunshine fixed the sed invocation in static.mak which emits the
+	  #ifdef/#endif around SCF_REGISTER_FACTORY_FUNC().  Problem was that
+	  'make' was eating the newlines in the sed expression, causing the
+	  output to appear all on one line.
+	- Eric Sunshine fixed bug in static.mak.  It was not cleaning up the
+	  files it created when the 'clean' target was invoked.
 1-Feb-2004
 	- Eric Sunshine applied a couple small patches from Randall Foreman
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration

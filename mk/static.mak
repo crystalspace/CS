@@ -1,7 +1,7 @@
 #==============================================================================
 #
 #    Automatic symbolic reference generation makefile
-#    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000,2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU Library General Public
@@ -88,6 +88,7 @@ ifeq ($(MAKESECTION),postdefines)
 DIR.LIBREF = $(OUTDERIVED)
 SRC.LIBREF = $(DIR.LIBREF)/cslibref.cpp
 OBJ.LIBREF = $(addprefix $(OUT)/,$(notdir $(SRC.LIBREF:.cpp=$O)))
+SED.LIBREF = $(DIR.LIBREF)/cslibref-reg.sed
 
 # List of resources to monitor for changes.  If any of these resources change,
 # then the file referenced by SRC.LIBREF will be regenerated.
@@ -132,11 +133,7 @@ define LIBREF.BODY
   $(SED) 's:\\:\\\\:g;s:":\\":g;s:\(.*\):"\1":' < $(INF.$(strip $(UPCASE_V))) >>$(SRC.LIBREF)
   echo $";$">>$(SRC.LIBREF)
   echo $"SCF_REGISTER_STATIC_LIBRARY($r,$(r)_metainfo)$">>$(SRC.LIBREF)
-  #$(SED) '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  SCF_REGISTER_FACTORY_FUNC(\1):g' < $(INF.$(strip $(UPCASE_V))) >>$(SRC.LIBREF)
-  $(SED) '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  #ifndef \1_FACTORY_REGISTERED \
-  #define \1_FACTORY_REGISTERED \
-    SCF_REGISTER_FACTORY_FUNC(\1) \
-  #endif:g' < $(INF.$(strip $(UPCASE_V))) >>$(SRC.LIBREF)
+  $(SED) -f $(SED.LIBREF) < $(INF.$(strip $(UPCASE_V))) >>$(SRC.LIBREF)
   echo $"$">>$(SRC.LIBREF)
 
 endef
@@ -147,7 +144,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),targets)
 
 # Rule to synthesize SRC.LIBREF.
-$(SRC.LIBREF): $(DEP.LIBREF.EXTRA) $(DIR.LIBREF)
+$(SRC.LIBREF): $(DEP.LIBREF.EXTRA) $(SED.LIBREF) $(DIR.LIBREF)
 	-$(RM) $(SRC.LIBREF)
 	@$(LIBREF.CONTENT)
 	@echo "Generated $(SRC.LIBREF)"
@@ -155,5 +152,19 @@ $(SRC.LIBREF): $(DEP.LIBREF.EXTRA) $(DIR.LIBREF)
 # Rule to compile SRC.LIBREF into OBJ.LIBREF.
 $(OBJ.LIBREF): $(SRC.LIBREF)
 	$(DO.COMPILE.CPP)
+
+# Rule to create 'sed' script for transforming <implementation> class names
+# into invocations of SCF_REGISTER_FACTORY_FUNC() and related macros. 
+$(SED.LIBREF):
+	@echo $"/<implementation>/!d$">$(SED.LIBREF)
+	@echo $"s:[ 	]*<implementation>\(..*\)</implementation>:#ifndef \1_FACTORY_REGISTERED\$">>$(SED.LIBREF)
+	@echo $"#define \1_FACTORY_REGISTERED\$">>$(SED.LIBREF)
+	@echo $"SCF_REGISTER_FACTORY_FUNC(\1)\$">>$(SED.LIBREF)
+	@echo $"#endif:g$">>$(SED.LIBREF)
+
+.PHONY: cslibrefclean
+clean: cslibrefclean
+cslibrefclean:
+	-$(RM) $(SRC.LIBREF) $(OBJ.LIBREF) $(SED.LIBREF)
 
 endif # ifeq ($(MAKESECTION),targets)
