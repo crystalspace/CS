@@ -111,6 +111,9 @@ bool csOggSoundData::Initialize(const csSoundFormat *fmt)
   if (!ogg_ok)
   {
     ogg_ok = ov_open_callbacks(ds, &vf, NULL, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
+    vorbis_info *vi=ov_info(&vf,-1);
+    this->fmt.Channels = vi->channels;
+    this->fmt.Freq = vi->rate;
     if (fmt->Channels != -1)
       this->fmt.Channels = fmt->Channels;
     if (fmt->Freq != -1)
@@ -158,20 +161,39 @@ void csOggSoundData::ResetStreamed()
 
 void *csOggSoundData::ReadStreamed(long &NumSamples)
 {
+  uint8 *write_ptr;
   if (ogg_ok)
   {
+    // Calculate the size needed to buffer the number of samples requested
     size_t buffersize = NumSamples * (fmt.Bits >> 3) * fmt.Channels;
-
+    // Increase the size of the current buffer if needed
     if (buffersize > len)
     {
       buf = (uint8*) realloc (buf, buffersize);
       len = buffersize;
     }
-  
-    size_t bytes_read = ov_read (&vf, (char*)buf, buffersize, endian,
+    size_t bytes_read=1;
+    write_ptr=buf;
+
+    // NumSamples is to be filled with the number of samples actually read
+    NumSamples=0;
+
+    /*  ov_read decodes at most a single Ogg packet.
+     * 
+     *  Continue reading until no more can be read (end of stream)
+     *   or the requested number of samples have been read.
+     *
+     */
+    while (bytes_read && buffersize)
+    {
+      
+      bytes_read = ov_read (&vf, (char *)write_ptr, buffersize, endian,
 			       fmt.Bits>>3, 1, &current_section);
 
-    NumSamples = bytes_read / ((fmt.Bits >> 3) * fmt.Channels);
+      NumSamples += bytes_read / ((fmt.Bits >> 3) * fmt.Channels);
+      buffersize-=bytes_read;
+      write_ptr += bytes_read;
+    }
     return buf;
   }
 

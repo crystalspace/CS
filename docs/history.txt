@@ -4,7 +4,13 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 5-Apr-2003
-	- Rhad removed double include protection from 
+	- Rhad fixed some issues with oggdata.cpp.
+          Initialize() member function now handles channels and frequency
+          requests of default (-1).
+          ReadStreamed() member function now conforms to iSoundData specs
+          and only returns less than the requested number of samples if
+          end of stream is reached.
+        - Rhad removed double include protection from 
           /include/ivideo/effects/effectstrings.h since that file needs to
           be included twice in a row with macro redefinitions to work
           correctly.  Fixes rendering errors with OpenGL using certain
