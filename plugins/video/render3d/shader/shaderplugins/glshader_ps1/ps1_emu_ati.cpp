@@ -59,16 +59,13 @@ void csShaderGLPS1_ATI::Deactivate()
 void csShaderGLPS1_ATI::SetupState (csRenderMesh *mesh, 
 	const CS_SHADERVAR_STACK &stacks)
 {
-  int i;
-  const csGLExtensionManager* ext = shaderPlug->ext;
-
   // set variables
-  for(i = 0; i < variablemap.Length(); ++i)
+  for(int i = 0; i < variablemap.Length(); ++i)
   {
     // Check if it's statically linked
     csRef<csShaderVariable> lvar = variablemap[i].statlink;
     // If not, we check the stack
-    if (!lvar && variablemap[i].name<stacks.Length ()
+    if (!lvar && (int)variablemap[i].name<stacks.Length ()
         && stacks[variablemap[i].name].Length () > 0)
       lvar = stacks[variablemap[i].name].Top ();
 
@@ -77,6 +74,7 @@ void csShaderGLPS1_ATI::SetupState (csRenderMesh *mesh,
       csVector4 v4;
       if (lvar->GetValue (v4))
       {
+        // const csGLExtensionManager* ext = shaderPlug->ext;
         //ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, 
         //  variablemap[i].registernum, &v4.x);
       }

@@ -75,7 +75,7 @@ void csShaderGLPS1_NV::SetupState (csRenderMesh *mesh,
     // Check if it's statically linked
     csRef<csShaderVariable> lvar = variablemap[i].statlink;
     // If not, we check the stack
-    if (!lvar && variablemap[i].name<stacks.Length ()
+    if (!lvar && (int)variablemap[i].name<stacks.Length ()
         && stacks[variablemap[i].name].Length () > 0)
       lvar = stacks[variablemap[i].name].Top ();
 
@@ -334,9 +334,9 @@ bool csShaderGLPS1_NV::GetNVInstructions(csArray<nv_combiner_stage> &stages,
     // Convert the PS1.x registers to NV_r_c equivalents
     for(int j=0;j<4;j++)
     {
-      csPSRegisterType in_reg;
-      int in_num;
-      GLenum *out = NULL;
+      csPSRegisterType in_reg = CS_PS_REG_NONE;
+      int in_num = 0;
+      GLenum *out = 0;
       switch(j)
       {
       case 0:
@@ -378,6 +378,8 @@ bool csShaderGLPS1_NV::GetNVInstructions(csArray<nv_combiner_stage> &stages,
         if(in_num == 0) *out = GL_PRIMARY_COLOR_NV;
         else *out = GL_SECONDARY_COLOR_NV;
         break;
+      default:
+	break;
       }
 
       // Get the src register modifiers

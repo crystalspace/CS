@@ -33,6 +33,8 @@ chronological order.
 	  is still the default behavior.
 	- Eric Sunshine eliminated a few compilation warnings about potentially
 	  uninitialize variables in glfontcache.cpp
+	- Eric Sunshine eliminated a slew of compilation warnings from the new
+	  glshader_ps1 plugin.
 1-Mar-2004
 	- res augmented the Win32 canvas to allow retrieval/setting of the
 	  window rectangle (via PerformExtension()).

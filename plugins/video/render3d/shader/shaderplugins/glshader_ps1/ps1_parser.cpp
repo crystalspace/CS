@@ -284,7 +284,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
 
   csString istr;
   line.SubString (istr, 0, line.FindFirst (' '));
-  csStringID inst_id = -1;
+  csStringID inst_id = (csStringID)~0;
 
   if(!strcmp(istr, "def"))
   {
@@ -329,7 +329,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 
       "Pixel Shader version %s does not support instruction '%s'",
-      version_string, istr.GetData ());
+      version_string.GetData (), istr.GetData ());
     return false;
   }
   if(!PS_Instructions[i].supported)
@@ -391,7 +391,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Destination register out of range, max for version '%s' is '%d'!",
-      version_string,
+      version_string.GetData(),
       max_registers[inst.dest_reg]);
     return false;
   }
@@ -438,7 +438,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     {
       Report (CS_REPORTER_SEVERITY_ERROR,
         "Source register out of range, max for version '%s' is '%d'!",
-        version_string,
+        version_string.GetData(),
         max_registers[inst.src_reg[j]]);
       return false;
     }
