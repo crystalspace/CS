@@ -704,6 +704,7 @@ The history order is reversed so that new features are at the top.
 	  manager so that it hopefully works. Fixed the discardingsystem.
 	- Marten also began implementing shader loading.
 4-Feb-2003
+	- Release of CS 0.96r002.
 	- Eric Sunshine augmented the ODE check in configure.ac so that it
 	  works in two phases.  First it checks for libode.  Second, it checks
 	  if the installed libode is sufficiently recent.  This approach will
@@ -731,7 +732,6 @@ The history order is reversed so that new features are at the top.
 	  (almost twice as fast).
 	- Daniel also added light parameter to DrawShadow() for optimization
 	  purposes.
-	- Release of CS 0.96r002.
 3-Feb-2003
 	- Eric Sunshine replaced fabsf() with fabs() in terrbig plugin for
 	  improved portability since not all platforms have fabsf().  (An
