@@ -288,7 +288,7 @@ bool csGetKeyDesc (int key, int shift, char *buf, bool use_shift)
 {
   csEvent ev (0, csevKeyDown,
     key >= CSKEY_FIRST && key <= CSKEY_LAST ? key : 0,
-    key < 256 && key > 0 ? 0 : key,
+    key < 256 && key > 0 ? key : 0,
     shift);
   return csGetInputDesc (ev, buf, use_shift);
 }

@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+28-Jun-2003
+	- DeSigna fixed a small logic error in csGetKeyDesc(), where
+	  a ?: conditional had its values the wrong way round.
 27-Jun-2003
 	- Jorrit fixed a bug in genmesh where it would not initialize
 	  normals to 0 if <autonormals/> was not used. The result would
