@@ -3,6 +3,7 @@ The history order is reversed so that new features are at the top.
 6-Oct-2002
 	- Eric Sunshine upgraded CS/docs/texinfo/texinfo.tex to the most recent
 	  version.
+	- Eric Sunshine enabled automated MSVC7 project file generation.
 4-Oct-2002
         - Jonathan Tarbox added a SquaredNorm() member function to the
           csDVector class
