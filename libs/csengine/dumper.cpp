@@ -312,7 +312,7 @@ void Dumper::dump (csBspTree* tree, csBspNode* node, int indent)
     if (node->polygons.GetPolygon (i)->GetType () == 1)
     {
       csPolygon3D* p = (csPolygon3D*)node->polygons.GetPolygon (i);
-      CsPrintf (MSG_DEBUG_0, "%s  %d='%s'\n", spaces, i, p->GetName ());
+      CsPrintf (MSG_DEBUG_0, "%s  %d='%s'\n", spaces, i, p->GetName () ? p->GetName () : "<noname>");
     }
   }
   if (node->front || node->back)

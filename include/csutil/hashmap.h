@@ -107,7 +107,10 @@ public:
   bool HasNext ();
   /// Get the next element.
   csHashObject Next ();
-  /// Delete next element and fetches new one.
+  /**
+   * Delete next element and fetches new one.
+   * @@@ Not implemented yet!
+   */
   void DeleteNext ();
 };
 
@@ -182,6 +185,58 @@ public:
    * Delete all objects from this map.
    */
   void DeleteAll ();
+};
+
+/**
+ * This class implements a basic set for objects.
+ * You can basicly use this to test for the occurance
+ * of some object quickly.
+ */
+class csHashSet
+{
+private:
+  csHashMap map;
+
+public:
+  /// Construct a new empty set.
+  csHashSet ();
+
+  /**
+   * Add an object to this set.
+   * This will do nothing is the object is already here.
+   */
+  void Add (csHashObject object);
+
+  /**
+   * Add an object to this set.
+   * This function does not test if the object is already
+   * there. This is used for efficiency reasons. But use
+   * with care!
+   */
+  void AddNoTest (csHashObject object);
+
+  /**
+   * Test if an object is in this set.
+   */
+  bool In (csHashObject object);
+
+  /**
+   * Get an iterator to iterate over all objects
+   * in this set.
+   */
+  csHashIterator* GetIterator ();
+
+  /**
+   * Delete all elements in the set.
+   */
+  void DeleteAll ();
+
+  /**
+   * Delete an object from the set. This function
+   * does nothing if the object is not in the set.
+   * @@@ Not implemented yet!
+   */
+  void Delete (csHashObject object);
 };
 
 #endif //_CS_HASHMAP_H

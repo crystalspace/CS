@@ -163,3 +163,54 @@ void csHashMap::DeleteAll ()
     buckets.Delete (b);
 }
 
+//---------------------------------------------------------------------------
+
+csHashSet::csHashSet ()
+{
+}
+
+void csHashSet::Add (csHashObject object)
+{
+  if (In (object)) return;
+  AddNoTest (object);
+}
+
+void csHashSet::AddNoTest (csHashObject object)
+{
+  csHashKey key = (csHashKey)object;
+  map.Put (key, object);
+}
+
+bool csHashSet::In (csHashObject object)
+{
+  csHashKey key = (csHashKey)object;
+  csHashIterator* it = map.GetIterator (key);
+  while (it->HasNext ())
+  {
+    csHashObject obj = it->Next ();
+    if (obj == object)
+    {
+      delete it;
+      return true;
+    }
+  }
+  delete it;
+  return false;
+}
+
+csHashIterator* csHashSet::GetIterator ()
+{
+  return map.GetIterator ();
+}
+
+void csHashSet::DeleteAll ()
+{
+  map.DeleteAll ();
+}
+
+void csHashSet::Delete (csHashObject /*object*/)
+{
+}
+
+//---------------------------------------------------------------------------
+

@@ -1,6 +1,19 @@
 The history order has been reversed so that new features are at the top.
 
+12-Jul-2000
+	- Added new csHashSet class. This is a class that you can use
+	  to add objects and to test if some object is already in the
+	  set. It uses csHashMap so it should be fairly quick.
+	- Use the new thing visibility system for lighting too. This
+	  should speed up the calculation of static lighting a lot
+	  (and dynamic lighting if things cast shadows). This new system
+	  uses the csHashSet class from above.
+	- Greatly cleaned up the csSector::RealCheckFrustum() code and
+	  added some comments.
+	- Fixed a small bug in engine/Dumper where it crashes for polygons
+	  having no name.
 11-Jul-2000
+	- Paul Garceau did an update to the Mingw makefile.
 	- Andrew Zabolotny did some fixes to dos configuration batch
 	  files.
 	- Seth Galbraith fixed one of the files that Andrew fixed.
