@@ -30,15 +30,15 @@ Use this option to set the size of the display.
 Use this option to select the type of 2D canvas to use.
 
 @item -video=opengl
-(or direct3d, software, ...).
+(or software, ...).
 Use this option to select type of display driver to use.  Other options
-are @code{software}, @code{direct3d}, etc.
+are @code{software}, @code{null}, etc.
 
 @item -relight
 Use this option to recalculate all lightmaps after you changed lighting
 or geometry in a level that you're trying. If you don't do this you either
 get the old lightmaps or no lightmaps at all.
 
-@item @emph{FIXME}
+@item @emph{@@@@@@FIXME}
 Document the remaining common command line options.
 @end table

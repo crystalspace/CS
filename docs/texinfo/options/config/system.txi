@@ -1,4 +1,4 @@
-@node Config System, Config Graphics, Configuration File, Configuration File
+@node Config System, Config Graphics, Specific Options, Specific Options
 @subsection System Configuration
 @cindex Configuration, System
 
@@ -81,5 +81,5 @@ Apart from the list of plug-in modules, the following keys are recognized:
 @table @code
 @item System.UserConfig = true
 Specifies whether or not user-specific configuration information should be
-used and maintained. @xref{Platform peruser}.
+used and maintained. @xref{Config PerUser}.
 @end table

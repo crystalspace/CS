@@ -1,4 +1,4 @@
-@node Config Console, Config Mouse, Config Sound, Configuration File
+@node Config Console, Config Mouse, Config Sound, Specific Options
 @subsection Console Configuration
 @cindex Configuration, Console
 

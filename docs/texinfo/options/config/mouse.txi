@@ -1,4 +1,4 @@
-@node Config Mouse, , Config Console, Configuration File
+@node Config Mouse, , Config Console, Specific Options
 @subsection Mouse Configuration
 @cindex Configuration, Mouse
 

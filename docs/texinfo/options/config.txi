@@ -1,115 +1,33 @@
 @c -*-texinfo-*-
-@node Configuration File, Platform peruser, Common Command Line Options, Options
+@node Configuration File, Config Domains, Common Command Line Options, Options
 @section Configuration File
 @cindex Configuration File
 
 Many applications have an accompanying configuration file which describes
-configuration options specific to that application.  Similarly, some plug-in
-modules have have a configuration file.  Configuration files are named with the
-file extension @file{.cfg} and are typically located within the virtual
-directory @file{/config/} which is often mounted at the physical location
-@file{CS/data/config} for Crystal Space sample applications.
+configuration options specific to that application.  Similarly, plug-in
+modules can have configuration files.  Configuration files are named with the
+file extension @file{.cfg} and are typically located within the @sc{vfs}
+virtual directory @file{/config/} (@pxref{VFS}) which is often mounted at the
+physical location @file{CS/data/config} for Crystal Space sample applications.
 
 The format of these files is simple. They consist of a number of @dfn{keys},
-each of which consists of a name, a value and an optional comment. Key names
-contain dots to create sort of hierarchy, similar to a file system:
-@samp{Video.OpenGL.EnableDither}. This should be interpreted as the key
-@samp{EnableDither} in the sub-section @samp{OpenGL.}, which resides in
-section @samp{Video.} (note that the dots are part of the section names).
+each of which consists of a name, a @dfn{value} and an optional comment.  Key
+names contain dots to create a pseudo-hierarchy, similar to a file system; for
+example: @samp{Video.OpenGL.EnableDither}.  This should be interpreted as the
+@samp{EnableDither} option in the sub-section @samp{OpenGL.}, which resides in
+section @samp{Video.} (note that the dots are part of the key name).
 
-The file itself looks like this:
+The file itself looks something like this:
 
 @example
-; This is the comment for Section.Keyname
+; This is the comment for the first batch of keys.
 Section.Keyname = Value
 ; Comments may be
 ; several lines long
-; The option 'Section.TestOption' has no comment attached to it.
+; The option 'Section.TestOption' (below) has no attached comment.
 Video.OpenGL.EnableDither = true
 Section.TestOption = false
 ; Comments at the end of the file do not belong to any configuration
 ; key. When a config file is loaded and saved again later this
-; end-of-file comment is put back at the end of the config file.
+; end-of-file comment is retained at the end of the file.
 @end example
-
-When you run an application, all configuration domains are combined to one
-big database of options. When this happens, options from higher-priority
-domains override options from lower-priority domains. These domains are (from
-low to high priority):
-
-@itemize @bullet
-@item
-Plug-In configuration files, such as @file{CS/data/config/opengl.cfg}. These
-files define the default values for the plug-in configuration.
-
-@item
-The application configuration file. This is the file which you specify in
-@code{@var{System}->Initialize(argc, argv, @var{ConfigFile})}. This file
-defines the default values for the application configuration, and can
-override the configuration for plug-in modules if an application requires
-this.
-
-@item
-The user-specific, application-neutral domain. This domain only makes sense
-in a multi-user environment, thus you can disable it in @file{system.cfg} or
-in the application configuration file by setting the @samp{System.UserConfig}
-to @samp{false}, however it rarely hurts to leave this option enabled, so
-you probably should not need to disable it unless you have a very specific
-reason for doing so.
-
-This domain is intended for users who want to override the configuration from
-the lower-priority domains explained above. This is an application-neutral
-domain, so any options you define here are used by all applications for the
-current user.
-
-It is stored in a platform-dependent manner.  @xref{Platform peruser}.  The
-@emph{unique identifier} is @samp{CrystalSpace.Global}.
-
-@item
-The user-specific, application-specific domain. This domain works like the
-application-neutral user domain, except that it is not application-neutral.
-A user may set options in this domain, for example, if he wants different
-screen size settings for different applications.
-
-It is stored in a platform-dependent manner.  @xref{Platform peruser}.  The
-@emph{unique identifier} is @var{<ApplicationID>}, where @var{<ApplicationID>}
-is defined in the user-neutral, application-specific configuration file (i.e.
-@file{walktest.cfg}).
-
-It is strongly recommended that an application identifier always have the form 
-@samp{<Producer>.<ProductName>}. If the application is a tool that is only 
-meaningful if used together with CrystalSpace, or if you think your name is 
-not worthy enough to be used in such an exposed place as the 
-per-user configuration, you can also use something generic like 
-@samp{CrystalSpaceApp} or just @samp{CrystalSpace} (the latter one is also
-used by CrystalSpace itself, so be wary of possible conflicts).
-
-@item
-The command-line parameters. @strong{Note}: This is not yet implemented.
-@end itemize
-
-Thus you can set any option in your application's configuration file to
-override options from the plug-in configuration files.  And you can also
-override those options via the user configuration.
-
-If the application changes options in the configuration database, these changes
-are always applied to the user-specific, application-specific domain.  The only
-exception is when an application disable user configuration altogether, in
-which case the changes are applied to the user-neutral, application-specific
-configuration.
-
-@menu
-* Config System:: System Configuration
-* Config Graphics:: Graphics Configuration
-* Config Engine:: Engine Configuration
-* Config Sound:: Sound Configuration
-* Config Console:: Console Configuration
-* Config Mouse:: Mouse Configuration
-@end menu
-
-@importss{options,config,system.txi}
-@importss{options,config,graphics.txi}
-@importss{options,config,engine.txi}
-@importss{options,config,sound.txi}
-@importss{options,config,console.txi}
-@importss{options,config,mouse.txi}

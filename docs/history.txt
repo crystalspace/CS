@@ -43,6 +43,11 @@ chronological order.
 	- Jorrit eliminated another 12 bytes per polygon and then another
 	  12 bytes for every polygon and pseudo-dynamic light that affects
 	  the polygon.
+	- Eric Sunshine rewrote almost completely the configuration section of
+	  the user manual.  Expanded discussion of configuration domains and
+	  how priority-based system works.  Added missing material.  Clarified
+	  existing material.  Added section detailing MacOS/X-specific storgage
+	  of user-specific settings via NSUserDefaults.
 13-Oct-2003
 	- Eric Sunshine eliminated several compilation warnings from Walktest.
 	- Jorrit fixed phystut for the latest polygon changes.
