@@ -5,6 +5,9 @@
  * All other files should include this one.
  */
 
+#ifndef __#PROJECTNAME#_h
+#define __#PROJECTNAME#_h
+
 /* We expect to use Crystal Space everywhere. */
 #include <cssysdef.h>
 
@@ -16,3 +19,5 @@
 #endif
 
 /* Insert additional project-specific declarations here. */
+
+#endif // __#PROJECTNAME#_h
