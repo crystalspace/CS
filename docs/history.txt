@@ -35,6 +35,7 @@ Short-term cleanups that need to be done:
 	  renderers built on BeOS.
 	- Eric Sunshine fixed bug in parsing of submenu from next.cfg which
 	  prevented application menu from displaying on MacOS/X Server.
+	- Fixed a memory leak in csVector::SetLength() reported by Denis Dmitriev.
 22-Feb-2000
 	- Gary Haussmann fixed another mipmap bug in the OpenGL rasterizer.
 	  The problem was that the maximum mipmap level required is actually
