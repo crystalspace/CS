@@ -14,6 +14,8 @@ chronological order.
 	- res fixed custom cursors for the X canvases.
 	- Jorrit added support to the simpleformer for adding
 	  additional data maps. Currently unused and untested.
+	- Jorrit added bruteblock, simpleformer, and simpleformerldr to
+	  the walktest_static target.
 7-Oct-2004
 	- Jorrit added a new 'proto' mesh. This is a basic mesh that can
 	  be used to start creating a new mesh. It supports the following

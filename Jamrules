@@ -111,6 +111,9 @@ if $(USE_NEW_RENDERER) = "yes"
     shadermgr
     xmlshader
     chunklod
+    bruteblock
+    simpleformer
+    simpleformerldr
     ;
 }
 else
