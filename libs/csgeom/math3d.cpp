@@ -352,14 +352,14 @@ int csIntersect3::IntersectSegment (csPlane3* planes, int num_planes,
       mod = true;
       Plane (v1, v2, pl, isect, dist);
       v1 = isect;
-      if ((v2 - v1) < .0001) return -1;
+      if ((v2 - v1) < (float).0001) return -1;
     }
     else if (c1 > 0 && c2 < 0)
     {
       mod = true;
       Plane (v1, v2, pl, isect, dist);
       v2 = isect;
-      if ((v2 - v1) < .0001) return -1;
+      if ((v2 - v1) < (float).0001) return -1;
     }
   }
   return mod ? 1 : 0;
