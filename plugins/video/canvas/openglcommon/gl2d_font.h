@@ -16,6 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __GL2D_FONT_H__
+#define __GL2D_FONT_H__
 
 #include "cs2d/common/graph2d.h"
 #include <GL/gl.h>
@@ -82,6 +84,6 @@ class csGraphics2DOpenGLFontServer
     ~csGraphics2DOpenGLFontServer();
 };
 
-
+#endif
 
 
