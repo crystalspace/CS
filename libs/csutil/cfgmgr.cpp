@@ -259,7 +259,7 @@ iConfigFile *csConfigManager::AddDomain(char const* path, iVFS* vfs, int priorit
     int n = FindRemoved(path);
     if (n != -1)
     {
-      iConfigFile *cfg = (iConfigFile*)Removed.Get(n);
+      iConfigFile *cfg = Removed[n];
       AddDomain(cfg, priority);
       FlushRemoved(n);
       return cfg;
@@ -534,31 +534,24 @@ void csConfigManager::RemoveIterator(csConfigManagerIterator *it)
 {
   int n = Iterators.Find(it);
   CS_ASSERT(n != -1);
-  Iterators.Delete(n);
+  Iterators.DeleteIndex(n);
 }
 
 void csConfigManager::FlushRemoved()
 {
-  for (long i=0; i<Removed.Length(); i++)
-  {
-    iConfigFile *cfg = (iConfigFile*)Removed.Get(i);
-    cfg->DecRef();
-  }
   Removed.DeleteAll();
 }
 
 void csConfigManager::FlushRemoved(int n)
 {
-  iConfigFile *cfg = (iConfigFile*)Removed.Get(n);
-  cfg->DecRef();
-  Removed.Delete(n);
+  Removed.Delete (n);
 }
 
 int csConfigManager::FindRemoved(const char *Name) const
 {
   for (long i=0; i<Removed.Length(); i++)
   {
-    iConfigFile *cfg = (iConfigFile*)Removed.Get(i);
+    iConfigFile *cfg = Removed[i];
     if (cfg->GetFileName())
       if (strcmp(cfg->GetFileName(), Name)==0)
         return i;
@@ -571,7 +564,6 @@ void csConfigManager::RemoveDomain(csConfigDomain *d)
   d->Remove();
   if (Optimize && d->Cfg && d->Cfg->GetFileName()!=0 && FindConfig(d->Cfg)==0)
   {
-    d->Cfg->IncRef();
     Removed.Push(d->Cfg);
   }
   delete d;

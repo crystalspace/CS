@@ -16,6 +16,15 @@ for each given day, however, are in normal (ascending) chronological order.
 	    - Replaced 'Iterators' in csConfigFile with
 	      csArray<csConfigIterator>.
 	  This is only the start.
+	- Jorrit performed the next bunch of csVector removal:
+	    - Replaced 'Removed' in csConfigManager with a
+	      csRefArray<iConfigFile>.
+	    - Replaced 'Iterators' in csConfigManager with a
+	      csArray<iConfigIterator*>.
+	    - Replaced 'tags' in csObjectRegistry with a csStringArray.
+	    - Replaced 'registry' in csObjectRegistry with a csArray<iBase*>.
+	    - Replaced 'objects' in csObjectRegistryIterator with a
+	      csRefArray<iBase>.
 27-Jul-2003
 	- Philipp Aumayr added Cubemap and Texture3d Parser/Loader
 	- Marten Svanfeldt made a few changes related to new renderer

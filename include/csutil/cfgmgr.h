@@ -20,7 +20,8 @@
 #define __CS_CFGMGR_H__
 
 #include "iutil/cfgmgr.h"
-#include "csutil/csvector.h"
+#include "csutil/refarr.h"
+#include "csutil/array.h"
 
 /**
  * A configuration manager makes a number of individual configuration files
@@ -197,9 +198,9 @@ private:
   /// list of all domains (including the dynamic domain)
   class csConfigDomain *FirstDomain, *LastDomain;
   /// list of all removed config files (only used in optimize mode)
-  csVector Removed;
+  csRefArray<iConfigFile> Removed;
   /// list of all iterators
-  csVector Iterators;
+  csArray<iConfigIterator*> Iterators;
 
   csConfigDomain *FindConfig(iConfigFile *cfg) const;
   csConfigDomain *FindConfig(const char *name) const;

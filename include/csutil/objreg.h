@@ -23,7 +23,8 @@
 #include <stdio.h>
 #include "iutil/objreg.h"
 #include "csutil/scf.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
+#include "csutil/stringarray.h"
 #include "csutil/scopedmutexlock.h"
 
 /**
@@ -34,8 +35,8 @@ class csObjectRegistry : public iObjectRegistry
 {
 private:
   csRef<csMutex> mutex;
-  csVector registry;
-  csVector tags;
+  csArray<iBase*> registry;
+  csStringArray tags;
   // True when this object is being cleared; prevents external changes.
   bool clearing;
 
