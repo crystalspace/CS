@@ -35,18 +35,26 @@ struct iCameraPosition : public iBase
 {
   /// Get the iObject for this camera position.
   virtual iObject *QueryObject() = 0;
+
+  /// Create a clone this camera position
+  virtual iCameraPosition *Clone () const = 0;
   
+  /// Return the home sector
   virtual const char *GetSector() = 0;
   
+  /// Return the position
   virtual csVector3 GetPosition() = 0;
   
+  /// Return the 'up' vector
   virtual csVector3 GetUpwardVector() = 0;
   
+  /// Return the 'front' vector
   virtual csVector3 GetForwardVector() = 0;
 
   /// Load the camera position into a camera object
   virtual bool Load (iCamera*, iEngine*) = 0;
 
+  /// Set all attributes of the camera position
   virtual void Set (const char *sector, const csVector3 &pos,
       const csVector3 &forward, const csVector3 &upward) = 0;
 };

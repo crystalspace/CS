@@ -52,6 +52,9 @@ struct iTextureWrapper : public iBase
   /// Get the iObject for this texture
   virtual iObject *QueryObject() = 0;
 
+  /// Create a clone this texture wrapper, using the same texture handle
+  virtual iTextureWrapper *Clone () const = 0;
+
   /**
    * Change the base iImage. The changes will not be visible until the
    * texture is registered again.

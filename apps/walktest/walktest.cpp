@@ -581,8 +581,8 @@ void WalkTest::DrawFrameDebug ()
   }
   if (do_show_debug_boxes)
   {
-    extern void DrawDebugBoxes (csCamera* cam, bool do3d);
-    DrawDebugBoxes (view->GetCamera ()->GetPrivateObject (), false);
+    extern void DrawDebugBoxes (iCamera* cam, bool do3d);
+    DrawDebugBoxes (view->GetCamera (), false);
   }
 }
 
@@ -594,8 +594,8 @@ void WalkTest::DrawFrameDebug3D ()
 {
   if (do_show_debug_boxes)
   {
-    extern void DrawDebugBoxes (csCamera* cam, bool do3d);
-    DrawDebugBoxes (view->GetCamera ()->GetPrivateObject (), true);
+    extern void DrawDebugBoxes (iCamera* cam, bool do3d);
+    DrawDebugBoxes (view->GetCamera (), true);
   }
 }
 

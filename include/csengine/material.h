@@ -146,6 +146,8 @@ public:
   csMaterialWrapper (iMaterial* Image);
   /// Construct a csMaterialWrapper from a pre-registered material handle.
   csMaterialWrapper (iMaterialHandle *ith);
+  /// Copy constructor
+  csMaterialWrapper (csMaterialWrapper &);
 
   /**
    * Change the material handle. Note: This will also change the base
@@ -183,6 +185,8 @@ public:
     { return (csMaterialWrapper*)scfParent; }
     virtual iObject *QueryObject()
     { return scfParent; }
+    virtual iMaterialWrapper *Clone () const
+    { return &(new csMaterialWrapper (*scfParent))->scfiMaterialWrapper; }
     virtual void SetMaterialHandle (iMaterialHandle *mat)
     { scfParent->SetMaterialHandle (mat); }
     virtual iMaterialHandle* GetMaterialHandle ()

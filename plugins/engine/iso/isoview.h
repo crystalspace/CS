@@ -122,6 +122,8 @@ public:
 
   //----------- iCamera --------------------------
   virtual csCamera* GetPrivateObject () {return 0;}
+  virtual iCamera* Clone () const
+  { return new csIsoFakeCamera (*this); }
   virtual int GetFOV () const {return fov;}
   virtual float GetInvFOV () const {return invfov;}
   virtual float GetFOVAngle () const {return fovangle;}
@@ -131,6 +133,8 @@ public:
   virtual float GetShiftY () const {return shifty;}
   virtual void SetPerspectiveCenter(float, float) {}
   virtual csOrthoTransform& GetTransform ()
+  { return trans; }
+  virtual const csOrthoTransform& GetTransform () const
   { return trans; }
   virtual void SetTransform (const csOrthoTransform& tr)
   { trans = tr; }
@@ -145,6 +149,7 @@ public:
   virtual void SetMirrored(bool m) {mirror = m;}
   virtual bool GetFarPlane(class csPlane3 &) const {return false;}
   virtual long GetCameraNumber() const {return camnum;}
+  virtual iPolygon3D *GetHit (csVector3 &) {return NULL;}
 
   /// but in isometric space :-)
   virtual void Perspective (const csVector3& v, csVector2& p) const

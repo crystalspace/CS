@@ -449,10 +449,10 @@ void csMeshWrapper::GetTransformedBoundingBox (
 }
 
 float csMeshWrapper::GetScreenBoundingBox (
-	const csCamera& camera, csBox2& sbox, csBox3& cbox)
+	const iCamera *camera, csBox2& sbox, csBox3& cbox)
 {
   csVector2 oneCorner;
-  GetTransformedBoundingBox (camera, cbox);
+  GetTransformedBoundingBox (camera->GetTransform (), cbox);
 
   // if the entire bounding box is behind the camera, we're done
   if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
@@ -469,15 +469,15 @@ float csMeshWrapper::GetScreenBoundingBox (
   }
   else
   {
-    camera.Perspective (cbox.Max (), oneCorner);
+    camera->Perspective (cbox.Max (), oneCorner);
     sbox.StartBoundingBox (oneCorner);
     csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
-    camera.Perspective (v, oneCorner);
+    camera->Perspective (v, oneCorner);
     sbox.AddBoundingVertexSmart (oneCorner);
-    camera.Perspective (cbox.Min (), oneCorner);
+    camera->Perspective (cbox.Min (), oneCorner);
     sbox.AddBoundingVertexSmart (oneCorner);
     v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
-    camera.Perspective (v, oneCorner);
+    camera->Perspective (v, oneCorner);
     sbox.AddBoundingVertexSmart (oneCorner);
   }
 
@@ -524,8 +524,7 @@ void csMeshWrapper::MeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
 float csMeshWrapper::MeshWrapper::GetScreenBoundingBox (iCamera* camera,
 	csBox2& sbox, csBox3& cbox)
 {
-  return scfParent->GetScreenBoundingBox (camera->GetPrivateObject (),
-  	sbox, cbox);
+  return scfParent->GetScreenBoundingBox (camera, sbox, cbox);
 }
 
 //--------------------------------------------------------------------------

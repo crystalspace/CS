@@ -48,6 +48,14 @@ protected:
 public:
   /// Initialize the csObject
   csObject (iBase* pParent = NULL);
+
+  /**
+   * Copy constructor. The copied object contains all children of the original
+   * object, but has a new ID and is not automatically added to the original
+   * object's parent.
+   */
+  csObject (csObject &o);
+
   /// Destroy this object and the associated children
   virtual ~csObject ();
 

@@ -108,6 +108,19 @@ csObject::csObject (iBase* pParent) : Children (NULL), Name (NULL)
   ParentObject = NULL;
 }
 
+csObject::csObject (csObject &o) : Children (NULL), Name (NULL)
+{
+  csObject (NULL);
+  
+  iObjectIterator *it = o.GetIterator ();
+  while (!it->IsFinished ()) {
+    ObjAdd (it->GetObject ());
+    it->Next ();
+  }
+  it->DecRef ();
+  SetName (o.GetName ());
+}
+
 csObject::~csObject ()
 {
   ObjRemoveAll ();

@@ -24,6 +24,7 @@
 #include "iengine/camera.h"
 #include "csengine/planeclp.h"
 #include "csengine/sector.h"
+#include "csengine/polygon.h"
 
 class csSector;
 class csPolygon3D;
@@ -344,8 +345,9 @@ public:
   struct Camera : public iCamera
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCamera);
-    virtual csCamera* GetPrivateObject ()
-    { return scfParent; }
+
+    virtual iCamera *Clone () const
+    { return &(new csCamera (*scfParent))->scfiCamera; }
 
     virtual int GetFOV () const
     { return scfParent->GetFOV (); }
@@ -367,6 +369,8 @@ public:
 
     virtual csOrthoTransform& GetTransform ()
     { return *(csOrthoTransform*)scfParent; }
+    virtual const csOrthoTransform& GetTransform () const
+    { return *(csOrthoTransform*)scfParent; }
     virtual void SetTransform (const csOrthoTransform& tr)
     {
       *(csOrthoTransform*)scfParent = tr;
@@ -387,6 +391,8 @@ public:
     virtual void SetSector (iSector *s)
     { scfParent->SetSector (s->GetPrivateObject ()); }
 
+    virtual iPolygon3D* GetHit (csVector3& v)
+    { return &(scfParent->GetHit (v)->scfiPolygon3D); }
     virtual void Correct (int n)
     {
       scfParent->Correct (n);

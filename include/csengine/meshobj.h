@@ -34,7 +34,6 @@ struct iMeshWrapper;
 struct iRenderView;
 struct iMovable;
 class csMeshWrapper;
-class csCamera;
 class csMeshFactoryWrapper;
 class csLight;
 
@@ -422,7 +421,7 @@ public:
    * Returns -1 if object behind the camera or else the distance between
    * the camera and the furthest point of the 3D box.
    */
-  float GetScreenBoundingBox (const csCamera& camera, csBox2& sbox,
+  float GetScreenBoundingBox (const iCamera *camera, csBox2& sbox,
   	csBox3& cbox);
 
   /**

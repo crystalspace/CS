@@ -86,6 +86,8 @@ public:
   csTextureWrapper (iImage* Image);
   /// Construct a csTextureWrapper from a pre-registered texture
   csTextureWrapper (iTextureHandle *ith);
+  /// Copy constructor
+  csTextureWrapper (csTextureWrapper &);
 
   /**
    * Change the base iImage. The changes will not be visible until the
@@ -159,6 +161,8 @@ public:
     {return scfParent;}
 
     virtual iObject *QueryObject();
+    virtual iTextureWrapper *Clone () const
+    { return &(new csTextureWrapper (*scfParent))->scfiTextureWrapper; }
     virtual void SetImageFile (iImage *Image);
     virtual iImage* GetImageFile ();
     virtual void SetTextureHandle (iTextureHandle *tex);

@@ -40,14 +40,15 @@ class csCamera;
 class csVector3;
 class csVector2;
 struct iSector;
+struct iPolygon3D;
 
 SCF_VERSION (iCamera, 0, 0, 12);
 
 /// Camera class.
 struct iCamera : public iBase
 {
-  /// Ugly@@@.
-  virtual csCamera* GetPrivateObject () = 0;
+  /// Create a clone of this camera
+  virtual iCamera *Clone () const = 0;
 
   ///
   virtual int GetFOV () const = 0;
@@ -76,6 +77,10 @@ struct iCamera : public iBase
    * returned transform otherwise. Just do not assign to it.
    */
   virtual csOrthoTransform& GetTransform () = 0;
+
+  /// 'const' version of GetTransform ()
+  virtual const csOrthoTransform& GetTransform () const = 0;
+
   /**
    * Set the transform corresponding to this camera. In this transform,
    * 'other' is world space and 'this' is camera space.
@@ -125,6 +130,12 @@ struct iCamera : public iBase
   virtual bool IsMirrored () const = 0;
   /// Set mirrored state.
   virtual void SetMirrored (bool m) = 0;
+
+  /**
+   * Check if there is a polygon in front of us in the direction
+   * defined by 'v' (world space coordinates). Return the nearest polygon.
+   */
+  virtual iPolygon3D* GetHit (csVector3& v) = 0;
 
   /**
    * Get the 3D far plane that should be used to clip all geometry.

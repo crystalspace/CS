@@ -68,6 +68,21 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
+
+csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
+  csObject (t), flags (CS_TEXTURE_3D), use_callback (NULL)
+{
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
+
+  (handle = t.handle)->IncRef ();
+  (image = t.image)->IncRef ();
+
+  UpdateKeyColorFromImage ();
+
+  // @@@ ?????
+  csEngine::current_engine->AddToCurrentRegion (this);
+}
+
 csTextureWrapper::~csTextureWrapper ()
 {
   if (handle)

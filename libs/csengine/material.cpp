@@ -160,6 +160,19 @@ csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
+csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject (w)
+{
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+
+  material = w.material;
+  material->IncRef ();
+  handle = w.handle;
+  handle->IncRef ();
+
+  // @@@ ??????
+  csEngine::current_engine->AddToCurrentRegion (this);
+}
+
 csMaterialWrapper::~csMaterialWrapper ()
 {
   if (handle)

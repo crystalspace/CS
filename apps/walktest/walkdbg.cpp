@@ -193,7 +193,7 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
 // Draw debug boxes
 //------------------------------------------------------------------------
 
-void DrawDebugBoxSide (csCamera* cam, bool do3d,
+void DrawDebugBoxSide (iCamera* cam, bool do3d,
     	const csVector3& v1, const csColor& c1,
     	const csVector3& v2, const csColor& c2,
     	const csVector3& v3, const csColor& c3,
@@ -208,7 +208,7 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
   poly.flat_color_r = 255;
   poly.flat_color_g = 255;
   poly.flat_color_b = 255;
-  v = cam->World2Camera (v1);
+  v = cam->GetTransform ().Other2This (v1);
   if (v.z < .01) return;
   cam->Perspective (v, persp);
   if (do3d)
@@ -226,7 +226,7 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
   poly.vertices[0].r = c1.red;
   poly.vertices[0].g = c1.green;
   poly.vertices[0].b = c1.blue;
-  v = cam->World2Camera (v2);
+  v = cam->GetTransform ().Other2This (v2);
   if (v.z < .01) return;
   cam->Perspective (v, persp);
   if (do3d)
@@ -244,7 +244,7 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
   poly.vertices[1].r = c2.red;
   poly.vertices[1].g = c2.green;
   poly.vertices[1].b = c2.blue;
-  v = cam->World2Camera (v3);
+  v = cam->GetTransform ().Other2This (v3);
   if (v.z < .01) return;
   cam->Perspective (v, persp);
   if (do3d)
@@ -262,7 +262,7 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
   poly.vertices[2].r = c3.red;
   poly.vertices[2].g = c3.green;
   poly.vertices[2].b = c3.blue;
-  v = cam->World2Camera (v4);
+  v = cam->GetTransform ().Other2This (v4);
   if (v.z < .01) return;
   cam->Perspective (v, persp);
   if (do3d)
@@ -298,7 +298,7 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
   }
 }
 
-void DrawDebugBox (csCamera* cam, bool do3d, const csBox3& box, float r, float b)
+void DrawDebugBox (iCamera* cam, bool do3d, const csBox3& box, float r, float b)
 {
   DrawDebugBoxSide (cam, do3d,
       	box.GetCorner (BOX_CORNER_xYz), csColor (r, .5, b),
@@ -332,7 +332,7 @@ void DrawDebugBox (csCamera* cam, bool do3d, const csBox3& box, float r, float b
       	box.GetCorner (BOX_CORNER_xyZ), csColor (r, .5, b));
 }
 
-void DrawDebugBoxes (csCamera* cam, bool do3d)
+void DrawDebugBoxes (iCamera* cam, bool do3d)
 {
   DrawDebugBox (cam, do3d, Sys->debug_box1, .5, 0);
   DrawDebugBox (cam, do3d, Sys->debug_box2, 0, .5);

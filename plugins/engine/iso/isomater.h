@@ -179,6 +179,10 @@ public:
     {
       return (csMaterialWrapper*)scfParent;
     }
+    virtual iMaterialWrapper *Clone () const
+    {
+      return &(new csIsoMaterialWrapper (*scfParent))->scfiMaterialWrapper;
+    }
     virtual void SetMaterialHandle (iMaterialHandle* m)
     {
       scfParent->SetMaterialHandle (m);

@@ -124,7 +124,6 @@ void csRegion::DeleteAll ()
       iSector* o = SCF_QUERY_INTERFACE_FAST (obj, iSector);
       if (!o) continue;
 
-      o->GetPrivateObject ()->CleanupReferences ();
       engine->GetSectors ()->Remove (o);
       ObjRemove (obj);
       copy[i] = NULL;

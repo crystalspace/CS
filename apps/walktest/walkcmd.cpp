@@ -827,16 +827,16 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "action"))
   {
     csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other(3.0f*VEC_FORWARD);
-    csPolygon3D* p = Sys->view->GetCamera ()->GetPrivateObject ()->GetHit (where);
+    iPolygon3D* p = Sys->view->GetCamera ()->GetHit (where);
     if (p)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Action polygon '%s'", p->GetName ());
-      csThing* ob = p->GetParent ();
+      	"Action polygon '%s'", p->QueryObject ()->GetName ());
+      iThingState* ob = p->GetParent ();
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"in set '%s'", ob->GetName ());
+      	"in set '%s'", ob->QueryObject ()->GetName ());
       printf ("ACTION\n");
-      Sys->ActivateObject ((csObject*)ob);
+      Sys->ActivateObject ((csObject*)(ob->QueryObject ()));
     }
   }
   else if (!strcasecmp (cmd, "saverec"))

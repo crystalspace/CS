@@ -43,6 +43,9 @@ struct iMaterialWrapper : public iBase
   /// Get the iObject for this material.
   virtual iObject *QueryObject() = 0;
 
+  /// Create a clone this material wrapper, using the same material handle
+  virtual iMaterialWrapper *Clone () const = 0;
+
   /**
    * Change the material handle. Note: This will also change the base
    * material to NULL.

@@ -72,6 +72,8 @@ public:
 
     virtual iObject *QueryObject()
     { return scfParent; }
+    virtual iCameraPosition *Clone () const
+    { return &(new csCameraPosition (*scfParent))->scfiCameraPosition; }
     virtual const char *GetSector()
     { return scfParent->Sector; }
     virtual csVector3 GetPosition()
