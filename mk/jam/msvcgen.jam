@@ -620,12 +620,7 @@ rule MsvcProject
   local workdir = [ msvcgen_work_dir $(MSVC_VERSION) ] ;
 
   local msvcname = $(MSVC.NAME_OVERRIDE.$(rawname)) ;
-  if ! $(msvcname)
-  {
-    msvcname = [ MsvcAddPrefix $(rawname) : $(type) ] ;
-Echo "rawname" $(rawname) "type" $(type) "prefix" $(MSVC.PREFIX.$(type))
-"msvcname" $(msvcname) ;
-  }
+  if ! $(msvcname) { msvcname = [ MsvcAddPrefix $(rawname) : $(type) ] ; }
   $(rawname)_MSVCNAME = $(msvcname) ;
       
   local respdir = $(workdir) ;
