@@ -63,12 +63,13 @@ class csCrystalBall
 
   class trinode : public csTreeNode
   {
+  public:
     enum 
     {
       INSIDE = 0,
       OUTSIDE = 1
     };
-  public:
+
     int from, len; // contains <len> points in vPoints starting at <from>
     int divider; // index to point that divides this triangle
     trinode (trinode *theParent=NULL, int from=-1, int len=0) : csTreeNode (theParent)
