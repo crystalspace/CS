@@ -5,7 +5,10 @@ M - Medium Priority
 L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
 
-[L] Improve hanlding of rc files on win32. jam should now about them and you
+[M] We should try to get dependencies for system headers as well. Sometimes
+    people update their system packages too (apt-get, ...) and this might
+    break stuff like opengl.
+[L] Improve handling of rc files on win32. jam should know about them and you
     should be able to specify them like normal source files. (Caveats:
     mingw/cygwin only allow 1 rc file per plugin/application, creating a
     correct version resource file is hard when doing it purely in jam, but I
@@ -25,21 +28,26 @@ W - Wishlist (the build also works without this feature)
     static application you should have to use a 2nd rule where you have to
     specify which plugins you want to have linked into the application.
 [W] Create templates for some IDEs. Generating a template for kdevelop3.x is
-    very easy in theory but not possible at the moment, because kdevelop is only
-    able to handle make as build tool. I already filled a featurerequest
-    in the kdevelop bugtracker.
+    very easy in theory as it comes with a great plugin architecture allowing
+    for custom build plugins. However there are only a standard plugin for
+    make, ant and qmake. We'd have to write a custom jam plugin first, there's
+    no way to have a "standard" plugin where you specify just some commands
+    for building/updating.
     Seems we have a similar situation in anjuta. Creating projectfiles would
-    be easy but they also rely on make. At least they say that they already
-    have patches/stuff in cvs which should let users customize the build
-    application they use, so anjuta could be a nice option soon.
-[W] It would be nice to have the configure files regenerated and execute if the
+    be easy but they also rely on make. Anjuta2 seems to be better here and
+    provides support for custom commands being run for building, however the
+    code seems to have a bug at the moment and always adds -k to the
+    commandline :-(
+[L] It would be nice to have the configure files regenerated and execute if the
     configure.ac file has changed. Unfortunately it is not possible to force jam
     to reread it's config files, so this isn't 100% possible...
-[H] The jobber scripts on sourceforge should use the Jamrules.
+    Would it be possible to somehow recreate the configure files and then exit
+    jam with a message telling that you should rerun configure?
+[H] The jobber scripts on sourceforge should use the jam instead of make.
 [H] The msvc generation rules aren't tested on msvc yet.
 [M] Try if there's a way to create some suitable msvc templates for external
-    proejcts, so that we autogenrate msvc-makefiles there too.
-[L] Rework the provided m4 scripts to provide functionality like CS_CHECK_HOST
+    projects, so that we autogenrate msvc-makefiles there too.
+[M] Rework the provided m4 scripts to provide functionality like CS_CHECK_HOST
     and INITJAMFILE. Would be also nice to extract more of the detection scripts
     in CS (perl, python, nasm, problematic cflags?)
 [M] Finish the tool for extracting the documentation from the rules files.
