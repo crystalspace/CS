@@ -91,8 +91,8 @@ public:
 class csTerrFuncObject : public iMeshObject
 {
 public:
-  iTerrainHeightFunction* height_func;
-  iTerrainNormalFunction* normal_func;
+  csRef<iTerrainHeightFunction> height_func;
+  csRef<iTerrainNormalFunction> normal_func;
   int blockxy;
   int gridx, gridy;
   csVector3 topleft;
@@ -134,7 +134,7 @@ public:
   iObjectRegistry* object_reg;
   iBase* logparent;
   iMeshObjectFactory* pFactory;
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
   iVertexBufferManager *vbufmgr;
   float current_lod;
   uint32 current_features;
@@ -295,13 +295,13 @@ public:
   /// Set the function to use for the terrain.
   void SetHeightFunction (iTerrainHeightFunction* func)
   {
-    SCF_SET_REF (height_func, func);
+    height_func = func;
     initialized = false;
   }
   /// Set the normal function to use for the terrain.
   void SetNormalFunction (iTerrainNormalFunction* func)
   {
-    SCF_SET_REF (normal_func, func);
+    normal_func = func;
     initialized = false;
   }
   void SetHeightMap (iImage* im, float hscale, float hshift);
@@ -510,7 +510,7 @@ public:
 
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    SCF_SET_REF (vis_cb, cb);
+    vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
   {

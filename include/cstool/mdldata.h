@@ -114,8 +114,8 @@ public:
 class csModelDataMaterial : public iModelDataMaterial
 {
 private:
-  iMaterial *BaseMaterial;
-  iMaterialWrapper *MaterialWrapper;
+  csRef<iMaterial> BaseMaterial;
+  csRef<iMaterialWrapper> MaterialWrapper;
 
 public:
   SCF_DECLARE_IBASE;
@@ -244,7 +244,7 @@ public:
 class csModelDataObject : public iModelDataObject
 {
 private:
-  iModelDataVertices *DefaultVertices;
+  csRef<iModelDataVertices> DefaultVertices;
 
 public:
   SCF_DECLARE_IBASE;

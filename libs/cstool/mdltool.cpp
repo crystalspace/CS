@@ -488,8 +488,7 @@ inline float MergeTimes (float in1, float in2)
 void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject *src)
 {
   // store vertex, normal, texel and color offset
-  iModelDataVertices *DefaultVertices = dest->GetDefaultVertices ();
-  SCF_INC_REF (DefaultVertices);
+  csRef<iModelDataVertices> DefaultVertices = dest->GetDefaultVertices ();
   int VertexOffset = DefaultVertices ? DefaultVertices->GetVertexCount () : 0;
   int NormalOffset = DefaultVertices ? DefaultVertices->GetNormalCount () : 0;
   int TexelOffset = DefaultVertices ? DefaultVertices->GetTexelCount () : 0;
@@ -497,12 +496,14 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
   int i;
 
   // copy the default vertices
-  iModelDataVertices *ver = new csModelDataVertices (DefaultVertices, src->GetDefaultVertices ());
+  iModelDataVertices *ver = new csModelDataVertices (DefaultVertices,
+  	src->GetDefaultVertices ());
   dest->SetDefaultVertices (ver);
   ver->DecRef ();
 
   // copy all polygons
-  csModelDataPolygonIterator *polyit = new csModelDataPolygonIterator (src->QueryObject ());
+  csModelDataPolygonIterator *polyit = new csModelDataPolygonIterator (
+  	src->QueryObject ());
   while (polyit->HasNext ())
   {
     iModelDataPolygon *poly = polyit->Next ();
@@ -561,9 +562,12 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
     iModelDataAction *Action1 = ActionMap1.Get (i),
                      *Action2 = ActionMap2.Get (i),
 		     *NewAction;
-    if (Action1 && Action1->GetTotalTime () > EPSILON) {
-      if (Action2 && Action2->GetTotalTime () > EPSILON) {
-        float total = MergeTimes (Action1->GetTotalTime (), Action2->GetTotalTime ());
+    if (Action1 && Action1->GetTotalTime () > EPSILON)
+    {
+      if (Action2 && Action2->GetTotalTime () > EPSILON)
+      {
+        float total = MergeTimes (Action1->GetTotalTime (),
+		Action2->GetTotalTime ());
 
 	if (total<0)
 	{
@@ -573,11 +577,15 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
 	}
 
 	NewAction = MergeAction (Action1, Action2, total);
-      } else {
+      }
+      else
+      {
         // merge action 1 and the default frame of object 2
 	NewAction = MergeAction (Action1, src->GetDefaultVertices (), false);
       }
-    } else {
+    }
+    else
+    {
       // merge action 2 and the default frame of object 1
       NewAction = MergeAction (Action2, DefaultVertices, true);
     }
@@ -588,7 +596,6 @@ void csModelDataTools::MergeCopyObject (iModelDataObject *dest, iModelDataObject
     dest->QueryObject ()->ObjAdd (NewAction->QueryObject ());
     NewAction->DecRef ();
   }
-  SCF_DEC_REF (DefaultVertices);
 }
 
 void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,

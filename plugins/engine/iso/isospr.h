@@ -45,7 +45,7 @@ private:
   /// drawing prealloc
   G3DPolygonDPFX g3dpolyfx;
   /// the grid change callback
-  iGridChangeCallback* gridcall;
+  csRef<iGridChangeCallback> gridcall;
 
 public:
   SCF_DECLARE_IBASE;
@@ -78,7 +78,7 @@ public:
   virtual iIsoGrid *GetGrid() const {return grid;}
   virtual void SetGridChangeCallback (iGridChangeCallback* func)
   {
-    SCF_SET_REF (gridcall, func);
+    gridcall = func;
   }
   virtual iGridChangeCallback* GetGridChangeCallback () const
   {

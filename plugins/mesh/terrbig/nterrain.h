@@ -277,7 +277,7 @@ private:
   iObjectRegistry* object_reg;
 
   /// Visible call-back
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
 
   /// Pointer to terrain object
   nTerrain *terrain;
@@ -374,7 +374,7 @@ public:
 
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    SCF_SET_REF (vis_cb, cb);
+    vis_cb = cb;
   }
 
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const

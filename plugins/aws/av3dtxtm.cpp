@@ -279,7 +279,7 @@ void csMaterialHandle::FreeMaterial ()
   if (texture)
   {
     DG_UNLINK (this, texture);
-    SCF_DEC_REF (texture);
+    if (texture) texture->DecRef ();
   }
 
   if (material)
@@ -296,7 +296,7 @@ void csMaterialHandle::Prepare ()
     if (texture != material->GetTexture ())
     {
       DG_UNLINK (this, texture);
-      SCF_DEC_REF (texture);
+      if (texture) texture->DecRef ();
       texture = material->GetTexture ();
       if (texture)
       {

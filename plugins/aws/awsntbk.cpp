@@ -209,7 +209,7 @@ awsNotebookPage::awsNotebookPage ():
 
 awsNotebookPage::~awsNotebookPage ()
 {
-  SCF_DEC_REF (caption);
+  if (caption) caption->DecRef ();
 }
 
 bool awsNotebookPage::Setup (iAws *_wmgr, iAwsComponentNode *settings)
@@ -270,7 +270,7 @@ bool awsNotebookPage::SetProperty (const char *name, void *parm)
   {
     iString *s = (iString *) (parm);
 
-    SCF_DEC_REF (caption);
+    if (caption) caption->DecRef ();
 
     if (s && s->Length ())
       (caption = s)->IncRef ();
@@ -285,7 +285,7 @@ bool awsNotebookPage::SetProperty (const char *name, void *parm)
   {
     iString *s = (iString *) (parm);
 
-    SCF_DEC_REF (icon);
+    if (icon) icon->DecRef ();
 
     if (s && s->Length ())
       (icon = s)->IncRef ();
@@ -529,7 +529,7 @@ bool awsNotebookButton::SetProperty (const char *name, void *parm)
   {
     iString *s = (iString *) (parm);
 
-    SCF_DEC_REF (caption);
+    if (caption) caption->DecRef ();
 
     if (s && s->Length ())
       (caption = s)->IncRef ();
@@ -670,9 +670,9 @@ awsNotebookButtonBar::~awsNotebookButtonBar ()
     next_slot->Disconnect (next, awsCmdButton::signalClicked,
                            sink, sink->GetTriggerID ("Next"));
 
-  SCF_DEC_REF (sink);
-  SCF_DEC_REF (prev_slot);
-  SCF_DEC_REF (next_slot);
+  if (sink) sink->DecRef ();
+  if (prev_slot) prev_slot->DecRef ();
+  if (next_slot) next_slot->DecRef ();
 }
 
 bool awsNotebookButtonBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
@@ -843,7 +843,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   comp->GetProperty ("Caption", (void**)&str);
   if (!str || !str->GetData ())
   {
-    SCF_DEC_REF(str);
+    if (str) str->DecRef ();
     csString theCap ("Tab ");
     theCap += vTabs.Length ()+1;
     str = new scfString ((const char*)theCap);

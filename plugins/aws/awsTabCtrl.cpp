@@ -205,7 +205,7 @@ bool awsTab::SetProperty (const char *name, void *parm)
   {
     iString *s = (iString *) (parm);
 
-    SCF_DEC_REF (caption);
+    if (caption) caption->DecRef ();
 
     if (s && s->Length ())
       (caption = s)->IncRef ();

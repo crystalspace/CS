@@ -196,7 +196,7 @@ public:
   iObjectRegistry* object_reg;
   iBase* logparent;
   iMeshObjectFactory* pFactory;
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
   csRef<iBCTerrFactoryState> factory_state;
   iVertexBufferManager *vbufmgr;
   csBox3 bbox;
@@ -259,7 +259,7 @@ public:
 
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    SCF_SET_REF (vis_cb, cb);
+    vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
   {

@@ -310,7 +310,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  iEmitGen3D *gen;
 	  gen = ParseEmit (child, fstate, &amt);
 	  emix->AddEmitter (amt, gen);
-	  SCF_DEC_REF (gen);
+	  if (gen) gen->DecRef ();
 	  result = emix;
 	}
 	break;
@@ -529,21 +529,21 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetStartPosEmit (emit);
-	  SCF_DEC_REF (emit);
+	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_STARTSPEED:
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetStartSpeedEmit (emit);
-	  SCF_DEC_REF (emit);
+	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_STARTACCEL:
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetStartAccelEmit (emit);
-	  SCF_DEC_REF (emit);
+	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_ATTRACTORFORCE:
@@ -553,21 +553,21 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetAttractorEmit (emit);
-	  SCF_DEC_REF (emit);
+	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_FIELDSPEED:
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetFieldSpeedEmit (emit);
-	  SCF_DEC_REF (emit);
+	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_FIELDACCEL:
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetFieldAccelEmit (emit);
-	  SCF_DEC_REF (emit);
+	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_CONTAINERBOX:

@@ -59,7 +59,7 @@ private:
   int flags;
 
   // The callback which is called just before texture is used.
-  iTextureCallback* use_callback;
+  csRef<iTextureCallback> use_callback;
 
   // update our key color with that from the handle
   void UpdateKeyColorFromHandle ()
@@ -134,7 +134,7 @@ public:
    */
   void SetUseCallback (iTextureCallback* callback)
   {
-    SCF_SET_REF (use_callback, callback);
+    use_callback = callback;
   }
 
   /**

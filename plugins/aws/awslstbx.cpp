@@ -61,8 +61,8 @@ int awsListRow::GetHeight (iAwsPrefManager *pm, int colcount)
 //
 awsListItem::~awsListItem ()
 {
-  SCF_DEC_REF (text);
-  SCF_DEC_REF (image);
+  if (text) text->DecRef ();
+  if (image) image->DecRef ();
 }
 
 int awsListItem::GetHeight (iAwsPrefManager *pm)

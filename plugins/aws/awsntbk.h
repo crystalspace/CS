@@ -152,8 +152,8 @@ class awsNotebookButtonBar : public awsComponent
     {
       te->slot->Disconnect (te->button, awsCmdButton::signalClicked, 
                            te->sink, te->sink->GetTriggerID ("ActivateTab"));
-      SCF_DEC_REF (te->slot);
-      SCF_DEC_REF (te->sink);
+      if (te->slot) te->slot->DecRef ();
+      if (te->sink) te->sink->DecRef ();
     }
     static int CompareComp (tabEntry* const& te1, tabEntry* const& te2)
     {

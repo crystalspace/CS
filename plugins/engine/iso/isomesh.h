@@ -43,7 +43,7 @@ private:
   csMatrix3 transform;
 
   /// the grid change callback
-  iGridChangeCallback* gridcall;
+  csRef<iGridChangeCallback> gridcall;
 
   /// the mesh object
   iMeshObject *mesh;
@@ -79,7 +79,7 @@ public:
   virtual iIsoGrid *GetGrid() const {return grid;}
   virtual void SetGridChangeCallback(iGridChangeCallback* func)
   {
-    SCF_SET_REF (gridcall, func);
+    gridcall = func;
   }
   virtual iGridChangeCallback* GetGridChangeCallback() const
   {

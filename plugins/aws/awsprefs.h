@@ -204,7 +204,9 @@ public:
 
   /// Destructor does nothing
   virtual ~awsStringKey ()
-  { SCF_DEC_REF(val); }
+  {
+    if (val) val->DecRef ();
+  }
 
   /// Accessor function gets name of key
   unsigned long Name () { return awsKey::Name(); }

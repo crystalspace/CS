@@ -69,15 +69,15 @@ awsScrollBar::~awsScrollBar ()
         sink,
         sink->GetTriggerID ("TickTock"));
 
-  SCF_DEC_REF (incVal);
-  SCF_DEC_REF (decVal);
-  SCF_DEC_REF (knob);
-  SCF_DEC_REF (sink);
-  SCF_DEC_REF (inc_slot);
-  SCF_DEC_REF (dec_slot);
-  SCF_DEC_REF (knob_slot);
-  SCF_DEC_REF (tick_slot);
-  SCF_DEC_REF (timer);
+  if (incVal) incVal->DecRef ();
+  if (decVal) decVal->DecRef ();
+  if (knob) knob->DecRef ();
+  if (sink) sink->DecRef ();
+  if (inc_slot) inc_slot->DecRef ();
+  if (dec_slot) dec_slot->DecRef ();
+  if (knob_slot) knob_slot->DecRef ();
+  if (tick_slot) tick_slot->DecRef ();
+  if (timer) timer->DecRef ();
 
   if (captured) WindowManager ()->ReleaseMouse ();
 }
@@ -835,8 +835,8 @@ awsSliderButton::~awsSliderButton ()
 
   if (captured) WindowManager ()->ReleaseMouse ();
 
-  SCF_DEC_REF (tick_slot);
-  SCF_DEC_REF (timer);
+  if (tick_slot) tick_slot->DecRef ();
+  if (timer) timer->DecRef ();
 }
 
 bool awsSliderButton::Setup (iAws *wmgr, iAwsComponentNode *settings)

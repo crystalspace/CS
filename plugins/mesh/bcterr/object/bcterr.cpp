@@ -1437,7 +1437,6 @@ csBCTerrObject::csBCTerrObject (iObjectRegistry* object_reg,
   initialized = false;
   topleft.Set (0,0,0);
   x_blocks = z_blocks = 0;
-  vis_cb = 0;
   collision = 0;
   initheight = false;
   toph = 0.0;
@@ -1455,7 +1454,6 @@ csBCTerrObject::~csBCTerrObject ()
   // int x, z;
   delete [] control_points;
   delete [] blocks;
-  if (vis_cb) vis_cb->DecRef ();
 }
 
 void csBCTerrObject::Build ()

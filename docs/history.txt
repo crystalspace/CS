@@ -35,6 +35,9 @@ chronological order.
 	  was 100% incorrect.
 	- Jorrit changed the way that the coverage buffer outline drawing
 	  works in preparation for outline clamping.
+	- Jorrit removed all usages of SCF_SET_REF, SCF_DEC_REF, and
+	  SCF_INC_REF and then removed those macros. You should now use
+	  csRef instead.
 3-Nov-2003
 	- Chris Matuszewski added some explicit type casts to stop msvc6 from
 	  emitting warning messages in csgfx/rgbpixel.h and shadervar.h.

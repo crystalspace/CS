@@ -49,12 +49,6 @@
   void clname::Set##name (type val)					\
   { name = val; }
 
-#define CS_IMPLEMENT_ACCESSOR_METHOD_REF(clname,type,name)		\
-  type clname::Get##name () const					\
-  { return name; }							\
-  void clname::Set##name (type val)					\
-  { if (name) name->DecRef (); name = val; if (name) name->IncRef (); }
-
 #define CS_IMPLEMENT_OBJECT_INTERFACE(clname)				\
   CS_IMPLEMENT_EMBEDDED_OBJECT (clname::Embedded_csObject);		\
   iObject* clname::QueryObject ()					\
@@ -97,8 +91,8 @@ const char *csModelDataTexture::GetFileName () const
   return FileName;
 }
 
-CS_IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataTexture, iImage*, Image);
-CS_IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataTexture, iTextureWrapper*, TextureWrapper);
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataTexture, iImage*, Image);
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataTexture, iTextureWrapper*, TextureWrapper);
 
 void csModelDataTexture::LoadImage (iVFS *vfs, iImageIO *io, int Format)
 {
@@ -139,18 +133,14 @@ csModelDataMaterial::csModelDataMaterial ()
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
-  BaseMaterial = 0;
-  MaterialWrapper = 0;
 }
 
 csModelDataMaterial::~csModelDataMaterial ()
 {
-  SCF_DEC_REF (BaseMaterial);
-  SCF_DEC_REF (MaterialWrapper);
 }
 
-CS_IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataMaterial, iMaterial*, BaseMaterial);
-CS_IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataMaterial, iMaterialWrapper*, MaterialWrapper);
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataMaterial, iMaterial*, BaseMaterial);
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataMaterial, iMaterialWrapper*, MaterialWrapper);
 
 void csModelDataMaterial::Register (iMaterialList *ml)
 {
@@ -382,7 +372,7 @@ void csModelDataPolygon::DeleteVertex (int n)
   Texels.DeleteIndex (n);
 }
 
-CS_IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataPolygon, iModelDataMaterial*, Material);
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataPolygon, iModelDataMaterial*, Material);
 CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Vertex, Vertices);
 CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Normal, Normals);
 CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Color, Colors);
@@ -407,19 +397,17 @@ SCF_IMPLEMENT_IBASE_END
 
 CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataObject);
 
-CS_IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataObject,
+CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataObject,
 	iModelDataVertices *, DefaultVertices);
 
 csModelDataObject::csModelDataObject ()
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
-  DefaultVertices = 0;
 }
 
 csModelDataObject::~csModelDataObject ()
 {
-  SCF_DEC_REF (DefaultVertices);
 }
 
 /*** csModelDataCamera ***/

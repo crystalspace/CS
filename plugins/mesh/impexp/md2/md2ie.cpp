@@ -292,7 +292,7 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 
   char currAction [256];
   memset (currAction, 0, 256);
-  iModelDataAction * action = 0;
+  csRef<iModelDataAction> action;
   float time = 0;
 
   for (i = 0; i < Header.FrameCount; i++, time += FRAME_DELAY)
@@ -317,9 +317,8 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
     extractActionName (FrameName, ActionName);
     if (strcmp (ActionName, currAction))
     {
-      SCF_DEC_REF (action);
       memcpy (currAction, ActionName, strlen (ActionName)+1);
-      action = new csModelDataAction ();
+      action = csPtr<iModelDataAction> (new csModelDataAction ());
       action->QueryObject ()->SetName (currAction);
       Object->QueryObject ()->ObjAdd (action->QueryObject ());
       time = FRAME_DELAY;
@@ -356,7 +355,6 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
     VertexFrame->AddNormal (csVector3 (1, 0, 0));
     VertexFrame->DecRef ();
   }
-  SCF_DEC_REF (action);
   Object->SetDefaultVertices (DefaultFrame);
   Object->DecRef ();
   delete Texels;

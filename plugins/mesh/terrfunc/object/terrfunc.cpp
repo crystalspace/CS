@@ -528,8 +528,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   base_color.red = 0;
   base_color.green = 0;
   base_color.blue = 0;
-  height_func = new DefaultFunction ();
-  normal_func = 0;
+  height_func = csPtr<iTerrainHeightFunction> (new DefaultFunction ());
   lod_sqdist[0] = 100*100;
   lod_sqdist[1] = 400*400;
   lod_sqdist[2] = 800*800;
@@ -539,7 +538,6 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   CorrectSeams (0, 0);
   quad_depth = 6;
   quadtree = 0;
-  vis_cb = 0;
   current_lod = 1;
   current_features = 0;
   vbufmgr = 0;
@@ -553,9 +551,6 @@ csTerrFuncObject::~csTerrFuncObject ()
 {
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   delete[] blocks;
-  if (vis_cb) vis_cb->DecRef ();
-  if (height_func) height_func->DecRef ();
-  if (normal_func) normal_func->DecRef ();
   delete quad_height;
 }
 

@@ -190,13 +190,12 @@ class csGenerateImageValueFunc : public csGenerateImageValue
 {
 private:
   /// Height or slope function.
-  iGenerateImageFunction* heightfunc;
+  csRef<iGenerateImageFunction> heightfunc;
 
 public:
-  csGenerateImageValueFunc () : heightfunc (0) { }
+  csGenerateImageValueFunc () { }
   virtual ~csGenerateImageValueFunc ()
   {
-    if (heightfunc) heightfunc->DecRef ();
   }
 
   /// Get the value for location.
@@ -207,7 +206,7 @@ public:
   /// Set the function.
   void SetFunction (iGenerateImageFunction* func)
   {
-    SCF_SET_REF (heightfunc, func);
+    heightfunc = func;
   }
 };
 

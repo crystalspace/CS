@@ -52,7 +52,6 @@ csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiConsoleWatcher);
-  Callback = 0;
   Console = 0;
   Prompt = 0;
   strCursorPos = 0;
@@ -75,7 +74,6 @@ csConsoleInput::~csConsoleInput ()
     Console->RegisterWatcher (0);
     Console->DecRef ();
   }
-  if (Callback) Callback->DecRef ();
 }
 
 bool csConsoleInput::Initialize (iObjectRegistry *object_reg)

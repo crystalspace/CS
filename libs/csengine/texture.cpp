@@ -36,8 +36,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csTextureWrapper::csTextureWrapper (iImage *Image) :
     csObject(),
-    flags(CS_TEXTURE_3D),
-    use_callback(0)
+    flags(CS_TEXTURE_3D)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
@@ -47,8 +46,7 @@ csTextureWrapper::csTextureWrapper (iImage *Image) :
   UpdateKeyColorFromImage ();
 }
 
-csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject(),
-  use_callback(0)
+csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
@@ -71,8 +69,7 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject(),
 
 csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
   csObject(t),
-  flags(CS_TEXTURE_3D),
-  use_callback(0)
+  flags(CS_TEXTURE_3D)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
@@ -96,8 +93,6 @@ csTextureWrapper::~csTextureWrapper ()
   {
     DG_UNLINK (this, image);
   }
-
-  if (use_callback) use_callback->DecRef ();
 }
 
 void csTextureWrapper::SetImageFile (iImage *Image)

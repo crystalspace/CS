@@ -893,7 +893,7 @@ TYPEMAP_OUT_csWrapPtr
 
 	%extend T
 	{
-		~ T () { SCF_DEC_REF(self); }
+		~ T () { if (self) self->DecRef (); }
 	}
 
 %enddef
