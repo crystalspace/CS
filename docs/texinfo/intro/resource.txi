@@ -35,7 +35,7 @@ The Crystal Space Developer's Project page is located at:
 The released Crystal Space packages can be downloaded directly via @sc{ftp}
 from the following locations:
 
-@uref{ftp://ftp.linuxgames.com/crystal/}
+@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/}
 
 @uref{http://sourceforge.net/project/showfiles.php?group_id=649}
 
