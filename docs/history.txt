@@ -13,6 +13,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+12-Sep-1999
+	- Eric Sunshine rewrote MazeEditor::LoadWorld() so that it integrates
+	  correctly with VFS and can once again load worlds.
 11-Sep-1999
 	- Andrew Zabolotny integrated his Virtual File System (VFS) into
 	  Crystal Space.  This was a major update to CS, and involved many
