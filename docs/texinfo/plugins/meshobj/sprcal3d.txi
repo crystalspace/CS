@@ -28,40 +28,39 @@ Make a new file called @file{test.cal3d} in the @file{CS} directory with
 the following contents:
 
 @example
-<!-- the meshfact name is the CS name used to instantiate
-     instances of this object -->
+<!-- The meshfact name is the CS name used to create
+     instances of this object. -->
 <meshfact name="test">
 
-<!-- the plugin line specifies the plugin to use to parse
-     the succeeding 'params' tag -->
+<!-- The plugin line specifies the plugin to use to parse
+     the succeeding 'params' tag. -->
 <plugin>crystalspace.mesh.loader.factory.sprite.cal3d</plugin>
 
 <params>
   <options rotate_x_axis="yes" flip_textures="no" />
 
-  <!-- path specifies the OS-dependent directory path to
-       where all the other files are located.  optional. -->
+  <!-- Path specifies the OS-dependent directory path to
+       where all the other files are located. (optional) -->
   <path dir="cally/" />
 
-  <!-- the cally model is much too large. -->
+  <!-- The cally model is much too large. -->
   <scale value="0.01" />
 
-  <!-- specify cal3d skeleton file used by model -->
+  <!-- Specify cal3d skeleton file used by model. -->
   <skeleton file="cally.csf" />
 
-  <!-- animations specify the filename to load, and the
-       CS-accessible name of this anim.  The type attribute
+  <!-- Animations specify the filename to load, and the
+       CS-accessible name of this animation.  The type attribute
        is used to distinguish various types of animations.
-       Type 1 is a regular animation cycle with movement and
-       type 4 is a one-time action.  It is a TODO to use
-       words instead of numbers here base_vel specifies the
+       Recognized types are "idle", "travel", "cycle",
+       "style_cycle", and "action". base_vel specifies the
        speed of translation which should be used when the
        animation is playing alone.  min_vel and max_vel are
        used by the blender to achieve a specified desired
-       velocity.  min_random and max are interval to be used
-       in idle override actions, in seconds.  idle_pct is a
+       velocity.  min_random and max_random are interval to be
+       used in idle override actions, in seconds.  idle_pct is a
        number between 0 and 100, which is the % probability
-       of that action being the override action.-->
+       of that action being the override action. -->
   <animation
     file="cally_idle.caf"
     name="stand"
@@ -108,15 +107,15 @@ the following contents:
     type="action"
     idle_pct="34" />
 
-  <!-- materials are VFS filenames because they are CS
-       materials and not cal3d materials.  optional.  we
-       cannot use the real .xrf files because CS can't load
+  <!-- Materials are VFS filenames because they are CS
+       materials and not cal3d materials. (optional) We
+       can not use the real .xrf files because CS can't load
        that format.  -->
   <material file="/lib/std/green.gif" name="green" />
 
-  <!-- meshes specify each attachable part of the model.
-       the name is the CS-accessible name which will be used
-       to select/deselect it for the model.  the material
+  <!-- Meshes specify each attachable part of the model.
+       The name is the CS-accessible name which will be used
+       to select/deselect it for the model.  The material
        specified is the default CS material used by this
        mesh.  -->
   <mesh file="cally_calf_left.cmf"
@@ -171,8 +170,8 @@ the following contents:
         name="cally_upperarm_right"
         material="green" />
 
-  <!-- the following rotates the model and all anims around
-       the Y axis by 180 degrees.  any axis and angle maybe
+  <!-- The following rotates the model and all animations around
+       the Y axis by 180 degrees.  Any axis and angle may be
        specified, and translation may also be specified. -->
   <hardtransform
     rot_axis_x="0"
