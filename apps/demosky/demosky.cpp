@@ -26,7 +26,6 @@
 #include "csengine/camera.h"
 #include "csengine/light.h"
 #include "csengine/polygon.h"
-#include "csengine/cssprite.h"
 #include "csengine/meshobj.h"
 #include "csengine/texture.h"
 #include "csengine/thing.h"

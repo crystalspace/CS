@@ -31,10 +31,11 @@
 #include "igraph2d.h"
 #include "itxtmgr.h"
 #include "ifontsrv.h"
+#include "imspr3d.h"
 
 #include "csphyzik/phyziks.h"
 #include "csgeom/math3d.h"
-#include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "cstso.h"
 
 // PHYZTEST DEMO
@@ -52,7 +53,7 @@ ctWorld phyz_world;
 Phyztest *Sys;
 
 // data for mass on spring demo
-csSprite3D *bot = NULL;
+csMeshWrapper *bot = NULL;
 ctRigidBody *rb_bot = NULL;
   
 // data for swinging chain demo
@@ -62,14 +63,14 @@ bool chain_added = false;
 class ChainLink
 {
 public:
-  ChainLink( csSprite3D *psprt, ctRigidBody *prb, ctArticulatedBody *pab )
+  ChainLink( csMeshWrapper *psprt, ctRigidBody *prb, ctArticulatedBody *pab )
   {
     sprt = psprt;
     rb = prb;
     ab = pab;   
   }
 
-  csSprite3D *sprt;         // sprite that represents a link
+  csMeshWrapper *sprt;         // mesh that represents a link
   ctRigidBody *rb;          // rigidbody object for this link
   ctArticulatedBody * ab;   // articulated body ( jointed body ) for this link
 };
@@ -93,20 +94,20 @@ ctRigidBody *add_test_body( ctVector3 ppos )
   return arb;
 }
 
-csSprite3D *add_test_sprite( csSpriteTemplate *tmpl, csSector *aroom, csView *view )
+csMeshWrapper *add_test_mesh( csMeshFactoryWrapper *tmpl, csSector *aroom, csView *view )
 {
-  csSprite3D *tsprt;
+  csMeshWrapper *tsprt;
   
-  tsprt = new csSprite3D(view->GetEngine ());
-  tsprt->SetTemplate( tmpl );
+  tsprt = tmpl->NewMeshObject (view->GetEngine ());
   view->GetEngine ()->sprites.Push (tsprt);
   tsprt->GetMovable ().SetSector (aroom);
   csXScaleMatrix3 m (2);
   tsprt->GetMovable ().SetTransform (m);
   tsprt->GetMovable ().SetPosition (csVector3( 0, 0, 0 ));    // only matters for root in chain demo
   tsprt->GetMovable ().UpdateMove ();
-  tsprt->SetAction ("default");
-  tsprt->InitSprite ();
+
+  iSprite3DState* state = QUERY_INTERFACE (tsprt->GetMeshObject (), iSprite3DState);
+  state->SetAction ("default");
 
   return tsprt;
 }
@@ -307,17 +308,17 @@ void Phyztest::NextFrame ()
     // CsPrintf (MSG_DEBUG_0, "adding chain\n");
     // use box template
 
-    csSpriteTemplate* bxtmpl = (csSpriteTemplate*)
-      view->GetEngine ()->sprite_templates.FindByName ("box");
+    csMeshFactoryWrapper* bxtmpl = (csMeshFactoryWrapper*)
+      view->GetEngine ()->meshobj_factories.FindByName ("box");
     if (!bxtmpl)
     {  
       Printf (MSG_INITIALIZATION, "couldn't load template 'box'\n");
       return;
     }
 
-    // root of chain.  invisible ( no sprite )
+    // root of chain.  invisible ( no mesh )
     // this body doesn't rotate or translate if it is rooted. 
-    csSprite3D *sprt;
+    csMeshWrapper *sprt;
     ctArticulatedBody *ab_parent;
     ctArticulatedBody *ab_child;
     // each link of chain has a rigid body 
@@ -345,7 +346,7 @@ void Phyztest::NextFrame ()
       ab_parent->link_revolute( ab_child, joint_offset, joint_offset, joint_action );
   
       // make something to draw
-      sprt = add_test_sprite( bxtmpl, room, view );
+      sprt = add_test_mesh( bxtmpl, room, view );
       chain[i] = new ChainLink( sprt, rb, ab_child );
       
       // this will be parent of next body
@@ -365,21 +366,20 @@ void Phyztest::NextFrame ()
   {
     if  ( bot == NULL )
     {
-      // add a sprite
-      csSpriteTemplate* tmpl = (csSpriteTemplate*)
-	view->GetEngine ()->sprite_templates.FindByName ("box");
+      // add a mesh
+      csMeshFactoryWrapper* tmpl = (csMeshFactoryWrapper*)
+	view->GetEngine ()->meshobj_factories.FindByName ("box");
       if (!tmpl)
       {     
 	Printf (MSG_INITIALIZATION, "couldn't load template 'bot'\n");
 	return;
       }
 
-      bot = new csSprite3D(view->GetEngine ());
-      bot->SetTemplate( tmpl );
+      bot = tmpl->NewMeshObject (view->GetEngine ());
       view->GetEngine ()->sprites.Push (bot);
       bot->GetMovable ().SetSector (room);
-      bot->SetAction ("default");
-      bot->InitSprite ();
+      iSprite3DState* state = QUERY_INTERFACE (bot->GetMeshObject (), iSprite3DState);
+      state->SetAction ("default");
 
 
       // add the rigidbody physics object
@@ -452,8 +452,8 @@ void Phyztest::NextFrame ()
     csVector3 new_p;
     int num_lights;
 
-    // update position and orientation of all sprites for the chain.
-    // queries the physics world for rigidbody data then sets the sprites
+    // update position and orientation of all meshes for the chain.
+    // queries the physics world for rigidbody data then sets the meshes
     // properties accordingly
     for( i = 0; i < NUM_LINKS; i++ )
     {
@@ -469,7 +469,7 @@ void Phyztest::NextFrame ()
         // ctMatrix3 and csMatrix3 not directly compatable yet
         m.Set( M[0][0], M[0][1], M[0][2],
                M[1][0], M[1][1], M[1][2],
-               M[2][0], M[2][1], M[2][2]);    // set orientation of sprite
+               M[2][0], M[2][1], M[2][2]);    // set orientation of mesh
         csMatrix3 M_scale;   // chain is half size of box
         M_scale.Identity();
         M_scale *= 0.5;

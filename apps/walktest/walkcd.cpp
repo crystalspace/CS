@@ -38,7 +38,7 @@
 #include "csengine/engine.h"
 #include "csengine/keyval.h"
 #include "csengine/collider.h"
-#include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csengine/terrain.h"
 #include "csparser/impexp.h"
 #include "csutil/csrect.h"

@@ -4480,6 +4480,20 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 	  iMeshObject* mo2 = QUERY_INTERFACE (mo, iMeshObject);
 	  mesh->SetMeshObject (mo2);
 	  mo2->DecRef ();
+	  // This is a bit ugly but I don't know another way to do it.
+	  // Here we find the csMeshFactoryWrapper which is holding the
+	  // reference to the factory that created this object.
+	  iMeshObjectFactory* fact = mo2->GetFactory ();
+	  int i;
+	  for (i = 0 ; i < Engine->meshobj_factories.Length () ; i++)
+	  {
+	    csMeshFactoryWrapper* factwrap = (csMeshFactoryWrapper*)(Engine->meshobj_factories[i]);
+	    if (factwrap->GetMeshObjectFactory () == fact)
+	    {
+	      mesh->SetFactory (factwrap);
+	      break;
+	    }
+	  }
 	}
         break;
 

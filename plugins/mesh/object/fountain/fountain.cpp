@@ -77,8 +77,8 @@ void csFountainMeshObject::SetupObject ()
   }
 }
 
-csFountainMeshObject::csFountainMeshObject (iSystem* system)
-	: csParticleSystem (system)
+csFountainMeshObject::csFountainMeshObject (iSystem* system, iMeshObjectFactory* factory)
+	: csParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiFountainState);
   initialized = false;
@@ -194,7 +194,8 @@ csFountainMeshObjectFactory::~csFountainMeshObjectFactory ()
 
 iMeshObject* csFountainMeshObjectFactory::NewInstance ()
 {
-  csFountainMeshObject* cm = new csFountainMeshObject (system);
+  csFountainMeshObject* cm = new csFountainMeshObject (system,
+  	QUERY_INTERFACE (this, iMeshObjectFactory));
   return QUERY_INTERFACE (cm, iMeshObject);
 }
 

@@ -38,6 +38,7 @@ class csSprite2DMeshObjectFactory;
 class csSprite2DMeshObject : public iMeshObject
 {
 private:
+  iMeshObjectFactory* ifactory;
   csSprite2DMeshObjectFactory* factory;
 
   iMaterialWrapper* material;
@@ -45,7 +46,7 @@ private:
   bool initialized;
   csMeshCallback* vis_cb;
   void* vis_cbData;
-  float radius;
+  csVector3 radius;
 
   /**
    * Array of 3D vertices.
@@ -90,6 +91,7 @@ public:
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
+  virtual iMeshObjectFactory* GetFactory () { return ifactory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
@@ -104,7 +106,7 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
-  virtual float GetRadius () { return radius; }
+  virtual csVector3 GetRadius () { return radius; }
   virtual void NextFrame (cs_time /*current_time*/) { }
   virtual bool WantToDie () { return false; }
   virtual void HardTransform (const csReversibleTransform& t);

@@ -79,7 +79,7 @@ public:
    * swirl is the amount of swirling of particles.
    * color_scale scales the colour the particles are set to.
    */
-  csFireMeshObject (iSystem* system);
+  csFireMeshObject (iSystem* system, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csFireMeshObject ();
 

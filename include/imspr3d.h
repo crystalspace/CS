@@ -263,7 +263,7 @@ struct iSprite3DFactoryState : public iBase
   virtual void MergeNormals () = 0;
 };
 
-SCF_VERSION (iSprite3DState, 0, 0, 1);
+SCF_VERSION (iSprite3DState, 0, 0, 2);
 
 /**
  * This interface describes the API for the 2D sprite mesh object.
@@ -279,14 +279,7 @@ struct iSprite3DState : public iBase
   /// Get mix mode.
   virtual UInt GetMixMode () = 0;
 
-  // @@@ TODO: global LOD level.
-  // @@@ TODO: static int global_lighting_quality;
   // @@@ TODO: what about conveniance functions to set colors for verts?
-
-  /**
-   * Get the reference to the factory for this sprite.
-   */
-  virtual iMeshObjectFactory* GetFactory () = 0;
 
   /**
    * Get the skeleton state. Will only be valid if skeletal animation

@@ -35,6 +35,7 @@
 #include "imater.h"
 #include "imeshobj.h"
 #include "itranman.h"
+#include "iconfig.h"
 
 struct iSystem;
 
@@ -895,7 +896,7 @@ public:
   void SetFactory (csSprite3DMeshObjectFactory* factory);
 
   /// Get the factory.
-  csSprite3DMeshObjectFactory* GetFactory () { return factory; }
+  csSprite3DMeshObjectFactory* GetFactory3D () { return factory; }
 
   /// Get the skeleton state for this sprite.
   csSkelState* GetSkeletonState () { return skeleton_state; }
@@ -962,11 +963,6 @@ public:
    * for a given LOD level.
    */
   void GenerateSpriteLOD (int num_vts);
-
-  /**
-   * Get a radius in object space.//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-   */
-  csVector3 GetRadiusVec ();
 
   /**
    * Go to the next frame depending on the current time in milliseconds.
@@ -1056,6 +1052,7 @@ public:
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
+  virtual iMeshObjectFactory* GetFactory () { return QUERY_INTERFACE (factory, iMeshObjectFactory); }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
@@ -1070,7 +1067,7 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
-  virtual float GetRadius () { return 0;/*@@@radius;*/ }
+  virtual csVector3 GetRadius ();
   virtual void NextFrame (cs_time current_time)
   {
     OldNextFrame (current_time);
@@ -1087,19 +1084,19 @@ public:
     /// Get the number of vertices for this mesh.
     virtual int GetNumVertices ()
     {
-      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory ();
+      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
       return fact->GetNumVertices ();
     }
     /// Get the pointer to the array of vertices.
     virtual csVector3* GetVertices ()
     {
-      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory ();
+      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
       return fact->GetVertices (0);
     }
     /// Get the number of polygons for this mesh.
     virtual int GetNumPolygons ()
     {
-      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory ();
+      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
       return fact->GetNumTriangles ();
     }
     
@@ -1139,10 +1136,6 @@ public:
     virtual UInt GetMixMode ()
     {
       return scfParent->GetMixmode ();
-    }
-    virtual iMeshObjectFactory* GetFactory ()
-    {
-      return NULL; // @@@ Cannot be implemented here yet.
     }
     virtual iSkeletonState* GetSkeletonState ();
     virtual void SetFrame (int f)
@@ -1240,6 +1233,16 @@ public:
 
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
+
+  ///------------------- iConfig interface implementation -------------------
+  struct csSprite3DConfig : public iConfig
+  {
+    DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectType);
+    virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+    virtual bool SetOption (int id, csVariant* value);
+    virtual bool GetOption (int id, csVariant* value);
+  } scfiConfig;
+  friend struct csSprite3DConfig;
 };
 
 #endif // __CS_SPR3D_H__

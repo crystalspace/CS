@@ -68,8 +68,8 @@ void csRainMeshObject::SetupObject ()
   }
 }
 
-csRainMeshObject::csRainMeshObject (iSystem* system)
-	: csParticleSystem (system)
+csRainMeshObject::csRainMeshObject (iSystem* system, iMeshObjectFactory* factory)
+	: csParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiRainState);
   initialized = false;
@@ -151,7 +151,8 @@ csRainMeshObjectFactory::~csRainMeshObjectFactory ()
 
 iMeshObject* csRainMeshObjectFactory::NewInstance ()
 {
-  csRainMeshObject* cm = new csRainMeshObject (system);
+  csRainMeshObject* cm = new csRainMeshObject (system,
+  	QUERY_INTERFACE (this, iMeshObjectFactory));
   return QUERY_INTERFACE (cm, iMeshObject);
 }
 

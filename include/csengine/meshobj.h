@@ -30,6 +30,8 @@ struct iRenderView;
 class Dumper;
 class csMeshWrapper;
 class csRenderView;
+class csCamera;
+class csMeshFactoryWrapper;
 
 /**
  * The holder class for all implementations of iMeshObject.
@@ -53,6 +55,9 @@ private:
   /// Userdata for the draw_callback.
   void* draw_cbData;
 
+  /// Optional reference to the parent csMeshFactoryWrapper.
+  csMeshFactoryWrapper* factory;
+
 protected:
   /**
    * Update this sprite in the polygon trees.
@@ -68,6 +73,17 @@ public:
   csMeshWrapper (csObject* theParent);
   /// Destructor.
   virtual ~csMeshWrapper ();
+
+  /// Set the mesh factory.
+  void SetFactory (csMeshFactoryWrapper* factory)
+  {
+    csMeshWrapper::factory = factory;
+  }
+  /// Get the mesh factory.
+  csMeshFactoryWrapper* GetFactory ()
+  {
+    return factory;
+  }
 
   /// Set the mesh object.
   void SetMeshObject (iMeshObject* mesh);
@@ -133,7 +149,7 @@ public:
   csNamedObjVector& GetChildren () { return children; }
 
   /// Get the radius of this mesh (ignoring children).
-  float GetRadius () { return mesh->GetRadius (); }
+  csVector3 GetRadius () { return mesh->GetRadius (); }
 
   /**
    * Do a hard transform of this object.
@@ -145,6 +161,20 @@ public:
    * only the position.
    */
   void HardTransform (const csReversibleTransform& t);
+
+  /**
+   * Get the bounding box of this object after applying a transformation to it.
+   * This is really a very inaccurate function as it will take the bounding
+   * box of the object in object space and then transform this bounding box.
+   */
+  void GetTransformedBoundingBox (const csReversibleTransform& trans, csBox3& cbox);
+
+  /**
+   * Get a very inaccurate bounding box of the object in screen space.
+   * Returns -1 if object behind the camera or else the distance between
+   * the camera and the furthest point of the 3D box.
+   */
+  float GetScreenBoundingBox (const csCamera& camera, csBox2& sbox, csBox3& cbox);
 
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csSprite);

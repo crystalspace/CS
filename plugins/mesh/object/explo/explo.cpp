@@ -79,8 +79,8 @@ void csExploMeshObject::SetupObject ()
   }
 }
 
-csExploMeshObject::csExploMeshObject (iSystem* system)
-	: csNewtonianParticleSystem (system)
+csExploMeshObject::csExploMeshObject (iSystem* system, iMeshObjectFactory* factory)
+	: csNewtonianParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiExplosionState);
   initialized = false;
@@ -173,7 +173,8 @@ csExploMeshObjectFactory::~csExploMeshObjectFactory ()
 
 iMeshObject* csExploMeshObjectFactory::NewInstance ()
 {
-  csExploMeshObject* cm = new csExploMeshObject (system);
+  csExploMeshObject* cm = new csExploMeshObject (system,
+  	QUERY_INTERFACE (this, iMeshObjectFactory));
   return QUERY_INTERFACE (cm, iMeshObject);
 }
 

@@ -842,8 +842,7 @@ void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b, bool /*accurate*/)
   }
 }
 
-//@@@@@@@@@@@@
-csVector3 csSprite3DMeshObject::GetRadiusVec ()
+csVector3 csSprite3DMeshObject::GetRadius ()
 {
   csBox3 b;
   GetObjectBoundingBox (b);
@@ -1550,7 +1549,7 @@ csMeshedPolygon* csSprite3DMeshObject::PolyMesh::GetPolygons ()
 {
   if (!polygons)
   {
-    csSprite3DMeshObjectFactory* tmpl = scfParent->GetFactory ();
+    csSprite3DMeshObjectFactory* tmpl = scfParent->GetFactory3D ();
     csTriangle* triangles = tmpl->GetTriangles ();
     polygons = new csMeshedPolygon [GetNumPolygons ()];
     int i;
@@ -1573,7 +1572,12 @@ iSkeletonState* csSprite3DMeshObject::Sprite3DState::GetSkeletonState ()
 IMPLEMENT_IBASE (csSprite3DMeshObjectType)
   IMPLEMENTS_INTERFACE (iMeshObjectType)
   IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectType::csSprite3DConfig)
+  IMPLEMENTS_INTERFACE (iConfig)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_FACTORY (csSprite3DMeshObjectType)
 
@@ -1585,6 +1589,7 @@ EXPORT_CLASS_TABLE_END
 csSprite3DMeshObjectType::csSprite3DMeshObjectType (iBase* pParent)
 {
   CONSTRUCT_IBASE (pParent);
+  CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
 }
 
 csSprite3DMeshObjectType::~csSprite3DMeshObjectType ()
@@ -1602,5 +1607,47 @@ iMeshObjectFactory* csSprite3DMeshObjectType::NewFactory ()
   csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory ();
   cm->System = System;
   return QUERY_INTERFACE (cm, iMeshObjectFactory);
+}
+
+#define NUM_OPTIONS 2
+
+static const csOptionDescription config_options [NUM_OPTIONS] =
+{
+  { 0, "sprlod", "Sprite LOD Level", CSVAR_FLOAT },
+  { 1, "sprlq", "Sprite Lighting Quality", CSVAR_LONG },
+};
+
+bool csSprite3DMeshObjectType::csSprite3DConfig::SetOption (int id, csVariant* value)
+{
+  if (value->type != config_options[id].type)
+    return false;
+  switch (id)
+  {
+    case 0: csSprite3DMeshObject::global_lod_level = value->v.f; break;
+    case 1: csSprite3DMeshObject::global_lighting_quality = value->v.l; break;
+    default: return false;
+  }
+  return true;
+}
+
+bool csSprite3DMeshObjectType::csSprite3DConfig::GetOption (int id, csVariant* value)
+{
+  value->type = config_options[id].type;
+  switch (id)
+  {
+    case 0: value->v.f = csSprite3DMeshObject::global_lod_level; break;
+    case 1: value->v.l = csSprite3DMeshObject::global_lighting_quality; break;
+    default: return false;
+  }
+  return true;
+}
+
+bool csSprite3DMeshObjectType::csSprite3DConfig::GetOptionDescription
+  (int idx, csOptionDescription* option)
+{
+  if (idx < 0 || idx >= NUM_OPTIONS)
+    return false;
+  *option = config_options[idx];
+  return true;
 }
 

@@ -41,6 +41,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   csMeshWrapper::mesh = mesh;
   mesh->IncRef ();
   draw_cb = NULL;
+  factory = NULL;
 }
 
 csMeshWrapper::csMeshWrapper (csObject* theParent)
@@ -51,6 +52,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   ptree_obj = &bbox;
   csMeshWrapper::mesh = NULL;
   draw_cb = NULL;
+  factory = NULL;
 }
 
 void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
@@ -196,6 +198,57 @@ iMovable* csMeshWrapper::MeshWrapper::GetMovable ()
   return QUERY_INTERFACE (&(scfParent->GetMovable ()), iMovable);
 }
 
+void csMeshWrapper::GetTransformedBoundingBox (
+	const csReversibleTransform& trans, csBox3& cbox)
+{
+  csBox3 box;
+  mesh->GetObjectBoundingBox (box);
+  cbox.StartBoundingBox (trans * box.GetCorner (0));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (3));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (4));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (5));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (6));
+  cbox.AddBoundingVertexSmart (trans * box.GetCorner (7));
+}
+
+float csMeshWrapper::GetScreenBoundingBox (
+	const csCamera& camera, csBox2& sbox, csBox3& cbox)
+{
+  csVector2 oneCorner;
+  GetTransformedBoundingBox (camera, cbox);
+
+  // if the entire bounding box is behind the camera, we're done
+  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
+  {
+    return -1;
+  }
+
+  // Transform from camera to screen space.
+  if (cbox.MinZ () <= 0)
+  {
+    // Sprite is very close to camera.
+    // Just return a maximum bounding box.
+    sbox.Set (-10000, -10000, 10000, 10000);
+  }
+  else
+  {
+    camera.Perspective (cbox.Max (), oneCorner);
+    sbox.StartBoundingBox (oneCorner);
+    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+    camera.Perspective (v, oneCorner);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    camera.Perspective (cbox.Min (), oneCorner);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+    camera.Perspective (v, oneCorner);
+    sbox.AddBoundingVertexSmart (oneCorner);
+  }
+
+  return cbox.MaxZ ();
+}
+
 //--------------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csMeshFactoryWrapper)
@@ -238,6 +291,7 @@ csMeshWrapper* csMeshFactoryWrapper::NewMeshObject (csObject* parent)
   iMeshObject* mesh = meshFact->NewInstance ();
   csMeshWrapper* meshObj = new csMeshWrapper (parent, mesh);
   mesh->DecRef ();
+  meshObj->SetFactory (this);
   return meshObj;
 }
 

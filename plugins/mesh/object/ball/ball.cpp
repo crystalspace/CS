@@ -41,14 +41,15 @@ IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::BallState)
   IMPLEMENTS_INTERFACE (iBallState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csBallMeshObject::csBallMeshObject ()
+csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
+  csBallMeshObject::factory = factory;
   initialized = false;
   camera_cookie = 0;
   radiusx = radiusy = radiusz = 1;
-  max_radius = 1;
+  max_radius.Set (1, 1, 1);
   shift.Set (0, 0, 0);
   verts_circle = 6;
   material = NULL;
@@ -109,9 +110,7 @@ void csBallMeshObject::SetRadius (float radiusx, float radiusy, float radiusz)
   csBallMeshObject::radiusx = radiusx;
   csBallMeshObject::radiusy = radiusy;
   csBallMeshObject::radiusz = radiusz;
-  max_radius = radiusx;
-  if (radiusy > max_radius) max_radius = radiusy;
-  if (radiusz > max_radius) max_radius = radiusz;
+  max_radius.Set (radiusx, radiusy, radiusz);
 }
 
 float csBallMeshObject::GetScreenBoundingBox (iTransformationManager* tranman,
@@ -524,7 +523,7 @@ csBallMeshObjectFactory::~csBallMeshObjectFactory ()
 
 iMeshObject* csBallMeshObjectFactory::NewInstance ()
 {
-  csBallMeshObject* cm = new csBallMeshObject ();
+  csBallMeshObject* cm = new csBallMeshObject (QUERY_INTERFACE (this, iMeshObjectFactory));
   return QUERY_INTERFACE (cm, iMeshObject);
 }
 

@@ -53,6 +53,7 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
   CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
   csSprite2DMeshObject::factory = factory;
+  ifactory = QUERY_INTERFACE (factory, iMeshObjectFactory);
   material = factory->GetMaterialWrapper ();
   lighting = factory->HasLighting ();
   MixMode = factory->GetMixMode ();
@@ -79,7 +80,7 @@ void csSprite2DMeshObject::SetupObject ()
         vertices[i].color.Clamp (2, 2, 2);
       }
       // @@@ TODO: compute radius
-      radius = 1;
+      radius.Set (1, 1, 1);;
     }
   }
 }

@@ -1,7 +1,7 @@
 #include "cssysdef.h"
 #include "csphyzik/phyziks.h"
 #include "cstso.h"
-#include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csengine/sector.h"
 #include "phyztest.h"
 
@@ -23,7 +23,7 @@ csSpaceTimeObj::csSpaceTimeObj()
   //what_type = ST_SPACETIME; 
 }
 
-csRigidSpaceTimeObj::csRigidSpaceTimeObj( iCollideSystem* cdsys, csSprite3D *psprt, ctRigidBody *prb )
+csRigidSpaceTimeObj::csRigidSpaceTimeObj( iCollideSystem* cdsys, csMeshWrapper *psprt, ctRigidBody *prb )
 {
   space_time_continuum[continuum_end++] = this;
  // what_type = ST_SPACETIME; 
@@ -81,7 +81,7 @@ void csRigidSpaceTimeObj::update_space()
     // ctMatrix3 and csMatrix3 not directly compatable yet
     m.Set( M[0][0], M[0][1], M[0][2],
          M[1][0], M[1][1], M[1][2],
-         M[2][0], M[2][1], M[2][2]);    // set orientation of sprite
+         M[2][0], M[2][1], M[2][2]);    // set orientation of mesh
    
  sto->sprt->GetMovable ().SetTransform(m);
     sto->sprt->GetMovable ().UpdateMove ();
@@ -92,7 +92,7 @@ void csRigidSpaceTimeObj::update_space()
 real csRigidSpaceTimeObj::collision_check()
 {
   csCollider *coli;
-  //csSprite3D *sprt;
+  //csMeshWrapper *sprt;
   csSector* first_sector;
   ctMatrix3 M;
   csMatrix3 m;
@@ -122,7 +122,7 @@ real csRigidSpaceTimeObj::collision_check()
     M = space_time_continuum[i]->rb->get_world_to_this();
     m.Set( M[0][0], M[0][1], M[0][2],
                M[1][0], M[1][1], M[1][2],
-               M[2][0], M[2][1], M[2][2]);    // orientation of sprite
+               M[2][0], M[2][1], M[2][2]);    // orientation of mesh
 //    hits += CollisionDetect (col, first_sector, &m);
     x = space_time_continuum[i]->rb->get_pos();
     // this IS a transformaition from other to this space.

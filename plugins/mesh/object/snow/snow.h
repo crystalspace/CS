@@ -62,7 +62,7 @@ public:
    *   slant the particles in that case...
    * swirl: is the amount of swirl for a flake, 0.0 is like rain.
    */
-  csSnowMeshObject (iSystem* system);
+  csSnowMeshObject (iSystem* system, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csSnowMeshObject ();
 

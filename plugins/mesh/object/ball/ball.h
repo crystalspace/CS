@@ -36,8 +36,9 @@ class csBallMeshObjectFactory;
 class csBallMeshObject : public iMeshObject
 {
 private:
+  iMeshObjectFactory* factory;
   float radiusx, radiusy, radiusz;
-  float max_radius;
+  csVector3 max_radius;
   csVector3 shift;
   iMaterialWrapper* material;
   UInt MixMode;
@@ -71,7 +72,7 @@ private:
 
 public:
   /// Constructor.
-  csBallMeshObject ();
+  csBallMeshObject (iMeshObjectFactory* factory);
 
   /// Destructor.
   virtual ~csBallMeshObject ();
@@ -111,6 +112,7 @@ public:
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
+  virtual iMeshObjectFactory* GetFactory () { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
@@ -125,7 +127,7 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
-  virtual float GetRadius () { return max_radius; }
+  virtual csVector3 GetRadius () { return max_radius; }
   virtual void NextFrame (cs_time /*current_time*/) { }
   virtual bool WantToDie () { return false; }
   virtual void HardTransform (const csReversibleTransform& t);

@@ -77,7 +77,7 @@ public:
    * part_radius is the radius of every particle,
    * spreading multipliers: a random number (1.0..+1.0) * spread is added.
    */
-  csExploMeshObject (iSystem* system);
+  csExploMeshObject (iSystem* system, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csExploMeshObject ();
 

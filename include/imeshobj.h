@@ -24,6 +24,7 @@
 #include "iplugin.h"
 
 struct iMeshObject;
+struct iMeshObjectFactory;
 struct iMeshWrapper;
 struct iRenderView;
 struct iMovable;
@@ -37,13 +38,18 @@ typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshObject, 0, 0, 8);
+SCF_VERSION (iMeshObject, 0, 0, 10);
 
 /**
  * This is a general mesh object that the engine can interact with.
  */
 struct iMeshObject : public iBase
 {
+  /**
+   * Get the reference to the factory that created this mesh object.
+   */
+  virtual iMeshObjectFactory* GetFactory () = 0;
+
   /**
    * First part of Draw. The engine will call this DrawTest() before
    * calling Draw() so DrawTest() can (if needed) remember computationally
@@ -93,7 +99,7 @@ struct iMeshObject : public iBase
   /**
    * Get the radius of this object in object space.
    */
-  virtual float GetRadius () = 0;
+  virtual csVector3 GetRadius () = 0;
 
   /**
    * Control animation of this object.

@@ -61,8 +61,8 @@ void csSpiralMeshObject::SetupObject ()
   }
 }
 
-csSpiralMeshObject::csSpiralMeshObject (iSystem* system)
-	: csNewtonianParticleSystem (system)
+csSpiralMeshObject::csSpiralMeshObject (iSystem* system, iMeshObjectFactory* factory)
+	: csNewtonianParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSpiralState);
   initialized = false;
@@ -149,7 +149,8 @@ csSpiralMeshObjectFactory::~csSpiralMeshObjectFactory ()
 
 iMeshObject* csSpiralMeshObjectFactory::NewInstance ()
 {
-  csSpiralMeshObject* cm = new csSpiralMeshObject (system);
+  csSpiralMeshObject* cm = new csSpiralMeshObject (system,
+  	QUERY_INTERFACE (this, iMeshObjectFactory));
   return QUERY_INTERFACE (cm, iMeshObject);
 }
 

@@ -20,7 +20,7 @@
 #include "walktest/wentity.h"
 #include "walktest/walktest.h"
 #include "csengine/thing.h"
-#include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csgeom/matrix3.h"
 
 extern WalkTest* Sys;

@@ -38,10 +38,11 @@ IMPLEMENT_EMBEDDED_IBASE (csParticleSystem::ParticleState)
   IMPLEMENTS_INTERFACE (iParticleState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csParticleSystem::csParticleSystem (iSystem* system)
+csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
+  csParticleSystem::factory = factory;
   particles.SetLength (0);
   self_destruct = false;
   time_to_live = 0;
@@ -248,8 +249,9 @@ csVector3& csParticleSystem::GetRandomDirection (const csVector3& magnitude,
 
 //-- csNewtonianParticleSystem ------------------------------------------
 
-csNewtonianParticleSystem::csNewtonianParticleSystem (iSystem* system)
-  : csParticleSystem (system)
+csNewtonianParticleSystem::csNewtonianParticleSystem (iSystem* system,
+	iMeshObjectFactory* factory)
+  : csParticleSystem (system, factory)
 {
   // create csVector3's
   part_speed = NULL;

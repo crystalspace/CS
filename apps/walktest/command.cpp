@@ -32,15 +32,19 @@
 #include "csengine/sector.h"
 #include "csengine/polygon.h"
 #include "csengine/polytext.h"
-#include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csengine/dumper.h"
 #include "command.h"
 #include "csutil/scanstr.h"
+#include "walktest.h"
 #include "qint.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
 #include "iconsole.h"
 #include "ievent.h"
+#include "imeshobj.h"
+
+extern WalkTest* Sys;
 
 // Static csCommandProcessor variables
 csEngine* csCommandProcessor::engine = NULL;
@@ -230,6 +234,39 @@ bool csCommandProcessor::change_int (const char* arg, int* value, const char* wh
   return false;
 }
 
+/*
+ * Standard processing to change/display a long setting.
+ * Return true if value changed.
+ */
+bool csCommandProcessor::change_long (const char* arg, long* value, const char* what, long min, long max)
+{
+  if (arg)
+  {
+    // Change value.
+    long g;
+    if ((*arg == '+' || *arg == '-') && *(arg+1) == *arg)
+    {
+      long dv;
+      sscanf (arg+1, "%ld", &dv);
+      g = *value+dv;
+    }
+    else sscanf (arg, "%ld", &g);
+    if (g < min || g > max) CsPrintf (MSG_CONSOLE, "Bad value for %s (%ld <= value <= %ld)!\n", what, min, max);
+    else
+    {
+      *value = g;
+      CsPrintf (MSG_CONSOLE, "Set %s to %ld\n", what, *value);
+      return true;
+    }
+  }
+  else
+  {
+    // Show value.
+    CsPrintf (MSG_CONSOLE, "Current %s is %ld\n", what, *value);
+  }
+  return false;
+}
+
 bool csCommandProcessor::perform_line (const char* line)
 {
   char cmd[512], arg[255];
@@ -241,6 +278,10 @@ bool csCommandProcessor::perform_line (const char* line)
   else *arg = 0;
   return perform (cmd, *arg ? arg : (char*)NULL);
 }
+
+extern bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue);
+extern void SetConfigOption (iBase* plugin, const char* optName, const char* optValue);
+extern void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue);
 
 bool csCommandProcessor::perform (const char* cmd, const char* arg)
 {
@@ -311,10 +352,23 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   else if (!strcasecmp (cmd, "cosfact"))
     change_float (arg, &csPolyTexture::cfg_cosinus_factor, "cosinus factor", -1, 1);
   else if (!strcasecmp (cmd, "lod"))
-    change_float (arg, &csSprite3D::global_lod_level, "LOD detail", 
-      -1, 1000000);
+  {
+    iMeshObjectType* type = QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.sprite.3d",
+      	  "MeshObj", iMeshObjectType);
+    csVariant lod_level;
+    GetConfigOption (type, "sprlod", lod_level);
+    change_float (arg, &lod_level.v.f, "LOD detail", -1, 1000000);
+    SetConfigOption (type, "sprlod", lod_level);
+  }
   else if (!strcasecmp (cmd, "sprlight"))
-    change_int (arg, &csSprite3D::global_lighting_quality, "sprite lighting quality", 0, 3);
+  {
+    iMeshObjectType* type = QUERY_PLUGIN_CLASS (Sys, "crystalspace.mesh.object.sprite.3d",
+      	  "MeshObj", iMeshObjectType);
+    csVariant lqual;
+    GetConfigOption (type, "sprlq", lqual);
+    change_long (arg, &lqual.v.l, "sprite lighting quality", 0, 3);
+    SetConfigOption (type, "sprlq", lqual);
+  }
   else if (!strcasecmp (cmd, "dnl"))
     CsPrintf (MSG_DEBUG_0, "\n");
   else if (!strcasecmp (cmd, "exec"))

@@ -43,7 +43,7 @@ protected:
 
 public:
   /// Constructor.
-  csSpiralMeshObject (iSystem* system);
+  csSpiralMeshObject (iSystem* system, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csSpiralMeshObject ();
 

@@ -42,8 +42,9 @@ struct iRenderView;
 class csParticleSystem : public iMeshObject
 {
 protected:
+  iMeshObjectFactory* factory;
   /// Object space radius.
-  float radius;
+  csVector3 radius;
   /// iParticle ptrs to the particles.
   csVector particles;
   /// Self destruct and when.
@@ -94,7 +95,7 @@ public:
    * Make a new system. 
    * Also adds the particle system to the list of the current engine.
    */
-  csParticleSystem (iSystem* system);
+  csParticleSystem (iSystem* system, iMeshObjectFactory* factory);
 
   /**
    * Destroy particle system, and all particles.
@@ -208,6 +209,7 @@ public:
   //------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
+  virtual iMeshObjectFactory* GetFactory () { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
@@ -226,7 +228,7 @@ public:
     (void)accurate;
     bbox = csParticleSystem::bbox;
   }
-  virtual float GetRadius () { return radius; }
+  virtual csVector3 GetRadius () { return radius; }
   virtual void NextFrame (cs_time current_time)
   {
     cs_time elaps = 0;
@@ -317,7 +319,7 @@ protected:
 
 public:
   /// Specify max number of particles.
-  csNewtonianParticleSystem (iSystem* system);
+  csNewtonianParticleSystem (iSystem* system, iMeshObjectFactory* factory);
   virtual ~csNewtonianParticleSystem ();
 
   void SetNumber (int max);

@@ -93,6 +93,8 @@ public:
   static bool change_float (const char* arg, float* value, const char* what, float min, float max);
   /// Change int variable value
   static bool change_int (const char* arg, int* value, const char* what, int min, int max);
+  /// Change long variable value
+  static bool change_long (const char* arg, long* value, const char* what, long min, long max);
 
   /**
    * Additional command handler. If not NULL, this handler will be called

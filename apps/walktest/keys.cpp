@@ -28,7 +28,7 @@
 #include "csengine/engine.h"
 #include "csengine/csview.h"
 #include "csengine/wirefrm.h"
-#include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csengine/skeleton.h"
 #include "csengine/triangle.h"
 #include "csengine/polygon.h"
@@ -53,7 +53,7 @@ extern WalkTest* Sys;
 
 csKeyMap* mapping = NULL;
 
-csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVector2 *screenCoord);
+csMeshWrapper *FindNextClosestMesh (csMeshWrapper *baseMesh, csCamera *camera, csVector2 *screenCoord);
 
 //===========================================================================
 // Everything for key mapping and binding.
@@ -650,15 +650,15 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
 void WalkTest::MouseClick3Handler(iEvent &Event)
 {
   csVector2   screenPoint;
-  csSprite3D *closestSprite;
+  csMeshWrapper *closestMesh;
 
   screenPoint.x = Event.Mouse.x;
   screenPoint.y = Event.Mouse.y;
-  closestSprite = FindNextClosestSprite(NULL, view->GetCamera(), &screenPoint);
-  if (closestSprite)
-    Sys->Printf (MSG_CONSOLE, "Selected sprite %s\n", closestSprite->GetName ());
+  closestMesh = FindNextClosestMesh (NULL, view->GetCamera(), &screenPoint);
+  if (closestMesh)
+    Sys->Printf (MSG_CONSOLE, "Selected mesh %s\n", closestMesh->GetName ());
   else
-    Sys->Printf (MSG_CONSOLE, "No sprite selected!\n");
+    Sys->Printf (MSG_CONSOLE, "No mesh selected!\n");
 }
 
 
@@ -737,51 +737,51 @@ bool WalkTest::HandleEvent (iEvent &Event)
   return false;
 }
 
-csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVector2 *screenCoord)
+csMeshWrapper *FindNextClosestMesh (csMeshWrapper *baseMesh,
+	csCamera *camera, csVector2 *screenCoord)
 {
-  int spriteIndex;
+  int meshIndex;
   float thisZLocation;
   float closestZLocation;
-  csSprite3D *closestSprite;
-  csSprite3D *nextSprite;
+  csMeshWrapper *closestMesh;
+  csMeshWrapper *nextMesh;
   csBox2 screenBoundingBox;
   csBox3 bbox3;
   
-  if (baseSprite)
+  if (baseMesh)
   {
-    closestSprite = baseSprite;
-    closestZLocation = baseSprite->GetScreenBoundingBox(*camera, screenBoundingBox, bbox3);
-    // if the baseSprite isn't in front of the camera, return
+    closestMesh = baseMesh;
+    closestZLocation = baseMesh->GetScreenBoundingBox(*camera, screenBoundingBox, bbox3);
+    // if the baseMesh isn't in front of the camera, return
     if (closestZLocation < 0)
       return NULL;
   }
   else
   {
-    closestSprite = NULL;
+    closestMesh = NULL;
     closestZLocation = 32000;
   }
 
   // @@@ This routine ignores 2D sprites for the moment.
-  for (spriteIndex = 0; spriteIndex < Sys->engine->sprites.Length(); spriteIndex++)
+  for (meshIndex = 0; meshIndex < Sys->engine->sprites.Length(); meshIndex++)
   {
-    csSprite* sp = (csSprite*)Sys->engine->sprites[spriteIndex];
-    if (sp->GetType () != csSprite3D::Type) continue;
-    nextSprite = (csSprite3D*)sp;
+    csSprite* sp = (csSprite*)Sys->engine->sprites[meshIndex];
+    if (sp->GetType () != csMeshWrapper::Type) continue;
+    nextMesh = (csMeshWrapper*)sp;
 
-//  Sys->Printf(MSG_CONSOLE, "Checking sprite %s\n", nextSprite->GetName ());
-    if (nextSprite != baseSprite)
+    if (nextMesh != baseMesh)
     {
-      thisZLocation = nextSprite->GetScreenBoundingBox(*camera, screenBoundingBox, bbox3);
+      thisZLocation = nextMesh->GetScreenBoundingBox(*camera, screenBoundingBox, bbox3);
       if ((thisZLocation > 0) && (thisZLocation < closestZLocation))
       {
         if (screenBoundingBox.In(screenCoord->x, screenCoord->y))
         {
           closestZLocation = thisZLocation;
-          closestSprite = nextSprite;
+          closestMesh = nextMesh;
         }
       }
     }
   }
 
-  return closestSprite;
+  return closestMesh;
 }

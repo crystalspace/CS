@@ -71,8 +71,8 @@ void csSnowMeshObject::SetupObject ()
   }
 }
 
-csSnowMeshObject::csSnowMeshObject (iSystem* system)
-	: csParticleSystem (system)
+csSnowMeshObject::csSnowMeshObject (iSystem* system, iMeshObjectFactory* factory)
+	: csParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSnowState);
   initialized = false;
@@ -163,7 +163,8 @@ csSnowMeshObjectFactory::~csSnowMeshObjectFactory ()
 
 iMeshObject* csSnowMeshObjectFactory::NewInstance ()
 {
-  csSnowMeshObject* cm = new csSnowMeshObject (system);
+  csSnowMeshObject* cm = new csSnowMeshObject (system,
+  	QUERY_INTERFACE (this, iMeshObjectFactory));
   return QUERY_INTERFACE (cm, iMeshObject);
 }
 

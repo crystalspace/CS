@@ -47,7 +47,7 @@
 #include "csengine/covtree.h"
 #include "csengine/solidbsp.h"
 #include "csengine/terrain.h"
-#include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csparser/impexp.h"
 #include "csutil/csrect.h"
 #include "csutil/scanstr.h"

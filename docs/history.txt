@@ -1,6 +1,41 @@
 The history order has been reversed so that new features are at the top.
 
+9-Feb-2001
+	- Wouter Wijngaards added default =0 to csPixmap function.
+	- Philip Wyett fixed memory reference errors on app exit under
+	  Windows. "->DecRef ();" both cube and ball inside the destructor.
+	- Added incomplete doc on transition from 0.17 to 0.18. Will work
+	  further on this.
+	- Added GetTransformedBoundingBox() and GetScreenBoundingBox() to
+	  csMeshWrapper.
+	- Changed sprite selection code in WalkTest to work on mesh objects.
+	- Spr3d plugin now also implements iConfig so that you can set
+	  sprite configuration options through that. Currently the supported
+	  options are 'sprlod' (sprite lod level) and 'sprlq' (sprite
+	  lighting quality).
+	- Modified WalkTest to use the iConfig interface of the spr3d
+	  plugin to implement the 'lod' and 'sprlight' console commands.
+	  Added GetConfigOption() and SetConfigOption() routines in WalkTest
+	  to make this easier.
+	- WalkTest is now completely free of the old csSprite3D and is
+	  fully converted to the new spr3d plugin.
+	- Converted cctest app and csclear lib to use new spr3d plugin.
+	- Added SetFactory() and GetFactory() to csMeshWrapper.
+	- Added GetFactory() to iMeshObject and removed GetFactory() from
+	  iSprite3DState. Changed all mesh object plugins accordingly.
+	- Fixed MazeD for the new spr3d plugin.
+	- Fixed Physics test appliation to use the new spr3d plugin.
+	- Fixed levtool app to use the new spr3d plugin.
+	- Changed GetRadius() in iMeshObject to return a csVector instead
+	  of a float.
 8-Feb-2001
+	- Martin Geisse changed DirectInput version number from 0x0700
+	  to 0x0300.
+	- Philip Wyett fixed VERY VERY long standing compile errors
+	  in the MingW port. There are no code changes, just a code move
+	  around. Still compiles in VC6. Other platforms say Linux etc.
+	  will have to compile to verify this hack (and it is a hack :-))
+	  is OK?
 	- Changed 'bot' code in Walktest and ptlab to use the new spr3d
 	  plugin instead of csSprite3D.
 	- Initialization of collision detection in WalkTest will now work

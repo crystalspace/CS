@@ -40,6 +40,7 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
 {
   CONSTRUCT_IBASE (NULL);
   csCubeMeshObject::factory = factory;
+  ifactory = QUERY_INTERFACE (factory, iMeshObjectFactory);
   initialized = false;
   camera_cookie = 0;
   vis_cb = NULL;
@@ -52,7 +53,8 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
   if (sizey > max_size) max_size = sizey;
   if (sizez > max_size) max_size = sizez;
   float a = max_size/2.;
-  radius = qsqrt (a*a + a*a);
+  float r = qsqrt (a*a + a*a);
+  radius.Set (r, r, r);
 }
 
 csCubeMeshObject::~csCubeMeshObject ()

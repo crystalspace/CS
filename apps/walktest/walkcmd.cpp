@@ -31,7 +31,6 @@
 #include "csengine/engine.h"
 #include "csengine/csview.h"
 #include "csengine/wirefrm.h"
-#include "csengine/cssprite.h"
 #include "csengine/meshobj.h"
 #include "csengine/skeleton.h"
 #include "csengine/triangle.h"
@@ -367,9 +366,78 @@ void list_meshes (void)
 	       Sys->engine->sprites.Length());
 }
 
+//===========================================================================
 
+void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
+{
+  iConfig* config = QUERY_INTERFACE (plugin, iConfig);
+  if (!config)
+    CsPrintf (MSG_CONSOLE, "No config interface for this plugin.\n");
+  else
+  {
+    int i;
+    for (i = 0 ; ; i++)
+    {
+      csOptionDescription odesc;
+      if (!config->GetOptionDescription (i, &odesc)) break;
+      if (strcmp (odesc.name, optName) == 0)
+      {
+	CsPrintf (MSG_CONSOLE, "Set option %s to %s\n", odesc.name, optValue);
+	csVariant var;
+	switch (odesc.type)
+	{
+	  case CSVAR_LONG: sscanf (optValue, "%ld", &var.v.l); break;
+	  case CSVAR_BOOL: ScanStr (optValue, "%b", &var.v.b); break;
+	  case CSVAR_FLOAT: ScanStr (optValue, "%f", &var.v.f); break;
+	  default: break;
+	}
+	config->SetOption (i, &var);
+	return;
+      }
+    }
+  }
+}
 
+void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
+{
+  iConfig* config = QUERY_INTERFACE (plugin, iConfig);
+  if (!config)
+    CsPrintf (MSG_CONSOLE, "No config interface for this plugin.\n");
+  else
+  {
+    int i;
+    for (i = 0 ; ; i++)
+    {
+      csOptionDescription odesc;
+      if (!config->GetOptionDescription (i, &odesc)) break;
+      if (strcmp (odesc.name, optName) == 0)
+	config->SetOption (i, &optValue);
+	return;
+    }
+  }
+}
 
+bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
+{
+  iConfig* config = QUERY_INTERFACE (plugin, iConfig);
+  if (!config)
+    CsPrintf (MSG_CONSOLE, "No config interface for this plugin.\n");
+  else
+  {
+    int i;
+    for (i = 0 ; ; i++)
+    {
+      csOptionDescription odesc;
+      if (!config->GetOptionDescription (i, &odesc)) break;
+      if (strcmp (odesc.name, optName) == 0)
+      {
+	config->GetOption (i, &optValue);
+	return true;
+      }
+    }
+  }
+  return false;
+}
 
 //===========================================================================
 
@@ -655,31 +723,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       else
       {
         iBase* plugin = Sys->GetPlugIn (idx);
-        iConfig* config = QUERY_INTERFACE (plugin, iConfig);
-	if (!config)
-	  CsPrintf (MSG_CONSOLE, "No config interface for this plugin.\n");
-	else
-	{
-          int i;
-          for (i = 0 ; ; i++)
-          {
-	    csOptionDescription odesc;
-	    if (!config->GetOptionDescription (i, &odesc)) break;
-	    if (strcmp (odesc.name, name) == 0)
-	    {
-	      CsPrintf (MSG_CONSOLE, "Set option %s to %s\n", odesc.name, val);
-	      csVariant var;
-	      switch (odesc.type)
-	      {
-	        case CSVAR_LONG: sscanf (val, "%ld", &var.v.l); break;
-	        case CSVAR_BOOL: ScanStr (val, "%b", &var.v.b); break;
-	        case CSVAR_FLOAT: ScanStr (val, "%f", &var.v.f); break;
-		default: break;
-	      }
-	      config->SetOption (i, &var);
-	    }
-          }
-	}
+	SetConfigOption (plugin, name, val);
       }
     }
     else
@@ -1455,8 +1499,9 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (aspr && aspr->GetType () >= csMeshWrapper::Type)
       {
         csMeshWrapper* wrap = (csMeshWrapper*)aspr;
-	iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
-	iSprite3DFactoryState* fstate = QUERY_INTERFACE (state->GetFactory (), iSprite3DFactoryState);
+	iSprite3DFactoryState* fstate = QUERY_INTERFACE (
+		wrap->GetMeshObject ()->GetFactory (),
+		iSprite3DFactoryState);
 	iSpriteAction* aspr_act;
 	int i;
 

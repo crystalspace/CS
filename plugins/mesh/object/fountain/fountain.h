@@ -73,7 +73,7 @@ public:
    * elevation is the angle of the direction (up/down) of the stream.
    *   angles in radians (2*PI is 360 degrees)
    */
-  csFountainMeshObject (iSystem* system);
+  csFountainMeshObject (iSystem* system, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csFountainMeshObject ();
 

@@ -59,7 +59,7 @@ public:
    *   You can make slanted rain this way. Although you would also want to
    *   slant the particles in that case...
    */
-  csRainMeshObject (iSystem* system);
+  csRainMeshObject (iSystem* system, iMeshObjectFactory* factory);
   /// Destructor.
   virtual ~csRainMeshObject ();
 

@@ -82,8 +82,8 @@ void csFireMeshObject::SetupObject ()
   }
 }
 
-csFireMeshObject::csFireMeshObject (iSystem* system)
-	: csParticleSystem (system)
+csFireMeshObject::csFireMeshObject (iSystem* system, iMeshObjectFactory* factory)
+	: csParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiFireState);
   initialized = false;
@@ -242,7 +242,8 @@ csFireMeshObjectFactory::~csFireMeshObjectFactory ()
 
 iMeshObject* csFireMeshObjectFactory::NewInstance ()
 {
-  csFireMeshObject* cm = new csFireMeshObject (system);
+  csFireMeshObject* cm = new csFireMeshObject (system,
+  	QUERY_INTERFACE (this, iMeshObjectFactory));
   return QUERY_INTERFACE (cm, iMeshObject);
 }
 
