@@ -30,21 +30,61 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp %.cc plugins/sound/renderer/arts
 
 ARTSTEST.EXE = artstest$(EXE)
-LIB.CSARTS = plugins/sound/renderer/arts/libcsarts.la
-INC.ARTS = -I$(KDEDIR)/include/arts
-LIB.ARTS=-L$(KDEDIR)/lib -lartsflow -lartsflow_idl -lartsmodules -lmcop -lsoundserver_idl -ldl -lstdc++
-IDL.ARTSTEST = $(wildcard plugins/sound/renderer/arts/*.idl)
-IDLSRC.ARTSTEST = $(IDL.ARTSTEST:.idl=.cc)
-SRC.ARTSTEST = $(wildcard plugins/sound/renderer/arts/*.cpp) 
-IMPLSRC.ARTSTEST = $(wildcard plugins/sound/renderer/arts/*_impl.cpp) 
-MOOBJ.ARTSTEST = $(addprefix $(OUT),$(notdir $(IDLSRC.ARTSTEST:.cc=.moo)))
-OBJ.ARTSTEST = $(MOOBJ.ARTSTEST) $(addprefix $(OUT),$(notdir $(SRC.ARTSTEST:.cpp=$O)))
-DEP.ARTSTEST = CSGFX CSGEOM CSUTIL CSSYS CSUTIL 
-LIB.ARTSTEST = $(foreach d,$(DEP.ARTSTEST),$($d.LIB))
+
+# Unlike CS interfaces, mcop interfaces need to be precompiled and are, in the end,
+# represemted by 3 classes (foo_skel, foo_stub, foo)
+# Our final renderer plugin will only access foos and not their implementation, so we create
+# two libraries: csarts and csart_idl, where csarts_idl only holds the interface classes
+# The final renderer will be linked with csarts_idl, whereas the implementation library csarts will live
+# in a path that is searched by mcop's objectmanager
+
+# these are the files we feed the MCOP idl compiler with
+IDL.CSARTS = $(wildcard plugins/sound/renderer/arts/*.idl)
+
+# the mcop compiler will spill out the following files, we keep track of them separatly to link those
+# (and only those) into the csarts_idl library
+SRC.CSARTS.IDL = $(IDL.ARTSTEST:.idl=.cc)
+
+# Next we will need the implementation sources for the interfaces.
+# We introduce the convention, that the implementation sources are named *_impl.cpp.
+# We keep track of them explicitly because we'll send them through libtool.
+SRC.CSARTS.IMPL = $(wildcard plugins/sound/renderer/arts/*_impl.cpp) 
+
+# what follows are the source only needed by the csarts renderer itself
+SRC.CSARTS = $(filter-out $(SRC.CSARTS.IMPL) $(wildcard plugins/sound/renderer/arts/*.cpp))
+
+# since we need the obj files for the interfaces and their implementations created through libtool
+# we'll give them a unique suffix - .moo
+MOOBJ.CSARTS.IDL = $(addprefix $(OUT),$(notdir $(SRC.CSARTS:.cc=.moo)))
+MOOBJ.CSARTS.IMPL = $(addprefix $(OUT),$(notdir $(SRC.CSARTS.IMPL:.cpp=.moo)))
+
+# the others use the usual suffix
+OBJ.CSARTS = $(addprefix $(OUT),$(notdir $(SRC.CSARTS:.cpp=$O)))
+
+# the lib that will be used by mcop and that ends up in a directory visible by mcop
+LIB.CSARTS.IMPL = plugins/sound/renderer/arts/libcsarts.la
+
+# the iterface lib we'll link to our csarts renderer
+LIB.CSARTS.IDL  = $(OUT)$(LIB_PREFIX)csarts_idl$(DLL)
+
+# the csarts renderer plugin
+CSARTS  = $(OUTDLL)csarts$(DLL)
+
+# common lib we need to link
+LIB.CSARTS.COMMON = -lartsflow_idl -lmcop -ldl
+
+# additional libs we need to link the csarts plugin
+LIB.LINK.CSARTS =-L$(MCOP.LIBDIR) $(LIB.CSARTS.COMMON) -lsoundserver_idl -lstdc++
+
+# additional libs we need to link the implementation library
+LIB.LINK.CSARTS.IMPL=-module -rpath $(KDEDIR)/lib -L$(MCOP.LIBDIR) $(LIB.CSARTS.COMMON) -lartsmodules
+
+DEP.CSARTS = CSGFX CSGEOM CSUTIL CSSYS CSUTIL 
+LIB.CSARTS = $(foreach d,$(DEP.CSARTS),$($d.LIB))
+
 ARTS.CXX = libtool --mode=compile g++
-ARTS.LD=libtool --mode=link g++
-ARTS.CP=libtool --mode=install cp
-ARTS.LDFLAGS=-module -rpath $(KDEDIR)/lib -L$(KDEDIR)/lib -lartsflow -lartsflow_idl -lartsmodules -lmcop -ldl
+ARTS.LD  =libtool --mode=link g++
+ARTS.CP  =libtool --mode=install cp
 
 CSARTS.LA.SRC = $(IDLSRC.ARTSTEST) $(IMPLSRC.ARTSTEST)
 
@@ -53,7 +93,7 @@ $(addprefix plugins/sound/renderer/arts/,$(notdir $(IMPLSRC.ARTSTEST:.cpp=.lo)))
 
 TO_INSTALL.EXE += $(ARTSTEST.EXE)
 
-MSVC.DSP += ARTSTEST
+#MSVC.DSP += ARTSTEST
 DSP.ARTSTEST.NAME = artstest
 DSP.ARTSTEST.TYPE = appcon
 
@@ -62,14 +102,17 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csarts csartsclean csartsinstall csartslib
+.PHONY: csarts csartsclean csartsinstall csartslib csartsidl
 
 csarts: $(OUTDIRS) $(ARTSTEST.EXE) $(LIB.CSARTS)
+csartidl: $(LIB.CSARTSIDL)
 csartslib: $(LIB.CSARTS)
 clean: csartsclean
 
-$(ARTSTEST.EXE): $(OBJ.ARTSTEST) $(LIB.ARTSTEST)
-	$(DO.LINK.EXE) $(LIB.ARTS)
+$(ARTSTEST.EXE): $(OBJ.ARTSTEST) $(LIB.ARTSTEST) $(LIB.CSARTSIDL)
+	$(DO.LINK.EXE) $(LIB.ARTS) $(LIB.CSARTSIDL)
+
+$(LIB.CSARTSIDL): $(OBJ.ARTSTEST)
 
 $(LIB.CSARTS): $(CSARTS.LA.OBJ) $(LIB.ARTSTEST)
 	$(ARTS.LD) -o $(LIB.CSARTS) $(ARTS.LDFLAGS) $(CSARTS.LA.OBJ)
