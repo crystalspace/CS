@@ -90,27 +90,27 @@ Then you need to do the following:
 
 	make apps
 
-If you selected USE_SHARED_PLUGINS=yes then this will generate an
-executable and drivers (extension *.so) for the software renderer,
-a 2D driver, and some network drivers. If you selected USE_SHARED_PLUGINS=no
-then only the executable is generated and the drivers are contained in that
-executable.
+If you selected USE_SHARED_PLUGINS=yes then this will generate an executable
+and drivers (extension *.so on Linux and most Unix platforms) for the software
+renderer, a 2D driver, and some network drivers.  If you selected
+USE_SHARED_PLUGINS=no then only the executable is generated and the drivers
+are contained in that executable.
 
-If you selected USE_SHARED_PLUGINS=yes then you need to register the drivers
-(this only needs to be done once) with the 'csregsvr' utility that was
-also compiled by 'make all'. Do this as follows:
+If you selected USE_SHARED_PLUGINS=yes then you may need to register the
+drivers with the SCF system.  This generally only needs to be done once.  The
+registration information is maintained in the file scf.cfg.  However, typically
+this file is already up-to-date, so usually you can skip this step altogether.
+Only perform this step if the system is unable to locate the drivers or
+if you are actively developing a driver and changing registration information.
+The program to register plug-ins is called scfreg, and it was also compiled by
+'make all'. To run it, type:
 
-	./csregsvr ./*.so
+	./scfreg *.so
 
-If all is well this should register all drivers so
-that Crystal Space will be able to load them dynamically. This step
-is not needed with USE_SHARED_PLUGINS=no. The result of registration is
-put in csCOM.cfg which needs to be in the same directory as the executable.
-The csCOM.cfg which comes with CS is already pre-registered so the
-above step may actually not be needed. But it is best to try it to
-make sure that all libraries are correctly compiled. Note that it
-does not do any harm to register them more than once.
-
+If all is well this should register all drivers so that Crystal Space will be
+able to load them dynamically.  If your platform uses a file extension other
+than *.so for plug-in modules, then alter the command appropriately.  This
+step is not needed when USE_SHARED_PLUGINS=no is specified.
 
 Now you can run the executable 'walktest'.
 (see the original 'INSTALL' file for running instructions).

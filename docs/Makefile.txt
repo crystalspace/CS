@@ -153,7 +153,7 @@ search mask apps/*/*.mak, this way:
 
 	[1|home|~/CS]ls apps/*/*.mak
 	apps/blocks/blocks.mak      apps/primedit/primedit.mak
-	apps/csregsvr/csregsvr.mak  apps/simple/simple.mak
+	apps/scfreg/scfreg.mak      apps/simple/simple.mak
 	apps/cswstest/cswstest.mak  apps/walktest/walktest.mak
 	apps/mazed/mazed.mak
 
@@ -210,7 +210,7 @@ a number of variables that defines linker flags:
 	LFLAGS.EXE	The linker flags used when building a executable
 	LFLAGS.CONSOLE.EXE
 			These flags are used when building a console executable
-			(for example, csregsvr). Some systems makes difference
+			(for example, scfreg). Some systems makes difference
 			between a "graphics" executable and a "console"
 			executable.
 

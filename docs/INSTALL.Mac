@@ -67,7 +67,7 @@ Squawk.mcp  	- A Crystal Space application.
 Walktest.mcp	- Another Simple Crystal Space application.
 
 and 2 project that builds other projects
-MakeShared.mcp	- Makes sure all of the shared libraries and CSRegSvr are up to date.
+MakeShared.mcp	- Makes sure all of the shared libraries and scfreg are up to date.
 MakeApps.mcp	- Makes sure all of the applications are up to date.
 
 Generally you will just build an application and all of the other pieces will be built for you.
