@@ -13,6 +13,12 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+24-Aug-1999
+	- Eric Sunshine fixed CSWS and MazeD so that the desktop is correctly
+	  repainted in all cases after information has been printed to the
+	  console.  This fixes problems where some sub-systems printed
+	  informational or debugging output without refreshing the desktop
+	  afterward, thus leaving the desktop in an unusable state.
 23-Aug-1999
 	- Minimize splitter in BSP tree creator uses random selection
 	  instead of initial polygons. This improves BSP tree creation
