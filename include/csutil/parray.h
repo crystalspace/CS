@@ -120,7 +120,7 @@ public:
   /// Call csArray<T*>::SetLength(n).
   void SetLength (int n)
   {
-    csArray<T*>::SetLength(n);
+    csArray<T*, csPDelArrayElementHandler<T*> >::SetLength(n);
   }
 };
 
