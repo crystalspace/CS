@@ -55,9 +55,16 @@ void csView::SetRectangle (int x, int y, int w, int h)
 {
   orig_width = G3D->GetWidth ();
   orig_height = G3D->GetHeight();
+
+  // Do not allow the rectangle to go out of the screen
+  if (x < 0) { w += x; x = 0; }
+  if (y < 0) { h += y; y = 0; }
+  if (x + w > orig_width) { w = orig_width - x; }
+  if (y + h > orig_height) { h = orig_height - y; }
+
   CHK (delete view);  view = NULL;
   CHK (delete bview);
-  CHK (bview = new csBox (x, y, x+w-1, y+h-1));
+  CHK (bview = new csBox (x, y, x + w - 1, y + h - 1));
   CHK (delete clipper); clipper = NULL;
 }
 

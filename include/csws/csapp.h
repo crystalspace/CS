@@ -112,7 +112,7 @@ public:
   void ShutDown ();
 
   /// The windowing system is idle: do some lazy work
-  void Idle ();
+  virtual void Idle ();
 
   /// Draw the application background
   virtual void Draw ();
@@ -298,8 +298,6 @@ public:
 protected:
   /// Initialize configuration data: load csws.cfg
   virtual void LoadConfig ();
-
-private:
   /// setup palette
   void SetupPalette ();
   /// Flush graphics pipeline
