@@ -457,7 +457,7 @@ private:
   /**
    * Setup for starting a Draw or DrawFunc.
    */
-  void StartDraw (csCamera* c, iClipper2D* view, csRenderView& rview);
+  void StartDraw (iCamera* c, iClipper2D* view, csRenderView& rview);
 
   /**
    * Find some object (given a name) which is both in a region
@@ -475,7 +475,7 @@ public:
   /**
    * The current camera for drawing the world.
    */
-  csCamera* current_camera;
+  iCamera* current_camera;
 
   /**
    * The top-level clipper we are currently using for drawing.

@@ -418,7 +418,7 @@ csEngine::csEngine (iBase *iParent) : camera_positions (16, 16)
 }
 
 // @@@ Hack
-csCamera* camera_hack = NULL;
+iCamera* camera_hack = NULL;
 
 csEngine::~csEngine ()
 {
@@ -435,7 +435,8 @@ csEngine::~csEngine ()
   delete c_buffer;
   
   // @@@ temp hack
-  delete camera_hack;
+  if (camera_hack)
+    camera_hack->DecRef ();
   camera_hack = NULL;
 }
 
@@ -501,7 +502,7 @@ bool csEngine::HandleEvent (iEvent &Event)
         // This is needed for the lighting routines.
         if (!current_camera)
         {
-          current_camera = new csCamera ();
+          current_camera = &(new csCamera ())->scfiCamera;
           camera_hack = current_camera;
         }
 
@@ -1107,7 +1108,7 @@ void csEngine::StartEngine ()
   Clear ();
 }
 
-void csEngine::StartDraw (csCamera* c, iClipper2D* view, csRenderView& rview)
+void csEngine::StartDraw (iCamera* c, iClipper2D* view, csRenderView& rview)
 {
   Stats::polygons_considered = 0;
   Stats::polygons_drawn = 0;
@@ -1158,7 +1159,7 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
   ControlMeshes ();
 
   csRenderView rview (c, view, G3D, G2D);
-  StartDraw (c->GetPrivateObject (), view, rview);
+  StartDraw (c, view, rview);
   rview.SetCallback (NULL);
 
   // First initialize G3D with the right clipper.
@@ -1166,7 +1167,7 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
   
-  csSector* s = c->GetSector ()->GetPrivateObject ();
+  iSector* s = c->GetSector ();
   s->Draw (&rview);
 
   // draw all halos on the screen
@@ -1185,7 +1186,7 @@ void csEngine::DrawFunc (iCamera* c, iClipper2D* view,
   ControlMeshes ();
 
   csRenderView rview (c, view, G3D, G2D);
-  StartDraw (c->GetPrivateObject (), view, rview);
+  StartDraw (c, view, rview);
   rview.SetCallback (callback);
 
   // First initialize G3D with the right clipper.
@@ -1193,7 +1194,7 @@ void csEngine::DrawFunc (iCamera* c, iClipper2D* view,
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
 
-  csSector* s = c->GetSector ()->GetPrivateObject ();
+  iSector* s = c->GetSector ();
   s->Draw (&rview);
 
   G3D->SetClipper (NULL, CS_CLIPPER_NONE);
@@ -1205,7 +1206,7 @@ void csEngine::AddHalo (csLight* Light)
     return;
 
   // Transform light pos into camera space and see if it is directly visible
-  csVector3 v = current_camera->World2Camera (Light->GetCenter ());
+  csVector3 v = current_camera->GetTransform ().Other2This (Light->GetCenter ());
 
   // Check if light is behind us
   if (v.z <= SMALL_Z)

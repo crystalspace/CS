@@ -523,6 +523,8 @@ public:
   	csVector3& intersect, iPolygon3D** polygonPtr);
     virtual iSector* FollowSegment (csReversibleTransform& t,
   	csVector3& new_position, bool& mirror);
+    virtual void Draw (iRenderView* rview)
+    { scfParent->Draw (rview); }
   } scfiSector;
   friend struct eiSector;
 };

@@ -828,6 +828,10 @@ public:
     {
       scfParent->AddCurveVertex (v, uv);
     }
+    virtual bool HasFog () const
+    { return scfParent->HasFog (); }
+    virtual csFog *GetFog () const
+    { return &scfParent->GetFog (); }
   } scfiThingState;
   friend struct ThingState;
  

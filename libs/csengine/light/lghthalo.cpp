@@ -233,7 +233,7 @@ bool csLightHalo::Process (csTime ElapsedTime, const csEngine &Engine)
   float xtl = 0, ytl = 0;
 
   // Project the halo.
-  csVector3 v = Engine.current_camera->World2Camera (Light->GetCenter ());
+  csVector3 v = Engine.current_camera->GetTransform ().Other2This (Light->GetCenter ());
   // The clipped halo polygon
   csVector2 HaloClip [32];
   // Number of vertices in HaloClip array
@@ -295,7 +295,7 @@ bool csLightFlareHalo::Process (csTime elapsed_time, csEngine const& engine)
   // Whenever the center of halo (the light) is directly visible
   bool halo_vis = false;
   // Project the halo.
-  csVector3 v = engine.current_camera->World2Camera (Light->GetCenter ());
+  csVector3 v = engine.current_camera->GetTransform ().Other2This (Light->GetCenter ());
   halo_vis = IsVisible(engine, v);
 
   /// compute new intensity

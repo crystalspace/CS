@@ -193,6 +193,11 @@ struct iThingState : public iBase
    */
   virtual void ReplaceMaterials (iMaterialList* matList,
   	const char* prefix) = 0;
+
+  /// Has this thing fog?
+  virtual bool HasFog () const = 0;
+  /// Return the fog structure (even if fog is disabled).
+  virtual csFog *GetFog () const = 0;
 };
 
 #endif

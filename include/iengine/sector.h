@@ -37,6 +37,7 @@ struct iObject;
 struct csFog;
 struct iGraphics3D;
 struct iPolygon3D;
+struct iRenderView;
 
 SCF_VERSION (iSector, 0, 2, 12);
 
@@ -162,6 +163,9 @@ struct iSector : public iBase
    */
   virtual iSector* FollowSegment (csReversibleTransform& t,
   	csVector3& new_position, bool& mirror) = 0;
+
+  /// Draw the sector with the given render view
+  virtual void Draw (iRenderView* rview) = 0;
 };
 
 #endif // __IENGINE_SECTOR_H__
