@@ -212,6 +212,26 @@ public:
   GLfloat* glcolorsFog;
   GLfloat* gltxtFog;
 
+  /** The Lightmap Queue can have a copy of the data or a
+  * reference (a pointer to) the original triangle array.
+  * If it has a reference we have to be careful when
+  * clean or destroy the lightmap
+  */
+  bool ownsData;
+
+  /** When a superlightmap swaps between owning or not data 
+   * it can lose references. Here we keep the last arrays
+   * to avoid unnecessary mallocs
+   */
+  int* trisCached;
+  GLfloat* glvertsCached;
+  GLfloat* gltxtCached;
+  int num_trianglesCached, max_trianglesCached;
+  int num_verticesCached, max_verticesCached;
+  int num_fog_colorsCached, max_fog_colorsCached;
+  GLfloat* glcolorsFogCached;
+  GLfloat* gltxtFogCached;
+
   /// Add some vertices. Return index of the added vertices.
   int AddVertices (int num);
 
@@ -223,32 +243,6 @@ public:
   
   GLfloat* GetGLVerts (int idx) { return &glverts[idx<<2]; }
   GLfloat* GetGLTxt (int idx) { return &gltxt[idx<<1]; }
-
-  /// Constructor.
-  csLightMapQueue () :
-  	num_triangles (0), max_triangles (0), tris (NULL),
-	num_vertices (0), max_vertices (0), glverts (NULL), gltxt (NULL),
-  num_trianglesCached (0), max_trianglesCached (0), trisCached (NULL),
-	num_verticesCached (0), max_verticesCached (0), glvertsCached (NULL), gltxtCached (NULL),
-  glcolorsFog(NULL), gltxtFog(NULL),glcolorsFogCached(NULL), gltxtFogCached(NULL)
-  { ownsData = true;}
-  /// Destructor.
-  ~csLightMapQueue ()
-  {
-
-    if(!ownsData){
-      if(gltxtCached) delete[] gltxtCached;
-      if(glvertsCached) delete[] glvertsCached;
-      if(trisCached) delete[] trisCached;
-      if(gltxtFogCached) delete[] gltxtFogCached;
-      if(glcolorsFogCached) delete[]glcolorsFogCached;
-    };
-    delete[] tris;
-    delete[] glverts;
-    delete[] gltxt;
-    /*if(glcolorsFog) delete[] glcolorsFog;
-    if(gltxtFog) delete[] gltxtFog;*/
-  }
 
   /*DeleteArrays()
   {
@@ -297,34 +291,43 @@ public:
   ///Gets the state of ownsData attribute;
   //bool GetOwnsData() {return ownsData;}
 
-  /** The Lightmap Queue can have a copy of the data or a
-  * reference (a pointer to) the original triangle array.
-  * If it has a reference we have to be careful when
-  * clean or destroy the lightmap
-  */
-  bool ownsData;
-
-  /** When a superlightmap swaps between owning or not data 
-   * it can lose references. Here we keep the last arrays
-   * to avoid unnecessary mallocs
-   */
-  int* trisCached;
-  GLfloat* glvertsCached;
-  GLfloat* gltxtCached;
-  int num_trianglesCached, max_trianglesCached;
-  int num_verticesCached, max_verticesCached;
-  int num_fog_colorsCached, max_fog_colorsCached;
-  GLfloat* glcolorsFogCached;
-  GLfloat* gltxtFogCached;
-
-
-  
-
   /// Saves the arrays when swapping from owning to non owning data
   void SaveArrays();
 
   /// Loads the arrays when swapping from non owning to owning data
   void LoadArrays();
+
+  /// Constructor.
+  csLightMapQueue () :
+    num_triangles (0), max_triangles (0), tris (NULL),
+    num_vertices (0), max_vertices (0), glverts (NULL), gltxt (NULL),
+    num_fog_colors (0), max_fog_colors (0),
+    glcolorsFog(NULL), gltxtFog(NULL),
+    ownsData (true), 
+    trisCached (NULL), glvertsCached (NULL), gltxtCached (NULL),
+    num_trianglesCached (0), max_trianglesCached (0), 
+    num_verticesCached (0), max_verticesCached (0),
+    num_fog_colorsCached (0), max_fog_colorsCached (0),
+    glcolorsFogCached(NULL), gltxtFogCached(NULL)
+  {}
+  /// Destructor.
+  ~csLightMapQueue ()
+  {
+
+    if(!ownsData){
+      if(gltxtCached) delete[] gltxtCached;
+      if(glvertsCached) delete[] glvertsCached;
+      if(trisCached) delete[] trisCached;
+      if(gltxtFogCached) delete[] gltxtFogCached;
+      if(glcolorsFogCached) delete[]glcolorsFogCached;
+    };
+    delete[] tris;
+    delete[] glverts;
+    delete[] gltxt;
+    /*if(glcolorsFog) delete[] glcolorsFog;
+    if(gltxtFog) delete[] gltxtFog;*/
+  }
+
 };
 
 /**
