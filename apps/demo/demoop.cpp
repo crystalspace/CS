@@ -211,5 +211,15 @@ void TestOp::Do (csTicks dt, iBase*)
   	DemoSequenceManager::demoseq->GetFPS ()); fflush (stdout);
 }
 
+RecurseOp::RecurseOp (iSequence* sequence, csRef<iSequenceManager> manager)
+{
+  seq = sequence;
+  seqmgr = manager;
+}
+
+void RecurseOp::Do (csTicks dt, iBase*)
+{
+  seqmgr->RunSequence (0, seq);
+}
 //-----------------------------------------------------------------------------
 

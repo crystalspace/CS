@@ -160,5 +160,25 @@ public:
   virtual void Do (csTicks dt, iBase* params);
 };
 
+/**
+ * Recurse a sequence. Won't IncRef() it so clean-up works
+ * properly.
+ */
+class RecurseOp : public StandardOp
+{
+private:
+  /**
+   * Sequence to run.
+   * IncRef() is avoided intentionally. Otherwise a recursing
+   * sequence will own itself and prevent proper clean-up.
+   */
+  iSequence* seq;
+  /// sequence manager
+  csRef<iSequenceManager> seqmgr;
+public:
+  RecurseOp (iSequence* sequence, csRef<iSequenceManager> manager);
+  virtual void Do (csTicks dt, iBase* params);
+};
+
 #endif // __DEMOOP_H__
 

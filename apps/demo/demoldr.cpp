@@ -126,6 +126,7 @@ DemoSequenceLoader::~DemoSequenceLoader ()
   {
     NamedSequence* ns = (NamedSequence*)sequences[i];
     delete[] ns->name;
+    delete ns;
   }
 }
 
@@ -356,7 +357,9 @@ void DemoSequenceLoader::LoadSequence (iDocumentNode* node, iSequence* seq)
       }
       case XMLTOKEN_RECURSE:
       {
-        seq->AddRunSequence (cur_time, seq);
+        //seq->AddRunSequence (cur_time, seq);
+        csRef<RecurseOp> op = csPtr<RecurseOp> (new RecurseOp (seq, seqmgr));
+	seq->AddOperation (cur_time, op);
         break;
       }
       case XMLTOKEN_RUNSEQUENCE:
