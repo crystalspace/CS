@@ -59,7 +59,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: glidex2d glidexclean
+.PHONY: glidex2d glidex2dclean
 
 # Chain rules
 clean: glidexclean
@@ -75,7 +75,7 @@ $(OUT)%$O: libs/cs2d/glide2common/%.cpp
 $(GLIDEX2D): $(OBJ.GLIDEX2D) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 	$(DO.PLUGIN) $(LIBS.GLIDEX2D)
 
-glidexclean:
+glidex2dclean:
 	$(RM) $(GLIDEX2D) $(OBJ.GLIDEX2D)
 
 ifdef DO_DEPEND
