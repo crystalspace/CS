@@ -178,7 +178,7 @@ private:
  */
 class csSpriteTemplate : public csObject
 {
-  friend Dumper;
+  friend class Dumper;
 
 private:
   friend class csSprite3D;
@@ -302,8 +302,8 @@ typedef void (csSpriteCallback) (csSprite3D* spr, csRenderView* rview);
  */
 class csSprite3D : public csObject
 {
-  friend Dumper;
-  friend csCollider;
+  friend class Dumper;
+  friend class csCollider;
 
 private:
   /// Static vertex array.
