@@ -1193,7 +1193,7 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_SHADOWDEBUG:
 	// swap the default shadow volume material shader to/from a version
 	// better visualizing the volume.
-	csRef<iMaterialWrapper> shadowmat = 
+	/*csRef<iMaterialWrapper> shadowmat = 
 	  Engine->FindMaterial ("shadow extruder");
 	if (!standardShadowShader)
 	  standardShadowShader = shadowmat->GetMaterial()->GetShader();
@@ -1230,7 +1230,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "BugPlug %s shadow debugging.",
-	    do_shadow_debug ? "enabled" : "disabled");
+	    do_shadow_debug ? "enabled" : "disabled");*/
         break;
 #endif
     }

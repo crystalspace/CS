@@ -65,20 +65,6 @@ DP3 eyeNormal.w, eyeNormal, eyeNormal;
 RSQ eyeNormal.w, eyeNormal.w;
 MUL eyeNormal, eyeNormal, eyeNormal.w;
 
-#Create normEyeToVertex (normalized eye to vertex vector)
-DP3 normalEyeToVertex.w, eyeVertex, eyeVertex;
-RSQ normalEyeToVertex.w, normalEyeToVertex.w;
-MUL normalEyeToVertex, -eyeVertex, normalEyeToVertex.w;
-
-
-#Calculate halfector
-ADD halfVector, normalEyeToVertex, vertToLight;
-#normalize it
-DP3 halfVector.w, halfVector, halfVector;
-RSQ halfVector.w, halfVector.w;
-MUL halfVector, halfVector, halfVector.w;
-
-
 #calculate vector from vertex to light in eye-space
 ADD vertToLight, lightPos, -eyeVertex;
 DP3 temp.w, vertToLight, vertToLight;
@@ -86,28 +72,13 @@ RSQ vertToLight.w, temp.w;
 #Normalize vertex to light vector
 MUL vertToLight, vertToLight, vertToLight.w;
 
-
-#calculate attenuation
-DST temp, temp.wwww, vertToLight.wwww;  # (1, d, d*d, 1/d)
-DP3 temp.w, temp, lightAttenuation;     # (a0 + a1*d + a2*d2)
-RCP lightAtnFinal.w, temp.w;              # 1 / (a0 + a1*d + a2*d2)
-
-
 #Dot normal with lightvector (vertex to light)
 #diffuse lighting
 DP3 lightFactors.x, eyeNormal, vertToLight;
-#dot normal with half-vector
-DP3 lightFactors.yz, halfVector, eyeNormal;
 
-#calculate lighting
-LIT lightConsts, lightFactors;
-
-#scale by attenuation
-MUL lightConsts, lightConsts, lightAtnFinal.w;
-
-#accumulate color
-MUL temp, lightConsts.y, lightDiffuse;
-MAD oCol0.xyz, lightConsts.z, lightSpecular, temp;
+#MUL temp, lightConsts.y, lightDiffuse;
+#MOV oCol0.xyz, ;
+MUL oCol0.xyz, lightFactors.x, lightDiffuse;
 MOV oCol0.w, lightDiffuse.w;
 
 END

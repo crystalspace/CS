@@ -23,6 +23,7 @@
 
 #include "csgeom/vector4.h"
 #include "csutil/ref.h"
+#include "csutil/refarr.h"
 #include "csutil/scf.h"
 #include "csutil/strhash.h"
 #include "csutil/csvector.h"
@@ -52,7 +53,7 @@ struct iShaderManager : iBase
   /// Get a shader by name
   virtual iShader* GetShader(const char* name) = 0;
   /// Returns all shaders that have been created
-  virtual const csBasicVector &GetShaders () = 0;
+  virtual const csRefArray<iShader> &GetShaders () = 0;
 
   /// Create variable
   virtual csPtr<iShaderVariable> CreateVariable(const char* name) = 0;

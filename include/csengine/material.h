@@ -67,7 +67,7 @@ private:
 
 #ifdef CS_USE_NEW_RENDERER
   /// Shader assoiciated with material
-  csRef<iShader> shader;
+  csHashMap* shaders;
 #endif
 
 public:
@@ -115,10 +115,10 @@ public:
   //--------------------- iMaterial implementation ---------------------
 
 #ifdef CS_USE_NEW_RENDERER
-  /// Set associated shader
-  virtual void SetShader (iShader* shader);
-  /// Get associated shader
-  virtual iShader* GetShader ();
+  /// Associate a shader with a shader type
+  virtual void SetShader (csStringID type, iShader* shader);
+  /// Get shader associated with a shader type
+  virtual iShader* GetShader (csStringID type);
 
 #endif
 

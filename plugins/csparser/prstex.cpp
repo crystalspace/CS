@@ -23,8 +23,10 @@
 #include "csloader.h"
 #include "imap/ldrctxt.h"
 #include "imap/reader.h"
+#include "csutil/array.h"
 #include "csutil/scanstr.h"
 #include "iutil/document.h"
+#include "iutil/strset.h"
 #include "cstool/proctex.h"
 #include "cstool/prdots.h"
 #include "cstool/prfire.h"
@@ -407,7 +409,11 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   
   csRef<iEffectDefinition> efdef ;
 #ifdef CS_USE_NEW_RENDERER
-  csRef<iShader> shader;
+  csArray<csStringID> shadertypes;
+  csArray<iShader*> shaders;
+
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.renderer.stringset", iStringSet);
 #endif // CS_USE_NEW_RENDERER
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -551,12 +557,20 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
             break;
           }
           const char* shadername = child->GetContentsValue ();
-          shader = shaderMgr->GetShader (shadername);
+          iShader* shader = shaderMgr->GetShader (shadername);
           if (!shader)
           {
             ReportNotify ("Shader (%s) couldn't be found for material %s, ignoring it", shadername,matname);
             break;
           }
+          const char* shadertype = child->GetAttributeValue ("type");
+          if (!shadertype)
+          {
+            ReportNotify ("No shadertype specified for shader %s in material %s, ignoring it", shadername, matname);
+            break;
+          }
+          shadertypes.Push (strings->Request(shadertype));
+          shaders.Push (shader);
         }
         break;
 #endif //CS_USE_NEW_RENDERER
@@ -593,11 +607,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   else
     mat->QueryObject()->SetName (matname);
 #ifdef CS_USE_NEW_RENDERER
-  if (shader)
-  {
-    if (shader->Prepare ())
-      material->SetShader (shader);
-  }
+  for (int i=0; i<shaders.Length (); i++)
+    if (shaders[i]->Prepare ())
+      material->SetShader (shadertypes[i], shaders[i]);
 #endif // CS_USE_NEW_RENDERER
   // dereference material since mat already incremented it
 

@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
+              (C) 2003 by Anders Stenberg
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,30 +28,39 @@
 
 #include "iengine/renderloop.h"
 #include "csengine/engine.h"
+#include "iutil/strset.h"
 
 class csRenderView;
 class csRenderLoop;
 
-class csAmbientRenderStep : public iRenderStep
+class csLightIteratorRenderStep : public iRenderStep
 {
 private:
   csRenderLoop* rl;
+  csRefArray<iRenderStep> steps;
 public:
   SCF_DECLARE_IBASE;
 
-  csAmbientRenderStep (csRenderLoop* rl);
+  csLightIteratorRenderStep (csRenderLoop* rl);
 
   virtual void Perform (csRenderView* rview, iSector* sector);
+
+  void AddStep (iRenderStep* step);
 };
 
-class csLightingRenderStep : public iRenderStep
+
+class csGenericRenderStep : public iRenderStep
 {
 private:
   csRenderLoop* rl;
+  csStringID shadertype;
+  bool firstpass;
+  csZBufMode zmode;
 public:
   SCF_DECLARE_IBASE;
 
-  csLightingRenderStep (csRenderLoop* rl);
+  csGenericRenderStep (csRenderLoop* rl, csStringID shadertype, 
+    bool firstpass, csZBufMode zmode);
 
   inline void RenderMeshes (iRender3D* r3d, iShader* shader, 
     csRenderMesh** meshes, int num);
@@ -60,8 +70,8 @@ public:
 class csRenderLoop : public iRenderLoop
 {
 protected:
-  friend class csAmbientRenderStep;
-  friend class csLightingRenderStep;
+  friend class csLightIteratorRenderStep;
+  friend class csGenericRenderStep;
 
   csEngine* engine;
 

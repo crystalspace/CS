@@ -179,11 +179,18 @@ private:
 
   void SetGlOrtho (bool inverted);
 
-  void SetZMode (csZBufMode mode);
+  // Enables offsetting of Z values
+  void EnableZOffset ()
+  { glPolygonOffset (-0.05, -2); 
+  statecache->Enable_GL_POLYGON_OFFSET_FILL (); }
+
+  // Disables offsetting of Z values
+  void DisableZOffset ()
+  { statecache->Disable_GL_POLYGON_OFFSET_FILL (); }
+
+  csZBufMode GetZModePass2 (csZBufMode mode);
 
   float SetMixMode (uint mode, float m_alpha, bool txt_alpha);
-  
-  csZBufMode GetZModePass2 (csZBufMode mode);
 
   void SetMirrorMode (bool mirror);
 
@@ -303,6 +310,9 @@ public:
     return aspect;
   }
 
+  /// Set the z buffer write/test mode
+  virtual void SetZMode (csZBufMode mode);
+
   /// Set world to view transform
   void SetObjectToCamera (csReversibleTransform* wvmatrix);
   csReversibleTransform* GetWVMatrix ();
@@ -351,16 +361,6 @@ public:
     blue = color_blue_enabled;
     alpha = alpha_enabled;
   }
-
-
-  /// Enables offsetting of Z values
-  virtual void EnableZOffset ()
-    { glPolygonOffset (-0.05, -2); 
-      statecache->Enable_GL_POLYGON_OFFSET_FILL (); }
-
-  /// Disables offsetting of Z values
-  virtual void DisableZOffset ()
-    { statecache->Disable_GL_POLYGON_OFFSET_FILL (); }
 
   /// Controls shadow drawing
   virtual void SetShadowState (int state);

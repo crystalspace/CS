@@ -46,7 +46,7 @@ private:
   csRef<iVirtualClock> vc;
 
   csHashMap* variables;
-  csBasicVector* shaders;
+  csRefArray<iShader> shaders;
 
   int seqnumber;
 
@@ -69,7 +69,7 @@ public:
   /// Get a shader by name
   virtual iShader* GetShader(const char* name) ;
   /// Returns all shaders that have been created
-  virtual const csBasicVector &GetShaders () { return *shaders; }
+  virtual const csRefArray<iShader> &GetShaders () { return shaders; }
 
   /// Create variable
   virtual csPtr<iShaderVariable> CreateVariable(const char* name) ;

@@ -650,10 +650,6 @@ csEngine::csEngine (iBase *iParent) :
   BuildSqrtTable ();
   resize = false;
 
-#if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
-  DefaultRenderLoop.AttachNew (new csRenderLoop (this));
-#endif
-
   ClearRenderPriorities ();
 }
 
@@ -729,6 +725,10 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
 
   csConfigAccess cfg (object_reg, "/config/engine.cfg");
   ReadConfig (cfg);
+
+#if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
+  DefaultRenderLoop.AttachNew (new csRenderLoop (this));
+#endif
 
   return true;
 }

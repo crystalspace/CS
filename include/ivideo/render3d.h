@@ -395,6 +395,9 @@ struct iRender3D : public iBase
   /// Get the masking of color and/or alpha values to framebuffer
   virtual void GetWriteMask (bool &red, bool &green, bool &blue, bool &alpha) = 0;
 
+  /// Set the z buffer write/test mode
+  virtual void SetZMode (csZBufMode mode) = 0;
+
   /// Enables offsetting of Z values
   virtual void EnableZOffset () = 0;
 

@@ -100,8 +100,6 @@ csShaderManager::csShaderManager(iBase* parent)
   // alloc variables-hash
   variables = new csHashMap();
 
-  shaders = new csBasicVector();
-
   seqnumber = 0;
 }
 
@@ -120,11 +118,12 @@ csShaderManager::~csShaderManager()
   delete variables;
 
   //clear all shaders
-  while(shaders->Length() > 0)
+  /*while(shaders.Length() > 0)
   {
     delete (csShader*)shaders->Pop();
   }
-  delete shaders;
+  delete shaders;*/
+  shaders.DeleteAll ();
   if (scfiEventHandler) scfiEventHandler->DecRef();
 }
 
@@ -243,7 +242,7 @@ csPtr<iShader> csShaderManager::CreateShader()
   csShader* cshader = new csShader(name, this, objectreg);
   cshader->IncRef();
 
-  shaders->Push(cshader);
+  shaders.Push(cshader);
   
   return (iShader*)cshader;
 }
@@ -252,10 +251,10 @@ csPtr<iShader> csShaderManager::CreateShader()
 iShader* csShaderManager::GetShader(const char* name)
 {
   int i;
-  for( i = 0; i < shaders->Length(); ++i)
+  for (i = 0; i < shaders.Length(); ++i)
   {
-    if( strcasecmp(((iShader*)shaders->Get(i))->GetName() ,name) == 0)
-      return (iShader*)shaders->Get(i);
+    if (strcasecmp(shaders.Get(i)->GetName(), name) == 0)
+      return shaders.Get(i);
   }
   return 0;
 }

@@ -11,6 +11,12 @@ The history order is reversed so that new features are at the top.
 	  less computations on the pixel data. They also come from a pool
 	  now, which reduces the number of new/delete calls when many 
 	  screenshots are requested (i.e. when recording a movie.)
+	- (New Renderer) Anders Stenberg rewrote the custom render loop a bit 
+	  to be more general, and also added "foreachlight" support. Also 
+	  changed the way z-mode is set. Now it's set explicitly by a SetZMode 
+	  call, and not implicitly in DrawMesh. A csBasicVector in the 
+	  shadermanager has been replaced with csRefArray too. 
+	  (Might have introduced bugs with reference counts.)
 31-May-2003
 	- Oktal fixed an error in the Perl plugin that only appeared with
 	  certain versions of Perl, to do with their funny macros.

@@ -27,6 +27,7 @@
  * @{ */
  
 #include "csutil/scf.h"
+#include "csutil/strset.h"
 
 /// Default material `diffuse' parameter
 #define CS_DEFMAT_DIFFUSE 0.7f
@@ -70,14 +71,14 @@ struct iMaterial : public iBase
 {
 #ifdef CS_USE_NEW_RENDERER
   /**
-   * Set accosiated shader
+   * Associate a shader with a shader type
    */
-  virtual void SetShader (iShader* shader) = 0;
+  virtual void SetShader (csStringID type, iShader* shader) = 0;
 
   /**
-   * Get accosiated shader
+   * Get shader associated with a shader type
    */
-  virtual iShader* GetShader () = 0;
+  virtual iShader* GetShader (csStringID type) = 0;
 
 #endif
 
@@ -139,9 +140,9 @@ struct iMaterialHandle : public iBase
 {
 #ifdef CS_USE_NEW_RENDERER
   /**
-   * Get accosiated shader
+   * Get shader associated with a shader type
    */
-  virtual iShader* GetShader () = 0;
+  virtual iShader* GetShader (csStringID type) = 0;
 #endif
 
   /**

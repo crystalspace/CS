@@ -44,6 +44,10 @@ csMaterial::csMaterial () :
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
+
+#ifdef CS_USE_NEW_RENDERER
+  shaders = new csHashMap();
+#endif // CS_USE_NEW_RENDERER
 }
 
 csMaterial::csMaterial (iTextureWrapper *w) :
@@ -57,10 +61,25 @@ csMaterial::csMaterial (iTextureWrapper *w) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
   texture = w;
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
+
+#ifdef CS_USE_NEW_RENDERER
+  shaders = new csHashMap();
+#endif // CS_USE_NEW_RENDERER
 }
 
 csMaterial::~csMaterial ()
 {
+#ifdef CS_USE_NEW_RENDERER
+  csGlobalHashIterator cIter (shaders);
+
+  while(cIter.HasNext() )
+  {
+    iShader* i = (iShader*)cIter.Next();
+    i->DecRef();
+  }
+  shaders->DeleteAll ();
+  delete shaders;
+#endif // CS_USE_NEW_RENDERER
 }
 
 void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
@@ -97,14 +116,15 @@ iEffectDefinition *csMaterial::GetEffect ()
 }
 
 #ifdef CS_USE_NEW_RENDERER
-void csMaterial::SetShader (iShader* shd)
+void csMaterial::SetShader (csStringID type, iShader* shd)
 {
-  shader = shd;
+  shd->IncRef ();
+  shaders->Put (type, shd);
 }
 
-iShader* csMaterial::GetShader()
+iShader* csMaterial::GetShader(csStringID type)
 {
-  return shader;
+  return (iShader*)shaders->Get (type);
 }
 
 #endif

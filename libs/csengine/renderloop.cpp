@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
+              (C) 2003 by Anders Stenberg
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -40,75 +41,89 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csAmbientRenderStep)
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep)
+SCF_IMPLEMENT_IBASE(csLightIteratorRenderStep)
+SCF_IMPLEMENTS_INTERFACE(iRenderStep)
 SCF_IMPLEMENT_IBASE_END
 
-csAmbientRenderStep::csAmbientRenderStep (csRenderLoop* rl)
+csLightIteratorRenderStep::csLightIteratorRenderStep (csRenderLoop* rl)
 {
   SCF_CONSTRUCT_IBASE (0);
 
-  csAmbientRenderStep::rl = rl;
+  csLightIteratorRenderStep::rl = rl;
 }
 
-void csAmbientRenderStep::Perform (csRenderView* rview, iSector* sector)
+void csLightIteratorRenderStep::Perform (csRenderView* rview, iSector* sector)
 {
   iRender3D* r3d = rl->engine->G3D;
 
-  r3d->EnableZOffset ();
-  iSectorRenderMeshList* meshes = sector->GetRenderMeshes ();
-  
-  int i = 0, meshnum = meshes->GetCount();
-  while (true)
+  r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, 
+    csVector3 (0, 0, 0));
+
+  iLightList* lights = sector->GetLights();
+
+  int nlights = lights->GetCount();
+
+  while (nlights-- > 0)
   {
-    iMeshWrapper* mw;
-    iVisibilityObject* visobj;
-    csRenderMesh* mesh;
-    if (!meshes->GetVisible (i, mw, visobj, mesh))
+    iLight* light = lights->Get (nlights);
+    const csVector3 lightPos = light->GetCenter ();
+
+    /* 
+    @@@ material specific diffuse/specular/ambient.
+    Realized as shader variables maybe?
+    */
+    csReversibleTransform camTransR = 
+      rview->GetCamera()->GetTransform();
+    r3d->SetObjectToCamera (&camTransR);
+
+    const csColor& color = light->GetColor ();
+    r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, 
+    csVector3 (color.red, color.green, color.blue));
+
+    r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
+    light->GetAttenuationVector ());
+    r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
+    lightPos);
+
+    csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
+    if (rview->TestBSphere (camTransR, lightSphere))
     {
-      break;
+      int i;
+      for (i = 0; i < steps.Length(); i++)
+      {
+        steps[i]->Perform (rview, sector);
+      }
     }
-
-    if (!mesh) continue;
-
-    iMaterialWrapper *matsave;
-    //matsave = mesh->mathandle;
-    //mesh->mathandle = 0;
-    matsave = mesh->material;
-    mesh->material = 0;
-    uint mixsave = mesh->mixmode;
-    mesh->mixmode = CS_FX_COPY;
-    csZBufMode zsave = mesh->z_buf_mode;
-    mesh->z_buf_mode = CS_ZBUF_USE;
-    
-    r3d->DrawMesh (mesh);
-
-    mesh->z_buf_mode = zsave;
-    //mesh->mathandle = matsave;
-    mesh->material = matsave;;
-    mesh->mixmode = mixsave;
   }
+}
 
-  r3d->DisableZOffset ();
-};
+void csLightIteratorRenderStep::AddStep (iRenderStep* step)
+{
+  steps.Push (step);
+}
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csLightingRenderStep)
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep)
+SCF_IMPLEMENT_IBASE(csGenericRenderStep)
+SCF_IMPLEMENTS_INTERFACE(iRenderStep)
 SCF_IMPLEMENT_IBASE_END
 
-csLightingRenderStep::csLightingRenderStep (csRenderLoop* rl)
+csGenericRenderStep::csGenericRenderStep (csRenderLoop* rl, 
+  csStringID shadertype, bool firstpass, csZBufMode zmode)
 {
   SCF_CONSTRUCT_IBASE (0);
 
-  csLightingRenderStep::rl = rl;
+  csGenericRenderStep::rl = rl;
+
+  csGenericRenderStep::shadertype = shadertype;
+  csGenericRenderStep::firstpass = firstpass;
+  csGenericRenderStep::zmode = zmode;
 }
 
-void csLightingRenderStep::RenderMeshes (iRender3D* r3d,
-					 iShader* shader, 
-					 csRenderMesh** meshes, 
-					 int num)
+void csGenericRenderStep::RenderMeshes (iRender3D* r3d,
+                                         iShader* shader, 
+                                         csRenderMesh** meshes, 
+                                         int num)
 {
   if (num == 0) return;
 
@@ -125,16 +140,13 @@ void csLightingRenderStep::RenderMeshes (iRender3D* r3d,
       csRenderMesh* mesh = meshes[j];
 
       pass->SetupState (mesh);
-      csZBufMode zsave = mesh->z_buf_mode;
+
       uint mixsave = mesh->mixmode;
-      
       uint mixmode = pass->GetMixmodeOverride ();
       if (mixmode != 0)
-	mesh->mixmode = mixmode;
-      
-      mesh->z_buf_mode = CS_ZBUF_TEST;
+        mesh->mixmode = mixmode;
+
       rl->engine->G3D->DrawMesh (mesh);
-      mesh->z_buf_mode = zsave;
       mesh->mixmode = mixsave;
 
       pass->ResetState ();
@@ -143,20 +155,14 @@ void csLightingRenderStep::RenderMeshes (iRender3D* r3d,
   }
 }
 
-void csLightingRenderStep::Perform (csRenderView* rview, iSector* sector)
+void csGenericRenderStep::Perform (csRenderView* rview, iSector* sector)
 {
   iRender3D* r3d = rl->engine->G3D;
 
-  csReversibleTransform camTransR = 
-    rview->GetCamera()->GetTransform();
-  r3d->SetObjectToCamera (&camTransR);
+  if (firstpass)
+    r3d->EnableZOffset ();
 
-//  r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-//  	csVector3 (0, 0, 0));
-//  r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
-//  	csVector3 (1, 0, 0));
-  r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, 
-    csVector3 (0, 0, 0));
+  r3d->SetZMode (zmode);
 
   iSectorRenderMeshList* meshes = sector->GetRenderMeshes ();
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, meshes->GetCount());
@@ -164,70 +170,42 @@ void csLightingRenderStep::Perform (csRenderView* rview, iSector* sector)
   iShader* shader = 0;
   iLightList* lights = sector->GetLights();
 
-  int nlights = lights->GetCount();
+  int i = 0;
 
-  while (nlights-- > 0)
+  while (true)
   {
-    iLight* light = lights->Get (nlights);
-    const csVector3 lightPos = light->GetCenter ();
+    iMeshWrapper* mw;
+    iVisibilityObject* visobj;
+    csRenderMesh* mesh;
+    // @@@Objects outside the light's influence radius are 'lit' as well!
+    if (!meshes->GetVisible (i, mw, visobj, mesh)) break;
+    /*
+    @@@!!! That should of course NOT be necessary,
+    but otherwise there's some corruption (at least w/ genmesh).
+    Seems that it has some side effect we have to find out.
+    */
+    int n;
+    mw->GetRenderMeshes(n);
 
-    /* 
-      @@@ material specific diffuse/specular/ambient.
-      Realized as shader variables maybe?
-     */
-    const csColor& color = light->GetColor ();
-    r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, 
-      csVector3 (color.red, color.green, color.blue));
-    
-    r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
-      light->GetAttenuationVector ());
-    r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-      lightPos);
+    if (!mesh) continue;
 
-    csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
-    if (rview->TestBSphere (camTransR, lightSphere))
+    mesh->material->Visit(); // @@@ here?
+    iShader* meshShader = mesh->material->GetMaterialHandle()->GetShader(shadertype);
+    if (meshShader != shader)
     {
-      int i = 0/*, meshnum = meshes->GetCount()*/;
+      RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
 
-      while (true)
-      {
-	iMeshWrapper* mw;
-	iVisibilityObject* visobj;
-	csRenderMesh* mesh;
-	// @@@Objects outside the light's influence radius are 'lit' as well!
-	if (!meshes->GetVisible (i, mw, visobj, mesh)) break;
-	/*
-	@@@!!! That should of course NOT be necessary,
-	  but otherwise there's some corruption (at least w/ genmesh).
-	Seems that it has some side effect we have to find out.
-	*/
-	int n;
-	mw->GetRenderMeshes(n);
-
-//	r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, 
-//	  csVector3 ((i & 1), (i & 2) >> 1, (i & 4) >> 2));
-
-	if (!mesh) continue;
-
-	mesh->material->Visit(); // @@@ here?
-	iShader* meshShader = mesh->material->GetMaterialHandle()->GetShader();
-        if (meshShader != shader)
-	{
-	  RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
-
-	  shader = meshShader;
-	  numSSM = 0;
-	}
-	sameShaderMeshes[numSSM++] = mesh;
-	// for now, so different objects are colored
-	//RenderMeshes (r3d, meshShader, &mesh, 1);
-      }
-      if (numSSM != 0)
-      {
-	RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
-      }
+      shader = meshShader;
+      numSSM = 0;
     }
+    sameShaderMeshes[numSSM++] = mesh;
   }
+  if (numSSM != 0)
+  {
+    RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
+  }
+  if (firstpass)
+    r3d->DisableZOffset ();
 };
 
 //---------------------------------------------------------------------------
@@ -242,11 +220,20 @@ csRenderLoop::csRenderLoop (csEngine* engine)
 
   csRenderLoop::engine = engine;
 
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (engine->object_reg, 
+    "crystalspace.renderer.stringset", iStringSet);
+
   csRef<iRenderStep> tmp;
-  tmp.AttachNew (new csAmbientRenderStep (this));
+  tmp.AttachNew (new csGenericRenderStep (this, 
+    strings->Request("ambient"), true, CS_ZBUF_USE));
   steps.Push (tmp);
-  tmp.AttachNew (new csLightingRenderStep (this));
-  steps.Push (tmp);
+  csRef<csLightIteratorRenderStep> itstep = 
+    new csLightIteratorRenderStep (this);
+  steps.Push (itstep);
+  tmp.AttachNew (new csGenericRenderStep (this,
+    strings->Request("diffuse"), false, CS_ZBUF_TEST));
+  itstep->AddStep (tmp);
 }
 
 void csRenderLoop::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)

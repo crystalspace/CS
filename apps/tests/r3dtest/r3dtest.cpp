@@ -36,6 +36,7 @@
 #include "iutil/object.h"
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
+#include "iutil/strset.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
@@ -371,6 +372,10 @@ bool R3DTest::Initialize ()
   r3d->GetDriver2D ()->SetMouseCursor( csmcNone );
 
 #ifdef CS_USE_NEW_RENDERER
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+    "crystalspace.renderer.stringset", iStringSet);
+
   // Load in lighting shaders
   csRef<iShaderManager> shmgr ( CS_QUERY_REGISTRY(object_reg, iShaderManager));
   if(shmgr)
@@ -378,11 +383,28 @@ bool R3DTest::Initialize ()
     csRef<iShader> shader (shmgr->CreateShader());
     if(shader)
     {
+      shader->Load(csRef<iDataBuffer>(vfs->ReadFile("/shader/ambient.xml")));
+      if(shader->Prepare())
+      {
+        for (int i=0; i<engine->GetMaterialList ()->GetCount (); i++)
+        {
+          engine->GetMaterialList ()->Get (i)->GetMaterial ()->
+            SetShader(strings->Request ("ambient"), shader);
+        }
+      }
+    }
+
+    shader = shmgr->CreateShader();
+    if(shader)
+    {
       shader->Load(csRef<iDataBuffer>(vfs->ReadFile("/shader/light.xml")));
       if(shader->Prepare())
       {
         for (int i=0; i<engine->GetMaterialList ()->GetCount (); i++)
-          engine->GetMaterialList ()->Get (i)->GetMaterial ()->SetShader(shader);
+        {
+          engine->GetMaterialList ()->Get (i)->GetMaterial ()->
+            SetShader(strings->Request ("diffuse"), shader);
+        }
       }
     }
 
@@ -392,7 +414,7 @@ bool R3DTest::Initialize ()
       shader->Load(csRef<iDataBuffer>(vfs->ReadFile("/shader/shadow.xml")));
       if(shader->Prepare())
       {
-        shadow->SetShader(shader);
+        shadow->SetShader(strings->Request ("shadow volume"), shader);
       }
     }
   }

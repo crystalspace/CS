@@ -391,7 +391,8 @@ void csGLRender3D::SetupStencil ()
     csVector2* v = clipper->GetClipPoly ();
     glColor4f (1, 0, 0, 0);
     statecache->SetShadeModel (GL_FLAT);
-    SetZMode (CS_ZBUF_NONE);
+    bool oldz = statecache->IsEnabled_GL_DEPTH_TEST ();
+    if (oldz) statecache->Disable_GL_DEPTH_TEST ();
 
     statecache->Disable_GL_TEXTURE_2D ();
     if (color_red_enabled || color_green_enabled || color_blue_enabled ||
@@ -426,6 +427,7 @@ void csGLRender3D::SetupStencil ()
     glPopMatrix ();
     glMatrixMode (GL_PROJECTION);
     glPopMatrix ();
+    if (oldz) statecache->Enable_GL_DEPTH_TEST ();
   }
 }
 
@@ -915,14 +917,13 @@ bool csGLRender3D::BeginDraw (int drawflags)
   }
   if (drawflags & CSDRAW_2DGRAPHICS)
   {
-    glMatrixMode (GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity ();
     glMatrixMode (GL_PROJECTION);
-    glPushMatrix();
     glLoadIdentity ();
     SetGlOrtho (false);
     glViewport (1, -1, viewwidth+1, viewheight+1);
+
+    glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity ();
 
     SetZMode (CS_ZBUF_NONE);
     return G2D->BeginDraw ();
@@ -938,13 +939,7 @@ void csGLRender3D::FinishDraw ()
 
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
-  if (current_drawflags & CSDRAW_2DGRAPHICS)
-  {
-    glMatrixMode (GL_MODELVIEW);
-    glPopMatrix();
-    glMatrixMode (GL_PROJECTION);
-    glPopMatrix();
-  }
+
   current_drawflags = 0;
 
   if (render_target)
@@ -1331,7 +1326,6 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane);*/
 
-  SetZMode (mymesh->z_buf_mode);
   // @@@ maybe GL can do this for us? or in the VPs, maybe?
   SetObjectToCamera (mymesh->transform);
 
@@ -1430,13 +1424,13 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
   glColor4f (red, green, blue, alpha);*/
 
-  csRef<iShader> shader;
+  /*csRef<iShader> shader;
   if (mathandle)
-     shader = mathandle->GetMaterial()->GetShader();
+     shader = mathandle->GetMaterial()->GetShader();*/
 
   glEnableClientState(GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV);
   bool useshader = false;
-  if(shader && shader->IsValid())
+  if(true/*shader && shader->IsValid()*/)
   {
     useshader = true;
     //iShaderTechnique* tech = shader->GetBestTechnique();
@@ -1736,7 +1730,8 @@ bool csGLRender3D::Initialize (iObjectRegistry* p)
 
   bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, "crystalspace.renderer.stringset", iStringSet);
+  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.renderer.stringset", iStringSet);
   if (!strings)
   {
     strings = csPtr<iStringSet> (new csScfStringSet ());
