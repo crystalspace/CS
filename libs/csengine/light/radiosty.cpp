@@ -760,14 +760,14 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   csPolygon3D *destpoly3d = ((csPolygon3D*)obj)->GetBasePolygon();
   csRadPoly *dest = csRadPoly::GetRadPoly(*destpoly3d); // obtain radpoly
   // if polygon not lightmapped / radiosity rendered, it can still be a portal.
-  if(dest) 
+  /* if(dest) 
   {
     // check poly -- on right side of us?
     csVector3 destcenter;
     dest->QuickLumel2World(destcenter,dest->GetWidth()/2.,dest->GetHeight()/2.);
     if( csMath3::WhichSide3D(destcenter-plane_origin, plane_v1, plane_v2) >= 0)
       dest=0; // when on the plane or behind, skip.
-  }
+  } */
 
   csFrustumView new_lview = *lview;
   new_lview.light_frustum = NULL;
@@ -958,19 +958,20 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   // compute formfactors.
   csVector3 path = dest_lumel - src_lumel;
   float distance = path.Norm();
-  if(distance < 0.000001) return; // too close together
+  if(distance < 1.0f) distance=1.0f; // too close together
   path /= distance ; //otherwise dot product will not return cos(angle).
   distance *= distance;
   float cossrcangle = src_normal * path;
-  if(cossrcangle < 0.0) return;
+  if(cossrcangle < 0.0f) return;
   float cosdestangle = - (dest_normal * path);
-  if(cosdestangle < 0.0) return; // facing away, negative light is not good.
+  if(cosdestangle < 0.0f) return; // facing away, negative light is not good.
 
   float totalfactor = cossrcangle * cosdestangle * 
     source_patch_area * visibility / distance;
   //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
 #if 0
+   if(totalfactor > 10.0f)
     CsPrintf(MSG_STDOUT, "totalfactor %g = "
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
 	"srclumelcolor (%g, %g, %g)\n", 
