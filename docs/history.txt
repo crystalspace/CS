@@ -13,6 +13,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+30-Aug-1999
+	- Eric Sunshine fixed a compilation problem in the BeOS port and also
+	  removed more unused code.
 26-Aug-1999
 	- Eric Sunshine renamed docs/changes.old to changes.txt since Jorrit
 	  recently brought it up to date.  Previously it was extremely out of
