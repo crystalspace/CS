@@ -260,17 +260,17 @@ public:
   csCamera* GetCamera () { return c; }
 
   ///
-  void KeyUp (bool shift, bool alt, bool ctrl);
+  void KeyUp (float speed, bool slow, bool fast);
   ///
-  void KeyDown (bool shift, bool alt, bool ctrl);
+  void KeyDown (float speed, bool slow, bool fast);
   ///
-  void KeyLeft (bool shift, bool alt, bool ctrl);
+  void KeyLeft (float speed, bool slow, bool fast);
   ///
-  void KeyRight (bool shift, bool alt, bool ctrl);
+  void KeyRight (float speed, bool slow, bool fast);
   ///
-  void KeyPgDn (bool shift, bool alt, bool ctrl);
+  void KeyPgDn (float speed, bool slow, bool fast);
   ///
-  void KeyPgUp (bool shift, bool alt, bool ctrl);
+  void KeyPgUp (float speed, bool slow, bool fast);
 };
 
 #endif /*WIREFRM_H*/

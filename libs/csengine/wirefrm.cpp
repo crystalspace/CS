@@ -59,8 +59,7 @@ csWfObject::~csWfObject ()
 
 bool csWfObject::Perspective (csCamera* c, csVector3& v, csVector2& persp, float radius, float& pradius)
 {
-  csVector3 cam;
-  cam = c->Other2This (v);
+  csVector3 cam = c->Other2This (v);
   if (cam.z > SMALL_Z)
   {
     float iz = csCamera::aspect/cam.z;
@@ -81,8 +80,7 @@ void csWfVertex::Draw (IGraphics3D* g, csCamera* c)
 
   if (Perspective (c, loc, persp, PLANE_VERTEX_RADIUS, rad))
   {
-    csVector3 cam;
-    cam = c->Other2This (loc);
+    csVector3 cam = c->Other2This (loc);
     int col = color->GetColor (cam.z);
 
     r = QInt (rad);
@@ -101,9 +99,8 @@ void csWfVertex::Draw (IGraphics3D* g, csCamera* c)
 
 void csWfLine::Draw (IGraphics3D* g, csCamera* c)
 {
-  csVector3 cam1, cam2;
-  cam1 = c->Other2This (v1);
-  cam2 = c->Other2This (v2);
+  csVector3 cam1 = c->Other2This (v1);
+  csVector3 cam2 = c->Other2This (v2);
   g->DrawLine (cam1, cam2, csCamera::aspect, color->GetColor ((cam1.z+cam2.z)/2));
 }
 
@@ -191,9 +188,9 @@ bool csWfPolygon::IsVisible (csCamera* camera)
 void csWfPolygon::Draw (IGraphics3D* g, csCamera* c)
 {
   int i;
-  csVector3 cam1, cam2, cen;
+  csVector3 cam1, cam2;
   bool vis = IsVisible (c);
-  cen = c->Other2This (center);
+  csVector3 cen = c->Other2This (center);
   int col = color->GetColor (cen.z);
   int vcol = vcolor->GetColor (cen.z);
   for (i = 0 ; i < num_vertices ; i++)
@@ -336,79 +333,45 @@ csWireFrameCam::~csWireFrameCam ()
   CHK (delete c);
 }
 
-void csWireFrameCam::KeyUp (bool shift, bool alt, bool ctrl)
+void csWireFrameCam::KeyUp (float speed, bool slow, bool fast)
 {
-  if (alt)
-  {
-    if (ctrl) c->MoveUnrestricted (.01*VEC_UP);
-    else if (shift) c->MoveUnrestricted (.4*VEC_UP);
-    else c->MoveUnrestricted (.2*VEC_UP);
-  }
-  else if (ctrl) c->MoveUnrestricted (.01*VEC_FORWARD);
-  else if (shift) c->MoveUnrestricted (1.2*VEC_FORWARD);
-  else c->MoveUnrestricted (.6*VEC_FORWARD);
+  if (slow) c->MoveUnrestricted (speed*.01*VEC_FORWARD);
+  else if (fast) c->MoveUnrestricted (speed*1.2*VEC_FORWARD);
+  else c->MoveUnrestricted (speed*.6*VEC_FORWARD);
 }
 
-void csWireFrameCam::KeyDown (bool shift, bool alt, bool ctrl)
+void csWireFrameCam::KeyDown (float speed, bool slow, bool fast)
 {
-  if (alt)
-  {
-    if (ctrl) c->MoveUnrestricted (.01*VEC_DOWN);
-    else if (shift) c->MoveUnrestricted (.4*VEC_DOWN);
-    else c->MoveUnrestricted (.2*VEC_DOWN);
-  }
-  else if (ctrl) c->MoveUnrestricted (.01*VEC_BACKWARD);
-  else if (shift) c->MoveUnrestricted (1.2*VEC_BACKWARD);
-  else c->MoveUnrestricted (.6*VEC_BACKWARD);
+  if (slow) c->MoveUnrestricted (speed*.01*VEC_BACKWARD);
+  else if (fast) c->MoveUnrestricted (speed*1.2*VEC_BACKWARD);
+  else c->MoveUnrestricted (speed*.6*VEC_BACKWARD);
 }
 
-void csWireFrameCam::KeyLeft (bool shift, bool alt, bool ctrl)
+void csWireFrameCam::KeyLeft (float speed, bool slow, bool fast)
 {
-  if (alt)
-  {
-    if (ctrl) c->MoveUnrestricted (.01*VEC_LEFT);
-    else if (shift) c->MoveUnrestricted (.4*VEC_LEFT);
-    else c->MoveUnrestricted (.2*VEC_LEFT);
-  }
-  else if (ctrl) c->Rotate (VEC_ROT_LEFT, .005);
-  else if (shift) c->Rotate (VEC_ROT_LEFT, .2);
-  else c->Rotate (VEC_ROT_LEFT, .1);
+  if (slow) c->Rotate (VEC_ROT_LEFT, speed*.005);
+  else if (fast) c->Rotate (VEC_ROT_LEFT, speed*.2);
+  else c->Rotate (VEC_ROT_LEFT, speed*.1);
 }
 
-void csWireFrameCam::KeyRight (bool shift, bool alt, bool ctrl)
+void csWireFrameCam::KeyRight (float speed, bool slow, bool fast)
 {
-  if (alt)
-  {
-    if (ctrl) c->MoveUnrestricted (.01*VEC_RIGHT);
-    else if (shift) c->MoveUnrestricted (.4*VEC_RIGHT);
-    else c->MoveUnrestricted (.2*VEC_RIGHT);
-  }
-  else if (ctrl) c->Rotate (VEC_ROT_RIGHT, .005);
-  else if (shift) c->Rotate (VEC_ROT_RIGHT, .2);
-  else c->Rotate (VEC_ROT_RIGHT, .1);
+  if (slow) c->Rotate (VEC_ROT_RIGHT, speed*.005);
+  else if (fast) c->Rotate (VEC_ROT_RIGHT, speed*.2);
+  else c->Rotate (VEC_ROT_RIGHT, speed*.1);
 }
 
-void csWireFrameCam::KeyPgUp (bool shift, bool alt, bool ctrl)
+void csWireFrameCam::KeyPgUp (float speed, bool slow, bool fast)
 {
-  if (alt)
-  {
-    if (ctrl) c->Rotate (VEC_TILT_LEFT, .005);
-    else c->Rotate (VEC_TILT_LEFT, .1);
-  }
-  else if (ctrl) c->Rotate (VEC_TILT_UP, .005);
-  else if (shift) c->Rotate (VEC_TILT_UP, .2);
-  else c->Rotate (VEC_TILT_UP, .1);
+  if (slow) c->Rotate (VEC_TILT_UP, speed*.005);
+  else if (fast) c->Rotate (VEC_TILT_UP, speed*.2);
+  else c->Rotate (VEC_TILT_UP, speed*.1);
 }
 
-void csWireFrameCam::KeyPgDn (bool shift, bool alt, bool ctrl)
+void csWireFrameCam::KeyPgDn (float speed, bool slow, bool fast)
 {
-  if (alt)
-  {
-    if (ctrl) c->Rotate (VEC_TILT_RIGHT, .005);
-    else c->Rotate (VEC_TILT_RIGHT, .1);
-  }
-  else if (ctrl) c->Rotate (VEC_TILT_DOWN, .005);
-  else if (shift) c->Rotate (VEC_TILT_DOWN, .2);
-  else c->Rotate (VEC_TILT_DOWN, .1);
+  if (slow) c->Rotate (VEC_TILT_DOWN, speed*.005);
+  else if (fast) c->Rotate (VEC_TILT_DOWN, speed*.2);
+  else c->Rotate (VEC_TILT_DOWN, speed*.1);
 }
 
