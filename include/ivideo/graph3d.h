@@ -342,6 +342,7 @@ struct csGraphics3DCaps
   G3D_FOGMETHOD fog;
   bool NeedsPO2Maps;
   int MaxAspectRatio;
+  bool SupportsPointSprites;
 };
 
 //===========================================================================
