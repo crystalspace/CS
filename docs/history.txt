@@ -11,10 +11,10 @@ The history order is reversed so that new features are at the top.
 	  following polygons may still attempt to load their lightmap
 	  data without errors.
 	- If the -verbose commandline option is given then the thing plugin
-	  will report accurate errors explain why the lightmaps failed to
+	  will report accurate errors explaining why the lightmaps failed to
 	  load.
 	- If the -verbose commandline option is given then the genmesh plugin
-	  will report accurate errors explain why the lighting info failed to
+	  will report accurate errors explaining why the lighting info failed to
 	  load.
 3-Mar-2003
 	- Philip Wyett added libxml2 link flag for msvc project file.
