@@ -19,6 +19,7 @@
 #include "sysdef.h"
 #include "csengine/terrain.h"
 #include "csengine/pol2d.h"
+#include "csengine/texture.h"
 #include "csterr/ddgtmesh.h"
 #include "csterr/ddgbtree.h"
 #include "csgeom/math2d.h"
@@ -43,6 +44,37 @@ csTerrain::~csTerrain ()
   CHK (delete mesh);
   CHK (delete height);
   CHK (delete clipbox);
+}
+
+void csTerrain::classify( ddgVector3 *p, ddgVector3 *n, ddgColor3 *c)
+{
+	// Steep normal
+    if (fabs(n->v[1]) < _cliffangle)
+		c->set(_cliff); // Cliff
+    else if (p->v[1] < _beachalt)
+		c->set(_beach); // Beach
+    else if (p->v[1] < _grassalt)
+		c->set(_grass); // Grass
+    else if (p->v[1] < _treealt)
+		c->set(_trees); // Trees
+    else if (p->v[1] < _rockalt)
+		c->set(_rock);  // Rock
+    else
+		c->set(_snow);  // Snow
+	
+	static int cl = 0, b=0,g=0,t=0,r=0,s=0;
+    if (fabs(n->v[1]) < _cliffangle)
+		cl++;
+    else if (p->v[1] < _beachalt)
+		b++;
+    else if (p->v[1] < _grassalt)
+		g++;
+    else if (p->v[1] < _treealt)
+		t++;
+    else if (p->v[1] < _rockalt)
+		r++;
+    else
+		s++;
 }
 
 static csRenderView *grview = NULL;
@@ -75,17 +107,34 @@ bool csTerrain::Initialize (char* heightmap)
   float fov = 90.0;
   mesh->settransform(transformer); 
   mesh->init (wtoc, clipbox, fov);
+
+	_cliff.set(175,175,175);  // Cliff
+	_beach.set(200,200,50);  // Beach.
+	_grass.set(95,145,70);    // Grass
+	_trees.set(25,50,25);     // Trees
+	_rock.set(125,125,125);      // Rock
+	_snow.set(250,250,250);      // Snow
+
+	_cliffangle = 0.2; // up component of normal vector.
+	_beachalt = 0;
+	_grassalt = 3;
+	_treealt = 5;
+	_rockalt = 7;
+	_snowalt = 999;
+
   return true;
 }
 
 void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 {
   G3DPolygonDPFX poly;
+
   memset (&poly, 0, sizeof(poly));
   poly.inv_aspect = rview.inv_aspect;
   poly.flat_color_r = 1;
   poly.flat_color_g = 1;
   poly.flat_color_b = 1;
+  poly.txt_handle = _textureMap->GetTextureHandle ();
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD);
@@ -103,12 +152,34 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
     {
 
       ddgVector3 *p1, *p2, *p3;
+      ddgVector3 wp1, wp2, wp3;
+      ddgVector3 n1, n2, n3;
+      ddgVector2 t1, t2, t3;
+      ddgColor3  c1, c2, c3;
+	  unsigned int tva = bt->parent (tvc),
+		  tv0 = bt->v0 (tvc),
+		  tv1 = bt->v1 (tvc);
+	  // Camera space coords.
+	  p3 =	bt->tri(tva)->pos();
+	  p2 =	bt->tri(tv0)->pos();
+	  p1 =	bt->tri(tv1)->pos();
+	  // World space coords.
+      bt->vertex(tva,&wp1);
+      bt->vertex(tv0,&wp2);
+      bt->vertex(tv1,&wp3);
+	  // Normals.
+	  bt->normal(tva,&n1);
+	  bt->normal(tv0,&n2);
+	  bt->normal(tv1,&n3);
+      // Texture coords from 0 - N where N is size of texture.
+	  bt->textureC(tva,t1);
+	  bt->textureC(tv0,t2);
+	  bt->textureC(tv1,t3);
+	  // Create some color scheme.
+	  classify(wp1,&n1,&c1);
+	  classify(wp2,&n2,&c2);
+	  classify(wp3,&n3,&c3);
 
-	  p3 =	bt->tri(bt->parent (tvc))->pos();
-	  p2 =	bt->tri(bt->v0 (tvc))->pos();
-	  p1 =	bt->tri(bt->v1 (tvc))->pos();
-	  
-      // DDG vectors work with negative Z pointing forwards.
       float iz;
       float pz[3];
       csVector2 triangle[3];
@@ -136,23 +207,23 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
       poly.vertices[0].z = 1.0/pz[0];
       poly.vertices[0].u = 0;
       poly.vertices[0].v = 0;
-      poly.vertices[0].r = 1;
-      poly.vertices[0].g = 1;
-      poly.vertices[0].b = 1;
+      poly.vertices[0].r = (float)c1.v[0]/255.0;
+      poly.vertices[0].g = (float)c1.v[1]/255.0;
+      poly.vertices[0].b = (float)c1.v[2]/255.0;
 
       poly.vertices[1].z = 1.0/pz[1];
       poly.vertices[1].u = 1;
       poly.vertices[1].v = 0;
-      poly.vertices[1].r = 1;
-      poly.vertices[1].g = 0;
-      poly.vertices[1].b = 0;
+      poly.vertices[1].r = (float)c2.v[0]/255.0;
+      poly.vertices[1].g = (float)c2.v[1]/255.0;
+      poly.vertices[1].b = (float)c2.v[2]/255.0;
 
       poly.vertices[2].z = 1.0/pz[2];
       poly.vertices[2].u = 0;
       poly.vertices[2].v = 1;
-      poly.vertices[2].r = 0;
-      poly.vertices[2].g = 0;
-      poly.vertices[2].b = 1;
+      poly.vertices[2].r = (float)c3.v[0]/255.0;
+      poly.vertices[2].g = (float)c3.v[1]/255.0;
+      poly.vertices[2].b = (float)c3.v[2]/255.0;
       
       PreparePolygonFX (&poly, clipped_triangle, rescount, triangle,
       	true);
