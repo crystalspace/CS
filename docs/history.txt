@@ -40,18 +40,19 @@ chronological order.
 	  msvcgen.jam which tried to insure that the resource file (.rc) had
 	  the correct path in the generated project file.  The more correct fix
 	  involved slightly re-ordering the --strip-root options given to
-	  msvcgen.pl.  As a happy side-effect, removal the hack also fixes a
+	  msvcgen.pl.  As a happy side-effect, removal of the hack also fixes a
 	  bug in which it was unconditionally referencing mk/visualc7, despite
 	  the fact that MSVC_VERSION might be "6".  Also fixed a couple other
-	  minor bugs, and did a bit of cleanup.
+	  minor bugs and did a bit of cleanup.
 	- Eric Sunshine fixed problem in csXMLShaderCompiler::CompileShader()
-	  where some compilers considered return expression ambiguous.  Also
-	  fixed bug in ~csXMLShaderCompiler where it failed to invoke
+	  where some compilers considered the return expression ambiguous.
+	  Also fixed bug in ~csXMLShaderCompiler where it failed to invoke
 	  SCF_DESTRUCT_IBASE().
-	- Norman fixed the frequency conversion routine in the software sound 
-	  renderer where a float factor was determined by dividing two integers.
-	  When downsampling was performed the downsampled data was zero bytes 
-	  long (muted).
+	- Norman fixed the frequency conversion routine in the software sound
+	  renderer where a float factor was determined by dividing two
+	  integers.  When downsampling was performed the downsampled data was
+	  zero bytes long (muted).
+	- Eric Sunshine augmented cspace.i so that it also publishes csPixmap.
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.
