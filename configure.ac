@@ -1281,6 +1281,7 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 	[$cs_cv_libogg_libs $cs_cv_libvorbis_libs])])
 
 
+
 #------------------------------------------------------------------------------
 # Check for libpgserver (PicoGUI server library).
 # In addition to the standard installed locations,
@@ -1482,12 +1483,42 @@ CS_CHECK_BUILD([for Linux joystick API], [cs_cv_sys_linux_joystick],
 
 #------------------------------------------------------------------------------
 # Check if libbfd is present (part of GNU binutils).
+#
+# IMPLEMENTATION NOTES
+#
+# It seems that some platforms have two version of libiberty installed: one
+# from binutils and one from gcc.  The binutils version resides in /usr/lib,
+# whereas the gcc version resides in the gcc installation directory.  The gcc
+# version, by default, takes precedence at link time over the binutils version.
+# Unfortunately, the in broken cases, the gcc version of libiberty is missing
+# htab_create_alloc() which is required by some libbfd functions.  The
+# extensive secondary check of libbfd catches this anomalous case of broken gcc
+# libiberty.  It turns out that it is possible to make the linker prefer the
+# binutils version by specifying -L/usr/lib, thus the extensive test attempts
+# to do so in an effort to resolve this unfortunate issue.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([bfd],
-    [AC_LANG_PROGRAM([#include <bfd.h>], [bfd_init();])], [], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libbfd], [LIBBFD])
-    CS_BUILD_PROPERTY([LIBS.EXE], [$cs_cv_libbfd_libs], [+])],
-    [], [], [], [-liberty])
+    [AC_LANG_PROGRAM([#include <bfd.h>], [bfd_init();])],
+    [], [], [], [], [], [], [-liberty])
+
+AS_IF([test $cs_cv_libbfd = yes],
+    [CS_CHECK_BUILD([if libbfd is usable], [cs_cv_libbfd_ok],
+	[AC_LANG_PROGRAM([#include <bfd.h>],
+	    [bfd* p;
+	    asection* s;
+	    bfd_init();
+	    p = bfd_openr(0,0);
+	    bfd_check_format(p,bfd_object);
+	    bfd_get_section_by_name(p,0);
+	    bfd_section_size(p,s);
+	    bfd_get_section_contents(p,s,0,0,0);
+	    bfd_close(p);])],
+	[CS_CREATE_TUPLE() CS_CREATE_TUPLE([],[-L/usr/lib],[])], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libbfd_ok], [LIBBFD])
+	CS_BUILD_PROPERTY([CFLAGS.SYSTEM], [$cs_cv_libbfd_ok_cflags], [+])
+	CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [$cs_cv_libbfd_ok_lflags], [+])
+	CS_BUILD_PROPERTY([LIBS.EXE], [$cs_cv_libbfd_ok_libs], [+])], [], [],
+	[$cs_cv_libbfd_cflags], [$cs_cv_libbfd_lflags], [$cs_cv_libbfd_libs])])
 
 
 

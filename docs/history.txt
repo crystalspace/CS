@@ -7,25 +7,28 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 5-Sep-2003
-	- Jorrit changed R3D_RENDERSTATEOPTION to G3D_RENDERSTATEOPTION
-	  for the new renderer.
-	- Jorrit renamed GetWVMatrix() to GetObjectToCamera(). This is
-	  more logical (symetrical with SetObjectToCamera()) and also
-	  more compatible with old renderer.
+	- Jorrit changed R3D_RENDERSTATEOPTION to G3D_RENDERSTATEOPTION for the
+	  new renderer.
+	- Jorrit renamed GetWVMatrix() to GetObjectToCamera().  This is more
+	  logical (symetrical with SetObjectToCamera()) and also more
+	  compatible with old renderer.
 	- Jorrit completely merged render3d.h with graph3d.h so that only
 	  graph3d.h remains.
-	- Peter Amstutz added more comments to the AttachCollider*
-	  methods in varia/dynamics.h and changed the default
-	  softness from .316 to .01
-	- Duhprey fixed the default to stepfast and coding style in
-	  odedynam.
-	- Duhprey added the following to stencil shadows
-	  - Improved memory management with csHash<> and csArray<>
-	  - Fixed robustness on animated (deforming) meshes
-	  - Fixed robustness on moving meshes
+	- Peter Amstutz added more comments to the AttachCollider* methods in
+	  varia/dynamics.h and changed the default softness from .316 to .01
+	- Duhprey fixed the default to stepfast and coding style in odedynam.
+	- Duhprey made the following changes to stencil shadows:
+	    - Improved memory management with csHash<> and csArray<>
+	    - Fixed robustness on animated (deforming) meshes
+	    - Fixed robustness on moving meshes
+	- Eric Sunshine augmented configure.ac so that it recognizes and
+	  attempts to work around anomalous installations with multiple
+	  versions of libiberty (one from binutils and one from gcc), in which
+	  the gcc version is missing the htab_create_alloc() function required
+	  by libbfd.
 4-Sep-2003
 	- Peter Amstutz fixed the csPolyTexture destructor (part of
-	  the thing plugin) to not try to deallocate the lightmap 
+	  the thing plugin) to not try to deallocate the lightmap
 	  (and thus crash) if the lightmap is actually NULL
 	- Peter Amstutz added new API documentation for the
           parameters of about 75% of the methods defined in iEngine
@@ -44,7 +47,7 @@ chronological order.
 	  to glrender3d.
 	- Jorrit added stenciltest level to CVS. This is for the new
 	  renderer.
-	- res added the ATI_separate_stencil and EXT_stencil_two_side 
+	- res added the ATI_separate_stencil and EXT_stencil_two_side
 	  extensions to the GL extension manager and made some other small
 	  tweaks in the ext manager.
 	- res fixed a cut'n'paste error in metaglext.xml.
@@ -58,7 +61,7 @@ chronological order.
 	  be closed. Next the viscull mesh is used. A check for the 'closed'
 	  flag of the mesh object will be added later. If it's set, the mesh
 	  will be treated as closed. If the viscull mesh isn't present, the
-	  colldet resp. base meshes are tried. If, either due the missing flag 
+	  colldet resp. base meshes are tried. If, either due the missing flag
 	  or a test, the mesh is found 'unclosed', it'll be naively closed
 	  (by duplicating faces & flipping their normals.)
 	- res modified the Thing static data to not set the shadow poly mesh.
@@ -79,7 +82,7 @@ chronological order.
 	  So I just moved the two functions in csPolyMeshTools to the
 	  already exsisting csPolygonMeshTools in csgeom.
 	- res made the following changes:
-	    - ARB VPs can now contain a <description> token. The content of it 
+	    - ARB VPs can now contain a <description> token. The content of it
 	      is displayed in case of a program error (or warning).
 	    - ARB VP spec says that a program error string may be available
 	      even if no program error occured. The error string is displayed
@@ -90,8 +93,8 @@ chronological order.
 	      shadow mesh is used; if not present, no shadow is casted.
 	      However, the shadow mesh is tested for closedness.
 	- Duhprey commited the ode.h he forgot to commit yesterday
-	- Troy fixed strcmp calls in stringarray.h (Find & and 
-	  FindCaseInsensitive).
+	- Troy fixed broken strcmp calls in stringarray.h: Find() and
+	  FindCaseInsensitive().
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.
@@ -126,7 +129,7 @@ chronological order.
 	  so you can be sure that on the new renderer GetAttenuationVector()
 	  will always work.
 	- res made the following changes:
-	    - Fixed shadow volume generation. The problem was that the 
+	    - Fixed shadow volume generation. The problem was that the
 	      "light position" shader var wasn't properly propagated to the
 	      shadow volume shader.
 	    - The shadow model is now queried from the mesh object, not the
@@ -136,7 +139,7 @@ chronological order.
 	      done when a value on the SV is set, so no need for the client
 	      code to do that itself.
 	    - Updated NR todo.
-        - Philip Wyett updated docs to reflect a new msvc_libs release.        
+        - Philip Wyett updated docs to reflect a new msvc_libs release.
 	- Eric Sunshine fixed a memory leak in bfdplugins.cpp where it was
 	  duplicating a string before passing it to iStringArray::Push() and
 	  then leaking the clone.
@@ -153,12 +156,12 @@ chronological order.
 	      in SetLightParameter ().
 	    - csLight::CalculateInfluenceRadius () called SetInfluenceRadius ()
 	      to set it's calculated influence radius. However, this called
-	      CalculateAttenuationVector(), which in turn called 
+	      CalculateAttenuationVector(), which in turn called
 	      SetAttenuationVector(), which clears the "influence radius valid"
 	      flag, causing an unnecessary recalculations of the influence
 	      radius. Worse, probably due to numerical precision, the
 	      attenuation vector and influence radius wasn't the same between
-	      two calls of GetInfluenceRadius (), causing very visible 
+	      two calls of GetInfluenceRadius (), causing very visible
 	      flickering.
 	    - Worked a bit on the vertex light VP. It is a bit more complete
 	      now - not just diffuse, but also specular lighting (tho FP
@@ -193,7 +196,7 @@ chronological order.
 	  csShaderManager::SetupState().
 	- Jorrit fixed some occurances of Compare (changed with CompareKeys)
 	  in csHash.
-	- res fixed a bug in csHash<>::GetAll(). When you have a loop that 
+	- res fixed a bug in csHash<>::GetAll(). When you have a loop that
 	  should iterate from n-1 to 0, it's better to decrement the loop
 	  counter than to increment.
 	- Eric Sunshine changed the NASM check in configure.ac so that it
@@ -270,10 +273,10 @@ chronological order.
 	  was breaking <unistd.h> in some fashion).
 	- res made the following changes:
 	    - Typo fix: iVisibilityCullerListner -> iVisibilityCullerListener
-	    - Added viscallback versions of the viscull methods to cull 
+	    - Added viscallback versions of the viscull methods to cull
 	      against planes and spheres.
 	    - Stencil shadow plugin now compiles again. However, it's still a
-	      work in progress of trying to get it to work (and it looks like 
+	      work in progress of trying to get it to work (and it looks like
 	      that.)
 31-Aug-2003
         - Philip Wyett changed #include "GL/glu.h" to <GL/glu.h>, in the new
@@ -353,17 +356,17 @@ chronological order.
 	  built with the GNU make system failed to link because the libraries
 	  were specified in the wrong order (they were listed far too early in
 	  the link invocation).
-	- Anders Stenberg reimplemented the PicoGUI video driver. Now it should 
-	  be hardware accelerated and generally cleaner. Logical operations 
+	- Anders Stenberg reimplemented the PicoGUI video driver. Now it should
+	  be hardware accelerated and generally cleaner. Logical operations
 	  aren't supported yet though, and there are some redraw issues.
 	- DeSigna fixed up an exit crasher in PGUI plugin caused by a
-	  reference held past DestroyApplication. 
+	  reference held past DestroyApplication.
 	- Anders Stenberg reenabled pixmap drawing with csPixmap derivates in
 	  the new renderer, which was disabled.
         - Philip Wyett added test for PGSERVER.AVAILABLE in user.mak, so that
           the Pico plugin is not built unless the library is on the build box.
           Also added test to Pico test app 'pgtest', so that if the plugin
-          associated is not built the test app will also not be built.          
+          associated is not built the test app will also not be built.
 	- Jorrit fixed uninitialized variables in the xmlread plugin in case
 	  of an xml declaration. Some of the shader xml files use this and
 	  this could cause crashes with walktest (which uses xmlread) and
@@ -377,9 +380,9 @@ chronological order.
 	  for real this time. Includes a very nasty, but unfortunately
 	  necessary hack in the pgserver plugin.
 	- res fixed a problem with library loading error reporting on Win32:
-	  under certain circumstances, csPrintLibraryError() popped strings 
+	  under certain circumstances, csPrintLibraryError() popped strings
 	  from an empty string array, which triggers an assertion.
-	- res augmented SCF to emit an error in case a symbol couldn't be 
+	- res augmented SCF to emit an error in case a symbol couldn't be
 	  retrieved from a library.
         - Andreas Busch renamed CS_ZBUF_SPECIAL to CS_ZBUF_INVERT in python
 	  and perl5 modules to match latest renderer changes.
@@ -395,26 +398,26 @@ chronological order.
 	    - cstool/csview.cpp and cstool/keyval.cpp unnecessarily included
 	      iengine/sector.h.
 	    - Made the type of the key in csHash<> templated as well and added
-	      support for "key handlers" which compute the actual hash of a 
+	      support for "key handlers" which compute the actual hash of a
 	      key and compare two keys. Overriding key handlers makes strings
 	      as keys possible, for example.
 	    - Fixed an off-by-one error in csHash<>::Iterator.
 	    - Changed the shader manager to emit a warning of no shader plugin
 	      was found.
 	    - In NR build, the sector doesn't cache the rendermeshes any more
-	      or does culling. This is the responsibility of the renderstep 
-	      now. Note 1: The generic RS has been updated, but is still 
-	      rather unoptimized. Note 2: The stencil RS hasn't been updated 
+	      or does culling. This is the responsibility of the renderstep
+	      now. Note 1: The generic RS has been updated, but is still
+	      rather unoptimized. Note 2: The stencil RS hasn't been updated
 	      yet.
 	- res removed cssys/general/printf.cpp from the VC libcssys source
 	  file list. Win32 has it's own csPrintf() etc.
-	- res added support for the "SetDllDirectory()" API on Win32. It 
-	  provides pretty much the functionality that the PATH patching 
-	  already, but a bit cleaner. It is only supported by very recent 
-	  Windowses, tho, and if not present, PATH is still patched like 
+	- res added support for the "SetDllDirectory()" API on Win32. It
+	  provides pretty much the functionality that the PATH patching
+	  already, but a bit cleaner. It is only supported by very recent
+	  Windowses, tho, and if not present, PATH is still patched like
 	  before.
 	- Anders Stenberg fixed pico update problem by updating all the time.
-	- Anders Stenberg fixed a graphics2D implementation that dropped 
+	- Anders Stenberg fixed a graphics2D implementation that dropped
 	  alpha when blitting.
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
@@ -490,7 +493,7 @@ chronological order.
 	- Jorrit reverted a call to Prepare() in FillRenderMeshes() (thing
 	  mesh plugin). This breaks the thing mesh for smoothed things (with
 	  new renderer enabled) but it fixes it for all the rest :-)
-	- Anders Stenberg now added the csplugin, jam and makefiles for new 
+	- Anders Stenberg now added the csplugin, jam and makefiles for new
 	  software renderer, which were forgotten last time.
 	- Jorrit worked around a strange thing with new renderer and the
 	  XOR pattern image that is used in case a texture is not found. It
@@ -540,15 +543,15 @@ chronological order.
 	      do.
 	    - cslight now displays a text progress meter on the console, in
 	      addition to the graphical meter.
-	- Anders Stenberg changed most occurances of "Render3D" to 
+	- Anders Stenberg changed most occurances of "Render3D" to
 	  "Graphics3D", including some "r3d" that were changed to "g3d".
 	  Now filenames and makefile targets should be the only remnant of the
 	  stupid "render3d" naming (which was my fault, sorry for that :)
 	  Also added make- & jamfiles for new software renderer.
-	- Anders Stenberg fixed a bug in new renderer where aspect wasn't 
+	- Anders Stenberg fixed a bug in new renderer where aspect wasn't
 	  initialized before BeginDraw in WalkTest. Solved by setting default
 	  aspect and center in iGraphics3D::Open based on canvas size. Note
-	  that this isn't really a good solution[TM]. The apps should call 
+	  that this isn't really a good solution[TM]. The apps should call
 	  SetPerspectiveAspect/Center _before_ calls to BeginDraw.
 27-Aug-2003
 	- Eric Sunshine fixed problem in csHash where non-friend classes
@@ -618,17 +621,17 @@ chronological order.
 	- res made the following changes:
 	    - The DS3D plugin passed some parameters as csRef<>s. Changed to
 	      just pointers.
-	    - Changed the DS3D coop level to 'priority'. That's the highest in 
+	    - Changed the DS3D coop level to 'priority'. That's the highest in
 	      DX8+ anyway, and is a bit 'nicer' than 'exclusive' for older
 	      DirectXs.
-	    - Thing's SLM layouting strategy has been changed; now, the 
+	    - Thing's SLM layouting strategy has been changed; now, the
 	      factory does the layouting once, and the mesh objects reuse the
-	      layout. 
+	      layout.
 	    - Moved SLM dumping from Thing to renderer.
 	    - Enhanced bugplug's "debug command" feature; it now accepts
 	      a tag as a target name as well.
 	    - Changed non-PO2 resizing of the renderers: instead of blindly
-	      scaling up(GL) resp. down(SW), the direction with the least 
+	      scaling up(GL) resp. down(SW), the direction with the least
 	      quality loss is guestimated and chosen. Also, both renderers
 	      share that code; it's important that non-PO2 textures are resized
 	      to the same dimensions on all renderers, otherwise lightmapping
@@ -644,7 +647,7 @@ chronological order.
 	      trouble.
 	- res fixed some makefiles to allow compilation from non-source root
 	  directories.
-	- res fixed the glrender3d Jamfile to link against the "render3d 
+	- res fixed the glrender3d Jamfile to link against the "render3d
 	  common" stuff.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
@@ -2260,10 +2263,10 @@ chronological order.
 	    - Made sure NextFrame is called when rendering with new renderer.
 	    - Fixed a bug where xorpat assumed width == height.
 	- DeSigna made the following changes:
-	  - Added a pair of MemoryMapWindow() functions, allow mapping parts of
-	    files, mapping in read/write files and re-using file handles for
-	    multiple windows into the same file.
-	  - MemoryMapFile() was modified to work with these new functions.
+	    - Added a pair of MemoryMapWindow() functions, allow mapping parts
+	      of files, mapping in read/write files and re-using file handles
+	      for multiple windows into the same file.
+	    - MemoryMapFile() was modified to work with these new functions.
 	- Duhprey made a Speed improvement to PreCompute in terrbig
 	- res updated the Win32 memory mapping for "window mapping".  However,
 	  the new stuff is still untested, as it isn't used yet anywhere.
@@ -2273,17 +2276,17 @@ chronological order.
 	  CVS until some parts are transplanted.
 1-Jul-2003
 	- HangDude made the following changes:
-	   - Moved anonrndbuf.h from csutil to cstool (on Jorrit's request).
-	   - Added LGPL notice.
-	   - Updated genmesh because of that change.
+	    - Moved anonrndbuf.h from csutil to cstool (on Jorrit's request).
+	    - Added LGPL notice.
+	    - Updated genmesh because of that change.
 	- res fixed rlsstencil.mak which got messed up when the plugin name was
 	  changed.
 	- Matze moved CFLAGS from mk/jam/variant.jam to Jamrules to not enforce
 	  external projects to the same flags as CS is using
 	- Anders Stenberg made the following changes:
-	  - Fixed a bug in stdrep where it assumed that the renderer was
-	    in 2d mode.
-	  - Added console output to r3dtest. Can be toggled with TAB.
+	    - Fixed a bug in stdrep where it assumed that the renderer was in
+	      2d mode.
+	    - Added console output to r3dtest. Can be toggled with TAB.
 29-Jun-2003
 	- Luca fixed the inconcistency of properties read and written by
 	  Set/GetProperty in the awsScrollBar class. He updated the texinfo
