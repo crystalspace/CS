@@ -257,8 +257,7 @@ bool IsoTest::CreateActor ()
   spark_material->SetShader (strings->Request ("ambient"), ambient_shader);
   spark_material->SetShader (strings->Request ("diffuse"), light_shader);
   iMaterialWrapper *mat = engine->GetMaterialList ()->NewMaterial (
-  	spark_material);
-  mat->QueryObject ()->SetName ("spark");
+  	spark_material, "spark");
 
   // Load a sprite template from disk.
   csRef<iMeshFactoryWrapper> imeshfact (

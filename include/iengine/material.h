@@ -160,13 +160,15 @@ SCF_VERSION (iMaterialList, 0, 0, 1);
 struct iMaterialList : public iBase
 {
   /// Create a new material.
-  virtual iMaterialWrapper* NewMaterial (iMaterial* material) = 0;
+  virtual iMaterialWrapper* NewMaterial (iMaterial* material,
+  	const char* name) = 0;
 
   /**
    * Create a engine wrapper for a pre-prepared iTextureHandle
    * The handle will be IncRefed.
    */
-  virtual iMaterialWrapper *NewMaterial (iMaterialHandle *ith) = 0;
+  virtual iMaterialWrapper *NewMaterial (iMaterialHandle *ith,
+  	const char* name) = 0;
 
   /// Return the number of materials in this list
   virtual int GetCount () const = 0;

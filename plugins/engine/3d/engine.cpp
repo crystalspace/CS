@@ -1266,9 +1266,10 @@ void csEngine::PrepareTextures ()
   }
 
   // Then register all materials to the texture manager.
-  for (i = 0; i < materials->Length (); i++)
+  int j;
+  for (j = 0; j < materials->GetCount (); j++)
   {
-    iMaterialWrapper *csmh = materials->Get (i);
+    iMaterialWrapper *csmh = materials->Get (j);
     if (!csmh->GetMaterialHandle ()) csmh->Register (txtmgr);
   }
 }
@@ -2864,8 +2865,7 @@ iMaterialWrapper *csEngine::CreateMaterial (
   iTextureWrapper *texture)
 {
   csMaterial *mat = new csMaterial (this, texture);
-  iMaterialWrapper *wrapper = materials->NewMaterial (mat);
-  wrapper->QueryObject ()->SetName (name);
+  iMaterialWrapper *wrapper = materials->NewMaterial (mat, name);
 
   mat->SetShader (default_shadertype, default_shader);
   mat->shadersCustomized = false;
@@ -2981,7 +2981,7 @@ iTextureList *csEngine::GetTextureList () const
 
 iMaterialList *csEngine::GetMaterialList () const
 {
-  return &(GetMaterials ()->scfiMaterialList);
+  return GetMaterials ();
 }
 
 iSharedVariableList *csEngine::GetVariableList () const

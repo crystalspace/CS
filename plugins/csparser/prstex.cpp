@@ -613,7 +613,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     material->SetFlatColor (col);
   material->SetReflection (diffuse, ambient, reflection);
 
-  iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);
+  iMaterialWrapper *mat;
  
   if (prefix)
   {
@@ -621,12 +621,12 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     strcpy (prefixedname, prefix);
     strcat (prefixedname, "_");
     strcat (prefixedname, matname);
-    mat->QueryObject()->SetName (prefixedname);
+    mat = Engine->GetMaterialList ()->NewMaterial (material, prefixedname);
     delete [] prefixedname;
   }
   else
   {
-    mat->QueryObject()->SetName (matname);
+    mat = Engine->GetMaterialList ()->NewMaterial (material, matname);
   }
   
   size_t i;

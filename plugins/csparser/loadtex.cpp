@@ -147,8 +147,7 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
   if (create_material)
   {
     csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
-    matwrap = Engine->GetMaterialList ()->NewMaterial (material);
-    matwrap->QueryObject ()->SetName (name);
+    matwrap = Engine->GetMaterialList ()->NewMaterial (material, name);
   }
 
   if (reg && tm)

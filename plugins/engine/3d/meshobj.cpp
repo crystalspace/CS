@@ -1272,31 +1272,33 @@ csMeshList::~csMeshList ()
 iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
 {
   char const* p = strchr (Name, ':');
-  if (!p) return list.FindByName (Name);
+  if (!p) return meshes_hash.Get (Name, 0);
 
-  size_t i;
-  for (i = 0 ; i < list.Length () ; i++)
-  {
-    iMeshWrapper* m = list.Get (i);
-    const char* mn = m->QueryObject ()->GetName ();
-    if (mn && !strncmp (mn, Name, p-Name))
-    {
-      return m->GetChildren ()->FindByName (p+1);
-    }
-  }
-  return 0;
+  int firstsize = p-Name;
+  char* firstname = (char*)alloca (firstsize+1);
+  strncpy (firstname, Name, firstsize);
+  firstname[firstsize] = 0;
+
+  iMeshWrapper* m = meshes_hash.Get (firstname, 0);
+  if (!m) return 0;
+  return m->GetChildren ()->FindByName (p+1);
 }
 
 int csMeshList::Add (iMeshWrapper *obj)
 {
   PrepareMesh (obj);
-  list.Push (obj);
-  return true;
+  const char* name = obj->QueryObject ()->GetName ();
+  if (name)
+    meshes_hash.Put (name, obj);
+  return list.Push (obj);
 }
 
 bool csMeshList::Remove (iMeshWrapper *obj)
 {
   FreeMesh (obj);
+  const char* name = obj->QueryObject ()->GetName ();
+  if (name)
+    meshes_hash.Delete (name, obj);
   list.Delete (obj);
   return true;
 }
@@ -1304,6 +1306,10 @@ bool csMeshList::Remove (iMeshWrapper *obj)
 bool csMeshList::Remove (int n)
 {
   FreeMesh (list[n]);
+  iMeshWrapper* obj = list[n];
+  const char* name = obj->QueryObject ()->GetName ();
+  if (name)
+    meshes_hash.Delete (name, obj);
   list.DeleteIndex (n);
   return true;
 }
@@ -1315,6 +1321,7 @@ void csMeshList::RemoveAll ()
   {
     FreeMesh (list[i]);
   }
+  meshes_hash.DeleteAll ();
   list.DeleteAll ();
 }
 
@@ -1328,7 +1335,7 @@ iMeshWrapper *csMeshList::FindByName (const char *Name) const
   if (strchr (Name, ':'))
     return FindByNameWithChild (Name);
   else
-    return list.FindByName (Name);
+    return meshes_hash.Get (Name, 0);
 }
 
 //--------------------------------------------------------------------------
@@ -1417,22 +1424,25 @@ csMeshFactoryList::~csMeshFactoryList ()
 int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
 {
   PrepareFactory (obj);
-  list.Push (obj);
-  return true;
+  const char* name = obj->QueryObject ()->GetName ();
+  if (name)
+    factories_hash.Put (name, obj);
+  return list.Push (obj);
 }
 
 bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
 {
   FreeFactory (obj);
+  const char* name = obj->QueryObject ()->GetName ();
+  if (name)
+    factories_hash.Delete (name, obj);
   list.Delete (obj);
   return true;
 }
 
 bool csMeshFactoryList::Remove (int n)
 {
-  FreeFactory (list[n]);
-  list.Delete (Get (n));
-  return true;
+  return Remove (Get (n));
 }
 
 void csMeshFactoryList::RemoveAll ()
@@ -1442,6 +1452,7 @@ void csMeshFactoryList::RemoveAll ()
   {
     FreeFactory (list[i]);
   }
+  factories_hash.DeleteAll ();
   list.DeleteAll ();
 }
 
@@ -1453,7 +1464,7 @@ int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
 iMeshFactoryWrapper *csMeshFactoryList::FindByName (
   const char *Name) const
 {
-  return list.FindByName (Name);
+  return factories_hash.Get (Name, 0);
 }
 
 //--------------------------------------------------------------------------

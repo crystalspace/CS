@@ -149,7 +149,7 @@ CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataMaterial, iMaterialWrapper*, MaterialWr
 void csModelDataMaterial::Register (iMaterialList *ml)
 {
   if (!BaseMaterial) return;
-  SetMaterialWrapper (ml->NewMaterial (BaseMaterial));
+  SetMaterialWrapper (ml->NewMaterial (BaseMaterial, 0));
 }
 
 iModelDataMaterial *csModelDataMaterial::Clone () const

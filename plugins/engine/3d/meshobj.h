@@ -27,6 +27,8 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
+#include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
 #include "plugins/engine/3d/movable.h"
 #include "plugins/engine/3d/impmesh.h"
 #include "plugins/engine/3d/meshlod.h"
@@ -47,12 +49,13 @@ class csMeshFactoryWrapper;
 class csLight;
 
 /**
- * General list of meshes. This class implements iMeshList.
+ * General list of meshes.
  */
 class csMeshList : public iMeshList
 {
 private:
   csRefArrayObject<iMeshWrapper> list;
+  csHash<iMeshWrapper*,csStrKey,csConstCharHashKeyHandler> meshes_hash;
 
 public:
   SCF_DECLARE_IBASE;
@@ -102,6 +105,8 @@ class csMeshFactoryList : public iMeshFactoryList
 {
 private:
   csRefArrayObject<iMeshFactoryWrapper> list;
+  csHash<iMeshFactoryWrapper*,csStrKey,csConstCharHashKeyHandler>
+  	factories_hash;
 
 public:
   SCF_DECLARE_IBASE;

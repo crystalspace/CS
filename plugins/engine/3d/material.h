@@ -23,6 +23,8 @@
 #include "csgfx/rgbpixel.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
+#include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
 #include "csutil/leakguard.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
@@ -306,41 +308,31 @@ public:
 /**
  * This class is used to hold a list of materials.
  */
-class csMaterialList : public csRefArrayObject<iMaterialWrapper>
+class csMaterialList : public iMaterialList
 {
+private:
+  csRefArrayObject<iMaterialWrapper> list;
+  csHash<iMaterialWrapper*,csStrKey,csConstCharHashKeyHandler> mat_hash;
+
 public:
   /// Initialize the array
   csMaterialList ();
   virtual ~csMaterialList ();
 
-  /// Create a new material.
-  iMaterialWrapper* NewMaterial (iMaterial* material);
-
-  /**
-   * Create a engine wrapper for a pre-prepared iTextureHandle
-   * The handle will be IncRefed.
-   */
-  iMaterialWrapper* NewMaterial (iMaterialHandle *ith);
-
   SCF_DECLARE_IBASE;
 
-  //------------------- iMaterialList implementation -----------------------
-  class MaterialList : public iMaterialList
-  {
-  public:
-    SCF_DECLARE_EMBEDDED_IBASE (csMaterialList);
-
-    virtual iMaterialWrapper* NewMaterial (iMaterial* material);
-    virtual iMaterialWrapper* NewMaterial (iMaterialHandle *ith);
-    virtual int GetCount () const;
-    virtual iMaterialWrapper *Get (int n) const;
-    virtual int Add (iMaterialWrapper *obj);
-    virtual bool Remove (iMaterialWrapper *obj);
-    virtual bool Remove (int n);
-    virtual void RemoveAll ();
-    virtual int Find (iMaterialWrapper *obj) const;
-    virtual iMaterialWrapper *FindByName (const char *Name) const;
-  } scfiMaterialList;
+  virtual iMaterialWrapper* NewMaterial (iMaterial* material,
+  	const char* name);
+  virtual iMaterialWrapper* NewMaterial (iMaterialHandle *ith,
+  	const char* name);
+  virtual int GetCount () const { return list.Length (); }
+  virtual iMaterialWrapper *Get (int n) const { return list[n]; }
+  virtual int Add (iMaterialWrapper *obj);
+  virtual bool Remove (iMaterialWrapper *obj);
+  virtual bool Remove (int n);
+  virtual void RemoveAll ();
+  virtual int Find (iMaterialWrapper *obj) const;
+  virtual iMaterialWrapper *FindByName (const char *Name) const;
 };
 
 #endif // __CS_MATERIAL_H__

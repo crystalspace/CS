@@ -113,8 +113,8 @@ void ConstructMaterialTask::doTask()
       int blue = strtol(newproperty.substr(5, 2).c_str(), 0, 16);
       color->SetFlatColor(csRGBcolor(red, green, blue));
       if(!material) {
-      material = engine->GetMaterialList()->NewMaterial(color);
-      material->QueryObject()->SetName(p.getURL().getString().c_str());
+      material = engine->GetMaterialList()->NewMaterial(color,
+      	p.getURL().getString().c_str());
       }
       material->SetMaterial(color);
       material->Register(txtmgr);
@@ -124,8 +124,8 @@ void ConstructMaterialTask::doTask()
       csRef<iMaterial> color = engine->CreateBaseMaterial(0);
       color->SetFlatColor(csRGBcolor((int)(r*255), (int)(g*255), (int)(b*255)));
       if(!material) {
-      material = engine->GetMaterialList()->NewMaterial(color);
-      material->QueryObject()->SetName(p.getURL().getString().c_str());
+      material = engine->GetMaterialList()->NewMaterial(color,
+      	p.getURL().getString().c_str());
       }
       material->SetMaterial(color);
       material->Register(txtmgr);
@@ -149,7 +149,7 @@ void ConstructMaterialTask::doTask()
   if(imat.IsValid())
   {
     csRef<iMaterialWrapper> material = engine->GetMaterialList()->NewMaterial(
-      imat);
+      imat, 0);
     if(!material) return;
     material->Register(txtmgr);
 
@@ -179,7 +179,7 @@ void csMetaMaterial::CreateCheckerboard()
   csRef<iTextureWrapper> tw = engine->GetTextureList()->NewTexture(th);
   tw->SetImageFile(im);
   csRef<iMaterial> mat = engine->CreateBaseMaterial(tw);
-  checkerboard = engine->GetMaterialList()->NewMaterial(mat);
+  checkerboard = engine->GetMaterialList()->NewMaterial (mat, 0);
   checkerboard->Register(txtmgr);
 }
 

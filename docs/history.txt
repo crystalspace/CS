@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Jan-2004
+	- Jorrit fixed a bug in csMeshList::Add() and csMeshFactoryList::Add().
+	  It was returning true on success instead of the last added index.
+	- Jorrit improved finding by name for several objects in the engine
+	  by using a hashmap. This means that finding lights, meshes,
+	  factories, materials, and sectors should now be a lot faster.
+	- Jorrit changed iMaterialList so that the NewMaterial() function now
+	  needs the name of the materials that is created. It is not
+	  recommended to change the name later as that will mess up with the
+	  internal hash table used to find materials quickly (this goes for
+	  the other objects that use hashes too).
 18-Jan-2004
 	- Eric Sunshine updated csPosixCondition::Wait() so that it also
 	  catches EINVAL from pthread_cond_timedwait().

@@ -506,8 +506,8 @@ bool csWaterDemo::Initialize ()
 
   mat->SetShader (strings->Request ("general"), shader);
 
-  csRef<iMaterialWrapper> matW = engine->GetMaterialList ()->NewMaterial (mat);
-  matW->QueryObject ()->SetName ("waterMaterial");
+  csRef<iMaterialWrapper> matW = engine->GetMaterialList ()->NewMaterial (mat,
+  	"waterMaterial");
 
   csRef<iImageVector> imgvec = csPtr<iImageVector> (new csImageVector ());
   csRef<iImage> img;

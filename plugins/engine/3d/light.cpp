@@ -576,18 +576,28 @@ iLight *csLightList::FindByID (const char* id) const
 int csLightList::Add (iLight *obj)
 {
   PrepareLight (obj);
+  const char* lightname = obj->QueryObject ()->GetName ();
+  if (lightname)
+    lights_hash.Put (lightname, obj);
   return list.Push (obj);
 }
 
 bool csLightList::Remove (iLight *obj)
 {
   FreeLight (obj);
+  const char* lightname = obj->QueryObject ()->GetName ();
+  if (lightname)
+    lights_hash.Delete (lightname, obj);
   return list.Delete (obj);
 }
 
 bool csLightList::Remove (int n)
 {
   FreeLight (list[n]);
+  iLight* obj = list[n];
+  const char* lightname = obj->QueryObject ()->GetName ();
+  if (lightname)
+    lights_hash.Delete (lightname, obj);
   return list.DeleteIndex (n);
 }
 
@@ -598,6 +608,7 @@ void csLightList::RemoveAll ()
   {
     FreeLight (list[i]);
   }
+  lights_hash.DeleteAll ();
   list.DeleteAll ();
 }
 
@@ -608,7 +619,7 @@ int csLightList::Find (iLight *obj) const
 
 iLight *csLightList::FindByName (const char *Name) const
 {
-  return list.FindByName (Name);
+  return lights_hash.Get (Name, 0);
 }
 
 // --- csLightingProcessInfo --------------------------------------------------

@@ -387,92 +387,81 @@ bool csMaterialWrapper::IsVisitRequired () const
 
 //------------------------------------------------------ csMaterialList -----//
 SCF_IMPLEMENT_IBASE(csMaterialList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMaterialList)
+  SCF_IMPLEMENTS_INTERFACE(iMaterialList)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterialList::MaterialList)
-  SCF_IMPLEMENTS_INTERFACE(iMaterialList)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csMaterialList::csMaterialList () :
-  csRefArrayObject<iMaterialWrapper> (16, 16)
+csMaterialList::csMaterialList ()
 {
   SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
 }
 
 csMaterialList::~csMaterialList()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMaterialList);
   SCF_DESTRUCT_IBASE ();
 }
 
-iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material)
+iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
+	const char* name)
 {
   iMaterialWrapper *tm = &
     (new csMaterialWrapper (material))->scfiMaterialWrapper;
-  Push (tm);
+  tm->QueryObject ()->SetName (name);
+  if (name)
+    mat_hash.Put (name, tm);
+  list.Push (tm);
   tm->DecRef ();
   return tm;
 }
 
-iMaterialWrapper *csMaterialList::NewMaterial (iMaterialHandle *ith)
+iMaterialWrapper *csMaterialList::NewMaterial (iMaterialHandle *ith,
+	const char* name)
 {
   iMaterialWrapper *tm = &(new csMaterialWrapper (ith))->scfiMaterialWrapper;
-  Push (tm);
+  tm->QueryObject ()->SetName (name);
+  if (name)
+    mat_hash.Put (name, tm);
+  list.Push (tm);
   tm->DecRef ();
   return tm;
 }
 
-iMaterialWrapper *csMaterialList::MaterialList::NewMaterial (
-  iMaterial *material)
+int csMaterialList::Add (iMaterialWrapper *obj)
 {
-  return scfParent->NewMaterial (material);
+  const char* name = obj->QueryObject ()->GetName ();
+  if (name)
+    mat_hash.Put (name, obj);
+  return list.Push (obj);
 }
 
-iMaterialWrapper *csMaterialList::MaterialList::NewMaterial (
-  iMaterialHandle *ith)
+bool csMaterialList::Remove (iMaterialWrapper *obj)
 {
-  return scfParent->NewMaterial (ith);
+  const char* name = obj->QueryObject ()->GetName ();
+  if (name)
+    mat_hash.Delete (name, obj);
+  return list.Delete (obj);
 }
 
-int csMaterialList::MaterialList::GetCount () const
+bool csMaterialList::Remove (int n)
 {
-  return scfParent->Length ();
+  iMaterialWrapper* obj = list[n];
+  const char* name = obj->QueryObject ()->GetName ();
+  if (name)
+    mat_hash.Delete (name, obj);
+  return list.DeleteIndex (n);
 }
 
-iMaterialWrapper *csMaterialList::MaterialList::Get (int n) const
+void csMaterialList::RemoveAll ()
 {
-  return scfParent->Get (n);
+  list.DeleteAll ();
+  mat_hash.DeleteAll ();
 }
 
-int csMaterialList::MaterialList::Add (iMaterialWrapper *obj)
+int csMaterialList::Find (iMaterialWrapper *obj) const
 {
-  return scfParent->Push (obj);
+  return list.Find (obj);
 }
 
-bool csMaterialList::MaterialList::Remove (iMaterialWrapper *obj)
+iMaterialWrapper *csMaterialList::FindByName (const char *Name) const
 {
-  return scfParent->Delete (obj);
-}
-
-bool csMaterialList::MaterialList::Remove (int n)
-{
-  return scfParent->DeleteIndex (n);
-}
-
-void csMaterialList::MaterialList::RemoveAll ()
-{
-  scfParent->DeleteAll ();
-}
-
-int csMaterialList::MaterialList::Find (iMaterialWrapper *obj) const
-{
-  return scfParent->Find (obj);
-}
-
-iMaterialWrapper *csMaterialList::MaterialList::FindByName (
-  const char *Name) const
-{
-  return scfParent->FindByName (Name);
+  return mat_hash.Get (Name, 0);
 }

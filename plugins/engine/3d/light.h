@@ -25,6 +25,8 @@
 #include "csutil/flags.h"
 #include "csutil/nobjvec.h"
 #include "csutil/hashmap.h"
+#include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
 #include "csutil/refarr.h"
 #include "plugins/engine/3d/lview.h"
 #include "iengine/light.h"
@@ -416,6 +418,7 @@ class csLightList : public iLightList
 {
 private:
   csRefArrayObject<iLight> list;
+  csHash<iLight*,csStrKey,csConstCharHashKeyHandler> lights_hash;
 
 public:
   SCF_DECLARE_IBASE;

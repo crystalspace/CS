@@ -975,6 +975,9 @@ void csSectorList::FreeSector (iSector* item)
 
 int csSectorList::Add (iSector *obj)
 {
+  const char* name = obj->QueryObject ()->GetName ();
+  if (name)
+    sectors_hash.Put (name, obj);
   return list.Push (obj);
 }
 
@@ -982,12 +985,19 @@ bool csSectorList::Remove (iSector *obj)
 {
   csEngine::current_engine->FireRemoveSector (obj);
   FreeSector (obj);
+  const char* name = obj->QueryObject ()->GetName ();
+  if (name)
+    sectors_hash.Delete (name, obj);
   return list.Delete (obj);
 }
 
 bool csSectorList::Remove (int n)
 {
-  FreeSector (list[n]);
+  iSector* obj = list[n];
+  FreeSector (obj);
+  const char* name = obj->QueryObject ()->GetName ();
+  if (name)
+    sectors_hash.Delete (name, obj);
   return list.DeleteIndex (n);
 }
 
@@ -999,6 +1009,7 @@ void csSectorList::RemoveAll ()
     FreeSector (list[i]);
   }
   list.DeleteAll ();
+  sectors_hash.DeleteAll ();
 }
 
 int csSectorList::Find (iSector *obj) const
@@ -1008,5 +1019,5 @@ int csSectorList::Find (iSector *obj) const
 
 iSector *csSectorList::FindByName (const char *Name) const
 {
-  return list.FindByName (Name);
+  return sectors_hash.Get (Name, 0);
 }

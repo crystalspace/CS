@@ -145,15 +145,14 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
   if (tex)
   {
     // Add a default material with the same name as the texture
-    csRef<iMaterial> material (Engine->CreateBaseMaterial (tex));
-    iMaterialWrapper *mat = Engine->GetMaterialList ()
-      	->NewMaterial (material);
-    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
+    csRef<iMaterial> material = Engine->CreateBaseMaterial (tex);
     // First we have to extract the optional region name from the name:
     char const* n = strchr (filename, '/');
     if (!n) n = filename;
     else n++;
-    mat->QueryObject()->SetName (n);
+    iMaterialWrapper *mat = Engine->GetMaterialList ()
+      	->NewMaterial (material, n);
+    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
 
     // @@@ should this be done here?
     iTextureManager *tm;
@@ -185,15 +184,14 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
   if (tex)
   {
     // Add a default material with the same name as the texture
-    csRef<iMaterial> material (Engine->CreateBaseMaterial (tex));
-    iMaterialWrapper *mat = Engine->GetMaterialList ()
-      	->NewMaterial (material);
-    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
+    csRef<iMaterial> material = Engine->CreateBaseMaterial (tex);
     // First we have to extract the optional region name from the name:
     char const* n = strchr (name, '/');
     if (!n) n = name;
     else n++;
-    mat->QueryObject()->SetName (n);
+    iMaterialWrapper *mat = Engine->GetMaterialList ()
+      	->NewMaterial (material, n);
+    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
 
     // @@@ should this be done here?
     iTextureManager *tm;
@@ -346,15 +344,14 @@ iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
   if (tex)
   {
     // Add a default material with the same name as the texture
-    csRef<iMaterial> material (Engine->CreateBaseMaterial (tex));
-    iMaterialWrapper *mat = Engine->GetMaterialList ()
-      	->NewMaterial (material);
-    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
+    csRef<iMaterial> material = Engine->CreateBaseMaterial (tex);
     // First we have to extract the optional region name from the name:
     char const* n = strchr (name, '/');
     if (!n) n = name;
     else n++;
-    mat->QueryObject()->SetName (n);
+    iMaterialWrapper *mat = Engine->GetMaterialList ()
+      	->NewMaterial (material, n);
+    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
 
     // @@@ should this be done here?
     iTextureManager *tm;
@@ -386,15 +383,14 @@ iMaterialWrapper* ThreadedLoaderContext::FindNamedMaterial (const char* name,
   if (tex)
   {
     // Add a default material with the same name as the texture
-    csRef<iMaterial> material (Engine->CreateBaseMaterial (tex));
-    iMaterialWrapper *mat = Engine->GetMaterialList ()
-      	->NewMaterial (material);
-    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
+    csRef<iMaterial> material = Engine->CreateBaseMaterial (tex);
     // First we have to extract the optional region name from the name:
     char const* n = strchr (name, '/');
     if (!n) n = name;
     else n++;
-    mat->QueryObject()->SetName (n);
+    iMaterialWrapper *mat = Engine->GetMaterialList ()
+      	->NewMaterial (material, n);
+    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
 
     // @@@ should this be done here?
     iTextureManager *tm;

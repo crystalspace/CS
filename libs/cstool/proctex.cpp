@@ -247,8 +247,8 @@ iMaterialWrapper* csProcTexture::Initialize (iObjectRegistry * object_reg,
   }
   //PrepareAnim ();
   csRef<iMaterial> material (engine->CreateBaseMaterial (tex));
-  iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (material);
-  mat->QueryObject ()->SetName (name);
+  iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (material,
+  	name);
   if (txtmgr)
   {
     mat->Register (txtmgr);
