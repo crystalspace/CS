@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef WORLD_H
-#define WORLD_H
+#ifndef __CS_WORLD_H__
+#define __CS_WORLD_H__
 
 #include "csutil/scf.h"
 #include "csgeom/math3d.h"
@@ -459,13 +459,15 @@ public:
    *     which the object is shadowed (not implemented yet).
    * <li>CS_NLIGHT_STATIC: return static lights.
    * <li>CS_NLIGHT_DYNAMIC: return dynamic lights.
-   * <li>CS_NLIGHT_NEARBYSECTORS: Also check lights in nearby sectors (not implemented yet).
+   * <li>CS_NLIGHT_NEARBYSECTORS: Also check lights in nearby sectors
+   *     (not implemented yet).
    * </ul><br>
    * It will only return as many lights as the size that you specified
    * for the light array. The returned lights are not guaranteed to be sorted
-   * but they are guaranteed to be the specified number of lights closest to the
-   * given position.<br>
-   * This function returns the actual number of lights added to the 'lights' array.
+   * but they are guaranteed to be the specified number of lights closest to
+   * the given position.<br>
+   * This function returns the actual number of lights added to the 'lights'
+   * array.
    */
   int GetNearbyLights (csSector* sector, const csVector3& pos, ULong flags,
   	csLight** lights, int max_num_lights);
@@ -563,7 +565,6 @@ public:
   csWorld *GetCsWorld () { return this; };
 
   //--------------------- iConfig interface implementation --------------------
-  static csOptionDescription config_options[];
 
   ///
   virtual int GetOptionCount ();
@@ -575,4 +576,4 @@ public:
   virtual bool GetOption (int id, csVariant* value);
 };
 
-#endif /*WORLD_H*/
+#endif // __CS_WORLD_H__

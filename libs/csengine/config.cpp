@@ -24,7 +24,7 @@
 
 #define NUM_OPTIONS 8
 
-csOptionDescription csWorld::config_options [NUM_OPTIONS] =
+static const csOptionDescription config_options [NUM_OPTIONS] =
 {
   { 0, "fov", "Field of Vision", CSVAR_LONG },
   { 1, "rad", "Pseudo-radiosity system", CSVAR_BOOL },
