@@ -50,7 +50,7 @@ public:
   virtual void FinishDraw();
   virtual HRESULT SetColorPalette();
   
-  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle* iBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
   virtual bool SetMousePosition (int x, int y);
   virtual int GetPage ();
   virtual bool DoubleBuffer (bool Enable);

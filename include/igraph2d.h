@@ -126,7 +126,7 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
-SCF_VERSION (iGraphics2D, 0, 0, 2);
+SCF_VERSION (iGraphics2D, 0, 0, 3);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -209,7 +209,7 @@ struct iGraphics2D : public iPlugIn
   * should be set to its nearest system equivalent depending on
   * iShape argument.
   */
-  virtual bool SetMouseCursor (csMouseCursorID Shape, iTextureHandle *hBitmap) = 0;
+  virtual bool SetMouseCursor (csMouseCursorID Shape) = 0;
   /// Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b) = 0;
   /// Write a text string into the back buffer

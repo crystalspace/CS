@@ -382,7 +382,7 @@ void SysSystemDriver::ProcessUserEvent (BMessage* m)
   }
 }
 
-bool SysSystemDriver::SetMouseCursor(csMouseCursorID shape, iTextureHandle*)
+bool SysSystemDriver::SetMouseCursor(csMouseCursorID shape)
 {
   return app->SetMouse(shape);
 }

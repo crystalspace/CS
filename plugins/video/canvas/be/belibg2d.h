@@ -52,7 +52,7 @@ public:
   virtual bool Open (const char* title);
   virtual void Close ();
   virtual void Print (csRect* area = NULL);
-  virtual bool SetMouseCursor (csMouseCursorID shape, iTextureHandle*);
+  virtual bool SetMouseCursor (csMouseCursorID shape);
   virtual void ApplyDepthInfo (color_space);
 };
 

@@ -107,9 +107,6 @@ void csInputLine::Draw ()
 
   csComponent::Draw ();
 
-  if (Disabled)
-    return;
-
   textx = dx;
   texty = dy + (clip.Height () - TextHeight ()) / 2;
 
@@ -123,7 +120,8 @@ void csInputLine::Draw ()
   if (sels < firstchar)
     sels = firstchar;
   if ((sels >= sele)
-   || !GetState (CSS_FOCUSED))
+   || !GetState (CSS_FOCUSED)
+   || Disabled)
     sels = sele = 0;
 
   // draw selection
@@ -150,13 +148,14 @@ void csInputLine::Draw ()
   } /* endif */
 
   // draw text
-  if (!app->insert && cursorvis && GetState (CSS_FOCUSED))
+  if (!app->insert && cursorvis && GetState (CSS_FOCUSED) && !Disabled)
   {
     if (sels == sele)
     {
       sels = cursorpos;
       sele = cursorpos + 1;
-    } else if (cursorpos == sele)
+    }
+    else if (cursorpos == sele)
       sele++;
 
     // if cursor is in overstrike mode, draw it before text
@@ -164,6 +163,7 @@ void csInputLine::Draw ()
       Box (cursorrect.xmin, cursorrect.ymin, cursorrect.xmax,
         cursorrect.ymax, CSPAL_INPUTLINE_TEXT);
   } /* endif */
+
   if (sels != sele)
   {
     int sc = sels < firstchar ? firstchar : sels;
@@ -180,11 +180,12 @@ void csInputLine::Draw ()
     text [sele] = tmp;
     if (sele < (int)strlen (text))
       Text (cx, texty, CSPAL_INPUTLINE_TEXT, -1, &text [sele]);
-  } else
+  }
+  else
     Text (textx, texty, CSPAL_INPUTLINE_TEXT, -1, &text [firstchar]);
 
   // if cursor is in insert state, draw
-  if (app->insert && cursorvis && GetState (CSS_FOCUSED))
+  if (app->insert && cursorvis && GetState (CSS_FOCUSED) && !Disabled)
   {
     if (!cursorrect.IsEmpty ())
       Box (cursorrect.xmin, cursorrect.ymin, cursorrect.xmax,

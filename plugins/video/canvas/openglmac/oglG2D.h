@@ -56,7 +56,7 @@ public:
  	virtual void	WindowChanged( void );
 	virtual bool	HandleEvent( EventRecord *inEvent );
 
-	virtual bool	SetMouseCursor (csMouseCursorID iShape, iTextureHandle* iBitmap);
+	virtual bool	SetMouseCursor (csMouseCursorID iShape);
 	virtual int		GetPage ();
 	virtual bool	DoubleBuffer (bool Enable);
 	virtual bool	DoubleBuffer ();

@@ -67,7 +67,8 @@ public:
 class csMouse : public csComponent
 {
 private:
-  int MouseX, MouseY;
+  int MouseX, MouseY;			// Mouse X and Y
+  int VirtualX, VirtualY;		// Virtual mouse position
   int Visible;				// Visibility counter
   bool invisible;			// "Invisible cursor" is selected
 
@@ -102,6 +103,10 @@ public:
 
   /// Called by csApp when textures has been loaded
   void Setup ();
+
+  /// Set "virtual" mouse position, i.e. show cursor at a different location
+  void SetVirtualPosition (int x, int y)
+  { VirtualX = x; VirtualY = y; }
 
 private:
   friend class csApp;

@@ -188,9 +188,9 @@ bool csGraphics2DDOSAlleg::SetMousePosition (int x, int y)
   return DosSystem->SetMousePosition (x, y);
 }
 
-bool csGraphics2DDOSAlleg::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
+bool csGraphics2DDOSAlleg::SetMouseCursor (csMouseCursorID iShape)
 {
-  (void)iShape; (void)hBitmap;
+  (void)iShape;
   return false;
 }
 

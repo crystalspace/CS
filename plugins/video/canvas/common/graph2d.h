@@ -218,7 +218,7 @@ public:
    * should be set to its nearest system equivalent depending on
    * iShape argument.
    */
-  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
 
   /// Gets the ID of current font.
   virtual int GetFontID ()

@@ -48,7 +48,7 @@ public:
 
   /// Implementation of iBeLibSystemDriver
   void ProcessUserEvent (BMessage*);
-  bool SetMouseCursor (csMouseCursorID shape, iTextureHandle*);
+  bool SetMouseCursor (csMouseCursorID shape);
 };
 
 #endif // __CS_CSBE_H__

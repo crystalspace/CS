@@ -521,7 +521,7 @@ bool csGraphics2DOS2DIVE::SetMousePosition (int x, int y)
   return WinSetPointerPos (HWND_DESKTOP, pp.x, pp.y);
 }
 
-bool csGraphics2DOS2DIVE::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
+bool csGraphics2DOS2DIVE::SetMouseCursor (csMouseCursorID iShape)
 {
   if (!HardwareCursor)
   {

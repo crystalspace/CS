@@ -688,7 +688,7 @@ csComponent *csComponent::NextControl (csComponent *start)
         cur = cur->NextChild (cur);
       break;
     }
-  } while (!cur->GetState (CSS_SELECTABLE));
+  } while ((cur != start) && !cur->GetState (CSS_SELECTABLE));
   return cur;
 }
 
@@ -705,7 +705,7 @@ csComponent *csComponent::PrevControl (csComponent *start)
       if (cur->GetState (CSS_SELECTABLE))
         prev = cur;
       cur = NextChild (cur, true);
-    } while (!cur->GetState (CSS_GROUP)); /* enddo */
+    } while (!cur->GetState (CSS_GROUP));
     return prev;
   }
   do
@@ -715,7 +715,7 @@ csComponent *csComponent::PrevControl (csComponent *start)
       return cur;
     if (cur->GetState (CSS_GROUP))
       return PrevControl (cur);
-  } while (cur != start); /* enddo */
+  } while (cur != start);
   return start;
 }
 

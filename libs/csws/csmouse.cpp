@@ -25,6 +25,7 @@
 #include "csws/csapp.h"
 
 #define MOUSE_TEXTURE_NAME	"csws::Mouse"
+#define NO_VIRTUAL_POS		-999999
 
 csMousePointer::csMousePointer (csComponent *iParent, int ID, int x, int y,
   int w, int h, int hsx, int hsy) : csComponent (iParent)
@@ -90,6 +91,7 @@ csMouse::csMouse (csComponent *iParent) : csComponent (iParent)
   MouseY = 0;
   Visible = 0;
   invisible = false;
+  VirtualX = NO_VIRTUAL_POS;
 }
 
 csMouse::~csMouse ()
@@ -105,8 +107,11 @@ void csMouse::Move (int x, int y)
 void csMouse::Draw ()
 {
   // Draw mouse pointer
-  if ((focused) && (Visible == 0) && (!invisible))
-    ((csMousePointer *)focused)->Draw (MouseX, MouseY);
+  if (focused && (Visible == 0) && (!invisible))
+    if (VirtualX != NO_VIRTUAL_POS)
+      ((csMousePointer *)focused)->Draw (VirtualX, VirtualY);
+    else
+      ((csMousePointer *)focused)->Draw (MouseX, MouseY);
 }
 
 void csMouse::Undraw ()
@@ -146,6 +151,9 @@ bool csMouse::HandleEvent (csEvent &Event)
     case csevMouseDoubleClick:
     case csevMouseDown:
     case csevMouseUp:
+      // If mouse moves, reset virtual mouse position
+      if (Event.Type == csevMouseMove)
+        VirtualX = NO_VIRTUAL_POS;
       Move (Event.Mouse.x, Event.Mouse.y);
       return true;
     case csevBroadcast:
@@ -165,10 +173,20 @@ bool csMouse::HandleEvent (csEvent &Event)
 
 bool csMouse::SetCursor (csMouseCursorID ID)
 {
+  // Do not set hardware mouse cursor if virtual pos != mouse pos
+  bool virt = (VirtualX != NO_VIRTUAL_POS) &&
+    ((VirtualX != MouseX) || (VirtualY != MouseY));
+
   csMousePointer *Cur = (csMousePointer *)GetChild (ID);
   if (Cur)
   {
-    if (app->SetMouseCursor (ID, Cur->Cursor->GetTextureHandle ()))
+    if (virt)
+    {
+      app->SwitchMouseCursor (csmcNone);
+      SetFocused (Cur);
+      invisible = false;
+    }
+    else if (app->SwitchMouseCursor (ID))
       invisible = true;
     else
     {
@@ -176,9 +194,10 @@ bool csMouse::SetCursor (csMouseCursorID ID)
       invisible = false;
     } /* endif */
     return true;
-  } else
+  }
+  else
   {
-    app->SetMouseCursor (csmcNone, NULL);
+    app->SwitchMouseCursor (csmcNone);
     invisible = true;
     return false;
   }

@@ -51,7 +51,7 @@ public:
 
 	virtual bool BeginDraw();
 	virtual void FinishDraw();
-	virtual bool SetMouseCursor(int iShape, TextureMM *iBitmap);
+	virtual bool SetMouseCursor(int iShape);
 };
 
 /// Amiga/Warp3D version

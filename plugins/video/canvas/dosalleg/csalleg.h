@@ -45,7 +45,7 @@ public:
   virtual void Print (csRect *area = NULL);
 
   virtual bool SetMousePosition (int x, int y);
-  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
 
   virtual void SetRGB(int i, int r, int g, int b);
 

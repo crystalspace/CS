@@ -716,9 +716,8 @@ void csGraphics2DDDraw6::SetRGB(int i, int r, int g, int b)
   m_bPaletteChanged = true;
 }
 
-bool csGraphics2DDDraw6::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
+bool csGraphics2DDDraw6::SetMouseCursor (csMouseCursorID iShape)
 {
-  (void)hBitmap;
   switch(iShape)
   {
     case csmcNone: SetCursor(NULL); break;

@@ -284,6 +284,9 @@ public:
   csComponent *ForEachItem (bool (*func) (csComponent *child, void *param),
     void *param = NULL, bool iSelected = true);
 
+  /// Override SetState method to disable scroll bars as well
+  virtual void SetState (int mask, bool enable);
+
 protected:
   /// Make a listbox item visible (same as cscmdListBoxMakeVisible)
   void MakeItemVisible (csComponent *item);

@@ -94,7 +94,7 @@ public:
   virtual void SetRGB (int i, int r, int g, int b);
 
   /// Set mouse cursor shape
-  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *iBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
 
   virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
   

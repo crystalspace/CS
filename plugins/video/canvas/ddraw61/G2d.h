@@ -46,7 +46,7 @@ public:
   virtual bool BeginDraw();
   virtual void FinishDraw();
   
-  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
   virtual bool SetMousePosition (int x, int y);
   virtual int GetPage ();
   virtual bool DoubleBuffer (bool Enable);

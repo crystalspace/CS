@@ -449,9 +449,9 @@ void csGraphics2DOpenGL::SetRGB(int i, int r, int g, int b)
   m_bPaletteChanged = true;
 }
 
-bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape, iTextureHandle* iBitmap)
+bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
 {
-  (void)iShape; (void)iBitmap;
+  (void)iShape;
   return false;
 }
 

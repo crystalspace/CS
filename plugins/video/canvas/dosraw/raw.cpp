@@ -243,7 +243,7 @@ bool csGraphics2DDOSRAW::SetMousePosition (int x, int y)
   return DosSystem->SetMousePosition (x, y);
 }
 
-bool csGraphics2DDOSRAW::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
+bool csGraphics2DDOSRAW::SetMouseCursor (csMouseCursorID iShape)
 {
   (void)iShape; (void)hBitmap;
   return false;

@@ -67,7 +67,6 @@ csApp::csApp (const char *AppTitle, csAppBackgroundStyle iBackgroundStyle) : csC
   BackgroundStyle = iBackgroundStyle;
   insert = true;
 
-  oldMouseCursorID = csmcNone;
   MouseCursorID = csmcArrow;
 
   SetPalette (CSPAL_APP);
@@ -175,11 +174,7 @@ void csApp::NextFrame (time_t elapsed_time, time_t current_time)
 
 void csApp::Update ()
 {
-  if (MouseCursorID != oldMouseCursorID)
-  {
-    Mouse->SetCursor (MouseCursorID);
-    oldMouseCursorID = MouseCursorID;
-  } /* endif */
+  Mouse->SetCursor (MouseCursorID);
 
   // Save background/draw mouse cursor
   Mouse->Draw ();

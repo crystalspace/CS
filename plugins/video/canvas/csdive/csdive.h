@@ -91,7 +91,7 @@ public:
   virtual void FinishDraw ();
 
   virtual bool SetMousePosition (int x, int y);
-  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
 
 private:
   static void KeyboardHandlerStub (void *Self, unsigned char ScanCode, int Down,

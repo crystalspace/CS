@@ -32,7 +32,7 @@ SCF_VERSION (iBeLibSystemDriver, 0, 0, 1);
 struct iBeLibSystemDriver : public iBase
 {
   virtual void ProcessUserEvent (BMessage*) = 0;
-  virtual bool SetMouseCursor (csMouseCursorID shape, iTextureHandle*) = 0;
+  virtual bool SetMouseCursor (csMouseCursorID shape) = 0;
 };
 
 #endif // __CS_ICSBE_H__

@@ -721,11 +721,9 @@ void csGraphics2DDDraw3::SetRGB(int i, int r, int g, int b)
   m_bPaletteChanged = true;
 }
 
-bool csGraphics2DDDraw3::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
+bool csGraphics2DDDraw3::SetMouseCursor (csMouseCursorID iShape)
 {
-  (void)hBitmap;
   (void)iShape;
-
   return false; //the code below needs more work on the general Win32 files, 
                 //but just returning false will give us a working MazeD for now
 

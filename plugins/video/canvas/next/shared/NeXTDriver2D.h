@@ -49,7 +49,7 @@ public:
     virtual bool Open( char const* title );
     virtual void Close();
     virtual void Print( csRect* = 0 );
-    virtual bool SetMouseCursor( csMouseCursorID shape, iTextureHandle* );
+    virtual bool SetMouseCursor( csMouseCursorID shape );
     DECLARE_IBASE;
     };
 

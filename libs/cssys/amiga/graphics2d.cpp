@@ -199,9 +199,8 @@ void SysGraphics2D::SetRGB(int i, int r, int g, int b)
 	csGraphics2D::SetRGB(i,r,g,b);
 }
 
-bool SysGraphics2D::SetMouseCursor (int iShape, TextureMM* iBitmap)
+bool SysGraphics2D::SetMouseCursor (int iShape)
 {
-	(void)iBitmap;
 	if (iShape != csmcArrow) {
 		SetPointer(window, empty_pointer, 0, 0, 0, 0);
 	} else {

@@ -67,10 +67,9 @@ void csGraphicsPipeline::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB
   G2D->FinishDraw ();
 }
 
-bool csGraphicsPipeline::SetMouseCursor (csMouseCursorID Shape,
-  iTextureHandle *hBitmap)
+bool csGraphicsPipeline::SwitchMouseCursor (csMouseCursorID Shape)
 {
-  return G2D->SetMouseCursor (Shape, hBitmap);
+  return G2D->SetMouseCursor (Shape);
 }
 
 void csGraphicsPipeline::Box (int xmin, int ymin, int xmax, int ymax, int color)

@@ -90,7 +90,7 @@ public:
   virtual bool SetMousePosition (int x, int y);
 
   /// Set mouse cursor shape
-  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *iBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
 
 protected:
   /// This routine is called once per event loop

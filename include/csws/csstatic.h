@@ -123,6 +123,8 @@ protected:
   csComponent *oldKO;
   // link is focused?
   bool linkactive;
+  // link is focused?
+  bool linkdisabled;
 
 public:
   /// Create static component object (by default - a label) linked to another
@@ -154,6 +156,10 @@ public:
   /// Set text alignment (only for csscsText style)
   void SetTextAlign (int iTextAlignment)
   { TextAlignment = iTextAlignment; }
+
+  /// Set linked component
+  void SetLink (csComponent *iLink)
+  { link = iLink; CheckUp (); }
 
 protected:
   // Common part of constructors

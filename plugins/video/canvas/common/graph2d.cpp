@@ -502,9 +502,8 @@ bool csGraphics2D::SetMousePosition (int x, int y)
   return false;
 }
 
-bool csGraphics2D::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
+bool csGraphics2D::SetMouseCursor (csMouseCursorID iShape)
 {
-  (void)hBitmap;
   return (iShape == csmcArrow);
 }
 

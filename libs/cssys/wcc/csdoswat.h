@@ -58,7 +58,7 @@ public:
 
   virtual void Clear (int color);
   virtual void SetRGB(int i, int r, int g, int b);
-  virtual bool SetMouseCursor (int iShape, IMipMapContainer *iBitmap);
+  virtual bool SetMouseCursor (int iShape);
 
 private:
   //unsigned char *Memory;

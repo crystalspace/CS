@@ -123,6 +123,8 @@ bool csSpinBox::HandleEvent (csEvent &Event)
       break;
     case csevMouseDoubleClick:
     case csevMouseDown:
+      if (GetState (CSS_DISABLED))
+        return true;
       Select ();
       if (!app->KeyboardOwner
        && (Event.Mouse.Button == 1)

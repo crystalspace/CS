@@ -61,7 +61,7 @@ public:
   virtual void FinishDraw ();
 
   virtual bool SetMousePosition (int x, int y);
-  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
 };
 
 #endif // __CSAA_H__

@@ -737,9 +737,8 @@ int csGraphics2DMac::GetPage()
 /*----------------------------------------------------------------
 	Set the mouse cursor.
 ----------------------------------------------------------------*/
-bool csGraphics2DMac::SetMouseCursor( csMouseCursorID iShape, iTextureHandle* iBitmap )
+bool csGraphics2DMac::SetMouseCursor( csMouseCursorID iShape )
 {
-#pragma unused( iBitmap )
 	bool		cursorSet = true;
 	CursHandle	theCursor;
 

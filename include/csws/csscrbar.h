@@ -73,7 +73,21 @@ enum
    * IN: (csScrollBar *)source
    * </pre>
    */
-  cscmdScrollBarValueChanged
+  cscmdScrollBarValueChanged,
+  /**
+   * Query just the scroll bar value
+   * <pre>
+   * OUT: (int)value
+   * </pre>
+   */
+  cscmdScrollBarQueryValue,
+  /**
+   * Set just the scroll bar value
+   * <pre>
+   * IN: (int)value
+   * </pre>
+   */
+  cscmdScrollBarSetValue
 };
 
 /**
@@ -126,6 +140,9 @@ public:
 
   /// Set scroll button positions on resize
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);
+
+  /// Override SetState method to disable scroll buttons as well
+  virtual void SetState (int mask, bool enable);
 
 protected:
   /// Set scroll bar value

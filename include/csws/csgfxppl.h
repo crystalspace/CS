@@ -210,7 +210,7 @@ private:
   void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
 
   /// Change system mouse cursor and return success status
-  bool SetMouseCursor (csMouseCursorID Shape, iTextureHandle *hBitmap);
+  bool SwitchMouseCursor (csMouseCursorID Shape);
 
   /// Return the width of given text using selected font
   int TextWidth (const char *text, int Font);

@@ -68,11 +68,12 @@ void csStatic::Init (csStaticStyle iStyle)
   }
   TextAlignment = CSSTA_LEFT | CSSTA_VCENTER;
   linkactive = false;
+  linkdisabled = false;
 }
 
 void csStatic::Draw ()
 {
-  int disabled = link ? link->GetState (CSS_DISABLED) : false;
+  int disabled = link ? linkdisabled : false;
   int textcolor = disabled ? CSPAL_STATIC_DTEXT :
     linkactive ? CSPAL_STATIC_ATEXT : CSPAL_STATIC_ITEXT;
   switch (style)
@@ -89,7 +90,7 @@ void csStatic::Draw ()
         CSPAL_STATIC_LIGHT3D, CSPAL_STATIC_DARK3D);
       Rect3D (1, fry + 1, bound.Width () - 1, bound.Height () - fry - 1,
         CSPAL_STATIC_DARK3D, CSPAL_STATIC_LIGHT3D);
-      int txtx = TextWidth ("@@");
+      int txtx = TextWidth ("///");
       Text (txtx, 0, textcolor, CSPAL_STATIC_BACKGROUND, text);
       DrawUnderline (txtx, 0, text, underline_pos, textcolor);
       break;
@@ -167,7 +168,7 @@ bool csStatic::HandleEvent (csEvent &Event)
         // for frames, check if mouse is within label text
         if (style == csscsFrameLabel)
         {
-          int xmin = TextWidth ("@@");
+          int xmin = TextWidth ("///");
           csRect r (xmin, 0, xmin + TextWidth (text), TextHeight ());
           if (!r.Contains (Event.Mouse.x, Event.Mouse.y))
             break;
@@ -270,8 +271,10 @@ void csStatic::CheckUp ()
   if (!link)
     return;
   bool newlinkactive = !!link->GetState (CSS_FOCUSED);
-  if (linkactive != newlinkactive)
+  bool newlinkdisabled = !!link->GetState (CSS_DISABLED);
+  if ((linkactive != newlinkactive) || (linkdisabled != newlinkdisabled))
   {
+    linkdisabled = newlinkdisabled;
     linkactive = newlinkactive;
     Invalidate ();
   }

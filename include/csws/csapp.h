@@ -66,7 +66,7 @@ protected:
   /// Window list width and height
   int WindowListWidth, WindowListHeight;
   /// Current & old mouse pointer ID
-  csMouseCursorID MouseCursorID, oldMouseCursorID;
+  csMouseCursorID MouseCursorID;
   /// The recursion level within System->Loop ()
   int LoopLevel;
   /// The code that dialog passed to Dismiss ()
@@ -288,8 +288,8 @@ public:
   { return GfxPpl->ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2); }
 
   /// Change system mouse cursor and return success status
-  bool SetMouseCursor (csMouseCursorID Shape, iTextureHandle *hBitmap)
-  { return GfxPpl->SetMouseCursor (Shape, hBitmap); }
+  bool SwitchMouseCursor (csMouseCursorID Shape)
+  { return GfxPpl->SwitchMouseCursor (Shape); }
 
   /// Get R,G,B at given screen location
   void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)

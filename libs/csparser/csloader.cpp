@@ -1571,13 +1571,14 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
 
   if (tx1_given)
     if (tx2_given)
-         poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
-				tx1.x, tx1.y, tx1.z, tx1_len,
-				tx2.x, tx2.y, tx2.z, tx2_len);
-    else poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
-				tx1.x, tx1.y, tx1.z, tx1_len);
+      poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
+                               tx1.x, tx1.y, tx1.z, tx1_len,
+                               tx2.x, tx2.y, tx2.z, tx2_len);
+  else
+    poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
+                             tx1.x, tx1.y, tx1.z, tx1_len);
   else if (plane_name[0])
-           poly3d->SetTextureSpace ((csPolyPlane*)w->planes.FindByName (plane_name));
+    poly3d->SetTextureSpace ((csPolyPlane*)w->planes.FindByName (plane_name));
   else if (tx_len)
   {
     // If a length is given (with 'LEN') we will take the first two vertices
@@ -1585,7 +1586,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
     // length).
     poly3d->SetTextureSpace (poly3d->Vobj(0), poly3d->Vobj(1), tx_len);
   }
-  else poly3d->SetTextureSpace (tx_matrix, tx_vector);
+  else
+    poly3d->SetTextureSpace (tx_matrix, tx_vector);
 
   if (uv_shift_given)
   {
@@ -1607,8 +1609,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
 
 
 csCurve* csLoader::load_bezier (char* polyname, csWorld* w, char* buf,
-        csTextureList* textures, csTextureHandle* default_texture, float default_texlen,
-        CLights* default_lightx, csSector* sec, csPolygonSet* parent)
+  csTextureList* textures, csTextureHandle* default_texture, float default_texlen,
+  CLights* default_lightx, csSector* sec, csPolygonSet* parent)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXNR)

@@ -395,7 +395,7 @@ void csGraphics2DGlideX::SetTMUPalette(int tmu)
   GlideLib_grTexDownloadTable(tmu, GR_TEXTABLE_PALETTE, &p);		
 }
 
-bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape, iTextureHandle* /*iBitmap*/)
+bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape)
 {
   if (do_hwmouse
    && (iShape >= 0)

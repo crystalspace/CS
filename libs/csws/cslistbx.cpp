@@ -88,6 +88,8 @@ bool csListBoxItem::HandleEvent (csEvent &Event)
   switch (Event.Type)
   {
     case csevMouseDown:
+      if (parent->GetState (CSS_DISABLED))
+        return true;
       if (Event.Mouse.Button == 1)
       {
         parent->SendCommand (cscmdListBoxStartTracking, this);
@@ -169,10 +171,11 @@ void csListBoxItem::SetBitmap (csSprite2D *iBitmap, bool iDelete)
 
 void csListBoxItem::Draw ()
 {
-  bool selected = GetState (CSS_LISTBOXITEM_SELECTED);
+  bool enabled = !parent->GetState (CSS_DISABLED);
+  bool selected = enabled && GetState (CSS_LISTBOXITEM_SELECTED);
   if (selected)
     Box (0, 0, bound.Width (), bound.Height (), CSPAL_LISTBOXITEM_SELECTION);
-  if (GetState (CSS_FOCUSED))
+  if (GetState (CSS_FOCUSED) && enabled)
   {
     int w,h;
     SuggestSize (w, h);
@@ -183,7 +186,7 @@ void csListBoxItem::Draw ()
   } /* endif */
 
   int color;
-  if (GetState (CSS_SELECTABLE))
+  if (GetState (CSS_SELECTABLE) && enabled)
   {
     if (ItemStyle == cslisNormal)
       if (selected)
@@ -195,7 +198,8 @@ void csListBoxItem::Draw ()
         color = CSPAL_LISTBOXITEM_SETEXT;
       else
         color = CSPAL_LISTBOXITEM_UETEXT;
-  } else
+  }
+  else
     color = CSPAL_LISTBOXITEM_DTEXT;
 
   int x = LISTBOXITEM_XSPACE - deltax + hOffset;
@@ -621,7 +625,8 @@ bool csListBox::HandleEvent (csEvent &Event)
           csComponent *item = (csComponent *)Event.Command.Info;
           if (app->MouseOwner != this)
             selstate = true;
-          if (item->GetState (CSS_SELECTABLE))
+          if (item->GetState (CSS_SELECTABLE)
+           && item->SendCommand (cscmdListBoxItemCheck))
           {
             if (app->MouseOwner != this)
               ForEachItem (do_deselect, (void *)item);
@@ -756,12 +761,25 @@ csComponent *csListBox::ForEachItem (bool (*func) (csComponent *child,
     if (iSelected)
       ok = (reply == CS_LISTBOXITEMCHECK_SELECTED);
     else
-      ok = (reply == CS_LISTBOXITEMCHECK_SELECTED)
-        || (reply == CS_LISTBOXITEMCHECK_UNSELECTED);
+      ok = (reply != 0);
     if (ok && func (cur, param))
       return cur;
     if ((cur == next) || ((cur = next) == start))
       break;
   } /* endwhile */
   return NULL;
+}
+
+void csListBox::SetState (int mask, bool enable)
+{
+  int oldstate = state;
+  csComponent::SetState (mask, enable);
+  if ((oldstate ^ state) & CSS_DISABLED)
+  {
+    bool dis = GetState (CSS_DISABLED);
+    if (hscroll)
+      hscroll->SetState (CSS_DISABLED, dis);
+    if (vscroll)
+      vscroll->SetState (CSS_DISABLED, dis);
+  }
 }

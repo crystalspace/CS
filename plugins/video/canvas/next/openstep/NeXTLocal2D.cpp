@@ -177,7 +177,7 @@ void NeXTDriver2D::flush()
 //-----------------------------------------------------------------------------
 // SetMouseCursor
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::SetMouseCursor( csMouseCursorID shape, iTextureHandle* )
+bool NeXTDriver2D::SetMouseCursor( csMouseCursorID shape )
     {
     bool handled = false;
     if (shape == csmcArrow)

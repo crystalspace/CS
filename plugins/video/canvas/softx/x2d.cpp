@@ -949,7 +949,7 @@ bool csGraphics2DXLib::SetMousePosition (int x, int y)
   return true;
 }
 
-bool csGraphics2DXLib::SetMouseCursor (csMouseCursorID iShape, iTextureHandle* hBitmap)
+bool csGraphics2DXLib::SetMouseCursor (csMouseCursorID iShape)
 {
   if (do_hwmouse
    && (iShape >= 0)

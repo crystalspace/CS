@@ -174,6 +174,8 @@ bool csScrollBar::HandleEvent (csEvent &Event)
       break;
     case csevMouseDown:
     case csevMouseDoubleClick:
+      if (GetState (CSS_DISABLED))
+        return true;
       if (csComponent::HandleEvent (Event))
       {
         // Switch mouse owner to us if scroller captured it
@@ -284,6 +286,12 @@ pulse:      if (active_button == SCROLL_UL)
           *((csScrollBarStatus *)Event.Command.Info) = status;
           Event.Command.Info = NULL;
           return true;
+        case cscmdScrollBarQueryValue:
+          Event.Command.Info = (void *)status.value;
+          return true;
+        case cscmdScrollBarSetValue:
+          SetValue (int (Event.Command.Info));
+          return true;
       } /* endswitch */
       break;
     case csevKeyDown:
@@ -386,14 +394,18 @@ void csScrollBar::SetValue (int iValue)
     return;
   status.value = iValue;
 
-  if (status.maxvalue <= 0)
+  bool disable = GetState (CSS_DISABLED);
+  scroller->SetState (CSS_DISABLED, disable);
+
+  if (disable || (status.maxvalue <= 0))
   {
 noscrollbut:
     if (IsHorizontal)
       scroller->SetRect (bound.Width () / 2, 0, bound.Width () / 2, -1);
     else
       scroller->SetRect (0, bound.Height () / 2, -1, bound.Height () / 2);
-  } else
+  }
+  else
   {
     int pixmin, pixmax;
 
@@ -433,7 +445,7 @@ noscrollbut:
   if (IsHorizontal)
   {
     scroller->SetBitmap (sprscroller[1], NULL, false);
-    if ((status.maxvalue <= 0) || (status.value <= 0))
+    if (disable || (status.maxvalue <= 0) || (status.value <= 0))
     {
       topleft->SetBitmap (sprarrows[8], NULL, false);
       topleft->SetState (CSS_DISABLED, true);
@@ -442,7 +454,7 @@ noscrollbut:
       topleft->SetBitmap (sprarrows[6], sprarrows[10], false);
       topleft->SetState (CSS_DISABLED, false);
     } /* endif */
-    if ((status.maxvalue <= 0) || (status.value >= status.maxvalue))
+    if (disable || (status.maxvalue <= 0) || (status.value >= status.maxvalue))
     {
       botright->SetBitmap (sprarrows[9], NULL, false);
       botright->SetState (CSS_DISABLED, true);
@@ -454,7 +466,7 @@ noscrollbut:
   } else
   {
     scroller->SetBitmap (sprscroller[0], NULL, false);
-    if ((status.maxvalue <= 0) || (status.value <= 0))
+    if (disable || (status.maxvalue <= 0) || (status.value <= 0))
     {
       topleft->SetBitmap (sprarrows[2], NULL, false);
       topleft->SetState (CSS_DISABLED, true);
@@ -463,7 +475,7 @@ noscrollbut:
       topleft->SetBitmap (sprarrows[0], sprarrows[4], false);
       topleft->SetState (CSS_DISABLED, false);
     } /* endif */
-    if ((status.maxvalue <= 0) || (status.value >= status.maxvalue))
+    if (disable || (status.maxvalue <= 0) || (status.value >= status.maxvalue))
     {
       botright->SetBitmap (sprarrows[3], NULL, false);
       botright->SetState (CSS_DISABLED, true);
@@ -476,4 +488,15 @@ noscrollbut:
 
   if (parent)
     parent->SendCommand (cscmdScrollBarValueChanged, (void *)this);
+}
+
+void csScrollBar::SetState (int mask, bool enable)
+{
+  int oldstate = state;
+  csComponent::SetState (mask, enable);
+  if ((oldstate ^ state) & CSS_DISABLED)
+  {
+    int oldval = status.value--;
+    SetValue (oldval);
+  }
 }

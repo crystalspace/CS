@@ -75,8 +75,6 @@ void csCheckBox::SetCheckBoxState (csCheckBoxState iNewState)
 {
   if (iNewState == CheckBoxState)
     return;
-  if (parent)
-    parent->SendCommand (cscmdCheckBoxSwitched, (void *)this);
   switch (iNewState)
   {
     case cscbsNonChecked:
@@ -92,6 +90,8 @@ void csCheckBox::SetCheckBoxState (csCheckBoxState iNewState)
       CheckBoxState = iNewState;
       break;
   } /* endswitch */
+  if (parent)
+    parent->SendCommand (cscmdCheckBoxSwitched, (void *)this);
 }
 
 bool csCheckBox::HandleEvent (csEvent &Event)

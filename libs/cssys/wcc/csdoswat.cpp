@@ -176,9 +176,9 @@ void SysGraphics2D::SetRGB(int i, int r, int g, int b)
   csGraphics2D::SetRGB (i, r, g, b);
 }
 
-bool SysGraphics2D::SetMouseCursor (int iShape, IMipMapContainer *iBitmap)
+bool SysGraphics2D::SetMouseCursor (int iShape)
 {
-  (void)iShape; (void)iBitmap;
+  (void)iShape;
   return false;
 }
 

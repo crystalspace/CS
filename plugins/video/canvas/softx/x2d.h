@@ -121,7 +121,7 @@ public:
   virtual bool SetMousePosition (int x, int y);
 
   /// Set mouse cursor shape
-  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *iBitmap);
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
 };
 
 #endif // __X2D_H__

@@ -133,10 +133,9 @@ void csGraphics2DBeLib::Print (csRect*)
   }
 }
 
-bool csGraphics2DBeLib::SetMouseCursor (csMouseCursorID shape,
-  iTextureHandle* bitmap)
+bool csGraphics2DBeLib::SetMouseCursor (csMouseCursorID shape)
 {
-  return be_system->SetMouseCursor(shape, bitmap);
+  return be_system->SetMouseCursor(shape);
 }
 
 void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)

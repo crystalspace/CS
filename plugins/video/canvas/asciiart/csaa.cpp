@@ -288,7 +288,7 @@ bool csGraphics2DAA::SetMousePosition (int x, int y)
   return false;
 }
 
-bool csGraphics2DAA::SetMouseCursor (csMouseCursorID iShape, iTextureHandle *hBitmap)
+bool csGraphics2DAA::SetMouseCursor (csMouseCursorID iShape)
 {
   if (!HardwareCursor)
   {
