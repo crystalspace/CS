@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
 #  STDLDR = $(OUTDLL)stdldr$(DLL)
-  STDLDR = stdldr$(EXE)
+  STDLDR = testldr$(EXE)
   DEP.STDLDR = $(CSUTIL.LIB) $(CSGEOM.LIB)
 else
   STDLDR = $(OUT)$(LIB_PREFIX)stdldr$(LIB)
