@@ -47,7 +47,7 @@ public:
   /// Get the first original key string with the given key number.
   const char* GetKey (csHashKey key) const;
   
-  /// Get the element with the given key string.
+  /// Calls Get(csHashCompute(key)).
   csHashObject Get (const char* key) const;
 
   /**

@@ -111,6 +111,8 @@ chronological order.
 	- Eric Sunshine fixed a lot of makefiles throughout the project which
 	  were incorrectly using DO.PLUGIN rather than	DO.PLUGIN.PREAMBLE,
 	  CORE, POSTAMBLE.
+	- Oktal changed a doxygen comment in csHashMapReversible to reflect the
+	  dodgy way it works.
 28-Aug-2003
 	- Jorrit fixed the x2d plugin so it actually reports an error if the
 	  'xwin' plugin cannot be found.
