@@ -44,6 +44,18 @@
  * configuration files may override these.
  */
 
+/**\def CS_MAXPATHLEN
+ * Maximum length of a filesystem pathname. Useful for declaring character
+ * buffers for calls to system functions which return a pathname in the buffer.
+ */
+#ifndef CS_MAXPATHLEN
+#define CS_MAXPATHLEN 1024
+#endif
+#include <stdio.h>
+#ifdef CS_HAS_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+
 /**\def CS_ALLOC_STACK_ARRAY(type, var, size)
  * Dynamic stack memory allocation.
  * \param type Type of the array elements.

@@ -39,7 +39,6 @@
 
 #define CS_HAS_POSIX_MMAP
 #define CS_USE_CUSTOM_ISDIR
-#define CS_MAXPATHLEN 256
 #define CS_PATH_DELIMITER ':'
 #define CS_PATH_SEPARATOR '/'
 
