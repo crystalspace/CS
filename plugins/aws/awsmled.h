@@ -16,8 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_AWS_MULTILINE_EDIT_H__
-#define __CS_AWS_MULTILINE_EDIT_H__
+#ifndef __CS_AWS_MLED_H__
+#define __CS_AWS_MLED_H__
+
 /**
  * This is a simple multiline edit control.
  */
@@ -32,11 +33,11 @@
 
 class awsMultiLineEdit : public awsComponent
 {
- protected:
+protected:
   struct mlEvent
   {
-    /*csEvent e;
-    csKeyEventData keyData;*/
+    //csEvent e;
+    //csKeyEventData keyData;
     csInputDefinition inputDef;
     void (awsMultiLineEdit::*ring)();
   };
@@ -52,8 +53,8 @@ class awsMultiLineEdit : public awsComponent
     {
       return (Item->inputDef.Compare ((iEvent*)Key));
     }
-    
-    bool Add (const csInputDefinition &e, void (awsMultiLineEdit::*ring)())
+
+    bool Add (const csInputDefinition &e, void (awsMultiLineEdit::*ring) ())
     {
       mlEvent *ev = new mlEvent;
       ev->inputDef = e;
@@ -78,15 +79,15 @@ class awsMultiLineEdit : public awsComponent
   int style;
   csRect contentRect;
 
-  int nMarkMode; // currently active mark mode
-  int nClipMarkMode; // markmode the content of clipboard was created with
-  bool bMarking; // marking in progress ?
+  int nMarkMode; // Currently active mark mode
+  int nClipMarkMode; // Markmode the content of clipboard was created with
+  bool bMarking; // Marking in progress ?
   int mark_fromrow, mark_torow;
   int mark_fromcol, mark_tocol;
-  int row, col; // cursor position
+  int row, col; // Cursor position
 
-  int toprow; // first visible row
-  int leftcol; // first visible col - doesn't make much sense for variable sized fonts
+  int toprow; // First visible row
+  int leftcol; // First visible col
   int visrow, viscol;
   int ymaxchar, xmaxchar;
   /// The timer that makes the cursor blink.
@@ -124,7 +125,8 @@ class awsMultiLineEdit : public awsComponent
   void PasteClipboard ();
   void CutToClipboard ();
 
-  // actions
+  // Actions
+
   static void actInsertRow (void *owner, iAwsParmList* parmlist);
   static void actDeleteRow (void *owner, iAwsParmList* parmlist);
   static void actReplaceRow (void *owner, iAwsParmList* parmlist);
@@ -133,9 +135,7 @@ class awsMultiLineEdit : public awsComponent
   static void actGetText (void *owner, iAwsParmList* parmlist);
   static void actSetText (void *owner, iAwsParmList* parmlist);
   static void actClear (void *owner, iAwsParmList* parmlist);
-
-
- public:
+public:
   static const int MARK_ROWWRAP;
   static const int MARK_COLUMN;
   static const int MARK_ROW;
@@ -153,7 +153,8 @@ class awsMultiLineEdit : public awsComponent
   static const int frameMask;
   static const int styleMask;
 
-  /**** signals ****/
+  // Signals
+
   static const int signalPaste;
   static const int signalCopy;
   static const int signalCut;
@@ -165,19 +166,17 @@ class awsMultiLineEdit : public awsComponent
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties
+  /// Gets properties.
   bool GetProperty (const char *name, void **parm);
 
-  /// Sets properties
+  /// Sets properties.
   bool SetProperty (const char *name, void *parm);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();
 
-  /// Executes some actions
+  /// Executes some actions.
   virtual bool Execute (const char *action, iAwsParmList* parmlist);
-
- public:
 
   awsMultiLineEdit ();
   virtual ~awsMultiLineEdit ();
@@ -190,50 +189,51 @@ class awsMultiLineEdit : public awsComponent
   /// Gets the smallest this button can be.
   csRect getMinimumSize ();
 
-  /// Triggered when the component needs to draw
+  /// Triggered when the component needs to draw.
   virtual void OnDraw (csRect clip);
 
-  /// Triggered when the user presses a mouse button down
+  /// Triggered when the user presses a mouse button down.
   virtual bool OnMouseDown (int button, int x, int y);
 
-  /// Triggered when the user unpresses a mouse button
+  /// Triggered when the user unpresses a mouse button.
   virtual bool OnMouseUp (int button, int x, int y);
 
-  /// Triggered when the user moves the mouse
+  /// Triggered when the user moves the mouse.
   virtual bool OnMouseMove (int button, int x, int y);
 
-  /// Triggered when the user clicks the mouse
+  /// Triggered when the user clicks the mouse.
   virtual bool OnMouseClick (int button, int x, int y);
 
-  /// Triggered when the user double clicks the mouse
+  /// Triggered when the user double clicks the mouse.
   virtual bool OnMouseDoubleClick (int button, int x, int y);
 
-  /// Triggered when this component loses mouse focus
+  /// Triggered when this component loses mouse focus.
   virtual bool OnMouseExit ();
 
-  /// Triggered when this component gains mouse focus
+  /// Triggered when this component gains mouse focus.
   virtual bool OnMouseEnter ();
 
-  /// Triggered when the keyboard focus is lost
+  /// Triggered when the keyboard focus is lost.
   virtual bool OnLostFocus ();
 
-  /// Triggered when the keyboard focus is gained
+  /// Triggered when the keyboard focus is gained.
   virtual bool OnGainFocus ();
 };
 
-class awsMultiLineEditFactory :
-  public awsComponentFactory
+class awsMultiLineEditFactory : public awsComponentFactory
 {
 public:
-
-  /// Calls register to register the component that it builds with the window manager
+  /**
+   * Calls register to register the component that it builds with the
+   * window manager.
+   */
   awsMultiLineEditFactory (iAws *wmgr);
 
-  /// Does nothing
+  /// Does nothing.
   virtual ~awsMultiLineEditFactory ();
 
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();
 };
 
-#endif // __CS_AWS_MULTILINE_EDIT_H__
+#endif // __CS_AWS_MLED_H__
