@@ -23,9 +23,10 @@
 
 #include "isystem.h"
 #include "iplugin.h"
-#include "inetcmd.h"
-#include "isector.h"
-#include "iworld.h"
+
+struct iNetCmd;
+struct iSector;
+struct iWorld;
 
 SCF_VERSION (iCmdMgr, 0, 0, 1);
 
@@ -81,8 +82,4 @@ struct iCMDMGR: public iPlugIn
 
 };
 
-
 #endif 
-
-
-
