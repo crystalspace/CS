@@ -2,6 +2,59 @@ The history order has been reversed so that new features are at the top.
 
 3-Jul-2000
 	- Seth Galbraith cut skybox in half to save 200 KB for Squawk.
+	- Andrew Zabolotny did the following changes:
+	    - Renamed everywhere the term "transparent" to the correct
+	      term "keycolor". It was a misunderstanding because the term
+	      "transparent" is related to both alpha transparency and key
+	      color. Now "transparent" is used only where alpha
+	      transparency is involved.
+	    - Changed naming convention of csScan_X_draw_scanline_xxx
+	      routines. I tried to make the names shorter and at the same
+	      time add the information of what the routine actually does
+	      into its name.
+	    - Added a lot of new scanline routines:
+		- Textured Gouraud-shaded polygons with key color
+		  transparency.
+		- Textured flat-shaded polygons with key color transparency.
+		- Textured flat-shaded polygons with table-driven effects (FX).
+		- Flat-color flat-shaded polygons with table-driven
+		  effects (FX).
+		- Flat-color Gouraud-shaded polygons with table-driven
+		  effects (FX).
+	      The routines were added for all supported modes (8, 15, 16,
+	      32 bits). Note that not all of them were tested (time for a
+	      G3D test app?) thus some may be buggy. If you find bugs, tell
+	      me and I will fix them.
+	    - Added support for 15-bits modes to MGL 2D driver.
+	    - Fixed 8-bit fog. There was a strange error in there (strange
+	      because it was in its initial state (nobody has changed
+	      anything) and still gcc generated wrong code (unsigned shift
+	      instead of signed)). I wonder how it worked when I initially
+	      wrote it.
+	    - Implemented alpha-mapped textures support. Preliminary though,
+	      several details about how the Z-buffer is to be filled are
+	      unclear for now. The routines work surprisingly fast, and were
+	      implemented for all supported modes (8, 15, 16, 32 bits).
+	      The following drawing modes support per-pixel alpha-blending:
+		  - DrawPolygon() with Z-fill and Z-use modes.
+		    This means you may use alpha-mapped textures for walls and
+		    things; the engine does not support this too well for now.
+		  - DrawPolygonFX() supports just flat-shaded alpha-mapped
+		    textures. That is, if the texture has an alpha channel,
+		    the blending modes and Gouraud shading flag are ignored
+		    for now.
+	      Usage is pretty simple: no changes to world file is required
+	      for this. Simply create a texture with alpha-channel and save
+	      it to a format that supports alpha channel (I have used .PNG).
+	      Then use it as a regular texture; anywhere you use it (walls,
+	      things and sprites) it should work.
+	- Andrew also replaced REGISTER_STATIC_CLASS with REGISTER_STATIC_LIB
+	  which is shorter (in CSWS).
+	- Andrew removed REGISTER_STATIC_CLASS (csVFS) from cswssys.
+	  Note that things like this should be done ONLY from applications.
+	  No library should register static SCF classes and/or plugins because
+	  several libraries may require same class, and the class will be
+	  registered several times in the best case.
 2-Jul-2000
 	- Samuel Humphreys did the following fixes to dtsimple:
 	    - Thanks to AndyZ's mem debugger, plugged all the memory leaks
