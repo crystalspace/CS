@@ -7240,8 +7240,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE@@ | sed 'y% %#%'` \
-	    `echo @-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP@@ | sed 'y% %#%'`
+    for cs_build_item in `echo @-D_GNU_SOURCE -DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE@@ | sed 'y% %#%'` \
+	    `echo @-D_GNU_SOURCE -DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }

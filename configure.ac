@@ -1098,8 +1098,8 @@ AS_IF([test $cs_cv_sys_pthread = yes],
 		 ],
 		[pthread_mutexattr_t attr;
 		pthread_mutexattr_settype (&attr, CS_RECURSIVE);])],
-	    [CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
-	    CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP])],
+	    [CS_CREATE_TUPLE([-D_GNU_SOURCE -DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
+	    CS_CREATE_TUPLE([-D_GNU_SOURCE -DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP])],
 	    [C++],
 	    [cs_cv_sys_pthread_recursive=`echo $cs_build_cflags | \
 		sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`],
