@@ -122,15 +122,15 @@ For a list of available topics, see the
 @import{cpyright.txi}
 @end ifnottex
 
-@c @imports{intro,chapter.txi}
-@c @imports{build,chapter.txi}
-@c @imports{options,chapter.txi}
-@c @imports{apps,chapter.txi}
-@c @imports{tutorial,chapter.txi}
-@c @imports{libs,chapter.txi}
-@c @imports{plugins,chapter.txi}
-@c @imports{internal,chapter.txi}
-@c @imports{contrib,chapter.txi}
+@imports{intro,chapter.txi}
+@imports{build,chapter.txi}
+@imports{options,chapter.txi}
+@imports{apps,chapter.txi}
+@imports{tutorial,chapter.txi}
+@imports{libs,chapter.txi}
+@imports{plugins,chapter.txi}
+@imports{internal,chapter.txi}
+@imports{contrib,chapter.txi}
 @imports{appendix,appendix.txi}
 
 @node Index, , API Modifications, Top
