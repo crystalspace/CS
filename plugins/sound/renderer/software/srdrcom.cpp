@@ -153,6 +153,12 @@ bool csSoundRenderSoftware::Open()
 
   if (!SoundDriver) return false;
 
+  /* Grab the mixing mutex while we start the sound driver.
+   *  The windows driver calls back to the mixer to mix audio.  The mixer is 
+   *  not ready to be called yet.
+   */
+  mixing->LockWait ();
+
   SoundDriver->Open (this,
     Config->GetInt("Sound.Software.Frequency", 22050),
     Config->GetBool("Sound.Software.16Bits", true),
@@ -178,6 +184,9 @@ bool csSoundRenderSoftware::Open()
   et = vc->GetElapsedTicks ();
   ct = vc->GetCurrentTicks ();
   LastTime = ct;
+
+  // The mixer is now ready to go
+  mixing->Release ();
 
   if (SoundDriver->ThreadAware ())
   {

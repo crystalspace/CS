@@ -56,6 +56,7 @@
  *  Sound.WaveOut.BufferLength - A floating point value specifying the length of buffers (in seconds) created to
  *                                     hold data from the renderer (streaming AND static audio). (default is 0.05 seconds)
  *                               Increasing this value will cause delays in sound actions (button clicks are especially noticable)
+ *  Sound.WaveOut.DeviceIndexOverride - An integer value 0 - (Number of devices-1) overriding the default selection of output device.
 */
 class csSoundDriverWaveOut : public iSoundDriver
 {
@@ -120,6 +121,8 @@ protected:
   // This function is called by the above callback to put the returned block into the recycle queue
   void RecycleBlock(SoundBlock *Block);
 
+  void EnumerateAvailableDevices();
+
 
   class BackgroundThread : public csRunnable
   {
@@ -166,6 +169,9 @@ protected:
   void *Memory;
   int MemorySize;
 
+  // Selected waveout device index.
+  unsigned int waveout_device_index;
+
   // Pointer to the array of allocated SoundBlock structures
   SoundBlock *AllocatedBlocks;
   // list of blocks that are available to fill with sound data
@@ -180,8 +186,9 @@ protected:
   // old system volume
   DWORD OldVolume;
 
-  /// Mutex to protect the EmptyBlocks queue which may be accessed by both the callback function and the background thread.
-  csRef<csMutex> mutex_EmptyBlocks;
+  /// Critical section wrapping the EmptyBlocks queue which must be accessable by both the background thread and the MMsystem callback.
+  CRITICAL_SECTION critsec_EmptyBlocks;
+
   /// CS representation of running background thread
   csRef<csThread> csbgThread;
   /// Background thread object

@@ -90,9 +90,13 @@ bool csSoundDriverWaveOut::Initialize (iObjectRegistry *r)
     q->RegisterListener (scfiEventHandler, CSMASK_Nothing | CSMASK_Broadcast);
   Config.AddConfig(object_reg, "/config/sound.cfg");
 
-  // Create mutexes to lock access to the various block exchange lists
-  mutex_EmptyBlocks = csMutex::Create(true);
 
+  /* Create a critical section to lock access to the block exchange list.
+   *  Note.  According to the MSDN documentation, a critical section is the ONLY mutexing
+   *  method that may be used here.  This means that in its current state on windows, csMutex
+   *  is not an option!
+  */
+  InitializeCriticalSection(&critsec_EmptyBlocks);
 
   return true;
 }
@@ -142,7 +146,10 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   float BufferLength=Config->GetFloat("Sound.WaveOut.BufferLength", (float)0.05);
   Report (CS_REPORTER_SEVERITY_NOTIFY, "  pre-buffering %f seconds of sound",
     BufferLength);
+  waveout_device_index=(unsigned int)Config->GetInt("Sound.WaveOut.DeviceIndexOverride",(int)WAVE_MAPPER);
 
+  // Send out NOTIFY messages listing available devices
+  EnumerateAvailableDevices();
 
   // setup misc member variables
 
@@ -191,7 +198,6 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
 void csSoundDriverWaveOut::Close()
 {
   int wait_timer=0;
-  int got_lock=0;
   // Signal background thread to halt
   bgThread->RequestStop();
 
@@ -199,10 +205,7 @@ void csSoundDriverWaveOut::Close()
     csSleep(0);
 
   // Clear out the EmptyBlocks queue
-  if (!mutex_EmptyBlocks->LockTry())
-    Report (CS_REPORTER_SEVERITY_WARNING, "  Could not obtain EmptyBlocks lock during driver shutdown.  Clearing list without a lock.");
-  else
-    got_lock=1;
+  EnterCriticalSection(&critsec_EmptyBlocks);
 
   while (EmptyBlocks.Length())
   {
@@ -210,8 +213,9 @@ void csSoundDriverWaveOut::Close()
     GlobalUnlock(Block->DataHandle);
     GlobalFree(Block->DataHandle);
   }
-  if (got_lock)
-    mutex_EmptyBlocks->Release();
+
+  LeaveCriticalSection(&critsec_EmptyBlocks);
+  DeleteCriticalSection(&critsec_EmptyBlocks);
 
   delete AllocatedBlocks;
   AllocatedBlocks=NULL;
@@ -225,6 +229,45 @@ void csSoundDriverWaveOut::Close()
 
   Memory = 0;
 }
+
+void csSoundDriverWaveOut::EnumerateAvailableDevices()
+{
+  unsigned int num_devs,current_dev;
+  WAVEOUTCAPS devcaps;
+
+  num_devs=waveOutGetNumDevs();
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "%d WaveOut audio output devices available:",num_devs);
+
+  //Sound.WaveOut.DeviceIndexOverride
+  for (current_dev=0;current_dev<num_devs;current_dev++)
+  {
+    if (MMSYSERR_NOERROR == waveOutGetDevCaps(current_dev,&devcaps,sizeof(WAVEOUTCAPS)))
+    {
+      bool device_valid=true;
+
+      // Check for compatible format
+      if (!(devcaps.dwFormats & WAVE_FORMAT_4S16))
+        device_valid=false;
+
+      // Override selection if the selection cannot handle 44khz stereo
+      if (waveout_device_index == current_dev && !device_valid)
+        waveout_device_index=WAVE_MAPPER;
+
+      // If it's still valid, this is the selected device
+      if (waveout_device_index == current_dev)
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Device %d : %s (SELECTED)",current_dev,devcaps.szPname);
+      else
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Device %d : %s (%s)",current_dev,devcaps.szPname,device_valid?"SUPPORTED":"NOT SUPPORTED");
+    }
+  }
+  if (num_devs>1)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "To override the default device selection, set the Sound.WaveOut.DeviceIndexOverride configuration value to the index of the desired device listed above.");
+  
+  // Trim out any bogus override values
+  if (waveout_device_index >= num_devs)
+    waveout_device_index=WAVE_MAPPER;
+}
+
 
 void csSoundDriverWaveOut::LockMemory(void **mem, int *memsize)
 {
@@ -263,9 +306,9 @@ void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*WaveOut*/,
 
 void csSoundDriverWaveOut::RecycleBlock(SoundBlock *Block)
 {
-  mutex_EmptyBlocks->LockWait();
+  EnterCriticalSection(&critsec_EmptyBlocks);
   EmptyBlocks.Push(Block);
-  mutex_EmptyBlocks->Release();
+  LeaveCriticalSection(&critsec_EmptyBlocks);
 }
 
 
@@ -387,7 +430,7 @@ void csSoundDriverWaveOut::BackgroundThread::Run()
   running=true;
 
   // Startup waveOut device
-  result = waveOutOpen (&WaveOut, WAVE_MAPPER, &(parent_driver->Format),
+  result = waveOutOpen (&WaveOut, parent_driver->waveout_device_index, &(parent_driver->Format),
     (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
   CheckError ("waveOutOpen", result);
 
@@ -397,20 +440,28 @@ void csSoundDriverWaveOut::BackgroundThread::Run()
     int block_count;
 
     // Grab a lock on the available blocks list
-    parent_driver->mutex_EmptyBlocks->LockWait();
+    EnterCriticalSection(&(parent_driver->critsec_EmptyBlocks));
 
     // Fill all available blocks
     block_count=parent_driver->EmptyBlocks.Length();
     while (block_count>0)
     {
+      bool fill_result;
       SoundBlock *CurrentBlock=parent_driver->EmptyBlocks.Pop();
-      if (!FillBlock(CurrentBlock))
+
+      // Release the lock during the buffer filling.  We don't need the lock here and it's the longest part of this operation
+      LeaveCriticalSection(&(parent_driver->critsec_EmptyBlocks));
+      fill_result=FillBlock(CurrentBlock);
+      // Grab the lock back before continuing
+      EnterCriticalSection(&(parent_driver->critsec_EmptyBlocks));
+
+      if (!fill_result)
         parent_driver->EmptyBlocks.Insert(0,CurrentBlock);
       block_count--;
     }
 
     // Release the lock
-    parent_driver->mutex_EmptyBlocks->Release();
+    LeaveCriticalSection(&(parent_driver->critsec_EmptyBlocks));
     // Give up timeslice
     csSleep(0);
   }
@@ -427,17 +478,17 @@ void csSoundDriverWaveOut::BackgroundThread::Run()
       break; 
 
     // Grab a lock on the available blocks list
-    parent_driver->mutex_EmptyBlocks->LockWait();
+    EnterCriticalSection(&(parent_driver->critsec_EmptyBlocks));
 
     if (parent_driver->EmptyBlocks.Length() >= WAVEOUT_BUFFER_COUNT)
     {
       // Release the lock
-      parent_driver->mutex_EmptyBlocks->Release();
+      LeaveCriticalSection(&(parent_driver->critsec_EmptyBlocks));
       break;
     }
 
     // Release the lock
-    parent_driver->mutex_EmptyBlocks->Release();
+    LeaveCriticalSection(&(parent_driver->critsec_EmptyBlocks));
     // Give up timeslice
     csSleep(0);
   }
