@@ -69,7 +69,7 @@ struct mmioInfo
 // Fills in the mmioInfo struct by mapping in filename.  Returns true on success, false otherwise.
 inline 
 bool
-MemoryMapFile(mmioInfo *platform, char *filename)
+MemoryMapFile(mmioInfo *platform, const char *filename)
 {   
   struct stat statInfo;
   
@@ -91,7 +91,7 @@ MemoryMapFile(mmioInfo *platform, char *filename)
 
 inline 
 void
-UnMemoryMapFile(mmioInfo *platform, char *filename)
+UnMemoryMapFile(mmioInfo *platform)
 {
   if (platform->data != 0)
     munmap(platform->data, platform->file_size);
