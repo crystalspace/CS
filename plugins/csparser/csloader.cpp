@@ -538,6 +538,7 @@ bool csLoader::LoadLibrary (char* buf)
     CS_TOKEN_TABLE (TEXTURES)
     CS_TOKEN_TABLE (MATERIALS)
     CS_TOKEN_TABLE (MESHFACT)
+    CS_TOKEN_TABLE (PLUGINS)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (MESHREF)
     CS_TOKEN_TABLE (SOUNDS)
@@ -631,6 +632,10 @@ bool csLoader::LoadLibrary (char* buf)
 	    }
 	  }
 	  break;
+        case CS_TOKEN_PLUGINS:
+	  if (!LoadPlugins (params))
+	    return false;
+          break;
       }
     }
     if (cmd == CS_PARSERR_TOKENNOTFOUND)
