@@ -10,7 +10,7 @@
 
 #include "bitarray.h"
 
-class csBitArray2D : private csBitArray
+class csBitArray2D : public csBitArray
 {
    typedef csBitArray super;
    
