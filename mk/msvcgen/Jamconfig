@@ -17,7 +17,7 @@ TARGET.OS = "WIN32" ;
 TARGET.PROCESSOR = "X86" ;
 MODE = "debug" ; # msvcgen will create rules for debug and optimize
 USE_PLUGINS = "yes" ;
-USE_NEW_RENDERER ?= "yes" ;
+USE_NEW_RENDERER ?= "no" ;
 
 # msvcgen flags
 MSVC.DEPEND = ;
