@@ -74,6 +74,8 @@ public:
   void SetRectangle (int x, int y, int w, int h);
   /// Add a vertex to clipping polygon (non-rectangular clipping).
   void AddViewVertex (int x, int y);
+  /// Update the Clipper. This is usually called from Draw.
+  void UpdateClipper();
   /// Draw world as seen from the camera.
   void Draw ();
   /// Set sector for the current camera.
