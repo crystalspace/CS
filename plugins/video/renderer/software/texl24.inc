@@ -64,7 +64,11 @@
 #if PI_BS > 0
       else b &= PI_BM;
 #endif
+#if defined (PI_R8G8B8) && defined (TOP8BITS_R8G8B8_USED)
+      *tm++ = (r | g | b) >> PostShift;
+#else
       *tm++ = r | g | b;
+#endif
 #ifdef TL_WHITE
       whi += whi_d;
 #else

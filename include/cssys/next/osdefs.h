@@ -26,6 +26,8 @@
 #undef  SOFTWARE_2D_DRIVER
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
 
+// Tell software texture mapper that top 8 bits in RGBA pixel sometimes are used
+#define TOP8BITS_R8G8B8_USED
 
 //-----------------------------------------------------------------------------
 // NeXT does not know about wchar_t, so fake one up for the COM system.

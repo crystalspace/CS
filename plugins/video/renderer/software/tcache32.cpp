@@ -29,10 +29,13 @@
 TextureCache32::TextureCache32 (csPixelFormat* pfmt) : TextureCache (pfmt)
 {
   gi_pixelbytes = 4;
-  // simplified check as for now we know only about RGB and BGR modes.
-  // If support for more pixel formats is needed, modify here and the
-  // start of create_lighted_24bit () routine.
-  pixmode = pfmt->RedShift ? PIX_RGB : PIX_BGR;
+  RedByte = pfmt->RedShift >> 3;
+  GreenByte = pfmt->GreenShift >> 3;
+  BlueByte = pfmt->BlueShift >> 3;
+  if (RedByte && GreenByte && BlueByte)
+    PostShift = 8, RedByte--, GreenByte--, BlueByte--;
+  else
+    PostShift = 0;
 }
 
 TextureCache32::~TextureCache32 ()
@@ -66,12 +69,13 @@ void TextureCache32::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture
   int Imin_u = tcd.Imin_u;
   int Imin_v = tcd.Imin_v;
 
-  unsigned char *mapR, *mapG, *mapB;
+  unsigned char *LightMap [3];
+  LightMap [RedByte] = tcd.mapR;
+  LightMap [GreenByte] = tcd.mapG;
+  LightMap [BlueByte] = tcd.mapB;
 
-  if (pixmode == PIX_RGB)
-    mapR = tcd.mapR, mapG = tcd.mapG, mapB = tcd.mapB;
-  else
-    mapR = tcd.mapB, mapG = tcd.mapG, mapB = tcd.mapR;
+  // The line below should be optimized well by most decent compilers
+  unsigned char *mapR = LightMap [2], *mapG = LightMap [1], *mapB = LightMap [0];
 
   ULong* otmap = (ULong*)tcd.tdata;
   int shf_w = tcd.shf_w;
