@@ -46,6 +46,8 @@ chronological order.
 	- Eric Sunshine resolved circular forward-reference problems between
 	  awsListRow and awsListRowVector which arose following migration to
 	  csArray<>.
+	- Jorrit changed csStringArray<char*,...> to
+	  csStringArray<const char*,...>.
 7-Aug-2003
 	- Jorrit did the following array related changes:
 	    - Added Put() to csArray.

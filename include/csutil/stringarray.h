@@ -27,19 +27,19 @@
 class csStringArrayElementHandler
 {
 public:
-  static void Construct (char** address, char* const& src)
+  static void Construct (const char** address, const char* const& src)
   {
     *address = csStrNew (src);
   }
 
-  static void Destroy (char** address)
+  static void Destroy (const char** address)
   {
     delete[] *address;
   }
 
-  static void InitRegion (char** address, int count)
+  static void InitRegion (const char** address, int count)
   {
-    memset (address, 0, count*sizeof (char*));
+    memset (address, 0, count*sizeof (const char*));
   }
 };
 
@@ -47,7 +47,7 @@ public:
  * An array of strings. This array will properly make copies of the strings
  * and delete those copies using delete[] later.
  */
-class csStringArray : public csArray<char*, csStringArrayElementHandler>
+class csStringArray : public csArray<const char*, csStringArrayElementHandler>
 {
 public:
   /**
@@ -55,7 +55,7 @@ public:
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csStringArray (int ilimit = 0, int ithreshold = 0)
-  	: csArray<char*, csStringArrayElementHandler> (ilimit, ithreshold)
+  	: csArray<const char*, csStringArrayElementHandler> (ilimit, ithreshold)
   {
   }
 
@@ -84,7 +84,7 @@ public:
    */
   void Sort (ArraySortCompareFunction* compare)
   {
-    csArray<char*, csStringArrayElementHandler>::Sort (compare);
+    csArray<const char*, csStringArrayElementHandler>::Sort (compare);
   }
 
   /**
@@ -92,7 +92,8 @@ public:
    */
   void Sort ()
   {
-    csArray<char*, csStringArrayElementHandler>::Sort (CaseSensitiveCompare);
+    csArray<const char*,
+    	csStringArrayElementHandler>::Sort (CaseSensitiveCompare);
   }
 
   /// Pop an element from tail end of array.
@@ -100,7 +101,7 @@ public:
   {
     CS_ASSERT (Length () > 0);
     int l = Length () - 1;
-    char* ret = Get (l);
+    char* ret = (char*)Get (l);
     InitRegion (l, 1);
     SetLength (l);
     return ret;
