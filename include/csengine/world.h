@@ -574,6 +574,11 @@ public:
   bool HasHalo (csLight* Light);
 
   /**
+   * Remove halo attached to given light from the world.
+   */
+  void RemoveHalo (csLight* Light);
+
+  /**
    * Process a existing light halo. The function changes halo brightness
    * in dependence whenever the halo is obscured or not and returns "false"
    * if halo has reached zero intensity and should be removed from halo queue.

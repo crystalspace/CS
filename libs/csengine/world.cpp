@@ -1083,6 +1083,13 @@ bool csWorld::HasHalo (csLight* Light)
   return halos.FindKey (Light) >= 0;
 }
 
+void csWorld::RemoveHalo (csLight* Light)
+{
+  int idx = halos.FindKey (Light);
+  if(idx!=-1)
+    halos.Delete (idx);
+}
+
 #define HALO_INTENSITY_STEP	0.15f
 
 bool csWorld::ProcessHalo (csLightHalo *Halo)
