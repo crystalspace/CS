@@ -79,7 +79,6 @@ if $(USE_NEW_RENDERER) = "yes"
     frustvis
     genmesh
     gmeshldr
-    gtreeldr
     haze
     hazeldr
     ieplex
@@ -151,7 +150,6 @@ else
     genmesh
     gl3d
     gmeshldr
-    gtreeldr
     haze
     hazeldr
     ieplex
