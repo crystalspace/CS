@@ -601,7 +601,10 @@ supports_halos = false;
 
     // was this halo actually drawn?
     if (hres == S_FALSE)
-      pinfo->pLight->RemoveReference ();
+      pinfo->pLight->RemoveReference();
+    else
+      if(!pinfo->pLight->GetReferenceCount())
+        pinfo->pLight->AddReference();
   }   
   if (piHR) piHR->Release();
 
