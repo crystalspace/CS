@@ -14,6 +14,8 @@ Short-term cleanups that need to be done:
 
 12-Jan-2000
 	- Added double linked list code from David Durant to csutil.
+	- Did first work on new system to add dynamic objects to
+	  polygon trees.
 11-Jan-2000
 	- Changes from David Durant to implement a new callback for sprites
 	  which is called when the sprite is REALLY drawn. He also added

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,6 +24,7 @@
 class csPolygonInt;
 class csPolygonParentInt;
 class csPolygonTree;
+class csPolygonStub;
 
 
 #define NODE_OCTREE 1
@@ -34,16 +35,25 @@ class csPolygonTree;
  */
 class csPolygonTreeNode
 {
+private:
+  /**
+   * A linked list for all polygons stubs that are added
+   * to this node. These stubs represents sets of polygons
+   * from this object that belong to the same plane as the
+   * plane of the splitter in the tree node.
+   */
+  csPolygonStub* first_stub;
+
 public:
   /**
    * Constructor.
    */
-  csPolygonTreeNode () { }
+  csPolygonTreeNode () : first_stub (NULL) { }
 
   /**
    * Destructor.
    */
-  virtual ~csPolygonTreeNode () { }
+  virtual ~csPolygonTreeNode ();
 
   /// Remove all dynamic added polygons.
   virtual void RemoveDynamicPolygons () = 0;
@@ -53,6 +63,13 @@ public:
 
   /// Return type (NODE_???).
   virtual int Type () = 0;
+
+  /**
+   * Unlink a stub from the stub list.
+   * Warning! This function does not test if the stub
+   * is really on the list!
+   */
+  void UnlinkStub (csPolygonStub* ps);
 };
 
 /**
