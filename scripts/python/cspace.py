@@ -257,6 +257,33 @@ class csColorPtr(csColor):
         _swig_setattr(self, csColor,self.__class__,csColor)
 _cspace.csColor_swigregister(csColorPtr)
 
+class csColor4(csColor):
+    __swig_setmethods__ = {}
+    for _s in [csColor]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csColor4, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csColor]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csColor4, name)
+    def __repr__(self):
+        return "<C csColor4 instance at %s>" % (self.this,)
+    __swig_setmethods__["alpha"] = _cspace.csColor4_alpha_set
+    __swig_getmethods__["alpha"] = _cspace.csColor4_alpha_get
+    if _newclass:alpha = property(_cspace.csColor4_alpha_get, _cspace.csColor4_alpha_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csColor4, 'this', _cspace.new_csColor4(*args))
+        _swig_setattr(self, csColor4, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csColor4):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class csColor4Ptr(csColor4):
+    def __init__(self, this):
+        _swig_setattr(self, csColor4, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csColor4, 'thisown', 0)
+        _swig_setattr(self, csColor4,self.__class__,csColor4)
+_cspace.csColor4_swigregister(csColor4Ptr)
+
 class csCommandLineHelper(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csCommandLineHelper, name, value)
@@ -1870,6 +1897,7 @@ class csCatmullRomSpline(csBSpline):
         try:
             if self.thisown: destroy(self)
         except: pass
+    def Clone(*args): return _cspace.csCatmullRomSpline_Clone(*args)
 
 class csCatmullRomSplinePtr(csCatmullRomSpline):
     def __init__(self, this):
@@ -5727,6 +5755,7 @@ class iMeshObjectFactory(iBase):
     def SupportsHardTransform(*args): return _cspace.iMeshObjectFactory_SupportsHardTransform(*args)
     def SetLogicalParent(*args): return _cspace.iMeshObjectFactory_SetLogicalParent(*args)
     def GetLogicalParent(*args): return _cspace.iMeshObjectFactory_GetLogicalParent(*args)
+    def GetMeshObjectType(*args): return _cspace.iMeshObjectFactory_GetMeshObjectType(*args)
     def GetObjectModel(*args): return _cspace.iMeshObjectFactory_GetObjectModel(*args)
     def __del__(self, destroy=_cspace.delete_iMeshObjectFactory):
         try:
@@ -8202,6 +8231,7 @@ CS_FX_ALPHA = _cspace.CS_FX_ALPHA
 CS_FX_TRANSPARENT = _cspace.CS_FX_TRANSPARENT
 CS_FX_DESTALPHAADD = _cspace.CS_FX_DESTALPHAADD
 CS_FX_SRCALPHAADD = _cspace.CS_FX_SRCALPHAADD
+CS_FX_PREMULTALPHA = _cspace.CS_FX_PREMULTALPHA
 CS_FX_MESH = _cspace.CS_FX_MESH
 CS_FX_KEYCOLOR = _cspace.CS_FX_KEYCOLOR
 CS_FX_FLAT = _cspace.CS_FX_FLAT
