@@ -236,8 +236,8 @@ AS_IF([test -n "$SWIGBIN"],
     [CS_CHECK_PROG_VERSION([swig], [$SWIGBIN -version 2>&1], [1.3.14],
 	[9.9|.9], [CS_BUILD_PROPERTY([SWIGBIN], [$SWIGBIN])])])
 
-AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 AC_CHECK_PROGS([JAM], [jam])
+AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 AC_PROG_MAKE_SET
 
 
@@ -364,8 +364,8 @@ AC_DEFUN([CS_CHECK_PTHREAD],
 	*)
 	    CS_CHECK_BUILD([for pthread], [cs_cv_sys_pthread],
 		[AC_LANG_PROGRAM(
-		    [#include <pthread.h>
-		    void* worker(void* p) { (void)p; return p; }],
+		    [[#include <pthread.h>
+		    void* worker(void* p) { (void)p; return p; }]],
 		    [pthread_t tid; pthread_create(&tid, 0, worker, 0);])],
 		[cs_pthread_flags], [],
 		[CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])])
@@ -379,7 +379,7 @@ AS_IF([test $cs_cv_sys_pthread = yes],
 	[cs_cv_sys_pthread_recursive],
 	[CS_BUILD_IFELSE(
 	    [AC_LANG_PROGRAM(
-		[#include <pthread.h>],
+		[[#include <pthread.h>]],
 		[pthread_mutexattr_t attr;
 		pthread_mutexattr_settype (&attr, CS_RECURSIVE);])],
 	    [CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
@@ -404,7 +404,7 @@ AS_IF([test $cs_cv_sys_pthread = yes],
 AC_DEFUN([CS_CHECK_RTLD],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     CS_CHECK_BUILD([for RTLD_NOW], [cs_cv_sys_rtld_now],
-	[AC_LANG_PROGRAM([#include <dlfcn.h>], [dlopen(0, RTLD_NOW)])],
+	[AC_LANG_PROGRAM([[#include <dlfcn.h>]], [dlopen(0, RTLD_NOW)])],
 	[], [], [CS_HEADER_PROPERTY([CS_RTLD_NOW_AVAILABLE])], [], [],
 	[], [], [$cs_cv_libdl_libs])])
 
@@ -418,13 +418,16 @@ CS_CHECK_RTLD
 # ExtUtils::Embed or if it must be created manually.
 #------------------------------------------------------------------------------
 AC_CHECK_PROGS([PERL], [perl5 perl])
-AS_IF([test -n "$PERL"],
-    [CS_BUILD_PROPERTY([PERL5.AVAILABLE], [yes])
-    CS_BUILD_PROPERTY([PERL5], [$PERL])
-    CS_BUILD_PROPERTY([PERL], [$PERL])
-    CS_BUILD_PROPERTY([CMD.PERL5], [$PERL])
+CS_BUILD_PROPERTY([PERL5], [$PERL])
+CS_BUILD_PROPERTY([PERL], [$PERL])
+CS_BUILD_PROPERTY([CMD.PERL5], [$PERL])
 
-    AC_CACHE_CHECK([for perl ExtUtils::Embed module], [cs_cv_perl_mod_embed],
+AC_ARG_WITH([perl], [AC_HELP_STRING([--with-perl],
+    [use Perl5 scripting interface (default YES)])])
+AS_IF([test -z "$with_perl"], [with_perl=yes])
+
+AS_IF([test -n "$PERL" && test "$with_perl" != no],
+    [AC_CACHE_CHECK([for perl ExtUtils::Embed module], [cs_cv_perl_mod_embed],
 	[AS_IF([AC_RUN_LOG([$PERL -MExtUtils::Embed -e 0 1>&2])],
 	    [cs_cv_perl_mod_embed=yes], [cs_cv_perl_mod_embed=no])])
     AS_IF([test $cs_cv_perl_mod_embed = yes],
@@ -442,7 +445,7 @@ AS_IF([test -n "$PERL"],
 	cs_cv_perl_lflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ldopts])`],
 
 	# ExtUtils::Embed absent.
-	[AC_MSG_NOTICE([Recommend you install the latest release of Perl 5.])
+	[AC_MSG_NOTICE([Recommend you install a recent release of Perl 5.])
 	AC_MSG_NOTICE([http://www.perl.org/])
 
 	AC_CACHE_CHECK([for perl Config module], [cs_cv_perl_mod_config],
@@ -471,23 +474,13 @@ AS_IF([test -n "$PERL"],
     cs_cv_perl_cflags=CS_TRIM([$cs_cv_perl_cflags])
     cs_cv_perl_lflags=CS_TRIM([$cs_cv_perl_lflags])
     AS_IF([test -n "$cs_cv_perl_cflags$cs_cv_perl_lflags"],
-	[CS_BUILD_PROPERTY([PERL5.SDK.AVAILABLE], [yes])
-	CS_BUILD_PROPERTY([PERL5.CFLAGS], [$cs_cv_perl_cflags])
-	CS_BUILD_PROPERTY([PERL5.LFLAGS], [$cs_cv_perl_lflags])])
-
-#@@@ The following is intended to check whether the Perl SDK builds correctly.
-# However, I [res] get link errors on cygwin, tho in theory the SDK should be
-# usable.
-#   CS_CHECK_BUILD([if Perl SDK is usable], [cs_cv_perl],
-#       [AC_LANG_PROGRAM([
-#            #include <EXTERN.h>
-#	    #include <perl.h>],
-#	    [perl_run (0);])],
-#    	    [],
-#           [], [CS_BUILD_PROPERTY([PERL5.SDK.AVAILABLE], [yes])], [], [],
-#           [$cs_cv_perl_cflags], [$cs_cv_perl_lflags],
-#           [])
-    ])
+	[CS_CHECK_BUILD([if Perl SDK is usable], [cs_cv_perl],
+	    [AC_LANG_PROGRAM(
+		[[#include <EXTERN.h>
+		#include <perl.h>]],
+		[perl_run(0);])],
+	    [CS_CREATE_TUPLE([$cs_cv_perl_cflags],[],[$cs_cv_perl_lflags])],
+	    [], [CS_EMIT_BUILD_RESULT([cs_cv_perl], [PERL5])])])])
 
 
 
@@ -506,126 +499,138 @@ AS_IF([test -n "$PERL"],
 AC_CHECK_PROGS([PYTHON], [python])
 CS_BUILD_PROPERTY([PYTHON], [$PYTHON])
 
-AS_IF([test -n "$PYTHON"],
-    [AC_CACHE_CHECK([for python distutils module], [cs_cv_python_distutils],
-	[AS_IF([AC_RUN_LOG([$PYTHON -c 'import distutils.sysconfig' 1>&2])],
-	    [cs_cv_python_distutils=yes], [cs_cv_python_distutils=no])])
-    AS_IF([test $cs_cv_python_distutils = yes],
-	[CS_BUILD_PROPERTY([PYTHON.DISTUTILS], [yes])])],
-    [cs_cv_python_distutils=no])
+AC_ARG_WITH([python], [AC_HELP_STRING([--with-python],
+    [use Python scripting interface (default YES)])])
+AS_IF([test -z "$with_python"], [with_python=yes])
 
-AC_CACHE_CHECK([for python SDK], [cs_cv_python_sdk],
-    [cs_cv_python_sdk=no
-    cs_python_lib_dir=''
-    cs_python_makefile=''
-
-    AS_IF([test -n "$PYTHON"],
-	[# Python 2.x?
+AS_IF([test "$with_python" != no],
+    [AS_IF([test -n "$PYTHON"],
+	[AC_CACHE_CHECK([for python distutils module],
+	    [cs_cv_python_distutils],
+	    [AS_IF([AC_RUN_LOG(
+		[$PYTHON -c 'import distutils.sysconfig' 1>&2])],
+		[cs_cv_python_distutils=yes], [cs_cv_python_distutils=no])])
 	AS_IF([test $cs_cv_python_distutils = yes],
-	    [cs_cv_python_base=`AC_RUN_LOG([$PYTHON -c \
-		'import distutils.sysconfig ; import os.path ; \
-		print os.path.basename( \
-		    distutils.sysconfig.get_python_lib(0,1))'])`
-	    cs_cv_python_base_cflags=`AC_RUN_LOG([$PYTHON -c \
-		'import distutils.sysconfig ; \
-		print "-I"+distutils.sysconfig.get_python_inc()'])`
-	    cs_cv_python_base_lflags=`AC_RUN_LOG([$PYTHON -c \
-		'import distutils.sysconfig ; import os.path ; \
-		print "-L"+distutils.sysconfig.get_python_lib(0,1)+" "+ \
-		    "-L"+distutils.sysconfig.get_python_lib(0,1)+"/config"'])`
-	    cs_cv_python_base_libs=`AC_RUN_LOG([$PYTHON -c \
-		'import distutils.sysconfig ; \
-		print (distutils.sysconfig.get_config_var("LIBS") or "") + \
-		" " + (distutils.sysconfig.get_config_var("SYSLIBS") or "")'])`
-	    cs_cv_python_base_cflags=CS_TRIM([$cs_cv_python_base_cflags])
-	    cs_cv_python_base_lflags=CS_TRIM([$cs_cv_python_base_lflags])
-	    cs_cv_python_base_libs=CS_TRIM([$cs_cv_python_base_libs])
-	    cs_cv_python_sdk=yes])
-
-	# Not Python 2.x; try Python 1.x.
-	AS_IF([test $cs_cv_python_sdk != yes],
-	    [cs_python_paths=`AC_RUN_LOG([$PYTHON -c \
+	    [CS_BUILD_PROPERTY([PYTHON.DISTUTILS], [yes])])],
+	[cs_cv_python_distutils=no])
+    
+    AC_CACHE_CHECK([for python SDK], [cs_cv_python_sdk],
+	[cs_cv_python_sdk=no
+	cs_pylib_dir=''
+	cs_python_makefile=''
+    
+	AS_IF([test -n "$PYTHON"],
+	    [# Python 2.x?
+	    AS_IF([test $cs_cv_python_distutils = yes],
+		[cs_cv_pybase=`AC_RUN_LOG([$PYTHON -c \
+		    'import distutils.sysconfig ; import os.path ; \
+		    print os.path.basename( \
+			distutils.sysconfig.get_python_lib(0,1))'])`
+		cs_cv_pybase_cflags=`AC_RUN_LOG([$PYTHON -c \
+		    'import distutils.sysconfig ; \
+		    print "-I"+distutils.sysconfig.get_python_inc()'])`
+		cs_cv_pybase_lflags=`AC_RUN_LOG([$PYTHON -c \
+		    'import distutils.sysconfig ; import os.path ; \
+		    print "-L"+distutils.sysconfig.get_python_lib(0,1)+" "+ \
+			"-L"+distutils.sysconfig.get_python_lib(0,1)+ \
+			"/config"'])`
+		cs_cv_pybase_libs=`AC_RUN_LOG([$PYTHON -c \
+		    'import distutils.sysconfig ; \
+		    print (distutils.sysconfig.get_config_var("LIBS") or "")+ \
+			" " + (distutils.sysconfig.get_config_var("SYSLIBS") \
+			or "")'])`
+		cs_cv_pybase_cflags=CS_TRIM([$cs_cv_pybase_cflags])
+		cs_cv_pybase_lflags=CS_TRIM([$cs_cv_pybase_lflags])
+		cs_cv_pybase_libs=CS_TRIM([$cs_cv_pybase_libs])
+		cs_cv_python_sdk=yes])
+    
+	    # Not Python 2.x; try Python 1.x.
+	    AS_IF([test $cs_cv_python_sdk != yes],
+		[cs_python_paths=`AC_RUN_LOG([$PYTHON -c \
 'import sys
 for p in sys.path: print p'])`
-	    AS_IF([test -n "$cs_python_paths"],
-		[for cs_pypath in $cs_python_paths
+		AS_IF([test -n "$cs_python_paths"],
+		    [for cs_pypath in $cs_python_paths
+		    do
+			cs_pypath=`echo $cs_pypath | sed 's:/$::'`
+			AS_IF([test -f $cs_pypath/config/Makefile],
+			    [cs_pylib_dir=$cs_pypath
+			    cs_python_makefile=$cs_pypath/config/Makefile
+			    break])
+		    done])])],
+    
+	    [# Unable to query missing Python executable or query failed, so
+	    # try PYTHON_LIB and well-known locations.
+	    AS_IF([test -n "$PYTHON_LIB"],
+		[cs_pylib_dir=$PYTHON_LIB
+		AS_IF([test -f $PYTHON_LIB/config/Makefile],
+		    [cs_python_makefile=$PYTHON_LIB/config/Makefile])],
+		[for cs_pypath in /usr/local/python /usr/local /usr
 		do
-		    cs_pypath=`echo $cs_pypath | sed 's:/$::'`
-		    AS_IF([test -f $cs_pypath/config/Makefile],
-			[cs_python_lib_dir=$cs_pypath
-			cs_python_makefile=$cs_pypath/config/Makefile
-			break])
-		done])])],
-
-	[# Unable to query missing Python executable or query failed, so try
-	# PYTHON_LIB and well-known locations.
-	AS_IF([test -n "$PYTHON_LIB"],
-	    [cs_python_lib_dir=$PYTHON_LIB
-	    AS_IF([test -f $PYTHON_LIB/config/Makefile],
-		[cs_python_makefile=$PYTHON_LIB/config/Makefile])],
-	    [for cs_pypath in /usr/local/python /usr/local /usr
-	    do
-		# If multiple Python subdirectories exists in a given path,
-		# we choose the last one since it probably has the highest
-		# version number (that is, do not "break" from the loop).
-		for cs_pydir in $cs_pypath/lib/python*
-		do
-		    AS_IF([test -f $cs_pydir/config/Makefile],
-			[cs_python_lib_dir=$cs_pydir
-			cs_python_makefile=$cs_pydir/config/Makefile])
-		done
-	    done])])
-
-    # If compiler and linker flags not yet determined but resource directory
-    # and makefile located, then try extracting information from Python
-    # makefile.
-    AS_IF([test $cs_cv_python_sdk != yes],
-	[AS_IF([test -n "$cs_python_makefile"],
-	    [cs_pylibs=`AC_RUN_LOG(
-		[grep '^LIBS[[ 	]]*=' $cs_python_makefile | \
-		    sed 's/LIBS[[ 	]]*=//'])`
-	    cs_pylibm=`AC_RUN_LOG(
-		[grep '^LIBM[[ 	]]*=' $cs_python_makefile | \
-		    sed 's/LIBM[[ 	]]*=//'])`
-	    cs_pylibc=`AC_RUN_LOG(
-		[grep '^LIBC[[ 	]]*=' $cs_python_makefile | \
-		    sed 's/LIBC[[ 	]]*=//'])`])
-
-	# Construct CFLAGS and LFLAGS
-	AS_IF([test -n "$cs_python_lib_dir"],
-	    [cs_cv_python_base=`AS_BASENAME([$cs_python_lib_dir])`
-	    AS_IF([test -n "$cs_cv_python_base"],
-		[AS_IF([test -n "$PYTHON_INC"],
-		    [cs_python_inc_dir=$PYTHON_INC],
-		    [cs_pyinc=`AS_DIRNAME([$cs_python_lib_dir])`
-		    cs_pyinc=`AS_DIRNAME([$cs_pyinc])`
-		    cs_python_inc_dir="$cs_pyinc/include/$cs_cv_python_base"])
-
-		cs_cv_python_base_cflags="-I$cs_python_inc_dir"
-		cs_cv_python_base_lflags="-L$cs_python_lib_dir
-		    -L$cs_python_lib_dir/config"
-		cs_cv_python_base_libs="$cs_pylibs $cs_pylibm $cs_pylibc"
-
-		cs_cv_python_base_cflags=CS_TRIM([$cs_cv_python_base_cflags])
-		cs_cv_python_base_lflags=CS_TRIM([$cs_cv_python_base_lflags])
-		cs_cv_python_base_libs=CS_TRIM([$cs_cv_python_base_libs])
-		cs_cv_python_sdk=yes])])])])
-
-# Check if Python SDK is usable.  Some distributions (such as the one shipped
-# with MacOS/X Jaguar which is missing the static link library) are broken.
-# The most common library name is the basename with a few decorations (for
-# example, "libpython2.2.a"), however some Windows libraries lack the decimal
-# point (for example, "libpython22.a" or "python22.lib"), so we must check for
-# both variations.
-cs_pylib1="-l$cs_cv_python_base"
-cs_pylib2=`echo "-l$cs_cv_python_base" | sed 's/\.//g'`
-CS_CHECK_BUILD([if python SDK is usable], [cs_cv_python],
-    [AC_LANG_PROGRAM([#include <Python.h>],[Py_Initialize(); Py_Finalize();])],
-    [CS_CREATE_TUPLE([],[],[$cs_pylib1]) CS_CREATE_TUPLE([],[],[$cs_pylib2])],
-    [], [CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON])], [], [],
-    [$cs_cv_python_base_cflags $cs_cv_sys_pthread_cflags],
-    [$cs_cv_python_base_lflags $cs_cv_sys_pthread_lflags],
-    [$cs_cv_python_base_libs   $cs_cv_sys_pthread_libs])
+		    # If multiple Python subdirectories exists in a given path,
+		    # we choose the last one since it probably has the highest
+		    # version number (that is, do not "break" from the loop).
+		    for cs_pydir in $cs_pypath/lib/python*
+		    do
+			AS_IF([test -f $cs_pydir/config/Makefile],
+			    [cs_pylib_dir=$cs_pydir
+			    cs_python_makefile=$cs_pydir/config/Makefile])
+		    done
+		done])])
+    
+	# If compiler and linker flags not yet determined but resource
+	# directory and makefile located, then try extracting information from
+	# Python makefile.
+	AS_IF([test $cs_cv_python_sdk != yes],
+	    [AS_IF([test -n "$cs_python_makefile"],
+		[cs_pylibs=`AC_RUN_LOG(
+		    [grep '^LIBS[[ 	]]*=' $cs_python_makefile | \
+			sed 's/LIBS[[ 	]]*=//'])`
+		cs_pylibm=`AC_RUN_LOG(
+		    [grep '^LIBM[[ 	]]*=' $cs_python_makefile | \
+			sed 's/LIBM[[ 	]]*=//'])`
+		cs_pylibc=`AC_RUN_LOG(
+		    [grep '^LIBC[[ 	]]*=' $cs_python_makefile | \
+			sed 's/LIBC[[ 	]]*=//'])`])
+    
+	    # Construct CFLAGS and LFLAGS
+	    AS_IF([test -n "$cs_pylib_dir"],
+		[cs_cv_pybase=`AS_BASENAME([$cs_pylib_dir])`
+		AS_IF([test -n "$cs_cv_pybase"],
+		    [AS_IF([test -n "$PYTHON_INC"],
+			[cs_pyinc_dir=$PYTHON_INC],
+			[cs_pyinc=`AS_DIRNAME([$cs_pylib_dir])`
+			cs_pyinc=`AS_DIRNAME([$cs_pyinc])`
+			cs_pyinc_dir="$cs_pyinc/include/$cs_cv_pybase"])
+    
+		    cs_cv_pybase_cflags="-I$cs_pyinc_dir"
+		    cs_cv_pybase_lflags="-L$cs_pylib_dir
+			-L$cs_pylib_dir/config"
+		    cs_cv_pybase_libs="$cs_pylibs $cs_pylibm $cs_pylibc"
+    
+		    cs_cv_pybase_cflags=CS_TRIM([$cs_cv_pybase_cflags])
+		    cs_cv_pybase_lflags=CS_TRIM([$cs_cv_pybase_lflags])
+		    cs_cv_pybase_libs=CS_TRIM([$cs_cv_pybase_libs])
+		    cs_cv_python_sdk=yes])])])])
+    
+    # Check if Python SDK is usable.  Some distributions (such as the one
+    # shipped with MacOS/X Jaguar which is missing the static link library) are
+    # broken.  The most common library name is the basename with a few
+    # decorations (for example, "libpython2.2.a"), however some Windows
+    # libraries lack the decimal point (for example, "libpython22.a" or
+    # "python22.lib"), so we must check for both variations.
+    AS_IF([test $cs_cv_python_sdk = yes],
+	[cs_pylib1="-l$cs_cv_pybase"
+	cs_pylib2=`echo "-l$cs_cv_pybase" | sed 's/\.//g'`
+	CS_CHECK_BUILD([if python SDK is usable], [cs_cv_python],
+	    [AC_LANG_PROGRAM([[#include <Python.h>]],
+		[Py_Initialize(); Py_Finalize();])],
+	    [CS_CREATE_TUPLE([],[],[$cs_pylib1]) \
+	    CS_CREATE_TUPLE([],[],[$cs_pylib2])],
+	    [], [CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON])], [], [],
+	    [$cs_cv_pybase_cflags $cs_cv_sys_pthread_cflags],
+	    [$cs_cv_pybase_lflags $cs_cv_sys_pthread_lflags],
+	    [$cs_cv_pybase_libs   $cs_cv_sys_pthread_libs])])])
 
 
 
@@ -670,7 +675,7 @@ CS_CHECK_BUILD_FLAGS([how to treat warnings as errors],
 # Check if warnings about unknown #pragmas can be disabled.  (MSVC and Borland
 # use a number of pragmas not understood by GCC, for instance.)
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([how to disable unknown @%:@pragma warnings],
+CS_EMIT_BUILD_FLAGS([[how to disable unknown #pragma warnings]],
     [cs_cv_prog_cxx_disable_pragma_warnings],
     [CS_CREATE_TUPLE([-Wno-unknown-pragmas])], [C++], [CFLAGS.SYSTEM], [+])
 
@@ -1113,11 +1118,11 @@ AS_IF([test "$no_x" != yes],
 
     CS_CHECK_LIB_WITH([Xxf86vm],
 	[AC_LANG_PROGRAM(
-	    [#define XK_MISCELLANY 1
+	    [[#define XK_MISCELLANY 1
 	    #include <X11/Xlib.h>
 	    #include <X11/Xutil.h>
 	    #include <X11/Xatom.h>
-	    #include <X11/extensions/xf86vmode.h>],
+	    #include <X11/extensions/xf86vmode.h>]],
 	    [XF86VidModeLockModeSwitch(0, 0, 0)])], [], [],
 	[CS_BUILD_PROPERTY([USE_XFREE86VM], [yes])
 	CS_JAMCONFIG_PROPERTY([XFREE86VM.CFLAGS], [AS_ESCAPE([$(X_CFLAGS)])])
@@ -1156,10 +1161,10 @@ AS_IF([test "$no_x" != yes],
 # account.
 #------------------------------------------------------------------------------
 m4_define([cs_define_int32],
-    [@%:@if !HAVE_TYPE_INT32
+    [[#if !HAVE_TYPE_INT32
     typedef long int32;
-    @%:@endif
-    ])
+    #endif
+    ]])
 
 AC_DEFUN([CS_CHECK_GL_PREPARE],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
@@ -1172,21 +1177,21 @@ AC_DEFUN([CS_CHECK_GL_PREPARE],
 # CS_GL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
 AC_DEFUN([CS_GL_INCLUDE],
     [AC_REQUIRE([CS_CHECK_GL_PREPARE])
-    @%:@if HAVE_WINDOWS_H
-    @%:@if !HAVE_TYPE_INT32
+    [#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
     typedef long int32;
-    @%:@endif
-    @%:@include <windows.h>
-    @%:@endif
-    @%:@ifndef CS_HEADER_GLOBAL
-    @%:@define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-    @%:@define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
-    @%:@endif
-    @%:@ifdef $1
-    @%:@include CS_HEADER_GLOBAL($1,$3)
-    @%:@else
-    @%:@include <$2/$3>
-    @%:@endif])
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef $1
+    #include CS_HEADER_GLOBAL($1,$3)
+    #else
+    #include <$2/$3>
+    #endif]])
 
 CS_CHECK_GL_PREPARE
 
@@ -1265,7 +1270,7 @@ AS_IF([test $cs_cv_libgl = yes],
 
     # Check for GLX.
     CS_CHECK_BUILD([for GLX], [cs_cv_libglx],
-	[AC_LANG_PROGRAM([#include <GL/glx.h>], [glXWaitGL()])],
+	[AC_LANG_PROGRAM([[#include <GL/glx.h>]], [glXWaitGL()])],
 	[CS_CREATE_TUPLE() \
 	CS_CREATE_TUPLE([],[],[-lGLX]) \
 	CS_CREATE_TUPLE([],[],[-lglx]) \
@@ -1278,8 +1283,8 @@ AS_IF([test $cs_cv_libgl = yes],
     AS_IF([test $cs_cv_libglx = yes],
 	[CS_CHECK_BUILD([for GLX extensions], [cs_cv_libglx_extensions],
 	    [AC_LANG_PROGRAM(
-		[@%:@define GLX_GLXEXT_PROTOTYPES
-		@%:@include <GL/glx.h>],
+		[[#define GLX_GLXEXT_PROTOTYPES
+		#include <GL/glx.h>]],
 		[glXGetProcAddressARB(0)])],
 	    [CS_CREATE_TUPLE(
 		[$cs_cv_libglx_cflags],
@@ -1298,13 +1303,13 @@ AS_IF([test $cs_cv_libgl = yes],
 AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
 CS_CHECK_BUILD([for DirectX], [cs_cv_libdirectx],
     [AC_LANG_PROGRAM(
-	[@%:@if !HAVE_TYPE_INT32
+	[[#if !HAVE_TYPE_INT32
 	typedef long int32;
-	@%:@endif
-	@%:@include <windows.h>
-	@%:@include <ddraw.h>
-	@%:@include <dsound.h>
-	@%:@include <dinput.h>],
+	#endif
+	#include <windows.h>
+	#include <ddraw.h>
+	#include <dsound.h>
+	#include <dinput.h>]],
 	[DirectDrawCreate(0,0,0); 
 	 DirectSoundCreate(0,0,0); 
 	 DirectInputCreate(0,0,0,0)])],
@@ -1318,7 +1323,8 @@ CS_CHECK_BUILD([for DirectX], [cs_cv_libdirectx],
 # Check for zlib.  In addition to the standard installed locations, we also
 # search CS/libs/zlib*.
 #------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([z], [AC_LANG_PROGRAM([#include <zlib.h>], [zlibVersion()])],
+CS_CHECK_LIB_WITH([z],
+    [AC_LANG_PROGRAM([[#include <zlib.h>]], [zlibVersion()])],
     [$srcdir/libs/zlib*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libz], [ZLIB])],
     [CS_MSG_ERROR([zlib is essential for building CS.])], [], [], [], [zlib])
 
@@ -1335,7 +1341,7 @@ AC_DEFUN([CS_CHECK_LIBPNG_PREPARE],
 AS_IF([test "$cs_cv_libz" = yes],
     [CS_CHECK_LIBPNG_PREPARE
     CS_CHECK_LIB_WITH([png],
-	[AC_LANG_PROGRAM([#include <png.h>],
+	[AC_LANG_PROGRAM([[#include <png.h>]],
 	    [png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0)])],
 	[$srcdir/libs/libpng*], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libpng], [PNG])], [],
@@ -1351,9 +1357,9 @@ AS_IF([test "$cs_cv_libz" = yes],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([jpeg],
     [AC_LANG_PROGRAM(
-	[#include <stddef.h>
+	[[#include <stddef.h>
 	#include <stdio.h>
-	#include <jpeglib.h>],
+	#include <jpeglib.h>]],
 	[jpeg_create_compress(0)])],
     [$srcdir/libs/*jpeg*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjpeg], [JPEG])],
     [], [], [], [], [libjpeg])
@@ -1366,7 +1372,7 @@ CS_CHECK_LIB_WITH([jpeg],
 #------------------------------------------------------------------------------
 AS_IF([test "$cs_cv_libz" = yes && test "$cs_cv_libjpeg" = yes],
     [CS_CHECK_LIB_WITH([mng],
-	[AC_LANG_PROGRAM([#include <libmng.h>], [mng_version_release()])],
+	[AC_LANG_PROGRAM([[#include <libmng.h>]], [mng_version_release()])],
 	[$srcdir/libs/libmng*], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libmng], [MNG])], [],
 	[$cs_cv_libjpeg_cflags $cs_cv_libz_cflags],
@@ -1381,7 +1387,7 @@ AS_IF([test "$cs_cv_libz" = yes && test "$cs_cv_libjpeg" = yes],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([mikmod],
     [AC_LANG_PROGRAM(
-	[#include <mikmod.h>],
+	[[#include <mikmod.h>]],
 	[MikMod_Init("mikmodtest"); MikMod_Exit();])],
     [$srcdir/libs/libmikmod*], [],
     [CS_EMIT_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])], [],
@@ -1398,14 +1404,14 @@ CS_CHECK_LIB_WITH([mikmod],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([ogg],
     [AC_LANG_PROGRAM(
-	[#include <ogg/ogg.h>],
+	[[#include <ogg/ogg.h>]],
 	[ogg_sync_state state; ogg_sync_init(&state);])],
     [$srcdir/libs/libogg*], [],
     [CS_EMIT_BUILD_RESULT([cs_cv_libogg], [OGG])])
 
 AS_IF([test "$cs_cv_libogg" = yes],
     [CS_CHECK_LIB_WITH([vorbis],
-	[AC_LANG_PROGRAM([#include <vorbis/codec.h>],
+	[AC_LANG_PROGRAM([[#include <vorbis/codec.h>]],
 	  [vorbis_info info; vorbis_info_init(&info);])],
 	[$srcdir/libs/libvorbis.*], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libvorbis], [VORBIS])], [],
@@ -1416,10 +1422,9 @@ AS_IF([test "$cs_cv_libogg" = yes],
 AS_IF([test "$cs_cv_libvorbis" = yes],
     [CS_CHECK_LIB_WITH([vorbisfile],
 	[AC_LANG_PROGRAM(
-	  [#include <vorbis/vorbisfile.h>
-	   #include <stdio.h>],
-	  [ OggVorbis_File file;
-	    ov_test(stdin, &file, "", 0); ])],
+	    [[#include <vorbis/vorbisfile.h>
+	    #include <stdio.h>]],
+	    [OggVorbis_File file; ov_test(stdin, &file, "", 0);])],
 	[$srcdir/libs/libvorbisfile*], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libvorbisfile], [VORBISFILE])], [],
 	[$cs_cv_libogg_cflags $cs_cv_libvorbis_cflags],
@@ -1434,7 +1439,7 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 # we also search CS/libs/libpgserver*
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([pgserver],
-  [AC_LANG_PROGRAM([#include <pgserver/g_error.h>], [g_error e;])],
+  [AC_LANG_PROGRAM([[#include <pgserver/g_error.h>]], [g_error e;])],
   [$srcdir/libs/libpgserver*], [],
   [CS_EMIT_BUILD_RESULT([cs_cv_libpgserver], [PGSERVER])])
 
@@ -1450,13 +1455,13 @@ AC_DEFUN([CS_CHECK_LIB3DS_PREPARE],
 CS_CHECK_LIB3DS_PREPARE
 
 CS_CHECK_LIB_WITH([3ds],
-    [AC_LANG_PROGRAM([#include <lib3ds/file.h>],[lib3ds_file_new();])],
+    [AC_LANG_PROGRAM([[#include <lib3ds/file.h>]],[lib3ds_file_new();])],
     [$srcdir/libs/lib3ds*], [], [], [], [], [], [$cs_cv_libm_libs],
     [lib3ds-120])
 
 AS_IF([test $cs_cv_lib3ds = yes],
     [CS_CHECK_BUILD([if lib3ds is sufficiently recent], [cs_cv_lib3ds_recent],
-	[AC_LANG_PROGRAM([#include <lib3ds/io.h>], [lib3ds_io_free(0);])],
+	[AC_LANG_PROGRAM([[#include <lib3ds/io.h>]], [lib3ds_io_free(0);])],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [], [],
 	[$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])])
 
@@ -1468,13 +1473,13 @@ AS_IF([test $cs_cv_lib3ds = yes],
 # (0.039 as of this writing).
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([ode],
-    [AC_LANG_PROGRAM([#include <ode/ode.h>], [dWorldCreate()])],
+    [AC_LANG_PROGRAM([[#include <ode/ode.h>]], [dWorldCreate()])],
     [$srcdir/libs/libode*], [C++])
 
 AS_IF([test $cs_cv_libode = yes],
     [CS_CHECK_BUILD([if libode is sufficiently recent], [cs_cv_libode_recent],
 	[AC_LANG_PROGRAM(
-	    [#include <ode/ode.h>],
+	    [[#include <ode/ode.h>]],
 	    [dWorldID w = dWorldCreate();
 	    dBodySetGravityMode(0,0);
 	    dWorldStepFast1(w,0,0);
@@ -1489,15 +1494,15 @@ AS_IF([test $cs_cv_libode = yes],
 #------------------------------------------------------------------------------
 # CS_AL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
 AC_DEFUN([CS_AL_INCLUDE],
-    [@%:@ifndef CS_HEADER_GLOBAL
-    @%:@define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-    @%:@define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
-    @%:@endif
-    @%:@ifdef $1
-    @%:@include CS_HEADER_GLOBAL($1,$3)
-    @%:@else
-    @%:@include <$2/$3>
-    @%:@endif])
+    [[#ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef $1
+    #include CS_HEADER_GLOBAL($1,$3)
+    #else
+    #include <$2/$3>
+    #endif]])
 
 AC_DEFUN([CS_CHECK_LIBOPENAL],
     [AC_REQUIRE([CS_CHECK_LOCAL_INCLUDE])
@@ -1534,11 +1539,11 @@ AS_IF([test -n "$FT2CONFIG"],
     cs_cv_libft2_libs=`AC_RUN_LOG([$FT2CONFIG --libs])`
     CS_CHECK_BUILD([if freetype2 is sufficiently recent], [cs_cv_ft2_recent],
 	[AC_LANG_PROGRAM(
-	    [@%:@include <ft2build.h>
+	    [[#include <ft2build.h>
 	    #include FT_INTERNAL_OBJECTS_H
 	    #include FT_FREETYPE_H
 	    #include FT_GLYPH_H
-	    @%:@include FT_MODULE_H], [return
+	    #include FT_MODULE_H]], [return
 	    FT_LOAD_TARGET_MONO|FT_RENDER_MODE_NORMAL|FT_ENCODING_UNICODE])],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libft2], [FT2])], [], [],
 	[$cs_cv_libft2_cflags], [$cs_cv_libft2_lflags], [$cs_cv_libft2_libs])])
@@ -1559,7 +1564,7 @@ AC_DEFUN([CS_CHECK_LIBMINGWX],
 	mingw*)
 	    AC_CACHE_CHECK([for libmingwex], [cs_cv_libmingwex],
 		[CS_BUILD_IFELSE(
-		    [AC_LANG_PROGRAM([#include <dirent.h>], [opendir("");])],
+		    [AC_LANG_PROGRAM([[#include <dirent.h>]], [opendir("");])],
 		    [CS_CREATE_TUPLE() CS_CREATE_TUPLE([],[],[-lmingwex])], [],
 		    [AS_IF([test -n "$cs_build_libs"],
 			[cs_cv_libmingwex=yes], [cs_cv_libmingwex=no])],
@@ -1578,7 +1583,7 @@ AS_IF([test $cs_cv_libmingwex = yes],
 # Check for svgalib.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([vga],
-    [AC_LANG_PROGRAM([#include <vga.h>], [vga_init()])], [], [],
+    [AC_LANG_PROGRAM([[#include <vga.h>]], [vga_init()])], [], [],
     [CS_EMIT_BUILD_RESULT([cs_cv_libvga], [SVGA])
 	CS_HEADER_PROPERTY([CS_HAS_SVGALIB])],
     [], [], [], [-lvgagl])
@@ -1589,13 +1594,13 @@ CS_CHECK_LIB_WITH([vga],
 # Check for cal3d.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([cal3d],
-    [AC_LANG_PROGRAM([#include <cal3d/cal3d.h>],
+    [AC_LANG_PROGRAM([[#include <cal3d/cal3d.h>]],
 	[CalModel m; m.create(0); m.destroy();])], [], [C++])
 
 AS_IF([test $cs_cv_libcal3d = yes],
     [CS_CHECK_BUILD([if cal3d is sufficiently recent], [cs_cv_cal3d_recent],
 	[AC_LANG_PROGRAM(
-	    [@%:@include <cal3d/cal3d.h>],
+	    [[#include <cal3d/cal3d.h>]],
 	    [CalCoreModel m;
 	    m.addCoreMorphAnimation(new CalCoreMorphAnimation());])],
 	[], [C++],
@@ -1627,8 +1632,9 @@ AS_IF([test -n "$SDLCONFIG"],
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([for Linux joystick API], [cs_cv_sys_linux_joystick],
     [AC_LANG_PROGRAM(
-	[#include <fcntl.h>
-	@%:@include <linux/joystick.h>],
+	[[#include <fcntl.h>
+	#include <sys/ioctl.h>
+	#include <linux/joystick.h>]],
 	[unsigned char axes;
 	unsigned char buttons;
 	int version;
@@ -1658,15 +1664,15 @@ CS_CHECK_LIBCG_PREPARE
 
 CS_CHECK_LIB_WITH([Cg],
     [AC_LANG_PROGRAM(
-	[@%:@include <Cg/cg.h>],
+	[[#include <Cg/cg.h>]],
 	[CGcontext c = cgCreateContext()])], [], [], [], [],
     [$cs_cv_libm_cflags], [$cs_cv_libm_lflags], [$cs_cv_libm_libs])
 
 AS_IF([test $cs_cv_libCg = yes],
     [CS_CHECK_LIB_WITH([CgGL],
 	[AC_LANG_PROGRAM(
-	    [#include <Cg/cg.h>
-	    @%:@include <Cg/cgGL.h>],
+	    [[#include <Cg/cg.h>
+	    #include <Cg/cgGL.h>]],
 	    [CGprogram p; cgGLBindProgram(p)])], [], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libCgGL], [CG])], [],
 	[$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
@@ -1758,9 +1764,9 @@ AC_CHECK_HEADER([stdint.h],
 AS_IF([test $cs_cv_header_stdint_h = yes],
     [CS_CHECK_BUILD([if INT64_C is available], [cs_cv_c_int64],
         [AC_LANG_PROGRAM(
-            [#define __STDC_CONSTANT_MACROS
+            [[#define __STDC_CONSTANT_MACROS
             #define __STDC_LIMIT_MACROS
-            #include <stdint.h>],
+            #include <stdint.h>]],
             [(void)INT64_C(0x100000000)])],
         [], [C++], [CS_HEADER_PROPERTY([CS_HAS_STDINT_H])])])
 
@@ -1785,16 +1791,16 @@ AC_LANG_PUSH([C++])
 AC_CHECK_HEADER([wchar.h], [CS_HEADER_PROPERTY([CS_HAS_WCHAR_H])])
 
 AC_CHECK_TYPE([wchar_t], [cs_type_wchar_t=yes], [cs_type_wchar_t=no],
-    [#if HAVE_WCHAR_H
+    [[#if HAVE_WCHAR_H
     #include <wchar.h>
-    @%:@endif])
+    #endif]])
 
 AS_IF([test $cs_type_wchar_t = yes],
     [AC_CHECK_FUNC([wcslen], [], [CS_HEADER_PROPERTY([CS_USE_FAKE_WCSLEN])])
     AC_CHECK_SIZEOF([wchar_t], []
-	[#if HAVE_WCHAR_H
+	[[#if HAVE_WCHAR_H
 	#include <wchar.h>
-	@%:@endif])
+	#endif]])
     CS_HEADER_PROPERTY([CS_WCHAR_T_SIZE], [$ac_cv_sizeof_wchar_t])],
     [CS_HEADER_PROPERTY([CS_USE_FAKE_WCHAR_TYPE])])
 
@@ -1853,7 +1859,7 @@ AC_CHECK_HEADERS(
 
 CS_CHECK_BUILD([for socket support], [cs_cv_sys_socket],
     [AC_LANG_PROGRAM(
-	[#if HAVE_WINSOCK_H
+	[[#if HAVE_WINSOCK_H
 	#include <winsock.h>
 	#else
 	#if HAVE_SYS_TYPES_H
@@ -1868,14 +1874,14 @@ CS_CHECK_BUILD([for socket support], [cs_cv_sys_socket],
 	#if HAVE_SYS_SOCKET_H
 	#include <sys/socket.h>
 	#endif
-	@%:@endif],
+	#endif]],
 	[struct in_addr a; inet_ntoa(a); socket(0,0,0);])],
 	[cs_socket_flags], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_sys_socket], [SOCKET])])
 
 AS_IF([test $cs_cv_sys_socket = yes],
     [AC_CHECK_TYPE([socklen_t], [], [CS_HEADER_PROPERTY([socklen_t],[int])],
-	[#if HAVE_UNISTD_H
+	[[#if HAVE_UNISTD_H
 	#include <unistd.h>
 	#endif
 	#if HAVE_SYS_TYPES_H
@@ -1892,7 +1898,7 @@ AS_IF([test $cs_cv_sys_socket = yes],
 	#endif
 	#if HAVE_NETDB_H
 	#include <netdb.h>
-	@%:@endif])])
+	#endif]])])
 
 
 
@@ -1990,9 +1996,9 @@ AC_DEFUN([CS_CHECK_QSQRT],
 		[cs_qsqrt_cflags="$cs_cv_prog_cxx_force_cpusubtype_all"])
 	    CS_BUILD_IFELSE(
 		[AC_LANG_PROGRAM(
-		    [#define PROC_$cs_host_cpu_normalized
+		    [[#define PROC_$cs_host_cpu_normalized
 		    #define COMP_GCC
-		    #include <qsqrt.h>],
+		    #include <qsqrt.h>]],
 		    [float n = qsqrt(1.0f); (void)n;])],
 		[CS_CREATE_TUPLE([$cs_qsqrt_cflags -I$srcdir/include])], [C++],
 		[cs_cv_cxx_qsqrt_ok=yes], [cs_cv_cxx_qsqrt_ok=no])])],
@@ -2115,14 +2121,14 @@ AC_DEFUN([CS_CHECK_LIBBFD],
     [AC_REQUIRE([CS_CHECK_ENABLE_META_EMBEDDING])
     AS_IF([test $enable_meta_info_embedding = yes],
 	[CS_CHECK_LIB_WITH([bfd],
-	    [AC_LANG_PROGRAM([#include <bfd.h>], [bfd_init();])],
+	    [AC_LANG_PROGRAM([[#include <bfd.h>]], [bfd_init();])],
 	    [], [], [], [], [], [], [-liberty])],
 	[cs_cv_libbfd=no])])
 
 CS_CHECK_LIBBFD
 AS_IF([test $cs_cv_libbfd = yes],
     [CS_CHECK_BUILD([if libbfd is usable], [cs_cv_libbfd_ok],
-	[AC_LANG_PROGRAM([#include <bfd.h>],
+	[AC_LANG_PROGRAM([[#include <bfd.h>]],
 	    [bfd* p;
 	    asection* s;
 	    bfd_init();

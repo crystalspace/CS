@@ -24,6 +24,7 @@
 #include "csutil/array.h"
 
 #include <fcntl.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 #include <linux/joystick.h>
 
