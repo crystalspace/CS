@@ -139,6 +139,68 @@ BuildTableLeaf(unsigned char **pRE, csRESyntaxTree &tree)
   // Check to see if this is a named table
   if (*p==':')
   {  // Named table resolution
+    ++p;
+    
+    if (memcmp(p, "alpha", 5) == 0) 
+    {
+     p+=7;
+     *pRE=p;
+     return new csRENamedTableLeaf(MATCH_ALPHA_TABLE);
+    }
+    else if  (memcmp(p, "alnum", 5) == 0) 
+    {
+     p+=7;
+     *pRE=p;
+     return new csRENamedTableLeaf(MATCH_ALNUM_TABLE);
+    }
+    else if  (memcmp(p, "digit", 5) == 0) 
+    {
+     p+=7;
+     *pRE=p;
+     return new csRENamedTableLeaf(MATCH_DIGIT_TABLE);
+    } 
+    else if  (memcmp(p, "upper", 5) == 0) 
+    {
+     p+=7;
+     *pRE=p;
+     return new csRENamedTableLeaf(MATCH_UPPER_TABLE);
+    }
+    else if  (memcmp(p, "lower", 5) == 0) 
+    {
+     p+=7;
+     *pRE=p;
+     return new csRENamedTableLeaf(MATCH_LOWER_TABLE);
+    }
+    else if  (memcmp(p, "print", 5) == 0) 
+    {
+     p+=7;
+     *pRE=p;
+     return new csRENamedTableLeaf(MATCH_PRINT_TABLE);
+    }
+    else if  (memcmp(p, "space", 5) == 0) 
+    {
+     p+=7;
+     *pRE=p;
+     return new csRENamedTableLeaf(MATCH_SPACE_TABLE);
+    }
+    else if  (memcmp(p, "cntrl", 5) == 0) 
+    {
+     p+=7;
+     *pRE=p;
+     return new csRENamedTableLeaf(MATCH_CNTRL_TABLE);
+    }
+    else if  (memcmp(p, "graph", 5) == 0) 
+    {
+     p+=7;
+     *pRE=p;
+     return new csRENamedTableLeaf(MATCH_GRAPH_TABLE);
+    }
+    else if  (memcmp(p, "xdigit", 6) == 0) 
+    {
+     p+=8;
+     *pRE=p;
+     return new csRENamedTableLeaf(MATCH_XDIGIT_TABLE);
+    }
       	
     tree.SetErrorCondition(RE_COMP_ERR_UNKNOWN_CHAR_CLASS);
     return NULL;
