@@ -154,7 +154,7 @@ static char const* const knownExtensions[] =
 
 void csGraphics3DOGLCommon::DetectExtensions()
 {
-  printf ("Detecting Mesa Driver extensions...\n");
+  printf ("Detecting Win32 OpenGL extensions.\n");
   const unsigned char* extensions = glGetString(GL_EXTENSIONS);
   if (!extensions)
     return;	//No luck, no extensions on this machine.
