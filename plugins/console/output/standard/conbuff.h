@@ -19,7 +19,7 @@
 #ifndef __CS_CONBUFF_H__
 #define __CS_CONBUFF_H__
 
-#include <csutil/csstring.h>
+#include "csutil/csstring.h"
 
 class csConsoleBuffer
 {
