@@ -1,0 +1,127 @@
+Specific Compilation Instructions on Amiga:
+-------------------------------------------
+(Original instructions by Ralf Eisele)
+(Updated by Jesse McClusky)
+
+WARNING:  The Amiga version of CS is barely compilable at
+   the moment!!!  This is mainly a developer version for
+   those working on the Amiga port.  Use at your own risk,
+   if you can manage to use it at all.
+
+For current status, see the Amiga CS Port support web site at:
+   http://www.weblink.org/weblink/AmigaCS/
+
+
+Current Minimum Requirements:
+   Geek Gadgets
+   - GCC 2.7.0+
+   - ixemul.library 47.3+
+   - make 3.75+
+   - X11R6.1
+   16MB RAM
+   About 20MB of hard drive space
+   Several Hours and A Lot of Patience  (:
+
+
+This is a little doc for compiling Crystalspace on the Amiga:
+I will transform this piece of text into a Guide file when I have
+more time on my hands.
+
+- First of all you need to install the Amiga GNU compiler.
+  (How to install and get the GNU compiler is not documented here.)
+  (See the "Geek Gadgets" CD, or either the dev/gnu or dev/gg
+   directories on the Aminet for more information.)
+
+- After you installed the GNU compiler you need an assign to
+  the GNU compiler.  Put the following assign into your
+  s:user-startup if it is not already there:
+
+  Assign gg: <Your path where you have installed the GNU compiler>
+
+  If you want to change the assign from gg: to something else
+  remember to also change it in cryst/src/mk/system/amiga.mak
+  ( -Igg:os-include/amiga )
+
+- Unpack the Crystal Space archive in a directory of your choice.
+  A directory cryst will be created for you.
+
+- Unpack the zlib_1.1.1.tgz archive. Unpack this archive in the
+  cryst directory. If you want support for PNG or JPEG you can also
+  unpack the libpng.tgz and the libjpeg.tgz into the same directory
+  as zlib_1.1.1.tgz (in directory cryst). These two aren't needed to
+  a working Crystal Space version.
+
+- You need to make the zlib. This is done by compiling the z.lib
+  library. Go to the zlib directory (cryst/zlib) and type
+  "sh ./configure".  When that is done, type "make".
+
+  If all goes well you will get a libz.a file. To be sure that
+  the zlib file is OK you can also type  "make test".
+  Now the zlib will be built and the zlib will be tested to see if
+  it has been build correctly.
+
+  NOTE:  This is the static zlib library.  A shared library is not
+  available at this time.
+
+- If you also chose to use the libpng package, you need to copy the
+  file "makefile.aos" from the cryst/src/system/amiga/png/
+  directory to the cryst/libpng/ directory if you got the general
+  version.  If you got the Amiga-specific version, that step is
+  unnecessary.  Type "make -f makefile.aos" to compile PNG support.
+
+- Currently the libjpeg is untested because I couldn't get it to work.
+
+- You'll need to create dummy (empty) files for the following,
+  unless these files actually exist in your installation:
+    GG:include/alloca.h
+    GG:include/dlfcn.h
+    GG:include/sys/io.h
+
+- There are a number of harmless warnings that come from the
+  misdefinition of strchr()/index() in the Amiga GNU distribution,
+  and from implicit typecasting to and from (void *).
+
+- Compiling without FPU:
+  Set DO_ASM to no in file cryst/src/mk/user.mak
+
+- Compiling with FPU:
+  Set DO_ASM=yes in file cryst/src/mk/user.mak
+  Set FPUVER=-m68881 in file cryst/src/mk/system/amiga.mak
+
+- Optimizing for 020, 040, or 060:
+  See the CPUVER flag comments in cryst/src/mk/system/amiga.mak
+
+- If you don't have png or jpeg installed set DO_PNG=no and DO_JPG=no
+  in file cryst/src/mk/user.mak. The GIF switch is require, because
+  without it your program will do nothing.
+
+- Change DO_SOUND and DO_MMX to no in cryst/src/mk/user.mak
+  (Sound isn't currently supported.)
+
+- Before you can compile CS you will need to add an include directory
+  where the GNU make can find the Amiga specific includes like exec/type.h
+  etc. This is essental, or Amiga.cpp and various other files will not be
+  compiled.  The default is "GG:os-include/amiga/", but you can change
+  this in the cryst/src/mk/system/amiga.mak file by changing the path on
+  the "INCLUDE_DIRS=" line.
+
+- When you're ready to start making the CrystalSpace project, type
+  'make amiga' from the cryst/src directory.  When that completes,
+  you'll need to type 'make depend'.  After that, type 'make' by itself
+  to see a list of the options available.  You'll need to make all of
+  the network drivers, as CS currently requires them all (this will
+  change soon).
+
+  NOTE:  This procedure may not work anymore, as several items
+  (notably the software renderer and network drivers) became COM-only
+  with the 0.11.058 beta.  I haven't tested the compiles for
+  USE_DLL=yes yet, so this might not work.
+
+- This is all that I could think of at the moment, more will be added. Any
+  comments will be appreciated.
+
+Note: Be aware of using an editor who expands the TAB key to spaces.
+      Your makefiles won't work correctly if you do. The Amiga standard
+      'ed' and GOLDED both do this.  Micro Emacs ('memacs') that also
+      comes with the Amiga supports tabs correctly.
+

@@ -1,0 +1,223 @@
+A short explanation on the Primitive Editor.
+--------------------------------------------
+
+There are four modes in the editor:
+
+	NORMAL		Default mode (key 'n')
+	VERTEX		Some commands will only work on vertices (key 'v')
+	PLANE		Some commands will only work on planes (key 'p')
+	POLYGON		Some commands will only work on polygons (key 'o')
+
+Visual objects on screen:
+
+	Objects grow if you move towards them (perspective correct).
+
+	There is always a blue asterix visible. This is the center of
+	the world (0,0,0).
+
+	Vertices are green crosses. Selected vertices are red.
+
+	Planes are two yellow vectors, three yellow vertices and three
+	yellow lines indicating the plane. Selected planes are red.
+
+	Polygons have white borders and a dark grey cross connected to
+	the center of the polygon. The dark grey cross is only visible
+	if you are on the positive side of the polygon (the 'visible'
+	side). A selected polygon is red.
+
+====
+TODO
+====
+
+I plan to do the following things for this editor:
+
+	- The ability to 'lookat' some point in space. When moving
+	  you will move at a fixed distance around the selected point.
+	- Implement the 'unimplemented features'.
+	- The possibility to 'constrain' vertices to a plane. This means
+	  that all selected vertices will move the closest distance
+	  possible to be on the selected plane.
+	- A mode in which you can move the selected objects not locally
+	  to your camera position but locally to their own position. Now
+	  it is rather difficult to move some object upwards in Y space
+	  for example. To do that you need to align your camera so that
+	  the plane is flat with Y.
+	- A flat-filled mode in which all polygons are drawn using a
+	  Z buffer and a flat filled scanline drawer.
+	- Implement 45 degree mode for objects as well.
+
+=========
+The Mouse
+=========
+
+Mouse button 1:
+	Deselect all selected objects first.
+	Select a vertex, plane, or polygon (checking happens in that order).
+	If any one is found it is added to the selection.
+	To select an object you can click on every feature of it.
+	If a vertex was selected you can drag it depending on some
+	conditions (see below).
+	If empty space was selected you can drag a border to multi-select
+	some vertices (see below).
+
+Mouse button 1 + shift:
+	Identical to mouse button 1 but all selected objects are NOT cleared
+	first. This is used for multiple selection.
+
+Mouse button 2:
+	Create a new vertex constrained to the selected plane(s) or
+	polygon(s) (if a polygon is selected a dummy plane is created
+	internally and that plane is used for constraints). If one
+	plane is selected the new vertex will be on the specified location
+	on the plane. If two planes are selected the new vertex will be
+	on the intersection of the two planes.
+
+Dragging button 1:
+	If you select a vertex and hold down while dragging it will move
+	based on the constraints. If no planes or polygons are selected,
+	it will not move. If one plane is selected the vertex will be
+	constrained to the selected plane. If two planes are selected the
+	vertex will be constrained to the intersection of the two planes.
+	If you drag while nothing is selected you will get a border. When
+	you release the mouse button all vertices in the border will be
+	selected.
+
+======
+Moving
+======
+
+All movement keys work differently depending on the mode. If the mode
+is NORMAL the camera will move. Otherwise all selected objects of the
+given move will move.
+
+Selecting 'shift' will increase the speed of the specified movement.
+Selecting 'ctrl' will decrease the speed of the specified movement (to
+VERY slow).
+
+Key up:
+	Move forward. If 'alt' is pressed move upwards.
+
+Key down:
+	Move backward. If 'alt' is pressed move downwards.
+
+Key left:
+	Turn left. If 'alt' is pressed move left.
+
+Key right:
+	Turn right. If 'alt' is pressed move right.
+
+Key PgUp:
+	Turn around the X axis. If 'alt' is pressed turn around the Z axis.
+
+Key PgDn:
+	Turn around the X axis. If 'alt' is pressed turn around the Z axis.
+
+Key b:
+	If in NORMAL mode turn the camera around. Otherwise do nothing.
+
+Key N:
+	Face the camera north. This is an easy way to reorient yourselves
+	after a set of complicated movements.
+
+Key ctrl-n:
+	Toggle 45 degree mode (default off). When this is on all rotation
+	of the camera (mode = NORMAL only) will be with 45 degrees. This
+	is to make accurate positioning of the camera possible.
+
+==============
+Other commands
+==============
+
+Key X:
+	Create a new X plane with the origin set at (0,0,0).
+
+Key Y:
+	Create a new Y plane with the origin set at (0,0,0).
+
+Key Z:
+	Create a new Z plane with the origin set at (0,0,0).
+
+Key V:
+	Create a new vertex at (0,0,0).
+
+Key P:
+	Create a new polygon around the selected vertices. In future you
+	will not have to care which order you selected the vertices.
+	It will create a polygon with the vertices so that the polygon
+	is visible from where you are standing. Currently it does not
+	work that way and you have to select the vertices in the right
+	clockwise order.
+
+Key D:
+	If the mode is not NORMAL it will delete all selected objects
+	of that mode.
+
+Key g:
+	Toggle grid mode on/off (default on). If grid mode is on a grid
+	of 21x21 dots which are at unit distance 1 from each other is
+	created if there is one selected plane. If there are two selected
+	planes then the grid will be a line of 21 dots (which are at unit
+	distance 1 from each other) along the intersection of the two planes.
+	If more than two planes are selected nothing happens.
+
+Key a:
+	If one vertex is selected it will move the origin of the selected
+	plane to that vertex. If two vertices is selected it will move
+	the plane with one vector aligned to the two vertices and the
+	other pointing upwards (not implemented yet). If three vertices
+	are selected it will move the plane with both vectors aligned to the
+	three vertices.
+	If no vertices are selected but one polygon is selected it will
+	align the plane to the plane of the polygon.
+
+	If no plane is selected it will create a plane and do all of the above
+	functions for that new plane.
+
+Key C:
+	Clone all selected vertices. Deselect the original vertices and
+	select the new ones.
+
+Key ctrl-p:
+	Select all polygons which contain all the selected vertices.
+
+Key ctrl-v:
+	Select all vertices that are connected to all the selected
+	polygons.
+
+Key p:
+	Go to PLANE mode.
+
+Key alt-p:
+	Show only planes.
+
+Key o:
+	Go to POLYGON mode.
+
+Key alt-o:
+	Show only polygons.
+
+Key n:
+	Go to NORMAL mode.
+
+Key alt-n:
+	Show everyting.
+
+Key v:
+	Go to VERTEX mode.
+
+Key alt-v:
+	Show only vertices
+
+Key q:
+	Quit (DON'T do this! It will quit the editor!! :-)
+
+Key ctrl-s:
+	Save the world to 'world.pri'.
+
+Key S:
+	Load the world from 'world.pri'.
+	Note that the format is very strict. Don't make any modifications
+	to 'world.pri'. The format is suitable for input for CS but
+	you will probably want to edit it. In that case copy it to
+	'world' (for example) and modify that.
+

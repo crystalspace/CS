@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML 2.0//EN">
+<HTML>
+<HEAD>
+<TITLE>Notes on CrystalSpace OS/2 port</TITLE>
+</HEAD>
+<BODY TEXT=#FFFFFF LINK=#00D0D0 VLINK=#00FFFF BGCOLOR=#003050 BACKGROUND="img/texture6.gif">
+
+<H1>CrystalSpace for OS/2</H1>
+<P>
+  The OS/2 port of CrystalSpace has a number of specific features that should
+  be mentioned, so that you can better understand sourcecode and/or make
+  modifications, if you need them (if you do, you should make them available
+  to the public, as stated by LGPL).
+</P>
+
+<H2>DIVE</H2>
+<P>
+  The current implementation requires DIVE, so the application is compiled as
+  a PM application, and you will need to write a .DEF file for your
+  executable(-s), like below:
+<PRE>
+NAME Cryst WINDOWAPI
+DESCRIPTION "CrystalSpace test executable"
+STACKSIZE 1048576
+</PRE>
+  If you won't define the WINDOWAPI flag, the executable will not work.
+<P>
+  Other thing you should keep in mind is that DIVE library (libDIVE.cpp)
+  uses a couple of resources, so you should not forget to link the resources
+  to your application. Resources can be found in libDIVE.rc
+</P>
+<P>
+  There is one feature not too pleasant related to DIVE (or to acceleration
+  hardware specifics?). If DIVE image should be rescaled (i.e. the scale ratio
+  is not 1:1) DIVE is almost TWICE (!) slower if DIVE window (the client
+  rectangle, not the window border) is not on a two-aligned bound (at least
+  such an effect I've got on my Matrox Mystique). If you get low frame
+  rates, try moving the window by one pixel left/right.
+</P>
+<P>
+  To fix this if you use WINDOWX/WINDOWY keywords in cryst.cfg file
+  or -pos <x>x<y> command-line switch, the computed X value will be rounded
+  to nearest divisor of 2. However, if you manually move the window it can
+  fall on a odd bound and you'll get twice lower frame rates.
+</P>
+<P>
+  You can use WINDOWWIDTH and WINDOWHEIGHT keywords in cryst.cfg file
+  to define start window width and height (client window width and height,
+  not counting borders and titlebar). If you won't define it, the DIVE
+  window will be rescaled to the maximum possible integer factor such
+  that window won't be larger than screen. For example, a 320x200 window
+  in 1152x864 resolution will be automatically rescaled at startup to
+  960x600.
+</P>
+<H3>DIVE features</H3>
+<P>
+  Here is a short list of implementation features related to DIVE:
+  <UL>
+    <LI> DIVE contexts can be created with following pixel formats:
+         <UL>
+           <LI> FOURCC_LUT8
+           <LI> FOURCC_R565
+           <LI> FOURCC_R664
+           <LI> FOURCC_R555
+         </UL>
+         If you use <TT>DEPTH=8</TT> in CrystalSpace configuration file, or use
+         <TT>-depth 8</TT> command-line parameter, CrystalSpace will start with
+         FOURCC_LUT8 pixel format, regardless of what PM screen depth you have.
+         If you use <TT>DEPTH=16</TT> config option or <TT>-depth 16</TT>
+         parameter, the format will be choosed as follows:
+         <UL>
+           <LI> If screen pixel depth is FOURCC_R565, FOURCC_R664, FOURCC_R555,
+                that pixel format is used. Note that there is no <TT>-depth 15</TT>
+                or <TT>DEPTH=15</TT> option, however 32K color modes are supported
+                through 16-bit switches (but only if your screen is set up
+                with this mode).
+           <LI> Otherwise the list of DIVE supported pixel formats is scanned.
+                The most wanted mode is R5-G6-B5 mode, if it is not available
+                R6-G6-B4 mode is choosen, if it is not available, R5-G5-B5 mode
+                is choosen. If no 16- or 15-bit mode is available, code falls
+                back to 256-color mode.
+         </UL>
+    <LI> DIVE windows can be rescaled to arbitrary sizes. Rescaling is done
+         automatically by DIVE, as well as color conversion. Note that if
+         EnDIVE is available, you better use the same pixel format as your PM
+         does, since most cards (my Matrox Mystique, for example) supports
+         in hardware EITHER color conversion OR rescaling, but not both
+         (although I can be wrong here, but that was my impression).
+    <LI> Although DIVE does not (transparently) allow blitting only a <I>portion</I>
+         of backbuffer to screen, there is still a solution. The key is to
+         call each time DiveSetupBlitter with same parameters as usual, but
+         clipping first all rectangles returned by GpiQueryRegionRects against
+         the rectangle you want to update.
+         Look in libDIVE.cpp (diveWindow::SetupBlitter) for more details.
+         <P>
+         Although docs states that DiveSetupBlitter is a longplay operation,
+         I think if you should update only a small part of screen it is still
+         faster to use it (for example, CSWS mostly needs to update only the
+         portion of screen around mouse cursor). DiveSetupBlitter is not called
+         multiple times if update region does not change, so if you always call
+         Graphics2D::Print with a constant argument (or NULL for entire area),
+         it won't be called more often than in the 'classic' situation.
+    <LI> There is an 'almost full-screen DIVE' mode of operation available.
+         To activate/deactivate it you can press Alt+Home (like in DOS windows :-).
+         In this mode window is resized so that window borders and window
+         title will fall outside of physical screen, and DIVE window occupies
+         entire screen. The bad side is that you get not too high frame rates
+         in this mode (for example, on Matrox Mystique a window 320x200x256
+         rescaled to 1152x864x64K can be updated only about 15 times per
+         second).
+    <LI> The system menu on CrystalSpace window is replaced by a more
+         application-specific menu. There are some useful options there
+         (also available through hot-keys, for example Ctrl+Alt+1 rescales
+         window to 1:1 scale, Ctrl+Alt+2 to 2:1 and so on). The menu definition
+         is contained in libDIVE.rc. If you need some additional entries, you
+         can add them directly to resource file.
+  </UL>
+</P>
+<H1>Mouse/keyboard</H1>
+<P>
+  I was too lazy to intercept system event queue, so code generates all
+  CrystalSpace events from events that are passed to DIVE window. As a
+  consequence, there are some (minor) flaws:
+  <UL>
+    <LI> If you press a mouse button inside CrystalSpace window, then move
+         the mouse outside the window and release button, CrystalSpace won't
+         receive the 'mouse button released' event, since OS/2 passes mouse
+         events to a window only if mouse is over that window. Theoretically
+         this can be fixed by capturing mouse when any mouse button is pressed
+         and releasing mouse when all mouse buttons will be released. I didn't
+         have time to do it, and anyway it is not so important I think.
+    <LI> If you press a key inside the window, then activate another window
+         and release it, the same happens as with mouse buttons. Keyboard
+         events are passed by OS/2 only to active windows. To avoid this,
+         the default 'focus change' handler in csSystemDriver class calls
+         Keyboard->Reset and Mouse->Reset if focus goes away. Keyboard::Reset
+         clears all 'Key pressed' flags and emmits corresponding 'csevKeyUp'
+         events. Mouse::Reset clears all 'button down' flags and emmits
+         corresponding events too.
+  </UL>
+</P>
+<P>
+  By default Crystal Space Windowing System will use builtin OS/2 mouse
+  pointers whenever possible (there are three cursors that do not have
+  their counterparts in OS/2 and will be emulated in software). This
+  behaviour can be controlled by
+  <PRE>
+  SYS_MOUSE_CURSOR = {yes|no}
+  </PRE>
+  parameter in config file. If set to "yes", system mouse pointers will be
+  used when available; if set to "no", mouse pointers will be drawn by
+  CrystalSpace as 2D sprites. This is slower but more precise. Theoretically
+  csGraphics2D::SetMousePointer can be implemented to construct a OS/2
+  pointer from "native" CrystalSpace textures, but I was too lazy for this.
+</P>
+<HR>
+<H1>Contributors</H1>
+<P>
+  For the moment, there is only one contributor :-) If you have any
+  problems/questions related to OS/2 port, mail them to me:
+<P>
+  e-mail: <ADDRESS>"Andrew Zabolotny" &lt;bit@eltech.ru&gt;</ADDRESS>
+<P>
+  You also may want to check the
+  <A HREF=http://goof.com/pcg/os2>PGCC for OS/2 home page</A>,
+  which I'm maintaining. You also may want to use PGCC for CrystalSpace since
+  it better optimizes for Pentium and alike than regular GCC.
+</BODY>
+</HTML>

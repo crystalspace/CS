@@ -1,0 +1,140 @@
+/*
+    Crystal Space for XXXX
+    Copyright (C) 1998 by Jorrit Tyberghein
+    Contributed by YYY ZZZ <abc@def.org>
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "xxxx.h"
+
+SysSystemDriver::SysSystemDriver () : csSystemDriver ()
+{
+}
+
+SysSystemDriver::~SysSystemDriver ()
+{
+}
+
+void SysSystemDriver::SetSystemDefaults ()
+{
+  csSystemDriver::SetSystemDefaults ();
+  SysGraphics2D::Depth = config.get_int ("DEPTH", 8);
+  SysGraphics2D::FullScreen = config.get_yesno ("FULL_SCREEN", 0);
+  SysGraphics2D::WindowWidth = config.get_int ("WINDOWWIDTH", -1);
+  SysGraphics2D::WindowHeight = config.get_int ("WINDOWHEIGHT", -1);
+  SysGraphics2D::WindowX = config.get_int ("WINDOWX", INT_MIN);
+  SysGraphics2D::WindowY = config.get_int ("WINDOWY", INT_MIN);
+}
+
+void SysSystemDriver::Help ()
+{
+  csSystemDriver::Help ();
+  CsPrintf (MSG_STDOUT, "   -mode <w>x<y>      set resolution (default=%dx%d)\n", FRAME_WIDTH, FRAME_HEIGHT);
+  CsPrintf (MSG_STDOUT, "   -window <w>x<y>    set window size (default=max fit mode multiple)\n");
+  CsPrintf (MSG_STDOUT, "   -pos <w>x<y>       set window position in percent of screen (default=center)\n");
+  CsPrintf (MSG_STDOUT, "   -depth <bits>      set display depth (default=8 bits AKA 256 colors)\n");
+}
+
+void SysSystemDriver::Loop ()
+{
+  while (!Shutdown)
+  {
+    NextFrame ();			// One frame
+
+    // System-dependent stuff goes here
+    // System event handling etc.
+
+  } // while (!Shutdown)
+}
+
+SysGraphics2D::SysGraphics2D (int argc, char* argv[]) : csGraphics2D ()
+{
+  // for 256-color modes
+  pfmt.PalEntries = 256;
+  pfmt.PixelBytes = 1;
+  pfmt.RedMask    = 0xff;
+  pfmt.GreenMask  = 0xff;
+  pfmt.BlueMask   = 0xff;
+/*
+  for R5G6B5 mode:
+      pfmt.PalEntries = 0;
+      pfmt.PixelBytes = 2;
+      pfmt.RedMask    = 0xf800;
+      pfmt.GreenMask  = 0x07e0;
+      pfmt.BlueMask   = 0x001f;
+ */
+  complete_pixel_format ();
+}
+
+SysGraphics2D::~SysGraphics2D ()
+{
+  Close ();
+}
+
+bool SysGraphics2D::Open (char *Title)
+{
+  ... create a new graphics window with given title (if applicable) ...
+  return true;
+}
+
+void SysGraphics2D::Close ()
+{
+  ... close the window ...
+}
+
+void SysGraphics2D::Print (csRect *area = NULL)
+{
+  if (area)
+  {
+    BitBlit (area->xmin, area->ymin, area->xmax, area->ymax, backbuff, screen);
+  } else
+    BitBlit (0, 0, FRAME_WIDTH - 1, FRAME_HEIGHT - 1, backbuff, screen);
+}
+
+SysKeyboardDriver::SysKeyboardDriver () : csKeyboardDriver ()
+{
+}
+
+SysKeyboardDriver::~SysKeyboardDriver ()
+{
+}
+
+bool SysKeyboardDriver::Open (csEventQueue *EvQueue)
+{
+  return csKeyboardDriver::Open (EvQueue);
+}
+
+void SysKeyboardDriver::Close ()
+{
+  csKeyboardDriver::Close ();
+}
+
+SysMouseDriver::SysMouseDriver () : csMouseDriver ()
+{
+}
+
+SysMouseDriver::~SysMouseDriver ()
+{
+}
+
+bool SysMouseDriver::Open (csEventQueue *EvQueue)
+{
+  return csMouseDriver::Open (EvQueue);
+}
+
+void SysMouseDriver::Close ()
+{
+}

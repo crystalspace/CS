@@ -1,0 +1,225 @@
+This is a document I wrote some time ago that describes how a camera
+in a 3D engine can be represented by a 3x3 matrix and a 3-vector. This
+is the method that is used in the Crystal Space engine but it is
+general enough so that it can be used in other engines as well.
+This document is almost the exact mail that was sent so it is to
+be read as if you just asked the question to me ("how do you represent
+a 3D camera using a matrix and vector?") and I am answering you
+with this text :-)
+
+
+
+Hi,
+
+Ok, I will first try to give some general theory and try to make
+it clear to you and then I will apply this theory to answer your
+specific questions below.
+
+A way to look at the matrix/vector representation of a camera is
+by seeing the matrix as a 3 dimension arrow pointing in some
+direction (the direction the camera is looking at) and the vector
+as the starting point of that arrow.
+
+What does this matrix do? In fact it performs a linear transformation
+from 3D to 3D. With a 3x3 matrix you can represent every linear
+transformation from 3D to 3D. The matrix that we use for a camera
+is just a linear transformation matrix that transforms coordinates
+represented in one base to another. Let's assume that everything in
+the world is defined by using 3D vertices with an x, y, and z
+component. So a vertex is defined by three numbers: x, y, and z.
+These three numbers only have meaning when used relative to some
+base. A base is defined by three axis (if it is a 3D base that is).
+
+So our camera matrix transforms 3D vertices from world space to
+camera space. This means that a vertex with position x,y,z in the
+world (in world space) will get new coordinates x',y',z' in
+camera space. The only reason that we want to apply this transformation
+is to make things easier for the rest of the 3D engine. Because after
+this transformation we can program the rest of the engine as if every
+vertex is represented in camera space. In other words; a vertex with
+coordinates (0,0,5) will be a vertex that lies just in front of the
+camera at distance 5. A vertex with coordinates (1,3,-5) is behind
+the plane of the camera and can thus be easily discarded. The test
+Z < 0 is thus an easy test to see if a vertex will be visible or not.
+
+How does this transformation work? In fact it is just matrix algebra.
+For example, if the camera matrix is represented by M and the camera
+position is represented by P then we can write the equation to transform
+from world space to camera space by using:
+
+	C = M * (W-P)
+
+W is a 3D vector describing the position of a vertex in world space
+coordinates. C is a 3D vector describing the position of a vertex in
+camera space coordinates.
+
+What this formula does is: first it translates the world space position
+so that the camera position is at (0,0,0). This is done by W-P. As you
+can see a vertex that would be on the same world space coordinates as
+the camera would be translated to (0,0,0). The result of this calculation
+is another 3D vector.
+
+This vector is then multiplied by the camera matrix M to transform it
+to camera space. You can visualize this by treating M as an arrow pointing
+in some direction and the vertex lying somewhere relative to that arrow.
+By transforming with M (multiplying) we move the arrow until it points
+just the way we want it (with the Z-axis in front and so on).
+
+A matrix by vector multiplication is defined as follows:
+
+   / a b c \     / x \     / a*x + b*y + c*z \
+   | d e f |  *  | y |  =  | d*x + e*y + f*z |
+   \ g h i /     \ z /     \ g*x + h*y + i*z /
+
+So for example, let's apply this formula in the initial configuration,
+with the camera pointing forwards in world space. The camera matrix is
+then equal to:
+
+   / 1 0 0 \
+   | 0 1 0 |
+   \ 0 0 1 /
+
+and the vector is equal to
+
+   / 0 \
+   | 0 |
+   \ 0 /
+
+Translation of a vertex in world space coordinates to camera space
+coordinates makes no changes since the camera is at the origin of the
+world. Transformation results in the previous formula being applied:
+
+   / 1 0 0 \     / x \     / 1*x + 0*y + 0*z \
+   | 0 1 0 |  *  | y |  =  | 0*x + 1*y + 0*z |
+   \ 0 0 1 /     \ z /     \ 0*x + 0*y + 1*z /
+
+So as you can see, this does not change the vertex as it should be.
+
+This is more or less the theory. If you have specific questions about
+this, don't hesitate to ask me.
+
+Now I will try to answer your other questions.
+
+
+> Hi,
+> 
+> When I have initialized the matrix (as you sayd), how do you change it
+> if you move the position/target of the camera. Are they the new 3-axis
+> for the camera?
+
+Ok, all the different kind of movements that you can do are again
+performed as transformations.
+
+For example, let's say that you want to move forward a bit. If you would
+represent this movement in camera space than you would say that the camera
+moves from (0,0,0) (since the camera is at the origin in camera space) to
+(0,0,dist) with dist the distance that you want to move. This is because
+we defined camera space so that Z is in front of you.
+
+But we want to know the position of the camera in world space! In fact,
+what we want to do is to transfrom the camera space position (0,0,dist)
+to world space. This would then be the new position for the camera.
+
+So we need the inverse transformation. To calculate the inverse
+transformation you need to calculate the inverse of the matrix M. Let's
+call this inverse M'. We know that M * M' = I (the identity matrix).
+
+Calculation of the inverse of a matrix is a bit complicated. If you are
+interested I can tell you how I do it but I don't really understand it
+myself (I just got the formulas from somewhere :-)
+
+Starting from the equation:
+
+	C = M * (W-P)
+
+(our transformation from world to camera space) we would now like to
+calculate the new equation for the inverse transformation. We already have
+M' (the inverse matrix). Ok, let us multiply both sides of the equation
+by M'. This gives:
+
+	M' * C = M' * M * (W-P)
+
+Since M' * M = I, this results in:
+
+	M' * C = W-P
+
+So the equation we are looking for is:
+
+	W = M' * C + P
+
+So this is the equation that transforms camera space to world space.
+Now we can use this to transform (0,0,dist) to the new camera space
+coordinates.
+
+
+Other movements (like moving to the right (dist,0,0), upwards (0,dist,0),
+down (0,-dist,0) and so on) are all equivalent to this.
+
+
+If you want to turn right then your position will not change but you will
+have to change the transformation matrix. This works differently. For
+example, to turn right you would want to rotate a certain angle around
+the Y axis (since the Y axis points upwards). This rotation can be
+represented by the following matrix:
+
+	/ cos(a)   0    -sin(a) \
+	| 0        1    0       |
+	\ sin(a)   0    cos(a)  /
+
+(to see why this works, just try multiplying it by some vectors in 3D and
+see where they will transform too)
+
+How can we then use this matrix to turn our camera to the right? An
+important thing to realize is that transformations can be combined by
+multiplying the matrices of the transformations. For example, if we
+have our matrix M transforming from world to camera space and we would
+like to apply the Y-axis rotation on the camera then you can see
+this as a combination of first the transformation from world to camera
+space followed by the rotation along the Y-axis. So instead of:
+
+	C = M * (W-P)
+
+we would want to do:
+
+	C = R * M * (W-P)
+
+with R the rotation matrix.
+
+Note that multiplication of matrices is not communative. R * M is not
+(always) the same as M * R.
+R * M * (W-P) means: first apply transformation M on (W-P) and after that
+apply transformation R on that result.
+
+So, we can conclude from this that we just have to multiply the camera
+matrix by R to get the new camera matrix:
+
+	M' = R * M
+
+Matrix multiplication works as follows:
+
+	/ a b c \   / A B C \   / a*A+b*D+c*G a*B+b*E+c*H a*C+b*F+c*I \
+	| d e f | * | D E F | = | d*A+e*D+f*G d*B+e*E+f*H d*C+e*F+f*I |
+	\ g h i /   \ G H I /   \ g*A+h*D+i*G g*B+h*E+i*H g*C+h*F+i*I /
+
+Rotation along the other axis works similar. The rotation along the X
+axis is represented by:
+
+	/ 1   0        0       \
+	| 0   cos(a)   -sin(a) |
+	\ 0   sin(a)   cos(a)  /
+
+The rotation along the Z axis is represented by:
+
+	/ cos(a)   -sin(a) 0  \
+	| sin(a)   cos(a)  0  |
+	\ 0        0       1  /
+
+
+With these formulas you should be able to do any movement of the camera that
+you want.
+
+> I also want to be able to rotate the camera around the direction it
+> is looking, can this also be achieved by this matrix?
+
+See above.
+

@@ -1,0 +1,134 @@
+/*
+    Crystal Space for XXXX
+    Copyright (C) 1998 by Jorrit Tyberghein
+    Contributed by YYY ZZZ <abc@def.org>
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __XXX_H__
+#define __XXX_H__
+
+/**
+ * To port CrystalSpace to another system or graphics library you should
+ * implement your own system-dependent classes called SysGraphics2D,
+ * SysSystemDriver, SysKeyboardDriver, SysMouseDriver. They are in
+ * charge for interfacing with corresponding hardware.
+ */
+
+/**
+ * This is the interface to operating system.<p>
+ * This driver takes care of all system-dependent parts such as
+ * video hardware and input hardware.
+ */
+class SysSystemDriver : public csSystemDriver
+{
+public:
+  /// Initialize system-dependent data
+  csSystemDriver ();
+  /// Deinitialize system-dependent parts
+  virtual ~csSystemDriver ();
+
+  /**
+   * System loop. This should be called last since it returns
+   * only on program exit
+   */
+  virtual void Loop ();
+
+  /**
+   * System dependent function to set all system defaults (like
+   * the default resolution, if SHM is used or not (only for X),
+   * and so on...).<p>
+   * This routine can also make use of the config file to get
+   * the defaults from there (so instead of having to specify
+   * -mode 640x480 everytime you can set this in the config file
+   * and this routine should read that).
+   */
+  virtual void SetSystemDefaults ();
+
+  /**
+   * This is a function that prints the commandline help text.
+   * If system has system-dependent switches, it should override
+   * this method and type its own text (possibly invoking
+   * csSystemDriver::Help() first).
+   */
+  virtual void Help ();
+};
+
+/**
+ * This class inherits most of its functionality from csGraphics2D. There
+ * are some virtual methods that you SHOULD override and many methods that
+ * you CAN override. Here are listed only those that you should override,
+ * if you want to see which ones you can override you should look in
+ * src/render/graph2d.h. In general, it would be nice to look there in
+ * any case since this will give you a better idea how Graphics2D class
+ * should work.
+ */
+class SysGraphics2D : public csGraphics2D
+{
+public:
+  /// Create csGraphics2D object
+  csGraphics2D (int argc, char* argv[]);
+  /// Destroy csGraphics2D object
+  virtual ~csGraphics2D ();
+
+  /// Open graphics system (set videomode, open window etc)
+  virtual bool Open (char *Title);
+  /// Close graphics system
+  virtual void Close ();
+
+  /// Flip video pages (or dump backbuffer into framebuffer).
+  virtual void Print (csRect *area = NULL) = 0;
+};
+
+/**
+ * This is the lowest-level interface to keyboard.<p>
+ * Keyboard driver should generate events and put them into the
+ * event queue which is passed to object on Open().
+ */
+class SysKeyboardDriver : public csKeyboardDriver
+{
+public:
+  /// Initialize keyboard interface
+  csKeyboardDriver ();
+  /// Deinitialize keyboard interface
+  virtual ~csKeyboardDriver ();
+
+  /// Start receiving keyboard events
+  virtual bool Open (csEventQueue *EvQueue);
+  /// Finish receiving keyboard events
+  virtual void Close ();
+};
+
+/**
+ * This is the lowest-level interface to mouse.<p>
+ * Mouse driver should generate events and put them into the
+ * event queue which is passed to object on Open().
+ */
+class SysMouseDriver : public csMouseDriver
+{
+public:
+  /// Initialize mouse interface
+  csMouseDriver ();
+  /// Deinitialize mouse interface
+  virtual ~csMouseDriver ();
+
+  /// Start receiving mouse events
+  virtual bool Open(csEventQueue *EvQueue);
+  /// Finish receiving mouse events
+  virtual void Close ();
+};
+
+#endif // __XXX_H__

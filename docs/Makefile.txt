@@ -1,0 +1,320 @@
+
+
+	Makefile howto
+	--------------
+
+	Crystal Space has a complex and kinda sophisticated makefile system,
+this document describes how it works and defines a set of rules that should
+be followed, if possible, to keep makefiles clean and understandable.
+
+	The makefile system heavily relies on many features of GNU Make.
+This renders them very simple, but at the same time makes it heavily depend
+on this tool; however as of today GNU Make is available for almost every
+platform, so this is not a so big price for the goods it brings.
+
+	This document is not intended as a GNU Make manual; refer to appropiate
+documents if you do not understand something. The following text supposes you
+are familiar with GNU Make extensions; with at least basic features if not with
+all.
+
+
+	The overall structure
+	---------------------
+
+	The makefile system was designed to be very modular. This means that
+there are separate submakefiles for each unit that have to be built. Besides,
+there is a system-dependent submakefile (referenced through the variable
+$(SYSMAKEFILE)), user settings submakefile (mk/user.mak), common definitions
+submakefile (mk/common.mak) and several other minor submakefiles. The "root"
+makefile (which is located in the root of Crystal Space source tree) cares
+about including all other submakefiles as required.
+
+	Initially the makefile system is supposed to be not "configured".
+The "configuration" process is supposed to define the system-dependent
+submakefile and several other definitions required for building Crystal Space
+on host platform. During configuration phase a submakefile called "config.mak"
+is created (in the same directory where root makefile is located). Here is
+a sample of configuration submakefile for Linux:
+
+	# Automatically generated file, do not edit!
+	TARGET = linux
+	SYSMAKEFILE = mk/system/linux.mak
+	MODE = debug
+	USE_DLL = no
+	PROC = INTEL
+	CXX = g++
+	CFLAGS.CONFIG += -mpentium -march=i586
+	CFLAGS.CONFIG += -fno-exceptions
+	CFLAGS.CONFIG += -fno-rtti
+	X11_PATH = /usr/X11R6
+
+	As you can see, the first statement defines the TARGET platform and the
+second defines the system-dependend submakefile. The MODE variable defines the
+default build mode (debug, profile or optimize). USE_DLL tells whenever we
+will or won't use dynamic-linked libraries (on platforms that do not support
+dynamic linking system-dependent submakefile usually do "override USE_DLL=no").
+The following statements defines several minor host platform/OS characteristics
+such as processor type, C++ compiler, X Windows include path and several
+optimization switches that are supported by compiler.
+
+	The system submakefile defines everything that is host platform/compiler
+dependent - the system-dependent libraries (for example, some Unices require
+the math library -lm in order to use several math functions required by CS),
+the C/C++ compiler flags (separate for optimize, debug and profile modes) and
+so on. The system submakefile is included several times; the reason is that
+there are (system/compiler dependent) definitions that should be defined at
+the top of makefile, in the middle and so on. To differentiate between them
+a variable called MAKESECTION is used. For example, at the top of root makefile
+it is already needed to know which OS/compiler/processor we are running on.
+For this root makefile does the following:
+
+MAKESECTION=rootdefines
+include mk/subs.mak
+
+	The mk/subs.mak makefile is a special makefile that cares about
+including all submakefiles: system-dependent and submakefiles for all
+drivers and applications; in our case we care only about system submakefile;
+effectively "include mk/subs.mak" turns into:
+
+-include $(SYSMAKEFILE)
+
+	In $(SYSMAKEFILE) we check the MAKESECTION variable, and execute
+appropiate makefile statements. In our case:
+
+ifeq ($(MAKESECTION),rootdefines)
+PROC=INTEL
+OS=LINUX
+COMP=GCC
+endif # ifneq (,$(findstring defines,$(MAKESECTION)))
+
+	Note that for some operating systems processor is defined directly in
+config.mak (it is detected in configure phase), so for such systems PROC=
+is not defined in rootdefines section.
+
+	For building something root Makefile runs a submakefile called
+mk/cs.mak. Note that cs.mak is not *included* but is run as a separate
+submakefile using "$(MAKE) mk/cs.mak [args...]" command. This means that
+all definitions made for root makefile are ignored in cs.mak, so cs.mak
+needs again to include mk/subs.mak in appropiate places with appropiate
+values for MAKESECTION. For example, to build csutil library, root makefile
+executes the following command:
+
+	$(MAKE) -f mk/cs.mak csutil
+
+	Currently the following values of MAKESECTION are used:
+
+------- used in root makefile --------------------------------------------------
+	configure	The system submakefile is included from root makefile
+			to define the "configure:" target.
+	rootdefines	Define all the variables required by the root makefile
+	roottargets	Define all additional targets required by the root
+			makefile
+------- used in cs.mak ---------------------------------------------------------
+	defines		Define all variables that are required for building
+			any targets - the C/C++ compilers, flags and so on.
+	postdefines	Define any variables that depend on other variables.
+	targets		Define any additional targets to cs.mak: a library,
+			a driver, an executable and so on.
+
+	Note that MAKESECTION variable is used not only in system-dependent
+submakefile. All submakefiles uses it: for libraries, for drivers and so on.
+
+	Each system-dependent submakefile defines a variable called DRIVERS
+which contain references to all drivers that are supported by this platform.
+The drivers are referenced by their directory name inside libs/ subdirectory.
+For example, a DRIVERS variable that refers to the software X Windows 2D driver
+and to the software 3D renderer would look this way:
+
+	DRIVERS = cs2d/softx cs3d/soft
+
+	To find the submakefiles for drivers, libs/ is prepended to all
+components of DRIVERS, /*.mak is appended and a wildcard search is performed.
+A possible result of above expansion would be:
+
+	DRIVER_SUBMAKEFILES=libs/cs2d/softx/x2d.mak libs/cs3d/soft/soft3d.mak
+
+	These submakefiles are included each time when subs.mak is included
+either into root makefile or into submakefile.
+
+	To find the submakefiles for libraries, subs.mak looks for all
+submakefiles contained one level deep into libs/ directory (i.e. libs/*/*.mak).
+For example, it could look like this:
+
+	[1|home|~/cs/cryst]ls libs/*/*.mak
+	libs/cs2d/cs2d.mak          libs/csinput/csinput.mak
+	libs/cs3d/cs3d.mak          libs/csparser/csparser.mak
+	libs/cscom/cscom.mak        libs/cssndldr/cssndldr.mak
+	libs/csengine/csengine.mak  libs/cssys/cssys.mak
+	libs/csgeom/csgeom.mak      libs/csutil/csutil.mak
+	libs/csgfxldr/csgfxldr.mak  libs/csws/csws.mak
+
+	The submakefiles for applications are searched latest, using the
+search mask apps/*/*.mak, this way:
+
+	[1|home|~/cs/cryst]ls apps/*/*.mak
+	apps/blocks/blocks.mak      apps/primedit/primedit.mak
+	apps/csregsvr/csregsvr.mak  apps/simple/simple.mak
+	apps/cswstest/cswstest.mak  apps/walktest/walktest.mak
+	apps/mazed/mazed.mak
+
+	The library and application submakefiles also uses the MAKESECTION
+variable to insert statements into different places of the makefile. If you
+do not understand something, feel free to look through submakefiles that can
+be found in any major directory of Crystal Space source tree.
+
+
+	Variable naming conventions
+	---------------------------
+
+	To avoid maximal flexibility (the makefile system should be usable by
+any compiler on any platform) cs.mak avoids any direct references to compiler
+switches, tool names and so on; instead there are a number of variables (some
+of which have default values, but can be changed by submakefiles) which should
+be used by cs.mak as well as by submakefiles, if possible.
+
+	The main "tool" used to build Crystal Space is, naturally, the C++
+compiler. The variable name for C++ compiler is CXX. There are also places
+where The plain C compiler is required; it is referenced by CC variable.
+The flags for C/C++ compilers (it is supposed they both understand same
+command-line flags) are collected from a number of variables:
+
+	CFLAGS.GENERAL	the general C/C++ compiler flags used in all
+			compilation modes.
+	CFLAGS.optimize	the C/C++ flags used in optimize mode
+	CFLAGS.debug	the C/C++ flags used in debug mode
+	CFLAGS.profile	the C/C++ flags used in profile mode
+	CFLAGS.DLL	the C/C++ flags used when compiling object files
+			for dynamicaly-linked libraries (i.e. -fpic)
+
+	The submakefiles also often needs to know how to tell something to
+C/C++ compiler; for example the path to some system-dependent include files,
+libraries, how to define a macro and so on. The GNU C++ compiler, for example,
+uses the -I[path] form to define a include path; the Watcom C compiler, on
+other hand, uses the -i=[path] form. To accomodate with this, there are a
+number of variables that contain the equivalent of required switches for
+currently selected compiler:
+
+	CFLAGS.@	the flags to define the output file name. The default
+			(for Unix-like C compilers) equivalent is "-o $@"
+	CFLAGS.D	how to define a macro. The default equivalent is "-D"
+	CFLAGS.I	how to define a macro. The default equivalent is "-I"
+
+	The linker is referenced through the variable $(LINK); there are also
+a number of variables that defines linker flags:
+
+	LFLAGS.GENERAL	The general linker flags
+	LFLAGS.optimize	The linker flags used in optimize mode
+	LFLAGS.debug	The linker flags used in debug mode
+	LFLAGS.profile	The linker flags used for profiling
+	LFLAGS.DLL	The linker flags used when building a dynamic library
+	LFLAGS.EXE	The linker flags used when building a executable
+	LFLAGS.CONSOLE.EXE
+			These flags are used when building a console executable
+			(for example, csregsvr). Some systems makes difference
+			between a "graphics" executable and a "console"
+			executable.
+
+	Also there are variables similar to CFLAGS.* which tells linker how
+to link with an additional library and so on:
+
+	LFLAGS.@	Define the output file name to $@. The default
+			equivalent is "-o $@".
+	LFLAGS.L	Define an non-standard library path. The default
+			equivalent is "-L"
+	LFLAGS.l	Add a library for linking. The default equivalent
+			is "-l".
+
+	If your driver/application/library requires specific C/C++ compiler
+flags, linking flags, libraries, the usual naming convention is the following:
+
+	CFLAGS.[name]	Additional C/C++ flags
+	LFLAGS.[name]	Additional linking flags
+	LIBS.[name]	Additional libraries
+	DEP.[name]	Additional dependencies
+
+	For example, suppose your application which is called Ping-Pong
+requires specific compilation flags, as well as dependencies (it depends
+on several Crystal Space libraries) and libraries (suppose you link with
+an additional libpingpong.a). In this case the variables would be called
+this way:
+
+	CFLAGS.PINGPONG = $(CFLAGS.I)~/include
+	LIBS.PINGPONG = $(LFLAGS.L)~/lib $(LFLAGS.l)pingpong
+	DEP.PINGPONG = $(CSSYS.LIB) $(CSUTIL.LIB)
+
+	Another issue is that several types of files use different
+extensions on different systems; for example, executable files on Unix
+typically have no extension; on DOS, OS/2 and Windows they typically have the
+.exe extension; other example could be object files that have .o extension on
+Unix and .obj extension on Windows. To accomodate this several variables are
+used where appropiate:
+
+	EXE	Typical extension for executables (ex: ".exe")
+	O	Typical extension for object files (ex: ".o"; usage: pingpong$O)
+	LIB	Typical extension for libraries (ex: ".a" or ".lib")
+	DLL	Typical extension for dynamic libraries (".so" or ".dll")
+
+	Also on Unix systems libraries usually have the "lib" prefix, i.e. the
+"util" library would typically be called "libutil.a". On other systems this is
+not the case; to resolve this problem a variable called LIB_PREFIX is used; it
+is equal to "lib" or it is empty depending on environment. So, for example,
+if our submakefile would define the rules to build libpingpong.a, the name
+of target library could be:
+
+	PINGPONG.LIB = $(LIB_PREFIX)pingpong$(LIB)
+
+	If we would like to build a dynamic library, the name of target
+would be:
+
+	PINGPONG.DLL = pingpong$(DLL)
+
+	As you observe, the name of target variables also has a kind of naming
+convention. If the target is a static library, it is typically named NAME.LIB;
+if it is a dynamic library, it is called NAME.DLL; if it is an executable, the
+variable is typically named NAME.EXE.
+
+
+	The output directory
+	--------------------
+
+	To avoid filling directory structure with temporary and intermediate
+files, all such output should be put into a separate directory. By default
+this directory is named out/$(OS)/$(PROC)/$(MODE)$(MAKE_DLL). So, if you're
+building a dynamic library for Linux on a x86, the output directory would be
+called out/Linux/INTEL/optimize.so/. To reference to the output directory
+you should use the variable $(OUT). For example, the default rule that tells
+make how to compile .cpp files looks like this:
+
+$(OUT)%$O: %.cpp
+	$(DO.COMPILE.CPP)
+
+	This rule supposes that cpp file is located in current directory;
+this is wrong of course. We can avoid this problem in several ways; the major
+solution is to define a vpath for .cpp files, this way:
+
+	vpath %.cpp libs/csutil libs/cssys libs/csgfxldr
+
+	This forces MAKE to look for .cpp files in all mentioned directory.
+The overall rule is that each submakefile defines an additional vpath for
+his directory or directories. For example, the submakefile that defines the
+rules for building $(CSSYS.LIB) defines the following vpath:
+
+	vpath %.cpp libs/cssys
+
+	However, sometimes you want a separate rule for one or several files.
+In this case you can define a rule for building a object file in $(OUT)
+directory from a source file in given directory; if we take the above example,
+we could write instead of that vpath directive the following:
+
+	$(OUT)%$O: libs/cssys/%.cpp
+		$(DO.COMPILE.CPP) $(CFLAGS.CSSYS)
+
+	If you will want a separate rule for just one or several specific files,
+you could do it this way:
+
+	vpath %.cpp libs/cssys
+	$(OUT)file1$O: libs/cssys/file1.cpp
+		$(DO.COMPILE.CPP) $(CFLAGS.CSSYS)
+	$(OUT)file2$O: libs/cssys/file2.cpp
+		$(DO.COMPILE.CPP) $(CFLAGS.CSSYS)
+

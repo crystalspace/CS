@@ -1,0 +1,96 @@
+Here is a run-thru of the main rendering loop. This document is not an
+explanation of portal technology. It just explains how the main
+rendering loop in Crystal Space works so that you can have a quick idea
+of where you have to go to see a particular part of the algorithm work
+(or to make nice enhancements :-)
+
+This document should be read AFTER you have read document.txt so that
+you understand how portals are used in Crystal Space.
+
+First we start in main.cpp:
+
+  There is a function do_stuff() which is called everytime a new frame
+  needs to be drawn.
+    - do_stuff() will first recalculate all uniform dynamic lights with the
+      CLights::LightIdel() routine which you can find in dynlight.cpp.
+    - If physics is enabled, the camera is also moved according to more
+      or less correct physics characteristics. This is done by
+      Camera::spendTime in camera.cpp.
+    - Then do_stuff() will do some stuff to calculate the frame rate.
+    - do_stuff() will also call World::step_scripts to let all scripts
+      execute one step. This will be done in a seperately timed loop
+      in future because this should be independent of the frame rate.
+    - Finally do_stuff() will call do_expose() (also in main.cpp) which
+      is responsible for rendering the display.
+
+  do_expose() main purpose is to draw one frame. In addition it will also
+  show the frame rate and the overlayed console.
+  To render a frame it will call World::draw with a pointer to the current
+  graphics system as argument one, a pointer to the current camera as
+  argument 2, and a 2D polygon representing the screen as the second argument.
+  Rendering in Crystal Space is always done inside a general 2D polygon (not
+  just a rectangle). So, if you would like to draw inside a hexagon instead
+  of the usual rectangle, you could just supply a different view polygon here.
+
+When World::draw() is called we go to world.cpp:
+
+  World::draw() first initializes a bit (for example, the Z-buffer is
+  cleared here), and then just passes control to Sector::draw with the
+  current sector. The current sector can be found into the Camera
+  object that was provided to World::draw(). It represents the sector
+  that the camera is currently in. We start drawing at that sector.
+
+When Sector::draw() is called we go to sector.cpp:
+
+  Sector::draw() is responsible for drawing everything in the current
+  sector. This includes all the polygons of the sector and all Things
+  that are located in this sector.
+
+  To do this it will first transform all vertices of the current sector
+  to the given camera. This means that the camera is put in the center
+  and looks in Z direction. This transformation is done with
+  PolygonSet::transform_world2cam (in polyset.cpp). Sector is a subclass
+  of PolygonSet (and Thing is also a subclass of PolygonSet).
+
+  Then Sector::draw() will do the following for every polygon:
+    - First perspective correction is applied. The routine
+      Polygon3D::do_perspective (in polygon.cpp) will do perspective
+      correction but only if the polygon is visible (it uses backface
+      culling to check this, and also checks if the polygon is not behind
+      the Z-plane).
+      do_perspective will also clip polygons against the Z-plane if
+      needed.
+      The result of do_perspective is thus a 2D polygon which could
+      be drawn on the screen (it is in screen space).
+    - If the polygon is deemed visible and it is also perspective
+      corrected we will clip (in 2D) this polygon against the view
+      polygon that was given to Sector::draw(). This is done by
+      Polygon2D::clip_poly_variant().
+    - If the resulting clipped 2D polygon is not empty we will draw it.
+      There are two cases here: either it is a normal polygon in which
+      case it will just be drawn. Polygon2D::draw_filled() is responsible
+      for drawing a polygon on the screen (in polygon.cpp). Note that
+      this function does not do any clipping anymore. It assumes that
+      the whole 2D polygon is completely visible on screen.
+      The other case is where the polygon is a portal. In that case we
+      need to recursively call Sector::draw() for the new sector that
+      this portal points to. To do this we use the clipped 2D polygon
+      as the new view polygon for the recursive call.
+
+  After all polygons of the sectors have been drawn, the Things in the
+  current sector all drawn. A Thing is very similar to a Sector (the
+  major difference is that the polygons are oriented the other way because
+  they are meant to be viewable from the outside). The drawing of
+  Things happens by Thing::draw() (in thing.cpp).
+
+  There is a little more that is going on here in this function but this
+  indicates the most important functions. In summary:
+      Sector::draw()			-> the main drawing function
+      Polygon3D::do_perspective()	-> perspective correction (3D -> 2D)
+      Polygon2D::clip_poly_variant()	-> clip two 2D polygons
+      Polygon2D::draw_filled()		-> draw the polygon in 2D
+      Thing::draw()			-> draw a thing
+
+This explains the main rendering loop. I hope this document can help
+people navigating in the source.
+

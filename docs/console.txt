@@ -1,0 +1,483 @@
+Console Commands
+----------------
+
+Pressing 'tab' activates the console. On the console there are several
+commands that you can use to control how Crystal Space works. Several of
+the commands are not directly useful for use from within the console
+but they are attached to keys. There are several kinds of commands. Here
+is a general explanation on how the commands work:
+
+  - boolean commands. Boolean commands have either an 'on' or 'off' state.
+    When you just type the command without arguments it will show you the
+    current state of the command ('on' or 'off'). To turn the state on
+    just use: 'on', 'yes', 'true', or '1' as the first argument of the
+    command. To turn it off use: 'off', 'no', 'false', or '0'.
+    To toggle a state use 'toggle'.
+    Example:
+	fps			-> show current setting for FPS display
+    	fps on			-> enable FPS display
+	fps 0			-> disable FPS display
+	fps toggle		-> toggle FPS display
+
+  - value commands. A value command has some value associated with it.
+    Typing the command without arguments will show the current value.
+    Just type the value after the command to change it. Using a '++'
+    or '--' operator before the value will increase or decrease the value with
+    the given amount.
+    Example:
+	gamma			-> show current gamma value
+	gamma 1.5		-> set gamma to 1.5
+	gamma ++0.05		-> increase gamma with 0.05
+	gamma --0.05		-> decrease gamma with 0.05
+
+  - multi-choice commands. A multi-choice command has one or more
+    possible values. Typing the command without arguments will show the
+    current value. Just type the new value after the command to change it.
+    Use 'next' to switch to the next value and 'prev' to switch to the
+    previous value.
+    Example:
+	lightmap		-> show the current lightmap setting
+	lightmap reasonable	-> set lightmap setting to 'reasonable'
+	lightmap next		-> use the next value for lightmap setting
+
+  - general command. How the argument is interpreted depends on the
+    command.
+
+Here is a list of all commands:
+
+Command: quit
+Type:    general command
+Action:  Quit Crystal Space (what did you expect :-)
+
+Command: help
+Type:    general command
+Action:  Give a short list of all commands.
+
+Command: colldet
+Type:    boolean command
+Action:  Enable/disable new collision detection (using RAPID library).
+         Corresponds to -colldet/-nocolldet commandline options.
+
+Command: fclear
+Type:    boolean command
+Action:  Enable/disable the clearing of the display every frame
+	 (this is useful for debugging). Corresponds to -clear
+	 command line option.
+
+Command: debug
+Type:    boolean command
+Action:  Enable/disable more debug information (which is written in
+         debug.txt if the program crashes provided your system can
+	 catch crashes).
+
+Command: maxpol
+Type:    value command
+Action:  Set/get the maximum number of polygons that is drawn every
+         frame. Normally this is set to a very high number so that this
+	 maximum is never reached (2000000000 polygons every frame should
+	 suit everones need for the near future :-)  You can reduce this
+	 number for debugging purposes. In combination with 'fclear' and
+	 binding a keys to 'maxpol ++1'  and 'maxpol --1' you can get the
+	 effect of drawing one polygon at a time.
+
+Command: stats
+Type:    boolean command
+Action:  Enable/disable statistics display. Corresponds
+	 to -stats/-nostats commandline options and STATS configuration
+	 option.
+	 Note that enabling the statistics counter automatically
+	 disables the display of the coordinates.
+
+Command: fps
+Type:    boolean command
+Action:  Enable/disable FPS display (frames per second). Corresponds
+	 to -fps/-nofps commandline options and FPS configuration
+	 option.
+
+Command: transp
+Type:    boolean command
+Action:  Enable/disable transparent/filtered/alpha drawing.
+
+Command: portals
+Type:    boolean command
+Action:  Enable/disable drawing through portals. If this is off, a portal
+	 will just draw as the default texture on the polygon.
+
+Command: inter
+Type:    multi-choice command
+Action:  Choose the size of the interpolation step for simulation of
+         perspective correct texture mapping. Default is 'smart' which
+	 will base the selection on the slope of the polygon. This is the
+	 fastest option but also the lowest quality as there are visible
+	 pops when the slope of a polygon changes slightly and another
+	 interpolation step is selected. Other choices are 'step8', 'step16',
+	 and 'step32' which will set interpolation at 8, 16, or 32 steps
+	 respectively.
+
+Command: edges
+Type:    boolean command
+Action:  Enable/disable display of edges around polygons. This is
+	 useful for debugging.
+
+Command: frustrum
+Type:    boolean command
+Action:  Enable/disable the display of the view frustrum around the
+         selected light (select lights with 'edges' enabled and by
+	 clicking the left mousebutton on the light).
+
+Command: texture
+Type:    boolean command
+Action:  Enable/disable texture mapping.
+
+Command: lighting
+Type:    boolean command
+Action:  Enable/disable lighting.
+
+Command: console
+Type:    boolean command
+Action:  Open/close console (is done automatically by 'tab' key).
+
+Command: mipmap
+Type:    multi-choice command
+Action:  Selects when you want mipmapping. There are three possible
+	 values: 'off', 'on', and 'always' (default is 'on').
+	 When mipmapping is set to 'off' there will be no mipmapping.
+	 When mipmapping is set to 'always' the highest level of
+	 mipmapping is always selected (results in a blurred display).
+
+Command: capture
+Type:    general command
+Action:  Make a screenshot in PCX format. This does not seem to work
+	 correctly in all cases.
+
+Command: cachedump
+Type:    general command
+Action:  Give information about the contents of the texture cache.
+
+Command: cacheclr
+Type:    general command
+Action:  Clear the texture cache.
+
+Command: turn
+Type:    general command
+Action:  Turn arround (so that the camera looks the other way).
+
+Command: activate
+Type:    general command
+Action:  Activate the object that is right in front of you.
+
+Command: perftest
+Type:    general command
+Action:  Do a performance test on the current position.
+
+Command: coorddump
+Type:    general command
+Action:  Show where the camera is located (sector and position).
+
+Command: coordsave
+Type:    general command
+Action:  Save the current position to the 'coord' file.
+
+Command: coordload
+Type:    general command
+Action:  Restore the position from the 'coord' file.
+
+Command: coordshow
+Type:    boolean command
+Action:  Enable/disable display of coordinate at runtime.
+	 Note that enabling the coordinates display automatically
+	 disables the statistics display.
+
+Command: gamma
+Type:    value command
+Action:  Control the gamma value of the display. A gamma of 1.00
+	 is neutral. 2.00 (for example) is lighter and 0.5 is
+	 darker. Press 'g' or 'shf-g' to experiment with this value
+	 at render time.
+	 This command corresponds with the -gamma commandline option
+	 and with the GAMMA configuration option.
+
+Command: fov
+Type:    value command
+Action:  Control the FOV (Field Of Vision) of the display.
+	 By default this is equal to the height (in pixels) of the
+	 current display. Press 'f' or 'shf-f' to experiment with
+	 this value at render time.
+	 This command corresponds with the -fov commandline option
+	 and with the FOV configuration option.
+
+Command: dmipmap1
+Type:    value command
+Action:  Control the distance at which mipmapping level 1 starts to
+	 get effect.
+	 This command corresponds with the -dmipmap1 command option
+	 and with the DMIPMAP1 configuration option.
+
+Command: dmipmap2
+Type:    value command
+Action:  Control the distance at which mipmapping level 2 starts to
+	 get effect.
+	 This command corresponds with the -dmipmap2 command option
+	 and with the DMIPMAP2 configuration option.
+
+Command: dmipmap3
+Type:    value command
+Action:  Control the distance at which mipmapping level 3 starts to
+	 get effect.
+	 This command corresponds with the -dmipmap3 command option
+	 and with the DMIPMAP3 configuration option.
+
+Command: hi
+Type:    general command
+Action:  Hilight the named polygon in the current sector. If the polygon
+         is not found hilighting is disabled. This command is useful
+	 for debugging.
+
+Command: exec
+Type:    general command
+Action:  Start a script containing console commands. Every line in this
+         script is performed one line at a time at every new frame.
+	 The console automatically closes after executing a succesful
+	 'exec' command.
+
+Command: coordset
+Type:    general command
+Action:  Set the coordinate of the camera to the given sector and
+         location. Example 'coordset room,0,0,0' to restore the
+	 position of the camera to the starting point.
+
+Command: cls
+Type:    general command
+Action:  Clear all messages from the console window.
+
+Command: facenorth
+Type:    general command
+Action:  Face the camera to the north.
+
+Command: facesouth
+Type:    general command
+Action:  Face the camera to the south.
+
+Command: facewest
+Type:    general command
+Action:  Face the camera to the west.
+
+Command: faceeast
+Type:    general command
+Action:  Face the camera to the east.
+
+Command: facedown
+Type:    general command
+Action:  Face the camera down.
+
+Command: faceup
+Type:    general command
+Action:  Face the camera up.
+
+Command: cmessage
+Type:    general command
+Action:  Write the specified message to the console.
+
+Command: dmessage
+Type:    general command
+Action:  Write the specified message to 'debug.txt'.
+
+Command: dnl
+Type:    general command
+Action:  Write a newline to 'debug.txt'.
+
+Command: version
+Type:    general command
+Action:  Write the current version to the console.
+
+Command: about
+Type:    general command
+Action:  Write the current version to the console in a more
+         verbose format.
+
+Command: addlight
+Type:    general command
+Action:  Add a dynamic light at the position of the camera.
+         With no arguments the color of this dynamic light will
+	 be random and the light will move up and down slightly.
+	 But you can also say 'addlight r,g,b,radius' for a more
+	 controlled light.
+
+Command: dellight
+Type:    general command
+Action:  Delete the last added dynamic light.
+
+Command: dellights
+Type:    general command
+Action:  Delete all dynamic lights.
+
+Command: picklight
+Type:    general command
+Action:  ...BROKEN...
+
+Command: droplight
+Type:    general command
+Action:  ...BROKEN...
+
+Command: things
+Type:    boolean command
+Action:  Toggle the display of things on/off (default on).
+
+Command: ilace
+Type:    boolean command
+Action:  Toggle interlace on/off (see config.txt for information about
+         the INTERLACING option).
+
+Command: mmx
+Type:    boolean command
+Action:  Toggle MMX support on/off. This command corresponds with the
+         MMX configuration file option (see config.txt for more info).
+	 Note that this command is only useful if you have a MMX
+	 capable processor.
+
+Command: zbuf
+Type:    boolean command
+Action:  For debugging. When enabled this will show an alternate view
+	 where far away objects are rendered in another color. In other
+	 words: it tests the Z buffer. It works best in 16-bit mode.
+
+Command: map
+Type:    multi-choice command
+Action:  Control the display of the map. 'off' (default) is off.
+	 'overlay' shows the map on top of the current display.
+	 'on' shows the map on its own. While the map is active,
+	 moving with the arrow keys will move the map instead of
+	 the display.
+
+Command: texelflt
+Type:    boolean command
+Action:  Experimental feature. Disable/enable texel filtering (default
+	 off). This will slow down the engine considerably and the
+	 current implementation also shows artifacts.
+
+Command: subcache
+Type:    value command
+Action:  Control the optimization of sub-textures in the cache. If 0
+         this optimization will be disabled and textures will always be
+         calculated completely. If any other size (power of two) then every
+         texture will logically be split in sub-textures of the given size
+         and only the visible sub-textures will be calculated (if needed).
+         While this does not improve memory usage of the cache this optimization
+         greatly improves the speed at which the cache is used and also make
+         sure that the overhead of filling a texture is more equally spread
+         accross several frames. Default value is 32.
+
+Command: dyncache
+type:    boolean command
+Action:  If the sub-texture optimization is enabled (see the 'subcache' command)
+         then this option controls if an additional optimization with dynamic
+	 lighting is performed. With this optimization enabled (default) dynamic
+	 lights will only cause recalculation of the sub-textures that were
+	 really touched by the dynamic light.
+
+Command: dblbuff
+Type:    boolean command
+Action:  Enable double buffering for systems that support this.
+
+Command: fire
+Type:    general command
+Action:  Fire a missile in the direction that you are looking. The missile
+         will explode when it hits a wall.
+
+Command: debug0
+Type:    boolean command
+Action:  Debug command. The function of this command is undefined but it
+         serves as a place-holder for some debugging functionality. A
+	 particular version of Crystal Space may assign some action to this
+	 command but another version may remove this action again.
+
+Command: debug1
+Type:    general command
+Action:  Debug command. The function of this command is undefined but it
+         serves as a place-holder for some debugging functionality. A
+	 particular version of Crystal Space may assign some action to this
+	 command but another version may remove this action again.
+
+Command: debug2
+Type:    general command
+Action:  Debug command. The function of this command is undefined but it
+         serves as a place-holder for some debugging functionality. A
+	 particular version of Crystal Space may assign some action to this
+	 command but another version may remove this action again.
+
+Command: lm_grid
+Type:    boolean command
+Action:  Enable a lightmap grid which is overlayed on all lighted textures.
+         This is for debugging and is disabled by default. You need to clear
+	 the texture cache to see the effects of this command.
+
+Command: lm_only
+Type:    boolean command
+Action:  When enabled texture mapping is disabled and lightmaps are drawn
+         instead. You need to clear the texture cache to see the effects of
+	 this command.
+
+Command: cosfact
+Type:    value command
+Action:  Control the cosinus factor (default 0) used for lighting. See
+         docs/config.txt for more details.
+
+Command: p_alpha
+Type:    value command
+Action:  Change the alpha transparency for a selected portal. You can select
+         a portal by clicking on it (only if it already has alpha transparency)
+	 or else by using the 'hi' command. Legal values for p_alpha are
+	 between 0 and 100.
+
+Command: extension
+Type:    general command
+Action:  Perform the specified system specific extension. Currently the X11 port
+         is the only port that has extensions (sim_pal, sim_grey, and sim_332). They
+	 are used when simulating 15/16-bit display mode on a 8-bit display.
+
+Command: bind
+Type:    general command
+Action:  Bind a key to a command. The given key can be anything like (alt-c,
+         shift-pgdn, home, ctrl-space, ...). The command can be anything that
+	 you can execute in the console. If you only give a key this command
+	 will show the current command that is bound to that key. If you give
+	 no parameters then all current key-bindings will be listed. Note that
+	 if you bind a key which has already been bound then the old key-binding
+	 will be removed.
+
+Command: snd_play
+Type:    general command
+Action:  Play the given 'wav' file (currently only has effect on Windows) as an
+         'ephemeral' wave.
+
+Command: snd_volume
+Type:    value command
+Action:  Change the master volume. Value between 0 and 1.
+
+Command: s_fog
+Type:    general command
+Action:  If no arguments are given this command will show the fog settings for the
+         current sector. Otherwise you can set the fog level for this sector.
+	 Syntax is 's_fog r,g,b,density'.
+
+Command: move3d
+Type:    boolean command
+Action:  Toggle between between pure 3D movement (the old way) and
+         'comfortable' movement (Quake-like). The latter is now default. This
+	 basicly affects the left and right arrow keys which now rotate the
+	 camera how you would expect it.
+
+Command: freelook
+Type:    boolean command
+Action:  If freelook is enabled the mouse moves around like in Quake.
+         By default freelook is disabled.
+
+Command: addbot
+Type:    general command
+Action:  Add a sprite that moves randomly through the dungeon.
+
+Command: delbot
+Type:    general command
+Action:  Remove the last added bot.
+
+

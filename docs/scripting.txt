@@ -1,0 +1,148 @@
+Proposal for the new scripting system.
+
+Script is a class that is used for every possible script in the
+world. There is only one Script instance even if the script is
+run multiple times and even if the same Script is attached to
+several objects at once.
+
+RunningScript is a class that is instantiated every time some
+script is run for an object. It is removed again when the script
+stops executing. There can be many RunningScript instances for
+a given Script instance.
+
+A language implementor will implement subclasses of Script
+and RunningScript to implement the specific language.
+
+
+
+class CsObject
+{
+  // This class already exists in Crystal Space. It is the common
+  // ancestor of all objects that need to be manipulated from within
+  // the script language. Sectors, Things, Lights, and Collection
+  // objects are all CsObjects. More will probably follow (the world
+  // itself for example).
+  // A running script will also be a CsObject so that that can also be
+  // manipulated using many of the methods.
+  // A script will also be a CsObject so that you can create new
+  // running scripts from that.
+
+  // Get the type of this object (one of CS_LIGHT, CS_SECTOR,
+  // CS_THING, CS_COLLECTION, CS_WORLD, CS_SCRIPTRUN, CS_SCRIPT,
+  // ...).
+  int get_type ();
+
+  // Get the name of this object.
+  char* get_name ();
+};
+
+class Attributes
+{
+  // Represents a list of name/value pairs. The usage of this list is
+  // mandatory but it can be used by a language implementor to create
+  // named variables that need to be kept with some object.
+};
+
+class LanguageLayer
+{
+  // The API for the language.
+  // There is only one instance of this class.
+
+  // Find a named object given some parent object.
+  CsObject* find_object (CsObject* parent, char* name);
+
+  // Start enumeration of all objects in some parent object.
+  CsObject* first_object (CsObject* parent);
+  CsObject* next_object (CsObject* parent, CsObject* obj);
+
+  // Get the type of an object (one of CS_LIGHT, CS_SECTOR,
+  // CS_THING, CS_COLLECTION, CS_WORLD, CS_SCRIPTRUN, CS_SCRIPT,
+  // ...).
+  int object_type (CsObject* obj);
+
+  // Get the name of an object.
+  char* object_name (CsObject* obj);
+
+  // Get the world object.
+  CsObject* get_world ();
+
+  // Get information about the camera.
+  CsObject* camera_sector ();
+  Matrix3* camera_matrix ();
+  Vector3* camera_vector ();
+
+  // Transform an object given some matrix and/or vector.
+  void transform (CsObject* obj, Matrix3& m, Vector3& v);
+  void transform (CsObject* obj, Matrix3& m);
+  void transform (CsObject* obj, Vector3& v);
+  void transform (CsObject* obj, float dx, float dy, float dz);
+  void transform_rot_x (CsObject* obj, float angle);
+  void transform_rot_y (CsObject* obj, float angle);
+  void transform_rot_z (CsObject* obj, float angle);
+
+  // Fill a transformation matrix to do a rotation around
+  // some angle.
+  void matrix_rot_x (Matrix3& m, float angle);
+  void matrix_rot_y (Matrix3& m, float angle);
+  void matrix_rot_z (Matrix3& m, float angle);
+
+  // Set/get the intensities/color of a light object
+  // (Note that class Light is also a CsObject).
+  void set_light_intensity (Light* light, float l1, float l2, float l3);
+  float get_lightmap1_intensity (Light* light);
+  float get_lightmap2_intensity (Light* light);
+  float get_lightmap3_intensity (Light* light);
+
+  // Show/hide some object.
+  void show (CsObject* obj);
+  void hide (CsObject* obj);
+
+  // Activate some trigger on another object (maybe causing
+  // a new script to be run).
+  void activate_trigger (CsObject* object, int trigger_type);
+
+  // Find a script (note that class Script is also a CsObject).
+  Script* find_script (char* name);
+
+  // Run the script (create a new RunningScript) on some object.
+  RunningScript* run_script (Script* script, CsObject* attached);
+
+  // Suspend a script for a specific time (in milliseconds).
+  void suspend (RunningScript* run, long milli);
+
+  // ... and so on ...
+};
+
+
+class Script
+{
+  // Every script gets an instance of this class. It is responsible
+  // for loading the script and possibly compiling it into some
+  // internal form.
+
+  // Create the script with the given name. Where and how the script is
+  // loaded depends on the language used for the script.
+  Script (char* name);
+  ~Script ();
+
+  // Prepare the script for usage (compilation to byte code for
+  // example).
+  void prepare ();
+
+  // Create an instance of a running script.
+  RunningScript* run_script ();
+
+  // Create an instance of a static script info object.
+  StaticScriptInfo* create_static_info ();
+};
+
+class RunningScript
+{
+  // For every running script there is an instance of this class.
+
+  RunningScript (Script* script, CsObject* attached);
+  ~RunningScript ();
+
+  void init ();
+  void step ();
+};

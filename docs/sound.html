@@ -1,0 +1,242 @@
+<html>
+
+<head>
+<meta name="GENERATOR" content="Microsoft FrontPage 3.0">
+<title>CrystalSpace Sound System Document</title>
+</head>
+
+<body bgcolor="#FFFFFF">
+
+<p align="right">Version 0.021 (12 dec 1998)</p>
+
+<p align="right">By <strong>NooTe</strong> (aka <strong>Nathaniel Saint Martin</strong>)</p>
+
+<p align="right"><a href="mailto:noote@bigfoot.com">noote@bigfoot.com</a></p>
+
+<p align="right"><a href="http://www.bigfoot.com/~noote/">http://www.bigfoot.com/~noote/</a></p>
+
+<hr>
+
+<h1 align="center">Sound System for CrystalSpace.</h1>
+
+<p align="center"><strong><font color="#FF0000" size="3">A big WWAARRNNIINNGG... Module
+player is bugged a lot. Also, don't try to play mod !</font></strong></p>
+
+<h3>OS supported :</h3>
+
+<blockquote>
+  <p>I have made a win32 driver using waveOut functions (standard win32 api).</p>
+  <p>Gert Steenssens <a href="mailto:gsteenss@eps.agfa.be">gsteenss@eps.agfa.be</a> have
+  made a (experimental) linux driver.</p>
+  <p>(I cannot do a linux/solaris driver because my pnp awe64 isn't recognize yet, if you
+  have info/solution about this problem, well : email me :-)).</p>
+  <p>I planed to add DirectSound with hardware mixing when this sound system will be
+  stabilized.</p>
+</blockquote>
+
+<h3>File format supported :</h3>
+
+<blockquote>
+  <p>it can read :</p>
+  <blockquote>
+    <p>sun standard <strong>.au</strong> (or <strong>.snd</strong>), 8 and 16 bit PCM, 8 bit
+    G.711 u-Law (no-compressed) ;</p>
+    <p>microsoft <strong>.wav</strong>, 8 and 16 bit PCM ;</p>
+    <p>amiga <strong>.8svx</strong>/<strong>.iff</strong>, 8 bit PCM ;</p>
+    <p>mac <strong>.aiff</strong>, 8 and 16 bit PCM.</p>
+  </blockquote>
+  <p>I'm searching about other usual file format (<a href="http://www.wotsit.org">http://www.wotsit.org</a>
+  don't handle or give (good) information about mac .aiff format).</p>
+  <p>Does some one know about 'Fibonacci-Delta encoding' compression in .8svx/.iff format ?</p>
+</blockquote>
+
+<blockquote>
+  <p>Or about G.721 a-Law ADPCM compression ?</p>
+</blockquote>
+
+<h3>Module file supported :</h3>
+
+<blockquote>
+  <p>currently, my module player don't work correctly but I can read .mod file and play
+  (more or less) it :</p>
+  <blockquote>
+    <p><strong>.mod</strong>, old 4 channel mod format, protracker, fastracker, oktalizer,
+    taketracker and startracker : 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28 and 32
+    channels and 31/15 instruments.</p>
+  </blockquote>
+  <p>I try to made all specific effects in some general effects for all (and future)
+  supported module format (it, s3m...).</p>
+</blockquote>
+
+<h3>Where can get it ?</h3>
+
+<blockquote>
+  <p>In CrystalSpace. distribution at <a href="http://crystal.linuxgames.com">http://crystal.linuxgames.com</a>
+  !</p>
+  <p>or on <a href="http://www.bigfoot.com/~noote/CrystalSpace/Sound">http://www.bigfoot.com/~noote/CrystalSpace/Sound</a>
+  for latest development, fix and others things...</p>
+</blockquote>
+
+<h3>How it work ?</h3>
+
+<blockquote>
+  <p>csSoundDriver class is the interface driver, you might use this for handle you sound
+  driver.</p>
+  <p>This class mix sound in a alone output.</p>
+  <p>I call 'Wave' : the sound get from sound file (not module), 'Module' is... yes, a
+  module get from module file :-). A 'Channel' contient a Wave or a Module output,
+  csSoundDriver mix several Channel (you can define number of channel in properties, see '<a
+  href="#config">How configure sound system ?</a>').</p>
+  <p>csSoundDriver handle a list of Channel, it choice the 'MAX_CHANNELS' channels to mix.
+  The selection of happy channels can be done with a priority function : then you add a
+  Channel in the list, you can set a priority on it.</p>
+  <p>Each module is a channel, so you can add several module in channel list and play it
+  simultaneous, but you cpu free time can decrease a lot !</p>
+  <p>Currently, you can play simultaneous several time one Wave : csSoundDriver handle each
+  with a different... handle. For Modules, its a bit different, you can play only once a
+  Module, you cannot play two time the same Module simultaneous.</p>
+  <p>Well, there are to type of wave control, one is ephemeral : you put a wave in the list
+  of channel, mixing play until the end and kill him (delete), second is a Channel control,
+  you can stop, resume, kill, mute, loop... if you arrive to the end you need to kill him
+  because it wait in the list (but he's desactived).<br>
+  You can control the volume/3d position of the two waves categories (and maybe later
+  effects like reverb, echo...).<br>
+  <br>
+  The first category is best for random sound like ambiance (in a sector or the world) or
+  for other stuff with gui, menu...<br>
+  The second is for entities sounds (sprites, moving things...).<br>
+  An example : for missile, the 'whoosh' must be a second category but the 'boom' can be
+  first category (we don't need to control him).</p>
+</blockquote>
+
+<h3><a name="config">How configure sound system ?</a></h3>
+
+<blockquote>
+  <p>in your configuration file (cryst.cfg) you might have a [SoundDriver] section else make
+  it :-) like this :</p>
+</blockquote>
+
+<pre>
+[SoundDriver]
+; MAX_CHANNELS set the maximum of channels we can mix
+MAX_CHANNELS=16
+; FREQUENCY set frequency supported by sound device (44100, 22050, 11025...)
+FREQUENCY=11025
+; 16BITS set if sound device may use 16 bits (if it supported)
+16BITS=false
+; STEREO enable stereo on sound device (if it supported) (for a 3d sound it
+; can be necessary)
+STEREO=true
+; Active sound driver
+ACTIVE=true
+; Set general volume [0..1]
+; If you put -1 or a value inferior to 0, current device volume is kept.
+VOLUME=-1
+</pre>
+
+<blockquote>
+  <p><strong>MAX_CHANNELS</strong> is the maximum of channels you can mix (only for software
+  mixing, for a hardware multi voice, it the sound card whose fix this) (more is this value,
+  more it can take cpu). </p>
+  <p><strong>FREQUENCY</strong> is the sample frequency for playing (more is this value,
+  more it can take cpu), this value can be fixed by hardware limit, verify it from your
+  manual/driver/manufacturer).</p>
+  <p><strong>16BITS</strong> is for use 16 bits else it use 8 bits playing (depend of you
+  sound card capabilities)</p>
+  <p><strong>STEREO</strong> is for use of... stereo ? YES, you're right, (it depend of your
+  sound card too). this one can be usefully for 3d sound.</p>
+  <p><strong>ACTIVE</strong>, so, you want ear sound, well, set this one to true and it
+  activate your sound driver.</p>
+  <p><strong>VOLUME</strong> is a software or hardware value, from 0 (empty) to 1 (full), it
+  depend of you sound card and/or driver.</p>
+</blockquote>
+
+<h3>waveOut win32 driver configuration ?</h3>
+
+<blockquote>
+  <p>the waveOut win32 driver have is own configuration in addition to general sound driver
+  configuration&nbsp; (see '<a href="#config">How configure sound system ?</a>')</p>
+</blockquote>
+
+<pre>[SoundDriver.waveOut]
+; CALLBACK can be 'function' or 'thread'
+CALLBACK=thread
+; THREAD_PRIORITY can be 'lowest', 'normal' or 'highest'
+THREAD_PRIORITY=highest
+; 16BITS set if sound device may use 16 bits (if it supported)
+REFRESH=10
+</pre>
+
+<blockquote>
+  <p><strong>CALLBACK</strong> method have two choice : 'thread' or 'function'. Thread
+  method start a process whose fill sound data when it receive order (by waveOut). Function
+  callback 'block' program for filling sound data, the call of function is done by waveOut
+  but if us fps (Frame Per Second) is low or system idle is very low, calls to function
+  can't be done (it unstable). I preconize thread method, (theorically) independent of main
+  process idle.</p>
+  <p><strong>THREAD_PRIORITY</strong> is only for thread method, it set the priority of
+  thread : 'lowest' mean than sound thread have a lowest priority than main process,
+  'normal' is equal priority for main process and sound thread, and 'highest' mean than
+  thread priority is... highest than main process ! Better is 'highest' but it might not
+  work in full screen some time (maybe a little bug from me).</p>
+  <p><strong>REFRESH</strong> is the time of refresh of sound data, a '10' value mean
+  refresh sound data 10 times per second. But here, a warning (erh, it's stay an
+  experimental stuff yet ;-)), if you get an fps inferior to this refresh value, it can
+  crash for function callback or cut sound for thread method !</p>
+</blockquote>
+
+<h3>How make a specific driver ?</h3>
+
+<blockquote>
+  <p>the csSoundDriver class is made for a sound card which have only one digital output
+  (like a sb16), if you want add support for multi digital outputs (like a sbawe or a gus),
+  you need to overload csSoundDriver::functionMixing() but it an other thing...</p>
+  <p>For made you own sound driver for CrystalSpace (assume it have one ouput) :</p>
+  <blockquote>
+    <p>- you must do a class whose inherit of csSoundDriver class, some thing like : 'class
+    MyOSSoundDriver : private csSoundDriver' ;</p>
+    <p>- you need to overload csSoundDriver::Open(int Frequency, bool 16bit, bool stereo), for
+    open your OS sound driver&nbsp; ;</p>
+    <p>- you need to overload csSoundDriver::Close(), for close you OS sound driver ;</p>
+    <p>- you need to overload csSoundDriver::setVolume(float volume), for setting volume in
+    you hardware (value is [0...1], so you certainly need to convert it) ;</p>
+    <p>- you need to overload csSoundDriver::nextMemory(), for preparing your next buffer
+    sound system ;</p>
+    <p>- you need to set correctly csSoundDriver::Background value : true if you have you own
+    handler for putting output data, false if you wait a CrystalSpace event
+    (csSystem::NextFrame()) for fill sound memory ;</p>
+    <p>- if you have you own callback function (timer, callback...), you to do fill in this
+    order :</p>
+    <blockquote>
+      <p>1° set size in csSoundDriver::MemorySize (remember this size correspond to number of
+      bytes not to number of samples and set pointer for csSoundDriver::Memory ;</p>
+      <p>2° call csSoundDriver::functionMixing() ;</p>
+      <p>3° (depending of your OS sound driver), write csSoundDriver::Memory in your OS sound
+      driver (like OSS)</p>
+    </blockquote>
+    <p>- if you're waiting for CrystalSpace event (csSystem::NextFrame()), you need to
+    overload csSoundDriver::update() and do :</p>
+    <blockquote>
+      <p>1° verify if you have finish to play current buffer sound memory ;</p>
+      <p>2° prepare next buffer</p>
+      <p>3° call csSoundDriver::functionMixing() ;</p>
+      <p>4° put new data in you OS sound driver</p>
+    </blockquote>
+    <p>-(...)</p>
+  </blockquote>
+</blockquote>
+
+<h3>Why it don't work ?</h3>
+
+<blockquote>
+  <p>hum... :</p>
+  <p>first, are you sure to have a sound card ? :-)</p>
+  <p>second, are you sure that sound card is supported by your OS ?</p>
+  <p>three, are you sure CrystalSpace have a sound driver for your OS ?</p>
+  <p>fourth, are you sure ? see debug.txt, if return a error from sound driver, try an other
+  configuration by changing FREQUENCY, STEREO, 16 BITS, VOLUME and check if ACTIVE is
+  'on/true/1'</p>
+  <p>fifth... bin, p'têt' qu'c'est un bogue ? (well, maybe it's a bug ?)</p>
+</blockquote>
+</body>
+</html>

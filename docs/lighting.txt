@@ -1,0 +1,30 @@
+This document gives a VERY short explanation of the static lighting
+system used in version 0.10 of Crystal Space (not in the earlier versions).
+
+The basic principle is as follows. First we initialize all lightmaps to
+black (or the ambient color). Then, for every light in the world, we
+generate a view frustrum as seen from the position of that light. The
+frustrum is defined as a set of 3D polygon or light patches. Every light
+patch is clipped against the relevant portals until nothing remains (light
+patch becomes empty). Every light patch in this frustrum is
+in fact a projection of the light on the normal polygons. It is in that
+area that we need to update the lightmap for every polygon.
+
+So for every polygon hit by the light we use the light patch and cast
+beams from the light to every lightmap point on the polygon (lightmap
+points are often defined every 16x16 texels although you can change this
+in Crystal Space). We know that in principle the beam of light should reach
+the polygon since the light patch gives the boundary of where the light
+can reach the polygon. But the frustrum was generated ignoring Things.
+So it is possible that there is a Thing blocking a specific beam of
+light. We need to test for that.
+
+If there is a succesful hit then we calculate the distance between the
+light and the point on the polygon and update the intensity there.
+
+Note that light patches are slightly expanded before clipping and also
+before using in the lightmap-updater. This is to accomplish better results
+at boundaries of polygons (still not perfect though).
+
+This is it. I still need to write a better document :-)
+

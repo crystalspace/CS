@@ -1,0 +1,28 @@
+Render Quality
+--------------
+
+With MIXLIGHTS and TXTMODE you can control the final quality of the
+renderer (including the choice of colors) and also the startup speed
+of Crystal Space. The effects of these flags are also dependent on the
+pixel width of your display (current 8-bit or 16-bit).
+
+The following table describes all the (useful) possibilities.
+'Display' is the width of the display (8-bits or 16-bits).
+'MIX' is the setting for MIXLIGHTS.
+'TXTMODE' is the setting for TXTMODE.
+'TSpeed' is the speed of the texture cache. From very good to very bad,
+    here are the ratings: 'fast', 'good', 'fair', 'slow', and 'bad'.
+
+Note that all modes with TXTMODE equal to '24bit' are not supported yet.
+
+Display MIX      TXTMODE T TSpeed Remarks
+-------------------------------------------------------------------------
+8-bit   nocolor  global  - fast   no colored lights
+        true_rgb global  - fair   RGB lights
+        true_rgb private - slow   RGB lights, texture colors more accurate
+        true_rgb 24bit   - fair   RGB lights, texture colors more accurate
+16-bit  nocolor  global  - good   no colored lights
+        true_rgb global  - good   RGB lights
+	true_rgb private - bad    RGB lights, texture colors more accurate
+	true_rgb 24bit   - fair   RGB lights, texture colors more accurate
+

@@ -1,0 +1,156 @@
+The Keyboard Interface
+----------------------
+
+There is currently only a primitive physics system in Crystal Space.
+However, for navigating in 3D Crystal Space supports the
+following keys:
+
+	b		Turn camera the other way arround.
+
+	up		Go forward.
+	shf-up		Go forward faster.
+	ctrl-up		Go forward very slow (for debugging).
+	alt-up		Go up.
+	shf-alt-up	Go up faster.
+	ctrl-alt-up	Go up very slow.
+
+	down		(similar to 'up')
+	...
+
+	left		Turn left (rotate camera to the left).
+	shf-left	Faster.
+	ctrl-left	Slower.
+	alt-left	Stride left.
+	shf-alt-left	Faster.
+	ctrl-alt-left	Slower.
+
+	right		(similar to 'left')
+	...
+
+	pgup		Rotate camera upwards.
+	shf-pgup	Faster.
+	ctrl-pgup	Slower.
+	alt-pgup	Rotate camera around Z-axis.
+	shf-alt-pgup	Faster.
+	ctr-alt-pgup	Slower.
+
+	pgdn		(similar to 'pgup')
+	...
+
+	3		Change mode of movement. Default is like most 3D games
+			do. If you press this then movement will be fully 3D.
+			This affects the left and right arrow keys only.
+
+	\		Enable freelook mode (press once to enable, press
+			again to disable).
+
+	a		Activate a trigger.
+
+	space		Fire a missile (a moving sprite and a dynamic light).
+
+	l		Toggle lighting (default on).
+
+	e		Toggle edges on/off (default off). This is
+			useful for debugging world files.
+			When edges are on you will also see where all
+			the lights are. Clicking on a light will select
+			it (useful for the next key).
+	
+	shf-e		Toggle frustrum viewing on/off (default off).
+			This is useful for debugging the engine.
+			With this option you see the view frustrum
+			around the selected light (see the 'e' key
+			above). The white outlines are the shapes where
+			the light may hit the polygon (ignoring radius
+			of the light). The red lines connect the vertices
+			of every outline with the center of the light.
+
+	c		Load coordinates from the 'coord' file
+			and jump camera to that location.
+	
+	shf-c		Save current coordinates to the 'coord' file.
+
+	alt-c		Show where we are (current sector and coordinates).
+			Output comes into 'debug.txt'.
+
+	ctr-c		Toggle display of coordinates while we are running.
+
+	q		Quit program.
+
+	t		Toggle texture mapping or flat drawing.
+
+	shf-t		Enable mipmapping. Three possible states:
+				'on' (default) mipmapping is used
+				     according to the distance.
+				'off': mipmapping is never used.
+				'always': mipmapping is always used.
+
+	alt-t		Toggle texel filtering (default off). This is an
+			experimental feature which will slow down the engine
+			considerably and also introduces some artifacts
+			on the borders of polygons.
+
+	ctr-t		Turn on/off the display of things (same as
+			'things' command). Default is on.
+
+	i		Dump information about the texture cache.
+
+	r		Clear the texture cache.
+
+	p		Do a performance test on the current location.
+
+	shf-p		Toggle perfect texture mapping on/off (default off).
+
+	alt-p		Switch between 'smart', 'step16', and 'step32' scanline
+			interpolation modes (see console.txt for more info
+			on the 'inter' command).
+
+	m		Toggle 'map' mode.
+
+	alt-a		Make a screenshot in PCX format. This currently
+			only seems to work in the DJGPP port.
+
+	g		Increase gamma level of display.
+
+	shf-g		Decrease gamma level of display.
+
+	f		Increase FOV value.
+
+	shf-f		Decrease FOV value.
+
+	alt-f		Toggle FPS dipslay.
+
+	tab		Toggle input console (see below for list of
+			commands).
+
+	1		Experimental: create a new pulsating dynamic
+			light at your location.
+	
+	shf-1		Delete the last created dynamic light.
+
+	alt-1		Delete all dynamic lights.
+	
+	2		...BROKEN...
+
+	shf-2		...BROKEN...
+
+	F1		(X version only) Used when simulating a 15/16-bit
+			display on an 8-bit display (-depth option). This
+			will compute an optimal palette for the current
+			frame.
+
+	F2		(X version only) Used when simulating a 15/16-bit
+			display on an 8-bit display (-depth option). This
+			will compute a greyscale palette and use that instead
+			of the standard 3:3:2 truecolor palette.
+
+	F3		(X version only) Restore the standard 3:3:2 palette
+			used for simulating 15/16-bit on an 8-bit display.
+
+	d		Assigned to 'debug0 toggle'.
+
+	shf-d		Assigned to 'debug1'.
+
+	*		Enable/disable collision detection.
+
+

@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD W3 HTML 2.0//EN">
+<HTML>
+<HEAD>
+<TITLE>MazeD: The User Interface</TITLE>
+</HEAD>
+<BODY TEXT=#FFFFFF LINK=#00D0D0 VLINK=#00FFFF BGCOLOR=#003050 BACKGROUND="img/texture6.gif">
+
+<H1>The User Interface</H1>
+<P>
+This section covers miscelaneous aspects related to Maze Editor's user interface
+such as basical ideology, windows and their meaning and so on.
+</P>
+
+<A NAME="Ideology"></A>
+<H2>Interface ideology</H2>
+<P>
+The user-interface is almost-CUA compliant :-) First the terminology: a window
+does not neccessarily have a title bar or a border, it is just a rectangle
+which can be filled with anything. Any window can have "child windows" which
+are "inserted" into "parent" window. Child windows cannot extend over parent's
+bounds, if they do, they are clipped. There is a exception from this rule
+which is used, particularily, for menus (windows that have different "parent"
+and "clip parent" windows).
+</P>
+<P>
+Here is a example how a CSWS (Crystal Space Windowing System) standard window
+looks like: (sorry if this looks like a Microsoft Press bullshit :-), this is
+just to avoid confusion because of different terms used in different windowing
+systems).
+<CENTER>
+<IMG SRC="img/csws.gif" ALT="Example of How A Window Looks Like">
+</CENTER>
+<UL>
+  <LI>Windows (won't say "objects" :-) are dragged with right mouse button
+      As a exception, windows can be dragged with left mouse button too.
+  <LI>Right mouse button click on any window pops up a context menu, if
+      available.
+</UL>
+Here and further left mouse button is called shortly LMB and right mouse
+button is called RMB. There is no support in MazeD for center button since
+most mices today has only two buttons.
+</P>
+<P>
+Menus and dialog items often has some underlined characters. They are called
+"hot keys" and are used if you want to activate that item by keyboard. To use
+keyboard you should press Alt+"character that is underlined".
+For example, to activate this menu item: <U>Q</U>uit you should press Alt+Q.
+As a exception from rule, if active dialog field doesn't eat the character
+(for example, a button labeled <U>P</U>ushMe won't eat any keys except P
+when it is active (AKA focused)) you can press the same letter without Alt.
+</P>
+<P>
+Menu bars are activated either by mouse (in which case it is deactivated
+as soon as you release mouse button) or by keyboard. For last one you should
+press Alt+hotkey, then use arrow keys to navigate around, Enter to choose
+a menu item (or to open a submenu if item has a arrow to the right of it),
+left/right keys on a menu item with a submenu opens/closes the submenu(s).
+Hot keys can be pressed without Alt since (see exception from hot key rule
+in paragraph above) menu item does not eat any key except its own hot key.
+</P>
+<P>
+<I>... to be continued ... ;-)</I>
+</P>
+
+<A NAME="Windows"></A>
+<H2>Maze Editor Windows</H2>
+<P>
+Here is how Maze Editor basically looks like:
+<IMG SRC="img/MazeD.gif" ALT="Maze Editor">
+The Tool Box contains a number of buttons that switches between editing modes.
+Editing mode has impact on how mouse clicks in Draft Editor and 3D View are
+interpreted. For example, in "Create Vertex" mode (a red little flag in
+top-left corner of toolbox) mode a LMB click will insert a vertex at given
+position into current model. Clicking RMB on a toolbox button brings a
+context menu where you can switch between several editing modes available
+for assigning to this button. On the picture you can see how the "Create
+3D preset" button is set up; if you press for example LMB on the sphere,
+the picture on the top-level button will be replaced with the sphere and
+you enter into the "Create sphere" mode.
+</P>
+<P>
+A short description of each button (buttons are described in the left-to-right
+and top-to-bottom direction): <UL>
+  <LI>Toolbox:
+    <UL>
+      <LI><B>"Create Vertex"</B>. Context menu: <B>"Delete Vertex"</B>,
+          <B>"Delete Selected Vertices"</B>, <B>"Delete Selected Polygons"</B>.
+      <LI><B>"Create Light"</B>.
+      <LI><B>"Create 2D Preset"</B>. Context menu: <B>"Create Triangle"</B>, <B>"Create Square"</B>,
+          <B>"Create Hexagon"</B>, <B>"Create N-gon"</B>.
+      <LI><B>"Create 3D Preset"</B>. Context menu: <B>"Create Box"</B>, <B>"Create Prism"</B>,
+          <B>"Create Pyramid"</B>, <B>"Create Torus"</B>, <B>"Create Sphere"</B>. Right clicking
+          on any button should bring the object complexity setup dialog where
+          you can enter the number of vertices, faces, sectors etc.
+      <LI><B>"Create Polygon"</B>. Context menu: <B>"Click Each Vertex"</B>, <B>"Triangle Fan"</B>,
+          <B>"Triangle Strip"</B>, <B>"Square Strip"</B>.
+      <LI><B>"Select"</B>. Context menu: <B>"Select Vertices"</B>, <B>"Deselect Vertices"</B>,
+          <B>"Invert Vertices"</B>, <B>"Select Polygons"</B>, <B>"Deselect Polygons"</B>,
+          <B>"Invert Polygons"</B>.
+      <LI><B>"Move"</B>
+      <LI><B>"Scale"</B>
+      <LI><B>"Rotate"</B>
+    </UL>
+  <LI>Window Manager:
+    <UL>
+      <LI><B>"Window Layout 1"</B>
+      <LI><B>"Window Layout 2"</B>
+      <LI><B>"Window Layout 3"</B>
+      <LI><B>"Window Layout 4"</B>
+          When switching window layouts MazeD stores the type, parameters and
+          position of each window except menu bar. Then you can re-position
+          and change other parameters of your windows; when you will switch to
+          previous layout windows will be restored as they were before you
+          changed them.
+      <LI><B>"Close all windows"</B>
+      <LI><B>"Recycle Windows"</B>. Windows are restored to their default position
+          and parameters.
+      <LI><B>"Rotate Coordinate System"</B>. In this mode, after clicking with LMB
+          in draft editor window you can move the mouse to rotate the
+          coordinate system. Horizontal mouse motion rotates coordinate system
+          horizontally (around OZ axis) while vertical mouse motion rotates
+          coordinate system around OX axis. This is not a fully
+          6-degree-of-freedom system (although it can be easily expanded to
+          be so), but its enough for practical goals. The problem is that
+          mouse has only two motion directions :-)
+      <LI><B>"Zoom in/out"</B>. In this mode clicking LMB inside a draft editor window
+          will zoom the picture in, clicking RMB will zoom it out.
+      <LI><B>"Zoom to rectangle"</B>. In this mode you're allowed to drag (with LMB)
+          a rectangle around the area of model you're interested in; after
+          this when you release LMB the view zooms so that selected area will
+          occupy maximally possible area of view.
+      <LI><B>"Pan View"</B>. Pressing LMB in a draft editor window will enter into
+           panning mode until you will release it. You can move the draft by
+           moving mouse. Scale and rotation factors are not affected.
+      <LI><B>"Toggle axis"</B>. This button shows and allows to be changed the
+          visibility status of coordinate axis.
+      <LI><B>"Toggle grid"</B>. This button shows and allows to be changed the
+          visibility status of coordinate grid. RMB on this button will bring
+          up the grid setup dialog box.
+    </UL>
+</UL>
+</P>
+
+<A NAME="Keys"></A>
+<H2>Hot keys</H2>
+<P>
+I'm a son of CUA :-) and as such, many keys are alike their counterparts in CUA,
+whenever possible (and whenever I like it :-) However, most keys are MazeD-specific,
+I've tried to bind most used functions to a key since mouse is good for
+beginners, but with keyboard you can work a lot faster.
+</P>
+<P>
+I've tried to bind most keys to function keys like HOME, END, INS, DEL and
+their combinations with CTRL, ALT, SHIFT. The reason for this is that that's
+what they (function keys) were made for :-)
+</P>
+<DL>
+  <DT><B>Shift+Q</B>
+  <DD>Quit editor. I've considered using F3 (CUA) for this but thought that
+      many (including me :-) will consider this weird.
+  <DT><B>Ins</B>
+  <DD>Enter "Create Vertices" mode
+  <DT><B>Del</B>
+  <DD>Enter "Delete Vertices" mode
+  <DT><B>Ctrl+Ins</B>
+  <DD>Enter "Create Polygon By Clicking Each Vertex" mode
+  <DT><B>Ctrl+Alt+Ins</B>
+  <DD>Enter "Create Triangle Fan" mode
+  <DT><B>Ctrl+Shift+Ins</B>
+  <DD>Enter "Create Triangle Strip" mode
+  <DT><B>Ctrl+Shift+Alt+Ins</B>
+  <DD>Enter "Create Quad Strip" mode
+  <DT><B>Ctrl+Del</B>
+  <DD>Delete selected vertices (no confirmation!)
+  <DT><B>Ctrl+Shift+Del</B> (not Ctrl+Alt+Del! :-)
+  <DD>Delete selected polygons
+  <DT><B>Home</B>
+  <DD>Center all draft views to the origin of coordinates
+  <DT><B>Ctrl+Home</B>
+  <DD>Make all draft views to maximally fit the active model
+  <DT><B>Ctrl+1...4</B>
+  <DD>Choose window layout 1...4
+  <DT><B>+</B>, <B>-</B>, <B>*</B>
+  <DD>Enter "Select/Deselect/Invert Vertices" mode
+  <DT><B>Ctrl+'+'</B>, <B>Ctrl+'-'</B>, <B>Ctrl+'*'</B>
+  <DD>Select/Deselect/Invert all vertices of the active model
+  <DT><B>Shift+'+'</B>, <B>Shift+'-'</B>, <B>Shift+'*'</B>
+  <DD>Enter "Select/Deselect/Invert Polygons" mode
+  <DT><B>Ctrl+Shift+'+'</B>, <B>Ctrl+Shift+'-'</B>, <B>Ctrl+Shift+'*'</B>
+  <DD>Select/Deselect/Invert all polygons of the active model
+  <DT>
+  <DD>
+</DL>
+
+</BODY>
+</HTML>

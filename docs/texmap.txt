@@ -1,0 +1,490 @@
+(note, this text must be read with tabsize 8 and a fixed width font).
+
+This document contains two parts. The first part explains how the
+ORIG/FIRST/SECOND commands are used (in the world file) to map a
+texture on a polygon. The second part is more technical and explains
+how the texture mapper works mathematically.
+
+
+=============
+| Section 1 |
+=============
+
+The ORIG/FIRST/SECOND vertex describe the texture plane. What CS does 
+internally is to create a transformation matrix/vector which translates 
+object space (3D coordinates) to texture space (UV coordinates). Here is how 
+this works: 
+
+    First a few definitions: 
+
+        ORIG vector: Vo 
+        FIRST vector: V1 
+        SECOND vector: V2 
+        FIRST_LEN: len1 
+        SECOND_LEN: len2 
+        Length of V1-Vo: l1 
+        Length of V2-Vo: l2 
+
+    Vo, V1, and V2 are vertices in object space. These define the local coordinate 
+    system for texture space. So we have the following mapping: 
+
+        Vo -> (0,0) 
+        V1 -> (len1,0) 
+        V2 -> (0,len2) 
+
+    It is important to realize that the coordinate (0,0) in texture space is the top-left 
+    coordinate of the texture and (1,1) is the bottom-right corner. The coordinate 
+    (2,2) is thus the bottom-right corner of a tiled texture (2x2 times). 
+
+    The conversion to the matrix happens as follows: 
+  
+        Vu = (len1 / l1) * (V1-Vo) 
+        Vv = (len2 / l2) * (V2-Vo) 
+  
+              / Vu.x Vv.x 1 \ 
+        Mot = | Vu.y Vv.y 1 | 
+              \ Vu.z Vv.z 1 / 
+
+    (The last column represents the W texture component which is not used). 
+
+        Vot = < Vo.x Vo.y Vo.z > 
+
+    So Mot and Vot are the transformation matrix/vector to go from object 
+    to texture space. Use these as follows: 
+
+
+        T = Mot * (O - Vot)
+
+    with O being the object space vector that you want to convert and
+    T the texture space vector. Only the x and y components are used of T.
+    'x' represents U and 'y' represents V.
+ 
+Using the last equation you can convert every point of your polygon to
+texture space.
+
+=============
+| Section 2 |
+=============
+
+This document explains the formulas that are used to perform texture
+mapping for a polygon. This text assumes that you have read document.txt
+and cam_matr.txt (or at least looked at them). document.txt describes
+how Crystal Space uses portals and also describes the different coordinate
+spaces that are used. cam_matr.txt describes matrices and matrix
+transformations and how those are used inside Crystal Space.
+
+Conventions
+-----------
+
+  - P<s> denotes a polygon in some space. Pw (for example) is a polygon in
+    world space coordinates. The other spaces are 'o' for object space,
+    'c' for camera space, 't' for texture space, and 's' for screen space.
+  - V<s> denotes a vertex in 3D. Vw is a vertex in world space.
+  - M<s><t> denotes a matrix transforming space from <s> to <t>. For
+    example, Mow is a matrix transforming space from object to world.
+    All M<s><t> are 3x3 matrices.
+  - V<s><t> denotes the corresponding vector transforming space from
+    <s> to <t>.
+  - N<s> denotes a plane normal vector (A,B,C) in some space.
+  - V<s>.x, V<s>.y, and V<s>.z are the respective x, y, and z components
+    of a vector (for example, Vw.y is the y component of a vector in
+    world space).
+  - Vt.u, and Vt.v are the respective u, and v components of a
+    vector (in texture space).
+
+Polygon
+-------
+
+A polygon is represented as a set of 3D vertices oriented in clockwise
+order (if the orientation is different, the polygon is not visible on screen).
+There are three versions of any polygon:
+
+  1. Po: the polygon in object space. Here, the vertices of the polygon
+     are given in object space coordinates (see document.txt for
+     an explanation of what object space, world space, ... mean).
+
+  2. Pw: the polygon in world space. For a sector world space is equal
+     to object space but for a thing there is a transformation from
+     object space to world space given as:
+
+	Vw = Mow * Vo - Vow
+
+     (meaning: the vertex in world space coordinates (Vw) is given as
+     the vertex in object space coordinates (Vo) transformed by the
+     matrix from object to world space (Mow) and the vector from object to
+     world space (Vow))
+
+     This transformation is recomputed whenever a thing moves.
+
+  3. Pc: the polygon in camera space. Before viewing, every relevant
+     vertex is transformed from world space to camera space using the
+     following equation:
+
+	Vc = Mwc * (Vw - Vwc)
+
+Note, all these three versions of a polygon are represented by the
+same Polygon3D object. The change from object to world and world to
+camera space happens inside the Vertex class that is referenced by
+Polygon3D.
+
+Associated with every polygon there is also a plane normal or plane
+equation:
+
+	N:    A*x + B*y + C*z + D = 0
+
+There are also three versions of this plane equation (one for object
+space, one for world space, and one for camera space):
+
+	No:   Ao*x + Bo*y + Co*z + Do = 0
+	Nw:   Aw*x + Bw*y + Cw*z + Dw = 0
+	Nc:   Ac*x + Bc*y + Cc*z + Dc = 0
+
+Camera
+------
+
+A camera is represented as a matrix (Mwc) and a vector (Vwc). In
+fact the camera describes the transformation between world and camera
+space. The inverse transformation (Mcw) from camera space to world
+space is also kept inside a Camera object because it can be used
+for movement (for example, to move forward one would want to move
+forward along the Z axis in camera space and not in world space).
+
+Texture
+-------
+
+There is also a texture associated with every polygon (unless it is a
+portal with no transparent overlay). The texture represents a 2
+dimensional rectangular space where (0,0) is one corner of the texture
+and (1,1) is the opposite corner. If a texture is overlayed onto a
+rectangular polygon such that one corner is mapped onto (0,0) in texture
+space and the opposite corner is mapped onto (2,2) then the texture will
+be tiled four times across the surface of the polygon.
+
+To transform object to texture space we have the following equation:
+
+	Vt = Mot * (Vo - Vot)
+
+similarly for world space:
+
+	Vt = Mwt * (Vw - Vwt)
+
+and for camera space:
+
+	Vt = Mct * (Vc - Vct)
+
+So, just as there are three versions of the polygon (Po, Pw, and Pc) and
+three plane equations, we also have three equations transforming the
+various spaces to the texture. Mot and Vot (object to texture space)
+are fixed (calculated at load time). Mwt and Vwt (world to texture space)
+are the same for sectors but for things they are calculated whenever
+a thing moves. Mct and Vct (camera to texture space) are calculated every
+time the corresponding polygon is visible and needs to be drawn on screen.
+
+Note that the texture transformation matrix is actually a transformation
+from 3D to 3D. We simply don't use the Z component in texture space (it
+is just ignored).
+
+Perspective correction
+----------------------
+
+Objects in camera space are still 3D and thus not suited for immediate
+display on a 2 dimensional screen. Therefore you still need to do perspective
+correction as follows:
+
+		F * Vc.x
+	x = ---------------
+		  Vc.z
+
+		F * Vc.y
+	y = ---------------
+		  Vc.z
+
+(x,y) are then the 2 dimensional coordinates corresponding to the 3D
+vertex (lets call this 2D vector Vs).
+
+F is some factor needed to get a correct Field Of Vision (FOV). Crystal
+Space currently uses the height of the display (in pixels) for this. You
+can experiment with other values using the -fov commandline option or
+use the 'f'/shf-'f' keys while the program is running.
+
+
+Bringing It All Together
+------------------------
+
+Using all this information we have enough to correctly map a texture
+on screen. Let's disregard clipping for the moment and just explain all
+the steps from the original object space polygon until the final texture
+mapped polygon on screen.
+
+We will assume that the polygon (and the texture) has already been
+transformed from object to world space. So we start with a world space
+polygon: Pw.
+
+First all vertices of the polygon are transformed to camera space (note
+that in Crystal Space this is done earlier since vertices are shared
+for one sector. This text ignores that and just concentrates on one
+polygon) with the equation:
+
+	Vc = Mwc * (Vw - Vwc)
+
+(Also note that at this point you could discard vertices because they
+are behind the view plane (or Z=0). We assume here that the polygon
+is completely visible so this does not matter)
+
+At this point we do perspective correction on the polygon. This means
+that we create a new 2 dimensional polygon with vertices Vs (screen space)
+using the following equations:
+
+		   F * Vc.x
+	Vs.x = ---------------
+		     Vc.z
+
+		   F * Vc.y
+	Vs.y = ---------------
+		     Vc.z
+
+Now we create the matrix to transform camera space to texture space
+starting from the matrix to transform world space to texture space.
+Given:
+
+	Vc = Mwc * (Vw - Vwc)
+
+we calculate (using the inverse matrix of Mwc):
+
+	Mcw * Vc + Vwc = Vw				(1)
+
+Given also:
+
+	Vt = Mwt * (Vw - Vwt)				(2)
+
+we substitute (1) in (2):
+
+	Vt = Mwt * (Mcw * Vc + Vwc - Vwt)
+
+this can also be written as:
+
+	Vt = Mwt * (Mcw * Vc + Mcw * Mwc * (Vwc - Vwt))
+
+and:
+
+	Vt = Mwt * Mcw * (Vc + Mwc * (Vwc - Vwt))
+
+if we say that:
+
+	Mct = Mwt * Mcw
+	Vct = Mwc * (Vwt - Vwc)
+
+we get:
+
+	Vt = Mct * (Vc - Vct)
+
+and this is the equation transforming camera space to texture space.
+
+
+Then we need to transform the world space plane equation to a camera
+space plane equation. This we do as follows:
+
+The plane vector Nw = (Aw,Bw,Cw) is transformed to Nc = (Ac,Bc,Cc) using the
+following equation:
+
+	Nc = Mwc * Nw
+
+Using the first vertex of the polygon in camera space coordinates (Vc) we
+then calculate Dc as follows:
+
+Since the plane equation in camera space is equal to:
+
+	Ac * Vc.x + Bc * Vc.y + Cc * Vc.z + Dc = 0
+
+(for every vertex Vc on the polygon) we can calculate the missing Dc as
+follows:
+
+	Dc = -Ac * Vc.x - Bc * Vc.y - Cc * Vc.z
+
+
+Using this information (the polygon in perspective corrected 2D coordinates,
+the transformation from camera space to texture space and the plane equation
+in camera space) we can draw the polygon on the screen and perform correct
+texture mapping. This happens as follows:
+
+From the perspective correction equations:
+
+		   F * Vc.x
+	Vs.x = ---------------
+		     Vc.z
+
+		   F * Vc.y
+	Vs.y = ---------------
+		     Vc.z
+
+we can invert them to:
+
+		  Vs.x * Vc.z
+	Vc.x = -----------------			(1)
+		       F
+
+		  Vs.y * Vc.z
+	Vc.y = -----------------			(2)
+		       F
+
+we can now substiture (1) and (2) into the following equation:
+
+	Ac * Vc.x + Bc * Vc.y + Cc * Vc.z + Dc = 0
+
+and get:
+
+	Ac * Vs.x * Vc.z   Bc * Vs.y * Vc.z   F * Cc * Vc.z
+	---------------- + ---------------- + ------------- = -Dc
+	        F		   F		    F
+
+or:
+
+	  Ac * Vs.x   Bc * Vs.y     Cc        1
+        - --------- - --------- - ------ = ------
+	    F*Dc	F*Dc	   F*Dc     Vc.z
+
+This equation is very important. From this it follows that 1/z linear
+is in screen space and this can be used for perspective correct texture
+mapping. Lets define the following three new variables:
+
+		-Ac
+	M = -------------
+	       F * Dc
+
+		-Bc
+	N = -------------
+	       F * Dc
+
+		-Cc
+	O = -------------
+	         Dc
+
+
+So the 1/z equation in linear screen space is then written as:
+
+	  1
+       ------ = M * Vs.x + N * Vs.y + O			(3)
+        Vc.z
+
+So now we can easily calculate 1/z at every point in screen space. But
+we also need to calculate the texture coordinates (u,v) or Vt. Lets
+call the individual fields of the transformation matrix Mct as follows:
+
+	      / m11 m12 m13 \
+	Mct = | m21 m22 m23 |	Vct = (v1 v2 v3)
+	      \ m31 m32 m33 /
+
+For simplicity lets use u for Vt.u and v for Vt.v (the (u,v) texture
+coordinates). Let us also use x, y, and z for Vc.x, Vc.y, Vc.z respectively.
+
+Then from:
+
+	Vt = Mct * (Vc - Vct)
+
+we get:
+
+	u = m11 * (x-v1) + m12 * (y-v2) + m13 * (z-v3)
+	v = m21 * (x-v1) + m22 * (y-v2) + m23 * (z-v3)
+
+This can be rewritten as:
+
+	u = m11 * x + m12 * y + m13 * z - (m11*v1+m12*v2+m13*v3)
+	v = m21 * x + m22 * y + m23 * z - (m21*v1+m22*v2+m23*v3)
+
+Lets call:
+
+	P = - (m11*v1+m12*v2+m13*v3)
+	Q = - (m21*v1+m22*v2+m23*v3)
+
+and we have:
+
+	u = m11 * x + m12 * y + m13 * z + P
+	v = m21 * x + m22 * y + m23 * z + Q
+
+
+
+Like before we substitute the inverse perspective correction equations
+(1) and (2) into the previous equations and we get:
+
+	    m11 * Vs.x * z   m12 * Vs.y * z
+	u = -------------- + -------------- + m13 * z + P
+		   F		    F
+
+	    m21 * Vs.x * z   m22 * Vs.y * z
+	v = -------------- + -------------- + m23 * z + Q
+		   F		    F
+
+Rewrite as:
+
+	 u    m11 * Vs.x   m12 * Vs.y	       P
+	--- = ---------- + ---------- + m13 + ---
+	 z	  F		F	       z
+
+	 v    m21 * Vs.x   m22 * Vs.y	       Q
+	--- = ---------- + ---------- + m23 + ---
+	 z	  F		F	       z
+
+Substitute the linear 1/z equation (3) into this:
+
+
+	 u    m11 * Vs.x   m12 * Vs.y
+	--- = ---------- + ---------- + m13 + P * (M * Vs.x + N * Vs.y + O)
+	 z	  F		F
+
+	 v    m21 * Vs.x   m22 * Vs.y
+	--- = ---------- + ---------- + m23 + Q * (M * Vs.x + N * Vs.y + O)
+	 z	  F		F
+
+Rewrite as:
+
+	 u    m11 * Vs.x + m12 * Vs.y + F*(m13 + P*(M*Vs.x + N*Vs.y + O)
+	--- = ----------------------------------------------------------
+	 z				   F
+
+	 v    m21 * Vs.x + m22 * Vs.y + F*(m23 + Q*(M*Vs.x + N*Vs.y + O)
+	--- = ----------------------------------------------------------
+	 z				   F
+
+Again rewrite:
+
+	 u
+	--- = (m11/F + P*M) * Vs.x + (m12/F + P*N) * Vs.y + (m13 + P*O)
+	 z
+
+	 v
+	--- = (m21/F + Q*M) * Vs.x + (m22/F + Q*N) * Vs.y + (m23 + Q*O)
+	 z
+
+These are again two important equations because they state that u/z
+and v/z are also linear in screen space. Using this we can easily
+calculate (u,v) at every screen space point.
+
+Lets call:
+
+	J1 = m11/F + P*M
+	J2 = m12/F + P*N
+	J3 = m13 + P*O
+
+	K1 = m21/F + Q*M
+	K2 = m22/F + Q*N
+	K3 = m23 + Q*O
+
+Then we have the following three equations:
+
+	 1
+	--- = M * Vs.x + N * Vs.y + O
+	 z
+
+	 u
+	--- = J1 * Vs.x + J2 * Vs.y + J3
+	 z
+
+	 v
+	--- = K1 * Vs.x + K2 * Vs.y + K3
+	 z
+
+With these three important equations we can do all texture mapping we
+want. With the first equation we can calculate 1/z. This is useful
+for Z-buffering and also for calculating (u,v) from the two other
+equations.
+

@@ -1,0 +1,360 @@
+The Config File Options
+-----------------------
+
+In this document all the possible options that can go into the config
+file ('cryst.cfg') are explained. Some of these options can also be
+placed in the local cryst.cfg file. When this is possible this is
+mentioned below. The local cryst.cfg file is the configuration file
+that is put inside the level archive. Options in the local cryst.cfg
+file always override the global options.
+Note that there are several options influencing the quality of
+rendering and of the colored lights. To better explain these there
+is a seperate section after this one that gives a summary of all
+possibilities. The options controlling output/color quality are:
+MIXLIGHTS and TXTMODE.
+
+Note that every option belongs in some section. The list below always
+mentions: <section>/<option>=<value>. Sections are denoted with [<section>]
+in the config file.
+
+  World/MIXLIGHTS=<value>
+	This flag controls how Crystal Space will control the colored
+	lighting. Note that Crystal Space uses three lookup tables to
+	control the color of a light. How these three lookup tables are
+	defines is set with this flag. Note that this setting influences
+	the speed of the texture cache. This setting is overridden
+	by the -mixing commandline option.
+	  - true_rgb	The three tables are red, green, and blue. An
+	  		accurate form of mixing is used which makes
+			the texture cache a bit slower. This mode is
+			automatically selected if you are running a
+			16-bit display or running with hardware
+			acceleration.
+	  - nocolor	There is no colored lighting. This is the fastest
+	  		way for the texture cache.
+  	Note that you can also specify this option in the local cryst.cfg
+	file.
+  World/TXTMODE=<value>
+	With this option you can control how the textures are managed
+	internally independent of the display width. There are three
+	possibilities:
+	  - global	The original mode. There is one global 256-color
+	  		palette and all textures are mapped to that
+			palette.
+	  - private	Every texture has its own private palette. There
+	  		is still a global 256-color palette (and it is
+			computed the same way as with 'global') but the
+			global palette is only used AFTER lighting has
+			been added.
+	  - 24bit	Every texture is represented in full 24-bit.
+	  		This option is not supported yet.
+	The difference between 'global' and 'private' is that with 'global'
+	all textures are first mapped onto a global palette, then lighting
+	is added (by the texture cache). With 'private' all lighting is
+	added to the color of the texture and only then the conversion to
+	the global palette is made. So 'private' should give much more
+	accurate colors. '24bit' will give about the same quality but
+	will have large textures (24-bit instead of 8-bit) and a slightly
+	faster texture cache.
+	This setting is overridden by the -txtmode commandline option.
+  	Note that you can also specify this option in the local cryst.cfg
+	file.
+  World/AMBIENT_WHITE=<ambient>
+  	Controls the amount of ambient light that is present on all textures
+	even if there is no light shining on that. The value ranges from 0
+	(no white light) to 255 (full bright). Default is 40.
+  World/AMBIENT_RED=<ambient>
+  	Controls the amount of additional red light that is present on all
+	textures. The value ranges from 0 to 255. Default is 0.
+  World/AMBIENT_GREEN=<ambient>
+  	Controls the amount of additional green light that is present on all
+	textures. The value ranges from 0 to 255. Default is 0.
+  World/AMBIENT_BLUE=<ambient>
+  	Controls the amount of additional blue light that is present on all
+	textures. The value ranges from 0 to 255. Default is 0.
+  World/RGB_DIST=<value>
+  	Control the maximum distance between two colors that is accepted
+	by the color allocater before considering two colors from a texture
+	to be the same. The color function that is used is:
+		299*dr*dr + 587*dg*dg + 114*db*db
+	with dr = (r2-r1), dg = (g2-g1) and db = (b2-b1).
+	The default value is 16333. If you lower this value Crystal Space
+	will try to get very close matches for the most occuring values
+	in every texture but this may not leave enough empty color slots
+	for the colors that don't occur very much.
+	A high value will cause a sloppy matching algorithm.
+  World/RGB_COL_DIST=<value>
+  	Control the maximum distance between two colors that is accepted
+	by the color allocater. This value is used when allocating colors
+	for colored lighting. Crystal Space will try to allocate color
+	cells for all colors used in a texture and it will also try to
+	allocate color cells for colored versions of those color cells.
+	Default value is 133333. If you lower this value, the quality
+	of colored lights may get somewhat better but normal lighting for
+	texture will be worse. If you use no colored lighting
+	(MIXLIGHTS=nocolor) this value will not be used.
+  World/WORLDFILE=<file>
+	Use the specified file as the default world file. Default is
+	'world'. Note that you can also specify the world file on the
+	command line.
+
+  TextureMapper/MIPMAP_NICE=<mm>
+	There are four values for MIPMAP_NICE: 'verynice', 'nice', 'ugly',
+	and 'default'. Despite the name 'default' is not the default option :-)
+	'nice' is the default option. This option controls how the
+	mipmapping is done. With 'ugly' mipmapping works by just removing
+	every odd pixel and pixel-line. This is really no mipmapping at
+	all but it makes the creation of the mipmapped texture a little
+	faster. With 'default' (which is not the default) a mean value
+	is calculated for every block of four pixels which is much better
+	than 'ugly'. With 'nice' a box filter is used which gives the
+	best result. 'verynice' also uses a box filter but mipmap level
+	1 (level 0 is not mipmapped) has the same size as mipmap
+	level 0 but is blended somewhat. 'verynice' is very nice :-)
+	but it uses a lot more memory in the texture cache.
+  TextureMapper/BLEND_MIPMAP=<yesno>
+	Default is 'no'. If set to 'yes', all mipmap level 0 textures
+	(the original non-mipmmaped textures) are blended with a box
+	filter. After this process the mipmaps are created as usual
+	(but they will now be more blended because the original texture
+	is more blended). This option has no performance penalty which
+	is not true for MIPMAP_NICE=verynice (which performs a similar
+	blending for mipmap level 1).
+  TextureMapper/MIPMAP_FILTER_1=<list>
+	This is a 3x3 box filter that is used for mipmapping one level.
+	Default is '1,2,1,2,4,2,1,2,1' which should be viewed as:
+		1 2 1
+		2 4 2
+		1 2 1
+  TextureMapper/MIPMAP_FILTER_2=<list>
+	This is 5x5 box filter that is used for mipmapping two levels
+	at once. Default is '1,1,1,1,1,1,2,4,2,1,1,4,8,4,1,1,2,4,2,1,1,1,1,1,1'
+	which should be viewed as:
+		1 1 1 1 1
+		1 2 4 2 1
+		1 4 8 4 1
+		1 2 4 2 1
+		1 1 1 1 1
+  TextureMapper/BLEND_FILTER=<list>
+	This is a 3x3 box filter that is used for blending (either with
+	BLEND_MIPMAP=yes or with MIPMAP_NICE=verynice).
+	Default is '1,2,1,2,4,2,1,2,1' which should be viewed as:
+		1 2 1
+		2 4 2
+		1 2 1
+  TextureMapper/DMIPMAP1=<distance>
+	This floating point option sets the distance at which the first
+	level of mipmapping starts to take effect. By default this is
+	equal to 15. This option corresponds to the -dmipmap1 commandline
+	option.
+  TextureMapper/DMIPMAP2=<distance>
+	Identical to DMIPMAP1 for mipmap level 2 (default is 30).
+	This option corresponds to the -dmipmap2 commandline option.
+  TextureMapper/DMIPMAP3=<distance>
+	Identical to DMIPMAP1 for mipmap level 3 (default is 60).
+	This option corresponds to the -dmipmap3 commandline option.
+  TextureMapper/LIGHTMAP_SIZE=<size>
+  	Set the size of the lightmap boxes. Default is 16.
+	Use 4 or 8 for more accurate lightmaps (but lightmap size will
+	increase and texture cache speed will decrease). Use 32
+	for very blocky textures.
+	Note that LIGHTMAP_SIZE should be a power of 2.
+	Note that Crystal Space will automatically recompute all
+	the lightmaps when this value changes (this make take a long
+	time).
+  	Note that you can also specify this option in the local cryst.cfg
+	file.
+  TextureMapper/CACHE=<size>
+	Set the size of the texture cache. By default this is equal
+	to 4000000 texels. If you have lots of memory you can increase
+	this value so that Crystal Space will run a little faster if you
+	go a lot to several different rooms. If you have little memory
+	I suggest lowering this value. Don't set it below 1200000
+	though because this may cause problems!
+	This option can also be set with the -cache commandline
+	option. Note that this value is the number of texels allocated
+	in the cache. If you're running in 16-bit or 32-bit display mode
+	than one texel is actually larger than one byte. So in 32-bit
+	display mode, a cache of 4000000 is actually 16000000 bytes!
+  TextureMapper/GAMMA=<value>
+	Set the gamma correction. Default value is 1.0. A value of 3 makes
+	the display very light. A value of 0.5 (for example) is very dark.
+	The gamma value can also be set with the -gamma commandline option,
+	or you can change the value at runtime with the 'g' and 'G'
+	keys.
+
+  SimpleConsole/LINEMAX=<lines>
+	Set the maximum number of lines that will be displayed in
+	the output-console at the top of the screen. This console
+	is used for output of several diagnostics commands (but not
+	for the frame rate, this appears at the bottom).
+  SimpleConsole/CONFG=<r,g,b>
+	Set the color that is used for console output and the frame
+	rate counter. Default is 255,255,255 (white).
+	Note that this color is independent of the gamma setting.
+	The console always tries to find the closest possible color
+	given the current palette. If you change the palette by changing
+	the gamma value (by pressing 'g' or 'G' for example) the console
+	will search again for the most fitting color.
+  SimpleConsole/CONBG=<r,g,b>
+	Set the color that is used for console background. Default is
+	0,0,0 (black).
+  SimpleConsole/CONFONT=<font>
+	Set the font to use for the console and frame rate counter. Default
+	is 'auto' which uses an auto-selected font depending on display
+	size. However, this font may be a tad small (especially if running
+	at 320x200). So you can also choose: 'tiny' (very small font),
+	'courier', or 'police' (fixed font).
+  SimpleConsole/COLOREDBG=<yesno>
+	Enabled/disabled colored background for the console. Default is 'yes'.
+	If set to 'no' the console will be transparent which means that
+	Crystal Space will continue rendering the frames with an overlay of
+	the console.
+  SimpleConsole/LINEHISTORY=<hist>
+	Control the size of the history in the console (the history is the
+	number of commands that you can go back to). Default is 32.
+
+  WalkTest/FPS=<yesno>
+	Enable/disable the FPS counter (default is 'yes'). You can
+	disable the FPS counter (frames per second) with this option.
+	The FPS counter can also be enabled/disabled with the
+	-fps/-nofps commandline options.
+  WalkTest/STATS=<yesno>
+	Enable/disable the statistics counter (default is 'no').
+	The statistics counter can also be enabled/disabled with the
+	-stats/-nostats commandline options.
+  WalkTest/COLLDET=<yesno>
+  	Enable/disable the collision detection code which is based on the
+	RAPID library. It is enabled by default ('yes') and can also be
+	controled with the -colldet/-nocolldet commandline options or the
+	'colldet' console command.
+  WalkTest/DEBUG=<yesno>
+	This option is off by default. With it you can enable debugging
+	information. When this is on, there will be more information
+	kept in 'debug.txt' after a crash. Note that this feature only
+	works on systems that can catch a crash (currently only Unix).
+
+  VideoDriver/DRIVER=<value>
+	Choose the renderer. Possible values are 'auto' (default),
+	'software', 'direct3d', 'opengl', or 'glide'. 'opengl' and 'glide'
+	are not supported currently and 'direct3d' is only supported for the
+	Windows version. 'auto' is the prefered mode. It tries to auto-
+	detect if there is the possibililty of hardware accelerated support.
+	Currently this is only functional on the Windows port (since it
+	is the only port with possible hardware acceleration). 'auto' is
+	the same as 'software' on all other systems.
+  VideoDriver/INTERLACING=<yesno>
+	Enable/disable interlacing. This is for the software version only
+	and it can greatly increase the speed of the framerate (almost
+	double). The downside is that you get motion blur (which is almost
+	a nice effect :-)
+	This option corresponds with the -ilace/-noilace command
+	line options and the 'ilace' console command.
+  VideoDriver/WIDTH=<width>
+	The default width of the display. What the real default is is
+	system dependent but often it is 320. The width and height can
+	also be set with the -mode commandline option.
+  VideoDriver/HEIGHT=<height>
+	The default height of the display. What the real default is is
+	system dependent but often it is 200. The width and height can
+	also be set with the -mode commandline option.
+  VideoDriver/DEPTH=<depth>
+	This option is for all ports of Crystal Space where it is possible
+	to control the depth of the display from within Crystal Space
+	itself (currently SVGALIB, Windows (fullscreen), GGI, OS/2,
+	Watcom/DOS, and DJGPP (with ALLEGRO) support this option).  Use 8,
+	15, or 16 here (default is 8). Note that 15 is not supported by the
+	Windows version. Note that the Windows version ignores the given
+	depth if it is running in windowed mode.  Note also that there is
+	also an equivalent commandline option -depth.
+	Special note for the X11 version: normally the X11 version will also
+	ignore the '-depth' commandline option as it will open a window
+	to match the given depth of the display. However if you give a
+	negative depth it will simulate the given depth as well as possible.
+	This is useful for debugging purposes (to see on an 8-bit display
+	if a feature works in 16-bit mode as well without having to restart
+	your server).
+  VideoDriver/XSHM=<yesno>
+	This option is only for Crystal Space on the X window system.
+	This option is 'yes' by default if enabled in the makefile
+	(normally this is the case). This option enables the shared
+	memory extension which makes Crystal Space considerably faster.
+	This extension is not present on all systems. Crystal Space will
+	automatically detect this and disable shm.
+	You can manually disable this option by setting it to 'no'.
+	The shared memory extension can also be enabled/disabled with
+	the -shm/-noshm commandline options.
+  VideoDriver/MMX=<yesno>
+	This option is only for Crystal Space on Intel platforms and with
+	assembler optimizations enabled. It enables the MMX optimized
+	routines (currently only two functions). If your processor doesn't
+	support MMX Crystal Space will automatically detect this and
+	use the normal routines. So it is safe to set this option to 'yes'
+	all the times. There is also an equivalent 'mmx' command from
+	the console which you can use to toggle MMX support on/off.
+  VideoDriver/FULL_SCREEN=<yesno>
+	This option is only for the Win32 and OS/2 versions of Crystal Space
+	and is 'yes' by default. It is used to set the Crystal Space
+	window to fullscreen.
+  VideoDriver/WINDOWX=<windowx>
+	For OS/2 only. Window X position relative to bottom-left corner
+	(percentage of total screen size).
+  VideoDriver/WINDOWY=<windowy>
+	For OS/2 only. Window Y position relative to bottom-left corner
+	(percentage of total screen size).
+  VideoDriver/WINDOWWIDTH=<width>
+	For OS/2 only. Absolute window size (without frame and titlebar).
+  VideoDriver/WINDOWHEIGHT=<height>
+	For OS/2 only. Absolute window size (without frame and titlebar).
+
+  Lighting/REFLECT=<number>
+	The number of reflections that are allowed for static lighting.
+	The default for this is 1 which means that light is not reflected
+	by mirrors. This number is actually the number of times that some
+	light may affect the same sector.
+	This option only has effect in combination with the
+	'-recalc' commandline option.
+  Lighting/RADIOSITY=<yesno>
+  	If yes the precalculated lighting routines will also reflect
+	light on normal polygons (and not only on mirrors). The number
+	of allowed reflections depends on the REFLECT variable.
+	Using this flag you get a sort of simulation of radiosity. Note
+	that it greatly increases the time needed for precalculated
+	lighting. This option only has effect in combination with the
+	'-recalc' commandline option.
+  Lighting/ACCURATE_THINGS=<yesno>
+  	With this option enabled (default) precalculated lighting is much
+	more accurate with regards to shadow calculation of Things. However
+	this is also a lot slower (only when calculating lighting information).
+	This option corresponds with the '-accthg/-noaccthg' commandline
+	options.
+  Lighting/COSINUS_FACTOR=<float>
+	Control how much the angle of the light with the polygon
+	it hits affects the final light value. Values ranges from -1 to 1.
+	With -1 the polygons will get no light at all. With 0 it will be perfect
+	cosine rule. With 1 the cosine is ignored and it will be like Crystal Space
+	was in the past. Note that changing this value at runtime only has an
+	effect on dynamic lights. This option corresponds to the -cosfact commandline
+	option and the 'cosfact' console command.
+
+  SoundDriver/MAX_CHANNELS=<number>
+	Set the maximum number of channels we can mix.
+  SoundDriver/FREQUENCY=<number>
+	Set frequency supported by sound device (44100, 22050, 11025, ...)
+  SoundDriver/16BITS=<yesno>
+	Set if sound device may use 16 bits sound (if supported).
+  SoundDriver/STEREO=<yesno>
+	Enable stereo on sound device (if supported).
+  SoundDriver/ACTIVE=<yesno>
+	Activate sound driver.
+  SoundDriver/VOLUME
+	Set general volume [0..1].
+	If you put -1 or a value inferior to 0, current device volume is kept.
+
+  Network/NetDriver=<driver>
+	Choose 'crystalspace.network.null' this time. In future more
+	networking devices will be supported.
+
+
+
+

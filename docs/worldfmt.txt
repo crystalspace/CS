@@ -1,0 +1,528 @@
+The first section of this document is a syntax description of the
+Crystal Space world file format. The second section gives a few hints
+about what everything means.
+
+
+=============================================================================
+                                 SYNTAX
+=============================================================================
+
+
+Basic syntax elements:
+
+  <from..to>	is a numeric range. For example, <0..1> is a number
+		between 0 and 1.
+  <number>	a general number
+  <pos-number>	a general positive number
+  <name>	a name identifier
+  <integer>	a general integer
+  <pos-integer>	a positive integer (> 0)
+
+List of numbers:
+
+  <number-list> ::= <number> { ',' <number> }
+
+Boolean values:
+
+  <yes> ::= 'yes' | 'true' | 'on' | '1'
+  <no> ::= 'no' | 'false' | 'off' | '0'
+  <yes-no> ::= <yes> | <no>
+
+-----------------------------------------------------------------------------
+Color description:
+
+  <red> ::= <0..1>
+  <green> ::= <0..1>
+  <blue> ::= <0..1>
+  <color> ::= <red> ',' <green> ',' <blue>
+
+-----------------------------------------------------------------------------
+Fog description:
+
+  <density> ::= <number>
+  <fog-desc> ::= 'FOG' '(' <color> ',' <density> ')'
+
+-----------------------------------------------------------------------------
+Vectors and coordinates. Note that the z-axis points forward, the y-axis
+points upwards and the x-axis points to the right.
+
+  <x> ::= <number>
+  <y> ::= <number>
+  <z> ::= <number>
+  <u> ::= <number>
+  <v> ::= <number>
+  <vector-2d> ::= <x> ',' <z>
+  <vector-3d> ::= <x> ',' <y> ',' <z>
+  <coordinate> ::= <vector-3d>
+  <coordinate-2d> ::= <vector-2d>
+  <texture-coordinate> ::= <u> ',' <v>
+
+-----------------------------------------------------------------------------
+Various names of objects:
+
+  <sector-name> ::= <name>
+  <thing-name> ::= <name>
+  <thingtpl-name> ::= <name>
+  <plane-name> ::= <name>
+  <col-name> ::= <name>
+  <script-name> ::= <name>
+  <lightx-name> ::= <name>
+  <texture-name> ::= <name>
+  <polygon-name> ::= <name>
+  <sprite-name> ::= <name>
+  <spritetpl-name> ::= <name>
+  <library-name> ::= <name>
+  <file-name> ::= <name>
+
+-----------------------------------------------------------------------------
+Various attributes and numbers:
+
+  <max-textures-nr> ::= <pos-integer>
+  <radius> ::= <pos-number>
+  <texture-length> ::= <pos-number>
+  <height-nr> ::= <number>
+  <alpha-nr> ::= '0' | '25' | '50' | '75'
+  <fog-nr> ::= '0' | '1'
+  <angle> ::= <number>
+  <light-index> ::= '0' | <pos-integer>
+  <vertex-index> ::= '0' | <pos-integer>
+
+-----------------------------------------------------------------------------
+Various basic objects:
+
+  <vertex> ::= 'VERTEX' '(' <coordinate> ')'
+
+  <texture> ::= 'TEXTURE' '(' <texture-name> ')'
+  <ceil-texture> ::= 'CEIL_TEXTURE' '(' <texture-name> ')'
+  <floor-texture> ::= 'FLOOR_TEXTURE' '(' <texture-name> ')'
+  <texnr> ::= 'TEXNR' '(' <texture-name> ')'
+
+  <texlen> ::= 'LEN' '(' <texture-length> ')'
+  <texture-scale> ::= 'TEXTURE_SCALE' '(' <texture-length> ')'
+
+  <lightx> ::= 'LIGHTX' '(' <lightx-name> ')'
+
+  <activate> ::= 'ACTIVATE' '(' <script-name> ')'
+  <trigger> ::= 'TRIGGER' '(' <trigger-type> ',' <script-name> ')'
+  <trigger-type> ::= 'activate'
+
+  <bsp> ::= 'BSP' '(' ')'
+  <statbsp> ::= 'STATBSP' '(' ')'
+
+  <plane> ::= 'PLANE' '(' <plane-name> ')'
+
+  <tex-lighting> ::= 'TEXTURE_LIGHTING' '(' <yes-no> ')'
+  <tex-mipmap> ::= 'TEXTURE_MIPMAP' '(' <yes-no> ')'
+  <lighting> ::= 'LIGHTING' '(' <yes-no> ')'
+  <mipmap> ::= 'MIPMAP' '(' <yes-no> ')'
+
+  <dim> ::= 'DIM' '(' <x> ',' <y> ',' <z> ')'
+  <height> ::= 'HEIGHT' '(' <height-nr> ')'
+  <floor-height> ::= 'FLOOR_HEIGHT' '(' <height-nr> ')'
+
+  <alpha> ::= 'ALPHA' '(' <alpha-nr> ')'
+  <fog> ::= 'FOG' '(' <fog-nr> ')'
+
+  <vector> ::= 'V' '(' <vector-3d> ')'
+
+  <identity-matrix> ::= 'IDENTITY'
+  <rotation-x-matrix> ::= 'ROT_X' '(' <angle> ')'
+  <rotation-y-matrix> ::= 'ROT_Y' '(' <angle> ')'
+  <rotation-z-matrix> ::= 'ROT_Z' '(' <angle> ')'
+  <rotation-matrix-comp> ::= <rotation-x-matrix> | <rotation-y-matrix> | <rotation-z-matrix>
+  <rotation-matrix> ::= 'ROT' '(' { <rotation-matrix-comp> } ')'
+  <mult-matrix> ::= <number>
+  <normal-matrix> ::= <vector-3d> ',' <vector-3d> ',' <vector-3d>
+  <matrix> ::= 'MATRIX '(' <identity-matrix> | <rotation-matrix> | <mult-matrix> | <normal-matrix> ')'
+
+-----------------------------------------------------------------------------
+Various components:
+
+  <plane-orig> ::= 'ORIG' '(' <vector-3d> ')'
+  <plane-first> ::= 'FIRST' '(' <vector-3d> ')'
+  <plane-second> ::= 'SECOND' '(' <vector-3d> ')'
+  <plane-first-len> ::= 'FIRST_LEN' '(' <texture-length> ')'
+  <plane-second-len> ::= 'SECOND_LEN' '(' <texture-length> ')'
+  <uv-shift> ::= 'UV_SHIFT' '(' <texture-coordinate> ')'
+
+  <polytext-comp> ::= <plane-orig> | <plane-first-len> | <plane-first> | <plane-second-len> |
+		    <plane-second> | <matrix> | <vector> | <texlen> | <plane> | <uv-shift>
+  <polygon-texture> ::= 'TEXTURE' '(' { <polytext-comp> } ')'
+
+  <beziertext-comp> ::= <plane-orig> | <plane-first-len> | <plane-first> | <plane-second-len> |
+		    <plane-second> | <matrix> | <vector> | <texlen> | <uv-shift>
+  <bezier-texture> ::= 'TEXTURE' '(' { <beziertext-comp> } ')'
+
+  <portal> ::= 'PORTAL' '(' <sector-name> ')'
+
+  <after-vector> ::= 'W' '(' <vector-3d> ')'
+  <warp-mirror> ::= 'MIRROR' '(' ')'
+  <warp-static> ::= 'STATIC' '(' ')'
+  <warp-comp> ::= <matrix> | <vector> | <after-vector> | <warp-mirror> | <warp-static>
+  <warp> ::= 'WARP' '(' { <warp-comp> } ')'
+
+  <move-comp> ::= <matrix> | <vector>
+  <move2> ::= 'MOVE' '(' { <move-comp> } ')'
+  <move> ::= 'MOVE' '(' <matrix> <vector> ')'
+
+  <floor> ::= 'FLOOR' '(' '(' <coordinate> ')' '(' <coodinate> ')' '(' <coordinate> ')' '(' <coordinate> ')' ')'
+  <ceiling> ::= 'CEILING' '(' '(' <coordinate> ')' '(' <coodinate> ')' '(' <coordinate> ')' '(' <coordinate> ')' ')'
+  <floor-ceil> ::= 'FLOOR_CEILING' '(' '(' <coordinate-2d> ')' '(' <coodinate-2d> ')' '(' <coordinate-2d> ')' '(' <coordinate-2d> ')' ')'
+
+-----------------------------------------------------------------------------
+A circle of vertices:
+
+This command is just a short-cut for specifying some circular vertices.
+Internally it is exactly the same as saying VERTEX (...) VERTEX (...) ...
+
+  <radiusx> ::= <number>
+  <radiusy> ::= <number>
+  <radiusz> ::= <number>
+  <num-verts> ::= <integer>
+  <circle> ::= 'CIRCLE' '(' <coordinate> ':' <radiusx> ',' <radiusy> ',' <radiusz> ',' <num-verts> ')'
+
+-----------------------------------------------------------------------------
+A skydome (half-sphere):
+
+A skydome is a large short-cut for creating a complex half-sphere
+with gouroud shaded triangles. Note that you need to generate the
+first circle of vertices using the 'CIRCLE' macro.
+
+  <skydome-radius> ::= 'RADIUS' '(' <radius> ')'
+  <skydome-vertices> ::= 'VERTICES' '(' <vertex-index> { ',' <vertex-index> } ')'
+  <skydome-comp> ::= <skydome-radius> | <skydome-vertices>
+  <skydome> ::= 'SKYDOME' '(' { <skydome-comp> } ')'
+
+-----------------------------------------------------------------------------
+A light:
+
+  <dynamic-flag> ::= '0' | '1'
+
+  <light-oldsyntax> ::= <coordinate> ':' <radius> ',' <color> ',' <dynamic-flag>
+
+  <light-center> ::= 'CENTER' '(' <coordinate> ')'
+  <light-radius> ::= 'RADIUS' '(' <radius> ')'
+  <light-color> ::= 'COLOR' '(' <color> ')'
+  <light-dynamic> ::= 'DYNAMIC' '(' ')'
+  <light-halo> ::= 'HALO' '(' ')'
+  <light-comp> ::= <light-center> | <light-radius> | <light-dynamic> | <light-color> |
+  		   <light-halo>
+  <light-newsyntax> ::= { <light-comp> }
+
+  <light> ::= 'LIGHT' '(' <light-oldsyntax> | <light-newsyntax> ')'
+
+-----------------------------------------------------------------------------
+A bezier curve:
+
+  <bezier-comp> ::= <texnr> | <bezier-texture> | <vertices>
+  <bezier> ::= 'BEZIER' '(' { <bezier-comp> } ')'
+
+-----------------------------------------------------------------------------
+A polygon:
+
+The list of vertices is a list of vertex indices. These indices are
+relative to the list of vertices of the parent object (a sector,
+thing or thing template). The first vertex in the parent object has
+index 0. The vertices of a polygon must be defined in clock-wise
+ordering as seen from a position from where you want the polygon to
+be visible.
+
+  <vertices> ::= 'VERTICES' '(' <vertex-index> { ',' <vertex-index> } ')'
+
+  <uva-scale> ::= <number>
+  <uva-offset> ::= <number>
+  <uva-spec> ::= <angle> ',' <uva-scale> ',' <uva-offset>
+  <uva> ::= 'UVA' '(' <uva-spec> ',' <uva-spec> ',' <uva-spec> ')'
+  <uv> ::= 'UV' '(' <texture-coordinate> ',' <texture-coordinate> ',' <texture-coordinate> ')'
+
+  <colors> ::= 'COLORS' '(' <color> ',' <color> ',' <color> ')'
+  
+  <cosfact> ::= 'COSFACT' '(' <number> ')'
+
+  <polygon-comp> ::= <texnr> | <lighting> | <mipmap> | <portal> | <warp> |
+		   <lightx> | <polygon-texture> | <vertices> | <alpha> |
+		   <fog> | <uv> | <uva> | <colors> | <cosfact>
+  <polygon> ::= 'POLYGON' <polygon-name> '(' { <polygon-comp> } ')'
+
+-----------------------------------------------------------------------------
+Polygon templates:
+
+  <polygon-tpl-comp> ::= <texnr> | <lighting> | <mipmap> | <polygon-texture> | <vertices>
+  <polygon-template> ::= 'POLYGON' <polygon-name> '(' { <polygon-tpl-comp> } ')'
+
+-----------------------------------------------------------------------------
+Uniform dynamic light:
+
+  <lightx-type> ::= <number>
+  <lightx-period> ::= <number>
+  <lightx-dp> ::= <number>
+  <lightx-intensity> ::= <number>
+  <lightx-di> ::= <number>
+
+  <lightx-description> ::= <lightx-type> ',' <lightx-period> ',' <lightx-dp> ',' <lightx-intensity> ','
+			 <lightx-di>
+  <lightx-act> ::= 'ACTIVE' '(' <number> ')'
+  <lightx-prim-act> ::= 'PRIMARY_ACTIVE' '(' <lightx-description> ')'
+  <lightx-sec-act> ::= 'SECONDARY_ACTIVE' '(' <lightx-description> ')'
+  <lightx-bec-act> ::= 'BECOMING_ACTIVE' '(' <lightx-description> ')'
+  <lightx-prim-inact> ::= 'PRIMARY_INACTIVE' '(' <lightx-description> ')'
+  <lightx-sec-inact> ::= 'SECONDARY_INACTIVE' '(' <lightx-description> ')'
+  <lightx-bec-inact> ::= 'BECOMING_INACTIVE' '(' <lightx-description> ')'
+  <lightx-stateless> ::= 'STATELESS' '(' <number> ')'
+
+  <lightx-desc-comp> ::= <lightx-act> | <lightx-prim-act> | <lightx-sec-act> | <lighx-bec-act> |
+		  <lightx-prim-inact> | <lightx-sec-inact> | <lightx-bec-inact> | <lightx-stateless>
+  <lightx-desc> ::= 'LIGHTX' <lightx-name> '(' { <lightx-desc-comp> } ')'
+
+-----------------------------------------------------------------------------
+A collection object:
+
+  <col-thing> ::= 'THING' '(' <thing-name> ')'
+  <col-collection> ::= 'COLLECTION' '(' <col-name> ')'
+  <col-light> ::= 'LIGHT' '(' <sector-name> ',' <light-index> ')'
+  <col-sector> ::= 'SECTOR' '(' <sector-name> ')'
+  <col-trigger> ::= 'TRIGGER' '(' <obj-name> ',' <trigger-type> '->' <script-name> ')'
+
+  <collection-comp> ::= <col-thing> | <col-collection> | <col-light> | <col-trigger> | <col-sector>
+  <collection> ::= 'COLLECTION' <col-name> '(' { <collection-comp> } ')'
+
+-----------------------------------------------------------------------------
+A texture description:
+
+  <transparent> ::= 'TRANSPARENT' '(' <color> ')'
+  <filter> ::= 'FILTER' '(' ... ')'
+
+  <texture-desc-comp> ::= <transparent> | <filter>
+  <texture-desc> ::= 'TEXTURE' '(' { <texture-desc-comp> } ')'
+
+-----------------------------------------------------------------------------
+A script:
+
+  <script> ::= 'SCRIPT' <script-name> '(' <script-language> ':' <script-description> ')'
+
+-----------------------------------------------------------------------------
+Things and objects:
+
+  <moveable> ::= 'MOVEABLE' '(' ')'
+  <convex> ::= 'CONVEX' '(' ')'
+  <template> ::= 'TEMPLATE' '(' <thingtpl-name> ')'
+
+  <thing-comp> ::= <vertex> | <polygon> | <texnr> | <texlen> | <lightx> |
+		  <activate> | <trigger> | <bsp> | <move2> | <template> |
+		  <fog-desc> | <moveable> | <convex> | <circle> | <bezier>
+  <thing> ::= 'THING' <thing-name> '(' { <thing-comp> } ')'
+
+  <sixface-comp> ::= <move2> | <texture-scale> | <texture> | <ceil-texture> |
+		   <dim> | <height> | <floor-height> | <floor-ceil> | <floor-texture> |
+		   <floor> | <ceiling> | <trigger> | <activate> | <moveable> | <fog-desc> |
+		   <convex>
+  <sixface> ::= 'SIXFACE' <thing-name> '(' { <sixface-comp> } ')'
+
+-----------------------------------------------------------------------------
+Thing and object templates:
+
+  <curve-center> ::= 'CURVECENTER' '(' <coordinate> ')'
+  <curve-scale> ::= 'CURVESCALE' '(' <number> ')'
+  <curve-control> ::= 'CURVECONTROL' '(' <coordinate> ':' <texture-coordinate> ')'
+  <thing-tpl-comp> ::= <vertex> | <polygon-template> | <texnr> | <texlen> |
+  		  <move> | <fog-desc> | <circle> | <bezier> | <curve-center> |
+		  <curve-scale> | <curve-control>
+  <thing-template> ::= 'THING' <thingtpl-name> '(' { <thing-tpl-comp> } ')'
+
+  <sixface-tpl-comp> ::= <move> | <texture-scale> | <texture> |
+		       <ceil-texture> | <dim> | <height> | <floor-height> | <floor-ceil> |
+		       <floor-texture> | <floor> | <ceiling> | <fog-desc>
+  <sixface-template> ::= 'SIXFACE' <thingtpl-name> '(' { <sixface-tpl-comp> } ')'
+
+-----------------------------------------------------------------------------
+Sprites:
+
+  <u> ::= <number>
+  <v> ::= <number>
+  <x> ::= <number>
+  <y> ::= <number>
+  <z> ::= <number>
+  <v1> ::= <pos-number>
+  <v2> ::= <pos-number>
+  <v3> ::= <pos-number>
+  <frame-vector> :: 'V' '(' <x> ',' <y> ',' <z> ':' <u> ',' <v> ')'
+  <frame-name> :: <name>
+  <sprite-frame> ::= 'FRAME' <frame-name> '(' { <frame-vector> } ')'
+  <action-name> :: <name>
+  <action-delay> :: <pos-number>
+  <action-frame> :: 'F' '(' <frame-name> ',' <action-delay> ')'
+  <sprite-action> :: = 'ACTION' <action-name> '(' { <action-frame> } ')' 
+  <sprite-triangle> ::= 'TRIANGLE' '(' <v1> ',' <v2> ',' <v3> ')'
+
+  <sprite-tpl-comp> ::= <texnr> | <sprite-frame> | <sprite-action> | <sprite-triangle>
+  <sprite-template> ::= 'SPRITE' <spritetpl-name> '(' { <sprite-tpl-comp> } ')'
+
+  <sp-template> ::= 'TEMPLATE' '(' <spritetpl-name> ',' <action-name> ')'
+  <sprite-comp> ::= <move2> | <sp-template> | <texnr>
+  <sprite> ::= 'SPRITE' <sprite-name> '(' { <sprite-comp> } ')'
+
+-----------------------------------------------------------------------------
+Sectors and rooms:
+
+  <tex-comp> ::= <texture> | <plane> | <texlen>
+  <tex> ::= 'TEX' '(' { <tex-comp> } ')'
+
+  <portal-poly> ::= 'POLYGON' '(' <polygon-name> ')'
+  <portal-sector> ::= 'SECTOR' '(' <sector-name> ')'
+  <room-portal-comp> ::= <portal-poly> | <portal-sector> | <alpha> | <warp>
+  <room-portal> ::= 'PORTAL' '(' { <room-portal-comp> ) ')'
+
+  <split-direction> ::= 'VER' | 'HOR'
+  <split-list> ::= <number-list>
+  <split> ::= 'SPLIT' '(' <polygon-name> ',' <split-direction> '(' <split-list> ')' ')'
+
+  <sector-comp> ::= <vertex> | <polygon> | <texnr> | <texlen> | <lightx> |
+		  <activate> | <trigger> | <bsp> | <statbsp> | <thing> | <sixface> | <light> |
+		  <sprite> | <fog-desc> | <circle> | <skydome>
+  <sector> ::= 'SECTOR' <sector-name> '(' { <sector-comp> } ')'
+
+  <room-comp> ::= <tex-lighting> | <tex-mipmap> | <texture-scale> | <texture> |
+		<tex> | <ceil-texture> | <floor-texture> | <lightx> | <light> |
+		<dim> | <height> | <floor-height> | <floor-ceil> | <floor> | <ceiling> |
+		<sixface> | <thing> | <room-portal> | <split> | <trigger> | <activate> |
+		<bsp> | <statbsp> | <move> | <sprite> | <fog-desc>
+  <room> ::= 'ROOM' <sector-name> '(' { <room-comp> } ')'
+
+-----------------------------------------------------------------------------
+Descriptions for all textures:
+
+  <max-textures> ::= 'MAX_TEXTURES' '(' <max-textures-nr> ')'
+  <textures-comp> ::= <max-textures> | <texture-desc>
+  <textures> ::= 'TEXTURES' '(' { <textures-comp> } ')'
+
+-----------------------------------------------------------------------------
+Plane description:
+
+  <plane-desc-comp> ::= <plane-orig> | <plane-first-len> | <plane-first> | <plane-second-len> |
+		      <plane-second> | <matrix> | <vector>
+  <plane-desc> ::= 'PLANE' <plane-name> '(' { <plane-desc-comp> } ')'
+
+-----------------------------------------------------------------------------
+Library description:
+
+  <library> ::= 'LIBRARY' <library-name> '(' <file-name> ')'
+
+-----------------------------------------------------------------------------
+Start description:
+
+  <start> ::= 'START' '(' <sector-name> ',' <coordinate> ')'
+
+-----------------------------------------------------------------------------
+The World:
+
+  <world-comp> ::= <textures> | <library> <sector> | <room> | <thing-template> |
+		 <sixface-template> | <sprite-template> | <plane-desc> |
+		 <collection> | <script> | <lightx-desc> | <start>
+  <world> ::= 'WORLD' '(' { <world-comp> } ')'
+
+-----------------------------------------------------------------------------
+Description of a Library file ('library'):
+
+  <library-comp> ::= <textures> | <thing-template> | <sprite-template>
+  <library> ::= 'LIBRARY' '(' { <library-comp> } ')'
+
+
+=============================================================================
+                                  HINTS
+=============================================================================
+
+A little explanation about LEN and TEXLEN. With those you can specify the
+size of the texture on the polygon. For example, let's say that you have
+a rectangular polygon which is 4 units wide and 6 units high. A texture with
+LEN set to 2 will be tiled 2 times horizontally and 3 times vertically.
+If this texture is 128x128 (for example) then the final texture on the polygon
+will be 256x384.
+
+
+Using a TEXTURE statement inside a POLYGON or with a PLANE statement you can
+get even more control on how the texture should be scaled accross the polygon.
+I will explain it with an example. Say that you have a polygon like this:
+	VERTEX (0,2,3) VERTEX (2,2,3) VERTEX (2,0,3) VERTEX (0,0,3)
+	POLYGON 'xxx' (VERTICES (0,1,2,3))
+Let's say that you want to align the texture so that it's origin is at (2,2,3).
+You can do this as follows:
+	POLYGON 'xxx' (VERTICES (0,1,2,3) TEXTURE (ORIG (2,2,3) FIRST (0,2,3)
+			SECOND (2,0,3) FIRST_LEN (1) SECOND_LEN (1)))
+With ORIG, FIRST, and SECOND you specify how the u/v coordinate system is
+located. The origin of u/v is at ORIG, the u-axis is at FIRST-ORIG, and
+the v-axis is at SECOND-ORIG. FIRST_LEN and SECOND_LEN are simlar to LEN
+and TEXLEN except that you can control the u and v scaling seperately here.
+Note that ORIG, FIRST, and SECOND need not coincide with vertices of the
+polygon. They should just be on the same plane as the polygon. That way
+you can also create slanted textures.
+
+
+TEXLEN in a THING or SECTOR is the default LEN for all polygons following
+the TEXLEN declaration.
+TEXNR in a THING or SECTOR is the default TEXNR for all following polygons.
+
+
+PLANE's are good and recommended. A PLANE is just a way to give a name to
+a texture orientation. All polygons sharing the same PLANE will have
+textures that fit perfectly at the borders. CS will also be able to do
+some optimizations on polygons that share the same plane (like backface
+culling a whole set of polygons in one go). Note that even if a PLANE is
+only used by one polygon it does not hurt. If you did not specify the PLANE,
+Crystal Space would have created one anyway.
+
+
+Currently Crystal Space assumes that there is a sector called 'room'. It
+will use that as a starting place. It will also always start at location
+(0,0,0).
+
+
+Note that SECTOR's must be convex (unless you add a BSP tree).
+
+
+Note that THING's need not be convex.
+
+
+Vertices in a THING are specified in local object space. You can translate
+this object space to world space with the MOVE statement.
+
+
+When a THING or SPRITE is defined in the WORLD statement and not in a
+SECTOR or ROOM then you define a template. This template can then be
+used inside a SECTOR or ROOM by giving another THING or SPRITE statement
+and using the TEMPLATE statement there. It is also possible to define
+the THING or SPRITE inside the SECTOR or ROOM but using templates is
+preferable.
+
+
+With WARP you give a matrix which will mirror space. For example, when you
+want to make a mirroring floor the warping matrix should invert Y and leave
+the others intact. So the WARP matrix is:
+    / 1  0 0 \
+    | 0 -1 0 |
+    \ 0  0 1 /
+The vector should be a vector on the plane of the mirror. It is used to
+determine where exactly mirroring should start. If the floor is at height
+-1 (for example) so <0,-1,0> is a good spot.
+
+
+Note that PORTAL's are one-direction only. If you need a PORTAL that works
+in two directions (so that you can go back) then you'll also have to specify
+a PORTAL in the other sector pointing back.
+
+
+Note that even though a PORTAL does not require a texture (unless it has
+alpha transparency) you still need to specify one. The current CS code
+assumes that every polygon has a texture.
+
+
+The ROOM and SIXFACE interface is good for human editors but it is not suited
+for computer generated output. Ignore ROOM and SIXFACE if you want to write
+an editor or convertor and concentrate on SECTOR and THING instead.
+
+
+MATRIX (.5) is a shorthand for:
+    / .5 0 0 \
+    | 0 .5 0 |
+    \ 0 0 .5 /
+
+

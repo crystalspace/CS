@@ -1,0 +1,14 @@
+VERSION		EQU	0
+REVISION	EQU	12
+DATE	MACRO
+	dc.b	'2.28.99'
+	ENDM
+VERS 	MACRO
+	dc.b	'cryst 0.12'
+	ENDM
+VSTRING	MACRO
+	dc.b	'cryst 0.12 (2.28.99)',13,10,0
+	ENDM
+VERSTAG	MACRO
+	dc.b	0,'$VER: cryst 0.12 (2.28.99)',0
+	ENDM
