@@ -41,7 +41,6 @@ struct iNetworkDriver;
 struct iSoundRender;
 struct iConfig;
 struct iConsole;
-struct iConfigFile;
 struct iConfigManager;
 struct iMotionManager;
 
@@ -452,12 +451,6 @@ public:
     bool iVFS = true, int Priority = ConfigPriorityPlugIn);
   /// Remove a config file that was added with AddConfig()
   virtual void RemoveConfig(iConfigFileNew *ConfigFile);
-  /**
-   * Create a new configuration file object which resides on VFS without
-   * adding it to the config manager. NOTE: The config file uses the soon
-   * outdated INI structure.
-   */
-  virtual iConfigFile *CreateINIConfig (const char *iFileName, bool iVFS = true);
   /**
    * Create a new configuration file object which resides on VFS without
    * adding it to the config manager.

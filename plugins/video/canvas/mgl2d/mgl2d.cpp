@@ -23,7 +23,6 @@
 #include "csutil/cfgacc.h"
 #include "plugins/video/canvas/common/scancode.h"
 #include "mgl2d.h"
-#include "icfgfile.h"
 #include "icfgnew.h"
 
 IMPLEMENT_FACTORY (csGraphics2DMGL)

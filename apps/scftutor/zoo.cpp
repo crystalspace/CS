@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "csutil/inifile.h"
 #include "csutil/cfgfile.h"
 
 #include "iname.h"

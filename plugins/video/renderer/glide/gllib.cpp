@@ -23,7 +23,6 @@
 #include "cssysdef.h"
 #include "gllib.h"
 #include "cssys/system.h"
-#include "csutil/inifile.h"
 
 #if defined(OS_WIN32)
 #include <windows.h>

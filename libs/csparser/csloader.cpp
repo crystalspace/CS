@@ -41,7 +41,7 @@
 #include "csengine/thing.h"
 #include "csgfxldr/csimage.h"
 #include "cssys/system.h"
-#include "csutil/inifile.h"
+#include "csutil/cfgfile.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/token.h"
@@ -2772,12 +2772,12 @@ bool csLoader::AppendMapFile (csEngine* engine, const char* file,
     return false;
   }
 
-  csIniFile* cfg = new csIniFile ("map.cfg", System->VFS);
+  iConfigFileNew *cfg = new csConfigFile ("map.cfg", System->VFS);
   if (cfg)
   {
-    csLightMap::SetLightCellSize (cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",
+    csLightMap::SetLightCellSize (cfg->GetInt ("Engine.Lighting.LightmapSize",
     	csLightMap::lightcell_size));
-    delete cfg;
+    cfg->DecRef();
   }
   CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d.\n",
       csLightMap::lightcell_size, csLightMap::lightcell_size);

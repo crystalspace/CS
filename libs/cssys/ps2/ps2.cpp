@@ -17,7 +17,6 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/inifile.h"
 #include "cssys/unix/unix.h"
 #include "cssys/system.h"
 #include "igraph3d.h"

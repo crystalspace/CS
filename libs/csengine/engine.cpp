@@ -61,7 +61,6 @@
 #include "itxtmgr.h"
 #include "igraph3d.h"
 #include "ievent.h"
-#include "icfgfile.h"
 #include "icfgmgr.h"
 
 //---------------------------------------------------------------------------

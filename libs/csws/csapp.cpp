@@ -21,9 +21,9 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "qint.h"
-#include "csutil/inifile.h"
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
+#include "csutil/csstring.h"
 #include "cssys/cseventq.h"
 #include "csws/cslistbx.h"
 #include "csws/csmenu.h"
@@ -37,7 +37,6 @@
 #include "ivfs.h"
 #include "itxtmgr.h"
 #include "ievent.h"
-#include "icfgfile.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugIn //--
 

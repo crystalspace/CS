@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "x11comm.h"
-#include "icfgfile.h"
 #include "csutil/cfgacc.h"
 
 void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,

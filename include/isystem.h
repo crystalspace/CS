@@ -156,7 +156,6 @@ struct iEventOutlet;
 struct iEventPlug;
 struct iEventCord;
 struct iStrVector;
-struct iConfigFile;
 struct iConfigFileNew;
 struct iConfigManager;
 
@@ -317,12 +316,6 @@ struct iSystem : public iBase
     bool iVFS = true, int Priority = ConfigPriorityPlugIn) = 0;
   /// Remove a config file that was added with AddConfig()
   virtual void RemoveConfig(iConfigFileNew *ConfigFile) = 0;
-  /**
-   * Create a new configuration file object which resides on VFS without
-   * adding it to the config manager. NOTE: The config file uses the soon
-   * outdated INI structure.
-   */
-  virtual iConfigFile *CreateINIConfig (const char *iFileName, bool iVFS = true) = 0;
   /**
    * Create a new configuration file object which resides on VFS without
    * adding it to the config manager.

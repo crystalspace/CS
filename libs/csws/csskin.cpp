@@ -26,7 +26,6 @@
 #include "csws/csbackgr.h"
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
-#include "icfgfile.h"
 
 //--//--//--//--//--//--//--//--//--//--//--// The skin repository class -//--//
 

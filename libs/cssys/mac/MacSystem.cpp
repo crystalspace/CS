@@ -36,11 +36,9 @@
 #include <SIOUX.h>
 #include "cssysdef.h"
 #include "cstypes.h"
-#include "csutil/inifile.h"
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
 #include "cssys/sysdriv.h"
-#include "csutil/inifile.h"
 #include "IMacGraphics.h"
 #include "igraph3d.h"
 #include "igraph2d.h"

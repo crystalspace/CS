@@ -27,7 +27,6 @@
 #include "video/canvas/common/scancode.h"
 #include "video/canvas/common/os2-keys.h"
 #include "isystem.h"
-#include "icfgfile.h"
 #include "icfgnew.h"
 
 // shit ...

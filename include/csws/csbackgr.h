@@ -23,7 +23,6 @@
 #include "csgfxldr/rgbpixel.h"
 
 struct iTextureHandle;
-struct iConfigFile;
 class csApp;
 class csComponent;
 

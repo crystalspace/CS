@@ -14,7 +14,6 @@
 
 #include "cssysdef.h"
 #include "cssys/system.h"
-#include "csutil/inifile.h"
 #include "csengine/sector.h"
 #include "csengine/engine.h"
 #include "csengine/csview.h"

@@ -23,7 +23,6 @@
 #include "inf_txt.h"
 #include "csgfxldr/quantize.h"
 #include "csutil/scanstr.h"
-#include "csutil/inifile.h"
 #include "isystem.h"
 #include "iimage.h"
 

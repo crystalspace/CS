@@ -72,7 +72,6 @@
 
 // CS Util
 #ifndef NO_CSUTIL
-#include "csutil/inifile.h"
 #endif
 
 // CS Parser

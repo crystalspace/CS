@@ -21,7 +21,6 @@
 #include "csws/csapp.h"
 #include "csws/csttlbar.h"
 #include "csws/sdefault.h"
-#include "icfgfile.h"
 
 void csDefaultTitlebarSkin::Initialize (csApp *iApp, csSkin *Parent)
 {

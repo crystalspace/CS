@@ -26,7 +26,6 @@
 #include "csutil/csrect.h"
 #include "csutil/cfgacc.h"
 #include "isystem.h"
-#include "icfgfile.h"
 #include "icfgmgr.h"
 
 IMPLEMENT_FACTORY (csGraphics2DLineXLib)

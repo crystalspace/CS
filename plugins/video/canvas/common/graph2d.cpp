@@ -27,7 +27,6 @@
 #include "isystem.h"
 #include "igraph3d.h"
 #include "itexture.h"
-#include "icfgfile.h"
 
 csGraphics2D::csGraphics2D ()
 {

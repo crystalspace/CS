@@ -22,7 +22,6 @@
 #include "cssysdef.h"
 #include "txtmgr.h"
 #include "csutil/util.h"
-#include "csutil/inifile.h"
 #include "qint.h"
 #include "iimage.h"
 #include "imater.h"

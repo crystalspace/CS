@@ -33,7 +33,6 @@
 #include "cssysdef.h"
 #include "cssys/djgpp/djgpp.h"
 #include "isystem.h"
-#include "icfgfile.h"
 #include "inputq.h"
 #include "djkeysys.h"
 #include "djmousys.h"

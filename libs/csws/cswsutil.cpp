@@ -26,7 +26,6 @@
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
 #include "isystem.h"
-#include "icfgfile.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--/ Window list --//--
 

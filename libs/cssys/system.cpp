@@ -30,7 +30,6 @@
 #include "csutil/prfxcfg.h"
 #include "csutil/csrect.h"
 #include "csutil/util.h"
-#include "csutil/inifile.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
 #include "csutil/cfgacc.h"
@@ -1141,11 +1140,6 @@ iConfigFileNew *csSystemDriver::AddConfig(const char *iFileName, bool iVFS, int 
 void csSystemDriver::RemoveConfig(iConfigFileNew *cfg)
 {
   Config->RemoveDomain(cfg);
-}
-
-iConfigFile *csSystemDriver::CreateINIConfig (const char *iFileName, bool iVFS)
-{
-  return new csIniFile (iFileName, iVFS ? VFS : NULL);
 }
 
 iConfigFileNew *csSystemDriver::CreateSeparateConfig (const char *iFileName, bool iVFS)

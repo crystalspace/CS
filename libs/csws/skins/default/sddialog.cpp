@@ -22,7 +22,6 @@
 #include "csws/csapp.h"
 #include "csws/cswsutil.h"
 #include "csws/sdefault.h"
-#include "icfgfile.h"
 #include "qint.h"
 
 void csDefaultDialogSkin::Initialize (csApp *iApp, csSkin *Parent)

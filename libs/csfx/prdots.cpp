@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "itxtmgr.h"
-#include "icfgfile.h"
 #include "cssys/system.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
