@@ -83,7 +83,7 @@ public:
 
   /// Push a element on 'top' of vector
   inline int Push (void* what);
-  /// Push an elemen on top of the vector if it is not yet contained
+  /// Push an element on top of the vector if it is not yet contained
   inline int PushSmart (void* what);
   /// Pop a element from vector 'top'
   inline void* Pop ();
