@@ -34,12 +34,12 @@ private:
 		
   csRef<iBase> rendererData;
 
-  csRef<iBase> GetRendererData()
+  iBase* GetRendererData()
   {
     return rendererData;
   }
 
-  void SetRendererData(csRef<iBase> data)
+  void SetRendererData(iBase* data)
   {
     rendererData = data;
   }
@@ -119,12 +119,12 @@ public:
       return scfParent->GetNextState();
     }
 
-    csRef<iBase> GetRendererData()
+    iBase* GetRendererData()
     {
       return scfParent->GetRendererData();
     }
 
-    void SetRendererData(csRef<iBase> data)
+    void SetRendererData(iBase* data)
     {
       scfParent->SetRendererData(data);
     }

@@ -15,6 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+#define SCF_DEBUG
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -5357,7 +5358,8 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
 
   for( p=0; p<technique->GetPassCount(); p++ )
   {
-    csRef<csOpenGlEffectPassData> pass_data = new csOpenGlEffectPassData();
+    csRef<csOpenGlEffectPassData> pass_data = 
+      csPtr <csOpenGlEffectPassData> (new csOpenGlEffectPassData());
 
     iEffectPass* pass = technique->GetPass(p);
     csStringID pass_state = pass->GetFirstState();
@@ -5516,7 +5518,8 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
     for( l=0; l<pass->GetLayerCount(); l++ )
     {
       iEffectLayer* layer = pass->GetLayer(l);
-      csRef<csOpenGlEffectLayerData> layer_data = new csOpenGlEffectLayerData();
+      csRef<csOpenGlEffectLayerData> layer_data = 
+	csPtr<csOpenGlEffectLayerData> (new csOpenGlEffectLayerData);
 
       csStringID layer_state = layer->GetFirstState();
       csStringID layer_statestring;
@@ -5744,10 +5747,10 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           return false;
         layer_state = layer->GetNextState();
       }
-      layer->SetRendererData( SCF_QUERY_INTERFACE(layer_data, iBase) );
+      layer->SetRendererData( layer_data );
     }
     //csRef<iBase> pass_data_b = ;
-    pass->SetRendererData( SCF_QUERY_INTERFACE(pass_data, iBase) );
+    pass->SetRendererData( pass_data );
   }
   return true;
 }

@@ -386,6 +386,9 @@ void csTextureHandleOpenGL::ShowFormat ()
 void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
            csPixelFormat *pfmt)
 {
+  if (!image)
+    return;
+
   orig_width = image->GetWidth ();
   orig_height = image->GetHeight ();
 

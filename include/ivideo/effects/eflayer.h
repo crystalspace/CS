@@ -63,10 +63,10 @@ struct iEffectLayer : public iBase
   /// Get the id of the next state.
   virtual csStringID GetNextState() = 0;
 
-	/// Get renderer specific data
-	virtual csRef<iBase> GetRendererData() = 0;
-	/// Set renderer specific data
-	virtual void SetRendererData(csRef<iBase> data) = 0;
+  /// Get renderer specific data
+  virtual iBase* GetRendererData () = 0;
+  /// Set renderer specific data
+  virtual void SetRendererData (iBase* data) = 0;
 };
 
 /** @} */

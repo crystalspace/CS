@@ -76,10 +76,9 @@ struct iEffectPass : public iBase
   virtual csStringID GetNextState() = 0;
 
   /// Get renderer specific data
-  virtual csRef<iBase> GetRendererData() = 0;
+  virtual iBase* GetRendererData() = 0;
   /// Set renderer specific data
-  virtual void SetRendererData(csRef<iBase> data) = 0;
-
+  virtual void SetRendererData(iBase* data) = 0;
 };
 
 /** @} */

@@ -27,18 +27,17 @@ class csEffectLayer : public csStateHandler
 private:
   csRef<iBase> rendererData;
 
-  csRef<iBase> GetRendererData()
+  iBase* GetRendererData()
   {
     return rendererData;
   }
 
-  void SetRendererData(csRef<iBase> data)
+  void SetRendererData(iBase* data)
   {
     rendererData = data;
   }
 
 public:
-
   SCF_DECLARE_IBASE;
 
   csEffectLayer()
@@ -46,7 +45,6 @@ public:
     SCF_CONSTRUCT_IBASE( NULL );
     SCF_CONSTRUCT_EMBEDDED_IBASE( scfiEffectLayer );
   }
-  
 
   struct EffectLayer : public iEffectLayer
   {
@@ -95,12 +93,12 @@ public:
       return scfParent->GetNextState();
     }
 
-    csRef<iBase> GetRendererData()
+    iBase* GetRendererData()
     {
       return scfParent->GetRendererData();
     }
 
-    void SetRendererData(csRef<iBase> data)
+    void SetRendererData(iBase* data)
     {
       scfParent->SetRendererData(data);
     }

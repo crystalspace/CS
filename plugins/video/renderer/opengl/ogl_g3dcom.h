@@ -245,8 +245,8 @@ public:
    * otherwise false. Also reports the error if enabled by user.
    */
   bool CheckGLError (char* call);
-private:
 
+private:
   csRef<iEffectServer> effectserver;
 
   // [lightmap no/yes ][fog 0/1][mixmode]
