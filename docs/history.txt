@@ -10,6 +10,9 @@ The history order is reversed so that new features are at the top.
 	- Keith Fulton added a FormatPush member to stringarray.h.
 	- Eric Sunshine continued updating the user manual to reflect recent
 	  SCF changes.
+	- Eric Sunshine started updating the user manual to reflect the recent
+	  changes to how user-specific settings are managed (i.e. retirement of
+	  user.cfg).
 24-Jul-2003
 	- Reed Hedges made some minor updates to the AWS "Quick Start" section
 	  and API Changes appendix for the recent changes to AWS (15-Jul-2003).

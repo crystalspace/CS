@@ -181,7 +181,7 @@ produce @file{.exe} files.
 
 @subsubheading Compiling Your Own Program Using Crystal Space
 
-@emph{TODO} Point this to the HOWTO for creating apps under MSVC7.
+@emph{TODO} Point this to the @sc{howto} for creating apps under @sc{msvc7}.
 
 @subsubheading Frequently Asked Questions (@sc{faq})
 @anchor{MSVC7 FAQ}

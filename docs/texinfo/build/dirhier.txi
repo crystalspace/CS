@@ -5,13 +5,13 @@
 @cindex Hierarchy, Directory
 
 @noindent
-@emph{Written by Thomas Hieber, @email{thieber@@gmx.net}.  Last updated 21 June
-2002 by Chris Forno, @email{jcore@@arbornet.org}.}
+@emph{Written by Thomas Hieber, @email{thieber@@gmx.net}.  Updated by Chris
+Forno, @email{jcore@@arbornet.org}.}
 
 This section is intended to explain the general CS directory structure. It
 lists all the directories, however some may be missing from your copy of
 Crystal Space if you just downloaded the files for a specific port like
-Linux or Win32.
+Linux or Windows.
 
 Crystal Space consists of the following directories:
 
@@ -24,13 +24,14 @@ Crystal Space consists of the following directories:
 The main directory for Crystal Space.  You can choose any path for it, as long
 as it is supported by your operating system.  This is the path that all
 compiled programs end up in.  This should be your working directory for these
-executables.  The two files @file{vfs.cfg} and @file{scf.cfg} also reside in
-this directory.
+executables.  The file @file{vfs.cfg} also resides in this directory.
 
 @item CS/out
-This directory is used by the build process. It will contain all object,
-dependency, and other files needed for building the Crystal Space
-applications, libraries, and plugins.
+This directory is used by the build process if you build the project using
+``make'' or ``jam'' within the source tree.  It is also possible (and
+recommended) to build the project in some other location.  This directory
+will contain all object, dependency, and other files needed for building
+the Crystal Space applications, libraries, and plugins.
 
 @item CS/apps
 This is where all applications which ship with Crystal Space reside.
@@ -42,7 +43,7 @@ Applications for testing specific features of the project reside here.
 @end table
 
 @item CS/bin
-Some scripts to support the build process on various platforms.
+Miscellaneous scripts used by the project maintainers.
 
 @item CS/data
 Here you should place your levels like @file{flarge.zip}. You can use any
@@ -159,7 +160,7 @@ This directory contains the common parts of the makefiles for many systems
 @item CS/mk/msvcgen
 Component for automatic generation of Visual C++ project files based upon
 information gleaned from @sc{gnu} makefiles project-wide.
-@item CS/mk/visualc
+@item CS/mk/visualc6
 Project files for Win32 using @sc{msvc} 5.0/6.0
 @item CS/mk/visualc7
 Project files for Win32 using @sc{msvc} 7.0
@@ -171,10 +172,10 @@ strictly via @sc{scf} interfaces. @xref{SCF}.
 
 @table @code
 @item CS/plugin/aws
-Alternate Windowing System
+Alternate Windowing System.
 
 @item CS/plugins/bugplug
-Crystal Space Debugger
+Crystal Space debugger.
 
 @item CS/plugins/collide
 Collision detection plugins.
@@ -198,10 +199,10 @@ interact with the Crystal Space engine in a scripting language.
 
 @table @code
 @item CS/plugins/cscript/csperl5
-Perl5 interface
+Perl5 interface.
 
 @item CS/plugins/cscript/cspython
-Python @sc{swig} interface
+Python @sc{swig} interface.
 @end table
 
 @item CS/plugins/csparser
@@ -214,7 +215,7 @@ Crystal Space format loader services (for @sc{cs} World loading).
 @end table
 
 @item CS/plugins/culling
-visibility culling plug-ins
+Visibility culling plug-ins.
 
 @table @code
 @item CS/plugins/culling/dynavis
@@ -224,29 +225,31 @@ Frustvis visibility culling system (default culler if no other is selected)
 @end table
 
 @item CS/plugins/device
-hardware device plugins
+Hardware device plugins.
 
 @table @code
 @item CS/plugins/device/joystick
-joystick input support (currently only for Linux)
+Joystick input support (currently only for Linux).
 @end table
 
 @item CS/plugins/engine
-The engine plugin: the preferred method of interfacing with the Crystal Space
-engine.
+The @dfn{engines} which drive Crystal Space.  Both 3D and isometric engines
+are available.
 
 @table @code
 @item CS/plugins/engine/3d
-The main 3D engine
+The 3D engine plugin.  It is recommended that you employ the Crystal Space
+engine via this plugin module, rather than linking directly with the
+@file{csEngine} library.
 
 @item CS/plugins/engine/iso
-This is an alternative engine used in Crystal Space. It gives an isometric view
-instead of a real 3D view. Mesh objects can also work with this engine
-with a few limitations (mostly regarding size).
+The isometric engine provides an isometric view instead of a real 3D view.
+Mesh objects can also work with this engine with a few limitations (mostly
+regarding size).
 @end table
 
 @item CS/plugins/filesys
-filesystem-related plugins
+Filesystem-related plugins.
 
 @table @code
 @item CS/plugins/filesys/vfs
@@ -254,188 +257,188 @@ Virtual Filesystem, @sc{vfs}.  @xref{VFS}.
 @end table
 
 @item CS/plugins/font
-a collection of font servers
+Collection of font servers.
 
 @table @code
 @item CS/plugins/font/server/csfont
-standard (bitmapped) Crystal Space font server
+Standard (bitmapped) Crystal Space font server.
 @item CS/plugins/font/server/freefont
-FreeType (version 2) font server
+FreeType (version 2) font server.
 @item CS/plugins/font/server/fontplex
-font server multiplexer
+Font server multiplexer.
 @end table
 
 @item CS/plugins/isoldr
-the old isometric world loader plug-in
+Isometric world loader plug-in.
 
 @item CS/plugins/mesh
-Various mesh object implementations (@pxref{MeshObject}). For every mesh object
-there is typically one implementation in @file{object/} and one or more
-loader/saver plugins in @file{persist/}. @file{persist/standard/} is the loader
-in Crystal Space format.
+Various mesh object implementations (@pxref{MeshObject}).  For every mesh
+object there is typically one implementation in @file{object/} and one or more
+loader/saver plugins in @file{persist/}.  @file{persist/standard/} is the
+loader in Crystal Space format.
 
 @item CS/plugins/motion
-Skeletal Motion
+Skeletal motion.
 
 @item CS/plugins/net
-Network Communications
+Network communications.
 
 @table @code
 @item CS/plugins/net/driver/ensocket
-Ensocket Network Driver
+A very thin wrapper over @sc{bsd}-style Sockets.
 
 @item CS/plugins/net/driver/socket
-@sc{bsd} Sockets Network Driver
+@sc{bsd} Sockets network driver.  This driver provides an implementation of the
+very generic @samp{iNetworkDriver}, @samp{iNetworkConnection}, etc.
+interfaces.  It is much more abstract and generic than the @file{ensocket}
+driver.  Use of this driver is recommended over the other.
 @end table
 
 @item CS/plugins/perfstat
-Performance Statistics
+Performance statistics.
 
 @item CS/plugins/physics
-Plug-ins relating to the physics of motion
+Plug-ins relating to the physics of motion.
 
 @table @code
 @item CS/plugins/physics/odedynam
-@sc{ode} Dynamics
+@sc{ode} dynamics.
 @end table
 
 @item CS/plugins/reporter
-Reporter
+Reporter.
 
 @item CS/plugins/sequence
 This is the sequence manager which is useful for managing timed sequences
 of events such as for demos.
 
 @item CS/plugins/sound
-Sound Plugins
+Audio plugins.
 
 @table @code
 @item CS/plugins/sound/driver
-System-dependent sound drivers.
+Platform-specific sound drivers.
 
 @table @code
 @item CS/plugins/sound/driver/coreaudio
-CoreAudio Sound Driver (MacOS/X)
+CoreAudio sound driver (MacOS/X).
 @item CS/plugins/sound/driver/oss
-Open Sound System (@sc{oss}) Sound Driver (@sc{unix})
+Open Sound System (@sc{oss}) sound driver (@sc{unix}).
 @item CS/plugins/sound/driver/waveoutsd
-WaveOut Sound Driver (Win32)
+WaveOut sound driver (Win32).
 @end table
 
 @item CS/plugins/sound/loader
 Loaders for various sound file formats.
 
 @item CS/plugins/sound/renderer
+Platform- or facility-specific sound renderers.
 
 @table @code
 @item CS/plugins/sound/renderer/arts
-aRts Sound Renderer
+``aRts'' sound renderer
 
 @item CS/plugins/sound/renderer/common
-common sound rendering routines
+Common sound rendering utility functions.
 
 @item CS/plugins/sound/renderer/ds3d
-DirectSound 3D Sound Renderer
+DirectSound 3D sound renderer.
 
 @item CS/plugins/sound/renderer/eax
-@sc{eax} Sound Renderer
+@sc{eax} sound renderer.
 
 @item CS/plugins/sound/renderer/software
-Software Sound Renderer
+Software sound renderer.
 @end table
 
 @end table
 
 @item CS/plugins/stdrep
-Standard Report Listener
+Standard report listener.
 
 @item CS/plugins/video
-All plugins directly related to rendering to a video surface
+All plugins directly related to rendering to a video surface.
 
 @table @code
 @item CS/plugins/video/canvas
-The 2D driver component which manages creation of the Crystal Space window
-used for rendering and also supports limited 2D drawing capabilities
-(including 2D pixmaps). It can be used standalone but it is currently very
-limited and not very useful (this may change in the future).
+The 2D driver component which manages creation of the Crystal Space window used
+for rendering and also supports limited 2D drawing capabilities (including 2D
+pixmaps).
 
 @table @code
 @item CS/plugins/video/canvas/asciiart
-@sc{ascii} Art driver
+@sc{ascii} Art driver.
 
 @item CS/plugins/video/canvas/common
-Common code for 2D drivers
+Common code for 2D drivers.
 
 @item CS/plugins/video/canvas/ddraw
-Windows DirectDraw driver
+Windows DirectDraw driver.
 
 @item CS/plugins/video/canvas/ddraw8
-Windows DirectDraw (version 8) driver
+Windows DirectDraw (version 8) driver.
 
 @item CS/plugins/video/canvas/directxcommon
-Common DirectX (Win32) code
-
-@item CS/plugins/video/canvas/linex
-X11 Line3D driver
+Common DirectX (Win32) code.
 
 @item CS/plugins/video/canvas/macosx
-MacOS/X OpenGL, CoreGraphics, and Cocoa 2D graphics drivers
+MacOS/X OpenGL, CoreGraphics, and Cocoa 2D graphics drivers.
 
 @item CS/plugins/video/canvas/memory
-Memory driver (render a scene directly to memory)
+Memory driver (render a scene directly to memory).
 
 @item CS/plugins/video/canvas/null2d
-@sc{null} 2D driver
+@sc{null} 2D driver.
 
 @item CS/plugins/video/canvas/openglcommon
-Common code for all OpenGL 2D drivers
+Common code for all OpenGL 2D drivers.
 
 @item CS/plugins/video/canvas/openglwin
-OpenGL 2D driver for Windows
+OpenGL 2D driver for Windows.
 
 @item CS/plugins/video/canvas/openglx
-OpenGL 2D driver for X11
+OpenGL 2D driver for X11.
 
 @item CS/plugins/video/canvas/softx
-X11 software 2D driver
+X11 software 2D driver.
 
 @item CS/plugins/video/canvas/svgalib
-SVGAlib
+SVGAlib driver (Linux).
 
 @item CS/plugins/video/canvas/xextf86vm
-X-extension driver (X11)
+X-extension driver (X11).
 
 @item CS/plugins/video/canvas/xextshm
-@sc{mit} X-extension shared memory driver (X11)
+@sc{mit} X-extension shared memory driver (X11).
 
 @item CS/plugins/video/canvas/xwindow
-X11 driver
+X-windows X11 driver.
 @end table
 
 @item CS/plugins/video/format
-Code for playing video files on a surface
+Code for playing video files on a surface.
 
 @table @code
 @item CS/plugins/video/format/avi
-Audio-Video Interlace format
+Audio-Video Interlace format.
 
 @item CS/plugins/video/format/codecs
-Video codecs for various formats (currently only @sc{avi})
+Video codecs for various formats (currently only @sc{avi}).
 
 @table @code
 @item codecs/divx4
-DivX version 4
+DivX version 4.
 
 @item codecs/opendivx
-OpenDivX
+OpenDivX.
 
 @item codecs/rle
-Run-Length Encoded
+Run-Length Encoded.
 @end table
 @end table
 
 @item CS/plugins/video/loader
-Loaders for various graphics file formats
+Loaders for various graphics file formats.
 
 @item CS/plugins/video/renderer
 The 3D rasterizer component is required by the 3D engine but may also be
@@ -443,22 +446,16 @@ used in a standalone environment.  It requires a 2D Driver to function.
 
 @table @code
 @item CS/plugins/video/renderer/common
-Common code for 3D rasterizers
-
-@item CS/plugins/video/renderer/inf
-Infinite 3D renderer
-
-@item CS/plugins/video/renderer/line
-Line 3D renderer
+Common code for 3D rasterizers.
 
 @item CS/plugins/video/renderer/null
-@sc{null} renderer (required to work with 2D graphics only)
+@sc{null} renderer (required to work with 2D graphics only).
 
 @item CS/plugins/video/renderer/opengl
-OpenGL renderer
+OpenGL renderer.
 
 @item CS/plugins/video/renderer/software
-Software (non-accelerated) renderer
+Software (non-accelerated) renderer.
 @end table
 @end table
 @end table

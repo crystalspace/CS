@@ -72,26 +72,6 @@ modules (with extension @file{*.so} on Linux and most Unix platforms) for the
 plugin modules, then only the executable is generated and the drivers are
 incorporated in the executable.
 
-@strong{Optional}: @emph{Only perform this step if you are developing a brand
-new plug-in module or changing the SCF identification of an existing one.} If
-you opted to build plugin modules, then you may need to register the drivers
-with the @sc{scf} system. This generally only needs to be done once. The
-registration information is maintained in the file @file{scf.cfg}. However,
-typically this file is already up-to-date, so usually you can skip this step
-altogether. Only perform this step if the system is unable to locate the
-drivers or if you are actively developing a driver and changing registration
-information. The program to register plug-ins is called scfreg, and it was
-also compiled by @samp{make -k all}.  To run it, type:
-
-@example
-./scfreg *.so
-@end example
-
-If all is well this should register all drivers so that Crystal Space will be
-able to load them dynamically. If your platform uses a file extension other
-than @file{*.so} for plug-in modules, then alter the command appropriately.
-This step is not needed when plugin modules are not built separately.
-
 Now you can run the executable @file{walktest}.
 
 @subsubheading Renderer Selection
@@ -102,11 +82,11 @@ otherwise it will try the @samp{SVGAlib} driver, if SVGAlib is available on
 your platform.  There is no need to recompile the program.
 
 To select another 3D rasterizer you need to edit your local configuration file
-@file{CS/data/config/user.cfg}.  Add the following line to select OpenGL for
+@file{$HOME/.crystal/Global.cfg}.  Add the following line to select OpenGL for
 all applications:
 
 @example
-Global.System.Plugins.iGraphics3D = crystalspace.graphics3d.opengl
+System.Plugins.iGraphics3D = crystalspace.graphics3d.opengl
 @end example
 
 Alternately, you can choose the OpenGL renderer from the command-line:
@@ -124,12 +104,3 @@ with optimization then all object files will end up in
 @file{CS/out/UNIX/X86/optimize}.  However if you compile on a Solaris
 system for Sparc with debugging enabled then all objects files end up in
 @file{CS/out/UNIX/SPARC/debug}.
-
-The reason for this directory structure is that it simplifies the compilation
-of Crystal Space both with and without optimization, as well as when using a
-cross-compiler to generate object files for other processor architectures.
-
-Another advantage is for people who share the same directory structure for
-different systems. For example, if Crystal Space is located on a shared
-directory for both a Solaris system and a Linux system then this arrangement
-allows the package to be built for each system without overwriting the other.
