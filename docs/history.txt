@@ -25,6 +25,12 @@ chronological order.
 	  the huge slowdown in CS though.
 	- res changed the csArray<> comparison functor to not store the key as
 	  a ref. This seems to fix the slowdown.
+	- Eric Sunshine fixed cs.mak so that "-L$(OUT)" appears in the link
+	  command before other platform-specific -L directives.  This ensures,
+	  for instance, that application and plugin targets will link against
+	  the libraries in the build directory, rather than any installed
+	  versions.  Without this change, the linker was preferring installed
+	  CS libraries over developmental ones, which was incorrect.
 31-Mar-2004
 	- Jorrit fixed a bug with iSector->HitBeamPortals(). It would not
 	  be able to register hits on meshes that don't return a polygon
