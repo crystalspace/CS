@@ -32,6 +32,7 @@ code.
 * HOWTO Simple Map Example:: Simple Map Example
 * HOWTO Use custom font:: Using a Custom Font
 * HOWTO Recording Movies:: Recording Movies
+* HOWTO Using Procedural Textures:: Using Procedural Textures
 @end menu
 
 @importss{tutorial,howto,smartptr.txi}
@@ -53,3 +54,4 @@ code.
 @importss{tutorial,howto,simpmap.txi}
 @importss{tutorial,howto,custfont.txi}
 @importss{tutorial,howto,movierec.txi}
+@importss{tutorial,howto,proctex.txi}

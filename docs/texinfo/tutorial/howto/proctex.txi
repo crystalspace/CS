@@ -1,0 +1,7 @@
+@c -*-texinfo-*-
+@node HOWTO Using Procedural Textures, , HOWTO Use custom font, HOWTO
+@subsection Using Procedural Textures
+@cindex Using procedural textures
+
+For example code, @ref{ProcTextures}.
+

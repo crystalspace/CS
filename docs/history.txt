@@ -41,6 +41,8 @@ The history order is reversed so that new features are at the top.
 	  documentation.
 	- Jorrit fixed csProcFile inheritance to use public inheritance
 	  for iFireTexture instead of private inheritance.
+	- Jorrit added a howto section on procedural textures which simply
+	  refers to the procedural texture section in plugins.
 	- Eric Sunshine fixed ddraw8/Jamfile so that it only enables the ddraw8
 	  target if DirectDraw8 is present (DDRAW8.AVAILABLE=yes).  This
 	  prevents Jam from trying to build this plugin when a lesser version
