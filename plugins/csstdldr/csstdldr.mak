@@ -47,8 +47,14 @@ SRC.STDLDR = plugins/csstdldr/stdparse.cpp plugins/csstdldr/stdldr.cpp \
 OBJ.STDLDR = $(addprefix $(OUT),$(notdir $(SRC.STDLDR:.cpp=$O)))
 
 #@@@ to be removed
-DEP.STDLDR += $(CSSYS.LIB) $(CSENGINE.LIB) \
-  $(CSUTIL.LIB) $(CSGEOM.LIB) $(CSOBJECT.LIB) $(CSTERR.LIB) $(CSGFXLDR.LIB)
+DEP.STDLDR += \
+$(CSENGINE.LIB) \
+$(CSTERR.LIB) \
+$(CSGEOM.LIB) \
+$(CSGFXLDR.LIB) \
+$(CSUTIL.LIB) \
+$(CSSYS.LIB) \
+$(CSOBJECT.LIB) 
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
