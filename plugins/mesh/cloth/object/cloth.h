@@ -20,18 +20,204 @@
 #include <stdarg.h>
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "csgeom/box.h"
 #include "csgeom/tesselat.h"
+#include "csutil/csvector.h"
+
+struct csTriangle;
+struct iClothFactoryState;	
+	
+class Constraint
+{
+	public:
+uint v0;
+uint v1;	
+float L0;
+	
+Constraint(uint i0, uint i1) 
+{
+	v0=i0; v1=i1;	
+	printf( " CREATING constrain between %u and %u... \n",i0,i1);
+};
+
+~Constraint() 
+{};
+	
+};
+
+// things allocated under the responsability of Cloth:
+//  Cloth::vertices
+//  Cloth::triangles
+//  Cloth::(all Constraint elements)
+
+class Cloth
+{
+public:
+csVector3*       shift;
+csBox3*          object_bbox;
+csVector3        gravity;
+
+csVector3*       vertices;	
+uint             nverts;
+
+csTriangle*      triangles;
+uint             ntris;
+
+csBasicVector*   Edges;
+uint             nedges;
+
+//quick access data
+uint**            Edge2TriangleRef;  //which triangles share this edge?
+Constraint***     Triangle2EdgeRef;  //which edges bound this triangle?
+uint**            Vertex2EdgeRef;    //which edges share this vertex?
+
+
+Cloth ( iClothFactoryState*  mesh,
+         csVector3&    Sh,
+         csBox3&       box,
+         csVector3     grav );
+~ Cloth ();
+
+bool AddConstraint( int v0, int v1 , Constraint** edge );
+
+};
+
+//**//**//**//**//**//**//**//**//**//**//**//**//**//**//
+ //           Integrator methods                     //
+//**//**//**//**//**//**//**//**//**//**//**//**//**//
+class Integrator
+{
+	public:
+		
+	Cloth*         cloth_object;
+	csVector3*     vertices;
+	uint           nverts;
+	csBasicVector* fields;
+	float          structural_k;
+	float          density;
+	float          friction;
+	float          rigidity;
+	float          dt;
+	float          time;
+	csVector3      gravity;
+	csVector3*     velocities;
+	csVector3*     forces;
+			
+	Integrator( Cloth* obj )
+	{
+		cloth_object = obj;
+		vertices     = obj->vertices;
+		nverts       = obj->nverts;
+		fields       = obj->Edges;
+		gravity      = obj->gravity;
+		structural_k = 35.0;
+		density      = 3.0;
+		friction     = 0.7;
+		rigidity     = 0.9;
+		dt           = 0.07;
+		time         = 0.0;
+		velocities   = new csVector3 [ nverts ];
+		forces       = new csVector3 [ nverts ];
+	};
+	~Integrator()
+    {
+		if (velocities)   { delete[] velocities; };
+		if (forces)       { delete[] forces;     };
+	};
+	
+	inline void ComputeFields()
+	{
+		Constraint* first;		
+		Constraint* p;
+		csVector3   temp;
+		float       N;
+		int size    = fields->Length();  
+		for (int i=0; i < size ; i++ )
+			{
+				p       = (Constraint*) fields -> Get( i ); 
+				temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
+				N       = temp.Norm();
+				N       = structural_k*( ( N - p->L0 ) / N );
+				temp   *= N;
+				forces[ p->v0 ] += temp;
+				forces[ p->v1 ] -= temp;
+			};
+	}; 
+	
+	inline void ApplyProvotConstraint()
+	{
+	Constraint* first;
+	Constraint* p;
+	csVector3   temp;
+	float       N;
+	int size    = fields->Length();  
+	for (int i=0; i < size ; i++ )
+		{
+			p       = (Constraint*) fields -> Get( i ); 
+			temp    = vertices [ p->v1 ] - vertices [ p->v0 ];
+			N       = temp.Norm();
+			if (rigidity*N>p->L0)
+				{
+					temp *= 0.5*( rigidity - p->L0/N ); 
+					vertices[ p->v0 ] += temp;
+					vertices[ p->v1 ] -= temp;
+				};
+		};
+    };
+	
+	inline void ComputeEuler()
+	{
+		int i;
+		time += dt;
+		ComputeFields();
+		// WARNING:: this 2nd order reference should be profiled!! can be harmful!!
+		cloth_object -> object_bbox -> StartBoundingBox ( vertices[0] + *cloth_object->shift );
+		for (i=0;i<nverts;i++) 
+			{
+				vertices[i]  += velocities[i]*dt;
+				velocities[i]+= forces[i]*(dt/density); 
+				forces[i]     = density*gravity;   
+				cloth_object -> object_bbox -> AddBoundingVertexSmart ( vertices[i] + *cloth_object->shift );
+			};
+		//printf("vertice[0]=%f",(vertices[0] + *cloth_object->shift).x);	
+		ApplyProvotConstraint();
+    };
+	
+	inline void Update(uint msec)
+	{
+		//do
+			//{
+				ComputeEuler();
+		        //printf("compute!");
+			//} while (time*1000<msec);				
+    };
+	
+		
+};
+
+
+
+//TODO: 
+//     Integrator should be a global object ?
+//       
+//
 
 
 class ClothIntegrator
 {
 	public:
-	        ClothIntegrator(    int XSZ,
+		ClothIntegrator( Cloth* obj )
+{
+	cloth_object=obj;	
+	
+};
+		ClothIntegrator(    int XSZ,
 				    int YSZ,				    
 			     csVector3& Sh,
 			        csBox3& box,
 			      csVector3 grav  )
-	{            shift=&Sh;
+	{     cloth_object=NULL;       
+		    shift=&Sh;
 		   gravity=grav;
                      Xsize=XSZ+1;  //the +1 goes because in Xsize in the plugin is quad axe numbers 
 		     Ysize=YSZ+1;
@@ -43,12 +229,12 @@ class ClothIntegrator
 		  //a lot faster that Runge-Kutta 4, and more precise =), but uses
 		  //4 timesteps for velocities and forces!!, no very memory friendly as you could guess
 		
-		velocities=new csVector3[nverts];  
-       	       velocities1=new csVector3[nverts];
+    		velocities=new csVector3[nverts];  
+ 	       velocities1=new csVector3[nverts];
 	       velocities2=new csVector3[nverts];
 	       velocities3=new csVector3[nverts];
 	      
-                    forces=new csVector3[nverts];	     
+            forces=new csVector3[nverts];	     
 		   forces1=new csVector3[nverts];
 		   forces2=new csVector3[nverts];
 		   forces3=new csVector3[nverts];
@@ -82,8 +268,29 @@ class ClothIntegrator
 	               //\  this class only cares about
 	                //\  computation
 		
-		~ClothIntegrator();
+		~ClothIntegrator()
+	{
+		if (cloth_object)
+		{
+			delete cloth_object;
+		} else
+		{
+			if (vertices)        { delete[] vertices; };
+		};
+		if (tempvertices)    { delete[] tempvertices; };
+		if (velocities)      { delete[] velocities; };
+		if (velocities1)     { delete[] velocities1; };
+		if (velocities2)     { delete[] velocities2; };
+		if (velocities3)     { delete[] velocities3; };
+		if (forces)          { delete[] forces; };
+		if (forces1)         { delete[] forces1; };
+		if (forces2)         { delete[] forces2; };
+		if (forces3)         { delete[] forces3; };
+			
+	};
+		
 
+	        Cloth* cloth_object;
 		csVector3* vertices;
 		csVector3* tempvertices;
 		
@@ -380,76 +587,46 @@ void ComputeConstrainConditionsForces()
 
 };
 void Compute() {   
-      int i;   
-	ComputeForces();
-/*	
-      for (i=0;i<Xsize-8;i++) {
-  forces[i]+= -(Xsize*Ysize)*density*gravity;
-  //vertices[1].Set(0.1,0,0);
-   };
-    for (i=nverts-Ysize+1;i<nverts;i++) {
-  forces[i]+= -(Xsize*Ysize)*density*gravity;   
- // vertices[i].Set(2.0*(i-nverts+Xsize)/Xsize,2.0,0);
-  //vertices[1].Set(0.1,0,0);
-   };*/
+int i;   
+ComputeForces();
 
-     csVector3* aux2;  //swapping variables
-     csVector3* aux3;
+csVector3* aux2;  //swapping variables
+csVector3* aux3;
          
-   for (i=0;i<nverts;i++)
-   {
-	   //let apply here Adams-Moulton predictor
-
-	   /*
-    tempVelocity = velocities[i]+(dt/24)*( 55*forces[i] - 59*forces1[i] + 37*forces2[i] - 9*forces3[i] ); 
-    tempVertices = vertices[i]+(dt/24)*( 55*velocities[i] - 59*velocities1[i] + 37*velocities2[i] - 9*velocities3[i] );  */
+for (i=0;i<nverts;i++)
+{
 	//predicted vertice positions
 	//IMPORTANT: note that velocities holds at this moment the value holded from velocities3 (t - 3h) which was swapped   
-    tempvertices[i] = vertices[i]+(dt/24)*( 55*velocities1[i] - 59*velocities2[i] + 37*velocities3[i] - 9*velocities[i] ); 
+tempvertices[i] = vertices[i]+(dt/24)*( 55*velocities1[i] - 59*velocities2[i] + 37*velocities3[i] - 9*velocities[i] ); 
       //predicted velocities 
-      velocities[i] = friction*velocities1[i]+(dt/(24*density))*( 55*forces[i] - 59*forces1[i] + 37*forces2[i] - 9*forces3[i] );
+velocities[i]   = friction*velocities1[i]+(dt/(24*density))*( 55*forces[i] - 59*forces1[i] + 37*forces2[i] - 9*forces3[i] );
           
-         forces3[i] = density*gravity;
+forces3[i]      = density*gravity;
 
-      // Now we need to recompute forces for the new vertices to apply corrector, ugh
-   };
-                 aux3 = vertices;
-             vertices = tempvertices; 
-                Swap();
-       ComputeForces();   // this evaluation is done on the predicted vertice positions
-                 aux2 = vertices;
-             vertices = aux3;
-         tempvertices = aux2;
+// Now we need to recompute forces for the new vertices to apply corrector, ugh
+};
+aux3            = vertices;
+vertices        = tempvertices; 
+Swap            ();
+ComputeForces   ();   // this evaluation is done on the predicted vertice positions
+aux2            = vertices;
+vertices        = aux3;
+tempvertices    = aux2;
              
-     for (i=0;i<nverts;i++)
+for (i=0;i<nverts;i++)
    {      
-            	   //  and here lets apply the corrector
-	   //  
-                   // IMPORTANT: now, if im not wrong, in velocities is the timestep t - 2h, 
-	    vertices[i]+= (dt/24)*( 9*velocities1[i] + 19*velocities2[i] - 5*velocities3[i] + velocities[i]); 
-         velocities1[i] = velocities2[i] + (dt/(24*density))*( 9*forces[i] + 19*forces1[i] - 5*forces2[i] + forces3[i]);
-             forces[i] = density*gravity;   //clean temporal predicted force buffer and set to default gravity for
-	                            //calculation on next timestep
-	
-	//	 vertices[i].z=cos(1./(cos(pow( xindex-3 , 2 )+pow( yindex-3 ,2)-time*time)+2.1) );
-	//	 vertices[i].x=xindex;
-	//	 vertices[i].y=yindex;
-       object_bbox->AddBoundingVertexSmart ( vertices[i] + *shift );
-		 //texels[i].Set(xindex/5.1f , yindex/5.1f );
-		 //colors[i].Set (1.0f, 1.0f, 1.0f);
-	//	 xindex+=5.0/Xsize;
-	//	 if ( ((i+1)%(Xsize+1))==0 ) { xindex=0.0; yindex+=5.0/Ysize;  };
-		 	 };
-  // Swap();   //swap timebuffers             
- 
-  // vertices[Xsize-1].Set(0,0,0);
-
-    };
+       // IMPORTANT: now, velocities is the timestep t - 2h, 
+      vertices   [i] += (dt/24)*( 9*velocities1[i] + 19*velocities2[i] - 5*velocities3[i] + velocities[i]); 
+	  velocities1[i]  = velocities2[i] + (dt/(24*density))*( 9*forces[i] + 19*forces1[i] - 5*forces2[i] + forces3[i]);
+	  forces     [i]  = density*gravity;   //clean temporal predicted force buffer and set to default gravity for
+	  object_bbox ->    AddBoundingVertexSmart ( vertices[i] + *shift );
+	};
+};
 
  void ComputeVerlet() 
  {
 	 
-	ComputeConstrainedForces( 1.0 );
+	//ComputeConstrainedForces( 1.0 );
         int i;     
    for (i=0;i<nverts;i++)
    {
@@ -487,10 +664,11 @@ void Compute() {
     };
 
 
- void  ComputeConstrainedForces(float stiffness)
+	/*
+ void  ComputeConstrainedForces(float maxlengthfactor)
 	
    {
-   float softness= 1.0 - stiffness;	   
+   
    //the purpose of this routine is evaluate how off are satisfied distance constrains
    //for rigid edges and apply relaxation  ( i wonder if there is a way to induce critical relaxation)
    //
@@ -513,9 +691,9 @@ void Compute() {
       N=temp.Norm();
       N=((N-EquilbDist)/N);
       temp*=N;
-      forces[j]+=softness*temp;   //action -
+      //forces[j]+=softness*temp;   //action -
       vertices[j]+=0.5*temp;
-      forces[j+1]-=softness*temp;  //reaction -  At Work     
+      //forces[j+1]-=softness*temp;  //reaction -  At Work     
       vertices[j+1]-=0.5*temp;
 	   
    };
@@ -572,10 +750,12 @@ void Compute() {
 	
       };
    }; 
+   
  };
 
 
-};
+*/
+ };
 
 #endif // __CLOTH_H__
 
