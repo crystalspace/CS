@@ -1,5 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
+4-Dec-2000
+	- Norman Kramer implemented farplane culling for sprites.
 3-Dec-2000
 	- Norman Kramer did some work on CrystalBall (his polygon culler).
 	- Norman also did the following with relation to the c-buffer
