@@ -129,7 +129,7 @@ OUT.DOC.IMAGE.LIST = $(subst $(CSMANUAL_DIR)/,,$(DOC.IMAGE.LIST))
 # stripping off one layer of subdirectories at a time.
 OUT.DOC.IMAGE.DIRS.0 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.LIST)))
 OUT.DOC.IMAGE.DIRS.1 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.0)))
-OUT.DOC.IMAGE.DIRS.2 ;= $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.1)))
+OUT.DOC.IMAGE.DIRS.2 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.1)))
 OUT.DOC.IMAGE.DIRS.3 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.2)))
 OUT.DOC.IMAGE.DIRS.4 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.3)))
 OUT.DOC.IMAGE.DIRS.5 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.4)))
