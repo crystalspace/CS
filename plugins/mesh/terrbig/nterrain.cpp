@@ -89,3 +89,31 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable* movable, csZBufMode zbuf
   return true;
 }
 
+void 
+csBigTerrainObject::GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+{
+	
+}
+
+void 
+csBigTerrainObject::GetRadius (csVector3& rad, csVector3& cent)
+{
+
+}
+
+bool 
+csBigTerrainObject::HitBeamOutline (const csVector3& start, const csVector3& end, csVector3& isect, float* pr)
+{
+
+}
+
+bool 
+csBigTerrainObject::HitBeamObject (const csVector3& start, const csVector3& end, csVector3& isect, float* pr)
+{
+
+}
+
+
+
+
+
