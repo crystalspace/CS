@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Oct-2004
+	- Rhad fixed a long standing bug in the Ogg loader.
+	  - Per specs, SEEK_END must seek 1 byte past the end of data
+	    buffer, not to the last byte.
 4-Oct-2004
 	- res fixed xmlshader to correctly deal with shader conditionals 
 	  in text.

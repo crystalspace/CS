@@ -27,10 +27,17 @@ SCF_IMPLEMENT_IBASE (csOggSoundData)
   SCF_IMPLEMENTS_INTERFACE (iSoundData)
 SCF_IMPLEMENT_IBASE_END
 
+// As of 2004/10/05 the specs to which these functions (should) adhere is located at
+// http://www.xiph.org/ogg/vorbis/doc/vorbisfile/callbacks.html
+
 static size_t cs_ogg_read (void *ptr, size_t size, size_t nmemb,
   void *datasource)
 {
   csOggSoundData::datastore *ds = (csOggSoundData::datastore*)datasource;
+
+  // size_t is unsigned, be careful with subtraction.  A 0 return indicates end of stream.
+  if (ds->length <= ds->pos)
+    return 0;
   size_t br = MIN (size*nmemb, ds->length - ds->pos);
 
   memcpy (ptr, ds->data+ds->pos, br);
@@ -49,11 +56,13 @@ static int cs_ogg_seek (void *datasource, ogg_int64_t offset, int whence)
   else if (whence == SEEK_CUR)
     np = ds->pos + offset;
   else if (whence == SEEK_END)
-    np = ds->length + offset - 1;
+    np = ds->length + offset;
   else
     return -1;
 
-  if (np >= ds->length)
+  // Since np is unsigned, a negative value will wrap around to a huge positive value, and 
+  //  inevitably be well beyond the length.
+  if (np > ds->length)
     return -1;
 
   ds->pos = np;
