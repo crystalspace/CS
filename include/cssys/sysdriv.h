@@ -43,10 +43,6 @@
 #  include "cssys/mac/MacSystem.h"
 #endif
 
-#if defined(OS_AMIGAOS)
-#  include "cssys/amiga/amiga.h"
-#endif
-
 #if defined(OS_OS2)
 #  include "cssys/os2/csos2.h"
 #endif

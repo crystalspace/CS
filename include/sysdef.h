@@ -100,10 +100,6 @@
 #  include "cssys/unix/csosdefs.h"
 #endif
 
-#if defined (OS_AMIGAOS)
-#  include "cssys/amiga/csosdefs.h"
-#endif
-
 #if defined (OS_OS2)
 #  include "cssys/os2/csosdefs.h"
 #endif
@@ -224,7 +220,7 @@
 # endif
 // Generic ISDIR needed for COMP_GCC
 #  ifdef __NEED_GENERIC_ISDIR
-#    if !defined (OS_UNIX) && !defined (OS_MACOS) && !defined (OS_AMIGAOS)
+#    if !defined (OS_UNIX) && !defined (OS_MACOS)
 #      include <io.h>
 #    endif
 #    if defined(OS_MACOS)

@@ -275,8 +275,6 @@ MacOS/X Server, OpenStep, NextStep
 Unix, including Linux, Solaris, Irix, etc.
 @item CS/libs/cssys/win32
 Win32
-@item CS/libs/cssys/amiga
-Amiga
 @end table
 
 @item CS/libs/tools

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node GCC Windows, Amiga, MS-DOS, Platform Instructions
+@node GCC Windows, , MS-DOS, Platform Instructions
 @subsection @sc{gcc} and Mingw for Windows
 
 @strong{Warning}: @emph{These instructions are extremely incomplete.  You

@@ -23,8 +23,6 @@
 #  define OS_VERSION "DOS"
 #elif defined(OS_MACOS)
 #  define OS_VERSION "Macintosh"
-#elif defined(OS_AMIGAOS)
-#  define OS_VERSION "Amiga"
 #elif defined(OS_WIN32)
 #  define OS_VERSION "Win32"
 #elif defined(OS_OS2)

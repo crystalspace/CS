@@ -25,7 +25,6 @@ will find a reference to it from within the instructions in this section.
 * BeOS:: @sc{b}e@sc{os}
 * MS-DOS:: @sc{ms-dos}
 * GCC Windows:: @sc{gcc} and Mingw for Windows
-* Amiga::
 @end menu
 
 @importss{build,platform,unix.txi}
@@ -36,4 +35,3 @@ will find a reference to it from within the instructions in this section.
 @importss{build,platform,beos.txi}
 @importss{build,platform,msdos.txi}
 @importss{build,platform,win32gcc.txi}
-@importss{build,platform,amiga.txi}
