@@ -200,6 +200,20 @@ struct iLight : public iBase
    */
   virtual void SetAttenuation (int a) = 0;
 
+#ifdef CS_USE_NEW_RENDERER
+  /**
+  * Set attenuation vector 
+  * csVector3(constant, linear, quadric)
+  */
+  virtual void SetAttenuationVector(csVector3 &pattenv) = 0;
+
+  /**
+  * Get attenuation vector
+  * csVector3(constant, linear, quadric)
+  */
+  virtual csVector3 &GetAttenuationVector() = 0;
+
+#endif
   /// Create a cross halo for this light.
   virtual iCrossHalo* CreateCrossHalo (float intensity, float cross) = 0;
   /// Create a nova halo for this light.

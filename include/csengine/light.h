@@ -72,6 +72,10 @@ protected:
 
   /// Attenuation type
   int attenuation;
+  
+#ifdef CS_USE_NEW_RENDERER
+  csVector3 attenuationvec;
+#endif
 
   /// Light number. Changes when the light changes in some way (color/pos).
   uint32 lightnr;
@@ -196,6 +200,21 @@ public:
    */
   void SetAttenuation (int a) {attenuation = a;}
 
+#ifdef CS_USE_NEW_RENDERER
+  /**
+  * Set attenuation vector 
+  * csVector3(constant, linear, quadric)
+  */
+  void SetAttenuationVector(csVector3 &pattenv);
+
+  /**
+  * Get attenuation vector
+  * csVector3(constant, linear, quadric)
+  */
+  csVector3 &GetAttenuationVector();
+
+#endif
+
   /**
    * Get the brightness of a light at a given distance.
    */
@@ -258,6 +277,10 @@ public:
     {
       return scfParent->GetBrightnessAtDistance (d);
     }
+#ifdef CS_USE_NEW_RENDERER
+    virtual void SetAttenuationVector(csVector3 &pattenv) { scfParent->SetAttenuationVector(pattenv); }
+    virtual csVector3 &GetAttenuationVector() { return scfParent->GetAttenuationVector(); }
+#endif
     virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
     virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
   	float roundness);

@@ -170,6 +170,20 @@ void csLight::SetColor (const csColor& col)
   lightnr++;
 }
 
+#ifdef CS_USE_NEW_RENDERER
+
+void csLight::SetAttenuationVector(csVector3 &pattenv)
+{
+  attenuationvec = pattenv;
+}
+
+csVector3 &csLight::GetAttenuationVector()
+{
+  return attenuationvec;
+}
+
+#endif
+
 iCrossHalo *csLight::Light::CreateCrossHalo (float intensity, float cross)
 {
   csCrossHalo *halo = new csCrossHalo (intensity, cross);
