@@ -22,6 +22,8 @@ interface IMacGraphicsInfo : public IUnknown
     STDMETHOD(PointInWindow)( Point *thePoint, bool *inWindow ) = 0;
     ///
     STDMETHOD(IsDrawSprocketsEnabled)( bool *enabled ) = 0;
+    ///
+    STDMETHOD(SetColorPalette)( void ) = 0;
 };
 
 #endif

@@ -22,6 +22,8 @@ class IXMacGraphicsInfo : public IMacGraphicsInfo
     STDMETHOD(PointInWindow)( Point *thePoint, bool *inWindow );
     ///
     STDMETHOD(IsDrawSprocketsEnabled)( bool *isEnabled );
+    ///
+    STDMETHOD(SetColorPalette)( void );
 };
 
 #endif

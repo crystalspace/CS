@@ -16,8 +16,8 @@ Contents:
 3) Libraries: libjpeg, linpng, and zlib.  The easiest place to get these is to
 get them from my web site <http://www.ultranet.com/~rbate>.  The libraries
 from my web site already have been built so they are ready to go.
-4) Directory layout:  The three libraries mentioned above and crystal space need
-to be unpacked into the same folder.
+4) Directory layout:  The three libraries mentioned above need to be placed into "cryst"
+if they were not unpacked into this folder.
 
 [2] GETTING READY TO DEVELOP
 

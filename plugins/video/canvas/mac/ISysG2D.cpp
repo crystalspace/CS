@@ -72,3 +72,11 @@ STDMETHODIMP IXMacGraphicsInfo::IsDrawSprocketsEnabled( bool *isEnabled )
     pThis->IsDrawSprocketsEnabled( isEnabled );
     return S_OK;
 }
+
+STDMETHODIMP IXMacGraphicsInfo::SetColorPalette( void )
+{
+    METHOD_PROLOGUE( csGraphics2DMac, XMacGraphicsInfo);
+    
+    pThis->SetColorPalette();
+    return S_OK;
+}

@@ -70,9 +70,11 @@ public:
 	void		 		UpdateWindow( WindowPtr theWindow, bool *updated );
 	void				PointInWindow( Point *thePoint, bool *inWindow );
  	void				IsDrawSprocketsEnabled( bool *isEnabled );
+ 	void				SetColorPalette( void );
 
 protected:
 	CWindowPtr			mMainWindow;
+	GDHandle			mMainGDevice;
 	CTabHandle			mColorTable;
 	GWorldPtr			mOffscreen;
 	PixMapHandle		mPixMap;

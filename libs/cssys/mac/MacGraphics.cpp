@@ -127,7 +127,6 @@ csGraphics2DMac::~csGraphics2DMac()
 ----------------------------------------------------------------*/
 void csGraphics2DMac::Initialize()
 {
-	GDHandle				theMainDevice;
 	long					pixel_format;
 	OSErr					err;
 	Boolean					showDialogFlag;
@@ -206,19 +205,23 @@ void csGraphics2DMac::Initialize()
 		mMainWindow = NULL;
 		mOldDepth = 0;
 
-		theMainDevice = GetMainDevice();
-		pixel_format = GETPIXMAPPIXELFORMAT( *((**theMainDevice).gdPMap) );
+		/*
+		 *	Get the depth of the main gdevice.
+		 *	FIXMEkrb: Should ask user which gdevice to use if more then one.
+		 */
+		mMainGDevice = GetMainDevice();
+		pixel_format = GETPIXMAPPIXELFORMAT( *((**mMainGDevice).gdPMap) );
 
 		/*
-		 *	If the programs needs a certain pixel depth and the main device
-		 *	is not at this depth, ask the user if we can set the main screen
+		 *	If the programs needs a certain pixel depth and the gdevice
+		 *	is not at this depth, ask the user if we can set the gdevice
 		 *	to the required depth.
 		 */
 		if (( Depth ) && ( Depth != pixel_format )) {
 			/*
 			 *	Check to see if the main screen can handle the requested depth.
 			 */
-			if ( ! HasDepth( theMainDevice, Depth, (**theMainDevice).gdFlags, 1 )) {
+			if ( ! HasDepth( mMainGDevice, Depth, (**mMainGDevice).gdFlags, 1 )) {
 				DisplayErrorDialog( kBadDepthString );
 			}
 			/*
@@ -238,18 +241,18 @@ void csGraphics2DMac::Initialize()
 		/*
 		 *	If the program does not need a certain pixel depth, check to make
 		 *	sure the pixel depth is on of the ones we can deal with.  If not,
-		 *	ask the user if we can set the main screen to the required depth.
+		 *	ask the user if we can set the gdevice to the required depth.
 		 */
 		if (( ! Depth ) && (( pixel_format != 8 ) && ( pixel_format != 16 ) && ( pixel_format != 32 ))) {
 			/*
 			 *	Check to see if the main screen can handle the default depth.
 			 */
-			if ( ! HasDepth( theMainDevice, 8, (**theMainDevice).gdFlags, 1 )) {
+			if ( ! HasDepth( mMainGDevice, 8, (**mMainGDevice).gdFlags, 1 )) {
 				/*
 				 *	No, see if it can deal with the other depths.
 				 */
-				if ( ! HasDepth( theMainDevice, 16, (**theMainDevice).gdFlags, 1 )) {
-					if ( ! HasDepth( theMainDevice, 32, (**theMainDevice).gdFlags, 1 )) {
+				if ( ! HasDepth( mMainGDevice, 16, (**mMainGDevice).gdFlags, 1 )) {
+					if ( ! HasDepth( mMainGDevice, 32, (**mMainGDevice).gdFlags, 1 )) {
 						DisplayErrorDialog( kBadDepthString );
 					} else {
 						Depth = 32;
@@ -279,7 +282,7 @@ void csGraphics2DMac::Initialize()
 		 *	is not at this depth, change the main device to the required depth.
 		 */
 		if (( Depth ) && ( Depth != pixel_format )) {
-			SetDepth( theMainDevice, Depth, (**theMainDevice).gdFlags, 1 );
+			SetDepth( mMainGDevice, Depth, (**mMainGDevice).gdFlags, 1 );
 			mOldDepth = pixel_format;
 		} else {
 			Depth = pixel_format;
@@ -344,10 +347,13 @@ bool csGraphics2DMac::Open(char* Title)
 {
 	Str255			theTitle;
 	Rect			theBounds;
+	Rect			displayRect;
 	int				i;
 	int				theOffset;
 	unsigned int	theRowBytes;
 	OSErr			theError;
+	int				displayWidth;
+	int				displayHeight;
 
 	if ( mDrawSprocketsEnabled ) {
 		DSpContext_FadeGammaOut(NULL, NULL);
@@ -364,7 +370,6 @@ bool csGraphics2DMac::Open(char* Title)
 		/*
 		 *	Make the offscreen port.
 		 */
-
 		theBounds.left = 0;
 		theBounds.top = 0;
 		theBounds.right = Width;
@@ -381,8 +386,18 @@ bool csGraphics2DMac::Open(char* Title)
 
 		/*
 		 *	Create the main window with the given title
+		 *	centered on the main gdevice.
 		 */
-		OffsetRect( &theBounds, 64, 64 );
+		displayRect = (**mMainGDevice).gdRect;
+		displayWidth = displayRect.right - displayRect.left;
+		displayHeight = displayRect.bottom - displayRect.top;
+		
+		theBounds.left = displayRect.left + ((displayWidth - Width) / 2);
+		theBounds.top = displayRect.top + ((displayHeight - Height) / 2);
+		
+		theBounds.right = theBounds.left + Width;
+		theBounds.bottom = theBounds.top + Height;
+
 		strcpy( (char *)&theTitle[1], Title );
 		theTitle[0] = strlen( Title );
 		mMainWindow = (CWindowPtr)::NewCWindow( nil, &theBounds, theTitle, true, noGrowDocProc, 
@@ -518,33 +533,7 @@ bool csGraphics2DMac::BeginDraw()
 
 		mPaletteChanged = false;
 	} else {
-		CTabHandle	theCTable;
-
-		/*
-		 *	If the palette has changed, make sure the offscreen gworld
-		 *	(if there is one)and the window are correctly set up.
-		 */
-		if ( mPaletteChanged ) {
-			if ( mOffscreen ) {
-				theCTable = (**(mOffscreen->portPixMap)).pmTable;
-
-				::SetGWorld( (GWorldPtr)mOffscreen, NULL );
-				::CTabChanged( theCTable );
-			} else {
-				theCTable = (**(mMainWindow->portPixMap)).pmTable;
-
-				::SetGWorld( (GWorldPtr)mMainWindow, NULL );
-				::CTabChanged( theCTable );
-			}
-
-			::SetGWorld( (GWorldPtr)mMainWindow, NULL );
-			::SelectWindow( (WindowPtr)mMainWindow );
-			::ActivatePalette( (WindowPtr)mMainWindow );
-
-			mPaletteChanged = false;
-		} else {
-			::SetGWorld( (GWorldPtr)mMainWindow, NULL );
-		}
+		::SetGWorld( (GWorldPtr)mMainWindow, NULL );
 	}
 
   return true;
@@ -801,6 +790,43 @@ void csGraphics2DMac::PointInWindow( Point *thePoint, bool *inWindow )
 void csGraphics2DMac::IsDrawSprocketsEnabled( bool *isEnabled )
 {
 	*isEnabled = mDrawSprocketsEnabled;
+
+	return;
+}
+
+
+void csGraphics2DMac::SetColorPalette( void )
+{
+	CTabHandle	theCTable;
+
+	if ( ! mDrawSprocketsEnabled ) {
+		/*
+		 *	If the palette has changed, make sure the offscreen gworld
+		 *	(if there is one)and the window are correctly set up.
+		 */
+		if ( mPaletteChanged ) {
+			::GetGWorld( &mSavedPort, &mSavedGDHandle );
+
+			if ( mOffscreen ) {
+				theCTable = (**(mOffscreen->portPixMap)).pmTable;
+
+				::SetGWorld( (GWorldPtr)mOffscreen, NULL );
+				::CTabChanged( theCTable );
+			} else {
+				theCTable = (**(mMainWindow->portPixMap)).pmTable;
+
+				::SetGWorld( (GWorldPtr)mMainWindow, NULL );
+				::CTabChanged( theCTable );
+			}
+
+			::SetGWorld( (GWorldPtr)mMainWindow, NULL );
+			::SelectWindow( (WindowPtr)mMainWindow );
+			::ActivatePalette( (WindowPtr)mMainWindow );
+
+			mPaletteChanged = false;
+			::SetGWorld( mSavedPort, mSavedGDHandle );
+		}
+	}
 
 	return;
 }

@@ -37,7 +37,7 @@ void csSystemDriver::printf_close(void)
 }
 
 // to be called instead of printf (exact same prototype/functionality of printf)
-int csSystemDriver::printf(char *str, ...)
+int csSystemDriver::printf(const char *str, ...)
 {
   va_list arg;
   char buf[1024];

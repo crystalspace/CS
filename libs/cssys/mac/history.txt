@@ -7,6 +7,10 @@ Add Network support.
 Optimize everything.
 
 History:
+5-May-99
+	- Updated to v13r010.
+	- Move zlib, libjpeg and libpng into the cryst folder to be the same as other platforms.
+	- Fixed the access paths, hopefuly this will work for all.
 26-Apr-99
 	- Updated the Glide Render to v13r009.  Everything else just compiles and works.
 20-Apr-99

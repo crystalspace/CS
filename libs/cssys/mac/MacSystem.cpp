@@ -35,7 +35,6 @@
 #include <SIOUX.h>
 #include "sysdef.h"
 #include "types.h"
-#include "csutil/archive.h"
 #include "csutil/inifile.h"
 #include "csgeom/math3d.h"
 #include "cssys/common/system.h"
@@ -275,6 +274,7 @@ void SysSystemDriver::Loop(void)
 
 	if (SUCCEEDED(hRes)) {
 		piG2D->IsDrawSprocketsEnabled( &usingDrawSprockets );
+      	piG2D->SetColorPalette();
 
 		piG2D->Release();
 		piG2D = NULL;
