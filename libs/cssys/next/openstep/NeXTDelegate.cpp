@@ -22,7 +22,7 @@
 //-----------------------------------------------------------------------------
 #import "NeXTDelegate.h"
 #import "NeXTSystemProxy.h"
-#import "csinput/csevent.h"
+#import "csinput/csevdefs.h"
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSCursor.h>
