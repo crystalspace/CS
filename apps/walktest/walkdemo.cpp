@@ -1385,8 +1385,11 @@ csMeshWrapper* CreatePortalThing (const char* name, csSector* room,
 
   thing_state->InitLightMaps (false);
   iMeshWrapper* iwrap = QUERY_INTERFACE (thing->GetMeshObject (), iMeshWrapper);
-  room->ShineLights (iwrap);
-  iwrap->DecRef ();
+  if (iwrap)
+  {
+    room->ShineLights (iwrap);
+    iwrap->DecRef ();
+  }
   thing_state->CreateLightMaps (Sys->G3D);
   thing_state->DecRef ();
 
@@ -1411,7 +1414,7 @@ void OpenPortal (iLoader *LevelLoader, csView* view, char* lev)
     char buf[255];
     sprintf (buf, "/lev/%s", lev);
     Sys->VFS->ChDir (buf);
-    LevelLoader->AppendMapFile ("world");
+    LevelLoader->LoadMapFile ("world", false);
     Sys->engine->GetCurrentRegion ()->Prepare ();
   }
 

@@ -259,12 +259,15 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
   ctxt->SetLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
   // @@@ Engine should not know about iThingState!!!
-  iThingState* thing_state = QUERY_INTERFACE (th->GetMeshObject (),
-  	iThingState);
-  if (thing_state)
+  if (th)
   {
-    thing_state->CheckFrustum ((iFrustumView*)&lview, th->GetMovable ());
-    thing_state->DecRef ();
+    iThingState* thing_state = QUERY_INTERFACE (th->GetMeshObject (),
+  	  iThingState);
+    if (thing_state)
+    {
+      thing_state->CheckFrustum ((iFrustumView*)&lview, th->GetMovable ());
+      thing_state->DecRef ();
+    }
   }
 }
 

@@ -84,16 +84,16 @@ struct iLoader : public iPlugIn
   /// Load a sound file, register the sound and create a wrapper object for it
   virtual csSoundDataObject *LoadSound (const char *name, const char *fname) = 0;
 
-  /// Load map file into engine.
-  virtual bool LoadMapFile (const char* filename) = 0;
   /**
-   * Merge map file into engine (i.e. don't clear the current engine
-   * contents first). If 'onlyRegion' is true then portals will only
-   * connect to the sectors in the current region, things will only use
-   * thing templates defined in the current region and meshes will
-   * only use mesh factories defined in the current region.
+   * Load a map file. If 'ClearEngine' is true then the current contents
+   * of the engine will be deleted before loading. If 'ResolveOnlyRegion'
+   * is true then portals will only connect to the sectors in the current
+   * region, things will only use thing templates defined in the current
+   * region and meshes will only use mesh factories defined in the current
+   * region.
    */
-  virtual bool AppendMapFile (const char* filename, bool onlyRegion = true) = 0;
+  virtual bool LoadMapFile (const char* filename, bool ClearEngine = true,
+	bool ResolveOnlyRegion = true) = 0;
   /// Load library from a VFS file
   virtual bool LoadLibraryFile (const char* filename) = 0;
 

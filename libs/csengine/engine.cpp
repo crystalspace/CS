@@ -1612,7 +1612,7 @@ void csEngine::SelectRegion (const char *iName)
 
 iRegion* csEngine::GetCurrentRegion ()
 {
-  return &region->scfiRegion;
+  return region ? &region->scfiRegion : NULL;
 }
 
 void csEngine::AddToCurrentRegion (csObject* obj)

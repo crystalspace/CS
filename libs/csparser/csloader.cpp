@@ -19,10 +19,12 @@
 
 #include "cssysdef.h"
 #include "qint.h"
-#include "csengine/campos.h"
 #include "csparser/crossbld.h"
-#include "csengine/cscoll.h"
 #include "csparser/csloader.h"
+#include "csparser/snddatao.h"
+
+#include "csengine/campos.h"
+#include "csengine/cscoll.h"
 #include "csengine/curve.h"
 #include "csengine/dumper.h"
 #include "csengine/engine.h"
@@ -32,12 +34,9 @@
 #include "csengine/meshobj.h"
 #include "csengine/polygon.h"
 #include "csengine/polytmap.h"
-#include "csengine/region.h"
 #include "csengine/sector.h"
-#include "csparser/snddatao.h"
 #include "csengine/terrobj.h"
 #include "csengine/textrans.h"
-#include "csengine/texture.h"
 #include "csengine/thing.h"
 #include "cssys/system.h"
 #include "csutil/cfgfile.h"
@@ -47,15 +46,17 @@
 #include "csutil/util.h"
 #include "iutil/databuff.h"
 #include "imap/reader.h"
-#include "iengine/motion.h"
 #include "imesh/sprite3d.h"
 #include "imesh/skeleton.h"
+#include "iengine/motion.h"
 #include "iengine/skelbone.h"
+#include "iengine/region.h"
+#include "iengine/texture.h"
 #include "isound/data.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
-#include "iterrain/object.h"
 #include "iengine/terrain.h"
+#include "iterrain/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "isys/vfs.h"
@@ -301,13 +302,13 @@ bool csLoader::load_color (char *buf, csRGBcolor &c)
   return true;
 }
 
-csMaterialWrapper *csLoader::FindMaterial (const char *iName, bool onlyRegion)
+csMaterialWrapper *csLoader::FindMaterial (const char *iName)
 {
-  iMaterialWrapper *mat = Engine->FindMaterial (iName, onlyRegion);
+  iMaterialWrapper *mat = Engine->FindMaterial (iName, ResolveOnlyRegion);
   if (mat)
     return mat->GetPrivateObject();
 
-  iTextureWrapper *tex = Engine->FindTexture (iName, onlyRegion);
+  iTextureWrapper *tex = Engine->FindTexture (iName, ResolveOnlyRegion);
   if (tex)
   {
     // Add a default material with the same name as the texture
@@ -362,7 +363,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
 # if 0
 //@@@@@@
           ScanStr (params, "%s", str);
-	  iMeshWrapper* spr = Engine->FindMeshObject (str, onlyRegion);
+	  iMeshWrapper* spr = Engine->FindMeshObject (str, ResolveOnlyRegion);
           if (!spr)
           {
             CsPrintf (MSG_FATAL_ERROR, "Mesh object '%s' not found!\n", str);
@@ -385,7 +386,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
       case CS_TOKEN_SECTOR:
         {
           ScanStr (params, "%s", str);
-	  iSector* s = Engine->FindSector (str, onlyRegion);
+	  iSector* s = Engine->FindSector (str, ResolveOnlyRegion);
           if (!s)
           {
             CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found!\n", str);
@@ -751,7 +752,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
       case CS_TOKEN_TEXTURE:
       {
         ScanStr (params, "%s", str);
-        iTextureWrapper *texh = Engine->FindTexture (str, onlyRegion);
+        iTextureWrapper *texh = Engine->FindTexture (str, ResolveOnlyRegion);
         if (texh)
           material->SetTextureWrapper (texh->GetPrivateObject());
         else
@@ -785,18 +786,18 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
     fatal_exit (0, false);
   }
 
-  csMaterialWrapper *mat = Engine->GetCsEngine()->GetMaterials ()->NewMaterial (material);
+  iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);
   if (prefix)
   {
     char *prefixedname = new char [strlen (name) + strlen (prefix) + 2];
     strcpy (prefixedname, prefix);
     strcat (prefixedname, "_");
     strcat (prefixedname, name);
-    mat->SetName (prefixedname);
+    mat->QueryObject()->SetName (prefixedname);
     delete [] prefixedname;
   }
   else
-    mat->SetName (name);
+    mat->QueryObject()->SetName (name);
   // dereference material since mat already incremented it
   material->DecRef ();
 }
@@ -901,7 +902,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 
 //---------------------------------------------------------------------------
 
-static void ResolvePortalSectors (iEngine* Engine, bool onlyRegion,
+static void ResolvePortalSectors (iEngine* Engine, bool ResolveOnlyRegion,
 	csThing* ps)
 {
   for (int i=0;  i < ps->GetNumPolygons ();  i++)
@@ -911,7 +912,7 @@ static void ResolvePortalSectors (iEngine* Engine, bool onlyRegion,
     {
       csPortal *portal = p->GetPortal ();
       csSector *stmp = portal->GetSector ();
-      iSector *snew = Engine->FindSector (stmp->GetName (), onlyRegion);
+      iSector *snew = Engine->FindSector (stmp->GetName (), ResolveOnlyRegion);
       if (!snew)
       {
         CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found for portal in"
@@ -926,10 +927,8 @@ static void ResolvePortalSectors (iEngine* Engine, bool onlyRegion,
   }
 }
 
-bool csLoader::LoadMap (char* buf, bool iOnlyRegion)
+bool csLoader::LoadMap (char* buf)
 {
-  onlyRegion = iOnlyRegion;
-
   CS_TOKEN_TABLE_START (tokens)
     CS_TOKEN_TABLE (WORLD)
   CS_TOKEN_TABLE_END
@@ -1040,7 +1039,7 @@ bool csLoader::LoadMap (char* buf, bool iOnlyRegion)
 	  }
 	  break;
         case CS_TOKEN_SECTOR:
-          if (!Engine->FindSector (name, onlyRegion))
+          if (!Engine->FindSector (name, ResolveOnlyRegion))
             Engine->GetCsEngine()->sectors.Push (load_sector (name, params));
           break;
         case CS_TOKEN_COLLECTION:
@@ -1091,8 +1090,8 @@ bool csLoader::LoadMap (char* buf, bool iOnlyRegion)
   }
 
   int sn = Engine->GetCsEngine()->sectors.Length ();
-  csRegion* cur_region = NULL;
-  if (onlyRegion) cur_region = Engine->GetCsEngine()->GetCsCurrentRegion ();
+  iRegion* cur_region = NULL;
+  if (ResolveOnlyRegion) cur_region = Engine->GetCurrentRegion ();
   while (sn > 0)
   {
     sn--;
@@ -1109,7 +1108,8 @@ bool csLoader::LoadMap (char* buf, bool iOnlyRegion)
       iThing* ith = QUERY_INTERFACE (ps->GetMeshObject (), iThing);
       if (ith)
       {
-        ResolvePortalSectors (Engine->GetCsEngine(), onlyRegion, ith->GetPrivateObject ());
+        ResolvePortalSectors (Engine->GetCsEngine(), ResolveOnlyRegion,
+		ith->GetPrivateObject ());
 	ith->DecRef ();
       }
     }
@@ -1118,15 +1118,11 @@ bool csLoader::LoadMap (char* buf, bool iOnlyRegion)
   return true;
 }
 
-bool csLoader::LoadMapFile (const char* file)
-{
-  Engine->GetCsEngine()->StartEngine ();
-  return AppendMapFile (file);
-}
-
-bool csLoader::AppendMapFile (const char* file, bool onlyRegion)
+bool csLoader::LoadMapFile (const char* file, bool iClearEngine, bool iOnlyRegion)
 {
   Stats->Init ();
+  if (iClearEngine) Engine->GetCsEngine()->StartEngine ();
+  ResolveOnlyRegion = iOnlyRegion;
 
   iDataBuffer *buf = System->VFS->ReadFile (file);
 
@@ -1147,7 +1143,7 @@ bool csLoader::AppendMapFile (const char* file, bool onlyRegion)
   CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d.\n",
       csLightMap::lightcell_size, csLightMap::lightcell_size);
 
-  if (!LoadMap (**buf, onlyRegion))
+  if (!LoadMap (**buf))
     return false;
 
   if (Stats->polygons_loaded)
@@ -1363,6 +1359,7 @@ bool csLoader::LoadLibraryFile (const char* fname)
     return false;
   }
 
+  ResolveOnlyRegion = false;
   bool retcode = LoadLibrary (**buf);
 
   buf->DecRef ();
@@ -1621,7 +1618,7 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
       case CS_TOKEN_MATERIAL:
         {
           ScanStr (params, "%s", str);
-          csMaterialWrapper *mat = FindMaterial (str, onlyRegion);
+          csMaterialWrapper *mat = FindMaterial (str);
           if (mat)
 	  {
 	    iSprite3DFactoryState* state = QUERY_INTERFACE (
@@ -2401,7 +2398,7 @@ csLoader::csLoader(iBase *p)
   Engine = NULL;
 
   flags = 0;
-  onlyRegion = false;
+  ResolveOnlyRegion = false;
   Stats = new csLoaderStats();
 }
 
@@ -2514,14 +2511,14 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
 
   iTextureWrapper *TexWrapper =
 	Engine->GetTextureList()->NewTexture(TexHandle);
-  TexWrapper->GetPrivateObject()->SetName (name);
+  TexWrapper->QueryObject()->SetName (name);
 
   csMaterial *Material = new csMaterial ();
   Material->SetTextureWrapper (TexWrapper->GetPrivateObject());
 
   iMaterialWrapper *MatWrapper = Engine->GetMaterialList()->
     NewMaterial (Material);
-  MatWrapper->GetPrivateObject()->SetName (name);
+  MatWrapper->QueryObject()->SetName (name);
   Material->DecRef ();
 
   return TexWrapper;

@@ -91,8 +91,12 @@ class csLoader : public iLoader
   csLoadedPluginVector loaded_plugins;
   /// Loader flags
   int flags;
-  /// If true the we only load in the current region
-  bool onlyRegion;
+  /**
+   * If true then references to other objects (e.g. textures, mesh factories
+   * etc.) are only resolved if the referenced object exists in the current
+   * region.
+   */
+  bool ResolveOnlyRegion;
   /// Statistics
   class csLoaderStats *Stats;
   
@@ -191,10 +195,10 @@ class csLoader : public iLoader
   bool LoadLibrary (char* buf);
 
   /// Load map from a memory buffer
-  bool LoadMap (char* buf, bool onlyRegion);
+  bool LoadMap (char* buf);
 
   /// Find a material (and create one from texture if possible)
-  csMaterialWrapper* FindMaterial (const char *iName, bool onlyRegion = false);
+  csMaterialWrapper* FindMaterial (const char *iName);
 
 public:
   /********** iLoader implementation **********/
@@ -232,8 +236,8 @@ public:
   virtual iSoundHandle *LoadSound (const char *fname);
   virtual csSoundDataObject *LoadSound (const char *name, const char *fname);
 
-  virtual bool LoadMapFile (const char* filename);
-  virtual bool AppendMapFile (const char* filename, bool onlyRegion = true);
+  virtual bool LoadMapFile (const char* filename, bool clearEngine,
+	bool onlyRegion);
   virtual bool LoadLibraryFile (const char* filename);
 
   virtual csMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname);
