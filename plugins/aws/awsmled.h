@@ -26,7 +26,6 @@
 #include "awstimer.h"
 #include "awsscr.h"
 #include "csutil/csevent.h"
-#include "csutil/csvector.h"
 #include "csutil/parray.h"
 
 class awsMultiLineEdit : public awsComponent
@@ -38,15 +37,12 @@ class awsMultiLineEdit : public awsComponent
     void (awsMultiLineEdit::*ring)();
   };
 
-  class eventVector : public csVector
+  class eventVector : public csPDelArray<mlEvent>
   {
   public:
-    virtual ~eventVector () {DeleteAll (); }
-    virtual bool FreeItem (void* Item){delete (mlEvent*)Item; return true;}
-    virtual int DoCompare (const csEvent *e1, const csEvent *e2, int Mode=0) const
+    static int DoCompare (const csEvent *e1, const csEvent *e2)
     {
       int d = (int)e1->Type - (int)e2->Type;
-      (void)Mode;
       if (d == 0)
       {
         if (CS_IS_KEYBOARD_EVENT (*e1))
@@ -59,23 +55,21 @@ class awsMultiLineEdit : public awsComponent
       }
       return d;
     }
-    virtual int Compare (void* Item1, void* Item2, int Mode=0) const
+    static int Compare (void const* Item1, void* Item2)
     {
-      return DoCompare (&((mlEvent*)Item1)->e, &((mlEvent*)Item2)->e, Mode);
+      return DoCompare (&((mlEvent*)Item1)->e, &((mlEvent*)Item2)->e);
     }
-    virtual int CompareKey (void* Item, const void* Key, int Mode=0) const
+    static int CompareKey (void const* Item, void* Key)
     {
-      return DoCompare (&((mlEvent*)Item)->e, (csEvent*)Key, Mode);
+      return DoCompare (&((mlEvent*)Item)->e, (csEvent*)Key);
     }
     
-    mlEvent* Get (int idx) const {return (mlEvent*)csVector::Get (idx);}
-
     bool Add (const csEvent &e, void (awsMultiLineEdit::*ring)())
     {
       mlEvent *ev = new mlEvent;
       ev->e = e;
       ev->ring = ring;
-      if (InsertSorted ((void*) ev) >= 0)
+      if (InsertSorted (ev, Compare) >= 0)
         return true;
       delete ev;
       return false;

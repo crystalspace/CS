@@ -798,7 +798,7 @@ void awsNotebookButtonBar::DoLayout ()
     x += br.Width ();
     btn->SetTop (is_top);
     //csRect o = vTabs.Get (i)->comp->Frame ();
-	vTabs.Get(i)->comp->ResizeTo(cr);
+    vTabs.Get(i)->comp->ResizeTo(cr);
     //vTabs.Get (i)->comp->Frame () = cr;
     //vTabs.Get (i)->comp->MoveChildren (cr.xmin - o.xmin, cr.ymin - o.ymin);
   }
@@ -914,7 +914,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
 
 bool awsNotebookButtonBar::Remove (iAwsComponent *comp)
 {
-  int idx = vTabs.Find ((void*)comp);
+  int idx = vTabs.Find ((awsNotebookButtonBar::tabEntry*)comp);
 
   if (idx!=-1)
   {
@@ -934,6 +934,7 @@ bool awsNotebookButtonBar::Remove (iAwsComponent *comp)
     if (idx < active)
       active--;
 
+    vTabs.FreeItem (vTabs[idx]);
     vTabs.Delete (idx);
     return true;
   }
@@ -1056,7 +1057,8 @@ void awsNotebookButtonBar::Activate (int idx)
 void awsNotebookButtonBar::ActivateTab (void *sk, iAwsSource *source)
 {
   awsNotebookButtonBar *bb = (awsNotebookButtonBar *)sk;
-  int idx = bb->vTabs.FindKey ((const void*)source->GetComponent (), 1);
+  int idx = bb->vTabs.FindKey ((void*)source->GetComponent (),
+  	bb->vTabs.CompareKeyButton);
   if (idx != -1 && bb->active != idx)
   {
     // hide the active and make the new one active

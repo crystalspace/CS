@@ -22,7 +22,7 @@
 #include "ivideo/fontserv.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "csutil/refarr.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
@@ -58,27 +58,21 @@ class csFreeType2Font : public iFont
   };
 
   // An array with (numerous) sets of glyphs of different sizes
-  class csFontDefVector : public csVector
+  class csFontDefVector : public csPDelArray<GlyphSet>
   {
   public:
-    virtual ~csFontDefVector ()
-    { DeleteAll (); }
-    virtual bool FreeItem (void* Item)
-    { delete (GlyphSet *)Item; return true; }
-    GlyphSet *Get (int n)
-    { return (GlyphSet *)csVector::Get (n); }
-    virtual int Compare (void* Item1, void* Item2, int /*Mode*/) const
+    static int Compare (void const* Item1, void* Item2)
     {
       int id1 = ((GlyphSet*)Item1)->size, id2 = ((GlyphSet*)Item2)->size;
       return id1 - id2;
     }
-    virtual int CompareKey (void* Item1, const void* Key, int /*Mode*/) const
+    static int CompareKey (void const* Item1, void* Key)
     { int id1 = ((GlyphSet*)Item1)->size; return id1 - (int)Key; }
   } cache;
 
   GlyphSet *FindGlyphSet (int size)
   {
-    int idx = cache.FindKey ((const void*)size);
+    int idx = cache.FindKey ((void*)size, cache.CompareKey);
     return (idx == -1 ? 0 : cache.Get (idx));
   }
 
@@ -188,22 +182,16 @@ public:
  */
 class csFreeType2Server : public iFontServer
 {
-  class csFontVector : public csVector
+  class csFontVector : public csRefArray<csFreeType2Font>
   {
   public:
-    void Put (csFreeType2Font *Font)
-    { Font->IncRef (); csVector::Push (Font); }
-    virtual bool FreeItem (void* Item)
-    { ((csFreeType2Font *)Item)->DecRef (); return true; }
-    csFreeType2Font *Get (int n)
-    { return (csFreeType2Font *)csVector::Get (n); }
-    virtual int Compare (void* Item1, void* Item2, int /*Mode*/) const
+    static int Compare (void const* Item1, void* Item2)
     { return strcmp (((csFreeType2Font *)Item1)->name,
                      ((csFreeType2Font *)Item2)->name); }
-    virtual int CompareKey (void* Item1, const void* Key, int /*Mode*/) const
+    static int CompareKey (csFreeType2Font* Item1, void* Key)
     {
       // compare the font names
-      const char *id1 = ((csFreeType2Font *)Item1)->name;
+      const char *id1 = Item1->name;
       const char *id2 = (const char *)Key;
       return strcmp (id1, id2);
     }

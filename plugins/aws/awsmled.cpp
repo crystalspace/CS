@@ -361,12 +361,12 @@ bool awsMultiLineEdit::HandleEvent (iEvent &Event)
     Event.Key.Char = 0;
     //    if ((Event.Key.Modifiers & CSMASK_ALT) && Event.Key.Code == 'c')
     //      DEBUG_BREAK;
-    idx = vDispatcher.FindSortedKey ((const void*)&Event);
+    idx = vDispatcher.FindSortedKey ((void*)&Event, vDispatcher.CompareKey);
     Event.Key.Modifiers = mod;
     Event.Key.Char = theChar;
   }
   else
-    idx = vDispatcher.FindSortedKey ((const void*)&Event);
+    idx = vDispatcher.FindSortedKey ((void*)&Event, vDispatcher.CompareKey);
   if (idx != -1)
     (this->*vDispatcher.Get (idx)->ring) ();
   else

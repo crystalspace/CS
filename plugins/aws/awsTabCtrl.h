@@ -6,6 +6,7 @@
 
 #include "awscomp.h"
 #include "awsscrbr.h"
+#include "csutil/parray.h"
 
 /** This class implements a basic tab button on a tab control. */
 class awsTab : public awsComponent
@@ -93,21 +94,10 @@ class awsTabCtrl : public awsComponent
 protected:
 
 
-  class TabVector : public csVector
+  class TabVector : public csPDelArray<awsTab>
   {
   public:
-    virtual ~TabVector (){DeleteAll ();}
-    awsTab *Get(int idx) const {return (awsTab*)csVector::Get (idx);}
-    int Push (awsTab *tab)
-    {
-      return csVector::Push ((void*)tab);
-    }
-    virtual bool FreeItem (void* Item)
-    {
-      delete (awsTab*)Item;
-      return true;
-    }
-    virtual int Compare (void* Item1, void* Item2) const
+    static int Compare (void const* Item1, void const* Item2)
     {
       awsTab *te1 = (awsTab *)Item1;
       awsTab *te2 = (awsTab *)Item2;

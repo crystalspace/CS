@@ -134,7 +134,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename)
   }
 
   // see if we already loaded that font
-  int idx = fonts.FindKey (filename);
+  int idx = fonts.FindKey ((void*)filename, fonts.CompareKey);
   if (idx >= 0)
   {
     csFreeType2Font *font = fonts.Get (idx);
@@ -149,7 +149,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename)
     delete font;
     return 0;
   }
-  fonts.Put (font);
+  fonts.Push (font);
   return font;
 }
 

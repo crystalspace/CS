@@ -102,8 +102,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   bool txtfound = false;
 
   /*  Perform a lookup on the texture list.  We may consider doing this a little more
-  * optimally in the future, like subclassing csVector and overriding CompareKey for
-  * the QuickSort algorithm */
+  * optimally in the future, like with a QuickSort. */
   if (DEBUG_GETTEX)
     printf (
       "aws-debug: (%s) texture count is: %d\n",

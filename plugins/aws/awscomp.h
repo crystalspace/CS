@@ -473,12 +473,7 @@ public:
   void RegisterConstant (const char* name, int value);
 };
 
-class awsComponentVector : public csVector
-{
-public:
-  iAwsComponent *Get(int idx) const; 
-  int Push (iAwsComponent* comp); 
-};
+typedef csArray<iAwsComponent*> awsComponentVector;
 
 #endif // __CS_AWS_COMPONENT_H__
 

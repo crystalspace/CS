@@ -530,7 +530,7 @@ void awsTabCtrl::RemoveTab(void* user_param)
 
 void awsTabCtrl::RemoveTab (iAwsSource *src)
 {
-  int idx = vTabs.Find ((void*) src->GetComponent());
+  int idx = vTabs.Find ((awsTab*)src->GetComponent());
   if(idx >= 0) RemoveTab(idx);
 }
 
@@ -668,7 +668,7 @@ void awsTabCtrl::ActivateTab(void* param)
 
 void awsTabCtrl::ActivateTab(iAwsSource *src)
 {
-  int idx = vTabs.Find((void*) src->GetComponent());
+  int idx = vTabs.Find((awsTab*) src->GetComponent());
   if(idx >= 0)
 	ActivateTab(idx);
 }
@@ -706,7 +706,7 @@ void awsTabCtrl::OnResized()
 void awsTabCtrl::ActivateTabCallback (void *p, iAwsSource *source)
 {
   awsTabCtrl *tc = (awsTabCtrl *)p;
-  int idx = tc->vTabs.Find((void*) source->GetComponent());
+  int idx = tc->vTabs.Find((awsTab*) source->GetComponent());
   if (idx != -1 && tc->active != idx)
   {
     // hide the active and make the new one active

@@ -38,6 +38,19 @@ chronological order.
 	      csVector.
 	    - Replaced 'csWSTexVector' for csws with a
 	      csPDelArray<csWSTexture>.
+	- Jorrit replaced various occurances of csVector:
+	    - Replaced 'TabVector' in awsTabCtrl with a csPDelArray<awsTab>.
+	    - Replaced 'awsComponentVector' in awscomp.h with a
+	      csArray<iAwsComponent*>.
+	    - Replaced 'eventVector' in awsMultiLineEdit with a
+	      csPDelArray<mlEvent>.
+	    - Replaced 'TabVector' in awsNotebookButtonBar with a
+	      csPDelArray<tabEntry>.
+	    - Replaced 'csFontDefVector' in csFreeType2Font with a
+	      csPDelArray<GlyphSet>.
+	    - Replaced 'csFontVector' in csFreeType2Server with a
+	      csRefArray<csFreeType2Font>.
+	- Jorrit added csRefArray::FindKey().
 31-Jul-2003
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'vTex' in OpenGL texture manager with

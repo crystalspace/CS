@@ -1104,14 +1104,3 @@ bool awsComponent::LinkedListCheck()
 }
 
 
-//////////////////////////////////// awsComponentVector ///////////////////////////////
-  
-iAwsComponent *awsComponentVector::Get(int idx) const 
-{
-  return (iAwsComponent*)csVector::Get (idx);
-}
-int awsComponentVector::Push (iAwsComponent* comp) 
-{ 
-  return csVector::Push ((void*)comp);
-}
-

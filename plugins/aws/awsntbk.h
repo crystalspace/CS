@@ -23,6 +23,7 @@
 #include "awsPanel.h"
 #include "awscmdbt.h"
 #include "awsTabCtrl.h"
+#include "csutil/parray.h"
 
 class awsSliderButton;
 
@@ -124,12 +125,13 @@ class awsNotebookButtonBar : public awsComponent
     awsSink *sink;
   };
 
-  class TabVector : public csVector
+  class TabVector : public csPDelArray<tabEntry>
   {
   public:
-    virtual ~TabVector (){DeleteAll ();}
-    tabEntry *Get(int idx) const {return (tabEntry*)csVector::Get (idx);}
-    int Push (awsNotebookButton *btn, awsSlot *slot, iAwsComponent *comp, awsSink *sink)
+    ~TabVector () { FreeAll (); }
+
+    int Push (awsNotebookButton *btn, awsSlot *slot,
+    	iAwsComponent *comp, awsSink *sink)
     {
       tabEntry *te = new tabEntry;
       te->button = btn;
@@ -137,37 +139,45 @@ class awsNotebookButtonBar : public awsComponent
       te->comp = comp;
       te->sink = sink;
       sink->IncRef ();
-      return csVector::Push ((void*) te);
+      return csPDelArray<tabEntry>::Push (te);
     }
-    virtual bool FreeItem (void* Item)
+    void FreeAll ()
     {
-      tabEntry *te = (tabEntry*)Item;
+      int i;
+      for (i = 0 ; i < Length () ; i++)
+        FreeItem (Get (i));
+      DeleteAll ();
+    }
+    void FreeItem (tabEntry* te)
+    {
       te->slot->Disconnect (te->button, awsCmdButton::signalClicked, 
                            te->sink, te->sink->GetTriggerID ("ActivateTab"));
       SCF_DEC_REF (te->slot);
       SCF_DEC_REF (te->sink);
-      delete te;
-      return true;
     }
-    virtual int Compare (void* Item1, void* Item2, int Mode=0) const
+    static int CompareComp (void const* Item1, void* Item2)
     {
       tabEntry *te1 = (tabEntry *)Item1;
       tabEntry *te2 = (tabEntry *)Item2;
-      if (Mode==0)
-        return (te1->comp < te2->comp ? -1 : te1->comp > te2->comp ? 1 : 0);
-      else
-        return (te1->button < te2->button ? -1 : te1->button > te2->button ? 1 : 0);
+      return (te1->comp < te2->comp ? -1 : te1->comp > te2->comp ? 1 : 0);
     }
-    virtual int CompareKey (void* Item1, const void* Key, int Mode=0) const
+    static int CompareButton (void const* Item1, void* Item2)
     {
-      (void)Mode;
+      tabEntry *te1 = (tabEntry *)Item1;
+      tabEntry *te2 = (tabEntry *)Item2;
+      return (te1->button < te2->button ? -1 : te1->button>te2->button ? 1 : 0);
+    }
+    static int CompareKeyComp (void const* Item1, void* Key)
+    {
       tabEntry *te1 = (tabEntry *)Item1;
       iAwsComponent *comp = (iAwsComponent *)Key;
+      return (te1->comp < comp ? -1 : te1->comp > comp ? 1 : 0);
+    }
+    static int CompareKeyButton (void const* Item1, void* Key)
+    {
+      tabEntry *te1 = (tabEntry *)Item1;
       awsNotebookButton *button = (awsNotebookButton *)Key;
-      if (Mode==0)
-        return (te1->comp < comp ? -1 : te1->comp > comp ? 1 : 0);
-      else
-        return (te1->button < button ? -1 : te1->button > button ? 1 : 0);
+      return (te1->button < button ? -1 : te1->button > button ? 1 : 0);
     }
   };
 

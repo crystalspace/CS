@@ -178,6 +178,18 @@ public:
     return -1;
   }
 
+  /**
+   * Find an element based on some key.
+   */
+  int FindKey (void* key, ArrayCompareKeyFunction* comparekey) const
+  {
+    int i;
+    for (i = 0 ; i < Length () ; i++)
+      if (comparekey (root[i], key) == 0)
+        return i;
+    return -1;
+  }
+
   /// Push a element on 'top' of vector.
   int Push (T* what)
   {
