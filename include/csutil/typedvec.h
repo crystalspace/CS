@@ -204,7 +204,7 @@ public:
  */
 #define CS_DECLARE_TYPED_VECTOR_NODELETE(NAME,TYPE)			\
   CS_BEGIN_TYPED_VECTOR (NAME,TYPE)					\
-    inline bool FreeTypedItem (TYPE* obj)				\
+    inline bool FreeTypedItem (TYPE*)					\
     { return true; }							\
   CS_FINISH_TYPED_VECTOR (TYPE)
 
