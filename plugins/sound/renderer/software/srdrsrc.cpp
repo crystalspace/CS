@@ -179,9 +179,9 @@ void csSoundSourceSoftware::Prepare(float BaseVolume) {
 #define READLEFTSAMP        ((int)(RawData[2*i])-NullSample)
 #define READRIGHTSAMP       ((int)(RawData[2*i+1])-NullSample)
 
-#define WRITEMONOSAMP(x)    Buffer[i]+=(x)*(CalcVolL+CalcVolR)/2+NullSample;
-#define WRITELEFTSAMP(x)    Buffer[2*i]+=(x)*CalcVolL+NullSample;
-#define WRITERIGHTSAMP(x)   Buffer[2*i+1]+=(x)*CalcVolR+NullSample;
+#define WRITEMONOSAMP(x)    Buffer[i]+=(x)*(CalcVolL+CalcVolR)/2;
+#define WRITELEFTSAMP(x)    Buffer[2*i]+=(x)*CalcVolL;
+#define WRITERIGHTSAMP(x)   Buffer[2*i+1]+=(x)*CalcVolR;
 
 #define READMONO3D          int samp=READMONOSAMP;
 #define READSTEREO3D        int samp=(READLEFTSAMP+READRIGHTSAMP)/2;

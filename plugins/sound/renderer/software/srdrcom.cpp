@@ -223,10 +223,7 @@ void csSoundRenderSoftware::MixingFunction()
   long i;
   for (i=0;i<Sources.Length();i++) {
     csSoundSourceSoftware *src=(csSoundSourceSoftware*)(Sources.Get(i));
-    // @@@ this divides volume by number of sources. If we don't do this,
-    // sound can be distorted because of too high volume. Is there a better
-    // solution?
-    src->Prepare(Volume / Sources.Length());
+    src->Prepare(Volume);
     src->AddToBuffer(memory, memorysize);
     if (!src->IsActive()) {
       RemoveSource(src);
