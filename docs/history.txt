@@ -1,5 +1,168 @@
 The history order has been reversed so that new features are at the top.
 
+9-Aug-2000
+	- Fixed solaris.mak after Andrew broke it for me.
+8-Aug-2000
+	- At last! Fixed one of two big bugs that prevented PVS from working
+	  correctly.
+	- Changed number of edges in csPolygonEdges class to a prime to make
+	  more efficient use of the hashmap.
+	- Fixed a small memory leak in csPolygonEdges.
+	- Fixed a big memory leak in csHashMap and csHashSet!
+	- Michael Dale Long did some fixes for CrystalClear after the recent
+	  set of big patches. Not everything works yet, notable the console
+	  and quit key do not work.
+	- Wouter Wijngaards committed a patch from illume (Rene Dudfield)
+	  adding cmds for setting sprite actions to walk console.
+	- Wouter Wijngaards changed csSprite3D::SetAction to return a bool
+	  on success.
+	- Thomas Hieber made WalkTest compilable again.
+	- Thomas Hieber removed the 'app' prefix from the executable names
+	  for the Windows apps.
+	- Thomas added perfstat plugin to the VC project files and did
+	  various other updates to the project files.
+	- Norman Kramer added missing libs/cssys/general/getopt.cpp to
+	  linux.mak.
+	- Norman fixed a crash that occured if one press PGUP too often
+	  in the console.
+	- Norman did an optimization in the OpenGL renderer. He saved
+	  a multiplication in fog calculation.
+	- Paul Garceau did the following:
+	    Maintenance Update (Cleanup)
+	    - removed hard library links (-Llibs/zlib, etc.) from Mingw.mak
+	      libpng.a, libjpeg.a and z.a now are only available from
+	      compilers' include directory.
+	    - Updated system dependent source file variables to accomodate
+	      AndyZs changes.
+	    - exeentry.cpp, as of this update, is once again enabled for both
+	      static library and dynamic library builds.  Before this update,
+	      only the dynamic library build (USE_SHARED_PLUGINS=yes)
+	      was allowed to invoke exeentry.cpp.
+7-Aug-2000
+	- Samuel Humphreys removed the delete [] Scan.GlobalCMap from
+	  PrepareTextures. It must have been some debugging junk I'd left
+	  in. Sorry Andy :) (it was also deleted in the destructor as
+	  originally intended).
+	- Fixed linking bugs with engine plugin. Also added the install
+	  targets to enginep.mak.
+	- Added WalkTest::DrawFrameDebug3D() to have a routine that contains
+	  all debugging stuff that is rendered in 3D.
+	- Added support for debug boxes in walktest. This is going to be
+	  used for debugging PVS.
+	- Added csBox2::SetCenter and csBox3::SetCenter to set the center
+	  point of a box without changing size.
+	- Added csBox2::SetSize and csBox3::SetSize to set the size of a box
+	  without changing the center.
+	- Added db_boxshow, db_boxcam1, db_boxcam2, db_boxsize1, and
+	  db_boxsize2 console commands to control the visibility, location,
+	  and size of the boxes.
+	- Added db_boxvis command to test the visibility between the two
+	  debug boxes in an octree. This visibility test basicly corresponds
+	  to the routine that is used for calculating the PVS and as such
+	  is useful for debugging the PVS.
+	- Added db_boxnode1 and db_boxnode2 console commands to set the size
+	  of the respective debug boxes to the size of the current octree
+	  leaf.
+	- Added public csOctree::BoxCanSeeBox() to test if one box can see
+	  the other box.
+	- Extended db_curleaf command to give more information about the
+	  current leaf.
+	- Wouter Wijngaards added wscs3d.cfg to installed set of files.
+	- Wouter Wijngaards fixed an internal compiler error for solaris
+	  by permutating the code a little (polyset).
+	- Andrew Zabolotny did the following changes:
+	    - Enhancements to win32gcc.mak. In fact, win32gcc is a fully
+	      working port with same features found in other programming
+	      environments:
+		- dynamic libraries are supported
+		- DirectDraw canvas
+		- DirectDraw 6.1 canvas
+		- Software renderer
+		- Direct3D renderer
+	      I have not tried other Windows canvases (e.g. glide and
+	      OpenGL) but I think they will work as well, with minimum
+	      changes required.
+	    - Fixed makedep to not generate readonly files when they are
+	      missing. This is sometimes caused by uninitialized garbage
+	      in st_mode member of `struct stat'.
+	    - I have renamed libs/cssys/win32/printf.cpp into
+	      win32printf.cpp because it conflicts with
+	      libs/cssys/general/printf.cpp.
+	    - Moved WinMain() from win32.cpp back to exeentry.cpp. The
+	      reason why this is needed (Thomas, hear me!) is that some
+	      programs need just the WinMain() routine and don't need the
+	      SysSystemDriver (which is in win32.cpp). For example scfreg,
+	      makedep, gfxtest and other console programs don't use the
+	      SysSystemDriver, thus they don't need to be linked against
+	      DirectInput, DirectDraw, GUI libs and so on. They just become
+	      a lot smaller. This is also the case with DLLs - for some
+	      reason DLLs made with MinGW32 needs the WinMain function,
+	      thus every plugin gets the full load of routines in win32.cpp
+	      (just because WinMain was there).
+	    - Enhanced ddraw driver a lot (the one for software render).
+	    - Setting mouse cursor now works (persistent)
+	    - Moving window does not cause the image to stay at old position.
+	    - Moving other window on top of CS window does does not leave
+	      ugly traces (e.g. non-refreshed portions of window).
+	    - The region argument passed to ::Print() is handled properly.
+	    - The window now has a titlebar and even a minimize button.
+	    - Alt+Enter now toggles fullscreen/windowed mode.
+	    - The contents of backbuffer are preserved during fullscreen/
+	      windowed mode toggle.
+	    - Fixed the double buffering. In windowed mode only
+	      single-buffering is allowed, in fullscreen both
+	      double-buffering (page flipping) and single-buffering
+	      (blitting from backbuffer) works. CSWS works a lot faster
+	      in single-buffering mode.
+	      Hmm, strange. Just tried and found that even walktest works
+	      A LOT faster with single-buffering. With page flipping it gives
+	      about 20fps, when blitting from system memory it runs at
+	      31fps (!!!) I will set double buffering to disabled by
+	      default...
+	      I have encountered a bug on Windows NT SP3 (with a Matrox
+	      Mystique videocard, don't know if this matters) - if you
+	      request an 16bpp videomode in fullscreen, you will really
+	      get just an 15bpp mode. This leads to strange colors if you
+	      started the program in windowed 16bpp mode and then switch
+	      with Alt+Enter to fullscreen or vice versa. On Windows98
+	      this does not happen.
+	    - Applied same enhancements to DX61 driver. Tested only with
+	      software renderer though, I hope it will work with D3D
+	      renderer as well...
+	    - Enhancements to Windows system driver:
+	        - SetMouseCursor() is implemented now in system driver.
+	          From canvas driver you have to call:
+			System->SystemExtension ("SetMouseCursor", CursorID);
+	        - When mouse is pressed inside CS window, the pointer is
+		  captured.  Thus even when you move the cursor outside
+		  window the mouse position is continuously tracked. The
+		  mouse coordinates are send to system driver as signed
+		  values (they were unsigned).
+	        - DirectInput keyboard handling is not needed anymore. I
+		  have implemented perfect keyboard handling through normal
+		  Windows window messages. You can use DirectInput if you
+		  like buzzwords, but it won't give you absolutely
+		  anything. In fact, DirectInput handling is worse because
+		  it does not support national characters right now, and
+		  WM_CHAR supports it.
+	          In general, CSWS/MazeD works perfectly now with
+	    - Fixed history in simple console. It used to crash sometimes
+	      due to an uninitialized variable.
+	    - Fixed the Direct3D renderer. Well, my Matrox Mystique lacks
+	      alpha blending so I can't see if lightmaps really works,
+	      but without them it works.
+	    - Moved getopt.c && getopt1.c into cssys/general. Also I have
+	      unified these two files into one C++ files. Thus we have
+	      no plain C anymore anywhere.
+	- Norman Kramer fixed Shooter and csgame (for material and CD mostly)
+	  so that it compiles and runs. But there are a few undecrefed
+	  plugins at exit.
+	- Norman changed lib sequence in csstdldr.mak to please the
+	  linux linker.
+	- Thomas Hieber fixed CS_ASSERT and made sure that CS_DEBUG
+	  is defined when building in debug mode (for Windows).
+	- Thomas Hieber did some other various updates to get the windows
+	  port working again.
 6-Aug-2000
 	- Samuel Humphreys did the following:
            - Added a new plugin called perfstat, and updated walktest so
@@ -12,7 +175,7 @@ The history order has been reversed so that new features are at the top.
              main section it is gathering statistics for.
 	     Walktest has a max of three nested perfstats with the
              recsubperf command (see below).
-           - Chages to walktest:  
+           - Changes to walktest:  
   	    - Perfstat now takes care of fps calculations according 
               to user specifiable resolution. Defaults to 10 frames per 
 	      update.
@@ -44,7 +207,6 @@ The history order has been reversed so that new features are at the top.
                         <file>.rps when played back. To finish the subsection
                         call the command again without an argument.
 			Stands for 'rec(ord)sub(section)perf(ormance)'
-           
 	- Jorrit committed the engine plugin which he forgot to do
 	  some time ago. Now simplep should really work.
 	- Wouter Wijngaards did the following changes:
@@ -79,6 +241,9 @@ The history order has been reversed so that new features are at the top.
 	- Norman fixed phyztest.
 	- Norman fixed simplep.
 	- Norman fixed wscs3d.
+	- Norman fixed OpenGL renderer:
+	    - m_textured was used uninitialized in meshdrawing.
+	    - made some minor optimizations to meshdrawing.
 5-Aug-2000
 	- Wouter Wijngaards did the following:
 	  - install safer for people that do not update config.mak.

@@ -576,6 +576,156 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
 }
 
 //------------------------------------------------------------------------
+// Draw debug boxes
+//------------------------------------------------------------------------
+
+void DrawDebugBoxSide (csCamera* cam, bool do3d,
+    	const csVector3& v1, const csColor& c1,
+    	const csVector3& v2, const csColor& c2,
+    	const csVector3& v3, const csColor& c3,
+    	const csVector3& v4, const csColor& c4)
+{
+  G3DPolygonDPFX poly;
+  csVector3 v;
+  csVector2 persp;
+  poly.num = 4;
+  poly.use_fog = false;
+  poly.inv_aspect = cam->GetInvFOV ();
+  poly.mat_handle = NULL;
+  poly.flat_color_r = 255;
+  poly.flat_color_g = 255;
+  poly.flat_color_b = 255;
+  v = cam->World2Camera (v1);
+  if (v.z < .01) return;
+  cam->Perspective (v, persp);
+  if (do3d)
+  {
+    if (persp.x <= 0) persp.x = 1;
+    if (persp.x > FRAME_WIDTH) persp.x = FRAME_WIDTH-1;
+    if (persp.y <= 0) persp.y = 1;
+    if (persp.y > FRAME_HEIGHT) persp.y = FRAME_HEIGHT-1;
+  }
+  poly.vertices[0].sx = persp.x;
+  poly.vertices[0].sy = persp.y;
+  poly.vertices[0].z = 1./v.z;
+  poly.vertices[0].u = 0;
+  poly.vertices[0].v = 0;
+  poly.vertices[0].r = c1.red;
+  poly.vertices[0].g = c1.green;
+  poly.vertices[0].b = c1.blue;
+  v = cam->World2Camera (v2);
+  if (v.z < .01) return;
+  cam->Perspective (v, persp);
+  if (do3d)
+  {
+    if (persp.x <= 0) persp.x = 1;
+    if (persp.x > FRAME_WIDTH) persp.x = FRAME_WIDTH-1;
+    if (persp.y <= 0) persp.y = 1;
+    if (persp.y > FRAME_HEIGHT) persp.y = FRAME_HEIGHT-1;
+  }
+  poly.vertices[1].sx = persp.x;
+  poly.vertices[1].sy = persp.y;
+  poly.vertices[1].z = 1./v.z;
+  poly.vertices[1].u = 1;
+  poly.vertices[1].v = 0;
+  poly.vertices[1].r = c2.red;
+  poly.vertices[1].g = c2.green;
+  poly.vertices[1].b = c2.blue;
+  v = cam->World2Camera (v3);
+  if (v.z < .01) return;
+  cam->Perspective (v, persp);
+  if (do3d)
+  {
+    if (persp.x <= 0) persp.x = 1;
+    if (persp.x > FRAME_WIDTH) persp.x = FRAME_WIDTH-1;
+    if (persp.y <= 0) persp.y = 1;
+    if (persp.y > FRAME_HEIGHT) persp.y = FRAME_HEIGHT-1;
+  }
+  poly.vertices[2].sx = persp.x;
+  poly.vertices[2].sy = persp.y;
+  poly.vertices[2].z = 1./v.z;
+  poly.vertices[2].u = 1;
+  poly.vertices[2].v = 1;
+  poly.vertices[2].r = c3.red;
+  poly.vertices[2].g = c3.green;
+  poly.vertices[2].b = c3.blue;
+  v = cam->World2Camera (v4);
+  if (v.z < .01) return;
+  cam->Perspective (v, persp);
+  if (do3d)
+  {
+    if (persp.x <= 0) persp.x = 1;
+    if (persp.x > FRAME_WIDTH) persp.x = FRAME_WIDTH-1;
+    if (persp.y <= 0) persp.y = 1;
+    if (persp.y > FRAME_HEIGHT) persp.y = FRAME_HEIGHT-1;
+  }
+  poly.vertices[3].sx = persp.x;
+  poly.vertices[3].sy = persp.y;
+  poly.vertices[3].z = 1./v.z;
+  poly.vertices[3].u = 0;
+  poly.vertices[3].v = 1;
+  poly.vertices[3].r = c4.red;
+  poly.vertices[3].g = c4.green;
+  poly.vertices[3].b = c4.blue;
+  if (do3d)
+  {
+    Gfx3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
+    Gfx3D->StartPolygonFX (NULL, CS_FX_ADD|CS_FX_GOURAUD);
+    Gfx3D->DrawPolygonFX (poly);
+    Gfx3D->FinishPolygonFX ();
+  }
+  else
+  {
+    iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
+    int color = txtmgr->FindRGB (QInt (255.*c1.red*2), 0, QInt (255.*c1.blue*2));
+    Gfx2D->DrawLine (poly.vertices[0].sx, FRAME_HEIGHT-poly.vertices[0].sy, poly.vertices[1].sx, FRAME_HEIGHT-poly.vertices[1].sy, color);
+    Gfx2D->DrawLine (poly.vertices[1].sx, FRAME_HEIGHT-poly.vertices[1].sy, poly.vertices[2].sx, FRAME_HEIGHT-poly.vertices[2].sy, color);
+    Gfx2D->DrawLine (poly.vertices[2].sx, FRAME_HEIGHT-poly.vertices[2].sy, poly.vertices[3].sx, FRAME_HEIGHT-poly.vertices[3].sy, color);
+    Gfx2D->DrawLine (poly.vertices[3].sx, FRAME_HEIGHT-poly.vertices[3].sy, poly.vertices[0].sx, FRAME_HEIGHT-poly.vertices[0].sy, color);
+  }
+}
+
+void DrawDebugBox (csCamera* cam, bool do3d, const csBox3& box, float r, float b)
+{
+  DrawDebugBoxSide (cam, do3d,
+      	box.GetCorner (BOX_CORNER_xYz), csColor (r, .5, b),
+      	box.GetCorner (BOX_CORNER_XYz), csColor (r, 0, b),
+      	box.GetCorner (BOX_CORNER_Xyz), csColor (r, .5, b),
+      	box.GetCorner (BOX_CORNER_xyz), csColor (r, 0, b));
+  DrawDebugBoxSide (cam, do3d,
+      	box.GetCorner (BOX_CORNER_XYz), csColor (r, 0, b),
+      	box.GetCorner (BOX_CORNER_XYZ), csColor (r, .5, b),
+      	box.GetCorner (BOX_CORNER_XyZ), csColor (r, 0, b),
+      	box.GetCorner (BOX_CORNER_Xyz), csColor (r, .5, b));
+  DrawDebugBoxSide (cam, do3d,
+      	box.GetCorner (BOX_CORNER_XYZ), csColor (r, .5, b),
+      	box.GetCorner (BOX_CORNER_xYZ), csColor (r, 0, b),
+      	box.GetCorner (BOX_CORNER_xyZ), csColor (r, .5, b),
+      	box.GetCorner (BOX_CORNER_XyZ), csColor (r, 0, b));
+  DrawDebugBoxSide (cam, do3d,
+      	box.GetCorner (BOX_CORNER_xYZ), csColor (r, 0, b),
+      	box.GetCorner (BOX_CORNER_xYz), csColor (r, .5, b),
+      	box.GetCorner (BOX_CORNER_xyz), csColor (r, 0, b),
+      	box.GetCorner (BOX_CORNER_xyZ), csColor (r, .5, b));
+  DrawDebugBoxSide (cam, do3d,
+      	box.GetCorner (BOX_CORNER_xYZ), csColor (r, 0, b),
+      	box.GetCorner (BOX_CORNER_XYZ), csColor (r, .5, b),
+      	box.GetCorner (BOX_CORNER_XYz), csColor (r, 0, b),
+      	box.GetCorner (BOX_CORNER_xYz), csColor (r, .5, b));
+  DrawDebugBoxSide (cam, do3d,
+      	box.GetCorner (BOX_CORNER_xyz), csColor (r, 0, b),
+      	box.GetCorner (BOX_CORNER_Xyz), csColor (r, .5, b),
+      	box.GetCorner (BOX_CORNER_XyZ), csColor (r, 0, b),
+      	box.GetCorner (BOX_CORNER_xyZ), csColor (r, .5, b));
+}
+
+void DrawDebugBoxes (csCamera* cam, bool do3d)
+{
+  DrawDebugBox (cam, do3d, Sys->debug_box1, .5, 0);
+  DrawDebugBox (cam, do3d, Sys->debug_box2, 0, .5);
+}
+
+//------------------------------------------------------------------------
 // Draw cross signs where the octree centers are.
 //------------------------------------------------------------------------
 

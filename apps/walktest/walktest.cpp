@@ -161,6 +161,10 @@ WalkTest::WalkTest () :
 
   ConsoleInput = NULL;
   SmallConsole = false;
+
+  debug_box1.Set (csVector3 (-1, -1, -1), csVector3 (1, 1, 1));
+  debug_box2.Set (csVector3 (2, 2, 2), csVector3 (3, 3, 3));
+  do_show_debug_boxes = false;
 }
 
 WalkTest::~WalkTest ()
@@ -477,6 +481,11 @@ void WalkTest::DrawFrameDebug ()
       cbuf->GfxDump (Gfx2D, Gfx3D);
     }
   }
+  if (do_show_debug_boxes)
+  {
+    extern void DrawDebugBoxes (csCamera* cam, bool do3d);
+    DrawDebugBoxes (view->GetCamera (), false);
+  }
 }
 
 void WalkTest::DrawFrameExtraDebug ()
@@ -519,6 +528,15 @@ void WalkTest::DrawFrameExtraDebug ()
     poly3.Draw (Gfx2D, 0x008f);
     //covtree->TestConsistency ();
 #   endif
+  }
+}
+
+void WalkTest::DrawFrameDebug3D ()
+{
+  if (do_show_debug_boxes)
+  {
+    extern void DrawDebugBoxes (csCamera* cam, bool do3d);
+    DrawDebugBoxes (view->GetCamera (), true);
   }
 }
 
@@ -802,7 +820,10 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
    || !Console->GetVisible ()
    || SmallConsole
    || Console->GetTransparency ())
+  {
     DrawFrame3D (drawflags, current_time);
+    DrawFrameDebug3D ();
+  }
 
   // Start drawing 2D graphics
   if (!Gfx3D->BeginDraw (drawflags | CSDRAW_2DGRAPHICS))

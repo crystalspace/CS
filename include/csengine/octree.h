@@ -455,6 +455,12 @@ public:
   }
 
   /**
+   * Test if 'box1' can see 'box2' through all the polygons
+   * in this octree.
+   */
+  bool BoxCanSeeBox (const csBox3& box1, const csBox3& box2);
+
+  /**
    * Given a position return the leaf that this position is in.
    */
   csOctreeNode* GetLeaf (const csVector3& pos);

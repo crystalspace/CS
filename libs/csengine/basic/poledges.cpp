@@ -64,7 +64,7 @@ csPolygon3D* csPolEdgeIterator::Next ()
 //---------------------------------------------------------------------------
 
 csPolygonEdges::csPolygonEdges (csPolygonInt** polygons, int num_polygons)
-	: edges (20003)	//@@@ Should be a prime. This probably isn't one.
+	: edges (25247)	// Some prime number
 {
   int i, j, j1;
   for (i = 0 ; i < num_polygons ; i++)
@@ -96,6 +96,7 @@ csPolygonEdges::~csPolygonEdges ()
     csPolEdge* pol_edge = (csPolEdge*)(iterator->Next ());
     delete pol_edge;
   }
+  delete iterator;
 }
 
 //---------------------------------------------------------------------------

@@ -47,6 +47,20 @@ csSegment2 csBox2::GetEdge (int edge) const
   return csSegment2 ();
 }
 
+void csBox2::SetCenter (const csVector2& c)
+{
+  csVector2 move = c-GetCenter ();
+  minbox += move;
+  maxbox += move;
+}
+
+void csBox2::SetSize (const csVector2& s)
+{
+  csVector2 center = GetCenter ();
+  minbox = center - s*.5;
+  maxbox = center + s*.5;
+}
+
 csBox2& csBox2::operator+= (const csBox2& box)
 {
   if (box.minbox.x < minbox.x) minbox.x = box.minbox.x;
@@ -264,6 +278,20 @@ csSegment3 csBox3::GetEdge (int edge) const
     case 11: return csSegment3 (GetCorner (2), GetCorner (6));
   }
   return csSegment3 ();
+}
+
+void csBox3::SetCenter (const csVector3& c)
+{
+  csVector3 move = c-GetCenter ();
+  minbox += move;
+  maxbox += move;
+}
+
+void csBox3::SetSize (const csVector3& s)
+{
+  csVector3 center = GetCenter ();
+  minbox = center - s*.5;
+  maxbox = center + s*.5;
 }
 
 csBox2 csBox3::GetSide (int side) const

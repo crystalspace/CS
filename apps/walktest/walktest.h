@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "csgeom/box.h"
 #include "cssys/sysdriv.h"
 #include "csengine/collider.h"
 #include "csengine/light.h"
@@ -268,6 +269,13 @@ public:
   /// The selected polygon.
   csPolygon3D* selected_polygon;
 
+  /// Debug box 1.
+  csBox3 debug_box1;
+  /// Debug box 2.
+  csBox3 debug_box2;
+  /// If true then show both debug boxes.
+  bool do_show_debug_boxes;
+
   /// A WireFrame object for the map.
   csWireFrameCam* wf;
   /// Map mode.
@@ -337,6 +345,12 @@ public:
    * Must be called with G3D set in 2D mode.
    */
   void DrawFrameDebug ();
+
+  /**
+   * Draw all things related to debugging in 3D mode instead of 2D.
+   * Must be called with G3D set in 3D mode.
+   */
+  void DrawFrameDebug3D ();
 
   /**
    * Another debug DrawFrame version which is called last. This

@@ -87,6 +87,17 @@ public:
   csVector2 GetCenter () const { return (minbox+maxbox)/2; }
 
   /**
+   * Set the center of this box. This will not change the size
+   * of the box but just relocate the center.
+   */
+  void SetCenter (const csVector2& c);
+
+  /**
+   * Set the size of the box but keep the center intact.
+   */
+  void SetSize (const csVector2& s);
+
+  /**
    * Return every edge (segment) of this bounding box
    * from 0 to 3. The returned edge is undefined for any
    * other index.
@@ -352,6 +363,17 @@ public:
    * Get the center of this box.
    */
   csVector3 GetCenter () const { return (minbox+maxbox)/2; }
+
+  /**
+   * Set the center of this box. This will not change the size
+   * of the box but just relocate the center.
+   */
+  void SetCenter (const csVector3& c);
+
+  /**
+   * Set the size of the box but keep the center intact.
+   */
+  void SetSize (const csVector3& s);
 
   /**
    * Get a side of this box as a 2D box.

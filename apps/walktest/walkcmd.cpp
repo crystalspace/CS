@@ -549,13 +549,15 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  snow fountain flame\n");
     CONPRI("Debugging:\n");
     CONPRI("  fclear hi frustum zbuf debug0 debug1 debug2 edges palette\n");
+    CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2\n");
+    CONPRI("  db_boxnode1 db_boxnode2 db_boxvis\n");
     CONPRI("Sprites:\n");
-    CONPRI(" loadsprite addsprite delsprite listsprites \n");
-    CONPRI(" listactions setaction\n");
+    CONPRI("  loadsprite addsprite delsprite listsprites\n");
+    CONPRI("  listactions setaction\n");
     CONPRI("Various:\n");
     CONPRI("  coordsave coordload bind capture map mapproj p_alpha s_fog\n");
     CONPRI("  snd_play snd_volume record play clrrec saverec\n");
-    CONPRI("   loadrec action\n");
+    CONPRI("  loadrec action\n");
 
 #   undef CONPRI
   }
@@ -733,6 +735,72 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_boolean (arg, &Sys->do_light_frust, "frustum");
   else if (!strcasecmp (cmd, "zbuf"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_z, "zbuf");
+  else if (!strcasecmp (cmd, "db_boxshow"))
+    csCommandProcessor::change_boolean (arg, &Sys->do_show_debug_boxes, "show debug boxes");
+  else if (!strcasecmp (cmd, "db_boxcam1"))
+    Sys->debug_box1.SetCenter (Sys->view->GetCamera ()->GetOrigin ());
+  else if (!strcasecmp (cmd, "db_boxcam2"))
+    Sys->debug_box2.SetCenter (Sys->view->GetCamera ()->GetOrigin ());
+  else if (!strcasecmp (cmd, "db_boxsize1"))
+  {
+    float size = Sys->debug_box1.MaxX ()-Sys->debug_box1.MinX ();
+    csCommandProcessor::change_float (arg, &size, "box1 size", 0.01, 1000);
+    Sys->debug_box1.SetSize (csVector3 (size, size, size));
+  }
+  else if (!strcasecmp (cmd, "db_boxsize2"))
+  {
+    float size = Sys->debug_box2.MaxX ()-Sys->debug_box2.MinX ();
+    csCommandProcessor::change_float (arg, &size, "box2 size", 0.01, 1000);
+    Sys->debug_box2.SetSize (csVector3 (size, size, size));
+  }
+  else if (!strcasecmp (cmd, "db_boxnode1"))
+  {
+    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    csPolygonTree* tree = room->GetStaticTree ();
+    if (tree)
+    {
+      csOctree* otree = (csOctree*)tree;
+      csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
+      Sys->debug_box1 = l->GetBox ();
+      Sys->Printf (MSG_CONSOLE, "Box 1: (%f,%f,%f)-(%f,%f,%f)\n",
+	  	Sys->debug_box1.MinX (), Sys->debug_box1.MinY (),
+	  	Sys->debug_box1.MinZ (), Sys->debug_box1.MaxX (),
+	  	Sys->debug_box1.MaxY (), Sys->debug_box1.MaxZ ());
+    }
+    else
+      Sys->Printf (MSG_CONSOLE, "There is no octree in this sector!\n");
+  }
+  else if (!strcasecmp (cmd, "db_boxnode2"))
+  {
+    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    csPolygonTree* tree = room->GetStaticTree ();
+    if (tree)
+    {
+      csOctree* otree = (csOctree*)tree;
+      csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
+      Sys->debug_box2 = l->GetBox ();
+      Sys->Printf (MSG_CONSOLE, "Box 2: (%f,%f,%f)-(%f,%f,%f)\n",
+	  	Sys->debug_box2.MinX (), Sys->debug_box2.MinY (),
+	  	Sys->debug_box2.MinZ (), Sys->debug_box2.MaxX (),
+	  	Sys->debug_box2.MaxY (), Sys->debug_box2.MaxZ ());
+    }
+    else
+      Sys->Printf (MSG_CONSOLE, "There is no octree in this sector!\n");
+  }
+  else if (!strcasecmp (cmd, "db_boxvis"))
+  {
+    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    csPolygonTree* tree = room->GetStaticTree ();
+    if (tree)
+    {
+      csOctree* otree = (csOctree*)tree;
+      bool vis1 = otree->BoxCanSeeBox (Sys->debug_box1, Sys->debug_box2);
+      bool vis2 = otree->BoxCanSeeBox (Sys->debug_box2, Sys->debug_box1);
+      CsPrintf (MSG_CONSOLE, "Box1->box2:%d box2->box1:%d\n", vis1, vis2);
+    }
+    else
+      CsPrintf (MSG_CONSOLE, "No octree in this sector!\n");
+  }
   else if (!strcasecmp (cmd, "db_cbuffer"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_cbuffer, "debug cbuffer");
   else if (!strcasecmp (cmd, "db_frustum"))
@@ -750,6 +818,12 @@ bool CommandHandler (const char *cmd, const char *arg)
       const csBox3& b = l->GetBox ();
       printf ("Leaf (%d): %f,%f,%f %f,%f,%f\n", l->IsLeaf (),
       	b.MinX (), b.MinY (), b.MinZ (), b.MaxX (), b.MaxY (), b.MaxZ ());
+      printf ("Solid Mask x: %04x\n", l->GetSolidMask (BOX_SIDE_x));
+      printf ("Solid Mask X: %04x\n", l->GetSolidMask (BOX_SIDE_X));
+      printf ("Solid Mask y: %04x\n", l->GetSolidMask (BOX_SIDE_y));
+      printf ("Solid Mask Y: %04x\n", l->GetSolidMask (BOX_SIDE_Y));
+      printf ("Solid Mask z: %04x\n", l->GetSolidMask (BOX_SIDE_z));
+      printf ("Solid Mask Z: %04x\n", l->GetSolidMask (BOX_SIDE_Z));
     }
     else
       Sys->Printf (MSG_CONSOLE, "There is no octree in this sector!\n");

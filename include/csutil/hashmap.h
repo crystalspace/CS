@@ -41,6 +41,11 @@ struct csHashElement
 class csHashBucket : public csVector
 {
 public:
+  virtual ~csHashBucket ()
+  {
+    DeleteAll ();
+  }
+
   virtual bool FreeItem (csSome Item)
   {
     csHashElement* el = (csHashElement*)Item;
@@ -56,6 +61,11 @@ public:
 class csVectorVector : public csVector
 {
 public:
+  virtual ~csVectorVector ()
+  {
+    DeleteAll ();
+  }
+
   virtual bool FreeItem (csSome Item)
   {
     csVector* vec = (csVector*)Item;

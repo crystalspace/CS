@@ -41,19 +41,19 @@ NEED_SOCKET_LIB=yes
 LIBS.EXE=-ldl -lnsl -lm
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-L/usr/local/lib -lz
+Z_LIBS=-L/usr/local/lib -Llibs/zlib -lz
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-L/usr/local/lib -lpng
+PNG_LIBS=-L/usr/local/lib -Llibs/libpng -lpng
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-L/usr/local/lib -ljpeg
+JPG_LIBS=-L/usr/local/lib -Llibs/libjpeg -ljpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=-I/usr/local/include
+CFLAGS.INCLUDE=-I/usr/local/include -Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)

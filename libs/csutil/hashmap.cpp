@@ -159,7 +159,7 @@ void csHashMap::DeleteAll (csHashKey key)
 void csHashMap::DeleteAll ()
 {
   int b;
-  for (b = buckets.Length () ; b >= 0 ; b--)
+  for (b = buckets.Length ()-1 ; b >= 0 ; b--)
     buckets.Delete (b);
 }
 
