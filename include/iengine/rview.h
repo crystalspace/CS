@@ -360,11 +360,20 @@ struct iRenderView : public iBase
    * render view. If true is returned (visible) then clip_plane,
    * clip_z_plane, and clip_portal will be set to the right value depending
    * on wether or not clipping is wanted. This function also does far
-   * plane clipping.
+   * plane clipping. Use SetupClipPlanes() to get the clipping planes
+   * for this function.
    */
-  virtual bool ClipBBox (const csReversibleTransform& tr_o2c,
-  	const csBox3& cbox,
+  virtual bool ClipBBox (csPlane3* planes, uint32 frustum_mask,
+  	csPlane3* top_planes, const csBox3& obox,
       	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
+
+  /**
+   * Setup clipping planes in object space. The input arrays for planes
+   * should each be able to hold 10 planes. Returns a mask that you can
+   * use for the csIntersect3::BoxFrustum() function.
+   */
+  virtual void SetupClipPlanes (const csReversibleTransform& tr_o2c,
+  	csPlane3* planes, uint32& frustum_mask, csPlane3* top_planes) = 0;
 
   /**
    * Get current sector.

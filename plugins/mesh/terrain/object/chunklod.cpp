@@ -834,8 +834,8 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
 	csChunkLodTerrainFactory::MeshTreeNode* node, float kappa) 
 {
   int clip_portal, clip_plane, clip_z_plane;
-  if (!rv->ClipBBox (tr_o2c, node->BBox (), clip_portal, clip_plane,
-  	clip_z_plane))
+  if (!rv->ClipBBox (planes, frustum_mask, top_planes,
+  	node->BBox (), clip_portal, clip_plane, clip_z_plane))
     return false;
 
   csVector3 camera_origin = tr_o2c * node->Center ();
@@ -914,6 +914,7 @@ bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
     palette_meshes[i].SetLength(0);
   }
   tricount = 0;
+  rview->SetupClipPlanes (tr_o2c, planes, frustum_mask, top_planes);
   if (!DrawTestQuad (rview, pFactory->root, kappa)) 
     return false;
   if (meshes.Length () == 0)

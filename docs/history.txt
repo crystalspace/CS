@@ -59,6 +59,10 @@ chronological order.
 	  the frustum is now transformed from camera to object space.
 	- Jorrit changed chunklod mesh object plugin to use this new
 	  ClipBBox() routine.
+	- Jorrit split the new iRenderView->ClipBBox() routine in
+	  iRenderView->SetupClipPlanes() and ClipBBox(). That way it is
+	  possible to call SetupClipPlanes() in advance and then reuse
+	  it multiple times. Chunklod now uses this technique.
 19-Apr-2004
 	- Eric Sunshine added LGPL license notice to the .m4 and .jam files.
 	- Jorrit fixed a bug in iEngine->CreatePortalContainer(). If there

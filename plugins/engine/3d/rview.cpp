@@ -1156,33 +1156,25 @@ bool csRenderView::ClipBBox (
   return true;
 }
 
-bool csRenderView::ClipBBox (
-  const csReversibleTransform& tr_o2c,
-  const csBox3 &obox,
-  int &clip_portal,
-  int &clip_plane,
-  int &clip_z_plane)
+void csRenderView::SetupClipPlanes (const csReversibleTransform& tr_o2c,
+  	csPlane3* planes, uint32& frustum_mask,
+	csPlane3* top_planes)
 {
-  //------
-  // Test if there is a chance we must clip to current portal.
-  //------
-  uint32 frustum_mask;
-  csPlane3 cam_frustum[7];
   csPlane3* frust = ctxt->iview_frustum->frustum;
   csVector3 o2tmult = tr_o2c.GetO2T () * tr_o2c.GetO2TTranslation ();
-  cam_frustum[0].Set (tr_o2c.GetT2O() * frust[0].norm, -frust[0].norm*o2tmult);
-  cam_frustum[1].Set (tr_o2c.GetT2O() * frust[1].norm, -frust[1].norm*o2tmult);
-  cam_frustum[2].Set (tr_o2c.GetT2O() * frust[2].norm, -frust[2].norm*o2tmult);
-  cam_frustum[3].Set (tr_o2c.GetT2O() * frust[3].norm, -frust[3].norm*o2tmult);
+  planes[0].Set (tr_o2c.GetT2O() * frust[0].norm, -frust[0].norm*o2tmult);
+  planes[1].Set (tr_o2c.GetT2O() * frust[1].norm, -frust[1].norm*o2tmult);
+  planes[2].Set (tr_o2c.GetT2O() * frust[2].norm, -frust[2].norm*o2tmult);
+  planes[3].Set (tr_o2c.GetT2O() * frust[3].norm, -frust[3].norm*o2tmult);
   csPlane3 pz0 (0, 0, 1, 0);	// Inverted!!!.
-  cam_frustum[4] = tr_o2c.This2Other (pz0);
+  planes[4] = tr_o2c.This2Other (pz0);
   if (ctxt->do_clip_plane)
   {
     // We have a real near clipping plane. In that case
     // we add both the Z=0 plane and the near clipping plane.
     csPlane3 pznear = ctxt->clip_plane;
     pznear.Invert ();
-    cam_frustum[5] = tr_o2c.This2Other (pznear);
+    planes[5] = tr_o2c.This2Other (pznear);
     frustum_mask = 0x3f;
   }
   else
@@ -1193,12 +1185,30 @@ bool csRenderView::ClipBBox (
   if (far_plane)
   {
     csPlane3 fp = *far_plane;
-    cam_frustum[6] = tr_o2c.This2Other (fp);
+    planes[6] = tr_o2c.This2Other (fp);
     frustum_mask |= 0x40;
   }
 
+  csRenderView* top_rview = engine->GetCsTopLevelClipper ();
+  csRenderContext* top_ctxt = top_rview->ctxt;
+  frust = top_ctxt->iview_frustum->frustum;
+  top_planes[0].Set (tr_o2c.GetT2O()*frust[0].norm, -frust[0].norm*o2tmult);
+  top_planes[1].Set (tr_o2c.GetT2O()*frust[1].norm, -frust[1].norm*o2tmult);
+  top_planes[2].Set (tr_o2c.GetT2O()*frust[2].norm, -frust[2].norm*o2tmult);
+  top_planes[3].Set (tr_o2c.GetT2O()*frust[3].norm, -frust[3].norm*o2tmult);
+}
+
+bool csRenderView::ClipBBox (
+  csPlane3* planes,
+  uint32 frustum_mask,
+  csPlane3* top_planes,
+  const csBox3 &obox,
+  int &clip_portal,
+  int &clip_plane,
+  int &clip_z_plane)
+{
   uint32 outClipMask;
-  if (!csIntersect3::BoxFrustum (obox, cam_frustum, frustum_mask, outClipMask))
+  if (!csIntersect3::BoxFrustum (obox, planes, frustum_mask, outClipMask))
     return false;	// Not visible.
 
   if (outClipMask & 0xf == 0xf)
@@ -1227,15 +1237,7 @@ bool csRenderView::ClipBBox (
   //------
   if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
   {
-    csRenderView* top_rview = engine->GetCsTopLevelClipper ();
-    csRenderContext* top_ctxt = top_rview->ctxt;
-    csPlane3* frust = top_ctxt->iview_frustum->frustum;
-    cam_frustum[0].Set (tr_o2c.GetT2O()*frust[0].norm, -frust[0].norm*o2tmult);
-    cam_frustum[1].Set (tr_o2c.GetT2O()*frust[1].norm, -frust[1].norm*o2tmult);
-    cam_frustum[2].Set (tr_o2c.GetT2O()*frust[2].norm, -frust[2].norm*o2tmult);
-    cam_frustum[3].Set (tr_o2c.GetT2O()*frust[3].norm, -frust[3].norm*o2tmult);
-    if (!csIntersect3::BoxFrustum (obox, cam_frustum, 0xf,
-  	outClipMask))
+    if (!csIntersect3::BoxFrustum (obox, top_planes, 0xf, outClipMask))
     {
       CS_ASSERT (false);	// This is not possible!
       return false;

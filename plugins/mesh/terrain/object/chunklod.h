@@ -270,6 +270,12 @@ private:
   csRenderMesh **meshpp;
   int meshppsize;
   csReversibleTransform tr_o2c;
+
+  // Use for clipping during rendering.
+  csPlane3 planes[10];
+  csPlane3 top_planes[10];
+  uint32 frustum_mask;
+
   int tricount;
   csFlags flags;
 
