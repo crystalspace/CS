@@ -54,10 +54,15 @@ public:
 	csZBufMode z_buf_mode);
 
   /**
-   * Get a sorted list of meshes, sorted by renderpriority, and if needed
-   * do a sort within the RP.
+   * Sort the list of meshes by render priority and within every render
+   * priority. Return number of total meshes.
    */
-  void GetSortedMeshList (csArray<csRenderMesh*>& meshes);
+  int SortMeshLists ();
+
+  /**
+   * After sorting the meshes fetch them with this function.
+   */
+  void GetSortedMeshes (csRenderMesh** meshes);
 
   /**
    * Empty the meshlist. It will still hold the list of renderpriorities.

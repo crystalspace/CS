@@ -137,12 +137,9 @@ static int SortMeshMaterial (void const* item1,
   return 0;
 }
 
-void csRenderMeshList::GetSortedMeshList (
-	csArray<csRenderMesh*>& meshes)
+int csRenderMeshList::SortMeshLists ()
 {
-  // Iterate, and if needed, sort the lists
-  meshes.Empty ();
-
+  int numObjects = 0;
   csPDelArray < renderMeshListInfo >::Iterator it = renderList.GetIterator ();
   while (it.HasNext ())
   {
@@ -162,12 +159,22 @@ void csRenderMeshList::GetSortedMeshList (
     {
       listEnt->meshList.Sort (SortMeshMaterial);
     }
+    numObjects += listEnt->meshList.Length ();
+  }
+  return numObjects;
+}
 
-    int numObjects = listEnt->meshList.Length ();
-    int j;
-    for (j = 0 ; j < numObjects ; j++)
+void csRenderMeshList::GetSortedMeshes (csRenderMesh** meshes)
+{
+  csPDelArray < renderMeshListInfo >::Iterator it = renderList.GetIterator ();
+  while (it.HasNext ())
+  {
+    renderMeshListInfo* listEnt = it.Next ();
+    if (listEnt)
     {
-      meshes.Push (listEnt->meshList[j]);
+      int numObjects = listEnt->meshList.Length ();
+      for (int j = 0 ; j < numObjects ; j++)
+        *meshes++ = listEnt->meshList[j];
     }
   }
 }

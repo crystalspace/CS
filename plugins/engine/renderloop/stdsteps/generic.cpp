@@ -201,18 +201,18 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
   iGraphics3D* g3d = rview->GetGraphics3D();
 
-  // This is a work array we use for getting all meshes.
-  csArray<csRenderMesh*> meshes;
-  sector->GetVisibleMeshes (rview)->GetSortedMeshList (meshes);
-  int num = meshes.Length ();
- 
+  csRenderMeshList* meshlist = sector->GetVisibleMeshes (rview);
+  int num = meshlist->SortMeshLists ();
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
+  meshlist->GetSortedMeshes (sameShaderMeshes);
+ 
+  int lastidx = 0;
   int numSSM = 0;
   iShader* shader = 0;
 
   for (int n = 0; n < num; n++)
   {
-    csRenderMesh* mesh = meshes[n];
+    csRenderMesh* mesh = sameShaderMeshes[n];
 
     if (mesh->portal) 
     {
@@ -220,7 +220,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
       {
         if (shader != 0)
 	{
-          RenderMeshes (g3d, shader, sameShaderMeshes, numSSM);
+          RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, numSSM);
           shader = 0;
 	}
         numSSM = 0;
@@ -238,12 +238,13 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
         // @@@ Need error reporter
         if (shader != 0)
 	{
-          RenderMeshes (g3d, shader, sameShaderMeshes, numSSM);
+          RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, numSSM);
 	}
+	lastidx = n;
         shader = meshShader;
         numSSM = 0;
       }
-      sameShaderMeshes[numSSM++] = mesh;
+      numSSM++;
     }
   }
   
@@ -251,7 +252,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
   {
     // @@@ Need error reporter
     if (shader != 0)
-      RenderMeshes (g3d, shader, sameShaderMeshes, numSSM);
+      RenderMeshes (g3d, shader, sameShaderMeshes+lastidx, numSSM);
   }
 
   ToggleStepSettings (g3d, false);
