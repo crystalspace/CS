@@ -41,7 +41,25 @@ SCF_EXPORT_CLASS_TABLE (stdrep)
     "Standard Reporter Listener")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csReporterListener)
+void csReporterListener::DecRef ()							
+{									
+  scfRefCount--;							
+  if (scfRefCount <= 0)							
+  {									
+    SCF_TRACE (("  delete (%s *)%p\n", "csReporterListener", this));			
+    if (scfParent)							
+      scfParent->DecRef ();						
+    delete this;							
+  }									
+  else									
+    SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", "csReporterListener", this, scfRefCount));
+}
+
+//SCF_IMPLEMENT_IBASE (csReporterListener)
+
+SCF_IMPLEMENT_IBASE_INCREF(csReporterListener)					
+SCF_IMPLEMENT_IBASE_GETREFCOUNT(csReporterListener)				
+SCF_IMPLEMENT_IBASE_QUERY(csReporterListener)
   SCF_IMPLEMENTS_INTERFACE (iStandardReporterListener)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iReporterListener)
@@ -90,7 +108,15 @@ csReporterListener::csReporterListener (iBase *iParent)
 csReporterListener::~csReporterListener ()
 {
   delete[] debug_file;
-  if (reporter) reporter->RemoveReporterListener (&scfiReporterListener);
+  // @@ this is to prevent the chicken/egg problem, note that this solution lacks in the 
+  // sense that we might listen to  a totally different reporter then the one in the 
+  // registry.
+  // A more general solution could be to introduce a method in the iReporterListener 
+  // interface, something like DontUseMeAnymoreSincerelyYourReporterOfChoice ()
+  // which is called by iReporter destructor for all listeners still in the listenerqueue
+  //  .. norman
+  iReporter *rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (rep && rep == reporter) reporter->RemoveReporterListener (&scfiReporterListener);
 }
 
 bool csReporterListener::Initialize (iObjectRegistry *object_reg)
