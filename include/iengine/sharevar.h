@@ -27,6 +27,8 @@
 
 #include "cstypes.h"
 #include "csutil/scf.h"
+#include "csutil/cscolor.h"
+#include "csgeom/vector3.h"
 
 SCF_VERSION (iSharedVariable, 0, 1, 0);
 
@@ -36,12 +38,47 @@ SCF_VERSION (iSharedVariable, 0, 1, 0);
  */
 struct iSharedVariable : public iBase
 {
+  /// Get the private object interface
   virtual iObject* QueryObject () = 0;
-  virtual void Set(float val) = 0;
-  virtual float Get() const = 0;
+
+  /// iSharedVariables are referenced by name. Here is where you set it.
   virtual void SetName (const char *iName) = 0;
+
+  /// Get the name of this variable.
   virtual const char *GetName () const = 0;
+
+  /// Set the variable to a floating pt value.
+  virtual void Set(float val) = 0;
+
+  /// Get the floating point version of the var value.
+  virtual float Get() const = 0;
+
+  /// Set the variable to store a csColor.
+  virtual void SetColor (const csColor& col) = 0;
+
+  /// Get the csColor from the variable.
+  virtual const csColor& GetColor() = 0;
+
+  /// Set the variable to store a csVector3.
+  virtual void SetVector (float x, float y, float z) = 0;
+
+  /// Get the vector from the variable.
+  virtual const csVector3& GetVector() = 0;
+
+  /// Possible types stored by this class.
+  enum SharedVariableType
+  {
+      SV_UNKNOWN = 0,
+      SV_FLOAT   = 1,
+      SV_COLOR   = 2,
+      SV_VECTOR  = 3
+  };
+
+  /// Get the type currently stored by this variable.
+  virtual int GetType () const = 0;
 };
+
+
 
 SCF_VERSION (iSharedVariableList, 0, 0, 2);
 

@@ -35,7 +35,10 @@ SCF_VERSION (csSharedVariable, 0, 0, 2);
 class csSharedVariable : public csObject
 {
 private:
+  int   type;
   float value;
+  csColor color;
+  csVector3 vec;
 
 public:
 
@@ -48,12 +51,29 @@ public:
   { 
     SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSharedVariable);
     value = 0;
+    type = iSharedVariable::SV_UNKNOWN;
   }
 
   void Set (float val)
-  {    value = val; }
+  {  value = val; type = iSharedVariable::SV_FLOAT; }
+  
   float Get () const
-  {    return value; }
+  {  return (type == iSharedVariable::SV_FLOAT) ? value : 0; }
+  
+  void SetColor (const csColor& col)
+  {  color.Set(col.red,col.green,col.blue); type = iSharedVariable::SV_COLOR; }
+
+  const csColor& GetColor()
+  {  return (type == iSharedVariable::SV_COLOR) ? color : color.Set(0,0,0),color; }
+
+  void SetVector (float x, float y, float z)
+  {  vec.Set(x,y,z); type = iSharedVariable::SV_VECTOR; }
+
+  const csVector3& GetVector()
+  {  return (type == iSharedVariable::SV_VECTOR) ? vec : vec.Set(0,0,0),vec; }
+
+  int GetType () const
+  {  return type; }
 
 
   //------------------------- iSharedVariable interface -------------------------------
@@ -70,6 +90,17 @@ public:
     {   scfParent->SetName(iName); }
     virtual const char *GetName () const
     {   return scfParent->GetName(); }
+    virtual void SetColor (const csColor& color)
+    {   scfParent->SetColor (color); }
+    virtual const csColor& GetColor() 
+    {   return scfParent->GetColor(); }
+    virtual void SetVector (float x, float y, float z)
+    {   scfParent->SetVector (x,y,z); }
+    virtual const csVector3& GetVector () 
+    {   return scfParent->GetVector (); }
+    int GetType () const
+    {   return scfParent->GetType (); }
+
   } scfiSharedVariable;
   friend struct eiSharedVariable;
 };
