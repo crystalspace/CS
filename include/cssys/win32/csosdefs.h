@@ -64,9 +64,6 @@
   #define VERIFY_RESULT(expression, result) expression
 #endif
 
-//COM Helpers. (DirectX still requires COM...03/31/2000 -- PEG)
-#define FINAL_RELEASE(d) if (d != NULL) { d->Release(); d = NULL; }
-
 // The 2D graphics driver used by software renderer on this platform
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
 #define OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"
