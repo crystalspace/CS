@@ -9128,7 +9128,7 @@ fi
 
 
 if test -d /usr/local/lib; then
-  cs_build_prop_val=`echo x-L/usr/local/include | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_prop_val=`echo x-L/usr/local/lib | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LFLAGS.SYSTEM += $cs_build_prop_val
 "

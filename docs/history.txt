@@ -27,6 +27,8 @@ chronological order.
 	  class is no longer needed.
 	- Jorrit removed support for getting camera vertices from iThingState
 	  and iPolygon3D (GetVertexC() function).
+	- Eric Sunshine fixed a bug in configure.ac reported by Matze where it
+	  was emitting -L/usr/local/include rather than -L/usr/local/lib.
 7-Oct-2003
 	- Jorrit changed the main loader for portals:
 	    - New <portals> statement that can group several portals and

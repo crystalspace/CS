@@ -865,7 +865,7 @@ AC_DEFUN([CS_CHECK_LOCAL_INCLUDE],
 CS_CHECK_LOCAL_INCLUDE
 
 AS_IF([test -d /usr/local/lib],
-    [CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [-L/usr/local/include], [+])
+    [CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [-L/usr/local/lib], [+])
     cs_use_local_lib=-L/usr/local/lib],
     [cs_use_local_lib=''])
 
