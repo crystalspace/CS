@@ -50,11 +50,7 @@ bool MemoryMapFile(mmioInfo* info, char const* filename)
 void UnMemoryMapFile(mmioInfo* info)
 {
   if (info->data != 0)
-#ifdef OS_SOLARIS  
-    munmap((char *)info->data, info->file_size);
-#else
-    munmap(info->data, info->file_size);
-#endif
+    munmap((char*)info->data, info->file_size);
   if (info->hMappedFile != -1)
     close(info->hMappedFile);
 }

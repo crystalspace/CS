@@ -23,8 +23,8 @@ The history order is reversed so that new features are at the top.
 	      responsibility to enable this plugin when the SVGA.AVAILABLE
 	      variable is set to "yes".
 	    - Added new CS_HAS_SVGALIB macro to volatile.h.
-	    - Removed all dependence upon OS_LINUX, OS_BSD, and __NetBSD__
-	      from the project.
+	    - Removed all dependence upon OS_LINUX, OS_BSD, OS_SOLARIS,
+	      OS_BE and __NetBSD__ from the project.
 2-Jan-2003
 	- Eric Sunshine changed the OpenGL-related configuration script and
 	  makefiles so that it is now the responsibility of the configuration

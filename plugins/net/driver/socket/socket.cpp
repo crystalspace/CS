@@ -107,24 +107,11 @@ bool csSocketEndPoint::ValidateSocket()
   return ok;
 }
 
-#if !defined(OS_BE)
-
 bool csSocketEndPoint::PlatformSetBlocking(bool blocks)
 {
   unsigned long flag = (blocks ? 0 : 1);
   return (CS_IOCTLSOCKET(Socket, FIONBIO, &flag) == 0);
 }
-
-#else
-
-bool csSocketEndPoint::PlatformSetBlocking(bool blocks)
-{
-  const unsigned char flag = (blocks ? 0x00 : 0xff);
-  return (setsockopt(Socket, SOL_SOCKET, SO_NONBLOCK, &flag,
-    sizeof(flag)) >= 0);
-}
-
-#endif
 
 // csSocketConnection ---------------------------------------------------------
 

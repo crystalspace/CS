@@ -50,10 +50,8 @@
 #  include <unistd.h>
 #  define BSD_COMP 1
 #  include <sys/ioctl.h>
-#  if !defined (OS_SOLARIS) && !defined (OS_BE)
-#    include <arpa/inet.h>
-#    include <sys/time.h>
-#  endif
+#  include <arpa/inet.h>
+#  include <sys/time.h>
 #  include <netinet/in.h>
 #  include <netdb.h>
 #endif

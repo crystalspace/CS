@@ -21,6 +21,7 @@
 #define __CS_CSOSDEFS_H__
 
 #include <math.h>
+#include <unistd.h>
 
 // filesystem settings
 #define CS_MAXPATHLEN	256
@@ -71,14 +72,6 @@ struct mmioInfo
 
 #if defined (CS_SYSDEF_PROVIDE_DIR)
 #  define __NEED_GENERIC_ISDIR
-#endif
-
-#if defined (CS_SYSDEF_PROVIDE_SOCKETS) && defined (OS_SOLARIS)
-extern "C" unsigned long inet_addr(const char*);
-#endif
-
-#if defined (OS_SOLARIS)
-extern "C" int usleep (unsigned);
 #endif
 
 #if !defined(CS_STATIC_LINKED) && defined(CS_UNIX_PLUGIN_REQUIRES_MAIN)
