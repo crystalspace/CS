@@ -343,6 +343,10 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
     if (!lastps)
       break;
 
+    // we don't need to create a directory if we only want to read
+    if ((Mode & VFS_FILE_MODE) == VFS_FILE_READ)
+      break;
+
     *lastps = 0;
     MakeDir (rp, NameSuffix);
     *lastps = VFS_PATH_SEPARATOR;
