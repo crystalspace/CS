@@ -123,7 +123,7 @@ void csSharedLODMesh::CreateMesh (int new_x_verts, int new_z_verts, int edge_res
   x_verts = new_x_verts;
   z_verts = new_z_verts;
   // free = true;
-  num_verts = (x_verts * z_verts) + ( (edge_res + 3) * 4) ;
+  num_verts = (x_verts * z_verts) + ( (edge_res + 2) * 4) ;
   normals = new csVector3[num_verts];
   color = new csColor[num_verts];
   texels = new csVector2[num_verts];
@@ -452,12 +452,13 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   size = nowner->factory_state->GetSize ();
   edge_res = nowner->factory_state->GetMaxEdgeResolution ();
   end = default_lod->x_verts * default_lod->z_verts;
-  edges = edge_res + 1;
+  edges = edge_res;
 
   // up
   //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation up");
   if (up_neighbor)
   {
+    float count = 0.0;
     work_mesh = up_neighbor->default_lod;
     pos = end;
     x1_end = 0;
@@ -468,14 +469,17 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
       default_lod->verts[pos] = work_mesh->verts[i];
       default_lod->normals[pos] = work_mesh->normals[i];
       u = i - (work_end + up_neighbor->z1_end);
-      if (u > 0.0f) u = u / u_add;
+      u = u / u_add;
       if (u < 0.0f) u = 0.0f;
       if (u > 1.0f) u = 1.0f;
       default_lod->texels[pos].Set ( 0.0, u);
+      //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u : 0.0 v: %f", u );
       default_lod->color[pos] = work_mesh->color[i];
-      pos += 1;
-      x1_end += 1;
+      pos++;
+      x1_end++;
+      count += 1.0f;
     }
+    //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u_add %f", u_add );
   } else
   {
     u_add = 1.0 / edges;
@@ -487,7 +491,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
     u = u_add;
     pos += 1;
     x1_end = 1;
-    while ( u < 1.0)
+    for (i = 0; i < edges; i++)
     {
       default_lod->verts[pos] = BezierCompute (u, cntrl);
       //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
@@ -509,7 +513,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation right");
 
 
-  u_add = 1.0 / edges;
+  u_add = 1.0 / (edges + 1.0);
   pos = end + x1_end;
   default_lod->verts[pos] = cntrl[3];
   default_lod->normals[pos].Set (0,1,0);
@@ -518,7 +522,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   u = u_add;
   pos += 1;
   z1_end = x1_end + 1;
-  while ( u < 1.0)
+  for (i = 0; i < edges; i++)
   {
     default_lod->verts[pos] = BezierControlCompute (u, &cntrl[3], nowner->hor_length) ;
     //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
@@ -537,22 +541,24 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
 
   // down
   //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Edge Creation down");
-  u_add = 1.0 / edges;
+  u_add = 1.0 / (edges + 1.0);
   pos = end + z1_end;
   default_lod->verts[pos] = work[0];
   default_lod->normals[pos].Set (0,1,0);
   default_lod->texels[pos].Set ( 1, 0);
   default_lod->color[pos].Set (1,1,1);
+  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","Down u : 1.0 v: 0.0" );
   u = u_add;
   pos += 1;
   x2_end = z1_end + 1;
-  while ( u < 1.0)
+  for (i = 0; i < edges; i++)
   {
     default_lod->verts[pos] = BezierCompute (u, work) ;
     //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
 
     default_lod->normals[pos].Set (0,1,0);
     default_lod->texels[pos].Set (1, u);
+    //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u : 1.0 v: %f", u );
     default_lod->color[pos].Set (1,1,1);
     x2_end++;
     pos++;
@@ -562,6 +568,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   default_lod->normals[pos].Set (0,1,0);
   default_lod->texels[pos].Set ( 1, 1);
   default_lod->color[pos].Set (1,1,1);
+  //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","Down u : 1.0 v: 1.0" );
   x2_end++;
 
   // left
@@ -578,10 +585,11 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
       default_lod->verts[pos] = work_mesh->verts[i];
       default_lod->normals[pos] = work_mesh->normals[i];
       u = i - (work_end + left_neighbor->x1_end);
-      if (u > 0.0f) u = u / u_add;
+      u = u / u_add;
       if (u < 0.0f) u = 0.0f;
       if (u > 1.0f) u = 1.0f;
       default_lod->texels[pos].Set ( u, 0.0);
+      //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo u : %f v: 0.0", u );
       default_lod->color[pos] = work_mesh->color[i];
       pos++;
       z2_end++;
@@ -597,7 +605,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
     u = u_add;
     pos += 1;
     z2_end = x2_end + 1;
-    while ( u < 1.0)
+    for (i = 0; i < edges; i++)
     {
       default_lod->verts[pos] = BezierControlCompute (u, cntrl, nowner->hor_length);
       //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
@@ -1043,8 +1051,19 @@ void csBCTerrBlock::CreateNewMesh (int level)
 {
   csSharedLODMesh* newmesh;
   int end;
+  
   newmesh = owner->factory_state->GetSharedMesh (level, this);
-  if (!newmesh) return;
+  if (!newmesh) 
+  {
+    int levels;
+    levels = owner->factory_state->GetUserLOD ();
+    levels--;
+    level++;
+    if ( level < levels )
+      newmesh = owner->factory_state->GetSharedMesh (level, this);
+    if (!newmesh)
+      return;
+  }
   FreeLOD ();
   current_lod = newmesh;
   AddEdgesToCurrent ();
@@ -1440,7 +1459,7 @@ bool csBCTerrObject::Draw (iRenderView* rview, iMovable* movable,
         if ( current_lod->level == 0 )
         {
           // front of lod spectrum
-          if (distance > (Distances[0] * 4) )
+          if (distance > (Distances[0]) )
           {
             blocks[i].FreeLOD ();
             if (lod_levels > 1)
@@ -1778,7 +1797,7 @@ void csBCTerrObject::FreeSharedLOD (const csVector3 point)
         // currently unused and incomplete
         dist = blocks[i].bbox.GetCenter () - point;
         distance = dist.x * dist.x + dist.y * dist.y + dist.z * dist.z;
-        checkdistance = Distances[blocks[i].current_lod->level] * 2;
+        checkdistance = Distances[blocks[i].current_lod->level];
         if (distance > checkdistance )
           blocks[i].FreeLOD ();
       }
@@ -1947,6 +1966,7 @@ csBCTerrObjectFactory::csBCTerrObjectFactory (iObjectRegistry* object_reg)
   sys_distance = 10000;
   object_list = NULL;
   num_objects = 0;
+  time_count = 0;
   free_lods = false;
 }
 
@@ -2121,10 +2141,12 @@ iMeshObject* csBCTerrObjectFactory::NewInstance ()
         if (x > 0) x = x * x; else x = 0;
         LOD_Mesh_Numbers[i] = (coverage * coverage) - x;
         csSharedLODMesh* list;
-        list = new csSharedLODMesh[ LOD_Mesh_Numbers[i] ];
+        
         GetXZFromLOD (i, x_verts, z_verts);
         //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Factory","LOD_MEsh Number %d", LOD_Mesh_Numbers[i]);
-        if (LOD_Mesh_Numbers[i] > 20) LOD_Mesh_Numbers[i] = 20;
+        if (LOD_Mesh_Numbers[i] > 30) LOD_Mesh_Numbers[i] = 30;
+        if (LOD_Mesh_Numbers[i] < 4) LOD_Mesh_Numbers[i] = 4;
+        list = new csSharedLODMesh[ LOD_Mesh_Numbers[i] ];
         for (j = 0; j < LOD_Mesh_Numbers[i]; j++)
         {
           //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Factory","create mesh call");
