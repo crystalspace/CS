@@ -185,15 +185,17 @@ iShader* csShaderManager::GetShader(const char* name)
 csPtr<iShaderProgram> csShaderManager::CreateShaderProgramFromFile(const char* filename, const char* type)
 {
   csRef<iVFS> vfs = CS_QUERY_REGISTRY(objectreg, iVFS);
+  if(!vfs) return NULL;
 
   csRef<iFile> shaderfile (vfs->Open(filename, VFS_FILE_READ));
+  if(!shaderfile) return NULL;
 
   char* shadercontent = new char[shaderfile->GetSize()];
-  shaderfile->Read(shadercontent, shaderfile->GetSize());
+  int i = shaderfile->Read(shadercontent, shaderfile->GetSize());
+  shadercontent[i] = 0;
 
   csPtr<iShaderProgram> pm = CreateShaderProgramFromString(shadercontent, type);
   
-  delete shadercontent;
   return pm;
 }
 
@@ -214,12 +216,19 @@ csPtr<iShaderProgram> csShaderManager::CreateShaderProgramFromString(const char*
 //===================== csShader ====================//
 csShader::csShader()
 {
+  SCF_CONSTRUCT_IBASE( NULL );
+  this->name = 0;
   variables = new csHashMap();
+  techniques = new csBasicVector();
 }
 
 csShader::csShader(const char* name)
 {
-  csShader();
+  SCF_CONSTRUCT_IBASE( NULL );
+  this->name = 0;
+  variables = new csHashMap();
+  techniques = new csBasicVector();
+  
   SetName(name);
 }
 
@@ -239,6 +248,13 @@ csShader::~csShader()
 
   variables->DeleteAll();
   delete variables;
+
+  while(techniques->Length() > 0)
+  {
+    delete (iShaderTechnique*)techniques->Pop();
+  }
+
+  delete techniques;
 }
 
 bool csShader::IsValid()
@@ -320,6 +336,21 @@ void csShader::MapStream(int mapid, const char* streamname)
 
 
 //================= csShaderTechnique ============//
+csShaderTechnique::csShaderTechnique()
+{
+  SCF_CONSTRUCT_IBASE( NULL );
+  passes = new csBasicVector();
+}
+
+csShaderTechnique::~csShaderTechnique()
+{
+  while(passes->Length() > 0)
+  {
+    delete (iShaderPass*)passes->Pop();
+  }
+
+  delete passes;
+}
 
 csPtr<iShaderPass> csShaderTechnique::CreatePass()
 {

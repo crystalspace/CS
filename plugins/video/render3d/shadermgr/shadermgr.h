@@ -167,6 +167,10 @@ private:
 
 public:
   SCF_DECLARE_IBASE;
+  
+  csShaderTechnique();
+  virtual ~csShaderTechnique();
+  
 
   //================== iShaderTechnique ============//
   /// Sets a stream-mapping
@@ -198,6 +202,13 @@ private:
   csRef<iShaderProgram> fp;
 public:
   SCF_DECLARE_IBASE;
+
+  csShaderPass()
+  {
+    SCF_CONSTRUCT_IBASE( NULL );
+    vp = 0; fp = 0;
+  }
+
   /// Get vertex-program
   virtual iShaderProgram* GetVertexProgram() {return vp; }
 
@@ -216,6 +227,20 @@ public:
     if( vp || fp )
       return true;
     return false;
+  }
+
+  /// Activate
+  virtual void Activate()
+  {
+    if(vp) vp->Activate();
+    if(fp) fp->Activate();
+  }
+
+  /// Deactivate
+  virtual void Deactivate()
+  {
+    if(vp) vp->Deactivate();
+    if(fp) fp->Deactivate();
   }
 };
 
