@@ -25,6 +25,7 @@
 #include "csengine/arrays.h"
 
 class csBspTree;
+class csPolygonArrayNoFree;
 class Dumper;
 
 // The BSP tree can be build using the following criteria:
@@ -163,7 +164,7 @@ private:
    * Add all visible polygons in this tree to
    * the given polygon array (for PVS).
    */
-  void AddToPVS (csBspNode* node, csPolygonArray& polygons);
+  void AddToPVS (csBspNode* node, csPolygonArrayNoFree* polygons);
 
 public:
   /**
@@ -225,7 +226,7 @@ public:
    * Add all visible polygons in this tree to
    * the given polygon array (for PVS).
    */
-  void AddToPVS (csPolygonArray& polygons)
+  void AddToPVS (csPolygonArrayNoFree* polygons)
   {
     AddToPVS ((csBspNode*)root, polygons);
   }

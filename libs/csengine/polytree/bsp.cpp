@@ -541,7 +541,7 @@ int* csBspTree::GetVertices (int& count)
   return indices;
 }
 
-void csBspTree::AddToPVS (csBspNode* node, csPolygonArray& polygons)
+void csBspTree::AddToPVS (csBspNode* node, csPolygonArrayNoFree* polygons)
 {
   if (!node) return;
   int i;
@@ -549,8 +549,10 @@ void csBspTree::AddToPVS (csBspNode* node, csPolygonArray& polygons)
   {
     if (node->polygons.GetPolygon (i)->GetType () != 1) continue;
     csPolygon3D* p = (csPolygon3D*)(node->polygons.GetPolygon (i));
-    if (p->IsVisible ()) polygons.Push (p);
+    if (p->IsVisible ()) polygons->Push (p);
   }
+  AddToPVS (node->front, polygons);
+  AddToPVS (node->back, polygons);
 }
 
 //---------------------------------------------------------------------------

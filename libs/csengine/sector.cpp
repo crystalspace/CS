@@ -402,7 +402,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   if (csWorld::current_world->IsPVS ())
   {
     // Test for PVS.
-    if (!onode->IsVisible ()) { printf ("-"); return false; }
+    if (!onode->IsVisible ()) return false;
   }
 
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
@@ -518,6 +518,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     for (i = 0 ; i < num_indices ; i++)
       cam[indices[i]] = rview->Other2This (pset->Vwor (indices[i]));
   }
+
   return true;
 }
 

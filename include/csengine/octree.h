@@ -21,7 +21,6 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
-#include "csutil/garray.h"
 #include "csengine/polytree.h"
 #include "csengine/bsp.h"
 #include "csengine/arrays.h"
@@ -32,6 +31,7 @@ class csOctreeNode;
 class csBspTree;
 class csCovcube;
 class csThing;
+class csPVS;
 class Dumper;
 
 #define OCTREE_FFF 0
@@ -44,30 +44,72 @@ class Dumper;
 #define OCTREE_BBB 7
 
 /**
+ * Subclass of csPolygonArray that doesn't delete
+ * the polygons but only maintains the pointers.
+ */
+class csPolygonArrayNoFree : public csPolygonArray
+{
+public:
+  /// Create the polygon array object
+  csPolygonArrayNoFree (int iLimit, int iDelta)
+  	: csPolygonArray (iLimit, iDelta) { }
+
+  /// Delete a particular array element
+  virtual bool FreeItem (csSome /*Item*/) { return true; }
+};
+
+/**
  * A visibility info node for one octree node.
  * This node represents a visible octree node and possibly
  * all visible polygons (if the node is a leaf).
  */
 class csOctreeVisible
 {
+  friend class csPVS;
+
 private:
+  // Next visibility entry.
+  csOctreeVisible* next;
   // The visible polygons.
-  csPolygonArray polygons;
+  csPolygonArrayNoFree polygons;
   // The visible node.
   csOctreeNode* node;
   
 public:
-  csOctreeVisible() : polygons (8, 16), node (NULL) {}
+  csOctreeVisible() : next (NULL), polygons (8, 16), node (NULL) {}
   /// Set octree node.
   void SetOctreeNode (csOctreeNode* onode) { node = onode; }
   /// Get octree node.
   csOctreeNode* GetOctreeNode () { return node; }
   /// Get the polygon array.
-  csPolygonArray& GetPolygons () { return polygons; }
+  csPolygonArrayNoFree& GetPolygons () { return polygons; }
 };
 
-/// A growing array for the PVS information (visible octree/polygons).
-TYPEDEF_GROWING_ARRAY (csPVS, csOctreeVisible);
+/**
+ * The PVS itself.
+ */
+class csPVS
+{
+private:
+  // Linked list of visible nodes (with polygons attached).
+  csOctreeVisible* visible;
+
+public:
+  /// Constructor.
+  csPVS () : visible (NULL) { }
+  /// Destructor.
+  ~csPVS ();
+  /// Clear the PVS.
+  void Clear ();
+
+  /// Add a new visibility struct.
+  csOctreeVisible* Add ();
+
+  /// Get the first visibility struct.
+  csOctreeVisible* GetFirst () { return visible; }
+  /// Get the next one.
+  csOctreeVisible* GetNext (csOctreeVisible* ovis) { return ovis->next; }
+};
 
 /**
  * An octree node.
@@ -104,11 +146,12 @@ private:
   int minibsp_numverts;
 
   /**
-   * A growing array for the PVS information.
+   * The PVS for this node.
    * This list contains all octree nodes and polygons that
    * are visible from this node.
    */
   csPVS pvs;
+
   /**
    * Visibility number. If equal to csOctreeNode::pvs_cur_vis_nr then
    * this object is visible.

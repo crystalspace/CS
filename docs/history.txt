@@ -13,6 +13,15 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 1-Mar-2000
+	- Norman Kramer did some further code cleanup and preparing for
+	  alphamap handling (halos) in glide driver.
+	- Michael Dale Long changed add and mult fields in struct pivot to
+	  be unsigned long instead of int, and changed the values in the
+	  static declaration below to reflect that. This fixes some nasty
+	  warnings in GCC, as well as prevents the possibility of
+	  overflow errors.
+	- Wyatt Miler added background music to Blocks.
+	- Continued work on PVS. Still not working properly though.
 	- Eric Sunshine fixed the Terrain and Phyziks libraries so that they
 	  once again compile on OpenStep (taking into account OpenStep
 	  compiler bugs).
@@ -28,6 +37,7 @@ Short-term cleanups that need to be done:
 	  quote frame names in output file, which caused a parse error later
 	  on when CS tried loading the sprite if the sprite name contained
 	  whitespace.
+	- Thomas Hieber did some further work on the D3D port.
 28-Feb-2000
 	- Michael Ewert did some more optimization work op csphyzik.  At least
 	  another 2x speed increase overall.

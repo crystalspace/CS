@@ -30,6 +30,31 @@
 
 //---------------------------------------------------------------------------
 
+csPVS::~csPVS ()
+{
+  Clear ();
+}
+
+void csPVS::Clear ()
+{
+  while (visible)
+  {
+    csOctreeVisible* n = visible->next;
+    CHK (delete visible);
+    visible = n;
+  }
+}
+
+csOctreeVisible* csPVS::Add ()
+{
+  CHK (csOctreeVisible* ovis = new csOctreeVisible ());
+  ovis->next = visible;
+  visible = ovis;
+  return ovis;
+}
+
+//---------------------------------------------------------------------------
+
 ULong csOctreeNode::pvs_cur_vis_nr = 1;
 
 csOctreeNode::csOctreeNode ()
@@ -519,14 +544,23 @@ void csOctree::MarkVisibleFromPVS (const csVector3& pos)
   csOctreeNode::pvs_cur_vis_nr++;
 
   csPVS& pvs = node->GetPVS ();
-  int i;
+  int j;
   // Here we mark all octree nodes as visible.
   // The polygons from the pvs are only marked visible
   // when we actually traverse to an octree node.
-  for (i = 0 ; i < pvs.GetLimit () ; i++)
+  csOctreeVisible* ovis = pvs.GetFirst ();
+printf ("==============\n");
+  while (ovis)
   {
-    csOctreeVisible& ovis = pvs[i];
-    ovis.GetOctreeNode ()->MarkVisible ();
+printf ("Mark node visible.\n");
+    ovis->GetOctreeNode ()->MarkVisible ();
+    csPolygonArrayNoFree& pol = ovis->GetPolygons ();
+    for (j = 0 ; j < pol.Length () ; j++)
+    {
+printf ("  Mark polygon %d visible.\n", j);
+      pol.Get (j)->MarkVisible ();
+    }
+    ovis = pvs.GetNext (ovis);
   }
 }
 
@@ -591,14 +625,15 @@ void csOctree::AddToPVS (csPVS& pvs, csOctreeNode* node)
   if (!node) return;
   if (!node->IsVisible ()) return;
 
-  int new_pvs_idx = pvs.GetLimit ();
-  pvs.SetLimit (new_pvs_idx+1);
-  pvs[new_pvs_idx].SetOctreeNode (node);
+printf ("  Add\n");
+  csOctreeVisible* ovis = pvs.Add ();
+  ovis->SetOctreeNode (node);
 
   if (node->GetMiniBsp ())
   {
     csBspTree* bsp = node->GetMiniBsp ();
-    bsp->AddToPVS (pvs[new_pvs_idx].GetPolygons ());
+    bsp->AddToPVS (&ovis->GetPolygons ());
+printf ("  Bsp Add\n");
   }
 
   int i;
@@ -618,6 +653,9 @@ printf ("*"); fflush (stdout);
   // Mark all objects in the world as invisible.
   csOctreeNode::pvs_cur_vis_nr++;
 
+  // The root is always visible.
+  ((csOctreeNode*)root)->MarkVisible ();
+
   // @@@ This algorithm is not good. It just samples a few
   // points in the cube and gathers all visible objects seen
   // from that point. It has two problems:
@@ -629,7 +667,8 @@ printf ("*"); fflush (stdout);
   // test the PVS in principle.
   const csVector3& bmin = leaf->GetMinCorner ();
   const csVector3& bmax = leaf->GetMaxCorner ();
-  csVector3 steps = (bmax-bmin)/2.;
+  //csVector3 steps = (bmax-bmin)/2.;
+  csVector3 steps = (bmax-bmin);//@@@
   csVector3 pos;
   PVSBuildData pvsdata;
   pvsdata.center = pos;
@@ -650,7 +689,8 @@ printf ("*"); fflush (stdout);
   // found all (not really, see above) visible nodes and polygons. Here
   // we will fetch them all and put them in the PVS for this leaf.
   csPVS& pvs = leaf->GetPVS ();
-  pvs.SetLimit (0);
+  pvs.Clear ();
+  printf ("=========AddToPVS\n");
   AddToPVS (pvs, (csOctreeNode*)root);
 }
 

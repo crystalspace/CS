@@ -536,6 +536,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	printf (".");
         continue;
       }
+
       clip = (csPolygon2D*)(render_pool->Alloc ());
       visible = false;
       if ( !p->dont_draw &&
