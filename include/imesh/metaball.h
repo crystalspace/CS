@@ -32,11 +32,11 @@ struct MetaParameters
   float rate;
 };
 
-enum EnvMappingModes    {TRUE_ENV_MAP,FAKE_ENV_MAP};
+enum EnvMappingModes { TRUE_ENV_MAP,FAKE_ENV_MAP };
 
 SCF_VERSION (iMetaBallState, 0, 0, 1);
 
-///
+/// Document me! @@@
 struct iMetaBallState : public iBase
 {
   /// Get number of balls currently being animated

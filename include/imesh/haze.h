@@ -29,19 +29,19 @@ struct iMaterialWrapper;
 SCF_VERSION (iHazeHull, 0, 0, 1);
 
 /**
- *  A mesh specially meant for use by the haze.
- *  This mesh must be a convex hull.
- *  for example: cubes, boxes, spheres, cones, cylinders, pyramids.
- *  A convex hull object can be defined as follows:
- *    from any point inside the object, all of the polygons are completely
- *    visible (none are obscured by other polygons from the convex hull).
- *  The ordering of the vertices (vertice numbering) is important when
- *  multiple hulls are used.
- *  Also edges must be numbered, with a number for each undirected edge.
- *  (i.e. a->b and b->a have the same edge number).
- *  Polygons thus have N vertices and N edges.
- *  For a particular polygon, the edges return their points in clockwise
- *  ordering.
+ * A mesh specially meant for use by the haze.
+ * This mesh must be a convex hull.
+ * for example: cubes, boxes, spheres, cones, cylinders, pyramids.
+ * A convex hull object can be defined as follows:
+ *   from any point inside the object, all of the polygons are completely
+ *   visible (none are obscured by other polygons from the convex hull).
+ * The ordering of the vertices (vertice numbering) is important when
+ * multiple hulls are used.
+ * Also edges must be numbered, with a number for each undirected edge.
+ * (i.e. a->b and b->a have the same edge number).
+ * Polygons thus have N vertices and N edges.
+ * For a particular polygon, the edges return their points in clockwise
+ * ordering.
  */
 struct iHazeHull : public iBase
 {
@@ -74,7 +74,7 @@ struct iHazeHull : public iBase
 SCF_VERSION (iHazeHullBox, 0, 0, 1);
 
 /**
- *  A predefined hull.
+ * A predefined hull.
  */
 struct iHazeHullBox : public iBase
 {
@@ -85,7 +85,7 @@ struct iHazeHullBox : public iBase
 SCF_VERSION (iHazeHullCone, 0, 0, 1);
 
 /**
- *  A predefined hull.
+ * A predefined hull.
  */
 struct iHazeHullCone : public iBase
 {
@@ -116,7 +116,7 @@ SCF_VERSION (iHazeFactoryState, 0, 0, 1);
  * This interface describes the API for the sprite factory mesh object.
  * When multiple hulls are used, they must have the same number of
  * vertices, vertices are taken to be numbered in the same ordering.
- *
+ * <p>
  * The factory also implements the iHazeHullCreation interface
  */
 struct iHazeFactoryState : public iBase

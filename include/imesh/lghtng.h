@@ -28,7 +28,7 @@ struct iMaterialWrapper;
 
 SCF_VERSION (iLightningFactoryState, 0, 0, 1);
 
-///
+/// Document me! @@@
 struct iLightningFactoryState : public iBase
 {
   /// Set material of sprite.

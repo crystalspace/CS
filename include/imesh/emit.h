@@ -41,18 +41,18 @@ SCF_VERSION (iEmitCylinderTangent, 0, 0, 1);
  */
 struct iEmitGen3D : public iBase
 {
-  /// get the 3d value, posibly using a given value
+  /// get the 3d value, posibly using a given value.
   virtual void GetValue(csVector3& value, csVector3 &given) = 0;
 };
 
-/** fixed value emitter - returns a particular point value */
+/// fixed value emitter - returns a particular point value.
 struct iEmitFixed : public iEmitGen3D
 {
   /// set the fixed value
   virtual void SetValue(const csVector3& value) = 0;
 };
 
-/** sphere value emitter - returns points in a sphere */
+/// sphere value emitter - returns points in a sphere.
 struct iEmitSphere : public iEmitGen3D
 {
   /// set content, center and min, max radius
@@ -61,7 +61,7 @@ struct iEmitSphere : public iEmitGen3D
   virtual void GetContent(csVector3& center, float& min, float& max) = 0;
 };
 
-/** box value emitter - returns points in an (axis aligned) box */
+/// box value emitter - returns points in an (axis aligned) box.
 struct iEmitBox : public iEmitGen3D
 {
   /// set content, min and max vector values
@@ -70,11 +70,12 @@ struct iEmitBox : public iEmitGen3D
   virtual void GetContent(csVector3& min, csVector3& max) = 0;
 };
 
-/** cone value emitter - returns points in a cone */
+/// cone value emitter - returns points in a cone.
 struct iEmitCone : public iEmitGen3D
 {
-  /** set content, origin, elevation, azimuth, aperture(opening),
-   *  and distance min, distance max from the origin of the cone.
+  /**
+   * Set content, origin, elevation, azimuth, aperture(opening),
+   * and distance min, distance max from the origin of the cone.
    */
   virtual void SetContent(const csVector3& origin, float elevation,
     float azimuth, float aperture, float min, float max) = 0;
@@ -83,7 +84,7 @@ struct iEmitCone : public iEmitGen3D
     float& azimuth, float& aperture, float& min, float& max) = 0;
 };
 
-/** mix value emitter - returns a weighted random mix of other emitters */
+/// mix value emitter - returns a weighted random mix of other emitters.
 struct iEmitMix : public iEmitGen3D
 {
   /// add a weighted emitter to the mix
@@ -96,7 +97,7 @@ struct iEmitMix : public iEmitGen3D
   virtual void GetContent(int num, float& weight, iEmitGen3D*& emit) = 0;
 };
 
-/** line value emitter - returns values on the line between start and end */
+/// line value emitter - returns values on the line between start and end.
 struct iEmitLine : public iEmitGen3D
 {
   /// set content, start and end vector values
@@ -105,7 +106,7 @@ struct iEmitLine : public iEmitGen3D
   virtual void GetContent(csVector3& start, csVector3& end) = 0;
 };
 
-/** cylinder value emitter - returns values in a cylinder */
+/// cylinder value emitter - returns values in a cylinder.
 struct iEmitCylinder : public iEmitGen3D
 {
   /// set content, start and end position of cylinder, min/max distance
@@ -116,8 +117,10 @@ struct iEmitCylinder : public iEmitGen3D
     float& min, float& max) = 0;
 };
 
-/** sphere tangential value emitter - gives direction tangential to sphere
-  Uses the given point, gives a tangential direction for that */
+/**
+ * sphere tangential value emitter - gives direction tangential to sphere
+ * Uses the given point, gives a tangential direction for that.
+ */
 struct iEmitSphereTangent : public iEmitGen3D
 {
   /// set content, center of sphere, min/max size
@@ -126,8 +129,10 @@ struct iEmitSphereTangent : public iEmitGen3D
   virtual void GetContent(csVector3& center, float& min, float& max) = 0;
 };
 
-/** cylinder tangential value emitter - gives direction tangential to cylinder
-  Uses the given point, gives a tangential direction for that */
+/**
+ * cylinder tangential value emitter - gives direction tangential to cylinder
+ * Uses the given point, gives a tangential direction for that
+ */
 struct iEmitCylinderTangent : public iEmitGen3D
 {
   /// set content, start,end of cylinder, min/max size
@@ -216,7 +221,8 @@ struct iEmitState : public iBase
   /// get field accel emitter, can be 0
   virtual iEmitGen3D* GetFieldAccelEmit() const = 0;
 
-  /** Add an aging moment, they are interpolated.
+  /**
+   * Add an aging moment, they are interpolated.
    * time is the time since creation of the particle in msec.
    * color is a gouraud color to set the particle to. (0..1)
    * alpha can be used to make the particles transparent.
@@ -224,7 +230,7 @@ struct iEmitState : public iBase
    * the swirl value gives a swirlyness of the movement of the particle.
    * rotspeed is the rotationspeed of the particle (per second).
    * scale is the size of the particle at the time
-  */
+   */
   virtual void AddAge(int time, const csColor& color, float alpha,
     float swirl, float rotspeed, float scale) = 0;
   /// Get the number of aging moments

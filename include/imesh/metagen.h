@@ -31,7 +31,8 @@ struct csTriangle;
 
 SCF_VERSION (iMetaGen, 0, 0, 1 );
 
-struct iMetaGen : iBase
+/// Document me! @@@
+struct iMetaGen : public iBase
 {
   enum EnvMappingModes { TRUE_ENV_MAP, FAKE_ENV_MAP };
 

@@ -167,8 +167,10 @@ struct iGeneralFactoryState : public iBase
     csRenderBufferComponentType component_type, int component_size) = 0;
 
   /// Adds a component to stream with name
-  virtual bool SetRenderBufferComponent (const char *name, int index, int component, float value) = 0; 
-  virtual bool SetRenderBufferComponent (const char *name, int index, int component, int value) = 0; 
+  virtual bool SetRenderBufferComponent (const char *name, int index,
+  	int component, float value) = 0; 
+  virtual bool SetRenderBufferComponent (const char *name, int index,
+  	int component, int value) = 0; 
 
   /// Sets the stream based on the input array
   virtual bool SetRenderBuffer (const char *name, float *value) = 0;

@@ -71,18 +71,24 @@ struct iBCTerrState : public iBase
   /// Set Height to flatten edges : default = topleft.y
   virtual void SetFlattenHeight (const float up, const float down,
         const float left, const float right) = 0;
-  /// Make the MeshObject flatten it's edges, be sure not to set the height different for sides that touch
+  /**
+   * Make the MeshObject flatten it's edges, be sure not to set the height
+   * different for sides that touch
+   */
   virtual void DoFlatten (const bool up, const bool down,
         const bool left, const bool right) = 0;
   /// Set System LOD increments
   virtual void SetSystemInc (const int inc) = 0;
-  /// Pre Build control points, should be called before setting height or control points
+  /**
+   * Pre Build control points, should be called before setting height or
+   * control points.
+   */
   virtual void PreBuild () = 0;
   /// Build the mesh, prepare mesh for material calls
   virtual void Build () = 0;
   /// Length of control point array
   virtual int GetControlLength () = 0;
-  /// Get control point.  iter: Starts at 0 and stops at GetControlLength () - 1.
+  /// Get control point. iter: Starts at 0 and stops at GetControlLength () - 1.
   /// return true if successful
   virtual bool GetControlPoint (int iter, csVector3 &point) = 0;
 };
