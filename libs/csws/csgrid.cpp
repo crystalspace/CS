@@ -244,7 +244,8 @@ csGridView::csGridView (csGrid *pParent, const csRect& region, int iStyle) : csC
   else
     vscroll = NULL;
   SetPalette (CSPAL_GRIDVIEW);
-  row = col = 0;
+  col = area.xmin;
+  row = area.ymin;
 }
 
 csGridView::csGridView (const csGridView& view, int iStyle /*=0*/) : csComponent (view.pGrid)
@@ -370,17 +371,17 @@ void csGridView::Draw()
   csVector vRegions;
   csGridCell *cell = NULL;
 
-  while (y < bound.Height ()){
+  while (y < bound.Height () && actRow < area.ymax){
     rc.Set (col, actRow, area.xmax, actRow+1);
     vRegions.SetLength (0);
     pGrid->regions->FindRegion (rc, vRegions);
     if (vRegions.Length () == 0) break; // no more rows to draw
     x=0; n=0; c=col;
-    while (x < bound.Width () && n < vRegions.Length ()){
+    while (x < bound.Width () && n < vRegions.Length () && c < area.xmax){
       r = (csRegionTree2D*)vRegions.Get (n++);
       cell = (csGridCell*)r->data;
       Insert (cell); cell->Show (false); // show but don't focus
-      for (; c < r->region.xmax && x < bound.Width (); c++){
+      for (; c < r->region.xmax && x < bound.Width () && c < area.xmax; c++){
 	cell->SetPos (x, y);
 	cell->row = actRow;
 	cell->col = c;
@@ -529,6 +530,7 @@ void csGrid::init (csComponent *pParent, csRect &rc, int iStyle, csGridCell *gc)
 csGrid::~csGrid ()
 {
   int i;
+  
   for (i=0; i < grid->rows.Length (); i++){
     csSparseGrid::csGridRow *r = (csSparseGrid::csGridRow*)grid->rows.Get(i)->data;
     for(int j=0; j<r->Length (); j++){
