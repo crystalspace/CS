@@ -13,6 +13,10 @@ chronological order.
 	  csPrintLibraryError() if the plugin fails to load.  This error
 	  reporting was accidentally dropped with all of the recent SCF
 	  implementation changes.
+	- res made the following changes:
+	    - Removed the unmaintained and hardly used ddraw8 canvas plugin.
+	    - Updated win32/csosdefs.h to provide the LONG_PTR type on older
+	      Platform SDKs.
 18-Aug-2003
 	- Jorrit fixed a bug with destruction of hierarchical factories.
 	  The problem was that it was trying to remove objects from
