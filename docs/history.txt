@@ -175,7 +175,7 @@ The history order is reversed so that new features are at the top.
 	- Oktal changed the prototype of main() in perl5test to
 	  (int, char**) from (int, char**, char**) because that was causing
 	  it to fail linking on some platforms including Mingw.
-	- Eric Sunshine fixed apps/tests/perl5tst/Jamefile so that it is only
+	- Eric Sunshine fixed apps/tests/perl5tst/Jamfile so that it is only
 	  enabled if the Perl SDK was detected, rather than if the Perl command
 	  is available.  This is an important distinction because the presence
 	  of the Perl command alone does not necessarily imply the presence of
@@ -225,7 +225,7 @@ The history order is reversed so that new features are at the top.
 	      msvc7gen.pl were merged.
 	    - Renamed msvcgen.pl options --projext, -px, --wsext, -wx,
 	      --projname, and --htmlent to --project-extension, -P,
-	      --workspace-extension, -W, --project-name, --xml-protect,
+	      --workspace-extension, -W, --project-name, and --xml-protect,
 	      respectively.
 	    - Changed msvcgen.pl so that it no longer creates the unused
 	      "dummy" fragment file.  This file seems to have been an ugly
@@ -301,7 +301,7 @@ The history order is reversed so that new features are at the top.
 	      resources for inclusion in generated projects.  Upgrade module
 	      Jamfiles to mention headers from the CS/include/foobar directory.
 	      This will allow related headers to appear in the generated
-	      project files.  For instance, the libcsutil project should
+	      project files.  For instance, the libcsengine project should
 	      mention headers from CS/include/csengine, in addition to the ones
 	      from CS/libs/csengine, which it currently mentions.
 	    - Renamed CS/mk/visualc to CS/mk/visualc6.
@@ -311,9 +311,9 @@ The history order is reversed so that new features are at the top.
 	    - Fixed problem in Jam build where it would attempt to invoke
 	      Bourne scripts using C-shell if user's login shell was C-shell or
 	      compatible.
-	    - Fixed csperl5/Jamefile so that it is only enabled if the Perl
-	      SDK was detected, rather than if the Perl command is available.
-	      This is an important distinction because the presence of the Perl
+	    - Fixed csperl5/Jamfile so that it is only enabled if the Perl SDK
+	      was detected, rather than if the Perl command is available.  This
+	      is an important distinction because the presence of the Perl
 	      command alone does not necessarily imply the presence of a
 	      working SDK.
 	- Eric Sunshine removed the hack from cs.mak which was needed to clean
@@ -512,13 +512,13 @@ The history order is reversed so that new features are at the top.
 	  big writing with pictures version as it were! :)
 	- Eric Sunshine adjusted the field widths in help.jam in order to avoid
 	  all the "description" truncations.
-	- Eric Sunshine fixed problem where empty G3D_FOGMETHOD  enum in cs.i
+	- Eric Sunshine fixed problem where empty G3D_FOGMETHOD enum in cs.i
 	  caused Swig 1.3.19 for Windows to crash with segmentation fault.
 	  Reported by Boyan Histrov.
 	- Eric Sunshine eliminated copy/paste redundancy in LinkApplication
 	  and LinkApplicationConsole rules in unix.jam and win32.jam.
-	- Eric Sunshine corrected a number of typographical and other erros in
-	  comments in the Jam files (mk/jam).
+	- Eric Sunshine corrected a number of typographical and other errors in
+	  comments in the Jam files (CS/mk/jam).
 	- Eric Sunshine corrected some confusion in objectivec.jam where .mm
 	  and .M were being registered within the CMD.OBJC block rather than
 	  the CMD.OBJC++ block.
