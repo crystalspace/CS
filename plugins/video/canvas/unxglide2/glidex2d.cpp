@@ -40,6 +40,8 @@ bool DoGlideInWindow=true;
 
 bool locked;
 
+csGraphics2DGlideX* thisPtr=NULL;
+
 // csGraphics2DGLX functions
 csGraphics2DGlideX::csGraphics2DGlideX(ISystem* piSystem) :
   csGraphics2D (piSystem), xim (NULL), cmap (0)
@@ -55,6 +57,7 @@ csGraphics2DGlideX::csGraphics2DGlideX(ISystem* piSystem) :
 
 void csGraphics2DGlideX::Initialize()
 {
+  thisPtr=this;
   csGraphics2D::Initialize ();
   Screen* screen_ptr;
 
@@ -79,11 +82,6 @@ void csGraphics2DGlideX::Initialize()
   UnixSystem->GetSettings (sim_depth, do_shm, do_hwmouse);
 
   dpy = XOpenDisplay (NULL);
-  if (!dpy)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: Cannot open X display\n");
-    exit (-1);
-  }
 
   screen_num = DefaultScreen (dpy);
   screen_ptr = DefaultScreenOfDisplay (dpy);
@@ -96,8 +94,8 @@ void csGraphics2DGlideX::Initialize()
   
   Depth=16;
 	  
-  DrawPixel = DrawPixelGlide;   WriteChar = WriteCharGlide;
-  GetPixelAt = GetPixelAtGlide; DrawSprite = DrawSpriteGlide;
+  DrawPixel = DrawPixelGlide; WriteChar = WriteCharGlide;
+  GetPixelAt = GetPixelAt16;  DrawSprite = DrawSpriteGlide;
     
   // calculate CS's pixel format structure. 565
   pfmt.PixelBytes = 2;
@@ -141,7 +139,7 @@ csGraphics2DGlideX::~csGraphics2DGlideX ()
 }
 
 // Used to printf through system driver
-void csGraphics2DGlideX::CsPrintf (int msgtype, const char *format, ...)
+void csGraphics2DGlideX::CsPrintf (int msgtype, char *format, ...)
 {
   va_list arg;
   char buf[256];
@@ -153,7 +151,7 @@ void csGraphics2DGlideX::CsPrintf (int msgtype, const char *format, ...)
   System->Print (msgtype, buf);
 }
 
-bool csGraphics2DGlideX::Open(const char *Title)
+bool csGraphics2DGlideX::Open(char *Title)
 { 
 
   // Open your graphic interface
@@ -322,7 +320,7 @@ bool csGraphics2DGlideX::BeginDraw(/*int Flag*/)
   bret=GlideLib_grLfbLock(glDrawMode|GR_LFB_IDLE,
                           GR_DRAWBUFFER,
                           GR_LFBWRITEMODE_565,
-                          GR_ORIGIN_ANY,
+                          GR_ORIGIN_UPPER_LEFT,
                           FXFALSE,
                           &lfbInfo);
   if(bret)
@@ -444,19 +442,59 @@ void csGraphics2DGlideX::DrawPixelGlide (int x, int y, int color)
 
 void csGraphics2DGlideX::WriteCharGlide (int x, int y, int fg, int bg, char c)
 {
+  //if (!locked)
+//thisPtr->BeginDraw();
+//  if (locked) thisPtr->FinishDraw();
+//  thisPtr->BeginDraw();
+  thisPtr->WriteChar16(x,y,fg,bg,c);
+
   // not implemented yet...
 }
 
 void csGraphics2DGlideX::DrawSpriteGlide (ITextureHandle *hTex, int sx, int sy,
   int sw, int sh, int tx, int ty, int tw, int th)
 {
+ // if (!locked) thisPtr->BeginDraw();
+//  if (locked) thisPtr->FinishDraw();
+  //thisPtr->BeginDraw();
+  thisPtr->DrawSprite16(hTex,sx,sy,sw,sh,tx,ty,tw,th);
   // not implemented yet...
 }
 
 unsigned char* csGraphics2DGlideX::GetPixelAtGlide (int x, int y)
 {
   // not implemented yet...
-  return NULL;
+   //static FxBool bret;
+//   static unsigned char ch;
+   //static GrLfbInfo_t lfbInfo;
+
+/*   if (!locked)
+   {
+     lfbInfo.size=sizeof(GrLfbInfo_t);
+
+
+     bret=GlideLib_grLfbLock(GR_LFB_READ_ONLY|GR_LFB_IDLE,
+                          GR_DRAWBUFFER,
+                          GR_LFBWRITEMODE_565,
+                          GR_ORIGIN_ANY,
+                          FXFALSE,
+                          &lfbInfo);
+     locked=bret;
+   }*/
+
+
+   if (!locked) thisPtr->BeginDraw();
+
+   return thisPtr->GetPixelAt16(x,y);
+/*   if(locked)
+   {
+     //Memory=(unsigned char*)lfbInfo.lfbPtr;
+     return (unsigned char *)thisPtr->Memory+(y*thisPtr->lfbInfo.strideInBytes+x);
+
+     //GlideLib_grLfbUnlock(GR_LFB_READ_ONLY,GR_DRAWBUFFER);
+   }
+
+   else return NULL;*/
 }
 
 static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
