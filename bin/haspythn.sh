@@ -44,7 +44,10 @@ if [ -z "${PYTHON_LIB}" ]; then
 fi
 
 if [ -n "${PYTHON_INC}" -a -n "${PYTHON_LIB}" ]; then
+  echo "PLUGINS.DYNAMIC += cscript/cspython"
   echo "PYTHON_INC = ${PYTHON_INC}"
   echo "PYTHON_LIB = ${PYTHON_LIB}"
-  echo "PLUGINS.DYNAMIC += cscript/cspython"
+  if [ -r "${PYTHON_LIB}/libutil.a" ]; then
+    echo "PYTHON_LFLAGS_EXTRA = -lutil"
+  fi
 fi

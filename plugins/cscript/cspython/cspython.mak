@@ -35,13 +35,6 @@ ifeq ($(MAKESECTION),postdefines)
 # For custom compiled python with tk/tcl
 #TCLTK=-ltk8.0 -ltcl8.0 -L/usr/X11R6/lib -lX11
 
-# For python 2.0+
-ifneq ($(OS),NEXT)
-  ifneq (,$(filter python2%, $(notdir $(PYTHON_LIB))))
-    LIBUTIL=-lutil
-  endif
-endif
-
 ifneq ($(OS),NEXT)
 PTHREAD=-lpthread
 endif
@@ -64,7 +57,8 @@ ifneq (,$(strip $(PYTHON_LIB)))
   # "libpython1.5.a".
   LIBS.CSPYTHON.SYSTEM = \
     $(LFLAGS.L)$(PYTHON_LIB)/config $(LFLAGS.L)$(PYTHON_LIB) \
-    $(LFLAGS.l)$(notdir $(PYTHON_LIB)) $(TCLTK) $(PTHREAD) $(LIBUTIL)
+    $(LFLAGS.l)$(notdir $(PYTHON_LIB)) $(TCLTK) $(PTHREAD) \
+    $(PYTHON_LFLAGS_EXTRA)
 endif
 endif
 

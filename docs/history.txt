@@ -27,6 +27,10 @@ The history order is reversed so that new features are at the top.
 	  locating Python even when Python is installed in a non-standard
 	  location.
 	- Eric Sunshine patched cspython.mak for MacOS/X.
+	- Eric Sunshine patched haspythn.sh and cspython.mak so that cspython
+	  plugin only tries linking with Python's libutil.a if that library
+	  actually exists.  (It seems to have existed in Python 2.0, but went
+	  away for 2.1.)
 12-Sep-2002
 	- Fixed a crash at exit bug in Blocks.
 	- Fixed stupid bug in star loader that crashed csdemo.
