@@ -77,6 +77,36 @@ The history order is reversed so that new features are at the top.
 	  some minor formatting for the printed manual.
 	- Duhprey added a line to the hashmap constructor forcing bucket 
 	  capacity to a prime number
+	- Eric Sunshine performed Phase Four of the elimination of the
+	  monolithic scf.cfg:
+	    - Repaired static linking mode so that it works with the new SCF
+	      design.
+	    - Added new macros SCF_REGISTER_STATIC_LIBRARY() and
+	      SCF_REGISTER_FACTORY_FUNC() which can be used in aid of static
+	      linking (and other special cases).
+	    - Added iSCF::RegisterClasses(char const*) convenience variation.
+	    - Added iSCF::RegisterFactoryFunc() which allows clients to
+	      register a class factory function after-the-fact (that is, after
+	      a class has been registered).
+	    - Modified static.mak and static.jam to utilize the new
+	      SCF_REGISTER_STATIC_LIBRARY() and SCF_REGISTER_FACTORY_FUNC()
+	      macros when creating the special static-link stub source files
+	      which register the SCF classes and ensure that the program links
+	      with the appropriate libraries.
+	    - Redesigned the sed expressions used in creation of the plugin
+	      .def files on Windows.  Was able to eliminate
+	      CS/libs/cssys/win32/mkdef.sh since the sed expressions no longer
+	      contain embedded newlines.
+	    - Still To-Do:
+		- Remove references to scf.cfg and scfreg from documentation.
+		  Also document new .csplugin resources.
+		- Add platform-specific function to scan and locate plugins
+		  automatically rather than using the ad-hoc approach inherited
+		  from scanning for .scf files.
+		- Add platform-specific function to query a plugin's
+		  meta-information.  This should be used by SCF to do the raw
+		  extraction.  Provide and finalize API for higher-level
+		  clients to access meta-information.
 12-Jun-2003
 	- Jorrit clarified a comment with csColliderWrapper telling people that
 	  you must DecRef() the new collider wrapper after creating it.

@@ -18,14 +18,16 @@
 */
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
-#include "csutil/scf.h"
-#include "csutil/csvector.h"
-#include "csutil/scfstrv.h"
 #include "csutil/csstring.h"
+#include "csutil/csvector.h"
+#include "csutil/memfile.h"
+#include "csutil/ref.h"
+#include "csutil/scf.h"
+#include "csutil/scfstrv.h"
+#include "csutil/scopedmutexlock.h"
 #include "csutil/strset.h"
 #include "csutil/util.h"
-#include "csutil/ref.h"
-#include "csutil/scopedmutexlock.h"
+#include "csutil/xmltiny.h"
 #include "iutil/document.h"
 
 /// This is the registry for all class factories
@@ -58,11 +60,13 @@ public:
   virtual ~csSCF ();
 
   virtual void RegisterClasses (iDocument*);
+  virtual void RegisterClasses (char const*);
   virtual bool RegisterClass (const char *iClassID,
     const char *iLibraryName, const char *iFactoryClass,
     const char *Description, const char *Dependencies = 0);
   virtual bool RegisterClass (scfFactoryFunc, const char *iClassID,
     const char *Description, const char *Dependencies = 0);
+  virtual bool RegisterFactoryFunc (scfFactoryFunc, const char *FactClass);
   virtual bool ClassRegistered (const char *iClassID);
   virtual void *CreateInstance (const char *iClassID,
     const char *iInterfaceID, int iVersion);
@@ -204,6 +208,8 @@ public:
   char *Description;
   // The dependency list
   char *Dependencies;
+  // Name of factory implementation class in shared library.
+  char *FactoryClass;
   // Function which actually creates an instance
   scfFactoryFunc CreateFunc;
 #ifndef CS_STATIC_LINKED
@@ -211,8 +217,6 @@ public:
   char *LibraryName;
   // A pointer to shared library object (0 for local classes)
   scfSharedLibrary *Library;
-  // Name of factory implementation class in shared library.
-  char *FactoryClass;
 #endif
 
   // Create the factory for a class located in a shared library
@@ -259,16 +263,13 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   ClassID = csStrNew (iClassID);
   Description = csStrNew (iDescription);
   Dependencies = csStrNew (iDepend);
+  FactoryClass = csStrNew (iFactoryClass);
   CreateFunc = iCreate;
 #ifndef CS_STATIC_LINKED
   LibraryName = csStrNew (iLibraryName);
   Library = 0;
-  FactoryClass = csStrNew (iFactoryClass);
 #else
   (void)iLibraryName;
-  (void)iFactoryClass;
-  // this branch should never be called
-  abort ();
 #endif
 }
 
@@ -284,9 +285,9 @@ scfFactory::~scfFactory ()
 #ifndef CS_STATIC_LINKED
   if (Library)
     Library->DecRef ();
-  delete [] FactoryClass;
   delete [] LibraryName;
 #endif
+  delete [] FactoryClass;
   delete [] Dependencies;
   delete [] Description;
   delete [] ClassID;
@@ -446,10 +447,17 @@ csSCF::~csSCF ()
   SCF = PrivateSCF = 0;
 }
 
+void csSCF::RegisterClasses (char const* xml)
+{
+  csMemFile file(xml, strlen(xml));
+  csTinyDocumentSystem docsys;
+  csRef<iDocument> doc = docsys.CreateDocument();
+  if (doc->Parse(&file) == 0)
+    RegisterClasses(doc);
+}
+
 void csSCF::RegisterClasses (iDocument* doc)
 {
-  (void)doc;
-#ifndef CS_STATIC_LINKED
   if (doc)
   {
     csRef<iDocumentNode> rootnode = doc->GetRoot();
@@ -475,7 +483,6 @@ void csSCF::RegisterClasses (iDocument* doc)
 	  "csSCF::RegisterClasses: Missing root <plugin> node.\n");
     }
   }
-#endif
 }
 
 static char const* get_node_value(csRef<iDocumentNode> parent, char const* key)
@@ -566,7 +573,6 @@ void csSCF::UnloadUnusedModules ()
 {
 #ifndef CS_STATIC_LINKED
   csScopedMutexLock lock (mutex);
-
   for (int i = LibraryRegistry->Length () - 1; i >= 0; i--)
   {
     scfSharedLibrary *sl = (scfSharedLibrary *)LibraryRegistry->Get (i);
@@ -578,40 +584,47 @@ void csSCF::UnloadUnusedModules ()
 bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   const char *iFactoryClass, const char *iDesc, const char *Dependencies)
 {
-#ifndef CS_STATIC_LINKED
   csScopedMutexLock lock (mutex);
-
   if (ClassRegistry->FindKey (iClassID) >= 0)
     return false;
-  // Create a factory and add it to class registry
   scfFactory* factory = new scfFactory (iClassID, iLibraryName, iFactoryClass,
     0, iDesc, Dependencies);
   ClassRegistry->Push (factory);
   SortClassRegistry = true;
   return true;
-#else
-  (void)iClassID;
-  (void)iLibraryName;
-  (void)iFactoryClass;
-  (void)iDesc;
-  (void)Dependencies;
-  return false;
-#endif
 }
 
 bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
   const char *Desc, const char *Dependencies )
 {
   csScopedMutexLock lock (mutex);
-
   if (ClassRegistry->FindKey (iClassID) >= 0)
     return false;
-  // Create a factory and add it to class registry
   scfFactory* factory =
     new scfFactory (iClassID, 0, 0, Func, Desc, Dependencies);
   ClassRegistry->Push (factory);
   SortClassRegistry = true;
   return true;
+}
+
+bool csSCF::RegisterFactoryFunc (scfFactoryFunc Func, const char *FactClass)
+{
+  bool ok = false;
+  csScopedMutexLock lock (mutex);
+  for (int i = 0, n = ClassRegistry->Length(); i < n; i++)
+  {
+    scfFactory* fact = (scfFactory*)ClassRegistry->Get(i);
+    if (fact->FactoryClass != 0 && strcmp(fact->FactoryClass, FactClass) == 0)
+    {
+      if (fact->CreateFunc == 0)
+      {
+        fact->CreateFunc = Func;
+	ok = true;
+      }
+      break;
+    }
+  }
+  return ok;
 }
 
 bool csSCF::UnregisterClass (const char *iClassID)

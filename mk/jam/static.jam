@@ -13,19 +13,15 @@ rule BuildStaticFile
   SEARCH on $(sources) = $(LOCATE_TARGET) ;
   MakeLocate $(object) : $(LOCATE_TARGET) ;
 
-  local registrystring i ;
+  local metalist metafile i ;
   for i in $(<)
   {
-    registrystring += "SCF_REGISTER_STATIC_LIBRARY($(i))
-" ;
+    metafile = $($(i)_METAFILE) ;
+    metalist += $(metafile) ;
+    Depends $(sources) : $(metafile) ;
   }
   
-  GenerateStaticPluginRegistry $(sources) ;
-  REGISTRYSTRING on $(sources) = $(registrystring) ;
-  # We rebuild always for safety here. jam can't detect changes on
-  # variables/command output.
-  Always $(sources) ;
-
+  GenerateStaticPluginRegistry $(sources) : $(metalist) ;
   return $(object) ;
 }
 
@@ -59,5 +55,14 @@ actions GenerateStaticPluginRegistry
   echo '#include "cssysdef.h"' >> $(<)
   echo '#include "csutil/scf.h"' >> $(<)
   echo '' >> $(<)
-  echo '$(REGISTRYSTRING)' >> $(<)
+  for x in $(>)
+  do
+    n=`basename $x $(SUFMETA)`
+    echo "static char const ${n}_metainfo[] =" >> $(<)
+    sed 's:\\:\\\\:g;s:":\\":g;s:\(.*\):"\1":' < $x >>$(<)
+    echo ";" >> $(<)
+    echo "SCF_REGISTER_STATIC_LIBRARY($n,${n}_metainfo)" >>$(<)
+    sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  SCF_REGISTER_FACTORY_FUNC(\1):g' < $x >>$(<)
+    echo "" >>$(<)
+  done
 }

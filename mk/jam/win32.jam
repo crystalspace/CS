@@ -170,17 +170,11 @@ rule GenerateExportDefs
   Depends $(<) : $(>) ;
 }
 
-# Implementation note: Do not change the layout/formatting of the sed
-# invocation.  It is purposely split over multiple lines (using backslash +
-# newline) in order to ensure that the entries in the generated .def file are
-# each placed on a separate line.
 actions GenerateExportDefs
 {
   echo "EXPORTS" > $(<)
   echo "  plugin_compiler" >> $(<)
-  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize\
-  \1_scfFinalize\
-  \1_Create:' < $(>) >> $(<)
+  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize:;p;s:_scfInitialize:_scfFinalize:;p;s:_scfFinalize:_Create:' < $(>) >> $(<)
 }
 
 actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS bind EXPORTDEFS

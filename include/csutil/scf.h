@@ -516,6 +516,41 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
     }									\
   } Class##_static_init__;
 
+/**
+ * Automatically register a static library with SCF during startup.  Employ
+ * this macro along with one or more invocations of SCF_REGISTER_FACTORY_FUNC.
+ */
+#define SCF_REGISTER_STATIC_LIBRARY(Module, MetaInfo)			\
+  class Module##_StaticInit						\
+  {									\
+  public:								\
+    Module##_StaticInit()						\
+    {									\
+      scfInitialize();							\
+      iSCF::SCF->RegisterClasses(MetaInfo);				\
+    }									\
+  } Module##_static_init__;
+
+/**
+ * Used in conjunction with SCF_REGISTER_STATIC_LIBRARY to ensure that a
+ * reference to the class(s) registered via SCF_REGISTER_STATIC_LIBRARY are
+ * actually linked into the application.  Invoke this macro once for each
+ * <implementation> mentioned in the MetaInfo registered with
+ * SCF_REGISTER_STATIC_LIBRARY.  Invocations of this macro must appear after
+ * the the invocation of SCF_REGISTER_STATIC_LIBRARY.
+ */
+#define SCF_REGISTER_FACTORY_FUNC(Class)				\
+  CS_EXPORTED_FUNCTION void* CS_EXPORTED_NAME(Class,_Create)(iBase*);	\
+  class Class##_StaticInit						\
+  {									\
+  public:								\
+    Class##_StaticInit()						\
+    {									\
+      scfInitialize();							\
+      iSCF::SCF->RegisterFactoryFunc(CS_EXPORTED_NAME(Class,_Create),#Class); \
+    }									\
+  } Class##_static_init__;
+
 //--------------------------------------------- Class factory interface -----//
 
 /**
@@ -528,7 +563,8 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
  * internally maintained by SCF. That is, you can use an existing factory
  * but cannot create objects that implements this interface (well, you can
  * but its pointless since you won't be able to add it to the factory list).
- * Instead, you should register new class factories using scfRegisterClass ().
+ * Instead, you should register new class factories through the normal class
+ * registration mechanism.
  */
 struct iFactory : public iBase
 {
@@ -660,6 +696,13 @@ struct iSCF : public iBase
   virtual void RegisterClasses (iDocument*) = 0;
 
   /**
+   * A convenience wrapper for RegisterClasses(iDocument).  Assumes that the
+   * string input argument is XML, which it wraps in an iDocument and then
+   * passes to RegisterClasses(iDocument).
+   */
+  virtual void RegisterClasses (char const*) = 0;
+
+  /**
    * Check whenever the class is present in SCF registry.
    * You can use this function to check whenever a class instance creation
    * failed because the class is not present at all in the class registry,
@@ -726,6 +769,15 @@ struct iSCF : public iBase
    */
   virtual bool RegisterClass (scfFactoryFunc, const char *iClassID,
 	const char *Description, const char *Dependencies = 0) = 0;
+
+  /**
+   * Associate a factory function (the function which instantiates a class)
+   * with an implementation name (the value in the <implementation> node of the
+   * meta info; also the name of the iFactoryClass in RegisterClass).  Returns
+   * true upon sucess, or false if the class does not exist or already has an
+   * associated creation function.
+   */
+  virtual bool RegisterFactoryFunc (scfFactoryFunc, const char *FactClass) = 0;
 
   /**
    * This function should be called to deregister a class at run-time.
