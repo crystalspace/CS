@@ -55,6 +55,9 @@ The history order is reversed so that new features are at the top.
 	- Wouter fixed reference leaks in Aws for iGraphics2D/3D and font
 	  manager.
 	- Jorrit fixed a bug in the region code. It didn't remove lights.
+	- Wouter added new method to iAws: GetKeyboardFocusedComponent.
+	  It is useful when trying to determine if Aws is interested
+	  in keyboard events.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,

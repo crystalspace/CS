@@ -210,6 +210,12 @@ void awsManager::SetFocusedComponent (iAwsComponent *_focused)
   /*keyb_focus = */focused = _focused;
 }
 
+iAwsComponent *awsManager::GetKeyboardFocusedComponent()
+{
+  return keyb_focus;
+}
+
+
 void awsManager::SetCanvas (iAwsCanvas *newCanvas)
 {
   if (!newCanvas)

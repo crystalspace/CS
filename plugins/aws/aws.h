@@ -194,6 +194,9 @@ public:
   /// Get the focused component
   virtual iAwsComponent *GetFocusedComponent ();
 
+  /// Get the component with the keyboard focus
+  virtual iAwsComponent *GetKeyboardFocusedComponent();
+
   /// Set the focused component
   virtual void SetFocusedComponent (iAwsComponent *_focused);
 

@@ -254,6 +254,9 @@ public:
   /// Set the focused component
   virtual void SetFocusedComponent(iAwsComponent * _focused)=0;
 
+  /// Get the component with the keyboard focus
+  virtual iAwsComponent *GetKeyboardFocusedComponent()=0;
+
   /// Finds the smallest visible component which contains the point (x,y)
   virtual iAwsComponent* ComponentAt(int x, int y)=0;
 
