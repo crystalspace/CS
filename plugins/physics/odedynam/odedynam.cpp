@@ -656,6 +656,7 @@ void csODEDynamicSystem::Step (float stepsize)
 
 csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   system = sys;
 }
 
@@ -668,13 +669,14 @@ csODEBodyGroup::~csODEBodyGroup ()
 
 void csODEBodyGroup::AddBody (iRigidBody *body) 
 {
+  body->IncRef ();
   bodies.Push (body);
   ((csODERigidBody *)body)->SetGroup (this);
 }
 
 void csODEBodyGroup::RemoveBody (iRigidBody *body)
 {
-  bodies.Delete (body, false);
+  bodies.Delete (body, true);
   ((csODERigidBody *)body)->UnsetGroup ();
 }
 
