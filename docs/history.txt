@@ -79,6 +79,8 @@ The history order has been reversed so that new features are at the top.
 	- Added support for UV coordinates in 3ds2lev convertor by using
 	  the above new feature.
 	- Eric Sunshine fixed some compilation warnings in wave.cpp.
+	- Eric Sunshine fixed potential memory leak in memfile.cpp which was
+	  introduced by Andrew's Big Change(tm) today.
 1-Oct-2000
 	- Since Martin fixed a bug in the sound code Blocks sound is now
 	  working so I enabled it by default.

@@ -108,7 +108,10 @@ iDataBuffer *csMemFile::GetAllData()
     free (buffer);
   }
   iDataBuffer *db = new csDataBuffer (buffer, size);
-  disposition = DISPOSITION_IGNORE;
+  // Set disposition to 'DELETE' so that if Write() is called later on,
+  // memory allocated for it will be correctly deallocated.  Do not use
+  // 'IGNORE' here.
+  disposition = DISPOSITION_DELETE;
   buffer = NULL;
   capacity = 0;
   size = 0;
