@@ -9,7 +9,7 @@
 
 #include "inetwork/driver2.h"
 #include "inetwork/socket2.h"
-#include "inetwork/socketerr.h"
+#include "inetwork/sockerr.h"
 
 
 CS_IMPLEMENT_APPLICATION

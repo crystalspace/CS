@@ -18,7 +18,7 @@
 #endif
 
 #include "inet.h"
-#include "inetwork/socketerr.h"
+#include "inetwork/sockerr.h"
 
 CS_IMPLEMENT_PLUGIN
 
