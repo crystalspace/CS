@@ -258,10 +258,9 @@ int FindNearestPowerOf2 (int n)
 // returns true if n is a power of two
 bool IsPowerOf2 (int n)
 {
-  int i;
-  int po2 = 1;
+//int i;
+//int po2 = 1;
 
   if (n<=0) return false; 
-  return (n-1)^n >= n;
+  return !(n&(n-1)) ;//(n-1)^n >= n;
 }
-
