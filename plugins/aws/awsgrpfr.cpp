@@ -96,7 +96,7 @@ bool awsGroupFrame::SetProperty (char *name, void *parm)
   return false;
 }
 
-void awsGroupFrame::OnDraw (csRect clip)
+void awsGroupFrame::OnDraw (csRect /*clip*/)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
 

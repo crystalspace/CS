@@ -384,8 +384,8 @@ void awsManager::CreateTransitionEx(iAwsWindow *win, unsigned transition_type, f
   if (win==NULL) return;
 
   awsWindowTransition *t = new awsWindowTransition;
-  int w = G2D()->GetWidth();
-  int h = G2D()->GetHeight();
+  //  int w = G2D()->GetWidth();
+  //  int h = G2D()->GetHeight();
   
   t->morph=0.0;
   t->morph_step=step_size;
@@ -953,7 +953,7 @@ void awsManager::CreateChildrenFromDef (
   }           // end for count of keys
 }
 
-void awsManager::RecursiveLayoutChildren (iAwsComponent *comp, bool move_kids)
+void awsManager::RecursiveLayoutChildren (iAwsComponent *comp, bool /*move_kids*/)
 {
   if (comp->Layout ()) comp->Layout ()->LayoutComponents ();
   if (!comp->HasChildren ()) return ;
@@ -1214,7 +1214,7 @@ void awsManager::RegisterCommonComponents ()
 
 bool awsManager::AllWindowsHidden ()
 {
-  iAwsWindow *curwin = top, *oldwin = 0;
+  iAwsWindow *curwin = top;
 
   while (curwin)
   {

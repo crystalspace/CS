@@ -35,7 +35,7 @@ CS_IMPLEMENT_STATIC_VAR (GetChartSlot, awsSlot,())
 
 static awsSlot *chart_slot = NULL;
 
-static void DriveTimer (void *parm, iAwsSource *source)
+static void DriveTimer (void *, iAwsSource *source)
 {
   iAwsComponent *comp = source->GetComponent ();
 
@@ -222,7 +222,7 @@ bool awsBarChart::Execute (char *action, iAwsParmList &parmlist)
   return false;
 }
 
-void awsBarChart::OnDraw (csRect clip)
+void awsBarChart::OnDraw (csRect /*clip*/)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
 
@@ -305,7 +305,7 @@ void awsBarChart::OnDraw (csRect clip)
 
   // Now draw chart!
   int tw=0, th=0;
-  int i, maxtxtlen=0;
+  int i;
   float max=0.0001;
   char buf[32];
 

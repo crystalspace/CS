@@ -20,7 +20,7 @@ const int awsStatusBar:: fsNone = 0x5;
 
 const int awsStatusBar:: signalClicked = 0x1;
 
-static iAwsSink *chart_sink = 0;
+//static iAwsSink *chart_sink = 0;
 
 CS_IMPLEMENT_STATIC_VAR (GetChartSlot, awsSlot,())
 static awsSlot *chart_slot = NULL;
@@ -115,7 +115,7 @@ bool awsStatusBar::Execute (char *action, iAwsParmList &parmlist)
   return false;
 }
 
-void awsStatusBar::OnDraw (csRect clip)
+void awsStatusBar::OnDraw (csRect /*clip*/)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
 
@@ -143,7 +143,7 @@ void awsStatusBar::OnDraw (csRect clip)
   inner.ymax-=insets.ymax;
 
   // Figure out how much we should draw
-  int width = status * (float)inner.Width();
+  int width = (int)(status * (float)inner.Width());
 
   if (barimg)
   {
@@ -153,7 +153,7 @@ void awsStatusBar::OnDraw (csRect clip)
     barimg->GetOriginalDimensions(tw ,th);
 
     // Figure out how much we should draw
-    int twidth = status * (float)tw;
+    int twidth = (int)(status * (float)tw);
 
     if (twidth<1) return;
 

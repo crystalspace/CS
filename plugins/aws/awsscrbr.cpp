@@ -455,7 +455,7 @@ void awsScrollBar::DecClicked (void *sk, iAwsSource *)
   sb->Invalidate ();
 }
 
-void awsScrollBar::OnDraw (csRect clip)
+void awsScrollBar::OnDraw (csRect /*clip*/)
 {
   aws3DFrame frame3d;
   int height = 10, width = 10;

@@ -21,7 +21,7 @@ CS_IMPLEMENT_STATIC_VAR (GetTextBoxBlinkingCursorSlot, awsSlot,())
 
 static awsSlot *textbox_slot = NULL;
 
-static void BlinkCursor (void *parm, iAwsSource *source)
+static void BlinkCursor (void *, iAwsSource *source)
 {
   iAwsComponent *comp = source->GetComponent ();
 
@@ -195,7 +195,7 @@ bool awsTextBox::SetProperty (char *name, void *parm)
   return false;
 }
 
-void awsTextBox::OnDraw (csRect clip)
+void awsTextBox::OnDraw (csRect /*clip*/)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
   iGraphics3D *g3d = WindowManager ()->G3D ();

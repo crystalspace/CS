@@ -69,7 +69,7 @@ bool awsImageView::SetProperty (char *name, void *parm)
   return false;
 }
 
-void awsImageView::OnDraw (csRect clip)
+void awsImageView::OnDraw (csRect /*clip*/)
 {
   aws3DFrame frame3d;
 

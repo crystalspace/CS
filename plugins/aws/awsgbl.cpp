@@ -49,13 +49,13 @@ awsGridBagConstraints::awsGridBagConstraints (
     gridy(gridy),
     gridwidth(gridwidth),
     gridheight(gridheight),
-    fill(fill),
-    ipadx(ipadx),
-    ipady(ipady),
-    insets(insets),
-    anchor(anchor),
     weightx(weightx),
-    weighty(weighty)
+    weighty(weighty),
+    anchor(anchor),
+    fill(fill),
+    insets(insets),
+    ipadx(ipadx),
+    ipady(ipady)
 {
 }
 

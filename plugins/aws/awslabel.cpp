@@ -108,7 +108,7 @@ csRect awsLabel::getMinimumSize ()
   return csRect (0, 0, tw + 6 + (tw >> 2), th + 6 + (th >> 1));
 }
 
-void awsLabel::OnDraw (csRect clip)
+void awsLabel::OnDraw (csRect /*clip*/)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
 

@@ -196,7 +196,7 @@ bool awsCmdButton::HandleEvent (iEvent &Event)
   return false;
 }
 
-void awsCmdButton::OnDraw (csRect clip)
+void awsCmdButton::OnDraw (csRect /*clip*/)
 {
   int tw=0, th=0, tx, ty, itx=0, ity=0;
 

@@ -687,7 +687,7 @@ bool awsListBox::IsLastChild (awsListRow *row)
   }
 }
 
-void awsListBox::OnDraw (csRect clip)
+void awsListBox::OnDraw (csRect /*clip*/)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
 
@@ -1381,7 +1381,7 @@ void awsListBox::OnAdded ()
 
 void awsListBox::OnResized ()
 {
-  int w = scrollbar->Frame ().Width (), h = scrollbar->Frame ().Width ();
+  int w = scrollbar->Frame ().Width (); //, h = scrollbar->Frame ().Width ();
 
   scrollbar->Frame ().SetPos (Frame ().xmax - w - 1, Frame ().ymin + 2);
   scrollbar->Frame ().xmax = Frame ().xmax - 1;

@@ -1510,7 +1510,7 @@ void awsWindow::SetLayout (awsLayoutManager *l)
   comp.SetLayout (l);
 }
 
-void awsWindow::RecursiveLayoutChildren (iAwsComponent *cmp, bool move_kids)
+void awsWindow::RecursiveLayoutChildren (iAwsComponent *cmp, bool /*move_kids*/)
 {
   if (cmp->Layout ()) cmp->Layout ()->LayoutComponents ();
   if (!cmp->HasChildren ()) return ;

@@ -144,7 +144,7 @@ bool awsRadButton::HandleEvent (iEvent &Event)
   return false;
 }
 
-void awsRadButton::OnDraw (csRect clip)
+void awsRadButton::OnDraw (csRect /*clip*/)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
   iGraphics3D *g3d = WindowManager ()->G3D ();

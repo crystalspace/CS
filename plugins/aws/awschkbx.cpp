@@ -108,7 +108,7 @@ bool awsCheckBox::SetProperty (char *name, void *parm)
   return false;
 }
 
-void awsCheckBox::OnDraw (csRect clip)
+void awsCheckBox::OnDraw (csRect /*clip*/)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
   iGraphics3D *g3d = WindowManager ()->G3D ();
