@@ -20,6 +20,9 @@ The history order is reversed so that new features are at the top.
 	  now shfolder.dll is used.
 	- res added "CrystalSpace." prefixes to the default "Noname" 
 	  application ID and to those of CS demo apps.
+	- res augmented csInitializer::SetupConfigManager() to read user.cfg
+	  again for some backward compatibility. user.cfg has a lower priority
+	  than the platform-specific configuration.
 10-Jun-2003
         - Philip Wyett eliminated signed/unsigned mismatch warning in
           function csString::SubString ().

@@ -15,6 +15,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
@@ -284,24 +285,29 @@ bool csInitializer::SetupConfigManager (
     if (cfgacc->GetBool ("System.UserConfig", true))
     {
       // Open the user-specific, application-neutral config domain.
+      cfg = new csPrefixConfig ("/config/user.cfg", VFS, "Global",
+	"User.Global");
+      Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserGlobal - 25);
+
       cfg = csGetPlatformConfig ("CrystalSpace.Global");
-      if (!cfg)
+      if (cfg)
       {
-	cfg = new csPrefixConfig ("/config/user.cfg", VFS, "Global",
-	  "User.Global");
+        Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserGlobal);
       }
-      Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserGlobal);
 
       // Open the user-and-application-specific config domain.
       const char* appid = cfgacc->GetStr ("System.ApplicationID", AppID);
-      cfg = csGetPlatformConfig (appid);
-      if (!cfg)
-      {
-        cfg = new csPrefixConfig ("/config/user.cfg", VFS,
-          appid, "User.Application");
-      }
-      Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserApp);
+      cfg = new csPrefixConfig ("/config/user.cfg", VFS,
+        appid, "User.Application");
+      Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserApp - 25);
       Config->SetDynamicDomain (cfg);
+
+      cfg = csGetPlatformConfig (appid);
+      if (cfg)
+      {
+        Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserApp);
+        Config->SetDynamicDomain (cfg);
+      }
     }
   }
 
