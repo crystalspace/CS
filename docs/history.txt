@@ -1,21 +1,64 @@
 The history order has been reversed so that new features are at the top.
 
+20-Aug-2000
+	- Norman Kramer updated the install documentation for the win32gcc
+	  target.
+	- Wouter Wijngaards did the following:
+	    - removed memory.h from csdef.h since it is not used anymore
+	      (and memory.h is not in include).
+	    - Added DrawTiled and DrawTiledShifted methods. These draw the
+	      pixmap on a rectangle of the screen, tiling the pixmap. A
+	      shift can be applied for animation, or to make several calls
+	      align properly.
+	    - Fixed uninstall of docs.
+19-Aug-2000
+	- Norman Kramer did the following:
+	    - Added csutil to mdl2spr.mak, gfxtest.mak and t3d2cs.mak to
+	      resolve link error with mingw.
+	    - Added include statement to ptests3d.cpp to make it compileable
+	      with mingw.
+	    - Added libs to the makefiles to link with mingw.
+	    - In the include statement of d3d_txtcache were 2 invisible
+	      chars that prevented compiling with mingw they were
+	      invisible in notepad but luckily wordpad showed them.
+	- Martin Geisse updated the MSVC project files.
 18-Aug-2000
+	- Martin Geisse fixed the error output in the sound loading function
+	  of csparser.
 	- Wouter Wijngaards:
-	    Unix system now checks $CRYSTAL or defaults to
-	    /usr/local/crystal/ dir. Thus you can create .rpms, or .tgzs
-	    that are easy to install, by installing to /usr/local/crystal.
-	- Wouter Wijngaards added registry searching to find install path
-	  for win32. If that fails the environment variable CRYSTAL is used.
-	  If that fails too, the default C:\Program Files\Crystal\ is used.
-	  I cannot compile this code, it is untested. Also, the registry
-	  entry 'SOFTWARE\CrystalSpace', key 'installpath' is a guess for
-	  a reasonable value.
+	    - Unix system now checks $CRYSTAL or defaults to
+	      /usr/local/crystal/ dir. Thus you can create .rpms, or .tgzs
+	      that are easy to install, by installing to /usr/local/crystal.
+	    - Fixed various compiler errors and warnings.
+	    - Fixing install a bit.
+		a) make install now requires all files to be built. (all
+		  except mazed build now)
+		b) for unix, when /usr/local/crystal is not a valid install
+		   (no vfs.cfg can be opened in it), the current dir is used.
+		   Thus, people unaware of the install changes will be able
+		   to run the binaries from CS/ as usual.
+		c) DLERROR: warning is now only printed once, not while
+		  searching, but only when finding fails. It is printed
+		  for all platforms now.
+		d) install now works correctly with the funky
+		  tutorial/map2cs directory. (uninstall will not delete
+		  the tutorial directory, as it contains no files)
+	    - Added registry searching to find install path for win32. If
+	      that fails the environment variable CRYSTAL is used. If that
+	      fails too, the default C:\Program Files\Crystal\ is used.
+	      I cannot compile this code, it is untested. Also, the registry
+	      entry 'SOFTWARE\CrystalSpace', key 'installpath' is a guess for
+	      a reasonable value.
 	- Wouter fixed lib/ addition to be platform independent.
 	- Norman Kramer made LibPath in findlib.cpp a pointer. Previously it
 	  caused trouble with plugins binding CSSYS itself like the enginep
 	  plugin (LibPath was created again but was zeroed out) (NOTE:
 	  its not destructed - os has to take care of it).
+	- Norman fixed a bug in software sound renderer:
+	    Sources vector was initialzed with NULL which is intresting
+	    since Sources is not a pointer :) Not that the compiler
+	    complained about, but at some point programs using the
+	    soundrenderer segfaulted.
 	- Accidently left on PVS building. I wonder why nobody complained
 	  about dmburg needing several hours to start up :-)
 	- Fixed BMP loader so that it doesn't enable ALPHA anymore.
