@@ -364,8 +364,6 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 	    if (sscanf (token, "c[%d]", &varIndex) != 1)
 	      break;
 
-	    int newIndex = 0;
-	    bool found = false;
 	    if (isMatrix)
 	    {
 	      // Align matrices on 4-register boundaries.
