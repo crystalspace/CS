@@ -160,10 +160,22 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	    hshift = shiftnode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> flipxnode = child->GetNode ("flipx");
 	  if(flipxnode)
-	    flipx = (strcmp(flipxnode->GetContentsValue(),"yes")==0);
+	    if(!SyntaxService->ParseBool(flipxnode, flipx, false))
+	    {
+	      ReportError (
+	        "crystalspace.maploader.parse.heightgen",
+                "bad flipx argument.");
+	      return false;
+	    }
 	  csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
 	  if(flipynode)
-	    flipy = (strcmp(flipynode->GetContentsValue(),"yes")==0);
+	    if(!SyntaxService->ParseBool(flipynode, flipy, false))
+	    {
+	      ReportError (
+	        "crystalspace.maploader.parse.heightgen",
+                "bad flipy argument.");
+	      return false;
+	    }
 
 	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
 	  if (!img) return 0;
@@ -204,10 +216,22 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	    hshift = shiftnode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> flipxnode = child->GetNode ("flipx");
 	  if(flipxnode)
-	    flipx = (strcmp(flipxnode->GetContentsValue(),"yes")==0);
+	    if(!SyntaxService->ParseBool(flipxnode, flipx, false))
+	    {
+	      ReportError (
+	        "crystalspace.maploader.parse.heightgen",
+                "bad flipx argument.");
+	      return false;
+	    }
 	  csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
 	  if(flipynode)
-	    flipy = (strcmp(flipynode->GetContentsValue(),"yes")==0);
+	    if(!SyntaxService->ParseBool(flipynode, flipy, false))
+	    {
+	      ReportError (
+	        "crystalspace.maploader.parse.heightgen",
+                "bad flipy argument.");
+	      return false;
+	    }
 	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
 	  if (!img) return 0;
 	  PrsHeightMapData* data = new PrsHeightMapData (true);

@@ -358,12 +358,24 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
 	  if (scalenode) hscale = scalenode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> shiftnode = child->GetNode ("shift");
 	  if (shiftnode) hshift = shiftnode->GetContentsValueAsFloat ();
-          csRef<iDocumentNode> flipxnode = child->GetNode ("flipx");
-          if(flipxnode)
-            flipx = (strcmp(flipxnode->GetContentsValue(),"yes")==0);
-          csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
-          if(flipynode)
-            flipy = (strcmp(flipynode->GetContentsValue(),"yes")==0);
+	  csRef<iDocumentNode> flipxnode = child->GetNode ("flipx");
+	  if(flipxnode)
+	    if(!synldr->ParseBool(flipxnode, flipx, false))
+	    {
+	      synldr->ReportError (
+	        "crystalspace.maploader.parse.heightgen", flipxnode,
+                "bad flipx argument.");
+	      return false;
+	    }
+	  csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
+	  if(flipynode)
+	    if(!synldr->ParseBool(flipynode, flipy, false))
+	    {
+	      synldr->ReportError (
+	        "crystalspace.maploader.parse.heightgen", flipynode,
+                "bad flipy argument.");
+	      return false;
+	    }
 
 	  csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
 	  if (!vfs)
