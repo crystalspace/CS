@@ -964,11 +964,11 @@ void awsManager::RegisterCommonComponents ()
   GetPrefMgr ()->RegisterConstant ("gbcWest", 17);
   GetPrefMgr ()->RegisterConstant ("gbcNorthWest", 18);
 
-  GetPregMgr ()->RegisterConstant ("blCenter", 0);
-  GetPregMgr ()->RegisterConstant ("blNorth", 1);
-  GetPregMgr ()->RegisterConstant ("blEast", 2);
-  GetPregMgr ()->RegisterConstant ("blSouth", 3);
-  GetPregMgr ()->RegisterConstant ("blWest", 4);
+  GetPrefMgr ()->RegisterConstant ("blCenter", 0);
+  GetPrefMgr ()->RegisterConstant ("blNorth", 1);
+  GetPrefMgr ()->RegisterConstant ("blEast", 2);
+  GetPrefMgr ()->RegisterConstant ("blSouth", 3);
+  GetPrefMgr ()->RegisterConstant ("blWest", 4);
 
 }
 
