@@ -1,6 +1,6 @@
 /*
     Copyright (C) 1997, 1998, 1999 by Alex Pfaffe
-	(Digital Dawn Graphics Inc)
+  (Digital Dawn Graphics Inc)
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -42,8 +42,8 @@ float ddgBBox::cornerz(int n) { return (n < 4) ?_min[2] : _max[2];}
 //
 void ddgBBox::set(float xmin, float xmax, float ymin, float ymax, float zmin, float zmax)
 {
-	_min = ddgVector3(xmin,ymin,zmin);
-	_max = ddgVector3(xmax,ymax,zmax);
+  _min = ddgVector3(xmin,ymin,zmin);
+  _max = ddgVector3(xmax,ymax,zmax);
 }
 // ----------------------------------------------------------------------
 // MinMax:
@@ -51,8 +51,8 @@ void ddgBBox::set(float xmin, float xmax, float ymin, float ymax, float zmin, fl
 //
 ddgBBox::ddgBBox(const ddgVector3 &min, const ddgVector3 &max)
 {
-	_min = min;
-	_max = max;
+  _min = min;
+  _max = max;
 }
 // ----------------------------------------------------------------------
 // ddgBBox:
@@ -60,8 +60,8 @@ ddgBBox::ddgBBox(const ddgVector3 &min, const ddgVector3 &max)
 //
 ddgBBox::ddgBBox(float xc, float xd, float yc, float yd, float zc, float zd)
 {
-	_min = ddgVector3( xc - xd, yc - yd, zc - zd);
-	_max = ddgVector3( xc + xd, yc + yd, zc + zd);
+  _min = ddgVector3( xc - xd, yc - yd, zc - zd);
+  _max = ddgVector3( xc + xd, yc + yd, zc + zd);
 }
 
 // ----------------------------------------------------------------------
@@ -102,7 +102,7 @@ void ddgBBox::split(Split side, float value )
     }
   else
     {
-	/*
+  /*
     float ftmp;
     switch(side)
     {
@@ -119,8 +119,11 @@ void ddgBBox::split(Split side, float value )
       case ZGT:  ftmp = _delta[2]; _delta.v[2] = (cornerz(7) - value)/2.0;
                  _centre.v[2] += ftmp - _delta[2]; break;
       }
-	  */
+    */
     }
+#else
+  (void) value;
+  (void) side;
 #endif
 }
 
@@ -134,12 +137,13 @@ void ddgBBox::split(Split side, float value )
 float ddgBBox::distancesq(ddgVector3 *eye)
 {
 #ifdef DDG
-	ddgVector3 c(_min + _max);
-	c.divide(2);
-	ddgVector3 d(c - *eye);
-	return d.sizesq();
+  ddgVector3 c(_min + _max);
+  c.divide(2);
+  ddgVector3 d(c - *eye);
+  return d.sizesq();
 #else
-	return 0;
+  (void) eye;
+  return 0;
 #endif
 }
 
@@ -150,11 +154,11 @@ float ddgBBox::distancesq(ddgVector3 *eye)
 // Calculate values in given dimension and test them.
 #define CALCTEST(mm,d1,d2,d3) \
 { \
-	t = (mm[d1] - p1->v[d1]) / d[d1]; \
-	iv = p1->v[d2] + t * d[d2]; \
-	jv = p1->v[d3] + t * d[d3]; \
-	if (INSIDE2(_min[d2],_min[d3],_max[d2],_max[d3],iv,jv)) \
-		return true; \
+  t = (mm[d1] - p1->v[d1]) / d[d1]; \
+  iv = p1->v[d2] + t * d[d2]; \
+  jv = p1->v[d3] + t * d[d3]; \
+  if (INSIDE2(_min[d2],_min[d3],_max[d2],_max[d3],iv,jv)) \
+    return true; \
 }
 // Calculate the min and max values in a dimension and test.
 #define CALCDIM(d1,d2,d3) CALCTEST(_min,d1,d2,d3) CALCTEST(_max,d1,d2,d3)
@@ -162,77 +166,80 @@ float ddgBBox::distancesq(ddgVector3 *eye)
 bool ddgBBox::intersect( ddgVector3 *p1, ddgVector3 *p2)
 {
 #ifdef DDG
-	ddgVector3 d(*p2 - *p1); // Slope of line.
-	float	t;
-	float   iv,jv;
-	// Test each face for inter section as follows:
-	// For each dimension
-	// Substitute a min and max value in the equation
-	// and find the point in 3space. then test if this
-	// point is within the bounds of the other 2 dimensions.
-	// If any point satisfies, we intersect.
-	CALCDIM(0,1,2)
-	CALCDIM(1,0,2)
-	CALCDIM(2,0,1)
+  ddgVector3 d(*p2 - *p1); // Slope of line.
+  float t;
+  float   iv,jv;
+  // Test each face for inter section as follows:
+  // For each dimension
+  // Substitute a min and max value in the equation
+  // and find the point in 3space. then test if this
+  // point is within the bounds of the other 2 dimensions.
+  // If any point satisfies, we intersect.
+  CALCDIM(0,1,2)
+  CALCDIM(1,0,2)
+  CALCDIM(2,0,1)
+#else
+  (void) p1;
+  (void) p2;
 #endif
-	return false;
+  return false;
 }
 // Test for intersection of another bbox.
 bool ddgBBox::intersect( ddgBBox *b )
 {
-	if (cornerx(0) > b->cornerx(1)
-		|| cornerx(1) < b->cornerx(0)
-		|| cornery(1) > b->cornery(5)
-		|| cornery(5) < b->cornery(1)
-		|| cornerz(0) > b->cornerz(2)
-		|| cornerz(2) < b->cornerz(0))
-		return false;
-	else return true;
+  if (cornerx(0) > b->cornerx(1)
+    || cornerx(1) < b->cornerx(0)
+    || cornery(1) > b->cornery(5)
+    || cornery(5) < b->cornery(1)
+    || cornerz(0) > b->cornerz(2)
+    || cornerz(2) < b->cornerz(0))
+    return false;
+  else return true;
 }
 
 
 ddgClipFlags ddgBBox::visibleSpace( ddgBBox b, float tanHalfFOV )
 {
-	ddgClipFlags vis = 0;
+  ddgClipFlags vis = 0;
 
-	// Flip Z axis. (Could be eliminated).
+  // Flip Z axis. (Could be eliminated).
 #ifdef DDG
-	b.setz(-1*b.maxz(),-1*b.minz());
+  b.setz(-1*b.maxz(),-1*b.minz());
 #endif
-	if (tanHalfFOV != 1.0)		// Not 90 degree case
-		b.scale(ddgVector3(1.0/tanHalfFOV,1.0/tanHalfFOV,1));
-	// Test against near, and far plane and test viewing frustrum.
-	if (b.maxz() >= minz())
-		DDG_BSET(vis, DDGCF_NIN);
-	if (b.minz() <= maxz())
-		DDG_BSET(vis, DDGCF_FIN);
-	if (DDG_BGET(vis, DDGCF_FIN) && DDG_BGET(vis, DDGCF_NIN))
-	{
-		if (b.maxx() > 0 || fabs(b.maxx()) <= b.maxz() )
-			DDG_BSET(vis, DDGCF_LIN);		// In left
-		if (b.minx() < 0 || b.minx() <= b.maxz() )
-			DDG_BSET(vis, DDGCF_RIN);		// In right
-		if (b.miny() < 0 || b.miny() <= b.maxz() )
-			DDG_BSET(vis, DDGCF_TIN);		// In top
-		if (b.maxy() > 0 || fabs(b.maxy()) <= b.maxz() )
-			DDG_BSET(vis, DDGCF_BIN);		// In bottom
-	}
-	// Check if bounding box is totally within the viewing volume.
-	if (DDG_BGET(vis, DDGCF_VISIBILITY) == DDGCF_VISIBILITY)
-	{
-	    if ((b.minz() >= minz())
-			&& (b.maxz() <= maxz())
-			&& (b.minx() > 0 || fabs(b.minx()) <= b.minz() )
-			&& (b.maxx() < 0 || b.maxx() <= b.minz() )
-			&& (b.maxy() < 0 || b.maxy() <= b.minz() )
-			&& (b.miny() > 0 || fabs(b.miny()) <= b.minz() ))
-			DDG_BSET(vis, DDGCF_ALLIN);		// All Inside
-	}
-	else
-		DDG_BSET(vis, DDGCF_ALLOUT);			// All Outside.
+  if (tanHalfFOV != 1.0)    // Not 90 degree case
+    b.scale(ddgVector3(1.0/tanHalfFOV,1.0/tanHalfFOV,1));
+  // Test against near, and far plane and test viewing frustrum.
+  if (b.maxz() >= minz())
+    DDG_BSET(vis, DDGCF_NIN);
+  if (b.minz() <= maxz())
+    DDG_BSET(vis, DDGCF_FIN);
+  if (DDG_BGET(vis, DDGCF_FIN) && DDG_BGET(vis, DDGCF_NIN))
+  {
+    if (b.maxx() > 0 || fabs(b.maxx()) <= b.maxz() )
+      DDG_BSET(vis, DDGCF_LIN);   // In left
+    if (b.minx() < 0 || b.minx() <= b.maxz() )
+      DDG_BSET(vis, DDGCF_RIN);   // In right
+    if (b.miny() < 0 || b.miny() <= b.maxz() )
+      DDG_BSET(vis, DDGCF_TIN);   // In top
+    if (b.maxy() > 0 || fabs(b.maxy()) <= b.maxz() )
+      DDG_BSET(vis, DDGCF_BIN);   // In bottom
+  }
+  // Check if bounding box is totally within the viewing volume.
+  if (DDG_BGET(vis, DDGCF_VISIBILITY) == DDGCF_VISIBILITY)
+  {
+      if ((b.minz() >= minz())
+      && (b.maxz() <= maxz())
+      && (b.minx() > 0 || fabs(b.minx()) <= b.minz() )
+      && (b.maxx() < 0 || b.maxx() <= b.minz() )
+      && (b.maxy() < 0 || b.maxy() <= b.minz() )
+      && (b.miny() > 0 || fabs(b.miny()) <= b.minz() ))
+      DDG_BSET(vis, DDGCF_ALLIN);   // All Inside
+  }
+  else
+    DDG_BSET(vis, DDGCF_ALLOUT);      // All Outside.
 
 
-	return vis;
+  return vis;
 }
 /*
 Return Values:
@@ -242,30 +249,32 @@ Return Values:
 */
 ddgVis ddgBBox::isVisible(ddgPlane planes[6] )
 {
-	bool bIntersecting = false;	// Assume all points are inside.
+  bool bIntersecting = false; // Assume all points are inside.
 #ifdef DDG
-	ddgVector3 MinPt, MaxPt;
-	for (int i = 0; i < 6; i++)   // For each plane.
-	{
-		for (int j = 0; j < 3; j++)  // For each dimension.
-		{
-			if (planes[i].normal()->v[j] >= 0.0f)
-			{
-				MinPt.v[j] = _min[j];
-				MaxPt.v[j] = _max[j];
-			}
-			else
-			{
-				MinPt.v[j] = _max[j];
-				MaxPt.v[j] = _min[j];
-			}
-		}
-	   	if (planes[i].isPointAbovePlane(MinPt) > 0.0f)	// MinPt is on outside.
-			return ddgOUT;
+  ddgVector3 MinPt, MaxPt;
+  for (int i = 0; i < 6; i++)   // For each plane.
+  {
+    for (int j = 0; j < 3; j++)  // For each dimension.
+    {
+      if (planes[i].normal()->v[j] >= 0.0f)
+      {
+        MinPt.v[j] = _min[j];
+        MaxPt.v[j] = _max[j];
+      }
+      else
+      {
+        MinPt.v[j] = _max[j];
+        MaxPt.v[j] = _min[j];
+      }
+    }
+    if (planes[i].isPointAbovePlane(MinPt) > 0.0f)  // MinPt is on outside.
+      return ddgOUT;
 
-		if (planes[i].isPointAbovePlane(MaxPt) >= 0.0f) // MaxPt is on outside (and min was on inside).
-			bIntersecting = true;
-	}
+    if (planes[i].isPointAbovePlane(MaxPt) >= 0.0f) // MaxPt is on outside (and min was on inside).
+      bIntersecting = true;
+  }
+#else
+  (void) planes;
 #endif
-	return bIntersecting ? ddgPART : ddgIN;
+  return bIntersecting ? ddgPART : ddgIN;
 }

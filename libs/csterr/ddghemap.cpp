@@ -619,6 +619,7 @@ bool ddgHeightMap::saveAsTGA(const char *s)
 	}
 	return img->writeTGA(s);
 #else
+  (void) s;
 	return ddgSuccess;
 #endif
 }
@@ -716,10 +717,12 @@ bool ddgHeightMap::createSpectralMap(int level, float smoothness)
 			set(i,j,iconvert(v));
 		}
 	}
-    // Success
-    return ddgSuccess;
+  // Success
+  return ddgSuccess;
 #else
-    return ddgFailure;
+  (void) level;
+  (void) smoothness;
+  return ddgFailure;
 #endif
 }
 
@@ -878,6 +881,8 @@ bool ddgHeightMap::readPGM(const char* data, int desired_max)
 
 	return ddgSuccess;
 #else
+  (void) data;
+  (void) desired_max;
 	return ddgFailure;
 #endif
 };
