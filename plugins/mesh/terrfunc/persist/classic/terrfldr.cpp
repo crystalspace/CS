@@ -97,6 +97,7 @@ csTerrFuncFactoryLoader::~csTerrFuncFactoryLoader ()
 
 bool csTerrFuncFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
+  csTerrFuncFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
@@ -134,6 +135,7 @@ csTerrFuncLoader::~csTerrFuncLoader ()
 
 bool csTerrFuncLoader::Initialize (iObjectRegistry* object_reg)
 {
+  csTerrFuncLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }

@@ -34,6 +34,8 @@ The history order is reversed so that new features are at the top.
 	  registered. If you want to do that (which can be important for
 	  some of the standard plugins like iGraphics3D, iConsoleOutput, ...)
 	  then you must register them manually.
+	- Fixed terrain loader. It wasn't storing the object registry but
+	  it was still using it later on.
 	- Philip Wyett did the following:
 	    - Added 'WIN32_LEAN_AND_MEAN' to remove rarely used Windows
 	      stuff. This works for all Windows compilers.
