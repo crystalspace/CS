@@ -156,22 +156,6 @@ csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius, float* p
   return min_p;
 }
 
-
-#	define INTERPOLATE(val,tl,bl,tr,br)	\
-        {					\
-          float vl,vr;				\
-          if (tl != bl)				\
-            vl = tl + (bl - tl) * tL;		\
-          else					\
-            vl = tl;				\
-          if (tr != br)				\
-            vr = tr + (br - tr) * tR;		\
-          else					\
-            vr = tr;				\
-          val = vl + (vr - vl) * tX;		\
-        }
-
-
 void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 {
   int i;
@@ -181,7 +165,6 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   csVector3 wv = curves_center;
   csVector3 world_coord = obj.This2Other (wv);
   csVector3 camera_coord = rview.Other2This (world_coord);
-
 
   if (camera_coord.z >= SMALL_Z)
   {
