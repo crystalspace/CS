@@ -63,6 +63,10 @@ chronological order.
 	      drawn the first time. Also changed it to use DrawSimpleMesh().
 	- res augmented the Win32 keyboard handling to support input from an
 	  IME, based on some code from 'fusilli'.
+	- Eric Sunshine fixed several errors in Jorrit's untested changes to
+	  mdl2spr where it was emitting a tag without a terminating "/>" token,
+	  and where it was incorrectly terminating tags with ">" when "/>" was
+	  called for.
 4-Apr-2004
 	- res moved the attenuation texture generation to the light iter 
 	  plugin. Still the same texture for all lights, though. Plan is to

@@ -552,7 +552,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
         u = u / (float) skinwidth;
         v = v / (float) skinheight;
 
-        fprintf(f, " <v x=\"%.3f\" y=\"%.3f\" z=\"%.3f\" u=\"%.2f\" v=\"%.2f\"", x, y, z, u, v);
+        fprintf(f, " <v x=\"%.3f\" y=\"%.3f\" z=\"%.3f\" u=\"%.2f\" v=\"%.2f\"/>", x, y, z, u, v);
       }
       fprintf(f, " </frame>\n");
     }
@@ -581,7 +581,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
         if (j > 0)
 	  delay -= framesets[i].delay[j - 1];
         delay *= 1000.0;
-        fprintf(f, " <f name=\"%s\" delay=\"%d\">", framesets[i].frames[j].name, (int)delay);
+        fprintf(f, " <f name=\"%s\" delay=\"%d\"/>", framesets[i].frames[j].name, (int)delay);
       }
       fprintf(f, " </action>\n");
     }
@@ -589,7 +589,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
     {
       if (!isdigit(
         framesets[i].frames[0].name[strlen(framesets[i].frames[0].name) - 1]))
-        fprintf(f, "\t\t<action name=\"%s\"> <f name=\"%s\" delay=\"%d\"> </action>\n",
+        fprintf(f, "\t\t<action name=\"%s\"> <f name=\"%s\" delay=\"%d\"/> </action>\n",
 	  framesets[i].frames[0].name, framesets[i].frames[0].name, delayMdl);
       else
       {
