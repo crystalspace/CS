@@ -227,7 +227,7 @@ bool csWsTest::HandleEvent (csEvent &Event)
   };
 
   static int mousecursor = 1;
-  static int px, py;
+  static int px = -1, py;
   static bool draw = false;
 
   if (csApp::HandleEvent (Event))
@@ -281,6 +281,7 @@ bool csWsTest::HandleEvent (csEvent &Event)
       SetMouse (mousecursors [mousecursor]);
       if (draw)
       {
+drawline:
         // kludge: set dirty rectangle so that line won't get clipped
         csRect old (dirty);
         dirty.Set (px, py, Event.Mouse.x, Event.Mouse.y);
@@ -298,6 +299,10 @@ bool csWsTest::HandleEvent (csEvent &Event)
     case csevMouseDoubleClick:
       if (Event.Mouse.Button == 1)
       {
+        if (Event.Mouse.Modifiers & CSMASK_CTRL)
+          if (px >= 0 && py >= 0)
+            goto drawline;
+
         draw = true;
         px = Event.Mouse.x;
         py = Event.Mouse.y;
