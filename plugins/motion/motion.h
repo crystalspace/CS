@@ -70,10 +70,13 @@ public:
   unsigned int GetHash() { return hash; }
 };
 
-class csMotionVectorBase:public csVector {
+DECLARE_TYPED_VECTOR(csMotionVectorBase, csMotion);
+
+class csMotionVector : public csMotionVectorBase
+{
 public:
-  csMotionVectorBase (int ilimit = 8, int ithreshold = 16) 
-    : csVector(ilimit, ithreshold) {}
+  csMotionVector (int ilimit = 8, int ithreshold = 16) 
+    : csMotionVectorBase(ilimit, ithreshold) {}
   virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
     { int id1 = ((csMotion*)Item1)->GetHash(), id2 = ((csMotion*)Item2)->GetHash();
       return id1 - id2; }
@@ -81,8 +84,6 @@ public:
   virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
     { int id1 = ((csMotion*)Item1)->GetHash(), id2 = (unsigned int)Key; return id1 - id2; }
 };
-
-DECLARE_TYPED_VECTOR_WITH_BASE(csMotionVector,csMotion,csMotionVectorBase); 
 
 struct csAppliedMotion
 {
