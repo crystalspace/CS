@@ -89,8 +89,8 @@ void csGfxProgressMeter::Step()
     System->g3d->DrawPixmap (System->logo, (fw - w)/2, 20, w, h,
 	0, 0, lw, lh);
     if (System->font)
-      System->g2d->Write (System->font, 20, fh*3/4-40, System->color_bg,
-      	System->color_text, cur_description);
+      System->g2d->Write (System->font, 20, fh*3/4-40, System->color_text, 
+        System->color_bg, cur_description);
     System->g2d->DrawBox (10, fh*3/4-10, where, 20, System->color_done);
     System->g2d->DrawBox (10+where, fh*3/4-10, fw-where-20, 20, System->color_todo);
     System->g3d->FinishDraw ();
@@ -180,7 +180,8 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,
 	CS_REQUEST_ENGINE,
-	CS_REQUEST_FONTSERVER,
+	//CS_REQUEST_FONTSERVER,
+	CS_REQUEST_PLUGIN("crystalspace.font.server.freetype", iFontServer),
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_LEVELLOADER,
 	CS_REQUEST_END))
