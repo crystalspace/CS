@@ -535,11 +535,12 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
   csVector3 projector;
 
+  float inv_lightcell_size = 1.0 / lightcell_size;
   for (i = 0; i < rpv; i++)
   {
     projector = txt_pl->m_world2tex * (polygon->Vwor (i) - txt_pl->v_world2tex);
-    rp [i].x = (projector.x * ww - Imin_u) / lightcell_size + 0.5;
-    rp [i].y = (projector.y * hh - Imin_v) / lightcell_size + 0.5;
+    rp [i].x = (projector.x * ww - Imin_u) * inv_lightcell_size + 0.5;
+    rp [i].y = (projector.y * hh - Imin_v) * inv_lightcell_size + 0.5;
   }
 
   for (i = 0; i < num_frustrum; i++)
@@ -552,8 +553,8 @@ void csPolyTexture::FillLightMap (csLightView& lview)
     // T = Mwt * (W - Vwt)
     v1 = txt_pl->m_world2tex *
       (frustrum [mi] + light_frustrum->GetOrigin () - txt_pl->v_world2tex);
-    f_uv [i].x = (v1.x * ww - Imin_u) / lightcell_size + 0.5;
-    f_uv [i].y = (v1.y * hh - Imin_v) / lightcell_size + 0.5;
+    f_uv [i].x = (v1.x * ww - Imin_u) * inv_lightcell_size + 0.5;
+    f_uv [i].y = (v1.y * hh - Imin_v) * inv_lightcell_size + 0.5;
     if (f_uv [i].y < miny) miny = f_uv [MinIndex = i].y;
     if (f_uv [i].y > maxy) maxy = f_uv [MaxIndex = i].y;
   }
@@ -791,11 +792,11 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   unsigned char* mapR = remap.GetRed ();
   unsigned char* mapG = remap.GetGreen ();
   unsigned char* mapB = remap.GetBlue ();
-  long lm_size = lm->lm_size;
 
   int i;
   float miny = 1000000, maxy = -1000000;
   int MaxIndex = -1, MinIndex = -1;
+  float inv_lightcell_size = 1.0 / lightcell_size;
 
   // Calculate the uv's for all points of the frustrum (the
   // frustrum is actually a clipped version of the polygon).
@@ -814,8 +815,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
       //v1 = pl->m_world2tex * (lp->vertices[mi] + lp->center - pl->v_world2tex);
       //@@@ This is only right if we don't allow reflections on dynamic lights
       v1 = txt_pl->m_world2tex * (lp->vertices[mi] + light->GetCenter () - txt_pl->v_world2tex);
-      f_uv[i].x = (v1.x * ww - Imin_u) / lightcell_size;
-      f_uv[i].y = (v1.y * hh - Imin_v) / lightcell_size;
+      f_uv[i].x = (v1.x * ww - Imin_u) * inv_lightcell_size;
+      f_uv[i].y = (v1.y * hh - Imin_v) * inv_lightcell_size;
       if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
       if (f_uv[i].y > maxy) maxy = f_uv[MaxIndex = i].y;
     }
