@@ -81,7 +81,7 @@ ddgAngle ddg_init;	// Ensure table gets initialized.
 
 ddgAngle::ddgAngle()
 {
-	int i;
+	unsigned int i;
 	// Calculate from 0.0 to 180.0 degrees.
 	for (i = 0; i <= 180*ddgAngle_res; i++)
 	{

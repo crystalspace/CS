@@ -179,12 +179,12 @@ bool ddgTBinMesh::init( ddgContext *ctx )
 		for (j = 0; j < _nc; j++)
 		{
 			_bintree[2*(i*_nc+j)]->pNeighbourDiag( _bintree[2*(i*_nc+j)+1]);
-			_bintree[2*(i*_nc+j)]->pNeighbourLeft( (j==0)? NULL: _bintree[2*(i*_nc+j-1)+1]);
-			_bintree[2*(i*_nc+j)]->pNeighbourTop( (i==0)? NULL: _bintree[2*((i-1)*_nc+j)+1]);
+			_bintree[2*(i*_nc+j)]->pNeighbourLeft( (j==0)? 0: _bintree[2*(i*_nc+j-1)+1]);
+			_bintree[2*(i*_nc+j)]->pNeighbourTop( (i==0)? 0: _bintree[2*((i-1)*_nc+j)+1]);
 			//
 			_bintree[2*(i*_nc+j)+1]->pNeighbourDiag( _bintree[2*(i*_nc+j)]);
-			_bintree[2*(i*_nc+j)+1]->pNeighbourLeft( (j+1==_nc)? NULL: _bintree[2*(i*_nc+j+1)]);
-			_bintree[2*(i*_nc+j)+1]->pNeighbourTop( (i+1==_nr)? NULL: _bintree[2*((i+1)*_nc+j)]);
+			_bintree[2*(i*_nc+j)+1]->pNeighbourLeft( (j+1==_nc)? 0: _bintree[2*(i*_nc+j+1)]);
+			_bintree[2*(i*_nc+j)+1]->pNeighbourTop( (i+1==_nr)? 0: _bintree[2*((i+1)*_nc+j)]);
 		}
 	}
 

@@ -173,9 +173,9 @@ public:
 	/// Initialize the cache.
 	inline void init (unsigned int size ) { super::init(size,sizeof(ddgTNode)); }
 	/// Get entry.
-	inline ddgTNode* get(ddgCacheIndex index)
+	inline ddgTNode* get(ddgCacheIndex n)
 	{
-		return (ddgTNode*) ddgLCache::get(index);
+		return (ddgTNode*) ddgLCache::get(n);
 	}
 };
 

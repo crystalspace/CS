@@ -1,5 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
+21-May-2000
+	- Eric Sunshine made the following changes to the terrain library.
+	    - Fixed quite a few additional compilation warnings and errors,
+	      some of which were introduced with Alex's latest changes; some
+	      earlier.
+	    - Ported to OpenStep by working around a compiler problem where it
+	      generates unlinkable code when an inline method calls a second
+	      inline method before the compiler has seen the second method.
+	      Working around this problem is as simple as textually reordering
+	      the file.
 19-May-2000
 	- Alex Pfaffe did various changes to terrain engine again.
 	- Various small changes to csTerrain to help Alex integrate his

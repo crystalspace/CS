@@ -49,13 +49,13 @@ public:
 	/// Default constructor.
 	ddgMatrix4(void) { }
 	/// Return an Vector element from the matrix.
-	float operator[](int i)
+	float& operator[](int i)
 	{ return m[i/4].v[i%4]; }
 	/// Get a matrix value using [i,j] notation.
-	float operator()(int i, int j)
+	float& operator()(int i, int j)
 	{ return m[i].v[j]; }
 	/// Get a matrix value using a 0-15 index.
-	float operator()(int i)
+	float& operator()(int i)
 	{ return m[i/4].v[i%4]; }
 	/// Addition.
 	ddgMatrix4& operator += ( const ddgMatrix4& m1 )
@@ -137,7 +137,7 @@ public:
 	void assignto( float u[16] )
 	{ int i = 0; do { u[i] = m[i/4].v[i%4]; } while (++i < 16 ); }
 	/// Return object a pointer to array of floats.
-	operator float*() { return (float*)this; };
+	operator float*() { return &m[0].v[0]; };
 	/// Find the inverset matrix A' such that A A' = I (identity).
 	void invert(void);
 	/// Transpose this matrix.

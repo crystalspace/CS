@@ -190,7 +190,7 @@ void ddgTBinTree::insertSQ(ddgTriIndex tindex, ddgPriority pp, ddgCacheIndex ci,
 
 	// If parent is completely inside or completely outside of view, inherit.
 	// Otherwise calculate triangle's visibility.
-	ddgVisState v = (tindex, (vp == ddgIN || vp == ddgOUT) ? vp : visibilityTriangle(tindex));
+	ddgVisState v = (vp == ddgIN || vp == ddgOUT) ? vp : visibilityTriangle(tindex);
 
 	ddgAssert(v != ddgUNDEF);
 
@@ -497,7 +497,7 @@ void ddgTBinTree::updateMerge(ddgTriIndex tindex, ddgPriority pr )
 	// triangles as being part of a merge diamond.
 	ddgTriIndex p = parent(tindex);
 	ddgTriIndex n = neighbour(p);
-	ddgCacheIndex cl, cr, nl = 0, nr = 0;
+	ddgCacheIndex cl, cr = 0, nl = 0, nr = 0;
 
 	ddgAssert( n < ddgNINIT );
 	ddgAssert( tindex > 0 );

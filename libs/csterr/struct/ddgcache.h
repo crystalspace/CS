@@ -119,9 +119,9 @@ class WEXP ddgLCache : public ddgCache {
 	typedef ddgCache super;
 public:
 	/// Get entry.
-	inline ddgLNode* get(ddgCacheIndex index)
+	inline ddgLNode* get(ddgCacheIndex n)
 	{
-		return (ddgLNode*) super::get(index);
+		return (ddgLNode*) super::get(n);
 	}
 	/**
 	 * Insert a node into the cache before the specified node.
@@ -257,6 +257,16 @@ public:
 		_tail = 0;
 		_bucket = 0;
 	}
+	/// Reset the queue.
+	inline void reset(void)
+	{
+		ddgCache::reset();
+		_head = 0;
+		_tail = 0;
+		unsigned int i = _bucketNo;
+		while (i--)
+			_bucket[i] = 0;
+	}
 	/// Initialize the cache.
 	void init (unsigned int size, unsigned int nodeSize, unsigned int bn, bool r = false ) {
 		ddgAssert(bn < 0xFFFF);
@@ -267,16 +277,6 @@ public:
 		ddgAsserts(_bucket, "Failed to allocate memory.");
 		ddgMemorySet(ddgCacheIndex,_bucketNo);
 		reset();
-	}
-	/// Reset the queue.
-	inline void reset(void)
-	{
-		ddgCache::reset();
-		_head = 0;
-		_tail = 0;
-		unsigned int i = _bucketNo;
-		while (i--)
-			_bucket[i] = 0;
 	}
 	/// Get entry.
 	inline ddgSNode* get(unsigned short index)

@@ -146,59 +146,59 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   const csMatrix3& orientation = rview.GetO2T ();
 
   // set up coordinate transform
-  ddgMatrix4 *mm = context->transformation();
+  ddgMatrix4 &mm = *context->transformation();
  
-  *mm[0] = 1.0;
-  *mm[5] = 1.0;
-  *mm[10] = 1.0;
-  *mm[15] = 1.0;
+  mm[0] = 1.0;
+  mm[5] = 1.0;
+  mm[10] = 1.0;
+  mm[15] = 1.0;
 
-  *mm[0] = orientation.m11;
-  *mm[1] = orientation.m21;
-  *mm[2] = orientation.m31;
+  mm[0] = orientation.m11;
+  mm[1] = orientation.m21;
+  mm[2] = orientation.m31;
 
-  *mm[4] = orientation.m12;
-  *mm[5] = orientation.m22;
-  *mm[6] = orientation.m32;
+  mm[4] = orientation.m12;
+  mm[5] = orientation.m22;
+  mm[6] = orientation.m32;
 
-  *mm[8] = orientation.m13;
-  *mm[9] = orientation.m23;
-  *mm[10] = orientation.m33;
+  mm[8] = orientation.m13;
+  mm[9] = orientation.m23;
+  mm[10] = orientation.m33;
 
   const csVector3& translation = rview.GetO2TTranslation();
 
-  *mm[3] = translation.x;
-  *mm[7] = translation.y;
-  *mm[11] = translation.z;
+  mm[3] = translation.x;
+  mm[7] = translation.y;
+  mm[11] = translation.z;
 
-  *mm[12] = *mm[13] = *mm[14] = 0;
+  mm[12] = mm[13] = mm[14] = 0;
 
   ddgControl *control = context->control();
   control->position(translation.x, translation.y, translation.z);
  
-  ddgMatrix4 *pm = context->projection();
+  ddgMatrix4 &pm = *context->projection();
   
   float rnear = 1.0;
   float rfar = 10.0;
-  *pm[0] = 2 *rnear/ (rview.rightx - rview.leftx);
-  *pm[1] = 0;
-  *pm[2] = (rview.rightx + rview.leftx)/ (rview.rightx - rview.leftx);
-  *pm[3] = 0;
+  pm[0] = 2 *rnear/ (rview.rightx - rview.leftx);
+  pm[1] = 0;
+  pm[2] = (rview.rightx + rview.leftx)/ (rview.rightx - rview.leftx);
+  pm[3] = 0;
 
-  *pm[4] = 0;
-  *pm[5] = 2 *rnear/ (rview.topy - rview.boty);
-  *pm[6] = (rview.topy + rview.boty)/(rview.topy - rview.boty);
-  *pm[7] = 0;
+  pm[4] = 0;
+  pm[5] = 2 *rnear/ (rview.topy - rview.boty);
+  pm[6] = (rview.topy + rview.boty)/(rview.topy - rview.boty);
+  pm[7] = 0;
 
-  *pm[8] = 0;
-  *pm[9] = 0;
-  *pm[10] = -1 * (rfar + rnear)/ (rfar - rnear);
-  *pm[11] = -2 * rnear * rfar /(rfar - rnear);
+  pm[8] = 0;
+  pm[9] = 0;
+  pm[10] = -1 * (rfar + rnear)/ (rfar - rnear);
+  pm[11] = -2 * rnear * rfar /(rfar - rnear);
 
-  *pm[12] = 0;
-  *pm[13] = 0;
-  *pm[14] = -1;
-  *pm[15] = 0;
+  pm[12] = 0;
+  pm[13] = 0;
+  pm[14] = -1;
+  pm[15] = 0;
 
   context->extractPlanes(context->frustrum());
   // Optimize the mesh w.r.t. the current viewing location.

@@ -42,10 +42,10 @@ public:
 	 *  Create an image but don't allocate memory.
 	 */
 	ddgHeightMap( void )
-		: _pixbuffer(0),_base(0), _scale(1) {}
+		: _pixbuffer(0), _scale(1), _base(0) {}
 	/// Create an image and allocate memory.
 	ddgHeightMap( unsigned short r, unsigned short c)
-		: _pixbuffer(0),_base(0), _scale(1) { allocate(r,c); }
+		: _pixbuffer(0), _scale(1), _base(0) { allocate(r,c); }
 	/// Destroy and image.
 	~ddgHeightMap();
 	/// Return the data block.
@@ -72,25 +72,6 @@ public:
 		if (d1) *d1 = s;
 		return s;
 	}
-	/// Get a transformed value in the image.
-	float getf(unsigned short r, unsigned short c,
-		float *d1 = 0)
-	{
-		ddgAssert(r < _rows && c < _cols);
-		float s = convert( _pixbuffer[(r*_cols+c)+0] );
-		if (d1) *d1 = s;
-		return s;
-	}
-	/// Transform a value from short space back to real float space.
-	inline float convert(short n)
-	{
-		return sconvert(n, _base, _scale);
-	}
-	/// Inverse transform a value from real float to short space.
-	inline short iconvert(float n)
-	{
-		return siconvert(n, _base, _scale );
-	}
 	/// Transform a value from  short space back to real float space.
 	static inline float sconvert(short n, float base, float scale)
 	{
@@ -100,6 +81,25 @@ public:
 	static inline short siconvert(float n, float base, float scale)
 	{
 		return (short) ddgUtil::clamp((n - base ) / scale - 0x7FFF,-0x7FFF,0x7FFF);
+	}
+	/// Inverse transform a value from real float to short space.
+	inline short iconvert(float n)
+	{
+		return siconvert(n, _base, _scale );
+	}
+	/// Transform a value from short space back to real float space.
+	inline float convert(short n)
+	{
+		return sconvert(n, _base, _scale);
+	}
+	/// Get a transformed value in the image.
+	float getf(unsigned short r, unsigned short c,
+		float *d1 = 0)
+	{
+		ddgAssert(r < _rows && c < _cols);
+		float s = convert( _pixbuffer[(r*_cols+c)+0] );
+		if (d1) *d1 = s;
+		return s;
 	}
 	/** Load an heightmap buffer from a memory buffer.
 	 * Return true on error.

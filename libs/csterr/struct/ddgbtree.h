@@ -156,31 +156,6 @@ public:
 	/// Returns true if this is a mirrored mesh.
 	inline bool mirror(void) { return _mirror; }
 
-    /** Get height of mesh at a real location.
-     * Coords should be unscaled in x,z direction.
-     */
-    float treeHeight(unsigned int r, unsigned int c, float dx, float dz);
-    /// Get vertex location in world space from the cache, return the cache index if we have it.
-    inline unsigned int vertex(ddgTriIndex tindex, ddgVector3 *vout)
-    {
-		*vout = ddgVector3(mrow(tindex),height(tindex),mcol(tindex));
-
-        if (vbufferIndex(tindex))
-			return 0;
-
-        return vbufferIndex(tindex);
-    }
-
-    /// Get texture coord data, as a value from 0 to 1 on the bintree.
-    void textureC(unsigned int tindex, ddgVector2 *vout)
-    {
-        if (_mirror)
-        	vout->set(ddgTBinMesh_size-row(tindex),ddgTBinMesh_size-col(tindex));
-        else
-        	vout->set(row(tindex),col(tindex));
-		vout->multiply( 1.0 / (float)ddgTBinMesh_size);
-	}
-
 	/// Initialize the bin tree.
 	bool init(void);
 	/// Get maxLevel.
@@ -242,14 +217,14 @@ public:
 		return i/2;
 	}
 	/// Return the index of the left child.
-	inline static ddgTriIndex left(ddgTriIndex i)
-	{
-		return right(i)+1;
-	}
-	/// Return the index of the left child.
 	inline static ddgTriIndex right(ddgTriIndex i)
 	{
 		return i*2;
+	}
+	/// Return the index of the left child.
+	inline static ddgTriIndex left(ddgTriIndex i)
+	{
+		return right(i)+1;
 	}
 	/// Return the quad neighbour. If 0 there is no neighbour.
 	inline ddgTriIndex neighbour( ddgTriIndex i)
@@ -393,6 +368,31 @@ public:
 		return height(tindex);
     }
 
+    /** Get height of mesh at a real location.
+     * Coords should be unscaled in x,z direction.
+     */
+    float treeHeight(unsigned int r, unsigned int c, float dx, float dz);
+    /// Get vertex location in world space from the cache, return the cache index if we have it.
+    inline unsigned int vertex(ddgTriIndex tindex, ddgVector3 *vout)
+    {
+		*vout = ddgVector3(mrow(tindex),height(tindex),mcol(tindex));
+
+        if (vbufferIndex(tindex))
+			return 0;
+
+        return vbufferIndex(tindex);
+    }
+
+    /// Get texture coord data, as a value from 0 to 1 on the bintree.
+    void textureC(unsigned int tindex, ddgVector2 *vout)
+    {
+        if (_mirror)
+        	vout->set(ddgTBinMesh_size-row(tindex),ddgTBinMesh_size-col(tindex));
+        else
+        	vout->set(row(tindex),col(tindex));
+		vout->multiply( 1.0 / (float)ddgTBinMesh_size);
+	}
+
 	/// Calculate visibility of a triangle.
 	ddgVisState visibilityTriangle(ddgTriIndex tvc);
 	/// Is triangle visible (even partially)?
@@ -438,7 +438,7 @@ public:
 	/// Update the merge info for a triangle which is in the mesh.
 	void updateMerge(ddgTriIndex tindex, ddgPriority pr);
 	/// Calculate priority of triangle tindex  We assume that we only get called
-	inline ddgPriority priorityCalc(ddgTriIndex tindex);
+	ddgPriority priorityCalc(ddgTriIndex tindex);
 
 	/// The mesh that manages this bintree.
 	inline ddgTBinMesh *mesh(void) { return _mesh; }
