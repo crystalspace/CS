@@ -227,6 +227,13 @@ struct iGraphics2D : public iBase
   virtual void Write (iFont *font, int x, int y, int fg, int bg,
     const char *str) = 0;
 
+  /**
+   * Write a text string into the back buffer. A negative value for bg
+   * color will not draw the background. x and y are the pen position on a baseline
+   */
+  virtual void WriteBaseline (iFont *font, int x, int y, int fg, int bg,
+    const char *str) = 0;
+
   /// Enable/disable canvas resizing
   virtual void AllowResize (bool iAllow) = 0;
 
