@@ -19,7 +19,7 @@ CFG=%project% - Win32 Debug
 !MESSAGE 
 !MESSAGE "%project% - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "%project% - Win32 Debug" (based on "Win32 (x86) Static Library")
-!MESSAGE "%project% - Win32 ExtensiveMemDebug" (based on "Win32 (x86) Console Application")
+!MESSAGE "%project% - Win32 ExtensiveMemDebug" (based on "Win32 (x86) Static Library")
 !MESSAGE 
 
 # Begin Project
