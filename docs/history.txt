@@ -8,6 +8,7 @@ The history order is reversed so that new features are at the top.
 	- Added an (untested) frustum view culler. This culler is a simpler
 	  version of Dynavis that will be used as the default culler in
 	  the future for all sectors.
+	- Added 'frustvis' target to walkall.
 23-Jun-2002
 	- Added csIntersect3::BoxSphere() function which tests intersection
 	  between a box and a sphere.
