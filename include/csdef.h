@@ -97,7 +97,7 @@
 #if defined(CS_USE_FAKE_MATH_H_FLOAT_FUNCS)
   #define acosf(X)  CS_STATIC_CAST(float,acos(X))
   #define asinf(X)  CS_STATIC_CAST(float,asin(X))
-  #define atan2f(X) CS_STATIC_CAST(float,atan2(X))
+  #define atan2f(X,Y) CS_STATIC_CAST(float,atan2(X,Y))
   #define atanf(X)  CS_STATIC_CAST(float,atan(X))
   #define cosf(X)   CS_STATIC_CAST(float,cos(X))
   #define exp2f(X)  CS_STATIC_CAST(float,exp2(X))
