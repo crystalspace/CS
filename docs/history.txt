@@ -21,6 +21,8 @@ The history order is reversed so that new features are at the top.
 	  mechanism.
 	- res started working on a generic render step plugin. For now just 
 	  compiles, but doesn't do anything yet.
+	- res added missing csEvent::DecRefUnlessPooled() and 
+	  csEvent::IncRefIfPooled().
 4-June-2003
 	- Jorrit fixed a bug in the AWS engine view where it would not set the
 	  FOV of the camera based on the height of the frame. This caused the
