@@ -16,6 +16,8 @@ chronological order.
 	- Steven Geens added sockets to sprcal3d. The PositionChild method 
 	  hasn't been implemented yet. Steven Geens also fixed some minor 
 	  bugs in sprcal3d.h and configure.ac.
+	- Steven Geens implemented the PositionChild method of sprcal3d.
+	  The socket system should now be completely ready.
 28-Dec-2003
 	- Philip Wyett fixed a few config files so Freetype2 could again be
 	  invoked.

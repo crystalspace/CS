@@ -884,6 +884,74 @@ void csSpriteCal3DMeshObject::SetupObject()
 
 void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,csTicks current_time)
 {
+  iSpriteCal3DSocket* socket = 0;
+  int i;
+  for(i=0;i<sockets.Length();i++)
+  {
+    if(sockets[i]->GetMeshWrapper())
+    {
+      if (sockets[i]->GetMeshWrapper()->GetMeshObject() == child)
+      {
+	socket = sockets[i];
+	break;
+      }
+    }
+  }
+  if(socket)
+  {
+    iMovable* movable = socket->GetMeshWrapper()->GetMovable();
+    Advance(current_time);
+    CalCoreSubmesh* coresubmesh = calModel.getCoreModel()->
+      getCoreMesh(socket->GetMeshIndex())->getCoreSubmesh(socket->GetSubmeshIndex());
+    CalCoreSubmesh::Face face = coresubmesh->getVectorFace()[socket->GetTriangleIndex()];
+    CalCoreSubmesh::Vertex vertex1 = coresubmesh->getVectorVertex()[face.vertexId[0]];
+    CalCoreSubmesh::Vertex vertex2 = coresubmesh->getVectorVertex()[face.vertexId[1]];
+    CalCoreSubmesh::Vertex vertex3 = coresubmesh->getVectorVertex()[face.vertexId[2]];
+    CalVector vector1(0,0,0);
+    CalVector vector2(0,0,0);
+    CalVector vector3(0,0,0);
+    unsigned int i;
+    for(i=0;i<vertex1.vectorInfluence.size();i++)
+    {
+      CalBone* bone = calModel.getSkeleton()->getBone(vertex1.vectorInfluence[i].boneId);
+      CalVector v(vertex1.position);
+      v *= bone->getTransformMatrix();
+      v += bone->getTranslationBoneSpace();
+      vector1 += vertex1.vectorInfluence[i].weight*v;
+    }
+    for(i=0;i<vertex2.vectorInfluence.size();i++)
+    {
+      CalBone* bone = calModel.getSkeleton()->getBone(vertex2.vectorInfluence[i].boneId);
+      CalVector v(vertex2.position);
+      v *= bone->getTransformMatrix();
+      v += bone->getTranslationBoneSpace();
+      vector2 += vertex2.vectorInfluence[i].weight*v;
+    }
+    for(i=0;i<vertex3.vectorInfluence.size();i++)
+    {
+      CalBone* bone = calModel.getSkeleton()->getBone(vertex3.vectorInfluence[i].boneId);
+      CalVector v(vertex3.position);
+      v *= bone->getTransformMatrix();
+      v += bone->getTranslationBoneSpace();
+      vector3 += vertex3.vectorInfluence[i].weight*v;
+    }
+    csVector3 vert1(vector1.x,vector1.y,vector1.z);
+    csVector3 vert2(vector2.x,vector2.y,vector2.z);
+    csVector3 vert3(vector3.x,vector3.y,vector3.z);
+
+    csVector3 center= (vert1+vert2+vert3)/3;
+
+    csVector3 ab = vert2 - vert1;
+    csVector3 bc = vert3 - vert2;
+    csVector3 normal = ab % bc;
+
+    csReversibleTransform trans = movable->GetFullTransform();
+    trans.SetOrigin(center);
+    trans.LookAt(normal, csVector3(0,1,0));
+    movable->SetTransform(trans);
+    movable->UpdateMove();
+
+  }
 }
 
 bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
