@@ -1,5 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+22-Sep-2002
+	- Modified iMeshWrapper->SetDrawCallback() so that multiple
+	  callbacks are now supported. Added RemoveDrawCallback() and
+	  GetDrawCallbackCount(). Also modified GetDrawCallback() so that
+	  there is an additional index parameter.
+	- Modified iPortal->SetMissingSectorCallback() and
+	  iPortal->SetPortalCallback() in a similar way (as SetDrawCallback()).
+	  Also added the appropriate functions to remove and get
+	  all callbacks.
+	- The missing sector callback that is used in the loader is now
+	  self-cleaning.
 21-Sep-2002
 	- Keith Fulton added optimization to dynamic lightmap recalculation
 	  to use tighter loops when overflow protection is not necessary.  These

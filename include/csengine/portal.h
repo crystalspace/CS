@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/flags.h"
 #include "csutil/csobject.h"
+#include "csutil/csvector.h"
 #include "imesh/thing/portal.h"
 
 class csPolygon2D;
@@ -51,10 +52,10 @@ protected:
   csReversibleTransform warp_obj;
   /// Warp transform in world space.
   csReversibleTransform warp_wor;
-  /// Callback when a sector is missing.
-  iPortalCallback* sector_cb;
-  /// Callback for traversing to a portal.
-  iPortalCallback* portal_cb;
+  /// List of callbacks called when a sector is missing (iPortalCallback).
+  csVector sector_cb_vector;
+  /// List of callbacks called for traversing to a portal (iPortalCallback).
+  csVector portal_cb_vector;
   /// Maximum number of time a single sector will be visited by this portal.
   int max_sector_visit;
 
@@ -110,15 +111,37 @@ public:
 
   /// Set the portal callback.
   void SetPortalCallback (iPortalCallback* cb);
-
-  /// Get the portal callback.
-  iPortalCallback* GetPortalCallback () const;
+  void RemovePortalCallback (iPortalCallback* cb)
+  {
+    int idx = portal_cb_vector.Find (cb);
+    if (idx != -1)
+    {
+      portal_cb_vector.Delete (idx);
+      cb->DecRef ();
+    }
+  }
+  int GetPortalCallbackCount () const
+  {
+    return portal_cb_vector.Length ();
+  }
+  iPortalCallback* GetPortalCallback (int idx) const;
 
   /// Set the missing sector callback.
   void SetMissingSectorCallback (iPortalCallback* cb);
-
-  /// Get the missing sector callback.
-  iPortalCallback* GetMissingSectorCallback () const;
+  void RemoveMissingSectorCallback (iPortalCallback* cb)
+  {
+    int idx = sector_cb_vector.Find (cb);
+    if (idx != -1)
+    {
+      sector_cb_vector.Delete (idx);
+      cb->DecRef ();
+    }
+  }
+  int GetMissingSectorCallbackCount () const
+  {
+    return sector_cb_vector.Length ();
+  }
+  iPortalCallback* GetMissingSectorCallback (int idx) const;
 
   /// Set the filter texture
   void SetFilter (iTextureHandle* ft);
@@ -255,17 +278,33 @@ public:
     {
       scfParent->SetPortalCallback (cb);
     }
-    virtual iPortalCallback* GetPortalCallback () const
+    virtual void RemovePortalCallback (iPortalCallback* cb)
     {
-      return scfParent->GetPortalCallback ();
+      scfParent->RemovePortalCallback (cb);
+    }
+    virtual int GetPortalCallbackCount () const
+    {
+      return scfParent->GetPortalCallbackCount ();
+    }
+    virtual iPortalCallback* GetPortalCallback (int idx) const
+    {
+      return scfParent->GetPortalCallback (idx);
     }
     virtual void SetMissingSectorCallback (iPortalCallback* cb)
     {
       scfParent->SetMissingSectorCallback (cb);
     }
-    virtual iPortalCallback* GetMissingSectorCallback () const
+    virtual void RemoveMissingSectorCallback (iPortalCallback* cb)
     {
-      return scfParent->GetMissingSectorCallback ();
+      scfParent->RemoveMissingSectorCallback (cb);
+    }
+    virtual int GetMissingSectorCallbackCount () const
+    {
+      return scfParent->GetMissingSectorCallbackCount ();
+    }
+    virtual iPortalCallback* GetMissingSectorCallback (int idx) const
+    {
+      return scfParent->GetMissingSectorCallback (idx);
     }
     virtual void SetFilter (iTextureHandle* ft)
     {

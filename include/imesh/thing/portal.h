@@ -86,11 +86,14 @@ SCF_VERSION (iPortalCallback, 0, 0, 1);
  */
 struct iPortalCallback : public iBase
 {
-  /// Traverse to the portal.
+  /**
+   * Traverse to the portal. It is safe to delete this callback
+   * in this function.
+   */
   virtual bool Traverse (iPortal* portal, iBase* context) = 0;
 };
 
-SCF_VERSION (iPortal, 0, 0, 7);
+SCF_VERSION (iPortal, 0, 1, 0);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -128,23 +131,41 @@ struct iPortal : public iReference
 
   /**
    * Set the portal callback. This will call IncRef() on the callback
-   * (and possible DecRef() on the old callback). So make sure you
-   * call DecRef() to release your own reference.
+   * So make sure you call DecRef() to release your own reference.
+   * Note that ALL portal callbacks have to return true before
+   * the portal is traversed.
    */
   virtual void SetPortalCallback (iPortalCallback* cb) = 0;
 
-  /// Get the portal callback.
-  virtual iPortalCallback* GetPortalCallback () const = 0;
+  /**
+   * Remove a portal callback.
+   */
+  virtual void RemovePortalCallback (iPortalCallback* cb) = 0;
+
+  /// Get the number of portal callbacks.
+  virtual int GetPortalCallbackCount () const = 0;
+  
+  /// Get the specified portal callback.
+  virtual iPortalCallback* GetPortalCallback (int idx) const = 0;
 
   /**
    * Set the missing sector callback. This will call IncRef() on the callback
-   * (and possible DecRef() on the old callback). So make sure you
-   * call DecRef() to release your own reference.
+   * So make sure you call DecRef() to release your own reference.
+   * Note that as soon as one of these callbacks creates the missing
+   * sector, the loop to call these callbacks will stop.
    */
   virtual void SetMissingSectorCallback (iPortalCallback* cb) = 0;
 
-  /// Get the missing sector callback.
-  virtual iPortalCallback* GetMissingSectorCallback () const = 0;
+  /**
+   * Remove a missing sector callback.
+   */
+  virtual void RemoveMissingSectorCallback (iPortalCallback* cb) = 0;
+
+  /// Get the number of missing sector callbacks.
+  virtual int GetMissingSectorCallbackCount () const = 0;
+  
+  /// Get the specified missing sector callback.
+  virtual iPortalCallback* GetMissingSectorCallback (int idx) const = 0;
 
   /// Set the filter texture
   virtual void SetFilter (iTextureHandle* ft) = 0;

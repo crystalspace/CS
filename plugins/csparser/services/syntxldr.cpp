@@ -281,6 +281,7 @@ public:
     // For efficiency reasons we deallocate the name here.
     delete[] sectorname;
     sectorname = NULL;
+    portal->RemoveMissingSectorCallback (this);
     return true;
   }
 };

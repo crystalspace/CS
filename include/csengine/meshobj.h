@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
+#include "csutil/csvector.h"
 #include "csutil/flags.h"
 #include "csutil/garray.h"
 #include "csengine/movable.h"
@@ -194,8 +195,11 @@ private:
   /// Children of this object (other instances of iMeshWrapper).
   csMeshMeshList children;
 
-  /// The callback which is called just before drawing.
-  iMeshDrawCallback* draw_cb;
+  /**
+   * The callbacks which are called just before drawing.
+   * Type: iMeshDrawCallback.
+   */
+  csVector draw_cb_vector;
 
   /// Optional reference to the parent csMeshFactoryWrapper.
   iMeshFactoryWrapper* factory;
@@ -278,15 +282,28 @@ public:
    */
   void SetDrawCallback (iMeshDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (draw_cb) draw_cb->DecRef ();
-    draw_cb = cb;
+    draw_cb_vector.Push (cb);
+    cb->IncRef ();
   }
 
-  /// Get the draw callback.
-  iMeshDrawCallback* GetDrawCallback () const
+  void RemoveDrawCallback (iMeshDrawCallback* cb)
   {
-    return draw_cb;
+    int idx = draw_cb_vector.Find (cb);
+    if (idx != -1)
+    {
+      draw_cb_vector.Delete (idx);
+      cb->DecRef ();
+    }
+  }
+
+  virtual int GetDrawCallbackCount () const
+  {
+    return draw_cb_vector.Length ();
+  }
+
+  iMeshDrawCallback* GetDrawCallback (int idx) const
+  {
+    return (iMeshDrawCallback*)draw_cb_vector.Get (idx);
   }
 
   /// Mark this object as visible.
@@ -487,9 +504,17 @@ public:
     {
       scfParent->SetDrawCallback (cb);
     }
-    virtual iMeshDrawCallback* GetDrawCallback () const
+    virtual void RemoveDrawCallback (iMeshDrawCallback* cb)
     {
-      return scfParent->GetDrawCallback ();
+      scfParent->RemoveDrawCallback (cb);
+    }
+    virtual int GetDrawCallbackCount () const
+    {
+      return scfParent->GetDrawCallbackCount ();
+    }
+    virtual iMeshDrawCallback* GetDrawCallback (int idx) const
+    {
+      return scfParent->GetDrawCallback (idx);
     }
     virtual void SetRenderPriority (long rp)
     {

@@ -69,7 +69,6 @@ csMeshWrapper::csMeshWrapper (
 
   csEngine::current_engine->AddToCurrentRegion (this);
   csMeshWrapper::mesh = mesh;
-  draw_cb = NULL;
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
@@ -95,7 +94,6 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
 
   csEngine::current_engine->AddToCurrentRegion (this);
   csMeshWrapper::mesh = NULL;
-  draw_cb = NULL;
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
@@ -109,7 +107,12 @@ void csMeshWrapper::SetMeshObject (iMeshObject *mesh)
 
 csMeshWrapper::~csMeshWrapper ()
 {
-  if (draw_cb) draw_cb->DecRef ();
+  int i;
+  for (i = 0 ; i < draw_cb_vector.Length () ; i++)
+  {
+    iMeshDrawCallback* cb = (iMeshDrawCallback*)draw_cb_vector.Get (i);
+    cb->DecRef ();
+  }
 }
 
 void csMeshWrapper::UpdateMove ()
@@ -217,8 +220,16 @@ void csMeshWrapper::DrawInt (iRenderView *rview)
     rview->CallCallback (CS_CALLBACK_MESH, (void *) &scfiMeshWrapper);
   }
 
-  if (draw_cb)
-    if (!draw_cb->BeforeDrawing (meshwrap, rview)) return ;
+  int i;
+  // Callback are traversed in reverse order so that they can safely
+  // delete themselves.
+  i = draw_cb_vector.Length ()-1;
+  while (i >= 0)
+  {
+    iMeshDrawCallback* cb = (iMeshDrawCallback*)draw_cb_vector.Get (i);
+    if (!cb->BeforeDrawing (meshwrap, rview)) return ;
+    i--;
+  }
 
   if (mesh->DrawTest (rview, &movable.scfiMovable))
   {
@@ -243,7 +254,6 @@ void csMeshWrapper::DrawInt (iRenderView *rview)
     }
   }
 
-  int i;
   for (i = 0; i < children.Length (); i++)
   {
     iMeshWrapper *spr = children.Get (i);

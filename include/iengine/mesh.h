@@ -107,12 +107,15 @@ SCF_VERSION (iMeshDrawCallback, 0, 0, 1);
  */
 struct iMeshDrawCallback : public iBase
 {
-  /// Before drawing.
+  /**
+   * Before drawing. It is safe to delete this callback
+   * in this function.
+   */
   virtual bool BeforeDrawing (iMeshWrapper* spr, iRenderView* rview) = 0;
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 1, 18);
+SCF_VERSION (iMeshWrapper, 0, 2, 0);
 
 /**
  * A mesh wrapper is an engine-level object that wraps around an actual
@@ -226,8 +229,16 @@ struct iMeshWrapper : public iBase
    */
   virtual void SetDrawCallback (iMeshDrawCallback* cb) = 0;
 
-  /// Get the draw callback.
-  virtual iMeshDrawCallback* GetDrawCallback () const = 0;
+  /**
+   * Remove a draw callback.
+   */
+  virtual void RemoveDrawCallback (iMeshDrawCallback* cb) = 0;
+
+  /// Get the number of draw callbacks.
+  virtual int GetDrawCallbackCount () const = 0;
+
+  /// Get the specified draw callback.
+  virtual iMeshDrawCallback* GetDrawCallback (int idx) const = 0;
 
   /**
    * The renderer will render all objects in a sector based on this

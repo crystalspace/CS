@@ -49,8 +49,6 @@ csPortal::csPortal ()
   filter_g = 1;
   filter_b = 1;
   sector = NULL;
-  sector_cb = NULL;
-  portal_cb = NULL;
   max_sector_visit = 5;
 }
 
@@ -60,8 +58,17 @@ csPortal::~csPortal ()
   // set to NULL.
   CS_ASSERT (sector == NULL);
   if (filter_texture) filter_texture->DecRef ();
-  if (sector_cb) sector_cb->DecRef ();
-  if (portal_cb) portal_cb->DecRef ();
+  int i;
+  for (i = 0 ; i < sector_cb_vector.Length () ; i++)
+  {
+    iPortalCallback* cb = (iPortalCallback*)sector_cb_vector.Get (i);
+    cb->DecRef ();
+  }
+  for (i = 0 ; i < portal_cb_vector.Length () ; i++)
+  {
+    iPortalCallback* cb = (iPortalCallback*)portal_cb_vector.Get (i);
+    cb->DecRef ();
+  }
 }
 
 iReferencedObject *csPortal::GetReferencedObject () const
@@ -128,14 +135,34 @@ bool csPortal::CompleteSector (iBase *context)
 {
   if (sector)
   {
-    if (portal_cb)
-      return portal_cb->Traverse (&(this->scfiPortal), context);
-    else
-      return true;
+    bool rc = true;
+    int i;
+    // Callback are traversed in reverse order so that they can safely
+    // delete themselves.
+    i = portal_cb_vector.Length ()-1;
+    while (i >= 0)
+    {
+      iPortalCallback* cb = (iPortalCallback*)portal_cb_vector.Get (i);
+      rc = cb->Traverse (&(this->scfiPortal), context);
+      if (!rc) break;
+      i--;
+    }
+    return rc;
   }
-  else if (sector_cb)
+  else
   {
-    return sector_cb->Traverse (&(this->scfiPortal), context);
+    bool rc = false;
+    // Callback are traversed in reverse order so that they can safely
+    // delete themselves.
+    int i = sector_cb_vector.Length ()-1;
+    while (i >= 0)
+    {
+      iPortalCallback* cb = (iPortalCallback*)sector_cb_vector.Get (i);
+      rc = cb->Traverse (&(this->scfiPortal), context);
+      if (rc == true) break;
+      i--;
+    }
+    return rc;
   }
 
   return false;
@@ -500,24 +527,23 @@ void csPortal::SetMirror (iPolygon3D *iPoly)
 
 void csPortal::SetPortalCallback (iPortalCallback *cb)
 {
-  if (cb) cb->IncRef ();
-  if (portal_cb) portal_cb->DecRef ();
-  portal_cb = cb;
+  portal_cb_vector.Push (cb);
+  cb->IncRef ();
 }
 
-iPortalCallback *csPortal::GetPortalCallback () const
+iPortalCallback *csPortal::GetPortalCallback (int idx) const
 {
-  return portal_cb;
+  return (iPortalCallback*)portal_cb_vector.Get (idx);
 }
 
 void csPortal::SetMissingSectorCallback (iPortalCallback *cb)
 {
-  if (cb) cb->IncRef ();
-  if (sector_cb) sector_cb->DecRef ();
-  sector_cb = cb;
+  sector_cb_vector.Push (cb);
+  cb->IncRef ();
 }
 
-iPortalCallback *csPortal::GetMissingSectorCallback () const
+iPortalCallback *csPortal::GetMissingSectorCallback (int idx) const
 {
-  return sector_cb;
+  return (iPortalCallback*)sector_cb_vector.Get (idx);
 }
+
