@@ -83,6 +83,7 @@ public:
     virtual bool Load (iCamera *c, iEngine *e)
     { return scfParent->Load (c, e); }
   } scfiCameraPosition;
+  friend struct CameraPosition;
 };
 
 #endif // __CS_CAMPOS_H__

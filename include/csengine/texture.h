@@ -152,6 +152,7 @@ public:
     virtual void* GetUseData ();
     virtual void Visit ();
   } scfiTextureWrapper;
+  friend struct TextureWrapper;
 };
 
 /**

@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 	  the stack, since such huge arrays are frequently unportable.  In this
 	  case, they blew the OpenStep stack, resulting in abnormal program
 	  termination.
+	- Eric Sunshine worked around an OpenStep compiler warning where it
+	  complained that csCameraPosition, csMaterialWrapper and
+	  csTextureWrapper had private destructors but no friends.
 22-Jun-2001
 	- Fixed a bug in Walktest with the deletion of the legs/body
 	  collider. They were deleted with DecRef() but that is illegal

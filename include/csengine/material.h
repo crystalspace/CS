@@ -196,6 +196,7 @@ public:
     virtual void Visit ()
     { scfParent->Visit (); }
   } scfiMaterialWrapper;
+  friend struct MaterialWrapper;
 };
 
 /**
