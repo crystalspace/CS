@@ -65,6 +65,7 @@ public:
 	virtual int			GetPage();
 	virtual bool		DoubleBuffer( bool Enable );
 	virtual bool		DoubleBuffer() { return mDoubleBuffering; }
+	virtual void		Clear( int color );
 
 	void		 		ActivateWindow( WindowPtr theWindow, bool active );
 	void		 		UpdateWindow( WindowPtr theWindow, bool *updated );
@@ -93,6 +94,7 @@ protected:
 	short				mActivePage;
 
 	void				DisplayErrorDialog( short errorIndex );
+	void				GetColorfromInt( int color, RGBColor *outColor );
 
   DECLARE_IUNKNOWN()
   DECLARE_INTERFACE_TABLE(csGraphics2DMac)

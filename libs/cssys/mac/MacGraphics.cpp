@@ -498,6 +498,34 @@ void csGraphics2DMac::SetRGB(int i, int r, int g, int b)
 	mPaletteChanged = true;
 }
 
+void csGraphics2DMac::GetColorfromInt( int color, RGBColor *outColor )
+{
+	unsigned short c;
+
+	switch (pfmt.PixelBytes) {
+		case 1: // paletted colors
+			outColor->red = (((unsigned short)Palette[color].red) << 8) +
+									((unsigned short)Palette[color].red);
+			outColor->green = (((unsigned short)Palette[color].green) << 8) +
+									((unsigned short)Palette[color].green);
+			outColor->blue = (((unsigned short)Palette[color].blue) << 8) +
+									((unsigned short)Palette[color].blue);
+			break;
+
+		case 2: // 16bit color
+			outColor->red =  (( color & pfmt.RedMask) << 1 ) + (( color & pfmt.RedMask ) >> 10);
+			outColor->green = (( color & pfmt.GreenMask) << 6 ) + (( color & pfmt.GreenMask ) >> 5);
+			outColor->blue = (( color & pfmt.BlueMask) << 11 ) + ( color & pfmt.BlueMask );
+			break;
+
+		case 4: // truecolor
+			outColor->red =  (( color & pfmt.RedMask ) >> 8) + (( color & pfmt.RedMask ) >> 16);
+			outColor->green = ( color & pfmt.GreenMask ) + (( color & pfmt.GreenMask ) >> 8);
+			outColor->blue = (( color & pfmt.BlueMask ) << 8 ) + ( color & pfmt.BlueMask );
+			break;
+	}
+}
+
 
 /*----------------------------------------------------------------
 	Make sure we are ready to draw.
@@ -522,7 +550,10 @@ bool csGraphics2DMac::BeginDraw()
 
 		mPaletteChanged = false;
 	} else {
-		::SetGWorld( (GWorldPtr)mMainWindow, NULL );
+		if ( mOffscreen )
+			::SetGWorld( mOffscreen, NULL );
+		else
+			::SetGWorld( (GWorldPtr)mMainWindow, NULL );
 	}
 
   return true;
@@ -597,6 +628,23 @@ void csGraphics2DMac::Print( csRect * area )
 			::SetGWorld( thePort, theGDHandle );
 		}
 	}
+}
+
+
+void csGraphics2DMac::Clear( int color )
+{
+	RGBColor	theColor;
+	Rect		theRect;
+
+	if ( mOffscreen )
+		::SetGWorld( mOffscreen, NULL );
+	else
+		::SetGWorld( (GWorldPtr)mMainWindow, NULL );
+
+	GetColorfromInt( color, &theColor );
+	RGBBackColor( &theColor );
+	SetRect( &theRect, 0, 0, Width, Height );
+	EraseRect( &theRect );
 }
 
 
