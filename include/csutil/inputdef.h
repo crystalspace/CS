@@ -74,8 +74,10 @@ public:
   csInputDefinition (iEvent *event,
 		     uint32 honorModifiers = 0, bool useCookedCode = false);
 
-  /// Construct an input description from an iEvent (usually an axis).
-  /// Axis: 0 = x, 1 = y.
+  /**
+   * Construct an input description from an iEvent (usually an axis).
+   * Axis: 0 = x, 1 = y.
+   */
   csInputDefinition (iEvent *event, int axis);
 
   /// Construct an input description from a string like "mouse1" or "shift+a".
