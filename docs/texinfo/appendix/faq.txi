@@ -299,5 +299,20 @@ recalculated. How can I avoid that?
 sure the lighting gets recalculated AND cached in the zip file of your
 level.
 
+@item
+I'm confused by the Crystal Space coordinate system. The 3D renderer
+seems to work in reverse y. What's up?
+
+@strong{A}: When talking in 3D, Crystal Space defines the positive X axis
+as pointing to the right, the positive Y axis as pointing upwards, and
+the positive Z axis pointing forwards. 2D operations in the 3D renderer
+(like when drawing polygons using coordinates perspective projected by
+the engine) work with positive X axis to the right (as usual), and positive
+Y axis pointing upwards (so (0,0) is in the bottom-left corner). This is the
+exact reverse of how screen coordinates are usually defined but corresponds
+better with the Y axis pointing upwards in 3D coordinates).
+However, when getting mouse events the normal screen
+space coordinate system is used with (0,0) in the top-left corner.
+
 @end itemize
 

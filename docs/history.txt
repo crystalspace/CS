@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+10-Jun-2002
+	- Added an entry to the faq.
 9-Jun-2002
 	- Eric Sunshine fixed bug reported by Noah Falk <nsf@andrew.cmu.edu>.
 	  In the case where csRectRegion::ClipTo() clipped a rectangle
