@@ -85,16 +85,14 @@ bool csGraphics2DGLCommon::Open (const char *Title)
   CsPrintf (MSG_INITIALIZATION, "Using %s mode at resolution %dx%d.\n",
 	     FullScreen ? "full screen" : "windowed", Width, Height);
 
-  // Choose the fastest mode for 2D operations.
-  // The 3D driver will (if present) switch these depending on opengl.cfg
-  glDisable (GL_DITHER);
-  glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-
   glClearColor (0., 0., 0., 0.);
   glClearDepth (-1.0);
 
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
+
+  glViewport (0, 0, Width, Height);
+  Clear (0);
 
   // load font 'server'
   if (LocalFontServer == NULL)
@@ -106,7 +104,6 @@ bool csGraphics2DGLCommon::Open (const char *Title)
     LocalFontServer->SetClipRect (0, 0, Width, Height);
   }
 
-  Clear (0);
   return true;
 }
 

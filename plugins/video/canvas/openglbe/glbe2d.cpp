@@ -95,7 +95,6 @@ bool csGraphics2DGLBe::Open(const char* title)
     window->Unlock();
   }
 
-  glViewport (0, 0, Width, Height);
   return superclass::Open (title);
 }
 

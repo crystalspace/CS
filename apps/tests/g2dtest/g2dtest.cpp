@@ -681,17 +681,20 @@ int main (int argc, char **argv)
   }
 
   // Now load the canvas plugin
-  const char *canvas = System.GetOptionCL ("canvas");
-  if (!canvas || !*canvas)
-    canvas = SOFTWARE_2D_DRIVER;
-  else if (strncmp ("crystalspace.", canvas, 13))
+  if (!System.G2D)
   {
-    char *tmp = (char *)alloca (strlen (canvas) + 25);
-    strcpy (tmp, "crystalspace.graphics2d.");
-    strcat (tmp, canvas);
-    canvas = tmp;
+    const char *canvas = System.GetOptionCL ("canvas");
+    if (!canvas || !*canvas)
+      canvas = SOFTWARE_2D_DRIVER;
+    else if (strncmp ("crystalspace.", canvas, 13))
+    {
+      char *tmp = (char *)alloca (strlen (canvas) + 25);
+      strcpy (tmp, "crystalspace.graphics2d.");
+      strcat (tmp, canvas);
+      canvas = tmp;
+    }
+    System.G2D = LOAD_PLUGIN (&System, canvas, CS_FUNCID_CANVAS, iGraphics2D);
   }
-  System.G2D = LOAD_PLUGIN (&System, canvas, CS_FUNCID_CANVAS, iGraphics2D);
 
   if (!System.Open (APP_TITLE))
   {

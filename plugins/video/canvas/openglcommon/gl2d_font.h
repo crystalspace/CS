@@ -24,10 +24,10 @@
 #include "csutil/csvector.h"
 #include "ifontsrv.h"
 
-// Define the following macro to use "font-on-a-texture" approach.
-// Otherwise we will use glBitmap()
+// Define the following macro to use glBitmap() text drawin approach
+// rather than default "font-on-a-texture" approach.
 // Currently this is defined in csosdefs.h for platforms with
-// buggy OpenGL's.
+// OpenGL's that prefer glBitmap() method.
 //#define OPENGL_BITMAP_FONT
 
 class GLFontInfo;

@@ -25,22 +25,23 @@
 #include "cssys/sysdriv.h"
 #include "video/canvas/common/graph2d.h"
 #include "csutil/util.h"
+#include "qint.h"
 
 #include "gl2d_font.h"
 
 #if !defined (OPENGL_BITMAP_FONT)
 
-struct GLGlyph 
+struct GLGlyph
 {
   GLuint hTexture; // the texture where we find this character in
   float x, y, width, texwidth; // location and size of the character
 };
-  
+
 class GLFontInfo
 {
   friend class csGraphics2DOpenGLFontServer;
   public:
-    
+
     GLFontInfo (){}
     ~GLFontInfo ();
 
@@ -48,7 +49,7 @@ class GLFontInfo
     float height, texheight;
     bool one_texture;
 };
-  
+
 /* MACOS driver do not currently support GL_ALPHA textures needed for
  * shaped text, so for that platform we have a hack that gives blocky
  * text.  This is superior to the other option which is NO text. -GJH 05-20-2000
@@ -115,7 +116,7 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
       texwidth = width;
     }
   }
-  
+
   int basetextureheight = FindNearestPowerOf2 (MIN (maxheight * rows, 256));
   font->texheight = ((float)maxheight) / basetextureheight;
 
@@ -155,12 +156,12 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
 	if (c)
 	{
 #ifdef OS_MACOS
-          glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, 
+          glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */,
 			GL_LUMINANCE /* bytes-per-pixel */,
                         basetexturewidth, basetextureheight, 0 /*border*/,
                         GL_LUMINANCE, GL_UNSIGNED_BYTE, fontbitmapdata);
 #else
-          glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, 
+          glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */,
 			GL_ALPHA /* bytes-per-pixel */,
                         basetexturewidth, basetextureheight, 0 /*border*/,
                         GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
@@ -216,12 +217,12 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
   }
 
 #ifdef OS_MACOS
-  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, 
+  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */,
 		GL_LUMINANCE /* bytes-per-pixel */,
                 basetexturewidth, basetextureheight, 0 /*border*/,
                 GL_LUMINANCE, GL_UNSIGNED_BYTE, fontbitmapdata);
 #else
-  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, 
+  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */,
 		GL_ALPHA /* bytes-per-pixel */,
                 basetexturewidth, basetextureheight, 0 /*border*/,
                 GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
@@ -232,27 +233,29 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
 }
 
 bool csGraphics2DOpenGLFontServer::ClipRect (float x, float y,
-  float &x1, float &y1, float &x2, float &y2, 
+  float &x1, float &y1, float &x2, float &y2,
   float &tx1, float &ty1, float &tx2, float &ty2)
 {
-  float nx1=x1+x, ny1=y1+y, nx2=x2+x, ny2=y2+y;
-  float ntx1=tx1, nty1=ty1, ntx2=tx2, nty2=ty2;
+  float nx1 = x1 + x, ny1 = y1 + y, nx2 = x2 + x, ny2 = y2 + y;
+  float ntx1 = tx1, nty1 = ty1, ntx2 = tx2, nty2 = ty2;
 
-  if ((nx1 > float(ClipX2)) || (nx2 < float(ClipX1)) 
-      || (ny1 > float(ClipY1)) || (ny2 < float(ClipY2)))
+  if ((nx1 > float (ClipX2)) || (nx2 < float (ClipX1))
+   || (ny1 > float (ClipY2)) || (ny2 < float (ClipY1)))
       return false;
+
   if (nx1 < ClipX1)
-    tx1 += (ntx2-ntx1)*(ClipX1 - nx1)/(nx2-nx1), x1 = ClipX1-x;
-
+    tx1 += (ntx2 - ntx1) * (ClipX1 - nx1) / (nx2 - nx1), x1 = ClipX1 - x;
   if (nx2 > ClipX2)
-    tx2 -= (ntx2-ntx1)*(nx2-ClipX2)/(nx2-nx1), x2 = ClipX2-x;
-  if (ny1 < ClipY2)
-    ty2 -= (nty2-nty1)*(ClipY2 - ny1)/(ny2-ny1), y1 = ClipY2-y;
+    tx2 -= (ntx2 - ntx1) * (nx2 - ClipX2) / (nx2 - nx1), x2 = ClipX2 - x;
+  if (tx2 <= tx1)
+    return false;
 
-  if (ny2 > ClipY1)
-    ty1 += (nty2-nty1)*(ny2-ClipY1)/(ny2-ny1), y2 = ClipY1-y;
-  if ((tx2 <= tx1) || (ty2 <= ty1))
-   return false;                                                                                        
+  if (ny1 < ClipY1)
+    ty2 -= (nty2 - nty1) * (ClipY1 - ny1) / (ny2 - ny1), y1 = ClipY1 - y;
+  if (ny2 > ClipY2)
+    ty1 += (nty2 - nty1) * (ny2 - ClipY2) / (ny2 - ny1), y2 = ClipY2 - y;
+  if (ty2 <= ty1)
+    return false;
 
   return true;
 }
@@ -262,10 +265,13 @@ void csGraphics2DOpenGLFontServer::Write (int x, int y, const char *text, int Fo
 {
   if (!text || !*text) return;
 
+  y = y - QInt (FontCache.Get (Font)->height) + 1;
+  if (y >= ClipY2) return;
+
   GLGlyph *glyphs = FontCache.Get (Font)->glyphs;
   GLuint hLastTexture = 0;
   GLuint hTexture     = glyphs[*text].hTexture;
-  
+
   glPushMatrix();
   glTranslatef (x, y, 0);
 
@@ -313,7 +319,7 @@ void csGraphics2DOpenGLFontServer::Write (int x, int y, const char *text, int Fo
     ty2 = ty1 + texheight;
     y1 = 0.0;
     y2 = maxheight;
-      
+
     if (ClipRect (x, y, x1, y1, x2, y2, tx1, ty1, tx2, ty2))
     {
       glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
@@ -324,10 +330,10 @@ void csGraphics2DOpenGLFontServer::Write (int x, int y, const char *text, int Fo
 
     x1 = x_right;
   }
-    
+
   glEnd ();
 
-#ifndef OS_MACOS  
+#ifndef OS_MACOS
   glDisable(GL_ALPHA_TEST);
 #endif
   glPopMatrix ();

@@ -280,8 +280,6 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 	csGraphics2DGLCommon::Open( Title );
 
 	aglSwapBuffers( mGLContext );
-
-	glViewport (0, 0, Width, Height);
   
 	return true;
 }

@@ -219,41 +219,26 @@ bool csGraphics2DGLX::Open(const char *Title)
   // We now select the visual here as with a mesa bug it is not possible
   // to destroy double buffered contexts and then create a single buffered
   // one.
-  if (!is_double_buffered)
+  int desired_attributes[] =
   {
-    int desired_attributes[] =
-    {
-      GLX_RGBA, 
-      GLX_DEPTH_SIZE, 8, 
-      GLX_RED_SIZE, 4,
-      GLX_BLUE_SIZE, 4,
-      GLX_GREEN_SIZE, 4,
-      None
-    };
+    GLX_RGBA, 
+    GLX_DEPTH_SIZE, 8, 
+    GLX_RED_SIZE, 4,
+    GLX_BLUE_SIZE, 4,
+    GLX_GREEN_SIZE, 4,
+    None,
+    None
+  };
 
-    if (!CreateContext (desired_attributes))
-      return false;
-  }
-  else
-  {
-    int desired_attributes[] =
-    {
-      GLX_RGBA, 
-      GLX_DOUBLEBUFFER,
-      GLX_DEPTH_SIZE, 8, 
-      GLX_RED_SIZE, 4,
-      GLX_BLUE_SIZE, 4,
-      GLX_GREEN_SIZE, 4,
-      None
-    };
+  if (is_double_buffered)
+    desired_attributes [9] = GLX_DOUBLEBUFFER;
 
-    if (!CreateContext (desired_attributes))
-      return false;
-  }
+  if (!CreateContext (desired_attributes))
+    return false;
 
   CsPrintf (MSG_INITIALIZATION, "\nVideo driver GL/X version ");
-  if (glXIsDirect (dpy, active_GLContext))
-    CsPrintf (MSG_INITIALIZATION, "(direct renderer)\n");
+  CsPrintf (MSG_INITIALIZATION, "%s\n",
+    glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : "");
 
   Depth = active_GLVisual->depth;
 
@@ -425,12 +410,8 @@ bool csGraphics2DGLX::Open(const char *Title)
   if (!csGraphics2DGLCommon::Open (Title))
     return false;
 
-  Clear (0);
-  glViewport (0, 0, Width, Height);
-
-  if (FullScreen) {
-    EnterFullScreen();
-  }
+  if (FullScreen)
+    EnterFullScreen ();
 
   return true;
 }

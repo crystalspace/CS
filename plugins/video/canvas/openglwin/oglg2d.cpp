@@ -320,19 +320,11 @@ bool csGraphics2DOpenGL::Open(const char *Title)
   if (!csGraphics2DGLCommon::Open(Title))
     return false;
 
-  Memory=new unsigned char [Width*Height*2];
-  if(Memory==NULL)
-    sys_fatalerror("Dummy buffer not allowed");
-
-  for(int i = 0; i < Height; i++)
-    LineAddress [i] = i * Width;
-
-  if(Depth==8) m_bPalettized = true;
-  else m_bPalettized = false;
-
+  if (Depth == 8)
+    m_bPalettized = true;
+  else
+    m_bPalettized = false;
   m_bPaletteChanged = false;
-
-  glViewport (0, 0, Width, Height);
 
   return true;
 }
@@ -358,8 +350,6 @@ void csGraphics2DOpenGL::Close(void)
     ReleaseDC(NULL, dc);
 */
   }
-
-  if(Memory) delete Memory;
 
   csGraphics2D::Close ();
 }
