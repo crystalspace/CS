@@ -330,16 +330,16 @@ bool csGraphics2DGLX::Open(const char *Title)
   XSelectInput (dpy, WMwindow, FocusChangeMask | KeyPressMask |
   	KeyReleaseMask | StructureNotifyMask);
 
+  // Intern WM_DELETE_WINDOW and set window manager protocol
+  // (Needed to catch user using window manager "delete window" button)
+  wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols (dpy, WMwindow, &wm_delete_window, 1);
+
   window = XCreateWindow(dpy, WMwindow, 0, 0, Width,Height, 0 /*border*/,
     active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWBorderPixel | CWColormap | CWEventMask | CWBitGravity, &winattr);
 
   XStoreName (dpy, window, Title);
-
-  // Intern WM_DELETE_WINDOW and set window manager protocol
-  // (Needed to catch user using window manager "delete window" button)
-  wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols (dpy, window, &wm_delete_window, 1);
 
   // Now communicate fully to the window manager our wishes using the non-mapped
   // leader_window to form a window_group

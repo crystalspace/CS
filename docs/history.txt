@@ -18,6 +18,12 @@ The history order has been reversed so that new features are at the top.
               i.e. CS_TEXTURE_PROC_UNCACHE_ALWAYS.. or would this be an unwanted
               complication? An app which utilises and benefits from this is 
               forthcoming.
+            - Fixed minor bug in system.cpp which broke command line argument
+              processing
+            - Added accessor to iTextureHandle to be able to retrieve which flags
+              have been set.
+	    - I believe this propagates the changes made to x2d.cpp to glx2d.cpp
+              which allows exit without pipe broken error (it works for me :). 
 28-Jul-2000
 	- Norman Kramer fixes the x2d canvas so that the title is set
 	  to the right window.
