@@ -6,7 +6,7 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-19-Jan-2004
+19-Jan-2005
 	- Jorrit fixed a bug in csMeshList::Add() and csMeshFactoryList::Add().
 	  It was returning true on success instead of the last added index.
 	- Jorrit improved finding by name for several objects in the engine
@@ -17,7 +17,13 @@ chronological order.
 	  recommended to change the name later as that will mess up with the
 	  internal hash table used to find materials quickly (this goes for
 	  the other objects that use hashes too).
-18-Jan-2004
+	- Eric Sunshine lifted the 18-Jan-2005 restriction that recursive
+	  mutexes should not be used with csCondition::Wait() since the
+	  restriction was based upon an erroneous code/documentation
+	  interpretation. (In fact, POSIX states that recursive mutexes can be
+	  used with 'wait' provided that the mutex has not been recursively
+	  locked.)
+18-Jan-2005
 	- Eric Sunshine updated csPosixCondition::Wait() so that it also
 	  catches EINVAL from pthread_cond_timedwait().
 	- Jorrit fixed smooth in thing. It was using the normals in object
@@ -49,7 +55,7 @@ chronological order.
 	  predicated upon the mesh having a skeleton, and will misbehave
 	  (i.e. crash) when it is lacking. The loader also now prints an
 	  informative error message for the user rather than crashing silently.
-17-Jan-2004
+17-Jan-2005
 	- Eric Sunshine applied patch from Lukas Erlinghagen <erluk@web.de>
 	  which fixes crash in csSCF::RegisterClassesInt() triggered by the
 	  SCF_REGISTER_STATIC_CLASS() and SCF_REGISTER_STATIC_LIBRARY() macros.
@@ -59,7 +65,7 @@ chronological order.
 	  changed to make it legal to scan the same directory multiple times.)
 	- Jorrit optimized the routine in thing to calculate normals. Thanks
 	  to Marten for suggesting this.
-16-Jan-2004
+16-Jan-2005
 	- res reduced the iImage interface to a container for pixel data,
 	  merged csImageFile and csImageMemory and moved the image 
 	  manipulation functions into helper classes.
@@ -70,7 +76,7 @@ chronological order.
 	- Peter Amstutz updated the csvosa3dl plugin to use VIP/UDP instead
 	  of VOP/TCP.  Also it now replaces both local and remote A3DL
 	  factories.  A bugfix was applied to movement updates.
-15-Jan-2004
+15-Jan-2005
 	- Jorrit fixed a bug in engine->GetNearbyObjects() and
 	  GetNearbyMeshes(). These functions could get confused in situations
 	  with lots of space warping portals and not return the correct
@@ -90,7 +96,7 @@ chronological order.
 	- res made the object registry call scfInitialize() in debug mode if 
 	  needed and undid the addition of scfInitialize() to the object 
 	  registry test.
-14-Jan-2004
+14-Jan-2005
 	- Eric Sunshine added a new automated and highly dynamic unit testing
 	  framework which employs CppUnit (http://cppunit.sourceforge.net/).
 	  The new Jam rule `UnitTest' can be used to set up unit testing for
@@ -136,7 +142,7 @@ chronological order.
 	  object registry relies on a valid iSCF::SCF).
 	- res changed the CppUnit autoconf check to also check whether the
 	  CppUnit version is recent enough.
-13-Jan-2004
+13-Jan-2005
 	- Eric Sunshine renamed the 'memory' plugin to 'memory2d' for the
 	  following reasons:
 	    - Sensibility: Jam would become confused if C++ code #included the
