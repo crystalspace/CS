@@ -243,11 +243,11 @@ public:
   void debug_print(){
     for( int i = 0; i < dimen; i++ ){
       for( int j = 0; j < dimen; j++ ){
-#ifdef __CYSTALSPACE__
+#ifdef __CRYSTALSPACE__
         Debug::logf( CT_DEBUG_LEVEL, "%lf :: ", rows[i][j] ); 
 #endif
       }
-#ifdef __CYSTALSPACE__
+#ifdef __CRYSTALSPACE__
         Debug::logf( CT_DEBUG_LEVEL, "\n" );
 #endif
     }
@@ -305,7 +305,7 @@ public:
     ctMatrix3 Mret;
     for( int idx = 0; idx < 3; idx++ )
       for( int idy = 0; idy < 3; idy++ )
-        Mret[idx][idy] = rows[idy][idx];
+        Mret[idx][idy] = (*this)[idy][idx];
     return Mret;
   }
 
@@ -336,7 +336,7 @@ public:
       for( int idc = 0; idc < 3; idc++ ){
         Mret[idr][idc] = 0.0;
         for( int adder = 0; adder < 3; adder++ )
-          Mret[idr][idc] += rows[idr][adder]*MM[adder][idc];
+          Mret[idr][idc] += (*this)[idr][adder]*MM[adder][idc];
       }
 
     return Mret;
@@ -346,7 +346,7 @@ public:
     ctMatrix3 Mret;
     for( int idr = 0; idr < 3; idr++ )
       for( int idc = 0; idc < 3; idc++ ){
-        Mret[idr][idc] = rows[idr][idc]*pk;
+        Mret[idr][idc] = (*this)[idr][idc]*pk;
       }
 
     return Mret;
@@ -362,25 +362,25 @@ public:
   void add( const ctMatrix3 &pm ){
     for( int idx = 0; idx < 3; idx++ )
       for( int idy = 0; idy < 3; idy++ )
-        rows[idx][idy] += pm.rows[idx][idy];
+        (*this)[idx][idy] += pm[idx][idy];
   }
 
   void add2( const ctMatrix3 &pm1, const ctMatrix3 &pm2 ){
     for( int idx = 0; idx < 3; idx++ )
       for( int idy = 0; idy < 3; idy++ )
-        rows[idx][idy] = pm1.rows[idx][idy] + pm2.rows[idx][idy];
+        (*this)[idx][idy] = pm1[idx][idy] + pm2[idx][idy];
   }
 
   void add3( ctMatrix3 &pmdest, const ctMatrix3 &pm1, const ctMatrix3 &pm2 ){
     for( int idx = 0; idx < 3; idx++ )
       for( int idy = 0; idy < 3; idy++ )
-        pmdest.rows[idx][idy] = pm1.rows[idx][idy] + pm2.rows[idx][idy];
+        pmdest[idx][idy] = pm1[idx][idy] + pm2[idx][idy];
   }
 
   void operator+=( const ctMatrix3 &pm ){
     for( int idx = 0; idx < 3; idx++ )
       for( int idy = 0; idy < 3; idy++ )
-        rows[idx][idy] += pm.rows[idx][idy];
+        (*this)[idx][idy] += pm[idx][idy];
   }
 
   ctMatrix3 operator+( const ctMatrix3 &pm ){
@@ -388,7 +388,7 @@ public:
 
     for( int idx = 0; idx < 3; idx++ )
       for( int idy = 0; idy < 3; idy++ )
-        Mret.rows[idx][idy] = rows[idx][idy] + pm.rows[idx][idy];
+        Mret[idx][idy] = (*this)[idx][idy] + pm[idx][idy];
 
     return Mret;
   }
@@ -397,26 +397,26 @@ public:
   void subtract( const ctMatrix3 &pm ){
     for( int idx = 0; idx < 3; idx++ )
       for( int idy = 0; idy < 3; idy++ )
-        rows[idx][idy] -= pm.rows[idx][idy];
+        (*this)[idx][idy] -= pm[idx][idy];
   }
 
   void subtract2( const ctMatrix3 &pm1, const ctMatrix3 &pm2 ){
     for( int idx = 0; idx < 3; idx++ )
       for( int idy = 0; idy < 3; idy++ )
-        rows[idx][idy] = pm1.rows[idx][idy] - pm2.rows[idx][idy];
+        (*this)[idx][idy] = pm1[idx][idy] - pm2[idx][idy];
   }
 
   void subtract3( ctMatrix3 &pmdest, const ctMatrix3 &pm1,
                   const ctMatrix3 &pm2 ){
     for( int idx = 0; idx < 3; idx++ )
       for( int idy = 0; idy < 3; idy++ )
-        pmdest.rows[idx][idy] = pm1.rows[idx][idy] - pm2.rows[idx][idy];
+        pmdest[idx][idy] = pm1[idx][idy] - pm2[idx][idy];
   }
 
   void operator-=( const ctMatrix3 &pm ){
     for( int idx = 0; idx < 3; idx++ )
       for( int idy = 0; idy < 3; idy++ )
-        rows[idx][idy] -= pm.rows[idx][idy];
+        (*this)[idx][idy] -= pm[idx][idy];
   }
 
   ctMatrix3 operator-( ctMatrix3 &pm ){
@@ -424,7 +424,7 @@ public:
 
     for( int idx = 0; idx < 3; idx++ )
       for( int idy = 0; idy < 3; idy++ )
-        Mret.rows[idx][idy] = rows[idx][idy] - pm.rows[idx][idy];
+        Mret[idx][idy] = (*this)[idx][idy] - pm[idx][idy];
 
     return Mret;
   }
@@ -440,17 +440,22 @@ public:
     
     b = (real *)malloc( sizeof( real )*3 );
     A = (real **)malloc( sizeof( real * )*3 );
-    x = px.get_elements();
+//    x = px.get_elements();
+    x = (real *)malloc( sizeof( real )*3 );
+    x[0] = px[0]; x[1] = px[1]; x[2] = px[2];
 
     for( idx = 0; idx < 3; idx++ ){
       b[idx] = pb[idx];
       A[idx] = (real *)malloc( sizeof( real )*3 );
       for( int idy = 0; idy < 3; idy++ )
-        A[idx][idy] = rows[idx][idy];
+        A[idx][idy] = (*this)[idx][idy];
     }
 
     // solve this sucker
     linear_solve( A, 3, x, b );
+
+    px[0] = x[0]; px[1] = x[1]; px[2] = x[2];
+    free( x );
     free( b );
     free( A );
   }
@@ -479,18 +484,19 @@ public:
   }
 };
 
+#ifndef __CRYSTALSPACE__
 inline ctMatrix3 ctVector3::operator*( const ctVectorTranspose3 &pv )
 { 
 ctMatrix3 Mret;
   for( int idr = 0; idr < 3; idr++ ){
     for( int idc = 0; idc < 3; idc++ ){
-      Mret[idr][idc] = elements[idr]*pv[idc];
+      Mret[idr][idc] = (*this)[idr]*pv[idc];
     } 
   }
 
   return Mret;
 }
-
+#endif
 
 inline void ctMatrix3::set( real p00, real p01, real p02,
                 real p10, real p11, real p12,
@@ -510,7 +516,7 @@ inline void ctMatrix3::set( real p00, real p01, real p02,
 
 inline void ctMatrix3::orthonormalize()
 {
-  rows[0].normalize();
+  rows[0].Normalize();
   rows[1] -= rows[0]*(rows[1] * rows[0]);
   rows[2] = rows[0] % rows[1];
 }

@@ -23,6 +23,8 @@
 
 #include "csphyzik/phyztype.h"
 
+#define MIN_CONTACT MIN_REAL * 100
+
 class ctPhysicalEntity;
 class ctRigidBody;
 
@@ -65,7 +67,6 @@ public:
 
   ctContact(){
     body_b = NULL;
-    restitution = 1.0;
     next = NULL;
   }
 
@@ -81,10 +82,6 @@ public:
 	bool vf;
 
   ctVector3 n;   // collision normal
-
-  // coefficent of restitution.  what % of v bounces back. +ve
-  // should be a number between 0.0 and 1.0
-  real restitution;  
 
   // link to next contact
   ctContact *next;

@@ -313,7 +313,7 @@ ctVector3 ctContactSolver::compute_ndot( ctContact *c )
     //!me using % where it said * in witkin/baraff/kass
     ctVector3 n1 = ea % eb;
     ctVector3 z = ( eadot % eb ) + ( ea % ebdot );
-    real len = n1.length();
+    real len = n1.Norm();
 
     n1 *= 1.0/ len;
 

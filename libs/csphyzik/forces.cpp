@@ -56,14 +56,14 @@ ctVector3 ctAirResistanceF::apply_F( ctDynamicEntity &pe )
 }
 
 ctAppliedF::ctAppliedF( ctVector3 dir, real pm )
-{ magnitude = pm; direction = dir.unit(); }
+{ magnitude = pm; direction = dir.Unit(); }
 
 ctVector3 ctAppliedF::apply_F( ctDynamicEntity &pe )
 { pe.sum_force( direction*magnitude ); return direction*magnitude; }
 
 
 ctTorqueF::ctTorqueF( ctVector3 dir, real pm )
-{ magnitude = pm; direction = dir.unit(); }
+{ magnitude = pm; direction = dir.Unit(); }
 
 ctVector3 ctTorqueF::apply_F( ctDynamicEntity &pe )
 { pe.sum_torque( direction*magnitude ); return direction*magnitude; }
@@ -101,9 +101,9 @@ ctVector3 a2;
 				
 					//!me maybe don't need to normalize and find unit vector
 					//!me I think that d.Norm() and later mult d by disp divides out to 1
-					real disp = d.length() - rest_length;
+					real disp = d.Norm() - rest_length;
 					if( d*d > MIN_REAL ){ // avoid divide by zero
-						d = d.unit();
+						d = d.Unit();
 					}else{
 						d = ctVector3(1, 0,0 );  
 					}
@@ -156,7 +156,7 @@ ctPhysicalEntity *planet;
 
 			r_len2 = r_vec*r_vec;
 
-			r_vec.normalize();
+			r_vec.Normalize();
 			if( r_len2 < MIN_REAL ){  //!me maybe have a max accel limit instead?
 				r_len2 = MIN_REAL;
 			}

@@ -1,6 +1,11 @@
 #ifndef PHYZTYPE_H
 #define PHYZTYPE_H
 
+//!me check with CS team to see if there is a CS define I can use
+#ifndef __NO_CRYSTALSPACE__
+#define __CRYSTALSPACE__
+#endif
+
 const double M_PER_WORLDUNIT = 1.0;
 
 #define DEFAULT_AIR_RESISTANCE	0.25L /**M_PER_WORLDUNIT */  // 2.5 is ok for bigger stuff

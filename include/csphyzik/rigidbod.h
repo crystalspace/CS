@@ -79,6 +79,9 @@ public:
   // collision response
   virtual void resolve_collision( ctCollidingContact *cont );
   virtual void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector );
+  // get relative velocity of two ( or one ) body from perspective of a 
+  // point in world space attached to first body ( //!me I think that is right )
+  ctVector3 get_relative_v( ctPhysicalEntity *body_b, const ctVector3 &the_p );
 
 
 protected:

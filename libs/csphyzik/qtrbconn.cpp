@@ -34,14 +34,14 @@ ctVector3 ctQuatRigidBodyConnector::pos() {
 ctVector3 ctQuatRigidBodyConnector::vel() {
   ctVector3 pt = rigid->get_orientation().Rotate(r);
   ctVector3 av;
-  av.cross(rigid->get_omega(), pt);
+  av.Cross(rigid->get_omega(), pt);
   return av + rigid->get_linear_velocity();
 }
 
 void ctQuatRigidBodyConnector::apply_force(ctVector3 F) {
   ctVector3 torque;
 
-  torque.cross(r, F);
+  torque.Cross(r, F);
   rigid->apply_T(torque);
   rigid->apply_F(F);
 }

@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-
+#include <float.h>
 #ifndef ctEntity_H
 #define ctEntity_H
 

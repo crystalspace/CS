@@ -80,7 +80,7 @@ class ctQuatRigidBody : public ctEntity {
     return ctVector3(quat.x * fact, quat.y * fact, quat.z*fact);
   }
   void         set_rotation(ctVector3 rot) {
-    real len = rot.length();
+    real len = rot.Norm();
     if(len <= 3*MIN_REAL) {
       set_orientation(ctQuaternion(1.0, 0.0, 0.0, 0.0));
     } else {

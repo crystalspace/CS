@@ -29,6 +29,9 @@ class ctQuaternion : public csQuaternion {
  public:
   ctQuaternion(real r, real x, real y, real z) : csQuaternion(r, x, y, z) {}
   ctQuaternion(ctVector3 x) : csQuaternion(csVector3(x[0], x[1], x[2])) {}
+#ifdef __CRYSTALSPACE__
+  ctQuaternion(csVector3 x) : csQuaternion(csVector3(x[0], x[1], x[2])) {}
+#endif
   ctQuaternion(csQuaternion q) : csQuaternion(q.r, q.x, q.y, q.z) {}
   ctQuaternion() {}
   ~ctQuaternion() {}

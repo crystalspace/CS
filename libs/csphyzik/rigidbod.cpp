@@ -182,18 +182,38 @@ void ctRigidBody::set_m( real pm )
   }
 }
 
+// return the relative velocity between up to two bodies at a point in world space
+ctVector3 ctRigidBody::get_relative_v( ctPhysicalEntity *body_b, const ctVector3 &the_p )
+{
+  ctVector3 v_rel;
+  ctVector3 body_x = get_pos();
+  ctVector3 ra = the_p - body_x;
+
+  ctVector3 ra_v = get_angular_v()%ra + get_v();
+
+  if( body_b == NULL ){
+    v_rel = ra_v;
+  }else{
+    ctVector3 rb = the_p - body_b->get_pos();
+    ctVector3 rb_v = body_b->get_angular_v()%rb + body_b->get_v();
+    v_rel = (ra_v - rb_v);
+  }
+
+  return v_rel;
+
+}
 
 // collision response
 void ctRigidBody::resolve_collision( ctCollidingContact *cont )
 {
 ctVector3 j;
 real v_rel;       // relative velocity of collision points
-ctVector3 ra_v, rb_v;
+//ctVector3 ra_v, rb_v;
 real j_magnitude;
 real bottom;
 real ma_inv, mb_inv;   // 1/mass_body
 real rota, rotb;       // contribution from rotational inertia
-ctVector3 & n = cont->n;
+ctVector3 n;
 ctVector3 ra, rb;      // center of body to collision point in inertail ref frame 
 // keep track of previous object collided with.
 // in simultaneous collisions with the same object the restituion should
@@ -204,7 +224,7 @@ ctVector3 ra, rb;      // center of body to collision point in inertail ref fram
 //!me this isn't actually a very good method.... maybe something better can be 
 //!me implemented once contact force solver is implemented
 ctPhysicalEntity *prev;
-
+ctCollidingContact *head_cont = cont;
 //!debug
 //int hit_cout = 0;
 
@@ -214,7 +234,7 @@ ctPhysicalEntity *prev;
 
   while( cont != NULL ){
 
-    ctVector3 body_x = get_pos();
+/*    ctVector3 body_x = get_pos();
     ra = cont->contact_p - body_x;
 
     ra_v = get_angular_v()%ra + get_v();
@@ -227,10 +247,15 @@ ctPhysicalEntity *prev;
       rb_v = cont->body_b->get_angular_v()%rb + cont->body_b->get_v();
       v_rel = n*(ra_v - rb_v);
     }
+*/
+    n = cont->n;
+    // get component of relative velocity along collision normal
+    v_rel = n*get_relative_v( cont->body_b, cont->contact_p );
 
     // if the objects are traveling towards each other do collision response
     if( v_rel < 0 ){
 
+      ra = cont->contact_p - get_pos();
  //         DEBUGLOGF2( "contact %lf o %lf, ", cont->contact_p[0], body_x[0] );
  //   DEBUGLOGF2( "contact %lf o %lf, ", cont->contact_p[1], body_x[1] );
  //   DEBUGLOGF2( "contact %lf o %lf\n ", cont->contact_p[2], body_x[2] );
@@ -243,6 +268,7 @@ ctPhysicalEntity *prev;
         mb_inv = 0;
         rotb = 0;
       }else{
+        rb = cont->contact_p - cont->body_b->get_pos();
         mb_inv = 1.0/cont->body_b->get_impulse_m();
         rotb = n * ((cont->body_b->get_impulse_I_inv()*( rb%n ) )%rb);
       }
@@ -272,6 +298,30 @@ ctPhysicalEntity *prev;
     }
     cont = cont->next;  
   }
+
+  // now check if any of the contacts are in resting contact
+  cont = head_cont;
+
+  while( cont != NULL ){
+    // get component of relative velocity along collision normal
+    v_rel = cont->n*get_relative_v( cont->body_b, cont->contact_p );
+
+    if( fabs(v_rel) < MIN_CONTACT ){
+      ctContact *r_cont = new ctContact;
+
+      r_cont->body_a = (ctRigidBody *)(cont->body_a);  //!me bad but works for now
+      r_cont->body_b = (ctRigidBody *)(cont->body_b);
+      r_cont->n = cont->n;
+      r_cont->ea = cont->ea;
+      r_cont->eb = cont->eb;
+      r_cont->vf = cont->vf;
+      r_cont->contact_p = cont->contact_p;
+   
+    }
+
+    cont = cont->next;
+  }
+
 }
 
 void ctRigidBody::apply_impulse( ctVector3 jx, ctVector3 jv )

@@ -100,6 +100,54 @@ protected:
 };
 
 
+//!me this introduces some inefficiencies.  a bunch of temporary ctVector3's
+//!me will be generated as a result when they aren't really needed.
+//!me TODO: just defind ctVector3 as csVector3 and modify all code needed to make
+//!me these compatible.  Shouldn't be too much work.  
+#ifdef __CRYSTALSPACE__
+
+#include "csgeom/math3d_d.h"
+#define ctVector3 csDVector3
+/*
+class ctVector3 : public csDVector3
+{
+public:
+
+  ctVector3(){
+    x = y = z = 0.0;
+  }
+
+  ctVector3( real pone, real ptwo, real pthree ){
+    x = pone;
+    y = ptwo;
+    z = pthree;
+  }
+
+  ctVector3( const csDVector3 &csv ){ x = csv.x; y = csv.y; z = csv.z; }
+
+  void operator=( const csDVector3 &csv ){ x = csv.x; y = csv.y; z = csv.z; }
+
+	/// Returns n-th component of the vector
+  inline real & operator[](int n){return !n?x:n&1?y:z;}
+	/// Returns n-th component of the vector
+  inline real operator[](int n) const {return !n?x:n&1?y:z;}
+
+  ctMatrix3 operator*( const ctVectorTranspose3 &pvt );
+  
+  void cross(const ctVector3 & px, const ctVector3 & py){
+    x = px.y*py.z - px.z*py.y;
+    y = px.z*py.x - px.x*py.z;
+    z = px.x*py.y - px.y*py.x;
+  }
+
+  ctVector3 unit() const { return Unit(); } 
+
+  void normalize();
+  real length(){ return Norm(); }
+};
+*/
+#else
+
 class ctVector3
 {
 public:
@@ -299,6 +347,15 @@ inline ctVector3 ctVector3::unit() {
   return ((*this)/this->length() );
 }
 
+
+
+inline real ctVectorTranspose3::operator*( const ctVector3 &pv )
+{ 
+real dotp = 0.0;
+  for( int idx = 0; idx < 3; idx++ ) dotp += elements[idx] * pv[idx]; 
+  return dotp;
+}
+
 inline void ctVector3::normalize() {
 real len;
   len = this->length();
@@ -307,12 +364,8 @@ real len;
   
 }
 
-inline real ctVectorTranspose3::operator*( const ctVector3 &pv )
-{ 
-real dotp = 0.0;
-  for( int idx = 0; idx < 3; idx++ ) dotp += elements[idx] * pv[idx]; 
-  return dotp;
-}
+#endif
+
 
 
 //*************** VECTOR6
@@ -380,7 +433,6 @@ public:
 protected:
   real elements[ 6 ];
 };
-
 
 class ctVector6
 {
