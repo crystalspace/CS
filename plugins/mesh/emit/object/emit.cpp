@@ -630,26 +630,6 @@ void csEmitMeshObject::SetupObject ()
   }
 }
 
-
-/// particle backtofront sorting
-static int compareparticle(const void* p1, const void* p2)
-{
-  struct csEmitCompPart *cp1 = (struct csEmitCompPart*)p1;
-  struct csEmitCompPart *cp2 = (struct csEmitCompPart*)p2;
-  /// pos.z is smaller when close to camera.
-  /// bigger z's should be drawn first.
-  /// thus the bigger z should be considered first.
-  /// so if cp1.z > cp2.z --- return -1 (draw p1 before p2)
-  /// if cp1.z == cp2.z --- return 0 (same)
-  /// if cp1.z < cp2.z --- return +1 (draw p1 after p2)
-  /// this is the sign of cp2.z - cp1.z
-  float val = cp2->z - cp1->z;
-  if(val<0) return -1;
-  if(val>0) return +1;
-  return 0;
-}
-
-
 csEmitMeshObject::csEmitMeshObject (iObjectRegistry* object_reg,
   iMeshObjectFactory* factory)
 	: csParticleSystem (object_reg, factory)
