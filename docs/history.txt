@@ -631,11 +631,11 @@ Short-term cleanups that need to be done:
 	- Added error checking (at load time) on portals that go to
 	  unknown sectors.
 20-Apr-99:
-	- Fixed bug in 32-bit gouroud shader. There was an overflow
+	- Fixed bug in 32-bit gouraud shader. There was an overflow
 	  for lights that are too bright. There is still a problem though.
 	  On systems which don't group RGB as such the colors are wrong.
 	  Therefore we need to do a conversion before calling the
-	  gouroud shader.
+	  gouraud shader.
 19-Apr-99:
 	- Implemented support for up-side-down skydome (negative radius).
 	  There is still a small problem: the vertices have to be specified
@@ -1550,7 +1550,7 @@ Short-term cleanups that need to be done:
 	- Created 16-bit simulation of 32-bit mode.
 	- Implemented fog in 32-bit mode. This looks REALLY very nice but
 	  it could be faster.
-	- Implemented gouroud shaded triangle drawers in 32-bit mode.
+	- Implemented gouraud shaded triangle drawers in 32-bit mode.
 	- Still missing from 32-bit mode:
 		- alpha transparancy
 		- color 0 transparancy
@@ -1586,7 +1586,7 @@ Short-term cleanups that need to be done:
 	- Note: currently the only things that are supported in 32-bit
 	  mode are normal sector wall drawing and thing drawing. No fog,
 	  no alpha tranparancy, no unlighted textures, no sprites, no
-	  gouroud shaded triangles, ...
+	  gouraud shaded triangles, ...
 	- Because the texture cache needs to be larger in 32-bit mode (lighted
 	  textures are four times as large as with 8-bit mode) I changed the
 	  Cache size argument to mean the number of texels in the cache
@@ -2058,7 +2058,7 @@ Short-term cleanups that need to be done:
 		  can draw are convex clipped versions of a triangle. So
 		  DrawPolygonQuick is in fact a triangle drawer which can
 		  draw sub-parts of triangles.
-		- Can draw unlighted or lighted (using gouroud shading)
+		- Can draw unlighted or lighted (using gouraud shading)
 		  polygons.
 		- Texture mapping is specified by assigning texture coordinates
 		  to vertices.
@@ -2075,16 +2075,16 @@ Short-term cleanups that need to be done:
 	  System dependent networking drivers can be created and added
 	  dynamically to Crystal Space.
 2-Jan-99:
-	- Made gouroud shader more general: support for both 555 and 565
-	  color formats and support for Z buffer in gouroud shader (so it can
+	- Made gouraud shader more general: support for both 555 and 565
+	  color formats and support for Z buffer in gouraud shader (so it can
 	  also be used for Things).
 	- Use csColor in Light class instead of seperate red, green, and blue
 	  fields. This is cleaner.
-	- Implemented gouroud shading support for sprites. csSprite3D has a new
+	- Implemented gouraud shading support for sprites. csSprite3D has a new
 	  set_vertex_color function with which you can set the color of one
 	  vertex. This is initial support, we still need some lighting system
 	  so that we don't need to set the colors of every vertex ourselves.
-	- The static lighting system also affects gouroud shaded triangles now
+	- The static lighting system also affects gouraud shaded triangles now
 	  (but only on Things and Sectors, not on sprites or curves!). This is
 	  preliminary support. We still need support for dynamic lights and
 	  also the static lighting calculations are not remembered like the

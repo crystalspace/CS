@@ -59,13 +59,13 @@ CHANGES FROM 0.10 to 0.12
 
 - Optional halos around lights (only in 16-bit software mode right now).
 
-- Support for spherical sky mapping. The sky is dynamically gouroud shading
+- Support for spherical sky mapping. The sky is dynamically gouraud shading
   so you could make a sky which slowly changes color as the sun rises.
 
 - General curved surface support. Currently Bezier curves with 3x3 control
   points are supported but other curves can be implemented easily.
 
-- Support for gouroud shading triangles (16-bit mode only currently). This
+- Support for gouraud shading triangles (16-bit mode only currently). This
   can be used by sprites, curved surfaces and world triangles. Currently
   it is only supported for world triangles.
 

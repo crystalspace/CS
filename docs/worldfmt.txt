@@ -185,7 +185,7 @@ Internally it is exactly the same as saying VERTEX (...) VERTEX (...) ...
 A skydome (half-sphere):
 
 A skydome is a large short-cut for creating a complex half-sphere
-with gouroud shaded triangles. Note that you need to generate the
+with gouraud shaded triangles. Note that you need to generate the
 first circle of vertices using the 'CIRCLE' macro.
 
   <skydome-radius> ::= 'RADIUS' '(' <radius> ')'

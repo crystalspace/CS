@@ -43,8 +43,8 @@ Currently Crystal Space has the following features:
 	  transparent mirrors.
 	- Alpha transparency in combination with mirrors allows simulation
 	  of shining walls.
-	- You can also include gouroud shaded triangle in the world.
-	- Dynamic gouroud shaded sky spheres.
+	- You can also include gouraud shaded triangle in the world.
+	- Dynamic gouraud shaded sky spheres.
 	- Colored volumetric fog.
 	- Halos around lights.
 	- Curved surfaces (unlighted currently).
