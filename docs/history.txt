@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+31-May-2003
+	- Oktal fixed an error in the Perl plugin that only appeared with
+	  certain versions of Perl, to do with their funny macros.
 30-May-2003
 	- Philip Wyett added the CS copyright notice and moved the includes to
 	  the correct place in 'iddetect.h'.

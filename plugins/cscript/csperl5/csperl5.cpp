@@ -284,7 +284,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csPerl5::Object::Object (const csPerl5 *p, const char *t, SV *s)
 : parent ((csPerl5 *) p), type (strdup (t)),
-  stash (gv_stashpv (t, FALSE)), self (s)
+  stash (gv_stashpv (t, FALSE)), my_perl (parent->my_perl), self (s)
 {
   SCF_CONSTRUCT_IBASE (parent);
 

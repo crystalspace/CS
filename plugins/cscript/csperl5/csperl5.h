@@ -50,13 +50,12 @@ struct iObjectRegistry;
 
 class csPerl5 : public iScript
 {
-  PerlInterpreter *my_perl;
-
   class Object : public iScriptObject
   {
     csPerl5 *parent;
     char *type;
     HV *stash;
+    PerlInterpreter *my_perl;
 
   protected:
     SV *self;
@@ -142,6 +141,8 @@ class csPerl5 : public iScript
   friend struct eiComponent;
 
 protected:
+  PerlInterpreter *my_perl;
+
   csRef<iReporter> reporter;
 
   bool Init (iObjectRegistry *);
