@@ -188,7 +188,7 @@ public:
    * is normally called by csWorld::Prepare() so you only need
    * to worry about this function when you add sectors later.
    */
-  virtual void Prepare ();
+  virtual void Prepare (csSector* sector);
 
   /**
    * Add a sky to this sector.

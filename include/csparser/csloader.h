@@ -87,8 +87,8 @@ class csLoader
   /// Parse a map node definition and return a new object
   static csMapNode* load_node (char* name, char* buf, csSector* sec);
   /// Default handler for objects derived from polygon set
-  static csPolygonSet& ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
-    char* name, char* params);
+  static csPolygonSet& ps_process (csPolygonSet& ps, csSector* sector,
+      PSLoadInfo& info, int cmd, char* name, char* params);
   /// Parse the definition for a skydome and create the corresponding objects
   static void skydome_process (csSector& sector, char* name, char* buf,
     csMaterialWrapper* material);
@@ -101,7 +101,7 @@ class csLoader
   /// Parse a 3D polygon definition and return a new object
   static csPolygon3D* load_poly3d (char* polyname, char* buf,
     csMaterialWrapper* default_material, float default_texlen,
-    CLights* default_lightx, csSector* sec, csPolygonSet* parent);
+    CLights* default_lightx, csPolygonSet* parent);
   /// Parse a Bezier surface definition and return a new object
   static csCurve* load_bezier (char* polyname, char* buf,
     csMaterialWrapper* default_material, float default_texlen,

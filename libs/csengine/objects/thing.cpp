@@ -490,7 +490,8 @@ void csThing::InitLightMaps (bool do_cache)
   for (i = 0 ; i < polygons.Length () ; i++)
     polygons.Get (i)->InitLightMaps (this, do_cache, i);
   for (i = 0 ; i < GetNumCurves () ; i++)
-    curves.Get (i)->InitLightMaps (this, do_cache, polygons.Length ()+i);
+    curves.Get (i)->InitLightMaps (this, GetSector (),
+	do_cache, polygons.Length ()+i);
 }
 
 void csThing::CacheLightMaps ()

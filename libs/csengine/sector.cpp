@@ -76,7 +76,7 @@ csSector::csSector (csWorld* world) : csPolygonSet (world)
   CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   first_thing = NULL;
   first_sky = NULL;
-  sector = this;
+  //sector = this;
   beam_busy = 0;
   level_r = level_g = level_b = 0;
   static_tree = NULL;
@@ -112,19 +112,19 @@ csSector::~csSector ()
   terrains.DeleteAll ();
 }
 
-void csSector::Prepare ()
+void csSector::Prepare (csSector*)
 {
-  csPolygonSet::Prepare ();
+  csPolygonSet::Prepare (this);
   csThing* th = first_thing;
   while (th)
   {
-    th->Prepare ();
+    th->Prepare (this);
     th = (csThing*)(th->GetNext ());
   }
   th = first_sky;
   while (th)
   {
-    th->Prepare ();
+    th->Prepare (this);
     th = (csThing*)(th->GetNext ());
   }
 }
@@ -455,7 +455,7 @@ csSector* csSector::FollowSegment (csReversibleTransform& t,
   csVector3& new_position, bool& mirror)
 {
   csVector3 isect;
-  csPolygon3D* p = sector->IntersectSegment (t.GetOrigin (), new_position, isect);
+  csPolygon3D* p = IntersectSegment (t.GetOrigin (), new_position, isect);
   csPortal* po;
 
   if (p)
@@ -860,6 +860,7 @@ void csSector::Draw (csRenderView& rview)
   UpdateTransformation (rview);
   Stats::polygons_considered += polygons.Length ();
   int i;
+  rview.this_sector = this;
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
 
@@ -1124,8 +1125,7 @@ void csSector::Draw (csRenderView& rview)
     // In those cases we draw the sprite anyway. @@@ Note that we should
     // draw it clipped (in 3D) to the portal polygon. This is currently not
     // done.
-    csSector* previous_sector = rview.portal_polygon ?
-    	rview.portal_polygon->GetSector () : (csSector*)NULL;
+    csSector* previous_sector = rview.previous_sector;
 
     int spr_num;
     if (sprite_queue) spr_num = num_sprite_queue;

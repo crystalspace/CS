@@ -123,6 +123,16 @@ public:
   csPolygon3D* portal_polygon;
 
   /**
+   * The previous sector (or NULL if the first sector).
+   */
+  csSector* previous_sector;
+
+  /**
+   * This sector.
+   */
+  csSector* this_sector;
+
+  /**
    * This variable holds the plane of the portal through which the camera
    * is looking.
    */

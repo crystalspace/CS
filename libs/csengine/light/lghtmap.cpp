@@ -210,7 +210,7 @@ void CacheName (char *buf, csPolygonSet *owner, int index, char *suffix)
 
   if (owner->GetType () == csThing::Type)
   {
-    const char* pname = owner->GetSector ()->GetName ();
+    const char* pname = ((csThing*)owner)->GetSector ()->GetName ();
     if (!pname)
       CsPrintf (MSG_WARNING, "Lighting cache is used while some objects don't have names!\n");
     sprintf (buf, "lm/%s_%s_%d%s", pname ? pname : ".", name ? name : ".", index, suffix);

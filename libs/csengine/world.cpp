@@ -134,6 +134,11 @@ csPolygon3D* csPolyIt::Fetch ()
     thing->GetPolygon3D (polygon_idx) : sector->GetPolygon3D (polygon_idx);
 }
 
+csSector* csPolyIt::GetLastSector ()
+{
+  return (csSector*)(world->sectors[sector_idx]);
+}
+
 //--------------------- csCurveIt -------------------------------------------
 
 csCurveIt::csCurveIt (csWorld* w) : world(w)
@@ -890,7 +895,7 @@ void csWorld::PrepareSectors()
   for (int i = 0 ; i < sectors.Length () ; i++)
   {
     csSector* s = (csSector*)sectors[i];
-    s->Prepare ();
+    s->Prepare (s);
   }
 }
 

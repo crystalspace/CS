@@ -90,7 +90,7 @@ csPolygonSet::csPolygonSet (csWorld* world) : csObject(),
 
   next = NULL;
   parent = NULL;
-  sector = NULL;
+  //sector = NULL;
   csPolygonSet::world = world;
 }
 
@@ -103,14 +103,14 @@ csPolygonSet::~csPolygonSet ()
   delete bbox;
 }
 
-void csPolygonSet::Prepare ()
+void csPolygonSet::Prepare (csSector* sector)
 {
   int i;
   csPolygon3D* p;
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     p = polygons.Get (i);
-    p->Finish ();
+    p->Finish (sector);
   }
 }
 
@@ -321,7 +321,7 @@ iPolygon3D *csPolygonSet::PolySet::GetPolygon (int idx)
 csPolygon3D* csPolygonSet::NewPolygon (csMaterialWrapper* material)
 {
   csPolygon3D* p = new csPolygon3D (material);
-  p->SetSector (sector);
+  //p->SetSector (sector);
   AddPolygon (p);
   return p;
 }
@@ -330,7 +330,7 @@ iPolygon3D *csPolygonSet::PolySet::CreatePolygon (const char *iName)
 {
   csPolygon3D *p = new csPolygon3D ((csMaterialWrapper *)NULL);
   p->SetName (iName);
-  p->SetSector (scfParent->sector);
+  //p->SetSector (scfParent->sector);
   scfParent->AddPolygon (p);
   iPolygon3D *ip = QUERY_INTERFACE (p, iPolygon3D);
   p->DecRef ();
@@ -406,7 +406,7 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
   {
     bool filtered = false;
     // is_this_fog is true if this sector is fogged.
-    bool is_this_fog = sector->HasFog ();
+    bool is_this_fog = d->this_sector->HasFog ();
 
     // If there is filtering (alpha mapping or something like that) we need
     // to keep the texture plane so that it can be drawn after the sector has
@@ -431,7 +431,7 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
       {
 	if (filtered) poly->DrawFilled (d, p, keep_plane, use_z_buf);
 	if (is_this_fog) poly->AddFogPolygon (d->g3d, p, keep_plane,
-		d->IsMirrored (), sector->GetID (), CS_FOG_BACK);
+		d->IsMirrored (), d->this_sector->GetID (), CS_FOG_BACK);
 	// Here we z-fill the portal contents to make sure that sprites
 	// that are drawn outside of this portal cannot accidently cross
 	// into the others sector space (we cannot trust the Z-buffer here).

@@ -247,7 +247,8 @@ public:
   ///
   virtual void Normal (csVector3& vec, double u, double v);
   ///
-  void InitLightMaps (csPolygonSet* owner, bool do_cache, int index);
+  void InitLightMaps (csPolygonSet* owner, csSector* sector,
+      bool do_cache, int index);
 
   /// Add a lightpatch to this curves list of light patches
   void AddLightPatch (csLightPatch* lp);

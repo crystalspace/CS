@@ -80,7 +80,8 @@ void csRenderView::SetFOV (int a)
 
 csRenderView::csRenderView () :
     csCamera (), world (NULL), view (NULL), g3d (NULL), g2d (NULL),
-    portal_polygon (NULL), do_clip_plane (false), do_clip_frustum (false),
+    portal_polygon (NULL), previous_sector (NULL), this_sector (NULL),
+    do_clip_plane (false), do_clip_frustum (false),
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
@@ -89,7 +90,8 @@ csRenderView::csRenderView () :
 
 csRenderView::csRenderView (const csCamera& c) :
     csCamera (c), world (NULL), view (NULL), g3d (NULL), g2d (NULL),
-    portal_polygon (NULL), do_clip_plane (false), do_clip_frustum (false),
+    portal_polygon (NULL), previous_sector (NULL), this_sector (NULL),
+    do_clip_plane (false), do_clip_frustum (false),
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
@@ -99,7 +101,8 @@ csRenderView::csRenderView (const csCamera& c) :
 csRenderView::csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
     iGraphics2D* ig2d) :
     csCamera (c), world (NULL), view (v), g3d (ig3d), g2d (ig2d),
-    portal_polygon (NULL), do_clip_plane (false), do_clip_frustum (false),
+    portal_polygon (NULL), previous_sector (NULL), this_sector (NULL),
+    do_clip_plane (false), do_clip_frustum (false),
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {

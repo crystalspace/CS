@@ -1,5 +1,25 @@
 The history order has been reversed so that new features are at the top.
 
+26-Aug-2000
+	- Added a new csMovable class which encapsulates moving entities.
+	  It does not hold geometry but everything needed to do the
+	  object to world transformation and move that around.
+	  Class is not yet used but preparation work for the usage
+	  of this class has started. The main benefit of this class will
+	  be to make sure that the API for moving sprites and things
+	  is the same by putting that API in a seperate class.
+	- Removed strange 'sector' pointer from csPolygonSet and put it
+	  in csThing instead. Sectors don't have a need for a 'sector'
+	  pointer as this is equal to 'this'. Also this will make it easier
+	  to use the new csMovable.
+	- Removed 'sector' pointer from csPolygon3D because it is unused
+	  and dangerous (redundant) to keep it there since this information
+	  is implicit in the parent of the polygon (which can move to another
+	  sector). (note: this also removed SetSector() and GetSector()
+	  calls). This removal had lots of repercusions in the entire
+	  engine so several things have been slightly rewritten.
+	- csRenderView now contains a this_sector and previous_sector pointer
+	  (also triggered by the removal of csPolygon3D::sector).
 25-Aug-2000
 	- Andrew Zabolotny implemented the following for levtool:
 	  - Implemented the per-window key handling.

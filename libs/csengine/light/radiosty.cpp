@@ -364,9 +364,10 @@ csRadElement* csRadElement::GetRadElement(csCurve &object)
 
 IMPLEMENT_CSOBJTYPE(csRadPoly, csObject);
 
-csRadPoly :: csRadPoly(csPolygon3D *original)
+csRadPoly :: csRadPoly(csPolygon3D *original, csSector* sector)
 : csRadElement()
 {
+  csRadPoly::sector = sector;
   polygon = original;
   polygon->ObjAdd(this); // attach to original
   area = original->GetArea();
@@ -802,7 +803,7 @@ csRadiosity :: csRadiosity(csWorld *current_world)
          poly->GetLightMapInfo() && // only for lightmapped polys
          poly->GetLightMapInfo()->GetPolyTex()->GetCSLightMap())
     {
-      list->InsertElement(new csRadPoly(poly));
+      list->InsertElement(new csRadPoly(poly, poly_it.GetLastSector ()));
     }
   }
 

@@ -290,6 +290,7 @@ class csRadPoly : public csRadElement
 {
 private:
   csPolygon3D* polygon;
+  csSector* sector;
   csVector3 lumel_origin, lumel_x_axis, lumel_y_axis;
 
 protected:
@@ -304,7 +305,7 @@ protected:
   virtual void Setup();
 
 public:
-  csRadPoly(csPolygon3D *original);
+  csRadPoly(csPolygon3D *original, csSector* sector);
   ~csRadPoly();
 
   /// get normal vector for polygon 
@@ -320,7 +321,7 @@ public:
   /// Get world coordinates for a lumel
   virtual void Lumel2World(csVector3& res, int x, int y);
 
-  csSector* GetSector () const { return polygon->GetSector (); }
+  csSector* GetSector () const { return sector; }
 
   /// Populates the shadow coverage Matrix for this element
   virtual void GetCoverageMatrix(csFrustumView* lview, 

@@ -134,7 +134,7 @@ protected:
   csCurvesArray curves;
 
   /// csSector where this polyset belongs (pointer to 'this' if it is a sector).
-  csSector* sector;
+  //csSector* sector;
 
   /// Optional oriented bounding box.
   csPolygonSetBBox* bbox;
@@ -242,7 +242,7 @@ public:
    * to worry about this function when you add sectors or things
    * later.
    */
-  virtual void Prepare ();
+  virtual void Prepare (csSector* sector);
 
   /// Just add a new vertex to the polygonset.
   int AddVertex (const csVector3& v) { return AddVertex (v.x, v.y, v.z); }
@@ -418,10 +418,10 @@ public:
    * This is either the polygonset itself if it is a sector
    * or else the sector that this thing is in.
    */
-  virtual void SetSector (csSector* sector) { csPolygonSet::sector = sector; }
+  //virtual void SetSector (csSector* sector) { csPolygonSet::sector = sector; }
 
   /// Return the sector that this polygonset belongs to.
-  csSector* GetSector () { return sector; }
+  //csSector* GetSector () { return sector; }
 
   /**
    * Return a list of shadow frustums which extend from

@@ -470,19 +470,9 @@ private:
   csPolyIndexed vertices;
 
   /**
-   * The following two fields are somewhat related. 'poly_set' is the real
-   * parent (container) of this polygon. It is either a 3D thing or a sector.
-   * 'sector' is always a sector. If this polygon belongs to a sector ('poly_set'
-   * is a sector) then 'sector' will have the same value as 'poly_set'. If
-   * this polygon belongs to a thing then 'sector' will be set to the sector
-   * containing the thing.<p>
-   *
-   * @@@ Note! We have to reconsider this. If a thing moves to another sector
-   * we would have to update this variable for all polygons of the thing.
+   * The physical parent (thing or sector) of this polygon.
    */
   csPolygonSet* poly_set;
-  /// The csSector that this polygon is in.
-  csSector* sector;
 
   /**
    * If not-null, this polygon is a portal.
@@ -703,7 +693,7 @@ public:
    * polygon (using the copy constructor) or if you change the vertices
    * in a polygon.
    */
-  void Finish ();
+  void Finish (csSector* sector);
 
   /**
    * If the polygon is a portal this will set the sector
@@ -731,16 +721,6 @@ public:
    * Get the polygonset (container) that this polygons belongs to.
    */
   csPolygonSet* GetParent () { return poly_set; }
-
-  /**
-   * Get the sector that this polygon belongs to.
-   */
-  csSector* GetSector () { return sector; }
-
-  /**
-   * Set the sector that this polygon belongs to.
-   */
-  void SetSector (csSector* sector) { csPolygon3D::sector = sector; }
 
   /**
    * Return the plane of this polygon. This function returns

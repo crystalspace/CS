@@ -158,6 +158,9 @@ public:
 
   /// Get polygon from iterator. Return NULL at end.
   csPolygon3D* Fetch ();
+
+  /// Get the sector for the last fetched polygon.
+  csSector* GetLastSector ();
 };
 
 /**

@@ -214,7 +214,7 @@ csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
 
   portal = NULL;
 
-  sector = NULL;
+  //sector = NULL;
   orig_poly = NULL;
   txt_share_list = NULL;
 
@@ -234,7 +234,7 @@ csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
 }
 
 csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
-  csObject (), vertices (4)
+  iBase (), csObject (), vertices (4)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
@@ -243,7 +243,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
   if (tname) SetName (tname);
 
   poly_set = poly.poly_set;
-  sector = poly.sector;
+  //sector = poly.sector;
 
   portal = poly.portal;
 
@@ -405,8 +405,9 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
     sideA = sideB;
   }
 
-  np1->Finish ();
-  np2->Finish ();
+  //@@@ Not needed?
+  //np1->Finish ();
+  //np2->Finish ();
 }
 
 bool csPolygon3D::Overlaps (csPolygonInt* overlapped)
@@ -586,7 +587,7 @@ void csPolygon3D::HardTransform (const csReversibleTransform& t)
 #define TEXW(t)	((t)->w_orig)
 #define TEXH(t)	((t)->h)
 
-void csPolygon3D::Finish ()
+void csPolygon3D::Finish (csSector* sector)
 {
   if (orig_poly) return;
 #ifdef DO_HW_UVZ
@@ -638,7 +639,7 @@ void csPolygon3D::Finish ()
     csLightMap *lm = new csLightMap ();
     lmi->tex->SetLightMap (lm);
     int r, g, b;
-    GetSector ()->GetAmbientColor (r, g, b);
+    sector->GetAmbientColor (r, g, b);
     lm->Alloc (lmi->tex->w_orig, lmi->tex->h, r, g, b);
     lm->DecRef ();
   }
@@ -1828,6 +1829,8 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   {
     // If there is no portal we simulate radiosity by creating
     // a dummy portal for this polygon which reflects light.
+#if 0
+    //@@@ DISABLED FOR NOW. WAS BROKEN ANYWAY.
     csPortal mirror;
     mirror.SetSector (GetSector ());
     UByte r, g, b;
@@ -1835,6 +1838,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
     mirror.SetFilter (r/1000., g/1000., b/1000.);
     mirror.SetWarp (csTransform::GetReflect (*GetPolyPlane ()));
     mirror.CheckFrustum (new_lview, 10);
+#endif
   }
 }
 

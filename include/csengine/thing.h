@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -85,6 +85,9 @@ private:
   /// World to object transformation.
   csReversibleTransform obj;
 
+  /// csSector where this polyset belongs (pointer to 'this' if it is a sector).
+  csSector* sector;
+
   /// If convex, this holds the index to the center vertex.
   int center_idx;
 
@@ -125,11 +128,15 @@ public:
   virtual ~csThing ();
 
   /// Set the sector for this thing.
-  virtual void SetSector (csSector* sector)
+  void SetSector (csSector* sector)
   {
-    csPolygonSet::SetSector (sector);
+    //csPolygonSet::SetSector (sector);
+    csThing::sector = sector;
     UpdateInPolygonTrees ();
   }
+
+  /// Return the sector that this polygonset belongs to.
+  csSector* GetSector () { return sector; }
 
   /**
    * Set convexity flag of this thing. You should call this instead

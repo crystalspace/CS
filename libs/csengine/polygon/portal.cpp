@@ -96,7 +96,7 @@ void csPortal::WarpSpace (csReversibleTransform& t, bool& mirror)
 }
 
 bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
-	csRenderView& rview)
+    	csRenderView& rview)
 {
   if (!sector) CompleteSector ();
 
@@ -147,6 +147,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   new_rview.view = &new_view;
   new_rview.added_fog_info = false;
   new_rview.portal_polygon = portal_polygon;
+  new_rview.previous_sector = rview.this_sector;
   new_rview.clip_plane = portal_polygon->GetPlane ()->GetCameraPlane();
   new_rview.clip_plane.Invert ();
   if (flags.Check (CS_PORTAL_CLIPDEST)) new_rview.do_clip_plane = true;

@@ -266,15 +266,14 @@ void csCurve::Normal (csVector3& /*vec*/, double /*u*/, double /*v*/)
 // #define CURVE_LM_SIZE 32
 #define CURVE_LM_SIZE (8 - 2) /*this is the real value - 2*/
 
-void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
+void csCurve::InitLightMaps (csPolygonSet* owner, csSector* sector,
+    	bool do_cache, int index)
 {
   if (!IsLightable ()) return;
   lightmap = new csLightMap ();
 
   // Allocate space for the lightmap and initialize it current sector ambient color.
   int r, g, b;
-  csSector* sector = owner->GetSector ();
-  if (!sector) sector = (csSector*)owner;
   sector->GetAmbientColor (r, g, b);
   lightmap->Alloc (CURVE_LM_SIZE*csLightMap::lightcell_size, 
                    CURVE_LM_SIZE*csLightMap::lightcell_size, r, g, b);

@@ -1937,7 +1937,7 @@ void Blocks::ChangePlaySize (int new_size)
   player1->zone_dim = new_size;
   WriteConfig ();
   InitGameRoom ();
-  room->Prepare ();
+  room->Prepare (room);
   room->InitLightMaps (false);
   room->ShineLights ();
   room->CreateLightMaps (Gfx3D);

@@ -1193,8 +1193,8 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
 
 //---------------------------------------------------------------------------
 
-csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info,
-  int cmd, char* name, char* params)
+csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
+    PSLoadInfo& info, int cmd, char* name, char* params)
 {
   TOKEN_TABLE_START (tok_matvec)
     TOKEN_TABLE (MATRIX)
@@ -1246,7 +1246,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info,
       {
 	csPolygon3D* poly3d = load_poly3d (name, params,
           info.default_material, info.default_texlen,
-          info.default_lightx, ps.GetSector (), &ps);
+          info.default_lightx, &ps);
 	if (poly3d)
 	{
 	  ps.AddPolygon (poly3d);
@@ -1292,7 +1292,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info,
       //CsPrintf(MSG_WARNING,"Encountered curve!\n");
       ps.AddCurve (load_bezier (name, params,
         info.default_material, info.default_texlen,
-        info.default_lightx, ps.GetSector (), &ps) );
+        info.default_lightx, sector, &ps) );
       csLoaderStat::curves_loaded++;
       break;
 
@@ -1743,7 +1743,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
         load_key(params, thing);
         break;
       default:
-        ps_process (*thing, info, cmd, xname, params);
+        ps_process (*thing, sec, info, cmd, xname, params);
         break;
     }
   }
@@ -1773,7 +1773,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
 
 csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   csMaterialWrapper* default_material, float default_texlen,
-  CLights* default_lightx, csSector* sec, csPolygonSet* parent)
+  CLights* default_lightx, csPolygonSet* parent)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXNR)
@@ -1838,7 +1838,6 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   poly3d->SetName (polyname);
 
   csMaterialWrapper* mat = NULL;
-  poly3d->SetSector (sec);
   poly3d->SetParent (parent);
 
   bool tx1_given = false, tx2_given = false;
@@ -4283,7 +4282,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       }
       default:
-        ps_process (*sector, info, cmd, name, params);
+        ps_process (*sector, sector, info, cmd, name, params);
         break;
     }
   }
@@ -4413,7 +4412,6 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       sprintf (end_poly_name, "%d_%d_A", i, j);
       csPolygon3D* p = new csPolygon3D (material);
       p->SetName (poly_name);
-      p->SetSector (&sector);
       p->SetParent (&sector);
       p->flags.Set (CS_POLY_LIGHTING, lighting_flags);
       p->SetCosinusFactor (1);
@@ -4433,7 +4431,6 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       sprintf (end_poly_name, "%d_%d_B", i, j);
       p = new csPolygon3D (material);
       p->SetName (poly_name);
-      p->SetSector (&sector);
       p->SetParent (&sector);
       p->flags.Set (CS_POLY_LIGHTING, lighting_flags);
       p->SetCosinusFactor (1);
@@ -4475,7 +4472,6 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
     sprintf (end_poly_name, "%d_%d", num/2, j);
     csPolygon3D* p = new csPolygon3D (material);
     p->SetName (poly_name);
-    p->SetSector (&sector);
     p->SetParent (&sector);
     p->flags.Set (CS_POLY_LIGHTING, lighting_flags);
     p->SetCosinusFactor (1);
