@@ -121,6 +121,7 @@ class csGLRender3D : public iRender3D
 
   int stencilclipnum;
   bool stencil_enabled;
+  bool clip_planes_enabled;
   char clip_outer[3];
   csRef<iClipper2D> clipper;
   int cliptype;

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "iutil/vfs.h"
+#include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
@@ -26,6 +27,7 @@
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
+#include "igeom/clip2d.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
@@ -196,12 +198,12 @@ void R3DTest::SetupFrame ()
   r3d->SetPerspectiveAspect (r3d->GetDriver2D ()->GetHeight ());
   r3d->SetPerspectiveCenter (r3d->GetDriver2D ()->GetWidth ()/2,
                              r3d->GetDriver2D ()->GetHeight ()/2);
+
   // Tell 3D driver we're going to display 3D things.
   if (!r3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER))
     return;
 
   csRenderMesh mesh;
-
   mesh.SetIndexRange (0, 36);
   mesh.SetMaterialWrapper (matwrap);
   mesh.SetStreamSource (testmesh);
@@ -210,17 +212,29 @@ void R3DTest::SetupFrame ()
   csReversibleTransform trans;
   static float a = 0;
 
+  /*csVector2 clipshape[10];
+  clipshape[0] = csVector2 (sin(a*5.0)*100.0+200, 100);
+  clipshape[1] = csVector2 (sin(a*5.0+0.5)*100.0+150, 200);
+  clipshape[2] = csVector2 (sin(a*5.0+1.0)*100.0+300, 300);
+  clipshape[3] = csVector2 (sin(a*5.0+1.5)*100.0+450, 200);
+  clipshape[4] = csVector2 (sin(a*5.0+2.0)*100.0+400, 100);
+  csPolygonClipper polyclip (clipshape, 5);
+  csRef<iClipper2D> clipper = SCF_QUERY_INTERFACE (&polyclip, iClipper2D);
+  r3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);*/
+
   a += speed;
   trans.RotateOther (csVector3 (1,0,0), a*2.0);
   trans.RotateOther (csVector3 (0,1,0), a*1.5);
   trans.RotateOther (csVector3 (0,0,1), a*1.0);
-  trans.SetOrigin (csVector3 (0,0,sin(a*10.0)*5));
+  trans.SetOrigin (csVector3 (0,0,5));
   trans = trans.GetInverse ();
   r3d->SetObjectToCamera (&trans);
-  r3d->DrawMesh (&mesh, CS_ZBUF_NONE, CS_CLIP_NOT, CS_CLIP_NOT, CS_CLIP_NOT);
+  r3d->DrawMesh (&mesh, CS_ZBUF_NONE, CS_CLIP_TOPLEVEL, CS_CLIP_NOT, CS_CLIP_NOT);
 
   // Tell the camera to render into the frame buffer.
   //view->Draw ();
+
+  //r3d->SetClipper (NULL, CS_CLIPPER_NONE);
 
   r3d->FinishDraw ();
 
