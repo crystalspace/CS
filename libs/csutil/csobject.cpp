@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-CS_DECLARE_TYPED_VECTOR_DECREF (csObjectContainer, iObject);
+CS_DECLARE_TYPED_IBASE_VECTOR (csObjectContainer, iObject);
 
 /*** Object Iterators ***/
 
@@ -165,7 +165,6 @@ void csObject::ObjAdd (iObject *obj)
   if (!Children)
     Children = new csObjectContainer ();
 
-  obj->IncRef ();
   obj->SetObjectParent (this);
   Children->Push (obj);
 }
@@ -179,8 +178,7 @@ void csObject::ObjRemove (iObject *obj)
   if (n>=0)
   {
     obj->SetObjectParent (NULL);
-    /* @@@ why GetRefCount() ? */
-    Children->Delete (n, (bool)obj->GetRefCount());
+    Children->Delete (n);
   }
 }
 
@@ -193,7 +191,8 @@ void csObject::ObjReleaseOld (iObject *obj)
   if (n>=0)
   {
     obj->SetObjectParent (NULL);
-    Children->Delete (n, false);
+    obj->IncRef ();
+    Children->Delete (n);
   }
 }
 
@@ -206,8 +205,7 @@ void csObject::ObjRemoveAll ()
   {
     iObject* child = Children->Get (i);
     child->SetObjectParent (NULL);
-    /* @@@ why GetRefCount() ? */
-    Children->Delete (i, (bool)child->GetRefCount ());
+    Children->Delete (i);
   }
 }
 
