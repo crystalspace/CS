@@ -202,7 +202,7 @@ void csObject::ObjRemoveAll ()
     return;
 
   int i;
-  for (i=0; i < Children->Length (); i++)
+  for (i=Children->Length ()-1; i>=0; i--)
   {
     iObject* child = Children->Get (i);
     child->SetObjectParent (NULL);
