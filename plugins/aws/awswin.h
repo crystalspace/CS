@@ -211,7 +211,7 @@ public:
 };
 
 
-class awsWindowFactory : awsComponentFactory
+class awsWindowFactory : public awsComponentFactory
 {
 public:
 	awsWindowFactory(iAws *wmgr);

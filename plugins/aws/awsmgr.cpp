@@ -60,11 +60,6 @@
 //#define DEBUG_MANAGER
 
 // Implementation //////////////////////////////////////////////////////
-awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
-{
-  factory->DecRef ();
-}
-
 awsManager::awsManager (iBase *p) :
   prefmgr(NULL),
   sinkmgr(NULL),
@@ -1138,35 +1133,41 @@ void awsManager::RaiseComponents(iAwsComponent* comp)
   }
 }
 
+#define RegisterFactory(factoryclass)	\
+  factory = new factoryclass(this);  \
+  factory->DecRef ();
+
 void awsManager::RegisterCommonComponents ()
 {
   //   Components register themselves into the window manager.  Just creating a factory
   // takes care of all the implementation details.  There's nothing else you need to do.
-  (void)new awsCmdButtonFactory (this);
-  (void)new awsLabelFactory (this);
-  (void)new awsTextBoxFactory (this);
-  (void)new awsRadButtonFactory (this);
-  (void)new awsCheckBoxFactory (this);
-  (void)new awsGroupFrameFactory (this);
-  (void)new awsListBoxFactory (this);
-  (void)new awsScrollBarFactory (this);
-  (void)new awsBarChartFactory (this);
-  (void)new awsStatusBarFactory (this);
-  (void)new awsNotebookFactory (this);
-  (void)new awsNotebookPageFactory (this);
-  (void)new awsNotebookButtonFactory (this);
-  (void)new awsWindowFactory (this);
-  (void)new awsEngineViewFactory(this);
-  (void)new awsImageViewFactory (this);
-  (void)new awsMultiLineEditFactory (this);
-  (void)new awsControlBarFactory(this);
-  (void)new awsPopupMenuFactory(this);
-  (void)new awsMenuEntryFactory(this);
-  (void)new awsMenuBarFactory(this);
-  (void)new awsMenuBarEntryFactory(this);
+  iAwsComponentFactory* factory;
+  RegisterFactory (awsCmdButtonFactory);
+  RegisterFactory (awsLabelFactory);
+  RegisterFactory (awsTextBoxFactory);
+  RegisterFactory (awsRadButtonFactory);
+  RegisterFactory (awsCheckBoxFactory);
+  RegisterFactory (awsGroupFrameFactory);
+  RegisterFactory (awsListBoxFactory);
+  RegisterFactory (awsScrollBarFactory);
+  RegisterFactory (awsBarChartFactory);
+  RegisterFactory (awsStatusBarFactory);
+  RegisterFactory (awsNotebookFactory);
+  RegisterFactory (awsNotebookPageFactory);
+  RegisterFactory (awsNotebookButtonFactory);
+  RegisterFactory (awsWindowFactory);
+  RegisterFactory (awsEngineViewFactory);
+  RegisterFactory (awsImageViewFactory);
+  RegisterFactory (awsMultiLineEditFactory);
+  RegisterFactory (awsControlBarFactory);
+  RegisterFactory (awsPopupMenuFactory);
+  RegisterFactory (awsMenuEntryFactory);
+  RegisterFactory (awsMenuBarFactory);
+  RegisterFactory (awsMenuBarEntryFactory);
+  factory = new awsComponentFactory (this);
+  RegisterComponentFactory (factory, "awsComponent");
+  factory->DecRef ();
   
-  RegisterComponentFactory (new awsComponentFactory (this), "awsComponent");
-
   // Standard sink
   GetSinkMgr ()->RegisterSink ("awsStandardSink", new awsStandardSink (this));
 

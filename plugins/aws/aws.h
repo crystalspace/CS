@@ -108,7 +108,6 @@ private:
     */
   struct awsComponentFactoryMap
   {
-    ~awsComponentFactoryMap();
     iAwsComponentFactory *factory;
     unsigned long id;
   };
