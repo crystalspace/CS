@@ -145,6 +145,8 @@ struct csRGBpixel
       green += c.green;
       blue  += c.blue;
   }
+  void UnsafeAdd(const csRGBcolor&c)
+  { *(uint32*)this += *(uint32*)&c; }
 };
 
 // We don't need RGB_MASK anymore
