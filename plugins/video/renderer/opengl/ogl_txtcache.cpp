@@ -822,11 +822,11 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
     else
       clm->lm_scale_v = 1. / (lm_high_v - lm_low_v);
 
-    lm_low_u -= .75 / (double (lmwidth) * clm->lm_scale_u);
-    lm_high_u += .75 / (double (lmwidth) * clm->lm_scale_u);
+    lm_low_u -= .75 / (float (lmwidth) * clm->lm_scale_u);
+    lm_high_u += .75 / (float (lmwidth) * clm->lm_scale_u);
 
-    lm_low_v -= .75 / (double (lmheight) * clm->lm_scale_v);
-    lm_high_v += .75 / (double (lmheight) * clm->lm_scale_v);
+    lm_low_v -= .75 / (float (lmheight) * clm->lm_scale_v);
+    lm_high_v += .75 / (float (lmheight) * clm->lm_scale_v);
 
     clm->lm_scale_u = 1.00 / (lm_high_u - lm_low_u);
     clm->lm_scale_v = 1.00 / (lm_high_v - lm_low_v);

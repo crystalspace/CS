@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+6-Jun-2002
+	- Changed 'double' to 'float' in OpenGL renderer texture cache.
 5-Jun-2002
 	- Thanks to the extensive research and coding efforts of Toni
 	  I managed to fix up static lighting so that it gives more correct
