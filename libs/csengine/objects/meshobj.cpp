@@ -81,6 +81,7 @@ csMeshWrapper::csMeshWrapper (
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
   children.SetMesh (this);
   imposter_active = false;
+  imposter_mesh = NULL;
 }
 
 csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
@@ -96,6 +97,8 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   defered_lighting_flags = 0;
   last_anim_time = 0;
   is_visible = false;
+  imposter_active = false;
+  imposter_mesh = NULL;
   wor_bbox_movablenr = -1;
   Parent = theParent;
   movable.SetMeshWrapper (this);
@@ -124,6 +127,8 @@ csMeshWrapper::~csMeshWrapper ()
     iMeshDrawCallback* cb = (iMeshDrawCallback*)draw_cb_vector.Get (i);
     cb->DecRef ();
   }
+  if (imposter_mesh)
+      delete imposter_mesh;
 }
 
 void csMeshWrapper::UpdateMove ()
@@ -225,6 +230,30 @@ void csMeshWrapper::Draw (iRenderView *rview)
 
 void csMeshWrapper::DrawInt (iRenderView *rview)
 {
+  if (imposter_active && CheckImposterRelevant(rview) )
+    if (DrawImposter (rview))
+	return;
+  
+  DrawIntFull (rview);
+}
+
+bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
+{
+  iCamera* camera = rview->GetCamera ();
+  // calculate distance from camera to mesh
+  csBox3 obox;
+  GetWorldBoundingBox (obox);
+  csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
+  csVector3 wor_center = movable.GetFullTransform ().This2Other (obj_center);
+  csVector3 cam_origin = camera->GetTransform ().GetOrigin ();
+  float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
+  float dist = min_imposter_distance->Get ();
+
+  return (wor_sq_dist > dist*dist);
+}
+
+void csMeshWrapper::DrawIntFull (iRenderView *rview)
+{
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
   if (rview->GetCallback ())
   {
@@ -271,6 +300,37 @@ void csMeshWrapper::DrawInt (iRenderView *rview)
   {
     iMeshWrapper *spr = children.Get (i);
     spr->Draw (rview);
+  }
+}
+
+bool csMeshWrapper::DrawImposter (iRenderView *rview)
+{
+  // Check for imposter existence.  If not, create it.
+  if (!imposter_mesh)
+  {
+      return false;
+
+  }
+  // Check for imposter already ready
+  if (!imposter_mesh->GetImposterReady())
+      return false;
+
+  // Check for too much camera movement since last imposter render
+  if (!imposter_mesh->CheckIncidenceAngle(rview, imposter_rotation_tolerance->Get () ))
+      return false;
+
+  // Else draw imposter as-is.
+  imposter_mesh->Draw (rview);
+  return true;
+}
+
+void csMeshWrapper::SetImposterActive(bool flag,iObjectRegistry *objreg)
+{ 
+  imposter_active = flag;
+  if (flag)
+  {
+    imposter_mesh = new csImposterMesh (this,objreg);
+    imposter_mesh->SetImposterReady (false);
   }
 }
 

@@ -31,6 +31,7 @@
 #include "iengine/viscull.h"
 #include "iengine/imposter.h"
 #include "ivideo/graph3d.h"
+#include "csengine/impmesh.h"
 
 struct iMeshWrapper;
 struct iRenderView;
@@ -223,6 +224,8 @@ private:
   /// Imposter Redo Threshold angle change
   csRef<iSharedVariable> imposter_rotation_tolerance;
 
+  csImposterMesh *imposter_mesh;
+
 public:
   /// Set of flags
   csFlags flags;
@@ -244,9 +247,8 @@ protected:
   void UpdateMove ();
 
   /**
-   * Draw this mesh object given a camera transformation.
-   * If needed the skeleton state will first be updated.
-   * Optionally update lighting if needed (DeferUpdateLighting()).
+   * This function determines whether to draw the imposter
+   * or the true mesh and calls the appropriate function.
    */
   void DrawInt (iRenderView* rview);
 
@@ -455,8 +457,8 @@ public:
   //---------- iImposter Functions -----------------//
 
   /// Set true if this Mesh should use Impostering
-  void SetImposterActive(bool flag)
-  { imposter_active = flag; }
+  void SetImposterActive(bool flag,iObjectRegistry *objreg);
+
   /**
    * Determine if this mesh is using Impostering
    * (not if Imposter is being drawn, but simply considered).
@@ -491,10 +493,25 @@ public:
   void CreateImposter(csReversibleTransform& /*pov*/)
   { /* implement later */ }
 
+  /**
+   * Renders the imposter on the screen
+   */
+  bool DrawImposter (iRenderView *rview);
+
   /// Determine if imposter or true rendering will be used
   bool WouldUseImposter(csReversibleTransform& /*pov*/)
   { /* implement later */ return false; }
+
+  /// This is true function to check distances.  Fn above may not be needed.
+  bool CheckImposterRelevant (iRenderView *rview);
   
+  /**
+   * Draw this mesh object given a camera transformation, non-impostered.
+   * If needed the skeleton state will first be updated.
+   * Optionally update lighting if needed (DeferUpdateLighting()).
+   */
+  void DrawIntFull (iRenderView* rview);
+
   //--------------------- SCF stuff follows ------------------------------//
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -664,8 +681,8 @@ public:
   struct MeshImposter : public iImposter
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshWrapper);
-    virtual void SetImposterActive(bool flag)
-    { scfParent->SetImposterActive(flag); }
+    virtual void SetImposterActive(bool flag,iObjectRegistry *objreg)
+    { scfParent->SetImposterActive(flag,objreg); }
     virtual bool GetImposterActive() const
     { return scfParent->GetImposterActive(); }
     virtual void SetMinDistance(iSharedVariable* dist)

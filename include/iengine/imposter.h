@@ -31,6 +31,8 @@
 
 SCF_VERSION (iImposter, 0, 0, 1);
 
+struct iObjectRegistry;
+
 /**
  * iImposter defines the interface a mesh (or other) class must
  * implement to be used as imposter mesh by the engine.
@@ -38,7 +40,7 @@ SCF_VERSION (iImposter, 0, 0, 1);
 struct iImposter : public iBase
 {
   /// Self explanatory
-  virtual void SetImposterActive(bool flag)=0;
+  virtual void SetImposterActive(bool flag,iObjectRegistry *objreg)=0;
   virtual bool GetImposterActive() const =0;
 
   /**

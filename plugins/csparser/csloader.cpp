@@ -2109,9 +2109,9 @@ void csLoader::ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node)
   }
   const char *s = node->GetAttributeValue ("active");
   if (s && !strcmp (s,"no"))
-      imposter->SetImposterActive (false);
+      imposter->SetImposterActive (false,NULL);
   else
-      imposter->SetImposterActive (true);
+      imposter->SetImposterActive (true,object_reg);
 
   s = node->GetAttributeValue ("range");
   iSharedVariable *var = Engine->GetVariableList()->FindByName (s);
