@@ -15,6 +15,14 @@ chronological order.
 	- res added CAL3D as an external lib to viewmesh (in case Cal3d was
 	  detected). (bug #1113976)
 	- res added CS_HAS_CAL3D to the viewmesh MSVC CFlags.
+	- Jorrit added a new in-code profile system to CS. This is still
+	  experimental. You use it by enclosing code in CS_PROFSTART/
+	  CS_PROFSTOP. At setup time of app you need CS_PROFSETUP. To print
+	  out current profile info you need CS_PROFDUMP. This profiling code
+	  is only enabled in case CS_DO_PROFILING is defined. There is
+	  currently no configure switch for that yet. Also the profiler is
+	  using csGetTicks(). This should be changed to use higher resolution
+	  timers.
 31-Jan-2005
 	- Jorrit changed csloader so that it will now look for addon
 	  plugins with iBase instead of iComponent.
