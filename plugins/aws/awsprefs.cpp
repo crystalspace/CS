@@ -161,6 +161,12 @@ awsPrefManager::SetFontServer(iFontServer *fntsvr)
   default_font = fontsvr->LoadFont(CSFONT_LARGE);
 }
 
+void 
+awsPrefManager::SetWindowMgr(iAws *_wmgr)
+{
+  wmgr=_wmgr;
+}
+
 void
 awsPrefManager::SetupPalette()
 {
@@ -226,6 +232,13 @@ awsPrefManager::SetupPalette()
 void 
 awsPrefManager::Load(const char *def_file)
 {
+
+  if (wmgr==NULL) 
+  {
+    printf("\tunable to load definitions because of an internal error: no window manager.\n");
+    return;
+  }
+
   printf("\tloading definitions file %s...\n", def_file);
 
   awsin = fopen( def_file, "r" );

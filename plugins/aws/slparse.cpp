@@ -1203,6 +1203,12 @@ void
 mapsourcetosink(iAws *windowmgr, unsigned long signal, iString *sinkname, iString *triggername)
 {
 
+  if (windowmgr==NULL)
+  {
+    printf("  internal error: window manager parameter is null in mapsourcetosink!\n");
+	return;
+  }
+
   iAwsSink *sink = ((awsManager *)windowmgr)->GetSinkMgr()->FindSink(sinkname->GetData());
 
   if (sink==NULL)

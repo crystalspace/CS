@@ -455,6 +455,9 @@ public:
 
     /** Changes the font server.  This must be set during setup in awsManager. */
     virtual void SetFontServer(iFontServer *fntsvr);
+
+    /** Changes the window manager.  This must be set during setup in awsManager. */
+    virtual void SetWindowMgr(iAws *_wmgr);
         
     /** Sets up the AWS palette so that the colors are valid reflections of
        user preferences.  Although SetColor can be used, it's recommended 
