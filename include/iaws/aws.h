@@ -819,6 +819,12 @@ struct iAwsComponent : public iAwsSource
   /// Gets the preferred size of the component
   virtual csRect getPreferredSize()=0;
 
+  /// Set the preferred size of the component.
+  virtual void setPreferredSize (const csRect& size) = 0;
+
+  /// Clear the manually set preferred size.
+  virtual void clearPreferredSize () = 0;
+
   /// Gets the minimum size that the component can be
   virtual csRect getMinimumSize()=0;
 

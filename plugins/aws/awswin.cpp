@@ -667,11 +667,6 @@ void awsWindow::SetFocusedChild (iAwsComponent *comp)
   window_focused_child = comp;
 }
 
-csRect awsWindow::getPreferredSize ()
-{
-  return getMinimumSize ();
-}
-
 csRect awsWindow::getMinimumSize ()
 {
   return csRect(0,0, Frame().Width(), Frame().Height());

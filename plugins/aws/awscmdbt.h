@@ -82,9 +82,6 @@ public:
   
   bool HandleEvent (iEvent &Event);
 
-  /// Gets how big this button should ideally be.
-  csRect getPreferredSize ();
-
   /// Gets the smallest this button can be.
   csRect getMinimumSize ();
 

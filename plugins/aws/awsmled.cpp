@@ -465,6 +465,9 @@ bool awsMultiLineEdit::SetHandler (const char *action,  const char *event)
 
 csRect awsMultiLineEdit::getPreferredSize ()
 {
+  if (set_preferred_size)
+    return preferred_size;
+
   // the preferred size we define as the one showing the whole content
   int nHeight = 0;
   int nWidth = 0;

@@ -264,11 +264,6 @@ bool awsTab::HandleClick (int x, int y)
   return false;
 }
 
-csRect awsTab::getPreferredSize ()
-{
-  return getMinimumSize ();
-}
-
 csRect awsTab::getMinimumSize ()
 {
   int tw = 0, th = 0;
@@ -690,15 +685,17 @@ void awsTabCtrl::ActivateTab (int idx)
 
 csRect awsTabCtrl::getPreferredSize()
 {
-   int width = 0;
-   for(int i = 0; i < vTabs.Length(); i++)
-   {
-	   width += vTabs.Get(i)->getPreferredSize().Width();
-   }
+  if (set_preferred_size)
+    return preferred_size;
+  int width = 0;
+  for(int i = 0; i < vTabs.Length(); i++)
+  {
+    width += vTabs.Get(i)->getPreferredSize().Width();
+  }
 
-   csRect r = Frame();
-   r.xmax = r.xmin + width;
-   return r;
+  csRect r = Frame();
+  r.xmax = r.xmin + width;
+  return r;
 }
 
 void awsTabCtrl::OnResized()

@@ -75,7 +75,6 @@ class awsNotebookButton : public awsComponent
   bool OnMouseUp (int, int x, int y);
   bool OnMouseClick (int, int x, int y);
   bool OnMouseDoubleClick (int, int x, int y);
-  virtual csRect getPreferredSize ();
   virtual csRect getMinimumSize ();
 
   virtual const char *Type ()

@@ -89,6 +89,10 @@ protected:
   /// Embedded awsSource
   awsSource signalsrc;
 
+  /// If true then the preferred set is manually set.
+  bool set_preferred_size;
+  /// Preferred size if set_preferred_size is true.
+  csRect preferred_size;
 
   /**
    * Contains the redraw tag.  This tag changes everytime we redraw the
@@ -349,6 +353,12 @@ public:
 
   /// Gets the preferred size of the component
   virtual csRect getPreferredSize ();
+
+  /// Set the preferred size of the component.
+  virtual void setPreferredSize (const csRect& size);
+
+  /// Clear the manually set preferred size.
+  virtual void clearPreferredSize ();
 
   /// Gets the minimum size that the component can be
   virtual csRect getMinimumSize ();

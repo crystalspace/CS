@@ -59,7 +59,6 @@ class awsTab : public awsComponent
   bool OnMouseUp (int, int x, int y);
   bool OnMouseClick (int, int x, int y);
   bool OnMouseDoubleClick (int, int x, int y);
-  virtual csRect getPreferredSize ();
   virtual csRect getMinimumSize ();
 
   virtual const char *Type ()
@@ -149,6 +148,7 @@ protected:
   virtual const char *Type (){return "Simple Tab Control";}
 
   virtual csRect getInsets();
+  virtual csRect getPreferredSize();
 
   // This will create a button based on the caption
   // This source will fire sActivateTab and sDeactivateTab
@@ -189,8 +189,6 @@ protected:
 
   // scroll buttons until the <idx>-th becomes visible
   void MakeVisible (int idx);
-
-  virtual csRect getPreferredSize();
 
   virtual void OnResized();
 

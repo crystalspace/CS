@@ -194,9 +194,6 @@ public:
   /// Hides window and broadcast signal
   void Hide ();
 
-  /// Gets the preferred size of the awsComponent
-  virtual csRect getPreferredSize ();
-
   /// Gets the minimum size that the awsComponent can be
   virtual csRect getMinimumSize ();
 

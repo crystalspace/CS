@@ -31,6 +31,7 @@ awsComponent::awsComponent () :
 {
   signalsrc.SetOwner (this);
   SCF_CONSTRUCT_IBASE (0);
+  set_preferred_size = false;
 }
 
 awsComponent::~awsComponent ()
@@ -397,7 +398,21 @@ bool awsComponent::Overlaps (csRect &r)
 
 csRect awsComponent::getPreferredSize ()
 {
-  return getMinimumSize ();
+  if (set_preferred_size)
+    return preferred_size;
+  else
+    return getMinimumSize ();
+}
+
+void awsComponent::setPreferredSize (const csRect& size)
+{
+  preferred_size = size;
+  set_preferred_size = true;
+}
+
+void awsComponent::clearPreferredSize ()
+{
+  set_preferred_size = false;
 }
 
 csRect awsComponent::getMinimumSize ()

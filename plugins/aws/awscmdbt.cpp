@@ -394,11 +394,6 @@ void awsCmdButton::OnDraw (csRect /*clip*/)
   }
 }
 
-csRect awsCmdButton::getPreferredSize ()
-{
-  return getMinimumSize ();
-}
-
 csRect awsCmdButton::getMinimumSize ()
 {
   if (style==fsBitmap)

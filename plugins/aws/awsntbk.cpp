@@ -585,11 +585,6 @@ bool awsNotebookButton::HandleClick (int x, int y)
   return false;
 }
 
-csRect awsNotebookButton::getPreferredSize ()
-{
-  return getMinimumSize ();
-}
-
 csRect awsNotebookButton::getMinimumSize ()
 {
   int tw = 0, th = 0;

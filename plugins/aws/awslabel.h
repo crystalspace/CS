@@ -69,9 +69,6 @@ public:
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();
 
-  /// Returns this label's preferred size.
-  virtual csRect getPreferredSize ();
-
   /// Returns the smallest this label can be.
   virtual csRect getMinimumSize ();
 

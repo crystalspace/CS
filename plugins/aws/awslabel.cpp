@@ -93,11 +93,6 @@ bool awsLabel::SetProperty (const char *name, void *parm)
   return false;
 }
 
-csRect awsLabel::getPreferredSize ()
-{
-  return getMinimumSize ();
-}
-
 csRect awsLabel::getMinimumSize ()
 {
   int tw = 0, th = 0;

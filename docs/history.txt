@@ -7,6 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 18-Dec-2003
+	- Jorrit added two new methods to iAwsComponent. One to set the
+	  preferred size and one to clear it again. This way one can forcibly
+	  set the preferred size of some component. This is useful for
+	  some layout managers like BorderLayout so you can have better
+	  control over the layout.
 	- Eric Sunshine fixed bugs in glshader_fixed.mak and softshader.mak
 	  where header files (.h) were being listed in SRC.GLSHADER_FIXED and
 	  SRC.SOFTSHADER.  This resulted in the values of OBJ.GLSHADER_FIXED
