@@ -1,0 +1,23 @@
+@c -*-texinfo-*-
+@node map2cs Invoking, map2cs.cfg Game-Specific Data, map2cs Classnames and Keys, map2cs
+@subsection Invoking
+
+@file{map2cs} doesn't really have many options, but they should be mentioned
+anyway:
+
+@example
+map2cs @var{mapfile} @var{worldfile} [@var{configfile}]
+@end example
+
+You must specify the name of the @code{@var{mapfile}} and the
+@code{@var{worldfile}}.  (You can use relative paths here if you want.)
+
+You can optionally override the configuration file by specifying
+@code{@var{configfile}}.  If you don't specify an alternate configuration
+file, @file{map2cs.cfg} is being used.
+
+Example:
+
+@example
+map2cs ..\maps\mymap.map data\mymap.map mymyp.cfg
+@end example

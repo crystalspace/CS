@@ -29,6 +29,8 @@
 #        - Repairs broken @node directives and @menu blocks.
 #        - Converts Texinfo documentation to HTML format.
 #        - Commits all changes to the CVS repository.
+#        - Makes the generated HTML available online for browsing.
+#        - Makes archives of the generated HTML availble for download.
 #
 #    This script takes special care to invoke the appropriate CVS commands to
 #    add new files and directories to the repository, and to remove obsolete
@@ -60,28 +62,29 @@
 #      CVS, run the various 'make' commands (make platform, make htmldoc,
 #      make repairdoc, etc.), and perform the comparision and commit of
 #      generated files.
-#    * Possibly perform some ancillary tasks such as generating archives of
-#      the converted documentation available in various formats (.tgz, .zip,
-#      etc.) as well as making the documentation available online to browsers.
 #
 #------------------------------------------------------------------------------
 use Carp;
+use File::Basename;
 use File::Copy;
 use File::Find;
 use File::Path;
+use FileHandle;
 use Getopt::Long;
 use POSIX 'tmpnam';
 use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'docproc.pl';
-my $PROG_VERSION = '1.2';
+my $PROG_VERSION = '1.3';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 #------------------------------------------------------------------------------
 # Configuration Section
+#    PROJECT_ROOT - Root directory of the project.  This is the top-level
+#        directory created as a side-effect of retrieving the files from CVS.
 #    CVSROOT - The CVSROOT setting used for invoking CVS commands.  The
 #        specified value must allow "write" access to the repository.
 #    CVS_SOURCES - All directories which need to be extracted from the
@@ -97,6 +100,15 @@ my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 #        the CVS repository.
 #    NEW_HTML_DIR - Relative path to newly generated HTML directory hierarchy.
 #    TEXINFO_DIR - Relative path to Texinfo source directory hierarchy.
+#    BROWSEABLE_DIR - Directory into which generated HTML should be copied for
+#        browsing via a web browser.
+#    PACKAGE_DIR - Directory into which archives of generated documentation
+#        are placed to make them available for download in package form.
+#    PACKAGE_BASE - Base name of the packaged archives.  An appropriate file
+#        extention will be appended for each generated archive.
+#    OWNER_GROUP - Group to which to assign all directories which will exist
+#        after script's termination (such as the "browseable" directory).  May
+#        be 'undef' if no special group should be assigned.
 #    PLATFORM - An essentially arbitrary platform name for the makefile
 #        configuration step.  The rules for building the documentation do not
 #        actually care about the platform, but the makefile architecture
@@ -105,26 +117,53 @@ my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 #    LOG_MESSAGE_HTML = Log message for CVS transactions for HTML conversion.
 #    LOG_MESSAGE_REPAIR = Log message for CVS transactions for repaired
 #        document files.
+#    ARCHIVERS - A list of archiver records.  Each arechiver is used to
+#        generate a package archive given an input directory.  Each archiver
+#        record contains the following keys.  The key "name" specifies the
+#        archiver's printable name.  The key "ext" is the file extension for
+#        the generated archive file.  The key "cmd" is the actual command
+#        template which describes how to generate the given archive.  It may
+#        contain the meta-token ~S and ~D.  The name of the source directory
+#        is interpolated into the command in place of ~S, and the destination
+#        package name is interpolated in place of ~D.
 #------------------------------------------------------------------------------
 
 $ENV{'CVS_RSH'} = 'ssh';
+my $PROJECT_ROOT = 'CS';
 my $CVSUSER = 'sunshine';
 my $CVSROOT = "$CVSUSER\@cvs1:/cvsroot/crystal";
-my $CVS_SOURCES = 'CS/bin CS/docs CS/libs/cssys/unix CS/mk CS/Makefile';
-my $FAKE_DIRS = 'CS/include';
+my $CVS_SOURCES = "$PROJECT_ROOT/bin $PROJECT_ROOT/docs $PROJECT_ROOT/mk " .
+    "$PROJECT_ROOT/Makefile $PROJECT_ROOT/libs/cssys/unix";
+my $FAKE_DIRS = "$PROJECT_ROOT/include";
 my $OLD_HTML_DIR = 'docs/html';
 my $NEW_HTML_DIR = 'out/docs/html';
 my $TEXINFO_DIR = 'docs/texinfo';
+my $PUBLIC_DOC_DIR = '/home/groups/crystal/htdocs/docs';
+my $BROWSEABLE_DIR = "$PUBLIC_DOC_DIR/online/manual";
+my $PACKAGE_DIR = "$PUBLIC_DOC_DIR/download";
+my $PACKAGE_BASE = 'csmanual';
+my $OWNER_GROUP = 'crystal';
 my $PLATFORM = 'linux';
 my $LOG_MESSAGE_HTML = 'Automated Texinfo to HTML conversion.';
 my $LOG_MESSAGE_REPAIR = 'Automated Texinfo \@node and \@menu repair.';
+
+my @ARCHIVERS =
+    ({ 'name' => 'gzip',
+       'ext'  => 'tgz',
+       'cmd'  => 'tar --create --file=- ~S | gzip > ~D' },
+     { 'name' => 'bzip2',
+       'ext'  => 'tar.bz2',
+       'cmd'  => 'tar --create --file=- ~S | bzip2 > ~D' },
+     { 'name' => 'zip',
+       'ext'  => 'zip',
+       'cmd'  => 'zip -q -r ~D ~S' });
 
 #------------------------------------------------------------------------------
 # Internal configuration.
 #------------------------------------------------------------------------------
 my $DEBUG = undef;
 my $CONV_DIR = tmpnam();
-my $CAPTURED_OUTPUT;
+my $CAPTURED_OUTPUT = '';
 my $MAKE = 'make';
 
 my @SCRIPT_OPTIONS = (
@@ -145,11 +184,45 @@ sub expire {
 }
 
 #------------------------------------------------------------------------------
+# Change group ownership on a list of directories.
+#------------------------------------------------------------------------------
+sub change_group {
+    my $group = shift;
+    my @dirs = @_;
+    return unless $group && @dirs;
+    my $gid = getgrnam($group) or expire("getgrnam($group)");
+    chown(-1, $gid, @dirs) or expire("chown(-1, $gid, ".join(' ', @dirs).')');
+    chmod(0775, @dirs) or expire("chmod(0775, ".join(' ', @dirs).')');
+}
+
+
+#------------------------------------------------------------------------------
+# Change group ownership of directories and all subdirectories (recursive).
+#------------------------------------------------------------------------------
+sub change_group_deep {
+    my $group = shift;
+    my @dirs = @_;
+    my @children = ();
+    find(sub{my $n=$File::Find::name; push(@children, $n) if -d $n}, @dirs);
+    change_group($group, @dirs, @children);
+}
+
+#------------------------------------------------------------------------------
 # Create a directory.
 #------------------------------------------------------------------------------
 sub create_directory {
-    my $dir = shift;
+    my ($dir, $group) = @_;
     mkdir($dir, 0755) or expire("mkdir($dir)");
+    change_group($group, $dir);
+}
+
+#------------------------------------------------------------------------------
+# Create a directory and all intermediate directories.
+#------------------------------------------------------------------------------
+sub create_directory_deep {
+    my ($dir, $group) = @_;
+    my @dirs = mkpath($dir);
+    change_group($group, @dirs);
 }
 
 #------------------------------------------------------------------------------
@@ -174,6 +247,27 @@ sub copy_file {
 sub remove_file {
     my $file = shift;
     unlink($file) or expire("unlink($file)");
+}
+
+#------------------------------------------------------------------------------
+# Rename a file.
+#------------------------------------------------------------------------------
+sub rename_file {
+    my ($src, $dst) = @_;
+    rename($src, $dst) or expire("rename($src,$dst)");
+}
+
+#------------------------------------------------------------------------------
+# Generate a temporary name in a directory.  (Perl tmpnam() only knows '/tmp'.)
+#------------------------------------------------------------------------------
+sub temporary_name {
+    my ($dir, $prefix, $suffix) = @_;
+    $prefix = 'tmp' unless $prefix;
+    $suffix = '' unless $suffix;
+    my ($i, $limit) = (0, 100);
+    $i++ while -e "$dir/$prefix$i$suffix" && $i < $limit;
+    expire("temporary_name($dir,$prefix,$suffix)") if $i >= $limit;
+    return "$dir/$prefix$i$suffix";
 }
 
 #------------------------------------------------------------------------------
@@ -215,7 +309,7 @@ sub cvs_remove {
     else {
 	print "Removing file: $file\n";
 	remove_file($dst);
-	run_command("cvs -Q remove $dst") if !$DEBUG;
+	run_command("cvs -Q remove $dst") unless $DEBUG;
     }
 }
 
@@ -231,14 +325,14 @@ sub cvs_add {
     if (-d $src) {
 	print "Adding directory: $file\n";
 	create_directory($dst);
-	run_command("cvs -Q add -m \"$LOG_MESSAGE_HTML\" $dst") if !$DEBUG;
+	run_command("cvs -Q add -m \"$LOG_MESSAGE_HTML\" $dst") unless $DEBUG;
     }
     else {
 	my $isbin = -B $src;
 	my $flags = ($isbin ? '-kb' : '');
 	print "Adding file: $file [" . ($isbin ? 'binary' : 'text') . "]\n";
 	copy_file($src, $dst);
-	run_command("cvs -Q add $flags $dst") if !$DEBUG;
+	run_command("cvs -Q add $flags $dst") unless $DEBUG;
     }
 }
 
@@ -280,7 +374,7 @@ sub cvs_update {
 #------------------------------------------------------------------------------
 sub cvs_commit_files {
     my ($files, $message) = @_;
-    run_command("cvs -Q commit -m \"$message\" $files") if !$DEBUG;
+    run_command("cvs -Q commit -m \"$message\" $files") unless $DEBUG;
 }
 
 #------------------------------------------------------------------------------
@@ -357,6 +451,86 @@ sub apply_diffs {
 }
 
 #------------------------------------------------------------------------------
+# Publish a browseable copy of the generated documentation.  Also, copy
+# index.html to index.html so that the manual displays automatically if a
+# client browses the directory.  (The alternative would be to add a
+# "DirectoryIndex index.htm" directive to Apache's .htaccess file, SourceForge
+# disallows this.) 
+#------------------------------------------------------------------------------
+sub publish_browseable {
+    print("Publishing browseable.\n"), return if $DEBUG;
+    print "Preparing browseable.\n";
+    my $parent = dirname($BROWSEABLE_DIR);
+    create_directory_deep($parent, $OWNER_GROUP);
+
+    my $new_dir = temporary_name($parent, 'new');
+    my $old_dir = temporary_name($parent, 'old');
+    run_command("cp -r \"$NEW_HTML_DIR\" \"$new_dir\"");
+    change_group_deep($OWNER_GROUP, "$new_dir");
+    copy_file("$new_dir/index.htm", "$new_dir/index.html")
+	if -e "$new_dir/index.htm";
+
+    print "Publishing browseable.\n";
+    rename_file($BROWSEABLE_DIR, $old_dir) if -e $BROWSEABLE_DIR;
+    rename_file($new_dir, $BROWSEABLE_DIR);
+
+    print "Cleaning browseable.\n";
+    rmtree($old_dir);
+}
+
+#------------------------------------------------------------------------------
+# Interpolate a value into a string in place of a token.
+#------------------------------------------------------------------------------
+sub interpolate {
+    local $_ = $_[0];
+    my ($token, $value) = @_[1..2];
+    s/$token/$value/g or expire("Interpolation of $token in $_");
+    $_[0] = $_;
+}
+
+#------------------------------------------------------------------------------
+# Publish an archive of the generated documentation.
+#------------------------------------------------------------------------------
+sub publish_package {
+    my ($archiver, $dir) = @_;
+    print "Packaging: $archiver->{'name'}\n";
+    return if $DEBUG;
+    my $ext = $archiver->{'ext'};
+    my $tmp_pkg = temporary_name($PACKAGE_DIR, 'pkg', ".$ext");
+    my $package = "$PACKAGE_DIR/$PACKAGE_BASE.$ext";
+    my $cmd = $archiver->{'cmd'};
+    interpolate($cmd, '~S', $dir);
+    interpolate($cmd, '~D', $tmp_pkg);
+    run_command($cmd);
+    rename_file($tmp_pkg, $package);
+}
+
+#------------------------------------------------------------------------------
+# Publish generated documentation as archives of various formats.  This
+# function packages up the generated documentation directory.  For consistency
+# from the user's standpoint, the documentation within the archive should have
+# a directory hierarchy identical to the one in the project itself (ie.
+# CS/docs/html).  Unfortunately, CVS directories are present within this tree,
+# and it would be preferable not to include them in the archive.  To work
+# around this problem, this function archives the newly generated directory
+# (out/docs/html) instead.  A small amount of sleight-of-hand is used to make
+# the directory appear as though it resides directly in the project root.
+# (Specifically, it is temporarily renamed from out/docs/html to CS/docs/html.)
+#------------------------------------------------------------------------------
+sub publish_packages {
+    my $fake_root = "$PROJECT_ROOT/$OLD_HTML_DIR";
+    create_directory_deep($PACKAGE_DIR, $OWNER_GROUP);
+    create_directory_deep(dirname($fake_root));
+    rename_file($NEW_HTML_DIR, $fake_root); # Sleight-of-hand (magic).
+    foreach my $archiver (@ARCHIVERS) {
+	publish_package($archiver, $fake_root);
+    }
+    rename_file($fake_root, $NEW_HTML_DIR); # Unmagic.
+    rmtree($PROJECT_ROOT);
+
+}
+
+#------------------------------------------------------------------------------
 # Create the temporary working directory.
 #------------------------------------------------------------------------------
 sub create_transient {
@@ -390,11 +564,13 @@ sub process_docs {
     print 'BEGIN: ' . time_now() . "\n";
     create_transient($CONV_DIR);
     extract_docs();
-    change_directory('CS');
+    change_directory($PROJECT_ROOT);
     build_docs();
     apply_diffs();
     cvs_update();
     cvs_commit();
+    publish_browseable();
+    publish_packages();
     destroy_transient($CONV_DIR);
     print 'END: ' . time_now() . "\n";
 }

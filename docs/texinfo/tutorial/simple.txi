@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Tutorial Simple, Tutorial CrystalClear, Tutorial Introduction, Tutorials
+@node Tutorial Simple, map2cs Tutorial, Tutorial Introduction, Tutorials
 @section Simple Tutorial
 @cindex Tutorial, Simple
 @cindex Simple Tutorial

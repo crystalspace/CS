@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node CCtest, Squawk, Walktest, Applications
+@node CCtest, Squawk, map2cs, Applications
 @section CCtest
 @cindex @file{cctest}
 @cindex Applications, @file{cctest}

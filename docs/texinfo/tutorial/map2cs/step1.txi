@@ -1,0 +1,82 @@
+@c -*-texinfo-*-
+@node map2cs Tutorial Step 1, map2cs Tutorial Step 2, map2cs Tutorial, map2cs Tutorial
+@subsection Step 1: Links to Required Tools and Data
+
+To get started creating your own maps, I assume, you have downloaded and
+installed the following tools from the Internet.  Worldcraft and @file{map2cs}
+require a bit complex setup, which I will explain that later.
+
+@itemize @bullet
+@item
+Worldcraft---The Half-Life editor (version 2.1 beta at the time of this
+writing).  You might be technically or legally required to have a legal
+Half-Life on your PC too, so you might want to get this really cool game too,
+if you don't have it yet.
+
+@uref{ftp://ftp.cdrom.com/pub/planetquake/planethalflife/wavelength/levels/}
+
+Download the most recent version available.  For version 2.1 beta, the package
+name is @file{wc21.exe}.
+
+@item
+QuArK (@emph{optional})---Another editor.  Has a bit strange license, but is
+mostly Open Source.  I don't use that editor, but it has some massive fans,
+and it looks really nice.  It offers a more flexible approach for texturing,
+than Worldcraft, using a proprietary extension to the map format.  These
+extensions are understood by @file{map2cs}.  You only need this editor if you
+don't want to use Worldcraft, but this tutorial will only cover Worldcraft.
+
+@uref{http://www.planetquake.com/quark/}
+
+@item
+Texture Pack 1---More than 150 free textures from the Crystal Space texture
+archive in 3.4@sc{mb}.  They are already converted to the @sc{wad} format, so
+you can directly use them.
+
+@uref{http://members.xoom.com/thieber/cs/cstex_1.zip}
+
+@item
+Wally (@emph{optional})---A great tool to modify or create textures for use
+with Worldcraft and Crystal Space.  Required only if you want to create new
+textures.
+
+@uref{http://www.telefragged.com/wally/}
+
+@item
+Crystal Space tools---A recent version of Crystal Space.  @xref{Where to Get}.
+
+@uref{http://crystal.linuxgames.com/}
+@end itemize
+
+I assume you will use the following structure to install your programs.  You
+can use any structure you like, but I will use references to the following
+structure in the tutorial, so you need to replace the sample paths with the
+paths I will give you here:
+
+@example
+e:\cryst
+    worldcraft
+    wally
+    quark
+    bin
+    wads
+    maps
+@end example
+
+Here is a quick summary of each of the subdirectories:
+
+@table @code
+@item worldcraft
+Install worldcraft here.
+@item wally
+Install wally here.
+@item quark
+Install QuArK here.
+@item bin
+Put the Crystal Space distribution and @file{map2cs} here.
+@item wads
+Put all texture files (@file{.wad} and @file{.pk3}) here.
+@item maps
+Put your own or downloaded map source files (@file{.map} and @file{.rmf})
+here.
+@end table

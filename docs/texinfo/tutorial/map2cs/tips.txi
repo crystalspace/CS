@@ -1,0 +1,46 @@
+@c -*-texinfo-*-
+@node map2cs Tutorial Tips, , map2cs Tutorial Skybox, map2cs Tutorial
+@subsection Tips for Map Creation
+
+Here are some general tips for creating maps to use with Crystal Space:
+
+@itemize @bullet
+@item
+Try to use only textures that have sizes that are a power of two: 128*64 would
+be okay for example, 192*32 is not good.  Crystal Space can handle any size of
+textures, but textures that are a power of two are most efficent.  Also try to
+limit yourself to sizes below 256.  Textures larger than that can't be handled
+for example by @sc{3d/fx} cards.  Crystal Space will do its best to work
+around that problem, but it is pretty easy for you to avoid.
+
+@item
+Avoid open spaces.  You will get best performance, if you have lots of
+occluders in your map.
+
+@item
+Check your map while you create it.  If there are spots that do not perform
+very well, try to change these areas.  Often it is enough to close an opening
+in a wall to get significantly better performance.
+
+@item
+Use textures for details.  It is a common error trying to model every little
+detail with brushes.  Often it looks better and is much faster if you paint
+the details on some texture and apply that texture to a plain wall.
+
+@item
+Align your textures properly.  While working with normal brushes make sure,
+that ``texture lock'' is not enabled.  Enable ``texture lock'' only, if you
+are moving objects, that have been thoroughly aligned (usually only some
+decorative stuff).
+
+@item
+Read the reference section for @file{map2cs} (@pxref{map2cs}).  @file{map2cs}
+provides quite a few features, that have not been covered in this tutorial,
+such as mirrors and volumetric fog.
+@end itemize
+
+If you know other tips, please email them to me at @email{thieber@@gmx.net}.
+
+I would also really like to receive some prefabs, so if you have created nice
+furniture or things to use in maps, that you want to donnate to the public,
+please send them to me.

@@ -185,8 +185,8 @@ mode (for example, on Matrox Mystique a window 320x200x256 rescaled to
 @item
 The system menu on Crystal Space window is replaced by a more
 application-specific menu.  There are some useful options there (also
-available through hot-keys, for example @key{CTRL}-@key{ALT}-@kbd{1} rescales
-window to 1:1 scale, @key{CTRL}-@key{ALT}-@kbd{2} to 2:1, and so on).  The
+available through hot-keys, for example @kbd{@key{CTRL}-@key{ALT}-1} rescales
+window to 1:1 scale, @kbd{@key{CTRL}-@key{ALT}-2} to 2:1, and so on).  The
 menu definition is contained in @file{libDIVE.rc}.  If you need some
 additional entries, you can add them directly to resource file.
 @end itemize

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Walktest, CCtest, Applications Overview, Applications
+@node Walktest, map2cs, Applications Overview, Applications
 @section Walktest
 @cindex @file{walktest}
 @cindex Applications, @file{walktest}

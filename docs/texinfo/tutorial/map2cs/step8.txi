@@ -1,0 +1,22 @@
+@c -*-texinfo-*-
+@node map2cs Tutorial Step 8, map2cs Tutorial Step 9, map2cs Tutorial Step 7, map2cs Tutorial
+@subsection Step 8: Adding More Detail
+
+The map already looks pretty nice, but it still looks a bit simple and boring.
+So I created a new texture for the wall that has some structure painted on it.
+I also copied some furniture from another map.
+
+@ifinfo
+The result of this addition can be seen by examining @file{tut3.map}.
+@end ifinfo
+@ifnotinfo
+This results in the following map.  (Available as @file{tut3.map}.)
+
+@picturess{tutorial,map2cs,csmap4}
+@end ifnotinfo
+
+I will stop the general Worldcraft related stuff here.  There is still a lot
+to be learned about Worldcraft, but there are lots of tutorials and tips about
+Worldcraft on the Internet.  One last hint: If you plan to do large maps with
+Worldcraft use @dfn{visgroups}.  They will help you very much to keep track of
+all these polygons that accumulate on your screen.

@@ -1,0 +1,77 @@
+@c -*-texinfo-*-
+@node map2cs Tutorial Skybox, map2cs Tutorial Tips, map2cs Tutorial Step 9, map2cs Tutorial
+@subsection Generating Skybox Textures
+
+If you don't like to idea of keeping the player always inside a building and
+never allowing him to look outside, then you need a skybox.  A skybox will
+give the player a good illusion that there is an outside to your level.  A
+skybox is a huge box with textures that shows what is outside.  However,
+creating these textures is a bit tricky, otherwise, it might just look like
+the inside of a textured cube.
+
+But there is good news, because there is a free tool that is great for making
+these textures.  It is called Terragen.
+
+@uref{http://www.planetside.co.uk/}
+
+Please consult the terragen documentation about how to create a world, as
+I will only explain, how to export the world file to Crystal Space.
+
+@subsubheading Exporting to Crystal Space
+
+When you are done creating your world peform the following steps:
+
+@noindent
+Open the ``Rendering Controls'' panel.
+
+@enumerate
+@item
+Move your camera to the desired point in your map.
+@item
+Disable the ``Fixed Height Above Surface'' switch.
+@item
+Set ``Detail'' to @emph{Maximum}.
+@item
+In the ``Camera Settings'' dialog set ``Zoom Maginfication'' to ``1''.
+@item
+Set ``Image Size'' to 512x512 or 256x256.
+@end enumerate
+
+@ifnotinfo
+@picturess{tutorial,map2cs,terra1}
+
+@end ifnotinfo
+Now create six images and store them.  Use the following settings for these
+images:
+
+@quotation
+@multitable @columnfractions .35 .2 .2 .2
+@item @emph{Texture Name Suffix}
+@tab @emph{Camera Head}
+@tab @emph{Camera Pitch}
+@tab @emph{Camera Bank}
+@item @code{_f} @tab 0 @tab 0 @tab 0
+@item @code{_r} @tab 90 @tab 0 @tab 0
+@item @code{_b} @tab 180 @tab 0 @tab 0
+@item @code{_l} @tab 270 @tab 0 @tab 0
+@item @code{_u} @tab 0 @tab 90 @tab 0
+@item @code{_d} @tab 0 @tab 270 @tab 0
+@end multitable
+@end quotation
+
+Convert the generated bitmaps to a format readable by @file{map2cs} (@sc{tga},
+@sc{jpg}, @sc{jpeg}, @sc{bmp}, @sc{wal}).
+
+Then you need to add a setting ``skybox'' with the value of your basename in
+the general world properties.  (For example, if your textures are called
+@file{sample_f.bmp}, @file{sample_r.bmp}, you will set ``skybox'' to
+``sample'').  Now every brush you assign the classname ``cs_sky'' will look
+like your skybox.  Just try this out.  It is a really amazing effect.
+@ifnotinfo
+
+This screenshot doesn't really do justice to the skybox effect, but it looks
+quite nice, never-the-less.  To really appreciate the effect you will need to
+move around a world in Crystal Space using a map enclosed within a skybox.
+
+@picturess{tutorial,map2cs,terra2}
+@end ifnotinfo

@@ -161,7 +161,7 @@ walktest -video=opengl    # @r{Runs in OpenGL mode}
 walktest -video=glide     # @r{Runs in Glide mode (@emph{currently broken})}
 @end example
 
-@key{ALT}-@kbd{f} will switch you in and out of full screen.  (Note, the
+@kbd{@key{ALT}-f} will switch you in and out of full screen.  (Note, the
 software driver does not currently implement full screen mode, though OpenGL
 does.)
 
