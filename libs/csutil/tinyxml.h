@@ -814,6 +814,33 @@ protected :
 };
 
 
+
+/** XML Cdata section. Contained in an element.
+ * Always start with <![CDATA[  and end with ]]>
+*/
+class TiXmlCData : public TiXmlText
+{
+	friend class TiXmlElement;
+public:
+	/// Constructor.
+	TiXmlCData (const char * initValue) : TiXmlText (initValue)
+	{
+		SetValue( initValue );
+	}
+	virtual ~TiXmlCData() {}
+
+	#ifdef TIXML_USE_STL
+	/// Constructor.
+	TiXmlCData( const std::string& initValue ) : TiXmlText (initValue)
+	{
+		SetValue( initValue );
+	}
+	#endif
+
+protected :
+	virtual const char* Parse( const char* p );
+};
+
 /** In correct XML the declaration is the first entry in the file.
 	@verbatim
 		<?xml version="1.0" standalone="yes"?>

@@ -647,6 +647,23 @@ const char* TiXmlElement::ReadValue( const char* p )
 			else
 				delete textNode;
 		} 
+                else if ( StringEqual(p, "<![CDATA[", true) )
+                {
+                        TiXmlCData* cdataNode = new TiXmlCData( "" );
+
+			if ( !cdataNode )
+			{
+				if ( document ) document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+				    return 0;
+			}
+
+			p = cdataNode->Parse( p );
+
+			if ( !cdataNode->Blank() )
+				LinkEndChild( cdataNode );
+			else
+				delete cdataNode;
+                }
 		else 
 		{
 			// We hit a '<'
@@ -850,6 +867,22 @@ const char* TiXmlText::Parse( const char* p )
 	p = ReadText( p, &value, ignoreWhite, end, false );
 	if ( p )
 		return p-1;	// don't truncate the '<'
+	return 0;
+}
+
+const char* TiXmlCData::Parse( const char* p )
+{
+	value = "";
+
+	//TiDocument* doc = GetDocument();
+	bool ignoreWhite = false;
+//	if ( doc && !doc->IgnoreWhiteSpace() ) ignoreWhite = false;
+        //skip the <![CDATA[ 
+        p += 9;
+	const char* end = "]]>";
+	p = ReadText( p, &value, ignoreWhite, end, false );
+	if ( p )
+		return p;
 	return 0;
 }
 
