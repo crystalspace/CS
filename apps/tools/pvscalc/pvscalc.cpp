@@ -31,11 +31,13 @@ PVSCalcSector::PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
 
   // @@@ Make dimension configurable?
   plane.covbuf = new csTiledCoverageBuffer (DIM_COVBUFFER, DIM_COVBUFFER);
+  plane.covbuf_clipper = 0;
 }
 
 PVSCalcSector::~PVSCalcSector ()
 {
   delete plane.covbuf;
+  delete plane.covbuf_clipper;
 }
 
 void PVSCalcSector::CountDistribution (
