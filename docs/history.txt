@@ -17,7 +17,7 @@ chronological order.
 	- Eric Sunshine fixed bugs in walktest/Jamfile and walktest.mak where
 	  `walkall' target unconditionally tried to build the OpenGL canvas and
 	  renderer even if OpenGL was not detected.
-	- Eric Sunshine fixed bug in aws/skinpars.yy.  The `expf' lacked a
+	- Eric Sunshine fixed bug in aws/skinpars.yy.  The `expf' rule lacked a
 	  terminating semi-colon.
 	- Eric Sunshine fixed docs/Jamfile so that it also now installs
 	  history.old, README.html, and doxygen.css.
