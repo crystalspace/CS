@@ -70,7 +70,7 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   Pixmap EmptyPixmap;
 
   /// Pointer to DOS-specific interface
-  IUnixSystemDriver* UnixSystem;
+  iUnixSystemDriver* UnixSystem;
 
 public:
   csGraphics2DGLX (iBase *iParent);

@@ -75,10 +75,13 @@ glx2d: $(OUTDIRS) $(GLX2D)
 $(OUT)%$O: libs/cs2d/openglx/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLX2D)
  
+$(OUT)%$O: libs/cs2d/openglcommon/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.GLX2D)
+ 
 $(GLX2D): $(OBJ.GLX2D) $(DEP.GLX2D)
 	$(DO.PLUGIN) $(LIBS.GLX2D)
 
-glxclean:
+glx2dclean:
 	$(RM) $(GLX2D) $(OBJ.GLX2D)
  
 ifdef DO_DEPEND
