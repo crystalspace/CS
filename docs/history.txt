@@ -18,8 +18,8 @@ chronological order.
 	  that the composed shell variable name is of the form
 	  `CONFIG_{library}', rather than `{library}_CONFIG', since {library}
 	  might begin with a numeric, which would result in an illegal shell
-	  variable name For instance, the library "3ds" resulted in the illegal
-	  shell variable name `3DS_CONFIG'.
+	  variable name. For instance, the library "3ds" resulted in the
+	  illegal shell variable name `3DS_CONFIG'.
 	- Eric Sunshine fixed _CS_CHECK_LIB_CONFIG_FLAGS() in checklib.m4 so
 	  that illegal characters are transliterated to underscore `_' in the
 	  composed shell variable name. For instance, the library alias
