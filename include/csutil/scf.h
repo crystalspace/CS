@@ -504,9 +504,6 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
  * into the program
  */
 #define SCF_REGISTER_STATIC_CLASS(Class,Ident,Desc,Dep)			\
-  CS_EXPORTED_FUNCTION void CS_EXPORTED_NAME(Class,_scfInitialize)	\
-    (bool, iSCF*);							\
-  CS_EXPORTED_FUNCTION void CS_EXPORTED_NAME(Class,_scfFinalize)(bool);	\
   CS_EXPORTED_FUNCTION void* CS_EXPORTED_NAME(Class,_Create)(iBase*);	\
   class Class##_StaticInit__						\
   {									\
@@ -516,10 +513,6 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
       scfInitialize();							\
       iSCF::SCF->RegisterClass(						\
         CS_EXPORTED_NAME(Class,_Create), Ident, Desc, Dep);		\
-    }									\
-    ~Class##_StaticInit__()						\
-    {									\
-      CS_EXPORTED_NAME(Class,_scfFinalize)(false);			\
     }									\
   } Class##_static_init__;
 

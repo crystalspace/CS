@@ -3,6 +3,12 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+11-Jun-2003
+	- Eric Sunshine removed an invocation of class_scfFinalize() from
+	  SCF_REGISTER_STATIC_CLASS() which should have been removed yesterday
+	  as part of Eric's other fixes to SCF.  This patch eliminates a
+	  shutdown-time crash caused by static global variables being destroyed
+	  twice.  (Bug #752140)
 10-Jun-2003
         - Philip Wyett eliminated signed/unsigned mismatch warning in
           function csString::SubString ().
