@@ -18,35 +18,41 @@
 */
 
 #include "cssysdef.h"
+#include "bumptest.h"
+#include "prbump.h"
+
 #include "cssys/system.h"
-#include "apps/bumptest/bumptest.h"
-#include "csengine/sector.h"
-#include "csengine/engine.h"
-#include "csengine/csview.h"
-#include "csengine/camera.h"
-#include "csengine/light.h"
-#include "csengine/polygon.h"
-#include "csengine/meshobj.h"
-#include "csengine/texture.h"
-#include "csengine/thing.h"
-#include "csengine/halo.h"
+#include "csgeom/transfrm.h"
 #include "csfx/proctex.h"
 #include "csfx/prdots.h"
 #include "csfx/prplasma.h"
 #include "csfx/prfire.h"
 #include "csfx/prwater.h"
+
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
 #include "imesh/object.h"
-#include "iengine/mesh.h"
 #include "imesh/cube.h"
 #include "imesh/ball.h"
 #include "imesh/sprite3d.h"
 #include "imap/parser.h"
-#include "prbump.h"
 #include "iengine/ptextype.h"
+#include "iengine/mesh.h"
+#include "iengine/view.h"
+#include "iengine/engine.h"
+#include "iengine/material.h"
+#include "iengine/polygon.h"
+#include "iengine/thing.h"
+#include "iengine/sector.h"
+#include "iengine/movable.h"
+#include "iengine/light.h"
+#include "iengine/dynlight.h"
+#include "iengine/camera.h"
 #include "igraphic/loader.h"
+
+#include "csengine/texture.h"
+#include "csengine/material.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -70,7 +76,8 @@ BumpTest::BumpTest ()
 
 BumpTest::~BumpTest ()
 {
-  delete view;
+  if (view) view->DecRef ();
+  if (engine) engine->DecRef ();
   delete prBump;
   if (LevelLoader) LevelLoader->DecRef();
 }
@@ -84,8 +91,7 @@ void cleanup ()
 bool BumpTest::InitProcDemo ()
 {
   iTextureManager* txtmgr = G3D->GetTextureManager ();
-  csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("wood");
-  iMaterialWrapper* itm = QUERY_INTERFACE (tm, iMaterialWrapper);
+  iMaterialWrapper* itm = engine->FindMaterial ("wood");
 
   //char *vfsfilename = "/lib/std/mystone2.gif";
   char *vfsfilename = "/lib/std/stone4.gif";
@@ -102,10 +108,10 @@ bool BumpTest::InitProcDemo ()
   //buf->DecRef();
   //VFS->DecRef();
   //imgloader->DecRef();
-  iImage *map = bptex->GetPrivateObject()->GetImageFile();
+  iImage *map = bptex->GetPrivateObject ()->GetImageFile();
   prBump = new csProcBump (map);
   //prBump->SetBumpMap(map);
-  matBump = prBump->Initialize (this, engine, txtmgr, "bumps");
+  matBump = &(prBump->Initialize (this, engine->GetCsEngine (), txtmgr, "bumps"))->scfiMaterialWrapper;
   iMeshObjectType* thing_type = engine->GetThingType ();
   iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
   iMeshObject* thing_obj = QUERY_INTERFACE (thing_fact, iMeshObject);
@@ -227,18 +233,16 @@ bool BumpTest::InitProcDemo ()
   */
 
   iSector* iroom = QUERY_INTERFACE (room, iSector);
-  csMeshWrapper* thing_wrap = new csMeshWrapper (engine, thing_obj);
+  iMeshWrapper* thing_wrap = engine->CreateMeshObject ("Bumpy");
   thing_obj->DecRef ();
-  thing_wrap->SetName ("Bumpy");
-  engine->meshes.Push (thing_wrap);
+
+  thing_wrap->SetMeshObject (thing_obj);
   thing_wrap->HardTransform (csTransform (csMatrix3 (), csVector3 (0, 5, 1)));
-  thing_wrap->GetMovable ().SetSector (room);
-  thing_wrap->GetMovable ().UpdateMove ();
+  thing_wrap->GetMovable ()->SetSector (room);
+  thing_wrap->GetMovable ()->UpdateMove ();
 
   thing_state->InitLightMaps (false);
-  iMeshWrapper* ithing_wrap = QUERY_INTERFACE (thing_wrap, iMeshWrapper);
-  room->ShineLights (ithing_wrap);
-  ithing_wrap->DecRef ();
+  room->ShineLights (thing_wrap);
   thing_state->CreateLightMaps (G3D);
 
 #if 0
@@ -279,14 +283,15 @@ bool BumpTest::InitProcDemo ()
   spstate->DecRef ();
 #endif
 
-
+// @@@ mem leaks, but the engine does not IncRef these yet
+/*
   iroom->DecRef();
   //sprfact->DecRef(); // mem leak
 
   thing_state->DecRef ();
   imatBump->DecRef ();
   itm->DecRef();
-
+*/
 
   return true;
 }
@@ -298,19 +303,17 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  iEngine *Engine = QUERY_PLUGIN (this, iEngine);
-  if (!Engine)
+  engine = QUERY_PLUGIN (this, iEngine);
+  if (!engine)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
-  engine = Engine->GetCsEngine ();
-  Engine->DecRef ();
 
   LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
@@ -351,16 +354,15 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   LevelLoader->LoadTexture ("wood", "/lib/std/andrew_wood.gif");
-  csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
+  iMaterialWrapper* tm = engine->FindMaterial ("stone");
 
-  room = engine->CreateCsSector ("room");
-  iMaterialWrapper* itm = QUERY_INTERFACE (tm, iMaterialWrapper);
+  room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
   iPolygon3D* p;
   iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
   p = walls_state->CreatePolygon ();
-  p->SetMaterial (itm);
+  p->SetMaterial (tm);
   p->CreateVertex (csVector3 (-5, 0, 5));
   p->CreateVertex (csVector3 (5, 0, 5));
   p->CreateVertex (csVector3 (5, 0, -5));
@@ -368,7 +370,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
-  p->SetMaterial (itm);
+  p->SetMaterial (tm);
   p->CreateVertex (csVector3 (-5, 20, -5));
   p->CreateVertex (csVector3 (5, 20, -5));
   p->CreateVertex (csVector3 (5, 20, 5));
@@ -376,7 +378,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
-  p->SetMaterial (itm);
+  p->SetMaterial (tm);
   p->CreateVertex (csVector3 (-5, 20, 5));
   p->CreateVertex (csVector3 (5, 20, 5));
   p->CreateVertex (csVector3 (5, 0, 5));
@@ -384,7 +386,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
-  p->SetMaterial (itm);
+  p->SetMaterial (tm);
   p->CreateVertex (csVector3 (5, 20, 5));
   p->CreateVertex (csVector3 (5, 20, -5));
   p->CreateVertex (csVector3 (5, 0, -5));
@@ -392,7 +394,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
-  p->SetMaterial (itm);
+  p->SetMaterial (tm);
   p->CreateVertex (csVector3 (-5, 20, -5));
   p->CreateVertex (csVector3 (-5, 20, 5));
   p->CreateVertex (csVector3 (-5, 0, 5));
@@ -400,7 +402,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
-  p->SetMaterial (itm);
+  p->SetMaterial (tm);
   p->CreateVertex (csVector3 (5, 20, -5));
   p->CreateVertex (csVector3 (-5, 20, -5));
   p->CreateVertex (csVector3 (-5, 0, -5));
@@ -408,14 +410,11 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   walls_state->DecRef ();
-  itm->DecRef ();
 
   LevelLoader->LoadTexture ("flare_center", "/lib/std/snow.jpg");
-  csMaterialWrapper* fmc = engine->GetMaterials ()->FindByName ("flare_center");
-  iMaterialWrapper* ifmc = QUERY_INTERFACE(fmc, iMaterialWrapper);
+  iMaterialWrapper* fmc = engine->FindMaterial ("flare_center");
   LevelLoader->LoadTexture ("flare_spark", "/lib/std/spark.png");
-  csMaterialWrapper* fms = engine->GetMaterials ()->FindByName ("flare_spark");
-  iMaterialWrapper* ifms = QUERY_INTERFACE(fms, iMaterialWrapper);
+  iMaterialWrapper* fms = engine->FindMaterial ("flare_spark");
 
   /*
   csStatLight* light;
@@ -428,9 +427,6 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   //light = new csStatLight (0, 5, -3, 10, 0, 1, 0, false);
   */
 
-  ifmc->DecRef();
-  ifms->DecRef();
-
   InitProcDemo ();
 
   //engine->Prepare ();
@@ -438,12 +434,11 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   // Create a -dynamic light.
   //float angle = 0;
   //dynlight = new csDynLight (cos (angle)*3, 5, sin (angle)*3, 7, 1, 1, 1);
-  dynlight = new csDynLight (-3, 5, -2, 7, 1, 1, 1);
-  dynlight->SetHalo (new csCrossHalo (1.0, 0.7));  // intensity, crossfactor
-  engine->AddDynLight (dynlight);
-  dynlight->SetSector (room);
+  dynlight = engine->CreateDynLight (csVector3 (-3, 5, -2), 7, csColor (1, 1, 1));
+  dynlight->QueryLight ()->CreateCrossHalo (1.0, 0.7);  // intensity, crossfactor
+  dynlight->QueryLight ()->SetSector (room);
   dynlight->Setup ();
-  bumplight = QUERY_INTERFACE(dynlight, iLight);
+  bumplight = dynlight->QueryLight ();
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
@@ -451,9 +446,9 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (engine, G3D);
+  view = engine->CreateView (G3D);
   view->SetSector (room);
-  view->GetCamera ()->SetPosition (csVector3 (0, 5, -3));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
 
   txtmgr->SetPalette ();
@@ -472,13 +467,13 @@ void BumpTest::NextFrame ()
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
 
   if (GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->RotateThis (VEC_ROT_RIGHT, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
   if (GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->RotateThis (VEC_ROT_LEFT, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
   if (GetKeyState (CSKEY_PGUP))
-    view->GetCamera ()->RotateThis (VEC_TILT_UP, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_UP, speed);
   if (GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->RotateThis (VEC_TILT_DOWN, speed);
+    view->GetCamera ()->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
   if (GetKeyState (CSKEY_UP))
     view->GetCamera ()->Move (VEC_FORWARD * 4.0f * speed);
   if (GetKeyState (CSKEY_DOWN))
@@ -496,8 +491,8 @@ void BumpTest::NextFrame ()
     animli -= speed * 2.5;
     if(animli < 0.0) going_right = true;
   }
-  dynlight->SetSector (room);
-  dynlight->SetCenter (csVector3(-3 + animli, 5, -2));
+  dynlight->QueryLight ()->SetSector (room);
+  dynlight->QueryLight ()->SetCenter (csVector3(-3 + animli, 5, -2));
   //printf("Moved to %g\n", -3 + animli);
   dynlight->Setup ();
 

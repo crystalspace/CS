@@ -18,18 +18,20 @@
 */
 
 #include "cssysdef.h"
-#include "ivideo/txtmgr.h"
+#include "qint.h"
+#include "prbump.h"
+
 #include "cssys/system.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
-#include "igraphic/image.h"
 #include "csgfx/rgbpixel.h"
-#include "iengine/light.h"
-#include "qint.h"
 
-#include "prbump.h"
+#include "ivideo/txtmgr.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "igraphic/image.h"
+#include "iengine/light.h"
+
 
 IMPLEMENT_CSOBJTYPE (csProcBump, csProcTexture);
 

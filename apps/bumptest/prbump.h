@@ -22,6 +22,7 @@
 
 #include "csutil/cscolor.h"
 #include "csfx/proctex.h"
+#include "csgeom/vector3.h"
 
 struct iImage;
 struct iLight;

@@ -29,23 +29,23 @@ struct iMeshFactoryWrapper;
 struct iMeshWrapper;
 struct iLoader;
 struct iLight;
-class csSector;
-class csView;
-class csEngine;
-class csDynLight;
+struct iSector;
+struct iView;
+struct iEngine;
+struct iDynLight;
+struct iMaterialWrapper;
 class csProcBump;
-class csMaterialWrapper;
 
 class BumpTest : public SysSystemDriver
 {
   typedef SysSystemDriver superclass;
 private:
-  csSector* room;
-  csView* view;
-  csEngine* engine;
-  csDynLight* dynlight;
+  iSector* room;
+  iView* view;
+  iEngine* engine;
+  iDynLight* dynlight;
   iLight *bumplight;
-  csMaterialWrapper* matBump;
+  iMaterialWrapper* matBump;
   iLoader *LevelLoader;
 
   float animli;
