@@ -213,6 +213,23 @@ struct iLight : public iBase
   */
   virtual csVector3 &GetAttenuationVector() = 0;
 
+  /** 
+   * Get the influenceradius of the light
+   */
+  virtual float GetInfluenceRadius () = 0;
+
+  /**
+   * Set the influenceradius
+   */
+  virtual void SetInfluenceRadius (float radius) = 0;
+
+  /**
+   * Calculate the influenceradius from the attenuation vector.
+   * If we only have constant attenuation the influence radius will be
+   * the same as the usual radius;
+   */
+  virtual void CalculateInfluenceRadius () = 0;
+
 #endif
   /// Create a cross halo for this light.
   virtual iCrossHalo* CreateCrossHalo (float intensity, float cross) = 0;

@@ -817,6 +817,18 @@ bool csGenmeshMeshObject::DrawZ (iRenderView* rview, iMovable* /*movable*/,
 bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
 	csZBufMode mode, iLight* light)
 {
+
+  iCamera* camera = rview->GetCamera ();
+  // First create the transformation from object to camera space directly:
+  //   W = Mow * O - Vow;
+  //   C = Mwc * (W - Vwc)
+  // ->
+  //   C = Mwc * (Mow * O - Vow - Vwc)
+  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
+  tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+
   csRef<iMaterialWrapper> mater = factory->shadowmat;
 
   iRender3D* r3d = rview->GetGraphics3D ();
@@ -881,6 +893,8 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
     r3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
   r3d->DrawMesh (&mesh);
 
+  //reset shadowcaps
+  shadow_caps = false;
   return true;
 }
 
@@ -916,6 +930,7 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* /*movable*/,
   color.blue *= (matcolor.blue/255);
 
   r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
+  //r3d->SetObjectToCamera (&tr_o2c);
   //set the light-parameters
   r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
   	light->GetCenter ());

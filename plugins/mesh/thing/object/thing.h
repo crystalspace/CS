@@ -1243,10 +1243,13 @@ public:
       return false;
     }
     virtual bool DrawLight (iRenderView* rview, iMovable* movable,
-    	csZBufMode zMode)
+  	csZBufMode zbufMode, iLight *light)
     {
       return false;
     }
+      /// The following enable/disable shadow caps for stencil shadow rendering
+    virtual void EnableShadowCaps () {}
+    virtual void DisableShadowCaps () {}
 #endif // CS_USE_NEW_RENDERER
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const

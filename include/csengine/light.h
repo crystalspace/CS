@@ -72,7 +72,17 @@ protected:
   int attenuation;
   
 #ifdef CS_USE_NEW_RENDERER
+  /// Attenuation vector in the format x=kc, y=kl, z=kq
   csVector3 attenuationvec;
+
+  /// The radius where the light have any effect at all
+  float influenceRadius; 
+
+  /**
+   * Config value: The intensity at the influenceRadius in parts of the 
+   * main light intensity.
+   */
+  static float influenceIntensity;
 #endif
 
   /// Light number. Changes when the light changes in some way (color/pos).
@@ -214,6 +224,22 @@ public:
   */
   csVector3 &GetAttenuationVector();
 
+  /** 
+   * Get the influenceradius of the light
+   */
+  float GetInfluenceRadius ();
+
+  /**
+   * Set the influenceradius
+   */
+  void SetInfluenceRadius (float radius);
+
+  /**
+   * Calculate the influenceradius from the attenuation vector.
+   * If we only have constant attenuation the influence radius will be
+   * the same as the usual radius;
+   */
+  void CalculateInfluenceRadius ();
 #endif
 
   /**
@@ -281,6 +307,9 @@ public:
 #ifdef CS_USE_NEW_RENDERER
     virtual void SetAttenuationVector(csVector3 &pattenv) { scfParent->SetAttenuationVector(pattenv); }
     virtual csVector3 &GetAttenuationVector() { return scfParent->GetAttenuationVector(); }
+    virtual float GetInfluenceRadius () { return scfParent->GetInfluenceRadius(); }
+    virtual void SetInfluenceRadius (float radius) { scfParent->SetInfluenceRadius (radius); }
+    virtual void CalculateInfluenceRadius () { scfParent->CalculateInfluenceRadius (); }
 #endif
     virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
     virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,

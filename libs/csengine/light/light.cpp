@@ -31,6 +31,8 @@ int csLight:: ambient_red = CS_DEFAULT_LIGHT_LEVEL;
 int csLight:: ambient_green = CS_DEFAULT_LIGHT_LEVEL;
 int csLight:: ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
 
+float csLight::influenceIntensity = 1/256;
+
 SCF_IMPLEMENT_IBASE_EXT(csLight)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLight)
 SCF_IMPLEMENT_IBASE_EXT_END
@@ -71,6 +73,7 @@ csLight::csLight (
   lightnr = 0;
 #ifdef CS_USE_NEW_RENDERER
   attenuationvec = csVector3(1,0,0); //default lightattenuation is kc = 1, kl=0,kq=0
+  CalculateInfluenceRadius ();
 #endif
 }
 
@@ -190,6 +193,8 @@ void csLight::SetRadius (float radius)
   sqdist = dist*dist;
   inv_dist = 1 / dist;
   lightnr++;
+
+  CalculateInfluenceRadius ();
 }
 
 void csLight::SetColor (const csColor& col) 
@@ -211,11 +216,58 @@ void csLight::SetColor (const csColor& col)
 void csLight::SetAttenuationVector(csVector3 &pattenv)
 {
   attenuationvec = pattenv;
+  
+  if (attenuationvec.x < 0)
+    attenuationvec.x = 0;
+  if (attenuationvec.y < 0)
+    attenuationvec.y = 0;
+  if (attenuationvec.z < 0)
+    attenuationvec.z = 0;
+
+  CalculateInfluenceRadius ();
 }
 
 csVector3 &csLight::GetAttenuationVector()
 {
   return attenuationvec;
+}
+
+float csLight::GetInfluenceRadius ()
+{
+  return influenceRadius;
+}
+
+void csLight::SetInfluenceRadius (float radius)
+{
+  if (radius > 0)
+    influenceRadius = radius;
+}
+
+void csLight::CalculateInfluenceRadius ()
+{
+  if (attenuationvec.y == 0 && attenuationvec.z == 0) {
+    SetInfluenceRadius (GetRadius()); //if we only have constant falloff, use current radius
+  }
+
+  /*calculate radius where the light have the intensity of 1/256 using the
+  standard lightmodel    1/(kc + kl*d + kl*d^2)
+  solution formula:
+       / -kl +- sqrt( kl^2 - 4*kc*kq + 1024*kq )\
+  0.5* |---------------------------------------|
+       \                kq                     /
+  */
+  float radius1, radius2;
+  float kc = attenuationvec.x;
+  float kl = attenuationvec.y;
+  float kq = attenuationvec.z;
+  float det;
+  
+  det = -kl + sqrtf( pow(kl,2) - 4*kc*kq + 1024*kq);
+  radius1 = 0.5*(det/kq);
+  det = -kl - sqrtf( pow(kl,2) - 4*kc*kq + 1024*kq);
+  radius2 = 0.5*(det/kq);
+
+  SetInfluenceRadius(MAX(radius1,radius2));
 }
 
 #endif

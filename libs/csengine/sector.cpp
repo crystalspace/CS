@@ -729,6 +729,28 @@ void csSector::Draw (iRenderView *rview)
     delete[] objects;
 #else
 
+    /*
+     * Culling in the new renderer
+     * - Lights are culled using their radius against the screen.
+     *   Normally the intensity at radius is 1/(256, 512 or 1024) and can
+     *   be said to be invisible.
+     *
+     * - DrawZ pass only draw objects on screen
+     * - DrawShadow is the most complicated in terms of culling. First it
+     *   uses a bounding-sphere calculation against the light influence 
+     *   radius. Thereafter it checks wheter the light is in front of or 
+     *   behind the camera-plane. Depending on that we can do two things
+     *    1. In front of - don't cull any meshes based on that.
+     *    2. Behind. Go through all meshes in the boundingsphere and test
+     *       if they are behind or infront of the light. If they are behind
+     *       don't draw shadow, otherwise draw it.
+     *   At last we go through and check if we should use Carmacks Reversed
+     *   for objects which we are in the shadow of.
+     * - DrawLight uses the objectlist created by DrawZ and does an additional
+     *   check to see that object is in influenceradius of a light.
+     */
+
+
     csLightList alllights;
     csRef<iSectorList> secs = csEngine::current_engine->GetSectors ();
 	int i;
@@ -739,7 +761,7 @@ void csSector::Draw (iRenderView *rview)
       {
         // Sphere check against rview before adding it.
         csSphere s = csSphere (seclights->Get(j)->GetCenter (), 
-        seclights->Get(j)->GetRadius());
+        seclights->Get (i)->GetInfluenceRadius ());
         if (rview->TestBSphere (rview->GetCamera()->GetTransform(), s))
 	      alllights.Add (seclights->Get(j));
         else { 
@@ -747,6 +769,15 @@ void csSector::Draw (iRenderView *rview)
         }
       }
     }
+
+    PrepareDraw (rview);
+
+    
+    // Mark visible objects.
+    culler->VisTest (rview);
+    uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
+
+    objects = RenderQueues.SortAll (rview, num_objects, current_visnr);
 
     r3d->EnableZOffset ();
     DrawZ (rview);
@@ -764,6 +795,7 @@ void csSector::Draw (iRenderView *rview)
     }
     
     delete[] objects;
+    draw_busy --;
 #endif
   }
 
@@ -814,12 +846,7 @@ void csSector::Draw (iRenderView *rview)
 #ifdef CS_USE_NEW_RENDERER
 void csSector::DrawZ (iRenderView* rview)
 {
-  PrepareDraw (rview);
   int i;
-
-  // Mark visible objects.
-  culler->VisTest (rview);
-  uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
 
   // get a pointer to the previous sector
   iSector *prev_sector = rview->GetPreviousSector ();
@@ -835,7 +862,6 @@ void csSector::DrawZ (iRenderView* rview)
           CS_PORTAL_WARP);
   }
 
-  objects = RenderQueues.SortAll (rview, num_objects, current_visnr);
   for (i = 0; i < num_objects; i ++)
   {
     iMeshWrapper *sp = objects[i];
@@ -857,13 +883,69 @@ void csSector::DrawZ (iRenderView* rview)
 
 void csSector::DrawShadow (iRenderView* rview, iLight* light)
 {
-  for (int i = 0; i < num_objects; i ++) {
-    iMeshWrapper *sp = objects[i];
+  //test if light is in front of or behind camera
+  bool lightBehindCamera = false;
+  const csVector3 camPlaneZ = rview->GetCamera ()->GetTransform ().GetO2T ().Row3 ();
+  const csVector3 camPos = rview->GetCamera ()->GetTransform().GetOrigin ();
+  const csVector3 lightPos = light->GetCenter ();
+  csVector3 v = lightPos - camPos;
+
+  if (camPlaneZ*v < 0)
+    lightBehindCamera = true;
+
+  // mark those objects where we are in the shadow-volume
+  csRef<iVisibilityObjectIterator> objCameraInShadow = culler->IntersectSegment (
+    camPos, lightPos);
+  while (!objCameraInShadow->IsFinished() )
+  {
+    iMeshWrapper *sp = objCameraInShadow->GetObject() ->GetMeshWrapper ();
+    sp->GetMeshObject ()->EnableShadowCaps ();
+    objCameraInShadow->Next();
+  }
+
+  //cull against the boundingsphere of the light
+  csSphere lightSphere (light->GetCenter (), light->GetInfluenceRadius ());
+  csRef<iVisibilityObjectIterator> objInLight = culler->VisTest (lightSphere);
+  
+  csVector3 rad, center;
+  float maxRadius = 0;
+  while (objInLight->Next () )
+  {
+    iMeshWrapper *sp = objInLight->GetObject() ->GetMeshWrapper ();
     if (sp) 
     {
-      sp->DrawShadow (rview, light);
+      sp->GetRadius (rad, center);
+      
+      csVector3 pos = sp->GetMovable() ->GetTransform ().This2Other (center); //transform it
+      csVector3 radWorld = sp->GetMovable ()->GetTransform ().This2Other (rad);
+      maxRadius = MAX(radWorld.x, MAX(radWorld.y, radWorld.z));
+
+      if (!lightBehindCamera) {
+        // light is in front of camera
+        //test if mesh is behind camera
+        v = pos - camPos;
+        if (!(camPlaneZ*v < -maxRadius))
+          sp->DrawShadow (rview, light); //mesh is also infront of camera, draw the shadow
+      }
+      else {
+        // light is behind camera
+        // if mesh is behind the light we don't draw it
+        v = pos - lightPos;
+        if (camPlaneZ*v < maxRadius)
+          sp->DrawShadow (rview, light); //mesh is infront of the light, draw the shadow
+      }
     }
   }
+
+  //disable the reverses
+  objCameraInShadow->Reset ();
+  while (!objCameraInShadow->IsFinished() )
+  {
+    iMeshWrapper *sp = objCameraInShadow->GetObject() ->GetMeshWrapper ();
+    sp->GetMeshObject ()->DisableShadowCaps ();
+    objCameraInShadow->Next();
+  }
+
 }
 
 void csSector::DrawLight (iRenderView* rview, iLight* light)
@@ -883,7 +965,7 @@ void csSector::DrawLight (iRenderView* rview, iLight* light)
     // Tell the engine to try to add this light into the halo queue
     csEngine::current_engine->AddHalo (lights.Get (i)->GetPrivateObject ());
 
-  draw_busy --;
+
 }
 #endif // CS_USE_NEW_RENDERER
 
