@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+6-Jul-2002
+	- Removed -fno-rtti from comptest.sh. So this option will no
+	  longer be used from the moment you do 'make linux' again.
 4-Jul-2002
 	- Received a binary sprite loader/saver from David Asbell
 	  <dasbell@yahoo.com>. This sprite 3D loader is roughly equivalent

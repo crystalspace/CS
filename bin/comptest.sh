@@ -64,7 +64,8 @@ fi
 
 # Check for GCC-version-specific command-line options
 ${CXX} -c -fno-exceptions comptest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-exceptions"
-${CXX} -c -fno-rtti comptest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-rtti"
+#We no longer add the -fno-rtti since this complicates linking:
+#${CXX} -c -fno-rtti comptest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-rtti"
 
 #------------------------------------------------------------------------------
 # Check if C++ compiler has a built-in 'bool' type.
