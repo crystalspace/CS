@@ -2726,7 +2726,7 @@ void csThing::PrepareLMs ()
     const csThingStatic::csStaticLitPolyGroup& slpg = 
       *(static_data->litPolys[i]);
 
-    const csRef<iSuperLightmap>* SLMptr = superLMs.Get (slpg.staticSLM);
+    const csRef<iSuperLightmap>* SLMptr = superLMs.GetPointer (slpg.staticSLM);
     csRef<iSuperLightmap> SLM;
 
     if (SLMptr == 0)
