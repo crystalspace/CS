@@ -51,16 +51,6 @@ class csRenderMesh;
 /** \name Meshwrapper flags
  * @{ */
 /**
- * If CS_ENTITY_CONVEX is set then this entity is convex (what did
- * you expect :-)
- * This means the 3D engine can do various optimizations.
- * If you set 'convex' to true the center vertex will also be calculated.
- * It is unset by default.
- * This flag is currently not used.
- */
-#define CS_ENTITY_CONVEX 1
-
-/**
  * If CS_ENTITY_DETAIL is set then this entity is a detail
  * object. A detail object is treated as a single object by
  * the engine. The engine can do several optimizations on this.

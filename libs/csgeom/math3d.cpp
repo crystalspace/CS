@@ -880,6 +880,7 @@ private:
   csVector3 verts[8];
   csMeshedPolygon poly[6];
   int vertices[4*6];
+  csFlags flags;
   
 public:
   UnitCubeMesh ();
@@ -891,7 +892,7 @@ public:
   virtual int GetPolygonCount () { return 6; }
   virtual csMeshedPolygon* GetPolygons () { return poly; }
   virtual void Cleanup () { }
-  virtual bool IsDeformable () const { return false; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return 0; }
 };
 

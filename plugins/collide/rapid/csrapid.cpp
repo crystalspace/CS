@@ -114,6 +114,7 @@ struct TriPolygonMesh : public iPolygonMesh
   csVector3 verts[3];
   csMeshedPolygon poly[1];
   int vt_idx[3];
+  csFlags flags;
 
   SCF_DECLARE_IBASE;
 
@@ -132,7 +133,7 @@ struct TriPolygonMesh : public iPolygonMesh
   virtual int GetPolygonCount () { return 1; }
   virtual csMeshedPolygon* GetPolygons () { return poly; }
   virtual void Cleanup () { }
-  virtual bool IsDeformable () const { return false; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return 0; }
 };
 

@@ -645,6 +645,8 @@ public:
   {
   private:
     csSprite3DMeshObjectFactory* factory;
+    csFlags flags;
+
   public:
     SCF_DECLARE_IBASE;
 
@@ -675,7 +677,7 @@ public:
     /// Cleanup.
     virtual void Cleanup () { delete[] polygons; polygons = 0; }
     
-    virtual bool IsDeformable () const { return false;  }
+    virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
     PolyMesh () : polygons (0)
@@ -1704,6 +1706,10 @@ public:
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
   {
+  private:
+    csFlags flags;
+
+  public:
     SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
 
     /// Get the number of vertices for this mesh.
@@ -1731,7 +1737,7 @@ public:
     /// Cleanup.
     virtual void Cleanup () { delete[] polygons; polygons = 0; }
     
-    virtual bool IsDeformable () const { return false;  }
+    virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
     PolyMesh () : polygons (0) { }

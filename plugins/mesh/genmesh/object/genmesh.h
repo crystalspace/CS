@@ -361,6 +361,10 @@ public:
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
   {
+  private:
+    csFlags flags;
+
+  public:
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
 
     virtual int GetVertexCount ();
@@ -369,7 +373,7 @@ public:
     virtual csMeshedPolygon* GetPolygons ();
     virtual void Cleanup () { }
     
-    virtual bool IsDeformable () const { return false;  }
+    virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
     PolyMesh () { }
@@ -655,6 +659,7 @@ public:
   {
   private:
     csGenmeshMeshObjectFactory* factory;
+    csFlags flags;
   public:
     //SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
     SCF_DECLARE_IBASE;
@@ -668,7 +673,7 @@ public:
     virtual csMeshedPolygon* GetPolygons ();
     virtual void Cleanup () { }
     
-    virtual bool IsDeformable () const { return false;  }
+    virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
     PolyMesh () { SCF_CONSTRUCT_IBASE (0); }

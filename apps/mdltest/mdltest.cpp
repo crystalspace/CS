@@ -476,14 +476,12 @@ bool Simple::Initialize (const char *iConfigName)
   ThingWrapper->HardTransform (tr);
   ThingWrapper->GetMovable ()->SetSector (room);
   ThingWrapper->GetMovable ()->UpdateMove ();
-  ThingWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
   ThingWrapper->SetZBufMode (CS_ZBUF_USE);
   ThingWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
 
   SpriteWrapper->GetMovable ()->SetPosition (csVector3 (rad, 0, 0));
   SpriteWrapper->GetMovable ()->SetSector (room);
   SpriteWrapper->GetMovable ()->UpdateMove ();
-  SpriteWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
   SpriteWrapper->SetZBufMode (CS_ZBUF_USE);
   SpriteWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
 

@@ -127,6 +127,7 @@ public:
   csMeshedPolygon* culling_mesh;
   bool culling;
   csVector3* square_verts;
+  csFlags flags;
 
   SCF_DECLARE_IBASE;
   BCPolyMesh ();
@@ -165,9 +166,8 @@ public:
     return;
   }
  
-  virtual bool IsDeformable () const { return false;  }
+  virtual csFlags& GetFlags () { return flags;  }
   virtual uint32 GetChangeNumber() const { return 0; }
-
 };
 
 /**

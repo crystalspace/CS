@@ -29,6 +29,31 @@ chronological order.
 	- Jorrit fixed a bug in the new renderer where it would fail to
 	  set the top_clipper in StartDraw(). In fact new renderer fails to
 	  do anything in StartDraw().
+	- Jorrit replaced iPolygonMesh->IsDeformable() with the more general
+	  iPolygonMesh->GetFlags(). The following flags are supported:
+	  	- CS_POlYMESH_CLOSED: object is closed.
+	  	- CS_POlYMESH_NOTCLOSED: object is not closed.
+	  	- CS_POlYMESH_CONVEX: object is convex.
+	  	- CS_POlYMESH_NOTCONVEX: object is not convex.
+	  	- CS_POlYMESH_DEFORMABLE: object is deformable.
+	  Modules inside CS (like the shadow manager for the new renderer
+	  and the visibility culler) may use these flags to optimize
+	  their behaviour with respect to the model. For example, the stencil
+	  shadower wants to have closed objects so if an object is not closed
+	  it will have to close it itself.
+	- Jorrit added <closed />, <notclosed />, <convex />, and <notconvex />
+	  keywords to <polymesh> parser so that you can set the hints to be used
+	  for culler, CD, and shadow manager. Note that <box> is closed and
+	  convex by default so there is no need to add the hints then.
+	- Jorrit also added <default /> to <polymesh> parsing so that you can
+	  change the closed/convex flags for the default polymesh of
+	  some object.
+	- Jorrit removed CS_ENTITY_CONVEX. This flag was not used and
+	  is now made obsolete by the flags in iPolygonMesh.
+	- Jorrit reports: the old <convex> and <closed> keywords that you
+	  could use in a mesh will now also set the equivalent
+	  CS_POlYMESH_... flags in all polygon meshes associated with that mesh.
+	- Jorrit added support for <closed> and <convex> to factories too.
 4-Sep-2003
 	- Peter Amstutz fixed the csPolyTexture destructor (part of
 	  the thing plugin) to not try to deallocate the lightmap

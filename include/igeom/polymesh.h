@@ -21,11 +21,50 @@
 #define __CS_IGEOM_POLYMESH_H__
 
 #include "csutil/scf.h"
+#include "csutil/flags.h"
 
 /**
  * \addtogroup geom_utils
  * @{ */
  
+/** \name flags for iPolygonMesh.
+ * @{ */
+/**
+ * If this flag is set then the object is closed. With closed we mean
+ * that if you run a beam of light through the object it will always
+ * hit an even amount of faces (one going in, and one going out).
+ */
+#define CS_POLYMESH_CLOSED 1
+/**
+ * If this flag is set then the object is not closed.
+ * This is the opposite of CS_POLYMESH_CLOSED. Use this flag if you are
+ * absolutely certain that the object is not closed. The engine will not
+ * attempt to test if the object is really closed or not. If you don't
+ * set CLOSED or NOTCLOSED then the state is not known and the engine
+ * may test it if it wants.
+ */
+#define CS_POLYMESH_NOTCLOSED 2
+/**
+ * If this flag is set then the object is convex. With convex we mean
+ * that if you run a beam of light through the object it will always
+ * hit an two faces (one going in, and one going out).
+ */
+#define CS_POLYMESH_CONVEX 4
+/**
+ * If this flag is set then the object is not convex.
+ * This is the opposite of CS_POLYMESH_CONVEX. Use this flag if you are
+ * absolutely certain that the object is not convex. The engine will not
+ * attempt to test if the object is really convex or not. If you don't
+ * set CONVEX or NOTCONVEX then the state is not known and the engine
+ * may test it if it wants.
+ */
+#define CS_POLYMESH_NOTCONVEX 8
+/**
+ * Set this flag if the polygon mesh is deformable.
+ */
+#define CS_POLYMESH_DEFORMABLE 16
+/** @} */
+
 /**
  * A polygon. Note that this structure is only valid if used
  * in combination with a vertex table. The vertex array then
@@ -39,7 +78,7 @@ struct csMeshedPolygon
 
 class csVector3;
 
-SCF_VERSION (iPolygonMesh, 0, 2, 1);
+SCF_VERSION (iPolygonMesh, 0, 3, 0);
 
 /**
  * This interface reprents a mesh of polygons. It is useful to communicate
@@ -67,13 +106,24 @@ struct iPolygonMesh : public iBase
    * This gives the polygon mesh a chance to clean up some stuff.
    */
   virtual void Cleanup () = 0;
-  
+
   /**
-   * Is this a deformable mesh? If yes you can use GetChangeNumber()
-   * to detect if a change actually occured.
+   * Get flags for this polygon mesh. This is zero or more of the
+   * following:
+   * <ul>
+   * <li>#CS_POLYMESH_CLOSED: mesh is closed.
+   * <li>#CS_POLYMESH_NOTCLOSED: mesh is not closed.
+   * <li>#CS_POLYMESH_CONVEX: mesh is convex.
+   * <li>#CS_POLYMESH_NOTCONVEX: mesh is not convex.
+   * <li>#CS_POLYMESH_DEFORMABLE: mesh is deformable.
+   * </ul>
+   * Note that if neither #CS_POLYMESH_CLOSED nor #CS_POLYMESH_NOTCLOSED
+   * are set then the closed state is not known. Setting both is illegal.
+   * Note that if neither #CS_POLYMESH_CONVEX nor #CS_POLYMESH_NOTCONVEX
+   * are set then the convex state is not known. Setting both is illegal.
    */
-  virtual bool IsDeformable () const = 0;
-  
+  virtual csFlags& GetFlags () = 0;
+
   /**
    * When this number changes you know the polygon mesh has changed
    * (deformation has occured) since the last time you got another

@@ -400,10 +400,15 @@ public:
   {
   private:
     csBallMeshObject* ball;
+    csFlags flags;
   public:
     SCF_DECLARE_IBASE;
 
-    void SetBall (csBallMeshObject* Ball) { ball = Ball; }
+    void SetBall (csBallMeshObject* Ball)
+    {
+      ball = Ball;
+      flags.SetAll (CS_POLYMESH_CLOSED | CS_POLYMESH_CONVEX);
+    }
 
     virtual int GetVertexCount ();
     virtual csVector3* GetVertices ();
@@ -411,7 +416,7 @@ public:
     virtual csMeshedPolygon* GetPolygons ();
     virtual void Cleanup ();
     
-    virtual bool IsDeformable () const { return false;  }
+    virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
     PolyMesh () 

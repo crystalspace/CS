@@ -792,6 +792,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("convex", XMLTOKEN_CONVEX);
   xmltokens.Register ("culler", XMLTOKEN_CULLER);
   xmltokens.Register ("cullerp", XMLTOKEN_CULLERP);
+  xmltokens.Register ("default", XMLTOKEN_DEFAULT);
   xmltokens.Register ("detail", XMLTOKEN_DETAIL);
   xmltokens.Register ("distance", XMLTOKEN_DISTANCE);
   xmltokens.Register ("dynamic", XMLTOKEN_DYNAMIC);
@@ -846,6 +847,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("node", XMLTOKEN_NODE);
   xmltokens.Register ("nolighting", XMLTOKEN_NOLIGHTING);
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
+  xmltokens.Register ("notclosed", XMLTOKEN_NOTCLOSED);
+  xmltokens.Register ("notconvex", XMLTOKEN_NOTCONVEX);
   xmltokens.Register ("nullmesh", XMLTOKEN_NULLMESH);
   xmltokens.Register ("params", XMLTOKEN_PARAMS);
   xmltokens.Register ("paramsfile", XMLTOKEN_PARAMSFILE);
@@ -1423,6 +1426,7 @@ private:
   int* vertex_indices;
   int num_verts;
   int num_tris;
+  csFlags flags;
 
 public:
   PolygonMeshMesh (int num_verts, int num_tris)
@@ -1455,7 +1459,7 @@ public:
   virtual int GetPolygonCount () { return num_tris; }
   virtual csMeshedPolygon* GetPolygons () { return polygons; }
   virtual void Cleanup () { }
-  virtual bool IsDeformable () const { return false; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return 0; }
 };
 
@@ -1536,6 +1540,11 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
   bool colldet = false;
   bool viscull = false;
   bool shadows = false;
+  bool convex = false;
+  bool notconvex = false;
+  bool closed = false;
+  bool notclosed = false;
+  bool use_default_mesh = false;
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
@@ -1544,13 +1553,53 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_DEFAULT:
+        if (polymesh)
+	{
+	  SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.polymesh", child,
+	    "Use either <default>, <box>, or <mesh>!");
+	  return false;
+	}
+	use_default_mesh = true;
+        break;
       case XMLTOKEN_BOX:
+        if (polymesh || use_default_mesh)
+	{
+	  SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.polymesh", child,
+	    "Use either <default>, <box>, or <mesh>!");
+	  return false;
+	}
         if (!ParsePolyMeshChildBox (child, polymesh))
 	  return false;
         break;
       case XMLTOKEN_MESH:
+        if (polymesh || use_default_mesh)
+	{
+	  SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.polymesh", child,
+	    "Use either <default>, <box>, or <mesh>!");
+	  return false;
+	}
         if (!ParsePolyMeshChildMesh (child, polymesh))
 	  return false;
+        break;
+      case XMLTOKEN_CLOSED:
+        closed = true;
+	notclosed = false;
+        break;
+      case XMLTOKEN_NOTCLOSED:
+        closed = false;
+        notclosed = true;
+        break;
+      case XMLTOKEN_CONVEX:
+        convex = true;
+	notconvex = false;
+        break;
+      case XMLTOKEN_NOTCONVEX:
+        convex = false;
+        notconvex = true;
         break;
       case XMLTOKEN_COLLDET:
         colldet = true;
@@ -1573,12 +1622,57 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
 	node, "Please specify either <shadows/>, <viscull/> or <colldet/>!");
     return false;
   }
-  if (colldet)
-    objmodel->SetPolygonMeshColldet (polymesh);
-  if (viscull)
-    objmodel->SetPolygonMeshViscull (polymesh);
-  if (shadows)
-    objmodel->SetPolygonMeshShadows (polymesh);
+#undef CS_CLO
+#undef CS_CON
+#define CS_CLO (CS_POLYMESH_CLOSED|CS_POLYMESH_NOTCLOSED)
+#define CS_CON (CS_POLYMESH_CONVEX|CS_POLYMESH_NOTCONVEX)
+  if (use_default_mesh)
+  {
+    if (colldet && objmodel->GetPolygonMeshColldet ())
+    {
+      csFlags& flags = objmodel->GetPolygonMeshColldet ()->GetFlags ();
+      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
+      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
+      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
+      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
+    }
+    if (viscull && objmodel->GetPolygonMeshViscull ())
+    {
+      csFlags& flags = objmodel->GetPolygonMeshViscull ()->GetFlags ();
+      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
+      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
+      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
+      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
+    }
+    if (shadows && objmodel->GetPolygonMeshShadows ())
+    {
+      csFlags& flags = objmodel->GetPolygonMeshShadows ()->GetFlags ();
+      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
+      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
+      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
+      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
+    }
+  }
+  else
+  {
+    if (polymesh)
+    {
+      csFlags& flags = polymesh->GetFlags ();
+      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
+      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
+      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
+      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
+    }
+
+    if (colldet)
+      objmodel->SetPolygonMeshColldet (polymesh);
+    if (viscull)
+      objmodel->SetPolygonMeshViscull (polymesh);
+    if (shadows)
+      objmodel->SetPolygonMeshShadows (polymesh);
+  }
+#undef CS_CLO
+#undef CS_CON
 
   return true;
 }
@@ -1820,6 +1914,52 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	}
 	break;
 
+      case XMLTOKEN_CLOSED:
+	if (!stemp->GetMeshObjectFactory ())
+	{
+          SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.meshfactory",
+            child, "Please use 'params' before specifying 'closed'!");
+	  return false;
+	}
+	else
+        {
+	  iObjectModel* objmodel = stemp->GetMeshObjectFactory ()
+	  	->GetObjectModel ();
+          if (objmodel->GetPolygonMeshShadows ())
+            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+	      CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
+          if (objmodel->GetPolygonMeshViscull ())
+            objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
+	      CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
+          if (objmodel->GetPolygonMeshShadows ())
+            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+	      CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
+        }
+        break;
+      case XMLTOKEN_CONVEX:
+	if (!stemp->GetMeshObjectFactory ())
+	{
+          SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.meshfactory",
+            child, "Please use 'params' before specifying 'convex'!");
+	  return false;
+	}
+	else
+        {
+	  iObjectModel* objmodel = stemp->GetMeshObjectFactory ()
+	  	->GetObjectModel ();
+          if (objmodel->GetPolygonMeshShadows ())
+            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+	      CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+          if (objmodel->GetPolygonMeshViscull ())
+            objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
+	      CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+          if (objmodel->GetPolygonMeshShadows ())
+            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+	      CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+        }
+        break;
       case XMLTOKEN_MATERIAL:
         {
 	  if (!stemp->GetMeshObjectFactory ())
@@ -2204,6 +2344,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	  	child, "First specify the parent factory with 'factory'!");
 	return false;
       }
+      else
       {
         csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
   	  iVisibilityObject);
@@ -2218,6 +2359,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	  	child, "First specify the parent factory with 'factory'!");
 	return false;
       }
+      else
       {
         csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
   	  iVisibilityObject);
@@ -2232,10 +2374,22 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	  	child, "First specify the parent factory with 'factory'!");
 	return false;
       }
+      else
       {
         csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
   	  iVisibilityObject);
         visobj->GetCullerFlags ().Set (CS_CULLER_HINT_CLOSED);
+
+	iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+        if (objmodel->GetPolygonMeshShadows ())
+          objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+	    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
+        if (objmodel->GetPolygonMeshViscull ())
+          objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
+	    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
+        if (objmodel->GetPolygonMeshShadows ())
+          objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+	    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
       }
       break;
     case XMLTOKEN_CONVEX:
@@ -2246,11 +2400,22 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	  	child, "First specify the parent factory with 'factory'!");
 	return false;
       }
-      mesh->GetFlags().Set (CS_ENTITY_CONVEX);
+      else
       {
         csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
   	  iVisibilityObject);
         visobj->GetCullerFlags ().Set (CS_CULLER_HINT_CONVEX);
+
+	iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+        if (objmodel->GetPolygonMeshShadows ())
+          objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+	    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+        if (objmodel->GetPolygonMeshViscull ())
+          objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
+	    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+        if (objmodel->GetPolygonMeshShadows ())
+          objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
+	    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
       }
       break;
     case XMLTOKEN_KEY:
@@ -2261,6 +2426,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	  	child, "First specify the parent factory with 'factory'!");
 	return false;
       }
+      else
       {
         iKeyValuePair* kvp = ParseKey (child, mesh->QueryObject());
 	if (kvp)

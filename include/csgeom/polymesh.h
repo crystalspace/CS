@@ -31,12 +31,10 @@
 /**
  * A convenience polygon mesh implementation that you can feed
  * with vertices and polygons from another source.
- * This mesh optionally supports deformable.
  */
 class csPolygonMesh : public iPolygonMesh
 {
 private:
-  bool deformable;
   uint32 change_nr;
 
   int vt_count;
@@ -47,6 +45,8 @@ private:
   csMeshedPolygon* po;
   bool delete_po;	// If true this class is responsible for cleanup.
 
+  csFlags flags;
+
 public:
   /**
    * Construct a polygon mesh.
@@ -54,7 +54,6 @@ public:
   csPolygonMesh ()
   {
     SCF_CONSTRUCT_IBASE (0);
-    deformable = false;
     change_nr = 0;
     vt = 0;
     vt_count = 0;
@@ -125,14 +124,6 @@ public:
   }
 
   /**
-   * Set deformable on or off.
-   */
-  void SetDeformable (bool deformable)
-  {
-    csPolygonMesh::deformable = deformable;
-  }
-
-  /**
    * Indicate that the shape has changed.
    */
   void ShapeChanged ()
@@ -147,7 +138,7 @@ public:
   virtual int GetPolygonCount () { return po_count; }
   virtual csMeshedPolygon* GetPolygons () { return po; }
   virtual void Cleanup () { }
-  virtual bool IsDeformable () const { return deformable; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return change_nr; }
 };
 
@@ -161,6 +152,7 @@ private:
   csMeshedPolygon polygons[6];
   int vertex_indices[4*6];
   uint32 change_nr;
+  csFlags flags;
 
 public:
   /**
@@ -201,6 +193,8 @@ public:
     vertex_indices[5*4+2] = 3;
     vertex_indices[5*4+3] = 2;
     SetBox (box);
+
+    flags.SetAll (CS_POLYMESH_CLOSED | CS_POLYMESH_CONVEX);
   }
 
   virtual ~csPolygonMeshBox ()
@@ -230,7 +224,7 @@ public:
   virtual int GetPolygonCount () { return 6; }
   virtual csMeshedPolygon* GetPolygons () { return polygons; }
   virtual void Cleanup () { }
-  virtual bool IsDeformable () const { return false; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return change_nr; }
 };
 

@@ -116,7 +116,7 @@ public:
   }
   virtual void Cleanup ();
   
-  virtual bool IsDeformable () const { return false;  }
+  virtual csFlags& GetFlags () { return flags;  }
   virtual uint32 GetChangeNumber() const { return 0; }
 
 private:
@@ -127,6 +127,7 @@ private:
   int num_poly;			// Total number of polygons.
   int num_verts;		// Total number of vertices.
   uint32 poly_flag;		// Polygons must match with this flag.
+  csFlags flags;
 };
 
 /**
