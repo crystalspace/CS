@@ -79,7 +79,7 @@ struct iTextureHandle : public iBase
 #ifdef CS_USE_NEW_RENDERER
   // CHANGED TO ADD SUPPORT FOR CUBEMAPS AND 3D TEXTURES
   // done by Phil Aumayr (phil@rarebyte.com)
-  enum { CS_TEX_IMG_1D = 1, CS_TEX_IMG_2D, CS_TEX_IMG_3D, CS_TEX_IMG_CUBEMAP };
+  enum { CS_TEX_IMG_1D = 0, CS_TEX_IMG_2D, CS_TEX_IMG_3D, CS_TEX_IMG_CUBEMAP };
   /**
    * Texture Depth Indices are used for Cubemap interface
    */
