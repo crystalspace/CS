@@ -3,6 +3,7 @@ The history order is reversed so that new features are at the top.
 9-Oct-2002
 	- For some reason include/cssys/win32/csosdefs.h was full of
 	  ^M (carriage return) characters. This failed the compilation.
+	- Fixed other ^M chars in other thread related files.
 8-Oct-2002
 	- Eric Sunshine made the following changes:
 	    - Added the new makefile variable MKDIRS which, given a path
