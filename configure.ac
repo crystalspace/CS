@@ -708,12 +708,12 @@ CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
 
 
 #------------------------------------------------------------------------------
-# Check if linker recognizes -E which is specified in debug mode to allow the
-# backtrace() callstack creation code to obtain symbols in all cases.
+# Check how to ask the linker to export all dynamic symbols in debug mode to
+# allow the backtrace() callstack creation code to obtain symbols in all cases.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD([if -E is accepted], [cs_cv_prog_link_E], [],
-    [CS_CREATE_TUPLE([-Wl,-E])], [C++],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.debug], [-Wl,-E], [+])])
+CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
+    [cs_cv_prog_link_export_dynamic], [CS_CREATE_TUPLE([-Wl,-E])],
+    [C++], [COMPILER.LFLAGS.debug], [+])
 
 
 
