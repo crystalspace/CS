@@ -115,92 +115,154 @@ csRef<iDocumentNode> csSaver::CreateValueNode(
   return child;
 }
 
-csRef<iDocumentNode> csSaver::CreateValueNodeAsFloat(
-  iDocumentNode* parent, const char* name, float value)
+const char* csSaver::GetPluginName (const char* plugin, const char* type)
 {
-  csRef<iDocumentNode> child = CreateNode(parent, name);
-  csRef<iDocumentNode> text = child->CreateNodeBefore(CS_NODE_TEXT, 0);
-  text->SetValueAsFloat (value);
-  return child;
+  if (!plugins.In (plugin))
+  {
+    csString plugintype (plugin);
+    size_t pos = plugintype.FindLast ('.');
+    csString pluginname = plugintype.Slice (pos+1, plugintype.Length ()-pos-1);
+    pluginname += type; // For uniqueness
+    plugins.PutUnique (plugintype.GetData (), pluginname.GetData ());
+  }
+  return plugins.Get (plugin, plugin);
 }
 
-csRef<iDocumentNode> csSaver::CreateValueNodeAsColor(
-  iDocumentNode* parent, const char* name, const csColor &color)
+bool csSaver::SavePlugins (iDocumentNode* parent)
 {
-  csRef<iDocumentNode> child=CreateNode(parent, name);
-  child->SetAttributeAsFloat("red",   color.red  );
-  child->SetAttributeAsFloat("green", color.green);
-  child->SetAttributeAsFloat("blue",  color.blue );
-  return child;
+  csHash<csStrKey, csStrKey, csConstCharHashKeyHandler>::GlobalIterator it =
+    plugins.GetIterator ();
+  csRef<iDocumentNode> pluginNode =
+    parent->CreateNodeBefore (CS_NODE_ELEMENT, before);
+  pluginNode->SetValue ("plugins");
+  before = 0;
+
+  csStrKey plugintype;
+  while (it.HasNext ())
+  {
+    csRef<iDocumentNode> plg = CreateNode (pluginNode, "plugin");
+    plg->SetAttribute ("name", it.Next (plugintype));
+    plg->CreateNodeBefore (CS_NODE_TEXT)->SetValue (plugintype);
+  }
+  return true;
 }
 
 bool csSaver::SaveTextures(iDocumentNode *parent)
 {
   csRef<iDocumentNode> current = CreateNode(parent, "textures");
+  before = current; // Set up for plugins
 
   iTextureList* texList=engine->GetTextureList();
   for (int i = 0; i < texList->GetCount(); i++)
   {
     iTextureWrapper *texWrap=texList->Get(i);
+    iTextureHandle* texHand = texWrap->GetTextureHandle ();
     csRef<iDocumentNode>child = current->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     const char *name=texWrap->QueryObject()->GetName();
-    child->SetValue("texture");
     if (name && *name)
       child->SetAttribute("name", name);
-    iImage* img = texWrap->GetImageFile();
-    if (img)
-    {
-      const char* filename=img->GetName();
-      if (filename && *filename)
-        CreateValueNode(child, "file", filename);
 
-      int r,g,b, r2,g2,b2;
-      texWrap->GetKeyColor(r, g, b);
-      if (r != -1)
+    // Save keys...
+    SaveKeys (child, texWrap->QueryObject ());
+
+    // TBD: Heightgen?
+    int texTarget = texHand->GetTextureTarget ();
+    if (texTarget == iTextureHandle::CS_TEX_IMG_CUBEMAP)
+    {
+      child->SetValue ("cubemap"); // cubemap node
+      CreateValueNode (child, "north",
+        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_POS_X));
+      CreateValueNode (child, "south",
+        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_NEG_X));
+      CreateValueNode (child, "east",
+        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_POS_Y));
+      CreateValueNode (child, "west",
+        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_NEG_Y));
+      CreateValueNode (child, "top",
+        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_POS_Z));
+      CreateValueNode (child, "bottom",
+        texHand->GetImageName (iTextureHandle::CS_TEXTURE_CUBE_NEG_Z));
+    }
+    else if (texTarget == iTextureHandle::CS_TEX_IMG_3D)
+    {
+      child->SetValue ("texture3d"); // texture3d node
+      int w,h,d;
+      if (texHand->GetMipMapDimensions (0, w, h, d) && d)
       {
-        if (img->HasKeyColor())
-        {
-          img->GetKeyColor(r2, g2, b2);
-        }
-        if (r != r2 || g != g2 || b != b2)
-          CreateValueNodeAsColor(child, "transparent",
-	    csColor(r * ONE_OVER_256, g * ONE_OVER_256, b * ONE_OVER_256));
+        for (int i=0; i<d; i++)
+          CreateValueNode (child, "layer", texHand->GetImageName (i));
       }
     }
+    else
+    {
+      child->SetValue("texture"); // texture node
 
-    iTextureCallback* texCb = texWrap->GetUseCallback();
-    if (!texCb) continue;
+      const char* filename = texHand->GetImageName ();
+      if (filename && *filename)
+      {
+        CreateValueNode(child, "file", filename);
 
-    csRef<iProcTexCallback> proctexCb = 
-      SCF_QUERY_INTERFACE(texCb, iProcTexCallback);
-    if (!proctexCb) continue;
+        int r,g,b, r2,g2,b2;
+        texWrap->GetKeyColor(r, g, b);
+        if (r != -1)
+        {
+          iImage* img = texWrap->GetImageFile();
+          if (img && img->HasKeyColor())
+          {
+            img->GetKeyColor(r2, g2, b2);
+          }
+          if (r != r2 || g != g2 || b != b2)
+          {
+            csColor col (r * ONE_OVER_256, g * ONE_OVER_256, b * ONE_OVER_256);
+            synldr->WriteColor (CreateNode (child, "transparent"), &col);
+          }
+        }
+      
+        synldr->WriteBool (child, "for2d", texWrap->GetFlags () & CS_TEXTURE_2D, false);
+        // No for3d as that's default
+        synldr->WriteBool (child, "mipmap", !(texWrap->GetFlags () & CS_TEXTURE_NOMIPMAPS), true);
+        synldr->WriteBool (child, "dither", texWrap->GetFlags () & CS_TEXTURE_DITHER, false);
+        synldr->WriteBool (child, "clamp", texWrap->GetFlags () & CS_TEXTURE_CLAMP, false);
+        synldr->WriteBool (child, "filter", !(texWrap->GetFlags () & CS_TEXTURE_NOFILTER), true);
+        synldr->WriteBool (child, "keepimage", texWrap->KeepImage (), false);
+      }
 
-    iProcTexture* proctex = proctexCb->GetProcTexture();
-    if (!proctex) continue;
+      iTextureCallback* texCb = texWrap->GetUseCallback();
+      if (!texCb) continue;
 
-    iTextureFactory* texfact = proctex->GetFactory();
-    if (!texfact) continue;
+      csRef<iProcTexCallback> proctexCb = 
+        SCF_QUERY_INTERFACE(texCb, iProcTexCallback);
+      if (!proctexCb) continue;
 
-    iTextureType* textype = texfact->GetTextureType();
-    if (!textype) continue;
+      iProcTexture* proctex = proctexCb->GetProcTexture();
+      if (!proctex) continue;
 
-    csRef<iFactory> fact = SCF_QUERY_INTERFACE(textype, iFactory);
-    if (!fact) continue;
+      iTextureFactory* texfact = proctex->GetFactory();
+      if (!texfact) continue;
 
-    char loadername[128] = "";
-    csFindReplace(loadername, fact->QueryClassID(), ".type.", ".loader.",128);
-    CreateValueNode(child, "type", loadername);
+      iTextureType* textype = texfact->GetTextureType();
+      if (!textype) continue;
 
-    char savername[128] = "";
-    csFindReplace(savername, fact->QueryClassID(), ".type.", ".saver.", 128);
+      csRef<iFactory> fact = SCF_QUERY_INTERFACE(textype, iFactory);
+      if (!fact) continue;
 
-    //Invoke the iSaverPlugin::WriteDown
-    csRef<iSaverPlugin> saver = 
-      CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
-    if (!saver) 
-      saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
-    if (saver)
-      saver->WriteDown(proctex, child);
+      char loadername[128] = "";
+      csFindReplace(loadername, fact->QueryClassID(), ".type.", ".loader.",128);
+      CreateValueNode(child, "type", GetPluginName (loadername, "Tex"));
+
+      char savername[128] = "";
+      csFindReplace(savername, fact->QueryClassID(), ".type.", ".saver.", 128);
+
+      //Invoke the iSaverPlugin::WriteDown
+      csRef<iSaverPlugin> saver = 
+        CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
+      if (!saver) 
+        saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+      if (saver)
+        saver->WriteDown(proctex, child);
+
+      synldr->WriteBool (child, "alwaysanimate", proctex->GetAlwaysAnimate (), false);
+    }
   }
   return true;
 }
@@ -243,9 +305,9 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
     matWrap->GetMaterial()->GetFlatColor(color, 0);
     if (color.red != 255 || color.green != 255 || color.blue != 255)
     {
-      CreateValueNodeAsColor(child, "color",
-        csColor(color.red * ONE_OVER_256, color.green * ONE_OVER_256,
-	  color.blue * ONE_OVER_256));
+      csColor col (color.red * ONE_OVER_256, color.green * ONE_OVER_256,
+	      color.blue * ONE_OVER_256);
+      synldr->WriteColor (CreateNode (child, "color"), &col);     
     }
 
     if(texWrap)
@@ -254,6 +316,21 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
       if (texname && *texname)
         CreateValueNode(child, "texture", texname);
     }
+
+    // Save Keys
+    SaveKeys (child, matWrap->QueryObject ());
+
+    float diffuse,ambient,reflection;
+    matWrap->GetMaterial ()->GetReflection (diffuse, ambient, reflection);
+    if (diffuse && diffuse != CS_DEFMAT_DIFFUSE)
+      CreateNode (child, "diffuse")->CreateNodeBefore (CS_NODE_TEXT)->
+        SetValueAsFloat (diffuse);
+    if (ambient && ambient != CS_DEFMAT_AMBIENT)
+      CreateNode (child, "ambient")->CreateNodeBefore (CS_NODE_TEXT)->
+        SetValueAsFloat (ambient);
+    if (reflection && reflection != CS_DEFMAT_REFLECTION)
+      CreateNode (child, "reflection")->CreateNodeBefore (CS_NODE_TEXT)->
+        SetValueAsFloat (reflection);
 
 #ifdef CS_USE_OLD_RENDERER
     int layerCount = mat->GetTextureLayerCount();
@@ -284,38 +361,10 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
         shiftItem->SetAttributeAsFloat("v", texLayer->vshift);
       }
 
-      if (texLayer->mode != (CS_FX_ADD|CS_FX_TILING) )
+      if (texLayer->mode != (CS_FX_ADD|CS_FX_TILING)
       {
-        int blendmode=texLayer->mode & CS_FX_MASK_MIXMODE;
-
-        csRef<iDocumentNode> mixmodeItem = CreateNode(layerItem, "mixmode");
-        if(blendmode == CS_FX_ALPHA) {
-          int alpha = texLayer->mode & CS_FX_MASK_ALPHA;
-          CreateValueNodeAsFloat(mixmodeItem, "alpha", alpha*ONE_OVER_256);
-        }
-        if (blendmode == CS_FX_ADD) {
-          CreateNode(mixmodeItem, "add");
-        }
-        if (blendmode == CS_FX_MULTIPLY)
-        {
-          CreateNode(mixmodeItem, "multiply");
-        }
-        if (blendmode == CS_FX_MULTIPLY2)
-        {
-          CreateNode(mixmodeItem, "multiply2");
-        }
-        if (blendmode == CS_FX_TRANSPARENT)
-        {
-          CreateNode(mixmodeItem, "transparent");
-        }
-        if (texLayer->mode & CS_FX_KEYCOLOR)
-        {
-          CreateNode(mixmodeItem, "keycolor");
-        }
-        if (texLayer->mode & CS_FX_TILING)
-        {
-          CreateNode(mixmodeItem, "tiling");
-        }
+        csRef<iDocumentNode> mixmodeItem = CreateNode (layerItem, "mixmode");
+        synldr->WriteMixmode (mixmodeItem, texLayer->mode, false);
       }
     }
 #else
@@ -599,7 +648,7 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
     char loadername[128] = "";
     csFindReplace(loadername, pluginname, ".object.", ".loader.factory.",128);
 
-    pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
+    pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (loadername, "Fact"));
 
     char savername[128] = "";
     csFindReplace(savername, pluginname, ".object.", ".saver.factory.", 128);
@@ -766,7 +815,7 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
         char loadername[128] = "";
         csFindReplace(loadername, pluginname, ".object.", ".loader.", 128);
 
-        pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
+        pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (loadername, "Mesh"));
 
         char savername[128] = "";
         csFindReplace(savername, pluginname, ".object.", ".saver.", 128);
@@ -891,7 +940,8 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
 
     iBaseHalo* halo = light->GetHalo();
 
-    if (halo)
+    /// TBD: Make halos work
+    if (0&&halo)
     {
       csRef<iDocumentNode> haloNode = CreateNode(lightNode, "halo");
 
@@ -1165,6 +1215,7 @@ bool csSaver::SaveMapFile(const char* filename)
 
 bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
 {
+  plugins.DeleteAll (); // Clear plugin list
   csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   parent->SetValue("world");
 
@@ -1180,6 +1231,7 @@ bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
   if (!SaveSectors(parent)) return false;
   if (!SaveSequence(parent)) return false;
   if (!SaveTriggers(parent)) return false;
+  if (!SavePlugins(parent)) return false;
 
   return true;
 }

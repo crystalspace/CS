@@ -222,6 +222,11 @@ void csGLTextureHandle::Clear()
 
 void csGLTextureHandle::FreeImage ()
 {
+  origNames.SetLength (images->Length ());
+  for (size_t i=0; i<images->Length (); i++)
+  {
+    origNames.Put (i, images->GetImage (i)->GetName ());
+  }
   images = 0;
 }
 
@@ -342,7 +347,9 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh,
   }
   else if(images.IsValid() && images->GetImage (0).IsValid())
   {
-    // TODO: implement to get size from image array
+    mw = images->GetImage (0)->GetWidth ();
+    mh = images->GetImage (0)->GetHeight ();
+    md = images->Length ();
   }
   else
     return false;
@@ -364,6 +371,19 @@ void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
 void csGLTextureHandle::SetTextureTarget (int target)
 {
   this->target = target;
+}
+
+const char* csGLTextureHandle::GetImageName (int depth) const
+{
+  if (images.IsValid () && images->GetImage (depth).IsValid ())
+  {
+    return images->GetImage (depth)->GetName ();
+  }
+  else if (origNames.Length () > (size_t)depth)
+  {
+    return origNames.Get (depth);
+  }
+  return 0;
 }
 
 void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, uint8 &blue)

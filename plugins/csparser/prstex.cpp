@@ -760,6 +760,8 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
   const char* texname = node->GetAttributeValue ("name");
   const char *fname;
 
+  csRefArray<iDocumentNode> key_nodes;
+
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
@@ -768,6 +770,9 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_KEY:
+        key_nodes.Push (child);
+        break;
       case XMLTOKEN_NORTH:
         fname = child->GetContentsValue ();
 	if (!fname)
@@ -861,6 +866,18 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
   itexwrap = Engine->GetTextureList()->NewTexture(itex);
   itexwrap->QueryObject()->SetName(texname);
 
+  // Set keys
+  for (size_t i=0; i<key_nodes.Length (); i++)
+  {
+    iKeyValuePair* kvp = 0;
+    SyntaxService->ParseKey (key_nodes[i], kvp);
+    if (kvp)
+    {
+      itexwrap->QueryObject()->ObjAdd (kvp->QueryObject ());
+      kvp->DecRef ();
+    }
+  }
+
   return itexwrap;
 }
 
@@ -878,6 +895,8 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
 
   const char* texname = node->GetAttributeValue ("name");
 
+  csRefArray<iDocumentNode> key_nodes;
+
   int imagecount = 0;
   while (it->HasNext ())
   {
@@ -887,6 +906,9 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_KEY:
+        key_nodes.Push (child);
+        break;
       case XMLTOKEN_LAYER:
       {
         const char* fname = child->GetContentsValue ();
@@ -910,6 +932,18 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
 
   csRef<iTextureWrapper> itexwrap = Engine->GetTextureList()->NewTexture(itex);
   itexwrap->QueryObject()->SetName(texname);
+
+  // Set keys
+  for (size_t i=0; i<key_nodes.Length (); i++)
+  {
+    iKeyValuePair* kvp = 0;
+    SyntaxService->ParseKey (key_nodes[i], kvp);
+    if (kvp)
+    {
+      itexwrap->QueryObject()->ObjAdd (kvp->QueryObject ());
+      kvp->DecRef ();
+    }
+  }
 
   return itexwrap;
 }

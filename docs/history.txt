@@ -44,6 +44,14 @@ chronological order.
 	- Eric Sunshine performed an audit (and update) of code which might be
 	  impacted by the 26-Oct-2004 change to iDocument::Parse() to preserve
 	  whitespace by default.
+	- Squee made the following changes:
+	    - Added GetImageName() and GetTextureTarget() to iTextureHandle.
+	    - Modified csparser to load key-value pairs for cubemaps and 3D
+	      texutres.
+	    - Fixed some bugs in some Write*() functions in the syntax service.
+	    - Fixed a bunch of cssaver (especially textures) so that saving a
+	      copy of flarge now produces a loadable (though incomplete) map
+	      file.
 9-Dec-2004
 	- Keith Fulton added support for new animation callback system in
 	  cal3d.  See viewmesh.cpp for very simple example of how to use this.

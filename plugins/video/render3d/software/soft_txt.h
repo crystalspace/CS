@@ -206,6 +206,10 @@ public:
   virtual void SetTextureTarget(int target)
   {
   }
+  
+  virtual int GetTextureTarget () const { return iTextureHandle::CS_TEX_IMG_2D; }
+
+  virtual const char* GetImageName (int depth = 0) const { return image->GetName (); }
 
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data);

@@ -34,7 +34,7 @@
 struct iGraphics2D;
 struct iGraphics3D;
 
-SCF_VERSION (iTextureHandle, 2, 2, 3);
+SCF_VERSION (iTextureHandle, 2, 2, 4);
 
 /**
  * A texture handle as returned by iTextureManager.
@@ -124,13 +124,16 @@ struct iTextureHandle : public iBase
 
   /**
    * Sets Texture Target. 
-   * This can either be CS_TEXTURE_1D, CS_TEXTURE_2D, CS_TEXTURE_3D, 
-   * CS_TEXTURE_CUBEMAP etc.
-   * With CS_TEXTURE_CUBEMAP, the depth index specifies the side 
+   * This can either be CS_TEX_IMG_1D, CS_TEX_IMG_2D, CS_TEX_IMG_3D, 
+   * CS_TEX_IMG_CUBEMAP etc.
+   * With CS_TEX_IMG_CUBEMAP, the depth index specifies the side 
    * of the cubemap (CS_TEXTURE_CUBE_POS_X, CS_TEXTURE_CUBE_NEG_X,
    * CS_TEXTURE_CUBE_POS_Y, etc.
    */
   virtual void SetTextureTarget (int target) = 0;
+
+  /// Get the texture target
+  virtual int GetTextureTarget () const = 0;
 
   /**
    * Blit a memory block to this texture. Format of the image is RGBA
@@ -139,6 +142,12 @@ struct iTextureHandle : public iBase
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data) = 0;
 #endif // CS_USE_OLD_RENDERER
+
+  /**
+   * Get the original image name at the given depth. Use depths above 0
+   * for cubemap or 3D textures. For 2D textures, the depth is ignored.
+   */
+  virtual const char* GetImageName (int depth = 0) const = 0;
 
   /// Get the mean color.
   virtual void GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) const = 0;

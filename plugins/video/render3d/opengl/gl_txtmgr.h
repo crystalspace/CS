@@ -37,6 +37,7 @@
 #include "csutil/weakrefarr.h"
 #include "csutil/blockallocator.h"
 #include "csutil/leakguard.h"
+#include "csutil/stringarray.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "iutil/vfs.h"
@@ -115,6 +116,9 @@ private:
   
   /// Used until Prepare() is called
   csRef<iImageVector> images;
+
+  /// Stores the names of the images
+  csStringArray origNames;
 
   /// Texture flags (combined public and private)
   csFlags texFlags;
@@ -270,13 +274,19 @@ public:
 
   /**
    * Sets Texture Target. 
-   * This can either be CS_TEXTURE_1D, CS_TEXTURE_2D, CS_TEXTURE_3D, 
-   * CS_TEXTURE_CUBEMAP etc.
-   * With CS_TEXTURE_CUBEMAP, the depth index specifies the side 
+   * This can either be CS_TEX_IMG_1D, CS_TEX_IMG_2D, CS_TEX_IMG_3D, 
+   * CS_TEX_IMG_CUBEMAP etc.
+   * With CS_TEX_IMG_CUBEMAP, the depth index specifies the side 
    * of the cubemap (CS_TEXTURE_CUBE_POS_X, CS_TEXTURE_CUBE_NEG_X,
    * CS_TEXTURE_CUBE_POS_Y, etc.
    */
   virtual void SetTextureTarget(int target);
+
+  /// Get the texture target
+  virtual int GetTextureTarget () const { return target; }
+
+  /// Get the original image name at the given depth
+  virtual const char* GetImageName (int depth = 0) const;
 
   /// Get the mean color.
   virtual void GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) const;

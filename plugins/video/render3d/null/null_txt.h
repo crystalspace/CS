@@ -141,6 +141,8 @@ public:
   void GetOriginalDimensions (int& mw, int& mh, int& md)
   { GetMipMapDimensions (0, mw, mh, md); }
   void SetTextureTarget (int target) { }
+  int GetTextureTarget () const { return iTextureHandle::CS_TEX_IMG_2D; }
+  const char* GetImageName (int depth = 0) const { return image->GetName (); }
 };
 
 /**

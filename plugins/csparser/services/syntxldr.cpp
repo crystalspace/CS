@@ -404,35 +404,35 @@ bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
   switch ( mixmode & CS_FX_MASK_MIXMODE )
   {
     case CS_FX_TRANSPARENT:
-      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("transparent");
+      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("transparent");
     case CS_FX_KEYCOLOR:
-      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("keycolor");
+      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("keycolor");
     case CS_FX_TILING:
-      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("tiling");
+      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("tiling");
     case CS_FX_COPY: 
-      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("copy");
+      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("copy");
       break;
     case CS_FX_MULTIPLY: 
-      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("multiply");
+      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("multiply");
       break;
     case CS_FX_MULTIPLY2: 
-      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("multipy2");
+      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("multipy2");
       break;
     case CS_FX_ADD: 
-      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("add");
+      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("add");
       break;
     case CS_FX_DESTALPHAADD:
-      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("destalphaadd");
+      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("destalphaadd");
       break;
     case CS_FX_SRCALPHAADD:
-      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("destalphaadd");
+      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("destalphaadd");
       break;
     case CS_FX_PREMULTALPHA:
-      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("premultalpha");
+      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("premultalpha");
       break;
     case CS_FX_ALPHA:
       {
-        csRef<iDocumentNode> alpha = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        csRef<iDocumentNode> alpha = node->CreateNodeBefore(CS_NODE_ELEMENT);
         alpha->SetValue ("alpha");
         alpha->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat (
           (float) ((mixmode & CS_FX_MASK_ALPHA) / 255.0f));
@@ -838,30 +838,30 @@ bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
     case csShaderVariable::VECTOR2:
       {
         node->SetAttribute ("type", "vector2");
-        char* val = '\0';
+        csString val;
         csVector2 vec;
         var->GetValue (vec);
-        sprintf (val, "%f,%f", vec.x, vec.y);
+        val.Format ("%f,%f", vec.x, vec.y);
         node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
       }
       break;
     case csShaderVariable::VECTOR3:
       {
         node->SetAttribute ("type", "vector3");
-        char* val = '\0';
+        csString val;
         csVector3 vec;
         var->GetValue (vec);
-        sprintf (val, "%f,%f,%f", vec.x, vec.y, vec.z);
+        val.Format ("%f,%f,%f", vec.x, vec.y, vec.z);
         node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
       }
       break;
     case csShaderVariable::VECTOR4:
       {
         node->SetAttribute ("type", "vector4");
-        char* val = '\0';
+        csString val;
         csVector4 vec;
         var->GetValue (vec);
-        sprintf (val, "%f,%f,%f,%f", vec.x, vec.y, vec.z, vec.w);
+        val.Format ("%f,%f,%f,%f", vec.x, vec.y, vec.z, vec.w);
         node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
       }
       break;
@@ -870,7 +870,8 @@ bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
         node->SetAttribute ("type", "texture");
         iTextureWrapper* val;
         var->GetValue (val);
-        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val->QueryObject ()->GetName ());
+        if (val)
+          node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val->QueryObject ()->GetName ());
       }
       break;
     default:
@@ -1045,7 +1046,7 @@ bool csTextSyntaxService::WriteZMode (iDocumentNode* node,
     node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("ztest");
     break;
   case CS_ZBUF_USE:
-    node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("zuse");
+    //node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("zuse");
     break;
   case CS_ZBUF_EQUAL:
     node->CreateNodeBefore (CS_NODE_ELEMENT, 0)->SetValue ("zequal");

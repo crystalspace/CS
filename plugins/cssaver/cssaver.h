@@ -26,6 +26,8 @@
 #include "iutil/document.h"
 #include "iutil/plugin.h"
 #include "csutil/cscolor.h"
+#include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
 
 struct iSyntaxService;
 
@@ -35,6 +37,8 @@ class csSaver : public iSaver
   csRef<iEngine> engine;
   csRef<iSyntaxService> synldr;
   csRef<iPluginManager> plugin_mgr;
+  csHash<csStrKey, csStrKey, csConstCharHashKeyHandler> plugins;
+  csRef<iDocumentNode> before;
 
 public:
   SCF_DECLARE_IBASE;
@@ -48,10 +52,9 @@ public:
     iDocumentNode *parent, const char* name);
   static csRef<iDocumentNode> CreateValueNode(
     iDocumentNode *parent, const char* name, const char* value);
-  static csRef<iDocumentNode> CreateValueNodeAsFloat(
-    iDocumentNode *parent, const char* name, float value);
-  static csRef<iDocumentNode> CreateValueNodeAsColor(
-    iDocumentNode *parent, const char* name, const csColor &color);
+
+  const char* GetPluginName (const char* plugin, const char* type);
+  bool SavePlugins (iDocumentNode* parent);
 
   bool SaveCameraPositions(iDocumentNode *parent);
   bool SaveMaterials(iDocumentNode *parent);
