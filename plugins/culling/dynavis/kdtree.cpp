@@ -130,8 +130,12 @@ csKDTree::csKDTree ()
   child2 = NULL;
   objects = NULL;
   num_objects = max_objects = 0;
-  tree_bbox.StartBoundingBox ();
   disallow_distribute = false;
+
+  obj_bbox.StartBoundingBox ();
+  node_bbox.Set (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
+  	-CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE,
+	CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE);
 }
 
 csKDTree::~csKDTree ()
@@ -156,7 +160,7 @@ void csKDTree::Clear ()
   delete child1; child1 = NULL;
   delete child2; child2 = NULL;
   disallow_distribute = false;
-  tree_bbox.StartBoundingBox ();
+  obj_bbox.StartBoundingBox ();
 }
 
 void csKDTree::AddObject (csKDTreeChild* obj)
@@ -254,11 +258,10 @@ int csKDTree::FindBestSplitLocation (int axis, float& split_loc)
       else if (bbox.Min (axis) > a) right++;
     }
     int cut = num_objects-left-right;
-    // If we have left, right, or cut equal to the number
-    // objects we have an extremely bad situation that we will not
-    // allow to be used.
+    // If we have no object on the left or right then this is a bad
+    // split which we should never take.
     int qual;
-    if (cut == num_objects || left == num_objects || right == num_objects)
+    if (left == 0 || right == 0)
     {
       qual = -1;
     }
@@ -285,9 +288,9 @@ void csKDTree::UpdateBBox (const csBox3& bbox)
   // This function assumes that the object is already
   // added to this node.
   if (num_objects > 1 || child1)
-    tree_bbox += bbox;
+    obj_bbox += bbox;
   else
-    tree_bbox = bbox;
+    obj_bbox = bbox;
 }
 
 void csKDTree::DistributeLeafObjects ()
@@ -365,8 +368,8 @@ void csKDTree::Distribute ()
     CS_ASSERT (num_objects == 0);
 
     // Update the bounding box of this node.
-    tree_bbox = child1->tree_bbox;
-    tree_bbox += child2->tree_bbox;
+    obj_bbox = child1->obj_bbox;
+    obj_bbox += child2->obj_bbox;
   }
   else
   {
@@ -410,8 +413,12 @@ void csKDTree::Distribute ()
       DistributeLeafObjects ();
       CS_ASSERT (num_objects == 0);
       // Update the bounding box of this node.
-      tree_bbox = child1->tree_bbox;
-      tree_bbox += child2->tree_bbox;
+      obj_bbox = child1->obj_bbox;
+      obj_bbox += child2->obj_bbox;
+      child1->node_bbox = node_bbox;
+      child1->node_bbox.SetMax (split_axis, split_location);
+      child2->node_bbox = node_bbox;
+      child2->node_bbox.SetMin (split_axis, split_location);
     }
   }
 }
@@ -561,8 +568,15 @@ bool csKDTree::Debug_CheckTree (csString& str)
 
     KDT_ASSERT (split_axis >= CS_KDTREE_AXISX && split_axis <= CS_KDTREE_AXISZ,
     	"axis");
-    KDT_ASSERT (tree_bbox.Contains (child1->tree_bbox), "tree_bbox mismatch");
-    KDT_ASSERT (tree_bbox.Contains (child2->tree_bbox), "tree_bbox mismatch");
+    KDT_ASSERT (obj_bbox.Contains (child1->obj_bbox), "obj_bbox mismatch");
+    KDT_ASSERT (obj_bbox.Contains (child2->obj_bbox), "obj_bbox mismatch");
+    KDT_ASSERT (node_bbox.Contains (child1->node_bbox), "node_bbox mismatch");
+    KDT_ASSERT (node_bbox.Contains (child2->node_bbox), "node_bbox mismatch");
+    csBox3 new_node_bbox = child1->node_bbox;
+    new_node_bbox += child2->node_bbox;
+    KDT_ASSERT (new_node_bbox == node_bbox, "node_bbox mismatch");
+    csBox3 intersect = node_bbox * obj_bbox;
+    KDT_ASSERT (!intersect.Empty (), "node_bbox * tree_box == empty!");
 
     if (!child1->Debug_CheckTree (str))
       return false;
@@ -582,7 +596,7 @@ bool csKDTree::Debug_CheckTree (csString& str)
   {
     csKDTreeChild* o = objects[i];
 
-    KDT_ASSERT (tree_bbox.Contains (o->bbox), "object not in tree_bbox");
+    KDT_ASSERT (obj_bbox.Contains (o->bbox), "object not in obj_bbox");
 
     KDT_ASSERT (o->num_leafs <= o->max_leafs, "leaf list");
     int parcnt = 0;
@@ -605,9 +619,23 @@ static float rnd (float range)
   return float ((rand () >> 4) % 1000) * range / 1000.0;
 }
 
+// Number of objects we use for UnitTest().
+#define CS_UNITTEST_OBJECTS 500
+
 struct Debug_TraverseData
 {
   int obj_counter;
+  // The min_node_bbox array contains pointers to the node bounding
+  // boxes we encounter before traversing further objects.
+  const csBox3* min_node_bbox[CS_UNITTEST_OBJECTS*10];
+
+  // The obj_bbox array contains pointers to the object bounding
+  // boxes we encounter during traversing a node. Or NULL
+  // if this is a node entry.
+  const csBox3* obj_bbox[CS_UNITTEST_OBJECTS*10];
+
+  // Counter of the number of pointers in the above three arrays.
+  int num_bbox_pointers;
 };
 
 static bool Debug_TraverseFunc (csKDTree* treenode, void* userdata,
@@ -616,7 +644,12 @@ static bool Debug_TraverseFunc (csKDTree* treenode, void* userdata,
   Debug_TraverseData* data = (Debug_TraverseData*)userdata;
 
   treenode->Distribute ();
-  
+
+  data->min_node_bbox[data->num_bbox_pointers] = &(treenode->GetNodeBBox ());
+  data->obj_bbox[data->num_bbox_pointers] = NULL;
+  data->num_bbox_pointers++;
+  CS_ASSERT (data->num_bbox_pointers < CS_UNITTEST_OBJECTS * 10);
+
   int num_objects = treenode->GetObjectCount ();
   csKDTreeChild** objects = treenode->GetObjects ();
   int i;
@@ -626,8 +659,14 @@ static bool Debug_TraverseFunc (csKDTree* treenode, void* userdata,
     {
       objects[i]->timestamp = cur_timestamp;
       data->obj_counter++;
+
+      data->min_node_bbox[data->num_bbox_pointers] = &(treenode->GetNodeBBox ());
+      data->obj_bbox[data->num_bbox_pointers] = &(objects[i]->GetBBox ());
+      data->num_bbox_pointers++;
+      CS_ASSERT (data->num_bbox_pointers < CS_UNITTEST_OBJECTS * 10);
     }
   }
+
   return true;
 }
 
@@ -636,6 +675,7 @@ iString* csKDTree::Debug_UnitTest ()
   csTicks seed = csGetTicks ();
   srand (seed);
 
+  iString* dbdump;
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
 
@@ -673,26 +713,23 @@ iString* csKDTree::Debug_UnitTest ()
   FullDistribute ();
   if (!Debug_CheckTree (str)) return rc;
 
-  iString* dbdump;
-
   Clear ();
 
   //=================
-  // In this test we are going to insert 'total_test_objects'
+  // In this test we are going to insert CS_UNITTEST_OBJECTS
   // objects randomly in the tree. Every 20 objects we do a
   // FullDistribute() which optimizes the tree. Since we do
   // it every 20 objects instead of after all objects have
   // been added the quality of the tree will not be optimal.
   // The tests below will print out statistics to show that.
   //=================
-  int i;
-  int total_test_objects = 500;
-  for (i = 0 ; i < total_test_objects ; i++)
+  int i, j;
+  for (i = 0 ; i < CS_UNITTEST_OBJECTS ; i++)
   {
     float x = rnd (100.0)-50.0;
     float y = rnd (100.0)-50.0;
     float z = rnd (100.0)-50.0;
-    b.Set (x, y, z, x+rnd (1.0)+.5, y+rnd (1.0)+.5, z+rnd (1.0)+.5);
+    b.Set (x, y, z, x+rnd (7.0)+.5, y+rnd (7.0)+.5, z+rnd (7.0)+.5);
     AddObject (b, (void*)0);
     if (!Debug_CheckTree (str)) return rc;
     if (i % 20 == 0)
@@ -711,6 +748,7 @@ iString* csKDTree::Debug_UnitTest ()
   if (!Debug_CheckTree (str)) return rc;
   dbdump = Debug_Statistics ();
   printf ("Step 1: %s", dbdump->GetData ()); fflush (stdout);
+  dbdump->DecRef ();
 
   //=================
   // Now we flatten the tree completely.
@@ -719,6 +757,7 @@ iString* csKDTree::Debug_UnitTest ()
   if (!Debug_CheckTree (str)) return rc;
   dbdump = Debug_Statistics ();
   printf ("Flat  : %s", dbdump->GetData ()); fflush (stdout);
+  dbdump->DecRef ();
 
   //=================
   // Do a FullDistribute() again. Since we now start from a flattened
@@ -729,17 +768,78 @@ iString* csKDTree::Debug_UnitTest ()
   if (!Debug_CheckTree (str)) return rc;
   dbdump = Debug_Statistics ();
   printf ("Optim : %s", dbdump->GetData ()); fflush (stdout);
+  dbdump->DecRef ();
 
   //=================
   // Now we are going to test traversal. The crucial thing here is
   // that the traversal of the entire tree should return exactly
-  // 'total_test_objects' objects.
+  // CS_UNITTEST_OBJECTS objects. We are also going to test if
+  // Front2Back() traversal is really front to back.
   //=================
   Debug_TraverseData data;
-  data.obj_counter = 0;
-  Front2Back (csVector3 (0, 0, 0), Debug_TraverseFunc, (void*)&data);
-  KDT_ASSERT (data.obj_counter == total_test_objects,
+  // Test 20 different starting positions.
+  for (i = 0 ; i < 20 ; i++)
+  {
+    data.obj_counter = 0;
+    data.num_bbox_pointers = 0;
+    csVector3 start (rnd (100.0)-50.0, rnd (100.0)-50.0, rnd (100.0)-50.0);
+    Front2Back (start, Debug_TraverseFunc, (void*)&data);
+    KDT_ASSERT (data.obj_counter == CS_UNITTEST_OBJECTS,
   	"number of objects traversed doesn't match tree!");
+
+    // Test 20 different end positions for Front2Back testing.
+    for (j = 0 ; j < 20 ; j++)
+    {
+      csVector3 end;
+      end.Set (rnd (1000.0)+1.0, rnd (1000.0)+1.0, rnd (1000.0)+1.0);
+      end.Normalize ();
+      end *= 1000000.0;
+      end += start;
+
+      csSegment3 seg (start, end);
+      float max_minsqdist = 0.0;
+      float max_nodesqdist = 0.0;
+      csVector3 isect;
+      for (i = 0 ; i < data.num_bbox_pointers ; i++)
+      {
+        if (data.obj_bbox[i])
+        {
+	  // Take bbox of object and intersect with current node
+	  // bbox. This is required because otherwise perfect
+	  // Front2Back for object/nodes is not guaranteed.
+	  csBox3 obox = *data.obj_bbox[i];
+	  obox = obox * *data.min_node_bbox[i];
+          if (csIntersect3::BoxSegment (obox, seg, isect) != -1)
+          {
+            float obj_sqdist = csSquaredDist::PointPoint (start, isect);
+            if (obj_sqdist > max_minsqdist)
+	      max_minsqdist = obj_sqdist;
+          }
+        }
+        else
+        {
+          if (csIntersect3::BoxSegment (*data.min_node_bbox[i], seg, isect)
+	  	!= -1)
+          {
+            float node_sqdist = csSquaredDist::PointPoint (start, isect);
+	    if (node_sqdist < 1000000.0)
+	    {
+	      KDT_ASSERT (node_sqdist >= (max_minsqdist-0.1),
+	    	  "bad front2back sorting!");
+	      if (!(node_sqdist >= (max_nodesqdist-0.1)))
+	      {
+	        printf ("node_sqdist=%g max_nodesqdist=%g\n", node_sqdist,
+	          max_nodesqdist);
+	      }
+	      KDT_ASSERT (node_sqdist >= (max_nodesqdist-0.1),
+	    	  "bad front2back sorting!");
+	    }
+	    max_nodesqdist = node_sqdist;
+          }
+        }
+      }
+    }
+  }
 
   //=================
   // Flatten the tree and test traversal again. The traversal function
@@ -748,15 +848,89 @@ iString* csKDTree::Debug_UnitTest ()
   //=================
   Flatten ();
   data.obj_counter = 0;
+  data.num_bbox_pointers = 0;
   Front2Back (csVector3 (0, 0, 0), Debug_TraverseFunc, (void*)&data);
-  KDT_ASSERT (data.obj_counter == total_test_objects,
+  KDT_ASSERT (data.obj_counter == CS_UNITTEST_OBJECTS,
   	"number of objects traversed doesn't match tree!");
   if (!Debug_CheckTree (str)) return rc;
   dbdump = Debug_Statistics ();
   printf ("Traver: %s", dbdump->GetData ()); fflush (stdout);
+  dbdump->DecRef ();
 
   rc->DecRef ();
   return NULL;
+}
+
+static bool Debug_TraverseFuncBenchmark (csKDTree* treenode, void*,
+	uint32 cur_timestamp)
+{
+  treenode->Distribute ();
+
+  int num_objects = treenode->GetObjectCount ();
+  csKDTreeChild** objects = treenode->GetObjects ();
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+      objects[i]->timestamp = cur_timestamp;
+  }
+
+  return true;
+}
+
+csTicks csKDTree::Debug_Benchmark (int num_iterations)
+{
+  int i, j;
+
+  srand (12345678);
+
+  csTicks pass0 = csGetTicks ();
+
+  csBox3 b;
+  for (i = 0 ; i < num_iterations ; i++)
+  {
+    Clear ();
+    for (j = 0 ; j < 500 ; j++)
+    {
+      float x = rnd (100.0)-50.0;
+      float y = rnd (100.0)-50.0;
+      float z = rnd (100.0)-50.0;
+      b.Set (x, y, z, x+rnd (7.0)+.5, y+rnd (7.0)+.5, z+rnd (7.0)+.5);
+      AddObject (b, (void*)0);
+      if (i % 20 == 0) FullDistribute ();
+    }
+  }
+
+  csTicks pass1 = csGetTicks ();
+
+  for (i = 0 ; i < num_iterations ; i++)
+  {
+    Front2Back (csVector3 (0, 0, 0), Debug_TraverseFuncBenchmark, NULL);
+  }
+
+  csTicks pass2 = csGetTicks ();
+
+  for (i = 0 ; i < num_iterations ; i++)
+  {
+    Flatten ();
+    FullDistribute ();
+  }
+
+  csTicks pass3 = csGetTicks ();
+
+  for (i = 0 ; i < num_iterations ; i++)
+  {
+    Front2Back (csVector3 (0, 0, 0), Debug_TraverseFuncBenchmark, NULL);
+  }
+
+  csTicks pass4 = csGetTicks ();
+
+  printf ("Creating the tree:        %d ms\n", pass1-pass0);
+  printf ("Unoptimized Front2Back:   %d ms\n", pass2-pass1);
+  printf ("Flatten + FullDistribute: %d ms\n", pass3-pass2);
+  printf ("Optimized Front2Back:     %d ms\n", pass4-pass3);
+
+  return pass4-pass0;
 }
 
 void csKDTree::Debug_Statistics (int& tot_objects,
@@ -821,10 +995,12 @@ void csKDTree::Debug_Dump (csString& str, int indent)
 
   csString ss;
   iString* stats = Debug_Statistics ();
-  ss.Format ("%s KDT bbox(%g,%g,%g)-(%g,%g,%g) disallow_dist=%d\n%s %s",
-  	spaces, tree_bbox.MinX (), tree_bbox.MinY (), tree_bbox.MinZ (),
-	tree_bbox.MaxX (), tree_bbox.MaxY (), tree_bbox.MaxZ (),
+  ss.Format ("%s KDT obj_bbox(%g,%g,%g)-(%g,%g,%g) disallow_dist=%d\n%s     node_bbox=(%g,%g,%g)-(%g,%g,%g)\n%s %s",
+  	spaces, obj_bbox.MinX (), obj_bbox.MinY (), obj_bbox.MinZ (),
+	obj_bbox.MaxX (), obj_bbox.MaxY (), obj_bbox.MaxZ (),
 	disallow_distribute,
+  	spaces, node_bbox.MinX (), node_bbox.MinY (), node_bbox.MinZ (),
+	node_bbox.MaxX (), node_bbox.MaxY (), node_bbox.MaxZ (),
   	spaces, stats->GetData ());
   stats->DecRef ();
   str.Append (ss);

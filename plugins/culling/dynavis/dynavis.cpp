@@ -95,3 +95,22 @@ iString* csDynaVis::Debug_Dump ()
   return NULL;
 }
 
+csTicks csDynaVis::Debug_Benchmark (int num_iterations)
+{
+  csKDTree* kdtree = new csKDTree ();
+  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (kdtree, iDebugHelper);
+  if (dbghelp)
+  {
+    csTicks rc = dbghelp->Benchmark (num_iterations);
+    dbghelp->DecRef ();
+    if (rc)
+    {
+      delete kdtree;
+      return rc;
+    }
+  }
+  delete kdtree;
+
+  return 0;
+}
+

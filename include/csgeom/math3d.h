@@ -28,6 +28,7 @@
 #include "csgeom/plane3.h"
 #include "csgeom/plane2.h"
 #include "csgeom/segment.h"
+#include "iutil/dbghelp.h"
 
 class csDVector3;
 class csPoly3D;
@@ -437,15 +438,54 @@ public:
   }
 
   /**
-   * Intersect a segment with a box and returns true if it intersects.
+   * Intersect a segment with a box and returns one of CS_BOX_SIDE_... if it
+   * intersects, CS_BOX_INSIDE if inside, or -1 otherwise.
    * The intersection point is also returned.
    * If 'pr' is given then a number between 0 and 1 is returned which
    * corresponds to the position on the segment. If we were in the box
-   * this this function will also return true. In this case 'isect' will
+   * this this function will return CS_BOX_INSIDE. In this case 'isect' will
    * be set to the start of the segment and *pr to 0.
    */
   static int BoxSegment (const csBox3& box, const csSegment3& segment,
   	csVector3& isect, float* pr = NULL);
 };
 
+/**
+ * This is a class that does unit testing (and other debug stuff) for most
+ * of csgeom classes.
+ */
+class csGeomDebugHelper : public iDebugHelper
+{
+public:
+  csGeomDebugHelper ();
+  virtual ~csGeomDebugHelper () { }
+
+  SCF_DECLARE_IBASE;
+  virtual int GetSupportedTests () const
+  {
+    return CS_DBGHELP_UNITTEST;
+  }
+  virtual iString* UnitTest ();
+  virtual iString* StateTest ()
+  {
+    return NULL;
+  }
+  virtual csTicks Benchmark (int /*num_iterations*/)
+  {
+    return 0;
+  }
+  virtual iString* Dump ()
+  {
+    return NULL;
+  }
+  virtual void Dump (iGraphics3D* /*g3d*/)
+  {
+  }
+  virtual bool DebugCommand (const char*)
+  {
+    return false;
+  }
+};
+
 #endif // __CS_MATH3D_H__
+

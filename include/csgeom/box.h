@@ -325,6 +325,20 @@ public:
     else { minbox.x = x1;  minbox.y = y1;  maxbox.x = x2;  maxbox.y = y2; }
   }
 
+  /// Set Min component for 0 (x) or 1 (y).
+  void SetMin (int idx, float val)
+  {
+    if (idx == 1) minbox.y = val;
+    else minbox.x = val;
+  }
+
+  /// Set Max component for 0 (x) or 1 (y).
+  void SetMax (int idx, float val)
+  {
+    if (idx == 1) maxbox.y = val;
+    else maxbox.x = val;
+  }
+
   /// Compute the union of two bounding boxes.
   csBox2& operator+= (const csBox2& box);
   /// Compute the union of a point with this bounding box.
@@ -692,6 +706,22 @@ public:
       minbox.x = x1; minbox.y = y1; minbox.z = z1;
       maxbox.x = x2; maxbox.y = y2; maxbox.z = z2;
     }
+  }
+
+  /// Set Min component for 0 (x), 1 (y), or 2 (z).
+  void SetMin (int idx, float val)
+  {
+    if (idx == 1) minbox.y = val;
+    else if (idx == 0) minbox.x = val;
+    else minbox.z = val;
+  }
+
+  /// Set Max component for 0 (x), 1 (y), or 2 (z).
+  void SetMax (int idx, float val)
+  {
+    if (idx == 1) maxbox.y = val;
+    else if (idx == 0) maxbox.x = val;
+    else maxbox.z = val;
   }
 
   /**

@@ -1,5 +1,27 @@
 The history order is reversed so that new features are at the top.
 
+6-May-2002
+	- Added csBox2::SetMin/SetMax and csBox3::SetMin/SetMax functions.
+	- Renamed csKDTree::tree_bbox to obj_bbox and added a node_bbox
+	  member too. So now for every node we have a bounding box of
+	  all objects that are in the node (this bbox may exceed actual
+	  node dimensions because objects are not clipped by the tree),
+	  and we also have a bounding box of the node itself which is
+	  made by cutting an infinite box at the root with all the axis
+	  planes during tree creation.
+	- Fixed the comment with csIntersect3::BoxSegment().
+	- Added csGeomDebugHelper class in csgeom library. This class
+	  implements iDebugHelper and is responsible for unit testing in
+	  the csgeom library. Unittest app will also call UnitTest() on it.
+	  Currently this unit tester only contains a few tests for
+	  csIntersect3::BoxSegment().
+	- Fixed a bad bug in the csKDTree again. In some cases it would
+	  generate an infinite tree (memory allowing :-)
+	- Added more extensive unit testing for Front2Back() in csKDTree
+	  implementation. Now UnitTest() tries to test that Front2Back()
+	  is really front 2 back.
+	- Implemented Benchmark() in iDebugHelper implementation
+	  of csKDTree and Dynavis plugin.
 3-May-2002
 	- Implemented delayed processing in the KD-tree. This means that
 	  when objects are added they are not automatically distributed

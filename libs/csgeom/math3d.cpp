@@ -28,6 +28,7 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/segment.h"
 #include "csgeom/box.h"
+#include "csutil/scfstr.h"
 
 //---------------------------------------------------------------------------
 bool csMath3::FindIntersection (
@@ -813,3 +814,42 @@ int csIntersect3::BoxSegment (
 
   return -1;
 }
+
+SCF_IMPLEMENT_IBASE (csGeomDebugHelper)
+  SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
+SCF_IMPLEMENT_IBASE_END
+
+csGeomDebugHelper::csGeomDebugHelper ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+}
+
+#define GEO_ASSERT(test,msg) \
+  if (!(test)) \
+  { \
+    csString ss; \
+    ss.Format ("csGeom failure (%d,%s): %s\n", int(__LINE__), \
+    	#msg, #test); \
+    str.Append (ss); \
+    return rc; \
+  }
+
+iString* csGeomDebugHelper::UnitTest ()
+{
+  scfString* rc = new scfString ();
+  csString& str = rc->GetCsString ();
+
+  csSegment3 seg (csVector3 (0, 0, 0), csVector3 (0, 0, 100));
+  csBox3 b (-10, -10, 50, 10, 10, 70);
+  float r;
+  csVector3 isect;
+  int result = csIntersect3::BoxSegment (b, seg, isect, &r);
+  GEO_ASSERT (result == CS_BOX_SIDE_z, "BoxSegment");
+  GEO_ASSERT (isect.x == 0 && isect.y == 0 && ABS (isect.z-50.0) < .00001,
+  	"BoxSegment");
+  GEO_ASSERT (ABS (r-.5) < .00001, "BoxSegment");
+
+  rc->DecRef ();
+  return NULL;
+}
+

@@ -57,6 +57,7 @@ public:
   iString* Debug_UnitTest ();
   iString* Debug_StateTest ();
   iString* Debug_Dump ();
+  csTicks Debug_Benchmark (int num_iterations);
 
   struct eiComponent : public iComponent
   {
@@ -71,7 +72,7 @@ public:
     virtual int GetSupportedTests () const
     {
       return CS_DBGHELP_UNITTEST | CS_DBGHELP_TXTDUMP |
-      	CS_DBGHELP_STATETEST;
+      	CS_DBGHELP_STATETEST | CS_DBGHELP_BENCHMARK;
     }
     virtual iString* UnitTest ()
     {
@@ -81,9 +82,9 @@ public:
     {
       return scfParent->Debug_StateTest ();
     }
-    virtual csTicks Benchmark (int /*num_iterations*/)
+    virtual csTicks Benchmark (int num_iterations)
     {
-      return 0;
+      return scfParent->Debug_Benchmark (num_iterations);
     }
     virtual iString* Dump ()
     {

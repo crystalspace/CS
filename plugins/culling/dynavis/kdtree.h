@@ -88,6 +88,11 @@ public:
    * Find leaf.
    */
   int FindLeaf (csKDTree* leaf);
+
+  /**
+   * Get the bounding box of this object.
+   */
+  const csBox3& GetBBox () const { return bbox; }
 };
 
 #define CS_KDTREE_AXISX 0
@@ -116,7 +121,8 @@ private:
   csKDTree* child1;		// If child1 is not NULL then child2 will
   csKDTree* child2;		// also be not NULL.
 
-  csBox3 tree_bbox;		// Bbox of all objects in this tree.
+  csBox3 obj_bbox;		// Bbox of all objects in this tree.
+  csBox3 node_bbox;		// Bbox of the node itself.
 
   int split_axis;		// One of CS_KDTREE_AXIS?
   float split_location;		// Where is the split?
@@ -246,6 +252,17 @@ public:
    */
   csKDTreeChild** GetObjects () const { return objects; }
 
+  /**
+   * Return the bounding box of all objects in this node and children.
+   */
+  const csBox3& GetObjectBBox () const { return obj_bbox; }
+
+  /**
+   * Return the bounding box of the node itself (does not always contain
+   * all children since children are not split by the tree).
+   */
+  const csBox3& GetNodeBBox () const { return node_bbox; }
+
   // Debugging functions.
   bool Debug_CheckTree (csString& str);
   iString* Debug_UnitTest ();
@@ -254,14 +271,15 @@ public:
 	int& tot_nodes, int& tot_leaves, int depth, int& max_depth,
 	float& balance_quality);
   iString* Debug_Statistics ();
+  csTicks Debug_Benchmark (int num_iterations);
 
   struct DebugHelper : public iDebugHelper
   {
     SCF_DECLARE_EMBEDDED_IBASE (csKDTree);
     virtual int GetSupportedTests () const
     {
-      return CS_DBGHELP_UNITTEST |
-      	CS_DBGHELP_STATETEST | CS_DBGHELP_TXTDUMP;
+      return CS_DBGHELP_UNITTEST | CS_DBGHELP_STATETEST |
+      	CS_DBGHELP_TXTDUMP | CS_DBGHELP_BENCHMARK;
     }
     virtual iString* UnitTest ()
     {
@@ -275,9 +293,9 @@ public:
       delete rc;
       return NULL;
     }
-    virtual csTicks Benchmark (int /*num_iterations*/)
+    virtual csTicks Benchmark (int num_iterations)
     {
-      return 0;
+      return scfParent->Debug_Benchmark (num_iterations);
     }
     virtual iString* Dump ()
     {
