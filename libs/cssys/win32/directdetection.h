@@ -9,8 +9,6 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
-#if defined(OS_WIN32)
-
 #include <windows.h>
 #include <windowsx.h>
 #include <ddraw.h>
@@ -129,5 +127,4 @@ public:
   DirectDetectionDevice * Devices; // list of devices
 };
 
-#endif
 #endif // !defined(AFX_DIRECTDETECTION_H__E850B940_FD15_11D1_933A_0000B43D8331__INCLUDED_)

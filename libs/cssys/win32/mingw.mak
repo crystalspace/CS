@@ -29,6 +29,12 @@ OS=WIN32
 # Compiler
 COMP=GCC
 
+# Use Xavier Trocchus DO_DINPUT_KEYBOARD?  set to no if you do not wish to
+# use DirectInput.
+# If you select "yes", then you must change include\cssys\win32\volatile.h
+# to reflect this by uncommenting #define DO_DINPUT_KEYBOARD
+DO_DINPUT=no
+
 # Command to update a target
 #UPD=bin\dosupd.bat $@ DEST
 
@@ -66,8 +72,17 @@ endif
 CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL+=-Dpentiumpro -fomit-frame-pointer -fvtable-thunks \
+# Default is Ix386:
+CFLAGS.GENERAL+=-fomit-frame-pointer -fvtable-thunks \
 		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
+
+# If using Pentium II
+#CFLAGS.GENERAL+=-Dpentium -fomit-frame-pointer -fvtable-thunks \
+#		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
+
+# If using Pentium Pro or better (Recommended for MMX builds)
+#CFLAGS.GENERAL+=-Dpentiumpro -fomit-frame-pointer -fvtable-thunks \
+#		-DWIN32_VOLATILE -Wall $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-s -O3
@@ -82,7 +97,13 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL= -mwindows -ldinput
+# -mwindows required for MS-Windows build.
+LFLAGS.GENERAL = -mwindows
+
+#  If you only wish to support command prompt console
+# version, Comment the above (-mwindows) and uncomment
+#the following:
+#LFLAGS.GENERAL=
 
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=

@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <windowsx.h>
+
 #include <ddraw.h>
 
 #include <d3d.h>
@@ -342,7 +343,7 @@ bool DirectDetection::checkDevices3D()
         
         if (FAILED(DirectDrawCreate(pGuid, &lpDD, NULL)))
           sys_fatalerror("DirectDetection::checkDevices3D(DirectDrawCreate) can't create DirectDraw device");
-        
+
         lpDD->QueryInterface(IID_IDirect3D, (LPVOID *)&lpD3D);
         if (FAILED(lpD3D->EnumDevices(DirectDetectionD3DEnumCallback, (LPVOID *)&toy)))
           sys_fatalerror("DirectDetection::checkDevices3D(lpD3D->EnumDevices) Error when enumerating Direct3D devices.");
