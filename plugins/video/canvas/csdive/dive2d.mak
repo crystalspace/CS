@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csdive
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers2d: csdive
-endif
 
 csdive:
 	$(MAKE_TARGET) MAKE_DLL=yes

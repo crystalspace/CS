@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: ggi2d
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers2d: ggi2d
-endif
 
 ggi2d:
 	$(MAKE_TARGET) MAKE_DLL=yes

@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: svgalib2d
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers2d: svgalib2d
-endif
 
 svgalib2d:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -41,7 +39,7 @@ else
   SVGA2D=$(OUT)$(LIB_PREFIX)svga2d$(LIB)
   DEP.EXE+=$(SVGA2D)
   LIBS.EXE+=$(LIBS._SVGA2D)
-  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_SVGA2D
+  CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_SVGALIB2D
 endif
 DESCRIPTION.$(SVGA2D) = $(DESCRIPTION.svgalib2d)
 SRC.SVGA2D = $(wildcard libs/cs2d/svgalib/*.cpp $(SRC.COMMON.DRV2D))

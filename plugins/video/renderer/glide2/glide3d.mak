@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glide3d
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers3d: glide3d
-endif
 
 glide3d:
 	$(MAKE_TARGET) MAKE_DLL=yes

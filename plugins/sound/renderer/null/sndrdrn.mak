@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: sndrdrn
 
-ifeq ($(USE_DLL),yes)
 all drivers snddrivers: sndrdrn
-endif
 
 sndrdrn:
 	$(MAKE_TARGET) MAKE_DLL=yes

@@ -23,9 +23,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glx2d
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers2d: glx2d
-endif
 
 glx2d:
 	$(MAKE_TARGET) MAKE_DLL=yes

@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: be2d
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers2d: be2d
-endif
 
 be2d:
 	$(MAKE_TARGET) MAKE_DLL=yes

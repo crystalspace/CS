@@ -21,9 +21,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glidex2d
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers2d: glidex2d
-endif
 
 glidex2d:
 	$(MAKE_TARGET) MAKE_DLL=yes

@@ -19,9 +19,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glbe2d
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers2d: glbe2d
-endif
 
 glbe2d:
 	$(MAKE_TARGET) MAKE_DLL=yes

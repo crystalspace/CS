@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: raw2d
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers2d: raw2d
-endif
 
 raw2d:
 	$(MAKE_TARGET) MAKE_DLL=yes

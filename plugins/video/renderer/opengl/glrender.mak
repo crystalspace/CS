@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glrender
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers3d: glrender
-endif
 
 glrender:
 	$(MAKE_TARGET) MAKE_DLL=yes

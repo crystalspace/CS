@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: netdrvn
 
-ifeq ($(USE_DLL),yes)
 all drivers netdrivers: netdrvn
-endif
 
 netdrvn:
 	$(MAKE_TARGET) MAKE_DLL=yes

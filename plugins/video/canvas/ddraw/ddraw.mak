@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: ddraw
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers2d: ddraw
-endif
 
 ddraw:
 	$(MAKE_TARGET) MAKE_DLL=yes

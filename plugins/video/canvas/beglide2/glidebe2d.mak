@@ -19,9 +19,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glidebe2d
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers2d: glidebe2d
-endif
 
 glidebe2d:
 	$(MAKE_TARGET) MAKE_DLL=yes

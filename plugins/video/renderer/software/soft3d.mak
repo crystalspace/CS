@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: soft
 
-ifeq ($(USE_DLL),yes)
 all drivers drivers3d: soft
-endif
 
 soft:
 	$(MAKE_TARGET) MAKE_DLL=yes

@@ -17,9 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: oss
 
-ifeq ($(USE_DLL),yes)
 all drivers snddrivers: oss
-endif
 
 oss:
 	$(MAKE_TARGET) MAKE_DLL=yes
