@@ -225,19 +225,17 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
       // Total penalty is a combination of both penalties. 0 is very good,
       float penalty = balance_factor * balance_penalty + split_factor * split_penalty;
 
-DB((MSG_DEBUG_0, "    pen=%f least=%f\n", penalty, least_penalty));
       // Add EPSILON to penalty before comparing to avoid system dependent
       // results because a cost result is ALMOST the same.
       // This is to try to get the same octree on all platforms.
       if ((penalty+EPSILON) < least_penalty)
       {
-DB((MSG_DEBUG_0, "    SEL=%d\n", ii));
         least_penalty = penalty;
 	poly_idx = ii;
       }
     }
   }
-DB((MSG_DEBUG_0, "    BEST=%d\n", poly_idx));
+DB((MSG_DEBUG_0, "BEST=%d\n", poly_idx));
   return poly_idx;
 }
 
@@ -248,7 +246,7 @@ DB((MSG_DEBUG_0, "num=%d\n", num))
   int i;
   if (!Covers (polygons, num))
   {
-//DB((MSG_DEBUG_0, "  !Covers\n"))
+DB((MSG_DEBUG_0, "  !Covers\n"))
     // We have a convex set.
     node->polygons_on_splitter = false;
     for (i = 0 ; i < num ; i++)
