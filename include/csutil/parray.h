@@ -1,5 +1,5 @@
 /*
-  Crystal Space Smart Pointers
+  Crystal Space Pointer Array
   Copyright (C) 2003 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
@@ -28,7 +28,8 @@ typedef int csArrayCompareFunction (void const* item1, void const* item2);
  * An array of pointers. No ref counting is done on the elements in this
  * array. Use csRefArray if you want ref counting to happen.
  * This array will delete elements (using 'delete') as needed.
- * This array properly initializes new elements in the array to 0.
+ * This array properly initializes new elements in the array to 0 (the NULL
+ * pointer).
  */
 template <class T>
 class csPDelArray
