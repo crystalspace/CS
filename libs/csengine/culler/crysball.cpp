@@ -31,13 +31,11 @@ int csCrystalBall::csTriNode::Add (
   if (IsLeaf ())
   {
     // we reached the last level
-
     // if this leaf is empty just add the polyidx
-
     // if the new normal to be added equals the one in this leaf we are done
-
     // otherwise we have to split this leaf
-    if (len == 0)
+
+    if (len == 0) //leaf is empty
     {
       nPos = vP->Insert (from, (void *)normal);
     }
@@ -53,78 +51,37 @@ int csCrystalBall::csTriNode::Add (
       else
       {
         // split
-
-        // as the splitpoint we just take the middle of old-new (this will
-
+        // as the splitpoint we select the middle of old-new (this will
         // ensure, that the old and new point are separated in distinct
-
         // triangles)
         csVector3 *mc = new csVector3 (*n + (*normal -*n) / 2.0f);
         mc->Normalize ();     // now the point lies on the unit sphere
         divider = vTP->Push ((void *)mc);
 
-        bool bNew = false, bOld = false;
+        bool newStuffed = false, oldStuffed = false;
+        int tripoint[4] = {tri1, tri2, tri3, tri1};
 
         // now decide which triangle the old and the new point(s) will go into
-        bOld = Classify (*n, tri1, tri2, divider, vTP);
-        if (bOld == INSIDE)
+        for (int i=0; i<3; i++)
         {
-          // contains the original points
-          AddChild (new csTriNode (this, from, len));
-        }
-        else
-        {
-          bNew = Classify (*normal, tri1, tri2, divider, vTP);
-          if (bNew == INSIDE)
+          if (!oldStuffed && Classify (*n, tripoint[i], tripoint[i+1], divider, vTP) == INSIDE)
           {
-            csTriNode *tnode = new csTriNode (this, from + len, 0);
-            AddChild (tnode); // contains the new point
-            nPos = tnode->Add (normal, tri1, tri2, divider, vP, vTP);
+            // contains the original points
+            AddChild (new csTriNode (this, from, len));
+            oldStuffed = true;
           }
           else
-            AddChild (new csTriNode (this, from + len + 1, 0)); // remains empty
-        }
-
-        bOld = Classify (*n, tri2, tri3, divider, vTP);
-        if (!bOld && bOld == INSIDE)
-        {
-          // contains the original points
-          AddChild (new csTriNode (this, from, len));
-        }
-        else
-        {
-          bNew = Classify (*normal, tri2, tri3, divider, vTP);
-          if (!bNew && bNew == INSIDE)
           {
-            csTriNode *tnode = new csTriNode (this, from + len, 0);
-
-            // contains the new point
-            AddChild (new csTriNode (this, from + len, 1));
-            nPos = tnode->Add (normal, tri2, tri3, divider, vP, vTP);
+            if (!newStuffed && Classify (*normal, tripoint[i], tripoint[i+1], divider, vTP) == INSIDE)
+            {
+              csTriNode *tnode = new csTriNode (this, from + len, 1);
+              AddChild (tnode); // contains the new point
+              nPos = tnode->Add (normal, tripoint[i], tripoint[i+1], divider, vP, vTP);
+              newStuffed = true;
+            }
+            else
+              AddChild (new csTriNode (this, from, 0)); // remains empty
           }
-          else
-            AddChild (new csTriNode (this, from + len + 1, 0)); // remains empty
-        }
-
-        bOld = Classify (*n, tri3, tri1, divider, vTP);
-        if (!bOld && bOld == INSIDE)
-        {
-          // contains the original points
-          AddChild (new csTriNode (this, from, len));
-        }
-        else
-        {
-          bNew = Classify (*normal, tri3, tri1, divider, vTP);
-          if (!bNew && bNew == INSIDE)
-          {
-            csTriNode *tnode = new csTriNode (this, from + len, 0);
-
-            // contains the new point
-            AddChild (new csTriNode (this, from + len, 1));
-            nPos = tnode->Add (normal, tri3, tri1, divider, vP, vTP);
-          }
-          else
-            AddChild (new csTriNode (this, from + len + 1, 0)); // remains empty
         }
       }
     }
@@ -343,10 +300,11 @@ void csCrystalBall::InsertPolygon (iPolygonMesh *polyset, int idx)
 
   // which of the 8 starting triangles we add this to ?
   int i1 = 0, i2 = 0, i3 = 0, i = 0;
-  if (n->y < 0) i += 4;
-  if (n->z < 0) i += 2;
+  if (n->y < 0) i += 4; // select one of the octants behind (where y is negative) the xz plane
+  if (n->z < 0) i += 2; // select one of the octants behind the xy plane
   if (n->x >= 0) i += 1;
 
+  // determine the indices to the base vectors that make the found octant <i>
   switch (i)
   {
     case 0: i1 = 3; i2 = 1; i2 = 2; break;
@@ -359,6 +317,7 @@ void csCrystalBall::InsertPolygon (iPolygonMesh *polyset, int idx)
     case 7: i1 = 0; i2 = 4; i2 = 5; break;
   }
 
+  // stuff our new normal <n> into the triangle span by these vectors
   int nPos = tri[i].Add (n, i1, i2, i3, &vPoints, &vTrianglePoints);
   for (i = 0; i < 7; i++) tri[i].Adjust (nPos);
 }
