@@ -29,13 +29,21 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-LIBS.DDRAW+=$(LFLAGS.l)ddraw$(LIB)
+ifeq ($(COMP),GCC)
+# COMP_GCC Linker assumes static libs have extension .a
+# Mingw/Cygwin both use libddraw.a (static lib) as the
+# place to get MS DirectDraw references from
+  LIBS.DDRAW+=$(LFLAGS.l)ddraw$
+else
+  LIBS.DDRAW+=$(LFLAGS.l)ddraw$(LIB)
+endif
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   DDRAW=ddraw2d$(DLL)
   DEP.DDRAW=$(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.LOCAL.DDRAW=$(LIBS.DDRAW)
 else
+# Generate Static Libs
   DDRAW=$(OUT)$(LIB_PREFIX)ddraw2d$(LIB)
   DEP.EXE+=$(DDRAW)
   LIBS.EXE+=$(LIBS.DDRAW)
