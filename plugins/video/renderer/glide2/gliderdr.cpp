@@ -22,6 +22,8 @@
 
 #ifdef OS_WIN32
 #define DLL_NAME "Glide2xRender.dll"
+#elif OS_BE
+#define DLL_NAME "Glide2xRender.so"
 #elif OS_LINUX
 #define DLL_NAME "Glide2xRender.so"
 #define IS_DEFAULT
@@ -73,7 +75,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD /*fdwReason*/, LPVOID /*lpvReserve
 
 #endif
 
-#if OS_LINUX || OS_MACOS
+#if OS_LINUX || OS_MACOS  || OS_BE
   STDAPI DllInitialize ()
   {
        csCoInitialize (0);
