@@ -69,6 +69,9 @@ chronological order.
 	  utilize GLU.CFLAGS.
 	- Eric Sunshine fixed bug in render3d/opengl/Jamfile where it failed to
 	  utilize GLU.CFLAGS and GLU.LFLAGS.
+	- Eric Sunshine fixed bugs in csvos3adl.mak and sprcal3d.mak where they
+	  were incorrectly utilizing VOS.LFLAGS and CAL3D.LFLAGS, respectively.
+	  The error would cause static link builds (USE_PLUGINS=no) to fail.
 12-Jan-2004
 	- Peter Amstutz added a preliminary version of a VOS 
 	  plugin for CS, along with a test program.  The configure script
