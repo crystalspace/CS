@@ -70,8 +70,8 @@ struct iCollideSystem : public iBase
    * this plugin. Returns false if no collision or else true.
    * The collisions will be added to the collision pair array
    * that you can query with GetCollisionPairs and reset/clear
-   * with ResetCollisionPairs. Every call to Collide will
-   * add to that array.
+   * with ResetCollisionPairs (very important! Do not forget this).
+   * Every call to Collide will add to that array.
    */
   virtual bool Collide (
   	iCollider* collider1, const csReversibleTransform* trans1,
@@ -89,7 +89,9 @@ struct iCollideSystem : public iBase
   virtual int GetCollisionPairCount () = 0;
 
   /**
-   * Reset the array with collision pairs.
+   * Reset the array with collision pairs. It is very important to call
+   * this before collision detection. Otherwise the internal table of
+   * collision pairs will grow forever.
    */
   virtual void ResetCollisionPairs () = 0;
 

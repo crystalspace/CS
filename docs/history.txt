@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Sep-2003
+	- Jorrit updated the collision detection howto and also clarified
+	  a Doxygen comment about the need to call ResetCollisionPairs().
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.

@@ -18,9 +18,8 @@ and what you should do to use them.
 
 The basis of the collision detection system is the @samp{iCollideSystem}.
 This is an interface which is implemented by some collision detection plugin.
-At this moment we only have an implementation of the @sc{rapid} collision
-detection system but it would be a simple matter to add a new plugin for
-another system.
+At this moment we have implementations of @sc{rapid} and @sc{opcode} collision
+detection systems.
 
 To load a collision detection system you can use the following code:
 
@@ -165,6 +164,10 @@ idea to have some system on top of the collision detection system that
 detects when it is useful to do collision detection. You can use a bounding
 sphere for that. Also you should only do collision detection if the object
 moves.
+
+Note! Don't forget to call @code{ResetCollisionPairs} before doing collision
+detection! Otherwise the internal table of collision pairs will grow
+forever.
 
 @subsubheading Sliding Along Walls (this section is in beta)
 
