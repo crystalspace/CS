@@ -54,8 +54,6 @@ void OpenGLRenderUnregister ()
 #define DLL_NAME "glrender.dll"
 #elif defined (OS_MACOS)
 #define DLL_NAME "OpenGLRender.shlb"
-#elif defined (OS_NEXT)
-#define DLL_NAME "glrender.dylib"
 #else
 #define DLL_NAME "glrender.so"
 #endif
@@ -68,12 +66,12 @@ STDAPI DllInitialize ()
   return TRUE;
 }
 
-void STDAPICALLTYPE ModuleRelease ()
+EXTERN_C void STDAPICALLTYPE ModuleRelease ()
 {
   gRefCount--;
 }
 
-void STDAPICALLTYPE ModuleAddRef ()
+EXTERN_C void STDAPICALLTYPE ModuleAddRef ()
 {
   gRefCount++;
 }

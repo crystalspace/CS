@@ -58,8 +58,6 @@ void NetNullUnregister ()
 #define DLL_NAME "netdrvn.dll"
 #elif defined (OS_MACOS)
 #define DLL_NAME "netdrvn.shlb"
-#elif defined (OS_NEXT)
-#define DLL_NAME "netdrvn.dylib"
 #else
 #define DLL_NAME "netdrvn.so"
 #endif
@@ -72,12 +70,12 @@ STDAPI DllInitialize ()
   return TRUE;
 }
 
-void STDAPICALLTYPE ModuleRelease ()
+EXTERN_C void STDAPICALLTYPE ModuleRelease ()
 {
   gRefCount--;
 }
 
-void STDAPICALLTYPE ModuleAddRef ()
+EXTERN_C void STDAPICALLTYPE ModuleAddRef ()
 {
   gRefCount++;
 }

@@ -58,8 +58,6 @@ void SoundDriverNullUnregister ()
 #define DLL_NAME "snddrvn.dll"
 #elif defined (OS_MACOS)
 #define DLL_NAME "snddrvn.shlb"
-#elif defined (OS_NEXT)
-#define DLL_NAME "snddrvn.dylib"
 #else
 #define DLL_NAME "snddrvn.so"
 #endif
@@ -72,12 +70,12 @@ STDAPI DllInitialize ()
   return TRUE;
 }
 
-void STDAPICALLTYPE ModuleRelease ()
+EXTERN_C void STDAPICALLTYPE ModuleRelease ()
 {
   gRefCount--;
 }
 
-void STDAPICALLTYPE ModuleAddRef ()
+EXTERN_C void STDAPICALLTYPE ModuleAddRef ()
 {
   gRefCount++;
 }

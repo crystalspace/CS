@@ -58,8 +58,6 @@ void SoundRenderSoftwareUnregister ()
 #define DLL_NAME "sndrdrs.dll"
 #elif defined (OS_MACOS)
 #define DLL_NAME "sndrdrs.shlb"
-#elif defined (OS_NEXT)
-#define DLL_NAME "sndrdrs.dylib"
 #else
 #define DLL_NAME "sndrdrs.so"
 #endif
@@ -72,12 +70,12 @@ STDAPI DllInitialize ()
   return TRUE;
 }
 
-void STDAPICALLTYPE ModuleRelease ()
+EXTERN_C void STDAPICALLTYPE ModuleRelease ()
 {
   gRefCount--;
 }
 
-void STDAPICALLTYPE ModuleAddRef ()
+EXTERN_C void STDAPICALLTYPE ModuleAddRef ()
 {
   gRefCount++;
 }
