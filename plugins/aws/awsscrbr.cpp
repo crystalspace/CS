@@ -149,7 +149,8 @@ bool awsScrollBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
               Frame ().Width (),
               Frame ().Height ()));
 
-        knobinfo.AddRectKey ("Frame", csRect (0, img_h + 1, Frame ().Width (), 2 * img_h + 1));
+        knobinfo.AddRectKey ("Frame",
+	      csRect (0, img_h + 1, Frame ().Width (), 2 * img_h + 1));
       }
       break;
 
@@ -165,26 +166,18 @@ bool awsScrollBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
         incimg->GetOriginalDimensions (img_w, img_h);
 
-        decinfo.AddRectKey ("Frame",
-            csRect (
-              Frame ().xmin,
-              Frame ().ymin,
-              Frame ().xmin + img_w + 5,
-              Frame ().ymax));
+        decinfo.AddRectKey ("Frame", csRect (0, 0, img_w, img_h + 2));
 
         incinfo.AddRectKey ("Frame",
-            csRect (
-              Frame ().xmax - img_w - 5,
-              Frame ().ymin,
-              Frame ().xmax,
-              Frame ().ymax));
+            csRect (Frame ().Width () - img_w - 6, 0,
+                    Frame ().Width () - 4, img_h + 2));
 
         knobinfo.AddRectKey ("Frame",
             csRect (
               Frame ().xmin + img_w + 6,
-              Frame ().ymin,
+              0,
               Frame ().xmin + 2 * img_w + 6,
-              Frame ().ymax));
+              Frame ().Height()));
       }
       break;
   } // end switch framestyle

@@ -14,6 +14,10 @@ The history order is reversed so that new features are at the top.
 	  Mosafi <nmosafi@totalise.co.uk>.  Now it instead reports a sensible
 	  warning message (and avoids crashing).  Also fixed bug where it was
 	  manually invoking IncRef()/DecRef() on its csRef'd `font' member.
+	- Eric Sunshine applied a patch from Michael Herder <crapsite@gmx.net>
+	  to awsScrollBar::Setup() to correct the placement of the horizontal
+	  scroll bar left/right buttons.  Eric also corrected the initial
+	  position of the "knob" for horzontal scrollers.
 4-May-2003
 	- Eric Sunshine made the following changes:
 	    - Updated Swig test in configure.ac to utilize new optional version
