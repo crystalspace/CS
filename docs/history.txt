@@ -43,6 +43,11 @@ chronological order.
 	      incorrectly led the reader to believe that joystick numbers were
 	      0-based, despite the fact that iJoystickDriver and the event
 	      system consider them 1-based.
+	    - Fixed Doxygen comments in csinput.h which stated incorrectly that
+	      joystick numbers were 0-based. (They are 1-based.)
+	    - Fixed bugs in csJoystickDriver where it confusedly treated the
+	      joystick number as 0-based some of the time, and 1-based other
+	      times. Now, all code treats it as 1-based.
 28-Sep-2004
 	- Rhad mutexed some portions of the software renderer to reduce
 	  thread contention issues.  This is not a complete fix but should

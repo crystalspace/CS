@@ -175,9 +175,11 @@ public:
 /**
  * Generic Mouse Driver.<p>
  * Mouse driver should generate events and put them into the event queue.  Also
- * it is responsible for generating double-click events.
+ * it is responsible for generating double-click events. Mouse button numbers
+ * are 1-based.
  */
-class CS_CSUTIL_EXPORT csMouseDriver : public csInputDriver, public iMouseDriver
+class CS_CSUTIL_EXPORT csMouseDriver :
+  public csInputDriver, public iMouseDriver
 {
 private:
   // Generic keyboard driver (for checking modifier key states).
@@ -248,6 +250,7 @@ public:
  * Generic Joystick driver.<p>
  * The joystick driver is responsible for tracking current
  * joystick state and also for generating joystick events.
+ * Joystick numbers and button numbers are 1-based.
  */
 class CS_CSUTIL_EXPORT csJoystickDriver : public csInputDriver,
   public iJoystickDriver
@@ -275,15 +278,15 @@ public:
   virtual void Reset ();
 
   /// Query last joystick X position
-  virtual int GetLastX (int number) { return LastX [number]; }
+  virtual int GetLastX (int number) { return LastX [number - 1]; }
   /// Query last joystick Y position
-  virtual int GetLastY (int number) { return LastY [number]; }
+  virtual int GetLastY (int number) { return LastY [number - 1]; }
   /// Query the last known joystick button state
   virtual bool GetLastButton (int number, int button)
   {
     return (number > 0 && number <= CS_MAX_JOYSTICK_COUNT
          && button > 0 && button <= CS_MAX_JOYSTICK_BUTTONS) ?
-            Button [number - 1] [button - 1] : false;
+            Button [number - 1][button - 1] : false;
   }
 
   /// Call this to add a 'joystick button down/up' event to queue

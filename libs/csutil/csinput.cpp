@@ -694,10 +694,10 @@ iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
 void csJoystickDriver::DoButton (int number, int button, bool down,
   int x, int y)
 {
-  if (number < 0 || number >= CS_MAX_JOYSTICK_COUNT)
+  if (number <= 0 || number >= CS_MAX_JOYSTICK_COUNT)
     return;
 
-  if (x != LastX [number] || y != LastY [number])
+  if (x != LastX [number - 1] || y != LastY [number - 1])
     DoMotion (number, x, y);
 
   if (button <= 0 || button > CS_MAX_JOYSTICK_BUTTONS)
@@ -708,7 +708,7 @@ void csJoystickDriver::DoButton (int number, int button, bool down,
             | (k->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
             | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
 
-  Button [number] [button - 1] = down;
+  Button [number - 1][button - 1] = down;
   csRef<iEvent> ev;
   ev.AttachNew (new csEvent (csGetTicks (),
     down ? csevJoystickDown : csevJoystickUp, number, x, y, button, smask));
@@ -718,22 +718,21 @@ void csJoystickDriver::DoButton (int number, int button, bool down,
 
 void csJoystickDriver::DoMotion (int number, int x, int y)
 {
-  if (number < 0 || number >= CS_MAX_JOYSTICK_COUNT)
+  if (number <= 0 || number >= CS_MAX_JOYSTICK_COUNT)
     return;
 
-  if (x != LastX [number] || y != LastY [number])
+  if (x != LastX [number - 1] || y != LastY [number - 1])
   {
     iKeyboardDriver* k = GetKeyboardDriver();
     int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
               | (k->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
               | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
-    LastX [number] = x;
-    LastY [number] = y;
+    LastX [number - 1] = x;
+    LastY [number - 1] = y;
 
     csRef<iEvent> ev;
     ev.AttachNew (new csEvent(csGetTicks(), csevJoystickMove, 
       number, x, y, 0, smask));
     Post(ev);
-
   }
 }

@@ -216,9 +216,9 @@ SCF_VERSION(iJoystickDriver, 0, 0, 1);
  * Generic Joystick driver.<p>
  * The joystick driver is responsible for tracking current joystick state and
  * also for synthesizing joystick movement events.  Multiple joysticks are
- * supported; they are numbered starting at zero.  Joystick button numbers
- * start at 1.  Typically, one instance of this object is available from the
- * shared-object registry (iObjectRegistry) under the name
+ * supported; they are numbered starting at one.  Joystick button numbers also
+ * start at one.  Typically, a single instance of this object is available from
+ * the shared-object registry (iObjectRegistry) under the name
  * "crystalspace.driver.input.generic.joystick".
  * <p>
  * Main creators of instances implementing this interface:
@@ -245,13 +245,13 @@ struct iJoystickDriver : public iBase
   virtual int GetLastY (int number) = 0;
   /**
    * Query the last known button state of joystick 'number'.  Joystick numbers
-   * start at 0.  Button numbers start at 1.
+   * start at 1.  Button numbers start at 1.
    */
   virtual bool GetLastButton (int number, int button) = 0;
 
   /**
    * Call this to add a 'button down/up' event to queue.  Joystick
-   * numbers start at 0.  Button numbers start at 1.
+   * numbers start at 1.  Button numbers start at 1.
    */
   virtual void DoButton (int number, int button, bool down, int x, int y) = 0;
   /// Call this to add a 'moved' event to queue for joystick 'number'.
