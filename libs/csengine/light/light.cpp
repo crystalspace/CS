@@ -337,6 +337,7 @@ csDynLight::~csDynLight ()
 {
   while (lightpatches)
     csWorld::current_world->lightpatch_pool->Free (lightpatches);
+  csWorld::current_world->RemoveDynLight (this);
 }
 
 void csDynLight::Setup ()
