@@ -7,15 +7,18 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 22-Feb-2004
-	- Duhprey made null renderer for NR (Shaders currently try to load with 
-	  error, but it appears to be harmless.)
+	- Duhprey made null renderer for the NR.  (Shaders currently try to
+	  load with error, but it appears to be harmless.)
 	- res made the following changes:
-	    - Updated csRefArray<> to support the ref tracker.
-	    - Leak and circular refs fixes.
-	    - Fixed some classes which confused the ref tracker.
+	    - Updated csRefArray<> to support the reference tracker.
+	    - Leak and circular reference fixes.
+	    - Fixed some classes which confused the reference tracker.
 	    - Removed the custom DecRef() code from the stdrep plugin.
-	    - Moved the code to access DbgHelp.dll on Win32 out of 
+	    - Moved the code to access DbgHelp.dll on Win32 out of
 	      callstack.cpp into a separate file. Also created a header for it.
+	- Eric Sunshine fixed several makefile and Jamfile problems with the
+	  new null renderer for the NR, including a sizable number of
+	  copy/paste errors.
 20-Feb-2004
 	- Jorrit added a csArray::GetIndex() function which will return the
 	  index of an element in the array (as input you give a pointer to

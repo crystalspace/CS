@@ -6,4 +6,5 @@ if $(USE_NEW_RENDERER) = "yes"
   SubInclude TOP plugins video render3d opengl ;
   SubInclude TOP plugins video render3d software ;
   SubInclude TOP plugins video render3d shader ;
+  SubInclude TOP plugins video render3d null ;
 }

@@ -115,10 +115,13 @@ PLUGINS += engseq
 PLUGINS += documentsystem/xmlread
 
 ifeq ($(USE_NEW_RENDERER),yes)
+PLUGINS.DYNAMIC += video/render3d/null
 ifeq ($(GL.AVAILABLE),yes)
 PLUGINS.DYNAMIC += video/render3d/opengl
 endif
 PLUGINS.DYNAMIC += video/render3d/software
+else
+PLUGINS.DYNAMIC += video/renderer/null
 endif
 PLUGINS.DYNAMIC += video/render3d/shader/shadermgr
 PLUGINS.DYNAMIC += video/render3d/shader/shadercompiler/xmlshader
@@ -134,7 +137,6 @@ PLUGINS.DYNAMIC += engine/renderloop/shadow/stencil
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += isoldr
 PLUGINS.DYNAMIC += video/renderer/line
-PLUGINS.DYNAMIC += video/renderer/null
 PLUGINS.DYNAMIC += video/renderer/inf
 PLUGINS.DYNAMIC += video/canvas/null2d
 PLUGINS.DYNAMIC += video/canvas/memory
