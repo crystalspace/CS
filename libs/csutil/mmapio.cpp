@@ -24,6 +24,9 @@
 #include "iutil/vfs.h"
 #include "csutil/ref.h"
 
+bool MemoryMapFile(mmioInfo*, char const* filename);
+void UnMemoryMapFile(mmioInfo*);
+
 csMemoryMappedIO::csMemoryMappedIO(unsigned _block_size, char const *filename, 
                                    iVFS* vfs):
   block_size(_block_size)
