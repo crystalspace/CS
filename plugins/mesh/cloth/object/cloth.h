@@ -162,6 +162,11 @@ class           Integrator {
       int            i;
       velocities = new csVector3[nverts];
       forces = new csVector3[nverts];
+      for (i = 0; i < nverts; i++) 
+      {	
+        velocities[i]  = 0.0;
+        forces[i] = gravity;
+      };
 #if defined(AMPC_PROVOT)
       tempvertices = new csVector3[nverts];
         // Adams-Moulton predictor-corrector is used on this Integrator,
@@ -175,13 +180,15 @@ class           Integrator {
       forces2 = new csVector3[nverts];
       forces3 = new csVector3[nverts];
       for (i = 0; i < nverts; i++) 
-      {
+      {	
+        velocities1[i] = 0.0;
+        velocities2[i] = 0.0;
+        velocities3[i] = 0.0;
         forces3[i] = gravity;	// set all timestep buffers to default gravity at initialization
 	forces2[i] = gravity;
-	forces1[i] = gravity;
-	forces[i] = gravity;
-      };
-#endif
+	forces1[i] = gravity;	        
+      };      
+#endif      
       ConstrainedVertices = new csBitArray(nverts);
       ConstrainedVertices->Clear();
 	// the following is for demo , this shouldn't be here
