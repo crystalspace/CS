@@ -12620,6 +12620,12 @@ fi
 # before attempting to locate a separate GLX-specific library.  The same logic
 # is also applied to GLU and GLUT checks.
 #
+# On MacOS/X, some users have XFree86 installed which creates a link from
+# /usr/include/GL to /usr/X11R6/include/GL.  We want to ignore this directory
+# and instead check for Apple's OpenGL.framework, if we are not cross-building
+# for Darwin.  We accomplish this by placing the OpenGL.framework test ahead of
+# the other tests.
+#
 # At least one user (Jorrit) has a strange installation in which inclusion of
 # <windows.h> fails if an int32 is not present, thus we must take this into
 # account.
@@ -12873,6 +12879,7 @@ done
 
 
 
+
     echo "$as_me:$LINENO: checking for int32" >&5
 echo $ECHO_N "checking for int32... $ECHO_C" >&6
 if test "${ac_cv_type_int32+set}" = set; then
@@ -13024,6 +13031,15 @@ if test $with_mesa != no; then
 fi
 
 
+# MacOS/X or Darwin?
+if test "x$cs_host_macosx" = "xyes"; then
+  cs_osx_gl=`echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'`
+    cs_osx_glu=`echo @-DCS_GLU_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'`
+    cs_osx_glut=`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'`
+fi
+
+
+# Windows?
 case $host_os in
     mingw*|cygwin*)
 	cs_win32_gl=`echo @@@-lopengl32 | sed 'y% %#%'`
@@ -13051,7 +13067,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in $cs_win32_gl \
-    `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+    $cs_osx_gl \
     `echo @@@-lGL | sed 'y% %#%'` \
     `echo @@@-lgl | sed 'y% %#%'` \
     $cs_mesa_gl
@@ -13206,7 +13222,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in $cs_win32_gl \
-    `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+    $cs_osx_gl \
     `echo @@@-lGL | sed 'y% %#%'` \
     `echo @@@-lgl | sed 'y% %#%'` \
     $cs_mesa_gl
@@ -13402,9 +13418,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+    for cs_build_item in $cs_osx_glu \
+	`echo @@@ | sed 'y% %#%'` \
 	$cs_win32_glu \
-	`echo @-DCS_GLU_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
 	`echo @@@-lGLU | sed 'y% %#%'` \
 	`echo @@@-lglu | sed 'y% %#%'` \
 	$cs_mesa_glu
@@ -13558,9 +13574,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+    for cs_build_item in $cs_osx_glu \
+	`echo @@@ | sed 'y% %#%'` \
 	$cs_win32_glu \
-	`echo @-DCS_GLU_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
 	`echo @@@-lGLU | sed 'y% %#%'` \
 	`echo @@@-lglu | sed 'y% %#%'` \
 	$cs_mesa_glu
@@ -13755,9 +13771,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+    for cs_build_item in $cs_osx_glut \
+	`echo @@@ | sed 'y% %#%'` \
 	$cs_win32_glut \
-	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'` \
 	`echo @@@-lGLUT | sed 'y% %#%'` \
 	`echo @@@-lglut | sed 'y% %#%'`
     do
@@ -13910,9 +13926,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+    for cs_build_item in $cs_osx_glut \
+	`echo @@@ | sed 'y% %#%'` \
 	$cs_win32_glut \
-	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'` \
 	`echo @@@-lGLUT | sed 'y% %#%'` \
 	`echo @@@-lglut | sed 'y% %#%'`
     do

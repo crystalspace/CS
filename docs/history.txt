@@ -33,6 +33,16 @@ chronological order.
 	- Eric Sunshine removed a good number of unnecessary #includes and
 	  forward delcarations from the particle-related plugins and fixed
 	  numerous formatting goofs.
+	- Eric Sunshine worked around problem where configure.ac's GLU and GLUT
+	  checks could export incorrect build flags on MacOS/X if user had
+	  installed XFree86.  In this case, it would find the GLU and GLUT
+	  resources from XFree86 rather than utilizing GLU.framework and
+	  GLUT.framework.
+	- Eric Sunshine fixed problem in configure.ac where the OpenGL and
+	  related checks were not sensitive to Darwin cross-building from
+	  MacOS/X (via the --with-x switch).  In this case, the checks were
+	  still incorrectly trying to locate OpenGL.framework, GLU.framework,
+	  and GLUT.framework, rather than the XFree86 resources.
 10-Jan-2004
 	- res added a facility to draw meshes with less render buffer juggling
 	  etc. required from the client.

@@ -1157,6 +1157,12 @@ AS_IF([test "$no_x" != yes],
 # before attempting to locate a separate GLX-specific library.  The same logic
 # is also applied to GLU and GLUT checks.
 #
+# On MacOS/X, some users have XFree86 installed which creates a link from
+# /usr/include/GL to /usr/X11R6/include/GL.  We want to ignore this directory
+# and instead check for Apple's OpenGL.framework, if we are not cross-building
+# for Darwin.  We accomplish this by placing the OpenGL.framework test ahead of
+# the other tests.
+#
 # At least one user (Jorrit) has a strange installation in which inclusion of
 # <windows.h> fails if an int32 is not present, thus we must take this into
 # account.
@@ -1168,7 +1174,8 @@ m4_define([cs_define_int32],
     ]])
 
 AC_DEFUN([CS_CHECK_GL_PREPARE],
-    [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
+    [AC_REQUIRE([CS_CHECK_HOST])
+    AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     AC_REQUIRE([CS_CHECK_PTHREAD])
     AC_REQUIRE([AC_PATH_X])
     AC_REQUIRE([AC_PATH_XTRA])
@@ -1224,6 +1231,13 @@ AS_IF([test $with_mesa != no],
     cs_mesa_glu=CS_CREATE_TUPLE([],[],[-lMesaGLU])
     cs_mesa_glx=CS_CREATE_TUPLE([],[],[-lMesaGLX])])
 
+# MacOS/X or Darwin?
+AS_IF([test "x$cs_host_macosx" = "xyes"],
+    [cs_osx_gl=CS_CREATE_TUPLE([-DCS_OPENGL_PATH=OpenGL],[],[-framework OpenGL])
+    cs_osx_glu=CS_CREATE_TUPLE([-DCS_GLU_PATH=OpenGL],[],[-framework OpenGL])
+    cs_osx_glut=CS_CREATE_TUPLE([-DCS_GLUT_PATH=GLUT],[],[-framework GLUT])])
+
+# Windows?
 case $host_os in
     mingw*|cygwin*)
 	cs_win32_gl=CS_CREATE_TUPLE([],[],[-lopengl32])
@@ -1236,7 +1250,7 @@ esac
 CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
     [AC_LANG_PROGRAM([CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],[glEnd()])],
     [$cs_win32_gl \
-    CS_CREATE_TUPLE([-DCS_OPENGL_PATH=OpenGL],[],[-framework OpenGL]) \
+    $cs_osx_gl \
     CS_CREATE_TUPLE([],[],[-lGL]) \
     CS_CREATE_TUPLE([],[],[-lgl]) \
     $cs_mesa_gl], [],
@@ -1248,9 +1262,9 @@ AS_IF([test $cs_cv_libgl = yes],
     CS_CHECK_BUILD([for GLU], [cs_cv_libglu],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GLU_PATH],[GL],[glu.h])], [gluNewQuadric()])],
-	[CS_CREATE_TUPLE() \
+	[$cs_osx_glu \
+	CS_CREATE_TUPLE() \
 	$cs_win32_glu \
-	CS_CREATE_TUPLE([-DCS_GLU_PATH=OpenGL],[],[-framework OpenGL]) \
 	CS_CREATE_TUPLE([],[],[-lGLU]) \
 	CS_CREATE_TUPLE([],[],[-lglu]) \
 	$cs_mesa_glu], [],
@@ -1261,9 +1275,9 @@ AS_IF([test $cs_cv_libgl = yes],
     CS_CHECK_BUILD([for GLUT], [cs_cv_libglut],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GLUT_PATH],[GL],[glut.h])], [glutSwapBuffers])],
-	[CS_CREATE_TUPLE() \
+	[$cs_osx_glut \
+	CS_CREATE_TUPLE() \
 	$cs_win32_glut \
-	CS_CREATE_TUPLE([-DCS_GLUT_PATH=GLUT],[],[-framework GLUT]) \
 	CS_CREATE_TUPLE([],[],[-lGLUT]) \
 	CS_CREATE_TUPLE([],[],[-lglut])], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libglut], [GLUT])], [], [],
