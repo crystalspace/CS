@@ -1,0 +1,13 @@
+@c -*-texinfo-*-
+@node Texture Cache
+@section Texture Cache
+@cindex Texture Cache
+
+Every polygon has a tiled texture and three lightmaps. When a polygon needs
+to be displayed the Texture Cache will combine this into a new untiled
+texture that can be displayed. The lightmaps are combined with bilinear
+interpolation with the original tiled texture. After that the new texture is
+put in the cache. If a texture was already in the cache it will not be
+generated again but it will be put in front of all other textures. If the
+cache is full the textures that have been used least recently are removed
+first.

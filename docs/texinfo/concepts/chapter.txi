@@ -19,17 +19,17 @@ resides in LaTeX format.
 @item
 Octree
 @item
-Lighting
-@item
-Defining a World
-@item
 Collision Detection
 @end itemize
 
 @menu
 * Cameras and Matrices::
+* Portal Engine:: The Portal Engine
 * Space Warping::
 * Texture Mapping::
+* Texture Cache::
+* Mipmapping::
+* Lighting::
 * Visibility Culling:: Visibility Culling In Detail
 * Rendering Loop::
 * 3D Sprites::
@@ -37,8 +37,12 @@ Collision Detection
 @end menu
 
 @imports{concepts,camera.txi}
+@imports{concepts,portals.txi}
 @imports{concepts,warping.txi}
 @imports{concepts,texmap.txi}
+@imports{concepts,texcache.txi}
+@imports{concepts,mipmap.txi}
+@imports{concepts,lighting.txi}
 @imports{concepts,viscull.txi}
 @imports{concepts,render.txi}
 @imports{concepts,3dsprite.txi}
