@@ -68,6 +68,8 @@
 #include <stdio.h>
 
 
+const bool AWSTEST_SINGLEPROCTEXCANVAS=false;
+
 //-----------------------------------------------------------------------------
 
 #define  QUERY_REG(myPlug, iFace, errMsg) \
@@ -153,7 +155,7 @@ static bool AwsEventHandler (iEvent& ev)
   }
 }
 
-//#define AWSTEST_SINGLEPROCTEXCANVAS
+
 
 bool 
 awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
@@ -380,11 +382,16 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   
   
 
-#ifdef AWSTEST_SINGLEPROCTEXCANVAS
-  awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager(), 512, 512, NULL);
-#else
-  awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager());
-#endif
+  if (AWSTEST_SINGLEPROCTEXCANVAS)
+  {
+    awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager(), 512, 512, NULL);
+    //aws->SetFlag(AWSF_AlwaysEraseWindows);  // Only set for surface or direct-drawing
+  }
+  else
+  {
+    awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager());
+  }
+
   aws->SetCanvas(awsCanvas);
 
   // next, setup sinks before loading any preferences
@@ -453,18 +460,19 @@ awsTest::SetupFrame()
   aws->Redraw();
   aws->Print(myG3D);
 
-#ifdef AWSTEST_SINGLEPROCTEXCANVAS
-  iTextureWrapper *tex = SCF_QUERY_INTERFACE(awsCanvas, iTextureWrapper);
-  if (tex)
+  /*if (AWSTEST_SINGLEPROCTEXCANVAS)
   {
-    myG3D->DrawPixmap(tex->GetTextureHandle(),
+    iTextureWrapper *tex = SCF_QUERY_INTERFACE(awsCanvas, iTextureWrapper);
+    if (tex)
+    {
+      myG3D->DrawPixmap(tex->GetTextureHandle(),
                     0,0,512,512,
                     0,0,512,512,
                     0);
 
-    SCF_DEC_REF(tex);
-  }
-#endif
+      SCF_DEC_REF(tex);
+    }
+  }*/
 }
   
 void 
