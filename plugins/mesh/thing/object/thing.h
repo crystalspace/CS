@@ -19,42 +19,42 @@
 #ifndef __CS_THING_H__
 #define __CS_THING_H__
 
-#include "csgeom/transfrm.h"
+#include "csgeom/csrect.h"
 #include "csgeom/objmodel.h"
 #include "csgeom/pmtools.h"
-#include "parrays.h"
-#include "csutil/csobject.h"
-#include "csutil/nobjvec.h"
-#include "csutil/util.h"
-#include "csutil/flags.h"
-#include "csutil/cscolor.h"
-#include "csutil/array.h"
-#include "csutil/refarr.h"
-#include "csutil/garray.h"
-#include "csutil/blockallocator.h"
-#include "csutil/parray.h"
+#include "csgeom/subrec2.h"
+#include "csgeom/transfrm.h"
+#include "csgfx/memimage.h"
 #include "csgfx/shadervar.h"
+#include "csutil/array.h"
+#include "csutil/blockallocator.h"
+#include "csutil/cscolor.h"
+#include "csutil/csobject.h"
+#include "csutil/flags.h"
+#include "csutil/garray.h"
+#include "csutil/nobjvec.h"
+#include "csutil/parray.h"
+#include "csutil/refarr.h"
+#include "csutil/util.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
-#include "imesh/thing.h"
-#include "imesh/object.h"
 #include "imesh/lighting.h"
-#include "iutil/eventh.h"
+#include "imesh/object.h"
+#include "imesh/thing.h"
 #include "iutil/comp.h"
 #include "iutil/config.h"
 #include "iutil/dbghelp.h"
+#include "iutil/eventh.h"
 #include "ivideo/shader/shader.h"
-#include "lghtmap.h"
-
-#include "csgeom/subrec2.h"
-#include "csgfx/memimage.h"
 #include "ivideo/txtmgr.h"
+#include "lghtmap.h"
+#include "parrays.h"
+#include "polygon.h"
 
 class csThing;
 class csThingStatic;
 class csThingObjectType;
-class csPolygon3D;
 class csLightPatchPool;
 class csPolyTexLightMap;
 struct iShadowBlockList;
@@ -136,7 +136,7 @@ public:
   }
   virtual void Lock () { locked++; }
   virtual void Unlock ();
- 
+
   virtual csFlags& GetFlags () { return flags;  }
   virtual uint32 GetChangeNumber() const { return 0; }
 
@@ -181,7 +181,7 @@ public:
   /// Maximal number of vertices
   int max_vertices;
   /// Vertices in object space.
-  csVector3* obj_verts;  
+  csVector3* obj_verts;
   /// Normals in object space
   csVector3* obj_normals;
 
@@ -225,7 +225,7 @@ public:
   struct StaticSuperLM;
 
   /**
-   * Static polys which share the same material and fit on the same SLM 
+   * Static polys which share the same material and fit on the same SLM
    * template.
    */
   struct csStaticLitPolyGroup : public csStaticPolyGroup
@@ -241,7 +241,7 @@ public:
     csSubRectangles2* rects;
     int freeLumels;
 
-    StaticSuperLM (int w, int h) : width(w), height(h)    
+    StaticSuperLM (int w, int h) : width(w), height(h)
     {
       rects = 0;
       freeLumels = width * height;
@@ -263,7 +263,7 @@ public:
     void Grow (int newWidth, int newHeight)
     {
       int usedLumels = (width * height) - freeLumels;
-     
+
       width = newWidth; height = newHeight;
       if (rects != 0)
 	rects->Grow (width, height);
@@ -317,7 +317,7 @@ public:
   void PrepareLMLayout ();
   /// Do the actual distribution.
   void DistributePolyLMs (const csStaticPolyGroup& inputPolys,
-    csPDelArray<csStaticLitPolyGroup>& outputPolys, 
+    csPDelArray<csStaticLitPolyGroup>& outputPolys,
     csStaticPolyGroup* rejectedPolys);
   /// Delete LM distro information. Needed when adding/removing polys.
   void UnprepareLMLayout ();
@@ -430,7 +430,7 @@ public:
   virtual void SetSmoothingFlag (bool smoothing) { smoothed = smoothing; }
   virtual bool GetSmoothingFlag () { return smoothed; }
   virtual csVector3* GetNormals () { return obj_normals; }
-    
+
   virtual float GetCosinusFactor () const { return cosinus_factor; }
   virtual void SetCosinusFactor (float c) { cosinus_factor = c; }
 
@@ -489,7 +489,7 @@ public:
   virtual const csPlane3& GetPolygonObjectPlane (int polygon_idx);
   virtual bool IsPolygonTransparent (int polygon_idx);
 
-  //-------------------- iMeshObjectFactory interface implementation ---------
+  //-------------------- iMeshObjectFactory interface implementation ----------
 
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
@@ -498,14 +498,14 @@ public:
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 
-  //-------------------- iPolygonMesh interface implementation ---------------
+  //-------------------- iPolygonMesh interface implementation ----------------
   PolyMeshHelper scfiPolygonMesh;
-  //-------------------  CD iPolygonMesh implementation ---------------
+  //-------------------- CD iPolygonMesh implementation -----------------------
   PolyMeshHelper scfiPolygonMeshCD;
-  //------------------- Lower detail iPolygonMesh implementation ---------------
+  //-------------------- Lower detail iPolygonMesh implementation -------------
   PolyMeshHelper scfiPolygonMeshLOD;
 
-  //------------------------- iObjectModel implementation ----------------
+  //-------------------- iObjectModel implementation --------------------------
   class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThingStatic);
@@ -703,7 +703,7 @@ private:
   	csZBufMode zMode);
 
   /// Generate a cachename based on geometry.
-  char* GenerateCacheName ();  
+  char* GenerateCacheName ();
 
 public:
   /// Option variable: quality for lightmap calculation.
@@ -1041,14 +1041,14 @@ public:
   } scfiLightingInfo;
   friend struct LightingInfo;
 
-  //-------------------- iPolygonMesh interface implementation ---------------
+  //-------------------- iPolygonMesh interface implementation ----------------
   PolyMeshHelper scfiPolygonMesh;
-  //------------------- CD iPolygonMesh implementation ---------------
+  //-------------------- CD iPolygonMesh implementation -----------------------
   PolyMeshHelper scfiPolygonMeshCD;
-  //------------------- Lower detail iPolygonMesh implementation ---------------
+  //-------------------- Lower detail iPolygonMesh implementation -------------
   PolyMeshHelper scfiPolygonMeshLOD;
 
-  //-------------------- iShadowCaster interface implementation ----------
+  //-------------------- iShadowCaster interface implementation ---------------
   struct ShadowCaster : public iShadowCaster
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
@@ -1095,7 +1095,8 @@ public:
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const
     { return 0; }
-    virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/) { }
+    virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/)
+    { }
     virtual void HardTransform (const csReversibleTransform& t)
     {
       scfParent->HardTransform (t);

@@ -22,9 +22,8 @@
 #define __CS_PARRAYS_H__
 
 #include "csutil/array.h"
+#include "polygon.h"
 
-class csPolygon3D;
-class csPolygon3DStatic;
 class csThingObjectType;
 
 /**
