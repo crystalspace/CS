@@ -65,7 +65,11 @@ void csBackground::Draw (csComponent &This, int x, int y, int w, int h,
       G3DPolygonDPFX poly;
       poly.use_fog = false;
       poly.num = 4;
+#ifdef CS_USE_NEW_RENDERER
+      poly.tex_handle = 0;
+#else
       poly.mat_handle = 0;
+#endif
 	  int i;
       for (i = 0; i < 4; i++)
       {

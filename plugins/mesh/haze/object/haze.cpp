@@ -1271,6 +1271,7 @@ void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
 void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
   iMaterialHandle *mat, int num, const csVector3* pts, const csVector2* uvs)
 {
+#ifndef CS_USE_NEW_RENDERER
   g3dpolyfx.use_fog = false;
   g3dpolyfx.num = num;
   g3dpolyfx.mat_handle = mat;
@@ -1308,6 +1309,7 @@ void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
   rview->CalculateFogPolygon (g3dpolyfx);
   g3dpolyfx.mixmode = MixMode; // | CS_FX_GOURAUD;
   g3d->DrawPolygonFX (g3dpolyfx);
+#endif
 }
 
 void csHazeMeshObject::GetObjectBoundingBox (csBox3& retbbox, int /*type*/)

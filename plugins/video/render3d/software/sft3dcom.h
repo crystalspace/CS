@@ -129,7 +129,7 @@ protected:
   /// Values to check if we have to reinit StartPolygonFX.
   bool dpfx_valid;
   bool dpfx_use_fog;
-  iMaterialHandle* dpfx_mat_handle;
+  iTextureHandle* dpfx_tex_handle;
   uint dpfx_mixmode;
   csZBufMode dpfx_z_buf_mode;
 
@@ -226,7 +226,7 @@ protected:
   void DrawPolygonFlat (G3DPolygonDPF& poly);
 
   /// Start a series of DrawPolygonFX
-  void RealStartPolygonFX (iMaterialHandle* handle, uint mode,
+  void RealStartPolygonFX (iTextureHandle* handle, uint mode,
   	bool use_fog);
 
 
@@ -238,11 +238,13 @@ protected:
   csStringID string_indices;
   csStringID string_texture_diffuse;
   csStringID string_texture_lightmap;
+  csStringID string_material_flatcolor;
 
   csRef<iShaderManager> shadermgr;
 
   iRenderBuffer* activebuffers[CS_VATTRIB_SPECIFIC_LAST - 
     CS_VATTRIB_SPECIFIC_FIRST + 1];
+  iTextureHandle* activeTex;
 
   // Structure used for maintaining a stack of clipper portals.
   struct csClipPortal
@@ -586,7 +588,9 @@ public:
   /// Activate a texture
   bool ActivateTexture (iTextureHandle *txthandle, int unit = 0)
   {
-    return false;
+    if (unit != 0) return false;
+    activeTex = txthandle;
+    return true;
   }
 
   /// Activate a texture (Should probably handled some better way)
@@ -612,6 +616,7 @@ public:
   /// Deactivate a texture
   void DeactivateTexture (int unit = 0)
   {
+    if (unit == 0) activeTex = 0;
   }
 
   /// Get width of window

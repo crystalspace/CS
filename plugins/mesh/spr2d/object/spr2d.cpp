@@ -363,6 +363,7 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	csZBufMode mode)
 {
+#ifndef CS_USE_NEW_RENDERER
 // @@@ TODO:
 //     - Z fill vs Z use
   if (!material)
@@ -444,6 +445,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   rview->CalculateFogPolygon (g3dpolyfx);
   g3dpolyfx.mixmode = MixMode;
   g3d->DrawPolygonFX (g3dpolyfx);
+#endif
   return true;
 }
 

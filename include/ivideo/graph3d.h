@@ -483,8 +483,12 @@ struct G3DPolygonDPFX
   /// Use fog info?
   bool use_fog;
 
+#ifndef CS_USE_NEW_RENDERER
   /// The material handle as returned by iTextureManager.
   iMaterialHandle *mat_handle;
+#else
+  iTextureHandle* tex_handle;
+#endif
   /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
   uint mixmode;
 

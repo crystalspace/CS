@@ -287,6 +287,7 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent)
   object_reg = 0;
 
   memset (activebuffers, 0, sizeof (activebuffers));
+  activeTex = 0;
 
   clipportal_dirty = true;
   clipportal_floating = 0;
@@ -2955,7 +2956,7 @@ inline long round16 (long f)
 // The static global variable that holds current PolygonQuick settings
 static struct
 {
-  iMaterialHandle *mat_handle;
+  iTextureHandle* tex_handle;
   int redFact, greenFact, blueFact;
   int max_r, max_g, max_b;
   int twfp, thfp;
@@ -2972,18 +2973,18 @@ static struct
 
 #define EPS   0.0001
 
-void csSoftwareGraphics3DCommon::RealStartPolygonFX (iMaterialHandle* handle,
+void csSoftwareGraphics3DCommon::RealStartPolygonFX (iTextureHandle* handle,
   uint mode, bool use_fog)
 {
   if (!dpfx_valid ||
   	use_fog != dpfx_use_fog ||
-	handle != dpfx_mat_handle ||
+	handle != dpfx_tex_handle ||
 	z_buf_mode != dpfx_z_buf_mode ||
 	mode != dpfx_mixmode)
   {
     dpfx_valid = true;
     dpfx_use_fog = use_fog;
-    dpfx_mat_handle = handle;
+    dpfx_tex_handle = handle;
     dpfx_z_buf_mode = z_buf_mode;
     dpfx_mixmode = mode;
   }
@@ -2992,13 +2993,12 @@ void csSoftwareGraphics3DCommon::RealStartPolygonFX (iMaterialHandle* handle,
   if (!do_gouraud || !do_lighting)
     mode |= CS_FX_FLAT;
 
-  pqinfo.mat_handle = handle;
+  pqinfo.tex_handle = handle;
 
-  iTextureHandle *txt_handle = handle ? handle->GetTexture () : 0;
-  if (txt_handle)
+  if (pqinfo.tex_handle)
   {
     csSoftwareTextureHandle *tex_mm = (csSoftwareTextureHandle*)
-    	txt_handle->GetPrivateObject ();
+    	pqinfo.tex_handle->GetPrivateObject ();
     csSoftwareTexture *txt_unl = (csSoftwareTexture *)tex_mm->get_texture (0);
     csScan_InitDrawFX (tex_mm, txt_unl);
     pqinfo.bm = txt_unl->get_bitmap ();
@@ -3105,7 +3105,7 @@ zfill_only:
 
 void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
-  RealStartPolygonFX (poly.mat_handle, poly.mixmode, poly.use_fog);
+  RealStartPolygonFX (poly.tex_handle, poly.mixmode, poly.use_fog);
 
   if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
     return;
@@ -3115,11 +3115,8 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     Scan.FlatRGB.Set (255, 255, 255);
   else
   {
-    if (pqinfo.mat_handle)
-      pqinfo.mat_handle->GetFlatColor (Scan.FlatRGB);
-    else
-      Scan.FlatRGB.Set (
-      	poly.flat_color_r, poly.flat_color_g, poly.flat_color_b);
+    Scan.FlatRGB.Set (
+      poly.flat_color_r, poly.flat_color_g, poly.flat_color_b);
   }
 
   // Get the same value as a pixel-format-encoded value
@@ -4408,6 +4405,23 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   rmesh.indexend = mesh.indexCount;
   rmesh.variablecontext = &scrapContext;
 
+  if (flags & csSimpleMeshScreenspace)
+  {
+    // @@@ Could be optimized by letting DrawMesh() do this special transform.
+    const float vwf = (float)(width);
+    const float vhf = (float)(height);
+
+    rmesh.object2camera.SetO2T (
+    csMatrix3 (1.0f, 0.0f, 0.0f,
+                0.0f, -1.0f, 0.0f,
+                0.0f, 0.0f, 1.0f));
+    rmesh.object2camera.SetO2TTranslation (csVector3 (
+    vwf / 2.0f, vhf / 2.0f, -aspect));
+    rmesh.object2camera *= mesh.object2camera;
+  }
+  else
+    rmesh.object2camera = mesh.object2camera;
+
   csShaderVarStack stacks;
   shadermgr->PushVariables (stacks);
   scrapContext.PushVariables (stacks);
@@ -4784,6 +4798,32 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
       indexend = triIdx;
       break;
     }
+  case CS_MESHTYPE_QUADS:
+    {
+      //triangulate
+      int numInd = mesh->indexend - mesh->indexstart;
+      if (mesh->indexend - mesh->indexstart == 0) return;
+
+      int numTri = (numInd / 2);
+      workIndices = new uint32 [numTri * 3];
+      deleteIndices = true;
+
+      int triIdx = 0;
+      
+      for(uint indIdx = mesh->indexstart; indIdx < mesh->indexend; indIdx += 4)
+      {
+        workIndices[triIdx++] = indices[indIdx+0];
+        workIndices[triIdx++] = indices[indIdx+1];
+        workIndices[triIdx++] = indices[indIdx+2];
+        workIndices[triIdx++] = indices[indIdx+0];
+        workIndices[triIdx++] = indices[indIdx+2];
+        workIndices[triIdx++] = indices[indIdx+3];
+      }
+
+      indexstart = 0;
+      indexend = triIdx;
+      break;
+    }
   default:
     workIndices = indices;
   }
@@ -4828,11 +4868,11 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   work_uv_verts = uv1;
   work_col = col1;
 
+  z_verts->SetLength (num_vertices);
+  persp->SetLength (num_vertices);
   // Perspective project.
   for (i = 0 ; i < num_vertices ; i++)
   {
-    z_verts->SetLength (num_vertices);
-    persp->SetLength (num_vertices);
     if (work_verts[i].z >= SMALL_Z)
     {
       (*z_verts)[i] = 1. / work_verts[i].z;
@@ -4845,15 +4885,26 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   // Clipped polygon (assume it cannot have more than 64 vertices)
   G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
-  poly.mat_handle = mesh->material->GetMaterialHandle ();
+  poly.tex_handle = activeTex;
   poly.mixmode = modes.mixmode | CS_FX_TILING |
     (!work_col ? CS_FX_FLAT : 0);
 
   // Fill flat color if renderer decide to paint it flat-shaded
-  iTextureHandle* txt_handle = mesh->material->GetMaterialHandle ()->GetTexture ();
-  if (txt_handle)
-    txt_handle->GetMeanColor (poly.flat_color_r,
-      poly.flat_color_g, poly.flat_color_b);
+  {
+    if (string_material_flatcolor<(csStringID)stacks.Length ()
+	&& stacks[string_material_flatcolor].Length () > 0)
+    {
+      csShaderVariable* flatcolSV = stacks[string_material_flatcolor].Top ();
+      csRGBpixel flatcol;
+      flatcolSV->GetValue (flatcol);
+      poly.flat_color_r = flatcol.red;
+      poly.flat_color_g = flatcol.green;
+      poly.flat_color_b = flatcol.blue;
+    }
+    else if (poly.tex_handle)
+      poly.tex_handle->GetMeanColor (poly.flat_color_r, poly.flat_color_g,
+	poly.flat_color_b);
+  }
 
   poly.use_fog = false;
 
@@ -4913,7 +4964,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 #undef INTERPOL
 #define INTERPOL(id,idl,i1,i2) \
 	uv[id] = work_uv_verts[i1] + r*(work_uv_verts[i2]-work_uv_verts[i1]); \
-        zv[id] = com_zv; \
+	zv[id] = com_zv; \
 	p##idl.x = v.x * com_iz + width2; p##idl.y = v.y * com_iz + width2; \
 	if (work_col) \
 	{ \
