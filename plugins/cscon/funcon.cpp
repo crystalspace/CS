@@ -50,8 +50,6 @@ funConsole::funConsole (iBase *base) : csConsole (NULL)
 
 funConsole::~funConsole ()
 {
-  if (G3D)
-    G3D->DecRef ();
   if (VFS)
     VFS->DecRef ();
 }
@@ -59,7 +57,6 @@ funConsole::~funConsole ()
 bool funConsole::Initialize (iSystem *system) 
 {
   bool succ = csConsole::Initialize ( system );
-  G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
 
   outersize.Set ( size );
   if (!G3D)

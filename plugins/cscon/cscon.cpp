@@ -64,6 +64,9 @@ csConsole::csConsole (iBase *base)
   system_ready = false;
   visible = true;
   Client = NULL;
+  G3D = NULL;
+  G2D = NULL;
+  System = NULL;
 }
 
 csConsole::~csConsole ()
@@ -72,6 +75,8 @@ csConsole::~csConsole ()
     System->DecRef ();
   if (G2D)
     G2D->DecRef ();
+  if (G3D)
+    G3D->DecRef ();    
   delete buffer;
 }
 
@@ -81,7 +86,8 @@ bool csConsole::Initialize(iSystem *system)
   G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D) return false;
   G2D = G3D->GetDriver2D ();
-
+  G2D->IncRef ();
+  
   // Initialize the display rectangle to the entire display
   size.Set (0, 0, G2D->GetWidth () - 1, G2D->GetHeight () - 1);
   invalid.Set (size); // Invalidate the entire console

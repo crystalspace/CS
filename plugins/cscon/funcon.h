@@ -59,7 +59,6 @@ protected:
   virtual void GetPosition (int &x, int &y, int &width, int &height) const;
   virtual void SetPosition (int x, int y, int width = -1, int height = -1);
 
-  iGraphics3D *G3D;
   iVFS *VFS;
   ConsoleDecoration deco;
   csRect outersize, bordersize, p2size;
