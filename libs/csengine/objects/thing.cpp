@@ -466,6 +466,98 @@ void csThing::DrawFoggy (csRenderView& d)
 }
 
 
+void csThing::CalculateLightmaps (csLightView& lview)
+{
+  csPolygon3D* p;
+  csPortal* po;
+  int i, j;
+
+  draw_busy++;
+  csVector3* old;
+  NewTransformation (old);
+
+  TranslateVector (lview.light_frustrum->GetOrigin ());
+
+  if (light_frame_number != current_light_frame_number)
+  {
+    light_frame_number = current_light_frame_number;
+    lview.gouroud_color_reset = true;
+  }
+  else lview.gouroud_color_reset = false;
+
+  csFrustrum* light_frustrum = lview.light_frustrum;
+  csFrustrum* new_light_frustrum;
+  csVector3* poly;
+  for (i = 0 ; i < num_polygon ; i++)
+  {
+    p = (csPolygon3D*)polygons[i];
+    CHK (poly = new csVector3 [p->GetNumVertices ()]);	//@@@ Not efficient, allocate once, use many times!!!
+    for (j = 0 ; j < p->GetNumVertices () ; j++)
+      poly[j] = p->Vcam (j);
+    new_light_frustrum = light_frustrum->Intersect (poly, p->GetNumVertices ());
+    CHK (delete [] poly);
+
+    if (new_light_frustrum)
+    {
+      // First we check if the light can reach the polygon. If not then there is no
+      // need to include it in the view frustrum. This is especially useful for portals
+      // since then whole sectors can be culled away efficiently.
+      float dist_to_plane = p->GetPolyPlane ()->Distance (light_frustrum->GetOrigin ());
+
+      bool faraway = true;
+      if (dist_to_plane < lview.l->GetRadius ())
+      {
+        // The light is close enough to the plane of the polygon. Now we calculate
+	// an accurate minimum squared distance from the light to the polygon. Note
+	// that we use the new_frustrum which is relative to the center of the light.
+	// So this algorithm works with the light position at (0,0,0) (@@@ we should
+	// use this to optimize this algorithm further).
+	csVector3 o (0, 0, 0);
+	float min_sqdist = csSquaredDist::PointPoly (o, new_light_frustrum->GetVertices (),
+		new_light_frustrum->GetNumVertices (),
+		*(p->GetPolyPlane ()), dist_to_plane*dist_to_plane);
+	if (min_sqdist < lview.l->GetSquaredRadius ()) faraway = false;	// Light reaches polygon.
+      }
+
+      if (!faraway)
+      {
+        csLightView new_lview;
+	new_lview.CopyNoFrustrum (lview);
+        new_lview.light_frustrum = new_light_frustrum;
+        p->CalculateLightmaps (new_lview);
+        po = p->GetPortal ();
+        if (po) po->CalculateLightmaps (new_lview);
+        else if (!new_lview.dynamic && csSector::do_radiosity)
+        {
+          // If there is no portal we simulate radiosity by creating
+	  // a dummy portal for this polygon which reflects light.
+	  csPortalCS mirror;
+	  mirror.SetSector (p->GetSector ());
+	  mirror.SetAlpha (10);
+	  float r, g, b;
+	  p->GetTextureHandle ()->GetMeanColor (r, g, b);
+	  mirror.SetFilter (r/4, g/4, b/4);
+	  mirror.SetWarp (csTransform::GetReflect ( *(p->GetPolyPlane ()) ));
+	  mirror.CalculateLightmaps (new_lview);
+        }
+      }
+
+      CHK (delete new_light_frustrum);
+    }
+  }
+
+  // Loop over all curves
+  csCurve* c;
+  for (i = 0 ; i < num_curves ; i++)
+  {
+    c = curves[i];
+    c->ShineLightmaps (lview);
+  }
+
+  RestoreTransformation (old);
+  draw_busy--;
+}
+
 void csThing::ShineLightmaps (csLightView& lview)
 {
   csPolygon3D* p;

@@ -1171,6 +1171,94 @@ void csPolygon3D::InitLightmaps (csPolygonSet* owner, bool do_cache, int index)
   else lightmap_up_to_date = true;
 }
 
+void csPolygon3D::CalculateLightmaps (csLightView& lview)
+{
+  if (orig_poly) return;
+
+  if (uv_coords || use_flat_color)
+  {
+    // We are working for a vertex lighted polygon.
+    csLight* light = (csLight*)lview.l;
+    float rd = lview.r / light->GetRadius ();
+    float gd = lview.g / light->GetRadius ();
+    float bd = lview.b / light->GetRadius ();
+
+    if (lview.dynamic)
+    {
+      // Currently not yet supported. @@@
+      return;
+    }
+    else
+    {
+      csColor col;
+      int i;
+      float cosfact = cosinus_factor;
+      if (cosfact == -1) cosfact = csPolyTexture::cfg_cosinus_factor;
+
+      for (i = 0 ; i < num_vertices ; i++)
+      {
+        if (colors && !lview.gouroud_color_reset) col = colors[i];
+	else col.Set (0, 0, 0);
+        float d = csSquaredDist::PointPoint (light->GetCenter (), Vwor (i));
+	if (d >= light->GetSquaredRadius ()) continue;
+	d = sqrt (d);
+	float cosinus = (Vwor (i)-light->GetCenter ())*GetPolyPlane ()->Normal ();
+	cosinus /= d;
+	cosinus += cosfact;
+	if (cosinus < 0) cosinus = 0;
+	else if (cosinus > 1) cosinus = 1;
+	col.red = col.red + cosinus * rd*(light->GetRadius () - d);
+	if (col.red > 1) col.red = 1;
+	col.green = col.green + cosinus * gd*(light->GetRadius () - d);
+	if (col.green > 1) col.green = 1;
+	col.blue = col.blue + cosinus * bd*(light->GetRadius () - d);
+	if (col.blue > 1) col.blue = 1;
+        SetColor (i, col);
+      }
+    }
+    return;
+  }
+
+  if (lview.gouroud_only) return;
+
+  if (lview.dynamic)
+  {
+    // We are working for a dynamic light. In this case we create
+    // a light patch for this polygon.
+    CHK (csLightPatch* lp = new csLightPatch ());
+    AddLightpatch (lp);
+    csDynLight* dl = (csDynLight*)lview.l;
+    dl->AddLightpatch (lp);
+
+    lp->num_vertices = lview.light_frustrum->GetNumVertices ();
+    CHK (lp->vertices = new csVector3 [lp->num_vertices]);
+
+    int i, mi;
+    for (i = 0 ; i < lp->num_vertices ; i++)
+    {
+      if (lview.mirror) mi = lp->num_vertices-i-1;
+      else mi = i;
+      //lp->vertices[i] = lview.frustrum[mi] + lview.center;
+      lp->vertices[i] = lview.light_frustrum->GetVertex (mi);
+    }
+
+  }
+  else
+  {
+    if (lightmap_up_to_date) return;
+    tex->CalculateLightmaps (lview);
+#if 0
+//@@@
+    // If there is already a lightmap1 this means that we are
+    // redoing lighting at run-time. In that case we also
+    // need to update the other mipmap levels.
+    // @@@ We need specific functionality for this.
+    // Doing this with create_lightmaps is NOT efficient.
+    if (lightmap1) create_lightmaps ();
+#endif
+  }
+}
+
 void csPolygon3D::ShineLightmaps (csLightView& lview)
 {
   if (orig_poly) return;

@@ -20,6 +20,7 @@
 #define RVIEW_H
 
 #include "csgeom/math3d.h"
+#include "csgeom/frustrum.h"
 #include "csengine/camera.h"
 
 class csClipper;
@@ -149,6 +150,13 @@ public:
   bool gouroud_color_reset;
 
   /**
+   * The frustrum for the light. Everthing that falls in this frustrum
+   * is lit unless it also is in a shadow frustrum.
+   */
+  csFrustrum* light_frustrum;
+
+  /**
+  @@@ OBSOLETE
    * The current view frustrum as seen from the light (relative
    * to the center of the light). If frustrum == NULL then everything is
    * visible (the full frustrum).
@@ -158,6 +166,7 @@ public:
   int num_frustrum;
 
   /**
+  @@@ OBSOLETE
    * All shadows collected upto now.
    * @@@ Currently not used but reserved for later when implementing
    * a better lighting system.
@@ -165,6 +174,7 @@ public:
   csShadowPatch* shadows;
 
   /**
+  @@@ OBSOLETE
    * Pointer to the first shadow in the list which belongs to
    * the previous recursion level (and which should not be cleaned
    * by this one).
@@ -172,6 +182,7 @@ public:
   csShadowPatch* prev_shadows;
 
   /**
+  @@@ OBSOLETE?
    * A tranform from the space of the light beam to the space of the light
    * source.
    */
@@ -179,7 +190,8 @@ public:
 
 public:
   ///
-  csLightView () : frustrum (NULL), num_frustrum (0), shadows (NULL), prev_shadows (NULL), beam2source () { }
+  csLightView () : light_frustrum (NULL), frustrum (NULL), num_frustrum (0), shadows (NULL),
+  	prev_shadows (NULL), beam2source () { }
  
   ///
   ~csLightView ()
@@ -218,6 +230,10 @@ public:
       CHK (frustrum = new csVector3 [num_frustrum]);
       memcpy (frustrum, other.frustrum, num_frustrum*sizeof (csVector3));
     }
+    if (other.light_frustrum)
+    {
+      CHK (light_frustrum = new csFrustrum (*other.light_frustrum));
+    }
     return *this;
   }
 
@@ -229,6 +245,7 @@ public:
     //prev_shadows = shadows;
     frustrum = NULL,
     num_frustrum = 0;
+    light_frustrum = NULL;
     return *this;
   }
 };

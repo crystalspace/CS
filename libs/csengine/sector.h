@@ -92,10 +92,18 @@ private:
   	int num, void* data);
 
   /**
+  @@@ OBSOLETE
    * This function is called by the BSP tree traversal routine
    * to update the lightmaps for a number of polygons.
    */
   static void* ShinePolygons (csPolygonParentInt*, csPolygonInt** polygon,
+  	int num, void* data);
+
+  /**
+   * This function is called by the BSP tree traversal routine
+   * to update the lightmaps for a number of polygons.
+   */
+  static void* CalculateLightmapsPolygons (csPolygonParentInt*, csPolygonInt** polygon,
   	int num, void* data);
 
   /**
@@ -232,6 +240,12 @@ public:
    * the cache.
    */
   void InitLightmaps (bool do_cache = true);
+
+  /**
+   * Update the lightmaps for all things and polygons in this sector
+   * and possibly traverse through portals to other sectors.
+   */
+  void CalculateLightmaps (csLightView& lview);
 
   /**
    * Update the lightmaps for all polygons in this sector and possibly

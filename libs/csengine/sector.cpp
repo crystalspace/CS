@@ -19,6 +19,7 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "csengine/sysitf.h"
+#include "csengine/dumper.h"
 #include "csengine/sector.h"
 #include "csengine/objects/thing.h"
 #include "csengine/objects/cssprite.h"
@@ -757,6 +758,116 @@ void csSector::ShineLightmaps (csLightView& lview)
   RestoreTransformation (old);
   draw_busy--;
 }
+
+void* csSector::CalculateLightmapsPolygons (csPolygonParentInt*, csPolygonInt** polygon, int num, void* data)
+{
+  csPolygon3D* p;
+  csPortal* po;
+  csLightView* d = (csLightView*)data;
+  csFrustrum* light_frustrum = d->light_frustrum;
+  csFrustrum* new_light_frustrum;
+  csVector3* poly;
+  int i, j;
+  for (i = 0 ; i < num ; i++)
+  {
+    p = (csPolygon3D*)polygon[i];
+    CHK (poly = new csVector3 [p->GetNumVertices ()]);	//@@@ Not efficient, allocate once, use many times!!!
+    for (j = 0 ; j < p->GetNumVertices () ; j++)
+      poly[j] = p->Vcam (j);
+    new_light_frustrum = light_frustrum->Intersect (poly, p->GetNumVertices ());
+    CHK (delete [] poly);
+
+    if (new_light_frustrum)
+    {
+      // There is an intersection of the current light frustrum with the polygon.
+      // This means that the polygon is hit by the light.
+
+      // First compute the distance from the center of the light to the plane of
+      // the polygon. If this distance is greater than the radius of the light then
+      // we have a trivial case (no hit possible).
+      float dist_to_plane = p->GetPolyPlane ()->Distance (light_frustrum->GetOrigin ());
+
+      bool faraway = true;
+      if (dist_to_plane < d->l->GetRadius ())
+      {
+        // The light is close enough to the plane of the polygon. Now we calculate
+	// an accurate minimum squared distance from the light to the polygon. Note
+	// that we use the new_frustrum which is relative to the center of the light.
+	// So this algorithm works with the light position at (0,0,0) (@@@ we should
+	// use this to optimize this algorithm further).
+	csVector3 o (0, 0, 0);
+	float min_sqdist = csSquaredDist::PointPoly (o, new_light_frustrum->GetVertices (),
+		new_light_frustrum->GetNumVertices (),
+		*(p->GetPolyPlane ()), dist_to_plane*dist_to_plane);
+	if (min_sqdist < d->l->GetSquaredRadius ()) faraway = false;	// Light reaches polygon.
+      }
+
+      if (!faraway)
+      {
+        csLightView new_lview;
+	new_lview.CopyNoFrustrum (*d);
+        new_lview.light_frustrum = new_light_frustrum;
+        p->CalculateLightmaps (new_lview);
+        po = p->GetPortal ();
+        if (po) po->CalculateLightmaps (new_lview);
+        else if (!new_lview.dynamic && do_radiosity)
+        {
+          // If there is no portal we simulate radiosity by creating
+	  // a dummy portal for this polygon which reflects light.
+	  csPortalCS mirror;
+	  mirror.SetSector (p->GetSector ());
+	  mirror.SetAlpha (10);
+	  float r, g, b;
+	  p->GetTextureHandle ()->GetMeanColor (r, g, b);
+	  mirror.SetFilter (r/4, g/4, b/4);
+	  mirror.SetWarp (csTransform::GetReflect ( *(p->GetPolyPlane ()) ));
+	  mirror.CalculateLightmaps (new_lview);
+        }
+      }
+
+      CHK (delete new_light_frustrum);
+    }
+  }
+  return NULL;
+}
+
+void csSector::CalculateLightmaps (csLightView& lview)
+{
+  if (draw_busy >= cfg_reflections) return;
+
+  draw_busy++;
+  csVector3* old;
+  NewTransformation (old);
+
+  TranslateVector (lview.light_frustrum->GetOrigin ());
+
+  csLightView new_lview;
+  new_lview.Copy (lview);
+
+  if (light_frame_number != current_light_frame_number)
+  {
+    light_frame_number = current_light_frame_number;
+    new_lview.gouroud_color_reset = true;
+  }
+  else new_lview.gouroud_color_reset = false;
+
+  if (bsp)
+    bsp->Back2Front (new_lview.center, &CalculateLightmapsPolygons, (void*)&new_lview);
+  else
+    CalculateLightmapsPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&new_lview);
+
+  if (static_thing) static_thing->CalculateLightmaps (lview);
+  csThing* sp = first_thing;
+  while (sp)
+  {
+    if (!sp->IsMerged ()) sp->CalculateLightmaps (lview);
+    sp = (csThing*)(sp->GetNext ());
+  }
+
+  RestoreTransformation (old);
+  draw_busy--;
+}
+
 
 void* csSector::DumpFrustrumPolygons (csPolygonParentInt*, csPolygonInt** polygon, int num, void* data)
 {

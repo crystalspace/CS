@@ -243,9 +243,15 @@ public:
   virtual bool BlockingThings (csVector3& start, csVector3& end, csPolygon3D** poly) = 0;
 
   /**
+  @@@OBSOLETE
    * Update lightmaps of all polygons reachable through this portal.
    */
   virtual void ShineLightmaps (csLightView& lview) = 0;
+
+  /**
+   * Update lightmaps of all polygons reachable through this portal.
+   */
+  virtual void CalculateLightmaps (csLightView& lview) = 0;
 
   /**
    * Dump frustrum of all polygons reachable through this portal
@@ -310,6 +316,12 @@ public:
    * Follow a beam of light through this portal (for Things).
    */
   virtual bool BlockingThings (csVector3& start, csVector3& end, csPolygon3D** poly);
+
+  /**
+   @@@OBSOLETE
+   * Update lightmaps of all polygons visible through this portal.
+   */
+  virtual void CalculateLightmaps (csLightView& lview);
 
   /**
    * Update lightmaps of all polygons visible through this portal.

@@ -204,6 +204,51 @@ void csPortalCS::ShineLightmaps (csLightView& lview)
   else sector->ShineLightmaps (lview);
 }
 
+void csPortalCS::CalculateLightmaps (csLightView& lview)
+{
+  if (do_warp_space)
+  {
+    csLightView new_lview;
+    new_lview.Copy (lview);
+
+    new_lview.center = warp_wor.Other2This (lview.center);
+    new_lview.beam2source /= warp_wor;
+    new_lview.light_frustrum->Transform (&warp_wor);
+
+    if (do_mirror)
+    {
+      new_lview.mirror = !lview.mirror;
+      new_lview.light_frustrum->SetMirrored (new_lview.mirror);
+    }
+    if (cfg_alpha)
+    {
+      //float a = cfg_alpha;
+      //new_lview.r = (a * lview.r + (100-a) * filter_r) / 100.;
+      //new_lview.g = (a * lview.g + (100-a) * filter_g) / 100.;
+      //new_lview.b = (a * lview.b + (100-a) * filter_b) / 100.;
+      float fr, fg, fb;
+      if (filter_texture)
+      {
+        filter_texture->GetMeanColor (fr, fg, fb);
+      }
+      else
+      {
+        fr = filter_r;
+        fg = filter_g;
+        fb = filter_b;
+      }
+      new_lview.r = lview.r * fr;
+      new_lview.g = lview.g * fg;
+      new_lview.b = lview.b * fb;
+    }
+
+    // Don't go further if the light intensity is almost zero.
+    if (new_lview.r >= SMALL_EPSILON || new_lview.g >= SMALL_EPSILON || new_lview.b >= SMALL_EPSILON)
+      sector->CalculateLightmaps (new_lview);
+  }
+  else sector->CalculateLightmaps (lview);
+}
+
 void csPortalCS::DumpFrustrum (csStatLight* light, csVector3* frustrum, int num_frustrum,
 	csTransform& t)
 {

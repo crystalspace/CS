@@ -17,6 +17,7 @@
 */
 
 #include "sysdef.h"
+#include "csgeom/frustrum.h"
 #include "csengine/sysitf.h"
 #include "csengine/light/light.h"
 #include "csengine/sector.h"
@@ -162,7 +163,12 @@ void csStatLight::ShineLightmaps ()
   lview.g = GetColor ().green;
   lview.b = GetColor ().blue;
   lview.dynamic = false;
+
   sector->ShineLightmaps (lview);
+
+  //CHK (lview.light_frustrum = new csFrustrum (center));
+  //lview.light_frustrum->MakeInfinite ();
+  //sector->CalculateLightmaps (lview);
 }
 
 void csStatLight::ShineLightmaps (csThing* th)

@@ -283,6 +283,16 @@ void Dumper::dump (csFrustrum* frustrum, char* name)
     CsPrintf (MSG_DEBUG_0, "  NULL\n");
     return;
   }
+  if (frustrum->IsEmpty ())
+  {
+    CsPrintf (MSG_DEBUG_0, "  EMPTY\n");
+    return;
+  }
+  if (frustrum->IsInfinite ())
+  {
+    CsPrintf (MSG_DEBUG_0, "  INFINITE\n");
+    return;
+  }
   int i;
   CsPrintf (MSG_DEBUG_0, "  "); dump (&frustrum->GetOrigin (), "origin");
   for (i = 0 ; i < frustrum->GetNumVertices () ; i++)

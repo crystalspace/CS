@@ -754,6 +754,7 @@ public:
   void InitLightmaps (csPolygonSet* owner, bool do_cache, int index);
 
   /**
+  @@@OBSOLETE
    * Update the lightmap of this polygon according to the given light and
    * the frustrum. The light is given in world space coordinates. The
    * view frustrum is given in camera space (with (0,0,0) the origin
@@ -763,6 +764,17 @@ public:
    * do nothing.
    */
   void ShineLightmaps (csLightView& lview);
+
+  /**
+   * Update the lightmap of this polygon according to the given light and
+   * the frustrum. The light is given in world space coordinates. The
+   * view frustrum is given in camera space (with (0,0,0) the origin
+   * of the frustrum). The camera space used is just world space translated
+   * so that the center of the light is at (0,0,0).
+   * If the lightmaps were cached in the level archive this function will
+   * do nothing.
+   */
+  void CalculateLightmaps (csLightView& lview);
 
   /**
    * Call after calling InitLightmaps and ShineLightmaps to cache
