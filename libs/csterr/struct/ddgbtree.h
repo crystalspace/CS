@@ -21,7 +21,9 @@
 
 #include "struct/ddgtmesh.h"
 #include "struct/ddgcntxt.h"
+#ifdef DDG
 #include "struct/ddghist.h"
+#endif
 
 typedef unsigned short ddgPriority;
 
@@ -375,8 +377,10 @@ public:
 	 * Returns false otherwise.
 	 */
 	bool rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int depth = -1 );
+#ifdef DDG
 	/// Generate a histogram of usage.
 	static void setHist( ddgHistogram * hist);
+#endif
 };
 
 

@@ -995,13 +995,13 @@ float ddgTBinTree::treeHeight(unsigned int r, unsigned int c, float dx, float dz
 
     return v[1];
 }
-
+#ifdef DDG
 ddgHistogram *prioHist = NULL;
 void ddgTBinTree::setHist( ddgHistogram * hist)
 {
 	prioHist = hist;
 }
-
+#endif
 /// Calculate priority of triangle tindex  We assume that we only get called
 /// for visible triangles which are not leaves, because all others have priority 0.
 ddgPriority ddgTBinTree::priorityCalc(ddgTriIndex tindex, float pf)
@@ -1040,13 +1040,13 @@ ddgPriority ddgTBinTree::priorityCalc(ddgTriIndex tindex, float pf)
 	_mesh->priCountIncr();
 #endif
 	ddgAssert(z >= 0);
-
+#ifdef DDG
 	if (prioHist)
 	{
 		int i = z >= ddgPriorityResolution ? ddgPriorityResolution-1 : z;
 		prioHist->incr(i);
 	}
-
+#endif
 	return (ddgPriority)(z >= ddgPriorityResolution ? ddgPriorityResolution-1 : z);
 
 }
