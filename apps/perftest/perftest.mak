@@ -31,7 +31,7 @@ PERF.EXE = perftest$(EXE)
 INC.PERF = $(wildcard apps/perftest/*.h)
 SRC.PERF = $(wildcard apps/perftest/*.cpp)
 OBJ.PERF = $(addprefix $(OUT),$(notdir $(SRC.PERF:.cpp=$O)))
-DEP.PERF = CSUTIL CSTOOL CSSYS CSGEOM CSUTIL
+DEP.PERF = CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSGFX
 LIB.PERF = $(foreach d,$(DEP.PERF),$($d.LIB))
 
 TO_INSTALL.EXE += $(PERF.EXE)
