@@ -110,17 +110,31 @@ void csGraphics2DGlideCommon::SetTMUPalette(int tmu)
   GlideLib_grTexDownloadTable(tmu, GR_TEXTABLE_PALETTE, &p);		
 }
 
-void csGraphics2DGlideCommon::DrawLine (int x1, int y1, int x2, int y2, int color)
+void csGraphics2DGlideCommon::DrawLine (float x1, float y1, float x2, float y2, int color)
 {
-  // can't do this while framebuffer is locked...
-  if (locked) return;
- 
-  GrVertex a,b;
-  a.x=x1; a.y=y1;
-  b.x=x2; b.y=y2;
+  if (locked)
+    csGraphics2D::DrawLine( x1, y1, x2, y2, color );
+  else
+  {
+    // our origin is lower left
+    y1 = ClipY2 - y1;
+    y2 = ClipY2 - y2;
+    if ( !ClipLine( x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2 ) ){
+      GrVertex a,b;
+      a.x=x1; a.y=y1;a.z=GR_WDEPTHVALUE_NEAREST;a.oow=GR_WDEPTHVALUE_FARTHEST;
+      b.x=x2; b.y=y2;b.z=GR_WDEPTHVALUE_NEAREST;b.oow=GR_WDEPTHVALUE_FARTHEST;
 
-  grConstantColorValue(color);
-  grDrawLine(&a,&b);
+      GlideLib_grColorCombine ( GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
+                                GR_COMBINE_LOCAL_CONSTANT, GR_COMBINE_OTHER_NONE, FXFALSE );
+      GlideLib_grAlphaBlendFunction ( GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO );
+      GlideLib_grConstantColorValue ( 0xff000000 | 
+        ( (color&pfmt.RedMask) >> pfmt.RedShift ) << 16 + 8-pfmt.RedBits| 
+        ( (color&pfmt.GreenMask) >> pfmt.GreenShift) << 8 + 8-pfmt.GreenBits|
+        ( (color&pfmt.BlueMask) >> pfmt.BlueShift) << + 8-pfmt.BlueBits);
+
+    GlideLib_grDrawLine(&a,&b);
+    }
+  }
 }
 
 //#define GR_DRAWBUFFER GR_BUFFER_FRONTBUFFER
@@ -139,10 +153,6 @@ bool csGraphics2DGlideCommon::BeginDraw(/*int Flag*/)
 
   if(locked) FinishDraw();
 
-  // save current state
-//  GlideLib_grGlideGetState( &fxstate );
-//  GlideLib_grDisableAllEffects();
-      
   bret=GlideLib_grLfbLock(glDrawMode|GR_LFB_IDLE,
                           GR_DRAWBUFFER,
                           GR_LFBWRITEMODE_565,
@@ -166,7 +176,6 @@ bool csGraphics2DGlideCommon::BeginDraw(/*int Flag*/)
       locked=true;
     }else
   {
-//    GlideLib_grGlideSetState( &fxstate );
   }
   return bret;
 
@@ -181,7 +190,7 @@ void csGraphics2DGlideCommon::FinishDraw ()
   Memory=NULL;
   for (int i = 0; i < Height; i++) LineAddress [i] = 0;
   if (locked) 
-    GlideLib_grLfbUnlock(glDrawMode,GR_DRAWBUFFER);
+    GlideLib_grLfbUnlock (glDrawMode,GR_DRAWBUFFER);
   
 //  GlideLib_grGlideSetState( &fxstate );
   locked = false;
@@ -191,13 +200,22 @@ void csGraphics2DGlideCommon::FinishDraw ()
 void csGraphics2DGlideCommon::DrawPixel (int x, int y, int color)
 {
   // can't do this while framebuffer is locked...
-  if (locked) return;
-
-  GrVertex p;
-  p.x=x; p.y=y;
-
-  grConstantColorValue(color);
-  grDrawPoint(&p);
+  if (locked)
+    *((UShort*)GetPixelAt( x, y )) = color;
+  else
+  {
+    GrVertex p;
+    p.x=x; p.y=y;
+    
+    GlideLib_grColorCombine ( GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
+                              GR_COMBINE_LOCAL_CONSTANT, GR_COMBINE_OTHER_NONE, FXFALSE );
+    GlideLib_grAlphaBlendFunction( GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO );
+    GlideLib_grConstantColorValue ( 0xff000000 | 
+      ( (color&pfmt.RedMask) >> pfmt.RedShift ) << 16 | 
+      ( (color&pfmt.GreenMask) >> pfmt.GreenShift) << 8 |
+      ( (color&pfmt.BlueMask) >> pfmt.BlueShift) );
+    GlideLib_grDrawPoint(&p);
+  }
 }
 
 void csGraphics2DGlideCommon::WriteCharGlide ( csGraphics2D *This, int x, int y, int fg, int bg, char c)

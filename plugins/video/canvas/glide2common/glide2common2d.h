@@ -93,7 +93,7 @@ public:
   //  Glide-specific procedures
   void SetTMUPalette(int tmu);
   /// Draw a line
-  virtual void DrawLine( int x1, int y1, int x2, int y2, int color);
+  virtual void DrawLine( float x1, float y1, float x2, float y2, int color);
   /// Draw a pixel
   virtual void DrawPixel (int x, int y, int color);
   /// Write a single character
