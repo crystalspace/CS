@@ -36,6 +36,8 @@ chronological order.
 	- res changed csStringArray::CaseSensitiveCompareKey() and
 	  CaseInsensitiveCompareKey() to not treat the key parameter as a
 	  pointer to a string, but a string itself.
+	- Anders Stenberg made sure all loaded shaders get prepared at
+	  iEngine::Prepare ()
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.

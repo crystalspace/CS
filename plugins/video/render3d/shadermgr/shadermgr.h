@@ -135,6 +135,9 @@ public:
 /// Create a shaderprogram
   virtual csPtr<iShaderProgram> CreateShaderProgram(const char* type);
 
+  /// Prepare all created shaders
+  virtual void PrepareShaders ();
+
   //==================== iComponent ====================//
   bool Initialize(iObjectRegistry* objreg);
 

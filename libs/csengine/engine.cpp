@@ -1167,6 +1167,10 @@ bool csEngine::Prepare (iProgressMeter *meter)
   G3D->ClearCache ();
 #endif // CS_USE_NEW_RENDERER
 
+  csRef<iShaderManager> shadermgr = 
+    CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  shadermgr->PrepareShaders ();
+
   // Prepare lightmaps if we have any sectors
   if (sectors.GetCount ()) ShineLights (0, meter);
 

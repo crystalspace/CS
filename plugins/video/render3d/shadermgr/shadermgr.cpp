@@ -172,7 +172,8 @@ csPtr<iShader> csShaderManager::CreateShader()
   csShader* cshader = new csShader(name, this, objectreg);
   //cshader->IncRef();
 
-  //shaders.Push(cshader);
+  csRef<iShaderWrapper> wrap = CreateWrapper (cshader);
+  shaders.Push(wrap);
   
   return csPtr<iShader> (cshader);
 }
@@ -202,6 +203,14 @@ csPtr<iShaderProgram> csShaderManager::CreateShaderProgram(const char* type)
   }
   return 0;
 }
+
+void csShaderManager::PrepareShaders ()
+{
+  int i;
+  for (i = 0; i < shaders.Length(); ++i)
+    shaders[i]->GetShader ()->Prepare ();
+}
+
 
 
 //===================== csShader ====================//

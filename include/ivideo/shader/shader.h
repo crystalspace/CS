@@ -100,6 +100,9 @@ struct iShaderManager : iShaderBranch
 
   /// Create a shaderprogram
   virtual csPtr<iShaderProgram> CreateShaderProgram(const char* type) = 0;
+
+  /// Prepare all created shaders
+  virtual void PrepareShaders () = 0;
 };
 
 SCF_VERSION (iShaderRenderInterface, 0,0,1);
