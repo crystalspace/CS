@@ -13,7 +13,8 @@ The history order is reversed so that new features are at the top.
 	      concept and not only for things. The only portal implementation
 	      is currently still in thing though.
 	    - Added the ability to get the portal vertices from iPortal.
-	    - Added iMeshObject->GetPortalCount() and iMeshObject->GetPortal().
+	    - Added iMeshObject->GetPortalCount() and 
+	      iMeshObject->GetPortal().
 	    - Also added default implementations of those to csMeshObject
 	      (supporting no portals).
 	    - At two places in the engine (GetNearbyObjects() and PlaceMesh())
@@ -25,6 +26,13 @@ The history order is reversed so that new features are at the top.
 	      is not fulfilled yet.
 	- DeSigna brought manual section 6.4.6 (SCF Examples)
 	  up-to-date with current SCF workings.
+	- res made a few changes to bugplug to have it work more nicely with
+	  the new renderer. The most 'drastic' changes is that 
+	  G3D->FinishDraw() is now called after the FPS is shown.
+	- res changed render3d to push the current modelview/projection 
+	  matrices when beginning 2D drawing and popping them when it ends.
+	  Before, the 2d ortho projection matrix was preserved causing 
+	  wrong drawing of meshes.
 20-May-2003
 	- Philip Wyett worked around problem of incorrect pathed cs_pyth.cpp
           being included in the cspython MSVC project file. Added variable

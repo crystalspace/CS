@@ -916,8 +916,10 @@ bool csGLRender3D::BeginDraw (int drawflags)
   if (drawflags & CSDRAW_2DGRAPHICS)
   {
     glMatrixMode (GL_MODELVIEW);
+    glPushMatrix();
     glLoadIdentity ();
     glMatrixMode (GL_PROJECTION);
+    glPushMatrix();
     glLoadIdentity ();
     SetGlOrtho (false);
     glViewport (1, -1, viewwidth+1, viewheight+1);
@@ -936,6 +938,13 @@ void csGLRender3D::FinishDraw ()
 
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
+  if (current_drawflags & CSDRAW_2DGRAPHICS)
+  {
+    glMatrixMode (GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode (GL_PROJECTION);
+    glPopMatrix();
+  }
   current_drawflags = 0;
 
   if (render_target)

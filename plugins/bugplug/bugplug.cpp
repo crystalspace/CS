@@ -119,13 +119,23 @@ csBugPlug::csBugPlug (iBase *iParent)
   edit_mode = false;
   edit_string[0] = 0;
   initialized = false;
+#ifndef CS_USE_NEW_RENDERER
   spider = new csSpider ();
+#else
+  spider = NULL;
+#endif
+#ifndef CS_USE_NEW_RENDERER
   shadow = new csShadow ();
-  spider_hunting = false;
+#else
+  shadow = NULL;
+#endif
   selected_mesh = NULL;
+#ifndef CS_USE_NEW_RENDERER
+  shadow->SetShadowMesh (selected_mesh);
+#endif
+  spider_hunting = false;
   prev_selected_mesh = NULL;
   scfiEventHandler = NULL;
-  shadow->SetShadowMesh (selected_mesh);
 
   do_fps = true;
   fps_frame_count = 0;
@@ -1437,6 +1447,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "FPS=%.2f", fps_cur);
       GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "FPS=%.2f", fps_cur);
     }
+    G3D->FinishDraw ();
   }
 
   ShowCounters ();
