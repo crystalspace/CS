@@ -38,7 +38,8 @@ SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLCommon)
 SCF_IMPLEMENT_IBASE_EXT_END
   
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
-  csGraphics2D (iParent), statecache (0), hasRenderTarget (false)
+  csGraphics2D (iParent), statecache (0), statecontext (0), 
+    hasRenderTarget (false)
 {
   EventOutlet = 0;
   screen_shot = 0;
@@ -76,6 +77,8 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
   ext.Initialize (object_reg, this);
 
   statecache = new csGLStateCache (&ext);
+  statecontext = new csGLStateCacheContext (&ext);
+  statecache->SetContext (statecontext);
 
   multiFavorQuality = config->GetBool ("Video.OpenGL.MultisampleFavorQuality");
 
@@ -101,7 +104,7 @@ bool csGraphics2DGLCommon::Open ()
 {
   if (is_open) return true;
 
-  statecache->InitCache();
+  statecontext->InitCache();
 
   ext.Open ();
   driverdb.Open (this);

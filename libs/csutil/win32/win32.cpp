@@ -212,7 +212,9 @@ typedef void (WINAPI * LPFNSETDLLDIRECTORYA)(LPCSTR lpPathName);
 
 bool csPlatformStartup(iObjectRegistry* r)
 {
-  csPluginPaths* pluginpaths = csGetPluginPaths (__argv[0]);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
+
+  csPluginPaths* pluginpaths = csGetPluginPaths (cmdline->GetAppPath());
 
   /*
     When it isn't already in the PATH environment,

@@ -2793,7 +2793,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   // @@@ Is this correct to override current_zmode?
   G3D->SetZMode (CS_ZBUF_NONE);
   bool texEnabled = 
-    csGLGraphics3D::statecache->enabled_GL_TEXTURE_2D[0];
+    csGLGraphics3D::statecache->IsEnabled_GL_TEXTURE_2D ();
   csGLGraphics3D::statecache->Enable_GL_TEXTURE_2D ();
 
   csGLGraphics3D::statecache->SetShadeModel (GL_FLAT);

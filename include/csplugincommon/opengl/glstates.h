@@ -31,310 +31,389 @@
 // Set to 'true' to force state changing commands. For debugging.
 #define FORCE_STATE_CHANGE			  false/*true*/
 
-#define IMPLEMENT_CACHED_BOOL(name)					     \
-  bool enabled_##name;							     \
-  void Enable_##name ()							     \
-  {									     \
-    if (!enabled_##name || FORCE_STATE_CHANGE)				     \
-    {									     \
-      enabled_##name = true;						     \
-      glEnable (name);							     \
-    }									     \
-  }									     \
-  void Disable_##name ()						     \
-  {									     \
-    if (enabled_##name || FORCE_STATE_CHANGE) {				     \
-      enabled_##name = false;						     \
-      glDisable (name);							     \
-    }									     \
-  }									     \
-  bool IsEnabled_##name () const					     \
-  {									     \
-    return enabled_##name;						     \
+#define DECLARE_CACHED_BOOL(name) \
+  bool enabled_##name;
+
+#define IMPLEMENT_CACHED_BOOL(name) \
+  void Enable_##name () \
+  { \
+    if (!currentContext->enabled_##name || FORCE_STATE_CHANGE) \
+    { \
+      currentContext->enabled_##name = true;  \
+      glEnable (name); \
+    } \
+  } \
+  void Disable_##name () \
+  { \
+    if (currentContext->enabled_##name || FORCE_STATE_CHANGE) { \
+      currentContext->enabled_##name = false;  \
+      glDisable (name); \
+    } \
+  } \
+  bool IsEnabled_##name () const \
+  { \
+    return currentContext->enabled_##name; \
   }
 
 #define CS_GL_MAX_LAYER 16
 
+#define DECLARE_CACHED_BOOL_CURRENTLAYER(name) \
+  bool enabled_##name[CS_GL_MAX_LAYER];
 
-#define IMPLEMENT_CACHED_BOOL_CURRENTLAYER(name)			     \
-  bool enabled_##name[CS_GL_MAX_LAYER]; 				     \
-  void Enable_##name () 						     \
-  { 									     \
-    if (!enabled_##name[currentUnit] || FORCE_STATE_CHANGE)		     \
-    { 									     \
-      ActivateTU (); 							     \
-      enabled_##name[currentUnit] = true;  				     \
-      glEnable (name); 							     \
-    } 									     \
-  } 									     \
-  void Disable_##name () 						     \
-  { 									     \
-    if (enabled_##name[currentUnit] || FORCE_STATE_CHANGE)		     \
-    { 									     \
-      ActivateTU (); 							     \
-      enabled_##name[currentUnit] = false;  				     \
-      glDisable (name); 						     \
-    } 									     \
-  } 									     \
-  bool IsEnabled_##name () const 					     \
-  { 									     \
-    return enabled_##name[currentUnit]; 				     \
+#define IMPLEMENT_CACHED_BOOL_CURRENTLAYER(name) \
+  void Enable_##name () \
+  { \
+    if (!currentContext->enabled_##name[currentContext->currentUnit] || FORCE_STATE_CHANGE) \
+    { \
+      ActivateTU (); \
+      currentContext->enabled_##name[currentContext->currentUnit] = true;  \
+      glEnable (name); \
+    } \
+  } \
+  void Disable_##name () \
+  { \
+    if (currentContext->enabled_##name[currentContext->currentUnit] || FORCE_STATE_CHANGE) \
+    { \
+      ActivateTU (); \
+      currentContext->enabled_##name[currentContext->currentUnit] = false;  \
+      glDisable (name); \
+    } \
+  } \
+  bool IsEnabled_##name () const \
+  { \
+    return currentContext->enabled_##name[currentContext->currentUnit]; \
   }
 
-#define IMPLEMENT_CACHED_PARAMETER_1(func, name, type1, param1) 	     \
-  type1 parameter_##param1; 						     \
-  void Set##name (type1 param1, bool forced = false)			     \
-  { 									     \
-    if (forced || (param1 != parameter_##param1)			     \
-      || FORCE_STATE_CHANGE) 						     \
-    { 									     \
-      parameter_##param1 = param1;  					     \
-      func (param1); 							     \
-    } 									     \
-  } 									     \
-  void Get##name (type1 & param1) const					     \
-  { 									     \
-    param1 = parameter_##param1;  					     \
+#define DECLARE_CACHED_PARAMETER_1(func, name, type1, param1) \
+  type1 parameter_##param1;
+
+#define IMPLEMENT_CACHED_PARAMETER_1(func, name, type1, param1) \
+  void Set##name (type1 param1, bool forced = false) \
+  { \
+    if (forced || (param1 != currentContext->parameter_##param1) || FORCE_STATE_CHANGE) \
+    { \
+      currentContext->parameter_##param1 = param1;  \
+      func (param1); \
+    } \
+  } \
+  void Get##name (type1 & param1) const\
+  { \
+    param1 = currentContext->parameter_##param1;  \
   }
+
+#define DECLARE_CACHED_PARAMETER_2(func, name, type1, param1, type2, param2) \
+  type1 parameter_##param1; \
+  type2 parameter_##param2;
 
 #define IMPLEMENT_CACHED_PARAMETER_2(func, name, type1, param1, type2, param2) \
-  type1 parameter_##param1; 						     \
-  type2 parameter_##param2; 						     \
-  void Set##name (type1 param1, type2 param2, bool forced = false)	     \
-  { 									     \
-    if (forced || (param1 != parameter_##param1)			     \
-      || (param2 != parameter_##param2)					     \
-      || FORCE_STATE_CHANGE)						     \
-    { 									     \
-      parameter_##param1 = param1;  					     \
-      parameter_##param2 = param2;  					     \
-      func (param1, param2);   						     \
-    }   			  					     \
-  }   			  						     \
-  void Get##name (type1 & param1, type2 & param2) const			     \
-  {   			  			  			     \
-    param1 = parameter_##param1;  					     \
-    param2 = parameter_##param2;  					     \
+  void Set##name (type1 param1, type2 param2, bool forced = false) \
+  { \
+    if (forced || (param1 != currentContext->parameter_##param1) || \
+        (param2 != currentContext->parameter_##param2) || FORCE_STATE_CHANGE) \
+    { \
+      currentContext->parameter_##param1 = param1;  \
+      currentContext->parameter_##param2 = param2;  \
+      func (param1, param2); \
+    } \
+  } \
+  void Get##name (type1 & param1, type2 & param2) const\
+  { \
+    param1 = currentContext->parameter_##param1;  \
+    param2 = currentContext->parameter_##param2;  \
   }
+
+#define DECLARE_CACHED_PARAMETER_3(func, name, type1, param1, type2, param2, type3, param3) \
+  type1 parameter_##param1; \
+  type2 parameter_##param2; \
+  type3 parameter_##param3;
 
 #define IMPLEMENT_CACHED_PARAMETER_3(func, name, type1, param1, type2, param2, type3, param3) \
-  type1 parameter_##param1; 						     \
-  type2 parameter_##param2; 						     \
-  type3 parameter_##param3; 						     \
   void Set##name (type1 param1, type2 param2, type3 param3, bool forced = false) \
-  { 									     \
-    if (forced || (param1 != parameter_##param1)			     \
-      || (param2 != parameter_##param2)					     \
-      || (param3 != parameter_##param3)					     \
-      || FORCE_STATE_CHANGE)						     \
-    { 									     \
-      parameter_##param1 = param1;  					     \
-      parameter_##param2 = param2;  					     \
-      parameter_##param3 = param3;  					     \
-      func (param1, param2, param3); 					     \
-    } 									     \
-  } 									     \
-  void Get##name (type1 &param1, type2 & param2, type3 & param3) const	     \
-  { 									     \
-    param1 = parameter_##param1;  					     \
-    param2 = parameter_##param2;  					     \
-    param3 = parameter_##param3;  					     \
+  { \
+    if (forced || (param1 != currentContext->parameter_##param1) \
+        || (param2 != currentContext->parameter_##param2) \
+        || (param3 != currentContext->parameter_##param3) || FORCE_STATE_CHANGE) \
+    { \
+      currentContext->parameter_##param1 = param1;  \
+      currentContext->parameter_##param2 = param2;  \
+      currentContext->parameter_##param3 = param3;  \
+      func (param1, param2, param3); \
+    } \
+  } \
+  void Get##name (type1 &param1, type2 & param2, type3 & param3) const\
+  { \
+    param1 = currentContext->parameter_##param1;  \
+    param2 = currentContext->parameter_##param2;  \
+    param3 = currentContext->parameter_##param3;  \
   }
 
-#define IMPLEMENT_CACHED_PARAMETER_4(func, name, type1, param1, 	     \
-    type2, param2, type3, param3, type4, param4) 			     \
-  type1 parameter_##param1; 						     \
-  type2 parameter_##param2; 						     \
-  type3 parameter_##param3; 						     \
-  type4 parameter_##param4; 						     \
-  void Set##name (type1 param1, type2 param2, type3 param3, type4 param4,    \
-    bool forced = false) 						     \
-  { 									     \
-    if (forced || (param1 != parameter_##param1) || 			     \
-      (param2 != parameter_##param2) || 				     \
-      (param3 != parameter_##param3) || 				     \
-      (param4 != parameter_##param4)					     \
-      || FORCE_STATE_CHANGE) 						     \
-    { 									     \
-      parameter_##param1 = param1;  					     \
-      parameter_##param2 = param2;  					     \
-      parameter_##param3 = param3;  					     \
-      parameter_##param4 = param4;  					     \
-      func (param1, param2, param3, param4); 				     \
-    } 									     \
-  } 									     \
+#define DECLARE_CACHED_PARAMETER_4(func, name, type1, param1, \
+  type2, param2, type3, param3, type4, param4) \
+  type1 parameter_##param1; \
+  type2 parameter_##param2; \
+  type3 parameter_##param3; \
+  type4 parameter_##param4;
+
+#define IMPLEMENT_CACHED_PARAMETER_4(func, name, type1, param1, \
+    type2, param2, type3, param3, type4, param4) \
+  void Set##name (type1 param1, type2 param2, type3 param3, type4 param4, \
+    bool forced = false) \
+  { \
+    if (forced || (param1 != currentContext->parameter_##param1) || \
+      (param2 != currentContext->parameter_##param2) || \
+      (param3 != currentContext->parameter_##param3) || \
+      (param4 != currentContext->parameter_##param4) || FORCE_STATE_CHANGE) \
+    { \
+      currentContext->parameter_##param1 = param1;  \
+      currentContext->parameter_##param2 = param2;  \
+      currentContext->parameter_##param3 = param3;  \
+      currentContext->parameter_##param4 = param4;  \
+      func (param1, param2, param3, param4); \
+    } \
+  } \
   void Get##name (type1 &param1, type2 & param2, type3 & param3, type4& param4) const\
-  { 									     \
-    param1 = parameter_##param1;  					     \
-    param2 = parameter_##param2; 					     \
-    param3 = parameter_##param3;  					     \
-    param4 = parameter_##param4;  					     \
+  { \
+    param1 = currentContext->parameter_##param1;  \
+    param2 = currentContext->parameter_##param2;  \
+    param3 = currentContext->parameter_##param3;  \
+    param4 = currentContext->parameter_##param4;  \
   }
 
-#define IMPLEMENT_CACHED_CLIENT_STATE(name)				     \
-  bool enabled_##name;							     \
-  void Enable_##name () 						     \
-  { 									     \
-    if (!enabled_##name || FORCE_STATE_CHANGE)				     \
-    { 									     \
-      enabled_##name = true;  						     \
-      glEnableClientState (name); 					     \
-    } 									     \
-  } 									     \
-  void Disable_##name () 						     \
-  { 									     \
-    if (enabled_##name || FORCE_STATE_CHANGE) {				     \
-      enabled_##name = false;  						     \
-      glDisableClientState (name); 					     \
-    } 									     \
-  } 									     \
-  bool IsEnabled_##name () const 					     \
-  { 									     \
-    return enabled_##name; 						     \
+#define DECLARE_CACHED_CLIENT_STATE(name)	      \
+  bool enabled_##name;
+
+#define IMPLEMENT_CACHED_CLIENT_STATE(name)	      \
+  void Enable_##name () \
+  { \
+    if (!currentContext->enabled_##name || FORCE_STATE_CHANGE) \
+    { \
+      currentContext->enabled_##name = true;  \
+      glEnableClientState (name); \
+    } \
+  } \
+  void Disable_##name () \
+  { \
+    if (currentContext->enabled_##name || FORCE_STATE_CHANGE) { \
+      currentContext->enabled_##name = false;  \
+      glDisableClientState (name); \
+    } \
+  } \
+  bool IsEnabled_##name () const \
+  { \
+    return currentContext->enabled_##name; \
+  }
+
+#define DECLARE_CACHED_CLIENT_STATE_LAYER(name)	      \
+  bool enabled_##name[CS_GL_MAX_LAYER];
+
+#define IMPLEMENT_CACHED_CLIENT_STATE_LAYER(name)	      \
+  void Enable_##name () \
+  { \
+    if (!currentContext->enabled_##name[currentContext->currentUnit] \
+        || FORCE_STATE_CHANGE) \
+    { \
+      ActivateTU (); \
+      currentContext->enabled_##name[currentContext->currentUnit] = true;  \
+      glEnableClientState (name); \
+    } \
+  } \
+  void Disable_##name () \
+  { \
+    if (currentContext->enabled_##name[currentContext->currentUnit] \
+        || FORCE_STATE_CHANGE) { \
+      ActivateTU (); \
+      currentContext->enabled_##name[currentContext->currentUnit] = false;  \
+      glDisableClientState (name); \
+    } \
+  } \
+  bool IsEnabled_##name () const \
+  { \
+    return currentContext->enabled_##name[currentContext->currentUnit]; \
+  }
+
+#define DECLARE_CACHED_PARAMETER_1_LAYER(func, name, type1, param1) \
+  type1 parameter_##param1[CS_GL_MAX_LAYER];
+
+#define IMPLEMENT_CACHED_PARAMETER_1_LAYER(func, name, type1, param1) \
+  void Set##name (type1 param1, bool forced = false) \
+  { \
+    if (forced || \
+        (param1 != currentContext->parameter_##param1[currentContext->currentUnit] \
+        || FORCE_STATE_CHANGE)) \
+    { \
+      ActivateTU (); \
+      currentContext->parameter_##param1[currentContext->currentUnit] = param1;  \
+      func (param1); \
+    } \
+  } \
+  void Get##name (type1 &param1) const\
+  { \
+    param1 = currentContext->parameter_##param1[currentContext->currentUnit];  \
+  }
+
+#define DECLARE_CACHED_PARAMETER_2_LAYER(func, name, type1, param1, \
+  type2, param2) \
+  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
+  type2 parameter_##param2[CS_GL_MAX_LAYER];
+
+#define IMPLEMENT_CACHED_PARAMETER_2_LAYER(func, name, type1, param1, \
+  type2, param2) \
+  void Set##name (type1 param1, type2 param2, bool forced = false) \
+  { \
+    if (forced || (param1 != currentContext->parameter_##param1[ \
+                    currentContext->currentUnit]) || \
+                  (param2 != currentContext->parameter_##param2[ \
+                    currentContext->currentUnit]) \
+               || FORCE_STATE_CHANGE) \
+    { \
+      ActivateTU (); \
+      currentContext->parameter_##param1[currentContext->currentUnit] = param1;  \
+      currentContext->parameter_##param2[currentContext->currentUnit] = param2;  \
+      func (param1, param2); \
+    } \
+  } \
+  void Get##name (type1 &param1, type2 & param2) const\
+  { \
+    param1 = currentContext->parameter_##param1[currentContext->currentUnit];  \
+    param2 = currentContext->parameter_##param2[currentContext->currentUnit];  \
+  }
+
+#define DECLARE_CACHED_PARAMETER_3_LAYER(func, name, type1, param1, \
+  type2, param2, type3, param3) \
+  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
+  type2 parameter_##param2[CS_GL_MAX_LAYER]; \
+  type3 parameter_##param3[CS_GL_MAX_LAYER];
+
+
+#define IMPLEMENT_CACHED_PARAMETER_3_LAYER(func, name, type1, param1, \
+  type2, param2, type3, param3) \
+  void Set##name (type1 param1, type2 param2, type3 param3,\
+    bool forced = false) \
+  { \
+    if (forced || (param1 != currentContext->parameter_##param1[ \
+                    currentContext->currentUnit]) || \
+                  (param2 != currentContext->parameter_##param2[ \
+                    currentContext->currentUnit]) || \
+                  (param3 != currentContext->parameter_##param3[ \
+                    currentContext->currentUnit]) \
+               || FORCE_STATE_CHANGE) \
+    { \
+      ActivateTU (); \
+      currentContext->parameter_##param1[currentContext->currentUnit] = param1;  \
+      currentContext->parameter_##param2[currentContext->currentUnit] = param2;  \
+      currentContext->parameter_##param3[currentContext->currentUnit] = param3;  \
+      func (param1, param2, param3); \
+    } \
+  } \
+  void Get##name (type1 &param1, type2 & param2, type3 & param3) const\
+  { \
+    param1 = currentContext->parameter_##param1[currentContext->currentUnit];  \
+    param2 = currentContext->parameter_##param2[currentContext->currentUnit];  \
+    param3 = currentContext->parameter_##param3[currentContext->currentUnit];  \
   }
 
 
-#define IMPLEMENT_CACHED_CLIENT_STATE_LAYER(name)	      		     \
-  bool enabled_##name[CS_GL_MAX_LAYER]; 		     		     \
-  void Enable_##name () 		     		     		     \
-  { 		     		     		     		     	     \
-    if (!enabled_##name[currentUnit] || FORCE_STATE_CHANGE)	     	     \
-    { 		     		     		     		     	     \
-      ActivateTU (); 		     		     		     	     \
-      enabled_##name[currentUnit] = true;  		     		     \
-      glEnableClientState (name); 		     		     	     \
-    }									     \
-  }								  	     \
-  void Disable_##name ()					    	     \
-  {									     \
-    if (enabled_##name[currentUnit] || FORCE_STATE_CHANGE) {   	     	     \
-      ActivateTU (); 	     	     	     	     	     		     \
-      enabled_##name[currentUnit] = false;				     \
-      glDisableClientState (name);					     \
-    }									     \
-  }									     \
-  bool IsEnabled_##name () const					     \
-  {									     \
-    return enabled_##name[currentUnit];					     \
-  }
+#define DECLARE_CACHED_PARAMETER_4_LAYER(func, name, type1, param1, \
+  type2, param2, type3, param3, type4, param4) \
+  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
+  type2 parameter_##param2[CS_GL_MAX_LAYER]; \
+  type3 parameter_##param3[CS_GL_MAX_LAYER]; \
+  type4 parameter_##param4[CS_GL_MAX_LAYER];
 
-#define IMPLEMENT_CACHED_PARAMETER_1_LAYER(func, name, type1, param1)	     \
-  type1 parameter_##param1[CS_GL_MAX_LAYER];				     \
-  void Set##name (type1 param1, bool forced = false)			     \
-  {									     \
-    if (forced || (param1 != parameter_##param1[currentUnit])		     \
-       || FORCE_STATE_CHANGE)						     \
-    {									     \
-      ActivateTU ();							     \
-      parameter_##param1[currentUnit] = param1;				     \
-      func (param1);							     \
-    }									     \
-  }									     \
-  void Get##name (type1 &param1) const					     \
-  {									     \
-    param1 = parameter_##param1[currentUnit];				     \
-  }
-
-
-#define IMPLEMENT_CACHED_PARAMETER_2_LAYER(func, name, type1, param1,	     \
-  type2, param2)							     \
-  type1 parameter_##param1[CS_GL_MAX_LAYER];				     \
-  type2 parameter_##param2[CS_GL_MAX_LAYER];				     \
-  void Set##name (type1 param1, type2 param2, bool forced = false)	     \
-  {									     \
-    if (forced || (param1 != parameter_##param1[currentUnit]) ||	     \
-                  (param2 != parameter_##param2[currentUnit])		     \
-       || FORCE_STATE_CHANGE)						     \
-    {									     \
-      ActivateTU ();							     \
-      parameter_##param1[currentUnit] = param1;				     \
-      parameter_##param2[currentUnit] = param2;				     \
-      func (param1, param2);						     \
-    }									     \
-  }									     \
-  void Get##name (type1 &param1, type2 & param2) const			     \
-  {									     \
-    param1 = parameter_##param1[currentUnit];				     \
-    param2 = parameter_##param2[currentUnit];				     \
-  }
-
-
-#define IMPLEMENT_CACHED_PARAMETER_3_LAYER(func, name, type1, param1,	     \
-  type2, param2, type3, param3)						     \
-  type1 parameter_##param1[CS_GL_MAX_LAYER];				     \
-  type2 parameter_##param2[CS_GL_MAX_LAYER];				     \
-  type3 parameter_##param3[CS_GL_MAX_LAYER];				     \
-  void Set##name (type1 param1, type2 param2, type3 param3,		     \
-    bool forced = false)						     \
-  {									     \
-    if (forced || (param1 != parameter_##param1[currentUnit]) ||	     \
-                  (param2 != parameter_##param2[currentUnit]) ||	     \
-                  (param3 != parameter_##param3[currentUnit]		     \
-       || FORCE_STATE_CHANGE))						     \
-    {									     \
-      ActivateTU ();							     \
-      parameter_##param1[currentUnit] = param1;				     \
-      parameter_##param2[currentUnit] = param2;				     \
-      parameter_##param3[currentUnit] = param3;				     \
-      func (param1, param2, param3);					     \
-    }									     \
-  }									     \
-  void Get##name (type1 &param1, type2 & param2, type3 & param3) const	     \
-  {									     \
-    param1 = parameter_##param1[currentUnit];				     \
-    param2 = parameter_##param2[currentUnit];				     \
-    param3 = parameter_##param3[currentUnit];				     \
-  }
-
-
-#define IMPLEMENT_CACHED_PARAMETER_4_LAYER(func, name, type1, param1,	     \
-    type2, param2, type3, param3, type4, param4)			     \
-  type1 parameter_##param1[CS_GL_MAX_LAYER];				     \
-  type2 parameter_##param2[CS_GL_MAX_LAYER];				     \
-  type3 parameter_##param3[CS_GL_MAX_LAYER];				     \
-  type4 parameter_##param4[CS_GL_MAX_LAYER];				     \
-  void Set##name (type1 param1, type2 param2, type3 param3, type4 param4,    \
-    bool forced = false)						     \
-  {									     \
-    if (forced || (param1 != parameter_##param1[currentUnit]) ||	     \
-                  (param2 != parameter_##param2[currentUnit]) ||	     \
-                  (param3 != parameter_##param3[currentUnit]) ||	     \
-                  (param4 != parameter_##param4[currentUnit])		     \
-       || FORCE_STATE_CHANGE)						     \
-    {									     \
-      ActivateTU ();							     \
-      parameter_##param1[currentUnit] = param1;				     \
-      parameter_##param2[currentUnit] = param2;				     \
-      parameter_##param3[currentUnit] = param3;				     \
-      parameter_##param4[currentUnit] = param4;				     \
-      func (param1, param2, param3, param4);				     \
-    }									     \
-  }									     \
+#define IMPLEMENT_CACHED_PARAMETER_4_LAYER(func, name, type1, param1, \
+    type2, param2, type3, param3, type4, param4) \
+  void Set##name (type1 param1, type2 param2, type3 param3, type4 param4, \
+    bool forced = false) \
+  { \
+    if (forced || (param1 != currentContext->parameter_##param1[ \
+                      currentContext->currentUnit]) || \
+                  (param2 != currentContext->parameter_##param2[ \
+                      currentContext->currentUnit]) || \
+                  (param3 != currentContext->parameter_##param3[ \
+                      currentContext->currentUnit]) || \
+                  (param4 != currentContext->parameter_##param4[ \
+                      currentContext->currentUnit]) \
+              || FORCE_STATE_CHANGE) \
+    { \
+      ActivateTU (); \
+      currentContext->parameter_##param1[currentContext->currentUnit] = param1;  \
+      currentContext->parameter_##param2[currentContext->currentUnit] = param2;  \
+      currentContext->parameter_##param3[currentContext->currentUnit] = param3;  \
+      currentContext->parameter_##param4[currentContext->currentUnit] = param4;  \
+      func (param1, param2, param3, param4); \
+    } \
+  } \
   void Get##name (type1 &param1, type2 & param2, type3 & param3, type4& param4) const\
-  {									     \
-    param1 = parameter_##param1[currentUnit];				     \
-    param2 = parameter_##param2[currentUnit];				     \
-    param3 = parameter_##param3[currentUnit];				     \
-    param4 = parameter_##param4[currentUnit];				     \
+  { \
+    param1 = currentContext->parameter_##param1[currentContext->currentUnit];  \
+    param2 = currentContext->parameter_##param2[currentContext->currentUnit];  \
+    param3 = currentContext->parameter_##param3[currentContext->currentUnit];  \
+    param4 = currentContext->parameter_##param4[currentContext->currentUnit];  \
   }
 
 
-/**
- * Since this class is passed directly between plugins the
- * code in this class cannot do memory allocations or
- * deallocations. The functions in this class will only
- * manipulate member variables.
- */
-class csGLStateCache
+class csGLStateCacheContext
 {
 public:
   csGLExtensionManager* extmgr;
 
-  csGLStateCache (csGLExtensionManager* extmgr)
-  {
-    csGLStateCache::extmgr = extmgr;
-  }
+  // Special caches
+  GLuint boundtexture[CS_GL_MAX_LAYER]; // 32 max texture layers
+  int currentUnit, activeUnit;
+  GLuint currentBufferID, currentIndexID;
+
+  // Standardized caches
+  DECLARE_CACHED_BOOL (GL_DEPTH_TEST)
+  DECLARE_CACHED_BOOL (GL_BLEND)
+  DECLARE_CACHED_BOOL (GL_DITHER)
+  DECLARE_CACHED_BOOL (GL_STENCIL_TEST)
+  DECLARE_CACHED_BOOL (GL_CULL_FACE)
+  DECLARE_CACHED_BOOL (GL_POLYGON_OFFSET_FILL)
+  DECLARE_CACHED_BOOL (GL_LIGHTING)
+  DECLARE_CACHED_BOOL (GL_ALPHA_TEST)
+  DECLARE_CACHED_BOOL (GL_SCISSOR_TEST)
+  DECLARE_CACHED_BOOL (GL_TEXTURE_GEN_S)
+  DECLARE_CACHED_BOOL (GL_TEXTURE_GEN_T)
+  DECLARE_CACHED_BOOL (GL_TEXTURE_GEN_R)
+  DECLARE_CACHED_BOOL (GL_FOG)
+  DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_1D)
+  DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_2D)
+  DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_3D)
+  DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_CUBE_MAP)
+  DECLARE_CACHED_PARAMETER_2 (glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref)
+  DECLARE_CACHED_PARAMETER_2 (glBlendFunc, BlendFunc, GLenum, blend_source, GLenum, blend_destination)
+  DECLARE_CACHED_PARAMETER_1 (glCullFace, CullFace, GLenum, cull_mode)
+  DECLARE_CACHED_PARAMETER_1 (glDepthFunc, DepthFunc, GLenum, depth_func)
+  DECLARE_CACHED_PARAMETER_1 (glDepthMask, DepthMask, GLboolean, depth_mask)
+  DECLARE_CACHED_PARAMETER_1 (glShadeModel, ShadeModel, GLenum, shade_model)
+  DECLARE_CACHED_PARAMETER_3 (glStencilFunc, StencilFunc, GLenum, stencil_func, GLint, stencil_ref, GLuint, stencil_mask)
+  DECLARE_CACHED_PARAMETER_3 (glStencilOp, StencilOp, GLenum, stencil_fail, GLenum, stencil_zfail, GLenum, stencil_zpass)
+  DECLARE_CACHED_PARAMETER_1 (glStencilMask, StencilMask, GLuint, maskl)
+  DECLARE_CACHED_PARAMETER_4 (glColorMask, ColorMask, GLboolean, wmRed, \
+    GLboolean, wmGreen, GLboolean, wmBlue, GLboolean, wmAlpha)
+
+  DECLARE_CACHED_CLIENT_STATE (GL_VERTEX_ARRAY)
+  DECLARE_CACHED_CLIENT_STATE (GL_COLOR_ARRAY)
+  DECLARE_CACHED_CLIENT_STATE (GL_NORMAL_ARRAY)
+  DECLARE_CACHED_CLIENT_STATE_LAYER (GL_TEXTURE_COORD_ARRAY)
+
+  DECLARE_CACHED_PARAMETER_1 (glMatrixMode, MatrixMode, GLenum, matrixMode)
   
+  DECLARE_CACHED_PARAMETER_4 (glVertexPointer, VertexPointer, GLint, vsize,
+    GLenum, vtype, GLsizei, vstride, GLvoid*, vpointer);
+  DECLARE_CACHED_PARAMETER_3 (glNormalPointer, NormalPointer, GLenum, ntype,
+    GLsizei, nstride, GLvoid*, npointer);
+  DECLARE_CACHED_PARAMETER_4 (glColorPointer, ColorPointer, GLint, csize,
+    GLenum, ctype, GLsizei, cstride, GLvoid*, cpointer);
+  DECLARE_CACHED_PARAMETER_4_LAYER (glTexCoordPointer, TexCoordPointer, GLint, tsize,
+    GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer);
+  
+  csGLStateCacheContext (csGLExtensionManager* extmgr)
+  {
+    csGLStateCacheContext::extmgr = extmgr;
+  }
+
+
   /// Init cache
   void InitCache()
   {
@@ -373,30 +452,58 @@ public:
     enabled_GL_TEXTURE_GEN_T = glIsEnabled (GL_TEXTURE_GEN_T);
     enabled_GL_TEXTURE_GEN_R = glIsEnabled (GL_TEXTURE_GEN_R);
     enabled_GL_FOG = glIsEnabled (GL_FOG);
-    enabled_GL_TEXTURE_1D[0] = glIsEnabled (GL_TEXTURE_1D);
-    enabled_GL_TEXTURE_2D[0] = glIsEnabled (GL_TEXTURE_2D);
-    enabled_GL_TEXTURE_3D[0] = glIsEnabled (GL_TEXTURE_3D);
-    enabled_GL_TEXTURE_CUBE_MAP[0] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
-    enabled_GL_TEXTURE_COORD_ARRAY[0] = glIsEnabled (GL_TEXTURE_COORD_ARRAY);
-    for (i = 1 ; i < CS_GL_MAX_LAYER; i++)
+
+    if (extmgr->CS_GL_ARB_multitexture)
     {
-      enabled_GL_TEXTURE_1D[i] = enabled_GL_TEXTURE_1D[0];
-      enabled_GL_TEXTURE_2D[i] = enabled_GL_TEXTURE_2D[0];
-      enabled_GL_TEXTURE_3D[i] = enabled_GL_TEXTURE_3D[0];
-      enabled_GL_TEXTURE_CUBE_MAP[i] = enabled_GL_TEXTURE_CUBE_MAP[0];
-      enabled_GL_TEXTURE_COORD_ARRAY[i] = enabled_GL_TEXTURE_COORD_ARRAY[0];
+      for (i = 0 ; i < CS_GL_MAX_LAYER; i++)
+      {
+        extmgr->glActiveTextureARB (GL_TEXTURE0_ARB + i);
+        extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB + i);
+        enabled_GL_TEXTURE_1D[i] = glIsEnabled (GL_TEXTURE_1D);
+        enabled_GL_TEXTURE_2D[i] = glIsEnabled (GL_TEXTURE_2D);
+        enabled_GL_TEXTURE_3D[i] = glIsEnabled (GL_TEXTURE_3D);
+        enabled_GL_TEXTURE_CUBE_MAP[i] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
+        enabled_GL_TEXTURE_COORD_ARRAY[i] = glIsEnabled (GL_TEXTURE_COORD_ARRAY);
+        glGetIntegerv (GL_TEXTURE_COORD_ARRAY_SIZE, (GLint*)&parameter_tsize[i]);
+        glGetIntegerv (GL_TEXTURE_COORD_ARRAY_STRIDE, (GLint*)&parameter_tstride[i]);
+        glGetIntegerv (GL_TEXTURE_COORD_ARRAY_TYPE, (GLint*)&parameter_ttype[i]);
+        glGetPointerv (GL_TEXTURE_COORD_ARRAY_POINTER, &parameter_tpointer[i]);
+      }
+    } else {
+      enabled_GL_TEXTURE_1D[0] = glIsEnabled (GL_TEXTURE_1D);
+      enabled_GL_TEXTURE_2D[0] = glIsEnabled (GL_TEXTURE_2D);
+      enabled_GL_TEXTURE_3D[0] = glIsEnabled (GL_TEXTURE_3D);
+      enabled_GL_TEXTURE_CUBE_MAP[0] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
+      enabled_GL_TEXTURE_COORD_ARRAY[0] = glIsEnabled (GL_TEXTURE_COORD_ARRAY);
+      glGetIntegerv (GL_TEXTURE_COORD_ARRAY_SIZE, (GLint*)&parameter_tsize[0]);
+      glGetIntegerv (GL_TEXTURE_COORD_ARRAY_STRIDE, (GLint*)&parameter_tstride[0]);
+      glGetIntegerv (GL_TEXTURE_COORD_ARRAY_TYPE, (GLint*)&parameter_ttype[0]);
+      glGetPointerv (GL_TEXTURE_COORD_ARRAY_POINTER, &parameter_tpointer[0]);
+      for (i = 1 ; i < CS_GL_MAX_LAYER; i++)
+      {
+        enabled_GL_TEXTURE_1D[i] = enabled_GL_TEXTURE_1D[0];
+        enabled_GL_TEXTURE_2D[i] = enabled_GL_TEXTURE_2D[0];
+        enabled_GL_TEXTURE_3D[i] = enabled_GL_TEXTURE_3D[0];
+        enabled_GL_TEXTURE_CUBE_MAP[i] = enabled_GL_TEXTURE_CUBE_MAP[0];
+        enabled_GL_TEXTURE_COORD_ARRAY[i] = enabled_GL_TEXTURE_COORD_ARRAY[0];
+      }
     }
     enabled_GL_SCISSOR_TEST = glIsEnabled (GL_SCISSOR_TEST);
     enabled_GL_VERTEX_ARRAY = glIsEnabled (GL_VERTEX_ARRAY);
     enabled_GL_COLOR_ARRAY = glIsEnabled (GL_COLOR_ARRAY);
     enabled_GL_NORMAL_ARRAY = glIsEnabled (GL_NORMAL_ARRAY);
 
+    if (extmgr->CS_GL_ARB_multitexture)
+    {
+      extmgr->glActiveTextureARB (GL_TEXTURE0_ARB);
+      extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB);
+    }
     memset (boundtexture, 0, CS_GL_MAX_LAYER * sizeof (GLuint));
     currentUnit = 0;
     activeUnit = 0;
     currentBufferID = 0;
     currentIndexID = 0;
-    
+
     glGetIntegerv (GL_VERTEX_ARRAY_SIZE, (GLint*)&parameter_vsize);
     glGetIntegerv (GL_VERTEX_ARRAY_STRIDE, (GLint*)&parameter_vstride);
     glGetIntegerv (GL_VERTEX_ARRAY_TYPE, (GLint*)&parameter_vtype);
@@ -410,6 +517,31 @@ public:
     glGetIntegerv (GL_COLOR_ARRAY_STRIDE, (GLint*)&parameter_cstride);
     glGetIntegerv (GL_COLOR_ARRAY_TYPE, (GLint*)&parameter_ctype);
     glGetPointerv (GL_COLOR_ARRAY_POINTER, &parameter_cpointer);
+  }
+};
+
+
+/**
+ * Since this class is passed directly between plugins the
+ * code in this class cannot do memory allocations or
+ * deallocations. The functions in this class will only
+ * manipulate member variables.
+ */
+class csGLStateCache
+{
+public:
+  csGLExtensionManager* extmgr;
+  csGLStateCacheContext* currentContext;
+
+  csGLStateCache (csGLExtensionManager* extmgr)
+  {
+    csGLStateCache::extmgr = extmgr;
+    currentContext = 0;
+  }
+
+  void SetContext (csGLStateCacheContext *context)
+  {
+    currentContext = context;
   }
 
   // Standardized caches
@@ -459,24 +591,22 @@ public:
     GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer);
   
   // Special caches
-  GLuint boundtexture[CS_GL_MAX_LAYER]; // 32 max texture layers
-  int currentUnit, activeUnit;
   void SetTexture (GLenum target, GLuint texture)
   {
-    if (texture != boundtexture[currentUnit])
+    if (texture != currentContext->boundtexture[currentContext->currentUnit])
     {
       ActivateTU ();
-      boundtexture[currentUnit] = texture;
+      currentContext->boundtexture[currentContext->currentUnit] = texture;
       glBindTexture (target, texture);
     }
   }
   GLuint GetTexture (GLenum target)
   {
-    return boundtexture[currentUnit];
+    return currentContext->boundtexture[currentContext->currentUnit];
   }
   GLuint GetTexture (GLenum target, int unit)
   {
-    return boundtexture[unit];
+    return currentContext->boundtexture[unit];
   }
   /**
    * Set active texture unit. Doesn't check whether the multitexture ext is
@@ -484,44 +614,43 @@ public:
    */
   void SetActiveTU (int unit)
   {
-    currentUnit = unit;   
+    currentContext->currentUnit = unit;   
   }
   int GetActiveTU ()
   {
-    return currentUnit;
+    return currentContext->currentUnit;
   }
   void ActivateTU ()
   {
-    if (activeUnit != currentUnit && extmgr->CS_GL_ARB_multitexture)
+    if (currentContext->activeUnit != currentContext->currentUnit && extmgr->CS_GL_ARB_multitexture)
     {
-      extmgr->glActiveTextureARB (GL_TEXTURE0_ARB + currentUnit);
-      extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB + currentUnit);
+      extmgr->glActiveTextureARB (GL_TEXTURE0_ARB + currentContext->currentUnit);
+      extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB + currentContext->currentUnit);
     }
-    activeUnit = currentUnit;
+    currentContext->activeUnit = currentContext->currentUnit;
   }
 
   //VBO buffers
-  GLuint currentBufferID, currentIndexID;
   void SetBufferARB (GLenum target, GLuint id)
   {
     if (target == GL_ELEMENT_ARRAY_BUFFER_ARB)
     {
-      if (id != currentIndexID)
+      if (id != currentContext->currentIndexID)
       {
         extmgr->glBindBufferARB (target, id);
-        currentIndexID = id;
+        currentContext->currentIndexID = id;
       }
     } 
     else 
     {
-      if (id != currentBufferID)
+      if (id != currentContext->currentBufferID)
       {
         extmgr->glBindBufferARB (target, id);
-        currentBufferID = id;
-        parameter_vpointer = (GLvoid*)~0; //invalidate vertexpointer
-        parameter_npointer = (GLvoid*)~0; //invalidate vertexpointer
-        parameter_cpointer = (GLvoid*)~0; //invalidate vertexpointer
-        memset(&parameter_tpointer, ~0, sizeof(GLvoid*)*CS_GL_MAX_LAYER);
+        currentContext->currentBufferID = id;
+        currentContext->parameter_vpointer = (GLvoid*)~0; //invalidate vertexpointer
+        currentContext->parameter_npointer = (GLvoid*)~0; //invalidate vertexpointer
+        currentContext->parameter_cpointer = (GLvoid*)~0; //invalidate vertexpointer
+        memset(&currentContext->parameter_tpointer, ~0, sizeof(GLvoid*)*CS_GL_MAX_LAYER);
       }
     }
   }
@@ -530,11 +659,11 @@ public:
   {
     if (target == GL_ELEMENT_ARRAY_BUFFER_ARB)
     {
-      return currentIndexID;
+      return currentContext->currentIndexID;
     } 
     else 
     {
-      return currentBufferID;
+      return currentContext->currentBufferID;
     }
   }
 };
@@ -544,6 +673,26 @@ public:
 #undef IMPLEMENT_CACHED_PARAMETER_1
 #undef IMPLEMENT_CACHED_PARAMETER_2
 #undef IMPLEMENT_CACHED_PARAMETER_3
+#undef IMPLEMENT_CACHED_PARAMETER_4
+#undef IMPLEMENT_CACHED_PARAMETER_1_LAYER
+#undef IMPLEMENT_CACHED_PARAMETER_2_LAYER
+#undef IMPLEMENT_CACHED_PARAMETER_3_LAYER
+#undef IMPLEMENT_CACHED_PARAMETER_4_LAYER
+#undef IMPLEMENT_CACHED_CLIENT_STATE
+#undef IMPLEMENT_CACHED_CLIENT_STATE_LAYER
+
+#undef DECLARE_CACHED_BOOL
+#undef DECLARE_CACHED_BOOL_CURRENTLAYER
+#undef DECLARE_CACHED_PARAMETER_1
+#undef DECLARE_CACHED_PARAMETER_2
+#undef DECLARE_CACHED_PARAMETER_3
+#undef DECLARE_CACHED_PARAMETER_4
+#undef DECLARE_CACHED_PARAMETER_1_LAYER
+#undef DECLARE_CACHED_PARAMETER_2_LAYER
+#undef DECLARE_CACHED_PARAMETER_3_LAYER
+#undef DECLARE_CACHED_PARAMETER_4_LAYER
+#undef DECLARE_CACHED_CLIENT_STATE
+#undef DECLARE_CACHED_CLIENT_STATE_LAYER
 
 #undef FORCE_STATE_CHANGE
 

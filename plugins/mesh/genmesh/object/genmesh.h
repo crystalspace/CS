@@ -79,6 +79,15 @@ public:
   }
 };
 
+struct csGenmeshSubMesh
+{
+  csRef<iRenderBuffer> index_buffer;
+  csRef<iMaterialWrapper> material;
+  csRenderMeshHolderSingle rmHolder;
+  csRef<csRenderBufferHolder> bufferHolder;
+  int tricount;
+};
+
 /**
  * Genmesh version of mesh object.
  */
@@ -104,6 +113,9 @@ private:
 
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
+
+  csArray<csGenmeshSubMesh*> subMeshes;
+  csDirtyAccessArray<csRenderMesh*> renderMeshes;
 
   csUserRenderBufferManager userBuffers;
   csArray<csStringID> user_buffer_names;
@@ -199,6 +211,10 @@ public:
 
   /// Destructor.
   virtual ~csGenmeshMeshObject ();
+
+  void ClearSubMeshes ();
+  void AddSubMesh (unsigned int *triangles,
+    int tricount, iMaterialWrapper *material);
 
   void SetMixMode (uint mode) { MixMode = mode; }
   uint GetMixMode () const { return MixMode; }
@@ -418,6 +434,16 @@ public:
     virtual iGenMeshAnimationControl* GetAnimationControl () const
     {
       return scfParent->GetAnimationControl ();
+    }
+    void ClearSubMeshes ()
+    {
+      scfParent->ClearSubMeshes ();
+    }
+    void AddSubMesh (unsigned int *triangles,
+      int tricount,
+      iMaterialWrapper *material)
+    {
+      scfParent->AddSubMesh (triangles, tricount, material);
     }
     virtual bool AddRenderBuffer (const char *name, iRenderBuffer* buffer)
     { return scfParent->AddRenderBuffer (name, buffer); }

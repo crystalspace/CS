@@ -163,6 +163,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
 
 csGenmeshMeshObject::~csGenmeshMeshObject ()
 {
+  ClearSubMeshes ();
   if (vis_cb) vis_cb->DecRef ();
   delete[] lit_mesh_colors;
   delete[] static_mesh_colors;
@@ -178,6 +179,41 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   SCF_DESTRUCT_IBASE ();
+}
+
+void csGenmeshMeshObject::ClearSubMeshes ()
+{
+  for (size_t i=0; i<subMeshes.Length (); ++i)
+  {
+    delete subMeshes[i];
+  }
+  subMeshes.DeleteAll ();
+}
+
+void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
+                                      int tricount,
+                                      iMaterialWrapper *material)
+{
+  csGenmeshSubMesh *subMesh = new csGenmeshSubMesh();
+  subMesh->material = material;
+  subMesh->index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+    sizeof (unsigned int)*tricount*3,
+    CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
+  csTriangle *triangleData = (csTriangle*)subMesh->index_buffer->Lock(CS_BUF_LOCK_NORMAL);
+  //subMesh->index_buffer->CopyToBuffer (triangles, tricount*sizeof (unsigned int)*3);
+
+  for (int i=0; i<tricount; ++i)
+  {
+    triangleData[i] = factory->GetTriangles ()[triangles[i]];
+  }
+  subMesh->tricount = tricount;
+
+  subMesh->bufferHolder.AttachNew (new csRenderBufferHolder);
+  subMesh->bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX, subMesh->index_buffer);
+  subMesh->bufferHolder->SetAccessor (scfiRenderBufferAccessor, 
+    CS_BUFFER_ALL_MASK & (~CS_BUFFER_MAKE_MASKABLE(CS_BUFFER_INDEX)));
+
+  subMeshes.Push (subMesh);
 }
 
 const csVector3* csGenmeshMeshObject::AnimControlGetVertices ()
@@ -1017,77 +1053,121 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     	logparent, -1, false);
   }
 
-  iMaterialWrapper* mater = material;
-  if (!mater) mater = factory->GetMaterialWrapper ();
-  if (!mater)
+  if (subMeshes.Length () == 0)
   {
-    printf ("INTERNAL ERROR: mesh used without material!\n");
-    return 0;
-  }
+    renderMeshes.SetLength (1);
 
-  if (material_needs_visit) mater->Visit ();
+    iMaterialWrapper* mater = material;
+    if (!mater) mater = factory->GetMaterialWrapper ();
+    if (!mater)
+    {
+      printf ("INTERNAL ERROR: mesh used without material!\n");
+      return 0;
+    }
 
-  bool rmCreated;
-  csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
-    rview->GetCurrentFrameNumber ());
+    if (mater->IsVisitRequired ()) mater->Visit ();
 
-  if (factory->back2front)
-  {
-    if (!sorted_index_buffer)
+    bool rmCreated;
+    csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
+      rview->GetCurrentFrameNumber ());
+
+    if (factory->back2front)
     {
       sorted_index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
       	factory->GetTriangleCount()*3,
 	CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
+
+      if (num_sorted_mesh_triangles != factory->GetTriangleCount ())
+      {
+        delete[] sorted_mesh_triangles;
+        num_sorted_mesh_triangles = factory->GetTriangleCount ();
+        sorted_mesh_triangles = new csTriangle [num_sorted_mesh_triangles];
+      }
+
+      csBSPTree* back2front_tree = factory->back2front_tree;
+      if (!back2front_tree)
+      {
+        factory->BuildBack2FrontTree ();
+        back2front_tree = factory->back2front_tree;
+      }
+      const csDirtyAccessArray<int>& triidx = back2front_tree->Back2Front (
+        tr_o2c.GetOrigin ());
+      CS_ASSERT (triidx.Length () == (size_t)num_sorted_mesh_triangles);
+
+      csTriangle* factory_triangles = factory->GetTriangles ();
+      int i;
+      for (i = 0 ; i < num_sorted_mesh_triangles ; i++)
+        sorted_mesh_triangles[i] = factory_triangles[triidx[i]];
+      sorted_index_buffer->CopyInto (sorted_mesh_triangles,
+        sizeof (unsigned int)*num_sorted_mesh_triangles*3);
+
+      bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX, sorted_index_buffer);
+      bufferHolder->SetAccessor (scfiRenderBufferAccessor, 
+        CS_BUFFER_ALL_MASK & (~CS_BUFFER_MAKE_MASKABLE(CS_BUFFER_INDEX)));
+    } else {
+      bufferHolder->SetAccessor (scfiRenderBufferAccessor, CS_BUFFER_ALL_MASK);
     }
-    if (num_sorted_mesh_triangles != factory->GetTriangleCount ())
-    {
-      delete[] sorted_mesh_triangles;
-      num_sorted_mesh_triangles = factory->GetTriangleCount ();
-      sorted_mesh_triangles = new csTriangle [num_sorted_mesh_triangles];
-    }
 
-    csBSPTree* back2front_tree = factory->back2front_tree;
-    if (!back2front_tree)
-    {
-      factory->BuildBack2FrontTree ();
-      back2front_tree = factory->back2front_tree;
-    }
-    const csDirtyAccessArray<int>& triidx = back2front_tree->Back2Front (
-    	tr_o2c.GetOrigin ());
-    CS_ASSERT (triidx.Length () == (size_t)num_sorted_mesh_triangles);
-
-    csTriangle* factory_triangles = factory->GetTriangles ();
-    int i;
-    for (i = 0 ; i < num_sorted_mesh_triangles ; i++)
-      sorted_mesh_triangles[i] = factory_triangles[triidx[i]];
-    sorted_index_buffer->CopyInto (sorted_mesh_triangles, 
-      num_sorted_mesh_triangles*3);
-
-    bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, sorted_index_buffer);
-  }
-
-  meshPtr->mixmode = MixMode;
-  meshPtr->clip_portal = clip_portal;
-  meshPtr->clip_plane = clip_plane;
-  meshPtr->clip_z_plane = clip_z_plane;
-  meshPtr->do_mirror = camera->IsMirrored ();
-  meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
-  meshPtr->indexstart = 0;
-  meshPtr->indexend = factory->GetTriangleCount () * 3;
-  meshPtr->material = mater;
-  CS_ASSERT (mater != 0);
-  meshPtr->object2camera = tr_o2c;
-  meshPtr->camera_origin = camera_origin;
-  meshPtr->camera_transform = &camera->GetTransform();
-  if (rmCreated)
-  {
+    meshPtr->mixmode = MixMode;
+    meshPtr->clip_portal = clip_portal;
+    meshPtr->clip_plane = clip_plane;
+    meshPtr->clip_z_plane = clip_z_plane;
+    meshPtr->do_mirror = camera->IsMirrored ();
+    meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
+    meshPtr->indexstart = 0;
+    meshPtr->indexend = factory->GetTriangleCount () * 3;
+    meshPtr->material = mater;
+    CS_ASSERT (mater != 0);
+    meshPtr->object2camera = tr_o2c;
+    meshPtr->camera_origin = camera_origin;
+    meshPtr->camera_transform = &camera->GetTransform();
     meshPtr->variablecontext = svcontext;
     meshPtr->buffers = bufferHolder;
+    meshPtr->geometryInstance = (void*)factory;
+
+    renderMeshes[0] = meshPtr;
+  } else {
+    renderMeshes.SetLength (subMeshes.Length ());
+
+    for (size_t i = 0; i<subMeshes.Length (); ++i)
+    {
+      iMaterialWrapper* mater = subMeshes[i]->material;
+      if (!mater) mater = factory->GetMaterialWrapper ();
+      if (!mater)
+      {
+        printf ("INTERNAL ERROR: mesh used without material!\n");
+        return 0;
+      }
+
+      if (mater->IsVisitRequired ()) mater->Visit ();
+
+      bool rmCreated;
+      csRenderMesh*& meshPtr = subMeshes[i]->rmHolder.GetUnusedMesh (rmCreated,
+        rview->GetCurrentFrameNumber ());
+
+      meshPtr->mixmode = MixMode;
+      meshPtr->clip_portal = clip_portal;
+      meshPtr->clip_plane = clip_plane;
+      meshPtr->clip_z_plane = clip_z_plane;
+      meshPtr->do_mirror = camera->IsMirrored ();
+      meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
+      meshPtr->indexstart = 0;
+      meshPtr->indexend = subMeshes[i]->tricount * 3;
+      meshPtr->material = mater;
+      CS_ASSERT (mater != 0);
+      meshPtr->object2camera = tr_o2c;
+      meshPtr->camera_origin = camera_origin;
+      meshPtr->camera_transform = &camera->GetTransform();
+      meshPtr->variablecontext = svcontext;
+      meshPtr->buffers = subMeshes[i]->bufferHolder;
+      meshPtr->geometryInstance = (void*)factory;
+
+      renderMeshes[i] = meshPtr;
+    }
   }
-  meshPtr->geometryInstance = (void*)factory;
- 
-  n = 1;
-  return &meshPtr;
+
+  n = renderMeshes.Length ();
+  return renderMeshes.GetArray ();
 }
 
 void csGenmeshMeshObject::GetObjectBoundingBox (csBox3& bbox)
@@ -2235,3 +2315,24 @@ bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
 
   return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -18,6 +18,11 @@ chronological order.
 	    when more than one terrain existed in the scene.
 	  - Flipped Z of heightmaps in terraformer to correspond to material 
 	    & base maps. Hope this doesn't screw things up for people using it.
+	- Anders Stenberg added support for multiple contexts to the GL
+	  statecache. This is only for possible future use, and not used yet.
+	- Anders Stenberg fixed a bug in Win32 utils where command line 
+	  arguments were read directly instead of through the command line
+	  parser.
 25-Feb-2005
 	- Jorrit added a new HOWTO that explains how to compile external
 	  applications for Crystal Space and CEL using Dev-CPP.

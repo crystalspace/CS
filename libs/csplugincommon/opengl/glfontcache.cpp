@@ -406,7 +406,7 @@ void csGLFontCache::FlushArrays ()
 {
   if (jobCount == 0) return;
 
-  bool texEnabled = statecache->enabled_GL_TEXTURE_2D;
+  bool texEnabled = statecache->IsEnabled_GL_TEXTURE_2D ();
   statecache->Enable_GL_TEXTURE_2D ();
 
   if (needStates)
@@ -785,9 +785,9 @@ void csGLFontCache::BeginText ()
 {
   if (textWriting) return;
 
-  vaEnabled = statecache->enabled_GL_VERTEX_ARRAY;
-  tcaEnabled = statecache->enabled_GL_TEXTURE_COORD_ARRAY;
-  caEnabled = statecache->enabled_GL_COLOR_ARRAY;
+  vaEnabled = statecache->IsEnabled_GL_VERTEX_ARRAY ();
+  tcaEnabled = statecache->IsEnabled_GL_TEXTURE_COORD_ARRAY ();
+  caEnabled = statecache->IsEnabled_GL_COLOR_ARRAY ();
 
   statecache->SetActiveTU (0);
   statecache->Enable_GL_VERTEX_ARRAY();

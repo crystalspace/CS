@@ -99,7 +99,8 @@ protected:
 
   /// Cache for GL states
   csGLStateCache* statecache;
-  
+  csGLStateCacheContext *statecontext;
+
   bool hasRenderTarget;
 
   /// Decompose a color ID into r,g,b components
