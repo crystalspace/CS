@@ -93,6 +93,10 @@ Hariharan wrote the pathtut tutorial in CS. This tutorial shows how
 to use the @code{csPath} class to smoothly move an object along some
 path.
 
+@item Ryan Surkamp (@email{deathatsight@@yahoo.com})
+
+Ryan made a bezier based landscape engine.
+
 @item
 Steven Geens (@email{old_belge@@hotmail.com})
 

@@ -10,6 +10,11 @@ The history order is reversed so that new features are at the top.
 	  resulting vectors can then be used with SetOrigin() and
 	  LookAt(). The tutorial is also speed independent so that
 	  the object will move at the same speed on all hardware.
+	- Got a new landscape engine (based on bezier curves) from
+	  Ryan Surkamp <deathatsight@yahoo.com>. This engine is still
+	  work in progress though but as I have seen the author seems
+	  very fast in his development :-)  The new landscape engine
+	  can be found in plugins/mesh/bcterr.
 18-Jul-2002
 	- Steven Geens fixed a bad bug in the RAPID collision detection
 	  plugin. It now seems to work properly in all cases regardless

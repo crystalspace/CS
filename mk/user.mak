@@ -56,6 +56,7 @@ PLUGINS +=                         mesh/genmesh/persist/tree
 PLUGINS += mesh/emit/object        mesh/emit/persist/classic
 PLUGINS += mesh/metaball/object    mesh/metaball/persist/classic
 PLUGINS += mesh/terrfunc/object    mesh/terrfunc/persist/classic
+PLUGINS += mesh/bcterr/object      mesh/bcterr/persist/classic
 PLUGINS += mesh/metagen/object
 PLUGINS += mesh/stars/object       mesh/stars/persist/classic
 PLUGINS += mesh/haze/object        mesh/haze/persist/classic
