@@ -57,7 +57,8 @@ if ! [ Property build : projgen ]
 Description walktest_static : "WalkTest demo (static build)" ;
 
 SubVariant static ;
-Application walktest_static : [ Wildcard *.cpp *.h ] : independent noinstall ;
+Application walktest_static : [ Wildcard *.cpp *.h ] :
+  independent noinstall nohelp ;
 LinkWith walktest_static : csgeom csgfx cstool csutil ;
 LinkStaticPlugins walktest_static : $(STATIC.PLUGINLIST) ;
 Win32Resource walktest_static :
