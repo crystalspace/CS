@@ -67,6 +67,8 @@ chronological order.
 	  use of the CS Jam build system won't have BFD storing metadata in
 	  their plugins unless they specifically ask for it in their own
 	  project Jamfiles.
+	- Oktal added BFD metadata storage functionality to the GNU make build
+	  system.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.
