@@ -69,21 +69,20 @@ SCF_EXPORT_CLASS_TABLE_END
 
 
 SCF_IMPLEMENT_IBASE(csGLRender3D)
-SCF_IMPLEMENTS_INTERFACE(iRender3D)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEffectClient)
+  SCF_IMPLEMENTS_INTERFACE(iRender3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiEffectClient)
-SCF_IMPLEMENTS_INTERFACE (iEffectClient)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiShaderRenderInterface )
+  SCF_IMPLEMENTS_INTERFACE (iShaderRenderInterface)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csGLRender3D::EventHandler)
-SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 
@@ -91,7 +90,6 @@ csGLRender3D::csGLRender3D (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEffectClient);
 
   scfiEventHandler = NULL;
 
@@ -561,13 +559,25 @@ bool csGLRender3D::Open ()
   asp_center_x = w/2;
   asp_center_y = h/2;
 
-  /*effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
+/*  effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
   if( !effectserver )
   {
   effectserver = CS_LOAD_PLUGIN (plugin_mgr,
   "crystalspace.video.effects.stdserver", iEffectServer);
   object_reg->Register (effectserver, "iEffectServer");
-  }*/
+  }
+*/
+
+  shadermanager = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  if( !shadermanager )
+  {
+    shadermanager = CS_LOAD_PLUGIN (plugin_mgr, 
+    "crystalspace.video.shader.manager", iShaderManager);
+    if (shadermanager)
+      object_reg->Register (shadermanager, "iShaderManager");
+    else
+      Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't find any shadermanager, ignoring shaders");
+  }
 
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
@@ -905,20 +915,6 @@ void csGLRender3D::SetClipper (iClipper2D* clipper, int cliptype)
 
 
 
-////////////////////////////////////////////////////////////////////
-// iEffectClient
-////////////////////////////////////////////////////////////////////
-
-
-
-
-bool csGLRender3D::Validate (iEffectDefinition* effect, iEffectTechnique* technique)
-{
-  return false;
-}
-
-
-
 
 ////////////////////////////////////////////////////////////////////
 // iComponent
@@ -969,4 +965,21 @@ bool csGLRender3D::HandleEvent (iEvent& Event)
       }
   }
   return false;
+}
+
+
+////////////////////////////////////////////////////////////////////
+//                    iShaderRenderInterface
+////////////////////////////////////////////////////////////////////
+csPtr<iShaderProgram> csGLRender3D::eiShaderRenderInterface::CreateShaderProgram(const char* programstring, void* parameters, const char* type)
+{
+  return NULL;
+}
+
+csGLRender3D::eiShaderRenderInterface::eiShaderRenderInterface()
+{
+}
+
+csGLRender3D::eiShaderRenderInterface::~eiShaderRenderInterface()
+{
 }

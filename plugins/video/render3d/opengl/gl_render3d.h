@@ -37,7 +37,7 @@
 #include "iutil/eventh.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/render3d.h"
-#include "ivideo/effects/efclient.h"
+#include "ivideo/shader/shader.h"
 #include "video/canvas/openglcommon/iglstates.h"
 
 #include "glextmanager.h"
@@ -54,9 +54,6 @@ struct iTextureManager;
 struct iRenderBufferManager;
 struct iLightingManager;
 
-struct iEffectServer;
-struct iEffectDefinition;
-struct iEffectTechnique;
 struct iEvent;
 
 
@@ -86,7 +83,7 @@ class csGLRender3D : public iRender3D
   csRef<iGraphics2D> G2D;
   csRef<iRenderBufferManager> buffermgr;
   csRef<iLightingManager> lightmgr;
-  csRef<iEffectServer> effectserver;
+  csRef<iShaderManager> shadermanager;
 
   static csRef<iGLStateCache> statecache;
 
@@ -315,18 +312,21 @@ public:
     { return strings; }
 
   ////////////////////////////////////////////////////////////////////
-  //                         iEffectClient
+  //                    iShaderRenderInterface
   ////////////////////////////////////////////////////////////////////
 
-  bool Validate (iEffectDefinition* effect, iEffectTechnique* technique);
-
-  struct eiEffectClient : public iEffectClient
+  class eiShaderRenderInterface : public iShaderRenderInterface
   {
+  private:
+
+  public:
     SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
-    virtual bool Validate (
-      iEffectDefinition* effect, iEffectTechnique* technique)
-      { return scfParent->Validate (effect, technique); }
-  } scfiEffectClient;
+    eiShaderRenderInterface();
+    virtual ~eiShaderRenderInterface();
+
+    /// Create a shaderprogram from a string describing it
+    virtual csPtr<iShaderProgram> CreateShaderProgram(const char* programstring, void* parameters, const char* type);
+  } scfiShaderRenderInterface;
 
   ////////////////////////////////////////////////////////////////////
   //                          iComponent
