@@ -114,7 +114,7 @@ iSoundListener *csSoundRenderSoftware::GetListener()
 iSoundSource *csSoundRenderSoftware::CreateSource(iSoundData *snd, bool Is3d)
 {
   if (snd == NULL) return NULL;
-  return new csSoundSourceSoftware(NULL, Is3d, this, snd);
+  return new csSoundSourceSoftware(snd, Is3d, this, snd);
 }
 
 bool csSoundRenderSoftware::is16Bits()
