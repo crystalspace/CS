@@ -1,0 +1,95 @@
+Description of BeOS port internals
+==================================
+Beta 0.13r010 (8/5/99)
+written by David Huen(smh1008@cus.cam.ac.uk)
+
+Contents
+========
+0. Introduction
+
+1.0 Description of the BeOS SysSystemDriver
+1.1 Operation of SysSystemDriver
+
+2.0 Description of BeOS 2D Graphics Driver
+
+0. Introduction
+===============
+I have expended many hours on working out how CrystalSpace works in BeOS with a view to improving its existing performance and eventually extending its functionality.  My main interest in CS is as a testbed to explore the extent to which SMP can impact 3D graphics engines.  Unfortunately, I'll have to understand the current implementation thoroughly before I can begin to explore SMP possibilities.
+
+Anyway, I thought that if I'm going to invest all this time and effort, I might as well write up what I have learned to make it easier for others to pick up CS.  What I write specifically addresses the BeOS port when used in conjunction with the Walktest example although it may be relevant to some of the other ports as well.
+
+This document serves as an aide-memoire for myself on BeOS CS and I will be periodically releasing updates to it.
+
+1.0 Description of the BeOS SysSystemDriver
+===========================================
+CrystalSpace-based applications are derived from a single class of type SysSystemDriver. It is necessary to understand how this class relates to the standard BeOS class BApplication.
+
+For example, in the demo application, walktest.cpp, the main block begins with a creating an instance of Walktest:-
+CHK(Sys = new Walktest());  [see apps/walktest/walktest.cpp]
+
+Walktest itself is derived from SysSystemDriver (which is derived from csSystemDriver) so SysSystemDriver::SysSystemDriver is invoked.  This in turn creates an instance of CrystApp:-
+CHK (app = new CrystApp(this)); [see cryst/libs/cssys/be/csbe]
+
+app is a global pointer that points to CrystApp (and therefore the BApplication).
+
+CrystApp is derived from BApplication and the CrystApp constructor:-
+
+CrystApp::CrystApp(SysSystemDriver *from)
+
+takes the argument 'from' and assigns it to the pointer 'driver' within CrystApp.  driver then points to the walktest object and can access all class members of walktest.  You probably need 'driver' because CrystApp is derived from BApplication rather than SysSystemDriver and needs access to SysSystemDriver members for its operation.
+
+1.1 Operation of SysSystemDriver
+================================
+This description follows the execution of walktest.exe.
+
+The main block creates the Walktest object (derived from SysSystemDriver) at the start and sets up a pointer Sys to it.
+
+It then picks up info from the configuration files, sets up the world, COM drivers, console object (csSimpleConsole), loads textures, execute the script, etc.
+
+Right at the end it invokes the method Sys->Loop, which invokes the inherited SysSystemDriver::Loop method.  This method sets up the BeOS 2D Graphics interface to obtain the display view from it.
+
+On first passage, it starts a thread with SysSystemDriver::LoopThread, initialises the pulse rate and calls app->Run which beging message processing on the Walktest (=SysSystemDriver) object.  While there is more code in the method, it appears to be unreachable to me and it does not appear that the Run method is called again from anywhere else.
+
+The LoopThread method runs in its own thread separately and receives from its caller a pointer 'data' to the SysSystemDriver object but it already has that from app.  At any rate, 'data' is never used.  What LoopThread does do is to post a 'next' message to the SysSystemDriver roughly every app->mspf milliseconds.  Loop termination is detected by a local variable 'shutdown' which as far as I'm concerned will never be TRUE!  Weird.
+
+The 'next' message is posted to the SysSystemDriver object's BHandler's MessageReceived and that will be CrystApp::MessageReceived.  MessageReceived calls driver(which points to the walktest object)->NextFrame.  This would be Walktest::NextFrame which first invokes SysSystemDriver::NextFrame.  SysSystemDriver::NextFrame doesn't not exist but invokes the inherited csSystemDriver which merely calls piSound->Update to update the sound driver state.  MessageReceived also strips out all outstanding 'next' events from the queue before returning as a means of dealing with excessively slow rendering.
+
+After this Walktest::NextFrame does all the stuff needed to setup and draw the next frame.
+
+2.0 Description of BeOS 2D Graphics Driver
+==========================================
+The BeOS-specific 2D Graphics class is csGraphics2DBeLib and it is derived from the general 2D graphics class csGraphics2D.
+
+2.1 Operation of BeOS 2D Graphics Driver
+========================================
+During the initialisation of COM by:-
+  if (!Sys->Initialize (argc, argv, world->GetEngineConfigCOM ()))
+
+csSystemDriver::Initialize is called and in this method, csSystemDriver::InitGraphics is eventually called.  This first sets up the graphics context class factory.  This factory is then used to create an instance of the 3D graphics object by a call to the method csGraphics3DSoftwareFactory::CreateInstance.  This method creates a new Graphics3DSoftware and returns a pointer to its interface.  The csGraphics3DSoftware::csGraphics3DSoftware constructor initialises the class factory for the 2D driver and creates an instance of csGraphics2DBeLib via COM.
+
+csGraphics2DBeLib::csGraphics2DBeLib checks that the interace has been succesfully created.  It doesn't call the csGraphics2D constructor.
+
+When csGraphics3DSoftware::Initialize executes, it calls csGraphics2DBeLib::Initialize.  This method begins by calling csGraphics2D::Initialize which initialises default values for parameters like pixel format, screen size and the actual methods used to implement the virtual methods GetPixelAt, DrawPixel, WriteChar and DrawSprite.  csGraphics2DBeLib::Initialize then uses BScreen to access the current color_space setting and uses it to set the correct values for all these parameters.  it also creates a bitmap of the required color_space pointed to by private BBitMap *cryst_bitmap.
+
+csGraphics3DSoftware::Open calls csSystemDriver::Open [defined in cs2d/be/belibg2d.cpp] which begins by calling the inherited csGraphics2D::Open method [defined in cs2d/common/graph2d.cpp].  csGraphics2D::Open creates an int array with the number of scanlines designated in cryst.cfg and sets up the static csGraphics2D::ScanLine pointer to it. It then initialises it with precalculated addresses of each scanline in the bitmap.  A new instance of CrystView and attached to a new instance of CrystWindow.  [N.B.: if changeable screen sizes are to be implemented, Scanline may have to be deleted and recreated.]
+
+CrystView is derived from BView and implements handlers for key and mouse actions.  CrystWindow is derived from BDirectWindow and implements a MessageReceived method to deal with events.  This MessageReceived handles the periodic 'next' events from LoopThread.  As you will note, CrystApp doesn't currently use BDirectWindow in the prescribed manner, e.g. using a separate drawing thread to render it.  This doesn't matter currently as direct framebuffer manipulation is not currently used but could eventually take on a greater significance when that is done.
+
+The current implementation of the software renderer calls:-
+
+Gfx3D->Print
+
+from Walktest::DrawFrame.  csGraphics3DSoftware::Print then calls:-
+  m_piG2D->Print (area);
+which invokes the 2D method csGraphics2DBeLib::Print (csRect *area).
+
+As currently implemented, the software renderer draws to a BBitMap of the same color_space as screen.  This bitmap is pointed to by the static:-
+
+unsigned char *csGraphics2D::Memory = NULL;
+
+This Print method  displays the bitmap by locking the window, blitting the BBitmap to the CrystView, then unlocking the window.
+
+
+
+
+
