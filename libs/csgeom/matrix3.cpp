@@ -90,10 +90,15 @@ csMatrix3& csMatrix3::operator*= (float s)
 
 void csMatrix3::Identity ()
 {
-  m12 = m13 = 0;
-  m21 = m23 = 0;
-  m31 = m32 = 0;
-  m11 = m22 = m33 = 1;
+  m11 = m22 = m33 = 1.0;
+  m12 = m13 = m21 = m23 = m31 = m32 = 0.0;
+}
+
+bool csMatrix3::IsIdentity () const
+{
+  return (m11 == 1.0) && (m22 == 1.0) && (m33 == 1.0)
+      && (m12 == 0.0) && (m13 == 0.0) && (m21 == 0.0)
+      && (m23 == 0.0) && (m31 == 0.0) && (m32 == 0.0);
 }
 
 void csMatrix3::Transpose ()

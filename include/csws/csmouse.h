@@ -69,6 +69,8 @@ private:
   bool invisible;
   /// Application is focused
   bool AppFocused;
+  /// Last time we painted a virtual cursor
+  bool LastVirtual;
   /// Area under mouse cursor
   csImageArea *Under [MAX_SYNC_PAGES];
   /// The application object

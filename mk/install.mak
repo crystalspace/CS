@@ -23,9 +23,7 @@
 #------------------------------------------------------------- all defines ---#
 ifneq ($(findstring defines,$(MAKESECTION)),)
 
-ifeq (,$(INSTALL_DIR))
-INSTALL_DIR = /usr/local/crystal
-endif
+INSTALL_DIR ?= /usr/local/crystal
 
 endif # ifneq ($(findstring defines,$(MAKESECTION)),)
 

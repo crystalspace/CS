@@ -34,7 +34,7 @@ void csDVector3::Normalize()
 {
   double len;
   len = this->Norm();
-  if( len > SMALL_EPSILON )
+  if (len > SMALL_EPSILON)
     *this /= len;
 }
 

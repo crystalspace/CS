@@ -142,6 +142,9 @@ public:
   /// Set this matrix to the identity matrix.
   void Identity ();
 
+  /// Check if the matrix is identity
+  bool IsIdentity () const;
+
   /// Add two matricies.
   friend csMatrix3 operator+ (const csMatrix3& m1, const csMatrix3& m2);
   /// Subtract two matricies.

@@ -65,12 +65,17 @@ void csGraphicsPipeline::Initialize (iSystem *System)
     (G2D = G3D->GetDriver2D ())->IncRef ();
   else
     G2D = QUERY_PLUGIN_ID (System, CS_FUNCID_CANVAS, iGraphics2D);
+  RefreshRect.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
+  CanvasResize ();
+}
+
+void csGraphicsPipeline::CanvasResize ()
+{
   if (G2D)
   {
     FrameWidth = G2D->GetWidth ();
     FrameHeight = G2D->GetHeight ();
   }
-  RefreshRect.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
 }
 
 bool csGraphicsPipeline::ClipLine (float &x1, float &y1, float &x2, float &y2,

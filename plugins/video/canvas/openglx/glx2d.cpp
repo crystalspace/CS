@@ -122,10 +122,6 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 
-#ifdef XFREE86VM
-  InitVidModes();
-#endif
-
   return true;
 }
 
@@ -304,13 +300,12 @@ bool csGraphics2DGLX::Open(const char *Title)
     ButtonReleaseMask;
 
 #ifdef XFREE86VM
-  fs_width  = fs_mode.hdisplay;
-  fs_height = fs_mode.vdisplay;
-  fs_window = XCreateWindow (dpy, root_window, 0, 0,
-    fs_width, fs_height, 0 /*border*/,
-    active_GLVisual->depth, InputOutput, active_GLVisual->visual,
+  currently_full_screen = false;
+  fs_window = XCreateWindow (dpy, root_window, 0, 0, 1, 1,
+    0 /*border*/, active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWOverrideRedirect | CWBorderPixel | CWColormap, &winattr);
   XStoreName (dpy, fs_window, Title);
+  XSetWindowBackground (dpy, fs_window, BlackPixel (dpy, screen_num));
 #endif
 
   wm_width  = Width;
@@ -367,16 +362,16 @@ bool csGraphics2DGLX::Open(const char *Title)
   MouseCursor [csmcArrow] = XCreateFontCursor (dpy, XC_left_ptr);
 //MouseCursor [csmcLens] = XCreateFontCursor (dpy,
   MouseCursor [csmcCross] = XCreateFontCursor (dpy, 33/*XC_crosshair*/);
-  MouseCursor [csmcPen] = XCreateFontCursor (dpy, XC_hand2/*XC_pencil*/);
+  MouseCursor [csmcPen] = XCreateFontCursor (dpy, /*XC_hand2*/XC_pencil);
   MouseCursor [csmcMove] = XCreateFontCursor (dpy, XC_fleur);
   /// Diagonal (\) resizing cursor
 //MouseCursor [csmcSizeNWSE] = XCreateFontCursor (dpy,
   /// Diagonal (/) resizing cursor
 //MouseCursor [csmcSizeNESW] = XCreateFontCursor (dpy,
   /// Vertical sizing cursor
-  MouseCursor [csmcSizeNS] = XCreateFontCursor (dpy, XC_sb_v_double_arrow);
+//MouseCursor [csmcSizeNS] = XCreateFontCursor (dpy, XC_sb_v_double_arrow);
   /// Horizontal sizing cursor
-  MouseCursor [csmcSizeEW] = XCreateFontCursor (dpy, XC_sb_h_double_arrow);
+//MouseCursor [csmcSizeEW] = XCreateFontCursor (dpy, XC_sb_h_double_arrow);
   /// Invalid operation cursor
 //MouseCursor [csmcStop] = XCreateFontCursor (dpy, XC_pirate);
   /// Wait (longplay operation) cursor
@@ -499,6 +494,32 @@ bool csGraphics2DGLX::SetMouseCursor (csMouseCursorID iShape)
   } /* endif */
 }
 
+void csGraphics2DGLX::AllowCanvasResize (bool iAllow)
+{
+  XSizeHints normal_hints;
+  normal_hints.flags = PMinSize | PMaxSize | PSize | PResizeInc;
+  normal_hints.width = Width;
+  normal_hints.height = Height;
+  normal_hints.width_inc = 2;
+  normal_hints.height_inc = 2;
+  if (iAllow)
+  {
+    normal_hints.min_width = 32;
+    normal_hints.min_height = 32;
+    normal_hints.max_width = display_width;
+    normal_hints.max_height = display_height;
+  }
+  else
+  {
+    normal_hints.min_width =
+    normal_hints.max_width = Width;
+    normal_hints.min_height =
+    normal_hints.max_height = Height;
+  }
+  XSetWMNormalHints (dpy, wm_window, &normal_hints);
+  allow_canvas_resize = iAllow;
+}
+
 static Bool CheckKeyPress (Display * /*dpy*/, XEvent *event, XPointer arg)
 {
   XEvent *curevent = (XEvent *)arg;
@@ -550,26 +571,9 @@ bool csGraphics2DGLX::HandleEvent (iEvent &/*Event*/)
 	    }
 	  }
 	}
-#ifdef XFREE86VM
-	else if (event.xconfigure.window == fs_window)
-	{
-	  if (fs_width  != event.xconfigure.width ||
-	      fs_height != event.xconfigure.height)
-	  {
-	    fs_width  = event.xconfigure.width;
-	    fs_height = event.xconfigure.height;
-
-	    if (currently_full_screen)
-	    {
-	      newWidth  = fs_width;
-	      newHeight = fs_height;
-	      parent_resize = true;
-	    }
-	  }
-	}
-#endif
-	else if ((Width  != event.xconfigure.width) ||
-		 (Height != event.xconfigure.height))
+        else if ((event.xconfigure.window == window)
+              && ((Width  != event.xconfigure.width)
+               || (Height != event.xconfigure.height)))
 	{
 	  Width = event.xconfigure.width;
 	  Height = event.xconfigure.height;
@@ -709,240 +713,5 @@ bool csGraphics2DGLX::HandleEvent (iEvent &/*Event*/)
   return false;
 }
 
-#ifdef XFREE86VM
-Bool GetModeInfo(Display *dpy, int scr, XF86VidModeModeInfo *info)
-{
-  XF86VidModeModeLine *l;
-    
-  l = (XF86VidModeModeLine*) ((char*) info + sizeof(info->dotclock));
-
-  return XF86VidModeGetModeLine (dpy, scr, (int *) &info->dotclock, l);
-}
-
-static int cmp_modes(const void *va, const void *vb)
-{
-  XF86VidModeModeInfo *a = *(XF86VidModeModeInfo **) va;
-  XF86VidModeModeInfo *b = *(XF86VidModeModeInfo **) vb;
-
-  if (a->hdisplay > b->hdisplay)
-  {
-    return -1;
-  }
-  else
-  {
-    return b->vdisplay - a->vdisplay;
-  }
-}
-
-static Bool wait_for_notify(Display */*display*/, XEvent *xEvent, XPointer arg)
-{
-  return (xEvent->type == MapNotify) && (xEvent->xmap.window == (Window) arg);
-}
-
-void csGraphics2DGLX::InitVidModes()
-{
-  XF86VidModeModeLine mode;
-  XF86VidModeModeInfo **modes;
-  int i;
-  int nModes;
-
-  currently_full_screen = false;
-
-  if (XF86VidModeGetModeLine(dpy, screen_num, &i, &mode) &&
-      XF86VidModeGetAllModeLines (dpy, screen_num, &nModes, &modes))
-  {
-    qsort (modes, nModes, sizeof(*modes), cmp_modes);
-
-    // find best full screen mode
-    for (i = nModes - 1; i >= 0; --i)
-    {
-      if (modes[i]->hdisplay >= Width && modes[i]->vdisplay >= Height)
-      {
-	fs_mode = *modes[i];
-	break;
-      }
-    }
-
-    XFree (modes);
-  }
-}
-#endif
-
-void csGraphics2DGLX::EnterFullScreen()
-{
-#ifdef XFREE86VM
-  XEvent xEvent;
-  int x;
-  int y;
-  int pointerX;
-  int pointerY;
-  Window rootReturn;
-  Window childReturn;
-  int childX;
-  int childY;
-  int rootX;
-  int rootY;
-  unsigned int maskReturn;
-
-  XF86VidModeLockModeSwitch (dpy, screen_num, False);
-  // only switch if needed
-  if (!currently_full_screen) {
-    XSetWindowBackground (dpy, fs_window, 0);
-    XClearWindow (dpy, fs_window);
-
-    XSelectInput (dpy, fs_window, StructureNotifyMask);
-    XMapRaised (dpy, fs_window);
-    XIfEvent (dpy, &xEvent, wait_for_notify, (XPointer) fs_window);
-    XSelectInput (dpy, fs_window, NoEventMask);
-
-    // save current display information
-    GetModeInfo (dpy, screen_num, &orig_mode);
-    XF86VidModeGetViewPort (dpy, screen_num, &orig_x, &orig_y);
-
-    // get pointer location inside original window so it appears not to move
-    if (XQueryPointer (dpy, window, &rootReturn, &childReturn,
-		       &rootX, &rootY, &childX, &childY, &maskReturn)) {
-      pointerX = childX;
-      pointerY = childY;
-    }
-    else {
-      pointerX = fs_mode.hdisplay / 2;
-      pointerY = fs_mode.vdisplay / 2;
-    }
-
-    // grab pointer in fullscreen mode
-    if (XGrabPointer (dpy, fs_window, True, 0, GrabModeAsync, GrabModeAsync,
-		      fs_window, None, CurrentTime) != GrabSuccess ||
-	XGrabKeyboard (dpy, wm_window, True, GrabModeAsync,
-		       GrabModeAsync, CurrentTime) != GrabSuccess) {
-      XUnmapWindow (dpy, fs_window);
-      CsPrintf (MSG_FATAL_ERROR, "Unable to grab focus\n");
-    }
-
-    if (fs_mode.hdisplay != orig_mode.hdisplay ||
-	fs_mode.vdisplay != orig_mode.vdisplay)
-    {
-      // switch mode
-      XF86VidModeLockModeSwitch (dpy, screen_num, True);
-      if (!XF86VidModeSwitchToMode (dpy, screen_num, &fs_mode))
-      {
-	LeaveFullScreen ();
-	CsPrintf (MSG_FATAL_ERROR, "Unable to switch to mode %dx%d\n",
-		  fs_mode.hdisplay, fs_mode.vdisplay);
-      }
-      else
-      {
-	XF86VidModeSetViewPort (dpy, screen_num, 0, 0);
-
-	x = (fs_mode.hdisplay - fs_width) / 2;
-	y = (fs_mode.vdisplay - fs_height) / 2;
-	XReparentWindow (dpy, window, fs_window, x, y);
-	XResizeWindow (dpy, window, fs_width, fs_height);
-	XWarpPointer (dpy, None, window, 0, 0, 0, 0, pointerX, pointerY);
-
-	display_width  = fs_mode.hdisplay;
-	display_height = fs_mode.vdisplay;
-	currently_full_screen = true;
-      }
-    }
-
-    XSync (dpy, True);
-  }
-#endif // XFREE86VM
-}
-
-void csGraphics2DGLX::LeaveFullScreen()
-{
-#ifdef XFREE86VM
-  XF86VidModeModeInfo mode;
-  int pointerX;
-  int pointerY;
-  Window rootReturn;
-  Window childReturn;
-  int childX;
-  int childY;
-  int rootX;
-  int rootY;
-  unsigned int maskReturn;
-
-  if (currently_full_screen)
-  {
-    // get pointer location inside original window so it appears not to move
-    if (XQueryPointer (dpy, window, &rootReturn, &childReturn,
-		       &rootX, &rootY, &childX, &childY, &maskReturn)) {
-      pointerX = childX;
-      pointerY = childY;
-    }
-    else {
-      pointerX = fs_mode.hdisplay / 2;
-      pointerY = fs_mode.vdisplay / 2;
-    }
-
-    XUngrabPointer (dpy, CurrentTime);
-    XUngrabKeyboard (dpy, CurrentTime);
-
-    XReparentWindow (dpy, window, wm_window, 0, 0);
-    XResizeWindow (dpy, window, wm_width, wm_height);
-    if (GetModeInfo (dpy, screen_num, &mode))
-    {
-      if (orig_mode.hdisplay != mode.hdisplay ||
-	  orig_mode.vdisplay != mode.vdisplay)
-      {
-	// switch to non-fullscreen mode
-	if (!XF86VidModeSwitchToMode (dpy, screen_num, &orig_mode))
-	{
-	  CsPrintf (MSG_FATAL_ERROR, "Unable to restore mode %dx%d\n",
-		    fs_mode.hdisplay, fs_mode.vdisplay);
-	}
-	else
-	{
-	  if (orig_x != 0 || orig_y != 0)
-	  {
-	    // restore viewport if offset inside virtual screen
-	    XF86VidModeSetViewPort(dpy, screen_num, orig_x, orig_y);
-	  }
-
-	  // restore pointer location
-	  XWarpPointer (dpy, None, window, 0, 0, 0, 0, pointerX, pointerY);
-
-	  display_width  = orig_mode.hdisplay;
-	  display_height = orig_mode.vdisplay;
-	  currently_full_screen = false;
-	}
-
-      }
-
-      XUnmapWindow (dpy, fs_window);
-    }
-
-    XF86VidModeLockModeSwitch (dpy, screen_num, False);
-
-    XSync (dpy, True);
-  }
-#endif // XFREE86VM
-}
-
-void csGraphics2DGLX::AllowCanvasResize (bool iAllow)
-{
-  XSizeHints normal_hints;
-  normal_hints.flags = PMinSize | PMaxSize | PSize | PResizeInc;
-  normal_hints.width = Width;
-  normal_hints.height = Height;
-  normal_hints.width_inc = 2;
-  normal_hints.height_inc = 2;
-  if (iAllow)
-  {
-    normal_hints.min_width = 32;
-    normal_hints.min_height = 32;
-    normal_hints.max_width = display_width;
-    normal_hints.max_height = display_height;
-  }
-  else
-  {
-    normal_hints.min_width =
-    normal_hints.max_width = Width;
-    normal_hints.min_height =
-    normal_hints.max_height = Height;
-  }
-  XSetWMNormalHints (dpy, wm_window, &normal_hints);
-}
+#define X2D_CANVAS csGraphics2DGLX
+#include "plugins/video/canvas/softx/x2dfs.inc"

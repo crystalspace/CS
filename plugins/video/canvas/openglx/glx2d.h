@@ -73,16 +73,7 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   Pixmap EmptyPixmap;
 
   bool currently_full_screen;
-
-#ifdef XFREE86VM
-  XF86VidModeModeInfo orig_mode;
-  XF86VidModeModeInfo fs_mode;
-  Window fs_window;
-  int fs_width;
-  int fs_height;
-  int orig_x;
-  int orig_y;
-#endif
+  bool allow_canvas_resize;
 
 public:
   csGraphics2DGLX (iBase *iParent);
@@ -111,14 +102,9 @@ public:
    */
   bool CreateContext (int *desired_attributes);
 
-  void EnterFullScreen ();
-  void LeaveFullScreen ();
-
   virtual void AllowCanvasResize (bool iAllow);
 
-#ifdef XFREE86VM
-  void InitVidModes ();
-#endif
+#include "plugins/video/canvas/softx/x2dfs.h"
 };
 
 #endif // __GLX2D_H__

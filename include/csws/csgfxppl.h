@@ -193,6 +193,9 @@ private:
 
   /// Force redraw of the specified rectangle
   void Invalidate (csRect &rect);
+
+  /// The canvas has been resized, query frame width/height
+  void CanvasResize ();
 };
 
 #endif // __CSGFXPPL_H__

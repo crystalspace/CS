@@ -145,8 +145,8 @@ bool csApp::Initialize (const char *iConfigName)
   // Create the graphics pipeline
   GfxPpl.Initialize (System);
 
-  ScreenWidth = GfxPpl.G2D->GetWidth ();
-  ScreenHeight = GfxPpl.G2D->GetHeight ();
+  ScreenWidth = GfxPpl.FrameWidth;
+  ScreenHeight = GfxPpl.FrameHeight;
   bound.Set (0, 0, ScreenWidth, ScreenHeight);
   dirty.Set (bound);
   WindowListWidth = ScreenWidth / 3;
@@ -560,6 +560,25 @@ bool csApp::HandleEvent (iEvent &Event)
   Mouse.HandleEvent (Event);
   // Same about hint manager
   hints.HandleEvent (Event);
+
+  // If canvas size changes, adjust our size accordingly
+  if (Event.Type == csevBroadcast
+   && Event.Command.Code == cscmdContextResize)
+  {
+    GfxPpl.CanvasResize ();
+    int newScreenWidth = GfxPpl.FrameWidth;
+    int newScreenHeight = GfxPpl.FrameHeight;
+    int newxmax = bound.xmax;
+    int newymax = bound.ymax;
+    if (bound.xmax == ScreenWidth)
+      newxmax = newScreenWidth;
+    if (bound.ymax == ScreenHeight)
+      newymax = newScreenHeight;
+    ScreenWidth = newScreenWidth;
+    ScreenHeight = newScreenHeight;
+    SetRect (bound.xmin, bound.ymin, newxmax, newymax);
+    Invalidate (true);
+  }
 
   if ((Event.Type == csevKeyDown)
    && (Event.Key.Code == CSKEY_INS))

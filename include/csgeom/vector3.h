@@ -241,6 +241,10 @@ public:
 
   /// Scale this vector to length = 1.0;
   void Normalize ();
+
+  /// Query if the vector is zero
+  inline bool IsZero () const
+  { return (x == 0) && (y == 0) && (z == 0); }
 };
 
 #endif // __VECTOR3_H__

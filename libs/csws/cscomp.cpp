@@ -545,7 +545,8 @@ AbortDrag:
       ret = focused->HandleEvent (Event);
     else
       ret = false;
-  } else
+  }
+  else
   {
     if (IS_MOUSE_EVENT (Event))
     {
@@ -617,11 +618,8 @@ AbortDrag:
       if ((Event.Mouse.Button == 1)
        && (!GetState (CSS_FOCUSED))
        && (GetState (CSS_SELECTABLE)))
-      {
         Select ();
-        return true;
-      }
-      if ((Event.Mouse.Button == 2)
+      else if ((Event.Mouse.Button == 2)
        && (app->FocusOwner == this)
        && (!bound.ContainsRel (Event.Mouse.x, Event.Mouse.y)))
         app->Dismiss (cscmdCancel);
@@ -1475,7 +1473,7 @@ void csComponent::Line (float x1, float y1, float x2, float y2, int colindx)
   * all resulting rectangles.
   */
   csObjVector rect (8, 4);
-  csRect *lb = new csRect (QInt (x1), QInt (y1), QInt (x2), QInt (y2));
+  csRect *lb = new csRect (int (x1), int (y1), int (x2), int (y2));
   lb->Normalize ();
   lb->xmax += 1;
   lb->ymax += 1;

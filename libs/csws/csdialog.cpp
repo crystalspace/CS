@@ -222,9 +222,9 @@ void csDialog::SuggestSize (int &w, int &h)
 
 void csDialog::FixSize (int &newW, int &newH)
 {
-  int minw,minh;
   if ((GridX >= 0) && (GridY >= 0))
   {
+    int minw,minh;
     minw = (BorderWidth + GridX) * 2;
     minh = (BorderHeight + GridY) * 2;
     if (first)
@@ -232,13 +232,10 @@ void csDialog::FixSize (int &newW, int &newH)
       minw += first->bound.Width ();
       minh += first->bound.Height ();
     }
+    // Don't allow too small windows
+    if (newW < minw) newW = minw;
+    if (newH < minh) newH = minh;
   }
-  else
-    SuggestSize (minw, minh);
-
-  // Don't allow too small windows
-  if (newW < minw) newW = minw;
-  if (newH < minh) newH = minh;
 }
 
 void csDialog::SetBorderSize (int w, int h)

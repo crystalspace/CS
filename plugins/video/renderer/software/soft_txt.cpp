@@ -407,15 +407,13 @@ iGraphics3D *csTextureHandleSoftware::GetProcTextureInterface ()
 void csTextureHandleSoftware::Prepare ()
 {
   CreateMipmaps ();
-  if (flags & CS_TEXTURE_PROC)
-  {
-    if (texman->pfmt.PixelBytes == 1)
-      RemapProcToGlobalPalette (texman);
-    else
-      remap_texture ();
-    if (texman->main_txtmgr)
-      texman->main_txtmgr->Reprepare8BitProcs ();
-  }
+  if ((flags & CS_TEXTURE_PROC)
+   && (texman->pfmt.PixelBytes == 1))
+    RemapProcToGlobalPalette (texman);
+  else
+    remap_texture ();
+  if (texman->main_txtmgr)
+    texman->main_txtmgr->Reprepare8BitProcs ();
 }
 
 //----------------------------------------------- csTextureManagerSoftware ---//
@@ -709,9 +707,9 @@ void csTextureManagerSoftware::PrepareTextures ()
   for (i = 0; i < textures.Length (); i++)
   {
     csTextureHandleSoftware* txt = (csTextureHandleSoftware*)textures.Get (i);
-    if ((pfmt.PixelBytes == 1) && 
-       ((txt->GetFlags() & CS_TEXTURE_PROC) == CS_TEXTURE_PROC))
-      ((csTextureHandleSoftware*)txt)->RemapProcToGlobalPalette (this);
+    if ((pfmt.PixelBytes == 1)
+     && (txt->GetFlags() & CS_TEXTURE_PROC))
+      txt->RemapProcToGlobalPalette (this);
     else
       txt->remap_texture ();
   }

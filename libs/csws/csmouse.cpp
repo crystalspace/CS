@@ -60,6 +60,7 @@ csMouse::csMouse (csApp *iApp)
   ActiveCursor = NULL;
   memset (&Under, 0, sizeof (Under));
   Texture = NULL;
+  LastVirtual = false;
 }
 
 csMouse::~csMouse ()
@@ -77,8 +78,16 @@ void csMouse::Move (int x, int y)
 
 void csMouse::Draw (int Page)
 {
+  if (!ActiveCursor)
+    return;
+
+  bool virt = (VirtualX != NO_VIRTUAL_POS);
+  if (LastVirtual != virt)
+    SetCursor (csMouseCursorID (ActiveCursor->id));
+  LastVirtual = virt;
+
   // Draw mouse pointer
-  if (ActiveCursor && AppFocused && (Visible == 0) && (!invisible))
+  if (AppFocused && (Visible == 0) && (!invisible))
     if (VirtualX != NO_VIRTUAL_POS)
       ActiveCursor->Draw (VirtualX, VirtualY, Under [Page]);
     else

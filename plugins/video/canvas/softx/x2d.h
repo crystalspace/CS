@@ -93,16 +93,7 @@ class csGraphics2DXLib : public csGraphics2D, public iEventPlug
   UShort* sim_lt16;		// 16-bit lookup table (with 8-bit index) for simulated depth
   
   bool currently_full_screen;
-
-#ifdef XFREE86VM
-  XF86VidModeModeInfo orig_mode;
-  XF86VidModeModeInfo fs_mode;
-  Window fs_window;
-  int fs_width;
-  int fs_height;
-  int orig_x;
-  int orig_y;
-#endif
+  bool allow_canvas_resize;
 
   // The event outlet
   iEventOutlet *EventOutlet;
@@ -157,19 +148,15 @@ public:
 
   virtual void AllowCanvasResize (bool iAllow);
 
-  void EnterFullScreen ();
-  void LeaveFullScreen ();
-
-#ifdef XFREE86VM
-  void InitVidModes ();
-#endif
-
   //------------------------- iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
   virtual unsigned QueryEventPriority (unsigned /*iType*/)
   { return 150; }
+
+#include "x2dfs.h"
+
 };
 
 #endif // __X2D_H__
