@@ -42,8 +42,8 @@ CS_IMPLEMENT_PLUGIN
 enum
 {
   XMLTOKEN_PLUGIN = 1,
-  XMLTOKEN_SCALE,
-  XMLTOKEN_HEIGHTMAP,
+  XMLTOKEN_TERRAFORMER,
+  XMLTOKEN_SAMPLEREGION,
   XMLTOKEN_COLOR,
   XMLTOKEN_MATERIAL,
   XMLTOKEN_FACTORY,
@@ -85,8 +85,8 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
-  xmltokens.Register ("scale", XMLTOKEN_SCALE);
-  xmltokens.Register ("heightmap", XMLTOKEN_HEIGHTMAP);
+  xmltokens.Register ("terraformer", XMLTOKEN_TERRAFORMER);
+  xmltokens.Register ("sampleregion", XMLTOKEN_SAMPLEREGION);
   return true;
 }
 
@@ -136,7 +136,36 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
           synldr->ReportError ("crystalspace.terrain.loader.factory",
             node, "Could not query iTerrainFactoryState from %s", pluginname);
         }
+        break;
       }
+      case XMLTOKEN_TERRAFORMER:
+      {
+        const char* name = child->GetContentsValue ();
+        csRef<iTerraFormer> form = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+	  name, iTerraFormer);
+	if (form == 0) 
+	{
+          synldr->ReportError ("crystalspace.terrain.factory.loader",
+            child, "Unable to find TerraFormer %s", name);
+          return false;
+	}
+        state->SetTerraFormer (form);
+        break;
+      }
+      case XMLTOKEN_SAMPLEREGION:
+      {
+        csBox3 box;
+        if (!synldr->ParseBox (child, box)) 
+	{
+          synldr->ReportError ("crystalspace.terrain.factory.loader",
+            child, "Unable to parse sampleregion");
+          return false;
+	}
+        state->SetSamplerRegion (csBox2(box.MinX(), box.MinY(), 
+		                        box.MaxX(), box.MaxY()));
+        break;
+      }
+      /*
       case XMLTOKEN_SCALE:
       {
         csVector3 v;
@@ -193,6 +222,7 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
         }
         break;
       }
+      */
       default:
         synldr->ReportError ("crystalspace.terrain.factory.loader",
           child, "Unknown token!");

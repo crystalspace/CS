@@ -161,10 +161,10 @@ void csChunkLodTerrainFactory::GetRadius (csVector3& rad, csVector3& c)
   rad = (bbox.Max () - bbox.Min ()) * 0.5f;
 }
 
-void csChunkLodTerrainFactory::SetScale (const csVector3& s)
+/*void csChunkLodTerrainFactory::SetScale (const csVector3& s)
 {
   scale = s;
-}
+}*/
 
 void csChunkLodTerrainFactory::ComputeError (int i, int j, int di, int dj,
 	int n, int w)
@@ -192,7 +192,77 @@ void csChunkLodTerrainFactory::ComputeError (int i, int j, int di, int dj,
   }
 }
 
-bool csChunkLodTerrainFactory::SetHeightMap (const csArray<float>& data,
+void csChunkLodTerrainFactory::SetTerraFormer (iTerraFormer *form)
+{
+  terraform = form;
+}
+
+iTerraFormer *csChunkLodTerrainFactory::GetTerraFormer ()
+{
+  return terraform;
+}
+
+void csChunkLodTerrainFactory::SetSamplerRegion (
+  const csBox2& region)
+{
+  // @@@ Add better control over resolution?
+  int resolution = region.MaxX ()-region.MinX ();
+  // Make the resolution conform to n^2+1
+  resolution = csLog2(resolution);
+  resolution = pow(2, resolution)+1;
+
+  hm_x = hm_y = resolution;
+  fullsample = terraform->GetSampler (region, resolution);
+
+  datamap.SetLength (hm_x * hm_y);
+
+  int i, j;
+  for (j = 0; j < hm_y; j ++)
+  {
+    for (i = 0; i < hm_x; i ++)
+    {
+      int pos = i + j * hm_x;
+
+      datamap[pos].pos = fullsample->SampleVector3 (vertex_name)[pos];
+      datamap[pos].norm = fullsample->SampleVector3 (normal_name)[pos];
+      datamap[pos].tex = fullsample->SampleVector2 (texcors_name)[pos];
+    }
+  }
+
+  int a, b, c, s;
+  for (a = c = 1, b = 2, s = 0; a != hm_x-1; a = c = b, b *= 2, s = hm_x)
+  {
+    for (j = a; j < hm_x-1; j += b)
+    {
+      for (i = 0; i < hm_x; i += b)
+      {
+        ComputeError (i, j, 0, a, s, hm_x);
+        ComputeError (j, i, a, 0, s, hm_x);
+      }
+    }
+
+    for (j = a; j < hm_x-1; c = -c, j += b)
+    {
+      for (i = a; i < hm_x-1; c = -c, i += b)
+      {
+        ComputeError (i, j, a, c, hm_x, hm_x);
+      }
+    }
+  }
+
+  /*int max_error = csLog2 (hm_x - 1) - csLog2 (MIN_TERRAIN);
+  float error = pow (2.0, max_error);*/
+  float error = datamap[(hm_x*hm_y)>>1].error/16;
+  root = new MeshTreeNode (this, 0, 0, hm_x, hm_y, error);
+}
+
+const csBox2& csChunkLodTerrainFactory::GetSamplerRegion ()
+{
+  return fullsample->GetRegion ();
+}
+
+
+/*bool csChunkLodTerrainFactory::SetHeightMap (const csArray<float>& data,
 	int w, int h)
 {
   CS_ASSERT (w == h);
@@ -279,7 +349,7 @@ bool csChunkLodTerrainFactory::SetHeightMap (iImage* map)
     }
   }
   return SetHeightMap (image_data, map->GetWidth(), map->GetHeight());
-}
+}*/
 
 bool csChunkLodTerrainFactory::SaveState (const char *filename)
 {
@@ -293,19 +363,13 @@ bool csChunkLodTerrainFactory::RestoreState (const char *filename)
 
 csVector3 csChunkLodTerrainFactory::CollisionDetect (const csVector3 &p)
 {
-  int i = (int)(p.x / scale.x + (hm_x >> 1));
-  float i_delta = p.x / scale.x + (hm_x >> 1) - i;
-  int j = (int)(-p.z / scale.z + (hm_y >> 1));
-  float j_delta =  -p.z / scale.z + (hm_y >> 1) - j;
-  if (i < 0 || i >= hm_x-1 || j < 0 || j >= hm_y-1) 
-    return p;
+  csVector3 d;
+  terraform->SampleVector3 (vertex_name, p.x, p.z, d);
 
-  float d1 = datamap[i+j*hm_x].pos.y * (1.0-i_delta) + 
-             datamap[(i+1)+j*hm_x].pos.y * i_delta;
-  float d2 = datamap[i+(j+1)*hm_x].pos.y * (1.0-i_delta) +
-             datamap[(i+1)+(j+1)*hm_x].pos.y * i_delta;
-  float d = d1 * (1.0 - j_delta) + d2 * j_delta + 2;
-  return csVector3 (p.x, (d > p.y) ? d : p.y, p.z);
+  // @@@ The +2 seems pretty ugly, but seems to be needed, at least for
+  // walktest
+  d.y += 2;
+  return (d.y > p.y)?d:p;
 }
 
 
@@ -822,7 +886,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
     rm->z_buf_mode = CS_ZBUF_TEST;
     rm->mixmode = CS_FX_COPY;
     rm->variablecontext = nodeWrapper->svcontext;
-    rm->indexstart = 0;
+    rm->indexstart = 1;
     rm->indexend = node->Count ();
     rm->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
     // meshes[len].meshtype = CS_MESHTYPE_LINESTRIP;
@@ -847,7 +911,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
         rm->z_buf_mode = CS_ZBUF_TEST;
         rm->mixmode = CS_FX_COPY;
 	rm->variablecontext = nodeWrapper->svcontext;
-        rm->indexstart = 0;
+        rm->indexstart = 1;
         rm->indexend = node->Count ();
         rm->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
 	returnMeshes->Push (rm);
@@ -902,7 +966,7 @@ csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (
     rm->z_buf_mode = CS_ZBUF_TEST;
     rm->mixmode = CS_FX_COPY;
     rm->variablecontext = rootNode->svcontext;
-    rm->indexstart = 0;
+    rm->indexstart = 1;
     rm->indexend = rootNode->factoryNode->Count ();
     rm->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
     returnMeshes->Push (rm);
@@ -1036,7 +1100,7 @@ bool csChunkLodTerrainObject::SetMaterialMap (iImage* map)
 
 bool csChunkLodTerrainObject::SetLODValue (const char* parameter, float value)
 {
-  if (strcmp (parameter, "lod distance") == 0)
+  if (strcmp (parameter, "splatting distance") == 0)
   {
     lod_distance = value;
     return true;
@@ -1046,13 +1110,14 @@ bool csChunkLodTerrainObject::SetLODValue (const char* parameter, float value)
     error_tolerance = value;
     return true;
   }
+
   else
     return false;
 }
 
 float csChunkLodTerrainObject::GetLODValue (const char* parameter) const
 {
-  if (strcmp (parameter, "lod distance") == 0)
+  if (strcmp (parameter, "splatting distance") == 0)
   {
     return lod_distance;
   }

@@ -122,7 +122,37 @@ public:
   virtual csPtr<iTerraSampler> GetSampler (csBox2 region, 
                                            unsigned int resolution);
 
-  
+  /**
+   * Sample float data.
+   * Allowed types:
+   * heights
+   */ 
+  virtual bool SampleFloat (csStringID type, float x, float z, 
+    float &value);
+
+  /**
+   * Sample csVector2 data.
+   * No allowed types (will return false)
+   */ 
+  virtual bool SampleVector2 (csStringID type, float x, float z, 
+    csVector2 &value);
+
+  /**
+   * Sample csVector3 data.
+   * Allowed types:
+   * vertices
+   */ 
+  virtual bool SampleVector3 (csStringID type, float x, float z, 
+    csVector3 &value);
+
+  /**
+   * Sample integer data.
+   * No allowed types (will return false)
+   */ 
+  virtual bool SampleInteger (csStringID type, float x, float z, 
+    int &value);
+
+
   // ------------- iComponent implementation -------------
 
   /// Initializes this object
@@ -216,7 +246,7 @@ public:
   /**
    * Sample 3d vector data.
    * Allowed types:
-   * positions
+   * vertices
    * normals
    */ 
   virtual const csVector3 *SampleVector3 (csStringID type);

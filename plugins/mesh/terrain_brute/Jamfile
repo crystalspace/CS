@@ -1,0 +1,3 @@
+SubDir TOP plugins mesh terrain_brute ;
+
+SubInclude TOP plugins mesh terrain_brute object ;

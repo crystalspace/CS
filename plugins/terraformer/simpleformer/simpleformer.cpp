@@ -32,6 +32,96 @@
 CS_IMPLEMENT_PLUGIN
 
 //////////////////////////////////////////////////////////////////////////
+//                           Filtering helpers
+//////////////////////////////////////////////////////////////////////////
+
+// Looks up height with bilinear interpolation
+float BiLinearData (float* data, int width, int height, float x, float z)
+{
+  // Calculate surrounding integer indices
+  int lowX = floor (x), lowZ = floor (z);
+  int highX = ceil (x), highZ = ceil (z);
+
+  // Clamp coordinates to heightmap size
+  lowX = MAX (MIN (lowX, width-1), 0);
+  highX = MAX (MIN (highX, width-1), 0);
+  lowZ = MAX (MIN (lowZ, height-1), 0);
+  highZ = MAX (MIN (highZ, height-1), 0);
+
+  // Grab height data at the four points
+  float height1 = 0, height2 = 0, height3 = 0, height4 = 0;
+  height1 = data[lowX+lowZ*width];
+  height2 = data[highX+lowZ*width];
+  height3 = data[lowX+highZ*width];
+  height4 = data[highX+highZ*width];
+
+  // Blend between the heights (standard bilinear)
+  return height1*(1-(x-lowX))*(1-(z-lowZ))+
+         height2*(x-lowX)*(1-(z-lowZ))+
+         height3*(1-(x-lowX))*(z-lowZ)+
+         height4*(x-lowX)*(z-lowZ);
+}
+
+// Bicubic weight function
+float WeightFunction (float x)
+{
+  float a = (x+2)<0?0:(x+2);
+  float b = (x+1)<0?0:(x+1);
+  float c = (x+0)<0?0:(x+0);
+  float d = (x-1)<0?0:(x-1);
+  return (a*a*a - 4*b*b*b + 6*c*c*c - 4*d*d*d)/6.0;
+}
+
+// Looks up height with bicubic interpolation
+float BiCubicData (float* data, int width, int height, float x, float z)
+{
+  float result = 0;
+
+  float deltaX = x-floor (x);
+  float deltaZ = z-floor (z);
+
+  // If deltaX/Z is close to 0, we're pretty much 
+  // right on a heightmap sample point, which means it's useless to blend
+  if (fabs (deltaX) <= SMALL_EPSILON && 
+      fabs (deltaZ) <= SMALL_EPSILON)
+  {
+    int intX = floor(x+0.5);
+    int intZ = floor(z+0.5);
+    intX = MAX (MIN (intX, width-1), 0);
+    intZ = MAX (MIN (intZ, height-1), 0);
+    return data[(int)intX+(int)intZ*width];
+  }
+
+  // Grab 16 surrounding heights and blend them
+  for (int i=0; i<4; ++i)
+  {
+    for (int j=0; j<4; ++j)
+    {
+      // Calculate integer position
+      int intX = floor(x)-1+i;
+      int intZ = floor(z)-1+j;
+
+      // Clamp coordinates to heightmap size
+      intX = MAX (MIN (intX, width-1), 0);
+      intZ = MAX (MIN (intZ, height-1), 0);
+
+      // Grab the height
+      float height = data[intX+intZ*width];
+
+      // Weight the height using a cubic weight function
+      height *= WeightFunction (i-1.0f-deltaX) * 
+                WeightFunction (j-1.0f-deltaZ);
+
+      // Add the weighted height to the result
+      result += height;
+    }
+  }
+
+  // Return the resulting height
+  return result;
+}
+
+//////////////////////////////////////////////////////////////////////////
 //                             csSimpleFormer
 //////////////////////////////////////////////////////////////////////////
 
@@ -92,9 +182,6 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
     // It's a RGBA image
     csRGBpixel *data = (csRGBpixel *)heightmap->GetImageData ();
 
-    // Keep an index to avoid uneccesary x+y*w calculations
-    int idx = 0;
-
     unsigned int x, y;
     // Loop through the data
     for (y = 0; y < height; ++y)
@@ -102,8 +189,10 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
       for (x = 0; x < width; ++x)
       {
         // Grab the intensity as height
-        heightData[idx] = data[idx].Intensity ()/255.0;
-        idx++;
+        // We're reversing Y to later get negative Y in heightmap image 
+        // to positive Z in terrain
+        heightData[x+(height-y-1)*width] = 
+          data[x+y*width].Intensity ()/255.0;
       }
     }
   }
@@ -114,7 +203,9 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
     csRGBpixel *palette = heightmap->GetPalette ();
 
     // Keep an index to avoid uneccesary x+y*w calculations
-    int idx = 0;
+    // Start at last line, since we're gonna want it reversed in Y later
+    // (negative Y in heightmap image goes to positive Z in terrain)
+    int idx = (height-1)*width;
 
     unsigned int x, y;
     // Loop through the data
@@ -123,8 +214,10 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
       for (x = 0; x < width; ++x)
       {
         // Grab the intensity as height
-        heightData[idx] = palette[data[idx]].Intensity () / 255.0;
-        idx++;
+        // We're reversing Y to later get negative Y in heightmap image 
+        // to positive Z in terrain
+        heightData[x+(height-y-1)*width] = 
+          palette[data[x+y*width]].Intensity () / 255.0;
       }
     }
   }
@@ -166,6 +259,47 @@ csPtr<iTerraSampler> csSimpleFormer::GetSampler (csBox2 region,
   return new csSimpleSampler (this, region, resolution);
 }
 
+bool csSimpleFormer::SampleFloat (csStringID type, float x, float z, 
+                                  float &value)
+{
+  if (type == stringHeights)
+  {
+    // Transform input coordinates to heightmap space.
+    // See CachePositions for details
+    x = ((x-offset.x)/scale.x+1)*(width/2);
+    z = ((z-offset.z)/scale.z+1)*(height/2);
+
+    // Calculate height and return it
+    value = BiLinearData (heightData, width, height, x, z) * 
+      scale.y + offset.y;
+    return true;
+  }
+  return false;
+}
+
+bool csSimpleFormer::SampleVector2 (csStringID type, float x, float z, 
+                                    csVector2 &value)
+{
+  return false;
+}
+
+bool csSimpleFormer::SampleVector3 (csStringID type, float x, float z, 
+                                    csVector3 &value)
+{
+  if (type == stringVertices)
+  {
+    value = csVector3 (x, 0, z);
+    SampleFloat (stringHeights, x, z, value.y);
+    return true;
+  }
+  return false;
+}
+
+bool csSimpleFormer::SampleInteger (csStringID type, float x, float z, 
+                                    int &value)
+{
+  return false;
+}
 
 //////////////////////////////////////////////////////////////////////////
 //                            csSimpleSampler
@@ -199,11 +333,6 @@ csSimpleSampler::~csSimpleSampler ()
   // Do a cleanup
   Cleanup ();
   SCF_DESTRUCT_IBASE ();
-}
-
-inline int iround(double x)
-{
-  return (int)floor(x);
 }
 
 void csSimpleSampler::CachePositions ()
@@ -270,50 +399,31 @@ void csSimpleSampler::CachePositions ()
     float xh = minCorner.x-sampleDistanceHeight.x;
     for (unsigned int j=0; j<resolution+2; ++j)
     {
-      unsigned int ix = iround (xh);
-      unsigned int iz = iround (zh);
-      
       // If we're at the corners, we'll just move along
       if ((i>0 || j>0) && (i>0 || j<resolution+1) &&
           (i<resolution+1 || j>0) && (i<resolution+1 || j<resolution+1))
       {
-        // Check if we're inside the heightmap (if <0 it will wrap to >size)
-        if (ix<terraFormer->width && iz<terraFormer->height)
+        // If we're not on the extra edge, store the position in
+        // our output buffer, and if we are, store it in the edge buffer
+        if (i>0 && i<resolution+1 && j>0 && j<resolution+1)
         {
-          // If we're not on the extra edge, store the position in
-          // our output buffer, and if we are, store it in the edge buffer
-          if (i>0 && i<resolution+1 && j>0 && j<resolution+1)
-          {
-            positions[posIdx++] = 
-              csVector3 (xr,
-                        terraFormer->heightData[ix+iz*terraFormer->width]*
-                          terraFormer->scale.y + terraFormer->offset.y,
-                         zr);
-          }
-	  else
-	  {
-            edgePositions[edgeIdx++] = 
-              csVector3 (xr,
-                        terraFormer->heightData[ix+iz*terraFormer->width]*
-                          terraFormer->scale.y + terraFormer->offset.y,
-                         zr);
-          }
+          positions[posIdx++] = 
+            csVector3 (xr,
+                        BiCubicData (terraFormer->heightData,
+                                     terraFormer->width,
+                                     terraFormer->height, xh, zh)*
+                        terraFormer->scale.y + terraFormer->offset.y,
+                        zr);
         }
 	else
 	{
-          // If we're not on the extra edge, store the position (with height
-          // 0 since we're outside the heightmap) in our output buffer, and 
-          // if we are, store it in the edge buffer
-          if (i>0 && i<resolution+1 && j>0 && j<resolution+1)
-          {
-            positions[posIdx++] = 
-              csVector3 (xr, terraFormer->offset.y, zr);
-          }
-	  else
-	  {
-            edgePositions[edgeIdx++] = 
-              csVector3 (xr, terraFormer->offset.y, zr);
-          }
+          edgePositions[edgeIdx++] = 
+            csVector3 (xr,
+                        BiCubicData (terraFormer->heightData,
+                                     terraFormer->width,
+                                     terraFormer->height, xh, zh)*
+                          terraFormer->scale.y + terraFormer->offset.y,
+                        zr);
         }
       }
 

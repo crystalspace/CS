@@ -134,13 +134,26 @@
     <params />
   </meshfact>
 
+  <addon>
+    <plugin>crystalspace.terraformer.simple.loader</plugin>
+    <params>
+      <name>simple</name>
+      <heightmap>/lev/terrain/heightmap_257x257.png</heightmap>
+      <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
+      <scale x="256" y="30" z="256" />
+    </params>
+  </addon>
+
   <meshfact name="TerrainFact">
     <plugin>terrainFact</plugin>
     <params>
       <plugin>crystalspace.mesh.object.terrain.chunklod</plugin>
-      <scale x="1" y="30" z="1" />
-      <heightmap image="/lev/terrain/heightmap_257x257.png"/>
-      <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
+      <!--<plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>-->
+      <terraformer>simple</terraformer>
+      <sampleregion>
+        <min x="-128" y="-128" />
+        <max x="128" y="128" />
+      </sampleregion>
     </params>
   </meshfact>
 
@@ -177,8 +190,13 @@
 	  <material>Marble</material>
 	  <material>Stone</material>
 	</materialpalette>
-	<lodvalue name="lod distance">200</lodvalue>
+	<lodvalue name="splatting distance">200</lodvalue>
+  <!--For chunklod-->
 	<lodvalue name="error tolerance">1</lodvalue>
+	<!--For bruteblock-->
+  <lodvalue name="block resolution">16</lodvalue>
+  <lodvalue name="block split distance">8</lodvalue>
+  <lodvalue name="minimum block size">32</lodvalue>
 	<materialmap image="/lev/terrain/materialmap.png" />
       </params>
       <move> 

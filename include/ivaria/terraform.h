@@ -45,6 +45,42 @@ struct iTerraFormer : public iBase
    */
   virtual csPtr<iTerraSampler> GetSampler (csBox2 region, 
     unsigned int resolution) = 0;
+
+  /**
+   * Sample float data at a given spot on the terrain.
+   * Note that this should only be used when single heights are needed.
+   * For multiple samples in a grid a sampler should be used.
+   * Returns true if the requested type was returned, and false otherwise.
+   */
+  virtual bool SampleFloat (csStringID type, float x, float z, 
+    float &value) = 0;
+
+  /**
+   * Sample csVector2 data at a given spot on the terrain.
+   * Note that this should only be used when single samples are needed.
+   * For multiple samples in a grid a sampler should be used.
+   * Returns true if the requested type was returned, and false otherwise.
+   */
+  virtual bool SampleVector2 (csStringID type, float x, float z, 
+    csVector2 &value) = 0;
+
+  /**
+   * Sample csVector2 data at a given spot on the terrain.
+   * Note that this should only be used when single samples are needed.
+   * For multiple samples in a grid a sampler should be used.
+   * Returns true if the requested type was returned, and false otherwise.
+   */
+  virtual bool SampleVector3 (csStringID type, float x, float z, 
+    csVector3 &value) = 0;
+
+  /**
+   * Sample integer data at a given spot on the terrain.
+   * Note that this should only be used when single samples are needed.
+   * For multiple samples in a grid a sampler should be used.
+   * Returns true if the requested type was returned, and false otherwise.
+   */
+  virtual bool SampleInteger (csStringID type, float x, float z, 
+    int &value) = 0;
 };
 
 

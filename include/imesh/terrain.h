@@ -25,6 +25,8 @@
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
 
+#include "ivaria/terraform.h"
+
 #include "iengine/material.h"
 
 struct iImage;
@@ -117,16 +119,25 @@ SCF_VERSION (iTerrainFactoryState, 0, 0, 1);
  */
 struct iTerrainFactoryState : public iBase
 {
-  /// Set/Get the 3 axis scale of the terrain
-  virtual void SetScale (const csVector3& scale) = 0;
-  virtual const csVector3& GetScale () const = 0;
 
   /**
-   * Sets the heightmap for heightvalues
-   * Note x and y must be 2^n + 1 and usually they must be equal
+   * The terraformer defines the height, scale and other properties
+   * related to the formation and structure of the terrain.
+   * The terrain rendering plugin will sample from this data model
+   * based on its algorithm.  The terraformer can be shared between
+   * plugins, especially plugins which use the information for 
+   * vegatation rendering.
    */
-  virtual bool SetHeightMap (const csArray<float>& data, int x, int y) = 0;
-  virtual bool SetHeightMap (iImage* map) = 0;
+  virtual void SetTerraFormer (iTerraFormer *form) = 0;
+  virtual iTerraFormer *GetTerraFormer () = 0;
+
+  /**
+   * This specifies the max region the renderer will sample from.  This 
+   * is more of a hint to the renderer as it may try to optimally sample
+   * only from regions near the camera. 
+   */
+  virtual void SetSamplerRegion (const csBox2& region) = 0;
+  virtual const csBox2& GetSamplerRegion () = 0;
 
   /**
    * Save/Restore preprocessing information, the algorithm will 

@@ -115,6 +115,9 @@ public:
   };
   csArray<Data> datamap;
   int hm_x, hm_y;
+  
+  csRef<iTerraFormer> terraform;
+  csRef<iTerraSampler> fullsample;
 
   csStringID vertex_name, compressed_vertex_name; 
   csStringID normal_name, compressed_normal_name;
@@ -221,24 +224,24 @@ public:
   } scfiObjectModel;
   friend struct eiObjectModel;
 
-  void SetScale (const csVector3& scale);
-  const csVector3& GetScale () const { return scale; }
-  bool SetHeightMap (const csArray<float>& data, int x, int y);
-  bool SetHeightMap (iImage* map);
+  void SetTerraFormer (iTerraFormer *form);
+  iTerraFormer *GetTerraFormer ();
+  void SetSamplerRegion (const csBox2& region);
+  const csBox2& GetSamplerRegion ();
   bool SaveState (const char *filename);
   bool RestoreState (const char *filename);
 
   struct eiTerrainFactoryState : public iTerrainFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csChunkLodTerrainFactory);
-    virtual void SetScale (const csVector3& scale)
-    { scfParent->SetScale (scale); }
-    virtual const csVector3& GetScale () const
-    { return scfParent->GetScale (); }
-    virtual bool SetHeightMap (const csArray<float>& data, int x, int y)
-    { return scfParent->SetHeightMap (data, x, y); }
-    virtual bool SetHeightMap (iImage* map)
-    { return scfParent->SetHeightMap (map); }
+    void SetTerraFormer (iTerraFormer* form)
+    { scfParent->SetTerraFormer (form); }
+    iTerraFormer* GetTerraFormer ()
+    { return scfParent->GetTerraFormer (); }
+    void SetSamplerRegion (const csBox2& region)
+    { scfParent->SetSamplerRegion (region); }
+    const csBox2& GetSamplerRegion ()
+    { return scfParent->GetSamplerRegion (); }
     virtual bool SaveState (const char *filename)
     { return scfParent->SaveState (filename); }
     virtual bool RestoreState (const char *filename) 
