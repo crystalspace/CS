@@ -5,16 +5,17 @@
 # checks if CRYSTAL environment variable is set, and after that if it tries to
 # find Crystal Space.  If all else fails, it just looks in /usr/local/crystal.
 # Emits an error if it can not locate Crystal Space or it was fed it a bad
-# (optional) path.  Remember to do CFLAGS="$CFLAGS $CRYSTAL_CFLAGS" and
-# LDFLAGS=$"LDFLAGS $CRYSTAL_LIBS" so you can use the information provided by
-# this script.
+# (optional) path.  Exports the variables CRYSTAL_VERSION, CRYSTAL_CFLAGS,
+# CRYSTAL_LIBS, and CRYSTAL_INCLUDE_DIR.  Remember to do CFLAGS="$CFLAGS
+# $CRYSTAL_CFLAGS" and LDFLAGS=$"LDFLAGS $CRYSTAL_LIBS" so you can use the
+# information provided by this script.
 
 # Matze Braun <MatzeBraun@gmx.de>
 # Patrick McFarland (Diablo-D3) <unknown@panax.com>
 
 dnl helper function
 AC_DEFUN([CS_PATH_CRYSTAL_HELPER],
-[# Get the cflags and libraries from the cs-config script
+[# Get the cflags, libraries, and include-dir from the cs-config script.
 AC_ARG_WITH([cs-prefix],
     [AC_HELP_STRING([--with-cs-prefix=PFX],
 	[Prefix where Crystal Space is installed (optional)])],
@@ -71,6 +72,7 @@ then
     CRYSTAL_CFLAGS=`$CSCONF $csconf_args --cxxflags $4`
     CRYSTAL_LIBS=`$CSCONF $csconf_args --libs $4`
     CRYSTAL_VERSION=`$CSCONF --version $4`
+    CRYSTAL_INCLUDE_DIR=`$CSCONF --includedir $4`
 
     cs_major_version=`$CSCONF $cs_args --version | \
        sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)?/\1/'`
@@ -152,31 +154,36 @@ else
    CRYSTAL_CFLAGS=""
    CRYSTAL_VERSION=""
    CRYSTAL_LIBS=""
+   CRYSTAL_INCLUDE_DIR=""
    ifelse([$3], [], [:], [$3])
 fi
 ])
 
 dnl CS_PATH_CRYSTAL([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND
 dnl    [, LIBS]]]])
-dnl Test for Crystal Space, and set CRYSTAL_VERSION, CRYSTAL_CFLAGS, and
-dnl CRYSTAL_LIBS.  Also exports these variables via AC_SUBST().
+dnl Test for Crystal Space, and set CRYSTAL_VERSION, CRYSTAL_CFLAGS,
+dnl CRYSTAL_LIBS, and CRYSTAL_INCLUDE_DIR.  Also exports these variables via
+dnl AC_SUBST().
 dnl
 AC_DEFUN([CS_PATH_CRYSTAL],[
 CS_PATH_CRYSTAL_HELPER([$1],[$2],[$3],[$4])
 AC_SUBST([CRYSTAL_CFLAGS])
 AC_SUBST([CRYSTAL_LIBS])
 AC_SUBST([CRYSTAL_VERSION])
+AC_SUBST([CRYSTAL_INCLUDE_DIR])
 ])
 
 dnl CS_PATH_CRYSTAL_JAM([MINIMUM-VERSION, [ACTION-IF-FOUND
 dnl    [, ACTION-IF-NOT-FOUND [, LIBS]]]])
-dnl Test for Crystal Space, and set CRYSTAL_VERSION, CRYSTAL_CFLAGS, and
-dnl CRYSTAL_LIBS.  Also exports these variabls via CS_JAMCONFIG_PROPERTY() as
-dnl the Jam variables CRYSTAL.VERSION, CRYSTAL.CFLAGS, and CRYSTAL.LFLAGS.
+dnl Test for Crystal Space, and set CRYSTAL_VERSION, CRYSTAL_CFLAGS,
+dnl CRYSTAL_LIBS, and CRYSTAL_INCLUDE_DIR.  Also exports these variabls via
+dnl CS_JAMCONFIG_PROPERTY() as the Jam variables CRYSTAL.VERSION,
+dnl CRYSTAL.CFLAGS, CRYSTAL.LFLAGS, and CRYSTAL.INCLUDE_DIR.
 dnl
 AC_DEFUN([CS_PATH_CRYSTAL_JAM],[
 CS_PATH_CRYSTAL_HELPER([$1],[$2],[$3],[$4])
 CS_JAMCONFIG_PROPERTY([CRYSTAL.CFLAGS], [$CRYSTAL_CFLAGS])
 CS_JAMCONFIG_PROPERTY([CRYSTAL.LFLAGS], [$CRYSTAL_LIBS])
 CS_JAMCONFIG_PROPERTY([CRYSTAL.VERSION], [$CRYSTAL_VERSION])
+CS_JAMCONFIG_PROPERTY([CRYSTAL.INCLUDE_DIR], [$CRYSTAL_INCLUDE_DIR])
 ])

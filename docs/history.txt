@@ -19,6 +19,9 @@ chronological order.
 	  Jam-specific modifications to "prefix" and "exec_prefix" local to
 	  itself, rather than polluting the global $prefix and $exec_prefix
 	  variables, which might needed unmolested elsewhere.
+	- Eric Sunshine augmented crystal.m4 so that it also exports
+	  CRYSTAL_INCLUDE_DIR (make) and CRYSTAL.INCLUDE_DIR (jam).  This is
+	  the value returned by cs-config's --includedir option.
 4-Dec-2003
         - Steven Geens added a odedynam function for mesh<->plane collisions.
 3-Dec-2003
