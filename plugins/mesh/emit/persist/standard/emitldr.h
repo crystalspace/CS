@@ -109,7 +109,7 @@ private:
   csRef<iReporter> reporter;
   csStringHash xmltokens;
 
-  iEmitGen3D* ParseEmit (iDocumentNode* node,
+  csRef<iEmitGen3D> ParseEmit (iDocumentNode* node,
 	      iEmitFactoryState *fstate, float* weight);
 
 public:

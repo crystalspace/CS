@@ -251,7 +251,7 @@ struct iEmitCylinderTangent : public iEmitGen3D
     float& min, float& max) = 0;
 };
 
-SCF_VERSION (iEmitFactoryState, 0, 0, 1);
+SCF_VERSION (iEmitFactoryState, 0, 0, 2);
 
 /**
  * This interface describes the API for the emitter mesh factory object.
@@ -273,24 +273,23 @@ SCF_VERSION (iEmitFactoryState, 0, 0, 1);
 struct iEmitFactoryState : public iBase
 {
   /// create an emitter, you have to set the content
-  virtual iEmitFixed* CreateFixed() = 0;
+  virtual csRef<iEmitFixed> CreateFixed() = 0;
   /// create an emitter
-  virtual iEmitBox* CreateBox() = 0;
+  virtual csRef<iEmitBox> CreateBox() = 0;
   /// create an emitter
-  virtual iEmitSphere* CreateSphere() = 0;
+  virtual csRef<iEmitSphere> CreateSphere() = 0;
   /// create an emitter
-  virtual iEmitCone* CreateCone() = 0;
+  virtual csRef<iEmitCone> CreateCone() = 0;
   /// create an emitter
-  virtual iEmitMix* CreateMix() = 0;
+  virtual csRef<iEmitMix> CreateMix() = 0;
   /// create an emitter
-  virtual iEmitLine* CreateLine() = 0;
+  virtual csRef<iEmitLine> CreateLine() = 0;
   /// create an emitter
-  virtual iEmitCylinder* CreateCylinder() = 0;
+  virtual csRef<iEmitCylinder> CreateCylinder() = 0;
   /// create an emitter
-  virtual iEmitSphereTangent* CreateSphereTangent() = 0;
+  virtual csRef<iEmitSphereTangent> CreateSphereTangent() = 0;
   /// create an emitter
-  virtual iEmitCylinderTangent* CreateCylinderTangent() = 0;
-
+  virtual csRef<iEmitCylinderTangent> CreateCylinderTangent() = 0;
 };
 
 SCF_VERSION (iEmitState, 0, 0, 1);

@@ -1008,22 +1008,27 @@ only relocated, not removed.
 
 Forbidding direct manipulation of an @samp{iImage}'s pixel data has the 
 following consequences:
+
 @itemize bullet
 @item
 The @code{Clone()} function was removed. The
 @samp{csImageMemory} class provides a constructor that copies the pixel data
 from another @samp{iImage} object, providing a functionality equal to 
 @code{Clone()}.
+
 @item
 To edit the pixel data of an image, create a clone of an image (e.g. a
 @samp{csImageMemory} as mentioned above) and manipulate the data in the newly
 cerated instance.
+
 @item
 If the image data is needed in another
 format, as the @code{SetFormat()} call has been removed from the interface.
+
 @item
 The image editing functionality found in methods such as @code{Rescale()},
 @code{Sharpen()} was moved into the @samp{csImageManipulate} class.
+
 @item
 The @code{CopyXXX()} method that copied an image into another are now provided
 by @samp{csImageMemory}.
@@ -1051,11 +1056,11 @@ are also removed.
 @samp{iDataBuffer} object, instead of separate @samp{buffer} and @samp{size}
 parameters.
 
-@subheading @samp{iRenderBuffer} Renderer Independency
+@subheading @samp{iRenderBuffer} Generalization
 
 The @samp{iRenderBuffer} interface was made renderer-independant. Consequently,
 creation was moved out of @samp{iGraphics3D} and into @samp{csRenderBuffer}.
-The semantics of the parameters have changed, too; notably, instead of 
+The semantics of the parameters have changed too: notably, instead of 
 specifying the byte size of a buffer, the element count is specified. The same
 change has been made to @code{CopyToBuffer()} (which has been renamed to 
 @code{CopyInto()} to enforce human correction of the parameters).
@@ -1115,3 +1120,35 @@ csTypedObjectIterator<iFoo> iter(parent);
 while (iter.HasNext())
 @{
 @end example
+
+@subheading Reference Count Automation
+
+For consistency with the bulk of the Crystal Space @sc{api}, and in order to
+simplify reference-count management, the following methods have been changed
+to return @code{csRef<>} rather than raw pointers of which the client had to
+dispose manually via @code{DecRef()}.
+
+@itemize @bullet
+@item
+@code{iEmitFactoryState::CreateBox()}
+@item
+@code{iEmitFactoryState::CreateCone()}
+@item
+@code{iEmitFactoryState::CreateCylinder()}
+@item
+@code{iEmitFactoryState::CreateCylinderTangent()}
+@item
+@code{iEmitFactoryState::CreateFixed()}
+@item
+@code{iEmitFactoryState::CreateLine()}
+@item
+@code{iEmitFactoryState::CreateMix()}
+@item
+@code{iEmitFactoryState::CreateSphere()}
+@item
+@code{iEmitFactoryState::CreateSphereTangent()}
+@item
+@code{iHazeHullCreation::CreateBox()}
+@item
+@code{iHazeHullCreation::CreateCone()}
+@end itemize

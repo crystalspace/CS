@@ -155,10 +155,10 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
 	    return 0;
-	  iHazeHullBox *ebox = hullcreate->CreateBox (box.Min (), box.Max ());
+	  csRef<iHazeHullBox> ebox =
+	    hullcreate->CreateBox (box.Min (), box.Max ());
 	  result = SCF_QUERY_INTERFACE (ebox, iHazeHull);
 	  CS_ASSERT (result);
-          ebox->DecRef ();
 	}
 	break;
       case XMLTOKEN_HAZECONE:
@@ -169,11 +169,10 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
 	  number = child->GetAttributeValueAsInt ("number");
 	  p = child->GetAttributeValueAsFloat ("p");
 	  q = child->GetAttributeValueAsFloat ("q");
-	  iHazeHullCone *econe = hullcreate->CreateCone (number,
-	    box.Min (), box.Max (), p, q);
+	  csRef<iHazeHullCone> econe =
+	    hullcreate->CreateCone (number, box.Min (), box.Max (), p, q);
 	  result = SCF_QUERY_INTERFACE (econe, iHazeHull);
 	  CS_ASSERT (result);
-          econe->DecRef ();
 	}
 	break;
       case XMLTOKEN_SCALE:

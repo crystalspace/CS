@@ -28,6 +28,20 @@ chronological order.
 	  20-Aug-2003 fix to the problem where the macro-based class was
 	  incorrectly invoking the pure-virtual GetRequestedInterface().
 	- Eric Sunshine added a `meshimpexp' Jam compile-group.
+	- Eric Sunshine changed the following methods to return csRef<> rather
+	  than raw pointers of which the client had to dispose manually via
+	  DecRef():
+	    iEmitFactoryState::CreateBox()
+	    iEmitFactoryState::CreateCone()
+	    iEmitFactoryState::CreateCylinder()
+	    iEmitFactoryState::CreateCylinderTangent()
+	    iEmitFactoryState::CreateFixed()
+	    iEmitFactoryState::CreateLine()
+	    iEmitFactoryState::CreateMix()
+	    iEmitFactoryState::CreateSphere()
+	    iEmitFactoryState::CreateSphereTangent()
+	    iHazeHullCreation::CreateBox()
+	    iHazeHullCreation::CreateCone()
 5-Mar-2005
 	- res added some terrain-related interfaces to cspace.i.
 	- res made more -ansi -pedantic compile fixes on Win32. 

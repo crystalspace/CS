@@ -269,15 +269,15 @@ bool PartEdit::EventHandler (iEvent& ev)
 
 bool PartEdit::InitEmitterList(EmitterList *elist)
 {
-  elist->point=csPtr<iEmitFixed> (EmitFactoryState->CreateFixed());
-  elist->line=csPtr<iEmitLine> (EmitFactoryState->CreateLine());
-  elist->box=csPtr<iEmitBox> (EmitFactoryState->CreateBox());
-  elist->cylinder=csPtr<iEmitCylinder> (EmitFactoryState->CreateCylinder());
-  elist->cone=csPtr<iEmitCone> (EmitFactoryState->CreateCone());
-  elist->sphere=csPtr<iEmitSphere> (EmitFactoryState->CreateSphere());
-  elist->spheretangent=csPtr<iEmitSphereTangent> (EmitFactoryState->CreateSphereTangent());
-  elist->cylindertangent=csPtr<iEmitCylinderTangent> (EmitFactoryState->CreateCylinderTangent());
-  elist->mix=csPtr<iEmitMix> (EmitFactoryState->CreateMix());
+  elist->point=EmitFactoryState->CreateFixed();
+  elist->line=EmitFactoryState->CreateLine();
+  elist->box=EmitFactoryState->CreateBox();
+  elist->cylinder=EmitFactoryState->CreateCylinder();
+  elist->cone=EmitFactoryState->CreateCone();
+  elist->sphere=EmitFactoryState->CreateSphere();
+  elist->spheretangent=EmitFactoryState->CreateSphereTangent();
+  elist->cylindertangent=EmitFactoryState->CreateCylinderTangent();
+  elist->mix=EmitFactoryState->CreateMix();
   elist->current_type=EMITTER_NONE;
   elist->current=NULL;
   elist->point_used=false;
@@ -416,7 +416,7 @@ bool PartEdit::UpdateGen3D(EmitterList *elist,Emitter3DState *emitter_state)
       {
         // Clear out the mix emitter.  Since we have to reset the emitter here anyway
         // clearing saves us from having to check if any existing mix members were removed
-        elist->mix=csPtr<iEmitMix> (EmitFactoryState->CreateMix());
+        elist->mix=EmitFactoryState->CreateMix();
 
         elist->current=(iEmitGen3D*)elist->mix;
       }

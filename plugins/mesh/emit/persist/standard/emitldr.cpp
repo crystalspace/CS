@@ -179,7 +179,8 @@ bool csEmitFactorySaver::Initialize (iObjectRegistry* object_reg)
 bool csEmitFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  csRef<iDocumentNode> paramsNode =
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
   return true;
 }
@@ -234,11 +235,11 @@ bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
+csRef<iEmitGen3D> csEmitLoader::ParseEmit (iDocumentNode* node,
 			      iEmitFactoryState *fstate, float* weight)
 {
-  iEmitGen3D* result = 0;
-  iEmitMix *emix = 0;
+  csRef<iEmitGen3D> result;
+  csRef<iEmitMix> emix;
   csVector3 a;
   float p,q,r,s,t;
   if (weight) *weight = 1.;
@@ -266,7 +267,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  a.x = child->GetAttributeValueAsFloat ("x");
 	  a.y = child->GetAttributeValueAsFloat ("y");
 	  a.z = child->GetAttributeValueAsFloat ("z");
-	  iEmitFixed *efixed = fstate->CreateFixed ();
+	  csRef<iEmitFixed> efixed = fstate->CreateFixed ();
 	  efixed->SetValue (a);
 	  result = efixed;
 	}
@@ -280,7 +281,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 		  child, "Error parsing box for 'emitbox'!");
 	    return 0;
 	  }
-	  iEmitBox *ebox = fstate->CreateBox ();
+	  csRef<iEmitBox> ebox = fstate->CreateBox ();
 	  ebox->SetContent (box.Min (), box.Max ());
 	  result = ebox;
 	}
@@ -292,7 +293,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  a.z = child->GetAttributeValueAsFloat ("z");
 	  p = child->GetAttributeValueAsFloat ("p");
 	  q = child->GetAttributeValueAsFloat ("q");
-	  iEmitSphere *esphere = fstate->CreateSphere ();
+	  csRef<iEmitSphere> esphere = fstate->CreateSphere ();
 	  esphere->SetContent (a, p, q);
 	  result = esphere;
 	}
@@ -307,7 +308,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  r = child->GetAttributeValueAsFloat ("r");
 	  s = child->GetAttributeValueAsFloat ("s");
 	  t = child->GetAttributeValueAsFloat ("t");
-	  iEmitCone *econe = fstate->CreateCone ();
+	  csRef<iEmitCone> econe = fstate->CreateCone ();
 	  econe->SetContent (a, p, q, r, s, t);
 	  result = econe;
 	}
@@ -316,10 +317,8 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
         {
 	  if (!emix) emix = fstate->CreateMix ();
 	  float amt;
-	  iEmitGen3D *gen;
-	  gen = ParseEmit (child, fstate, &amt);
+	  csRef<iEmitGen3D> gen = ParseEmit (child, fstate, &amt);
 	  emix->AddEmitter (amt, gen);
-	  if (gen) gen->DecRef ();
 	  result = emix;
 	}
 	break;
@@ -332,7 +331,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 		  child, "Error parsing box for 'emitline'!");
 	    return 0;
 	  }
-	  iEmitLine *eline = fstate->CreateLine ();
+	  csRef<iEmitLine> eline = fstate->CreateLine ();
 	  eline->SetContent (box.Min (), box.Max ());
 	  result = eline;
 	}
@@ -348,7 +347,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  }
 	  p = child->GetAttributeValueAsFloat ("p");
 	  q = child->GetAttributeValueAsFloat ("q");
-	  iEmitCylinder *ecyl = fstate->CreateCylinder ();
+	  csRef<iEmitCylinder> ecyl = fstate->CreateCylinder ();
 	  ecyl->SetContent (box.Min (), box.Max (), p, q);
 	  result = ecyl;
 	}
@@ -364,7 +363,8 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  }
 	  p = child->GetAttributeValueAsFloat ("p");
 	  q = child->GetAttributeValueAsFloat ("q");
-	  iEmitCylinderTangent *ecyltan = fstate->CreateCylinderTangent ();
+	  csRef<iEmitCylinderTangent> ecyltan =
+	    fstate->CreateCylinderTangent ();
 	  ecyltan->SetContent (box.Min (), box.Max (), p, q);
 	  result = ecyltan;
 	}
@@ -383,7 +383,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 	  a.z = minnode->GetAttributeValueAsFloat ("z");
 	  p = child->GetAttributeValueAsFloat ("p");
 	  q = child->GetAttributeValueAsFloat ("q");
-	  iEmitSphereTangent *espheretan = fstate->CreateSphereTangent ();
+	  csRef<iEmitSphereTangent> espheretan = fstate->CreateSphereTangent();
 	  espheretan->SetContent (a, p, q);
 	  result = espheretan;
 	}
@@ -399,7 +399,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
 csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 			    iLoaderContext* ldr_context, iBase*)
 {
-  iEmitGen3D *emit;
+  csRef<iEmitGen3D> emit;
   csRef<iMeshObject> mesh;
   csRef<iParticleState> partstate;
   csRef<iEmitFactoryState> emitfactorystate;
@@ -546,21 +546,18 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetStartPosEmit (emit);
-	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_STARTSPEED:
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetStartSpeedEmit (emit);
-	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_STARTACCEL:
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetStartAccelEmit (emit);
-	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_ATTRACTORFORCE:
@@ -570,21 +567,18 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetAttractorEmit (emit);
-	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_FIELDSPEED:
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetFieldSpeedEmit (emit);
-	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_FIELDACCEL:
 	{
 	  emit = ParseEmit (child, emitfactorystate, 0);
 	  emitstate->SetFieldAccelEmit (emit);
-	  if (emit) emit->DecRef ();
 	}
 	break;
       case XMLTOKEN_CONTAINERBOX:
@@ -605,7 +599,6 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 }
 
 //---------------------------------------------------------------------------
-
 
 csEmitSaver::csEmitSaver (iBase* pParent)
 {
@@ -628,10 +621,10 @@ bool csEmitSaver::Initialize (iObjectRegistry* object_reg)
 
 bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 {
-  if (!parent) return false; //you never know...
-  if (!obj)    return false; //you never know...
+  if (!parent || !obj) return false; //you never know...
   
-  csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  csRef<iDocumentNode> paramsNode =
+    parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
   csRef<iParticleState> partstate = SCF_QUERY_INTERFACE (obj, iParticleState);
@@ -641,16 +634,18 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
   if ( partstate && emitstate && mesh )
   {
     //Writedown Factory tag
-    csRef<iMeshFactoryWrapper> fact = 
-      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+    csRef<iMeshFactoryWrapper> fact = SCF_QUERY_INTERFACE(
+      mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
     if (fact)
     {
       const char* factname = fact->QueryObject()->GetName();
       if (factname && *factname)
       {
-        csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        csRef<iDocumentNode> factNode =
+	  paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         factNode->SetValue("factory");
-        csRef<iDocumentNode> factnameNode = factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        csRef<iDocumentNode> factnameNode =
+	  factNode->CreateNodeBefore(CS_NODE_TEXT, 0);
         factnameNode->SetValue(factname);
       }    
     }    
@@ -665,16 +660,19 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
       const char* matname = mat->QueryObject()->GetName();
       if (matname && *matname)
       {
-        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        csRef<iDocumentNode> matNode =
+	  paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
         matNode->SetValue("material");
-        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        csRef<iDocumentNode> matnameNode =
+	  matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
         matnameNode->SetValue(matname);
       }
     }
 
     //Writedown Mixmode tag
     int mixmode = partstate->GetMixMode();
-    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> mixmodeNode =
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     mixmodeNode->SetValue("mixmode");
     synldr->WriteMixmode(mixmodeNode, mixmode, true);
 	  
@@ -683,7 +681,8 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 
     //Writedown Number tag
     int number = emitstate->GetParticleCount();
-    csRef<iDocumentNode> numberNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> numberNode =
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     numberNode->SetValue("number");
     numberNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(number);
 
@@ -691,7 +690,8 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     iEmitGen3D* startpos = emitstate->GetStartPosEmit();
     if (startpos) 
     {
-      csRef<iDocumentNode> startposNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> startposNode =
+	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       startposNode->SetValue("startpos");
       WriteEmit(startpos, startposNode);
     }
@@ -700,7 +700,8 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     iEmitGen3D* startspeed = emitstate->GetStartSpeedEmit();
     if (startspeed) 
     {
-      csRef<iDocumentNode> startspeedNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> startspeedNode =
+	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       startspeedNode->SetValue("startspeed");
       WriteEmit(startspeed, startspeedNode);
     }
@@ -709,7 +710,8 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     iEmitGen3D* startaccel = emitstate->GetStartAccelEmit();
     if (startaccel) 
     {
-      csRef<iDocumentNode> startaccelNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> startaccelNode =
+	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       startaccelNode->SetValue("startaccel");
       WriteEmit(startaccel, startaccelNode);
     }
@@ -718,7 +720,8 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     iEmitGen3D* attractor = emitstate->GetAttractorEmit();
     if (attractor) 
     {
-      csRef<iDocumentNode> attractorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> attractorNode =
+	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       attractorNode->SetValue("attractor");
       WriteEmit(attractor, attractorNode);
     }
@@ -727,7 +730,8 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     iEmitGen3D* fieldspeed = emitstate->GetFieldSpeedEmit();
     if (fieldspeed) 
     {
-      csRef<iDocumentNode> fieldspeedNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> fieldspeedNode =
+	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       fieldspeedNode->SetValue("fieldspeed");
       WriteEmit(fieldspeed, fieldspeedNode);
     }
@@ -736,14 +740,16 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     iEmitGen3D* fieldaccel = emitstate->GetFieldAccelEmit();
     if (fieldaccel)
     {
-      csRef<iDocumentNode> fieldaccelNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> fieldaccelNode =
+	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       fieldaccelNode->SetValue("fieldaccel");
       WriteEmit(fieldaccel, fieldaccelNode);
     }
 
     for (int i = 0; i < emitstate->GetAgingCount(); i++)
     {
-      csRef<iDocumentNode> agingNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> agingNode =
+	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       agingNode->SetValue("aging");
 
       int time;
@@ -753,32 +759,39 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
       emitstate->GetAgingMoment(i, time, color, alpha, swirl, rotspeed, scale);
 
       //Writedown Aging's Color tag
-      csRef<iDocumentNode> colorNode = agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> colorNode =
+	agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       colorNode->SetValue("color");
       synldr->WriteColor(colorNode, &color);
 
       //Writedown Aging's Time tag
-      csRef<iDocumentNode> timeNode = agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> timeNode =
+	agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       timeNode->SetValue("time");
       timeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(time);
 
       //Writedown Aging's Alpha tag
-      csRef<iDocumentNode> alphaNode = agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> alphaNode =
+	agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       alphaNode->SetValue("alpha");
       alphaNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(alpha);
 
       //Writedown Aging's Swirl tag
-      csRef<iDocumentNode> swirlNode = agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> swirlNode =
+	agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       swirlNode->SetValue("swirl");
       swirlNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(swirl);
 
       //Writedown Aging's Rotspeed tag
-      csRef<iDocumentNode> rotspeedNode = agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> rotspeedNode =
+	agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       rotspeedNode->SetValue("rotspeed");
-      rotspeedNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(rotspeed);
+      rotspeedNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(
+        rotspeed);
 
       //Writedown Aging's Scale tag
-      csRef<iDocumentNode> scaleNode = agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> scaleNode =
+	agingNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       scaleNode->SetValue("scale");
       scaleNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(scale);
     }
@@ -787,7 +800,8 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     csVector3 minBox, maxBox;
     if (emitstate->GetContainerBox(minBox, maxBox))
     {
-      csRef<iDocumentNode> containerboxNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> containerboxNode =
+	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       containerboxNode->SetValue("containerbox");
       csBox3 box(minBox, maxBox);
       synldr->WriteBox(containerboxNode, &box);
@@ -796,35 +810,39 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     //Writedown RectParticles tag
     float dw, dh;
     emitstate->GetRectParticles(dw, dh);
-    csRef<iDocumentNode> rectparticlesNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> rectparticlesNode =
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     rectparticlesNode->SetValue("rectparticles");
     rectparticlesNode->SetAttributeAsFloat("w", dw);
     rectparticlesNode->SetAttributeAsFloat("h", dh);
 
     //Writedown AttractorForce tag
     float attractorforce = emitstate->GetAttractorForce();
-    csRef<iDocumentNode> attractorforceNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> attractorforceNode =
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     attractorforceNode->SetValue("attractorforce");
-    attractorforceNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(attractorforce);
+    attractorforceNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(
+      attractorforce);
 
     //Writedown RegularParticles tag
     int sides;
     float radius;
     emitstate->GetRegularParticles(sides, radius);
-    csRef<iDocumentNode> regularparticlesNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> regularparticlesNode =
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     regularparticlesNode->SetValue("regularparticles");
     regularparticlesNode->SetAttributeAsInt("sides", sides);
     regularparticlesNode->SetAttributeAsFloat("radius", radius);
 
     //Writedown TotalTime tag
     int totaltime = emitstate->GetParticleTime();
-    csRef<iDocumentNode> totaltimeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> totaltimeNode =
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     totaltimeNode->SetValue("totaltime");
     totaltimeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(totaltime);
   }
 
-  paramsNode=0;
-
+  paramsNode = 0;
   return true;
 }
 
@@ -917,7 +935,8 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     node->SetAttributeAsFloat("q",q);
     return true;
   }
-  csRef<iEmitCylinderTangent> ecyltan (SCF_QUERY_INTERFACE(emit, iEmitCylinderTangent));
+  csRef<iEmitCylinderTangent> ecyltan (
+    SCF_QUERY_INTERFACE(emit, iEmitCylinderTangent));
   if(ecyltan)
   {
     csBox3 x(a,b);
@@ -929,7 +948,8 @@ bool csEmitSaver::WriteEmit (iEmitGen3D* emit, iDocumentNode* parent)
     node->SetAttributeAsFloat("q",q);
     return true;
   }
-  csRef<iEmitSphereTangent> espheretan (SCF_QUERY_INTERFACE(emit, iEmitSphereTangent));
+  csRef<iEmitSphereTangent> espheretan (
+    SCF_QUERY_INTERFACE(emit, iEmitSphereTangent));
   if(espheretan)
   {
     espheretan->GetContent(a, p, q);

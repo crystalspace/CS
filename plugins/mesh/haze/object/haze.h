@@ -490,12 +490,23 @@ public:
   class HazeHullCreation : public iHazeHullCreation
   {
     SCF_DECLARE_EMBEDDED_IBASE (csHazeMeshObjectFactory);
-    virtual iHazeHullBox* CreateBox(const csVector3& a, const csVector3& b)
-      const { return &(new csHazeHullBox(a, b))->scfiHazeHullBox; }
-    virtual iHazeHullCone* CreateCone(int nr_sides, const csVector3& start,
-      const csVector3& end, float srad, float erad) const
-      { return &(new csHazeHullCone(nr_sides, start, end, srad, erad))->
-        scfiHazeHullCone; }
+    virtual csRef<iHazeHullBox> CreateBox(
+	const csVector3& a, const csVector3& b) const
+    {
+      csHazeHullBox* c = new csHazeHullBox(a, b);
+      csRef<iHazeHullBox> x;
+      x.AttachNew(&c->scfiHazeHullBox);
+      return x;
+    }
+    virtual csRef<iHazeHullCone> CreateCone(int nr_sides,
+      const csVector3& start, const csVector3& end, float srad,
+      float erad) const
+    {
+      csHazeHullCone* c = new csHazeHullCone(nr_sides, start, end, srad, erad);
+      csRef<iHazeHullCone> x;
+      x.AttachNew(&c->scfiHazeHullCone);
+      return x;
+    }
 
   } scfiHazeHullCreation;
   friend class HazeHullCreation;
