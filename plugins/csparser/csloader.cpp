@@ -391,11 +391,11 @@ csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderContext* ldr_context,
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
-  bool iOnlyRegion, bool checkdupes)
+bool csLoader::LoadMapFile (const char* file, bool clearEngine,
+  bool onlyRegion, bool checkdupes)
 {
-  if (iClearEngine) Engine->DeleteAll ();
-  csRef<iLoaderContext> ldr_context = CreateLoaderContext (iOnlyRegion,
+  if (clearEngine) Engine->DeleteAll ();
+  csRef<iLoaderContext> ldr_context = CreateLoaderContext (onlyRegion,
   	checkdupes);
 
   csRef<iFile> buf (VFS->Open (file, VFS_FILE_READ));
@@ -408,7 +408,8 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
     return false;
   }
 
-  Engine->ResetWorldSpecificSettings();
+  if (clearEngine)
+    Engine->ResetWorldSpecificSettings();
 
   csRef<iDocument> doc;
   bool er = TestXml (file, buf, doc);

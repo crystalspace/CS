@@ -42,6 +42,10 @@ The history order is reversed so that new features are at the top.
 	- Jorrit made checkDupes and resolveOnlyRegion in the loader part
 	  of the loader context to make it easier to make the loader thread
 	  safe.
+	- Jorrit fixed the loader so that engine->ResetWorldSpecificSettings()
+	  is only called if clearEngine is true. The reasoning is that when
+	  clearEngine is false you want to append a map file to an already
+	  loaded map and you don't want to reset engine settings in that case.
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.
