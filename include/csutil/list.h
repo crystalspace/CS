@@ -206,6 +206,11 @@ public:
     Delete (tail);
     return true;
   }
+  
+  bool IsEmpty ()
+  {
+    return (head==0) && (head==0);
+  }
 
 private:
   friend class Iterator;
