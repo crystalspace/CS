@@ -42,7 +42,9 @@ public:
   virtual void Print (csRect *area = NULL);
   
   virtual void SetRGB(int i, int r, int g, int b);
- 
+
+  virtual bool PerformExtension (char *args);
+	
   virtual bool Initialize (iSystem *pSystem);
 
   virtual bool BeginDraw();
@@ -79,7 +81,6 @@ protected:
   LPDIRECTDRAW m_lpDD;
   LPDIRECTDRAWSURFACE m_lpddsPrimary;
   LPDIRECTDRAWSURFACE m_lpddsBack;
-  LPDIRECTDRAWCLIPPER m_lpddClipper;
   LPDIRECTDRAWPALETTE m_lpddPal;
   
   iWin32SystemDriver* m_piWin32System;
@@ -96,8 +97,20 @@ protected:
   bool m_bUses3D;
   bool m_bHardwareCursor;
   
-  HRESULT RestoreAll();
   unsigned char *LockBackBuf();
+
+	RECT m_rcWindow;             // Saves the window size & pos.
+	RECT m_rcViewport;           // Pos. & size to blt from
+	RECT m_rcScreen;             // Screen pos. for blt
+
+	bool m_bWindowed;
+  bool m_bReady;
+
+	HRESULT InitSurfaces(HWND hWnd);
+	HRESULT ReleaseAllObjects(HWND hWnd);
+	HRESULT ChangeCoopLevel(HWND hWnd );
+	HRESULT InitFail(HWND hWnd, HRESULT hRet, LPCTSTR szError, ...);
+
 };
 
 #endif
