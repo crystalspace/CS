@@ -59,6 +59,15 @@ Short-term cleanups that need to be done:
 	  Dropped number of kept snapshots down to two from three (in order to
 	  make more efficient use of limited disk space at Source Forge), and
 	  bumped kept diffs and logs up to seven.
+	- Eric Sunshine fixed a nasty bug in the PNG loader which caused the
+	  image loader to access memory far beyond the allocated palette.
+	  This bug was responsible for the crasher which afflicted Windows
+	  users when trying to launch MazeD.
+	- Eric Sunshine templatized the linked-list class, ctLinkList.  Shhh!
+	  Don't tell anybody that I did this.  Now Michael Ewert need not
+	  consider the CS guys bullies any longer. :-)  As a happy side-effect,
+	  the linked-lists no longer generate a bogus compilation warning from
+	  the NextStep compiler.
 20-Feb-2000
 	- csPolygonSet now also holds a pointer to the parent container and
 	  checks if the parent is NULL before being added to a parent. This
