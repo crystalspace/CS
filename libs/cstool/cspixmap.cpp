@@ -21,11 +21,10 @@
 
 csSimplePixmap::csSimplePixmap (iTextureHandle *hTexture)
 {
-  hTex = 0;
-  if (hTexture)
+  if (hTexture != 0)
   {
     int w,h;
-    (hTex = hTexture)->IncRef ();
+    hTex = hTexture;
     //hTex->GetMipMapDimensions (0,w,h);
     hTex->GetOriginalDimensions (w,h);
     SetTextureRectangle (0, 0, w, h);
@@ -34,29 +33,27 @@ csSimplePixmap::csSimplePixmap (iTextureHandle *hTexture)
 
 csSimplePixmap::csSimplePixmap (iTextureHandle *hTexture, int x, int y, int w, int h)
 {
-  hTex = 0;
-  if (hTexture)
+  if (hTexture != 0)
   {
-    (hTex = hTexture)->IncRef ();
+    hTex = hTexture;
     SetTextureRectangle (x, y, w, h);
   }
 }
 
 csSimplePixmap::~csSimplePixmap ()
 {
-  if (hTex) hTex->DecRef ();
 }
 
 void csSimplePixmap::DrawScaled (iGraphics3D* g3d, int sx, int sy, int sw,
     int sh, uint8 Alpha)
 {
-  if (hTex) g3d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
+  if (hTex != 0) g3d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }
 
 void csSimplePixmap::DrawTiled (iGraphics3D* g3d, int sx, int sy,
   int sw, int sh, int orgx, int orgy, uint8 Alpha)
 {
-  if (hTex) g3d->DrawPixmap
+  if (hTex != 0) g3d->DrawPixmap
     (hTex, sx, sy, sw, sh, sx - orgx, sy - orgy, sw, sh, Alpha);
 }
 
@@ -66,9 +63,5 @@ iTextureHandle *csSimplePixmap::GetTextureHandle() {return hTex;}
 
 void csSimplePixmap::SetTextureHandle (iTextureHandle *hTexture)
 {
-  if (hTexture)
-  {
-    if (hTex) hTex->DecRef ();
-    (hTex = hTexture)->IncRef ();
-  }
+  hTex = hTexture;
 }

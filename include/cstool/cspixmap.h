@@ -20,6 +20,7 @@
 #ifndef __CS_CSPIXMAP_H__
 #define __CS_CSPIXMAP_H__
 
+#include "csutil/ref.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
@@ -86,7 +87,7 @@ public:
 class csSimplePixmap : public csPixmap
 {
 protected:
-  iTextureHandle *hTex;
+  csRef<iTextureHandle> hTex;
   int tx, ty, tw, th;
 
 public:

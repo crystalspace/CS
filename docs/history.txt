@@ -19,6 +19,10 @@ chronological order.
           especially beneficial to sprite3d's, where it updates the
           buffer quite frequently, when VBO is enabled because you
           cannot render from a locked VBO buffer.
+	- res augmented the documentation of csInitializer::DestroyApplication()
+	  with the information that it unloads all plugins (and what this can
+	  cause.)
+	- res changed csSimplePixmap to store the texture handle in a csRef<>.
 30-Nov-2003
 	- Eric Sunshine clarified and corrected comments in crystal.m4.  Also
 	  cleaned up m4 mis-quoting issues and generally improved formatting.

@@ -274,6 +274,29 @@ public:
    * Destroy the application.<p>
    * Undo all of the initialization done by CreateEnvironment() or any of the
    * other setup functions.
+   * \remarks
+   * This will also unload all loaded plugins! So if you keep any references
+   * to plugins in the same scope as DestroyApplication (), clear those
+   * BEFORE calling DestroyApplication (). Example:
+   * \code
+   * class MyApp
+   * {
+   *   csRef<iVFS> vfs;
+   *  public:
+   *   MyApp ();
+   *   ~MyApp ()
+   *   {
+   *     csInitializer::DestroyApplication (...);
+   *   }
+   * }
+   * \endcode
+   * The above snippet will likely return in a crash at the end of the 
+   * program - DestroyApplication () causes the unloading of all plugins,
+   * including VFS, however, the csRef<iVFS> is destroyed AFTER 
+   * DestroyApplication () was called, so it'll try to DecRef() an object that
+   * has already been deleted. To fix the problem, either set 'vfs' to 0, or
+   * move DestroyApplication () into another scope (e.g. the main() of an 
+   * application.)
    */
   static void DestroyApplication (iObjectRegistry*);
 };
