@@ -1077,10 +1077,9 @@ public:
 
   /**
    * Transform the plane of this polygon from object space to world space.
-   * This is mainly used for things since sectors currently have
-   * identical object and world space coordinates.
+   * 'vt' is a vertex of this polygon in world space.
    */
-  void ObjectToWorld (const csReversibleTransform& t);
+  void ObjectToWorld (const csReversibleTransform& t, const csVector3& vwor);
 
   /**
    * Hard transform the plane of this polygon and also the

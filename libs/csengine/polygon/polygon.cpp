@@ -570,9 +570,10 @@ void csPolygon3D::ComputeNormal ()
   plane->GetWorldPlane ().Set (A, B, C, D);
 }
 
-void csPolygon3D::ObjectToWorld (const csReversibleTransform& t)
+void csPolygon3D::ObjectToWorld (const csReversibleTransform& t,
+    	const csVector3& vwor)
 {
-  plane->ObjectToWorld (t, Vwor (0));
+  plane->ObjectToWorld (t, vwor);
   csPolyTexLightMap* lmi = GetLightMapInfo ();
   if (lmi) lmi->GetTxtPlane ()->ObjectToWorld (t);
   if (portal) portal->ObjectToWorld (t);
@@ -916,12 +917,12 @@ void csPolygon3D::PlaneNormal (float* yz, float* zx, float* xy)
   i1 = GetVertices ().GetNumVertices ()-1;
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
-    x = Vwor (i).x;
-    y = Vwor (i).y;
-    z = Vwor (i).z;
-    x1 = Vwor (i1).x;
-    y1 = Vwor (i1).y;
-    z1 = Vwor (i1).z;
+    x = Vobj (i).x;
+    y = Vobj (i).y;
+    z = Vobj (i).z;
+    x1 = Vobj (i1).x;
+    y1 = Vobj (i1).y;
+    z1 = Vobj (i1).z;
     ayz += (z1+z) * (y-y1);
     azx += (x1+x) * (z-z1);
     axy += (y1+y) * (x-x1);

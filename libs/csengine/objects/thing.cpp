@@ -199,7 +199,7 @@ void csThing::WorUpdate ()
         for (i = 0 ; i < polygons.Length () ; i++)
         {
           csPolygon3D* p = GetPolygon3D (i);
-          p->ObjectToWorld (movtrans);
+          p->ObjectToWorld (movtrans, p->Vwor (0));
         }
         UpdateCurveTransform ();
       }
