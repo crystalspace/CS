@@ -25,6 +25,7 @@ class csMaterialWrapper;
 struct iMaterial;
 struct iMaterialHandle;
 struct iTextureManager;
+struct iTextureWrapper;
 struct iObject;
 
 SCF_VERSION (iMaterialWrapper, 0, 0, 4);
@@ -71,6 +72,29 @@ struct iMaterialWrapper : public iBase
    * that are used.
    */
   virtual void Visit () = 0;
+};
+
+SCF_VERSION (iMaterialEngine, 0, 0, 1);
+
+/**
+ * This interface represents the engine part of the material definition.
+ * Using this interface you will be able to access the original texture
+ * wrappers that were used to create the material. If you have something
+ * that implements iMaterial you can query for iMaterialEngine.
+ * So this interface basically augments iMaterial with engine specific
+ * features.
+ */
+struct iMaterialEngine : public iBase
+{
+  /**
+   * Get the base texture from the material.
+   */
+  virtual iTextureWrapper *GetTextureWrapper () = 0;
+
+  /**
+   * Get a texture used by a texture layer.
+   */
+  virtual iTextureWrapper* GetTextureWrapper (int idx) = 0;
 };
 
 SCF_VERSION (iMaterialList, 0, 0, 1);

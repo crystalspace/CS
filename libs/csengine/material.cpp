@@ -26,7 +26,12 @@
 
 SCF_IMPLEMENT_IBASE(csMaterial)
   SCF_IMPLEMENTS_INTERFACE(iMaterial)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMaterialEngine)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterial::MaterialEngine)
+  SCF_IMPLEMENTS_INTERFACE(iMaterialEngine)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMaterial::csMaterial () :
   texture(NULL),
@@ -36,6 +41,7 @@ csMaterial::csMaterial () :
   reflection(CS_DEFMAT_REFLECTION)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
 }
 
@@ -47,6 +53,7 @@ csMaterial::csMaterial (iTextureWrapper *w) :
   reflection(CS_DEFMAT_REFLECTION)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
   if (texture) texture->IncRef ();
 }

@@ -20,8 +20,7 @@
 
 #include "cssysdef.h"
 #include "unittest.h"
-#include "csengine/engine.h"
-#include "csengine/xorbuf.h"
+#include "iengine/engine.h"
 #include "iutil/string.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
@@ -34,11 +33,6 @@
 //------------------------------------------------- We need the 3D engine -----
 
 CS_IMPLEMENT_APPLICATION
-
-// need to register the engine explicit here when not building static
-#if !defined(CS_STATIC_LINKED)
-SCF_REGISTER_STATIC_LIBRARY (engine)
-#endif
 
 //-----------------------------------------------------------------------------
 
@@ -125,13 +119,6 @@ int main (int argc, char* argv[])
     csInitializer::DestroyApplication (object_reg);
     return -1;
   }
-
-  printf ("================================================================\n");
-
-  csXORBuffer* buf = new csXORBuffer (640, 480);
-  Test (buf, "csXORBuffer");
-  //Benchmark (buf, "csXORBuffer", 10000);
-  delete buf;
 
   printf ("================================================================\n");
 

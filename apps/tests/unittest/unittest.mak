@@ -31,7 +31,7 @@ UNITTEST.EXE = unittest$(EXE)
 INC.UNITTEST = $(wildcard apps/tests/unittest/*.h)
 SRC.UNITTEST = $(wildcard apps/tests/unittest/*.cpp)
 OBJ.UNITTEST = $(addprefix $(OUT),$(notdir $(SRC.UNITTEST:.cpp=$O)))
-DEP.UNITTEST = CSTOOL CSENGINE CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
+DEP.UNITTEST = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.UNITTEST = $(foreach d,$(DEP.UNITTEST),$($d.LIB))
 
 TO_INSTALL.EXE    += $(UNITTEST.EXE)

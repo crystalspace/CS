@@ -123,6 +123,20 @@ public:
   }
 
   SCF_DECLARE_IBASE;
+
+  struct MaterialEngine : public iMaterialEngine
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csMaterial);
+    virtual iTextureWrapper *GetTextureWrapper ()
+    {
+      return scfParent->texture;
+    }
+    virtual iTextureWrapper* GetTextureWrapper (int idx)
+    {
+      return scfParent->texture_layer_wrappers[idx];
+    }
+  } scfiMaterialEngine;
+  friend struct MaterialEngine;
 };
 
 /**

@@ -1,10 +1,21 @@
 The history order is reversed so that new features are at the top.
 
+30-May-2002
+	- Removed support for the XOR buffer in the engine. The XOR buffer
+	  is still used in Dynavis. Also removed 'toggle_xorbuf' command
+	  in the engine.
+	- Unittest application will no longer link statically with engine
+	  since the XOR buffer test is removed.
+	- Added new iMaterialEngine interface. The material definition of
+	  the engine implements this interface (in addition to iMaterial).
+	  You can use this to query for the iTextureWrapper's that are used
+	  by the material. Keep in mind that not all iMaterial implementations
+	  may implement this additional interface.
 29-May-2002
 	- Implemented history culling in Dynavis. This means that if an
 	  object is visible then it will be kept as visible for a few
 	  frames (random). This will avoid testing objects that are most
-	  likely visible, too much.
+	  likely visible too much.
 	- Added a new 'toggle_history' command in Dynavis to enable/disable
 	  this new feature. Assigned to the '3' key in BugPlug.
 	- Added a new outline debugging mode. This will render all outlines
