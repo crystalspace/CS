@@ -55,7 +55,7 @@ class SendPacket : public iNetworkPacket
   void SetData (char d []) { data = d; }
 
   virtual bool Read (csDataStream &stream) { return false; }
-  virtual const char* Write (size_t &size)
+  virtual char* Write (size_t &size)
   {
     size = strlen (data);
     return data;
@@ -95,7 +95,7 @@ class RecvPacket : public iNetworkPacket
     else
       return false;
   }
-  virtual const char* Write (size_t &size) { return NULL; }
+  virtual char* Write (size_t &size) { return NULL; }
   virtual iNetworkPacket* New () { return new RecvPacket (); }
   virtual bool FilterSocket (iNetworkSocket2 *s) { return true; }
 };
