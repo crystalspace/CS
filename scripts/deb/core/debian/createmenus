@@ -11,13 +11,13 @@ cat >> $CURDIR/debian/crystalspace.menu <<-FIN
   section="Games/Arcade/CrystalSpace" \\
   hints="Demos,$videotype" \\
   title="Walktest flarge $videotype" \\
-  command="/usr/games/walktest -video=$videotype" \\
+  command="/usr/bin/walktest -video=$videotype" \\
   icon="/usr/share/pixmaps/flarge.xpm"
 ?package(crystalspace):needs="X11" \\
   section="Games/Arcade/CrystalSpace" \\
   hints="Demos,$videotype" \\
   title="Walktest partsys $videotype" \\
-  command="/usr/games/walktest -video=$videotype partsys" \\
+  command="/usr/bin/walktest -video=$videotype partsys" \\
   icon="/usr/share/pixmaps/partsys.xpm"
 FIN
 
