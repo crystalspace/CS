@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Sep-2003
+	- Eric Sunshine added the new CS_MSG_ERROR() Autoconf macro.  This is A
+	  convenience wrapper for AC_MSG_ERROR() which invokes AC_CACHE_SAVE()
+	  before aborting the script.  Saving the cache should make subsequent
+	  re-invocations of the configure script faster once the user has
+	  corrected the problem(s) which caused the failure.  All invocations
+	  of AC_MSG_ERROR() in configure.ac have been converted to instead
+	  invoke CS_MSG_ERROR().
 18-Sep-2003
 	- res reverted Paul's change made to libs/cssys/win32/shellstuff.h
 	  yesterday which caused SHGetFolderPathW() to be used when present.

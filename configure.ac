@@ -267,7 +267,7 @@ AC_CACHE_CHECK([how to create a directory tree], [cs_cv_shell_mkdir_p],
 
 AS_VAR_SET_IF([cs_cv_shell_mkdir_p],
     [CS_BUILD_PROPERTY([CMD.MKDIRS], [$cs_cv_shell_mkdir_p])],
-    [AC_MSG_ERROR([do not know how to create a directory tree])])
+    [CS_MSG_ERROR([do not know how to create a directory tree])])
 
 
 
@@ -764,7 +764,7 @@ AC_MSG_RESULT([$enable_cpu_specific_optimizations])
 
 case $enable_cpu_specific_optimizations in
     no|minimum|maximum) ;;
-    *) AC_MSG_ERROR([unrecognized option; use `no', `minimum', or `maximum'])
+    *) CS_MSG_ERROR([unrecognized option; use `no', `minimum', or `maximum'])
        ;;
 esac
 
@@ -1220,7 +1220,7 @@ CS_CHECK_BUILD([for DirectX], [cs_cv_libdirectx],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([z], [AC_LANG_PROGRAM([#include <zlib.h>], [zlibVersion()])],
     [$srcdir/libs/zlib*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libz], [ZLIB])],
-    [AC_MSG_ERROR([zlib is essential for building CS.])])
+    [CS_MSG_ERROR([zlib is essential for building CS.])])
 
 
 
@@ -1965,7 +1965,7 @@ AC_ARG_ENABLE([mode], [AC_HELP_STRING([--enable-mode=mode],
 	(default OPTIMIZE)])],
     [case $enableval in
 	optimize|debug|profile) cs_build_mode=$enableval ;;
-	*) AC_MSG_ERROR([m4_text_wrap(
+	*) CS_MSG_ERROR([m4_text_wrap(
 	    [unrecognized mode --enable-mode=$enableval;
 	    use `optimize', `debug', or `profile'], [    ], [[]], [60])]) ;;
     esac])
