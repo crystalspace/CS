@@ -28,12 +28,6 @@
 #include "iutil/cfgfile.h"
 #include "igraphic/image.h"
 
-#include "GL/glext.h"
-
-#ifndef GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB
-  #define GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB	0x86A0
-#endif
-
 //---------------------------------------------------------------------------
 
 csTextureOpenGL::csTextureOpenGL (csTextureHandle *Parent, iImage *Image)
