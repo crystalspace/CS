@@ -1866,11 +1866,13 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
 #ifdef CS_USE_NEW_RENDERER
   SetupObject ();
 
+  n = 0;
+
   if (!factory->cstxt)
   {
     factory->Report (CS_REPORTER_SEVERITY_ERROR,
     	"Error! Trying to draw a sprite with no material!");
-    return false;
+    return 0;
   }
 
   iCamera* camera = rview->GetCamera ();
@@ -1896,7 +1898,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
   int clip_portal, clip_plane, clip_z_plane;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
   	clip_z_plane) == false)
-    return false;
+    return 0;
 
   //first, check if we have any usable mesh
   if(lastMeshPtr->inUse == true)
@@ -2018,7 +2020,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
     m = factory->GetTexelMesh ();
   }
 
-  if (num_verts_for_lod <= 1) return false;
+  if (num_verts_for_lod <= 1) return 0;
 
   int i;
 

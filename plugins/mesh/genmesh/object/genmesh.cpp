@@ -983,6 +983,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n, iRenderView* rview,
   SetupObject ();
   CheckLitColors ();
 
+  n = 0;
+
   iCamera* camera = rview->GetCamera ();
 
   // First create the transformation from object to camera space directly:
@@ -1007,10 +1009,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n, iRenderView* rview,
   sphere.SetRadius (max_radius);
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
     clip_z_plane) == false)
-  {
-    n = 0;
     return 0;
-  }
 
 
   lighting_movable = movable;
@@ -1028,7 +1027,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n, iRenderView* rview,
   if (!mater)
   {
     printf ("INTERNAL ERROR: mesh used without material!\n");
-    return false;
+    return 0;
   }
 
   if (material_needs_visit) mater->Visit ();

@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Mar-2004
+	- Anders Stenberg fixed several places where mesh objects would
+	  return "false" from GetRenderMeshes (which is supposed to return
+	  a pointer), and didn't initialize the "number of meshes returned"
+	  variable. This could cause the culler to crash.
 21-Mar-2004
 	- Luca Cappa committed the res fix to the problem regarding the lack
 	  of the regex.c file in the CSUtil library. The problem was 

@@ -692,6 +692,8 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
 
   SetupObject ();
 
+  num = 0;
+
   iCamera* camera = rview->GetCamera ();
 
   // First create the transformation from object to camera space directly:
@@ -715,10 +717,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   int clip_portal, clip_plane, clip_z_plane;
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
     clip_z_plane) == false)
-  {
-    num = 0;
     return 0;
-  }
 
 
   if (((csBallMeshObjectFactory*)factory)->light_mgr)
@@ -735,7 +734,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   if (!mater)
   {
     printf ("INTERNAL ERROR: mesh used without material!\n");
-    return false;
+    return 0;
   }
   UpdateBufferSV ();
   mater->Visit ();
