@@ -34,6 +34,10 @@ chronological order.
 	  portals would be traversed anyway.
 	- Jorrit started a new document that explains the inner workings of
 	  the engine.
+	- res changed the sprcal3d plugin to not read from the pointer to the
+	  locked normals render buffer. While this doesn't make a difference 
+	  on drivers that don't have VBO support, it improves performances 
+	  when VBO is available.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.

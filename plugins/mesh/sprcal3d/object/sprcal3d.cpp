@@ -2148,7 +2148,7 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
       render->getVertices (vertices);
       vertex_buffer->Release ();
 
-      float* normals = (float*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
+      CS_ALLOC_STACK_ARRAY(float, normals, vertexCount * 3);
       render->getNormals (normals);
 
       const csArray<iLight*>& relevant_lights = meshobj->factory->light_mgr
@@ -2161,7 +2161,7 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
                                       submesh,
                                       normals);
 
-      normal_buffer->Release ();
+      normal_buffer->CopyToBuffer (normals, sizeof (float) * vertexCount * 3);
 
       float* texels = (float*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
       render->getTextureCoordinates (0, texels);
