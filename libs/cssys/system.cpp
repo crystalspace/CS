@@ -367,6 +367,10 @@ bool csSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName
   csPluginList PluginList;
 
   // Now eat all common-for-plugins command-line switches
+  static const char g3d_str[] = "crystalspace.graphics3d.";
+  const int g3d_len = sizeof(g3d_str) / sizeof(g3d_str[0]) - 1;
+  bool g3d_override = false;
+
   const char *val;
   if ((val = GetOptionCL ("video")))
   {
@@ -375,6 +379,7 @@ bool csSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName
     sprintf (temp, "crystalspace.graphics3d.%s", val);
     Printf (MSG_INITIALIZATION, "Using alternative 3D driver: %s\n", temp);
     PluginList.Push (strnew (temp));
+    g3d_override = true;
   }
 
   // Eat all --plugin switches specified on the command line
@@ -388,8 +393,14 @@ bool csSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName
   while (n < PluginList.Length ())
   {
     const char *classID = Config->GetStr ("PlugIns", (char *)PluginList.Get (n));
-    PluginList.Replace (n, strnew (classID));
-    n++;
+    // If -video was used to override 3D driver, then respect it.
+    if (g3d_override && strncmp(classID, g3d_str, g3d_len) == 0)
+      PluginList.Delete(n);
+    else
+    {
+      PluginList.Replace (n, strnew (classID));
+      n++;
+    }
   }
 
   // Sort all plugins by their dependency lists
