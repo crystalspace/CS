@@ -67,11 +67,13 @@ private:
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();
   void FinishFrame ();
+
+  csRef<iEmitGen3D> CreateGen3D(Emitter3DState *emitter_state);
   bool RefreshFileList();
-  bool RecreateParticleSystem(const char *texturefile);
+  bool RecreateParticleSystem();
+  bool UpdateParticleSystem();
 
-  void UpdateEmitState();
-
+  bool recreate_system;
   EmitterState state_emitter;
   Emitter3DState state_initial_position;
   Emitter3DState state_initial_speed;
