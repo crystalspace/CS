@@ -35,14 +35,14 @@ struct csMeshedPolygon
 
 class csVector3;
 
-SCF_VERSION (iPolygonMesh, 0, 1, 0);
+SCF_VERSION (iPolygonMesh, 0, 2, 0);
 
 /**
  * This interface reprents a mesh of polygons. It is useful to communicate
  * geometry information outside of the engine. One place where this will
  * be useful is for communicating geometry information to the collision
  * detection plugin.<br>
- * All Crystal Space entities classes (csSector, csThing, csSprite, ...)
+ * All Crystal Space mesh objects (things, sprites, ...)
  * should implement and/or embed an implementation of this interface.<p>
  *
  * A polygon mesh has the concept of a vertex buffer and an array of polygons.
@@ -57,6 +57,12 @@ struct iPolygonMesh : public iBase
   virtual int GetPolygonCount () = 0;
   /// Get the pointer to the array of polygons.
   virtual csMeshedPolygon* GetPolygons () = 0;
+  /**
+   * Cleanup: this is called by the collider system
+   * when it is ready extracting the data from the iPolygonMesh.
+   * This gives the polygon mesh a chance to clean up some stuff.
+   */
+  virtual void Cleanup () = 0;
 };
 
 #endif // __IENGINE_POLYMESH_H__

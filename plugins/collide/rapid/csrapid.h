@@ -30,8 +30,6 @@
 class csRapidCollider : public iCollider
 {
 private:
-  /// The mesh.
-  iPolygonMesh* mesh;
   /// The RAPID collider.
   csRAPIDCollider* collider;
 
@@ -48,9 +46,6 @@ public:
 public:
   ///------------------------ iCollider implementation ------------------------
   SCF_DECLARE_IBASE;
-
-  /// Return a reference to the polygon mesh for this collider.
-  virtual iPolygonMesh* GetGeometry () { return mesh; }
 };
 
 /**

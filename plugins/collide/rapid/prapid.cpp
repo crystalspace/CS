@@ -108,7 +108,8 @@ void csRAPIDCollider::GeometryInitialize (iPolygonMesh* mesh)
   // first, count the number of triangles polyset contains
   csVector3* vertices = mesh->GetVertices ();
   csMeshedPolygon* polygons = mesh->GetPolygons ();
-  for (i = 0; i < mesh->GetPolygonCount () ; i++)
+  int polycnt = mesh->GetPolygonCount ();
+  for (i = 0; i < polycnt ; i++)
   {
     csMeshedPolygon& p = polygons[i];
     tri_count += p.num_vertices - 2;
@@ -120,7 +121,7 @@ void csRAPIDCollider::GeometryInitialize (iPolygonMesh* mesh)
     if (!m_pCollisionModel)
       return;
     
-    for (i = 0; i < mesh->GetPolygonCount () ; i++)
+    for (i = 0; i < polycnt ; i++)
     {
       csMeshedPolygon& p = polygons[i];
       int* vidx = p.vertices;

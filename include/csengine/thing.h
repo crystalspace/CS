@@ -974,22 +974,45 @@ public:
   //-------------------- iPolygonMesh interface implementation ---------------
   struct PolyMesh : public iPolygonMesh
   {
+    PolyMesh () : polygons (NULL), vertices (NULL), alloc_vertices (NULL) { }
+    virtual ~PolyMesh () { Cleanup (); }
+    void Setup ();
+
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
 
-    virtual int GetVertexCount () { return scfParent->GetVertexCount (); }
-    virtual csVector3* GetVertices () { return scfParent->wor_verts; }
+    virtual int GetVertexCount ()
+    {
+      Setup ();
+      return num_verts;
+    }
+    virtual csVector3* GetVertices ()
+    {
+      Setup ();
+      return vertices;
+    }
     virtual int GetPolygonCount ()
     {
-      GetPolygons ();	// To make sure our count is ok.
-      return num;
+      Setup ();
+      return num_poly;
     }
-    virtual csMeshedPolygon* GetPolygons ();
+    virtual csMeshedPolygon* GetPolygons ()
+    {
+      Setup ();
+      return polygons;
+    }
+    virtual void Cleanup ();
 
-    PolyMesh () { polygons = NULL; }
-    virtual ~PolyMesh () { delete[] polygons; }
-
-    csMeshedPolygon* polygons;
-    int num;
+    csMeshedPolygon* polygons;	// Array of polygons.
+    csVector3* vertices;	// Array of vertices (points to alloc_vertices
+    				// or else obj_verts of scfParent).
+    csVector3* alloc_vertices;	// Optional copy of vertices from parent.
+    				// This copy is used if there are curve
+				// vertices.
+    int num_poly;		// Total number of polygons.
+    int curve_poly_start;	// Index of first polygon from curves.
+    				// Polygons after this index need to be
+				// deleted individually.
+    int num_verts;		// Total number of vertices.
   } scfiPolygonMesh;
   friend struct PolyMesh;
  

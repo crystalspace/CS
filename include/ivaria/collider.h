@@ -35,15 +35,13 @@ struct csCollisionPair
   csVector3 a2, b2, c2;	// Second triangle
 };
 
-SCF_VERSION (iCollider, 0, 1, 0);
+SCF_VERSION (iCollider, 0, 2, 0);
 
 /**
  * A collider.
  */
 struct iCollider : public iBase
 {
-  /// Return a reference to the polygon mesh for this collider.
-  virtual iPolygonMesh* GetGeometry () = 0;
 };
 
 SCF_VERSION (iCollideSystem, 0, 0, 1);

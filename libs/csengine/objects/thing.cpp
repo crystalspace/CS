@@ -1481,36 +1481,114 @@ void csThing::GetBoundingBox (iMovable* movable, csBox3& box)
 
 //-------------------------------------------------------------------------
 
-csMeshedPolygon* csThing::PolyMesh::GetPolygons ()
+void csThing::PolyMesh::Setup ()
 {
-  if (!polygons)
+  if (polygons || alloc_vertices) return;	// Already set up.
+  vertices = NULL;
+
+  // Count the number of needed polygons and vertices.
+  num_verts = scfParent->GetVertexCount ();
+  num_poly = 0;
+  int i, j;
+  const csPolygonArray& pol = scfParent->polygons;
+  for (i = 0 ; i < scfParent->GetPolygonCount () ; i++)
   {
-    int i;
-    num = 0;
-    const csPolygonArray& pol = scfParent->polygons;
-    for (i = 0 ; i < scfParent->GetPolygonCount () ; i++)
+    csPolygon3D* p = pol.Get (i);
+    if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
+      num_poly++;
+  }
+  // Check curves.
+  for (i = 0 ; i < scfParent->GetCurveCount () ; i++)
+  {
+    csCurve* c = scfParent->curves.Get (i);
+    csCurveTesselated* tess = c->Tesselate (1000);	// @@@ High quality?
+    num_poly += tess->GetTriangleCount ();
+    num_verts += tess->GetVertexCount ();
+  }
+
+  // Allocate the arrays and the copy the data.
+  if (num_verts)
+  {
+    // If there are no curves we don't need to copy vertex data.
+    if (scfParent->GetCurveCount () == 0)
     {
-      csPolygon3D* p = pol.Get (i);
-      if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
-        num++;
+      vertices = scfParent->obj_verts;
     }
-  
-    // Always allocate at least one polygon.
-    polygons = new csMeshedPolygon [num ? num : 1];
-    num = 0;
+    else
+    {
+      alloc_vertices = new csVector3 [num_verts];
+      vertices = alloc_vertices;
+      // Copy the polygon vertices.
+      // Set num_verts to the number of vertices in polygon set so
+      // that we can continue copying vertices from curves.
+      num_verts = scfParent->GetVertexCount ();
+      if (num_verts)
+      {
+        memcpy (vertices, scfParent->obj_verts, sizeof (csVector3)*num_verts);
+      }
+    }
+  }
+  if (num_poly)
+  {
+    polygons = new csMeshedPolygon [num_poly];
+    num_poly = 0;
     for (i = 0 ; i < scfParent->GetPolygonCount () ; i++)
     {
       csPolygon3D* p = pol.Get (i);
       if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
       {
-        polygons[num].num_vertices = p->GetVertexCount ();
-        polygons[num].vertices = p->GetVertexIndices ();
-	num++;
+        polygons[num_poly].num_vertices = p->GetVertexCount ();
+	polygons[num_poly].vertices = p->GetVertexIndices ();
+	num_poly++;
       }
     }
+    // Indicate that polygons after and including this index need to
+    // have their 'vertices' array cleaned up. These polygons were generated
+    // from curves.
+    curve_poly_start = num_poly;
+    for (i = 0 ; i < scfParent->GetCurveCount () ; i++)
+    {
+      csCurve* c = scfParent->curves.Get (i);
+      csCurveTesselated* tess = c->Tesselate (1000);	// @@@ High quality?
+      csTriangle* tris = tess->GetTriangles ();
+      int tri_count = tess->GetTriangleCount ();
+      for (j = 0 ; j < tri_count ; j++)
+      {
+        polygons[num_poly].num_vertices = 3;
+	polygons[num_poly].vertices = new int [3];
+	// Adjust indices to skip the original polygon set vertices and
+	// preceeding curves.
+	polygons[num_poly].vertices[0] = tris[j].a + num_verts;
+	polygons[num_poly].vertices[1] = tris[j].b + num_verts;
+	polygons[num_poly].vertices[2] = tris[j].c + num_verts;
+	num_poly++;
+      }
+      csVector3* vts = tess->GetVertices ();
+      int num_vt = tess->GetVertexCount ();
+      memcpy (vertices+num_verts, vts, sizeof (csVector3)*num_vt);
+      num_verts += num_vt;
+    }
   }
-  return polygons;
 }
+
+void csThing::PolyMesh::Cleanup ()
+{
+  int i;
+  // Delete all polygons which were generated from curved surfaces.
+  // The other polygons just have a reference to the original polygons
+  // from the parent.
+  if (polygons)
+  {
+    for (i = curve_poly_start ; i < num_poly ; i++)
+    {
+      delete[] polygons[i].vertices;
+    }
+    delete[] polygons; polygons = NULL;
+  }
+  delete[] alloc_vertices; alloc_vertices = NULL;
+  vertices = NULL;
+}
+
 void csThing::SetConvex (bool c)
 {
   flags.Set (CS_ENTITY_CONVEX, c ? CS_ENTITY_CONVEX : 0);

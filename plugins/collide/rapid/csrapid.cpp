@@ -30,15 +30,12 @@ SCF_IMPLEMENT_IBASE_END
 csRapidCollider::csRapidCollider (iPolygonMesh* mesh)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-
-  csRapidCollider::mesh = mesh;
-  mesh->IncRef ();
   collider = new csRAPIDCollider (mesh);
+  mesh->Cleanup ();
 }
 
 csRapidCollider::~csRapidCollider ()
 {
-  if (mesh) mesh->DecRef ();
   delete collider;
 }
 

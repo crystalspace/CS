@@ -1239,15 +1239,11 @@ public:
     /// Get the pointer to the array of polygons.
     virtual csMeshedPolygon* GetPolygons ();
 
-    PolyMesh ()
-    {
-      polygons = NULL;
-    }
+    /// Cleanup.
+    virtual void Cleanup () { delete[] polygons; polygons = NULL; }
 
-    virtual ~PolyMesh ()
-    {
-      delete[] polygons;
-    }
+    PolyMesh () : polygons (NULL) { }
+    virtual ~PolyMesh () { Cleanup (); }
 
     csMeshedPolygon* polygons;
   } scfiPolygonMesh;

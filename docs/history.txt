@@ -1,5 +1,40 @@
 The history order is reversed so that new features are at the top.
 
+31-Aug-2001
+	- Fixed a bug with curved surfaces with dynamic lighting. If
+	  there were no lights in the level and/or the curve was never
+	  reached by static lights then adding a dynamic light near the
+	  curve would cause a crash because some data wasn't calculated
+	  yet (uv2World). Fixed this by testing for this case and
+	  then calculating uv2World if not already done.
+	- Fixed a bug with the iPolygonMesh implementation for csThing. It
+	  was accidently using the world space vertices instead of object
+	  space vertices. In most cases this would be no problem (for things
+	  that cannot move) but for things that move this doesn't work very
+	  well.
+	- Removed iCollider::GetGeometry(). It is not a good idea that
+	  the created collider keeps a reference to the iPolygonMesh
+	  instance. That is not needed. So GetGeometry() has to go as well.
+	- Modified the rapid plugin so that it no longer keeps the reference
+	  to the iPolygonMesh. It uses the iPolygonMesh to get the geometry
+	  but then it doesn't reuse the pointer later.
+	- Added iPolygonMesh::Cleanup(). This function is called by the
+	  collision detection system when it no longer needs the data in
+	  the iPolygonMesh. This can be used by iPolygonMesh to clean up
+	  temporary data it used. Note that the other functions in iPolygonMesh
+	  MUST still work after Cleanup() has been called. In that case
+	  they will just have to recalculate the temporary data. This change
+	  should reduce memory usage considerably as some of the iPolygonMesh
+	  implementations actually have a considerable amount of temporary
+	  data (especially for csThing).
+	- Both the thing and sprite3d mesh objects now support
+	  iPolygonMesh::Cleanup() and give back a considerable amount of
+	  temporary data which was previously just remembered.
+	- Implemented full support for iPolygonMesh with curved surfaces
+	  as well. At this moment the curved surfaces are tesselated at
+	  maximum resolution for this. Maybe this needs to be a parameter?
+	  In any case this means that collision detection will now work
+	  nicely with curved surfaces too.
 30-Aug-2001
 	- Added full transformation capabilities to csTransform and
 	  csReversibleTransform for the new csSphere class.
@@ -34,6 +69,12 @@ The history order is reversed so that new features are at the top.
 	- Renamed CALLBACK_... to CS_CALLBACK_...
 	- Fixed several of the howto's to some of the recent changes.
 	  Also completed the howto on collision detection.
+	- Philip Wyett removed un-necessary:
+		#include <windowsx.h>
+		#include <ddraw.h>
+	  added:
+		#include <windows.h>
+	  Removed an extra/stray ";" at the end of a line.
 29-Aug-2001
 	- Andrew Zabolotny reports: OS/2 port strikes back :-)
 	    - Fixed csdive plugin.

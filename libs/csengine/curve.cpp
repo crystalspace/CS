@@ -208,6 +208,7 @@ bool csCurve::RecalculateDynamicLights ()
 void csCurve::ShineDynLight (csLightPatch* lp)
 {
   CS_ASSERT(O2W);
+  if (!uv2World) CalcUVBuffers ();
   CS_ASSERT(uv2World);
   CS_ASSERT(uv2Normal);
 
