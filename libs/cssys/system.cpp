@@ -370,8 +370,8 @@ csSystemDriver::~csSystemDriver ()
 
   // Free all plugins.
   int i;
-  for (i = 0; i < Plugins.Length(); i++)
-      UnloadPlugin((iComponent *)Plugins.Get(i));
+  for (i = Plugins.Length()-1; i >= 0; i--)
+      UnloadPlugin((iComponent *)Plugins.Get(i)->Plugin);
      
   if (EventQueue != 0)
     EventQueue->DecRef();
@@ -904,7 +904,7 @@ bool csSystemDriver::UnloadPlugin (iComponent *iObject)
   csPlugin *p = Plugins.Get (idx);
 
 #define CHECK(Var,Func)						\
-  if (!strcmp (p->FuncID, Func)) { Var->DecRef (); Var = NULL; }
+  if (p->FuncID && !strcmp (p->FuncID, Func)) { Var->DecRef (); Var = NULL; }
 
   CHECK (VFS, CS_FUNCID_VFS)
 
