@@ -18,6 +18,23 @@ The history order is reversed so that new features are at the top.
 	      normalizes mounted "roots" rather than mounting them in native
 	      form.  For example, in vsh on Windows, we now have /native/c/,
 	      /native/d/, etc. rather than /native/C:/, /native/D:/, etc.
+	- Eric Sunshine made the following string class/interface-related
+	  changes:
+	    - Eliminated the very ugly iString::SetFastGrowing() and
+	      csString::SetFastGrowing() hacks.
+	    - Replaced with more flexible and generic "grows by" and "grows
+	      exponentially" options.  With "grows by", the client can set the
+	      capacity growth increment directly.  With "grows exponentially",
+	      the string capacity grows exponentially.
+	    - Eliminated the ugly grows_a_lot hack from csString::SetCapacity()
+	      since that was the incorrect place to implement incremental or
+	      exponential growth and interferred with clients which needed to
+	      set the capacity precisely.
+	    - Added a new private csString::ExpandIfNeeded() which respects the
+	      "grows by" and "grows exponentially" settings and is used by
+	      other methods which need to ensure proper capacity.
+	    - Added iString::GetCapacity() and csString::GetCapacity() to
+	      complement existing SetCapacity().
 27-Aug-2002
 	- Eric Sunshine simplified the task of extracting version numbers and
 	  release date from csver.h by external tools.  Also simplified the

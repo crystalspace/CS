@@ -43,15 +43,7 @@ void csString::SetCapacity (size_t NewSize)
   NewSize++; // Plus one for implicit null byte.
   if (NewSize <= MaxSize)
     return;
-  if (grows_a_lot)
-  {
-    MaxSize = NewSize * 2 + 1;
-  }
-  else
-  {
-    MaxSize = NewSize;
-  }
-
+  MaxSize = NewSize;
   char* buff = new char[MaxSize];
   if (Data == 0 || Size == 0)
     buff[0] = '\0';
@@ -61,6 +53,31 @@ void csString::SetCapacity (size_t NewSize)
   if (Data)
     delete[] Data;
   Data = buff;
+}
+
+void csString::ExpandIfNeeded(size_t NewSize)
+{
+  if (NewSize + 1 > MaxSize)
+  {
+    size_t n;
+    if (!GrowExponentially)
+      n = (NewSize + GrowBy - 1) & ~(GrowBy - 1);
+    else
+    {
+      n = MaxSize << 1;
+      while (n < NewSize)
+        n <<= 1;
+    }
+  SetCapacity(n);
+  }
+}
+
+void csString::SetGrowsBy(size_t n)
+{
+  if (n < DEFAULT_GROW_BY)
+    n = DEFAULT_GROW_BY;
+  // Round `n' up to multiple of DEFAULT_GROW_BY.
+  GrowBy = (n + DEFAULT_GROW_BY - 1) & ~(DEFAULT_GROW_BY - 1);
 }
 
 csString &csString::Reclaim()
@@ -109,7 +126,7 @@ csString &csString::Insert (size_t iPos, const csString &iStr)
 
   size_t const sl = iStr.Length ();
   size_t const NewSize = sl + Size;
-  SetCapacity (NewSize);
+  ExpandIfNeeded (NewSize);
   memmove (Data + iPos + sl, Data + iPos, Size - iPos + 1); // Also move null.
   memcpy (Data + iPos, iStr.GetData (), sl);
   Size = NewSize;
@@ -131,7 +148,7 @@ csString &csString::Overwrite (size_t iPos, const csString &iStr)
 
   size_t const sl = iStr.Length ();
   size_t const NewSize = iPos + sl;
-  SetCapacity (NewSize);
+  ExpandIfNeeded (NewSize);
   memcpy (Data + iPos, iStr.GetData (), sl + 1); // Also copy null terminator.
   Size = NewSize;
   return *this;
@@ -153,7 +170,7 @@ csString &csString::Append (const char *iStr, size_t iCount)
   // not fully correct way: Size=0; Append(str);
 
   size_t const NewSize = Size + iCount;
-  SetCapacity (NewSize);
+  ExpandIfNeeded (NewSize);
  
   if (iCount > 0)
       memcpy (Data + Size, iStr, iCount);
@@ -236,7 +253,7 @@ csString &csString::FormatV (const char *format, va_list args)
     if (rc >= 0)
       SetCapacity(rc); // SetCapacity() ensures room for null byte.
     else
-      SetCapacity(MaxSize * 2 - 1);
+      SetCapacity(MaxSize * 2);
   }
   Size = rc;
   return *this;
@@ -294,7 +311,7 @@ csString &csString::PadLeft (size_t iNewSize, char iChar)
 {
   if (iNewSize > Size)
   {
-    SetCapacity (iNewSize);
+    ExpandIfNeeded (iNewSize);
     const size_t toInsert = iNewSize - Size;
     memmove (Data + toInsert, Data, Size + 1); // Also move null terminator.
     for (size_t x = 0; x < toInsert; x++)
@@ -335,7 +352,7 @@ csString& csString::PadRight (size_t iNewSize, char iChar)
 {
   if (iNewSize > Size)
   {
-    SetCapacity (iNewSize);
+    ExpandIfNeeded (iNewSize);
     for (size_t x = Size; x < iNewSize; x++)
       Data [x] = iChar;
     Size = iNewSize;
@@ -375,7 +392,7 @@ csString& csString::PadCenter (size_t iNewSize, char iChar)
 {
   if (iNewSize > Size)
   {
-    SetCapacity (iNewSize);
+    ExpandIfNeeded (iNewSize);
     const size_t toInsert = iNewSize - Size;
     const size_t halfInsert = toInsert / 2;
     if (Size > 0)

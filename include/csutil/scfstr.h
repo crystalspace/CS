@@ -56,10 +56,18 @@ public:
   /// Get the pointer to the internal csString.
   csString& GetCsString () { return s; }
 
-  /// Set string capacity to NewSize characters (plus one for ending NULL)
+  /// Set string capacity to NewSize characters.
   virtual void SetCapacity (size_t NewSize);
-  /// Set to true for fast growing strings.
-  virtual void SetFastGrowing (bool fast);
+  /// Get string capacity.
+  virtual size_t GetCapacity() const;
+  /// Set the allocation growth increment.
+  virtual void SetGrowsBy(size_t);
+  /// Get the allocation growth increment.
+  virtual size_t GetGrowsBy() const;
+  /// Set exponential allocation growth.  Overrides SetGrowsBy().
+  virtual void SetGrowsExponentially(bool);
+  /// Get exponential growth setting.
+  virtual bool GetGrowsExponentially() const;
 
   /// Truncate the string
   virtual void Truncate (size_t iPos);

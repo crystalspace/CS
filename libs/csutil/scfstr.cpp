@@ -27,8 +27,20 @@ SCF_IMPLEMENT_IBASE_END
 void scfString::SetCapacity (size_t NewSize)
 { s.SetCapacity (NewSize); }
 
-void scfString::SetFastGrowing (bool fast)
-{ s.SetFastGrowing (fast); }
+size_t scfString::GetCapacity() const
+{ return s.GetCapacity(); }
+
+void scfString::SetGrowsBy(size_t n)
+{ s.SetGrowsBy(n); }
+
+size_t scfString::GetGrowsBy() const
+{ return s.GetGrowsBy(); }
+
+void scfString::SetGrowsExponentially(bool b)
+{ s.SetGrowsExponentially(b); }
+
+bool scfString::GetGrowsExponentially() const
+{ return s.GetGrowsExponentially(); }
 
 void scfString::Truncate (size_t iPos)
 { s.Truncate (iPos); }

@@ -33,15 +33,35 @@ SCF_VERSION (iString, 0, 1, 0);
 /// This is a SCF-compatible interface for csString.
 struct iString : public iBase
 {
-  /// Set string capacity to NewSize characters (plus one for ending NULL)
+  /**
+   * Advise the string that it should allocate enough space to hold up to
+   * NewSize characters.  After calling this method, the string's capacity will
+   * be at least NewSize + 1 (one for the implicit null terminator).  Never
+   * shrinks capacity.  If you need to actually reclaim memory, then use Free()
+   * or Reclaim().
+   */
   virtual void SetCapacity (size_t NewSize) = 0;
+  /// Get string capacity.
+  virtual size_t GetCapacity () const = 0;
 
   /**
-   * If this is set to true then we have a string that grows faster.
-   * Use this if memory is not really a big issue but you have a
-   * string that has a lot of Append calls.
+   * Advise the string that it should grow by approximately this many bytes
+   * when more space is required.  This value is only a suggestion.  The actual
+   * value by which it grows may be rounded up or down to an
+   * implementation-dependent allocation multiple.
    */
-  virtual void SetFastGrowing (bool fast) = 0;
+  virtual void SetGrowsBy(size_t) = 0;
+  /// Get the allocation growth increment.
+  virtual size_t GetGrowsBy() const = 0;
+
+  /**
+   * Tell the string to re-size its buffer exponentially as needed.  If set to
+   * true, the GetGrowsBy() setting is ignored.
+   */
+  virtual void SetGrowsExponentially(bool) = 0;
+
+  /// Returns true if exponential growth is enabled.
+  virtual bool GetGrowsExponentially() const = 0;
 
   /// Truncate the string
   virtual void Truncate (size_t iPos) = 0;

@@ -29,32 +29,63 @@
 class csString
 {
 protected:
-  /// String buffer.
+  // Default number of bytes by which allocation should grow.
+  // *** IMPORTANT *** This must be a power of two (i.e. 8, 16, 32, 64, etc.).
+  enum { DEFAULT_GROW_BY = 64 };
+
+  // String buffer.
   char *Data;
-  /// Length of string; not including null terminator.
+  // Length of string; not including null terminator.
   size_t Size;
-  /// Size in bytes of allocated string buffer.
+  // Size in bytes of allocated string buffer.
   size_t MaxSize;
-  /// If true this string grows a lot.
-  bool grows_a_lot;
+  // Size in bytes by which allocated buffer is increased when needed.
+  size_t GrowBy;
+  // Controls if allocated buffer grows exponentially (overrides GrowBy).
+  bool GrowExponentially;
+
+  // If necessary, increase the buffer capacity enough to hold NewSize bytes.
+  // Buffer capacity is increased in GrowBy increments or exponentially
+  // depending upon configuration.
+  void ExpandIfNeeded(size_t NewSize);
 
 public:
   /**
-   * Set string capacity to at least NewSize characters (plus one for null
-   * terminator).  Never shrinks capacity.  If you need to actually reclaim
-   * memory, then use Free() or Reclaim().
+   * Advise the string that it should allocate enough space to hold up to
+   * NewSize characters.  After calling this method, the string's capacity will
+   * be at least NewSize + 1 (one for the implicit null terminator).  Never
+   * shrinks capacity.  If you need to actually reclaim memory, then use Free()
+   * or Reclaim().
    */
   void SetCapacity (size_t NewSize);
 
+  /// Return the current capacity.
+  size_t GetCapacity() const
+  { return MaxSize; }
+
   /**
-   * If this is set to true then we have a string that grows faster.
-   * Use this if memory is not really a big issue but you have a
-   * string that has a lot of Append calls.
+   * Advise the string that it should grow by approximately this many bytes
+   * when more space is required.  This value is only a suggestion.  The actual
+   * value by which it grows may be rounded up or down to an
+   * implementation-dependent allocation multiple.  This method turns off
+   * exponential growth.
    */
-  void SetFastGrowing (bool fast)
-  {
-    grows_a_lot = fast;
-  }
+  void SetGrowsBy(size_t);
+
+  /// Return the number of bytes by which the string grows.
+  size_t GetGrowsBy() const
+  { return GrowBy; }
+
+  /**
+   * Tell the string to re-size its buffer exponentially as needed.  If set to
+   * true, the GetGrowsBy() setting is ignored.
+   */
+  void SetGrowsExponentially(bool b)
+  { GrowExponentially = b; }
+
+  /// Returns true if exponential growth is enabled.
+  bool GetGrowsExponentially() const
+  { return GrowExponentially; }
 
   /// Free the memory allocated for the string
   void Free ();
@@ -186,7 +217,8 @@ public:
     return Append (iStr, iCount);
   }
 
-#define STR_REPLACE(TYPE) csString& Replace (TYPE s) { Size = 0; return Append(s); }
+#define STR_REPLACE(TYPE) \
+csString& Replace (TYPE s) { Size = 0; return Append(s); }
   STR_REPLACE(char)
   STR_REPLACE(unsigned char)
   STR_REPLACE(short)
@@ -237,31 +269,32 @@ public:
   { return (strncasecmp (Data ? Data : "", iStr, Size) == 0); }
 
   /// Create an empty csString object
-  csString () : Data (NULL), Size (0), MaxSize (0), grows_a_lot (false) {}
+  csString () : Data (NULL), Size (0), MaxSize (0), GrowBy (DEFAULT_GROW_BY),
+    GrowExponentially (false) {}
 
   /// Create an csString object and reserve space for iLength characters
   csString (size_t iLength) : Data (NULL), Size (0), MaxSize (0),
-  	grows_a_lot (false)
+    GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { SetCapacity (iLength); }
 
   /// Copy constructor from existing csString.
   csString (const csString& copy) : Data (NULL), Size (0), MaxSize (0),
-  	grows_a_lot (false)
+    GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (copy); }
 
   /// Copy constructor from ASCIIZ string
   csString (const char* copy) : Data (NULL), Size (0), MaxSize (0),
-  	grows_a_lot (false)
+    GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (copy); }
 
   /// Copy constructor from a character
   csString (char c) : Data (NULL), Size (0), MaxSize (0),
-  	grows_a_lot (false)
+    GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append (c); }
 
   /// Copy constructor from a character (unsigned)
   csString (unsigned char c) : Data(NULL), Size (0), MaxSize (0),
-  	grows_a_lot (false)
+    GrowBy (DEFAULT_GROW_BY), GrowExponentially(false)
   { Append ((char) c); }
 
   /// Destroy a csString object
@@ -294,9 +327,9 @@ public:
   csString& Format(const char *format, ...) CS_GNUC_PRINTF (2, 3);
 
   /**
-   * Format this string using sprintf() formatting directives in a va_list.  Automatically
-   * allocates sufficient memory to hold result.  Newly formatted string
-   * overwrites previous string value.
+   * Format this string using sprintf() formatting directives in a va_list.
+   * Automatically allocates sufficient memory to hold result.  Newly formatted
+   * string overwrites previous string value.
    */
   csString& FormatV(const char *format, va_list args);
 
@@ -408,7 +441,8 @@ public:
 #undef STR_PADCENTER
 
   // Assign a string to another
-#define STR_ASSIGN(TYPE) const csString& operator = (TYPE s) { return Replace (s); }
+#define STR_ASSIGN(TYPE) \
+const csString& operator = (TYPE s) { return Replace (s); }
   STR_ASSIGN(const csString&)
   STR_ASSIGN(const char*)
   STR_ASSIGN(char)
