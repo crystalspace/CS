@@ -59,6 +59,11 @@ The history order is reversed so that new features are at the top.
 	  systems.
 	- res changed the software renderer to not flip procedural textures 
 	  any more.
+	- groton (groton@gmx.net) modified the comment about the method 
+	  iEventQueue::Register in the file include/iutil/eventq.h, so now
+	  that comment is up to date with the introduction of two pseudo-event 
+	  types that have a Code value of cscmdProcess and cscmdFinalProcess.
+
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.

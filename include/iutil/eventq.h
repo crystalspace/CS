@@ -65,16 +65,21 @@ struct iEventQueue : public iBase
 
   /**
    * Register a listener for specific events.  If the listener is already
-   * registered, then this method merely changes the listener's `trigger'.  The
+   * registered, then this method merely changes the listener's `trigger'. The
    * `trigger' argument is a combination of the CSMASK_XXX event triggers
    * defined in iutil/evdefs.h.  Multiple triggers may be specified by
    * combining them with the bitwise "or" operator (`|').  The CSMASK_Nothing
    * event trigger is special.  If registered with this trigger, the listener
-   * will be called just before Process() iterates over the event queue, and
-   * just after it dispatches the last event.  In this case, the listener will
-   * be sent an csevBroadcast event with the Event.Command.Code equal to
-   * cscmdPreProcess before event dispatching, and cscmdPostProcess after event
-   * dispatching.
+   * will be called in just before Process() iterates over the event queue, 
+   * and then it will be called with 3 different csevBroadcast events after 
+   * has been dispatched the last event. In this case, the listener will be 
+   * sent an csevBroadcast event with the Event.Command.Code equal to 
+   * cscmdPreProcess before events dispatching, and after events dispatching
+   * the listener will receive three csevBroadcast events, in 3 successive 
+   * phases, following this ordering: the first broadcasted event has the 
+   * Event.Command.Code equal to cscmdProcess, then the second broadcasted 
+   * event has a value of cscmdPostProcess and finally the last event 
+   * broadcasted has the cscmdFinalProcess value .
    */
   virtual void RegisterListener (iEventHandler*, unsigned int trigger) = 0;
 
