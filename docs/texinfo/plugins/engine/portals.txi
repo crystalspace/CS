@@ -81,15 +81,30 @@ ceiling polygon.  All polygons are equivalent.
 
 @subsubheading Sectors
 @cindex Sectors
+@cindex visibility culler
 
 In this section I will describe Sectors a bit more thoroughly.  As stated
 before sectors are regions of space. You can fill a sector with geometry
 by using mesh objects (@pxref{MeshObject}).
 
-It is also possible to add a @sc{bsp} tree to a sector.  This is useful if you
-want to define very big non-convex sectors.  The @sc{bsp} is local to the
-sector.  A different sector can use its own @sc{bsp} if it so chooses.
-The sector still uses portals to go to other sectors.
+With a sector there is always an associated visibility culler. Currently
+Crystal Space supports two cullers:
+@itemize
+@item
+@samp{frustvis}: This is the default visibility culler that is used if no
+other is specified. It only does frustum culling. It is the best culler to
+use for simple sectors that don't have a lot of objects or else for sectors
+that are big but where all objects are small. For such sectors it doesn't
+make much sense to try to do more complicated visibility culling so
+frustum cullling (testing if an object is visible in the current view)
+is more than enough.
+@item
+@samp{dynavis}: This is a more advanced visibility culler that does
+frustum culling in addition to trying to avoid rendering objects that
+are obscured by other objects (@pxref{Visibility Culling}). This culler
+is mainly useful when you have big complex sectors with lots of objects
+and when objects have a good chance of occluding (hiding) other objects.
+@end itemize
 
 @subsubheading Things
 @cindex Things
@@ -186,9 +201,8 @@ Note that static lighting makes this a bit difficult in some cases.
 @end itemize
 
 One disadvantage a portal engine is that it can be more difficult to define
-worlds.  You have to make sure that all sectors are convex.  A @sc{bsp} tree
-approach, on the other hand, would solve this problem automatically. Crystal
-Space also supports this.
+worlds. If you want to be able to use @sc{zfill} mode you must make all
+sectors convex. If you don't care about that then you can use @sc{zuse} too.
 
 @subsubheading Rendering The World
 @cindex Rendering The World
@@ -197,6 +211,12 @@ This section describes the various steps taken by the engine to actually
 render the world.  The camera and a view 2D polygon are given as parameters
 (the view polygon defines what is visible on the screen).
 
+Note that this discussion explains how thing polygons are rendered using
+the current implementation. As this implementation is not hardware friendly
+(i.e. it doesn't allow for hardware accelerated transforms) we will change
+this in the future. Note that some of the other objects (like genmesh,
+spr3d, @dots{}) correctly support hardware accelerated transforms already.
+
 @enumerate
 @item
 First the mesh objects of the current sector are transformed from world to
@@ -204,9 +224,7 @@ camera space using the given camera (this means that all of the vertices are
 transformed).
 
 @item
-Then, for every polygon of the current mesh object do the following
-(if there is a @sc{bsp} for this sector then the following is also done but
-in back to front order as defined by the @sc{bsp}):
+Then, for every polygon of the current mesh object do the following:
 
 @enumerate a
 @item
@@ -253,12 +271,14 @@ it is drawn over the resulting image.
 @noindent
 
 A consequence of this algorithm is that there is no overdraw when drawing the
-sectors.  The 2D polygon clipping algorithm takes care of that.  One may think
-that this algorithm would be rather expensive but this does not seem to be the
-case.  So we eliminate overdraw when drawing all the sectors without having to
-resort to S-buffer or other similar techniques.
+outer walls of a sector (if defined with @sc{zfill}). The 2D polygon clipping
+algorithm takes care of that.  One may think that this algorithm would be
+rather expensive but this does not seem to be the case.  So we eliminate
+overdraw when drawing all the sectors without having to resort to S-buffer or
+other similar techniques.
 
-There is overdraw when Things are drawn.  This is difficult to avoid.  One
-could consider another clipping algorithm but this would result in concave
-polygons which our polygon drawer can not handle.
+There is overdraw when inner things are drawn (the ones using @sc{zuse}).
+This is difficult to avoid.  One could consider another clipping algorithm
+but this would result in concave polygons which our polygon drawer can not
+handle.
 

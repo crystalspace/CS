@@ -15,19 +15,18 @@ only represents of the ideal implementation which lives in my head right
 now and which I'm planning to implement in the near future. Parts of the
 system are implemented though.
 
-@emph{NOTE}: This section is greatly outdated and needs information about
-Dynavis.
-
 @menu
 * VIS sectors and portals:: Sectors and Portals
+* VIS cullers:: Visibility Cullers
 * VIS entities:: Entities
 * VIS sector structure:: Sector Structure
 * VIS visibility culling:: Visibility Culling
 * VIS view frustum culling:: View Frustum Culling
 * VIS portal/Sector visibility:: Portal/Sector Visibility
+* VIS Insector Vis:: In-sector Visibility
 @end menu
 
-@node VIS sectors and portals, VIS entities, Visibility Culling, Visibility Culling
+@node VIS sectors and portals, VIS cullers, Visibility Culling, Visibility Culling
 @subsubsection Sectors and Portals
 @cindex portals
 @cindex sectors
@@ -54,7 +53,33 @@ is all visibility testing that ignores portal boundaries and we have
 portal/sector visibility which controls what you can see through a
 portal. Discussing both will be the main focus of this document later.
 
-@node VIS entities, VIS sector structure, VIS sectors and portals, Visibility Culling
+@node VIS cullers, VIS entities, VIS sectors and portals, Visibility Culling
+@subsubsection Visibility Cullers
+@cindex frustvis
+@cindex dynavis
+
+With a sector there is always an associated visibility culler. Currently
+Crystal Space supports two cullers:
+@itemize
+@item
+@samp{frustvis}: This is the default visibility culler that is used if no
+other is specified. It only does frustum culling. It is the best culler to
+use for simple sectors that don't have a lot of objects or else for sectors
+that are big but where all objects are small. For such sectors it doesn't
+make much sense to try to do more complicated visibility culling so
+frustum cullling (testing if an object is visible in the current view)
+is more than enough.
+@item
+@samp{dynavis}: This is a more advanced visibility culler that does
+frustum culling in addition to trying to avoid rendering objects that
+are obscured by other objects. This culler
+is mainly useful when you have big complex sectors with lots of objects
+and when objects have a good chance of occluding (hiding) other objects.
+@end itemize
+
+This document will mainly discuss @samp{Dynavis}.
+
+@node VIS entities, VIS sector structure, VIS cullers, Visibility Culling
 @subsubsection Entities
 
 But first lets discuss the type of entities that Crystal Space supports.
@@ -86,9 +111,8 @@ objects. Polygons on things can also be portals to other areas.
 @cindex Visibility of Curved Surfaces
 @cindex Curved Surfaces, Visibility
 
-Curved surfaces are technically part of things but for visibility
-they are considered differently. They are always considered as detail
-objects as they represent a rather large triangle mesh.
+Curved surfaces are part of things at this moment. They are usually
+considered as detail objects.
 
 @subsubheading Terrain Surfaces
 @cindex Visibility of Terrain Surfaces
@@ -164,7 +188,7 @@ objects automatically from detail objects.
 View frustum culling is the most obvious type of culling.  Crystal Space does
 this for all objects.
 
-@node VIS portal/Sector visibility, , VIS view frustum culling, Visibility Culling
+@node VIS portal/Sector visibility, VIS Insector Vis, VIS view frustum culling, Visibility Culling
 @subsubsection Portal/Sector Visibility
 
 Portal/sector visibility is based on 2D clipping. The 2D projected
@@ -182,4 +206,18 @@ Detail objects like 3D sprites are only clipped in total. i.e. the individual
 polygons are not clipped but either the object is visible or not. The
 Z-buffer takes care of the rest. To do this clipping we take the bounding
 box of the object and test if that bounding box is visible through the portal.
+
+@node VIS Insector Vis, , VIS portal/Sector visibility, Visibility Culling
+@subsubsection In-sector Visibility
+
+For in-sector visibility either @samp{frustvis} or @samp{dynavis} can
+be used. @samp{frustvis} only does frustum culling so we will discuss
+@samp{dynavis} here.
+
+Dynavis is roughly based on @samp{dPVS}
+(@url{http://www.hybrid.fi/dpvs_download.html}) but at this moment we
+are not that advanced yet :-) I recommend you read the reference document
+you can download from there. It is very interesting.
+
+(more documentation todo later).
 

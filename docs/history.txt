@@ -25,6 +25,8 @@ The history order is reversed so that new features are at the top.
 	- Changed prototype of iSharedVariable->SetVector() so that it
 	  expects a vector instead of three floats.
 	- Added 'const' to a few methods in iSharedVariable.
+	- Updated the FAQ a little bit.
+	- Updated a bit of the engine documentation.
 15-Jan-2003
 	- Started removing a few csVector usages and replacing them
 	  with typed versions. In particular changed:

@@ -7,11 +7,7 @@
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
-@strong{Warning}: About half of the information in this document is out of
-date and no longer accurately reflects the state of the rendering engine in
-Crystal Space.
-
-Here is a run-through of the main rendering loop.  This document is not an
+Here is a short run-through of the main rendering loop.  This document is not an
 explanation of portal technology.  It just explains how the main rendering
 loop in Crystal Space works so that you can have a quick idea of where you
 have to go to see a particular part of the algorithm work.  This is a rather
@@ -22,8 +18,8 @@ to know how Crystal Space works internally.
 To understand this you should know how portals are used in Crystal Space.  You
 should also read the tutorial (@pxref{Tutorial Simple}) as this explains the
 basics for using Crystal Space.  This document is based upon the
-@file{simple} application (@file{CS/apps/simple/}) because this discussion
-looks a lot like a tutorial.
+@file{simple} application (@file{CS/apps/tutorial/simple1/}) because this
+discussion looks a lot like a tutorial.
 
 First we start in @file{apps/tutorial/simple1/simple1.cpp}.  In the
 @code{main()} function we initialize our engine.  This is an instance of the
@@ -62,10 +58,6 @@ geometry in 3D to @samp{clip_plane}.  This is normally not used except in
 special cases where we have portals that arrive in the middle of a sector.  In
 that case the portal will be used as an extra clipping plane because we don't
 want to render everything that is behind the arrival plane of the portal.
-
-@item callback
-@itemx callback_data
-These are used for special purposes which are not relevant to this discussion.
 @end table
 
 Another important thing is that @samp{csRenderView} is actually a subclass of
@@ -89,190 +81,42 @@ This method @code{csSector::Draw()} is located in
 @file{CS/libs/csengine/sector.cpp}.
 
 @code{csSector::Draw()} is responsible for rendering everything in the current
-sector.  It will do this by first rendering the walls of the sector (using
-Z-fill only).  It is possible that there is a @sc{bsp} tree attached to the
-sector.  In that case @code{csSector::Draw()} will use that @sc{bsp} tree to
-sort the wall polygons back to front.
+sector. Before it does that it will ask the current visibility culler
+(@samp{frustvis} or @samp{dynavis}) what objects are likely to be visible
+or not. It will then render all visible objects sorted by render priority
+(@pxref{HOWTO Render Priorities}) and using the z-buffer mode that is
+associated with every object. It is up to the map designer to make sure
+that the objects in their render priority and z-buffer mode will actually
+cause the sector to be rendered ok.
 
-Before actually starting to render, it will first transform the sector to the
-camera position so that (0,0,0) is the camera point, (1,0,0) is one unit right
-of the camera, (0,1,0) is one unit above the camera, and (0,0,1) is one unit
-above the camera.  This is done in @code{csPolygonSet::NewTransformation()}
-and @code{csPolygonSet::TransformWorld2Cam()} (see
-@file{CS/libs/csengine/basic/polyset.cpp}).  The call to
-@code{NewTransformation()} is needed because it is possible that we render the
-same sector multiple times in the same recursion tree.  Because of this we
-don't actually want to loose the transformation that occurred the previous time
-so @code{NewTransformation()} takes care of potentially storing the old
-transformation and setting a new one (mirrors and other space warping portals
-make this feature essential).
+Every object that is rendered will get the current camera transformation
+so it can correctly transform its coordinates from world to camera space:
+(0,0,0) is the camera pointer, (1,0,0) is one to the right, (0,1,0) is one
+unit above the camera, and (0,0,1) is one unit in front of the camera.
 
-After that actual drawing of the transformed polygons is performed by the
-method @code{csSector::DrawPolygons()}, which in turn calls
-@code{csPolygonSet::DrawPolygonArray()}.  The @samp{csPolygonSet} class is
-implemented in @file{CS/libs/csengine/basic/polyset.cpp}), and
-@code{DrawPolygonArray()} is discussed further in the next section.
+Every object also gets the current movable (@code{csMovable}) which indicates
+where the object currently is in the world. The transform created from
+the camera and the movable can be used to transform from object space
+to camera space. Note that some objects leave this transformation up to
+the 3D renderer which is good because that means hardware accelerated
+transforms can be used.
 
-While drawing the polygons of the sector (which are the sector's walls) some
-of them may be portals.  In that case @code{csPolygonSet::DrawPolygonArray()}
-will immediately perform recursion to the destination sector of the portal.
-This means creating a new @samp{csRenderView} with the new view and then
-recursing into @code{csSector::Draw()} of the new sector.  It is important to
-note that @code{DrawPolygonArray()} may already enter recursion for a new
-sector even though the first sector has not finished drawing yet.
+Every mesh object is responsible for drawing itself (@pxref{MeshObject}).
+The engine decides when to render an object, the object decides on how
+to render itself. Finally the 3D renderer will process the actual rendering
+operations done by the mesh object.
 
-So it is important to note that after drawing all sector walls we have in fact
-drawn the entire world visible from this sector (including things and sprites
-in other sectors).  But we have not drawn things and sprites in this sector
-yet.
+The @samp{thing} mesh object type supports portals. When such a thing containing
+a portal is rendered the destination sector will be rendered recursively.
+This means that rendering of the current sector will be temporarily
+suspended while first the destination sector through that portal is rendered.
+Going through a portal results in the current @samp{csRenderView}
+instance to get a new clipper (a smaller clipper usually). Objects can use
+that clipper to decide if they want to be rendered or not. In some special
+cases a portal can also transform space (like a mirror). In that case the
+world@result{}camera transformation will also be modified in the current
+@code{csRenderView}.
 
-@code{csSector::Draw()} will then continue to draw all things in the current
-sector.  There are some special cases here.  It is possible that all
-non-moving things have been collected into one thing which has an attached
-@sc{bsp} tree.  This is the @samp{static_thing}.  If that exists we first
-render that @samp{static_thing} by using back to front ordering and using
-Z-fill instead of Z-buffer.  Note that all non-moving things which were
-collected into the static thing are still in the list of things for the
-sector.  But you can recognize them because they @code{IsMerged()} returns
-true.
+When a sector has finished rendering we conclude by optionally fogging the
+current sector if this is needed.
 
-Now there are two important cases depending on whether or not there was a
-static thing in the previous case.  If there was a static thing or if the
-sector itself had a @sc{bsp} tree, then all remaining things have to be drawn
-using the Z-buffer (ignoring foggy things for the moment).  In this case we
-can't use Z-fill anymore because there was a @sc{bsp} tree used to render the
-previous sector or static thing.
-
-If there was no static thing and there was no @sc{bsp} tree for the sector
-then we can still use Z-fill to render all convex things provided we render
-them back to front.  This part of the algorithm does not work correctly yet
-and that's the reason that it has been disabled.
-
-In any case all foggy things are collected and then Z-sorted.  This is also
-not correct but currently the only way.  Here we need a better way to do
-Z-sorting.
-
-Now we can proceed to drawing all sprites.  @strong{Warning}: @emph{The
-remainder of this paragraph is no longer true.} Currently this algorithm is
-somewhat simple.  It assumes that a sprite always lives in one sector.  This
-is of course not always right and the sprite structure (@samp{csSprite3D} in
-@file{CS/libs/csengine/objects/cssprite.h}) already has provisions for the
-fact that a single sprite can live in several sectors at the same time.  What
-we want to do here is to only draw a sprite if one of the below conditions is
-true:
-
-@enumerate
-@item
-The current sector is being rendered through an alpha mapping portal.
-
-@item
-The sector we came from before entering the portal (in the render process) is
-also a sector where the sprite lives.
-@end enumerate
-
-In the first case we have to clip the sprite to the portal and render only the
-side on this portal.  When returning from the recursion we will have to render
-the other side of the sprite.
-
-In the second case we don't render the sprite but it will be rendered when we
-return from our recursion because the sprite is also part of the previous
-sector.
-
-The next step in @code{csSector::Draw()} is to queue all halos that were
-encountered in this sector so that they can be drawn later.  A Z-buffer
-visibility test will be used later to make sure that the halo only appears
-when the center is visible.
-
-Finally we conclude by optionally fogging the current sector if this is
-needed.  There are currently two ways of fogging:
-
-@itemize @bullet
-@item
-Using the Z-buffer (@samp{G3DFOGMETHOD_ZBUFFER}).
-
-@item
-Using planed fog (@samp{G3DFOGMETHOD_PLANES}).
-@end itemize
-
-@noindent
-@emph{Fixme}: Is the next paragraph even accurate anymore?
-
-The last method does not work correctly at this time.  The first method is
-only implemented by the software renderer.
-
-The method @code{csSector::Draw()} ends by restoring the transformation by
-calling @code{csPolygonSet::RestoreTransformation()}.
-
-@subsubheading Polygon Array Rendering (@code{csPolygonSet::DrawPolygonArray()})
-
-The implementation of @code{csPolygonSet::DrawPolygonArray()} can be found in
-the file @file{CS/libs/csengine/basic/polyset.cpp}.
-
-Both @samp{csSector} and @samp{csThing} inherit from @samp{csPolygonSet} so
-they both basically use the same way of rendering polygons.
-@code{DrawPolygonArray()} is responsible for that.  @code{DrawPolygonArray()}
-is typically called on either the complete list of polygons for the
-@samp{csThing} or @samp{csSector} or else a subset which was computed from a
-@sc{bsp} tree.
-
-@code{DrawPolygonArray()} will process every polygon in the array in turn.  It
-will basically call the following three functions for every polygon:
-
-@enumerate
-@item
-@code{csPolygon3D::ClipToPlane()} (@file{CS/libs/csengine/polygon/polygon.cpp})
-
-@item
-@code{csPolygon3D::DoPerspective()}
-
-@item
-@code{csPolygon2D::ClipAgainst()}
-@end enumerate
-
-@code{ClipToPlane()} will do a quick test to see if all vertices of the
-polygon are in front of the Z-plane.  That will at least exclude polygons
-quickly which are behind the viewer.  Then it will perform backface culling.
-Finally it will process the special @samp{clip_plane} field in
-@samp{csRenderView} which was mentioned in the beginning of this document.  In
-other words, it will clip the polygon in 3D to that plane.  This is rarely
-needed.
-
-If @code{ClipToPlane()} fails then the polygon is not visible and we don't
-need to continue with the other steps.
-
-@code{DoPerspective()} does perspective correction on the polygon and thus
-transforms the polygon from 3D to 2D.  The 2D polygon will be placed in a
-special static variable of type @samp{csPolygon2D} (called @samp{clipped}).
-Finally it will also transform the plane of the polygon to camera space.
-
-@code{DoPerspective()} can also fail in which case the polygon is not visible
-and processing can stop here.
-
-Finally we do @code{ClipAgainst()}.  This will clip the polygon to the current
-view.  The clipping happens in place.  The result will be in @samp{clipper}.
-
-If @code{ClipAgainst()} fails the polygon was completely clipped away and we
-don't need to show anything.
-
-When all three steps above succeed we have a visible (part) of a polygon which
-has been perspective corrected.  We can now render that polygon.
-
-If the polygon is a portal then we initiate a recursive process by calling the
-method @code{csPortal::Draw()} (@file{CS/libs/csengine/polygon/portal.cpp})
-which will in turn call @code{csSector::Draw()} for the destination sector.
-@code{csPortal::Draw()} also takes care of possible space warping and also
-creation of the @samp{clip_plane} in @samp{csRenderView} if this should be
-needed.
-
-If a portal has an alpha transparent texture superimposed then we will draw
-that texture on top of the portal when @code{csPortal::Draw()} returned.
-However since @samp{clipped} is a static variable we need to copy it locally
-to be able to draw it again later.  This happens in @samp{keep_clipped} and
-@samp{keep_plane}.
-
-If the polygon was not a portal then we just render it.  This happens in
-@code{csPolygon2D::DrawFilled()} (from the file
-@file{CS/libs/csengine/polygon/polygon.cpp}) which is further explained in the
-next section.
-
-That's basically it for this function.

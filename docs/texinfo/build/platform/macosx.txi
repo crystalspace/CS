@@ -131,9 +131,9 @@ Once you have obtained the latest Crystal Space source code package
 (@pxref{Where to Get}) and have installed or prepared the supporting libraries
 (@pxref{MacOS/X Libraries}), unpack the source code archive into a convenient
 directory as shown below.  A description of the directory hierarchy which is
-created when you unpack the source code archive is available, @ref{Directory
-Hierarchy}.  A description of the files specific to the MacOS/X port is also
-available, @ref{MacOS/X Details}.
+created when you unpack the source code archive is available,
+@ref{Directory Hierarchy}.  A description of the files specific to the MacOS/X
+port is also available, @ref{MacOS/X Details}.
 
 @example
 gnutar xfz @var{CS-package-name}.tgz

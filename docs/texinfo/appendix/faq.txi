@@ -169,7 +169,19 @@ with the @samp{-mode=} option.  @xref{Common Command Line Options}.
 @strong{A2}: Use a hardware accelerated graphics card and driver.  Such cards
 are quite popular these days and can perform extremely well, especially when
 compared to Crystal Space's software renderer. Framerates of 100 fps and more
-are not uncommon if you have a properly configured OpenGL renderer.
+are not uncommon if you have a properly configured OpenGL renderer. Note that
+by default Crystal Space does not use OpenGL. You have to use the
+@samp{-video=opengl} commandline option to enable OpenGL rendering.
+
+@item
+@strong{Q}: I'm using OpenGL with Crystal Space (using the commandline
+option @samp{-video=opengl} for example) but it really goes extremely slow.
+What's wrong?
+
+@strong{A}: When this happens this usually means that your OpenGL renderer
+is not using hardware acceleration. If you are sure that you actually have
+a 3D card that is supported by OpenGL then you should make sure you have
+recent drivers for that card and that they are properly configured.
 
 @item
 @strong{Q}: I want to create textures for Crystal Space.  What palette should I
@@ -433,6 +445,21 @@ Note that you should invoke the method @code{engine->GetBeginDrawFlags()} in
 your call to @code{g3d->BeginDraw()} to ensure that this Z-buffer clearing will
 actually work (in fact you should @emph{always} use
 @code{GetBeginDrawFlags()}).
+
+@item
+@strong{Q}: I'm using a @samp{thing} mesh object and some of the polygons
+are rendered completely wrong.
+
+@strong{A1}: Polygons in Crystal Space must be convex (meaning that every
+line between two random vertices of the polygon is fully contained in
+the polygon).
+
+@strong{A2}: The vertices of the polygon must all be on the same plane.
+For a triangle that is automatically the case.
+
+@strong{A3}: If you specify texture coordinates using @samp{uv} on three
+of the polygon vertices then those three texture coordinates must be
+different.
 
 @item
 @strong{Q}: I'm trying to use some plugin but it says that it cannot find it
