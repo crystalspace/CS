@@ -10,6 +10,9 @@ The history order has been reversed so that new features are at the top.
 	  created with the wrong position. Actually, it is the right position
 	  but set through the wrong method. Now correctly uses
 	  movable.SetPosition() to set the position.
+	- Added the first and incomplete include/imspr3d.h which contains
+	  the iSprite3DState and iSprite3DFactoryState SCF interfaces that
+	  will be used by to access the sprite3d plugin (when it is ready).
 14-Jan-2001
 	- Eric Sunshine fixed vfs.cfg so that it works with MacOS/X Server
 	  again following Andrew's change to the meaning of CS_PLATFORM_NAME.
