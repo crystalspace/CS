@@ -503,8 +503,11 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 #endif
 
 #ifdef __CYGWIN32__
+#if !defined(CS_IMPLEMENT_PLATFORM_APPLICATION)
 #define CS_IMPLEMENT_PLATFORM_APPLICATION
-#else
+#endif
+
+#else // __CYGWIN32__
 
 /*
  if the EXE is compiled as a GUI app,
@@ -513,6 +516,7 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
  instead. 
  */
 
+#if !defined(CS_IMPLEMENT_PLATFORM_APPLICATION)
 #define CS_IMPLEMENT_PLATFORM_APPLICATION                              \
 int main (int argc, char* argv[]);                                     \
 int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show)\
@@ -524,11 +528,13 @@ int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show)\
   int ret = main(CS_WIN32_ARGC, CS_WIN32_ARGV);                        \
   return ret;                                                          \
 }
+#endif // CS_IMPLEMENT_PLATFORM_APPLICATION
 
-#endif
+#endif // __CYGWIN32__
 
 #if !defined(CS_STATIC_LINKED)
 
+#if !defined(CS_IMPLEMENT_PLATFORM_PLUGIN)
 #define CS_IMPLEMENT_PLATFORM_PLUGIN                                   \
 int _cs_main(int argc, char* argv[])                                   \
 {                                                                      \
@@ -543,7 +549,8 @@ CS_EXPORTED_FUNCTION const char* plugin_compiler()                     \
 {                                                                      \
          return CS_COMPILER_NAME;                                      \
 }
+#endif // CS_IMPLEMENT_PLATFORM_PLUGIN
 
-#endif // !CS_STATIC_LINKED
+#endif // CS_STATIC_LINKED
 
 #endif // __CS_CSOSDEFS_H__

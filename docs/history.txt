@@ -8,6 +8,9 @@ chronological order.
 
 12-Mar-2004
 	- res fixed a few lib name issues in configure.
+	- Eric Sunshine fixed win32/csosdefs.h so that it only defines
+	  CS_IMPLEMENT_PLATFORM_APPLICATION and CS_IMPLEMENT_PLATFORM_PLUGIN if
+	  the client has not already provided definitions for these macros.
 11-Mar-2004
 	- Eric Sunshine performed an overhaul of the "Creating an External
 	  Crystal Space Application" HOWTO since it was extremely outdated.
