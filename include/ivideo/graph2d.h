@@ -149,7 +149,7 @@ struct iOffscreenCanvasCallback : public iBase
   virtual void SetRGB (iGraphics2D* canvas, int idx, int r, int g, int b) = 0;
 };
 
-SCF_VERSION (iGraphics2D, 2, 4, 0);
+SCF_VERSION (iGraphics2D, 2, 5, 0);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -383,7 +383,7 @@ struct iGraphics2D : public iBase
    * all black colors in the image will become the value of 'bg' and all 
    * non-black colors will become 'fg'
    */
-  virtual bool SetMouseCursor (iImage *image, csRGBcolor keycolor, 
+  virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor = 0, 
                                int hotspot_x = 0, int hotspot_y = 0,
                                csRGBcolor fg = csRGBcolor(255,255,255),
                                csRGBcolor bg = csRGBcolor(0,0,0)) = 0;

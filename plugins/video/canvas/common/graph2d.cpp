@@ -983,7 +983,7 @@ bool csGraphics2D::SetMouseCursor (csMouseCursorID iShape)
   return (iShape == csmcArrow);
 }
 
-bool csGraphics2D::SetMouseCursor (iImage *, csRGBcolor, int, int, 
+bool csGraphics2D::SetMouseCursor (iImage *, const csRGBcolor*, int, int, 
                                    csRGBcolor, csRGBcolor)
 {
   return false;

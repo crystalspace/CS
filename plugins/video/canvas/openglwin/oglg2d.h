@@ -24,6 +24,7 @@
 #include "plugins/video/canvas/common/graph2d.h"
 #include "plugins/video/canvas/openglcommon/glcommon2d.h"
 #include "plugins/video/canvas/openglcommon/iogl.h"
+#include "plugins/video/canvas/win32canvascommon/customcursor.h"
 
 #include "detectdriver.h"
 
@@ -70,6 +71,9 @@ public:
   virtual HRESULT SetColorPalette();
 
   virtual bool SetMouseCursor (csMouseCursorID iShape);
+  virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor, 
+                               int hotspot_x, int hotspot_y,
+                               csRGBcolor fg, csRGBcolor bg);
   virtual bool SetMousePosition (int x, int y);
 
   virtual bool PerformExtensionV (char const* command, va_list);
@@ -133,6 +137,8 @@ protected:
   void SwitchDisplayMode (bool userMode);
   /// hardware accelerated?
   bool hardwareAccelerated;
+
+  csWin32CustomCursors cursors;
 };
 
 #endif // __CS_OGLG2D_H__

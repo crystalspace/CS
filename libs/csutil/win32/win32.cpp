@@ -104,7 +104,6 @@ private:
   /// The console codepage that was set on program startup. WIll be restored on exit.
   UINT oldCP;
 
-  void SetWinCursor (HCURSOR);
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
   static LRESULT CALLBACK CBTProc (int nCode, WPARAM wParam, LPARAM lParam);
@@ -117,6 +116,7 @@ public:
   virtual bool GetIsActive () const;
   virtual int GetCmdShow () const;
   virtual bool SetCursor (int cursor);
+  virtual bool SetHCursor (HCURSOR);
   virtual bool HandleEvent (iEvent&);
   virtual unsigned GetPotentiallyConflictingEvents ();
   virtual unsigned QueryEventPriority (unsigned);
@@ -545,10 +545,11 @@ void Win32Assistant::Shutdown()
   }
 }
 
-void Win32Assistant::SetWinCursor (HCURSOR cur)
+bool Win32Assistant::SetHCursor (HCURSOR cur)
 {
   m_hCursor = cur;
   ::SetCursor (cur);
+  return true;
 }
 
 unsigned Win32Assistant::GetPotentiallyConflictingEvents ()
@@ -814,7 +815,7 @@ bool Win32Assistant::SetCursor (int cursor)
     cur = 0;
     success = false;
   }
-  SetWinCursor (cur);
+  SetHCursor (cur);
   return success;
 }
 

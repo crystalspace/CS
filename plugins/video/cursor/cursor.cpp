@@ -276,8 +276,8 @@ bool csCursor::SwitchCursor (const char *name)
     checkedOSsupport = true;
 
     // Attempt to use image to enable OS level cursor
-    if (g2d->SetMouseCursor (ci->image, ci->keycolor, ci->hotspot.x, 
-                             ci->hotspot.y, ci->fg, ci->bg))
+    if (g2d->SetMouseCursor (ci->image, ci->hasKeyColor ? &ci->keycolor : 0, 
+      ci->hotspot.x, ci->hotspot.y, ci->fg, ci->bg))
     {
       useOS = true;
       return true;
@@ -286,8 +286,8 @@ bool csCursor::SwitchCursor (const char *name)
   }
 
   // We already know which method to use if we're here
-  if (useOS) g2d->SetMouseCursor (ci->image, ci->keycolor, ci->hotspot.x,
-                                  ci->hotspot.y, ci->fg, ci->bg);
+  if (useOS) g2d->SetMouseCursor (ci->image, ci->hasKeyColor ? &ci->keycolor : 0, 
+    ci->hotspot.x, ci->hotspot.y, ci->fg, ci->bg);
 
   current = name;
   return true;

@@ -343,7 +343,7 @@ public:
    * all black colors in the image will become the value of 'bg' and all 
    * non-black colors will become 'fg'
    */
-  virtual bool SetMouseCursor (iImage *image, csRGBcolor keycolor, 
+  virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor = 0, 
                                int hotspot_x = 0, int hotspot_y = 0,
                                csRGBcolor fg = csRGBcolor(255,255,255),
                                csRGBcolor bg = csRGBcolor(0,0,0));

@@ -34,7 +34,7 @@
 /// CrystalSpace window class (Unicode version)
 #define CS_WIN32_WINDOW_CLASS_NAMEW L"CrystalSpaceWin32"
 
-SCF_VERSION (iWin32Assistant, 0, 1, 0);
+SCF_VERSION (iWin32Assistant, 0, 2, 0);
 
 /**
  * This interface describes actions specific to the Windows platform.
@@ -56,6 +56,8 @@ struct iWin32Assistant : public iBase
   virtual int GetCmdShow () const = 0;
   /// Set the mouse shape.
   virtual bool SetCursor (int cursor) = 0;
+  /// Set the mouse shape.
+  virtual bool SetHCursor (HCURSOR cursor) = 0;
   /// Disable the console window (if present)
   virtual void DisableConsole () = 0;
   /// Display a nice message box

@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2003 by Jorrit Tyberghein
-	      (C) 2003 by Frank Richter
+    Copyright (C) 2004 by Jorrit Tyberghein
+	      (C) 2004 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,35 +17,21 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_PROCTXTANIM_H__
-#define __CS_PROCTXTANIM_H__
+#ifndef __CS_CANVAS_WIN32CANVASCOMMON_CUSTOMCURSOR_H__
+#define __CS_CANVAS_WIN32CANVASCOMMON_CUSTOMCURSOR_H__
 
-#include "csutil/scf.h"
-#include "iutil/comp.h"
-#include "iutil/plugin.h"
-#include "imap/reader.h"
-#include "igraphic/image.h"
-#include "igraphic/animimg.h"
-#include "cstool/proctex.h"
+#include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
+#include "csgfx/rgbpixel.h"
 
-/**
- * A procedural texture for animated images.
- */
-class CS_CSTOOL_EXPORT csProcAnimated : public csProcTexture
+class csWin32CustomCursors
 {
-private:
-  csRef<iImage> image;
-  csRef<iAnimatedImage> animation;
-
-  csTicks last_time;
+  csHash<HCURSOR, csStrKey, csConstCharHashKeyHandler> cachedCursors;
 public:
-  csProcAnimated (iImage* img);
-  virtual ~csProcAnimated ();
+  ~csWin32CustomCursors ();
 
-  virtual bool PrepareAnim ();
-
-  virtual void Animate (csTicks current_time);
+  HCURSOR GetMouseCursor (iImage* image, const csRGBcolor* keycolor, 
+    int hotspot_x, int hotspot_y, csRGBcolor fg, csRGBcolor bg);
 };
 
-#endif
-
+#endif // __CS_CANVAS_WIN32CANVASCOMMON_CUSTOMCURSOR_H__

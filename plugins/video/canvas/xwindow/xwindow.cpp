@@ -34,6 +34,7 @@
 #include "ivaria/reporter.h"
 #include "plugins/video/canvas/common/scancode.h"
 #include "igraphic/image.h"
+#include "plugins/video/canvas/common/cursorconvert.h"
 
 // Define this if you want keyboard-grabbing behavior enabled.  For now it is
 // disabled by default.  In the future, we should probably provide an API for
@@ -781,7 +782,7 @@ bool csXWindow::SetMouseCursor (csMouseCursorID iShape)
   } /* endif */
 }
 
-bool csXWindow::SetMouseCursor (iImage *image, csRGBcolor keycolor,
+bool csXWindow::SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
                                 int hotspot_x, int hotspot_y,
                                 csRGBcolor fg, csRGBcolor bg)
 {
@@ -798,35 +799,21 @@ bool csXWindow::SetMouseCursor (iImage *image, csRGBcolor keycolor,
     }
   }
 
-  // Get image info
-  csRGBpixel *pix = (csRGBpixel *) image->GetImageData ();
-  int numpixels = image->GetWidth() * image->GetHeight();
-  int numbytes = (int) ceil (numpixels / 8.0);
-
-  // Data for X functions
-  unsigned char source[numbytes], mask[numbytes];
-  memset (source, 0, numbytes);
-  memset (mask, 0, numbytes);
-
-  // In X we must have a monochrome pointer.  So we take all blacks and
-  // initialise their bit to 0 and all non-blacks and initialise their bit to
-  // 1.  At the same time, we create a mask array based on the keycolor provided
-  for (int i = 0; i < numpixels; i++)
-  {
-    // Calculate current array index and the bit in the char
-    int byte = (int) floor (i / 8.0);
-    int bit = i % 8;
-
-    // Set the appropriate bit in the source and mask bitmaps
-    if (pix[i].red || pix[i].green || pix[i].blue) source[byte] |= (1 << bit);
-    if (pix[i] != keycolor) mask[byte] |= (1 << bit);
-  }
+  // In X we must have a monochrome pointer. csCursorConverter takes care of
+  // the conversion.
+  uint8* source;
+  uint8* mask;
+  if (!csCursorConverter::ConvertTo1bpp (image, source, mask, fg, bg, 
+    keycolor)) 
+    return false;
 
   // Create Xwindow compatible Pixmaps
   Pixmap srcPixmap = XCreatePixmapFromBitmapData (dpy, ctx_win, (char *) source,
                                 image->GetWidth(), image->GetHeight(), 1, 0, 1);
   Pixmap maskPixmap = XCreatePixmapFromBitmapData (dpy, ctx_win, (char *) mask,
                                 image->GetWidth(), image->GetHeight(), 1, 0, 1);
+  delete[] source;
+  delete[] mask;
 
   // Create foreground color.  X colors are 16 bit so we must scale them to
   // keep relative values

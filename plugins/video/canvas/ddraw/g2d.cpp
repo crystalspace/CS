@@ -511,7 +511,7 @@ void csGraphics2DDDraw3::SetRGB (int i, int r, int g, int b)
 
 bool csGraphics2DDDraw3::SetMouseCursor (csMouseCursorID iShape)
 {
-bool rc;
+  bool rc;
   if (!m_bHardwareCursor)
   {
     m_piWin32Assistant->SetCursor (csmcNone);
@@ -522,6 +522,25 @@ bool rc;
     rc = m_piWin32Assistant->SetCursor (iShape);
   }
   return rc;
+}
+
+bool csGraphics2DDDraw3::SetMouseCursor (iImage *image, const csRGBcolor* keycolor, 
+					 int hotspot_x, int hotspot_y,
+					 csRGBcolor fg, csRGBcolor bg)
+{
+  if (!m_bHardwareCursor)
+  {
+    m_piWin32Assistant->SetCursor (csmcNone);
+    return false;
+  }
+  HCURSOR cur = cursors.GetMouseCursor (image, keycolor, hotspot_x, 
+    hotspot_y, fg, bg);
+  if (cur == 0)
+  {
+    m_piWin32Assistant->SetCursor (csmcNone);
+    return false;
+  }
+  return m_piWin32Assistant->SetHCursor (cur);
 }
 
 bool csGraphics2DDDraw3::SetMousePosition (int x, int y)

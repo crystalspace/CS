@@ -131,7 +131,7 @@ public:
   virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
-  virtual bool SetMouseCursor (iImage *image, csRGBcolor keycolor, 
+  virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor, 
                                int hotspot_x, int hotspot_y,
                                csRGBcolor fg, csRGBcolor bg);
 

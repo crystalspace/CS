@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Oct-2004
+	- res added a missing CS_CSTOOL_EXPORT to csProcAnimated.
+	- res added a helper class to quickly write images to disk for
+	  debugging purposes.
+	- res added custom cursor support to the Win32 canvases.
 7-Oct-2004
 	- Jorrit added a new 'proto' mesh. This is a basic mesh that can
 	  be used to start creating a new mesh. It supports the following

@@ -309,6 +309,17 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
 int csGraphics2DOpenGL::FindPixelFormatGDI (HDC hDC, 
 					    csGLPixelFormatPicker& picker)
 {
+  /*GLPixelFormat someFormat;
+  csString str;
+  while (picker.GetNextFormat (someFormat))
+  {
+    str.Clear();
+    GetPixelFormatString (someFormat, str);
+    csPrintf ("%s\n", str.GetData());
+  }
+  picker.Reset();*/
+
+
   int newPixelFormat = 0;
   GLPixelFormat& format = currentFormat;
   while (picker.GetNextFormat (format))
@@ -784,6 +795,25 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
     rc = winhelper->SetCursor (iShape);
   }
   return rc;
+}
+
+bool csGraphics2DOpenGL::SetMouseCursor (iImage *image, const csRGBcolor* keycolor, 
+					 int hotspot_x, int hotspot_y,
+					 csRGBcolor fg, csRGBcolor bg)
+{
+  if (!m_bHardwareCursor)
+  {
+    m_piWin32Assistant->SetCursor (csmcNone);
+    return false;
+  }
+  HCURSOR cur = cursors.GetMouseCursor (image, keycolor, hotspot_x, 
+    hotspot_y, fg, bg);
+  if (cur == 0)
+  {
+    m_piWin32Assistant->SetCursor (csmcNone);
+    return false;
+  }
+  return m_piWin32Assistant->SetHCursor (cur);
 }
 
 bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
