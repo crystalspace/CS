@@ -1,5 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
+21-Apr-2000
+	- Andrew Zabolotny changed 'int' back to 'ceil' in CompressVertices()
+	  (i.e. change from Frank O'Connor).
+	- Andrew also fixed all warnings and compilation errors left in
+	  dungeon plugin.
 20-Apr-2000
 	- Andrew Zabolotny did another try to fix the Windows port
 	  by adding an assembly version of memcpy.
@@ -38,6 +43,17 @@ The history order has been reversed so that new features are at the top.
 	- Added experimental spiral particle system. It does not look
 	  nice yet. This is intended for a special spiraling effect.
 	  Added the 'spiral' console command to use it.
+	- Frank O'Connor <frank@oconnors.org> is now the new Windows port
+	  maintainer. He did the following changes:
+	    - Removed tunnelfighter.dsp from csAll.dsw
+	    - Changed win32 debug optimization setting to "default" (avoids
+	      compiler error while debug/testing).
+	    - Commented out "iTextureMap *piTM = NULL;", unreferenced and
+	      iTextureMap is undeclared.
+	    - Fixed DrawPolygonMesh for d3d_g3d.h.
+	    - Removed references to /csinput/* and replaced with /cssys/*.
+	    - Changed rint to rint to int in "csPolygonSet::CompressVertices()"
+	- Martin Geisse did some fixes to dungeon plugin.
 19-Apr-2000
 	- Andrew Zabolotny did a few changes to the windows port to
 	  try to get it working after his large changes from a few
