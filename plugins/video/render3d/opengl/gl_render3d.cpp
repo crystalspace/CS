@@ -186,24 +186,25 @@ int csGLGraphics3D::GetMaxTextureSize () const
 
 void csGLGraphics3D::SetGlOrtho (bool inverted)
 {
-  if (render_target)
+  /// @@@ Why was this here in the first place? /Anders Stenberg
+  /*if (render_target)
   {
     if (inverted)
-      glOrtho (0., (GLdouble) (viewwidth+1),
-      (GLdouble) (viewheight+1), 0., -1.0, 10.0);
+      glOrtho (0., (GLdouble) viewwidth,
+      (GLdouble) (viewheight), 0., -1.0, 10.0);
     else
-      glOrtho (0., (GLdouble) (viewwidth+1), 0.,
-      (GLdouble) (viewheight+1), -1.0, 10.0);
+      glOrtho (0., (GLdouble) viewwidth, 0.,
+      (GLdouble) (viewheight), -1.0, 10.0);
   }
   else
-  {
+  {*/
     if (inverted)
       glOrtho (0., (GLdouble) viewwidth,
       (GLdouble) viewheight, 0., -1.0, 10.0);
     else
       glOrtho (0., (GLdouble) viewwidth, 0.,
       (GLdouble) viewheight, -1.0, 10.0);
-  }
+  //}
 }
 
 void csGLGraphics3D::SetZMode (csZBufMode mode)
@@ -974,7 +975,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       glMatrixMode (GL_PROJECTION);
       glLoadIdentity ();
       SetGlOrtho (false);
-      glViewport (1, -1, viewwidth+1, viewheight+1);
+      glViewport (0, 0, viewwidth, viewheight);
       glMatrixMode (GL_MODELVIEW);
       glLoadIdentity ();
 
@@ -1011,7 +1012,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     SetGlOrtho (false);
-    glViewport (1, -1, viewwidth+1, viewheight+1);
+    glViewport (0, 0, viewwidth, viewheight);
     glTranslatef (viewwidth/2, viewheight/2, 0);
 
     GLfloat matrixholder[16];
@@ -1043,7 +1044,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     glLoadIdentity ();
     SetGlOrtho (false);
     //glViewport (0, 0, viewwidth, viewheight);
-    glViewport (1, -1, viewwidth+1, viewheight+1);
+    glViewport (0, 0, viewwidth, viewheight);
 
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
@@ -1115,7 +1116,7 @@ void csGLGraphics3D::FinishDraw ()
           }
           tex_mm->was_render_target = true;
         }
-        glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 1, viewheight-txt_h,
+        glCopyTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 0, viewheight-txt_h,
           txt_w, txt_h, 0);
       }
       else
