@@ -1,52 +1,253 @@
 <?php
 //-----------------------------------------------------------------------------
+// spoofdir.php
 // Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
-// This script allows HTTP access to Crystal Space's CVS snapshots directory
-// (which is normally only accessible via FTP).
+// This script allows HTTP access to directories and files which are contained
+// both within and outside of the normal Apache 'htdocs' directory tree.  It
+// does so by treating such URIs as virtual paths and resolves them into
+// actual physical paths at run-time.  A common reason for allowing access to
+// directories and files which reside outside of the 'htdocs' tree is to allow
+// HTTP access to an FTP archive hierarchy.
 //
-// Typical configuration simulates a snapshot directory by making use of
-// Apache's URI rewriting mechanism to invoke this script whenever a file is
-// requested within the pseudo-directory, or when a listing of the directory
-// itself is requested.
+// In addition to the obvious benefit of being able to browse locations
+// outside of 'htdocs', this script also pretty-prints directory listings and
+// can optionally annotate them with descriptive information contained within
+// a configuration file residing in the directory being browsed (in much the
+// same manner as some FTP servers automatically send the contents of a
+// README file along with a directory listing).
+// 
+// Many aspects of the script's operation can be controlled by both a global
+// configuration file as well as configuration files in each of the browsed
+// directories.  These options are described below.
+//
+// Typical configuration involves use of Apache's URI rewriting mechanism in
+// order to invoke this script whenever a file is requested within the
+// pseudo-directory, or when a listing of the directory itself is requested.
 //
 // This script should be accompanied by an .htaccess file in the same
-// directory.  Typical contents of .htaccess are:
+// directory.  Here is an example .htaccess file which defines two virtual
+// directories; 'docs' and 'download':
 //
-//     Options FollowSymLinks
-//     RewriteEngine on
-//     RewriteRule "^cvs-snapshots(/)?$" "/cvssnap.php?$1" [L]
-//     RewriteRule "^cvs-snapshots/(.+)$" "/cvssnap.php?$1" [L]
+//    Options FollowSymLinks
+//    RewriteEngine on
+//    RewriteRule "^(docs|download)(/)?$"  "/spoofdir.php?/$1$2"  [L]
+//    RewriteRule "^(docs|download)/(.+)$" "/spoofdir.php?/$1/$2" [L]
 //
-// This sample .htaccess file specifies a pseudo-directory named
-// "cvs-snapshots" and invokes this script (cvssnap.php) with various input
-// arguments depending upon the URL requested by the client.  The following
-// list summarizes the input arguments:
+// In this example, the first rule catches requests for the directory itself
+// (either 'docs' or 'download'), with or without the trailing '/'.  The
+// second rule catches requests for any file within either of the virtual
+// directories and passes the requests on to this script.
 //
-//     http://.../cvs-snapshots	      Invokes script with "" as argument.
-//     http://.../cvs-snapshots/      Invokes script with "/" as argument.
-//     http://.../cvs-snapshots/file  Invokes script with "file" as argument.
+// When the script is invoked, it takes the input virtual path argument and
+// tries to locate a matching physical path by searching through a list of
+// potential target directories.  The search list (see $dirlist) can be
+// configured by the global configuration file (see $globalconfig).  If the
+// configuration file fails to initialize the search list, then all searching
+// is performed relative to the "current" directory, which is denoted by ".".
 //
-// When the argument is a filename, the requested file is returned to the
-// client.  When the argument is "/", a formatted, recursive listing of the
-// snapshot directory is returned.  When the argument is "", the script
-// redirects the client to the same URL, but with a "/" appended.  This forces
-// the client browser to believe that it is viewing the contents of a
-// directory, rather than a file.
+// One of the following actions is taken depending upon the outcome of the
+// search:
+//
+//    - If a corresponding physical path does not exist, then a standard HTTP
+//      "404 Not Found" exception is raised.
+//
+//    - If the path is a file, then it is returned to the client's browser.
+//      If the file can be viewed directly by the browser (see $disposition)
+//      then it is sent "inline"; otherwise it is sent as an "attachment".
+//
+//    - If the path is a directory but is not in canonical format (that is,
+//      if it is missing the final '/'), then the browser is redirected to
+//      the same URI with the final '/' added.  This ensures that the browser
+//      will treat relative URIs correctly later on.
+//
+//    - If the path is a directory in canonical format and the directory
+//      contains an index-like file (such as "index.html"), then that file is
+//      returned to the client browser.  This emulates the standard behavior
+//      of most HTTP servers where they prefer returning an index-like file,
+//      if present, rather than a directory listing.  The candidate list of
+//      index-like files can be configured (see $indexfile).
+//
+//    - If the path is a directory in canonical format and the directory does
+//      not contain an index-like file, then the contents of the directory
+//      are nicely formatted and returned to the client browser.  Several
+//      customizations to the directory listing are possible, including
+//      colors, omission of certain files (see $ignore), title (see $title),
+//      and descriptive information (see $annotation).  These options may be
+//      specified in the global configuration file (see $globalconfig) or the
+//      configuration file local to the directory itself (see $localconfig).
+//
+// An explanation of the various configuration options can be found in the
+// "Configuration Options" section below.
+//
+// spoofdir.php was written by Eric Sunshine <sunshine@sunshineco.com> on
+// September 3, 2000, and is Copyright (C)2000 by Eric Sunshine.
 //-----------------------------------------------------------------------------
 
-$prog_name = 'cvssnap.php';
-$prog_version = '1.2';
+$prog_name = 'spoofdir.php';
+$prog_version = '1.1';
 $author_name = 'Eric Sunshine';
 $author_email = 'sunshine@sunshineco.com';
-$copyright = "Copyright &copy; 2000 by $author_name " .
-    "&lt;<a href=\"mailto:$author_email\">$author_email</a>&gt;";
 
-$snapdir = '/home/groups/ftp/pub/crystal/cvs-snapshots';
+//-----------------------------------------------------------------------------
+// Configuration Options
+//
+// The default values for the following options can be overriden via the
+// global configuration file (see $globalconfig) or the configuration file
+// local to the directory being browsed (see $localconfig), unless otherwise
+// noted.
+//
+// $dirlist
+//    An array of physical paths which will be searched for the given virtual
+//    path.  If $dirlist is not initialized by the global conifguration file
+//    (see $globalconfig), then the search list will default to the "current"
+//    directory (also known as ".").  Setting this value only makes sense in
+//    the global configuration file.
+//
+// $ignore
+//    An array of regular-expresions which constitute the set of files to
+//    omit from the generated directory listing.  By default, the $ignore
+//    array is seeded with patterns matching the names of this script and its
+//    configuration files, thus the directory listing will automatically be
+//    purged of these administrative entries.
+//
+// $title
+//    The human-readable title for the directory.  The title is displayed in
+//    the <head> and <body> portions of the document.  It should not contain
+//    any HTML mark-up.  It generally only makes sense to specify this value
+//    in the local configuration file (see $localconfig).
+//
+// $annotation
+//    Descriptive text used to annotate the directory contents.  This
+//    information is presented after the opening banner but before the actual
+//    directory listing.  It may contain HTML mark-up.  It generally only
+//    makes sense to specify this value in the local configuration file.
+//
+// $globalconfig
+//    The name of the global configuration file.  If this file exists, then it
+//    must be a valid PHP file and should contain statements which override or
+//    initialize various options.  Remember to surround PHP expressions within
+//    an appropriate '<?php...>' block within this file.  It is not possible
+//    to override the value of $globalconfig without actually modifying this
+//    script.
+//
+// $localconfig
+//    The name of the local configuration file.  If this file exists within
+//    the directory being browsed, then it must be a valid PHP file and should
+//    contain statements which override various options.  Remember to surround
+//    PHP expressions within an appropriate '<?php...>' block within this
+//    file.  Overriding the default value of $localconfig only makes sense in
+//    the global configuration file.
+//
+// $banner_bgcolor, $banner_fgcolor, $banner_linkcolor
+//    Specify the various colors of the opening and closing banners.
+//
+// $row_colors
+//    An array of two colors.  The rows of the directory listing alternate
+//    between these two colors.
+//
+// $mimetype, $default_mimetype
+//    When sending files to the client's browser, the file's MIME-type (also
+//    known as content-type) is derived from the file's extension.   $mimetype
+//    is an associative array where the keys are file extensions (sans the '.')
+//    and the values are the MIME-types.  $default_mimetype will be used if
+//    the file's extension does not appear in $mimetype or if the file has no
+//    extension.
+//
+// $disposition, $default_disposition
+//    When sending files to the client's browser, the file's MIME-type is used
+//    to determine its disposition.  The two most common dispositions are
+//    "inline" for when the browser can (probably) display the file directly,
+//    and "attachment" for when the browser should save the file to disk or
+//    send it to an external program.  $disposition is an associative array
+//    where the keys are MIME-types and the values are disposition identifiers.
+//    $default_disposition is used if the MIME-type does not appear in
+//    $disposition.
+//
+// $cacheable
+//    When sending files to the client's browser, the file's MIME-type is used
+//    to determine if the browser should be able to cache the file.  Typically
+//    files with disposition type "inline" are cacheable, whereas other types
+//    are not.  $cacheable is an associative array where the keys are
+//    MIME-types and the values are boolean values; 1 for true, or 0 for false.
+//    By default, if a file's MIME-type does not appear in $cacheable, then it
+//    is considered uncacheable.
+//
+// $indexfile
+//    An associative array where the keys are potential index-like filenames,
+//    and the values are boolean values; 1 for true, or 0 for false.  If a
+//    file exists with one of these names in the directory being browsed, and
+//    if the associated value is 'true' then that file will be sent to the
+//    client's browser instead of a directory listing.  This emulates the
+//    behavior of most HTTP servers where the presence of an index-like file
+//    (such as 'index.html') within a directory results in the transmission of
+//    that file rather than a listing of the directory.
+//-----------------------------------------------------------------------------
+
+$globalconfig = 'spoofdir.cfg';
+$localconfig = 'spoofdir.info';
+
+$banner_bgcolor = '#5544ff';
+$banner_fgcolor = '#ffff00';
+$banner_linkcolor = '#ffffff';
+$row_colors = array('#ccccee', '#ffffff');
+
+$default_mimetype = 'application/octet-stream';
+$mimetype['htm'  ] = 'text/html';
+$mimetype['html' ] = 'text/html';
+$mimetype['html3'] = 'text/html';
+$mimetype['ht3'  ] = 'text/html';
+$mimetype['txt'  ] = 'text/plain';
+$mimetype['text' ] = 'text/plain';
+
+$default_disposition = 'attachment';
+$disposition['text/html' ] = 'inline';
+$disposition['text/plain'] = 'inline';
+
+$cacheable['text/html' ] = 1;
+$cacheable['text/plain'] = 1;
+
+$ignore[] = '^index\..+$';
+$ignore[] = "$prog_name\$";
+$ignore[] = "$globalconfig\$";
+$ignore[] = "$localconfig\$";
+
+$indexfile['index.htm'  ] = 1;
+$indexfile['index.html' ] = 1;
+$indexfile['index.shtml'] = 1;
+$indexfile['index.php'  ] = 1;
+$indexfile['index.php3' ] = 1;
+$indexfile['index.php4' ] = 1;
+
+//-----------------------------------------------------------------------------
+// Private Configuration
+//-----------------------------------------------------------------------------
+if (file_exists($globalconfig))
+    include($globalconfig);
+if (count($dirlist) == 0)
+    $dirlist[] = '.';
+
+$copyright = "Copyright &copy;2000 by $author_name " .
+    "&lt;<a href=\"mailto:$author_email\">" .
+    "<font color=\"$banner_linkcolor\">$author_email</font></a>&gt;";
+
+//-----------------------------------------------------------------------------
+// Utility Functions
+//-----------------------------------------------------------------------------
+function sort_array(&$a)
+{
+    if (count($a) > 1)
+	usort($a, strcasecmp);
+}
+
+function solidify($s)
+{
+    return strtr($s, array(' ' => '&nbsp;'));
+}
 
 function pretty_date($stamp)
 {
-    return gmdate('d M Y H:i:s', $stamp);
+    return gmdate('d M Y H:i:s', $stamp) . ' UTC';
 }
 
 function pretty_size($bytes)
@@ -54,110 +255,315 @@ function pretty_size($bytes)
     $KB = 1024;
     $MB = $KB * 1024;
     $GB = $MB * 1024;
-    if ($bytes > $GB) { return sprintf('%.1f GB', (float)$bytes / $GB); }
-    elseif ($bytes > $MB) { return sprintf('%.1f MB', (float)$bytes / $MB); }
-    elseif ($bytes > $KB) { return sprintf('%.1f KB', (float)$bytes / $KB); }
-    else { return "$bytes"; }
+    if ($bytes > $GB)
+	$s = sprintf('%.1f GB', (float)$bytes / $GB);
+    elseif ($bytes > $MB)
+	$s = sprintf('%.1f MB', (float)$bytes / $MB);
+    elseif ($bytes > $KB)
+	$s = sprintf('%.1f KB', (float)$bytes / $KB); 
+    else
+	$s = "$bytes";
+    return $s;
 }
 
-function list_recursive($prefix, $sub)
+function find_mimetype($file)
 {
-    $dir = strlen($sub) ? "$prefix/$sub" : $prefix;
-    $handle = @opendir($dir) or die("Directory \"$dir\" not found.");
+    global $mimetype, $default_mimetype;
+    $type = '';
+    $ext = strrchr($file, '.');
+    if ($ext && strlen($ext) > 1) // Not empty and not just '.'.
+	$type = $mimetype[substr($ext, 1)]; // Remove leading period from ext.
+    if (!$type)
+	$type = $default_mimetype;
+    return $type;
+}
 
-    $dir_files = array();
-    $dir_subdirs = array();
+function find_disposition($type)
+{
+    global $disposition, $default_disposition;
+    $s = $disposition[$type];
+    if (!$s)
+	$s = $default_disposition;
+    return $s;
+}
+
+function is_indexfile($file)
+{
+    global $indexfile;
+    return $indexfile[basename($file)];
+}
+
+function is_cacheable($type)
+{
+    global $cacheable;
+    return $cacheable[$type];
+}
+
+function is_ignored($file)
+{
+    global $ignore;
+    for ($s = reset($ignore); $s; $s = next($ignore))
+	if (ereg($s, $file))
+	    return 1;
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+// Emit the sign-off banner containing copyright notice, etc.
+//-----------------------------------------------------------------------------
+function signoff()
+{
+    global $prog_name, $prog_version, $copyright,
+	$banner_bgcolor, $banner_fgcolor;
+    print("<p><table width=\"100%\" border=0 cellspacing=0 cellpadding=2>\n" .
+	"<tr bgcolor=\"$banner_bgcolor\">\n" .
+	"<td><font color=\"$banner_fgcolor\">&nbsp;&nbsp;" .
+	'Generated ' . pretty_date(time()) . " by <tt>$prog_name</tt> " .
+	"version $prog_version.<br>&nbsp;&nbsp;$copyright</font></td>" .
+	"</tr></table>\n");
+    exit();
+}
+
+//-----------------------------------------------------------------------------
+// Enumerate over the search list ($dirlist) to find a corresponding physical
+// path for the given virtual path.
+//-----------------------------------------------------------------------------
+function find_path($find)
+{
+    global $dirlist;
+    if (strlen($find) > 0 && $find[0] == '/')
+	$find = substr($find, 1);
+    for ($s = reset($dirlist); $s; $s = next($dirlist))
+    {
+	$n = strlen($s);
+	if ($n > 0 && $s[n - 1] != '/')
+	    $s .= '/';
+	$s .= $find;
+	if (file_exists($s))
+	    return $s;
+    }
+    return '';
+}
+
+//-----------------------------------------------------------------------------
+// Re-direct client's browser to given URI.  Note that PHP treats "Location:"
+// header specially and does all the work for us.
+//-----------------------------------------------------------------------------
+function redirect($uri)
+{
+    global $HTTP_HOST;
+    header("Location: http://$HTTP_HOST$uri");
+    exit();
+}
+
+//-----------------------------------------------------------------------------
+// Send a file to the client's browser using appropriate content-type,
+// disposition, etc.
+//-----------------------------------------------------------------------------
+function send_file($path)
+{
+    $name = basename($path);
+    $type = find_mimetype($name);
+    $disposition = find_disposition($type);
+    header("Content-Disposition: $disposition; filename=$name");
+    header("Content-Type: $type; file=$name");
+    header('Content-Length: ' . filesize($path));
+    if (!is_cacheable($type))
+    {
+	header('Pragma: no-cache');
+	header('Expires: 0');
+    }
+    readfile($path);
+    exit();
+}
+
+//-----------------------------------------------------------------------------
+// Send an index-like file (such as index.html) to the client's browser.
+//
+// NOTE: Unfortunately, PHP files must be handled specially.  A simple
+// re-direct will not execute the file.  Instead, the PHP file is loaded into
+// the currently running script via include().  This is a poor solution since
+// the script might cause name clashes, among other problems.  A better
+// solution is needed.
+//-----------------------------------------------------------------------------
+function send_indexfile($path, $file)
+{
+    if (!ereg('\.php[0-9]?$', $file))
+	send_file("$path/$file"); // Never returns.
+    else
+    {
+	chdir($path);
+	include($file);
+	exit();
+    }
+}
+
+//-----------------------------------------------------------------------------
+// Emit standard HTML boilerplate to begin the page.
+//-----------------------------------------------------------------------------
+function open_doc($title)
+{
+    print("<html>\n<head>\n<title>$title</title>\n</head>\n<body>\n");
+}
+
+//-----------------------------------------------------------------------------
+// Emit standard HTML boilerplate to end the page.
+//-----------------------------------------------------------------------------
+function close_doc()
+{
+    signoff();
+    print("</body>\n</html>\n");
+}
+
+//-----------------------------------------------------------------------------
+// Chop a pathname into directory-sized components and provide an HREF to
+// each.  Given the input "/one/two/three/four", the output HTML will be
+// "/<one>/<two>/<three>/<four>" where '<' and '>' signify the presence of an
+// HREF link.  (The '<' and '>' are for illustration purposes only and do not
+// appear in the output string.)
+//-----------------------------------------------------------------------------
+function parent_link($path, $link = '../')
+{
+    global $banner_linkcolor;
+    $s = '/';
+    if ($path && $path != '/')
+    {
+	$s = parent_link(dirname($path), "../$link");
+	$f = basename($path);
+	$s .= "<a href=\"$link\"><font color=\"$banner_linkcolor\">" .
+	    "$f</font></a>/";
+    }
+    return $s;    
+}
+
+//-----------------------------------------------------------------------------
+// Emit HTML to announce a directory.  Elements include the actual pathname
+// with embedded links pointing at parent directories, an optional title,
+// and optional annotation.  $title and $annotation can be set in the
+// $localconfig file.
+//-----------------------------------------------------------------------------
+function announce_directory($path, $title, $annotation)
+{
+    global $banner_bgcolor, $banner_fgcolor;
+    if ($path && $path[strlen($path) - 1] == '/')
+	$path = substr($path, 0, -1);
+
+    print("<p><table width=\"100%\" border=0 cellspacing=0 cellpadding=2>\n" .
+	"<tr bgcolor=\"$banner_bgcolor\">\n" .
+	"<td><font color=\"$banner_fgcolor\">&nbsp;&nbsp;" .
+	'<strong>Directory</strong>: <code>' .
+	parent_link(dirname($path)) . basename($path) .
+	'</code></font></td>');
+    if ($title)
+	print("<td align=\"right\"><font color=\"$banner_fgcolor\">\n" .
+	    "<em>$title</em>&nbsp;&nbsp;</td>\n");
+    print("</tr></table><p>\n");
+
+    if ($annotation)
+      print("$annotation<p>\n");
+}
+
+//-----------------------------------------------------------------------------
+// Emit a single directory entry.
+//-----------------------------------------------------------------------------
+function print_entry($link, $info1, $info2)
+{
+    global $row_colors;
+    static $color = 0;
+    print("<tr bgcolor=\"$row_colors[$color]\">\n" .
+	"<td><a href=\"$link\">$link</a></td>\n" .
+	"<td align=\"right\">$info1</td>\n" .
+	"<td>$info2</td>\n</tr>\n");
+    $color = !$color;
+}
+
+//-----------------------------------------------------------------------------
+// Emit a directory listing.  If a $localconfig file exists, then invoke it.
+// It may override any of the options mentioned in the 'global' statement
+// below.  If the directory contains an index-like file, then send that file
+// back to the client browser rather than a directory listing.
+//-----------------------------------------------------------------------------
+function list_directory($display_name, $path)
+{
+    global $localconfig;
+    // Allow local configuration file to override any of these globals.
+    global $mimetype, $disposition, $cacheable, $ignore, $indexfile;
+    // And these locals.
+    $title = '';
+    $annotation = '';
+    if (file_exists("$path/$localconfig"))
+	include("$path/$localconfig");
+
+    $handle = @opendir($path) or die("Directory $display_name not found.");
+    $files = array();
+    $subdirs = array();
     while ($entry = readdir($handle))
     {
-	if ($entry != '..' && $entry != '.')
+	if (is_indexfile($entry))
 	{
-	    if (is_dir("$dir/$entry"))
-		$dir_subdirs[] = $entry;
+	    closedir($handle);
+	    send_indexfile($path, $entry); // Never returns
+	}
+	elseif ($entry != '..' && $entry != '.' && !is_ignored($entry))
+	{
+	    if (is_dir("$path/$entry"))
+		$subdirs[] = $entry;
 	    else
-		$dir_files[] = $entry;
+		$files[] = $entry;
 	}
     }
-    sort($dir_files);
-    sort($dir_subdirs);
-
-    if (count($dir_files) > 0) // List all files.
-    {
-	print("<table border=0 cellspacing=0>\n");
-	for ($i=0; $i < count($dir_files); $i++)
-	{
-	    $file = $dir_files[$i];
-	    print('<tr><td align="left" valign="top">' .
-		"<a href=\"$sub/$file\">$file</a>&nbsp&nbsp</td>" .
-		'<td align="right" valign="top">' .
-		pretty_size(filesize("$dir/$file")) . '&nbsp&nbsp</td>' .
-		'<td align="left" valign="top">' .
-		pretty_date(filemtime("$dir/$file")) . "</td></tr>\n");
-	}
-	print("</table>\n");
-    }
-
-    for ($i=0; $i < count($dir_subdirs); $i++) // Recurse into subdirectories.
-    {
-	$subdir = $dir_subdirs[$i];
-	print("Contents: <tt>$subdir</tt>\n<blockquote>\n");
-	list_recursive($prefix, strlen($sub) ? "$sub/$subdir" : $subdir);
-	print("</blockquote>\n");
-    }
-
     closedir($handle);
+    sort_array($files);
+    sort_array($subdirs);
+
+    open_doc($title);
+    announce_directory($display_name, $title, $annotation);
+    print("<table width=\"100%\" border=0 cellspacing=1 cellpadding=2>\n");
+
+    for ($s = reset($subdirs); $s; $s = next($subdirs))
+	print_entry("$s/", '(dir)', '&nbsp');
+
+    for ($s = reset($files); $s; $s = next($files))
+	print_entry($s, solidify(pretty_size(filesize("$path/$s"))),
+	    solidify(pretty_date(filemtime("$path/$s"))));
+
+    print("</table>\n");
+    close_doc();
 }
 
-function list_root($dir)
+//-----------------------------------------------------------------------------
+// Raise a standard HTTP "404 Not Found" exception.
+//-----------------------------------------------------------------------------
+function path_not_found($uri)
 {
-?>
-<html>
-<head>
-<title>Crystal Space: CVS Snapshots</title>
-</head>
-<body>
-<center><h3>Crystal Space: CVS Snapshots</h3></center><p>
-This is a list of the <em>bleeding-edge</em> snapshots and `diffs' of
-the Crystal Space CVS repository which are available for download.
-Time stamps refer to Universal Coordinated Time (UTC),
-which is also known as Greenwich Mean Time (GMT).<p>
-<?php
-    global $prog_name, $prog_version, $copyright, $snapdir;
-    list_recursive($snapdir, $dir);
-    print('<hr>Generated ' . pretty_date(time()) . ' UTC ' .
-	"by <tt>$prog_name</tt> version $prog_version.<br>\n$copyright\n");
-?>
-</body>
-</html>
-<?php
+    header("http/1.0 404 Not Found");
+    open_doc("404 Not Found");
+    print("<h1>Not Found</h1>The requested URL ($uri) was not found on " .
+	'this server.');
+    close_doc();
 }
 
-function send_file($file)
+//-----------------------------------------------------------------------------
+// Dispatch the given URI.
+//-----------------------------------------------------------------------------
+function dispatch_uri($uri)
 {
-    global $snapdir;
-    $base = basename($file);
-    $path = "$snapdir/$file";
-    file_exists($path) or die ("File \"$file\" not found.");
-
-    header("Content-Disposition: attachment; filename=$base");
-    header("Content-Type: application/octet-stream; file=$base");
-    header('Content-Length: ' . filesize($path));
-    header('Pragma: no-cache');
-    header('Expires: 0');
-    readfile($path);
+    $path = find_path($uri);
+    if (strlen($path) == 0)
+	path_not_found($uri);
+    elseif (!is_dir($path))
+	send_file($path);
+    elseif ($path[strlen($path) - 1] != '/')
+	redirect("$uri/"); // Enforce correct directory syntax (append '/').
+    else
+	list_directory($uri, $path);
 }
 
-function redirect()
-{
-    // Append a "/" to the URI so the browser thinks this is a directory.
-    global $HTTP_HOST, $REQUEST_URI;
-    header("Location: http://$HTTP_HOST$REQUEST_URI/");
-}
-
-$file = $argv[0];
-if ($file == '')	// Redirect browser to directory (with trailing '/').
-    redirect();
-elseif ($file == '/')	// List the pseudo-directory itself.
-    list_root('');
-else			// Send a file.
-    send_file($argv[0]);
+//-----------------------------------------------------------------------------
+// Main: Dispatch the input URI.
+//-----------------------------------------------------------------------------
+$uri = $argv[0];
+if (strlen($uri) == 0)
+    $uri = $REQUEST_URI;
+dispatch_uri($uri);
 ?>
