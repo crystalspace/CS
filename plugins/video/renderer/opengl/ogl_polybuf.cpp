@@ -105,7 +105,7 @@ csTriangleInfo::csTriangleInfo()
 
 
 csTriangleArrayPolygonBuffer::csTriangleArrayPolygonBuffer (
-	iVertexBufferManager* mgr) : csPolygonBuffer (mgr)
+  iVertexBufferManager* mgr) : csPolygonBuffer (mgr)
 {
 
   vertices = NULL;
@@ -610,13 +610,12 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
     else
     {
       //There is no vertices in the index. We have to create it.
-      csVector4 point;
+      csVector3 point;
       Indexes ind;
 
       point.x = vertices[verts[0]].x;
       point.y = vertices[verts[0]].y;
       point.z = vertices[verts[0]].z;
-      point.w = 1.0;
 
 
       triSuperLM->vertexIndices[verts[0]] = new csVertexIndexArrayNode;
@@ -640,12 +639,11 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
         * the verticesPoints array and the uv's can be pushed directly too
         */
         Indexes ind;
-        csVector4 point;
+        csVector3 point;
 
         point.x = vertices[verts[i]].x;
         point.y = vertices[verts[i]].y;
         point.z = vertices[verts[i]].z;
-        point.w = 1.0;
 
         triSuperLM->vertexIndices[verts[i]] = new csVertexIndexArrayNode;
         triSuperLM->vertices.Push(point);
@@ -661,11 +659,10 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
       else
       {
         Indexes ind;
-        csVector4 point;
+        csVector3 point;
         point.x = vertices[verts[i+1]].x;
         point.y = vertices[verts[i+1]].y;
         point.z = vertices[verts[i+1]].z;
-        point.w = 1.0;
 
         triSuperLM->vertexIndices[verts[i+1]] = new csVertexIndexArrayNode;
         triSuperLM->vertices.Push(point);
@@ -747,11 +744,10 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
        * create it
        */
       Indexes ind;
-      csVector4 point;
+      csVector3 point;
       point.x = vertices[verts[0]].x;
       point.y = vertices[verts[0]].y;
       point.z = vertices[verts[0]].z;
-      point.w = 1.0;
 
       triSuperLM->vertices.Push(point);
       ind.vertex = triSuperLM->vertices.Length() - 1; // this is the index!!
@@ -773,13 +769,12 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
   else
   {
     //There is no vertices in the index. We have to create it.
-    csVector4 point;
+    csVector3 point;
     Indexes ind;
 
     point.x = vertices[verts[0]].x;
     point.y = vertices[verts[0]].y;
     point.z = vertices[verts[0]].z;
-    point.w = 1.0;
 
     triSuperLM->vertexIndices[verts[0]] = new csVertexIndexArrayNode;
     triSuperLM->vertices.Push(point);
@@ -820,12 +815,11 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
       if(indexVert < 0)
       {
         Indexes ind;
-        csVector4 point;
+        csVector3 point;
 
         point.x = vertices[verts[i]].x;
         point.y = vertices[verts[i]].y;
         point.z = vertices[verts[i]].z;
-        point.w = 1.0;
 
         triSuperLM->vertices.Push(point);
         ind.vertex = triSuperLM->vertices.Length() - 1; // this is the index!!
@@ -847,12 +841,11 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
        * the verticesPoints array and the uv's can be pushed directly too
        */
       Indexes ind;
-      csVector4 point;
+      csVector3 point;
 
       point.x = vertices[verts[i]].x;
       point.y = vertices[verts[i]].y;
       point.z = vertices[verts[i]].z;
-      point.w = 1.0;
 
       triSuperLM->vertexIndices[verts[i]] = new csVertexIndexArrayNode;
       triSuperLM->vertices.Push(point);
@@ -886,12 +879,11 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
        // that position will give us an index, and that index is
        // the one we will push in the vertices array, position verts[i+1]
        Indexes ind;
-       csVector4 point;
+       csVector3 point;
 
        point.x = vertices[verts[i+1]].x;
        point.y = vertices[verts[i+1]].y;
        point.z = vertices[verts[i+1]].z;
-       point.w = 1.0;
 
        triSuperLM->vertices.Push(point);
        ind.vertex = triSuperLM->vertices.Length() - 1; // this is the index!!
@@ -908,11 +900,10 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
     else
     {
       Indexes ind;
-      csVector4 point;
+      csVector3 point;
       point.x = vertices[verts[i+1]].x;
       point.y = vertices[verts[i+1]].y;
       point.z = vertices[verts[i+1]].z;
-      point.w = 1.0;
 
       triSuperLM->vertexIndices[verts[i+1]] = new csVertexIndexArrayNode;
       triSuperLM->vertices.Push(point);
@@ -1016,13 +1007,13 @@ int csTriangleArrayPolygonBuffer::GetSuperLMCount()
 }
 
 csSLMCacheData* csTriangleArrayPolygonBuffer::GetCacheData(
-	TrianglesSuperLightmapNode* t)
+  TrianglesSuperLightmapNode* t)
 {
   return t->info->cacheData;
 }
 
 int csTriangleArrayPolygonBuffer::GetLightmapCount(
-	TrianglesSuperLightmapNode* t)
+  TrianglesSuperLightmapNode* t)
 {
   return t->info->numLightmaps;
 }
@@ -1033,37 +1024,37 @@ TrianglesSuperLightmapNode* csTriangleArrayPolygonBuffer::GetFirstTrianglesSLM()
 }
 
 TrianglesSuperLightmapNode* csTriangleArrayPolygonBuffer::GetNextTrianglesSLM(
-	TrianglesSuperLightmapNode* t)
+  TrianglesSuperLightmapNode* t)
 {
   return t->prev;
 }
 
-csVector4* csTriangleArrayPolygonBuffer::GetVerticesPerSuperLightmap(
-	TrianglesSuperLightmapNode* t)
+csVector3* csTriangleArrayPolygonBuffer::GetVerticesPerSuperLightmap(
+  TrianglesSuperLightmapNode* t)
 {
   return t->info->vertices.GetArray();
 }
 
 csVector2* csTriangleArrayPolygonBuffer::GetUV(
-	TrianglesSuperLightmapNode* t)
+  TrianglesSuperLightmapNode* t)
 {
   return t->info->texels.GetArray();
 }
 
 csTriangle* csTriangleArrayPolygonBuffer::GetTriangles(
-	TrianglesSuperLightmapNode* t)
+  TrianglesSuperLightmapNode* t)
 {
   return t->info->triangles.GetArray();
 }
 
 int csTriangleArrayPolygonBuffer::GetTriangleCount(
-	TrianglesSuperLightmapNode* t)
+  TrianglesSuperLightmapNode* t)
 {
   return t->info->numTriangles;
 }
 
 int csTriangleArrayPolygonBuffer::GetVertexCount(
-	TrianglesSuperLightmapNode* t)
+  TrianglesSuperLightmapNode* t)
 {
   return t->info->numVertices;
 }
@@ -1075,7 +1066,7 @@ GetFogIndices(TrianglesSuperLightmapNode*tSL)
 }
 
 void csTriangleArrayPolygonBuffer::SetVertexArray (csVector3* verts,
-	int num_verts)
+  int num_verts)
 {
   delete[] vertices;
   vertices = new csVector3 [num_verts];
@@ -1152,7 +1143,7 @@ TrianglesNode* csTriangleArrayPolygonBuffer::GetNext(TrianglesNode* t)
 }
 
 csVector3* csTriangleArrayPolygonBuffer::GetVerticesPerMaterial(
-	TrianglesNode* t)
+  TrianglesNode* t)
 {
   return t->info->verticesPoints.GetArray();
 }

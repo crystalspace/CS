@@ -29,6 +29,7 @@ SCF_VERSION(csOpenGlEffectLayerData, 0, 0, 1);
 #define ED_SOURCE_NONE 0
 #define ED_SOURCE_FOG 1
 #define ED_SOURCE_MESH 2
+#define ED_SOURCE_LIGHTMAP 3
 #define ED_SOURCE_USERARRAY(x) (100+(x))
 
 

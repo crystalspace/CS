@@ -137,7 +137,7 @@ public:
   CS_DECLARE_GROWING_ARRAY(triangles,csTriangle);
 
   /// Vertices of those triangles
-  CS_DECLARE_GROWING_ARRAY(vertices,csVector4);
+  CS_DECLARE_GROWING_ARRAY(vertices,csVector3);
 
   /// texels of those triangles
   CS_DECLARE_GROWING_ARRAY(texels,csVector2);
@@ -304,7 +304,7 @@ public:
   csVector3* GetVerticesPerMaterial(TrianglesNode* t);
 
   /// Gets the vertices for a given node (by super lightmap)
-  csVector4* GetVerticesPerSuperLightmap(TrianglesSuperLightmapNode* t);
+  csVector3* GetVerticesPerSuperLightmap(TrianglesSuperLightmapNode* t);
 
   /// Gets the vertices' colors for a given node (per material)
   csColor* GetColors(TrianglesNode *t);

@@ -91,7 +91,7 @@ void csLMCacheDataQueue::Clear()
 
 //------------------------------------------------------------------------//
 void* csSLMCacheData::Alloc(int /*w*/, int /*h*/, SourceData s,
-	csSubRectangles* /*r*/, GLuint /*Handle*/)
+  csSubRectangles* /*r*/, GLuint /*Handle*/)
 {
   source = s.superLMDataSource;
   source->cacheData = this;
@@ -135,7 +135,7 @@ void OpenGLTextureCache::Unload (csTxtCacheData *d)
 //----------------------------------------------------------------------------//
 
 OpenGLTextureCache::OpenGLTextureCache (int max_size,
-	csGraphics3DOGLCommon* g3d)
+  csGraphics3DOGLCommon* g3d)
 {
   cache_size = max_size;
   num = 0;
@@ -180,7 +180,7 @@ void OpenGLTextureCache::Cache (iTextureHandle *txt_handle)
   else
   {
     csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
-    	txt_handle->GetPrivateObject ();
+      txt_handle->GetPrivateObject ();
 
     // unit is not in memory. load it into the cache
     while (total_size + txt_mm->size >= cache_size)
@@ -230,7 +230,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 {
   iTextureHandle *txt_handle = (iTextureHandle *)d->Source;
   csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
-  	txt_handle->GetPrivateObject ();
+    txt_handle->GetPrivateObject ();
 
   if (reload)
   {
@@ -243,7 +243,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
     glGenTextures (1, &texturehandle);
     d->Handle = texturehandle;
     csGraphics3DOGLCommon::statecache->SetTexture (
-    	GL_TEXTURE_2D, texturehandle);
+      GL_TEXTURE_2D, texturehandle);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   }
@@ -251,7 +251,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
   if (((txt_mm->GetFlags () & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS
-  	| CS_TEXTURE_PROC)) == CS_TEXTURE_3D))
+    | CS_TEXTURE_PROC)) == CS_TEXTURE_3D))
   {
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
       rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR
@@ -277,7 +277,7 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
     if (togl->compressed == GL_FALSE)
       glTexImage2D (GL_TEXTURE_2D, i, txt_mm->TargetFormat (),
         togl->get_width (), togl->get_height (),
-	0, txt_mm->SourceFormat (), txt_mm->SourceType (), togl->image_data);
+  0, txt_mm->SourceFormat (), txt_mm->SourceType (), togl->image_data);
     else
       csGraphics3DOGLCommon::glCompressedTexImage2DARB (
         GL_TEXTURE_2D, i, (GLenum)togl->internalFormat,
@@ -366,7 +366,7 @@ void csLightMapQueue::AddVerticesArray(csVector4 * verts,int numVerts)
 }
 
 void csLightMapQueue::AddTrianglesArrayFast(csTriangle* indices,
-	int numTriangles)
+  int numTriangles)
 {
   tris = (int*)indices;
   num_triangles = numTriangles;
@@ -549,7 +549,7 @@ void OpenGLLightmapCache::Setup ()
     glGenTextures (1, &lightmaphandle);
     suplm[i].Handle = lightmaphandle;
     csGraphics3DOGLCommon::statecache->SetTexture (
-    	GL_TEXTURE_2D, lightmaphandle);
+      GL_TEXTURE_2D, lightmaphandle);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -568,7 +568,7 @@ void OpenGLLightmapCache::Setup ()
   // Initialize the temporary handle
   glGenTextures (1, &TempHandle);
   csGraphics3DOGLCommon::statecache->SetTexture (
-    	GL_TEXTURE_2D, TempHandle);
+      GL_TEXTURE_2D, TempHandle);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -700,6 +700,7 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
 
   for(i = 0; i < numLightmaps; i++)
   {
+    lmArray[i]->RecalculateDynamicLights();
     iLightMap* lm = lmArray[i]->GetLightMap();
     int lmwidth = lm->GetWidth();
     int lmheigth = lm->GetHeight();
@@ -709,6 +710,7 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
     glTexSubImage2D(GL_TEXTURE_2D, 0,r.xmin,r.ymin,
       lmwidth, lmheigth,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
   }
+  s->initialized = true;
 }
 
 void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
@@ -762,7 +764,7 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
       int prev_lm = cur_lm;
       while (num_proc > 0)
       {
-	prev_lm = (prev_lm+super_lm_num-1)%super_lm_num;
+  prev_lm = (prev_lm+super_lm_num-1)%super_lm_num;
         if(suplm[prev_lm].cacheData == NULL)
         {
           suplm[prev_lm].cacheData = new csLMCacheDataQueue();
@@ -777,22 +779,22 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
           clm = (csLMCacheData*)suplm[prev_lm].Alloc (lmwidth, lmheight, sd);
         }
 
-	if (clm)
-	{
-	  clm->super_lm_idx = prev_lm;
-	  num_proc = 0; // Stop.
-	}
-	else
-	{
-	  num_proc--;
-	}
+  if (clm)
+  {
+    clm->super_lm_idx = prev_lm;
+    num_proc = 0; // Stop.
+  }
+  else
+  {
+    num_proc--;
+  }
       }
 
       if (!clm)
       {
         // There was no room in the current super-lightmap and neither
-	// was there room in the previous one. We allocate a new
-	// super-lightmap here.
+  // was there room in the previous one. We allocate a new
+  // super-lightmap here.
         cur_lm = (cur_lm+1)%super_lm_num;
         num_lm_processed++;
 
@@ -805,12 +807,12 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
         suplm[cur_lm].Clear ();
         suplm[cur_lm].cacheData = new csLMCacheDataQueue();
 
-	// Now allocate the first lightmap in this super-lightmap.
-	// This can not fail.
-	SourceData sd;
-	sd.LMDataSource = piLM;
-	clm = (csLMCacheData*)suplm[cur_lm].Alloc (lmwidth, lmheight, sd);
-	clm->super_lm_idx = cur_lm;
+  // Now allocate the first lightmap in this super-lightmap.
+  // This can not fail.
+  SourceData sd;
+  sd.LMDataSource = piLM;
+  clm = (csLMCacheData*)suplm[cur_lm].Alloc (lmwidth, lmheight, sd);
+  clm->super_lm_idx = cur_lm;
       }
     }
 
@@ -893,7 +895,7 @@ void OpenGLLightmapCache::Flush ()
   g3d->SetGLZBufferFlagsPass2 (queue_zbuf_mode, true);
   csGraphics3DOGLCommon::statecache->EnableState (GL_TEXTURE_2D);
   glColor4f (1, 1, 1, 0);
-  csGraphics3DOGLCommon::SetupBlend (CS_FX_SRCDST, 0, false);
+  csGraphics3DOGLCommon::SetupBlend (CS_FX_COPY, 0, false);
   csGraphics3DOGLCommon::SetClientStates (CS_CLIENTSTATE_VT);
   for (i = 0 ; i < super_lm_num ; i++)
   {

@@ -241,6 +241,8 @@ private:
 
   // [lightmap no/yes ][fog 0/1][mixmode]
   iEffectDefinition* StockEffects[2][2][9];
+  iEffectDefinition* SeparateLightmapStockEffect;
+  iEffectDefinition* SeparateFogStockEffect;
 
   /// Inits stock effects
   void InitStockEffects();
@@ -283,8 +285,8 @@ private:
     csVector3* vertices,
     csVector2* texels,
     csColor* vertex_colors,
-		float** userarrays,
-		int* userarraycomponents,
+    float** userarrays,
+    int* userarraycomponents,
     G3DFogInfo* vertex_fog,
     int& num_clipped_triangles,
     int& num_clipped_vertices,
@@ -306,8 +308,8 @@ private:
     csVector3* vertices,
     csVector2* texels,
     csColor* vertex_colors,
-		float** userarrays,
-		int* userarraycomponents,
+    float** userarrays,
+    int* userarraycomponents,
     G3DFogInfo* vertex_fog,
     int& num_clipped_triangles,
     int& num_clipped_vertices,
@@ -316,103 +318,6 @@ private:
     csPlane3* planes, int num_planes,
     csPlane3* diag_planes, int num_diag_planes);
 
-
-  void ClipTrianglePolygonMesh (
-    int num_triangles,
-    int num_vertices,
-    csTriangle* triangles,
-    csVector3* vertices,
-    csVector2* texels,
-    csColor* vertex_colors,
-    G3DFogInfo* vertex_fog,
-    iPolyTex_p* lightmaps,
-    int& num_clipped_triangles,
-    int& num_clipped_vertices,
-    bool transform,
-    bool mirror,
-    bool exact_clipping,
-    bool plane_clipping,
-    bool z_plane_clipping,
-    bool frustum_clipping);
-
-
-  void ClipTrianglePolygonMesh (
-    int num_triangles,
-    int num_vertices,
-    csTriangle* triangles,
-    csVector3* vertices,
-    csVector2* texels,    
-    csColor* vertex_colors,
-    G3DFogInfo* vertex_fog,
-    iPolyTex_p* lightmaps,
-    int& num_clipped_triangles,
-    int& num_clipped_vertices,
-    bool exact_clipping,
-    const csVector3& frust_origin,
-    csPlane3* planes, int num_planes,
-    csPlane3* diag_planes, int num_diag_planes);
-
-  void ClipTriangleLightmapMesh (
-    int num_triangles,
-    int num_vertices,
-    csTriangle* triangles,
-    csVector4* vertices,
-    csVector2* texels,
-    G3DFogInfo* vertex_fog,
-    int* fog_indices,
-    int& num_clipped_triangles,
-    int& num_clipped_vertices,
-    bool transform,
-    bool mirror,
-    bool exact_clipping,
-    bool plane_clipping,
-    bool z_plane_clipping,
-    bool frustum_clipping);
-
-  void ClipTriangleLightmapMesh (
-    int num_triangles,
-    int num_vertices,
-    csTriangle* triangles,
-    csVector4* vertices,
-    csVector2* texels,
-    G3DFogInfo* vertex_fog,
-    int* fog_indices,
-    int& num_clipped_triangles,
-    int& num_clipped_vertices,
-    bool exact_clipping,
-    const csVector3& frust_origin,
-    csPlane3* planes, int num_planes,
-    csPlane3* diag_planes, int num_diag_planes);
-
-  void ClipUnlitPolys (
-    int num_triangles,
-    int num_vertices,
-    csTriangle* triangles,
-    csVector4* vertices,    
-    G3DFogInfo* vertex_fog,
-    int* fog_indices,
-    int& num_clipped_triangles,
-    int& num_clipped_vertices,
-    bool transform,
-    bool mirror,
-    bool exact_clipping,
-    bool plane_clipping,
-    bool z_plane_clipping,
-    bool frustum_clipping);
-
-  void ClipUnlitPolys (
-    int num_triangles,
-    int num_vertices,
-    csTriangle* triangles,
-    csVector4* vertices,    
-    G3DFogInfo* vertex_fog,
-    int* fog_indices,
-    int& num_clipped_triangles,
-    int& num_clipped_vertices,
-    bool exact_clipping,
-    const csVector3& frust_origin,
-    csPlane3* planes, int num_planes,
-    csPlane3* diag_planes, int num_diag_planes);
 
   /**
    * Draw the outlines of all triangles. This function accepts
@@ -604,6 +509,8 @@ public:
   /// The lightmap cache.
   OpenGLLightmapCache* lightmap_cache;
 
+
+
   /**
    * Low-level 2D graphics layer.
    * csGraphics3DOGLCommon is in charge of creating and managing this.
@@ -770,7 +677,10 @@ public:
 
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
-  virtual void OldDrawTriangleMesh (G3DTriangleMesh& mesh);
+  void OldDrawTriangleMesh (G3DTriangleMesh& mesh);
+  void EffectDrawTriangleMesh (G3DTriangleMesh& mesh,
+    GLuint lightmap = NULL, csVector2* lightmapcoords = NULL );
+
   /**
    * Debug version that draws outlines only. Is automatically
    * called by DrawTriangleMesh if needed.
@@ -779,6 +689,7 @@ public:
 
   /// Draw a polygon mesh.
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh);
+  //virtual void OldDrawPolygonMesh (G3DPolygonMesh& mesh);
 
   /// Get the iGraphics2D driver.
   virtual iGraphics2D *GetDriver2D ()
