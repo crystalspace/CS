@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  according to the parameters given by the terrfunc user.
 	- Set default quad-tree depth to 6 instead of 4. This seems to give
 	  much better results for newsky.zip.
+	- Did a VERY small optimization to the octree traversal code with
+	  regards to selecting front2back/back2front modes.
 13-Jun-2001
 	- Increased robustness of the Spider in BugPlug a little. If there
 	  are no sectors it will not start hunting. There is also a timeout

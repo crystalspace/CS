@@ -541,10 +541,10 @@ void* csOctree::Back2Front (csOctreeNode* node, const csVector3& pos,
   rc = Back2Front ((csOctreeNode*)node->children[x], pos, func, data, cullfunc, culldata); \
   if (rc) return rc;
 
-  __TRAVERSE__ (7-cur_idx);
-  __TRAVERSE__ ((7-cur_idx) ^ 1);
-  __TRAVERSE__ ((7-cur_idx) ^ 2);
-  __TRAVERSE__ ((7-cur_idx) ^ 4);
+  __TRAVERSE__ (cur_idx ^ 7);
+  __TRAVERSE__ (cur_idx ^ 6);
+  __TRAVERSE__ (cur_idx ^ 5);
+  __TRAVERSE__ (cur_idx ^ 3);
   __TRAVERSE__ (cur_idx ^ 1);
   __TRAVERSE__ (cur_idx ^ 2);
   __TRAVERSE__ (cur_idx ^ 4);
@@ -582,10 +582,10 @@ void* csOctree::Front2Back (csOctreeNode* node, const csVector3& pos,
   __TRAVERSE__ (cur_idx ^ 1);
   __TRAVERSE__ (cur_idx ^ 2);
   __TRAVERSE__ (cur_idx ^ 4);
-  __TRAVERSE__ ((7-cur_idx) ^ 1);
-  __TRAVERSE__ ((7-cur_idx) ^ 2);
-  __TRAVERSE__ ((7-cur_idx) ^ 4);
-  __TRAVERSE__ (7-cur_idx);
+  __TRAVERSE__ (cur_idx ^ 6);
+  __TRAVERSE__ (cur_idx ^ 5);
+  __TRAVERSE__ (cur_idx ^ 3);
+  __TRAVERSE__ (cur_idx ^ 7);
   return rc;
 }
 
