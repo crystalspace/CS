@@ -40,6 +40,7 @@ DOCHELP = \
   echo $"The following Crystal Space documentation targets can be invoked:$"
 define PSEUDOHELP
   echo $"The following pseudo targets can be invoked:$"
+  echo $"  make all          Make all important targets$"
   echo $"  make apps         Make all applications$"
   echo $"  make libs         Make all static libraries$"
   echo $"  make plugins      Make all plug-in modules including drivers$"
