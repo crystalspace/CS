@@ -1682,7 +1682,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 	  {
 	    csMatrix3 m;
 	    if (!SyntaxService->ParseMatrix (matrix_node, m))
-	      return false;
+	      return NULL;
             tr.SetO2T (m);
 	  }
 	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
@@ -1690,7 +1690,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 	  {
 	    csVector3 v;
 	    if (!SyntaxService->ParseVector (vector_node, v))
-	      return false;
+	      return NULL;
             tr.SetOrigin (v);
 	  }
 	  mesh->HardTransform (tr);
@@ -1713,7 +1713,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 	  {
 	    csMatrix3 m;
 	    if (!SyntaxService->ParseMatrix (matrix_node, m))
-	      return false;
+	      return NULL;
             mesh->GetMovable ()->SetTransform (m);
 	  }
 	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
@@ -1721,7 +1721,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 	  {
 	    csVector3 v;
 	    if (!SyntaxService->ParseVector (vector_node, v))
-	      return false;
+	      return NULL;
             mesh->GetMovable ()->SetPosition (v);
 	  }
 	  mesh->GetMovable ()->UpdateMove ();
