@@ -35,6 +35,7 @@ enum csVisReason
   VISIBLE,		// Just visible.
   VISIBLE_INSIDE,	// Visible because camera is inside bbox.
   VISIBLE_HISTORY,	// Visible because it was visible last frame.
+  VISIBLE_VPT,		// Visible because of VPT tracking (visible point tracking).
   LAST_REASON
 };
 

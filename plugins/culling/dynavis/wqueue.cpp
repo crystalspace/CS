@@ -135,6 +135,18 @@ void csWriteQueue::Append (const csBox2& box, float depth, void* obj)
   }
 }
 
+bool csWriteQueue::IsPointAffected (const csVector2& p, float depth)
+{
+  csWriteQueueElement* el = queue_min;
+  while (el)
+  {
+    if (el->depth > depth) return false;	// No occluder found.
+    if (el->box.In (p)) return true;
+    el = el->next;
+  }
+  return false;
+}
+
 void* csWriteQueue::Fetch (const csBox2& box, float depth, float& out_depth)
 {
   CS_ASSERT ((queue_min != 0) == (queue_max != 0));

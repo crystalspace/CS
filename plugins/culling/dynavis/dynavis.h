@@ -79,6 +79,7 @@ public:
   bool hint_closed;
   bool hint_badoccluder;
   bool hint_goodoccluder;
+  bool use_outline_filler;
 
   uint32 last_visible_vistestnr;
 
@@ -159,6 +160,7 @@ private:
   bool do_cull_writequeue;
   bool do_cull_ignoresmall;
   bool do_cull_clampoccluder;
+  bool do_cull_vpt;
   bool do_freeze_vis;
 
   // This hash set holds references to csVisibilityObjectWrapper instances

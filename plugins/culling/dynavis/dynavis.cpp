@@ -185,6 +185,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   do_cull_writequeue = true;
   do_cull_ignoresmall = false;
   do_cull_clampoccluder = false;
+  do_cull_vpt = true;
   do_freeze_vis = false;
 
   cfg_view_mode = VIEWMODE_STATS;
@@ -329,6 +330,9 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   visobj_wrap->hint_goodoccluder = visobj->GetCullerFlags ().Check (
   	CS_CULLER_HINT_GOODOCCLUDER);
 
+  visobj_wrap->use_outline_filler = (visobj_wrap->hint_closed
+  	|| visobj_wrap->model->CanUseOutlineFiller ()) && !visobj_wrap->hint_goodoccluder;
+
   visobj_vector.Push (visobj_wrap);
 }
 
@@ -386,6 +390,8 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
   iVisibilityObject* visobj = visobj_wrap->visobj;
   iMovable* movable = visobj->GetMovable ();
   model_mgr->CheckObjectModel (visobj_wrap->model, visobj_wrap->mesh);
+  visobj_wrap->use_outline_filler = (visobj_wrap->hint_closed
+  	|| visobj_wrap->model->CanUseOutlineFiller ()) && !visobj_wrap->hint_goodoccluder;
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
   kdtree->MoveObject (visobj_wrap->child, bbox);
@@ -534,6 +540,7 @@ end:
 	hist->reason == INVISIBLE_TESTRECT ? "covered" :
 	hist->reason == VISIBLE_INSIDE ? "visible inside" :
 	hist->reason == VISIBLE ? "visible" :
+	hist->reason == VISIBLE_VPT ? "visible vpt" :
 	"?"
 	);
     if (hist->reason != INVISIBLE_FRUSTUM && hist->reason != VISIBLE_INSIDE)
@@ -542,7 +549,8 @@ end:
       	sbox.MinX (), sbox.MinY (),
       	sbox.MaxX (), sbox.MaxY (), min_depth);
     }
-    if (hist->reason != VISIBLE && hist->reason != VISIBLE_INSIDE)
+    if (hist->reason != VISIBLE && hist->reason != VISIBLE_INSIDE
+    	&& hist->reason != VISIBLE_VPT)
     {
       printf ("  ");
       treenode->Front2Back (data->pos, PrintObjects, 0, 0);
@@ -979,6 +987,12 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     	    camera->GetShiftX (), camera->GetShiftY (), sbox,
 	    min_depth, max_depth);
       }
+
+      csVector2 sbox_center;
+      bool do_vpt_test = do_cull_vpt;
+      if (do_cull_vpt)
+        sbox_center = sbox.GetCenter ();
+
       if (rc)
       {
 #       ifdef CS_DEBUG
@@ -988,7 +1002,24 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
           printf ("Before obj test:\n%s\n", str->GetData ());
         }
 #       endif
-	rc = tcovbuf->TestRectangle (sbox, min_depth);
+	if (do_cull_vpt)
+	{
+	  // If we do VPT then we first test the center point of the box.
+	  // If that fails we test the rectangle.
+	  rc = tcovbuf->TestPoint (sbox_center, min_depth);
+	  if (!rc)
+	  {
+	    rc = tcovbuf->TestRectangle (sbox, min_depth);
+	    // There is no need to continue doing the vpt test later
+	    // because we know the sbox_center point is already covered
+	    // even without accounting for write queue.
+	    do_vpt_test = false;
+	  }
+	}
+	else
+	{
+	  rc = tcovbuf->TestRectangle (sbox, min_depth);
+        }
       }
 
       if (rc)
@@ -998,6 +1029,26 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	// object as non-visible.
 	if (do_cull_writequeue)
 	{
+	  if (do_vpt_test)
+	  {
+	    // Write queue is enabled and we're using VPT. If do_vpt_test is true
+	    // (i.e. if the tested center point was visible) then we will see if
+	    // the write queue could potentially affect that test point. If it
+	    // does then we assume the vpt test fails. Otherwise we know the object
+	    // is visible. If do_vpt_test is false
+	    // then the tested center point is already covered so we don't have
+	    // to continue the vpt test here.
+	    if (!write_queue->IsPointAffected (sbox_center, min_depth))
+	    {
+	      // Point is visible. So we know the entire object is visible.
+	      obj->MarkVisible (VISIBLE_VPT, RAND_HISTORY, current_vistest_nr,
+	      	  history_frame_cnt);
+	      data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+	      do_write_object = true;
+	      goto end;
+	    }
+	  }
+
 	  // If the write queue is enabled we try to see if there
 	  // are occluders that are relevant (intersect with this object
 	  // to test). We will insert those object with the coverage
@@ -1019,8 +1070,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	    {
 	      // Yes! We found such an object. Insert it now.
 	      bool cc = (do_cull_coverage == COVERAGE_POLYGON);
-	      if ((!qobj->hint_closed && !qobj->model->CanUseOutlineFiller ())
-	      		|| qobj->hint_goodoccluder)
+	      if (!qobj->use_outline_filler)
 		cc = true;
 	      if (cc)
 		UpdateCoverageBuffer (data->rview->GetCamera (), qobj->visobj,
@@ -1079,8 +1129,7 @@ end:
         // Let it update the coverage buffer if we
         // are using cull_coverage.
 	bool cc = (do_cull_coverage == COVERAGE_POLYGON);
-	if ((!obj->hint_closed && !obj->model->CanUseOutlineFiller ())
-	      		|| obj->hint_goodoccluder)
+	if (!obj->use_outline_filler)
 	  cc = true;
         if (cc)
           UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
@@ -1106,6 +1155,7 @@ end:
 	hist->reason == VISIBLE_INSIDE ? "visible inside" :
 	hist->reason == VISIBLE_HISTORY ? "visible history" :
 	hist->reason == VISIBLE ? "visible" :
+	hist->reason == VISIBLE_VPT ? "visible vpt" :
 	"?"
 	);
     if (hist->reason != INVISIBLE_FRUSTUM && hist->reason != VISIBLE_INSIDE
@@ -1990,7 +2040,8 @@ static color reason_colors[] =
   { 128, 64, 64 },
   { 255, 255, 255 },
   { 255, 255, 128 },
-  { 255, 255, 196 }
+  { 255, 255, 196 },
+  { 255, 128, 196 }
 };
 
 void csDynaVis::Debug_Dump (iGraphics3D* g3d)
@@ -2464,6 +2515,13 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     	"%s write queue!", do_cull_writequeue ? "Enabled" : "Disabled");
     return true;
   }
+  else if (!strcmp (cmd, "toggle_vpt"))
+  {
+    do_cull_vpt = !do_cull_vpt;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"%s vpt culling!", do_cull_vpt ? "Enabled" : "Disabled");
+    return true;
+  }
   else if (!strcmp (cmd, "toggle_history"))
   {
     do_cull_history = !do_cull_history;
@@ -2637,6 +2695,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	  visobj_wrap->history->reason == VISIBLE ? "vis" :
 	  visobj_wrap->history->reason == VISIBLE_INSIDE ? "vis inside" :
 	  visobj_wrap->history->reason == VISIBLE_HISTORY ? "vis history" :
+	  visobj_wrap->history->reason == VISIBLE_VPT ? "vis vpt" :
 	  "?",
 	  vispix, totpix,
 	  vispix != 0 && visobj_wrap->history->reason < VISIBLE

@@ -77,6 +77,12 @@ public:
    */
   void* Fetch (const csBox2& box, float depth, float& out_depth);
 
+  /**
+   * Test if there is an object in the queue that might affect
+   * the given point.
+   */
+  bool IsPointAffected (const csVector2& p, float depth);
+
   // Debugging functions.
   csPtr<iString> Debug_UnitTest ();
 

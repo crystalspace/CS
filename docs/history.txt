@@ -20,6 +20,14 @@ chronological order.
 	- Jorrit reenabled the dynavis_debug target in the Dynavis jamfile
 	  after Matze applied some fixes to the metadata embedding code
 	  on windows.
+	- Jorrit added VPT (visible point tracking) to Dynavis. Enabled
+	  by default but you can disable it with the toggle_vpt bugplug
+	  command (assigned to bugplug key '5'). Doesn't seem to give
+	  a big performance increase though.
+	- Jorrit fixed another bad bug in Dynavis. It was mistakenly assuming
+	  that all objects are suitable for outline filling even if the
+	  object was not closed.
+	- Jorrit performed some minor optimizations in Dynavis.
 	- Eric Sunshine made some corrections to the keystroke classification
 	  (cooked versus raw) which is performed by OSXDelegate.  Most
 	  importantly, it now correctly cooks Return and Enter to CSKEY_ENTER;

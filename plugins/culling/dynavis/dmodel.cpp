@@ -165,10 +165,10 @@ bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
 	iMeshWrapper* mw)
 {
   CS_ASSERT (model->ref_cnt > 0);
-  model->use_outline_filler = true;
   if (model->imodel->GetShapeNumber () != model->shape_number)
   {
     model->shape_number = model->imodel->GetShapeNumber ();
+    model->use_outline_filler = true;
     model->outline_info.Clear ();
     model->dirty_obb = true;
     iPolygonMesh* mesh = model->imodel->GetPolygonMeshViscull ();
