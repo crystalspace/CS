@@ -38,6 +38,8 @@ Short-term cleanups that need to be done:
 	      NeXTMenu.cfg.
 	- Eric Sunshine added several hundred (or more) missing 'const'
 	  qualifiers throughout the project.
+	- Eric Sunshine fixed a bug in his CVS snapshot script (snapshot.py).
+	  It failed to close the time stamp file after reading it.
 11-Feb-2000
 	- Eric Sunshine eliminated several compilation warnings in csPhyziks.
 	- Eric Sunshine eliminated some unsigned versus signed warnings in
