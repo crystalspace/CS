@@ -1065,8 +1065,11 @@ bool csBspPolygon::IntersectSegment (
 }
 
 //---------------------------------------------------------------------------
-CS_IMPLEMENT_STATIC_CLASSVAR (csPolyTreeBBox,stub_pool,GetPolyStubPool,csPolygonStubPool,)
-CS_IMPLEMENT_STATIC_CLASSVAR (csPolyTreeBBox,stub_fact,GetPolyStubFactory,csPolygonStubFactory,(&csBspPolygon::GetPolygonPool()))
+CS_IMPLEMENT_STATIC_CLASSVAR (csPolyTreeBBox,stub_pool,GetPolyStubPool,
+                              csPolygonStubPool,())
+CS_IMPLEMENT_STATIC_CLASSVAR (csPolyTreeBBox,stub_fact,GetPolyStubFactory,
+                              csPolygonStubFactory,
+                              (&csBspPolygon::GetPolygonPool()))
 
 csPolyTreeBBox::csPolyTreeBBox ()
 {

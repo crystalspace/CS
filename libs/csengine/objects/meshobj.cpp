@@ -166,7 +166,7 @@ void csMeshWrapper::SetRenderPriority (long rp)
 
 /// The list of lights that hit the mesh
 CS_TYPEDEF_GROWING_ARRAY_REF (engine3d_LightWorkTable, iLight *);
-CS_IMPLEMENT_STATIC_VAR (GetStaticLightWorkTable, engine3d_LightWorkTable,)
+CS_IMPLEMENT_STATIC_VAR (GetStaticLightWorkTable, engine3d_LightWorkTable,())
 
 void csMeshWrapper::UpdateDeferedLighting (const csVector3 &pos)
 {

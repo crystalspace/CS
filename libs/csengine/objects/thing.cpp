@@ -2680,7 +2680,7 @@ static int count_cull_node_notvis_behind;
 static int count_cull_node_notvis_cbuffer;
 static int count_cull_node_vis;
 
-CS_IMPLEMENT_STATIC_VAR (GetCullOctreeNodePerspPoly,csPolygon2D,)
+CS_IMPLEMENT_STATIC_VAR (GetCullOctreeNodePerspPoly,csPolygon2D,())
 
 // @@@ This routine need to be cleaned up!!! It probably needs to
 
