@@ -54,7 +54,7 @@ class awsTextBox :
   int start;
 
   /// Position of cursor
-  int cursor;
+  unsigned int cursor;
 
   /// The timer that makes the cursor blink.
   awsTimer *blink_timer;
