@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  renderer.
 	- Eric sunshine eliminated compilation warnings from the csSaver
 	  plugin.
+	- A few improvements to SetRenderTarget() for software renderer.
+	  Still disabled because not working properly yet.
 16-Oct-2002
 	- Keith Fulton added definitions and initial implementations for
 	  iSharedVariable, iSharedVariableList and iImposter.  iEngine now

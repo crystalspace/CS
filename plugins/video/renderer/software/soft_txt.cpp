@@ -196,7 +196,7 @@ void csTextureHandleSoftware::CreateReversePalette ()
 	best_idx = j;
       }
     }
-    reverse_palette[i] = j;
+    reverse_palette[i] = best_idx;
   }
 }
 
@@ -244,6 +244,32 @@ void csTextureHandleSoftware::ComputeMeanColor ()
 
   csRGBpixel *tc = transp ? &transp_color : 0;
 
+  csRGBpixel bias[8];
+  bias[0].red = 255;
+  bias[0].green = 0;
+  bias[0].blue = 0;
+  bias[1].red = 0;
+  bias[1].green = 255;
+  bias[1].blue = 0;
+  bias[2].red = 0;
+  bias[2].green = 0;
+  bias[2].blue = 255;
+  bias[3].red = 255;
+  bias[3].green = 0;
+  bias[3].blue = 255;
+  bias[4].red = 255;
+  bias[4].green = 255;
+  bias[4].blue = 0;
+  bias[5].red = 0;
+  bias[5].green = 255;
+  bias[5].blue = 255;
+  bias[6].red = 255;
+  bias[6].green = 255;
+  bias[6].blue = 255;
+  bias[7].red = 0;
+  bias[7].green = 0;
+  bias[7].blue = 0;
+
   for (i = 0; i < 4; i++)
     if (tex [i])
     {
@@ -252,6 +278,9 @@ void csTextureHandleSoftware::ComputeMeanColor ()
       quant.Count ((csRGBpixel *)t->image->GetImageData (),
         t->get_size (), tc);
     }
+#if 0
+  quant.Count (bias, 8, NULL);
+#endif
 
   csRGBpixel *pal = palette;
   palette_size = 256;
@@ -715,7 +744,8 @@ csPtr<iTextureHandle> csTextureManagerSoftware::RegisterTexture (iImage* image,
   return csPtr<iTextureHandle> (txt);
 }
 
-void csTextureManagerSoftware::UnregisterTexture (csTextureHandleSoftware* handle)
+void csTextureManagerSoftware::UnregisterTexture (
+		csTextureHandleSoftware* handle)
 {
   int idx = textures.Find (handle);
   if (idx >= 0) textures.Delete (idx);
