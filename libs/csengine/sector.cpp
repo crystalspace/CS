@@ -1324,7 +1324,7 @@ int qsort_meshobjs_callback (const void *b1, const void *b2)
 {
   const csRenderMesh *r1 = (const csRenderMesh *)b1;
   const csRenderMesh *r2 = (const csRenderMesh *)b2;
-  if (r1->material == r2->material || r1->streamsource == r2->streamsource)
+  if (r1->material == r2->material || r1->buffersource == r2->buffersource)
     return 0;
   return r2 - r1;
 }

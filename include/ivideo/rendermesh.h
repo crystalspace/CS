@@ -101,8 +101,8 @@ public:
   /// End of the range of indices to use
   unsigned int indexend;
 
-  /// Streamsource to get buffers from
-  iStreamSource* streamsource;
+  /// Source to get buffers from
+  iRenderBufferSource* buffersource;
 
   /// Material used for this mesh
   //iMaterialHandle* mathandle;

@@ -113,12 +113,12 @@ struct iRenderBuffer : public iBase
 
 };
 
-SCF_VERSION (iStreamSource, 0, 0, 1);
+SCF_VERSION (iRenderBufferSource, 0, 0, 1);
 
-struct iStreamSource : public iBase
+struct iRenderBufferSource : public iBase
 {
   /// Get a named buffer
-  virtual iRenderBuffer* GetBuffer (csStringID name) = 0;
+  virtual iRenderBuffer* GetRenderBuffer (csStringID name) = 0;
 };
 
 /** @} */

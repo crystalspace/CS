@@ -42,6 +42,9 @@ The history order is reversed so that new features are at the top.
 	    - All platforms now use the same plugin paths:
 	      <app dir>, $CRYSTAL/lib, $CRYSTAL/crystal, $CRYSTAL 
 	      (where $CRYSTAL is the CS installation dir)
+	- Marten renamed iStreamSource to iRenderBufferSource and GetBuffer to
+	  GetRenderBuffer. In the classes the terms stream and renderbuffer are
+	  mixed, from now on use just the term renderbuffer.
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older

@@ -656,7 +656,7 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
   {
     if (streammapping[i] != csInvalidStringID)
     {
-      iRenderBuffer* buf  = mesh->streamsource->GetBuffer (streammapping[i]);
+      iRenderBuffer* buf  = mesh->buffersource->GetRenderBuffer (streammapping[i]);
       if (buf)
         if (myr->ActivateBuffer ((csVertexAttrib)i, buf))
           continue;

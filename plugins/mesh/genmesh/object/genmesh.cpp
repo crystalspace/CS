@@ -58,7 +58,7 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
 #ifdef CS_USE_NEW_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iStreamSource)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
 #endif
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowReceiver)
@@ -83,8 +83,8 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
 SCF_IMPLEMENT_IBASE_END
 
 #ifdef CS_USE_NEW_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::StreamSource)
-  SCF_IMPLEMENTS_INTERFACE (iStreamSource) 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::BufferSource)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource) 
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif
 
@@ -114,7 +114,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (0);
 #ifdef CS_USE_NEW_RENDERER
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStreamSource);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
 #endif
   //SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
@@ -703,9 +703,9 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
 }
 
 #ifdef CS_USE_NEW_RENDERER
-iRenderBuffer *csGenmeshMeshObject::GetBuffer (csStringID name)
+iRenderBuffer *csGenmeshMeshObject::GetRenderBuffer (csStringID name)
 {
-  return factory->GetBuffer (name);
+  return factory->GetRenderBuffer (name);
 }
 
 csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
@@ -741,8 +741,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
   mesh.indexend = factory->GetTriangleCount () * 3;
   //mesh.mathandle = mater->GetMaterialHandle();
   mesh.material = mater;
-  csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
-  mesh.streamsource = stream;
+  csRef<iRenderBufferSource> source = SCF_QUERY_INTERFACE (factory, iRenderBufferSource);
+  mesh.buffersource = source;
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   meshPtr = &mesh;
   n = 1;
@@ -867,7 +867,7 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
     }
   }
 #ifdef CS_USE_NEW_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iStreamSource)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
 #endif
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iGeneralFactoryState)
 #ifndef CS_USE_NEW_RENDERER
@@ -876,8 +876,8 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
 #ifdef CS_USE_NEW_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::StreamSource)
-  SCF_IMPLEMENTS_INTERFACE (iStreamSource) 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::BufferSource)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource) 
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif
 
@@ -901,7 +901,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
 {
   SCF_CONSTRUCT_IBASE (pParent);
 #ifdef CS_USE_NEW_RENDERER
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStreamSource);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
 #endif
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
@@ -1073,7 +1073,7 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
 
 #ifdef CS_USE_NEW_RENDERER
 
-iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
+iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
 {
   if (name == vertex_name)
   {

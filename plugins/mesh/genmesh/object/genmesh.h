@@ -224,15 +224,15 @@ public:
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 #ifdef CS_USE_NEW_RENDERER
-  iRenderBuffer *GetBuffer (csStringID name);
-  //------------------------- iStreamSource implementation ----------------
-  class StreamSource : public iStreamSource 
+  iRenderBuffer *GetRenderBuffer (csStringID name);
+  //------------------------- iRenderBufferSource implementation ----------------
+  class BufferSource : public iRenderBufferSource 
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
-    iRenderBuffer *GetBuffer (csStringID name)
-	{ return scfParent->GetBuffer (name); }
-  } scfiStreamSource;
-  friend class StreamSource;
+    iRenderBuffer *GetRenderBuffer (csStringID name)
+	{ return scfParent->GetRenderBuffer (name); }
+  } scfiRenderBufferSource;
+  friend class BufferSource;
 #endif
 
   virtual iObjectModel* GetObjectModel ();
@@ -545,15 +545,15 @@ public:
     return top_mesh;
   }
 #else
-  iRenderBuffer *GetBuffer (csStringID name);
-  //------------------------- iStreamSource implementation ----------------
-  class StreamSource : public iStreamSource 
+  iRenderBuffer *GetRenderBuffer (csStringID name);
+  //------------------------- iRenderBufferSource implementation ----------------
+  class BufferSource : public iRenderBufferSource 
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
-    iRenderBuffer *GetBuffer (csStringID name)
-	{ return scfParent->GetBuffer (name); }
-  } scfiStreamSource;
-  friend class StreamSource;
+    iRenderBuffer *GetRenderBuffer (csStringID name)
+	{ return scfParent->GetRenderBuffer (name); }
+  } scfiRenderBufferSource;
+  friend class BufferSource;
 #endif
 
   //------------------------ iMeshObjectFactory implementation --------------

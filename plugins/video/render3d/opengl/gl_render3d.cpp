@@ -1379,9 +1379,9 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
   glEnableClientState(GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV);
 
-  iStreamSource* source = mymesh->streamsource;
+  iRenderBufferSource* source = mymesh->buffersource;
   iRenderBuffer* indexbuf =
-    source->GetBuffer (string_indices);
+    source->GetRenderBuffer (string_indices);
   if (!indexbuf)
     return;
 
