@@ -1205,8 +1205,6 @@ void csSprite3DMeshObject::ResetVertexColors ()
     for (i = 0 ; i < factory->GetVertexCount (); i++)
       vertex_colors [i].Set (base_color);
   }
-  //delete [] vertex_colors;
-  //vertex_colors = 0;
 }
 
 void csSprite3DMeshObject::FixVertexColors ()

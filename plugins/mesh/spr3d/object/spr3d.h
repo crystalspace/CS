@@ -1450,8 +1450,6 @@ public:
   /// Set base color.
   void SetBaseColor (const csColor& col)
   {
-    delete[] vertex_colors;
-    vertex_colors = 0;
     base_color.Set (col);
 #ifdef CS_USE_NEW_RENDERER
     if (MixMode & CS_FX_ALPHA)

@@ -16,6 +16,8 @@ chronological order.
 	  to be propagated to other mesh objects too.
 	- Jorrit added a few methods to csColor4.
 	- Eric Sunshine eliminated several compilation warnings.
+	- Jorrit fixed spr3d so that SetBaseColor() is more efficient
+	  and should now also work at runtime.
 	- Eric Sunshine eliminated about 350 errors and warnings reported by
 	  modern versions of Doxygen for the public API reference.
 14-Oct-2004
