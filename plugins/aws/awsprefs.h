@@ -162,7 +162,7 @@ public:
   { val->IncRef (); }
 
   awsStringKey (const awsStringKey& key)
-    : awsKey(key)
+    : awsKey(key), iAwsStringKey()
   { val = key.val; val->IncRef(); }
 
   /// Destructor does nothing

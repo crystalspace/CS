@@ -23,7 +23,7 @@
 
 #ifdef CS_DEBUG     
 // defining this causes the csRectRegionDebug class to be compiled in  
-#define CS_DEBUG_RECT_REG 
+//#define CS_DEBUG_RECT_REG 
 #endif
 
 #ifdef CS_DEBUG_RECT_REG
