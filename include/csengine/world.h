@@ -34,6 +34,7 @@
 class csSector;
 class csSprite;
 class csTextureList;
+class csMaterialList;
 class csPolygon3D;
 class csCamera;
 class csThing;
@@ -357,8 +358,10 @@ public:
   static bool do_force_revis;
 
 private:
-  /// Texture and color information object.
+  /// Texture and color information objects.
   csTextureList* textures;
+  /// Material objects.
+  csMaterialList* materials;
   /// Linked list of dynamic lights.
   csDynLight* first_dyn_lights;
   /// List of halos (csHaloInformation).
@@ -460,6 +463,8 @@ public:
    * Prepare the textures. It will initialise all loaded textures
    * for the texture manager. (Normally you shouldn't call this function
    * directly, because it will be called by Prepare() for you.
+   * This function will also prepare all loaded materials after preparing
+   * the textures.
    */
   void PrepareTextures ();
 
@@ -706,6 +711,11 @@ public:
    * Return the object managing all loaded textures.
    */
   csTextureList* GetTextures () { return textures; }
+
+  /**
+   * Return the object managing all loaded materials.
+   */
+  csMaterialList* GetMaterials () { return materials; }
 
   /**
    * Add a dynamic light to the world.

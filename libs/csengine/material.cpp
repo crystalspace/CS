@@ -20,9 +20,15 @@
 #include "cssysdef.h"
 #include "csengine/material.h"
 #include "csengine/texture.h"
+#include "itxtmgr.h"
+
+IMPLEMENT_IBASE (csMaterial)
+  IMPLEMENTS_INTERFACE (iMaterial)
+IMPLEMENT_IBASE_END
 
 csMaterial::csMaterial ()
 {
+  CONSTRUCT_IBASE (NULL);
   // set defaults
   // black flat shaded.
   flat_color.Set(0.f,0.f,0.f);
@@ -41,4 +47,77 @@ csMaterial::csMaterial (csTextureHandle *txt)
 csMaterial::~csMaterial () 
 {
   delete texture;
+}
+
+iTextureHandle* csMaterial::GetTexture ()
+{
+  return GetTextureHandle ()->GetTextureHandle ();
+}
+
+//---------------------------------------------------------------------------
+
+IMPLEMENT_CSOBJTYPE (csMaterialHandle, csObject);
+
+csMaterialHandle::csMaterialHandle (iMaterial* material) :
+  csObject (), handle (NULL)
+{
+  csMaterialHandle::material = material;
+  material->IncRef ();
+}
+
+csMaterialHandle::csMaterialHandle (csMaterialHandle &th) :
+  csObject (), handle (NULL)
+{
+  (material = th.material)->IncRef ();
+  handle = th.GetMaterialHandle ();
+  SetName (th.GetName ());
+}
+
+csMaterialHandle::csMaterialHandle (iMaterialHandle *ith) :
+  csObject (), material (NULL)
+{
+  ith->IncRef ();
+  handle = ith;
+}
+
+csMaterialHandle::~csMaterialHandle ()
+{
+  if (handle)
+    handle->DecRef ();
+  if (material)
+    material->DecRef ();
+}
+
+void csMaterialHandle::SetMaterial (iMaterial *material)
+{
+  if (csMaterialHandle::material)
+    csMaterialHandle::material->DecRef ();
+  csMaterialHandle::material = material;
+  material->IncRef ();
+}
+
+void csMaterialHandle::Register (iTextureManager *txtmgr)
+{
+  handle = txtmgr->RegisterMaterial (material);
+}
+
+//-------------------------------------------------------- csMaterialList -----//
+
+csMaterialList::~csMaterialList ()
+{
+  DeleteAll ();
+}
+
+csMaterialHandle* csMaterialList::NewMaterial (iMaterial* material)
+{
+  csMaterialHandle *tm = new csMaterialHandle (material);
+  Push (tm);
+  return tm;
+}
+
+csMaterialHandle* csMaterialList::NewMaterial (iMaterialHandle *ith)
+{
+  csMaterialHandle *tm = new csMaterialHandle (ith);
+  Push (tm);
+  return tm;
 }

@@ -41,6 +41,7 @@
 #include "csengine/covcube.h"
 #include "csengine/cbufcube.h"
 #include "csengine/texture.h"
+#include "csengine/material.h"
 #include "csengine/lghtmap.h"
 #include "csengine/stats.h"
 #include "csengine/cspmeter.h"
@@ -293,6 +294,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   G3D = NULL;
   G2D = NULL;
   textures = NULL;
+  materials = NULL;
   c_buffer = NULL;
   quad3d = NULL;
   covcube = NULL;
@@ -317,6 +319,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   SetCuller (CS_CULLER_CBUFFER);
 
   textures = new csTextureList ();
+  materials = new csMaterialList ();
 
   render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory());
   lightpatch_pool = new csLightPatchPool ();
@@ -335,6 +338,7 @@ csWorld::~csWorld ()
   if (VFS) VFS->DecRef ();
   if (System) System->DecRef ();
   delete textures;
+  delete materials;
   delete render_pol2d_pool;
   delete lightpatch_pool;
   delete covcube;
@@ -463,6 +467,8 @@ void csWorld::Clear ()
   }
   delete textures; textures = NULL;
   textures = new csTextureList ();
+  delete materials; materials = NULL;
+  materials = new csMaterialList ();
 
   // Delete world states and their references to cullers before cullers are
   // deleted in SetCuller below.
@@ -610,6 +616,17 @@ void csWorld::PrepareTextures ()
 
   // Prepare all the textures.
   txtmgr->PrepareTextures ();
+
+  // Then register all materials to the texture manager.
+  for (int i = 0; i < materials->Length (); i++)
+  {
+    csMaterialHandle *csth = materials->Get (i);
+    if (!csth->GetMaterialHandle ())
+      csth->Register (txtmgr);
+  }
+
+  // Prepare all the materials.
+  txtmgr->PrepareMaterials ();
 }
 
 void csWorld::PrepareSectors()
@@ -1460,6 +1477,7 @@ bool csWorld::DeleteLibrary (const char *iName)
   DELETE_ALL_OBJECTS (thing_templates, csThingTemplate)
   DELETE_ALL_OBJECTS (sectors, csSector)
   DELETE_ALL_OBJECTS ((*textures), csTextureHandle)
+  DELETE_ALL_OBJECTS ((*materials), csMaterialHandle)
 
 #undef DELETE_ALL_OBJECTS
 #define DELETE_ALL_OBJECTS(vector,type)				\

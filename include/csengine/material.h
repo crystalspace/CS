@@ -20,15 +20,19 @@
 #define __CS_MATERIAL_H__
 
 #include "csutil/cscolor.h"
+#include "csobject/csobject.h"
+#include "csobject/nobjvec.h"
+#include "imater.h"
 
 class csTextureHandle;
+struct iTextureManager;
 
 
 /**
  * A material class.
  */
 
-class csMaterial
+class csMaterial : public iMaterial
 {
 private:
   /// flat shading color
@@ -57,7 +61,7 @@ public:
   /**
    * destroy material
    */
-  ~csMaterial ();
+  virtual ~csMaterial ();
 
 
   /// Get the flat shading color
@@ -84,6 +88,83 @@ public:
   inline float GetReflection () const { return reflection; }
   /// Set reflection of the material
   inline void SetReflection (float val) { reflection = val; }
+
+  //--------------------- iMaterial implementation ---------------------
+  DECLARE_IBASE;
+  ///
+  virtual iTextureHandle* GetTexture ();
+};
+
+/**
+ * csMaterialHandle represents a texture and its link
+ * to the iMaterialHandle as returned by iTextureManager.
+ */
+class csMaterialHandle : public csObject
+{
+private:
+  /// The corresponding iMaterial.
+  iMaterial* material;
+  /// The handle as returned by iTextureManager.
+  iMaterialHandle* handle;
+
+public:
+  /// Construct a material handle given a material.
+  csMaterialHandle (iMaterial* Image);
+
+  /**
+   * Construct a csMaterialHandle from a pre-registered AND prepared material 
+   * handle. The engine takes over responsibility for destroying the material
+   * handle. To prevent this IncRef () the material handle.
+   */
+  csMaterialHandle (iMaterialHandle *ith);
+
+  /// Copy constructor
+  csMaterialHandle (csMaterialHandle &th);
+  /// Release material handle
+  virtual ~csMaterialHandle ();
+
+  /// Get the material handle.
+  iMaterialHandle* GetMaterialHandle () { return handle; }
+
+  /// Change the base material
+  void SetMaterial (iMaterial* material);
+  /// Get the material.
+  iMaterial* GetMaterial () { return material; }
+
+  /// Register the material with the texture manager
+  void Register (iTextureManager *txtmng);
+
+  CSOBJTYPE;
+};
+
+/**
+ * This class is used to hold a list of materials.
+ */
+class csMaterialList : public csNamedObjVector
+{
+public:
+  /// Initialize the array
+  csMaterialList () : csNamedObjVector (16, 16)
+  { }
+  /// Destroy every material in the list
+  virtual ~csMaterialList ();
+
+  /// Create a new material.
+  csMaterialHandle* NewMaterial (iMaterial* material);
+
+  /**
+   * Create a engine wrapper for a pre-prepared iTextureHandle
+   * The handle will be IncRefed.
+   */
+  csMaterialHandle* NewMaterial (iMaterialHandle *ith);
+
+  /// Return material by index
+  csMaterialHandle *Get (int idx)
+  { return (csMaterialHandle *)csNamedObjVector::Get (idx); }
+
+  /// Find a material by name
+  csMaterialHandle *FindByName (const char* iName)
+  { return (csMaterialHandle *)csNamedObjVector::FindByName (iName); }
 };
 
 #endif // __CS_MATERIAL_H__

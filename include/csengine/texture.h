@@ -56,7 +56,7 @@ public:
    */
   csTextureHandle (iTextureHandle *ith);
 
-  /// Copy contstructor
+  /// Copy constructor
   csTextureHandle (csTextureHandle &th);
   /// Release texture handle
   virtual ~csTextureHandle ();
@@ -97,8 +97,10 @@ public:
   /// Create a new texture.
   csTextureHandle *NewTexture (iImage *image);
 
-  /// Create a engine wrapper for a pre-prepared iTextureHandle
-  /// The handle will be IncRefed
+  /**
+   * Create a engine wrapper for a pre-prepared iTextureHandle
+   * The handle will be IncRefed
+   */
   csTextureHandle *NewTexture (iTextureHandle *ith);
 
   /// Return texture by index

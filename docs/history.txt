@@ -27,6 +27,11 @@ The history order has been reversed so that new features are at the top.
 	  implementation for this for the 3D renderers. Nothing related
 	  to materials really works right now. These are only stubs to
 	  make a future implementation easier.
+	- Let csMaterial implement iMaterial. Added csMaterialHandle
+	  which represents the connection between csMaterial (or iMaterial)
+	  and iMaterialHandle. Added csMaterialList which is a list of
+	  loaded materials.
+	- Added list of loaded materials to csWorld.
 2-Aug-2000
 	- Martin Geisse added 2d animations and aligned pixmaps.
 	- Norman Kramer fixed funcon plugin so that use_fog=false for DPFX.
