@@ -212,6 +212,13 @@ public:
   virtual void InvalidateMaterialHandles () { }
 
   /**
+   * see imesh/object.h for specification. The default implementation
+   * does nothing.
+   */
+  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
+
+
+  /**
    * See igeom/objmodel.h for specification. The default implementation
    * returns an infinite bounding box.
    */

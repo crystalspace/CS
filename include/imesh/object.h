@@ -219,6 +219,14 @@ struct iMeshObject : public iBase
    * again.
    */
   virtual void InvalidateMaterialHandles () = 0;
+
+  /**
+   * The engine asks this mesh object to place one of his hierarchical
+   * children. It must be placed where it should be at the given time.
+   * This object might or might not have been drawn, so you can't use 
+   * it's current state.
+   */
+  virtual void PositionChild (iMeshObject* child,csTicks current_time) = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 6);

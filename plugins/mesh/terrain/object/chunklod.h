@@ -323,6 +323,11 @@ public:
   { matwrap = m; return true; }
   iMaterialWrapper* GetMaterialWrapper () const { return matwrap; }
   void InvalidateMaterialHandles () { }
+  /**
+   * see imesh/object.h for specification. The default implementation
+   * does nothing.
+   */
+  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
 
   bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal);
   csArray<iMaterialWrapper*> GetMaterialPalette ();

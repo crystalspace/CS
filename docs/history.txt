@@ -8,6 +8,9 @@ chronological order.
 
 28-Dec-2003
   - Philip Wyett fixed a few config files so Freetype2 could again be invoked.
+  - Steven Geens added iMeshObject::PositionChild(iMeshObject* child,csTicks
+    time) and an empty implementation for each of its subclasses. He also 
+    added code to the OR to place hierarchical children with this method.
 27-Dec-2003
   - Philip Wyett continues a general cleanup of CS code.
   - Philip Wyett added 'docconv' to the root CS directory .cvsignore.

@@ -175,6 +175,11 @@ class           csStuffObject:public iMeshObject
        { material = mat; return true; }
   virtual iMaterialWrapper *GetMaterialWrapper() const { return material; }
   virtual void InvalidateMaterialHandles () { }
+  /**
+   * see imesh/object.h for specification. The default implementation
+   * does nothing.
+   */
+  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
 
 // --------------------| BEGIN iClothMeshState implementation// |----------------// 
 bool LightsEnabled;

@@ -322,6 +322,12 @@ public:
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
   virtual void InvalidateMaterialHandles () { }
+  /**
+   * see imesh/object.h for specification. The default implementation
+   * does nothing.
+   */
+  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
+
 
   //------------------------- iBallState implementation ----------------
   class BallState : public iBallState

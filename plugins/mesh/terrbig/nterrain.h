@@ -411,6 +411,11 @@ public:
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual void InvalidateMaterialHandles () { }
+  /**
+   * see imesh/object.h for specification. The default implementation
+   * does nothing.
+   */
+  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
 
   /// Get write object.
   virtual iPolygonMesh* GetWriteObject () { return 0; }

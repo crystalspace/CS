@@ -261,6 +261,11 @@ public:
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat);
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
   virtual void InvalidateMaterialHandles () { }
+  /**
+   * see imesh/object.h for specification. The default implementation
+   * does nothing.
+   */
+  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
 
   //------------------------- iLightingInfo interface -------------------------
   struct LightingInfo : public iLightingInfo

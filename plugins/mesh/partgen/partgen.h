@@ -293,6 +293,11 @@ public:
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return mat; }
   virtual void InvalidateMaterialHandles () { }
+  /**
+   * see imesh/object.h for specification. The default implementation
+   * does nothing.
+   */
+  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
 
   //------------------------- iParticleState implementation ----------------
   class ParticleState : public iParticleState
