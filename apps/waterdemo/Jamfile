@@ -5,15 +5,7 @@ Application waterdemo
 ;
 LinkWith waterdemo : csgeom csgfx cstool csutil ;
 
-CompileGroups rendstep_stencil : nrall ;
-CompileGroups rendstep_std : nrall ;
-CompileGroups rendloop_loader : nrall ;
-CompileGroups glshader_fixed : nrall ;
-CompileGroups glshader_arb : nrall ;
-CompileGroups glrender3d : nrall ;
-CompileGroups shadermgr : nrall ;
 CompileGroups waterdemo : nrall ;
-CompileGroups effects : nrall ;
 
-Help r3dtest : "Displaying rendering of a watersurface in new renderer" ;
+Help waterdemo : "Displaying rendering of a watersurface in new renderer" ;
 
