@@ -90,6 +90,23 @@ chronological order.
 	  of code which was the target of the goto.
 	- Eric Sunshine eliminated signed versus unsigned compilation warning
 	  from aws/awsmled.cpp.
+	- Eric Sunshine made the following changes to the build system with
+	  regards to AWS:
+	    - Fixed bug in aws/Jamfile where it failed to correctly apply
+	      -Wno-unused when compiling skinlex.cpp.
+	    - Updated aws/Jamfile to also apply -Wno-unused to skinpars.cpp.
+	    - Worked around bizarre preprocessor error on older MacOS/X
+	      installations where it fails to search CS/plugins/aws for headers
+	      #included by aws/skinpars.cpp (at least building outside the
+	      source tree).  Work-around in aws.mak and Jamfile involves
+	      explicitly adding -I$(SRCDIR)/plugins/aws to CFLAGS for
+	      skinpars.cpp.
+	    - Updated aws.mak to apply -Wno-unused when building skinlex.cpp
+	      and skinpars.cpp in order to avoid compilation warnings over
+	      which we have no control in these auto-generated files.
+	    - Converted aws.mak to new build style where generated resources
+	      are placed in a aws-specific build directory, rather than
+	      directly in $(OUT).
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.
