@@ -122,7 +122,7 @@ void csTextureHandle::CreateMipmaps ()
   DG_LINK (this, tex[0]);
 
   // 2D textures uses just the top-level mipmap
-  if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
+  if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_PROC)) == CS_TEXTURE_3D)
   {
     // Create each new level by creating a level 2 mipmap from previous level
     iImage *i1 = image->MipMap (1, tc);
