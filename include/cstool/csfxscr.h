@@ -46,7 +46,7 @@ void csfxInterference (iGraphics2D *g2d, iTextureManager *txtmgr,
   float amount, float anim, float length);
 
 /**
- * Fade the screen to black. The fadevalue determines much much fading is
+ * Fade the screen to black. The fadevalue determines how much fading is
  * done. fadevalue 0: no fading. fadevalue 1: all black.
  * Hardware acceleration is used, if available.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
@@ -111,6 +111,13 @@ void csfxShadeVert (iGraphics3D *g3d, const csColor& topcolor,
  */
 void csfxScreenDPFX (iGraphics3D *g3d, iMaterialHandle *mat, uint mixmode,
   uint8 r, uint8 g, uint8 b);
+
+/**
+ * Do a drapolygonFX draw, but only part of the screen is covered.
+ * Rest the same as the fullscreen version.
+ */
+void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h, 
+  iMaterialHandle *mat, uint mixmode, uint8 r, uint8 g, uint8 b);
 
 #endif // __CS_CSFXSCR_H__
 

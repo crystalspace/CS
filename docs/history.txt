@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Nov-2003
+	- Wouter fixed a typo in csfxscr fullscreen header file, and 
+          added a new function that can do a dpfx for part of the screen.
 7-Nov-2003
 	- res reverted the behaviour of setting the alpha of keycolored pixels
 	  of textures in GL: just drop the alpha of KCed pixels to 0, but don't

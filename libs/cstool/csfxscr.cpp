@@ -220,3 +220,61 @@ void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, uint mixmode,
 #endif // CS_USE_NEW_RENDERER
 }
 
+void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
+  iMaterialHandle *mat, uint mixmode, uint8 r, uint8 g, uint8 b)
+{
+#ifndef CS_USE_NEW_RENDERER
+  float width = g3d->GetWidth();
+  float height = g3d->GetHeight();
+  float sx = (float(x)-width*0.5)/(width*0.5);
+  float sy = (float(height - y - 1)-height*0.5)/(height*0.5);
+  float smx = sx + float(w)/(width*0.5);
+  float smy = sy;
+  sy -= float(h)/(height*0.5);
+  G3DPolygonDPFX dpfx;
+  dpfx.num = 4;
+  dpfx.use_fog = false;
+  dpfx.vertices[0].x = sx;
+  dpfx.vertices[0].y = sy;
+  dpfx.z[0] = 0.;
+  dpfx.texels[0].x = 0.;
+  dpfx.texels[0].y = 1.;
+  dpfx.colors[0].red = 1.;
+  dpfx.colors[0].green = 1.;
+  dpfx.colors[0].blue = 1.;
+  dpfx.vertices[1].x = sx;
+  dpfx.vertices[1].y = smy;
+  dpfx.z[1] = 0.;
+  dpfx.texels[1].x = 0.;
+  dpfx.texels[1].y = 0.;
+  dpfx.colors[1].red = 1.;
+  dpfx.colors[1].green = 1.;
+  dpfx.colors[1].blue = 1.;
+  dpfx.vertices[2].x = smx;
+  dpfx.vertices[2].y = smy;
+  dpfx.z[2] = 0.;
+  dpfx.texels[2].x = 1.;
+  dpfx.texels[2].y = 0.;
+  dpfx.colors[2].red = 1.;
+  dpfx.colors[2].green = 1.;
+  dpfx.colors[2].blue = 1.;
+  dpfx.vertices[3].x = smx;
+  dpfx.vertices[3].y = sy;
+  dpfx.z[3] = 0.;
+  dpfx.texels[3].x = 1.;
+  dpfx.texels[3].y = 1.;
+  dpfx.colors[3].red = 1.;
+  dpfx.colors[3].green = 1.;
+  dpfx.colors[3].blue = 1.;
+  dpfx.mat_handle = mat;
+  dpfx.mixmode = mixmode;
+  dpfx.flat_color_r = r;
+  dpfx.flat_color_g = g;
+  dpfx.flat_color_b = b;
+  int oldzbufmode = g3d->GetRenderState (G3DRENDERSTATE_ZBUFFERMODE);
+  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
+  g3d->DrawPolygonFX (dpfx);
+  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, oldzbufmode);
+#endif // CS_USE_NEW_RENDERER
+}
+
