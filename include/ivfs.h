@@ -88,10 +88,6 @@ struct iFile : public iBase
   virtual char *GetAllData () = 0;
 };
 
-// Ugly Win32 hack
-#ifdef DeleteFile
-#  undef DeleteFile
-#endif
 
 SCF_VERSION (iVFS, 0, 0, 2);
 

@@ -20,7 +20,6 @@
 
 #include "cssysdef.h"
 #include <stdio.h>
-#include <windows.h>
 #include <mmsystem.h>
 
 #include "csutil/scf.h"

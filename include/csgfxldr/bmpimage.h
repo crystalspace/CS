@@ -31,7 +31,6 @@ protected:
   /// Try to load the image
   virtual csImageFile* LoadImage (UByte* iBuffer, ULong iSize, int iFormat);
 };
-
 /**
  * An csImageFile subclass for reading BMP files.
  *<p>

@@ -19,8 +19,6 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 
-#include <windows.h>
-
 HINSTANCE ModuleHandle;
 
 // Main DLL entry point... should be called when we're loaded.

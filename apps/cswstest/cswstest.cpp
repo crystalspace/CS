@@ -489,7 +489,9 @@ int main (int argc, char* argv[])
   app = new csWsTest ("Crystal Space 3D maze editor");
 
   if (app->InitialSetup (argc, argv, "/config/MazeD.cfg", "/lib/MazeD"))
+  {
     app->Loop ();
+  }
 
   delete app;
 

@@ -28,7 +28,6 @@
 #include "cssys/win32/DirectDetection.h"
 #include "video/canvas/ddraw/ig2d.h"
 
-#include <windows.h>
 #include <windowsx.h>
 
 #include <ddraw.h>
@@ -600,7 +599,7 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
   return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
-#undef main
+
 extern int csMain (int argc, char* argv[]);
 
 // The main entry for GUI applications

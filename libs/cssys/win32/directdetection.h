@@ -9,7 +9,6 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
-#include <windows.h>
 #include <windowsx.h>
 #include <ddraw.h>
 #include <d3d.h>

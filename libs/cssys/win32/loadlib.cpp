@@ -19,8 +19,6 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 
-#include <windows.h>
-
 csLibraryHandle csLoadLibrary (const char* szLibName)
 {
   return LoadLibrary (szLibName);

@@ -25,7 +25,6 @@
 #define INITGUID
 
 #include "cssysdef.h"
-#include <windows.h>
 #include <stdlib.h>
 #include <ddraw.h>
 #include <d3d.h>

@@ -20,7 +20,6 @@
 // csGraphics2DGlide2x implementation file
 // Written by xtrochu and Nathaniel
 
-#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <glide.h>

@@ -19,6 +19,17 @@
 
 #ifndef __CSOSDEFS_H__
 #define __CSOSDEFS_H__
+
+// So many things require this. IF you have an issue with something defined
+// in it then undef that def here.
+#include <windows.h>
+#undef min
+#undef max
+#undef GetCurrentTime
+#undef DeleteFile
+
+
+
 // For GUI applications, use "csMain" instead of "main".
 // For console applications, use regular "main".
 #ifndef CONSOLE
@@ -155,9 +166,6 @@
 #endif
 
 #ifdef SYSDEF_SOCKETS
-#  define _WINSOCKAPI_
-#  include <winsock2.h>
-#  include <winsock.h>
    typedef int socklen_t;
    typedef SOCKET csNetworkSocket;
 #  define CS_NET_SOCKET_INVALID INVALID_SOCKET
@@ -169,8 +177,6 @@
 #endif
 
 #ifdef SYSDEF_SELECT
-#  define _WINSOCKAPI_
-#  include <winsock.h>
 #  undef SYSDEF_SELECT
 #endif
 

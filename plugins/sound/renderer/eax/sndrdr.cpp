@@ -17,14 +17,14 @@
 	License along with this library; if not, write to the Free
 	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+#include "cssysdef.h"
+
 #include <stdio.h>
-#include <windows.h>
 
 #include <initguid.h>
 #include "dsound.h"
 #include "eax.h"
 
-#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "sndrdr.h"
 #include "sndlstn.h"

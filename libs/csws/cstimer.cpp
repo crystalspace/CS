@@ -22,8 +22,6 @@
 #include "csws/csapp.h"
 #include "csws/cswssys.h"
 
-#undef GetCurrentTime
-
 csTimer::csTimer (csComponent *iParent, unsigned long iPeriod)
   : csComponent (iParent)
 {

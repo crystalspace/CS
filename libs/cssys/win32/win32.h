@@ -19,8 +19,6 @@
 #ifndef __CS_WIN32_H__
 #define __CS_WIN32_H__
 
-#include <windows.h>
-
 #if defined (OS_WIN32)
 // Windows compilers has a different idea of program entry point behaviour,
 // compared to other platform compilers.

@@ -19,7 +19,6 @@
 */
 #include "cssysdef.h"
 #include <stdio.h>
-#include <windows.h>
 #include <initguid.h>
 #include "dsound.h"
 

@@ -18,13 +18,12 @@
 */ 
 
 #include "cssysdef.h"
-#include <windows.h>
 #include "csutil/scf.h"
 
-#undef main
 extern int csMain (int argc, char* argv[]);
 HINSTANCE ModuleHandle;	
 
+#undef main
 // The main entry for console applications
 int main (int argc, char* argv[])
 {

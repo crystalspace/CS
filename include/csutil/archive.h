@@ -25,11 +25,6 @@
 #include "csutil/zip.h"
 #include "csutil/csstrvec.h"
 
-// Ugly Win32 hack
-#ifdef DeleteFile
-#  undef DeleteFile
-#endif
-
 /**
  * This class can be used to work with standard ZIP archives.
  * Constructor accepts a file name - if such a file is not found, it is
