@@ -35,7 +35,7 @@ struct csSprite2DVertex
   float u, v;
 };
 
-CS_TYPEDEF_GROWING_ARRAY (csColoredVertices, csSprite2DVertex);
+typedef csGrowingArray<csSprite2DVertex> csColoredVertices;
 
 SCF_VERSION (iSprite2DUVAnimationFrame, 0, 0, 1);
 

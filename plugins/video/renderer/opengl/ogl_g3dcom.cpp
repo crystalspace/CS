@@ -76,42 +76,42 @@
 // dynamic textures will utilise multiple instances of csGraphics3DOGLCommon
 
 /// Static vertex array.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_tr_verts, csVector3);
+typedef csGrowingArray<csVector3> ogl_g3dcom_tr_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, ogl_g3dcom_tr_verts, ())
 /// Static uv array.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_uv_verts, csVector2);
+typedef csGrowingArray<csVector2> ogl_g3dcom_uv_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_uv_verts, ogl_g3dcom_uv_verts, ())
 /// Static uv array for multi-texture.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_uv_mul_verts, csVector2);
+typedef csGrowingArray<csVector2> ogl_g3dcom_uv_mul_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_uv_mul_verts, ogl_g3dcom_uv_mul_verts, ())
 /// Array with colors.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_color_verts, csColor);
+typedef csGrowingArray<csColor> ogl_g3dcom_color_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_color_verts, ogl_g3dcom_color_verts, ())
 /// Array with RGBA colors.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_rgba_verts, GLfloat);
+typedef csGrowingArray<GLfloat> ogl_g3dcom_rgba_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_rgba_verts, ogl_g3dcom_rgba_verts, ())
 
 /// Array for clipping.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_triangles, csTriangle);
+typedef csGrowingArray<csTriangle> ogl_g3dcom_clipped_triangles;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_triangles, ogl_g3dcom_clipped_triangles, ())
 /// Array for clipping.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_translate, int);
+typedef csGrowingArray<int> ogl_g3dcom_clipped_translate;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_translate, ogl_g3dcom_clipped_translate, ())
 /// Array for clipping.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_vertices, csVector3);
+typedef csGrowingArray<csVector3> ogl_g3dcom_clipped_vertices;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_vertices, ogl_g3dcom_clipped_vertices, ())
 /// Array for clipping.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_texels, csVector2);
+typedef csGrowingArray<csVector2> ogl_g3dcom_clipped_texels;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_texels, ogl_g3dcom_clipped_texels, ())
 /// Array for clipping.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_colors, csColor);
+typedef csGrowingArray<csColor> ogl_g3dcom_clipped_colors;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_colors, ogl_g3dcom_clipped_colors, ())
 /// Array for clipping.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_fog, G3DFogInfo);
+typedef csGrowingArray<G3DFogInfo> ogl_g3dcom_clipped_fog;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_fog, ogl_g3dcom_clipped_fog, ())
 
 /// Array for clipping.
-CS_TYPEDEF_GROWING_ARRAY_REF (ogl_g3dcom_clipped_user, float);
+typedef csGrowingArray<float> ogl_g3dcom_clipped_user;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_user0, ogl_g3dcom_clipped_user, ())
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_user1, ogl_g3dcom_clipped_user, ())
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_user2, ogl_g3dcom_clipped_user, ())

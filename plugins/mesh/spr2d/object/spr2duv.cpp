@@ -52,7 +52,7 @@ const char *csSprite2DUVAnimationFrame::GetName ()
 
 csVector2 &csSprite2DUVAnimationFrame::GetUVCoo (int idx)
 {
-  return vCoo.Get (idx);
+  return vCoo[idx];
 }
 
 const csVector2 *csSprite2DUVAnimationFrame::GetUVCoo ()

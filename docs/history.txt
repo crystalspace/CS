@@ -26,6 +26,13 @@ The history order is reversed so that new features are at the top.
 	  csNamedObjVector.
 	- Iso engine uses csRefArray instead of csNamedObjVector.
 	- Removed csNamedObjVector.
+	- Fixed a small bug in the Insert() function of csRefArray and csPArray.
+	- Added csGrowingArray. This will be a replacement for
+	  CS_DECLARE_GROWING_ARRAY. csGrowingArray is only for objects that
+	  don't require constructors and not for pointers (for pointers use
+	  csPArray or csRefArray).
+	- Replaced all occurances of CS_DECLARE_GROWING_ARRAY with
+	  csGrowingArray. Consequently removed the GROWING ARRAY macros.
 	- Andreas Busch modified the documentation for all meshobjects
 	  from old syntax to XML. The thing documentation needs a big
 	  review, and Texinfo box-warnings need to be checked.

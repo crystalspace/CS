@@ -207,7 +207,7 @@ public:
       const int nmove = (count - n - 1);
       if (nmove > 0)
       {
-        memmove (&root [n + 1], &root [n], nmove * sizeof (csSome));
+        memmove (&root [n + 1], &root [n], nmove * sizeof (T*));
       }
       root [n] = item;
       return true;

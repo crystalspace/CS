@@ -312,7 +312,7 @@ public:
   /// The list of all named render priorities.
   csVector render_priorities;
   /// Sorting flags for the render priorities.
-  CS_DECLARE_GROWING_ARRAY (render_priority_sortflags, int);
+  csGrowingArray<int> render_priority_sortflags;
   /**
    * The engine knows about the following render priorities and keeps
    * them here:

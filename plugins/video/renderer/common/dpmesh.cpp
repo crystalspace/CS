@@ -34,13 +34,13 @@
 
 //@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
 /// Static vertex array.
-CS_TYPEDEF_GROWING_ARRAY (dpmesh_tr_verts, csVector3);
+typedef csGrowingArray<csVector3> dpmesh_tr_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, dpmesh_tr_verts, ())
 /// The perspective corrected vertices.
-CS_TYPEDEF_GROWING_ARRAY (dpmesh_persp, csVector2);
+typedef csGrowingArray<csVector2> dpmesh_persp;
 CS_IMPLEMENT_STATIC_VAR (Get_persp, dpmesh_persp, ())
 /// Array which indicates which vertices are visible and which are not.
-CS_TYPEDEF_GROWING_ARRAY (dpmesh_visible, bool);
+typedef csGrowingArray<bool> dpmesh_visible;
 CS_IMPLEMENT_STATIC_VAR (Get_visible, dpmesh_visible, ())
 
 static dpmesh_tr_verts *tr_verts = NULL;

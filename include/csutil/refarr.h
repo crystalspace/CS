@@ -216,7 +216,7 @@ public:
       const int nmove = (count - n - 1);
       if (nmove > 0)
       {
-        memmove (&root [n + 1], &root [n], nmove * sizeof (csSome));
+        memmove (&root [n + 1], &root [n], nmove * sizeof (csRef<T>));
 	// The following manual IncRef() is to make sure that
 	// the element will not get deleted later. This element is
 	// currently (temporarily) duplicated in the root array so

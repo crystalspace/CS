@@ -24,172 +24,195 @@
  * vector class interface
  */
 
-/**\internal
- * Default growstep for growing arrays.
+/**
+ * An automatically growing array of objects. Warning! Do NOT use
+ * this for objects that require a constructor. Do not use this
+ * for pointers. For normal pointers you should use csPArray and for
+ * reference counted pointers you should use csRefArray instead of this
+ * class.
  */
-#define CS_GARRAY_GROWSTEP 16
+template <class T>
+class csGrowingArray
+{
+private:
+  int count, limit, threshold;
+  int shrinklimit;
+  T* root;
+  int RefCount;
 
-/**\internal
- * If SetLength() is called and the new length is CS_GARRAY_SHRINKLIMIT
- * smaller than the limit then the new array will be shrinked.
- */
-#define CS_GARRAY_SHRINKLIMIT 1000
-
-
-/// \internal Common macro for declarations in this file.
-#define CS_TYPEDEF_GROWING_ARRAY_EXT(Name, Type, ExtraConstructor, Extra) \
-  class Name								\
-  {									\
-    typedef Type ga_type;						\
-    ga_type *root;							\
-    int limit;								\
-    int length;								\
-  public:								\
-    int Limit () const							\
-    { return limit; }							\
-    void SetLimit (int inlimit)						\
-    {									\
-      if (limit == inlimit) return;					\
-      if ((limit = inlimit)!=0)						\
-        root = (ga_type *)realloc (root, limit * sizeof (ga_type));	\
-      else								\
-      { if (root) { free (root); root = NULL; } }			\
-    }									\
-    Name ()								\
-    { limit = length = 0; root = NULL; ExtraConstructor; }		\
-    ~Name ()								\
-    { SetLimit (0); }							\
-    int Length () const							\
-    { return length; }							\
-    void SetLength (int inlength, int growstep = CS_GARRAY_GROWSTEP)	\
-    {									\
-      length = inlength;						\
-      int newlimit = ((length + (growstep - 1)) / growstep) * growstep;	\
-      if (newlimit > limit || newlimit < limit-CS_GARRAY_SHRINKLIMIT)   \
-        SetLimit (newlimit);						\
-    }									\
-    ga_type &operator [] (int n)					\
-    { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
-    const ga_type &operator [] (int n) const				\
-    { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
-    ga_type &Get (int n)						\
-    { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
-    void Delete (int n)							\
-    { CS_ASSERT (n >= 0 && n < limit);					\
-      memmove (root + n, root + n + 1, (length - n - 1) * sizeof (ga_type)); \
-      SetLength (length-1); }						\
-    ga_type *GetArray ()						\
-    { return root; }							\
-    int Push (const ga_type &val, int growstep = CS_GARRAY_GROWSTEP)	\
-    {									\
-      SetLength (length + 1, growstep);					\
-      memcpy (root + length - 1, &val, sizeof (ga_type));		\
-      return length-1;							\
-    }									\
-    void Insert (int pos, const ga_type &val, int growstep=CS_GARRAY_GROWSTEP)\
-    {									\
-      CS_ASSERT (pos>=0 && pos<=length);				\
-      SetLength (length + 1, growstep);					\
-      memmove (root+pos+1, root+pos, sizeof(ga_type) * (length-pos-1)); \
-      memcpy (root + pos, &val, sizeof (ga_type));			\
-    }									\
-    Extra								\
+public:
+  /**
+   * Initialize object to hold initially 'ilimit' elements, and increase
+   * storage by 'ithreshold' each time the upper bound is exceeded.
+   */
+  csGrowingArray (int ilimit = 0, int ithreshold = 0, int ishrinklimit = 0)
+  {
+    RefCount = 0;
+    count = 0;
+    limit = (ilimit > 0 ? ilimit : 0);
+    threshold = (ithreshold > 0 ? ithreshold : 16);
+    shrinklimit = (ishrinklimit > 0 ? ishrinklimit : 1000);
+    if (limit != 0)
+      root = (T*)malloc (limit * sizeof(T));
+    else
+      root = NULL;
   }
-/** A Set of Availables Extra for CS_TYPEDEF_GROWING_ARRAY_EXT
-  *
-  *  
-  */
-// HANDLECHUNKS allows to insert or delete segments arrays into the array
-#define HANDLECHUNKS                                                             \
-bool InsertChunk (int n, int size , Type* Item)                                  \
-{ /* no run-time checks here, just in debug mode   */                            \
-  CS_ASSERT( n <= count );                                                       \
-  CS_ASSERT( size>0 );                                                           \
-  SetLength ( length + size); /* Increments 'count' as a side-effect */          \
-  const int nmove = (length - (n + size));                                       \
-  if (nmove > 0)                                                                 \
-    memmove ( &root [ n + size ] , &root [ n ] , nmove * sizeof (Type) );        \
-                                                                                 \
-   memcpy  ( &root [ n ] , Item , size * sizeof (Type) );                        \
-  return true;                                                                   \
-}                                                                                \
-bool DeleteChunk (int n, int size)                                               \
-{ /* no run-time checks here, just in debug mode */                              \
-  CS_ASSERT( (n >= 0) && (n < length) );                                         \
-  CS_ASSERT( (size > 0) && ( n + size <= length ) );                             \
-  const int nmove  = length - n - size;                                          \
-  if ( nmove > 0 )                                                               \
-    memmove (&root [ n ] , &root [ n + size ] , nmove * sizeof (Type) );         \
-                                                                                 \
-  SetLength ( length - size );                                                   \
-  return true;                                                                   \
-}           
-  
-/**
- * This is a macro that will declare a growable array variable that is able to
- * contain a number of elements of given type.<p>
- * Methods:
- * <ul>
- * <li>void SetLimit (int) - set max number of values the array can hold
- * <li>int Limit () - query max number of values the array can hold
- * <li>void SetLength (int) - set the amount of elements that are actually used
- * <li>int Length () - query the amount of elements that are actually used
- * <li>operator [] (int) - return a reference to Nth element of the array
- * <li><i>type*</i> GetArray() - query a pointer to the first item
- * <i>Note:</i> if you want to pass a reference to the array as a whole,
- * better use <i>myArray</i>->GetArray() than &<i>myArray</i>[0], the latter
- * one is a possible source of hard-to-find bugs.
- * </ul>
- * Usage examples:
- * <pre>
- * CS_TYPEDEF_GROWING_ARRAY (csLightArray, csLight*);
- * CS_TYPEDEF_GROWING_ARRAY (csIntArray, int);
- * static csLightArray la;
- * static csIntArray ia;
- * </pre>
- */
-#define CS_TYPEDEF_GROWING_ARRAY(Name, Type)				\
-  CS_TYPEDEF_GROWING_ARRAY_EXT (Name, Type, ;,  ;)
 
-/**
- * Same as TYPEDEF_GROWING_ARRAY but contains additionally an reference
- * counter, so that the object can be shared among different clients.
- * If you do an IncRef each time you make use of it and an DecRef when you're
- * done, the array will be automatically freed when there are no more
- * references to it.<p>
- * Methods:
- * <ul>
- * <li>void IncRef ()/void DecRef () - Reference counter management
- * </ul>
- */
-#define CS_TYPEDEF_GROWING_ARRAY_REF(Name, Type)			\
-  CS_TYPEDEF_GROWING_ARRAY_EXT (Name, Type, RefCount = 0,		\
-    int RefCount;							\
-    void IncRef ()							\
-    { RefCount++; }							\
-    void DecRef ()							\
-    {									\
-      if (RefCount == 1) SetLimit (0);					\
-      RefCount--;							\
-    })
+  /**
+   * Clear entire vector.
+   */
+  void DeleteAll ()
+  {
+    if (root)
+    {
+      free (root);
+      root = NULL;
+      count = 0;
+    }
+  }
 
-/**
- * This is a shortcut for above to declare a dummy class and a single
- * instance of that class.
- * <p>
- * Usage examples:
- * <pre>
- * CS_DECLARE_GROWING_ARRAY (la, csLight*);
- * CS_DECLARE_GROWING_ARRAY (ia, int);
- * </pre>
- */
-#define CS_DECLARE_GROWING_ARRAY(Name, Type)				\
-  CS_TYPEDEF_GROWING_ARRAY(__##Name##_##Type,Type) Name
+  /**
+   * Destroy the container.
+   */
+  ~csGrowingArray ()
+  {
+    DeleteAll ();
+  }
 
-/**
- * Same as above but declares an object which has a reference counter.
- */
-#define CS_DECLARE_GROWING_ARRAY_REF(Name, Type)			\
-  CS_TYPEDEF_GROWING_ARRAY_REF(__##Name,Type) Name
+  // Reference counting.
+  void IncRef () { RefCount++; }
+
+  // Reference counting. Delete array when reference reaches 0.
+  void DecRef ()
+  {
+    if (RefCount == 1) { SetLimit (0); count = 0; }
+    RefCount--;
+  }
+
+  /// Set maximum size of array.
+  void SetLimit (int inlimit)
+  {
+    if (limit == inlimit) return;
+    if ((limit = inlimit) != 0)
+      root = (T*)realloc (root, limit * sizeof (T));
+    else if (root) { free (root); root = NULL; }
+  }
+
+  /// Set vector length to n.
+  void SetLength (int n)
+  {
+    count = n;
+    int newlimit = ((count + (threshold - 1)) / threshold) * threshold;
+    if (newlimit > limit || newlimit < limit-shrinklimit)
+      SetLimit (newlimit);
+  }
+
+  /// Query vector length.
+  int Length () const
+  {
+    return count;
+  }
+
+  /// Query vector limit.
+  int Limit () const
+  {
+    return limit;
+  }
+
+  /// Get the pointer to the start of the array.
+  T* GetArray ()
+  {
+    return root;
+  }
+
+  /// Get a const reference.
+  const T& Get (int n) const
+  {
+    CS_ASSERT (n >= 0 && n < count);
+    return root[n];
+  }
+
+  /// Get a const reference.
+  const T& operator [] (int n) const
+  {
+    CS_ASSERT (n >= 0 && n < count);
+    return root[n];
+  }
+
+  /// Get a reference.
+  T& operator [] (int n)
+  {
+    CS_ASSERT (n >= 0);
+    if (n >= count)
+      SetLength (n + 1);
+    return root[n];
+  }
+
+  /// Push a element on 'top' of vector.
+  int Push (const T& what)
+  {
+    SetLength (count + 1);
+    root [count - 1] = what;
+    return (count - 1);
+  }
+
+  /// Push a element on 'top' of vector if it is not already there.
+  int PushSmart (const T& what)
+  {
+    int n = Find (what);
+    return (n == -1) ? Push (what) : n;
+  }
+
+  /// Pop an element from vector 'top'.
+  T Pop ()
+  {
+    T ret = root [count - 1];
+    SetLength (count - 1);
+    return ret;
+  }
+
+  /// Return the top element but don't remove it.
+  T& Top () const
+  {
+    return root [count - 1];
+  }
+
+  /// Delete element number 'n' from vector.
+  bool Delete (int n)
+  {
+    if (n >= 0 && n < count)
+    {
+      const int ncount = count - 1;
+      const int nmove = ncount - n;
+      if (nmove > 0)
+      {
+        memmove (&root [n], &root [n + 1], nmove * sizeof (T));
+      }
+      SetLength (ncount);
+      return true;
+    }
+    else
+      return false;
+  }
+
+  /// Insert element 'Item' before element 'n'.
+  bool Insert (int n, const T& item)
+  {
+    if (n <= count)
+    {
+      SetLength (count + 1); // Increments 'count' as a side-effect.
+      const int nmove = (count - n - 1);
+      if (nmove > 0)
+      {
+        memmove (&root [n + 1], &root [n], nmove * sizeof (T));
+      }
+      root [n] = item;
+      return true;
+    }
+    else
+     return false;
+  }
+};
+
 
 #endif // __CS_GARRAY_H__

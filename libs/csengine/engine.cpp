@@ -1446,7 +1446,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   {
     csTicks elapsed = virtual_clock->GetElapsedTicks ();
     for (int halo = halos.Length () - 1; halo >= 0; halo--)
-      if (!halos.Get (halo)->Process (elapsed, *this)) halos.Delete (halo);
+      if (!halos[halo]->Process (elapsed, *this)) halos.Delete (halo);
   }
 
 #ifndef CS_USE_NEW_RENDERER

@@ -256,7 +256,7 @@ private:
   int polybuf_material_count;
 
   /// A vector with all edges in this thing.
-  CS_DECLARE_GROWING_ARRAY (thing_edges, csThingEdge);
+  csGrowingArray<csThingEdge> thing_edges;
   /// If false then thing_edges is not valid and needs to be recalculated.
   bool thing_edges_valid;
 

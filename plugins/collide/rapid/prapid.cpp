@@ -73,7 +73,7 @@
 #define CD_MAX_COLLISION    1000
 
 // This array contains the colliding pairs
-CS_TYPEDEF_GROWING_ARRAY_REF (prapid_CD_contact, csCollisionPair);
+typedef csGrowingArray<csCollisionPair> prapid_CD_contact;
 CS_IMPLEMENT_STATIC_VAR (GetCD_contact, prapid_CD_contact,())
 
 static prapid_CD_contact *CD_contact = NULL;

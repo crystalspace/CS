@@ -40,8 +40,8 @@ void csPlane3::Set (
   DD = -norm * v1;
 }
 
-CS_TYPEDEF_GROWING_ARRAY (csgeom_csPlane3_Verts, csVector3);
-CS_TYPEDEF_GROWING_ARRAY (csgeom_csPlane3_Vis, bool);
+typedef csGrowingArray<csVector3> csgeom_csPlane3_Verts;
+typedef csGrowingArray<bool> csgeom_csPlane3_Vis;
 CS_IMPLEMENT_STATIC_VAR (GetStatic_csgeom_csPlane3_Verts, csgeom_csPlane3_Verts,())
 CS_IMPLEMENT_STATIC_VAR (GetStatic_csgeom_csPlane3_Vis, csgeom_csPlane3_Vis,())
 

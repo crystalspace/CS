@@ -2258,7 +2258,7 @@ csPolygon3D *csThing::IntersectSphere (
 
 /// The list of fog vertices
 #ifndef CS_USE_NEW_RENDERER
-CS_TYPEDEF_GROWING_ARRAY (engine3d_StaticFogVerts, G3DFogInfo);
+typedef csGrowingArray<G3DFogInfo> engine3d_StaticFogVerts;
 CS_IMPLEMENT_STATIC_VAR (GetStaticFogVerts, engine3d_StaticFogVerts,())
 
 bool csThing::DrawCurves (

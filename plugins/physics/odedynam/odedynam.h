@@ -76,7 +76,7 @@ public:
   }
 };
 
-CS_TYPEDEF_GROWING_ARRAY (csGeomList, dGeomID);
+typedef csGrowingArray<dGeomID> csGeomList;
 
 /**
  * This is the implementation for the actual plugin.

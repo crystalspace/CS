@@ -28,7 +28,8 @@ class csSprite2DUVAnimationFrame : public iSprite2DUVAnimationFrame
  protected:
   char *name;
   int duration;
-  CS_TYPEDEF_GROWING_ARRAY(UVArray, csVector2) vCoo;
+  typedef csGrowingArray<csVector2> UVArray;
+  UVArray vCoo;
 
  public:
   SCF_DECLARE_IBASE;

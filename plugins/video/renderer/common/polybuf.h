@@ -45,9 +45,9 @@ public:
 class csPolArrayPolygonBuffer : public csPolygonBuffer
 {
 protected:
-  CS_DECLARE_GROWING_ARRAY (polygons, csPolArrayPolygon);
+  csGrowingArray<csPolArrayPolygon> polygons;
   typedef iMaterialHandle* iMaterialHandleP;
-  CS_DECLARE_GROWING_ARRAY (materials, iMaterialHandleP);
+  csGrowingArray<iMaterialHandleP> materials;
 
   csVector3* vertices;
   int num_vertices;

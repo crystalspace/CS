@@ -35,7 +35,7 @@ typedef struct {
   int vidx;
 } UsedVertexInfo;
 
-CS_TYPEDEF_GROWING_ARRAY (UsedVerticesInfo, UsedVertexInfo);
+typedef csGrowingArray<UsedVertexInfo> UsedVerticesInfo;
 
 bool csSpriteBuilder::Build (iModelDataObject *Object)
 {

@@ -57,7 +57,7 @@
 // Thus, when the engine is cleaned, the array is automatically
 // cleaned too.
 
-CS_TYPEDEF_GROWING_ARRAY_REF (engine3d_VectorArray, csVector3);
+typedef csGrowingArray<csVector3> engine3d_VectorArray;
 CS_IMPLEMENT_STATIC_VAR (GetStaticVectorArray, engine3d_VectorArray,())
 
 static engine3d_VectorArray *VectorArray = NULL;

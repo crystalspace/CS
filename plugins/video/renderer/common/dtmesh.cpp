@@ -184,19 +184,19 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
 
 //@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
 /// Static vertex array.
-CS_TYPEDEF_GROWING_ARRAY (dtmesh_tr_verts, csVector3);
+typedef csGrowingArray<csVector3> dtmesh_tr_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, dtmesh_tr_verts, ())
 /// Static z array.
-CS_TYPEDEF_GROWING_ARRAY (dtmesh_z_verts, float);
+typedef csGrowingArray<float> dtmesh_z_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_z_verts, dtmesh_z_verts, ())
 /// Static uv array.
-CS_TYPEDEF_GROWING_ARRAY (dtmesh_uv_verts, csVector2);
+typedef csGrowingArray<csVector2> dtmesh_uv_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_uv_verts, dtmesh_uv_verts, ())
 /// The perspective corrected vertices.
-CS_TYPEDEF_GROWING_ARRAY (dtmesh_persp, csVector2);
+typedef csGrowingArray<csVector2> dtmesh_persp;
 CS_IMPLEMENT_STATIC_VAR (Get_persp, dtmesh_persp, ())
 /// Array with colors.
-CS_TYPEDEF_GROWING_ARRAY (dtmesh_color_verts, csColor);
+typedef csGrowingArray<csColor> dtmesh_color_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_color_verts, dtmesh_color_verts, ())
 
 static dtmesh_tr_verts *tr_verts = NULL;

@@ -41,7 +41,7 @@ struct Indexes
 class csVertexIndexArrayNode
 {
 public:
-  CS_DECLARE_GROWING_ARRAY(indices,Indexes);
+  csGrowingArray<Indexes> indices;
 };
 
 typedef csVertexIndexArrayNode* csIndexVertex;
@@ -57,11 +57,11 @@ public:
   // We're duplicating info, but we need the number of vertices per
   // material, so later we can call ClipTriangleMesh
 
-  CS_DECLARE_GROWING_ARRAY(idx_vertices,csIndexVertex);
-  CS_DECLARE_GROWING_ARRAY(triangles,csTriangle);
+  csGrowingArray<csIndexVertex> idx_vertices;
+  csGrowingArray<csTriangle> triangles;
 
-  CS_DECLARE_GROWING_ARRAY(texels, csVector2);
-  CS_DECLARE_GROWING_ARRAY(verticesPoints, csVector3);
+  csGrowingArray<csVector2> texels;
+  csGrowingArray<csVector3> verticesPoints;
 
   csTrianglesPerMaterial ();
   csTrianglesPerMaterial (int numVertex);
@@ -108,13 +108,13 @@ class csTrianglesPerSuperLightmap
 {
 public:
   /// triangles which shares the same superlightmap
-  CS_DECLARE_GROWING_ARRAY (triangles, csTriangle);
+  csGrowingArray<csTriangle> triangles;
 
   /// Vertices of those triangles
-  CS_DECLARE_GROWING_ARRAY (vec_vertices, csVector3);
+  csGrowingArray<csVector3> vec_vertices;
 
   /// texels of those triangles
-  CS_DECLARE_GROWING_ARRAY (texels, csVector2);
+  csGrowingArray<csVector2> texels;
 
   /// The lightmaps in the superlightmap
   csRefArray<iPolygonTexture> lightmaps;
@@ -130,7 +130,7 @@ public:
    * if it was an original vertex (Basically it stores original
    * vertices indices).
    */
-  CS_DECLARE_GROWING_ARRAY (fogInfo, int);
+  csGrowingArray<int> fogInfo;
 
   /**
    * Auxiliary array for vertices: because we want to create as few
@@ -138,8 +138,8 @@ public:
    * same coordinates but
    * different lightmap coordinates
    */
-  CS_DECLARE_GROWING_ARRAY (vertexIndices, csIndexVertex);
-  CS_DECLARE_GROWING_ARRAY (rectangles, csRect);
+  csGrowingArray<csIndexVertex> vertexIndices;
+  csGrowingArray<csRect> rectangles;
 
   //SuperLightmap Id.
   int slId;
@@ -247,7 +247,7 @@ protected:
   TrianglesList polygons;
 
   csRefArray<iMaterialHandle> materials;
-  CS_DECLARE_GROWING_ARRAY (normals, csVector3);
+  csGrowingArray<csVector3> normals;
 
   csVector3 * vertices;
   int matCount;

@@ -59,7 +59,7 @@ struct csMDLHeader
   float AverageTriangleSize;
 };
 
-CS_TYPEDEF_GROWING_ARRAY (csVector2Array, csVector2);
+typedef csGrowingArray<csVector2> csVector2Array;
 
 // ---------------------------------------------------------------------------
 

@@ -133,10 +133,10 @@ public:
 class csModelDataVertices : public iModelDataVertices
 {
 private:
-  CS_DECLARE_GROWING_ARRAY (Vertices, csVector3);
-  CS_DECLARE_GROWING_ARRAY (Normals, csVector3);
-  CS_DECLARE_GROWING_ARRAY (Colors, csColor);
-  CS_DECLARE_GROWING_ARRAY (Texels, csVector2);
+  csGrowingArray<csVector3> Vertices;
+  csGrowingArray<csVector3> Normals;
+  csGrowingArray<csColor> Colors;
+  csGrowingArray<csVector2> Texels;
 
 public:
   SCF_DECLARE_IBASE;
@@ -168,7 +168,7 @@ public:
 class csModelDataAction : public iModelDataAction
 {
 private:
-  CS_DECLARE_GROWING_ARRAY (Times, float);
+  csGrowingArray<float> Times;
   csObjectVector States;
 
 public:
@@ -201,10 +201,10 @@ public:
 class csModelDataPolygon : public iModelDataPolygon
 {
 private:
-  CS_DECLARE_GROWING_ARRAY (Vertices, int);
-  CS_DECLARE_GROWING_ARRAY (Normals, int);
-  CS_DECLARE_GROWING_ARRAY (Colors, int);
-  CS_DECLARE_GROWING_ARRAY (Texels, int);
+  csGrowingArray<int> Vertices;
+  csGrowingArray<int> Normals;
+  csGrowingArray<int> Colors;
+  csGrowingArray<int> Texels;
   iModelDataMaterial *Material;
 
 public:

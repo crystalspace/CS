@@ -141,9 +141,9 @@ CS_DECLARE_OBJECT_ITERATOR (csModelDataActionIterator, iModelDataAction);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataTextureIterator, iModelDataTexture);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataMaterialIterator, iModelDataMaterial);
 
-CS_TYPEDEF_GROWING_ARRAY (csVector3ArrayType, csVector3);
-CS_TYPEDEF_GROWING_ARRAY (csVector2Array, csVector2);
-CS_TYPEDEF_GROWING_ARRAY (csColorArray, csColor);
+typedef csGrowingArray<csVector3> csVector3ArrayType;
+typedef csGrowingArray<csVector2> csVector2Array;
+typedef csGrowingArray<csColor> csColorArray;
 CS_DECLARE_TYPED_VECTOR (csIntArrayVector, csIntArray);
 
 typedef csRefArrayObject<iModelDataAction> csModelDataActionVector;

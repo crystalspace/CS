@@ -233,7 +233,7 @@ typedef struct {
   int normal;
 } AdjacentFace;
 
-CS_TYPEDEF_GROWING_ARRAY (Faces, AdjacentFace);
+typedef csGrowingArray<AdjacentFace> Faces;
 CS_DECLARE_TYPED_VECTOR (FacesVector, Faces);
 CS_DECLARE_TYPED_VECTOR (csVector3Vector, csVector3);
 

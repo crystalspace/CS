@@ -21,7 +21,7 @@
 
 #include "csutil/garray.h"
 
-CS_TYPEDEF_GROWING_ARRAY (csIntArrayHelper, int);
+typedef csGrowingArray<int> csIntArrayHelper;
 
 /// Growing array of <code>int</code>s.
 class csIntArray : public csIntArrayHelper

@@ -56,7 +56,7 @@ private:
     iEventHandler* object;
     unsigned int trigger;
   };
-  CS_TYPEDEF_GROWING_ARRAY(ListenerVector, Listener);
+  typedef csGrowingArray<Listener> ListenerVector;
 
   /*
    * The array of all allocated event outlets.  *NOTE* It is not the
