@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Metaballs Demo (C) 1999 by Denis Dmitriev
+    Metaballs Demo
+    Copyright (C) 1999 by Denis Dmitriev
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -240,7 +240,7 @@ void csMetaBall::CalculateBlob(int dx,int dy,int dz)
     
     FillCell(_x,_y,_z,_cell);
 
-    int num=Tesselate(_cell, mesh->vertices[0] + vertices_tesselated);
+    int num=Tesselate(_cell, mesh.vertices[0] + vertices_tesselated);
 
     if(!num)
       goto skip;

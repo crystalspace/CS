@@ -62,7 +62,7 @@ class csMetaBall : public iMeshObject
   MetaParameters mp;
   iSystem *Sys;
   iMaterialWrapper *th;
-  G3DTriangleMesh* mesh;
+  G3DTriangleMesh mesh;
   MetaBall *meta_balls;
   char frame;
 //------------- MeshObject Data
@@ -107,7 +107,7 @@ public:
   { return &mp; }
 
   virtual int ReportNumberTriangles ()
-  { return mesh->num_triangles; }
+  { return mesh.num_triangles; }
 
 // Where the real work gets done....
 //  int Tesselate (const GridCell &grid,csVector3 *verts);

@@ -54,7 +54,6 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE(scfiMetaBallState);
   th = NULL;
-  mesh = NULL;
   alpha = frame = 0;
   meta_balls = NULL;
   factory = fact;
@@ -83,11 +82,10 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
 csMetaBall::~csMetaBall ()
 {
   delete [] meta_balls;
-  delete [] mesh->triangles;
-  delete [] mesh->vertices[0];
-  delete [] mesh->texels[0];
-  delete [] mesh->vertex_colors[0];
-  delete mesh;
+  delete [] mesh.triangles;
+  delete [] mesh.vertices[0];
+  delete [] mesh.texels[0];
+  delete [] mesh.vertex_colors[0];
   initialize = false;
 }
 
@@ -118,25 +116,25 @@ bool csMetaBall::Initialize ()
   if (!initialize)
   {
     initialize = true;
-    mesh = new G3DTriangleMesh();
-    memset(mesh,0,sizeof(G3DTriangleMesh));
     meta_balls = new MetaBall[num_meta_balls];
-    mesh->triangles = new csTriangle[int(max_vertices/3)];
-    mesh->vertices[0] = new csVector3[max_vertices];
-    mesh->texels[0] = new csVector2[max_vertices];
-    mesh->vertex_colors[0] = new csColor[max_vertices];
+    memset(&mesh,0,sizeof(G3DTriangleMesh));
+    mesh.num_vertices_pool = 1;
+    mesh.triangles = new csTriangle[int(max_vertices/3)];
+    mesh.vertices[0] = new csVector3[max_vertices];
+    mesh.texels[0] = new csVector2[max_vertices];
+    mesh.vertex_colors[0] = new csColor[max_vertices];
     for (int i = 0; i < max_vertices; i++)
     {
-      mesh->vertices[i]->Set(0,0,0);
-      mesh->texels[i]->Set(0,0);
-      mesh->vertex_colors[i]->Set(1,1,1);
+      mesh.vertices[0][i].Set(0,0,0);
+      mesh.texels[0][i].Set(0,0);
+      mesh.vertex_colors[0][i].Set(1,1,1);
     }
     InitTables();
-    mesh->do_fog = false;
-    mesh->do_mirror = false;
-    mesh->do_morph_texels = false;
-    mesh->do_morph_colors = false;
-    mesh->vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+    mesh.do_fog = false;
+    mesh.do_mirror = false;
+    mesh.do_morph_texels = false;
+    mesh.do_morph_colors = false;
+    mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
     NextFrame(0);
   }
   return true;
@@ -197,10 +195,10 @@ bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
   	clip_z_plane) == false )
     return false;
   g3d->SetObjectToCamera( &tr_o2c );
-  mesh->clip_portal = clip_portal;
-  mesh->clip_plane = clip_plane;
-  mesh->clip_z_plane = clip_z_plane;
-  mesh->do_mirror = cam->IsMirrored();
+  mesh.clip_portal = clip_portal;
+  mesh.clip_plane = clip_plane;
+  mesh.clip_z_plane = clip_z_plane;
+  mesh.do_mirror = cam->IsMirrored();
   return true;
 }
 
@@ -211,9 +209,9 @@ void csMetaBall::UpdateLighting( iLight **, int, iMovable * )
       csVector3 n(0, 0, 0);
       for(int k = 0; k < num_meta_balls; k++)
       {
-        csVector3 rv(mesh->vertices[0][m].x - meta_balls[k].center.x,
-          mesh->vertices[0][m].y - meta_balls[k].center.y,
-          mesh->vertices[0][m].z - meta_balls[k].center.z);
+        csVector3 rv(mesh.vertices[0][m].x - meta_balls[k].center.x,
+          mesh.vertices[0][m].y - meta_balls[k].center.y,
+          mesh.vertices[0][m].z - meta_balls[k].center.z);
 
         float r = rv.Norm();
         float c = mp.charge / (r*r*r);
@@ -221,7 +219,7 @@ void csMetaBall::UpdateLighting( iLight **, int, iMovable * )
         n += rv * c;
       }
       n = n.Unit();
-	  LitVertex ( n, mesh->vertex_colors[0][m]);
+	  LitVertex ( n, mesh.vertex_colors[0][m]);
 #endif
 }
 
@@ -247,19 +245,19 @@ void csMetaBall::CreateBoundingBox()
   
   int maxxi = 0, maxyi = 0, maxzi = 0, minxi = 0, minyi = 0, minzi = 0;
   
-  for ( int i = 0; i < mesh->num_vertices; i++ )
+  for ( int i = 0; i < mesh.num_vertices; i++ )
   {
-	if ( mesh->vertices[0][i].x < minx ) {minx = mesh->vertices[0][i].x; minxi = i; }
+	if ( mesh.vertices[0][i].x < minx ) {minx = mesh.vertices[0][i].x; minxi = i; }
 	else
-	if ( mesh->vertices[0][i].x > maxx ) {maxx = mesh->vertices[0][i].x; maxxi = i; }
+	if ( mesh.vertices[0][i].x > maxx ) {maxx = mesh.vertices[0][i].x; maxxi = i; }
 	
-	if ( mesh->vertices[0][i].y < miny ) {miny = mesh->vertices[0][i].y; minyi = i; }
+	if ( mesh.vertices[0][i].y < miny ) {miny = mesh.vertices[0][i].y; minyi = i; }
 	else
-	if ( mesh->vertices[0][i].y > maxy ) {maxy = mesh->vertices[0][i].y; maxyi = i; }
+	if ( mesh.vertices[0][i].y > maxy ) {maxy = mesh.vertices[0][i].y; maxyi = i; }
 	
-	if ( mesh->vertices[0][i].z < minz ) {minz = mesh->vertices[0][i].z; minzi = i; }
+	if ( mesh.vertices[0][i].z < minz ) {minz = mesh.vertices[0][i].z; minzi = i; }
 	else
-	if ( mesh->vertices[0][i].z > maxz ) {maxz = mesh->vertices[0][i].z; maxzi = i; }
+	if ( mesh.vertices[0][i].z > maxz ) {maxz = mesh.vertices[0][i].z; maxzi = i; }
   }
   object_bbox.StartBoundingBox( csVector3(minx,miny,minz));
   object_bbox.AddBoundingVertexSmart( csVector3(maxx,maxy,maxz));
@@ -269,8 +267,8 @@ void csMetaBall::CreateBoundingBox()
   printf("Maximum bounding found at %d,%d,%d\n", maxxi, maxyi, maxzi);
   printf("Minimum bounding vertex at (%f,%f,%f)\n", minx, miny, minz);
   printf("Maximum bounding vertex at (%f,%f,%f)\n", maxx, maxy, maxz);
-  printf("Vertex zero : (%f,%f,%f)\n",mesh->vertices[0][0].x, mesh->vertices[0][0].y, mesh->vertices[0][0].z);
-  printf("Num verts : %d\n", mesh->num_vertices);
+  printf("Vertex zero : (%f,%f,%f)\n",mesh.vertices[0][0].x, mesh.vertices[0][0].y, mesh.vertices[0][0].z);
+  printf("Num verts : %d\n", mesh.num_vertices);
 #endif
 
 }
@@ -315,13 +313,13 @@ void csMetaBall::GetTransformedBoundingBox( long cam_num, long move_num,
 
 void csMetaBall::NextFrame( cs_time )
 {
-  if ((mesh->num_vertices == 0) || (mp.rate != 0))
+  if ((mesh.num_vertices == 0) || (mp.rate != 0))
   {
   int i,j,m;
   float l = ( do_lighting ) ? 1.0 : 0.0;
   alpha += mp.rate;
-  mesh->num_vertices = 0;
-  mesh->num_triangles = 0;
+  mesh.num_vertices = 0;
+  mesh.num_triangles = 0;
 //-------------------------------- MetaBall - Set position -------
 // Below is the generic position calculation that was supplied with
 // metaballs by Denis Dmitriev. In future I will be looking at replacing
@@ -355,9 +353,9 @@ void csMetaBall::NextFrame( cs_time )
   for (i = 0; i < trigs; i++, num += 3)
   {
 	// Fill our mesh buffer with the created triangles
-	mesh->triangles[i].a = num + 2;
-	mesh->triangles[i].b = num + 1;
-	mesh->triangles[i].c = num;
+	mesh.triangles[i].a = num + 2;
+	mesh.triangles[i].b = num + 1;
+	mesh.triangles[i].c = num;
 	
 	for ( j = 0; j < 3; j++ )
 	{
@@ -365,9 +363,9 @@ void csMetaBall::NextFrame( cs_time )
       csVector3 n(0, 0, 0);
       for(int k = 0; k < num_meta_balls; k++)
       {
-      	csVector3 rv(mesh->vertices[0][m].x - meta_balls[k].center.x,
-          mesh->vertices[0][m].y - meta_balls[k].center.y,
-          mesh->vertices[0][m].z - meta_balls[k].center.z);
+      	csVector3 rv(mesh.vertices[0][m].x - meta_balls[k].center.x,
+          mesh.vertices[0][m].y - meta_balls[k].center.y,
+          mesh.vertices[0][m].z - meta_balls[k].center.z);
 
         float r = rv.Norm();
         float c = mp.charge / (r*r*r);
@@ -375,14 +373,14 @@ void csMetaBall::NextFrame( cs_time )
         n += rv * c;
       }
       n = n.Unit();
-	  mesh->texels[0][m].x = map (n.x);
-	  mesh->texels[0][m].y = map (n.y);
-	  csColor &c = mesh->vertex_colors[0][m];
+	  mesh.texels[0][m].x = map (n.x);
+	  mesh.texels[0][m].y = map (n.y);
+	  csColor &c = mesh.vertex_colors[0][m];
 	  c.red = c.blue = c.green = l; // Default lighting. Not real perty yet.
 	}
   }
-  mesh->num_triangles = trigs;
-  mesh->num_vertices = vertices_tesselated;
+  mesh.num_triangles = trigs;
+  mesh.num_vertices = vertices_tesselated;
   CreateBoundingBox();
   } // If Rate != 0
 }
@@ -400,19 +398,19 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
 	printf("csMetaBall: Draw aborted, no material applied to this object\n");
 	return false;
   }
-  mesh->mat_handle = th->GetMaterialHandle();
-  mesh->use_vertex_color = true;
+  mesh.mat_handle = th->GetMaterialHandle();
+  mesh.use_vertex_color = true;
 
 #if 0
-  printf("Dumping Triangles: %d Vertices: %d\n", mesh->num_triangles, mesh->num_vertices );
-  for (int i = 0; i < mesh->num_vertices; i++ )
+  printf("Dumping Triangles: %d Vertices: %d\n", mesh.num_triangles, mesh.num_vertices );
+  for (int i = 0; i < mesh.num_vertices; i++ )
   {
-	csVector3 v = mesh->vertices[0][i];
+	csVector3 v = mesh.vertices[0][i];
 	printf("V(%f,%f,%f) ; %d\n", v.x,v.y,v.z, i);
   }
-  for ( int i = 0; i < mesh->num_triangles; i++ )
+  for ( int i = 0; i < mesh.num_triangles; i++ )
   {
-	csTriangle tr = mesh->triangles[i];
+	csTriangle tr = mesh.triangles[i];
 	printf("TRIANGLE(%d,%d,%d) ; %d\n",tr.a,tr.b,tr.c,i);
   } 
   printf("Finished dump =============================================\n");
@@ -421,8 +419,8 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   if (vis_cb) vis_cb( this, rview, vis_cbdata );
   iGraphics3D* G3D = rview->GetGraphics3D();
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
-  mesh->fxmode = MixMode | CS_FX_GOURAUD;
-  G3D->DrawTriangleMesh(*mesh);
+  mesh.fxmode = MixMode | CS_FX_GOURAUD;
+  G3D->DrawTriangleMesh(mesh);
   return true;
 }
 
