@@ -157,18 +157,27 @@ bool csGLRender3D::Open ()
   int h = G2D->GetHeight ();
   SetDimensions (w, h);
 
-  effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
+  /*effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
   if( !effectserver )
   {
     effectserver = CS_LOAD_PLUGIN (plugin_mgr,
       "crystalspace.video.effects.stdserver", iEffectServer);
     object_reg->Register (effectserver, "iEffectServer");
-  }
+  }*/
 
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
 
-  buffermgr = new csSysRenderBufferManager ();
+  if( ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  {
+    csVARRenderBufferManager * bm = new csVARRenderBufferManager();
+    bm->Initialize(this);
+    buffermgr = bm;
+  }else
+  {
+    buffermgr = new csSysRenderBufferManager();
+  }
+
   txtcache = new csGLTextureCache (1024*1024*32, this);
   txtmgr = new csGLTextureManager (object_reg, GetDriver2D (), config, this);
 
@@ -290,18 +299,22 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
 
   glColor3f (1,1,1);
-  glVertexPointer (3, GL_FLOAT, 0, vertexbuf->GetFloatBuffer ());
+  glVertexPointer (3, GL_FLOAT, 0, (float*)vertexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
   glEnableClientState (GL_VERTEX_ARRAY);
 
   if (texcoordbuf)
   {
-    glTexCoordPointer (2, GL_FLOAT, 0, texcoordbuf->GetFloatBuffer ());
+    glTexCoordPointer (2, GL_FLOAT, 0, (float*) texcoordbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
     glEnableClientState (GL_TEXTURE_COORD_ARRAY);
   }
   /*glIndexPointer (GL_INT, 0, vertexbuf->GetUIntBuffer ());
   glEnableClientState (GL_INDEX_ARRAY);
   glDrawArrays (GL_TRIANGLES, 0, indexbuf->GetUIntLength ());*/
-  glDrawElements (GL_TRIANGLES, indexbuf->GetUIntLength (), GL_UNSIGNED_INT, indexbuf->GetUIntBuffer ());
+  glDrawElements (GL_TRIANGLES, indexbuf->GetSize() / sizeof(unsigned int) , GL_UNSIGNED_INT, (unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER) );
+
+  vertexbuf->Release();
+  indexbuf->Release();
+  texcoordbuf->Release();
 }
 
 

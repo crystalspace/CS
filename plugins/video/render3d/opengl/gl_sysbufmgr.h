@@ -23,14 +23,11 @@
 #include "csutil/strhash.h"
 #include "ivideo/rndbuf.h"
 
-class csVector3;
-class csVector2;
-class csColor;
-
 struct iLightingInfo;
 struct iTextureHandle;
 
 
+SCF_VERSION(csSysRenderBuffer, 0,0,2);
 /**
  * This is a general buffer to be used by the renderer. It can ONLY be
  * created by the VB manager
@@ -41,6 +38,7 @@ private:
   void *buffer;
   int size;
   CS_RENDERBUFFER_TYPE type;
+  bool locked;
 public:
   SCF_DECLARE_IBASE;
 
@@ -52,6 +50,7 @@ public:
     csSysRenderBuffer::buffer = buffer;
     csSysRenderBuffer::size = size;
     csSysRenderBuffer::type = type;
+    locked = false;
   }
   ~csSysRenderBuffer ()
   {
@@ -59,25 +58,26 @@ public:
       delete[] buffer;
   }
   
-  /// Get a raw pointer to the bufferdata as different datatypes
-  float* GetFloatBuffer() { return (float*)buffer; }
-  unsigned char* GetUCharBuffer() { return (unsigned char*)buffer; }
-  unsigned int* GetUIntBuffer() { return (unsigned int*)buffer; }
-  csVector3* GetVector3Buffer() { return (csVector3*)buffer; }
-  csVector2* GetVector2Buffer() { return (csVector2*)buffer; }
-  csColor* GetColorBuffer() { return (csColor*)buffer; }
+  /**
+   * Lock the buffer to allow writing and give us a pointer to the data
+   * The pointer will be NULL if there was some error
+   */
+  virtual void* Lock(CS_BUFFER_LOCK_TYPE lockType)
+  {
+    locked = true;
+    return buffer;
+  }
+
+  /// Releases the buffer. After this all writing to the buffer is illegal
+  virtual void Release() { locked = false; }
 
   /// Get type of buffer (where it's located)
   virtual CS_RENDERBUFFER_TYPE GetBufferType() { return type; }
 
-  /// Get number of indices in the data (as different datatypes)
-  int GetFloatLength() { return size/sizeof(float); }
-  int GetUCharLength() { return size/sizeof(unsigned char); }
-  int GetUIntLength() { return size/sizeof(unsigned int); }
-  int GetVec3Length() { return size/sizeof(csVector3); }
-  int GetVec2Length() { return size/sizeof(csVector2); }
-  int GetColorLength() { return size/sizeof(csColor); }
+  /// Get the size of the buffer (in bytes)
+  virtual int GetSize() {return size; }
 };
+
 
 class csSysRenderBufferManager: public iRenderBufferManager
 {
@@ -86,12 +86,7 @@ public:
 
   /// Allocate a buffer of the specified type and return it
   csPtr<iRenderBuffer> GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE location);
-  
-  /// Lock a specified buffer. Return true if successful
-  bool LockBuffer(iRenderBuffer* buffer) { return true; }
 
-  /// Unlock buffer
-  void UnlockBuffer(iRenderBuffer* buffer) {}
 };
 
 #endif //  __GL_SYSRBUFMGR_H__

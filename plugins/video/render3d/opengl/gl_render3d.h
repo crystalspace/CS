@@ -28,6 +28,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
+#include "csutil/scf.h"
 #include "csutil/strset.h"
 
 #include "iutil/comp.h"
@@ -38,6 +39,8 @@
 #include "ivideo/effects/efclient.h"
 
 #include "glextmanager.h"
+#include "gl_sysbufmgr.h"
+#include "gl_varbufmgr.h"
 
 class csGLTextureCache;
 class csGLTextureHandle;
@@ -56,6 +59,10 @@ struct iEvent;
 
 class csGLRender3D : public iRender3D
 {
+  //friend declarations
+  friend class csVARRenderBufferManager;
+  friend class csSysRenderBufferManager;
+  friend class csVARRenderBuffer;
 private:
 friend csGLTextureHandle;
 friend csGLTextureCache;
