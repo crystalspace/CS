@@ -134,6 +134,7 @@ csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
 {
   csODEDynamicSystem* system = new csODEDynamicSystem (erp, cfm);
   csRef<iDynamicSystem> isystem (SCF_QUERY_INTERFACE (system, iDynamicSystem));
+  systems.Push (isystem);
   isystem->DecRef ();
   return csPtr<iDynamicSystem> (isystem);
 }
@@ -160,11 +161,15 @@ void csODEDynamics::Step (float elapsed_time)
   total_elapsed += elapsed_time;
 
   // TODO handle fractional total_remaining (interpolate render)
-  while (total_elapsed > stepsize) {
+  while (total_elapsed > stepsize) 
+  {
     total_elapsed -= stepsize;
     for (long i=0; i<systems.Length(); i++)
     {
       systems.Get (i)->Step (stepsize);
+      for (long j = 0; j < updates.Length(); j ++) {
+        updates[i]->Execute (stepsize);
+      }
       dJointGroupEmpty (contactjoints);
     }
   }
@@ -847,12 +852,15 @@ void csODEDynamicSystem::Step (float elapsed_time)
     if (stepfast) {
       dWorldStep (worldID, stepsize);
     } else {
-      dWorldStepFast (worldID, stepsize, sfiter);
+      dWorldStepFast1 (worldID, stepsize, sfiter);
     }
     for (long i = 0; i < bodies.Length(); i ++) {
         iRigidBody *b = bodies.Get(i);
         b->SetAngularVelocity (b->GetAngularVelocity () * roll_damp);
         b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
+    }
+    for (long j = 0; j < updates.Length(); j ++) {
+      updates[j]->Execute (stepsize);
     }
   }
 

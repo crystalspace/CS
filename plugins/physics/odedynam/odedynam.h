@@ -114,6 +114,7 @@ private:
   bool rateenabled;
   float steptime, limittime;
   float total_elapsed;
+  csRefArrayObject<iODEFrameUpdateCallback> updates;
 
   bool stepfast;
   int sfiter;
@@ -160,6 +161,8 @@ public:
   float FrameRate () { return 1.0 / steptime; }
   void SetFrameLimit (float hz) { limittime = 1.0 / hz; }
   float FrameLimit () { return 1.0 / limittime; }
+  void AddFrameUpdateCallback (iODEFrameUpdateCallback *cb) { updates.Push (cb); }
+  void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb) { updates.Delete (cb); }
   void EnableFastObjects (bool enable) { fastobjects = enable; }
   bool FastObjectsEnabled () { return false; }
 
@@ -194,6 +197,10 @@ public:
     { scfParent->SetFrameLimit (hz); }
     float FrameLimit ()
     { return scfParent->FrameLimit (); }
+    void AddFrameUpdateCallback (iODEFrameUpdateCallback *cb)
+    { scfParent->AddFrameUpdateCallback (cb); }
+    void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb)
+    { scfParent->RemoveFrameUpdateCallback (cb); }
     void EnableFastObjects (bool enable)
     { scfParent->EnableFastObjects (enable); }
     bool FastObjectsEnabled ()
@@ -238,6 +245,7 @@ private:
   bool rateenabled;
   float steptime, limittime;
   float total_elapsed;
+  csRefArrayObject<iODEFrameUpdateCallback> updates;
 
   bool stepfast;
   int sfiter;
@@ -312,6 +320,8 @@ public:
   float FrameRate () { return 1.0 / steptime; }
   void SetFrameLimit (float hz) { limittime = 1.0 / hz; }
   float FrameLimit () { return 1.0 / limittime; }
+  void AddFrameUpdateCallback (iODEFrameUpdateCallback *cb) { updates.Push (cb); }
+  void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb) { updates.Delete (cb); }
   void EnableFastObjects (bool enable) { fastobjects = enable; }
   bool FastObjectsEnabled () { return false; }
 
@@ -346,6 +356,10 @@ public:
     { scfParent->SetFrameLimit (hz); }
     float FrameLimit ()
     { return scfParent->FrameLimit (); }
+    void AddFrameUpdateCallback (iODEFrameUpdateCallback *cb)
+    { scfParent->AddFrameUpdateCallback (cb); }
+    void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb)
+    { scfParent->RemoveFrameUpdateCallback (cb); }
     void EnableFastObjects (bool enable)
     { scfParent->EnableFastObjects (enable); }
     bool FastObjectsEnabled ()
