@@ -1736,12 +1736,12 @@ void Blocks::StartKeyConfig ()
 
   keyconf_menu->Add ("shape left", KeyName (key_left), (void*)&key_left);
   keyconf_menu->Add ("shape right", KeyName (key_right), (void*)&key_right);
-  keyconf_menu->Add ("rotate pos x", KeyName (key_rotpx), (void*)&key_rotpx);
-  keyconf_menu->Add ("rotate min x", KeyName (key_rotmx), (void*)&key_rotmx);
-  keyconf_menu->Add ("rotate pos y", KeyName (key_rotpy), (void*)&key_rotpy);
-  keyconf_menu->Add ("rotate min y", KeyName (key_rotmy), (void*)&key_rotmy);
-  keyconf_menu->Add ("rotate pos z", KeyName (key_rotpz), (void*)&key_rotpz);
-  keyconf_menu->Add ("rotate min z", KeyName (key_rotmz), (void*)&key_rotmz);
+  keyconf_menu->Add ("pitch up", KeyName (key_rotpx), (void*)&key_rotpx);
+  keyconf_menu->Add ("pitch down", KeyName (key_rotmx), (void*)&key_rotmx);
+  keyconf_menu->Add ("yaw left", KeyName (key_rotpy), (void*)&key_rotpy);
+  keyconf_menu->Add ("yaw right", KeyName (key_rotmy), (void*)&key_rotmy);
+  keyconf_menu->Add ("roll left", KeyName (key_rotpz), (void*)&key_rotpz);
+  keyconf_menu->Add ("roll right", KeyName (key_rotmz), (void*)&key_rotmz);
   keyconf_menu->Add ("camera left", KeyName (key_viewleft), (void*)&key_viewleft);
   keyconf_menu->Add ("camera right", KeyName (key_viewright), (void*)&key_viewright);
   keyconf_menu->Add ("camera up", KeyName (key_viewup), (void*)&key_viewup);
