@@ -36,6 +36,7 @@
 #include "iutil/cache.h"
 #include "iutil/object.h"
 #include "iutil/vfs.h"
+#include "iutil/cmdline.h"
 #include "csutil/memfile.h"
 #include "csutil/csmd5.h"
 #include "iengine/mesh.h"
@@ -353,25 +354,70 @@ csPtr<iMeshObject> csSprite3DMeshObjectFactory::NewInstance ()
 void csSprite3DMeshObjectFactory::GenerateLOD ()
 {
   int i;
-
-  //@@@ turn this into a parameter or member variable?
-  int lod_base_frame = 0;
-
-  csVector3* v = new csVector3[GetVertexCount()];
-
-  for (i = 0; i < GetVertexCount(); i++)
-    v[i] = GetVertex (lod_base_frame, i);
-
-  csTriangleVerticesCost* verts = new csTriangleVerticesCost (texel_mesh, v,
-  	GetVertexCount());
-  delete [] v;
-
-  delete [] emerge_from;
-  emerge_from = new int [GetVertexCount()];
   int* translate = new int [GetVertexCount()];
-  csTriangleMesh* new_mesh = new csTriangleMesh (*texel_mesh);
 
-  csTriangleMeshLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
+  	object_reg, iCommandLineParser);
+  bool forcerecalc = false;
+  if (cmdline->GetOption ("recalc"))
+  {
+    forcerecalc = true;
+    static bool reportit = true;
+    if (reportit)
+    {
+      reportit = false;
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Forced recalculation of spr3d LOD!");
+    }
+  }
+
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  char buf[100];
+  iCacheManager* cache_mgr = 0;
+
+  bool was_in_cache = false;
+  if (!forcerecalc && engine)
+  {
+    cache_mgr = engine->GetCacheManager ();
+    sprintf (buf, "spr3dlod");
+    csRef<iDataBuffer> db (cache_mgr->ReadCache (buf, GetCacheName (), 0));
+    if (db)
+    {
+      csMemFile* cf = new csMemFile ((char*)db->GetData (), db->GetSize (),
+  	    csMemFile::DISPOSITION_IGNORE);
+      int* tr = translate;
+      for (i = 0; i < GetVertexCount(); i++)
+      {
+	int f;
+        cf->Read ((char*)&f, 4); f = convert_endian (f);
+	*tr++ = f;
+      }
+  
+      cf->DecRef ();
+      was_in_cache = true;
+    }
+  }
+
+  if (!was_in_cache)
+  {
+    //@@@ turn this into a parameter or member variable?
+    int lod_base_frame = 0;
+    csVector3* v = new csVector3[GetVertexCount()];
+    for (i = 0; i < GetVertexCount(); i++)
+      v[i] = GetVertex (lod_base_frame, i);
+
+    csTriangleVerticesCost* verts = new csTriangleVerticesCost (texel_mesh, v,
+  	  GetVertexCount());
+    delete [] v;
+
+    delete [] emerge_from;
+    emerge_from = new int [GetVertexCount()];
+    csTriangleMesh* new_mesh = new csTriangleMesh (*texel_mesh);
+
+    csTriangleMeshLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
+    delete verts;
+    delete new_mesh;
+  }
 
   csVector2* new_texels = new csVector2 [GetVertexCount ()];
   csVector3* new_vertices = new csVector3 [GetVertexCount ()];
@@ -407,9 +453,24 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
     tr.c = translate[tr.c];
   }
 
+  if (cache_mgr && !was_in_cache)
+  {
+    csMemFile m;
+    csRef<iFile> mf (SCF_QUERY_INTERFACE ((&m), iFile));
+
+    int* tr = translate;
+    for (i = 0; i < GetVertexCount(); i++)
+    {
+      int f;
+      f = convert_endian (*tr++);
+      mf->Write ((char *) &f, 4);
+    }
+
+    cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),
+  	  buf, GetCacheName (), 0);
+  }
+
   delete [] translate;
-  delete verts;
-  delete new_mesh;
 }
 
 void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
@@ -617,31 +678,50 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
   GetFrame (frame)->SetNormalsCalculated (true);
 
-  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
+  	object_reg, iCommandLineParser);
+  bool forcerecalc = false;
+  if (cmdline->GetOption ("recalc"))
+  {
+    forcerecalc = true;
+    static bool reportit = true;
+    if (reportit)
+    {
+      reportit = false;
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Forced recalculation of spr3d normals!");
+    }
+  }
+
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   char buf[100];
   iCacheManager* cache_mgr = 0;
-  if (engine)
-  {
-    cache_mgr = engine->GetCacheManager ();
-    sprintf (buf, "spr3dnormals_%d_%d", base, frame);
-    csRef<iDataBuffer> db (cache_mgr->ReadCache (buf, GetCacheName (), 0));
-    if (db)
-    {
-      csMemFile* cf = new csMemFile ((char*)db->GetData (), db->GetSize (),
-  	  csMemFile::DISPOSITION_IGNORE);
-      csVector3* fr_normals = GetNormals (frame);
-      for (i = 0; i < GetVertexCount(); i++)
-      {
-        float f;
-	csVector3 v;
-        cf->Read ((char*)&f, 4); v.x = convert_endian (f);
-        cf->Read ((char*)&f, 4); v.y = convert_endian (f);
-        cf->Read ((char*)&f, 4); v.z = convert_endian (f);
-	fr_normals[i].Set (v);
-      }
 
-      cf->DecRef ();
-      return;
+  if (!forcerecalc)
+  {
+    if (engine)
+    {
+      cache_mgr = engine->GetCacheManager ();
+      sprintf (buf, "spr3dnormals_%d_%d", base, frame);
+      csRef<iDataBuffer> db (cache_mgr->ReadCache (buf, GetCacheName (), 0));
+      if (db)
+      {
+        csMemFile* cf = new csMemFile ((char*)db->GetData (), db->GetSize (),
+  	    csMemFile::DISPOSITION_IGNORE);
+        csVector3* fr_normals = GetNormals (frame);
+        for (i = 0; i < GetVertexCount(); i++)
+        {
+          float f;
+	  csVector3 v;
+          cf->Read ((char*)&f, 4); v.x = convert_endian (f);
+          cf->Read ((char*)&f, 4); v.y = convert_endian (f);
+          cf->Read ((char*)&f, 4); v.z = convert_endian (f);
+	  fr_normals[i].Set (v);
+        }
+  
+        cf->DecRef ();
+        return;
+      }
     }
   }
 
