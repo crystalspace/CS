@@ -23,6 +23,8 @@ Short-term cleanups that need to be done:
 	  the makefile system.  Hopefully this will help to eliminate the need
 	  to actually change makedep's source code as it is ported to new
 	  platforms.
+	- Eric Sunshine fixed a number of compilation warnings which were
+	  recently introduced into the project.
 1-Oct-1999
 	- Finished implementation of csQuadtree. Also added csQuadcube
 	  class which represents a cube of quad-trees.
@@ -37,14 +39,14 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed a shadowed-variable compiler warning in md2.cpp.
 30-Sep-1999
 	- Eric Sunshine ported map2cs to Unix.  He created map2cs.mak which
-	  conforms to the CS makefile system.  He was also forced to renamed
+	  conforms to the CS makefile system.  He was also forced to rename
 	  parser.{h|cpp} and main.cpp to mparser.{h|cpp} and map2cs.cpp,
 	  respectively.  Unfortunately, the original file names conflicted
 	  with other file names used elsewhere in CS, and the flat structure
 	  of the 'out' object-file directory prevents use of files with the
 	  same name even in different subprojects.  (We really need to do
 	  something to resolve this less than ideal situation.)  He also
-	  replaced a Windows-specific calls with more portable code.
+	  replaced a Windows-specific call with more portable code.
 	- Eric Sunshine fixed a bug in map2cs where some variables were
 	  shadowing others with the same name.  The code incorrectly assumed
 	  that it was setting the values of the original variables, when in
