@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Aug-2003
+	- Jorrit added more features with references to parts of the
+	  documentation.
 15-Aug-2003
 	- Jorrit did some documentation fixes on the new lod section.
 	- Jorrit added support for <nullmesh> in factories too.

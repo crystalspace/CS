@@ -37,19 +37,37 @@ the feature. The most useful documentation comes first.
 
 @itemize @bullet
 @item
-2D and 3D vectors
+Geometrical utility library with stuff like 2D and 3D vectors,
+matrices, transforms, quaternions, kdtree, axis aligned and oriented bounding
+box routines, rectangle subdivision, @dots{}. @xref{csGeom}.
 
 @item
-Quaternions. @xref{csGeom}.
+General utility library with stuff like templated arrays, smart pointer,
+hashmap, object registry, plugin manager, radix sort, bit array, optimized
+allocators, strings, @dots{}. @xref{csUtil}.
+
+@item
+System library for making abstraction of system dependent stuff like
+threads, getting system environment, unicode support, endian support,
+processor capabilities, @dots{}. @xref{csSys}.
+
+@item
+Higher level tool library containing things like some example procedural
+textures (plasma, fire, and water), full screen effects, collider support,
+texture generation tools, @dots{}.
+
+@item
+Graphics library with simple utilities to do mipmapping, color quantization,
+calculation of color gradients, simple bumpmapping, @dots{}.
 
 @item
 2D and 3D polygons
 
 @item
-2D and 3D matrices (and transforms). @xref{csGeom}.
+Shared Class Facility @sc{scf}.  @xref{SCF}, @xref{Tutorial Introduction}.
 
 @item
-Shared Class Facility @sc{scf}.  @xref{SCF}, @xref{Tutorial Introduction}.
+Smart Pointers. @xref{HOWTO Smart Pointers}.
 
 @item
 Flexible plug-in system. @xref{SCF}, @xref{HOWTO Create Your Own Plugin}.
@@ -76,7 +94,16 @@ Procedural textures. @xref{ProcTextures}, @xref{Texture Mapping}.
 Level of Detail. @xref{Level of Detail}.
 
 @item
+Animated 3D models (3D sprites). @xref{Animation}.
+
+@item
 2D animations.
+
+@item
+MD3 to Crystal Space convertor. @xref{md32spr Tutorial}.
+
+@item
+CAL3D to Crystal Space exporter. @xref{caltocs Tutorial}.
 
 @item
 Crystal Space native windowing system. @xref{AWS}, @xref{CSWS}.
@@ -109,7 +136,7 @@ Visibility culling based on kd-tree with coverage buffers (Dynavis).
 @xref{Visibility Culling}.
 
 @item
-Multiple cameras.
+Multiple cameras. @xref{HOWTO Camera Movement}.
 
 @item
 Textures, materials, and shaders. @xref{Texture Mapping}.
@@ -156,14 +183,15 @@ Pull-down console that you can integrate in your own games.
 Network sockets. @xref{Network Drivers}.
 
 @item
-Collision detection (using @sc{rapid} or @sc{opcode})
+Collision detection (using @sc{rapid} or @sc{opcode}).
+@xref{HOWTO Collision Detection}.
 
 @item
-Bitmapped and vector fonts.
+Bitmapped and vector fonts (freefont). @xref{HOWTO Use custom font}.
 
 @item
 Map file loader and converters. @xref{XML File Format},
-@xref{Old Map File Format}.
+@xref{Tutorial Simple Map}, @xref{Old Map File Format}.
 
 @item
 Scripting engine (python, perl, ...). @xref{Scripting Languages}.
@@ -173,6 +201,9 @@ Skeletal animation. @xref{MeshObject Spr3D}.
 
 @item
 Object movement. @xref{HOWTO Mesh Movement}.
+
+@item
+Movie Recording plugin. @xref{HOWTO Recording Movies}.
 
 @item
 Debugging system
