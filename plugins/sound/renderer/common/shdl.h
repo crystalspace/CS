@@ -38,7 +38,7 @@ public:
   // constructor
   csSoundHandle(iSoundData *);
   // destructor
-  ~csSoundHandle();
+  virtual ~csSoundHandle();
   // release the sound data
   void ReleaseSoundData();
   // update the sound handle
