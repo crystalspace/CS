@@ -20,7 +20,7 @@ Please follow these guidelines when writing documentation for Crystal Space.
 @subsubheading General
 
 Write documentation using the Texinfo mark-up language. You can get more
-information at @uref{www.texinfo.org}.
+information at @uref{http://www.texinfo.org}.
 
 The documentation is converted from Texinfo to other formats, such as
 @sc{html}. Conversion to most important formats happens automatically within
