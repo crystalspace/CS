@@ -60,13 +60,12 @@ SCF_IMPLEMENT_IBASE_END
 csTinyXmlAttributeIterator::csTinyXmlAttributeIterator (TiXmlNode* parent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  if (parent->Type () != TiXmlNode::ELEMENT)
+  csTinyXmlAttributeIterator::parent = parent->ToElement ();
+  if (csTinyXmlAttributeIterator::parent == NULL)
   {
-    csTinyXmlAttributeIterator::parent = NULL;
     current = NULL;
     return;
   }
-  csTinyXmlAttributeIterator::parent = (TiXmlElement*)parent;
   current = csTinyXmlAttributeIterator::parent->FirstAttribute ();
 }
 
@@ -151,11 +150,6 @@ csTinyXmlNode::~csTinyXmlNode ()
 {
 }
 
-const char* csTinyXmlNode::GetType ()
-{
-  return node->Value ();
-}
-
 csRef<iXmlNode> csTinyXmlNode::GetParent ()
 {
   csRef<iXmlNode> child;
@@ -163,9 +157,27 @@ csRef<iXmlNode> csTinyXmlNode::GetParent ()
   return child;
 }
 
-void csTinyXmlNode::SetType (const char* type)
+csXmlNodeType csTinyXmlNode::GetType ()
 {
-  node->SetValue (type);
+  switch (node->Type ())
+  {
+    case TiXmlNode::DOCUMENT: return CS_XMLNODE_DOCUMENT;
+    case TiXmlNode::ELEMENT: return CS_XMLNODE_ELEMENT;
+    case TiXmlNode::COMMENT: return CS_XMLNODE_COMMENT;
+    case TiXmlNode::TEXT: return CS_XMLNODE_TEXT;
+    case TiXmlNode::DECLARATION: return CS_XMLNODE_DECLARATION;
+    default: return CS_XMLNODE_UNKNOWN;
+  }
+}
+
+const char* csTinyXmlNode::GetValue ()
+{
+  return node->Value ();
+}
+
+void csTinyXmlNode::SetValue (const char* value)
+{
+  node->SetValue (value);
 }
 
 csRef<iXmlNodeIterator> csTinyXmlNode::GetNodes ()
@@ -235,6 +247,38 @@ void csTinyXmlNode::MoveNodeAfter (const csRef<iXmlNode>& node,
   // @@@ TODO
 }
 
+const char* csTinyXmlNode::GetContentsValue ()
+{
+  TiXmlNode* child = node->FirstChild ();
+  while (child)
+  {
+    if (child->Type () == TiXmlNode::TEXT)
+    {
+      return child->Value ();
+    }
+    child = child->NextSibling ();
+  } 
+  return NULL;
+}
+
+int csTinyXmlNode::GetContentsValueAsInt ()
+{
+  const char* v = GetContentsValue ();
+  if (!v) return 0;
+  int val;
+  sscanf (v, "%d", &val);
+  return val;
+}
+
+float csTinyXmlNode::GetContentsValueAsFloat ()
+{
+  const char* v = GetContentsValue ();
+  if (!v) return 0;
+  float val;
+  sscanf (v, "%f", &val);
+  return val;
+}
+
 csRef<iXmlAttributeIterator> csTinyXmlNode::GetAttributes ()
 {
   csRef<iXmlAttributeIterator> it;
@@ -257,15 +301,9 @@ csRef<iXmlAttribute> csTinyXmlNode::GetAttribute (const char* name)
 
 const char* csTinyXmlNode::GetAttributeValue (const char* name)
 {
-  if (node->Type () == TiXmlNode::ELEMENT)
-  {
-    TiXmlElement* el = (TiXmlElement*)node;
-    return el->Attribute (name);
-  }
-  else
-  {
-    return NULL;
-  }
+  TiXmlElement* el = node->ToElement ();
+  if (el) return el->Attribute (name);
+  else return NULL;
 }
 
 int csTinyXmlNode::GetAttributeValueAsInt (const char* name)

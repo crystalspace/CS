@@ -29,6 +29,19 @@ struct iFile;
 struct iDataBuffer;
 struct iString;
 
+/**
+ * Possible node types for XML.
+ */
+enum csXmlNodeType
+{
+  CS_XMLNODE_DOCUMENT = 1,
+  CS_XMLNODE_ELEMENT,
+  CS_XMLNODE_COMMENT,
+  CS_XMLNODE_UNKNOWN,
+  CS_XMLNODE_TEXT,
+  CS_XMLNODE_DECLARATION
+};
+
 //===========================================================================
 
 SCF_VERSION (iXmlAttributeIterator, 0, 0, 1);
@@ -88,17 +101,44 @@ struct iXmlNodeIterator : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iXmlNode, 0, 0, 1);
+SCF_VERSION (iXmlNode, 0, 1, 0);
 
 /**
  * This represents a node in XML.
  */
 struct iXmlNode : public iBase
 {
-  /// Get the type of this node.
-  virtual const char* GetType () = 0;
-  /// Set the type of this node.
-  virtual void SetType (const char* type) = 0;
+  /**
+   * Get the type of this node (one of CS_XMLNODE_...).
+   */
+  virtual csXmlNodeType GetType () = 0;
+
+  /**
+   * Get the value of this node.
+   * What this is depends on the type of the node:
+   * <ul>
+   * <li>CS_XMLNODE_DOCUMENT: filename of the xml file
+   * <li>CS_XMLNODE_ELEMENT: name of the element
+   * <li>CS_XMLNODE_COMMENT: comment text
+   * <li>CS_XMLNODE_UNKNOWN: tag contents
+   * <li>CS_XMLNODE_TEXT: text string
+   * <li>CS_XMLNODE_DECLARATION: undefined
+   * </ul>
+   */
+  virtual const char* GetValue () = 0;
+  /**
+   * Set the value of this node.
+   * What this is depends on the type of the node:
+   * <ul>
+   * <li>CS_XMLNODE_DOCUMENT: filename of the xml file
+   * <li>CS_XMLNODE_ELEMENT: name of the element
+   * <li>CS_XMLNODE_COMMENT: comment text
+   * <li>CS_XMLNODE_UNKNOWN: tag contents
+   * <li>CS_XMLNODE_TEXT: text string
+   * <li>CS_XMLNODE_DECLARATION: undefined
+   * </ul>
+   */
+  virtual void SetValue (const char* value) = 0;
   /// Get the parent.
   virtual csRef<iXmlNode> GetParent () = 0;
 
@@ -136,6 +176,25 @@ struct iXmlNode : public iBase
    */
   virtual void MoveNodeAfter (const csRef<iXmlNode>& node,
   	const csRef<iXmlNode>& after) = 0;
+
+  /**
+   * Get the value of a node. What this does is scan all child nodes
+   * and look for a node of type 'text'. It will return the text of that
+   * node.
+   */
+  virtual const char* GetContentsValue () = 0;
+  /**
+   * Get the value of a node as int. What this does is scan all child nodes
+   * and look for a node of type 'text'. It will return the text of that
+   * node.
+   */
+  virtual int GetContentsValueAsInt () = 0;
+  /**
+   * Get the value of a node as float. What this does is scan all child nodes
+   * and look for a node of type 'text'. It will return the text of that
+   * node.
+   */
+  virtual float GetContentsValueAsFloat () = 0;
 
   //---------------------------------------------------------------------
 

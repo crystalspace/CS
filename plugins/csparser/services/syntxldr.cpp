@@ -119,6 +119,69 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (CLIP)
 CS_TOKEN_DEF_END
 
+enum
+{
+  XMLTOKEN_ROTX = 1,
+  XMLTOKEN_ROTY,
+  XMLTOKEN_ROTZ,
+  XMLTOKEN_SCALEX,
+  XMLTOKEN_SCALEY,
+  XMLTOKEN_SCALEZ,
+  XMLTOKEN_SCALE,
+  XMLTOKEN_M11,
+  XMLTOKEN_M12,
+  XMLTOKEN_M13,
+  XMLTOKEN_M21,
+  XMLTOKEN_M22,
+  XMLTOKEN_M23,
+  XMLTOKEN_M31,
+  XMLTOKEN_M32,
+  XMLTOKEN_M33,
+  XMLTOKEN_COPY,
+  XMLTOKEN_MULTIPLY2,
+  XMLTOKEN_MULTIPLY,
+  XMLTOKEN_ADD,
+  XMLTOKEN_ALPHA,
+  XMLTOKEN_TRANSPARENT,
+  XMLTOKEN_KEYCOLOR,
+  XMLTOKEN_TILING,
+  XMLTOKEN_NONE,
+  XMLTOKEN_FLAT,
+  XMLTOKEN_GOURAUD,
+  XMLTOKEN_LIGHTMAP,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_LIGHTING,
+  XMLTOKEN_PORTAL,
+  XMLTOKEN_WARP,
+  XMLTOKEN_TEXTURE,
+  XMLTOKEN_SHADING,
+  XMLTOKEN_VERTICES,
+  XMLTOKEN_UVA,
+  XMLTOKEN_UV,
+  XMLTOKEN_COLORS,
+  XMLTOKEN_COLLDET,
+  XMLTOKEN_COSFACT,
+  XMLTOKEN_MAXVISIT,
+  XMLTOKEN_MIXMODE,
+  XMLTOKEN_LEN,
+  XMLTOKEN_V,
+  XMLTOKEN_ORIG,
+  XMLTOKEN_FIRST_LEN,
+  XMLTOKEN_FIRST,
+  XMLTOKEN_SECOND_LEN,
+  XMLTOKEN_SECOND,
+  XMLTOKEN_UVEC,
+  XMLTOKEN_VVEC,
+  XMLTOKEN_MATRIX,
+  XMLTOKEN_PLANE,
+  XMLTOKEN_UV_SHIFT,
+  XMLTOKEN_W,
+  XMLTOKEN_MIRROR,
+  XMLTOKEN_STATIC,
+  XMLTOKEN_ZFILL,
+  XMLTOKEN_CLIP
+};
+
 static void ReportError (iReporter* reporter, const char* id,
 	const char* description, ...)
 {
@@ -158,6 +221,65 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 {
   csTextSyntaxService::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  xmltokens.Register ("rotx", XMLTOKEN_ROTX);
+  xmltokens.Register ("roty", XMLTOKEN_ROTY);
+  xmltokens.Register ("rotz", XMLTOKEN_ROTZ);
+  xmltokens.Register ("scalex", XMLTOKEN_SCALEX);
+  xmltokens.Register ("scaley", XMLTOKEN_SCALEY);
+  xmltokens.Register ("scalez", XMLTOKEN_SCALEZ);
+  xmltokens.Register ("scale", XMLTOKEN_SCALE);
+  xmltokens.Register ("m11", XMLTOKEN_M11);
+  xmltokens.Register ("m12", XMLTOKEN_M12);
+  xmltokens.Register ("m13", XMLTOKEN_M13);
+  xmltokens.Register ("m21", XMLTOKEN_M21);
+  xmltokens.Register ("m22", XMLTOKEN_M22);
+  xmltokens.Register ("m23", XMLTOKEN_M23);
+  xmltokens.Register ("m31", XMLTOKEN_M31);
+  xmltokens.Register ("m32", XMLTOKEN_M32);
+  xmltokens.Register ("m33", XMLTOKEN_M33);
+  xmltokens.Register ("copy", XMLTOKEN_COPY);
+  xmltokens.Register ("multiply2", XMLTOKEN_MULTIPLY2);
+  xmltokens.Register ("multiply", XMLTOKEN_MULTIPLY);
+  xmltokens.Register ("add", XMLTOKEN_ADD);
+  xmltokens.Register ("alpha", XMLTOKEN_ALPHA);
+  xmltokens.Register ("transparent", XMLTOKEN_TRANSPARENT);
+  xmltokens.Register ("keycolor", XMLTOKEN_KEYCOLOR);
+  xmltokens.Register ("tiling", XMLTOKEN_TILING);
+  xmltokens.Register ("none", XMLTOKEN_NONE);
+  xmltokens.Register ("flat", XMLTOKEN_FLAT);
+  xmltokens.Register ("gouraud", XMLTOKEN_GOURAUD);
+  xmltokens.Register ("lightmap", XMLTOKEN_LIGHTMAP);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
+  xmltokens.Register ("portal", XMLTOKEN_PORTAL);
+  xmltokens.Register ("warp", XMLTOKEN_WARP);
+  xmltokens.Register ("texture", XMLTOKEN_TEXTURE);
+  xmltokens.Register ("shading", XMLTOKEN_SHADING);
+  xmltokens.Register ("vertices", XMLTOKEN_VERTICES);
+  xmltokens.Register ("uva", XMLTOKEN_UVA);
+  xmltokens.Register ("uv", XMLTOKEN_UV);
+  xmltokens.Register ("colors", XMLTOKEN_COLORS);
+  xmltokens.Register ("colldet", XMLTOKEN_COLLDET);
+  xmltokens.Register ("cosfact", XMLTOKEN_COSFACT);
+  xmltokens.Register ("maxvisit", XMLTOKEN_MAXVISIT);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("len", XMLTOKEN_LEN);
+  xmltokens.Register ("v", XMLTOKEN_V);
+  xmltokens.Register ("orig", XMLTOKEN_ORIG);
+  xmltokens.Register ("first_len", XMLTOKEN_FIRST_LEN);
+  xmltokens.Register ("first", XMLTOKEN_FIRST);
+  xmltokens.Register ("second_len", XMLTOKEN_SECOND_LEN);
+  xmltokens.Register ("second", XMLTOKEN_SECOND);
+  xmltokens.Register ("uvec", XMLTOKEN_UVEC);
+  xmltokens.Register ("vvec", XMLTOKEN_VVEC);
+  xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
+  xmltokens.Register ("plane", XMLTOKEN_PLANE);
+  xmltokens.Register ("uv_shift", XMLTOKEN_UV_SHIFT);
+  xmltokens.Register ("w", XMLTOKEN_W);
+  xmltokens.Register ("mirror", XMLTOKEN_MIRROR);
+  xmltokens.Register ("static", XMLTOKEN_STATIC);
+  xmltokens.Register ("zfill", XMLTOKEN_ZFILL);
+  xmltokens.Register ("clip", XMLTOKEN_CLIP);
   return true;
 }
 
@@ -1320,7 +1442,67 @@ bool csTextSyntaxService::ParseMatrix (iXmlNode* node, csMatrix3 &m)
   while (it->HasNext ())
   {
     csRef<iXmlNode> child = it->Next ();
-    const char* type = child->GetType ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_SCALE:
+        {
+	  float scale = child->GetContentsValueAsFloat ();
+	  m *= scale;
+	}
+        break;
+      case XMLTOKEN_SCALEX:
+        {
+	  float scale = child->GetContentsValueAsFloat ();
+          m *= csXScaleMatrix3 (scale);
+	}
+        break;
+      case XMLTOKEN_SCALEY:
+        {
+	  float scale = child->GetContentsValueAsFloat ();
+          m *= csYScaleMatrix3 (scale);
+	}
+        break;
+      case XMLTOKEN_SCALEZ:
+        {
+	  float scale = child->GetContentsValueAsFloat ();
+          m *= csZScaleMatrix3 (scale);
+	}
+        break;
+      case XMLTOKEN_ROTX:
+        {
+	  float angle = child->GetContentsValueAsFloat ();
+          m *= csXRotMatrix3 (angle);
+	}
+        break;
+      case XMLTOKEN_ROTY:
+        {
+	  float angle = child->GetContentsValueAsFloat ();
+          m *= csYRotMatrix3 (angle);
+	}
+        break;
+      case XMLTOKEN_ROTZ:
+        {
+	  float angle = child->GetContentsValueAsFloat ();
+          m *= csZRotMatrix3 (angle);
+	}
+        break;
+      case XMLTOKEN_M11: m.m11 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M12: m.m12 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M13: m.m13 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M21: m.m21 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M22: m.m22 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M23: m.m23 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M31: m.m31 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M32: m.m32 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M33: m.m33 = child->GetContentsValueAsFloat (); break;
+      default:
+        ReportError (reporter, "crystalspace.syntax.matrix",
+          "Unknown token '%s'!", value);
+        return false;
+    }
   }
   return true;
 }

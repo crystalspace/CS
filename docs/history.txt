@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+9-Aug-2002
+	- Added conveniance functions to get a value from a node (iXmlNode).
+	  This will basically search for the first TEXT child in the node and
+	  return the value of that child.
+	- Changed GetType()/SetType() to GetValue()/SetValue() in iXmlNode.
+	  Added GetType() which returns the type of the node.
+	- Implemented ParseMatrix() in syntax services for XML.
 8-Aug-2002
 	- Removed support/doom2cs again. This doom2cs utility can now be
 	  found at ftp://sunsite.dk/projects/crystal/contrib/doom2cs.zip

@@ -151,9 +151,11 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual const char* GetType ();
-  virtual void SetType (const char* type);
+  virtual csXmlNodeType GetType ();
+  virtual const char* GetValue ();
+  virtual void SetValue (const char* value);
   virtual csRef<iXmlNode> GetParent ();
+
   virtual csRef<iXmlNodeIterator> GetNodes ();
   virtual csRef<iXmlNodeIterator> GetNodes (const char* type);
   virtual csRef<iXmlNode> GetNode (const char* type);
@@ -168,6 +170,11 @@ public:
   	const csRef<iXmlNode>& before);
   virtual void MoveNodeAfter (const csRef<iXmlNode>& node,
   	const csRef<iXmlNode>& after);
+
+  virtual const char* GetContentsValue ();
+  virtual int GetContentsValueAsInt ();
+  virtual float GetContentsValueAsFloat ();
+
   virtual csRef<iXmlAttributeIterator> GetAttributes ();
   virtual csRef<iXmlAttribute> GetAttribute (const char* name);
   virtual int GetAttributeValueAsInt (const char* name);

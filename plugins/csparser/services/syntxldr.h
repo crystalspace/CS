@@ -29,6 +29,7 @@
 #include "imap/services.h"
 #include "iutil/comp.h"
 #include "csutil/csstring.h"
+#include "csutil/strhash.h"
 
 struct iObjectRegistry;
 struct iPolygon3D;
@@ -49,6 +50,7 @@ protected:
   iObjectRegistry* object_reg;
   iMeshObjectType* thing_type;
   iReporter* reporter;
+  csStringHash xmltokens;
 
   void OptimizePolygon (iPolygon3D *p);
 
