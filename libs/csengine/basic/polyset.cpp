@@ -88,6 +88,7 @@ csPolygonSet::csPolygonSet () : csObject(), csPolygonParentInt ()
   bsp = NULL;
   draw_busy = 0;
   fog.enabled = false;
+  bbox = NULL;
 
   light_frame_number = -1;
 }
@@ -113,6 +114,7 @@ csPolygonSet::~csPolygonSet ()
   CHK (delete [] curve_vertices);
   CHK (delete [] curve_texels);
   CHK (delete bsp);
+  CHK (delete bbox);
 }
 
 void csPolygonSet::Prepare ()
@@ -605,7 +607,7 @@ csFrustrumList* csPolygonSet::GetShadows (csVector3& origin)
     CHK (frust = new csShadowFrustrum (origin));
     list->AddFirst (frust);
     csPlane pl = p->GetPlane ()->GetWorldPlane ();
-    pl.DD -= origin * pl.norm;
+    pl.DD += origin * pl.norm;
     pl.Invert ();
     frust->SetBackPlane (pl);
     frust->polygon = p;
@@ -613,6 +615,35 @@ csFrustrumList* csPolygonSet::GetShadows (csVector3& origin)
       frust->AddVertex (p->Vwor (j)-origin);
   }
   return list;
+}
+
+void csPolygonSet::CreateBoundingBox ()
+{
+  float minx, miny, minz, maxx, maxy, maxz;
+  CHK (delete bbox); bbox = NULL;
+  if (num_vertices <= 0) return;
+  CHK (bbox = new csPolygonSetBBox ());
+  minx = maxx = obj_verts[0].x;
+  miny = maxy = obj_verts[0].y;
+  minz = maxz = obj_verts[0].z;
+  int i;
+  for (i = 1 ; i < num_vertices ; i++)
+  {
+    if (obj_verts[i].x < minx) minx = obj_verts[i].x;
+    else if (obj_verts[i].x > maxx) maxx = obj_verts[i].x;
+    if (obj_verts[i].y < miny) miny = obj_verts[i].y;
+    else if (obj_verts[i].y > maxy) maxy = obj_verts[i].y;
+    if (obj_verts[i].z < minz) minz = obj_verts[i].z;
+    else if (obj_verts[i].z > maxz) maxz = obj_verts[i].z;
+  }
+  bbox->i7 = AddVertexSmart (minx, miny, minz);
+  bbox->i3 = AddVertexSmart (minx, miny, maxz);
+  bbox->i5 = AddVertexSmart (minx, maxy, minz);
+  bbox->i1 = AddVertexSmart (minx, maxy, maxz);
+  bbox->i8 = AddVertexSmart (maxx, miny, minz);
+  bbox->i4 = AddVertexSmart (maxx, miny, maxz);
+  bbox->i6 = AddVertexSmart (maxx, maxy, minz);
+  bbox->i2 = AddVertexSmart (maxx, maxy, maxz);
 }
 
 //---------------------------------------------------------------------------------------------------------
