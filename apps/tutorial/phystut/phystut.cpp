@@ -150,6 +150,11 @@ bool Simple::HandleEvent (iEvent& ev)
     return true;
   }
 
+  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_SPACE)
+  {
+    if (rand()%2) CreateBox (); else CreateSphere ();
+    return true;
+  }
   else if (ev.Type == csevKeyDown && ev.Key.Code == 'b')
   {
     CreateBox ();
@@ -483,7 +488,7 @@ void Simple::CreateSphere (void)
 
   // Set the ball mesh properties.
   iBallState *s = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState);
-  const float r (rand()%100/100.);
+  const float r (rand()%10/10.);
   const csVector3 radius (r, r, r); // This should be the same size as the mesh.
   s->SetRadius (radius.x, radius.y, radius.z);
   s->SetRimVertices (16);
