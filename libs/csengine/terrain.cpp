@@ -231,7 +231,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 		vbuf->sort();
   }
    // Render
-  int i;
+  unsigned int i;
   csVector3 *p1, *p2, *p3;
   ddgVector2 t1, t2, t3;
 //  float  *c1, *c2, *c3;
