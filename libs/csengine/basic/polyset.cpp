@@ -234,6 +234,9 @@ int compare_vt_orig (const void* p1, const void* p2)
 
 void csPolygonSet::CompressVertices ()
 {
+  if (num_vertices <= 0)
+    return;
+
   CHK (CompressVertex* vt = new CompressVertex [num_vertices]);
   int i, j;
   for (i = 0 ; i < num_vertices ; i++)
@@ -294,7 +297,6 @@ void csPolygonSet::CompressVertices ()
   CHK (delete [] obj_verts);
   wor_verts = new_wor;
   obj_verts = new_obj;
-  int old_num_vertices = num_vertices;
   num_vertices = max_vertices = count_unique;
 
   // Now we can remap the vertices in all polygons.
