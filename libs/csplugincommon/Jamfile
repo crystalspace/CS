@@ -21,7 +21,7 @@ SubDir TOP libs csplugincommon ;
       [ Wildcard [ ConcatDirs $(subinc) $(i) ] : *.h ] ;
   }
   Library csplugincommon : $(files) : shared ;
-  LinkWith csplugincommon : cstool csgfx csgeom csutil ;
+  LibDepends csplugincommon : cstool csgfx csgeom csutil ;
 }
 
 SubInclude TOP libs csplugincommon directx ;
