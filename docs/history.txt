@@ -36,6 +36,8 @@ chronological order.
 	  do vfs->Sync() anymore since vfs->Sync() may not be appropriate
 	  for the specific cache implementation. Instead they will call
 	  iCacheManager->Flush() now.
+	- Eric Sunshine worked around warnings reported by Swig 1.3.22 for
+	  Perl5.
 25-Oct-2004
 	- Jorrit disabled VBO by default now. It gives too many problems
 	  (both on ATI and nVidia). Having this option on by default can

@@ -27,53 +27,58 @@
  * We ignore operator &&= and ||=
  * since they have nothing to which to be wrapped
  ****************************************************************************/
-%ignore			*::operator[];
-%ignore			*::operator();
-%ignore			*::operator* ();
+%ignore			operator[];
+%ignore			operator();
+%ignore			operator* ();
 
-%rename(__add__)	*::operator+;
-%rename(__subtr__)	*::operator-;
-%ignore			*::operator+ ();
-%rename(__neg__)	*::operator- ();
+%rename(__add__)	operator+;
+%rename(__subtr__)	operator-;
+%ignore			operator+ ();
+%rename(__neg__)	operator- ();
 
-%rename(__mult__)	*::operator*;
-%rename(__div__)	*::operator/;
-%rename(__modulo__)	*::operator%;
-%rename(__lshift__)	*::operator<<;
-%rename(__rshift__)	*::operator>>;
-%rename(__and__)	*::operator&;
-%rename(__or__)		*::operator|;
-%rename(__xor__)	*::operator^;
+%rename(__mult__)	operator*;
+%rename(__div__)	operator/;
+%rename(__modulo__)	operator%;
+%rename(__lshift__)	operator<<;
+%rename(__rshift__)	operator>>;
+%rename(__and__)	operator&;
+%rename(__or__)		operator|;
+%rename(__xor__)	operator^;
 
-%rename(__lt__)		*::operator<;
-%rename(__le__)		*::operator<=;
-%rename(__gt__)		*::operator>;
-%rename(__ge__)		*::operator>=;
-%rename(__eq__)		*::operator==;
-%rename(__ne__)		*::operator!=;
+%rename(__lt__)		operator<;
+%rename(__le__)		operator<=;
+%rename(__gt__)		operator>;
+%rename(__ge__)		operator>=;
+%rename(__eq__)		operator==;
+%rename(__ne__)		operator!=;
 
-%rename(__not__)	*::operator!;
-%rename(__compl__)	*::operator~;
-%rename(__inc__)	*::operator++;
-%rename(__dec__)	*::operator--;
+%rename(__not__)	operator!;
+%rename(__compl__)	operator~;
+%rename(__inc__)	operator++;
+%rename(__dec__)	operator--;
 
-%rename(__copy__)	*::operator=;
-%rename(__add_ass__)	*::operator+=;
-%rename(__subtr_ass__)	*::operator-=;
-%rename(__mult_ass__)	*::operator*=;
-%rename(__divide_ass__)	*::operator/=;
-%rename(__modulo_ass__)	*::operator%=;
-%rename(__lshift_ass__)	*::operator<<=;
-%rename(__rshift_ass__)	*::operator>>=;
-%rename(__and_ass__)	*::operator&=;
-%rename(__or_ass__)	*::operator|=;
-%rename(__xor_ass__)	*::operator^=;
+%rename(__copy__)	operator=;
+%rename(__add_ass__)	operator+=;
+%rename(__subtr_ass__)	operator-=;
+%rename(__mult_ass__)	operator*=;
+%rename(__divide_ass__)	operator/=;
+%rename(__modulo_ass__)	operator%=;
+%rename(__lshift_ass__)	operator<<=;
+%rename(__rshift_ass__)	operator>>=;
+%rename(__and_ass__)	operator&=;
+%rename(__or_ass__)	operator|=;
+%rename(__xor_ass__)	operator^=;
 
-%rename(__land__)	*::operator&&;
-%rename(__lor__)	*::operator||;
+%rename(__land__)	operator&&;
+%rename(__lor__)	operator||;
 
-%ignore			*::operator&&=;
-%ignore			*::operator||=;
+%ignore			operator&&=;
+%ignore			operator||=;
+
+// csgeom/vector3.h -- ignore (float); (double) overloads still visible
+%ignore operator/ (const csVector3&, float);
+%ignore operator* (const csVector3&, float);
+%ignore operator* (float, const csVector3&);
 
 /****************************************************************************
  * Applying this Perl code is the second and final stage of wrapping
