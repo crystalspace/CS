@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+3-Mar-2003
+	- Philip Wyett added libxml2 link flag for msvc project file.
 2-Mar-2003
 	- Greg Block committed changes to the MacOS/X gl canvas to correctly
 	  support the necessary CS interfaces for loading extensions and being

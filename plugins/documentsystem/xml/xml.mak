@@ -50,6 +50,7 @@ DEP.XML = CSUTIL CSTOOL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
 MSVC.DSP += XML
 DSP.XML.NAME = xml
 DSP.XML.TYPE = plugin
+DSP.XML.LIBS = libxml2
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
