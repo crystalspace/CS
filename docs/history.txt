@@ -32,10 +32,27 @@ chronological order.
 	  (swig.jam) so that it is used verbatim, rather than being interpreted
 	  as relative to $(LOCATE_TARGET). This allows more flexibility in
 	  placement of auxilliary generated files.
+	- Eric Sunshine fixed bug in Swig rule (swig.jam) where it was invoking
+	  MakeLocate unconditionally with $(LOCATE_TARGET) even if `outdir' had
+	  been provided.
 	- Eric Sunshine augmented Perl and Python Jamfiles so that the *.pm and
 	  *.py files are emitted by Swig directly into $(LOCATE.TARGETS),
 	  rather than being copied there from $(LOCATE_TARGET) in a secondary
 	  step.
+	- Eric Sunshine made the following changes to csList<>:
+	    - Renamed Prev() and FetchPrev() to Previous() and FetchPrevious(),
+	      respectively, to complement existing HashPrevious(). (The old
+	      names still exist, however, for backward compatibility.)
+	    - Added FetchCurrent() to complement existing FetchNext() and
+	      FetchPrevious().
+	    - Fixed behavior of HasNext()/Next() and HasPrevious()/Previous()
+	      so that they work the same as the other iterators in CS; that is,
+	      you can simply use it via:
+	        while (i.HasNext()) { foo = i.Next() }
+	      Previously, usage required a more complicated:
+	        foo = i.Current(); while (i.HasNext()) { foo = i.Next(); }
+            - Fixed a number of bugs where constructors were not initializing
+	      all member variables.
 21-Oct-2004
 	- Eric Sunshine made the following changes to the DDS image loader:
 	    - Fixed bug in dds::Loader::ReadHeader() where it could/would
