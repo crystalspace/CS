@@ -90,7 +90,7 @@ ctRigidBody *add_test_body( ctVector3 ppos )
 
   arb = ctRigidBody::new_ctRigidBody();
   arb->set_m( 2.0 );
-  arb->set_pos( ppos[0],ppos[1],ppos[2] );
+  arb->set_pos( ctVector3(ppos[0],ppos[1],ppos[2]) );
   arb->calc_simple_I_tensor( .1,0.2,.1 );
   return arb;
 }
@@ -275,9 +275,9 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
   if (GetKeyState (CSKEY_PGDN))
     view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed);
   if (GetKeyState (CSKEY_UP))
-    view->GetCamera ()->Move (VEC_FORWARD * 4 * speed);
+    view->GetCamera ()->Move (VEC_FORWARD * 4.0f * speed);
   if (GetKeyState (CSKEY_DOWN))
-    view->GetCamera ()->Move (VEC_BACKWARD * 4 * speed);
+    view->GetCamera ()->Move (VEC_BACKWARD * 4.0f * speed);
 
   // add a chain
   if (GetKeyState (CSKEY_DEL) && !chain_added ){
@@ -351,7 +351,7 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
     // add the rigidbody physics object
     rb_bot = ctRigidBody::new_ctRigidBody();
     rb_bot->set_m( 15.0 );
-    rb_bot->set_pos( 0,10,0);
+    rb_bot->set_pos(ctVector3(0,10,0));
     rb_bot->set_v( ctVector3( 1.0,0, 0));
     rb_bot->calc_simple_I_tensor( 0.2,0.4, 0.2 );
     phyz_world.add_entity( rb_bot );

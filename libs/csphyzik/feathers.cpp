@@ -359,7 +359,7 @@ ctSpatialVector svwork, gXfa;
 void ctFeatherstoneAlgorithm::test_impulse_response()
 {
   ctArticulatedBody *inboard_link;
-  ctFeatherstoneAlgorithm *in_feather;
+  ctFeatherstoneAlgorithm *in_feather=NULL;
   ctSpatialVector s;
 
   if( ab.inboard_joint != NULL ){

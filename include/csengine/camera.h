@@ -28,8 +28,8 @@
 #define VEC_BACKWARD  csVector3(0,0,-1)
 #define VEC_RIGHT     csVector3(1,0,0)
 #define VEC_LEFT      csVector3(-1,0,0)
-#define VEC_UP        (-csVector3(0,-1,0))
-#define VEC_DOWN      (-csVector3(0,1,0))
+#define VEC_UP        csVector3(0,1,0)
+#define VEC_DOWN      csVector3(0,-1,0)
 
 #define VEC_ROT_RIGHT  csVector3(0,1,0)
 #define VEC_ROT_LEFT   csVector3(0,-1,0)

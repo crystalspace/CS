@@ -599,7 +599,7 @@ void move_ghost (csSprite3D* spr)
 
   // Find all sectors that the ghost will occupy on the new position.
   csSector *n[MAXSECTORSOCCUPIED];
-  int num_sectors = FindSectors (new_pos, 4*col->GetRadius(), first_sector, n);
+  int num_sectors = FindSectors (new_pos, 4.0f*col->GetRadius(), first_sector, n);
 
   // Start collision detection.
   csRAPIDCollider::CollideReset ();
@@ -636,13 +636,13 @@ void move_ghost (csSprite3D* spr)
 
   // OpenStep compiler bug prevents Transform(GetYRotation()), which is why
   // the expressions are split across two statements below.
-  if (vel < 0.01)
+  if (vel < 0.01f)
   {
     // We did not move much. Turn around quickly.
     csMatrix3 m = csYRotMatrix3 (gh_info->dir*.2);
     spr->Transform (m);
   }
-  else if (vel < 0.05)
+  else if (vel < 0.05f)
   {
     // We did a bit. Turn around slightly.
     csMatrix3 m = csYRotMatrix3 (gh_info->dir*.1);

@@ -333,16 +333,16 @@ csWireFrameCam::~csWireFrameCam ()
 
 void csWireFrameCam::KeyUp (float speed, bool slow, bool fast)
 {
-  if (slow) c->MoveUnrestricted (speed*.01*VEC_FORWARD);
-  else if (fast) c->MoveUnrestricted (speed*1.2*VEC_FORWARD);
-  else c->MoveUnrestricted (speed*.6*VEC_FORWARD);
+  if (slow) c->MoveUnrestricted (speed*0.01f*VEC_FORWARD);
+  else if (fast) c->MoveUnrestricted (speed*1.2f*VEC_FORWARD);
+  else c->MoveUnrestricted (speed*0.6f*VEC_FORWARD);
 }
 
 void csWireFrameCam::KeyDown (float speed, bool slow, bool fast)
 {
-  if (slow) c->MoveUnrestricted (speed*.01*VEC_BACKWARD);
-  else if (fast) c->MoveUnrestricted (speed*1.2*VEC_BACKWARD);
-  else c->MoveUnrestricted (speed*.6*VEC_BACKWARD);
+  if (slow) c->MoveUnrestricted (speed*0.01f*VEC_BACKWARD);
+  else if (fast) c->MoveUnrestricted (speed*1.2f*VEC_BACKWARD);
+  else c->MoveUnrestricted (speed*0.6f*VEC_BACKWARD);
 }
 
 void csWireFrameCam::KeyLeft (float speed, bool slow, bool fast)

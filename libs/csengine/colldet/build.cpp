@@ -282,14 +282,14 @@ bool csCdBBox::BuildBBoxTree(int*          TriangleIndices,
   // With the max and min data, determine the center point and dimensions
   // of the parent box.
 
-  c = (minval + maxval) * 0.5; 
+  c = (minval + maxval) * 0.5f; 
 
   m_Translation.x = c.x * m_Rotation.m11 + c.y * m_Rotation.m12 + c.z * m_Rotation.m13;
   m_Translation.y = c.x * m_Rotation.m21 + c.y * m_Rotation.m22 + c.z * m_Rotation.m23;
   m_Translation.z = c.x * m_Rotation.m31 + c.y * m_Rotation.m32 + c.z * m_Rotation.m33;
 
   // delta.
-  m_Radius = (maxval - minval ) * 0.5;
+  m_Radius = (maxval - minval ) * 0.5f;
 
   // allocate new boxes
   m_pChild[0] = box_pool++;
@@ -422,7 +422,7 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
   }
 
   sv = sqrt (sv);
-  a0 = a0 / (sv > SMALL_EPSILON ? sv : SMALL_EPSILON);
+  a0 = a0 / (float)(sv > SMALL_EPSILON ? sv : SMALL_EPSILON);
   // Now compute unit normal to triangle, and put into a2.
   csVector3 a2 = u12 % u23;
   if (a2.Norm () != 0) a2 = csVector3::Unit (a2);
@@ -448,14 +448,14 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
  
   // With the max and min data, determine the center point and dimensions
   // of the box
-  c = (minval + maxval) * 0.5;
+  c = (minval + maxval) * 0.5f;
 
   m_Translation.x = c.x * m_Rotation.m11 + c.y * m_Rotation.m12 + c.z * m_Rotation.m13;
   m_Translation.y = c.x * m_Rotation.m21 + c.y * m_Rotation.m22 + c.z * m_Rotation.m23;
   m_Translation.z = c.x * m_Rotation.m31 + c.y * m_Rotation.m32 + c.z * m_Rotation.m33;
 
 
-  m_Radius = (maxval - minval) * 0.5;
+  m_Radius = (maxval - minval) * 0.5f;
 
   // Assign the one triangle to this box
   m_pTriangle = pTriangle;

@@ -652,7 +652,7 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	// max as your distortion bound and priority.
 
 	float result = ddgMAXPRI;
-#define ddgEPSILON 0.00001
+#define ddgEPSILON 0.00001f
 
 	float a = th[0],
 		  b = th[1],

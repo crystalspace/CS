@@ -26,7 +26,7 @@
 class csVFS;
 class csStrVector;
 
-typedef bool (csIniWriteFunc) (csSome Stream, const void *data,
+typedef bool (*csIniWriteFunc) (csSome Stream, const void *data,
   unsigned int iniWriteType, size_t len);
 
 class csIniFile : public csBase

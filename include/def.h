@@ -132,11 +132,11 @@
 #endif
 
 #undef EPSILON
-#define EPSILON 0.001			/* Small value */
+#define EPSILON 0.001f			/* Small value */
 #undef SMALL_EPSILON
-#define SMALL_EPSILON 0.000001		/* Very small value */
+#define SMALL_EPSILON 0.000001f		/* Very small value */
 #undef SMALL_EPSILON_D
-#define SMALL_EPSILON_D 0.000000000001	/* Very, very small value */
+#define SMALL_EPSILON_D 0.000000000001f	/* Very, very small value */
 
 #ifndef PI
 #  define PI 3.14159265358979323

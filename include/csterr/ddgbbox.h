@@ -130,7 +130,7 @@ public:
 	void split(Split side, float value = 0 );
 	/// Return the centre point of the bounding box.
 	ddgVector3 centre(void)
-	{ return ( _min + _max ) * 0.5;}
+	{ return ( _min + _max ) * 0.5f;}
 	/// Move the bounding box by the specified vector.
 	void move(ddgVector3 o)
 	{ _min = _min + o; _max = _max + o; }
@@ -139,7 +139,7 @@ public:
 	void scale(ddgVector3 s)
 	{
 		ddgVector3 c(_min + _max);
-		c = c * 0.5;
+		c = c * 0.5f;
 		ddgVector3 d(c - _min);
 		d[0] *= s[0];
 		d[1] *= s[1];

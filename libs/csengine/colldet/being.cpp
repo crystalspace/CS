@@ -270,7 +270,7 @@ int csBeing::CollisionDetect( void )
   // See if we are on solid ground.
   // First test against the current ground if there is one.
   // If there isn't one, test the sector.
-  cdtnew.SetOrigin (transform->GetO2TTranslation () + (0.2 * VEC_DOWN));
+  cdtnew.SetOrigin (transform->GetO2TTranslation () + (0.2f * VEC_DOWN));
 
   // Test with the known ground object.
   hit = _ground && m_pCollider->Collide (*_ground, &cdtnew);
@@ -312,7 +312,7 @@ int csBeing::CollisionDetect( void )
       csCollider *cdhit = m_pCollider->FindCollision();
                         
       // Try to see if we can climb up.
-      csTransform cdtnew(transform->GetO2T (),transform->GetO2TTranslation ()+(0.2*VEC_UP));
+      csTransform cdtnew(transform->GetO2T (),transform->GetO2TTranslation ()+(0.2f*VEC_UP));
                         
       // See if we still hit.  If so we are stuck, if not we may try to climb but
       // we need to retest the sector since we may still hit something else.
@@ -347,7 +347,7 @@ int csBeing::CollisionDetect( void )
     // the hole in large.zip.
     //transform->SetOrigin (transform->GetO2TTranslation () +(0.2*VEC_DOWN));
     bool mirror = false;
-    csVector3 new_position = transform->GetOrigin () + (0.2*VEC_DOWN);
+    csVector3 new_position = transform->GetOrigin () + (0.2f*VEC_DOWN);
     csReversibleTransform t = *transform;
     sector = sector->FollowSegment (t, new_position, mirror);
     *transform = t;  transform->SetOrigin (new_position);

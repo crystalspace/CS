@@ -855,7 +855,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
   csOrthoTransform test (m, new_pos);
 
   csSector *n[MAXSECTORSOCCUPIED];
-  int num_sectors = FindSectors (new_pos, 4*Sys->body->GetRadius(),
+  int num_sectors = FindSectors (new_pos, 4.0f*Sys->body->GetRadius(),
     Sys->view->GetCamera()->GetSector(), n);
 
   num_our_cd = 0;
@@ -902,7 +902,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     new_pos = pos+vel;
     test = csOrthoTransform (csMatrix3(), new_pos);
 
-    num_sectors = FindSectors (new_pos, 4*Sys->legs->GetRadius(), 
+    num_sectors = FindSectors (new_pos, 4.0f*Sys->legs->GetRadius(), 
 		Sys->view->GetCamera()->GetSector(), n);
 
     num_our_cd = 0;

@@ -151,7 +151,10 @@ public:
   // impulse_point is point of collision in world frame
   virtual void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
 			      const ctVector3 &unit_length_impulse_vector  )
-  { *pm = DEFAULT_ENTITY_MASS; 
+  { 
+    (void)unit_length_impulse_vector;
+    (void)impulse_point;
+    *pm = DEFAULT_ENTITY_MASS; 
     pI_inv->identity();
     *pI_inv *= 1.0/DEFAULT_ENTITY_MASS;
   }

@@ -24,7 +24,7 @@
 #include "iplugin.h"
 
 class csWorld;
-struct csColor;
+class csColor;
 
 SCF_VERSION (iWorld, 0, 1, 0);
 

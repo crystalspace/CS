@@ -1379,13 +1379,13 @@ bool csWorld::DeleteLibrary (const char *iName)
   if (!lib) return false;
 
 #define DELETE_ALL_OBJECTS(vector,type)				\
-  for (csObjIterator iter = lib->GetIterator (type::Type);	\
-       !iter.IsFinished (); ++iter)				\
-  {								\
-    type &x = (type&)*iter;					\
-    int idx = vector.Find (&x);					\
-    if (idx >= 0) vector.Delete (idx);				\
-  }
+  { for (csObjIterator iter = lib->GetIterator (type::Type);	\
+         !iter.IsFinished (); ++iter)				\
+    {								\
+      type &x = (type&)*iter;					\
+      int idx = vector.Find (&x);					\
+      if (idx >= 0) vector.Delete (idx);				\
+  } }
 
   DELETE_ALL_OBJECTS (collections, csCollection)
   DELETE_ALL_OBJECTS (sprites, csSprite)

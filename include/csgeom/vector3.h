@@ -102,6 +102,14 @@ public:
   inline friend csVector3 operator* (float f, const csVector3& v)
   { return csVector3(v.x*f, v.y*f, v.z*f); }
 
+  /// Multiply a vector and a scalar.
+  inline friend csVector3 operator* (const csVector3& v, double f)
+  { return v*(float)f; }
+
+  /// Multiply a vector and a scalar.
+  inline friend csVector3 operator* (double f, const csVector3& v)
+  { return v*(float)f; }
+
   /// Divide a vector by a scalar.
   inline friend csVector3 operator/ (const csVector3& v, float f)
   { f = 1.0f/f; return csVector3(v.x*f, v.y*f, v.z*f); }

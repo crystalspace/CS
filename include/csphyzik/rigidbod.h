@@ -94,7 +94,10 @@ public:
 */
 
   virtual void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
-			      const ctVector3 &unit_length_impulse_vector  ){
+			      const ctVector3 &unit_length_impulse_vector  )
+  {
+    (void)unit_length_impulse_vector;
+    (void)impulse_point;
     *pm = m;
     const ctMatrix3 &R = RF.get_R();
     R.similarity_transform( *pI_inv, I_inv );
