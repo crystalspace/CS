@@ -62,18 +62,6 @@ struct iLightingManager;
 
 struct iEvent;
 
-
-#define CS_GL_CLIP_AUTO           'a' // Used for auto-detection.
-#define CS_GL_CLIP_NONE           'n'
-#define CS_GL_CLIP_ZBUF           'z'
-#define CS_GL_CLIP_STENCIL        's'
-#define CS_GL_CLIP_PLANES         'p'
-#define CS_GL_CLIP_SOFTWARE       '0'
-#define CS_GL_CLIP_LAZY_NONE      'N'
-#define CS_GL_CLIP_LAZY_ZBUF      'Z'
-#define CS_GL_CLIP_LAZY_STENCIL   'S'
-#define CS_GL_CLIP_LAZY_PLANES    'P'
-
 class csGLGraphics3D : public iGraphics3D
 {
 private:
@@ -111,6 +99,7 @@ private:
 
   csReversibleTransform object2camera;
 
+  bool verbose;
   csGraphics3DCaps rendercaps;
 
   csRef<iStringSet> strings;
@@ -131,16 +120,15 @@ private:
   bool do_near_plane;
   csPlane3 near_plane;
 
-  /// Prefered clipping modes to use for optional portals.
-  char clip_optional[3];
-  /// Prefered clipping modes to use for required portals.
-  char clip_required[3];
-  /// Prefered clipping modes to use for outer portal.
+  /**
+   * Simple flag to indicate if stencil clipping is prefered over plane
+   * clipping (glClipPlane).
+   */
+  bool prefer_stencil;
 
   int stencilclipnum;
   bool stencil_enabled;
   bool clip_planes_enabled;
-  char clip_outer[3];
   csRef<iClipper2D> clipper;
   int cliptype;
   bool stencil_initialized;

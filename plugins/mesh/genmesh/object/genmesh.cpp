@@ -567,7 +567,7 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-    clip_z_plane) == false)
+      clip_z_plane) == false)
     return false;
 
 #ifndef CS_USE_NEW_RENDERER

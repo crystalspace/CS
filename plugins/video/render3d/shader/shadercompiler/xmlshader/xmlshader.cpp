@@ -787,7 +787,8 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
         last_textures[i] = wrap->GetTextureHandle ();
       else
         last_textures[i] = 0;
-    } else if (thispass->textureID[i] < stacks.Length ())
+    }
+    else if (thispass->textureID[i] < stacks.Length ())
     {
       csShaderVariable* var = 0;
       if (stacks[thispass->textureID[i]].Length () > 0)

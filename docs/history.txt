@@ -9,6 +9,17 @@ chronological order.
 3-Mar-2004
 	- Eric Sunshine added REGEX.AVAILABLE=no to msvcgen/required.mak to
 	  ensure that generic/regex.c gets included in csutil project file.
+	- Jorrit did a considerable cleanup of the NR OpenGL clipping system.
+	  Only two options are now possible: stencil and glClipPlane. Stencil
+	  is now default because it is usually (a lot) faster then glClipPlane.
+	  This gives a huge performance boost in some cases.
+	- Jorrit also added MaxTextureSize config option to r3dopengl.cfg.
+	- Jorrit added PreferClipPlane config option to r3dopengl.cfg.
+	- Jorrit added some more reporting to the NR OpenGL renderer if
+	  -verbose is used. More specifically the maximum texture size,
+	  VBO support, point sprite support, the use of nVidia extensions,
+	  the use of ATI extensions, and if glClipPlane is prefered are now
+	  all reported.
 2-Mar-2004
 	- Jorrit modified the stdrep plugin (standard reporter listener) so
 	  that it now prints all messages on standard output if the

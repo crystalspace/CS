@@ -97,6 +97,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiShaderRenderInterface);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiDebugHelper);
 
+  verbose = false;
   frustum_valid = false;
 
   do_near_plane = false;
@@ -116,17 +117,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   current_shadow_state = 0;
 
   use_hw_render_buffers = false;
-
-  //@@@ Test default. Will have to be autodetected later.
-  clip_optional[0] = CS_GL_CLIP_PLANES;
-  clip_optional[1] = CS_GL_CLIP_STENCIL;
-  clip_optional[2] = CS_GL_CLIP_NONE;
-  clip_required[0] = CS_GL_CLIP_PLANES;
-  clip_required[1] = CS_GL_CLIP_STENCIL;
-  clip_required[2] = CS_GL_CLIP_NONE;
-  clip_outer[0] = CS_GL_CLIP_PLANES;
-  clip_outer[1] = CS_GL_CLIP_STENCIL;
-  clip_outer[2] = CS_GL_CLIP_NONE;
+  prefer_stencil = true;
 
   int i;
   for (i=0; i<16; i++)
@@ -180,7 +171,7 @@ int csGLGraphics3D::GetMaxTextureSize () const
   GLint max;
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max);
   if (max == 0)
-    max = 256; //@@ Assume we support at least 256^2 textures
+    max = 256; // @@@ Assume we support at least 256^2 textures
   return max;
 }
 
@@ -442,13 +433,8 @@ int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
                                    bool add_near_clip,
                                    bool add_z_clip)
 {
-  /*add_near_clip = false;
-  add_z_clip = false;*/
-  /*if (clipplane_initialized)
-    return 0;
-  
-  clipplane_initialized = true;
-*/
+  if (!(add_clipper || add_near_clip || add_z_clip)) return 0;
+
   glMatrixMode (GL_MODELVIEW);
   glPushMatrix ();
   glLoadIdentity ();
@@ -510,112 +496,44 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   // First we are going to find out what kind of clipping (if any)
   // we need. This depends on various factors including what the engine
   // says about the mesh (the clip_portal and clip_plane flags in the
-  // mesh), what the current clipper is (the current cliptype), what
-  // the current z-buf render mode is, and what the settings are to use
-  // for the clipper on the current type of hardware (the clip_... arrays).
+  // mesh), what the current clipper is (the current cliptype),
+  // and what the prefered clipper (stencil or glClipPlane).
   //===========
-  char how_clip = CS_GL_CLIP_NONE;
-  bool use_lazy_clipping = false;
-  bool do_plane_clipping = false;
-  bool do_z_plane_clipping = false;
+
+  // If the following flag becomes true in this routine then this means
+  // that for portal clipping we will use stencil.
+  char clip_with_stencil = false;
+  // If the following flag becomes true in this routine then this means
+  // that for portal clipping we will use glClipPlane. This flag does
+  // not say anything about z-plane and near plane clipping.
+  char clip_with_planes = false;
+  // If one of the following flags is true then this means
+  // that we will have to do plane clipping using glClipPlane for the near
+  // or z=0 plane.
+  bool do_plane_clipping = (do_near_plane && clip_plane != CS_CLIP_NOT);
+  bool do_z_plane_clipping = (clip_z_plane != CS_CLIP_NOT);
 
   // First we see how many additional planes we might need because of
   // z-plane clipping and/or near-plane clipping. These additional planes
   // will not be usable for portal clipping (if we're using OpenGL plane
   // clipping).
-  int reserved_planes =
-    int (do_near_plane && clip_plane != CS_CLIP_NOT) +
-    int (clip_z_plane != CS_CLIP_NOT);
+  int reserved_planes = int (do_plane_clipping) + int (do_z_plane_clipping);
 
   if (clip_portal != CS_CLIP_NOT)
   {
     // Some clipping may be required.
-
-    // In some z-buf modes we cannot use clipping modes that depend on
-    // zbuffer ('n','N', 'z', or 'Z').
-    bool no_zbuf_clipping = (
-      current_zmode == CS_ZBUF_NONE || current_zmode == CS_ZBUF_FILL ||
-      current_zmode == CS_ZBUF_FILLONLY);
-
-    // Select the right clipping mode variable depending on the
-    // type of clipper.
-    int ct = cliptype;
-    // If clip_portal in the mesh indicates that we might need toplevel
-    // clipping then we do as if the current clipper type is toplevel.
-    if (clip_portal == CS_CLIP_TOPLEVEL) ct = CS_CLIPPER_TOPLEVEL;
-    char* clip_modes;
-    switch (ct)
-    {
-      case CS_CLIPPER_OPTIONAL: clip_modes = clip_optional; break;
-      case CS_CLIPPER_REQUIRED: clip_modes = clip_required; break;
-      case CS_CLIPPER_TOPLEVEL: clip_modes = clip_outer; break;
-      default: clip_modes = clip_optional;
-    }
-    // Go through all the modes and select the first one that is appropriate.
-    for (int i = 0 ; i < 3 ; i++)
-    {
-      char c = clip_modes[i];
-      // We cannot use n,N,z, or Z if no_zbuf_clipping is true.
-      if ((c == 'n' || c == 'N' || c == 'z' || c == 'Z') && no_zbuf_clipping)
-        continue;
-      // We cannot use p or P if the clipper has more vertices than the
-      // number of hardware planes minus one (for the view plane).
-      if ((c == 'p' || c == 'P') &&
-        clipper->GetVertexCount () > 6-reserved_planes)
-        continue;
-      how_clip = c;
-      break;
-    }
-    if (how_clip != '0' && toupper (how_clip) == how_clip)
-    {
-      use_lazy_clipping = true;
-      how_clip = tolower (how_clip);
-    }
-  }
-
-  // Check for the near-plane.
-  if (do_near_plane && clip_plane != CS_CLIP_NOT)
-  {
-    do_plane_clipping = true;
-    // If we must do clipping to the near plane then we cannot use
-    // lazy clipping.
-    use_lazy_clipping = false;
-    // If we are doing plane clipping already then we don't have
-    // to do additional software plane clipping as the OpenGL plane
-    // clipper can do this too.
-    if (how_clip == 'p')
-    {
-      do_plane_clipping = false;
-    }
-  }
-
-  // Check for the z-plane.
-  if (clip_z_plane != CS_CLIP_NOT)
-  {
-    do_z_plane_clipping = true;
-    // If hardware requires clipping to the z-plane (because it
-    // crashes otherwise) we have to disable lazy clipping.
-    // @@@
-    if (true)
-    {
-      use_lazy_clipping = false;
-    }
+    if (prefer_stencil)
+      clip_with_stencil = true;
+    else if (clipper->GetVertexCount () > 6-reserved_planes)
+      clip_with_stencil = true;
     else
-    {
-      // If we are doing plane clipping already then we don't have
-      // to do additional software plane clipping as the OpenGL plane
-      // clipper can do this too.
-      if (how_clip == 'p')
-      {
-        do_z_plane_clipping = false;
-      }
-    }
+      clip_with_planes = true;
   }
 
   //===========
   // First setup the clipper that we need.
   //===========
-  if (how_clip == 's')
+  if (clip_with_stencil)
   {
     SetupStencil ();
     stencil_enabled = true;
@@ -623,17 +541,16 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
     statecache->Enable_GL_STENCIL_TEST ();
   }
 
-  int planes = SetupClipPlanes (how_clip == 'p', 
-    do_near_plane && clip_plane != CS_CLIP_NOT,
-    clip_z_plane != CS_CLIP_NOT);
-  if (planes>0)
+  int planes = SetupClipPlanes (clip_with_planes, do_plane_clipping,
+  	do_z_plane_clipping);
+  if (planes > 0)
   {
     clip_planes_enabled = true;
     for (int i = 0; i < planes; i++)
       glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }
   // @@@ Hard coded max number of planes (6). Maybe not so good.
-  for (int i = planes; i<6; i++)
+  for (int i = planes ; i < 6 ; i++)
     glDisable ((GLenum)(GL_CLIP_PLANE0+i));
 }
 
@@ -710,9 +627,11 @@ bool csGLGraphics3D::Open ()
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
   	object_reg, iCommandLineParser);
 
+  verbose = cmdline->GetOption ("verbose") != 0;
+
   textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias",
     -0.3f);
-
+ 
   if (!G2D->Open ())
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening Graphics2D context.");
@@ -753,6 +672,9 @@ bool csGLGraphics3D::Open ()
    */
   if (config->GetBool ("Video.OpenGL.UseNVidiaExt", true))
   {
+    if (verbose)
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Attempting to use nVidia extensions.");
     ext->InitGL_NV_register_combiners ();
     ext->InitGL_NV_register_combiners2 ();
     ext->InitGL_NV_texture_shader ();
@@ -766,15 +688,59 @@ bool csGLGraphics3D::Open ()
    */
   if (config->GetBool ("Video.OpenGL.UseATIExt", true))
   {
+    if (verbose)
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Attempting to use ATI extensions.");
     ext->InitGL_ATI_separate_stencil ();
     ext->InitGL_ATI_fragment_shader ();
   }
 
+  rendercaps.minTexHeight = 2;
+  rendercaps.minTexWidth = 2;
+  GLint mts = config->GetInt ("Video.OpenGL.Caps.MaxTextureSize", -1);
+  if (mts == -1)
+  {
+    glGetIntegerv (GL_MAX_TEXTURE_SIZE, &mts);
+    if (mts == 0)
+    {
+      // There appears to be a bug in some OpenGL drivers where
+      // getting the maximum texture size simply doesn't work. In that
+      // case we will issue a warning about this and assume 256x256.
+      mts = 256;
+      Report (CS_REPORTER_SEVERITY_WARNING, "Detecting maximum texture size fails! 256x256 is assumed.\nEdit Video.OpenGL.Caps.MaxTextureSize if you want to change.");
+    }
+  }
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Maximum texture size is %dx%d", mts, mts);
+  rendercaps.maxTexHeight = mts;
+  rendercaps.maxTexWidth = mts;
+
   rendercaps.SupportsPointSprites = ext->CS_GL_ARB_point_parameters &&
     ext->CS_GL_ARB_point_sprite;
+  if (verbose)
+    if (rendercaps.SupportsPointSprites)
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Point sprites are supported.");
+    else
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Point sprites are NOT supported.");
 
   // check for support of VBO
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
+  if (verbose)
+    if (use_hw_render_buffers)
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "VBO is supported.");
+    else
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "VBO is NOT supported.");
+
+  prefer_stencil = true;
+  if (config->GetBool ("Video.OpenGL.PreferClipPlane", false))
+  {
+    prefer_stencil = false;
+  }
+  if (verbose)
+    if (prefer_stencil)
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is prefered.");
+    else
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Hardware plane clipping is prefered.");
 
   shadermgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   if (!shadermgr)
@@ -856,8 +822,8 @@ bool csGLGraphics3D::Open ()
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_2D);
 
-  csRef<csShaderVariable> fogvar = csPtr<csShaderVariable>( new csShaderVariable(
-    strings->Request ("standardtex fog")));
+  csRef<csShaderVariable> fogvar = csPtr<csShaderVariable> (
+  	new csShaderVariable (strings->Request ("standardtex fog")));
   fogvar->SetValue (fogtex);
   shadermgr->AddVariable(fogvar);
 
@@ -930,11 +896,11 @@ bool csGLGraphics3D::Open ()
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_CUBEMAP);
 
-  csRef<csShaderVariable> normvar = csPtr<csShaderVariable>( new csShaderVariable(
-    strings->Request ("standardtex normalization map")));
+  csRef<csShaderVariable> normvar = csPtr<csShaderVariable> (
+  	new csShaderVariable (
+		strings->Request ("standardtex normalization map")));
   normvar->SetValue (normtex);
   shadermgr->AddVariable(normvar);
-
 
   #define CS_ATTTABLE_SIZE	  128
   #define CS_HALF_ATTTABLE_SIZE	  ((float)CS_ATTTABLE_SIZE/2.0f)
@@ -963,8 +929,9 @@ bool csGLGraphics3D::Open ()
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
     iTextureHandle::CS_TEX_IMG_2D);
 
-  csRef<csShaderVariable> attvar = csPtr<csShaderVariable>( new csShaderVariable(
-    strings->Request ("standardtex attenuation")));
+  csRef<csShaderVariable> attvar = csPtr<csShaderVariable> (
+  	new csShaderVariable (
+		strings->Request ("standardtex attenuation")));
   attvar->SetValue (atttex);
   shadermgr->AddVariable(attvar);
 
@@ -1537,24 +1504,21 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
   const CS_SHADERVAR_STACK &stacks)
 {
-  /*SetupClipper (mymesh->clip_portal, 
+  SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
-                mymesh->clip_z_plane);*/
+                mymesh->clip_z_plane);
 
   SetObjectToCamera (&mymesh->object2camera);
   
-  csShaderVariable* indexBufSV;
-  if (string_indices<stacks.Length ()
-      && stacks[string_indices].Length () > 0)
-    indexBufSV = stacks[string_indices].Top ();
-  CS_ASSERT(indexBufSV);
+  CS_ASSERT (!(string_indices<(csStringID)stacks.Length ()
+      && stacks[string_indices].Length () > 0));
+  csShaderVariable* indexBufSV = stacks[string_indices].Top ();
   iRenderBuffer* iIndexbuf = 0;
   indexBufSV->GetValue (iIndexbuf);
   CS_ASSERT(iIndexbuf);
   csGLRenderBuffer* indexbuf = (csGLRenderBuffer*)iIndexbuf;
 
-
-  GLenum primitivetype;
+  GLenum primitivetype = GL_TRIANGLES;
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
@@ -1576,18 +1540,14 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
         break;
       }
       float radius, scale;
-      csShaderVariable* radiusSV;
-      if (string_point_radius<stacks.Length ()
-          && stacks[string_point_radius].Length () > 0)
-        radiusSV = stacks[string_point_radius].Top ();
-      CS_ASSERT (radiusSV);
+      CS_ASSERT (!(string_point_radius<(csStringID)stacks.Length ()
+          && stacks[string_point_radius].Length () > 0));
+      csShaderVariable* radiusSV = stacks[string_point_radius].Top ();
       radiusSV->GetValue (radius);
 
-      csShaderVariable* scaleSV;
-      if (string_point_scale<stacks.Length ()
-          && stacks[string_point_scale].Length () > 0)
-        scaleSV = stacks[string_point_scale].Top ();
-      CS_ASSERT (scaleSV);
+      CS_ASSERT (!(string_point_scale < (csStringID)stacks.Length ()
+          && stacks[string_point_scale].Length () > 0));
+      csShaderVariable* scaleSV = stacks[string_point_scale].Top ();
       scaleSV->GetValue (scale);
 
       glPointSize (1.0f);
@@ -1886,10 +1846,8 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
   stencil_initialized = false;
   frustum_valid = false;
   stencil_enabled = false;
-  if (cliptype != CS_CLIPPER_NONE)
+  if (cliptype == CS_CLIPPER_NONE)
   {
-    SetupClipper (CS_CLIP_NEEDED, CS_CLIP_NEEDED, CS_CLIP_NEEDED);
-  } else {
     for (int i = 0; i<6; i++)
       glDisable ((GLenum)(GL_CLIP_PLANE0+i));
     statecache->Disable_GL_STENCIL_TEST ();
@@ -2044,7 +2002,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
 
     iTextureHandle* tex = 0;
     if (mesh.alphaType.autoModeTexture != csInvalidStringID
-        && mesh.alphaType.autoModeTexture < stacks.Length ()
+        && mesh.alphaType.autoModeTexture < (csStringID)stacks.Length ()
         && stacks[mesh.alphaType.autoModeTexture].Length () > 0)
     {
       csShaderVariable* texVar = 
