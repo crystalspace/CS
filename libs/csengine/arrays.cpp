@@ -25,7 +25,7 @@
 
 //-------------------------------------------------------+ csCurvesArray +----//
 
-bool csCurvesArray::FreeTypedItem (csCurve *Item)
+bool csCurvesArray_Helper::FreeTypedItem (csCurve *Item)
 {
   delete Item;
   return true;
@@ -65,7 +65,7 @@ csPolygon3D *csPolygonArray::Get (int iIndex) const
 
 //---------------------------------------------------------+ csHaloArray +----//
 
-bool csHaloArray::FreeTypedItem (csLightHalo *Item)
+bool csHaloArray_Helper::FreeTypedItem (csLightHalo *Item)
 {
   delete Item;
   return true;

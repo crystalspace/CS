@@ -108,7 +108,12 @@
  * a typed vector class called "NAME_Helper". This also means that by
  * default there is no constructor that takes any parameters. Note that
  * when using CS_DECLARE_TYPED_VECTOR_USERDELETE for MACRO, the function
- * to implement is called "NAME_Helper::FreeTypedItem", Not "NAME::..."
+ * to implement is called "NAME_Helper::FreeTypedItem", Not "NAME::..." <p>
+ *
+ * IMPORTANT: FreeTypedItem() is not virtual. If you define that function
+ * between CS_BEGIN_TYPED_VECTOR() and CS_FINISH_TYPED_VECTOR(), it will
+ * not be called! (more exactly: It will not override the FreeTypedItem
+ * that is defined by 'MACRO')
  */
 #define CS_BEGIN_TYPED_VECTOR(MACRO,NAME,TYPE)				\
   CS_PRIVATE_BEGIN_USER_VECTOR(MACRO,NAME,TYPE)
