@@ -288,7 +288,7 @@ public:
   { /* deprecated */ return false; }
 
   /// Returns the mesh, ready for rendering
-  csRenderMesh** GetRenderMeshes (int &n);
+  csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, iMovable* movable);
 
   void SetVisibleCallback (iMeshObjectDrawCallback* cb) { vis_cb = cb; }
   iMeshObjectDrawCallback* GetVisibleCallback () const { return vis_cb; }

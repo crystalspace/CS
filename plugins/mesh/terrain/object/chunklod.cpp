@@ -972,7 +972,8 @@ bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
-csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (int &n)
+csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (int &n, iRenderView* rview, 
+                                                         iMovable* movable)
 {
   int i;
   n = meshes.Length();

@@ -205,6 +205,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       shader->TeardownPass ();
       if (mesh->variablecontext)
         mesh->variablecontext->PopVariables (stacks);
+      mesh->inUse = false;
     }
     shader->DeactivatePass ();
   }
@@ -257,13 +258,14 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 	@@@ Uuuugly workaround: copy the RMs before drawing behind the
 	portal and copy them back afterwards.
        */
-      saveMeshes.SetLength (num - n);
+      /*saveMeshes.SetLength (num - n);
       int i;
       for (i = n; i < num; i++)
-	saveMeshes[i - n] = *sameShaderMeshes[i - n];
+	saveMeshes[i - n] = *sameShaderMeshes[i - n];*/
       mesh->portal->Draw (rview);
-      for (i = n; i < num; i++)
-	*sameShaderMeshes[i - n] = saveMeshes[i - n];
+      mesh->inUse = false;
+      /*for (i = n; i < num; i++)
+	*sameShaderMeshes[i - n] = saveMeshes[i - n];*/
     }
     else 
     {

@@ -84,10 +84,14 @@ csNewParticleSystem::csNewParticleSystem (
 
   vertices = 0;
 
-  mesh.variablecontext.AttachNew (new csShaderVariableContext);
+  svcontext = new csShaderVariableContext;
+  /*mesh.variablecontext.AttachNew (new csShaderVariableContext);
   mesh.object2camera = csReversibleTransform ();
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
-  meshPtr = &mesh;
+  meshPtr = &mesh;*/
+
+  lastMeshPtr = new csRenderMesh;
+  meshes.Push (lastMeshPtr);
 #endif
 
   texels = 0;
@@ -264,17 +268,17 @@ void csNewParticleSystem::SetupObject ()
         sizeof (unsigned int)*TriangleCount*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
     csShaderVariable *sv;
-    sv = mesh.variablecontext->GetVariableAdd (vertex_name);
+    sv = svcontext->GetVariableAdd (vertex_name);
     sv->SetValue (vertex_buffer);
-    sv = mesh.variablecontext->GetVariableAdd (texel_name);
+    sv = svcontext->GetVariableAdd (texel_name);
     sv->SetValue (texel_buffer);
 #if 0
-    sv = mesh.variablecontext->GetVariableAdd (normal_name);
+    sv = svcontext->GetVariableAdd (normal_name);
     sv->SetValue (normal_buffer);
 #endif
-    sv = mesh.variablecontext->GetVariableAdd (color_name);
+    sv = svcontext->GetVariableAdd (color_name);
     sv->SetValue (color_buffer);
-    sv = mesh.variablecontext->GetVariableAdd (index_name);
+    sv = svcontext->GetVariableAdd (index_name);
     sv->SetValue (index_buffer);
 #endif
   }
@@ -416,16 +420,6 @@ bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
   if (!rview->ClipBBox (sbox, cbox, ClipPortal, ClipPlane, ClipZ))
     return false;
 
-#ifdef CS_USE_NEW_RENDERER
-  mesh.clip_portal = ClipPortal;
-  mesh.clip_plane = ClipPlane;
-  mesh.clip_z_plane = ClipZ;
-  mesh.do_mirror = camera->IsMirrored ();
-  mesh.object2camera = csReversibleTransform ();
-
-  csBox3 box;
-  SetupParticles (trans, vertices, box);
-#endif
 
   if (Lighting && light_mgr)
   {
@@ -535,10 +529,76 @@ bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
   return true;
 }
 
-csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num)
+csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num, iRenderView* rview, 
+                                                     iMovable* movable)
 {
 #ifdef CS_USE_NEW_RENDERER
+  num = 0;
   SetupObject ();
+
+  // get the object-to-camera transformation
+  iCamera *camera = rview->GetCamera ();
+  csReversibleTransform trans = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    trans /= movable->GetFullTransform ();
+
+  // build a bounding box in camera space
+  csBox3 cbox;
+  int i;
+  for (i=0; i<8; i++)
+    cbox.AddBoundingVertexSmart (trans * Bounds.GetCorner (i));
+  if (cbox.MaxZ () < 0)
+  {
+    num = 0;
+    return 0;
+  }
+    
+
+  // transform from camera to screen space
+  csBox2 sbox;
+
+  if (cbox.MinZ () <= 0)
+  {
+    sbox.Set (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
+      +CS_BOUNDINGBOX_MAXVALUE, +CS_BOUNDINGBOX_MAXVALUE);
+  }
+  else
+  {
+    sbox.StartBoundingBox ();
+    float fov = camera->GetFOV ();
+    float shift_x = camera->GetShiftX ();
+    float shift_y = camera->GetShiftY ();
+
+    for (i=0; i<8; i++)
+    {
+      csVector3 cv = cbox.GetCorner (i);
+      int inv_z = QInt (fov / cv.z);
+      int sx = QInt (cv.x * inv_z + shift_x);
+      int sy = QInt (cv.y * inv_z + shift_y);
+      sbox.AddBoundingVertex (sx, sy);
+    }
+  }
+
+  // Test visibility of bounding box with the clipper
+  if (!rview->ClipBBox (sbox, cbox, ClipPortal, ClipPlane, ClipZ))
+  {
+    num = 0;
+    return 0;
+  }
+
+  
+  csBox3 box;
+  SetupParticles (trans, vertices, box);
+
+
+  if (Lighting && light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = light_mgr
+      ->GetRelevantLights (LogParent, -1, false);
+    UpdateLighting (relevant_lights, movable);
+  }
+
+  
   // some generic setup
   //@@@?if (VisCallback) VisCallback->BeforeDrawing (this, rview);
 
@@ -550,14 +610,42 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num)
   index_buffer->CopyToBuffer (triangles,
       	sizeof (unsigned int) * TriangleCount *3);
 
-  // Prepare for rendering.
-  mesh.mixmode = MixMode;
-  mesh.indexstart = 0;
-  mesh.indexend = TriangleCount * 3;
-  mesh.material = Material;
+  //first, check if we have any usable mesh
+  if(lastMeshPtr->inUse == true)
+  {
+    lastMeshPtr = 0;
+    //check the list
+    int i;
+    for(i = 0; i<meshes.Length (); i++)
+    {
+      if (meshes[i]->inUse == false){
+        lastMeshPtr = meshes[i];
+        break;
+      }
+    }
+    if (lastMeshPtr == 0)
+    {
+      lastMeshPtr = new csRenderMesh;
+      meshes.Push (lastMeshPtr);
+    }
+  }
 
+  // Prepare for rendering.
+  lastMeshPtr->inUse = true;
+  lastMeshPtr->mixmode = MixMode;
+  lastMeshPtr->clip_portal = ClipPortal;
+  lastMeshPtr->clip_plane = ClipPlane;
+  lastMeshPtr->clip_z_plane = ClipZ;
+  lastMeshPtr->do_mirror = camera->IsMirrored ();
+  lastMeshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
+  lastMeshPtr->indexstart = 0;
+  lastMeshPtr->indexend = TriangleCount * 3;
+  lastMeshPtr->material = Material;
+  lastMeshPtr->object2camera = csReversibleTransform ();
+  lastMeshPtr->variablecontext = svcontext;
+ 
   num = 1;
-  return &meshPtr;
+  return &lastMeshPtr;
 #else
   num = 0;
   return 0;

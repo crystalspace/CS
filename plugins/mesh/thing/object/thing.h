@@ -645,7 +645,11 @@ private:
   csFlags flags;
 
 #ifdef CS_USE_NEW_RENDERER
-  csDirtyAccessArray<csRenderMesh*> renderMeshes;
+  struct rmHolder {
+    csDirtyAccessArray<csRenderMesh*> renderMeshes;
+  };
+  csArray<rmHolder*> rmHolderList;
+  int rmHolderListIndex;
 
   void PrepareRenderMeshes ();
   void ClearRenderMeshes ();
@@ -1071,7 +1075,8 @@ public:
   } scfiShadowReceiver;
   friend struct ShadowReceiver;
 
-  virtual csRenderMesh **GetRenderMeshes (int &num);
+  virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView* rview, 
+    iMovable* movabl);
 
   //-------------------- iMeshObject interface implementation ----------
   struct MeshObject : public iMeshObject
@@ -1088,9 +1093,10 @@ public:
     {
       return scfParent->Draw (rview, movable, zMode);
     }
-    virtual csRenderMesh** GetRenderMeshes (int &n)
+    virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
+      iMovable* movable)
     {
-      return scfParent->GetRenderMeshes (n);
+      return scfParent->GetRenderMeshes (n, rview, movable);
     }
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const

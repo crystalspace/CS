@@ -121,10 +121,90 @@ csPortalContainer::csPortalContainer (iEngine* engine) :
   scfiPolygonMesh.SetPortalContainer (this);
   scfiPolygonMeshCD.SetPortalContainer (this);
   scfiPolygonMeshLOD.SetPortalContainer (this);
+
+#ifdef CS_USE_NEW_RENDERER
+  lastMeshPtr = new csRenderMesh;
+  meshes.Push (lastMeshPtr);
+#endif
 }
 
 csPortalContainer::~csPortalContainer ()
 {
+  #ifdef CS_USE_NEW_RENDERER
+  //clear up rendermeshes
+  while (meshes.Length () > 0)
+  {
+    csRenderMesh *mesh = meshes.Pop ();
+    delete mesh;
+  }
+#endif
+}
+
+csRenderMesh** csPortalContainer::GetRenderMeshes (int& num, iRenderView* rview, 
+                                iMovable* movable)
+{
+  Prepare ();
+
+  iCamera* camera = rview->GetCamera ();
+  const csMovable& cmovable = meshwrapper->GetCsMovable ();
+  const csReversibleTransform& camtrans = camera->GetTransform ();
+  const csReversibleTransform& movtrans = cmovable.GetFullTransform ();
+
+  if (movable_nr != cmovable.GetUpdateNumber ())
+    ObjectToWorld (cmovable, movtrans);
+
+  csSphere sphere;
+  sphere.SetCenter (object_bbox.GetCenter ());
+  sphere.SetRadius (max_object_radius);
+  csReversibleTransform tr_o2c;
+  tr_o2c = camtrans;
+
+  if (movable_identity)
+  {
+    if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
+      clip_plane, clip_z_plane))
+    {
+      num = 0;
+      return 0;
+    }
+  }
+  else
+  {
+    tr_o2c /= movtrans;
+    if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
+      clip_plane, clip_z_plane))
+    {
+      num = 0;
+      return 0;
+    }
+  }
+
+  //first, check if we have any usable mesh
+  if(lastMeshPtr->inUse == true)
+  {
+    lastMeshPtr = 0;
+    //check the list
+    int i;
+    for(i = 0; i<meshes.Length (); i++)
+    {
+      if (meshes[i]->inUse == false){
+        lastMeshPtr = meshes[i];
+        break;
+      }
+    }
+    if (lastMeshPtr == 0)
+    {
+      lastMeshPtr = new csRenderMesh;
+      meshes.Push (lastMeshPtr);
+    }
+  }
+
+  lastMeshPtr->inUse = true;
+  lastMeshPtr->portal = this;
+  lastMeshPtr->material = 0;
+  lastMeshPtr->object2camera = tr_o2c;
+  num = 1;
+  return &lastMeshPtr;
 }
 
 void csPortalContainer::Prepare ()
@@ -158,10 +238,6 @@ void csPortalContainer::Prepare ()
   max_object_radius = qsqrt (csSquaredDist::PointPoint (
   	object_bbox.Max (), object_bbox.Min ())) * 0.5f;
 
-#ifdef CS_USE_NEW_RENDERER
-  rmesh.portal = this;
-  rmesh.material = 0;
-#endif
 }
 
 //------------------- For iPortalContainer ---------------------------//

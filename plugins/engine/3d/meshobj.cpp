@@ -290,7 +290,8 @@ void csMeshWrapper::Draw (iRenderView *rview)
   DrawInt (rview);
 }
 
-csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n)
+csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
+                                               iMovable* mov)
 {
 //  iMeshWrapper *meshwrap = &scfiMeshWrapper;
 
@@ -320,7 +321,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n)
 
     csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
     meshobj->NextFrame (lt,movable.GetPosition ());
-    return meshobj->GetRenderMeshes (n);
+    return meshobj->GetRenderMeshes (n, rview, mov);
 /*  }
   return 0;*/
 

@@ -453,7 +453,7 @@ public:
    * Draw the zpass for the object.  If this object doesn't use lighting
    * then it can be drawn fully here.
    */
-  csRenderMesh** GetRenderMeshes (int& num);
+  csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview, iMovable* movable);
   /// This pass sets up the shadow stencil buffer
   void DrawShadow (iRenderView* rview, iLight* light);
   /// This pass draws the diffuse lit mesh
@@ -775,9 +775,10 @@ public:
     {
       scfParent->AddMeshToStaticLOD (lod, mesh);
     }
-    virtual csRenderMesh** GetRenderMeshes (int& num) 
+    virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
+      iMovable*) 
     {
-      return scfParent->GetRenderMeshes (num);
+      return scfParent->GetRenderMeshes (num, rview, 0);
     }
     virtual void DrawShadow (iRenderView* rview, iLight* light)
     {

@@ -25,6 +25,7 @@
 #include "ivideo/rendermesh.h"
 #include "iengine/lightmgr.h"
 #include "csgfx/shadervarcontext.h"
+#include "csutil/garray.h"
 
 /**
  * flag value to indicate that the system should be deleted when all
@@ -62,8 +63,9 @@ protected:
 
   bool initialized;
 #ifdef CS_USE_NEW_RENDERER
-  csRenderMesh mesh;
-  csRenderMesh* meshPtr;
+  csDirtyAccessArray<csRenderMesh*> meshes;
+  csRenderMesh *lastMeshPtr;
+  csShaderVariableContext* svcontext;
 
   int VertexCount;
   int TriangleCount;
@@ -185,7 +187,8 @@ public:
 
   /// quick visibility test
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
-  virtual csRenderMesh** GetRenderMeshes (int& n);
+  virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
+    iMovable* movable);
 
   /// update lighting info
   void UpdateLighting (const csArray<iLight*>&, iMovable*);

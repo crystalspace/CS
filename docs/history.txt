@@ -10,6 +10,8 @@ chronological order.
 	- Luca committed the res fix to the problem regarding the lack
 	  of the regex.c file in the CSUtil library. The problem was 
 	  related to the VisualC++ compiler environments only.
+	- Marten made a new, hopefully permanent, fix for the csRenderMesh 
+	  problem. This fix replace removed res workaround from the 15th March.
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
 	  textures wasn't called, and is now called on access in the shader

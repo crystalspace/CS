@@ -286,19 +286,21 @@ public:
     	->GetCsMeshWrapper ();
     csMeshWrapper* csParent = cmesh->GetCsParent ();
     if (csParent && !csParent->IsChildVisible (mesh, rview)) return;
-    if (!cmesh->GetMeshObject ()->DrawTest (rview,
+    /*if (!cmesh->GetMeshObject ()->DrawTest (rview,
     	&(cmesh->GetCsMovable ()).scfiMovable))
-      return;
+      return;*/
 
     int num;
-    csRenderMesh** meshes = cmesh->GetRenderMeshes (num);
+    csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, 
+      &(cmesh->GetCsMovable ()).scfiMovable);
 #ifdef CS_DEBUG
     int i;
     for (i = 0 ; i < num ; i++)
       meshes[i]->db_mesh_name = cmesh->GetName ();
 #endif
-    privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
-	cmesh->GetZBufMode ());
+    if (num > 0)
+      privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
+	  cmesh->GetZBufMode ());
   }
 
 private:

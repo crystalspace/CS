@@ -150,6 +150,9 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
   buffers_version = (uint)-1;
   mesh_colors_dirty_flag = true;
+
+  lastMeshPtr = new csRenderMesh;
+  meshes.Push (lastMeshPtr);
 #endif
 }
 
@@ -160,6 +163,15 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   delete[] static_mesh_colors;
 
   ClearPseudoDynLights ();
+
+#ifdef CS_USE_NEW_RENDERER
+  //clear up rendermeshes
+  while (meshes.Length () > 0)
+  {
+    csRenderMesh *mesh = meshes.Pop ();
+    delete mesh;
+  }
+#endif
 
   //SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
@@ -584,14 +596,6 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   m.clip_plane = clip_plane;
   m.clip_z_plane = clip_z_plane;
   m.do_mirror = camera->IsMirrored ();
-#else
-  mesh.object2camera = tr_o2c;
-  mesh.clip_portal = clip_portal;
-  mesh.clip_plane = clip_plane;
-  mesh.clip_z_plane = clip_z_plane;
-  mesh.do_mirror = camera->IsMirrored ();
-
-  lighting_movable = movable;
 #endif
 
   if (factory->light_mgr)
@@ -972,20 +976,52 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
 }*/
 #endif
 
-csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
+csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n, iRenderView* rview, 
+                                                     iMovable* movable)
 {
 #ifdef CS_USE_NEW_RENDERER
   SetupObject ();
-  //if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
+  CheckLitColors ();
 
+  iCamera* camera = rview->GetCamera ();
 
-  // iGraphics3D* g3d = rview->GetGraphics3D ();
-
-//  iCamera* camera = rview->GetCamera ();
-/*  tr_o2c = camera->GetTransform ();
+  // First create the transformation from object to camera space directly:
+  //   W = Mow * O - Vow;
+  //   C = Mwc * (W - Vwc)
+  // ->
+  //   C = Mwc * (Mow * O - Vow - Vwc)
+  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
+  csReversibleTransform tr_o2c;
+  // Shouldn't this be done in the renderer?
+  tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
-*/
+
+  int clip_portal, clip_plane, clip_z_plane;
+  csVector3 radius;
+  csSphere sphere;
+  GetRadius (radius, sphere.GetCenter ());
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  sphere.SetRadius (max_radius);
+  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
+    clip_z_plane) == false)
+  {
+    n = 0;
+    return 0;
+  }
+
+
+  lighting_movable = movable;
+
+  if (factory->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = factory->light_mgr
+      ->GetRelevantLights (logparent, -1, false);
+    UpdateLighting (relevant_lights, movable);
+  }
+
 
   iMaterialWrapper* mater = material;
   if (!mater) mater = factory->GetMaterialWrapper ();
@@ -995,24 +1031,46 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
     return false;
   }
 
-  // iGraphics3D* g3d = rview->GetGraphics3D ();
-
   if (material_needs_visit) mater->Visit ();
-  //mesh.transform = &tr_o2c;
-  //mesh.object2world = movable->GetFullTransform ();
+ 
 
-  // Prepare for rendering.
-  mesh.mixmode = MixMode;
+  //first, check if we have any usable mesh
+  if(lastMeshPtr->inUse == true)
+  {
+    lastMeshPtr = 0;
+    //check the list
+    int i;
+    for(i = 0; i<meshes.Length (); i++)
+    {
+      if (meshes[i]->inUse == false){
+        lastMeshPtr = meshes[i];
+        break;
+      }
+    }
+    if (lastMeshPtr == 0)
+    {
+      lastMeshPtr = new csRenderMesh;
+      meshes.Push (lastMeshPtr);
+    }
+  }
 
-  mesh.indexstart = 0;
-  mesh.indexend = factory->GetTriangleCount () * 3;
-  mesh.material = mater;
-  mesh.variablecontext = svcontext;
-  mesh.meshtype = CS_MESHTYPE_TRIANGLES;
-
-  meshPtr = &mesh;
+  lastMeshPtr->inUse = true;
+  lastMeshPtr->mixmode = MixMode;
+  lastMeshPtr->clip_portal = clip_portal;
+  lastMeshPtr->clip_plane = clip_plane;
+  lastMeshPtr->clip_z_plane = clip_z_plane;
+  lastMeshPtr->do_mirror = camera->IsMirrored ();
+  lastMeshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
+  lastMeshPtr->indexstart = 0;
+  lastMeshPtr->indexend = factory->GetTriangleCount () * 3;
+  lastMeshPtr->material = mater;
+  lastMeshPtr->object2camera = tr_o2c;
+  lastMeshPtr->variablecontext = svcontext;
+  lastMeshPtr->geometryInstance = (void*)factory;
+ 
   n = 1;
-  return &meshPtr;
+  return &lastMeshPtr;
+
 #else
   n = 0;
   return 0;

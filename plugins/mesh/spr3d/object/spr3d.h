@@ -51,6 +51,7 @@
 #include "ivideo/material.h"
 #include "qint.h"
 #include "csgfx/shadervarcontext.h"
+#include "csutil/garray.h"
 
 struct iObjectRegistry;
 struct iEngine;
@@ -1294,8 +1295,9 @@ private:
 #ifndef CS_USE_NEW_RENDERER
   G3DTriangleMesh g3dmesh;
 #else
-  csRenderMesh rendermesh;
-  csRenderMesh *meshptr;
+  csDirtyAccessArray<csRenderMesh*> meshes;
+  csRenderMesh *lastMeshPtr;
+
 #endif // CS_USE_NEW_RENDERER
 
   bool initialized;
@@ -1702,7 +1704,8 @@ public:
   virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
-  virtual csRenderMesh **GetRenderMeshes (int &n);
+  virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview, 
+    iMovable* movable);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();

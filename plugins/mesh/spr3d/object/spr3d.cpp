@@ -1050,9 +1050,13 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   single_step = false;
   frame_increment = 1;
 
-#ifndef CS_USE_NEW_RENDERER
+#ifdef CS_USE_NEW_RENDERER
+  lastMeshPtr = new csRenderMesh;
+  meshes.Push (lastMeshPtr);
+#else
   vbufmgr = 0;
 #endif // CS_USE_NEW_RENDERER
+
 }
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()
@@ -1562,9 +1566,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
-#ifdef CS_USE_NEW_RENDERER
-  rendermesh.object2camera = tr_o2c;
-#endif
 
 #if 1
   csVector3 radius;
@@ -1742,8 +1743,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   {
 #ifndef CS_USE_NEW_RENDERER
     g3dmesh.mat_handle = cstxt->GetMaterialHandle ();
-#else
-    rendermesh.material = cstxt;
 #endif // CS_USE_NEW_RENDERER
     cstxt->Visit ();
   }
@@ -1751,8 +1750,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   {
 #ifndef CS_USE_NEW_RENDERER
     g3dmesh.mat_handle = factory->cstxt->GetMaterialHandle ();
-#else
-    rendermesh.material = factory->cstxt;
 #endif // CS_USE_NEW_RENDERER
     factory->cstxt->Visit ();
   }
@@ -1811,18 +1808,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
   g3dmesh.mixmode = MixMode | (vertex_colors ? CS_FX_GOURAUD : 0);
 
-#else
-  final_verts = verts;
-  final_texcoords = real_uv_verts;
-  final_colors = vertex_colors;
-  final_triangles = m->GetTriangles ();
-  final_num_vertices = num_verts_for_lod;
-  final_num_triangles = m->GetTriangleCount ();
-
-  rendermesh.clip_portal = clip_portal;
-  rendermesh.clip_plane = clip_plane;
-  rendermesh.clip_z_plane = clip_z_plane;
-  rendermesh.do_mirror = camera->IsMirrored ();
 
 #endif // CS_USE_NEW_RENDERER
 
@@ -1875,9 +1860,232 @@ bool csSprite3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   return true;
 }
 
-csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n)
+csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview, 
+                                                      iMovable* movable)
 {
 #ifdef CS_USE_NEW_RENDERER
+  SetupObject ();
+
+  if (!factory->cstxt)
+  {
+    factory->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Error! Trying to draw a sprite with no material!");
+    return false;
+  }
+
+  iCamera* camera = rview->GetCamera ();
+
+
+  // First create the transformation from object to camera space directly:
+  //   W = Mow * O - Vow;
+  //   C = Mwc * (W - Vwc)
+  // ->
+  //   C = Mwc * (Mow * O - Vow - Vwc)
+  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+
+  csVector3 radius;
+  csSphere sphere;
+  GetRadius (radius, sphere.GetCenter ());
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  sphere.SetRadius (max_radius);
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
+  	clip_z_plane) == false)
+    return false;
+
+  //first, check if we have any usable mesh
+  if(lastMeshPtr->inUse == true)
+  {
+    lastMeshPtr = 0;
+    //check the list
+    int i;
+    for(i = 0; i<meshes.Length (); i++)
+    {
+      if (meshes[i]->inUse == false){
+        lastMeshPtr = meshes[i];
+        break;
+      }
+    }
+    if (lastMeshPtr == 0)
+    {
+      lastMeshPtr = new csRenderMesh;
+      meshes.Push (lastMeshPtr);
+    }
+  }
+
+
+  UpdateWorkTables (factory->GetVertexCount());
+
+  CS_ASSERT (cur_action != 0);
+  csSpriteFrame * cframe = cur_action->GetCsFrame (cur_frame);
+
+  // Get next frame for animation tweening.
+  csSpriteFrame * next_frame = cur_action->GetCsNextFrame (cur_frame);
+
+  // First create the transformation from object to camera space directly:
+  //   W = Mow * O - Vow;
+  //   C = Mwc * (W - Vwc)
+  // ->
+  //   C = Mwc * (Mow * O - Vow - Vwc)
+  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
+
+
+  bool do_tween = false;
+  if (!skeleton_state && tween_ratio) do_tween = true;
+
+  int cf_idx = cframe->GetAnmIndex();
+
+  csVector3* real_obj_verts;
+  csVector3* real_tween_verts = 0;
+
+  real_obj_verts = factory->GetVertices (cf_idx);
+  if (do_tween)
+  {
+    int nf_idx = next_frame->GetAnmIndex();
+    real_tween_verts = factory->GetVertices (nf_idx);
+  }
+
+  // If we have a skeleton then we transform all vertices through
+  // the skeleton. In that case we also include the camera transformation
+  // so that the 3D renderer does not need to do it anymore.
+  csVector3* verts;
+  if (skeleton_state)
+  {
+    skeleton_state->Transform (tr_o2c, real_obj_verts, tr_verts->GetArray ());
+    verts = tr_verts->GetArray ();
+  }
+  else
+  {
+    verts = real_obj_verts;
+  }
+
+  // Calculate the right LOD level for this sprite.
+
+  // Select the appropriate mesh.
+  csTriangleMesh* m;
+  int* emerge_from = 0;
+
+  float fnum = 0.0f;
+
+  // GetLodLevel() is the distance at which you will see full detail
+  float level_of_detail = 1;
+
+  if (IsLodEnabled ())
+  {
+    // reduce LOD based on distance from camera to center of sprite
+    csBox3 obox;
+    GetObjectBoundingBox (obox);
+    csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
+    csVector3 wor_center;
+    if (movable->IsFullTransformIdentity ())
+      wor_center = obj_center;
+    else
+      wor_center = movable->GetFullTransform ().This2Other (obj_center);
+    csVector3 cam_origin = camera->GetTransform ().GetOrigin ();
+    float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
+    level_of_detail = GetLodLevel (qsqrt (wor_sq_dist));
+
+    // reduce LOD based on field-of-view
+    float aspect = 2 * (float) tan (camera->GetFOVAngle () * PI / 360);
+    level_of_detail *= aspect;
+
+    if (level_of_detail < 0) level_of_detail = 0;
+    else if (level_of_detail >= 1) level_of_detail = 1;
+  }
+
+  if (level_of_detail < 1)
+  {
+    // We calculate the number of vertices to use for this LOD
+    // level. The integer part will be the number of vertices.
+    // The fractional part will determine how much to morph
+    // between the new vertex and the previous last vertex.
+    fnum = level_of_detail * (factory->GetVertexCount() + 1);
+    num_verts_for_lod = (int)fnum;
+    fnum -= num_verts_for_lod;  // fnum is now the fractional part.
+
+    GenerateSpriteLOD (num_verts_for_lod);
+    emerge_from = factory->GetEmergeFrom ();
+    m = mesh;
+  }
+  else
+  {
+    num_verts_for_lod = factory->GetVertexCount ();
+    m = factory->GetTexelMesh ();
+  }
+
+  if (num_verts_for_lod <= 1) return false;
+
+  int i;
+
+  csVector2* real_uv_verts;
+  // Do vertex morphing if needed.
+  //
+  // @@@ Don't understand this piece of code.
+  //   Why is it checking if the level == 0, and negative?  neg is supposed
+  //    to be off.  zero is a valid on number...???
+  if (level_of_detail <= 0 || level_of_detail >= 1)
+  {
+    real_uv_verts = factory->GetTexels (cf_idx);
+  }
+  else
+  {
+    for (i = 0 ; i < num_verts_for_lod ; i++)
+    {
+      csVector2 uv;
+      if (i < num_verts_for_lod-1)
+      {
+        uv = factory->GetTexel (cf_idx, i);
+      }
+      else
+      {
+        // Morph between the last vertex and the one we morphed from.
+        uv = (1-fnum) * factory->GetTexel (cf_idx, emerge_from[i])
+          + fnum * factory->GetTexel (cf_idx, i);
+      }
+
+      (*uv_verts)[i] = uv;
+    }
+    real_uv_verts = uv_verts->GetArray ();
+  }
+
+  // Setup the structure for DrawTriangleMesh.
+  if (force_otherskin)
+  {
+    lastMeshPtr->material = cstxt;
+    cstxt->Visit ();
+  }
+  else
+  {
+    lastMeshPtr->material = factory->cstxt;
+    factory->cstxt->Visit ();
+  }
+  if (!vertex_colors) AddVertexColor (0, csColor (0, 0, 0));
+
+  final_verts = verts;
+  final_texcoords = real_uv_verts;
+  final_colors = vertex_colors;
+  final_triangles = m->GetTriangles ();
+  final_num_vertices = num_verts_for_lod;
+  final_num_triangles = m->GetTriangleCount ();
+
+  lastMeshPtr->clip_portal = clip_portal;
+  lastMeshPtr->clip_plane = clip_plane;
+  lastMeshPtr->clip_z_plane = clip_z_plane;
+  lastMeshPtr->do_mirror = camera->IsMirrored ();
+
+
+  if (factory->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = factory->light_mgr
+    	->GetRelevantLights (logparent, -1, false);
+    UpdateLighting (relevant_lights, movable);
+  }
+
   {
     csShaderVariable* sv;
     sv = svcontext.GetVariableAdd (vertices_name);
@@ -1895,16 +2103,17 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n)
   if (skeleton_state) 
   {
     /* set to identify for software skeleton */
-    rendermesh.object2camera = csReversibleTransform ();
+    lastMeshPtr->object2camera = csReversibleTransform ();
   }
-  rendermesh.mixmode = CS_FX_COPY;
-  rendermesh.indexstart = 0;
-  rendermesh.indexend = final_num_triangles * 3;
+  lastMeshPtr->mixmode = CS_FX_COPY;
+  lastMeshPtr->indexstart = 0;
+  lastMeshPtr->indexend = final_num_triangles * 3;
   
-  rendermesh.variablecontext = &svcontext;
-  rendermesh.meshtype = CS_MESHTYPE_TRIANGLES;
-  meshptr = &rendermesh;
-  return &meshptr;
+  lastMeshPtr->variablecontext = &svcontext;
+  lastMeshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
+  lastMeshPtr->inUse = true;
+  n = 1;
+  return &lastMeshPtr;
 #else
   n = 0;
   return 0;

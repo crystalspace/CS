@@ -96,7 +96,8 @@ public:
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 
-  virtual csRenderMesh **GetRenderMeshes (int &num)
+  virtual csRenderMesh **GetRenderMeshes (int &num ,iRenderView* rview, 
+    iMovable* movable)
   {
     num = 0;
     return 0;

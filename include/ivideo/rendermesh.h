@@ -64,12 +64,16 @@ struct csRenderMesh
     indexstart = indexend = 0;
     portal = 0;
     geometryInstance = 0;
+    inUse = false;
 #ifdef CS_DEBUG
     db_mesh_name = "<unknown>";
 #endif
   }
 
   ~csRenderMesh () {}
+
+  /// In use by the rendering system
+  bool inUse;
 
   /// Z mode to use
   csZBufMode z_buf_mode;

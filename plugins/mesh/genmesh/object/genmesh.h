@@ -83,8 +83,8 @@ class csGenmeshMeshObject : public iMeshObject
 {
 private:
 #ifdef CS_USE_NEW_RENDERER
-  csRenderMesh mesh;
-  csRenderMesh* meshPtr;
+  csDirtyAccessArray<csRenderMesh*> meshes;
+  csRenderMesh *lastMeshPtr;
   csShaderVariableContext* svcontext;
   csRef<iGraphics3D> g3d;
   bool mesh_colors_dirty_flag;
@@ -220,7 +220,8 @@ public:
   virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
-  virtual csRenderMesh** GetRenderMeshes (int &n);
+  virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
+    iMovable* movable);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();

@@ -134,7 +134,8 @@ class csStuffObject : public iMeshObject
     // |-------------------------------//
     virtual csFlags& GetFlags () { return flags; }
     virtual bool    DrawTest(iRenderView * rview, iMovable * movable);
-    virtual csRenderMesh **GetRenderMeshes (int & n) { n = 0; return 0; }
+    virtual csRenderMesh **GetRenderMeshes (int & n,iRenderView* rview, 
+      iMovable* movable) { n = 0; return 0; }
     virtual bool    Draw(iRenderView * rview, iMovable * movable,
 			 csZBufMode zbufmode);
 

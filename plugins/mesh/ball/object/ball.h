@@ -35,6 +35,7 @@
 #include "ivideo/rendermesh.h"
 #include "iengine/lightmgr.h"
 #include "csgfx/shadervarcontext.h"
+#include "csutil/garray.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -80,8 +81,9 @@ private:
 #ifdef CS_USE_NEW_RENDERER
   unsigned int* ball_indices;
   int ball_triangles;
-  csRenderMesh mesh;
-  csRenderMesh* meshPtr;
+  
+  csDirtyAccessArray<csRenderMesh*> meshes;
+  csRenderMesh *lastMeshPtr;
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
@@ -245,7 +247,8 @@ public:
 
   int GetVertexCount () { SetupObject(); return num_ball_vertices; }
   csVector3* GetVertices () { SetupObject (); return ball_vertices; }
-  virtual csRenderMesh **GetRenderMeshes (int &num);
+  virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView* rview, 
+    iMovable* movable);
 
 #ifndef CS_USE_NEW_RENDERER
   int GetTriangleCount () { SetupObject(); return top_mesh.num_triangles; }

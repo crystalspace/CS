@@ -153,6 +153,8 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   ball_triangle_dirty_flag = false;
 
   svcontext.AttachNew (new csShaderVariableContext);
+  lastMeshPtr = new csRenderMesh;
+  meshes.Push (lastMeshPtr);
 #endif
 }
 
@@ -166,6 +168,14 @@ csBallMeshObject::~csBallMeshObject ()
   delete[] polygons;
 #ifdef CS_USE_NEW_RENDERER
   delete[] ball_indices;
+
+  //clear up rendermeshes
+  while (meshes.Length () > 0)
+  {
+    csRenderMesh *mesh = meshes.Pop ();
+    delete mesh;
+  }
+
 #else
   delete[] top_mesh.triangles;
   delete[] top_mesh.vertex_fog;
@@ -675,9 +685,51 @@ void csBallMeshObject::UpdateBufferSV()
 }
 #endif // CS_USE_NEW_RENDERER
 
-csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
+csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview, 
+                                                  iMovable* movable)
 {
 #ifdef CS_USE_NEW_RENDERER
+
+  SetupObject ();
+
+  iCamera* camera = rview->GetCamera ();
+
+  // First create the transformation from object to camera space directly:
+  //   W = Mow * O - Vow;
+  //   C = Mwc * (W - Vwc)
+  // ->
+  //   C = Mwc * (Mow * O - Vow - Vwc)
+  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
+  csReversibleTransform tr_o2c;
+  tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+
+  csVector3 radius;
+  csSphere sphere;
+  scfiObjectModel.GetRadius (radius, sphere.GetCenter ());
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  sphere.SetRadius (max_radius);
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
+    clip_z_plane) == false)
+  {
+    num = 0;
+    return 0;
+  }
+
+
+  if (((csBallMeshObjectFactory*)factory)->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights
+      = ((csBallMeshObjectFactory*)factory)->light_mgr
+      ->GetRelevantLights (logparent, -1, false);
+    UpdateLighting (relevant_lights, movable);
+  }
+
+
   iMaterialWrapper* mater = material;
 
   if (!mater)
@@ -685,26 +737,46 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
     printf ("INTERNAL ERROR: mesh used without material!\n");
     return false;
   }
-
-
-  // iGraphics3D* g3d = rview->GetGraphics3D ();
   UpdateBufferSV ();
   mater->Visit ();
-  //mesh.transform = &tr_o2c;
 
-  // Prepare for rendering.
-  mesh.mixmode = CS_FX_COPY; // MixMode;
 
-  mesh.indexstart = 0;
-  mesh.indexend = ball_triangles * 3;
-  //mesh.mathandle = mater->GetMaterialHandle();
-  mesh.material = mater;
-  mesh.variablecontext = svcontext;
-
-  mesh.meshtype = CS_MESHTYPE_TRIANGLES;
-  meshPtr = &mesh;
+  //first, check if we have any usable mesh
+  if(lastMeshPtr->inUse == true)
+  {
+    lastMeshPtr = 0;
+    //check the list
+    int i;
+    for(i = 0; i<meshes.Length (); i++)
+    {
+      if (meshes[i]->inUse == false){
+        lastMeshPtr = meshes[i];
+        break;
+      }
+    }
+    if (lastMeshPtr == 0)
+    {
+      lastMeshPtr = new csRenderMesh;
+      meshes.Push (lastMeshPtr);
+    }
+  }
+  
+  lastMeshPtr->inUse = true;
+  lastMeshPtr->mixmode = CS_FX_COPY; // MixMode;
+  lastMeshPtr->clip_portal = clip_portal;
+  lastMeshPtr->clip_plane = clip_plane;
+  lastMeshPtr->clip_z_plane = clip_z_plane;
+  lastMeshPtr->do_mirror = camera->IsMirrored ();  
+  lastMeshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
+  lastMeshPtr->indexstart = 0;
+  lastMeshPtr->indexend = ball_triangles * 3;
+  lastMeshPtr->material = mater;
+  lastMeshPtr->object2camera = tr_o2c;
+  lastMeshPtr->variablecontext = svcontext;
+  lastMeshPtr->geometryInstance = (void*)factory;
+  
   num = 1;
-  return &meshPtr;
+  return &lastMeshPtr;
 #else
   num = 0;
   return 0;
@@ -759,13 +831,7 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   	clip_z_plane) == false)
     return false;
 
-#ifdef CS_USE_NEW_RENDERER
-  mesh.object2camera = tr_o2c;
-  mesh.clip_portal = clip_portal;
-  mesh.clip_plane = clip_plane;
-  mesh.clip_z_plane = clip_z_plane;
-  mesh.do_mirror = camera->IsMirrored ();  
-#else
+#ifndef CS_USE_NEW_RENDERER
   iGraphics3D* g3d = rview->GetGraphics3D ();
   g3d->SetObjectToCamera (&tr_o2c);
   top_mesh.clip_portal = clip_portal;

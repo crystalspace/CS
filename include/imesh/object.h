@@ -124,15 +124,8 @@ struct iMeshObject : public iBase
   /**
    * For NR: @@@ document me!!!
    */
-  virtual csRenderMesh** GetRenderMeshes (int& num) = 0;
-
-  /* For NR: @@@ document me!!!
-  virtual bool DrawShadow (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode, iLight *light) = 0;
-
-  virtual bool DrawLight (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode, iLight *light) = 0;
-  */
+  virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
+    iMovable* movable) = 0;
 
   /**
    * Register a callback to the mesh object which will be called

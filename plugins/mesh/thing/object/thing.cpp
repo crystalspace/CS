@@ -1575,6 +1575,9 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 
 #ifndef CS_USE_NEW_RENDERER
   polybuf = 0;
+#else
+  rmHolderList.Push (new rmHolder);
+  rmHolderListIndex = 0;
 #endif // CS_USE_NEW_RENDERER
   current_visnr = 1;
 
@@ -2409,39 +2412,6 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
   sphere.SetCenter (b.GetCenter ());
   sphere.SetRadius (static_data->max_obj_radius);
 
-#ifdef CS_USE_NEW_RENDERER
-  //@@@
-  int i;
-  csReversibleTransform tr_o2c = camtrans;
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-  int clip_portal, clip_plane, clip_z_plane;
-  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-  	clip_z_plane) == false)
-    return false;
-
-  if (renderMeshes.Length() == 0)
-  {
-    PrepareRenderMeshes ();
-  }
-
-  for (i = 0; i < renderMeshes.Length(); i++)
-  {
-    csRenderMesh* rm = renderMeshes[i];
-    rm->object2camera = tr_o2c;
-    rm->clip_portal = clip_portal;
-    rm->clip_plane = clip_plane;
-    rm->clip_z_plane = clip_z_plane;
-    rm->do_mirror = icam->IsMirrored ();  
-
-    rm->variablecontext->GetVariable (static_data->texLightmapName)->
-      SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
-  }
-
-  UpdateDirtyLMs (); // @@@ Here?
-
-  return true;
-#else
   if (can_move)
   {
     csReversibleTransform tr_o2c = camtrans;
@@ -2455,7 +2425,7 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
     bool rc = rview->TestBSphere (camtrans, sphere);
     return rc;
   }
-#endif
+
 }
 
 bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
@@ -2658,54 +2628,135 @@ void csThing::PrepareLighting ()
 void csThing::PrepareRenderMeshes ()
 {
   int i;
-  for (i = 0; i < renderMeshes.Length () ; i++)
+  rmHolder *rmH = rmHolderList[rmHolderListIndex];
+
+  for (i = 0; i < rmH->renderMeshes.Length () ; i++)
   {
     // @@@ Is this needed?
-    if (renderMeshes[i]->variablecontext != 0)
-      renderMeshes[i]->variablecontext->DecRef ();
-    delete renderMeshes[i];
+    if (rmH->renderMeshes[i]->variablecontext != 0)
+      rmH->renderMeshes[i]->variablecontext->DecRef ();
+    delete rmH->renderMeshes[i];
   }
-  renderMeshes.DeleteAll ();
-  static_data->FillRenderMeshes (renderMeshes, replace_materials, mixmode);
+  rmH->renderMeshes.DeleteAll ();
+  static_data->FillRenderMeshes (rmH->renderMeshes, replace_materials, mixmode);
   materials_to_visit.DeleteAll ();
-  for (i = 0 ; i < renderMeshes.Length () ; i++)
+  for (i = 0 ; i < rmH->renderMeshes.Length () ; i++)
   {
-    if (renderMeshes[i]->material->IsVisitRequired ())
-      materials_to_visit.Push (renderMeshes[i]->material);
-    //renderMeshes[i]->dynDomain = 
+    if (rmH->renderMeshes[i]->material->IsVisitRequired ())
+      materials_to_visit.Push (rmH->renderMeshes[i]->material);
   }
 }
 
 void csThing::ClearRenderMeshes ()
 {
-  for (int i = 0; i < renderMeshes.Length(); i++)
+  rmHolder *rmH;
+  while (rmHolderList.Length() > 0)
   {
-    delete renderMeshes[i];
+    rmH = rmHolderList.Pop();
+    for (int i = 0; i < rmH->renderMeshes.Length(); i++)
+    {
+      delete rmH->renderMeshes[i];
+    }
+    rmH->renderMeshes.DeleteAll ();
+    delete rmH;
   }
-  renderMeshes.DeleteAll ();
+  rmHolderList.DeleteAll();
 }
 
 #endif
 
-csRenderMesh **csThing::GetRenderMeshes (int &num)
+csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview, 
+                                         iMovable* movable)
 {
 #ifdef CS_USE_NEW_RENDERER
-  // @@@ "dirtiness" check
-  if (renderMeshes.Length() == 0)
+  Prepare ();
+
+  iCamera *icam = rview->GetCamera ();
+  const csReversibleTransform &camtrans = icam->GetTransform ();
+
+  // Only get the transformation if this thing can move.
+  bool can_move = false;
+  if (movable && cfg_moving != CS_THING_MOVE_NEVER)
+  {
+    can_move = true;
+  }
+
+  //@@@ Ok?
+  cached_movable = movable;
+  WorUpdate ();
+
+  csBox3 b;
+  static_data->GetBoundingBox (b);
+
+  csSphere sphere;
+  sphere.SetCenter (b.GetCenter ());
+  sphere.SetRadius (static_data->max_obj_radius);
+
+  //@@@
+  int i;
+  csReversibleTransform tr_o2c = camtrans;
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
+    clip_z_plane) == false)
+  {
+    num = 0;
+    return 0;    
+  }
+
+  rmHolder *rmH = rmHolderList[rmHolderListIndex];
+
+  if (rmH->renderMeshes.Length() > 0 && rmH->renderMeshes[0]->inUse)
+  {
+    rmHolderListIndex = -1;
+    //find an empty rmH
+    for(i = 0; i < rmHolderList.Length(); i++)
+    {
+      rmH = rmHolderList[i];
+      csRenderMesh *m = rmH->renderMeshes[0];
+      if (rmH->renderMeshes.Length() == 0 || rmH->renderMeshes[0]->inUse == false)
+      {
+        rmHolderListIndex = i;
+        break;
+      }
+    }
+    if (rmHolderListIndex == -1)
+    {
+      rmHolderList.Push (new rmHolder);
+      rmHolderListIndex = rmHolderList.Length()-1;
+      rmH = rmHolderList[rmHolderListIndex];
+    }
+  }
+  
+  if (rmH->renderMeshes.Length() == 0)
   {
     PrepareRenderMeshes ();
   }
 
-  //PrepareLMs (); // @@@ Maybe more here ?
+  for (i = 0; i < rmH->renderMeshes.Length(); i++)
+  {
+    csRenderMesh* rm = rmH->renderMeshes[i];
+    rm->object2camera = tr_o2c;
+    rm->clip_portal = clip_portal;
+    rm->clip_plane = clip_plane;
+    rm->clip_z_plane = clip_z_plane;
+    rm->do_mirror = icam->IsMirrored ();
+    rm->inUse = true;
 
-  int i;
-  num = renderMeshes.Length ();
+    rm->variablecontext->GetVariable (static_data->texLightmapName)->
+      SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
+  }
+
+  UpdateDirtyLMs (); // @@@ Here?
+
+  num = rmH->renderMeshes.Length ();
   for (i = 0; i < materials_to_visit.Length (); i++)
   {
     materials_to_visit[i]->Visit ();
   }
 
-  return renderMeshes.GetArray ();
+  return rmH->renderMeshes.GetArray ();
 #else
   return 0;
 #endif

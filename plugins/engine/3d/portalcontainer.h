@@ -157,8 +157,9 @@ private:
 	const csReversibleTransform& movtrans, iRenderView *rview,
 	const csPlane3& camera_plane);
 
-  csRenderMesh rmesh;
-  csRenderMesh *rmeshPtr;
+  csDirtyAccessArray<csRenderMesh*> meshes;
+  csRenderMesh *lastMeshPtr;
+
   csFlags flags;
   csMeshWrapper* meshwrapper;
 
@@ -226,12 +227,8 @@ public:
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0);
 
-  virtual csRenderMesh** GetRenderMeshes (int& num)
-  {
-    num = 1;
-    rmeshPtr = &rmesh;
-    return &rmeshPtr;
-  }
+  virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
+    iMovable* movable);
 
   //--------------------- For csMeshObject ------------------------------//
   virtual void GetObjectBoundingBox (csBox3& bbox, int)
