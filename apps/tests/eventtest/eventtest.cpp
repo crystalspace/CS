@@ -129,90 +129,72 @@ bool run_event_tests(iObjectRegistry* object_reg)
   }
 
   csRef<iEvent> e = q->CreateEvent(1);
-  fprintf (stdout, "Ok, now it's time to test the events themselves...\n\n");
+  fprintf (stdout, "Ok, now it's time to test the events themselves:\n");
   
-  fprintf (stdout, "Firstly, let's add one of each data type.\n");
-  
-  fprintf (stdout, "\nAdding an my_int8... %s\n", e->Add("my_int8", (int8)1) ? "Sucess!\n" : "Failure!\n");
-  fprintf (stdout, "Adding an my_uint8... %s\n", e->Add("my_uint8", (uint8)1) ? "Sucess!\n" : "Failure!\n");
-  fprintf (stdout, "Adding an my_int16... %s\n", e->Add("my_int16", (int16)1) ? "Sucess!\n" : "Failure!\n");
-  fprintf (stdout, "Adding an my_uint16... %s\n", e->Add("my_uint16", (uint16)1) ? "Sucess!\n" : "Failure!\n");
-  fprintf (stdout, "Adding an my_int32... %s\n", e->Add("my_int32", (int32)1) ? "Sucess!\n" : "Failure!\n");
-  fprintf (stdout, "Adding an my_uint32... %s\n", e->Add("my_uint32", (uint32)1) ? "Sucess!\n" : "Failure!\n");
-  fprintf (stdout, "Adding an my_float... %s\n", e->Add("my_float", (float)1.0) ? "Sucess!\n" : "Failure!\n");
-  fprintf (stdout, "Adding an my_double... %s\n", e->Add("my_double", (double)1.0) ? "Sucess!\n" : "Failure!\n");
-  fprintf (stdout, "Adding an my_bool... %s\n", e->Add("my_bool", (bool)true) ? "Sucess!\n" : "Failure!\n");
-  fprintf (stdout, "Adding an my_string... %s\n", e->Add("my_string", "Hello World!") ? "Sucess!\n" : "Failure!\n");
-  
-  
-  fprintf (stdout, "\nOk, now lets print the iEvent's contents\n");
-  e->Print();
-
-  fprintf (stdout, "\n\nOk, now let's find them!\n");
-
+  fprintf (stdout, "Adding an my_int8... %s\n", e->Add("my_int8", (int8)1) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_uint8... %s\n", e->Add("my_uint8", (uint8)1) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_int16... %s\n", e->Add("my_int16", (int16)1) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_uint16... %s\n", e->Add("my_uint16", (uint16)1) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_int32... %s\n", e->Add("my_int32", (int32)1) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_uint32... %s\n", e->Add("my_uint32", (uint32)1) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_int64... %s\n", e->Add("my_int64", (int64)1) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_uint64... %s\n", e->Add("my_uint64", (uint64)1) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_float... %s\n", e->Add("my_float", (float)1.0) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_double... %s\n", e->Add("my_double", (double)1.0) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_bool... %s\n", e->Add("my_bool", (bool)true) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_string... %s\n", e->Add("my_string", "Hello World!") ? "Sucess!" : "Failure!");
   int8 my_int8 = 0;
-  fprintf (stdout, "Searching for my_int8...%s", e->Find("my_int8", my_int8) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %d\n", my_int8);
+  fprintf (stdout, "Searching for my_int8...%s", e->Find("my_int8", my_int8) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %d)\n", my_int8);
   uint8 my_uint8 = 0;
-  fprintf (stdout, "Searching for my_uint8...%s", e->Find("my_uint8", my_uint8) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %d\n", my_uint8);
+  fprintf (stdout, "Searching for my_uint8...%s", e->Find("my_uint8", my_uint8) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %d)\n", my_uint8);
   int16 my_int16 = 0;
-  fprintf (stdout, "Searching for my_int16...%s", e->Find("my_int16", my_int16) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %d\n", my_int16);
+  fprintf (stdout, "Searching for my_int16...%s", e->Find("my_int16", my_int16) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %d)\n", my_int16);
   uint16 my_uint16 = 0;
-  fprintf (stdout, "Searching for my_uint16...%s", e->Find("my_uint16", my_uint16) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %d\n", my_uint16);
+  fprintf (stdout, "Searching for my_uint16...%s", e->Find("my_uint16", my_uint16) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %d)\n", my_uint16);
   int32 my_int32 = 0;
-  fprintf (stdout, "Searching for my_int32...%s", e->Find("my_int32", my_int32) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %d\n", my_int32);
+  fprintf (stdout, "Searching for my_int32...%s", e->Find("my_int32", my_int32) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %d)\n", my_int32);
   uint32 my_uint32 = 0;
-  fprintf (stdout, "Searching for my_uint32...%s", e->Find("my_uint32", my_uint32) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %u\n", my_uint32);
+  fprintf (stdout, "Searching for my_uint32...%s", e->Find("my_uint32", my_uint32) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %u)\n", my_uint32);
+  int64 my_int64 = 0;
+  fprintf (stdout, "Searching for my_int64...%s", e->Find("my_int64", my_int64) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %lld)\n", my_int64);
+  uint64 my_uint64 = 0;
+  fprintf (stdout, "Searching for my_uint64...%s", e->Find("my_uint64", my_uint64) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %llu)\n", my_uint64);
   float my_float= 0;
-  fprintf (stdout, "Searching for my_float...%s", e->Find("my_float", my_float) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %f\n", my_float);
+  fprintf (stdout, "Searching for my_float...%s", e->Find("my_float", my_float) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %f)\n", my_float);
   double my_double = 0;
-  fprintf (stdout, "Searching for my_double...%s", e->Find("my_double", my_double) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %f\n", my_double);
+  fprintf (stdout, "Searching for my_double...%s", e->Find("my_double", my_double) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %f)\n", my_double);
   bool my_bool = false;
-  fprintf (stdout, "Searching for my_bool...%s", e->Find("my_bool", my_bool) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %s\n", my_bool ? "true" : "false");
+  fprintf (stdout, "Searching for my_bool...%s", e->Find("my_bool", my_bool) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %s)\n", my_bool ? "true" : "false");
   char *my_string = NULL;
-  fprintf (stdout, "Searching for my_string...%s", e->Find("my_string", &my_string) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %s\n", my_string);
-
-  fprintf (stdout, "\nOk, now let's add a databuffer..\n");
+  fprintf (stdout, "Searching for my_string...%s", e->Find("my_string", &my_string) ? "Success!" : "Failure!");
+  fprintf (stdout, "  (value: %s)\n", my_string);
   char buffer[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f };
-  fprintf (stdout, "\nAdding a databuffer 32 in length called my_databuffer... %s\n", e->Add("my_databuffer", (void*)buffer, 32) ? "Sucess!\n" : "Failure!\n");
-  
+  fprintf (stdout, "Adding a databuffer 32 in length called my_databuffer... %s\n", e->Add("my_databuffer", (void*)buffer, 32) ? "Sucess!" : "Failure!");
   my_string = NULL;
   uint32 l;
   bool found = false;
-  fprintf (stdout, "\nAnd now lets retrieve it:\n");
-  fprintf (stdout, "Searching for my_databuffer...%s", (found = e->Find("my_databuffer", (void**)&my_string, (uint32&)l, 0)) ? "Success!\n" : "Failure!\n");
+  fprintf (stdout, "Searching for my_databuffer...%s\n", (found = e->Find("my_databuffer", (void**)&my_string, (uint32&)l, 0)) ? "Success!" : "Failure!");
   if (found)
-    fprintf (stdout, "  Comparing buffers...%s\n", compare_buffers(my_string, (char*)buffer, 32) ? "Perfect!\n" : "Not the same!\n");
+    fprintf (stdout, "  Comparing buffers...%s\n", compare_buffers(my_string, (char*)buffer, 32) ? "Perfect!" : "Not the same!");
     
-  fprintf (stdout, "\nNow, it's time to add an Event to another Event.\n");
-  fprintf (stdout, "Frist, a test to see if the loop checking code works..\n");
-  fprintf (stdout, "We do this by adding to an event.. itself!\n");
-   
-  fprintf (stdout, "Adding an event as my_event... %s\n", e->Add("my_event", e) ? "Sucess!\n" : "Failure!\n");
-  
-  fprintf (stdout, "That should have failed.\n");
-  
-  fprintf (stdout, "\nNow, lets add a new event to our current event\n");
-  
+  fprintf (stdout, "Adding an this event to itself... %s\n", e->Add("my_event", e) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "  That should have failed.\n");
   csRef<iEvent> f = q->CreateEvent(1);
-  fprintf (stdout, "Adding an event as my_event... %s\n", e->Add("my_event", f) ? "Sucess!\n" : "Failure!\n");
-   
-  fprintf (stdout, "That should have succeeded.\n");
-  
-  fprintf (stdout, "\nAnd let's try adding the parent event to the child event\n");
-  fprintf (stdout, "thus creating an endless loop...\n");
-  fprintf (stdout, "Adding an event as my_event... %s\n", f->Add("my_event", e) ? "Sucess!\n" : "Failure!\n");
-  fprintf (stdout, "That should have failed.\n");
+  fprintf (stdout, "Adding a new event as my_event... %s\n", e->Add("my_event", f) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding the parent event to the child event... %s\n", f->Add("my_event", e) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "  That should have failed.\n");
   
   return true;
 }
