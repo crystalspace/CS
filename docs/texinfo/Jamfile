@@ -2,7 +2,7 @@ SubDir TOP docs texinfo ;
 
 if $(CMD.MAKEINFO)
 {
-  Texinfo manualinfo : cs-unix.txi : info : info manual ;
+  Texi2Info manualinfo : cs-unix.txi : info : info manual ;
   FLAGS.MAKEINFO on manualinfo += --output=crystal.info ;
   Help manualinfo : "user manual in info format" ;
 }

@@ -30,6 +30,15 @@ chronological order.
 	  they were exactly the same.
 	- Jorrit fixed the null mesh NewInstance() so that the parameters
 	  of the factory are copied to the null mesh.
+	- Eric Sunshine made the following changes to docs.jam and the other
+	  documentation-related Jamfiles:
+	    - Added documentation-specific 'clean' targets ('manualinfoclean',
+	      'manualhtmlclean', 'apihtmlclean', etc.).
+	    - Added a 'cleandoc' target (and a 'docclean' alias).
+	    - Updated the global 'clean' target to also remove built
+	      documentation.
+	    - Fixed several cases in docs.jam where it was hard-coding
+	      Unix-style pathnames when referencing supporting resources.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.
