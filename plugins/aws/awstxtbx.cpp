@@ -456,6 +456,8 @@ bool awsTextBox::OnMouseDown (int, int x, int y)
       WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->
 	GetDimensions (mask, mw, mh);
       strCursor = strStart + ((x - 4 - Frame ().xmin) / mw);
+	  if(strCursor > text->Length()) // maximum is string length.
+		  strCursor = text->Length();
     }
     else
     {
@@ -535,9 +537,9 @@ bool awsTextBox::OnKeyboard (const csKeyEventData& eventData)
         if (text && (text->Length () > 1))
         {
           csString tmp (text->GetData ());
-          tmp.DeleteAt (strCursor, chSize);
-	  text->Clear ();
-	  text->Append (tmp);
+         tmp.DeleteAt (strCursor, chSize);
+		text->Clear ();
+		text->Append (tmp);
         }
         else
           text->Clear ();

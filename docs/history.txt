@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Dec-2003
+	- Philipp Aumayr fixed a bug in AWS where a masked textbox raised an assert
+	  if the input was reactivated by clicking on the far right of the string.
 10-Dec-2003
 	- Eric Sunshine fixed bug in unix.mak where it was incorrectly
 	  exporting the hard-coded "-ldl -lm" to cs-config's --libs option even
