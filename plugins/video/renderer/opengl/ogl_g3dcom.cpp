@@ -955,6 +955,21 @@ void csGraphics3DOGLCommon::FinishDraw ()
 
 void csGraphics3DOGLCommon::Print (csRect * area)
 {
+#if 0
+  int fps_limit = 40; // for G400, 40 msec ( a fps limit of 50 fps )
+  cs_time elapsed_time, current_time;
+  System->GetElapsedTime(elapsed_time, current_time);
+  /// smooth last n frames, to avoid jitter when objects appear/disappear
+  static int num = 10;
+  static int times[10] = {0};
+  static int cur = 0;
+  static int totaltime = 0;
+  totaltime -= times[cur];
+  times[cur] = elapsed_time;
+  totaltime += times[cur];
+  cur = (cur+1)%num;
+  if(totaltime/10 < fps_limit) System->Sleep(fps_limit - totaltime/10);
+#endif
   G2D->Print (area);
   // glClear(GL_COLOR_BUFFER_BIT);
 }
