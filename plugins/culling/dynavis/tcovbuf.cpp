@@ -242,7 +242,7 @@ void csCoverageTile::FlushForEmptyConstFValue (csTileCol& fvalue,
   CS_ASSERT (fvalue != TILECOL_FULL);
   CS_ASSERT (num_operations == 0);
 
-  int i;
+//  int i;
   MakeEmptyQuick ();
   // We know fvalue will not be full (case handled elsewhere).
   tile_full = false;
@@ -270,7 +270,7 @@ void csCoverageTile::FlushForEmptyConstFValue (csTileCol& fvalue,
       do
       {
         *ldepth++ = maxdepth;
-	i--;
+//	i--;
       }
       while (ldepth < ldepth_end);
     else ldepth = ldepth_end;
