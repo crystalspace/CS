@@ -20,13 +20,14 @@
   TODO:
     Make nice startup screen with moving blocks as demo.
     Print out score.
-    Improve 'new game'.
     Detect end of game when blocks are too high.
     Better rotation of blocks.
     Better textures.
     Better recognition of side of play area.
     Make keys configurable.
     Fix bug with partially shifted blocks.
+    Add highscore list.
+    Add 'nightmare' level.
  */
 
 #define SYSDEF_ACCESS
@@ -345,18 +346,6 @@ void Blocks::add_cube_template ()
   p->AddVertex (7);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-#if 0
-  p = new csPolygonTemplate (cube_tmpl, "f", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (7);
-  p->AddVertex (6);
-  p->AddVertex (2);
-  p->AddVertex (3);
-  p->PlaneNormal (&A, &B, &C);
-  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	cube_tmpl->Vtex (7), cube_tmpl->Vtex (6), CUBE_DIM, A, B, C);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-#else
   p = new csPolygonTemplate (cube_tmpl, "f1", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (7);
@@ -370,7 +359,6 @@ void Blocks::add_cube_template ()
   p->AddVertex (2);
   p->AddVertex (3);
   p->SetTextureSpace (tx_matrix, tx_vector);
-#endif
 
   p = new csPolygonTemplate (cube_tmpl, "l1", cube_txt);
   cube_tmpl->AddPolygon (p);
@@ -792,7 +780,6 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
       cam_move_dest = cam_move_src - .3 * (view_origin - cam_move_src);
       cam_move_up = csVector3 (0, -1, 0);
       break;
-    case CSKEY_F1: G2D->PerformExtension ("sim_pal"); break;
     case 'w': start_rotation (ROT_PX); break;
     case 's': start_rotation (ROT_MX); break;
     case 'e': start_rotation (ROT_PY); break;
@@ -803,8 +790,8 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
     case 'k': start_horizontal_move (move_down_dx, move_down_dy); break;
     case 'j': start_horizontal_move (-move_right_dx, -move_right_dy); break;
     case 'l': start_horizontal_move (move_right_dx, move_right_dy); break;
-    case ' ': if (speed == 7) speed = 0.2; // Space changes speeds now.
-	      else speed = 7; break;
+    case ' ': if (speed == 9) speed = 0.2; // Space changes speeds now.
+	      else speed = 9; break;
     case 'p': pause = !pause; break;
     case CSKEY_ESC: newgame = true; startup_screen = true; break;
   }
@@ -948,8 +935,6 @@ void Blocks::move_cubes (time_t elapsed_time)
   float elapsed_move = elapsed*1.6;
   float elapsed_cam_move = elapsed*1.6;
 
-  csPolygonSet::current_light_frame_number++;
-
   if (startup_screen)
   {
     float old_dyn_x = dynlight_x;
@@ -1063,6 +1048,7 @@ void Blocks::move_cubes (time_t elapsed_time)
     reset_vertex_colors (t);
     room->ShineLights (t);
   }
+  csPolygonSet::current_light_frame_number++;
 }
 
 void Blocks::InitTextures ()
@@ -1134,19 +1120,13 @@ void Blocks::InitWorld ()
   Sys->add_pilar (-1, ZONE_DIM);
   Sys->add_pilar (ZONE_DIM, ZONE_DIM);
 
-  csStatLight* light;
-  light = new csStatLight (-3, 5, 0, 10, 1, 0, 0, false);
-  room->AddLight (light);
-  light = new csStatLight (3, 5, 0, 10, 0, 0, 1, false);
-  room->AddLight (light);
-  light = new csStatLight (0, 5, -3, 10, 0, 1, 0, false);
-  room->AddLight (light);
-  light = new csStatLight (0, (ZONE_HEIGHT-3-3)*CUBE_DIM+1, 0,
-  	CUBE_DIM*10, .5, .5, .5, false);
-  room->AddLight (light);
-  light = new csStatLight (0, (ZONE_HEIGHT-3+3)*CUBE_DIM+1, 0,
-  	CUBE_DIM*10, .5, .5, .5, false);
-  room->AddLight (light);
+  room->AddLight (new csStatLight (-3, 5, 0, 10, .8, .4, .4, false));
+  room->AddLight (new csStatLight (3, 5, 0, 10, .4, .4, .8, false));
+  room->AddLight (new csStatLight (0, 5, -3, 10, .4, .8, .4, false));
+  room->AddLight (new csStatLight (0, (ZONE_HEIGHT-3-3)*CUBE_DIM+1, 0,
+  	CUBE_DIM*10, .5, .5, .5, false));
+  room->AddLight (new csStatLight (0, (ZONE_HEIGHT-3+3)*CUBE_DIM+1, 0,
+  	CUBE_DIM*10, .5, .5, .5, false));
 
   //-----
   // Prepare the demo area.
@@ -1163,11 +1143,10 @@ void Blocks::InitWorld ()
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 100);
   p->SetFlags (CS_POLY_MIPMAP, 0);
 
-  light = new csStatLight (0, 0, -2, 10, .4, .4, .4, false);
-  demo_room->AddLight (light);
+  demo_room->AddLight (new csStatLight (0, 0, -2, 10, .4, .4, .4, false));
 
   float char_width = CUBE_DIM*4.;
-  float offset_x = -char_width * (6/2);
+  float offset_x = -char_width * (6/2)+CUBE_DIM*2;
   Sys->start_demo_shape (SHAPE_DEMO_B, offset_x, 3, 4); offset_x += char_width;
   Sys->start_demo_shape (SHAPE_DEMO_L, offset_x, 3, 4); offset_x += char_width;
   Sys->start_demo_shape (SHAPE_DEMO_O, offset_x, 3, 4); offset_x += char_width;
@@ -1184,11 +1163,11 @@ void Blocks::StartDemo ()
   newgame = false;
 
   dynlight_x = 0;
-  dynlight_y = 2;
-  dynlight_z = -2;
+  dynlight_y = 3;
+  dynlight_z = 0;
   dynlight_dx = 3;
   delete dynlight;
-  dynlight = new csDynLight (dynlight_x, dynlight_y, dynlight_z, 6, 3, 0, 0);
+  dynlight = new csDynLight (dynlight_x, dynlight_y, dynlight_z, 7, 3, 0, 0);
 
   Sys->world->AddDynLight (dynlight);
   dynlight->SetSector (demo_room);
@@ -1197,6 +1176,7 @@ void Blocks::StartDemo ()
   view->SetSector (demo_room);
   csVector3 pos (0, 3, -5);
   view->GetCamera ()->SetPosition (pos);
+  cam_move_up = csVector3 (0, -1, 0);
   view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 }
@@ -1218,6 +1198,7 @@ void Blocks::StartNewGame ()
   Sys->init_game ();
   Sys->start_shape ((BlShapeType)(rand () % difficulty), 3, 3, ZONE_HEIGHT-3);
 
+  cam_move_up = csVector3 (0, -1, 0);
   view->SetSector (room);
   Sys->move_camera ();
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);

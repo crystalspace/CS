@@ -21,7 +21,9 @@ Short-term cleanups that need to be done:
 	- When a dynamic light is deleted (with 'delete') it will now
 	  remove itself from the world.
 	- Eric Sunshine fixed several compilation warnings and errors in
-	  simpcons.h and cssprite.cpp which affliected MSVC++.
+	  simpcons.h and cssprite.cpp which afflicted MSVC++.
+	- Made the colors for Blocks a little nicer.
+	- Fixed bug with camera position. Uninitialized variable.
 31-Jan-2000
 	- Eric Sunshine fixed unixconf.sh so that it correctly captures
 	  and interprets output of 'which' command.
