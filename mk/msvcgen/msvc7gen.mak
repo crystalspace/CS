@@ -1,6 +1,6 @@
 #==============================================================================
 #
-#    Automatic MSVC-compliant DSW and DSP generation makefile
+#    Automatic MSVC7-compliant .SLN and .VCPROJ generation makefile
 #    Copyright (C) 2000,2001 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or
@@ -21,15 +21,15 @@
 #------------------------------------------------------------------------------
 # msvcgen.mak
 #
-#	A makefile for synthesizing a complete set of MSVC-compliant DSW and
-#	DSP project files based upon information gleaned from GNU makefiles
+#	A makefile for synthesizing a complete set of MSVC7-compliant .SLN and
+#	.VCPROJ project files based upon information gleaned from GNU makefiles
 #	project-wide.
 #
 #	This process strives to enforce the fundamental invariant that if the
 #	GNU makefile builds a working target (application, plug-in, library,
-#	etc.), then the synthesized DSW and DSP resources will also build a
+#	etc.), then the synthesized .SLN and .VCPROJ resources will also build a
 #	working target.  Thus, the headache associated with manual maintenance
-#	of the MSVC project files becomes a problem of the past.
+#	of the MSVC7 project files becomes a problem of the past.
 #
 # IMPORTS
 #	In the discussion which follows, assume that "PROJECT" is the core name
@@ -37,7 +37,7 @@
 #
 #	The following general-purpose makefile variables are imported from
 #	other makefiles, project-wide, in order to glean information needed to
-#	generate MSVC project files.
+#	generate MSVC7 project files.
 #
 #	o SRC.PROJECT -- List of source files which comprise this module.
 #
@@ -49,15 +49,17 @@
 #
 #	o CFG.PROJECT -- List of configuration files related to this module.
 #
-#	Furthermore, the following variables specifically control DSW and
-#	DSP project file creation.  These variables should only appear in
-#	makefiles for which a corresponding DSP file should be generated.
+#	Furthermore, the following variables specifically control .SLN and
+#	.VCPROJ project file creation.  These variables should only appear in
+#	makefiles for which a corresponding .VCPROJ file should be generated.
+#	Note: the variable names contain 'DSP' so that the information for MSVC6
+#	      DSW/DSP generation can be re-used.
 #
-#	o MSVC7.DSP -- Master list of modules for which project files should be
+#	o MSVC.DSP -- Master list of modules for which project files should be
 #	  generated.  Entries must be *appended* to this list with the "+="
 #	  operator.  Each entry is the core name of a module as used within its
 #	  makefile.  For example, soft3d.mak, modifies this variable with the
-#	  expression "MSVC7.DSP += SOFT3D".
+#	  expression "MSVC.DSP += SOFT3D".
 #
 #	o DSP.PROJECT.NAME -- Base name (such as "soft3d") for the generated
 #	  project and target.  This name is used to compose the DSP file name,
@@ -111,11 +113,11 @@
 #	The automatic MSVC project file generation mechanism also employs
 #	additional makefile components from the CS/mk/msvcgen directory.
 #
-#	o win32.mak -- Extends MSVC7.DSP with extra project targets which are
+#	o win32.mak -- Extends MSVC.DSP with extra project targets which are
 #	  specific to Windows or which are not otherwise represented by
 #	  stand-alone makefiles within the project hierarchy.
 #
-#	o required.mak -- Sets the value of the MSVC7.PLUGINS.REQUIRED variable.
+#	o required.mak -- Sets the value of the MSVC.PLUGINS.REQUIRED variable.
 #	  This variable supplements the list of plug-in modules defined by the
 #	  PLUGINS variable (see CS/mk/user.mak) and ensures that the correct
 #	  set of DSP files are generated even when invoking the project file
@@ -124,18 +126,18 @@
 # EXPORTS
 #	The following files are exported by this makefile:
 #
-#	o A DSP project file is generated for each project mentioned by the
-#	  MSVC7.DSP variable.
+#	o A .VCPROJ project file is generated for each project mentioned by the
+#	  MSVC.DSP variable.
 #
-#	o A single DSW file, named csall.dsw, is generated.  It contains
-#	  dependency information for all generated DSP projects.
+#	o A single .SLN file, named csall.sln, is generated.  It contains
+#	  dependency information for all generated .VCPROJ projects.
 #
 #	The following makefile targets are exported:
 #
-#	o msvcgen -- Generates the DSW file csall.dsw, as well as one DSP
-#	  project files for each module mentioned by the MSVC7.DSP variable.
+#	o msvc7gen -- Generates the .SLN file csall.sln, as well as one .VCPROJ
+#	  project files for each module mentioned by the MSVC.DSP variable.
 #
-#	o msvcinst -- Copies the newly generated project files over top of the
+#	o msvc7inst -- Copies the newly generated project files over top of the
 #	  existing files from the CVS repository and informs the user as to
 #	  exactly which CVS commands must be invoked in order to permanently
 #	  commit the new files to the repository.
@@ -160,7 +162,7 @@ PSEUDOHELP += \
   $(NEWLINE)echo $"  make msvc7gen     Rebuild the $(DESCRIPTION.msvc7gen)$" \
   $(NEWLINE)echo $"  make msvc7inst    Install the $(DESCRIPTION.msvc7inst)$"
 
-# Set MSVC7.PLUGINS.REQUIRED to a list of plug-ins for which DSP files must be
+# Set MSVC.PLUGINS.REQUIRED to a list of plug-ins for which DSP files must be
 # generated even if the current makefile target (i.e. 'linux') would not
 # normally build those plug-ins.  This list augments the normal PLUGINS list.
 include mk/msvcgen/required.mak
@@ -178,7 +180,7 @@ msvc7gen:
 	@echo $(SEPARATOR)
 	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ \
 	DO_MSVCGEN=yes DO_ASM=no USE_MAKEFILE_CACHE=no \
-	PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC7.PLUGINS.REQUIRED)'
+	PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
 
 msvc7inst: msvc7gen
 	@echo $(SEPARATOR)

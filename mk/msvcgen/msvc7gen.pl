@@ -705,30 +705,37 @@ file which makes up a file group (represented by vcprojgroup.tpi).  This
 template may contain the variable \%file\% which represents a file name
 provided as an argument to this script during .VCPROJ generation.
 
-During .VCPROJ file generation, a .SLN dependency fragment file can also be
-generated with the --fragment option and zero or more --depend options.
-The generated fragment file can later be used to create a complete .SLN file
-containing a dependency graph for the entire project.
+During .VCPROJ file generation, a couple of .SLN fragment files (for project, 
+configuration, and dependency information) can also be generated with the 
+--fragment option and zero or more --depend options. The generated fragment files 
+can later be used to create a complete .SLN file containing all .vcprojs, 
+configuration information and dependency graph for the entire project (That is, 
+to create a complete, valid Solution).
 
-The dependency fragment file is created from the template slngroup.tpi.
+The project fragment file is created from the template slngroup.tpi.
 This template may contain the variables \%project\%, \%vcproj\%, and
-\%depends\%.  The \%project\% variable has the same meaning as it does when
+\%guid\%.  The \%project\% variable has the same meaning as it does when
 used with the templates specified via --template.  The \%vcproj\% variable is
 replaced by the name of the generated .VCPROJ file (see --output), except that
-the directory portion of the path is stripped off.
+the directory portion of the path is stripped off. \%guid\% contains a unique 
+identifier every project in a MSVC7 Solution must have.  
+
+To create configuration fragments, the template slncfg.tpi is used. The only 
+variable it may contain is \%guid\%.
 
 The template slndep.tpi is used mulitple times to build a value for the
 \%depends\% variable mentioned above.  This template is used to specify each
-project name which makes up a dependency group (represented by
-slngroup.tpi).  This template may contain the variable \%depend\% which
-represents a project name upon which the generated .VCPROJ file depends (see
---depend).
+project guid which makes up a dependency group (represented by
+slngroup.tpi) for a specific project  This template may contain the variable 
+\%guid\%, \%depguid\% and \%depnum\%. \%depguid\% represents a project guid 
+upon which the generated .VCPROJ file depends (see --depend). \%depnum\% is 
+simply a counter, beginning with 0.
 
 Finally, a .SLN file is generated when --sln is specified.  The SLN file is
-created by merging the contents of dependency fragment files into the
-template sln.tpl.  This template may contain the variable \%groups\%, which
-is replaced by the collective contents of all fragment files named as
-arguments to this script during .SLN generation.
+created by merging the contents of fragment files into the template sln.tpl.  
+This template may contain the variable \%groups\%, \%depends\% and \%configs\%, 
+which are replaced by the collective contents of all fragments named as arguments 
+to this script during .SLN generation.
 
 Usage: $PROG_NAME [options] <file> ...
 
@@ -832,18 +839,18 @@ Global Options:
     -f <path>
     --fragment
     --fragment=<path>
-                 Specifies whether or not to generate a .SLN dependency
-                 fragment file along with the .VCPROJ file.  A dependency
-                 fragment file lists the other projects upon which this .VCPROJ
-                 relies.  If not specified, then no fragment file is
-                 generated.  If specified, but no path is given, then the
+                 Specifies whether or not to generate .SLN fragment files 
+                 along with the .VCPROJ file.  Fragment files list the other 
+                 projects upon which this .VCPROJ relies and some other stuff
+                 needed for the solution.  If not specified, then no fragments
+                 are generated.  If specified, but no path is given, then the
                  name given with --name is used as the fragment name.
-                 Fragment files use the suffix .sli.  This suffix is added
-                 automatically if absent.  Generated fragment files can
-                 later be incorporated into a .SLN file to collectively
-                 define a dependency graph for the entire project.  Each
-                 dependency specified with the --depend option is listed in
-                 the generated fragment file.
+                 Fragment files use the suffixes .frag, .frag.vpi, .frag.cfi 
+                 and .frag.dpi.  This suffixes are added automatically if absent.  
+                 Generated fragments can later be incorporated into a .SLN file 
+                 to collectively define a complete solution for the entire project.  
+                 each dependency specified with the --depend option is listed in
+                 the generated fragments.
     -D <project>
     --depend=<project>
                  Specifies the name of a project upon which this .VCPROJ depends.
@@ -856,13 +863,8 @@ Global Options:
                  only be used in conjunction with the --fragment option.
                  
 .SLN Options:
-<file> Path of a dependency fragment file emitted during a .VCPROJ generation
-       phase.  The fragment file contains a list of project names on which
-       the containing project fragment depends.  Any number of fragment
-       files may be specified, or none if the .SLN does not need to contain
-       any dependency groups.  Taken collectively, these fragments define an
-       entire dependency graph for the .SLN.  See the discussion of fragment
-       file generation (above) for details.
+<file> Path of a fragment file emitted during a .VCPROJ generation phase.  
+       See the discussion of fragment file generation (above) for details.
 
     -N <name>
     --name=<name>
