@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "csgeom/box.h"
 #include "isys/plugin.h"
+#include "ivideo/graph3d.h"
 
 struct iMeshObject;
 struct iMeshObjectFactory;
@@ -94,7 +95,7 @@ class csFlags;
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshWrapper, 0, 0, 5);
+SCF_VERSION (iMeshWrapper, 0, 0, 6);
 
 /**
  * This interface corresponds to the object in the engine
@@ -189,6 +190,15 @@ struct iMeshWrapper : public iBase
    * Get flags for this meshwrapper.
    */
   virtual csFlags& GetFlags () = 0;
+
+  /**
+   * Set the Z-buf drawing mode to use for this object.
+   */
+  virtual void SetZBufMode (csZBufMode mode) = 0;
+  /**
+   * Get the Z-buf drawing mode.
+   */
+  virtual csZBufMode GetZBufMode () = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 0, 3);

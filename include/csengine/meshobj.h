@@ -373,6 +373,14 @@ public:
     {
       return scfParent->flags;
     }
+    virtual void SetZBufMode (csZBufMode mode)
+    {
+      scfParent->SetZBufMode (mode);
+    }
+    virtual csZBufMode GetZBufMode ()
+    {
+      return scfParent->GetZBufMode ();
+    }
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 
