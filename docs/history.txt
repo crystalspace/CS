@@ -34,6 +34,11 @@ chronological order.
 	  whereas previously it was incorrectly setting the raw code.  Updated
 	  full-screen toggle in OSXDriver2D to reflect the corrected raw/cooked
 	  classification performed by OSXDelegate.
+	- Jorrit fixed a bug in the frozen OBB creation (csOBBFrozen class).
+	  It could crash if z happened to be 0. In addition to fixing that bug
+	  it will now also create a conservative projection of the OBB
+	  if one or more of the points are behind the view plane (z < 0).
+	  In the past it would simply create a huge screensize box.
 22-Oct-2003
 	- Jorrit fixed a bug in csMovableSectorList which did all the needed
 	  SCF stuff EXCEPT inherit from iBase. This is an old bug but for

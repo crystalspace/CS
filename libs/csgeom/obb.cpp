@@ -51,27 +51,50 @@ bool csOBBFrozen::ProjectOBB (
 	float& min_z, float& max_z)
 {
   csVector2 v;
-  Perspective (GetCorner (0), v, fov, sx, sy);
+  csVector3 p;
+  p = GetCorner (0);
+  min_z = p.z;
+  max_z = p.z;
+  if (p.z < .1)
+  {
+    // Conservative clipping to screen.
+    float iz = fov * 10;
+    v.x = p.x * iz + sx;
+    v.y = p.y * iz + sy;
+  }
+  else
+  {
+    Perspective (p, v, fov, sx, sy);
+  }
   sbox.StartBoundingBox (v);
-  min_z = GetCorner (0).z;
-  max_z = GetCorner (0).z;
   int i;
   for (i = 1; i < 8; i++)
   {
-    Perspective (GetCorner (i), v, fov, sx, sy);
-    sbox.AddBoundingVertexSmart (v);
-    float z = GetCorner (i).z;
+    p = GetCorner (i);
+    float z = p.z;
     if (z < min_z) min_z = z;
     else if (z > max_z) max_z = z;
+    if (z < .1)
+    {
+      float iz = fov * 10;
+      v.x = p.x * iz + sx;
+      v.y = p.y * iz + sy;
+    }
+    else
+    {
+      Perspective (p, v, fov, sx, sy);
+    }
+
+    sbox.AddBoundingVertexSmart (v);
   }
 
   if (max_z < 0.01) return false;
-  if (min_z < 0.01)
-  {
-    //@@@ Is there a better solution to this?
-    sbox.Set (-10000, -10000, 10000, 10000);
-    return true;
-  }
+  //if (min_z < 0.01)
+  //{
+    ////@@@ Is there a better solution to this?
+    //sbox.Set (-10000, -10000, 10000, 10000);
+    //return true;
+  //}
 
   return true;
 }
