@@ -32,6 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 ifeq ($(USE_PLUGINS),yes)
   GLX2D = $(OUTDLL)/glx2d$(DLL)
   LIB.GLX2D = $(foreach d,$(DEP.GLX2D),$($d.LIB))
+  LIB.GLX2D.LFLAGS = $(GL.LFLAGS)
   TO_INSTALL.DYNAMIC_LIBS += $(GLX2D)
 else
   GLX2D = $(OUT)/$(LIB_PREFIX)glx2d$(LIB)
@@ -64,7 +65,9 @@ $(OUT)/%$O: plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
 $(GLX2D): $(OBJ.GLX2D) $(LIB.GLX2D)
-	$(DO.PLUGIN) $(GL.LFLAGS)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.GLX2D.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: glx2dclean
 glx2dclean:

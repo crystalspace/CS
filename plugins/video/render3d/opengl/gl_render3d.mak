@@ -32,6 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 ifeq ($(USE_PLUGINS),yes)
   GLRENDER3D = $(OUTDLL)/glrender3d$(DLL)
   LIB.GLRENDER3D = $(foreach d,$(DEP.GLRENDER3D),$($d.LIB))
+  LIB.GLRENDER3D.LFLAGS = $(GL.LFLAGS)
   TO_INSTALL.DYNAMIC_LIBS += $(GLRENDER3D)
 else
   GLRENDER3D = $(OUT)/$(LIB_PREFIX)glrender3d$(LIB)
@@ -74,7 +75,7 @@ $(OUT)/%$O: plugins/video/render3d/opengl/%.cpp
 
 $(GLRENDER3D): $(OBJ.GLRENDER3D) $(LIB.GLRENDER3D)
 	$(DO.PLUGIN.PREAMBLE) \
-	$(DO.PLUGIN.CORE) $(GL.LFLAGS) \
+	$(DO.PLUGIN.CORE) $(LIB.GLRENDER3D.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
 
 glrender3dclean:

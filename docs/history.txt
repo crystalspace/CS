@@ -3,7 +3,9 @@ The history order is reversed so that new features are at the top.
 30-Jan-2003
 	- Matthias Braun made plugin makefiles using the CFLAGS from external
 	  libraries (3ds, mikmod, ogg/vorbis, openal, ode plugins)
-
+	- Eric Sunshine fixed problem in the various OpenGL renderer and canvas
+	  plugins in which GL.LFLAGS was being applied to the `ar' invocation
+	  for static builds.
 29-Jan-2003
 	- Matthias Braun fixed ogg loader crash when sound hasn't been
 	  initialized.
@@ -16,7 +18,6 @@ The history order is reversed so that new features are at the top.
 	- The software implementation of DrawPolygonMesh was not at all
 	  behaving well in case polygons go beyond the Z-plane. Fixed this
 	  now.
-
 28-Jan-2003
 	- Keith Fulton did the following:
 	    - Fixed opposite logic bug in binary sprite saver which was
