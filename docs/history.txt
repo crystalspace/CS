@@ -18,6 +18,9 @@ The history order is reversed so that new features are at the top.
 	  the `clean' target now deletes the generated executable,
 	  makefile.dep, and csconfig.mak.  David Calkins <dcalk@verizon.net>
 	  reported this shortcoming.
+	- res further worked on XMLifying map2cs.
+	- res changed the image, sound and model converter multiplexer to
+	  lazily load plugins.
 8-Feb-2003
 	- Reverted the changes of res for packed rgb struct since they
 	  don't appear to work on linux (png image loader crashes).
