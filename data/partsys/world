@@ -12,6 +12,7 @@ WORLD (
     TEXTURE 'andrew_marble4' (FILE (/lib/std/andrew_marble4.gif))
     TEXTURE 'sky' (FILE (/lib/stdtex/sky.jpg))
     TEXTURE 'fpart' (FILE (/lib/stdtex/fpart.png))
+    TEXTURE 'fp2' (FILE (/lib/stdtex/fp2.png))
   )
   MATERIALS (
     MATERIAL 'wood' (TEXTURE ('andrew_wood.jpg'))
@@ -23,6 +24,7 @@ WORLD (
     MATERIAL 'andrew_marble4' (TEXTURE ('andrew_marble4'))
     MATERIAL 'sky' (TEXTURE ('sky'))
     MATERIAL 'fpart' (TEXTURE ('fpart'))
+    MATERIAL 'fp2' (TEXTURE ('fp2'))
   )
   PLUGINS (
     PLUGIN 'thing' ('crystalspace.mesh.loader.thing')
@@ -569,7 +571,7 @@ WORLD (
 	FACTORY ('emitFact')
 	MIXMODE (COPY ())
 	NUMBER (100)
-	MATERIAL ('fpart')
+	MATERIAL ('fp2')
 	REGULARPARTICLES(8, 0.9)
 	LIGHTING (off)
 	TOTALTIME (5000)
@@ -579,10 +581,10 @@ WORLD (
 	ATTRACTOR (EMITBOX (-0.2,2,-0.2, +0.2,2,+0.2))
 	ATTRACTORFORCE (0.15)
 	; age: time, rgb,  alpha, swirl, rotspeed, scale
-        AGING (   0, 1.0,1.0,1.0, 1.0, 0.0, 0.0, 1.0)
-        AGING ( 200, 1.0,1.0,1.0, 0.0, 0.1, 0.0, 1.0)
+        AGING (   0, 1.0,1.0,1.0, 1.0, 0.0, 0.0, 0.5)
+        AGING ( 200, 1.0,1.0,1.0, 0.0, 0.1, 0.0, 0.5)
         AGING (1300, 1.0,1.0,0.2, 0.2, 0.1, 0.0, 1.0)
-        AGING (2700, 1.0,0.5,0.2, 0.5, 0.1, 0.0, 1.0)
+        AGING (2700, 1.0,0.5,0.2, 0.5, 0.1, 0.0, 0.8)
         AGING (3600, 0.2,0.2,0.2, 0.5, 0.0, 0.0, 1.5)
         AGING (5000, 0.0,0.0,0.0, 1.0, 0.0, 0.0, 1.5)
       )
