@@ -25,48 +25,45 @@
 #include "csutil/csstring.h"
 #include "csutil/nobjvec.h"
 
-// all int's in an MD2 file are little endian
+/*
+// all int's in an MDL file are little endian
 #include "cssys/csendian.h"
 
-// upper bound onsize of biggest data element (vertex, polygon) in an MD2 file
+// upper bound onsize of biggest data element (vertex, polygon) in an MDL file
 static int const MAX_DATAELEMENT_SIZE = 8192;
 
-// size of various MD2 elements
-static int const SIZEOF_MD2SHORT = 2;
-static int const SIZEOF_MD2LONG = 4;
-static int const SIZEOF_MD2FLOAT = 4;
-static int const SIZEOF_MD2SKINNAME = 64;
-static int const SIZEOF_MD2FRAMENAME = 16;
-static int const SIZEOF_MD2HEADER = 15*SIZEOF_MD2LONG;
+// size of various MDL elements
+static int const SIZEOF_MDLSHORT = 2;
+static int const SIZEOF_MDLLONG = 4;
+static int const SIZEOF_MDLFLOAT = 4;
+static int const SIZEOF_MDLSKINNAME = 64;
+static int const SIZEOF_MDLFRAMENAME = 16;
 
 CS_DECLARE_TYPED_VECTOR (csStringVector, csString);
 CS_DECLARE_OBJECT_VECTOR (csVertexFrameVector, iModelDataVertices);
 
-struct csMD2Header
+struct csMDLHeader
 {
-  // width and height of skin texture in pixels
-  long SkinWidth, SkinHeight;
-  // size of each frame int the sprite, in pixels
-  long FrameSize;
-  // number of skins, vertices, texels, triangles, glcmds(?), frames
-  long SkinCount, VertexCount, TexelCount, TriangleCount, glcmds, FrameCount;
-  // offset of the skin information in the file
-  long SkinOffset;
-  // offset of the texel information in the file
-  long TexelOffset;
-  // offset of the triangle information in the file
-  long TriangleOffset;
-  // offset of the frame information in the file
-  long FramesOffset;
-  // offset of the GL commands information in the file
-  long GLCommandsOffset;
-  // total file size
-  long FileSize;
+  // translation and scale
+  csVector3 Scale, Origin;
+  // radius of the bounding sphere
+  float BoundingSphereRadius;
+  // position of the player camera for this model
+  csVector3 CameraPosition;
+  // number of skins, width and height of the skin texture
+  long SkinCount, SkinWidth, SkinHeight;
+  // number of vertices, triangles and frames
+  long VertexCount, TriangleCount, FrameCount;
+  // ???
+  long SyncType, Flags;
+  // average triangle size (?)
+  float AverageTriangleSize;
 };
+*/
 
 // ---------------------------------------------------------------------------
 
-class csModelConverterMD2 : iModelConverter
+class csModelConverterMDL : iModelConverter
 {
 private:
   csModelConverterFormat FormatInfo;
@@ -75,10 +72,10 @@ public:
   SCF_DECLARE_IBASE;
 
   /// constructor
-  csModelConverterMD2 (iBase *pBase);
+  csModelConverterMDL (iBase *pBase);
 
   /// destructor
-  virtual ~csModelConverterMD2 ();
+  virtual ~csModelConverterMDL ();
 
   bool Initialize (iObjectRegistry *object_reg);
   virtual int GetFormatCount() const;
@@ -88,7 +85,7 @@ public:
 
   struct Plugin : public iPlugin
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csModelConverterMD2);
+    SCF_DECLARE_EMBEDDED_IBASE (csModelConverterMDL);
     virtual bool Initialize (iObjectRegistry *object_reg)
     { 
       return scfParent->Initialize (object_reg);
@@ -96,50 +93,50 @@ public:
   } scfiPlugin;
 };
 
-SCF_IMPLEMENT_IBASE (csModelConverterMD2)
+SCF_IMPLEMENT_IBASE (csModelConverterMDL)
   SCF_IMPLEMENTS_INTERFACE (iModelConverter)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csModelConverterMD2::Plugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csModelConverterMDL::Plugin)
   SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_FACTORY (csModelConverterMD2)
+SCF_IMPLEMENT_FACTORY (csModelConverterMDL)
 
-SCF_EXPORT_CLASS_TABLE (md2ie)
-  SCF_EXPORT_CLASS (csModelConverterMD2, 
-    "crystalspace.modelconverter.md2",
-    "MD2 Model Converter")
+SCF_EXPORT_CLASS_TABLE (mdlie)
+  SCF_EXPORT_CLASS (csModelConverterMDL, 
+    "crystalspace.modelconverter.mdl",
+    "MDL Model Converter")
 SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
 
-csModelConverterMD2::csModelConverterMD2 (iBase *pBase)
+csModelConverterMDL::csModelConverterMDL (iBase *pBase)
 {
   SCF_CONSTRUCT_IBASE (pBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
 
-  FormatInfo.Name = "md2";
+  FormatInfo.Name = "mdl";
   FormatInfo.CanLoad = true;
   FormatInfo.CanSave = false;
 }
 
-csModelConverterMD2::~csModelConverterMD2 ()
+csModelConverterMDL::~csModelConverterMDL ()
 {
 }
 
-bool csModelConverterMD2::Initialize (iObjectRegistry *objreg)
+bool csModelConverterMDL::Initialize (iObjectRegistry *objreg)
 {
   return true;
 }
 
-int csModelConverterMD2::GetFormatCount () const
+int csModelConverterMDL::GetFormatCount () const
 {
   return 1;
 }
 
-const csModelConverterFormat *csModelConverterMD2::GetFormat (int idx) const
+const csModelConverterFormat *csModelConverterMDL::GetFormat (int idx) const
 {
   return (idx == 0) ? &FormatInfo : NULL;
 }
@@ -147,7 +144,7 @@ const csModelConverterFormat *csModelConverterMD2::GetFormat (int idx) const
 /*
   Purpose:
    
-    csModelConverterMD2::Load() reads a Quake2 MD2 model file.
+    csModelConverterMDL::Load() reads a Quake2 MDL model file.
 
   Examples:
 
@@ -162,7 +159,8 @@ const csModelConverterFormat *csModelConverterMD2::GetFormat (int idx) const
   Modified by Martin Geisse to work with the new converter system.
 */
 
-static bool CheckMD2Version (csDataStream &in)
+/*
+static bool CheckMDLVersion (csDataStream &in)
 {
   // Read in header and check for a correct file.  The
   // header consists of two longs, containing
@@ -174,7 +172,7 @@ static bool CheckMD2Version (csDataStream &in)
   FileID = little_endian_long (FileID);
   FileVersion = little_endian_long (FileVersion);
 
-  if (FileID != ( ('2'<<24)+('P'<<16)+('D'<<8)+'I' ) )
+  if (FileID != ( ('O'<<24)+('P'<<16)+('D'<<8)+'I' ) )
     return false;
 
   if (FileVersion != 8)
@@ -183,42 +181,37 @@ static bool CheckMD2Version (csDataStream &in)
   return true;
 }
 
-#define CS_MD2_READ(num,name)						\
-  hdr->name = get_le_long (buf + num * SIZEOF_MD2LONG);
+#define CS_MDL_READ_LONG(name)						\
+  hdr->name = get_le_long (buf + Position);				\
+  Position += SIZEOF_MDL_LONG;
 
-static void ReadMD2Header (csMD2Header *hdr, csDataStream *in)
+#define CS_MDL_READ_FLOAT(name)						\
+  hrd->name = convert_endian(*((float*)(buf + Position)));		\
+  Position += SIZEOF_MDL_FLOAT;
+
+static void ReadMDLHeader (csMDLHeader *hdr, csDataStream *in)
 {
-  char buf [SIZEOF_MD2HEADER];
-  in->Read (buf, SIZEOF_MD2HEADER);
+  char buf [SIZEOF_MD2_HEADER];
+  in.Read (buf, SIZEOF_MD2_HEADER);
+  int Position = 0;
 
-  CS_MD2_READ (0, SkinWidth);
-  CS_MD2_READ (1, SkinHeight);
-  CS_MD2_READ (2, FrameSize);
-  CS_MD2_READ (3, SkinCount);
-  CS_MD2_READ (4, VertexCount);
-  CS_MD2_READ (5, TexelCount);
-  CS_MD2_READ (6, TriangleCount);
-  CS_MD2_READ (7, glcmds);
-  CS_MD2_READ (8, FrameCount);
-  CS_MD2_READ (9, SkinOffset);
-  CS_MD2_READ (10, TexelOffset);
-  CS_MD2_READ (11, TriangleOffset);
-  CS_MD2_READ (12, FramesOffset);
-  CS_MD2_READ (13, GLCommandsOffset);
-  CS_MD2_READ (14, FileSize);
+  @@@
 }
+#undef CS_MDL_READ_LONG
+#undef CS_MDL_READ_FLOAT
+*/
 
-#undef CS_MD2_READ
-
-iModelData *csModelConverterMD2::Load (UByte *Buffer, ULong Size)
+iModelData *csModelConverterMDL::Load (UByte *Buffer, ULong Size)
 {
+  return NULL;
+/*
   // prepare input buffer
   csDataStream in (Buffer, Size, false);
   unsigned char readbuffer[MAX_DATAELEMENT_SIZE];
   int i,j;
 
   // check for the correct version
-  if (!CheckMD2Version (in))
+  if (!CheckMDLVersion (in))
     return NULL;
 
   // build the object framework
@@ -226,17 +219,17 @@ iModelData *csModelConverterMD2::Load (UByte *Buffer, ULong Size)
   iModelDataObject *Object = new csModelDataObject ();
   Scene->QueryObject ()->ObjAdd (Object->QueryObject ());
 
-  // read MD2 header
-  csMD2Header Header;
-  ReadMD2Header (&Header, &in);
+  // read MDL header
+  csMDLHeader Header;
+  ReadMDLHeader (&Header, &in);
 
   // read in texmap (skin) names - skin names are 64 bytes long
   csStringVector SkinNames;
   in.SetPosition (Header.SkinOffset);
   for (i = 0; i < Header.SkinCount; i++)
   {
-    csString *s = new csString (SIZEOF_MD2SKINNAME);
-    in.Read (s->GetData (), SIZEOF_MD2SKINNAME);
+    csString *s = new csString (SIZEOF_MDLSKINNAME);
+    in.Read (s->GetData (), SIZEOF_MDLSKINNAME);
     SkinNames.Push (s);
   }
 
@@ -249,7 +242,7 @@ iModelData *csModelConverterMD2::Load (UByte *Buffer, ULong Size)
   in.SetPosition (Header.TexelOffset);
   for (i = 0; i < Header.TexelCount; i++)
   {
-    in.Read (readbuffer, SIZEOF_MD2SHORT*2);
+    in.Read (readbuffer, SIZEOF_MDLSHORT*2);
     Texels [i].Set (get_le_short(readbuffer)/(float)Header.SkinWidth,
                     get_le_short(readbuffer+2)/(float)Header.SkinHeight);
   }
@@ -266,11 +259,11 @@ iModelData *csModelConverterMD2::Load (UByte *Buffer, ULong Size)
     iModelDataPolygon *Polygon = new csModelDataPolygon ();
     Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
 
-    in.Read (readbuffer, SIZEOF_MD2SHORT*6);
+    in.Read (readbuffer, SIZEOF_MDLSHORT*6);
     for (j = 2; j>=0; j--)
     {
-      short xyzindex = get_le_short(readbuffer + j * SIZEOF_MD2SHORT);
-      short texindex = get_le_short(readbuffer + (j+3) * SIZEOF_MD2SHORT);
+      short xyzindex = get_le_short(readbuffer + j * SIZEOF_MDLSHORT);
+      short texindex = get_le_short(readbuffer + (j+3) * SIZEOF_MDLSHORT);
       Polygon->AddVertex (xyzindex, 0, 0, texindex);
     }
 
@@ -285,8 +278,8 @@ iModelData *csModelConverterMD2::Load (UByte *Buffer, ULong Size)
   for (i = 0; i < Header.FrameCount; i++)
   {
     // read in scale and translate info
-    in.Read (scale, SIZEOF_MD2FLOAT*3);
-    in.Read (translate, SIZEOF_MD2FLOAT*3);
+    in.Read (scale, SIZEOF_MDLFLOAT*3);
+    in.Read (translate, SIZEOF_MDLFLOAT*3);
     for (j = 0; j<3; j++)
     {
       scale[j] = convert_endian(scale[j]);
@@ -294,8 +287,8 @@ iModelData *csModelConverterMD2::Load (UByte *Buffer, ULong Size)
     }
 
     // name of this frame
-    char FrameName [SIZEOF_MD2FRAMENAME];
-    in.Read (FrameName, SIZEOF_MD2FRAMENAME);
+    char FrameName [SIZEOF_MDLFRAMENAME];
+    in.Read (FrameName, SIZEOF_MDLFRAMENAME);
 
     // read in vertex coordinate data for the frame
     float *raw_vertexcoords = new float[3*Header.VertexCount];
@@ -327,11 +320,12 @@ iModelData *csModelConverterMD2::Load (UByte *Buffer, ULong Size)
   Object->SetDefaultVertices (DefaultFrame);  
   Object->DecRef ();
   return Scene;
+*/
 }
 
-iDataBuffer *csModelConverterMD2::Save (iModelData *Data, const char *Format)
+iDataBuffer *csModelConverterMDL::Save (iModelData *Data, const char *Format)
 {
-  if (strcasecmp (Format, "md2"))
+  if (strcasecmp (Format, "mdl"))
     return NULL;
 
   return NULL;
