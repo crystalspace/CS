@@ -6,7 +6,7 @@ Documentation for the Crystal Space project has been written and edited by
 numerous volunteers.  This section pays tribute to both the major
 documentation contributors as well as the minor ones.  In cases where a
 section or chapter has been wholly authored or extensively edited by a single
-individual notice of that contribution is included as part of the section or
+individual, notice of that contribution is included as part of the section or
 chapter itself.
 
 The following people have made significant contributions to the Crystal Space
@@ -19,7 +19,7 @@ Jorrit Tyberghein (@email{jorrit.tyberghein@@uz.kuleuven.ac.be})
 
 As the creator of Crystal Space, Jorrit wrote the original documentation
 included with the package.  Although some of that original work has since been
-subsumed by more recent work by himself and others, much of his writing can
+superceded by more recent work by himself and others, much of his writing can
 still be found in this document.  In particular, he has authored several
 sections which detail inner workings of the 3D engine as well as sections
 which describe the theory behind the engine.
@@ -127,7 +127,8 @@ due to lack of maintenance and interest.
 Wyatt Miler (@email{wmiler@@milertronics.com}
 
 Wyatt was involved in improving and correcting mark-up problems in the aborted
-conversion of Crystal Space documentation to LaTex.
+conversion of Crystal Space documentation to LaTex. He currently is correcting 
+correcting typos and grammar in preparation of the 1.0 release of Crystal Space.
 
 @item
 Jesse McClusky  (@email{Jesse.McClusky@@PSS.Boeing.com})
@@ -138,7 +139,7 @@ platform.
 @item
 Frank O'Connor (<frank@@oconnors.org>)
 
-Frank is the current maintainer of the Windows port and now maintains the
+Frank was the maintainer of the Windows port and created some of the
 instructions for building Crystal Space on Windows.
 
 @item
@@ -164,6 +165,13 @@ Siu-Hang (@email{shor@@cse.cuhk.edu.hk})
 
 Siu-Hang wrote one of several tutorials for MazeD, the Crystal Space map
 editor.
+
+@item
+Philip Wyett (@email{philipwyett@@dsl.pipex.com})
+
+Philip has taken over from Frank O'Connor as the Windows port maintainer.
+He also maintains the instructions for building Crystal Space on Windows.
+
 @end itemize
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.

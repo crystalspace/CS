@@ -98,9 +98,9 @@ technologies, including @sc{bzip2}, @sc{gzip}, and @sc{zip}.
 @url{http://crystal.sourceforge.net/docs/download/}
 
 @noindent
-Currently these documents are only available in @sc{html} format, but may
-someday be available as @sc{pdf}, PostScript, and possibly other formats as
-well.
+Currently these documents are only available in @sc{html} format, but may 
+be available as @sc{pdf}, PostScript, @sc{dvi}, and possibly other 
+formats in the near future.
 
 Developers can generate their own copies of these manuals from the Crystal
 Space source package by invoking certain makefile targets.  The @cite{User's
@@ -150,7 +150,7 @@ unsubscribing.
 People who are interested in being notified of changes which are made to
 Crystal Space's @sc{cvs} repository can subscribe the the @sc{cvs}
 notification list.  A notification message is sent to members of this list
-each time a change is made to resources within the @sc{cvs} repository.
+each time a change is made to the resources within the @sc{cvs} repository.
 
 @noindent
 Mailing List: @email{crystal-cvs@@lists.sourceforge.net}.

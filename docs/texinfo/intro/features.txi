@@ -19,7 +19,10 @@ A system library that will perform system-dependent operations for your
 program. This way your program is easily portable to any supported system.
 It includes a good plug-in system that offers you an interface to
 dynamically loaded drivers (@file{.so} or @file{.dll}), like the 3D rasterizer.
-
+NOTE: This library as such will not be available in the 1.0 release, OS-specific 
+functions will remain in this library however. The most important classes will 
+be moving into the Tool and Utility libraries.
+ 
 @item Geometry Library
 A 3D math library, including 2D and 3D vectors, matrices and polygons.
 This libary can be used without the rest of Crystal Space.
@@ -58,7 +61,7 @@ texture need not be a square.
 
 @item
 Procedural textures. Currently the included procedural textures are plasma,
-sky, water, and fire. You can define your own procedural textures.
+sky, water, and fire. You can also define your own procedural textures.
 
 @item
 It is possible to map the texture on a polygon in various ways such as via
@@ -102,7 +105,7 @@ ignored for shadows currently).
 
 @item
 Support for frame and skeletal based 3D triangle mesh sprites with
-level-of-detail (@sc{lod}) reduction via progressive meshes!
+level-of-detail (@sc{lod}) reduction via progressive meshes.
 
 @item
 Support for 2D sprites and particle systems.
@@ -145,9 +148,9 @@ Support for multiple cameras and the ability to make 1st person or
 
 @item
 @sc{zip} archive format to pack the map file, the textures and all other
-needed data files for one level inside one file. Crystal Space will also
-use the same @sc{zip} file to automatically add lightmap data. This will
-greatly speed up the start-up of Crystal Space.
+needed data files for one level inside one file. Crystal Space also
+uses the same @sc{zip} file to automatically add lightmap data. This 
+greatly speeds up the start-up of Crystal Space.
 
 @item
 Powerful text-based map file format allows you to easily redefine the world.
@@ -182,6 +185,23 @@ Dynamically-sized arrays (@code{csVector}).
 @item @sc{vfs}
 Virtual file system.  @xref{VFS}.
 
+@item Tool Library
+Much of the utility functionality in this library can be used independently
+of Crystal Space.  This library includes the following functionality:
+
+@itemize @bullet
+@item
+Contains several functions that can help setup an application. 
+The most important class in this library is csInitializer which will create 
+everything needed to get a CS application operational.
+
+@item
+Support for models, procedural textures, and sprites.
+
+@item
+Support for collision detection.
+@end itemize
+
 @item Sound Driver / Sound Renderer
 General sound system.  Currently drivers exist for GNU/Linux, MacOS/9, and
 Windows.
@@ -191,7 +211,7 @@ General networking support.  Currently supports socket-based networking via
 @sc{TCP/IP}.
 
 @item Scripting
-Crystal Space supports scripting through the @sc{Python} plugin. That way
+Crystal Space supports scripting through the @sc{Python} plugin. This way
 a game using Crystal Space can call @sc{Python} methods and @sc{Python}
 scripts can call Crystal Space methods.
 @end table

@@ -687,7 +687,8 @@ Wyatt Miler (@email{wmiler@@milertronics.com}
 
 Wyatt has performed some editing of Crystal Space's (now defunct) LaTeX
 documentation files. He has also helped to maintain the Mac port. Wyatt added
-the background music to Blocks.
+the background music to Blocks. He has also worked on correcting errors in the 
+texinfo documentation.
 
 @item
 Scott Wood (@email{scott@@geekland.cx})
@@ -875,7 +876,7 @@ Philip Wyett (@email{philipwyett@@dsl.pipex.com})
 
 Philip has done (and is doing) a great job maintaining the Windows ports,
 both the @sc{msvc} one and the @sc{gcc} one and also the documentation for
-the ports. He also creates installable packets for Windows from time to time
+the ports. He also creates installable packages for Windows from time to time
 and helps with maintenance in general.
 
 @item

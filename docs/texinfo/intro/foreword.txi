@@ -42,15 +42,14 @@ possible.
 
 What if you want to use Crystal Space in your project?
 The best approach at this point in time is to become a member of the
-developers mailing list (more about this later) and listen how everything
-develops. If you're really serious about things you can even join discussions
-and develop stuff.  I will gladly add contributed code to Crystal Space
-(provided I can use the stuff, I will not add code to format disks as I
-think that this is a little off topic :-)
+developers' mailing list and listen to how everything
+develops. If you're really serious about things you can join discussions
+and develop for the engine.  Jorrit will gladly add contributed code to Crystal Space
+provided he can use the code.
 
 Note that you also need to agree to the LGPL details but I don't think that
 this is a real problem. @xref{License}.
 
-We're always interested in hearing what other people are doing with
-Crystal Space. Even if it is only for small private projects we'd like to
-hear about it (just out of curiosity).
+We are always interested in hearing what other people are doing with
+Crystal Space. Even if it is only for small private projects we would like to
+hear about it just to satisfy our curiosity.
