@@ -38,9 +38,9 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
 #endif
 
         // Compute destination R,G,B
-        unsigned int dr = d & HALO_RM;
-        unsigned int dg = d & HALO_GM;
-        unsigned int db = d & HALO_BM;
+        int dr = d & HALO_RM;
+        int dg = d & HALO_GM;
+        int db = d & HALO_BM;
         // Apply alpha
         dr = dr + (a * (Scan.FogR - dr) >> 8);
         dg = dg + (a * (Scan.FogG - dg) >> 8);
@@ -49,11 +49,16 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
 #ifdef HALO_CLAMP
         if (dr > HALO_RM) dr = HALO_RM; else dr &= HALO_RM;
         if (dg > HALO_GM) dg = HALO_GM; else dg &= HALO_GM;
-        if (db > HALO_BM) db = HALO_BM;//else db &= HALO_BM;
+        if (db > HALO_BM) db = HALO_BM;
+#  if (HALO_BM & 1) == 0
+        else db &= HALO_BM;
+#  endif
 #else
         dr &= HALO_RM;
         dg &= HALO_GM;
-      //db &= HALO_BM;
+#  if (HALO_BM & 1) == 0
+        db &= HALO_BM;
+#  endif
 #endif
 
         // Build the value to write back into framebuffer
@@ -82,9 +87,9 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
 #endif
 
         // Compute destination R,G,B
-        unsigned int dr = d & HALO_RM;
-        unsigned int dg = d & HALO_GM;
-        unsigned int db = d & HALO_BM;
+        int dr = d & HALO_RM;
+        int dg = d & HALO_GM;
+        int db = d & HALO_BM;
         // Apply alpha
         dr = dr + (a * (Scan.FogR - dr) >> 8);
         dg = dg + (a * (Scan.FogG - dg) >> 8);
@@ -93,11 +98,16 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
 #ifdef HALO_CLAMP
         if (dr > HALO_RM) dr = HALO_RM; else dr &= HALO_RM;
         if (dg > HALO_GM) dg = HALO_GM; else dg &= HALO_GM;
-        if (db > HALO_BM) db = HALO_BM;//else db &= HALO_BM;
+        if (db > HALO_BM) db = HALO_BM;
+#  if (HALO_BM & 1) == 0
+        else db &= HALO_BM;
+#  endif
 #else
         dr &= HALO_RM;
         dg &= HALO_GM;
-      //db &= HALO_BM;
+#  if (HALO_BM & 1) == 0
+        db &= HALO_BM;
+#  endif
 #endif
 
         // Build the value to write back into framebuffer

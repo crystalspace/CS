@@ -186,7 +186,8 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   int PostShift = 0;
 #endif
   // Draw a single scanline of halo
-  void (*dscan)(void *src, void *dest, int count, int delta, int post_shift)=0;
+  void (*dscan)(void *src, void *dest, int count, int delta, int post_shift) = 0;
+  bool clamp = false;
 
   if (G3D->pfmt.PixelBytes == 1)
   {
@@ -200,14 +201,17 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   }
   else
   {
-    Scan.FogR = QRound (R * G3D->pfmt.RedMask  ) & G3D->pfmt.RedMask;
-    Scan.FogG = QRound (G * G3D->pfmt.GreenMask) & G3D->pfmt.GreenMask;
-    Scan.FogB = QRound (B * G3D->pfmt.BlueMask ) & G3D->pfmt.BlueMask;
+    Scan.FogR = QRound (R * G3D->pfmt.RedMask  ) & (0xffffffff << G3D->pfmt.RedShift);
+    Scan.FogG = QRound (G * G3D->pfmt.GreenMask) & (0xffffffff << G3D->pfmt.GreenShift);
+    Scan.FogB = QRound (B * G3D->pfmt.BlueMask ) & (0xffffffff << G3D->pfmt.BlueShift);
     // halo intensity (0..255)
     Scan.FogDensity = QRound (iIntensity * 255);
+    // Detech when the halo will possibly overflow
+    clamp = (unsigned (Scan.FogR) > G3D->pfmt.RedMask)
+         || (unsigned (Scan.FogG) > G3D->pfmt.GreenMask)
+         || (unsigned (Scan.FogB) > G3D->pfmt.BlueMask);
   }
 
-  bool clamp = (R * iIntensity > 1) || (G * iIntensity > 1) || (B * iIntensity > 1);
   switch (G3D->pfmt.PixelBytes)
   {
     case 1:
