@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+24-Apr-2000
+        - Martin Geisse added the first working version of the DUNGEON
+          plugin (random level generator).
 21-Apr-2000
 	- Andrew Zabolotny changed 'int' back to 'ceil' in CompressVertices()
 	  (i.e. change from Frank O'Connor).
