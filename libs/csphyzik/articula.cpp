@@ -133,6 +133,13 @@ int sze = 0;
 	return sze;
 }
 
+
+
+void ctArticulatedBody::apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector )
+{
+  ((ctArticulatedSolver *)solver)->apply_impulse( impulse_point, impulse_vector );
+}
+
 void ctArticulatedBody::init_state()
 {
 ctArticulatedBody *out_link;

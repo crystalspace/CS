@@ -347,3 +347,76 @@ ctSpatialVector svwork, gXfa;
 		out_link = ab.outboard_links.get_next();
 	}
 }
+
+void ctFeatherstoneAlgorithm::impulse_to_v()
+{
+  ctFeatherstoneAlgorithm *in = (ctFeatherstoneAlgorithm *)(ab.inboard_joint->inboard->solver);
+  // instantaneous change in joint acceleration
+  real dqv;  
+  ctSpatialVector s = ab.inboard_joint->get_spatial_joint_axis();
+
+  dqv = !s*( 1.0L/sIs )*( Ia*gXf*in->dv + Ja )*(-1.0);
+  dv = gXf*in->dv + s*dqv;
+
+  ab.inboard_joint->qv += dqv;
+
+  ctArticulatedBody *out_link = ab.outboard_links.get_first();
+  ctFeatherstoneAlgorithm *out_link_solver;
+	while( out_link ){
+		out_link_solver = (ctFeatherstoneAlgorithm *)out_link->solver;
+		out_link_solver->impulse_to_v();
+		out_link = ab.outboard_links.get_next();
+	}
+}
+
+void ctFeatherstoneAlgorithm::propagate_impulse()
+{
+  ctArticulatedBody *inboard_link;
+  ctFeatherstoneAlgorithm *in_feather;
+  
+  if( ab.inboard_joint != NULL ){
+    inboard_link = ab.inboard_joint->inboard;
+    if( inboard_link != NULL ){
+      in_feather = (ctFeatherstoneAlgorithm *)inboard_link->solver;
+	    ctSpatialMatrix fXg;
+      ctVector3 vwork;
+      ctSpatialVector s = ab.inboard_joint->get_spatial_joint_axis();
+      // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
+      ab.T_fg.put_transpose( Mwork );
+      Mwork.mult_v( vwork, ab.r_fg );
+      vwork *= -1.0; 
+      fXg.form_spatial_transformation( Mwork, vwork );
+
+      // calc impulse transfered to parent
+      ctSpatialMatrix6 Ident;
+      Ident.identity();
+      in_feather->Ja = fXg*( Ident - Ia*s*(!s)*(1.0L/sIs) )*Ja;
+      // recurse
+      in_feather->propagate_impulse();
+    }
+  }
+  
+  // we have reached the root, so go back down and calc v changes from impulses
+  dv.zero();
+  ctArticulatedBody *out_link = ab.outboard_links.get_first();
+  ctFeatherstoneAlgorithm *out_link_solver;
+	while( out_link ){
+		out_link_solver = (ctFeatherstoneAlgorithm *)out_link->solver;
+		out_link_solver->impulse_to_v();
+		out_link = ab.outboard_links.get_next();
+	}
+}
+
+void ctFeatherstoneAlgorithm::apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector )
+{
+  ctMatrix3 iR = ab.handle->get_this_to_world();
+  ctVector3 ir = iR.get_transpose()*(ab.handle->get_org_world() - impulse_point);
+  ctVector3 ija = iR*impulse_vector;
+  ctVector3 ijb = -ir % ( iR*impulse_vector );
+  ctSpatialVector j_coll( ija, ijb );
+
+  Ja = j_coll*(-1.0);
+
+  propagate_impulse();
+
+}
