@@ -268,9 +268,35 @@ public:
    */
   void DrawPoly(iRenderView *rview, iGraphics3D *g3d, iMaterialHandle *mat,
     int num, const csVector3* pts, const csVector2* uvs);
+  /**
+   *  Compute the outline of a particular hull.
+   *  Pass a hull and its layerscale.
+   *  Also pass the camera position in object space, and projection info.
+   *  Returned is: layer_num - number of vertices in layer outline
+   *  layer_poly - vertice indices of layer polygon, clockwise. new[]ed.
+   *  layer_pts - vertice csvector3 position of layer polygon. new[]ed.
+   *    these positions are in screen space.
+   *  layer_uvs - u,v information per vertice.
+   */
+  void ComputeHullOutline(iHazeHull *hull, float layer_scale,
+    const csVector3& campos, csReversibleTransform& tr_o2c, float fov, 
+    float shx, float shy, int &layer_num, int *& layer_poly, 
+    csVector3 *& layer_pts, csVector2 *&layer_uvs);
   /** project a vertice in object space to screenspace */
   void ProjectO2S(csReversibleTransform& tr_o2c, float fov, float shiftx,
     float shifty, const csVector3& objpos, csVector3& scrpos);
+  /** recursively draw a polygon - type 0=center 1,2 is rim, with
+    alternative interpolation.
+    quality is the minimal cos of the angle.
+      .9999 is maximum quality (infinite polygons).
+      .90 is nice quality.
+      0.70 is lower quality.
+      0.50 is low quality.
+      -1 is lowest quality (no adaptation)
+    */
+  void DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d, iMaterialHandle *mat,
+    int num_sides, csVector3* pts, csVector2* uvs, 
+    float layer_scale, float quality);
 
   ///------------------------ iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;

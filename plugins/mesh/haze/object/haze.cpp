@@ -699,6 +699,45 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 #undef INTERPOLATE
 #undef INTERPOLATE1
 
+
+void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
+  const csVector3& campos, csReversibleTransform& tr_o2c, float fov, float shx,
+  float shy, int &layer_num, int *& layer_poly, csVector3 *& layer_pts, 
+  csVector2 *&layer_uvs)
+{
+  int i;
+  // get hull outline in screenspace
+  layer_num = 0;
+  layer_poly = 0;
+  //printf("campos %g,%g,%g\n", campos.x, campos.y, campos.z);
+  csHazeHull::ComputeOutline(hull, campos, layer_num, layer_poly);
+  //printf("has outline of size %d: ", layer_num);
+  if(layer_num <= 0) return;
+  layer_pts = new csVector3[layer_num];
+  for(i=0; i<layer_num; i++)
+  {
+    //printf(" %d", layer_poly[i]);
+    csVector3 objpos;
+    hull->GetVertex(objpos, layer_poly[i] );
+    ProjectO2S(tr_o2c, fov, shx, shy, objpos, layer_pts[i]);
+  }
+  //printf("\n");
+  // get hull 0 uv values
+  layer_uvs = new csVector2[layer_num];
+  csVector2 center(0.5, 0.5);
+  // project to screenspace
+  csVector3 scr_orig;
+  ProjectO2S(tr_o2c, fov, shx, shy, origin, scr_orig);
+  csVector2 dir;
+  for(i=0; i<layer_num; i++)
+  {
+    dir.x = layer_pts[i].x - scr_orig.x;
+    dir.y = layer_pts[i].y - scr_orig.y;
+    dir /= dir.Norm();
+    layer_uvs[i] = center + dir * layer_scale;
+  }
+}
+
 bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 	csZBufMode mode)
 {
@@ -736,40 +775,21 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
   material->Visit ();
 
-  // project to screenspace
+  // project origin to screenspace
+  csVector2 center(0.5, 0.5);
   csVector3 scr_orig;
   ProjectO2S(tr_o2c, fov, shx, shy, origin, scr_orig);
 
   // get hull 0 outline in screenspace
   iHazeHull *hull = layers.GetLayer(0)->hull;
+  float layer_scale = layers.GetLayer(0)->scale;
   int layer_num = 0;
   int *layer_poly = 0;
-  //campos.Set(10,10,10);
-  //printf("campos %g,%g,%g\n", campos.x, campos.y, campos.z);
-  csHazeHull::ComputeOutline(hull, campos, layer_num, layer_poly);
-  //printf("has outline of size %d: ", layer_num);
+  csVector3* layer_pts = 0;
+  csVector2* layer_uvs = 0;
+  ComputeHullOutline(hull, layer_scale, campos, tr_o2c, fov, shx, shy,
+    layer_num, layer_poly, layer_pts, layer_uvs);
   if(layer_num <= 0) return false;
-  csVector3* layer_pts = new csVector3[layer_num];
-  for(i=0; i<layer_num; i++)
-  {
-    //printf(" %d", layer_poly[i]);
-    csVector3 objpos;
-    hull->GetVertex(objpos, layer_poly[i] );
-    ProjectO2S(tr_o2c, fov, shx, shy, objpos, layer_pts[i]);
-  }
-  //printf("\n");
-  // get hull 0 uv values
-  float layer_scale = layers.GetLayer(0)->scale;
-  csVector2* layer_uvs = new csVector2[layer_num];
-  csVector2 center(0.5, 0.5);
-  csVector2 dir;
-  for(i=0; i<layer_num; i++)
-  {
-    dir.x = layer_pts[i].x - scr_orig.x;
-    dir.y = layer_pts[i].y - scr_orig.y;
-    dir /= dir.Norm();
-    layer_uvs[i] = center + dir * layer_scale;
-  }
 
   // draw triangles from orig to layer 0
   csVector3 tri_pts[3];
@@ -784,7 +804,10 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
     tri_uvs[2] = layer_uvs[i];
     tri_uvs[1] = layer_uvs[nexti];
     //printf("drawing a polygon\n");
-    DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
+    //DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
+    float quality = 0.90;
+    DrawPolyAdapt(rview, g3d, mat, 3, tri_pts, tri_uvs, layer_scale,
+      quality);
 
 #if 0
     // debug drawing of the outline 
@@ -804,11 +827,136 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 #endif
   }
 
+
+#if 0 // draw multiple hulls
+  for(int curlay = 1; curlay < layers.Length(); curlay++)
+  {
+    // get hull [curlay] outline in screenspace
+    iHazeHull *hull2 = layers.GetLayer(curlay)->hull;
+    float layer_scale2 = layers.GetLayer(curlay)->scale;
+    int layer_num2 = 0;
+    int *layer_poly2 = 0;
+    csVector3* layer_pts2 = 0;
+    csVector2* layer_uvs2 = 0;
+    ComputeHullOutline(hull2, layer_scale2, campos, tr_o2c, fov, shx, shy,
+      layer_num2, layer_poly2, layer_pts2, layer_uvs2);
+    if(layer_num2 <= 0)
+    {
+      delete[] layer_poly;
+      delete[] layer_pts;
+      delete[] layer_uvs;
+      return true;
+    }
+
+#if 1
+    for(i=0; i<layer_num2; i++)
+    {
+      int nexti = (i+1)%layer_num;
+      iGraphics2D *g2d = g3d->GetDriver2D();
+      int m2dy = g2d->GetHeight();
+      float midx = (layer_pts2[i].x + layer_pts2[nexti].x)*0.5;
+      float midy = (layer_pts2[i].y + layer_pts2[nexti].y)*0.5;
+      g2d->DrawLine( layer_pts2[i].x, m2dy-layer_pts2[i].y, midx, m2dy-midy, 0);
+      g2d->DrawLine( midx, m2dy-midy, layer_pts2[nexti].x, 
+        m2dy-layer_pts2[nexti].y, -1);
+    }
+#endif
+    
+    /// got  this outline, draw between hull to hull2
+    if(layer_num != layer_num2) {
+      printf("haze: outlines differ for hull %d,%d!\n", layer_num, layer_num2);
+      /*
+      delete[] layer_poly;
+      delete[] layer_pts;
+      delete[] layer_uvs;
+      delete[] layer_poly2;
+      delete[] layer_pts2;
+      delete[] layer_uvs2;
+      return true;
+      */
+    }
+    /// draw
+    for(i=0; i<layer_num; i++)
+    {
+      int ni = (i+1)%layer_num;
+      tri_pts[0] = layer_pts[i];
+      tri_uvs[0] = layer_uvs[i];
+      tri_pts[1] = layer_pts[ni];
+      tri_uvs[1] = layer_uvs[ni];
+      tri_pts[2] = layer_pts2[ni];
+      tri_uvs[2] = layer_uvs2[ni];
+      DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
+      tri_pts[0] = layer_pts[i];
+      tri_uvs[0] = layer_uvs[i];
+      tri_pts[1] = layer_pts2[ni];
+      tri_uvs[1] = layer_uvs2[ni];
+      tri_pts[2] = layer_pts2[i];
+      tri_uvs[2] = layer_uvs2[i];
+      DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
+    }
+
+    /// get ready for the next hull
+    hull = hull2;
+    layer_scale = layer_scale2;
+    layer_num = layer_num2;
+    delete[] layer_poly; layer_poly = layer_poly2;
+    delete[] layer_pts; layer_pts = layer_pts2;
+    delete[] layer_uvs; layer_uvs = layer_uvs2;
+  }
+#endif // draw multiple hulls
+
   delete[] layer_poly;
   delete[] layer_pts;
   delete[] layer_uvs;
 
   return true;
+}
+
+
+void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d, 
+  iMaterialHandle *mat, int num_sides, csVector3* pts, csVector2* uvs, 
+        float layer_scale, float quality)
+{
+  /// only triangles
+  CS_ASSERT(num_sides == 3);
+  // check if the angle is OK
+  csVector2 dir1;
+  dir1.x = pts[1].x - pts[0].x;
+  dir1.y = pts[1].y - pts[0].y;
+  csVector2 dir2;
+  dir2.x = pts[2].x - pts[0].x;
+  dir2.y = pts[2].y - pts[0].y;
+  csVector2 normdir1 = dir1 / dir1.Norm();
+  csVector2 normdir2 = dir2 / dir2.Norm();
+  float cosangle = normdir1 * normdir2;
+  //printf("cosangle %g, quality %g\n", cosangle, quality);
+  if(cosangle > quality)
+  {
+    // draw it
+    DrawPoly(rview, g3d, mat, 3, pts, uvs);
+    return;
+  }
+  // split up
+  csVector3 oldpos = pts[2];
+  csVector2 olduv = uvs[2];
+  pts[2] = (pts[1] + pts[2])*0.5;
+  csVector2 newdir;
+  newdir.x = pts[2].x - pts[0].x;
+  newdir.y = pts[2].y - pts[0].y;
+  newdir /= newdir.Norm();
+  uvs[2].Set(0.5, 0.5);
+  uvs[2] += newdir * layer_scale;
+  DrawPolyAdapt(rview, g3d, mat, 3, pts, uvs, layer_scale, quality);
+  // other half
+  csVector3 oldpos1 = pts[1];
+  csVector2 olduv1 = uvs[1];
+  pts[1] = pts[2];
+  uvs[1] = uvs[2];
+  pts[2] = oldpos;
+  uvs[2] = olduv;
+  DrawPolyAdapt(rview, g3d, mat, 3, pts, uvs, layer_scale, quality);
+  pts[1] = oldpos1;
+  uvs[1] = olduv1;
 }
   
 void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
