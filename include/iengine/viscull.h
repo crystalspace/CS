@@ -60,13 +60,13 @@ struct iVisibilityObjectIterator : public iBase
 };
 
 
-SCF_VERSION (iVisibilityCullerListner, 0, 0, 1);
+SCF_VERSION (iVisibilityCullerListener, 0, 0, 1);
 
 /**
  * Implement this interface when you want to get notified about visible
  * objects detected by the visibility cullers.
  */
-struct iVisibilityCullerListner : public iBase
+struct iVisibilityCullerListener : public iBase
 {
   /**
    * This function is called whenever the visibilty culler discovers a new
@@ -76,7 +76,7 @@ struct iVisibilityCullerListner : public iBase
     iMeshWrapper *mesh) = 0;
 };
 
-SCF_VERSION (iVisibilityCuller, 0, 3, 2);
+SCF_VERSION (iVisibilityCuller, 0, 4, 0);
 
 /**
  * This interface represents a visibility culling system.
@@ -109,7 +109,7 @@ struct iVisibilityCuller : public iBase
    * all objects are visible.
    */
   virtual bool VisTest (iRenderView* irview, 
-    iVisibilityCullerListner* viscallback) = 0;
+    iVisibilityCullerListener* viscallback) = 0;
 
   /**
    * Mark all objects as visible that intersect with the given bounding
@@ -122,6 +122,12 @@ struct iVisibilityCuller : public iBase
    * sphere.
    */
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere) = 0;
+  /**
+   * Notify the visibility callback of all objects that intersect with the 
+   * given bounding sphere.
+   */
+  virtual void VisTest (const csSphere& sphere, 
+    iVisibilityCullerListener* viscallback) = 0;
 
   /**
    * Mark all objects as visible that are in the volume formed by the set
@@ -131,6 +137,15 @@ struct iVisibilityCuller : public iBase
   virtual csPtr<iVisibilityObjectIterator> VisTest (csPlane3* plane,
   	int num_planes) = 0;
 
+  /**
+   * Notify the visibility callback of all objects that are in the volume 
+   * formed by the set of planes. Can be used for frustum intersection, 
+   * box intersection, ....
+   * \remarks Warning! This function can only use up to 32 planes.
+   */
+  virtual void VisTest (csPlane3* plane, int num_planes, 
+    iVisibilityCullerListener* viscallback) = 0;
+	
   /**
    * Intersect a segment with all objects in the visibility culler and
    * return them all in an iterator.

@@ -27,16 +27,20 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 #include "ivideo/rendersteps/irenderstep.h"
+#include "ivideo/rendersteps/icontainer.h"
 #include "ivideo/rendersteps/ilightiter.h"
 #include "iengine/viscull.h"
 #include "igeom/objmodel.h"
 #include "igeom/polymesh.h"
 #include "csutil/hashmap.h"
+#include "csutil/csstring.h"
 #include "csutil/strhash.h"
 #include "../../common/basesteptype.h"
 #include "../../common/basesteploader.h"
+#include "../../common/parserenderstep.h"
 
-class csStencilShadowCacheEntry : public iObjectModelListener
+class csStencilShadowCacheEntry : public iObjectModelListener,
+				  public iRenderBufferSource
 {
 private:
   iObjectModel *model;
@@ -77,34 +81,25 @@ public:
   virtual ~csStencilShadowCacheEntry ();
 
   bool Initialize (iObjectRegistry *objreg);
+
   void SetActiveLight (iLight *light, csVector3 meshlightpos, int& active_index_range, int& active_edge_start);
-  void ObjectModelChanged (iObjectModel* model);
-  iRenderBuffer *GetRenderBuffer (csStringID name);
+  virtual void ObjectModelChanged (iObjectModel* model);
+  virtual iRenderBuffer *GetRenderBuffer (csStringID name);
   void EnableShadowCaps () { enable_caps = true; }
   void DisableShadowCaps () { enable_caps = false; }
   bool ShadowCaps () { return enable_caps; }
-
-  class RenderBufferSource : public iRenderBufferSource
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csStencilShadowCacheEntry);
-	virtual iRenderBuffer *GetRenderBuffer (csStringID name)
-	{ return scfParent->GetRenderBuffer (name); }
-  } scfiRenderBufferSource;
-
-  struct Component : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csStencilShadowCacheEntry);
-	virtual bool Initialize (iObjectRegistry *objreg)
-	{ return scfParent->Initialize (objreg); }
-  } scfiComponent;
 };
 
-class csStencilShadowStep : public iRenderStep
+class csStencilShadowStep : public iRenderStep,
+			    public iLightRenderStep,
+			    public iRenderStepContainer
 {
 private:
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics3D> g3d;
   csRef<iShader> shadow;
+
+  csRefArray<iLightRenderStep> steps;
 
   csHashMap shadowcache;
   void DrawShadow (iRenderView* rview, iLight* light, iMeshWrapper *mesh, iShaderPass *pass);
@@ -119,20 +114,20 @@ public:
   void Perform (iRenderView* rview, iSector* sector);
   void Perform (iRenderView* rview, iSector* sector, iLight* light);
 
-  struct LightRenderStep : public iLightRenderStep
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csStencilShadowStep);
-    virtual void Perform (iRenderView* rview, iSector* sector, iLight* light) 
-    { return scfParent->Perform (rview, sector, light); }
-  } scfiLightRenderStep;
+  virtual int AddStep (iRenderStep* step);
+  virtual int GetStepCount ();
 
-  struct Component : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csStencilShadowStep);
-    virtual bool Initialize (iObjectRegistry *objreg)
-    { return scfParent->Initialize (objreg); }
-  } scfiComponent;
+/*  struct ShadowDrawVisCallback : public iVisibilityCullerListener
+  {    
+    csStencilShadowStep* parent;
 
+    SCF_DECLARE_IBASE;
+    ShadowDrawVisCallback (csStencilShadowStep* parent);
+    virtual ~ShadowDrawVisCallback ();
+
+    virtual void ObjectVisible (iVisibilityObject *visobject, 
+      iMeshWrapper *mesh);
+  } shadowDrawVisCallback;*/
 };
 
 class csStencilShadowFactory : public iRenderStepFactory
@@ -159,13 +154,17 @@ public:
 
 class csStencilShadowLoader : public csBaseRenderStepLoader
 {
+  csRenderStepParser rsp;
+
   csStringHash tokens; 
-// #define CS_TOKEN_ITEM_FILE "video/render3d/renderloop/shadow/stencil/stencil.tok"
-// #include "cstool/tokenlist.h"
+ #define CS_TOKEN_ITEM_FILE "video/render3d/renderloop/shadow/stencil/stencil.tok"
+ #include "cstool/tokenlist.h"
 
 public:
   csStencilShadowLoader (iBase *p);
   virtual ~csStencilShadowLoader ();
+
+  virtual bool Initialize (iObjectRegistry* object_reg);
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context,

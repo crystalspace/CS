@@ -79,7 +79,7 @@ private:
   csRef<iStringSet> strings;
 
   // @@@ Veeery rough
-  class ViscullCallback : public iVisibilityCullerListner
+  class ViscullCallback : public iVisibilityCullerListener
   {
     iGraphics3D* g3d;
     csStringID shadertype;

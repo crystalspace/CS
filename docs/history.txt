@@ -57,6 +57,13 @@ chronological order.
 	  aliases getopt to __getopt on some platforms, which causes problems
 	  for other includes (for instance, on MacOS/X, it is reported that it
 	  was breaking <unistd.h> in some fashion).
+	- res made the following changes:
+	    - Typo fix: iVisibilityCullerListner -> iVisibilityCullerListener
+	    - Added viscallback versions of the viscull methods to cull 
+	      against planes and spheres.
+	    - Stencil shadow plugin now compiles again. However, it's still a
+	      work in progress of trying to get it to work (and it looks like 
+	      that.)
 31-Aug-2003
         - Philip Wyett changed #include "GL/glu.h" to <GL/glu.h>, in the new
           GL renderer gl_txtcache.cpp, eliminating the warning messages within

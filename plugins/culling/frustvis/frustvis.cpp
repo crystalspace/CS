@@ -337,7 +337,7 @@ struct FrustTest_Front2BackData
   csPlane3 frustum[32];
 
   // this is the callback to call when we discover a visible node
-  iVisibilityCullerListner* viscallback;
+  iVisibilityCullerListener* viscallback;
 };
 
 bool csFrustumVis::TestNodeVisibility (csKDTree* treenode,
@@ -422,7 +422,7 @@ static bool FrustTest_Front2Back (csKDTree* treenode, void* userdata,
 }
 
 bool csFrustumVis::VisTest (iRenderView* rview, 
-                            iVisibilityCullerListner* viscallback)
+                            iVisibilityCullerListener* viscallback)
 {
   // just make sure we have a callback
   if (0 == viscallback)
@@ -471,6 +471,8 @@ struct FrustTestPlanes_Front2BackData
   // is maintained recursively during VisTest() and indicates the
   // planes that are still active for the current kd-tree node.
   csPlane3* frustum;
+
+  iVisibilityCullerListener* viscallback;
 };
 
 static bool FrustTestPlanes_Front2Back (csKDTree* treenode,
@@ -512,8 +514,16 @@ static bool FrustTestPlanes_Front2Back (csKDTree* treenode,
 	if (csIntersect3::BoxFrustum (obj_bbox, data->frustum,
 		frustum_mask, new_mask2))
 	{
-	  visobj_wrap->last_visible_vistest_nr  = data->current_vistest_nr ;
-	  data->vistest_objects->Push (visobj_wrap->visobj);
+	  if (data->viscallback)
+	  {
+	    data->viscallback->ObjectVisible (visobj_wrap->visobj, 
+	      visobj_wrap->mesh);
+	  }
+	  else
+	  {
+	    visobj_wrap->last_visible_vistest_nr  = data->current_vistest_nr ;
+	    data->vistest_objects->Push (visobj_wrap->visobj);
+	  }
 	}
       }
     }
@@ -545,6 +555,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (csPlane3* planes,
   data.current_vistest_nr = current_vistest_nr;
   data.vistest_objects = v;
   data.frustum = planes;
+  data.viscallback = 0;
   uint32 frustum_mask = (1 << num_planes)-1;
 
   kdtree->Front2Back (csVector3 (0, 0, 0), FrustTestPlanes_Front2Back,
@@ -553,6 +564,22 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (csPlane3* planes,
   csFrustVisObjIt* vobjit = new csFrustVisObjIt (v,
   	vistest_objects_inuse ? 0 : &vistest_objects_inuse);
   return csPtr<iVisibilityObjectIterator> (vobjit);
+}
+
+void csFrustumVis::VisTest (csPlane3* planes,
+	int num_planes, iVisibilityCullerListener* viscallback)
+{
+  UpdateObjects ();
+  current_vistest_nr++;
+
+  FrustTestPlanes_Front2BackData data;
+  data.current_vistest_nr = current_vistest_nr;
+  data.frustum = planes;
+  data.viscallback = viscallback;
+  uint32 frustum_mask = (1 << num_planes)-1;
+
+  kdtree->Front2Back (csVector3 (0, 0, 0), FrustTestPlanes_Front2Back,
+  	(void*)&data, frustum_mask);
 }
 
 //======== VisTest box =====================================================
@@ -645,6 +672,8 @@ struct FrustTestSphere_Front2BackData
   csVector3 pos;
   float sqradius;
   csArray<iVisibilityObject*>* vistest_objects;
+
+  iVisibilityCullerListener* viscallback;
 };
 
 static bool FrustTestSphere_Front2Back (csKDTree* treenode,
@@ -682,8 +711,15 @@ static bool FrustTestSphere_Front2Back (csKDTree* treenode,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       if (csIntersect3::BoxSphere (obj_bbox, data->pos, data->sqradius))
       {
-	visobj_wrap->last_visible_vistest_nr = data->current_vistest_nr;
-	data->vistest_objects->Push (visobj_wrap->visobj);
+	if (data->viscallback)
+	{
+	  data->viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh);
+	}
+	else
+	{
+ 	  visobj_wrap->last_visible_vistest_nr = data->current_vistest_nr;
+	  data->vistest_objects->Push (visobj_wrap->visobj);
+	}
       }
     }
   }
@@ -714,12 +750,28 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
   data.vistest_objects = v;
+  data.viscallback = 0;
   kdtree->Front2Back (data.pos, FrustTestSphere_Front2Back, (void*)&data,
   	0);
 
   csFrustVisObjIt* vobjit = new csFrustVisObjIt (v,
   	vistest_objects_inuse ? 0 : &vistest_objects_inuse);
   return csPtr<iVisibilityObjectIterator> (vobjit);
+}
+
+void csFrustumVis::VisTest (const csSphere& sphere, 
+			    iVisibilityCullerListener* viscallback)
+{
+  UpdateObjects ();
+  current_vistest_nr++;
+
+  FrustTestSphere_Front2BackData data;
+  data.current_vistest_nr = current_vistest_nr;
+  data.pos = sphere.GetCenter ();
+  data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
+  data.viscallback = viscallback;
+  kdtree->Front2Back (data.pos, FrustTestSphere_Front2Back, (void*)&data,
+  	0);
 }
 
 //======== IntersectSegment ================================================

@@ -117,12 +117,12 @@ void csSectorMeshList::FreeItem (iMeshWrapper* item)
 SCF_IMPLEMENT_IBASE_EXT(csSector)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iReferencedObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSector)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVisibilityCullerListner)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVisibilityCullerListener)
   SCF_IMPLEMENTS_INTERFACE (csSector);
 SCF_IMPLEMENT_IBASE_EXT_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSector::eiVisCullListner)
-  SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListner)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSector::eiVisibilityCullerListener)
+  SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListener)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSector::eiSector)
@@ -138,7 +138,7 @@ csSector::csSector (csEngine *engine) :
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReferencedObject);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCullerListner);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCullerListener);
   DG_TYPE (this, "csSector");
   csSector::engine = engine;
 #ifndef CS_USE_NEW_RENDERER
@@ -754,7 +754,7 @@ void csSector::Draw (iRenderView *rview)
   {
     // Mark visible objects.
     current_visnr++;
-    culler->VisTest (rview, &scfiVisibilityCullerListner);
+    culler->VisTest (rview, &scfiVisibilityCullerListener);
     //uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
 
     // get a pointer to the previous sector

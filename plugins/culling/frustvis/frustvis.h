@@ -144,11 +144,15 @@ public:
   virtual void RegisterVisObject (iVisibilityObject* visobj);
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
   virtual bool VisTest (iRenderView* rview, 
-    iVisibilityCullerListner* viscallback);
+    iVisibilityCullerListener* viscallback);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
+  virtual void VisTest (const csSphere& sphere, 
+    iVisibilityCullerListener* viscallback);
   virtual csPtr<iVisibilityObjectIterator> VisTest (csPlane3* planes,
   	int num_planes);
+  virtual void VisTest (csPlane3* planes,
+  	int num_planes, iVisibilityCullerListener* viscallback);
   virtual csPtr<iVisibilityObjectIterator> IntersectSegment (
     const csVector3& start, const csVector3& end, bool accurate = false);
   virtual bool IntersectSegment (const csVector3& start,

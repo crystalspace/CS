@@ -147,7 +147,7 @@ SCF_IMPLEMENT_IBASE(csGenericRenderStep)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE(csGenericRenderStep::ViscullCallback)
-  SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListner)
+  SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListener)
 SCF_IMPLEMENT_IBASE_END
 
 csGenericRenderStep::csGenericRenderStep (
@@ -213,11 +213,15 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
 
   g3d->SetZMode (zmode);
 
+  //g3d->SetShadowState (CS_SHADOW_VOLUME_USE);
+
   iVisibilityCuller* viscull = sector->GetVisibilityCuller ();
   // @@@ Don't alloc/dealloc every frame!
   ViscullCallback* callback = new ViscullCallback (g3d, shadertype, rview);
   viscull->VisTest (rview, callback);
   delete callback;
+
+  //g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
 
   if (zOffset)
     g3d->DisableZOffset ();

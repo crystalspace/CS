@@ -484,12 +484,12 @@ public:
   friend struct ReferencedObject;
 
   //--------------------- iVisibilityCullerListner interface ------------------
-  struct eiVisCullListner : public iVisibilityCullerListner
+  struct eiVisibilityCullerListener : public iVisibilityCullerListener
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSector);
     virtual void ObjectVisible (iVisibilityObject *visobj, iMeshWrapper *mesh)
       { scfParent->ObjectVisible (visobj, mesh);  }
-  } scfiVisibilityCullerListner;
+  } scfiVisibilityCullerListener;
 
   void ObjectVisible (iVisibilityObject *visobj, iMeshWrapper *mesh)
   {
