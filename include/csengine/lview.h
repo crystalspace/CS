@@ -50,15 +50,15 @@ public:
   /// Create empty frustum.
   csShadowFrustum () :
     csFrustum (csVector3 (0), &csPooledVertexArrayPool::GetDefaultPool()),
-    userData (NULL) { }
+    userData (NULL), relevant (false) { }
   /// Create empty frustum.
   csShadowFrustum (const csVector3& origin) :
     csFrustum (origin, &csPooledVertexArrayPool::GetDefaultPool()),
-    userData (NULL) { }
+    userData (NULL), relevant (false) { }
   /// Create empty frustum.
   csShadowFrustum (const csVector3& origin, int num_verts) :
     csFrustum (origin, num_verts, &csPooledVertexArrayPool::GetDefaultPool()),
-    userData (NULL) { }
+    userData (NULL), relevant (false) { }
   /// Copy constructor.
   csShadowFrustum (const csShadowFrustum& orig);
   /// Set user data.
