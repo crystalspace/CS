@@ -19,6 +19,8 @@ chronological order.
 	  maximum elapsed time.
 	- Jorrit enhanced PrecacheCulling() in Dynavis so that it also traverses
 	  the kdtree now. That improves efficiency a bit more.
+	- res changed genmesh to let not tris facing the light, but rather 
+	  those facing away cast shadows. This seems to give better results.
 1-Feb-2005
 	- Jorrit reverted a bug fix in engine->GetNearbyObjects() and
 	  GetNearbyMeshes() that was done on 15-Jan. The problem is that this

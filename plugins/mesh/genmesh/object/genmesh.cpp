@@ -499,6 +499,8 @@ void csGenmeshMeshObject::LightDisconnect (iLight* light)
   lighting_dirty = true;
 }
 
+#define SHADOW_CAST_BACKFACE
+
 void csGenmeshMeshObject::AppendShadows (iMovable* movable,
     iShadowBlockList* shadows, const csVector3& origin)
 {
@@ -532,14 +534,27 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
     //if (pl.VisibleFromPoint (origin) != cw) continue;
     float clas = pl.Classify (origin);
     if (ABS (clas) < EPSILON) continue;
+#ifdef SHADOW_CAST_BACKFACE
+    if ((clas < 0) == cw) continue;
+#else
     if ((clas <= 0) != cw) continue;
+#endif
 
-    pl.DD += origin * pl.norm;
+    const csVector3 offs = csVector3 (pl.norm) * csVector3 (EPSILON);
+    pl.DD += (origin + offs) * pl.norm;
+#ifndef SHADOW_CAST_BACKFACE
     pl.Invert ();
+#endif
     frust = list->AddShadow (origin, 0, 3, pl);
+#ifdef SHADOW_CAST_BACKFACE
+    frust->GetVertex (0).Set (vt_world[tri->c] - origin);
+    frust->GetVertex (1).Set (vt_world[tri->b] - origin);
+    frust->GetVertex (2).Set (vt_world[tri->a] - origin);
+#else
     frust->GetVertex (0).Set (vt_world[tri->a] - origin);
     frust->GetVertex (1).Set (vt_world[tri->b] - origin);
     frust->GetVertex (2).Set (vt_world[tri->c] - origin);
+#endif
   }
 
   delete[] vt_array_to_delete;
@@ -683,7 +698,10 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   int i;
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
   {
-    csVector3 normal = normals[i];
+    const csVector3& normal = normals[i];
+#ifdef SHADOW_CAST_BACKFACE
+    csVector3 v = o2w.This2Other (vertices[i]) - wor_light_pos;
+#else
     /*
       A small fraction of the normal is added to prevent unwanted
       self-shadowing (due small inaccuracies, the tri(s) this vertex
@@ -691,6 +709,9 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
      */
     csVector3 v = o2w.This2Other (vertices[i] + (normal * VERTEX_OFFSET)) -
       wor_light_pos;
+    /*csVector3 vN (v); vN.Normalize();
+    v -= (vN * 0.1f);*/
+#endif
 
     if (!light_frustum->Contains (v))
     {
