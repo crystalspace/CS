@@ -19,15 +19,16 @@ awsComponent::~awsComponent()
    /// Let go our references to any children if we have them.
    if (children)
    {
-      void *item = children->GetFirstItem();
+      void *item;
+      int   i;
 
-      while(item)
+      for(i=0; i<GetChildCount(); ++i)
       {
-         awsComponent *cmp = (awsComponent *)item;
+        item = GetChildAt(i);
+          
+        awsComponent *cmp = (awsComponent *)item;
 
-         cmp->DecRef();
-
-         item = children->GetNextItem();
+        cmp->DecRef();
       }
 
       delete children;
@@ -135,9 +136,9 @@ awsComponent::AddChild(awsComponent *child, bool owner)
   */
    // Create a new child list if the current one does not exist.
    if (children==NULL)
-     children = new csDLinkList();
+     children = new csBasicVector();
    
-   children->AddItem(child);
+   children->Push(child);
    
    // Modify the child's rectangle to be inside and relative to the parent's rectangle.
    child->frame.Move(frame.xmin, frame.ymin);
@@ -146,43 +147,33 @@ awsComponent::AddChild(awsComponent *child, bool owner)
 void 
 awsComponent::RemoveChild(awsComponent *child)
 {
+   int i;
+
    if (children)
-     if (children->SetCurrentItem (child))
+     if ((i=children->Find(child))!=-1)
      {
-       children->RemoveItem();
+       children->Delete(i);
        child->DecRef ();
      }
 }
 
-awsComponent *
-awsComponent::GetFirstChild()
+int
+awsComponent::GetChildCount()
 {
-   if (children)
-     return (awsComponent *)children->GetFirstItem();
-
-   return NULL;
+  if (children)
+    return children->Length();
+  else 
+    return 0;
 }
 
-    
 awsComponent *
-awsComponent::GetNextChild()
+awsComponent::GetChildAt(int i)
 {
-   if (children)
-    return (awsComponent *)children->GetNextItem();
-
-  return NULL;
-}
-
-bool
-awsComponent::FinishedChildren()
-{
-  if (children->GetCurrentItem() == children->PeekFirstItem())
-    return true;
-
+  if (children)
+    return (awsComponent *)((*children)[i]);
   else
-    return false;
+    return NULL;
 }
-
 
 void 
 awsComponent::Hide()

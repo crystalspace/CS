@@ -36,10 +36,10 @@ SCF_IMPLEMENT_IBASE(awsWindow)
 SCF_IMPLEMENT_IBASE_END
 
 awsWindow::awsWindow():above(NULL), below(NULL), 
+  min_button(NULL), max_button(NULL), close_button(NULL), btxt(NULL),
   frame_style(fsNormal), 
   frame_options(foControl | foZoom | foMin | foClose | foTitle | foGrip | foRoundBorder),
-  resizing_mode(false), moving_mode(false),
-  min_button(NULL), max_button(NULL), close_button(NULL)
+  resizing_mode(false), moving_mode(false)
 {
 
 }
@@ -76,8 +76,11 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
   if ((close_button=pm->GetTexture("WindowClose"))==NULL)
     printf("aws-debug: No WindowClose texture found.\n");
 
-  printf("aws-debug: texture for min_button is: %p\n", min_button); 
+  btxt=pm->GetTexture("Texture");
 
+  pm->GetInt(settings, "Style", frame_style);
+  pm->GetInt(settings, "Options", frame_options);
+  
   return true;
 }
 
@@ -308,20 +311,19 @@ awsWindow::OnMouseMove(int button, int x, int y)
     Frame().ymax+=delta_y;
 
     // Move children
-    awsComponent *child = GetFirstChild();
-
-    if (child)
+    int i;
+    awsComponent *child;
+   
+    for(i=0; i<GetChildCount(); ++i) 
     {
-      do 
-      {
+        child=GetChildAt(i);
+
         child->Frame().xmin+=delta_x;
         child->Frame().ymin+=delta_y;
         child->Frame().xmax+=delta_x;
-        child->Frame().ymax+=delta_y;
-        
-        child = GetNextChild();
-      } while(!FinishedChildren());
-    }
+        child->Frame().ymax+=delta_y;                
+    } 
+    
 
     //if (DEBUG_WINDOW_EVENTS)
         //printf("aws-debug: deltas for move: %d, %d\n", delta_x, delta_y);
@@ -404,7 +406,7 @@ awsWindow::OnDraw(csRect clip)
   int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
 //int white = WindowManager()->GetPrefMgr()->GetColor(AC_WHITE);
 
-  int tw, th, toff;
+  int tw, th, toff, btw, bth;
 
   // Get the size of the text
   WindowManager()->GetPrefMgr()->GetDefaultFont()->GetMaxSize(tw, th);
@@ -417,6 +419,9 @@ awsWindow::OnDraw(csRect clip)
 
   // Set the height of the title bar
   title_bar_height = th+3;
+
+  // Get the texture size, if there is one.
+  if (btxt) btxt->GetOriginalDimensions(btw, bth);
   
   switch(frame_style)
   {
@@ -424,7 +429,10 @@ awsWindow::OnDraw(csRect clip)
     // Draw the solid fill (or texture)
     if (frame_options & foBeveledBorder)
     {
-      g2d->DrawBox(Frame().xmin+2, Frame().ymin+2, Frame().xmax-Frame().xmin-2, Frame().ymax-Frame().ymin-2, fill);
+      if (btxt==NULL)
+        g2d->DrawBox(Frame().xmin+2, Frame().ymin+2, Frame().xmax-Frame().xmin-2, Frame().ymax-Frame().ymin-2, fill);
+      else
+        g3d->DrawPixmap(btxt, Frame().xmin+2, Frame().ymin+2, Frame().xmax-Frame().xmin-2, Frame().ymax-Frame().ymin-2, 0,0, Frame().Width(), Frame().Height(), 0);
 
       // Draw a beveled border, fill-hi on top and left, black-shadow on bot and right
       g2d->DrawLine(Frame().xmin, Frame().ymin, Frame().xmax, Frame().ymin, fill);
@@ -442,7 +450,12 @@ awsWindow::OnDraw(csRect clip)
     }
     else
     {
-      g2d->DrawBox(Frame().xmin+9, Frame().ymin+9, Frame().xmax-Frame().xmin-9, Frame().ymax-Frame().ymin-9, fill);
+      
+      if (btxt==NULL) 
+        g2d->DrawBox(Frame().xmin+9, Frame().ymin+9, Frame().xmax-Frame().xmin-9, Frame().ymax-Frame().ymin-9, fill);
+      else
+        g3d->DrawPixmap(btxt, Frame().xmin+9, Frame().ymin+9, Frame().xmax-Frame().xmin-9, Frame().ymax-Frame().ymin-9, 0,0, Frame().Width(), Frame().Height(), 0);
+      
 
       int topleft[10] =  { fill, hi, hi2, fill, fill, fill, lo2, lo, black };
       int botright[10] = { black, lo, lo2, fill, fill, fill, hi2, hi, fill };
@@ -534,9 +547,9 @@ awsWindow::OnDraw(csRect clip)
       close_button->GetOriginalDimensions(ctw, cth);
 
       // Draw min/max/close buttons
-      g3d->DrawPixmap(min_button, Frame().xmax-ctw-mxtw-mtw-8, Frame().ymin+8, mtw, mth, 0,0, mtw, mth, 0);
-      g3d->DrawPixmap(max_button, Frame().xmax-ctw-mxtw-8, Frame().ymin+8, mxtw, mth, 0,0, mxtw, mxth, 0);
-      g3d->DrawPixmap(close_button, Frame().xmax-ctw-6, Frame().ymin+8, ctw, cth, 0,0, ctw, cth, 0);
+      g3d->DrawPixmap(min_button, Frame().xmax-ctw-mxtw-mtw-8, Frame().ymin+toff+3, mtw, mth, 0,0, mtw, mth, 0);
+      g3d->DrawPixmap(max_button, Frame().xmax-ctw-mxtw-8, Frame().ymin+toff+3, mxtw, mth, 0,0, mxtw, mxth, 0);
+      g3d->DrawPixmap(close_button, Frame().xmax-ctw-6, Frame().ymin+toff+3, ctw, cth, 0,0, ctw, cth, 0);
            
     } 
     break;

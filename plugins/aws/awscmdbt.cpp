@@ -31,10 +31,37 @@ awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
  if (!awsComponent::Setup(_wmgr, settings)) return false;
 
  iAwsPrefs *pm=WindowManager()->GetPrefMgr();
-     
+      
  pm->GetInt(settings, "Style", frame_style);
  pm->GetInt(settings, "Style", alpha_level);
  pm->GetString(settings, "Caption", caption);
+
+ switch(frame_style)
+ {
+ case fsNormal:
+ case fsToolbar:
+   {
+     iString   *tn=NULL;
+    
+     tex[0]=pm->GetTexture("Texture");
+     pm->GetString(settings, "Image", tn);
+     
+     if (tn) tex[1]=pm->GetTexture(tn->GetData(), tn->GetData());
+   } break;
+
+ case fsBitmap:
+   {
+     iString   *tn1=NULL, *tn2=NULL, *tn3=NULL;
+
+     pm->GetString(settings, "BitmapNormal", tn1);
+     pm->GetString(settings, "BitmapFocused", tn2);
+     pm->GetString(settings, "BitmapClicked", tn3);
+
+     if (tn1) tex[0]=pm->GetTexture(tn1->GetData(), tn1->GetData());
+     if (tn2) tex[1]=pm->GetTexture(tn2->GetData(), tn2->GetData());
+     if (tn3) tex[2]=pm->GetTexture(tn3->GetData(), tn3->GetData());
+   } break;
+ }
 
  return true;
 }
@@ -50,6 +77,7 @@ awsCmdButton::OnDraw(csRect clip)
   int hi2   = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT2);
   int lo    = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW);
   int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);
+  int  fill = WindowManager()->GetPrefMgr()->GetColor(AC_FILL);
   int dfill = WindowManager()->GetPrefMgr()->GetColor(AC_DARKFILL);
   int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
   
@@ -73,6 +101,7 @@ awsCmdButton::OnDraw(csRect clip)
       g2d->DrawLine(Frame().xmax-1, Frame().ymin+2, Frame().xmax-1, Frame().ymax-1, hi2);
 
       g2d->DrawBox(Frame().xmin+3, Frame().ymin+3, Frame().Width()-3, Frame().Height()-3, dfill);
+      
     }
     else
     {
@@ -87,8 +116,14 @@ awsCmdButton::OnDraw(csRect clip)
       g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmin+1, Frame().ymax-2, hi2);
       g2d->DrawLine(Frame().xmin+1, Frame().ymax-2, Frame().xmax-2, Frame().ymax-2, lo2);
       g2d->DrawLine(Frame().xmax-2, Frame().ymin+1, Frame().xmax-2, Frame().ymax-2, lo2);
+
+      g2d->DrawBox(Frame().xmin+2, Frame().ymin+2, Frame().Width()-3, Frame().Height()-3, fill);
     }
 
+    if (tex[0])
+       g3d->DrawPixmap(tex[0], Frame().xmin, Frame().ymin, Frame().Width(), Frame().Height(), 0, 0, Frame().Width(), Frame().Height(), 96);
+
+    
     // Draw the caption, if there is one and the style permits it.
     if (caption && frame_style==fsNormal)
     {     

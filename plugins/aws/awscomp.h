@@ -55,8 +55,8 @@ class awsComponent : public awsSigSrc
    /// The rectangle marking the frame of this component
    csRect frame;
 
-   /// This points to a linked list if this component has children
-   csDLinkList *children;
+   /// This points to a vector if this component has children
+   csBasicVector *children;
 
    /// Every component will have a name, which is translated to an id
    unsigned long id;
@@ -127,14 +127,11 @@ public:
      */
     virtual void RemoveChild(awsComponent *child);
 
-    /// Mirrors the GetFirstItem from the DLinkList class
-    virtual awsComponent *GetFirstChild();
+    /// Get's the number of children
+    virtual int GetChildCount();
 
-    /// Mirrors the GetNextItem from the DLinkList class
-    virtual awsComponent *GetNextChild();
-
-    /// Checks to see if we're done iterating through children - you must ALWAYS check this at the bottom of a loop!
-    virtual bool          FinishedChildren();
+    /// Get's a specific child
+    virtual awsComponent *GetChildAt(int i);
     
     /// Returns true if this component has children
     virtual bool HasChildren()

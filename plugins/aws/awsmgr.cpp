@@ -263,7 +263,7 @@ awsManager::UpdateStore()
    while(curwin)
    {
       csRect r(curwin->Frame());
-      printf("\t%d,%d,%d,%d\n", r.xmin, r.ymin, r.xmax, r.ymax);
+      //printf("\t%d,%d,%d,%d\n", r.xmin, r.ymin, r.xmax, r.ymax);
       updatestore.Include(r);
       curwin = curwin->WindowBelow();
    }
@@ -294,7 +294,7 @@ awsManager::Print(iGraphics3D *g3d)
   }
 
   // Debug code
-  for(i=0; i<updatestore.Count(); ++i)
+  /*for(i=0; i<updatestore.Count(); ++i)
   {
     csRect r(updatestore.RectAt(i));
      
@@ -303,7 +303,7 @@ awsManager::Print(iGraphics3D *g3d)
     g2d->DrawLine(r.xmin, r.ymax, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
     g2d->DrawLine(r.xmax, r.ymin, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
 
-  }
+  }*/
 }
 
 void       
@@ -321,8 +321,8 @@ awsManager::Redraw()
    
    //ptG2D->SetClipRect(0,0,proctex_width, proctex_width);
 
-   if (redraw_tag%2) ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_SHADOW));
-   else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
+   //if (redraw_tag%2) ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_SHADOW));
+   //else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
        
    // check to see if there is anything to redraw.
    if (dirty.Count() == 0) 
@@ -448,14 +448,15 @@ awsManager::RedrawWindow(awsWindow *win, csRect &dirtyarea)
 void
 awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
 {
-   awsComponent *child = cmp->GetFirstChild();
-
-   if (!child) return;
+   int i; 
+   awsComponent *child;
 
    if (DEBUG_MANAGER) printf("aws-debug: start drawing children.\n");
 
-   do 
+   for(i=0; i<cmp->GetChildCount(); ++i)
    {
+     child = cmp->GetChildAt(i);
+
      if (DEBUG_MANAGER) printf("aws-debug: entered draw children loop for %p.\n", child);
 
      // Check to see if this component even needs redrawing.
@@ -472,9 +473,8 @@ awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
      // If it has children, draw them
      if (child->HasChildren())
        RecursiveDrawChildren(child, dirtyarea);
-
-     child = cmp->GetNextChild();
-   } while (!cmp->FinishedChildren()); 
+     
+   } // End for
 
    if (DEBUG_MANAGER) printf("aws-debug: finished drawing children.\n");
 
@@ -635,14 +635,13 @@ awsManager::HandleEvent(iEvent& Event)
 bool 
 awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
 {
+  int i;
+  awsComponent *child;
 
-  awsComponent *child = cmp->GetFirstChild();
-
-  if (!child)
-    return false;
-
-  do 
+  for(i=0; i<cmp->GetChildCount(); ++i)
    {
+
+    child = cmp->GetChildAt(i);
    
     switch(Event.Type)
     {
@@ -689,10 +688,8 @@ awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
     if (child->HasChildren()) 
       if (RecursiveBroadcastToChildren(child, Event))
         return true;
-       
-    child = cmp->GetNextChild();
-
-    } while (!cmp->FinishedChildren()); // End while
+   
+    } // End for
 
   return false;
 

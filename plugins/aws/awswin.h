@@ -50,7 +50,7 @@ private:
     void LinkBelow(awsWindow *win);
 
     /// Texture handles for buttons
-    iTextureHandle *min_button, *max_button, *close_button;
+    iTextureHandle *min_button, *max_button, *close_button, *btxt;
 
 private:
     /** Contains the redraw tag.  This tag changes everytime we redraw the window system, but only once per frame.
@@ -59,10 +59,10 @@ private:
     unsigned int redraw_tag;
 
     /// The frame style of the window
-    unsigned int frame_style;
+    int frame_style;
 
     /// Individual frame options
-    unsigned int frame_options;
+    int frame_options;
 
     /// The size of the title bar as of last draw
     int  title_bar_height;
