@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    CVS Snapshot Generation Script
-#    Copyright (C) 2000,2001 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2003 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -59,11 +59,11 @@
 import commands, glob, grp, os, re, string, sys, tempfile, time
 
 prog_name = "snapshot.py"
-prog_version = "11"
+prog_version = "12"
 author_name = "Eric Sunshine"
 author_email = "sunshine@sunshineco.com"
 author_info = author_name + " <" + author_email + ">"
-copyright = "Copyright (C) 2000,2001 by " + author_info
+copyright = "Copyright (C) 2000-2003 by " + author_info
 
 #------------------------------------------------------------------------------
 # Configuration Section
@@ -266,7 +266,7 @@ class Snapshot:
         rc = commands.getstatusoutput(
             "find " + dir + " -type d -name CVS -print -prune")
         if rc[0] == 0:
-            dirs = string.split(rc[1])
+            dirs = string.split(rc[1], "\n")
         else: # 'find' command returned error.
             if len(rc[1]) > 0:
                 self.log("Error searching for CVS directories")

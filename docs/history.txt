@@ -8,6 +8,9 @@ The history order is reversed so that new features are at the top.
 	  out by Vincent Knecht <vince@iefr.ath.cx>: existance -> existence
 	- Anders Stenberg made sure NextFrame is called when rendering with
 	  new renderer.
+	- Eric Sunshine applied a patch to snapshot.py from Just van Rossum
+	  <just@letterror.com> which allows it to work correctly when project
+	  subdirectory names contain spaces.
 01-Jul-2003
 	- HangDude made the following changes:
 	   - Moved anonrndbuf.h from csutil to cstool (on Jorrit's request).
