@@ -36,18 +36,6 @@ private:
   int tx, ty, tw, th;
 
 public:
-  /// Initialize the sprite from a texture.
-  csSprite2D (ITextureHandle *hTexture, int x, int y, int w, int h)
-  {
-    hTex = hTexture;
-    SetTextureRectangle (x, y, w, h);
-  }
-
-  /// Deinitialize the sprite
-  virtual ~csSprite2D ()
-  {
-  }
-
   /// Return true if sprite has been initialized okay
   bool ok ()
   { return hTex != NULL; }
@@ -80,6 +68,18 @@ public:
   /// Query sprite texture handle
   ITextureHandle *GetTextureHandle ()
   { return hTex; }
+
+  /// Initialize the sprite from a texture.
+  csSprite2D (ITextureHandle *hTexture, int x, int y, int w, int h)
+  {
+    hTex = hTexture;
+    SetTextureRectangle (x, y, w, h);
+  }
+
+  /// Deinitialize the sprite
+  virtual ~csSprite2D ()
+  {
+  }
 };
 
 #endif // __CSSPR2D_H__
