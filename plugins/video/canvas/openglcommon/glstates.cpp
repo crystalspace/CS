@@ -125,4 +125,5 @@ GLuint csGLStateCache::GetTexture( GLenum target, GLuint texture, int layer)
     return texture1d[layer];
   if( target == GL_TEXTURE_2D )
     return texture2d[layer];
+  return 0;
 }

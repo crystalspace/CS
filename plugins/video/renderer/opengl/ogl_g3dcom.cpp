@@ -5700,7 +5700,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       else
       {
 	// @@@ This is suspicious: inputtex is int but routine returns float?
-	inputtex = layer->GetStateFloat( csEffectStrings::texture_source );
+	inputtex = (int)layer->GetStateFloat( csEffectStrings::texture_source );
       }
       
       if( inputtex==-1 )
