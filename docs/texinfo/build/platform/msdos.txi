@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node MS-DOS, GCC Windows, BeOS, Platform Instructions
-@subsection @sc{ms-dos}
+@subsection @sc{ms-dos} - using @sc{DJGPP} compiler
 @cindex @sc{ms-dos}
 
 If you want to compile and use Crystal Space for @sc{dos} using the @sc{djgpp}

@@ -18,20 +18,20 @@ will find a reference to it from within the instructions in this section.
 
 @menu
 * Unix::
-* Win32:: Windows
+* Win32:: Windows - using @sc{MSVC}++ compiler
+* Mingw:: Windows - using Mingw compiler
 * NeXT:: MacOS/X Server, OpenStep, NextStep
 * OS2:: @sc{os}/2
 * Macintosh::
 * BeOS:: @sc{b}e@sc{os}
-* MS-DOS:: @sc{ms-dos}
-* GCC Windows:: @sc{gcc} and Mingw for Windows
+* MS-DOS:: @sc{ms-dos} - using @sc{DJGPP} compiler
 @end menu
 
 @importss{build,platform,unix.txi}
 @importss{build,platform,win32.txi}
+@importss{build,platform,win32gcc.txi}
 @importss{build,platform,next.txi}
 @importss{build,platform,os2.txi}
 @importss{build,platform,mac.txi}
 @importss{build,platform,beos.txi}
 @importss{build,platform,msdos.txi}
-@importss{build,platform,win32gcc.txi}

@@ -1,14 +1,15 @@
 @c -*-texinfo-*-
-@node GCC Windows, , MS-DOS, Platform Instructions
-@subsection @sc{gcc} and Mingw for Windows
+@node Mingw, , MS-DOS, Platform Instructions
+@subsection Windows - using Mingw compiler
 
 @noindent
 @emph{Updated by Norman Kr@"amer, @email{norman@@users.sourceforge.net}.}
 
-These instructions are for building Crystal Space with a @sc{gnu} compiler for
-Windows.  Unfortunately, there are many different versions of the @sc{gnu}
-Windows compiler and problems arise with some Windows header files containing
-non-standard code used by Microsoft.
+These instructions are for building Crystal Space with Mingw - a @sc{gnu}
+compiler for Windows.  There are many different versions of the @sc{gnu}
+Windows compiler and problems arise with some Windows header files
+containing non-standard code used by Microsoft, so we recommend
+the Mingw compiler which is currently best supported by Crystal Space.
 
 @subsubheading Necessary Resources
 
@@ -108,5 +109,8 @@ the Mingw32 makefile.  Check the the following variables:
 @code{LIBS.SOUND.SYSTEM}
 @end itemize
 
-Adjust them to match your system libraries.  Also in the file
-@file{CS\mk\user.mak} select which plugins you wish to compile.
+Adjust them to match your system libraries.  For example, if you use the
+SGI OpenGL SDK instead of Microsoft's OpenGL, change @code{-lopengl32}
+and  @code{-lglut32} to @code{-lopengl and @code{-lglut} in
+@code{LIBS.GL3D.SYSTEM}. Also in the file @file{CS\mk\user.mak} select
+which plugins you wish to compile.
