@@ -2,8 +2,12 @@ The history order is reversed so that new features are at the top.
 
 1-Oct-2002
 	- Eric Sunshine made CS/bin/arch.sh more robust.  It now correctly
-	  handles the case on Linux where the user does not have
-	  permission to read /proc/cpuinfo.
+	  handles the case on Linux where the user does not have permission to
+	  read /proc/cpuinfo.
+	- Eric Sunshine updated jobber.pl so that it now fakes up CC and CXX
+	  using `false' rather than `true' for the SourceForge shell machine.
+	  Using `false' allows the makefile configuration phase to complete
+	  successfully, whereas `true' caused some tests to fail.
 30-Sep-2002
 	- Reverted a downscaling fix in OpenGL renderer for 2D images.
 	- Fixed simplept so it works again. Basically there was a problem

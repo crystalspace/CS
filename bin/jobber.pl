@@ -84,7 +84,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '15';
+my $PROG_VERSION = '16';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000,2001,2002 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -175,22 +175,20 @@ my $COPYRIGHT = "Copyright (C) 2000,2001,2002 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 # For write-access, SourceForge requires SSH access.
 $ENV{'CVS_RSH'} = 'ssh';
 
-# Doxygen is not installed on SourceForge, so use a local copy.
-$ENV{'PATH'} .= ':/home/groups/c/cr/crystal/bin:/usr/local/bin';
+# Ensure that Doxygen can be found.
+$ENV{'PATH'} .= ':/usr/local/bin';
 
 # The SourceForge shell machine has no developer tools.  Nothing in this script
-# requires a compiler, but this script does need to configure the makefiles
-# by invoking `make platform'.  Unfortunately, unixconf.sh which is invoked by
+# requires a compiler, but this script does need to configure the makefiles by
+# invoking `make platform'.  Unfortunately, unixconf.sh which is invoked by
 # `make platform' does expect to find a compiler.  We can fake out unixconf.sh
-# by pretending that a compiler is present.
-$ENV{'CC' } = 'true';
-$ENV{'CXX'} = 'true';
-
-# The SourceForge shell machine crashes the makefile configuration step (as of
-# 2001/10/16) with a segmentation fault.  As a stop-gap measure, rather than
-# spending a lot of time debugging another SourceForge issue, just disable
-# makefile caching.
-$ENV{'USE_MAKEFILE_CACHE'} = 'no';
+# by pretending that a compiler is present.  We specifically invoke the `false'
+# program instead of the non-existent compiler so that the tests performed by
+# unixconf.sh run cleanly.  (Using `true' rather than `false' would cause some
+# tests to fail since the script would try to run test programs which it
+# thought had built correctly.)
+$ENV{'CC' } = 'false';
+$ENV{'CXX'} = 'false';
 
 # The Visual-C++ DSW and DSP generation process is a bit too noisy.
 $ENV{'MSVC_QUIET'} = 'yes';
