@@ -43,10 +43,10 @@ endif
 DIR.BUGPLUG = plugins/bugplug
 OUT.BUGPLUG = $(OUT)/$(DIR.BUGPLUG)
 INF.BUGPLUG = $(SRCDIR)/$(DIR.BUGPLUG)/bugplug.csplugin
-INC.BUGPLUG = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BUGPLUG)/*.h))
-SRC.BUGPLUG = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BUGPLUG)/*.cpp))
+INC.BUGPLUG = $(wildcard $(SRCDIR)/$(DIR.BUGPLUG)/*.h)
+SRC.BUGPLUG = $(wildcard $(SRCDIR)/$(DIR.BUGPLUG)/*.cpp)
 OBJ.BUGPLUG = $(addprefix $(OUT.BUGPLUG)/,$(notdir $(SRC.BUGPLUG:.cpp=$O)))
-DEP.BUGPLUG = CSTOOL CSGEOM CSUTIL CSUTIL
+DEP.BUGPLUG = CSTOOL CSGEOM CSUTIL
 CFG.BUGPLUG = $(SRCDIR)/data/config/bugplug.cfg
 
 OUTDIRS += $(OUT.BUGPLUG)
