@@ -15,7 +15,8 @@ Short-term cleanups that need to be done:
 
 10-Oct-1999
 	- Eric Sunshine fixed the MacOS/X Server, OpenStep, and NextStep ports
-	  so that applications once again link following Andrew's changes.
+	  so that applications once again link following Andrew's recent
+	  system-wide changes.
 	- Eric Sunshine fixed a few problems with the Crystal Clear makefiles
 	  which caused the 'depend' target to break.
 	- Eric Sunshine ported Crystal Clear to MacOS/X Server, OpenStep and
@@ -25,10 +26,15 @@ Short-term cleanups that need to be done:
 	  where it is asked to load the same module multiple times.  This
 	  modification allows Crystal Clear to work.
 	- Eric Sunshine fixed Crystal Clear so that it can be built and used
-	  on statically linked platforms (or when USE_DLL is specified).
+	  on statically linked platforms (or when USE_DLL=no is specified).
 	- Eric Sunshine fixed a crasher in the Crystal Clear test program.
 	  It was calling the wrong function, csLoader::LoadLibrary() rather
 	  than LoadLibraryFile(), in order to load /lib/std/library.
+	- Eric Sunshine modified WalkTest so that the 'loadsprite' command
+	  works through VFS.  Also now leaves less garbage in the filesystem
+	  from the import process.
+	- Eric Sunshine fixed csLoader so that it doesn't leave quite as much
+	  garbage laying around in the filesystem after loading a model file.
 7-Oct-1999
 	- Eric Sunshine added apps/support/ezstatic.cpp.  This is a companion
 	  to static.cpp.  It provides COM initialization for applications
@@ -8343,4 +8349,3 @@ Short-term cleanups that need to be done:
 26-Aug-1997 V0.01
 	- First public release.
 -----------------------------------------------------------------------------
-
