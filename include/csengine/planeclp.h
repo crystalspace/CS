@@ -28,6 +28,11 @@
  */
 class csPlaneClip : public csPlane
 {
+protected:
+  DECLARE_GROWING_ARRAY(verts, csVector3);
+  DECLARE_GROWING_ARRAY(vis, bool);
+  void init (int len) { verts.SetLimit (len); vis.SetLimit (len); }
+
 public:
   /// Initialize the plane.
   csPlaneClip (const csVector3& plane_norm, float d = 0) :
@@ -101,11 +106,6 @@ public:
     pverts = verts.GetArray();
     return true;
   }
-
-protected:
-  DECLARE_GROWING_ARRAY(verts, csVector3);
-  DECLARE_GROWING_ARRAY(vis, bool);
-  void init (int len) { verts.SetLimit (len); vis.SetLimit (len); }
 };
 
 #endif // __CS_PLANECLP_H__
