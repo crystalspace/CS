@@ -188,6 +188,17 @@ public:
 
 #define CS_FX_EXTRA_MODES 0x000f0000
 
+/**
+ * Client states CS keeps for OpenGL.
+ */
+#define CS_CLIENTSTATE_VERTEX_ARRAY 1
+#define CS_CLIENTSTATE_TEXTURE_COORD_ARRAY 2
+#define CS_CLIENTSTATE_COLOR_ARRAY 4
+#define CS_CLIENTSTATE_ALL 0x7
+#define CS_CLIENTSTATE_VTC 0x7
+#define CS_CLIENTSTATE_VC 0x5
+#define CS_CLIENTSTATE_VT 0x3
+
 /// Crystal Space OpenGL driver.
 class csGraphics3DOGLCommon : public iGraphics3D
 {
@@ -226,6 +237,12 @@ public:
    * Setup and remember blend mode for subsequent polygon drawing.
    */
   static float SetupBlend (UInt mode, float m_alpha, bool txt_alpha);
+
+  /**
+   * Setup and remember client states.
+   * Use a combination of CS_CLIENTSTATE_...
+   */
+  static void SetClientStates (UInt client_states);
 
 private:
   /**

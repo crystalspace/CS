@@ -658,14 +658,11 @@ void OpenGLLightmapCache::Flush ()
   glEnable (GL_TEXTURE_2D);
   glColor4f (1, 1, 1, 0);
   csGraphics3DOGLCommon::SetupBlend (CS_FX_SRCDST, 0, false);
-  glEnableClientState (GL_VERTEX_ARRAY);
-  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+  csGraphics3DOGLCommon::SetClientStates (CS_CLIENTSTATE_VT);
   for (i = 0 ; i < super_lm_num ; i++)
   {
     suplm[i].queue.Flush (suplm[i].Handle);
   }
-  glDisableClientState (GL_VERTEX_ARRAY);
-  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 }
 
 void OpenGLLightmapCache::Flush (int sup_idx)
@@ -680,10 +677,7 @@ void OpenGLLightmapCache::Flush (int sup_idx)
   g3d->SetGLZBufferFlagsPass2 (queue_zbuf_mode, true);
   glEnable (GL_TEXTURE_2D);
   csGraphics3DOGLCommon::SetupBlend (CS_FX_SRCDST, 0, false);
-  glEnableClientState (GL_VERTEX_ARRAY);
-  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+  csGraphics3DOGLCommon::SetClientStates (CS_CLIENTSTATE_VT);
   lm_queue.Flush (suplm[sup_idx].Handle);
-  glDisableClientState (GL_VERTEX_ARRAY);
-  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 }
 

@@ -1025,7 +1025,7 @@ static float GetAlpha (UInt mode, float m_alpha, bool txt_alpha)
 }
 
 
-static UInt prev_mode = 0xffffffff;
+static UInt prev_mode = 0xffffffff; //@@@ Move to class (static).
 static bool prev_txt_alpha = false;
 
 float csGraphics3DOGLCommon::SetupBlend (UInt mode,
@@ -1103,6 +1103,36 @@ float csGraphics3DOGLCommon::SetupBlend (UInt mode,
   return m_alpha;
 }
 
+UInt prev_ct = 0;	// @@@ Move to class (static).
+
+void csGraphics3DOGLCommon::SetClientStates (UInt ct)
+{
+  if (prev_ct == ct) return;
+
+  if (!(prev_ct & CS_CLIENTSTATE_COLOR_ARRAY) &&
+  	(ct & CS_CLIENTSTATE_COLOR_ARRAY))
+    glEnableClientState (GL_COLOR_ARRAY);
+  else if (!(ct & CS_CLIENTSTATE_COLOR_ARRAY) &&
+  	(prev_ct & CS_CLIENTSTATE_COLOR_ARRAY))
+    glDisableClientState (GL_COLOR_ARRAY);
+
+  if (!(prev_ct & CS_CLIENTSTATE_VERTEX_ARRAY) &&
+  	(ct & CS_CLIENTSTATE_VERTEX_ARRAY))
+    glEnableClientState (GL_VERTEX_ARRAY);
+  else if (!(ct & CS_CLIENTSTATE_VERTEX_ARRAY) &&
+  	(prev_ct & CS_CLIENTSTATE_VERTEX_ARRAY))
+    glDisableClientState (GL_VERTEX_ARRAY);
+
+  if (!(prev_ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY) &&
+  	(ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY))
+    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+  else if (!(ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY) &&
+  	(prev_ct & CS_CLIENTSTATE_TEXTURE_COORD_ARRAY))
+    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+
+  prev_ct = ct;
+}
+
 void csGraphics3DOGLCommon::SetupStencil ()
 {
   if (stencil_init) return;
@@ -1141,17 +1171,12 @@ void csGraphics3DOGLCommon::FlushDrawFog ()
   glShadeModel (GL_SMOOTH);
   SetupBlend (CS_FX_ALPHA, 0, false);
 
-  glEnableClientState (GL_VERTEX_ARRAY);
-  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState (GL_COLOR_ARRAY);
+  SetClientStates (CS_CLIENTSTATE_ALL);
   glColorPointer (3, GL_FLOAT, 0, fog_queue.fog_color);
   glVertexPointer (4, GL_FLOAT, 0, fog_queue.glverts);
   glTexCoordPointer (2, GL_FLOAT, 0, fog_queue.fog_txt);
   glDrawElements (GL_TRIANGLES, fog_queue.num_triangles*3, GL_UNSIGNED_INT,
   	  fog_queue.tris);
-  glDisableClientState (GL_COLOR_ARRAY);
-  glDisableClientState (GL_VERTEX_ARRAY);
-  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 
   fog_queue.Reset ();
 }
@@ -1216,18 +1241,17 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   // Gouraud shading will be delayed to after the multiple texture layers
   // if we have them.
   //=================
-  glEnableClientState (GL_VERTEX_ARRAY);
-  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
   // Only do gouraud shading in the first pass if we don't have
   // extra material layers.
   if (gouraud && !multimat)
   {
     glShadeModel (GL_SMOOTH);
-    glEnableClientState (GL_COLOR_ARRAY);
+    SetClientStates (CS_CLIENTSTATE_ALL);
     glColorPointer (4, GL_FLOAT, 0, queue.glcol);
   }
   else
   {
+    SetClientStates (CS_CLIENTSTATE_VT);
     glShadeModel (GL_FLAT);
   }
   glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
@@ -1236,7 +1260,6 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   	  queue.tris);
   if (gouraud && !multimat)
   {
-    glDisableClientState (GL_COLOR_ARRAY);
     glShadeModel (GL_FLAT);
   }
 
@@ -1306,13 +1329,11 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
       glShadeModel (GL_SMOOTH);
       SetupBlend (CS_FX_MULTIPLY2, 0, false);
 
-      glDisableClientState (GL_TEXTURE_COORD_ARRAY);	//@@@ REMEMBER!
-      glEnableClientState (GL_COLOR_ARRAY);
+      SetClientStates (CS_CLIENTSTATE_VC);
       glColorPointer (4, GL_FLOAT, 0, queue.glcol);
       glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
       glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
   	  queue.tris);
-      glDisableClientState (GL_COLOR_ARRAY);
     }
   }
 
@@ -1337,9 +1358,6 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   	  queue.tris);
   }
 #endif
-
-  glDisableClientState (GL_VERTEX_ARRAY);
-  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 
   queue.Reset ();
 }
@@ -2500,7 +2518,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     mat = (csMaterialHandle*)mesh.mat_handle;
   }
-  bool colstate_enabled = false;
   bool do_gouraud = m_gouraud && work_colors;
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
@@ -2539,8 +2556,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   //===========
   // Draw the base mesh.
   //===========
-  glEnableClientState (GL_VERTEX_ARRAY);
-  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
   glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
   glTexCoordPointer (2, GL_FLOAT, 0, & work_uv_verts[0]);
   // If multi-texturing is enabled we delay apply of gouraud shading
@@ -2548,8 +2563,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (do_gouraud && !m_multimat)
   {
     glShadeModel (GL_SMOOTH);
-    colstate_enabled = true;
-    glEnableClientState (GL_COLOR_ARRAY);
+    SetClientStates (CS_CLIENTSTATE_ALL);
     if (mesh.fxmode & CS_FX_ALPHA)
       glColorPointer (4, GL_FLOAT, 0, & rgba_verts[0]);
     else
@@ -2557,6 +2571,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   }
   else
   {
+    SetClientStates (CS_CLIENTSTATE_VT);
     glShadeModel (GL_FLAT);
     glColor4f (flat_r, flat_g, flat_b, m_alpha);
   }
@@ -2575,11 +2590,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (m_multimat)
   {
     glShadeModel (GL_FLAT);
-    if (colstate_enabled)
-    {
-      colstate_enabled = false;
-      glDisableClientState (GL_COLOR_ARRAY);
-    }
+    SetClientStates (CS_CLIENTSTATE_VT);
     if (num_vertices > uv_mul_verts.Limit ())
       uv_mul_verts.SetLimit (num_vertices);
 
@@ -2650,11 +2661,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       glDisable (GL_TEXTURE_2D);
       glShadeModel (GL_SMOOTH);
       SetupBlend (CS_FX_MULTIPLY2, 0, false);
-      if (!colstate_enabled)
-      {
-        colstate_enabled = true;
-        glEnableClientState (GL_COLOR_ARRAY);
-      }
+      SetClientStates (CS_CLIENTSTATE_ALL);
       if (mesh.fxmode & CS_FX_ALPHA)
         glColorPointer (4, GL_FLOAT, 0, & rgba_verts[0]);
       else
@@ -2677,13 +2684,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     SetupBlend (CS_FX_ALPHA, 0, false);
 
     glShadeModel (GL_SMOOTH);
-
-    if (!colstate_enabled)
-    {
-      colstate_enabled = true;
-      glEnableClientState (GL_COLOR_ARRAY);
-    }
-
+    SetClientStates (CS_CLIENTSTATE_ALL);
     glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
     glTexCoordPointer (2, GL_FLOAT, sizeof (G3DFogInfo), & work_fog[0].intensity);
     glColorPointer (3, GL_FLOAT, sizeof (G3DFogInfo), & work_fog[0].r);
@@ -2695,11 +2696,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     if (!m_gouraud)
       glShadeModel (GL_FLAT);
   }
-
-  if (colstate_enabled)
-    glDisableClientState (GL_COLOR_ARRAY);
-  glDisableClientState (GL_VERTEX_ARRAY);
-  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 
   glMatrixMode (GL_MODELVIEW);
   glPopMatrix ();
