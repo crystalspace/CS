@@ -24,12 +24,7 @@
 #include "cstypes.h"
 #endif
 
-#ifdef WIN32
-#define MAXFLOAT  99999999
-#ifndef M_PI
-#define M_PI      3.1415926535897932384626433832795028841971693993751
-#endif
-#else
+#ifndef WIN32
 // Linux defines
 #ifdef DDG
 #include <strstream.h> 
@@ -43,9 +38,11 @@
 #define acosf	acos
 #define logf	log
 #define powf	pow
-#ifndef MAXFLOAT
-#define MAXFLOAT 99999999
 #endif
+
+#define MAXFLOAT  99999999
+#ifndef M_PI
+#define M_PI      3.1415926535897932384626433832795028841971693993751
 #endif
 
 #define DDG_BGET(VALUE,BITMASK) ((VALUE) & (BITMASK))
