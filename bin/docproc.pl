@@ -78,7 +78,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'docproc.pl';
-my $PROG_VERSION = '1.7';
+my $PROG_VERSION = '1.8';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -144,10 +144,6 @@ my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 # For write-access, SourceForge requires SSH access.
 $ENV{'CVS_RSH'} = 'ssh';
-
-# Use local copy of Doxygen since it is not installed on SourceForge.
-my $LOCAL_PATH = '/home/groups/crystal/bin';
-$ENV{'PATH'} = "$LOCAL_PATH:$ENV{'PATH'}";
 
 my $PROJECT_ROOT = 'CS';
 my $CVSUSER = 'sunshine';
