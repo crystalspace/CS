@@ -21,6 +21,7 @@
 #define __CS_GL_RENDERBUFFER_H__
 
 #include "ivideo/rndbuf.h"
+#include "csutil/leakguard.h"
 
 enum csGLRenderBufferLockType
 {
@@ -43,6 +44,8 @@ protected:
   size_t rangeEnd;
 public:
   SCF_DECLARE_IBASE;
+
+  CS_LEAKGUARD_DECLARE (csGLRenderBuffer);
 
   csGLRenderBuffer (size_t size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount);

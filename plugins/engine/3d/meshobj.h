@@ -26,6 +26,7 @@
 #include "csutil/flags.h"
 #include "csutil/garray.h"
 #include "csutil/weakref.h"
+#include "csutil/leakguard.h"
 #include "plugins/engine/3d/movable.h"
 #include "plugins/engine/3d/impmesh.h"
 #include "plugins/engine/3d/meshlod.h"
@@ -271,6 +272,8 @@ private:
   csFlags relevant_lights_flags;
 
 public:
+  CS_LEAKGUARD_DECLARE (csMeshWrapper);
+
   /// Set of flags
   csFlags flags;
   /// Culler flags.
@@ -890,6 +893,8 @@ public:
   csMeshFactoryWrapper (iMeshObjectFactory* meshFact);
   /// Constructor.
   csMeshFactoryWrapper ();
+
+  CS_LEAKGUARD_DECLARE (csMeshFactoryWrapper);
 
   /// Set the mesh object factory.
   void SetMeshObjectFactory (iMeshObjectFactory* meshFact);

@@ -23,6 +23,7 @@
 #include "csutil/csstring.h"
 #include "csutil/csobject.h"
 #include "csutil/refarr.h"
+#include "csutil/leakguard.h"
 #include "iengine/sharevar.h"
 
 
@@ -43,6 +44,7 @@ private:
   void FireListeners ();
 
 public:
+  CS_LEAKGUARD_DECLARE (csSharedVariable);
 
   SCF_DECLARE_IBASE_EXT (csObject);
 

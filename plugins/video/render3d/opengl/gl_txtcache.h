@@ -22,6 +22,7 @@
 
 #include "csutil/scf.h"
 #include "csgeom/csrect.h"
+#include "csutil/leakguard.h"
 
 struct iTextureHandle;
 struct iObjectRegistry;
@@ -34,6 +35,8 @@ class csGLGraphics3D;
  */
 struct csTxtCacheData
 {
+  CS_LEAKGUARD_DECLARE (csTxtCacheData);
+
   /// The size of this texture.
   long Size;
   /// iTextureHandle.

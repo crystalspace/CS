@@ -30,6 +30,9 @@
 #include "ivideo/graph3d.h"
 
 
+CS_LEAKGUARD_IMPLEMENT (csMeshWrapper)
+CS_LEAKGUARD_IMPLEMENT (csMeshFactoryWrapper)
+
 // ---------------------------------------------------------------------------
 
 // Implementations of iShadowCaster and iShadowReceiver that are used

@@ -22,6 +22,8 @@
 #include "csutil/hashmap.h"
 
 
+CS_LEAKGUARD_IMPLEMENT (csSharedVariable)
+
 SCF_IMPLEMENT_IBASE_EXT(csSharedVariable)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSharedVariable)
 SCF_IMPLEMENT_IBASE_EXT_END

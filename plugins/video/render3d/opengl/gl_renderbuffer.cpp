@@ -22,6 +22,8 @@
 #include "gl_render3d.h"
 #include "gl_renderbuffer.h"
 
+CS_LEAKGUARD_IMPLEMENT (csGLRenderBuffer)
+
 SCF_IMPLEMENT_IBASE (csGLRenderBuffer)
   SCF_IMPLEMENTS_INTERFACE (iRenderBuffer)
 SCF_IMPLEMENT_IBASE_END
