@@ -9,6 +9,16 @@ The history order has been reversed so that new features are at the top.
 	- Started working on saving and loading of octree and PVS.
 	  This will help debugging this thing as computing it is
 	  time consuming.
+	- Frank O'Connor added the ability to change dynamically
+	  between window/fullscreen. This is implemented via iGraph2D::
+	  PerformExtension() (called 'fullscreen'). Currently only
+	  DirectDraw2d handles this. Added new 'fullscreen' console
+	  command to use this extension.
+	- Frank also rewrote a lot of DirectDraw. Work on unifying all
+	  DirectDraw drivers into one.
+	- Gary Haussmann added patch submitted by
+	  samuel@metalog.softnet.co.uk, to fix segfaults when using
+	  Voodoo/glide based X server.
 	- Eric Sunshine pored through the project several times to correct
 	  problems caused by relocation of 2D, 3D, and sound drivers from
 	  CS/libs to CS/plugins.  He updated source, headers, makefiles,
@@ -26,6 +36,10 @@ The history order has been reversed so that new features are at the top.
 6-May-2000
 	- Fixed several bugs in PVS and routines used by PVS. It finally
 	  starts to resemble doing PVS work for real.
+	- Norman Kramer changed DRIVERS into PLUGINS for the linux
+	  makefile.
+	- Norman also changed all references to the old directories
+	  cs2d and cs3d.
 	- Eric Sunshine fixed a bug in the 'depend' target of openglx/glide.
 	- Eric Sunshine added ugly debug_dump() and cleanup() to scfreg.cpp
 	  for glooky Linux system driver.
@@ -46,6 +60,7 @@ The history order has been reversed so that new features are at the top.
 	  even if there was an intersection.
 	- Paul Garceau modified mingw.mak to accomodate static lib builds
 	  for COMP_GCC. Added libdinput.a link reference.
+	- Paul also forced scf to use Dx3 for Windows NT4 under COMP_GCC.
 	- Fixed a fix by Eric to radiosity (suggested by Wouter Wijngaards).
 	- Fixed memory leak in new lighting code from Andrew.
 	- Further debug work on PVS. Still not working properly though.
