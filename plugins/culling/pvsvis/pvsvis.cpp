@@ -406,6 +406,11 @@ void csPVSVis::PVSTest_Traverse (csStaticPVSNode* treenode,
 	PVSTest_Front2BackData* data,
 	uint32 cur_timestamp, uint32 frustum_mask)
 {
+  // First we see if the current timestamp is equal to the invisibility
+  // number of the node. In that case the node is invisible due to the PVS.
+  if (cur_timestamp == treenode->invisible_number)
+    return;
+
   // In the first part of this test we are going to test if the node
   // itself is visible. If it is not then we don't need to continue.
   int nodevis = TestNodeVisibility (treenode, data, frustum_mask);
@@ -460,18 +465,22 @@ bool csPVSVis::VisTest (iRenderView* rview,
 
   // Data for the vis tester.
   PVSTest_Front2BackData data;
+  data.rview = rview;
+  data.viscallback = viscallback;
+  data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
 
   // First get the current view frustum from the rview.
   csRenderContext* ctxt = rview->GetRenderContext ();
   data.frustum = ctxt->clip_planes;
   uint32 frustum_mask = ctxt->clip_planes_mask;
 
+  // First we mark all invisible nodes.
+  uint32 cur_timestamp = pvstree.NewTraversal ();
+  pvstree.MarkInvisible (data.pos, cur_timestamp);
+
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
-  data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
-  data.rview = rview;
-  data.viscallback = viscallback;
-  PVSTest_Traverse (pvstree.GetRealRootNode (), &data, pvstree.NewTraversal (),
+  PVSTest_Traverse (pvstree.GetRealRootNode (), &data, cur_timestamp,
   	frustum_mask);
 
   return true;

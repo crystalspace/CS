@@ -28,6 +28,7 @@
 csStaticPVSNode::csStaticPVSNode ()
 {
   child1 = child2 = 0;
+  invisible_number = 0;
 }
 
 csStaticPVSNode::~csStaticPVSNode ()
@@ -68,6 +69,7 @@ void csStaticPVSNode::PropagateBBox (const csBox3& box)
 
 void csStaticPVSNode::ResetTimestamps ()
 {
+  invisible_number = 0;
   size_t i;
   for (i = 0 ; i < objects.Length () ; i++)
     objects[i]->timestamp = 0;
@@ -138,6 +140,19 @@ void csStaticPVSNode::AddObject (const csBox3& bbox,
     child2->AddObject (bbox, object);
   if (mi <= where)
     child1->AddObject (bbox, object);
+}
+
+void csStaticPVSNode::MarkInvisible (const csVector3& pos, uint32 cur_timestamp)
+{
+  size_t i;
+  for (i = 0 ; i < invisible_nodes.Length () ; i++)
+    invisible_nodes[i]->invisible_number = cur_timestamp;  
+  if (!child1) return;
+
+  if (pos[axis] <= where)
+    child1->MarkInvisible (pos, cur_timestamp);
+  else
+    child2->MarkInvisible (pos, cur_timestamp);
 }
 
 //-------------------------------------------------------------------------
@@ -407,5 +422,10 @@ void csStaticPVSTree::TraverseRandom (csPVSTreeVisitFunc* func,
 {
   NewTraversal ();
   root->TraverseRandom (func, userdata, global_timestamp, frustum_mask);
+}
+
+void csStaticPVSTree::MarkInvisible (const csVector3& pos, uint32 cur_timestamp)
+{
+  root->MarkInvisible (pos, cur_timestamp);
 }
 

@@ -9,6 +9,11 @@ chronological order.
 21-Jan-2005
 	- Jorrit continued work on the PVS. The PVS kdtree should now be
 	  working (not tested).
+	- Jorrit mostly finished the PVS visibility culler. It should now
+	  work mostly and perform frustum and PVS visibility culling in
+	  an efficient manner. However. This pvs culler is not yet useful
+	  since the pvscalc application is not doing anything yet. Also pvsvis
+	  has not been tested yet.
 20-Jan-2005
 	- res made the following changes:
 	    - Let the GL renderer always clear the stencil buffer in 

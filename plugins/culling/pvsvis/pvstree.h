@@ -43,6 +43,11 @@ public:
   float where;
   csStaticPVSNode* child1, * child2;
   uint32 id;
+
+  // Invisibility number. If equal to the current traversal number
+  // this this node (and children) are invisible.
+  uint32 invisible_number;
+  
   // Array of invisible nodes as seen from this node.
   csArray<csStaticPVSNode*> invisible_nodes;
 
@@ -81,6 +86,12 @@ public:
    */
   void TraverseRandom (csPVSTreeVisitFunc* func,
   	void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
+
+  /**
+   * Mark nodes invisible by filling the 'invisible_number' field
+   * with the current timestamp.
+   */
+  void MarkInvisible (const csVector3& pos, uint32 cur_timestamp);
 
   /**
    * Add a dynamic object to the tree.
@@ -167,7 +178,13 @@ public:
   void TraverseRandom (csPVSTreeVisitFunc* func,
   	void* userdata, uint32 frustum_mask);
 
-  virtual csStaticPVSNode* GetRealRootNode () { return root; }
+  /**
+   * Mark nodes invisible by filling the 'invisible_number' field
+   * with the current timestamp.
+   */
+  void MarkInvisible (const csVector3& pos, uint32 cur_timestamp);
+
+  csStaticPVSNode* GetRealRootNode () { return root; }
 
   SCF_DECLARE_IBASE;
 
