@@ -37,8 +37,6 @@
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
 
-#include <X11/extensions/xf86vmode.h>
-
 class csXWindow : public iXWindow, public iEventPlug
 {
   /// The Object Registry

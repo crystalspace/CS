@@ -52,6 +52,7 @@ esac
 case $MACHINE in
   *ppc*)	PROC="POWERPC" ;;
   *i[3-9]86*)	PROC="X86"     ;;
+  *i86pc*)	PROC="X86"     ;;
   *ia64*)	PROC="UNKNOWN" ;;
   *sparc*)	PROC="SPARC"   ;;
   *mips*)	PROC="MIPS"    ;;
