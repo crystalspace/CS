@@ -1260,7 +1260,7 @@ endproc
 ;   int xx, unsigned char *d, unsigned long *z_buf,
 ;   float inv_z, float u_div_z, float v_div_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_16_draw_scanline_fog_view_555,40,ebx,esi,edi,ebp
+proc		csScan_16_draw_scanline_fog_view_555,28,ebx,esi,edi,ebp
 		targ	%$width		; int
 		targ	%$dest		; unsigned char *
 		targ	%$zbuff		; unsigned long *
@@ -1274,9 +1274,6 @@ proc		csScan_16_draw_scanline_fog_view_555,40,ebx,esi,edi,ebp
 		tloc	%$fogr		; FogR
 		tloc	%$fogg		; FogG
 		tloc	%$fogb		; FogB
-		tloc	%$fogr8		; FogR << 8
-		tloc	%$fogg8		; FogG << 8
-		tloc	%$fogb8		; FogB << 8
 		tloc	%$pix		; *dest
 
 ; if (xx <= 0) return;
@@ -1297,21 +1294,15 @@ proc		csScan_16_draw_scanline_fog_view_555,40,ebx,esi,edi,ebp
 		mov	ecx,FogG					; 2
 		mov	edx,FogB					; 3
 		mov	%$fogr,eax					; 3
-		shl	eax,8						; 4
 		mov	%$fogg,ecx					; 4
-		shl	ecx,8						; 5
-		mov	%$fogb,edx					; 5
-		shl	edx,8						; 6
-		mov	%$fogr8,eax					; 6
-		mov	%$fogg8,ecx					; 7
-		mov	%$fogb8,edx					; 7
+		mov	%$fogb,edx					; 4
 
 ; EAX	/	  ESI	/
 ; EBX	fd	  EDI	dest
 ; ECX	/	  EBP	zbuff
 ; EDX   /
-		mov	ebp,%$zbuff					; 8
-		xor	ebx,ebx						; 8
+		mov	ebp,%$zbuff					; 5
+		xor	ebx,ebx						; 5
 %$fogloop:
 ; if (izz >= 0x1000000)
 		mov	eax,[ebp]					; 0
@@ -1379,7 +1370,7 @@ endproc
 ;   int xx, unsigned char *d, unsigned long *z_buf,
 ;   float inv_z, float u_div_z, float v_div_z
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_16_draw_scanline_fog_view_565,40,ebx,esi,edi,ebp
+proc		csScan_16_draw_scanline_fog_view_565,28,ebx,esi,edi,ebp
 		targ	%$width		; int
 		targ	%$dest		; unsigned char *
 		targ	%$zbuff		; unsigned long *
@@ -1393,9 +1384,6 @@ proc		csScan_16_draw_scanline_fog_view_565,40,ebx,esi,edi,ebp
 		tloc	%$fogr		; FogR
 		tloc	%$fogg		; FogG
 		tloc	%$fogb		; FogB
-		tloc	%$fogr8		; FogR << 8
-		tloc	%$fogg8		; FogG << 8
-		tloc	%$fogb8		; FogB << 8
 		tloc	%$pix		; *dest
 
 ; if (xx <= 0) return;
@@ -1416,21 +1404,15 @@ proc		csScan_16_draw_scanline_fog_view_565,40,ebx,esi,edi,ebp
 		mov	ecx,FogG					; 2
 		mov	edx,FogB					; 3
 		mov	%$fogr,eax					; 3
-		shl	eax,8						; 4
 		mov	%$fogg,ecx					; 4
-		shl	ecx,8						; 5
-		mov	%$fogb,edx					; 5
-		shl	edx,8						; 6
-		mov	%$fogr8,eax					; 6
-		mov	%$fogg8,ecx					; 7
-		mov	%$fogb8,edx					; 7
+		mov	%$fogb,edx					; 4
 
 ; EAX	/	  ESI	/
 ; EBX	fd	  EDI	dest
 ; ECX	/	  EBP	zbuff
 ; EDX   /
-		mov	ebp,%$zbuff					; 8
-		xor	ebx,ebx						; 8
+		mov	ebp,%$zbuff					; 5
+		xor	ebx,ebx						; 5
 %$fogloop:
 ; if (izz >= 0x1000000)
 		mov	eax,[ebp]					; 0

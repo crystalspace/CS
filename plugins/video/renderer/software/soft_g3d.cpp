@@ -423,10 +423,18 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProc [SCANPROC_FLAT_ZFIL] = csScan_32_draw_scanline_flat_zfil;
       ScanProc [SCANPROC_FLAT_ZUSE] = csScan_32_draw_scanline_flat_zuse;
 
-      ScanProc [SCANPROC_TEX_ZFIL] = csScan_32_draw_scanline_tex_zfil;
+      ScanProc [SCANPROC_TEX_ZFIL] =
+#if defined (DO_MMX) && defined (DO_NASM)
+        UseMMX ? csScan_32_mmx_draw_scanline_tex_zfil :
+#endif
+        csScan_32_draw_scanline_tex_zfil;
       ScanProc [SCANPROC_TEX_ZUSE] = csScan_32_draw_scanline_tex_zuse;
 
-      ScanProc [SCANPROC_MAP_ZFIL] = csScan_32_draw_scanline_map_zfil;
+      ScanProc [SCANPROC_MAP_ZFIL] =
+#if defined (DO_MMX) && defined (DO_NASM)
+        UseMMX ? csScan_32_mmx_draw_scanline_map_zfil :
+#endif
+        csScan_32_draw_scanline_map_zfil;
       ScanProc [SCANPROC_MAP_ZUSE] = csScan_32_draw_scanline_map_zuse;
 
 //    ScanProc [SCANPROC_MAP_FILT_ZFIL] = do_bilin_filt ?
@@ -445,15 +453,9 @@ void csGraphics3DSoftware::ScanSetup ()
 //    ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_32_draw_scanline_map_key_zfil;
 //    ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_32_draw_scanline_map_key_zuse;
 
-      ScanProc [SCANPROC_FOG] = (pfmt.RedShift == 0) ?
-        csScan_32_draw_scanline_fog_BGR :
-        csScan_32_draw_scanline_fog_RGB;
-      ScanProc [SCANPROC_FOG_VIEW] = (pfmt.RedShift == 0) ?
-        csScan_32_draw_scanline_fog_view_BGR :
-        csScan_32_draw_scanline_fog_view_RGB;
-      ScanProc [SCANPROC_FOG_PLANE] = (pfmt.RedShift == 0) ?
-        csScan_32_draw_scanline_fog_plane_BGR :
-        csScan_32_draw_scanline_fog_plane_RGB;
+      ScanProc [SCANPROC_FOG] = csScan_32_draw_scanline_fog;
+      ScanProc [SCANPROC_FOG_VIEW] = csScan_32_draw_scanline_fog_view;
+      ScanProc [SCANPROC_FOG_PLANE] = csScan_32_draw_scanline_fog_plane;
 
       ScanProcPI [SCANPROCPI_FLAT_ZFIL] = csScan_32_draw_pi_scanline_flat_zfil;
       ScanProcPI [SCANPROCPI_FLAT_ZUSE] = csScan_32_draw_pi_scanline_flat_zuse;
@@ -1668,6 +1670,20 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
     Scan.FogG = QRound (fb->green * ((1 << pfmt.GreenBits) - 1)) << pfmt.GreenShift;
     Scan.FogB = QRound (fb->blue * ((1 << pfmt.BlueBits) - 1)) << pfmt.BlueShift;
     Scan.FogPix = Scan.FogR | Scan.FogG | Scan.FogB;
+
+    if (pfmt.PixelBytes == 4)
+    {
+      // trick: in 32-bit modes set FogR,G,B so that "R" uses bits 16-23,
+      // "G" uses bits 8-15 and "B" uses bits 0-7. This is to accomodate
+      // different pixel encodings such as RGB, BGR, RBG and so on...
+      unsigned long r = (pfmt.RedShift == 16) ? Scan.FogR :
+        (pfmt.GreenShift == 16) ? Scan.FogG : Scan.FogB;
+      unsigned long g = (pfmt.RedShift == 8) ? Scan.FogR :
+        (pfmt.GreenShift == 8) ? Scan.FogG : Scan.FogB;
+      unsigned long b = (pfmt.RedShift == 0) ? Scan.FogR :
+        (pfmt.GreenShift == 0) ? Scan.FogG : Scan.FogB;
+      Scan.FogR = r; Scan.FogG = g; Scan.FogB = b;
+    }
   }
   else
   {

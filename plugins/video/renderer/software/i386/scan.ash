@@ -628,7 +628,7 @@ endproc
 		add	edi,8*4						; 8
 		sub	ecx,8						; 8
 		jnb	%$zloop8					; 9
-		shr	ebx,1			; ebx = dz
+		sar	ebx,1			; ebx = dz
 
 %$zbyone:	add	ecx,8
 		jz	%$zexit

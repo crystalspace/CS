@@ -24,7 +24,15 @@
 
 #include "sttest.h"
 
-//------------------------------------------------------------------
+//--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
+
+#if !defined(NO_ASSEMBLER)
+#  if defined(PROC_INTEL) && defined (DO_NASM)
+#    include "i386/scan32a.h"
+#  endif //PROC_INTEL
+#endif //!NO_ASSEMBLER
+
+//--//--//--//--//--//--//--//--//--//--//--//--//-- draw_scanline_XXXX --//--//
 
 #ifndef NO_draw_scanline_flat_zfil
 
@@ -202,9 +210,9 @@ void csScan_32_draw_scanline_flat_zuse (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_fog_RGB
+#ifndef NO_draw_scanline_fog
 
-void csScan_32_draw_scanline_fog_RGB (int xx, unsigned char* d,
+void csScan_32_draw_scanline_fog (int xx, unsigned char* d,
   unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
@@ -253,68 +261,13 @@ fd_done:
   while (_dest < _destend);
 }
 
-#endif // NO_draw_scanline_fog_RGB
+#endif // NO_draw_scanline_fog
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_fog_BGR
+#ifndef NO_draw_scanline_fog_view
 
-void csScan_32_draw_scanline_fog_BGR (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
-{
-  if (xx <= 0) return;
-  (void)u_div_z; (void)v_div_z;
-  ULong* _dest = (ULong*)d;
-  ULong* _destend = _dest + xx;
-  unsigned long izz = QInt24 (inv_z);
-  int dzz = QInt24 (Scan.M);
-  ULong fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
-  ULong fog_dens = Scan.FogDensity;
-
-  do
-  {
-    int fd;
-    unsigned long izb = *z_buf;
-    if (izz >= 0x1000000)
-    {
-      // izz exceeds our 1/x table, so compute fd aproximatively and go on.
-      // This happens seldom, only when we're very close to fog, but not
-      // inside it; however we should handle this case as well.
-      if ((izb < 0x1000000) && (izz > izb))
-      {
-        fd = fog_dens * (Scan.one_div_z [izb >> 12] - (Scan.one_div_z [izz >> 20] >> 8)) >> 12;
-        goto fd_done;
-      }
-    }
-    else if (izz > izb)
-    {
-      fd = fog_dens * (Scan.one_div_z [izb >> 12] - Scan.one_div_z [izz >> 12]) >> 12;
-fd_done:
-      if (fd < EXP_256_SIZE)
-      {
-        fd = Scan.exp_256 [fd];
-        register int r = (fd * ((*_dest & 0x000000ff) - Scan.FogR) >> 8) + Scan.FogR;
-        register int g = (fd * ((*_dest & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
-        register int b = (fd * ((*_dest & 0x00ff0000) - Scan.FogB) >> 8) + Scan.FogB;
-        *_dest = r | (g & 0x0000ff00) | (b & 0x00ff0000);
-      }
-      else
-        *_dest = fog_pix;
-    }
-    _dest++;
-    z_buf++;
-    izz += dzz;
-  }
-  while (_dest < _destend);
-}
-
-#endif // NO_draw_scanline_fog_BGR
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_fog_view_RGB
-
-void csScan_32_draw_scanline_fog_view_RGB (int xx, unsigned char* d,
+void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
   unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
@@ -347,52 +300,13 @@ void csScan_32_draw_scanline_fog_view_RGB (int xx, unsigned char* d,
   while (_dest < _destend);
 }
 
-#endif // NO_draw_scanline_fog_view_RGB
+#endif // NO_draw_scanline_fog_view
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_fog_view_BGR
+#ifndef NO_draw_scanline_fog_plane
 
-void csScan_32_draw_scanline_fog_view_BGR (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
-{
-  if (xx <= 0) return;
-  (void)u_div_z; (void)v_div_z; (void)inv_z;
-  ULong* _dest = (ULong*)d;
-  ULong* _destend = _dest + xx;
-  ULong fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
-  ULong fog_dens = Scan.FogDensity;
-
-  do
-  {
-    unsigned long izb = *z_buf;
-    if (izb < 0x1000000)
-    {
-      int fd = fog_dens * Scan.one_div_z [izb >> 12] >> 12;
-      if (fd < EXP_256_SIZE)
-      {
-        fd = Scan.exp_256 [fd];
-        register int r = (fd * ((*_dest & 0x000000ff) - Scan.FogR) >> 8) + Scan.FogR;
-        register int g = (fd * ((*_dest & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
-        register int b = (fd * ((*_dest & 0x00ff0000) - Scan.FogB) >> 8) + Scan.FogB;
-        *_dest = r | (g & 0x0000ff00) | (b & 0x00ff0000);
-      }
-      else
-        *_dest = fog_pix;
-    } /* endif */
-    _dest++;
-    z_buf++;
-  }
-  while (_dest < _destend);
-}
-
-#endif // NO_draw_scanline_fog_view_BGR
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_fog_plane_RGB
-
-void csScan_32_draw_scanline_fog_plane_RGB (int xx, unsigned char* d,
+void csScan_32_draw_scanline_fog_plane (int xx, unsigned char* d,
   unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
@@ -411,32 +325,7 @@ void csScan_32_draw_scanline_fog_plane_RGB (int xx, unsigned char* d,
   while (_dest < _destend);
 }
 
-#endif // NO_draw_scanline_fog_plane_RGB
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_fog_plane_BGR
-
-void csScan_32_draw_scanline_fog_plane_BGR (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
-{
-  if (xx <= 0) return;
-  (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
-  UShort* _dest = (UShort*)d;
-  UShort* _destend = _dest + xx;
-  int fd = Scan.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
-
-  do
-  {
-    register int r = (fd * ((*_dest & 0x000000ff) - Scan.FogR) >> 8) + Scan.FogR;
-    register int g = (fd * ((*_dest & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
-    register int b = (fd * ((*_dest & 0x00ff0000) - Scan.FogB) >> 8) + Scan.FogB;
-    *_dest++ = r | (g & 0x0000ff00) | (b & 0x00ff0000);
-  }
-  while (_dest < _destend);
-}
-
-#endif // NO_draw_scanline_fog_plane_BGR
+#endif // NO_draw_scanline_fog_plane
 
 //------------------------------------------------------------------
 

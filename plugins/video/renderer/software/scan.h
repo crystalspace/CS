@@ -439,18 +439,19 @@ extern "C" csDrawScanline csScan_32_draw_scanline_map_zfil;
 /// Draw one horizontal scanline (Z buffer and lighting).
 extern "C" csDrawScanline csScan_32_draw_scanline_map_zuse;
 
-/// Draw one horizontal scanline for fog in R/G/B modes
-extern "C" csDrawScanline csScan_32_draw_scanline_fog_RGB;
-/// Draw one horizontal scanline for fog in B/G/R modes
-extern "C" csDrawScanline csScan_32_draw_scanline_fog_BGR;
-/// Draw one horizontal scanline for fog assuming the camera is in fog in R/G/B modes
-extern "C" csDrawScanline csScan_32_draw_scanline_fog_view_RGB;
-/// Draw one horizontal scanline for fog assuming the camera is in fog in B/G/R modes
-extern "C" csDrawScanline csScan_32_draw_scanline_fog_view_BGR;
-/// Draw a fogged horizontal scanline (no texture) in R/G/B modes
-extern "C" csDrawScanline csScan_32_draw_scanline_fog_plane_RGB;
-/// Draw a fogged horizontal scanline (no texture) in B/G/R modes
-extern "C" csDrawScanline csScan_32_draw_scanline_fog_plane_BGR;
+#if defined (DO_MMX) && defined (DO_NASM)
+/// Draw a perspective-incorrect texture mapped polygon scanline using MMX
+extern "C" csDrawScanline csScan_32_mmx_draw_scanline_map_zfil;
+/// Draw one horizontal scanline (no lighting) using MMX
+extern "C" csDrawScanline csScan_32_mmx_draw_scanline_tex_zfil;
+#endif
+
+/// Draw one horizontal scanline for fog
+extern "C" csDrawScanline csScan_32_draw_scanline_fog;
+/// Draw one horizontal scanline for fog assuming the camera is in fog
+extern "C" csDrawScanline csScan_32_draw_scanline_fog_view;
+/// Draw a fogged horizontal scanline (no texture)
+extern "C" csDrawScanline csScan_32_draw_scanline_fog_plane;
 
 /// Draw one horizontal scanline (lighting and alpha transparency).
 extern "C" csDrawScanline csScan_32_draw_scanline_map_alpha50;
