@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.glwin32 = Crystal Space GL/Win32 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make glwin32      Make the $(DESCRIPTION.glwin32)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make glwin32      Make the $(DESCRIPTION.glwin32)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: glwin32
+.PHONY: glwin32 glwin32clean
 
 all plugins drivers drivers2d: glwin32
 
@@ -26,16 +27,16 @@ glwin32clean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # We need also the GL libs
 CFLAGS.GLWIN32+=
 
-# The 2D GLBe driver
+# The 2D GL Win32 driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   GLWIN32=$(OUTDLL)glwin32$(DLL)
-  DEP.BE2D = $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.GLWIN32 = $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.GLWIN32=-lGL
 else
   GLWIN32=$(OUT)$(LIB_PREFIX)glwin32$(LIB)
@@ -50,13 +51,13 @@ OBJ.GLWIN32 = $(addprefix $(OUT),$(notdir $(SRC.GLWIN32:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: glwin32 glbeclean
+.PHONY: glwin32 glwin32clean
 
 # Chain rules
-clean: glbeclean
+clean: glwin32clean
 
 glwin32: $(OUTDIRS) $(GLWIN32)
 
@@ -65,11 +66,11 @@ $(OUT)%$O: plugins/video/canvas/openglwin/%.cpp
 $(OUT)%$O: plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLWIN32)
 
-$(GLWIN32): $(OBJ.GLWIN32) $(DEP.BE2D)
+$(GLWIN32): $(OBJ.GLWIN32) $(DEP.GLWIN32)
 	$(DO.PLUGIN) $(LIBS.GLWIN32)
 
-glbeclean:
-	$(RM) $(GLWIN32) $(OBJ.GLWIN32)
+glwin32clean:
+	$(RM) $(GLWIN32) $(OBJ.GLWIN32) $(OUTOS)glwin32.dep
 
 ifdef DO_DEPEND
 depend: $(OUTOS)glwin32.dep
