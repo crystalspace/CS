@@ -60,6 +60,14 @@ struct iVertexBuffer : public iBase
    */
   virtual csColor* GetColors () const = 0;
   /**
+   * Get all of the current user arrays.
+   */
+  virtual float* GetUserArray (int index) const = 0;
+  /**
+   * Get the number of components of one of the current user arrays.
+   */
+  virtual int GetUserArrayComponentCount (int index) const = 0;
+  /**
    * Get the number of vertices.
    */
   virtual int GetVertexCount () const = 0;
@@ -198,6 +206,10 @@ struct iVertexBufferManager : public iBase
 	csVector2* texels,
 	csColor* colors,
 	int num_verts, int buf_number) = 0;
+
+  virtual bool LockUserArray (iVertexBuffer* buf,
+		int index, float* user, 
+		int num_components, int buf_number) = 0;
 
   /**
    * Unlock a vertex buffer.

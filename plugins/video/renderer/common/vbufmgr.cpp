@@ -65,7 +65,7 @@ SCF_IMPLEMENT_IBASE (csVertexBufferManager)
 SCF_IMPLEMENT_IBASE_END
 
 csVertexBufferManager::csVertexBufferManager (iObjectRegistry* object_reg)
-	: buffers (16, 16)
+  : buffers (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   csVertexBufferManager::object_reg = object_reg;
@@ -99,22 +99,35 @@ iVertexBuffer* csVertexBufferManager::CreateBuffer (int priority)
 }
 
 void csVertexBufferManager::ChangePriority (iVertexBuffer* buf,
-	int new_priority)
+  int new_priority)
 {
   csVertexBuffer* vbuf = (csVertexBuffer*)buf;
   vbuf->SetPriority (new_priority);
 }
 
 bool csVertexBufferManager::LockBuffer (iVertexBuffer* buf,
-  	csVector3* verts, csVector2* texels,
-	csColor* colors,
-	int num_verts, int buf_number)
+    csVector3* verts, csVector2* texels,
+  csColor* colors,
+  int num_verts, int buf_number)
 {
   (void)buf_number;
   csVertexBuffer* vbuf = (csVertexBuffer*)buf;
   vbuf->SetBuffers (verts, texels, colors, num_verts);
   vbuf->SetLock (true);
   return true;
+}
+
+bool csVertexBufferManager::LockUserArray (iVertexBuffer* buf,
+		int index, float* user,
+    int num_components, int buf_number)
+{
+	(void)buf_number;
+  csVertexBuffer* vbuf = (csVertexBuffer*)buf;
+  if( vbuf->IsLocked() )
+  {
+    vbuf->SetUserArray (index, user, num_components);
+		return true;
+  } else return false;
 }
 
 void csVertexBufferManager::UnlockBuffer (iVertexBuffer* buf)

@@ -38,6 +38,8 @@ protected:
   csVector3* verts;
   csVector2* texels;
   csColor* colors;
+	int usercmp[16];
+	float* user[16];
   /// The number of vertices.
   int num_verts;
   /// Priority.
@@ -69,6 +71,10 @@ public:
   virtual csVector2* GetTexels () const { return texels; }
   /// Get the current array of colors.
   virtual csColor* GetColors () const { return colors; }
+  /// Get one of the current user arrays.
+	virtual float* GetUserArray (int index) const { return user[index]; }
+  /// Get the number of components of one of the current user arrays.
+  virtual int GetUserArrayComponentCount (int index) const { return usercmp[index]; }
   /// Get number of vertices.
   virtual int GetVertexCount () const { return num_verts; }
   /// Set buffer.
@@ -79,6 +85,16 @@ public:
     csVertexBuffer::texels = texels;
     csVertexBuffer::colors = colors;
     csVertexBuffer::num_verts = num_verts;
+		for( int i=0; i<16; i++ )
+			user[i] = NULL;
+  }
+
+  void SetUserArray (int index,
+		float* user, 
+		int num_components)
+  {
+		csVertexBuffer::user[index] = user;
+		csVertexBuffer::usercmp[index] = num_components;
   }
 
   SCF_DECLARE_IBASE;
@@ -142,6 +158,9 @@ public:
 	csVector2* texels,
 	csColor* colors,
 	int num_verts, int buf_number);
+  virtual bool LockUserArray (iVertexBuffer* buf,
+		int index, float* user,
+		int num_components, int buf_number);
   virtual void UnlockBuffer (iVertexBuffer* buf);
 
   virtual void AddClient (iVertexBufferManagerClient *client);
