@@ -315,6 +315,7 @@ private:
   void SetupPolyMeshData ();
   void CleanPolyMeshData ();
   int cd_resolution;
+  float cd_lod_cost;
 
   /**
   * Do the setup of the entire terrain. This will compute the base

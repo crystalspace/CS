@@ -28,6 +28,17 @@ chronological order.
 	- Eric Sunshine upgraded unix.jam so that it respects the result of the
 	  configure.ac `-fPIC' check rather than being hard-coded to assume
 	  that all compilers understand this option.
+	- Jorrit added the triangle connectivity information again to
+	  the triangle LOD routines.
+	- Jorrit implemented a LOD algorithm in bruteblock using the new
+	  LOD routines. This is used for the collision detection mesh
+	  (bruteblock still uses its original LOD routines for rendering).
+	  To enable this LOD (it is disabled by default) you have to
+	  use the lod setting 'cd lod cost' and set it to some useful
+	  value. 0.02 is probably good for most cases.
+	- Jorrit again changed the triangle connectivity. This speeds
+	- Jorrit changed data/terrainf/world to use the new CD mesh LOD
+	  reduction.
 13-Oct-2004
 	- Jorrit removed the triangle connectivity information in
 	  the csTriangleVerticesCost class since they were not used there.

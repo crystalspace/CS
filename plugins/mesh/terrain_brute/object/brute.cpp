@@ -693,89 +693,119 @@ bool csTerrBlock::IsMaterialUsed (int index)
 
 // ---------------------------------------------------------------
 
-static bool EV (const csVector3& v1, const csVector3& v2)
-{
-  if ((v1 * v2) > .95)
-    return true;
-  else
-    return false;
-}
-
-static bool TestEqualNormals (const csVector3* normals,
-    int res, int minx, int miny, int maxx, int maxy)
-{
-  csVector3 center = normals[((maxy-miny)/2+miny)*res + ((maxx-minx)/2+minx)];
-  int x, y;
-  for (y = miny ; y <= maxy ; y++)
-    for (x = minx ; x <= maxx ; x++)
-    {
-      const csVector3& v = normals[y*res + x];
-      if (!EV (v, center)) return false;
-    }
-  return true;
-}
-
-static void TriangulateHeightMap (const csVector3* normals,
-    int res, int minx, int miny, int maxx, int maxy,
-    csTriangle* tris, int& num_tris)
-{
-  if ((minx == maxx-1 && miny == maxy-1) || TestEqualNormals (normals,
-	res, minx, miny, maxx, maxy))
-  {
-    tris[num_tris++].Set (miny*res+minx, maxy*res+minx, miny*res+maxx);
-    tris[num_tris++].Set (miny*res+maxx, maxy*res+minx, maxy*res+maxx);
-    return;
-  }
-  int cx = (maxx-minx)/2+minx;
-  int cy = (maxy-miny)/2+miny;
-  if (minx == maxx-1)
-  {
-    TriangulateHeightMap (normals, res, minx, miny, maxx, cy, tris, num_tris);
-    TriangulateHeightMap (normals, res, minx, cy, maxx, maxy, tris, num_tris);
-  }
-  else if (miny == maxy-1)
-  {
-    TriangulateHeightMap (normals, res, minx, miny, cx, maxy, tris, num_tris);
-    TriangulateHeightMap (normals, res, cx, miny, maxx, maxy, tris, num_tris);
-  }
-  else
-  {
-    TriangulateHeightMap (normals, res, minx, miny, cx, cy, tris, num_tris);
-    TriangulateHeightMap (normals, res, cx, miny, maxx, cy, tris, num_tris);
-    TriangulateHeightMap (normals, res, minx, cy, cx, maxy, tris, num_tris);
-    TriangulateHeightMap (normals, res, cx, cy, maxx, maxy, tris, num_tris);
-  }
-}
-
-class csTriangleVertexCostHM : public csTriangleVertexCost
+class csTriangleLODAlgoHM : public csTriangleLODAlgo
 {
 public:
+  csVector3* normals;
+  // Per vertex: -1 for corner, 0 for center, 1, 2, 3, 4 for specific edge.
+  int* edgedata;
+  float min_max_cost;	// 1-max_cost
+  csTriangleMesh* mesh;
+
+public:
   virtual void CalculateCost (csTriangleVerticesCost* vertices,
-  	void* userdata)
+  	csTriangleVertexCost* vertex)
   {
-    size_t i;
-    to_vertex = -1;
-    float min_sq_dist = 1000000.;
-    if (deleted)
+    size_t i, j;
+    vertex->to_vertex = -1;
+    if (vertex->deleted)
     {
       // If the vertex is deleted we have a very high cost.
       // The cost is higher than the maximum cost you can get for
       // a non-deleted vertex. This is to make sure that we get
       // the last non-deleted vertex at the end of the LOD algorithm.
-      cost = min_sq_dist+1;
+      vertex->cost = 1000000.0;
       return;
     }
-    for (i = 0 ; i < con_vertices.Length () ; i++)
+    int idx = vertex->idx;
+    int edge = edgedata[idx];
+    if (edge == -1)
     {
-      float sq_dist = csSquaredDist::PointPoint (vertices->GetVertex (idx).pos,
-    	  vertices->GetVertex (con_vertices[i]).pos);
-      if (sq_dist < min_sq_dist)
+      // If we are on a corner then we can't collapse this vertex
+      // at all. Very high cost.
+      vertex->cost = 1000000.0;
+      return;
+    }
+
+    // Calculate the minimum cos(angle) for all normals adjacent to this
+    // vertex. That's the worst value for cos(angle) and so that will be
+    // the cost of removing this vertex.
+    const csVector3& n = normals[idx];
+    const csVector3& this_pos = vertex->pos;
+    float min_cosa = 1000.0;
+    float min_sq_dist = 1000000.;
+    for (i = 0 ; i < vertex->con_vertices.Length () ; i++)
+    {
+      int connected_i = vertex->con_vertices[i];
+      float cur_cosa = n * normals[connected_i];
+      if (cur_cosa < min_cosa)
       {
-        min_sq_dist = sq_dist;
-        to_vertex = con_vertices[i];
+        if (cur_cosa < min_max_cost)
+	{
+	  // We can already stop here. We are too bad.
+          vertex->cost = 1000000.0;
+          return;
+	}
+        min_cosa = cur_cosa;
+      }
+
+      // Check if we can collapse this edge. We can collapse this
+      // edge if this vertex is a center vertex or if it is on the same edge
+      // as the other vertex.
+      if (edge == 0 || edge == edgedata[connected_i])
+      {
+	const csVector3& other_pos = vertices->GetVertex (connected_i).pos;
+	csTriangle* tris = mesh->GetTriangles ();
+
+        // We will not collapse an edge if it means that the
+	// 'y' orientation of the triangle changes (i.e. the
+	// normals of the adjacent triangles no longer point
+	// upwards). We test this by checking all connected triangles
+	// that are not empty, then it projects them to 2D (with x
+	// and z) and it will see if their direction changes.
+	bool bad = false;
+	csVector3 v3[3];
+	csVector2 v[3];
+	for (j = 0 ; j < vertex->con_triangles.Length () ; j++)
+	{
+	  csTriangle& tri = tris[vertex->con_triangles[j]];
+	  v3[0] = vertices->GetVertex (tri.a).pos; v[0].Set (v3[0].x, v3[0].z);
+	  v3[1] = vertices->GetVertex (tri.b).pos; v[1].Set (v3[1].x, v3[1].z);
+	  v3[2] = vertices->GetVertex (tri.c).pos; v[2].Set (v3[2].x, v3[2].z);
+	  int sameidx;
+	  if (tri.a == idx) sameidx = 0;
+	  else if (tri.b == idx) sameidx = 1;
+	  else sameidx = 2;
+	  float dir_before = csMath2::Area2 (v[0], v[1], v[2]);
+	  v[sameidx].Set (other_pos.x, other_pos.z);
+	  float dir_after = csMath2::Area2 (v[0], v[1], v[2]);
+	  bad = (dir_before < -.0001 && dir_after > .0001) ||
+	    	(dir_before > .0001 && dir_after < -.0001);
+	  if (bad) break;
+	}
+
+	if (!bad)
+	{
+          // We prefer collapsing along the shortest edge.
+          float sq_dist = csSquaredDist::PointPoint (this_pos, other_pos);
+	  if (sq_dist < min_sq_dist)
+	  {
+            min_sq_dist = sq_dist;
+            vertex->to_vertex = connected_i;
+          }
+        }
       }
     }
-    cost = min_sq_dist;
+
+    // If we found no edge to collapse then we can't collapse and we
+    // pick a high cost.
+    if (vertex->to_vertex == -1)
+    {
+      vertex->cost = 1000000.0;
+      return;
+    }
+
+    vertex->cost = 1 - min_cosa;
   }
 };
 
@@ -788,36 +818,24 @@ void csTerrainObject::SetupPolyMeshData ()
   delete[] polymesh_triangles;
   delete[] polymesh_polygons; polymesh_polygons = 0;
 
-// @@@ TODO: CD is talking most time right now. Optimize this by
-// simplifying the CD mesh for flat areas.
   int res = cd_resolution;
   csRef<iTerraSampler> terrasampler = terraformer->GetSampler (
       csBox2 (rootblock->center.x - rootblock->size / 2.0,
       	      rootblock->center.z - rootblock->size / 2.0, 
 	      rootblock->center.x + rootblock->size / 2.0,
 	      rootblock->center.z + rootblock->size / 2.0), res);
+
+  // We get the vertices and normals from the sampler. We will
+  // use the normals for Level of Detail reduction on the collision
+  // detection mesh.
   polymesh_vertices = new csVector3 [res * res];
   polymesh_vertex_count = res * res;
   memcpy (polymesh_vertices, terrasampler->SampleVector3 (vertices_name),
     res * res * sizeof (csVector3));
 
-  csVector3* normals = new csVector3[res * res];
-  memcpy (normals, terrasampler->SampleVector3 (normals_name),
-    res * res * sizeof (csVector3));
-
-#if 0
-printf ("Maximum triangles %d\n", 2 * (res-1) * (res-1)); fflush (stdout);
-  CS_ALLOC_STACK_ARRAY (csTriangle, tris, 2 * (res-1) * (res-1));
-  polymesh_tri_count = 0;
-  TriangulateHeightMap (normals, res, 0, 0, res-1, res-1, tris,
-      polymesh_tri_count);
-  polymesh_triangles = new csTriangle [polymesh_tri_count];
-  memcpy (polymesh_triangles, tris, sizeof (csTriangle) * polymesh_tri_count);
-printf ("Final triangles %d\n", polymesh_tri_count); fflush (stdout);
-#elif 1
+  // First we make the base triangle mesh with highest detail.
   polymesh_tri_count = 2 * (res-1) * (res-1);
   polymesh_triangles = new csTriangle [polymesh_tri_count];
-
   int x, y;
   csTriangle* tri = polymesh_triangles;
   for (y = 0 ; y < res-1 ; y++)
@@ -829,24 +847,80 @@ printf ("Final triangles %d\n", polymesh_tri_count); fflush (stdout);
       (tri++)->Set (yr + x+1, yr+res + x, yr+res + x+1);
     }
   }
-#else
+
+  if (cd_lod_cost <= 0.00001)
+  {
+    // We do no lod on the CD mesh.
+    terrasampler->Cleanup ();
+    return;
+  }
+
+  csVector3* normals = new csVector3[res * res];
+  memcpy (normals, terrasampler->SampleVector3 (normals_name),
+    res * res * sizeof (csVector3));
+
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (pFactory->object_reg,
+  	iCommandLineParser);
+  bool verbose = cmdline->GetOption ("verbose") != 0;
+  if (verbose)
+  {
+    printf ("  Optimizing CD Mesh for Terrain: tris %d ... ",
+    	polymesh_tri_count); fflush (stdout);
+  }
+
+  // Set up the base mesh which will be used in the LOD
+  // reduction algorithm. After setting up this mesh we
+  // can discard our triangle array since a copy is made.
   csTriangleMesh mesh;
   mesh.SetTriangles (polymesh_triangles, polymesh_tri_count);
-  csVector3* copy_verts = new csVector3 [res * res];
-  memcpy (copy_verts, polymesh_vertices, sizeof (csVector3)*res*res);
-  csTriangleVertexCostHM* cost_vertices = new csTriangleVertexCostHM[
-  	res * res];
-  csTriangleVerticesCost mesh_verts (&mesh, copy_verts,
-      polymesh_vertex_count, cost_vertices);
+  delete[] polymesh_triangles;	// SetTriangles() makes a copy.
 
+  // Set up the LOD algorithm that we will use.
+  // This is basically the cost calculation function.
+  csTriangleLODAlgoHM lodalgo;
+  lodalgo.normals = normals;
+  lodalgo.edgedata = new int[res*res];	//@@@ Delete in csTriangleLODAlgoHM?
+  lodalgo.min_max_cost = 1.0 - cd_lod_cost;
+  lodalgo.mesh = &mesh;
+
+  // Set up edge data. We have to be careful when collapsing
+  // vertices that are on a border. For example, a vertex on a left
+  // border can only be collapsed to another vertex on the left
+  // border. To detect that quickly in our lod algorithm we fill
+  // the edgedata table with the relevant information here.
+  int i = 0;
+  for (y = 0 ; y < res ; y++)
+  {
+    bool u = y == 0;
+    bool d = y == res-1;
+    for (x = 0 ; x < res ; x++)
+    {
+      bool l = x == 0;
+      bool r = x == res-1;
+      lodalgo.edgedata[i] =
+        ((l && u) || (l && d) || (r && u) || (r && d)) ? -1 :
+      	l ? 1 : u ? 2 : r ? 3 : d ? 4 : 0;
+      i++;
+    }
+  }
+
+  // This class will maintain the cost of all vertices.
+  // It is used by CalculateLODFast() below.
+  csTriangleVerticesCost mesh_verts (&mesh, polymesh_vertices,
+      polymesh_vertex_count);
+
+  // Do the triangle reduction.
   polymesh_tri_count = 0;
-  csTriangle* triangles = csTriangleMeshLOD::CalculateLOD (&mesh,
-  	&mesh_verts, .1, polymesh_tri_count,
-	(void*)normals);
+  polymesh_triangles = csTriangleMeshLOD::CalculateLODFast (&mesh,
+  	&mesh_verts, cd_lod_cost, polymesh_tri_count,
+	&lodalgo);
 
-  delete[] copy_verts;
-#endif
+  if (verbose)
+  {
+    printf ("%d\n", polymesh_tri_count); fflush (stdout);
+  }
 
+  delete[] lodalgo.edgedata;
   delete[] normals;
   terrasampler->Cleanup ();
 }
@@ -942,6 +1016,7 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   polymesh_triangles = 0;
   polymesh_polygons = 0;
   cd_resolution = 256;
+  cd_lod_cost = -1;// 0.02;
 
   logparent = 0;
   initialized = false;
@@ -1685,6 +1760,11 @@ bool csTerrainObject::SetLODValue (const char* parameter, float value)
     cd_resolution = int (value);
     return true;
   }
+  else if (strcmp (parameter, "cd lod cost") == 0)
+  {
+    cd_lod_cost = value;
+    return true;
+  }
   else if (strcmp (parameter, "lightmap resolution") == 0)
   {
     lmres = int (value);
@@ -1716,6 +1796,10 @@ float csTerrainObject::GetLODValue (const char* parameter)
   else if (strcmp (parameter, "cd resolution") == 0)
   {
     return float (cd_resolution);
+  }
+  else if (strcmp (parameter, "cd lod cost") == 0)
+  {
+    return cd_lod_cost;
   }
   else if (strcmp (parameter, "lightmap resolution") == 0)
   {

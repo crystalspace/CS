@@ -80,12 +80,11 @@ csTriangleVerticesCost::csTriangleVerticesCost (csTriangleMesh* mesh,
 
   // First add the triangles that are used by every vertex.
   size_t tricount = mesh->GetTriangleCount ();
-  csArray<size_t>* con_triangles = new csArray<size_t> [num_vertices];
   for (j = 0 ; j < tricount ; j++)
   {
-    con_triangles[triangles[j].a].Push (j);
-    con_triangles[triangles[j].b].Push (j);
-    con_triangles[triangles[j].c].Push (j);
+    vertices[triangles[j].a].AddTriangle (j);
+    vertices[triangles[j].b].AddTriangle (j);
+    vertices[triangles[j].c].AddTriangle (j);
   }
   // Now setup the vertices and add the connected vertices.
   int i;
@@ -93,34 +92,14 @@ csTriangleVerticesCost::csTriangleVerticesCost (csTriangleMesh* mesh,
   {
     vertices[i].pos = verts[i];
     vertices[i].idx = i;
-    for (j = 0 ; j < con_triangles[i].Length () ; j++)
+    for (j = 0 ; j < vertices[i].con_triangles.Length () ; j++)
     {
-      size_t triidx = con_triangles[i][j];
+      size_t triidx = vertices[i].con_triangles[j];
       if (triangles[triidx].a != i) vertices[i].AddVertex (triangles[triidx].a);
       if (triangles[triidx].b != i) vertices[i].AddVertex (triangles[triidx].b);
       if (triangles[triidx].c != i) vertices[i].AddVertex (triangles[triidx].c);
     }
   }
-  delete[] con_triangles;
-#if 0
-  int i;
-  size_t j;
-  for (i = 0 ; i < num_vertices ; i++)
-  {
-    vertices[i].pos = verts[i];
-    vertices[i].idx = i;
-    for (j = 0 ; j < mesh->GetTriangleCount () ; j++)
-    {
-      if (triangles[j].a == i || triangles[j].b == i || triangles[j].c == i)
-      {
-        vertices[i].AddTriangle (j);
-	if (triangles[j].a != i) vertices[i].AddVertex (triangles[j].a);
-	if (triangles[j].b != i) vertices[i].AddVertex (triangles[j].b);
-	if (triangles[j].c != i) vertices[i].AddVertex (triangles[j].c);
-      }
-    }
-  }
-#endif
 }
 
 csTriangleVerticesCost::~csTriangleVerticesCost ()
@@ -287,6 +266,7 @@ void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
   int *from_vertices, *to_vertices;
   from_vertices = new int [num];
   to_vertices = new int [num];
+
   col_idx = 0;
   while (num > 1)
   {
@@ -308,10 +288,19 @@ void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
     }
 
     to_vertices[col_idx] = to;
+
     csTriangleVertexCost* vt_to = &verts->GetVertex (to);
     col_idx++;
 
     // Fix connectivity information after moving the 'from' vertex to 'to'.
+    for (i = 0 ; i < vt_from->con_triangles.Length () ; i++)
+    {
+      size_t id = vt_from->con_triangles[i];
+      csTriangle& tr = mesh->GetTriangles ()[id];
+      if (tr.a == from) { tr.a = to; vt_to->AddTriangle (id); }
+      if (tr.b == from) { tr.b = to; vt_to->AddTriangle (id); }
+      if (tr.c == from) { tr.c = to; vt_to->AddTriangle (id); }
+    }
     for (i = 0 ; i < vt_from->con_vertices.Length () ; i++)
     {
       int id = vt_from->con_vertices[i];
@@ -419,6 +408,15 @@ csTriangle* csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
 
     csTriangleVertexCost* vt_to = &verts->GetVertex (to);
 
+    // Fix connectivity information after moving the 'from' vertex to 'to'.
+    for (i = 0 ; i < vt_from->con_triangles.Length () ; i++)
+    {
+      size_t id = vt_from->con_triangles[i];
+      csTriangle& tr = mesh->GetTriangles ()[id];
+      if (tr.a == from) { tr.a = to; vt_to->AddTriangle (id); }
+      if (tr.b == from) { tr.b = to; vt_to->AddTriangle (id); }
+      if (tr.c == from) { tr.c = to; vt_to->AddTriangle (id); }
+    }
     for (i = 0 ; i < vt_from->con_vertices.Length () ; i++)
     {
       int id = vt_from->con_vertices[i];
@@ -516,6 +514,15 @@ csTriangle* csTriangleMeshLOD::CalculateLODFast (csTriangleMesh* mesh,
 
     csTriangleVertexCost* vt_to = &verts->GetVertex (to);
 
+    // Fix connectivity information after moving the 'from' vertex to 'to'.
+    for (i = 0 ; i < vt_from->con_triangles.Length () ; i++)
+    {
+      size_t id = vt_from->con_triangles[i];
+      csTriangle& tr = mesh->GetTriangles ()[id];
+      if (tr.a == from) { tr.a = to; vt_to->AddTriangle (id); }
+      if (tr.b == from) { tr.b = to; vt_to->AddTriangle (id); }
+      if (tr.c == from) { tr.c = to; vt_to->AddTriangle (id); }
+    }
     for (i = 0 ; i < vt_from->con_vertices.Length () ; i++)
     {
       int id = vt_from->con_vertices[i];
