@@ -394,21 +394,24 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
   {
     if ( *p != '<' )
     {
-      // Take what we have, make a text element.
-      TrXmlText* textNode = document->blk_text.Alloc ();
-
-      if ( !textNode )
+      // First skip some spaces to see if this can really be
+      // a text element.
+      char* ps = SkipWhiteSpace (p);
+      if (*ps != '<')
       {
-        document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
-            return 0;
-      }
+        // Take what we have, make a text element.
+        TrXmlText* textNode = document->blk_text.Alloc ();
+        if ( !textNode )
+        {
+          document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+          return 0;
+        }
 
-      p = textNode->Parse( document, p );
+	p = ps;
+        p = textNode->Parse( document, p );
 
-      if ( !textNode->Blank() )
         lastChild = LinkEndChild( lastChild, textNode );
-      else
-        document->DeleteNode (textNode);
+      }
     } 
     else if ( StringEqual(p, "<![CDATA[") )
     {
@@ -417,7 +420,7 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
       if ( !cdataNode )
       {
         document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
-            return 0;
+        return 0;
       }
 
       p = cdataNode->Parse( document, p );
