@@ -29,14 +29,13 @@ static int ShaderVariableWrapperCompare (csShaderVariableProxy const &item1,
 }
 
 
-csShaderVariable::csShaderVariable (csStringID name) : csRefCount (), 
-  TextureHandValue(0), TextureWrapValue(0), VectorValue(0), 
+csShaderVariable::csShaderVariable (csStringID name) :
+  csRefCount(), TextureHandValue(0), TextureWrapValue(0), VectorValue(0), 
   Name (name) , accessor(0)
 {
 }
 
-csShaderVariable& csShaderVariable::operator= (
-  csShaderVariable& copyFrom)
+csShaderVariable& csShaderVariable::operator= (csShaderVariable& copyFrom)
 {
   switch (copyFrom.Type)
   {
@@ -84,12 +83,14 @@ csShaderVariable& csShaderVariable::operator= (
 
 int csShaderVariableProxyList::InsertSorted (csShaderVariableProxy item)
 {
-  return csArray<csShaderVariableProxy>::InsertSorted (item, ShaderVariableWrapperCompare);
+  return csArray<csShaderVariableProxy>::InsertSorted(
+    item, ShaderVariableWrapperCompare);
 }
 
 int csShaderVariableProxyList::Push (csShaderVariableProxy item)
 {
-  return csArray<csShaderVariableProxy>::InsertSorted (item, ShaderVariableWrapperCompare);
+  return csArray<csShaderVariableProxy>::InsertSorted(
+    item, ShaderVariableWrapperCompare);
 }
 
 void csShaderVariableProxyList::PrepareFill ()
