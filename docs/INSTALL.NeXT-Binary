@@ -2,8 +2,8 @@
     Crystal Space for MacOS/X Server, OpenStep, NextStep
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
-    Copyright (C)1999 by Eric Sunshine
-    1999/08/10
+    Copyright (C)1999,2000 by Eric Sunshine
+    2000/01/10
 
     Also see README.NeXT for implementation details.
 ===============================================================================
@@ -74,14 +74,14 @@ information about obtaining level files.
 Assuming that the level file large.zip is in the same directory as WalkTest,
 you can explore the it by typing this command:
 
-    % ./walktest large.zip
+    % ./walktest large
 
 The very first time you explore a level with WalkTest after downloading it
 from the Internet, you should run WalkTest with the "-recalc" option.  This
 causes Crystal Space to recalculate some of the lighting information which is
 store in the level file.  For instance:
 
-    % ./walktest -recalc large.zip
+    % ./walktest -recalc large
 
 Recalculating the lighting information may be a time consuming process,
 particularly for sizable levels such as large.zip, so please be patient.  At
