@@ -454,6 +454,9 @@ awsManager::CreateWindowFrom(char *defname)
    
    // Create a new window
    awsWindow *win = new awsWindow();
+
+   // Setup the name of the window
+   win->SetID(winnode->Name());
    
    // Tell the window to set itself up
    win->Setup(this, winnode);
@@ -484,6 +487,9 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponent
       if (factory)
       {
 	awsComponent *comp = factory->Create();
+
+        // Setup the name of the component
+        comp->SetID(comp_node->Name());
 		
 	// Prepare the component, and add it into it's parent
 	comp->Setup(wmgr, comp_node);

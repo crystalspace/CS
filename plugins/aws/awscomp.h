@@ -106,6 +106,13 @@ public:
     /// Shows a component
     virtual void Show();
 
+    /// Get's the unique id of this component.
+    unsigned long GetID()
+    { return id; }
+
+    /// Set's the unique id of this component. Note: only to be used by window manager.
+    void SetID(unsigned long _id);
+
 
 public:
     /** Adds a child into this component.  It's frame should be respective this component, not absolute.

@@ -33,6 +33,12 @@ awsComponent::~awsComponent()
       delete children;
    }
 }
+
+void 
+awsComponent::SetID(unsigned long _id)
+{
+  id = _id;
+}
     
     
 /**
@@ -53,17 +59,12 @@ awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
   {
   
    iAwsPrefs *pm=WindowManager()->GetPrefMgr();
-   iString *id_str=NULL;
-  
+     
    pm->GetRect(settings, "Frame", frame);
-   pm->GetString(settings, "Id", id_str);
-
-   if (id_str!=NULL) id = pm->NameToId(id_str->GetData());
    
    if (AWS_COMP_DEBUG)
      printf("aws-debug: Frame is: (%d,%d)-(%d,%d)\n", frame.xmin, frame.ymin, frame.xmax, frame.ymax);
    
-
    // Children are automatically filled in by the windowmanager.
    
   }
