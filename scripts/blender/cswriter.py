@@ -22,12 +22,13 @@ class csSpriteFrame:
     """ ("stand1", [vert1, vert2, vert3, vert4]) """
     self.frameName = frameName
     self.vertexList = vertexList
+    self.indenting = 3
     
   def __str__(self):
-    returnString =  "FRAME '" + self.frameName + "' ("
+    returnString =  (" " * self.indenting) + "FRAME '" + self.frameName + "' (\n"
     for x in self.vertexList:
-      returnString = returnString + str(x)
-    returnString = returnString + ")"
+      returnString = returnString + (" " * 2 * self.indenting) +str(x) + "\n"
+    returnString = returnString + (" " * self.indenting) +")\n"
   
     return returnString
 
@@ -38,16 +39,17 @@ class csAction:
 
     self.frameList = frameList
     self.actionName = actionName
+    self.indenting = 3
 
   def __str__(self):
-    returnString = "ACTION " + "'" + self.actionName + "'("
+    returnString = "ACTION " + "'" + self.actionName + "'(\n"
     f = self.frameList
 
     for x in f:
-      returnString = returnString + ( "F (" + x[0] + ", " + 
-				      str(x[1]) + ")" )
+      returnString = returnString + (" " * self.indenting*2) + ( "F (" + x[0] + ", " + 
+				      str(x[1]) + ")\n" )
     
-    returnString = returnString + ")"
+    returnString = returnString + (" " * self.indenting) + ")"
     return returnString
 
 
@@ -90,16 +92,16 @@ class csSprite3d:
 
     
     returnString = ("SPRITE '" + spriteName + "'(\n"+ (" " * indenting) +
-		   "TEXNR('" + textureName + "')")
+		   "TEXNR('" + textureName + "')\n")
     
     for x in frameList:
       returnString = returnString + str(x)
     
     for x in triangleList:
-      returnString = returnString + str(x)
+      returnString = returnString + (" " * indenting) + str(x) + "\n"
     
     for x in actionList:
-      returnString = returnString + str(x)
+      returnString = returnString + "\n" + (" " * indenting) + str(x) + "\n"
     
     returnString = returnString + ")"
     
