@@ -673,7 +673,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("attenuation", XMLTOKEN_ATTENUATION);
 #ifdef CS_USE_NEW_RENDERER
   xmltokens.Register ("attenuationvec", XMLTOKEN_ATTENUATIONVECTOR);
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
   xmltokens.Register ("badoccluder", XMLTOKEN_BADOCCLUDER);
   xmltokens.Register ("camera", XMLTOKEN_CAMERA);
   xmltokens.Register ("center", XMLTOKEN_CENTER);
@@ -2745,7 +2745,7 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	    return NULL;
         }
         break;
-      #endif CS_USE_NEW_RENDERER
+      #endif // CS_USE_NEW_RENDERER
       default:
 	SyntaxService->ReportBadToken (child);
 	return NULL;
