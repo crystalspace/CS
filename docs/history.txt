@@ -1,5 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
+4-Jul-2000
+	- Samuel Humphreys did the following changes:
+	    - Backbuffer now works without being inverted. Re-reversed the
+	      orthographic projection from its default setting of reversed,
+	      for the duration of rendering to the back buffer.... this
+	      seems strange that the opengl driver has this setting.
+	    - Sets glviewport in the back buffer 3d driver within the
+	      begin/finish draw calls.
 3-Jul-2000
 	- Seth Galbraith cut skybox in half to save 200 KB for Squawk.
 	- Andrew Zabolotny did the following changes:
@@ -55,6 +63,14 @@ The history order has been reversed so that new features are at the top.
 	  No library should register static SCF classes and/or plugins because
 	  several libraries may require same class, and the class will be
 	  registered several times in the best case.
+	- Andrew fixed dnapp to link as a console executable (vs. GUI).
+	  Also replaced all Sys->Printf() with regular printf's. There
+	  is no much sense in using Sys->Printf from console apps.
+	- Norman Kramer added missing CheckAlpha() calls to various parts
+	  in the CS project (which Andrew forgot to do).
+	- Norman also copied GetAlphaMap() to csTextureMM from
+	  csTextureManager and renamed GetAlphaMap to GetAlphaMapData since
+	  it clashed with the new GetAlphaMap from iTextureHandle.
 2-Jul-2000
 	- Samuel Humphreys did the following fixes to dtsimple:
 	    - Thanks to AndyZ's mem debugger, plugged all the memory leaks
