@@ -23,6 +23,7 @@
 #include "csutil/ref.h"
 #include "csgeom/vector3.h"
 #include "csutil/csvector.h"
+#include "iengine/mesh.h"
 
 struct iEngine;
 struct iLoader;
@@ -65,6 +66,7 @@ private:
   iRigidBody* CreateSphere (void);
   iJoint* CreateJointed (void);
   iRigidBody* CreateWalls (const csVector3& radius);
+  csRef<iMeshWrapper> walls;
 
 public:
   Simple (iObjectRegistry *obj);

@@ -34,7 +34,6 @@
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/texture.h"
-#include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
 #include "imesh/thing/polygon.h"
@@ -179,28 +178,28 @@ bool Simple::SimpleEventHandler (iEvent& ev)
 bool Simple::Initialize ()
 {
   if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-	CS_REQUEST_SOFTWARE3D,
-	CS_REQUEST_ENGINE,
-	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_IMAGELOADER,
-	CS_REQUEST_LEVELLOADER,
-	CS_REQUEST_REPORTER,
-	CS_REQUEST_REPORTERLISTENER,
-	CS_REQUEST_PLUGIN ("crystalspace.dynamics.ode", iDynamics),
-	CS_REQUEST_END))
+    CS_REQUEST_VFS,
+    CS_REQUEST_SOFTWARE3D,
+    CS_REQUEST_ENGINE,
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_IMAGELOADER,
+    CS_REQUEST_LEVELLOADER,
+    CS_REQUEST_REPORTER,
+    CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_PLUGIN ("crystalspace.dynamics.ode", iDynamics),
+    CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-	"Can't initialize plugins!");
+        "crystalspace.application.phystut",
+    "Can't initialize plugins!");
     return false;
   }
 
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-	"Can't initialize event handler!");
+        "crystalspace.application.phystut",
+    "Can't initialize event handler!");
     return false;
   }
 
@@ -216,8 +215,8 @@ bool Simple::Initialize ()
   if (vc == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-	"Can't find the virtual clock!");
+        "crystalspace.application.phystut",
+    "Can't find the virtual clock!");
     return false;
   }
 
@@ -226,8 +225,8 @@ bool Simple::Initialize ()
   if (engine == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-	"No iEngine plugin!");
+        "crystalspace.application.phystut",
+    "No iEngine plugin!");
     return false;
   }
 
@@ -235,8 +234,8 @@ bool Simple::Initialize ()
   if (loader == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-    	"No iLoader plugin!");
+        "crystalspace.application.phystut",
+        "No iLoader plugin!");
     return false;
   }
 
@@ -244,8 +243,8 @@ bool Simple::Initialize ()
   if (g3d == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-    	"No iGraphics3D plugin!");
+        "crystalspace.application.phystut",
+        "No iGraphics3D plugin!");
     return false;
   }
 
@@ -253,8 +252,8 @@ bool Simple::Initialize ()
   if (kbd == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-    	"No iKeyboardDriver plugin!");
+        "crystalspace.application.phystut",
+        "No iKeyboardDriver plugin!");
     return false;
   }
 
@@ -262,16 +261,16 @@ bool Simple::Initialize ()
   if (!dyn)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-    	"No iDynamics plugin!");
+        "crystalspace.application.phystut",
+        "No iDynamics plugin!");
     return false;
   }
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-    	"Error opening system!");
+        "crystalspace.application.phystut",
+        "Error opening system!");
     return false;
   }
 
@@ -282,16 +281,16 @@ bool Simple::Initialize ()
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-    	"Error loading 'stone4' texture!");
+        "crystalspace.application.phystut",
+        "Error loading 'stone4' texture!");
     return false;
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  walls = engine->CreateSectorWallsMesh (room, "walls");
   csRef<iThingState> walls_state (
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
+    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -345,19 +344,19 @@ bool Simple::Initialize ()
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (NULL, csVector3 (3, 0, 0), 8,
-  	csColor (1, 0, 0), false);
+    csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
   light = engine->CreateLight (NULL, csVector3 (-3, 0,  0), 8,
-  	csColor (0, 0, 1), false);
+    csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
   light = engine->CreateLight (NULL, csVector3 (0, 0, 3), 8,
-  	csColor (0, 1, 0), false);
+    csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
   light = engine->CreateLight (NULL, csVector3 (0, -3, 0), 8,
-  	csColor (1, 1, 0), false);
+    csColor (1, 1, 0), false);
   ll->Add (light->QueryLight ());
 
   engine->Prepare ();
@@ -371,12 +370,12 @@ bool Simple::Initialize ()
   iTextureManager* txtmgr = g3d->GetTextureManager ();
 
   iTextureWrapper* txt = loader->LoadTexture ("spark",
-  	"/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
+    "/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
   if (txt == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-    	"Error loading texture!");
+        "crystalspace.application.phystut",
+        "Error loading texture!");
     return false;
   }
 
@@ -385,8 +384,8 @@ bool Simple::Initialize ()
   if (boxFact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-    	"Error loading mesh object factory!");
+        "crystalspace.application.phystut",
+        "Error loading mesh object factory!");
     return false;
   }
   // Double the size.
@@ -401,8 +400,8 @@ bool Simple::Initialize ()
   if (ballFact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-    	"Error creating mesh object factory!");
+        "crystalspace.application.phystut",
+        "Error creating mesh object factory!");
     return false;
   }
 
@@ -412,8 +411,8 @@ bool Simple::Initialize ()
   if (dynSys == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.phystut",
-    	"Error creating dynamic system!");
+        "crystalspace.application.phystut",
+        "Error creating dynamic system!");
     return false;
   }
 
@@ -467,7 +466,7 @@ iRigidBody* Simple::CreateSphere (void)
 
   // Set the ball mesh properties.
   csRef<iBallState> s (
-  	SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState));
+    SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState));
   const float r (rand()%5/10. + .1);
   const csVector3 radius (r, r, r);
   s->SetRadius (radius.x, radius.y, radius.z);
@@ -525,19 +524,11 @@ iRigidBody* Simple::CreateWalls (const csVector3& radius)
   rb->SetPosition (csVector3 (0));
   rb->MakeStatic ();
 
-  // left
-  rb->AttachColliderPlane (csPlane3 (1,0,0, radius.x), 1, 0, 0);
-  // right
-  rb->AttachColliderPlane (csPlane3 (-1,0,0, radius.x), 1, 0, 0);
-  // floor
-  rb->AttachColliderPlane (csPlane3 (0,1,0, radius.y), 1, 0, 0);
-  // ceiling
-  rb->AttachColliderPlane (csPlane3 (0,-1,0, radius.y), 1, 0, 0);
-  // forward
-  rb->AttachColliderPlane (csPlane3 (0,0,-1, radius.z), 1, 0, 0);
-  // back
-  rb->AttachColliderPlane (csPlane3 (0,0,1, radius.z), 1, 0, 0);
+  csRef<iThingState> walls_state ( SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
 
+  for(int i = 0; i < walls_state->GetPolygonCount(); i++) {
+      rb->AttachColliderPlane(walls_state->GetPolygon(i)->GetObjectPlane(), 0, 0, 0);
+  }
 
   return rb;
 }
