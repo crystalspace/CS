@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Mar-2004
+	- Anders Stenberg changed the terraformer interface a bit (made Sample
+	  functions return pointers to data instead of filling out supplied
+	  preallocated blocks). Also made it actually work, at least to some
+	  degree.
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
 	- Eric Sunshine fixed copy/paste error in terraformer loader makefile

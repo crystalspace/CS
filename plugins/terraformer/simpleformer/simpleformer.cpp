@@ -79,8 +79,12 @@ csSimpleFormer::~csSimpleFormer ()
 
 void csSimpleFormer::SetHeightmap (iImage *heightmap)
 {
+  // Grab dimensions
+  width = heightmap->GetWidth ();
+  height = heightmap->GetHeight ();
+
   // Allocate height data
-  heightData = new float[heightmap->GetWidth ()*heightmap->GetHeight ()];
+  heightData = new float[width*height];
 
   // Check what type of image we got
   if (heightmap->GetFormat () & CS_IMGFMT_TRUECOLOR)
@@ -92,9 +96,9 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
     int idx = 0;
 
     // Loop through the data
-    for (int y=0; y<heightmap->GetHeight (); ++y)
+    for (int y=0; y<height; ++y)
     {
-      for (int x=0; x<heightmap->GetWidth (); ++x)
+      for (int x=0; x<width; ++x)
       {
         // Grab the intensity as height
         heightData[idx] = data[idx].Intensity ()/255.0;
@@ -111,9 +115,9 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
     int idx = 0;
 
     // Loop through the data
-    for (int y=0; y<heightmap->GetHeight (); ++y)
+    for (int y=0; y<height; ++y)
     {
-      for (int x=0; x<heightmap->GetWidth (); ++x)
+      for (int x=0; x<width; ++x)
       {
         // Grab the intensity as height
         heightData[idx] = palette[data[idx]].Intensity ()/255.0;
@@ -138,7 +142,17 @@ bool csSimpleFormer::Initialize (iObjectRegistry* objectRegistry)
   // Initialize members
   csSimpleFormer::objectRegistry = objectRegistry;
 
-  // Not much can go wrong :)
+  // Get the shared string repository
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    objectRegistry, "crystalspace.shared.stringset", iStringSet);
+
+  // Grab string IDs
+  stringVertices = strings->Request ("vertices");
+  stringNormals = strings->Request ("normals");
+  stringTexture_Coordinates = strings->Request ("texture coordinates");
+  stringHeights = strings->Request ("heights");
+  stringMaterialIndices = strings->Request ("material indices");
+
   return true;
 }
 
@@ -168,8 +182,12 @@ csSimpleSampler::csSimpleSampler (csSimpleFormer *terraFormer,
   
   positions = 0;
   normals = 0;
+  texCoords = 0;
+  heights = 0;
+  edgePositions = 0;
 
-  sampleDistance = 0;
+  sampleDistanceReal = 0;
+  sampleDistanceHeight = 0;
 }
 
 csSimpleSampler::~csSimpleSampler ()
@@ -192,12 +210,16 @@ void csSimpleSampler::CachePositions ()
   // Allocate new data
   // We will sample 1 too much in both x and z, for correct normal
   // calculations at region edges
-  positions = new csVector3[(resolution+2)*(resolution+2)];
-  
-  // Compute region corners in heightmap space
+  positions = new csVector3[resolution*resolution];
+  edgePositions = new csVector3 [resolution*4];
+
+  // Compute region corners
   minCorner = csVector3 (region.MinX (), 0, region.MinY ());
-  maxCorner = csVector3 (region.MinX (), 0, region.MinY ());
-  
+  maxCorner = csVector3 (region.MaxX (), 0, region.MaxY ());
+
+  // Compute distance between sample points
+  sampleDistanceReal = (maxCorner-minCorner)/(float)(resolution-1);
+
   // We wanna compute our region in heightmap space
   // Heightmap -> real space is computed by:
   // 1. Divide by size/2 to get to 0..2
@@ -228,42 +250,70 @@ void csSimpleSampler::CachePositions ()
   minCorner.z *= (float)terraFormer->height/2;
   maxCorner.z *= (float)terraFormer->height/2;
 
-  // Compute distance between sample points
-  sampleDistance = (maxCorner-minCorner)/(float)(resolution-1);
+  // Compute distance between sample points in heightmap space
+  sampleDistanceHeight = (maxCorner-minCorner)/(float)(resolution-1);
 
-  // Keep an index counter to avoid uneccessary x+y*w calculations
-  int idx = 0;
+  // Keep index counters to avoid uneccessary x+y*w calculations
+  int posIdx = 0, edgeIdx = 0;
 
   // Iterate through the samplepoints in the region
-  float z = minCorner.z-sampleDistance.z;
+  float zr = region.MinY ()-sampleDistanceReal.z;
+  float zh = minCorner.z-sampleDistanceHeight.z;
   for (unsigned int i=0; i<resolution+2; ++i)
   {
-    float x = minCorner.x-sampleDistance.x;
+    float xr = region.MinX ()-sampleDistanceReal.x;
+    float xh = minCorner.x-sampleDistanceHeight.x;
     for (unsigned int j=0; j<resolution+2; ++j)
     {
-      unsigned int ix = iround (x);
-      unsigned int iz = iround (z);
+      unsigned int ix = iround (xh);
+      unsigned int iz = iround (zh);
       
-      // Check if we're inside the heightmap (if <0 it will wrap to >size)
-      if (ix<terraFormer->width && iz<terraFormer->height)
+      // If we're at the corners, we'll just move along
+      if ((i>0 || j>0) && (i>0 || j<resolution+1) &&
+          (i<resolution+1 || j>0) && (i<resolution+1 || j<resolution+1))
       {
-        // We are, so grab height*scale + offset
-        positions[idx++] = 
-          csVector3 (x,
-                     terraFormer->heightData[ix+iz*terraFormer->width]*
-                       terraFormer->scale.y + terraFormer->offset.y,
-                     z);
-      } else {
-        // We're not, so just grab 0 + offset
-        positions[idx++] = csVector3 (x, terraFormer->offset.y, z);
+        // Check if we're inside the heightmap (if <0 it will wrap to >size)
+        if (ix<terraFormer->width && iz<terraFormer->height)
+        {
+          // If we're not on the extra edge, store the position in
+          // our output buffer, and if we are, store it in the edge buffer
+          if (i>0 && i<resolution+1 && j>0 && j<resolution+1)
+          {
+            positions[posIdx++] = 
+              csVector3 (xr,
+                        terraFormer->heightData[ix+iz*terraFormer->width]*
+                          terraFormer->scale.y + terraFormer->offset.y,
+                         zr);
+          } else {
+            edgePositions[edgeIdx++] = 
+              csVector3 (xr,
+                        terraFormer->heightData[ix+iz*terraFormer->width]*
+                          terraFormer->scale.y + terraFormer->offset.y,
+                         zr);
+          }
+        } else {
+          // If we're not on the extra edge, store the position (with height
+          // 0 since we're outside the heightmap) in our output buffer, and 
+          // if we are, store it in the edge buffer
+          if (i>0 && i<resolution+1 && j>0 && j<resolution+1)
+          {
+            positions[posIdx++] = 
+              csVector3 (xr, terraFormer->offset.y, zr);
+          } else {
+            edgePositions[edgeIdx++] = 
+              csVector3 (xr, terraFormer->offset.y, zr);
+          }
+        }
       }
 
       // Step x forward
-      x += sampleDistance.x;
+      xr += sampleDistanceReal.x;
+      xh += sampleDistanceHeight.x;
     }
 
     // Step z forward
-    z += sampleDistance.z;
+    zr += sampleDistanceReal.z;
+    zh += sampleDistanceHeight.z;
   }
 }
 
@@ -281,142 +331,156 @@ void csSimpleSampler::CacheNormals ()
 
   // Keep index counters to avoid uneccessary x+y*w calculations
   int normIdx = 0;
-  int posIdx = resolution+1;
+  int posIdx = 0;
+
+  // Intermediate vectors
+  csVector3 v1, v2;
 
   // Iterate through the samplepoints in the region
   for (unsigned int i = 0; i<resolution; ++i)
   {
-    for (unsigned int j = 0; i<resolution; ++j)
+    for (unsigned int j = 0; j<resolution; ++j)
     {
       // Calculate two gradient vectors
-      csVector3 v1 (sampleDistance.x, 
-                    positions[posIdx+1].y-positions[posIdx-1].y,
-                    0);
-      csVector3 v2 (0, 
-                    positions[posIdx+resolution+2].y-
-                      positions[posIdx-resolution-2].y, 
-                    sampleDistance.z);
+      // Conditionals check wheter to fetch from edge data
+      v1 = j==resolution-1?
+              edgePositions[1+resolution+i*2]:positions[posIdx+1];
+      v1 -= j==0?
+              edgePositions[resolution+i*2]:positions[posIdx-1];
+
+      v2 = i==resolution-1?
+        edgePositions[resolution*3+j]:positions[posIdx+resolution];
+      v2 -= i==0?
+        edgePositions[j]:positions[posIdx-resolution];
+
       // Cross them and normalize to get a normal
-      normals[normIdx++] = (v1%v2).Unit ();
+      normals[normIdx++] = (v2%v1).Unit ();
       posIdx++;
     }
-    // Skip past outer edges
-    posIdx += 2;
+  }
+
+  // We've got our normals, so we can get rid of the edges
+  delete[] edgePositions;
+  edgePositions = 0;
+}
+
+void csSimpleSampler::CacheHeights ()
+{
+  // Break if we've already cached the data
+  if (heights != 0)
+    return;
+
+  // Allocate new data
+  heights = new float[resolution*resolution];
+
+  // Make sure we've got some position data to base the normals on
+  CachePositions ();
+
+  // Keep index counters to avoid uneccessary x+y*w calculations
+  int idx = 0;
+
+  // Iterate through the samplepoints in the region
+  for (unsigned int i = 0; i<resolution; ++i)
+  {
+    for (unsigned int j = 0; j<resolution; ++j)
+    {
+      heights[idx] = positions[idx].y;
+      idx++;
+    }
   }
 }
 
-bool csSimpleSampler::Sample (csStringID type, float* out)
+void csSimpleSampler::CacheTexCoords ()
+{
+  // Break if we've already cached the data
+  if (heights != 0)
+    return;
+
+  // Allocate new data
+  texCoords = new csVector2[resolution*resolution];
+
+  // The positions aren't really needed, but CachePositions
+  // calculates some other useful stuff too, so we just assume
+  // positions will be needed eventually too
+  CachePositions ();
+
+  // Keep index counter to avoid uneccessary x+y*w calculations
+  int idx = 0;
+
+  // Iterate through the samplepoints in the region
+  // Sample texture coordinates as x/z positions in heightmap space
+  csVector2 texCoord (minCorner.x, minCorner.z);
+  for (unsigned int i = 0; i<resolution; ++i)
+  {
+    texCoord.x = minCorner.x;
+    for (unsigned int j = 0; j<resolution; ++j)
+    {
+      // Just assign the texture coordinate
+      texCoords[idx++] = texCoord;
+      texCoord.x += sampleDistanceHeight.x;
+    }
+    texCoord.y += sampleDistanceHeight.z;
+  }
+}
+
+const float *csSimpleSampler::SampleFloat (csStringID type)
 {
   // Check what we're supposed to return
   if (type == terraFormer->stringHeights)
   {
     // Make sure we've got data
-    CachePositions ();
+    CacheHeights ();
 
-    // Keep index counters to avoid uneccessary x+y*w calculations
-    int outIdx = 0;
-    int posIdx = resolution+1;
-
-    // Iterate through the samplepoints in the region
-    for (unsigned int i = 0; i<resolution; ++i)
-    {
-      for (unsigned int j = 0; i<resolution; ++j)
-      {
-        out[outIdx++] = positions[posIdx++].y;
-      }
-      // Skip past outer edges
-      posIdx += 2;
-    }
-
-    return true;
+    return heights;
   } else {
     // Something we can't return was requested
-    return false;
+    return 0;
   }
 }
 
-bool csSimpleSampler::Sample (csStringID type, csVector2* out)
+const csVector2 *csSimpleSampler::SampleVector2 (csStringID type)
 {
   // Check what we're supposed to return
   if (type == terraFormer->stringTexture_Coordinates)
   {
     // Make sure we've got data
-    // The positions aren't really needed, but CachePositions
-    // calculates some other useful stuff too, so we just assume
-    // positions will be needed eventually too
-    CachePositions ();
+    CacheTexCoords ();
 
-    // Keep index counter to avoid uneccessary x+y*w calculations
-    int outIdx = 0;
-
-    // Iterate through the samplepoints in the region
-    // Sample texture coordinates as x/z positions in heightmap space
-    csVector2 texCoord (minCorner.x, minCorner.z);
-    for (unsigned int i = 0; i<resolution; ++i)
-    {
-      texCoord.x = minCorner.x;
-      for (unsigned int j = 0; i<resolution; ++j)
-      {
-        out[outIdx++] = texCoord;
-        texCoord.x += sampleDistance.x;
-      }
-      texCoord.y += sampleDistance.z;
-    }
-
-    return true;
+    return texCoords;
   } else {
     // Something we can't return was requested
-    return false;
+    return 0;
   }
 }
 
-bool csSimpleSampler::Sample (csStringID type, csVector3* out)
+const csVector3 *csSimpleSampler::SampleVector3 (csStringID type)
 {
   // Check what we're supposed to return
-  if (type == terraFormer->stringPositions)
+  if (type == terraFormer->stringVertices)
   {
     // Make sure we've got data
     CachePositions ();
 
-    // Keep index counters to avoid uneccessary x+y*w calculations
-    int outIdx = 0;
-    int posIdx = resolution+1;
-
-    // Copy our cached data straight to the output
-    for (unsigned int i=0; i<resolution; ++i)
-    {
-      // Copy a line at once
-      memcpy (out+outIdx, positions+posIdx, resolution*sizeof(csVector3));
-
-      // Skip to the next line
-      outIdx += resolution;
-      posIdx += resolution+2;
-    }
-
-    return true;
+    return positions;
   } else if (type == terraFormer->stringNormals)
   {
     // Make sure we've got data
     CacheNormals ();
 
-    // This is the most convenient types of them all
-    // Our cached data is prepared for direct copying
-    memcpy (out, normals, resolution*resolution*sizeof(csVector3));
-    return true;
+    return normals;
   } else {
     // Something we can't return was requested
-    return false;
+    return 0;
   }
 }
 
-bool csSimpleSampler::Sample (csStringID type, int* out)
+const int *csSimpleSampler::SampleInteger (csStringID type)
 {
   // Check what we're supposed to return
   if (type == terraFormer->stringMaterialIndices)
   {
     // This isn't implemented yet. We just return 0
-    memset (out, 0, resolution*resolution*sizeof(int));
-    return true;
+    return 0;
   } else {
     // Something we can't return was requested
     return false;
@@ -447,11 +511,6 @@ unsigned int csSimpleSampler::GetVersion () const
   return 0;
 }
 
-void Cleanup ()
-{
-}
-
-
 void csSimpleSampler::Cleanup ()
 {
   // Clean up allocated data
@@ -460,5 +519,14 @@ void csSimpleSampler::Cleanup ()
 
   delete[] normals;
   normals = 0;
+
+  delete[] heights;
+  heights = 0;
+
+  delete[] texCoords;
+  texCoords = 0;
+
+  delete[] edgePositions;
+  edgePositions = 0;
 }
 

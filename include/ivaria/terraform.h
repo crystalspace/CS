@@ -60,34 +60,34 @@ struct iTerraSampler : public iBase
   /**
    * Sample float data of the specified from the region. Data is sampled in 
    * a grid (regular or irregular) with the square resolution specified when 
-   * the sampler was created. The "out" argument must be a preallocated
-   * array of sufficient size that will be filled.
+   * the sampler was created. The returned array is guaranteed to be valid
+   * until Cleanup is called.
    */
-  virtual bool Sample (csStringID type, float* out) = 0;
+  virtual const float *SampleFloat (csStringID type) = 0;
 
   /**
    * Sample csVector2 data of the specified from the region. Data is sampled in 
    * a grid (regular or irregular) with the square resolution specified when 
-   * the sampler was created. The "out" argument must be a preallocated
-   * array of sufficient size that will be filled.
+   * the sampler was created. The returned array is guaranteed to be valid
+   * until Cleanup is called.
    */
-  virtual bool Sample (csStringID type, csVector2* out) = 0;
+  virtual const csVector2 *SampleVector2 (csStringID type) = 0;
 
   /**
    * Sample csVector3 data of the specified from the region. Data is sampled in 
    * a grid (regular or irregular) with the square resolution specified when 
-   * the sampler was created. The "out" argument must be a preallocated
-   * array of sufficient size that will be filled.
+   * the sampler was created. The returned array is guaranteed to be valid
+   * until Cleanup is called.
    */
-  virtual bool Sample (csStringID type, csVector3* out) = 0;
+  virtual const csVector3 *SampleVector3 (csStringID type) = 0;
 
   /**
    * Sample integer data of the specified from the region. Data is sampled in 
    * a grid (regular or irregular) with the square resolution specified when 
-   * the sampler was created. The "out" argument must be a preallocated
-   * array of sufficient size that will be filled.
+   * the sampler was created. The returned array is guaranteed to be valid
+   * until Cleanup is called.
    */
-  virtual bool Sample (csStringID type, int* out) = 0;
+  virtual const int *SampleInteger (csStringID type) = 0;
 
   /**
    * Retrieve the material palette used by this sampler region.
@@ -112,7 +112,9 @@ struct iTerraSampler : public iBase
    * Hint to the sampler that no data will be retrieved from it for a while. 
    * This may give the sampler a chance to release data it's been caching for
    * faster retrieval, and thereby save memory. This is a hint only, and may
-   * be ignored by the underlying implementation.
+   * be ignored by the underlying implementation. Arrays returned by Sample
+   * calls are not guaranteed to be valid after Cleanup has been called,
+   * and must be considered invalid.
    */
   virtual void Cleanup () = 0; 
 };

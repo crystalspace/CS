@@ -59,8 +59,8 @@ private:
   /// Material palette containing all used materials
   csArray<iMaterialWrapper*> materialPalette;
 
-  /// Cached string id for "positions"
-  csStringID stringPositions;  
+  /// Cached string id for "vertices"
+  csStringID stringVertices;  
   /// Cached string id for "normals"
   csStringID stringNormals;
   /// Cached string id for "texture coordinates"
@@ -155,11 +155,20 @@ private:
   /// The resolution to use for sampling
   unsigned int resolution;
 
-  /// Cached data
+  /// Cached float data
+  float *heights;
+
+  /// Cached positions from the outer edge, used for normal calculations
+  csVector3 *edgePositions;
+
+  /// Cached vector2 data
+  csVector2 *texCoords;
+
+  /// Cached vector3 data
   csVector3 *positions, *normals;
 
-  /// Distance between sample points
-  csVector3 sampleDistance;
+  /// Distance between sample points in real and heightmap space
+  csVector3 sampleDistanceReal, sampleDistanceHeight;
 
   /// Region corners in heightmap space
   csVector3 minCorner, maxCorner;
@@ -171,6 +180,12 @@ private:
 
   // Calculate and cache normals
   void CacheNormals ();
+
+  // Calculate and cache heights
+  void CacheHeights ();
+
+  // Calculate and cache texture coordinates
+  void CacheTexCoords ();
 
 public:
   SCF_DECLARE_IBASE;
@@ -189,14 +204,14 @@ public:
    * Allowed types:
    * height
    */ 
-  virtual bool Sample (csStringID type, float* out);
+  virtual const float *SampleFloat (csStringID type);
 
   /**
   * Sample 2d vector data.
   * Allowed types:
   * texture coordinates
   */ 
-  virtual bool Sample (csStringID type, csVector2* out);
+  virtual const csVector2 *SampleVector2 (csStringID type);
 
   /**
   * Sample 3d vector data.
@@ -204,14 +219,14 @@ public:
   * positions
   * normals
   */ 
-  virtual bool Sample (csStringID type, csVector3* out);
+  virtual const csVector3 *SampleVector3 (csStringID type);
 
   /**
   * Sample integer data.
   * Allowed types:
   * material indices
   */ 
-  virtual bool Sample (csStringID type, int* out);
+  virtual const int *SampleInteger (csStringID type);
 
   /// Returns the material palette
   virtual const csArray<iMaterialWrapper*> &GetMaterialPalette ();
