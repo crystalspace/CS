@@ -42,7 +42,7 @@ char* TrXmlBase::SkipWhiteSpace( char* p )
   {
     return 0;
   }
-  while ( isspace (*p)) p++;
+  while ( isspace ((unsigned char)*p)) p++;
   return p;
 }
 
@@ -52,7 +52,7 @@ const char* TrXmlBase::SkipWhiteSpace( const char* p )
   {
     return 0;
   }
-  while ( isspace (*p)) p++;
+  while ( isspace ((unsigned char)*p)) p++;
   return p;
 }
 
