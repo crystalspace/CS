@@ -355,7 +355,7 @@ public:
 
 #define STR_APPEND(TYPE,FMT,SZ) csString& Append(TYPE n) \
   { char s[SZ]; cs_snprintf(s, SZ, FMT, n); return Append(s); }
-  //@{
+  /** @{ */
   /**
    * Append the value, in formatted form, to this string.
    */
@@ -399,7 +399,7 @@ public:
 
 #define STR_REPLACE(TYPE) \
 csString& Replace (TYPE s) { Size = 0; return Append(s); }
-  //@{
+  /** @{ */
   /**
    * Replace contents of this string with the value in formatted form.
    * \remarks Internally uses the various flavours of Append().
@@ -579,7 +579,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 
 #define STR_FORMAT(TYPE) \
   static csString Format (TYPE v);
-  //@{
+  /** @{ */
   /**
    * Format this value using a sprintf() formatting directive.
    */
@@ -625,7 +625,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 
 #define STR_PADLEFT(TYPE) \
   static csString PadLeft (TYPE v, size_t iNewSize, char iChar=' ');
-  //@{
+  /** @{ */
   /** 
    * Return a new left-padded string representation of a basic type.
    */
@@ -662,7 +662,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 
 #define STR_PADRIGHT(TYPE) \
   static csString PadRight (TYPE v, size_t iNewSize, char iChar=' ');
-  //@{
+  /** @{ */
   /**
    * Return a new right-padded string representation of a basic type.
    */
@@ -702,7 +702,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 
 #define STR_PADCENTER(TYPE) \
   static csString PadCenter (TYPE v, size_t iNewSize, char iChar=' ');
-  //@{
+  /** @{ */
   /**
    * Return a new left+right padded string representation of a basic type.
    */
@@ -726,7 +726,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
 
 #define STR_ASSIGN(TYPE) \
 const csString& operator = (TYPE s) { return Replace (s); }
-  //@{
+  /** @{ */
   /**
    * Assign a formatted value to this string.
    */
@@ -750,7 +750,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
 
 #define STR_OP_APPEND(TYPE) \
   csString &operator += (TYPE s) { return Append (s); }
-  //@{
+  /** @{ */
   /**
    * Append a formatted value to this string.
    */
@@ -858,7 +858,7 @@ inline csString operator + (const csString& iStr1, const char* iStr2)
 
 #define STR_SHIFT(TYPE) \
   inline csString &operator << (csString &s, TYPE v) { return s.Append (v); }
-//@{
+/** @{ */
 /** 
  * Shift operator.  
  * For example: 
