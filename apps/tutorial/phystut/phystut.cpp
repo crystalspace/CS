@@ -478,7 +478,7 @@ void Simple::CreateBox (void)
   const csVector3 tv (0);
   csOrthoTransform t (tm, tv);
   csVector3 size (.4, .8, .4); // This should be the same size as the mesh.
-  rb->AttachColliderBox (size, t, 10, 1, 0);
+  rb->AttachColliderBox (size, t, 10, 1, .8);
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
@@ -515,7 +515,7 @@ void Simple::CreateSphere (void)
   mesh->DecRef ();
 
   // Create and attach a sphere collider.
-  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0), 10, 1, .1);
+  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0), 10, 1, .8);
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
