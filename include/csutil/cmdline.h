@@ -52,7 +52,7 @@ public:
   /// Construct with a given command line.
   csCommandLineParser (int argc, const char* const argv[]);
   /// Destructor.
-  ~csCommandLineParser() {}
+  virtual ~csCommandLineParser() {}
 
   /**
    * Initialize for the given command line.  Options from command line are
