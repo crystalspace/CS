@@ -13,6 +13,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+21-Jul-1999
+	- Eric Sunshine uploaded new archives of zlib, libpng, and libjpeg
+	  to the Crystal Space ftp site which conform to the new beta 13
+	  directory hierarchy.
 20-Jul-1999
 	- Gary Haussmann changed the OpenGL X 2D driver to be a little
 	  bit smarter when detecting which supported visuals there are.
