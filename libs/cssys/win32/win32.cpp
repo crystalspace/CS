@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -72,7 +72,7 @@ void SysSystemDriver::Alert (const char* s)
 
   if (FullScreen)
   {
-    //if fullscreen mode is active, we switch to default screen, because
+    //If fullscreen mode is active, we switch to default screen, because
     //otherwise this message will not be seen.
     ChangeDisplaySettings(NULL,0);
   }
@@ -100,12 +100,10 @@ void SysSystemDriver::Close(void)
 
 SysKeyboardDriver::SysKeyboardDriver() : csKeyboardDriver ()
 {
-  // Create your keyboard interface
 }
 
 SysKeyboardDriver::~SysKeyboardDriver(void)
 {
-  // Destroy your keyboard interface
   Close();
 }
 
@@ -359,7 +357,6 @@ void SysKeyboardDriver::Close (void)
 	::WaitForSingleObject(m_hThread,1000);
 	::CloseHandle(m_hThread);
 #endif
-  // Close your keyboard interface
 }
 
 //------------------------------------------------// The Mouse Driver //------//
@@ -376,13 +373,11 @@ SysMouseDriver::~SysMouseDriver(void)
 bool SysMouseDriver::Open(csEventQueue *EvQueue)
 {
   csMouseDriver::Open (System, EvQueue);
-  // Open mouse system
   return true;
 }
 
 void SysMouseDriver::Close()
 {
-  // Close mouse system
 }
 
 // The System driver ////////////////
@@ -409,13 +404,6 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   wc.lpszClassName = WINDOWCLASSNAME;
 
   RegisterClass (&wc);
-// Serguei 'Snaar' Narojnyi
-// Following doesnt want to work on my system,
-// it just thinks it's true anyway and i dont know what to do
-// It may be VC++ 6.0 SP2 bug, but since someone else could use it
-// I decided to make it in thins way.
-//  if(!RegisterClass( &wc ))
-//    sys_fatalerror("Cannot register CrystalSpace window class");
 }
 
 void SysSystemDriver::Loop ()
@@ -474,107 +462,55 @@ int SysSystemDriver::GetCmdShow() const
 //----------------------------------------// Windows input translator //------//
 
 #ifndef DO_DINPUT_KEYBOARD
-inline void WinKeyTrans(csSystemDriver* pSystemDriver, WPARAM wParam, 
-                        bool /*shift*/, bool /*alt*/, bool /*ctrl*/, bool down)
+void WinKeyTrans(csSystemDriver* pSystemDriver, WPARAM wParam, 
+  bool /*shift*/, bool /*alt*/, bool /*ctrl*/, bool down)
 {
-  if(!pSystemDriver) return;
-  
-  // handle standard alphabetical.
-/*    if((wParam >= 'A') && (wParam <= 'z'))
+  if(pSystemDriver)
+  {
+    switch(wParam)
     {
-      if(down)
-        pSystemDriver->Keyboard->do_keypress (SysGetTime (), wParam + ('a' - 'A')) ;
-      else
-        pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), wParam + ('a' - 'A')) ;
-      
+    case VK_END:
+      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_END) ;
+      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_END) ;
+      break;
+    case VK_UP:
+      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_UP) ;
+      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_UP) ;
+      break;
+    case VK_DOWN:
+      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_DOWN) ;
+      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_DOWN) ;
+      break;
+    case VK_LEFT:
+      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_LEFT) ;
+      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_LEFT) ;
+      break;
+    case VK_RIGHT:
+      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_RIGHT) ;
+      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_RIGHT) ;
+      break;
+    case VK_PRIOR:
+      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_PGUP) ;
+      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_PGUP) ;
+      break;
+    case VK_NEXT:
+      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_PGDN) ;
+      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_PGDN) ;
+      break;
+    case VK_MENU:
+      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_ALT) ;
+      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_ALT) ;
+      break;
+    case VK_CONTROL:
+      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_CTRL) ;
+      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_CTRL) ;
+      break;
+    case VK_SHIFT:
+      if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_SHIFT) ;
+      else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_SHIFT);
+      break;
     }
-    else if((wParam >= '0') && (wParam <= '9'))
-    {
-      if(down)
-        pSystemDriver->Keyboard->do_keypress(SysGetTime (), wParam);
-      else 
-        pSystemDriver->Keyboard->do_keyrelease(SysGetTime (), wParam);
-    }
-    else */
-    {
-      switch(wParam)
-      {
-      case VK_END:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_END) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_END) ;
-        break;
-      case VK_ESCAPE:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_ESC) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_ESC) ;
-        break;
-/*      case VK_SPACE:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), ' ') ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), ' ') ;
-        break;
-      case VK_TAB:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), '\t') ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), '\t');
-        break; */
-      case VK_RETURN:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), '\n') ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), '\n') ;
-        break;
-/*      case VK_BACK:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), '\b') ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), '\b') ;
-        break;
-      case VK_DELETE:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), '\b') ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), '\b') ;
-        break; */
-      case VK_UP:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_UP) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_UP) ;
-        break;
-      case VK_DOWN:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_DOWN) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_DOWN) ;
-        break;
-        
-      case VK_LEFT:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_LEFT) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_LEFT) ;
-        break;
-        
-      case VK_RIGHT:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_RIGHT) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_RIGHT) ;
-        break;
-        
-      case VK_PRIOR:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_PGUP) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_PGUP) ;
-        break;
-        
-      case VK_NEXT:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_PGDN) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_PGDN) ;
-        break;
-        
-      case VK_MENU:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_ALT) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_ALT) ;
-        break;
-        
-      case VK_CONTROL:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_CTRL) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_CTRL) ;
-        break;
-
-      case VK_SHIFT:
-        if(down) pSystemDriver->Keyboard->do_keypress (SysGetTime (), CSKEY_SHIFT) ;
-        else pSystemDriver->Keyboard->do_keyrelease (SysGetTime (), CSKEY_SHIFT);
-        break;
-
-//      default:
-//        pSystemDriver->Keyboard->do_keypress (SysGetTime (), wParam) ;
-      }
-    }
+  }
 }
 #endif
 
@@ -612,6 +548,7 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
   case WM_CHAR:
     if(System)
     {
+      if (wParam == '\r') wParam = CSKEY_ENTER;
         System->Keyboard->do_keypress (SysGetTime (), wParam) ;
         System->Keyboard->do_keyrelease (SysGetTime (), wParam) ;
     }
@@ -669,7 +606,6 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
     break;
     
   case WM_MOUSEMOVE:
-    // Not yet ready for this!
     if (System)
       System->Mouse->do_mousemotion(SysGetTime (), LOWORD(lParam), HIWORD(lParam));
     break;
