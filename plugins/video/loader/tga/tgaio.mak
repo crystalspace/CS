@@ -46,7 +46,7 @@ OBJ.TGAIMG = $(addprefix $(OUT),$(notdir $(SRC.TGAIMG:.cpp=$O)))
 DEP.TGAIMG = CSUTIL CSSYS CSGFX CSUTIL 
 
 MSVC.DSP += TGAIMG
-DSP.TGAIMG.NAME = tgaimg
+DSP.TGAIMG.NAME = cstgaimg
 DSP.TGAIMG.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)

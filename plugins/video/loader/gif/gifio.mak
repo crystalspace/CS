@@ -46,7 +46,7 @@ OBJ.GIFIMG = $(addprefix $(OUT),$(notdir $(SRC.GIFIMG:.cpp=$O)))
 DEP.GIFIMG = CSUTIL CSSYS CSGFX CSUTIL 
 
 MSVC.DSP += GIFIMG
-DSP.GIFIMG.NAME = gifimg
+DSP.GIFIMG.NAME = csgifimg
 DSP.GIFIMG.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)

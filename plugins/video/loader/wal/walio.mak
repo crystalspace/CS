@@ -46,7 +46,7 @@ OBJ.WALIMG = $(addprefix $(OUT),$(notdir $(SRC.WALIMG:.cpp=$O)))
 DEP.WALIMG = CSUTIL CSSYS CSGFX CSUTIL 
 
 MSVC.DSP += WALIMG
-DSP.WALIMG.NAME = walimg
+DSP.WALIMG.NAME = cswalimg
 DSP.WALIMG.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)

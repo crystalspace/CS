@@ -48,7 +48,7 @@ OBJ.JPGIMG = $(addprefix $(OUT),$(notdir $(SRC.JPGIMG:.cpp=$O)))
 DEP.JPGIMG = CSUTIL CSSYS CSGFX CSUTIL 
 
 MSVC.DSP += JPGIMG
-DSP.JPGIMG.NAME = jpgimg
+DSP.JPGIMG.NAME = csjpgimg
 DSP.JPGIMG.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
