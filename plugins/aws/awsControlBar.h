@@ -31,13 +31,13 @@
 class awsControlBar : public awsPanel
 {
 private:
-  /// The components in the bar
+  /// The components in the bar.
   awsComponentVector comps;
 
-  /// Spacing desired
+  /// Spacing desired.
   int hGap, vGap;
 
-  /// Vertical alignment
+  /// Vertical alignment.
   int vert_align;
 
   /**
@@ -66,7 +66,6 @@ private:
 
   /// Layout the child components and resize this component if necessary.
   void DoLayout ();
-
 public:
   awsControlBar ();
   virtual ~awsControlBar ();
@@ -76,31 +75,43 @@ public:
 
   bool Execute (const char* action, iAwsParmList *parmlist);
 
-  /// Adds a component to the bar
+  /// Adds a component to the bar.
   void AddChild (iAwsComponent *comp);
 
-  /// This will remove the component from the bar
+  /// This will remove the component from the bar.
   void RemoveChild (iAwsComponent *comp);
 
-  /// Returns true if the component resizes width to fit the controls when they change
+  /**
+   * Returns true if the component resizes width to fit the controls
+   * when they change.
+   */
   bool GetSizeToFitHorz ();
 
-  /// Returns true if the component resizes height to fit the controls when they change
+  /**
+   * Returns true if the component resizes height to fit the controls
+   * when they change.
+   */
   bool GetSizeToFitVert ();
 
-  /// Sets whether the component resizes width to fit the controls when they change
+  /**
+   * Sets whether the component resizes width to fit the controls
+   * when they change.
+   */
   void SetSizeToFitHorz (bool b);
- 
-  /// Sets whether the component resizes height to fit the controls when they change
+
+  /**
+   * Sets whether the component resizes height to fit the controls
+   * when they change.
+   */
   void SetSizeToFitVert (bool b);
 
-  /// Resizes the component to fit the controls snuggly
+  /// Resizes the component to fit the controls snuggly.
   void SizeToFit ();
 
-  /// Resizes the component to fit the width of the controls snuggly
+  /// Resizes the component to fit the width of the controls snuggly.
   void SizeToFitHorz ();
 
-  /// Resizes the component to fit the height of the controls snuggly
+  /// Resizes the component to fit the height of the controls snuggly.
   void SizeToFitVert ();
 
   bool GetVertical ();

@@ -34,19 +34,19 @@ struct iAwsComponent;
 class aws3DFrame
 {
 protected:
-  /// A ref to the current 2d drawing context
+  /// A ref to the current 2d drawing context.
   iGraphics2D* g2d;
 
-  /// A ref to the current 3d drawing context
+  /// A ref to the current 3d drawing context.
   iGraphics3D* g3d;
 
-  /// The basic colors
+  /// The basic colors.
   int hi, hi2, lo, lo2, fill, dfill, black, bfill;
 
-  /// Background/Overlay textures
+  /// Background/Overlay textures.
   iTextureHandle *bkg, *ovl;
 
-  /// Background/Overlay alpha levels
+  /// Background/Overlay alpha levels.
   int bkg_alpha, ovl_alpha;
 
   void DrawTexturedBackground (
@@ -84,10 +84,10 @@ public:
   static const int fsSmallSunken;
   static const int fsMask;
 
-  /// Creates a frame drawer
+  /// Creates a frame drawer.
   aws3DFrame ();
 
-  /// Destroys a frame drawer
+  /// Destroys a frame drawer.
   ~aws3DFrame ();
 
   /**
