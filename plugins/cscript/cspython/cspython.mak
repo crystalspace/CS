@@ -77,6 +77,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSPYTHON)
 endif
 
+TO_INSTALL.ROOT += python.cex
+
 SWIG.INTERFACE = include/ivaria/cs.i
 SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
 SWIG.CSPYTHON.OBJ = $(addprefix $(OUT),$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
