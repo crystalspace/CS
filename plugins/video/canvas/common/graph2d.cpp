@@ -376,8 +376,8 @@ bool csGraphics2D::ClipLine (float &x1, float &y1, float &x2, float &y2,
   u = 0;                                    \
   if (x < fxmin) u |= CLIP_LEFT;            \
   if (y < fymin) u |= CLIP_TOP;             \
-  if (x > fxmax) u |= CLIP_RIGHT;           \
-  if (y > fymax) u |= CLIP_BOTTOM;
+  if (x > fxmax ) u |= CLIP_RIGHT;           \
+  if (y > fymax ) u |= CLIP_BOTTOM;
 
 #define FSWAP(a,b) { float __tmp__ = a; a = b; b = __tmp__; }
 #define CSWAP(a,b) { char __tmp__ = a; a = b; b = __tmp__; }
@@ -410,13 +410,13 @@ bool csGraphics2D::ClipLine (float &x1, float &y1, float &x2, float &y2,
     }
     else if (ocu1 & CLIP_RIGHT)         // clip right
     {
-      float newx = fxmax - 0.0001;
+      float newx = fxmax;// - 0.0001; // smgh experimental fix
       y1 = y1 + ((y2 - y1) * (newx - x1)) / (x2 - x1);
       x1 = newx;
     }
     else if (ocu1 & CLIP_BOTTOM)        // clip below
     {
-      float newy = fymax - 0.0001;
+      float newy = fymax;// - 0.0001; // smgh experimental fix
       x1 = x1 + ((x2 - x1) * (newy - y1)) / (y2 - y1);
       y1 = newy;
     }
