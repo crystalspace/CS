@@ -20,6 +20,7 @@
 #define __CS_MESHOBJ_H__
 
 #include "csobject/pobject.h"
+#include "csobject/nobjvec.h"
 #include "csengine/cssprite.h"
 #include "csengine/movable.h"
 #include "imeshobj.h"
@@ -40,11 +41,16 @@ private:
   /// Mesh object corresponding with this csMeshWrapper.
   iMeshObject* mesh;
 
+  /// Children of this object (other instances of csMeshWrapper).
+  csNamedObjVector children;
+
 protected:
   /**
    * Update this sprite in the polygon trees.
    */
   virtual void UpdateInPolygonTrees ();
+  /// Update movement.
+  virtual void UpdateMove ();
 
 public:
   /// Constructor.
@@ -100,6 +106,9 @@ public:
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
+
+  /// Get the children of this mesh object.
+  csNamedObjVector& GetChildren () { return children; }
 
   CSOBJTYPE;
 };

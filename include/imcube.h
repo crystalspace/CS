@@ -24,7 +24,7 @@
 
 struct iMaterialWrapper;
 
-SCF_VERSION (iCubeMeshObject, 0, 0, 2);
+SCF_VERSION (iCubeMeshObject, 0, 0, 3);
 
 /**
  * This interface describes the API for the cube mesh object.
@@ -35,9 +35,21 @@ SCF_VERSION (iCubeMeshObject, 0, 0, 2);
 struct iCubeMeshObject : public iBase
 {
   /// Set size of cube.
-  virtual void SetSize (float size) = 0;
+  virtual void SetSize (float sizex, float sizey, float sizez) = 0;
   /// Get size of cube.
-  virtual float GetSize () = 0;
+  virtual float GetSizeX () = 0;
+  /// Get size of cube.
+  virtual float GetSizeY () = 0;
+  /// Get size of cube.
+  virtual float GetSizeZ () = 0;
+  /// Set shift of cube.
+  virtual void SetShift (float shiftx, float shifty, float shiftz) = 0;
+  /// Get shift of cube.
+  virtual float GetShiftX () = 0;
+  /// Get shift of cube.
+  virtual float GetShiftY () = 0;
+  /// Get shift of cube.
+  virtual float GetShiftZ () = 0;
   /// Set material of cube.
   virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
   /// Get material of cube.

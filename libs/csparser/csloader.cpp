@@ -3191,7 +3191,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         {
           csMeshWrapper* sp = new csMeshWrapper (Engine);
           sp->SetName (name);
-          LoadMeshObject (sp, params);
+          LoadMeshObject (sp, params, sector);
           Engine->sprites.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
@@ -3614,7 +3614,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         {
           csMeshWrapper* sp = new csMeshWrapper (Engine);
           sp->SetName (name);
-          LoadMeshObject (sp, params);
+          LoadMeshObject (sp, params, sector);
           Engine->sprites.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
@@ -4676,6 +4676,7 @@ void csLoader::NewPlugIn (const char* name, iPlugIn* plugin)
   LoadedPlugin* lp = new LoadedPlugin ();
   lp->name = name;
   lp->plugin = plugin;
+  loaded_plugins.Push (lp);
 }
 
 bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
@@ -4740,12 +4741,14 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
   return true;
 }
 
-bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf)
+bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 {
   CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (KEY)
+    CS_TOKEN_TABLE (MESHOBJ)
+    CS_TOKEN_TABLE (MOVE)
     CS_TOKEN_TABLE (PLUGIN)
     CS_TOKEN_TABLE (PARAMS)
-    CS_TOKEN_TABLE (MOVE)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (tok_matvec)
@@ -4770,6 +4773,19 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf)
     }
     switch (cmd)
     {
+      case CS_TOKEN_KEY:
+        load_key (params, mesh);
+        break;
+      case CS_TOKEN_MESHOBJ:
+        {
+          csMeshWrapper* sp = new csMeshWrapper (mesh);
+          sp->SetName (name);
+          LoadMeshObject (sp, params, sector);
+          mesh->GetChildren ().Push (sp);
+          sp->GetMovable ().SetSector (sector);
+	  sp->GetMovable ().UpdateMove ();
+        }
+        break;
       case CS_TOKEN_MOVE:
         {
           char* params2;

@@ -422,10 +422,16 @@ public:
   virtual iBase *QueryPlugIn (const char *iInterface, int iVersion);
   /// Find a plugin given his functionality ID
   virtual iBase *QueryPlugIn (const char *iFuncID, const char *iInterface, int iVersion);
+  /// Find a plugin given his class ID and functionality ID
+  virtual iBase *QueryPlugIn (const char* iClassID, const char *iFuncID, const char *iInterface, int iVersion);
   /// Remove a plugin from system driver's plugin list
   virtual bool UnloadPlugIn (iPlugIn *iObject);
   /// Register a object that implements the iPlugIn interface as a plugin
   virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID, iPlugIn *iObject);
+  /// Get the number of loaded plugins in the plugin manager.
+  virtual int GetNumPlugIns ();
+  /// Get the specified plugin from the plugin manager.
+  virtual iBase* GetPlugIn (int idx);
 
   /// Get the system configuration file: this does NOT IncRef the object
   virtual iConfigFile *GetConfig ();

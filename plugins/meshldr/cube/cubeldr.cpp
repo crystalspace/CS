@@ -30,6 +30,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MIXMODE)
+  CS_TOKEN_DEF (SHIFT)
   CS_TOKEN_DEF (SIZE)
 CS_TOKEN_DEF_END
 
@@ -74,6 +75,7 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (SHIFT)
     CS_TOKEN_TABLE (SIZE)
   CS_TOKEN_TABLE_END
 
@@ -82,7 +84,13 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
   char* params;
   char str[255];
 
-  iMeshObjectFactory* fact = LOAD_PLUGIN (sys, "crystalspace.meshobj.cube", "MeshObj", iMeshObjectFactory);
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.meshobj.cube", "MeshObj", iMeshObjectType);
+  if (!type)
+  {
+    type = LOAD_PLUGIN (sys, "crystalspace.meshobj.cube", "MeshObj", iMeshObjectType);
+    printf ("Load TYPE plugin crystalspace.meshobj.cube\n");
+  }
+  iMeshObjectFactory* fact = type->NewFactory ();
   iCubeMeshObject* cubeLook = QUERY_INTERFACE (fact, iCubeMeshObject);
 
   char* buf = (char*)string;
@@ -112,11 +120,18 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
       case CS_TOKEN_MIXMODE:
 	printf ("Not implemented yet!\n");
 	break;
+      case CS_TOKEN_SHIFT:
+	{
+	  float shiftx, shifty, shiftz;
+	  ScanStr (params, "%f,%f,%f", &shiftx, &shifty, &shiftz);
+	  cubeLook->SetShift (shiftx, shifty, shiftz);
+	}
+	break;
       case CS_TOKEN_SIZE:
 	{
-	  float size;
-	  ScanStr (params, "%f", &size);
-	  cubeLook->SetSize (size);
+	  float sizex, sizey, sizez;
+	  ScanStr (params, "%f,%f,%f", &sizex, &sizey, &sizez);
+	  cubeLook->SetSize (sizex, sizey, sizez);
 	}
 	break;
     }

@@ -155,7 +155,7 @@ class csLoader
   /**
    * Load the mesh object from the map file.
    */
-  static bool LoadMeshObject (csMeshWrapper* mesh, char* buf);
+  static bool LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector);
 
   /**
    * Load the 2D sprite from the map file.

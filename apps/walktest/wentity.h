@@ -19,6 +19,7 @@
 #ifndef __WENTITY_H
 #define __WENTITY_H
 
+#include "csengine/movable.h"
 #include "csobject/pobject.h"
 #include "csobject/dataobj.h"
 #include "csgeom/vector3.h"
@@ -90,14 +91,16 @@ private:
   bool always;
   /// The rotation angles.
   csVector3 angles;
-  /// Parent thing.
-  csThing* tparent;
+  /// Parent.
+  csObject* tparent;
+  /// Movable of the parent.
+  csMovable* movable;
   /// Time remaining before we stop rotating (if always == false).
   float remaining;
 
 public:
   /// Create this object.
-  csRotatingObject (csThing* p);
+  csRotatingObject (csObject* p);
 
   /// Set rotation angles.
   void SetAngles (const csVector3& a) { angles = a; }

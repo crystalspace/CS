@@ -93,6 +93,16 @@ void csMeshWrapper::UpdateInPolygonTrees ()
   bbox.RemoveFromTree ();
 }
 
+void csMeshWrapper::UpdateMove ()
+{
+  csSprite::UpdateMove ();
+  int i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    csSprite* spr = (csSprite*)children[i];
+    spr->GetMovable ().UpdateMove ();
+  }
+}
 
 void csMeshWrapper::Draw (csRenderView& rview)
 {
@@ -102,6 +112,12 @@ void csMeshWrapper::Draw (csRenderView& rview)
   {
     UpdateDeferedLighting (movable.GetPosition ());
     mesh->Draw (irv, imov);
+  }
+  int i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    csSprite* spr = (csSprite*)children[i];
+    spr->Draw (rview);
   }
 }
 
@@ -120,6 +136,12 @@ void csMeshWrapper::UpdateLighting (csLight** lights, int num_lights)
   iMovable* imov = QUERY_INTERFACE (&movable, iMovable);
   mesh->UpdateLighting (ilights, num_lights, imov);
   delete ilights;
+
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    csSprite* spr = (csSprite*)children[i];
+    spr->UpdateLighting (lights, num_lights);
+  }
 }
 
 

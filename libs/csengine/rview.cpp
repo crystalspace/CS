@@ -437,7 +437,7 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
         mesh.vertex_fog[i].g = finfo->fog->green;
         mesh.vertex_fog[i].b = finfo->fog->blue;
       }
-      finfo = fog_info->next;
+      finfo = finfo->next;
     }
   }
 }

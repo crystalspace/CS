@@ -40,7 +40,7 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
 {
   CONSTRUCT_IBASE (NULL);
   csCubeMeshObject::factory = factory;
-  cur_size = -1;
+  initialized = false;
   camera_cookie = 0;
 }
 
@@ -72,15 +72,15 @@ void csCubeMeshObject::GetTransformedBoundingBox (iTransformationManager* tranma
 }
 
 void Perspective (const csVector3& v, csVector2& p, float fov,
-    	float shiftx, float shifty)
+    	float sx, float sy)
 {
   float iz = fov / v.z;
-  p.x = v.x * iz + shiftx;
-  p.y = v.y * iz + shifty;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
 }
 
 float csCubeMeshObject::GetScreenBoundingBox (iTransformationManager* tranman,
-      float fov, float shiftx, float shifty,
+      float fov, float sx, float sy,
       const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox)
 {
   csVector2 oneCorner;
@@ -102,47 +102,49 @@ float csCubeMeshObject::GetScreenBoundingBox (iTransformationManager* tranman,
   }
   else
   {
-    Perspective (cbox.Max (), oneCorner, fov, shiftx, shifty);
+    Perspective (cbox.Max (), oneCorner, fov, sx, sy);
     sbox.StartBoundingBox (oneCorner);
     csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
-    Perspective (v, oneCorner, fov, shiftx, shifty);
+    Perspective (v, oneCorner, fov, sx, sy);
     sbox.AddBoundingVertexSmart (oneCorner);
-    Perspective (cbox.Min (), oneCorner, fov, shiftx, shifty);
+    Perspective (cbox.Min (), oneCorner, fov, sx, sy);
     sbox.AddBoundingVertexSmart (oneCorner);
     v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
-    Perspective (v, oneCorner, fov, shiftx, shifty);
+    Perspective (v, oneCorner, fov, sx, sy);
     sbox.AddBoundingVertexSmart (oneCorner);
   }
 
   return cbox.MaxZ ();
 }
 
-bool csCubeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
+void csCubeMeshObject::SetupObject ()
 {
-  float size = factory->GetSize ();
-  if (cur_size != size)
+  if (!initialized)
   {
-    cur_size = size;
-    // If current size is different from size in factory
-    // then we haven't computed our vertex array yet (or the
-    // size has changed so we have to recompute it).
-    float s = size/2;
-    vertices[0].Set (-s, -s, -s);
-    vertices[1].Set ( s, -s, -s);
-    vertices[2].Set (-s,  s, -s);
-    vertices[3].Set ( s,  s, -s);
-    vertices[4].Set (-s, -s,  s);
-    vertices[5].Set ( s, -s,  s);
-    vertices[6].Set (-s,  s,  s);
-    vertices[7].Set ( s,  s,  s);
-    normals[0] = vertices[0]; normals[0].Normalize ();
-    normals[1] = vertices[1]; normals[1].Normalize ();
-    normals[2] = vertices[2]; normals[2].Normalize ();
-    normals[3] = vertices[3]; normals[3].Normalize ();
-    normals[4] = vertices[4]; normals[4].Normalize ();
-    normals[5] = vertices[5]; normals[5].Normalize ();
-    normals[6] = vertices[6]; normals[6].Normalize ();
-    normals[7] = vertices[7]; normals[7].Normalize ();
+    initialized = true;
+    float sizex = factory->GetSizeX ();
+    float sizey = factory->GetSizeY ();
+    float sizez = factory->GetSizeZ ();
+    float shiftx = factory->GetShiftX ();
+    float shifty = factory->GetShiftY ();
+    float shiftz = factory->GetShiftZ ();
+    float sx = sizex/2;
+    float sy = sizey/2;
+    float sz = sizez/2;
+    vertices[0].Set (-sx, -sy, -sz);
+    vertices[1].Set ( sx, -sy, -sz);
+    vertices[2].Set (-sx,  sy, -sz);
+    vertices[3].Set ( sx,  sy, -sz);
+    vertices[4].Set (-sx, -sy,  sz);
+    vertices[5].Set ( sx, -sy,  sz);
+    vertices[6].Set (-sx,  sy,  sz);
+    vertices[7].Set ( sx,  sy,  sz);
+    int i;
+    for (i = 0 ; i < 8 ; i++)
+    {
+      normals[i] = vertices[i]; normals[i].Normalize ();
+      vertices[i] += csVector3 (shiftx, shifty, shiftz);
+    }
     uv[0].Set (0, 0);
     uv[1].Set (1, 0);
     uv[2].Set (0, 1);
@@ -185,7 +187,11 @@ bool csCubeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
     mesh.vertex_fog = fog;
   }
- 
+}
+
+bool csCubeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
+{
+  SetupObject ();
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
   iEngine* engine = rview->GetEngine ();
@@ -198,7 +204,7 @@ bool csCubeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
   csReversibleTransform tr_o2c = camera->GetTransform ()
-    	* movable->GetTransform ().GetInverse ();
+    	* movable->GetFullTransform ().GetInverse ();
   float fov = camera->GetFOV ();
   float shiftx = camera->GetShiftX ();
   float shifty = camera->GetShiftY ();
@@ -230,6 +236,8 @@ bool csCubeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 void csCubeMeshObject::UpdateLighting (iLight** lights, int num_lights,
     iMovable* movable)
 {
+  SetupObject ();
+
   int i, l;
 
   // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
@@ -238,7 +246,7 @@ void csCubeMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
   // Do the lighting.
   csVector3 obj_center (0);
-  csReversibleTransform& trans = movable->GetTransform ();
+  csReversibleTransform trans = movable->GetFullTransform ();
   csVector3 wor_center = trans.This2Other (obj_center);
   csColor color;
   for (l = 0 ; l < num_lights ; l++)
@@ -316,7 +324,6 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
 
 IMPLEMENT_IBASE (csCubeMeshObjectFactory)
   IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_EMBEDDED_INTERFACE (iCubeMeshObject)
 IMPLEMENT_IBASE_END
 
@@ -324,18 +331,16 @@ IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectFactory::CubeMeshObject)
   IMPLEMENTS_INTERFACE (iCubeMeshObject)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_FACTORY (csCubeMeshObjectFactory)
-
-EXPORT_CLASS_TABLE (cube)
-  EXPORT_CLASS (csCubeMeshObjectFactory, "crystalspace.meshobj.cube",
-    "Crystal Space Cube Mesh Object")
-EXPORT_CLASS_TABLE_END
-
-csCubeMeshObjectFactory::csCubeMeshObjectFactory (iBase* pParent)
+csCubeMeshObjectFactory::csCubeMeshObjectFactory ()
 {
-  CONSTRUCT_IBASE (pParent);
+  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiCubeMeshObject);
-  size = 1;
+  sizex = 1;
+  sizey = 1;
+  sizez = 1;
+  shiftx = 0;
+  shifty = 0;
+  shiftz = 0;
   material = NULL;
   MixMode = 0;
 }
@@ -344,14 +349,113 @@ csCubeMeshObjectFactory::~csCubeMeshObjectFactory ()
 {
 }
 
-bool csCubeMeshObjectFactory::Initialize (iSystem*)
-{
-  return true;
-}
-
 iMeshObject* csCubeMeshObjectFactory::NewInstance ()
 {
   csCubeMeshObject* cm = new csCubeMeshObject (this);
   return QUERY_INTERFACE (cm, iMeshObject);
+}
+
+//----------------------------------------------------------------------
+
+IMPLEMENT_IBASE (csCubeMeshObjectType)
+  IMPLEMENTS_INTERFACE (iMeshObjectType)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectType::csCubeConfig)
+  IMPLEMENTS_INTERFACE (iConfig)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_FACTORY (csCubeMeshObjectType)
+
+EXPORT_CLASS_TABLE (cube)
+  EXPORT_CLASS (csCubeMeshObjectType, "crystalspace.meshobj.cube",
+    "Crystal Space Cube Mesh Type")
+EXPORT_CLASS_TABLE_END
+
+csCubeMeshObjectType::csCubeMeshObjectType (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+  CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  default_sizex = 1;
+  default_sizey = 1;
+  default_sizez = 1;
+  default_shiftx = 0;
+  default_shifty = 0;
+  default_shiftz = 0;
+  default_MixMode = 0;
+}
+
+csCubeMeshObjectType::~csCubeMeshObjectType ()
+{
+}
+
+bool csCubeMeshObjectType::Initialize (iSystem*)
+{
+  return true;
+}
+
+iMeshObjectFactory* csCubeMeshObjectType::NewFactory ()
+{
+  csCubeMeshObjectFactory* cm = new csCubeMeshObjectFactory ();
+  iCubeMeshObject* cubeLook = QUERY_INTERFACE (cm, iCubeMeshObject);
+  cubeLook->SetSize (default_sizex, default_sizey, default_sizez);
+  cubeLook->SetShift (default_shiftx, default_shifty, default_shiftz);
+  return QUERY_INTERFACE (cm, iMeshObjectFactory);
+}
+
+#define NUM_OPTIONS 6
+
+static const csOptionDescription config_options [NUM_OPTIONS] =
+{
+  { 0, "sizex", "X Size", CSVAR_FLOAT },
+  { 1, "sizey", "Y Size", CSVAR_FLOAT },
+  { 2, "sizez", "Z Size", CSVAR_FLOAT },
+  { 3, "shiftx", "X Shift", CSVAR_FLOAT },
+  { 4, "shifty", "Y Shift", CSVAR_FLOAT },
+  { 5, "shiftz", "Z Shift", CSVAR_FLOAT },
+};
+
+bool csCubeMeshObjectType::csCubeConfig::SetOption (int id, csVariant* value)
+{
+  if (value->type != config_options[id].type)
+    return false;
+  switch (id)
+  {
+    case 0: scfParent->default_sizex = value->v.f; break;
+    case 1: scfParent->default_sizey = value->v.f; break;
+    case 2: scfParent->default_sizez = value->v.f; break;
+    case 3: scfParent->default_shiftx = value->v.f; break;
+    case 4: scfParent->default_shifty = value->v.f; break;
+    case 5: scfParent->default_shiftz = value->v.f; break;
+    default: return false;
+  }
+  return true;
+}
+
+bool csCubeMeshObjectType::csCubeConfig::GetOption (int id, csVariant* value)
+{
+  value->type = config_options[id].type;
+  switch (id)
+  {
+    case 0: value->v.f = scfParent->default_sizex; break;
+    case 1: value->v.f = scfParent->default_sizey; break;
+    case 2: value->v.f = scfParent->default_sizez; break;
+    case 3: value->v.f = scfParent->default_shiftx; break;
+    case 4: value->v.f = scfParent->default_shifty; break;
+    case 5: value->v.f = scfParent->default_shiftz; break;
+    default: return false;
+  }
+  return true;
+}
+
+bool csCubeMeshObjectType::csCubeConfig::GetOptionDescription
+  (int idx, csOptionDescription* option)
+{
+  if (idx < 0 || idx >= NUM_OPTIONS)
+    return false;
+  *option = config_options[idx];
+  return true;
 }
 

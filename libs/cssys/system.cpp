@@ -1012,6 +1012,17 @@ bool csSystemDriver::RegisterPlugIn (const char *iClassID,
   }
 }
 
+int csSystemDriver::GetNumPlugIns ()
+{
+  return PlugIns.Length ();
+}
+
+iBase* csSystemDriver::GetPlugIn (int idx)
+{
+  csPlugIn* pl = PlugIns.Get (idx);
+  return pl->PlugIn;
+}
+
 iBase *csSystemDriver::QueryPlugIn (const char *iInterface, int iVersion)
 {
   for (int i = 0; i < PlugIns.Length (); i++)
@@ -1032,6 +1043,26 @@ iBase *csSystemDriver::QueryPlugIn (const char *iFuncID, const char *iInterface,
     return NULL;
 
   return (iBase *)PlugIns.Get (idx)->PlugIn->QueryInterface (iInterface, iVersion);
+}
+
+iBase *csSystemDriver::QueryPlugIn (const char* iClassID, const char *iFuncID, const char *iInterface,
+  int iVersion)
+{
+  int i;
+  for (i = 0 ; i < PlugIns.Length () ; i++)
+  {
+    csPlugIn* pl = PlugIns.Get (i);
+    if (pl->ClassID)
+      if (pl->ClassID == iClassID || !strcmp (pl->ClassID, iClassID))
+      {
+	if (pl->FuncID)
+	  if (pl->FuncID == iFuncID || !strcmp (pl->FuncID, iFuncID))
+	  {
+	    return (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (iInterface, iVersion);
+	  }
+      }
+  }
+  return NULL;
 }
 
 bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)

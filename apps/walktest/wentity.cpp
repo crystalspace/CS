@@ -20,6 +20,7 @@
 #include "walktest/wentity.h"
 #include "walktest/walktest.h"
 #include "csengine/thing.h"
+#include "csengine/cssprite.h"
 #include "csgeom/matrix3.h"
 
 extern WalkTest* Sys;
@@ -72,12 +73,16 @@ printf ("Done opening door.\n");
 //--------------------------------------------------------------------------
 
 
-csRotatingObject::csRotatingObject (csThing* p)
+csRotatingObject::csRotatingObject (csObject* p)
 {
   always = true;
   tparent = p;
   angles.Set (90, 0, 0);
   remaining = 0;
+  if (p->GetType () == csThing::Type)
+    movable = &((csThing*)p)->GetMovable ();
+  else if (p->GetType () >= csSprite::Type)
+    movable = &((csSprite*)p)->GetMovable ();
 }
 
 void csRotatingObject::Activate ()
@@ -109,8 +114,8 @@ void csRotatingObject::NextFrame (float elapsed_time)
   csYRotMatrix3 maty (angles.y * trans);
   csZRotMatrix3 matz (angles.z * trans);
   csMatrix3 mat = matz * maty * matx;
-  tparent->GetMovable ().Transform (mat);
-  tparent->GetMovable ().UpdateMove ();
+  movable->Transform (mat);
+  movable->UpdateMove ();
 }
 
 //--------------------------------------------------------------------------

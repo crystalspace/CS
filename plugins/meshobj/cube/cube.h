@@ -26,6 +26,7 @@
 #include "imcube.h"
 #include "igraph3d.h"
 #include "itranman.h"
+#include "iconfig.h"
 
 struct iMaterialWrapper;
 class csCubeMeshObjectFactory;
@@ -43,8 +44,8 @@ private:
   csColor colors[8];
   csTriangle triangles[12];
   G3DFogInfo fog[8];
-  float cur_size;
   G3DTriangleMesh mesh;
+  bool initialized;
 
   /**
    * Camera space bounding box is cached here.
@@ -56,14 +57,17 @@ private:
   /// Current cookie for camera_bbox.
   csTranCookie camera_cookie;
 
+  /**
+   * Setup this object. This function will check if setup is needed.
+   */
+  void SetupObject ();
+
 public:
   /// Constructor.
   csCubeMeshObject (csCubeMeshObjectFactory* factory);
 
   /// Destructor.
   virtual ~csCubeMeshObject ();
-
-public:
 
   /// Get the bounding box in transformed space.
   void GetTransformedBoundingBox (iTransformationManager* tranman,
@@ -76,7 +80,7 @@ public:
    * valid.
    */
   float GetScreenBoundingBox (iTransformationManager* tranman, float fov,
-      float shiftx, float shifty,
+      float sx, float sy,
       const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
   ///------------------------ iMeshObject implementation ------------------------
@@ -96,28 +100,35 @@ public:
 class csCubeMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-  float size;
+  float sizex, sizey, sizez;
+  float shiftx, shifty, shiftz;
   iMaterialWrapper* material;
   UInt MixMode;
 
 public:
   /// Constructor.
-  csCubeMeshObjectFactory (iBase*);
+  csCubeMeshObjectFactory ();
 
   /// Destructor.
   virtual ~csCubeMeshObjectFactory ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-  /// Get the size of this cube.
-  float GetSize () { return size; }
+  /// Get the x size of this cube.
+  float GetSizeX () { return sizex; }
+  /// Get the y size of this cube.
+  float GetSizeY () { return sizey; }
+  /// Get the z size of this cube.
+  float GetSizeZ () { return sizez; }
+  /// Get the x shift of this cube.
+  float GetShiftX () { return shiftx; }
+  /// Get the y shift of this cube.
+  float GetShiftY () { return shifty; }
+  /// Get the z shift of this cube.
+  float GetShiftZ () { return shiftz; }
   /// Get the material for this cube.
   iMaterialWrapper* GetMaterialWrapper () { return material; }
   /// Get mixmode.
   UInt GetMixMode () { return MixMode; }
 
-public:
   //------------------------ iMeshObjectFactory implementation --------------
   DECLARE_IBASE;
 
@@ -128,8 +139,24 @@ public:
   class CubeMeshObject : public iCubeMeshObject
   {
     DECLARE_EMBEDDED_IBASE (csCubeMeshObjectFactory);
-    virtual void SetSize (float size) { scfParent->size = size; }
-    virtual float GetSize () { return scfParent->size; }
+    virtual void SetSize (float sizex, float sizey, float sizez)
+    {
+      scfParent->sizex = sizex;
+      scfParent->sizey = sizey;
+      scfParent->sizez = sizez;
+    }
+    virtual float GetSizeX () { return scfParent->sizex; }
+    virtual float GetSizeY () { return scfParent->sizey; }
+    virtual float GetSizeZ () { return scfParent->sizez; }
+    virtual void SetShift (float shiftx, float shifty, float shiftz)
+    {
+      scfParent->shiftx = shiftx;
+      scfParent->shifty = shifty;
+      scfParent->shiftz = shiftz;
+    }
+    virtual float GetShiftX () { return scfParent->shiftx; }
+    virtual float GetShiftY () { return scfParent->shifty; }
+    virtual float GetShiftZ () { return scfParent->shiftz; }
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
       scfParent->material = material;
@@ -139,6 +166,44 @@ public:
     virtual UInt GetMixMode () { return scfParent->MixMode; }
   } scfiCubeMeshObject;
   friend class CubeMeshObject;
+};
+
+/**
+ * Cube type. This is the plugin you have to use to create instances
+ * of csCubeMeshObjectFactory.
+ */
+class csCubeMeshObjectType : public iMeshObjectType
+{
+private:
+  float default_sizex, default_sizey, default_sizez;
+  float default_shiftx, default_shifty, default_shiftz;
+  UInt default_MixMode;
+
+public:
+  /// Constructor.
+  csCubeMeshObjectType (iBase*);
+
+  /// Destructor.
+  virtual ~csCubeMeshObjectType ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+  //------------------------ iMeshObjectType implementation --------------
+  DECLARE_IBASE;
+
+  /// Draw.
+  virtual iMeshObjectFactory* NewFactory ();
+
+  ///------------------- iConfig interface implementation -------------------
+  struct csCubeConfig : public iConfig
+  {
+    DECLARE_EMBEDDED_IBASE (csCubeMeshObjectType);
+    virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+    virtual bool SetOption (int id, csVariant* value);
+    virtual bool GetOption (int id, csVariant* value);
+  } scfiConfig;
+  friend struct csCubeConfig;
 };
 
 #endif // _CUBE_H_

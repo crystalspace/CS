@@ -32,6 +32,7 @@
 #include "csengine/csview.h"
 #include "csengine/wirefrm.h"
 #include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csengine/skeleton.h"
 #include "csengine/triangle.h"
 #include "csengine/polygon.h"
@@ -410,19 +411,16 @@ void WalkTest::ParseKeyCmds (csObject* src)
     }
     else if (!strcmp (kp->GetKey (), "entity_Rotate"))
     {
-      if (src->GetType () == csThing::Type)
-      {
-	csVector3 angle;
-	bool always;
-        ScanStr (kp->GetValue (), "%f,%f,%f,%b", &angle.x, &angle.y, &angle.z,
+      csVector3 angle;
+      bool always;
+      ScanStr (kp->GetValue (), "%f,%f,%f,%b", &angle.x, &angle.y, &angle.z,
 		&always);
-	csRotatingObject* rotobj = new csRotatingObject ((csThing*)src);
-	rotobj->SetAngles (angle);
-	rotobj->SetAlways (always);
-        src->ObjAdd (rotobj);
-	if (always)
-	  Sys->busy_entities.Push (rotobj);
-      }
+      csRotatingObject* rotobj = new csRotatingObject (src);
+      rotobj->SetAngles (angle);
+      rotobj->SetAlways (always);
+      src->ObjAdd (rotobj);
+      if (always)
+	Sys->busy_entities.Push (rotobj);
     }
     else if (!strcmp (kp->GetKey (), "entity_Light"))
     {
@@ -466,6 +464,16 @@ void WalkTest::ParseKeyCmds (csObject* src)
     }
     it.Next ();
   }
+  if (src->GetType () >= csMeshWrapper::Type)
+  {
+    csMeshWrapper* mesh = (csMeshWrapper*)src;
+    int k;
+    for (k = 0 ; k < mesh->GetChildren ().Length () ; k++)
+    {
+      csSprite* spr = (csSprite*)(mesh->GetChildren ()[k]);
+      ParseKeyCmds (spr);
+    }
+  }
 }
 
 void WalkTest::ParseKeyCmds ()
@@ -481,6 +489,11 @@ void WalkTest::ParseKeyCmds ()
     {
       csThing* thing = (csThing*)(sector->things[j]);
       ParseKeyCmds (thing);
+    }
+    for (j = 0 ; j < sector->sprites.Length () ; j++)
+    {
+      csSprite* sprite = (csSprite*)(sector->sprites[j]);
+      ParseKeyCmds (sprite);
     }
   }
 }
@@ -562,7 +575,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Various:\n");
     CONPRI("  coordsave coordload bind capture map mapproj p_alpha s_fog\n");
     CONPRI("  snd_play snd_volume record play clrrec saverec\n");
-    CONPRI("  loadrec action\n");
+    CONPRI("  loadrec action plugins conflist confset\n");
 
 #   undef CONPRI
   }
@@ -575,6 +588,107 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     Sys->Printf (MSG_CONSOLE, "LOAD COORDS\n");
     LoadCamera (Sys->VFS, "/this/coord");
+  }
+  else if (!strcasecmp (cmd, "plugins"))
+  {
+    int num = Sys->GetNumPlugIns ();
+    int i;
+    for (i = 0 ; i < num ; i++)
+    {
+      iBase* plugin = Sys->GetPlugIn (i);
+      iFactory* fact = QUERY_INTERFACE (plugin, iFactory);
+      CsPrintf (MSG_CONSOLE, "%d: %s\n", i, fact->QueryDescription ());
+    }
+  }
+  else if (!strcasecmp (cmd, "conflist"))
+  {
+    if (arg)
+    {
+      int idx;
+      sscanf (arg, "%d", &idx);
+      if (idx < 0 || idx >= Sys->GetNumPlugIns ())
+	CsPrintf (MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
+      else
+      {
+        iBase* plugin = Sys->GetPlugIn (idx);
+        iConfig* config = QUERY_INTERFACE (plugin, iConfig);
+	if (!config)
+	  CsPrintf (MSG_CONSOLE, "No config interface for this plugin.\n");
+	else
+	{
+          int i;
+          for (i = 0 ; ; i++)
+          {
+	    csOptionDescription odesc;
+	    if (!config->GetOptionDescription (i, &odesc)) break;
+	    CsPrintf (MSG_CONSOLE, "Option %s (%s) ", odesc.name,
+	        odesc.description);
+	    csVariant var;
+	    config->GetOption (i, &var);
+	    switch (odesc.type)
+	    {
+	      case CSVAR_LONG: CsPrintf (MSG_CONSOLE, "LONG=%ld\n",
+				   var.v.l);
+			       break;
+	      case CSVAR_BOOL: CsPrintf (MSG_CONSOLE, "BOOL=%d\n",
+				   var.v.b);
+			       break;
+	      case CSVAR_CMD: CsPrintf (MSG_CONSOLE, "CMD\n");
+			       break;
+	      case CSVAR_FLOAT: CsPrintf (MSG_CONSOLE, "FLOAT=%g\n",
+				   var.v.f);
+			       break;
+	      default: CsPrintf (MSG_CONSOLE, "<unknown type>\n");
+		       break;
+	    }
+          }
+	}
+      }
+    }
+    else
+      Sys->Printf (MSG_CONSOLE, "Expected index to plugin (from 'plugins' command)!\n");
+  }
+  else if (!strcasecmp (cmd, "confset"))
+  {
+    if (arg)
+    {
+      char name[50];
+      char val[256];
+      int idx;
+      ScanStr (arg, "%d,%s,%s", &idx, name, val);
+      if (idx < 0 || idx >= Sys->GetNumPlugIns ())
+	CsPrintf (MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
+      else
+      {
+        iBase* plugin = Sys->GetPlugIn (idx);
+        iConfig* config = QUERY_INTERFACE (plugin, iConfig);
+	if (!config)
+	  CsPrintf (MSG_CONSOLE, "No config interface for this plugin.\n");
+	else
+	{
+          int i;
+          for (i = 0 ; ; i++)
+          {
+	    csOptionDescription odesc;
+	    if (!config->GetOptionDescription (i, &odesc)) break;
+	    if (strcmp (odesc.name, name) == 0)
+	    {
+	      CsPrintf (MSG_CONSOLE, "Set option %s to %s\n", odesc.name, val);
+	      csVariant var;
+	      switch (odesc.type)
+	      {
+	        case CSVAR_LONG: sscanf (val, "%ld", &var.v.l); break;
+	        case CSVAR_BOOL: ScanStr (val, "%b", &var.v.b); break;
+	        case CSVAR_FLOAT: ScanStr (val, "%f", &var.v.f); break;
+	      }
+	      config->SetOption (i, &var);
+	    }
+          }
+	}
+      }
+    }
+    else
+      Sys->Printf (MSG_CONSOLE, "Expected index to plugin (from 'plugins' command)!\n");
   }
   else if (!strcasecmp (cmd, "action"))
   {

@@ -119,6 +119,19 @@
   (Interface *)Object->QueryPlugIn (FuncID, #Interface, VERSION_##Interface)
 
 /**
+ * Find a plugin by his class ID and functionality ID. First the plugin
+ * with requested class identifier and functionality identifier is found,
+ * and after this it is queried for the respective interface; if it does
+ * not implement the requested interface, NULL is returned. NULL is also
+ * returned if the plugin with respective functionality is simply not
+ * found. If you need the plugin with given functionality identifier no
+ * matter which interface it implements, ask for some basic interface,
+ * say iBase or iPlugIn.
+ */
+#define QUERY_PLUGIN_CLASS(Object,ClassID,FuncID,Interface)			\
+  (Interface *)Object->QueryPlugIn (ClassID, FuncID, #Interface, VERSION_##Interface)
+
+/**
  * Tell system driver to load a plugin.
  * Since SCF kernel is hidden behind the iSystem driver, this is the only
  * way to load a plugin from another plugin.
@@ -143,7 +156,7 @@ struct iEventPlug;
 struct iEventCord;
 struct iStrVector;
 
-SCF_VERSION (iSystem, 4, 0, 0);
+SCF_VERSION (iSystem, 4, 0, 1);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -261,11 +274,17 @@ struct iSystem : public iBase
   virtual iBase *QueryPlugIn (const char *iInterface, int iVersion) = 0;
   /// Find a plugin given his functionality ID
   virtual iBase *QueryPlugIn (const char *iFuncID, const char *iInterface, int iVersion) = 0;
+  /// Find a plugin given his class ID and functionality ID
+  virtual iBase *QueryPlugIn (const char* iClassID, const char *iFuncID, const char *iInterface, int iVersion) = 0;
   /// Remove a plugin from system driver's plugin list
   virtual bool UnloadPlugIn (iPlugIn *iObject) = 0;
   /// Register a object that implements the iPlugIn interface as a plugin
   virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID,
     iPlugIn *iObject) = 0;
+  /// Get the number of loaded plugins in the plugin manager.
+  virtual int GetNumPlugIns () = 0;
+  /// Get the specified plugin from the plugin manager.
+  virtual iBase* GetPlugIn (int idx) = 0;
 
   //----------------------- Configuration file interface ---------------------//
 

@@ -1,5 +1,70 @@
 The history order has been reversed so that new features are at the top.
 
+2-Jan-2001
+	- Philip Wyett fixed a small VC compiler warning.
+	- Wouter Wijngaards fixed a compile warning.
+	- Completed a fix Eric Sunshine did (previous millenium) with regards
+	  to CalculateFogMesh. Eric's fix was still not completely ok.
+	- Added an extra level of abstraction in the mesh object system.
+	  Created a plugin called iMeshObjectType which represents a type
+	  of mesh objects. From this you can created instances of
+	  iMeshObjectFactory. So iMeshObjectFactory is no longer a plugin
+	  but instances have to be created through iMeshObjectType.
+	- Added csCubeMeshObjectType in the cube plugin to implement
+	  iMeshObjectType.
+	- Added new QueryPlugIn to iSystem and system.h with which you can
+	  query for a loaded plugin on class ID. This complements the two
+	  other existing QueryPlugIn functions which could look for Func ID
+	  and interface name. The reason for this function is that you
+	  sometimes want to load a plugin with a certain class ID but you
+	  only want one. If there already is one you reuse the previously
+	  loaded plugin instance. So in that case you do QUERY_PLUGIN_CLASS
+	  first and if that fails (returns NULL) you do LOAD_PLUGIN.
+	- Also added QUERY_PLUGIN_CLASS which will use the new QueryPlugIn.
+	- Added GetNumPlugIns() and GetPlugIn() to iSystem and system.h.
+	  With this you can query the list of currently loaded plugins in
+	  the system.
+	- Fixed a bug in csloader which would cause the loader plugins to
+	  be loaded multiple times instead of only once.
+	- csCubeMeshObjectType now also implements iConfig through embedding.
+	  Using this you can set the default size (x, y, and z) and the default
+	  shift (x, y, and z) for all factories created from this object
+	  mesh type.
+	- Added 'plugins' console command to WalkTest with which you can
+	  ask all loaded plugins (loaded into the system driver).
+	- Added 'conflist' console command to WalkTest with which you can
+	  ask all config options for some loaded plugin (use the 'plugins'
+	  command to get the list of plugins). You also get the current values
+	  of the options. For example 'conflist 3' will list all the config
+	  options and values for the plugin with number 3 (from the list
+	  given by 'plugins').
+	- Added 'confset' console command to WalkTest with which you can
+	  set a config option to some value. Arguments are <plugnr>,<name>,<val>
+	  with <plugnr> the number you get from the 'plugins' command.
+1-Jan-2001
+	- Added 'children' array to csMeshWrapper. By this we will support
+	  hierarchical objects and transformations.
+	- Added support for MESHOBJ keyword in MESHOBJ. This will be used
+	  to specify the hierarchical objects. i.e. the mesh objects can
+	  be children of a parent mesh object. The transformation specified
+	  in the children is relative to the parent position and orientation.
+	- Generalized csRotatingObject in the entity system of WalkTest
+	  so that it will now also be able to rotate sprites instead of
+	  only things (sprites in the general sense: csSprite, so the new
+	  plugin objects are also included).
+	- Added support for KEY keyword in MESHOBJ.
+	- Modified WalkTest so that it will also recognize the children
+	  of csMeshWrapper and parse the KEY statements for them.
+	- Changed iCubeMeshObject to make it more general. You can now
+	  specify the sizes for x, y, and z seperatelly. So the cube does
+	  not have to be a cube anymore :-)
+	- Also added shift values so that you can shift the (0,0,0) point
+	  of the cube to another place.
+	- Fixed a bad bug with UpdateLighting for the cube plugin. In some
+	  cases it would actually crash because UpdateLighting was called
+	  before the cube object was properly initialized. Added SetupObject()
+  	  function to initialize cube properly and if needed.
+	- Hierarchical objects are now working :-)
 31-Dec-2000
 	- Eric Sunshine fixed compilation warnings in engine.cpp, rview.cpp,
 	  meshobj.cpp, prdots.cpp, prfire.cpp, proctex.cpp, cubeldr.cpp, and

@@ -59,20 +59,32 @@ struct iMeshObject : public iBase
   virtual bool Draw (iRenderView* rview, iMovable* movable) = 0;
 };
 
-SCF_VERSION (iMeshObjectFactory, 0, 0, 1);
+SCF_VERSION (iMeshObjectFactory, 0, 0, 3);
 
 /**
- * This is the actual interface describing the plugin for a mesh
- * object. The plugin is actually a factory which can generate
+ * This object is a factory which can generate
  * mesh objects of a certain type. For example, if you want to have
  * multiple sets of sprites from the same sprite template then
  * you should have an instance of iMeshObjectFactory for evey sprite
  * template and an instance of iMeshObject for every sprite.
  */
-struct iMeshObjectFactory : public iPlugIn
+struct iMeshObjectFactory : public iBase
 {
   /// Create an instance of iMeshObject.
   virtual iMeshObject* NewInstance () = 0;
+};
+
+SCF_VERSION (iMeshObjectType, 0, 0, 1);
+
+/**
+ * This plugin describes a specific type of mesh objects. Through
+ * this plugin the user can create instances of mesh object factories
+ * which can then be used to create instances of mesh objects.
+ */
+struct iMeshObjectType : public iPlugIn
+{
+  /// Create an instance of iMeshObjectFactory.
+  virtual iMeshObjectFactory* NewFactory () = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 0, 1);
