@@ -607,6 +607,7 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
   // Remember current frustum mask.
   uint32 old_frustum_mask = data->frustum_mask;
 
+#if 0
   // In the first part of this test we are going to test if the node
   // itself is visible. If it is not then we don't need to continue.
   if (!dynavis->TestNodeVisibility (treenode, data))
@@ -614,16 +615,22 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
     vis = false;
     goto end;
   }
+#endif
 
+printf ("Before Distribute\n"); fflush (stdout);
   treenode->Distribute ();
+printf ("After Distribute\n"); fflush (stdout);
 
+#if 0
   int num_objects;
   csKDTreeChild** objects;
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
   int i;
+printf ("tov 1\n"); fflush (stdout);
   for (i = 0 ; i < num_objects ; i++)
   {
+printf ("tov 2:%d\n", i); fflush (stdout);
     if (objects[i]->timestamp != cur_timestamp)
     {
       objects[i]->timestamp = cur_timestamp;
@@ -632,6 +639,8 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
       dynavis->TestObjectVisibility (visobj_wrap, data);
     }
   }
+printf ("tov 3\n"); fflush (stdout);
+#endif
 
   vis = true;
 
@@ -639,6 +648,7 @@ end:
   // Restore the frustum mask.
   data->frustum_mask = old_frustum_mask;
 
+printf ("Before Return\n"); fflush (stdout);
   return vis;
 }
 
@@ -697,6 +707,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
     }
   }
 
+printf ("AAAAAAAAAAAAAA1\n"); fflush (stdout);
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible. In the mean time also update the coverage
   // buffer for further culling.
@@ -704,6 +715,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
   data.rview = rview;
   data.dynavis = this;
   kdtree->Front2Back (data.pos, VisTest_Front2Back, (void*)&data);
+printf ("AAAAAAAAAAAAAA2\n"); fflush (stdout);
 
   // Conclude statistics.
   if (t2 != 0)

@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 	  If they were queried too early they could hold invalid date and
 	  the vis system would not know about it.
 	- This fix means that Dynavis outline culling finally works :-)
+	- Added lots of debug info to Dynavis (making it totally unusable
+	  for mere mortals) to help me debug a crash.
 23-May-2002
 	- Put back the fflush() in engine.cpp. An fflush() can NEVER
 	  cause crashes unless your environment is screwed up a lot.

@@ -596,13 +596,19 @@ bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
     // There are children.
     if (pos[split_axis] <= split_location)
     {
+printf ("F2B 1\n"); fflush (stdout);
       child1->Front2Back (pos, func, userdata, cur_timestamp);
+printf ("F2B 2\n"); fflush (stdout);
       child2->Front2Back (pos, func, userdata, cur_timestamp);
+printf ("F2B 3\n"); fflush (stdout);
     }
     else
     {
+printf ("F2B 4\n"); fflush (stdout);
       child2->Front2Back (pos, func, userdata, cur_timestamp);
+printf ("F2B 5\n"); fflush (stdout);
       child1->Front2Back (pos, func, userdata, cur_timestamp);
+printf ("F2B 6\n"); fflush (stdout);
     }
   }
   return true;

@@ -152,6 +152,7 @@ public:
   void Debug_Dump (iGraphics3D* g3d);
   csTicks Debug_Benchmark (int num_iterations);
   bool Debug_DebugCommand (const char* cmd);
+  csKDTree* GetKDTree () { return kdtree; }
 
   struct eiComponent : public iComponent
   {
