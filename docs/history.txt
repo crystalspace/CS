@@ -63,6 +63,9 @@ chronological order.
 	  <eidpers@comcast.net> which fixes a number of const versus non-const
 	  conflicts from the return value of strchr().  Eric also re-wrote some
 	  of the code to avoid these conflicts altogether.
+	- Eric Sunshine fixed bug in csGraphics3DOGLCommon::DebugCommand()
+	  where it was incorrectly parsing the the incoming command string with
+	  the result that it failed to recognize commands with arguments.
 18-Dec-2003
 	- Jorrit added two new methods to iAwsComponent. One to set the
 	  preferred size and one to clear it again. This way one can forcibly
