@@ -51,7 +51,7 @@ csLinuxJoystick::csLinuxJoystick (iBase *parent):
   object_reg(NULL),
   joystick(NULL),
   nJoy(0),
-  eq(NULL),
+  bHooked(false),
   EventOutlet(NULL)
 {
   SCF_CONSTRUCT_IBASE(parent);
@@ -118,9 +118,8 @@ bool csLinuxJoystick::Init ()
   int fd;
 
   nJoy=0;
-  SCF_DEC_REF (eq);
-  eq = NULL;
   SCF_DEC_REF (EventOutlet);
+  bHooked = false;
   EventOutlet = NULL;
 
   while (it->Next ())
@@ -174,11 +173,12 @@ bool csLinuxJoystick::Init ()
     }
 
     // hook into eventqueue
-    eq = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-    if (eq)
+    csRef<iEventQueue> eq (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+    if (eq != 0)
     {
       eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
       EventOutlet = eq->CreateEventOutlet (&scfiEventPlug);
+      bHooked = true;
     }
   }
   else
@@ -187,16 +187,17 @@ bool csLinuxJoystick::Init ()
             "No operable joystick found\n");
   }
 
-  return eq && EventOutlet;
+  return EventOutlet;
 }
 
 bool csLinuxJoystick::Close ()
 {
-  if (eq)
+  if (bHooked)
   {
-    eq->RemoveListener (&scfiEventHandler);
-    eq->DecRef ();
-    eq = NULL;
+    csRef<iEventQueue> eq (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+    if (eq != 0)
+      eq->RemoveListener (&scfiEventHandler);
+    bHooked = false;
   }
 
   SCF_DEC_REF (EventOutlet);

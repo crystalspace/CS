@@ -50,7 +50,7 @@ class csLinuxJoystick : public iComponent
   joydata *joystick;
   int nJoy; // number of joysticks operable
   csConfigAccess config;
-  iEventQueue *eq;
+  bool bHooked;
   iEventOutlet *EventOutlet;
 
   bool Init ();
