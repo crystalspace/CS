@@ -40,19 +40,19 @@ else
 endif
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  DDRAW=ddraw2d$(DLL)
+  DDRAW=csddraw$(DLL)
   DEP.DDRAW=$(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.LOCAL.DDRAW=$(LIBS.DDRAW)
 else
 # Generate Static Libs
-  DDRAW=$(OUT)$(LIB_PREFIX)ddraw2d$(LIB)
+  DDRAW=$(OUT)$(LIB_PREFIX)csddraw$(LIB)
   DEP.EXE+=$(DDRAW)
   ifeq ($(COMP),GCC)
     LIBS.EXE+=$(LIBS.DDRAW) $(LIBS.DINPUT)
   else
     LIBS.EXE+=$(LIBS.DDRAW)
   endif
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DDRAW2D
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_CSDDRAW
 endif
 
 DESCRIPTION.$(DDRAW)=$(DESCRIPTION.ddraw)
