@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glidebe2d glidebe2dclean
-
 all plugins drivers drivers2d: glidebe2d
 
 glidebe2d:
@@ -30,26 +29,28 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# local CFLAGS
-CFLAGS.GLIDEBE2D+=$(GLIDE2_PATH)
-LIBS._GLIDEBE2D+=/boot/develop/lib/x86/glide2x.so
+CFLAGS.GLIDEBE2D += $(GLIDE2_PATH)
+LIB.GLIDEBE2D.SYSTEM += /boot/develop/lib/x86/glide2x.so
 
-# The 2D BeOS/Glide2 driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  GLIDEBE2D=$(OUTDLL)glidebe2d$(DLL)
-  LIBS.GLIDEBE2D=$(LIBS._GLIDEBE2D)
+  GLIDEBE2D = $(OUTDLL)glidebe2d$(DLL)
+  LIB.GLIDEBE2D = $(foreach d,$(DEP.GLIDEBE2D),$($d.LIB))
+  LIB.GLIDEBE2D.SPECIAL = $(LIB.GLIDEBE2D.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(GLIDEBE2D)
 else
-  GLIDEBE2D=$(OUT)$(LIB_PREFIX)glidebe2d$(LIB)
-  DEP.EXE+=$(GLIDEBE2D)
-  LIBS.EXE+=$(LIBS._GLIDEBE2D)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDEBE2D
+  GLIDEBE2D = $(OUT)$(LIB_PREFIX)glidebe2d$(LIB)
+  DEP.EXE += $(GLIDEBE2D)
+  LIBS.EXE += $(LIB.GLIDEBE2D.SYSTEM)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_GLIDEBE2D
   TO_INSTALL.STATIC_LIBS += $(GLIDEBE2D)
 endif
-DESCRIPTION.$(GLIDEBE2D) = $(DESCRIPTION.glidebe2d)
+
+INC.GLIDEBE2D = $(wildcard plugins/video/canvas/beglide2/*.h \
+	$(INC.COMMON.DRV2D.GLIDE) $(INC.COMMON.DRV2D))
 SRC.GLIDEBE2D = $(wildcard plugins/video/canvas/beglide2/*.cpp \
 	$(SRC.COMMON.DRV2D.GLIDE) $(SRC.COMMON.DRV2D))
 OBJ.GLIDEBE2D = $(addprefix $(OUT),$(notdir $(SRC.GLIDEBE2D:.cpp=$O)))
+DEP.GLIDEBE2D = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -68,8 +69,8 @@ $(OUT)%$O: plugins/video/canvas/beglide2/%.cpp
 $(OUT)%$O: plugins/video/canvas/glide2common/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDEBE2D)
  
-$(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(CSUTIL.LIB) $(CSSYS.LIB)
-	$(DO.PLUGIN) $(LIBS.GLIDEBE2D)
+$(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(LIB.GLIDEBE2D)
+	$(DO.PLUGIN) $(LIB.GLIDEBE2D.SPECIAL)
 
 glidebe2dclean:
 	$(RM) $(GLIDEBE2D) $(OBJ.GLIDEBE2D) $(OUTOS)glidebe2d.dep

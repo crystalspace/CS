@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: asciiart asciiartclean
-
 all plugins drivers drivers2d: asciiart
 
 asciiart:
@@ -31,30 +30,40 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # The AsciiArt library
-LIBS.ASCIIART+=$(LFLAGS.l)aa
+LIB.ASCIIART.SYSTEM += $(LFLAGS.l)aa
 # On Unix we need additional libraries
 ifdef X11_PATH
-  LIBS.ASCIIART+=-lgpm -lslang -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
+  LIB.ASCIIART.SYSTEM += \
+    -lgpm -lslang -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 endif
 
 # The 2D Ascii Art driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  ASCIIART=asciiart$(DLL)
-  DEP.ASCIIART=$(CSUTIL.LIB) $(CSSYS.LIB)
-  LIBS.LOCAL.ASCIIART=$(LIBS.ASCIIART)
-  TO_INSTALL.DYNAMIC_LIBS+=$(ASCIIART)
+  ASCIIART = $(OUTDLL)asciiart$(DLL)
+  LIB.ASCIIART = $(foreach d,$(DEP.ASCIIART),$($d.LIB))
+  LIB.ASCIIART.SPECIAL = $(LIB.ASCIIART.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(ASCIIART)
 else
-  ASCIIART=$(OUT)$(LIB_PREFIX)asciiart$(LIB)
-  DEP.EXE+=$(ASCIIART)
-  LIBS.EXE+=$(LIBS.ASCIIART)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ASCII2D
-  TO_INSTALL.STATIC_LIBS+=$(ASCIIART)
+  ASCIIART = $(OUT)$(LIB_PREFIX)asciiart$(LIB)
+  DEP.EXE += $(ASCIIART)
+  LIBS.EXE += $(LIB.ASCIIART.SYSTEM)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_ASCII2D
+  TO_INSTALL.STATIC_LIBS += $(ASCIIART)
 endif
-TO_INSTALL.CONFIG += data/config/asciiart.cfg
-DESCRIPTION.$(ASCIIART)=$(DESCRIPTION.asciiart)
+
+INC.ASCIIART = $(wildcard plugins/video/canvas/asciiart/*.h \
+  $(INC.COMMON.DRV2D))
 SRC.ASCIIART = $(wildcard plugins/video/canvas/asciiart/*.cpp \
   $(SRC.COMMON.DRV2D))
 OBJ.ASCIIART = $(addprefix $(OUT),$(notdir $(SRC.ASCIIART:.cpp=$O)))
+DEP.ASCIIART = CSUTIL CSSYS
+CFG.ASCIIART = data/config/asciiart.cfg
+
+TO_INSTALL.CONFIG += $(CFG.ASCIIART)
+
+#MSVC.DSP += ASCIIART
+#DSP.ASCIIART.NAME = asciiart
+#DSP.ASCIIART.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -64,14 +73,12 @@ ifeq ($(MAKESECTION),targets)
 vpath %.cpp plugins/video/canvas/asciiart
 
 .PHONY: asciiart asciiartclean
-
-# Chain rules
 clean: asciiartclean
 
 asciiart: $(OUTDIRS) $(ASCIIART)
 
-$(ASCIIART): $(OBJ.ASCIIART) $(DEP.ASCIIART)
-	$(DO.PLUGIN) $(LIBS.LOCAL.ASCIIART)
+$(ASCIIART): $(OBJ.ASCIIART) $(LIB.ASCIIART)
+	$(DO.PLUGIN) $(LIB.ASCIIART.SPECIAL)
 
 asciiartclean:
 	$(RM) $(ASCIIART) $(OBJ.ASCIIART) $(OUTOS)asciiart.dep

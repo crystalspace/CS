@@ -14,6 +14,13 @@ EMPTY=
 SPACE=$(EMPTY) $(EMPTY)
 SEPARATOR=$"*-------------------------------------------------------------------------*$"
 
+ifndef "
+"='
+endif
+ifndef |
+|=|
+endif
+
 # Unix shells tend to use "$" as delimiter for variable names.
 # Test for this behaviour and set $(BUCK) variable correspondigly ...
 __TMP__:=$(shell echo $$$$)
@@ -49,8 +56,8 @@ endef
 # Macro used to build a subtarget
 define MAKE_TARGET
   @echo $(SEPARATOR)
-  @echo $"  Compiling $(DESCRIPTION.$@)$"
-  @echo $"  Compiling for $(OS)/$(COMP)/$(PROC) in $(MODE) mode$"
+  @echo $"  Building $(DESCRIPTION.$@)$"
+  @echo $"  Building for $(OS)/$(COMP)/$(PROC) in $(MODE) mode$"
   @echo $(SEPARATOR)
   @$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 endef

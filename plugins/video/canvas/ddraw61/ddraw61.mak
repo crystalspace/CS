@@ -2,7 +2,7 @@
 # to build the Windows DirectDraw 2D driver
 
 # Driver description
-DESCRIPTION.ddraw61 = Crystal Space Windows DirectDraw/DX 6.1 2D driver
+DESCRIPTION.ddraw61 = Crystal Space DirectDraw/DX 6.1 2D driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: ddraw61 ddraw61clean
-
 all plugins drivers drivers2d: ddraw61
 
 ddraw61:
@@ -30,40 +29,45 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+vpath %.cpp plugins/video/canvas/ddraw61 plugins/video/canvas/common
+
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  DDRAW61=ddraw61$(DLL)
-  DEP.DDRAW61=$(CSUTIL.LIB) $(CSSYS.LIB)
-  LIBS.LOCAL.DDRAW61=$(LFLAGS.l)ddraw $(LFLAGS.l)dxguid
+  DDRAW61 = $(OUTDLL)ddraw61$(DLL)
+  LIB.DDRAW61 = $(foreach d,$(DEP.DDRAW61),$($d.LIB))
+  LIB.DDRAW61.SPECIAL = $(LFLAGS.l)ddraw $(LFLAGS.l)dxguid
+  TO_INSTALL.DYNAMIC_LIBS += $(DDRAW61)
 else
-  DDRAW61=$(OUT)$(LIB_PREFIX)ddraw61$(LIB)
-  DEP.EXE+=$(DDRAW61)
-  LIBS.EXE+=$(LFLAGS.l)ddraw61
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DDRAW61
+  DDRAW61 = $(OUT)$(LIB_PREFIX)ddraw61$(LIB)
+  DEP.EXE += $(DDRAW61)
+  LIBS.EXE += $(LFLAGS.l)ddraw61
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_DDRAW61
+  TO_INSTALL.STATIC_LIBS += $(DDRAW61)
 endif
 
-DESCRIPTION.$(DDRAW61)=$(DESCRIPTION.ddraw61)
-
-SRC.DDRAW61 = $(wildcard plugins/video/canvas/ddraw61/*.cpp $(SRC.COMMON.DRV2D)) \
-	libs/cssys/win32/directdetection.cpp
+INC.DDRAW61 = $(wildcard plugins/video/canvas/ddraw61/*.h \
+  $(INC.COMMON.DRV2D)) libs/cssys/win32/directdetection.h
+SRC.DDRAW61 = $(wildcard plugins/video/canvas/ddraw61/*.cpp \
+  $(SRC.COMMON.DRV2D)) libs/cssys/win32/directdetection.cpp
 OBJ.DDRAW61 = $(addprefix $(OUT),$(notdir $(SRC.DDRAW61:.cpp=$O)))
+DEP.DDRAW61 = CSUTIL CSSYS
+
+MSVC.DSP += DDRAW61
+DSP.DDRAW61.NAME = ddraw61
+DSP.DDRAW61.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp plugins/video/canvas/ddraw61 plugins/video/canvas/common
-
 .PHONY: ddraw61 ddraw61clean
-
-# Chain rules
-clean: ddraw61clean
 
 ddraw61: $(OUTDIRS) $(DDRAW61)
 
-$(DDRAW61): $(OBJ.DDRAW61) $(DEP.DDRAW61)
-	$(DO.PLUGIN) $(LIBS.LOCAL.DDRAW61)
+$(DDRAW61): $(OBJ.DDRAW61) $(LIB.DDRAW61)
+	$(DO.PLUGIN) $(LIB.DDRAW61.SPECIAL)
 
+clean: ddraw61clean
 ddraw61clean:
 	$(RM) $(DDRAW61) $(OBJ.DDRAW61) $(OUTOS)ddraw61.dep
 

@@ -1,4 +1,4 @@
-DESCRIPTION.fontplex = Crystal Space font server multiplexor
+DESCRIPTION.fontplex = Crystal Space multiplexing font server
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: fontplex fontplexclean
-plugins all: fontplex
+all plugins: fontplex
 fontplex:
 	$(MAKE_TARGET) MAKE_DLL=yes
 fontplexclean:
@@ -21,23 +21,27 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-SRC.FONTPLEX = $(wildcard plugins/font/server/fontplex/*.cpp)
-OBJ.FONTPLEX = $(addprefix $(OUT),$(notdir $(SRC.FONTPLEX:.cpp=$O)))
-LIB.FONTPLEX = $(CSUTIL.LIB) $(CSSYS.LIB)
+vpath %.cpp plugins/font/server/fontplex
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  FONTPLEX=$(OUTDLL)fontplex$(DLL)
-  DEP.FONTPLEX=$(LIB.FONTPLEX)
+  FONTPLEX = $(OUTDLL)fontplex$(DLL)
+  LIB.FONTPLEX = $(foreach d,$(DEP.FONTPLEX),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(FONTPLEX)
 else
-  FONTPLEX=$(OUT)$(LIB_PREFIX)csfntmngr$(LIB)
-  DEP.EXE+=$(FONTPLEX)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_FONTPLEX
+  FONTPLEX = $(OUT)$(LIB_PREFIX)csfntmngr$(LIB)
+  DEP.EXE += $(FONTPLEX)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_FONTPLEX
   TO_INSTALL.STATIC_LIBS += $(FONTPLEX)
 endif
-DESCRIPTION.$(FONTPLEX) = $(DESCRIPTION.fontplex)
 
-vpath %.cpp $(sort $(dir $(SRC.FONTPLEX)))
+INC.FONTPLEX = $(wildcard plugins/font/server/fontplex/*.h)
+SRC.FONTPLEX = $(wildcard plugins/font/server/fontplex/*.cpp)
+OBJ.FONTPLEX = $(addprefix $(OUT),$(notdir $(SRC.FONTPLEX:.cpp=$O)))
+DEP.FONTPLEX = CSUTIL CSSYS
+
+MSVC.DSP += FONTPLEX
+DSP.FONTPLEX.NAME = fontplex
+DSP.FONTPLEX.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
@@ -46,7 +50,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: fontplex fontplexclean
 fontplex: $(OUTDIRS) $(FONTPLEX)
 
-$(FONTPLEX): $(OBJ.FONTPLEX) $(DEP.FONTPLEX)
+$(FONTPLEX): $(OBJ.FONTPLEX) $(LIB.FONTPLEX)
 	$(DO.PLUGIN)
 
 clean: fontplexclean

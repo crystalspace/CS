@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: next2d next2dclean
-
 all plugins drivers drivers2d: next2d
 
 next2d:
@@ -30,31 +29,34 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
-NEXT.SOURCE_2D_PATHS= \
+NEXT.SOURCE_2D_PATHS = \
   $(addprefix plugins/video/canvas/next/,$(NEXT.SEARCH_PATH))
-CFLAGS.INCLUDE+=$(addprefix $(CFLAGS.I),$(NEXT.SOURCE_2D_PATHS))
+CFLAGS.INCLUDE += $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_2D_PATHS))
 
 endif # ifeq ($(MAKESECTION),defines)
 
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# The NeXT 2D driver
+vpath %.cpp $(NEXT.SOURCE_2D_PATHS)
+
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  NEXT2D=$(OUTDLL)next2d$(DLL)
-  TO_INSTALL.DYNAMIC_LIBS+=$(NEXT2D)
+  NEXT2D = $(OUTDLL)next2d$(DLL)
+  LIB.NEXT2D = $(foreach d,$(DEP.NEXT2D),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(NEXT2D)
 else
-  NEXT2D=$(OUT)$(LIB_PREFIX)next2d$(LIB)
-  DEP.EXE+=$(NEXT2D)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_NEXT2D
-  TO_INSTALL.STATIC_LIBS+=$(NEXT2D)
+  NEXT2D = $(OUT)$(LIB_PREFIX)next2d$(LIB)
+  DEP.EXE += $(NEXT2D)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_NEXT2D
+  TO_INSTALL.STATIC_LIBS += $(NEXT2D)
 endif
-DESCRIPTION.$(NEXT2D) = $(DESCRIPTION.next2d)
+
+INC.NEXT2D = $(wildcard $(addsuffix /*.h,$(NEXT.SOURCE_2D_PATHS)) \
+  $(INC.COMMON.DRV2D))
 SRC.NEXT2D = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_2D_PATHS)) \
   $(SRC.COMMON.DRV2D))
 OBJ.NEXT2D = $(addprefix $(OUT),$(notdir $(SRC.NEXT2D:.cpp=$O)))
-
-vpath %.cpp $(sort $(dir $(SRC.NEXT2D)))
+DEP.NEXT2D =
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -63,14 +65,12 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: next2d next2dclean
 
-# Chain rules
-clean: next2dclean
-
 next2d: $(OUTDIRS) $(NEXT2D)
 
-$(NEXT2D): $(OBJ.NEXT2D)
+$(NEXT2D): $(OBJ.NEXT2D) $(LIB.NEXT2D)
 	$(DO.PLUGIN)
 
+clean: next2dclean
 next2dclean:
 	$(RM) $(NEXT2D) $(OBJ.NEXT2D) $(OUTOS)next2d.dep
 

@@ -2,7 +2,7 @@
 # to build the perfstat plug-in.
 
 # Driver description
-DESCRIPTION.perfstat = Crystal Space Performance Stats Plugin
+DESCRIPTION.perfstat = Crystal Space performance statistics plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: perfstat perfstatclean
-
 all plugins: perfstat
 
 perfstat:
@@ -33,18 +32,24 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/perfstat
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  PERFSTAT=$(OUTDLL)perfstat$(DLL)
-  DEP.PERFSTAT=$(CSGEOM.LIB) $(CSSYS.LIB) $(CSUTIL.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(PERFSTAT)
+  PERFSTAT = $(OUTDLL)perfstat$(DLL)
+  LIB.PERFSTAT = $(foreach d,$(DEP.PERFSTAT),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(PERFSTAT)
 else
-  PERFSTAT=$(OUT)$(LIB_PREFIX)perfstat$(LIB)
-  DEP.EXE+=$(PERFSTAT)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_PERFSTAT
-  TO_INSTALL.STATIC_LIBS+=$(PERFSTAT)
+  PERFSTAT = $(OUT)$(LIB_PREFIX)perfstat$(LIB)
+  DEP.EXE += $(PERFSTAT)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_PERFSTAT
+  TO_INSTALL.STATIC_LIBS += $(PERFSTAT)
 endif
-DESCRIPTION.$(PERFSTAT) = $(DESCRIPTION.perfstat)
+
+INC.PERFSTAT = $(wildcard plugins/perfstat/*.h)
 SRC.PERFSTAT = $(wildcard plugins/perfstat/*.cpp)
 OBJ.PERFSTAT = $(addprefix $(OUT),$(notdir $(SRC.PERFSTAT:.cpp=$O)))
+DEP.PERFSTAT = CSGEOM CSSYS CSUTIL
+
+MSVC.DSP += PERFSTAT
+DSP.PERFSTAT.NAME = perfstat
+DSP.PERFSTAT.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -53,15 +58,12 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: perfstat perfstatclean
 
-# Chain rules
-net: perfstat
-clean: perfstatclean
-
 perfstat: $(OUTDIRS) $(PERFSTAT)
 
-$(PERFSTAT): $(OBJ.PERFSTAT) $(DEP.PERFSTAT)
+$(PERFSTAT): $(OBJ.PERFSTAT) $(LIB.PERFSTAT)
 	$(DO.PLUGIN)
 
+clean: perfstatclean
 perfstatclean:
 	$(RM) $(PERFSTAT) $(OBJ.PERFSTAT) $(OUTOS)perfstat.dep
 

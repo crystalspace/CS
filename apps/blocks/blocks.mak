@@ -27,14 +27,22 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/blocks apps/support
 
-BLOCKS.EXE=blocks$(EXE)
-SRC.BLOCKS = $(wildcard apps/blocks/*.cpp) \
-  apps/support/static.cpp
+BLOCKS.EXE = blocks$(EXE)
+INC.BLOCKS = $(wildcard apps/blocks/*.h)
+SRC.BLOCKS = $(wildcard apps/blocks/*.cpp) apps/support/static.cpp
 OBJ.BLOCKS = $(addprefix $(OUT),$(notdir $(SRC.BLOCKS:.cpp=$O)))
-DESCRIPTION.$(BLOCKS.EXE) = $(DESCRIPTION.blks)
-TO_INSTALL.EXE += $(BLOCKS.EXE)
-TO_INSTALL.CONFIG += data/config/blocks.cfg
-TO_INSTALL.DATA += data/blocks.zip
+DEP.BLOCKS = \
+  CSPARSER CSENGINE CSTERR CSGFXLDR CSUTIL CSSYS CSGEOM CSOBJECT CSUTIL
+LIB.BLOCKS = $(foreach d,$(DEP.BLOCKS),$($d.LIB))
+CFG.BLOCKS = data/config/blocks.cfg
+
+TO_INSTALL.EXE    += $(BLOCKS.EXE)
+TO_INSTALL.CONFIG += $(CFG.BLOCKS)
+TO_INSTALL.DATA   += data/blocks.zip
+
+MSVC.DSP += BLOCKS
+DSP.BLOCKS.NAME = blocks
+DSP.BLOCKS.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -47,10 +55,7 @@ all: $(BLOCKS.EXE)
 blks: $(OUTDIRS) $(BLOCKS.EXE)
 clean: blksclean
 
-$(BLOCKS.EXE): $(DEP.EXE) $(OBJ.BLOCKS) \
-  $(CSPARSER.LIB) $(CSENGINE.LIB) $(CSTERR.LIB)\
-  $(CSSFXLDR.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) $(CSGEOM.LIB) \
-  $(CSOBJECT.LIB) $(CSUTIL.LIB)
+$(BLOCKS.EXE): $(DEP.EXE) $(OBJ.BLOCKS) $(LIB.BLOCKS)
 	$(DO.LINK.EXE)
 
 blksclean:

@@ -1,4 +1,4 @@
-DESCRIPTION.csfont = Default Crystal Space font server
+DESCRIPTION.csfont = Crystal Space default font server
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csfont csfontclean
-plugins all: csfont
+all plugins: csfont
 csfont:
 	$(MAKE_TARGET) MAKE_DLL=yes
 csfontclean:
@@ -21,23 +21,28 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-SRC.CSFONT = $(wildcard plugins/font/server/csfont/*.cpp)
-OBJ.CSFONT = $(addprefix $(OUT),$(notdir $(SRC.CSFONT:.cpp=$O)))
-LIB.CSFONT = $(CSUTIL.LIB) $(CSSYS.LIB)
+vpath %.cpp plugins/font/server/csfont
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  CSFONT=$(OUTDLL)csfont$(DLL)
-  DEP.CSFONT=$(LIB.CSFONT)
+  CSFONT = $(OUTDLL)csfont$(DLL)
+  LIB.CSFONT = $(foreach d,$(DEP.CSFONT),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(CSFONT)
 else
-  CSFONT=$(OUT)$(LIB_PREFIX)csfont$(LIB)
-  DEP.EXE+=$(CSFONT)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_CSFONT
+  CSFONT = $(OUT)$(LIB_PREFIX)csfont$(LIB)
+  DEP.EXE += $(CSFONT)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_CSFONT
   TO_INSTALL.STATIC_LIBS += $(CSFONT)
 endif
-DESCRIPTION.$(CSFONT) = $(DESCRIPTION.csfont)
 
-vpath %.cpp $(sort $(dir $(SRC.CSFONT)))
+INC.CSFONT = $(wildcard plugins/font/server/csfont/*.h)
+SRC.CSFONT = $(wildcard plugins/font/server/csfont/*.cpp)
+OBJ.CSFONT = $(addprefix $(OUT),$(notdir $(SRC.CSFONT:.cpp=$O)))
+DEP.CSFONT = CSUTIL CSSYS
+
+MSVC.DSP += CSFONT
+DSP.CSFONT.NAME = csfont
+DSP.CSFONT.TYPE = plugin
+DSP.CSFONT.RESOURCES = $(wildcard plugins/font/server/csfont/*.fnt)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
@@ -46,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: csfont csfontclean
 csfont: $(OUTDIRS) $(CSFONT)
 
-$(CSFONT): $(OBJ.CSFONT) $(DEP.CSFONT)
+$(CSFONT): $(OBJ.CSFONT) $(LIB.CSFONT)
 	$(DO.PLUGIN)
 
 clean: csfontclean

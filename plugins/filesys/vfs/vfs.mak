@@ -1,8 +1,6 @@
 #------------------------------------------------------------------------------
 # Virtual File System plug-in
 #------------------------------------------------------------------------------
-
-# Plug-in description
 DESCRIPTION.vfs = Virtual File System plug-in
 
 #------------------------------------------------------------- rootdefines ---#
@@ -18,7 +16,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: vfs vfsclean
-
 all plugins: vfs
 
 vfs:
@@ -34,20 +31,27 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/filesys/vfs
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  VFS=$(OUTDLL)vfs$(DLL)
-  LIB.VFS=$(CSSYS.LIB) $(CSUTIL.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(VFS)
+  VFS = $(OUTDLL)vfs$(DLL)
+  LIB.VFS = $(foreach d,$(DEP.VFS),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(VFS)
 else
-  VFS=$(OUT)$(LIB_PREFIX)vfs$(LIB)
-  DEP.EXE+=$(VFS)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_VFS
-  TO_INSTALL.STATIC_LIBS+=$(VFS)
+  VFS = $(OUT)$(LIB_PREFIX)vfs$(LIB)
+  DEP.EXE += $(VFS)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_VFS
+  TO_INSTALL.STATIC_LIBS += $(VFS)
 endif
-DESCRIPTION.$(VFS) = $(DESCRIPTION.vfs)
+
+INC.VFS = $(wildcard plugins/filesys/vfs/*.h)
 SRC.VFS = $(wildcard plugins/filesys/vfs/*.cpp)
 OBJ.VFS = $(addprefix $(OUT),$(notdir $(SRC.VFS:.cpp=$O)))
+DEP.VFS = CSSYS CSUTIL
+CFG.VFS = vfs.cfg
 
-TO_INSTALL.ROOT += vfs.cfg
+TO_INSTALL.ROOT += $(CFG.VFS)
+
+MSVC.DSP += VFS
+DSP.VFS.NAME = vfs
+DSP.VFS.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -55,8 +59,6 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: vfs vfsclean
-
-# Chain rules
 clean: vfsclean
 
 vfs: $(OUTDIRS) $(VFS)

@@ -189,11 +189,9 @@ submakefiles contained one level deep in the @file{libs/} directory (i.e.
 
 @example
 (~/CS)% ls libs/*/*.mak
-libs/csengine/csengine.mak      libs/cssfxldr/cssfxldr.mak
-libs/csgame/csgame.mak          libs/cssys/cssys.mak
-libs/csgeom/csgeom.mak          libs/csterr/csterr.mak
-libs/csgfxldr/csgfxldr.mak      libs/cstools/cstools.mak
-libs/csobject/csobject.mak      libs/csutil/csutil.mak
+libs/csengine/csengine.mak      libs/cssys/cssys.mak
+libs/csgeom/csgeom.mak          libs/csutil/csutil.mak
+libs/csobject/csobject.mak      libs/csws/csws.mak
 @end example
 
 Submakefiles for applications located last, using the search mask
@@ -201,9 +199,9 @@ Submakefiles for applications located last, using the search mask
 
 @example
 (~/CS)% ls apps/*/*.mak
-apps/blocks/blocks.mak          apps/shooter/shooter.mak
+apps/blocks/blocks.mak          apps/mazed/mazed.mak
 apps/map2cs/map2cs.mak          apps/simple/simple.mak
-apps/mazed/mazed.mak            apps/walktest/walktest.mak
+apps/levtool/levtool.mak        apps/walktest/walktest.mak
 @end example
 
 The library and application submakefiles also uses the @samp{MAKESECTION}

@@ -28,13 +28,21 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/walktest apps/support
 
-WALKTEST.EXE=walktest$(EXE)
+WALKTEST.EXE = walktest$(EXE)
+INC.WALKTEST = $(wildcard apps/walktest/*.h) apps/support/command.h
 SRC.WALKTEST = $(wildcard apps/walktest/*.cpp) \
   apps/support/static.cpp apps/support/command.cpp
 OBJ.WALKTEST = $(addprefix $(OUT),$(notdir $(SRC.WALKTEST:.cpp=$O)))
-DESCRIPTION.$(WALKTEST.EXE) = $(DESCRIPTION.walk)
-TO_INSTALL.EXE += $(WALKTEST.EXE)
-TO_INSTALL.CONFIG += data/config/cryst.cfg
+DEP.WALKTEST = CSPARSER CSENGINE CSTERR CSGEOM CSGFXLDR CSSYS CSUTIL CSOBJECT
+LIB.WALKTEST = $(foreach d,$(DEP.WALKTEST),$($d.LIB))
+CFG.WALKTEST = data/config/cryst.cfg
+
+TO_INSTALL.EXE    += $(WALKTEST.EXE)
+TO_INSTALL.CONFIG += $(CFG.WALKTEST)
+
+MSVC.DSP += WALKTEST
+DSP.WALKTEST.NAME = walktest
+DSP.WALKTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -47,10 +55,7 @@ all: $(WALKTEST.EXE)
 walk: $(OUTDIRS) $(WALKTEST.EXE)
 clean: walkclean
 
-$(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) \
-  $(CSPARSER.LIB) $(CSENGINE.LIB) $(CSTERR.LIB) \
-  $(CSGEOM.LIB) $(CSSFXLDR.LIB) $(CSGFXLDR.LIB) \
-  $(CSSYS.LIB) $(CSUTIL.LIB) $(CSOBJECT.LIB)
+$(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) $(LIB.WALKTEST)
 	$(DO.LINK.EXE)
 
 walkclean:

@@ -27,11 +27,20 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/cswstest apps/support
 
-CSWSTEST.EXE=cswstest$(EXE)
+CSWSTEST.EXE = cswstest$(EXE)
+INC.CSWSTEST = $(wildcard apps/cswstest/*.h)
 SRC.CSWSTEST = $(wildcard apps/cswstest/*.cpp) apps/support/static.cpp
 OBJ.CSWSTEST = $(addprefix $(OUT),$(notdir $(SRC.CSWSTEST:.cpp=$O)))
-DESCRIPTION.$(CSWSTEST.EXE) = $(DESCRIPTION.wstest)
-TO_INSTALL.EXE+=$(CSWSTEST.EXE)
+DEP.CSWSTEST = CSWS CSGEOM CSGFXLDR CSSYS CSGEOM CSUTIL
+LIB.CSWSTEST = $(foreach d,$(DEP.CSWSTEST),$($d.LIB))
+CFG.CSWSTEST = data/config/cswstest.cfg
+
+#TO_INSTALL.EXE    += $(CSWSTEST.EXE)
+#TO_INSTALL.CONFIG += $(CFG.CSWSTEST)
+
+MSVC.DSP += CSWSTEST
+DSP.CSWSTEST.NAME = cswstest
+DSP.CSWSTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -44,8 +53,7 @@ all: $(CSWSTEST.EXE)
 wstest: $(OUTDIRS) $(CSWSTEST.EXE)
 clean: wstestclean
 
-$(CSWSTEST.EXE): $(DEP.EXE) $(OBJ.CSWSTEST) $(CSWS.LIB) \
-  $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSSYS.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB)
+$(CSWSTEST.EXE): $(DEP.EXE) $(OBJ.CSWSTEST) $(LIB.CSWSTEST)
 	$(DO.LINK.EXE)
 
 wstestclean:

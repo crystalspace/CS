@@ -17,6 +17,7 @@
 # are always built; PLUGINS.DYNAMIC are built only if plugins are compiled
 # as shared libraries. Please think twice before adding anything to PLUGINS;
 # in most cases you will want to add to PLUGINS.DYNAMIC.
+
 PLUGINS += video/renderer video/canvas
 PLUGINS += filesys/vfs
 PLUGINS += simpcon
@@ -24,7 +25,7 @@ PLUGINS += font/server/csfont
 PLUGINS += colldet/rapid
 PLUGINS += perfstat
 PLUGINS.DYNAMIC += video/renderer/line video/renderer/null video/renderer/inf
-PLUGINS.DYNAMIC += sound/loader sound/driver/nulldrv
+PLUGINS.DYNAMIC += sound/loader
 PLUGINS.DYNAMIC += cscon
 PLUGINS.DYNAMIC += csclear
 PLUGINS.DYNAMIC += dungeon

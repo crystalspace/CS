@@ -48,6 +48,16 @@ CP=cp
 # The command to rename a file or move a list of files to a directory
 MV=mv
 
+# The command to change the current working directory.
+CD=cd
+
+# The command to print out the current working directory.  The output from
+# this command should be suitable for input back into the $(CD) command.
+PWD=pwd
+
+# The command to invoke a Perl interpreter.
+PERL=perl
+
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=
 

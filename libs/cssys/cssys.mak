@@ -3,8 +3,8 @@
 # system-dependent makefile:
 #
 # SRC.SYS_CSSYS
-#   - to contain all system-dependent source files that should be
-#     included into cssys library
+#   - all system-dependent source files that should be included in cssys
+#     library
 # SRC.SYS_CSSYS_DLL
 #   - additional source files needed only for dynamic libraries
 # SRC.SYS_CSSYS_EXE
@@ -14,15 +14,16 @@
 # Library description
 DESCRIPTION.cssys = Crystal Space system library
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
-LIBHELP += $(NEWLINE)echo $"  make cssys        Make the $(DESCRIPTION.cssys)$"
+LIBHELP += \
+  $(NEWLINE)echo $"  make cssys        Make the $(DESCRIPTION.cssys)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: cssys
@@ -35,39 +36,34 @@ cssysclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/cssys $(sort $(dir $(SRC.SYS_CSSYS)))
 
-ifneq ($(MEM),)
-  SRC.SYS_CSSYS_EXE+=memory.cpp
-  SRC.SYS_CSSYS_DLL+=memory.cpp
-endif
-
+INC.CSSYS = $(wildcard include/cssys/*.h)
 SRC.CSSYS = $(wildcard libs/cssys/*.cpp $(SRC.SYS_CSSYS))
 ifeq ($(MAKE_DLL),yes)
   CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys_D$(LIB_SUFFIX)
   SRC.CSSYS += $(SRC.SYS_CSSYS_DLL)
 else
-# not a dll library
- ifneq ($(OS),WIN32)
-   CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys$(LIB_SUFFIX)
- else
+  ifneq ($(OS),WIN32)
+    CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys$(LIB_SUFFIX)
+  else
     CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys$(LIB)
-    DEP.EXE+= $(CSSYS.LIB)
-#    LIBS.DXINPUT = $(LFLAGS.l)dinput$
-#    LIBS.DXGUID = $(LFLAGS.l)dxguid$
-    LIBS.EXE+= $(LIBS.DXINPUT) $(LIBS.DXGUID)
- endif
- SRC.CSSYS += $(SRC.SYS_CSSYS_EXE)
+    DEP.EXE  += $(CSSYS.LIB)
+    LIBS.EXE += $(LIBS.DXINPUT) $(LIBS.DXGUID)
+  endif
+  SRC.CSSYS += $(SRC.SYS_CSSYS_EXE)
 endif
-OBJ.CSSYS = $(addprefix $(OUT),$(notdir $(subst .s,$O,$(subst .c,$O,$(SRC.CSSYS:.cpp=$O)))))
+OBJ.CSSYS = $(addprefix $(OUT),$(notdir \
+  $(subst .s,$O,$(subst .c,$O,$(SRC.CSSYS:.cpp=$O)))))
+
 TO_INSTALL.STATIC_LIBS += $(CSSYS.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: cssys cssysclean
@@ -80,7 +76,7 @@ $(CSSYS.LIB): $(OBJ.CSSYS)
 	$(DO.LIBRARY) 
 
 cssysclean:
-	-$(RM) $(CSSYS.LIB) $(OBJ.CSSYS)
+	-$(RM) $(CSSYS.LIB) $(OBJ.CSSYS) dep: $(OUTOS)cssys.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)cssys.dep

@@ -18,7 +18,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: cspython cspythonclean cspythonswig
-
 all plugins: cspython
 
 cspython:
@@ -37,26 +36,34 @@ ifeq ($(MAKESECTION),postdefines)
 PTHREAD=-lpthread
 
 CFLAGS.PYTHON += $(CFLAGS.I)$(PYTHON_INC)
-LIBS.CSPYTHON += $(LFLAGS.l)$(notdir $(PYTHON_LIB)) \
+LIB.CSPYTHON.SYSTEM += $(LFLAGS.l)$(notdir $(PYTHON_LIB)) \
   $(LFLAGS.L)$(PYTHON_LIB)/config $(TCLTK) $(PTHREAD)
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   CSPYTHON = $(OUTDLL)cspython$(DLL)
-  LIBS.LOCAL.CSPYTHON = $(LIBS.CSPYTHON)
-  DEP.CSPYTHON = $(CSGEOM.LIB) $(CSSYS.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  LIB.CSPYTHON = $(foreach d,$(DEP.CSPYTHON),$($d.LIB))
+  LIB.CSPYTHON.LOCAL = $(LIB.CSPYTHON.SYSTEM)
+# TO_INSTALL.DYNAMIC_LIBS += $(CSPYTHON)
 else
   CSPYTHON = $(OUT)$(LIB_PREFIX)cspy$(LIB)
   DEP.EXE += $(CSPYTHON)
-  LIBS.EXE += $(LIBS.CSPYTHON)
+  LIBS.EXE += $(LIB.CSPYTHON.SYSTEM)
   CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_PYTHON
+# TO_INSTALL.STATIC_LIBS += $(CSPYTHON)
 endif
-DESCRIPTION.$(CSPYTHON) = $(DESCRIPTION.cspython)
 
 SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
 SWIG.INTERFACE = plugins/cscript/common/cs.i
 
+INC.CSPYTHON = $(wildcard plugins/cscript/cspython/*.h)
 SRC.CSPYTHON = $(wildcard plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON)
 OBJ.CSPYTHON = $(addprefix $(OUT),$(notdir $(SRC.CSPYTHON:.cpp=$O)))
+DEP.CSPYTHON = CSGEOM CSSYS CSUTIL CSSYS
+
+#MSVC.DSP += CSPYTHON
+#DSP.CSPYTHON.NAME = cspython
+#DSP.CSPYTHON.TYPE = plugin
+#DSP.CSPYTHON.RESOURCES = $(SWIG.INTERFACE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -67,20 +74,20 @@ ifeq ($(MAKESECTION),targets)
 
 all: $(CSPYTHON.LIB)
 cspython: $(OUTDIRS) $(CSPYTHON)
-clean: cspythonclean
+clean: cspythonclean cspythonswigclean
 
-$(OUT)%$O: plugins/cspython/%.cpp
+$(OUT)%$O: plugins/cscript/cspython/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PYTHON)
+
+$(OUT)%$O: plugins/cscript/cspython/%.c
+	$(DO.COMPILE.C) $(CFLAGS.PYTHON)
 
 $(SWIG.CSPYTHON): $(SWIG.INTERFACE)
 	swig -python -c++ -shadow -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
 	mv plugins/cscript/cspython/cspace.py scripts/python/
 
-$(OUT)%$O: plugins/cscript/cspython/%.cpp
-	$(DO.COMPILE.C) -w $(CFLAGS.PYTHON)
-
-$(CSPYTHON): $(OBJ.CSPYTHON) $(DEP.CSPYTHON)
-	$(DO.PLUGIN) $(LIBS.LOCAL.CSPYTHON)
+$(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
+	$(DO.PLUGIN) $(LIB.CSPYTHON.LOCAL)
 
 cspythonclean:
 	-$(RM) $(CSPYTHON) $(OBJ.CSPYTHON) $(OUTOS)cspython.dep
@@ -88,7 +95,8 @@ cspythonclean:
 cspythonswig: cspythonswigclean cspython
 
 cspythonswigclean:
-	-$(RM) $(CSPYTHON) $(SWIG.CSPYTHON) $(OUT)cs_pyth.cpp
+	-$(RM) $(CSPYTHON) $(SWIG.CSPYTHON) $(OUT)cs_pyth.cpp \
+	$(OUTOS)cspython.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)cspython.dep

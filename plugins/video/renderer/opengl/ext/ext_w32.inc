@@ -1,3 +1,4 @@
+/*  -*- Mode: C++; -*- */
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
     Contributions made by Robert Bergkvist <fragdance@hotmail.com>
@@ -136,7 +137,6 @@ extern PFNGLMULTITEXCOORD4DVARB glMultiTexCoord4dvARB;
 #define GL_CLIENT_ACTIVE_TEXTURE_ARB	0x84E1
 #define GL_MAX_TEXTURE_UNITS_ARB	0x84E2
 
-//#include "cssysdef.h"
 #include <windows.h>
 #include "../ogl_g3d.h"
 
@@ -193,11 +193,11 @@ PFNGLMULTITEXCOORD4DVARB glMultiTexCoord4dvARB;
 *
 ******************************************************************/
 
-//Number of know extensions
-#define NUM_EXTENSIONS 1
-
 //Strings of the known extensions
-const char *knownExtensions[]={"GL_ARB_multitexture"};
+static char const* const knownExtensions[] = {"GL_ARB_multitexture"};
+
+//Number of know extensions
+#define NUM_EXTENSIONS (sizeof(knownExtensions) / sizeof(knownExtensions[0]))
 
 // Here I get all function names for Windows (I don't like the platform,
 // yet I go through all this trouble. Go figure.). 

@@ -1,4 +1,4 @@
-DESCRIPTION.rapid = Crystal Space RAPID CD System
+DESCRIPTION.rapid = RAPID collision detection plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -12,6 +12,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: rapid rapidclean
 plugins all: rapid
+
 rapidclean:
 	$(MAKE_CLEAN)
 rapid:
@@ -21,22 +22,27 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-SRC.RAPID = $(wildcard plugins/colldet/rapid/*.cpp)
-OBJ.RAPID = $(addprefix $(OUT),$(notdir $(SRC.RAPID:.cpp=$O)))
-LIB.RAPID = $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+vpath %.cpp plugins/colldet/rapid
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-RAPID=$(OUTDLL)rapid$(DLL)
-DEP.RAPID=$(LIB.RAPID)
-TO_INSTALL.DYNAMIC_LIBS += $(RAPID)
+  RAPID = $(OUTDLL)rapid$(DLL)
+  LIB.RAPID = $(foreach d,$(DEP.RAPID),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(RAPID)
 else
-RAPID=$(OUT)$(LIB_PREFIX)rapid$(LIB)
-DEP.EXE+=$(RAPID)
-CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_RAPID
-TO_INSTALL.STATIC_LIBS += $(RAPID)
+  RAPID = $(OUT)$(LIB_PREFIX)rapid$(LIB)
+  DEP.EXE += $(RAPID)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_RAPID
+  TO_INSTALL.STATIC_LIBS += $(RAPID)
 endif
 
-vpath %.cpp $(sort $(dir $(SRC.RAPID)))
+INC.RAPID = $(wildcard plugins/colldet/rapid/*.h)
+SRC.RAPID = $(wildcard plugins/colldet/rapid/*.cpp)
+OBJ.RAPID = $(addprefix $(OUT),$(notdir $(SRC.RAPID:.cpp=$O)))
+DEP.RAPID = CSGEOM CSUTIL CSSYS
+
+MSVC.DSP += RAPID
+DSP.RAPID.NAME = rapid
+DSP.RAPID.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
@@ -45,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: rapid rapidclean
 rapid: $(OUTDIRS) $(RAPID)
 
-$(RAPID): $(OBJ.RAPID) $(DEP.RAPID)
+$(RAPID): $(OBJ.RAPID) $(LIB.RAPID)
 	$(DO.PLUGIN)
 
 clean: rapidclean

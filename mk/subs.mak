@@ -1,8 +1,6 @@
 # This submakefile dynamically compute the name for all
 # plugins, libs, and apps submakefiles and includes them.
 
-include mk/install.mak
-
 ifneq ($(TARGET_MAKEFILE),)
   include $(TARGET_MAKEFILE)
 endif
@@ -40,7 +38,7 @@ ifneq ($(TESTS_SUBMAKEFILES),)
 endif
 
 ifeq ($(COMPOSITE_SUBMAKEFILES),)
-  COMPOSITE_SUBMAKEFILES=$(wildcard docs/*.mak)
+  COMPOSITE_SUBMAKEFILES=docs/docs.mak mk/install.mak mk/msvcgen/msvcgen.mak
 endif
 ifneq ($(COMPOSITE_SUBMAKEFILES),)
   include $(COMPOSITE_SUBMAKEFILES)

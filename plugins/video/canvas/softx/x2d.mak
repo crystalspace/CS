@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: x2d x2dclean
-
 all plugins drivers drivers2d: x2d
 
 x2d:
@@ -31,34 +30,34 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
  
 ifeq ($(USE_XFREE86VM),yes)
-  CFLAGS.X2D+=-DXFREE86VM
-  # Place the xf86vm library before -lX11, this is required on some platforms
-  LIBS.X2D+=-lXxf86vm
+  CFLAGS.X2D += -DXFREE86VM
+  # On some platforms -lxf86vm must appear before -lX11.
+  LIB.X2D.SYSTEM += -lXxf86vm
 endif
 
-# We need also the X libs
-CFLAGS.X2D+=-I$(X11_PATH)/include
-LIBS.X2D+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
+CFLAGS.X2D += -I$(X11_PATH)/include
+LIB.X2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 
-# The 2D Xlib driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  XLIB2D=$(OUTDLL)x2d$(DLL)
-  LIBS.LOCAL.X2D=$(LIBS.X2D)
-  DEP.X2D=$(CSUTIL.LIB) $(CSSYS.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(XLIB2D)
+  X2D = $(OUTDLL)x2d$(DLL)
+  LIB.X2D = $(foreach d,$(DEP.X2D),$($d.LIB))
+  LIB.X2D.SPECIAL = $(LIB.X2D.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(X2D)
 else
-  XLIB2D=$(OUT)$(LIB_PREFIX)x2d$(LIB)
-  DEP.EXE+=$(XLIB2D)
-  LIBS.EXE+=$(LIBS.X2D)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_X2D
-  TO_INSTALL.STATIC_LIBS+=$(XLIB2D)
+  X2D = $(OUT)$(LIB_PREFIX)x2d$(LIB)
+  DEP.EXE += $(X2D)
+  LIBS.EXE += $(LIB.X2D.SYSTEM)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_X2D
+  TO_INSTALL.STATIC_LIBS += $(X2D)
 endif
-DESCRIPTION.$(XLIB2D) = $(DESCRIPTION.x2d)
-SRC.XLIB2D = $(wildcard plugins/video/canvas/softx/*.cpp \
+
+INC.X2D = $(wildcard plugins/video/canvas/softx/*.h $(INC.COMMON.DRV2D)) \
+  plugins/video/canvas/common/x11comm.h
+SRC.X2D = $(wildcard plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D)) \
   plugins/video/canvas/common/x11comm.cpp \
-  plugins/video/canvas/common/x11-keys.cpp \
-  $(SRC.COMMON.DRV2D))
-OBJ.XLIB2D = $(addprefix $(OUT),$(notdir $(SRC.XLIB2D:.cpp=$O)))
+  plugins/video/canvas/common/x11-keys.cpp
+OBJ.X2D = $(addprefix $(OUT),$(notdir $(SRC.X2D:.cpp=$O)))
+DEP.X2D = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -67,23 +66,21 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: x2d x2dclean
 
-# Chain rules
-clean: x2dclean
-
-x2d: $(OUTDIRS) $(XLIB2D)
+x2d: $(OUTDIRS) $(X2D)
 
 $(OUT)%$O: plugins/video/canvas/softx/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.X2D)
  
-$(XLIB2D): $(OBJ.XLIB2D) $(DEP.X2D)
-	$(DO.PLUGIN) $(LIBS.LOCAL.X2D)
+$(X2D): $(OBJ.X2D) $(LIB.X2D)
+	$(DO.PLUGIN) $(LIB.X2D.SPECIAL)
 
+clean: x2dclean
 x2dclean:
-	$(RM) $(XLIB2D) $(OBJ.XLIB2D) $(OUTOS)x2d.dep
+	$(RM) $(X2D) $(OBJ.X2D) $(OUTOS)x2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)x2d.dep
-$(OUTOS)x2d.dep: $(SRC.XLIB2D)
+$(OUTOS)x2d.dep: $(SRC.X2D)
 	$(DO.DEP1) $(CFLAGS.X2D) $(DO.DEP2)
 else
 -include $(OUTOS)x2d.dep

@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: mgl2d mgl2dclean
-
 all plugins drivers drivers2d: mgl2d
 
 mgl2d:
@@ -33,27 +32,33 @@ ifeq ($(MAKESECTION),postdefines)
 # We need also the MGL libs
 ifdef MGL_PATH
   CFLAGS.MGL2D += -I$(MGL_PATH)/include
-  LIBS.MGL2D += -L$(MGL_PATH)/lib
+  LIB.MGL2D.SYSTEM += -L$(MGL_PATH)/lib
 endif
 
-LIBS.MGL2D += -lgm -lmgl -lpm
+LIB.MGL2D.SYSTEM += -lgm -lmgl -lpm
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   MGL2D = $(OUTDLL)mgl2d$(DLL)
-  LIBS.LOCAL.MGL2D = $(LIBS.MGL2D)
-  DEP.MGL2D = $(CSUTIL.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(MGL2D)
+  LIB.MGL2D = $(foreach d,$(DEP.MGL2D),$($d.LIB))
+  LIB.MGL2D.SPECIAL = $(LIB.MGL2D.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(MGL2D)
 else
   MGL2D = $(OUT)$(LIB_PREFIX)mgl2d$(LIB)
   DEP.EXE += $(MGL2D)
-  LIBS.EXE += $(LIBS.MGL2D)
+  LIBS.EXE += $(LIB.MGL2D.SYSTEM)
   CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_MGL2D
-  TO_INSTALL.STATIC_LIBS+=$(MGL2D)
+  TO_INSTALL.STATIC_LIBS += $(MGL2D)
 endif
-DESCRIPTION.$(MGL2D) = $(DESCRIPTION.mgl2d)
-SRC.MGL2D = $(wildcard plugins/video/canvas/mgl2d/*.cpp \
-  plugins/video/canvas/common/pc-keys.cpp $(SRC.COMMON.DRV2D))
+
+INC.MGL2D = $(wildcard plugins/video/canvas/mgl2d/*.h   $(INC.COMMON.DRV2D))
+SRC.MGL2D = $(wildcard plugins/video/canvas/mgl2d/*.cpp $(SRC.COMMON.DRV2D)) \
+  plugins/video/canvas/common/pc-keys.cpp
 OBJ.MGL2D = $(addprefix $(OUT),$(notdir $(SRC.MGL2D:.cpp=$O)))
+DEP.MGL2D = CSUTIL
+
+#MSVC.DSP += MGL2D
+#DSP.MGL2D.NAME = mgl2d
+#DSP.MGL2D.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -62,17 +67,15 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: mgl2d mgl2dclean
 
-# Chain rules
-clean: mgl2dclean
-
 mgl2d: $(OUTDIRS) $(MGL2D)
 
 $(OUT)%$O: plugins/video/canvas/mgl2d/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.MGL2D)
  
-$(MGL2D): $(OBJ.MGL2D) $(DEP.MGL2D)
-	$(DO.PLUGIN) $(LIBS.LOCAL.MGL2D)
+$(MGL2D): $(OBJ.MGL2D) $(LIB.MGL2D)
+	$(DO.PLUGIN) $(LIB.MGL2D.SPECIAL)
 
+clean: mgl2dclean
 mgl2dclean:
 	$(RM) $(MGL2D) $(OBJ.MGL2D) $(OUTOS)mgl2d.dep
 

@@ -2,7 +2,7 @@
 # to build the Glide2 3D driver -- glide3d Version 3
 
 # Driver description
-DESCRIPTION.glide3d3 = Crystal Space Glide V3 3D driver
+DESCRIPTION.glide3d3 = Crystal Space Glide V3 3D renderer
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glide3d3
-
 all plugins drivers drivers3d: glide3d3
 
 glide3d3:
@@ -34,29 +33,37 @@ ifeq (,$(GLIDE2_LIB))
 GLIDE3_LIB = -lglide3x
 endif
 
-CFLAGS.GLIDE3D3+= $(GLIDE3_PATH) -DGLIDE3 
-LIBS._GLIDE3D3+=$(GLIDE3_LIB)
+CFLAGS.GLIDE3D3 += $(GLIDE3_PATH) -DGLIDE3 
+LIB.GLIDE3D3.SYSTEM += $(GLIDE3_LIB)
 
 # The Glide driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  GLIDE3D3=$(OUTDLL)glide3d3$(DLL)
-  LIBS.GLIDE3D3=$(LIBS._GLIDE3D3)
-  DEP.GLIDE3D3=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  GLIDE3D3 = $(OUTDLL)glide3d3$(DLL)
+  LIB.GLIDE3D3 = $(foreach d,$(DEP.GLIDE3D3),$($d.LIB))
+  LIB.GLIDE3D3.SPECIAL = $(LIB.GLIDE3D3.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(GLIDE3D3)
 else
-  GLIDE3D3=$(OUT)$(LIB_PREFIX)glide3d3$(LIB)
-  DEP.EXE+=$(GLIDE3D3)
-  LIBS.EXE+=$(LIBS._GLIDE3D3)
+  GLIDE3D3 = $(OUT)$(LIB_PREFIX)glide3d3$(LIB)
+  DEP.EXE += $(GLIDE3D3)
+  LIBS.EXE += $(LIB.GLIDE3D3.SYSTEM)
   TO_INSTALL.STATIC_LIBS += $(GLIDE3D3)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDE3D3
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_GLIDE3D3
 endif
-TO_INSTALL.CONFIG += data/config/glide.cfg
-DESCRIPTION.$(GLIDE3D3) = $(DESCRIPTION.glide3d3)
-SRC0.GLIDE3D3 = $(wildcard plugins/video/renderer/glide/*.cpp )
-SRC1.GLIDE3D3 = $(wildcard plugins/video/renderer/common/*.cpp)
-SRC.GLIDE3D3 = $(SRC0.GLIDE3D3) $(SRC1.GLIDE3D3)
-OBJ.GLIDE3D3 = $(addprefix $(OUT),$(notdir $(SRC1.GLIDE3D3:.cpp=$O) \
-  $(SRC0.GLIDE3D3:.cpp=3$O)))
+
+INC.GLIDE3D3 = $(wildcard plugins/video/renderer/glide/*.h \
+  plugins/video/renderer/common/*.h)
+SRC.GLIDE3D3 = $(wildcard plugins/video/renderer/glide/*.cpp \
+  plugins/video/renderer/common/*.cpp)
+OBJ.GLIDE3D3 = $(addprefix $(OUT),$(notdir $(SRC.GLIDE3D3:.cpp=$O)))
+DEP.GLIDE3D3 = CSGEOM CSGFXLDR CSUTIL CSSYS
+CFG.GLIDE3D3 = data/config/glide.cfg
+
+TO_INSTALL.CONFIG += $(CFG.GLIDE3D3)
+
+#MSVC.DSP += GLIDE3D3
+#DSP.GLIDE3D3.NAME = glide3d3
+#DSP.GLIDE3D3.TYPE = plugin
+#DSP.GLIDE3D3.RESOURCES = plugins/video/renderer/glide/init3.inc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -76,8 +83,8 @@ $(OUT)%3$O: plugins/video/renderer/glide/%.cpp
 $(OUT)%$O: plugins/video/renderer/common/%.cpp 
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDE3D3)
 
-$(GLIDE3D3): $(OBJ.GLIDE3D3) $(DEP.GLIDE3D3)
-	$(DO.PLUGIN) $(LIBS.GLIDE3D3)
+$(GLIDE3D3): $(OBJ.GLIDE3D3) $(LIB.GLIDE3D3)
+	$(DO.PLUGIN) $(LIB.GLIDE3D3.SPECIAL)
 
 glide3d3clean:
 	$(RM) $(GLIDE3D3) $(OBJ.GLIDE3D3) $(OUTOS)glide3d3.dep

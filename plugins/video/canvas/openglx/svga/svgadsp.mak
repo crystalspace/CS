@@ -2,7 +2,7 @@
 # to build the SVGA Displaydriver for GLX 2D driver -- oglsvga
 
 # Driver description
-DESCRIPTION.oglsvga=SVGA driver for Crystal Space GL/X 2D driver
+DESCRIPTION.oglsvga = Crystal Space SVGA GL/X 2D driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: oglsvga oglsvgaclean
-
 all plugins glxdisp: oglsvga
 
 oglsvga:
@@ -31,23 +30,22 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# Local CFLAGS and libraries
-#LIBS._OGLSVGA+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
+vpath %.cpp plugins/video/canvas/openglx/svga
 
-# The driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  OGLSVGA=$(OUTDLL)oglsvga$(DLL)
-  LIBS.OGLSVGA=$(LIBS._OGLSVGA)
-  DEP.OGLSVGA=$(CSUTIL.LIB) $(CSSYS.LIB)
+  OGLSVGA = $(OUTDLL)oglsvga$(DLL)
+  LIB.OGLSVGA = $(foreach d,$(DEP.OGLSVGA),$($d.LIB))
 else
-  OGLSVGA=$(OUT)$(LIB_PREFIX)oglsvga$(LIB)
-  DEP.EXE+=$(OGLSVGA)
-  LIBS.EXE+=$(LIBS._OGLSVGA) $(CSUTIL.LIB) $(CSSYS.LIB)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OGLSVGA
+  OGLSVGA = $(OUT)$(LIB_PREFIX)oglsvga$(LIB)
+  DEP.EXE += $(OGLSVGA)
+  LIBS.EXE += $(CSUTIL.LIB) $(CSSYS.LIB)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_OGLSVGA
 endif
-DESCRIPTION.$(OGLSVGA) = $(DESCRIPTION.oglsvga)
+
+INC.OGLSVGA = $(wildcard plugins/video/canvas/openglx/svga/*.h)
 SRC.OGLSVGA = $(wildcard plugins/video/canvas/openglx/svga/*.cpp)
 OBJ.OGLSVGA = $(addprefix $(OUT),$(notdir $(SRC.OGLSVGA:.cpp=$O)))
+DEP.OGLSVGA = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -55,16 +53,13 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: oglsvga oglsvgaclean
-vpath %.cpp plugins/video/canvas/openglx/svga
-
-# Chain rules
-clean: oglsvgaclean
 
 oglsvga: $(OUTDIRS) $(OGLSVGA)
 
-$(OGLSVGA): $(OBJ.OGLSVGA) $(DEP.OGLSVGA)
+$(OGLSVGA): $(OBJ.OGLSVGA) $(LIB.OGLSVGA)
 	$(DO.PLUGIN) $(LIBS.OGLSVGA)
 
+clean: oglsvgaclean
 oglsvgaclean:
 	$(RM) $(OGLSVGA) $(OBJ.OGLSVGA) $(OUTOS)oglsvga.dep
  

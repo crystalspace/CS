@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.phyz = Crystal Space phyztest example
+DESCRIPTION.phyz = Phyziks example
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -27,11 +27,19 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/phyztest apps/support
 
-PHYZTEST.EXE=phyztest$(EXE)
+PHYZTEST.EXE = phyztest$(EXE)
+INC.PHYZTEST = $(wildcard apps/phyztest/*.h)
 SRC.PHYZTEST = $(wildcard apps/phyztest/*.cpp) apps/support/static.cpp
 OBJ.PHYZTEST = $(addprefix $(OUT),$(notdir $(SRC.PHYZTEST:.cpp=$O)))
-DESCRIPTION.$(PHYZTEST.EXE) = $(DESCRIPTION.phyz)
-#TO_INSTALL.EXE+=$(PHYZTEST.EXE)
+DEP.PHYZTEST = CSPARSER CSENGINE CSTERR CSPHYZIK CSGFXLDR CSUTIL CSSYS CSGEOM \
+  CSOBJECT CSUTIL
+LIB.PHYZTEST = $(foreach d,$(DEP.PHYZTEST),$($d.LIB))
+
+#TO_INSTALL.EXE += $(PHYZTEST.EXE)
+
+MSVC.DSP += PHYZTEST
+DSP.PHYZTEST.NAME = phyztest
+DSP.PHYZTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -44,10 +52,7 @@ all: $(PHYZTEST.EXE)
 phyz: $(OUTDIRS) $(PHYZTEST.EXE)
 clean: phyzclean
 
-$(PHYZTEST.EXE): $(DEP.EXE) $(OBJ.PHYZTEST) \
-  $(CSPARSER.LIB) $(CSENGINE.LIB) $(CSTERR.LIB) \
-  $(CSPHYZIK.LIB) $(CSSFXLDR.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) \
-  $(CSGEOM.LIB) $(CSOBJECT.LIB) $(CSUTIL.LIB)
+$(PHYZTEST.EXE): $(DEP.EXE) $(OBJ.PHYZTEST) $(LIB.PHYZTEST)
 	$(DO.LINK.EXE)
 
 phyzclean:

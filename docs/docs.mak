@@ -80,14 +80,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-PERL = perl
 NODEFIX = bin/nodefix.pl
 TEXI2HTML = bin/texi2html
 TEXI2DVI = texi2dvi
 DVIPS = dvips
 PS2PDF = ps2pdf
 MAKEINFO = makeinfo
-PWD = pwd
 DOXYGEN = doxygen
 EFED = bin/efed.pl
 
@@ -278,7 +276,7 @@ pubapi: $(OUT.DOC.API.PUB).CLEAN do-pubapi
 
 # Rule to perform actual HTML conversion of $(CSMANUAL_FILE).
 do-htmldoc:
-	cd $(OUT.DOC.HTML); $(PERL) $(OUT.DOC.UNDO)/$(TEXI2HTML) \
+	$(CD) $(OUT.DOC.HTML); $(PERL) $(OUT.DOC.UNDO)/$(TEXI2HTML) \
 	-init_file $(OUT.DOC.UNDO)/$(TEXI2HTMLINIT) -prefix cs \
 	-I $(OUT.DOC.UNDO)/$(CSMANUAL_DIR) $(CSMANUAL_FILE)
 
@@ -296,8 +294,8 @@ htmldoc: \
 # Rule to perform actual DVI conversion of $(CSMANUAL_FILE).
 do-dvidoc:
 	$(CP) $(CSMANUAL_DIR)/texinfo.tex $(OUT.DOC.DVI)
-	cd $(OUT.DOC.DVI); $(TEXI2DVI) --batch --quiet \
-	-I `cd $(OUT.DOC.UNDO)/$(CSMANUAL_DIR); $(PWD)` $(CSMANUAL_FILE)
+	$(CD) $(OUT.DOC.DVI); $(TEXI2DVI) --batch --quiet \
+	-I `$(CD) $(OUT.DOC.UNDO)/$(CSMANUAL_DIR); $(PWD)` $(CSMANUAL_FILE)
 	$(MV) $(OUT.DOC.DVI)/$(addsuffix .dvi,$(basename $(CSMANUAL_FILE))) \
 	$(OUT.DOC.DVI)/cs.dvi
 	$(RM) $(OUT.DOC.DVI)/texinfo.tex
@@ -315,8 +313,8 @@ dvidoc: \
 
 # Rule to perform actual PS conversion from DVI file.
 do-psdoc:
-	cd $(OUT.DOC.DVI); $(DVIPS) -q -o $(OUT.DOC.UNDO)/$(OUT.DOC.PS)/cs.ps \
-	cs.dvi
+	$(CD) $(OUT.DOC.DVI); \
+	$(DVIPS) -q -o $(OUT.DOC.UNDO)/$(OUT.DOC.PS)/cs.ps cs.dvi
 
 # Rule to generate PS format output.  Target images are incorporated directly
 # into PostScript file from within DVI target directory.
@@ -339,7 +337,7 @@ pdfdoc: \
 
 # Rule to perform actual Info conversion of $(CSMANUAL_FILE).
 do-infodoc:
-	cd $(OUT.DOC.INFO); $(MAKEINFO) -I $(OUT.DOC.UNDO)/$(CSMANUAL_DIR) \
+	$(CD) $(OUT.DOC.INFO); $(MAKEINFO) -I $(OUT.DOC.UNDO)/$(CSMANUAL_DIR) \
 	--output=cs $(CSMANUAL_FILE)
 
 # Rule to generate Info format output.  Target images are removed after

@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: wos wosclean
-
 all plugins drivers snddrivers: wos
 
 wos:
@@ -34,19 +33,25 @@ vpath %.cpp plugins/sound/driver/waveoutsd
 
 # The WaveOut sound driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  SNDWOS=$(OUTDLL)sndwaveout$(DLL)
-  DEP.WOS+=$(CSUTIL.LIB) $(CSSYS.LIB)
-  LDFLAGS.WOS=$(LIBS.SOUND.SYSTEM)
-  TO_INSTALL.DYNAMIC_LIBS+=$(SNDWOS)
+  SNDWOS = $(OUTDLL)sndwaveout$(DLL)
+  LIB.SNDWOS = $(foreach d,$(DEP.SNDWOS),$($d.LIB))
+  LDFLAGS.WOS = $(LIBS.SOUND.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(SNDWOS)
 else
-  SNDWOS=$(OUT)$(LIB_PREFIX)sndwaveout.a
-  DEP.EXE+=$(SNDWOS)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDWOS
-  TO_INSTALL.STATIC_LIBS+=$(SNDWOS)
+  SNDWOS = $(OUT)$(LIB_PREFIX)sndwaveout$(LIB)
+  DEP.EXE += $(SNDWOS)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_SNDWOS
+  TO_INSTALL.STATIC_LIBS += $(SNDWOS)
 endif
-DESCRIPTION.$(SNDWOS) = $(DESCRIPTION.wos)
+
+INC.SNDWOS = $(wildcard plugins/sound/driver/waveoutsd/*.h)
 SRC.SNDWOS = $(wildcard plugins/sound/driver/waveoutsd/*.cpp)
 OBJ.SNDWOS = $(addprefix $(OUT),$(notdir $(SRC.SNDWOS:.cpp=$O)))
+DEP.SNDWOS = CSUTIL CSSYS
+
+MSVC.DSP += SNDWOS
+DSP.SNDWOS.NAME = sndwaveout
+DSP.SNDWOS.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -55,16 +60,14 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: wos wosclean
 
-# Chain rules
-clean: wosclean
-
 wos: $(OUTDIRS) $(SNDWOS)
 
-$(SNDWOS): $(OBJ.SNDWOS) $(DEP.WOS)
+$(SNDWOS): $(OBJ.SNDWOS) $(LIB.SNDWOS)
 	$(DO.PLUGIN) $(LDFLAGS.WOS)
 
+clean: wosclean
 wosclean:
-	$(RM) $(SNDWOS) $(OBJ.SNDWOS) $(OUTOS)waveoutsd.dep
+	$(RM) $(SNDWOS) $(OBJ.SNDWOS) $(OUTOS)wos.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)wos.dep

@@ -2,7 +2,7 @@
 ifneq (,$(findstring cspython,$(PLUGINS)))
 
 # Application description
-DESCRIPTION.pysimple = Crystal Space Python simple example
+DESCRIPTION.pysimple = Crystal Space Python example
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -31,11 +31,19 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/pysimp apps/support
 
-PYSIMP.EXE=pysimp$(EXE)
+PYSIMP.EXE = pysimp$(EXE)
+INC.PYSIMP = $(wildcard apps/pysimp/*.h)
 SRC.PYSIMP = $(wildcard apps/pysimp/*.cpp) apps/support/static.cpp
 OBJ.PYSIMP = $(addprefix $(OUT),$(notdir $(SRC.PYSIMP:.cpp=$O)))
-DESCRIPTION.$(PYSIMP.EXE) = $(DESCRIPTION.pysimple)
-TO_INSTALL.EXE+=$(PYSIMP.EXE)
+DEP.PYSIMP = \
+  CSPARSER CSENGINE CSTERR CSGFXLDR CSUTIL CSSYS CSGEOM CSOBJECT CSUTIL
+LIB.PYSIMP = $(foreach d,$(DEP.PYSIMP),$($d.LIB))
+
+#TO_INSTALL.EXE += $(PYSIMP.EXE)
+
+#MSVC.DSP += PYSIMP
+#DSP.PYSIMP.NAME = pysimp
+#DSP.PYSIMP.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -48,10 +56,7 @@ all: $(PYSIMP.EXE)
 pysimple: $(OUTDIRS) $(PYSIMP.EXE)
 clean: pysimpleclean
 
-$(PYSIMP.EXE): $(DEP.EXE) $(OBJ.PYSIMP) \
-  $(CSPARSER.LIB) $(CSENGINE.LIB) $(CSTERR.LIB) \
-  $(CSSFXLDR.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) $(CSGEOM.LIB) \
-  $(CSOBJECT.LIB) $(CSUTIL.LIB)
+$(PYSIMP.EXE): $(DEP.EXE) $(OBJ.PYSIMP) $(LIB.PYSIMP)
 	$(DO.LINK.EXE)
 
 pysimpleclean:

@@ -2,7 +2,7 @@
 # to build the Empty Displaydriver for GLX 2D driver -- oglempty
 
 # Driver description
-DESCRIPTION.oglempty=Empty driver for Crystal Space GL/X 2D driver
+DESCRIPTION.oglempty = Crystal Space GL/X 2D eMpTy driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: oglempty
-
 all plugins glxdisp: oglempty
 
 oglempty:
@@ -31,24 +30,21 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# Local CFLAGS and libraries
-#LIBS._OGLEMPTY+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
-
-# The driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  OGLEMPTY=$(OUTDLL)oglempty$(DLL)
-  LIBS.OGLEMPTY=$(LIBS._OGLEMPTY)
-#  LIBS.OGLEMPTY=$(LIBS._OGLEMPTY) $(CSUTIL.LIB) $(CSSYS.LIB)
-  DEP.OGLEMPTY=$(CSUTIL.LIB) $(CSSYS.LIB)
+  OGLEMPTY = $(OUTDLL)oglempty$(DLL)
+  LIB.OGLEMPTY = $(foreach d,$(DEP.OGLEMPTY),$($d.LIB))
+  DEP.OGLEMPTY = $(CSUTIL.LIB) $(CSSYS.LIB)
 else
-  OGLEMPTY=$(OUT)$(LIB_PREFIX)oglempty$(LIB)
-  DEP.EXE+=$(OGLEMPTY)
-  LIBS.EXE+=$(LIBS._OGLEMPTY) $(CSUTIL.LIB) $(CSSYS.LIB)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OGLEMPTY
+  OGLEMPTY = $(OUT)$(LIB_PREFIX)oglempty$(LIB)
+  DEP.EXE += $(OGLEMPTY)
+  LIBS.EXE += $(CSUTIL.LIB) $(CSSYS.LIB)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_OGLEMPTY
 endif
-DESCRIPTION.$(OGLEMPTY) = $(DESCRIPTION.oglempty)
+
+INC.OGLEMPTY = $(wildcard plugins/video/canvas/openglx/empty/*.cpp)
 SRC.OGLEMPTY = $(wildcard plugins/video/canvas/openglx/empty/*.cpp)
 OBJ.OGLEMPTY = $(addprefix $(OUT),$(notdir $(SRC.OGLEMPTY:.cpp=$O)))
+DEP.OGLEMPTY =
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -57,17 +53,15 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: oglempty oglemptyclean
 
-# Chain rules
-clean: oglemptyclean
-
 oglempty: $(OUTDIRS) $(OGLEMPTY)
 
 $(OUT)%$O: plugins/video/canvas/openglx/empty/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.OGLEMPTY)
  
-$(OGLEMPTY): $(OBJ.OGLEMPTY) $(DEP.OGLEMPTY)
-	$(DO.PLUGIN) $(LIBS.OGLEMPTY)
+$(OGLEMPTY): $(OBJ.OGLEMPTY) $(LIB.OGLEMPTY)
+	$(DO.PLUGIN)
 
+clean: oglemptyclean
 oglemptyclean:
 	$(RM) $(OGLEMPTY) $(OBJ.OGLEMPTY) $(OUTOS)oglempty.dep
  

@@ -2,21 +2,21 @@
 # to build the OpenGL 3D driver -- gl3d
 
 # Driver description
-DESCRIPTION.gl3d = Crystal Space OpenGL 3D driver
+DESCRIPTION.gl3d = Crystal Space OpenGL 3D renderer
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make gl3d         Make the $(DESCRIPTION.gl3d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make gl3d         Make the $(DESCRIPTION.gl3d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: gl3d
-
 all plugins drivers drivers3d: gl3d
 
 gl3d:
@@ -26,61 +26,67 @@ gl3dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-ifndef LIBS.GL3D.SYSTEM
+ifneq (,$(strip $(LIB.GL3D.SYSTEM)))
+  LIB.GL3D.LOCAL += $(LIB.GL3D.SYSTEM)
+else
+  ifdef X11_PATH
+    CFLAGS.GL3D += -I$(X11_PATH)/include
+    LIB.GL3D.LOCAL += -L$(X11_PATH)/lib -lXext -lX11
+  endif
 
-ifdef X11_PATH
-  CFLAGS.GL3D+=-I$(X11_PATH)/include
-  LIBS.LOCAL.GL3D+=-L$(X11_PATH)/lib -lXext -lX11
+  ifeq ($(USE_MESA),1)
+    ifdef MESA_PATH
+      CFLAGS.GL3D += -I$(MESA_PATH)/include
+      LIB.GL3D.LOCAL += -L$(MESA_PATH)/lib
+    endif
+    LIB.GL3D.LOCAL += -lMesaGL
+  else
+    ifdef OPENGL_PATH
+      CFLAGS.GL3D += -I$(OPENGL_PATH)/include
+      LIB.GL3D.LOCAL += -L$(OPENGL_PATH)/lib
+    endif
+    LIB.GL3D.LOCAL += -lGL
+  endif
 endif
 
-ifeq ($(USE_MESA),1)
-  ifdef MESA_PATH
-    CFLAGS.GL3D+=-I$(MESA_PATH)/include
-    LIBS.LOCAL.GL3D+=-L$(MESA_PATH)/lib
-  endif
-  LIBS.LOCAL.GL3D+=-lMesaGL
-else
-  ifdef OPENGL_PATH
-    CFLAGS.GL3D+=-I$(OPENGL_PATH)/include
-    LIBS.LOCAL.GL3D+=-L$(OPENGL_PATH)/lib
-  endif
-  LIBS.LOCAL.GL3D+=-lGL
-endif
-
-else
-
-LIBS.LOCAL.GL3D+=$(LIBS.GL3D.SYSTEM)
-
-endif # LIBS.GL3D.SYSTEM
-
-# The 3D OpenGL driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  GL3D=$(OUTDLL)gl3d$(DLL)
-  LIBS.GL3D=$(LIBS.LOCAL.GL3D)
-  DEP.GL3D=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(GL3D)
+  GL3D = $(OUTDLL)gl3d$(DLL)
+  LIB.GL3D = $(foreach d,$(DEP.GL3D),$($d.LIB))
+  LIB.GL3D.SPECIAL = $(LIB.GL3D.LOCAL)
+  TO_INSTALL.DYNAMIC_LIBS += $(GL3D)
 else
-  GL3D=$(OUT)$(LIB_PREFIX)gl3d$(LIB)
-  DEP.EXE+=$(GL3D)
-  LIBS.EXE+=$(LIBS.LOCAL.GL3D)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OPENGL3D
-  TO_INSTALL.STATIC_LIBS+=$(GL3D)
+  GL3D = $(OUT)$(LIB_PREFIX)gl3d$(LIB)
+  DEP.EXE += $(GL3D)
+  LIBS.EXE += $(LIB.GL3D.LOCAL)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_OPENGL3D
+  TO_INSTALL.STATIC_LIBS += $(GL3D)
 endif
-TO_INSTALL.CONFIG += data/config/opengl.cfg
-DESCRIPTION.$(GL3D) = $(DESCRIPTION.gl3d)
+
+INC.GL3D = $(wildcard plugins/video/renderer/opengl/*.h) \
+  plugins/video/renderer/common/txtmgr.h \
+  plugins/video/renderer/common/dtmesh.h \
+  plugins/video/renderer/common/dpmesh.h
 SRC.GL3D = $(wildcard plugins/video/renderer/opengl/*.cpp) \
   plugins/video/renderer/common/txtmgr.cpp \
   plugins/video/renderer/common/dtmesh.cpp \
   plugins/video/renderer/common/dpmesh.cpp
+OBJ.GL3D = $(addprefix $(OUT),$(notdir $(SRC.GL3D:.cpp=$O)))
+DEP.GL3D = CSGEOM CSGFXLDR CSUTIL CSSYS
+CFG.GL3D = data/config/opengl.cfg
 
-OBJ.GL3D = $(addprefix $(OUT),$(notdir $(subst .asm,$O,$(SRC.GL3D:.cpp=$O))))
+TO_INSTALL.CONFIG += $(CFG.GL3D)
+
+MSVC.DSP += GL3D
+DSP.GL3D.NAME = gl3d
+DSP.GL3D.TYPE = plugin
+DSP.GL3D.RESOURCES = $(wildcard plugins/video/renderer/opengl/ext/*.inc)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: gl3d gl3dclean
@@ -93,11 +99,11 @@ gl3d: $(OUTDIRS) $(GL3D)
 $(OUT)%$O: plugins/video/renderer/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GL3D)
  
-$(GL3D): $(OBJ.GL3D) $(DEP.GL3D)
-	$(DO.PLUGIN) $(LIBS.GL3D)
+$(GL3D): $(OBJ.GL3D) $(LIB.GL3D)
+	$(DO.PLUGIN) $(LIB.GL3D.SPECIAL)
 
 gl3dclean:
-	$(RM) $(GL3D) $(OBJ.GL3D)
+	$(RM) $(GL3D) $(OBJ.GL3D) $(OUTOS)gl3d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)gl3d.dep

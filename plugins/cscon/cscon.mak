@@ -1,4 +1,4 @@
-DESCRIPTION.cscon = Crystal Space Console Plugin
+DESCRIPTION.cscon = Crystal Space console plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -12,6 +12,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: cscon csconclean
 plugins all: cscon
+
 cscon:
 	$(MAKE_TARGET) MAKE_DLL=yes
 csconclean:
@@ -21,25 +22,31 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-CFLAGS.CSCON +=
-SRC.CSCON = $(wildcard plugins/cscon/*.cpp)
-OBJ.CSCON = $(addprefix $(OUT),$(notdir $(SRC.CSCON:.cpp=$O)))
-LIB.CSCON = $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
-LIB.EXTERNAL.CSCON = 
-DESCRIPTION.$(CSCON.EXE) = $(DESCRIPTION.cscon)
+vpath %.cpp plugins/cscon
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  CSCON=$(OUTDLL)cscon$(DLL)
-  DEP.CSCON=$(LIB.CSCON)
-  TO_INSTALL.DYNAMIC_LIBS+=$(CSCON)
+  CSCON = $(OUTDLL)cscon$(DLL)
+  LIB.CSCON = $(foreach d,$(DEP.CSCON),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(CSCON)
 else
-  CSCON=$(OUT)$(LIB_PREFIX)cscon$(LIB)
-  DEP.EXE+=$(CSCON)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_CSCON
-  TO_INSTALL.STATIC_LIBS+=$(CSCON)
+  CSCON = $(OUT)$(LIB_PREFIX)cscon$(LIB)
+  DEP.EXE += $(CSCON)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_CSCON
+  TO_INSTALL.STATIC_LIBS += $(CSCON)
 endif
-TO_INSTALL.CONFIG += data/config/funcon.cfg
+
+INC.CSCON = $(wildcard plugins/cscon/*.h)
+SRC.CSCON = $(wildcard plugins/cscon/*.cpp)
+OBJ.CSCON = $(addprefix $(OUT),$(notdir $(SRC.CSCON:.cpp=$O)))
+DEP.CSCON = CSGFXLDR CSUTIL CSSYS
+CFG.CSCON = data/config/funcon.cfg
+
+TO_INSTALL.CONFIG += $(CFG.CSCON)
 TO_INSTALL.DATA += data/funcon.zip
+
+MSVC.DSP += CSCON
+DSP.CSCON.NAME = cscon
+DSP.CSCON.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
@@ -48,10 +55,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: cscon csconclean
 cscon: $(OUTDIRS) $(CSCON)
 
-$(OUT)%$O: plugins/cscon/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.CSCON)
-
-$(CSCON): $(OBJ.CSCON) $(DEP.CSCON)
+$(CSCON): $(OBJ.CSCON) $(LIB.CSCON)
 	$(DO.PLUGIN)
 
 clean: csconclean

@@ -1,7 +1,7 @@
 # Application description
-DESCRIPTION.perf = Crystal Space Graphics Performance Tester
+DESCRIPTION.perf = Crystal Space graphics performance tester
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
@@ -9,7 +9,7 @@ APPHELP += $(NEWLINE)echo $"  make perf         Make the $(DESCRIPTION.perf)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------ roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: perf perfclean
@@ -22,20 +22,27 @@ perfclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------ postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/perftest apps/support
 
-PERF.EXE=perftest$(EXE)
+PERF.EXE = perftest$(EXE)
+INC.PERF = $(wildcard apps/perftest/*.h)
 SRC.PERF = $(wildcard apps/perftest/*.cpp) apps/support/static.cpp
 OBJ.PERF = $(addprefix $(OUT),$(notdir $(SRC.PERF:.cpp=$O)))
-DESCRIPTION.$(PERF.EXE) = $(DESCRIPTION.perf)
-TO_INSTALL.EXE+=$(PERF.EXE)
+DEP.PERF = CSUTIL CSSYS CSGEOM CSGFXLDR CSUTIL
+LIB.PERF = $(foreach d,$(DEP.PERF),$($d.LIB))
+
+TO_INSTALL.EXE += $(PERF.EXE)
+
+MSVC.DSP += PERF
+DSP.PERF.NAME = perftest
+DSP.PERF.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#----------------------------------------------------------------- targets ---#
+#---------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: perf perfclean
@@ -44,8 +51,7 @@ all: $(PERF.EXE)
 perf: $(OUTDIRS) $(PERF.EXE)
 clean: perfclean
 
-$(PERF.EXE): $(DEP.EXE) $(OBJ.PERF) \
-  $(CSUTIL.LIB) $(CSSYS.LIB) $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB)
+$(PERF.EXE): $(DEP.EXE) $(OBJ.PERF) $(LIB.PERF)
 	$(DO.LINK.EXE)
 
 perfclean:

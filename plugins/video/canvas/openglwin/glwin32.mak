@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glwin32 glwin32clean
-
 all plugins drivers drivers2d: glwin32
 
 glwin32:
@@ -30,31 +29,37 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+CFLAGS.GLWIN32 += 
+
 ifndef OPENGL.LIBS.DEFINED
-LIBS.GLLIBS=-lGL
+  LIB.GLWIN32.SYSTEM = -lGL
 else
-LIBS.GLLIBS=$(OPENGL.LIBS.DEFINED)
+  LIB.GLWIN32.SYSTEM = $(OPENGL.LIBS.DEFINED)
 endif
 
-# We need also the GL libs
-CFLAGS.GLWIN32+=
-# The 2D GL Win32 driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  GLWIN32=$(OUTDLL)glwin32$(DLL)
-  DEP.GLWIN32 = $(CSUTIL.LIB) $(CSSYS.LIB)
-  LIBS.GLWIN32=$(LIBS.GLLIBS)
-  TO_INSTALL.DYNAMIC_LIBS+=$(GLWIN32)
+  GLWIN32 = $(OUTDLL)glwin32$(DLL)
+  LIB.GLWIN32 = $(foreach d,$(DEP.GLWIN32),$($d.LIB))
+  LIB.GLWIN32.SPECIAL = $(LIB.GLWIN32.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(GLWIN32)
 else
-  GLWIN32=$(OUT)$(LIB_PREFIX)glwin32$(LIB)
-  DEP.EXE+=$(GLWIN32)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLWIN32
-  LIBS.EXE+=$(LIBS.GLLIBS)
-  TO_INSTALL.STATIC_LIBS+=$(GLWIN32)
+  GLWIN32 = $(OUT)$(LIB_PREFIX)glwin32$(LIB)
+  DEP.EXE += $(GLWIN32)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_GLWIN32
+  LIBS.EXE += $(LIB.GLWIN32.SYSTEM)
+  TO_INSTALL.STATIC_LIBS += $(GLWIN32)
 endif
-DESCRIPTION.$(GLWIN32) = $(DESCRIPTION.glwin32)
+
+INC.GLWIN32 = $(wildcard plugins/video/canvas/openglwin/*.h \
+  $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D))
 SRC.GLWIN32 = $(wildcard plugins/video/canvas/openglwin/*.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLWIN32 = $(addprefix $(OUT),$(notdir $(SRC.GLWIN32:.cpp=$O)))
+DEP.GLWIN32 = CSUTIL CSSYS
+
+MSVC.DSP += GLWIN32
+DSP.GLWIN32.NAME = glwin32
+DSP.GLWIN32.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -63,19 +68,18 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: glwin32 glwin32clean
 
-# Chain rules
-clean: glwin32clean
-
 glwin32: $(OUTDIRS) $(GLWIN32)
 
 $(OUT)%$O: plugins/video/canvas/openglwin/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLWIN32)
+
 $(OUT)%$O: plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLWIN32)
 
-$(GLWIN32): $(OBJ.GLWIN32) $(DEP.GLWIN32)
-	$(DO.PLUGIN) $(LIBS.GLWIN32)
+$(GLWIN32): $(OBJ.GLWIN32) $(LIB.GLWIN32)
+	$(DO.PLUGIN) $(LIB.GLWIN32.SPECIAL)
 
+clean: glwin32clean
 glwin32clean:
 	$(RM) $(GLWIN32) $(OBJ.GLWIN32) $(OUTOS)glwin32.dep
 

@@ -37,26 +37,34 @@ ifeq ($(MAKESECTION),postdefines)
 #PTHREAD=-lpthread
 
 CFLAGS.JAVA += $(CFLAGS.I)$(JAVA_INC)
-LIBS.CSJAVA += $(LFLAGS.l)native $(LFLAGS.l)kaffevm \
+LIB.CSJAVA.SYSTEM += $(LFLAGS.l)native $(LFLAGS.l)kaffevm \
   $(LFLAGS.L)$(JAVA_LIB) $(TCLTK) $(PTHREAD)
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   CSJAVA = $(OUTDLL)csjava$(DLL)
-  LIBS.LOCAL.CSJAVA = $(LIBS.CSJAVA)
-  DEP.CSJAVA = $(CSGEOM.LIB) $(CSSYS.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  LIB.CSJAVA = $(foreach d,$(DEP.CSJAVA),$($d.LIB))
+  LIB.CSJAVA.LOCAL = $(LIB.CSJAVA.SYSTEM)
+# TO_INSTALL.DYNAMIC_LIBS += $(CSJAVA)
 else
   CSJAVA = $(OUT)$(LIB_PREFIX)csja$(LIB)
   DEP.EXE += $(CSJAVA)
-  LIBS.EXE += $(LIBS.CSJAVA)
+  LIBS.EXE += $(LIB.CSJAVA.SYSTEM)
   CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_JAVA
+# TO_INSTALL.STATIC_LIBS += $(CSJAVA)
 endif
-DESCRIPTION.$(CSJAVA) = $(DESCRIPTION.csjava)
 
 SWIG.CSJAVA = plugins/cscript/csjava/cs_java.cpp
 SWIG.INTERFACE = plugins/cscript/common/cs.i
 
+INC.CSJAVA = $(wildcard plugins/cscript/csjava/*.h)
 SRC.CSJAVA = $(wildcard plugins/cscript/csjava/*.cpp) $(SWIG.CSJAVA)
 OBJ.CSJAVA = $(addprefix $(OUT),$(notdir $(SRC.CSJAVA:.cpp=$O)))
+DEP.CSJAVA = CSGEOM CSSYS CSUTIL CSSYS
+
+#MSVC.DSP += CSJAVA
+#DSP.CSJAVA.NAME = csjava
+#DSP.CSJAVA.TYPE = plugin
+#DSP.CSJAVA.RESOURCES = $(SWIG.INTERFACE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -67,10 +75,13 @@ ifeq ($(MAKESECTION),targets)
 
 all: $(CSJAVA.LIB)
 csjava: $(OUTDIRS) $(CSJAVA)
-clean: csjavaclean
+clean: csjavaclean csjavaswigclean
 
-$(OUT)%$O: plugins/csjava/%.cpp
+$(OUT)%$O: plugins/cscript/csjava/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.JAVA)
+
+$(OUT)%$O: plugins/cscript/csjava/%.c
+	$(DO.COMPILE.C) $(CFLAGS.JAVA)
 
 $(SWIG.CSJAVA): $(SWIG.INTERFACE)
 	swig -java -c++ -shadow -o $(SWIG.CSJAVA) $(SWIG.INTERFACE)
@@ -78,11 +89,8 @@ $(SWIG.CSJAVA): $(SWIG.INTERFACE)
 	javac scripts/java/*.java
 	mv *.class scripts/java/
 
-$(OUT)%$O: plugins/cscript/csjava/%.cpp
-	$(DO.COMPILE.C) -w $(CFLAGS.JAVA)
-
-$(CSJAVA): $(OBJ.CSJAVA) $(DEP.CSJAVA)
-	$(DO.PLUGIN) $(LIBS.LOCAL.CSJAVA)
+$(CSJAVA): $(OBJ.CSJAVA) $(LIB.CSJAVA)
+	$(DO.PLUGIN) $(LIB.CSJAVA.LOCAL)
 
 csjavaclean:
 	-$(RM) $(CSJAVA) $(OBJ.CSJAVA) $(OUTOS)csjava.dep

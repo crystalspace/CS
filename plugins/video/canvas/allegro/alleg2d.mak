@@ -1,5 +1,5 @@
 # This is a subinclude file used to define the rules needed
-# to build Allegro driver alleg2d
+# to build Allegro driver -- alleg2d
 
 # Driver description
 DESCRIPTION.alleg2d = Crystal Space Allegro driver
@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: alleg2d alleg2dclean
-
 all plugins drivers drivers2d: alleg2d
 
 alleg2d:
@@ -31,26 +30,32 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # Link with Allegro libraries.
-LIBS._ALLEG2D+=`allegro-config --libs release`
+LIB.ALLEG2D.SYSTEM+=`allegro-config --libs release`
 
 # The Allegro 2D driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  ALLEG2D=$(OUTDLL)alleg2d$(DLL)
-  LIBS.ALLEG2D+=$(LIBS._ALLEG2D)
-  DEP.ALLEG2D=$(CSUTIL.LIB) $(CSSYS.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(ALLEG2D)
+  ALLEG2D = $(OUTDLL)alleg2d$(DLL)
+  LIB.ALLEG2D = $(foreach d,$(DEP.ALLEG2D),$($d.LIB))
+  LIB.ALLEG2D.SPECIAL += $(LIB.ALLEG2D.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(ALLEG2D)
 else
-  ALLEG2D=$(OUT)$(LIB_PREFIX)alleg2d$(LIB)
-  DEP.EXE+=$(ALLEG2D)
-  LIBS.EXE+=$(LIBS._ALLEG2D)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ALLEG2D
-  TO_INSTALL.STATIC_LIBS+=$(ALLEG2D)
+  ALLEG2D = $(OUT)$(LIB_PREFIX)alleg2d$(LIB)
+  DEP.EXE += $(ALLEG2D)
+  LIBS.EXE += $(LIB.ALLEG2D.SYSTEM)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_ALLEG2D
+  TO_INSTALL.STATIC_LIBS += $(ALLEG2D)
 endif
 
-DESCRIPTION.$(ALLEG2D) = $(DESCRIPTION.alleg2d)
-SRC.ALLEG2D=$(wildcard plugins/video/canvas/allegro/*.cpp $(SRC.COMMON.DRV2D))
+INC.ALLEG2D = \
+  $(wildcard plugins/video/canvas/allegro/*.h $(INC.COMMON.DRV2D))
+SRC.ALLEG2D = \
+  $(wildcard plugins/video/canvas/allegro/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.ALLEG2D = $(addprefix $(OUT),$(notdir $(SRC.ALLEG2D:.cpp=$O)))
-CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ALLEG2D
+DEP.ALLEG2D = CSUTIL CSSYS
+
+#MSVC.DSP += ALLEG2D
+#DSP.ALLEG2D.NAME = alleg2d
+#DSP.ALLEG2D.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -68,8 +73,8 @@ alleg2d: $(OUTDIRS) $(ALLEG2D)
 $(OUT)%$O: plugins/video/canvas/allegro/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.ALLEG2D)
  
-$(ALLEG2D): $(OBJ.ALLEG2D) $(DEP.ALLEG2D)
-	$(DO.PLUGIN) $(LIBS.ALLEG2D)
+$(ALLEG2D): $(OBJ.ALLEG2D) $(LIB.ALLEG2D)
+	$(DO.PLUGIN) $(LIB.ALLEG2D.SPECIAL)
 
 alleg2dclean:
 	$(RM) $(ALLEG2D) $(OBJ.ALLEG2D) $(OUTOS)alleg2d.dep

@@ -106,7 +106,7 @@ platforms:
 	@$(MAKE) $(RECMAKEFLAGS) showplatforms TARGET="" TARGET_MAKEFILE=""
 
 showconfig:
-	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
+	@echo $"Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
 	@echo $"  USE_SHARED_PLUGINS=$(USE_SHARED_PLUGINS)$"
 	@echo $"  MODE=$(MODE)$"
 	@$(SYSMODIFIERS)

@@ -63,14 +63,12 @@
 
 // if you figure out how to support OpenGL extensions on your
 // machine add an appropriate file in the 'ext/'
-// directory and mangle the file 'ext/ext_auto.cpp'
+// directory and mangle the file 'ext/ext_auto.inc'
 // to access your extension code
 #if USE_EXTENSIONS
-#include "ext/ext_auto.cpp"
+#include "ext/ext_auto.inc"
 #else
-void csGraphics3DOGLCommon::DetectExtensions ()
-{
-}
+void csGraphics3DOGLCommon::DetectExtensions() {}
 #endif
 
 //@@@ Another experimental optimization:

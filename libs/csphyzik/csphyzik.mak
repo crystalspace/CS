@@ -1,15 +1,16 @@
 # Library description
-DESCRIPTION.csphyzik = Crystal Time physics library
+DESCRIPTION.csphyzik = Crystal Time Phyziks library
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
-LIBHELP += $(NEWLINE)echo $"  make csphyzik     Make the $(DESCRIPTION.csphyzik)$"
+LIBHELP += \
+  $(NEWLINE)echo $"  make csphyzik     Make the $(DESCRIPTION.csphyzik)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csphyzik
@@ -22,19 +23,25 @@ csphyzikclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csphyzik libs/csphyzik/math
 
 CSPHYZIK.LIB = $(OUT)$(LIB_PREFIX)csphyzik$(LIB)
+INC.CSPHYZIK = $(wildcard include/csphyzik/*.h)
 SRC.CSPHYZIK = $(wildcard libs/csphyzik/*.cpp libs/csphyzik/*/*.cpp)
 OBJ.CSPHYZIK = $(addprefix $(OUT),$(notdir $(SRC.CSPHYZIK:.cpp=$O)))
+
 TO_INSTALL.STATIC_LIBS += $(CSPHYZIK.LIB)
+
+MSVC.DSP += CSPHYZIK
+DSP.CSPHYZIK.NAME = csphyzik
+DSP.CSPHYZIK.TYPE = library
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: csphyzik csphyzikclean
@@ -47,7 +54,7 @@ $(CSPHYZIK.LIB): $(OBJ.CSPHYZIK)
 	$(DO.STATIC.LIBRARY)
 
 csphyzikclean:
-	-$(RM) $(CSPHYZIK.LIB) $(OBJ.CSPHYZIK)
+	-$(RM) $(CSPHYZIK.LIB) $(OBJ.CSPHYZIK) $(OUTOS)csphyzik.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csphyzik.dep

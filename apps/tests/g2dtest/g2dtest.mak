@@ -1,11 +1,11 @@
 # Application description
-DESCRIPTION.g2dtst = Crystal Space Graphics Canvas plugin test
+DESCRIPTION.g2dtst = Crystal Space canvas plugin test
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make g2dtst       Make the $(DESCRIPTION.g2dtst)$"
+APPHELP+=$(NEWLINE)echo $"  make g2dtst       Make the $(DESCRIPTION.g2dtst)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -27,13 +27,18 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tests/g2dtest
 
-LIB.G2DTEST = $(CSSYS.LIB) $(CSUTIL.LIB) $(CSGEOM.LIB)
 G2DTEST.EXE = g2dtest$(EXE)
-SRC.G2DTEST += apps/tests/g2dtest/g2dtest.cpp
+INC.G2DTEST =
+SRC.G2DTEST = apps/tests/g2dtest/g2dtest.cpp
 OBJ.G2DTEST = $(addprefix $(OUT),$(notdir $(SRC.G2DTEST:.cpp=$O)))
-#TO_INSTALL.EXE+=$(G2DTEST.EXE)
+DEP.G2DTEST = CSSYS CSUTIL CSGEOM
+LIB.G2DTEST = $(foreach d,$(DEP.G2DTEST),$($d.LIB))
 
-DESCRIPTION.$(G2DTEST.EXE) = $(DESCRIPTION.g2dtst)
+TO_INSTALL.EXE += $(G2DTEST.EXE)
+
+MSVC.DSP += G2DTEST
+DSP.G2DTEST.NAME = g2dtest
+DSP.G2DTEST.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

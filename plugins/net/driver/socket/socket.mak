@@ -1,6 +1,3 @@
-# This is a subinclude file used to define the rules needed
-# to build the Socket-based network driver.
-
 # Driver description
 DESCRIPTION.socket = Crystal Space socket network driver
 
@@ -8,7 +5,7 @@ DESCRIPTION.socket = Crystal Space socket network driver
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += \
+DRIVERHELP += \
   $(NEWLINE)echo $"  make socket       Make the $(DESCRIPTION.socket)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
@@ -17,7 +14,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: socket socketclean
-
 all plugins netdrivers: socket
 
 socket:
@@ -30,45 +26,47 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+vpath %.cpp plugins/net/driver/socket
+
 ifeq ($(NEED_SOCKET_LIB),yes)
-  LIBS.LOCAL.SOCKET=$(LFLAGS.l)socket
+  LIB.SOCKET.LOCAL = $(LFLAGS.l)socket
 endif
 
-# The NULL Network driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  SOCKET=$(OUTDLL)cssocket$(DLL)
-  LIBS.SOCKET=$(LIBS.LOCAL.SOCKET) $(LIBS.SOCKET.SYSTEM)
-  DEP.SOCKET=$(CSSYS.LIB) $(CSUTIL.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(SOCKET)
+  SOCKET = $(OUTDLL)cssocket$(DLL)
+  LIB.SOCKET = $(foreach d,$(DEP.SOCKET),$($d.LIB))
+  LIB.SOCKET.SPECIAL = $(LIB.SOCKET.LOCAL) $(LIB.SOCKET.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(SOCKET)
 else
-  SOCKET=$(OUT)$(LIB_PREFIX)cssocket$(LIB)
-  DEP.EXE+=$(SOCKET)
-  LIBS.EXE+=$(LIBS.LOCAL.SOCKET)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_NETSOCKET
-  TO_INSTALL.STATIC_LIBS+=$(SOCKET)
+  SOCKET = $(OUT)$(LIB_PREFIX)cssocket$(LIB)
+  DEP.EXE += $(SOCKET)
+  LIBS.EXE += $(LIBS.LOCAL.SOCKET)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_NETSOCKET
+  TO_INSTALL.STATIC_LIBS += $(SOCKET)
 endif
-DESCRIPTION.$(SOCKET) = $(DESCRIPTION.socket)
+
+INC.SOCKET = $(wildcard plugins/net/driver/socket/*.h)
 SRC.SOCKET = $(wildcard plugins/net/driver/socket/*.cpp)
 OBJ.SOCKET = $(addprefix $(OUT),$(notdir $(SRC.SOCKET:.cpp=$O)))
+DEP.SOCKET = CSSYS CSUTIL
+
+MSVC.DSP += SOCKET
+DSP.SOCKET.NAME = cssocket
+DSP.SOCKET.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp plugins/net/driver/socket
-
 .PHONY: socket socketclean
-
-# Chain rules
-net: socket
-clean: socketclean
 
 socket: $(OUTDIRS) $(SOCKET)
 
-$(SOCKET): $(OBJ.SOCKET) $(DEP.SOCKET)
-	$(DO.PLUGIN) $(LIBS.SOCKET)
+$(SOCKET): $(OBJ.SOCKET) $(LIB.SOCKET)
+	$(DO.PLUGIN) $(LIB.SOCKET.SPECIAL)
 
+clean: socketclean
 socketclean:
 	$(RM) $(SOCKET) $(OBJ.SOCKET) $(OUTOS)socket.dep
 

@@ -1,5 +1,5 @@
-# Driver description
-DESCRIPTION.motion = Crystal Space Skeletal Motion plugin
+# Plug-in description
+DESCRIPTION.motion = Crystal Space skeletal motion plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -14,7 +14,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: motion motionclean
-
 all plugins: motion
 
 motion:
@@ -30,18 +29,24 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/motion
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  MOTION=$(OUTDLL)motion$(DLL)
-  DEP.MOTION=$(CSGEOM.LIB) $(CSSYS.LIB) $(CSUTIL.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(MOTION)
+  MOTION = $(OUTDLL)motion$(DLL)
+  LIB.MOTION = $(foreach d,$(DEP.MOTION),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(MOTION)
 else
-  MOTION=$(OUT)$(LIB_PREFIX)motion$(LIB)
-  DEP.EXE+=$(MOTION)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_MOTION
-  TO_INSTALL.STATIC_LIBS+=$(MOTION)
+  MOTION = $(OUT)$(LIB_PREFIX)motion$(LIB)
+  DEP.EXE += $(MOTION)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_MOTION
+  TO_INSTALL.STATIC_LIBS += $(MOTION)
 endif
-DESCRIPTION.$(MOTION) = $(DESCRIPTION.motion)
+
+INC.MOTION = $(wildcard plugins/motion/*.h)
 SRC.MOTION = $(wildcard plugins/motion/*.cpp)
 OBJ.MOTION = $(addprefix $(OUT),$(notdir $(SRC.MOTION:.cpp=$O)))
+DEP.MOTION = CSGEOM CSSYS CSUTIL
+
+MSVC.DSP += MOTION
+DSP.MOTION.NAME = motion
+DSP.MOTION.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -50,14 +55,12 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: motion motionclean
 
-# Chain rules
-clean: motionclean
-
 motion: $(OUTDIRS) $(MOTION)
 
-$(MOTION): $(OBJ.MOTION) $(DEP.MOTION)
+$(MOTION): $(OBJ.MOTION) $(LIB.MOTION)
 	$(DO.PLUGIN)
 
+clean: motionclean
 motionclean:
 	$(RM) $(MOTION) $(OBJ.MOTION) $(OUTOS)motion.dep
 

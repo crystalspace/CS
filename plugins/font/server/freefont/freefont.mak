@@ -11,35 +11,41 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: freefont freefontclean
-plugins all: freefont
-freefontclean:
-	$(MAKE_CLEAN)
+all plugins: freefont
 freefont:
 	$(MAKE_TARGET) MAKE_DLL=yes
+freefontclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-SRC.FREEFONT = $(wildcard plugins/font/server/freefont/*.cpp)
-OBJ.FREEFONT = $(addprefix $(OUT),$(notdir $(SRC.FREEFONT:.cpp=$O)))
-LIB.FREEFONT = $(CSUTIL.LIB) $(CSSYS.LIB)
-
 LIB.EXTERNAL.FREEFONT = -lttf
 CFLAGS.FREEFONT = -I/usr/local/include/freetype
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  FREEFONT=$(OUTDLL)freefont$(DLL)
-  DEP.FREEFONT=$(LIB.FREEFONT)
-  TO_INSTALL.DYNAMIC_LIBS+=$(FREEFONT)
+  FREEFONT = $(OUTDLL)freefont$(DLL)
+  LIB.FREEFONT = $(foreach d,$(DEP.FREEFONT),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(FREEFONT)
 else
-  FREEFONT=$(OUT)$(LIB_PREFIX)freefont$(LIB)
-  DEP.EXE+=$(FREEFONT)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_FREEFONT
-  TO_INSTALL.STATIC_LIBS+=$(FREEFONT)
+  FREEFONT = $(OUT)$(LIB_PREFIX)freefont$(LIB)
+  DEP.EXE += $(FREEFONT)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_FREEFONT
+  TO_INSTALL.STATIC_LIBS += $(FREEFONT)
 endif
-TO_INSTALL.CONFIG += data/config/freetype.cfg
-DESCRIPTION.$(FREEFONT) = $(DESCRIPTION.freefont)
+
+INC.FREEFONT = $(wildcard plugins/font/server/freefont/*.h)
+SRC.FREEFONT = $(wildcard plugins/font/server/freefont/*.cpp)
+OBJ.FREEFONT = $(addprefix $(OUT),$(notdir $(SRC.FREEFONT:.cpp=$O)))
+DEP.FREEFONT = CSUTIL CSSYS
+CFG.FREEFONT = data/config/freetype.cfg
+
+TO_INSTALL.CONFIG += $(CFG.FREEFONT)
+
+MSVC.DSP += FREEFONT
+DSP.FREEFONT.NAME = freefont
+DSP.FREEFONT.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
@@ -51,7 +57,7 @@ freefont: $(OUTDIRS) $(FREEFONT)
 $(OUT)%$O: plugins/font/server/freefont/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.FREEFONT) 
 
-$(FREEFONT): $(OBJ.FREEFONT) $(DEP.FREEFONT)
+$(FREEFONT): $(OBJ.FREEFONT) $(LIB.FREEFONT)
 	$(DO.PLUGIN) $(LIB.EXTERNAL.FREEFONT)
 
 clean: freefontclean

@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glbe2d glbe2dclean
-
 all plugins drivers drivers2d: glbe2d
 
 glbe2d:
@@ -30,26 +29,27 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# We need also the GL libs
-CFLAGS.GLBE2D+=-I/boot/home/develop/headers/be/opengl
+CFLAGS.GLBE2D += -I/boot/home/develop/headers/be/opengl
 
-# The 2D GLBe driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  GLBE2D=$(OUTDLL)glbe2d$(DLL)
-  DEP.BE2D = $(CSUTIL.LIB) $(CSSYS.LIB)
-  LIBS.GLBE2D=-lGL
-  TO_INSTALL.DYNAMIC_LIBS+=$(GLBE2D)
+  GLBE2D = $(OUTDLL)glbe2d$(DLL)
+  LIB.GLBE2D = $(foreach d,$(DEP.GLBE2D),$($d.LIB))
+  LIBS.GLBE2D = -lGL
+  TO_INSTALL.DYNAMIC_LIBS += $(GLBE2D)
 else
-  GLBE2D=$(OUT)$(LIB_PREFIX)glbe2d$(LIB)
-  DEP.EXE+=$(GLBE2D)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLBE2D
-  LIBS.EXE+=-lGL
-  TO_INSTALL.STATIC_LIBS+=$(GLBE2D)
+  GLBE2D = $(OUT)$(LIB_PREFIX)glbe2d$(LIB)
+  DEP.EXE += $(GLBE2D)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_GLBE2D
+  LIBS.EXE += -lGL
+  TO_INSTALL.STATIC_LIBS += $(GLBE2D)
 endif
-DESCRIPTION.$(GLBE2D) = $(DESCRIPTION.glbe2d)
+
+INC.GLBE2D = $(wildcard plugins/video/canvas/openglbe/*.h \
+  $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D))
 SRC.GLBE2D = $(wildcard plugins/video/canvas/openglbe/*.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLBE2D = $(addprefix $(OUT),$(notdir $(SRC.GLBE2D:.cpp=$O)))
+DEP.BE2D = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -58,19 +58,18 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: glbe2d glbeclean
 
-# Chain rules
-clean: glbeclean
-
 glbe2d: $(OUTDIRS) $(GLBE2D)
 
 $(OUT)%$O: plugins/video/canvas/openglbe/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLBE2D)
+
 $(OUT)%$O: plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLBE2D)
 
-$(GLBE2D): $(OBJ.GLBE2D) $(DEP.BE2D)
+$(GLBE2D): $(OBJ.GLBE2D) $(LIB.BE2D)
 	$(DO.PLUGIN) $(LIBS.GLBE2D)
 
+clean: glbeclean
 glbeclean:
 	$(RM) $(GLBE2D) $(OBJ.GLBE2D) $(OUTOS)glbe2d.dep
 

@@ -2,9 +2,9 @@
 # to build the SVGALIB 2D driver -- svgalib2d
 
 # Driver description
-DESCRIPTION.svgalib2d = Crystal Space SVGALib 2D driver
+DESCRIPTION.svgalib2d = Crystal Space SVGAlib 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: svgalib2d svgalib2dclean
-
 all plugins drivers drivers2d: svgalib2d
 
 svgalib2d:
@@ -30,25 +29,25 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# Link with SVGALib librarys
-LIBS._SVGA2D+=-lvga -lvgagl
+LIB.SVGA2D.SYSTEM += -lvga -lvgagl
 
-# The 2D SVGAlib driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  SVGA2D=$(OUTDLL)svga2d$(DLL)
-  LIBS.SVGA2D+=$(LIBS._SVGA2D)
-  DEP.SVGA2D=$(CSUTIL.LIB) $(CSSYS.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(SVGA2D)
+  SVGA2D = $(OUTDLL)svga2d$(DLL)
+  LIB.SVGA2D = $(foreach d,$(DEP.SVGA2D),$($d.LIB))
+  LIB.SVGA2D.SPECIAL += $(LIB.SVGA2D.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(SVGA2D)
 else
-  SVGA2D=$(OUT)$(LIB_PREFIX)svga2d$(LIB)
-  DEP.EXE+=$(SVGA2D)
-  LIBS.EXE+=$(LIBS._SVGA2D)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SVGALIB2D
-  TO_INSTALL.STATIC_LIBS+=$(SVGA2D)
+  SVGA2D = $(OUT)$(LIB_PREFIX)svga2d$(LIB)
+  DEP.EXE += $(SVGA2D)
+  LIBS.EXE += $(LIB.SVGA2D.SYSTEM)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_SVGALIB2D
+  TO_INSTALL.STATIC_LIBS += $(SVGA2D)
 endif
-DESCRIPTION.$(SVGA2D) = $(DESCRIPTION.svgalib2d)
+
+INC.SVGA2D = $(wildcard plugins/video/canvas/svgalib/*.h   $(INC.COMMON.DRV2D))
 SRC.SVGA2D = $(wildcard plugins/video/canvas/svgalib/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.SVGA2D = $(addprefix $(OUT),$(notdir $(SRC.SVGA2D:.cpp=$O)))
+DEP.SVGA2D = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -57,17 +56,15 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: svgalib2d svgalib2dclean
 
-# Chain rules
-clean: svgalib2dclean
-
 svgalib2d: $(OUTDIRS) $(SVGA2D)
 
 $(OUT)%$O: plugins/video/canvas/svgalib/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SVGA2D)
  
-$(SVGA2D): $(OBJ.SVGA2D) $(DEP.SVGA2D)
-	$(DO.PLUGIN) $(LIBS.SVGA2D)
+$(SVGA2D): $(OBJ.SVGA2D) $(LIB.SVGA2D)
+	$(DO.PLUGIN) $(LIB.SVGA2D.SPECIAL)
 
+clean: svgalib2dclean
 svgalib2dclean:
 	$(RM) $(SVGA2D) $(OBJ.SVGA2D) $(OUTOS)svgalib2d.dep
 

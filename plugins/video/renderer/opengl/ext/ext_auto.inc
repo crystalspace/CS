@@ -1,3 +1,4 @@
+/*  -*- Mode: C++; -*- */
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
     File Created by Gary Haussmann 1/12/2000
@@ -33,16 +34,16 @@
 
 // win32 extension detection by Robert Bergkvist
 #if defined(OS_WIN32)
-#include "ext_w32.cpp"
+#include "ext_w32.inc"
 
 // Mesa 3.1/Linux extension detection by Gary Haussmann
 // if you get CS to compile and detect extensions on another
 // Mesa platform besides LINUX plz add a test here
 #elif (MESA_MAJOR_VERSION >= 3) && (MESA_MINOR_VERSION >= 1)
-#include "ext_mesa.cpp"
+#include "ext_mesa.inc"
 
 #elif defined(OS_LINUX) && defined(COMP_GCC)
-#include "ext_mesa.cpp"
+#include "ext_mesa.inc"
 
 // Default no extensions...
 #else
@@ -50,7 +51,8 @@
 #undef USE_MULTITEXTURE
 void csGraphics3DOGLCommon::DetectExtensions()
 {
-  SysPrintf (MSG_INITIALIZATION, "OpenGL extensions not supported on this platform!\n");
+  SysPrintf(MSG_INITIALIZATION,
+    "OpenGL extensions not supported on this platform!\n");
   return;
 }
 #define _DEFINED_DETECTION_METHOD
@@ -63,6 +65,3 @@ void csGraphics3DOGLCommon::DetectExtensions()
 #ifndef _DEFINED_DETECTION_METHOD
 #error Opengl extension detection not supported on this platform.
 #endif
-
-
-

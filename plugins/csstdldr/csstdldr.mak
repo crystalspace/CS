@@ -1,5 +1,5 @@
 # Plugin description
-DESCRIPTION.stdldr = Standard Crystal Space geometry loader plug-in
+DESCRIPTION.stdldr = Crystal Space geometry loader plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -15,7 +15,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: stdldr stdldrclean
 
-#@@@ dont enable till stdldr will be ready
+#@@@ Do not enable till stdldr is ready
 #all plugins: stdldr
 
 stdldr:
@@ -34,7 +34,7 @@ export BISON_SIMPLE = support/gnu/bison.sim
 ifeq ($(USE_SHARED_PLUGINS),yes)
 # STDLDR = $(OUTDLL)stdldr$(DLL)
   STDLDR = testldr$(EXE)
-  DEP.STDLDR = $(CSUTIL.LIB) $(CSGEOM.LIB)
+  LIB.STDLDR = $(foreach d,$(DEP.STDLDR),$($d.LIB))
 # TO_INSTALL.DYNAMIC_LIBS += $(STDLDR)
 else
   STDLDR = $(OUT)$(LIB_PREFIX)stdld$(LIB)
@@ -42,20 +42,20 @@ else
   CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_STDLDR
 # TO_INSTALL.STATIC_LIBS += $(STDLDR)
 endif
-DESCRIPTION.$(STDLDR) = $(DESCRIPTION.stdldr)
+
+INC.STDLDR = plugins/csstdldr/stdparse.h plugins/csstdldr/stdldr.h
 SRC.STDLDR = plugins/csstdldr/stdparse.cpp plugins/csstdldr/stdldr.cpp \
   plugins/csstdldr/test.cpp
 OBJ.STDLDR = $(addprefix $(OUT),$(notdir $(SRC.STDLDR:.cpp=$O)))
+DEP.STDLDR = CSUTIL CSGEOM
 
 #@@@ to be removed
-DEP.STDLDR += \
-$(CSENGINE.LIB) \
-$(CSTERR.LIB) \
-$(CSGEOM.LIB) \
-$(CSGFXLDR.LIB) \
-$(CSUTIL.LIB) \
-$(CSSYS.LIB) \
-$(CSOBJECT.LIB) 
+DEP.STDLDR += CSENGINE CSTERR CSGEOM CSGFXLDR CSUTIL CSSYS CSOBJECT 
+
+#MSVC.DSP += STDLDR
+#DSP.STDLDR.NAME = stdldr
+#DSP.STDLDR.TYPE = plugin
+#DSP.STDLDR.RESOURCES = $(wildcard plugin/csstdldr/*.y)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -65,8 +65,6 @@ ifeq ($(MAKESECTION),targets)
 vpath %.cpp plugins/csstdldr
 
 .PHONY: stdldr stdldrclean
-
-all: $(STDLDR)
 stdldr: $(OUTDIRS) $(STDLDR)
 clean: stdldrclean
 
@@ -74,7 +72,7 @@ plugins/csstdldr/stdparse.cpp: plugins/csstdldr/stdparse.y
 	bison -d -o $* $<
 	mv -f $* $@
 
-$(STDLDR): $(OBJ.STDLDR) $(DEP.STDLDR)
+$(STDLDR): $(OBJ.STDLDR) $(LIB.STDLDR)
 	$(DO.LINK.CONSOLE.EXE)
 #	$(DO.PLUGIN)
 

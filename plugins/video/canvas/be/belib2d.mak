@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: be2d be2dclean
-
 all plugins drivers drivers2d: be2d
 
 be2d:
@@ -34,18 +33,24 @@ vpath %.cpp plugins/video/canvas/be
 
 # The 2D Belib driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  BE2D=$(OUTDLL)be2d$(DLL)
-  DEP.BE2D = $(CSUTIL.LIB) $(CSSYS.LIB)
+  BE2D = $(OUTDLL)be2d$(DLL)
+  LIB.BE2D = $(foreach d,$(DEP.BE2D),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(BE2D)
 else
-  BE2D=be2d.a
-  DEP.EXE+=$(BE2D)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_BE2D
+  BE2D = be2d.a
+  DEP.EXE += $(BE2D)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_BE2D
   TO_INSTALL.STATIC_LIBS += $(BE2D)
 endif
-DESCRIPTION.$(BE2D) = $(DESCRIPTION.be2d)
+
+INC.BE2D = $(wildcard plugins/video/canvas/be/*.h   $(INC.COMMON.DRV2D))
 SRC.BE2D = $(wildcard plugins/video/canvas/be/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.BE2D = $(addprefix $(OUT),$(notdir $(SRC.BE2D:.cpp=$O)))
+DEP.BE2D = CSUTIL CSSYS
+
+#MSVC.DSP += BE2D
+#DSP.BE2D.NAME = be2d
+#DSP.BE2D.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -61,7 +66,7 @@ clean: be2dclean
 
 be2d: $(OUTDIRS) $(BE2D)
 
-$(BE2D): $(OBJ.BE2D) $(DEP.BE2D)
+$(BE2D): $(OBJ.BE2D) $(LIB.BE2D)
 	$(DO.PLUGIN)
 
 be2dclean:

@@ -95,8 +95,14 @@ typedef unsigned short wchar_t;
 #endif
 
 #ifdef __CRYSTAL_SPACE__
-// A rare case where cssysdef.h is included from a header file :-)
+// A rare case where cssysdef.h is included from a header file. :-)
+// By including cssysdef.h here, we avoid having to modify each of
+// the DDG source files.  We want to avoid CrystalSpace-specific
+// customization of those files since they are also part of the
+// stand-alone DDG toolkit.
+#ifndef __CS_CSSYSDEFS_H__
 #include "cssysdef.h"
+#endif
 #include "cstypes.h"
 #endif
 

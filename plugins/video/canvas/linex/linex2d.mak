@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: linex2d linex2dclean
-
 all plugins drivers drivers2d: linex2d
 
 linex2d:
@@ -31,33 +30,33 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 ifeq ($(USE_XFREE86VM),yes)
-  CFLAGS.LINEX2D+=-DXFREE86VM
-  LIBS.LINEX2D+=-lXxf86vm
+  CFLAGS.LINEX2D += -DXFREE86VM
+  LIB.LINEX2D.SYSTEM += -lXxf86vm
 endif
  
 # We need also the X libs
-CFLAGS.LINEX2D+=-I$(X11_PATH)/include
-LIBS.LINEX2D+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
+CFLAGS.LINEX2D += -I$(X11_PATH)/include
+LIB.LINEX2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 
 # The 2D Xlib driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  LINEXLIB2D=$(OUTDLL)linex2d$(DLL)
-  LIBS.LOCAL.LINEX2D=$(LIBS.LINEX2D)
-  DEP.LINEX2D=$(CSUTIL.LIB) $(CSSYS.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(LINEXLIB2D)
+  LINEX2D = $(OUTDLL)linex2d$(DLL)
+  LIB.LINEX2D = $(foreach d,$(DEP.LINEX2D),$($d.LIB))
+  LIB.LINEX2D.SPECIAL = $(LIB.LINEX2D.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(LINEX2D)
 else
-  LINEXLIB2D=$(OUT)$(LIB_PREFIX)linex2d$(LIB)
-  DEP.EXE+=$(LINEXLIB2D)
-  LIBS.EXE+=$(LIBS.LINEX2D)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_LINEX2D
-  TO_INSTALL.STATIC_LIBS+=$(LINEXLIB2D)
+  LINEX2D = $(OUT)$(LIB_PREFIX)linex2d$(LIB)
+  DEP.EXE += $(LINEX2D)
+  LIBS.EXE += $(LIB.LINEX2D.SYSTEM)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_LINEX2D
+  TO_INSTALL.STATIC_LIBS += $(LINEX2D)
 endif
-DESCRIPTION.$(LINEXLIB2D) = $(DESCRIPTION.linex2d)
-SRC.LINEXLIB2D = \
-  $(wildcard plugins/video/canvas/linex/*.cpp \
-  plugins/video/canvas/common/x11-keys.cpp \
-  $(SRC.COMMON.DRV2D))
-OBJ.LINEXLIB2D = $(addprefix $(OUT),$(notdir $(SRC.LINEXLIB2D:.cpp=$O)))
+
+INC.LINEX2D = $(wildcard plugins/video/canvas/linex/*.h   $(INC.COMMON.DRV2D))
+SRC.LINEX2D = $(wildcard plugins/video/canvas/linex/*.cpp $(SRC.COMMON.DRV2D))\
+  plugins/video/canvas/common/x11-keys.cpp
+OBJ.LINEX2D = $(addprefix $(OUT),$(notdir $(SRC.LINEX2D:.cpp=$O)))
+DEP.LINEX2D = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -66,23 +65,21 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: linex2d linelibxclean
 
-# Chain rules
-clean: linelibxclean
-
-linex2d: $(OUTDIRS) $(LINEXLIB2D)
+linex2d: $(OUTDIRS) $(LINEX2D)
 
 $(OUT)%$O: plugins/video/canvas/linex/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.LINEX2D)
  
-$(LINEXLIB2D): $(OBJ.LINEXLIB2D) $(DEP.LINEX2D)
-	$(DO.PLUGIN) $(LIBS.LOCAL.LINEX2D)
+$(LINEX2D): $(OBJ.LINEX2D) $(LIB.LINEX2D)
+	$(DO.PLUGIN) $(LIB.LINEX2D.SPECIAL)
 
+clean: linelibxclean
 linelibxclean:
-	$(RM) $(LINEXLIB2D) $(OBJ.LINEXLIB2D) $(OUTOS)linex2d.dep
+	$(RM) $(LINEX2D) $(OBJ.LINEX2D) $(OUTOS)linex2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)linex2d.dep
-$(OUTOS)linex2d.dep: $(SRC.LINEXLIB2D)
+$(OUTOS)linex2d.dep: $(SRC.LINEX2D)
 	$(DO.DEP1) $(CFLAGS.LINEX2D) $(DO.DEP2)
 else
 -include $(OUTOS)linex2d.dep

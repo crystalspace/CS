@@ -32,51 +32,52 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+vpath %.cpp plugins/video/canvas/openglos2 plugins/video/canvas/openglcommon
+
 # The OpenGL library
-LIBS.GLOS2+=-lopengl
+LIB.GLOS2.SYSTEM += -lopengl
 
 # Resource file for OS/2 OpenGL driver
-GLOS2.RES=$(OUTOS)libGL.res
+RES.GLOS2 = $(OUTOS)libGL.res
 
 # The 2D OS/2 OpenGL driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  GLOS2=$(OUTDLL)glos2$(DLL)
-  LIBS.LOCAL.GLOS2=$(LIBS.GLOS2)
-  DEP.GLOS2=$(GLOS2.RES) $(CSUTIL.LIB) $(CSSYS.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(GLOS2)
+  GLOS2 = $(OUTDLL)glos2$(DLL)
+  LIB.GLOS2 = $(foreach d,$(DEP.GLOS2),$($d.LIB))
+  LIB.GLOS2.SPECIAL = $(LIB.GLOS2.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(GLOS2)
 else
-  GLOS2=$(OUT)$(LIB_PREFIX)glos2$(LIB)
-  DEP.EXE+=$(GLOS2.RES) $(GLOS2) $(CSOS2.LIB)
-  LIBS.EXE+=$(LIBS.GLOS2)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GL2DOS2
-  TO_INSTALL.STATIC_LIBS+=$(GLOS2)
+  GLOS2 = $(OUT)$(LIB_PREFIX)glos2$(LIB)
+  DEP.EXE += $(RES.GLOS2) $(GLOS2) $(CSOS2.LIB)
+  LIBS.EXE += $(LIB.GLOS2.SYSTEM)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_GL2DOS2
+  TO_INSTALL.STATIC_LIBS += $(GLOS2)
 endif
-DESCRIPTION.$(GLOS2)=$(DESCRIPTION.glos2)
+
+INC.GLOS2 = $(wildcard plugins/video/canvas/openglos2/*.h \
+  $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D))
 SRC.GLOS2 = $(wildcard plugins/video/canvas/openglos2/*.cpp \
-  plugins/video/canvas/common/pc-keys.cpp $(SRC.COMMON.DRV2D.OPENGL) \
-  $(SRC.COMMON.DRV2D))
+  plugins/video/canvas/common/pc-keys.cpp \
+  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLOS2 = $(addprefix $(OUT),$(notdir $(SRC.GLOS2:.cpp=$O)))
+DEP.GLOS2 = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp plugins/video/canvas/openglos2 plugins/video/canvas/openglcommon
-
 .PHONY: glos2 glos2clean
-
-# Chain rules
-clean: glos2clean
 
 glos2: $(OUTDIRS) $(GLOS2)
 
-$(GLOS2): $(OBJ.GLOS2) $(DEP.GLOS2)
-	$(DO.PLUGIN) $(LIBS.LOCAL.GLOS2)
+$(GLOS2): $(OBJ.GLOS2) $(LIB.GLOS2) $(RES.GLOS2)
+	$(DO.PLUGIN) $(LIB.GLOS2.SPECIAL)
 
-$(GLOS2.RES): plugins/video/canvas/openglos2/libGL.rc
+$(RES.GLOS2): plugins/video/canvas/openglos2/libGL.rc
 	$(RC) $(RCFLAGS) $< $@
 
+clean: glos2clean
 glos2clean:
 	$(RM) $(GLOS2) $(OBJ.GLOS2) $(OUTOS)glos2.dep
 

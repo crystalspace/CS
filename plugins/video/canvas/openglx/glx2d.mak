@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glx2d glx2dclean
-
 all plugins drivers drivers2d: glx2d
 
 glx2d:
@@ -31,47 +30,51 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
-LIBS._GLX2D+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
-CFLAGS.GLX2D+=-I$(X11_PATH)/include
+LIB.GLX2D.SYSTEM += -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
+CFLAGS.GLX2D += -I$(X11_PATH)/include
 
 ifeq ($(USE_XFREE86VM),yes)
-  CFLAGS.GLX2D+=-DXFREE86VM
-  LIBS._GLX2D+=-lXxf86vm
+  CFLAGS.GLX2D += -DXFREE86VM
+  LIB.GLX2D.SYSTEM += -lXxf86vm
 endif
 
 ifeq ($(USE_MESA),1)
   ifdef MESA_PATH
-    CFLAGS.GLX2D+=-I$(MESA_PATH)/include
-    LIBS._GLX2D+=-L$(MESA_PATH)/lib
+    CFLAGS.GLX2D += -I$(MESA_PATH)/include
+    LIB.GLX2D.SYSTEM += -L$(MESA_PATH)/lib
   endif
-  LIBS._GLX2D+=-lMesaGL -lMesaGLU
+  LIB.GLX2D.SYSTEM += -lMesaGL -lMesaGLU
 else
   ifdef OPENGL_PATH
-    CFLAGS.GLX2D+=-I$(OPENGL_PATH)/include
-    LIBS._GLX2D+=-L$(OPENGL_PATH)/lib
+    CFLAGS.GLX2D += -I$(OPENGL_PATH)/include
+    LIB.GLX2D.SYSTEM += -L$(OPENGL_PATH)/lib
   endif
-  LIBS._GLX2D+=-lGL
+  LIB.GLX2D.SYSTEM += -lGL
 endif
 
 # The 2D GLX driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  GLX2D=$(OUTDLL)glx2d$(DLL)
-  LIBS.GLX2D=$(LIBS._GLX2D)
-  DEP.GLX2D=$(CSUTIL.LIB) $(CSSYS.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(GLX2D)
+  GLX2D = $(OUTDLL)glx2d$(DLL)
+  LIB.GLX2D = $(foreach d,$(DEP.GLX2D),$($d.LIB))
+  LIB.GLX2D.SPECIAL = $(LIB.GLX2D.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(GLX2D)
 else
-  GLX2D=$(OUT)$(LIB_PREFIX)glx2d$(LIB)
-  DEP.EXE+=$(GLX2D)
-  LIBS.EXE+=$(LIBS._GLX2D)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLX2D
-  TO_INSTALL.STATIC_LIBS+=$(GLX2D)
+  GLX2D = $(OUT)$(LIB_PREFIX)glx2d$(LIB)
+  DEP.EXE += $(GLX2D)
+  LIBS.EXE += $(LIB.GLX2D.SYSTEM)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_GLX2D
+  TO_INSTALL.STATIC_LIBS += $(GLX2D)
 endif
-DESCRIPTION.$(GLX2D) = $(DESCRIPTION.glx2d)
+
+INC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.h \
+  $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D)) \
+  plugins/video/canvas/common/x11comm.h
 SRC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.cpp \
+  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D)) \
   plugins/video/canvas/common/x11comm.cpp \
-  plugins/video/canvas/common/x11-keys.cpp \
-  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
+  plugins/video/canvas/common/x11-keys.cpp
 OBJ.GLX2D = $(addprefix $(OUT),$(notdir $(SRC.GLX2D:.cpp=$O)))
+DEP.GLX2D = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -79,9 +82,6 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: glx2d glx2dclean
-
-# Chain rules
-clean: glx2dclean
 
 glx2d: $(OUTDIRS) $(GLX2D)
 
@@ -91,9 +91,10 @@ $(OUT)%$O: plugins/video/canvas/openglx/%.cpp
 $(OUT)%$O: plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLX2D)
  
-$(GLX2D): $(OBJ.GLX2D) $(DEP.GLX2D)
-	$(DO.PLUGIN) $(LIBS.GLX2D)
+$(GLX2D): $(OBJ.GLX2D) $(LIB.GLX2D)
+	$(DO.PLUGIN) $(LIB.GLX2D.SPECIAL)
 
+clean: glx2dclean
 glx2dclean:
 	$(RM) $(GLX2D) $(OBJ.GLX2D) $(OUTOS)glx2d.dep
  

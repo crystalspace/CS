@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: oss ossclean
-
 all plugins drivers snddrivers: oss
 
 oss:
@@ -34,18 +33,19 @@ vpath %.cpp plugins/sound/driver/oss
 
 # The OSS sound driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  SNDOSS=$(OUTDLL)ossdrv$(DLL)
-  DEP.OSS+=$(CSUTIL.LIB) $(CSSYS.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(SNDOSS)
+  SNDOSS = $(OUTDLL)ossdrv$(DLL)
+  LIB.SNDOSS = $(foreach d,$(DEP.SNDOSS),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(SNDOSS)
 else
-  SNDOSS=$(OUT)$(LIB_PREFIX)ossdrv.a
-  DEP.EXE+=$(SNDOSS)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDOSS
-  TO_INSTALL.STATIC_LIBS+=$(SNDOSS)
+  SNDOSS = $(OUT)$(LIB_PREFIX)ossdrv.a
+  DEP.EXE += $(SNDOSS)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_SNDOSS
+  TO_INSTALL.STATIC_LIBS += $(SNDOSS)
 endif
-DESCRIPTION.$(SNDOSS) = $(DESCRIPTION.oss)
+
 SRC.SNDOSS = $(wildcard plugins/sound/driver/oss/*.cpp)
 OBJ.SNDOSS = $(addprefix $(OUT),$(notdir $(SRC.SNDOSS:.cpp=$O)))
+DEP.SNDOSS = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -54,14 +54,12 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: oss ossclean
 
-# Chain rules
-clean: ossclean
-
 oss: $(OUTDIRS) $(SNDOSS)
 
-$(SNDOSS): $(OBJ.SNDOSS) $(DEP.OSS)
+$(SNDOSS): $(OBJ.SNDOSS) $(LIB.SNDOSS)
 	$(DO.PLUGIN)
 
+clean: ossclean
 ossclean:
 	$(RM) $(SNDOSS) $(OBJ.SNDOSS) $(OUTOS)oss.dep
 

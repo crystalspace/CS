@@ -17,7 +17,6 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csdive csdiveclean
-
 all plugins drivers drivers2d: csdive
 
 csdive:
@@ -30,43 +29,42 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+vpath %.cpp plugins/video/canvas/csdive
+
 # Resource file for DIVE library
-DIVE2D.RES=$(OUTOS)libDIVE.res
+DIVE2D.RES = $(OUTOS)libDIVE.res
 
 # Additional library which contains functions undefined in os2.a
-CSOS2.LIB=$(OUT)$(LIB_PREFIX)csos2$(LIB)
+CSOS2.LIB = $(OUT)$(LIB_PREFIX)csos2$(LIB)
 
 # The 2D OS/2 DIVE driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  CSDIVE=csdive$(DLL)
-  DEP.CSDIVE=$(DIVE2D.RES) $(CSOS2.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
-  TO_INSTALL.DYNAMIC_LIBS+=$(CSDIVE)
+  CSDIVE = csdive$(DLL)
+  LIB.CSDIVE = $(foreach d,$(DEP.CSDIVE),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(CSDIVE)
 else
-  CSDIVE=$(OUT)$(LIB_PREFIX)csdive$(LIB)
-  DEP.EXE+=$(DIVE2D.RES) $(CSDIVE) $(CSOS2.LIB)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DIVE2D
-  TO_INSTALL.STATIC_LIBS+=$(CSDIVE)
+  CSDIVE = $(OUT)$(LIB_PREFIX)csdive$(LIB)
+  DEP.EXE += $(DIVE2D.RES) $(CSDIVE) $(CSOS2.LIB)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_DIVE2D
+  TO_INSTALL.STATIC_LIBS += $(CSDIVE)
 endif
-DESCRIPTION.$(CSDIVE)=$(DESCRIPTION.csdive)
+
+INC.CSDIVE = $(wildcard plugins/video/canvas/csdive/*.h $(INC.COMMON.DRV2D))
 SRC.CSDIVE = $(wildcard plugins/video/canvas/csdive/*.cpp \
   plugins/video/canvas/common/pc-keys.cpp $(SRC.COMMON.DRV2D))
 OBJ.CSDIVE = $(addprefix $(OUT),$(notdir $(SRC.CSDIVE:.cpp=$O)))
+DEP.CSDIVE = CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp plugins/video/canvas/csdive
-
 .PHONY: csdive csdiveclean
-
-# Chain rules
-clean: csdiveclean
 
 csdive: $(OUTDIRS) $(CSDIVE)
 
-$(CSDIVE): $(OBJ.CSDIVE) $(DEP.CSDIVE)
+$(CSDIVE): $(OBJ.CSDIVE) $(LIB.CSDIVE) $(DIVE2D.RES) $(CSOS2.LIB) 
 	$(DO.PLUGIN)
 
 $(CSOS2.LIB): plugins/video/canvas/csdive/csdive.imp
@@ -75,6 +73,7 @@ $(CSOS2.LIB): plugins/video/canvas/csdive/csdive.imp
 $(DIVE2D.RES): plugins/video/canvas/csdive/libDIVE.rc
 	$(RC) $(RCFLAGS) $< $@
 
+clean: csdiveclean
 csdiveclean:
 	$(RM) $(CSDIVE) $(OBJ.CSDIVE) $(OUTOS)csdive.dep
 

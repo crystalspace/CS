@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.gfxtst = Crystal Space Graphics Loader library test
+DESCRIPTION.gfxtst = Crystal Space image manipulator
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -28,12 +28,18 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tests/gfxtst
 
-LIB.GFXTEST = $(CSGFXLDR.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) $(CSUTIL.LIB) 
 GFXTEST.EXE = gfxtest$(EXE)
-SRC.GFXTEST += apps/tests/gfxtst/gfxtest.cpp
+INC.GFXTEST =
+SRC.GFXTEST = apps/tests/gfxtst/gfxtest.cpp
 OBJ.GFXTEST = $(addprefix $(OUT),$(notdir $(SRC.GFXTEST:.cpp=$O)))
-DESCRIPTION.$(GFXTEST.EXE) = $(DESCRIPTION.gfxtst)
-TO_INSTALL.EXE+=$(GFXTEST.EXE)
+DEP.GFXTEST = CSGFXLDR CSGEOM CSUTIL CSSYS CSUTIL 
+LIB.GFXTEST = $(foreach d,$(DEP.GFXTEST),$($d.LIB))
+
+TO_INSTALL.EXE += $(GFXTEST.EXE)
+
+MSVC.DSP += GFXTEST
+DSP.GFXTEST.NAME = gfxtest
+DSP.GFXTEST.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -29,11 +29,17 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp libs/csutil
 
 CSUTIL.LIB = $(OUT)$(LIB_PREFIX)csutil$(LIB_SUFFIX)
+INC.CSUTIL = $(wildcard include/csutil/*.h)
 SRC.CSUTIL = $(wildcard libs/csutil/*.cpp)
 OBJ.CSUTIL = $(addprefix $(OUT),$(notdir $(SRC.CSUTIL:.cpp=$O)))
+CFG.CSUTIL = scf.cfg
 
-TO_INSTALL.ROOT += scf.cfg
+TO_INSTALL.ROOT += $(CFG.CSUTIL)
 TO_INSTALL.STATIC_LIBS += $(CSUTIL.LIB)
+
+MSVC.DSP += CSUTIL
+DSP.CSUTIL.NAME = csutil
+DSP.CSUTIL.TYPE = library
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
