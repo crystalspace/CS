@@ -66,7 +66,6 @@
 #include "csutil/csendian.h"
 #include "csutil/csshlib.h"
 #include "csutil/sysfunc.h"
-#include "csutil/sockets.h"
 #endif
 
 // CS Interfaces

@@ -362,20 +362,6 @@ struct mmioInfo
 # endif // CS_BUILD_SHARED_LIBS
 #endif
 
-#ifdef CS_SYSDEF_PROVIDE_SOCKETS
-#include <winsock.h>
-#ifndef socklen_t
-   typedef int socklen_t;
-#endif
-   typedef SOCKET csNetworkSocket;
-#  define CS_NET_SOCKET_INVALID INVALID_SOCKET
-#  define CS_IOCTLSOCKET ioctlsocket
-#  define CS_CLOSESOCKET closesocket
-#  define EWOULDBLOCK WSAEWOULDBLOCK
-#  define CS_GETSOCKETERROR ::WSAGetLastError()
-#  undef CS_SYSDEF_PROVIDE_SOCKETS
-#endif
-
 #ifdef CS_SYSDEF_PROVIDE_SELECT
 #  undef CS_SYSDEF_PROVIDE_SELECT
 #endif

@@ -1,8 +1,9 @@
 /*
-  This header is used by CS_COMPILER_MSVC and CS_COMPILER_BCC for CS_PLATFORM_WIN32 builds.  It is
-  not used for CS_COMPILER_GCC builds under normal circumstances since GCC builds
-  are performed in concert with invocation of the CS configure script which
-  generates a suitable csconfig.h file.
+  This header is used by CS_COMPILER_MSVC and CS_COMPILER_BCC for
+  CS_PLATFORM_WIN32 builds.  It is not used for CS_COMPILER_GCC builds under
+  normal circumstances since GCC builds are performed in concert with
+  invocation of the CS configure script which generates a suitable csconfig.h
+  file.
 */
 #ifndef __CS_WIN32_CSCONFIG_H__
 #define __CS_WIN32_CSCONFIG_H__
@@ -46,6 +47,8 @@
 
 #define CS_HAS_WCHAR_H
 #define CS_WCHAR_T_SIZE 2
+
+#define CS_USE_FAKE_SOCKLEN_TYPE
 
 #define CS_EMBED_PLUGIN_META
 

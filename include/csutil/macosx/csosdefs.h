@@ -49,7 +49,6 @@
 // #undef it.
 //-----------------------------------------------------------------------------
 #if defined(CS_SYSDEF_PROVIDE_GETCWD)  || \
-    defined(CS_SYSDEF_PROVIDE_SOCKETS) || \
     defined(CS_SYSDEF_PROVIDE_SELECT)  || \
     defined(CS_SYSDEF_PROVIDE_ACCESS)
 #include <libc.h>

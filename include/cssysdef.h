@@ -208,13 +208,6 @@
 #  include "csutil/getopt.h"
 #endif
 
-#ifdef CS_SYSDEF_PROVIDE_SOCKETS
-# ifdef __GNUC__
-#  warning CS_SYSDEF_PROVIDE_SOCKETS is deprecated, include cssys/sockets.h instead
-# endif
-#include "csutil/sockets.h"
-#endif
-
 #ifdef CS_SYSDEF_PROVIDE_SELECT
 #  include <sys/select.h>
 #endif

@@ -36,9 +36,6 @@
 
 #if defined(CS_PLATFORM_WIN32) && !defined(__CYGWIN__)
 #  include <winsock.h>
-#  ifndef socklen_t
-     typedef int socklen_t;
-#  endif
 #  define CS_NET_SOCKET_INVALID INVALID_SOCKET
 #  define CS_IOCTLSOCKET ioctlsocket
 #  define CS_CLOSESOCKET closesocket
@@ -47,7 +44,6 @@
 #  endif
 #  define EWOULDBLOCK WSAEWOULDBLOCK
 #  define CS_GETSOCKETERROR ::WSAGetLastError()
-#  undef CS_SYSDEF_PROVIDE_SOCKETS
 #elif defined(CS_PLATFORM_UNIX) || defined(__CYGWIN__)
 #  include <sys/socket.h>
 #  include <unistd.h>
@@ -74,5 +70,12 @@ typedef unsigned int csNetworkSocket;
 #  define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
 #endif
 
-#endif // __CS_CSSYS_SOCKETS_H__
+// Platforms which do not supply a socklen_t type should define
+// CS_USE_FAKE_SOCKLEN_TYPE. Note that we invoke the typedef only if some other
+// entity has not already #defined socklen_t, since the #define would cause
+// problems (i.e. `typedef int int').
+#if defined(CS_USE_FAKE_SOCKLEN_TYPE) && !defined(socklen_t)
+  typedef int socklen_t;
+#endif
 
+#endif // __CS_CSSYS_SOCKETS_H__

@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Aug-2004
+	- Eric Sunshine localized the faked-up `socklen_t' from csdef.h to
+	  csutil/sockets.h so that the type is faked up only if requested by
+	  explicit inclusion of csutil/sockets.h. This helps to prevent it from
+	  polluting the type-space of external projects which generically
+	  #include <cssysdef.h>.  Also, the socklen_t typedef is now only
+	  invoked if some other entity (such as an external project) has not
+	  already faked it up via a #define, since the #define would cause the
+	  typedef to morph into a semantic error.
+	- Eric Sunshine retired the long-deprecated CS_SYSDEF_PROVIDE_SOCKETS.
+	  Instead, #include <csutil/sockets.h> explicitly.
 1-Aug-2004
 	- Eric Sunshine made csBaseEventHandler::HandleEvent() protected rather
 	  than private. This makes it possible for subclasses to deal with
@@ -57,6 +68,10 @@ chronological order.
 	  property CS_USE_FAKE_SOCKLEN_TYPE to csconfig.h rather than emitting
 	  the explicit 'typedef int socklen_t'. csdef.h now fakes up socklent_t
 	  in an appropriate manner if CS_USE_FAKE_SOCKLEN_TYPE is defined.
+	- Eric Sunshine fixed bug in the ObjTagMetaData rule (unix.jam) where
+	  it was placing plugin meta-data in a section named ".crystal",
+	  despite the fact that csGetPluginMetadata() (bfdplugins.cpp) expects
+	  the section to be named ".crystalspace" (at least as of 8 July 2004).
 30-Jul-2004
 	- Eric Sunshine fixed bugs in csInitializer::OpenApplication() and
 	  CloseApplication() where they created broadcast events on the stack.
