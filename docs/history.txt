@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Apr-2004
+	- Eric Sunshine reverted Peter Amstutz's change to csvosa3dl.mak from
+	  yesterday since it broke static link mode; it caused 'ar' to be
+	  invoked with linker flags.  Instead, Eric fixed the copy/paste error
+	  which resulted in link failure, which is what Peter was attempting to
+	  address.
 4-Apr-2004
 	- res moved the attenuation texture generation to the light iter 
 	  plugin. Still the same texture for all lights, though. Plan is to
