@@ -264,7 +264,7 @@ void csConsole::Draw(csRect *area)
 
 #ifdef CS_DEBUG
       if(cx!=0)
-	piSystem->Print(MSG_WARNING, "csConsole:  Current line is empty but cursor x != 0!\n");
+	piSystem->Printf(MSG_WARNING, "csConsole:  Current line is empty but cursor x != 0!\n");
 #endif // CS_DEBUG
 
       cx_pix = 1;
@@ -294,14 +294,14 @@ void csConsole::Draw(csRect *area)
     case csConCustomCursor:
 #ifdef CS_DEBUG
       if(custom_cursor==NULL)
-	piSystem->Print(MSG_FATAL_ERROR, "csConsole:  Tried to display NULL custom cursor!!!\n");
+	piSystem->Printf(MSG_FATAL_ERROR, "csConsole:  Tried to display NULL custom cursor!!!\n");
 #endif // CS_DEBUG
       line.ymin++; line.xmax--; line.ymax--;
       custom_cursor->Draw(line);
       break;
 #ifdef CS_DEBUG
     default:
-      piSystem->Print(MSG_WARNING, "csConsole:  Invalid cursor setting!\n");
+      piSystem->Printf(MSG_WARNING, "csConsole:  Invalid cursor setting!\n");
 #endif // CS_DEBUG
     }
 
@@ -490,7 +490,7 @@ void csConsole::SetCursorStyle(int style, bool flashing, iCursor *custom)
   if(style==csConCustomCursor) {
 #ifdef CS_DEBUG
     if(custom==NULL)
-      piSystem->Print(MSG_FATAL_ERROR, "csConsole:  Tried to assign NULL pointer for cursor texture!");
+      piSystem->Printf(MSG_FATAL_ERROR, "csConsole:  Tried to assign NULL pointer for cursor texture!");
 #endif
     custom_cursor = custom;
   } else
