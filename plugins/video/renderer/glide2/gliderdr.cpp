@@ -20,13 +20,13 @@
 #include "cscom/com.h"
 #include "cs3d/glide2/g3dglide.h"
 
-#ifdef OS_WIN32
+#ifdef OS_LINUX
+#define DLL_NAME "Glide2xRender.so"
+#define IS_DEFAULT
+#elif OS_WIN32
 #define DLL_NAME "Glide2xRender.dll"
 #elif OS_BE
 #define DLL_NAME "Glide2xRender.so"
-#elif OS_LINUX
-#define DLL_NAME "Glide2xRender.so"
-#define IS_DEFAULT
 #elif OS_MACOS
 #define DLL_NAME "Glide2xRender.shlb"
 #endif
@@ -75,7 +75,7 @@ COMBOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD /*fdwReason*/, LPVOID /*lpvRese
 
 #endif
 
-#if OS_LINUX || OS_MACOS  || OS_BE
+#ifdef OS_LINUX || OS_MACOS  || OS_BE
   STDAPI DllInitialize ()
   {
        csCoInitialize (0);
