@@ -221,7 +221,7 @@ int csColliderHelper::CollidePath (
   csVector3 start = test.GetOrigin ();
   csVector3 end = newpos;
   csVector3 testpos;
-  float step = 1. / stepsize;
+  float step = stepsize / (end - start).Norm();
   float curdist = 0;
   bool rc = false;
   bool firsthit = true;
