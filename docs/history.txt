@@ -17,9 +17,9 @@ The history order is reversed so that new features are at the top.
 	  Perl5 check.
 	- Eric Sunshine fixed bugs in csperl5.mak where swigperl5gen was not
 	  declared .PHONY.
-	- res changed the nomenclature in the apimod paragraph about iPolygonMesh
-	  changes, after Jorrit pointed out it should rather read 'object' instead
-	  of 'factory'.
+	- res changed the nomenclature in the apimod paragraph about
+	  iPolygonMesh changes, after Jorrit pointed out it should rather
+	  read 'object' instead of 'factory'.
 8-May-2003
 	- Eric Sunshine fixed problem in MacOS/X OpenGL canvas where it was not
 	  specifying its SCF dependency properly.
