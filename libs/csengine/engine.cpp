@@ -554,7 +554,9 @@ void csEngine::Clear ()
   for (i = collections.Length () -1; i >= 0 ; i--)
     RemoveCollection ((csCollection*)collections.Get (i));
 
-  meshes.DeleteAll ();
+  for (i = meshes.Length () -1; i >= 0 ; i--)
+    RemoveMesh ((csMeshWrapper*)meshes.Get (i));
+
   terrains.DeleteAll();
   mesh_factories.DeleteAll ();
   terrain_factories.DeleteAll();
@@ -1384,7 +1386,7 @@ void csEngine::RemoveMesh (csMeshWrapper* mesh)
   if (idx == -1) return;
   meshes[idx] = NULL;
   meshes.Delete (idx);
-  mesh->DecRef();
+  mesh->DecRef ();
 }
 
 void csEngine::RemoveMesh (iMeshWrapper* mesh)
@@ -1397,9 +1399,7 @@ void csEngine::RemoveTerrain (csTerrainWrapper* terr)
   terr->ClearSectors ();
   int idx = terrains.Find (terr);
   if (idx == -1) return;
-  terrains[idx] = NULL;
   terrains.Delete (idx);
-  terr->DecRef();
 }
 
 void csEngine::RemoveTerrain (iTerrainWrapper* terr)
