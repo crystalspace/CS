@@ -68,6 +68,7 @@
     }									\
     void Insert (int pos, const ga_type &val, int iGrowStep = 8)	\
     {									\
+      CS_ASSERT (pos>=0 && pos<=length);				\
       SetLength (length + 1, iGrowStep);				\
       memmove (root + pos + 1, root + pos, sizeof (ga_type) * (length - pos - 1)); \
       memcpy (root + pos, &val, sizeof (ga_type));			\
