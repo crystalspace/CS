@@ -100,8 +100,8 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   poly.flat_color_r = 1;
   poly.flat_color_g = 1;
   poly.flat_color_b = 1;
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, use_z_buf);
+  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
+  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD);
 
   // For each frame.
@@ -119,9 +119,9 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
     {
       ddgVector3 *p1, *p2, *p3;
 
-	  p1 =	bt->tri(bt->parent (tvc))->pos();
+	  p3 =	bt->tri(bt->parent (tvc))->pos();
 	  p2 =	bt->tri(bt->v1 (tvc))->pos();
-	  p3 =	bt->tri(bt->v0 (tvc))->pos();
+	  p1 =	bt->tri(bt->v0 (tvc))->pos();
       // DDG vectors work with negative Z pointing forwards.
       float iz;
       float pz[3];
@@ -145,13 +145,14 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
       csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
       int rescount;
       if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) goto not_vis;
+      poly.num = rescount;
 
       poly.vertices[0].z = pz[0];
       poly.vertices[0].u = 0;
       poly.vertices[0].v = 0;
-      poly.vertices[0].r = 0;
-      poly.vertices[0].g = 0;
-      poly.vertices[0].b = 0;
+      poly.vertices[0].r = 1;
+      poly.vertices[0].g = 1;
+      poly.vertices[0].b = 1;
 
       poly.vertices[1].z = pz[1];
       poly.vertices[1].u = 1;
@@ -183,37 +184,35 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 
       triangle[0].x = 0;
       triangle[0].y = 0;
-      clipped_triangle[0].x = 0;
-      clipped_triangle[0].y = 0;
-      poly.vertices[0].z = -1;
+      clipped_triangle[0] = triangle[0];
+      poly.vertices[0].z = 1;
       poly.vertices[0].u = 0;
       poly.vertices[0].v = 0;
-      poly.vertices[0].r = 0;
-      poly.vertices[0].g = 0;
-      poly.vertices[0].b = 0;
+      poly.vertices[0].r = 1;
+      poly.vertices[0].g = 1;
+      poly.vertices[0].b = 1;
 
-      triangle[1].x = 10;
-      triangle[1].y = 0;
-      clipped_triangle[1].x = 10;
-      clipped_triangle[1].y = 0;
-      poly.vertices[1].z = -1;
+      triangle[1].x = 0;
+      triangle[1].y = 30;
+      clipped_triangle[1] = triangle[1];
+      poly.vertices[1].z = 1;
       poly.vertices[1].u = 1;
       poly.vertices[1].v = 0;
       poly.vertices[1].r = 1;
       poly.vertices[1].g = 0;
       poly.vertices[1].b = 0;
 
-      triangle[2].x = 0;
-      triangle[2].y = 10;
-      clipped_triangle[2].x = 0;
-      clipped_triangle[2].y = 10;
-      poly.vertices[2].z = -1;
+      triangle[2].x = 30;
+      triangle[2].y = 0;
+      clipped_triangle[2] = triangle[2];
+      poly.vertices[2].z = 1;
       poly.vertices[2].u = 0;
       poly.vertices[2].v = 1;
       poly.vertices[2].r = 0;
       poly.vertices[2].g = 0;
       poly.vertices[2].b = 1;
-      
+      poly.num = 3;
+
       PreparePolygonFX (&poly, clipped_triangle, rescount, triangle,
       	true);
       rview.g3d->DrawPolygonFX (poly);
