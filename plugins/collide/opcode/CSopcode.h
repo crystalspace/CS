@@ -51,7 +51,7 @@ public:
 	csOPCODECollider* col2;
 	csReversibleTransform T2;
   csCollisionPair *pairs;
-  unsigned int N_pairs;
+  int N_pairs;
   iObjectRegistry *object_reg;
  
  SCF_DECLARE_IBASE;
