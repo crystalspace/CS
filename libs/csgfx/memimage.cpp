@@ -62,11 +62,12 @@ void csImageMemory::FreeImage ()
 {
   if (!destroy_image)
   {
-    // Before the csImageFile destructor fires we first
-    // clear the 'Image' pointer so that it will not try to
-    // deallocate.
+    // Clear the 'Image' and 'Palette' pointers so that they won't be
+    // deallocated later.
     Image = 0;
+    Palette = 0;
   }
+  csImageFile::FreeImage();
 }
 
 csImageMemory::~csImageMemory ()
@@ -74,9 +75,10 @@ csImageMemory::~csImageMemory ()
   if (!destroy_image)
   {
     // Before the csImageFile destructor fires we first
-    // clear the 'Image' pointer so that it will not try to
-    // deallocate.
+    // clear the 'Image' and 'Palette' pointers so that 
+    // it will not try to deallocate.
     Image = 0;
+    Palette = 0;
   }
 }
 

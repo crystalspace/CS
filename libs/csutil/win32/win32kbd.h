@@ -62,13 +62,12 @@ public:
   csWin32KeyboardDriver (iObjectRegistry* r);
 
   virtual void Reset ();
+  virtual void RestoreKeys ();
 
   virtual csPtr<iKeyComposer> CreateKeyComposer ();
 
   bool HandleKeyMessage (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
-
-  void UpdateModifierState ();
 };
 
 #endif // __CS_SYS_WIN32_WIN32KBD_H__

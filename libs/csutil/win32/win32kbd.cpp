@@ -243,6 +243,63 @@ void csWin32KeyboardDriver::Reset ()
   csKeyboardDriver::Reset ();
 }
 
+void csWin32KeyboardDriver::RestoreKeys ()
+{
+  uint8 keystate[256];
+  GetKeyboardState (keystate);
+
+  /*
+    Check the pressed keys and emit proper events for them.
+    @@@ Issue: Windows doesn't allow means to distinguish
+    extended keys here. If you press 'up' on the keypad, you'll
+    get a normal (non-kp) key code.
+   */
+
+  for (int vk = 0; vk < 255; vk++)
+  {
+    if ((vk <= 0x07) ||			  // Skip mouse buttons + unassigned
+      ((vk >= 0x0a) && (vk <= 0x0b)) ||	  // Skip reserved range
+      (vk == 0x5e) ||			  // Reserved
+      ((vk >= 0x88) && (vk <= 0x8f)) ||	  // Unassigned
+      ((vk >= 0x97) && (vk <= 0x9f)) ||	  // Unassigned
+      ((vk >= 0xb8) && (vk <= 0xb9)) ||	  // Reserved
+      ((vk >= 0xc1) && (vk <= 0xda)) ||	  // Reserved, Unassigned
+      (vk == 0xe0) ||			  // Reserved
+      (vk == 0xe8)			  // Unassigned
+      ) continue;
+
+    utf32_char rawCode;
+    utf32_char cookedCode;
+    csKeyCharType charType;
+
+    if ((vk == VK_MENU) || (vk == VK_CONTROL) || (vk == VK_SHIFT))
+      continue;
+
+    if ((keystate[vk] & 0x81) && 
+      Win32KeyToCSKey (vk, 
+      ((vk >= VK_PRIOR) && (vk <= VK_DOWN)) || // Check 'Arrow keys weirdness'
+      ((vk >= VK_INSERT) || (vk <= VK_DELETE)) ? 0x01000000 : 0, // below
+      rawCode, cookedCode, charType))
+    {
+      //SetKeyState (rawCode, true, false);
+      if (CSKEY_IS_MODIFIER (rawCode))
+      {
+	int modType = CSKEY_MODIFIER_TYPE(rawCode);
+	int modNum = CSKEY_MODIFIER_NUM(rawCode);
+
+	if (modifiersState.modifiers[modType] ^ (1 << modNum))
+	  continue;
+	DoKey (rawCode, cookedCode, keystate[vk] & 0x01, false, charType);
+      }
+      else
+      {
+	if (keystate[vk] & 0x80) 
+	  DoKey (rawCode, cookedCode, true, false, charType);
+      }
+    }
+  }
+}
+
 bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message, 
 					      WPARAM wParam, LPARAM lParam)
 {
@@ -301,11 +358,35 @@ bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags,
     case VK_MENU:
       DISTINGUISH_EXTENDED (CSKEY_ALT_LEFT, CSKEY_ALT_RIGHT, CSKEY_ALT);
       return true;
+    case VK_LMENU:
+      rawCode = CSKEY_ALT_LEFT;
+      cookedCode = CSKEY_ALT;
+      return true;
+    case VK_RMENU:
+      rawCode = CSKEY_ALT_RIGHT;
+      cookedCode = CSKEY_ALT;
+      return true;
     case VK_CONTROL:  
       DISTINGUISH_EXTENDED (CSKEY_CTRL_LEFT, CSKEY_CTRL_RIGHT, CSKEY_CTRL);
       return true;
+    case VK_LCONTROL:
+      rawCode = CSKEY_CTRL_LEFT;
+      cookedCode = CSKEY_CTRL;
+      return true;
+    case VK_RCONTROL:
+      rawCode = CSKEY_CTRL_RIGHT;
+      cookedCode = CSKEY_CTRL;
+      return true;
     case VK_SHIFT:
       DISTINGUISH_EXTENDED (CSKEY_SHIFT_LEFT, CSKEY_SHIFT_RIGHT, CSKEY_SHIFT);
+      return true;
+    case VK_LSHIFT:
+      rawCode = CSKEY_SHIFT_LEFT;
+      cookedCode = CSKEY_SHIFT;
+      return true;
+    case VK_RSHIFT:
+      rawCode = CSKEY_SHIFT_RIGHT;
+      cookedCode = CSKEY_SHIFT;
       return true;
     case VK_UP:       
       /*
@@ -479,7 +560,7 @@ bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags,
 	uint8 keystate[256];
 	/*
 	  For a number of keys, emit a special raw code,
-	  but a proecessed cooked code.
+	  but a processed cooked code.
 	 */
 	switch (vKey)
 	{
@@ -584,42 +665,5 @@ bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags,
 #undef DISTINGUISH_EXTENDED
 
   return false;
-}
-
-void csWin32KeyboardDriver::UpdateModifierState ()
-{
-  uint8 keystate[256];
-  GetKeyboardState (keystate);
-
-  memset (&modifiersState, 0, sizeof (modifiersState));
-  if (keystate[VK_LSHIFT] & 0x80)
-    modifiersState.modifiers[csKeyModifierTypeShift] |=
-    (1 << csKeyModifierNumLeft);
-  if (keystate[VK_RSHIFT] & 0x80)
-    modifiersState.modifiers[csKeyModifierTypeShift] |=
-    (1 << csKeyModifierNumRight);
-
-  if (keystate[VK_LCONTROL] & 0x80)
-    modifiersState.modifiers[csKeyModifierTypeCtrl] |=
-    (1 << csKeyModifierNumLeft);
-  if (keystate[VK_RCONTROL] & 0x80)
-    modifiersState.modifiers[csKeyModifierTypeCtrl] |=
-    (1 << csKeyModifierNumRight);
-
-  if (keystate[VK_LMENU] & 0x80)
-    modifiersState.modifiers[csKeyModifierTypeAlt] |=
-    (1 << csKeyModifierNumLeft);
-  if (keystate[VK_RMENU] & 0x80)
-    modifiersState.modifiers[csKeyModifierTypeAlt] |=
-    (1 << csKeyModifierNumRight);
-
-  if (keystate[VK_CAPITAL] & 0x01)
-    modifiersState.modifiers[csKeyModifierTypeCapsLock] = 1;
-  if (keystate[VK_SCROLL] & 0x01)
-    modifiersState.modifiers[csKeyModifierTypeScrollLock] = 1;
-  if (keystate[VK_NUMLOCK] & 0x01)
-    modifiersState.modifiers[csKeyModifierTypeNumLock] = 1;
-
-  // @@@ Hm, call SetKeyState() for pressed keys?
 }
 

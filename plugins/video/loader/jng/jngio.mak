@@ -49,7 +49,7 @@ MSVC.DSP += CSJNGIMG
 DSP.CSJNGIMG.NAME = csjngimg
 DSP.CSJNGIMG.TYPE = plugin
 DSP.CSJNGIMG.LIBS = libmng zlib libjpeg
-DSP.CSJNGIMG.DELAYLIBS = libmng zlib libjpeg
+DSP.CSJNGIMG.DELAYLIBS = libmng libz libjpeg
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

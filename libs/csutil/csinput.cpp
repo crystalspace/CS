@@ -62,7 +62,7 @@ void csInputDriver::StartListening()
     csRef<iEventQueue> q (GetEventQueue());
     if (q != 0)
     {
-      q->RegisterListener(Listener, CSMASK_Command);
+      q->RegisterListener(Listener, CSMASK_Broadcast);
       Registered = true;
     }
   }
@@ -89,11 +89,16 @@ void csInputDriver::Post(iEvent* e)
 
 bool csInputDriver::HandleEvent(iEvent& e)
 {
-  bool const mine = (e.Type == csevBroadcast &&
-    e.Command.Code == cscmdFocusChanged && !e.Command.Info);
-  if (mine) // Application lost focus.
-    LostFocus();
-  return mine;
+  const bool focusChanged = (e.Type == csevBroadcast &&
+    e.Command.Code == cscmdFocusChanged);
+  if (focusChanged) 
+  {
+    if (!e.Command.Info) // Application lost focus.
+      LostFocus();
+    if (e.Command.Info) // Application gained focus.
+      GainFocus();
+  }
+  return focusChanged;
 }
 
 //-----------------------------------------------------------------------------
@@ -329,7 +334,7 @@ void csKeyboardDriver::Reset ()
   csHash<bool, utf32_char>::GlobalIterator keyIter =
     keyStates.GetIterator ();
   
-  while (keyIter.HasNext ());
+  while (keyIter.HasNext ())
   {
     utf32_char rawCode;
     bool isDown = keyIter.Next (rawCode);
@@ -338,6 +343,17 @@ void csKeyboardDriver::Reset ()
       DoKey (rawCode, 0, false);
     }
   }
+}
+
+void csKeyboardDriver::RestoreKeys ()
+{
+  /*
+    This should set the 'key down' flags and emit KeyDown events for all
+    actually pressed keys. However, retrieving the pressed keys is highly 
+    platform-dependent, so this method needs to overridden or alternatively
+    DoKey() should be called for each pressed key by some other object with 
+    knowledge about the keyboard, e.g. the canvas.
+   */
 }
 
 void csKeyboardDriver::DoKey (utf32_char codeRaw, utf32_char codeCooked, 

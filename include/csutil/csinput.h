@@ -51,6 +51,7 @@ protected:
   csInputDriver(iObjectRegistry*);
   virtual ~csInputDriver();
   csPtr<iEventQueue> GetEventQueue();
+  virtual void GainFocus() = 0;
   virtual void LostFocus() = 0;
   virtual void Post(iEvent*);
   virtual bool HandleEvent(iEvent&);
@@ -110,6 +111,8 @@ public:
 
   /// Call to release all key down flags.
   virtual void Reset ();
+  /// Call to get the key down flags in sync with the actual pressed keys.
+  virtual void RestoreKeys ();
 
   /**
    * Call this routine to add a key down/up event to queue.
@@ -155,6 +158,7 @@ public:
 
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
+  virtual void GainFocus() { RestoreKeys(); }
 
   /// iEventHandler implementation
   struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler
@@ -226,6 +230,7 @@ public:
 
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
+  virtual void GainFocus() { }
 
   /// iEventHandler implementation
   struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler
@@ -285,6 +290,7 @@ public:
 
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
+  virtual void GainFocus() { }
 
   /// iEventHandler implementation
   struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler

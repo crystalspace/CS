@@ -15,6 +15,15 @@ chronological order.
 	  This change also means that DrawTest no longer is used in the NR
 	  way of doing things. Instead GetRenderMeshes now does the job of both
 	  DrawTest and GetRenderMeshes.
+	- res fixed the ball plugin to correctly update the lighting and use
+	  the set mixmode on NR.
+	- res fixed a few compiler warnings after the cs-win32libs update.
+	- res fixed csInputDriver so it actually can receive focus changed
+	  event.
+	- res updated the Win32 keyboard driver to do more sophisticated key
+	  state restoration after the CS window gained focus.
+	- res fixed csImageMemory to also not delete the Palette if the image
+	  isn't to be deleted.
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
 	  textures wasn't called, and is now called on access in the shader

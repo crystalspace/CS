@@ -740,7 +740,6 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   UpdateBufferSV ();
   mater->Visit ();
 
-
   //first, check if we have any usable mesh
   if(lastMeshPtr->inUse == true)
   {
@@ -762,7 +761,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   }
   
   lastMeshPtr->inUse = true;
-  lastMeshPtr->mixmode = CS_FX_COPY; // MixMode;
+  lastMeshPtr->mixmode = MixMode;
   lastMeshPtr->clip_portal = clip_portal;
   lastMeshPtr->clip_plane = clip_plane;
   lastMeshPtr->clip_z_plane = clip_z_plane;
@@ -855,6 +854,8 @@ void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     iMovable* movable)
 {
   if (generated_colors) return;
+
+  ball_colors_dirty_flag = true;
 
   int i, l;
   csColor* colors = ball_colors;

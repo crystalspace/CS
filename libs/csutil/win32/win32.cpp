@@ -135,8 +135,6 @@ public:
    */
   bool HandleKeyMessage (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
-  /// Instruct the keyboard driver to update the modifier flags.
-  void UpdateKeyboardModifiers ();
 };
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
@@ -660,8 +658,6 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
         outlet->Broadcast (cscmdFocusChanged,
           (void *)(LOWORD (wParam) != WA_INACTIVE));
-	if (LOWORD (wParam) != WA_INACTIVE)
-	  GLOBAL_ASSISTANT->UpdateKeyboardModifiers ();
       }
       break;
     case WM_CREATE:
@@ -945,10 +941,5 @@ bool Win32Assistant::HandleKeyMessage (HWND hWnd, UINT message,
 				       WPARAM wParam, LPARAM lParam)
 {
   return kbdDriver->HandleKeyMessage (hWnd, message, wParam, lParam);
-}
-
-void Win32Assistant::UpdateKeyboardModifiers ()
-{
-  kbdDriver->UpdateModifierState ();
 }
 
