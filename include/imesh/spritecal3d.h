@@ -69,6 +69,11 @@ struct iSpriteCal3DSocket : public iBase
   virtual void SetMeshIndex (int m_index) = 0;
   /// Get the index of the mesh for the socket.
   virtual int GetMeshIndex () const = 0;
+
+  /// Set the transform of the main mesh
+  virtual void SetTransform (const csReversibleTransform & trans) = 0;
+  /// Get the transform of the main mesh
+  virtual csReversibleTransform GetTransform () const = 0;
 };
 
 

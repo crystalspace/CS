@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Sep-2004
+	- Andrew Robberts updated sprcal3d to allow for transformations of
+	  a mesh attached to a socket.
 10-Sep-2004
 	- Eric Sunshine fixed bugs in walktest/Jamfile where it unconditionally
 	  attempted to add several optional modules to the "walkall" compile

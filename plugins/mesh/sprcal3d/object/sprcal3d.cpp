@@ -109,6 +109,13 @@ void csSpriteCal3DSocket::SetName (char const* n)
     name = 0;
 }
 
+void csSpriteCal3DSocket::SetMeshWrapper (iMeshWrapper* mesh)
+{
+  attached_mesh = mesh;
+  csMatrix3 mat;
+  mat.Identity();
+  attached_mesh_trans = csReversibleTransform(mat, csVector3(0,1,0));
+}
 
 //--------------------------------------------------------------------------
 
@@ -1559,7 +1566,8 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
     csReversibleTransform trans = movable->GetFullTransform();
     trans.SetOrigin(center);
     trans.LookAt(normal, up);
-    movable->SetTransform(trans);
+
+    movable->SetTransform(socket->GetTransform()*trans);
     movable->UpdateMove();
 
   }

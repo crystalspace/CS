@@ -97,7 +97,12 @@ class csSpriteCal3DSocket : public iSpriteCal3DSocket
     int triangle_index;
     int submesh_index;
     int mesh_index;
+
+    // following are for the primary attached mesh
     iMeshWrapper *attached_mesh;
+    csReversibleTransform attached_mesh_trans;
+
+    
 
   public:
 
@@ -112,7 +117,7 @@ class csSpriteCal3DSocket : public iSpriteCal3DSocket
     virtual char const* GetName () const { return name; }
 
     /// Set the attached sprite.
-    virtual void SetMeshWrapper (iMeshWrapper* mesh) {attached_mesh = mesh;}
+    virtual void SetMeshWrapper (iMeshWrapper* mesh);
     /// Get the attached sprite.
     virtual iMeshWrapper* GetMeshWrapper () const {return attached_mesh;}
 
@@ -130,6 +135,11 @@ class csSpriteCal3DSocket : public iSpriteCal3DSocket
     virtual void SetMeshIndex (int m_index) { mesh_index = m_index;}
     /// Get the index of the mesh for the socket.
     virtual int GetMeshIndex () const {return mesh_index;}
+
+    /// Set the transform of the main mesh
+    virtual void SetTransform (const csReversibleTransform & trans) { attached_mesh_trans = trans; }
+    /// Get the transform of the main mesh
+    virtual csReversibleTransform GetTransform () const { return attached_mesh_trans; }
 
     SCF_DECLARE_IBASE;
 };
