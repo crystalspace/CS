@@ -72,13 +72,19 @@ chronological order.
 	  "jam freezemasterheaders".
 	- Eric Sunshine augmented jobber.pl so that it keeps the new master
 	  header files up-to-date.
-	- Eric Sunshine began the task of making the CS headers self-contained
-	  and responsible for their own needs so that they will actually work
-	  correctly in conjunction with <crystalspace.h>. (Some headers expect
-	  that the .cpp file has #included other headers upon which they
-	  depend, but this is incorrect behavior.)
+	- Eric Sunshine cleaned up the CS headers so that they are
+	  self-contained and responsible for their own needs. This allows them
+	  to work correctly in in the context of, and in conjunction with,
+	  <crystalspace.h>. (Some headers expected that the .cpp file had
+	  #included other headers upon which they depend, but this is incorrect
+	  behavior. Other headers had various other problems.)
 	- Eric Sunshine removed the long-deprecated csutil/rng.h.  Use
 	  csutil/randomgen.h instead.
+	- Eric Sunshine augmented configure.ac so that the VOS check emits
+	  CS_HAS_VOS to csconfig.h when VOS is present. inetwork/vosapi.h now
+	  checks for the presence of this control macro before trying to
+	  #include <vos/vos/vos.hh>. This allows vosapi.h to work correctly
+	  with <crystalspace.h> and <inetwork.h> even if VOS is not present.
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:

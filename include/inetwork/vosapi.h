@@ -20,6 +20,8 @@
 #ifndef __CS_INETWORK_VOSAPI_H__
 #define __CS_INETWORK_VOSAPI_H__
 
+#ifdef CS_HAS_VOS
+
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 #include "iengine/mesh.h"
@@ -32,5 +34,7 @@ struct iVosApi : public iBase
 {
     virtual VOS::vRef<VOS::Vobject> GetVobject() = 0;
 };
+
+#endif // CS_HAS_VOS
 
 #endif

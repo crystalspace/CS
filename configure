@@ -28195,6 +28195,8 @@ fi
 
 fi
 
+	cs_header_text="${cs_header_text}#define CS_HAS_VOS
+"
 fi
 
 fi

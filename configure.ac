@@ -1498,7 +1498,8 @@ AS_IF([test "$with_vos" != no],
 		[cs_cv_libvos=no])],
 	    [cs_cv_libvos=no])])
     AS_IF([test $cs_cv_libvos = yes],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libvos], [VOS])])])
+	[CS_EMIT_BUILD_RESULT([cs_cv_libvos], [VOS])
+	CS_HEADER_PROPERTY([CS_HAS_VOS])])])
 
 
 
