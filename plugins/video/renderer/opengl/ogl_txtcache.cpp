@@ -699,7 +699,7 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s)
 
 void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
 {
-    Setup ();
+  Setup ();
 
   iLightMap* piLM = polytex->GetLightMap ();
   if (piLM == NULL) return;
@@ -768,14 +768,14 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
         }
 
 	if (clm)
-  { 
+  	{ 
 	  clm->super_lm_idx = prev_lm;
 	  num_proc = 0;	// Stop.
         }
 	else 
-  { 
-    num_proc--;
-  }
+  	{ 
+	  num_proc--;
+	}
       }
 
       if (!clm)
@@ -797,10 +797,10 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
 
 	// Now allocate the first lightmap in this super-lightmap.
 	// This can not fail.
-	  SourceData sd;
-    sd.LMDataSource = piLM;
-    clm = (csLMCacheData*)suplm[cur_lm].Alloc (lmwidth, lmheight, sd);
-	  clm->super_lm_idx = cur_lm;
+	SourceData sd;
+	sd.LMDataSource = piLM;
+	clm = (csLMCacheData*)suplm[cur_lm].Alloc (lmwidth, lmheight, sd);
+	clm->super_lm_idx = cur_lm;
       }
     }
 
@@ -812,8 +812,6 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
     polytex->GetTextureBox (lm_low_u, lm_low_v, lm_high_u, lm_high_v);
 
     // lightmap fudge factor
- 
-
     if (lm_high_u <= lm_low_u)
       clm->lm_scale_u = 1.;       // @@@ Is this right?
     else
@@ -824,25 +822,25 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
     else
       clm->lm_scale_v = 1. / (lm_high_v - lm_low_v);
 
-	  lm_low_u -= .75 / (double (lmwidth) * clm->lm_scale_u);
-	  lm_high_u += .75 / (double (lmwidth) * clm->lm_scale_u);
+    lm_low_u -= .75 / (double (lmwidth) * clm->lm_scale_u);
+    lm_high_u += .75 / (double (lmwidth) * clm->lm_scale_u);
 
     lm_low_v -= .75 / (double (lmheight) * clm->lm_scale_v);
-	  lm_high_v += .75 / (double (lmheight) * clm->lm_scale_v);
+    lm_high_v += .75 / (double (lmheight) * clm->lm_scale_v);
 
-  	clm->lm_scale_u = 1.00 / (lm_high_u - lm_low_u);
-	  clm->lm_scale_v = 1.00 / (lm_high_v - lm_low_v);
+    clm->lm_scale_u = 1.00 / (lm_high_u - lm_low_u);
+    clm->lm_scale_v = 1.00 / (lm_high_v - lm_low_v);
 
-	  // We take 95% of the total
-	  // Calculate position in super lightmap.
+    // We take 95% of the total
+    // Calculate position in super lightmap.
     float dlm = 1. / float (super_lm_size);
     float sup_u = float (clm->super_lm_rect.xmin) * dlm;
     float sup_v = float (clm->super_lm_rect.ymin) * dlm;
     clm->lm_scale_u = clm->lm_scale_u * float (lmwidth) * dlm;
     clm->lm_scale_v = clm->lm_scale_v * float (lmheight) * dlm;
     
-	  clm->lm_offset_u = lm_low_u - sup_u / clm->lm_scale_u;
-	  clm->lm_offset_v = lm_low_v - sup_v / clm->lm_scale_v;
+    clm->lm_offset_u = lm_low_u - sup_u / clm->lm_scale_u;
+    clm->lm_offset_v = lm_low_v - sup_v / clm->lm_scale_v;
   }
 }
 
@@ -896,14 +894,14 @@ void OpenGLLightmapCache::Flush ()
   csGraphics3DOGLCommon::SetupBlend (CS_FX_ALPHA, 0, false);
   csGraphics3DOGLCommon::SetClientStates (CS_CLIENTSTATE_ALL);
   glShadeModel (GL_SMOOTH);
-  for(i = 0; i < super_lm_num;i++)
+  for (i = 0; i < super_lm_num;i++)
   {
-    if(!suplm[i].cacheData)
+    if (!suplm[i].cacheData)
     {
-     suplm[i].queue.Reset();
-     continue;
+      suplm[i].queue.Reset();
+      continue;
     }
-    if(suplm[i].cacheData->HasFog())
+    if (suplm[i].cacheData->HasFog())
     { 
       csSLMCacheData* cacheData = (csSLMCacheData*) suplm[i].cacheData;
       suplm[i].queue.FlushFog(cacheData->FogHandle);
