@@ -84,9 +84,8 @@ int ctQuatRigidBody::set_delta_state(real *sa) {
   sa[4] = F[1] / mass;
   sa[5] = F[2] / mass;
 
-  ctQuaternion qdot(get_omega());
+  ctQuaternion qdot(get_omega() * 0.5);
   qdot *= quat;
-  qdot.r *= 0.5;
   sa[6] = qdot.r;
   sa[7] = qdot.x;
   sa[8] = qdot.y;
