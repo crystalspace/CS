@@ -33,6 +33,8 @@ chronological order.
 	- Jorrit made 'ieplex' optional in walktest and then removed the
 	  target from 'jam walkall'.
 	- Jorrit removed 'crossbld' from the 'meshes' target.
+	- Eric Sunshine removed 8-bit character from csjoywin.h, csjoylin.h,
+	  and csjoylin.cpp.
 15-Oct-2003
 	- Eric Sunshine fixed a bug in RemoveDups from helper.jam.  It was
 	  trying to dereference a variable using an 8-bit character instead of
