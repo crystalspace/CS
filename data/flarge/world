@@ -304,6 +304,7 @@
     <start>
         <sector>room</sector>
         <position x="0" y="0" z="0" />
+	<!-- <farplane a="0" b="0" c="1" d="10" /> -->
     </start>
     <meshfact name="square">
         <plugin>meshFact</plugin>
@@ -406,99 +407,6 @@
     <meshfact name="treeFact">
         <plugin>treeFact</plugin>
         <params />
-    </meshfact>
-    <meshfact name="sprSkelFact">
-        <plugin>spr3dFact</plugin>
-        <params>
-            <material>green_color</material>
-            <frame name="f1">
-                <v x="-0.1" y="-1" z="0.1" u="0.5" v="0.5" />
-                <v x="0.1" y="-1" z="0.1" u="0" v="0.5" />
-                <v x="-0.1" y="-1" z="-0.1" u="0.5" v="0" />
-                <v x="0.1" y="-1" z="-0.1" u="0.5" v="1" />
-                <v x="-0.1" y="0" z="0.1" u="1" v="0.5" />
-                <v x="0.1" y="0" z="0.1" u="1" v="1" />
-                <v x="-0.1" y="0" z="-0.1" u="1" v="0" />
-                <v x="0.1" y="0" z="-0.1" u="0" v="1" />
-                <v x="0" y="2" z="0" u="0.5" v="1" />
-                <v x="0" y="2" z="0" u="0" v="1" />
-                <v x="0" y="2" z="0" u="1" v="1" />
-                <v x="0" y="2" z="0" u="1" v="0.5" />
-            </frame>
-            <action name="default">
-                <f name="f1" delay="1000" />
-            </action>
-            <t v1="0" v2="3" v3="1" />
-            <t v1="0" v2="2" v3="3" />
-            <t v1="6" v2="7" v3="3" />
-            <t v1="6" v2="3" v3="2" />
-            <t v1="7" v2="5" v3="1" />
-            <t v1="7" v2="1" v3="3" />
-            <t v1="4" v2="6" v3="2" />
-            <t v1="4" v2="2" v3="0" />
-            <t v1="5" v2="4" v3="0" />
-            <t v1="5" v2="0" v3="1" />
-            <t v1="4" v2="5" v3="7" />
-            <t v1="4" v2="7" v3="6" />
-            <t v1="8" v2="5" v3="7" />
-            <t v1="8" v2="7" v3="6" />
-            <t v1="8" v2="6" v3="4" />
-            <t v1="8" v2="4" v3="5" />
-            <t v1="9" v2="5" v3="7" />
-            <t v1="9" v2="7" v3="6" />
-            <t v1="9" v2="6" v3="4" />
-            <t v1="9" v2="4" v3="5" />
-            <t v1="10" v2="5" v3="7" />
-            <t v1="10" v2="7" v3="6" />
-            <t v1="10" v2="6" v3="4" />
-            <t v1="10" v2="4" v3="5" />
-            <t v1="11" v2="5" v3="7" />
-            <t v1="11" v2="7" v3="6" />
-            <t v1="11" v2="6" v3="4" />
-            <t v1="11" v2="4" v3="5" />
-            <skeleton name="skel">
-                <v>0</v>
-                <v>1</v>
-                <v>2</v>
-                <v>3</v>
-                <v>4</v>
-                <v>5</v>
-                <v>6</v>
-                <v>7</v>
-                <limb name="l1">
-                    <v>8</v>
-                    <transform>
-                        <matrix>
-                            <rotz>0.3</rotz>
-                        </matrix>
-                    </transform>
-                </limb>
-                <limb name="l2">
-                    <v>9</v>
-                    <transform>
-                        <matrix>
-                            <rotz>-0.3</rotz>
-                        </matrix>
-                    </transform>
-                </limb>
-                <limb name="l3">
-                    <v>10</v>
-                    <transform>
-                        <matrix>
-                            <rotx>0.3</rotx>
-                        </matrix>
-                    </transform>
-                </limb>
-                <limb name="l4">
-                    <v>11</v>
-                    <transform>
-                        <matrix>
-                            <rotx>-0.3</rotx>
-                        </matrix>
-                    </transform>
-                </limb>
-            </skeleton>
-        </params>
     </meshfact>
     <meshfact name="sprFrameFact">
         <plugin>spr3dFact</plugin>
@@ -5784,16 +5692,6 @@
             </params>
             <move>
                 <v x="-17" y="-.7" z="18" />
-            </move>
-        </meshobj>
-        <meshobj name="sprSkel">
-            <plugin>spr3d</plugin>
-            <params>
-                <factory>sprSkelFact</factory>
-                <action>default</action>
-            </params>
-            <move>
-                <v x="1.5" y="0.3" z="14" />
             </move>
         </meshobj>
         <meshobj name="sprFrame">
