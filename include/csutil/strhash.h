@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Martin Geisse <mgeisse@gmx.net>
+    Copyright (C) 2002 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,32 +16,45 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_STRSET_H__
-#define __CS_STRSET_H__
+#ifndef __CS_STRHASH_H__
+#define __CS_STRHASH_H__
 
-#include "csutil/strhash.h"
+#include "csutil/hashmap.h"
 
 /**\file
  */
  
 /**
- * The string set is a list of strings, all with different content. Each
- * string has an ID number. The most important operation is to request a
- * string, which means to return the ID for the string, adding it to the
- * list if it is not already there.
+ * An identifier for a string. This identifier is equivalent to the contents
+ * of a string: If two strings have the same content, they have get the same
+ * identifier. If they have different content, they get different identifiers.
  */
-class csStringSet
+typedef uint32 csStringID;
+/// this ID is the 'invalid' value
+csStringID const csInvalidStringID = ~0;
+
+/**
+ * The string hash is a hash of strings, all with different content. Each
+ * string has an ID number.
+ */
+class csStringHash
 {
-  csStringHash Registry;
-  csStringID IDCounter;
+private:
+  csHashMap Registry;
+
 public:
   /// Constructor
-  csStringSet ();
+  csStringHash ();
   /// Destructor
-  ~csStringSet ();
+  ~csStringHash ();
 
   /**
-   * Request the ID for the given string. Create a new ID
+   * Register a string with an id.
+   */
+  void Register (const char *s, csStringID id);
+
+  /**
+   * Request the ID for the given string. Return csInvalidStringID
    * if the string was never requested before.
    */
   csStringID Request (const char *s);
@@ -53,10 +66,9 @@ public:
   const char* Request (csStringID id);
 
   /**
-   * Delete all stored strings. When new strings are registered again, new
-   * ID values will be used, not the old ones reused.
+   * Delete all stored strings.
    */
   void Clear ();
 };
 
-#endif // __CS_STRSET_H__
+#endif // __CS_STRHASH_H__

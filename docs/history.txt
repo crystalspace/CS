@@ -41,6 +41,10 @@ The history order is reversed so that new features are at the top.
 	- Steven Geens added a motion test program. With this program you can
 	  see the motion manager in action.
 	- Steven Geens also fixed bugs in the Milkshape 2 CS convertor.
+	- Added new csStringHash class. This is a simple hash of strings
+	  where you can assign unique id's to strings. The old csStringSet
+	  (which differs because it automatically assigns id's) now uses
+	  this new csStringHash.
 7-Aug-2002
 	- Eric Sunshine fixed a couple problems with csconf.mak.  First, it was
 	  using " instead of $".  It was using the hardcoded path "out/"

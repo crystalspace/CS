@@ -20,16 +20,6 @@
 #include "csutil/strset.h"
 #include "csutil/util.h"
 
-struct csRegisteredString
-{
-  csStringID ID;
-  char *String;
-  csRegisteredString()
-  { String = NULL; }
-  ~csRegisteredString()
-  { delete [] String; }
-};
-
 csStringSet::csStringSet ()
 {
   IDCounter = 0;
@@ -37,54 +27,30 @@ csStringSet::csStringSet ()
 
 csStringSet::~csStringSet ()
 {
-  Clear ();
 }
 
 csStringID csStringSet::Request (const char *Name)
 {
-  csRegisteredString *itf;
-  csHashKey hkey = csHashCompute (Name);
-
-  csHashIterator it (&Registry, hkey);
-  while (it.HasNext ())
+  csStringID id = Registry.Request (Name);
+  if (id == csInvalidStringID)
   {
-    itf = (csRegisteredString*) it.Next ();
-    if (strcmp (itf->String, Name)==0)
-      return itf->ID;
+    Registry.Register (Name, IDCounter);
+    IDCounter++;
+    return IDCounter-1;
   }
-
-  itf = new csRegisteredString ();
-  itf->String = csStrNew (Name);
-  itf->ID = IDCounter;
-  IDCounter++;
-
-  Registry.Put (hkey, itf);
-  return itf->ID;
+  else
+  {
+    return id;
+  }
 }
 
 const char* csStringSet::Request (csStringID id)
 {
-  csRegisteredString *itf;
-
-  csHashIterator it (&Registry);
-  while (it.HasNext ())
-  {
-    itf = (csRegisteredString*) it.Next ();
-    if (itf->ID == id)
-      return itf->String;
-  }
-
-  return NULL;
+  return Registry.Request (id);
 }
 
 void csStringSet::Clear ()
 {
-  csHashIterator it (&Registry);
-
-  while (it.HasNext ())
-  {
-    csRegisteredString *s = (csRegisteredString*) it.Next ();
-    delete s;
-  }
-  Registry.DeleteAll ();
+  Registry.Clear ();
 }
+
