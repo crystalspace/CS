@@ -271,6 +271,8 @@ void csSimpleConsole::PutMessage (bool advance, const char *iText)
     LineMessageNumber++;
 }
 
+CS_IMPLEMENT_STATIC_VAR(GetTextBuf, csString, ());
+
 void csSimpleConsole::PutTextV (const char *iText2, va_list args)
 {
   csScopedMutexLock lock (mutex);
@@ -285,8 +287,8 @@ void csSimpleConsole::PutTextV (const char *iText2, va_list args)
   if (iText2 == 0 || *iText2 == 0)
     goto Done;
 
-  char iText[4096];
-  vsprintf (iText, iText2, args);
+  csString& iText = *GetTextBuf();
+  iText.FormatV (iText2, args);
 
   len = strlen (Line [LineNumber]);
   dst = Line [LineNumber] + len;

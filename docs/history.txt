@@ -79,6 +79,8 @@ chronological order.
 	  python23_d.lib is used on MSVC.
 	- res fixed some VC6 compile errors in some shader plugin and updated
 	  some shader plugin makefiles to utilize the common shaderplugin code.
+	- res changed char arrays on the stack to csStrings in stdrep and 
+	  simpcon to avoid buffer overflows.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.

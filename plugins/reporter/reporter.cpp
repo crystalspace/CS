@@ -122,11 +122,13 @@ void csReporter::Report (int severity, const char* msgId,
   va_end (arg);
 }
 
+CS_IMPLEMENT_STATIC_VAR(GetReportBuf, csString, ());
+
 void csReporter::ReportV (int severity, const char* msgId,
   	const char* description, va_list arg)
 {
-  char buf[4000];
-  vsprintf (buf, description, arg);
+  csString& buf = *GetReportBuf();
+  buf.FormatV (description, arg);
 
   // To ensure thread-safety we first copy the listeners.
   csRefArray<iReporterListener> copy;
