@@ -33,6 +33,7 @@
 #include "csengine/sector.h"
 #include "csengine/scripts/csscript.h"
 #include "csengine/scripts/intscri.h"
+#include "csengine/2d/csspr2d.h"
 #include "csutil/scanstr.h"
 #include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
@@ -679,6 +680,7 @@ WalkTest::WalkTest () : SysSystemDriver ()
   infinite_maze = NULL;
   wMissile_boom = NULL;
   wMissile_whoosh = NULL;
+  cslogo = NULL;
 
   do_fps = true;
   do_stats = false;
@@ -699,6 +701,7 @@ WalkTest::~WalkTest ()
   CHK (delete layer);
   CHK (delete view);
   CHK (delete infinite_maze);
+  CHK (delete cslogo);
 }
 
 bool WalkTest::ParseArg (int argc, char* argv[], int& i)
