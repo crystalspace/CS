@@ -237,7 +237,7 @@ public:
   const csBox3& GetBoundingBox() const { return bbox;}
 
   /// Get the root rectangle vertices, array of 4.
-  csVector3* GetCorners() const {return corners;}
+  csVector3* GetCorners() {return corners;}
 
   /// Make the tree empty again
   void MakeEmpty();
