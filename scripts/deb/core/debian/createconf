@@ -1,6 +1,0 @@
-# !/bin/sh
-CURDIR=$1
-cd $CURDIR/CS
-#This should work but something is buggy there
-#grep cfg $CURDIR/CS/cache.mak | grep -v "^#" | cut -d= -f2 | xargs ls 2>/dev/null | sed 's:^data/::' | sed 's:\(.*$\):etc/crystalspace/\1:' >$CURDIR/debian/crystalspace.conffiles
-ls *.cfg data/config/*.cfg | sed 's:^data/::' | sed 's:\(.*$\):etc/crystalspace/\1:' >$CURDIR/debian/crystalspace.conffiles

@@ -65,7 +65,7 @@ install: build xpms
 
 %.xpm: %.jpg
 	convert -size 32x32 $< $@
-	mogrify -format xpm -geometry 32x32 -map /usr/X11R6/include/X11/pixmaps/cmap.xpm $@ || true
+	mogrify -format xpm -geometry 32x32 -map /usr/share/pixmaps/cmap.xpm $@ || true
 
 xpms: $(patsubst %.jpg,%.xpm,$(wildcard $(CURDIR)/data/*.jpg))
 

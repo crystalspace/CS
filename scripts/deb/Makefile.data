@@ -48,7 +48,7 @@ debbuild:
 	cd $(BUILDDIR)/crystalspace-data-$(VERSION); debuild
 
 $(BUILDDIR):
-	mkdir -p $(BUILDDIR)
+	-mkdir -p $(BUILDDIR)
 
 $(BUILDDIR)/crystalspace-data-$(VERSION)/data: $(BUILDDIR)/crystalspace-data-$(VERSION)
 	-mkdir $(BUILDDIR)/crystalspace-data-$(VERSION)/data

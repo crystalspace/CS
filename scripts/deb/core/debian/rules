@@ -50,13 +50,10 @@ configure-stamp:
 #	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
 	# Activating scripts
 	chmod +x $(CURDIR)/debian/createmenus
-	chmod +x $(CURDIR)/debian/createconf
 	chmod +x $(CURDIR)/debian/addmissing
 	chmod +x $(CURDIR)/debian/automan
 	# Creating menus
 	$(CURDIR)/debian/createmenus $(CURDIR)
-	# Creating conffiles
-	$(CURDIR)/debian/createconf $(CURDIR)
 
 	touch configure-stamp
 
@@ -161,7 +158,7 @@ install-arch:
 		$(CURDIR)/debian/tmp/etc/crystalspace
 	# Fed up of missing files, should not have to do this
 	cp $(CURDIR)/CS/data/config/*.cfg \
-		$(CURDIR)/debian/tmp/etc/crystalspace
+		$(CURDIR)/debian/tmp/etc/crystalspace/config
 
 	dh_movefiles -a
 
@@ -178,7 +175,7 @@ install-arch:
 
 %.xpm: %.jpg
 	convert -size 32x32 $< $@
-	mogrify -format xpm -geometry 32x32 -map /usr/X11R6/include/X11/pixmaps/cmap.xpm $@
+	mogrify -format xpm -geometry 32x32 -map /usr/share/pixmaps/cmap.xpm $@
 
 man: $(subst .sgml,, $(wildcard $(CURDIR)/debian/man/*.sgml*))
 %.1: %.sgml.1
@@ -210,8 +207,6 @@ binary-common:
 	dh_strip
 	dh_compress 
 	dh_fixperms
-	# You may want to make some executables suid here.
-	dh_suidregister
 	dh_makeshlibs
 	dh_installdeb
 #	dh_perl
