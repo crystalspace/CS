@@ -22,7 +22,8 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/scf.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
+#include "csutil/refarr.h"
 #include "csutil/scopedmutexlock.h"
 #include "ivaria/reporter.h"
 
@@ -48,8 +49,8 @@ class csReporter : public iReporter
 private:
   csRef<csMutex> mutex;
   iObjectRegistry *object_reg;
-  csVector messages;
-  csVector listeners;
+  csPDelArray<csReporterMessage> messages;
+  csRefArray<iReporterListener> listeners;
 
 public:
   SCF_DECLARE_IBASE;
@@ -64,10 +65,7 @@ public:
   	const char* description, va_list) CS_GNUC_PRINTF (4, 0);
   virtual void Clear (int severity = -1);
   virtual void Clear (const char* mask);
-  virtual int GetMessageCount () const;
-  virtual int GetMessageSeverity (int idx) const;
-  virtual const char* GetMessageId (int idx) const;
-  virtual const char* GetMessageDescription (int idx) const;
+  virtual csPtr<iReporterIterator> GetMessageIterator ();
   virtual void AddReporterListener (iReporterListener* listener);
   virtual void RemoveReporterListener (iReporterListener* listener);
   virtual bool FindReporterListener (iReporterListener* listener);

@@ -11,6 +11,8 @@ The history order is reversed so that new features are at the top.
 	  function which returns an iPluginIterator instance. That instance
 	  takes a copy of the plugin manager so that the plugin manager
 	  is not locked.
+	- Did a similar change to the reporter. There is now also a
+	  iReporter->GetMessageIterator().
 22-Apr-2003
 	- Eric Sunshine added links for the new CrystalDoc translation project
 	  to the Crystal Space web site.  Also cleaned up the web site's main

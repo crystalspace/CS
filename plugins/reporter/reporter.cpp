@@ -33,6 +33,59 @@ SCF_EXPORT_CLASS_TABLE (reporter)
     "Reporting utility")
 SCF_EXPORT_CLASS_TABLE_END
 
+//-----------------------------------------------------------------------
+
+class csReporterIterator : public iReporterIterator
+{
+public:
+  csPDelArray<csReporterMessage> messages;
+  int idx;
+
+public:
+  csReporterIterator ()
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    idx = 0;
+  }
+
+  SCF_DECLARE_IBASE;
+
+  virtual ~csReporterIterator ()
+  {
+  }
+
+  virtual bool HasNext ()
+  {
+    return idx < messages.Length ();
+  }
+
+  virtual void Next ()
+  {
+    idx++;
+  }
+
+  virtual int GetMessageSeverity () const
+  {
+    return messages[idx-1]->severity;
+  }
+
+  virtual const char* GetMessageId () const
+  {
+    return messages[idx-1]->id;
+  }
+
+  virtual const char* GetMessageDescription () const
+  {
+    return messages[idx-1]->description;
+  }
+};
+
+SCF_IMPLEMENT_IBASE (csReporterIterator)
+  SCF_IMPLEMENTS_INTERFACE (iReporterIterator)
+SCF_IMPLEMENT_IBASE_END
+
+//-----------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE (csReporter)
   SCF_IMPLEMENTS_INTERFACE (iReporter)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
@@ -53,12 +106,6 @@ csReporter::csReporter (iBase *iParent)
 csReporter::~csReporter ()
 {
   Clear (-1);
-  while (listeners.Length () > 0)
-  {
-    iReporterListener* listener = (iReporterListener*)listeners[0];
-    listener->DecRef ();
-    listeners.Delete (0);
-  }
 }
 
 bool csReporter::Initialize (iObjectRegistry *object_reg)
@@ -89,7 +136,7 @@ void csReporter::ReportV (int severity, const char* msgId,
     int i;
     for (i = 0 ; i < listeners.Length () ; i++)
     {
-      iReporterListener* listener = (iReporterListener*)listeners[i];
+      iReporterListener* listener = listeners[i];
       copy.Push (listener);
     }
   }
@@ -125,10 +172,9 @@ void csReporter::Clear (int severity)
   int len = messages.Length ();
   while (i < len)
   {
-    csReporterMessage* msg = (csReporterMessage*)messages[i];
+    csReporterMessage* msg = messages[i];
     if (severity == -1 || msg->severity == severity)
     {
-      delete msg;
       messages.Delete (i);
       len--;
     }
@@ -146,10 +192,9 @@ void csReporter::Clear (const char* mask)
   int len = messages.Length ();
   while (i < len)
   {
-    csReporterMessage* msg = (csReporterMessage*)messages[i];
+    csReporterMessage* msg = messages[i];
     if (csGlobMatches (msg->id, mask))
     {
-      delete msg;
       messages.Delete (i);
       len--;
     }
@@ -160,41 +205,26 @@ void csReporter::Clear (const char* mask)
   }
 }
 
-int csReporter::GetMessageCount () const
+csPtr<iReporterIterator> csReporter::GetMessageIterator ()
 {
   csScopedMutexLock lock (mutex);
-  return messages.Length ();
-}
-
-int csReporter::GetMessageSeverity (int idx) const
-{
-  csScopedMutexLock lock (mutex);
-  if (idx < 0 || idx >= messages.Length ()) return -1;
-  csReporterMessage* msg = (csReporterMessage*)messages[idx];
-  return msg->severity;
-}
-
-const char* csReporter::GetMessageId (int idx) const
-{
-  csScopedMutexLock lock (mutex);
-  if (idx < 0 || idx >= messages.Length ()) return NULL;
-  csReporterMessage* msg = (csReporterMessage*)messages[idx];
-  return msg->id;
-}
-
-const char* csReporter::GetMessageDescription (int idx) const
-{
-  csScopedMutexLock lock (mutex);
-  if (idx < 0 || idx >= messages.Length ()) return NULL;
-  csReporterMessage* msg = (csReporterMessage*)messages[idx];
-  return msg->description;
+  csReporterIterator* it = new csReporterIterator ();
+  int i;
+  for (i = 0 ; i < messages.Length () ; i++)
+  {
+    csReporterMessage* msg = new csReporterMessage ();
+    msg->severity = messages[i]->severity;
+    msg->id = csStrNew (messages[i]->id);
+    msg->description = csStrNew (messages[i]->description);
+    it->messages.Push (msg);
+  }
+  return csPtr<iReporterIterator> (it);
 }
 
 void csReporter::AddReporterListener (iReporterListener* listener)
 {
   csScopedMutexLock lock (mutex);
   listeners.Push (listener);
-  listener->IncRef ();
 }
 
 void csReporter::RemoveReporterListener (iReporterListener* listener)
@@ -204,7 +234,6 @@ void csReporter::RemoveReporterListener (iReporterListener* listener)
   if (idx != -1)
   {
     listeners.Delete (idx);
-    listener->DecRef ();
   }
 }
 

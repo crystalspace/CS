@@ -76,7 +76,38 @@ struct iReporterListener : public iBase
   	const char* description) = 0;
 };
 
-SCF_VERSION (iReporter, 0, 0, 3);
+SCF_VERSION (iReporterIterator, 0, 0, 1);
+
+/**
+ * An iterator to iterate over all messages in the reporter.
+ */
+struct iReporterIterator : public iBase
+{
+  /// Are there more elements?
+  virtual bool HasNext () = 0;
+  /**
+   * Get next element. After calling this call one of the
+   * GetBla() functions to get information for the current element.
+   */
+  virtual void Next () = 0;
+
+  /**
+   * Get the message severity for the current element in the iterator.
+   */
+  virtual int GetMessageSeverity () const = 0;
+
+  /**
+   * Get message id.
+   */
+  virtual const char* GetMessageId () const = 0;
+
+  /**
+   * Get message description.
+   */
+  virtual const char* GetMessageDescription () const = 0;
+};
+
+SCF_VERSION (iReporter, 0, 1, 0);
 
 /**
  * This is the interface for the error/message reporter plugin.
@@ -113,24 +144,10 @@ struct iReporter : public iBase
   virtual void Clear (const char* mask) = 0;
 
   /**
-   * Give the number of reported messages currently registered.
+   * Get an iterator to iterate over all messages. This will make a copy
+   * of all messages so that the reporter is not locked.
    */
-  virtual int GetMessageCount () const = 0;
-
-  /**
-   * Get message severity. Returns -1 if message doesn't exist.
-   */
-  virtual int GetMessageSeverity (int idx) const = 0;
-
-  /**
-   * Get message id. Returns NULL if message doesn't exist.
-   */
-  virtual const char* GetMessageId (int idx) const = 0;
-
-  /**
-   * Get message description. Returns NULL if message doesn't exist.
-   */
-  virtual const char* GetMessageDescription (int idx) const = 0;
+  virtual csPtr<iReporterIterator> GetMessageIterator () = 0;
 
   /**
    * Add a listener that listens to new reports. Listeners can optionally
