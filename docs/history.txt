@@ -19,6 +19,8 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+27-May-99:
+	- FLATCOL shading works better now.
 26-May-99:
 	- Received update to MazeD from Siu-Hang <shor@cse.cuhk.edu.hk>.
 	  It enables the creation of sectors and portals so that you can
@@ -39,6 +41,14 @@ Short-term cleanups that need to be done:
 	- Denis fixed the fog routines for correct Z buffer test.
 	- Integrated new 3D sound files from Nathaniel Saint Martin. Lots of
 	  bug fixes and update for EAX from 1.2 to 2.0 sdk.
+	- Thomas Hieber removed loading of standard.zip from CSLoader and
+	  put it in walktest where it belongs.
+	- Thomas enhanced the ds3d sound renderer to have support for proper
+	  volume settings.
+	- Thomas also cleaned up the rc files for VC (no MFC support required)
+	  and removed some of the files in the 'res' folder.
+	- Michael Dale Long added the 'cvsguide.txt' file to the documents
+	  directory.
 24-May-99:
 	- Thomas Hieber added a new mechanism for collision detection to
 	  interface to the rest of the CS engine. He uses the new
