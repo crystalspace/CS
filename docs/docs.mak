@@ -342,13 +342,13 @@ manualinfo: \
 # Rule to convert manual from HTML to MS compressed HTML.
 manualchm: 
 	$(CD) $(OUT.DOC); $(PERL) -I$(SRCDIRABS)/docs/support/winhelp \
-	$(SRCDIRABS)/docs/support/winhelp/gendoctoc.pl html/manual
+	$(SRCDIRABS)/docs/support/winhelp/gendoctoc.pl manual html/manual
 	$(CP) $(SRCDIR)/docs/support/winhelp/csmanual.hhp $(OUT.DOC)
 
 # Rule to convert public API reference from HTML to MS compressed HTML.
 apichm: 
 	$(CD) $(OUT.DOC); $(PERL) -I$(SRCDIRABS)/docs/support/winhelp \
-	$(SRCDIRABS)/docs/support/winhelp/gendoctoc.pl html/api
+	$(SRCDIRABS)/docs/support/winhelp/gendoctoc.pl api html/api
 	$(CP) $(SRCDIR)/docs/support/winhelp/csapi.hhp $(OUT.DOC)
 
 endif # ifeq ($(DO_DOC),yes)

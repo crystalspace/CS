@@ -325,4 +325,13 @@ EOTOCEND
   	close($TOCFILE);
 }
 
-doctoc($ARGV[0]);
+if ($ARGV[0] eq "manual") {
+  doctoc($ARGV[1]);
+}
+elsif ($ARGV[0] eq "api") {
+  apitoc($ARGV[1]);
+}
+else {
+  die "Unrecognized documentation selector: \"$ARGV[0]\"\n" .
+    "Use either \"manual\" or \"api\"\n";
+}
