@@ -132,10 +132,15 @@ void csStringBase::ExpandIfNeeded(size_t NewSize)
 
 void csStringBase::SetGrowsBy (size_t n)
 {
-  if (n < DEFAULT_GROW_BY)
-    n = DEFAULT_GROW_BY;
-  // Round `n' up to multiple of DEFAULT_GROW_BY.
-  GrowBy = (n + DEFAULT_GROW_BY - 1) & ~(DEFAULT_GROW_BY - 1);
+  if (n == 0)
+    GrowBy = 0; // Meaning `grow exponentially'.
+  else
+  {
+    if (n < DEFAULT_GROW_BY)
+      n = DEFAULT_GROW_BY;
+    // Round `n' up to multiple of DEFAULT_GROW_BY.
+    GrowBy = (n + DEFAULT_GROW_BY - 1) & ~(DEFAULT_GROW_BY - 1);
+  }
 }
 
 csStringBase &csStringBase::ShrinkBestFit()
