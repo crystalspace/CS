@@ -558,20 +558,6 @@ This is a list of known problems with the current release of this project.
 
     o Using the -nolight option causes WalkTest to crash very early in
       csScan_CalcBlendTables().
-    o The NextStep compiler generates invalid code at locations which make COM
-      queries for the IID_IHaloRasterizer module.  This is the only COM module
-      which is derived with multiple-inheritance, and it is the only module
-      which causes a crash inside QueryInterface().  The compiler is
-      definitely generating funky & incorrect information.  Currently
-      conditional compilation directives are used to ignore the offending
-      code.
-    o When compiling for sparc, the compiler crashes with an internal compiler
-      error on graph3d.cpp.  This problem is related to the multiple-
-      inheritance used to include IHaloRasterizer in the COM interface table.
-      If I comment out the IHaloRasterizer line from the interface table
-      (BEGIN_INTERFACE_TABLE) in graph2d.cpp, the problem disappears.
-      Currently conditional compilation directives are used to ignore the
-      offending code.
     o Keyboard events generated with the "alt" modifier are not correctly
       translated to Crystal Space events.  The reason is that NextStep "cooks"
       the key-code completely into some other character prior to sending the
@@ -596,6 +582,11 @@ This is a list of known problems with the current release of this project.
         of the problems (specifically broken non-inline constructors).  Now
         I added -O to the compilation directive as well.  This appears to
         handle the rest of the problems.
+    Worked around a NextStep multiple-inheritence compiler bug which in some
+        cases caused the compiler to crash, and in other cases caused the
+        application to crash when querying COM for the halo rasterizer.  In
+        order to fix the problem, I reworked csGraphics3DSoftware so that it
+        implements IHaloRasterizer via composition rather than inheritence.
 
 1999/10/10 (15r000+CVS)
     Reworked dynamic linking so that it deals gracefully with the case when it

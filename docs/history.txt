@@ -23,6 +23,12 @@ Short-term cleanups that need to be done:
 	  csCOM.cfg, rather than the desired Unix section.
 	- Eric Sunshine worked around a register allocation bug in the
 	  OpenStep compiler which was triggered when compiling for 'debug'.
+	- Eric Sunshine Worked around a NextStep multiple-inheritence compiler
+	  bug which, in some cases, caused the compiler to crash, and in other
+	  cases caused the application to crash when querying COM for the halo
+	  rasterizer.  In order to fix the problem, he reworked
+	  csGraphics3DSoftware so that it implements IHaloRasterizer via
+	  composition rather than inheritence.
 10-Oct-1999
 	- Fixed bug in octree outline table which caused octree visibility
 	  culling not to work correctly in some cases.
@@ -71,7 +77,7 @@ Short-term cleanups that need to be done:
 	  significant change which touched about 80 files on account of the
 	  radically different semantics of dynamic linking between NeXT and
 	  CS/COM.  The changes affected every port and every driver in one way
-	  or another.  I also made a number of changes to COM in support of
+	  or another.  He also made a number of changes to COM in support of
 	  this change.
 	- Eric Sunshine collapsed all the copy/paste code from the various
 	  itexture.cpp files, which were spread around in the various 3D
