@@ -56,7 +56,7 @@ $(MDLTEST.EXE): $(DEP.EXE) $(OBJ.MDLTEST) $(LIB.MDLTEST)
 	$(DO.LINK.EXE)
 
 mdltest1clean:
-        -$(RM) $(MDLTEST.EXE) $(OBJ.MDLTEST)
+	-$(RM) $(MDLTEST.EXE) $(OBJ.MDLTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)mdltest.dep
