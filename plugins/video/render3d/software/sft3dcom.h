@@ -229,13 +229,13 @@ struct G3DTriangleMesh
  * This class is the parent for both "normal" software renderer
  * as well as for procedural texture class.
  */
-class csSoftwareRender3DCommon : public iGraphics3D
+class csSoftwareGraphics3DCommon : public iGraphics3D
 {
 protected:
   //friend class csSoftHalo;
 
   /// Driver this driver is sharing info with (if any)
-  csSoftwareRender3DCommon *partner;
+  csSoftwareGraphics3DCommon *partner;
 
   /// if this is a procedural texture manager
   bool is_for_procedural_textures;
@@ -350,16 +350,16 @@ protected:
   csDrawPIScanlineGouraud* ScanProcPIG [0x28];
 
   /// The routine for getting the address of needed scanline_xxx_alpha
-  csDrawScanline* (*ScanProc_Alpha) (csSoftwareRender3DCommon*, int alpha, bool keycolor, bool alphamap);
+  csDrawScanline* (*ScanProc_Alpha) (csSoftwareGraphics3DCommon*, int alpha, bool keycolor, bool alphamap);
 
   /// ScanProc_Alpha for 8 bpp modes
-  static csDrawScanline* ScanProc_8_Alpha (csSoftwareRender3DCommon*,
+  static csDrawScanline* ScanProc_8_Alpha (csSoftwareGraphics3DCommon*,
     int alpha, bool keycolor, bool alphamap);
   /// ScanProc_Alpha for 16 bpp modes
-  static csDrawScanline* ScanProc_16_Alpha (csSoftwareRender3DCommon*,
+  static csDrawScanline* ScanProc_16_Alpha (csSoftwareGraphics3DCommon*,
     int alpha, bool keycolor, bool alphamap);
   /// ScanProc_Alpha for 32 bpp modes
-  static csDrawScanline* ScanProc_32_Alpha (csSoftwareRender3DCommon*,
+  static csDrawScanline* ScanProc_32_Alpha (csSoftwareGraphics3DCommon*,
     int alpha, bool keycolor, bool alphamap);
 
   /// Look for a given fog buffer
@@ -389,7 +389,7 @@ public:
 
   /**
    * Low-level 2D graphics layer.
-   * csSoftwareRender3DCommon is in charge of creating and managing this.
+   * csSoftwareGraphics3DCommon is in charge of creating and managing this.
    */
   csRef<iGraphics2D> G2D;
 
@@ -433,9 +433,9 @@ public:
   static int filter_bf;
 
   /// Setup scanline drawing routines according to current bpp and setup flags
-  csSoftwareRender3DCommon (iBase* parent);
+  csSoftwareGraphics3DCommon (iBase* parent);
   /// Destructor.
-  virtual ~csSoftwareRender3DCommon ();
+  virtual ~csSoftwareGraphics3DCommon ();
 
   /**
    * Initialization method required by iComponent interface.
@@ -713,7 +713,7 @@ public:
   { return display_width; }
 
   /// Capabilities of the driver
-  const csRender3dCaps* GetCaps() const
+  const csGraphics3DCaps* GetCaps() const
   { return 0; }
 
   /// Set the z buffer write/test mode
@@ -797,16 +797,16 @@ public:
 
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csSoftwareRender3DCommon);
+    SCF_DECLARE_EMBEDDED_IBASE(csSoftwareGraphics3DCommon);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
   struct EventHandler : public iEventHandler
   {
   private:
-    csSoftwareRender3DCommon* parent;
+    csSoftwareGraphics3DCommon* parent;
   public:
-    EventHandler (csSoftwareRender3DCommon* parent)
+    EventHandler (csSoftwareGraphics3DCommon* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;

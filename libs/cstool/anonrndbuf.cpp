@@ -50,7 +50,7 @@ iRenderBuffer * csAnonRenderBufferManager::GetRenderBuffer(csStringID name)
 
 bool csAnonRenderBufferManager::AddRenderBuffer (const char *name, csRenderBufferComponentType component_type, int component_size, int numverts)
 {
-  csRef<iGraphics3D> r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -86,7 +86,7 @@ bool csAnonRenderBufferManager::AddRenderBuffer (const char *name, csRenderBuffe
     size = sizeof(double);
     break;
   }
-  newrb->buf = r3d->CreateRenderBuffer (
+  newrb->buf = g3d->CreateRenderBuffer (
         size*component_size*(numverts), CS_BUF_STATIC,
         component_type, component_size, false);
  

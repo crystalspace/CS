@@ -50,7 +50,7 @@
 #  include "video/renderer/software/i386/cpuid.h"
 #endif
 
-int csSoftwareRender3DCommon::filter_bf = 1;
+int csSoftwareGraphics3DCommon::filter_bf = 1;
 
 //-------------------------- The indices into arrays of scanline routines ------
 
@@ -225,20 +225,20 @@ int csSoftwareRender3DCommon::filter_bf = 1;
 #define SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST  0x27
 
 ///---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csSoftwareRender3DCommon)
+SCF_IMPLEMENT_IBASE(csSoftwareGraphics3DCommon)
   SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSoftwareRender3DCommon::eiComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoftwareGraphics3DCommon::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csSoftwareRender3DCommon::EventHandler)
+SCF_IMPLEMENT_IBASE (csSoftwareGraphics3DCommon::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-csSoftwareRender3DCommon::csSoftwareRender3DCommon (iBase* parent)
+csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -292,7 +292,7 @@ csSoftwareRender3DCommon::csSoftwareRender3DCommon (iBase* parent)
     activebuffers[i] = 0;
 }
 
-csSoftwareRender3DCommon::~csSoftwareRender3DCommon ()
+csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
 {
   if (scfiEventHandler)
   {
@@ -312,7 +312,7 @@ csSoftwareRender3DCommon::~csSoftwareRender3DCommon ()
   }
 }
 
-bool csSoftwareRender3DCommon::Initialize (iObjectRegistry* p)
+bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
 {
   object_reg = p;
   if (!scfiEventHandler)
@@ -332,7 +332,7 @@ bool csSoftwareRender3DCommon::Initialize (iObjectRegistry* p)
   return true;
 }
 
-bool csSoftwareRender3DCommon::HandleEvent (iEvent& Event)
+bool csSoftwareGraphics3DCommon::HandleEvent (iEvent& Event)
 {
   if (Event.Type == csevBroadcast)
     switch (Event.Command.Code)
@@ -351,7 +351,7 @@ bool csSoftwareRender3DCommon::HandleEvent (iEvent& Event)
   return false;
 }
 
-void csSoftwareRender3DCommon::NewInitialize ()
+void csSoftwareGraphics3DCommon::NewInitialize ()
 {
   config.AddConfig(object_reg, "/config/soft3d.cfg");
   do_smaller_rendering = config->GetBool ("Video.Software.Smaller", false);
@@ -363,7 +363,7 @@ void csSoftwareRender3DCommon::NewInitialize ()
 #endif
 }
 
-void csSoftwareRender3DCommon::Report (int severity, const char* msg, ...)
+void csSoftwareGraphics3DCommon::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
@@ -378,7 +378,7 @@ void csSoftwareRender3DCommon::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool csSoftwareRender3DCommon::Open ()
+bool csSoftwareGraphics3DCommon::Open ()
 {
   if (!G2D->Open ())
   {
@@ -412,14 +412,14 @@ bool csSoftwareRender3DCommon::Open ()
   if( !shadermgr )
   {
     shadermgr = csPtr<iShaderManager>
-      (CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.render3d.shadermanager", iShaderManager));
+      (CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.graphics3d.shadermanager", iShaderManager));
     object_reg->Register( shadermgr, "iShaderManager");
   }
 
   return true;
 }
 
-bool csSoftwareRender3DCommon::NewOpen ()
+bool csSoftwareGraphics3DCommon::NewOpen ()
 {
 #if defined (DO_MMX)
   int family, features;
@@ -488,7 +488,7 @@ bool csSoftwareRender3DCommon::NewOpen ()
   return true;
 }
 
-bool csSoftwareRender3DCommon::SharedOpen ()
+bool csSoftwareGraphics3DCommon::SharedOpen ()
 {
   pixel_shift = partner->pixel_shift;
   //fog_buffers = partner->fog_buffers;
@@ -505,7 +505,7 @@ bool csSoftwareRender3DCommon::SharedOpen ()
   return true;
 }
 
-void csSoftwareRender3DCommon::ScanSetup ()
+void csSoftwareGraphics3DCommon::ScanSetup ()
 {
   // Select the right scanline drawing functions
   memset (&ScanProc, 0, sizeof (ScanProc));
@@ -1022,8 +1022,8 @@ void csSoftwareRender3DCommon::ScanSetup ()
     }
 }
 
-csDrawScanline* csSoftwareRender3DCommon::ScanProc_16_Alpha
-  (csSoftwareRender3DCommon *This, int alpha, bool keycolor, bool alphamap)
+csDrawScanline* csSoftwareGraphics3DCommon::ScanProc_16_Alpha
+  (csSoftwareGraphics3DCommon *This, int alpha, bool keycolor, bool alphamap)
 {
   csDrawScanline* const ScanProcs[24] = {
     0, csScan_16_scan_map_fixalpha50, csScan_16_scan_map_zfil, csScan_16_565_scan_map_fixalpha,
@@ -1059,8 +1059,8 @@ csDrawScanline* csSoftwareRender3DCommon::ScanProc_16_Alpha
   return ScanProcs[scanproc];
 }
 
-csDrawScanline* csSoftwareRender3DCommon::ScanProc_32_Alpha
-  (csSoftwareRender3DCommon* /*This*/, int alpha, bool keycolor, bool alphamap)
+csDrawScanline* csSoftwareGraphics3DCommon::ScanProc_32_Alpha
+  (csSoftwareGraphics3DCommon* /*This*/, int alpha, bool keycolor, bool alphamap)
 {
   csDrawScanline* const ScanProcs[12] = {
     0, csScan_32_scan_map_fixalpha50, csScan_32_scan_map_zfil, csScan_32_scan_map_fixalpha,
@@ -1087,7 +1087,7 @@ csDrawScanline* csSoftwareRender3DCommon::ScanProc_32_Alpha
   return ScanProcs[scanproc];
 }
 
-void csSoftwareRender3DCommon::Close ()
+void csSoftwareGraphics3DCommon::Close ()
 {
   if ((width == height) && (width == -1))
     return;
@@ -1121,7 +1121,7 @@ void csSoftwareRender3DCommon::Close ()
   width = height = -1;
 }
 
-void csSoftwareRender3DCommon::SetDimensions (int nwidth, int nheight)
+void csSoftwareGraphics3DCommon::SetDimensions (int nwidth, int nheight)
 {
   display_width = nwidth;
   display_height = nheight;
@@ -1153,16 +1153,16 @@ void csSoftwareRender3DCommon::SetDimensions (int nwidth, int nheight)
   line_table = new uint8* [height+1];
 }
 
-void csSoftwareRender3DCommon::SetClipper (iClipper2D* clip, int cliptype)
+void csSoftwareGraphics3DCommon::SetClipper (iClipper2D* clip, int cliptype)
 {
   if (clip) clip->IncRef ();
   if (clipper) clipper->DecRef ();
   clipper = clip;
   if (!clipper) cliptype = CS_CLIPPER_NONE;
-  csSoftwareRender3DCommon::cliptype = cliptype;
+  csSoftwareGraphics3DCommon::cliptype = cliptype;
 }
 
-bool csSoftwareRender3DCommon::BeginDraw (int DrawFlags)
+bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
 {
   dpfx_valid = false;
 
@@ -1312,7 +1312,7 @@ bool csSoftwareRender3DCommon::BeginDraw (int DrawFlags)
   return true;
 }
 
-void csSoftwareRender3DCommon::Print (csRect *area)
+void csSoftwareGraphics3DCommon::Print (csRect *area)
 {
   G2D->Print (area);
   if (do_interlaced != -1)
@@ -1322,7 +1322,7 @@ void csSoftwareRender3DCommon::Print (csRect *area)
 }
 
 
-void csSoftwareRender3DCommon::FinishDraw ()
+void csSoftwareGraphics3DCommon::FinishDraw ()
 {
   if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
@@ -1450,7 +1450,7 @@ inline static void SelectInterpolationStep (float M)
   }
 }
 
-void csSoftwareRender3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
+void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 {
   int i;
   int max_i, min_i;
@@ -1712,7 +1712,7 @@ void csSoftwareRender3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 }
 #if 0
 
-void csSoftwareRender3DCommon::DrawPolygon (G3DPolygonDP& poly)
+void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
 {
   if (z_buf_mode == CS_ZBUF_FILLONLY)
   {
@@ -2368,12 +2368,12 @@ finish:
   ;
 }
 
-void csSoftwareRender3DCommon::DrawPolygonDebug (G3DPolygonDP& poly)
+void csSoftwareGraphics3DCommon::DrawPolygonDebug (G3DPolygonDP& poly)
 {
   (void)poly;
 }
 
-FogBuffer* csSoftwareRender3DCommon::find_fog_buffer (CS_ID id)
+FogBuffer* csSoftwareGraphics3DCommon::find_fog_buffer (CS_ID id)
 {
   FogBuffer* f = fog_buffers;
   while (f)
@@ -2384,7 +2384,7 @@ FogBuffer* csSoftwareRender3DCommon::find_fog_buffer (CS_ID id)
   return 0;
 }
 
-void csSoftwareRender3DCommon::OpenFogObject (CS_ID id, csFog* fog)
+void csSoftwareGraphics3DCommon::OpenFogObject (CS_ID id, csFog* fog)
 {
   FogBuffer* fb = new FogBuffer ();
   fb->next = fog_buffers;
@@ -2398,7 +2398,7 @@ void csSoftwareRender3DCommon::OpenFogObject (CS_ID id, csFog* fog)
   fog_buffers = fb;
 }
 
-void csSoftwareRender3DCommon::CloseFogObject (CS_ID id)
+void csSoftwareGraphics3DCommon::CloseFogObject (CS_ID id)
 {
   FogBuffer* fb = find_fog_buffer (id);
   if (!fb)
@@ -2413,7 +2413,7 @@ void csSoftwareRender3DCommon::CloseFogObject (CS_ID id)
   delete fb;
 }
 
-void csSoftwareRender3DCommon::DrawFogPolygon (CS_ID id,
+void csSoftwareGraphics3DCommon::DrawFogPolygon (CS_ID id,
 	G3DPolygonDFP& poly, int fog_type)
 {
   int i;
@@ -2663,12 +2663,12 @@ void csSoftwareRender3DCommon::DrawFogPolygon (CS_ID id,
   } /* endfor */
 }
 
-void csSoftwareRender3DCommon::OpenPortal (G3DPolygonDFP* poly)
+void csSoftwareGraphics3DCommon::OpenPortal (G3DPolygonDFP* poly)
 {
   (void)poly;
 }
 
-void csSoftwareRender3DCommon::ClosePortal ()
+void csSoftwareGraphics3DCommon::ClosePortal ()
 {
 }
 #endif
@@ -2700,7 +2700,7 @@ static struct
 
 #define EPS   0.0001
 
-void csSoftwareRender3DCommon::RealStartPolygonFX (iMaterialHandle* handle,
+void csSoftwareGraphics3DCommon::RealStartPolygonFX (iMaterialHandle* handle,
   uint mode, bool use_fog)
 {
   if (!dpfx_valid ||
@@ -2831,7 +2831,7 @@ zfill_only:
   pqinfo.max_b = (1 << (pfmt.BlueBits  + shift_amount + 8)) - 1;
 }
 
-void csSoftwareRender3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
+void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
   RealStartPolygonFX (poly.mat_handle, poly.mixmode, poly.use_fog);
 
@@ -3180,7 +3180,7 @@ void csSoftwareRender3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   }
 }
 #if 0
-void csSoftwareRender3DCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
+void csSoftwareGraphics3DCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
   iClipper2D* cl;
   if (mesh.clip_portal >= CS_CLIPPER_NONE)
@@ -3191,7 +3191,7 @@ void csSoftwareRender3DCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 	false /*lazyclip*/, aspect, width2, height2);
 }
 
-void csSoftwareRender3DCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
+void csSoftwareGraphics3DCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 {
   iClipper2D* cl;
   if (mesh.clip_portal >= CS_CLIPPER_NONE)
@@ -3202,7 +3202,7 @@ void csSoftwareRender3DCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 	false /*lazyclip*/, aspect, width2, height2);
 }
 
-bool csSoftwareRender3DCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
+bool csSoftwareGraphics3DCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
   long value)
 {
   switch (op)
@@ -3274,7 +3274,7 @@ bool csSoftwareRender3DCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
   return true;
 }
 
-long csSoftwareRender3DCommon::GetRenderState(G3D_RENDERSTATEOPTION op)
+long csSoftwareGraphics3DCommon::GetRenderState(G3D_RENDERSTATEOPTION op)
 {
   switch (op)
   {
@@ -3314,12 +3314,12 @@ long csSoftwareRender3DCommon::GetRenderState(G3D_RENDERSTATEOPTION op)
 }
 #endif
 
-void csSoftwareRender3DCommon::ClearCache()
+void csSoftwareGraphics3DCommon::ClearCache()
 {
   if (tcache) tcache->Clear ();
 }
 
-void csSoftwareRender3DCommon::RemoveFromCache (iPolygonTexture* poly_texture)
+void csSoftwareGraphics3DCommon::RemoveFromCache (iPolygonTexture* poly_texture)
 {
   if (tcache)
   {
@@ -3330,12 +3330,12 @@ void csSoftwareRender3DCommon::RemoveFromCache (iPolygonTexture* poly_texture)
   }
 }
 
-void csSoftwareRender3DCommon::DumpCache()
+void csSoftwareGraphics3DCommon::DumpCache()
 {
   if (tcache) tcache->dump (this);
 }
 
-void csSoftwareRender3DCommon::DrawLine (const csVector3& v1,
+void csSoftwareGraphics3DCommon::DrawLine (const csVector3& v1,
 	const csVector3& v2, float fov, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
@@ -3375,20 +3375,20 @@ void csSoftwareRender3DCommon::DrawLine (const csVector3& v1,
   G2D->DrawLine (px1, py1, px2, py2, color);
 }
 
-float csSoftwareRender3DCommon::GetZBuffValue (int x, int y)
+float csSoftwareGraphics3DCommon::GetZBuffValue (int x, int y)
 {
   unsigned long zbf = z_buffer [x + y * width];
   if (!zbf) return 1000000000.;
   return 16777216.0 / float (zbf);
 }
 
-/*bool csSoftwareRender3DCommon::IsLightmapOK (iPolygonTexture* poly_texture)
+/*bool csSoftwareGraphics3DCommon::IsLightmapOK (iPolygonTexture* poly_texture)
 {
   const csLightMapMapping& mapping = poly_texture->GetMapping ();
   return ((mapping.GetWidth () * mapping.GetHeight ()) < MAX_LIGHTMAP_SIZE);
 }*/
 
-void csSoftwareRender3DCommon::SetRenderTarget (iTextureHandle* handle,
+void csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
 	bool persistent)
 {
   render_target = handle;
@@ -3400,7 +3400,7 @@ void csSoftwareRender3DCommon::SetRenderTarget (iTextureHandle* handle,
   rt_cliprectset = false;
 }
 
-/*void csSoftwareRender3DCommon::DrawMesh (csRenderMesh* mesh)
+/*void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
 {
   iRenderBufferSource* source = mesh->buffersource;
   iRenderBuffer* indexbuf = source->GetRenderBuffer (
@@ -3644,7 +3644,7 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
 }
 
 static void DrawTriangle (
-                          csSoftwareRender3DCommon* g3d,
+                          csSoftwareGraphics3DCommon* g3d,
                           iClipper2D* clipper,
                           csRenderMesh* mesh,
                           G3DPolygonDPFX& poly,
@@ -3735,7 +3735,7 @@ static void DrawTriangle (
 }
 
 
-void csSoftwareRender3DCommon::DrawMesh (csRenderMesh* mesh)
+void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
 {
   int i;
 

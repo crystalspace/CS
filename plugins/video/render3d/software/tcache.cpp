@@ -300,7 +300,7 @@ void csSoftwareTextureCache::fill_texture (int MipMap, iPolygonTexture* pt,
   	texman, u_min, v_min, u_max, v_max);
 }
 
-void csSoftwareTextureCache::dump (csSoftwareRender3DCommon *iG3D)
+void csSoftwareTextureCache::dump (csSoftwareGraphics3DCommon *iG3D)
 {
   iG3D->Report (CS_REPORTER_SEVERITY_NOTIFY, "Textures in the cache: %d", total_textures);
   iG3D->Report (CS_REPORTER_SEVERITY_NOTIFY, "Total size: %ld bytes", total_size);

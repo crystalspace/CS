@@ -126,7 +126,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY(objectreg, iPluginManager);
 
   csRef<iStringArray> classlist (csPtr<iStringArray> 
-    (iSCF::SCF->QueryClassList("crystalspace.render3d.shader.")));
+    (iSCF::SCF->QueryClassList("crystalspace.graphics3d.shader.")));
   int const nmatches = classlist->Length();
   if(nmatches != 0)
   {
@@ -138,7 +138,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
       if(plugin)
       {
         csReport(objectreg, CS_REPORTER_SEVERITY_NOTIFY,
-	  "crystalspace.render3d.shadermgr", "Loaded plugin %s", classname);
+	  "crystalspace.graphics3d.shadermgr", "Loaded plugin %s", classname);
         pluginlist.Push(plugin);
         plugin->Open();
       }
@@ -424,8 +424,8 @@ bool csShader::Load(iDataBuffer* program)
   const char* error = doc->Parse (program);
   if (error != 0)
   { 
-    csReport( objectreg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.render3d.shader.glarb",
-      "XML error '%s'!", error);
+    csReport( objectreg, CS_REPORTER_SEVERITY_ERROR, 
+      "crystalspace.graphics3d.shadermanager", "XML error '%s'!", error);
     return false;
   }
   return Load(doc->GetRoot()->GetNode("shader"));
@@ -507,7 +507,7 @@ void csShaderPass::Deactivate()
   {
     if (texmapping[i] != csInvalidStringID)
     {
-      r3d->DeactivateTexture (i);
+      g3d->DeactivateTexture (i);
     }
   }
 
@@ -515,8 +515,8 @@ void csShaderPass::Deactivate()
   {
     if (streammapping[i] != csInvalidStringID)
     {
-      r3d->DeactivateBuffer ((csVertexAttrib)i);
-      r3d->DeactivateBuffer ((csVertexAttrib)(i+100));
+      g3d->DeactivateBuffer ((csVertexAttrib)i);
+      g3d->DeactivateBuffer ((csVertexAttrib)(i+100));
     }
   }
 }
@@ -531,12 +531,12 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
       iRenderBuffer* buf  = 
         mesh->buffersource->GetRenderBuffer (streammapping[i]);
       if (buf)
-        if (r3d->ActivateBuffer ((csVertexAttrib)(i+
+        if (g3d->ActivateBuffer ((csVertexAttrib)(i+
           (streammappinggeneric[i]?0:100)), buf))
           continue;
     }
-    r3d->DeactivateBuffer ((csVertexAttrib)i);
-    r3d->DeactivateBuffer ((csVertexAttrib)(i+100));
+    g3d->DeactivateBuffer ((csVertexAttrib)i);
+    g3d->DeactivateBuffer ((csVertexAttrib)(i+100));
   }
 
   iMaterialHandle* mathandle =
@@ -551,15 +551,15 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
         iTextureHandle* tex;
         var->GetValue (tex);
         if (tex)
-          if (r3d->ActivateTexture (tex, i))
+          if (g3d->ActivateTexture (tex, i))
             continue;
       }
     }
-    r3d->DeactivateTexture (i);
+    g3d->DeactivateTexture (i);
   }
 
-  r3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
-  r3d->SetWriteMask (writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha);
+  g3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
+  g3d->SetWriteMask (writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha);
   
   if (vp) vp->SetupState (this, mesh);
   if (fp) fp->SetupState (this, mesh);
@@ -572,7 +572,7 @@ void csShaderPass::ResetState ()
   {
     if (streammapping[i] != csInvalidStringID)
     {
-      r3d->DeactivateBuffer ((csVertexAttrib)i);
+      g3d->DeactivateBuffer ((csVertexAttrib)i);
     }
   }*/
   /*
@@ -580,13 +580,13 @@ void csShaderPass::ResetState ()
   {
     if (texmappingdirect[i] || texmappinglayer[i] != -1)
     {
-      r3d->DeactivateTexture (i);
+      g3d->DeactivateTexture (i);
     }
   }*/
   if (vp) vp->ResetState ();
   if (fp) fp->ResetState ();
 
-  r3d->SetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
+  g3d->SetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
 }
 
 void csShaderPass::AddStreamMapping (csStringID name, csVertexAttrib attribute)

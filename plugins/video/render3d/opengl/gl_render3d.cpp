@@ -63,36 +63,36 @@
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
 
-csGLStateCache* csGLRender3D::statecache;
+csGLStateCache* csGLGraphics3D::statecache;
 
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY (csGLRender3D)
+SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
 
 
-SCF_IMPLEMENT_IBASE(csGLRender3D)
+SCF_IMPLEMENT_IBASE(csGLGraphics3D)
   SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShaderRenderInterface)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGLGraphics3D::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiShaderRenderInterface)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGLGraphics3D::eiShaderRenderInterface)
   SCF_IMPLEMENTS_INTERFACE (iShaderRenderInterface)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csGLRender3D::EventHandler)
+SCF_IMPLEMENT_IBASE (csGLGraphics3D::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 
-csGLRender3D::csGLRender3D (iBase *parent)
+csGLGraphics3D::csGLGraphics3D (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -141,7 +141,7 @@ csGLRender3D::csGLRender3D (iBase *parent)
   lastUsedShaderpass = 0;
 }
 
-csGLRender3D::~csGLRender3D()
+csGLGraphics3D::~csGLGraphics3D()
 {
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q)
@@ -153,7 +153,7 @@ csGLRender3D::~csGLRender3D()
 ////////////////////////////////////////////////////////////////////
 
 
-void csGLRender3D::Report (int severity, const char* msg, ...)
+void csGLGraphics3D::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
@@ -168,7 +168,7 @@ void csGLRender3D::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-int csGLRender3D::GetMaxTextureSize () const
+int csGLGraphics3D::GetMaxTextureSize () const
 {
   GLint max;
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max);
@@ -177,7 +177,7 @@ int csGLRender3D::GetMaxTextureSize () const
   return max;
 }
 
-void csGLRender3D::SetGlOrtho (bool inverted)
+void csGLGraphics3D::SetGlOrtho (bool inverted)
 {
   if (render_target)
   {
@@ -199,7 +199,7 @@ void csGLRender3D::SetGlOrtho (bool inverted)
   }
 }
 
-void csGLRender3D::SetZMode (csZBufMode mode)
+void csGLGraphics3D::SetZMode (csZBufMode mode)
 {
   switch (mode)
   {
@@ -243,7 +243,7 @@ void csGLRender3D::SetZMode (csZBufMode mode)
   }
 }
 
-void csGLRender3D::SetMixMode (uint mode)
+void csGLGraphics3D::SetMixMode (uint mode)
 {
 
   // Note: In all explanations of Mixing:
@@ -290,7 +290,7 @@ void csGLRender3D::SetMixMode (uint mode)
     statecache->Disable_GL_BLEND ();
 }
 
-void csGLRender3D::SetMirrorMode (bool mirror)
+void csGLGraphics3D::SetMirrorMode (bool mirror)
 {
   if (mirror)
     statecache->SetCullFace (GL_BACK);
@@ -298,7 +298,7 @@ void csGLRender3D::SetMirrorMode (bool mirror)
     statecache->SetCullFace (GL_FRONT);
 }
 
-void csGLRender3D::CalculateFrustum ()
+void csGLGraphics3D::CalculateFrustum ()
 {
   if (frustum_valid) return;
   frustum_valid = true;
@@ -319,7 +319,7 @@ void csGLRender3D::CalculateFrustum ()
   }
 }
 
-void csGLRender3D::SetupStencil ()
+void csGLGraphics3D::SetupStencil ()
 {
   if (stencil_initialized)
     return;
@@ -389,7 +389,7 @@ void csGLRender3D::SetupStencil ()
   }
 }
 
-int csGLRender3D::SetupClipPlanes (bool add_clipper,
+int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
                                    bool add_near_clip,
                                    bool add_z_clip)
 {
@@ -450,7 +450,7 @@ int csGLRender3D::SetupClipPlanes (bool add_clipper,
   return i;
 }
 
-void csGLRender3D::SetupClipper (int clip_portal,
+void csGLGraphics3D::SetupClipper (int clip_portal,
                                  int clip_plane,
                                  int clip_z_plane)
 {
@@ -588,7 +588,7 @@ void csGLRender3D::SetupClipper (int clip_portal,
   }*/
 }
 
-void csGLRender3D::ApplyObjectToCamera ()
+void csGLGraphics3D::ApplyObjectToCamera ()
 {
   GLfloat matrixholder[16];
   const csMatrix3 &orientation = object2camera.GetO2T();
@@ -627,7 +627,7 @@ void csGLRender3D::ApplyObjectToCamera ()
 // iGraphics3D
 ////////////////////////////////////////////////////////////////////
 
-bool csGLRender3D::Open ()
+bool csGLGraphics3D::Open ()
 {
   csRef<iPluginManager> plugin_mgr (
     CS_QUERY_REGISTRY (object_reg, iPluginManager));
@@ -688,7 +688,7 @@ bool csGLRender3D::Open ()
     //no special ati extensions atm
   }
   // check for support of VBO
-  use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
+  use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object && false;
 
   shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
   if( !shadermgr )
@@ -778,7 +778,7 @@ bool csGLRender3D::Open ()
   return true;
 }
 
-void csGLRender3D::Close ()
+void csGLGraphics3D::Close ()
 {
   glFinish ();
 
@@ -799,7 +799,7 @@ void csGLRender3D::Close ()
     G2D->Close ();
 }
 
-bool csGLRender3D::BeginDraw (int drawflags)
+bool csGLGraphics3D::BeginDraw (int drawflags)
 {
   current_drawflags = drawflags;
   if (lastUsedShaderpass)
@@ -850,6 +850,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
     }
   }
 
+  glClearColor (0.5, 0.5, 1, 1);
   if (drawflags & CSDRAW_CLEARZBUFFER)
   {
     statecache->SetDepthMask (GL_TRUE);
@@ -904,7 +905,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
   return false;
 }
 
-void csGLRender3D::FinishDraw ()
+void csGLGraphics3D::FinishDraw ()
 {
   SetMirrorMode (false);
 
@@ -1001,7 +1002,7 @@ void csGLRender3D::FinishDraw ()
   render_target = 0;
 }
 
-void csGLRender3D::Print (csRect* area)
+void csGLGraphics3D::Print (csRect* area)
 {
   //glFinish ();
   if (bugplug)
@@ -1009,12 +1010,12 @@ void csGLRender3D::Print (csRect* area)
   G2D->Print (area);
 }
 
-csReversibleTransform* csGLRender3D::GetWVMatrix()
+csReversibleTransform* csGLGraphics3D::GetWVMatrix()
 {
   return &object2camera;
 }
 
-void csGLRender3D::SetObjectToCamera(csReversibleTransform* wvmatrix)
+void csGLGraphics3D::SetObjectToCamera(csReversibleTransform* wvmatrix)
 {
   const csMatrix3 &orientation1 = object2camera.GetO2T();
   const csVector3 &translation1 = object2camera.GetO2TTranslation();
@@ -1029,7 +1030,7 @@ void csGLRender3D::SetObjectToCamera(csReversibleTransform* wvmatrix)
   ApplyObjectToCamera ();
 }
 
-void csGLRender3D::DrawLine(const csVector3 & v1, const csVector3 & v2, float fov, int color)
+void csGLGraphics3D::DrawLine(const csVector3 & v1, const csVector3 & v2, float fov, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;
@@ -1067,7 +1068,7 @@ void csGLRender3D::DrawLine(const csVector3 & v1, const csVector3 & v2, float fo
   G2D->DrawLine (px1, py1, px2, py2, color);
 }
 
-bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
+bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
 {
   bool bind = true;
   int att = attrib<100?attrib:attrib-100;
@@ -1134,7 +1135,7 @@ bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   return true;
 }
 
-void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
+void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
 {
   int att = attrib<100?attrib:attrib-100;
   if (ext->glDisableVertexAttribArrayARB && attrib<100) 
@@ -1172,7 +1173,7 @@ void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
   }
 }
 
-bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
+bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 {
   bool bind = true;
   if (texunit[unit] == txthandle)
@@ -1240,7 +1241,7 @@ bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   return true;
 }
 
-bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int unit)
+bool csGLGraphics3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int unit)
 {
   // @@@ deal with multiple textures
   iTextureHandle* txthandle = 0;
@@ -1319,7 +1320,7 @@ bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int u
 }
 
 
-void csGLRender3D::DeactivateTexture (int unit)
+void csGLGraphics3D::DeactivateTexture (int unit)
 {
   if (!texunitenabled[unit])
     return;
@@ -1354,7 +1355,7 @@ void csGLRender3D::DeactivateTexture (int unit)
   texunitenabled[unit] = false;
 }
 
-void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
+void csGLGraphics3D::DrawMesh(csRenderMesh* mymesh)
 {
   /*SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
@@ -1468,7 +1469,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   }*/
 }
 
-void csGLRender3D::DrawPixmap (iTextureHandle *hTex,
+void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, 
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
@@ -1582,7 +1583,7 @@ void csGLRender3D::DrawPixmap (iTextureHandle *hTex,
   glEnd ();
 }
 
-void csGLRender3D::SetShadowState (int state)
+void csGLGraphics3D::SetShadowState (int state)
 {
   switch (state)
   {
@@ -1621,18 +1622,18 @@ void csGLRender3D::SetShadowState (int state)
 }
 
 
-void csGLRender3D::SetClipper (iClipper2D* clipper, int cliptype)
+void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
 {
   //clipper = new csBoxClipper (10, 10, 200, 200);
-  csGLRender3D::clipper = clipper;
+  csGLGraphics3D::clipper = clipper;
   if (!clipper) cliptype = CS_CLIPPER_NONE;
-  csGLRender3D::cliptype = cliptype;
+  csGLGraphics3D::cliptype = cliptype;
   clipplane_initialized = false;
   stencil_initialized = false;
   frustum_valid = false;
 }
 
-void csGLRender3D::SetLightParameter (int i, int param, csVector3 value)
+void csGLGraphics3D::SetLightParameter (int i, int param, csVector3 value)
 {
   csVector4 v4;
   if(i != 0) return; //not implemented any other light than first yet
@@ -1670,12 +1671,12 @@ void csGLRender3D::SetLightParameter (int i, int param, csVector3 value)
 
 // @@@ doesn't serve any purpose for now, but might in the future.
 // left in for now.
-bool csGLRender3D::SetRenderState (R3D_RENDERSTATEOPTION op, long val)
+bool csGLGraphics3D::SetRenderState (R3D_RENDERSTATEOPTION op, long val)
 {
   return false;
 }
 
-long csGLRender3D::GetRenderState (R3D_RENDERSTATEOPTION op) const
+long csGLGraphics3D::GetRenderState (R3D_RENDERSTATEOPTION op) const
 {
   return 0;
 }
@@ -1687,7 +1688,7 @@ long csGLRender3D::GetRenderState (R3D_RENDERSTATEOPTION op) const
 
 
 
-bool csGLRender3D::Initialize (iObjectRegistry* p)
+bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 {
   object_reg = p;
 
@@ -1740,7 +1741,7 @@ bool csGLRender3D::Initialize (iObjectRegistry* p)
 
 
 
-bool csGLRender3D::HandleEvent (iEvent& Event)
+bool csGLGraphics3D::HandleEvent (iEvent& Event)
 {
   if (Event.Type == csevBroadcast)
     switch (Event.Command.Code)
@@ -1764,16 +1765,16 @@ bool csGLRender3D::HandleEvent (iEvent& Event)
 //                    iShaderRenderInterface
 ////////////////////////////////////////////////////////////////////
 
-csGLRender3D::eiShaderRenderInterface::eiShaderRenderInterface()
+csGLGraphics3D::eiShaderRenderInterface::eiShaderRenderInterface()
 {
 }
 
-csGLRender3D::eiShaderRenderInterface::~eiShaderRenderInterface()
+csGLGraphics3D::eiShaderRenderInterface::~eiShaderRenderInterface()
 {
 
 }
 
-void* csGLRender3D::eiShaderRenderInterface::GetPrivateObject(const char* name)
+void* csGLGraphics3D::eiShaderRenderInterface::GetPrivateObject(const char* name)
 {
   if(strcasecmp(name, "ext") == 0)
     return (void*) (scfParent->ext);
@@ -1782,7 +1783,7 @@ void* csGLRender3D::eiShaderRenderInterface::GetPrivateObject(const char* name)
   return 0;
 }
 
-void csGLRender3D::eiShaderRenderInterface::Initialize(iObjectRegistry *reg)
+void csGLGraphics3D::eiShaderRenderInterface::Initialize(iObjectRegistry *reg)
 {
   object_reg = reg;
 }
@@ -1791,11 +1792,11 @@ void csGLRender3D::eiShaderRenderInterface::Initialize(iObjectRegistry *reg)
 //                          iDebugHelper
 ////////////////////////////////////////////////////////////////////
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiDebugHelper)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGLGraphics3D::eiDebugHelper)
   SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-bool csGLRender3D::DebugCommand (const char* cmdstr)
+bool csGLGraphics3D::DebugCommand (const char* cmdstr)
 {
   CS_ALLOC_STACK_ARRAY(char, cmd, strlen (cmdstr) + 1);
   strcpy (cmd, cmdstr);

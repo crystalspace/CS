@@ -26,7 +26,7 @@
 
 class csSoftwareTexture;
 class csSoftwareTextureHandle;
-class csSoftwareRender3DCommon;
+class csSoftwareGraphics3DCommon;
 struct iPolygonTexture;
 
 //---//---//---//---//---//---//---//---//---//---//---//---// Constants //---//
@@ -245,7 +245,7 @@ void csScan_Finalize ();
 void csScan_CalcBlendTables (unsigned char *BlendingTable[], int rbits,
   int gbits, int bbits);
 /// Initialize the scanline variables
-void csScan_InitDraw (int MipMap, csSoftwareRender3DCommon* g3d,
+void csScan_InitDraw (int MipMap, csSoftwareGraphics3DCommon* g3d,
   iPolygonTexture* tex, csSoftwareTextureHandle* texture, csSoftwareTexture *untxt);
 /// Initialize the scanline variables for DrawPolygonFX
 void csScan_InitDrawFX (csSoftwareTextureHandle* texture, csSoftwareTexture *untxt);

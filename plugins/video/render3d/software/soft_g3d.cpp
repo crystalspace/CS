@@ -32,33 +32,33 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY (csSoftwareRender3D)
+SCF_IMPLEMENT_FACTORY (csSoftwareGraphics3D)
 
 
-SCF_IMPLEMENT_IBASE_EXT (csSoftwareRender3D)
+SCF_IMPLEMENT_IBASE_EXT (csSoftwareGraphics3D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSoftwareRender3D::eiSoftConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoftwareGraphics3D::eiSoftConfig)
   SCF_IMPLEMENTS_INTERFACE (iConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csSoftwareRender3D::csSoftwareRender3D (iBase *iParent)
-  : csSoftwareRender3DCommon (iParent)
+csSoftwareGraphics3D::csSoftwareGraphics3D (iBase *iParent)
+  : csSoftwareGraphics3DCommon (iParent)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   is_for_procedural_textures = false;
   csScan_Initialize ();
 }
 
-csSoftwareRender3D::~csSoftwareRender3D ()
+csSoftwareGraphics3D::~csSoftwareGraphics3D ()
 {
   csScan_Finalize ();
 }
 
-bool csSoftwareRender3D::Initialize (iObjectRegistry *object_reg)
+bool csSoftwareGraphics3D::Initialize (iObjectRegistry *object_reg)
 {
-  csSoftwareRender3DCommon::Initialize(object_reg);
+  csSoftwareGraphics3DCommon::Initialize(object_reg);
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
@@ -81,9 +81,9 @@ bool csSoftwareRender3D::Initialize (iObjectRegistry *object_reg)
   return G2D ? true : false;
 }
 
-bool csSoftwareRender3D::Open ()
+bool csSoftwareGraphics3D::Open ()
 {
-  if (!csSoftwareRender3DCommon::Open () || !NewOpen ())
+  if (!csSoftwareGraphics3DCommon::Open () || !NewOpen ())
     return false;
 
   bool bFullScreen = G2D->GetFullScreen ();
@@ -122,7 +122,7 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 6, "smaller", "Smaller rendering", CSVAR_BOOL },
 };
 
-bool csSoftwareRender3D::eiSoftConfig::SetOption (int id, csVariant* value)
+bool csSoftwareGraphics3D::eiSoftConfig::SetOption (int id, csVariant* value)
 {
   if (value->GetType () != config_options[id].type)
     return false;
@@ -142,7 +142,7 @@ bool csSoftwareRender3D::eiSoftConfig::SetOption (int id, csVariant* value)
   return true;
 }
 
-bool csSoftwareRender3D::eiSoftConfig::GetOption (int id, csVariant* value)
+bool csSoftwareGraphics3D::eiSoftConfig::GetOption (int id, csVariant* value)
 {
   switch (id)
   {
@@ -162,7 +162,7 @@ bool csSoftwareRender3D::eiSoftConfig::GetOption (int id, csVariant* value)
   return true;
 }
 
-bool csSoftwareRender3D::eiSoftConfig::GetOptionDescription
+bool csSoftwareGraphics3D::eiSoftConfig::GetOptionDescription
   (int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS)

@@ -96,7 +96,7 @@ void csSoftShader::Open()
 
   csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
   csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
-  if (f != 0 && strcmp ("crystalspace.render3d.software", 
+  if (f != 0 && strcmp ("crystalspace.graphics3d.software", 
     f->QueryClassID ()) == 0)
     enable = true;
 }

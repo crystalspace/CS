@@ -175,7 +175,7 @@ void csScan_Finalize ()
   delete [] Scan.one_div_z;
 }
 
-void csScan_InitDraw (int MipMap, csSoftwareRender3DCommon* g3d,
+void csScan_InitDraw (int MipMap, csSoftwareGraphics3DCommon* g3d,
   iPolygonTexture* tex, csSoftwareTextureHandle* texture,
   csSoftwareTexture *untxt)
 {

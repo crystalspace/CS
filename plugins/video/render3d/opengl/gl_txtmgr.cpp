@@ -95,12 +95,12 @@ SCF_IMPLEMENT_IBASE(csGLTextureHandle)
 SCF_IMPLEMENT_IBASE_END
 
 csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int bpp,
-                                      GLenum sourceFormat, csGLRender3D *iR3D)
+                                      GLenum sourceFormat, csGLGraphics3D *iG3D)
 {
   SCF_CONSTRUCT_IBASE(0);
   this->target = target;
-  (R3D = iR3D)->IncRef();
-  (txtmgr = R3D->txtmgr)->IncRef();
+  (G3D = iG3D)->IncRef();
+  (txtmgr = G3D->txtmgr)->IncRef();
   has_alpha = false;
   this->sourceFormat = sourceFormat;
   this->bpp = bpp;
@@ -126,12 +126,12 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int 
 }
 
 csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
-    GLenum sourceFormat, csGLRender3D *iR3D)
+    GLenum sourceFormat, csGLGraphics3D *iG3D)
 {
   SCF_CONSTRUCT_IBASE(0);
   this->target = target;
-  (R3D = iR3D)->IncRef();
-  (txtmgr = R3D->txtmgr)->IncRef();
+  (G3D = iG3D)->IncRef();
+  (txtmgr = G3D->txtmgr)->IncRef();
   has_alpha = false;
   this->sourceFormat = sourceFormat;
   this->bpp = bpp;
@@ -765,7 +765,7 @@ iGraphics2D* csGLTextureHandle::GetCanvas ()
   {
     csOFSCbOpenGL* ofscb = new csOFSCbOpenGL (this);
     csGLTexture *t = vTex[0];
-    canvas = R3D->GetDriver2D ()->CreateOffscreenCanvas (
+    canvas = G3D->GetDriver2D ()->CreateOffscreenCanvas (
       t->get_image_data (), t->get_width (), t->get_height (), 32,
       ofscb);
     ofscb->DecRef ();
@@ -775,8 +775,8 @@ iGraphics2D* csGLTextureHandle::GetCanvas ()
 
 void csGLTextureHandle::UpdateTexture ()
 {
-  if (R3D->txtcache)
-    R3D->txtcache->Uncache (this);
+  if (G3D->txtcache)
+    G3D->txtcache->Uncache (this);
 }
 
 /*
@@ -936,20 +936,20 @@ SCF_IMPLEMENT_IBASE_END
 
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
-        csGLRender3D *iR3D) : textures (16, 16), materials (16, 16)
+        csGLGraphics3D *iG3D) : textures (16, 16), materials (16, 16)
 {
   SCF_CONSTRUCT_IBASE (0);
   csGLTextureManager::object_reg = object_reg;
   verbose = false;
 
-  nameDiffuseTexture = iR3D->strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
+  nameDiffuseTexture = iG3D->strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 
   pfmt = *iG2D->GetPixelFormat ();
 
-  R3D = iR3D;
-  max_tex_size = R3D->GetMaxTextureSize ();
+  G3D = iG3D;
+  max_tex_size = G3D->GetMaxTextureSize ();
   read_config (config);
   Clear ();
 
@@ -982,7 +982,7 @@ void csGLTextureManager::AlterTargetFormat (const char *oldTarget, const char *n
 
   if (glformats[theOld].name)
   {
-    if (!strcmp (newTarget, "compressed") && R3D->ext->CS_GL_ARB_texture_compression)
+    if (!strcmp (newTarget, "compressed") && G3D->ext->CS_GL_ARB_texture_compression)
     {
       GLint compressedFormat;
       // is the format compressable at all ?
@@ -995,7 +995,7 @@ void csGLTextureManager::AlterTargetFormat (const char *oldTarget, const char *n
 	compressedFormat = GL_COMPRESSED_RGBA_ARB;
 	break;
       case GL_RGB5_A1:
-	if (R3D->ext->CS_GL_EXT_texture_compression_s3tc)
+	if (G3D->ext->CS_GL_EXT_texture_compression_s3tc)
 	{
 	  compressedFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
 	}
@@ -1057,12 +1057,12 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image, int fl
 {
   if (!image)
   {
-    R3D->Report(CS_REPORTER_SEVERITY_BUG,
+    G3D->Report(CS_REPORTER_SEVERITY_BUG,
       "BAAAAAAAD!!! csGLTextureManager::RegisterTexture with 0 image!");
     return 0;
   }
 
-  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, iTextureHandle::CS_TEX_IMG_2D,pfmt.PixelBytes*8, GL_RGBA, R3D);
+  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, iTextureHandle::CS_TEX_IMG_2D,pfmt.PixelBytes*8, GL_RGBA, G3D);
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
 }
@@ -1071,12 +1071,12 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image, 
 {
   if (!image)
   {
-    R3D->Report(CS_REPORTER_SEVERITY_BUG,
+    G3D->Report(CS_REPORTER_SEVERITY_BUG,
       "BAAAAAAAD!!! csGLTextureManager::RegisterTexture with 0 image array!");
     return 0;
   }
 
-  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, target,pfmt.PixelBytes*8, GL_RGBA, R3D);
+  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, target,pfmt.PixelBytes*8, GL_RGBA, G3D);
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
 }
@@ -1152,7 +1152,7 @@ int csGLTextureManager::GetTextureFormat ()
 void csGLTextureManager::SetPixelFormat (csPixelFormat &PixelFormat)
 {
   pfmt = PixelFormat;
-  max_tex_size = R3D->GetMaxTextureSize ();
+  max_tex_size = G3D->GetMaxTextureSize ();
   DetermineStorageSizes ();
 }
 
@@ -1182,7 +1182,7 @@ void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
       csRef<iDataBuffer> buf = iio->Save (img, "image/png");
       if (!buf)
       {
-	R3D->Report (CS_REPORTER_SEVERITY_WARNING,
+	G3D->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "Could not save super lightmap.");
       }
       else
@@ -1191,12 +1191,12 @@ void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
 	  dir, i);
 	if (!VFS->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
 	{
-	  R3D->Report (CS_REPORTER_SEVERITY_WARNING,
+	  G3D->Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Could not write to %s.", outfn.GetData ());
 	}
 	else
 	{
-	  R3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "Dumped %dx%d SLM to %s", superLMs[i]->w, superLMs[i]->h, outfn.GetData ());
 	}
       }
@@ -1248,7 +1248,7 @@ csGLRendererLightmap::~csGLRendererLightmap ()
       }
     }
 
-    csGLRender3D::statecache->SetTexture (
+    csGLGraphics3D::statecache->SetTexture (
       GL_TEXTURE_2D, slm->texHandle);
 
     glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
@@ -1280,7 +1280,7 @@ void csGLRendererLightmap::SetData (csRGBpixel* data)
 {
   slm->CreateTexture ();
 
-  csGLRender3D::statecache->SetTexture (
+  csGLGraphics3D::statecache->SetTexture (
     GL_TEXTURE_2D, slm->texHandle);
 
   glTexSubImage2D (GL_TEXTURE_2D, 0, rect.xmin, rect.ymin, 
@@ -1366,7 +1366,7 @@ void csGLSuperLightmap::CreateTexture ()
   {
     glGenTextures (1, &texHandle);
 
-    csGLRender3D::statecache->SetTexture (
+    csGLGraphics3D::statecache->SetTexture (
       GL_TEXTURE_2D, texHandle);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -1416,7 +1416,7 @@ void csGLSuperLightmap::DeleteTexture ()
 {
   if (texHandle != (GLuint)~0)
   {
-    csGLRender3D::statecache->SetTexture (
+    csGLGraphics3D::statecache->SetTexture (
       GL_TEXTURE_2D, 0);
 
     glDeleteTextures (1, &texHandle);
@@ -1467,7 +1467,7 @@ csPtr<iImage> csGLSuperLightmap::Dump ()
   if (texHandle == (GLuint)~0) return 0;
 
   GLint tw, th;
-  csGLRender3D::statecache->SetTexture (GL_TEXTURE_2D, texHandle);
+  csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, texHandle);
 
   glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &tw);
   glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &th);
@@ -1482,4 +1482,3 @@ csPtr<iImage> csGLSuperLightmap::Dump ()
 
   return csPtr<iImage> (lmimg);
 }
-

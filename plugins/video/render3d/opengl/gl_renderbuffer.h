@@ -31,7 +31,7 @@ enum csGLRenderBufferLockType
 class csGLRenderBuffer : public iRenderBuffer
 {
 protected:
-  friend class csGLRender3D;
+  friend class csGLGraphics3D;
 
   int size, compcount, compSize;
   csRenderBufferType type;

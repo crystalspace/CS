@@ -141,7 +141,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   polygons = 0;
   
 #ifdef CS_USE_NEW_RENDERER
-  r3d = CS_QUERY_REGISTRY (((csBallMeshObjectFactory*)factory)->object_reg, iGraphics3D);
+  g3d = CS_QUERY_REGISTRY (((csBallMeshObjectFactory*)factory)->object_reg, iGraphics3D);
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (((csBallMeshObjectFactory*)factory)->object_reg, 
     "crystalspace.renderer.stringset", iStringSet);
@@ -572,7 +572,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
   {
     if (ball_vertices_dirty_flag)
     {
-      vertex_buffer = r3d->CreateRenderBuffer (
+      vertex_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC, 
         CS_BUFCOMP_FLOAT, 3, false);
       ball_vertices_dirty_flag = false;
@@ -590,7 +590,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
   {
     if (ball_texels_dirty_flag)
     {
-      texel_buffer = r3d->CreateRenderBuffer (
+      texel_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector2)*num_ball_vertices, CS_BUF_STATIC, 
         CS_BUFCOMP_FLOAT, 2, false);
       ball_texels_dirty_flag = false;
@@ -608,7 +608,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
   {
     if (ball_normals_dirty_flag )
     {
-      normal_buffer = r3d->CreateRenderBuffer (
+      normal_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       ball_normals_dirty_flag = false;
@@ -626,7 +626,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
   {
     if (ball_colors_dirty_flag)
     {
-      color_buffer = r3d->CreateRenderBuffer (
+      color_buffer = g3d->CreateRenderBuffer (
         sizeof (csColor)*num_ball_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       ball_colors_dirty_flag = false;
@@ -644,7 +644,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
   {
     if (ball_triangle_dirty_flag)
     {
-      index_buffer = r3d->CreateRenderBuffer (
+      index_buffer = g3d->CreateRenderBuffer (
         sizeof (unsigned int)*ball_triangles*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
       ball_triangle_dirty_flag = false;
@@ -673,7 +673,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
     return false;
   }
 
-  // iGraphics3D* r3d = rview->GetGraphics3D ();
+  // iGraphics3D* g3d = rview->GetGraphics3D ();
 
   mater->Visit ();
   mesh.transform = &tr_o2c;

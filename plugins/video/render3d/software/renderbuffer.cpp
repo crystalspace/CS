@@ -59,7 +59,7 @@ csSoftRenderBuffer::csSoftRenderBuffer
 //-----------------------------------------------------------------
 
 
-csPtr<iRenderBuffer> csSoftwareRender3DCommon::CreateRenderBuffer (int size, 
+csPtr<iRenderBuffer> csSoftwareGraphics3DCommon::CreateRenderBuffer (int size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
   int componentCount, bool index)
 {

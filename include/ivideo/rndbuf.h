@@ -94,10 +94,10 @@ struct iRenderBuffer : public iBase
   /// Gets the number of components per element
   virtual int GetComponentCount () const = 0;
 
-  /// Gets the component type
+  /// Gets the component type (float, int, etc)
   virtual csRenderBufferComponentType GetComponentType () const = 0;
 
-  /// Get type of buffer (where it's located)
+  /// Get type of buffer (static/dynamic)
   virtual csRenderBufferType GetBufferType() const = 0;
 
   /// Get the size of the buffer (in bytes)
@@ -106,7 +106,10 @@ struct iRenderBuffer : public iBase
 
 SCF_VERSION (iRenderBufferSource, 0, 0, 1);
 
-/// Document me!@@@
+/**
+* This interface is implemented by meshes, and exposes a call for the 
+* renderer to use to fetch vertex data.
+*/
 struct iRenderBufferSource : public iBase
 {
   /// Get a named buffer

@@ -71,7 +71,7 @@ bool csSoftShader_VP::Load(iDataBuffer* program)
   if (error != 0)
   { 
     csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, 
-      "crystalspace.render3d.shader.software", "XML error '%s'!", error);
+      "crystalspace.graphics3d.shader.software", "XML error '%s'!", error);
     return false;
   }
   return Load(doc->GetRoot());
@@ -84,7 +84,7 @@ bool csSoftShader_VP::Load(iDocumentNode* program)
 
   BuildTokenHash();
 
-  csRef<iGraphics3D> r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iShaderManager> shadermgr = 
     CS_QUERY_REGISTRY(object_reg, iShaderManager);
 

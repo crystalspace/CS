@@ -73,10 +73,12 @@ struct iEvent;
 #define CS_GL_CLIP_LAZY_STENCIL   'S'
 #define CS_GL_CLIP_LAZY_PLANES    'P'
 
-class csGLRender3D : public iGraphics3D
+class csGLGraphics3D : public iGraphics3D
 {
 private:
   //friend declarations
+  friend class csGLSuperLightmap;
+  friend class csGLRendererLightmap;
   friend class csGLTextureHandle;
   friend class csGLTextureCache;
   friend class csGLTextureManager;
@@ -108,7 +110,7 @@ private:
 
   csReversibleTransform object2camera;
 
-  csRender3dCaps rendercaps;
+  csGraphics3DCaps rendercaps;
 
   csRef<iStringSet> strings;
 
@@ -208,11 +210,11 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  csGLRender3D (iBase *parent);
-  virtual ~csGLRender3D ();
+  csGLGraphics3D (iBase *parent);
+  virtual ~csGLGraphics3D ();
 
   ////////////////////////////////////////////////////////////////////
-  //                            iRender3d
+  //                            iGraphics3D
   ////////////////////////////////////////////////////////////////////
 
   /// Open 3d renderer.
@@ -263,7 +265,7 @@ public:
     { return viewheight; }
 
   /// Capabilities of the driver
-  const csRender3dCaps* GetCaps() const
+  const csGraphics3DCaps* GetCaps() const
     { return &rendercaps; }
 
   /// Set center of projection.
@@ -284,7 +286,7 @@ public:
   /// Set perspective aspect.
   virtual void SetPerspectiveAspect (float aspect)
   {
-    csGLRender3D::aspect = aspect;
+    csGLGraphics3D::aspect = aspect;
     frustum_valid = false;
   }
 
@@ -426,7 +428,7 @@ public:
   private:
     csRef<iObjectRegistry> object_reg;
   public:
-    SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
+    SCF_DECLARE_EMBEDDED_IBASE(csGLGraphics3D);
     eiShaderRenderInterface();
     virtual ~eiShaderRenderInterface();
 
@@ -445,7 +447,7 @@ public:
 
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
+    SCF_DECLARE_EMBEDDED_IBASE(csGLGraphics3D);
     virtual bool Initialize (iObjectRegistry* reg)
       { return scfParent->Initialize (reg); }
   } scfiComponent;
@@ -459,9 +461,9 @@ public:
   struct EventHandler : public iEventHandler
   {
   private:
-    csGLRender3D* parent;
+    csGLGraphics3D* parent;
   public:
-    EventHandler (csGLRender3D* parent)
+    EventHandler (csGLGraphics3D* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
@@ -481,7 +483,7 @@ public:
 
   struct eiDebugHelper : public iDebugHelper
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
+    SCF_DECLARE_EMBEDDED_IBASE(csGLGraphics3D);
     virtual int GetSupportedTests () const
     { return 0; }
     virtual csPtr<iString> UnitTest ()

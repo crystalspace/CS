@@ -26,14 +26,14 @@
 #include "sft3dcom.h"
 
 /// Software 3D renderer
-class csSoftwareRender3D : public csSoftwareRender3DCommon
+class csSoftwareGraphics3D : public csSoftwareGraphics3DCommon
 {
 public:
-  SCF_DECLARE_IBASE_EXT(csSoftwareRender3DCommon);
+  SCF_DECLARE_IBASE_EXT(csSoftwareGraphics3DCommon);
   /// Constructor
-  csSoftwareRender3D (iBase*);
+  csSoftwareGraphics3D (iBase*);
   /// Destructor
-  virtual ~csSoftwareRender3D ();
+  virtual ~csSoftwareGraphics3D ();
   /// Initialize iComponent.
   virtual bool Initialize (iObjectRegistry*);
   /// Open a canvas.
@@ -41,7 +41,7 @@ public:
 
   struct eiSoftConfig : public iConfig
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSoftwareRender3D);
+    SCF_DECLARE_EMBEDDED_IBASE (csSoftwareGraphics3D);
     virtual bool GetOptionDescription (int idx, csOptionDescription*);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);

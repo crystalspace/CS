@@ -148,7 +148,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   ambient_version = 0;
 
 #ifdef CS_USE_NEW_RENDERER
-  r3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
+  g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
 #endif
 }
 
@@ -712,7 +712,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
 {
   //if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
-  // iGraphics3D* r3d = rview->GetGraphics3D ();
+  // iGraphics3D* g3d = rview->GetGraphics3D ();
 
 //  iCamera* camera = rview->GetCamera ();
 /*  tr_o2c = camera->GetTransform ();
@@ -728,7 +728,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
     return false;
   }
 
-  // iGraphics3D* r3d = rview->GetGraphics3D ();
+  // iGraphics3D* g3d = rview->GetGraphics3D ();
 
   mater->Visit ();
   mesh.transform = &tr_o2c;
@@ -948,7 +948,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   color_buffer = 0;
   index_buffer = 0;
 
-  r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
   csRef<iStringSet> strings = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -1078,7 +1078,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
   {
     if (mesh_vertices_dirty_flag)
     {
-      vertex_buffer = r3d->CreateRenderBuffer (
+      vertex_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC, 
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_vertices_dirty_flag = false;
@@ -1096,7 +1096,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
   {
     if (mesh_texels_dirty_flag)
     {
-      texel_buffer = r3d->CreateRenderBuffer (
+      texel_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC, 
         CS_BUFCOMP_FLOAT, 2, false);
       mesh_texels_dirty_flag = false;
@@ -1114,7 +1114,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
   {
     if (mesh_normals_dirty_flag)
     {
-      normal_buffer = r3d->CreateRenderBuffer (
+      normal_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_normals_dirty_flag = false;
@@ -1132,7 +1132,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
   {
     if (mesh_colors_dirty_flag)
     {
-      color_buffer = r3d->CreateRenderBuffer (
+      color_buffer = g3d->CreateRenderBuffer (
         sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_colors_dirty_flag = false;
@@ -1150,7 +1150,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
   {
     if (mesh_triangle_dirty_flag)
     {
-      index_buffer = r3d->CreateRenderBuffer (
+      index_buffer = g3d->CreateRenderBuffer (
         sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_STATIC,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
       mesh_triangle_dirty_flag = false;

@@ -6,7 +6,7 @@
       <class>
         <name>crystalspace.graphics3d.shader.glcg</name>
         <implementation>csGLShader_CG</implementation>
-        <description>OpenGL specific shaderprogram provider for Render3D</description>
+        <description>OpenGL specific shaderprogram provider for Graphics3D</description>
       </class>
     </classes>
   </scf>

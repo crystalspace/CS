@@ -158,9 +158,9 @@ bool csShaderGLAVP::LoadProgramStringToGL(const char* programstring)
     else
       start++;
 
-    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb", "Couldn't load vertexprogram");
-    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb", "Programerror at: \"%s\"", start);
-    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb", "Errorstring %s", programErrorString);
+    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.graphics3d.shader.glarb", "Couldn't load vertexprogram");
+    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.graphics3d.shader.glarb", "Programerror at: \"%s\"", start);
+    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.graphics3d.shader.glarb", "Errorstring %s", programErrorString);
     return false;
   }
 
@@ -188,7 +188,7 @@ bool csShaderGLAVP::Load(iDataBuffer* program)
   const char* error = doc->Parse (program);
   if (error != 0)
   { 
-    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.render3d.shader.glarb",
+    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.graphics3d.shader.glarb",
       "XML error '%s'!", error);
     return false;
   }

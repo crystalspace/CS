@@ -35,7 +35,7 @@
 #define DP_PIXFORM_R8G8B8
 #include "drawsprt.inc"
 
-void csSoftwareRender3DCommon::DrawPixmap (iTextureHandle *hTex,
+void csSoftwareGraphics3DCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh,
   int tx, int ty, int tw, int th, uint8 Alpha)
 {

@@ -35,7 +35,7 @@ class csSoftHalo : public iHalo
   int Width, Height;
 
   // Software 3D rasterizer
-  csSoftwareRender3DCommon *G3D;
+  csSoftwareGraphics3DCommon *G3D;
 
 public:
 
@@ -43,7 +43,7 @@ public:
 
   /// Create the halo object
   csSoftHalo (float iR, float iG, float iB, unsigned char *iAlpha,
-    int iWidth, int iHeight, csSoftwareRender3DCommon *iG3D);
+    int iWidth, int iHeight, csSoftwareGraphics3DCommon *iG3D);
 
   /// Destroy the halo object
   virtual ~csSoftHalo ();
@@ -129,7 +129,7 @@ SCF_IMPLEMENT_IBASE_END
 
 // Create the halo object
 csSoftHalo::csSoftHalo (float iR, float iG, float iB, unsigned char *iAlpha,
-  int iWidth, int iHeight, csSoftwareRender3DCommon *iG3D)
+  int iWidth, int iHeight, csSoftwareGraphics3DCommon *iG3D)
 {
   SCF_CONSTRUCT_IBASE (0);
   R = iR; G = iG; B = iB;
@@ -346,7 +346,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   } /* endfor */
 }
 
-iHalo *csSoftwareRender3DCommon::CreateHalo (float iR, float iG, float iB,
+iHalo *csSoftwareGraphics3DCommon::CreateHalo (float iR, float iG, float iB,
   unsigned char *iAlpha, int iWidth, int iHeight)
 {
   // Allow R,G,B in range 0..2

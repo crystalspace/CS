@@ -142,7 +142,7 @@ bool csGLShaderFVP::Load(iDataBuffer* program)
   if (error != 0)
   { 
     csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, 
-      "crystalspace.render3d.shader.fixed", "XML error '%s'!", error);
+      "crystalspace.graphics3d.shader.fixed", "XML error '%s'!", error);
     return false;
   }
   return Load(doc->GetRoot());

@@ -29,6 +29,7 @@
 #include "ivideo/txtmgr.h"
 #include "iengine/texture.h"
 #include "igraphic/imgvec.h"
+#include "csutil/blockallocator.h"
 #include "csutil/scf.h"
 #include "csutil/refarr.h"
 #include "csutil/blockallocator.h"
@@ -109,17 +110,17 @@ public:
   int formatidx;
   int orig_width, orig_height;
   csArray<csGLTexture*> vTex;
-  csGLRender3D *R3D;
+  csGLGraphics3D *G3D;
   long size;
   int flags;
   int target;
   bool was_render_target;
 
   csGLTextureHandle (iImage* image, int flags, int target, int bpp,
-    GLenum sourceFormat, csGLRender3D *iR3D);
+    GLenum sourceFormat, csGLGraphics3D *iG3D);
 
   csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
-    GLenum sourceFormat, csGLRender3D *iR3D);
+    GLenum sourceFormat, csGLGraphics3D *iG3D);
 
   virtual ~csGLTextureHandle ();
 
@@ -331,7 +332,7 @@ class csGLSuperLightmap;
 class csGLRendererLightmap : iRendererLightmap
 {
   friend class csGLSuperLightmap;
-  friend class csGLRender3D;
+  friend class csGLGraphics3D;
 
   /// Texture coordinates (in pixels)
   csRect rect;
@@ -432,7 +433,7 @@ class csGLTextureManager : public iTextureManager
     int texelbytes;
   };
 
-  csRef<csGLRender3D> R3D;
+  csRef<csGLGraphics3D> G3D;
 
   typedef csRefArray<csGLTextureHandle> csTexVector;
   /// List of textures.
@@ -469,7 +470,7 @@ public:
 
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
-        csGLRender3D *R3D);
+        csGLGraphics3D *G3D);
 
   virtual ~csGLTextureManager () { }
 

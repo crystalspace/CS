@@ -208,7 +208,7 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
     NextFrame(0,csVector3(0,0,0));
 
 #ifdef CS_USE_NEW_RENDERER
-    r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
     csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
                       "crystalspace.renderer.stringset", iStringSet);
 
@@ -305,7 +305,7 @@ iRenderBuffer *csMetaBall::GetRenderBuffer (csStringID name)
   {
     if (!rndbuf_verts.IsValid())
     {
-      rndbuf_verts = r3d->CreateRenderBuffer(
+      rndbuf_verts = g3d->CreateRenderBuffer(
         sizeof (csVector3)*max_vertices, 
         CS_BUF_DYNAMIC, 
         CS_BUFCOMP_FLOAT, 3, false);
@@ -330,7 +330,7 @@ iRenderBuffer *csMetaBall::GetRenderBuffer (csStringID name)
   {
     if (!rndbuf_texels.IsValid())
     {
-      rndbuf_texels = r3d->CreateRenderBuffer(
+      rndbuf_texels = g3d->CreateRenderBuffer(
         sizeof (csVector2)*max_vertices, 
         CS_BUF_DYNAMIC,
         CS_BUFCOMP_FLOAT, 2, false);
@@ -356,7 +356,7 @@ iRenderBuffer *csMetaBall::GetRenderBuffer (csStringID name)
   {
     if (!rndbuf_colors.IsValid())
     {
-      rndbuf_colors = r3d->CreateRenderBuffer(
+      rndbuf_colors = g3d->CreateRenderBuffer(
         sizeof (csColor)*max_vertices, 
         CS_BUF_DYNAMIC,
         CS_BUFCOMP_FLOAT, 3, false);
@@ -383,7 +383,7 @@ iRenderBuffer *csMetaBall::GetRenderBuffer (csStringID name)
   {
     if (!rndbuf_index.IsValid())
     {
-      rndbuf_index = r3d->CreateRenderBuffer(
+      rndbuf_index = g3d->CreateRenderBuffer(
         sizeof (csTriangle)*int(max_vertices / 3), 
         CS_BUF_DYNAMIC,
         CS_BUFCOMP_UNSIGNED_INT,
@@ -440,7 +440,7 @@ bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
 
 #else
 
-  iGraphics3D * r3d = rview->GetGraphics3D();
+  iGraphics3D * g3d = rview->GetGraphics3D();
   iCamera *cam = rview->GetCamera();
 
   // Shouldn't this be done in the renderer?
@@ -460,7 +460,7 @@ bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
   	clip_z_plane) == false)
     return false;
 
-  r3d->SetObjectToCamera( &tr_o2c );
+  g3d->SetObjectToCamera( &tr_o2c );
  
   mesh.material = th;
   mesh.indexstart = 0;

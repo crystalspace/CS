@@ -35,15 +35,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/material.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
-#include "video/canvas/openglcommon/glstates.h"
 
 #include "video/canvas/openglcommon/glextmanager.h"
-#include "../../opengl/gl_txtmgr.h"
-#include "../../common/txtmgr.h"
-#include "../../opengl/gl_txtcache.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 #include "glshader_ffp.h"
 
@@ -172,7 +169,7 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
           }
           else
           {
-            SyntaxService->Report ("crystalspace.render3d.shader.fixed",
+            SyntaxService->Report ("crystalspace.graphics3d.shader.fixed",
               CS_REPORTER_SEVERITY_WARNING,
               child, "Invalid color source: %s", str);
           }
@@ -188,7 +185,7 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
           }
           else
           {
-            SyntaxService->Report ("crystalspace.render3d.shader.fixed",
+            SyntaxService->Report ("crystalspace.graphics3d.shader.fixed",
               CS_REPORTER_SEVERITY_WARNING,
               child, "Invalid color modifier: %s", str);
           }
@@ -245,7 +242,7 @@ bool csGLShaderFFP::Load(iDataBuffer* program)
   if (error != 0)
   { 
     csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, 
-      "crystalspace.render3d.shader.fixed", "Document error '%s'!", error);
+      "crystalspace.graphics3d.shader.fixed", "Document error '%s'!", error);
     return false;
   }
   return Load(doc->GetRoot());
@@ -265,7 +262,6 @@ bool csGLShaderFFP::Prepare()
     SCF_QUERY_INTERFACE (g3d, iShaderRenderInterface);
 
   ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
-  txtcache = (iGLTextureCache*) sri->GetPrivateObject("txtcache");
 
   if (texlayers.Length () > maxlayers)
     return false;

@@ -37,7 +37,7 @@
 class csFullscreenQuad : public iRenderBufferSource
 {
 private:
-  csRef<iGraphics3D> r3d;
+  csRef<iGraphics3D> g3d;
   csRef<iRenderBuffer> vertices;
   csRef<iRenderBuffer> indices;
   csRef<iRenderBuffer> texcoords;
@@ -48,19 +48,19 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  csFullscreenQuad (iGraphics3D* r3d, iStringSet* strings)
+  csFullscreenQuad (iGraphics3D* g3d, iStringSet* strings)
   {
     SCF_CONSTRUCT_IBASE (0)
 
-      csFullscreenQuad::r3d = r3d;
+      csFullscreenQuad::g3d = g3d;
 
-    vertices = r3d->CreateRenderBuffer (
+    vertices = g3d->CreateRenderBuffer (
       sizeof (csVector3)*4, CS_BUF_STATIC,
       CS_BUFCOMP_FLOAT, 3, false);
-    texcoords = r3d->CreateRenderBuffer (
+    texcoords = g3d->CreateRenderBuffer (
       sizeof (csVector2)*4, CS_BUF_STATIC,
       CS_BUFCOMP_FLOAT, 2, false);
-    indices = r3d->CreateRenderBuffer (
+    indices = g3d->CreateRenderBuffer (
       sizeof (unsigned int)*4, CS_BUF_STATIC,
       CS_BUFCOMP_UNSIGNED_INT, 1, true);
 
@@ -205,10 +205,10 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.renderer.stringset", iStringSet);
 
-  csRef<iGraphics3D> r3d = 
+  csRef<iGraphics3D> g3d = 
     CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
-  fullquad = new csFullscreenQuad (r3d, strings);
+  fullquad = new csFullscreenQuad (g3d, strings);
 
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   material = "";
@@ -221,9 +221,9 @@ csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
-  csRef<iGraphics3D> r3d = rview->GetGraphics3D();
+  csRef<iGraphics3D> g3d = rview->GetGraphics3D();
 
-  //r3d->BeginDraw (CSDRAW_3DGRAPHICS);
+  //g3d->BeginDraw (CSDRAW_3DGRAPHICS);
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (material);
   if (mat != 0)
   {
@@ -263,7 +263,7 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
 
         pass->Activate (0);
         pass->SetupState (&mesh);
-        r3d->DrawMesh (&mesh);
+        g3d->DrawMesh (&mesh);
         pass->ResetState ();
         pass->Deactivate ();
 	delete trans;
@@ -285,14 +285,14 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
   mesh.z_buf_mode = CS_ZBUF_NONE;
   csRef<iShaderManager> shadman = CS_QUERY_REGISTRY (object_reg, iShaderManager);
 
-  //r3d->SetRenderTarget (engine->FindTexture ("TARGET2")->GetTextureHandle ());  
+  //g3d->SetRenderTarget (engine->FindTexture ("TARGET2")->GetTextureHandle ());  
   /*mesh.mathandle = engine->GetMaterialList ()->FindByName ("post a")->GetMaterialHandle ();
   csRef<iShader> shader = shadman->GetShader ("posteffect a");
-  r3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN );
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN );
   shader->GetBestTechnique ()->GetPass (0)->Activate (&mesh);
   shader->GetBestTechnique ()->GetPass (0)->SetupState (&mesh);
-  r3d->DrawMesh (&mesh);
+  g3d->DrawMesh (&mesh);
   shader->GetBestTechnique ()->GetPass (0)->ResetState ();
   shader->GetBestTechnique ()->GetPass (0)->Deactivate ();
-  r3d->FinishDraw ();*/
+  g3d->FinishDraw ();*/
 };

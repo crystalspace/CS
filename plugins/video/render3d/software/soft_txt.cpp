@@ -358,6 +358,122 @@ void csSoftwareTextureHandle::ChangePaletteEntry (int idx, int r, int g, int b)
   }
 }
 
+//----------------------------------------------------------------------------//
+
+SCF_IMPLEMENT_IBASE_INCREF(csSoftRendererLightmap)					
+SCF_IMPLEMENT_IBASE_GETREFCOUNT(csSoftRendererLightmap)				
+SCF_IMPLEMENT_IBASE_QUERY(csSoftRendererLightmap)
+SCF_IMPLEMENTS_INTERFACE(iRendererLightmap)
+SCF_IMPLEMENT_IBASE_END
+
+void csSoftRendererLightmap::DecRef ()
+{
+  if (scfRefCount == 1)							
+  {									
+    CS_ASSERT (slm != 0);
+    slm->FreeRLM (this);
+    return;								
+  }									
+  scfRefCount--;							
+}
+
+csSoftRendererLightmap::csSoftRendererLightmap ()
+{
+  SCF_CONSTRUCT_IBASE (0);
+
+  data = 0;
+  dirty = false;
+
+  lightCellSize = 0;
+  memset (cacheData, 0, sizeof (cacheData));
+}
+
+csSoftRendererLightmap::~csSoftRendererLightmap ()
+{
+}
+
+void csSoftRendererLightmap::GetRendererCoords (float& lm_u1, float& lm_v1, 
+                                                float &lm_u2, float& lm_v2)
+{
+  lm_u1 = u1;
+  lm_v1 = v1;
+  lm_u2 = u2;
+  lm_v2 = v2;
+}
+
+void csSoftRendererLightmap::GetSLMCoords (int& left, int& top, 
+                                           int& width, int& height)
+{
+  left = rect.xmin; top  = rect.xmin;
+  width = rect.Width (); height = rect.Height ();
+}
+
+void csSoftRendererLightmap::SetData (csRGBpixel* data)
+{
+  csSoftRendererLightmap::data = data;
+  dirty = true;
+}
+
+void csSoftRendererLightmap::SetLightCellSize (int size)
+{
+  lightCellSize = size;
+  lightCellShift = csLog2 (lightCellSize);
+}
+
+int csSoftRendererLightmap::GetLightCellSize ()
+{
+  return lightCellSize;
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csSoftSuperLightmap)
+SCF_IMPLEMENTS_INTERFACE(iSuperLightmap)
+SCF_IMPLEMENT_IBASE_END
+
+csSoftSuperLightmap::csSoftSuperLightmap (int width, int height) : RLMs(32)
+{
+  SCF_CONSTRUCT_IBASE (0);
+
+  w = width; h = height;
+}
+
+csSoftSuperLightmap::~csSoftSuperLightmap ()
+{
+}
+
+void csSoftSuperLightmap::FreeRLM (csSoftRendererLightmap* rlm)
+{
+  // IncRef() ourselves manually.
+  // Otherwise freeing the RLM could trigger our own destruction -
+  // causing an assertion in block allocator (due to how BA frees items and
+  // the safety assertions on BA destruction.)
+  scfRefCount++;
+  RLMs.Free (rlm);
+  DecRef ();
+}
+
+csPtr<iRendererLightmap> csSoftSuperLightmap::RegisterLightmap (int left, int top, 
+                                                                int width, int height)
+{
+  csSoftRendererLightmap* rlm = RLMs.Alloc ();
+  rlm->slm = this;
+  rlm->rect.Set (left, top, left + width, top + height);
+
+  rlm->u1 = left;
+  rlm->v1 = top;
+  rlm->u2 = left + width;
+  rlm->v2 = top  + height;
+
+  return csPtr<iRendererLightmap> (rlm);
+}
+
+csPtr<iImage> csSoftSuperLightmap::Dump ()
+{
+  return 0;
+}
+
+
 //----------------------------------------------- csSoftwareTextureManager ---//
 
 static uint8 *GenLightmapTable (int bits)
@@ -381,7 +497,7 @@ static uint8 *GenLightmapTable (int bits)
 
 csSoftwareTextureManager::csSoftwareTextureManager (
   iObjectRegistry *object_reg,
-  csSoftwareRender3DCommon *iG3D, iConfigFile *config)
+  csSoftwareGraphics3DCommon *iG3D, iConfigFile *config)
   : csTextureManager (object_reg, iG3D->GetDriver2D())
 {
   read_config (config);

@@ -159,7 +159,7 @@ bool csShaderGLCGVP::Load(iDataBuffer* program)
   const char* error = doc->Parse (program);
   if (error != 0)
   { 
-    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.render3d.shader.glcg",
+    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.graphics3d.shader.glcg",
       "XML error '%s'!", error);
     return false;
   }
@@ -272,7 +272,7 @@ bool csShaderGLCGVP::Prepare()
         "Variablemap warning: Variable '%s' not found in CG program.", 
         variablemap[i].cgvarname);
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-        "crystalspace.render3d.shader.glcg", msg, 0);
+        "crystalspace.graphics3d.shader.glcg", msg, 0);
     }
     if (!cgIsParameterReferenced (variablemap[i].parameter))
       variablemap[i].parameter = 0;

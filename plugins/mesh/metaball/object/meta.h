@@ -94,7 +94,7 @@ class csMetaBall : public iMeshObject
   csRef<iRenderBuffer> rndbuf_index;
   bool rndbuf_index_dirty;
 
-  csRef<iGraphics3D> r3d;
+  csRef<iGraphics3D> g3d;
 
 #endif
 

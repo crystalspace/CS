@@ -26,7 +26,7 @@
 struct iTextureHandle;
 struct iPolygonTexture;
 struct iObjectRegistry;
-class csGLRender3D;
+class csGLGraphics3D;
 
 /**
  * Cache element for a texture. This element will be stored
@@ -63,7 +63,7 @@ struct iGLTextureCache : iBase
 class csGLTextureCache : iGLTextureCache
 {
 private:
-  csGLRender3D* R3D;
+  csGLGraphics3D* G3D;
 protected:
   bool rstate_bilinearmap;
 
@@ -79,7 +79,7 @@ protected:
 public:
   SCF_DECLARE_IBASE;
   /// Takes the maximum size of the cache.
-  csGLTextureCache (int max_size, csGLRender3D* R3D);
+  csGLTextureCache (int max_size, csGLGraphics3D* G3D);
   ///
   virtual ~csGLTextureCache ();
 

@@ -93,8 +93,8 @@ csStencilShadowCacheEntry::~csStencilShadowCacheEntry ()
 bool csStencilShadowCacheEntry::Initialize (iObjectRegistry *objreg) 
 {
   model = 0;
-  r3d = CS_QUERY_REGISTRY (objreg, iGraphics3D);
-  if (!r3d) { return false; }
+  g3d = CS_QUERY_REGISTRY (objreg, iGraphics3D);
+  if (!g3d) { return false; }
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objreg,
 	"crystalspace.renderer.stringset", iStringSet);
   shadow_vertex_name = strings->Request ("shadow vertices");
@@ -127,7 +127,7 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
   {
     entry->meshLightPos = meshlightpos;
     if (entry->shadow_index_buffer == 0) { 
-      entry->shadow_index_buffer = r3d->CreateRenderBuffer (
+      entry->shadow_index_buffer = g3d->CreateRenderBuffer (
         sizeof (unsigned int)*triangle_count*12, CS_BUF_STATIC/*CS_BUF_INDEX*/,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
     }
@@ -294,10 +294,10 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
     vertex_count = mesh->GetVertexCount ();
 	triangle_count = new_triangle_count;
 
-    shadow_vertex_buffer = r3d->CreateRenderBuffer (
+    shadow_vertex_buffer = g3d->CreateRenderBuffer (
        sizeof (csVector3)*new_triangle_count*3, CS_BUF_STATIC,
        CS_BUFCOMP_FLOAT, 3, false);
-    shadow_normal_buffer = r3d->CreateRenderBuffer (
+    shadow_normal_buffer = g3d->CreateRenderBuffer (
        sizeof (csVector3)*new_triangle_count*3, CS_BUF_STATIC,
        CS_BUFCOMP_FLOAT, 3, false);
 
@@ -415,12 +415,12 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
-  r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   // Load the shadow vertex program 
   csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   if (!shmgr) {
     shmgr = CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.render3d.shadermanager",
+      "crystalspace.graphics3d.shadermanager",
       iShaderManager);
 
     if (!shmgr) {
@@ -446,7 +446,7 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
 /*
 void csStencil::Start (iVisibilityCuller* cul)
 {
-  r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
+  g3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
   culler = cul;
 }
 */
@@ -465,7 +465,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, iMeshWr
   if (!mesh->GetMovable()->IsFullTransformIdentity ())
     tr_o2c /= mesh->GetMovable()->GetFullTransform ();
 
-  iGraphics3D* r3d = rview->GetGraphics3D ();
+  iGraphics3D* g3d = rview->GetGraphics3D ();
   
   csRef<csStencilShadowCacheEntry> shadowCacheEntry = 
     (csStencilShadowCacheEntry*)shadowcache.Get((csHashKey)mesh);
@@ -506,19 +506,19 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, iMeshWr
         WTF? The same mesh drawn twice, one immediately after another? -
 	That has to be optimized, kids! [res]
        */
-      r3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
-      r3d->DrawMesh (&rmesh);
-      r3d->SetShadowState (CS_SHADOW_VOLUME_FAIL2);
-      r3d->DrawMesh (&rmesh);
+      g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
+      g3d->DrawMesh (&rmesh);
+      g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL2);
+      g3d->DrawMesh (&rmesh);
     }
     else 
     {
       rmesh.indexstart = edge_start;
       rmesh.indexend = index_range;
-      r3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
-      r3d->DrawMesh (&rmesh);
-      r3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
-      r3d->DrawMesh (&rmesh);
+      g3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
+      g3d->DrawMesh (&rmesh);
+      g3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
+      g3d->DrawMesh (&rmesh);
     }
     pass->ResetState ();
   }
@@ -608,7 +608,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector, iLight* 
   csRef<iVisibilityObjectIterator> objInLight = culler->VisTest (lightSphere);
 #endif
 
-  r3d->SetZMode (CS_ZBUF_TEST);
+  g3d->SetZMode (CS_ZBUF_TEST);
   
   csVector3 rad, center;
   float maxRadius = 0;
@@ -668,14 +668,14 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector, iLight* 
   }  
 #endif
 
-  r3d->SetShadowState (CS_SHADOW_VOLUME_USE);
+  g3d->SetShadowState (CS_SHADOW_VOLUME_USE);
 
 }
 
 /*
 void csStencil::Finish ()
 {
-  r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
+  g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
 }
 */
 

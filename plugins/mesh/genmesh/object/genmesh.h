@@ -81,7 +81,7 @@ private:
 #ifdef CS_USE_NEW_RENDERER
   csRenderMesh mesh;
   csRenderMesh* meshPtr;
-  csRef<iGraphics3D> r3d;
+  csRef<iGraphics3D> g3d;
 
   csReversibleTransform tr_o2c;
 #endif
@@ -414,7 +414,7 @@ private:
 
   bool autonormals;
 
-  csRef<iGraphics3D> r3d;
+  csRef<iGraphics3D> g3d;
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;

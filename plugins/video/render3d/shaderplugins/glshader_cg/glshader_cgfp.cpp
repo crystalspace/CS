@@ -30,15 +30,13 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "iutil/document.h"
 #include "iutil/string.h"
+#include "iutil/strset.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 //#include "ivideo/shader/shadervar.h"
-
-#include "../../opengl/gl_txtmgr.h"
-#include "../../opengl/gl_txtcache.h"
 
 #include "glshader_cgfp.h"
 
@@ -142,7 +140,7 @@ bool csShaderGLCGFP::Load(iDataBuffer* program)
   if (error != 0)
   { 
     csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, 
-      "crystalspace.render3d.shader.glcg", "XML error '%s'!", error);
+      "crystalspace.graphics3d.shader.glcg", "XML error '%s'!", error);
     return false;
   }
   return Load(doc->GetRoot());
@@ -254,7 +252,7 @@ bool csShaderGLCGFP::Prepare()
         "Variablemap warning: Variable '%s' not found in CG program.", 
         variablemap[i].cgvarname);
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-        "crystalspace.render3d.shader.glcg", msg, 0);
+        "crystalspace.graphics3d.shader.glcg", msg, 0);
     }
     if (!cgIsParameterReferenced (variablemap[i].parameter))
       variablemap[i].parameter = 0;

@@ -162,7 +162,7 @@ csGenericRenderStep::~csGenericRenderStep ()
 {
 }
 
-void csGenericRenderStep::RenderMeshes (iGraphics3D* r3d,
+void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
                                          iShaderWrapper* shader, 
                                          csRenderMesh** meshes, 
                                          int num)
@@ -190,7 +190,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* r3d,
       if (mixmode != 0)
         mesh->mixmode = mixmode;
 
-      r3d->DrawMesh (mesh);
+      g3d->DrawMesh (mesh);
       mesh->mixmode = mixsave;
 
       pass->ResetState ();
@@ -201,12 +201,12 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* r3d,
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
-  iGraphics3D* r3d = rview->GetGraphics3D();
+  iGraphics3D* g3d = rview->GetGraphics3D();
 
   if (zOffset)
-    r3d->EnableZOffset ();
+    g3d->EnableZOffset ();
 
-  r3d->SetZMode (zmode);
+  g3d->SetZMode (zmode);
 
   iSectorRenderMeshList* meshes = sector->GetRenderMeshes ();
   int meshnum = meshes->GetCount();
@@ -245,7 +245,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
       // @@@ Need error reporter
       if (shader != 0)
       {
-        RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
+        RenderMeshes (g3d, shader, sameShaderMeshes, numSSM);
       }
 
       shader = meshShader;
@@ -257,10 +257,10 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
   {
     // @@@ Need error reporter
     if (shader != 0)
-      RenderMeshes (r3d, shader, sameShaderMeshes, numSSM);
+      RenderMeshes (g3d, shader, sameShaderMeshes, numSSM);
   }
   if (zOffset)
-    r3d->DisableZOffset ();
+    g3d->DisableZOffset ();
 };
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,

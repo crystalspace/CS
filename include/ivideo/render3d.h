@@ -173,7 +173,7 @@ enum csVertexAttrib
   CS_VATTRIB_TEXCOORD3 = 111
 };
 
-/**\name Mix modes for DrawPolygonFX ()
+/**\name Mix modes
  * The constants can be ORed together if they belong to different masks.
  * @{ */
 /// SRC/DST mixing mode mask
@@ -299,7 +299,7 @@ enum R3D_RENDERSTATEOPTION
 };
 */
 
-class csRender3dCaps
+class csGraphics3DCaps
 {
 };
 
@@ -329,7 +329,11 @@ struct iGraphics3D : public iBase
 
   /**
    * Create a renderbuffer.
-   * \p size is the size of the buffer in bytes.
+   * \param size Size of the buffer in bytes.
+   * \param type Type of buffer; CS_BUF_DYNAMIC or CS_BUF_STATIC
+   * \param componentType Type of components; CS_BUFCOMP_BYTE, CS_BUFCOMP_INT, etc
+   * \param componentCount Number of components per element (e.g. 4 for RGBA)
+   * \param index True if this buffer will contain indices. (Triangle buffer)
    */
   virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
@@ -345,10 +349,6 @@ struct iGraphics3D : public iBase
   /// Activate a texture
   virtual bool ActivateTexture (iTextureHandle *txthandle, int unit = 0) = 0;
 
-  /// Activate a texture (Should probably handled some better way)
-  virtual bool ActivateTexture (iMaterialHandle *matwrapper,
-	int layer, int unit = 0) = 0;
-
   /// Deactivate a texture
   virtual void DeactivateTexture (int unit = 0) = 0;
 
@@ -360,7 +360,7 @@ struct iGraphics3D : public iBase
   virtual int GetHeight () const = 0;
 
   /// Capabilities of the driver
-  virtual const csRender3dCaps* GetCaps () const = 0;
+  virtual const csGraphics3DCaps* GetCaps () const = 0;
 
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y) = 0;
@@ -453,12 +453,11 @@ struct iGraphics3D : public iBase
   /**
    * Set optional clipper to use. If clipper == null
    * then there is no clipper.
-   * Currently only used by DrawTriangleMesh.
    */
   virtual void SetClipper (iClipper2D* clipper, int cliptype) = 0;
 
   /**
-   * Get clipper that was used.
+   * Get clipper that is used.
    */
   virtual iClipper2D* GetClipper () = 0;
 

@@ -23,13 +23,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 #include "imap/services.h"
 
-class csGLRender3D;
-
 class csGLShaderFFP : public iShaderProgram
 {
 private:
   csRef<iGraphics3D> g3d;
-  iGLTextureCache* txtcache;
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 

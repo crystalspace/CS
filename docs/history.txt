@@ -25,6 +25,11 @@ chronological order.
 	      do.
 	    - cslight now displays a text progress meter on the console, in
 	      addition to the graphical meter.
+	- Anders Stenberg changed most occurances of "Render3D" to 
+	  "Graphics3D", including some "r3d" that were changed to "g3d".
+	  Now filenames and makefile targets should be the only remnant of the
+	  stupid "render3d" naming (which was my fault, sorry for that :)
+	  Also added make- & jamfiles for new software renderer.
 27-Aug-2003
 	- Eric Sunshine fixed problem in csHash where non-friend classes
 	  csHash::Iterator and GlobalIterator were accessing protected csHash

@@ -150,18 +150,18 @@ csTargetRenderStep::~csTargetRenderStep ()
 
 void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
-  iGraphics3D* r3d = rview->GetGraphics3D();
+  iGraphics3D* g3d = rview->GetGraphics3D();
 
   csRef<iTextureWrapper> tex = 
     engine->GetTextureList ()->FindByName (target);
   csRef<iTextureHandle> oldcontext;
   if (tex != 0)
   {
-    r3d->SetRenderTarget (tex->GetTextureHandle (), false);
+    g3d->SetRenderTarget (tex->GetTextureHandle (), false);
     oldcontext = engine->GetContext ();
     engine->SetContext (tex->GetTextureHandle ());
   }
-  r3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
   for (int i = 0; i < steps.Length(); i++)
   {
     steps[i]->Perform (rview, sector);
@@ -169,7 +169,7 @@ void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector)
   
   if (tex != 0)
   {
-    r3d->FinishDraw ();
+    g3d->FinishDraw ();
     engine->SetContext (oldcontext);
   }
 }

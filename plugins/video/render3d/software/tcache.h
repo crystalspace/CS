@@ -23,7 +23,7 @@
 #include "csutil/scf.h"
 #include "imesh/thing/polygon.h"	//@@@
 
-class csSoftwareRender3DCommon;
+class csSoftwareGraphics3DCommon;
 class csSoftwareTextureManager;
 class csSoftwareTextureHandle;
 struct csPixelFormat;
@@ -195,7 +195,7 @@ public:
   /**
    * Do a debugging dump.
    */
-  void dump (csSoftwareRender3DCommon *iG3D);
+  void dump (csSoftwareGraphics3DCommon *iG3D);
 };
 
 #endif // __CS_TCACHE_H__

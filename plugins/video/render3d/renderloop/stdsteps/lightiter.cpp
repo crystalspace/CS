@@ -142,16 +142,16 @@ csLightIterRenderStep::~csLightIterRenderStep ()
 
 void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
-  iGraphics3D* r3d = rview->GetGraphics3D();
+  iGraphics3D* g3d = rview->GetGraphics3D();
 
-  r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, 
+  g3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, 
     csVector3 (0, 0, 0));
 
   iLightList* lights = sector->GetLights();
 
   int nlights = lights->GetCount();
 
-  //r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
+  //g3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
 
   while (nlights-- > 0)
   {
@@ -164,15 +164,15 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
     */
     csReversibleTransform camTransR = 
       rview->GetCamera()->GetTransform();
-    r3d->SetObjectToCamera (&camTransR);
+    g3d->SetObjectToCamera (&camTransR);
 
     const csColor& color = light->GetColor ();
-    r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, 
+    g3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, 
     csVector3 (color.red, color.green, color.blue));
 
-    r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
+    g3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
       light->GetAttenuationVector ());
-    r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
+    g3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
       lightPos);
 
     csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
@@ -186,7 +186,7 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
     }
   }
 
-  //r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
+  //g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
 
 }
 

@@ -69,20 +69,20 @@ void csGLTextureCache::Unload (csTxtCacheData *d)
 //----------------------------------------------------------------------------//
 
 csGLTextureCache::csGLTextureCache (int max_size,
-  csGLRender3D* R3D)
+  csGLGraphics3D* G3D)
 {
   rstate_bilinearmap = true;
   cache_size = max_size;
   num = 0;
   head = tail = 0;
   total_size = 0;
-  (csGLTextureCache::R3D = R3D)/*->IncRef ()*/;
+  (csGLTextureCache::G3D = G3D)/*->IncRef ()*/;
 }
 
 csGLTextureCache::~csGLTextureCache ()
 {
   Clear ();
-  //R3D->DecRef ();
+  //G3D->DecRef ();
 }
 
 void csGLTextureCache::Cache (iTextureHandle *txt_handle)
@@ -206,10 +206,10 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
         !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
           GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
 
-      if (R3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+      if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
       {
         glTexParameterf (GL_TEXTURE_1D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-          R3D->txtmgr->texture_filter_anisotropy);
+          G3D->txtmgr->texture_filter_anisotropy);
       }
     }
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
@@ -235,10 +235,10 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
           (!(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
           GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST));
 
-      if (R3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+      if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
       {
         glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-          R3D->txtmgr->texture_filter_anisotropy);
+          G3D->txtmgr->texture_filter_anisotropy);
       }
     }
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
@@ -265,10 +265,10 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
         !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
           GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
 
-      if (R3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+      if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
       {
         glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-          R3D->txtmgr->texture_filter_anisotropy);
+          G3D->txtmgr->texture_filter_anisotropy);
       }
     }
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
@@ -296,10 +296,10 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
         !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
           GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
 
-      if (R3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+      if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
       {
         glTexParameterf (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-          R3D->txtmgr->texture_filter_anisotropy);
+          G3D->txtmgr->texture_filter_anisotropy);
       }
     }
   }
@@ -333,7 +333,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
 	  @@@ Compress keycolored images to COMPRESSED_RGBA_S3TC_DXT1_EXT?
 	  (1-bit alpha)
 	 */
-	R3D->ext->glCompressedTexImage2DARB (
+	G3D->ext->glCompressedTexImage2DARB (
 	  GL_TEXTURE_2D, 
 	  i, 
 	  (GLenum)togl->internalFormat,
@@ -351,7 +351,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
     for (int i=0; i < txt_mm->vTex.Length (); i++)
     {
       csGLTexture *togl = txt_mm->vTex[i];
-      R3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, 
+      G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, 
                     i,
                     txt_mm->TargetFormat (),
                     togl->get_width (),

@@ -74,7 +74,7 @@ bool csGLShader_ARB::SupportType(const char* type)
 {
   if (!enable)
     return false;
-  if( strcasecmp(type, "gl_arb_vp") == 0)
+  else if( strcasecmp(type, "gl_arb_vp") == 0)
     return true;
   return false;
 }

@@ -78,7 +78,7 @@ void* csVBORenderBuffer::RenderLock (csGLRenderBufferLockType type)
 
 //-----------------------------------------------------------------
 
-csPtr<iRenderBuffer> csGLRender3D::CreateRenderBuffer (int size, 
+csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (int size, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
   int componentCount, bool index)
 {
