@@ -279,20 +279,23 @@ void csSpriteTemplate::SetMaterial (csMaterialWrapper *material)
   cstxt = material;
 }
 
-void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
+void csSpriteTemplate::ComputeNormals (csFrame* frame)
 {
+  int i, j;
+
   // @@@ We only calculated normals once for every frame.
   // Normal calculation is too expensive to do again every time.
   // But maybe we should make this optional for fast systems?
   if (frame->NormalsCalculated ()) return;
   frame->SetNormalsCalculated (true);
 
+  csVector3* object_verts = GetVertices (frame->GetAnmIndex());
+
   if (!tri_verts)
   {
     tri_verts = new csTriangleVertices (texel_mesh, object_verts, GetNumTexels());
   }
 
-  int i, j;
   csTriangle * tris = texel_mesh->GetTriangles();
   int num_triangles = texel_mesh->GetNumTriangles();
   // @@@ Avoid this allocate!
@@ -329,6 +332,93 @@ void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
   }
 
   delete[] tri_normals;
+}
+
+void csSpriteTemplate::MergeNormals ()
+{
+  int i;
+  for (i = 0; i < GetNumFrames (); i++)
+    MergeNormals (i);
+}
+void csSpriteTemplate::MergeNormals (int frame)
+{
+  int i, j;
+
+  GetFrame(frame)->SetNormalsCalculated (true);
+
+  csVector3* obj_verts = GetVertices (frame);
+
+  if (!tri_verts)
+  {
+    tri_verts = new csTriangleVertices (texel_mesh, obj_verts, GetNumTexels());
+  }
+
+  csTriangle * tris = texel_mesh->GetTriangles();
+  int num_triangles = texel_mesh->GetNumTriangles();
+  // @@@ Avoid this allocate!
+  csVector3 * tri_normals = new csVector3[num_triangles];
+
+  // calculate triangle normals
+  // get the cross-product of 2 edges of the triangle and normalize it
+  for (i = 0; i < num_triangles; i++)
+  {
+    csVector3 ab = obj_verts [tris[i].b] - obj_verts [tris[i].a];
+    csVector3 bc = obj_verts [tris[i].c] - obj_verts [tris[i].b];
+    tri_normals [i] = ab % bc;
+    float norm = tri_normals[i].Norm ();
+    if (norm)
+      tri_normals[i] /= norm;
+  }
+
+  // create a table that maps each vertex to the
+  // first vertex that has the same coordinates
+  int * merge = new int [GetNumTexels()];
+  for (i = 0; i < GetNumTexels(); i++)
+  {
+    merge[i] = i;
+    for (j = 0; j < i; j++)
+    {
+      csVector3 difference = obj_verts[i] - obj_verts[j];
+      if (difference.Norm () < 0.01)
+      {
+        merge[i] = j;
+        break;
+      }
+    }
+  }
+
+  // create a mesh which only uses the vertex indices in the table
+  csTriangleMesh merge_mesh;
+  for (i = 0; i < num_triangles; i++)
+    merge_mesh.AddTriangle (merge[tris[i].a], merge[tris[i].b], merge[tris[i].c]);
+  csTriangleVertices * tv = new csTriangleVertices (&merge_mesh, obj_verts, GetNumTexels());
+
+  // calculate vertex normals, by averaging connected triangle normals
+  for (i = 0; i < GetNumTexels(); i++)
+  {
+    csTriangleVertex &vt = tv->GetVertex (i);
+    if (vt.num_con_triangles)
+    {
+      csVector3 &n = GetNormal (frame, i);
+      n = csVector3 (0,0,0);
+      for (j = 0; j < vt.num_con_triangles; j++)
+        n += tri_normals [vt.con_triangles[j]];
+      float norm = n.Norm ();
+      if (norm)
+        n /= norm;
+    }
+  }
+
+  // one last loop to fill in all of the merged vertex normals
+  for (i = 0; i < GetNumTexels(); i++)
+  {
+  	csVector3 &n = GetNormal (frame, i);
+	n = GetNormal (frame, merge [i]);
+  }
+
+  delete[] tri_normals;
+  delete[] merge;
+  delete tv;
 }
 
 
@@ -1162,20 +1252,25 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   defered_num_lights = 0;
 
   csFrame* this_frame = cur_action->GetFrame (cur_frame);
+  csFrame* next_frame; // next frame for vertex animation interpolation
+  if (cur_frame + 1 < cur_action->GetNumFrames())
+    next_frame = cur_action->GetFrame (cur_frame + 1);
+  else
+    next_frame = cur_action->GetFrame (0);
+
   csVector3* work_obj_verts;
+
+  // we will need the vertex normals for the current frame
+  tpl->ComputeNormals (this_frame);
 
   if (tween_ratio)
   {
-    UpdateWorkTables (tpl->GetNumTexels ());
-
-    csFrame* next_frame;
-    if (cur_frame + 1 < cur_action->GetNumFrames())
-      next_frame = cur_action->GetFrame (cur_frame + 1);
-    else
-      next_frame = cur_action->GetFrame (0);
+    tpl->ComputeNormals (next_frame); // next frame normals for interpolation
+    UpdateWorkTables (tpl->GetNumTexels ()); // make room in obj_verts;
 
     int tf_idx = this_frame->GetAnmIndex();
     int nf_idx = next_frame->GetAnmIndex();
+
     float remainder = 1 - tween_ratio;
 
     for (i = 0 ; i < tpl->GetNumTexels() ; i++)
@@ -1184,10 +1279,7 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 
     work_obj_verts = obj_verts.GetArray ();
   }
-  else
-    work_obj_verts = GetObjectVerts (this_frame);
-
-  tpl->ComputeNormals (this_frame, work_obj_verts);
+  else work_obj_verts = GetObjectVerts (this_frame);
 
   ResetVertexColors ();
 
@@ -1214,7 +1306,13 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
 {
   int i, j;
   csFrame* this_frame = cur_action->GetFrame (cur_frame);
+  csFrame* next_frame;
+  if (cur_frame + 1 < cur_action->GetNumFrames())
+    next_frame = cur_action->GetFrame (cur_frame + 1);
+  else
+    next_frame = cur_action->GetFrame (0);
   int tf_idx = this_frame->GetAnmIndex();
+  int nf_idx = next_frame->GetAnmIndex();
 
   csBox3 obox;
   GetObjectBoundingBox (obox);
@@ -1237,15 +1335,26 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
     float obj_dist = FastSqrt (obj_sq_dist);
     float wor_dist = FastSqrt (wor_sq_dist);
 
+	csVector3 obj_light_direction = (obj_light_pos - obj_center);
+
     for (j = 0 ; j < tpl->GetNumTexels () ; j++)
     {
-      csVector3& obj_vertex = object_vertices[j];
+//      csVector3& obj_vertex = object_vertices[j];
+
+      csVector3 normal = tpl->GetNormal (tf_idx, j);
+      if (tween_ratio)
+      {
+        normal = tween_ratio * normal
+          + (1 - tween_ratio) * tpl->GetNormal (nf_idx, j);
+        normal = normal.Unit();
+      }
 
       float cosinus;
       if (obj_sq_dist < SMALL_EPSILON)
         cosinus = 1;
       else
-        cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (tf_idx, j);
+//        cosinus = (obj_light_pos - obj_vertex) * normal;
+        cosinus = obj_light_direction * normal;
 
       if (cosinus > 0)
       {
@@ -1267,7 +1376,14 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
 {
   int i, j;
   csFrame* this_frame = cur_action->GetFrame (cur_frame);
-  int tf_idx = this_frame->GetAnmIndex ();
+  csFrame* next_frame;
+  if (cur_frame + 1 < cur_action->GetNumFrames())
+    next_frame = cur_action->GetFrame (cur_frame + 1);
+  else
+    next_frame = cur_action->GetFrame (0);
+  int tf_idx = this_frame->GetAnmIndex();
+  int nf_idx = next_frame->GetAnmIndex();
+
   csColor color;
 
   for (i = 0 ; i < num_lights ; i++)
@@ -1291,11 +1407,20 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
       float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_vertex);
       float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_vertex);
 
+      csVector3 normal = tpl->GetNormal (tf_idx, j);
+      if (tween_ratio)
+      {
+        normal = tween_ratio * normal
+          + (1 - tween_ratio) * tpl->GetNormal (nf_idx, j);
+        normal = normal.Unit();
+      }
+
       float cosinus;
       if (obj_sq_dist < SMALL_EPSILON)
         cosinus = 1;
       else
-        cosinus = (obj_light_pos - obj_vertex) * tpl->GetNormal (tf_idx, j);
+        cosinus = (obj_light_pos - obj_vertex) * normal;
+
 
       if ((cosinus > 0) && (wor_sq_dist < sq_light_radius))
       {
