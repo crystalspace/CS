@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp libs/cssnddrv/null
 
 # The NULL Sound driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   SNDDRVN=$(OUTDLL)snddrvn$(DLL)
   DEP.SNDDRVN=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
@@ -57,7 +57,7 @@ cleanlib: snddrvncleanlib
 snddrvn: $(OUTDIRS) $(SNDDRVN)
 
 $(SNDDRVN): $(OBJ.SNDDRVN) $(DEP.SNDDRVN)
-	$(DO.LIBRARY)
+	$(DO.PLUGIN)
 
 snddrvnclean:
 	$(RM) $(SNDDRVN)

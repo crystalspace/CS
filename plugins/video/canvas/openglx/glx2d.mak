@@ -45,7 +45,7 @@ endif
 CFLAGS.GLX2D+=-I$(X11_PATH)/include
 
 # The 2D GLX driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   GLX2D=$(OUTDLL)glx2d$(DLL)
   LIBS.GLX2D=$(LIBS._GLX2D)
   DEP.GLX2D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
@@ -82,7 +82,7 @@ $(OUT)%$O: libs/cs2d/openglx/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLX2D)
  
 $(GLX2D): $(OBJ.GLX2D) $(DEP.GLX2D)
-	$(DO.LIBRARY) $(LIBS.GLX2D)
+	$(DO.PLUGIN) $(LIBS.GLX2D)
 
 glxclean:
 	$(RM) $(GLX2D)

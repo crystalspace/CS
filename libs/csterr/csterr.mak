@@ -25,7 +25,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csterr
 
-CSTERR.LIB = $(OUT)$(LIB_PREFIX)csterr$(LIB)
+CSTERR.LIB = $(OUT)$(LIB_PREFIX)csterr$(LIB_SUFFIX)
 SRC.CSTERR = $(wildcard libs/csterr/*.cpp)
 OBJ.CSTERR = $(addprefix $(OUT),$(notdir $(SRC.CSTERR:.cpp=$O)))
 
@@ -41,7 +41,7 @@ csterr: $(OUTDIRS) $(CSTERR.LIB)
 clean: csterrclean
 
 $(CSTERR.LIB): $(OBJ.CSTERR)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 csterrclean:
 	-$(RM) $(CSTERR.LIB)

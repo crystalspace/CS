@@ -25,7 +25,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csscript 
 
-CSSCRIPT.LIB = $(OUT)$(LIB_PREFIX)csscript$(LIB)
+CSSCRIPT.LIB = $(OUT)$(LIB_PREFIX)csscript$(LIB_SUFFIX)
 SRC.CSSCRIPT = $(wildcard libs/csscript/*.cpp libs/csscript/*/*.cpp)
 OBJ.CSSCRIPT = $(addprefix $(OUT),$(notdir $(SRC.CSSCRIPT:.cpp=$O)))
 
@@ -41,7 +41,7 @@ csscript: $(OUTDIRS) $(CSSCRIPT.LIB)
 clean: csscriptclean
 
 $(CSSCRIPT.LIB): $(OBJ.CSSCRIPT)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 csscriptclean:
 	-$(RM) $(CSSCRIPT.LIB)

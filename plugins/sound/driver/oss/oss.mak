@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp libs/cssnddrv/oss
 
 # The OSS sound driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   SNDOSS=$(OUTDLL)SoundDriverOSS$(DLL)
   DEP.OSS+=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
@@ -56,7 +56,7 @@ cleanlib: osscleanlib
 oss: $(OUTDIRS) $(SNDOSS)
 
 $(SNDOSS): $(OBJ.SNDOSS) $(DEP.OSS)
-	$(DO.LIBRARY)
+	$(DO.PLUGIN)
 
 ossclean:
 	$(RM) $(SNDOSS)

@@ -25,7 +25,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csobject
 
-CSOBJECT.LIB = $(OUT)$(LIB_PREFIX)csobject$(LIB)
+CSOBJECT.LIB = $(OUT)$(LIB_PREFIX)csobject$(LIB_SUFFIX)
 SRC.CSOBJECT = $(wildcard libs/csobject/*.cpp)
 OBJ.CSOBJECT = $(addprefix $(OUT),$(notdir $(SRC.CSOBJECT:.cpp=$O)))
 
@@ -41,7 +41,7 @@ csobject: $(OUTDIRS) $(CSOBJECT.LIB)
 clean: csobjectclean
 
 $(CSOBJECT.LIB): $(OBJ.CSOBJECT)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 csobjectclean:
 	-$(RM) $(CSGEOM.LIB)

@@ -41,7 +41,7 @@ ifeq ($(DO_AU),yes)
   SRC.CSSFXLDR+=libs/cssfxldr/aufile.cpp
 endif
 
-CSSFXLDR.LIB = $(OUT)$(LIB_PREFIX)cssfxldr$(LIB)
+CSSFXLDR.LIB = $(OUT)$(LIB_PREFIX)cssfxldr$(LIB_SUFFIX)
 OBJ.CSSFXLDR = $(addprefix $(OUT),$(notdir $(SRC.CSSFXLDR:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -56,7 +56,7 @@ cssfxldr: $(OUTDIRS) $(CSSFXLDR.LIB)
 clean: cssfxldrclean
 
 $(CSSFXLDR.LIB): $(OBJ.CSSFXLDR)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 cssfxldrclean:
 	-$(RM) $(CSSFXLDR.LIB)

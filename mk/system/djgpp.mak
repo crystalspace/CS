@@ -141,8 +141,8 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #---------------------------------------------------------------- configure ---#
 ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
 
-# Always override USE_DLL for DOS to "no"
-override USE_DLL = no
+# Always override USE_SHARED_PLUGINS for DOS to "no"
+override USE_SHARED_PLUGINS = no
 
 SYSCONFIG=bin/dosconf.bat
 # Check if "echo" executable is not installed (thus using dumb COMMAND.COM's echo)

@@ -53,7 +53,7 @@ ifeq ($(DO_WAL),yes)
   SRC.CSGFXLDR+=libs/csgfxldr/walimage.cpp
 endif
 
-CSGFXLDR.LIB = $(OUT)$(LIB_PREFIX)csgfxldr$(LIB)
+CSGFXLDR.LIB = $(OUT)$(LIB_PREFIX)csgfxldr$(LIB_SUFFIX)
 OBJ.CSGFXLDR = $(addprefix $(OUT),$(notdir $(SRC.CSGFXLDR:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -68,7 +68,7 @@ csgfxldr: $(OUTDIRS) $(CSGFXLDR.LIB)
 clean: csgfxldrclean
 
 $(CSGFXLDR.LIB): $(OBJ.CSGFXLDR)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 csgfxldrclean:
 	-$(RM) $(CSGFXLDR.LIB)

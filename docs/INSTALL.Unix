@@ -58,11 +58,11 @@ It is NOT possible to make Crystal Space using any other makefile
 First you need to configure the makefiles for your system. If you are
 on Linux you can do this as follows:
 
-	make linux USE_DLL=yes
+	make linux USE_SHARED_PLUGINS=yes
 
 This indicates that we are going to compile for linux and use dynamic
 linking (preferable). If you don't want to use the dynamic libraries you
-can set USE_DLL=no. That will generate one big executable.
+can set USE_SHARED_PLUGINS=no. That will generate one big executable.
 
 Other options you have here are:
 	linux
@@ -72,7 +72,7 @@ Other options you have here are:
 	beos
 	os2gcc
 	os2wcc
-	djgpp (only with USE_DLL=no)
+	djgpp (only with USE_SHARED_PLUGINS=no)
 	macosxs
 	openstep
 	nextstep
@@ -90,12 +90,13 @@ Then you need to do the following:
 
 	make apps
 
-If you selected USE_DLL=yes then this will generate an executable and
-drivers (extension *.so) for the software renderer, a 2D driver,
-and some network drivers. If you selected USE_DLL=no then only the
-executable is generated and the drivers are contained in that executable.
+If you selected USE_SHARED_PLUGINS=yes then this will generate an
+executable and drivers (extension *.so) for the software renderer,
+a 2D driver, and some network drivers. If you selected USE_SHARED_PLUGINS=no
+then only the executable is generated and the drivers are contained in that
+executable.
 
-If you selected USE_DLL=yes then you need to register the drivers
+If you selected USE_SHARED_PLUGINS=yes then you need to register the drivers
 (this only needs to be done once) with the 'csregsvr' utility that was
 also compiled by 'make all'. Do this as follows:
 
@@ -103,8 +104,8 @@ also compiled by 'make all'. Do this as follows:
 
 If all is well this should register all drivers so
 that Crystal Space will be able to load them dynamically. This step
-is not needed with USE_DLL=no. The result of registration is put in
-csCOM.cfg which needs to be in the same directory as the executable.
+is not needed with USE_SHARED_PLUGINS=no. The result of registration is
+put in csCOM.cfg which needs to be in the same directory as the executable.
 The csCOM.cfg which comes with CS is already pre-registered so the
 above step may actually not be needed. But it is best to try it to
 make sure that all libraries are correctly compiled. Note that it

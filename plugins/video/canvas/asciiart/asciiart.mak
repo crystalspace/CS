@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 LIBS.ASCIIART+=$(LFLAGS.l)aa
 
 # The 2D Ascii Art driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   ASCIIART=asciiart$(DLL)
   DEP.ASCIIART=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.LOCAL.ASCIIART=$(LIBS.ASCIIART)
@@ -61,7 +61,7 @@ cleanlib: asciiartcleanlib
 asciiart: $(OUTDIRS) $(ASCIIART)
 
 $(ASCIIART): $(OBJ.ASCIIART) $(DEP.ASCIIART)
-	$(DO.LIBRARY) $(LIBS.LOCAL.ASCIIART)
+	$(DO.PLUGIN) $(LIBS.LOCAL.ASCIIART)
 
 asciiartclean:
 	$(RM) $(ASCIIART)

@@ -38,8 +38,16 @@ MAKESECTION=defines
 include mk/subs.mak
 include mk/nasm.mak
 
-ifeq ($(USE_DLL),no)
+ifeq ($(USE_SHARED_LIBS),no)
   override MAKE_DLL=no
+endif
+
+ifeq ($(USE_SHARED_LIBS),yes)
+  DO.LIBRARY = $(DO.SHARED.LIBRARY)
+  LIB_SUFFIX = $(DLL)
+else
+  DO.LIBRARY = $(DO.STATIC.LIBRARY)
+  LIB_SUFFIX = $(LIB)
 endif
 
 .SUFFIXES: $O $(EXE) $(LIB) $(DLL) .S .c .cpp .h .asm .ash
@@ -69,12 +77,12 @@ ifeq ($(MAKE_DLL),yes)
 endif
 
 # Use $(^^) instead of $^ when you need all dependencies except libraries
-^^=$(filter-out %$(LIB),$^)
+^^=$(filter-out %$(LIB_SUFFIX),$^)
 # Use $(<<) instead of $< to allow system-dependent makefiles to override
 <<=$<
 # Use $(L^) to link with all libraries specified as dependencies
 L^=$(addprefix $(LFLAGS.l),$(subst $(SPACE)$(LIB_PREFIX),$(SPACE),\
-  $(basename $(notdir $(filter %$(LIB),$+)))))
+  $(basename $(notdir $(filter %$(LIB_SUFFIX),$+)))))
 
 # How to compile a .c source
 DO.COMPILE.C = $(CC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
@@ -86,17 +94,22 @@ DO.COMPILE.S = $(CC) $(CFLAGS.@) -x assembler-with-cpp $(<<) $(CFLAGS) $(CFLAGS.
 DO.COMPILE.ASM = $(NASM) $(NASM.@) $(NASMFLAGS) $(<<)
 # How to make a static library
 DO.STATIC.LIBRARY = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
-# How to make a dynamic library
-DO.DYNAMIC.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
+# How to make a shared/dynamic library
+DO.SHARED.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
+# How to make a static plugin
+DO.STATIC.PLUGIN = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
+# How to make a shared plugin
+DO.SHARED.PLUGIN = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
 # How to link a console executable
 DO.LINK.CONSOLE.EXE = $(LINK) $(LFLAGS) $(LFLAGS.CONSOLE.EXE) $(LFLAGS.@) $(^^) $(L^) $(LIBS)
 # How to link a graphical executable
 DO.LINK.EXE = $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) $(L^) $(LIBS)
+
 # How to do either a dynamic or static library (depending on MAKE_DLL)
 ifeq ($(MAKE_DLL),yes)
-  DO.LIBRARY = $(DO.DYNAMIC.LIBRARY)
+  DO.PLUGIN = $(DO.SHARED.PLUGIN)
 else
-  DO.LIBRARY = $(DO.STATIC.LIBRARY)
+  DO.PLUGIN = $(DO.SHARED.PLUGIN)
 endif
 
 # The sed script used to build dependencies

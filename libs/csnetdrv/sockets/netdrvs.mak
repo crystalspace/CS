@@ -32,7 +32,7 @@ ifeq ($(NEED_SOCKET_LIB),yes)
 endif
 
 # The NULL Network driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   NETDRVS=$(OUTDLL)netdrvs$(DLL)
   LIBS.NETDRVS=$(LIBS.LOCAL.NETDRVS)
   DEP.NETDRVS=$(CSCOM.LIB) $(CSSYS.LIB) $(CSUTIL.LIB)
@@ -63,7 +63,7 @@ cleanlib: netdrvscleanlib
 netdrvs: $(OUTDIRS) $(NETDRVS)
 
 $(NETDRVS): $(OBJ.NETDRVS) $(DEP.NETDRVS)
-	$(DO.LIBRARY) $(LIBS.NETDRVS)
+	$(DO.PLUGIN) $(LIBS.NETDRVS)
 
 netdrvsclean:
 	$(RM) $(NETDRVS)

@@ -2,7 +2,7 @@
 
 DO.MAKE.VOLATILE=$(MAKE_VOLATILE_H)
 
-ifeq ($(USE_DLL),no)
+ifeq ($(USE_SHARED_PLUGINS),no)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_STATIC_LINKED$">>volatile.tmp
 endif
 ifeq ($(BUGGY_EGCS_COMPILER),yes)

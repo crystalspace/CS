@@ -37,7 +37,7 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 ifeq ($(MAKESECTION),defines)
 
 # Save the LIB variable for MSVC linker
-MSVCLIB:=$(LIB)
+MSVCLIB:=$(LIB_SUFFIX)
 
 # Typical extension for executables on this system (e.g. EXE=.exe)
 EXE=.exe
@@ -46,7 +46,7 @@ EXE=.exe
 DLL=.dll
 
 # Typical extension for static libraries
-LIB=.lib
+LIB_SUFFIX=.lib
 AR=lib
 ARFLAGS=-nologo
 ARFLAGS.@=-out:$@
@@ -182,11 +182,11 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),postdefines)
 
 # We need a slightly different approach to specify libraries
-L^=$(filter %$(LIB),$+)
+L^=$(filter %$(LIB_SUFFIX),$+)
 
 # How to bind resources to a DLL or executable
 DO.BIND.RES = $(RC) $(RCFLAGS) $(subst /,\,$(filter %.res,$^)) $@
-ifeq ($(USE_DLL),no)
+ifeq ($(USE_SHARED_PLUGINS),no)
 DO.LINK.CONSOLE.EXE+=$(CR)$(DO.BIND.RES)
 DO.LINK.EXE+=$(CR)$(DO.BIND.RES)
 endif

@@ -67,7 +67,7 @@ ARFLAGS=-b -c -fo -n
 LIB_PREFIX=
 
 # Extra libraries needed on this system.
-ifeq ($(USE_DLL),no)
+ifeq ($(USE_SHARED_PLUGINS),no)
   LIBS.EXE+=LIBP $(OUTOS) L csos2
 endif
 
@@ -163,7 +163,7 @@ CXX=wpp386
 LINKERFILE=_____tmp.lnk
 define LINK
   @rem $(shell del $(LINKERFILE))\
-       $(foreach objfile,$(subst /,\,$(filter-out %.res,$(filter-out %$(LIB),$^))),$(shell echo FILE $(objfile)>>$(LINKERFILE)))
+       $(foreach objfile,$(subst /,\,$(filter-out %.res,$(filter-out %$(LIB_SUFFIX),$^))),$(shell echo FILE $(objfile)>>$(LINKERFILE)))
   wlink
 endef
 
@@ -205,7 +205,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 # How to bind resources to a DLL or executable
 DO.BIND.RES = $(RC) $(RCFLAGS) $(subst /,\,$(filter %.res,$^)) $@
-ifeq ($(USE_DLL),no)
+ifeq ($(USE_SHARED_PLUGINS),no)
 DO.LINK.CONSOLE.EXE+=$(CR)$(DO.BIND.RES)
 DO.LINK.EXE+=$(CR)$(DO.BIND.RES)
 endif

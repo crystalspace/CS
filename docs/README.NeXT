@@ -658,7 +658,8 @@ This is a list of known problems with the current release of this project.
     Added a 'distclean' target to the makefile.
     Removed redundant code and hard-coded constants from Makefile and cs.mak.
     Updated makefiles so that drivers2d, drivers3d, netdrivers, snddrivers,
-        and drivers targets work even for platforms which specify USE_DLL=no.
+        and drivers targets work even for platforms which specify
+	USE_SHARED_PLUGINS=no.
     Updated PrimEdit to work with beta 13.
     Now TARGET_ARCHS is a "sticky" option, specified at configuration time.
     Worked around compiler bug in OpenStep 4.2 where compiler corrupts virtual

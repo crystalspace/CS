@@ -25,7 +25,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/cstools
 
-CSTOOLS.LIB = $(OUT)$(LIB_PREFIX)cstools$(LIB)
+CSTOOLS.LIB = $(OUT)$(LIB_PREFIX)cstools$(LIB_SUFFIX)
 SRC.CSTOOLS = $(wildcard libs/cstools/*.cpp)
 OBJ.CSTOOLS = $(addprefix $(OUT),$(notdir $(SRC.CSTOOLS:.cpp=$O)))
 
@@ -41,7 +41,7 @@ cstools: $(OUTDIRS) $(CSTOOLS.LIB)
 clean: cstoolsclean
 
 $(CSTOOLS.LIB): $(OBJ.CSTOOLS)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 cstoolsclean:
 	-$(RM) $(CSTOOLS.LIB)

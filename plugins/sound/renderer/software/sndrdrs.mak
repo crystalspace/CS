@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp libs/cssndrdr/software
 
 # The Software Sound renderer
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   SNDRDRS=$(OUTDLL)sndrdrs$(DLL)
   DEP.SNDRDRS=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) $(CSSNDLDR.LIB) $(CSSFXLDR.LIB)
 else
@@ -57,7 +57,7 @@ cleanlib: sndrdrscleanlib
 sndrdrs: $(OUTDIRS) $(SNDRDRS)
 
 $(SNDRDRS): $(OBJ.SNDRDRS) $(DEP.SNDRDRS)
-	$(DO.LIBRARY)
+	$(DO.PLUGIN)
 
 sndrdrsclean:
 	$(RM) $(SNDRDRS)

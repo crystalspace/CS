@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp libs/cssndrdr/null
 
 # The NULL Sound renderer
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   SNDRDRN=$(OUTDLL)sndrdrn$(DLL)
   DEP.SNDRDRN=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
@@ -57,7 +57,7 @@ cleanlib: sndrdrncleanlib
 sndrdrn: $(OUTDIRS) $(SNDRDRN)
 
 $(SNDRDRN): $(OBJ.SNDRDRN) $(DEP.SNDRDRN)
-	$(DO.LIBRARY)
+	$(DO.PLUGIN)
 
 sndrdrnclean:
 	$(RM) $(SNDRDRN)

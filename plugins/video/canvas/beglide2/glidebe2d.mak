@@ -34,7 +34,7 @@ CFLAGS.GLIDEBE2D+=-I/boot/develop/headers/3dfx/glide2
 LIBS._GLIDEBE2D+=/boot/develop/lib/x86/glide2x.so
 
 # The 2D BeOS/Glide driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   GLIDEBE2D=$(OUTDLL)glidebe2d$(DLL)
   LIBS.GLIDEBE2D=$(LIBS._GLIDEBE2D)
 else
@@ -71,7 +71,7 @@ $(OUT)%$O: libs/cs2d/beglide2/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDEBE2D)
  
 $(GLIDEBE2D): $(OBJ.GLIDEBE2D) $(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
-	$(DO.LIBRARY) $(LIBS.GLIDEBE2D)
+	$(DO.PLUGIN) $(LIBS.GLIDEBE2D)
 
 glidebeclean:
 	$(RM) $(GLIDEBE2D)

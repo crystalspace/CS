@@ -45,10 +45,10 @@ endif
 
 SRC.CSSYS = $(wildcard libs/cssys/common/*.cpp $(SRC.SYS_CSSYS))
 ifeq ($(MAKE_DLL),yes)
-  CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys_D$(LIB)
+  CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys_D$(LIB_SUFFIX)
   SRC.CSSYS += $(SRC.SYS_CSSYS_DLL)
 else
-  CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys$(LIB)
+  CSSYS.LIB = $(OUT)$(LIB_PREFIX)cssys$(LIB_SUFFIX)
   SRC.CSSYS += $(SRC.SYS_CSSYS_EXE)
 endif
 OBJ.CSSYS = $(addprefix $(OUT),$(notdir $(subst .s,$O,$(subst .c,$O,$(SRC.CSSYS:.cpp=$O)))))
@@ -65,7 +65,7 @@ cssys: $(OUTDIRS) $(CSSYS.LIB)
 clean: cssysclean
 
 $(CSSYS.LIB): $(OBJ.CSSYS)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 cssysclean:
 	-$(RM) $(CSSYS.LIB)

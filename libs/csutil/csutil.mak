@@ -25,7 +25,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csutil
 
-CSUTIL.LIB = $(OUT)$(LIB_PREFIX)csutil$(LIB)
+CSUTIL.LIB = $(OUT)$(LIB_PREFIX)csutil$(LIB_SUFFIX)
 SRC.CSUTIL = $(wildcard libs/csutil/*.cpp libs/csutil/*/*.cpp libs/csutil/*/*/*.cpp)
 OBJ.CSUTIL = $(addprefix $(OUT),$(notdir $(SRC.CSUTIL:.cpp=$O)))
 
@@ -80,7 +80,7 @@ $(OUT)%$O: libs/csutil/impexp/vla/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SOFT3D)
 
 $(CSUTIL.LIB): $(OBJ.CSUTIL)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 csutilclean:
 	-$(RM) $(CSUTIL.LIB)

@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 LIBS._GGI2D = -lggi
 
 # The GGI 2D driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   GGI2D=$(OUTDLL)ggi2d$(DLL)
   LIBS.GGI2D+=$(LIBS._GGI2D)
   DEP.GGI2D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
@@ -60,13 +60,13 @@ cleanlib: ggicleanlib
 ggi2d: $(OUTDIRS) $(GGI2D)
 
 $(GGI2D): $(OBJ.GGI2D)
-#	$(DO.LIBRARY) $(LIBS.GGI2D)
+#	$(DO.PLUGIN) $(LIBS.GGI2D)
 
 $(OUT)%$O: libs/cs2d/ggi/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GGI2D)
 
 $(GGI2D): $(OBJ.GGILIB2D) $(DEP.GGI2D)
-	$(DO.LIBRARY) $(LIBS.GGI2D)
+	$(DO.PLUGIN) $(LIBS.GGI2D)
 
 ggiclean:
 	$(RM) $(GGI2D)

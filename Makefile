@@ -31,7 +31,7 @@ SYSHELP = \
   echo $"The makefile system can be configured for the following platforms:$"
 define SYSMODIFIERSHELP
   echo $"+++ Modifiers +++$"
-  echo $"  USE_DLL=yes$|no$"
+  echo $"  USE_SHARED_PLUGINS=yes$|no$"
   echo $"      Build drivers/plugins as dynamic/static modules$"
   echo $"  MODE=optimize$|debug$|profile$"
   echo $"      Select one of three available compilation modes$"
@@ -76,7 +76,7 @@ platforms:
 
 showconfig:
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
-	@echo $"  USE_DLL=$(USE_DLL) MODE=$(MODE) $(SYSMODIFIERS)$"
+	@echo $"  USE_SHARED_PLUGINS=$(USE_SHARED_PLUGINS) MODE=$(MODE) $(SYSMODIFIERS)$"
 	@echo $(SEPARATOR)
 
 drvhelp:
@@ -121,7 +121,7 @@ banner:
 showplatforms:
 	@$(SYSHELP)
 	@$(SYSMODIFIERSHELP)
-	@echo $"  Example: make linux USE_DLL=yes MODE=debug$"
+	@echo $"  Example: make linux USE_SHARED_PLUGINS=yes MODE=debug$"
 	@echo $(SEPARATOR)
 
 # Prepare for specific system
@@ -145,7 +145,7 @@ configure: config.tmp
 
 config.tmp:
 	@echo MODE = $(MODE)>>config.tmp
-	@echo USE_DLL = $(USE_DLL)>>config.tmp
+	@echo USE_SHARED_PLUGINS = $(USE_SHARED_PLUGINS)>>config.tmp
 	@$(SYSCONFIG)
 	$(subst DEST,config.mak,$(UPD))
 

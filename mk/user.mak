@@ -9,8 +9,14 @@
 # changes to become effective.
 
 # Should we build drivers/plugins as loadable modules?
-ifndef USE_DLL
-  USE_DLL=yes
+ifndef USE_SHARED_PLUGINS
+  USE_SHARED_PLUGINS=yes
+endif
+
+# Should we build libraries as shared/dynamic libraries?
+# Currently only supported on Unix
+ifndef USE_SHARED_LIBS
+  USE_SHARED_LIBS=no
 endif
 
 # Default build mode

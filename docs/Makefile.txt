@@ -39,7 +39,7 @@ a sample of configuration submakefile for Linux:
 	# Automatically generated file, do not edit!
 	TARGET = linux
 	MODE = debug
-	USE_DLL = no
+	USE_SHARED_PLUGINS = no
 	PROC = INTEL
 	CXX = g++
 	CFLAGS.CONFIG += -mpentium -march=i586
@@ -49,12 +49,13 @@ a sample of configuration submakefile for Linux:
 
 	As you can see, the first statement defines the TARGET platform and the
 second defines the system-dependend submakefile. The MODE variable defines the
-default build mode (debug, profile or optimize). USE_DLL tells whenever we
-will or won't use dynamic-linked libraries (on platforms that do not support
-dynamic linking system-dependent submakefile usually do "override USE_DLL=no").
-The following statements defines several minor host platform/OS characteristics
-such as processor type, C++ compiler, X Windows include path and several
-optimization switches that are supported by compiler.
+default build mode (debug, profile or optimize). USE_SHARED_PLUGINS tells
+whenever we will or won't use dynamic-linked libraries (on platforms that
+do not support dynamic linking system-dependent submakefile usually do
+"override USE_SHARED_PLUGINS=no"). The following statements defines several
+minor host platform/OS characteristics such as processor type, C++ compiler,
+X Windows include path and several optimization switches that are supported
+by compiler.
 
 	The system submakefile defines everything that is host platform/compiler
 dependent - the system-dependent libraries (for example, some Unices require

@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp libs/csnetdrv/null
 
 # The NULL Network driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   NETDRVN=$(OUTDLL)netdrvn$(DLL)
   DEP.NETDRVN=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
@@ -57,7 +57,7 @@ cleanlib: netdrvncleanlib
 netdrvn: $(OUTDIRS) $(NETDRVN)
 
 $(NETDRVN): $(OBJ.NETDRVN) $(DEP.NETDRVN)
-	$(DO.LIBRARY)
+	$(DO.PLUGIN)
 
 netdrvnclean:
 	$(RM) $(NETDRVN)

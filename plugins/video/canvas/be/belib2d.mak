@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp libs/cs2d/be
 
 # The 2D Belib driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   BE2D=$(OUTDLL)be2d$(DLL)
   DEP.BE2D = $(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
@@ -58,7 +58,7 @@ cleanlib: becleanlib
 be2d: $(OUTDIRS) $(BE2D)
 
 $(BE2D): $(OBJ.BE2D) $(DEP.BE2D)
-	$(DO.LIBRARY)
+	$(DO.PLUGIN)
 
 beclean:
 	$(RM) $(BE2D)

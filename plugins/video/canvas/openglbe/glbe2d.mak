@@ -33,7 +33,7 @@ ifeq ($(MAKESECTION),postdefines)
 CFLAGS.GLBE2D+=-I/boot/home/develop/headers/be/opengl
 
 # The 2D GLBe driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   GLBE2D=$(OUTDLL)glbe2d$(DLL)
   DEP.BE2D = $(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.GLBE2D=-lGL
@@ -70,7 +70,7 @@ $(OUT)%$O: libs/cs2d/openglbe/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLBE2D)
 
 $(GLBE2D): $(OBJ.GLBE2D) $(DEP.BE2D)
-	$(DO.LIBRARY) $(LIBS.GLBE2D)
+	$(DO.PLUGIN) $(LIBS.GLBE2D)
 
 glbeclean:
 	$(RM) $(GLBE2D)

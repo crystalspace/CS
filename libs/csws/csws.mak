@@ -25,7 +25,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csws
 
-CSWS.LIB = $(OUT)$(LIB_PREFIX)csws$(LIB)
+CSWS.LIB = $(OUT)$(LIB_PREFIX)csws$(LIB_SUFFIX)
 SRC.CSWS = $(wildcard libs/csws/*.cpp)
 OBJ.CSWS = $(addprefix $(OUT),$(notdir $(SRC.CSWS:.cpp=$O)))
 
@@ -41,7 +41,7 @@ csws: $(OUTDIRS) $(CSWS.LIB)
 clean: cswsclean
 
 $(CSWS.LIB): $(OBJ.CSWS)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 cswsclean:
 	-$(RM) $(CSWS.LIB)

@@ -27,7 +27,7 @@ vpath %.cpp libs/csengine libs/csengine/2d libs/csengine/basic \
   libs/csengine/colldet libs/csengine/light libs/csengine/objects \
   libs/csengine/polygon
 
-CSENGINE.LIB = $(OUT)$(LIB_PREFIX)csengine$(LIB)
+CSENGINE.LIB = $(OUT)$(LIB_PREFIX)csengine$(LIB_SUFFIX)
 SRC.CSENGINE = $(wildcard libs/csengine/*.cpp libs/csengine/*/*.cpp)
 OBJ.CSENGINE = $(addprefix $(OUT),$(notdir $(SRC.CSENGINE:.cpp=$O)))
 
@@ -43,7 +43,7 @@ csengine: $(OUTDIRS) $(CSENGINE.LIB)
 clean: csengineclean
 
 $(CSENGINE.LIB): $(OBJ.CSENGINE)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 csengineclean:
 	-$(RM) $(CSENGINE.LIB)

@@ -31,7 +31,7 @@ CFLAGS.GLIDE3D+=-I/usr/local/glide/include -DDO_GLIDE -DGLIDE24_ONLY
 LIBS._GLIDE3D+=-lglide2x
 
 # The Glide driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   GLIDE3D=Glide2xRender$(DLL)
   LIBS.GLIDE3D=$(LIBS._GLIDE3D)
   DEP.GLIDE3D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
@@ -65,7 +65,7 @@ $(OUT)%$O: libs/cs3d/glide2/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDE3D)
 
 $(GLIDE3D): $(OBJ.GLIDE3D) $(DEP.GLIDE3D)
-	$(DO.LIBRARY) $(LIBS.GLIDE3D)
+	$(DO.PLUGIN) $(LIBS.GLIDE3D)
 
 glide3dclean:
 	$(RM) $(GLIDE3D)

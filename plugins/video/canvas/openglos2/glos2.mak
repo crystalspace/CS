@@ -19,7 +19,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glos2
 
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
 all drivers drivers2d: glos2
 endif
 
@@ -38,7 +38,7 @@ LIBS.GLOS2+=-lopengl
 GLOS2.RES=$(OUTOS)libGL.res
 
 # The 2D OS/2 OpenGL driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   GLOS2=glos2$(DLL)
   LIBS.LOCAL.GLOS2=$(LIBS.GLOS2)
   DEP.GLOS2=$(GLOS2.RES) $(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
@@ -74,7 +74,7 @@ cleanlib: gl2dcleanlib
 glos2: $(OUTDIRS) $(GLOS2)
 
 $(GLOS2): $(OBJ.GLOS2) $(DEP.GLOS2)
-	$(DO.LIBRARY) $(LIBS.LOCAL.GLOS2)
+	$(DO.PLUGIN) $(LIBS.LOCAL.GLOS2)
 
 $(GLOS2.RES): libs/cs2d/openglos2/libGL.rc
 	$(RC) $(RCFLAGS) $< $@

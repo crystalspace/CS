@@ -36,7 +36,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),postdefines)
 
 # The NeXT 2D driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   NEXT2D=$(OUTDLL)next2d$(DLL)
 else
   NEXT2D=$(OUT)$(LIB_PREFIX)next2d$(LIB)
@@ -64,7 +64,7 @@ cleanlib: next2dcleanlib
 next2d: $(OUTDIRS) $(NEXT2D)
 
 $(NEXT2D): $(OBJ.NEXT2D)
-	$(DO.LIBRARY)
+	$(DO.PLUGIN)
 
 next2dclean:
 	$(RM) $(NEXT2D)

@@ -32,7 +32,7 @@ CFLAGS.GLIDEX2D+=-L$(X11_PATH)/include -I/usr/local/glide/include
 LIBS._GLIDEX2D+=-L$(X11_PATH)/lib -lXext -lX11 -lglide2x  
 
 # The 2D GlideX driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   GLIDEX2D=glidex2d$(DLL)
   LIBS.GLIDEX2D=$(LIBS._GLIDEX2D)
 else
@@ -62,7 +62,7 @@ $(OUT)%$O: libs/cs2d/unxglide2/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDEX2D)
  
 $(GLIDEX2D): $(OBJ.GLIDEX2D) $(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
-	$(DO.LIBRARY) $(LIBS.GLIDEX2D)
+	$(DO.PLUGIN) $(LIBS.GLIDEX2D)
 
 glidexclean:
 	$(RM) $(GLIDEX2D)

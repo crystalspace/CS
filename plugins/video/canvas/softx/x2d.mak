@@ -32,7 +32,7 @@ CFLAGS.X2D+=-I$(X11_PATH)/include
 LIBS.X2D+=-L$(X11_PATH)/lib -lXext -lX11
  
 # The 2D Xlib driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   XLIB2D=$(OUTDLL)x2d$(DLL)
   LIBS.LOCAL.X2D=$(LIBS.X2D)
   DEP.X2D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
@@ -63,7 +63,7 @@ $(OUT)%$O: libs/cs2d/softx/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.X2D)
  
 $(XLIB2D): $(OBJ.XLIB2D) $(DEP.X2D)
-	$(DO.LIBRARY) $(LIBS.LOCAL.X2D)
+	$(DO.PLUGIN) $(LIBS.LOCAL.X2D)
 
 libxclean:
 	$(RM) $(XLIB2D)

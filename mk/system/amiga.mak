@@ -166,6 +166,6 @@ endif # ifeq ($(MAKESECTION),confighelp)
 ifeq ($(ROOTCONFIG),config)
 
 # Currently this port does not support dynamic libraries
-override USE_DLL = no
+override USE_SHARED_PLUGINS = no
 
 endif # ifeq ($(ROOTCONFIG),config)

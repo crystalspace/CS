@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 LIBS._SVGA2D+=-lvga -lvgagl
 
 # The 2D SVGAlib driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   SVGA2D=$(OUTDLL)svga2d$(DLL)
   LIBS.SVGA2D+=$(LIBS._SVGA2D)
   DEP.SVGA2D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
@@ -62,7 +62,7 @@ $(OUT)%$O: libs/cs2d/svgalib/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SVGA2D)
  
 $(SVGA2D): $(OBJ.SVGA2D) $(DEP.SVGA2D)
-	$(DO.LIBRARY) $(LIBS.SVGA2D)
+	$(DO.PLUGIN) $(LIBS.SVGA2D)
 
 svgalib2dclean:
 	$(RM) $(SVGA2D)

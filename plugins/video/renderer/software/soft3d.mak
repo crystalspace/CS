@@ -29,7 +29,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/cs3d/software
 
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   SOFT3D=$(OUTDLL)softrndr$(DLL)
   DEP.SOFT3D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
@@ -71,7 +71,7 @@ $(OUT)%$O: libs/cs3d/software/i386/%.asm
 	$(DO.COMPILE.ASM) $(NASMFLAGS.SOFT3D)
 
 $(SOFT3D): $(OBJ.SOFT3D) $(DEP.SOFT3D)
-	$(DO.LIBRARY)
+	$(DO.PLUGIN)
 
 softclean:
 	$(RM) $(SOFT3D)

@@ -25,7 +25,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csgeom
 
-CSGEOM.LIB = $(OUT)$(LIB_PREFIX)csgeom$(LIB)
+CSGEOM.LIB = $(OUT)$(LIB_PREFIX)csgeom$(LIB_SUFFIX)
 SRC.CSGEOM = $(wildcard libs/csgeom/*.cpp)
 OBJ.CSGEOM = $(addprefix $(OUT),$(notdir $(SRC.CSGEOM:.cpp=$O)))
 
@@ -41,7 +41,7 @@ csgeom: $(OUTDIRS) $(CSGEOM.LIB)
 clean: csgeomclean
 
 $(CSGEOM.LIB): $(OBJ.CSGEOM)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 csgeomclean:
 	-$(RM) $(CSGEOM.LIB)

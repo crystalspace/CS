@@ -29,7 +29,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 LIBS.DDRAW+=ddraw.lib
 
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   DDRAW=csddraw$(DLL)
   DEP.DDRAW=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
   LIBS.LOCAL.DDRAW=$(LIBS.DDRAW)
@@ -60,7 +60,7 @@ cleanlib: ddrawcleanlib
 ddraw: $(OUTDIRS) $(DDRAW)
 
 $(DDRAW): $(OBJ.DDRAW) $(DEP.DDRAW)
-	$(DO.LIBRARY) $(LIBS.LOCAL.DDRAW)
+	$(DO.PLUGIN) $(LIBS.LOCAL.DDRAW)
 
 ddrawclean:
 	$(RM) $(DDRAW)

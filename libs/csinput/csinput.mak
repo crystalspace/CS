@@ -25,7 +25,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/csinput
 
-CSINPUT.LIB = $(OUT)$(LIB_PREFIX)csinput$(LIB)
+CSINPUT.LIB = $(OUT)$(LIB_PREFIX)csinput$(LIB_SUFFIX)
 SRC.CSINPUT = $(wildcard libs/csinput/*.cpp)
 OBJ.CSINPUT = $(addprefix $(OUT),$(notdir $(SRC.CSINPUT:.cpp=$O)))
 
@@ -41,7 +41,7 @@ csinput: $(OUTDIRS) $(CSINPUT.LIB)
 clean: csinputclean
 
 $(CSINPUT.LIB): $(OBJ.CSINPUT)
-	$(DO.STATIC.LIBRARY)
+	$(DO.LIBRARY)
 
 csinputclean:
 	-$(RM) $(CSINPUT.LIB)

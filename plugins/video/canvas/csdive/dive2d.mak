@@ -34,7 +34,7 @@ DIVE2D.RES=$(OUTOS)libDIVE.res
 CSOS2.LIB=$(OUT)$(LIB_PREFIX)csos2$(LIB)
 
 # The 2D OS/2 DIVE driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   CSDIVE=csdive$(DLL)
   DEP.CSDIVE=$(DIVE2D.RES) $(CSOS2.LIB) $(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
@@ -62,7 +62,7 @@ cleanlib: dive2dcleanlib
 csdive: $(OUTDIRS) $(CSDIVE)
 
 $(CSDIVE): $(OBJ.CSDIVE) $(DEP.CSDIVE)
-	$(DO.LIBRARY)
+	$(DO.PLUGIN)
 
 $(CSOS2.LIB): libs/cs2d/csdive/csdive.imp
 	emximp -o $@ $<

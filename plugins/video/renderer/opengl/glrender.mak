@@ -47,7 +47,7 @@ CFLAGS.GL3D+=-I$(X11_PATH)/include
 endif # OPENGL.LIBS.DEFINED
 
 # The 3D OpenGL driver
-ifeq ($(USE_DLL),yes)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   GL3D=$(OUTDLL)glrender$(DLL)
   LIBS.GL3D=$(LIBS.LOCAL.GL3D)
   DEP.GL3D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
@@ -80,7 +80,7 @@ $(OUT)%$O: libs/cs3d/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GL3D)
  
 $(GL3D): $(OBJ.GL3D) $(DEP.GL3D)
-	$(DO.LIBRARY) $(LIBS.GL3D)
+	$(DO.PLUGIN) $(LIBS.GL3D)
 
 glclean:
 	$(RM) $(GL3D)

@@ -115,7 +115,7 @@ more time on my hands.
   NOTE:  This procedure may not work anymore, as several items
   (notably the software renderer and network drivers) became COM-only
   with the 0.11.058 beta.  I haven't tested the compiles for
-  USE_DLL=yes yet, so this might not work.
+  USE_SHARED_PLUGINS=yes yet, so this might not work.
 
 - This is all that I could think of at the moment, more will be added. Any
   comments will be appreciated.
