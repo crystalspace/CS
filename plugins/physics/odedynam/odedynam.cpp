@@ -348,12 +348,12 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
     csPlane3 plane(vertex_table[polycollide[i].vertices[0]] / mesht,
       vertex_table[polycollide[i].vertices[1]] / mesht,
       vertex_table[polycollide[i].vertices[2]] / mesht);
-    plane.Normalize ();
     // dCollideBP only works if box center is on the outside of the plane
     if (plane.Classify (boxt.GetOrigin()) < 0)
     {
       continue;
     }
+    plane.Normalize ();
     dGeomID odeplane = dCreatePlane(0,plane.norm.x, plane.norm.y, plane.norm.z,
       -plane.DD);
     dContactGeom tempcontacts[5];
@@ -559,11 +559,11 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
     csPlane3 plane(vertex_table[poly.vertices[0]] / mesht,
       vertex_table[poly.vertices[1]] / mesht,
       vertex_table[poly.vertices[2]] / mesht);
-    plane.Normalize();
     if (plane.Classify (center) < 0)
     {
       continue;
     }
+    plane.Normalize();
     float depth = rad - plane.Distance (center);
     if (depth < 0)
     {
