@@ -7,6 +7,8 @@ The history order has been reversed so that new features are at the top.
 	- As suggested by Chris Bruner, Jorrit did a small fix to Blocks
 	  so that it doesn't confuse the Borland compiler and is also more
 	  robust (i.e. don't compare floats with 0).
+	- Fixed line driver so that it uses the line 2D driver on Unix
+	  again.
 	- Andrew Zabolotny did a batch of changes:
 	    - Fixed the DOS/DJGPP that was slightly broken after my
 	      last changes to csinput system.

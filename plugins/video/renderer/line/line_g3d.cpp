@@ -36,6 +36,21 @@
 
 ///---------------------------------------------------------------------------
 
+#if defined(OS_UNIX)
+static char* get_line_2d_driver ()
+{
+  if (getenv ("DISPLAY"))
+    return "crystalspace.graphics2d.linexlib";
+  else
+    return SOFTWARE_2D_DRIVER;
+}
+#define LINE_SOFTWARE_2D_DRIVER get_line_2d_driver()
+#else
+#define LINE_SOFTWARE_2D_DRIVER SOFTWARE_2D_DRIVER
+#endif
+
+///---------------------------------------------------------------------------
+
 IMPLEMENT_FACTORY (csGraphics3DLine)
 
 EXPORT_CLASS_TABLE (line3d)
@@ -84,7 +99,7 @@ bool csGraphics3DLine::Initialize (iSystem *iSys)
 
   width = height = -1;
 
-  const char *driver = config->GetStr ("Hardware", "Driver2D", SOFTWARE_2D_DRIVER);
+  const char *driver = config->GetStr ("Hardware", "Driver2D", LINE_SOFTWARE_2D_DRIVER);
   G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;
