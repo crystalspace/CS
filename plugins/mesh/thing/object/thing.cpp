@@ -177,8 +177,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMeshLOD);
-  scfiObjectModel.SetPolygonMeshShadows (0);
-  //scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMeshLOD);
+  scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMeshLOD);
 
   max_vertices = num_vertices = 0;
   obj_verts = 0;

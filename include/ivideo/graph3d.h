@@ -58,6 +58,59 @@ struct csPixelFormat;
 struct csPolyTextureMapping;
 struct csPolyLightMapMapping;
 
+/**\name iGraphics3D::BeginDraw() flags
+ * @{ */
+/// We're going to draw 2D graphics
+#define CSDRAW_2DGRAPHICS   0x00000001
+/// We're going to draw 3D graphics
+#define CSDRAW_3DGRAPHICS   0x00000002
+/// Clear Z-buffer ?
+#define CSDRAW_CLEARZBUFFER 0x00000010
+/// Clear frame buffer ?
+#define CSDRAW_CLEARSCREEN  0x00000020
+/** @} */
+
+/**\name Type of clipper (for iGraphics3D::SetClipper())
+ * @{ */
+/**
+ * There is no clipper.
+ */
+#define CS_CLIPPER_NONE -1
+/**
+ * Clipper is optional.
+ */
+#define CS_CLIPPER_OPTIONAL 0
+/**
+ * Clipper is top-level.
+ */
+#define CS_CLIPPER_TOPLEVEL 1
+/**
+ * Clipper is required.
+ */
+#define CS_CLIPPER_REQUIRED 2
+/** @} */
+
+/**\name Clipping requirement for DrawTriangleMesh
+ * @{ */
+/**
+ * No clipping required.
+ * (setting for clip_portal, clip_plane, or clip_z_plane).
+ */
+#define CS_CLIP_NOT 0
+/**
+ * Clipping may be needed. Depending on the type of the clipper
+ * (one of the CS_CLIPPER_??? flags) the renderer has to clip or
+ * not. (setting for clip_portal, clip_plane, or clip_z_plane).
+ */
+#define CS_CLIP_NEEDED 1
+/**
+ * Clipping is not needed for the current clipper but it might
+ * be needed for the toplevel clipper. (setting for clip_portal,
+ * will never be used for clip_plane or clip_z_plane).
+ */
+#define CS_CLIP_TOPLEVEL 2
+/** @} */
+
 /**
  * Fog structure.
  */
@@ -140,6 +193,47 @@ enum G3D_FOGMETHOD
   G3DFOGMETHOD_VERTEX = 0x02
 };
 
+/**\name Mix modes for DrawPolygonFX ()
+ * The constants can be ORed together if they belong to different masks.
+ * @{ */
+/// SRC/DST mixing mode mask
+#define CS_FX_MASK_MIXMODE 0xF0000000 
+/// =SRC
+#define CS_FX_COPY         0x00000000 
+/// =SRC*DST
+#define CS_FX_MULTIPLY     0x10000000 
+/// =2*SRC*DST
+#define CS_FX_MULTIPLY2    0x20000000 
+/// =SRC+DST
+#define CS_FX_ADD          0x30000000 
+/// =(1-alpha)*SRC + alpha*DST
+#define CS_FX_ALPHA        0x40000000 
+/// =DST
+#define CS_FX_TRANSPARENT  0x50000000 
+/// =(dstalpha)*SRC + DST
+#define CS_FX_DESTALPHAADD 0x60000000 
+/// color 0 is transparent
+#define CS_FX_KEYCOLOR     0x08000000 
+/// Gouraud shading
+#define CS_FX_GOURAUD      0x04000000 
+/// Tiling
+#define CS_FX_TILING       0x02000000 
+/// alpha = 0..FF (opaque..transparent)
+#define CS_FX_MASK_ALPHA   0x000000FF 
+
+/// Macro for setting of alpha bits into mixmode (alpha between 0 and 1).
+#define CS_FX_SETALPHA(alpha) \
+  (CS_FX_ALPHA | uint (alpha * CS_FX_MASK_ALPHA))
+/// Macro for setting of alpha bits into mixmode (alpha between 0 and 255).
+#define CS_FX_SETALPHA_INT(alpha) \
+  (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
+/** @} */
+
+//===========================================================================
+// Below this point follows everything that is NOT relevant for the
+// new renderer!
+//===========================================================================
+
 #ifndef CS_USE_NEW_RENDERER
 
 #define CS_FOG_FRONT  0
@@ -165,40 +259,6 @@ enum G3D_FOGMETHOD
 #define CS_FOGTABLE_CLAMPVALUE 0.85f
 #define CS_FOG_MAXVALUE (CS_FOGTABLE_MAXDISTANCE * CS_FOGTABLE_CLAMPVALUE)
 //======================================================================
-
-/**\name Mix modes for DrawPolygonFX ()
- * The constants can be ORed together if they belong to different masks.
- * @{ */
-/// SRC/DST mixing mode mask
-#define CS_FX_MASK_MIXMODE 0xF0000000 
-/// =SRC
-#define CS_FX_COPY         0x00000000 
-/// =SRC*DST
-#define CS_FX_MULTIPLY     0x10000000 
-/// =2*SRC*DST
-#define CS_FX_MULTIPLY2    0x20000000 
-/// =SRC+DST
-#define CS_FX_ADD          0x30000000 
-/// =(1-alpha)*SRC + alpha*DST
-#define CS_FX_ALPHA        0x40000000 
-/// =DST
-#define CS_FX_TRANSPARENT  0x50000000 
-/// color 0 is transparent
-#define CS_FX_KEYCOLOR     0x08000000 
-/// Gouraud shading
-#define CS_FX_GOURAUD      0x04000000 
-/// Tiling
-#define CS_FX_TILING       0x02000000 
-/// alpha = 0..FF (opaque..transparent)
-#define CS_FX_MASK_ALPHA   0x000000FF 
-
-/// Macro for setting of alpha bits into mixmode (alpha between 0 and 1).
-#define CS_FX_SETALPHA(alpha) \
-  (CS_FX_ALPHA | uint (alpha * CS_FX_MASK_ALPHA))
-/// Macro for setting of alpha bits into mixmode (alpha between 0 and 255).
-#define CS_FX_SETALPHA_INT(alpha) \
-  (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
-/** @} */
 
 /// Extra information for vertex fogging.
 class G3DFogInfo
@@ -339,18 +399,6 @@ enum G3D_RENDERSTATEOPTION
   G3DRENDERSTATE_EDGES
 };
 
-/**\name iGraphics3D::BeginDraw() flags
- * @{ */
-/// We're going to draw 2D graphics
-#define CSDRAW_2DGRAPHICS   0x00000001
-/// We're going to draw 3D graphics
-#define CSDRAW_3DGRAPHICS   0x00000002
-/// Clear Z-buffer ?
-#define CSDRAW_CLEARZBUFFER 0x00000010
-/// Clear frame buffer ?
-#define CSDRAW_CLEARSCREEN  0x00000020
-/** @} */
-
 /// Information about 3d renderer capabilities.
 struct csGraphics3DCaps
 {
@@ -361,47 +409,6 @@ struct csGraphics3DCaps
   bool NeedsPO2Maps;
   int MaxAspectRatio;
 };
-
-/**\name Type of clipper (for iGraphics3D::SetClipper())
- * @{ */
-/**
- * There is no clipper.
- */
-#define CS_CLIPPER_NONE -1
-/**
- * Clipper is optional.
- */
-#define CS_CLIPPER_OPTIONAL 0
-/**
- * Clipper is top-level.
- */
-#define CS_CLIPPER_TOPLEVEL 1
-/**
- * Clipper is required.
- */
-#define CS_CLIPPER_REQUIRED 2
-/** @} */
-
-/**\name Clipping requirement for DrawTriangleMesh
- * @{ */
-/**
- * No clipping required.
- * (setting for clip_portal, clip_plane, or clip_z_plane).
- */
-#define CS_CLIP_NOT 0
-/**
- * Clipping may be needed. Depending on the type of the clipper
- * (one of the CS_CLIPPER_??? flags) the renderer has to clip or
- * not. (setting for clip_portal, clip_plane, or clip_z_plane).
- */
-#define CS_CLIP_NEEDED 1
-/**
- * Clipping is not needed for the current clipper but it might
- * be needed for the toplevel clipper. (setting for clip_portal,
- * will never be used for clip_plane or clip_z_plane).
- */
-#define CS_CLIP_TOPLEVEL 2
-/** @} */
 
 /**
  * Structure containing all info needed by DrawTriangeMesh.

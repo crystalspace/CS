@@ -42,6 +42,13 @@ chronological order.
 	- res modified the Thing static data to not set the shadow poly mesh.
 	- res changed r3dtest so that the viewer doesn't stare at a wall at
 	  startup.
+	- Jorrit started merging iGraphics3D for new and old renderer a bit.
+	- Jorrit reverted the shadow mesh change from res. This is totally
+	  against the spirit of how iObjectModel works. The visibility culler
+	  should ONLY use the viscull polygon mesh. If not present no
+	  visibility culling will happen. Similarly the shadow manager should
+	  ONLY use the shadow polygon mesh. If that is not present no
+	  shadow casting should happen either.
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.
