@@ -522,10 +522,15 @@ int main (int argc, char* argv[])
     fatal_exit (0, false);
   }
 
+#ifdef DEBUG
   // enable all kinds of useful exceptions on a x86
   // note that we can't do it above since at least on OS/2 each dynamic
   // library on loading/initialization resets the control word to default
-//_control87 (0x32, 0x3f);
+  _control87 (0x32, 0x3f);
+#else
+  // this will disable exceptions on DJGPP (for the "industrial" version)
+  _control87 (0x3f, 0x3f);
+#endif
 
   // Open the main system. This will open all the previously loaded
   // COM drivers.
