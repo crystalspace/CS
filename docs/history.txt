@@ -29,37 +29,36 @@ chronological order.
 	  culling that every object does in DrawTest() (for OR) and
 	  GetRenderMeshes() (for NR) using iRenderView->ClipBSphere() or
 	  ClipBBox(). Currently the following steps are done:
-	      - csRenderView has a new SetupClipPlanes() method that sets
-	        up the current clip planes in world space for the current
-		clipper and camera.
-	      - Extended iVisibilityCullerListener->ObjectVisible() with
-	        a new frustum_mask parameter. This parameter will be given
-		by the cullers and contains a bit mask telling the engine
-		which planes (out of csRenderView) are relevant (i.e. which
-		planes potentially intersect with the object). This is
-		compatible with csIntersect3::BoxFrustum().
-	      - Enhanced Dynavis and Frustvis to pass along the frustum_mask
-	        to ObjectVisible. Both Dynavis and Frustvis already use
-		BoxFrustum() and a frustum_mask to hierarchically do
-		frustum culling on the kdtree for all objects. So passing
-		this bitfield along comes naturally.
-	      - Extended iMeshObject->GetRenderMeshes() with an extra
-	        frustum_mask parameter. The ObjectVisible() function will
-		call GetRenderMeshes() with that parameter. Note that
-		for OR we will not support this optimization as it is hard
-		to do there and NR is the future anyway.
-	      - Removed the unused iMeshWrapper->GetRenderMeshes().
-	      - Extended all mesh objects to accept this new parameter
-	        in GetRenderMeshes(). None of the mesh objects will actually
-		use it yet. This is the next stage.
-	      - Enhanced the Frustvis and Dynavis plugins to use the clip
-	        planes as setup in csRenderView instead of having them
-		make their own clip planes. This saves a bit of processing
-		there.
+	    - csRenderView has a new SetupClipPlanes() method that sets up the
+	      current clip planes in world space for the current clipper and
+	      camera.
+	    - Extended iVisibilityCullerListener->ObjectVisible() with a new
+	      frustum_mask parameter.  This parameter will be given by the
+	      cullers and contains a bit mask telling the engine which planes
+	      (out of csRenderView) are relevant (i.e.  which planes
+	      potentially intersect with the object).  This is compatible with
+	      csIntersect3::BoxFrustum().
+	    - Enhanced Dynavis and Frustvis to pass along the frustum_mask to
+	      ObjectVisible.  Both Dynavis and Frustvis already use
+	      BoxFrustum() and a frustum_mask to hierarchically do frustum
+	      culling on the kdtree for all objects.  So passing this bitfield
+	      along comes naturally.
+	    - Extended iMeshObject->GetRenderMeshes() with an extra
+	      frustum_mask parameter.  The ObjectVisible() function will call
+	      GetRenderMeshes() with that parameter.  Note that for OR we will
+	      not support this optimization as it is hard to do there and NR is
+	      the future anyway.
+	    - Removed the unused iMeshWrapper->GetRenderMeshes().
+	    - Extended all mesh objects to accept this new parameter in
+	      GetRenderMeshes().  None of the mesh objects will actually use it
+	      yet.  This is the next stage.
+	    - Enhanced the Frustvis and Dynavis plugins to use the clip planes
+	      as setup in csRenderView instead of having them make their own
+	      clip planes.  This saves a bit of processing there.
 	- Eric Sunshine eliminated Cygwin compiler warnings about types not
 	  matching printf-format directives in win32/callstack.cpp.
 	- Eric Sunshine fixed problem in Recurse rule in helper.jam where it
-	  was using 'rule' as a variable name. This confused Jam 2.4 since
+	  was using 'rule' as a variable name. This confused BoostJam since
 	  'rule' is also a keyword.
 	- Jorrit fixed a big booboo in the clipper enhancements he did
 	  yesterday on chunklod. The results of the BoxFrustum() routine
