@@ -21,7 +21,8 @@
 #define __CS_FIRE_H__
 
 #include "cstool/basetexfact.h"
-#include "cstool/tokenlist.h"
+#include "csutil/strhash.h"
+#include "csutil/csstring.h"
 
 SCF_DECLARE_FACTORY(csPtFireType);
 SCF_DECLARE_FACTORY(csPtFireLoader);
@@ -45,21 +46,11 @@ public:
   virtual csPtr<iTextureWrapper> Generate ();
 };
 
-CS_TOKEN_LIST_PREPARE(csPtFireLoader)
-
 class csPtFireLoader : public csBaseProctexLoader
 {
-CS_TOKEN_LIST_BEGIN(csPtFireLoader)
-  CS_TOKEN_LIST_TOKEN(POSSBURN)
-  CS_TOKEN_LIST_TOKEN(ADDBURN)
-  CS_TOKEN_LIST_TOKEN(CONTBURN)
-  CS_TOKEN_LIST_TOKEN(SMOOTHING)
-  CS_TOKEN_LIST_TOKEN(EXTINGUISH)
-  CS_TOKEN_LIST_TOKEN(SINGLEFLAME)
-  CS_TOKEN_LIST_TOKEN(HALFBASE)
-  CS_TOKEN_LIST_TOKEN(POSTSMOOTH)
-  CS_TOKEN_LIST_TOKEN(PALETTE)
-CS_TOKEN_LIST_END (tokens)
+  csStringHash tokens;
+#define CS_TOKEN_ITEM_FILE "fire.tok"
+#include "cstool/tokenlist.h"
 public:
   csPtFireLoader(iBase *p);
 

@@ -71,6 +71,7 @@ csPtr<iTextureWrapper> csPtFireFactory::Generate ()
 
 csPtFireLoader::csPtFireLoader(iBase *p) : csBaseProctexLoader(p)
 {
+  init_token_table (tokens);
 }
 
 csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node, 
@@ -123,36 +124,36 @@ csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node,
     {
       csRef<iDocumentNode> child = it->Next ();
       if (child->GetType () != CS_NODE_ELEMENT) continue;
-      csStringID id = tokens.Lookup (child->GetValue ());
+      csStringID id = tokens.Request (child->GetValue ());
       switch (id)
       {
-	case tokens.POSSBURN:
+	case XMLTOKEN_POSSBURN:
 	  fire->SetPossibleBurn (child->GetContentsValueAsInt());
 	  break;
-	case tokens.ADDBURN:
+	case XMLTOKEN_ADDBURN:
 	  fire->SetAdditionalBurn (child->GetContentsValueAsInt());
 	  break;
-	case tokens.CONTBURN:
+	case XMLTOKEN_CONTBURN:
 	  fire->SetContinuedBurn (child->GetContentsValueAsInt());
 	  break;
-	case tokens.SMOOTHING:
+	case XMLTOKEN_SMOOTHING:
 	  fire->SetSmoothing (child->GetContentsValueAsInt());
 	  break;
-	case tokens.EXTINGUISH:
+	case XMLTOKEN_EXTINGUISH:
 	  fire->SetExtinguish (child->GetContentsValueAsInt());
 	  break;
-	case tokens.SINGLEFLAME:
+	case XMLTOKEN_SINGLEFLAME:
 	  bool res;
 	  if (synldr && synldr->ParseBool (child, res, true))
 	    fire->SetSingleFlameMode (res);
 	  break;
-	case tokens.HALFBASE:
+	case XMLTOKEN_HALFBASE:
 	  fire->SetHalfBase (child->GetContentsValueAsInt());
 	  break;
-	case tokens.POSTSMOOTH:
+	case XMLTOKEN_POSTSMOOTH:
 	  fire->SetPostSmoothing (child->GetContentsValueAsInt());
 	  break;
-	case tokens.PALETTE:
+	case XMLTOKEN_PALETTE:
 	  {
 	    if (!synldr) return NULL;
 
