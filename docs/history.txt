@@ -9,6 +9,10 @@ The history order is reversed so that new features are at the top.
 	  ScanStr then the parameter should be 'bool' and not 'int'.
 	  This mostly affected the LIGHTING() flag in several of the mesh
 	  object loaders.
+	- Enabled stencil buffer for Windows OpenGL canvas.
+	- Experimented a bit with the stencil buffer for clipping and
+	  DrawTriangleMesh. Not enabled by default yet since I have to
+	  experiment with it.
 1-May-2001
 	- Fixed a bug in software renderer so that tiling really works.
 	- Extended the iMaterial structure in preparation of multi-texturing

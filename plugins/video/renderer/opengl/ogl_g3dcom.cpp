@@ -507,6 +507,30 @@ void csGraphics3DOGLCommon::SetClipper (csVector2* vertices, int num_vertices)
   // even in cases where a box clipper would be better. We should
   // have a special SetBoxClipper call in iGraphics3D.
   clipper = new csPolygonClipper (vertices, num_vertices, false, true);
+#define EXP_STENCIL 0
+#if EXP_STENCIL
+  if (true)
+  {
+    // First set up the stencil area.
+    glEnable (GL_STENCIL_TEST);
+    glClearStencil (0);
+    glClear (GL_STENCIL_BUFFER_BIT);
+    glStencilFunc (GL_ALWAYS, 1, 1);
+    glStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
+    int nv = clipper->GetNumVertices ();
+    csVector2* v = clipper->GetClipPoly ();
+    glColor4f (0, 0, 0, 0);
+    glShadeModel (GL_FLAT);
+    glDisable (GL_TEXTURE_2D);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_ZERO, GL_ONE);
+    glBegin (GL_TRIANGLE_FAN);
+    for (int i = 0 ; i < nv ; i++)
+      glVertex2f (v[i].x, v[i].y);
+    glEnd ();
+    glDisable (GL_STENCIL_TEST);
+  }
+#endif
 }
 
 void csGraphics3DOGLCommon::GetClipper (csVector2* vertices, int& num_vertices)
@@ -763,7 +787,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
 
-  // The old code (still faster).
   glShadeModel (GL_FLAT);
   if (m_renderstate.textured)
     glEnable (GL_TEXTURE_2D);
@@ -1398,21 +1421,21 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // handle.  This includes software clipping.
   if (mesh.do_clip && clipper)
   {
-    //if (!stencil_bits)
-    //{
-      // If we have no stencil buffer then we just use the default version.
-      DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect,
-      	width2, height2);
-      return;
-    //}
-    //else
-    //{
-      //glClear (GL_STENCIL_BUFFER_BIT);
-      //glStencilOp (GL_KEEP, GL_INVERT, GL_INVERT);
-//
-      //glStencilFunc ();
-      //glEnable (GL_STENCIL_TEST);
-    //}
+#if EXP_STENCIL
+    if (true)
+    {
+      // Use the stencil area.
+      glEnable (GL_STENCIL_TEST);
+      glStencilFunc (GL_EQUAL, 1, 1);
+      glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+    }
+#else
+  
+    // If we have no stencil buffer then we just use the default version.
+    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect,
+    	width2, height2);
+    return;
+#endif
   }
 
   int i,k;
@@ -1750,6 +1773,16 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glPopMatrix ();
   glMatrixMode (GL_PROJECTION);
   glPopMatrix ();
+
+#if EXP_STENCIL
+  //@@@if (mesh.do_clip && clipper)
+  {
+    if (true)
+    {
+      glDisable (GL_STENCIL_TEST);
+    }
+  }
+#endif
 }
 
 
@@ -2018,8 +2051,10 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   // find lightmap information, if any
   iLightMap *thelightmap = tex->GetLightMap ();
 
-  // the shortcut works only if there is a lightmap and no fog
-  if (!thelightmap || poly.use_fog)
+  // the shortcut works only if there is a lightmap and no fog and
+  // no multitexturing
+  csMaterialHandle* mat_handle = (csMaterialHandle*)poly.mat_handle;
+  if (!thelightmap || poly.use_fog || mat_handle->GetNumTextureLayers () > 0)
   {
     DrawPolygonSingleTexture (poly);
     return true;

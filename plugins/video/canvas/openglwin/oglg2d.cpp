@@ -258,7 +258,7 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
       0,                              /* no accumulation buffer */
       0, 0, 0, 0,                     /* accum bits (ignored) */
       16,                             /* depth buffer */
-      0,                              /* no stencil buffer */
+      1,                              /* no stencil buffer */
       0,                              /* no auxiliary buffers */
       PFD_MAIN_PLANE,                 /* main layer */
       0,                              /* reserved */
