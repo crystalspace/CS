@@ -27,7 +27,7 @@
 // the value field is 33bit wide and might also contain pointers, unfortunatley
 // there is no easy fix. Making it 64bit will increase filesize dramatically,
 // making it intptr_t makes files incompatible between 32 and 64bit archs
-#error bindoc doesn't work with64 bit yet
+#error bindoc does not work with64 bit yet
 #endif
 
 struct iDataBuffer;
