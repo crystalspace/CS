@@ -525,12 +525,22 @@ void operator delete[] (void* p)
 
 #ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 #undef new
+static size_t alloc_total = 0;
+static size_t alloc_cnt = 0;
 void* operator new (size_t s, void* filename, int line)
 {
+  alloc_total += s;
+  alloc_cnt++;
+  if (s > 1000) { printf ("new s=%d tot=%d/%d file=%s line=%d\n",
+  	s, alloc_total, alloc_cnt, filename, line); fflush (stdout); }
   return (void*)malloc (s);
 }
-void* operator new[] (size_t s, void*, int)
+void* operator new[] (size_t s, void* filename, int line)
 {
+  alloc_total += s;
+  alloc_cnt++;
+  if (s > 1000) { printf ("new[] s=%d tot=%d/%d file=%s line=%d\n",
+  	s, alloc_total, alloc_cnt, filename, line); fflush (stdout); }
   return (void*)malloc (s);
 }
 void operator delete (void* p)

@@ -23,6 +23,8 @@ chronological order.
 	- Jorrit removed some left-over old code from the thing plugin
 	  to prepare lightmaps. It was doing a loop over all polygons
 	  and doing nothing in that loop.
+	- Jorrit added some debug code to scan for big memory allocations
+	  in memdebug.cpp.
 16-Dec-2003
 	- Jorrit fixed a warning in shadervar.h with initializers given in
 	  the wrong order.
