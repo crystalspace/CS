@@ -9,6 +9,9 @@ chronological order.
 19-Jan-2004
 	- Steven Geens changed the calling of PositionChild to a hierarchical
 	  scheme.
+	- Norman Kraemer changed render3d Jamfile to include shader subdir 
+	  only if new renderer is configured or msvc project file generation
+	  is in progress.
 18-Jan-2004
 	- Jorrit removed unused 'next'/'prev' fields in csLight. These
 	  are no longer needed after the redesign of two days ago.
