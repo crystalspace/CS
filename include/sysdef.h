@@ -84,11 +84,6 @@
 #  include "cssys/win32/csosdefs.h"
 #endif
 
-// For Mingw build under NT4 OS.
-#if defined(OS_NT4)
-#  include "cssys/mingw/csosdefs.h"
-#endif
-
 #if defined (COMP_WCC) && defined (OS_DOS)
 #  include "cssys/wcc/csosdefs.h"
 #endif
@@ -137,7 +132,7 @@
 #ifdef SYSDEF_PATH
 // Path separator character
 #  ifndef PATH_SEPARATOR
-#    if defined(OS_MACOS)
+#    if defined(OS_MACOS) || defined(__CYGWIN32__)
 #      define PATH_SEPARATOR '/'
 #    elif defined(OS_OS2) || defined(OS_DOS) || defined(OS_WIN32)
 #      define PATH_SEPARATOR '\\'
@@ -207,6 +202,8 @@
 
 #ifdef SYSDEF_DIR
 // For systems without opendir()
+// COMP_GCC has opendir, readdir 
+# ifndef COMP_GCC
 #  ifdef __NEED_OPENDIR_PROTOTYPE
 #    if defined(OS_MACOS)
        typedef char DIR;
@@ -224,6 +221,8 @@
      //extern "C" long telldir (DIR *dirp);
      //extern "C" void rewinddir (DIR *dirp);
 #  endif
+# endif
+// Generic ISDIR needed for COMP_GCC
 #  ifdef __NEED_GENERIC_ISDIR
 #    if !defined (OS_UNIX) && !defined (OS_MACOS) && !defined (OS_AMIGAOS)
 #      include <io.h>
@@ -235,6 +234,9 @@
 #      if !(defined (OS_WIN32) && defined (COMP_WCC))
 #        include <dirent.h>
 #      endif
+#	 if defined(__CYGWIN32__)
+#		include <sys/dirent.h>
+#	 endif
 #      include <sys/stat.h>
 #    endif
      static inline bool isdir (const char *path, struct dirent *de)
@@ -262,6 +264,10 @@
 #endif
 
 #ifdef SYSDEF_ALLOCA
+// Enable memory allocation
+#  if (defined(COMP_GCC) && defined(OS_WIN32))
+#	include <malloc.h>
+#  else
 #  if defined(COMP_WCC) || defined (COMP_VC) || defined(COMP_BC)
 #    include <malloc.h>
 #  elif defined(COMP_GCC) && defined(OS_DOS)
@@ -271,6 +277,7 @@
 #  else
 #    include <alloca.h>
 #  endif
+# endif
 #endif
 
 #ifdef SYSDEF_ACCESS
