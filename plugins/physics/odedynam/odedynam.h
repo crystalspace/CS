@@ -23,6 +23,7 @@
 #include "csgeom/vector3.h"
 #include "csutil/nobjvec.h"
 #include "csutil/garray.h"
+#include "csutil/refarr.h"
 #include "csgeom/transfrm.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"

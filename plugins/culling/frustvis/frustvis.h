@@ -26,7 +26,12 @@
 #include "csutil/scf.h"
 #include "csutil/hashmap.h"
 #include "csgeom/plane3.h"
+#include "igeom/objmodel.h"
 #include "iengine/viscull.h"
+#include "iengine/movable.h"
+#include "iengine/shadcast.h"
+#include "iengine/mesh.h"
+#include "imesh/thing/thing.h"
 
 class csSimpleKDTree;
 class csSimpleKDTreeChild;

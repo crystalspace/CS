@@ -91,6 +91,7 @@ csSpriteAction2::csSpriteAction2() : frames (8, 8), delays (8, 8)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   name = NULL;
+  SetReverseAction (false);
 }
 
 csSpriteAction2::~csSpriteAction2()

@@ -488,7 +488,8 @@ void csSprite2DMeshObject::Particle::Rotate (float angle)
   scfParent->FireListeners ();
 }
 
-void csSprite2DMeshObject::Sprite2DState::SetUVAnimation (const char *name, int style, bool loop)
+void csSprite2DMeshObject::Sprite2DState::SetUVAnimation (const char *name,
+	int style, bool loop)
 {
   if (name)
   {
@@ -520,8 +521,10 @@ void csSprite2DMeshObject::Sprite2DState::StopUVAnimation (int idx)
   {
     if (idx != -1)
     {
-      scfParent->uvani.frameindex = MIN(MAX(idx, 0), scfParent->uvani.framecount-1);
-      scfParent->uvani.frame = scfParent->uvani.ani->GetFrame (scfParent->uvani.frameindex);
+      scfParent->uvani.frameindex = MIN(MAX(idx, 0),
+      	scfParent->uvani.framecount-1);
+      scfParent->uvani.frame = scfParent->uvani.ani->GetFrame (
+      	scfParent->uvani.frameindex);
     }
     scfParent->uvani.halted = true;
   }
@@ -545,15 +548,32 @@ void csSprite2DMeshObject::Sprite2DState::PlayUVAnimation (int idx, int style, b
 }
 
 int csSprite2DMeshObject::Sprite2DState::GetUVAnimationCount () const
-{ return scfParent->factory->GetUVAnimationCount ();}
+{
+  return scfParent->factory->GetUVAnimationCount ();
+}
+
 iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::CreateUVAnimation ()
-{ return scfParent->factory->CreateUVAnimation ();}
-void csSprite2DMeshObject::Sprite2DState::RemoveUVAnimation (iSprite2DUVAnimation *anim)
-{ scfParent->factory->RemoveUVAnimation (anim); }
-iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (const char *name)
-{ return scfParent->factory->GetUVAnimation (name); }
-iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (int idx)
-{ return scfParent->factory->GetUVAnimation (idx); }
+{
+  return scfParent->factory->CreateUVAnimation ();
+}
+
+void csSprite2DMeshObject::Sprite2DState::RemoveUVAnimation (
+	iSprite2DUVAnimation *anim)
+{
+  scfParent->factory->RemoveUVAnimation (anim);
+}
+
+iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (
+	const char *name)
+{
+  return scfParent->factory->GetUVAnimation (name);
+}
+
+iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::GetUVAnimation (
+	int idx)
+{
+  return scfParent->factory->GetUVAnimation (idx);
+}
 
 
 void csSprite2DMeshObject::uvAnimationControl::Advance (csTicks current_time)

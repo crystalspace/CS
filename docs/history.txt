@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+16-Jan-2003
+	- 'reverse_action' in 3D sprites was not initialized to false.
+	- Fixed odedynam plugin so it compiles again.
+	- Fixed ie3ds plugin so it compiles again.
 15-Jan-2003
 	- Started removing a few csVector usages and replacing them
 	  with typed versions. In particular changed:

@@ -252,7 +252,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
   adj_faces.SetLength (numVertices);
   for (i=0; i < numVertices; i++)
   {
-    adj_faces[i] = new Faces ();
+    adj_faces.Put (i, new Faces ());
   }
 
 /* collect all adjacent triangles for every vertex

@@ -140,25 +140,53 @@ public:
   virtual int GetFrameCount () { return frames.Length (); }
   /// Query the frame number f.
   csSpriteFrame* GetCsFrame (int f)
-  { return (f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL; }
+  {
+    return (f < frames.Length ())
+    	? (csSpriteFrame *)frames [f]
+	: (csSpriteFrame*)NULL;
+	}
   /// Returns the looping frame after frame number f.
   csSpriteFrame* GetCsNextFrame (int f)
   {
     if (!reverse_action)
-    { f++; return f<frames.Length() ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[0]; }
+    {
+      f++;
+      return f<frames.Length()
+      	? (csSpriteFrame*)frames[f]
+	: (csSpriteFrame*)frames[0];
+    }
     else
-    { f--; return f>=0 ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[frames.Length()-1]; }
+    {
+      f--;
+      return f>=0
+        ? (csSpriteFrame*)frames[f]
+	: (csSpriteFrame*)frames[frames.Length()-1];
+    }
   }
   /// Query the frame number f.
   virtual iSpriteFrame* GetFrame (int f)
-  { return (iSpriteFrame*)((f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL); }
+  {
+    return (iSpriteFrame*)((f < frames.Length ())
+    	? (csSpriteFrame *)frames [f]
+	: (csSpriteFrame*)NULL);
+  }
   /// Returns the looping frame after frame number f.
   virtual iSpriteFrame* GetNextFrame (int f)
   {
     if (!reverse_action)
-    { f++; return (iSpriteFrame*)(f<frames.Length() ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[0]); }
+    {
+      f++;
+      return (iSpriteFrame*)(f<frames.Length()
+      	? (csSpriteFrame*)frames[f]
+	: (csSpriteFrame*)frames[0]);
+    }
     else
-    { f--; return (iSpriteFrame*)(f>=0 ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[frames.Length()-1]); }
+    {
+      f--;
+      return (iSpriteFrame*)(f>=0
+      	? (csSpriteFrame*)frames[f]
+	: (csSpriteFrame*)frames[frames.Length()-1]);
+    }
   }
   /// Get delay for frame number f
   virtual int GetFrameDelay (int f)
@@ -167,7 +195,7 @@ public:
   virtual float GetFrameDisplacement (int f)
   { return * (float*) & displacements [f]; }
 
-  void SetReverseAction(bool reverse)
+  void SetReverseAction (bool reverse)
   { reverse_action = reverse; }
 
   SCF_DECLARE_IBASE;
