@@ -573,6 +573,7 @@ package cspace::csString;
 *GetDataSafe = *cspacec::csString_GetDataSafe;
 *Length = *cspacec::csString_Length;
 *IsEmpty = *cspacec::csString_IsEmpty;
+*StartsWith = *cspacec::csString_StartsWith;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csString(@_);
@@ -7583,6 +7584,7 @@ package cspace::iVFS;
 *MountRoot = *cspacec::iVFS_MountRoot;
 *SaveMounts = *cspacec::iVFS_SaveMounts;
 *LoadMountsFromFile = *cspacec::iVFS_LoadMountsFromFile;
+*ChDirAuto = *cspacec::iVFS_ChDirAuto;
 *GetFileTime = *cspacec::iVFS_GetFileTime;
 *SetFileTime = *cspacec::iVFS_SetFileTime;
 *GetFileSize = *cspacec::iVFS_GetFileSize;
@@ -8191,12 +8193,12 @@ package cspace::csKeyEventHelper;
 %ITERATORS = ();
 *GetRawCode = *cspacec::csKeyEventHelper_GetRawCode;
 *GetCookedCode = *cspacec::csKeyEventHelper_GetCookedCode;
-*GetModifiers = *cspacec::csKeyEventHelper_GetModifiers;
 *GetEventType = *cspacec::csKeyEventHelper_GetEventType;
 *GetAutoRepeat = *cspacec::csKeyEventHelper_GetAutoRepeat;
 *GetCharacterType = *cspacec::csKeyEventHelper_GetCharacterType;
 *GetEventData = *cspacec::csKeyEventHelper_GetEventData;
 *GetModifiersBits = *cspacec::csKeyEventHelper_GetModifiersBits;
+*GetModifiers = *cspacec::csKeyEventHelper_GetModifiers;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csKeyEventHelper(@_);
@@ -8454,6 +8456,7 @@ package cspace::iKeyboardDriver;
 *DoKey = *cspacec::iKeyboardDriver_DoKey;
 *GetModifierState = *cspacec::iKeyboardDriver_GetModifierState;
 *CreateKeyComposer = *cspacec::iKeyboardDriver_CreateKeyComposer;
+*SynthesizeCooked = *cspacec::iKeyboardDriver_SynthesizeCooked;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
