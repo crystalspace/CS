@@ -555,12 +555,12 @@ void ddgTBinTree::updateMerge(ddgTriIndex tindex, ddgPriority pr )
 {
 	// Check all 4 members of this potential mergable group.
 	// A mergeble group looks as follows:
-	//      /|\
-	//     / | \
-	//    /__|__\
-	//    \  |  /
-	//     \ | /
-	//      \|/
+	//      /|\      //
+	//     / | \     //
+	//    /__|__\    //
+	//    \  |  /    //
+	//     \ | /     //
+	//      \|/      //
 	//
 	// We are mergable if all 4 triangles are in the tcache.
 	// Unless we have no neighbour in which case only this
