@@ -5,5 +5,14 @@ if $(ODE.AVAILABLE) = "yes"
 Description partphys_ode : "Particle ODE-based Physics plugin" ;
 Plugin partphys_ode : [ Wildcard *.cpp *.h ] ;
 LinkWith partphys_ode : csutil csgeom ;
+ExternalLibs partphys_ode : ODE ;
+if $(ODE.EXTERN_C) = "yes"
+{
+  CFlags partphys_ode : [ FDefines CS_USE_ODE_EXTERN_C ] ;
+}
+if [ Property build : projgen ] = msvc
+{
+  MsvcCFlags partphys_ode : "/D \"CS_USE_ODE_EXTERN_C\"" ;
+}
 CompileGroups partphys_ode : meshes ;
 }
