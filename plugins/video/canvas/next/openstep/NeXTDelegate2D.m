@@ -228,18 +228,22 @@ N2D_PROTO(void,set_window_title)(NeXTDelegateHandle2D handle, char const* s)
 //-----------------------------------------------------------------------------
 // focusChanged
 //-----------------------------------------------------------------------------
-- (void)focusChanged:(BOOL)focused
+- (void)focusChanged:(BOOL)focused shouldPause:(BOOL) pause
 {
-  paused = !focused;
-  [self adjustTitle];
-  if (paused)
+  if (pause != paused)
+  {
+    paused = !focused;
+    [self adjustTitle];
+  };
+  
+  if (!focused)
     [self stopTrackingMouse];
   else
     [self startTrackingMouse];
 }
 
-N2D_PROTO(void,focus_changed)(NeXTDelegateHandle2D handle, int focused)
-  { [(NeXTDelegate2D*)handle focusChanged:(BOOL)focused]; }
+N2D_PROTO(void,focus_changed)(NeXTDelegateHandle2D handle, int focused, int shouldPause)
+  { [(NeXTDelegate2D*)handle focusChanged:(BOOL)focused shouldPause:(BOOL)shouldPause]; }
 
 
 //-----------------------------------------------------------------------------

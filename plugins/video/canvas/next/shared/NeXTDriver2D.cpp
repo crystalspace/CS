@@ -272,6 +272,7 @@ bool NeXTDriver2D::SetMouseCursor(csMouseCursorID shape)
 //-----------------------------------------------------------------------------
 bool NeXTDriver2D::HandleEvent(iEvent& e)
 {
+  bool shouldPause;
   bool rc = false;
   if (e.Type == csevBroadcast)
   {
@@ -282,7 +283,8 @@ bool NeXTDriver2D::HandleEvent(iEvent& e)
 	rc = true;
 	break;
       case cscmdFocusChanged:
-	NeXTDelegate2D_focus_changed(controller, (bool)e.Command.Info);
+        shouldPause = !assistant->always_runs();
+	NeXTDelegate2D_focus_changed(controller, (bool)e.Command.Info, shouldPause);
 	rc = true;
 	break;
     }

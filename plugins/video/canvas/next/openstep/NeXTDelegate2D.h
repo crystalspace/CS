@@ -53,7 +53,7 @@
 - (void)closeWindow;
 - (void)setWindowTitle:(char const*)title;
 - (void)flush;
-- (void)focusChanged:(BOOL)flag;
+- (void)focusChanged:(BOOL)flag shouldPause:(BOOL) pause;
 - (BOOL)setMouseCursor:(csMouseCursorID)shape;
 
 @end
@@ -73,7 +73,7 @@ N2D_PROTO(int,open_window)(NeXTDelegate2D, char const* title, int width,
 N2D_PROTO(void,close_window)(NeXTDelegate2D);
 N2D_PROTO(void,set_window_title)(NeXTDelegate2D, char const* title);
 N2D_PROTO(void,flush)(NeXTDelegate2D);
-N2D_PROTO(void,focus_changed)(NeXTDelegate2D, int focused);
+N2D_PROTO(void,focus_changed)(NeXTDelegate2D, int focused, int shouldPause);
 N2D_PROTO(int,set_mouse_cursor)(NeXTDelegate2D, csMouseCursorID);
 
 #undef N2D_PROTO
