@@ -813,8 +813,8 @@ void WalkTest::CreateColliders (void)
 // No more than 1000 collisions ;)
 extern collision_pair *CD_contact;
 //collision_pair *our_cd_contact=0;
-static collision_pair our_cd_contact[1000];//=0;
-static int num_our_cd;
+collision_pair our_cd_contact[1000];//=0;
+int num_our_cd;
 
 int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
 {
@@ -1470,7 +1470,7 @@ int main (int argc, char* argv[])
     // Load the standard library.
     if (!CSLoader::LoadLibrary (world, "standard", "standard.zip"))
     {
-      //Error message was already printed be CSLoader...
+      //Error message was already printed by CSLoader...
       cleanup ();
       fatal_exit (0, false);
     }

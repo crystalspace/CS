@@ -35,6 +35,8 @@
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/csspr2d.h"
+#include "csengine/cdobj.h"
+#include "csengine/collider.h"
 #include "csutil/scanstr.h"
 #include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
@@ -102,7 +104,7 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where, csVector3 con
 
 // Recursive function to add limbs to a skeletal tree. This also builds
 // the sprite template.
-void add_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* parent, int& vertex_idx,
+void add_tree_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* parent, int& vertex_idx,
 	int prev_par_idx, int maxdepth, int width, int recursion)
 {
   int par_vertex_idx = vertex_idx;
@@ -159,7 +161,7 @@ void add_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* parent, 
 	csMatrix3::GetXRotation (.15);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
-    add_limbs (tmpl, frame, con, vertex_idx, par_vertex_idx, maxdepth, width, recursion+1);
+    add_tree_limbs (tmpl, frame, con, vertex_idx, par_vertex_idx, maxdepth, width, recursion+1);
   }
 }
 
@@ -168,13 +170,13 @@ csSkeleton* create_skeltree (csSpriteTemplate* tmpl, csFrame* frame, int& vertex
 	int maxdepth, int width)
 {
   CHK (csSkeleton* skel = new csSkeleton ());
-  add_limbs (tmpl, frame, skel, vertex_idx, 0, maxdepth, width, 0);
+  add_tree_limbs (tmpl, frame, skel, vertex_idx, 0, maxdepth, width, 0);
   return skel;
 }
 
 // Add a skeletal tree sprite. If needed it will also create
 // the template for this.
-void add_skeleton_sprite (csSector* where, csVector3 const& pos, int depth, int width)
+void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth, int width)
 {
   char skelname[50];
   sprintf (skelname, "__skeltree__%d,%d\n", depth, width);
@@ -194,12 +196,12 @@ void add_skeleton_sprite (csSector* where, csVector3 const& pos, int depth, int 
     tmpl->SetSkeleton (create_skeltree (tmpl, fr, vertex_idx, depth, width));
     tmpl->GenerateLOD ();
   }
-  add_sprite (skelname, "__testSkel__", where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
+  add_sprite (skelname, "__skeltree__", where, pos-csVector3 (0, Sys->cfg_body_height, 0), 1);
 }
 
 // Object added to every skeletal tree node to keep the animation
 // information.
-class SkelSpriteInfo : public csObject
+class TreeSkelSpriteInfo : public csObject
 {
 public:
   float z_angle_base;
@@ -213,18 +215,18 @@ public:
   CSOBJTYPE;
 };
 
-CSOBJTYPE_IMPL (SkelSpriteInfo, csObject);
+CSOBJTYPE_IMPL (TreeSkelSpriteInfo, csObject);
 
 // Animate a skeleton.
-void animate_skeleton (csSkeletonLimbState* limb)
+void animate_skeleton_tree (csSkeletonLimbState* limb)
 {
   csSkeletonConnectionState* con = (csSkeletonConnectionState*)limb->GetChildren ();
   while (con)
   {
-    SkelSpriteInfo* o = (SkelSpriteInfo*)con->GetObj (SkelSpriteInfo::Type ());
+    TreeSkelSpriteInfo* o = (TreeSkelSpriteInfo*)con->GetObj (TreeSkelSpriteInfo::Type ());
     if (!o)
     {
-      CHK (o = new SkelSpriteInfo ());
+      CHK (o = new TreeSkelSpriteInfo ());
       if ((rand () >> 3) & 0x1)
       {
         o->x_angle_base = (((float)((rand () >> 3)&0xff)) / 255.) * .4 -.2;
@@ -261,9 +263,261 @@ void animate_skeleton (csSkeletonLimbState* limb)
 	csMatrix3::GetXRotation (o->x_angle + o->x_angle_base);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
-    animate_skeleton (con);
+    animate_skeleton_tree (con);
     con = (csSkeletonConnectionState*)(con->GetNext ());
   }
+}
+
+//===========================================================================
+// Everything for skeletal ghost demo.
+//===========================================================================
+
+// Object added to every skeletal tree node to keep the animation
+// information.
+class GhostSkelSpriteInfo : public csObject
+{
+public:
+  float z_angle_base;
+  float z_angle;
+  float x_angle_base;
+  float x_angle;
+  float y_angle;
+  float dx;
+  float dz;
+  float dy;
+  CSOBJTYPE;
+};
+
+CSOBJTYPE_IMPL (GhostSkelSpriteInfo, csObject);
+
+// Object added to the ghost sprite itself to hold some information
+// about movement.
+class GhostSpriteInfo : public csObject
+{
+public:
+  float dir;
+  CSOBJTYPE;
+};
+
+CSOBJTYPE_IMPL (GhostSpriteInfo, csObject);
+
+// Recursive function to add limbs to a skeletal ghost. This also builds
+// the sprite template.
+void add_ghost_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* parent, int& vertex_idx,
+	int prev_par_idx, int maxdepth, int width, int recursion, float dim)
+{
+  int par_vertex_idx = vertex_idx;
+  parent->AddVertex (vertex_idx++);
+  parent->AddVertex (vertex_idx++);
+  parent->AddVertex (vertex_idx++);
+  parent->AddVertex (vertex_idx++);
+  parent->AddVertex (vertex_idx++);
+  parent->AddVertex (vertex_idx++);
+  if (tmpl->GetNumVertices ()+6 >= frame->GetMaxVertices ())
+  {
+    int more = 6;
+    tmpl->SetNumVertices (tmpl->GetNumVertices ()+more);
+    frame->AddVertex (more);
+  }
+  frame->SetVertex (par_vertex_idx+0, -dim, 0, -dim); frame->SetTexel (par_vertex_idx+0, 0, 0);
+  frame->SetVertex (par_vertex_idx+1, dim, 0, -dim); frame->SetTexel (par_vertex_idx+1, .99, 0);
+  frame->SetVertex (par_vertex_idx+2, 0, 0, dim); frame->SetTexel (par_vertex_idx+2, 0, .99);
+  frame->SetVertex (par_vertex_idx+3, -dim, .45, -dim); frame->SetTexel (par_vertex_idx+3, .99, .99);
+  frame->SetVertex (par_vertex_idx+4, dim, .45, -dim); frame->SetTexel (par_vertex_idx+4, .5, .5);
+  frame->SetVertex (par_vertex_idx+5, 0, .45, dim); frame->SetTexel (par_vertex_idx+5, .5, 0);
+  if (recursion > 0)
+  {
+    // Create connection triangles with previous set
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+3, prev_par_idx+5, par_vertex_idx+0);
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+5, par_vertex_idx+2, par_vertex_idx+0);
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, par_vertex_idx+1, par_vertex_idx+2);
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+5, prev_par_idx+4, par_vertex_idx+2);
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, par_vertex_idx+0, par_vertex_idx+1);
+    tmpl->GetBaseMesh ()->AddTriangle (prev_par_idx+4, prev_par_idx+3, par_vertex_idx+0);
+  }
+  // Create base triangles
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+0, par_vertex_idx+5, par_vertex_idx+3);
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+0, par_vertex_idx+2, par_vertex_idx+5);
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+2, par_vertex_idx+4, par_vertex_idx+5);
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+2, par_vertex_idx+1, par_vertex_idx+4);
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+1, par_vertex_idx+3, par_vertex_idx+4);
+  tmpl->GetBaseMesh ()->AddTriangle (par_vertex_idx+1, par_vertex_idx+0, par_vertex_idx+3);
+
+  if (recursion >= maxdepth) return;
+  csSkeletonConnection* con;
+  int i;
+  for (i = 0 ; i < width ; i++)
+  {
+    CHK (con = new csSkeletonConnection ());
+    parent->AddChild (con);
+    csMatrix3 tr = csMatrix3::GetYRotation (0) *
+    	csMatrix3::GetZRotation (.15) *
+	csMatrix3::GetXRotation (.15);
+    csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
+    con->SetTransformation (trans);
+    add_ghost_limbs (tmpl, frame, con, vertex_idx, par_vertex_idx, maxdepth, 1, recursion+1, dim * .7);
+  }
+}
+
+// Create a skeletal ghost.
+csSkeleton* create_skelghost (csSpriteTemplate* tmpl, csFrame* frame, int& vertex_idx,
+	int maxdepth, int width)
+{
+  CHK (csSkeleton* skel = new csSkeleton ());
+  add_ghost_limbs (tmpl, frame, skel, vertex_idx, 0, maxdepth, width, 0, .2);
+  return skel;
+}
+
+// Add a skeletal ghost sprite. If needed it will also create
+// the template for this.
+void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth, int width)
+{
+  char skelname[50];
+  sprintf (skelname, "__skelghost__\n");
+  csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname, true);
+  if (!tmpl)
+  {
+    CHK (tmpl = new csSpriteTemplate ());
+    csNameObject::AddName (*tmpl, skelname);
+    Sys->world->sprite_templates.Push (tmpl);
+    tmpl->SetTexture (Sys->world->GetTextures (), "green.gif");
+    int vertex_idx = 0;
+    csFrame* fr = tmpl->AddFrame ();
+    fr->SetName ("f");
+    csSpriteAction* act = tmpl->AddAction ();
+    act->SetName ("a");
+    act->AddFrame (fr, 100);
+    tmpl->SetSkeleton (create_skelghost (tmpl, fr, vertex_idx, maxdepth, width));
+    tmpl->GenerateLOD ();
+  }
+  csSprite3D* spr = add_sprite (skelname, "__skelghost__", where, pos, 1);
+  spr->SetMixmode (FX_Alpha, .75);
+  CHK (csCollider* col = new csCollider (spr));
+  csColliderPointerObject::SetCollider (*spr, col, true);
+  CHK (GhostSpriteInfo* gh_info = new GhostSpriteInfo ());
+  spr->ObjAdd (gh_info);
+  gh_info->dir = 1;
+}
+
+// Animate a skeleton.
+void animate_skeleton_ghost (csSkeletonLimbState* limb)
+{
+  csSkeletonConnectionState* con = (csSkeletonConnectionState*)limb->GetChildren ();
+  while (con)
+  {
+    GhostSkelSpriteInfo* o = (GhostSkelSpriteInfo*)con->GetObj (GhostSkelSpriteInfo::Type ());
+    if (!o)
+    {
+      CHK (o = new GhostSkelSpriteInfo ());
+      if ((rand () >> 3) & 0x1)
+      {
+        o->x_angle_base = (((float)((rand () >> 3)&0xff)) / 255.) * .4 -.2;
+        o->x_angle = 0;
+        o->dx = (rand () & 0x4) ? .005 : -.005;
+        o->z_angle_base = (((float)((rand () >> 3)&0xff)) / 255.) * 1.2 -.6;
+        o->z_angle = 0;
+        o->dz = (rand () & 0x4) ? .02 : -.02;
+      }
+      else
+      {
+        o->z_angle_base = (((float)((rand () >> 3)&0xff)) / 255.) * .4 -.2;
+        o->z_angle = 0;
+        o->dz = (rand () & 0x4) ? .005 : -.005;
+        o->x_angle_base = (((float)((rand () >> 3)&0xff)) / 255.) * 1.2 -.6;
+        o->x_angle = 0;
+        o->dx = (rand () & 0x4) ? .02 : -.02;
+      }
+      o->y_angle = 0;
+      o->dy = (rand () & 0x4) ? .04 : -.04;
+      con->ObjAdd (o);
+    }
+    o->x_angle += o->dx;
+    if (o->x_angle > .1 || o->x_angle < -.1) o->dx = -o->dx;
+    o->z_angle += o->dz;
+    if (o->z_angle > .1 || o->z_angle < -.1) o->dz = -o->dz;
+    o->y_angle += o->dy;
+    if (o->y_angle > .3 || o->y_angle < -.3) o->dy = -o->dy;
+
+    // @@@ Don't use the code below in a real-time environment.
+    // This is only demo code and HIGHLY inefficient.
+    csMatrix3 tr = csMatrix3::GetYRotation (o->y_angle) *
+    	csMatrix3::GetZRotation (o->z_angle + o->z_angle_base) *
+	csMatrix3::GetXRotation (o->x_angle + o->x_angle_base);
+    csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
+    con->SetTransformation (trans);
+    animate_skeleton_ghost (con);
+    con = (csSkeletonConnectionState*)(con->GetNext ());
+  }
+}
+
+#define MAXSECTORSOCCUPIED  20
+
+extern int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa);
+extern int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt);
+extern collision_pair our_cd_contact[1000];//=0;
+extern int num_our_cd;
+
+void move_ghost (csSprite3D* spr)
+{
+  csCollider* col = csColliderPointerObject::GetCollider (*spr);
+  csSector* first_sector = (csSector*)(spr->sectors[0]);
+
+  // Create a transformation 'test' which indicates where the ghost is moving too.
+  const csVector3& pos = spr->GetW2TTranslation ();
+  csVector3 vel (0, 0, .1);
+  vel = spr->GetW2T () * vel;
+  csVector3 new_pos = pos+vel;
+  csMatrix3 m;
+  csOrthoTransform test (m, new_pos);
+
+  // Find all sectors that the ghost will occupy on the new position.
+  csSector *n[MAXSECTORSOCCUPIED];
+  int num_sectors = FindSectors (new_pos, 4*col->GetBbox()->d, first_sector, n);
+
+  // Start collision detection.
+  csCollider::CollideReset ();
+  num_our_cd = 0;
+  csCollider::firstHit = false;
+  int hits = 0;
+  for ( ; num_sectors-- ; )
+    hits += CollisionDetect (col, n[num_sectors], &test);
+
+  // Change our velocity according to the collisions.
+  for (int j=0 ; j<hits ; j++)
+  {
+    CDTriangle *wall = our_cd_contact[j].tr2;
+    csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
+    if (n*vel<0)
+      continue;
+    vel = -(vel%n)%n;
+  }
+
+  if (!(vel < EPSILON))
+  {
+    // We move to our new position.
+    new_pos = pos+vel;
+    test = csReversibleTransform (csMatrix3 (), pos);
+    bool mirror = true;
+    first_sector = first_sector->FollowSegment (test, new_pos, mirror);
+    spr->MoveToSector (first_sector);
+    spr->SetMove (new_pos);
+  }
+
+  // Turn around at random intervals.
+  GhostSpriteInfo* gh_info = (GhostSpriteInfo*)spr->GetObj (GhostSpriteInfo::Type ());
+  if (rand () % 40 == 1) gh_info->dir = -gh_info->dir;
+
+  if (vel < 0.01)
+  {
+    // We did not move much. Turn around quickly.
+    spr->Transform (csMatrix3::GetYRotation (gh_info->dir*.2));
+  }
+  else if (vel < 0.05)
+  {
+    // We did a bit. Turn around slightly.
+    spr->Transform (csMatrix3::GetYRotation (gh_info->dir*.1));
+  }
+  else spr->Transform (csMatrix3::GetYRotation (gh_info->dir*.01));
 }
 
 //===========================================================================
@@ -637,7 +891,12 @@ void light_statics ()
     if (sk_state)
     {
       const char* name = csNameObject::GetName (*spr);
-      if (!strcmp (name, "__testSkel__")) animate_skeleton (sk_state);
+      if (!strcmp (name, "__skeltree__")) animate_skeleton_tree (sk_state);
+      else if (!strcmp (name, "__skelghost__"))
+      {
+        animate_skeleton_ghost (sk_state);
+        move_ghost (spr);
+      }
     }
     spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
@@ -662,7 +921,7 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " fps, perftest, capture, coordshow, zbuf, freelook\n");
     Sys->Printf (MSG_CONSOLE, " map, fire, debug0, debug1, debug2, edges, p_alpha, s_fog\n");
     Sys->Printf (MSG_CONSOLE, " snd_play, snd_volume, do_gravity\n");
-    Sys->Printf (MSG_CONSOLE, " addbot, delbot, addsprite, addskel\n");
+    Sys->Printf (MSG_CONSOLE, " addbot, delbot, addsprite, addskel, addghost\n");
     Sys->Printf (MSG_CONSOLE, " step_forward, step_backward, strafe_left, strafe_right\n");
     Sys->Printf (MSG_CONSOLE, " look_up, look_down, rotate_left, rotate_right, jump, move3d\n");
     Sys->Printf (MSG_CONSOLE, " i_forward, i_backward, i_left, i_right, i_up, i_down\n");
@@ -991,7 +1250,15 @@ static bool CommandHandler (char *cmd, char *arg)
     int depth, width;
     if (arg) ScanStr (arg, "%d,%d", &depth, &width);
     else { depth = 3; width = 3; }
-    add_skeleton_sprite (Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin (),
+    add_skeleton_tree (Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin (),
+    	depth, width);
+  }
+  else if (!strcasecmp (cmd, "addghost"))
+  {
+    int depth, width;
+    if (arg) ScanStr (arg, "%d,%d", &depth, &width);
+    else { depth = 5; width = 8; }
+    add_skeleton_ghost (Sys->view->GetCamera ()->GetSector (), Sys->view->GetCamera ()->GetOrigin (),
     	depth, width);
   }
   else if (!strcasecmp (cmd, "addbot"))
