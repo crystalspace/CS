@@ -226,6 +226,7 @@ void csChunkLodTerrainFactory::SetSamplerRegion (
       datamap[pos].pos = fullsample->SampleVector3 (vertex_name)[pos];
       datamap[pos].norm = fullsample->SampleVector3 (normal_name)[pos];
       datamap[pos].tex = fullsample->SampleVector2 (texcors_name)[pos];
+      datamap[pos].col = pos;
     }
   }
 
