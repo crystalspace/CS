@@ -266,8 +266,10 @@ bool csStaticPVSTree::WriteOut ()
 
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   iCacheManager* cache_mgr = engine->GetCacheManager ();
-  return cache_mgr->CacheData ((void*)buf->GetData (), buf->GetSize (),
+  bool rc = cache_mgr->CacheData ((void*)buf->GetData (), buf->GetSize (),
   	"pvs", pvscache, 0);
+  cache_mgr->Flush ();
+  return rc;
 }
 
 const char* csStaticPVSTree::ReadPVS (char*& data, csStaticPVSNode*& node)

@@ -32,6 +32,8 @@ chronological order.
 	      before doing the expensive calculations.
 	- Jorrit made precache default in walktest. There is now a
 	  -noprecache option to disable it.
+	- Jorrit fixed a problem in pvsvis which would prevent the pvs
+	  visibility information from being written out.
 14-Feb-2005
 	- Chris made the minimum polygon UV determinant into a #define
 	  so that it would be more amenable to experimentation. 
