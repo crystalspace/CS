@@ -22,11 +22,13 @@
 
 #include "csutil/cfgfile.h"
 #include "csutil/csstrvec.h"
+#include "csutil/scopedmutexlock.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"		  
 
 class VfsNode;
+class csVFS;
 struct iConfigFile;
 
 /// A replacement for standard-C FILE type in the virtual file space
@@ -45,7 +47,8 @@ protected:
   int Error;
 
   // The constructor for csFile
-  csFile (int Mode, VfsNode *ParentNode, int RIndex, const char *NameSuffix);
+  csFile (int Mode, VfsNode *ParentNode, int RIndex,
+  	const char *NameSuffix);
 
 public:
   /// Instead of fclose() do "delete file" or file->DecRef ()
@@ -102,6 +105,10 @@ protected:
  */
 class csVFS : public iVFS
 {
+private:
+  /// Mutex to make VFS thread-safe.
+  csRef<csMutex> mutex;
+
   friend class VfsNode;
 
   // A vector of VFS nodes

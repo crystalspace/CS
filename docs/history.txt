@@ -27,6 +27,9 @@ The history order is reversed so that new features are at the top.
 	- Jorrit removed the obsolete coverage buffer from Dynavis. The
 	  tiled coverage buffer works much better and was default anyway.
 	  Additionally removed the toggle_tiled debug command.
+	- Jorrit made VFS thread-safe. Working on the same iFile is not
+	  thread-safe though! Also the concept of the current VFS directory
+	  should not be used in threads.
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.

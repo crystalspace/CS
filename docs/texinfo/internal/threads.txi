@@ -11,8 +11,6 @@ threads in combination with Crystal Space you have to be careful. However,
 several parts of Crystal Space are thread-safe to some degree. This is
 documented in this section. However, by default you must assume that some
 Crystal Space plugin or module is not thread-safe unless it is mentioned here.
-One important module which is not at all thread-safe yet is @sc{vfs}. Since
-several other plugins depend on that this might be a problem.
 
 @subsubheading Threadsafe parts of CS
 
@@ -32,12 +30,14 @@ are safe. The @code{iObjectRegistryIterator} takes a copy of the data
 over which it iterates so it will not even lock.
 
 @item
+@sc{vfs} is thread-safe for most operations. But do not work on the same
+@code{iFile} from different threads! That is not thread-safe. Also the concept
+of the current directory is not really valid with threads.
+
+@item
 The TinyXML, XMLRead, and Binary XML parsers are thread safe in the sense
 that it is ok to create and work on seperate documents in seperate threads.
 However it is NOT ok to work on the same document in different threads.
-Also @sc{vfs} itself is not thread safe yet so avoid the
-@code{iDocument->Parse()} and @code{iDocument->Write()} calls that use
-@code{iFile} and/or @code{iVFS}.
 
 @item
 The syntax services plugin is safe for the basic parsing tools (vectors,
@@ -55,8 +55,6 @@ The reporter plugin is fully thread-safe.
 @item
 The standard reporter listener plugin is thread-safe for basic operations
 but not for initialization. That should be done from the main thread.
-Also logging to file (@sc{vfs}) with @file{debug.txt} or otherwise
-is not thread-safe since @sc{vfs} itself is not thread-safe.
 Also note that thread-safety of the standard reporter listener depends
 on thread-safety of the output console that is being used.
 
