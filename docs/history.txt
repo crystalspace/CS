@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Nov-2003
+	- Eric Sunshine once again disabled /nodefaultlib:"MSVCRT" in the
+	  freefnt2 MSVC project files since a user reports that it results in
+	  many unresolved references at link time.
 19-Nov-2003
 	- Eric Sunshine added new static method scfInterface<>::GetName() which
 	  returns an interface's name as a string.  This allows templates to

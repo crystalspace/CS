@@ -46,7 +46,7 @@ TO_INSTALL.CONFIG += $(CFG.FREEFNT2)
 MSVC.DSP += FREEFNT2
 DSP.FREEFNT2.NAME = freefnt2
 DSP.FREEFNT2.TYPE = plugin
-DSP.FREEFNT2.LFLAGS = /nodefaultlib:"MSVCRT"
+#DSP.FREEFNT2.LFLAGS = /nodefaultlib:"MSVCRT"
 DSP.FREEFNT2.CFLAGS = /I "..\..\include\cssys\win32\freetype2"
 DSP.FREEFNT2.LIBS = freetype2
 
