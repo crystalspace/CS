@@ -4,6 +4,7 @@ ifneq (,$(findstring cspython,$(PLUGINS)))
 # Plugin description
 DESCRIPTION.cspython = Crystal Script Python plug-in
 DESCRIPTION.cspythonswig = Crystal Script Python SWIG interface
+DESCRIPTION.cspymod = Crystal Script Python module
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
