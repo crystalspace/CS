@@ -293,7 +293,7 @@ bool csODERigidBody::MakeStatic ()
   {
     statjoint = dJointCreateFixed (dynsys->GetWorldID(), 0);
     dJointAttach (statjoint, bodyID, 0);
-    // TODO: when ODE has it: dBodySetGravityMode (bodyID, 0);
+    dBodySetGravityMode (bodyID, 0);
   }
   return true; 
 }
@@ -302,7 +302,7 @@ bool csODERigidBody::MakeDynamic ()
 {
   if (statjoint != 0) {
     dJointDestroy (statjoint);
-    // TODO: when ODE has it: dBodySetGravityMode (bodyID, 1);
+    dBodySetGravityMode (bodyID, 1);
   }
   return true; 
 }
@@ -596,15 +596,15 @@ const csVector3 csODERigidBody::GetTorque () const
 
 void csODERigidBody::AttachMesh (iMeshWrapper* m)
 {
-  if (m) m->IncRef();
-  if (mesh) mesh->DecRef();
+  if (m) m->IncRef ();
+  if (mesh) mesh->DecRef ();
   mesh = m;
 }
 
 void csODERigidBody::AttachBone (iSkeletonBone* b)
 {
-  if (b) b->IncRef();
-  if (bone) bone->DecRef();
+  if (b) b->IncRef ();
+  if (bone) bone->DecRef ();
   bone = b;
 }
 
@@ -614,14 +614,15 @@ void csODERigidBody::Update ()
   {
     csOrthoTransform trans;
     if (mesh || bone)
-      trans = GetTransform();
+      trans = GetTransform ();
     if (mesh)
     {
-      mesh->GetMovable ()->SetTransform (trans);
+      mesh->GetMovable ()->SetPosition (trans.GetOrigin ());
+      mesh->GetMovable ()->GetTransform ().SetT2O (trans.GetO2T ());
       mesh->GetMovable ()->UpdateMove ();
     }
     if (bone)
-      bone->SetTransformation(trans);
+      bone->SetTransformation (trans);
   }
 }
 
