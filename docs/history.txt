@@ -8,6 +8,10 @@ chronological order.
 
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
+	- Eric Sunshine fixed copy/paste error in terraformer loader makefile
+	  which broke it.  DIR.SIMPLEFORMERLDR referenced the wrong path.  Also
+	  fixed formatting of help message.  Added appropriate SubInclude
+	  invocation to its parent Jamfile to ensure that it gets built.
 16-Mar-2004
 	- Jorrit fixed a bug in iSector->HitBeamPortals(). It would not
 	  initialize the mesh to 0 which could cause bad errors in some

@@ -4,7 +4,8 @@ DESCRIPTION.simpleformerldr = Crystal Space simple terraformer loader
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make simpleformerldr Make the $(DESCRIPTION.simpleformerldr)$"
+  $(NEWLINE)echo $"  make simpleformerldr$"
+  $(NEWLINE)echo $"                    Make the $(DESCRIPTION.simpleformerldr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -35,7 +36,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SIMPLEFORMERLDR)
 endif
 
-DIR.SIMPLEFORMERLDR = plugins/terraformer/simpleformerldr
+DIR.SIMPLEFORMERLDR = plugins/terraformer/simpleformer/loader
 OUT.SIMPLEFORMERLDR = $(OUT)/$(DIR.SIMPLEFORMERLDR)
 INF.SIMPLEFORMERLDR = $(SRCDIR)/$(DIR.SIMPLEFORMERLDR)/simpleformerldr.csplugin
 INC.SIMPLEFORMERLDR = $(wildcard $(SRCDIR)/$(DIR.SIMPLEFORMERLDR)/*.h)
@@ -67,7 +68,8 @@ $(SIMPLEFORMERLDR): $(OBJ.SIMPLEFORMERLDR) $(LIB.SIMPLEFORMERLDR)
 
 clean: simpleformerldrclean
 simpleformerldrclean:
-	-$(RMDIR) $(SIMPLEFORMERLDR) $(OBJ.SIMPLEFORMERLDR) $(OUTDLL)/$(notdir $(INF.SIMPLEFORMERLDR))
+	-$(RMDIR) $(SIMPLEFORMERLDR) $(OBJ.SIMPLEFORMERLDR) \
+	$(OUTDLL)/$(notdir $(INF.SIMPLEFORMERLDR))
 
 cleandep: simpleformerldrcleandep
 simpleformerldrcleandep:

@@ -7,3 +7,5 @@ Plugin simpleformer
 ;
 
 LinkWith simpleformer : csgeom csutil ;
+
+SubInclude plugins terraformer simpleformer loader ;
