@@ -38,7 +38,7 @@
  */
 class csPixmap : public csBase
 {
-private:
+protected:
   iTextureHandle *hTex;
   int tx, ty, tw, th;
 
@@ -78,7 +78,7 @@ public:
   }
 
   /// Return true if pixmap has been initialized okay
-  bool ok ()
+  virtual bool ok ()
   { return hTex != NULL; }
 
   /// Draw the pixmap given the screen position and new size
@@ -105,7 +105,7 @@ public:
    * The orgx and orgy point to a pixel (perhaps offscreen) where the
    * (0,0) pixel of this pixmap would be drawn.
    */
-  void DrawTiled (iGraphics3D* g3d, int sx, int sy, int sw, int sh,
+  virtual void DrawTiled (iGraphics3D* g3d, int sx, int sy, int sw, int sh,
     int orgx, int orgy, uint8 Alpha = 0)
   { g3d->DrawPixmap (hTex, sx, sy, sw, sh, sx - orgx, sy - orgy, sw, sh, Alpha); }
 
@@ -130,7 +130,7 @@ public:
     }  
   }
   /// Query pixmap texture handle
-  iTextureHandle *GetTextureHandle ()
+  virtual iTextureHandle *GetTextureHandle ()
   { return hTex; }
 };
 
