@@ -24,7 +24,12 @@ Give information about the contents of the texture cache.
 Clear the texture cache.
 
 @item activate
-Activate the object that is right in front of you.
+Activate the object that is right in front of you (OBSOLETE).
+
+@item action
+Activate the object that is right in front of you. This command
+will use the WalkTest entity system. Currently it only works for
+opening doors that use the cmd_Door key.
 
 @item perftest
 Run a performance test on the current position.

@@ -24,8 +24,11 @@
 #include "walktest/bot.h"
 #include "walktest/infmaze.h"
 #include "walktest/hugeroom.h"
+#include "walktest/wentity.h"
 #include "apps/support/command.h"
 #include "cstools/simpcons.h"
+#include "csengine/keyval.h"
+#include "csengine/thing.h"
 #include "csengine/dumper.h"
 #include "csengine/camera.h"
 #include "csengine/octree.h"
@@ -297,6 +300,81 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
 
 //===========================================================================
 
+void WalkTest::ParseKeyCmds (csObject* src)
+{
+  csObjIterator it = src->GetIterator (csKeyValuePair::Type);
+  while (!it.IsFinished ())
+  {
+    csObject* obj = it.GetObj ();
+    csKeyValuePair* kp = (csKeyValuePair*)obj;
+    if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
+    {
+      if (src->GetType () == csSector::Type)
+      {
+        char name[100], rot[100];
+        ScanStr (kp->GetValue (), "%s,%s,%f", name, rot, &anim_sky_speed);
+        if (rot[0] == 'x') anim_sky_rot = 0;
+        else if (rot[0] == 'y') anim_sky_rot = 1;
+        else anim_sky_rot = 2;
+        anim_sky = ((csSector*)src)->GetSky (name);
+      }
+    }
+    else if (!strcmp (kp->GetKey (), "cmd_Door"))
+    {
+      if (src->GetType () == csThing::Type)
+      {
+        csVector3 hinge;
+        ScanStr (kp->GetValue (), "%f,%f,%f", &hinge.x, &hinge.y, &hinge.z);
+	csDoor* door = new csDoor ((csThing*)src);
+	door->SetHinge (hinge);
+        src->ObjAdd (door);
+      }
+    }
+    else
+    {
+      // Unknown command. Ignore for the moment.
+    }
+    it.Next ();
+  }
+}
+
+void WalkTest::ParseKeyCmds ()
+{
+  int i;
+  for (i = 0 ; i < world->sectors.Length () ; i++)
+  {
+    csSector* sector = (csSector*)world->sectors[i];
+    ParseKeyCmds (sector);
+
+    csThing* thing;
+    thing = sector->GetFirstThing ();
+    while (thing)
+    {
+      ParseKeyCmds (thing);
+      thing = (csThing*)(thing->GetNext ());
+    }
+  }
+}
+
+void WalkTest::ActivateObject (csObject* src)
+{
+printf ("ActivateObject\n");
+  csObjIterator it = src->GetIterator (csWalkEntity::Type, true);
+  while (!it.IsFinished ())
+  {
+printf ("it\n");
+    csWalkEntity* wentity = (csWalkEntity*)it.GetObj ();
+printf ("wentity=%08lx\n", wentity);
+printf ("wentity->Type='%s'\n", wentity->Type.ID);
+printf ("before\n");
+    wentity->Activate ();
+printf ("after\n");
+    it.Next ();
+  }
+}
+
+//===========================================================================
+
 float safe_atof (const char* arg)
 {
   if (arg) return atof (arg);
@@ -335,7 +413,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Various:\n");
     CONPRI("  coordsave coordload bind capture map p_alpha s_fog\n");
     CONPRI("  snd_play snd_volume loadsprite addsprite delsprite\n");
-    CONPRI("  record play clrrec saverec loadrec\n");
+    CONPRI("  record play clrrec saverec loadrec action\n");
 #   undef CONPRI
   }
   else if (!strcasecmp (cmd, "coordsave"))
@@ -347,6 +425,19 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     Sys->Printf (MSG_CONSOLE, "LOAD COORDS\n");
     LoadCamera (Sys->VFS, "/this/coord");
+  }
+  else if (!strcasecmp (cmd, "action"))
+  {
+    csVector3 where = Sys->view->GetCamera ()->This2Other(3.0f*VEC_FORWARD);
+    csPolygon3D* p = Sys->view->GetCamera ()->GetHit (where);
+    if (p)
+    {
+      CsPrintf (MSG_CONSOLE, "Action polygon '%s' ", p->GetName ());
+      csPolygonSet* ob = (csPolygonSet*)(p->GetParent ());
+      CsPrintf (MSG_CONSOLE, "in set '%s'\n", ob->GetName ());
+      printf ("ACTION\n");
+      Sys->ActivateObject ((csObject*)ob);
+    }
   }
   else if (!strcasecmp (cmd, "saverec"))
   {

@@ -45,10 +45,13 @@ protected:
   csObjContainer *Container;
   /// The last index of child we examined
   int Index;
+  /// If true we iterate over derived entities as well.
+  bool derived;
 
 public:
-  /// Create the iterator
-  csObjIterator (const csIdType &iType, const csObject &iObject);
+  /// Create the iterator.
+  csObjIterator (const csIdType &iType, const csObject &iObject,
+    bool derived = false);
 
   /// Reuse the iterator for an other search
   void Reset(const csIdType &iType, const csObject &iObject);

@@ -153,8 +153,10 @@ void csObject::ObjRemove (csObject *obj)
 
 //------------------------------------------------------ Object iterator -----//
 
-csObjIterator::csObjIterator (const csIdType &iType, const csObject &iObject)
+csObjIterator::csObjIterator (const csIdType &iType, const csObject &iObject,
+	bool derived)
 {
+  csObjIterator::derived = derived;
   Reset (iType, iObject);
 }
 
@@ -175,7 +177,7 @@ void csObjIterator::Next ()
 {
   if (Container)
   {
-    do
+    for (;;)
     {
       Index++;
       if (Index >= Container->count)
@@ -183,7 +185,15 @@ void csObjIterator::Next ()
         Container = NULL;
         break;
       }
-    } while (&Container->obj [Index]->GetType () != Type);
+      if (derived)
+      {
+        if (&Container->obj [Index]->GetType () >= Type) break;
+      }
+      else
+      {
+        if (&Container->obj [Index]->GetType () == Type) break;
+      }
+    }
   }
 }
 

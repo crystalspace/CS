@@ -47,7 +47,6 @@
 #include "csengine/world.h"
 #include "csengine/covtree.h"
 #include "csengine/solidbsp.h"
-#include "csengine/keyval.h"
 #include "csscript/csscript.h"
 #include "csscript/intscri.h"
 #include "csengine/cspixmap.h"
@@ -299,6 +298,15 @@ void WalkTest::MoveSystems (time_t elapsed_time, time_t current_time)
 	}
     }
     anim_sky->Transform ();
+  }
+
+  // Update all busy entities.
+  csObjIterator it = busy_entities.GetIterator (csWalkEntity::Type, true);
+  while (!it.IsFinished ())
+  {
+    csWalkEntity* wentity = (csWalkEntity*)it.GetObj ();
+    wentity->NextFrame (elapsed_time);
+    it.Next ();
   }
 
   // Move all particle systems.
@@ -937,36 +945,7 @@ void WalkTest::LoadLibraryData(void)
   csLoader::LoadLibraryFile (world, "/lib/std/library");
 }
 
-void WalkTest::ParseKeyCmds ()
-{
-  int i;
-  for (i = 0 ; i < world->sectors.Length () ; i++)
-  {
-    csSector* sector = (csSector*)world->sectors[i];
-    csObjIterator it = sector->GetIterator (csKeyValuePair::Type);
-    while (!it.IsFinished ())
-    {
-      csObject* obj = it.GetObj ();
-      csKeyValuePair* kp = (csKeyValuePair*)obj;
-      if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
-      {
-	char name[100], rot[100];
-        ScanStr (kp->GetValue (), "%s,%s,%f", name, rot, &anim_sky_speed);
-	if (rot[0] == 'x') anim_sky_rot = 0;
-	else if (rot[0] == 'y') anim_sky_rot = 1;
-	else anim_sky_rot = 2;
-        anim_sky = sector->GetSky (name);
-      }
-      else
-      {
-        // Unknown command. Ignore for the moment.
-      }
-      it.Next ();
-    }
-  }
-}
-
-void WalkTest::Inititalize2DTextures(void)
+void WalkTest::Inititalize2DTextures ()
 {
   csTextureHandle *texh;
   csTextureList *texlist = world->GetTextures ();

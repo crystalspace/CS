@@ -81,9 +81,14 @@ public:
   /// Return the first subobject instance of the given type
   csObject *GetChild (const csIdType& iType) const;
 
-  /// Return an iterator referencing all objects of the given type
-  csObjIterator GetIterator (const csIdType& iType) const
-  { return csObjIterator (iType, *this); }
+  /**
+   * Return an iterator referencing all objects of the given type.
+   * If 'derived' is true this iterator will also iterate over
+   * all derived entities (derived from the given type).
+   * Default is to iterate only over elements of the exact type.
+   */
+  csObjIterator GetIterator (const csIdType& iType, bool derived = false) const
+  { return csObjIterator (iType, *this, derived); }
 
   /// Attach a new csObject to the tree
   void ObjAdd (csObject *obj);

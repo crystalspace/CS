@@ -27,6 +27,7 @@
 #include "csengine/light.h"
 #include "csutil/inifile.h"
 #include "csutil/vfs.h"
+#include "walktest/wentity.h"
 #include "iworld.h"
 
 class Polygon3D;
@@ -127,6 +128,9 @@ public:
 
   /// Vector with recorded camera transformations.
   csRecordVector recording;
+
+  /// A list with all busy entities.
+  csBusyList busy_entities;
 
   // Various configuration values for collision detection.
   /// If >= 0 then we're recording. The value is the current frame entry.
@@ -266,7 +270,19 @@ public:
   virtual bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
 
-  /// Find all key commands attached to sectors and execute them.
+  /// Fire all commands on an object (run time execution).
+  virtual void ActivateObject (csObject* object);
+
+  /**
+   * Find all key commands attached to an object and execute
+   * them (load time execution).
+   */
+  virtual void ParseKeyCmds (csObject* src);
+
+  /**
+   * Find all key commands attached to objects and execute
+   * them (load time execution).
+   */
   virtual void ParseKeyCmds ();
 
   ///

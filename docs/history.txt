@@ -1,6 +1,7 @@
 The history order has been reversed so that new features are at the top.
+
 10-Jul-2000
-	- Samuel did the following changes:
+	- Samuel Humphreys did the following changes:
             - Added messages to distinguish between backbuffer and software GL
               implementations
             - Cleared out debugging junk I left in.
@@ -20,8 +21,34 @@ The history order has been reversed so that new features are at the top.
             - Various changes to dtsimple. Currently the meta balls texture is 
               set to be persistent over the top of the squawk background, so the 
               metaballs smear over the texture rather than being cleared each frame
+	- Extended csObject::GetIterator() with a new parameter that indicates
+	  if you want to iterate over derived objects as well. Normally
+	  the iterator that is returned only iterates over the objects of
+	  exactly that type. The parameter is defaulted to false so normally
+	  no code should be modified for this change.
+	- Added a new entity model to WalkTest. csWalkEntity is the main
+	  abstract superclass. You can attach a csWalkEntity subclass to
+	  any sector or thing in CS. In WalkTest there is a function
+	  called ActivateObject() which will activate all entities that
+	  are attached to some object. The main WalkTest loop (NextFrame)
+	  will also call NextFrame() on all 'busy' entities. By default
+	  entities are not busy but an entity can push itself on that list
+	  at activation time (and release itself later when it is no longer
+	  active).
+	- Added 'action' command to WalkTest which will replace the old
+	  'activate' command (for the obsolete scripting system). This
+	  'action' command will trigger ActivateObject() in the parent
+	  of the first polygon it can find in front of the camera (less
+	  than 3 units away). Bound 'a' to this new command (meaning
+	  'activate' is unbound now). WARNING! This new system is not
+	  operational yet and crashes still.
+	- Added first subclass of csWalkEntity: csDoor. This entity
+	  represents a door that can be opened or closed. To use
+	  this in world files add a key/value KEY ("cmd_Door", "X,Y,Z") to
+	  the thing that you want to let act as a door. The x,y,z location
+	  is the location of the hinge.
 8-Jul-2000
-        - Samuel did the following changes:
+        - Samuel Humphreys did the following changes:
             - Fixed the opengl back buffer procedural texture so it now displays
               curves and sprites non-inverted. The back buffer uses an inverted
               orthographic projection matrix, which was being overwritten by the
@@ -43,6 +70,7 @@ The history order has been reversed so that new features are at the top.
             - Small corrections to some txi files.
             - Added new flags to itxtmgr which I have written documentation for.
               Now all I need to do is write the code for it :)
+	- Seth Galbraith did some fixes to some of the DOS setup scripts.
 7-Jul-2000
 	- Moved alpha setting from portals to polygons. In most cases this
 	  setting only makes sense for portals but you can use it on a thing
@@ -52,6 +80,8 @@ The history order has been reversed so that new features are at the top.
 	- Fixed Map2CS so that it works on big endian machines and also
 	  works on processors that don't allow writing short/long on
 	  odd addresses.
+	- Norman Kramer fixes glide canvas so that it now intercepts
+	  WM_WINDOW_CLOSE messages from X.
 6-Jul-2000
 	- Samuel Humphreys did the following changes:
             - Removed indentation from bin/dosupd.bat..hope the unix eol stuff
