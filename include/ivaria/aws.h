@@ -14,8 +14,8 @@ struct iAwsSigSrc;
 class  awsWindow;
 class  awsComponentNode;
 class  awsComponentFactory;
-class  iGraphics2D;
-class  iGraphics3D;
+struct  iGraphics2D;
+struct  iGraphics3D;
             
 
 SCF_VERSION (iAws, 0, 0, 1);
