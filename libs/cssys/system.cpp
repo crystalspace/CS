@@ -241,7 +241,8 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
   bool error = false;
   char *loopp = strchr (loop, 0);
   *loopp++ = row + 1; *loopp = 0;
-  for (int col = 0; col < len; col++)
+  int col;
+  for (col = 0; col < len; col++)
     if (*dep++)
     {
       // If the plugin is already loaded, skip
@@ -254,7 +255,8 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
         iSys->ReportSys (CS_REPORTER_SEVERITY_ERROR,
 		"PLUGIN LOADER: Cyclic dependency detected!\n");
         int startx = int (already - loop);
-        for (int x = startx; loop [x]; x++)
+		int x;
+        for (x = startx; loop [x]; x++)
           iSys->ReportSys (CS_REPORTER_SEVERITY_ERROR, "   %s %s\n",
             x == startx ? "+->" : loop [x + 1] ? "| |" : "<-+",
             Get (loop [x] - 1).ClassID);
@@ -356,7 +358,8 @@ csSystemDriver::~csSystemDriver ()
   if (VFS) VFS->DecRef ();
 
   // Free all plugins.
-  for (int i = 0; i < Plugins.Length(); i++)
+  int i;
+  for (i = 0; i < Plugins.Length(); i++)
       UnloadPlugin((iPlugin *)Plugins.Get(i));
      
   // Free the system event outlet
@@ -598,7 +601,8 @@ bool csSystemDriver::HandleEvent (iEvent&Event)
 
   int evmask = 1 << Event.Type;
   bool canstop = !(Event.Flags & CSEF_BROADCAST);
-  for (int i = 0; i < Plugins.Length (); i++)
+  int i;
+  for (i = 0; i < Plugins.Length (); i++)
   {
     csPlugin *plugin = Plugins.Get (i);
     if (plugin->EventMask & evmask)
@@ -640,7 +644,8 @@ iConfigFile *csSystemDriver::OpenUserConfig(const char *ApplicationID,
 
 void csSystemDriver::Help (iConfig* Config)
 {
-  for (int i = 0; ; i++)
+  int i;
+  for (i = 0; ; i++)
   {
     csOptionDescription option;
     if (!Config->GetOptionDescription (i, &option))
@@ -682,7 +687,8 @@ void csSystemDriver::Help (iConfig* Config)
 void csSystemDriver::Help ()
 {
   csEvent HelpEvent (csGetTicks (), csevBroadcast, cscmdCommandLineHelp);
-  for (int i = 0; i < Plugins.Length (); i++)
+  int i;
+  for (i = 0; i < Plugins.Length (); i++)
   {
     csPlugin *plugin = Plugins.Get (i);
     iConfig *Config = SCF_QUERY_INTERFACE (plugin->Plugin, iConfig);
@@ -715,7 +721,8 @@ void csSystemDriver::QueryOptions (iPlugin *iObject)
   if (Config)
   {
     int on = OptionList.Length ();
-    for (int i = 0 ; ; i++)
+	int i;
+    for (i = 0 ; ; i++)
     {
       csOptionDescription option;
       if (!Config->GetOptionDescription (i, &option))
@@ -857,7 +864,8 @@ iBase* csSystemDriver::GetPlugin (int idx)
 iBase *csSystemDriver::QueryPlugin (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  for (int i = 0; i < Plugins.Length (); i++)
+  int i;
+  for (i = 0; i < Plugins.Length (); i++)
   {
     iBase *ret =
       (iBase *)Plugins.Get (i)->Plugin->QueryInterface (ifID, iVersion);
@@ -907,7 +915,8 @@ bool csSystemDriver::UnloadPlugin (iPlugin *iObject)
   iConfig *config = SCF_QUERY_INTERFACE (iObject, iConfig);
   if (config)
   {
-    for (int i = OptionList.Length () - 1; i >= 0; i--) 
+	int i;
+    for (i = OptionList.Length () - 1; i >= 0; i--) 
     {
       csPluginOption *pio = (csPluginOption *)OptionList.Get (i);
       if (pio->Config == config)
