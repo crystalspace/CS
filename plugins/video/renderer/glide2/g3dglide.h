@@ -100,20 +100,33 @@ private:
   int m_nFrameWidth;
   int m_nFrameHeight;
 
-  bool rstate_dither;
-  bool rstate_specular;
-  bool rstate_bilinearmap;
-  bool rstate_trilinearmap;
-  bool rstate_gouraud;
-  bool rstate_flat;
-  bool rstate_alphablend;
-  bool rstate_lighting;
-  int rstate_mipmap;
+  /**
+   * current render state
+   */
+  struct
+  {
+    bool dither;
+    bool specular;
+    bool bilinearmap;
+    bool trilinearmap;
+    bool gouraud;
+    bool textured;
+    bool alphablend;
+    bool lighting;
+    int  mipmap;
+  } m_renderstate;
 
-  bool  m_gouraud;
-  UInt  m_mixmode;
-  float m_alpha;
-
+  /**
+   * the effects currently in effect by DrawPolygonFX
+   */
+  struct
+  {
+    bool  gouraud;
+    bool  textured;
+    UInt  mixmode;
+    UInt  alpha;
+  } m_dpfx;
+  
   /// use 16 bit texture else 8 bit
   bool use16BitTexture;
 
@@ -125,7 +138,10 @@ private:
 
   /// fogtable
   GrFog_t fogtable[ GR_FOG_TABLE_SIZE];
-  
+
+  /// State of GlideEngine
+  GrState state;
+    
   /// aspect
   float aspect, inv_aspect;
   /// object -> camera transformation
@@ -225,6 +241,8 @@ public:
     DefaultDrawTriangleMesh( mesh, this, o2c, clipper, aspect, m_nHalfWidth, m_nHalfHeight );
   }
 
+  ///
+  virtual void AdjustToOptimalTextureSize (int& w, int& h) { (void)w; (void)h; }
   ///
   virtual bool NeedsPO2Maps () { return true; }
   ///

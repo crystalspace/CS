@@ -57,8 +57,6 @@
 #include "cs2d/macglide2/ig2d.h"
 #include "cssys/mac/MacRSRCS.h"
 #else //Is there another platform Glide runs on?
-//#include "cs2d/unxglide2/g2d.h"
-//#include "cs2d/unxglide2/ig2d.h"
 #endif
 
 #include "cs3d/glide2/glidelib.h"
@@ -413,15 +411,16 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
   m_Caps.PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
   m_Caps.fog = G3DFOGMETHOD_VERTEX;
   
-  rstate_dither = false;
-  rstate_specular = false;
-  rstate_bilinearmap = true;
-  rstate_trilinearmap = false;
-  rstate_gouraud = true;
-  rstate_flat = true;
-  rstate_alphablend = true;
-  rstate_mipmap = true;
-  rstate_lighting = true;
+  m_renderstate.dither = false;
+  m_renderstate.specular = false;
+  m_renderstate.bilinearmap = true;
+  m_renderstate.trilinearmap = false;
+  m_renderstate.gouraud = true;
+  m_renderstate.textured = true;
+  m_renderstate.alphablend = true;
+  m_renderstate.mipmap = true;
+  m_renderstate.lighting = true;
+  m_renderstate.textured = true;
 }
 
 csGraphics3DGlide2x::~csGraphics3DGlide2x()
@@ -528,7 +527,7 @@ static struct
         {856,480,GR_RESOLUTION_856x480},
         {512,256,GR_RESOLUTION_512x256},
 #ifndef GLIDE24_ONLY
-  {1024,768,GR_RESOLUTION_1024x768},
+        {1024,768,GR_RESOLUTION_1024x768},
         {1280,1024,GR_RESOLUTION_1280x1024},
         {1600,1200,GR_RESOLUTION_1600x1200},
         {400,300,GR_RESOLUTION_400x300},
@@ -541,10 +540,8 @@ static int getResolutionIndex(int width, int height)
 {
   int i;
   for(i=1;(unsigned)i<SIZEOFRESSTRUCT;i++)
-    {
-      if((width==StatGlideRes[i].width)&&(height==StatGlideRes[i].height))
-        return i;
-    }
+    if ( (width==StatGlideRes[i].width) && (height==StatGlideRes[i].height) )
+      return i;
   return -1;
 }
 
@@ -558,106 +555,91 @@ bool csGraphics3DGlide2x::Open(const char* Title)
     return false;
 
 #if defined(OS_WIN32)
-  pSysGInfo->GethWnd(&w);
+  pSysGInfo->GethWnd (&w);
   if(w)
     hwnd=(FxU32)w;
 #endif
 
-  if(use16BitTexture)
-    SysPrintf(MSG_INITIALIZATION, "  Use 16 bit textures\n");
+  if (use16BitTexture)
+    SysPrintf (MSG_INITIALIZATION, "  Use 16 bit textures\n");
 
-  m_nWidth = m_piG2D->GetWidth();
+  m_nWidth = m_piG2D->GetWidth ();
   m_nHalfWidth = m_nWidth/2;
   
-  m_nHeight = m_piG2D->GetHeight();
+  m_nHeight = m_piG2D->GetHeight ();
   m_nHalfHeight = m_nHeight/2;
 
-  if(/*config->GetYesNo("VideoDriver","FULL_SCREEN", true)*/true)
-    {
-      iRes=::getResolutionIndex(m_nWidth, m_nHeight);
-      if(iRes==-1)
-        sys_fatalerror("csGraphics3DGlide2x::Open() Invalid Resolution !");
-    }
-  else
-    {
-      iRes=0;
-    }
-        
-  if(!GlideLib_grSstWinOpen(hwnd, StatGlideRes[iRes].res,GR_REFRESH_60Hz, // We should find a way to allow to change the refresh rate
-                GR_COLORFORMAT_ARGB,GR_ORIGIN_LOWER_LEFT,2,1))
-    {
-      sys_fatalerror("csGraphics3DGlide2x::Open() : Could not open Window !");
-    }
-
-  GlideLib_grRenderBuffer(GR_BUFFER_BACKBUFFER);        // RENDER IN BACKBUFFER
-  GlideLib_grColorMask(FXTRUE,FXFALSE);                 // DISABLE ALPHA BUFFER
-  GlideLib_grDepthMask(FXTRUE);                                 // ENABLE ZBUFFER
-  GlideLib_grDepthBufferMode(GR_DEPTHBUFFER_WBUFFER); // ENABLE WBUFFER
-  GlideLib_grDepthBufferFunction(GR_CMP_LEQUAL);                // WBUFFER FUNCTION
+  iRes=::getResolutionIndex (m_nWidth, m_nHeight);
+  if (iRes==-1)
+    sys_fatalerror ("csGraphics3DGlide2x::Open() Invalid Resolution !");
   
-  GlideLib_grBufferClear(0,0,GR_WDEPTHVALUE_FARTHEST); // CLEAR BACKBUFFER
-  GlideLib_grBufferSwap(0);                                                     // PUT BACKBUFFER TO FRONT
-  GlideLib_grCullMode(GR_CULL_DISABLE);                         // CULL POSITIVE 
-  GlideLib_grChromakeyValue(0x0000);
+  // We should find a way to allow to change the refresh rate        
+  if (!GlideLib_grSstWinOpen (hwnd, StatGlideRes[iRes].res,GR_REFRESH_60Hz, 
+                GR_COLORFORMAT_ARGB,GR_ORIGIN_LOWER_LEFT,2,1))
+    sys_fatalerror ("csGraphics3DGlide2x::Open() : Could not open Window !");
+  
+
+  GlideLib_grRenderBuffer (GR_BUFFER_BACKBUFFER);        // RENDER IN BACKBUFFER
+  GlideLib_grColorMask (FXTRUE,FXFALSE);                 // DISABLE ALPHA BUFFER
+  GlideLib_grDepthMask (FXTRUE);                                 // ENABLE ZBUFFER
+  GlideLib_grDepthBufferMode (GR_DEPTHBUFFER_WBUFFER); // ENABLE WBUFFER
+  GlideLib_grDepthBufferFunction (GR_CMP_LEQUAL);                // WBUFFER FUNCTION
+  
+  GlideLib_grBufferClear (0,0,GR_WDEPTHVALUE_FARTHEST); // CLEAR BACKBUFFER
+  GlideLib_grBufferSwap (0);                                                     // PUT BACKBUFFER TO FRONT
+  GlideLib_grCullMode (GR_CULL_DISABLE);                         // CULL POSITIVE 
+  GlideLib_grChromakeyValue (0x0000);
         
-  if(m_iMultiPass)
-    { // This card has only one TMU, enable Multipass rendering   
-      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
-      GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
-      GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
-      FXFALSE,FXFALSE); // TMU INIT
+  if (m_iMultiPass)
+  { // This card has only one TMU, enable Multipass rendering   
+    GlideLib_grTexCombine (m_TMUs[0].tmu_id,
+                           GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
+                           GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
+                           FXFALSE,FXFALSE);
     
-      GlideLib_grAlphaBlendFunction(
-      GR_BLEND_ONE, GR_BLEND_ZERO,
-      GR_BLEND_ONE, GR_BLEND_ZERO);
+    GlideLib_grAlphaBlendFunction (GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO);
+    GlideLib_grTexClampMode (m_TMUs[0].tmu_id, GR_TEXTURECLAMP_WRAP,GR_TEXTURECLAMP_WRAP);
+    GlideLib_grTexFilterMode (m_TMUs[0].tmu_id, GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);
 
-      GlideLib_grTexClampMode(m_TMUs[0].tmu_id,
-                              GR_TEXTURECLAMP_WRAP,GR_TEXTURECLAMP_WRAP);        // TEXTURE WRAP
-      GlideLib_grTexFilterMode(m_TMUs[0].tmu_id,
-                               GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);     // Bilinear TEXTURE
-
-      //GlideLib_grTexLodBiasValue(m_TMUs[0].tmu_id,7.75);              // LOD BIAS
-      GlideLib_grTexMipMapMode(m_TMUs[0].tmu_id,GR_MIPMAP_NEAREST,FXFALSE);     // MIPMAP Mode
-      //GlideLib_grTexMipMapMode(m_TMUs[0].tmu_id,GR_MIPMAP_DISABLE,FXFALSE);
-      RenderPolygon=RenderPolygonMultiPass;
-    }
+    GlideLib_grTexMipMapMode (m_TMUs[0].tmu_id,GR_MIPMAP_NEAREST,FXFALSE);
+    RenderPolygon=RenderPolygonMultiPass;
+  }
   else
-    { // This card has several TMUs, enable Singlepass rendering
-      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
-                            GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
-                            GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
-                            FXFALSE,FXFALSE);   // TMU INIT (SCALED BY TMU1)
-      GlideLib_grTexClampMode(m_TMUs[0].tmu_id,
-                              GR_TEXTURECLAMP_WRAP,GR_TEXTURECLAMP_WRAP);        // TEXTURE WRAP
-      GlideLib_grTexFilterMode(m_TMUs[0].tmu_id,
-                               GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);     // TEXTURE WRAP
-      //GlideLib_grTexLodBiasValue(m_TMUs[0].tmu_id,7.75);              // LOD BIAS             
-      GlideLib_grTexMipMapMode(m_TMUs[0].tmu_id,GR_MIPMAP_NEAREST,FXFALSE); // MIPMAP Mode
-      
-      GlideLib_grTexCombine(m_TMUs[1].tmu_id,
-                            GR_COMBINE_FUNCTION_LOCAL,GR_COMBINE_FACTOR_NONE,
-                            GR_COMBINE_FUNCTION_ZERO,GR_COMBINE_FACTOR_NONE,
-                            FXFALSE,FXFALSE);   // TMU INIT
-      GlideLib_grTexClampMode(m_TMUs[1].tmu_id,
-                              GR_TEXTURECLAMP_CLAMP,GR_TEXTURECLAMP_CLAMP);      // TEXTURE WRAP
-      GlideLib_grTexFilterMode(m_TMUs[1].tmu_id,
-                               GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);     // TEXTURE WRAP
-      GlideLib_grTexMipMapMode(m_TMUs[1].tmu_id,GR_MIPMAP_NEAREST,FXFALSE); // MIPMAP Mode
-      GlideLib_grHints(0,GR_STWHINT_ST_DIFF_TMU1);
-      GlideLib_grAlphaBlendFunction(
-                                    GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA,
-                                    GR_BLEND_ONE,GR_BLEND_ZERO);
-      
-      RenderPolygon=RenderPolygonSinglePass;
-    }
+  { // This card has several TMUs, enable Singlepass rendering
 
-  GlideLib_grAlphaCombine(GR_COMBINE_FUNCTION_LOCAL,
-                          GR_COMBINE_FACTOR_NONE,
-                          GR_COMBINE_LOCAL_CONSTANT, 
-                          GR_COMBINE_OTHER_NONE,FXFALSE);
-  GlideLib_grColorCombine(GR_COMBINE_FUNCTION_BLEND,                    // COLOR COMBINE
-                          GR_COMBINE_FACTOR_LOCAL,GR_COMBINE_LOCAL_ITERATED,
-                          GR_COMBINE_OTHER_TEXTURE,FXFALSE);
+    // Setup 1st TMU
+    GlideLib_grTexCombine (m_TMUs[0].tmu_id,
+                           GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
+                           GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+                           FXFALSE,FXFALSE);   // TMU INIT (SCALED BY TMU1)
+    GlideLib_grTexClampMode (m_TMUs[0].tmu_id,
+                             GR_TEXTURECLAMP_WRAP,GR_TEXTURECLAMP_WRAP);
+    GlideLib_grTexFilterMode (m_TMUs[0].tmu_id,
+                              GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);
+    GlideLib_grTexMipMapMode (m_TMUs[0].tmu_id,GR_MIPMAP_NEAREST,FXFALSE); 
+
+    // Setup 2nd TMU      
+    GlideLib_grTexCombine (m_TMUs[1].tmu_id,
+                           GR_COMBINE_FUNCTION_LOCAL,GR_COMBINE_FACTOR_NONE,
+                           GR_COMBINE_FUNCTION_ZERO,GR_COMBINE_FACTOR_NONE,
+                           FXFALSE,FXFALSE);
+    GlideLib_grTexClampMode (m_TMUs[1].tmu_id, GR_TEXTURECLAMP_CLAMP,GR_TEXTURECLAMP_CLAMP);
+    GlideLib_grTexFilterMode (m_TMUs[1].tmu_id, GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);
+    GlideLib_grTexMipMapMode (m_TMUs[1].tmu_id,GR_MIPMAP_NEAREST,FXFALSE);
+    GlideLib_grHints (0,GR_STWHINT_ST_DIFF_TMU1);
+    GlideLib_grAlphaBlendFunction (GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA,
+                                   GR_BLEND_ONE,GR_BLEND_ZERO);
+      
+    RenderPolygon=RenderPolygonSinglePass;
+  }
+
+  GlideLib_grAlphaCombine (GR_COMBINE_FUNCTION_LOCAL,
+                           GR_COMBINE_FACTOR_NONE,
+                           GR_COMBINE_LOCAL_CONSTANT, 
+                           GR_COMBINE_OTHER_NONE,FXFALSE);
+  GlideLib_grColorCombine (GR_COMBINE_FUNCTION_BLEND,
+                           GR_COMBINE_FACTOR_LOCAL,GR_COMBINE_LOCAL_ITERATED,
+                           GR_COMBINE_OTHER_TEXTURE,FXFALSE);
 
   m_nDrawMode = 0;
  
@@ -667,7 +649,6 @@ bool csGraphics3DGlide2x::Open(const char* Title)
 void csGraphics3DGlide2x::Close()
 {
   ClearCache();
-
   GlideLib_grSstWinClose();
 }
 
@@ -677,7 +658,7 @@ void csGraphics3DGlide2x::SetDimensions (int width, int height)
   m_nHeight = height;
   m_nHalfWidth = width/2;
   m_nHalfHeight = height/2;
-  GlideLib_grClipWindow(0, 0, width, height);
+  GlideLib_grClipWindow (0, 0, width, height);
 }
 
 void csGraphics3DGlide2x::SetPerspectiveCenter (int x, int y)
@@ -698,33 +679,33 @@ void csGraphics3DGlide2x::SetClipper (csVector2* vertices, int num_vertices)
 bool csGraphics3DGlide2x::BeginDraw (int DrawFlags)
 {
   if (DrawFlags & CSDRAW_2DGRAPHICS)
-    {
-      // if graphics is in 3D mode, turn it off
-      if (m_nDrawMode & CSDRAW_3DGRAPHICS)
-        FinishDraw ();
+  {
+    // if graphics is in 3D mode, turn it off
+    if (m_nDrawMode & CSDRAW_3DGRAPHICS)
+      FinishDraw ();
       // if 2D mode is not enabled, turn it on
       if (!(m_nDrawMode & CSDRAW_2DGRAPHICS))
         m_piG2D->BeginDraw ();
-    }
+  }
   else if (DrawFlags & CSDRAW_3DGRAPHICS)
+  {
+    // if graphics is in 2D mode, turn it off
+    if (m_nDrawMode & CSDRAW_2DGRAPHICS)
+      FinishDraw ();
+    // if 3D mode is not enabled, turn it on
+    if (!(m_nDrawMode & CSDRAW_3DGRAPHICS))
     {
-      // if graphics is in 2D mode, turn it off
-      if (m_nDrawMode & CSDRAW_2DGRAPHICS)
-        FinishDraw ();
-      
-      // if 3D mode is not enabled, turn it on
-      if (!(m_nDrawMode & CSDRAW_3DGRAPHICS))
-        {
-//	  ClearBufferUnderTop();
-          GlideLib_grBufferClear(0,0,GR_WDEPTHVALUE_FARTHEST);
+//      ClearBufferUnderTop ();
+      GlideLib_grBufferClear (0,0,GR_WDEPTHVALUE_FARTHEST);
           
-        } /* endif */
     } /* endif */
+  } /* endif */
+  
   m_nDrawMode = DrawFlags;
   return true;
 }
 
-void csGraphics3DGlide2x::ClearBufferUnderTop()
+void csGraphics3DGlide2x::ClearBufferUnderTop ()
 {
     /// clear the screen by rendering a black polygon without disturbing overlays
    GrVertex v[4];
@@ -738,23 +719,23 @@ void csGraphics3DGlide2x::ClearBufferUnderTop()
 //     v[i].r = v[i].g = v[i].b = 0.0; v[i].a = 0;
    }
    
-   GrState state;
-  grGlideGetState( &state );
-  GlideLib_grColorCombine(GR_COMBINE_FUNCTION_LOCAL,                    // COLOR COMBINE
-                          GR_COMBINE_FACTOR_NONE,GR_COMBINE_LOCAL_CONSTANT,
-                          GR_COMBINE_OTHER_NONE,FXFALSE);
+  GrState state;
+  grGlideGetState ( &state );
+  GlideLib_grColorCombine (GR_COMBINE_FUNCTION_LOCAL,                    // COLOR COMBINE
+                           GR_COMBINE_FACTOR_NONE,GR_COMBINE_LOCAL_CONSTANT,
+                           GR_COMBINE_OTHER_NONE,FXFALSE);
    
-   grConstantColorValue( 0xffff0000 ); 
+   grConstantColorValue ( 0xffff0000 ); 
    G3DZBufMode mode=m_ZBufMode;
 
    m_ZBufMode=0;
-   grDepthMask( FXTRUE );
-   grDepthBufferFunction( GR_CMP_NOTEQUAL );
-   grDepthBufferMode( GR_DEPTHBUFFER_WBUFFER_COMPARE_TO_BIAS );
-   grDepthBiasLevel( 0 );
-   GlideLib_grDrawPlanarPolygonVertexList(4,v);
+   grDepthMask ( FXTRUE );
+   grDepthBufferFunction ( GR_CMP_NOTEQUAL );
+   grDepthBufferMode ( GR_DEPTHBUFFER_WBUFFER_COMPARE_TO_BIAS );
+   grDepthBiasLevel ( 0 );
+   GlideLib_grDrawPlanarPolygonVertexList (4,v);
    SetZBufMode (mode);
-  grGlideSetState( &state );
+   grGlideSetState ( &state );
 }
 
 /// End the frame
@@ -766,17 +747,9 @@ void csGraphics3DGlide2x::FinishDraw ()
   m_nDrawMode = 0;
 }
 
-/// do the page swap.
 void csGraphics3DGlide2x::Print(csRect* rect)
 {
-   // we need to tell the glide2d driver to update the screen...
   m_piG2D->Print (rect);
-/*
-  if(m_bVRetrace)
-    GlideLib_grBufferSwap(1);
-  else
-    GlideLib_grBufferSwap(0);
-*/
 }
 
 /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
@@ -788,14 +761,14 @@ void csGraphics3DGlide2x::SetZBufMode (G3DZBufMode mode)
   m_ZBufMode = mode;
   
   if (mode & CS_ZBUF_TEST)
-    GlideLib_grDepthMask(FXFALSE);
+    GlideLib_grDepthMask (FXFALSE);
   else
-    GlideLib_grDepthMask(FXTRUE);    
+    GlideLib_grDepthMask (FXTRUE);    
   
   if (mode & CS_ZBUF_FILL)      // write-only
-    GlideLib_grDepthBufferFunction(GR_CMP_ALWAYS);    
+    GlideLib_grDepthBufferFunction (GR_CMP_ALWAYS);    
   else 
-    GlideLib_grDepthBufferFunction(GR_CMP_LEQUAL);    
+    GlideLib_grDepthBufferFunction (GR_CMP_LEQUAL);    
 }
 
 #define SNAP (( float ) ( 3L << 18 ))
@@ -805,38 +778,38 @@ void csGraphics3DGlide2x::RenderPolygonSinglePass (GrVertex * verts, int num, bo
                                                    bool /*is_transparent*/)
 {
   int i;
-  for(i=0;i<num;i++) 
-    {
-      verts[i].tmuvtx[0].sow *= text->width*verts[i].oow;
-      verts[i].tmuvtx[0].tow *= text->height*verts[i].oow;
-    }
-  if(text)
-    GlideLib_grTexSource(text->tmu->tmu_id, text->loadAddress,
-                         GR_MIPMAPLEVELMASK_BOTH, &text->info);
+  for (i=0;i<num;i++) 
+  {
+    verts[i].tmuvtx[0].sow *= text->width*verts[i].oow;
+    verts[i].tmuvtx[0].tow *= text->height*verts[i].oow;
+  }
+  if (text)
+    GlideLib_grTexSource (text->tmu->tmu_id, text->loadAddress,
+                          GR_MIPMAPLEVELMASK_BOTH, &text->info);
   if(haslight && light)
+  {
+    for(i=0;i<num;i++)
     {
-      for(i=0;i<num;i++)
-        {
-          verts[i].tmuvtx[1].sow *= light->width*verts[i].oow; 
-          verts[i].tmuvtx[1].tow *= light->height*verts[i].oow;
-        }
-      GlideLib_grTexSource(light->tmu->tmu_id, light->loadAddress,
-                           GR_MIPMAPLEVELMASK_BOTH, &light->info);
-      
-      GlideLib_grTexCombine(text->tmu->tmu_id,
-                            GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
-                            //GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL, GR_COMBINE_FACTOR_ONE,
-                            GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
-                            FXFALSE,FXFALSE);
-       
-    }   
-  else
-    {
-      GlideLib_grTexCombine(text->tmu->tmu_id,
-                            GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
-                            GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
-                            FXFALSE,FXFALSE);
+      verts[i].tmuvtx[1].sow *= light->width*verts[i].oow; 
+      verts[i].tmuvtx[1].tow *= light->height*verts[i].oow;
     }
+    GlideLib_grTexSource (light->tmu->tmu_id, light->loadAddress,
+                          GR_MIPMAPLEVELMASK_BOTH, &light->info);
+      
+    GlideLib_grTexCombine (text->tmu->tmu_id,
+                           GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
+                            //GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL, GR_COMBINE_FACTOR_ONE,
+                           GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+                           FXFALSE,FXFALSE);
+       
+  }   
+  else
+  {
+    GlideLib_grTexCombine (text->tmu->tmu_id,
+                           GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
+                           GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+                           FXFALSE,FXFALSE);
+  }
 
        
  /*if(!haslight)
@@ -847,64 +820,56 @@ void csGraphics3DGlide2x::RenderPolygonSinglePass (GrVertex * verts, int num, bo
       FXFALSE,FXFALSE);
   }
  */
-   GlideLib_grDrawPlanarPolygonVertexList(num,verts);
+  GlideLib_grDrawPlanarPolygonVertexList(num,verts);
 }
 
 void csGraphics3DGlide2x::RenderPolygonMultiPass (GrVertex * verts, int num, bool haslight,TextureHandler*text,TextureHandler*light,bool is_transparent)
 {
   int i;
 
-  for(i=0;i<num;i++)
+  for (i=0;i<num;i++)
+  {
+    verts[i].tmuvtx[0].sow *= text->width*verts[i].oow;
+    verts[i].tmuvtx[0].tow *= text->height*verts[i].oow;
+  }
+
+  if (is_transparent)
+    GlideLib_grAlphaBlendFunction (GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA,
+                                   GR_BLEND_ONE, GR_BLEND_ZERO);
+
+  if (text)
+    GlideLib_grTexSource (text->tmu->tmu_id, text->loadAddress,
+                          GR_MIPMAPLEVELMASK_BOTH, &text->info);
+
+  GlideLib_grDrawPlanarPolygonVertexList (num,verts);
+
+  if (haslight && light)
+  {
+    for (i=0;i<num;i++)
     {
-      verts[i].tmuvtx[0].sow *= text->width*verts[i].oow;
-      verts[i].tmuvtx[0].tow *= text->height*verts[i].oow;
+      verts[i].tmuvtx[0].sow= verts[i].tmuvtx[1].sow * light->width*verts[i].oow; 
+      verts[i].tmuvtx[0].tow= verts[i].tmuvtx[1].tow * light->height*verts[i].oow; 
     }
 
-  if(is_transparent)
-    GlideLib_grAlphaBlendFunction(GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA,
-                                  GR_BLEND_ONE, GR_BLEND_ZERO);
+    GlideLib_grAlphaBlendFunction (GR_BLEND_DST_COLOR, GR_BLEND_ZERO,
+                                   GR_BLEND_ZERO, GR_BLEND_ZERO);
+    GlideLib_grTexClampMode (light->tmu->tmu_id, GR_TEXTURECLAMP_CLAMP,GR_TEXTURECLAMP_CLAMP);
+    GlideLib_grTexSource (light->tmu->tmu_id, light->loadAddress,
+                          GR_MIPMAPLEVELMASK_BOTH, &light->info);
+    GlideLib_grDrawPlanarPolygonVertexList (num,verts);
+    GlideLib_grTexClampMode (light->tmu->tmu_id, GR_TEXTURECLAMP_WRAP,GR_TEXTURECLAMP_WRAP);
 
-  if(text)
-    GlideLib_grTexSource(text->tmu->tmu_id, text->loadAddress,
-                         GR_MIPMAPLEVELMASK_BOTH, &text->info);
-
-  GlideLib_grDrawPlanarPolygonVertexList(num,verts);
-
-  if(haslight && light)
-    {
-      for(i=0;i<num;i++)
-        {
-          verts[i].tmuvtx[0].sow= verts[i].tmuvtx[1].sow * light->width*verts[i].oow; 
-          verts[i].tmuvtx[0].tow= verts[i].tmuvtx[1].tow * light->height*verts[i].oow; 
-        }
-
-      GlideLib_grAlphaBlendFunction(GR_BLEND_DST_COLOR, GR_BLEND_ZERO,
-                                    GR_BLEND_ZERO, GR_BLEND_ZERO);
-      
-      GlideLib_grTexClampMode(light->tmu->tmu_id,
-                              GR_TEXTURECLAMP_CLAMP,GR_TEXTURECLAMP_CLAMP);      // TEXTURE CLAMP
-      
-      GlideLib_grTexSource(light->tmu->tmu_id, light->loadAddress,
-                           GR_MIPMAPLEVELMASK_BOTH, &light->info);
-
-      GlideLib_grDrawPlanarPolygonVertexList(num,verts);
-      
-      GlideLib_grTexClampMode(light->tmu->tmu_id,
-                              GR_TEXTURECLAMP_WRAP,GR_TEXTURECLAMP_WRAP);        // TEXTURE WRAP
-
-      if(!is_transparent)
-        GlideLib_grAlphaBlendFunction(GR_BLEND_ONE, GR_BLEND_ZERO,
-                                      GR_BLEND_ONE, GR_BLEND_ZERO);
-    }
-  if(is_transparent)
-    GlideLib_grAlphaBlendFunction(GR_BLEND_ONE, GR_BLEND_ZERO,
-                                  GR_BLEND_ONE, GR_BLEND_ZERO);
+    if (!is_transparent)
+      GlideLib_grAlphaBlendFunction (GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO);
+  }
+  if (is_transparent)
+    GlideLib_grAlphaBlendFunction (GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO);
   
 }
 
-void csGraphics3DGlide2x::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
-                                                            float& K1, float& K2, float& K3,
-                                                            float& M,  float& N,  float& O  )
+void csGraphics3DGlide2x::SetupPolygon ( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
+                                                             float& K1, float& K2, float& K3,
+                                                             float& M,  float& N,  float& O  )
 {
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
@@ -921,7 +886,6 @@ void csGraphics3DGlide2x::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2
   else
   {
     float inv_aspect = poly.inv_aspect;
-  
     float P1, P2, P3, P4, Q1, Q2, Q3, Q4;
       
 
@@ -947,10 +911,9 @@ void csGraphics3DGlide2x::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2
   
 }
 
-void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
+void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
 {
   if (poly.num < 3) return;
-//printf("1\n");
   bool lm_exists=true;
   bool is_transparent = false;
   bool is_colorkeyed = false;
@@ -963,52 +926,47 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 #ifdef DO_HW_UVZ
   if ( !poly.uvz )
 #endif
-    {
-      float inv_aspect = poly.inv_aspect;
-      float inv_Dc = 1/poly.normal.D;
+  {
+    float inv_aspect = poly.inv_aspect;
+    float inv_Dc = 1/poly.normal.D;
   
-      if (ABS (poly.normal.D) < 0.06)
-	{
-	  M = 0;
-	  N = 0;
-	  O = 1/poly.z_value;
-	}else{
-	  M = -poly.normal.A*inv_Dc*inv_aspect;
-	  N = -poly.normal.B*inv_Dc*inv_aspect;
-	  O = -poly.normal.C*inv_Dc;
-	}
-      SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
+    if (ABS (poly.normal.D) < 0.06)
+    {
+      M = 0;
+      N = 0;
+      O = 1/poly.z_value;
     }
+    else
+    {
+      M = -poly.normal.A*inv_Dc*inv_aspect;
+      N = -poly.normal.B*inv_Dc*inv_aspect;
+      O = -poly.normal.C*inv_Dc;
+    }
+    SetupPolygon ( poly, J1, J2, J3, K1, K2, K3, M, N, O );
+  }
 
   // retrieve the texture.
   pTex = poly.poly_texture[0];
-
-  
   csTextureMMGlide* txt_mm = (csTextureMMGlide*)poly.txt_handle->GetPrivateObject ();
-  //csTexture* txt_unl = txt_mm->get_texture (mipmap);
-  
-
   if (!pTex) return;
 
-//printf("2\n");
   CacheTexture (pTex);
-//printf("3\n");
 
-  if ( poly_alpha != poly.alpha ){
-
+//  if ( poly_alpha != poly.alpha )
+//  {
     poly_alpha     = poly.alpha;
     is_transparent = poly_alpha ? true : false;
     if(is_transparent)
-      {
-	GrColor_t c = 0x00FFFFFF;
-	c |= ((int)((float)(poly_alpha)/100.0f*255.0f) << 24);
-	GlideLib_grConstantColorValue(c);
-      }
+    {
+      GrColor_t c = 0x00FFFFFF;
+      c |= ((int)((float)(poly_alpha)/100.0f*255.0f) << 24);
+      GlideLib_grConstantColorValue (c);
+    }
     else
-      {
-	GlideLib_grConstantColorValue(0xFFFFFFFF);
-      }
-  }
+    {
+      GlideLib_grConstantColorValue (0xFFFFFFFF);
+    }
+//  }
         
 
   csGlideCacheData* tcache = NULL;
@@ -1028,26 +986,23 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   printf( "width, height:  %g %g\n", th->width, th->height );
 */        
   // retrieve the lightmap from the cache.
-  iLightMap* piLM = ( rstate_lighting ? pTex->GetLightMap () : NULL );
+  iLightMap* piLM = ( m_renderstate.lighting ? pTex->GetLightMap () : NULL );
 
   if ( piLM )
   {
     lcache = (csGlideCacheData *)piLM->GetCacheData ();
     if (lcache==NULL)
-    {
       lm_exists = false;
-    }
-    
   }
   else
-  {
     lm_exists=false;
-  }
 
-  if ( m_dpvertsize < poly.num ){
+  if ( m_dpvertsize < poly.num )
+  {
     m_dpverts=new GrVertex[poly.num];
     m_dpvertsize = poly.num;
-    for( i=0; i < poly.num; i++ ){
+    for( i=0; i < poly.num; i++ )
+    {
       m_dpverts[i].r = 255;
       m_dpverts[i].g = 255;
       m_dpverts[i].b = 255;
@@ -1058,155 +1013,196 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
                  *thTex = (TextureHandler *)tcache->pData;
                   
   for(i=0;i < poly.num;i++)
-    {
+  {
 #ifdef DO_HW_UVZ
-      if ( poly.uvz ){
-	m_dpverts[i].x = poly.vertices[i].sx + SNAP;
-	m_dpverts[i].y = poly.vertices[i].sy + SNAP; 
-	j = poly.mirror ? poly.num-i-1 : i;
-	u = poly.uvz[ j ].x;
-	v = poly.uvz[ j ].y;
-	m_dpverts[i].z = z = poly.uvz[ j ].z;
-	ooz = 1/z;
-	
-      }else
-#endif
-	{
-	  x = poly.vertices[i].sx;
-	  y = poly.vertices[i].sy;
-	  m_dpverts[i].x = x + SNAP;
-	  m_dpverts[i].y = y + SNAP; 
-	  x-=m_nHalfWidth;
-	  y-=m_nHalfHeight;
-	  ooz = (M*(x) + N*(y) + O);
-	  m_dpverts[i].z = z = 1/ooz;
-	  u = (J1 * (x) + J2 * (y) + J3)*z;
-	  v = (K1 * (x) + K2 * (y) + K3)*z;
-	}
-      m_dpverts[i].tmuvtx[0].sow= u; 
-      m_dpverts[i].tmuvtx[0].tow= v; 
-      m_dpverts[i].oow /*= verts[i].tmuvtx[0].oow = verts[i].tmuvtx[1].oow */= ooz;
-    }
-
-  if(lm_exists)
+    if ( poly.uvz )
     {
-      thLm = (TextureHandler *)lcache->pData;
-      
-      float fMinU, fMinV, fMaxU, fMaxV;
-      
-      pTex->GetTextureBox( fMinU, fMinV, fMaxU, fMaxV );
-      
-      //thLm = (TextureHandler *)lcache->pData;
-      float lu_dif, lv_dif,lu_scale, lv_scale;
-      
-      // gsteenss: following few lines were added to scale the lightmaps 
-      // correctly (?)  
-      float scale_u,scale_v;
- 
-      int lmwidth = piLM->GetWidth ();
-      int lmrealwidth = piLM->GetRealWidth ();
-      int lmheight = piLM->GetHeight ();
-      int lmrealheight = piLM->GetRealHeight ();
-      
-      scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
-      scale_v = (float)(lmrealheight-1) / (float)lmheight;
-      
-      lu_dif = fMinU;
-      lv_dif = fMinV;
-      lu_scale = scale_u/(fMaxU - fMinU);
-      lv_scale = scale_v/(fMaxV - fMinV);
-
-      
-      for(i=0;i<poly.num;i++)
-        {
-          lu = (m_dpverts[i].tmuvtx[0].sow- lu_dif) * lu_scale;
-          lv = (m_dpverts[i].tmuvtx[0].tow- lv_dif) * lv_scale;
-          m_dpverts[i].tmuvtx[1].sow= lu; 
-          m_dpverts[i].tmuvtx[1].tow= lv; 
-        }
+      m_dpverts[i].x = poly.vertices[i].sx + SNAP;
+      m_dpverts[i].y = poly.vertices[i].sy + SNAP; 
+      j = poly.mirror ? poly.num-i-1 : i;
+      u = poly.uvz[ j ].x;
+      v = poly.uvz[ j ].y;
+      m_dpverts[i].z = z = poly.uvz[ j ].z;
+      ooz = 1/z;
     }
-  
-  if(is_colorkeyed)
-    GlideLib_grChromakeyMode(GR_CHROMAKEY_ENABLE);
-  
-  if(poly_fog != poly.use_fog){
-    poly_fog = poly.use_fog;
-    if ( poly_fog ){
-      GlideLib_grFogMode( GR_FOG_WITH_TABLE );
-      GlideLib_grFogTable( fogtable );
-      GlideLib_grFogColorValue( 0xFFC0C0C0 );
-    }else
-      GlideLib_grFogMode( GR_FOG_DISABLE );
+    else
+#endif
+    {
+      x = poly.vertices[i].sx;
+      y = poly.vertices[i].sy;
+      m_dpverts[i].x = x + SNAP;
+      m_dpverts[i].y = y + SNAP; 
+      x-=m_nHalfWidth;
+      y-=m_nHalfHeight;
+      ooz = (M*(x) + N*(y) + O);
+      m_dpverts[i].z = z = 1/ooz;
+      u = (J1 * (x) + J2 * (y) + J3)*z;
+      v = (K1 * (x) + K2 * (y) + K3)*z;
+    }
+    m_dpverts[i].tmuvtx[0].sow= u; 
+    m_dpverts[i].tmuvtx[0].tow= v; 
+    m_dpverts[i].oow /*= verts[i].tmuvtx[0].oow = verts[i].tmuvtx[1].oow */= ooz;
   }
-//printf("4\n");
-      
-  RenderPolygon(m_dpverts,poly.num,lm_exists,thTex,thLm,is_transparent);
-//printf("5\n");
 
-  if(is_colorkeyed)
-    GlideLib_grChromakeyMode(GR_CHROMAKEY_DISABLE);
+  if (lm_exists)
+  {
+    float fMinU, fMinV, fMaxU, fMaxV;
+    thLm = (TextureHandler *)lcache->pData;
+    pTex->GetTextureBox ( fMinU, fMinV, fMaxU, fMaxV );
+      
+    float lu_dif, lv_dif,lu_scale, lv_scale;
+  
+    // gsteenss: following few lines were added to scale the lightmaps 
+    // correctly (?)  
+    float scale_u,scale_v;
+    int lmwidth = piLM->GetWidth ();
+    int lmrealwidth = piLM->GetRealWidth ();
+    int lmheight = piLM->GetHeight ();
+    int lmrealheight = piLM->GetRealHeight ();
+      
+    scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
+    scale_v = (float)(lmrealheight-1) / (float)lmheight;
+      
+    lu_dif = fMinU;
+    lv_dif = fMinV;
+    lu_scale = scale_u/(fMaxU - fMinU);
+    lv_scale = scale_v/(fMaxV - fMinV);
+
+    for (i=0;i<poly.num;i++)
+    {
+      lu = (m_dpverts[i].tmuvtx[0].sow- lu_dif) * lu_scale;
+      lv = (m_dpverts[i].tmuvtx[0].tow- lv_dif) * lv_scale;
+      m_dpverts[i].tmuvtx[1].sow= lu; 
+      m_dpverts[i].tmuvtx[1].tow= lv; 
+    }
+  }
+  
+  if (is_colorkeyed)
+    GlideLib_grChromakeyMode (GR_CHROMAKEY_ENABLE);
+  
+  if (poly_fog != poly.use_fog)
+  {
+    poly_fog = poly.use_fog;
+    if ( poly_fog )
+    {
+      GlideLib_grFogMode ( GR_FOG_WITH_TABLE );
+      GlideLib_grFogTable ( fogtable );
+      GlideLib_grFogColorValue ( 0xFFC0C0C0 );
+    }
+    else
+      GlideLib_grFogMode ( GR_FOG_DISABLE );
+  }
+      
+  RenderPolygon (m_dpverts,poly.num,lm_exists,thTex,thLm,is_transparent);
+
+  if (is_colorkeyed)
+    GlideLib_grChromakeyMode (GR_CHROMAKEY_DISABLE);
   
 }
 
-void csGraphics3DGlide2x::StartPolygonFX(iTextureHandle *handle,  UInt mode)
+void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
 {
+  GlideLib_grGlideGetState ( &state );
+  if ( m_renderstate.textured && handle )
+  {
+    csTextureMMGlide* txt_mm = (csTextureMMGlide*)handle->GetPrivateObject ();
+    csGlideCacheData* tcache;
+    m_pTextureCache->Add (handle);
+    tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
 
-  csGlideCacheData* tcache = NULL;
-  csTextureMMGlide* txt_mm = (csTextureMMGlide*)handle->GetPrivateObject ();
-
-  m_pTextureCache->Add (handle);
-  tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
-
-//  ASSERT( tcache );
-  m_thTex = (TextureHandler *)tcache->pData;
-    
-  GlideLib_grTexSource(m_thTex->tmu->tmu_id, m_thTex->loadAddress, GR_MIPMAPLEVELMASK_BOTH, &m_thTex->info);
-
-  if(!m_iMultiPass)
+    m_thTex = (TextureHandler *)tcache->pData;
+    if ( m_thTex )
     {
-      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
-			    GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
-			    GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
-			    FXFALSE,FXFALSE);
-    }
+      GlideLib_grTexSource (m_thTex->tmu->tmu_id, m_thTex->loadAddress, 
+                            GR_MIPMAPLEVELMASK_BOTH, &m_thTex->info);
 
+      if(!m_iMultiPass)
+      {
+        GlideLib_grTexCombine (m_TMUs[0].tmu_id,
+                               GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
+                               GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+                               FXFALSE,FXFALSE);
+      }
+      GlideLib_grColorCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
+                               GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_TEXTURE, FXFALSE );
+      GlideLib_grAlphaCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_ONE, 
+                               GR_COMBINE_LOCAL_NONE, GR_COMBINE_OTHER_CONSTANT, FXFALSE );
+    }
+  }
   if ( !m_verts ) {
     m_verts = new GrVertex[ GLIDE_FX_VERTSIZE ];
     m_vertsize = GLIDE_FX_VERTSIZE;
   }
-  m_mixmode = mode;
-  m_alpha   = float (mode & CS_FX_MASK_ALPHA) / 255.;
-  m_gouraud = rstate_gouraud && ((mode & CS_FX_GOURAUD) != 0);
-
+  
+  m_dpfx.mixmode = mode;
+  m_dpfx.gouraud = m_renderstate.gouraud && ((mode & CS_FX_GOURAUD) != 0);
+  
+  bool blend = true;
+  switch (mode & CS_FX_MASK_MIXMODE)
+  {
+  case CS_FX_MULTIPLY:
+    // Color = SRC * DEST + 0 * SRC = SRC * DEST
+    m_dpfx.alpha = 255;
+    GlideLib_grAlphaBlendFunction ( GR_BLEND_DST_COLOR, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO );
+    break;
+  case CS_FX_MULTIPLY2:
+    // Color = SRC * DEST + DEST * SRC = 2 * SRC * DEST
+    m_dpfx.alpha = 255;
+    GlideLib_grAlphaBlendFunction ( GR_BLEND_DST_COLOR, GR_BLEND_SRC_COLOR, GR_BLEND_ONE, GR_BLEND_ZERO );
+    break;
+  case CS_FX_ADD:
+    // Color = 1 * DEST + 1 * SRC = SRC + DEST
+    m_dpfx.alpha = 255;
+    GlideLib_grAlphaBlendFunction ( GR_BLEND_ONE, GR_BLEND_ONE, GR_BLEND_ONE, GR_BLEND_ZERO );
+    break;
+  case CS_FX_ALPHA:
+    // Color = (1-Alpha) * DEST + Alpha * SRC 
+    m_dpfx.alpha   = 255 - (mode & CS_FX_MASK_ALPHA);
+    GlideLib_grAlphaBlendFunction ( GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA, 
+                                    GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA );
+    break;
+  case CS_FX_TRANSPARENT:
+    // Color = 1 * DEST + 0 * SRC = DEST
+    m_dpfx.alpha = 255;
+    GlideLib_grAlphaBlendFunction ( GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE );
+    break;
+  case CS_FX_COPY:
+  default:
+    // Color = 0 * DEST + 1 * SRC = SRC
+    blend = false;
+    m_dpfx.alpha = 255;
+    GlideLib_grAlphaBlendFunction ( GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO );
+    break;
+  }
+  GlideLib_grConstantColorValue ( m_dpfx.alpha << 24 );
 }
 
-void csGraphics3DGlide2x::FinishPolygonFX()
+void csGraphics3DGlide2x::FinishPolygonFX ()
 {
-  if(!m_iMultiPass)
-    {
-      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
-			    GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
-			    GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
-			    FXFALSE,FXFALSE);
-    }
+  if (!m_iMultiPass)
+  {
+    GlideLib_grTexCombine (m_TMUs[0].tmu_id,
+                           GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
+                           GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+                           FXFALSE,FXFALSE);
+  }
   m_thTex = NULL;
+  GlideLib_grGlideSetState ( &state );
 }
 
-void csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
+void csGraphics3DGlide2x::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
-  //This implementation is pretty wrong, because it does not take into account all the
-  //possible mixmodes. - Thomas Hieber 07/18/1999
-
   if (poly.num >= 3 && m_thTex)
   {
-    if ( poly.num  > m_vertsize ){
+    if ( poly.num  > m_vertsize )
+    {
       if ( m_verts ) delete m_verts;
-      CHK(m_verts = new GrVertex[poly.num]);
+      CHK (m_verts = new GrVertex[poly.num]);
       m_vertsize = poly.num;
     }
 
     float x, y;
-    for(int i=0; i<poly.num; i++)
+    for (int i=0; i<poly.num; i++)
     {
       x = poly.vertices[i].sx;
       y = poly.vertices[i].sy;
@@ -1214,7 +1210,7 @@ void csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
       m_verts[i].y = y + SNAP;
       x-=m_nHalfWidth;
       y-=m_nHalfHeight;
-      if(m_gouraud)
+      if (m_dpfx.gouraud)
       {
         m_verts[i].r = poly.vertices[i].r*255;
         m_verts[i].g = poly.vertices[i].g*255;
@@ -1234,20 +1230,19 @@ void csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
       m_verts[i].a = poly.vertices[i].z;
     }
     
-    if(poly.use_fog){
-      GlideLib_grFogMode( GR_FOG_WITH_ITERATED_ALPHA );
-      GlideLib_grFogColorValue( 0 );
+    if (poly.use_fog)
+    {
+      GlideLib_grFogMode ( GR_FOG_WITH_ITERATED_ALPHA );
+      GlideLib_grFogColorValue ( 0 );
     }
     
-    GlideLib_grDrawPlanarPolygonVertexList(poly.num, m_verts);
+    GlideLib_grDrawPlanarPolygonVertexList (poly.num, m_verts);
 
-    if(poly.use_fog){
-      GlideLib_grFogMode( GR_FOG_DISABLE );
-    }
+    if(poly.use_fog)
+      GlideLib_grFogMode ( GR_FOG_DISABLE );
   }
 }
 
-/// Give a texture to csGraphics3D to cache it.
 void csGraphics3DGlide2x::CacheTexture (iPolygonTexture *texture)
 {
   iTextureHandle* txt_handle = texture->GetTextureHandle ();
@@ -1255,40 +1250,33 @@ void csGraphics3DGlide2x::CacheTexture (iPolygonTexture *texture)
   m_pLightmapCache->Add (texture);
 }
 
-/// Dump the texture cache.
 void csGraphics3DGlide2x::DumpCache(void)
 {
-  m_pTextureCache->Dump();
-  m_pLightmapCache->Dump();
+  m_pTextureCache->Dump ();
+  m_pLightmapCache->Dump ();
 }
 
-/// Clear the texture cache.
 void csGraphics3DGlide2x::ClearCache(void)
 {
-  if(m_pTextureCache) m_pTextureCache->Clear();
-  if(m_pLightmapCache) m_pLightmapCache->Clear();
+  if (m_pTextureCache) m_pTextureCache->Clear ();
+  if (m_pLightmapCache) m_pLightmapCache->Clear ();
 }
 
-void csGraphics3DGlide2x::GetCaps(G3D_CAPS *caps)
+void csGraphics3DGlide2x::GetCaps (G3D_CAPS *caps)
 {
-  if (!caps) return;
-//    return E_INVALIDARG;
-
-  memcpy(caps, &m_Caps, sizeof(G3D_CAPS));
+  if (caps)
+    memcpy (caps, &m_Caps, sizeof(G3D_CAPS));
 }
 
 void csGraphics3DGlide2x::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
 {
-  if (v1.z < SMALL_Z && v2.z < SMALL_Z) return ; //S_FALSE;
+  if (v1.z < SMALL_Z && v2.z < SMALL_Z) return ;
 
   float x1 = v1.x, y1 = v1.y, z1 = v1.z;
   float x2 = v2.x, y2 = v2.y, z2 = v2.z;
 
   if (z1 < SMALL_Z)
   {
-    // x = t*(x2-x1)+x1;
-    // y = t*(y2-y1)+y1;
-    // z = t*(z2-z1)+z1;
     float t = ((float)SMALL_Z-z1) / (z2-z1);
     x1 = t*(x2-x1)+x1;
     y1 = t*(y2-y1)+y1;
@@ -1296,9 +1284,6 @@ void csGraphics3DGlide2x::DrawLine (csVector3& v1, csVector3& v2, float fov, int
   }
   else if (z2 < SMALL_Z)
   {
-    // x = t*(x2-x1)+x1;
-    // y = t*(y2-y1)+y1;
-    // z = t*(z2-z1)+z1;
     float t = ((float)SMALL_Z-z1) / (z2-z1);
     x2 = t*(x2-x1)+x1;
     y2 = t*(y2-y1)+y1;
@@ -1315,7 +1300,7 @@ void csGraphics3DGlide2x::DrawLine (csVector3& v1, csVector3& v2, float fov, int
   m_piG2D->DrawLine (px1, py1, px2, py2, color);
 }
 
-bool csGraphics3DGlide2x::SetRenderState(G3D_RENDERSTATEOPTION option, long value)
+bool csGraphics3DGlide2x::SetRenderState (G3D_RENDERSTATEOPTION option, long value)
 {
   switch (option)
   {
@@ -1345,25 +1330,25 @@ bool csGraphics3DGlide2x::SetRenderState(G3D_RENDERSTATEOPTION option, long valu
 */
     break;
   case G3DRENDERSTATE_SPECULARENABLE:
-    rstate_specular = value;
+    m_renderstate.specular = value;
     break;
   case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-    rstate_bilinearmap = value;
+    m_renderstate.bilinearmap = value;
     break;
   case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-    rstate_trilinearmap = value;
+    m_renderstate.trilinearmap = value;
     break;
   case G3DRENDERSTATE_TRANSPARENCYENABLE:
-    rstate_alphablend = value;
+    m_renderstate.alphablend = value;
     break;
   case G3DRENDERSTATE_MIPMAPENABLE:
-    rstate_mipmap = value;
+    m_renderstate.mipmap = value;
     break;
   case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-    rstate_flat = !value;
+    m_renderstate.textured = value;
     break;
   case G3DRENDERSTATE_LIGHTINGENABLE :
-    rstate_lighting = value;
+    m_renderstate.lighting = value;
     break;
   case G3DRENDERSTATE_FILTERINGENABLE :
   case G3DRENDERSTATE_PERFECTMAPPINGENABLE :
@@ -1371,7 +1356,7 @@ bool csGraphics3DGlide2x::SetRenderState(G3D_RENDERSTATEOPTION option, long valu
   case G3DRENDERSTATE_MMXENABLE :
     break;
   case G3DRENDERSTATE_GOURAUDENABLE:
-    rstate_gouraud = value;
+    m_renderstate.gouraud = value;
     break;
   default:
     return false;
@@ -1380,7 +1365,7 @@ bool csGraphics3DGlide2x::SetRenderState(G3D_RENDERSTATEOPTION option, long valu
   return true;
 }
 
-long csGraphics3DGlide2x::GetRenderState(G3D_RENDERSTATEOPTION op)
+long csGraphics3DGlide2x::GetRenderState (G3D_RENDERSTATEOPTION op)
 {
   switch(op)
   {
@@ -1393,25 +1378,25 @@ long csGraphics3DGlide2x::GetRenderState(G3D_RENDERSTATEOPTION op)
     case G3DRENDERSTATE_DITHERENABLE:
       return false;
     case G3DRENDERSTATE_SPECULARENABLE:
-      return rstate_specular;
+      return m_renderstate.specular;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-      return rstate_bilinearmap;
+      return m_renderstate.bilinearmap;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-      return rstate_trilinearmap;
+      return m_renderstate.trilinearmap;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
-      return rstate_alphablend;
+      return m_renderstate.alphablend;
     case G3DRENDERSTATE_MIPMAPENABLE:
-      return rstate_mipmap;
+      return m_renderstate.mipmap;
     case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-      return !rstate_flat;
+      return m_renderstate.textured;
     case G3DRENDERSTATE_GOURAUDENABLE:
-      return rstate_gouraud;
+      return m_renderstate.gouraud;
     default:
       return 0;
   }
 }
 
-unsigned long *csGraphics3DGlide2x::GetZBufPoint(int, int)
+unsigned long *csGraphics3DGlide2x::GetZBufPoint (int, int)
 {
   return NULL;
 }
@@ -1430,17 +1415,15 @@ void csGraphics3DGlide2x::CloseFogObject (CS_ID /*id*/)
 }
 
 
-iHalo *csGraphics3DGlide2x::CreateHalo(float r, float g, float b, unsigned char *alpha, int width, int height)
+iHalo *csGraphics3DGlide2x::CreateHalo (float r, float g, float b, unsigned char *alpha, int width, int height)
 {
-  if(m_bHaloEffect)
+  if (m_bHaloEffect)
   {
-    csHaloDrawer halo(m_piG2D, r, g, b);
-    
-    csG3DHardwareHaloInfo* retval = new csG3DHardwareHaloInfo();
-    
-    unsigned long *lpbuf = halo.GetBuffer();
+    csHaloDrawer halo (m_piG2D, r, g, b);
+    csG3DHardwareHaloInfo* retval = new csG3DHardwareHaloInfo ();
+    unsigned long *lpbuf = halo.GetBuffer ();
 
-    CHK(unsigned short *mem = new unsigned short [128*128]);
+    CHK (unsigned short *mem = new unsigned short [128*128]);
 
     // Warning : convertion maybe a bit bugged
     for (int j=0; j<128; j++)
@@ -1460,12 +1443,12 @@ iHalo *csGraphics3DGlide2x::CreateHalo(float r, float g, float b, unsigned char 
       }
     }
 
-    retval->halo = m_pTextureCache->LoadHalo((char *)mem);
+    retval->halo = m_pTextureCache->LoadHalo ((char *)mem);
 
     delete [] mem;
     delete [] lpbuf;
 
-    return (iHalo*)new csGlideHalo( r, g, b, alpha, width, height, this, retval );
+    return (iHalo*)new csGlideHalo ( r, g, b, alpha, width, height, this, retval );
   }
   return NULL;
 }
@@ -1481,9 +1464,9 @@ void csGraphics3DGlide2x::DestroyHalo(csHaloHandle haloInfo)
 }
 */
 
-bool csGraphics3DGlide2x::TestHalo(csVector3* pCenter)
+bool csGraphics3DGlide2x::TestHalo (csVector3* pCenter)
 {
-  if(m_bHaloEffect)
+  if (m_bHaloEffect)
   {
     if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0  ) 
       return false;
