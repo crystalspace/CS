@@ -2378,9 +2378,29 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     // The `R/G/B' colors and their per-scanline delta
     int r, drdy, g, dgdy, b, dbdy;
   } L,R;
+
+// Start of code to stop MSVC bitching about uninitialized variables
+  L.sv = R.sv = top;
   L.fv = R.fv = top;
   int sy = L.fy = R.fy = QRound (poly.vertices [top].sy);
-  L.x = R.x = 0; // Pacify MSVC which otherwise says they are used uninitialized.
+
+  L.x = R.x = 0;
+  L.dxdy = R.dxdy = 0;
+
+  L.u = R.u = 0;
+  L.dudy = R.dudy = 0;
+  L.v = R.v = 0;
+  L.dvdy = R.dvdy = 0;
+  L.z = R.z = 0;
+  L.dzdy = R.dzdy = 0;
+
+  L.r = R.r = 0;
+  L.drdy = R.drdy = 0;
+  L.g = R.g = 0;
+  L.dgdy = R.dgdy = 0;
+  L.b = R.b = 0;
+  L.dbdy = R.dbdy = 0;
+// End of MSVC specific code
 
   // Decide whenever we should use Gouraud or flat (faster) routines
   bool do_gouraud = (pqinfo.drawline_gouraud != NULL)
