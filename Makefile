@@ -15,8 +15,8 @@
 -include config.mak
 
 # parameters for recursive make calls
-RECMAKEFLAGS=--no-print-directory --no-builtin-rules --no-builtin-variables
-MAKEFLAGS+=rR
+RECMAKEFLAGS=--no-print-directory --no-builtin-rules
+MAKEFLAGS+=r
 
 include mk/user.mak
 include mk/common.mak
