@@ -1291,8 +1291,13 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   float cossrcangle = src_normal * path;
   float cosdestangle = - (dest_normal * path);
 
-  float distance = path.Norm ();
-  float sqdistance = distance * distance;
+  //// linear version
+  //float distance = path.Norm ();
+  //float sqdistance = distance * distance;
+  //// squared version
+  float distance = path.SquaredNorm ();
+  float sqdistance = distance;
+
   if (sqdistance < 0.01f) sqdistance = 0.01f;
 
   // This function calculates radiosity with linear light attenuation
