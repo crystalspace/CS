@@ -13,6 +13,51 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+27-Jul-1999
+	- Eric Sunshine fixed a bug in csGraphics2D::complete_pixel_format()
+	  where it could go into an infinite loop during calculation of
+	  RedBits, GreenBits, or BlueBits on account of accidental sign-
+	  extension of its work variable.
+	- Eric Sunshine modified the makefile configuration system so that the
+	  NO_BOOL_TYPE setting is now stored in config.mak and volatile.h.
+	  This setting is used to determine if include/types.h should provide
+	  a fake "bool" type for compilers which do not support bool natively.
+	- Eric Sunshine modified the makefile system so that the need for
+	  NO_BOOL_TYPE is automatically detected during the configuration
+	  phase.  Ports which use the GNU makefile system and which manually
+	  specified NO_BOOL_TYPE in the past no longer need to do so.
+	- Eric Sunshine fixed a bug in unixconf.sh where it was not correctly
+	  handling the case when the "which" command failed to find the
+	  program in question.
+	- Eric Sunshine re-wrote the blitters for the MacOS/X Server,
+	  OpenStep, and NextStep ports of Crystal Space so that they now work
+	  in 15-bit and 32-bit RGB modes.  Previously they were restricted to
+	  8-bit, 256 color palette mode.  Not only does this improve display
+	  quality, but it also means that they can now take advantage of all
+	  the features which are not available to 8-bit mode.  For instance,
+	  sprites are now lighted correctly, bots and the skeletal tree are
+	  now properly Gouraud shaded, the translucent green ghost is visible,
+	  and Crystal Shooter works.  Testing indicates that the low-level
+	  15-bit blitter is just as fast as the old 8-bit one, and the 32-bit
+	  blitter is actually faster.
+	- Eric Sunshine re-wrote the code which queries for device depth in
+	  the MacOS/X Server, OpenStep, and NextStep ports.  It now queries
+	  the WindowServer directly instead of the AppKit since the
+	  WindowServer has a better notion of its preferred image format.
+	  Under NextStep the WindowServer and AppKit will return the same
+	  value, howevever as of OpenStep 4.1, the values may differ, and the
+	  WindowServer's result should be taken as the truth.
+	- Eric Sunshine fixed a bug in the mouse-down method of the MacOS/X
+	  Server, OpenStep, and NextStep ports.  The states of the Alternate
+	  and Control keys were being incorrectly computed.
+	- Eric Sunshine worked around a nasty bug in GNU make on MacOS/X
+	  Server.  Specifically, it corrupts the contents of MAKE_VOLATILE_H
+	  (and probably other variables) by truncating values which are
+	  appended with +=.
+	- Eric Sunshine worked around a bizarre bug in the MacOS/X Server PPC
+	  compiler, where it would crash with an "internal compiler error" in
+	  soft_txt.cpp any time find_rgb_map() was called.  A simple textual
+	  reorganization of the file cured the problem.
 26-Jul-1999
 	- Andrew made changes to DrawPolygonFX().  He fixed a number of small
 	  bugs and adjusted the prototype.  It also now safely supports 2*SRC
