@@ -22,6 +22,7 @@
 #include <time.h>
 
 #include "sysdef.h"
+#include "cssys/common/system.h"
 #include "csbe.h"
 #include "csutil/inifile.h"
 //#include "cs3d/software/graph3d.h"	//@@@VERY DOUBTFUL! This should not be needed!!!
@@ -92,6 +93,7 @@ public:
 	CrystApp(SysSystemDriver *from) : BApplication("application/x-vnd.xsware-crystal") {
 		driver = from;
 		mspf = 100 * 1000;
+		time = system_time();//dhdebug
 	};
 	void Pulse(void);
 	bool QuitRequested();
@@ -100,7 +102,11 @@ public:
 	void doMouseAction(BPoint point, int16 button, bool shift, bool alt, bool ctrl);
 	void doKeyAction(int key, bool down, bool shift, bool alt, bool ctrl);
 	bigtime_t mspf;
+	bigtime_t time;//dhdebug
 private:
+	// performs actual drawing: done to implement BDirectWindow in the prescribed manner.
+//	void CrystApp::DrawingThread(void *data);
+	
 	SysSystemDriver	*driver;
 	BWindow			*aWindow;
 	bigtime_t		milisecpf;
@@ -135,15 +141,25 @@ void CrystApp::Pulse() {
 }
 
 void CrystApp::MessageReceived(BMessage *msg)
-{
-	bigtime_t	time = system_time();
-//printf("got something %4s\n",&msg->what);
+{	
+//	bigtime_t	time = system_time();
+	bigtime_t pre_draw_microsecs, post_draw_microsecs;
+	static long prev_frame_time = csSystemDriver::Time();//dhdebug
+	long curr_time;//dhdebug
+	//printf("got something %4s\n",&msg->what);
 	switch(msg->what) {
 	// Switch between full-screen mode and windowed mode.
 	case 'next' :
-		driver->NextFrame(system_time () - time, system_time ());
-		time = system_time() - time;
-		mspf = time;
+//		driver->NextFrame(system_time () - time, system_time ());
+		pre_draw_microsecs = system_time();
+		curr_time = pre_draw_microsecs / 1000;
+		driver->NextFrame(curr_time - prev_frame_time, curr_time);//dhdebug
+		post_draw_microsecs = system_time();
+		printf("curr_time, prev_frame_time: %u  %u \n", curr_time, prev_frame_time);
+//		time = system_time() - time;
+		prev_frame_time = curr_time;//dhdebug
+//		mspf = time;
+		mspf = post_draw_microsecs - pre_draw_microsecs;//dhdebug
 		{
 			BMessageQueue *queu = MessageQueue();
 			BMessage *mmsg = NULL;
@@ -478,3 +494,21 @@ long SysSystemDriver::LoopThread(void *data)
 	}	
 	return 0;
 }
+/*
+void CrystApp::DrawingThread(void *data)
+{
+	while (!shutdown) {
+		// decrement one-shot counter
+		if (acquire_sem(one_shot_cnt_sem) != B_NO_ERROR) {
+			Printf (MSG_FATAL_ERROR, "Semaphore error in DrawingThread");
+			return;
+		}
+		one_shot_cnt--;
+		release_sem(one_shot_cnt_sem);
+		
+		// acquire one-shot semaphore
+		acquire_sem(one_shot_sem);
+		
+		// do drawing
+*/	
+		
