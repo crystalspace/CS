@@ -18,6 +18,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
 #include "awscomp.h"
+#include "awsitmv.h"
 
 /// Knows how to draw items that have several properties.
 struct awsListItem
@@ -66,7 +67,7 @@ struct awsListRow
   awsListRow *parent;
 
   /// Pointer to list of children (if there are some)
-  csBasicVector *children;
+  cListRowVector *children;
 
   /// Pointer to columns of items in this row
   awsListItem *cols;
@@ -159,7 +160,7 @@ class awsListBox : public awsComponent
    awsListColumn *columns;
 
    /// Row container (grows and shrinks as items are manipulated)
-   csVector rows;
+   csListRowVector rows;
 
 protected:
    void ClearGroup();
