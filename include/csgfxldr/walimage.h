@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,13 +16,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef WALIMAGE_H
-#define WALIMAGE_H
+#ifndef __CS_WALIMAGE_H__
+#define __CS_WALIMAGE_H__
 
 #include "csgfxldr/csimage.h"
 
 /**
- * The TGA Image Loader.
+ * The WAL Image Loader.
  */
 class csWALImageLoader : public csImageLoader
 {
@@ -37,7 +37,6 @@ protected:
 class ImageWALFile : public csImageFile
 {
   friend class csWALImageLoader;
-
 private:
   /// Initialize the image object
   ImageWALFile (int iFormat) : csImageFile (iFormat) { };
@@ -45,4 +44,4 @@ private:
   bool Load (UByte* iBuffer, ULong iSize);
 };
 
-#endif
+#endif // __CS_WALIMAGE_H__
