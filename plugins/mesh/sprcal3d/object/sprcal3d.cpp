@@ -1558,7 +1558,6 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
 {
   SetupObject ();
 
-  iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
 
   // First create the transformation from object to camera space directly:
@@ -1582,6 +1581,7 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
       clip_z_plane);
 
 #ifndef CS_USE_NEW_RENDERER
+  iGraphics3D* g3d = rview->GetGraphics3D ();
   g3d->SetObjectToCamera (&tr_o2c);
   int meshCount;
   meshCount = calModel.getRenderer()->getMeshCount();
@@ -1620,7 +1620,6 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
 #else
   SetupObject ();
 
-  iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
 
   // First create the transformation from object to camera space directly:
