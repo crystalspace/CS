@@ -2165,6 +2165,9 @@ void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,
 
 void csGLGraphics3D::SetupClipPortals ()
 {
+  if (broken_stencil || !stencil_clipping_available)
+    return;
+
   csClipPortal* cp = clipportal_stack.Top ();
 
   // First setup projection matrix for 2D drawing.

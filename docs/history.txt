@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Jul-2004
+	- Jorrit fixed the NR GL renderer so that it doesn't attempt to
+	  implement floating portals if the stencil buffer is broken
+	  or not available.
 2-Jul-2004
 	- Jorrit fixed compile errors in sprcal3d and terrfunc.
 	- Eric Sunshine added a bunch of missing entries to
