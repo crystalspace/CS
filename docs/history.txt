@@ -60,7 +60,7 @@ Short-term cleanups that need to be done:
 	    load standard.zip.  In some cases this bug resulted in semi-random
 	    crashes.  In all cases, it resulted in the failure to load
 	    standard.zip.
-	  - Fixed a bug in standard.zip which was inadvertantly introduced
+	  - Fixed a bug in standard.zip which was inadvertently introduced
 	    when Andrew updated this archive to work with VFS.  The bug
 	    resulted in a crash since the texture loader was unable to find
 	    the image resource for one of the missile sprites.
@@ -89,7 +89,7 @@ Short-term cleanups that need to be done:
 	    of the output directories or process other dependencies on on
 	    platforms which do not use the .EXE extension.  Specifically, the
 	    problem was that the meta target and the executable were both
-	    named "vsh".  Unfortuantely, the current makefile system does not
+	    named "vsh".  Unfortunately, the current makefile system does not
 	    work properly when the meta target and executable have the same
 	    name.
 	  - Fixed the MacOS/X Server, OpenStep, and NextStep system drivers so
