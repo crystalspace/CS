@@ -110,26 +110,7 @@ bool PySimple::Initialize (int argc, char *argv[], const char *iConfigName)
   if(!is->RunText("unrmap.Load('data/entry')"))
     return 0;
     
-<<<<<<< pysimp.cpp
-/*  csStatLight* light;
-  light = new csStatLight (-3, 5, 0, 10, 1, 0, 0, false);
-  room->AddLight (light);
-  light = new csStatLight (3, 5, 0, 10, 0, 0, 1, false);
-  room->AddLight (light);
-  light = new csStatLight (0, 5, -3, 10, 0, 1, 0, false);
-  room->AddLight (light);*/
-
-  world->Prepare();
-
-  // Create a dynamic light.
-//  angle = 0;
-//  dynlight = new csDynLight (cos (angle)*3, 17, sin (angle)*3, 7, 1, 0, 0);
-//  world->AddDynLight (dynlight);
-//  dynlight->SetSector (room);
-//  dynlight->Setup ();
-=======
   world->Prepare ();
->>>>>>> 1.2
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
