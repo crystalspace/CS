@@ -145,7 +145,7 @@ bool csGraphics2DDDraw3::Open ()
 
   // Subclass the window
   m_OldWndProc = (WNDPROC)GetWindowLong(m_hWnd, GWL_WNDPROC);
-  //SetWindowLong (m_hWnd, GWL_WNDPROC, (LONG)WindowProc);
+  SetWindowLong (m_hWnd, GWL_WNDPROC, (LONG)WindowProc);
   SetWindowLong (m_hWnd, GWL_USERDATA, (LONG)this);
 
   // Get ahold of the main DirectDraw object...
