@@ -705,7 +705,7 @@ bool csGLRender3D::Open ()
   // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_compression ();
-  //ext->InitGL_ARB_vertex_buffer_object ();
+  ext->InitGL_ARB_vertex_buffer_object ();
   ext->InitGL_ARB_vertex_program ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
@@ -730,6 +730,7 @@ bool csGLRender3D::Open ()
   }
   // check for support of VBO
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
+  printf ("JOJO: %d\n", ext->CS_GL_ARB_vertex_buffer_object);
 
   shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
   if( !shadermgr )
@@ -1118,10 +1119,14 @@ bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
         glColorPointer (buffer->GetComponentCount (),
           ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
         glEnableClientState (GL_COLOR_ARRAY);
+	break;
       case CS_VATTRIB_TEXCOORD:
         glTexCoordPointer (buffer->GetComponentCount (), 
           ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
         glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+	break;
+      default:
+	break;
       }
     }
     vertattrib[attrib] = buffer;
@@ -1148,8 +1153,12 @@ void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
         break;
       case CS_VATTRIB_PRIMARY_COLOR:
         glDisableClientState (GL_COLOR_ARRAY);
+	break;
       case CS_VATTRIB_TEXCOORD:
         glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+	break;
+      default:
+	break;
       }
     }
     vertattrib[attrib]->Release ();
@@ -1198,7 +1207,7 @@ bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
     if (ext->CS_GL_EXT_texture_lod_bias)
     {
       glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); //big hack
+	GL_TEXTURE_LOD_BIAS_EXT, (int) textureLodBias); //big hack
     }
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
@@ -1279,7 +1288,7 @@ bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int u
     if (ext->CS_GL_EXT_texture_lod_bias)
     {
       glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); //big hack
+	GL_TEXTURE_LOD_BIAS_EXT, (int) textureLodBias); //big hack
     }
     texunit[unit] = txthandle;
     texunitenabled[unit] = true;
@@ -1409,9 +1418,11 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   else
     SetMirrorMode (mymesh->do_mirror);
 
+  /* 
   csMaterialHandle* mathandle = mymesh->material ?
     ((csMaterialHandle*)(mymesh->material->GetMaterialHandle())) :
     0;
+  */
 
   statecache->SetShadeModel (GL_SMOOTH);
 
