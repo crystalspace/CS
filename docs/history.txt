@@ -15,7 +15,7 @@ chronological order.
 	- Jorrit did an optimization to the OPCODE plugin. Instead of
 	  requesting polygons and triangulating it will now directly request
 	  the triangles. This is more optimal because many meshes actually
-	  support triangle meshes more efficiently then polygon meshes.
+	  support triangle meshes more efficiently than polygon meshes.
 	- Jorrit implemented support for real collision detection (using
 	  iPolygonMesh) for both chunklod and bruteblock terrain engines.
 	  Also removed the specialized support for collision detection in
