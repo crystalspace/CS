@@ -1760,13 +1760,13 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
       {
 	const csPlane& pl = fog_info->incoming_plane;
 	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
-	dist1 = -pl.DD;// / denom;
+	dist1 = v.Norm () * (-pl.DD / denom);
       }
       else
         dist1 = 0;
       const csPlane& pl = fog_info->outgoing_plane;
       float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
-      dist2 = -pl.DD;// / denom;
+      dist2 = v.Norm () * (-pl.DD / denom);
 
       // @@@ The following updates are not correct. We should use better formulas
       // to combine several differently colored layers of fog (and different densities).
