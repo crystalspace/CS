@@ -16,6 +16,8 @@ chronological order.
 	- Eric Sunshine relocated the HTML-specific ScanDocDirs rule from
 	  CS/docs/Jamfile to CS/docs/html/Jamfile, and also renamed it to
 	  InstallHTMLDocs to better reflect its function.
+	- Jorrit re-enabled the clipping optimization in NR GL renderer
+	  after fixing partsys so it has a 'portals' render priority.
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support
