@@ -394,7 +394,7 @@ void ddgTBinTree::textureC(unsigned int tindex, ddgVector2 *vout)
 	else
 		vout->set(_mesh->stri[tindex].row, _mesh->stri[tindex].col);
 
-	vout->multiply( 1.0 / (float)ddgTBinMesh_size);
+	vout->multiply( 1.0 / (float)(ddgTBinMesh_size+1));
 }
 
 /*
