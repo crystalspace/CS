@@ -60,6 +60,8 @@ typedef char ObName[30];
 static csWorld* World;
 /// The language layer we are currently working with
 static LanguageLayer* Layer;
+/// Loader flags
+static int flags = 0;
 
 //---------------------------------------------------------------------------
 
@@ -221,6 +223,11 @@ TOKEN_DEF_START
 TOKEN_DEF_END
 
 //---------------------------------------------------------------------------
+
+void csLoader::SetMode (int iFlags)
+{
+  flags = iFlags;
+}
 
 bool csLoader::load_matrix (char* buf, csMatrix3 &m)
 {
@@ -1234,8 +1241,11 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
   if (is_convex || thing->GetFog ().enabled)
     thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
   thing->SetTransform (obj);
-  thing->Transform ();
-  thing->CompressVertices ();
+
+  if (!(flags & CS_LOADER_NOTRANSFORM))
+    thing->Transform ();
+  if (!(flags & CS_LOADER_NOCOMPRESS))
+    thing->CompressVertices ();
 
   return thing;
 }
@@ -1363,9 +1373,12 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
   }
 
   thing->SetTransform (obj);
-  thing->Transform ();
-  thing->CompressVertices ();
-  if (is_convex || thing->GetFog ().enabled) thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
+  if (!(flags & CS_LOADER_NOTRANSFORM))
+    thing->Transform ();
+  if (!(flags & CS_LOADER_NOCOMPRESS))
+    thing->CompressVertices ();
+  if (is_convex || thing->GetFog ().enabled)
+    thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
 
   return thing;
 }
@@ -3541,8 +3554,10 @@ csSector* csLoader::load_room (char* secname, char* buf)
     p->SetAlpha (portals[i].alpha);
   }
 
-  sector->CompressVertices ();
-  if (do_stat_bsp) sector->UseStaticTree ();
+  if (!(flags & CS_LOADER_NOCOMPRESS))
+    sector->CompressVertices ();
+  if (!(flags & CS_LOADER_NOBSP))
+    if (do_stat_bsp) sector->UseStaticTree ();
 
   return sector;
 }
@@ -3649,8 +3664,10 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     fatal_exit (0, false);
   }
 
-  sector->CompressVertices ();
-  if (do_stat_bsp) sector->UseStaticTree ();
+  if (!(flags & CS_LOADER_NOCOMPRESS))
+    sector->CompressVertices ();
+  if (!(flags & CS_LOADER_NOBSP))
+    if (do_stat_bsp) sector->UseStaticTree ();
   return sector;
 }
 
