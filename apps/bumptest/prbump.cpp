@@ -28,7 +28,6 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
-#include "igraphic/image.h"
 #include "iengine/light.h"
 
 

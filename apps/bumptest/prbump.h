@@ -23,8 +23,8 @@
 #include "csutil/cscolor.h"
 #include "cstool/proctex.h"
 #include "csgeom/vector3.h"
+#include "igraphic/image.h"
 
-struct iImage;
 struct iLight;
 
 /**
