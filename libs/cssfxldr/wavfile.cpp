@@ -84,7 +84,7 @@ csSoundData* WAVLoader::loadsound(UByte* buf, ULong size)
   if(memcmp(wavhdr.fmt, "WAVEfmt ", 8))
     goto exit_read;
   
-#ifdef PORT_BYTESEX_BIG_ENDIAN
+#ifdef CS_BIG_ENDIAN
   wavhdr.f_len = ByteSwap32bit( wavhdr.f_len );
   wavhdr.fmt_len = ByteSwap32bit( wavhdr.fmt_len );
   wavhdr.fmt_tag = ByteSwap16bit( wavhdr.fmt_tag );
@@ -93,7 +93,7 @@ csSoundData* WAVLoader::loadsound(UByte* buf, ULong size)
   wavhdr.avg_bytes_per_sec = ByteSwap32bit( wavhdr.avg_bytes_per_sec );
   wavhdr.blk_align = ByteSwap16bit( wavhdr.blk_align );
   wavhdr.bits_per_sample = ByteSwap16bit( wavhdr.bits_per_sample );
-#endif // PORT_BYTESEX_BIG_ENDIAN
+#endif // CS_BIG_ENDIAN
 
   if(!((wavhdr.channel == 1) || (wavhdr.channel == 2)))
     goto exit_read;
@@ -104,9 +104,9 @@ csSoundData* WAVLoader::loadsound(UByte* buf, ULong size)
   while(ptr<ptr_end)
   {
     memcpy(&wavchk, ptr, sizeof(wavchk));
-#ifdef PORT_BYTESEX_BIG_ENDIAN
+#ifdef CS_BIG_ENDIAN
     wavchk.len = ByteSwap32bit( wavchk.len );
-#endif // PORT_BYTESEX_BIG_ENDIAN
+#endif // CS_BIG_ENDIAN
 
     ptr+=sizeof(wavchk);
     if(memcmp(wavchk.chunk, "data", 4)==0)
@@ -121,11 +121,11 @@ csSoundData* WAVLoader::loadsound(UByte* buf, ULong size)
   if(memcpy(data, ptr, wavchk.len)==NULL)
     goto exit_read;  
 
-#ifdef PORT_BYTESEX_BIG_ENDIAN
+#ifdef CS_BIG_ENDIAN
   if ( wavhdr.bits_per_sample==16 ) {
     ByteSwap16bitBuffer( (unsigned short *)data, wavchk.len / 2 );
   }
-#endif // PORT_BYTESEX_BIG_ENDIAN
+#endif // CS_BIG_ENDIAN
 
   CHK (sb = new csSoundData(wavhdr.samples_per_sec,
     (wavhdr.bits_per_sample==16)?true:false,

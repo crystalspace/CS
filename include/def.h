@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,11 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __DEF_H__
-#define __DEF_H__
+#ifndef __CS_DEF_H__
+#define __CS_DEF_H__
 
 #if !defined(OK_TO_INCLUDE_DEFS_IM_A_FRIEND)
-#error "You are not allowed to include this file! Use sysdef.h instead."
+#error You are not allowed to include this file! Use sysdef.h instead.
 #endif
 
 #include "platform.h"
@@ -33,7 +33,7 @@
 // binary (MAB) compilations.
 //---------------------------------------------------------------
 
-#if defined(OS_NEXT) || defined(OS_NT4)
+#if defined(OS_NEXT)
 #  if defined(__m68k__)
 #    if !defined(PROC_M68K)
 #      define PROC_M68K
@@ -61,14 +61,6 @@
 #  endif
 #endif
 
-#if defined(OS_NEXT)
-#  if defined(__BIG_ENDIAN__)
-#    define PORT_BYTESEX_BIG_ENDIAN
-#  else
-#    undef  PORT_BYTESEX_BIG_ENDIAN
-#  endif
-#endif
-
 //---------------------------------------------------------------
 // Test if the makefile correctly defines all the operating
 // system (one of the OS_ flags), the compiler (one of the
@@ -77,20 +69,29 @@
 
 #ifndef HAVE_CONFIG_H
 
-#if (defined(OS_SOLARIS) || defined(OS_LINUX) || defined(OS_IRIX) || defined(OS_BSD) || defined(OS_BE) || defined(OS_NEXT)) && !defined(OS_UNIX)
+#if (defined(OS_SOLARIS) || defined(OS_LINUX) || defined(OS_IRIX) || \
+     defined(OS_BSD) || defined(OS_BE) || defined(OS_NEXT)) && \
+     !defined(OS_UNIX)
 #  define OS_UNIX
 #endif
 
-#if !defined(OS_SOLARIS) && !defined(OS_LINUX) && !defined(OS_DOS) && !defined(OS_UNIX) && !defined(OS_MACOS) && !defined(OS_AMIGAOS) && !defined(OS_WIN32) && !defined(OS_OS2) && !defined(OS_IRIX) && !defined(OS_BSD) && !defined(OS_BE) && !defined(OS_NEXT) && !defined(OS_WINNT)
-#  error "Please specify the operating system in the makefile! (OS=...)"
+#if !defined(OS_SOLARIS) && !defined(OS_LINUX) && !defined(OS_DOS) && \
+    !defined(OS_UNIX) && !defined(OS_MACOS) && !defined(OS_AMIGAOS) && \
+    !defined(OS_WIN32) && !defined(OS_OS2) && !defined(OS_IRIX) && \
+    !defined(OS_BSD) && !defined(OS_BE) && !defined(OS_NEXT) && \
+    !defined(OS_WINNT)
+#  error Please specify the operating system in the makefile! (OS=...)
 #endif
 
-#if !defined(COMP_GCC) && !defined(COMP_WCC) && !defined(COMP_UNKNOWN) && !defined(COMP_MWERKS) && !defined(COMP_VC) && !defined(COMP_BC)
-#  error "Please specify the compiler in the makefile! (COMP=...)"
+#if !defined(COMP_GCC) && !defined(COMP_WCC) && !defined(COMP_UNKNOWN) && \
+    !defined(COMP_MWERKS) && !defined(COMP_VC) && !defined(COMP_BC)
+#  error Please specify the compiler in the makefile! (COMP=...)
 #endif
 
-#if !defined(PROC_INTEL) && !defined(PROC_SPARC) && !defined(PROC_MIPS) && !defined(PROC_UNKNOWN) && !defined(PROC_POWERPC) && !defined(PROC_M68K) && !defined(PROC_HPPA) && !defined(PROC_ALPHA)
-#  error "Please specify the processor in the makefile! (PROC=...)"
+#if !defined(PROC_INTEL) && !defined(PROC_SPARC) && !defined(PROC_MIPS) && \
+    !defined(PROC_UNKNOWN) && !defined(PROC_POWERPC) && \
+    !defined(PROC_M68K) && !defined(PROC_HPPA) && !defined(PROC_ALPHA)
+#  error Please specify the processor in the makefile! (PROC=...)
 #endif
 
 #endif
@@ -131,20 +132,20 @@
 #endif
 
 #undef EPSILON
-#define EPSILON 0.001				/* Small value */
+#define EPSILON 0.001			/* Small value */
 #undef SMALL_EPSILON
-#define SMALL_EPSILON 0.000001			/* Very small value */
+#define SMALL_EPSILON 0.000001		/* Very small value */
 #undef SMALL_EPSILON_D
-#define SMALL_EPSILON_D 0.000000000001		/* Very, very small value */
+#define SMALL_EPSILON_D 0.000000000001	/* Very, very small value */
 
 #ifndef PI
-#  define PI		3.14159265358979323	/* You know this number, don't you? */
+#  define PI 3.14159265358979323
 #endif
 #ifndef M_PI
 #  define M_PI PI
 #endif
 #ifndef M_PI_2
-#  define M_PI_2	1.57079632679489661923	/* PI/2 */
+#  define M_PI_2 1.57079632679489661923	/* PI/2 */
 #endif
 
 // NextStep 3.3 compiler frequently crashes when initializing static const
@@ -177,4 +178,4 @@
 // This macro causes a crash. Can be useful for debugging.
 #define CRASH { int* a=0; *a = 1; }
 
-#endif // __DEF_H__
+#endif // __CS_DEF_H__

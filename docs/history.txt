@@ -24,6 +24,9 @@ Short-term cleanups that need to be done:
 	  files from CS/mk and subdirectories.  These files were generally
 	  three to six months out of date (which is very significant in
 	  CS-time :-).
+	- Eric Sunshine fixed the WAV loader so that it works correctly for
+	  Jorrit on big-endian Sparc machines.  He also replaced non-standard
+	  PORT_BYTESEX_BIG_ENDIAN usage with CS_BIG_ENDIAN.
 27-Mar-2000
 	- W.C.A. Wijngaards <wouterw@cs.vu.nl> made a small fix to line
 	  renderer.
