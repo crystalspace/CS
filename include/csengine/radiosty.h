@@ -419,7 +419,7 @@ public:
   /// Populates the shadow coverage Matrix for this element
   virtual void GetCoverageMatrix(csFrustumView* lview, 
                                  csCoverageMatrix* shadow_matrix)
-  { curve->GetCoverageMatrix(*lview, *shadow_matrix); }
+  { /* @@@ curve->GetCoverageMatrix(*lview, *shadow_matrix); */ }
 
   SCF_DECLARE_IBASE_EXT (csRadElement);
 };

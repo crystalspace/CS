@@ -38,6 +38,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine renamed csColorMapLine to csColorMapNull in the `null'
 	  renderer in order to avoid symbolic naming conflicts with the `line'
 	  renderer when USE_PLUGINS=no.
+	- Eric Sunshine eliminated compilation warning from radiosity.h
+	  regarding undefined csCoverageMatrix.
 17-Jul-2001
 	- Worked around an internal compiler error (for MingW compiler) in
 	  recent changes to crossbld.cpp by completely rearranging the
