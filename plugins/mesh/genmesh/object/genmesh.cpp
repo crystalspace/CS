@@ -897,7 +897,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif
 
 csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
-      iObjectRegistry* object_reg) : anon_buffers(object_reg)
+      iObjectRegistry* object_reg)
+#ifdef CS_USE_NEW_RENDERER 
+     : anon_buffers(object_reg)
+#endif
 {
   SCF_CONSTRUCT_IBASE (pParent);
 #ifdef CS_USE_NEW_RENDERER
