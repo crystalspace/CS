@@ -19,9 +19,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
 */
 
+#include "cssysdef.h"
 #include "mapstd.h"
 #include "map.h"
-#include "csexport.h"
 #include "cworld.h"
 #include "wad3file.h"
 #include <Console.h>
@@ -80,7 +80,8 @@ int main( int argc, char *argv[ ])
 
   printf("Export using manual sectoring\n");
   CCSWorld World;
-  World.Write(worldfile, &Map);
+  World.Write(worldfile, &Map, mapfile);
 
   printf("done.");
   return 0;
+}
