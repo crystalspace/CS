@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __POLYAA_H__
-#define __POLYAA_H__
+#ifndef __CS_POLYAA_H__
+#define __CS_POLYAA_H__
 
 #include "csgeom/csrect.h"
 
@@ -44,4 +44,4 @@ typedef void (*csAAPFCBBox) (int x, int y, int w, int h, void *arg);
 extern void csAntialiasedPolyFill (csVector2 *iVertices, int iVertexCount,
   void *iArg, csAAPFCBPixel iPutPixel, csAAPFCBBox iDrawBox = NULL);
 
-#endif // __POLYAA_H__
+#endif // __CS_POLYAA_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef PLANE2_H
-#define PLANE2_H
+#ifndef __CS_PLANE2_H__
+#define __CS_PLANE2_H__
 
 #define CS_POLY_IN 1
 #define CS_POLY_ON 0
@@ -140,4 +140,4 @@ public:
   }
 };
 
-#endif /*PLANE2_H*/
+#endif // __CS_PLANE2_H__

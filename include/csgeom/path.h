@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __PATH_H__
-#define __PATH_H__
+#ifndef __CS_PATH_H__
+#define __CS_PATH_H__
 
 #include "csgeom/spline.h"
 
@@ -139,4 +139,4 @@ public:
   }
 };
 
-#endif // __PATH_H__
+#endif // __CS_PATH_H__

@@ -24,7 +24,7 @@
 
 //---------------------------------------------------------------------------
 
-void TextureTrans::compute_texture_space (
+void csTextureTrans::compute_texture_space (
 	csMatrix3& m, csVector3& v,
 	const csVector3& v_orig, const csVector3& v1, float len1,
 	float A, float B, float C)
@@ -33,7 +33,7 @@ void TextureTrans::compute_texture_space (
   	v1.x, v1.y, v1.z, len1, A, B, C);
 }
 
-void TextureTrans::compute_texture_space (
+void csTextureTrans::compute_texture_space (
 	csMatrix3& m, csVector3& v,
 	float xo, float yo, float zo,
 	float x1, float y1, float z1, float len1,
@@ -71,7 +71,7 @@ void TextureTrans::compute_texture_space (
   compute_texture_space (m, v, xo, yo, zo, x1, y1, z1, x2, y2, z2, a, b, c);
 }
 
-void TextureTrans::compute_texture_space (
+void csTextureTrans::compute_texture_space (
 	csMatrix3& m, csVector3& v,
 	const csVector3& v_orig,
 	const csVector3& v1, float len1,
@@ -91,7 +91,7 @@ void TextureTrans::compute_texture_space (
 	v_w.x, v_w.y, v_w.z);
 }
 
-void TextureTrans::compute_texture_space (
+void csTextureTrans::compute_texture_space (
 	csMatrix3& m, csVector3& v,
 	const csVector3& v_orig, const csVector3& v_u, const csVector3& v_v)
 {
@@ -103,7 +103,7 @@ void TextureTrans::compute_texture_space (
   	v_w.x, v_w.y, v_w.z);
 }
 
-void TextureTrans::compute_texture_space (
+void csTextureTrans::compute_texture_space (
 	csMatrix3& m, csVector3& v,
 	float xo, float yo, float zo,
 	float xu, float yu, float zu,

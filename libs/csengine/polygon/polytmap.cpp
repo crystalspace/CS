@@ -61,7 +61,7 @@ void csPolyTxtPlane::SetTextureSpace (
   float A = plane_wor.A ();
   float B = plane_wor.B ();
   float C = plane_wor.C ();
-  TextureTrans::compute_texture_space (
+  csTextureTrans::compute_texture_space (
   	m_obj2tex, v_obj2tex,
   	xo, yo, zo, x1, y1, z1, len1,
   	A, B, C);
@@ -74,7 +74,7 @@ void csPolyTxtPlane::SetTextureSpace (
 	const csVector3& v1, float len1,
 	const csVector3& v2, float len2)
 {
-  TextureTrans::compute_texture_space (
+  csTextureTrans::compute_texture_space (
   	m_obj2tex, v_obj2tex,
 	v_orig, v1, len1, v2, len2);
   m_world2tex = m_obj2tex;
@@ -86,7 +86,7 @@ void csPolyTxtPlane::SetTextureSpace (
 	const csVector3& v_u,
 	const csVector3& v_v)
 {
-  TextureTrans::compute_texture_space (
+  csTextureTrans::compute_texture_space (
   	m_obj2tex, v_obj2tex,
 	v_orig, v_u, v_v);
   m_world2tex = m_obj2tex;
@@ -100,7 +100,7 @@ void csPolyTxtPlane::SetTextureSpace (float xo, float yo, float zo,
   const csVector3 o(xo, yo, zo);
   const csVector3 u(xu, yu, zu);
   const csVector3 v(xv, yv, zv);
-  TextureTrans::compute_texture_space (m_obj2tex, v_obj2tex, o, u, v);
+  csTextureTrans::compute_texture_space (m_obj2tex, v_obj2tex, o, u, v);
   m_world2tex = m_obj2tex;
   v_world2tex = v_obj2tex;
 }
@@ -111,7 +111,7 @@ void csPolyTxtPlane::SetTextureSpace (
 	float xv, float yv, float zv,
 	float xw, float yw, float zw)
 {
-  TextureTrans::compute_texture_space (
+  csTextureTrans::compute_texture_space (
   	m_obj2tex, v_obj2tex,
 	xo, yo, zo,xu, yu, zu, xv, yv, zv, xw, yw, zw);
   m_world2tex = m_obj2tex;

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __MATRIX3_H__
-#define __MATRIX3_H__
+#ifndef __CS_MATRIX3_H__
+#define __CS_MATRIX3_H__
 
 #ifndef __CS_CSSYSDEFS_H__
 #error "cssysdef.h must be included in EVERY source file!"
@@ -232,4 +232,4 @@ public:
   csZScaleMatrix3 (float scaler) : csMatrix3(1, 0, 0, 0, 1, 0, 0, 0, scaler) {}
 };
 
-#endif // __MATRIX3_H__
+#endif // __CS_MATRIX3_H__

@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSRECT_H__
-#define __CSRECT_H__
+#ifndef __CS_RECT_H__
+#define __CS_RECT_H__
 
 /**
  * Rectangle class: simple class for manipulating 2D rectangles.
@@ -189,4 +189,4 @@ public:
   }
 };
 
-#endif // __CSRECT_H__
+#endif // __CS_RECT_H__

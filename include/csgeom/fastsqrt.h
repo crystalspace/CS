@@ -17,11 +17,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef FASTSQRT_H
-#define FASTSQRT_H
+#ifndef __FASTSQRT_H__
+#define __FASTSQRT_H__
 
 extern void BuildSqrtTable ();
 extern float FastSqrt (float n);
 
-#endif //FASTSQRT_H
+#endif // __FASTSQRT_H__
 

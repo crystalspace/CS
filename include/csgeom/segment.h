@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SEGMENT_H
-#define SEGMENT_H
+#ifndef __CS_SEGMENT_H__
+#define __CS_SEGMENT_H__
 
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
@@ -104,4 +104,4 @@ public:
   csVector3& End () { return end; }
 };
 
-#endif /*SEGMENT_H*/
+#endif // __CS_SEGMENT_H__

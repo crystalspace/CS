@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ___CS_MATH3D_D_H__
-#define ___CS_MATH3D_D_H__
+#ifndef __CS_MATH3D_D_H__
+#define __CS_MATH3D_D_H__
 
 #include "cstypes.h"
 
@@ -668,4 +668,4 @@ public:
     double B, const csDVector3& u, const csDVector3& v, csDVector3& isect);
 };
 
-#endif // ___CS_MATH3D_D_H__
+#endif // __CS_MATH3D_D_H__

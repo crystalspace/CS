@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLYIDX_H
-#define POLYIDX_H
+#ifndef __CS_POLYIDX_H__
+#define __CS_POLYIDX_H__
 
 /**
  * The following class represents a general polygon.
@@ -102,4 +102,4 @@ public:
   int AddVertex (int i);
 };
 
-#endif /*POLYIDX_H*/
+#endif // __CS_POLYIDX_H__

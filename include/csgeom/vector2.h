@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef VECTOR2_H
-#define VECTOR2_H
+#ifndef __CS_VECTOR2_H__
+#define __CS_VECTOR2_H__
 
 /**
  * A 2D vector.
@@ -104,4 +104,4 @@ public:
   { return ABS(v.x)<f && ABS(v.y)<f; }
 };
 
-#endif /*VECTOR2_H*/
+#endif // __CS_VECTOR2_H__

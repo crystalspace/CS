@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __PLANE3_H__
-#define __PLANE3_H__
+#ifndef __CS_PLANE3_H__
+#define __CS_PLANE3_H__
 
 #ifndef __CS_CSSYSDEFS_H__
 #error "cssysdef.h must be included in EVERY source file!"
@@ -113,4 +113,4 @@ public:
   }
 };
 
-#endif // __PLANE3_H__
+#endif // __CS_PLANE3_H__

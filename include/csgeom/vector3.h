@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __VECTOR3_H__
-#define __VECTOR3_H__
+#ifndef __CS_VECTOR3_H__
+#define __CS_VECTOR3_H__
 
 #ifndef __CS_CSSYSDEFS_H__
 #error "cssysdef.h must be included in EVERY source file!"
@@ -240,4 +240,4 @@ public:
   { return (x == 0) && (y == 0) && (z == 0); }
 };
 
-#endif // __VECTOR3_H__
+#endif // __CS_VECTOR3_H__

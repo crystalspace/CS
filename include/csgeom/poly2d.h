@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLY2D_H
-#define POLY2D_H
+#ifndef __CS_POLY2D_H__
+#define __CS_POLY2D_H__
 
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
@@ -228,4 +228,4 @@ public:
   virtual csPoly2D* Create () { csPoly2D* p = new csPoly2D (); return p; }
 };
 
-#endif /*POLY2D_H*/
+#endif // __CS_POLY2D_H__

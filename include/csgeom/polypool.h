@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLYPOOL_H
-#define POLYPOOL_H
+#ifndef __CS_POLYPOOL_H__
+#define __CS_POLYPOOL_H__
 
 #include "csgeom/poly2d.h"
 
@@ -113,4 +113,4 @@ public:
 };
 
 
-#endif /*POLYPOOL_H*/
+#endif // __CS_POLYPOOL_H__

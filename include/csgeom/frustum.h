@@ -16,8 +16,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __FRUSTRUM_H__
-#define __FRUSTRUM_H__
+#ifndef __CS_FRUSTRUM_H__
+#define __CS_FRUSTRUM_H__
 
 #include "cstypes.h"
 #include "csgeom/math3d.h"
@@ -444,4 +444,4 @@ public:
   void DecRef () { if (ref_count == 1) delete this; else ref_count--; }
 };
 
-#endif // __CSFRUSTRUM_H__
+#endif // __CS_FRUSTRUM_H__

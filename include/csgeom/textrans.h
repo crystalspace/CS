@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TEXTRANS_H
-#define TEXTRANS_H
+#ifndef __CS_TEXTRANS_H__
+#define __CS_TEXTRANS_H__
 
 #include "csgeom/matrix3.h"
 
@@ -27,7 +27,7 @@
  * This class makes it easiers to define textures for polygons given
  * various things.
  */
-class TextureTrans
+class csTextureTrans
 {
 public:
   /**
@@ -84,4 +84,4 @@ public:
 	float xw, float yw, float zw);
 };
 
-#endif /*TEXTRANS_H*/
+#endif // __CS_TEXTRANS_H__

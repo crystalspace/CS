@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MATH2D_H
-#define MATH2D_H
+#ifndef __CS_MATH2D_H__
+#define __CS_MATH2D_H__
 
 #define CS_POLY_IN 1
 #define CS_POLY_ON 0
@@ -253,4 +253,4 @@ public:
 
 };
 
-#endif /*MATH_H*/
+#endif // __CS_MATH_H__

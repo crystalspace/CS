@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SPLINE_H__
-#define __SPLINE_H__
+#ifndef __CS_SPLINE_H__
+#define __CS_SPLINE_H__
 
 /**
  * A spline superclass.
@@ -207,5 +207,5 @@ public:
   csCatmullRomSpline (int d, int p) : csBSpline (d, p) { }
 };
 
-#endif // __SPLINE_H__
+#endif // __CS_SPLINE_H__
 

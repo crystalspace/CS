@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLYEDGE_H
-#define POLYEDGE_H
+#ifndef __CS_POLYEDGE_H__
+#define __CS_POLYEDGE_H__
 
 #include "csgeom/math2d.h"
 #include "csgeom/segment.h"
@@ -226,4 +226,4 @@ public:
   }
 };
 
-#endif /*POLYEDGE_H*/
+#endif // __CS_POLYEDGE_H__

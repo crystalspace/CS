@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MATRIX2_H
-#define MATRIX2_H
+#ifndef __CS_MATRIX2_H__
+#define __CS_MATRIX2_H__
 
 #include "csgeom/vector2.h"
 
@@ -125,5 +125,5 @@ public:
   friend csMatrix2 operator/ (const csMatrix2& m, float f);
 };
 
-#endif /*MATRIX2_H*/
+#endif // __CS_MATRIX2_H__
 

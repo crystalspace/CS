@@ -573,37 +573,37 @@ void Blocks::add_pillar_template ()
 
   p = add_polygon_template (thing_state, "d", pillar_mat, 3, 2, 1, 0);
   norm = p->GetWorldPlane ().Normal ();
-  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+  csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (0), thing_state->GetVertex (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (thing_state, "b", pillar_mat, 0, 1, 5, 4);
   norm = p->GetWorldPlane ().Normal ();
-  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+  csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (0), thing_state->GetVertex (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (thing_state, "t", pillar_mat, 4, 5, 6, 7);
   norm = p->GetWorldPlane ().Normal ();
-  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+  csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (4), thing_state->GetVertex (5), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (thing_state, "f", pillar_mat, 7, 6, 2, 3);
   norm = p->GetWorldPlane ().Normal ();
-  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+  csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (7), thing_state->GetVertex (6), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (thing_state, "l", pillar_mat, 4, 7, 3, 0);
   norm = p->GetWorldPlane ().Normal ();
-  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+  csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (7), thing_state->GetVertex (3), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (thing_state, "r", pillar_mat, 6, 5, 1, 2);
   norm = p->GetWorldPlane ().Normal ();
-  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+  csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (6), thing_state->GetVertex (5), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
@@ -628,7 +628,7 @@ void Blocks::add_vrast_template ()
 
   p = add_polygon_template (thing_state, "f", raster_mat, 0, 1, 3, 2);
   norm = p->GetWorldPlane ().Normal ();
-  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+  csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (0), thing_state->GetVertex (1), 1,
 	norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
@@ -667,7 +667,7 @@ void Blocks::add_hrast_template ()
 
   p = add_polygon_template (thing_state, "f", raster_mat, 0, 1, 3, 2);
   norm = p->GetWorldPlane ().Normal ();
-  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+  csTextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	thing_state->GetVertex (0), thing_state->GetVertex (1), 1,
 	norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);

@@ -19,8 +19,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __POLYCLIP_H__
-#define __POLYCLIP_H__
+#ifndef __CS_POLYCLIP_H__
+#define __CS_POLYCLIP_H__
 
 #include "csgeom/math2d.h"
 #include "csgeom/polypool.h"
@@ -172,4 +172,4 @@ public:
   { return ClipPoly; }
 };
 
-#endif // __POLYCLIP_H__
+#endif // __CS_POLYCLIP_H__
