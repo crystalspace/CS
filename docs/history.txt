@@ -44,6 +44,8 @@ chronological order.
 	  was reported from inside the 2D functions, causing the 2D stuff to
 	  be called again, where again something was reported and so on, 
 	  leading to an infinite recursion resp. stack overflow).
+	- res changed csShaderVariable::SetValue(csVector2) to set the 3rd
+	  component of the internally stored Vector4 to 0 instead of 1.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through

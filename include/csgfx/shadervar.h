@@ -261,7 +261,7 @@ public:
   bool SetValue (const csVector2 &value)
   {
     Type = VECTOR2;
-    VectorValue.Set (value.x, value.y, 1.0f, 1.0f);
+    VectorValue.Set (value.x, value.y, 0.0f, 1.0f);
     Int = (int)value.x;
     return true;
   }
