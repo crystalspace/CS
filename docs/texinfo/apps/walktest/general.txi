@@ -236,13 +236,17 @@ Add a floating transparent green ghost. The first argument is the depth. A
 depth of 1 will create a root and one layer above. The second argument is
 the width. This is the number of arms for the ghost.
 
+@item rain
+Add a particle system simulating rain. The parameter for this
+command is the texture to use for the particles. Experimental!
+
 @item explosion
 Add a particle system simulating an explosion. The parameter for this
 command is the texture to use for the particles.
 
 @item spiral
 Add a particle system simulating an spiral. The parameter for this
-command is the texture to use for the particles.
+command is the texture to use for the particles. Experimental!
 
 @item dumpvis
 This command takes the current view and dumps information for the rendering
