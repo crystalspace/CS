@@ -13,6 +13,12 @@ chronological order.
 	  library and factory names via csStrSet.  This resulted in
 	  GetPluginMetadata() sometimes failing to return a valid meta-data
 	  document.
+	- Marten fixed a few issues in NR software renderer:
+	    - Added triangulation of trianglestrips and fans
+	    - Added Blit() to texture handle. This is needed for most/all proc.
+	      textures.
+	    - Made sure DrawPolysMesh visits the materials before usage.
+	    - Added a fallback-technique to the reflection shader.
 22-Nov-2004
 	- Eric Sunshine added blurb to apimod100.txi regarding newly supported
 	  Java bindings.

@@ -277,6 +277,53 @@ void csSoftwareTextureHandle::PrepareInt ()
   FreeImage ();
 }
 
+void csSoftwareTextureHandle::Blit (int x, int y, int width, int height, unsigned char const* data)
+{
+  Setup332Palette ();
+
+  csSoftwareTexture *tex0 = (csSoftwareTexture *)tex[0];
+  uint8 *bitmap = tex0->bitmap;
+  uint8 *src = (uint8*)data;
+
+  int tex_w, tex_h;
+  tex_w = tex0->get_width ();
+  tex_h = tex0->get_height ();
+
+  int blit_w = x+width;
+  int blit_h = y+height;
+
+  if (blit_w > tex_w) blit_w = tex_w;
+  if (blit_h > tex_h) blit_h = tex_h;
+
+  if (x > tex_w) return;
+  if (y > tex_h) return;
+
+  int rx, ry;
+  for (ry = y; ry < blit_h; ry++)
+  {
+    uint8 *linestart = bitmap + (ry*tex_w + x);
+    for (rx = x; rx < blit_w; rx++)
+    {
+      
+      uint8 r,g,b,a;
+      r = *src++;
+      g = *src++;
+      b = *src++;
+      a = *src++;
+
+      //compute palette-index
+      uint8 palIndex;
+      palIndex = ((r) >> 5) << 5;
+      palIndex |= ((g) >> 5) << 2;
+      palIndex |= ((b) >> 6);
+
+      *linestart++ = palIndex;
+    }
+  }
+
+  UpdateTexture ();  
+}
+
 class csOFSCbSoftware : public iOffscreenCanvasCallback
 {
 private:

@@ -290,6 +290,9 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent)
 
   clipportal_dirty = true;
   clipportal_floating = 0;
+
+  scrapIndicesSize = 0;
+  scrapVerticesSize = 0;
 }
 
 csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
@@ -2379,7 +2382,7 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
     }
 texr_done:
     tcache->fill_texture (mipmap, tmapping, srlm, 
-      /*tex, */tex_mm, u_min, v_min, u_max, v_max);
+      /*tex, */tex_mm, u_min, v_min, u_max, v_max);   
   }
   csScan_InitDraw (mipmap, this, tmapping, srlm, tex_mm, txt_unl);
 
@@ -4443,6 +4446,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
     const csArray< csArray<csShaderVariable*> > &stacks)
 {
+
   /*
   iRenderBufferSource* source = mesh->buffersource;
 
@@ -4463,9 +4467,13 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
     string_texture_diffuse < (csStringID)stacks.Length ()
       && stacks[string_texture_diffuse].Length () > 0);
   csShaderVariable* texDiffuseSV = stacks[string_texture_diffuse].Top ();
+  iTextureWrapper* texw = 0;
+  texDiffuseSV->GetValue (texw);
+  texw->Visit ();
   iTextureHandle* texh = 0;
   texDiffuseSV->GetValue (texh);
   CS_ASSERT_MSG ("A material has no diffuse texture attached.", texh);
+  
 
   CS_ASSERT_MSG ("'tex lightmap' SV does not exist.",
     string_texture_lightmap < (csStringID)stacks.Length ()
@@ -4473,10 +4481,14 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
   csShaderVariable* texLightmapSV = stacks[string_texture_lightmap].Top ();
   iTextureHandle* lmh = 0;
   texLightmapSV->GetValue (lmh);
-  if (!lmh) return; // @@@ FIXME
+  //if (!lmh) return; // @@@ FIXME
   //CS_ASSERT(("Mesh did not supply lightmap", lmh));
-  csSoftSuperLightmap* slm = 
-    (csSoftSuperLightmap*)((csSoftwareTextureHandle*)lmh->GetCacheData());
+  csSoftSuperLightmap* slm = 0;
+  
+  if (lmh)
+  {
+    slm = (csSoftSuperLightmap*)((csSoftwareTextureHandle*)lmh->GetCacheData());
+  }
 
   /*uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_NORMAL);
 
@@ -4519,6 +4531,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
   poly.mixmode = modes.mixmode;
   z_buf_mode = modes.z_buf_mode;
 
+
   for (i = 0; i < polyRender->polys.Length (); i++)
   {
     const csReversibleTransform& object2camera = mesh->object2camera;
@@ -4540,14 +4553,15 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
     }
     if (cnt_vis == 0) continue;
 
-    const csPlane3 &wplane = spoly->plane_obj;
-    float cl = wplane.Classify (w2c.GetOrigin ());
-    if (cl > EPSILON) continue;
+    const csPlane3 &oplane = spoly->plane_obj;
+    float cl = oplane.Classify (object2camera.GetOrigin ());
+    //if (cl > EPSILON) continue;
+    if ((mesh->do_mirror && cl <= 0) || ((!mesh->do_mirror) && cl >= 0)) continue;
 
     /* @@@ Portal clipping here? */
 
     csPlane3 plane_cam;
-    w2c.Other2This (wplane, camVerts[0], plane_cam);
+    object2camera.Other2This (oplane, camVerts[0], plane_cam);
 
     /* do perspective */
     csPoly2D p2d;
@@ -4562,7 +4576,15 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
       poly.z_value = camVerts[0].z;
       poly.normal = plane_cam;
       poly.txt_handle = texh;
-      poly.rlm = slm->GetRlmForID (polyRender->rlmIDs[i]);
+      if (slm)
+      {
+        poly.rlm = slm->GetRlmForID (polyRender->rlmIDs[i]);
+      }
+      else
+      {
+        poly.rlm = 0;
+      }
+      
       //@@@@@ poly.mat_handle = spoly->material;
       // Adding the material handle to csPolygonRenderData is not
       // really an option but we need the material here. Perhaps use
@@ -4580,9 +4602,9 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
       {
         CS_ASSERT (false);	// @@@ Support flat-shading!
       }
-      //csReversibleTransform obj2tex (m_o2t, v_o2t);
+      csReversibleTransform obj2tex (m_o2t, v_o2t);
 
-      csReversibleTransform obj2world; // @@@ 
+      /*csReversibleTransform obj2world; // @@@ 
       obj2world = w2c / mesh->object2camera;
 
       csMatrix3 m_world2tex = m_o2t;
@@ -4593,12 +4615,18 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
       *poly.cam2tex.m_cam2tex *= w2c.GetT2O ();
 
       csVector3 v = w2c.Other2This (v_world2tex);
-      poly.cam2tex.v_cam2tex = &v;
+      poly.cam2tex.v_cam2tex = &v;*/
 
       //csReversibleTransform cam2tex (obj2tex / object2camera.GetInverse ());
 
       //poly.cam2tex.m_cam2tex = (csMatrix3*)&cam2tex.GetO2T ();
       //poly.cam2tex.v_cam2tex = (csVector3*)&cam2tex.GetOrigin ();
+      csMatrix3 m_cam2tex = obj2tex.GetO2T () * object2camera.GetT2O ();
+      csVector3 v_cam2tex = object2camera.Other2This (obj2tex.GetO2TTranslation ());
+      
+      poly.cam2tex.m_cam2tex = &m_cam2tex;
+      poly.cam2tex.v_cam2tex = &v_cam2tex;
+
       poly.texmap = spoly->tmapping;
 
       DrawPolygon (poly);
@@ -4694,6 +4722,72 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
       num_vertices = indices[i]+1;
   }
 
+  //see if we need triangulation of strips/fans
+  uint32 *workIndices = 0;
+  bool deleteIndices = false;
+
+  int indexstart = mesh->indexstart;
+  int indexend = mesh->indexend;
+
+  switch (mesh->meshtype)
+  {
+  case CS_MESHTYPE_TRIANGLESTRIP:
+    {
+      //triangulate
+      int numInd = mesh->indexend - mesh->indexstart;
+      if (mesh->indexend - mesh->indexstart == 0) return;
+
+      int numTri = 1+(numInd-3);
+      workIndices = new uint32 [numTri * 3];
+      deleteIndices = true;
+
+      int triIdx = 0, indIdx = mesh->indexstart;
+      int old2, old1;
+      old2 = indices[indIdx++];
+      old1 = indices[indIdx++];
+      
+      for(int i = 0; i < numTri; i++)
+      {
+        workIndices[triIdx++] = old2;
+        old2 = old1;
+        workIndices[triIdx++] = old1;
+        old1 = workIndices[triIdx++] = indices[indIdx++];   
+      }
+
+      indexstart = 0;
+      indexend = triIdx;
+      break;
+    }
+  case CS_MESHTYPE_TRIANGLEFAN:
+    {
+      int numInd = mesh->indexend - mesh->indexstart;
+      if (mesh->indexend - mesh->indexstart == 0) return;
+
+      int numTri = 1+(numInd-3);
+      workIndices = new uint32 [numTri * 3];
+      deleteIndices = true;
+
+
+      int triIdx = 0, indIdx = mesh->indexstart;;
+      int first, old1;
+      first = indices[indIdx++];
+      old1 = indices[indIdx++];
+
+      for(int i = 0; i < numTri; i++)
+      {
+        workIndices[triIdx++] = first;
+        workIndices[triIdx++] = old1;
+        old1 = workIndices[triIdx++] = indices[indIdx++];   
+      }
+      
+      indexstart = 0;
+      indexend = triIdx;
+      break;
+    }
+  default:
+    workIndices = indices;
+  }
+
   // Update work tables.
   if (num_vertices > (unsigned int)tr_verts->Capacity ())
   {
@@ -4764,8 +4858,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   poly.use_fog = false;
 
   // Draw all triangles.
-  csTriangle* triangles = (csTriangle*)indices;
-  for (i = mesh->indexstart/3 ; i < mesh->indexend/3 ; i++)
+  csTriangle* triangles = (csTriangle*)workIndices;
+  for (i = indexstart/3 ; i < indexend/3 ; i++)
   {
     int a = triangles[i].a;
     int b = triangles[i].b;
@@ -4968,6 +5062,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 	zv, uv, work_col ? col : 0, fog);
     }
   }
+
+  if(deleteIndices) delete[] workIndices;
 
   indexbuf->Release ();
   for (i=0; i<numBuffers; ++i)

@@ -206,6 +206,9 @@ public:
   virtual void SetTextureTarget(int target)
   {
   }
+
+  virtual void Blit (int x, int y, int width, int height,
+    unsigned char const* data);
 };
 
 class csSoftSuperLightmap;
