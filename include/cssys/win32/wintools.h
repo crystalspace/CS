@@ -85,6 +85,5 @@ public:
 extern char* cswinGetErrorMessage (HRESULT code);
 extern wchar_t* cswinGetErrorMessageW (HRESULT code);
 extern bool cswinIsWinNT ();
-extern UINT cswinGetConCP ();
 
 #endif

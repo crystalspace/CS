@@ -103,23 +103,23 @@ CS_IMPLEMENT_PLUGIN
 # define CS_WINDOW_Z_ORDER HWND_TOPMOST
 #endif
 
-static void SystemFatalError (char *str, HRESULT hRes = S_OK)
+static void SystemFatalError (wchar_t* str, HRESULT hRes = S_OK)
 {
-  char* lpMsgBuf;
-  char* szMsg;
-  char szStdMessage[] = "Last Error: ";
+  wchar_t* lpMsgBuf;
+  wchar_t* szMsg;
+  wchar_t szStdMessage[] = L"Last Error: ";
 
-  lpMsgBuf = cswinGetErrorMessage (hRes);
+  lpMsgBuf = cswinGetErrorMessageW (hRes);
 
-  szMsg = new char[strlen(lpMsgBuf) + strlen(str)
-    + strlen(szStdMessage) + 1];
-  strcpy( szMsg, str );
-  strcat( szMsg, szStdMessage );
-  strcat( szMsg, lpMsgBuf );
+  szMsg = new wchar_t[wcslen (lpMsgBuf) + wcslen (str)
+    + wcslen (szStdMessage) + 1];
+  wcscpy (szMsg, str);
+  wcscat (szMsg, szStdMessage);
+  wcscat (szMsg, lpMsgBuf);
 
   delete[] lpMsgBuf ;
 
-  MessageBoxW (0, csCtoW (szMsg), L"Fatal Error in glwin32.dll", 
+  MessageBoxW (0, szMsg, L"Fatal Error in glwin32.dll", 
     MB_OK | MB_ICONERROR);
 
   delete[] szMsg;
@@ -209,7 +209,7 @@ static void CreateIdentityPalette (csRGBpixel *p)
   hWndPalette = CreatePalette ((LOGPALETTE *)&Palette);
 
   if (!hWndPalette)
-    SystemFatalError ("Error creating identity palette.");
+    SystemFatalError (L"Error creating identity palette.");
 }
 
 csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
@@ -250,7 +250,7 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
 
   m_piWin32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
   if (!m_piWin32Assistant)
-    SystemFatalError ("csGraphics2DOpenGL::Open(QI) -- system passed does not support iWin32Assistant.");
+    SystemFatalError (L"csGraphics2DOpenGL::Open(QI) -- system passed does not support iWin32Assistant.");
 
   // Get the creation parameters
   m_hInstance = m_piWin32Assistant->GetInstance ();
@@ -315,13 +315,13 @@ void csGraphics2DOpenGL::CalcPixelFormat (int pixelFormat)
     pixelFormat = ChoosePixelFormat (hDC, &pfd);
 
     if (pixelFormat == 0)
-      SystemFatalError ("ChoosePixelFormat failed.");
+      SystemFatalError (L"ChoosePixelFormat failed.");
   }
   if (SetPixelFormat (hDC, pixelFormat, &pfd) != TRUE)
-    SystemFatalError ("SetPixelFormat failed.");
+    SystemFatalError (L"SetPixelFormat failed.");
 
   if (DescribePixelFormat (hDC, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
-    SystemFatalError ("DescribePixelFormat failed.");
+    SystemFatalError (L"DescribePixelFormat failed.");
 
   Depth = pfd.cColorBits; 
   // @@@ ColorBits are ignored. Will cause corruption
@@ -418,7 +418,7 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
       PIXELFORMATDESCRIPTOR pfd;
       if (DescribePixelFormat (dwi->this_->hDC, pixelFormat, 
 	sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
-	SystemFatalError ("DescribePixelFormat failed.");
+	SystemFatalError (L"DescribePixelFormat failed.");
 
       dwi->this_->hGLRC = wglCreateContext (dwi->this_->hDC);
       wglMakeCurrent (dwi->this_->hDC, dwi->this_->hGLRC);
@@ -532,7 +532,7 @@ bool csGraphics2DOpenGL::Open ()
   }
 
   if (!m_hWnd)
-    SystemFatalError ("Cannot create Crystal Space window", GetLastError());
+    SystemFatalError (L"Cannot create Crystal Space window", GetLastError());
 
   SetTitle (win_title);
   
@@ -845,7 +845,7 @@ void csGraphics2DOpenGL::Activate (bool activated)
     m_bActivated = activated;
     if (m_bActivated)
     {
-      SwitchDisplayMode (true);
+      SwitchDisplayMode (false);
       ShowWindow (m_hWnd, SW_SHOWNORMAL);
       SetWindowPos (m_hWnd, CS_WINDOW_Z_ORDER, 0, 0, Width, Height, 0);
     }
@@ -854,7 +854,7 @@ void csGraphics2DOpenGL::Activate (bool activated)
       ShowWindow (m_hWnd, SW_SHOWMINIMIZED);
       SetWindowPos (m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE |
         SWP_NOSIZE | SWP_NOACTIVATE);
-      SwitchDisplayMode (false);
+      SwitchDisplayMode (true);
     }
   }
 }
@@ -883,6 +883,15 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
     EnumDisplaySettings (0, ENUM_CURRENT_SETTINGS, &curdmode);
     memcpy (&dmode, &curdmode, sizeof (DEVMODE));
 
+    // check if we already are in the desired display mode
+    if (((int)curdmode.dmBitsPerPel == Depth) &&
+      ((int)curdmode.dmPelsWidth == Width) &&
+      ((int)curdmode.dmPelsHeight == Height) &&
+      (!m_nDisplayFrequency || (dmode.dmDisplayFrequency == m_nDisplayFrequency)))
+    {
+      // no action necessary
+      return;
+    }
     dmode.dmBitsPerPel = Depth;
     dmode.dmPelsWidth = Width;
     dmode.dmPelsHeight = Height;
@@ -899,6 +908,7 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
         ((int)curdmode.dmPelsWidth == Width) &&
         ((int)curdmode.dmPelsHeight == Height))
       {
+	refreshRate = curdmode.dmDisplayFrequency;
         // no action necessary
         return;
       }

@@ -187,6 +187,18 @@ public:
      && Elements.Length () < MaxSize) Grow ();
   }
 
+  /// Returns whether at least one element matches the given key.
+  bool In (const K& key) const
+  {
+    const csArray<Element> &values = 
+      Elements[KeyHandler::ComputeHash (key) % Modulo];
+    for (int i = values.Length () - 1; i >= 0; i--)
+      if (KeyHandler::CompareKeys (values[i].key, key)) 
+	return true;
+
+    return false;
+  }
+
   /// Get the first element matching the given key, or 0 if there is none.
   const T& Get (const K& key) const
   {
@@ -463,13 +475,7 @@ public:
    */
   bool In (const T& object)
   {
-    typename csHash<T, T, KeyHandler>::Iterator it = map.GetIterator (object);
-    while (it.HasNext ())
-    {
-      const T& o = it.Next ();
-      if (o == object) return true;
-    }
-    return false;
+    return map.In (object);
   }
 
   /**

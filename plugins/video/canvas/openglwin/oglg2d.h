@@ -20,7 +20,6 @@
 #define __CS_OGLG2D_H__
 
 #include <GL/gl.h>
-#include "wglext.h"
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "video/canvas/openglcommon/glcommon2d.h"

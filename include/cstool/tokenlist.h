@@ -17,9 +17,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSTOOL_TOKENLIST_H__
-#define __CS_CSTOOL_TOKENLIST_H__
-
 /**\file
  * Token list helper macros.
  */
@@ -34,6 +31,11 @@
  * useful for e.g. parsers. The list of tokens have to be declared in an
  * external file, surrounded by '#CS_TOKEN_LIST_TOKEN()'. The name of the
  * file (full path!) has to be put in a macro named CS_TOKEN_ITEM_FILE.
+ * Optionally, the name of the function to init the token table can be set via
+ * CS_INIT_TOKEN_TABLE_NAME, default is 'init_token_table'. Note that the 
+ * user defines CS_TOKEN_ITEM_FILE and CS_INIT_TOKEN_TABLE_NAME won't be
+ * undefined by this file; hence, if you want to build multiple token lists,
+ * you have to redefine those macros and include tokenlist.h again.
  *
  * Example (from a real-world use):
  * fire.tok:
@@ -93,15 +95,24 @@ enum {
 #define CS_TOKEN_LIST_TOKEN(X) s = #X; s.Downcase(); \
   t.Register(s, XMLTOKEN_ ## X);
 
-static void init_token_table(csStringHash& t)
+#ifndef CS_INIT_TOKEN_TABLE_NAME
+#define CS_INIT_TOKEN_TABLE_NAME_DEFAULT
+#define CS_INIT_TOKEN_TABLE_NAME	init_token_table
+#endif
+  
+static void CS_INIT_TOKEN_TABLE_NAME(csStringHash& t)
 {
   csString s;
 #include CS_TOKEN_ITEM_FILE
 }
 #undef CS_TOKEN_LIST_TOKEN
 
-/** @} */
-
-/** @} */
-
+#ifdef CS_INIT_TOKEN_TABLE_NAME_DEFAULT
+#undef CS_INIT_TOKEN_TABLE_NAME
+#undef CS_INIT_TOKEN_TABLE_NAME_DEFAULT
 #endif
+
+/** @} */
+
+/** @} */
+

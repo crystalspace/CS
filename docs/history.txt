@@ -17,6 +17,15 @@ chronological order.
 	  rather than 0.035 since `odedynam' now requires 0.039.
 	- Eric Sunshine fixed compilation problem: csRGBVector::CompareKey()
 	  was using static_cast<> where reinterpret_cast<> was required.
+	- res made the following changes:
+	    - Added an In() method to csHash<>.
+	    - Changed cstool/tokenlist.h so the name of the token table init
+	      function can be user-defined.
+	    - Removed unused glwin32 wglext.h.
+	    - Changed glwin32 plugin to use less UTF8/WCHAR conversions.
+	    - Fixed mode switching when exiting/terminating app on glwin32.
+	    - Removed a prototype for a non-existing function from 
+	      win32/wintools.h.
 29-Sep-2003
 	- Jorrit moved ParseTextureMapping() and ParsePoly3d() from syntax
 	  services to thing loader. It doesn't make much sense to make those
