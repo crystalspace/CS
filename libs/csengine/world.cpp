@@ -128,8 +128,6 @@ csPolygon3D* csPolyIt::Fetch ()
 
 //---------------------------------------------------------------------------
 
-float csWorld::shift_x;
-float csWorld::shift_y;
 int csWorld::frame_width;
 int csWorld::frame_height;
 ISystem* csWorld::isys = NULL;
@@ -262,8 +260,6 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csV
 {
   g3d->GetWidth (frame_width);
   g3d->GetHeight (frame_height);
-  shift_x = (float)(frame_width/2);
-  shift_y = (float)(frame_height/2);
   isys = sys;
   current_world = this;
   VFS = vfs;
@@ -271,8 +267,8 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csV
   CHK (textures = new csTextureList ());
   ReadConfig (config);
 
-  if (csCamera::aspect == 0) csCamera::aspect = frame_height;
-  csCamera::inv_aspect = 1./csCamera::aspect;
+  if (csCamera::default_aspect == 0) csCamera::default_aspect = frame_height;
+  csCamera::default_inv_aspect = 1./csCamera::default_aspect;
 
   StartWorld ();
 
@@ -547,6 +543,8 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
   Stats::polygons_rejected = 0;
   Stats::polygons_accepted = 0;
 
+  current_camera = c;
+
   IGraphics2D* g2d;
   g3d->Get2dDriver (&g2d);
   csRenderView rview (*c, view, g3d, g2d);
@@ -627,9 +625,9 @@ supports_halos = false;
       
       if (pinfo->v.z > SMALL_Z)
       {
-        float iz = csCamera::aspect/pinfo->v.z;
-        pinfo->v.x = pinfo->v.x * iz + shift_x;
-        pinfo->v.y = frame_height - 1 - (pinfo->v.y * iz + shift_y);
+        float iz = rview.aspect/pinfo->v.z;
+        pinfo->v.x = pinfo->v.x * iz + rview.shift_x;
+        pinfo->v.y = frame_height - 1 - (pinfo->v.y * iz + rview.shift_y);
         
         pinfo->intensity = pinfo->pLight->GetHaloIntensity ();
 

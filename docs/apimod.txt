@@ -23,6 +23,14 @@ to 0.15 if you want to do that.
 
 -*- New csSector::RemoveThing().
 
+-*- csCamera::SetFOV() & GetFOV() now apply to a single instance of csCamera,
+    rather than globally to all cameras.  New SetDefaultFOV() and
+    GetDefaultFOV() refer to the default FOV value which is inherited by new
+    camera instances.
+
+-*- Class variables shift_x & shift_y from csWorld became instance variables
+    in csCamera.  Use csCamera::SetPerspectiveCenter() to set them.
+
 ==== VFS ====
 
 -*- Added the Virtual File System class. Every file operation is going to

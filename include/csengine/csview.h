@@ -78,6 +78,11 @@ public:
 
   /// Return the clipper.
   csClipper* GetClipper () { return clipper; }
+
+  /**
+   * Change the shift for perspective correction.
+   */
+  void SetPerspectiveCenter (float x, float y);
 };
 
 #endif //  CSVIEW_H

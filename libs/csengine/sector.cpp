@@ -756,9 +756,9 @@ void csSector::Draw (csRenderView& rview)
       if (cshaloinfo->v.z > SMALL_Z)
       {
         float iz = rview.aspect/cshaloinfo->v.z;
-        cshaloinfo->v.x = cshaloinfo->v.x * iz + csWorld::shift_x;
+        cshaloinfo->v.x = cshaloinfo->v.x * iz + rview.shift_x;
         cshaloinfo->v.y = csWorld::frame_height - 1 -
-		(cshaloinfo->v.y * iz + csWorld::shift_y);
+		(cshaloinfo->v.y * iz + rview.shift_y);
 
         cshaloinfo->pLight = light;
         
@@ -818,7 +818,7 @@ void csSector::Draw (csRenderView& rview)
         g3dpoly.normal.B = -rview.clip_plane.B ();
         g3dpoly.normal.C = -rview.clip_plane.C ();
         g3dpoly.normal.D = -rview.clip_plane.D ();
-        g3dpoly.inv_aspect = csCamera::inv_aspect;
+        g3dpoly.inv_aspect = rview.inv_aspect;
         rview.g3d->AddFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
       }
     }

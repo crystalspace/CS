@@ -62,9 +62,9 @@ bool csWfObject::Perspective (csCamera* c, csVector3& v, csVector2& persp, float
   csVector3 cam = c->Other2This (v);
   if (cam.z > SMALL_Z)
   {
-    float iz = csCamera::aspect/cam.z;
-    persp.x = cam.x * iz + csWorld::shift_x;
-    persp.y = csWorld::frame_height - 1 - (cam.y * iz + csWorld::shift_y);
+    float iz = c->aspect/cam.z;
+    persp.x = cam.x * iz + c->shift_x;
+    persp.y = csWorld::frame_height - 1 - (cam.y * iz + c->shift_y);
     pradius = radius * iz;
     return true;
   }
@@ -101,7 +101,7 @@ void csWfLine::Draw (IGraphics3D* g, csCamera* c)
 {
   csVector3 cam1 = c->Other2This (v1);
   csVector3 cam2 = c->Other2This (v2);
-  g->DrawLine (cam1, cam2, csCamera::aspect, color->GetColor ((cam1.z+cam2.z)/2));
+  g->DrawLine (cam1, cam2, c->aspect, color->GetColor ((cam1.z+cam2.z)/2));
 }
 
 csWfPolygon::csWfPolygon ()
@@ -197,8 +197,8 @@ void csWfPolygon::Draw (IGraphics3D* g, csCamera* c)
   {
     cam1 = c->Other2This (vertices[i]);
     cam2 = c->Other2This (vertices[(i+1)%num_vertices]);
-    g->DrawLine (cam1, cam2, csCamera::aspect, col);
-    if (vis) g->DrawLine (cam1, cen, csCamera::aspect, vcol);
+    g->DrawLine (cam1, cam2, c->aspect, col);
+    if (vis) g->DrawLine (cam1, cen, c->aspect, vcol);
   }
 }
 

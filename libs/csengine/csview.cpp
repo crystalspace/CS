@@ -77,3 +77,4 @@ void csView::SetSector (csSector *sector)
   camera->SetSector (sector);
 }
 
+void csView::SetPerspectiveCenter (float x, float y) {camera->SetPerspectiveCenter(x,y);}

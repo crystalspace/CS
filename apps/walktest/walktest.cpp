@@ -148,9 +148,9 @@ void show_frustrum (csLightView* lview, int type, void* /*entity*/)
       v1 = cam->Other2This (v0);
       v0 = fr->GetVertices ()[(j+1)%fr->GetNumVertices ()] + fr->GetOrigin ();
       v2 = cam->Other2This (v0);
-      Gfx3D->DrawLine (light_cam, v1, csCamera::aspect, red);
-      Gfx3D->DrawLine (light_cam, v2, csCamera::aspect, red);
-      Gfx3D->DrawLine (v1, v2, csCamera::aspect, white);
+      Gfx3D->DrawLine (light_cam, v1, cam->aspect, red);
+      Gfx3D->DrawLine (light_cam, v2, cam->aspect, red);
+      Gfx3D->DrawLine (v1, v2, cam->aspect, white);
     }
   }
 }
@@ -213,8 +213,8 @@ void select_object (csRenderView* rview, int type, void* entity)
       if (v.z > SMALL_Z)
       {
         iz = rview->aspect/v.z;
-        px = QInt (v.x * iz + csWorld::shift_x);
-        py = csWorld::frame_height - 1 - QInt (v.y * iz + csWorld::shift_y);
+        px = QInt (v.x * iz + rview->shift_x);
+        py = csWorld::frame_height - 1 - QInt (v.y * iz + rview->shift_y);
         r = QInt (.3 * iz);
         if (ABS (coord_check_vector.x - px) < 5 && ABS (coord_check_vector.y - (csWorld::frame_height-1-py)) < 5)
         {
@@ -297,8 +297,8 @@ void draw_edges (csRenderView* rview, int type, void* entity)
         if (v.z > SMALL_Z)
         {
           iz = rview->aspect/v.z;
-          px = QInt (v.x * iz + csWorld::shift_x);
-          py = csWorld::frame_height - 1 - QInt (v.y * iz + csWorld::shift_y);
+          px = QInt (v.x * iz + rview->shift_x);
+          py = csWorld::frame_height - 1 - QInt (v.y * iz + rview->shift_y);
           r = QInt (.3 * iz);
           rview->g2d->DrawLine (px-r, py-r, px+r, py+r, selcol);
           rview->g2d->DrawLine (px+r, py-r, px-r, py+r, selcol);

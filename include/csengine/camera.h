@@ -58,13 +58,20 @@ private:
 
 public:
   ///
-  static int aspect;
+  int aspect;
+  static int default_aspect;
   ///
-  static float inv_aspect;
+  float inv_aspect;
+  static float default_inv_aspect;
+  ///
+  float shift_x;
+  float shift_y;
 
 public:
   ///
   csCamera ();
+  /// copy constructor
+  csCamera (csCamera* c);
   ///
   virtual ~csCamera ();
 
@@ -88,15 +95,20 @@ public:
    */
   csPolygon3D* GetHit (csVector3& v);
 
-  /**
-   * Set the FOV to use for this camera.
-   */
-  static void SetFOV (int fov) { aspect = fov; inv_aspect = 1.0f / aspect; }
+  /// Set the default FOV for new cameras.
+  static void SetDefaultFOV (int fov)
+  {
+    default_aspect = fov;
+    default_inv_aspect = 1.0f / default_aspect;
+  }
 
-  /**
-   * Get the FOV for this camera.
-   */
-  static int GetFOV () { return aspect; }
+  /// Get the default FOV for new cameras.
+  static int GetDefaultFOV () { return default_aspect; }
+
+  /// Set the FOV for this camera.
+  void SetFOV (int a) { aspect = a; inv_aspect = 1.0f / a; }
+  /// Get the FOV for this camera
+  int GetFOV () const { return aspect; }
 
   /**
    * Set the sector that the camera resides in.
@@ -245,6 +257,9 @@ public:
    * grid of density n
    */
   void Correct (int n);
+
+  /// Change the shift for perspective correction.
+  void SetPerspectiveCenter (float x, float y) { shift_x = x; shift_y = y; }
 
 private:
   ///

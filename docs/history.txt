@@ -13,22 +13,34 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+20-Sep-1999
+	- Eric Sunshine fixed an accidental sign-extension problem in
+	  csPixelFormat.
+	- Seth Galbraith provided a new version (v14) of Squawk.
+	- Seth also changed csCamera so that each instance maintains its own
+	  field-of-view.  He also moved class variables shift_x and shift_y
+	  from csWorld into csCamera as instance variables.  Eric Sunshine,
+	  who committed these changes to CVS on Seth's behalf, fixed two or
+	  three bugs which had crept in, and also renamed a couple methods for
+	  clarity and consistency.
 19-Sep-1999
 	- Moved LIGHTMAP_SIZE config value from softrdnr.cfg to cryst.cfg
-	  where it belongs. It now works again.
-	- Scaling of lightmaps works very well! You can now optionally request
-	  that lightmaps are calculated in a higher resolution and then finally
-	  scaled down to normal resolution. The result is much better quality
-	  lightmaps. Note that the current scaling works by averaging. We have
-	  have to see if a box filter will be better or not.
-	  The new high quality lightmap renderer is enabled with
-	  LIGHTMAP_HIGHQUAL=yes in cryst.cfg. This new optoin is also available
-	  from within the cryst.cfg that lives in the level directory.
-	- Fixed handling of commandline 'driver' option so that it works again.
+	  where it belongs.  It now works again.
+	- Scaling of lightmaps works very well!  You can now optionally
+	  request that lightmaps are calculated in a higher resolution and
+	  then finally scaled down to normal resolution.  The result is much
+	  better quality lightmaps.  Note that the current scaling works by
+	  averaging.  We have have to see if a box filter will be better or
+	  not.  The new high quality lightmap renderer is enabled with
+	  LIGHTMAP_HIGHQUAL=yes in cryst.cfg.  This new optoin is also
+	  available from within the cryst.cfg that lives in the level
+	  directory.
+	- Fixed handling of commandline 'driver' option so that it works
+	  again.
 	- Added csPolyIt iterator which can be used to iterate over all
-	  polygons of the world. I made this to avoid having to add routines
-	  to csThing and csSector which are only used to be able to handle
-	  all polygons in a level (like InitLightmaps() ...).
+	  polygons of the world.  I made this to avoid having to add routines
+	  to csThing and csSector which are only used to be able to handle all
+	  polygons in a level (like InitLightmaps() ...).
 18-Sep-1999
 	- Started work on calculating lightmaps in high resolution and then
 	  downsampling them later.
@@ -45,7 +57,8 @@ Short-term cleanups that need to be done:
 	- Fixed a bug with loading of sprite position from world file.
 	  This bug was recently introduced with VFS changes.
 	- Tristan McLure provided a new DX6.1 renderer.
-	- Jonathan Hudson provided a fix for the upside-down BMP bug.
+	- Jonathan Hudson <jhudso1@gl.umbc.edu> provided a fix for the
+	  upside-down BMP bug.
 	- Eric Sunshine fixed some bugs in DECLARE_TYPED_VECTOR from
 	  csvector.h which would cause the Insert(), FreeItem(), and Equal()
 	  methods to loop infinitely.

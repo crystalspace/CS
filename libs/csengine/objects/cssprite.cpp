@@ -642,11 +642,11 @@ float csSprite3D::GetScreenBoundingBox (csCamera *camera, csBox &boundingBox)
     return -1;
 
   // Transform from camera to screen space.
-  oneCorner.x = cameraPointMin.x / cameraPointMin.z * csCamera::aspect + csWorld::shift_x;
-  oneCorner.y = cameraPointMin.y / cameraPointMin.z * csCamera::aspect + csWorld::shift_y;
+  oneCorner.x = cameraPointMin.x / cameraPointMin.z * camera->aspect + camera->shift_x;
+  oneCorner.y = cameraPointMin.y / cameraPointMin.z * camera->aspect + camera->shift_y;
   boundingBox.StartBoundingBox(oneCorner);
-  oneCorner.x = cameraPointMax.x / cameraPointMax.z * csCamera::aspect + csWorld::shift_x;
-  oneCorner.y = cameraPointMax.y / cameraPointMax.z * csCamera::aspect + csWorld::shift_y;
+  oneCorner.x = cameraPointMax.x / cameraPointMax.z * camera->aspect + camera->shift_x;
+  oneCorner.y = cameraPointMax.y / cameraPointMax.z * camera->aspect + camera->shift_y;
   boundingBox.AddBoundingVertexSmart(oneCorner);
 
   return cameraPointMin.z;
@@ -733,9 +733,9 @@ void csSprite3D::Draw (csRenderView& rview)
     uv_verts[i] = uv;
     if (v.z >= SMALL_Z)
     {
-      float iz = csCamera::aspect/v.z;
-      persp[i].x = v.x * iz + csWorld::shift_x;
-      persp[i].y = v.y * iz + csWorld::shift_y;
+      float iz = rview.aspect/v.z;
+      persp[i].x = v.x * iz + rview.shift_x;
+      persp[i].y = v.y * iz + rview.shift_y;
       visible[i] = true;
     }
     else
@@ -745,7 +745,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // Clipped polygon (assume it cannot have more than 64 vertices)
   G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
-  poly.inv_aspect = csCamera::inv_aspect;
+  poly.inv_aspect = rview.inv_aspect;
 
   if (force_otherskin)
     poly.txt_handle = cstxt->GetTextureHandle ();
@@ -950,7 +950,7 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 
   defered_num_lights = 0;
 
-  csFrame* this_frame = cur_action->GetFrame (cur_frame);
+  csFrame* this_frame = tpl->GetFrame (cur_frame);
   csVector3* object_vertices = GetObjectVerts (this_frame);
 
   if (!this_frame->HasNormals ())
@@ -965,38 +965,27 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   {
     csColor &light_color = lights [i]->GetColor ();
     float light_radius = lights [i]->GetRadius ();
-    float sq_light_radius = lights [i]->GetSquaredRadius ();
     float inv_light_radius = (256. / NORMAL_LIGHT_LEVEL) / light_radius;
     float r2 = light_color.red   * inv_light_radius;
     float g2 = light_color.green * inv_light_radius;
     float b2 = light_color.blue  * inv_light_radius;
 
     // Compute light position in object coordinates
-    csVector3 wor_light_pos = lights [i]->GetCenter ();
-    csVector3 obj_light_pos = m_world2obj * (wor_light_pos + v_obj2world);
+    csVector3 light_pos = m_world2obj * (lights [i]->GetCenter () + v_obj2world);
 
     for (j = 0 ; j < tpl->GetNumVertices () ; j++)
     {
-      csVector3& obj_vertex = object_vertices[j];
-      csVector3 wor_vertex = m_obj2world * obj_vertex - v_obj2world;
-
-      // @@@ We have the distance in object space. Can't we use
-      // that to calculate the distance in world space as well?
-      // These calculations aren't optimal. I have the feeling they
-      // can be optimized somewhat.
-      float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_vertex);
-      float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_vertex);
-
+      csVector3& vertex = object_vertices[j];
+      csVector3 light_vec = light_pos - vertex;
+      float dist = sqrt (csSquaredDist::PointPoint (light_pos, vertex));
       float cosinus;
-      if (obj_sq_dist < SMALL_EPSILON)
+      if (fabs (dist) < SMALL_EPSILON)
         cosinus = 1;
       else
-        cosinus = (obj_light_pos - obj_vertex) * this_frame->GetNormal (j);
+        cosinus = (light_vec * this_frame->GetNormal (j)) / dist;
 
-      if ((cosinus > 0) && (wor_sq_dist < sq_light_radius))
+      if ((cosinus > 0) && (dist < light_radius))
       {
-        if (obj_sq_dist >= SMALL_EPSILON)
-	  cosinus /= sqrt (obj_sq_dist);
         csColor color;
         if (cosinus >= 1)
           color.Set (
@@ -1005,7 +994,6 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
             light_color.blue  * (256. / NORMAL_LIGHT_LEVEL));
         else
         {
-          float dist = sqrt (wor_sq_dist);
           color.red   = cosinus * r2 * (light_radius - dist);
           color.green = cosinus * g2 * (light_radius - dist);
           color.blue  = cosinus * b2 * (light_radius - dist);

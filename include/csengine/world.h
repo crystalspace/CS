@@ -188,8 +188,6 @@ public:
    */
   csObjVector sprites;
 
-  // Shift for perspective correction (corresponds to half of frame size).
-  static float shift_x, shift_y;
   // Remember dimensions of display.
   static int frame_width, frame_height;
   // Remember ISystem interface.
@@ -239,6 +237,11 @@ public:
    * this field will be equal to the 0-vector (i.e. (0,0,0)).
    */
   csVector3 start_vec;
+
+  /**
+   * The current camera for drawing the world.
+   */
+  csCamera * current_camera;
 
 public:
   /**

@@ -49,7 +49,7 @@ bool csEngineConfig::SetOption (int id, csVariant* value)
 {
   switch (id)
   {
-    case 0: csCamera::SetFOV (value->v.lVal); break;
+    case 0: csCamera::SetDefaultFOV (value->v.lVal); break;
     case 1: csSector::do_radiosity = value->v.bVal; break;
     case 2: csPolyTexture::do_accurate_things = value->v.bVal; break;
     case 3: csPolyTexture::cfg_cosinus_factor = value->v.fVal; break;
@@ -66,7 +66,7 @@ bool csEngineConfig::GetOption (int id, csVariant* value)
   value->type = config_options[id].type;
   switch (id)
   {
-    case 0: value->v.lVal = csCamera::GetFOV (); break;
+    case 0: value->v.lVal = csCamera::GetDefaultFOV (); break;
     case 1: value->v.bVal = csSector::do_radiosity; break;
     case 2: value->v.bVal = csPolyTexture::do_accurate_things; break;
     case 3: value->v.fVal = csPolyTexture::cfg_cosinus_factor; break;

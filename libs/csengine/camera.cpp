@@ -33,14 +33,29 @@ BEGIN_INTERFACE_TABLE( csCamera )
 	IMPLEMENTS_COMPOSITE_INTERFACE( Camera )
 END_INTERFACE_TABLE()
 
-int csCamera::aspect = 0;
-float csCamera::inv_aspect = 0;
+int csCamera::default_aspect = 0;
+float csCamera::default_inv_aspect = 0;
 
 csCamera::csCamera () : csOrthoTransform()
 {
   mirror = false;
   sector = NULL;
+  aspect = default_aspect;
+  inv_aspect = default_inv_aspect;
+  shift_x = csWorld::frame_width / 2;
+  shift_y = csWorld::frame_height / 2;
 }
+
+csCamera::csCamera (csCamera* c) : csOrthoTransform((csOrthoTransform &)c)
+{
+  mirror = c->mirror;
+  sector = c->sector;
+  aspect = c->aspect;
+  inv_aspect = c->inv_aspect;
+  shift_x = c->shift_x;
+  shift_y = c->shift_y;
+}
+
 
 csCamera::~csCamera () {}
 
