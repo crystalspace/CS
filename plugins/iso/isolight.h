@@ -37,7 +37,7 @@ private:
   /// radius of the light, 1./radius
   float radius, inv_radius;
   /// visibility map
-  uint8 *vismap;
+  float *vismap;
   /// visibility map size
   int visw, vish;
   /// force recalc of vismap
@@ -56,9 +56,9 @@ public:
   /// precalc the visible and shadowed portions of the grid.
   void CalcVis();
   /// set visibility value 
-  void SetVis(int x, int y, bool val);
+  void SetVis(int x, int y, float val);
   /// get visibility value 
-  bool GetVis(int x, int y) const;
+  float GetVis(int x, int y) const;
   /// get the maximum radius when this light still has effect
   float MaxRadius() const;
 

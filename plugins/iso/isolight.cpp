@@ -50,7 +50,8 @@ void csIsoLight::SetGrid(iIsoGrid *grid)
   delete[] vismap;
   visw = grid->GetWidth() * grid->GetGroundMultX();
   vish = grid->GetHeight() * grid->GetGroundMultY();
-  vismap = new uint8 [ (visw * vish + 7) / 8 ];
+  //vismap = new uint8 [ (visw * vish + 7) / 8 ];
+  vismap = new float [ visw * vish ];
   recalc_vis = true;
 }
 
@@ -100,8 +101,10 @@ void csIsoLight::CalcVis()
   recalc_vis = false;
   
   // set all to invisible
-  int size = (visw*vish+7)/8;
-  memset(vismap, 0, size*sizeof(uint8));
+  //int size = (visw*vish+7)/8;
+  //memset(vismap, 0, size*sizeof(uint8));
+  int i = visw*vish-1;
+  while(i--) vismap[i] = 0.0;
   int mingridx, mingridy;
   grid->GetGridOffset(mingridx, mingridy);
   int multx = grid->GetGroundMultX();
@@ -126,45 +129,54 @@ void csIsoLight::CalcVis()
   csVector3 pos;
   float zinc = 1./float(multx);
   float xinc = 1./float(multy);
+  float res = 0;
   for(int y = ymin; y<=ymax; y++)
   {
     // set pos to the start of the x line
     // set it to the center of that square
     pos.Set(
-      float(y+mingridy*multy)/float(multy) + xinc*0.5,
+      float(y+mingridy*multy)/float(multy),
       0.,
-      float(xmin+mingridx*multx)/float(multx) + zinc*0.5 
+      float(xmin+mingridx*multx)/float(multx) 
     );
     for(int x = xmin; x<=xmax; x++)
     {
       // set posy to groundy
       pos.y = grid->GetGroundValue(x,y);
-      // check if line from my position to groudn cell pos is possible
-      if(grid->GroundHitBeam(position, pos))
-        SetVis(x,y,1);
+      // check if line from my position to ground cell pos is possible
+      res = 0.0;
+      if(grid->GroundHitBeam(position, pos+csVector3(xinc*0.5,0,zinc*0.5))) 
+        res += 0.2; // test center, then 4 corners
+      if(grid->GroundHitBeam(position, pos)) res += 0.2;
+      if(grid->GroundHitBeam(position, pos+csVector3(0,0,zinc))) res += 0.2;
+      if(grid->GroundHitBeam(position, pos+csVector3(xinc,0,0))) res += 0.2;
+      if(grid->GroundHitBeam(position, pos+csVector3(xinc,0,zinc))) res += 0.2;
+      SetVis(x,y,res);
       pos.z += zinc;
     }
   }
 }
 
 
-static uint8 bitmasks[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
+//static uint8 bitmasks[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
-void csIsoLight::SetVis(int x, int y, bool val)
+void csIsoLight::SetVis(int x, int y, float val)
 {
-  int pos = y*visw+x;
-  if(val) vismap[pos>>3] |= bitmasks[pos&0x7];
-  else vismap[pos>>3] &= ~bitmasks[pos&0x7];
+  //int pos = y*visw+x;
+  //if(val) vismap[pos>>3] |= bitmasks[pos&0x7];
+  //else vismap[pos>>3] &= ~bitmasks[pos&0x7];
+  vismap[ y*visw+x ] = val;
 }
 
-bool csIsoLight::GetVis(int x, int y) const
+float csIsoLight::GetVis(int x, int y) const
 {
   if(x<0) x=0;
   else if(x>=visw) x=visw-1;
   if(y<0) y=0;
   else if(y>=vish) y=vish-1;
-  int pos = y*visw+x;
-  return vismap[pos>>3] & bitmasks[pos&0x7];
+  //int pos = y*visw+x;
+  //return vismap[pos>>3] & bitmasks[pos&0x7];
+  return vismap[ y*visw+x ];
 }
 
 static void lightfunc(iIsoSprite *sprite, void *data)
@@ -219,10 +231,11 @@ void csIsoLight::ShineSprite(iIsoSprite *sprite)
     csVector3 vpos = sprite->GetVertexPosition(i);
     int x = QInt(vpos.z * float(multx)) + sprx;
     int y = QInt(vpos.x * float(multy)) + spry;
-    if(!GetVis(x,y)) continue;
+    float vis = GetVis(x,y);
+    if(vis==0.0) continue;
     csVector3 path = vpos - relpos;
     float dist = path.Norm();
-    float light = GetAttenuation(dist);
+    float light = vis*GetAttenuation(dist);
     /// no normal vectors taken into account atm.
     // light *= path.Unit()*normal;
     sprite->AddToVertexColor(i, color*light);
