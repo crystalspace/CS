@@ -108,6 +108,17 @@ wchar_t* csStrNewW (const char *s)
   }
 }
 
+// These functions are not inline in <csutil/util.h> because the underlying
+// str{n}casecmp() is not compatible with gcc's "-ansi -pedantic".
+int csStrCaseCmp(char const* s1, char const* s2)
+{
+  return strcasecmp(s1, s2);
+}
+int csStrNCaseCmp(char const* s1, char const* s2, size_t n)
+{
+  return strncasecmp(s1, s2, n);
+}
+
 #if defined (CS_PLATFORM_DOS)
   #define IS_PATH_SEPARATOR(c)	\
     (((c) == CS_PATH_SEPARATOR) || ((c) == '/') || ((c) == ':'))

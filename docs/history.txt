@@ -56,6 +56,15 @@ chronological order.
 	  clarified discussion recently added to apimod100.txi.
 	- Eric Sunshine added a Jamfile to the new CS/scripts/max/gmeshskelanim
 	  directory to ensure that this converter script gets installed.
+	- Eric Sunshine added csStrCaseCmp() and csStrNCaseCmp() to
+	  <csutil/util.h>. These are portable versions of strcasecmp(),
+	  stricmp(), strncasecmp(), and strnicmp(). They may be useful to
+	  projects which employ gcc's -ansi and -pedantic switches.
+	- Eric Sunshine further sanitized <csutil/csstring.h>,
+	  <csutil/stringarray.h>, and <ivaria/reporter.h> by eliminating usage
+	  of strcasecmp() and strncasecmp() from inline methods since these are
+	  not available under gcc's -ansi and -pedantic switches (at least on
+	  Windows).
 3-Mar-2005
 	- Jorrit fixed a compile error in spr2d. ||= is not a valid
 	  C++ operator. So put the original |= back.

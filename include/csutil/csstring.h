@@ -27,6 +27,7 @@
 #include <ctype.h>
 #include "csextern.h"
 #include "snprintf.h"
+#include "util.h"
 
 /**
  * This is a string class with a range of useful operators and type-safe
@@ -484,7 +485,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
       return false;
     if (Size == 0 && n == 0)
       return true;
-    return (strncasecmp (Data, iStr.GetData (), Size) == 0);
+    return (csStrNCaseCmp (Data, iStr.GetData (), Size) == 0);
   }
 
   /**
@@ -494,7 +495,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    * \remarks The comparison is case-insensitive.
    */
   bool CompareNoCase (const char* iStr) const
-  { return (strncasecmp (Data ? Data : "", iStr, Size) == 0); }
+  { return (csStrNCaseCmp (Data ? Data : "", iStr, Size) == 0); }
 
   /**
    * Check if this string starts with another one.
@@ -513,7 +514,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
       return false;
     CS_ASSERT(Data != 0);
     if (ignore_case)
-      return (strncasecmp (Data, iStr.GetData (), n) == 0);
+      return (csStrNCaseCmp (Data, iStr.GetData (), n) == 0);
     else
       return (strncmp (Data, iStr.GetData (), n) == 0);
   }
@@ -535,7 +536,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
       return false;
     CS_ASSERT(Data != 0);
     if (ignore_case)
-      return (strncasecmp (Data, iStr, n) == 0);
+      return (csStrNCaseCmp (Data, iStr, n) == 0);
     else
       return (strncmp (Data, iStr, n) == 0);
   }

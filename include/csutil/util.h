@@ -53,6 +53,24 @@ extern CS_CSUTIL_EXPORT wchar_t* csStrNewW (const wchar_t *s);
 extern CS_CSUTIL_EXPORT wchar_t* csStrNewW (const char *s);
 
 /**
+ * Perform case-insensitive string comparison. Returns a negative number if \p
+ * str1 is less than \p str2, zero if they are equal, or a positive number if
+ * \p str1 is greater than \p str2. For best portability, use function rather
+ * than strcasecmp() or stricmp().
+ */
+extern CS_CSUTIL_EXPORT int csStrCaseCmp(char const* str1, char const* str2);
+
+/**
+ * Perform case-insensitive string comparison of the first \p n characters of
+ * \p str1 and \p str2. Returns a negative number if the n-character prefix of
+ * \p str1 is less than \p str2, zero if they are equal, or a positive number
+ * if the prefix of \p str1 is greater than \p str2. For best portability, use
+ * function rather than strncasecmp() or strnicmp().
+ */
+extern CS_CSUTIL_EXPORT int csStrNCaseCmp(char const* str1, char const* str2,
+  size_t n);
+
+/**
  * Helper class to convert widechar* to char*(UTF-8) strings for use
  * as function parameters.
  * Use of this helper class is more convenient than an a 
@@ -134,13 +152,12 @@ extern CS_CSUTIL_EXPORT void csSplitPath (const char *iPathName, char *oPath,
   size_t iPathSize, char *oName, size_t iNameSize);
 
 /**
- * This is a really simple function that does very nice
- * "filename against filemask" comparisons. It understands
- * even such things like "*a*.txt" or "*a?b*" or even "*"
- * (wish I DOS could do it ...). No "[]" wildcards though :-)
- * <p>
- * \remark If you want case-insensitive comparison, upcase (or lowercase,
- *   depends on personal taste) strings first.
+ * Perform shell-like filename \e globbing (pattern matching).
+ * The special token \p * matches zero or more characters, and the token \p ? 
+ * matches exactly one character. Examples: "*a*.txt", "*a?b*", "*"
+ * Character-classes \p [a-z] are not understood by this function.
+ * \remark If you want case-insensitive comparison, convert \p fName and
+ *   \fMask to upper- or lower-case first.
  */
 extern CS_CSUTIL_EXPORT bool csGlobMatches (const char *fName, const char *fMask);
 
@@ -150,10 +167,10 @@ extern CS_CSUTIL_EXPORT bool csGlobMatches (const char *fName, const char *fMask
  */
 CS_CSUTIL_EXPORT int csFindNearestPowerOf2 (int n);
 
-/// returns true if n is a power of two
+/// Returns true if n is a power of two.
 CS_CSUTIL_EXPORT bool csIsPowerOf2 (int n);
 
-/// Find the log2 of 32bit argument
+/// Find the log2 of 32bit argument.
 static inline int csLog2 (int n)
 {
   const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
@@ -173,9 +190,9 @@ static inline int csLog2 (int n)
 }
 
 /**
- * given src and dest, which are already allocated, copy source to dest.
- * But, do not copy 'search', instead replace that with 'replace' string.
- * max is size of dest.
+ * Given \p src and \p dest, which are already allocated, copy \p source to \p
+ * dest.  But, do not copy \p search, instead replace that with \p replace
+ * string.  \p max is size in bytes of \p dest.
  */
 CS_CSUTIL_EXPORT void csFindReplace (char *dest, const char *src,
   const char *search, const char *replace, int max);

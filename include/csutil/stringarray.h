@@ -22,8 +22,8 @@
 
 #include <stdarg.h>
 #include "csextern.h"
-#include "util.h"
 #include "array.h"
+#include "util.h"
 
 class csStringArrayElementHandler
 {
@@ -70,7 +70,7 @@ public:
   static int CaseInsensitiveCompare (const char* const &item1,
 				     const char* const &item2)
   {
-    return strcasecmp (item1, item2);
+    return csStrCaseCmp (item1, item2);
   }
 
   /**
@@ -162,7 +162,7 @@ public:
   size_t FindCaseInsensitive (const char* what) const
   {
     for (size_t i = 0; i < Length (); i++)
-      if (!strcasecmp (Get (i), what))
+      if (!csStrCaseCmp (Get (i), what))
         return i;
     return (size_t)-1;
   }

@@ -23,6 +23,7 @@
 #include "csutil/ansicolor.h"
 #include "csutil/scf.h"
 #include "csutil/sysfunc.h"
+#include "csutil/util.h"
 #include "iutil/objreg.h"
 
 /**\file
@@ -333,7 +334,7 @@ inline void csReporterHelper::ReportV(iObjectRegistry* reg, int severity,
   else
   {
     /*
-      @@@ The strncasecmp()s are there because sometimes reported messages
+      @@@ The csStrNCaseCmp()s are there because sometimes reported messages
       start with "Warning", and a "Warning: Warning" output looks rather
       crappy. The correct fix is obviously to remove "Warning" prefixes
       when the reporter is used.
@@ -344,11 +345,11 @@ inline void csReporterHelper::ReportV(iObjectRegistry* reg, int severity,
 	csPrintf(CS_ANSI_BK CS_ANSI_FM CS_ANSI_FI "BUG: " CS_ANSI_RST);
 	break;
       case CS_REPORTER_SEVERITY_ERROR:
-        if (strncasecmp (description, "error", 5) != 0)
+        if (csStrNCaseCmp (description, "error", 5) != 0)
 	  csPrintf(CS_ANSI_BK CS_ANSI_FR CS_ANSI_FI "ERROR: " CS_ANSI_RST);
 	break;
       case CS_REPORTER_SEVERITY_WARNING:
-        if (strncasecmp (description, "warning", 7) != 0)
+        if (csStrNCaseCmp (description, "warning", 7) != 0)
 	  csPrintf(CS_ANSI_BK CS_ANSI_FY CS_ANSI_FI "WARNING: " CS_ANSI_RST);
 	break;
       case CS_REPORTER_SEVERITY_NOTIFY:
