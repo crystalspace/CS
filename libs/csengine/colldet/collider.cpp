@@ -36,12 +36,12 @@ static int currHit;
 csMatrix3 csCollider::mR;
 csVector3 csCollider::mT (0, 0, 0);
 ///
-int csCollider::trianglesTested = 0;
-int csCollider::boxesTested = 0;
-int csCollider::testLevel = 0;
-bool csCollider::firstHit = true;
-int  csCollider::numHits = 0;
-float csCollider::minBBoxDiam = 0.0;
+int   csCollider::trianglesTested = 0;
+int   csCollider::boxesTested     = 0;
+int   csCollider::testLevel       = 0;
+bool  csCollider::firstHit        = true;
+int   csCollider::numHits         = 0;
+float csCollider::minBBoxDiam     = 0.0;
 ///
 
 Moment *Moment::stack = 0;
@@ -773,7 +773,7 @@ int csCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2, csMatrix3 R, csVec
   // test top level
   csCollider::boxesTested++;
 
-  int f1 = obb_disjoint (R, T, b1->d, b2->d);
+  int f1 = obb_disjoint (R, T, b1->GetRadius(), b2->GetRadius());
 
   if (f1 != 0)
     return false;  // stop processing this test, go to top of loop
@@ -782,12 +782,12 @@ int csCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2, csMatrix3 R, csVec
   if (b1->IsLeaf() && b2->IsLeaf())
   {
     // it is a leaf pair - compare the polygons therein
-    // tri_contact uses the model-to-model transforms stored in
+    // TrianglesHaveContact uses the model-to-model transforms stored in
     // csCollider::mR, csCollider::mT.
 
     // this will pass along any OUT_OF_MEMORY return codes which
     // may be generated.
-    return csCdBBox::tri_contact (b1, b2);
+    return csCdBBox::TrianglesHaveContact(b1, b2);
   }
 
   csMatrix3 cR;
@@ -880,7 +880,7 @@ csCollider* csCollider::FindCollision (csCdTriangle **tr1, csCdTriangle **tr2)
   return 0;
 }
 
-bool csCdBBox::tri_contact (csCdBBox *pBox1, csCdBBox *pBox2)
+bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2)
 {
   // assume just one triangle in each box.
 

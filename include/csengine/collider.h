@@ -34,9 +34,9 @@ class csCdModel;
 struct csCdTriangle
 {
   /**
-    * an Identifier for the triangle. This will help to identify the triangle,
-    * if it is returned to a higher level later on. This id is assigned in 
-    * csCdModel::AddTriangle()
+    * an Identifier for the triangle. This will help to identify the 
+    * triangle, if it is returned to a higher level later on. This id 
+    * is assigned in csCdModel::AddTriangle()
     */
   int id;
   
@@ -45,10 +45,10 @@ struct csCdTriangle
 };
 
 /**
-  * A bounding box, used in collision detection. Any bounding box, can either be a 
-  * node or a leaf. A leaf will contain a single polygon, while a node contains
-  * pointers to two other bounding boxes. This means, that this class in fact
-  * represents a tree of hierarchical bounding boxes.
+  * A bounding box, used in collision detection. Any bounding box, can 
+  * either be a node or a leaf. A leaf will contain a single polygon, while 
+  * a node contains pointers to two other bounding boxes. This means, that 
+  * this class in fact represents a tree of hierarchical bounding boxes.
   */
 class csCdBBox
 {
@@ -66,45 +66,65 @@ protected:
   csVector3 pT;
 
   // this is "radius", that is, half the measure of a side length
-  csVector3 d;
+  csVector3 m_Radius;
 
   /**
     * Pointers to child boxes. These pointers are only for reference, they
     * do not indicate ownership. (these boxes are deleted elsewhere)
-    * (Formerly called P(m_pChild[0]) and N(m_pChild[1])
     */
   csCdBBox* m_pChild[2];
 
-public:
+  /**
+    * Checks if two Bounding Boxes do collide. Thes routine assumes, 
+    * that each Bounding Box contains _exactly_ one Triangle in 
+    * m_pTriangle!
+    */
+  static bool TrianglesHaveContact (csCdBBox* pBox1, csCdBBox* pBox2);
 
-  /// Construct a default bounding box
-  csCdBBox () : pT (0, 0, 0), d (0, 0, 0) { }
+  /**
+    * Assign a Triangle to this Bounding box. This will make this 
+    * Bounding Box into a leaf.
+    */
+  bool SetLeaf(csCdTriangle* pTriangle);
 
-  /// returns the "Radius", that is, half the measure of each side's length
-  const csVector3& GetRadius() {return d;}
+  /**
+    * Build a tree structure of Bounding Boxes. TriangleIndices is an array 
+    * of indices into the Triangles array. NumTriangles is the number of 
+    * valid indices in the TriangleIndices array. The idea behind this (at 
+    * first glance very odd) datastructure is, to keep the original order 
+    * of "Triangles" intact, and only shuffle the much smaller indices. In 
+    * fact, there is only one TriangleInidices array, that is sorted over 
+    * and over again and then passed recursively in two halfs to the same 
+    * routine again and again, until there are only leafes left.
+    */
+  bool BuildBBoxTree(int*          TriangleIndices, 
+                     int           NumTriangles, 
+                     csCdTriangle* Triangles,
+                     csCdBBox*&    box_pool);
 
   /**
     * returns true, if this is a leaf bounding box, Maybe, this would be 
-    * faster and more secure, if we would return true, if m_pTriangle is set.
-    * Maybe I will change that later. - thieber 13.03.2000 -
+    * faster and more secure, if we would return true, if m_pTriangle is 
+    * set. For this we need to make sure, that m_pTriangle is always
+    * properly initialised to NULL, which is currently not the case.
+    * - thieber 14.03.2000 -
     */
   bool IsLeaf() { return (!m_pChild[0] && !m_pChild[1]); } 
   
   /**
-    * return the size of the bounding box. Why this returns d.x and not d.y or
-    * d.z is not obious to me. - thieber 13.03.2000 -
+    * return the size of the bounding box. Why this returns d.x and not 
+    * d.y or d.z is not obious to me. - thieber 13.03.2000 -
     */
-  float GetSize() { return d.x; } 
+  float GetSize() { return m_Radius.x; } 
 
-  bool split_recurse(int *t, int n, csCdBBox *&box_pool, csCdTriangle *tris);
-  // specialized for leaf nodes
-  bool split_recurse(int *t, csCdTriangle *tris);
-  
-  /**
-    * Checks if two Bounding Boxes do collide. Thes routine assumes, that
-    * each Bounding Box contains _exactly_ one Triangle in m_pTriangle!
-    */
-  static bool tri_contact (csCdBBox* pBox1, csCdBBox* pBox2);
+public:
+
+  /// Construct a default bounding box
+  csCdBBox() : pT(0, 0, 0), m_Radius(0, 0, 0) { }
+
+  /// returns the "Radius", that is, half the measure of each side's length
+  const csVector3& GetRadius() {return m_Radius;}
+
 };
 
 class csCdModel
@@ -131,10 +151,13 @@ public:
   ~csCdModel ();
 
   /// Add a triangle to the model
-  bool AddTriangle (int id, const csVector3 &p1, const csVector3 &p2, const csVector3 &p3);
+  bool AddTriangle (int              id, 
+                    const csVector3& p1, 
+                    const csVector3& p2, 
+                    const csVector3& p3);
 };
 
-/****************************************************************************/
+/***************************************************************************/
 
 // this is the collision query invocation.  It assumes that the 
 // models are not being scaled up or down, but have their native
@@ -147,7 +170,7 @@ struct collision_pair
   csCdTriangle *tr2;
 };
 
-/****************************************************************************/
+/***************************************************************************/
 
 ///
 class csCollider

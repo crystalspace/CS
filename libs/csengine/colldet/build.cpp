@@ -156,7 +156,7 @@ bool csCdModel::build_hierarchy ()
 
   // do the build
   csCdBBox *pool = b + 1;
-  if (!b [0].split_recurse (t, num_tris, pool, tris))
+  if (!b [0].BuildBBoxTree(t, num_tris, tris, pool))
   {
     CHK (delete [] b); b = NULL;
     CHK (delete [] t);
@@ -173,7 +173,11 @@ bool csCdModel::build_hierarchy ()
   return true;
 }
 
-bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *tris)
+//bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *tris)
+bool csCdBBox::BuildBBoxTree(int*          TriangleIndices, 
+                             int           NumTriangles, 
+                             csCdTriangle* Triangles,
+                             csCdBBox*&    box_pool)
 {
   // The orientation for the parent box is already assigned to this->pR.
   // The axis along which to split will be column 0 of this->pR.
@@ -183,8 +187,8 @@ bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *
   // space will be established, as well as its dimensions.  Child boxes
   // will be constructed and placed in the parent's CS.
 
-  if (n == 1)
-    return split_recurse (t, tris);
+  if (NumTriangles == 1)
+    return SetLeaf(&Triangles[TriangleIndices[0]]);
   
   // walk along the tris for the box, and do the following:
   //   1. collect the max and min of the vertices along the axes of <or>.
@@ -194,9 +198,6 @@ bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *
   Accum _M1, _M2;
   csMatrix3 C;
 
-  int in;
-  csCdTriangle *ptr;
-  int i;
   float axdmp;
   int n1 = 0;  // The number of tris in group 1.  
   // Group 2 will have n - n1 tris.
@@ -207,13 +208,13 @@ bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *
   _M1.clear ();
   _M2.clear ();
 
-  csVector3 c = pR.GetTranspose () * tris [t [0]].p1;
+  csVector3 c = pR.GetTranspose () * Triangles [TriangleIndices[0]].p1;
   csVector3 minval = c, maxval = c;
 
-  for (i=0 ; i<n ; i++)
+  for (int i=0 ; i<NumTriangles ; i++)
   {
-    in = t[i];
-    ptr = tris + in;
+    int CurrentTriangleIndex = TriangleIndices[i];
+    csCdTriangle *ptr = &Triangles[CurrentTriangleIndex];
 
     c = pR.GetTranspose () * ptr->p1;
     csMath3::SetMinMax (c, minval, maxval); 
@@ -228,23 +229,23 @@ bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *
     // it onto the splitting axis (1st column of pR) and
     // see where it lies with respect to axdmp.
      
-    Moment::stack[in].mean (&c);
+    Moment::stack[CurrentTriangleIndex].mean (&c);
 
     if ((( pR.m11 * c.x + pR.m21 * c.y + pR.m31 * c.z) < axdmp)
-	  && ((n!=2)) || ((n==2) && (i==0)))    
+	  && ((NumTriangles!=2)) || ((NumTriangles==2) && (i==0)))    
     {
       // accumulate first and second order moments for group 1
-      _M1.moment (Moment::stack[in]);
+      _M1.moment (Moment::stack[CurrentTriangleIndex]);
       // put it in group 1 by swapping t[i] with t[n1]
-      int temp = t[i];
-      t[i] = t[n1];
-      t[n1] = temp;
+      int temp            = TriangleIndices[i];
+      TriangleIndices[i]  = TriangleIndices[n1];
+      TriangleIndices[n1] = temp;
       n1++;
     }
     else
     {
       // accumulate first and second order moments for group 2
-     _M2.moment (Moment::stack[in]);
+     _M2.moment (Moment::stack[CurrentTriangleIndex]);
       // leave it in group 2
       // do nothing...it happens by default
     }
@@ -253,19 +254,19 @@ bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *
   // done using this->pT as a mean point.
 
   // error check!
-  if ((n1 == 0) || (n1 == n))
+  if ((n1 == 0) || (n1 == NumTriangles))
   {
     // our partitioning has failed: all the triangles fell into just
     // one of the groups.  So, we arbitrarily partition them into
     // equal parts, and proceed.
 
-    n1 = n/2;
+    n1 = NumTriangles/2;
       
     // now recompute accumulated stuff
     _M1.clear ();
     _M2.clear ();
-    _M1.moments (t,n1);
-    _M2.moments (t+n1,n-n1);
+    _M1.moments (TriangleIndices,n1);
+    _M2.moments (TriangleIndices+n1,NumTriangles-n1);
   }
 
   // With the max and min data, determine the center point and dimensions
@@ -278,7 +279,7 @@ bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *
   pT.z = c.x * pR.m31 + c.y * pR.m32 + c.z * pR.m33;
 
   // delta.
-  d = (maxval - minval ) * 0.5;
+  m_Radius = (maxval - minval ) * 0.5;
 
   // allocate new boxes
   m_pChild[0] = box_pool++;
@@ -301,12 +302,15 @@ bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *
     }
 
     m_pChild[0]->pR = tR;
-    if (!m_pChild[0]->split_recurse (t, n1, box_pool, tris))
+    if (!m_pChild[0]->BuildBBoxTree (TriangleIndices, n1, 
+                                     Triangles, box_pool))
+    {
       return false;
+    }
   }
   else
   {
-    if (!m_pChild[0]->split_recurse (t, tris))
+    if (!m_pChild[0]->SetLeaf(&Triangles[TriangleIndices[0]]))
       return false;
   }
 
@@ -315,7 +319,7 @@ bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *
   c = m_pChild[0]->pT - pT;
   m_pChild[0]->pT = pR.GetTranspose () * c;
 
-  if ((n-n1) > 1)
+  if ((NumTriangles-n1) > 1)
   {      
     _M2.mean (&m_pChild[1]->pT);
     _M2.covariance (&C);
@@ -328,12 +332,15 @@ bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *
     }
       
     m_pChild[1]->pR = tR;
-    if (!m_pChild[1]->split_recurse (t + n1, n - n1, box_pool, tris))
+    if (!m_pChild[1]->BuildBBoxTree(TriangleIndices + n1, NumTriangles - n1, 
+                                    Triangles, box_pool))
+    {
       return false;
+    }
   }
   else
   {
-    if (!m_pChild[1]->split_recurse (t + n1, tris))
+    if (!m_pChild[1]->SetLeaf(&Triangles[TriangleIndices[n1]]))
       return false;
   }
 
@@ -347,7 +354,7 @@ bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *
   return true;
 }
 
-bool csCdBBox::split_recurse (int *t, csCdTriangle *tris)
+bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
 {
   // For a single triangle, orientation is easily determined.
   // The major axis is parallel to the longest edge.
@@ -359,18 +366,16 @@ bool csCdBBox::split_recurse (int *t, csCdTriangle *tris)
   m_pChild[0] = NULL;
   m_pChild[1] = NULL;
 
-  csCdTriangle *ptr = tris + t [0];
-
   // Find the major axis: parallel to the longest edge.
   // First compute the squared-lengths of each edge
 
-  csVector3 u12 = ptr->p1 - ptr->p2;
+  csVector3 u12 = pTriangle->p1 - pTriangle->p2;
   float d12 = u12 * u12;
  
-  csVector3 u23 = ptr->p2 - ptr->p3;
+  csVector3 u23 = pTriangle->p2 - pTriangle->p3;
   float d23 = u23 * u23;
 
-  csVector3 u31 = ptr->p3 - ptr->p1;
+  csVector3 u31 = pTriangle->p3 - pTriangle->p1;
   float d31 = u31 * u31;
 
   // Find the edge of longest squared-length, normalize it to
@@ -421,13 +426,13 @@ bool csCdBBox::split_recurse (int *t, csCdTriangle *tris)
   // Now compute the maximum and minimum extents of each vertex 
   // along each of the box axes.  From this we will compute the 
   // box center and box dimensions.
-  csVector3 c = pR.GetTranspose () * ptr->p1;
+  csVector3 c = pR.GetTranspose () * pTriangle->p1;
   csVector3 minval = c, maxval = c;
 
-  c = pR.GetTranspose () * ptr->p2;
+  c = pR.GetTranspose () * pTriangle->p2;
   csMath3::SetMinMax (c, minval, maxval);
 
-  c = pR.GetTranspose () * ptr->p3;
+  c = pR.GetTranspose () * pTriangle->p3;
   csMath3::SetMinMax (c, minval, maxval);
  
   // With the max and min data, determine the center point and dimensions
@@ -439,10 +444,10 @@ bool csCdBBox::split_recurse (int *t, csCdTriangle *tris)
   pT.z = c.x * pR.m31 + c.y * pR.m32 + c.z * pR.m33;
 
 
-  d = (maxval - minval) * 0.5;
+  m_Radius = (maxval - minval) * 0.5;
 
   // Assign the one triangle to this box
-  m_pTriangle = ptr;
+  m_pTriangle = pTriangle;
 
   return true;
 }
