@@ -742,7 +742,9 @@ void csSector::Draw (iRenderView *rview)
 		  seclights->Get(j)->GetRadius());
         if (rview->TestBSphere (rview->GetCamera()->GetTransform(), s))
 	      alllights.Add (seclights->Get(j));
-        // else { light isn't visible anyway }
+        else { 
+          i=i;
+        }
       }
     }
 
@@ -877,8 +879,6 @@ void csSector::DrawLight (iRenderView* rview, iLight* light)
     if (sp)
     {
       csColor color = light->GetColor ();
-      float radius = light->GetRadius ();
-      radius *= radius;
       float diffuse, specular, ambient;
       csRGBpixel matcolor;
 
@@ -899,7 +899,7 @@ void csSector::DrawLight (iRenderView* rview, iLight* light)
         csVector3 (color.red, color.green, color.blue)*specular);
 
       r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
-      	csVector3 (1,0,1/radius));
+      	light->GetAttenuationVector() );
       
       sp->DrawLight (rview, light);
     }
