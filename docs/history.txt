@@ -19,6 +19,11 @@ The history order is reversed so that new features are at the top.
 	  soon.
 	- Also added equivalent Engine.Lighting.LightmapQuality config option
 	  (in data/config/engine.cfg) which holds the default for this setting.
+	- Added a test for adjacent polygons for lighting. This is really
+	  very clumsy code and it should be rewritten preferably using some
+	  precalculated stuff. But it does improve lighting quality a lot,
+	  especially with low quality setting. Note that it slows down lighting
+	  again.
 15-Jul-2001
 	- New lighting system starts to work good enough so that I
 	  now removed the old system. There are still a few small problems

@@ -155,6 +155,57 @@ void csPolyTexture::InitLightMaps ()
 {
 }
 
+// @@@ This is realy an ugly function which should be precalculated!
+static bool TestAdjacency (csVector3* poly1, int num_vertices1,
+	csPolygon3D*p,  int num_vertices2, const csVector3& lightpos)
+{
+  int i, j, j1;
+  for (i = 0 ; i < num_vertices1 ; i++)
+  {
+    csVector3 v = poly1[i]+lightpos;
+    j1 = num_vertices2-1;
+    for (j = 0 ; j < num_vertices2 ; j++)
+    {
+      if (ABS (csMath3::Area3 (v, p->Vwor (j), p->Vwor (j1))) < SMALL_EPSILON)
+      {
+        // Check location of all other vertices relative to edge for polygon 1.
+	int sgn = 0;
+	int k;
+	for (k = 0 ; k < num_vertices1 ; k++)
+	  if (k != i)
+	  {
+	    csVector3 vtest = poly1[k]+lightpos;
+	    float area1 = csMath3::Area3 (vtest, p->Vwor (j), p->Vwor (j1));
+	    if (ABS (area1) >= SMALL_EPSILON)
+	    {
+	      int newsgn = SIGN (area1);
+	      if (sgn == 0) sgn = newsgn;
+	      else if (sgn != newsgn) goto bad;
+	    }
+	  }
+        // Check location of all other vertices relative to edge for polygon 2.
+	sgn = -sgn;
+	for (k = 0 ; k < num_vertices2 ; k++)
+	  if (k != j && k != j1)
+	  {
+	    float area2 = csMath3::Area3 (p->Vwor (k),
+	    	p->Vwor (j), p->Vwor (j1));
+	    if (ABS (area2) >= SMALL_EPSILON)
+	    {
+	      int newsgn = SIGN (area2);
+	      if (sgn != newsgn) goto bad;
+	    }
+	  }
+        return true;
+      }
+// @@@ Yes, I know this is bad: this is a temporary routine :-)
+bad:
+      j1 = j;
+    }
+  }
+  return false;
+}
+
 void csPolyTexture::FillLightMap (csFrustumView* lview, bool vis,
 	csPolygon3D* subpoly)
 {
@@ -322,6 +373,14 @@ void csPolyTexture::FillLightMap (csFrustumView* lview, bool vis,
       csFrustum* new_shadow = shadow_frust->Intersect (poly, num_vertices);
       if (new_shadow)
       {
+        // Test if two polygons are adjacent (@@@ should be precalculated).
+        if (TestAdjacency (new_shadow->GetVertices (),
+      	    new_shadow->GetVertexCount (), polygon, polygon->GetVertexCount (),
+	    lightpos))
+	{
+	  new_shadow->DecRef ();
+	  continue;
+	}
         int nv = new_shadow->GetVertexCount ();
         if (nv > MAX_OUTPUT_VERTICES) nv = MAX_OUTPUT_VERTICES;
         csVector3* s3d = new_shadow->GetVertices ();
