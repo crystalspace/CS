@@ -7,12 +7,11 @@
 const int awsParmList:: INT = 0;
 const int awsParmList:: FLOAT = 1;
 const int awsParmList:: STRING = 2;
-const int awsParmList:: BASICVECTOR = 3;
-const int awsParmList:: STRINGVECTOR = 4;
-const int awsParmList:: RECT = 5;
-const int awsParmList:: POINT = 6;
-const int awsParmList:: BOOL = 7;
-const int awsParmList:: VOPAQUE = 8;
+const int awsParmList:: STRINGVECTOR = 3;
+const int awsParmList:: RECT = 4;
+const int awsParmList:: POINT = 5;
+const int awsParmList:: BOOL = 6;
+const int awsParmList:: VOPAQUE = 7;
 
 SCF_IMPLEMENT_IBASE(awsParmList)
   SCF_IMPLEMENTS_INTERFACE(iAwsParmList)
@@ -33,13 +32,6 @@ awsParmList::awsParmList ()
 
 awsParmList::~awsParmList ()
 {
-  for (int i = 0; i < parms.Length(); i++)
-  {
-    parmItem* item = (parmItem*) parms[i];
-
-    if (item->type == STRING)
-      SCF_DEC_REF(item->parm.s);
-  }
 }
 
 awsParmList::parmItem * awsParmList::FindParm (const char *_name, int type)
@@ -49,7 +41,7 @@ awsParmList::parmItem * awsParmList::FindParm (const char *_name, int type)
 
   for (i = 0; i < parms.Length(); ++i)
   {
-    parmItem *item = (parmItem *)parms[i];
+    parmItem *item = parms[i];
 
     if (item->name == name && item->type == type) return item;
   }
@@ -57,11 +49,7 @@ awsParmList::parmItem * awsParmList::FindParm (const char *_name, int type)
 }
 void awsParmList::Clear ()
 {
-  int i;
-
-  for (i = 0; i < parms.Length (); ++i) delete (parmItem *)parms[i];
-
-  parms.SetLength (0);
+  parms.DeleteAll ();
 }
 
 void awsParmList::AddInt (const char *name, int value)
@@ -104,17 +92,6 @@ void awsParmList::AddString (const char *name, const char* value)
   pi->name = NameToID (name);
   pi->type = STRING;
   pi->parm.s = new scfString(value);
-
-  parms.Push (pi);
-}
-
-void awsParmList::AddBasicVector (const char *name, csBasicVector *value)
-{
-  parmItem *pi = new parmItem;
-
-  pi->name = NameToID (name);
-  pi->type = BASICVECTOR;
-  pi->parm.bv = value;
 
   parms.Push (pi);
 }
@@ -209,19 +186,6 @@ bool awsParmList::GetString (const char *name, iString **value)
   if (pi)
   {
     *value = pi->parm.s;
-    return true;
-  }
-
-  return false;
-}
-
-bool awsParmList::GetBasicVector (const char *name, csBasicVector **value)
-{
-  parmItem *pi = FindParm (name, BASICVECTOR);
-
-  if (pi)
-  {
-    *value = pi->parm.bv;
     return true;
   }
 

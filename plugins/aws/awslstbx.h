@@ -22,6 +22,7 @@
 # include "awsitmv.h"
 # include "awsscr.h"
 # include "awsscrbr.h"
+# include "csutil/parray.h"
 
 /// Knows how to draw items that have several properties.
 struct awsListItem
@@ -190,7 +191,7 @@ class awsListBox :
   awsListRowVector rows;
 
   /// Container of hotspots
-  csBasicVector hotspots;
+  csPDelArray<awsListHotspot> hotspots;
 
   /// Currently selected row
   awsListRow *sel;

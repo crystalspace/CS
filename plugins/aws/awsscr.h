@@ -1,7 +1,7 @@
 #ifndef __CS_AWS_SCRIPT_UTILITY_H__
 #define __CS_AWS_SCRIPT_UTILITY_H__
 
-# include "csutil/csvector.h"
+# include "csutil/array.h"
 
 struct awsActionMap
 {
@@ -15,7 +15,7 @@ struct awsActionMap
 class awsActionDispatcher
 {
   /// List of actions to execute
-  csBasicVector actions;
+  csArray<awsActionMap*> actions;
 public:
   /// Register an action.
   void Register (const char *name,

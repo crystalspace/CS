@@ -50,12 +50,6 @@ csIsoGrid::~csIsoGrid ()
   for(i=0; i<width*height; i++)
     if(grid[i]) grid[i]->DecRef();
 
-  for (i=0; i<lights.Length (); i++)
-    ((iIsoLight*)lights.Get (i))->DecRef ();
-
-  for (i=0; i<dynamiclights.Length (); i++)
-    ((iIsoLight*)dynamiclights.Get (i))->DecRef ();
-
   delete[] grid;
   delete groundmap;
   delete[] fakelights;
@@ -91,7 +85,7 @@ void csIsoGrid::AddSprite(iIsoSprite *sprite, const csVector3& pos)
     // Shine static lights on sprite
     sprite->SetAllStaticColors(csColor(0,0,0));
     for(int l=0; l<lights.Length(); l++)
-      ((iIsoLight*)(lights[l]))->ShineSprite(sprite);
+      lights[l]->ShineSprite(sprite);
   }
 }
 
@@ -269,7 +263,7 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
     ResetAllLight();
     int l;
     for(l=0; l<dynamiclights.Length(); l++)
-      ((iIsoLight*)(dynamiclights[l]))->ShineGrid();
+      dynamiclights[l]->ShineGrid();
     // reset fakelight array
     if(fakelights)
     {
@@ -284,7 +278,7 @@ void csIsoGrid::RecalcStaticLight()
   SetAllStaticLight(csColor(0.,0.,0.));
   int l;
   for(l=0; l<lights.Length(); l++)
-    ((iIsoLight*)(lights[l]))->ShineGrid();
+    lights[l]->ShineGrid();
   recalc_staticlight = false;
 }
 
@@ -435,7 +429,6 @@ void csIsoGrid::RegisterLight(iIsoLight *light)
   if(lights.Find(light)==-1)
   {
     lights.Push(light);
-    light->IncRef ();
   }
 }
 
@@ -444,8 +437,7 @@ void csIsoGrid::UnRegisterLight(iIsoLight *light)
   int idx = lights.Find(light);
   if(idx!=-1)
   {
-    ((iIsoLight*)lights.Get (idx))->DecRef ();
-    lights.Delete(idx);
+    lights.DeleteIndex (idx);
     recalc_staticlight = true;
   }
 }
@@ -455,18 +447,12 @@ void csIsoGrid::RegisterDynamicLight(iIsoLight *light)
   if(dynamiclights.Find(light)==-1)
   {
     dynamiclights.Push(light);
-    light->IncRef ();
   }
 }
 
 void csIsoGrid::UnRegisterDynamicLight(iIsoLight *light)
 {
-  int idx = dynamiclights.Find(light);
-  if(idx!=-1)
-  {
-    ((iIsoLight*)dynamiclights.Get (idx))->DecRef ();
-    dynamiclights.Delete(idx);
-  }
+  dynamiclights.Delete (light);
 }
 
 void csIsoGrid::GetFakeLights(const csVector3& pos, iLight **& flights,
@@ -490,13 +476,13 @@ void csIsoGrid::GetFakeLights(const csVector3& pos, iLight **& flights,
 
   for(l=0; l<lights.Length(); l++)
   {
-    if(((iIsoLight*)(lights[l]))->GetVis(visx, visy) > 0.0 )
-      flights[num++] = ((iIsoLight*)(lights[l]))->GetFakeLight();
+    if(lights[l]->GetVis(visx, visy) > 0.0 )
+      flights[num++] = lights[l]->GetFakeLight();
   }
   for(l=0; l<dynamiclights.Length(); l++)
   {
-    if(((iIsoLight*)(dynamiclights[l]))->GetVis(visx, visy) > 0.0 )
-      flights[num++] = ((iIsoLight*)(dynamiclights[l]))->GetFakeLight();
+    if(dynamiclights[l]->GetVis(visx, visy) > 0.0 )
+      flights[num++] = dynamiclights[l]->GetFakeLight();
   }
 
 }

@@ -5,7 +5,7 @@
 # include "csgeom/csrect.h"
 # include "csgeom/cspoint.h"
 # include "csutil/scfstr.h"
-# include "csutil/csvector.h"
+# include "csutil/parray.h"
 # include "iutil/stringarray.h"
 
 /***********************************************************************************
@@ -18,12 +18,10 @@
 class awsParmList :
   public iAwsParmList
 {
-  csBasicVector parms;
 public:
   static const int INT;
   static const int FLOAT;
   static const int STRING;
-  static const int BASICVECTOR;
   static const int STRINGVECTOR;
   static const int RECT;
   static const int POINT;
@@ -40,7 +38,6 @@ public:
       float f;
       bool b;
       iString *s;
-      csBasicVector *bv;
       iStringArray *sv;
       csRect *r;
       csPoint *p;
@@ -53,6 +50,7 @@ public:
     }
   };
 private:
+  csPDelArray<parmItem> parms;
   parmItem *FindParm (const char *name, int type);
 public:
   awsParmList ();
@@ -73,9 +71,6 @@ public:
 
   /// Adds a string to the parmeter list
   virtual void AddString (const char *name, const char* value);
-
-  /// Adds a vector to the parmeter list
-  virtual void AddBasicVector (const char *name, csBasicVector *value);
 
   /// Adds a string vector to the parmeter list
   virtual void AddStringVector (const char *name, iStringArray *value);
@@ -103,9 +98,6 @@ public:
 
   /// Returns the string named "name" in value.  True if it was found, otherwise false.
   virtual bool GetString (const char *name, iString **value);
-
-  /// Returns the basic vector named "name" in value.  True if it was found, otherwise false.
-  virtual bool GetBasicVector (const char *name, csBasicVector **value);
 
   /// Returns the string vector named "name" in value.  True if it was found, otherwise false.
   virtual bool GetStringVector (const char *name, iStringArray **value);

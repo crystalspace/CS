@@ -20,7 +20,7 @@
 *****************************************************************************/
 # include "iaws/aws.h"
 # include "iutil/comp.h"
-# include "csutil/csvector.h"
+# include "csutil/parray.h"
 
 /*********************************************************************************************************************
 *                                                                                                                    *
@@ -36,17 +36,14 @@ class awsSinkManager : public iAwsSinkManager
   struct SinkMap
   {
     unsigned long name;
-    iAwsSink *sink;
+    csRef<iAwsSink> sink;
 
-    SinkMap (unsigned long n, iAwsSink *s)
-    :
-    name(n),
-    sink(s)
+    SinkMap (unsigned long n, iAwsSink *s) : name(n), sink(s)
     {
     };
   };
 
-  csBasicVector sinks;
+  csPDelArray<SinkMap> sinks;
 public:
   SCF_DECLARE_IBASE;
 
@@ -92,15 +89,13 @@ class awsSink :
     void (*trigger) (void *, iAwsSource *);
 
     TriggerMap (unsigned long n, void (*t) (void *, iAwsSource *))
-    :
-    name(n),
-    trigger(t)
+    	: name(n), trigger(t)
     {
     };
   };
 
   /// List of triggers registered.
-  csBasicVector triggers;
+  csPDelArray<TriggerMap> triggers;
 
   /// Parameter to pass to triggers
   void *parm;
@@ -136,17 +131,18 @@ class awsSource :
   /// Owner
   iAwsComponent *owner;
 
-  /// contains a list of all slots that we have registered
-  csBasicVector slots;
-
   struct SlotSignalMap
   {
     /// The slot that's registered
-    iAwsSlot *slot;
+    csRef<iAwsSlot> slot;
 
     /// The signal it's registered for
     unsigned long signal;
   };
+
+  /// contains a list of all slots that we have registered
+  csPDelArray<SlotSignalMap> slots;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -191,20 +187,17 @@ class awsSlot :
   {
     unsigned long signal;
     unsigned long trigger;
-    iAwsSink *sink;
+    csRef<iAwsSink> sink;
     unsigned long refs;
 
-    SignalTriggerMap (unsigned long s, iAwsSink *sk, unsigned long t, unsigned long r)
-    :
-    signal(s),
-    trigger(t),
-    sink(sk),
-    refs(r)
+    SignalTriggerMap (unsigned long s, iAwsSink *sk,
+    	unsigned long t, unsigned long r)
+	: signal(s), trigger(t), sink(sk), refs(r)
     {
     };
   };
 
-  csBasicVector stmap;
+  csPDelArray<SignalTriggerMap> stmap;
 public:
   SCF_DECLARE_IBASE;
 

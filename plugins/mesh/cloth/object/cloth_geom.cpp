@@ -33,7 +33,7 @@ bool Cloth::AddConstraint(int v0, int v1, Constraint ** edge, int *pos)
   int             size = Edges->Length();
   for (int i = 0; i < size; i++) 
   {
-    p = (Constraint *) Edges->Get(i);
+    p = Edges->Get(i);
     if ((p->v0 == v0) || (p->v0 == v1)) 
     {
       if ((p->v1 == v0) || (p->v1 == v1)) 
@@ -45,7 +45,7 @@ bool Cloth::AddConstraint(int v0, int v1, Constraint ** edge, int *pos)
     };
   };
   p = new Constraint(v0, v1);
-  *pos = Edges->Push((void *) p);
+  *pos = Edges->Push(p);
   *edge = p;
   return true;
 }
@@ -61,7 +61,7 @@ bool Cloth::AddShearConstraint(int v0, int v1, Constraint ** edge, int *pos)
   int             size = Shear_Neighbours->Length();
   for (int i = 0; i < size; i++) 
   {
-    p = (Constraint *) Shear_Neighbours->Get(i);
+    p = Shear_Neighbours->Get(i);
     if ((p->v0 == v0) || (p->v0 == v1)) 
     {
       if ((p->v1 == v0) || (p->v1 == v1)) 
@@ -73,7 +73,7 @@ bool Cloth::AddShearConstraint(int v0, int v1, Constraint ** edge, int *pos)
     };
   };
   p = new Constraint(v0, v1);
-  *pos = Shear_Neighbours->Push((void *) p);
+  *pos = Shear_Neighbours->Push(p);
   *edge = p;
   return true;
 }
@@ -93,8 +93,8 @@ Cloth::Cloth(iClothFactoryState * mesh,
   csTriangle     *tris = mesh->GetTriangles();
   int            tri_count = mesh->GetTriangleCount();
   
-  Edges = new csBasicVector(nverts + 16, 16);
-  Shear_Neighbours = new csBasicVector(nverts - 32, 16);
+  Edges = new csPDelArray<Constraint> (nverts + 16, 16);
+  Shear_Neighbours = new csPDelArray<Constraint> (nverts - 32, 16);
   nedges = 0;
   vertices = new csVector3[nverts];
   
@@ -241,18 +241,8 @@ Cloth::Cloth(iClothFactoryState * mesh,
 
 Cloth::~Cloth()
 {
-  if (triangles)  
-    delete[]triangles; 
-  
-  Constraint     *p;
-  p = (Constraint *) Edges->Pop();
-  do 
-  {
-    delete          p;
-    p = (Constraint *) Edges->Pop();
-  } while (p != 0);
-  
-  delete          Edges;
+  delete[]triangles; 
+  delete Edges;
 }
 
 void Cloth::ReallocFields(Constraint ** Struct_F, int *size0,
@@ -265,7 +255,7 @@ void Cloth::ReallocFields(Constraint ** Struct_F, int *size0,
   Constraint     *NewFields = new Constraint[*size0];
   int             count = 0;
   Constraint     *p;
-  p = (Constraint *) Edges->Pop();
+  p = Edges->Pop();
   do
   {
     NewFields[count].v0 = p->v0;
@@ -273,15 +263,15 @@ void Cloth::ReallocFields(Constraint ** Struct_F, int *size0,
     NewFields[count].L0 = p->L0;
     delete          p;
     count++;
-    p = (Constraint *) Edges->Pop();
+    p = Edges->Pop();
   } while (count < *size0);
-  delete          Edges;
+  delete Edges;
   *Struct_F = NewFields;
   *size1 = Shear_Neighbours->Length();
   NewFields = new Constraint[*size1];
   count = 0;
   
-  p = (Constraint *) Shear_Neighbours->Pop();
+  p = Shear_Neighbours->Pop();
   do
   {
     NewFields[count].v0 = p->v0;
@@ -289,7 +279,7 @@ void Cloth::ReallocFields(Constraint ** Struct_F, int *size0,
     NewFields[count].L0 = p->L0;
     delete          p;
     count++;
-    p = (Constraint *) Shear_Neighbours->Pop();
+    p =  Shear_Neighbours->Pop();
   } while (count < *size1);
   delete          Shear_Neighbours;
   *Shear_F = NewFields;

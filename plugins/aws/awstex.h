@@ -1,7 +1,7 @@
 #ifndef __CS_AWS_TEXTURE_MANAGER_H__
 #define __CS_AWS_TEXTURE_MANAGER_H__
 
-# include "csutil/csvector.h"
+# include "csutil/parray.h"
 
 struct iString;
 struct iObjectRegistry;
@@ -33,9 +33,6 @@ class awsTextureManager
   /// contains a reference to the object registry
   iObjectRegistry *object_reg;
 
-  /// list of textures loaded
-  csBasicVector textures;
-
   struct awsTexture
   {
     ~awsTexture();
@@ -43,6 +40,10 @@ class awsTextureManager
     csRef<iTextureHandle> tex;
     unsigned long id;
   };
+
+  /// list of textures loaded
+  csPDelArray<awsTexture> textures;
+
 private:
   /// registers all currently loaded textures with the texture manager
   void RegisterTextures ();

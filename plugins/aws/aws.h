@@ -24,6 +24,7 @@
 # include "iutil/eventh.h"
 # include "iutil/comp.h"
 # include "csutil/array.h"
+# include "csutil/array.h"
 # include "csgeom/csrect.h"
 # include "csgeom/csrectrg.h"
 # include "cstool/proctex.h"
@@ -153,7 +154,7 @@ private:
   };
 
   /// Contains the list of windows in transition
-  csBasicVector transitions;
+  csArray<awsWindowTransition*> transitions;
 
   /// Mode flags for the engine
   unsigned int flags;

@@ -23,6 +23,7 @@
 #include "csgeom/box.h"
 #include "csgeom/tesselat.h"
 #include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "csutil/bitarray.h"
 #include "csutil/refarr.h"
 
@@ -72,8 +73,8 @@ class           Cloth {
     csTriangle     *triangles;
     int             ntris;
 
-    csBasicVector  *Edges;
-    csBasicVector  *Shear_Neighbours;
+    csPDelArray<Constraint> *Edges;
+    csPDelArray<Constraint>  *Shear_Neighbours;
     int             nedges;
 
     // quick access data
@@ -110,8 +111,8 @@ class           Integrator {
     csBitArray     *ConstrainedVertices;
     int            nverts;
 #if defined (DYNAMIC_CONSTRAINT)
-    csBasicVector  *fields;
-    csBasicVector  *shear_fields;
+    csPDelArray<Constraint>  *fields;
+    csPDelArray<Constraint>  *shear_fields;
 #elif defined (STATIC_CONSTRAINT)
     Constraint     *fields;
     Constraint     *shear_fields;
@@ -301,7 +302,7 @@ inline void     ComputeShearFields()
 	int             size = shear_fields->Length();
 	for (int i = 0; i < size; i++) 
         {
-	  p = (Constraint *) shear_fields->Get(i);
+	  p = shear_fields->Get(i);
 	  temp = vertices[p->v1] - vertices[p->v0];
 	  N = temp.Norm();
 
@@ -388,7 +389,7 @@ inline void     ApplyShearProvotConstraint()
 #endif
 	{
 #if   defined(DYNAMIC_CONSTRAINT)
-	    p = (Constraint *) shear_fields->Get(i);
+	    p = shear_fields->Get(i);
 #elif defined(STATIC_CONSTRAINT)
 	    p = &shear_fields[i];
 #endif

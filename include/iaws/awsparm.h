@@ -25,7 +25,7 @@
 #include "csutil/csvector.h"
 #include "iutil/stringarray.h"
 
-SCF_VERSION (iAwsParmList, 0, 0, 2);
+SCF_VERSION (iAwsParmList, 0, 1, 0);
 
 /**
  * Provides support for safely passing named parameters through to different
@@ -44,8 +44,6 @@ struct iAwsParmList : public iBase
   virtual void AddBool(const char *name, bool value)=0;
   /// Adds a string to the parmeter list
   virtual void AddString(const char *name, const char* value)=0;
-  /// Adds a vector to the parmeter list
-  virtual void AddBasicVector(const char *name, csBasicVector* value)=0;
   /// Adds a string vector to the parmeter list
   virtual void AddStringVector(const char *name, iStringArray* value)=0;
   /// Adds a rect to the parmeter list
@@ -79,11 +77,6 @@ struct iAwsParmList : public iBase
    * otherwise false.
    */
   virtual bool GetString(const char *name, iString **value)=0;
-  /**
-   * Returns the basic vector named "name" in value.  True if it was found,
-   * otherwise false.
-   */
-  virtual bool GetBasicVector(const char *name, csBasicVector **value)=0;
   /**
    * Returns the string vector named "name" in value.  True if it was found,
    * otherwise false.

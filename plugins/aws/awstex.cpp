@@ -34,8 +34,6 @@ awsTextureManager::awsTextureManager () : object_reg(0)
 
 awsTextureManager::~awsTextureManager ()
 {
-  for (int i = 0; i < textures.Length (); i++)
-    delete (awsTexture *)textures.Get (i);
 }
 
 void awsTextureManager::Initialize (iObjectRegistry *obj_reg)
@@ -112,7 +110,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   int i;
   for (i = 0; i < textures.Length () && txtfound == false; ++i)
   {
-    awsTexture *awstxt = (awsTexture *)textures[i];
+    awsTexture *awstxt = textures[i];
 
     if (DEBUG_GETTEX)
       printf ("aws-debug: (%s) texture is: %p\n", __FILE__,

@@ -21,7 +21,7 @@
 # include "iaws/aws.h"
 # include "csgeom/csrect.h"
 # include "csgeom/cspoint.h"
-# include "csutil/csvector.h"
+# include "csutil/parray.h"
 # include "csutil/scfstr.h"
 # include "csutil/refarr.h"
 # include "ivideo/graph2d.h"
@@ -580,9 +580,6 @@ class awsPrefManager : public iAwsPrefManager
   /// vfs plugin
   iObjectRegistry *objreg;
 
-  /// constant value heap
-  csBasicVector constants;
-
   /// container of constants
   struct constant_entry
   {
@@ -592,7 +589,10 @@ class awsPrefManager : public iAwsPrefManager
     /// Integer value
     int value;
   };
-  
+
+  /// constant value heap
+  csPDelArray<constant_entry> constants;
+
 public:
   SCF_DECLARE_IBASE;
 

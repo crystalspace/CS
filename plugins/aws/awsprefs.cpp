@@ -70,14 +70,6 @@ awsPrefManager::awsPrefManager (iBase *iParent) :
 awsPrefManager::~awsPrefManager ()
 {
   delete awstxtmgr;
-
-  // empty the constants list
-  int i;
-  for (i = 0; i < constants.Length (); ++i)
-  {
-    constant_entry *c = (constant_entry *)constants.Get (i);
-    delete c;
-  }
 }
 
 bool awsPrefManager::Setup (iObjectRegistry *obj_reg)
@@ -592,7 +584,7 @@ int awsPrefManager::GetConstantValue (const char *name)
   int i;
   for (i = 0; i < constants.Length (); ++i)
   {
-    constant_entry *c = (constant_entry *)constants.Get (i);
+    constant_entry *c = constants.Get (i);
 
     if (c->name == namev) return c->value;
   }
@@ -607,7 +599,7 @@ bool awsPrefManager::ConstantExists (const char *name)
   int i;
   for (i = 0; i < constants.Length (); ++i)
   {
-    constant_entry *c = (constant_entry *)constants.Get (i);
+    constant_entry *c = constants.Get (i);
 
     if (c->name == namev) return true;
   }

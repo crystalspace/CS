@@ -21,7 +21,7 @@
 
 #include "ivaria/iso.h"
 #include "csgeom/box.h"
-#include "csutil/csvector.h"
+#include "csutil/refarr.h"
 #include "qint.h"
 
 class csIsoGroundMap;
@@ -48,9 +48,9 @@ private:
   /// the ground map of this grid
   csIsoGroundMap *groundmap;
   /// the lights in this grid, type iIsoLight
-  csBasicVector lights;
+  csRefArray<iIsoLight> lights;
   /// the dynamic lights in this grid, type iIsoLight
-  csBasicVector dynamiclights;
+  csRefArray<iIsoLight> dynamiclights;
   /// recalc static lighting?
   bool recalc_staticlight;
 

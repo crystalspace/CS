@@ -6,6 +6,47 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Aug-2003
+	- Jorrit removed iAwsParmList->AddBasicVector() and GetBasicVector().
+	  These functions were not used in CS and I thikn they are not safe
+	  (i.e. should use SCF parameter and not csBasicVector). And
+	  csBasicVector is being removed.
+	- Jorrit replaced pointer to sink inside SinkMap (for awsSinkManager)
+	  with a csRef to do proper ref counting.
+	- Jorrit replaced pointer to slot inside SinkSignalMap (for
+	  awsSinkManager) with a csRef to do proper ref counting.
+	- Jorrit replaced pointer to sink inside SignalTriggerMap (for
+	  awsSinkManager) with a csRef to do proper ref counting.
+	- Jorrit replaced various occurances of csBasicVector:
+	    - Replaced 'awsParmsList' in aws with a csPDelArray<parmItem>.
+	    - Replaced 'transitions' in awsManager with a
+	      csArray<awsWindowTransition*>.
+	    - Replaced 'hotspots' in awsListBox with a
+	      csPDelArray<awsListHotSpot>.
+	    - Replaced 'constants' in awsPrefManager with a
+	      csPDelArray<constant_entry>.
+	    - Replaced 'actions' in awsActionDispatcher with a
+	      csArray<awsActionMap*>.
+	    - Replaced 'sinks' in awsSinkManager with a csPDelArray<SinkMak>.
+	    - Replaced 'triggers' in awsSinkManager with a
+	      csPDelArray<TriggerMap>.
+	    - Replaced 'slots' in awsSinkManager with a
+	      csPDelArray<SlotSignalMap>.
+	    - Replaced 'stmap' in awsSinkManager with a
+	      csPDelArray<SignalTriggerMap>.
+	    - Replaced 'textures' in awsTextureManager with a
+	      csPDelArray<awsTexture>.
+	    - Replaced 'lights' in csIsoGrid with a csRefArray<iIsoLight>.
+	    - Replaced 'dynamiclights' in csIsoGrid with a
+	      csRefArray<iIsoLight>.
+	    - Replaced 'Edges' in Cloth with a csPDelArray<Constraint>.
+	    - Replaced 'fields' in Cloth with a csPDelArray<Constraint>.
+	    - Replaced 'Shear_Neighbours' in Cloth with a
+	      csPDelArray<Constraint>.
+	    - Replaced 'shear_fields' in Cloth with a csPDelArray<Constraint>.
+	- Jorrit fixed a bug in awsSinkManager::RemoveSink(). That function
+	  was trying to find an iAwsSink inside the sinks basic vector but
+	  that vector only contains SinkMap instances.
 2-Aug-2003
 	- Jorrit renamed csPDelArray::Delete(int) to DeleteIndex() to conform
 	  more to the API used by csArray.

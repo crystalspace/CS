@@ -31,17 +31,6 @@ awsSinkManager::awsSinkManager (iBase *p)
 
 awsSinkManager::~awsSinkManager ()
 {
-  int i;
-
-  for (i = 0; i < sinks.Length (); ++i)
-  {
-    SinkMap *sm = (SinkMap *)sinks[i];
-
-    sm->sink->DecRef ();
-    delete sm;
-  }
-
-  return ;
 }
 
 bool awsSinkManager::Initialize (iObjectRegistry *)
@@ -51,19 +40,22 @@ bool awsSinkManager::Initialize (iObjectRegistry *)
 
 void awsSinkManager::RegisterSink (const char *name, iAwsSink *sink)
 {
-  sink->IncRef ();
   sinks.Push (new SinkMap (NameToId (name), sink));
 }
 
 bool awsSinkManager::RemoveSink (iAwsSink* sink)
 {
-  int rc = sinks.Find (sink);
-  if (rc<0)
-    return false;
-
-  sinks.Delete (rc);
-  sink->DecRef ();
-  return true;
+  int i;
+  for (i = 0; i < sinks.Length (); ++i)
+  {
+    SinkMap *sm = sinks[i];
+    if (sm->sink == sink)
+    {
+      sinks.DeleteIndex (i);
+      return true;
+    }
+  }
+  return false;
 }
 
 iAwsSink *awsSinkManager::FindSink (const char *_name)
@@ -73,7 +65,7 @@ iAwsSink *awsSinkManager::FindSink (const char *_name)
 
   for (i = 0; i < sinks.Length (); ++i)
   {
-    SinkMap *sm = (SinkMap *)sinks[i];
+    SinkMap *sm = sinks[i];
 
     if (sm->name == name)
       return sm->sink;
@@ -93,20 +85,13 @@ iAwsSlot *awsSinkManager::CreateSlot ()
 }
 
 ///////////////////////////////////// Signal Sinks //////////////////////////////////////////////////////////
-awsSink::awsSink (void *p) :
-parm(p), sink_err(0)
+awsSink::awsSink (void *p) : parm(p), sink_err(0)
 {
   SCF_CONSTRUCT_IBASE (0);
 }
 
 awsSink::~awsSink ()
 {
-  for (int i=0; i<triggers.Length(); i++)
-  {
-    TriggerMap *tm = (TriggerMap *)triggers[i];
-    delete tm;
-  }
-  triggers.SetLength(0);
 }
 
 unsigned long awsSink::GetTriggerID (const char *_name)
@@ -118,7 +103,7 @@ unsigned long awsSink::GetTriggerID (const char *_name)
 
   for (i = 0; i < triggers.Length (); ++i)
   {
-    TriggerMap *tm = (TriggerMap *)triggers[i];
+    TriggerMap *tm = triggers[i];
 
     if (tm->name == name) return i;
   }
@@ -137,8 +122,7 @@ void awsSink::HandleTrigger (int trigger, iAwsSource *source)
     return ;
   }
 
-  void (*Trigger) (void *, iAwsSource *) =
-    (((TriggerMap *) (triggers[trigger]))->trigger);
+  void (*Trigger) (void *, iAwsSource *) = triggers[trigger]->trigger;
   (Trigger) (parm, source);
 }
 
@@ -158,12 +142,6 @@ awsSource::awsSource (iAwsComponent *_owner) :
 
 awsSource::~awsSource ()
 {
-  for (int i = 0; i < slots.Length (); ++i)
-  {
-    SlotSignalMap *p = (SlotSignalMap*) slots[i];
-    p->slot->DecRef ();
-    delete p;
-  }
 }
 
 iAwsComponent *awsSource::GetComponent ()
@@ -178,7 +156,6 @@ bool awsSource::RegisterSlot (iAwsSlot *slot, unsigned long signal)
   ssm->slot = slot;
   ssm->signal = signal;
 
-  slot->IncRef ();
   slots.Push (ssm);
 
   return true;
@@ -188,14 +165,11 @@ bool awsSource::UnregisterSlot (iAwsSlot *slot, unsigned long signal)
 {
   for (int i = 0; i < slots.Length (); ++i)
   {
-    SlotSignalMap *ssm = (SlotSignalMap*) slots[i];
+    SlotSignalMap *ssm = slots[i];
 
     if (ssm->signal == signal && ssm->slot == slot)
     {
-      slot->DecRef ();
-      slots.Delete (i);
-      delete ssm;
-
+      slots.DeleteIndex (i);
       return true;
     }
   }
@@ -209,7 +183,7 @@ void awsSource::Broadcast (unsigned long signal)
 
   for (i = 0; i < slots.Length (); ++i)
   {
-    SlotSignalMap *ssm = (SlotSignalMap*) slots[i];
+    SlotSignalMap *ssm = slots[i];
 
     if (ssm->signal == signal)
 	ssm->slot->Emit (*this, signal);
@@ -224,12 +198,6 @@ awsSlot::awsSlot ()
 
 awsSlot::~awsSlot ()
 {
-    for (int i = 0; i < stmap.Length(); i++)
-    {
-	SignalTriggerMap* sm = (SignalTriggerMap*) stmap[i];
-	sm->sink->DecRef ();
-	delete sm;
-    }
 }
 
 void awsSlot::Connect (
@@ -244,7 +212,7 @@ void awsSlot::Connect (
 
   for (i = 0; i < stmap.Length (); ++i)
   {
-    SignalTriggerMap *stm = (SignalTriggerMap *)stmap[i];
+    SignalTriggerMap *stm = stmap[i];
 
     if (stm->signal == signal && stm->trigger == trigger && stm->sink == sink)
     {
@@ -253,7 +221,6 @@ void awsSlot::Connect (
     }
   }
 
-  sink->IncRef ();
   stmap.Push (new SignalTriggerMap (signal, sink, trigger, 1));
 }
 
@@ -269,7 +236,7 @@ void awsSlot::Disconnect (
 
   for (i = 0; i < stmap.Length (); ++i)
   {
-    SignalTriggerMap *stm = (SignalTriggerMap *)stmap[i];
+    SignalTriggerMap *stm = stmap[i];
 
     if (stm->signal == signal && stm->trigger == trigger && stm->sink == sink)
     {
@@ -277,8 +244,7 @@ void awsSlot::Disconnect (
 
       if (stm->refs == 0)
       {
-	stm->sink->DecRef ();
-	stmap.Delete (i);
+	stmap.DeleteIndex (i);
       }
 
       return ;
@@ -292,7 +258,7 @@ void awsSlot::Emit (iAwsSource &source, unsigned long signal)
 
   for (i = 0; i < stmap.Length (); ++i)
   {
-    SignalTriggerMap *stm = (SignalTriggerMap *)stmap[i];
+    SignalTriggerMap *stm = stmap[i];
 
     if (stm->signal == signal)
       stm->sink->HandleTrigger (stm->trigger, &source);

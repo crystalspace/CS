@@ -691,14 +691,7 @@ void awsListBox::ClearPeers (awsListItem *itm)
 
 void awsListBox::ClearHotspots ()
 {
-  int i;
-  for (i = 0; i < hotspots.Length (); ++i)
-  {
-    awsListHotspot *hs = (awsListHotspot *)hotspots[i];
-    delete hs;
-  }
-
-  hotspots.SetLength (0);
+  hotspots.DeleteAll ();
 }
 
 bool awsListBox::HandleEvent (iEvent &Event)
@@ -1325,7 +1318,7 @@ bool awsListBox::OnMouseDown (int
 
   for (i = 0; i < hotspots.Length (); ++i)
   {
-    awsListHotspot *hs = (awsListHotspot *)hotspots[i];
+    awsListHotspot *hs = hotspots[i];
     if (hs->r.Contains (x, y))
     {
       switch (hs->type)

@@ -33,7 +33,7 @@ void awsActionDispatcher::Execute (
   int i;
   for (i = 0; i < actions.Length (); ++i)
   {
-    awsActionMap *map = (awsActionMap *)actions[i];
+    awsActionMap *map = actions[i];
 
     if (name == map->name) map->Action (owner, parmlist);
   }
