@@ -82,29 +82,19 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
 	}
 	break;
       case XMLTOKEN_ZUSE:
-	{
-	  step->SetZBufMode (CS_ZBUF_USE);
-	}
+	step->SetZBufMode (CS_ZBUF_USE);
 	break;
       case XMLTOKEN_ZTEST:
-	{
-	  step->SetZBufMode (CS_ZBUF_TEST);
-	}
+	step->SetZBufMode (CS_ZBUF_TEST);
 	break;
       case XMLTOKEN_ZFILL:
-	{
-	  step->SetZBufMode (CS_ZBUF_FILL);
-	}
+	step->SetZBufMode (CS_ZBUF_FILL);
 	break;
       case XMLTOKEN_ZNONE:
-	{
-	  step->SetZBufMode (CS_ZBUF_NONE);
-	}
+	step->SetZBufMode (CS_ZBUF_NONE);
 	break;
       case XMLTOKEN_SHADERTYPE:
-	{
-	  step->SetShaderType (child->GetContentsValue ());
-	}
+	step->SetShaderType (child->GetContentsValue ());
 	break;
       default:
 	if (synldr) synldr->ReportBadToken (child);
@@ -221,14 +211,13 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
   //g3d->SetShadowState (CS_SHADOW_VOLUME_USE);
 
   iVisibilityCuller* viscull = sector->GetVisibilityCuller ();
-  // @@@ Don't alloc/dealloc every frame!
-  ViscullCallback* callback = new ViscullCallback (rview, objreg);
-  viscull->VisTest (rview, callback);
+  ViscullCallback callback (rview, objreg);
+  viscull->VisTest (rview, &callback);
   
   //draw
-  int num;
-  csRenderMesh** meshes = callback->meshList.GetSortedMeshList (num);
-   
+  callback.meshList.GetSortedMeshList (meshes);
+  int num = meshes.Length ();
+ 
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
   int numSSM = 0;
   iShaderWrapper* shader = 0;
@@ -260,13 +249,10 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
     if (shader != 0)
     {
       csGenericRenderStep::RenderMeshes (g3d, shader, sameShaderMeshes, 
-      numSSM);
+        numSSM);
     }
   }
    
-  delete[] meshes;
-  delete callback;
-
   //g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
 
   if (zOffset)

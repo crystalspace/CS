@@ -85,14 +85,13 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
     switch (id)
     {
       case XMLTOKEN_TARGET:
-        ((csTargetRenderStep*)(void*)step)->SetTarget (child->GetContentsValue ());
+        ((csTargetRenderStep*)(void*)step)->SetTarget (
+		child->GetContentsValue ());
         break;
       case XMLTOKEN_STEPS:
 	{
 	  if (!rsp.ParseRenderSteps (steps, child))
-	  {
 	    return 0;
-	  }
 	}
 	break;
       default:
@@ -176,8 +175,7 @@ void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector)
 
 int csTargetRenderStep::AddStep (iRenderStep* step)
 {
-  csRef<iRenderStep> lrs = 
-    SCF_QUERY_INTERFACE (step, iRenderStep);
+  csRef<iRenderStep> lrs = SCF_QUERY_INTERFACE (step, iRenderStep);
   if (!lrs) return -1;
   return steps.Push (lrs);
 }

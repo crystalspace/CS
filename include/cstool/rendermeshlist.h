@@ -53,10 +53,9 @@ public:
 
   /**
    * Get a sorted list of meshes, sorted by renderpriority, and if needed
-   * do a sort within the RP. The array should be deleted by delete [] when
-   * you are finished with it.
+   * do a sort within the RP.
    */
-  csRenderMesh** GetSortedMeshList (int &n);
+  void GetSortedMeshList (csArray<csRenderMesh*>& meshes);
 
 private:
   /// This struct contains one entry in the RP infoqueue

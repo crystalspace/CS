@@ -52,7 +52,7 @@ public:
   {
     SCF_CONSTRUCT_IBASE (0)
 
-      csFullscreenQuad::g3d = g3d;
+    csFullscreenQuad::g3d = g3d;
 
     vertices = g3d->CreateRenderBuffer (
       sizeof (csVector3)*4, CS_BUF_STATIC,
@@ -112,7 +112,8 @@ SCF_IMPLEMENT_FACTORY(csFullScreenQuadRSLoader);
 
 //---------------------------------------------------------------------------
 
-csFullScreenQuadRSType::csFullScreenQuadRSType (iBase* p) : csBaseRenderStepType (p)
+csFullScreenQuadRSType::csFullScreenQuadRSType (iBase* p)
+	: csBaseRenderStepType (p)
 {
 }
 
@@ -124,7 +125,8 @@ csPtr<iRenderStepFactory> csFullScreenQuadRSType::NewFactory()
 
 //---------------------------------------------------------------------------
 
-csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p) : csBaseRenderStepLoader (p)
+csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p)
+	: csBaseRenderStepLoader (p)
 {
   init_token_table (tokens);
 }
@@ -248,9 +250,9 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
         mesh.indexstart = 0;
         mesh.indexend = 4;
         mesh.buffersource = fullquad;
-        csReversibleTransform* trans =
-	 new csReversibleTransform (csMatrix3(), csVector3 (0, 0, -2.0f));
-        mesh.transform = trans;
+        csReversibleTransform trans = csReversibleTransform (
+		csMatrix3(), csVector3 (0, 0, -2.0f));
+        mesh.transform = &trans;
         mesh.meshtype = CS_MESHTYPE_QUADS;
         mesh.z_buf_mode = CS_ZBUF_NONE;
         mesh.material = mat;
@@ -266,11 +268,11 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
         g3d->DrawMesh (&mesh);
         pass->ResetState ();
         pass->Deactivate ();
-	delete trans;
       }
     }
   }
-  /*csRenderMesh mesh;
+#if 0
+  csRenderMesh mesh;
   mesh.clip_plane = CS_CLIP_NOT;
   mesh.clip_portal = CS_CLIP_NOT;
   mesh.clip_z_plane = CS_CLIP_NOT;
@@ -286,7 +288,7 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
   csRef<iShaderManager> shadman = CS_QUERY_REGISTRY (object_reg, iShaderManager);
 
   //g3d->SetRenderTarget (engine->FindTexture ("TARGET2")->GetTextureHandle ());  
-  /*mesh.mathandle = engine->GetMaterialList ()->FindByName ("post a")->GetMaterialHandle ();
+  mesh.mathandle = engine->GetMaterialList ()->FindByName ("post a")->GetMaterialHandle ();
   csRef<iShader> shader = shadman->GetShader ("posteffect a");
   g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN );
   shader->GetBestTechnique ()->GetPass (0)->Activate (&mesh);
@@ -294,5 +296,7 @@ void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)
   g3d->DrawMesh (&mesh);
   shader->GetBestTechnique ()->GetPass (0)->ResetState ();
   shader->GetBestTechnique ()->GetPass (0)->Deactivate ();
-  g3d->FinishDraw ();*/
-};
+  g3d->FinishDraw ();
+#endif
+}
+

@@ -81,6 +81,8 @@ private:
   csZBufMode zmode;
   csRef<iStringSet> strings;
   iObjectRegistry *objreg;
+  // This is a work array we use for getting all meshes.
+  csArray<csRenderMesh*> meshes;
 
   // helperclass for the visculling. this creates a list
   // of meshes, which we later render

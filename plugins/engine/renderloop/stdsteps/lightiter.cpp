@@ -84,9 +84,7 @@ csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_STEPS:
 	{
 	  if (!rsp.ParseRenderSteps (steps, child))
-	  {
 	    return 0;
-	  }
 	}
 	break;
       default:
@@ -153,19 +151,15 @@ void csLightIterRenderStep::InitVariables ()
     csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
       object_reg, "crystalspace.renderer.stringset", iStringSet);
 
-    csStringID posname =
-      strings->Request ("STANDARD_LIGHT_0_POSITION");
-    csStringID difname =
-      strings->Request ("STANDARD_LIGHT_0_DIFFUSE");
-    csStringID spcname =
-      strings->Request ("STANDARD_LIGHT_0_SPECULAR");
-    csStringID attname =
-      strings->Request ("STANDARD_LIGHT_0_ATTENUATION");
+    csStringID posname = strings->Request ("STANDARD_LIGHT_0_POSITION");
+    csStringID difname = strings->Request ("STANDARD_LIGHT_0_DIFFUSE");
+    csStringID spcname = strings->Request ("STANDARD_LIGHT_0_SPECULAR");
+    csStringID attname = strings->Request ("STANDARD_LIGHT_0_ATTENUATION");
 
-    csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+    csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY (
+    	object_reg, iShaderManager);
 
-    shvar_light_0_position = 
-      shadermgr->GetVariable (posname);
+    shvar_light_0_position = shadermgr->GetVariable (posname);
     if (!shvar_light_0_position)
     {
       shvar_light_0_position = shadermgr->CreateVariable(posname);
@@ -173,8 +167,7 @@ void csLightIterRenderStep::InitVariables ()
       shadermgr->AddVariable(shvar_light_0_position);
     }
 
-    shvar_light_0_diffuse = 
-      shadermgr->GetVariable (difname);
+    shvar_light_0_diffuse = shadermgr->GetVariable (difname);
     if (!shvar_light_0_diffuse)
     {
       shvar_light_0_diffuse = shadermgr->CreateVariable(difname);
@@ -182,8 +175,7 @@ void csLightIterRenderStep::InitVariables ()
       shadermgr->AddVariable(shvar_light_0_diffuse);
     }
 
-    shvar_light_0_specular = 
-      shadermgr->GetVariable (spcname);
+    shvar_light_0_specular = shadermgr->GetVariable (spcname);
     if (!shvar_light_0_specular)
     {
       shvar_light_0_specular = shadermgr->CreateVariable(spcname);
@@ -191,8 +183,7 @@ void csLightIterRenderStep::InitVariables ()
       shadermgr->AddVariable(shvar_light_0_specular);
     }
 
-    shvar_light_0_attenuation = 
-      shadermgr->GetVariable (attname);
+    shvar_light_0_attenuation = shadermgr->GetVariable (attname);
     if (!shvar_light_0_attenuation)
     {
       shvar_light_0_attenuation = shadermgr->CreateVariable(attname);
@@ -206,10 +197,9 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
 {
   InitVariables ();
 
-  iGraphics3D* g3d = rview->GetGraphics3D();
-
+  // @@@ This code is ignoring dynamic lights. Perhaps we need a better
+  // way to represent those.
   iLightList* lights = sector->GetLights();
-
   int nlights = lights->GetCount();
 
   //g3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
@@ -223,18 +213,14 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)
     @@@ material specific diffuse/specular/ambient.
     Realized as shader variables maybe?
     */
-    csReversibleTransform camTransR = 
-      rview->GetCamera()->GetTransform();
+    csReversibleTransform camTransR = rview->GetCamera()->GetTransform();
 
     const csColor& color = light->GetColor ();
     shvar_light_0_diffuse->SetValue (
       csVector3 (color.red, color.green, color.blue));
 
     shvar_light_0_specular->SetValue (csVector3 (1));
-
-    shvar_light_0_attenuation->SetValue (
-      light->GetAttenuationVector ());
-
+    shvar_light_0_attenuation->SetValue (light->GetAttenuationVector ());
     shvar_light_0_position->SetValue (lightPos * camTransR);
 
     csSphere lightSphere (lightPos, light->GetInfluenceRadius ());

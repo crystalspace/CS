@@ -40,6 +40,21 @@ chronological order.
 	  iObjectRegistry in a prototype even though it wasn't declared.
 	- Anders Stenberg did some color correction in picogui to get
 	  red/blue right.
+	- Jorrit did some code cleanup in the engine renderloop code. Also
+	  removed a few warnings.
+	- Jorrit performed the following small optimizations in relation
+	  to the renderloop stuff:
+	     - Avoided a memory allocation of a transformation for every
+	       single technique.
+	     - Avoided a memory allocation of the callback structure
+	       every frame.
+	     - Changed csRenderMeshList::GetSortedMeshList() so that it now
+	       updates a csArray<csRenderMesh*> instead of returning a table
+	       that has to be deleted every time. This avoids a lot of
+	       memory allocation overhead. In the generic render step code
+	       we now maintain a permanent array (permanent for that step)
+	       to keep these meshes in. This avoids having to construct/grow
+	       the array all the time.
 9-Sep-2003
 	- res added a simple calculation of binormals and tangents to thing.
 	- res reformatted light.xml a bit.

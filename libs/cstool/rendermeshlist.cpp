@@ -126,7 +126,8 @@ int SortMeshFront2Back (void const* item1,
   return 0;
 }
 
-csRenderMesh** csRenderMeshList::GetSortedMeshList (int &n)
+void csRenderMeshList::GetSortedMeshList (
+	csArray<csRenderMesh*>& meshes)
 {
   // iterate, and if needed, sort the lists
   // also sum up how many objects we have
@@ -154,8 +155,7 @@ csRenderMesh** csRenderMeshList::GetSortedMeshList (int &n)
     numObjects += listEnt->meshList.Length ();
   }
 
-  csRenderMesh** meshes = new csRenderMesh*[numObjects];
-  int totalNum = 0;
+  meshes.DeleteAll ();
   int currentElement;
   
   it.Reset ();
@@ -170,11 +170,7 @@ csRenderMesh** csRenderMeshList::GetSortedMeshList (int &n)
     for (currentElement = 0; currentElement < listEnt->meshList.Length (); 
       ++currentElement)
     {
-      meshes[totalNum] = listEnt->meshList.Get (currentElement);
-      totalNum++;
+      meshes.Push (listEnt->meshList.Get (currentElement));
     }
   }
-  
-  n = totalNum;
-  return meshes;
 }

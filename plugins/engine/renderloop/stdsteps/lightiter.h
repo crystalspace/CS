@@ -82,6 +82,7 @@ private:
   csRef<csShaderVariable> shvar_light_0_specular;
   csRef<csShaderVariable> shvar_light_0_attenuation;
   bool initialized;
+
 public:
   SCF_DECLARE_IBASE;
 
