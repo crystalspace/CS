@@ -30,6 +30,7 @@
 #include "csgeom/quaterni.h"
 #include "iutil/plugin.h"
 #include "imap/services.h"
+#include "ivaria/engseq.h"
 
 #include "ivideo/effects/efserver.h"
 #include "ivideo/effects/efdef.h"
@@ -74,6 +75,8 @@ struct iMapNode;
 struct iReporter;
 struct iLODControl;
 struct iLoaderContext;
+struct iSequenceTrigger;
+struct iSequenceWrapper;
 
 enum
 {
@@ -170,7 +173,7 @@ enum
   XMLTOKEN_SLOPE,
   XMLTOKEN_SOLID,
   XMLTOKEN_VALUE,
-  //effectsystem loader
+  // For effectsystem loader.
   XMLTOKEN_ALPHAMODIFIER1,
   XMLTOKEN_ALPHAMODIFIER2,
   XMLTOKEN_ALPHAMODIFIER3,
@@ -199,7 +202,18 @@ enum
   XMLTOKEN_VARIABLE,
   XMLTOKEN_VERTEXCOLOR,
   XMLTOKEN_VERTEXPROGRAM,
-  XMLTOKEN_VERTEXPROGRAMCONST
+  XMLTOKEN_VERTEXPROGRAMCONST,
+  // For sequences and triggers.
+  XMLTOKEN_RUNSEQUENCE,
+  XMLTOKEN_SEQUENCE,
+  XMLTOKEN_SEQUENCES,
+  XMLTOKEN_TRIGGER,
+  XMLTOKEN_TRIGGERS,
+  XMLTOKEN_SETFOG,
+  XMLTOKEN_FADEFOG,
+  XMLTOKEN_DELAY,
+  XMLTOKEN_FIRE,
+  XMLTOKEN_SECTORVIS
 };
 
 class StdLoaderContext;
@@ -215,8 +229,10 @@ private:
   iLoaderContext* GetLoaderContext ();
   csStringHash xmltokens;
 
-  /// Parser for common stuff like MixModes
+  /// Parser for common stuff like MixModes, vectors, matrices, ...
   csRef<iSyntaxService> SyntaxService;
+  /// Pointer to the engine sequencer (optional module).
+  csRef<iEngineSequenceManager> eseqmgr;
 
   class csLoaderStats
   {
@@ -283,6 +299,15 @@ private:
   bool ParseColor (iDocumentNode* node, csRGBcolor &c);
   /// Parse a color definition
   bool ParseColor (iDocumentNode* node, csColor &c);
+
+  /// Load a trigger.
+  iSequenceTrigger* LoadTrigger (iDocumentNode* node);
+  /// Load a list of triggers.
+  bool LoadTriggers (iDocumentNode* node);
+  /// Load a sequence.
+  iSequenceWrapper* LoadSequence (iDocumentNode* node);
+  /// Load a list of sequences.
+  bool LoadSequences (iDocumentNode* node);
 
   /// Parse a list of textures and add them to the engine.
   bool ParseTextureList (iDocumentNode* node);
@@ -396,6 +421,9 @@ private:
 
   /// Load map from a memory buffer
   bool LoadMap (iDocumentNode* node);
+
+  /// Get the engine sequence manager (load it if not already present).
+  iEngineSequenceManager* GetEngineSequenceManager ();
 
   //========================================================================
   //========================================================================

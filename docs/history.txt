@@ -4,6 +4,21 @@ The history order is reversed so that new features are at the top.
 	- Added new iEngineSequenceManager API. This is going to be used
 	  for an engine sequence manager. More info on this new feature
 	  later.
+	- Added csRefArray<T> which is a templated array for csRef's.
+	  It has most of the functionality of a csVector (but not all yet).
+	- Added new engine sequence manager plugin (plugins/engseq). This
+	  sequence manager enhances the normal sequence manager with engine
+	  specific operations (like triggers, light diming, moving
+	  of objects, fog, ...).
+	- At this moment only the 'setfog' and 'fadefog' commands
+	  are implemented.
+	- Extended the standard map loader with the ability to load
+	  triggers and sequences. Now you can have <sequences> and
+	  <triggers> blocks in both world and library files.
+	- Added a small demo of a trigger and sequences in flarge.
+	  When you go to the basement (through the hole in the floor
+	  in flarge) one of the corridors will start having fluctuating
+	  fog as soon as you first look at that corridor.
 22-Sep-2002
 	- Modified iMeshWrapper->SetDrawCallback() so that multiple
 	  callbacks are now supported. Added RemoveDrawCallback() and

@@ -46,58 +46,75 @@ struct iSequenceWrapper : public iBase
   virtual iObject* QueryObject () = 0;
 
   /**
-   * Get the sequence.
+   * Get the sequence. It is allowed to use the underlying sequence
+   * for general sequence operations like adding conditions, operations,
+   * and general sequence management. The AddOperationBla() functions
+   * provided in this wrapper do nothing more than add custom operations
+   * through the regular iSequence->AddOperation().
    */
   virtual iSequence* GetSequence () = 0;
 
   /**
    * Operation: set a light color.
    */
-  virtual void AddOperationSetLightColor (iLight* light,
+  virtual void AddOperationSetLightColor (csTicks time, iLight* light,
 		  const csColor& color) = 0;
 
   /**
    * Operation: fade a light to some color during some time.
    */
-  virtual void AddOperationSetLightColor (iLight* light,
+  virtual void AddOperationFadeLightColor (csTicks time, iLight* light,
 		  const csColor& color, csTicks duration) = 0;
 
   /**
-   * Operation: absolute move of object.
+   * Operation: set a fog color and density.
    */
-  virtual void AddOperationAbsoluteMove (iMeshWrapper* mesh,
-		  iSector* sector, const csReversibleTransform& trans);
+  virtual void AddOperationSetFog (csTicks time, iSector* sector,
+		  const csColor& color, float density) = 0;
+
+  /**
+   * Operation: fade fog to some color/density during some time.
+   */
+  virtual void AddOperationFadeFog (csTicks time, iSector* sector,
+		  const csColor& color, float density, csTicks duration) = 0;
 
   /**
    * Operation: absolute move of object.
    */
-  virtual void AddOperationAbsoluteMove (iMeshWrapper* mesh,
-		  iSector* sector, const csVector3& pos);
+  virtual void AddOperationAbsoluteMove (csTicks time, iMeshWrapper* mesh,
+		  iSector* sector, const csReversibleTransform& trans) = 0;
+
+  /**
+   * Operation: absolute move of object.
+   */
+  virtual void AddOperationAbsoluteMove (csTicks time, iMeshWrapper* mesh,
+		  iSector* sector, const csVector3& pos) = 0;
 
   /**
    * Operation: relative move of object.
    */
-  virtual void AddOperationRelativeMove (iMeshWrapper* mesh,
-		  const csReversibleTransform& trans);
+  virtual void AddOperationRelativeMove (csTicks time, iMeshWrapper* mesh,
+		  const csReversibleTransform& trans) = 0;
 
   /**
    * Operation: relative move of object.
    */
-  virtual void AddOperationRelativeMove (iMeshWrapper* mesh,
-		  const csVector3& pos);
+  virtual void AddOperationRelativeMove (csTicks time, iMeshWrapper* mesh,
+		  const csVector3& pos) = 0;
 
   /**
    * Operation: enable/disable a given trigger.
    */
-  virtual void AddOperationTriggerState (iSequenceTrigger* trigger,
-		  bool en);
+  virtual void AddOperationTriggerState (csTicks time,
+  		  iSequenceTrigger* trigger, bool en) = 0;
 };
 
 SCF_VERSION (iSequenceTrigger, 0, 0, 1);
 
 /**
  * A sequence trigger. When all conditions in a trigger are
- * true it will run a sequence.
+ * true it will run a sequence. Note that after the succesfull firing
+ * of a trigger it will automatically be disabled.
  */
 struct iSequenceTrigger : public iBase
 {
@@ -139,7 +156,7 @@ struct iSequenceTrigger : public iBase
   virtual void AddConditionManual () = 0;
 
   /**
-   * Enable/disable this trigger. Triggers start disabled by
+   * Enable/disable this trigger. Triggers start enabled by
    * default.
    */
   virtual void SetEnabled (bool en) = 0;
@@ -169,6 +186,23 @@ struct iSequenceTrigger : public iBase
    * Get the attached sequence.
    */
   virtual iSequenceWrapper* GetFiredSequence () = 0;
+};
+
+SCF_VERSION (iSequenceTimedOperation, 0, 0, 1);
+
+/**
+ * A timed operation for the engine sequence manager.
+ * This is basically something that needs to run over some period
+ * of time. The 'elapsed' value that needs to be implemented by
+ * subclasses will go from 0 to 1. When the time expires (goes beyond
+ * 1) then the operation will be deleted automatically.
+ */
+struct iSequenceTimedOperation : public iBase
+{
+  /**
+   * Do the operation. 'time' will be between 0 and 1.
+   */
+  virtual void Do (float time) = 0;
 };
 
 SCF_VERSION (iEngineSequenceManager, 0, 0, 1);
@@ -212,6 +246,11 @@ struct iEngineSequenceManager : public iBase
    */
   virtual iSequenceTrigger* GetTrigger (int idx) const = 0;
 
+  /**
+   * Get a trigger by name.
+   */
+  virtual iSequenceTrigger* FindTriggerByName (const char* name) const = 0;
+
   //-----------------------------------------------------------------------
 
   /**
@@ -238,6 +277,21 @@ struct iEngineSequenceManager : public iBase
    * Get a sequence.
    */
   virtual iSequenceWrapper* GetSequence (int idx) const = 0;
+
+  /**
+   * Get a sequence by name.
+   */
+  virtual iSequenceWrapper* FindSequenceByName (const char* name) const = 0;
+
+  //-----------------------------------------------------------------------
+
+  /**
+   * Start a timed operation with a given delta (in ticks).
+   * The delta has to be interpreted as the amount of time that has
+   * already elapsed since the beginning of the timed operation.
+   */
+  virtual void FireTimedOperation (csTicks delta, csTicks duration,
+  	iSequenceTimedOperation* op) = 0;
 
   //-----------------------------------------------------------------------
 };

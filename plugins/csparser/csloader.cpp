@@ -771,6 +771,17 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("vertexcolor", XMLTOKEN_VERTEXCOLOR);
   xmltokens.Register ("vertexprogram", XMLTOKEN_VERTEXPROGRAM);
   xmltokens.Register ("vertexprogramconstant", XMLTOKEN_VERTEXPROGRAMCONST);
+
+  xmltokens.Register ("runsequence", XMLTOKEN_RUNSEQUENCE);
+  xmltokens.Register ("sequence", XMLTOKEN_SEQUENCE);
+  xmltokens.Register ("sequences", XMLTOKEN_SEQUENCES);
+  xmltokens.Register ("trigger", XMLTOKEN_TRIGGER);
+  xmltokens.Register ("triggers", XMLTOKEN_TRIGGERS);
+  xmltokens.Register ("setfog", XMLTOKEN_SETFOG);
+  xmltokens.Register ("fadefog", XMLTOKEN_FADEFOG);
+  xmltokens.Register ("delay", XMLTOKEN_DELAY);
+  xmltokens.Register ("fire", XMLTOKEN_FIRE);
+  xmltokens.Register ("sectorvis", XMLTOKEN_SECTORVIS);
   return true;
 }
 
@@ -842,6 +853,14 @@ bool csLoader::LoadMap (iDocumentNode* node)
           if (!ParseMaterialList (child))
             return false;
           break;
+	case XMLTOKEN_SEQUENCES:
+	  if (!LoadSequences (child))
+	    return false;
+	  break;
+	case XMLTOKEN_TRIGGERS:
+	  if (!LoadTriggers (child))
+	    return false;
+	  break;
 	case XMLTOKEN_PLUGINS:
 	  if (!LoadPlugins (child))
 	    return false;
@@ -926,6 +945,14 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
 	  if (!LoadAddOn (child, (iEngine*)Engine))
 	    return false;
       	  break;
+	case XMLTOKEN_SEQUENCES:
+	  if (!LoadSequences (child))
+	    return false;
+	  break;
+	case XMLTOKEN_TRIGGERS:
+	  if (!LoadTriggers (child))
+	    return false;
+	  break;
         case XMLTOKEN_TEXTURES:
           // Append textures to engine.
           if (!ParseTextureList (child))
@@ -2960,6 +2987,23 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
   return sector;
 }
 
+iEngineSequenceManager* csLoader::GetEngineSequenceManager ()
+{
+  if (!eseqmgr)
+  {
+    csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+    eseqmgr = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.utilities.sequence.engine", iEngineSequenceManager);
+    if (!eseqmgr)
+    {
+      ReportError ("crystalspace.maploader",
+	"Could not load the engine sequence manager!");
+      return NULL;
+    }
+  }
+  return eseqmgr;
+}
 
 //========================================================================
 //========================================================================

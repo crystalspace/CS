@@ -229,6 +229,7 @@
         <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
         <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
     </plugins>
+
     <start>
         <sector>room</sector>
         <position x="0" y="0" z="0" />
@@ -22616,4 +22617,35 @@
         </meshobj>
         <fog red="0.2" green="0.3" blue="0.5" density="0.08" />
     </sector>
+
+    <sequences>
+        <sequence name="fogloop">
+	    <fadefog sector="kamer2l" red="1" green="1" blue="1" density="0.1"
+	    	duration="1000" />
+	    <delay>1000</delay>
+	    <fadefog sector="kamer2l" red="1" green="0" blue="0" density="0.2"
+	    	duration="1000" />
+	    <delay>1000</delay>
+	    <fadefog sector="kamer2l" red="0" green="1" blue="0" density="0.1"
+		duration="1000" />
+	    <delay>1000</delay>
+	    <fadefog sector="kamer2l" red="0" green="0" blue="1" density="0.2"
+	    	duration="1000" />
+	    <delay>1000</delay>
+	    <runsequence>fogloop</runsequence>
+	</sequence>
+        <sequence name="fog">
+	    <setfog sector="kamer2l" red="0" green="0" blue="0" density="0" />
+	    <delay>1000</delay>
+	    <runsequence>fogloop</runsequence>
+	</sequence>
+    </sequences>
+    <triggers>
+        <trigger name="setfog">
+	    <sectorvis>kamer2l</sectorvis>
+	    <fire delay=100>fog</fire>
+	</trigger>
+    </triggers>
+
 </world>
+

@@ -30,9 +30,7 @@
 #include "imesh/thing/portal.h"
 
 // ---------------------------------------------------------------------------
-
 // csMeshWrapper
-
 // ---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csMeshWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshWrapper)
