@@ -105,6 +105,7 @@ window:        TOKEN_WINDOW TOKEN_STR TOKEN_FROM TOKEN_STR '{' window_item_list 
  *************************************/
 
 skin_item:       TOKEN_ATTR ':' TOKEN_STR             { $$ = new awsStringKey(new scfString($1), new scfString($3)); }
+	       | TOKEN_ATTR ':' exp ',' exp ',' exp   { $$ = new awsRGBKey(new scfString($1), $3, $5, $7);           }
 ;
 
 skin_item_list:  skin_item                            { kcont.Add($1); }

@@ -2,6 +2,7 @@
 #include "aws.h"
 #include "awsprefs.h"
 #include "ivideo/txtmgr.h"
+#include "iengine/engine.h"
 #include <stdio.h>
 
 awsManager::awsManager(iBase *p):prefmgr(NULL),System(NULL)
@@ -124,22 +125,39 @@ awsManager::SetContext(iGraphics2D *g2d, iGraphics3D *g3d)
 }
 
 void 
-awsManager::SetDefaultContext()
+awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
 {
   canvas.SetSize(512, 512);
   canvas.SetKeyColor(255,0,255);
-  if (!canvas.Initialize(System))
+  if (!canvas.Initialize(System, engine, txtmgr, "awsCanvas"))
     printf("aws-debug: SetDefaultContext failed to initialize the memory canvas.\n");
   else
     printf("aws-debug: Memory canvas initialized!\n");
-      
+    
+  if (!canvas.PrepareAnim())
+    printf("aws-debug: Prepare anim failed!\n");
+  else
+    printf("aws-debug: Prepare anim succeeded.\n");
+   
+  iTextureWrapper *tw = engine->GetTextureList()->NewTexture(canvas.GetTextureWrapper()->GetTextureHandle());
+  iMaterialWrapper *canvasMat = engine->CreateMaterial("awsCanvasMat", tw);
+          
   ptG2D = canvas.G2D();
   ptG3D = canvas.G3D();
   
   printf("aws-debug: G2D=%x G3D=%x\n", ptG2D, ptG3D);
-  //ptG2D->Clear(ptG3D->GetTextureManager()->FindRGB(255,0,255));
+   
   
+  if (ptG3D)
+    GetPrefMgr()->SetupPalette(ptG3D);
   
+  if (ptG2D && ptG3D) 
+  {
+    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
+    ptG2D->Clear(txtmgr->FindRGB(255,0,255));
+    ptG3D->FinishDraw();
+    ptG3D->Print(NULL);
+  }
 }
 
 void
@@ -192,20 +210,33 @@ awsManager::WindowIsDirty(awsWindow *win)
   return false;
 }
 
+void
+awsManager::Print(iGraphics3D *g3d)
+{
+  g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
+  		  0,0,512,512,
+		  0,0,512,512,0);
+  		  
+  
+}
+
 void       
 awsManager::Redraw()
 {
    static unsigned redraw_tag = 0;
 
    redraw_tag++;
-    
+   ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
+   
+   ptG2D->DrawBox(0,200,512,250, ptG3D->GetTextureManager()->FindRGB(0,255,0));
+   
+   ptG3D->FinishDraw ();
+   ptG3D->Print (NULL);
+     
    // check to see if there is anything to redraw.
    if (dirty[0].IsEmpty()) {
       return;
-   }
-   
-   ptG2D->DrawLine(0,frame.ymax-20,frame.xmax,frame.ymax, 
-   			
+   }		
    
    return;
    
@@ -360,8 +391,7 @@ awsManager::awsCanvas::awsCanvas ()
   mat_w=512;
   mat_h=512;
   
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS | 
-    CS_TEXTURE_PROC_ALONE_HINT;
+  texFlags = CS_TEXTURE_2D | CS_TEXTURE_PROC;
    
 }
 

@@ -153,7 +153,10 @@ public:
 
     /// Returns true if part of this window is inside the dirty zones
     virtual bool       WindowIsDirty(awsWindow *win);
-
+    
+    /// Causes the current view of the window system to be drawn to the given graphics device.
+    virtual void       Print(iGraphics3D *g3d);
+  
     /// Redraw whatever portions of the screen need it.
     virtual void       Redraw();
 
@@ -179,7 +182,7 @@ public:
     virtual void SetContext(iGraphics2D *g2d, iGraphics3D *g3d);
 
     /// Set the context to the procedural texture
-    virtual void SetDefaultContext();
+    virtual void SetDefaultContext(iEngine* engine, iTextureManager* txtmgr);
 
     /// Get the iGraphics2D interface so that components can use it.
     virtual iGraphics2D *G2D() 

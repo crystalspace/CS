@@ -23,6 +23,7 @@
 struct iString;
 
 /****
+
  This is the pseudo-symbol table for the definitions keeper.  Windows and their sub-keys can be looked up from here.
 There are a few different types of values possible for keys:  Strings, Integers, and Rects.  They can be looked up
 using appropriate search methods in the main preferences.  Skins and Windows are containers which hold the keys, and
@@ -41,6 +42,7 @@ const unsigned char KEY_RECT = 2;
 const unsigned char KEY_WIN  = 3;
 const unsigned char KEY_SKIN = 4;
 const unsigned char KEY_COMPONENT = 5;
+const unsigned char KEY_RGB = 6;
 
 /// Abstract key interface
 class awsKey
@@ -122,6 +124,29 @@ public:
 
   /// Gets the value of this key as a rectangle
   csRect Value() { return val; }
+};
+
+class awsRGBKey : public awsKey
+{
+  /// The key's value
+  struct RGB {
+  	unsigned char red, green, blue;
+  } rgb;
+
+public:
+  /// Constructs an integer key with the given name
+  awsRGBKey(iString *name, unsigned char r, unsigned char g, unsigned char b):awsKey(name)
+  { rgb.red=r; rgb.green=g; rgb.blue=b; }
+
+  /// Destructor does nothing
+  virtual ~awsRGBKey() {};
+
+  /// So that we know this is a rect key 
+  virtual unsigned char Type() 
+  { return KEY_RGB; }
+
+  /// Gets the value of this key as a rectangle
+  awsRGBKey::RGB& Value() { return rgb; }
 };
 
 
@@ -212,14 +237,17 @@ public:
 
 //////////////////////////////////  Preference Manager ////////////////////////////////////////////////////////////////
 
-const unsigned int COLOR_HIGHLIGHT  = 0;
+/*const unsigned int COLOR_HIGHLIGHT  = 0;
 const unsigned int COLOR_SHADOW     = 1;
 const unsigned int COLOR_FILL 	    = 2;
 const unsigned int COLOR_DARKFILL   = 3;
 const unsigned int COLOR_TEXTFORE   = 4;
 const unsigned int COLOR_TEXTBACK   = 5;
-const unsigned int COLOR_TEXTDISABLED = 6;
+const unsigned int COLOR_TEXTDISABLED = 6;*/
 
+enum AWS_COLORS { AC_HIGHLIGHT, AC_SHADOW, AC_FILL, AC_DARKFILL, 
+		  AC_TEXTFORE, AC_TEXTBACK, AC_TESTDISABLE, AC_TRANSPARENT, 
+		  AC_COLOR_COUNT };
 
 class awsPrefManager : public iAwsPrefs
 {
@@ -237,6 +265,9 @@ class awsPrefManager : public iAwsPrefs
 
   /// Currently selected skin 
   awsSkinNode *def_skin;
+  
+  /// Color index
+  int sys_colors[AC_COLOR_COUNT];
 
 public:
     SCF_DECLARE_IBASE;
@@ -292,6 +323,19 @@ public:
     void AddSkinDef(awsSkinNode *skin)
     { skin_defs.AddItem(skin); n_skin_defs++; }
 
+public:
+    /// Sets the value of a color in the global AWS palette.
+    virtual void SetColor(int index, int color); 
+    
+    /// Gets the value of a color from the global AWS palette.
+    virtual int  GetColor(int index);
+    
+    /** Sets up the AWS palette so that the colors are valid reflections of
+       user preferences.  Although SetColor can be used, it's recommended 
+       that you do not.  Colors should always be a user preference, and 
+       should be read from the window and skin definition files (as
+       happens automatically normally. */
+    virtual void SetupPalette(iGraphics3D *g3d);
     
 };
  

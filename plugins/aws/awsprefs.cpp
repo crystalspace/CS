@@ -1,5 +1,7 @@
 #include "cssysdef.h"
 #include "csutil/scfstr.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
 #include "awsprefs.h"
 #include <stdio.h>
 #include <string.h>
@@ -42,6 +44,26 @@ awsPrefManager::NameToId(char *n)
  }
  else 
     return 0;
+}
+
+void
+awsPrefManager::SetColor(int index, int color)
+{
+  sys_colors[index] = color;  
+}
+
+int 
+awsPrefManager::GetColor(int index)
+{
+  return sys_colors[index]; 
+}
+
+void
+awsPrefManager::SetupPalette(iGraphics3D *g3d)
+{
+ iTextureManager* txtmgr = g3d->GetTextureManager();
+
+ sys_colors[AC_TRANSPARENT] = txtmgr->FindRGB(255,0,255); 
 }
 
 
