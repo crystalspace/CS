@@ -27,7 +27,7 @@ inline bool MemoryMapFile(mmioInfo* info, char const* filename)
   int const fd = open(filename, O_RDONLY);
   if (fd != -1 && fstat(fd, &st) != -1)
   {
-    unsigned char* p=(unsigned char*)mmap(0, st.st_size, PROT_READ, 0, fd, 0);
+    unsigned char* p=(unsigned char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
     if ((int)p != -1)
     {
       info->hMappedFile = fd;

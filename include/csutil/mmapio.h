@@ -140,8 +140,7 @@ public:
   inline void *GetPointer(unsigned int index)
   {
 #ifdef CS_HAS_MEMORY_MAPPED_IO
-
-    return platform.data + (index*block_size);
+    return (valid_mmio_object) ? platform.data + (index*block_size) : NULL;
 
 #else
 
