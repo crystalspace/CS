@@ -1544,8 +1544,8 @@ now have to set the invisible flag manually on all children in the hierarchy.
 @cindex @code{iSkeletonBone}
 
 Support for skeletal sprites has been removed, along with the following related
-interfaces.  Use the @sc{sprcal3d} mesh object instead.  It is more flexible
-and works correctly.
+interfaces.  Use the @samp{sprcal3d} mesh object instead.  It is more flexible
+and works correctly.  These interfaces have been retired:
 
 @itemize @bullet
 @item
@@ -1561,7 +1561,7 @@ and works correctly.
 @end itemize
 
 In addition, the motion manager plugin has been removed, along with the
-following related interfaces.
+following related interfaces:
 
 @itemize @bullet
 @item
@@ -1598,7 +1598,7 @@ and uses a lot less memory. In future we will remove the @sc{rapid} plugin.
 
 The @code{iCollideSystem::CollidePath()} utility method has been relocated to
 @code{csColliderHelper::CollidePath()}. In addition there are a few extra
-versions that can make life easier for calculating collisions on a path.
+overloads that can make life easier for calculating collisions on a path.
 
 @subheading Isometric Engine
 
