@@ -32,8 +32,6 @@ csCBufferLine::csCBufferLine ()
 
 void csCBufferLine::Initialize (int startx, int endx)
 {
-// this doesn't seem to work (HUGE memory leak). replaced by slow, but stable version ;-)
-#if 0
   if (last_span)
   {
     // Append the current unused list to the last span
@@ -42,15 +40,6 @@ void csCBufferLine::Initialize (int startx, int endx)
     last_span->next = parent->first_unused;
     parent->first_unused = first_span;
   }
-#else
-  csCBufferSpan *n;
-  while(first_span)
-  {
-    n=first_span->next;
-    parent->FreeSpan(first_span);
-    first_span=n;
-  }
-#endif
 
   // Allocate an empty span for the whole scanline.
   first_span = parent->AllocSpan ();
@@ -121,6 +110,7 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
 
       // If the start of the empty span is after the end of the full span
       // then we can stop.
+      if (s->startx > endx) return vis;
 
       // We know this empty span is going to modified somehow.
       // So the full span is visible.
@@ -130,12 +120,12 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       // empty span.
       if (s->startx >= startx && s->endx <= endx)
       {
-	      csCBufferSpan* sn = s->next;
+	csCBufferSpan* sn = s->next;
         if (ps) ps->next = sn;
-	      else first_span = sn;
-	      parent->FreeSpan (s);
-	      s = sn;
-	      continue;
+	else first_span = sn;
+	parent->FreeSpan (s);
+	s = sn;
+	continue;
       }
 
       // If start of empty span is before start of full span then we 
@@ -149,7 +139,7 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       // to shrink the empty span.
       else if (s->endx > endx && s->startx >= startx)
       {
-	      s->startx = endx+1;
+	s->startx = endx+1;
       }
 
       // Else the empty span is totally covering the full scan. We
@@ -157,12 +147,12 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       else
       {
         csCBufferSpan* new_span = parent->AllocSpan ();
-	      new_span->next = s->next;
-	      s->next = new_span;
-	      if (new_span->next == NULL) last_span = new_span;
-	      new_span->endx = s->endx;
-	      s->endx = startx-1;
-	      new_span->startx = endx+1;
+	new_span->next = s->next;
+	s->next = new_span;
+	if (new_span->next == NULL) last_span = new_span;
+	new_span->endx = s->endx;
+	s->endx = startx-1;
+	new_span->startx = endx+1;
       }
     }
     ps = s;
