@@ -21,11 +21,9 @@
 #include "cssysdef.h"
 #include "csfont.h"
 #include "iutil/vfs.h"
-#include "iutil/plugin.h"
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "iutil/objreg.h"
-#include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivaria/reporter.h"
 
