@@ -31,7 +31,7 @@ class csFuncTexLoader : public iLoaderPlugin
 protected:
   csRef<iObjectRegistry> object_reg;
   csStringHash tokens;
-#define CS_TOKEN_ITEM_FILE "proctex/tlfunc/tlfunc.tok"
+#define CS_TOKEN_ITEM_FILE "plugins/proctex/tlfunc/tlfunc.tok"
 #include "cstool/tokenlist.h"
 
 public:

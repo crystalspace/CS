@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssaver/cssaver.h"
+#include "plugins/cssaver/cssaver.h"
 #include "iutil/vfs.h"
 #include "iutil/document.h"
 #include "iutil/object.h"

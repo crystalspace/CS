@@ -41,7 +41,7 @@ public:
 class csPtFireLoader : public csBaseProctexLoader
 {
   csStringHash tokens;
-#define CS_TOKEN_ITEM_FILE "proctex/standard/fire.tok"
+#define CS_TOKEN_ITEM_FILE "plugins/proctex/standard/fire.tok"
 #include "cstool/tokenlist.h"
 public:
   csPtFireLoader(iBase *p);
