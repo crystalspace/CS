@@ -2114,6 +2114,7 @@ void Cs2Xml::ParseOther (char const* parent_token, csParser* parser,
     csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	CS_NODE_ELEMENT, NULL);
     child->SetValue (tokname);
+    if (name && *name) child->SetAttribute ("name", name);
   }
   else if (IsNumeric (params))
   {
