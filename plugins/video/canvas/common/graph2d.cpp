@@ -163,14 +163,47 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
     FontServer = CS_QUERY_REGISTRY (object_reg, iFontServer);
   }
 
-  Palette = new csRGBpixel [256];
-  pfmt.PalEntries = 256;
-  pfmt.PixelBytes = 1;
   // Initialize pointers to default drawing methods
   _DrawPixel = DrawPixel8;
   _WriteString = WriteString8;
   _WriteStringBaseline = WriteStringBaseline8;
   _GetPixelAt = GetPixelAt8;
+
+  Palette = new csRGBpixel [256];
+  if (Depth == 8)
+  {
+    pfmt.PalEntries = 256;
+    pfmt.PixelBytes = 1;
+  }
+  else if (Depth == 16)
+  {
+    _DrawPixel = DrawPixel16;
+    _WriteString = WriteString16;
+    _WriteStringBaseline = WriteStringBaseline16;
+    _GetPixelAt = GetPixelAt16;
+
+    // Set pixel format
+    pfmt.RedMask   = 0x1f << 11;
+    pfmt.GreenMask = 0x3f << 5;
+    pfmt.BlueMask  = 0x1f;
+    pfmt.PixelBytes = 2;
+    pfmt.PalEntries = 0;
+  }
+  else if (Depth == 32)
+  {
+    _DrawPixel = DrawPixel32;
+    _WriteString = WriteString32;
+    _WriteStringBaseline = WriteStringBaseline32;
+    _GetPixelAt = GetPixelAt32;
+
+    // calculate CS's pixel format structure.
+    pfmt.RedMask = 0xff << 16;
+    pfmt.GreenMask = 0xff << 8;
+    pfmt.BlueMask = 0xff;
+    pfmt.PixelBytes = 4;
+    pfmt.PalEntries = 0;
+  }
+  pfmt.complete ();
   // Mark all slots in palette as free
   int i;
   for (i = 0; i < 256; i++)

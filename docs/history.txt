@@ -1,4 +1,4 @@
-Crystal Space detailed change log.
+UpCrystal Space detailed change log.
 http://crystal.sourceforge.net/
 
 The overall history is in reverse (descending) chronological order, so that
@@ -59,6 +59,8 @@ chronological order.
 	  with DeleteIndex (int) in the source code of the csSoundRenderDS3D
 	  class.
 	- Eric Sunshine fixed compilation problems with partedit on MacOS/X.
+	- Anders Stenberg added better pixel format handling in csGraphics3D,
+	  since it was needed for the abuse pgserver puts it through.
 2-Aug-2003
 	- Jorrit renamed csPDelArray::Delete(int) to DeleteIndex() to conform
 	  more to the API used by csArray.
