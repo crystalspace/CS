@@ -2219,6 +2219,12 @@ csODEDefaultMoveCallback::~csODEDefaultMoveCallback ()
 void csODEDefaultMoveCallback::Execute (iMeshWrapper* mesh,
  csOrthoTransform& t)
 {
+  // Dont do anything if nothing has changed
+  if (mesh->GetMovable()->GetPosition() == t.GetOrigin() &&
+	  mesh->GetMovable()->GetTransform().GetT2O() == t.GetO2T())
+	return;
+
+  // Update movable
   mesh->GetMovable ()->SetPosition (t.GetOrigin ());
   mesh->GetMovable ()->GetTransform ().SetT2O (t.GetO2T ());
   mesh->GetMovable ()->UpdateMove ();
