@@ -31,8 +31,8 @@ typedef struct attribute_tag
 {
   union
   {
-    int32 Integer;
-	  uint32 Unsigned;
+    int64 Integer;
+    uint64 Unsigned;
     double Double;
     char *String;
     bool Bool;
@@ -46,6 +46,8 @@ typedef struct attribute_tag
     tag_uint16,
     tag_int32,
     tag_uint32,
+    tag_int64,
+    tag_uint64,
     tag_float,
     tag_double,
     tag_string,
@@ -72,6 +74,8 @@ char *GetTypeName(attribute::Type t)
     case attribute::tag_uint16: return "uint16";
     case attribute::tag_int32: return "int32";
     case attribute::tag_uint32: return "uint32";
+    case attribute::tag_int64: return "int64";
+    case attribute::tag_uint64: return "uint64";
     case attribute::tag_float: return "float";
     case attribute::tag_double: return "double";
     case attribute::tag_bool: return "bool";
@@ -265,6 +269,36 @@ bool csEvent::Add(const char *name, int32 v, bool force_boolean)
 bool csEvent::Add(const char *name, uint32 v)
 {
   attribute *object = new attribute(attribute::tag_uint32);
+  object->Unsigned = v;
+  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  if (!v1) 
+  {
+    v1 = new csVector();
+    attributes.Put(name, (csHashObject) v1);
+  }
+  v1->Push((csSome)object);
+  count++;
+  return true;
+}
+
+bool csEvent::Add(const char *name, int64 v)
+{
+  attribute *object = new attribute(attribute::tag_int64);
+  object->Integer = v;
+  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  if (!v1) 
+  {
+    v1 = new csVector();
+    attributes.Put(name, (csHashObject) v1);
+  }
+  v1->Push((csSome)object);
+  count++;
+  return true;
+}
+
+bool csEvent::Add(const char *name, uint64 v)
+{
+  attribute *object = new attribute(attribute::tag_uint64);
   object->Unsigned = v;
   csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
   if (!v1) 
@@ -498,6 +532,36 @@ bool csEvent::Find(const char *name, uint32 &v, int index)
   return false;
 }
 
+bool csEvent::Find(const char *name, int64 &v, int index)
+{
+  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  if (v1)
+  {
+    attribute *object = (attribute *) v1->Get(index);
+    if (object->type == attribute::tag_int64)
+    {
+      v = object->Integer;
+      return true;
+    }
+  }
+  return false;
+}
+  
+bool csEvent::Find(const char *name, uint64 &v, int index)
+{
+  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  if (v1)
+  {
+    attribute *object = (attribute *) v1->Get(index);
+    if (object->type == attribute::tag_uint64)
+    {
+      v = object->Unsigned;
+      return true;
+    }
+  }
+  return false;
+}
+  
 bool csEvent::Find(const char *name, float &v, int index)
 {
   csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
@@ -687,7 +751,7 @@ void IndentLevel(int level)
     
 }
 
-bool csEvent::Print(int level)
+bool csEvent::Print(int32 level)
 {
   csHashIteratorReversible iter(&attributes);
   while (iter.HasNext())
@@ -696,7 +760,7 @@ bool csEvent::Print(int level)
     if (v)
     {
       attribute *object = NULL;
-      int index = 0;
+      int32 index = 0;
       IndentLevel(level); printf ("Event Type: %d\n", Type);
       while(index < v->Length())
       {
@@ -715,13 +779,18 @@ bool csEvent::Print(int level)
             }
           }
           if ((object->type == attribute::tag_int8)
-	  	|| (object->type == attribute::tag_uint8)
-		|| (object->type == attribute::tag_int16)
-		|| (object->type == attribute::tag_uint16)
-		|| (object->type == attribute::tag_int32)
-		|| (object->type == attribute::tag_uint32))
+            || (object->type == attribute::tag_int16)
+            || (object->type == attribute::tag_int32)
+            || (object->type == attribute::tag_int64))
           {
-            IndentLevel(level); printf (" Value: %d\n", object->Integer);
+            IndentLevel(level); printf (" Value: %lld\n", object->Integer);
+          }
+          if ((object->type == attribute::tag_uint8)
+            || (object->type == attribute::tag_uint16)
+            || (object->type == attribute::tag_uint32)
+            || (object->type == attribute::tag_uint64))
+          {
+            IndentLevel(level); printf (" Value: %lld\n", object->Unsigned);
           }
           
           if ((object->type == attribute::tag_float)
@@ -737,7 +806,7 @@ bool csEvent::Print(int level)
           }
           if (object->type == attribute::tag_databuffer)
           {
-            IndentLevel(level); printf (" Value: 0x%X\n", (int)object->String);
+            IndentLevel(level); printf (" Value: 0x%X\n", (int32)object->String);
             IndentLevel(level); printf (" Length: %d\n", object->length);
           }
           if (object->type == attribute::tag_string)

@@ -30,12 +30,14 @@
 #define CS_DATATYPE_UINT16  0x03
 #define CS_DATATYPE_INT32   0x04
 #define CS_DATATYPE_UINT32  0x05
-#define CS_DATATYPE_FLOAT   0x06
-#define CS_DATATYPE_DOUBLE  0x07
-#define CS_DATATYPE_BOOL    0x08
-#define CS_DATATYPE_STRING  0x09
-#define CS_DATATYPE_DATABUFFER 0x0a
-#define CS_DATATYPE_EVENT   0x0b
+#define CS_DATATYPE_INT64   0x06
+#define CS_DATATYPE_UINT64  0x07
+#define CS_DATATYPE_FLOAT   0x08
+#define CS_DATATYPE_DOUBLE  0x09
+#define CS_DATATYPE_BOOL    0x0a
+#define CS_DATATYPE_STRING  0x0b
+#define CS_DATATYPE_DATABUFFER 0x0c
+#define CS_DATATYPE_EVENT   0x0d
 
 /**
  * This class represents a system event.<p>
@@ -95,6 +97,8 @@ public:
   virtual bool Add(const char *name, uint16 v);
   virtual bool Add(const char *name, int32 v, bool force_boolean = false);
   virtual bool Add(const char *name, uint32 v);
+  virtual bool Add(const char *name, int64 v);
+  virtual bool Add(const char *name, uint64 v);
   virtual bool Add(const char *name, float v);
   virtual bool Add(const char *name, double v);
   virtual bool Add(const char *name, char *v);
@@ -110,6 +114,8 @@ public:
   virtual bool Find(const char *name, uint16 &v, int index = 0);
   virtual bool Find(const char *name, int32 &v, int index = 0);
   virtual bool Find(const char *name, uint32 &v, int index = 0);
+  virtual bool Find(const char *name, int64 &v, int index = 0);
+  virtual bool Find(const char *name, uint64 &v, int index = 0);
   virtual bool Find(const char *name, float &v, int index = 0);
   virtual bool Find(const char *name, double &v, int index = 0);
   virtual bool Find(const char *name, char **v, int index = 0);

@@ -126,6 +126,8 @@ struct iEvent : public iBase
   virtual bool Add(const char *name, uint16 v) = 0;
   virtual bool Add(const char *name, int32 v, bool force_boolean = false) = 0;
   virtual bool Add(const char *name, uint32 v) = 0;
+  virtual bool Add(const char *name, int64 v) = 0;
+  virtual bool Add(const char *name, uint64 v) = 0;
   virtual bool Add(const char *name, float v) = 0;
   virtual bool Add(const char *name, double v) = 0;
   virtual bool Add(const char *name, char *v) = 0;
@@ -141,6 +143,8 @@ struct iEvent : public iBase
   virtual bool Find(const char *name, uint16 &v, int index = 0) = 0;
   virtual bool Find(const char *name, int32 &v, int index = 0) = 0;
   virtual bool Find(const char *name, uint32 &v, int index = 0) = 0;
+  virtual bool Find(const char *name, int64 &v, int index = 0) = 0;
+  virtual bool Find(const char *name, uint64 &v, int index = 0) = 0;
   virtual bool Find(const char *name, float &v, int index = 0) = 0;
   virtual bool Find(const char *name, double &v, int index = 0) = 0;
   virtual bool Find(const char *name, char **v, int index = 0) = 0;
