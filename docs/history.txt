@@ -19,9 +19,32 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+20-May-99:
+	- Various changes to the Unix OpenGL 2D driver from Gary Haussmann.
+	  2D text should be much better now. He also added support for drawing
+	  2D sprites.
+	- Bruce Williams added an IVCON based format conversion (not
+	  interfaced yet).
+	- I fixed several compilation errors in libs/csutil/convertor.*
+	- Unified much of the code preparing for DrawPolygonQuick. This means
+	  that the code that was used to draw sprite triangles, gouraud
+	  shaded triangles and curve triangles now use the same setup code.
+	- Don't do the texture cache if lighting is disabled.
+	- Curves, sprites, and gouraud shaded triangles are no longer lighted
+	  when lighting is disabled globally. They still don't obey the
+	  disabling of texture mapping though.
+	- Fixed 32-bit unlighted texture mappers.
 19-May-99:
 	- Denis Detriev fixed the lightmap calculator so that there no longer
 	  any ugly borders. Thanks Denis!!!
+	- Gary Haussmann added console text support to the Unix OpenGL 2D
+	  driver. He also fixed the Clear() function.
+	- Michael Dale Long fixed the Unix Glide, OpenGL and X 2D drivers to
+	  support mice with more than 3 buttons.
+	- Update to INSTALL.Win from Thomas Hieber.
+	- Ivan Avramovic patched the x2d driver so that there is no longer
+	  an error when opening the window offscreen. He also fixed a memory
+	  leak when using XSHM.
 18-May-99:
 	- Started adding csVolume class to csgeom to help lighting routines.
 	- Fixed LOD vertex morphing for sprites. It was broken (which caused
@@ -33,6 +56,16 @@ Short-term cleanups that need to be done:
 	- Finally fixed sprite triangle drawing. The fix is not perfect yet
 	  but at least the triangles look fine in all cases. I have to ask
 	  Andrew to have a better look at this.
+	- Included patch from Denis Detriev to help continue development
+	  of planed fog. It is not yet fully correct though so it is not
+	  enabled.
+	- Patch from Thomas Hieber to MazeD (he received it from someone
+	  else). This patch reenables loading and saving and thus
+	  makes it more useful. Note that the loading and saving is
+	  still not fully ok (there is a memory leak and saving saves
+	  to a world file and not the zip file).
+	- Robert Bate added CodeWarrior projects for the Macintosh
+	  port.
 17-May-99:
 	- Patch from Andrew Zabolotny:
 		- Fixed CSWSTEST and added some features to have a better
