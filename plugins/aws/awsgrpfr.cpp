@@ -127,9 +127,9 @@ awsGroupFrame::OnDraw(csRect clip)
       g2d->DrawLine(Frame().xmin+3, Frame().ymin+3, Frame().xmin+3, Frame().ymax-4, black);
 
       if (bkg)
-       g3d->DrawPixmap(bkg, Frame().xmin+4, Frame().ymin+4, Frame().Width()-4, Frame().Height()-4, 0, 0, Frame().Width()+1, Frame().Height()+1, 0);
+       g3d->DrawPixmap(bkg, Frame().xmin+4, Frame().ymin+4, Frame().Width()-7, Frame().Height()-7, 0, 0, Frame().Width(), Frame().Height(), 0);
       else
-       g2d->DrawBox(Frame().xmin+4, Frame().ymin+4, Frame().Width()-4, Frame().Height()-4, fill);
+       g2d->DrawBox(Frame().xmin+4, Frame().ymin+4, Frame().Width()-7, Frame().Height()-7, fill);
 
       break;
 
