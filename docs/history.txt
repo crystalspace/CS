@@ -22,6 +22,8 @@ The history order is reversed so that new features are at the top.
 	    - Added a GL configuration for ATI R300 (Radeon 9700/9700Pro.)
 	- res added resizing to the glwin32 canvas, fixed a typo and some 
 	  possible NULL pointer accesses in glcommon.
+	- Matze added possibility to specify msvc version for the msvcgen.sh
+	  script shich is used to regenerate msvc-projectfiles on jam.
 21-May-2003
 	- Jorrit fixed the new csString::SubString() so that it is more
 	  efficient (no longer returns a new csString) and also documented
