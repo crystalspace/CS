@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+23-Feb-2003
+	- Eric Sunshine made the following changes:
+	    - Fixed mk/autoconf/pkg.m4 so that it no longer aborts
+	      configuration and abuses the user just because an optional
+	      package is absent.
+	    - Fixed bin/autogen.sh so that it cleans up after itself.
 22-Feb-2003
 	- Christian Bayle made change in debian build
 	  Moved config files in /etc and added proper symlink

@@ -1,18 +1,16 @@
-#!/bin/sh
+#! /bin/sh
 
-# Make sure we're in the correct directory
-if [ ! -f configure.ac ]; then
-  echo "Please start this script from CS root directory"
+# Correct working directory?
+if test ! -f configure.ac ; then
+  echo "*** Please invoke this script from directory containing configure.ac."
   exit 1
 fi
 
 MACROFILE=aclocal.m4
 MACROFILES=mk/autoconf
-echo "creating $MACROFILE from macros out of $MACROFILES/*.m4"
 rm -f $MACROFILE
-for i in `find $MACROFILES -name "*.m4"`; do
-	cat $i >> $MACROFILE
+for i in $MACROFILES/*.m4 ; do
+  cat $i >> $MACROFILE
 done
-echo autoconf
 autoconf
-
+rm -f $MACROFILE
