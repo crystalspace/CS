@@ -67,6 +67,7 @@ csPolygonSet::csPolygonSet (csWorld* world) : csObject(),
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonSet);
+  CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   max_vertices = num_vertices = 0;
 
   curves_center.x = curves_center.y = curves_center.z = 0;

@@ -49,6 +49,8 @@ The history order has been reversed so that new features are at the top.
 	      effect as with older three. Besides, csstdldr plugin supports
 	      them for a long time.
 	- Fixed two bugs for compiling in Unix after Andrew's changes.
+	- Fixed embedded iPolygonMesh classes for both csPolygonSet
+	  and csSprite3D so that they are correctly specified now.
 27-Jul-2000
 	- Martin Geisse converted some more docs to texinfo format
 	  (including the much asked for worldfmt.tex file).

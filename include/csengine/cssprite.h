@@ -895,6 +895,8 @@ public:
   CSOBJTYPE;
 
   //-------------------- iPolygonMesh interface implementation ------------------
+  DECLARE_IBASE_EXT (csSprite);
+
   struct PolyMesh : public iPolygonMesh
   {
     DECLARE_EMBEDDED_IBASE (csSprite3D);

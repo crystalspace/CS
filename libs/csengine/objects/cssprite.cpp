@@ -504,12 +504,12 @@ void csSprite::Particle::DeferUpdateLighting(int flags, int num_lights)
 
 IMPLEMENT_CSOBJTYPE (csSprite3D, csSprite)
 
-//IMPLEMENT_IBASE (csSprite3D)
-  //IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
-//IMPLEMENT_IBASE_END
+IMPLEMENT_IBASE_EXT (csSprite3D)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
+IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE(csSprite3D::PolyMesh)
-  IMPLEMENTS_INTERFACE(iPolygonMesh)
+IMPLEMENT_EMBEDDED_IBASE (csSprite3D::PolyMesh)
+  IMPLEMENTS_INTERFACE (iPolygonMesh)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 /// Static vertex array.

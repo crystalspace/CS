@@ -1352,6 +1352,10 @@ void* CheckFrustumPolygonsFB (csSector* sector,
       poly[j] = p->Vwor (j)-center;
     bool vis = false;
 
+    float clas = p->GetPlane ()->GetWorldPlane ().Classify (center);
+    if (ABS (clas) < EPSILON) continue;
+    if ((clas <= 0) != cw) continue;
+
     if (p->GetPortal ())
     {
       if (cb) vis = cb->TestPolygon (poly, p->GetNumVertices ());
@@ -1365,10 +1369,6 @@ void* CheckFrustumPolygonsFB (csSector* sector,
     if (vis)
     {
       lview->poly_func ((csObject*)p, lview);
-
-      float clas = p->GetPlane ()->GetWorldPlane ().Classify (center);
-      if (ABS (clas) < EPSILON) continue;
-      if ((clas <= 0) != cw) continue;
 
       csShadowFrustum* frust;
       frust = new csShadowFrustum (center);
