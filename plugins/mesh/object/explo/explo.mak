@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: explo exploclean
-plugins all: explo
+plugins meshes all: explo
 
 exploclean:
 	$(MAKE_CLEAN)

@@ -72,7 +72,6 @@ csRainMeshObject::csRainMeshObject (iSystem* system, iMeshObjectFactory* factory
 	: csParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiRainState);
-  initialized = false;
   part_pos = NULL;
   rainbox.Set (csVector3 (0, 0, 0), csVector3 (1, 1, 1));
   rain_dir.Set (0, -1, 0);

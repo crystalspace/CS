@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: snow snowclean
-plugins all: snow
+plugins meshes all: snow
 
 snowclean:
 	$(MAKE_CLEAN)

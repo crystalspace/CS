@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: rain rainclean
-plugins all: rain
+plugins meshes all: rain
 
 rainclean:
 	$(MAKE_CLEAN)

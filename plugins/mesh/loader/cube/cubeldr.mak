@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: cubeldr cubeldrclean
-plugins all: cubeldr
+plugins meshes all: cubeldr
 
 cubeldrclean:
 	$(MAKE_CLEAN)

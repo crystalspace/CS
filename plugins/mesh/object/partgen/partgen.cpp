@@ -42,6 +42,7 @@ csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory
 {
   CONSTRUCT_IBASE (factory);
   CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
+  initialized = false;
   csParticleSystem::factory = factory;
   particles.SetLength (0);
   self_destruct = false;
@@ -57,6 +58,7 @@ csParticleSystem::csParticleSystem (iSystem* system, iMeshObjectFactory* factory
   prev_time = 0;
   MixMode = 0;
   vis_cb = NULL;
+  mat = NULL;
 
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (system, "crystalspace.mesh.object.sprite.2d",
       "MeshObj", iMeshObjectType);
@@ -115,7 +117,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   iSprite2DState* state = QUERY_INTERFACE (sprmesh, iSprite2DState);
   state->CreateRegularVertices (n, true);
   part->ScaleBy (radius);
-  state->SetMaterialWrapper (mat);
+  if (mat) state->SetMaterialWrapper (mat);
   state->SetLighting (lighted);
   part->SetColor (csColor (1.0, 1.0, 1.0));
 

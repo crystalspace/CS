@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: spiral spiralclean
-plugins all: spiral
+plugins meshes all: spiral
 
 spiralclean:
 	$(MAKE_CLEAN)

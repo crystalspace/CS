@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: fire fireclean
-plugins all: fire
+plugins meshes all: fire
 
 fireclean:
 	$(MAKE_CLEAN)

@@ -75,7 +75,6 @@ csSnowMeshObject::csSnowMeshObject (iSystem* system, iMeshObjectFactory* factory
 	: csParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSnowState);
-  initialized = false;
   part_pos = NULL;
   part_speed = NULL;
   rainbox.Set (csVector3 (0, 0, 0), csVector3 (1, 1, 1));

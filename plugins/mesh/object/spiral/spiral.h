@@ -37,8 +37,6 @@ protected:
   csVector3 source;
   int last_reuse;
 
-  bool initialized;
-
   void SetupObject ();
 
 public:

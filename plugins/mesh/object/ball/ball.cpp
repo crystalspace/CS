@@ -494,7 +494,7 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
   return true;
 }
 
-void csBallMeshObject::GetObjectBoundingBox (csBox3& bbox, bool /*accurate*/)
+void csBallMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
   SetupObject ();
   bbox = object_bbox;

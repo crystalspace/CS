@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: spr2dldr spr2dldrclean
-plugins all: spr2dldr
+plugins meshes all: spr2dldr
 
 spr2dldrclean:
 	$(MAKE_CLEAN)

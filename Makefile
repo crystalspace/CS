@@ -6,7 +6,7 @@
 
 .PHONY: help banner showplatforms showconfig platforms all depend configure \
   configbanner clean cleanlib cleandep distclean libs plugins drivers \
-  drivers2d drivers3d snddrivers netdrivers
+  drivers2d drivers3d snddrivers netdrivers meshes
 
 # The following two symbols are intended to be used in "echo" commands.
 # config.mak can override them depending on configured platform's requirements.
@@ -44,6 +44,7 @@ define PSEUDOHELP
   echo $"  make apps         Make all applications$"
   echo $"  make libs         Make all static libraries$"
   echo $"  make plugins      Make all plug-in modules including drivers$"
+  echo $"  make meshes       Make all mesh plugins$"
   echo $"  make drivers      Make all drivers$"
   echo $"  make drivers2d    Make all supported 2D graphics drivers$"
   echo $"  make drivers3d    Make all supported 3D graphics drivers (renderers)$"

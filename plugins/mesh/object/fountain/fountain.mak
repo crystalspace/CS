@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: fount fountclean
-plugins all: fount
+plugins meshes all: fount
 
 fountclean:
 	$(MAKE_CLEAN)

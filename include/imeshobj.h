@@ -31,6 +31,26 @@ struct iMovable;
 struct iLight;
 class csReversibleTransform;
 
+/**
+ * For iMeshObject::GetObjectBoundingBox() get a normal bounding box which
+ * may or may not be recalculated depending on the changing geometry of
+ * the object.
+ */
+#define CS_BBOX_NORMAL 0
+/**
+ * For iMeshObject::GetObjectBoundingBox() get a totally accurate bounding
+ * box. Not all plugins support this. Some will just return a normal
+ * bounding box.
+ */
+#define CS_BBOX_ACCURATE 1
+/**
+ * For iMeshObject::GetObjectBoundingBox() get the maximum bounding box
+ * that this object will ever use. For objects that don't have a preset
+ * maximum bounding box this just has to be a reasonable estimate of
+ * a realistic maximum bounding box.
+ */
+#define CS_BBOX_MAX 2
+
 /// A callback function for MeshObj::Draw().
 typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
 	void* callbackData);
@@ -38,7 +58,7 @@ typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshObject, 0, 0, 11);
+SCF_VERSION (iMeshObject, 0, 0, 12);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -90,11 +110,21 @@ struct iMeshObject : public iBase
 
   /**
    * Get the bounding box in object space for this mesh object.
-   * If 'accurate' is true an effort has to be done to make the
-   * bounding box as accurate as possible. Otherwise it just has
-   * to be a bounding box.
+   * Type has three possibilities:
+   * <ul>
+   * <li> CS_BBOX_NORMAL: get a normal bounding box which
+   *      may or may not be recalculated depending on the changing
+   *      geometry of the object.
+   * <li> CS_BBOX_ACCURATE: get a totally accurate bounding
+   *      box. Not all plugins support this. Some will just return a normal
+   *      bounding box.
+   * <li> CS_BBOX_MAX: get the maximum bounding box
+   *      that this object will ever use. For objects that don't have a
+   *      preset maximum bounding box this just has to be a reasonable
+   *      estimate of a realistic maximum bounding box.
+   * </ul>
    */
-  virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false) = 0;
+  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL) = 0;
 
   /**
    * Get the radius of this object in object space.

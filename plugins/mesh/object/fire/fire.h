@@ -51,7 +51,6 @@ protected:
 
   int number;
   float drop_width, drop_height;
-  bool initialized;
   bool lighted_particles;
 
   iLight* light;

@@ -86,7 +86,6 @@ csFireMeshObject::csFireMeshObject (iSystem* system, iMeshObjectFactory* factory
 	: csParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiFireState);
-  initialized = false;
   part_pos = NULL;
   part_speed = NULL;
   part_age = NULL;

@@ -65,7 +65,6 @@ csSpiralMeshObject::csSpiralMeshObject (iSystem* system, iMeshObjectFactory* fac
 	: csNewtonianParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSpiralState);
-  initialized = false;
   max = 50;
   source.Set (0, 0, 0);
   time_before_new_particle = 0;

@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: ballldr ballldrclean
-plugins all: ballldr
+plugins meshes all: ballldr
 
 ballldrclean:
 	$(MAKE_CLEAN)

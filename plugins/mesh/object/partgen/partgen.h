@@ -80,6 +80,7 @@ protected:
   /// Previous time.
   cs_time prev_time;
 
+  bool initialized;
   /// Set up this object.
   virtual void SetupObject () = 0;
 
@@ -214,9 +215,10 @@ public:
   {
     return vis_cb;
   }
-  virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false)
+  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
   {
-    (void)accurate;
+    (void)type;
+    SetupObject ();
     bbox = csParticleSystem::bbox;
   }
   virtual csVector3 GetRadius () { return radius; }
@@ -237,6 +239,7 @@ public:
     DECLARE_EMBEDDED_IBASE (csParticleSystem);
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
+      scfParent->initialized = false;
       scfParent->mat = material;
     }
     virtual iMaterialWrapper* GetMaterialWrapper ()

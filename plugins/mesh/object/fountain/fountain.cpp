@@ -81,7 +81,6 @@ csFountainMeshObject::csFountainMeshObject (iSystem* system, iMeshObjectFactory*
 	: csParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiFountainState);
-  initialized = false;
   part_pos = NULL;
   part_speed = NULL;
   part_age = NULL;

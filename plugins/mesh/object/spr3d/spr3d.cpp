@@ -833,7 +833,7 @@ float csSprite3DMeshObject::GetScreenBoundingBox (
   return cbox.MaxZ ();
 }
 
-void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b, bool /*accurate*/)
+void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b, int /*type*/)
 {
   if (skeleton_state)
   {

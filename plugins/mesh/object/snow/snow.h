@@ -42,7 +42,6 @@ protected:
   float drop_width, drop_height;
   int number;
 
-  bool initialized;
   bool lighted_particles;
 
   void SetupObject ();

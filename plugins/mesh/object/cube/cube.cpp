@@ -332,7 +332,7 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
   return true;
 }
 
-void csCubeMeshObject::GetObjectBoundingBox (csBox3& bbox, bool /*accurate*/)
+void csCubeMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
   SetupObject ();
   bbox = object_bbox;

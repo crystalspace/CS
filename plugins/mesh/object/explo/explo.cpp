@@ -61,12 +61,15 @@ void csExploMeshObject::SetupObject ()
       AppendRegularSprite (nr_sides, part_radius, mat, lighted_particles);
       pos = center + GetRandomDirection() * spread_pos;
       GetParticle(i)->SetPosition (pos);
-      part_speed[i] = push + spread_speed * GetRandomDirection();
-      part_accel[i] = (pos - center) * spread_accel * GetRandomDirection();
-      if (part_speed[i].SquaredNorm() > sqmaxspeed) 
-        sqmaxspeed = part_speed[i].SquaredNorm();
-      if (part_accel[i].SquaredNorm() > sqmaxaccel) 
-        sqmaxaccel = part_accel[i].SquaredNorm();
+      if (part_speed && part_accel)
+      {
+        part_speed[i] = push + spread_speed * GetRandomDirection();
+        part_accel[i] = (pos - center) * spread_accel * GetRandomDirection();
+        if (part_speed[i].SquaredNorm() > sqmaxspeed) 
+          sqmaxspeed = part_speed[i].SquaredNorm();
+        if (part_accel[i].SquaredNorm() > sqmaxaccel) 
+          sqmaxaccel = part_accel[i].SquaredNorm();
+      }
       bbox.AddBoundingVertexSmart(pos+bbox_radius);
       bbox.AddBoundingVertexSmart(pos-bbox_radius);
     }
@@ -83,7 +86,6 @@ csExploMeshObject::csExploMeshObject (iSystem* system, iMeshObjectFactory* facto
 	: csNewtonianParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiExplosionState);
-  initialized = false;
   /// defaults
   has_light = false;
   light_sector = NULL;
@@ -93,6 +95,8 @@ csExploMeshObject::csExploMeshObject (iSystem* system, iMeshObjectFactory* facto
   push.Set (0, 0, 0);
   center.Set (0, 0, 0);
   number = 50;
+  nr_sides = 3;
+  part_radius = .1;
 }
 
 csExploMeshObject::~csExploMeshObject()

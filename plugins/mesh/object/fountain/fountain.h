@@ -50,7 +50,6 @@ protected:
   int next_oldest;
   int number;
   float drop_width, drop_height;
-  bool initialized;
   bool lighted_particles;
 
   int FindOldest();

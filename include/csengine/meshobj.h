@@ -331,7 +331,7 @@ public:
     }
     virtual void GetBoundingBox (csBox3& bbox)
     {
-      scfParent->mesh->GetObjectBoundingBox (bbox, false);
+      scfParent->mesh->GetObjectBoundingBox (bbox, CS_BBOX_MAX);
     }
     virtual void MarkVisible () { scfParent->MarkVisible (); }
     virtual void MarkInvisible () { scfParent->MarkInvisible (); }

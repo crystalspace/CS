@@ -58,7 +58,6 @@ protected:
 
   csVector3 push;
   int number, nr_sides;
-  bool initialized;
   float part_radius;
   bool lighted_particles;
   float spread_pos;

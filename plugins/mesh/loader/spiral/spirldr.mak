@@ -11,7 +11,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: spirldr spirldrclean
-plugins all: spirldr
+plugins meshes all: spirldr
 
 spirldrclean:
 	$(MAKE_CLEAN)

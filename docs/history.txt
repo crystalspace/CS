@@ -1,9 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
 20-Feb-2001
+	- Wouter Wijngaards applied fix to demosky as suggested by Seth
+	  Galbraith. This fixed the crackes in the skydome. It aligns
+	  perfectly now.
 	- Norman Kramer cleaned up the unresolved instances for meshes,
 	  loaders and factories.
 	- Norman switched the X11 canvases to iConfigManager.
+	- Norman added a destructor to csRenderView so that there are no
+	  memory engine.core leaks.
 	- Eric Sunshine resolved several compilation problems on MacOS/X which
 	  were reported in a series of build-logs sent by Travis McLane
 	  <tmclane@swt.edu>.
@@ -17,6 +22,33 @@ The history order has been reversed so that new features are at the top.
 	      mechanism into NeXTDelegate.m since it is needed from a couple
 	      different places.  Added a new extension to
 	      NeXTSystemDriver::SystemExtension() named "flushgraphicscontext".
+	- Added useful defaults for some of the fields of the explosion plugin
+	  so that it doesn't crash when those fields are not set.
+	- Moved 'initialized' flag from specific particle systems to the
+	  general particle system code. If a material is now set initialized
+	  will be reset to false so that the particle system is reinitialized.
+	- Changed the way that iMeshObject::GetObjectBoundingBox() works.
+	  Instead of the 'accurate' flag there is now a 'type' flag which
+	  has three possible values:
+	    - CS_BBOX_NORMAL: get a normal bounding box which
+	      may or may not be recalculated depending on the changing
+	      geometry of the object.
+	    - CS_BBOX_ACCURATE: get a totally accurate bounding
+	      box. Not all plugins support this. Some will just return
+	      a normal bounding box.
+	    - CS_BBOX_MAX: get the maximum bounding box
+	      that this object will ever use. For objects that don't have a
+	      preset maximum bounding box this just has to be a reasonable
+	      estimate of a realistic maximum bounding box.
+	- Modified all mesh object plugins for this change.
+	- Changed csMeshWrapper so that the GetObjectBox() function in
+	  the iVisibilityObject implementation returns the CS_BBOX_MAX
+	  bounding box from the mesh.
+	- Added a 'meshes' target to the makefile to compile all mesh
+	  object and loader plugins at once.
+	- The changes above 'fix' the particle systems from being invisible
+	  when used with the visibility culler but the fix is far from
+	  perfect. This needs a small design change.
 19-Feb-2001
 	- Norman Kramer changed all csSector::GetNumberXxx() to GetNumXxx().
 	- Martin Geisse modified the system driver to use the config
