@@ -862,7 +862,7 @@ bool MsModel::WriteSPR(const char* spritename)
     fprintf(f, "  PARAMS (\n");
     fprintf(f, "    MOTION 'default' (\n");  
     fprintf(f, "      DURATION '%f' ( LOOP() )\n",((float)nbFrames)*frameDuration); 
-    int i;
+    int i, j, k;
     for(i = 0; i < nbJoints;i++)
     {
       if(joints[i]->nbPositionKeys>0||joints[i]->nbRotationKeys>0)
@@ -870,13 +870,13 @@ bool MsModel::WriteSPR(const char* spritename)
         //Some rotation and position keys might be at the same time.
         //I never encounter a case in which a rotation or position key was on his own.
         bool* rotUsed = new bool[joints[i]->nbRotationKeys];
-        for(int k = 0;k < joints[i]->nbRotationKeys;k++) rotUsed[k] = false;
+        for(k = 0;k < joints[i]->nbRotationKeys;k++) rotUsed[k] = false;
         
         fprintf(f, "      BONE '%s' (\n",joints[i]->name); 
-        for(int j = 0;j < joints[i]->nbPositionKeys;j++)
+        for(j = 0;j < joints[i]->nbPositionKeys;j++)
         {
           bool found = false;
-          for(int k = 0;k < joints[i]->nbRotationKeys;k++)
+          for(k = 0;k < joints[i]->nbRotationKeys;k++)
           {
             if(joints[i]->rotationKeys[k].time==joints[i]->positionKeys[j].time)
             {
@@ -909,7 +909,7 @@ bool MsModel::WriteSPR(const char* spritename)
                     joints[i]->positionKeys[j].data.z);
           }
         }
-        for(int k = 0;k < joints[i]->nbRotationKeys;k++)
+        for(k = 0;k < joints[i]->nbRotationKeys;k++)
         {
           if(!rotUsed[k])
           {
