@@ -300,7 +300,7 @@ public:
   { }
 
   /// Check if lightmap is not too large
-  virtual bool IsLightmapOK (iPolygonTexture* poly_texture)	    
+  virtual bool IsLightmapOK (iPolygonTexture*)
   { return true; }
 
   struct eiComponent : public iComponent

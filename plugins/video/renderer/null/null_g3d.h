@@ -245,7 +245,7 @@ public:
   { return vbufmgr; }
 
   /// Check if lightmap is not too large
-  virtual bool IsLightmapOK (iPolygonTexture* poly_texture)	    
+  virtual bool IsLightmapOK (iPolygonTexture*)
   { return true; }
 
   /// Get Z-buffer value at given X,Y position

@@ -121,7 +121,7 @@ bool csVertexBufferManagerEXT::LockBuffer (iVertexBuffer* buf,
                  csVector3* verts,
                  csVector2* texels,
                  csColor* colors,
-                 int num_verts, int buf_number)
+                 int num_verts, int /*buf_number*/)
 {
   csVertexBufferEXT *realbuf = (csVertexBufferEXT*)buf;
   realbuf->SetBuffers(verts, texels, colors, num_verts);
@@ -169,7 +169,7 @@ void csVertexBufferManagerEXT::RemoveClient (iVertexBufferManagerClient *client)
 
 bool csVertexBufferManagerEXT::LockUserArray (iVertexBuffer* buf,
 		int index, float* user, 
-		int num_components, int buf_number)
+		int num_components, int /*buf_number*/)
 {
   ((csVertexBufferEXT*)buf)->AddUserArray(index, user, num_components);
   return true;
