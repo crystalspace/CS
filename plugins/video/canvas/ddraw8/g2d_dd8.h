@@ -90,7 +90,7 @@ public:
   virtual int  GetPage ();
   virtual bool DoubleBuffer (bool Enable);
   virtual bool GetDoubleBufferState ();
-  virtual bool PerformExtension (const char *iCommand, ...);
+  virtual bool PerformExtensionV (char const* command, va_list);
 
   // iGraphics2DDDraw8
   virtual void GetDirectDrawDriver (LPDIRECTDRAW7* lplpDirectDraw);

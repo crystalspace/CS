@@ -40,7 +40,7 @@ public:
   virtual void Close ();
 
   /// Execute a system-dependent extension
-  virtual bool PerformExtension (const char *iCommand, ...);
+  virtual bool PerformExtensionV (char const* command, va_list);
 
   SCF_DECLARE_IBASE_EXT (csSystemDriver);
 

@@ -44,7 +44,7 @@ public:
   virtual void Sleep (int SleepTime);
 
   /// Perform extension function
-  bool PerformExtension (const char *iCommand, ...);
+  bool PerformExtensionV (char const* command, va_list);
 };
 
 #endif // __CSOS2_H__

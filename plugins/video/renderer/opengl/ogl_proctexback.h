@@ -159,8 +159,17 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
 
   virtual void Write (iFont*, int x, int y, int fg, int bg, const char *str);
 
-  virtual bool PerformExtension (const char *args)
-  { return g2d->PerformExtension (args); }
+  virtual bool PerformExtensionV (char const* command, va_list args)
+  { return g2d->PerformExtensionV (command, args); }
+
+  virtual bool PerformExtension (char const* command, ...)
+  {
+    va_list args;
+    va_start (args, command);
+    bool rc = PerformExtensionV(command, args);
+    va_end (args);
+    return rc;
+  }
 
   virtual int GetPixelBytes ()
   { return g2d->GetPixelBytes (); }
@@ -190,9 +199,6 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
    csPixelFormat* /*ipfmt = NULL*/, csRGBpixel* /*palette = NULL*/, 
    int /*pal_size = 0*/)
   { return NULL; }
-
-  virtual bool PerformExtension (const char * /*iCommand*/, ...)
-  { return false; }
 
   virtual void AllowCanvasResize (bool /*iAllow*/)
   { }

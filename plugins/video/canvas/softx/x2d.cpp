@@ -817,24 +817,24 @@ void csGraphics2DXLib::recompute_grey_palette ()
   CsPrintf (CS_MSG_DEBUG_0, "Done!\n");
 }
 
-bool csGraphics2DXLib::PerformExtension (const char* iCommand, ...)
+bool csGraphics2DXLib::PerformExtensionV (char const* command, va_list)
 {
-  if (!strcasecmp (iCommand, "sim_pal"))
+  if (!strcasecmp (command, "sim_pal"))
   {
     recompute_simulated_palette ();
     return true;
   }
-  else if (!strcasecmp (iCommand, "sim_grey"))
+  else if (!strcasecmp (command, "sim_grey"))
   {
     recompute_grey_palette ();
     return true;
   }
-  else if (!strcasecmp (iCommand, "sim_332"))
+  else if (!strcasecmp (command, "sim_332"))
   {
     restore_332_palette ();
     return true;
   }
-  else if (!strcasecmp (iCommand, "fullscreen"))
+  else if (!strcasecmp (command, "fullscreen"))
   {
     if (currently_full_screen)
       LeaveFullScreen ();
@@ -842,12 +842,11 @@ bool csGraphics2DXLib::PerformExtension (const char* iCommand, ...)
       EnterFullScreen ();
     return true;
   }
-  else if (!strcasecmp (iCommand, "flush"))
+  else if (!strcasecmp (command, "flush"))
   {
     XSync (dpy, False);
     return true;
   }
-
   return false;
 }
 

@@ -18,6 +18,20 @@ The history order is reversed so that new features are at the top.
 	    iConsoleOutput::ConsoleExtensionV() --> PerformExtentionV()
 	  These names now complement the existing PerformExtension() method of
 	  iGrahpics2D.
+	- Eric Sunshine added PerformExtensionV(va_list) variations to iSystem
+	  and iGraphics2D to complement the existing PerformExtension(...)
+	  methods.  Note that iConsoleOutput already had a
+	  PerformExtensionV(va_list) method, so no changes were needed there.
+	  The actual worker code in all the csSystemDriver and csGraphics2D
+	  subclasses is now contained in PerformExtensionV() rather than
+	  PerformExtension(), and PerformExtension() is now implemented as a
+	  very thin wrapper over PerformExtensionV().
+	- Eric Sunshine added iSystem::PrintfV(va_list) to complement the
+	  existing Printf(...) method.  Printf() is now implemented as a very
+	  thin wrapper over PrintfV().
+	- Eric Sunshine renamed csApp::printf(...) to Printf(...) and also
+	  added a PrintfV(va_list) variation.  Printf() is now implemented as a
+	  very thin wrapper over PrintfV().
 29-Jun-2001
 	- Got an Insure log from Philip Wyett. Using this I fixed a number
 	  of small problems and one rather bad problem. The bad problem

@@ -134,7 +134,7 @@ public:
   bool AllocateMemory ();
 
   /// Extensions for X11 port.
-  virtual bool PerformExtension (const char* iCommand, ...);
+  virtual bool PerformExtensionV (char const* command, va_list);
 
   /// Set mouse position.
   virtual bool SetMousePosition (int x, int y);

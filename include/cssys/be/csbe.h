@@ -77,7 +77,7 @@ public:
 
   // Implementation of iSystem.
   virtual bool Initialize(int argc, char const* const argv[], char const* cfg);
-  virtual bool PerformExtension(char const* cmd, ...);
+  virtual bool PerformExtensionV(char const* cmd, va_list);
   virtual void NextFrame();
 
   // Implementation of iEventPlug.

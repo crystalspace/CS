@@ -19,6 +19,7 @@
 #ifndef __ISYS_SYSTEM_H__
 #define __ISYS_SYSTEM_H__
 
+#include <stdarg.h>
 #include "csutil/scf.h"
 #include "iutil/cfgmgr.h"
 
@@ -222,17 +223,29 @@ struct iSystem : public iBase
   /// Get the time in milliseconds.
   virtual cs_time GetTime () = 0;
   /// Print a string to the specified device.
-  virtual void Printf (int mode, const char *format, ...) = 0;
+  virtual void Printf (int mode, char const* format, ...) = 0;
+  /**
+   * Print a string to the specified device.  This is just like Printf() except
+   * that it accepts a `va_list' instead of a variable argument list.
+   */
+  virtual void PrintfV (int mode, char const* format, va_list) = 0;
 
   /**
    * Execute a system-dependent extension.<p>
    * Sometimes we need just one extra function in system-dependent system
-   * driver, which is called, say, from canvas driver (such as EnablePrintf
-   * in DJGPP port of CS). In such cases it doesn't have much sense to create
-   * a new SCF interface and so on, better just override this function and
-   * use it.
+   * driver, which is called, say, from canvas driver (such as "EnablePrintf"
+   * in DJGPP port of CS).  In such cases it doesn't make much sense to create
+   * a new SCF interface; it is simpler to just override this function and
+   * respond to the special request.
    */
-  virtual bool PerformExtension (const char *iCommand, ...) = 0;
+  virtual bool PerformExtension (char const* command, ...) = 0;
+
+  /**
+   * Execute a system-dependent extension.<p>
+   * This is just like PerformExtension() except that it accepts a `va_list'
+   * instead of a variable argument list.
+   */
+  virtual bool PerformExtensionV (char const* command, va_list) = 0;
 
   /**
    * Suspend the engine's virtual-time clock.<p>

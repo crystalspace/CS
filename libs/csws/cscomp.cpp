@@ -488,7 +488,7 @@ bool csComponent::HandleEvent (iEvent &Event)
           if (name)
             if (!ApplySkin ((csSkin *)Event.Command.Info))
             {
-              app->System->Printf (CS_MSG_FATAL_ERROR,
+              app->Printf (CS_MSG_FATAL_ERROR,
                 "The skin does not contain a slice for component `%s'\n", name);
               abort ();
             }

@@ -529,10 +529,18 @@ bool csGraphics2D::SetMouseCursor (csMouseCursorID iShape)
   return (iShape == csmcArrow);
 }
 
-bool csGraphics2D::PerformExtension (const char* iCommand, ...)
+bool csGraphics2D::PerformExtensionV (char const*, va_list)
 {
-  (void)iCommand;
   return false;
+}
+
+bool csGraphics2D::PerformExtension (char const* command, ...)
+{
+  va_list args;
+  va_start (args, command);
+  bool rc = PerformExtensionV(command, args);
+  va_end (args);
+  return rc;
 }
 
 void csGraphics2D::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)

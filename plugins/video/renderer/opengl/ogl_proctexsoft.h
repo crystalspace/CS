@@ -20,7 +20,7 @@
 #define _OGL_PROCTEXSOFT_H_
 
 #include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h" // for csPixelFormat
+#include "ivideo/graph2d.h"
 
 class csGraphics3DOGLCommon;
 class csTextureHandleOpenGL;
@@ -268,8 +268,17 @@ class csOpenGLProcSoftware2D : public iGraphics2D
     g2d->Write (font, x, y, ConvertColour (fg), cbg, s);
   }
 
-  virtual bool PerformExtension (const char *args)
-  { return g2d->PerformExtension (args); }
+  virtual bool PerformExtensionV (char const* command, va_list args)
+  { return g2d->PerformExtensionV (command, args); }
+
+  virtual bool PerformExtension (char const* command, ...)
+  {
+    va_list args;
+    va_start (args, command);
+    bool rc = PerformExtensionV(command, args);
+    va_end (args);
+    return rc;
+  }
 
   virtual int GetPixelBytes ()
   { return g2d->GetPixelBytes (); }
@@ -303,9 +312,6 @@ class csOpenGLProcSoftware2D : public iGraphics2D
    csPixelFormat* /*ipfmt = NULL*/, csRGBpixel* /*palette = NULL*/, 
    int /*pal_size = 0*/)
   { return NULL; }
-
-  virtual bool PerformExtension (const char * /*iCommand*/, ...)
-  { return false; }
 
   virtual void AllowCanvasResize (bool /*iAllow*/)
   {}

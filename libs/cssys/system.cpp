@@ -849,14 +849,24 @@ bool csSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
   return InstallPath (oInstallPath, iBufferSize);
 }
 
-void csSystemDriver::Printf (int mode, const char *format, ...)
+bool csSystemDriver::PerformExtensionV (char const*, va_list)
+{
+  return false;
+}
+
+bool csSystemDriver::PerformExtension (char const* command, ...)
+{
+  va_list args;
+  va_start (args, command);
+  bool rc = PerformExtensionV(command, args);
+  va_end (args);
+  return rc;
+}
+
+void csSystemDriver::PrintfV (int mode, char const* format, va_list args)
 {
   char buf[1024];
-  va_list arg;
-
-  va_start (arg, format);
-  vsprintf (buf, format, arg);
-  va_end (arg);
+  vsprintf (buf, format, args);
 
   switch (mode)
   {
@@ -915,6 +925,14 @@ void csSystemDriver::Printf (int mode, const char *format, ...)
         debug_out (true, buf);
       break;
   } /* endswitch */
+}
+
+void csSystemDriver::Printf (int mode, char const* format, ...)
+{
+  va_list args;
+  va_start (args, format);
+  PrintfV(mode, format, args);
+  va_end (args);
 }
 
 iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,

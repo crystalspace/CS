@@ -21,6 +21,8 @@
 #ifndef __CSAPP_H__
 #define __CSAPP_H__
 
+#include <stdarg.h>
+
 #define CSWS_INTERNAL
 #include "csws.h"
 #include "cscomp.h"
@@ -196,7 +198,10 @@ public:
   void SetBackgroundStyle (csAppBackgroundStyle iBackgroundStyle);
 
   /// Display a string on the console using almost usual printf() syntax
-  void printf (int mode, char* str, ...);
+  void Printf (int mode, char const* format, ...);
+
+  /// Display a string on the console using almost usual printf() syntax
+  void PrintfV (int mode, char const* format, va_list);
 
   /// Add a single texture to application's texture list
   bool LoadTexture (const char *iTexName, const char *iTexParams,

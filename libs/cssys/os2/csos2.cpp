@@ -40,9 +40,9 @@ void SysSystemDriver::Sleep (int SleepTime)
   DosSleep (SleepTime);
 }
 
-bool SysSystemDriver::PerformExtension (const char *iCommand, ...)
+bool SysSystemDriver::PerformExtensionV (char const* command, va_list)
 {
-  if (!strcmp (iCommand, "StartGUI"))
+  if (!strcmp (command, "StartGUI"))
   {
     /*
       !!! This is a very nasty but VERY nice hack, it fools OS/2 and let the
@@ -54,13 +54,11 @@ bool SysSystemDriver::PerformExtension (const char *iCommand, ...)
       Credits and a great THANKS go to Michal Necasek (mike@mendelu.cz)
       (one of FreeType library authors) for finding this!
     */
-
     PTIB tib;
     PPIB pib;
     DosGetInfoBlocks (&tib, &pib);
     pib->pib_ultype = 3;
     return true;
   }
-
   return false;
 }

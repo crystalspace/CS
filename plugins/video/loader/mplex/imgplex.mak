@@ -1,5 +1,5 @@
 # Plug-in description
-DESCRIPTION.imgplex = Crystal Space imgplex image io multiplexer
+DESCRIPTION.imgplex = Crystal Space imgplex image I/O multiplexer
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

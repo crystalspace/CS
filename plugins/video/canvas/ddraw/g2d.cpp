@@ -443,13 +443,10 @@ bool csGraphics2DDDraw3::SetMousePosition (int x, int y)
   return true;
 }
 
-bool csGraphics2DDDraw3::PerformExtension (const char *iCommand, ...)
+bool csGraphics2DDDraw3::PerformExtensionV (char const* command, va_list)
 {
-  va_list args;
-  va_start (args, iCommand);
-
   bool rc = true;
-  if (!strcmp (iCommand, "fullscreen"))
+  if (!strcmp (command, "fullscreen"))
   {
     bool fs = va_arg (args, bool);
     if (fs != FullScreen
@@ -464,8 +461,6 @@ bool csGraphics2DDDraw3::PerformExtension (const char *iCommand, ...)
   }
   else
     rc = false;
-
-  va_end (args);
   return rc;
 }
 

@@ -224,7 +224,13 @@ public:
    * Perform a system specific extension. Return false if extension
    * not supported.
    */
-  virtual bool PerformExtension (const char* iCommand, ...);
+  virtual bool PerformExtension (char const* command, ...);
+
+  /**
+   * Perform a system specific extension. Return false if extension
+   * not supported.
+   */
+  virtual bool PerformExtensionV (char const* command, va_list);
 
   /// Do a screenshot: return a new iImage object
   virtual iImage *ScreenShot ();

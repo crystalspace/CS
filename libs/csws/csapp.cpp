@@ -310,14 +310,17 @@ void csApp::GetFont (iFont *&oFont, int &oFontSize)
   oFontSize = DefaultFontSize;
 }
 
-void csApp::printf (int mode, char* str, ...)
+void csApp::PrintfV (int mode, char const* format, va_list args)
 {
-  char buf[1024];
-  va_list arg;
-  va_start (arg, str);
-  vsprintf (buf, str, arg);
-  va_end (arg);
-  System->Printf (mode, "%s", buf);
+  System->Printf (mode, format, args);
+}
+
+void csApp::Printf (int mode, char const* format, ...)
+{
+  va_list args;
+  va_start (args, format);
+  PrintfV (mode, format, args);
+  va_end (args);
 }
 
 void csApp::SetBackgroundStyle (csAppBackgroundStyle iBackgroundStyle)
@@ -367,7 +370,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
       else if (!strcasecmp (tmp + 7, "no"))
         iFlags &= ~CS_TEXTURE_DITHER;
       else
-        printf (CS_MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
+        Printf (CS_MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
     }
     else if (!strncmp (tmp, "Mipmap:", 7))
     {
@@ -376,11 +379,11 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
       else if (!strcasecmp (tmp + 7, "no"))
         iFlags |= CS_TEXTURE_NOMIPMAPS;
       else
-        printf (CS_MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
+        Printf (CS_MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
     }
     else
     {
-      printf (CS_MSG_WARNING, "Texture `%s': Unknown texture parameter: '%s'\n", iTexName, parm);
+      Printf (CS_MSG_WARNING, "Texture `%s': Unknown texture parameter: '%s'\n", iTexName, parm);
       delete [] filename;
       return false;
     }
@@ -388,7 +391,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
 
   if (!filename)
   {
-    printf (CS_MSG_WARNING, "Texture `%s': No file name defined!\n", iTexName);
+    Printf (CS_MSG_WARNING, "Texture `%s': No file name defined!\n", iTexName);
     return false;
   }
 
@@ -396,7 +399,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   iDataBuffer *fbuffer = VFS->ReadFile (filename);
   if (!fbuffer || !fbuffer->GetSize ())
   {
-    printf (CS_MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", filename);
+    Printf (CS_MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", filename);
     delete [] filename;
     return false;
   }

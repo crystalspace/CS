@@ -697,13 +697,10 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
   return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
-bool SysSystemDriver::PerformExtension (const char *iCommand, ...)
+bool SysSystemDriver::PerformExtensionV (char const* command, va_list args)
 {
-  va_list args;
-  va_start (args, iCommand);
-
   bool rc = true;
-  if (!strcmp (iCommand, "SetCursor"))
+  if (!strcmp (command, "SetCursor"))
   {
     char *CursorID;
     switch (va_arg (args, int))
@@ -735,8 +732,6 @@ bool SysSystemDriver::PerformExtension (const char *iCommand, ...)
   }
   else
     rc = false;
-
-  va_end (args);
   return rc;
 }
 

@@ -420,9 +420,9 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
   return ss;
 }
 
-bool csGraphics2DGLCommon::PerformExtension (const char* iCommand, ...)
+bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list)
 {
-  if (!strcasecmp (iCommand, "flush"))
+  if (!strcasecmp (command, "flush"))
   {
     glFlush ();
     glFinish ();

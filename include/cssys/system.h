@@ -361,11 +361,29 @@ public:
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen);
   /// Get the time in milliseconds.
   virtual cs_time GetTime ();
-  /// Print a string to the specified device.
-  virtual void Printf (int mode, const char *format, ...);
-  /// Execute a system-dependent extension command.
-  virtual bool PerformExtension (const char *iCommand, ...)
-  { (void)iCommand; return false; }
+  /**
+   * Print a string to the specified device.  This is implemented as a thin
+   * wrapper over PrintfV().
+   */
+  virtual void Printf (int mode, char const* format, ...);
+  /**
+   * Print a string to the specified device.  Since Printf() is just a thin
+   * wrapper over this method, most subclasses which need to provide special
+   * extensions should override PrintfV() rather than Printf()
+   */
+  virtual void PrintfV (int mode, char const* format, va_list);
+  /**
+   * Execute a system-dependent extension command.  This is implemented as a
+   * thin wrapper over PerformExtensionV().
+   */
+  virtual bool PerformExtension (char const* command, ...);
+  /**
+   * Execute a system-dependent extension command.  Since PerformExtension() is
+   * just a thin wrapper over this method, most subclasses which need to
+   * provide special extensions should override PerformExtensionV() rather than
+   * PerformExtension().
+   */
+  virtual bool PerformExtensionV (char const* command, va_list);
   /// Suspend the engine's virtual-time clock.
   virtual void SuspendVirtualTimeClock() {}
   /// Resume the engine's virtual-time clock.

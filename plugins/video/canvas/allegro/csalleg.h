@@ -66,7 +66,7 @@ public:
   virtual bool DoubleBuffer (bool /*Enable*/) { return true; }
   virtual bool GetDoubleBufferState () { return true; }
   
-  virtual bool PerformExtension (const char *iCommand, ...);
+  virtual bool PerformExtensionV (char const* command, va_list);
   /**
    * Blit between a bitmap and one twice it's size.
    * sw,sh are in source dimensions.

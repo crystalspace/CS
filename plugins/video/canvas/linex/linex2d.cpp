@@ -451,9 +451,9 @@ bool csGraphics2DLineXLib::BeginDraw ()
   return true;
 }
 
-bool csGraphics2DLineXLib::PerformExtension (const char *iCommand, ...)
+bool csGraphics2DLineXLib::PerformExtensionV (char const* command, va_list)
 {
-  if (!strcasecmp (iCommand, "fullscreen"))
+  if (!strcasecmp (command, "fullscreen"))
   {
     if (currently_full_screen)
       LeaveFullScreen ();
@@ -461,12 +461,11 @@ bool csGraphics2DLineXLib::PerformExtension (const char *iCommand, ...)
       EnterFullScreen ();
     return true;
   }
-  else if (!strcasecmp (iCommand, "flush"))
+  else if (!strcasecmp (command, "flush"))
   {
     XSync (dpy, False);
     return true;
   }
-
   return true;
 }
 

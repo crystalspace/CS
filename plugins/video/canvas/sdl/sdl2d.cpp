@@ -541,12 +541,6 @@ void csGraphics2DSDL::SetRGB(int i, int r, int g, int b)
   SDL_SetColors(screen,&c,i,1);
 }
 
-bool csGraphics2DSDL::PerformExtension(const char* args)
-{
-  (void)args;
-  return true;
-}
-
 bool csGraphics2DSDL::BeginDraw()
 {
   if (!Memory)

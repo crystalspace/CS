@@ -141,7 +141,7 @@ public:
   { return !Enable; }
 
   /// Perform extension commands
-  virtual bool PerformExtension (const char* iCommand, ...);
+  virtual bool PerformExtensionV (char const* command, va_list);
 
   //------------------------ iEventPlug interface ---------------------------//
 

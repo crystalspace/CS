@@ -142,9 +142,9 @@ bool SysSystemDriver::Initialize (int argc, char const* const argv[],
 int32 SysSystemDriver::ThreadEntry(void* p)
 {
   SysSystemDriver* sys = (SysSystemDriver*)p;
-  be_app->Lock();		// Thread invoking Run() must hold lock.
+  be_app->Lock();		 // Thread invoking Run() must hold lock.
   be_app->Run();
-  sys->PerformExtension("Quit");	// BApplication terminated, so ask CS to quit.
+  sys->PerformExtension("Quit"); // BApplication terminated, so ask CS to quit.
   return 0;
 }
 
@@ -223,11 +223,9 @@ void SysSystemDriver::NextFrame()
 //	ContextClose <iGraphics2D*>
 //	    Notify Crystal Space that a 2D graphics context is closing.
 //-----------------------------------------------------------------------------
-bool SysSystemDriver::PerformExtension(char const* cmd, ...)
+bool SysSystemDriver::PerformExtensionV(char const* cmd, va_list args)
 {
   bool ok = false;
-  va_list args;
-  va_start(args, cmd);
 
   if (strcmp(cmd, "UserAction") == 0)
     ok = QueueMessage(va_arg(args, BMessage*));
@@ -244,7 +242,6 @@ bool SysSystemDriver::PerformExtension(char const* cmd, ...)
   else if (strcmp(cmd, "ContextClose") == 0)
     ok = QueueMessage(CS_BE_CONTEXT_CLOSE, va_arg(args, iGraphics2D*));
 
-  va_end(args);
   return ok;
 }
 

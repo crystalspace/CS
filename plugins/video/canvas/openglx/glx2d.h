@@ -85,7 +85,7 @@ public:
 
   virtual void Print (csRect *area = NULL);
 
-  virtual bool PerformExtension (const char* iCommand, ...);
+  virtual bool PerformExtensionV (char const* command, va_list);
 
   /// Set mouse position.
   virtual bool SetMousePosition (int x, int y);

@@ -225,13 +225,10 @@ void SysSystemDriver::Close ()
   }
 }
 
-bool SysSystemDriver::PerformExtension (const char *iCommand, ...)
+bool SysSystemDriver::PerformExtensionV (char const* command, va_list args)
 {
-  va_list args;
-  va_start (args, iCommand);
-
   bool rc = true;
-  if (!strcmp (iCommand, "SetMousePosition"))
+  if (!strcmp (command, "SetMousePosition"))
   {
     int x = va_arg (args, int);
     int y = va_arg (args, int);
@@ -245,11 +242,9 @@ bool SysSystemDriver::PerformExtension (const char *iCommand, ...)
       __dpmi_int (0x33, &regs);
     }
   }
-  else if (!strcmp (iCommand, "EnablePrintf"))
+  else if (!strcmp (command, "EnablePrintf"))
     EnablePrintf = va_arg (args, bool);
   else
     rc = false;
-
-  va_end (args);
   return rc;
 }

@@ -450,9 +450,9 @@ void csGraphics2DGLX::Close(void)
   }
 }
 
-bool csGraphics2DGLX::PerformExtension (const char* iCommand, ...)
+bool csGraphics2DGLX::PerformExtensionV (char const* command, va_list args)
 {
-  if (!strcasecmp (iCommand, "fullscreen"))
+  if (!strcasecmp (command, "fullscreen"))
   {
     if (currently_full_screen)
       LeaveFullScreen ();
@@ -460,8 +460,7 @@ bool csGraphics2DGLX::PerformExtension (const char* iCommand, ...)
       EnterFullScreen ();
     return true;
   }
-
-  return csGraphics2DGLCommon::PerformExtension (iCommand);
+  return csGraphics2DGLCommon::PerformExtensionV (command, args);
 }
 
 void csGraphics2DGLX::Print (csRect * /*area*/)

@@ -19,6 +19,7 @@
 #ifndef __IVIDEO_GRAPH2D_H__
 #define __IVIDEO_GRAPH2D_H__
 
+#include <stdarg.h>
 #include "csutil/scf.h"
 #include "csgfx/rgbpixel.h"
 #include "ivideo/texture.h"
@@ -242,12 +243,19 @@ struct iGraphics2D : public iBase
 
   /**
    * Perform a system specific exension.<p>
-   * The command is a string; any arguments may follow, use stdarg
-   * to extract them. There is no way to guarantee the uniquiness of
+   * The command is a string; any arguments may follow.
+   * There is no way to guarantee the uniquiness of
    * commands, so please try to use descriptive command names rather
    * than "a", "b" and so on...
    */
-  virtual bool PerformExtension (const char *iCommand, ...) = 0;
+  virtual bool PerformExtension (char const* command, ...) = 0;
+
+  /**
+   * Perform a system specific exension.<p>
+   * Just like PerformExtension() except that the command arguments are passed
+   * as a `va_list'.
+   */
+  virtual bool PerformExtensionV (char const* command, va_list) = 0;
 
   /// Do a screenshot: return a new iImage object
   virtual iImage *ScreenShot () = 0;

@@ -56,7 +56,7 @@ public:
   virtual void Close ();
 
   /// Perform extension function
-  bool PerformExtension (const char *iCommand, ...);
+  bool PerformExtensionV (char const* command, va_list);
 
   /// The system is idle: we can sleep for a while
   virtual void Sleep (int SleepTime);

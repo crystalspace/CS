@@ -40,7 +40,7 @@ public:
   
   virtual void SetRGB (int i, int r, int g, int b);
 
-  virtual bool PerformExtension (const char *iCommand, ...);
+  virtual bool PerformExtensionV (char const* command, va_list);
 	
   virtual bool BeginDraw ();
   virtual void FinishDraw ();

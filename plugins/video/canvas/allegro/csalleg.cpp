@@ -368,16 +368,15 @@ bool csGraphics2DAlleg::HandleEvent (iEvent &/*Event*/)
   return false;
 }
 
-bool csGraphics2DAlleg::PerformExtension (const char *iCommand, ...)
+bool csGraphics2DAlleg::PerformExtensionV (char const* command, va_list)
 {
-  if (!strcasecmp (iCommand, "fullscreen"))
+  if (!strcasecmp (command, "fullscreen"))
   {
     System->Printf (CS_MSG_INITIALIZATION, "Fullscreen toggle.");
     scale = !scale;
     clear (screen);
     Print (NULL);
   }
-
   return true;
 }
 
