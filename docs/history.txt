@@ -13,6 +13,8 @@ The history order has been reversed so that new features are at the top.
 	      iPROTO --> iNetSpaceProtocol
 	      iCMDMGR --> iCommandManager
 	      csNSTP --> csNetSpaceTransportProto
+	- Received patched VC project files from Philip Wyett
+	  <philipwyett@leedsalumni.org.uk>.
 7-Sep-2000
 	- Continued work on saver in levtool.  The saved world file works very
 	  well already.  But a few important things are still missing (like
