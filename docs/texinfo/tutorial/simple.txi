@@ -451,6 +451,8 @@ public:
   @dots{}
   csEngine* engine;
   @dots{}
+  virtual void NextFrame ();
+  @dots{}
 @end example
 
 Then edit @file{simple.cpp} and make the following changes to the constructor
