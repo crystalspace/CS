@@ -20,6 +20,7 @@
 #define __ICAMERA_H__
 
 #include "csutil/scf.h"
+#include "csgeom/transfrm.h"
 
 #define VEC_FORWARD   csVector3(0,0,1)
 #define VEC_BACKWARD  csVector3(0,0,-1)
@@ -35,15 +36,23 @@
 #define VEC_TILT_UP    (-csVector3(1,0,0))
 #define VEC_TILT_DOWN  (-csVector3(-1,0,0))
 
-SCF_VERSION (iCamera, 0, 0, 2);
+class csCamera;
 
-/// temporary - subject to change
+SCF_VERSION (iCamera, 0, 0, 3);
+
+/// Camera class.
 struct iCamera : public iBase
 {
+  /// Ugly@@@.
+  virtual csCamera* GetPrivateObject () = 0;
   ///
-  virtual float GetAspect () = 0;
+  virtual float GetFOV () = 0;
   ///
-  virtual float GetInvAspect () = 0;
+  virtual float GetInvFOV () = 0;
+  ///
+  virtual float GetShiftX () = 0;
+  ///
+  virtual float GetShiftY () = 0;
   /**
    * Sets the absolute position of the camera inside the sector.
    * Vector 'v' is in world space coordinates. This function does
@@ -123,6 +132,11 @@ struct iCamera : public iBase
    * grid of density n
    */
   virtual void Correct (int n) = 0;
+
+  /**
+   * Get the transform corresponding to this camera.
+   */
+  virtual csOrthoTransform& GetTransform () = 0;
 };
 
 #endif

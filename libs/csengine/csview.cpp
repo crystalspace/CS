@@ -198,11 +198,11 @@ void csView::View::SetSector (iSector* sector)
 
 iCamera* csView::View::GetCamera ()
 {
-  return (iCamera*)scfParent->GetCamera ();
+  return QUERY_INTERFACE (scfParent->GetCamera (), iCamera);
 }
 
 void csView::View::SetCamera (iCamera* camera)
 {
-  scfParent->SetCamera ((csCamera*)camera);
+  scfParent->SetCamera (camera->GetPrivateObject ());
 }
 

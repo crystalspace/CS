@@ -33,7 +33,7 @@ class Dumper;
 /**
  * A camera positioned in the 3D world.
  */
-class csCamera : public csOrthoTransform, public iCamera
+class csCamera : public csOrthoTransform, public iBase
 {
   friend class Dumper;
 
@@ -300,12 +300,66 @@ public:
     v.y = (p.y - shift_y) * z * inv_aspect;
   }
 
-  ///------------------------ iCamera implementation ------------------------
   DECLARE_IBASE;
-  ///
-  virtual float GetAspect () { return aspect; }
-  ///
-  virtual float GetInvAspect () { return inv_aspect; }
+
+  //------------------------ iCamera implementation ------------------------
+  struct Camera : public iCamera
+  {
+    DECLARE_EMBEDDED_IBASE (csCamera);
+    virtual csCamera* GetPrivateObject ()
+    {
+      return scfParent;
+    }
+    virtual float GetFOV () { return scfParent->GetFOV (); }
+    virtual float GetInvFOV () { return scfParent->GetInvFOV (); }
+    virtual float GetShiftX () { return scfParent->GetShiftX (); }
+    virtual float GetShiftY () { return scfParent->GetShiftY (); }
+    virtual csOrthoTransform& GetTransform () { return *(csOrthoTransform*)scfParent; }
+    virtual void SetPosition (const csVector3& v)
+    {
+      scfParent->SetPosition (v);
+    }
+    virtual void MoveWorld (const csVector3& v, bool cd = true)
+    {
+      scfParent->MoveWorld (v, cd);
+    }
+    virtual void Move (const csVector3& v, bool cd = true)
+    {
+      scfParent->Move (v, cd);
+    }
+    virtual void MoveWorldUnrestricted (const csVector3& v)
+    {
+      scfParent->MoveWorldUnrestricted (v);
+    }
+    virtual void MoveUnrestricted (const csVector3& v)
+    {
+      scfParent->MoveUnrestricted (v);
+    }
+    virtual void RotateWorld (const csVector3& v, float angle)
+    {
+      scfParent->RotateWorld (v, angle);
+    }
+    virtual void Rotate (const csVector3& v, float angle)
+    {
+      scfParent->Rotate (v, angle);
+    }
+    virtual void RotateWorld (const csMatrix3& m)
+    {
+      scfParent->RotateWorld (m);
+    }
+    virtual void Rotate (const csMatrix3& m)
+    {
+      scfParent->Rotate (m);
+    }
+    virtual void LookAt (const csVector3& v, const csVector3& up)
+    {
+      scfParent->LookAt (v, up);
+    }
+    virtual void Correct (int n)
+    {
+      scfParent->Correct (n);
+    }
+  } scfiCamera;
 
 private:
   ///

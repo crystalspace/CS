@@ -16,38 +16,32 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESHOBJ_H__
-#define __IMESHOBJ_H__
+#ifndef __IMESHCUBE_H__
+#define __IMESHCUBE_H__
 
 #include "csutil/scf.h"
-#include "csgeom/box.h"
 #include "iplugin.h"
 
-struct iRenderView;
-struct iMovable;
+struct iMaterialWrapper;
 
-SCF_VERSION (iMeshObject, 0, 0, 2);
+SCF_VERSION (iCubeMeshObject, 0, 0, 1);
 
 /**
- * This is a general mesh object that the engine can interact with.
+ * This interface describes the API for the cube mesh object.
+ * Using this you can set up the cube to whatever (cube) shape you
+ * want it to have and the appearance. The cube plugin implements
+ * this interface in addition to iMeshObjectFactory.
  */
-struct iMeshObject : public iBase
+struct iCubeMeshObject : public iBase
 {
-  /**
-   * Draw this mesh object. Returns false if not visible.
-   * If this function returns true it does not mean that the object
-   * is invisible. It just means that this MeshObject thinks that the
-   * object was probably visible.
-   */
-  virtual bool Draw (iRenderView* rview, iMovable* movable) = 0;
-};
-
-SCF_VERSION (iMeshObjectFactory, 0, 0, 1);
-
-struct iMeshObjectFactory : public iPlugIn
-{
-  /// Create an instance of iMeshObject.
-  virtual iMeshObject* NewInstance () = 0;
+  /// Set size of cube.
+  virtual void SetSize (float size) = 0;
+  /// Get size of cube.
+  virtual float GetSize () = 0;
+  /// Set material of cube.
+  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
+  /// Get material of cube.
+  virtual iMaterialWrapper* GetMaterialWrapper () = 0;
 };
 
 #endif

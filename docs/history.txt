@@ -1,5 +1,26 @@
 The history order has been reversed so that new features are at the top.
 
+27-Dec-2000
+	- Added iCubeMeshObject interface. The cube plugin implements
+	  this interface in addition to iMeshObjectFactory. Using
+	  iCubeMeshObject you can specify the geometric constraints
+	  and appearance of the cube (size and texture). Every mesh object
+	  plugin will have such a companion interface to specify appearance.
+	- Added GetMaterialHandle() to iMaterialWrapper interface.
+	- Extended Draw() in iMeshObject with an iMovable parameter.
+	- Added GetTransform() in iCamera.
+	- Made QUERY_INTERFACE macro a tiny bit safer.
+	- Fixed a bug in csCamera. One of the constructors didn't properly
+	  initialize the SCF stuff for iCamera. Also changed csCamera
+	  so that iCamera is now implemented through embedding instead
+	  of inheritance.
+	- Changed GetAspect() and GetInvAspect() to GetFOV() and GetInvFOV()
+	  in iCamera.
+	- Added GetShiftX() and GetShiftY() to iCamera.
+	- Fixed the SCF stuff for csRenderView. It was not properly done
+	  given that csCamera itself implements iBase.
+	- Continued work on csCubeMesh plugin so that it now renders a
+	  wireframe version.
 26-Dec-2000
 	- Samuel Humphreys did the following:
 	    - Little clean up of ptlab.

@@ -67,9 +67,9 @@ bool csFrustumView::DeregisterCleanup (csFrustrumViewCleanup *action)
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE (csRenderView)
+IMPLEMENT_IBASE_EXT (csRenderView)
   IMPLEMENTS_EMBEDDED_INTERFACE (iRenderView)
-IMPLEMENT_IBASE_END
+IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csRenderView::RenderView)
   IMPLEMENTS_INTERFACE (iRenderView)
@@ -82,7 +82,6 @@ csRenderView::csRenderView () :
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
 }
 
@@ -93,7 +92,6 @@ csRenderView::csRenderView (const csCamera& c) :
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
 }
 
@@ -105,7 +103,6 @@ csRenderView::csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
     callback (NULL), callback_data (NULL), fog_info (NULL),
     added_fog_info (false)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
 }
 

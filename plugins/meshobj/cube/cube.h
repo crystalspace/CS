@@ -20,6 +20,10 @@
 #define _CUBE_H_
 
 #include "imeshobj.h"
+#include "imcube.h"
+
+struct iMaterialWrapper;
+class csCubeMeshObjectFactory;
 
 /**
  * Cube version of mesh object.
@@ -27,10 +31,11 @@
 class csCubeMeshObject : public iMeshObject
 {
 private:
+  csCubeMeshObjectFactory* factory;
 
 public:
   /// Constructor.
-  csCubeMeshObject ();
+  csCubeMeshObject (csCubeMeshObjectFactory* factory);
 
   /// Destructor.
   virtual ~csCubeMeshObject ();
@@ -40,15 +45,19 @@ public:
   DECLARE_IBASE;
 
   /// Draw.
-  virtual bool Draw (iRenderView* rview);
+  virtual bool Draw (iRenderView* rview, iMovable* movable);
 };
 
 /**
- * Factory for cubes.
+ * Factory for cubes. This factory also implements iCubeMeshObject
+ * so that you can set the size of the cube and the material to use
+ * for all instances that are created from this factory.
  */
 class csCubeMeshObjectFactory : public iMeshObjectFactory
 {
 private:
+  float size;
+  iMaterialWrapper* material;
 
 public:
   /// Constructor.
@@ -60,12 +69,31 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iSystem *pSystem);
 
+  /// Get the size of this cube.
+  float GetSize () { return size; }
+  /// Get the material for this cube.
+  iMaterialWrapper* GetMaterialWrapper () { return material; }
+
 public:
-  ///------------------------ iMeshObjectFactory implementation ------------------------
+  //------------------------ iMeshObjectFactory implementation --------------
   DECLARE_IBASE;
 
   /// Draw.
   virtual iMeshObject* NewInstance ();
+
+  //------------------------- iCubeMeshObject implementation ----------------
+  struct CubeMeshObject : public iCubeMeshObject
+  {
+    DECLARE_EMBEDDED_IBASE (csCubeMeshObjectFactory);
+    virtual void SetSize (float size) { scfParent->size = size; }
+    virtual float GetSize () { return scfParent->size; }
+    virtual void SetMaterialWrapper (iMaterialWrapper* material)
+    {
+      scfParent->material = material;
+    }
+    virtual iMaterialWrapper* GetMaterialWrapper () { return scfParent->material; }
+  } scfiCubeMeshObject;
+  friend class CubeMeshObject;
 };
 
 #endif // _CUBE_H_

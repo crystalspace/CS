@@ -162,7 +162,7 @@ public:
     boty = by;
   }
 
-  DECLARE_IBASE;
+  DECLARE_IBASE_EXT (csCamera);
 
   //------------------- iRenderView implementation -----------------------
   struct RenderView : public iRenderView

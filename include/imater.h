@@ -94,6 +94,8 @@ SCF_VERSION (iMaterialWrapper, 0, 0, 1);
  */
 struct iMaterialWrapper : public iBase
 {
+  /// Get the material handle.
+  virtual iMaterialHandle* GetMaterialHandle () = 0;
 };
 
 #endif // __IMATER_H__

@@ -428,7 +428,7 @@ struct iConfigFile;
  * This is a wrapper around iBase::QueryInterface method.
  */
 #define QUERY_INTERFACE(Object,Interface)				\
-  (Interface *)Object->QueryInterface (#Interface, VERSION_##Interface)
+  (Interface *)(Object)->QueryInterface (#Interface, VERSION_##Interface)
 
 /**
  * This function should be called to initialize client SCF library.

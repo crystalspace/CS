@@ -24,8 +24,13 @@
 #include "csengine/engine.h"
 
 IMPLEMENT_IBASE (csCamera)
-  IMPLEMENTS_INTERFACE (iCamera)
+  IMPLEMENTS_INTERFACE (iBase)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iCamera)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csCamera::Camera)
+  IMPLEMENTS_INTERFACE (iCamera)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 int csCamera::default_aspect = 0;
 float csCamera::default_inv_aspect = 0;
@@ -34,6 +39,7 @@ float csCamera::default_fov_angle = 90;
 csCamera::csCamera () : csOrthoTransform()
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   mirror = false;
   sector = NULL;
   aspect = default_aspect;
@@ -47,6 +53,8 @@ csCamera::csCamera () : csOrthoTransform()
 
 csCamera::csCamera (csCamera* c) : csOrthoTransform (*c)
 {
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   mirror = c->mirror;
   sector = c->sector;
   aspect = c->aspect;
