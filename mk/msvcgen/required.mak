@@ -43,7 +43,8 @@
 #------------------------------------------------------------------------------
 MSVC.MAKE.FLAGS = \
   HAS_CAL3D=yes \
-  3DS.AVAILABLE=yes
+  3DS.AVAILABLE=yes \
+  CSPYTHON_MSVC_EXCLUDE=yes
 
 MSVC.PLUGINS.REQUIRED =         \
   apps/import/caltocs		\

@@ -32,7 +32,7 @@ all plugins: cspython
 endif
 
 cspython:
-	$(MAKE_TARGET) MAKE_DLL=yes
+	$(MAKE_TARGET) MAKE_DLL=yes CSPYTHON_MSVC_EXCLUDE=no
 cspythonclean:
 	$(MAKE_CLEAN)
 ifneq ($(MAKE_PYTHON_MODULE),no)
@@ -78,7 +78,9 @@ TO_INSTALL.EXE += python.cex
 
 SWIG.OUTDIR = $(OUTDERIVED)
 SWIG.INTERFACE = $(SRCDIR)/include/ivaria/cspace.i
+ifneq ($(CSPYTHON_MSVC_EXCLUDE),yes)
 SWIG.CSPYTHON = $(SWIG.OUTDIR)/cs_pyth.cpp
+endif
 SWIG.CSPYTHON.CVS = $(SRCDIR)/plugins/cscript/cspython/cs_pyth.cpp
 SWIG.CSPYTHON.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
 
