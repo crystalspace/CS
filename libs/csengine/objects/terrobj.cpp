@@ -27,7 +27,6 @@ IMPLEMENT_CSOBJTYPE (csTerrainWrapper, csObject)
 
 IMPLEMENT_OBJECT_INTERFACE (csTerrainWrapper)
   IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iTerrainWrapper)
-  IMPLEMENTS_OBJECT_TYPE (csTerrainWrapper)
 IMPLEMENT_OBJECT_INTERFACE_END
 
 IMPLEMENT_IBASE_EXT (csTerrainWrapper)
@@ -131,7 +130,6 @@ IMPLEMENT_CSOBJTYPE (csTerrainFactoryWrapper, csObject)
 
 IMPLEMENT_OBJECT_INTERFACE (csTerrainFactoryWrapper)
   IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iTerrainFactoryWrapper)
-  IMPLEMENTS_OBJECT_TYPE (csTerrainFactoryWrapper)
 IMPLEMENT_OBJECT_INTERFACE_END
 
 csTerrainFactoryWrapper::csTerrainFactoryWrapper (iTerrainObjectFactory *pFactory)

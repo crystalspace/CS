@@ -20,11 +20,26 @@
 #ifndef __IOBJECT_RTTI_H__
 #define __IOBJECT_RTTI_H__
 
-/// Use this macro in the headers of a module that wants to use RTTI.
+/**
+ * Pseudo-RTTI system: These macros allow to quickly and safely cast
+ * objects to other types. They work similar to SCF's QUERY_INTERFACE,
+ * but are less flexible and faster. They do not test for version
+ * compatibility, and the requested type is given as an integer number,
+ * not a string. This system requires that the ID numbers are allocated
+ * from a global plug-in, the string server. <p>
+ */
+
+/**
+ * Use this macro in the headers of a module that wants to use RTTI. It
+ * allows to use the type information in the whole module.
+ */
 #define DECLARE_OBJECT_TYPE(type)					\
 	extern int csObjectType_##type;
 
-/// Use this macro in one source file of a module that wants to use RTTI.
+/**
+ * Use this macro in one source file of a module that wants to use RTTI. It
+ * defines a global variable in the module that contains the type information.
+ */
 #define ALLOCATE_OBJECT_TYPE(type)					\
 	int csObjectType_##type = -1;
 
@@ -39,24 +54,57 @@
 #define QUERY_OBJECT_TYPE(object, type)					\
 	((type*)(object)->QueryObjectType(csObjectType_##type))
 
-/// Put this macro in the interface definition of an RTTI object.
+/**
+ * Put this macro in the interface definition of an RTTI object. It adds the
+ * (abstract) method that is required for the 'dynamic cast'.
+ */
 #define DECLARE_ABSTRACT_OBJECT_INTERFACE				\
 	virtual void *QueryObjectType (int typeID) = 0;
 
-/// Put this in the class definition of an RTTI object.
+/**
+ * Put this macro in the cass definition of an RTTI object. It adds the
+ * method that is required for the 'dynamic cast'.
+ */
 #define DECLARE_OBJECT_INTERFACE					\
 	virtual void *QueryObjectType (int typeID);
 
+/**
+ * Put this macro in the cass definition of an RTTI object that is a subclass
+ * of another RTTI-able class. It adds the method that is required for the
+ * 'dynamic cast', which also asks the parent class for the requested type.
+ */
 #define DECLARE_OBJECT_INTERFACE_EXT(parentclass)			\
 	typedef parentclass objParentClass;				\
 	virtual void *QueryObjectType (int typeID);
 
-/// Put these in the source file for the RTTI object:
+/**
+ * Put these macros in the source file for the RTTI object. They implement the
+ * 'dynamic cast' method. In the simple case you just write:
+ *
+ *   IMPLEMENT_OBJECT_INTERFACE (myclass)
+ *   IMPLEMENT_OBJECT_INTERFACE_END
+ *
+ * This allows casting to 'myclass'. You can add any number of
+ * IMPLEMENTS_OBJECT_TYPE or IMPLEMENTS_EMBEDDED_OBJECT_TYPE between these two
+ * macros to support casting to other types than the class itself. This is
+ * usually used to allow casting to SCF interfaces, for example
+ *
+ *   IMPLEMENT_OBJECT_INTERFACE (csSector)
+ *     IMPLEMENTS_OBJECT_TYPE (iSector)
+ *   IMPLEMENT_OBJECT_INTERFACE_END
+ *
+ * You must use the 'EXT' version of the macros if you want to allow casting
+ * to whatever the parent class allows (i.e. when using
+ * DECLARE_OBJECT_INTERFACE_EXT).
+ */
+
 #define IMPLEMENT_OBJECT_INTERFACE(object)				\
-	void *object::QueryObjectType (int Type) {
+	void *object::QueryObjectType (int Type) {			\
+	  if (Type == csObjectType_##object) return this;
 
 #define IMPLEMENT_OBJECT_INTERFACE_EXT(object)				\
-	void *object::QueryObjectType (int Type) {
+	void *object::QueryObjectType (int Type) {			\
+	  if (Type == csObjectType_##object) return this;
 
 #define IMPLEMENTS_OBJECT_TYPE(type)					\
 	if (Type == csObjectType_##type) return this;

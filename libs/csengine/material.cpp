@@ -113,7 +113,6 @@ IMPLEMENT_CSOBJTYPE (csMaterialWrapper, csPObject);
 
 IMPLEMENT_OBJECT_INTERFACE (csMaterialWrapper)
   IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iMaterialWrapper)
-  IMPLEMENTS_OBJECT_TYPE (csMaterialWrapper)
 IMPLEMENT_OBJECT_INTERFACE_END
 
 csMaterialWrapper::csMaterialWrapper (iMaterial* material) :

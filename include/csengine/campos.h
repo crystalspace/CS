@@ -63,6 +63,7 @@ public:
   bool Load (csCamera&, csEngine*);
 
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE;
 
   //--------------------- iCameraPosition implementation ----------------------

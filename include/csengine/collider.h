@@ -83,6 +83,7 @@ public:
   static csCollider* GetCollider (csObject& object);
 
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
 };
 
 #endif // __CS_COLLIDER_H__

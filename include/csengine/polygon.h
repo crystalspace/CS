@@ -1192,6 +1192,7 @@ public:
   { txt_share_list = next; }
 
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE_EXT (csObject);
 
   //------------------- iPolygon3D interface implementation -------------------

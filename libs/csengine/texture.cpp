@@ -38,7 +38,6 @@ IMPLEMENT_CSOBJTYPE (csTextureWrapper,csPObject);
 
 IMPLEMENT_OBJECT_INTERFACE (csTextureWrapper)
   IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iTextureWrapper)
-  IMPLEMENTS_OBJECT_TYPE (csTextureWrapper)
 IMPLEMENT_OBJECT_INTERFACE_END
 
 csTextureWrapper::csTextureWrapper (iImage* Image) :

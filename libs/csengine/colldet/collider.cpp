@@ -20,11 +20,14 @@
 #include "cssysdef.h"
 #include "csengine/collider.h"
 #include "iengine/collider.h"
-
+#include "csengine/engine.h"
 
 //----------------------------------------------------------------------
 
 IMPLEMENT_CSOBJTYPE (csCollider, csObject);
+
+IMPLEMENT_OBJECT_INTERFACE (csCollider)
+IMPLEMENT_OBJECT_INTERFACE_END
 
 csCollider::csCollider (csObject& parent,
 	iCollideSystem* collide_system,

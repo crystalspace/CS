@@ -51,6 +51,7 @@ public:
 private:
   char *m_Value;
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
 };
 
 /**
@@ -108,6 +109,7 @@ private:
   csSector *m_pSector;
   csVector3 m_Position;
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
 };
 
 /**

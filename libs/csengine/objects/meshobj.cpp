@@ -29,7 +29,6 @@ IMPLEMENT_CSOBJTYPE (csMeshWrapper, csPObject)
 
 IMPLEMENT_OBJECT_INTERFACE (csMeshWrapper)
   IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iMeshWrapper)
-  IMPLEMENTS_OBJECT_TYPE (csMeshWrapper)
 IMPLEMENT_OBJECT_INTERFACE_END
 
 IMPLEMENT_IBASE_EXT (csMeshWrapper)
@@ -418,7 +417,6 @@ IMPLEMENT_CSOBJTYPE (csMeshFactoryWrapper, csObject)
 
 IMPLEMENT_OBJECT_INTERFACE (csMeshFactoryWrapper)
   IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iMeshFactoryWrapper)
-  IMPLEMENTS_OBJECT_TYPE (csMeshFactoryWrapper)
 IMPLEMENT_OBJECT_INTERFACE_END
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (iMeshObjectFactory* meshFact)

@@ -32,6 +32,10 @@ IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_CSOBJTYPE (csCameraPosition,csPObject);
 
+IMPLEMENT_OBJECT_INTERFACE (csCameraPosition)
+  IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iCameraPosition)
+IMPLEMENT_OBJECT_INTERFACE_END
+
 csCameraPosition::csCameraPosition (const char *iName, const char *iSector,
   const csVector3 &iPosition, const csVector3 &iForward,
   const csVector3 &iUpward)

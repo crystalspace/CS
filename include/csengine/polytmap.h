@@ -129,6 +129,7 @@ public:
   void GetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
 
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE_EXT (csPObject);
 
   //----------------- iPolyTxtPlane interface implementation -----------------

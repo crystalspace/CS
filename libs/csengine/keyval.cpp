@@ -19,10 +19,14 @@
 #include "cssysdef.h"
 #include "csengine/keyval.h"
 #include "csengine/sector.h"
+#include "csengine/engine.h"
 
 //---------------------------------------------------------------------------
 
 IMPLEMENT_CSOBJTYPE (csKeyValuePair,csObject);
+
+IMPLEMENT_OBJECT_INTERFACE (csKeyValuePair)
+IMPLEMENT_OBJECT_INTERFACE_END
 
 csKeyValuePair::csKeyValuePair (const char* Key, const char* Value)
 {
@@ -83,6 +87,9 @@ bool csKeyValueIterator::IsFinished () const
 //---------------------------------------------------------------------------
 
 IMPLEMENT_CSOBJTYPE (csMapNode,csObject);
+
+IMPLEMENT_OBJECT_INTERFACE (csMapNode)
+IMPLEMENT_OBJECT_INTERFACE_END
 
 csMapNode::csMapNode (const char* Name) : m_Position (0, 0, 0)
 {
