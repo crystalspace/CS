@@ -57,8 +57,11 @@ ifeq ($(PROC),invalid)
 else
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
 	@echo $"  USE_DLL=$(USE_DLL) MODE=$(MODE) $(SYSMODIFIERS)$"
-	@echo $"  Other platforms are: linux, solaris, irix, freebsd, beos, os2gcc, os2wcc, djgpp,$"
-	@echo $"  macosxs, openstep, nextstep, amiga or win32vc with the following modifiers:$"
+	@echo $"$"
+	@echo $"  Other platforms are: linux, solaris, irix, freebsd, beos, os2gcc, os2wcc,$"
+	@echo $"  macosxs, openstep, nextstep, amiga, djgpp or win32vc.$"
+	@echo $"$"
+	@echo $"  -*- Modifiers -*-$"
 endif
 	@echo $"  USE_DLL=yes$|no    Build dynamic/static modules (drivers, plugins)$"
 	@echo $"  MODE=optimize$|debug$|profile  Select how to compile everything.$"
