@@ -370,6 +370,7 @@ void csVosSector::notifyChildRemoved (VobjectEvent &event)
 
 void csVosSector::notifyChildReplaced (VobjectEvent &event)
 {
+	if((*event.getNewChild()) == (*event.getOldChild())) return;
   LOG("csVosSector", 3, "notifyChildReplaced");
   notifyChildRemoved(event);
   notifyChildInserted(event);
