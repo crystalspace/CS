@@ -336,7 +336,7 @@ void csMaterial::SetShader (csStringID type, iShader* shd)
 iShader* csMaterial::GetShader(csStringID type)
 {
 #ifdef CS_USE_NEW_RENDERER
-  return shaders.Get (type, 0);
+  return shaders.Fetch (type, 0);
 #else
   return 0;
 #endif

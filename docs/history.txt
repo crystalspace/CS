@@ -43,6 +43,7 @@ chronological order.
 	  these otherwise difficult-to-diagnose bugs, the most notable of which
 	  was csKeyboardDriver::GetKeyState() which was returning bogus
 	  results.
+	- res changed some more occasions of csHash<>::Get() to Fetch().
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.
