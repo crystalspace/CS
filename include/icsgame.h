@@ -599,8 +599,8 @@ struct iDataSaver : public iBase
 SCF_VERSION (iGameNetworkConnection, 0, 1, 0);
 
 /**
- * @@@ Comment needs fixing
- * A Data Loader allows entites to read a structured datafile
+ * A network connection takes care of sending events to entities on a remote
+ * computer for network gameplay.
  */
 struct iGameNetworkConnection : public iBase
 {
