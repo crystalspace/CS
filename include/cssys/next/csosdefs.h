@@ -97,6 +97,13 @@ static inline char* strdup(char const* s)
 
 
 //-----------------------------------------------------------------------------
+// Provide CS_MAXPATHLEN with a reasonable value.
+//-----------------------------------------------------------------------------
+#include <sys/param.h>
+#define CS_MAXPATHLEN MAXPATHLEN
+
+
+//-----------------------------------------------------------------------------
 // Pull in definitions for getwd(), ntohl(), htonl(), select(), etc.
 // *NOTE* On MacOS/X Server 1.0, libc.h pulls in sys/mount.h which pulls in
 // net/radix.h which defines a macro named Free().  This macro interferes with
