@@ -252,12 +252,13 @@ bool Video::Initialize (int argc, const char* const argv[],
   walls->DecRef ();
   
   iStatLight* light;
+  iLightList* ll = room->GetLights ();
   light = engine->CreateLight (NULL, csVector3(-3, 5, 0), 10, csColor(1, 0, 0), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
   light = engine->CreateLight (NULL, csVector3(3, 5, 0), 10, csColor(0, 0, 1), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
   light = engine->CreateLight (NULL, csVector3(0, 5, -3), 10, csColor(0, 1, 0), false);
-  room->AddLight (light);
+  ll->AddLight (light->QueryLight ());
 
   engine->Prepare ();
 
