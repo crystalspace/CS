@@ -197,14 +197,24 @@ enum csZBufMode
 #define CS_SHADOW_VOLUME_PASS2 3
 
 /**
+ * Setup for carmack's reverse pass 1
+ */
+#define CS_SHADOW_VOLUME_FAIL1 4
+
+/**
+ * Setup for carmack's reverse pass 2
+ */
+#define CS_SHADOW_VOLUME_FAIL2 5
+
+/**
  * Setup for shadow masking
  */
-#define CS_SHADOW_VOLUME_USE 4
+#define CS_SHADOW_VOLUME_USE 6
 
 /**
  * Restore states
  */
-#define CS_SHADOW_VOLUME_FINISH 5
+#define CS_SHADOW_VOLUME_FINISH 7
 
 /** @} */
 
