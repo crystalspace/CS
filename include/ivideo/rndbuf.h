@@ -110,6 +110,9 @@ struct iStreamSource : public iBase
 {
   /// Get a named buffer
   virtual iRenderBuffer* GetBuffer (csStringID name) = 0;
+
+  /// Get the number of components in a buffer
+  virtual int GetComponentCount (csStringID name) = 0;
 };
 
 class csRenderMesh
@@ -135,6 +138,7 @@ private:
   const char *defaultvertices;
   const char *defaulttexcoords;
   const char *defaultnormals;
+  const char *defaultcolors;
   const char *defaultindices;
 
 public:
@@ -144,6 +148,7 @@ public:
     defaultvertices = "vertices";
     defaulttexcoords = "texture coordinates";
     defaultnormals = "normals";
+    defaultcolors = "colors";
     defaultindices = "indices";
     mixmode = CS_FX_COPY;
   }
@@ -183,31 +188,6 @@ public:
   /// Get buffer source
   virtual iStreamSource* GetStreamSource ()
     { return streamsource; }
-
-  /// Set default vertex buffer name
-  virtual void SetDefaultVertexBuffer (const char *name)
-    { defaultvertices = name; }
-  /// Get default vertex buffer name
-  virtual const char *GetDefaultVertexBuffer ()
-    { return defaultvertices; }
-  /// Set default vertex buffer name
-  virtual void SetDefaultTexCoordBuffer (const char *name)
-    { defaulttexcoords = name; }
-  /// Get default vertex buffer name
-  virtual const char *GetDefaultTexCoordBuffer ()
-    { return defaulttexcoords; }
-  /// Set default vertex buffer name
-  virtual void SetDefaultNormalBuffer (const char *name)
-    { defaultnormals = name; }
-  /// Get default vertex buffer name
-  virtual const char *GetDefaultNormalBuffer ()
-    { return defaultnormals; }
-  /// Set default vertex buffer name
-  virtual void SetDefaultIndexBuffer (const char *name)
-    { defaultindices = name; }
-  /// Get default vertex buffer name
-  virtual const char *GetDefaultIndexBuffer ()
-    { return defaultindices; }
 
   /// Set range of indices to use
   virtual void SetIndexRange (unsigned int start, unsigned int end)

@@ -34,6 +34,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/render3d.h"
+#include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 #include "ivideo/shader/shadervar.h"
 
@@ -92,11 +93,37 @@ void csShaderGLAVP::Activate(iShaderPass* current, csRenderMesh* mesh)
     }
   }
 
+  csRef<iStreamSource> source = mesh->GetStreamSource ();
 
+  // set streams
+  for(i = 0; i < streammap.Length(); ++i)
+  {
+    streammapentry* e = (streammapentry*)streammap.Get(i);
+    csRef<iRenderBuffer> buf = source->GetBuffer (e->name);
+    if (!buf)
+      continue;
+    void* ptr = buf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER);
+    if (ptr)
+    {
+      ext->glVertexAttribPointerARB (e->attribnum, 
+        source->GetComponentCount (e->name), GL_FLOAT, false, 0, ptr);
+      ext->glEnableVertexAttribArrayARB (e->attribnum);
+    }
+  }
 }
 
-void csShaderGLAVP::Deactivate(iShaderPass* current)
+void csShaderGLAVP::Deactivate(iShaderPass* current, csRenderMesh* mesh)
 {
+  csRef<iStreamSource> source = mesh->GetStreamSource ();
+  for(int i = 0; i < streammap.Length(); ++i)
+  {
+    streammapentry* e = (streammapentry*)streammap.Get(i);
+    csRef<iRenderBuffer> buf = source->GetBuffer (e->name);
+    if (!buf)
+      continue;
+    buf->Release ();
+    ext->glDisableVertexAttribArrayARB (e->attribnum);
+  }
   glDisable (GL_VERTEX_PROGRAM_ARB);
 }
 
@@ -156,7 +183,8 @@ void csShaderGLAVP::BuildTokenHash()
 {
   xmltokens.Register("ARBVP",XMLTOKEN_ARBVP);
   xmltokens.Register("declare",XMLTOKEN_DECLARE);
-  xmltokens.Register("map",XMLTOKEN_MAP);
+  xmltokens.Register("variablemap",XMLTOKEN_VARIABLEMAP);
+  xmltokens.Register("streammap",XMLTOKEN_STREAMMAP);
   xmltokens.Register("program", XMLTOKEN_PROGRAM);
 
   xmltokens.Register("integer", 100+iShaderVariable::INT);
@@ -164,6 +192,7 @@ void csShaderGLAVP::BuildTokenHash()
   xmltokens.Register("string", 100+iShaderVariable::STRING);
   xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
 }
+
 bool csShaderGLAVP::Load(iDataBuffer* program)
 {
   csRef<iDocumentSystem> xml (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
@@ -185,6 +214,8 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
     return false;
 
   BuildTokenHash();
+
+  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("arbvp");
   if(variablesnode)
@@ -234,7 +265,7 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
           variables.Put( csHashCompute(var->GetName()), var);
         }
         break;
-      case XMLTOKEN_MAP:
+      case XMLTOKEN_VARIABLEMAP:
         {
           //create a varable<->register mapping
           variablemapentry * map = new variablemapentry();
@@ -246,6 +277,17 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
           map->registernum = child->GetAttributeValueAsInt("register");
           //save it for later
           variablemap.Push( map );
+        }
+        break;
+      case XMLTOKEN_STREAMMAP:
+        {
+          //create a stream<->attribute mapping
+          streammapentry * map = new streammapentry();
+          map->name = r3d->GetStringContainer ()->Request (
+            child->GetAttributeValue("stream"));
+          map->attribnum = child->GetAttributeValueAsInt("attribute");
+          //save it for later
+          streammap.Push( map );
         }
         break;
       default:

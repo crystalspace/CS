@@ -299,9 +299,18 @@ public:
   virtual void DisableColorWrite ()
     { glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); }
 
+  /// Enables offsetting of Z values
+  virtual void EnableZOffset ()
+    { glPolygonOffset (-0.05, -2); 
+      statecache->EnableState (GL_POLYGON_OFFSET_FILL); }
+
+  /// Disables offsetting of Z values
+  virtual void DisableZOffset ()
+    { statecache->DisableState (GL_POLYGON_OFFSET_FILL); }
+
   /// Draw a line
   virtual void DrawLine(const csVector3 & v1,
-  const csVector3 & v2, float fov, int color);
+    const csVector3 & v2, float fov, int color);
 
   /**
    * Set optional clipper to use. If clipper == null

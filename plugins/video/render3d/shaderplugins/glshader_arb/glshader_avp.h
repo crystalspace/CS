@@ -30,7 +30,8 @@ private:
   {
     XMLTOKEN_ARBVP = 1,
     XMLTOKEN_DECLARE,
-    XMLTOKEN_MAP,
+    XMLTOKEN_VARIABLEMAP,
+    XMLTOKEN_STREAMMAP,
     XMLTOKEN_PROGRAM
   };
 
@@ -42,6 +43,13 @@ private:
     int registernum;
   };
 
+  struct streammapentry
+  {
+    streammapentry() { name = 0; }
+    csStringID name;
+    int attribnum;
+  };
+
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 
@@ -49,6 +57,7 @@ private:
 
   csHashMap variables;
   csBasicVector variablemap;
+  csBasicVector streammap;
   csStringHash xmltokens;
 
   void BuildTokenHash();
@@ -87,7 +96,7 @@ public:
   virtual void Activate(iShaderPass* current, csRenderMesh* mesh);
 
   /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate(iShaderPass* current);
+  virtual void Deactivate(iShaderPass* current, csRenderMesh* mesh);
 
   /* Propertybag - get property, return false if no such property found
    * Which properties there is is implementation specific

@@ -297,10 +297,10 @@ public:
   }
 
   /// Deactivate
-  virtual void Deactivate()
+  virtual void Deactivate(csRenderMesh* mesh)
   {
-    if(vp) vp->Deactivate(this);
-    if(fp) fp->Deactivate(this);
+    if(vp) vp->Deactivate(this, mesh);
+    if(fp) fp->Deactivate(this, mesh);
   }
 
   /// Add a variable to this context

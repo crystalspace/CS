@@ -952,9 +952,9 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     source->GetBuffer (string_vertices);
   csRef<iRenderBuffer> texcoordbuf =
     source->GetBuffer (string_texture_coordinates);
-  csRef<iRenderBuffer> normalbuf =
+  csRef<iRenderBuffer> normalbuf = 
     source->GetBuffer (string_normals);
-  csRef<iRenderBuffer> colorbuf =
+  csRef<iRenderBuffer> colorbuf = 
     source->GetBuffer (string_colors);
   csRef<iRenderBuffer> indexbuf =
     source->GetBuffer (string_indices);
@@ -1072,7 +1072,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       GL_UNSIGNED_INT,
       ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
       +mymesh->GetIndexStart ());
-      tech->GetPass(currp)->Deactivate();
+      tech->GetPass(currp)->Deactivate(mymesh);
     }
   }else{
     glDrawElements (

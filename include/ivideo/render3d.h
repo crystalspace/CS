@@ -296,6 +296,12 @@ struct iRender3D : public iBase
   /// Disables writing of color values to framebuffer
   virtual void DisableColorWrite () = 0;
 
+  /// Enables offsetting of Z values
+  virtual void EnableZOffset () = 0;
+
+  /// Disables offsetting of Z values
+  virtual void DisableZOffset () = 0;
+
   /// Draw a line
   virtual void DrawLine(const csVector3 & v1,
   const csVector3 & v2, float fov, int color) = 0;

@@ -38,6 +38,7 @@ class csReversibleTransform;
 struct iMeshWrapper;
 struct iMeshList;
 struct iLightList;
+struct iLight;
 struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
@@ -183,6 +184,30 @@ struct iSector : public iBase
 
   /// Draw the sector with the given render view
   virtual void Draw (iRenderView* rview) = 0;
+#ifdef CS_USE_NEW_RENDERER
+  /**
+   * The following three Draw* calls divide the draw into three passes.
+   * They correspond to similar Draw* calls in the MeshObject.  The 
+   * first fills the zBuffer and draws any meshes into the framebuffer
+   * which do not use the lighting system (i.e., lightmapped meshes)
+   * It will also store all objects drawn for the current scene, so that
+   * on the following passes, occlusions will not need to be redetermined.
+   * The object_list should be deleted by the calling function with
+   * delete [].
+   */
+  virtual void DrawZ (iRenderView* rview) = 0;
+  /**
+   * The second pass draws a shadow volume version of the object which
+   * uses the filled zBuffer to determine how to fill the stencil 
+   * buffer to mask out portions of light which are in shadow.
+   */
+  virtual void DrawShadow (iRenderView* rview, iLight *light) = 0;
+  /**
+   * The third pass draws the diffuse lit mesh using the stencil buffer
+   * to enable the shadows.
+   */
+  virtual void DrawLight (iRenderView* rview, iLight *light) = 0;
+#endif
 
   /**
    * Set the sector callback. This will call IncRef() on the callback
