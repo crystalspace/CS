@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -41,7 +41,7 @@ csGraphics2DBeGlide::csGraphics2DBeGlide(iBase* p) :
 {
 }
 
-csGraphics2DBeGlide::~csGraphics2DBeGlide() 
+csGraphics2DBeGlide::~csGraphics2DBeGlide()
 {
 }
 
@@ -58,7 +58,7 @@ bool csGraphics2DBeGlide::Initialize(iSystem* isys)
     screen_frame = screen.Frame();
     curr_color_space = screen.ColorSpace();
     ApplyDepthInfo(curr_color_space);
-  
+
     // Create frame-buffer.
     BRect const r(0, 0, Width - 1, Height - 1);
     bitmap = new BBitmap(r, curr_color_space);
@@ -68,7 +68,7 @@ bool csGraphics2DBeGlide::Initialize(iSystem* isys)
 }
 
 bool csGraphics2DBeGlide::Open(char const* title)
-{ 
+{
   bool ok = superclass::Open(title);
   if (ok)
   {
@@ -120,11 +120,16 @@ void csGraphics2DBeGlide::Print (csRect* r)
   superclass::Print(r);
 }
 
+bool csGraphics2DBeGlide::SetMouseCursor(csMouseCursorID shape)
+{
+  return System->SystemExtension("SetCursor", shape);
+}
+
 void csGraphics2DBeGlide::FXgetImage(csRect* cr)
 {
   // @@@FIXME: We only handle 16-bit (blah).
   if (Depth == 16)
-    grLfbReadRegion(GR_BUFFER_FRONTBUFFER,0,0,Width,Height,Width*2,Memory);         
+    grLfbReadRegion(GR_BUFFER_FRONTBUFFER,0,0,Width,Height,Width*2,Memory);
 
   if (window->Lock())
   {
@@ -144,12 +149,12 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space cs)
   unsigned long RedMask, GreenMask, BlueMask;
   switch (cs)
   {
-    case B_RGB15: 
+    case B_RGB15:
       Depth     = 15;
       RedMask   = 0x1f << 10;
       GreenMask = 0x1f << 5;
       BlueMask  = 0x1f;
-  		
+
       _DrawPixel = DrawPixel16;
       _WriteString = WriteString16;
       _GetPixelAt= GetPixelAt16;
@@ -159,7 +164,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space cs)
       pfmt.RedMask    = RedMask;
       pfmt.GreenMask  = GreenMask;
       pfmt.BlueMask   = BlueMask;
-  		
+
       pfmt.complete();
       break;
     case B_RGB16:
@@ -167,7 +172,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space cs)
       RedMask   = 0x1f << 11;
       GreenMask = 0x3f << 5;
       BlueMask  = 0x1f;
-  		
+
       _DrawPixel = DrawPixel16;
       _WriteString = WriteString16;
       _GetPixelAt= GetPixelAt16;
@@ -177,7 +182,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space cs)
       pfmt.RedMask    = RedMask;
       pfmt.GreenMask  = GreenMask;
       pfmt.BlueMask   = BlueMask;
-  		
+
       pfmt.complete();
       break;
     case B_RGB32:
@@ -186,7 +191,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space cs)
       RedMask   = 0xff << 16;
       GreenMask = 0xff << 8;
       BlueMask  = 0xff;
-  		
+
       _DrawPixel = DrawPixel32;
       _WriteString = WriteString32;
       _GetPixelAt= GetPixelAt32;
@@ -196,7 +201,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space cs)
       pfmt.RedMask    = RedMask;
       pfmt.GreenMask  = GreenMask;
       pfmt.BlueMask   = BlueMask;
-  		
+
       pfmt.complete();
       break;
     default:

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,7 +27,8 @@ IMPLEMENT_FACTORY (csGraphics2DGLBe)
 
 EXPORT_CLASS_TABLE (glbe2d)
   EXPORT_CLASS_DEP (csGraphics2DGLBe, "crystalspace.graphics2d.glbe",
-    "Crystal Space 2D driver for OpenGL using GL on BeOS", "crystalspace.font.server.")
+    "Crystal Space 2D driver for OpenGL using GL on BeOS",
+    "crystalspace.font.server.")
 EXPORT_CLASS_TABLE_END
 
 csGraphics2DGLBe::csGraphics2DGLBe(iBase* p) :
@@ -72,7 +73,7 @@ bool csGraphics2DGLBe::Open(char const* title)
 
   view = new CrystGLView(BRect(0, 0, vw, vh), System);
   window = new CrystGLWindow(win_rect, title, view, System, this);
-	
+
   window->Show();
   if (window->Lock())
   {
@@ -119,12 +120,17 @@ void csGraphics2DGLBe::Print(csRect*)
   }
 }
 
+bool csGraphics2DGLBe::SetMouseCursor(csMouseCursorID shape)
+{
+  return System->SystemExtension("SetCursor", shape);
+}
+
 void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)
 {
   unsigned long RedMask, GreenMask, BlueMask;
   switch (cs)
   {
-    case B_RGB15: 
+    case B_RGB15:
       Depth	= 15;
       RedMask   = 0x1f << 10;
       GreenMask = 0x1f << 5;
@@ -151,7 +157,7 @@ void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)
       pfmt.GreenMask  = GreenMask;
       pfmt.BlueMask   = BlueMask;
       pfmt.PalEntries = 0;
-  		
+
       pfmt.complete ();
       break;
     case B_RGB32:

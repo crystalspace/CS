@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
