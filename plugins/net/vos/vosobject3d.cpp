@@ -117,10 +117,13 @@ ConstructObject3DTask::~ConstructObject3DTask()
 void ConstructObject3DTask::doTask()
 {
   csRef<iMeshWrapper> mw = obj->GetCSinterface()->GetMeshWrapper();
-  LOG("vosobject3d", 2, "setting position of " << obj->getURLstr()
-    << " to " << pos.x << " " << pos.y << " " << pos.z);
-  LOG("vosobject3d", 2, "setting hard position of " << obj->getURLstr()
-    << " to " << hardpos.x << " " << hardpos.y << " " << hardpos.z);
+  LOG("vosobject3d", 2, "ConstructObject3DTask: creating " << obj->getURLstr()
+      << " at " << pos.x << " " << pos.y << " " << pos.z);
+  if(hardpos.x != 0 || hardpos.y != 0 || hardpos.z != 0) {
+    LOG("vosobject3d", 2, "setting hard position of " << obj->getURLstr()
+        << " to " << hardpos.x << " " << hardpos.y << " " << hardpos.z);
+  }
+
   if(mw.IsValid())
   {
     csReversibleTransform ht(hardtrans, hardpos);
@@ -270,13 +273,13 @@ void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 void csMetaObject3D::notifyChildInserted (VobjectEvent &event)
 
 {
-  LOG ("vosobject3d", 2, "notifyChildInserted " << event.getContextualName());
+  LOG ("vosobject3d", 4, "notifyChildInserted " << event.getContextualName());
   if (event.getContextualName() == "a3dl:position" ||
       event.getContextualName() == "a3dl:orientation")
   {
     try
     {
-      LOG("vosobject3d", 2, "adding property listener");
+      LOG("vosobject3d", 4, "adding property listener");
       meta_cast<Property> (event.getChild())->addPropertyListener (this);
     }
     catch (...)
@@ -287,7 +290,7 @@ void csMetaObject3D::notifyChildInserted (VobjectEvent &event)
 
 void csMetaObject3D::notifyChildRemoved (VobjectEvent &event)
 {
-  LOG ("vosobject3d", 2, "notifyChildRemoved " << event.getContextualName());
+  LOG ("vosobject3d", 4, "notifyChildRemoved " << event.getContextualName());
   if (event.getContextualName() == "a3dl:position" ||
       event.getContextualName() == "a3dl:orientation")
   {
@@ -303,7 +306,7 @@ void csMetaObject3D::notifyChildRemoved (VobjectEvent &event)
 
 void csMetaObject3D::notifyChildReplaced (VobjectEvent &event)
 {
-  LOG ("vosobject3d", 2, "notifyChildReplaced " << event.getContextualName());
+  LOG ("vosobject3d", 4, "notifyChildReplaced " << event.getContextualName());
   if (event.getContextualName() == "a3dl:position" ||
       event.getContextualName() == "a3dl:orientation")
   {
@@ -335,16 +338,20 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
       vRef<ParentChildRelation> pcr = event.getProperty()->findParent (*this);
       if (pcr->getContextualName() == "a3dl:position")
       {
-        double x, y, z;
+        double x = 0.0, y = 0.0, z = 0.0;
         getPosition (x,y,z);
-        vosa3dl->mainThreadTasks.push (new PositionTask(this,csVector3(x,y,z)));
+        LOG("vosobject3d", 2, getURLstr() << " event value is \"" << event.getValue()
+            << "\", prop read is \""
+            << event.getProperty()->read() << "\" and getPos() gave us "
+            << x << " " << y << " " << z);
+        vosa3dl->mainThreadTasks.push (new PositionTask(this,csVector3((float)x, (float)y, (float)z)));
       }
       else if (pcr->getContextualName() == "a3dl:orientation")
       {
-        double x, y, z, angle;
+        double x = 0.0, y = 0.0, z = 0.0, angle = 0.0;
         getOrientation (x,y,z,angle);
         csQuaternion q;
-        q.SetWithAxisAngle (csVector3(x,y,z), angle * M_PI/180.0);
+        q.SetWithAxisAngle (csVector3((float)x, (float)y, (float)z), angle * M_PI/180.0);
         vosa3dl->mainThreadTasks.push (new OrientateTask(this,csMatrix3(q)));
       }
     }
@@ -356,7 +363,7 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
 void csMetaObject3D::changePosition (const csVector3 &pos)
 {
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
-  LOG("vosobject3d", 2, "setting position of " << getURLstr() <<
+  LOG("vosobject3d", 2, "changePosition: " << getURLstr() <<
       " to " << pos.x << " " << pos.y << " " << pos.z);
   if(mw.IsValid())
   {

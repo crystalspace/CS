@@ -133,13 +133,13 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   csRef<iDynamics> dynamics = CS_QUERY_REGISTRY (objreg, iDynamics);
   if (dynamics)
   {
-  	LOG("csVosA3DL", 2, "Initializing dynamics system");
-	dynsys = dynamics->CreateSystem();
+    LOG("csVosA3DL", 2, "Initializing dynamics system");
+    dynsys = dynamics->CreateSystem();
   }
   else
   {
-  	LOG("csVosA3DL", 2, "Not using dynamics system");
-	dynsys = NULL;
+    LOG("csVosA3DL", 2, "Not using dynamics system");
+    dynsys = NULL;
   }
 
   return true;
@@ -151,9 +151,11 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
   {
     while(! mainThreadTasks.empty())
     {
+      LOG("csVosA3DL", 3, "starting main thread task");
       Task* t = mainThreadTasks.pop();
       t->doTask();
       delete t;
+      LOG("csVosA3DL", 3, "completed main thread task");
     }
   }
   return false;

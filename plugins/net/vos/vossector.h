@@ -30,7 +30,7 @@
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
-class csVosSector : public iVosSector, public iVosApi, 
+class csVosSector : public iVosSector, public iVosApi,
                     public VOS::ChildChangeListener
 {
 private:
@@ -42,6 +42,7 @@ private:
   VOS::vRef<A3DL::Sector> sectorvobj;
 
   bool isLit;
+  int waitingForChildren;
 
   virtual void notifyChildInserted (VOS::VobjectEvent &event);
   virtual void notifyChildRemoved (VOS::VobjectEvent &event);

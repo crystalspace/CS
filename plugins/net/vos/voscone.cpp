@@ -48,8 +48,8 @@ public:
   virtual void doTask();
 };
 
-ConstructConeTask::ConstructConeTask(iObjectRegistry *objreg, 
-                                     vRef<csMetaMaterial> mat, csMetaCone* c, 
+ConstructConeTask::ConstructConeTask(iObjectRegistry *objreg,
+                                     vRef<csMetaMaterial> mat, csMetaCone* c,
                                      std::string n, iSector *s)
   : object_reg(objreg), metamat(mat), cone(c, true), name(n), sector(s)
 {
@@ -65,7 +65,7 @@ void ConstructConeTask::doTask()
 
   // should store a single cone factory for everything?  or do we always get
   // the same one back?
-  //if (!cone_factory) 
+  //if (!cone_factory)
   //{
   csRef<iMeshFactoryWrapper> cone_factory = engine->CreateMeshFactory (
                           "crystalspace.mesh.object.genmesh", "cone_factory");
@@ -78,17 +78,20 @@ void ConstructConeTask::doTask()
     coneLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
 
     int hubVertices = 24;
-    
+
     coneLook->SetVertexCount (2 + hubVertices + 1);
     coneLook->SetTriangleCount (hubVertices * 2);
 
     csVector3 *vertices = coneLook->GetVertices();
     csTriangle *triangles = coneLook->GetTriangles();
+    csVector2 *texels = coneLook->GetTexels();
 
     vertices[0].Set (0,  0.5, 0);
     vertices[1].Set (0, -0.5, 0);
 
-    
+    texels[0].Set(.5, 0);
+    texels[0].Set(.5, 1);
+
     bool seam = true;
 
     if (seam)
@@ -97,6 +100,7 @@ void ConstructConeTask::doTask()
       {
         double angle = (double) i / (double) hubVertices * M_PI * 2;
         vertices[i+2].Set (cos(angle) * 0.5, -0.5, sin(angle) * 0.5);
+        texels[i+2].Set(0, (float)i / (float)hubVertices);
 
         if (i > 0)
         {
@@ -118,6 +122,7 @@ void ConstructConeTask::doTask()
       {
         double angle = (double) i / (double) hubVertices * M_PI * 2;
         vertices[2 + i].Set (cos(angle) * 0.5, -0.5, sin(angle) * 0.5);
+        texels[i+2].Set(0, (float)i / (float)hubVertices);
 
         if (i > 0)
         {
@@ -141,7 +146,7 @@ void ConstructConeTask::doTask()
       triangles[(hubVertices - 1) * 2].c = 2 + hubVertices-1;;
     }
 
-    
+
     coneLook->Invalidate ();
     coneLook->CalculateNormals ();
 
@@ -161,7 +166,7 @@ csMetaCone::csMetaCone(VobjectBase* superobject)
 }
 
 MetaObject* csMetaCone::new_csMetaCone(VobjectBase* superobject,
-	const std::string& type)
+  const std::string& type)
 {
   return new csMetaCone(superobject);
 }
@@ -174,7 +179,7 @@ void csMetaCone::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   mat->Setup(vosa3dl);
   LOG("csMetaCone", 2, "setting up cone");
   vosa3dl->mainThreadTasks.push(new ConstructConeTask(
-                                      vosa3dl->GetObjectRegistry(), mat, this, 
+                                      vosa3dl->GetObjectRegistry(), mat, this,
                                       getURLstr(), sect->GetSector()));
 
   LOG("csMetaCone", 2, "calling csMetaObject3D::setup");
