@@ -18,6 +18,14 @@ Short-term cleanups that need to be done:
 	  new md2.cpp file.  This problem affected older C++ compilers in
 	  which the life time of a variable declared in a for(;;) statement is
 	  not limited to the for(;;) statement, but instead extends beyond it.
+	- Gary Haussmann added code for a 'cross builder' which can take the
+	  data read in from various file formats (MD2, 3DS, DXF, ...) and
+	  build standard Crystal Space objects from those files.
+	- Eric Sunshine fixed a few things again.
+	- Michael Dale Long fixed project files for new files from Gary
+	  Haussmann.
+24-Jul-1999
+	- Changes from Thomas Hieber to fix Win32 again.
 23-Jul-1999
 	- Small optimization in WhichSide3D (made inline). This could
 	  be important for the lighting routines which use this function
@@ -25,9 +33,14 @@ Short-term cleanups that need to be done:
 	- Removed volume.cpp from csgeom library.
 	- Fixed MetaDemo for Unix.
 	- Changed typedef for COMBOOL to 'int'.
-	- Started work on vertex based fogging for the engine, OpenGL,
-	  and software renderer.
+	- Started work on vertex based fogging for the engine and OpenGL.
 	- Xavier Trochu fixed a bug in csSprite3D::RemoveFromSector().
+	- Andrew Zabolotny removed DrawHorizLine from the 2D drivers and
+	  replaced it with DrawBox (which is better).
+	- Andrew also added a small speed improvement to DrawPolygonFX and
+	  also made it 2*SRC*DST complient (software version).
+	- Andrew made some fixes to the makefiles again (echo problem).
+	- Some changes to Mac port from Robert Bate.
 22-Jul-1999
 	- Updated some docs (like the todo and faq).
 	- Added a callback to csSprite3D which is called just before the
@@ -77,6 +90,10 @@ Short-term cleanups that need to be done:
           from the OpenStep compiler which turned up when the ghost was added
           to keys.cpp.  The offending code actually looked fine, which leads
           me to believe that this is another compiler bug.
+	- More fixes to the OS/2 OpenGL driver from Andrew Zabolotny.
+	- Andrew fixed a bug that made console crash in double-buffered
+	  environments.
+	- Robert Bate updated the Macintosh project files.
 21-Jul-1999
 	- Eric Sunshine uploaded new archives of zlib, libpng, and libjpeg
 	  to the Crystal Space ftp site which conform to the new beta 13
