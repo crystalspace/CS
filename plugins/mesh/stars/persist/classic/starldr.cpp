@@ -28,6 +28,7 @@
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
 #include "iutil/plugin.h"
+#include "iutil/document.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
 #include "iutil/object.h"
@@ -49,6 +50,16 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MAXDISTANCE)
   CS_TOKEN_DEF (FACTORY)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_BOX = 1,
+  XMLTOKEN_COLOR,
+  XMLTOKEN_MAXCOLOR,
+  XMLTOKEN_DENSITY,
+  XMLTOKEN_MAXDISTANCE,
+  XMLTOKEN_FACTORY
+};
 
 SCF_IMPLEMENT_IBASE (csStarFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -167,6 +178,28 @@ iBase* csStarFactoryLoader::Parse (const char* /*string*/,
   return fact;
 }
 
+iBase* csStarFactoryLoader::Parse (iDocumentNode* /*node*/,
+	iLoaderContext*, iBase* /* context */)
+{
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.stars", iMeshObjectType);
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.stars",
+    	iMeshObjectType);
+  }
+  if (!type)
+  {
+    ReportError (reporter,
+		"crystalspace.starfactoryloader.setup.objecttype",
+		"Could not load the stars mesh object plugin!");
+    return NULL;
+  }
+  iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
+  return fact;
+}
+
 //---------------------------------------------------------------------------
 
 csStarFactorySaver::csStarFactorySaver (iBase* pParent)
@@ -222,25 +255,14 @@ bool csStarLoader::Initialize (iObjectRegistry* object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  if (!synldr)
-  {
-    synldr = CS_LOAD_PLUGIN (plugin_mgr,
-    	"crystalspace.syntax.loader.service.text", iSyntaxService);
-    if (!synldr)
-    {
-      ReportError (reporter,
-	"crystalspace.starloader.parse.initialize",
-	"Could not load the syntax services!");
-      return false;
-    }
-    if (!object_reg->Register (synldr, "iSyntaxService"))
-    {
-      ReportError (reporter,
-	"crystalspace.starloader.parse.initialize",
-	"Could not register the syntax services!");
-      return false;
-    }
-  }
+
+  xmltokens.Register ("box", XMLTOKEN_BOX);
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
+  xmltokens.Register ("maxcolor", XMLTOKEN_MAXCOLOR);
+  xmltokens.Register ("density", XMLTOKEN_DENSITY);
+  xmltokens.Register ("maxdistance", XMLTOKEN_MAXDISTANCE);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+
   return true;
 }
 
@@ -336,6 +358,77 @@ iBase* csStarLoader::Parse (const char* string,
   }
 
   if (starstate) starstate->DecRef ();
+  return mesh;
+}
+
+iBase* csStarLoader::Parse (iDocumentNode* node,
+	iLoaderContext* ldr_context, iBase*)
+{
+  csRef<iMeshObject> mesh;
+  csRef<iStarsState> starstate;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_BOX:
+	{
+	  csBox3 box;
+	  if (!synldr->ParseBox (child, box))
+	    return NULL;
+	  starstate->SetBox (box);
+	}
+	break;
+      case XMLTOKEN_COLOR:
+	{
+	  csColor col;
+	  if (!synldr->ParseColor (child, col))
+	    return NULL;
+	  starstate->SetColor (col);
+	}
+	break;
+      case XMLTOKEN_MAXCOLOR:
+	{
+	  csColor col;
+	  if (!synldr->ParseColor (child, col))
+	    return NULL;
+	  starstate->SetMaxColor (col);
+	}
+	break;
+      case XMLTOKEN_DENSITY:
+	starstate->SetDensity (child->GetContentsValueAsFloat ());
+	break;
+      case XMLTOKEN_MAXDISTANCE:
+	starstate->SetMaxDistance (child->GetContentsValueAsFloat ());
+	break;
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if (!fact)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.starloader.parse.unknownfactory",
+		child, "Couldn't find factory '%s'!", factname);
+	    return NULL;
+	  }
+	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
+          starstate.Take (SCF_QUERY_INTERFACE (mesh, iStarsState));
+	}
+	break;
+      default:
+        synldr->ReportBadToken (child);
+	return NULL;
+    }
+  }
+
+  // Incref to prevent smart pointer from deleting it.
+  if (mesh) mesh->IncRef ();
   return mesh;
 }
 

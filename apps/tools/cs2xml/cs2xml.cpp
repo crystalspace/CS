@@ -58,6 +58,8 @@ void Cs2Xml::ReportError (const char* description, ...)
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ACCEL)
   CS_TOKEN_DEF (AGING)
+  CS_TOKEN_DEF (ATTACH)
+  CS_TOKEN_DEF (BASECOLOR)
   CS_TOKEN_DEF (BOX)
   CS_TOKEN_DEF (CENTER)
   CS_TOKEN_DEF (CURVECENTER)
@@ -75,6 +77,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (EMITCYLINDER)
   CS_TOKEN_DEF (EMITCYLINDERTANGENT)
   CS_TOKEN_DEF (F)
+  CS_TOKEN_DEF (FADE)
   CS_TOKEN_DEF (FALLSPEED)
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FIRST)
@@ -87,10 +90,12 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (KEY)
   CS_TOKEN_DEF (LIGHT)
   CS_TOKEN_DEF (MATRIX)
+  CS_TOKEN_DEF (MAXCOLOR)
   CS_TOKEN_DEF (NUM)
   CS_TOKEN_DEF (ORIG)
   CS_TOKEN_DEF (ORIGIN)
   CS_TOKEN_DEF (ORIGINBOX)
+  CS_TOKEN_DEF (PATH)
   CS_TOKEN_DEF (POLYGON)
   CS_TOKEN_DEF (PORTAL)
   CS_TOKEN_DEF (POS)
@@ -104,16 +109,20 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ROT_X)
   CS_TOKEN_DEF (ROT_Y)
   CS_TOKEN_DEF (ROT_Z)
+  CS_TOKEN_DEF (ROTPART)
   CS_TOKEN_DEF (SCALE)
   CS_TOKEN_DEF (SCALE_X)
   CS_TOKEN_DEF (SCALE_Y)
   CS_TOKEN_DEF (SCALE_Z)
   CS_TOKEN_DEF (SECOND)
+  CS_TOKEN_DEF (SETUPMESH)
   CS_TOKEN_DEF (SHIFT)
   CS_TOKEN_DEF (SOURCE)
+  CS_TOKEN_DEF (SPEED)
   CS_TOKEN_DEF (START)
   CS_TOKEN_DEF (T)
   CS_TOKEN_DEF (TEXTURE)
+  CS_TOKEN_DEF (TIMES)
   CS_TOKEN_DEF (TRANSPARENT)
   CS_TOKEN_DEF (TRIANGLE)
   CS_TOKEN_DEF (TRIANGLES)
@@ -454,6 +463,8 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
   CS_TOKEN_TABLE_START (tokens)
     CS_TOKEN_TABLE (ACCEL)
     CS_TOKEN_TABLE (AGING)
+    CS_TOKEN_TABLE (ATTACH)
+    CS_TOKEN_TABLE (BASECOLOR)
     CS_TOKEN_TABLE (BOX)
     CS_TOKEN_TABLE (CENTER)
     CS_TOKEN_TABLE (CURVECENTER)
@@ -471,6 +482,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (EMITCYLINDER)
     CS_TOKEN_TABLE (EMITCYLINDERTANGENT)
     CS_TOKEN_TABLE (F)
+    CS_TOKEN_TABLE (FADE)
     CS_TOKEN_TABLE (FALLSPEED)
     CS_TOKEN_TABLE (FILE)
     CS_TOKEN_TABLE (FIRST)
@@ -482,10 +494,12 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (MAXCOLOR)
     CS_TOKEN_TABLE (NUM)
     CS_TOKEN_TABLE (ORIG)
     CS_TOKEN_TABLE (ORIGIN)
     CS_TOKEN_TABLE (ORIGINBOX)
+    CS_TOKEN_TABLE (PATH)
     CS_TOKEN_TABLE (POLYGON)
     CS_TOKEN_TABLE (PORTAL)
     CS_TOKEN_TABLE (POS)
@@ -496,13 +510,17 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (RECTPARTICLES)
     CS_TOKEN_TABLE (REGULARPARTICLES)
     CS_TOKEN_TABLE (ROT)
+    CS_TOKEN_TABLE (ROTPART)
     CS_TOKEN_TABLE (SCALE)
     CS_TOKEN_TABLE (SECOND)
+    CS_TOKEN_TABLE (SETUPMESH)
     CS_TOKEN_TABLE (SHIFT)
     CS_TOKEN_TABLE (SOURCE)
+    CS_TOKEN_TABLE (SPEED)
     CS_TOKEN_TABLE (START)
     CS_TOKEN_TABLE (T)
     CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (TIMES)
     CS_TOKEN_TABLE (TRANSPARENT)
     CS_TOKEN_TABLE (TRIANGLE)
     CS_TOKEN_TABLE (TRIANGLES)
@@ -547,6 +565,8 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
             ParseGeneral ("portal", parser, portal_node, params);
 	  }
 	  break;
+        case CS_TOKEN_BASECOLOR:
+        case CS_TOKEN_MAXCOLOR:
         case CS_TOKEN_COLOR:
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -583,6 +603,124 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    if (name && *name) child->SetAttribute ("name", name);
 	  }
 	  break;
+	case CS_TOKEN_SPEED:	// For sequences
+	case CS_TOKEN_TIMES:	// For sequences
+	  {
+	    if (!strcmp (parent_token, "path"))
+	    {
+	      int n;
+	      float* list = new float[10000];
+	      csScanStr (params, "%F", list, &n);
+	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	      child->SetValue (tokname);
+	      if (name && *name) child->SetAttribute ("name", name);
+	      const char* tt;
+	      if (!strcmp (tokname, "speed"))
+	        tt = "s";
+	      else
+	        tt = "t";
+	      int i;
+	      for (i = 0 ; i < n ; i++)
+	        CreateValueNodeAsFloat (child, tt, list[i]);
+	      delete[] list;
+	    }
+	    else
+	    {
+	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	      child->SetValue (tokname);
+	      if (name && *name) child->SetAttribute ("name", name);
+              ParseGeneral (tokname, parser, child, params);
+	    }
+	  }
+	  break;
+	case CS_TOKEN_ROTPART:	// For sequences
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    char meshName[100];
+	    int t;
+	    float angle_speed;
+	    csScanStr (params, "%d,%s,%f", &t, meshName, &angle_speed);
+	    CreateValueNode (child, "mesh", meshName);
+	    CreateValueNodeAsInt (child, "time", t);
+	    CreateValueNodeAsFloat (child, "anglespeed", angle_speed);
+	  }
+	  break;
+	case CS_TOKEN_ATTACH:	// For sequences
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    char meshName[100];
+	    char pathName[100];
+	    csScanStr (params, "%s,%s", meshName, pathName);
+	    CreateValueNode (child, "mesh", meshName);
+	    CreateValueNode (child, "path", pathName);
+	  }
+	  break;
+	case CS_TOKEN_PATH:	// For sequences
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    if (!strcmp (parent_token, "sequences"))
+	    {
+              ParseGeneral (tokname, parser, child, params);
+	    }
+	    else
+	    {
+	      char meshName[100];
+	      char pathName[100];
+	      int t;
+	      csScanStr (params, "%d,%s,%s", &t, meshName, pathName);
+	      CreateValueNode (child, "mesh", meshName);
+	      CreateValueNode (child, "path", pathName);
+	      CreateValueNodeAsInt (child, "time", t);
+	    }
+	  }
+	  break;
+	case CS_TOKEN_SETUPMESH:	// For sequences
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+
+	    char meshName[100];
+	    char sectName[100];
+	    csVector3 p;
+	    csScanStr (params, "%s,%s,%f,%f,%f", meshName, sectName,
+		&p.x, &p.y, &p.z);
+	    CreateValueNode (child, "mesh", meshName);
+	    CreateValueNode (child, "sector", sectName);
+	    csRef<iDocumentNode> childchild =
+	    	child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	    childchild->SetValue ("position");
+	    childchild->SetAttributeAsFloat ("x", p.x);
+	    childchild->SetAttributeAsFloat ("y", p.y);
+	    childchild->SetAttributeAsFloat ("z", p.z);
+	  }
+	  break;
+        case CS_TOKEN_FADE:	// For sequences
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    float start, end;
+	    int t;
+	    csScanStr (params, "%d,%f,%f", &t, &start, &end);
+	    CreateValueNodeAsInt (child, "time", t);
+	    CreateValueNodeAsFloat (child, "start", start);
+	    CreateValueNodeAsFloat (child, "end", end);
+	  }
+	  break;
         case CS_TOKEN_W:
         case CS_TOKEN_DIRECTION:
         case CS_TOKEN_DIRECTIONAL:
@@ -601,19 +739,29 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
         case CS_TOKEN_CURVECENTER:
 	  {
 	    csRef<iDocumentNode> child;
-	    float x, y, z;
-	    int num = csScanStr (params, "%f,%f,%f", &x, &y, &z);
-	    if (num == 3)
+	    if (!strcmp (parent_token, "path") && !strcmp (tokname, "pos"))
 	    {
+	      // For sequences
 	      child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
 	      child->SetValue (tokname);
-	      child->SetAttributeAsFloat ("x", x);
-	      child->SetAttributeAsFloat ("y", y);
-	      child->SetAttributeAsFloat ("z", z);
+              ParseGeneral (tokname, parser, child, params);
 	    }
 	    else
 	    {
-	      child = CreateValueNodeAsFloat (parent, tokname, x);
+	      float x, y, z;
+	      int num = csScanStr (params, "%f,%f,%f", &x, &y, &z);
+	      if (num == 3)
+	      {
+	        child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	        child->SetValue (tokname);
+	        child->SetAttributeAsFloat ("x", x);
+	        child->SetAttributeAsFloat ("y", y);
+	        child->SetAttributeAsFloat ("z", z);
+	      }
+	      else
+	      {
+	        child = CreateValueNodeAsFloat (parent, tokname, x);
+	      }
 	    }
 	    if (name && *name) child->SetAttribute ("name", name);
 	  }
@@ -1453,10 +1601,6 @@ bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
     if (params)
     {
       char* tokname = ToLower (parser->GetUnknownToken (), true);
-      bool is_cs = !strcmp (tokname, "world") ||
-      		   !strcmp (tokname, "library") ||
-      		   !strcmp (tokname, "meshobj") ||
-      		   !strcmp (tokname, "meshfact");
       csRef<iDocumentSystem> xml;
       xml.Take (new csTinyDocumentSystem ());
       csRef<iDocument> doc = xml->CreateDocument ();
@@ -1464,10 +1608,7 @@ bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
       csRef<iDocumentNode> parent = root->CreateNodeBefore (
     	    CS_NODE_ELEMENT, NULL);
       parent->SetValue (tokname);
-      // If not one of world, library, meshobj, or meshfact we
-      // assume this is a PARAMSFILE in which case we use 'params'
-      // as the logical parent.
-      ParseGeneral (is_cs ? "" : "params", parser, parent, params);
+      ParseGeneral (tokname, parser, parent, params);
 
       doc->Write (vfs, vfspath);
       delete[] tokname;
@@ -1519,18 +1660,24 @@ bool Cs2Xml::TestCSFile (const char* vfspath)
     if (params)
     {
       char* tokname = ToLower (parser->GetUnknownToken (), true);
-      if (*tokname != '<')
+      bool is_cs = !strcmp (tokname, "world") ||
+      		   !strcmp (tokname, "library") ||
+      		   !strcmp (tokname, "meshobj") ||
+      		   !strcmp (tokname, "sequences") ||
+      		   !strcmp (tokname, "path") ||
+      		   !strcmp (tokname, "params") ||
+      		   !strcmp (tokname, "meshfact");
+      delete[] tokname;
+      if (is_cs)
       {
         char* params2;
         cmd = parser->GetObject (&params, tokens, &name, &params2);
         if (cmd != CS_PARSERR_EOF && params2 != NULL)
         {
 	  delete parser;
-          delete[] tokname;
 	  return true;
         }
       }
-      delete[] tokname;
     }
   }
 

@@ -24,7 +24,8 @@
 #include "csgeom/math3d.h"
 #include "csgeom/path.h"
 #include "csutil/csvector.h"
-#include "csutil/parser.h"
+#include "csutil/strhash.h"
+#include "iutil/document.h"
 
 struct iSequence;
 struct iSequenceManager;
@@ -48,13 +49,14 @@ private:
   iSequenceManager* seqmgr;
   Demo* demo;
   DemoSequenceManager* demoseq;
+  csStringHash xmltokens;
 
-  csParser parser;
+  csNamedPath* LoadPath (iDocumentNode* node, const char* name);
+  void LoadSequence (iDocumentNode* node, iSequence* seq);
+  void LoadSequences (iDocumentNode* node);
+  void LoadSequencesMain (iDocumentNode* node);
 
-  csNamedPath* LoadPath (char* buf, const char* name);
-  void LoadSequence (char* buf, iSequence* seq);
-  void LoadSequences (char* buf);
-  void LoadSequencesMain (char* buf);
+  bool ParseVectorList (iDocumentNode* node, csVector3* list, int num);
 
 public:
   DemoSequenceLoader (Demo* demo, DemoSequenceManager* demoseq,

@@ -29,35 +29,37 @@
 #include "ivaria/reporter.h"
 #include "iutil/databuff.h"
 #include "iutil/vfs.h"
+#include "csutil/xmltiny.h"
 #include "qsqrt.h"
 
 // Define all tokens used through this file
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (ATTACH)
-  CS_TOKEN_DEF (DECLARESEQUENCE)
-  CS_TOKEN_DEF (RUNSEQUENCE)
-  CS_TOKEN_DEF (SEQUENCE)
-  CS_TOKEN_DEF (SEQUENCES)
-  CS_TOKEN_DEF (RECURSE)
-  CS_TOKEN_DEF (SETUPMESH)
-  CS_TOKEN_DEF (SHOWMESH)
-  CS_TOKEN_DEF (HIDEMESH)
-  CS_TOKEN_DEF (PATH)
-  CS_TOKEN_DEF (SECTOR)
-  CS_TOKEN_DEF (FILE)
-  CS_TOKEN_DEF (TEST)
-  CS_TOKEN_DEF (DELAY)
-  CS_TOKEN_DEF (FADE)
-  CS_TOKEN_DEF (NUM)
-  CS_TOKEN_DEF (POS)
-  CS_TOKEN_DEF (FORWARD)
-  CS_TOKEN_DEF (UP)
-  CS_TOKEN_DEF (TIMES)
-  CS_TOKEN_DEF (UNIFORMSPEED)
-  CS_TOKEN_DEF (ROTPART)
-  CS_TOKEN_DEF (SPEED)
-  CS_TOKEN_DEF (V)
-CS_TOKEN_DEF_END
+enum
+{
+  XMLTOKEN_ATTACH = 1,
+  XMLTOKEN_DECLARESEQUENCE,
+  XMLTOKEN_RUNSEQUENCE,
+  XMLTOKEN_SEQUENCE,
+  XMLTOKEN_SEQUENCES,
+  XMLTOKEN_RECURSE,
+  XMLTOKEN_SETUPMESH,
+  XMLTOKEN_SHOWMESH,
+  XMLTOKEN_HIDEMESH,
+  XMLTOKEN_PATH,
+  XMLTOKEN_SECTOR,
+  XMLTOKEN_FILE,
+  XMLTOKEN_TEST,
+  XMLTOKEN_DELAY,
+  XMLTOKEN_FADE,
+  XMLTOKEN_NUM,
+  XMLTOKEN_POS,
+  XMLTOKEN_FORWARD,
+  XMLTOKEN_UP,
+  XMLTOKEN_TIMES,
+  XMLTOKEN_UNIFORMSPEED,
+  XMLTOKEN_ROTPART,
+  XMLTOKEN_SPEED,
+  XMLTOKEN_V
+};
 
 #define SPEED_FACTOR 1
 
@@ -70,17 +72,53 @@ DemoSequenceLoader::DemoSequenceLoader (Demo* demo,
   DemoSequenceLoader::demo = demo;
   DemoSequenceLoader::demoseq = demoseq;
   DemoSequenceLoader::seqmgr = seqmgr;
-  iDataBuffer* buf = demo->myVFS->ReadFile (fileName);
+
+  xmltokens.Register ("attach", XMLTOKEN_ATTACH);
+  xmltokens.Register ("declaresequence", XMLTOKEN_DECLARESEQUENCE);
+  xmltokens.Register ("runsequence", XMLTOKEN_RUNSEQUENCE);
+  xmltokens.Register ("sequence", XMLTOKEN_SEQUENCE);
+  xmltokens.Register ("sequences", XMLTOKEN_SEQUENCES);
+  xmltokens.Register ("recurse", XMLTOKEN_RECURSE);
+  xmltokens.Register ("setupmesh", XMLTOKEN_SETUPMESH);
+  xmltokens.Register ("showmesh", XMLTOKEN_SHOWMESH);
+  xmltokens.Register ("hidemesh", XMLTOKEN_HIDEMESH);
+  xmltokens.Register ("path", XMLTOKEN_PATH);
+  xmltokens.Register ("sector", XMLTOKEN_SECTOR);
+  xmltokens.Register ("file", XMLTOKEN_FILE);
+  xmltokens.Register ("test", XMLTOKEN_TEST);
+  xmltokens.Register ("delay", XMLTOKEN_DELAY);
+  xmltokens.Register ("fade", XMLTOKEN_FADE);
+  xmltokens.Register ("num", XMLTOKEN_NUM);
+  xmltokens.Register ("pos", XMLTOKEN_POS);
+  xmltokens.Register ("forward", XMLTOKEN_FORWARD);
+  xmltokens.Register ("up", XMLTOKEN_UP);
+  xmltokens.Register ("times", XMLTOKEN_TIMES);
+  xmltokens.Register ("uniformspeed", XMLTOKEN_UNIFORMSPEED);
+  xmltokens.Register ("rotpart", XMLTOKEN_ROTPART);
+  xmltokens.Register ("speed", XMLTOKEN_SPEED);
+  xmltokens.Register ("v", XMLTOKEN_V);
+
+  csRef<iDataBuffer> buf;
+  buf.Take (demo->myVFS->ReadFile (fileName));
   if (!buf || !buf->GetSize ())
   {
-    if (buf) buf->DecRef ();
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
     	"Could not open sequence file '%s' on VFS!", fileName);
     exit (0);
   }
 
-  LoadSequencesMain (**buf);
-  buf->DecRef ();
+  csRef<iDocumentSystem> xml;
+  xml.Take (CS_QUERY_REGISTRY (demo->object_reg, iDocumentSystem));
+  if (!xml) xml.Take (new csTinyDocumentSystem ());
+  csRef<iDocument> doc = xml->CreateDocument ();
+  const char* error = doc->Parse (buf);
+  if (error != NULL)
+  {
+    demo->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"XML error '%s' for file '%s'!", error, fileName);
+    exit (0);
+  }
+  LoadSequencesMain (doc->GetRoot ());
 }
 
 DemoSequenceLoader::~DemoSequenceLoader ()
@@ -105,219 +143,291 @@ iSequence* DemoSequenceLoader::GetSequence (const char* name)
   return NULL;
 }
 
-void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
+void DemoSequenceLoader::LoadSequence (iDocumentNode* node, iSequence* seq)
 {
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (SETUPMESH)
-    CS_TOKEN_TABLE (SHOWMESH)
-    CS_TOKEN_TABLE (HIDEMESH)
-    CS_TOKEN_TABLE (ATTACH)
-    CS_TOKEN_TABLE (PATH)
-    CS_TOKEN_TABLE (TEST)
-    CS_TOKEN_TABLE (DELAY)
-    CS_TOKEN_TABLE (FADE)
-    CS_TOKEN_TABLE (ROTPART)
-    CS_TOKEN_TABLE (SEQUENCE)
-    CS_TOKEN_TABLE (RUNSEQUENCE)
-    CS_TOKEN_TABLE (RECURSE)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
   csTicks cur_time = 0;
 
-  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
   {
-    if (!params)
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
     {
-      demo->Report (CS_REPORTER_SEVERITY_ERROR,
-      	"Expected parameters instead of '%s'!", buf);
-      exit (-1);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_ROTPART:
+      case XMLTOKEN_ROTPART:
       {
-        char meshName[100];
+        const char* meshName;
 	csTicks t;
 	float angle_speed;
-	csScanStr (params, "%d,%s,%f", &t, meshName, &angle_speed);
+	csRef<iDocumentNode> meshnode = child->GetNode ("mesh");
+	if (!meshnode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <mesh> in <rotpart>!");
+	  exit (0);
+	}
+	meshName = meshnode->GetContentsValue ();
+	csRef<iDocumentNode> anglenode = child->GetNode ("anglespeed");
+	if (!anglenode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <anglespeed> in <rotpart>!");
+	  exit (0);
+	}
+	angle_speed = anglenode->GetContentsValueAsFloat ();
+	csRef<iDocumentNode> timenode = child->GetNode ("time");
+	if (!timenode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <time> in <rotpart>!");
+	  exit (0);
+	}
+	t = timenode->GetContentsValueAsInt ();
 	t = csTicks (float (t) * SPEED_FACTOR);
         RotatePartOp* op = new RotatePartOp (meshName, t, angle_speed);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
 	break;
       }
-      case CS_TOKEN_SETUPMESH:
+      case XMLTOKEN_SETUPMESH:
       {
-        char meshName[100];
-	char sectName[100];
+        const char* meshName;
+	const char* sectName;
+	csRef<iDocumentNode> meshnode = child->GetNode ("mesh");
+	if (!meshnode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <mesh> in <setupmesh>!");
+	  exit (0);
+	}
+	meshName = meshnode->GetContentsValue ();
+	csRef<iDocumentNode> sectnode = child->GetNode ("sector");
+	if (!sectnode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <sector> in <setupmesh>!");
+	  exit (0);
+	}
+	sectName = sectnode->GetContentsValue ();
+
 	csVector3 p;
-	csScanStr (params, "%s,%s,%f,%f,%f", meshName, sectName,
-		&p.x, &p.y, &p.z);
+	csRef<iDocumentNode> posnode = child->GetNode ("position");
+	if (!posnode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <position> in <setupmesh>!");
+	  exit (0);
+	}
+	p.x = posnode->GetAttributeValueAsFloat ("x");
+	p.y = posnode->GetAttributeValueAsFloat ("y");
+	p.z = posnode->GetAttributeValueAsFloat ("z");
         SetupMeshOp* op = new SetupMeshOp (meshName, sectName, p);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
 	break;
       }
-      case CS_TOKEN_SHOWMESH:
+      case XMLTOKEN_SHOWMESH:
       {
-        char meshName[100];
-	csScanStr (params, "%s", meshName);
-        ShowMeshOp* op = new ShowMeshOp (meshName);
+        ShowMeshOp* op = new ShowMeshOp (child->GetContentsValue ());
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
 	break;
       }
-      case CS_TOKEN_HIDEMESH:
+      case XMLTOKEN_HIDEMESH:
       {
-        char meshName[100];
-	csScanStr (params, "%s", meshName);
-        HideMeshOp* op = new HideMeshOp (meshName);
+        HideMeshOp* op = new HideMeshOp (child->GetContentsValue ());
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
 	break;
       }
-      case CS_TOKEN_ATTACH:
+      case XMLTOKEN_ATTACH:
       {
-        char meshName[100];
-	char pathName[100];
-	csScanStr (params, "%s,%s", meshName, pathName);
-	char* name = meshName;
+        const char* meshName;
+	const char* pathName;
+	csRef<iDocumentNode> meshnode = child->GetNode ("mesh");
+	if (!meshnode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <mesh> in <attach>!");
+	  exit (0);
+	}
+	meshName = meshnode->GetContentsValue ();
+	csRef<iDocumentNode> pathnode = child->GetNode ("path");
+	if (!pathnode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <path> in <attach>!");
+	  exit (0);
+	}
+	pathName = pathnode->GetContentsValue ();
+	const char* name = meshName;
 	if (!strcmp ("camera", meshName)) name = NULL;
         AttachOp* op = new AttachOp (name, pathName);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
 	break;
       }
-      case CS_TOKEN_PATH:
+      case XMLTOKEN_PATH:
       {
-        char meshName[100];
-	char pathName[100];
+        const char* meshName;
+	const char* pathName;
+	csRef<iDocumentNode> meshnode = child->GetNode ("mesh");
+	if (!meshnode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <mesh> in <path>!");
+	  exit (0);
+	}
+	meshName = meshnode->GetContentsValue ();
+	csRef<iDocumentNode> pathnode = child->GetNode ("path");
+	if (!pathnode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <path> in <path>!");
+	  exit (0);
+	}
+	pathName = pathnode->GetContentsValue ();
+
 	csTicks t;
-	csScanStr (params, "%d,%s,%s", &t, meshName, pathName);
+	csRef<iDocumentNode> timenode = child->GetNode ("time");
+	if (!timenode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <time> in <path>!");
+	  exit (0);
+	}
+	t = timenode->GetContentsValueAsInt ();
+
 	t = csTicks (float (t) * SPEED_FACTOR);
-	char* name = meshName;
+	const char* name = meshName;
 	if (!strcmp ("camera", meshName)) name = NULL;
         PathOp* op = new PathOp (t, name, pathName);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
 	break;
       }
-      case CS_TOKEN_TEST:
+      case XMLTOKEN_TEST:
       {
         TestOp* op = new TestOp ();
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
 	break;
       }
-      case CS_TOKEN_FADE:
+      case XMLTOKEN_FADE:
       {
 	float start, end;
 	csTicks t;
-	csScanStr (params, "%d,%f,%f,%d", &t, &start, &end);
+
+	csRef<iDocumentNode> timenode = child->GetNode ("time");
+	if (!timenode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <time> in <fade>!");
+	  exit (0);
+	}
+	t = timenode->GetContentsValueAsInt ();
+	csRef<iDocumentNode> startnode = child->GetNode ("start");
+	if (!startnode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <start> in <fade>!");
+	  exit (0);
+	}
+	start = startnode->GetContentsValueAsFloat ();
+	csRef<iDocumentNode> endnode = child->GetNode ("end");
+	if (!endnode)
+	{
+    	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Can't find <end> in <fade>!");
+	  exit (0);
+	}
+	end = endnode->GetContentsValueAsFloat ();
 	t = csTicks (float (t) * SPEED_FACTOR);
         FadeOp* op = new FadeOp (start, end, t);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
 	break;
       }
-      case CS_TOKEN_DELAY:
+      case XMLTOKEN_DELAY:
       {
 	csTicks delay;
-        csScanStr (params, "%d", &delay);
-	delay = csTicks (float (delay) * SPEED_FACTOR);
+	delay = csTicks (child->GetContentsValueAsFloat () * SPEED_FACTOR);
 	cur_time += delay;
 	break;
       }
-      case CS_TOKEN_RECURSE:
+      case XMLTOKEN_RECURSE:
       {
         seq->AddRunSequence (cur_time, seq);
         break;
       }
-      case CS_TOKEN_RUNSEQUENCE:
+      case XMLTOKEN_RUNSEQUENCE:
       {
-	char seqName[100];
-	csScanStr (params, "%s", seqName);
-        iSequence* newseq = GetSequence (seqName);
+        iSequence* newseq = GetSequence (child->GetContentsValue ());
 	if (!newseq)
 	{
     	  demo->Report (CS_REPORTER_SEVERITY_ERROR, "Can't find sequence '%s'!",
-	  	seqName);
+	  	child->GetContentsValue ());
 	  exit (0);
 	}
 	seq->AddRunSequence (cur_time, newseq);
         break;
       }
-      case CS_TOKEN_SEQUENCE:
+      case XMLTOKEN_SEQUENCE:
       {
         iSequence* newseq = seqmgr->NewSequence ();
-	LoadSequence (params, newseq);
+	LoadSequence (child, newseq);
 	seq->AddRunSequence (cur_time, newseq);
 	newseq->DecRef ();
 	break;
       }
+      default:
+    	demo->Report (CS_REPORTER_SEVERITY_ERROR,
+		"Unexpected token '%s'!", value);
+	exit (-1);
     }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    demo->Report (CS_REPORTER_SEVERITY_ERROR,
-      	"Token '%s' not found while parsing a sequence!",
-	parser.GetLastOffender ());
-    exit (-1);
   }
 }
 
-void DemoSequenceLoader::LoadSequences (char* buf)
+void DemoSequenceLoader::LoadSequences (iDocumentNode* node)
 {
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (PATH)
-    CS_TOKEN_TABLE (DECLARESEQUENCE)
-    CS_TOKEN_TABLE (SEQUENCE)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
   {
-    if (!params)
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
     {
-      demo->Report (CS_REPORTER_SEVERITY_ERROR,
-      	"Expected parameters instead of '%s'!", buf);
-      exit (-1);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_PATH:
+      case XMLTOKEN_PATH:
       {
-	csNamedPath* p = LoadPath (params, name);
+	csNamedPath* p = LoadPath (child, child->GetAttributeValue ("name"));
 	demoseq->RegisterPath (p);
         break;
       }
-      case CS_TOKEN_DECLARESEQUENCE:
+      case XMLTOKEN_DECLARESEQUENCE:
       {
-        iSequence* newseq = GetSequence (name);
+        iSequence* newseq = GetSequence (child->GetAttributeValue ("name"));
 	if (!newseq)
 	{
 	  newseq = seqmgr->NewSequence ();
 	  NamedSequence* ns = new NamedSequence ();
-	  ns->name = csStrNew (name);
+	  ns->name = csStrNew (child->GetAttributeValue ("name"));
 	  ns->sequence = newseq;
 	  sequences.Push (ns);
 	}
         break;
       }
-      case CS_TOKEN_SEQUENCE:
+      case XMLTOKEN_SEQUENCE:
       {
-        iSequence* newseq = GetSequence (name);
+        iSequence* newseq = GetSequence (child->GetAttributeValue ("name"));
 	if (!newseq)
 	{
           newseq = seqmgr->NewSequence ();
 	  NamedSequence* ns = new NamedSequence ();
-	  ns->name = csStrNew (name);
+	  ns->name = csStrNew (child->GetAttributeValue ("name"));
 	  ns->sequence = newseq;
 	  sequences.Push (ns);
 	}
@@ -325,122 +435,114 @@ void DemoSequenceLoader::LoadSequences (char* buf)
 	{
     	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
 	  	"Sequence '%s' is already defined!",
-	  	name);
+	  	child->GetAttributeValue ("name"));
 	  exit (0);
 	}
-	LoadSequence (params, newseq);
+	LoadSequence (child, newseq);
 	break;
       }
+      default:
+    	demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Unexpected token '%s'!", value);
+	exit (0);
     }
   }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+}
+
+void DemoSequenceLoader::LoadSequencesMain (iDocumentNode* node)
+{
+  csRef<iDocumentNode> child = node->GetNode ("sequences");
+  if (!child)
   {
     demo->Report (CS_REPORTER_SEVERITY_ERROR,
-      	"Token '%s' not found while parsing sequences!",
-	parser.GetLastOffender ());
+      	"Expected 'sequences'!");
     exit (-1);
   }
+  LoadSequences (child);
 }
 
-void DemoSequenceLoader::LoadSequencesMain (char* buf)
+bool DemoSequenceLoader::ParseVectorList (iDocumentNode* node,
+	csVector3* list, int num)
 {
-  CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (SEQUENCES)
-  CS_TOKEN_TABLE_END
-
-  parser.ResetParserLine ();
-  char *name, *data;
-  if (parser.GetObject (&buf, tokens, &name, &data))
-  {
-    if (!data)
-    {
-      demo->Report (CS_REPORTER_SEVERITY_ERROR,
-      	"Expected parameters instead of '%s'!", buf);
-      exit (-1);
-    }
-    LoadSequences (data);
-  }
-}
-
-static bool ParseVectorList (csParser* parser, char* buf, csVector3* list, int num)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (V)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
   int n = 0;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
   {
-    if (!params) return false;
-    switch (cmd)
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
     {
-      case CS_TOKEN_V:
+      case XMLTOKEN_V:
       {
         csVector3 v;
-	csScanStr (params, "%f,%f,%f", &v.x, &v.y, &v.z);
+	v.x = child->GetAttributeValueAsFloat ("x");
+	v.y = child->GetAttributeValueAsFloat ("y");
+	v.z = child->GetAttributeValueAsFloat ("z");
 	list[n++] = v;
 	break;
       }
+      default:
+        return false;
     }
   }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND) return false;
   if (n != num) return false;
   return true;
 }
 
-csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
+csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
+	const char* pName)
 {
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (FILE)
-    CS_TOKEN_TABLE (NUM)
-    CS_TOKEN_TABLE (POS)
-    CS_TOKEN_TABLE (FORWARD)
-    CS_TOKEN_TABLE (UP)
-    CS_TOKEN_TABLE (TIMES)
-    CS_TOKEN_TABLE (UNIFORMSPEED)
-    CS_TOKEN_TABLE (SPEED)
-    CS_TOKEN_TABLE (SECTOR)
-  CS_TOKEN_TABLE_END
-
   csNamedPath* np = NULL;
 
-  char* name;
-  long cmd;
-  char* params;
   int seq = 0;
   int num = 0;
 
-  while ((cmd = parser.GetObject (&buf, commands, &name, &params)) > 0)
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
   {
-    if (!params)
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
     {
-      demo->Report (CS_REPORTER_SEVERITY_ERROR,
-      	"Expected parameters instead of '%s'!", buf);
-      exit (-1);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_FILE:
+      case XMLTOKEN_FILE:
       {
-	char fname[255];
-	csScanStr (params, "%s", fname);
-  	iDataBuffer* buf = demo->myVFS->ReadFile (fname);
+	const char* fname = child->GetContentsValue ();
+  	csRef<iDataBuffer> buf;
+	buf.Take (demo->myVFS->ReadFile (fname));
 	if (!buf || !buf->GetSize ())
 	{
-	  if (buf) buf->DecRef ();
 	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
 	    "Could not open path file '%s' on VFS!", fname);
 	  exit (0);
 	}
-	np = LoadPath (**buf, pName);
-	buf->DecRef ();
+	csRef<iDocumentSystem> xml;
+	xml.Take (CS_QUERY_REGISTRY (demo->object_reg, iDocumentSystem));
+	if (!xml) xml.Take (new csTinyDocumentSystem ());
+	csRef<iDocument> doc = xml->CreateDocument ();
+	const char* error = doc->Parse (buf);
+	if (error != NULL)
+	{
+	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	    "Error '%s' reading XML file '%s'!", error, fname);
+	  exit (0);
+	}
+	csRef<iDocumentNode> pathnode = doc->GetRoot ()->GetNode ("path");
+	if (!pathnode)
+	{
+	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	    "File '%s' does not contain a <path> node!", fname);
+	  exit (0);
+	}
+
+	np = LoadPath (pathnode, pName);
 	return np;
       }
-      case CS_TOKEN_NUM:
+      case XMLTOKEN_NUM:
       {
         if (seq != 0)
 	{
@@ -449,11 +551,11 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  exit (0);
 	}
 	seq++;
-	csScanStr (params, "%d", &num);
+	num = child->GetContentsValueAsInt ();
 	np = new csNamedPath (num, pName);
 	break;
       }
-      case CS_TOKEN_SPEED:
+      case XMLTOKEN_SPEED:
       {
         if (seq < 2)
 	{
@@ -461,12 +563,22 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  	"First use NUM, POS in path '%s'!", pName);
 	  exit (0);
 	}
-	int i;
-
+	int n = 0;
 	// First get the list of relative speeds.
 	float* list = new float[10000];
-	int n;
-	csScanStr (params, "%F", list+1, &n);	// Don't read in list[0]
+	csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
+	while (child_it->HasNext ())
+	{
+	  csRef<iDocumentNode> childchild = child_it->Next ();
+	  if (childchild->GetType () != CS_NODE_ELEMENT) continue;
+	  const char* child_value = childchild->GetValue ();
+	  if (!strcmp (child_value, "s"))
+	  {
+	    ++n; // Don't read in list[0]
+	    list[n] = childchild->GetContentsValueAsFloat ();
+	  }
+	}
+
 	if (n != num-1)
 	{
 	  delete[] list;
@@ -486,6 +598,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	v0.Set (xv[0], yv[0], zv[0]);
 	list[0] = 0;
 	float tot = 0;
+	int i;
 	for (i = 1 ; i < num ; i++)
 	{
 	  v1.Set (xv[i], yv[i], zv[i]);
@@ -505,7 +618,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	delete[] list;
         break;
       }
-      case CS_TOKEN_UNIFORMSPEED:
+      case XMLTOKEN_UNIFORMSPEED:
       {
         if (seq < 2)
 	{
@@ -549,7 +662,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	delete[] list;
         break;
       }
-      case CS_TOKEN_TIMES:
+      case XMLTOKEN_TIMES:
       {
         if (seq < 1)
 	{
@@ -557,9 +670,22 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  	"First use NUM in path '%s'!", pName);
 	  exit (0);
 	}
-	int n;
+	int n = 0;
+	// First get the list of times.
 	float* list = new float[10000];
-	csScanStr (params, "%F", list, &n);
+	csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
+	while (child_it->HasNext ())
+	{
+	  csRef<iDocumentNode> childchild = child_it->Next ();
+	  if (childchild->GetType () != CS_NODE_ELEMENT) continue;
+	  const char* child_value = childchild->GetValue ();
+	  if (!strcmp (child_value, "t"))
+	  {
+	    list[n] = childchild->GetContentsValueAsFloat ();
+	    n++;
+	  }
+	}
+
 	if (n != num)
 	{
 	  delete[] list;
@@ -571,7 +697,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
         delete[] list;
 	break;
       }
-      case CS_TOKEN_POS:
+      case XMLTOKEN_POS:
       {
         if (seq < 1)
 	{
@@ -581,7 +707,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	}
 	seq++;
 	csVector3* v = new csVector3[10000];
-	if (!ParseVectorList (&parser, params, v, num))
+	if (!ParseVectorList (child, v, num))
 	{
 	  delete[] v;
 	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -592,7 +718,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	delete[] v;
 	break;
       }
-      case CS_TOKEN_FORWARD:
+      case XMLTOKEN_FORWARD:
       {
         if (seq < 1)
 	{
@@ -601,7 +727,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  exit (0);
 	}
 	csVector3* v = new csVector3[10000];
-	if (!ParseVectorList (&parser, params, v, num))
+	if (!ParseVectorList (child, v, num))
 	{
 	  delete[] v;
 	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -612,7 +738,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	delete[] v;
 	break;
       }
-      case CS_TOKEN_UP:
+      case XMLTOKEN_UP:
       {
         if (seq < 1)
 	{
@@ -621,7 +747,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	  exit (0);
 	}
 	csVector3* v = new csVector3[10000];
-	if (!ParseVectorList (&parser, params, v, num))
+	if (!ParseVectorList (child, v, num))
 	{
 	  delete[] v;
 	  demo->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -632,14 +758,11 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
 	delete[] v;
 	break;
       }
+      default:
+        demo->Report (CS_REPORTER_SEVERITY_ERROR,
+	  	"Unexpected token '%s'!", value);
+        exit (0);
     }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    demo->Report (CS_REPORTER_SEVERITY_ERROR,
-      	"Token '%s' not found while parsing a path!",
-	parser.GetLastOffender ());
-    exit (-1);
   }
 
   return np;
