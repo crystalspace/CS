@@ -40,7 +40,7 @@
 #  define __UNIX__
 #endif
 
-#if defined (PROC_INTEL)
+#if defined (PROC_X86)
 #  define __INTEL__
 #elif defined (PROC_ALPHA)
 #  define __ALPHA__

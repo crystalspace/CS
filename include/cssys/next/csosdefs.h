@@ -36,10 +36,10 @@
 #    define CS_PROCESSOR_NAME "M68K"
 #  endif
 #elif defined(__i386__)
-#  if !defined(PROC_INTEL)
-#    define PROC_INTEL
+#  if !defined(PROC_X86)
+#    define PROC_X86
 #    undef  CS_PROCESSOR_NAME
-#    define CS_PROCESSOR_NAME "Intel"
+#    define CS_PROCESSOR_NAME "X86"
 #  endif
 #elif defined(__sparc__)
 #  if !defined(PROC_SPARC)
@@ -206,7 +206,7 @@ static inline char* getcwd( char* p, size_t size )
 // compiler corrupts the emitted code for these functions.  Therefore, disable
 // these optimizations.
 //-----------------------------------------------------------------------------
-#if !defined(PROC_INTEL)
+#if !defined(PROC_X86)
 #  define CS_NO_IEEE_OPTIMIZATIONS
 #endif
 

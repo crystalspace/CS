@@ -48,7 +48,7 @@ esac
 # Now check processor type: add more checks here as needed
 case $MACHINE in
   *ppc*)	echo "PROC = POWERPC" ;;
-  *i[3-9]86*)	echo "PROC = INTEL" ;;
+  *i[3-9]86*)	echo "PROC = X86" ;;
   *ia64*)	echo "PROC = UNKNOWN" ;;
   *sparc*)	echo "PROC = SPARC" ;;
   *mips*)	echo "PROC = MIPS" ;;

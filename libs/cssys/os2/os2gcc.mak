@@ -25,7 +25,7 @@ vpath %.cpp libs/cssys/os2
 
 # Processor type. Most OS/2 systems runs on Intel's, I'm not sure IBM
 # will ever ressurect the PowerPC version ... :-(
-PROC=INTEL
+PROC=X86
 
 # Operating system
 OS=OS2

@@ -18,7 +18,7 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 .SUFFIXES: .exe
 
 # Processor type
-PROC=INTEL
+PROC=X86
 
 # "Operating system", if it can be called so :-/
 OS=DOS

@@ -28,7 +28,7 @@
  * strict alignment add your CPU to the !defined below to get slightly
  * smaller and faster code in some cases.
  */
-#if !defined (PROC_INTEL)
+#if !defined (PROC_X86)
 #  define PROC_NEEDS_STRICT_ALIGNMENT
 #endif
 

@@ -27,7 +27,7 @@
 #ifndef __QSQRT_H__
 #define __QSQRT_H__
 
-#if (!defined (CS_NO_QSQRT)) && defined (PROC_INTEL) && defined (COMP_GCC)
+#if (!defined (CS_NO_QSQRT)) && defined (PROC_X86) && defined (COMP_GCC)
 
 /*
   NB: Single-precision floating-point format (32 bits):

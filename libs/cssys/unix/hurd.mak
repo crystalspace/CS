@@ -87,7 +87,7 @@ CFLAGS.INCLUDE=
 CFLAGS.GENERAL=-Wall -Wunused -W $(CFLAGS.SYSTEM)
 
 # Flags for the compiler which are used when optimizing.
-ifeq ($(PROC),INTEL)
+ifeq ($(PROC),X86)
   CFLAGS.optimize=-O6 -fomit-frame-pointer -ffast-math
 else
   CFLAGS.optimize=-O -fomit-frame-pointer

@@ -18,7 +18,7 @@ endif
 ifneq ($(findstring defines,$(MAKESECTION))$(findstring config,$(ROOTCONFIG)),)
 
 PROC.m68k  = M68K
-PROC.i386  = INTEL
+PROC.i386  = X86
 PROC.sparc = SPARC
 PROC.hppa  = HPPA
 PROC.ppc   = POWERPC

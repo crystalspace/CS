@@ -24,7 +24,7 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 .SUFFIXES: .exe .dll
 
 # Processor type.
-PROC=INTEL
+PROC=X86
 
 # Operating system
 OS=WIN32

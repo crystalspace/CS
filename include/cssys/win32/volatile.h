@@ -11,9 +11,9 @@
 #  define CS_PLATFORM_NAME "Win32"
 #endif
 
-#define PROC_INTEL
+#define PROC_X86
 #if !defined(CS_PROCESSOR_NAME)
-#  define CS_PROCESSOR_NAME "Intel"
+#  define CS_PROCESSOR_NAME "X86"
 #endif
 
 #if defined(__BORLANDC__)

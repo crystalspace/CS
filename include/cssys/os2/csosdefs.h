@@ -136,7 +136,7 @@
 #  include <io.h>
 #endif
 
-#if defined (PROC_INTEL)
+#if defined (PROC_X86)
 #  define CS_LITTLE_ENDIAN
 #else
 #  error "Please define a suitable CS_XXX_ENDIAN macro in os2/csosdefs.h!"

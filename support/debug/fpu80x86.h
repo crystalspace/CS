@@ -19,7 +19,7 @@
 #ifndef __FPU80X86_H__
 #define __FPU80X86_H__
 
-#if defined(PROC_INTEL) && defined(COMP_GCC) && !defined(OS_NEXT) && !defined(OS_BE)
+#if defined(PROC_X86) && defined(COMP_GCC) && !defined(OS_NEXT) && !defined(OS_BE)
 
 /*
      ---- ---- --XX XXXX = MCW_EM - exception masks (1=handle exception internally, 0=fault)

@@ -31,7 +31,7 @@
 #include "libDIVE.h"
 #include "libDIVEprv.h"
 
-#if defined (PROC_INTEL)
+#if defined (PROC_X86)
 inline void memsetd (void *dest, unsigned int value, size_t count)
 {
   asm

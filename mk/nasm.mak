@@ -3,7 +3,7 @@
 ############################################
 
 # NASM works only on x86
-ifneq ($(PROC),INTEL)
+ifneq ($(PROC),X86)
 override NASM.INSTALLED = no
 endif
 

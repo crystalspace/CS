@@ -21,7 +21,7 @@ PLUGINS+=video/format/avi
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
 # Processor. Can be one of: INTEL, SPARC, POWERPC, M68K, UNKNOWN
-PROC=INTEL
+PROC=X86
 
 # Operating system. Can be one of:
 # NEXT, SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, WIN32, OS2, BE

@@ -334,7 +334,7 @@
 
 #ifdef CS_DEBUG
 #  if !defined (DEBUG_BREAK)
-#    if defined (PROC_INTEL)
+#    if defined (PROC_X86)
 #      if defined (COMP_GCC)
 #        define DEBUG_BREAK	asm ("int $3")
 #      else
@@ -371,12 +371,12 @@
 #endif
 
 // Adjust some definitions contained in volatile.h
-#if defined (PROC_INTEL) && !defined (DO_NASM)
+#if defined (PROC_X86) && !defined (DO_NASM)
 #  undef NO_ASSEMBLER
 #  define NO_ASSEMBLER
 #endif
 
-#if !defined (PROC_INTEL) || defined (NO_ASSEMBLER)
+#if !defined (PROC_X86) || defined (NO_ASSEMBLER)
 #  undef DO_MMX
 #  undef DO_NASM
 #endif
@@ -384,7 +384,7 @@
 // Use fast QInt and QRound on CPUs that are known to support it
 #if !defined (CS_NO_IEEE_OPTIMIZATIONS)
 #  if !defined (CS_IEEE_DOUBLE_FORMAT)
-#    if defined (PROC_INTEL) || defined (PROC_M68K)
+#    if defined (PROC_X86) || defined (PROC_M68K)
 #      define CS_IEEE_DOUBLE_FORMAT
 #    endif
 #  endif

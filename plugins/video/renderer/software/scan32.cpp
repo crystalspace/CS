@@ -27,9 +27,9 @@
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
-#if defined (PROC_INTEL) && defined (DO_NASM)
+#if defined (PROC_X86) && defined (DO_NASM)
 #  include "i386/scan32a.h"
-#endif //PROC_INTEL
+#endif // PROC_X86
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--/ scan_XXXX --//--//
 

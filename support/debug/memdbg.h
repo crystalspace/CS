@@ -90,7 +90,7 @@ typedef void *address;
 #if (__GNUC__ >= 2) && (__GNUC_MINOR__ >= 8)
 #  define GET_CALL_ADDRESS(firstarg)		\
      address addr = (address)__builtin_return_address (0);
-#elif defined (PROC_INTEL)
+#elif defined (PROC_X86)
 #  define GET_CALL_ADDRESS(firstarg)		\
      address addr = ((address *)&firstarg) [-1];
 #else
