@@ -2038,8 +2038,8 @@ void Cs2Xml::ParseScale (char const* parent_token, csParser* parser,
     {
       child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
       child->SetValue (tokname);
-      child->SetAttributeAsFloat ("x", x);
-      child->SetAttributeAsFloat ("y", y);
+      child->SetAttributeAsFloat ("u", x);
+      child->SetAttributeAsFloat ("v", y);
     }
     else
     {

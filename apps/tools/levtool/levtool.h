@@ -85,6 +85,15 @@ public:
 };
 
 /**
+ * iDocumentNode wrapper.
+ */
+class ltDocNodeWrap
+{
+public:
+  csRef<iDocumentNode> node;
+};
+
+/**
  * A thing.
  */
 class ltThing
@@ -213,6 +222,35 @@ public:
    * required modifications.
    */
   void RewriteThing (ltThing* thing, iDocumentNode* newthing);
+
+  //-----------------------------------------------------------------------
+
+  /**
+   * List the contents of a part.
+   */
+  void ListMeshPart (iDocumentNode* meshpart, int level);
+
+  /**
+   * List the contents of a meshobj.
+   */
+  void ListMeshObject (iDocumentNode* mesh, int level);
+
+  /**
+   * List the contents of a factory.
+   */
+  void ListFactory (iDocumentNode* factory, int level);
+
+  /**
+   * List the contents of a sector.
+   */
+  void ListSector (iDocumentNode* sector, int level);
+
+  /**
+   * List the contents of the world.
+   */
+  void ListContents (iDocumentNode* world);
+
+  //-----------------------------------------------------------------------
 
 public:
   LevTool ();

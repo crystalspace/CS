@@ -591,7 +591,9 @@ void LevTool::ParseThing (iDocumentNode* meshnode)
   const char* name = meshnode->GetAttributeValue ("name");
   if (name) th->SetName (name);
   things.Push (th);
-  thing_nodes.Push ((iDocumentNode*)meshnode);
+  ltDocNodeWrap* w = new ltDocNodeWrap ();
+  w->node = meshnode;
+  thing_nodes.Push (w);
 
   ParsePart (th, paramsnode, meshnode);
 }
@@ -681,6 +683,111 @@ void LevTool::RewriteThing (ltThing* thing, iDocumentNode* newthing)
 
 //-----------------------------------------------------------------------------
 
+void LevTool::ListMeshPart (iDocumentNode* meshpart, int level)
+{
+  char indent[1024];
+  int i; for (i = 0 ; i < level ; i++) indent[i] = ' '; indent[level] = 0;
+  const char* name = meshpart->GetAttributeValue ("name");
+  printf ("%spart(%s)\n", indent, name);
+}
+
+void LevTool::ListMeshObject (iDocumentNode* mesh, int level)
+{
+  char indent[1024];
+  int i; for (i = 0 ; i < level ; i++) indent[i] = ' '; indent[level] = 0;
+  const char* name = mesh->GetAttributeValue ("name");
+  csRef<iDocumentNode> pluginnode = mesh->GetNode ("plugin");
+  const char* plugin = pluginnode->GetContentsValue ();
+  printf ("%smeshobj(%s,%s)\n", indent, name, plugin);
+
+  if (IsMeshAThing (mesh))
+  {
+    csRef<iDocumentNode> paramsnode = mesh->GetNode ("params");
+    if (!paramsnode) return;
+    csRef<iDocumentNodeIterator> it = paramsnode->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      if (!strcmp (value, "part"))
+      {
+        ListMeshPart (child, level+1);
+      }
+    }
+  }
+}
+
+void LevTool::ListFactory (iDocumentNode* factory, int level)
+{
+  char indent[1024];
+  int i; for (i = 0 ; i < level ; i++) indent[i] = ' '; indent[level] = 0;
+  const char* name = factory->GetAttributeValue ("name");
+  csRef<iDocumentNode> pluginnode = factory->GetNode ("plugin");
+  const char* plugin = pluginnode->GetContentsValue ();
+  printf ("%smeshfact(%s,%s)\n", indent, name, plugin);
+
+  if (IsMeshAThing (factory))
+  {
+    csRef<iDocumentNode> paramsnode = factory->GetNode ("params");
+    if (!paramsnode) return;
+    csRef<iDocumentNodeIterator> it = paramsnode->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      if (!strcmp (value, "part"))
+      {
+        ListMeshPart (child, level+1);
+      }
+    }
+  }
+}
+
+void LevTool::ListSector (iDocumentNode* sector, int level)
+{
+  char indent[1024];
+  int i; for (i = 0 ; i < level ; i++) indent[i] = ' '; indent[level] = 0;
+  const char* name = sector->GetAttributeValue ("name");
+  printf ("%ssector(%s)\n", indent, name);
+  csRef<iDocumentNodeIterator> it = sector->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    if (!strcmp (value, "meshobj"))
+    {
+      ListMeshObject (child, level+1);
+    }
+  }
+}
+
+void LevTool::ListContents (iDocumentNode* world)
+{
+  printf ("world\n");
+  csRef<iDocumentNode> worldnode = world->GetNode ("world");
+  csRef<iDocumentNodeIterator> it = worldnode->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    if (!strcmp (value, "sector"))
+    {
+      ListSector (child, 1);
+    }
+    else if (!strcmp (value, "meshfact"))
+    {
+      ListFactory (child, 1);
+    }
+  }
+  fflush (stdout);
+}
+
+//-----------------------------------------------------------------------------
+
 LevTool::LevTool ()
 {
   object_reg = NULL;
@@ -701,12 +808,27 @@ LevTool::~LevTool ()
   }
 }
 
+#define OP_LIST 1
+#define OP_DYNAVIS 2
+
 //----------------------------------------------------------------------------
 
 void LevTool::Main ()
 {
   cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+
+  int op = OP_LIST;
+
+  if (cmdline->GetOption ("help"))
+  {
+    printf ("levtool <options> <zipfile>\n");
+    printf ("  -list: list world contents\n");
+    printf ("  -dynavis: convert to Dynavis\n");
+    exit (0);
+  }
+  if (cmdline->GetOption ("dynavis")) op = OP_DYNAVIS;
+  if (cmdline->GetOption ("list")) op = OP_LIST;
 
   const char* val = cmdline->GetName ();
   if (!val)
@@ -715,27 +837,26 @@ void LevTool::Main ()
     return;
   }
 
-  csRef<iDataBuffer> buf;
+  csString filename;
   if (strstr (val, ".zip"))
   {
     vfs->Mount ("/tmp/levtool_data", val);
-    buf = vfs->ReadFile ("/tmp/levtool_data/world");
-    if (!buf || !buf->GetSize ())
-    {
-      ReportError ("Archive '%s' does not seem to contain a 'world' file!",
-      	val);
-      return;
-    }
+    filename = "/tmp/levtool_data/world";
   }
   else
   {
-    buf = vfs->ReadFile (val);
-    if (!buf || !buf->GetSize ())
-    {
-      ReportError ("Could not load file '%s'!", val);
-      return;
-    }
+    filename = val;
   }
+
+  csRef<iDataBuffer> buf = vfs->ReadFile (filename);
+  if (!buf || !buf->GetSize ())
+  {
+    ReportError ("File '%s' does not exist!", (const char*)filename);
+    return;
+  }
+
+  // Make backup.
+  vfs->WriteFile (filename+".bak", **buf, buf->GetSize ());
 
   csRef<iDocumentSystem> xml (csPtr<iDocumentSystem> (
   	new csTinyDocumentSystem ()));
@@ -751,38 +872,58 @@ void LevTool::Main ()
 
   if (!TestValidXML (doc))
     return;
-  AnalyzePluginSection (doc);
-  FindAllThings (doc);
 
   csRef<iDocumentNode> root = doc->GetRoot ();
   csRef<iDocumentNode> worldnode = root->GetNode ("world");
-  int i;
-  for (i = 0 ; i < things.Length () ; i++)
-  {
-    ltThing* th = (ltThing*)things.Get (i);
-    printf ("found thing %s\n", th->GetName ());
-    th->CompressVertices ();
-    th->RemoveUnusedVertices ();
-    th->RemoveDuplicateVertices ();
-    th->CreateVertexInfo ();
 
-    csRef<iDocumentNode> newnode = worldnode->CreateNodeBefore (
-    	CS_NODE_ELEMENT, NULL);
-    RewriteThing (th, newnode);
-  }
-  for (i = 0 ; i < thing_nodes.Length () ; i++)
+  switch (op)
   {
-    iDocumentNode* node = (iDocumentNode*)thing_nodes.Get (i);
-    csRef<iDocumentNode> parent = node->GetParent ();
-    parent->RemoveNode (node);
+    case OP_LIST:
+      {
+	AnalyzePluginSection (doc);
+        ListContents (doc->GetRoot ());
+      }
+      break;
+    case OP_DYNAVIS:
+      {
+	AnalyzePluginSection (doc);
+	FindAllThings (doc);
+        int i;
+        for (i = 0 ; i < things.Length () ; i++)
+        {
+          ltThing* th = (ltThing*)things.Get (i);
+          printf ("found thing %s\n", th->GetName ());
+          th->CompressVertices ();
+          th->RemoveUnusedVertices ();
+          th->RemoveDuplicateVertices ();
+          th->CreateVertexInfo ();
+
+          csRef<iDocumentNode> sectornode = th->GetMeshNode ()->GetParent ();
+          csRef<iDocumentNode> newnode = sectornode->CreateNodeBefore (
+    	      CS_NODE_ELEMENT, NULL);
+          RewriteThing (th, newnode);
+        }
+        for (i = 0 ; i < thing_nodes.Length () ; i++)
+        {
+          ltDocNodeWrap* w = (ltDocNodeWrap*)thing_nodes.Get (i);
+	  csRef<iDocumentNode> node = w->node;
+          csRef<iDocumentNode> parent = node->GetParent ();
+printf ("  parent '%s'\n", parent->GetValue ());
+printf ("  node   '%s'\n", node->GetValue ());
+printf ("REMOVE NODE %p->%p\n", (iDocumentNode*)parent, (iDocumentNode*)node);
+          parent->RemoveNode (node);
+	  delete w;
+        }
+      }
+      break;
   }
 
   //---------------------------------------------------------------
 
-  error = doc->Write (vfs, "/this/world");
+  error = doc->Write (vfs, filename);
   if (error != NULL)
   {
-    ReportError ("Error writing /this/world: %s!", error);
+    ReportError ("Error writing '%s': %s!", (const char*)filename, error);
     return;
   }
 }
