@@ -74,18 +74,9 @@ bool csCameraPosition::Load (iCamera *camera, iEngine *e)
   camera->SetSector (room);
   camera->GetTransform ().SetOrigin (position);
 
-  csVector3 right = upward % forward;
-  camera->GetTransform ().SetT2O (
-      csMatrix3 (
-        right.x,
-        upward.x,
-        forward.x,
-        right.y,
-        upward.y,
-        forward.y,
-        right.z,
-        upward.z,
-        forward.z));
+  upward.Normalize ();
+  forward.Normalize ();
+  camera->GetTransform ().LookAt (forward, upward);
   camera->SetFarPlane (far_plane);
 
   return true;

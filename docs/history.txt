@@ -1,6 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 25-Jul-2002
+	- Fixed a bug in FORWARD/UPWARD (START command in map files) so
+	  that this now actually works. Keep in mind that both FORWARD
+	  and UPWARD are relative.
+25-Jul-2002
 	- Eric Sunshine made the following changes to the MingW/MSYS platform
 	  configuration (msys.make and msysconf.sh):
 	    - msysconf.sh is now run only once at configuration time, rather
