@@ -7,47 +7,169 @@ This is a short glossary of terminology used throughout the documentation as
 well as in discussions of 3D graphics.
 
 @table @emph
+@item 3D Renderer
+The 3D renderer plugin in Crystal Space is responsible for rendering
+3D objects (polygons) on the canvas. We have several renderers but the two
+most common are the software and OpenGL renderers.
+
+@item 3D Sprite
+A 3D Sprite in Crystal Space is a mesh object based on a triangle mesh.
+It is often used for actors. The word 'Sprite' may be confusing because a
+3D Sprite is really a full 3D object. 3D Sprites support skeletal and
+frame based animation.
+
 @item Camera Space
 Before viewing objects and rooms are transformed from world to camera space.
 This means that the position of the camera is set at (0,0,0); the positive z
-direction points away from the eys the y direction is up and the x direction is
-right.
+direction points away from the eyes, the y direction is up and the x
+direction is right.
+
+@item Canvas
+A canvas is a plugin which is responsible for managing a window for
+Crystal Space. On operating systems that don't support windows the canvas
+will represent the screen. The 3D renderer will use a canvas to render on.
+
+@item Detail Texture
+A detail texture is a texture that is blended on top of another texture
+so that the texture gets more detail. Crystal Space supports this by
+allowing several detail layers on top of the base texture in a material.
+
+@item Event Queue
+Crystal Space is an event-driven framework. So a Crystal Space application
+will also be event driven. The event queue manages the event system and
+sends events to listeners. Every module or plugin that implements
+@code{iEventHandler} can register itself with the event queue so it gets
+notified when certain events happen. See also
+with @code{csInitializer::CreateEventQueue()} or
+@code{csInitializer::CreateEnvironment()}.
+
+@item Haze Mesh Object
+A haze mesh object is a bit like volumetric light. It represents a 3D
+volume on which a texture is applied in a fuzzy way.
 
 @item Light-Map Space
 Two-dimensional (l,m) coordinate-system corresponding to some point on a
 light-map.  Light-map space is closely related to texture space.
 
+@item Material
+A material represents how some object or polygon looks. In the most common
+case a material is just a texture. But a material can contain additional
+information like detail textures (textures that are blended on top of
+the base texture). In future materials will be able to do much more.
+
+@item Mesh Factory
+A mesh factory is an object from which you can create mesh objects.
+(@pxref(MeshObject}).
+
+@item Mesh Object
+A mesh object represents geometry in Crystal Space. The Crystal Space engine
+is very modular. The engine itself does not know how to render. It only
+knows about mesh objects. Every mesh object is responsible for rendering
+what it represents (using the 3D renderer). Crystal Space supports several
+mesh objects: things, 3D sprites, 2D sprites, particle systems, haze,
+terrain engine, metaballs, ...
+
+@item Object Registry
+The object registry (represented by the @code{iObjectRegistry} interface
+is the central repository for all objects in Crystal Space. Everything in
+Crystal Space will use the object registry to get the pointer to the objects
+it is interested in. See also @code{csInitializer::CreateObjectRegistry()}
+or @code{csInitializer::CreateEnvironment()}.
+
 @item Object Space
 Every object or room is defined with its own local 3D coordinate system
 typically centered around (0,0,0).
 
+@item Particle System
+A particle system is another kind of mesh object. Crystal Space supports
+several particle systems (snow, rain, fire, explosion, emit, ...).
+
+@item Plugin
+A plugin is a number of classes that can be loaded dynamically into
+a running Crystal Space application. A plugin is represented by a dynamic
+library in a format suitable for the host operating system. On Unix systems
+this is a .so file and on Windows systems this is a .dll file.
+
+@item Plugin Manager
+The plugin manager is responsible for loading and unloading plugins. A
+plugin is a shared library of functions that can be loaded dynamically
+into a running Crystal Space application. On Unix a plugin has the @file{.so}
+extension and on Windows the @file{.dll} extension is used. Almost everything
+in the Crystal Space framework is itself a plugin. So the plugin manager
+is an important object. See also
+@code{csInitializer::CreatePluginManager()} or
+@code{csInitializer::CreateEnvironment()}.
+
 @item Portal
-A Portal is one of the polygons of a sector which will not be texture mapped
-(unless it has a semi-transparent texture).  Instead the other sector (visible
-through that portal) will be drawn.  A portal may even point back into the the
-sector in which it is contained.  This is useful for portals which act as
-mirrors.
+A Portal is one of the polygons of a thing mesh object which will not be
+texture mapped (unless it has a semi-transparent texture).  Instead another
+sector (visible through that portal) will be drawn.  A portal may
+even point back into the the sector in which it is contained.  This is
+useful for portals which act as mirrors. A more general form of a mirror
+is a space warping portal. This way a portal can go to any place in the
+world.
+
+@item Procedural Texture
+A procedural texture is a special texture that has a 3D renderer
+associated with it. This means that you can change the image on the
+procedural texture by drawing on it. Since the procedural texture
+has a full 3D renderer associated with it you can even use the 3D
+engine to render on a texture. Procedural textures can be used on
+all objects in Crystal Space that can use textures.
+
+@item Reporter
+The reporter is a plugin in Crystal Space that listens to messages.
+It supports the notion of errors, warnings, and notification messages.
+All components in Crystal Space use the reporter to report about unusual
+situations. An application can be aware of the reporter in two ways:
+it can either query the messages at regular intervals or else it can
+install a @dfn{reporter listener}. There is also a standard reporter
+listener plugin in Crystal Space which will use the console to output
+notification messages and use other means to report errors.
+
+@item Reporter Listener
+A reporter listener in general is an entity that can register itself
+with a reporter to listen to message that arrive on that reporter.
+There is also a standard reporter listener plugin that you can use
+so you don't need to write your own reporter listener.
 
 @item @sc{scf}
 The shared class facility.  A mechanism for managing plugin modules and
-treating objects in a uniform manner.  @xref{SCF}.
+treating objects in a uniform manner. Also manages reference counting.
+@xref{SCF}.
 
 @item Screen Space
 Two-dimensional coordinate-system corresponding to physical screen coordinates.
 Screen space is perspective corrected camera space.
 
 @item Sector
-A geometry container.  A sector is populated with mesh objects which are built
-from convex polygons in order to define the visual and physical attributes of
-the sector.
+A sector is simply a container of geometry. It contains several mesh objects
+which will represent the geometry of the sector. A common mesh object is
+the thing mesh object which is usually used to put walls around a sector
+(that way the sector represents a room). Other mesh objects like 3d sprites
+can be used for actors.
 
 @item Texture Space
 Two-dimensional (u,v) coordinate-system corresponding to some point on a
 texture.  Texture space is given by a transformation matrix and vector going
 from object space to texture space.
 
-@item Thing
-A mesh object which defines the fixed geometry within a sector.
+@item Thing Mesh Object
+A mesh object which is often used to represent walls of a sector but can
+in general be used to represent many more kinds of objects.
+
+@item Virtual Clock
+Most Crystal Space applications will be time-based. The virtual clock
+supports the notion of @sc{current time} and @sc{elapsed time}. It is
+called a virtual clock because it doesn't necessarily have to correspond
+with real time. A game can be paused for example. Note that a well-behaved
+game should always take elapsed time (between two frames) into consideration
+for calculating what could have happened in that time. This is important
+especially for physics calculations and also for speed of moving objects.
+You want an object moving at some speed to move with the same speed on a
+system with low framerates compared to a system with high framerates.
+See also @code{csInitializer::CreateVirtualClock()} or
+@code{csInitializer::CreateEnvironment()}.
 
 @item World Space
 Three-dimensional coordinate-system corresponding to the world in which all
@@ -56,5 +178,7 @@ matrix transformation.
 
 @item @sc{vfs}
 The virtual file system.  A mechanism for unifying filesystem access between
-various platforms.  @xref{VFS}.
+various platforms. Using this a Crystal Space application can read and write
+transparently from @sc{ZIP} archives. @xref{VFS}.
 @end table
+
