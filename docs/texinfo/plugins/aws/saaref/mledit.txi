@@ -40,12 +40,12 @@ Textboxes publish the following attributes.
 @item Style
 The following styles manipulate the appearance of the components frame:
 @itemize
-@item fsBump
-@item fsSimple
-@item fsRaised
-@item fsSunken
-@item fsFlat
-@item fsNone
+@item mefsBump
+@item mefsSimple
+@item mefsRaised
+@item mefsSunken
+@item mefsFlat
+@item mefsNone
 @end itemize
 These styles define what background is used.
 @itemize
