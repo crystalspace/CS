@@ -115,8 +115,6 @@ Cloth::Cloth(iClothFactoryState * mesh,
     // then i think this can be deleted after
     // the creation of neighbour constraints 
 
-    int             index = 0;
-    int             v;
     Constraint     *current;
     bool            isNew;
     for (i = 0; i < tri_count; i++) 
