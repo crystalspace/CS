@@ -12,17 +12,44 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+15-Feb-2000
+	- Seth Galbraith changed the arrays of vertices, normals, and
+	  vertices in each frame into vectors.
+	- Gary Haussmann added halo code written by FragDance.
+	- Gary also added extension detection code written by FragDance,
+	  with some modifications to support different platforms.
+	- Gary also fixed indentation a little and tried to fix some
+	  mipmap problems.
+	- Norman Kramer did some optimization of the ClipToPlane method.
+	- Norman also did an optimization of csMatrix3*=.
 14-Feb-2000
 	- Fixed a bug in highscore handling of Blocks.
 	- Fixed rotation center of a few shapes in Blocks.
 	- Added highscore GUI for Blocks.
 	- Current level is remembered in blocks.cfg.
 	- Pause removes view temporarily.
+	- Based color of lines in 3D line driver on mean texture color.
 	- Eric Sunshine improved integration of the Terrain engine with VFS.
 	  Height map files specified via the HEIGHTMAP() keyword in the world
 	  file are now loaded via VFS.  He also temporarily added height.ter
 	  to terrain.zip since automatic height map generation is currently
 	  broken (thus a pre-existing height map is required).
+	- Michael Ewert did some changes to csPhyzik:
+	    - Catastrophe support added.
+	    - Evolve loop moved into ctworld.
+	    - Collision detection/response handled by callbacks of the
+	      catastrophe system.
+	    - Added CD catastrophe manager at init.
+	    - Daniel Gudbjartsson pointed out an error in
+	      ctMatrix3::cofactor.
+	    - No longer multiplying return value by (i,j).
+	- Thomas Hieber did further documentation and cleanup of CD
+	  code.
+	- Thomas also did some small changes to VC project files.
+	- Robert Bate did some small fix to the new csIniFile stuff
+	  by making sure all the friend declarations have a class
+	  keyword after them.
+	- Robert also did some other changes.
 13-Feb-2000
 	- Eric Sunshine performed a fairly extensive overhaul of csIniFile.
 	  Except for the lowest level I/O functionality, most methods have
