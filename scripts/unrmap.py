@@ -58,24 +58,20 @@ class PlayerStart(Actor):
 class Brush(Actor):
     	"""A geometry object from Unreal"""
     	def MakeGeom(self, vecs, room, tm):
+    		poly=None
 		if not self.attrib.has_key('CsgOper'):
-			poly=room.NewPolygon(tm)
-		elif self.attrib['CsgOper']=='CSG_Add':
-			ptr=scf.scfCreateInstance('crystalclear.entitymanager.standard', 
-				'iEntityManager', MakeVersion(0,0,1))
-			if ptr=="NULL":
-				print "SCF is broken!"
-				return
-			print 'iEntityManager:', ptr
-			return
-			room.AddThing(poly)
+#			poly=room.CreatePolygon('a')
+			pass
+#		elif self.attrib['CsgOper']=='CSG_Add':
+#			room.AddThing(poly)
 #		elif self.attrib['CsgOper']=='CSG_Subtract':
 #			poly=room.NewPolygon(tm)
 		else:
 			if(warn):
 				print "WARNING: Unknown "+self.attrib['CsgOper']
 			return
-		vecs.Load(poly)
+		if poly:
+			vecs.Load(poly)
 	def Load(self, room, tm):
 		for x in self.stack:
 			for y in x.stack:
@@ -113,12 +109,10 @@ class Map(Actor):
 		global system, scf
 		system=GetSystem()
 		scf=system.GetSCF()
-		room=csSector(roomptr)
-		room.thisown=0
-		view=csView(viewptr)
-		view.thisown=0
-		tm=csTextureHandle(tmptr)
-		tm.thisown=0
+		world=system.Query_iWorld()
+	    	room=world.CreateSector("UnrealSector")
+		view=new_csView(scf);
+		tm=new_csTextureHandle(scf)
 		for x in self.stack:
 			if isinstance(x, Brush):
 				self.Inc('Brush')

@@ -25,6 +25,11 @@
 
 #ifndef NOTHING
 
+//SysDef
+#ifndef NO_CSSYSDEF
+#include "cssysdef.h"
+#endif
+
 //SCF
 #ifndef NO_CSSCF
 #include "csutil/scf.h"
@@ -37,9 +42,14 @@
 
 //CS Interfaces
 #ifndef NO_CSINTERFACE
+#include "iimage.h"
 #include "ipolygon.h"
 #include "ithing.h"
 #include "itxtmgr.h"
+#include "iview.h"
+#include "itexture.h"
+#include "iworld.h"
+#include "ipolyset.h"
 #endif
 
 //CS Geom
@@ -53,6 +63,9 @@
 #include "csengine/collider.h"
 #include "csengine/csview.h"
 #include "csengine/light.h"
+#include "csengine/sector.h"
+#include "csengine/polyset.h"
+#include "csengine/polygon.h"
 #endif
 
 //CS Object
