@@ -43,6 +43,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_arb.h"
 #include "glshader_avp.h"
 
+CS_LEAKGUARD_IMPLEMENT (csShaderGLAVP)
+
 SCF_IMPLEMENT_IBASE_EXT(csShaderGLAVP)
 SCF_IMPLEMENT_IBASE_EXT_END
 

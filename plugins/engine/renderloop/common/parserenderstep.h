@@ -22,20 +22,25 @@
 
 #include "csutil/strhash.h"
 #include "csutil/weakref.h"
+#include "csutil/leakguard.h"
 #include "iutil/plugin.h"
 
 class csRenderStepParser
 {
+private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
   csWeakRef<iPluginManager> plugmgr;
 
   csStringHash tokens;
-  enum {
+  enum
+  {
     XMLTOKEN_STEP
   };
 
 public:
+  CS_LEAKGUARD_DECLARE (csRenderStepParser);
+
   bool Initialize(iObjectRegistry *object_reg);
 
   csPtr<iRenderStep> Parse (iObjectRegistry* object_reg,

@@ -42,6 +42,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "../../common/shaderplugin.h"
 
+CS_LEAKGUARD_IMPLEMENT (csGLShader_FIXED)
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLShader_FIXED)

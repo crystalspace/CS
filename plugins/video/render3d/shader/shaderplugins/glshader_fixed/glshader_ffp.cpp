@@ -49,6 +49,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //                          csGLShaderFFP
 ////////////////////////////////////////////////////////////////////
 
+CS_LEAKGUARD_IMPLEMENT (csGLShaderFFP)
+
 csGLShaderFFP::csGLShaderFFP(csGLShader_FIXED* shaderPlug) :
   csShaderProgram (shaderPlug->object_reg)
 {

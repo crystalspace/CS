@@ -31,6 +31,8 @@
 
 #include "parserenderstep.h"
 
+CS_LEAKGUARD_IMPLEMENT (csRenderStepParser)
+
 bool csRenderStepParser::Initialize(iObjectRegistry *object_reg)
 {
   tokens.Register ("step", XMLTOKEN_STEP);

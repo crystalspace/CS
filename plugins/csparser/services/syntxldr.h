@@ -45,7 +45,6 @@ class csTextSyntaxService : public iSyntaxService
 {
 protected:
   iObjectRegistry* object_reg;
-  csRef<iMeshObjectType> thing_type;
   csRef<iReporter> reporter;
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE "plugins/csparser/services/syntxldr.tok"

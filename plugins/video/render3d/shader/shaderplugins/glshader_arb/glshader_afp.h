@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgfx/shadervarcontext.h"
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
+#include "csutil/leakguard.h"
 
 #include "glshader_arb.h"
 
@@ -40,6 +41,8 @@ private:
   void Report (int severity, const char* msg, ...);
 public:
   SCF_DECLARE_IBASE_EXT (csShaderProgram);
+
+  CS_LEAKGUARD_DECLARE (csShaderGLAFP);
 
   csShaderGLAFP (csGLShader_ARB* shaderPlug) : 
     csShaderProgram (shaderPlug->object_reg)

@@ -31,6 +31,8 @@
 
 #include "rlloader.h"
 
+CS_LEAKGUARD_IMPLEMENT (csRenderLoopLoader)
+
 // Plugin stuff
 
 SCF_IMPLEMENT_IBASE(csRenderLoopLoader);

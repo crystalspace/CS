@@ -21,9 +21,10 @@
 #define __GLSHADER_FVP_H__
 
 #include "ivideo/shader/shader.h"
-#include "csutil/weakref.h"
 #include "csgfx/shadervar.h"
+#include "csutil/weakref.h"
 #include "csutil/strhash.h"
+#include "csutil/leakguard.h"
 #include "../../common/shaderplugin.h"
 #include "../common/shaderprogram.h"
 
@@ -32,6 +33,8 @@ class csGLShader_FIXED;
 class csGLShaderFVP : public csShaderProgram
 {
 public:
+  CS_LEAKGUARD_DECLARE (csGLShaderFVP);
+
   enum TEXGENMODE
   {
     TEXGEN_NONE = 0,

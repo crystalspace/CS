@@ -27,6 +27,7 @@
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
 
+#include "csutil/leakguard.h"
 #include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
@@ -121,6 +122,8 @@ protected:
   void DumpVariableMappings (csString& output);
 public:
   SCF_DECLARE_IBASE;
+
+  CS_LEAKGUARD_DECLARE (csShaderProgram);
 
   csShaderProgram (iObjectRegistry* objectReg);
   virtual ~csShaderProgram ();

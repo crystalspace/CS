@@ -23,6 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/comp.h"
 #include "../../common/shaderplugin.h"
 #include "ivideo/shader/shader.h"
+#include "csutil/leakguard.h"
 
 #include "plugins/video/canvas/openglcommon/glextmanager.h"
 
@@ -37,6 +38,8 @@ private:
   bool enable;
   bool isOpen;
 public:
+  CS_LEAKGUARD_DECLARE (csGLShader_CG);
+
   static iObjectRegistry* object_reg;
   static CGcontext context;
   csRef<iShaderProgramPlugin> psplg;

@@ -30,6 +30,10 @@
 #include "csutil/xmltiny.h"
 #include "xmlshader.h"
 
+CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech)
+CS_LEAKGUARD_IMPLEMENT (csXMLShader)
+CS_LEAKGUARD_IMPLEMENT (csXMLShaderCompiler)
+
 CS_IMPLEMENT_PLUGIN
 
 //---------------------------------------------------------------------------

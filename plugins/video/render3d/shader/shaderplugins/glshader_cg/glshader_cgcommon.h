@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgfx/shadervarcontext.h"
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
+#include "csutil/leakguard.h"
 
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>
@@ -59,6 +60,8 @@ protected:
   virtual const char ** GetProfileCompilerArgs (CGprofile profile) 
   { return 0; }
 public:
+  CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
+
   csShaderGLCGCommon (csGLShader_CG* shaderPlug, const char* type);
   virtual ~csShaderGLCGCommon ();
 

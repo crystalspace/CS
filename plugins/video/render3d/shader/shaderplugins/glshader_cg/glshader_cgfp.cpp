@@ -39,6 +39,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "glshader_cgfp.h"
 
+CS_LEAKGUARD_IMPLEMENT (csShaderGLCGFP);
+
 void csShaderGLCGFP::Activate()
 {
   if (pswrap)

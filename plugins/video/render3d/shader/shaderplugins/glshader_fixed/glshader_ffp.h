@@ -22,6 +22,7 @@
 
 #include "ivideo/shader/shader.h"
 #include "csutil/weakref.h"
+#include "csutil/leakguard.h"
 #include "csgfx/shadervar.h"
 #include "imap/services.h"
 #include "../../common/shaderplugin.h"
@@ -139,6 +140,8 @@ private:
 
   void BuildTokenHash();
 public:
+  CS_LEAKGUARD_DECLARE (csGLShaderFFP);
+
   csGLShaderFFP(csGLShader_FIXED* shaderPlug);
   virtual ~csGLShaderFFP ();
 

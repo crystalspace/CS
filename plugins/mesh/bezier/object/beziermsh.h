@@ -138,7 +138,6 @@ class csBezierMeshStatic
 {
 public:
   csBezierMeshObjectType* thing_type;
-  csBezierMesh* thing;	// @@@@ TEMPORARY
 
   /// Bounding box in object space.
   csBox3 obj_bbox;
@@ -184,7 +183,7 @@ public:
   iBezierFactoryState* factory_state;
 
 public:
-  csBezierMeshStatic (csBezierMesh* thing, csBezierMeshObjectType* thing_type,
+  csBezierMeshStatic (csBezierMeshObjectType* thing_type,
   	iBezierFactoryState* factory_state);
   ~csBezierMeshStatic ();
 
@@ -340,7 +339,6 @@ private:
   csFlags factory_flags;
 
   csRenderMeshHolderMultiple rmHolder;
-  csShaderVariableContext* svcontext;
 
   struct BezierRenderBuffer
   {
@@ -860,7 +858,8 @@ public:
     virtual bool SupportsHardTransform () const { return true; }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
-    virtual iMeshObjectType* GetMeshObjectType () const { return scfParent->beziermsh_type; }
+    virtual iMeshObjectType* GetMeshObjectType () const
+    { return scfParent->beziermsh_type; }
     virtual iObjectModel* GetObjectModel () { return 0; }
   } scfiMeshObjectFactory;
   friend struct MeshObjectFactory;

@@ -394,7 +394,8 @@ bool csBallSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 
     //Writedown Factory tag
     csRef<iMeshFactoryWrapper> fact = 
-      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(),
+      	iMeshFactoryWrapper);
     if (fact)
     {
       const char* factname = fact->QueryObject()->GetName();

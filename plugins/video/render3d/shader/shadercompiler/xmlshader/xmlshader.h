@@ -21,6 +21,7 @@
 
 #include "csutil/weakref.h"
 #include "csutil/csobject.h"
+#include "csutil/leakguard.h"
 #include "ivideo/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
@@ -124,6 +125,8 @@ private:
 
   int GetPassNumber (shaderPass* pass);
 public:
+  CS_LEAKGUARD_DECLARE (csXMLShaderTech);
+
   csXMLShaderTech (csXMLShader* parent);
   ~csXMLShaderTech();
 
@@ -145,6 +148,8 @@ public:
 class csXMLShader : public iShader, public csObject
 {
 public:
+  CS_LEAKGUARD_DECLARE (csXMLShader);
+
   SCF_DECLARE_IBASE_EXT (csObject);
 
   csXMLShader (csXMLShaderCompiler* compiler);
@@ -216,6 +221,8 @@ public:
 class csXMLShaderCompiler : public iShaderCompiler, public iComponent
 {
 public:
+  CS_LEAKGUARD_DECLARE (csXMLShaderCompiler);
+
   SCF_DECLARE_IBASE;
   csXMLShaderCompiler(iBase* parent);
 

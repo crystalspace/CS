@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgfx/shadervarcontext.h"
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
+#include "csutil/leakguard.h"
 
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>
@@ -33,6 +34,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 class csShaderGLCGVP : public csShaderGLCGCommon
 {
+private:
   struct CGMatrixTrackerEntry
   {
     CGGLenum cgMatrix;
@@ -53,6 +55,8 @@ class csShaderGLCGVP : public csShaderGLCGCommon
   csArray<NVMatrixTrackerEntry> nvMatrixTrackers;
   csRef<iShaderProgram> override;
 public:
+  CS_LEAKGUARD_DECLARE (csShaderGLCGVP);
+
   csShaderGLCGVP (csGLShader_CG* shaderPlug) : 
     csShaderGLCGCommon (shaderPlug, "cgvp"), cgTrackMatrices(false), 
     nvTrackMatrices(false) { }

@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
+#include "csutil/leakguard.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "imap/reader.h"
@@ -44,6 +45,8 @@ protected:
   bool ParseRenderSteps (iRenderLoop* loop, iDocumentNode* node);
 public:
   SCF_DECLARE_IBASE;
+
+  CS_LEAKGUARD_DECLARE (csRenderLoopLoader);
 
   csRenderLoopLoader (iBase *p);
   virtual ~csRenderLoopLoader ();

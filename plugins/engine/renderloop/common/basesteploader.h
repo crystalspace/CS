@@ -26,6 +26,7 @@
 #include "imap/reader.h"
 #include "imap/services.h"
 #include "csutil/ref.h"
+#include "csutil/leakguard.h"
 
 class csBaseRenderStepLoader : public iLoaderPlugin, public iComponent
 {
@@ -35,6 +36,8 @@ protected:
 
 public:
   SCF_DECLARE_IBASE;
+
+  CS_LEAKGUARD_DECLARE (csBaseRenderStepLoader);
 
   csBaseRenderStepLoader (iBase *p);
   virtual ~csBaseRenderStepLoader ();

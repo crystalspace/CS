@@ -20,12 +20,16 @@
 #ifndef __CS_CANVAS_OPENGLCOMMON_DRIVERDB_H__
 #define __CS_CANVAS_OPENGLCOMMON_DRIVERDB_H__
 
+#include "csutil/leakguard.h"
+
 struct iConfigDocument;
 class csGraphics2DGLCommon;
 
 class csGLDriverDatabase
 {
 public:
+  CS_LEAKGUARD_DECLARE (csGLDriverDatabase);
+
   csGraphics2DGLCommon* ogl2d;
   csRefArray<iConfigFile> addedConfigs;
   const char* rulePhase;

@@ -126,11 +126,10 @@ int csBezierMesh:: last_thing_id = 0;
 
 //----------------------------------------------------------------------------
 
-csBezierMeshStatic::csBezierMeshStatic (csBezierMesh* thing,
+csBezierMeshStatic::csBezierMeshStatic (
 	csBezierMeshObjectType* thing_type,
 	iBezierFactoryState* factory_state)
 {
-  csBezierMeshStatic::thing = thing;
   csBezierMeshStatic::thing_type = thing_type;
   csBezierMeshStatic::factory_state = factory_state;
 
@@ -181,7 +180,7 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
 
   static_data = new csBezierMeshStatic (
-  	this, thing_type, &scfiBezierFactoryState);
+  	thing_type, &scfiBezierFactoryState);
 
   scfiPolygonMesh.SetThing (this);
   scfiPolygonMeshLOD.SetThing (this);

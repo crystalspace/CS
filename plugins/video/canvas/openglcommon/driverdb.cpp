@@ -32,8 +32,11 @@
 #include "driverdb.h"
 #include "glcommon2d.h"
 
+CS_LEAKGUARD_IMPLEMENT (csGLDriverDatabase)
+
 class csDriverDBReader
 {
+private:
   csGLDriverDatabase* db;
   csStringHash& tokens;
   iConfigManager* cfgmgr;
@@ -48,6 +51,8 @@ class csDriverDBReader
 
   csHash<csRef<csConfigDocument>, csStrKey, csConstCharHashKeyHandler> configs;
 public:
+  CS_LEAKGUARD_DECLARE (csDriverDBReader);
+
   csDriverDBReader (csGLDriverDatabase* db, iConfigManager* cfgmgr, 
     iSyntaxService* synsrv, int usedCfgPrio);
 
@@ -61,6 +66,8 @@ public:
   bool ParseConfigs (iDocumentNode* node);
   bool ParseRules (iDocumentNode* node);
 };
+
+CS_LEAKGUARD_IMPLEMENT (csDriverDBReader)
 
 csDriverDBReader::csDriverDBReader (csGLDriverDatabase* db, 
 				    iConfigManager* cfgmgr, 

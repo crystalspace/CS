@@ -23,6 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 #include "../../common/shaderplugin.h"
 #include "iutil/comp.h"
+#include "csutil/leakguard.h"
 
 class csGLShader_FIXED : public iShaderProgramPlugin
 {
@@ -39,6 +40,8 @@ public:
 
   void Report (int severity, const char* msg, ...);
 public:
+  CS_LEAKGUARD_DECLARE (csGLShader_FIXED);
+
   /// One-time initialization stuff
   void Open();
 

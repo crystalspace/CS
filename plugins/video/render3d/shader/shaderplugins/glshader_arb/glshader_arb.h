@@ -23,6 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/comp.h"
 #include "../../common/shaderplugin.h"
 #include "ivideo/shader/shader.h"
+#include "csutil/leakguard.h"
 
 class csGLShader_ARB : public iShaderProgramPlugin
 {
@@ -33,6 +34,8 @@ private:
 public:
   csGLExtensionManager* ext;
   iObjectRegistry* object_reg;
+
+  CS_LEAKGUARD_DECLARE (csGLShader_ARB);
 
   SCF_DECLARE_IBASE;
   

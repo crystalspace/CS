@@ -41,6 +41,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_cgvp.h"
 #include "glshader_cg.h"
 
+CS_LEAKGUARD_IMPLEMENT (csShaderGLCGVP)
+
 void csShaderGLCGVP::Activate()
 {
   if (override.IsValid())
