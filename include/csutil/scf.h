@@ -92,6 +92,10 @@ struct iBase
     if (ibase == 0) return 0;
     else return ibase->QueryInterface (iInterfaceID, iVersion);
   }
+  /// For weak references: add a reference owner.
+  virtual void AddRefOwner (iBase** ref_owner) = 0;
+  /// For weak references: remove a reference owner.
+  virtual void RemoveRefOwner (iBase** ref_owner) = 0;
 };
 
 /// Checks for null pointer before calling IncRef().
@@ -118,20 +122,9 @@ struct iBase
  */
 #define SCF_DECLARE_IBASE						\
   int scfRefCount;		/* Reference counter */			\
+  csArray<iBase**>* weak_ref_owners;					\
+  void RemoveRefOwners ();						\
   SCF_DECLARE_EMBEDDED_IBASE (iBase)
-
-/**
- * This macro should be embedded into any SCF-capable class definition
- * to declare the minimal functionality required by iBase interface.
- * This is a special version which supports weak references (the
- * csWeakRef<T> class).
- */
-#define SCF_DECLARE_IBASE_WEAK(Class)					\
-  csArray<Class**> weak_ref_owners;					\
-  virtual void AddRefOwner (Class** ref_owner);				\
-  virtual void RemoveRefOwner (Class** ref_owner);			\
-  virtual void RemoveRefOwners ();					\
-  SCF_DECLARE_IBASE
 
 /**
  * SCF_DECLARE_EMBEDDED_IBASE is used to declare the methods of iBase inside
@@ -143,6 +136,8 @@ public:									\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
   virtual int GetRefCount ();						\
+  virtual void AddRefOwner (iBase** ref_owner);				\
+  virtual void RemoveRefOwner (iBase** ref_owner);			\
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 
 /**
@@ -154,7 +149,9 @@ public:									\
  * to the parent object.
  */
 #define SCF_CONSTRUCT_IBASE(Parent)					\
-  scfRefCount = 1; scfParent = Parent; if (scfParent) scfParent->IncRef();
+  scfRefCount = 1;							\
+  weak_ref_owners = 0;							\
+  scfParent = Parent; if (scfParent) scfParent->IncRef();
 
 /**
  * The SCF_CONSTRUCT_EMBEDDED_IBASE macro should be invoked inside the
@@ -165,6 +162,19 @@ public:									\
  */
 #define SCF_CONSTRUCT_EMBEDDED_IBASE(Interface)				\
   Interface.scfParent = this;
+
+/**
+ * The SCF_DESTRUCT_IBASE macro should be invoked inside the destructor
+ * of an exported class (not inside an embedded interface).
+ */
+#define SCF_DESTRUCT_IBASE()						\
+  RemoveRefOwners ();
+
+/**
+ * The SCF_DESTRUCT_EMBEDDED_IBASE macro should be invoked inside the destructor
+ * of an embedded class.
+ */
+#define SCF_DESTRUCT_EMBEDDED_IBASE()
 
 /**
  * The SCF_IMPLEMENT_IBASE_INCREF() macro implements the IncRef() method for a
@@ -192,28 +202,7 @@ void Class::DecRef ()							\
   if (scfRefCount == 1)							\
   {									\
     SCF_TRACE ((" delete (%s *)%p\n", #Class, this));			\
-    if (scfParent)							\
-      scfParent->DecRef ();						\
-    delete this;							\
-    return;								\
-  }									\
-  scfRefCount--;							\
-}
-
-/**
- * The SCF_IMPLEMENT_IBASE_WEAK_DECREF() macro implements the DecRef() method
- * for a class in a C++ source module.  Typically, this macro is automatically
- * employed by the SCF_IMPLEMENT_IBASE_WEAK() convenience macro.
- * <p>
- * This version clears the pointers for all weak reference owners.
- */
-#define SCF_IMPLEMENT_IBASE_WEAK_DECREF(Class)				\
-void Class::DecRef ()							\
-{									\
-  if (scfRefCount == 1)							\
-  {									\
     RemoveRefOwners ();							\
-    SCF_TRACE ((" delete (%s *)%p\n", #Class, this));			\
     if (scfParent)							\
       scfParent->DecRef ();						\
     delete this;							\
@@ -223,26 +212,32 @@ void Class::DecRef ()							\
 }									\
 void Class::RemoveRefOwners ()						\
 {									\
-  for (int i = 0 ; i < weak_ref_owners.Length () ; i++)			\
+  if (!weak_ref_owners) return;						\
+  for (int i = 0 ; i < weak_ref_owners->Length () ; i++)		\
   {									\
-    Class** p = weak_ref_owners[i];					\
+    iBase** p = (*weak_ref_owners)[i];					\
     *p = 0;								\
   }									\
-  weak_ref_owners.DeleteAll ();						\
+  delete weak_ref_owners;						\
+  weak_ref_owners = 0;							\
 }
 
 /**
- * The SCF_IMPLEMENT_IBASE_WEAK_REFOWNER() macro implements the AddRefOwner()
+ * The SCF_IMPLEMENT_IBASE_REFOWNER() macro implements the AddRefOwner()
  * and RemoveRefOwner() for a weak reference.
  */
-#define SCF_IMPLEMENT_IBASE_WEAK_REFOWNER(Class)			\
-void Class::AddRefOwner (Class** ref_owner)				\
+#define SCF_IMPLEMENT_IBASE_REFOWNER(Class)				\
+void Class::AddRefOwner (iBase** ref_owner)				\
 {									\
-  weak_ref_owners.Push (ref_owner);					\
+  if (!weak_ref_owners)							\
+    weak_ref_owners = new csArray<iBase**>;				\
+  weak_ref_owners->Push (ref_owner);					\
 }									\
-void Class::RemoveRefOwner (Class** ref_owner)				\
+void Class::RemoveRefOwner (iBase** ref_owner)				\
 {									\
-  weak_ref_owners.Delete (ref_owner);					\
+  if (!weak_ref_owners)							\
+    weak_ref_owners = new csArray<iBase**>;				\
+  weak_ref_owners->Delete (ref_owner);					\
 }
 
 /**
@@ -287,19 +282,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
   SCF_IMPLEMENT_IBASE_INCREF(Class)					\
   SCF_IMPLEMENT_IBASE_DECREF(Class)					\
   SCF_IMPLEMENT_IBASE_GETREFCOUNT(Class)				\
-  SCF_IMPLEMENT_IBASE_QUERY(Class)
-
-/**
- * The SCF_IMPLEMENT_IBASE_WEAK() macro should be used within the C++ source
- * module that implements a interface derived from iBase.  Of course, you can
- * still implement those methods manually, if you desire ...
- * This version is for use with weak reference counting.
- */
-#define SCF_IMPLEMENT_IBASE_WEAK(Class)					\
-  SCF_IMPLEMENT_IBASE_INCREF(Class)					\
-  SCF_IMPLEMENT_IBASE_WEAK_DECREF(Class)				\
-  SCF_IMPLEMENT_IBASE_WEAK_REFOWNER(Class)				\
-  SCF_IMPLEMENT_IBASE_GETREFCOUNT(Class)				\
+  SCF_IMPLEMENT_IBASE_REFOWNER(Class)					\
   SCF_IMPLEMENT_IBASE_QUERY(Class)
 
 /**
@@ -307,13 +290,6 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
  * definition
  */
 #define SCF_IMPLEMENT_IBASE_END						\
-  SCF_IMPLEMENT_IBASE_QUERY_END
-
-/**
- * The SCF_IMPLEMENT_IBASE_WEAK_END macro is used to finish an
- * SCF_IMPLEMENT_IBASE_WEAK definition
- */
-#define SCF_IMPLEMENT_IBASE_WEAK_END					\
   SCF_IMPLEMENT_IBASE_QUERY_END
 
 /**
@@ -355,6 +331,20 @@ int Class::GetRefCount ()						\
 }
 
 /**
+ * The SCF_IMPLEMENT_EMBEDDED_IBASE_REFOWNER() macro implements the
+ * AddRefOwner() and RemoveRefOwner() for a weak reference.
+ */
+#define SCF_IMPLEMENT_EMBEDDED_IBASE_REFOWNER(Class)			\
+void Class::AddRefOwner (iBase** ref_owner)				\
+{									\
+  scfParent->AddRefOwner (ref_owner);					\
+}									\
+void Class::RemoveRefOwner (iBase** ref_owner)				\
+{									\
+  scfParent->RemoveRefOwner (ref_owner);				\
+}
+
+/**
  * The SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY() macro implements the opening
  * boilerplate for the QueryInterface() method for an embedded class in a C++
  * source module.  Typically, this macro is automatically employed by the
@@ -386,6 +376,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
   SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF(Class)				\
   SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF(Class)				\
   SCF_IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT(Class)			\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_REFOWNER(Class)				\
   SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY(Class)
 
 /**
@@ -440,6 +431,8 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
   virtual int GetRefCount ();						\
+  virtual void AddRefOwner (iBase** ref_owner);				\
+  virtual void RemoveRefOwner (iBase** ref_owner);			\
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 
 /**
@@ -479,6 +472,20 @@ int Class::GetRefCount ()						\
 }
 
 /**
+ * The SCF_IMPLEMENT_IBASE_EXT_REFOWNER() macro implements the
+ * AddRefOwner() and RemoveRefOwner() for a weak reference.
+ */
+#define SCF_IMPLEMENT_IBASE_EXT_REFOWNER(Class)			\
+void Class::AddRefOwner (iBase** ref_owner)				\
+{									\
+  __scf_superclass::AddRefOwner (ref_owner);				\
+}									\
+void Class::RemoveRefOwner (iBase** ref_owner)				\
+{									\
+  __scf_superclass::RemoveRefOwner (ref_owner);				\
+}
+
+/**
  * The SCF_IMPLEMENT_IBASE_EXT_QUERY() macro implements the opening boilerplate
  * for the QueryInterface() method for a class extending another SCF class in a
  * C++ source module.  Typically, this macro is automatically employed by the
@@ -506,6 +513,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
   SCF_IMPLEMENT_IBASE_EXT_INCREF(Class)					\
   SCF_IMPLEMENT_IBASE_EXT_DECREF(Class)					\
   SCF_IMPLEMENT_IBASE_EXT_GETREFCOUNT(Class)				\
+  SCF_IMPLEMENT_IBASE_EXT_REFOWNER(Class)				\
   SCF_IMPLEMENT_IBASE_EXT_QUERY(Class)
 
 /**

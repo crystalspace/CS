@@ -60,6 +60,7 @@
   SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF (Class);				\
   SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF (Class);				\
   SCF_IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT (Class);			\
+  SCF_IMPLEMENT_EMBEDDED_IBASE_REFOWNER (Class);			\
   SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY (Class);				\
     void *o = __scf_superclass__::QueryInterface (iInterfaceID, iVersion); \
     if (o) return o;							\

@@ -279,6 +279,7 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iDepend, csStringID context)
 {
   // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
+  weak_ref_owners = 0;
   scfRefCount = 0; scfParent = 0;
   ClassID = csStrNew (iClassID);
   Description = csStrNew (iDescription);
@@ -374,6 +375,16 @@ void scfFactory::DecRef ()
     }
   }
 #endif
+}
+
+void scfFactory::AddRefOwner (iBase**)
+{
+  // @@@ TODO
+}
+
+void scfFactory::RemoveRefOwner (iBase**)
+{
+  // @@@ TODO
 }
 
 int scfFactory::GetRefCount ()

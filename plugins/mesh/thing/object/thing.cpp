@@ -2340,9 +2340,9 @@ SCF_IMPLEMENT_IBASE_END
 
 //-------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_WEAK (PolyMeshHelper)
+SCF_IMPLEMENT_IBASE (PolyMeshHelper)
   SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
-SCF_IMPLEMENT_IBASE_WEAK_END
+SCF_IMPLEMENT_IBASE_END
 
 void PolyMeshHelper::SetThing (csThingStatic* thing)
 {

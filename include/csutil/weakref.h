@@ -53,7 +53,7 @@ public:
   csWeakRef (T* newobj)
   {
     obj = newobj.obj;
-    if (obj) obj->AddRefOwner (&obj);
+    if (obj) obj->AddRefOwner ((iBase**)&obj);
   }
 
   /**
@@ -61,7 +61,7 @@ public:
    */
   csWeakRef (csWeakRef const& other) : obj (other.obj)
   {
-    if (obj) obj->AddRefOwner (&obj);
+    if (obj) obj->AddRefOwner ((iBase**)&iobj);
   }
 
   /**
@@ -69,7 +69,7 @@ public:
    */
   ~csWeakRef ()
   {
-    if (obj) obj->RemoveRefOwner (&obj);
+    if (obj) obj->RemoveRefOwner ((iBase**)&obj);
   }
 
   /**
@@ -79,9 +79,9 @@ public:
   {
     if (obj != newobj)
     {
-      if (obj) obj->RemoveRefOwner (&obj);
+      if (obj) obj->RemoveRefOwner ((iBase**)&obj);
       obj = newobj;
-      if (obj) obj->AddRefOwner (&obj);
+      if (obj) obj->AddRefOwner ((iBase**)&obj);
     }
     return *this;
   }

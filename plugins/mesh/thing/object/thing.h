@@ -84,7 +84,7 @@ struct RepMaterial
 class PolyMeshHelper : public iPolygonMesh
 {
 public:
-  SCF_DECLARE_IBASE_WEAK (PolyMeshHelper);
+  SCF_DECLARE_IBASE;
 
   /**
    * Make a polygon mesh helper which will accept polygons which match
@@ -98,7 +98,7 @@ public:
   }
   virtual ~PolyMeshHelper ()
   {
-    RemoveRefOwners ();
+    SCF_DESTRUCT_IBASE ();
     Cleanup ();
   }
 

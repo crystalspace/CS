@@ -62,6 +62,7 @@ void csReporterListener::DecRef ()
 
 SCF_IMPLEMENT_IBASE_INCREF(csReporterListener)
 SCF_IMPLEMENT_IBASE_GETREFCOUNT(csReporterListener)
+SCF_IMPLEMENT_IBASE_REFOWNER(csReporterListener)
 SCF_IMPLEMENT_IBASE_QUERY(csReporterListener)
   SCF_IMPLEMENTS_INTERFACE (iStandardReporterListener)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)

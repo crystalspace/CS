@@ -376,6 +376,7 @@ void csTextureHandleSoftware::DeleteMipmaps ()
 
 SCF_IMPLEMENT_IBASE_INCREF(csSoftRendererLightmap)					
 SCF_IMPLEMENT_IBASE_GETREFCOUNT(csSoftRendererLightmap)				
+SCF_IMPLEMENT_IBASE_REFOWNER(csSoftRendererLightmap)				
 SCF_IMPLEMENT_IBASE_QUERY(csSoftRendererLightmap)
   SCF_IMPLEMENTS_INTERFACE(iRendererLightmap)
 SCF_IMPLEMENT_IBASE_END

@@ -26,6 +26,12 @@ chronological order.
 	    conveniant  --> convenient
 	    occurance   --> occurrence
 	    occurrance  --> occurrence
+	- Jorrit added weak reference support to all SCF objects. This adds
+	  four bytes of overhead per SCF object but that should not hurt
+	  too much. On the other hand you can now use csWeakRef<T> on every
+	  iBase instance. There is a new SCF_DESTRUCT_IBASE() macro (and
+	  SCF_DESTRUCT_EMBEDDED_IBASE()) which should now be used in
+	  all implementations of iBase (but currently is not used in anyone).
 14-Sep-2003
 	- DeSigna made the following changes:
 	    - Fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in 

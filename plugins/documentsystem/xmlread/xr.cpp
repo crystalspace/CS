@@ -72,7 +72,8 @@ TrDocumentNode* TrDocumentNode::NextSibling( const char * value ) const
 }
 
 
-TrDocumentNode* TrDocumentNodeChildren::Identify( TrDocument* document, const char* p )
+TrDocumentNode* TrDocumentNodeChildren::Identify (TrDocument* document,
+	const char* p)
 {
   TrDocumentNode* returnNode = 0;
 
@@ -99,16 +100,16 @@ TrDocumentNode* TrDocumentNodeChildren::Identify( TrDocument* document, const ch
   const char* xmlHeader = { "<?xml" };
   const char* commentHeader = { "<!--" };
 
-  if ( StringEqual( p, xmlHeader) )
+  if (StringEqual (p, xmlHeader))
   {
     returnNode = new TrXmlDeclaration();
   }
-  else if (    isalpha( *(p+1) )
+  else if (isalpha (*(p+1))
         || *(p+1) == '_' )
   {
     returnNode = document->blk_element.Alloc ();
   }
-  else if ( StringEqual ( p, commentHeader) )
+  else if (StringEqual (p, commentHeader))
   {
     returnNode = new TrXmlComment();
   }
@@ -117,7 +118,7 @@ TrDocumentNode* TrDocumentNodeChildren::Identify( TrDocument* document, const ch
     returnNode = new TrXmlUnknown();
   }
 
-  if ( returnNode )
+  if (returnNode)
   {
     // Set the parent, so it can report errors
     returnNode->parent = this;
