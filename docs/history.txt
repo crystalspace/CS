@@ -55,6 +55,13 @@ The history order has been reversed so that new features are at the top.
 	  files (in data/config) following renaming which Andrew performed in
 	  the source code.
 	- Eric Sunshine fixed the 'clean' target for ndrvdem.
+	- Eric Sunshine reverted Andrew's changes to csVector's Find() and
+	  FindKey() since they broke other parts of the system.  He changed
+	  the functions so that they search the vector from tail to head
+	  rather than head to tail.  Unfortunately, other parts of the system
+	  (even Andrew's own code) rely on the head to tail order.  An example
+	  of this is csSystemDriver::GetOptionCL(), which broke after Andrew's
+	  change.
 30-May-2000
 	- Alex Pfaffe did some minor fixes and cleanup in the terrain
 	  engine. Alex also fixed a bug w.r.t. vertex reuse in buffers.
