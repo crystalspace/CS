@@ -26,14 +26,18 @@
 
 static ctWorld *gcurrent_world = NULL;
 
-void dydt(real t, const real y[], real dy[] )
+static void __ctworld_dydt(real t, const real y[], real dy[]) {
+  gcurrent_world->dydt_eval(t, y, dy);
+}
+
+void ctWorld::dydt_eval(real t, const real y[], real dy[] )
 {
-//  assert_goto( gcurrent_world != NULL, "current world NULL in dydt\n", ASSERTFAIL );
+  //  assert_goto( gcurrent_world != NULL, "current world NULL in dydt\n",
+  //               ASSERTFAIL );
   
   gcurrent_world->calc_delta_state( t, y, dy ); 
-  
-//ASSERTFAIL:
-  
+
+  //ASSERTFAIL:
 }
 
 ctWorld::ctWorld()
@@ -80,7 +84,7 @@ void ctWorld::calc_delta_state( real t, const real y[], real dy[] )
 // zero out force accumulator and other transient variables
 void ctWorld::init_state()
 {
-ctPhysicalEntity *pe;
+  ctEntity *pe;
 
   pe = body_list.get_first();
   while( pe ){
@@ -105,13 +109,11 @@ void ctWorld::resize_state_vector( long new_size )
 // calculate new positions of world objects after time dt
 errorcode ctWorld::evolve( real t0, real t1 )
 {
-long arr_size = 0;
-ctPhysicalEntity *pe = body_list.get_first();
+  long arr_size = 0;
+  ctEntity *pe = body_list.get_first();
 
   while( pe ){
-//    if( pe->uses_ODE() ){
-      arr_size += pe->get_state_size();
-//    }
+    arr_size += pe->get_state_size();
     pe = body_list.get_next();
   }
 
@@ -130,7 +132,7 @@ ctPhysicalEntity *pe = body_list.get_first();
   y_save_size = arr_size;
 
   if( ode_to_math ){
-    ode_to_math->calc_step( y0, y1, arr_size, t0, t1, dydt );
+    ode_to_math->calc_step( y0, y1, arr_size, t0, t1, __ctworld_dydt );
   }else{
     if( fsm_state == CTWS_REWOUND && t1 >= rewound_from ){
       fsm_state = CTWS_NORMAL;
@@ -171,8 +173,8 @@ void ctWorld::collide()
 // resolve forces on all bodies
 void ctWorld::solve( real t )
 {
-ctPhysicalEntity *pe;
-ctForce *frc;
+  ctEntity *pe;
+  ctForce *frc;
 
   // solve for forces affecting contents of world.  the order matters
 
@@ -202,8 +204,9 @@ ctForce *frc;
 // state to array
 void ctWorld::load_state( real *state_array )
 {
-ctPhysicalEntity *pe;
-long state_size;
+  ctEntity *pe;
+  long state_size;
+
   pe = body_list.get_first();
   while( pe ){
     if( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) ){
@@ -220,8 +223,9 @@ long state_size;
 // array to state
 void ctWorld::reintegrate_state( const real *state_array )
 {
-ctPhysicalEntity *pe;
-long state_size;
+  ctEntity *pe;
+  long state_size;
+
   pe = body_list.get_first();
   while( pe ){
     if( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) ){
@@ -238,8 +242,9 @@ long state_size;
 
 void ctWorld::load_delta_state( real *state_array )
 {
-ctPhysicalEntity *pe;
-long state_size;
+  ctEntity *pe;
+  long state_size;
+
   pe = body_list.get_first();
   while( pe ){
     if( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) ){
@@ -254,36 +259,11 @@ long state_size;
 }
 
 
-// add a physical entity to this world
-//!me should consolodate these three methods, they do the same thing.
-errorcode ctWorld::add_physicalentity( ctPhysicalEntity *pe )
+// add an entity to this world
+errorcode ctWorld::add_entity( ctEntity *pe )
 {
   if( pe ){
     body_list.add_link( pe );
-    return WORLD_NOERR;
-  }else{
-    return WORLD_ERR_NULLPARAMETER;
-  }
-}
-
-
-
-// add a rigidbody to this world
-errorcode ctWorld::add_rigidbody( ctRigidBody *rb )
-{
-  if( rb ){
-    body_list.add_link( rb );
-    return WORLD_NOERR;
-  }else{
-    return WORLD_ERR_NULLPARAMETER;
-  }
-}
-
-// add an articulated body to this world. 
-errorcode ctWorld::add_articulatedbodybase( ctArticulatedBody *ab )
-{
-  if( ab ){
-    body_list.add_link( ab );
     return WORLD_NOERR;
   }else{
     return WORLD_ERR_NULLPARAMETER;
@@ -313,9 +293,9 @@ errorcode ctWorld::delete_articulatedbody( ctArticulatedBody *pbase )
 
 
 // apply the given function to all physical entities in the system.
-void ctWorld::apply_fuction_to_body_list( void(*fcn)( ctPhysicalEntity *ppe ) )
+void ctWorld::apply_function_to_body_list( void(*fcn)( ctEntity *ppe ) )
 {
-ctPhysicalEntity *pe;
+  ctEntity *pe;
 
   pe = body_list.get_first();
   while( pe ){

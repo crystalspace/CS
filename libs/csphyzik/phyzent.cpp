@@ -27,35 +27,19 @@
 
 ctPhysicalEntity::ctPhysicalEntity() : RF( ctReferenceFrame::universe() )
 {
-	RF.add_ref( RF );
-	solver = NULL;
-  flags = 0;
-//	use_ODE = true;   //!me does this get called by subclasses??
+  RF.add_ref( RF );
 }
 
 ctPhysicalEntity::ctPhysicalEntity( ctReferenceFrame &ref ) : RF( ref )
 {
-	RF.add_ref( RF );
-	solver = NULL;
-  flags = 0;
-//	use_ODE = true;
+  RF.add_ref( RF );
 }
 
 ctPhysicalEntity::~ctPhysicalEntity()
 {
-	RF.remove_ref( RF );
-	if( solver )
-		delete solver;
+  RF.remove_ref( RF );
 }
 
-
-// pass control to solver
-void ctPhysicalEntity::solve( real t )
-{
-	if( solver ){
-		solver->solve( t );
-	}
-}
 
 void ctPhysicalEntity::apply_given_F( ctForce &frc )
 {
@@ -65,11 +49,11 @@ void ctPhysicalEntity::apply_given_F( ctForce &frc )
 //!me make sure it's the right direction.. should be counter-clockwise in RHS
 void ctPhysicalEntity::rotate_around_line( ctVector3 &paxis, real ptheta )
 {
-	ctMatrix3 new_T;
-	
-	R_from_vector_and_angle( paxis, -ptheta, new_T );
-//	RF.set_T(new_T*RF.get_T());  //!me is this right?
-	RF.set_R(new_T*RF.get_R());  //!me is this right?
+  ctMatrix3 new_T;
+  
+  R_from_vector_and_angle( paxis, -ptheta, new_T );
+//  RF.set_T(new_T*RF.get_T());  //!me is this right?
+  RF.set_R(new_T*RF.get_R());  //!me is this right?
 
 }
 
@@ -77,85 +61,84 @@ void ctPhysicalEntity::rotate_around_line( ctVector3 &paxis, real ptheta )
 // increment state buffer to point after added state.  upload
 int ctPhysicalEntity::set_state( real *state_array )
 {
-ctVector3 o;
-ctMatrix3 M;
+  ctVector3 o;
+  ctMatrix3 M;
 
-	o = RF.get_offset();
-	M = RF.get_R();
+  o = RF.get_offset();
+  M = RF.get_R();
 
-	*state_array++ = o[0];
-	*state_array++ = o[1];
-	*state_array++ = o[2];
+  *state_array++ = o[0];
+  *state_array++ = o[1];
+  *state_array++ = o[2];
 
-	*state_array++ = M[0][0];
-	*state_array++ = M[0][1];
-	*state_array++ = M[0][2];
-	*state_array++ = M[1][0];
-	*state_array++ = M[1][1];
-	*state_array++ = M[1][2];
-	*state_array++ = M[2][0];
-	*state_array++ = M[2][1];
-	*state_array++ = M[2][2];
-	return ctPhysicalEntity::get_state_size();
+  *state_array++ = M[0][0];
+  *state_array++ = M[0][1];
+  *state_array++ = M[0][2];
+  *state_array++ = M[1][0];
+  *state_array++ = M[1][1];
+  *state_array++ = M[1][2];
+  *state_array++ = M[2][0];
+  *state_array++ = M[2][1];
+  *state_array++ = M[2][2];
+  return ctPhysicalEntity::get_state_size();
 }
 
 // add change in state vector over time to state buffer parameter.
 int ctPhysicalEntity::set_delta_state( real *state_array )
 {
-ctMatrix3 M;
+  ctMatrix3 M;
 
-	M = RF.get_R();
+  M = RF.get_R();
 
-	// dx/dt = v   change in position over time is velocity
-	*state_array++ = v[0];
-	*state_array++ = v[1];
-	*state_array++ = v[2];
+  // dx/dt = v   change in position over time is velocity
+  *state_array++ = v[0];
+  *state_array++ = v[1];
+  *state_array++ = v[2];
 
-	// dR/dt = ~w*R   ~w is cross product matrix thing.  R is rotation matrix
-	// ~w = [	  0		-w.z	 w.y	]   pre-mult of ~w with R has the
-	//		[	w.z		   0	-w.x	]	same effect as x-prod of w with
-	//		[  -w.y		 w.x	   0	]	each row of R
+  // dR/dt = ~w*R   ~w is cross product matrix thing.  R is rotation matrix
+  // ~w = [   0   -w.z   w.y  ]   pre-mult of ~w with R has the
+  //    [ w.z      0  -w.x  ] same effect as x-prod of w with
+  //    [  -w.y    w.x     0  ] each row of R
 
-	*state_array++ = -w[2]*M[1][0] + w[1]*M[2][0];
-	*state_array++ = -w[2]*M[1][1] + w[1]*M[2][1];
-	*state_array++ = -w[2]*M[1][2] + w[1]*M[2][2];
-	*state_array++ = w[2]*M[0][0] - w[0]*M[2][0];
-	*state_array++ = w[2]*M[0][1] - w[0]*M[2][1];
-	*state_array++ = w[2]*M[0][2] - w[0]*M[2][2];
-	*state_array++ = -w[1]*M[0][0] + w[0]*M[1][0];
-	*state_array++ = -w[1]*M[0][1] + w[0]*M[1][1];
-	*state_array++ = -w[1]*M[0][2] + w[0]*M[1][2];	
+  *state_array++ = -w[2]*M[1][0] + w[1]*M[2][0];
+  *state_array++ = -w[2]*M[1][1] + w[1]*M[2][1];
+  *state_array++ = -w[2]*M[1][2] + w[1]*M[2][2];
+  *state_array++ = w[2]*M[0][0] - w[0]*M[2][0];
+  *state_array++ = w[2]*M[0][1] - w[0]*M[2][1];
+  *state_array++ = w[2]*M[0][2] - w[0]*M[2][2];
+  *state_array++ = -w[1]*M[0][0] + w[0]*M[1][0];
+  *state_array++ = -w[1]*M[0][1] + w[0]*M[1][1];
+  *state_array++ = -w[1]*M[0][2] + w[0]*M[1][2];  
 
-	return ctPhysicalEntity::get_state_size();
-
+  return ctPhysicalEntity::get_state_size();
 }
 
 // download state from buffer into this entity
 int ctPhysicalEntity::get_state( const real *state_array )
 {
-ctVector3 o;
-ctMatrix3 M;
+  ctVector3 o;
+  ctMatrix3 M;
 
-	o[0] = *state_array++;
-	o[1] = *state_array++;
-	o[2] = *state_array++;
+  o[0] = *state_array++;
+  o[1] = *state_array++;
+  o[2] = *state_array++;
 
-	M[0][0] = *state_array++;
-	M[0][1] = *state_array++;
-	M[0][2] = *state_array++;
-	M[1][0] = *state_array++;
-	M[1][1] = *state_array++;
-	M[1][2] = *state_array++;
-	M[2][0] = *state_array++;
-	M[2][1] = *state_array++;
-	M[2][2] = *state_array++;
+  M[0][0] = *state_array++;
+  M[0][1] = *state_array++;
+  M[0][2] = *state_array++;
+  M[1][0] = *state_array++;
+  M[1][1] = *state_array++;
+  M[1][2] = *state_array++;
+  M[2][0] = *state_array++;
+  M[2][1] = *state_array++;
+  M[2][2] = *state_array++;
 
-	//!me probably don't need to do it every frame
-	M.orthonormalize();
+  //!me probably don't need to do it every frame
+  M.orthonormalize();
 
-	RF.set_offset( o );
-	RF.set_R( M );
-	return ctPhysicalEntity::get_state_size();
+  RF.set_offset( o );
+  RF.set_R( M );
+  return ctPhysicalEntity::get_state_size();
 }
 
 
@@ -183,10 +166,10 @@ ctVector3 j;
   apply_impulse( cont->contact_p, j );
 
   if( cont->body_b != NULL ){
-    j = ( cont->n*((cont->body_b->get_v())*cont->n) )*( -1.0 - cont->restitution );
+    j = ( cont->n*((cont->body_b->get_v())*cont->n) )
+      *( -1.0 - cont->restitution );
     cont->body_b->apply_impulse( cont->contact_p, j );
   }
-  
 }
 
 void ctPhysicalEntity::apply_impulse( ctVector3 jx, ctVector3 jv )
@@ -198,14 +181,14 @@ void ctPhysicalEntity::apply_impulse( ctVector3 jx, ctVector3 jv )
 
 ctDynamicEntity::ctDynamicEntity()
 {
-	m = 10;
-	solver = new ctSimpleDynamicsSolver( *this );
+  m = 10;
+  solver = new ctSimpleDynamicsSolver( *this );
 }
 
 ctDynamicEntity::ctDynamicEntity( ctReferenceFrame &ref ) : ctPhysicalEntity( ref )
 {
-	m = 10;
-	solver = new ctSimpleDynamicsSolver( *this );
+  m = 10;
+  solver = new ctSimpleDynamicsSolver( *this );
 }
 
 ctDynamicEntity::~ctDynamicEntity()
@@ -214,7 +197,7 @@ ctDynamicEntity::~ctDynamicEntity()
 
 void ctDynamicEntity::apply_given_F( ctForce &frc )
 {
-	frc.apply_F( *this );
+  frc.apply_F( *this );
 }
 
 
