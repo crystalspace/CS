@@ -1124,7 +1124,9 @@ void csGraphics3DOGLCommon::CommonOpen ()
   if( !effectserver )
   {
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-    effectserver = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.video.effects.stdserver", iEffectServer);
+    effectserver = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.video.effects.stdserver", iEffectServer);
+    object_reg->Register (effectserver, "iEffectServer");
     plugin_mgr->DecRef ();
   }
   csEffectStrings::InitStrings( effectserver );

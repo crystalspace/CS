@@ -7,6 +7,8 @@ The history order is reversed so that new features are at the top.
 	- Changed GetType()/SetType() to GetValue()/SetValue() in iXmlNode.
 	  Added GetType() which returns the type of the node.
 	- Implemented ParseMatrix() in syntax services for XML.
+	- The OpenGL renderer will now register the effects server with
+	  the object registry after loading it.
 8-Aug-2002
 	- Removed support/doom2cs again. This doom2cs utility can now be
 	  found at ftp://sunsite.dk/projects/crystal/contrib/doom2cs.zip
