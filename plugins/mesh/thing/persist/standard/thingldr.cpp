@@ -1138,7 +1138,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   // It is possible that the mesh wrapper is null.
-  csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (context, iMeshWrapper);
+  csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE_SAFE (context, iMeshWrapper);
 
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
   	engine, 0, true, mesh))

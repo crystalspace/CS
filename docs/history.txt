@@ -36,6 +36,9 @@ chronological order.
 	  vertex buffer switches. This requires mesh plugins to supply an
 	  ID for geometry to be effective, which currently only genmesh
 	  and thing (through polygonmesh) is augmented to do.
+	- Eric Sunshine changed SCF_QUERY_INTERFACE(context, iMeshWrapper) in
+	  csThingLoader::Parse() to use SCF_QUERY_INTERFACE_SAFE() since
+	  `context' might be null.  Reported by Atis Elsts <atisel@inbox.lv>.
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights
