@@ -1,0 +1,60 @@
+			    #LONGNAME#
+
+		by #AUTHOR#<#EMAIL#>
+
+XXX WARNING: This is a sample README file it seems that the author of the
+XXX          project didn't modify it yet. You'll only find generic
+XXX	     informations in here.
+
+Contents
+1. Introduction
+2. Building and Installing
+3. Usage
+4. Contact
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Introduction
+
+XXX Fill in some text
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2. Building and installing
+
+2.1 Jam
+
+ The build system is based on jam. If you don't have jam installed yet, then
+ check your distribution for a jam package or get the source directly and
+ compile/install jam yourself. You can find the source here:
+
+    ftp://ftp.perforce.com/pub/jam/
+
+ You'll need at least jam version 2.4.
+
+2.2 Building
+
+ 0. cd into the source directory
+ 1. Run "./configure" with some options if you which. You get a list of possible
+   options when you invoke configure with --help
+ 2. Run "jam"
+
+2.3 Installing
+
+ 0. Build the project
+ 1. Make sure you have write permissions to the install directories. On
+    unix/linux this usually means that you have to be the root user.
+ 1. Run "jam install"
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+3. Usage
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+4. Contact
+
+Bug-Reports, Suggestions, Calls-For-Help, Greeting Cards should be send to
+#EMAIL#
+

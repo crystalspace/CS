@@ -35,6 +35,16 @@ The history order is reversed so that new features are at the top.
 	  could let the Application rule construct a list of application
 	  targets and generate the clean targets from this list, but I think
 	  the question is if we really need this features) 
+	- Matze did several changes to the jam project generation (the script
+	    that creates a basic jambuildsystem for your external projects):
+	    - Added distclean and maintainerclean rules after the latest
+	      changes in CS.
+	    - Made the script interactive instead of requiring lots of
+	      commandline arguments. Now the script outputs detailed
+	      desciptions too.
+	    - Creates a basic README with some building and installation
+	      notes now.
+	    - Rewrote some parts of the script. 
 	- res did some smaller fixes to the stdpt makefile and added stdpt.scf.
 6-May-2003
 	- Eric Sunshine made the following changes:
