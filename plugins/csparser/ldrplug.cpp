@@ -26,10 +26,10 @@ struct csLoaderPluginRec
 {
   char* ShortName;
   char* ClassID;
-  iLoaderPlugIn* Plugin;
+  iLoaderPlugin* Plugin;
 
   csLoaderPluginRec (const char* iShortName,
-	const char *iClassID, iLoaderPlugIn *iPlugin)
+	const char *iClassID, iLoaderPlugin *iPlugin)
   {
     if (iShortName) ShortName = csStrNew (iShortName);
     else ShortName = NULL;
@@ -90,15 +90,15 @@ csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPlugInRec (
   return NULL;
 }
 
-iLoaderPlugIn* csLoader::csLoadedPluginVector::GetPluginFromRec (
+iLoaderPlugin* csLoader::csLoadedPluginVector::GetPluginFromRec (
 	csLoaderPluginRec *rec, const char *FuncID)
 {
   if (!rec->Plugin)
-    rec->Plugin = CS_LOAD_PLUGIN (System, rec->ClassID, FuncID, iLoaderPlugIn);
+    rec->Plugin = CS_LOAD_PLUGIN (System, rec->ClassID, FuncID, iLoaderPlugin);
   return rec->Plugin;
 }
 
-iLoaderPlugIn* csLoader::csLoadedPluginVector::FindPlugIn (
+iLoaderPlugin* csLoader::csLoadedPluginVector::FindPlugIn (
 	const char* Name, const char* FuncID)
 {
   // look if there is already a loading record for this plugin

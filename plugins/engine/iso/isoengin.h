@@ -125,7 +125,7 @@ public:
   /// Intercept events
   virtual bool HandleEvent (iEvent& e);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csIsoEngine);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

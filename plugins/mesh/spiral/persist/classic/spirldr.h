@@ -30,7 +30,7 @@ struct iSystem;
 /**
  * Spiral factory loader.
  */
-class csSpiralFactoryLoader : public iLoaderPlugIn
+class csSpiralFactoryLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
@@ -47,13 +47,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSpiralFactoryLoader);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
@@ -76,19 +76,19 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSpiralFactorySaver);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
  * Spiral loader.
  */
-class csSpiralLoader : public iLoaderPlugIn
+class csSpiralLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
@@ -105,13 +105,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSpiralLoader);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
@@ -134,13 +134,13 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSpiralSaver);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 #endif // _SPIRALLDR_H_

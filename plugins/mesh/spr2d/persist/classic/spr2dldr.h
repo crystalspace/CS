@@ -31,7 +31,7 @@ struct iReporter;
 /**
  * Sprite 2D factory loader.
  */
-class csSprite2DFactoryLoader : public iLoaderPlugIn
+class csSprite2DFactoryLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
@@ -52,7 +52,7 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite2DFactoryLoader);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
@@ -84,7 +84,7 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite2DFactorySaver);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
@@ -95,7 +95,7 @@ public:
 /**
  * Sprite 2D loader.
  */
-class csSprite2DLoader : public iLoaderPlugIn
+class csSprite2DLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
@@ -116,7 +116,7 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite2DLoader);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
@@ -148,7 +148,7 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite2DSaver);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

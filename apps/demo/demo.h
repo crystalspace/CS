@@ -30,7 +30,7 @@ struct iView;
 struct iFont;
 struct iFile;
 struct iImageLoader;
-struct iLoaderPlugIn;
+struct iLoaderPlugin;
 struct iMeshWrapper;
 class DemoSequenceManager;
 class csTransform;

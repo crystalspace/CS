@@ -30,7 +30,7 @@ struct iSystem;
 /**
  * Cube factory loader.
  */
-class csCubeFactoryLoader : public iLoaderPlugIn
+class csCubeFactoryLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
@@ -47,13 +47,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase *context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csCubeFactoryLoader);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
@@ -76,19 +76,19 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csCubeFactorySaver);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
  * Cube loader.
  */
-class csCubeLoader : public iLoaderPlugIn
+class csCubeLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
@@ -105,13 +105,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csCubeLoader);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
@@ -134,13 +134,13 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csCubeSaver);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 #endif // _CUBELDR_H_

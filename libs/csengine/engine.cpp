@@ -353,7 +353,7 @@ SCF_IMPLEMENT_IBASE (csEngine)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::eiPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::eiPlugin)
   SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
@@ -2076,10 +2076,10 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
 	const char* loaderClassId,
 	iDataBuffer* input)
 {
-  iLoaderPlugIn* plug = CS_QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
-  	iLoaderPlugIn);
+  iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
+  	iLoaderPlugin);
   if (!plug)
-    plug = CS_LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugIn);
+    plug = CS_LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugin);
   if (!plug)
     return NULL;
 
@@ -2099,10 +2099,10 @@ iMeshWrapper* csEngine::LoadMeshObject (
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos)
 {
-  iLoaderPlugIn* plug = CS_QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
-  	iLoaderPlugIn);
+  iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
+  	iLoaderPlugin);
   if (!plug)
-    plug = CS_LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugIn);
+    plug = CS_LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugin);
   if (!plug)
     return NULL;
 

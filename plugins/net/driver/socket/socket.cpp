@@ -60,7 +60,7 @@ SCF_IMPLEMENT_IBASE(csSocketDriver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSocketDriver::eiPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSocketDriver::eiPlugin)
   SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
@@ -231,7 +231,7 @@ void csSocketDriver::Close()
   PlatformDriverStop();
 }
 
-bool csSocketDriver::eiPlugIn::Initialize(iSystem* p)
+bool csSocketDriver::eiPlugin::Initialize(iSystem* p)
 {
   scfParent->Sys = p;
   p->CallOnEvents(this, CSMASK_Command | CSMASK_Broadcast);
@@ -373,7 +373,7 @@ bool csSocketDriver::PlatformDriverStop()
 
 #endif
 
-bool csSocketDriver::eiPlugIn::HandleEvent (iEvent &e)
+bool csSocketDriver::eiPlugin::HandleEvent (iEvent &e)
 {
   if (e.Type == csevCommand || e.Type == csevBroadcast)
   {

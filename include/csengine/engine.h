@@ -944,7 +944,7 @@ public:
   /// We need to handle some events
   virtual bool HandleEvent (iEvent &Event);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csEngine);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

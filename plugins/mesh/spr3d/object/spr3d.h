@@ -1367,14 +1367,14 @@ public:
   friend struct csSprite3DConfig;
 
   //--------------------- iPlugin interface implementation
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite3DMeshObjectType);
     virtual bool Initialize (iSystem* p)
     { scfParent->System = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 #endif // __CS_SPR3D_H__

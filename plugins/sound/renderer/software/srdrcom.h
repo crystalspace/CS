@@ -104,7 +104,7 @@ public:
   // previous time the sound handles were updated
   csTime LastTime;
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderSoftware);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

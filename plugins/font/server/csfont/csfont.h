@@ -157,13 +157,13 @@ public:
   /// This function is called by iFont objects when they are destroyed
   void NotifyDelete (csDefaultFont *font);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csDefaultFontServer);
     virtual bool Initialize(iSystem* p) { scfParent->System = p; return true; }
     virtual bool HandleEvent(iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 #endif // __CSFONT_H__

@@ -45,7 +45,7 @@ public:
   SCF_DECLARE_IBASE;
 
   // Implement iPlugin interface.
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csLua);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

@@ -328,7 +328,7 @@ class csAVIFormat : public iStreamFormat
   virtual bool Load (iFile *pVideoData);
   virtual void Unload ();
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csAVIFormat);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

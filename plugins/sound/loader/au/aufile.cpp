@@ -38,7 +38,7 @@ class csSoundLoader_AU : public iSoundLoader
 public:
   SCF_DECLARE_IBASE;
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundLoader_AU);
     virtual bool Initialize (iSystem*) { return true; }
@@ -58,7 +58,7 @@ SCF_IMPLEMENT_IBASE(csSoundLoader_AU)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
 SCF_IMPLEMENT_IBASE_END;
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoader_AU::eiPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoader_AU::eiPlugin)
   SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 

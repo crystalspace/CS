@@ -37,7 +37,7 @@ struct iVFS;
 struct iGraphics3D;
 struct iSoundRender;
 struct iMotionManager;
-struct iLoaderPlugIn;
+struct iLoaderPlugin;
 
 struct iObject;
 struct iThingState;
@@ -79,7 +79,7 @@ class csLoader : public iLoader
     // Find a loader plugin record
     struct csLoaderPluginRec* FindPlugInRec (const char* name);
     // Return the loader plugin from a record, possibly loading the plugin now
-    iLoaderPlugIn* GetPluginFromRec (csLoaderPluginRec*, const char *FuncID);
+    iLoaderPlugin* GetPluginFromRec (csLoaderPluginRec*, const char *FuncID);
   public:
     iSystem *System;
 
@@ -90,7 +90,7 @@ class csLoader : public iLoader
     // delete a plugin record
     virtual bool FreeItem (csSome Item);
     // find a plugin by its name or load it if it doesn't exist
-    iLoaderPlugIn* FindPlugIn (const char* Name, const char* FuncID);
+    iLoaderPlugin* FindPlugIn (const char* Name, const char* FuncID);
     // add a new plugin record
     void NewPlugIn (const char* ShortName, const char* ClassID);
   };
@@ -261,7 +261,7 @@ public:
   virtual iMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname);
   virtual iMeshWrapper* LoadMeshObject (const char* fname);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csLoader);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

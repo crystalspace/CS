@@ -13,7 +13,7 @@ SCF_IMPLEMENT_IBASE (awsManager)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (awsManager::eiPlugIn)                                                               
+SCF_IMPLEMENT_EMBEDDED_IBASE (awsManager::eiPlugin)                                                               
    SCF_IMPLEMENTS_INTERFACE (iPlugin)                                                                              
 SCF_IMPLEMENT_EMBEDDED_IBASE_END                                                                                  
                                                                                                                

@@ -8,7 +8,7 @@
 @cindex iMeshObject
 @cindex iMeshObjectFactory
 @cindex iMeshObjectType
-@cindex iLoaderPlugIn
+@cindex iLoaderPlugin
 @cindex csMeshWrapper
 
 @emph{Written by Jorrit Tyberghein,
@@ -101,7 +101,7 @@ valid for that type.
 
 In addition to the functionality for the Mesh Objects themselves, many Mesh
 Object Types support two implementations of the @sc{scf} interface
-@samp{iLoaderPlugIn}.  By implementing this, these plug-ins can be used
+@samp{iLoaderPlugin}.  By implementing this, these plug-ins can be used
 directly by the standard Crystal Space map file loader.  There is a loader for
 the Mesh Object Factory and a loader for the Mesh Object itself.  The Mesh
 Object plug-in itself doesn't know about these loader plug-ins.  In fact, you

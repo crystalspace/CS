@@ -441,14 +441,14 @@ public:
     return ALL_FEATURES;
   }
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csEmitMeshObjectType);
     virtual bool Initialize (iSystem* p)
     { scfParent->system = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 #endif // __CS_EMIT_H__

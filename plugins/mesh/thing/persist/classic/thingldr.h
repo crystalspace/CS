@@ -29,7 +29,7 @@ struct iSystem;
 /**
  * Thing loader.
  */
-class csThingLoader : public iLoaderPlugIn
+class csThingLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
@@ -45,13 +45,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingLoader);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
@@ -73,19 +73,19 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingSaver);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
  * Plane loader.
  */
-class csPlaneLoader : public iLoaderPlugIn
+class csPlaneLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
@@ -101,13 +101,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csPlaneLoader);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
@@ -129,19 +129,19 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csPlaneSaver);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
  * Bezier template loader.
  */
-class csBezierLoader : public iLoaderPlugIn
+class csBezierLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
@@ -157,13 +157,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBezierLoader);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
@@ -185,13 +185,13 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBezierSaver);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 #endif // _THINGLDR_H

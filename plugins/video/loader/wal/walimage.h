@@ -45,7 +45,7 @@ class csWALImageIO : public iImageIO
   virtual iDataBuffer *Save (iImage *image, const char *mime = NULL); 
   virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csWALImageIO);
     virtual bool Initialize (iSystem*) { return true; }

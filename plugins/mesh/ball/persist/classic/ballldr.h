@@ -31,7 +31,7 @@ struct iReporter;
 /**
  * Ball factory loader.
  */
-class csBallFactoryLoader : public iLoaderPlugIn
+class csBallFactoryLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
@@ -52,7 +52,7 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallFactoryLoader);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
@@ -84,7 +84,7 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallFactorySaver);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
@@ -95,7 +95,7 @@ public:
 /**
  * Ball loader.
  */
-class csBallLoader : public iLoaderPlugIn
+class csBallLoader : public iLoaderPlugin
 {
 private:
   iSystem* sys;
@@ -116,7 +116,7 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallLoader);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
@@ -148,7 +148,7 @@ public:
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csBallSaver);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

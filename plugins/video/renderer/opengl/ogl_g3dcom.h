@@ -741,7 +741,7 @@ public:
   // Extension flags
   bool ARB_multitexture;
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

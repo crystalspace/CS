@@ -88,14 +88,14 @@ public:
   int GetFrequency();
   bool IsHandleVoidSound();
   
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverOSS);
     virtual bool Initialize (iSystem* p)
     { scfParent->m_piSystem = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 
 private:
   // used to setup timer when background=true (not currently used)

@@ -706,7 +706,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
   long cmd;
   char* params;
   char str[255];
-  iLoaderPlugIn* plug = NULL;
+  iLoaderPlugin* plug = NULL;
   str[0] = 0;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
@@ -856,7 +856,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
   char priority[255]; priority[0] = 0;
 
   Stats->meshes_loaded++;
-  iLoaderPlugIn* plug = NULL;
+  iLoaderPlugin* plug = NULL;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -1071,7 +1071,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
   char str[255];
   str[0] = 0;
 
-  iLoaderPlugIn* plug = NULL;
+  iLoaderPlugin* plug = NULL;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -1234,7 +1234,7 @@ SCF_IMPLEMENT_IBASE(csLoader);
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin);
 SCF_IMPLEMENT_IBASE_END;
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLoader::eiPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLoader::eiPlugin)
   SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 

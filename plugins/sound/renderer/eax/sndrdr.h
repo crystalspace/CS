@@ -62,7 +62,7 @@ public:
 
   const char *GetError(HRESULT result);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderEAX);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

@@ -290,7 +290,7 @@ public:
     int, int, uint8)
   { }
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DInfinite);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

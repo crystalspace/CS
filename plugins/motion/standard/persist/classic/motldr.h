@@ -35,7 +35,7 @@ struct iMotion;
  *
  */
 
-class csMotionLoader : public iLoaderPlugIn
+class csMotionLoader : public iLoaderPlugin
 {
 private:
   iSystem *sys;
@@ -54,7 +54,7 @@ public:
   virtual bool Initialize( iSystem *Sys);
   virtual iBase* Parse( const char* string, iEngine *engine, iBase *context );
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMotionLoader);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
@@ -74,13 +74,13 @@ public:
   virtual ~csMotionSaver ();
   virtual void WriteDown ( iBase *obj, iStrVector *string, iEngine *engine );
   
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMotionSaver);
     virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 #endif

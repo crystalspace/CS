@@ -339,7 +339,7 @@ public:
     return ALL_FEATURES;
   }
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite2DMeshObjectType);
     virtual bool Initialize (iSystem*) { return true; }

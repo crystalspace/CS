@@ -58,7 +58,7 @@ public:
  
   void SndDoubleBackProc(SndChannelPtr, SndDoubleBufferPtr);
   
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverMac);
     virtual bool Initialize (iSystem* p)

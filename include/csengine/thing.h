@@ -1019,7 +1019,7 @@ public:
     return ALL_FEATURES;
   }
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

@@ -170,7 +170,7 @@ public:
   virtual iFont *GetFont (int iIndex)
   { (void)iIndex; return font.xfont ? &font : (iFont*)NULL; }
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csLineX2DFontServer);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }

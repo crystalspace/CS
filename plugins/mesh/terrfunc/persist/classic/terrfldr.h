@@ -28,7 +28,7 @@ struct iSystem;
 /**
  * TerrFunc factory loader.
  */
-class csTerrFuncFactoryLoader : public iLoaderPlugIn
+class csTerrFuncFactoryLoader : public iLoaderPlugin
 {
 private:
   iSystem* pSystem;
@@ -44,20 +44,20 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncFactoryLoader);
     virtual bool Initialize (iSystem* p)
     { scfParent->pSystem = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 /**
  * TerrFunc loader.
  */
-class csTerrFuncLoader : public iLoaderPlugIn
+class csTerrFuncLoader : public iLoaderPlugin
 {
 private:
   iSystem* pSystem;
@@ -73,14 +73,14 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncLoader);
     virtual bool Initialize (iSystem* p)
     { scfParent->pSystem = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
-  friend struct eiPlugIn;
+  friend struct eiPlugin;
 };
 
 #endif // _TERRFLDR_H_

@@ -48,7 +48,7 @@ public:
   // Load a sound file from the raw data.
   virtual iSoundData *LoadSound(void *Data, unsigned long Size) const;
 
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundLoaderMultiplexer);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
@@ -68,7 +68,7 @@ SCF_IMPLEMENT_IBASE(csSoundLoaderMultiplexer)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
 SCF_IMPLEMENT_IBASE_END;
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoaderMultiplexer::eiPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoaderMultiplexer::eiPlugin)
   SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 

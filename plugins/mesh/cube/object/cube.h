@@ -252,7 +252,7 @@ public:
   friend struct csCubeConfig;
 
   //------------------- iPlugin interface implementation -------------------
-  struct eiPlugIn : public iPlugin
+  struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csCubeMeshObjectType);
     virtual bool Initialize (iSystem*) { return true; }
