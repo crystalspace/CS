@@ -1,0 +1,3 @@
+@c -*-texinfo-*-
+@node Tips and Tricks with WinCVS, WinCVS Tutorial Step 2, WinCVS Tutorial, WinCVS Tutorial
+@subsection Tips and Tricks with WinCVS

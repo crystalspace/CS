@@ -1,0 +1,19 @@
+@c -*-texinfo-*-
+@node Advanced Topics for Developers Only, , Tutorial CrystalClear, Tutorials
+@section Advanced Topics for Developers Only
+@cindex Tutorial, Advanced Topics for Developers Only
+@cindex Advanced Topics for Developers Only, Tutorial
+
+The following sections of this tutorial are for developers who have been given
+write access to the Crystal Space source code repository by either Jorrit Tyberghein
+or Eric Sunshine, the Crystal Administrators.
+
+@menu
+* Commiting Modifed Files::Commiting Modifed Files
+* Adding New Files and Directories::Adding New Files and Directories
+* Tips and Tricks with WinCVS::Tips and Tricks with WinCVS
+@end menu
+
+@importss{tutorial,wincvs,step8.txi}
+@importss{tutorial,wincvs,step9.txi}
+@importss{tutorial,wincvs,step10.txi}

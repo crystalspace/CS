@@ -1,0 +1,3 @@
+@c -*-texinfo-*-
+@node Adding New Files and Directories, WinCVS Tutorial Step 2, WinCVS Tutorial, WinCVS Tutorial
+@subsection Adding New Files and Directories
