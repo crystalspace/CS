@@ -799,6 +799,7 @@ TYPEMAP_OUT_csWrapPtr
 #endif // CS_MINI_SWIG
 
 %ignore csGetPlatformConfig;
+%ignore csPrintfV;
 %include "csutil/sysfunc.h"
 
 %ignore csInitializer::RequestPlugins(iObjectRegistry*, ...);
@@ -929,9 +930,13 @@ TYPEMAP_OUT_csWrapPtr
 #endif // CS_MINI_SWIG
 
 #ifndef CS_MICRO_SWIG
-%include "ivideo/graph3d.h"
+%ignore iGraphics2D::PerformExtensionV;
 %include "ivideo/graph2d.h"
+%include "ivideo/graph3d.h"
 %include "ivideo/cursor.h"
+
+%ignore iNativeWindowManager::AlertV;
+%include "ivideo/natwin.h"
 
 %ignore GetGlyphSize(uint8, int &, int &);
 %ignore GetGlyphBitmap(uint8, int &, int &);
@@ -950,7 +955,6 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivideo/txtmgr.h"
 %include "ivideo/vbufmgr.h"
 %include "ivideo/material.h"
-%include "ivideo/natwin.h"
 
 %immutable csStreamDescription::name;
 %include "ivideo/codec.h"
@@ -965,11 +969,14 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csReporterHelper::ReportV;
 %include "ivaria/reporter.h"
 
+%ignore iConsoleOutput::PutTextV;
+%ignore iConsoleOutput::PerformExtensionV;
+%include "ivaria/conout.h"
+
 %include "ivaria/stdrep.h"
 %include "ivaria/view.h"
 %include "ivaria/collider.h"
 %include "ivaria/dynamics.h"
-%include "ivaria/conout.h"
 %include "ivaria/engseq.h"
 
 %rename(IntCall) *::Call(const char*, int&, const char*, ...);
