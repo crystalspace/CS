@@ -40,6 +40,10 @@ chronological order.
 	  encoding character (ex: A-umlaut is stored as two 8-bit values in
 	  UTF-8. That's one encoded character, but two encoding characters.)
 	- res made a cosmetic change in thingldr.cpp.
+	- Jorrit fixed a bug in the rain particle system. It was using
+	  vertex buffers but didn't register itself as a vertex buffer
+	  client. This causes problems at destruction (and thus simpmap
+	  crashes at exit).
 14-Oct-2003
 	- Eric Sunshine fixed typographical error in constant expression in
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.

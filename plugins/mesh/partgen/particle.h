@@ -21,6 +21,7 @@
 
 #include "cstool/meshobjtmpl.h"
 #include "imesh/partsys.h"
+#include "ivideo/vbufmgr.h"
 
 /**
  * flag value to indicate that the system should be deleted when all
@@ -147,6 +148,8 @@ public:
   /// destructor
   virtual ~csNewParticleSystem ();
 
+  SCF_DECLARE_IBASE_EXT (csMeshObject);
+
   /// grow or shrink the storage area to the specified amount of particles
   void SetCount (int num);
 
@@ -197,6 +200,16 @@ public:
   {
     bbox = Bounds;
   }
+
+#ifndef CS_USE_NEW_RENDERER
+  /// interface to receive state of vertexbuffermanager
+  struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csNewParticleSystem);
+    virtual void ManagerClosing ();
+  }scfiVertexBufferManagerClient;
+  friend struct eiVertexBufferManagerClient;
+#endif
 };
 
 #endif // __CS_PARTICLE_H__

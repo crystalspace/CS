@@ -1619,11 +1619,8 @@ csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
 #ifndef CS_USE_NEW_RENDERER
 void csGenmeshMeshObjectFactory::eiVertexBufferManagerClient::ManagerClosing ()
 {
-  if (scfParent->vbuf)
-  {
-    scfParent->vbuf = 0;
-    scfParent->vbufmgr = 0;
-  }
+  scfParent->vbuf = 0;
+  scfParent->vbufmgr = 0;
 }
 #endif
 

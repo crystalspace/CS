@@ -26,9 +26,24 @@
 #include "ivideo/vbufmgr.h"
 #include "qint.h"
 
+SCF_IMPLEMENT_IBASE_EXT (csNewParticleSystem)
+#ifndef CS_USE_NEW_RENDERER
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
+#endif
+SCF_IMPLEMENT_IBASE_EXT_END
+
+#ifndef CS_USE_NEW_RENDERER
+SCF_IMPLEMENT_EMBEDDED_IBASE (csNewParticleSystem::eiVertexBufferManagerClient)
+  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+#endif
+
 csNewParticleSystem::csNewParticleSystem (
 	iEngine *eng, iMeshObjectFactory *fact, int flags) : csMeshObject (eng)
 {
+#ifndef CS_USE_NEW_RENDERER 
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+#endif
   Factory = fact;
   ParticleFlags = flags;
   ParticleCount = 0;
@@ -184,6 +199,13 @@ void csNewParticleSystem::UpdateLighting (iLight** lights, int num,
   }
 }
 
+#ifndef CS_USE_NEW_RENDERER
+void csNewParticleSystem::eiVertexBufferManagerClient::ManagerClosing ()
+{
+  scfParent->vbuf = 0;
+}
+#endif
+
 bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
 	csZBufMode mode)
 {
@@ -303,6 +325,9 @@ bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
   iVertexBufferManager *vbufmgr = g3d->GetVertexBufferManager ();
   if (vbuf == 0)
   {
+#ifndef CS_USE_NEW_RENDERER
+    vbufmgr->AddClient (&scfiVertexBufferManagerClient);
+#endif
     vbuf = vbufmgr->CreateBuffer (100);
   }
 
