@@ -22,7 +22,7 @@
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
 #include "csutil/garray.h"
-#include "csutil/weakref.h"
+#include "csutil/ref.h"
 
 #include "csgeom/objmodel.h"
 #include "csgeom/transfrm.h"
@@ -124,7 +124,7 @@ private:
   float base_heat;
   csColor constant_color;
   csParticleColorMethod color_method;
-  csWeakRef<iParticlesColorCallback> color_callback;
+  csRef<iParticlesColorCallback> color_callback;
   csFlags flags;
 
 public:
@@ -533,7 +533,7 @@ private:
   float base_heat;
   csColor constant_color;
   csParticleColorMethod color_method;
-  csWeakRef<iParticlesColorCallback> color_callback;
+  csRef<iParticlesColorCallback> color_callback;
 
   const csArray<csParticlesData> *point_data;
   struct i_vertex
