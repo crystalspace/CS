@@ -7,6 +7,20 @@ The history order is reversed so that new features are at the top.
 	- After fixing the csgfx makefile so that it actually uses all
 	  .cpp files in the dir I reenabled the csCreateXORImage() in
 	  software, OpenGL, and csparser.
+	- Added initialization of 'radius' to partgen.cpp.
+	- Fixed partgen/GetRadius() to first call SetupObject(). This will
+	  make sure the radius returned by iMeshObject->GetRadius() is correct
+	  even before the particle system is first drawn.
+	- Fixed iMeshWrapper::PlaceMesh() so that it correctly transforms
+	  the bounding sphere of the object it is trying to place. Previously
+	  it was doing the inverse transform instead.
+	- Further fixed PlaceMesh() so that it finally works as intended.
+	- Optimized PlaceMesh() so it first checks if the sector has already
+	  been added before doing all the calculations.
+	- Changed iMeshWrapper::GetRadius() to also consider potential
+	  children. In that case it will calculate the union of all the
+	  bounding spheres of the children. As a consequence this means that
+	  PlaceMesh() will now also consider children.
 1-Jan-2001
 	- Fixed bug [497461] from sf.net. This bug prevented joystick
 	  button handling to work properly. Reported by J.F. Miller.

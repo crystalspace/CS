@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "explo.h"
@@ -82,6 +83,8 @@ void csExploMeshObject::SetupObject ()
     maxaccel = qsqrt (sqmaxaccel);
     SetupColor ();
     SetupMixMode ();
+    float r = qsqrt (csSquaredDist::PointPoint (bbox.Max (), bbox.Min ())) / 2;
+    radius.Set (r, r, r);
   }
 }
 

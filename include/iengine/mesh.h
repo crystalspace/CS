@@ -315,7 +315,7 @@ struct iMeshWrapper : public iBase
    */
   virtual void SetParentContainer (iMeshWrapper *) = 0;
 
-  /// Get the radius of this mesh (ignoring children).
+  /// Get the radius of this mesh and all its children.
   virtual void GetRadius (csVector3& rad, csVector3& cent) const = 0;
 
   /**

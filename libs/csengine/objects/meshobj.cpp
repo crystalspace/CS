@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "qsqrt.h"
 #include "csgeom/sphere.h"
 #include "csengine/sector.h"
 #include "csengine/meshobj.h"
@@ -267,12 +268,10 @@ void csMeshWrapper::PlaceMesh ()
   if (max_radius < radius.y) max_radius = radius.y;
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
-  sphere *= movable.GetFullTransform ();
+  sphere = movable.GetFullTransform ().This2Other (sphere);
   max_radius = sphere.GetRadius ();
   float max_sq_radius = max_radius * max_radius;
 
-  // @@@ This function is currently ignoring children but that's
-  // not good!
   // @@@ This function only goes one level deep in portals. Should be fixed!
   // @@@ It would be nice if we could find a more optimal portal representation
   // for large sectors.
@@ -291,25 +290,23 @@ void csMeshWrapper::PlaceMesh ()
       {
         for (j = 0 ; j < thing->GetPortalCount () ; j++)
         {
-	  iPolygon3D* portal_poly = thing->GetPortalPolygon (j);
-	  const csPlane3& pl = portal_poly->GetWorldPlane ();
-
-	  float sqdist = csSquaredDist::PointPlane (sphere.GetCenter (), pl);
-	  if (sqdist <= max_sq_radius)
+	  iPortal* portal = thing->GetPortal (j);
+	  iSector* dest_sector = portal->GetSector ();
+	  if (movable_sectors->Find (dest_sector) == -1)
 	  {
-	    // Plane of portal is close enough.
-	    // If N is the normal of the portal plane then center-N
-	    // will be the point on the plane that is closest to 'center'.
-	    // We check if that point is inside the portal polygon.
-	    if (portal_poly->PointOnPolygon (sphere.GetCenter ()
-	    	- pl.Normal ()))
+	    iPolygon3D* portal_poly = thing->GetPortalPolygon (j);
+	    const csPlane3& pl = portal_poly->GetWorldPlane ();
+
+	    float sqdist = csSquaredDist::PointPlane (sphere.GetCenter (), pl);
+	    if (sqdist <= max_sq_radius)
 	    {
-	      iPortal* portal = thing->GetPortal (j);
-	      iSector* dest_sector = portal->GetSector ();
-	      if (movable_sectors->Find (dest_sector) == -1)
-	      {
+	      // Plane of portal is close enough.
+	      // If N is the normal of the portal plane then we
+	      // can use that to calculate the point on the portal plane.
+	      csVector3 testpoint = sphere.GetCenter ()
+	    	  + pl.Normal ()*qsqrt (sqdist);
+	      if (portal_poly->PointOnPolygon (testpoint))
 	        movable_sectors->Add (dest_sector);
-	      }
 	    }
 	  }
         }
@@ -384,6 +381,34 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3& cbox)
     wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (7)));
   }
   cbox = wor_bbox;
+}
+
+void csMeshWrapper::GetRadius (csVector3& rad, csVector3& cent) const
+{
+  mesh->GetRadius (rad, cent);
+  if (children.Length () > 0)
+  {
+    float max_radius = rad.x;
+    if (max_radius < rad.y) max_radius = rad.y;
+    if (max_radius < rad.z) max_radius = rad.z;
+    csSphere sphere (cent, max_radius);
+    int i;
+    for (i = 0 ; i < children.Length () ; i++)
+    {
+      iMeshWrapper* spr = children.Get (i);
+      csVector3 childrad, childcent;
+      spr->GetRadius (childrad, childcent);
+      float child_max_radius = childrad.x;
+      if (child_max_radius < childrad.y) child_max_radius = childrad.y;
+      if (child_max_radius < childrad.z) child_max_radius = childrad.z;
+      csSphere childsphere (childcent, child_max_radius);
+      // @@@ Is this the right transform?
+      childsphere *= spr->GetMovable ()->GetTransform ();
+      sphere += childsphere;
+    }
+    rad.Set (sphere.GetRadius (), sphere.GetRadius (), sphere.GetRadius ());
+    cent.Set (sphere.GetCenter ());
+  }
 }
 
 void csMeshWrapper::GetTransformedBoundingBox (

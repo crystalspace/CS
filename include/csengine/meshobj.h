@@ -348,7 +348,7 @@ public:
    * Check if this object is hit by this object space vector.
    * BBox version.
    */
-  int HitBeamBBox (const csVector3& start, const csVector3& end, 
+  int HitBeamBBox (const csVector3& start, const csVector3& end,
          csVector3& isect, float* pr);
   /**
    * Check if this object is hit by this object space vector.
@@ -372,9 +372,8 @@ public:
   /// Get the children of this mesh object.
   const csMeshMeshList& GetChildren () const { return children; }
 
-  /// Get the radius of this mesh (ignoring children).
-  void GetRadius (csVector3& rad, csVector3& cent) const 
-	{ mesh->GetRadius (rad,cent); }
+  /// Get the radius of this mesh and all its children.
+  void GetRadius (csVector3& rad, csVector3& cent) const;
 
   /**
    * Do a hard transform of this object.
@@ -539,7 +538,7 @@ public:
     {
       scfParent->SetParentContainer (p);
     }
-    virtual void GetRadius (csVector3& rad, csVector3 &cent) const 
+    virtual void GetRadius (csVector3& rad, csVector3 &cent) const
     {
       scfParent->GetRadius (rad,cent);
     }

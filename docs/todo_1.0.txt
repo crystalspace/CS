@@ -31,11 +31,15 @@ Bugs to fix:
 	     some polygons are not updated when the dynamic light
 	     changes intensity/color.
 	[V]  Investigate various visible artifacts in the mazedex
-	     level.
+	     level. It appears that most of these have to do with the
+	     halos and only appear with OpenGL. One artifact appears
+	     to be Z-fighting (with OpenGL alone) and this occurs
+	     if you look into the reflecting table.
 	[V]  Static lighting no longer goes through space-warping
 	     portals.
-	[F]  Investigate if PlaceMesh() works correctly. I suspect it
-	     doesn't. May be related to bug [Bug 471638].
+	[**] Investigate if PlaceMesh() works correctly. I suspect it
+	     doesn't. May be related to bug [Bug 471637].
+	[V]  Bug with models seen through portals [Bug 471638].
 	[V]  One of the halos in flarge seems to disappear in some cases
 	     with OpenGL.
 	[V]  Walktest + newsky: it appears that there are some visibility

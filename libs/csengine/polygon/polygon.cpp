@@ -1549,7 +1549,7 @@ bool csPolygon3D::PointOnPolygon (const csVector3& v)
   // First check if point is on the plane.
   csPlane3& pl = plane->GetObjectPlane ();
   float dot = pl.D () + pl.A ()*v.x + pl.B ()*v.y + pl.C ()*v.z;
-  if (ABS (dot) >= SMALL_EPSILON) return false;
+  if (ABS (dot) >= EPSILON) return false;
 
   // Check if 'v' is on the same side of all edges.
   int i, i1;

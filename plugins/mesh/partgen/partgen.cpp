@@ -68,6 +68,7 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   MixMode = 0;
   vis_cb = NULL;
   mat = NULL;
+  radius.Set (0, 0, 0);
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
