@@ -1277,6 +1277,7 @@ CS_CHECK_LIB_WITH([ogg],
 	[ogg_sync_state state; ogg_sync_init(&state);])],
     [libs/libogg*], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libogg], [OGG])])
+
 AS_IF([test "$cs_cv_libogg" = yes],
     [CS_CHECK_LIB_WITH([vorbis],
 	[AC_LANG_PROGRAM([#include <vorbis/codec.h>],
@@ -1286,6 +1287,7 @@ AS_IF([test "$cs_cv_libogg" = yes],
 	[$cs_cv_libogg_cflags],
 	[$cs_cv_libogg_lflags],
 	[$cs_cv_libogg_libs])])
+
 AS_IF([test "$cs_cv_libvorbis" = yes],
     [CS_CHECK_LIB_WITH([vorbisfile],
 	[AC_LANG_PROGRAM(
@@ -1348,7 +1350,7 @@ CS_CHECK_LIB_WITH([openal],
 
 
 #-----------------------------------------------------------------------------
-# Check for freetype2.
+# Check for FreeType2.
 #-----------------------------------------------------------------------------
 AC_CHECK_FT2([2.0],
     [CS_MAKEFILE_PROPERTY([FT2.AVAILABLE], [yes])
@@ -1590,15 +1592,20 @@ AC_LANG_POP([C++])
 # Check for audio support.
 #------------------------------------------------------------------------------
 AC_CHECK_HEADER([soundcard.h],
-    [CS_HEADER_PROPERTY([CS_HAS_SOUNDCARD_H])],
+    [CS_HEADER_PROPERTY([CS_HAS_SOUNDCARD_H])
+    cs_cv_header_soundcard_h=yes],
     [AC_CHECK_HEADER([sys/soundcard.h],
 	[CS_HEADER_PROPERTY([CS_HAS_SYS_SOUNDCARD_H])
-	 cs_cv_soundcard_h="yes"],
+	cs_cv_header_soundcard_h=yes],
 	[AC_CHECK_HEADER([machine/soundcard.h],
 	      [CS_HEADER_PROPERTY([CS_HAS_MACHINE_SOUNDCARD_H])
-	       cs_cv_soundcard_h="yes"])])])
-AS_IF([test "$cs_cv_soundcard_h" = "yes"],
-	[CS_MAKEFILE_PROPERTY([OSS.AVAILABLE], [yes])],[])
+	      cs_cv_header_soundcard_h=yes],
+	      [cs_cv_header_soundcard_h=no])])])
+
+AS_IF([test $cs_cv_header_soundcard_h = yes],
+    [CS_MAKEFILE_PROPERTY([OSS.AVAILABLE], [yes])])
+
+
 
 #------------------------------------------------------------------------------
 # Check for BSD-style socket support.  Also test for presence of type
