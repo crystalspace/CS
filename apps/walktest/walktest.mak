@@ -18,10 +18,10 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: walktest walktestclean walkall
 
-walkall: walktest vfs gl3d softcanvas openglcanvas effects csfont csconin \
-  simpcon rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg csbmpimg \
-  reporter stdrep csparser frustvis bugplug sequence engseq xmlread stdpt \
-  ptanimimg
+walkall: walktest engine vfs gl3d softcanvas openglcanvas effects csfont \
+  csconin simpcon rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg \
+  csbmpimg reporter stdrep csparser frustvis bugplug sequence engseq xmlread \
+  stdpt ptanimimg
 all apps: walktest
 walktest:
 	$(MAKE_APP)

@@ -8,6 +8,7 @@ Application walktest
 LinkWith walktest : csgeom csgfx cstool csutil ;
 
 CompileGroups walktest : walkall ;
+CompileGroups engine : walkall ;
 CompileGroups vfs : walkall ;
 CompileGroups softcanvas : walkall ;
 CompileGroups openglcanvas : walkall ;
