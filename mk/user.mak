@@ -26,6 +26,7 @@ PLUGINS += video/loader/mplex
 PLUGINS += video/loader/gif
 PLUGINS += video/loader/png
 PLUGINS += video/loader/jpg
+PLUGINS += video/loader/bmp
 PLUGINS += sound/loader/mplex
 PLUGINS += sound/loader/au
 PLUGINS += sound/loader/aiff
