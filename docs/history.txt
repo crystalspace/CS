@@ -9,6 +9,9 @@ for each given day, however, are in normal (ascending) chronological order.
 	- Anders Stenberg brought the variable system for the new renderer
 	  back up and running, now using Oktal's symbol table which should
 	  make variable lookups a lot faster.
+	- Anders Stenberg added two new render steps. "target" and
+	  "fullscreenquad". (Apparantly I somehow failed to add them
+	  last time I claimed to do so.)
 29-Jul-2003
 	- Jorrit made scfStringArray actually work by adding the needed
 	  SCF_CONSTRUCT stuff.
