@@ -2644,7 +2644,7 @@ WORLD (
         FACTORY ('billboard')
         VERTICES (-1.2,.3,1.2,.3,1.2,-.3,-1.2,-.3)
         UV (0,0,1,0,1,1,0,1)
-        LIGHTING = NO
+        LIGHTING (no)
         COLORS(1,1,1, 1,1,1, 1,1,1, 1,1,1)
     	MATERIAL(billboard)
       )
@@ -2657,7 +2657,7 @@ WORLD (
         FACTORY ('billboard')
         VERTICES (-1.0,.5,1.0,.5,1.0,-.5,-1.0,-.5)
         UV (0,0,1,0,1,1,0,1)
-        LIGHTING = NO
+        LIGHTING (no)
         COLORS(1,1,1, 1,1,1, 1,1,1, 1,1,1)
     	MATERIAL(seagull)
       )
