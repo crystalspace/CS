@@ -69,7 +69,6 @@ csLightMapped::~csLightMapped ()
   CHK (delete lightmap1);
   CHK (delete lightmap2);
   CHK (delete lightmap3);
-  CHK (delete theDynLight);
 }
 
 void csLightMapped::Setup (csPolygon3D* poly3d, csTextureHandle* txtMM)
@@ -1312,8 +1311,6 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     }
 
   } /* if (ind != end) */
-
-  plane->WorldToCamera (trans, source[0]);
   return true;
 }
 

@@ -168,12 +168,18 @@ public:
    * Take a polygon and test if it would have changed the c-buffer.
    * This means that the polygon is visible. Polygon vertices are
    * converted to integer before comparing.
+   * Note that this function will work with both clockwise and anti-
+   * clockwise oriented polygons and will assume both orientations
+   * are visible. Backface culling needs to be done elsewhere.
    */
   bool TestPolygon (csVector2* verts, int num_verts);
 
   /**
    * Take a polygon and insert all spans in the c-buffer.
    * Returns true if the polygon is visible.
+   * Note that this function will work with both clockwise and anti-
+   * clockwise oriented polygons and will assume both orientations
+   * are visible. Backface culling needs to be done elsewhere.
    */
   bool InsertPolygon (csVector2* verts, int num_verts);
 

@@ -21,10 +21,14 @@
 
 #include "sysdef.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/poly2d.h"
 
 //---------------------------------------------------------------------------
 
-bool csBoxClipper::Clip (csVector2 *Polygon, csVector2* dest_poly, int Count, int &OutCount)
+csPoly2DPool csClipper::polypool (&csPoly2DFactory::factory);
+
+bool csBoxClipper::Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
+	int &OutCount)
 {
   memcpy (dest_poly, Polygon, Count * sizeof (csVector2));
   OutCount = Count;
@@ -251,24 +255,32 @@ bool csBoxClipper::Clip (csVector2 *Polygon, int& Count, int MaxCount,
 
 //---------------------------------------------------------------------------
 
-csPolygonClipper::csPolygonClipper (csVector2 *Clipper, int Count, bool mirror,
-  bool copy)
+csPolygonClipper::csPolygonClipper (csPoly2D *Clipper, bool mirror, bool copy)
 {
   int vert;
+  int Count = Clipper->GetNumVertices ();
 
-  ClipPolyIsACopy = mirror | copy;
   if (mirror)
   {
-    CHK (ClipPoly = new csVector2 [Count]);
+    ClipPoly2D = polypool.Alloc ();
+    ClipPoly2D->MakeRoom (Count);
+    ClipPoly = ClipPoly2D->GetVertices ();
     for (vert = 0; vert < Count; vert++)
-      ClipPoly [Count - 1 - vert] = Clipper [vert];
-  } else if (copy)
+      ClipPoly [Count - 1 - vert] = (*Clipper) [vert];
+  }
+  else if (copy)
   {
-    CHK (ClipPoly = new csVector2 [Count]);
+    ClipPoly2D = polypool.Alloc ();
+    ClipPoly2D->MakeRoom (Count);
+    ClipPoly = ClipPoly2D->GetVertices ();
     for (vert = 0; vert < Count; vert++)
-      ClipPoly [vert] = Clipper [vert];
-  } else
-    ClipPoly = Clipper;
+      ClipPoly [vert] = (*Clipper) [vert];
+  }
+  else
+  {
+    ClipPoly2D = NULL;
+    ClipPoly = Clipper->GetVertices ();
+  }
 
   CHK (ClipData = new SegData [ClipPolyVertices = Count]);
   // Precompute some data for each clipping edge
@@ -289,8 +301,8 @@ csPolygonClipper::~csPolygonClipper ()
 {
   if (ClipData)
     CHKB (delete [] ClipData);
-  if (ClipPolyIsACopy)
-    CHKB (delete [] ClipPoly);
+  if (ClipPoly2D)
+    polypool.Free (ClipPoly2D);
 }
 
 bool csPolygonClipper::IsInside (float x, float y)

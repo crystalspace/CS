@@ -30,9 +30,9 @@
 #include "csengine/stats.h"
 #include "csengine/dumper.h"
 #include "csengine/cbuffer.h"
-#include "csengine/pool.h"
 #include "csobject/nameobj.h"
 #include "csgeom/bsp.h"
+#include "csgeom/polypool.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 
@@ -349,8 +349,6 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     // If fog info was added then we are dealing with vertex fog and
     // the current sector has fog. This means we have to complete the
     // fog_info structure with the plane of the current polygon.
-    //@@@ Camera plane may not be valid after this point if we have a
-    // mirror transformation and a c_buffer usage (queue).
     d->fog_info->outgoing_plane = p->GetPlane ()->GetCameraPlane ();
   }
 
@@ -408,12 +406,12 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   csVector3* verts;
   int num_verts;
   int i;
-  csPolygon2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
   csPolygon2D* clip;
   
   for (i = 0 ; i < num ; i++)
   {
-    clip = render_pool->Alloc ();
+    clip = (csPolygon2D*)(render_pool->Alloc ());
     p = (csPolygon3D*)polygon[i];
     p->CamUpdate ();
     if ( !p->dont_draw &&
@@ -423,6 +421,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
 	 	d->IsMirrored ())  &&
          clip->ClipAgainst (d->view) )
     {
+      p->GetPlane ()->WorldToCamera (*d, verts[0]);
       DrawOnePolygon (p, clip, d, use_z_buf);
     }
     render_pool->Free (clip);
@@ -439,12 +438,12 @@ void csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   int i;
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   bool visible;
-  csPolygon2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
   csPolygon2D* clip;
   
   for (i = 0 ; i < num ; i++)
   {
-    clip = render_pool->Alloc ();
+    clip = (csPolygon2D*)(render_pool->Alloc ());
     visible = false;
     p = (csPolygon3D*)polygon[i];
     if ( !p->dont_draw &&

@@ -25,6 +25,7 @@
 #include "csengine/dynlight.h"
 #include "csengine/polyplan.h"
 #include "csengine/polygon.h"
+#include "csengine/pol2d.h"
 #include "csengine/polytext.h"
 #include "csengine/thingtpl.h"
 #include "csengine/thing.h"
@@ -68,7 +69,7 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
   piHR = NULL;
   textures = NULL;
   c_buffer = NULL;
-  CHK (render_pol2d_pool = new csPolygon2DPool ());
+  CHK (render_pol2d_pool = new csPoly2DPool (&csPolygon2DFactory::factory));
   CHK (cfg_engine = new csEngineConfig ());
   BuildSqrtTable ();
 }
@@ -104,7 +105,7 @@ void csWorld::Clear ()
   CHK (textures = new csTextureList ());
   CHK (delete c_buffer); c_buffer = NULL;
   CHK (delete render_pol2d_pool);
-  CHK (render_pol2d_pool = new csPolygon2DPool ());
+  CHK (render_pol2d_pool = new csPoly2DPool (&csPolygon2DFactory::factory));
 }
 
 void csWorld::EnableLightingCache (bool en)

@@ -87,10 +87,8 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
   bool vis = false;
   csCBufferSpan* s = first_span;
   csCBufferSpan* ps = NULL;	// 'ps' holds the previous span.
-//printf ("  test span %d-%d\n", startx, endx);
   while (s)
   {
-//printf ("    test against span %d-%d\n", s->startx, s->endx);
     // If the start of the empty span is after then end of the full span
     // then we can stop scanning.
     if (s->startx > endx) break;
@@ -107,10 +105,10 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       // So the full span is visible.
       vis = true;
 
-      // If empty span is fully enclosed in full span then we have to remove empty span.
+      // If empty span is fully enclosed in full span then we have to remove
+      // empty span.
       if (s->startx >= startx && s->endx <= endx)
       {
-//printf ("    remove empty span\n");
 	csCBufferSpan* sn = s->next;
         if (ps) ps->next = sn;
 	else first_span = sn;
@@ -123,7 +121,6 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       // have to shrink the empty span.
       else if (s->startx < startx && s->endx <= endx)
       {
-//printf ("    shrink empty span 1\n");
         s->endx = startx-1;
       }
 
@@ -131,7 +128,6 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       // to shrink the empty span.
       else if (s->endx > endx && s->startx >= startx)
       {
-//printf ("    shrink empty span 2\n");
 	s->startx = endx+1;
       }
 
@@ -139,7 +135,6 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       // have to split the empty span.
       else
       {
-//printf ("    split empty\n");
         csCBufferSpan* new_span = parent->AllocSpan ();
 	new_span->next = s->next;
 	s->next = new_span;
@@ -252,10 +247,10 @@ bool csCBuffer::TestPolygon (csVector2* verts, int num_verts)
 
   int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
   float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
-  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
+  int sy, fyL, fyR;                     // scanline Y, final Y left and right
   int xL, xR;
 
-  sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
+  sxL = sxR = dxL = dxR = 0;
   scanL2 = scanR2 = max_i;
   sy = fyL = fyR = QRound (verts [scanL2].y);
 
@@ -319,6 +314,13 @@ bool csCBuffer::TestPolygon (csVector2* verts, int num_verts)
       fin_y = fyL;
     else
       fin_y = fyR;
+
+    // Make sure we work correctly for both orientations of the polygon.
+    if (sxL > sxR)
+    {
+      float xs = sxR; sxR = sxL; sxL = xs;
+      float dxs = dxR; dxR = dxL; dxL = dxs;
+    }
 
     while (sy > fin_y)
     {
@@ -374,10 +376,10 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts)
 
   int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
   float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
-  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
+  int sy, fyL, fyR;                     // scanline Y, final Y left and right
   int xL, xR;
 
-  sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
+  sxL = sxR = dxL = dxR = 0;
   scanL2 = scanR2 = max_i;
   sy = fyL = fyR = QRound (verts [scanL2].y);
 
@@ -441,6 +443,13 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts)
       fin_y = fyL;
     else
       fin_y = fyR;
+
+    // Make sure we work correctly for both orientations of the polygon.
+    if (sxL > sxR)
+    {
+      float xs = sxR; sxR = sxL; sxL = xs;
+      float dxs = dxR; dxR = dxL; dxL = dxs;
+    }
 
     while (sy > fin_y)
     {

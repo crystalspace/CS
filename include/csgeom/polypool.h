@@ -16,12 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POOL_H
-#define POOL_H
+#ifndef POLYPOOL_H
+#define POLYPOOL_H
 
-#include "cscom/com.h"
-#include "csengine/pol2d.h"
-#include "csengine/sysitf.h"
+#include "csgeom/poly2d.h"
 
 /**
  * This is an object pool which holds objects of type
@@ -29,23 +27,29 @@
  * If needed it will allocate one for you but ideally it can
  * give you one which was allocated earlier.
  */
-class csPolygon2DPool
+class csPoly2DPool
 {
 private:
   struct PoolObj
   {
     PoolObj* next;
-    csPolygon2D* pol2d;
+    csPoly2D* pol2d;
   };
+  /// List of allocated polygons.
   PoolObj* alloced;
+  /// List of previously allocated, but now unused polygons.
   PoolObj* freed;
+
+  // Factory for creating new polygons.
+  csPoly2DFactory* factory;
 
 public:
   /// Create an empty pool.
-  csPolygon2DPool () : alloced (NULL), freed (NULL) { }
+  csPoly2DPool (csPoly2DFactory* fact) : alloced (NULL), freed (NULL),
+  	factory (fact) { }
 
   /// Destroy pool and all objects in the pool.
-  ~csPolygon2DPool ()
+  ~csPoly2DPool ()
   {
     while (alloced)
     {
@@ -64,7 +68,7 @@ public:
   }
 
   /// Allocate a new object in the pool.
-  csPolygon2D* Alloc ()
+  csPoly2D* Alloc ()
   {
     PoolObj* pnew;
     if (freed)
@@ -75,7 +79,7 @@ public:
     else
     {
       CHK (pnew = new PoolObj ());
-      CHK (pnew->pol2d = new csPolygon2D ());
+      pnew->pol2d = factory->Create ();
     }
     pnew->next = alloced;
     alloced = pnew;
@@ -87,7 +91,7 @@ public:
    * Note that it is only legal to free objects which were allocated
    * from the pool.
    */
-  void Free (csPolygon2D* pol)
+  void Free (csPoly2D* pol)
   {
     if (alloced)
     {
@@ -99,10 +103,10 @@ public:
     }
     else
     {
-      CsPrintf (MSG_INTERNAL_ERROR, "Object was not allocated from csPolygon2D pool!\n");
+      // Cannot happen!
     }
   }
 };
 
 
-#endif /*POOL_H*/
+#endif /*POLYPOOL_H*/

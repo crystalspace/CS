@@ -1011,11 +1011,10 @@ public:
    * be visible and it will return false.
    * 'do_perspective' will also do back-face culling and returns false
    * if the polygon is not visible because of this.
-   * If the polygon is deemed to be visible it will first transform
-   * the plane from world to camera space and return true.
+   * If the polygon is deemed to be visible it will return true.
    */
-  bool DoPerspective (const csTransform& trans,
-  	csVector3* source, int num_verts, csPolygon2D* dest, csVector2* orig_triangle,
+  bool DoPerspective (const csTransform& trans, csVector3* source,
+  	int num_verts, csPolygon2D* dest, csVector2* orig_triangle,
 	bool mirror);
 
   /**
@@ -1033,7 +1032,8 @@ public:
    * mimic the behaviour of the parent polygon as good as possible.
    * This function is mainly used by the BSP splitter.
    */
-  void SplitWithPlane (csPolygonInt** front, csPolygonInt** back, csPlane& plane);
+  void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
+  	csPlane& plane);
 
   /**
    * Return true if this polygon and the given polygon are on the same

@@ -23,6 +23,7 @@
 #define __POLYCLIP_H__
 
 #include "csgeom/math2d.h"
+#include "csgeom/polypool.h"
 
 class Dumper;
 
@@ -31,13 +32,18 @@ class Dumper;
  */
 class csClipper
 {
+protected:
+  /// This variable holds a pool for 2D polygons as used by the clipper.
+  static csPoly2DPool polypool;
+
 public:
   /**
    * Clip a set of 2D points and return in 'dest_poly'.
    * 'dest_poly' must be big enough to hold the clipped polygon.
    * Return false if polygon is not visible (clipped away).
    */
-  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count, int &OutCount) = 0;
+  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
+  	int &OutCount) = 0;
 
   /**
    * Clip a set of 2D points and return them in the same array.
@@ -73,7 +79,8 @@ public:
   csBoxClipper(float x1, float y1, float x2, float y2) : region(x1,y1,x2,y2) {}
 
   /// Clip a to dest_poly.
-  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count, int &OutCount);
+  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
+  	int &OutCount);
 
   /**
    * Clip a set of 2D points and return them in the same array.
@@ -127,22 +134,23 @@ class csPolygonClipper : public csClipper
   SegData *ClipData;
   /// Clipper polygon itself
   csVector2 *ClipPoly;
+  /// A pointer to the pooled polygon (so that we can free it later).
+  csPoly2D* ClipPoly2D;
   /// Number of vertices in clipper polygon
   int ClipPolyVertices;
-  /// true if ClipPoly is a copy of clipper (and thus should be freed)
-  bool ClipPolyIsACopy;
   /// Clipping polygon bounding box
   csBox ClipBox;
 
 public:
   /// Create a polygon clipper object from a set of 2D vectors.
-  csPolygonClipper (csVector2 *Clipper, int VertexCount, bool mirror = false,
+  csPolygonClipper (csPoly2D *Clipper, bool mirror = false,
     bool copy = false);
   /// Destroy the polygon clipper object.
   virtual ~csPolygonClipper ();
 
   /// Clip to dest_poly.
-  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count, int &OutCount);
+  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
+  	int &OutCount);
 
   /**
    * Clip a set of 2D points and return them in the same array.

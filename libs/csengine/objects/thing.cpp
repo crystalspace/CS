@@ -376,7 +376,7 @@ void csThing::DrawFoggy (csRenderView& d)
   csVector3* verts;
   int num_verts;
   int i;
-  csPolygon2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
   csPolygon2D* clip;
 
   // @@@ Wouldn't it be nice if we checked all vertices against the Z plane?
@@ -390,15 +390,16 @@ void csThing::DrawFoggy (csRenderView& d)
     {
       p = (csPolygon3D*)polygons[i];
       if (p->dont_draw) continue;
-      clip = render_pool->Alloc ();
+      clip = (csPolygon2D*)(render_pool->Alloc ());
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
 
-      if (!front
-       && p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
-             verts, num_verts, false)
-       && p->DoPerspective (d, verts, num_verts, clip, orig_triangle, d.IsMirrored ())
-       && clip->ClipAgainst (d.view))
+      if (!front &&
+        p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
+              verts, num_verts, false) &&
+        p->DoPerspective (d, verts, num_verts, clip, orig_triangle, d.IsMirrored ()) &&
+        clip->ClipAgainst (d.view))
       {
+        p->GetPlane ()->WorldToCamera (d, verts[0]);
 	if (d.callback)
 	{
           d.callback (&d, CALLBACK_POLYGON, (void*)p);
@@ -408,7 +409,8 @@ void csThing::DrawFoggy (csRenderView& d)
         Stats::polygons_drawn++;
 
 	if (!d.callback)
-          clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (), CS_FOG_BACK);
+          clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (),
+	  	CS_FOG_BACK);
       }
       render_pool->Free (clip);
     }
@@ -417,15 +419,16 @@ void csThing::DrawFoggy (csRenderView& d)
     {
       p = (csPolygon3D*)polygons[i];
       if (p->dont_draw) continue;
-      clip = render_pool->Alloc ();
+      clip = (csPolygon2D*)(render_pool->Alloc ());
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
 
-      if (front
-       && p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
-          verts, num_verts, true)
-       && p->DoPerspective (d, verts, num_verts, clip, orig_triangle, d.IsMirrored ())
-       && clip->ClipAgainst (d.view))
+      if (front &&
+        p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
+            verts, num_verts, true) &&
+        p->DoPerspective (d, verts, num_verts, clip, orig_triangle, d.IsMirrored ()) &&
+        clip->ClipAgainst (d.view))
       {
+        p->GetPlane ()->WorldToCamera (d, verts[0]);
 	if (d.callback)
 	{
           d.callback (&d, CALLBACK_POLYGON, (void*)p);
@@ -435,7 +438,8 @@ void csThing::DrawFoggy (csRenderView& d)
         Stats::polygons_drawn++;
 
         if (!d.callback)
-	  clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (), CS_FOG_FRONT);
+	  clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (),
+	  	CS_FOG_FRONT);
       }
       render_pool->Free (clip);
     }

@@ -97,8 +97,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   if (!new_clipper->GetNumVertices ())
     return false;
 
-  csPolygonClipper new_view (new_clipper->GetVertices (),
-    new_clipper->GetNumVertices (), rview.IsMirrored (), true);
+  csPolygonClipper new_view (new_clipper, rview.IsMirrored (), true);
 
   csRenderView new_rview = rview;
   new_rview.view = &new_view;

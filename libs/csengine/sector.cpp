@@ -305,10 +305,11 @@ void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
 {
   csPolygon3D* poly3d;
   csPolygon2D* poly2d;
-  csPolygon2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
   while (queue->Pop (&poly3d, &poly2d))
   {
     poly3d->CamUpdate ();
+    poly3d->GetPlane ()->WorldToCamera (*rview, poly3d->Vcam (0));
     DrawOnePolygon (poly3d, poly2d, rview, false);
     render_pool->Free (poly2d);
   }

@@ -65,7 +65,7 @@ void csView::Draw ()
 {
   if (!clipper)
     if (view)
-      CHKB (clipper = new csPolygonClipper (view->GetVertices (), view->GetNumVertices ()))
+      CHKB (clipper = new csPolygonClipper (view))
     else
       CHKB (clipper = new csBoxClipper (bview));
 

@@ -31,6 +31,7 @@
 #include "csengine/polytext.h"
 #include "csengine/polyset.h"
 #include "csengine/triangle.h"
+#include "csengine/thing.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/cssprite.h"
@@ -168,6 +169,12 @@ void Dumper::dump (csSector* s)
   {
     csSprite3D* sp3d = (csSprite3D*)s->sprites[i];
     dump (sp3d);
+  }
+  csThing* th = s->first_thing;
+  while (th)
+  {
+    dump ((csPolygonSet*)th);
+    th = (csThing*)(th->next);
   }
 }
 
