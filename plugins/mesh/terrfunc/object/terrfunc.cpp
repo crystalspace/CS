@@ -111,6 +111,8 @@ void csTerrBlock::PrepareFrame(const csVector3& campos)
   /// compute LOD
   quaddiv->ComputeLOD(framenum, campos, bbox.MinX(), bbox.MinZ(), bbox.MaxX(),
     bbox.MaxZ());
+  //printf("campos %g,%g,%g\n", campos.x, campos.y, campos.z);
+  //printf("estimated triangles: %d\n", quaddiv->EstimateTris(framenum));
 }
 
 /// data to pass for drawing
@@ -1697,6 +1699,7 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	  SetupVertexBuffer (block.vbuf[0], block.vbuf[0]);
 	  block.Draw(rview, clip_portal, clip_plane, clip_z_plane,
 	    correct_du, correct_su, correct_dv, correct_sv, this);
+	  break; //// only one block
 	  continue;
 	}
         csVector3& bc = block.center;

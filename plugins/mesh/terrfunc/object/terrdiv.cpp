@@ -111,6 +111,7 @@ csTerrainQuadDiv* csTerrainQuadDiv::GetNeighbor(int dir)
   if(!parent) return NULL;
 
   /// perhaps neighbor is sibling?
+  /// Note that this is prestored and should (and is) never actually used.
   int pchild = -1;
   if((dir==CS_QUAD_TOP) && (parentplace==CS_QUAD_BOTLEFT))
     pchild = CS_QUAD_TOPLEFT;
@@ -169,24 +170,25 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
   float midx = (minx+maxx)*0.5f;
   float midy = (miny+maxy)*0.5f;
   float h;
+  float cornerh[4];
+  cornerh[0] = height_func->GetHeight(minx, miny);
+  cornerh[1] = height_func->GetHeight(minx, maxy);
+  cornerh[2] = height_func->GetHeight(maxx, maxy);
+  cornerh[3] = height_func->GetHeight(maxx, miny);
   /// first establish min/max height
   if(IsLeaf())
   {
     min_height = height_func->GetHeight (midx, midy);
     max_height = min_height;
-    h = height_func->GetHeight (minx, miny);
-    if(h>max_height) max_height=h; if(h<min_height) min_height=h;
-    h = height_func->GetHeight (minx, maxy);
-    float h_bl = h; /// keep 
-    if(h>max_height) max_height=h; if(h<min_height) min_height=h;
-    h = height_func->GetHeight (maxx, miny);
-    float h_tr = h; /// keep 
-    if(h>max_height) max_height=h; if(h<min_height) min_height=h;
-    h = height_func->GetHeight (maxx, maxy);
-    if(h>max_height) max_height=h; if(h<min_height) min_height=h;
+    for(i=0; i<4; i++)
+    {
+      h = cornerh[i];
+      if(h>max_height) max_height=h; 
+      if(h<min_height) min_height=h;
+    }
 
-    /// compute dmax , also for leaves to get more accurate dmax up
-    float h_pol = (h_tr+h_bl)*0.5; // interpolated
+    /// compute dmax 
+    float h_pol = (cornerh[1] + cornerh[3])*0.5; // interpolated
     h = height_func->GetHeight (midx, midy);
     dmax = ABS(h_pol - h);
   }
@@ -212,9 +214,7 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
     /// compute dmax
     /// test middle vertice
     h = height_func->GetHeight(midx, midy);
-    float height_tr = height_func->GetHeight(maxx, miny);
-    float height_bl = height_func->GetHeight(minx, maxy);
-    float interpol_h = (height_tr+height_bl)*0.5;
+    float interpol_h = (cornerh[1]+cornerh[3])*0.5;
     dmax = ABS(interpol_h - h);
     /// make sure dmax >= MAX(children dmax);
     for(i=0; i<4; i++)
@@ -223,6 +223,23 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
         dmax = children[i]->GetDmax();
     }
   }
+  CS_ASSERT(max_height >= min_height);
+
+  /// compute dmax more precise - based on edge lines
+  h = height_func->GetHeight(midx, miny);
+  h -= (cornerh[3] + cornerh[0])*0.5;
+  h = ABS(h); if(h > dmax) dmax = h;
+  h = height_func->GetHeight(midx, maxy);
+  h -= (cornerh[1] + cornerh[2])*0.5;
+  h = ABS(h); if(h > dmax) dmax = h;
+  h = height_func->GetHeight(minx, midy);
+  h -= (cornerh[0] + cornerh[1])*0.5;
+  h = ABS(h); if(h > dmax) dmax = h;
+  h = height_func->GetHeight(maxx, midy);
+  h -= (cornerh[2] + cornerh[3])*0.5;
+  h = ABS(h); if(h > dmax) dmax = h;
+
+  //printf("size %g dmax is %g.\n", maxx-minx, dmax);
 }
 
 void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
@@ -233,35 +250,43 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
 
   /// compute visible error
   /// which is heightchange / distance * cameraslant
-  float e = dmax;
-  /// if camera in quad: dist = 0;
+  float e = dmax; 
+  /// if camera in quad: dist = 1; (see full length)
   float dist = 1.;
   if( (campos.x < minx) || (campos.x > maxx) || (campos.z < miny)
     || (campos.z > maxy))
-    dist = 1. / (1.+ (campos.x-midx)*(campos.x-midx) + 
-      (campos.z-midy)*(campos.z-midy) );
+  {
+    float distx = 0;
+    float disty = 0;
+    if(campos.x < minx) distx = minx-campos.x;
+    if(campos.x > maxx) distx = campos.x-maxx;
+    if(campos.z < miny) disty = miny-campos.z;
+    if(campos.z > maxy) disty = campos.z-maxy;
+    distx*=01.;
+    disty*=01.;
+    dist = 1. / qsqrt(1.0 + distx*distx + disty*disty);
+  }
   e *= dist;
   /// if camera in quad, camslant = 1 (full length is visible)
   float camslant = 1.0;
-  if(campos.y > max_height) camslant = 1.0 / (1.+ campos.y - max_height);
-  if(campos.y < min_height) camslant = 1.0 / (1.+ min_height - campos.y);
+  if(campos.y > max_height) camslant = 1.0 / (1.+ 01.*(campos.y - max_height));
+  if(campos.y < min_height) camslant = 1.0 / (1.+ 01.*(min_height - campos.y));
   e *= camslant;
 
   /// can this quad be displayed?
   bool OK = true;
-  float maxerror = 1./500.;
+  float maxerror = 0.010;
   if(e > maxerror) OK = false;
-  
+
   if(OK) return; // no need to divide
 
   /// debug prints
-  if(1)
+  if(0)
   {
-    float sizex = maxx-minx;
-    float sizey = maxy-miny;
-    printf("LOD %gx%g dmax is %f, error is %f.\n", 
-      sizex, sizey, dmax, e);
+    printf("LOD %g dmax is %g, dist %g, cam %g, error is %f.\n", 
+      maxx-minx, dmax, dist, camslant, e);
   }
+  
   if(!IsLeaf())
   {
     /// subdivide this quad
@@ -277,6 +302,20 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
     return;
   }
   // do nothing (yet)
+}
+
+int csTerrainQuadDiv::EstimateTris(int framenum)
+{
+  if(IsLeaf()) return 2;
+  if(subdivided == framenum)
+  {
+    return children[0]->EstimateTris(framenum) + 
+      children[1]->EstimateTris(framenum)
+      + children[2]->EstimateTris(framenum) +
+      children[3]->EstimateTris(framenum);
+  }
+  if(!HaveMoreDetailedNeighbor(framenum)) return 2;
+  return 4;
 }
 
 void csTerrainQuadDiv::Triangulate(void (*cb)(void *, const csVector3&, 
@@ -299,13 +338,114 @@ void csTerrainQuadDiv::Triangulate(void (*cb)(void *, const csVector3&,
       midx, midy, maxx, maxy);
     return;
   }
-  /// debug, create a polygon at medio height
-  /// float h = (min_height + max_height)*0.5;
+
+  /// can it suffice to just create two polys?
+  /// this is possible if this node is the same or more detailed
+  /// than its neighbors. (the neighbors will accomodate for this node)
   float h=0.0;
-  cb(userdata, 
-    csVector3(minx,h,miny), csVector3(minx,h,maxy), csVector3(maxx,h,miny));
-  cb(userdata, 
-   csVector3(maxx,h,miny), csVector3(minx,h,maxy), csVector3(maxx,h,maxy));
+  if(!HaveMoreDetailedNeighbor(framenum))
+  {
+    /// debug, create a polygon at medio height
+    /// float h = (min_height + max_height)*0.5;
+    cb(userdata, 
+      csVector3(minx,h,miny), csVector3(minx,h,maxy), csVector3(maxx,h,miny));
+    cb(userdata, 
+     csVector3(maxx,h,miny), csVector3(minx,h,maxy), csVector3(maxx,h,maxy));
+    return;
+  }
+
+  /// accomodate the more detailed neighbors
+  /// by drawing starshaped triangles fitting all vertices at edges
+  csVector3 center(midx,h,midy);
+  csVector3 nextv;
+  csVector3 oldv;
+
+  oldv.Set(minx, h, miny);
+  csTerrainQuadDiv *neigh = GetNeighbor(CS_QUAD_TOP);
+  nextv.Set(maxx,h,miny);
+  if(neigh) neigh->TriEdge(CS_QUAD_TOP, cb, userdata, framenum, center, oldv, 
+    nextv, minx, miny, maxx, maxy);
+  else { cb(userdata, center, nextv, oldv); oldv = nextv; }
+
+  nextv.Set(maxx,h,maxy);
+  neigh = GetNeighbor(CS_QUAD_RIGHT);
+  if(neigh) neigh->TriEdge(CS_QUAD_RIGHT, cb, userdata, framenum, center, oldv,
+    nextv, minx, miny, maxx, maxy);
+  else { cb(userdata, center, nextv, oldv); oldv = nextv; }
+
+  nextv.Set(minx,h,maxy);
+  neigh = GetNeighbor(CS_QUAD_BOT);
+  if(neigh) neigh->TriEdge(CS_QUAD_BOT, cb, userdata, framenum, center, oldv,
+    nextv, minx, miny, maxx, maxy);
+  else { cb(userdata, center, nextv, oldv); oldv = nextv; }
+
+  nextv.Set(minx,h,miny);
+  neigh = GetNeighbor(CS_QUAD_LEFT);
+  if(neigh) neigh->TriEdge(CS_QUAD_LEFT, cb, userdata, framenum, center, oldv,
+    nextv, minx, miny, maxx, maxy);
+  else { cb(userdata, center, nextv, oldv); oldv = nextv; }
+
 }
 
 
+bool csTerrainQuadDiv::HaveMoreDetailedNeighbor(int framenum)
+{
+  csTerrainQuadDiv *neigh = 0;
+  int dir;
+
+  CS_ASSERT(subdivided != framenum);
+
+  /// look in each direction
+  for(dir=0; dir<4; dir++)
+  {
+    neigh = GetNeighbor(dir);
+    if(!neigh) continue; // no neighbor - its not more detailed
+    /// is neigh more detailed?
+    if(neigh->subdivided == framenum)
+    {
+      /// more detailed than me
+      return true;
+    }
+  }
+  return false;
+}
+
+
+void csTerrainQuadDiv::TriEdge(int dir, void (*cb)(void *, 
+  const csVector3&, const csVector3&, const csVector3&), 
+  void *userdata, int framenum,
+  const csVector3& center, csVector3& oldv, const csVector3& nextv,
+  float minx, float miny, float maxx, float maxy)
+{
+  /// NOTE dir is from the caller (points from 'center' towards me)
+  if(subdivided != framenum) 
+  {
+    /// draw singly
+    cb(userdata, center, nextv, oldv);
+    oldv = nextv;
+    return;
+  }
+
+  /// node is divided.
+  CS_ASSERT(!IsLeaf());
+  csVector3 midpt = (oldv + nextv)*0.5f; // midpt along edge
+  int ch = -1;
+  if(dir == CS_QUAD_TOP) ch=CS_QUAD_BOTLEFT;
+  if(dir == CS_QUAD_RIGHT) ch=CS_QUAD_TOPLEFT;
+  if(dir == CS_QUAD_BOT) ch=CS_QUAD_TOPRIGHT;
+  if(dir == CS_QUAD_LEFT) ch=CS_QUAD_BOTRIGHT;
+  CS_ASSERT(ch!=-1);
+  children[ch]->TriEdge(dir, cb, userdata, framenum, center, oldv,
+    midpt, minx, miny, maxx, maxy);
+
+  CS_ASSERT( oldv == midpt );
+
+  ch=-1;
+  if(dir == CS_QUAD_TOP) ch=CS_QUAD_BOTRIGHT;
+  if(dir == CS_QUAD_RIGHT) ch=CS_QUAD_BOTLEFT;
+  if(dir == CS_QUAD_BOT) ch=CS_QUAD_TOPLEFT;
+  if(dir == CS_QUAD_LEFT) ch=CS_QUAD_TOPRIGHT;
+  CS_ASSERT(ch!=-1);
+  children[ch]->TriEdge(dir, cb, userdata, framenum, center, oldv,
+    nextv, minx, miny, maxx, maxy);
+}

@@ -93,6 +93,9 @@ public:
   void ComputeLOD(int framenum, const csVector3& campos,
     float minx, float miny, float maxx, float maxy);
 
+  /// estimate nr of triangles needed (rough estimate, will be higher)
+  int EstimateTris(int framenum);
+
   /** Triangulate this piece of terrain.
    *  Calls back with triangles, cb(userdata, t1, t2, t3).
    *  Pass frame number (number unique to frame so that all nodes
@@ -100,6 +103,24 @@ public:
    */
   void Triangulate(void (*cb)(void *, const csVector3&, const csVector3&,
     const csVector3&), void *userdata, int framenum,
+    float minx, float miny, float maxx, float maxy);
+
+  /**
+   * returns true if this node has a neighbor whose LOD > this LOD.
+   * false means all neighbors have less or equal detail.
+   * pass framenum so it can assess subdivide of neighbors.
+   */
+  bool HaveMoreDetailedNeighbor(int framenum);
+
+  /**
+   *  triangulate along an edge, edge in direction given.
+   *  center is not modified, oldv is the prev vertice to in the triangle fan.
+   *  nextv is the last vertice on the edge.
+   *  Note: call this on your neighbor
+   */
+  void TriEdge(int dir, void (*cb)(void *, const csVector3&, const csVector3&,
+    const csVector3&), void *userdata, int framenum, 
+    const csVector3& center, csVector3& oldv, const csVector3& nextv,
     float minx, float miny, float maxx, float maxy);
 
 };
