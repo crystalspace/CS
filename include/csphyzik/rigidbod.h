@@ -52,8 +52,14 @@ public:
 	// NOTE: m must be given first
 	void calc_simple_I_tensor( real width, real height, real depth );
 
-	ctMatrix3 &get_I(){ return I; }
+	const ctMatrix3 &get_I(){ return I; }
 
+  virtual ctMatrix3 get_impulse_I_inv(){ 
+    const ctMatrix3 &R = RF.get_R();
+    ctMatrix3 I_inv_world = R * I_inv * (R.get_transpose()); 
+    return I_inv_world;
+  }
+    
 	// ODE interface
 	virtual int get_state_size(){ return RBSTATESIZE; }
 	virtual int set_state( real *state_array ); 
@@ -62,6 +68,11 @@ public:
 	virtual void set_angular_v( const ctVector3 &pw );
   virtual void set_v( const ctVector3 &pv );
 	virtual void set_m( real pm );
+  
+  // collision response
+  virtual void resolve_collision( ctCollidingContact &cont );
+  virtual void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector );
+
 
 protected:
 	ctVector3 P;	// momentum

@@ -27,9 +27,12 @@
 #include "csphyzik/refframe.h"
 //#include <iostream>
 
+#define DEFAULT_ENTITY_MASS 10.0
+
 #define PHYSICALENTITY_STATESIZE 12  // Rmatrix, x
 
 class ctSolver;
+class ctCollidingContact;
 
 // parent class of all physical bodies ( or even some non-physical ones... )
 class ctPhysicalEntity
@@ -69,7 +72,7 @@ public:
 	// add change in state vector over time to state buffer parameter.
 	virtual int set_delta_state( real *state_array ); 
 
-	// change orientation
+	// change orientation in radians
 	virtual void rotate_around_line( ctVector3 &paxis, real ptheta );
 	ctVector3 get_v(){ return v; }
   // virtual because v is calculated from P ( momentum ) in rigid bodies
@@ -91,6 +94,12 @@ public:
 	virtual void apply_given_F( ctForce &frc );
 	void print_force(){/*cout << "F: " << F*F << "\n";*/ }
 
+  // collision routines
+  virtual void resolve_collision( ctCollidingContact &cont );
+  // can use this to impart and impulse to this object.
+  virtual void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector );
+  virtual real get_impulse_m(){ return DEFAULT_ENTITY_MASS; }
+  virtual ctMatrix3 get_impulse_I_inv(){ return ctMatrix3( 1.0/get_impulse_m() ); }
 //	bool uses_ODE(){ return use_ODE; }
 
 	const ctMatrix3 &get_R(){ return RF.get_R(); }
@@ -146,6 +155,8 @@ public:
 
 	virtual void set_m( real pm );
 	real get_m(){ return m; }
+  virtual real get_impulse_m(){ return m; }
+
 protected:
 
 	real m;			// mass
