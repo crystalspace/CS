@@ -11,4 +11,3 @@ SubInclude TOP apps tools tbconv ;
 SubInclude TOP apps tools uninst ;
 SubInclude TOP apps tools viewmesh ;
 SubInclude TOP apps tools vsh ;
-SubInclude TOP apps tools zedit ;
