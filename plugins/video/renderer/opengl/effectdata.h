@@ -21,6 +21,7 @@
 #define __EFFECTDATA_H__
 
 #include "csutil/scf.h"
+#include "csutil/csvector.h"
 
 ///OpenGL specific effectdata stored per layer
 SCF_VERSION(csOpenGlEffectLayerData, 0, 0, 1);
@@ -90,6 +91,22 @@ SCF_VERSION(csOpenGlEffectPassData, 0, 0, 1);
 #define ED_VC_SOURCE_FOG 1
 #define ED_VC_SOURCE_MESH 2
 
+#ifndef CS_EFVARIABLETYPE_UNDEFINED
+#define CS_EFVARIABLETYPE_UNDEFINED 0
+#define CS_EFVARIABLETYPE_FLOAT 1
+#define CS_EFVARIABLETYPE_VECTOR4 2
+#endif
+
+struct csOpenGlVPConstant
+{
+public:
+  int constantNumber;
+  int variableID;
+  char efvariableType;
+  csOpenGlVPConstant(int num, int id,char type)
+    {constantNumber = num; variableID = id; efvariableType = type;}
+};
+
 class csOpenGlEffectPassData : public iBase
 {
 public:
@@ -110,6 +127,9 @@ public:
   //id of initiated vertex program
   GLuint vertex_program;
 
+  //vertex program constants
+  csBasicVector vertex_constants;
+
   SCF_DECLARE_IBASE;
 
   csOpenGlEffectPassData()
@@ -125,6 +145,15 @@ public:
     vcsource = ED_VC_SOURCE_MESH;
 
     vertex_program = 0;
+  }
+
+  ~csOpenGlEffectPassData()
+  {
+    csOpenGlVPConstant* v;
+    while( (v = (csOpenGlVPConstant* )vertex_constants.Pop()) != NULL)
+    {
+      delete v;
+    }
   }
 };
 

@@ -352,37 +352,45 @@ bool Simple::Initialize ()
 	//effectserver test
 	
 
-	iMaterialWrapper *MatWrapper=engine->GetMaterialList()->FindByName("ms");
+  iMaterialWrapper *MatWrapper=engine->GetMaterialList()->FindByName("ms");
   iMaterial *Mat=MatWrapper->GetMaterial();
 	
   effect=efserver->CreateEffect();
   technique=effect->CreateTechnique();
   pass1=technique->CreatePass();
 
-	//load our vertex-shader
-//	csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
-	csRef<iDataBuffer> id = vfs->ReadFile("/effect/ms.nvv");
+  //Create and set our variables
+  int vn;
+  vn = effect->GetVariableID(efserver->RequestString("color"));
+  effect->SetVariableVector4(vn, csEffectVector4(1.0f,0.0f,0.0f) );
 
-	if( !id.IsValid())
-	{
-		csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.application", "Couldn't load vertex-program");
-		return false;
-	}
+  vn = effect->GetVariableID(efserver->RequestString("multiple"));
+  effect->SetVariableFloat(vn, 0.4f  );
 
-	char *vdata;
-	vdata = (char*)(id->GetData());
+  //load our vertex-shader
+  //	csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+  csRef<iDataBuffer> id = vfs->ReadFile("/effect/ms.nvv");
 
-	pass1->SetStateString( efserver->RequestString("nvvertex program gl"), efserver->RequestString(vdata) );
+  if( !id.IsValid())
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.application", "Couldn't load vertex-program");
+    return false;
+  }
 
-	pass1->SetStateVector4( efserver->RequestString("nvvertex program constant 2"), csEffectVector4(0.4f));
-	pass1->SetStateVector4( efserver->RequestString("nvvertex program constant 1"), csEffectVector4(1.0f, 0.0f, 0.0f));
+  char *vdata;
+  vdata = (char*)(id->GetData());
 
-	layer1=pass1->CreateLayer();
-  
+  pass1->SetStateString( efserver->RequestString("nvvertex program gl"), efserver->RequestString(vdata) );
+  pass1->SetStateString( efserver->RequestString("vertex program constant 4"), efserver->RequestString("color") );
+  pass1->SetStateString( efserver->RequestString("vertex program constant 5"), efserver->RequestString("multiple") );
 
-	layer1->SetStateFloat( efserver->RequestString("texture source"), 1);
-	layer1->SetStateFloat( efserver->RequestString("texture coordinate source"), 1);
-	//layer1->SetStateString( efserver->RequestString("color source 1") , efserver->RequestString("texture color"));
+
+  layer1=pass1->CreateLayer();
+
+
+  layer1->SetStateFloat( efserver->RequestString("texture source"), 1);
+  layer1->SetStateFloat( efserver->RequestString("texture coordinate source"), 1);
+  //layer1->SetStateString( efserver->RequestString("color source 1") , efserver->RequestString("texture color"));
   layer1->SetStateString( efserver->RequestString("color source 1") , efserver->RequestString("vertex color"));
   layer1->SetStateString( efserver->RequestString("color operation") , efserver->RequestString("use source 1"));
 

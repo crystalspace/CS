@@ -915,13 +915,13 @@ public:
   void DrawPolygonZFill (G3DPolygonDP &poly);
 
   /// Validate a technique
-  bool Validate (iEffectTechnique* technique);
+  bool Validate( iEffectDefinition* effect, iEffectTechnique* technique );
 
   struct eiEffectClient : public iEffectClient
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);
-    virtual bool Validate (iEffectTechnique* technique)
-    { return scfParent->Validate (technique); }
+    virtual bool Validate( iEffectDefinition* effect, iEffectTechnique* technique )
+    { return scfParent->Validate (effect, technique); }
   } scfiEffectClient;
   struct eiComponent : public iComponent
   {
