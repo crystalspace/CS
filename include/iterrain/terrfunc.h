@@ -37,7 +37,7 @@ typedef float (csTerrainHeightFunction)(void* data, float dx, float dy);
  */
 typedef csVector3 (csTerrainNormalFunction)(void* data, float dx, float dy);
 
-SCF_VERSION (iTerrFuncState, 0, 0, 4);
+SCF_VERSION (iTerrFuncState, 0, 0, 5);
 
 /**
  * This interface describes the API for the terrain object.
@@ -99,6 +99,16 @@ struct iTerrFuncState : public iBase
    * Get the maximum cost for LOD level (1..3).
    */
   virtual float GetMaximumLODCost (int lod) = 0;
+
+  /**
+   * Correct texture mapping so that no seams will appear with textures
+   * of the given size. By default this is 0,0 so no correction will happen.
+   */
+  virtual void CorrectSeams (int tw, int th) = 0;
+  /**
+   * Get texture size for which seams will be corrected.
+   */
+  virtual void GetCorrectSeams (int& tw, int& th) const = 0;
 };
 
 #endif // __ITERRAIN_TERRFUNC_H_

@@ -95,23 +95,23 @@ static float HeightMapFunc (void* data, float x, float y)
   HeightMapData* hm = (HeightMapData*)data;
   float dw = fmod (x*hm->w, 1.0f);
   float dh = fmod (y*hm->h, 1.0f);
-  int ix = int (x*hm->w);
-  int iy = int (y*hm->h);
+  int ix = int (x*(hm->w-1));
+  int iy = int (y*(hm->h-1));
   int iw = hm->iw;
   int ih = hm->ih;
   int idx = iy * iw + ix;
   float col00, col01, col10, col11;
   csRGBpixel* p = hm->p;
   col00 = float (p[idx].red + p[idx].green + p[idx].blue)/3.;
-  if (ix < iw)
+  if (ix < iw-1)
     col10 = float (p[idx+1].red + p[idx+1].green + p[idx+1].blue)/3.;
   else
     col10 = col00;
-  if (iy < ih)
+  if (iy < ih-1)
     col01 = float (p[idx+iw].red + p[idx+iw].green + p[idx+iw].blue)/3.;
   else
     col01 = col00;
-  if (ix < iw && iy < ih)
+  if (ix < iw-1 && iy < ih-1)
     col11 = float (p[idx+iw+1].red + p[idx+iw+1].green + p[idx+iw+1].blue)/3.;
   else
     col11 = col00;
@@ -163,6 +163,7 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   max_cost[0] = .03;
   max_cost[1] = .08;
   max_cost[2] = .2;
+  CorrectSeams (0, 0);
 }
 
 csTerrFuncObject::~csTerrFuncObject ()
@@ -907,8 +908,8 @@ void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
 #else
       uv.x += float (gx) / float (gridx);
       uv.y += float (gy) / float (gridy);
-      uv.x = uv.x * .96875 + .015625;	// @@@ HARDCODED FOR TEXTURES OF SIZE 64!!!!
-      uv.y = uv.y * .96875 + .015625;
+      uv.x = uv.x * correct_du + correct_su;
+      uv.y = uv.y * correct_dv + correct_sv;
 #endif
       mesh.texels[0][vtidx] = uv;
       mesh.vertex_colors[0][vtidx].Set (1, 1, 1);

@@ -759,23 +759,23 @@ static float HeightMapFunc (void* data, float x, float y)
   HeightMapData* hm = (HeightMapData*)data;
   float dw = fmod (x*hm->w, 1.0f);
   float dh = fmod (y*hm->h, 1.0f);
-  int ix = int (x*hm->w);
-  int iy = int (y*hm->h);
+  int ix = int (x*(hm->w-1));
+  int iy = int (y*(hm->h-1));
   int iw = hm->iw;
   int ih = hm->ih;
   int idx = iy * iw + ix;
   float col00, col01, col10, col11;
   csRGBpixel* p = hm->p;
   col00 = float (p[idx].red + p[idx].green + p[idx].blue)/3.;
-  if (ix < iw)
+  if (ix < iw-1)
     col10 = float (p[idx+1].red + p[idx+1].green + p[idx+1].blue)/3.;
   else
     col10 = col00;
-  if (iy < ih)
+  if (iy < ih-1)
     col01 = float (p[idx+iw].red + p[idx+iw].green + p[idx+iw].blue)/3.;
   else
     col01 = col00;
-  if (ix < iw && iy < ih)
+  if (ix < iw-1 && iy < ih-1)
     col11 = float (p[idx+iw+1].red + p[idx+iw+1].green + p[idx+iw+1].blue)/3.;
   else
     col11 = col00;
@@ -793,6 +793,7 @@ void csLoader::heightgen_process (char* buf)
     CS_TOKEN_TABLE (TEXTURE)
     CS_TOKEN_TABLE (SIZE)
     CS_TOKEN_TABLE (PARTSIZE)
+    CS_TOKEN_TABLE (MULTIPLY)
   CS_TOKEN_TABLE_END
 
   long cmd;
@@ -800,6 +801,7 @@ void csLoader::heightgen_process (char* buf)
   char* name;
   int totalw = 256, totalh = 256;
   int partw = 64, parth = 64;
+  int mw = 1, mh = 1;
   csGenerateTerrainImage* gen = new csGenerateTerrainImage ();
   HeightMapData* data = NULL;
 
@@ -809,6 +811,9 @@ void csLoader::heightgen_process (char* buf)
     {
       case CS_TOKEN_SIZE:
 	ScanStr (params, "%d,%d", &totalw, &totalh);
+	break;
+      case CS_TOKEN_MULTIPLY:
+	ScanStr (params, "%d,%d", &mw, &mh);
 	break;
       case CS_TOKEN_PARTSIZE:
 	ScanStr (params, "%d,%d", &partw, &parth);
@@ -848,7 +853,7 @@ void csLoader::heightgen_process (char* buf)
         {
 	  int startx, starty;
 	  ScanStr (params, "%d,%d", &startx, &starty);
-	  iImage* img = gen->Generate (totalw, totalh, startx, starty,
+	  iImage* img = gen->Generate (totalw, totalh, startx*mw, starty*mh,
 	  	partw, parth);
 	  iTextureHandle *TexHandle = G3D->GetTextureManager ()
 	  	->RegisterTexture (img, CS_TEXTURE_3D);

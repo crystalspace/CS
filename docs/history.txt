@@ -10,6 +10,15 @@ The history order is reversed so that new features are at the top.
 	  support for hardware stencil buffer. NeedScreenClipping if false
 	  by default but you can set it to true if you experience bad
 	  crashes with OpenGL.
+	- Fixed a bug in the terrfunc interpolation routine for reading from
+	  a heightmap. It was accessing past the heightmap boundaries.
+	- Added iTerrFuncState::CorrectSeams() and GetCorrectSeams(). With
+	  these you can enable correction for texture seams between adjacent
+	  textures of the landscape for the given texture size. By default
+	  no such correction happens.
+	- Also added CORRECTSEAMS keyword to terrfunc loader.
+	- Added MULTIPLY keyword to HEIGHTGEN in parser. This makes it easier
+	  to quickly switch texture sizes for the generated terrain.
 6-May-2001
 	- Martin Geisse made the following changes:
 	    - csengine now depends on the string server. All apps have

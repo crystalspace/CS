@@ -34,6 +34,7 @@
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (COLOR)
+  CS_TOKEN_DEF (CORRECTSEAMS)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (GROUPMATERIAL)
   CS_TOKEN_DEF (BLOCKS)
@@ -131,6 +132,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
     CS_TOKEN_TABLE (COLOR)
     CS_TOKEN_TABLE (LODDIST)
     CS_TOKEN_TABLE (LODCOST)
+    CS_TOKEN_TABLE (CORRECTSEAMS)
   CS_TOKEN_TABLE_END
 
   char *pName;
@@ -185,6 +187,13 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	  	rangeStart, rangeEnd);
 	}
     	break;
+      case CS_TOKEN_CORRECTSEAMS:
+	{
+	  int tw, th;
+	  ScanStr (pParams, "%d,%d", &tw, &th);
+          iTerrainState->CorrectSeams (tw, th);
+        }
+        break;
       case CS_TOKEN_BLOCKS:
 	{
 	  int bx, by;

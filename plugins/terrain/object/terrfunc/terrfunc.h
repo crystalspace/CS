@@ -88,6 +88,11 @@ private:
 
   bool initialized;
 
+  // For correcting texture seams.
+  int correct_tw, correct_th;
+  float correct_du, correct_su;
+  float correct_dv, correct_sv;
+
   /**
    * Clear a mesh and initialize it for new usage (call before
    * SetupBaseMesh() or ComputeLODLevel() (as dest)).
@@ -172,6 +177,125 @@ public:
   { normal_func = func; normal_func_data = d; initialized = false; }
   void SetHeightMap (iImage* im, float hscale, float hshift);
 
+  /// Setup the number of blocks in the terrain.
+  void SetResolution (int x, int y)
+  {
+    block_dim_invalid = blockx != x || blocky != y;
+    blockx = x;
+    blocky = y;
+    initialized = false;
+  }
+
+  /// Get the x resolution.
+  int GetXResolution () { return blockx; }
+  /// Get the y resolution.
+  int GetYResolution () { return blocky; }
+  /**
+   * Setup the number of grid points in every block for the base mesh.
+   */
+  void SetGridResolution (int x, int y)
+  {
+    gridx = x;
+    gridy = y;
+    initialized = false;
+  }
+  /// Get the x resolution for a block.
+  int GetXGridResolution () { return gridx; }
+  /// Get the y resolution for a block.
+  int GetYGridResolution () { return gridy; }
+
+  /// Set the top-left corner of the terrain.
+  void SetTopLeftCorner (const csVector3& topleft)
+  {
+    csTerrFuncObject::topleft = topleft;
+    initialized = false;
+  }
+  // Get the top-left corner.
+  csVector3 GetTopLeftCorner ()
+  {
+    return topleft;
+  }
+  /// Set the scale of the terrain.
+  void SetScale (const csVector3& scale)
+  {
+    csTerrFuncObject::scale = scale;
+    initialized = false;
+  }
+  /// Get the scale of the terrain.
+  csVector3 GetScale ()
+  {
+    return scale;
+  }
+  /**
+   * Set the distance at which to switch to the given lod level
+   * (lod from 1 to 3).
+   */
+  void SetLODDistance (int lod, float dist)
+  {
+    lod_sqdist[lod-1] = dist*dist;
+  }
+  /**
+   * Get the distance at which lod will switch to that level.
+   */
+  float GetLODDistance (int lod)
+  {
+    return sqrt (lod_sqdist[lod-1]);
+  }
+  /**
+   * Set the maximum cost for LOD level (1..3).
+   */
+  void SetMaximumLODCost (int lod, float maxcost)
+  {
+    max_cost[lod-1] = maxcost;
+    initialized = false;
+  }
+  /**
+   * Get the maximum cost for LOD level (1..3).
+   */
+  float GetMaximumLODCost (int lod)
+  {
+    return max_cost[lod-1];
+  }
+
+  /**
+   * Correct texture mapping so that no seams will appear with textures
+   * of the given size. By default this is 0,0 so no correction will happen.
+   */
+  void CorrectSeams (int tw, int th)
+  {
+    correct_tw = tw;
+    correct_th = th;
+    if (tw)
+    {
+      correct_du = 1. - 2. / float (tw);
+      correct_su = 1. / float (tw);
+    }
+    else
+    {
+      correct_du = 1;
+      correct_su = 0;
+    }
+    if (th)
+    {
+      correct_dv = 1. - 2. / float (th);
+      correct_sv = 1. / float (th);
+    }
+    else
+    {
+      correct_dv = 1;
+      correct_sv = 0;
+    }
+  }
+
+  /**
+   * Get texture size for which seams will be corrected.
+   */
+  void GetCorrectSeams (int& tw, int& th) const
+  {
+    tw = correct_tw;
+    th = correct_th;
+  }
+
   ///--------------------- iTerrainObject implementation ---------------------
   DECLARE_IBASE;
 
@@ -210,86 +334,6 @@ public:
   virtual void SetLOD (unsigned int) { }
 
   virtual int CollisionDetect (csTransform *p);
-
-  /// Setup the number of blocks in the terrain.
-  void SetResolution (int x, int y)
-  {
-    block_dim_invalid = blockx != x || blocky != y;
-    blockx = x;
-    blocky = y;
-    initialized = false;
-  }
-
-  /// Get the x resolution.
-  int GetXResolution () { return blockx; }
-  /// Get the y resolution.
-  int GetYResolution () { return blocky; }
-  /**
-   * Setup the number of grid points in every block for the base mesh.
-   */
-  void SetGridResolution (int x, int y)
-  {
-    gridx = x;
-    gridy = y;
-    initialized = false;
-  }
-  /// Get the x resolution for a block.
-  int GetXGridResolution () { return gridx; }
-  /// Get the y resolution for a block.
-  int GetYGridResolution () { return gridy; }
-
-  /// Set the top-left corner of the terrain.
-  virtual void SetTopLeftCorner (const csVector3& topleft)
-  {
-    csTerrFuncObject::topleft = topleft;
-    initialized = false;
-  }
-  // Get the top-left corner.
-  virtual csVector3 GetTopLeftCorner ()
-  {
-    return topleft;
-  }
-  /// Set the scale of the terrain.
-  virtual void SetScale (const csVector3& scale)
-  {
-    csTerrFuncObject::scale = scale;
-    initialized = false;
-  }
-  /// Get the scale of the terrain.
-  virtual csVector3 GetScale ()
-  {
-    return scale;
-  }
-  /**
-   * Set the distance at which to switch to the given lod level
-   * (lod from 1 to 3).
-   */
-  void SetLODDistance (int lod, float dist)
-  {
-    lod_sqdist[lod-1] = dist*dist;
-  }
-  /**
-   * Get the distance at which lod will switch to that level.
-   */
-  float GetLODDistance (int lod)
-  {
-    return sqrt (lod_sqdist[lod-1]);
-  }
-  /**
-   * Set the maximum cost for LOD level (1..3).
-   */
-  void SetMaximumLODCost (int lod, float maxcost)
-  {
-    max_cost[lod-1] = maxcost;
-    initialized = false;
-  }
-  /**
-   * Get the maximum cost for LOD level (1..3).
-   */
-  float GetMaximumLODCost (int lod)
-  {
-    return max_cost[lod-1];
-  }
 
   //------------------------- iTerrFuncState implementation ----------------
   class TerrFuncState : public iTerrFuncState
@@ -375,6 +419,14 @@ public:
     virtual float GetMaximumLODCost (int lod)
     {
       return scfParent->GetMaximumLODCost (lod);
+    }
+    virtual void CorrectSeams (int tw, int th)
+    {
+      scfParent->CorrectSeams (tw, th);
+    }
+    virtual void GetCorrectSeams (int& tw, int& th) const
+    {
+      scfParent->GetCorrectSeams (tw, th);
     }
   } scfiTerrFuncState;
   friend class TerrFuncState;
