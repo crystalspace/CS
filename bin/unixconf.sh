@@ -55,7 +55,7 @@ case $MACHINE in
 esac
 
 # Find the C++ compiler
-CXX=`which gcc 2>&1 | grep -v "[Nn]o"`
+[ -z "${CXX}" ] && CXX=`which gcc 2>&1 | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which egcs 2>&1 | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which g++ 2>&1 | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which c++ 2>&1 | grep -v "[Nn]o"`
