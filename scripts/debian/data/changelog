@@ -1,3 +1,9 @@
+crystalspace-data (0.94-1) unstable; urgency=low
+
+  * New upstream
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Thu, 13 Dec 2001 02:11:42 +0100
+
 crystalspace-data (0.93-1) unstable; urgency=low
 
   * New demodata.zip file
