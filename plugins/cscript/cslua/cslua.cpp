@@ -32,15 +32,10 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE(csLua)
   SCF_IMPLEMENTS_INTERFACE(iScript)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csLua::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLua::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csLua)
@@ -57,7 +52,6 @@ csLua::csLua(iBase *iParent) :object_reg(NULL), Mode(CS_REPORTER_SEVERITY_NOTIFY
 {
   SCF_CONSTRUCT_IBASE(iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   shared_instance = this;
 }
 
@@ -152,8 +146,8 @@ void csLua::Print(bool Error, const char *msg)
   }
 }
 
-extern "C" {
-  extern void swig_lua_init(lua_State *L) {
-    //BNE We are already initialized by this time so this is a no-op
-  }
-}
+//extern "C" {
+  //extern void swig_lua_init(lua_State *L) {
+    ////BNE We are already initialized by this time so this is a no-op
+  //}
+//}

@@ -170,18 +170,22 @@ functions in inner loops or other intensive operations.
 
 
 
-1.8.  class iPlugin
--------------------
+1.8.  class iComponent
+----------------------
 
 
 
+1.9.  class iEventHandler
+-------------------------
 
 
-1.9.  class iTextureWrapper
+
+1.10.  class iTextureWrapper
+----------------------------
+
+1.11.  class iTextureHandle
 ---------------------------
 
-1.10.  class iTextureHandle
----------------------------
 
 
 
@@ -192,8 +196,7 @@ functions in inner loops or other intensive operations.
 
 
 
-
-1.11.  class iMaterialHandle
+1.12.  class iMaterialHandle
 ----------------------------
 
 
@@ -204,12 +207,12 @@ functions in inner loops or other intensive operations.
 
 
 
-1.12.  class iMaterialWrapper
+1.13.  class iMaterialWrapper
 -----------------------------
 
 
 
-1.13.  class iFont
+1.14.  class iFont
 ------------------
 
 
@@ -226,7 +229,7 @@ functions in inner loops or other intensive operations.
 
 
 
-1.14.  class iFontServer
+1.15.  class iFontServer
 ------------------------
 
 
@@ -235,7 +238,7 @@ functions in inner loops or other intensive operations.
 
 
 
-1.15.  class iGraphics2D
+1.16.  class iGraphics2D
 ------------------------
 
 
@@ -312,7 +315,7 @@ functions in inner loops or other intensive operations.
 
 
 
-1.16.  class iHalo
+1.17.  class iHalo
 ------------------
 
 
@@ -325,7 +328,7 @@ functions in inner loops or other intensive operations.
 
 
 
-1.17.  class iGraphics3D
+1.18.  class iGraphics3D
 ------------------------
 
 
@@ -389,32 +392,32 @@ functions in inner loops or other intensive operations.
 
 
 
-1.18.  class iCamera
+1.19.  class iCamera
 --------------------
 
 
 
 
 
-1.19.  class iSector
+1.20.  class iSector
 --------------------
 
-1.20.  class iThingState
+1.21.  class iThingState
 ------------------------
 
 
 
-1.21.  class iMeshObject
+1.22.  class iMeshObject
 ------------------------
 
 
 
-1.22.  class iMeshWrapper
+1.23.  class iMeshWrapper
 -------------------------
 
 
 
-1.23.  class iLightMap
+1.24.  class iLightMap
 ----------------------
 
 
@@ -435,7 +438,7 @@ functions in inner loops or other intensive operations.
 
 
 
-1.24.  class iPolygon3D
+1.25.  class iPolygon3D
 -----------------------
 
 
@@ -468,7 +471,7 @@ functions in inner loops or other intensive operations.
 
 
 
-1.25.  class iImage
+1.26.  class iImage
 -------------------
 
 
@@ -499,7 +502,7 @@ functions in inner loops or other intensive operations.
 
 
 
-1.26.  class iTextureManager
+1.27.  class iTextureManager
 ----------------------------
 
 
@@ -520,7 +523,7 @@ functions in inner loops or other intensive operations.
 
 
 
-1.27.  class iPolygonTexture
+1.28.  class iPolygonTexture
 ----------------------------
 
 
@@ -560,10 +563,10 @@ functions in inner loops or other intensive operations.
 
 
 
-1.28.  class iCameraPosition
+1.29.  class iCameraPosition
 ----------------------------
 
-1.29.  class iSectorList
+1.30.  class iSectorList
 ------------------------
 
 
@@ -576,7 +579,17 @@ functions in inner loops or other intensive operations.
 
 
 
-1.30.  class iEngine
+1.31.  class iMaterialList
+--------------------------
+
+
+
+1.32.  class iTextureList
+-------------------------
+
+
+
+1.33.  class iEngine
 --------------------
 
 
@@ -595,11 +608,7 @@ functions in inner loops or other intensive operations.
 
 
 
-
-
-
-
-1.31.  class iObjectRegistry
+1.34.  class iObjectRegistry
 ----------------------------
 
 

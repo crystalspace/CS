@@ -1,10 +1,42 @@
 The history order is reversed so that new features are at the top.
 
+4-Sep-2001
+	- Fixed the ASE importer plugin for missing 'isspace'.
+	- Fixed the cslua plugin by regenerating the swig file with luaswig.
+	- Also fixed the scripts/lua/pysimp.lua so that pysimp -lua
+	  actually works.
+3-Sep-2001
+	- Philip Wyett did a minor typo fix to the msvc5/msvc6 documentation.
+	- Philip Wyett made the following changes to CS:
+	    - Fixed "C1001: INTERNAL COMPILER ERROR" when
+	      doing release builds of CS with MS Visual C++. This
+	      problem was brought about by my fixing of typo
+	      "COMP_MSVC" I gave this bug the kiss of life and
+	      brought it back into being. :-/ For time being I've
+	      re-initialized the typo until I have more time to
+	      look at this in depth.
+	    - Added '/Ox' full optimization on release builds.
+	    - Manually updated MSVC project files.
+	- Norman Kramer added mountpoint /aws which is needed by awstest.
+	- Martin Geisse made the following changes:
+	    - Added iModelDataVertices::FindVertex, FindNormal, FindColor,
+	      FindTexel.
+	    - Aoved the ASE importer to its plugin.
+	    - Fixed bugs in csDataStream, the ASE exporter and the MDL
+	      importer.
 2-Sep-2001
 	- Various documentation changes:
 	    - Updated the engine/portals document.
 	    - Updated the engine/lighting document.
 	    - Updated the engine/viscull document.
+	- Philip Wyett made the following changes to the Crystal Space project:
+	    - Updated winlibs version to the latest 0.19e.
+	    - Added BisonFlex links and build instructions.
+	- Martin Geisse made the following changes:
+	    - Added a Clone() method to most model data components.
+	    - Slightly increased performance of
+	      csModelDataTools::MergeObjects ().
+	    - Fixed some bugs in mdltest and in the MDL importer.
 1-Sep-2001
 	- Various documentation changes:
 	    - Updated plugins overview so it mentions recent developments.
@@ -12,6 +44,19 @@ The history order is reversed so that new features are at the top.
 	    - Mention the pending removal of the system driver.
 	    - Significantly updated the world components section. It
 	      didn't even mention mesh objects...
+	- Philip Wyett made the following changes to the Crystal Space project:
+	    - Removed non-standard trailing comma's in enum's CS wide.
+	      e.g.  enum { A, B, C, }; when it should be enum { A, B, C };
+	    - Made destructors of following base classes virtual.
+		csBasicVector
+		csCBuffer
+	      This stops Intel C++ 5.0 compiler whining.
+	- Philip later reverted use of "virtual" on destructor for csCBuffer.
+	  Intel compiler currently reports also a #444 again alot
+	  of CS variables as being "set but never used". This like
+	  above revert is a bug in the Intel compiler, which has been
+	  now reported to Intel.
+	- Philip changed incorrect COMP_MSVC to correct COMP_VC in qsqrt.h.
 31-Aug-2001
 	- Fixed a bug with curved surfaces with dynamic lighting. If
 	  there were no lights in the level and/or the curve was never
@@ -47,6 +92,11 @@ The history order is reversed so that new features are at the top.
 	  maximum resolution for this. Maybe this needs to be a parameter?
 	  In any case this means that collision detection will now work
 	  nicely with curved surfaces too.
+	- Martin Geisse did the following:
+	    - Added the csSingleIndexVertexSet class to cstool/mdltool.
+	    - Moved the ASE exporter to its plugin. The original converter
+	      is still in place because the new one is not yet guaranteed
+	      to work correctly.
 30-Aug-2001
 	- Added full transformation capabilities to csTransform and
 	  csReversibleTransform for the new csSphere class.

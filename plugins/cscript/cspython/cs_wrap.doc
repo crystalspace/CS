@@ -679,8 +679,6 @@ DeleteAll()
 
 CreateTexture(iName,iFileName,iTransp,iFlags)
 
-CreatePlane(iName,iOrigin,iMatrix)
-
 CreateSector(iName,link)
 
 CreateSectorWallsMesh(sector,name)
