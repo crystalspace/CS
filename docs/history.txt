@@ -16,6 +16,8 @@ chronological order.
 	      entirely dysfunctional.
 	    - Published additional interfaces: iMeshWrapperIterator, iPortal,
 	      iPortalContainer, iStandardReporterListener.
+	- Jorrit reverted the crash fix in genmesh made by res2k earlier.
+	  Better to leave the crash there until the REAL bug is fixed.
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to
