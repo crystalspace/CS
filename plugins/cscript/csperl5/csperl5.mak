@@ -61,7 +61,7 @@ INC.CSPERL5 = $(wildcard $(SRCDIR)/plugins/cscript/csperl5/*.h)
 SRC.CSPERL5 = $(filter-out $(SRCDIR)/plugins/cscript/csperl5/perl5mod.cpp, \
   $(wildcard $(SRCDIR)/plugins/cscript/csperl5/*.cpp))
 OBJ.CSPERL5 = $(addprefix $(OUT)/,$(notdir $(SRC.CSPERL5:.cpp=$O)))
-DEP.CSPERL5 = CSTOOL CSGEOM CSUTIL CSUTIL
+DEP.CSPERL5 = CSTOOL CSGFX CSGEOM CSUTIL
 
 CSPERL5.DERIVED = $(OUTDERIVED)/perl5
 

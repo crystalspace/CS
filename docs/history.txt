@@ -48,6 +48,12 @@ chronological order.
 	- Eric Sunshine fixed csEngine::CreateDefaultRenderLoop() so that it
 	  does not crash outright if it fails to load the
 	  crystalspace.renderloop.step.generic.type plugin.
+	- Eric Sunshine fixed bug in stdstep/rlsstd.mak where link libraries
+	  were mis-ordered, thus resulting in plugin load failure on account
+	  of missing symbols.
+	- Eric Sunshine fixed bug in csperl5.mak where csperl5 was not linked
+	  against csgfx, thus resulting in load failure on account of missing
+	  symbols.
 10-Apr-2004
 	- Jorrit fixed a bug in spr3d with new renderer. It would try to
 	  tween vertices also for skeletal animation. That would cause

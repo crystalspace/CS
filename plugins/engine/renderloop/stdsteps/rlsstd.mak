@@ -46,12 +46,15 @@ endif
 DIR.RENDSTEP_STD = plugins/engine/renderloop/stdsteps
 OUT.RENDSTEP_STD = $(OUT)/$(DIR.RENDSTEP_STD)
 INF.RENDSTEP_STD = $(SRCDIR)/$(DIR.RENDSTEP_STD)/rendstep_std.csplugin
-INC.RENDSTEP_STD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDSTEP_STD)/*.h \
+INC.RENDSTEP_STD = \
+  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDSTEP_STD)/*.h \
   plugins/engine/renderloop/common/*.h))
-SRC.RENDSTEP_STD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDSTEP_STD)/*.cpp \
+SRC.RENDSTEP_STD = \
+  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDSTEP_STD)/*.cpp \
   plugins/engine/renderloop/common/*.cpp))
-OBJ.RENDSTEP_STD = $(addprefix $(OUT.RENDSTEP_STD)/,$(notdir $(SRC.RENDSTEP_STD:.cpp=$O)))
-DEP.RENDSTEP_STD = CSGFX CSGEOM CSTOOL CSUTIL
+OBJ.RENDSTEP_STD = \
+  $(addprefix $(OUT.RENDSTEP_STD)/,$(notdir $(SRC.RENDSTEP_STD:.cpp=$O)))
+DEP.RENDSTEP_STD = CSTOOL CSGFX CSGEOM CSUTIL
 
 OUTDIRS += $(OUT.RENDSTEP_STD)
 
@@ -78,7 +81,8 @@ $(OUT.RENDSTEP_STD)/%$O: $(SRCDIR)/$(DIR.RENDSTEP_STD)/../common/%.cpp
 
 clean: rendstep_stdclean
 rendstep_stdclean:
-	-$(RMDIR) $(RENDSTEP_STD) $(OBJ.RENDSTEP_STD) $(OUTDLL)/$(notdir $(INF.RENDSTEP_STD))
+	-$(RMDIR) $(RENDSTEP_STD) $(OBJ.RENDSTEP_STD) \
+	$(OUTDLL)/$(notdir $(INF.RENDSTEP_STD))
 
 cleandep: rendstep_stdcleandep
 rendstep_stdcleandep:
