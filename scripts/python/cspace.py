@@ -2255,7 +2255,6 @@ csGetTicks = _cspace.csGetTicks
 csSleep = _cspace.csSleep
 
 csGetUsername = _cspace.csGetUsername
-CS_REQUEST_END = _cspace.CS_REQUEST_END
 class csPluginRequest(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPluginRequest, name, value)
