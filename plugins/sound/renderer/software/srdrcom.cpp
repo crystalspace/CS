@@ -85,8 +85,10 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 #else
 	char *szSoundDriver = "crystalspace.sound.driver.null";
 #endif
-	
-	ASSERT( iSys );
+
+	if ( iSys == NULL )
+		return false;
+
 	m_piSystem = iSys;
 
 	if (!iSys->RegisterDriver ("iSoundRender", this))
