@@ -85,6 +85,9 @@ chronological order.
 	  in cskeyacc.cpp.
 	- Eric Sunshine eliminated compilation warning in thing/polytext.cpp
 	  about unused variable in non-debug mode.
+	- Eric Sunshine fixed compilation error in csparser/prstex.cpp where a
+	  `goto' jumped over the initialization of a variable used by the block
+	  of code which was the target of the goto.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

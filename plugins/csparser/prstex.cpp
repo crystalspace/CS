@@ -143,6 +143,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     if (t) return t;
   }
 
+  static bool deprecated_warned = false;
+
   csRef<iTextureWrapper> tex;
   csRef<iLoaderPlugin> plugin;
 
@@ -325,8 +327,6 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     }
   }
   
-  static bool deprecated_warned = false;
-
   iLoaderPlugin* Plug; Plug = 0;
   iBinaryLoaderPlugin* Binplug;
   if (type && !plugin)
