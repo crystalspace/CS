@@ -67,7 +67,7 @@ not operate correctly in that type of application.
 
 Select @emph{Win32 Console Application}. Now enter the name of your application
 in the @emph{Project name} text box.  In our example, the application will be
-named @file{simple1}.  Once done, click on the @emph{@sc{ok}} button.
+named @file{simple1}.  Once done, click on the @emph{OK} button.
 
 You will now be presented with another dialog box (see image below), which asks
 what type of console application you would like to create.  We are working from
@@ -81,7 +81,7 @@ a blank canvas, as all Crystal Space application are.  Thus we select
 You should now be presented with a new dialog box (see image below).  This
 dialog is to confirm the previous settings you have supplied during the
 workspace creation process.  Once checked and verified to be correct, click on
-the @emph{@sc{ok}} button.
+the @emph{OK} button.
 
 @ifnotinfo
 @picturesss{tutorial,howto,msvc6proj,snap2}
@@ -131,7 +131,7 @@ Files into Project} dialog box, which can be seen below.
 @picturesss{tutorial,howto,msvc6proj,snap4}
 @end ifnotinfo
 
-After selecting the desired file(s) you wish to add, click on the @emph{@sc{ok}}
+After selecting the desired file(s) you wish to add, click on the @emph{OK}
 button to finalize your choice(s) and be returned back to the @sc{msvc ide}.  
 Repeat this process twice adding @file{simple1.cpp} to the @emph{Source Files}
 folder and @file{simple1.h} to the @emph{Include Files} folder. Once done you
@@ -195,7 +195,7 @@ See image below for an example of these set.
 @picturesss{tutorial,howto,msvc6proj,snap8}
 @end ifnotinfo
 
-Once done, click on the @emph{@sc{ok}} button and return to the @sc{msvc ide}.
+Once done, click on the @emph{OK} button and return to the @sc{msvc ide}.
 
 @subsubheading Step 4 - Setting Preprocessor Definitions in @sc{msvc}.
 
@@ -255,7 +255,7 @@ ones entered for a release build can be seen in the image below.
 @picturesss{tutorial,howto,msvc6proj,snap12}
 @end ifnotinfo
 
-Once done, click on the @emph{@sc{ok}} button and return to the @sc{msvc ide}.
+Once done, click on the @emph{OK} button and return to the @sc{msvc ide}.
 
 @subsubheading Step 5 - Setting Run-Time Library Used with Crystal Space Applications.
 
@@ -301,7 +301,7 @@ For release builds you need to select @emph{Multithreaded DLL} from the
 @picturesss{tutorial,howto,msvc6proj,snap14}
 @end ifnotinfo
 
-Once done, click on the @emph{@sc{ok}} button and return to the @sc{msvc ide}.
+Once done, click on the @emph{OK} button and return to the @sc{msvc ide}.
 
 @subsubheading Step 6 - Setting the Crystal Space static libs to link with.
 

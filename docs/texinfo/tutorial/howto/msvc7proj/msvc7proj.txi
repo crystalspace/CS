@@ -161,11 +161,11 @@ Once done, click on the @emph{OK} button and return to the MSVC IDE.
 
 Crystal Space essentially has three preprocessor definitions which MUST be set
 in-order to successfully compile and link your application.  They are
-@code{CS_WIN32_CSCONFIG}, which is added whether the build is release or debug.
-@code{__CRYSTAL_SPACE__}, which is also set whether the build is release or
-debug.  And finally @code{CS_RELEASE} or @code{CS_DEBUG}, which is added as you
-may guess @code{CS_RELEASE} in the settings for release builds and
-@code{CS_DEBUG} in the settings for debug builds.
+@samp{CS_WIN32_CSCONFIG}, which is added whether the build is release or debug.
+@samp{__CRYSTAL_SPACE__}, which is also set whether the build is release or
+debug.  And finally @samp{CS_RELEASE} or @samp{CS_DEBUG}, which is added as you
+may guess @samp{CS_RELEASE} in the settings for release builds and
+@samp{CS_DEBUG} in the settings for debug builds.
 
 To set the preprocessor definitions for your project.  Select your project in
 the @emph{Workspace} window.  See area highlighted in blue in the image below.
@@ -186,7 +186,7 @@ the @emph{Properties} dialog box, which can be seen in the image below.
 
 Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
 definitions in the @emph{Preprocessor Definitions} text box i.e.  for a debug
-build @code{CS_WIN32_CSCONFIG}, @code{__CRYSTAL_SPACE__} and @code{CS_DEBUG},
+build @samp{CS_WIN32_CSCONFIG}, @samp{__CRYSTAL_SPACE__} and @samp{CS_DEBUG},
 making sure to separate with semi-colons.  Alternatively, you can click the
 elipsis (@dots{}) button to pull up an easier view.  An example of the ones
 entered for a debug build can be seen in the image below.
@@ -197,7 +197,7 @@ entered for a debug build can be seen in the image below.
 
 Open the C/C++ folder and select @emph{Preprocessor}.  Insert the appropriate
 definitions in the @emph{Preprocessor Definitions} text box i.e.  for a release
-build @code{CS_WIN32_CSCONFIG}, @code{__CRYSTAL_SPACE__} and @code{CS_RELEASE},
+build @samp{CS_WIN32_CSCONFIG}, @samp{__CRYSTAL_SPACE__} and @samp{CS_RELEASE},
 making sure to separate with semi-colons.  Alternatively, you can click the
 elipsis (@dots{}) button to pull up an easier view.  An example the ones
 entered for a release build can be seen in the image below.
