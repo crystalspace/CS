@@ -1,6 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 19-Sep-2001
+	- Fixed a bug in csFrustum::Classify() and BatchClassify().
+	  Unfortunatelly this does not yet fix the routine completely
+	  as there still is a test-case where it fails (returns COVERED
+	  instead of OUTSIDE).
 	- Fixed a delete to delete[] in prsky.cpp
 	- Added CS_THING_NOCOMPRESS flag which can be used to disable
 	  vertex compression for a thing (removal of duplicate vertices).

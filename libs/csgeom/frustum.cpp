@@ -765,23 +765,41 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
   // inside the frustum created by polygon (reverse roles). In fact it is
   // enough to check just the first vertex of frustum is outside polygon
   // frustum: this lets us make the right decision.
+  // Note: except if this first vertex happens to coincide with polygon.
+  // In that case we need to select another vertex. If all vertices
+  // coincide with the polygon then we have COVERED too.
 
-  for (pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
+  int test_point = 0;
+  bool stop = true;
+  while (test_point < num_frust)
   {
-    csVector3 pn = poly [pvp] % poly [pv];
-    if (pn * frustum [0] >= 0)
-      return CS_FRUST_OUTSIDE;
+    for (pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
+    {
+      csVector3 pn = poly [pvp] % poly [pv];
+      float c = pn * frustum [test_point];
+      if (c > SMALL_EPSILON)
+        return CS_FRUST_OUTSIDE;
+      if (ABS (c) < SMALL_EPSILON)
+      {
+        test_point++;
+	stop = false;
+	break;
+      }
+    }
+    if (stop) break;
+    stop = true;
   }
 
   return CS_FRUST_COVERED;
 }
 
 /**
- * This is like the above version except that it takes a vector of precalculated frustum plane normals.
- * Use this if you have to classify a batch of polygons against the same frustum.
+ * This is like the above version except that it takes a vector of
+ * precalculated frustum plane normals. Use this if you have to classify a
+ * batch of polygons against the same frustum.
  */
-int csFrustum::BatchClassify (csVector3* frustum, csVector3* frustumNormals, int num_frust,
-  csVector3* poly, int num_poly)
+int csFrustum::BatchClassify (csVector3* frustum, csVector3* frustumNormals,
+  int num_frust, csVector3* poly, int num_poly)
 {
   // All poly vertices are inside frustum?
   bool all_inside = true;
@@ -837,12 +855,29 @@ int csFrustum::BatchClassify (csVector3* frustum, csVector3* frustumNormals, int
   // inside the frustum created by polygon (reverse roles). In fact it is
   // enough to check just the first vertex of frustum is outside polygon
   // frustum: this lets us make the right decision.
+  // Note: except if this first vertex happens to coincide with polygon.
+  // In that case we need to select another vertex. If all vertices
+  // coincide with the polygon then we have COVERED too.
 
-  for (pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
+  int test_point = 0;
+  bool stop = true;
+  while (test_point < num_frust)
   {
-    csVector3 pn = poly [pvp] % poly [pv];
-    if (pn * frustum [0] >= 0)
-      return CS_FRUST_OUTSIDE;
+    for (pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
+    {
+      csVector3 pn = poly [pvp] % poly [pv];
+      float c = pn * frustum [test_point];
+      if (c > SMALL_EPSILON)
+        return CS_FRUST_OUTSIDE;
+      if (ABS (c) < SMALL_EPSILON)
+      {
+        test_point++;
+	stop = false;
+	break;
+      }
+    }
+    if (stop) break;
+    stop = true;
   }
 
   return CS_FRUST_COVERED;
