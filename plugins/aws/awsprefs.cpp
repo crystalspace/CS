@@ -375,11 +375,11 @@ awsPrefManager::GetRect(awsComponentNode *node, char *name, csRect &val)
 {
    if (!node) return false;
    
-   printf("aws-debug: Getting \"%s\" from %x\n", name, node);
+   printf("aws-debug: Getting \"%s\" from %p\n", name, node);
    
    awsKey *k = ((awsKeyContainer *)node)->Find(NameToId(name));
 
-   printf("aws-debug: Node retrieved.\n", name, node);
+   printf("aws-debug: Node retrieved: %p [%s]\n", node, name);
    
     if (k)
     {

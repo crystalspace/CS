@@ -165,7 +165,7 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
   ptG2D = canvas.G2D();
   ptG3D = canvas.G3D();
   
-  printf("aws-debug: G2D=%x G3D=%x\n", ptG2D, ptG3D);
+  printf("aws-debug: G2D=%p G3D=%p\n", ptG2D, ptG3D);
 
   if (txtmgr)
     GetPrefMgr()->SetTextureManager(txtmgr);

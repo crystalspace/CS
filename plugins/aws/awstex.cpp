@@ -107,7 +107,7 @@ awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace
   {
     awsTexture *awstxt = (awsTexture *)textures[i];
 
-    if (DEBUG_GETTEX) printf("aws-debug: (%s) texture is: %x\n", __FILE__, awstxt);
+    if (DEBUG_GETTEX) printf("aws-debug: (%s) texture is: %p\n", __FILE__, awstxt);
 
     if (awstxt && id == awstxt->id) 
     {
