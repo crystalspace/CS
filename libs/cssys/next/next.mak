@@ -211,7 +211,7 @@ $(OUT)%$O: %.m
 OBJ.CSSYS = $(addprefix $(OUT),$(notdir \
   $(subst .s,$O,$(subst .c,$O,$(subst .cpp,$O,$(SRC.CSSYS:.m=$O))))))
 
-vpath %.m libs/cssys $(sort $(dir $(SRC.SYS_CSSYS)))
+vpath %.m libs/cssys $(filter-out libs/cssys/general/,$(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
 
 # Multiple -arch flags cause the compiler to barf when generating dependency
 # information, so we filter out -arch commands.  This step is performed under
