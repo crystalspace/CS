@@ -222,7 +222,6 @@ csFrustum *csShadowBlock::AddShadow (
 
 void csShadowBlock::UnlinkShadow (int idx)
 {
-  csShadowFrustum *sf = shadows[idx];
   shadows.Delete (idx);
   bbox_valid = false;
 }
