@@ -730,7 +730,7 @@ void csRadiosity :: StartFrustum()
   // And this leads to sharper shadows as well.
   shoot_src->QuickLumel2World(center, shoot_src->GetWidth()/2.,
     shoot_src->GetHeight()/2.);
-  lview->light_frustum = new csFrustum (center);
+  lview->light_frustum = new csFrustum (center - shoot_src->GetNormal() * 0.1f);
   lview->light_frustum->MakeInfinite ();
   // add a backplane to frustum to clip to it... But which plane?
   //csPlane3 *src_plane = shoot_src->GetPolygon3D()->GetPolyPlane();
