@@ -21,7 +21,7 @@
 #include "sndrdr.h"
 #include "sndsrc.h"
 
-#define REFRESH_RATE    1
+#define REFRESH_RATE    10
 
 csSoundHandleDS3D::csSoundHandleDS3D(csSoundRenderDS3D *srdr, iSoundData *snd)
         : csSoundHandle(snd)

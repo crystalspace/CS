@@ -83,6 +83,10 @@ private:
 
   // true if the sound is looped
   bool Looped;
+
+  // Current position for writing sound data (DS3D's own write cursor
+  // doesn't work correctly)
+  long WriteCursor;
 };
 
 #endif

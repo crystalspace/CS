@@ -41,6 +41,7 @@ csSoundSourceDS3D::csSoundSourceDS3D(iBase *piBase) {
   Buffer2D = NULL;
   Renderer = NULL;
   SoundHandle = NULL;
+  WriteCursor = -1;
 }
 
 csSoundSourceDS3D::~csSoundSourceDS3D() {
@@ -213,21 +214,35 @@ void csSoundSourceDS3D::Write(void *Data, unsigned long NumBytes) {
   void *Pointer1 = NULL, *Pointer2 = NULL;
   DWORD Length1, Length2;
 
-  if (Buffer2D->Lock(0, NumBytes, &Pointer1, &Length1, &Pointer2, &Length2,
-        DSBLOCK_FROMWRITECURSOR) != DS_OK) return;
+  bool ResetPlayPosition = false;
+  if (WriteCursor == -1) {
+    ResetPlayPosition = true;
+    WriteCursor = 0;
+  }
+
+  if (Buffer2D->Lock(WriteCursor, NumBytes, &Pointer1, &Length1,
+	&Pointer2, &Length2, 0) != DS_OK) return;
 
   if (Pointer1) CopyMemory(Pointer1, Data, Length1);
   if (Pointer2) CopyMemory(Pointer2, (unsigned char *)Data+Length1, Length2);
 
   Buffer2D->Unlock(Pointer1, Length1, Pointer2, Length2);
+  WriteCursor = (WriteCursor + NumBytes) % BufferBytes;
+  if (ResetPlayPosition) Buffer2D->SetCurrentPosition(0);
 }
 
 void csSoundSourceDS3D::WriteMute(unsigned long NumBytes) {
   void *Pointer1 = NULL, *Pointer2 = NULL;
   DWORD Length1, Length2;
 
-  if (Buffer2D->Lock(0, NumBytes, &Pointer1, &Length1, &Pointer2, &Length2,
-        DSBLOCK_FROMWRITECURSOR) != DS_OK) return;
+  bool ResetPlayPosition = false;
+  if (WriteCursor == -1) {
+    ResetPlayPosition = true;
+    WriteCursor = 0;
+  }
+
+  if (Buffer2D->Lock(WriteCursor, NumBytes, &Pointer1, &Length1,
+	&Pointer2, &Length2, 0) != DS_OK) return;
 
   unsigned char Byte = (SoundHandle->Data->GetFormat()->Bits==8)?128:0;
 
@@ -235,14 +250,13 @@ void csSoundSourceDS3D::WriteMute(unsigned long NumBytes) {
   if (Pointer2) FillMemory(Pointer2, Byte, Length2);
 
   Buffer2D->Unlock(Pointer1, Length1, Pointer2, Length2);
+  WriteCursor = (WriteCursor + NumBytes) % BufferBytes;
+  if (ResetPlayPosition) Buffer2D->SetCurrentPosition(0);
 }
 
 void csSoundSourceDS3D::ClearBuffer()
 {
-  DWORD pp, wp;
- 
-  Buffer2D->GetCurrentPosition(&pp,  &wp);
-  Buffer2D->SetCurrentPosition(wp);
+  WriteCursor = -1;
 }
 
 csSoundHandleDS3D *csSoundSourceDS3D::GetSoundHandle()
