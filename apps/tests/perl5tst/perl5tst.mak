@@ -1,3 +1,4 @@
+ifneq (,$(findstring csperl5,$(PLUGINS) $(PLUGINS.DYNAMIC)))
 
 DESCRIPTION.perl5test = Crystal Space Perl v5 Scripting Test App
 
@@ -66,6 +67,8 @@ ifdef DO_DEPEND
 dep: $(OUTOS)/perl5tst.dep
 else
 -include $(OUTOS)/perl5tst.dep
+endif
+
 endif
 
 endif
