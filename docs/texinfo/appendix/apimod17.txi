@@ -16,6 +16,12 @@ mail the Crystal Space mailing list and ask for help.
 This version explains how to go from 0.16 to 0.17.
 
 @menu
+* API NextFrame:: NextFrame Prototype (elapsed_time/current_time)
+* API HandleEvent:: HandleEvent Prototype (csEvent -> iEvent)
+* API Materials:: Materials versus Textures
+* API CD:: Collision Detection Plugin
+* API Texture Mapping:: Texture Mapping Changes
+* API Sound:: Sound Changes
 @end menu
 
 @node API NextFrame, API HandleEvent, , 
