@@ -492,6 +492,12 @@ public:
   /// Get drawing buffer height
   STDMETHOD (GetHeight) (int& nResult) PURE;
 
+  /**
+   * Set center of projection for perspective projection.
+   * Center is set in screen space coordinates.
+   */
+  STDMETHOD (SetPerspectiveCenter) (int x, int y) PURE;
+
   /// Get the texture representation scheme.
   STDMETHOD (GetColormapFormat) (G3D_COLORMAPFORMAT& g3dFormat) PURE;
 
