@@ -46,19 +46,7 @@ sub this {
 package cspace;
 
 *scfCompatibleVersion = *cspacec::scfCompatibleVersion;
-*__modulo__ = *cspacec::__modulo__;
-*__rshift__ = *cspacec::__rshift__;
-*__mult_ass__ = *cspacec::__mult_ass__;
-*__divide_ass__ = *cspacec::__divide_ass__;
-*__div__ = *cspacec::__div__;
 *fSqr = *cspacec::fSqr;
-*__subtr__ = *cspacec::__subtr__;
-*__add__ = *cspacec::__add__;
-*__mult__ = *cspacec::__mult__;
-*__eq__ = *cspacec::__eq__;
-*__ne__ = *cspacec::__ne__;
-*__gt__ = *cspacec::__gt__;
-*__lt__ = *cspacec::__lt__;
 *csDefaultRunLoop = *cspacec::csDefaultRunLoop;
 *csPlatformStartup = *cspacec::csPlatformStartup;
 *csPlatformShutdown = *cspacec::csPlatformShutdown;
@@ -2790,7 +2778,6 @@ package cspace::csInitializer;
 *OpenApplication = *cspacec::csInitializer_OpenApplication;
 *CloseApplication = *cspacec::csInitializer_CloseApplication;
 *_SetupEventHandler = *cspacec::csInitializer__SetupEventHandler;
-*SetupEventHandler = *cspacec::csInitializer_SetupEventHandler;
 *DestroyApplication = *cspacec::csInitializer_DestroyApplication;
 sub new {
     my $pkg = shift;
