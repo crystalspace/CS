@@ -60,40 +60,33 @@ protected:
   csMovable movable;
   /// Color.
   csColor color;
+  /// Specular color
+  csColor specularColor;
   /// The associated halo (if not 0)
   csHalo *halo;
 
   /// The dynamic type of this light (one of CS_LIGHT_DYNAMICTYPE_...)
-  csLightDynamicType dynamic_type;
+  csLightDynamicType dynamicType;
   /// Type of this light
   csLightType type;
 
   /// Attenuation type
   csLightAttenuationMode attenuation;
-  /// Attenuation vector in the format x=kc, y=kl, z=kq
-  csVector3 attenuationvec;
+  /// Attenuation constants
+  csVector3 attenuationConstants;
 
-  /// The radius where the light have any effect at all
-  float influenceRadius; 
-  /// Squared influence radius
-  float influenceRadiusSq; 
-  /// Inverse radius of light.
-  float inv_dist;
+  /// The distance where the light have any effect at all
+  float cutoffDistance; 
+
+  /// Radial cutoff radius for directional lights
+  float directionalCutoffRadius;
 
   /// Direction for directional and spotlight. Should be normalized.
   csVector3 direction;
   /// Falloff coefficients for spotlight.
-  csVector2 spotlight_falloff;
+  float spotlightFalloffInner, spotlightFalloffOuter;
 
-  /// Is the influence radius valid?
-  bool influenceValid;
-
-  /**
-   * Config value: The intensity at the influenceRadius in parts of the 
-   * main light intensity.
-   */
-  static float influenceIntensityFraction;
-
+  
   /// Light number. Changes when the light changes in some way (color/pos).
   uint32 lightnr;
 
@@ -126,7 +119,7 @@ public:
    * Config value: ambient green value.
    */
   static int ambient_green;
-  /**
+  /** 
    * Config value: ambient blue value.
    */
   static int ambient_blue;
@@ -148,7 +141,7 @@ public:
    */
   virtual ~csLight ();
 
-  csLightDynamicType GetDynamicType () const { return dynamic_type; }
+  csLightDynamicType GetDynamicType () const { return dynamicType; }
 
   /**
    * Shine this light on all polygons visible from the light.
@@ -197,9 +190,9 @@ public:
   /**
    * Get the current sector for this light.
    */
-  iSector* GetSector () 
+  iSector* GetSector ()
   { 
-    iSectorList* list = movable.GetSectors ();
+    iSectorList* list = movable.csMovable::GetSectors ();
     iSector *s = 0;
     if (list && list->GetCount () > 0)
     {
@@ -213,26 +206,16 @@ public:
    */
   void SetCenter (const csVector3& v)
   {
-    if (movable.csMovable::IsFullTransformIdentity () || 
-        movable.csMovable::GetParent () == 0)
-    {
-      movable.csMovable::SetPosition (v);
-    }
-    else
-    {
-      csVector3 v2 = movable.csMovable::GetParent ()->GetFullTransform ().Other2This (v);
-      movable.csMovable::SetPosition (v2);
-    }
-
+    movable.csMovable::SetPosition (v);
     movable.csMovable::UpdateMove ();
   }
 
   /**
    * Get the center position.
    */
-  const csVector3 GetCenter () 
+  const csVector3& GetCenter () const
   { 
-    return movable.GetFullPosition (); 
+    return movable.csMovable::GetPosition (); 
   }
   
   /**
@@ -246,7 +229,7 @@ public:
   /**
    * Get the light color.
    */
-  csColor& GetColor () { return color; }
+  const csColor& GetColor () const { return color; } 
 
   /**
    * Set the light color. Note that setting the color
@@ -256,6 +239,13 @@ public:
    * as that is a time consuming process.
    */
   void SetColor (const csColor& col);
+
+  /// Get the specular color of this light.
+  const csColor& GetSpecularColor () const
+  { return specularColor; }
+  /// Set the specular color of this light.
+  void SetSpecularColor (const csColor& col) 
+  { specularColor = col; }
 
   /**
    * Return the associated halo
@@ -270,7 +260,7 @@ public:
   /**
    * Get the light's attenuation type
    */
-  csLightAttenuationMode GetAttenuation () 
+  csLightAttenuationMode GetAttenuationMode () 
   {
     return attenuation;
   }
@@ -278,53 +268,74 @@ public:
   /**
    * Change the light's attenuation type
    */
-  void SetAttenuation (csLightAttenuationMode a); 
-
+  void SetAttenuationMode (csLightAttenuationMode a); 
+ 
   /**
-  * Set attenuation vector 
-  * csVector3(constant, linear, quadric)
+  * Set attenuation constants
+  * \sa csLightAttenuationMode
   */
-  void SetAttenuationVector (const csVector3& pattenv);
-
+  void SetAttenuationConstants (const csVector3& constants);
   /**
-  * Get attenuation vector
-  * csVector3(constant, linear, quadric)
+  * Get attenuation constants
+  * \sa csLightAttenuationMode
   */
-  const csVector3 &GetAttenuationVector();
-
-  /** 
-   * Get the influence radius of the light
-   */
-  float GetInfluenceRadius ();
-
-  /** 
-   * Get the squared influence radius of the light
-   */
-  float GetInfluenceRadiusSq ();
+  const csVector3 &GetAttenuationConstants () const
+  { return attenuationConstants; }
 
   /**
-   * Override the influence radius.
-   */
-  void SetInfluenceRadius (float radius);
+  * Get the the maximum distance at which the light is guranteed to shine. 
+  * Can be seen as the distance at which we turn the light of.
+  * Used for culling and selection of meshes to light, but not
+  * for the lighting itself.
+  */
+  float GetCutoffDistance () const
+  { return cutoffDistance; }
 
   /**
-   * Calculate the attenuation vector for a given attenuation type.
-   * \param atttype Attenuation type constant - #CS_ATTN_NONE,
-   *   #CS_ATTN_INVERSE, #CS_ATTN_REALISTIC
-   * \param radius Radius where the light is \p brightness bright
-   * \param brightness Brightness of the light at \p radius
-   */
-  void CalculateAttenuationVector (csLightAttenuationMode atttype, float radius = 1.0f,
-    float brightness = 1.0f);
+  * Set the the maximum distance at which the light is guranteed to shine. 
+  * Can be seen as the distance at which we turn the light of.
+  * Used for culling and selection of meshes to light, but not
+  * for the lighting itself.
+  */
+  void SetCutoffDistance (float distance);
 
   /**
-   * Get the distance for a given light brightness.
-   * \return Returns whether the distance could be calculated. E.g.
-   * when attenuation vector only has a constant part.
-   * \remarks 
-   * \li Might fail when \p brightness <= 0.
-   */
-  bool GetDistanceForBrightness (float brightness, float& distance);
+  * Get radial cutoff distance for directional lights.
+  * The directional light can be viewed as a cylinder with radius
+  * equal to DirectionalCutoffRadius and length CutoffDistance
+  */
+  float GetDirectionalCutoffRadius () const
+  { return directionalCutoffRadius; }
+
+  /**
+  * Set radial cutoff distance for directional lights.
+  * The directional light can be viewed as a cylinder with radius
+  * equal to DirectionalCutoffRadius and length CutoffDistance
+  */
+  void SetDirectionalCutoffRadius (float radius)
+  {
+    directionalCutoffRadius = radius;
+    lightnr++;
+  }
+
+  /**
+  * Set spot light falloff angles. Set in cosine of the angle. 
+  */
+  void SetSpotLightFalloff (float inner, float outer)
+  {
+    spotlightFalloffInner = inner;
+    spotlightFalloffOuter = outer;
+    lightnr++;
+  }
+
+  /**
+  * Get spot light falloff angles. Get in cosine of the angle.
+  */
+  void GetSpotLightFalloff (float& inner, float& outer) const
+  {
+    inner = spotlightFalloffInner;
+    outer = spotlightFalloffOuter;
+  }
 
   /**
    * Get the brightness of a light at a given distance.
@@ -345,18 +356,6 @@ public:
   void SetDirection (const csVector3& v)
   { if (v.IsZero()) return; direction = v.Unit (); }
 
-  /**
-   * Get the spotlight fall-off coefficients. First is cosine of
-   * hotspot angle, second cosine of outer angle.
-   */
-  const csVector2& GetSpotFalloff () const
-  { return spotlight_falloff; }
-  /**
-   * Set the spotlight fall-off coefficients. First is cosine of
-   * hotspot angle, second cosine of outer angle.
-   */
-  virtual void SetSpotFalloff (const csVector2& v)
-  { spotlight_falloff = v; }
 
   //----------------------------------------------------------------------
   // Light influence stuff.
@@ -420,96 +419,97 @@ public:
 
     SCF_DECLARE_EMBEDDED_IBASE (csLight);
     virtual const char* GetLightID () { return scfParent->GetLightID (); }
-    virtual iObject *QueryObject() { return scfParent; }
-    virtual csLightDynamicType GetDynamicType () const
-    {
-      return scfParent->GetDynamicType ();
-    }
-    virtual const csVector3 GetCenter () { return scfParent->GetCenter (); }
+    virtual iObject *QueryObject() { return (iObject*)scfParent; }
+    virtual csLightDynamicType GetDynamicType () const 
+    { return scfParent->GetDynamicType (); }
+
+    virtual const csVector3& GetCenter () const 
+    { return scfParent->GetCenter (); }
     virtual void SetCenter (const csVector3& pos)
-    {
-      scfParent->SetCenter (pos);
-    }
-    virtual iSector *GetSector () { return scfParent->GetSector (); }
-    virtual iMovable *GetMovable ()
-    {
-      return scfParent->GetMovable ();
-    }
-    virtual float GetInfluenceRadius ()
-    {
-      return scfParent->GetInfluenceRadius();
-    }
-    virtual float GetInfluenceRadiusSq ()
-    {
-      return scfParent->GetInfluenceRadiusSq();
-    }
-    virtual void SetInfluenceRadius (float radius)
-    {
-      scfParent->SetInfluenceRadius (radius);
-    }
-    virtual const csColor& GetColor () { return scfParent->GetColor (); }
-    virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
-    virtual csLightAttenuationMode GetAttenuation () { return scfParent->GetAttenuation (); }
-    virtual void SetAttenuation (csLightAttenuationMode a) { scfParent->SetAttenuation (a); }
-    virtual float GetBrightnessAtDistance (float d)
-    {
-      return scfParent->GetBrightnessAtDistance (d);
-    }
-    virtual void SetAttenuationVector(const csVector3& attenv) 
-    { scfParent->SetAttenuationVector(attenv); }
-    virtual const csVector3 &GetAttenuationVector()
-    {
-      return scfParent->GetAttenuationVector();
-    }
-    virtual void CalculateAttenuationVector (csLightAttenuationMode atttype, float radius,
-      float brightness) { scfParent->CalculateAttenuationVector 
-        (atttype, radius, brightness); }
-    virtual bool GetDistanceForBrightness (float brightness, float& distance)
-    { return scfParent->GetDistanceForBrightness (brightness, distance); }
-    virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
-    virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
-    float roundness);
-    virtual iFlareHalo* CreateFlareHalo ();
-    virtual csFlags& GetFlags () { return scfParent->flags; }
-    virtual void SetLightCallback (iLightCallback* cb)
-    {
-      scfParent->SetLightCallback (cb);
-    }
-    virtual void RemoveLightCallback (iLightCallback* cb)
-    {
-      scfParent->RemoveLightCallback (cb);
-    }
-    virtual int GetLightCallbackCount () const
-    {
-      return scfParent->GetLightCallbackCount ();
-    }
-    virtual iLightCallback* GetLightCallback (int idx) const
-    {
-      return scfParent->GetLightCallback (idx);
-    }
-    virtual uint32 GetLightNumber () const
-    {
-      return scfParent->lightnr;
-    }
-    virtual void AddAffectedLightingInfo (iLightingInfo* li)
-    { scfParent->AddAffectedLightingInfo (li); }
-    virtual void RemoveAffectedLightingInfo (iLightingInfo* li)
-    { scfParent->RemoveAffectedLightingInfo (li); }
-    virtual iBaseHalo* GetHalo () { return scfParent->GetHalo (); }
-    virtual void Setup ()
-    { scfParent->CalculateLighting (); }
+    { scfParent->SetCenter (pos); }
+
+    virtual iSector *GetSector ()
+    { return scfParent->GetSector (); }
+
+    virtual iMovable *GetMovable () 
+    { return scfParent->GetMovable (); }
+
+    virtual const csColor& GetColor () const 
+    { return scfParent->GetColor (); }
+    virtual void SetColor (const csColor& col)
+    { scfParent->SetColor (col); }
+
+    virtual const csColor& GetSpecularColor () const 
+    { return scfParent->GetSpecularColor (); }
+    virtual void SetSpecularColor (const csColor& col) 
+    { scfParent->SetSpecularColor (col);} 
+
     virtual csLightType GetType () const
     { return scfParent->GetType (); }
     virtual void SetType (csLightType type)
     { scfParent->SetType (type); }
-    virtual const csVector3& GetDirection () const
+
+    virtual const csVector3& GetDirection () const 
     { return scfParent->GetDirection (); }
     virtual void SetDirection (const csVector3& v)
     { scfParent->SetDirection (v); }
-    virtual const csVector2& GetSpotFalloff () const
-    { return scfParent->GetSpotFalloff (); }
-    virtual void SetSpotFalloff (const csVector2& v)
-    { scfParent->SetSpotFalloff (v); }
+
+    virtual csLightAttenuationMode GetAttenuationMode () const
+    { return scfParent->GetAttenuationMode (); }
+    virtual void SetAttenuationMode (csLightAttenuationMode a)
+    { scfParent->SetAttenuationMode (a); }
+    
+    virtual void SetAttenuationConstants (const csVector3& constants)
+    { scfParent->SetAttenuationConstants (constants); }
+    virtual const csVector3 &GetAttenuationConstants () const 
+    { return scfParent->GetAttenuationConstants (); }
+
+    virtual float GetCutoffDistance () const
+    { return scfParent->GetCutoffDistance (); }
+    virtual void SetCutoffDistance (float distance)
+    { scfParent->SetCutoffDistance (distance); }
+
+    virtual float GetDirectionalCutoffRadius () const
+    { return scfParent->GetDirectionalCutoffRadius (); }
+    virtual void SetDirectionalCutoffRadius (float radius) 
+    { scfParent->SetDirectionalCutoffRadius (radius); }
+    
+    virtual void SetSpotLightFalloff (float inner, float outer)
+    { scfParent->SetSpotLightFalloff (inner, outer); }
+    virtual void GetSpotLightFalloff (float& inner, float& outer) const
+    { scfParent->GetSpotLightFalloff (inner, outer); }
+
+    virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
+    virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
+      float roundness);
+    virtual iFlareHalo* CreateFlareHalo ();
+    virtual iBaseHalo* GetHalo () const 
+    { return scfParent->GetHalo (); }
+
+    virtual float GetBrightnessAtDistance (float d) const
+    { return scfParent->GetBrightnessAtDistance (d); }
+
+    virtual csFlags& GetFlags ()
+    { return scfParent->flags; }
+
+    virtual void SetLightCallback (iLightCallback* cb)
+    { scfParent->SetLightCallback (cb); }
+    virtual void RemoveLightCallback (iLightCallback* cb) 
+    { scfParent->RemoveLightCallback (cb); }
+    virtual int GetLightCallbackCount () const
+    { return scfParent->GetLightCallbackCount (); }
+    virtual iLightCallback* GetLightCallback (int idx) const 
+    { return scfParent->GetLightCallback (idx); }
+
+    virtual uint32 GetLightNumber () const
+    { return scfParent->lightnr; }
+
+    virtual void AddAffectedLightingInfo (iLightingInfo* li) 
+    { scfParent->AddAffectedLightingInfo (li); }    
+    virtual void RemoveAffectedLightingInfo (iLightingInfo* li) 
+    { scfParent->RemoveAffectedLightingInfo (li); }
+    virtual void Setup ()
+    { scfParent->CalculateLighting (); }
   } scfiLight;
   friend struct Light;
 };

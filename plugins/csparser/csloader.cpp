@@ -3926,7 +3926,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   csVector3 pos;
 
   csVector3 attenvec (0, 0, 0);
-  csVector2 spotlightfalloff (1,1);
+  float spotfalloffInner = 0, spotfalloffOuter = 1;
   csVector3 direction (1, 0, 0);
   csLightType type = CS_LIGHT_POINTLIGHT;
 
@@ -4234,8 +4234,12 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_SPOTLIGHTFALLOFF:
         {
-          if (!SyntaxService->ParseVector (child, spotlightfalloff))
-            return 0;
+          spotfalloffInner = child->GetAttributeValueAsFloat ("inner");
+          spotfalloffInner *= (PI/180);
+          spotfalloffInner = cosf(spotfalloffInner);
+          spotfalloffOuter = child->GetAttributeValueAsFloat ("outer");
+          spotfalloffOuter *= (PI/180);
+          spotfalloffOuter = cosf(spotfalloffOuter);
         }
         break;
       default:
@@ -4257,7 +4261,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   AddToRegion (ldr_context, l->QueryObject ());
   l->SetType (type);
   l->SetDirection (direction);
-  l->SetSpotFalloff (spotlightfalloff);
+  l->SetSpotLightFalloff (spotfalloffInner, spotfalloffOuter);
 
   switch (halo.type)
   {
@@ -4296,22 +4300,21 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
       }
       break;
   }
-  l->SetAttenuation (attenuation);
+  l->SetAttenuationMode (attenuation);
   if (attenuation == CS_ATTN_CLQ)
   {
     if (attenvec.IsZero())
     {
-      l->CalculateAttenuationVector 
-        (attenuation, dist, distbright);
+      //@@TODO:
     }
     else
     {
-      l->SetAttenuationVector (attenvec);
+      l->SetAttenuationConstants (attenvec);
     }
   }
 
   if (influenceOverride)
-    l->SetInfluenceRadius (influenceRadius);
+    l->SetCutoffDistance (influenceRadius);
 
   // Move the key-value pairs from 'Keys' to the light object
   l->QueryObject ()->ObjAddChildren (&Keys);

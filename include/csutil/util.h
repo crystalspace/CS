@@ -153,13 +153,23 @@ CS_CSUTIL_EXPORT int csFindNearestPowerOf2 (int n);
 /// returns true if n is a power of two
 CS_CSUTIL_EXPORT bool csIsPowerOf2 (int n);
 
-/// Find the log2 of argument
+/// Find the log2 of 32bit argument
 static inline int csLog2 (int n)
 {
-  int l = 31; unsigned x = 0x80000000;
-  while (x && !(n & x))
-    l--, x >>= 1;
-  return l;
+  const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
+  const unsigned int S[] = {1, 2, 4, 8, 16};
+  int i;
+
+  register unsigned int c = 0; // result of log2(v) will go here
+  for (i = 4; i >= 0; i--) // unroll for speed...
+  {
+    if (n & b[i])
+    {
+      n >>= S[i];
+      c |= S[i];
+    } 
+  }
+  return c;
 }
 
 /**

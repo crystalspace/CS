@@ -67,6 +67,13 @@ public:
     return mmxSupported;
   }
 
+  static inline bool HasSSE ()
+  {
+    Initialize ();
+
+    return sseSupported;
+  }
+
   static inline const char* GetProcessorName ()
   {
     Initialize ();

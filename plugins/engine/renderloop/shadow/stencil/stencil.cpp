@@ -612,7 +612,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   }
 
   //cull against the boundingsphere of the light
-  csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
+  csSphere lightSphere (lightPos, light->GetCutoffDistance ());
 
   g3d->SetZMode (CS_ZBUF_TEST);
 

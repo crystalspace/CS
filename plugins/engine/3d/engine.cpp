@@ -39,6 +39,7 @@
 #include "plugins/engine/3d/portalcontainer.h"
 #include "plugins/engine/3d/lightmgr.h"
 #include "iengine/portal.h"
+#include "csgeom/math.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
 #include "csgeom/kdtree.h"
@@ -2370,7 +2371,7 @@ static bool FindLightPos_Front2Back (csKDTree* treenode,
       {
         iLight* light = (iLight*)objects[i]->GetObject ();
 	float sqdist = csSquaredDist::PointPoint (pos, light->GetCenter ());
-	if (sqdist < light->GetInfluenceRadiusSq ())
+	if (sqdist < csSquare(light->GetCutoffDistance ()))
 	{
 	  light_array->AddLight (light, sqdist);
 	}
@@ -2416,7 +2417,7 @@ static bool FindLightBox_Front2Back (csKDTree* treenode,
         csBox3 b (box->Min () - light->GetCenter (),
 		  box->Max () - light->GetCenter ());
         float sqdist = b.SquaredOriginDist ();
-        if (sqdist < light->GetInfluenceRadiusSq ())
+        if (sqdist < csSquare (light->GetCutoffDistance ()))
 	{
 	  light_array->AddLight (light, sqdist);
 	}

@@ -1003,3 +1003,21 @@ The semantics of the parameters have changed, too; notably, instead of
 specifying the byte size of a buffer, the element count is specified. The same
 change has been made to @code{CopyToBuffer()} (which has been renamed to 
 @code{CopyInto()} to enforce human correction of the parameters).
+
+@subheading @samp{iLight} Light interface Change
+
+The @samp{iLight} and it's implementation (@samp{csLight}) have been extended
+to also handle spot- and directional lights. Note that the accual computation
+of lighting does not yet support these, just that the engine can store and
+handle the required data.
+There have also been two smaller changes to the interface to make it more
+coherent. The influence radius have been renamed cutoff distance, and thus the
+method @code(GetInfluenceRadius()} and @code{SetInfluenceRadius} have been 
+renamed accordingly to @code{GetCutoffDistance()} and @code{SetCutoffDistance()}
+The @code{SetAttenuation()} have been renamed @code{SetAttenuationMode()} to avoid
+mixup with other similary named methods.
+For the @code{CS_ATTN_LINEAR} attenuation type the specification have changed 
+a slight bit. As a default the distance where light goes out is same as the
+cutoff distance, but this can be changed by altering the first attenuation 
+constant. See comments in @file{include/iengine/light.h} for exact details of
+the different attenuation modes.

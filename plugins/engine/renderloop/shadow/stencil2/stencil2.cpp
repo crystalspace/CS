@@ -659,7 +659,7 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
     return;
   }
 
-  csSphere lightSphere (light->GetCenter (), light->GetInfluenceRadius ());
+  csSphere lightSphere (light->GetCenter (), light->GetCutoffDistance ());
   csRef<iVisibilityCuller> culler = sector->GetVisibilityCuller ();
   shadowMeshes.Truncate (0);
   culler->VisTest (lightSphere, &shadowDrawVisCallback);

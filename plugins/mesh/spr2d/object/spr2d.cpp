@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/math.h"
 #include "csgfx/renderbuffer.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
@@ -153,7 +154,7 @@ void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   for (i = 0; i < num_lights; i++)
   {
     csColor light_color = lights[i]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
-    float sq_light_radius = lights [i]->GetInfluenceRadiusSq ();
+    float sq_light_radius = csSquare (lights [i]->GetCutoffDistance ());
     // Compute light position.
     csVector3 wor_light_pos = lights [i]->GetCenter ();
     float wor_sq_dist =

@@ -59,6 +59,10 @@
  * configuration files may override these.
  */
 
+#ifndef CS_FORCEINLINE
+#define CS_FORCEINLINE inline
+#endif
+
 /**\def CS_MAXPATHLEN
  * Maximum length of a filesystem pathname. Useful for declaring character
  * buffers for calls to system functions which return a pathname in the buffer.

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csgfx/renderbuffer.h"
 #include "csgeom/math3d.h"
+#include "csgeom/math.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
@@ -664,7 +665,7 @@ void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     csVector3 wor_light_pos = li->GetCenter ();
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
-    if (obj_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
+    if (obj_sq_dist >= csSquare (li->GetDirectionalCutoffRadius ())) continue;
     float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)
     	? csQisqrt (obj_sq_dist)
 	: 1.0f;

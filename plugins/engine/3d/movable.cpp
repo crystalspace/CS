@@ -192,13 +192,3 @@ void csMovable::UpdateMove ()
     ml->MovableChanged (this);
   }
 }
-
-csReversibleTransform csMovable::GetFullTransform () const
-{
-  if (parent == 0)
-    return GetTransform ();
-  else if (is_identity)
-    return parent->GetFullTransform ();
-  else
-    return GetTransform () * parent->GetFullTransform ();
-}

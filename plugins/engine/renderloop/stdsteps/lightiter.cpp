@@ -272,13 +272,13 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
       csVector3 (color.red, color.green, color.blue));
 
     shvar_light_0_specular->SetValue (csVector3 (1));
-    shvar_light_0_attenuation->SetValue (light->GetAttenuationVector ());
+    shvar_light_0_attenuation->SetValue (light->GetAttenuationConstants ());
     shvar_light_0_position->SetValue (lightPos * camTransR);
     shvar_light_0_position_world->SetValue (lightPos);
 
     shvar_light_0_attenuationtex->SetAccessor (GetLightAccessor (light));
 
-    csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
+    csSphere lightSphere (lightPos, light->GetCutoffDistance ());
     if (rview->TestBSphere (camTransR, lightSphere))
     {
       size_t i;
@@ -413,7 +413,7 @@ void csLightIterRenderStep::LightSVAccessor::PreGetValue (
     //CreateTexture ();
     if (attnType == CS_ATTN_CLQ)
     {
-      const csVector3& attnVec = light->GetAttenuationVector ();
+      const csVector3& attnVec = light->GetAttenuationConstants ();
       attTex = parent->GetAttenuationTexture (attnVec);
     }
     else

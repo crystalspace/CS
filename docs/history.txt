@@ -15,6 +15,10 @@ chronological order.
 	  *.tok files from the CS/include/csplugincommon subdirectories.
 	- Vincent upgraded rpm/cs.spec for csplugincommon include directory.
 	  Also added *.afp to CS/data/shader/Jamfile InstallData directive.
+	- Marten changed the iLight interface to be a bit clearer and simpler.
+	- Marten added a few helper functions to csgeom for math calculations.
+	- Marten added a general per vertex light calculation system. It is not
+	  finished, and not yet used though.
 24-Feb-2005
 	- Jorrit fixed edge drawing by the OpenGL renderer by using
 	  glPolygonMode(GL_BACK,GL_LINE) instead of the way it was currently

@@ -41,6 +41,8 @@
 #include "igraphic/image.h"
 #include "ivaria/reporter.h"
 
+#include "csgeom/math.h"
+
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"
 #include "csgfx/renderbuffer.h"
@@ -1233,7 +1235,7 @@ void csChunkLodTerrainObject::UpdateColors (const csArray<int>& colors,
     ql.obj_light_pos = trans.Other2This (wor_light_pos);
 
     if (!csIntersect3::BoxSphere (box, ql.obj_light_pos,
-      (ql.inflRadSq = ql.light->GetInfluenceRadiusSq()))) continue;
+      (ql.inflRadSq = csSquare (ql.light->GetCutoffDistance ())))) continue;
 
     ql.isPseudo = false;
     ql.lightcol = ql.light->GetColor () * lightScale;
@@ -1251,7 +1253,7 @@ void csChunkLodTerrainObject::UpdateColors (const csArray<int>& colors,
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
 
     if (!csIntersect3::BoxSphere (box, obj_light_pos,
-      (ql.light->GetInfluenceRadiusSq()))) continue;
+      (csSquare (ql.light->GetCutoffDistance ())))) continue;
 
     ql.isPseudo = true;
     ql.intensities = shadowArr->shadowmap;
@@ -1649,7 +1651,7 @@ void csChunkLodTerrainObject::CastShadows (iMovable* movable,
     
     float vrt_sq_dist = csSquaredDist::PointPoint (obj_light_pos,
       data.pos);
-    if (vrt_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
+    if (vrt_sq_dist >= csSquare (li->GetCutoffDistance ())) continue;
     
     bool inShadow = false;
     shadowIt->Reset ();

@@ -17,6 +17,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
+#include "csgeom/math.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/vector3.h"
@@ -1662,7 +1663,7 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
   	iCommandLineParser);
   bool verbose = cmdline->GetOption ("verbose") != 0;
   size_t i;
-  float light_radiussq = li->GetInfluenceRadiusSq ();
+  float light_radiussq = csSquare (li->GetCutoffDistance ());
   for (i = 0 ; i < staticLights.Length() ; i++)
   {
     if (verbose)

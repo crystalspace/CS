@@ -937,7 +937,7 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
     centerNode->SetAttributeAsFloat("z", center.z);
 
     //Add the light radius node
-    float radius = light->GetInfluenceRadius();
+    float radius = light->GetCutoffDistance ();
     csRef<iDocumentNode> radiusNode = CreateNode(lightNode, "radius");
     radiusNode->CreateNodeBefore(CS_NODE_TEXT)->SetValueAsFloat(radius);
 

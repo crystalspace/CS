@@ -541,7 +541,7 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 	  return true;
 	}
       }
-      dyn->SetInfluenceRadius (es->radius);
+      dyn->SetCutoffDistance (es->radius);
       dyn->Setup ();
       break;
     }

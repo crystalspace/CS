@@ -20,6 +20,7 @@
 #include "csgfx/renderbuffer.h"
 #include "csutil/sysfunc.h"
 #include "spr3d.h"
+#include "csgeom/math.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"
 #include "csutil/dirtyaccessarray.h"
@@ -1963,7 +1964,7 @@ void csSprite3DMeshObject::UpdateLightingFast (const csArray<iLight*>& lights,
   {
     light_color = lights [light_num]->GetColor ()
     	* (256. / CS_NORMAL_LIGHT_LEVEL);
-    sq_light_radius = lights [light_num]->GetInfluenceRadiusSq ();
+    sq_light_radius = csSquare (lights [light_num]->GetCutoffDistance ());
 
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [light_num]->GetCenter ();
@@ -2070,7 +2071,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (const csArray<iLight*>& lights,
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [i]->GetCenter ();
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
-    if (wor_sq_dist >= lights[i]->GetInfluenceRadiusSq ()) continue;
+    if (wor_sq_dist >= csSquare (lights[i]->GetCutoffDistance ())) continue;
 
     csVector3 obj_light_pos;
     if (identity)
@@ -2154,7 +2155,7 @@ void csSprite3DMeshObject::UpdateLightingHQ (const csArray<iLight*>& lights,
   {
     csColor light_color = lights [i]->GetColor ()
     	* (256. / CS_NORMAL_LIGHT_LEVEL);
-    float sq_light_radius = lights [i]->GetInfluenceRadiusSq ();
+    float sq_light_radius = csSquare (lights [i]->GetCutoffDistance ());
 
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [i]->GetCenter ();

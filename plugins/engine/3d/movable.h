@@ -246,7 +246,15 @@ public:
    * Construct the full world to object transformation given
    * this transformation and possible parents transformations.
    */
-  csReversibleTransform GetFullTransform () const;
+  csReversibleTransform GetFullTransform () const
+  {
+    if (parent == 0)
+      return GetTransform ();
+    else if (is_identity)
+      return parent->GetFullTransform ();
+    else
+      return GetTransform () * parent->GetFullTransform ();
+  }
 
   /**
    * Relative move.

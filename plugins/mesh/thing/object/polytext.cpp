@@ -23,6 +23,7 @@
 #include "csgeom/polyaa.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/frustum.h"
+#include "csgeom/math.h"
 #include "thing.h"
 #include "polytext.h"
 #include "polygon.h"
@@ -504,7 +505,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   else
     lightpos = light->GetCenter ();
 
-  float infradius_sq = light->GetInfluenceRadiusSq ();
+  float infradius_sq = csSquare (light->GetCutoffDistance ());
 
   // Calculate the uv's for all points of the frustum (the
   // frustum is actually a clipped version of the polygon).
@@ -723,7 +724,7 @@ void csPolyTexture::ShineDynLightMapHorizCosfact (
 
   // We select a different loop based on attenuation type for most
   // effiency. This makes a huge difference.
-  switch (light->GetAttenuation ())
+  switch (light->GetAttenuationMode ())
   {
     case CS_ATTN_INVERSE:
       while (du > 0)
@@ -813,7 +814,7 @@ void csPolyTexture::ShineDynLightMapHorizCosfact (
       }
       break;
     case CS_ATTN_LINEAR:
-      inv_dist = 1.0 / light->GetInfluenceRadius ();
+      inv_dist = 1.0 / light->GetAttenuationConstants ().x;
       while (du > 0)
       {
         du--;
@@ -887,7 +888,7 @@ void csPolyTexture::ShineDynLightMapHoriz (
 
   // We select a different loop based on attenuation type for most
   // effiency. This makes a huge difference.
-  switch (light->GetAttenuation ())
+  switch (light->GetAttenuationMode ())
   {
     case CS_ATTN_INVERSE:
       while (du > 0)
@@ -961,7 +962,7 @@ void csPolyTexture::ShineDynLightMapHoriz (
       }
       break;
     case CS_ATTN_LINEAR:
-      inv_dist = 1.0 / light->GetInfluenceRadius ();
+      inv_dist = 1.0 / light->GetAttenuationConstants ().x;
       while (du > 0)
       {
         du--;
@@ -1525,7 +1526,7 @@ void csShadowBitmap::UpdateLightMap (
       // @@@ Optimization: It should be possible to combine these
       // calculations into a more efficient formula.
       float d = csSquaredDist::PointPoint (lightpos, v);
-      if (d >= light->GetInfluenceRadiusSq ()) continue;
+      if (d >= csSquare (light->GetCutoffDistance ())) continue;
 
       d = csQsqrt (d);
 
@@ -1717,7 +1718,7 @@ bool csShadowBitmap::UpdateShadowMap (
 
       // calculations into a more efficient formula.
       float d = csSquaredDist::PointPoint (lightpos, v);
-      if (d >= light->GetInfluenceRadiusSq ()) continue;
+      if (d >= csSquare (light->GetCutoffDistance ())) continue;
 
       d = csQsqrt (d);
 

@@ -183,19 +183,23 @@ bool csGlobMatches (const char *fName, const char *fMask)
 // finds the smallest number that is a power of two and is larger or equal to n
 int csFindNearestPowerOf2 (int n)
 {
-  int w=1;
+  int v=n;
 
-  while (n > w)  w <<= 1;
+  v--;
+  v |= v >> 1;
+  v |= v >> 2;
+  v |= v >> 4;
+  v |= v >> 8;
+  v |= v >> 16;
+  v++;
 
-  return w;
+  return v;
 }
 
 // returns true if n is a power of two
 bool csIsPowerOf2 (int n)
 {
-  if (n <= 0)
-    return false;
-  return !(n & (n - 1));	// (n-1) ^ n >= n;
+  return !(n & (n - 1)) && n;	// (n-1) ^ n >= n;
 }
 
 /**

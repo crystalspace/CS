@@ -24,6 +24,7 @@
 #include "beziermsh.h"
 #include "lightpool.h"
 #include "csgeom/frustum.h"
+#include "csgeom/math.h"
 #include "ivideo/graph3d.h"
 #include "iengine/light.h"
 #include "iengine/engine.h"
@@ -302,7 +303,7 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
       }
 
       d = csSquaredDist::PointPoint (center, pos);
-      if (d >= light->GetInfluenceRadiusSq ()) continue;
+      if (d >= csSquare (light->GetCutoffDistance ())) continue;
       d = csQsqrt (d);
       normal = uv2Normal[uv];
 
@@ -465,7 +466,7 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
       pos = uv2World[uv];
 
       d = csSquaredDist::PointPoint (center, pos);
-      if (d >= l->GetInfluenceRadiusSq ()) continue;
+      if (d >= csSquare (l->GetCutoffDistance ())) continue;
       d = csQsqrt (d);
 
       normal = uv2Normal[uv];

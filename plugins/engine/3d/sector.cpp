@@ -74,7 +74,7 @@ void csSectorLightList::PrepareLight (iLight* item)
   	->SetSector (&(sector->scfiSector));
 
   const csVector3& center = item->GetCenter ();
-  float radius = item->GetInfluenceRadius ();
+  float radius = item->GetCutoffDistance ();
   csBox3 lightbox (center - csVector3 (radius), center + csVector3 (radius));
   csKDTreeChild* childnode = kdtree->AddObject (lightbox, (void*)item);
   ((csLight::Light*)item)->GetPrivateObject ()->SetChildNode (childnode);

@@ -78,6 +78,8 @@
   #pragma inline_depth (255)
   #pragma inline_recursion (on)
   #pragma auto_inline (on)
+  
+  #define CS_FORCEINLINE __forceinline
 
   #pragma intrinsic (memset, memcpy, memcmp)
   #pragma intrinsic (strcpy, strcmp, strlen, strcat)

@@ -93,26 +93,33 @@ enum csLightDynamicType
 
 /** \name Attenuation modes
  * Attenuation controls how the brightness of a light fades with distance.
- * There are five attenuation formulas:
+ * Apart from the attenuation mode there are one to tree constants,
+ * which change meaning depending on attenuation mode.
+ * There are five attenuation formulas: (distance is distance between
+ * point for which lighting is computed and the light)
  * <ul>
  *   <li> no attenuation = light * 1
- *   <li> linear attenuation = light * (radius - distance) / radius
- *   <li> inverse attenuation = light * (radius / distance)
- *   <li> realistic attenuation = light * (radius^2 / distance^2)
- *   <li> using clq attenuation vector (prefered for lighting with new renderer)
+ *   <li> linear attenuation = light * (1 - distance / constant1)
+ *   <li> inverse attenuation = light / distance
+ *   <li> realistic attenuation = light / distance^2
+ *   <li> CLQ, Constant Linear Quadratic 
+ *        = light / (constant1 + constant2*distance + constant3*distance^2)
  * </ul>
  * @{ */
 enum csLightAttenuationMode
 {
   /// no attenuation: light * 1
   CS_ATTN_NONE = 0,
-  /// linear attenuation: light * (radius - distance) / radius
+  /// linear attenuation: light * (1 - distance / constant1)
   CS_ATTN_LINEAR = 1,
-  /// inverse attenuation: light * (radius / distance)
+  /// inverse attenuation: light / distance
   CS_ATTN_INVERSE = 2,
-  /// realistic attenuation: light * (radius^2 / distance^2)
+  /// realistic attenuation: light / distance^2
   CS_ATTN_REALISTIC = 3,
-  /// using clq attenuation 
+  /** 
+   * CLQ, Constant Linear Quadratic: 
+   * light / (constant1 + constant2*distance + constant3*distance^2)
+   */
   CS_ATTN_CLQ = 4
 };
 /** @} */
@@ -259,7 +266,7 @@ struct iLight : public iBase
   virtual csLightDynamicType GetDynamicType () const = 0;
 
   /// Get the position of this light.
-  virtual const csVector3 GetCenter () = 0;
+  virtual const csVector3& GetCenter () const = 0;
   /// Set the position of this light.
   virtual void SetCenter (const csVector3& pos) = 0;
 
@@ -269,10 +276,15 @@ struct iLight : public iBase
   /// Get the movable for this light.
   virtual iMovable *GetMovable () = 0;
 
-  /// Get the color of this light.
-  virtual const csColor& GetColor () = 0;
-  /// Set the color of this light.
+  /// Get the diffuse color of this light.
+  virtual const csColor& GetColor () const = 0;
+  /// Set the diffuse color of this light.
   virtual void SetColor (const csColor& col) = 0;
+
+  /// Get the specular color of this light.
+  virtual const csColor& GetSpecularColor () const = 0;
+  /// Set the specular color of this light.
+  virtual void SetSpecularColor (const csColor& col) = 0;
   
   /// Get the light type of this light.
   virtual csLightType GetType () const = 0;
@@ -285,78 +297,66 @@ struct iLight : public iBase
   virtual void SetDirection (const csVector3& v) = 0;
 
   /**
-   * Get the spotlight fall-off coefficients. First is cosine of
-   * hotspot angle, second cosine of outer angle.
+   * Return current attenuation mode.
+   * \sa csLightAttenuationMode
    */
-  virtual const csVector2& GetSpotFalloff () const = 0;
+  virtual csLightAttenuationMode GetAttenuationMode () const = 0;
   /**
-   * Set the spotlight fall-off coefficients. First is cosine of
-   * hotspot angle, second cosine of outer angle.
+   * Set attenuation mode.
+   * \sa csLightAttenuationMode
    */
-  virtual void SetSpotFalloff (const csVector2& v) = 0;
-
-  /** 
-   * Get the influence radius of the light
-   */
-  virtual float GetInfluenceRadius () = 0;
-
-  /** 
-   * Get the squared influence radius of the light.
-   */
-  virtual float GetInfluenceRadiusSq () = 0;
-  
-  /**
-   * Override the influence radius.
-   */
-  virtual void SetInfluenceRadius (float radius) = 0;
-
-  /// Return current attenuation mode.
-  virtual csLightAttenuationMode GetAttenuation () = 0;
-  /**
-   * Set attenuation mode. The following values are possible 
-   * (default is #CS_ATTN_LINEAR):
-   * <ul>
-   * <li>#CS_ATTN_NONE: light * 1
-   * <li>#CS_ATTN_LINEAR: light * (radius - distance) / radius
-   * <li>#CS_ATTN_INVERSE: light * (radius / distance)
-   * <li>#CS_ATTN_REALISTIC: light * (radius^2 / distance^2)
-   * <li>#CS_ATTN_CLQ: use attenuation vector
-   * </ul>
-   */
-  virtual void SetAttenuation (csLightAttenuationMode a) = 0;
+  virtual void SetAttenuationMode (csLightAttenuationMode a) = 0;
 
   /**
-  * Set attenuation vector 
-  * csVector3(constant, linear, quadric)
-  * FIXME: examples
-  */
-  virtual void SetAttenuationVector (const csVector3& attenv) = 0;
-
-  /**
-  * Get attenuation vector
-  * csVector3(constant, linear, quadric)
-  */
-  virtual const csVector3 &GetAttenuationVector() = 0;
-
-  /**
-   * Calculate the attenuation vector for a given attenuation type.
-   * \param atttype Attenuation type constant - #CS_ATTN_NONE,
-   *   #CS_ATTN_INVERSE, #CS_ATTN_REALISTIC
-   * \param radius Radius where the light is \p brightness bright
-   * \param brightness Brightness of the light at \p radius
+   * Set attenuation constants
+   * \sa csLightAttenuationMode
    */
-  virtual void CalculateAttenuationVector (csLightAttenuationMode atttype, 
-    float radius = 1.0f, float brightness = 1.0f) = 0;
+  virtual void SetAttenuationConstants (const csVector3& constants) = 0;
+  /**
+   * Get attenuation constants
+   * \sa csLightAttenuationMode
+   */
+  virtual const csVector3 &GetAttenuationConstants () const = 0;
 
   /**
-   * Get the distance for a given light brightness.
-   * \return Returns whether the distance could be calculated. E.g.
-   * when attenuation vector only has a constant part. \p distance is
-   * unaltered in this case.
-   * \remarks 
-   * \li Might fail when \p brightness <= 0.
+   * Get the the maximum distance at which the light is guranteed to shine. 
+   * Can be seen as the distance at which we turn the light of.
+   * Used for culling and selection of meshes to light, but not
+   * for the lighting itself.
    */
-  virtual bool GetDistanceForBrightness (float brightness, float& distance) = 0;
+  virtual float GetCutoffDistance () const = 0;
+
+  /**
+   * Set the the maximum distance at which the light is guranteed to shine. 
+   * Can be seen as the distance at which we turn the light of.
+   * Used for culling and selection of meshes to light, but not
+   * for the lighting itself.
+   */
+  virtual void SetCutoffDistance (float distance) = 0;
+
+  /**
+   * Get radial cutoff distance for directional lights.
+   * The directional light can be viewed as a cylinder with radius
+   * equal to DirectionalCutoffRadius and length CutoffDistance
+   */
+  virtual float GetDirectionalCutoffRadius () const = 0;
+
+  /**
+   * Set radial cutoff distance for directional lights.
+   * The directional light can be viewed as a cylinder with radius
+   * equal to DirectionalCutoffRadius and length CutoffDistance
+   */
+  virtual void SetDirectionalCutoffRadius (float radius) = 0;
+
+  /**
+   * Set spot light falloff angles. Set in cosine of the angle. 
+   */
+  virtual void SetSpotLightFalloff (float inner, float outer) = 0;
+
+  /**
+   * Get spot light falloff angles. Get in cosine of the angle.
+   */
+  virtual void GetSpotLightFalloff (float& inner, float& outer) const = 0;
 
   /// Create a cross halo for this light.
   virtual iCrossHalo* CreateCrossHalo (float intensity, float cross) = 0;
@@ -367,10 +367,10 @@ struct iLight : public iBase
   virtual iFlareHalo* CreateFlareHalo () = 0;
 
   /// Return the associated halo
-  virtual iBaseHalo* GetHalo () = 0;
+  virtual iBaseHalo* GetHalo () const = 0;
 
   /// Get the brightness of a light at a given distance.
-  virtual float GetBrightnessAtDistance (float d) = 0;
+  virtual float GetBrightnessAtDistance (float d) const = 0;
 
   /**
    * Get flags for this light.
