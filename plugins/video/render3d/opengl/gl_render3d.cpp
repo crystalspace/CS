@@ -489,6 +489,14 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
                                  int clip_plane,
                                  int clip_z_plane)
 {
+  if (cache_clip_portal == clip_portal &&
+      cache_clip_plane == clip_plane &&
+      cache_clip_z_plane == clip_z_plane)
+    return;
+  cache_clip_portal = clip_portal;
+  cache_clip_plane = clip_plane;
+  cache_clip_z_plane = clip_z_plane;
+
   stencil_enabled = false;
   clip_planes_enabled = false;
 
@@ -934,6 +942,10 @@ bool csGLGraphics3D::Open ()
 		strings->Request ("standardtex attenuation")));
   attvar->SetValue (atttex);
   shadermgr->AddVariable(attvar);
+
+  cache_clip_portal = -1;
+  cache_clip_plane = -1;
+  cache_clip_z_plane = -1;
 
   return true;
 }
@@ -1661,23 +1673,11 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
     indexbuf->Release();
   }
 
-  if(mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) 
+  if (mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) 
   {
-      glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
-      glDisable(GL_POINT_SPRITE_ARB);
+    glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
+    glDisable(GL_POINT_SPRITE_ARB);
   }
-
-  //if (clip_planes_enabled)
-  /*{
-    clip_planes_enabled = false;
-    for (int i = 0; i < 6; i++)
-      glDisable ((GLenum)(GL_CLIP_PLANE0+i));
-  }
-  if (stencil_enabled)
-  {
-    //stencil_enabled = false;
-    //statecache->Disable_GL_STENCIL_TEST ();
-  }*/
 }
 
 void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
@@ -1842,16 +1842,15 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
   csGLGraphics3D::clipper = clipper;
   if (!clipper) cliptype = CS_CLIPPER_NONE;
   csGLGraphics3D::cliptype = cliptype;
-  clipplane_initialized = false;
   stencil_initialized = false;
   frustum_valid = false;
   stencil_enabled = false;
-  if (cliptype == CS_CLIPPER_NONE)
-  {
-    for (int i = 0; i<6; i++)
-      glDisable ((GLenum)(GL_CLIP_PLANE0+i));
-    statecache->Disable_GL_STENCIL_TEST ();
-  }
+  for (int i = 0; i<6; i++)
+    glDisable ((GLenum)(GL_CLIP_PLANE0+i));
+  statecache->Disable_GL_STENCIL_TEST ();
+  cache_clip_portal = -1;
+  cache_clip_plane = -1;
+  cache_clip_z_plane = -1;
 }
 
 // @@@ doesn't serve any purpose for now, but might in the future.

@@ -117,22 +117,22 @@ private:
 
   float textureLodBias;
 
+  /**
+   * Clipping related stuff.
+   */
+  bool prefer_stencil;		// If true stencil clipping is prefered.
   bool do_near_plane;
   csPlane3 near_plane;
 
-  /**
-   * Simple flag to indicate if stencil clipping is prefered over plane
-   * clipping (glClipPlane).
-   */
-  bool prefer_stencil;
-
   int stencilclipnum;
-  bool stencil_enabled;
-  bool clip_planes_enabled;
-  csRef<iClipper2D> clipper;
-  int cliptype;
-  bool stencil_initialized;
-  bool clipplane_initialized;
+  bool stencil_enabled;		// Stencil clipper is enabled.
+  bool stencil_initialized;	// Stencil clipper is initialized from 'clipper'
+  bool clip_planes_enabled;	// glClipPlane is enabled.
+  csRef<iClipper2D> clipper;	// Current clipper from engine.
+  int cliptype;			// One of CS_CLIPPER_...
+  int cache_clip_portal;	// Cache values for SetupClipper().
+  int cache_clip_plane;
+  int cache_clip_z_plane;
 
   /// Current render target.
   csRef<iTextureHandle> render_target;

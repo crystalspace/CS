@@ -20,6 +20,8 @@ chronological order.
 	  VBO support, point sprite support, the use of nVidia extensions,
 	  the use of ATI extensions, and if glClipPlane is prefered are now
 	  all reported.
+	- Jorrit optimized NR GL clipping a bit more by caching the current
+	  values given to SetupClipper().
 2-Mar-2004
 	- Jorrit modified the stdrep plugin (standard reporter listener) so
 	  that it now prints all messages on standard output if the
