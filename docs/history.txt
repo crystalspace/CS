@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+25-Sep-2000
+	- Optimized radiosity inner loop a bit. This could give a
+	  significant speedup.
 24-Sep-2000
 	- Eric Sunshine worked around namespace collisions in csUtil/Parser
 	  and csLoader caused by Microsoft Windows' namespace pollution.  All
@@ -7,6 +10,7 @@ The history order has been reversed so that new features are at the top.
 	  with "CS_".  All functions are now prefixed with "cs".  Now
 	  publishes csGetParserLine() and csResetParserLine() instead of
 	  global "parser_line" variable.
+	- Jerry A. Segler Jr did further changes to Theme code.
 23-Sep-2000
 	- Jerry A. Segler Jr continued work on theme code.
 	- Fixed a bug in csPolygonSet::IntersectSegment introduced yesterday.

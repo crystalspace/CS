@@ -1281,13 +1281,9 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   csVector3 path = dest_lumel - src_lumel;
   dest_normal = shoot_dest->GetNormal(rx, ry);
 
-  float distance = path.Norm();
-  if(distance < 1.0f ) distance=1.0f; // too close together
-
-  path /= distance; //otherwise dot product will not return cos(angle).
-
-  distance *= distance;
-
+  // Since 'path' is not normalized the cosinus calculated below
+  // is not really a cosinus. But it doesn't matter for our calculations.
+  // If specular is enabled it matters and in that case we correct it.
   float cossrcangle = src_normal * path;
   if (cossrcangle < SMALL_EPSILON) 
     return;
@@ -1297,8 +1293,12 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
     return; 
   // facing away, negative light is not good.
 
+  float sqdistance = path.SquaredNorm ();
+  float sqdistance_real = sqdistance;
+  if (sqdistance < 1.0f) sqdistance = 1.0f;
+
   float totalfactor = cossrcangle * cosdestangle * 
-    source_patch_area * visibility / distance;
+    source_patch_area * visibility / (sqdistance_real * sqdistance);
 
   //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
@@ -1308,7 +1308,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
 	"srclumelcolor (%g, %g, %g), deltacolor (%g, %g, %g)\n", 
   	totalfactor, cossrcangle, cosdestangle,
- 	source_patch_area, visibility, distance,
+ 	source_patch_area, visibility, sqdistance,
 	src_lumel_color.red, src_lumel_color.green, src_lumel_color.blue,
 	delta_color.red, delta_color.green, delta_color.blue);
 #endif
@@ -1325,12 +1325,19 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   {
     return;
   }
-  
+ 
+  // Now we need to correct the cosinus factor so that it
+  // really represents a cosinus.
+  float distance = sqrt (sqdistance_real);
+  float inv_distance = 1./distance;
+  path *= inv_distance;
+  cosdestangle *= inv_distance;
+
   csVector3 viewdir = dest_normal;
 
   csVector3 reflectdir = (2.0f * dest_normal * (cosdestangle) - -path) * 
     dest_normal;
-  
+ 
   double val = ( reflectdir * viewdir );
   
   if(val<SMALL_EPSILON) 
@@ -1354,7 +1361,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   // add delta using both gloss and totalfactor
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss*totalfactor, src_lumel_color);
 
-  gloss *= source_patch_area * visibility / distance;
+  gloss *= source_patch_area * visibility / sqdistance;
   // add gloss seperately -- too much light this way
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss, trajectory_color );
   shoot_dest->AddToDelta(ruv, gloss * delta_color);
