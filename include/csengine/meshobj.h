@@ -29,7 +29,7 @@ class Dumper;
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshObject : public csSprite
+class csMeshWrapper : public csSprite
 {
   friend class Dumper;
 
@@ -37,7 +37,7 @@ private:
   /// Bounding box for polygon trees.
   csPolyTreeBBox bbox;
 
-  /// Mesh object corresponding with this csMeshObject.
+  /// Mesh object corresponding with this csMeshWrapper.
   iMeshObject* mesh;
 
 protected:
@@ -48,9 +48,14 @@ protected:
 
 public:
   /// Constructor.
-  csMeshObject (csObject* theParent, iMeshObject* mesh);
+  csMeshWrapper (csObject* theParent, iMeshObject* mesh);
+  /// Constructor.
+  csMeshWrapper (csObject* theParent);
   /// Destructor.
-  virtual ~csMeshObject ();
+  virtual ~csMeshWrapper ();
+
+  /// Set the mesh object.
+  void SetMeshObject (iMeshObject* mesh);
 
   /// Scale the mesh object by scaling the diagonal of the transform.
   virtual void ScaleBy (float factor);
@@ -97,6 +102,53 @@ public:
   	csVector3& isect, float* pr);
 
   CSOBJTYPE;
+};
+
+/**
+ * The holder class for all implementations of iMeshObjectFactory.
+ */
+class csMeshFactoryWrapper : public csObject
+{
+  friend class Dumper;
+
+private:
+  /// Mesh object factory corresponding with this csMeshFactoryWrapper.
+  iMeshObjectFactory* meshFact;
+
+public:
+  /// Constructor.
+  csMeshFactoryWrapper (iMeshObjectFactory* meshFact);
+  /// Constructor.
+  csMeshFactoryWrapper ();
+  /// Destructor.
+  virtual ~csMeshFactoryWrapper ();
+
+  /// Set the mesh object factory.
+  void SetMeshObjectFactory (iMeshObjectFactory* meshFact);
+
+  /// Get the mesh object factory.
+  iMeshObjectFactory* GetMeshObjectFactory ()
+  {
+    return meshFact;
+  }
+
+  /**
+   * Create a new mesh object for this template.
+   */
+  csMeshWrapper* NewMeshObject (csObject* parent);
+
+  CSOBJTYPE;
+  DECLARE_IBASE_EXT (csObject);
+
+  //--------------------- iMeshFactoryWrapper implementation --------------------//
+  struct MeshFactoryWrapper : public iMeshFactoryWrapper
+  {
+    DECLARE_EMBEDDED_IBASE (csMeshFactoryWrapper);
+    virtual iMeshObjectFactory* GetMeshObjectFactory ()
+    {
+      return scfParent->GetMeshObjectFactory ();
+    }
+  } scfiMeshFactoryWrapper;
 };
 
 #endif // __CS_MESHOBJ_H__

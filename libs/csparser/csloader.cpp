@@ -27,6 +27,7 @@
 #include "csengine/sector.h"
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csengine/csspr2d.h"
 #include "csengine/skeleton.h"
 #include "csengine/polygon.h"
@@ -64,6 +65,7 @@
 #include "isndrdr.h"
 #include "itxtmgr.h"
 #include "imotion.h"
+#include "ildrplug.h"
 
 typedef char ObName[30];
 /// The engine we are currently processing
@@ -190,6 +192,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MATERIALS)
   CS_TOKEN_DEF (MATRIX)
   CS_TOKEN_DEF (MAX_TEXTURES)
+  CS_TOKEN_DEF (MESHOBJ)
   CS_TOKEN_DEF (MIPMAP)
   CS_TOKEN_DEF (MIRROR)
   CS_TOKEN_DEF (MIXMODE)
@@ -203,8 +206,10 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (OPENING)
   CS_TOKEN_DEF (ORIG)
   CS_TOKEN_DEF (ORIGIN)
+  CS_TOKEN_DEF (PARAMS)
   CS_TOKEN_DEF (PERSISTENT)
   CS_TOKEN_DEF (PLANE)
+  CS_TOKEN_DEF (PLUGIN)
   CS_TOKEN_DEF (POLYGON)
   CS_TOKEN_DEF (PORTAL)
   CS_TOKEN_DEF (POSITION)
@@ -2953,6 +2958,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
     CS_TOKEN_TABLE (STATBSP)
     CS_TOKEN_TABLE (SPRITE2D)
     CS_TOKEN_TABLE (SPRITE)
+    CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (FOG)
     CS_TOKEN_TABLE (FOUNTAIN)
     CS_TOKEN_TABLE (RAIN)
@@ -3180,6 +3186,16 @@ csSector* csLoader::load_room (char* secname, char* buf)
         partsys = load_snow (name, params);
 	partsys->GetMovable ().SetSector (sector);
 	partsys->GetMovable ().UpdateMove ();
+        break;
+      case CS_TOKEN_MESHOBJ:
+        {
+          csMeshWrapper* sp = new csMeshWrapper (Engine);
+          sp->SetName (name);
+          LoadMeshObject (sp, params);
+          Engine->sprites.Push (sp);
+          sp->GetMovable ().SetSector (sector);
+	  sp->GetMovable ().UpdateMove ();
+        }
         break;
       case CS_TOKEN_SPRITE:
         {
@@ -3516,6 +3532,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (SPRITE2D)
     CS_TOKEN_TABLE (SPRITE)
+    CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (SKYDOME)
     CS_TOKEN_TABLE (SKY)
     CS_TOKEN_TABLE (TERRAIN)
@@ -3592,6 +3609,16 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       case CS_TOKEN_SIXFACE:
         Engine->things.Push (load_sixface (name, params, sector, false));
+        break;
+      case CS_TOKEN_MESHOBJ:
+        {
+          csMeshWrapper* sp = new csMeshWrapper (Engine);
+          sp->SetName (name);
+          LoadMeshObject (sp, params);
+          Engine->sprites.Push (sp);
+          sp->GetMovable ().SetSector (sector);
+	  sp->GetMovable ().UpdateMove ();
+        }
         break;
       case CS_TOKEN_SPRITE:
         {
@@ -4013,6 +4040,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     CS_TOKEN_TABLE (PLANE)
     CS_TOKEN_TABLE (COLLECTION)
     CS_TOKEN_TABLE (SCRIPT)
+    CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (TEXTURES)
     CS_TOKEN_TABLE (MATERIALS)
     CS_TOKEN_TABLE (MAT_SET)
@@ -4071,6 +4099,18 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
 	      }
 	    }
 	  }
+	  break;
+        case CS_TOKEN_MESHOBJ:
+          {
+            csMeshFactoryWrapper* t = (csMeshFactoryWrapper*)Engine->meshobj_factories.FindByName (name);
+            if (!t)
+            {
+              t = new csMeshFactoryWrapper ();
+              t->SetName (name);
+              Engine->meshobj_factories.Push (t);
+            }
+            LoadMeshObjectFactory (t, params);
+          }
 	  break;
         case CS_TOKEN_REGION:
 	  {
@@ -4609,6 +4649,194 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
   {
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite skeleton!\n",
         csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
+// @@@ MEMORY LEAK!!! We should unload all the plugins we load here.
+csVector csLoader::loaded_plugins;
+
+iPlugIn* csLoader::FindPlugIn (const char* name)
+{
+  int i;
+  for (i = 0 ; i < loaded_plugins.Length () ; i++)
+  {
+    LoadedPlugin* lp = (LoadedPlugin*)loaded_plugins[i];
+    if (!strcmp (lp->name, name)) return lp->plugin;
+  }
+  return NULL;
+}
+
+void csLoader::NewPlugIn (const char* name, iPlugIn* plugin)
+{
+  LoadedPlugin* lp = new LoadedPlugin ();
+  lp->name = name;
+  lp->plugin = plugin;
+}
+
+bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (PARAMS)
+    CS_TOKEN_TABLE (PLUGIN)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+  char str[255];
+  iLoaderPlugIn* plug = NULL;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_PARAMS:
+	if (!plug)
+	{
+          CsPrintf (MSG_FATAL_ERROR, "Could not load plugin!\n");
+          fatal_exit (0, false);
+	}
+	else
+	{
+	  iBase* mof = plug->Parse (params,
+	      (iEngine*)QUERY_INTERFACE (csEngine::current_engine, iEngine));
+	  iMeshObjectFactory* mof2 = QUERY_INTERFACE (mof, iMeshObjectFactory);
+	  stemp->SetMeshObjectFactory (mof2);
+	  mof2->DecRef ();
+	}
+        break;
+
+      case CS_TOKEN_PLUGIN:
+	{
+	  ScanStr (params, "%s", str);
+	  plug = (iLoaderPlugIn*)FindPlugIn (str);
+	  if (!plug)
+	  {
+	    printf ("Plugin '%s' loaded!\n", str);
+	    plug = LOAD_PLUGIN (System, str, "MeshLdr", iLoaderPlugIn);
+	    if (plug) NewPlugIn (str, plug);
+	  }
+	}
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a mesh factory!\n",
+        csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  return true;
+}
+
+bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (PLUGIN)
+    CS_TOKEN_TABLE (PARAMS)
+    CS_TOKEN_TABLE (MOVE)
+  CS_TOKEN_TABLE_END
+
+  CS_TOKEN_TABLE_START (tok_matvec)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+  char str[255];
+
+  csLoaderStat::sprites_loaded++;
+  iLoaderPlugIn* plug = NULL;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_MOVE:
+        {
+          char* params2;
+          mesh->GetMovable ().SetTransform (csMatrix3 ());     // Identity matrix.
+          mesh->GetMovable ().SetPosition (csVector3 (0, 0, 0));
+          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          {
+            if (!params2)
+            {
+              CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
+              fatal_exit (0, false);
+            }
+            switch (cmd)
+            {
+              case CS_TOKEN_MATRIX:
+              {
+                csMatrix3 m;
+                load_matrix (params2, m);
+                mesh->GetMovable ().SetTransform (m);
+                break;
+              }
+              case CS_TOKEN_V:
+              {
+                csVector3 v;
+                load_vector (params2, v);
+                mesh->GetMovable ().SetPosition (v);
+                break;
+              }
+            }
+          }
+	  mesh->GetMovable ().UpdateMove ();
+        }
+        break;
+
+      case CS_TOKEN_PARAMS:
+	if (!plug)
+	{
+          CsPrintf (MSG_FATAL_ERROR, "Could not load plugin!\n");
+          fatal_exit (0, false);
+	}
+	else
+	{
+	  iBase* mo = plug->Parse (params,
+	      (iEngine*)QUERY_INTERFACE (csEngine::current_engine, iEngine));
+	  iMeshObject* mo2 = QUERY_INTERFACE (mo, iMeshObject);
+	  mesh->SetMeshObject (mo2);
+	  mo2->DecRef ();
+	}
+        break;
+
+      case CS_TOKEN_PLUGIN:
+	{
+	  ScanStr (params, "%s", str);
+	  plug = (iLoaderPlugIn*)FindPlugIn (str);
+	  if (!plug)
+	  {
+	    printf ("Plugin '%s' loaded!\n", str);
+	    plug = LOAD_PLUGIN (System, str, "MeshLdr", iLoaderPlugIn);
+	    if (plug) NewPlugIn (str, plug);
+	  }
+	}
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the mesh object!\n", csGetLastOffender ());
     fatal_exit (0, false);
   }
 

@@ -33,6 +33,7 @@ struct iStatLight;
 struct iThing;
 struct iSprite;
 struct iSpriteTemplate;
+struct iMeshFactoryWrapper;
 struct iMaterialWrapper;
 struct iTextureWrapper;
 struct iCameraPosition;
@@ -41,7 +42,7 @@ struct iView;
 struct iGraphics3D;
 struct iTransformationManager;
 
-SCF_VERSION (iEngine, 0, 1, 7);
+SCF_VERSION (iEngine, 0, 1, 8);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -158,6 +159,14 @@ struct iEngine : public iPlugIn
    * engine.
    */
   virtual iSprite *FindSprite (const char *iName, bool regionOnly = false) = 0;
+  /**
+   * Find a mesh factory by name. If regionOnly is true then the returned
+   * factory will belong to the current region. Note that this is different
+   * from calling iRegion::FindMeshFactory() because the latter will also
+   * return factories that belong in a region but are not connected to the
+   * engine.
+   */
+  virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName, bool regionOnly = false) = 0;
   /**
    * Find a sprite template by name. If regionOnly is true then the returned
    * sprite will belong to the current region. Note that this is different

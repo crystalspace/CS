@@ -1107,7 +1107,10 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   p->AddVertex (dx, dy, dz);
   p->AddVertex (dx, dy, -dz);
   p->AddVertex (-dx, dy, -dz);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (0, 0),
+      p->Vobj (1), csVector2 (1, 0),
+      p->Vobj (2), csVector2 (1, 1));
 
   p = thing->NewPolygon (tm);
   p->flags.Reset (CS_POLY_COLLDET);
@@ -1115,7 +1118,10 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   p->AddVertex (dx, 0, dz);
   p->AddVertex (dx, dy, dz);
   p->AddVertex (-dx, dy, dz);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (0, 0),
+      p->Vobj (1), csVector2 (1, 0),
+      p->Vobj (2), csVector2 (1, 1));
 
   p = thing->NewPolygon (tm);
   p->flags.Reset (CS_POLY_COLLDET);
@@ -1123,7 +1129,10 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   p->AddVertex (dx, 0, -dz);
   p->AddVertex (dx, dy, -dz);
   p->AddVertex (dx, dy, dz);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (0, 0),
+      p->Vobj (1), csVector2 (1, 0),
+      p->Vobj (2), csVector2 (1, 1));
 
   p = thing->NewPolygon (tm);
   p->flags.Reset (CS_POLY_COLLDET);
@@ -1131,7 +1140,10 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   p->AddVertex (-dx, 0, dz);
   p->AddVertex (-dx, dy, dz);
   p->AddVertex (-dx, dy, -dz);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (0, 0),
+      p->Vobj (1), csVector2 (1, 0),
+      p->Vobj (2), csVector2 (1, 1));
 
   p = thing->NewPolygon (tm);
   p->flags.Reset (CS_POLY_COLLDET);
@@ -1139,7 +1151,10 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   p->AddVertex (-dx, 0, -dz);
   p->AddVertex (-dx, dy, -dz);
   p->AddVertex (dx, dy, -dz);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (0, 0),
+      p->Vobj (1), csVector2 (1, 0),
+      p->Vobj (2), csVector2 (1, 1));
   portalPoly = p;
 
   thing->Prepare (room);
@@ -1154,7 +1169,7 @@ void OpenPortal (csView* view, char* lev)
 {
   csSector* room = view->GetCamera ()->GetSector ();
   csVector3 pos = view->GetCamera ()->Camera2World (csVector3 (0, 0, 1));
-  csMaterialWrapper* tm = Sys->engine->GetMaterials ()->FindByName ("spark");
+  csMaterialWrapper* tm = Sys->engine->GetMaterials ()->FindByName ("portal");
 
   csPolygon3D* portalPoly;
   csThing* thing = CreatePortalThing ("portalTo", room, tm, portalPoly);

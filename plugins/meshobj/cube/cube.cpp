@@ -351,6 +351,7 @@ bool csCubeMeshObjectFactory::Initialize (iSystem*)
 
 iMeshObject* csCubeMeshObjectFactory::NewInstance ()
 {
-  return new csCubeMeshObject (this);
+  csCubeMeshObject* cm = new csCubeMeshObject (this);
+  return QUERY_INTERFACE (cm, iMeshObject);
 }
 

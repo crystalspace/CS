@@ -1,5 +1,55 @@
 The history order has been reversed so that new features are at the top.
 
+30-Dec-2000
+	- Philip Wyett fixed some of the 3D renderers that Jorrit forgot
+	  to fix yesterday.
+	- Got two nice textures from Wouter Wijngaards to use for the
+	  'portal' console command. The textures are in standard.zip.
+	  Only the texture for the box of the portal is used for now.
+	  There are some technical problems to getting the other texture
+	  working correctly.
+	- Added iLoaderPlugIn interface. A mesh object plugin (or something
+	  else, it is general enough) can implement this in order to
+	  provide extra loading functionality for the loader.
+	- Renamed csMeshObject to csMeshWrapper in order not to let people
+	  think that csMeshWrapper actually implements iMeshObject
+	  (it does not).
+	- Added csMeshFactoryWrapper which is a class similar to what
+	  csSpriteTemplate is for sprites.
+	- Added iMeshFactoryWrapper and let csMeshFactoryWrapper implement
+	  this through embedding.
+	- Extended iEngine and csEngine with FindMeshFactory().
+	- Extended iRegion and csRegion with FindMeshFactory() and extended
+	  csRegion to actually support mesh object factories as well.
+	- Added new array of mesh object factories in csEngine
+	  (meshobj_factories).
+	- Implemented cube loader plugins. One for cube factories and one
+	  for regular cubes. These plugins are placed in plugins/meshldr/cube.
+	- Added support for MESHOBJ keyword in WORLD (loader). This will
+	  generate a general csMeshWrapper object for the specified
+	  plugin. For example, to load an instance of the cube factory
+	  in the world you can do:
+	  	MESHOBJ 'cubeFact' (
+		    PLUGIN ('crystalspace.meshldr.cubefact')
+		    PARAMS (
+		        MATERIAL ('stone')
+			SIZE (.5)
+		    )
+		)
+	  The section in the 'PARAMS' block will be passed to the plugin
+	  loader.
+	- Added support for MESHOBJ keyword in SECTOR or ROOM. This is
+	  based on the factory above:
+	  	MESHOBJ 'cube1' (
+		    PLUGIN ('crystalspace.meshldr.cube')
+		    PARAMS (
+		        FACTORY ('cubeFact')
+		    )
+		    MOVE (V (-4,0,9))
+		)
+	- Fixed some of the FindXxx() routines in csEngine so that they
+	  actually return NULL if the object is not found instead of
+	  some low (but invalid) value.
 29-Dec-2000
 	- Added iRenderView::ClipBBox() to test if a screen bounding box
 	  is visible and needs to be clipped. In addition it does far plane

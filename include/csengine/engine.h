@@ -436,6 +436,12 @@ public:
   csNamedObjVector sprite_templates;
 
   /**
+   * List of mesh object factories. This vector contains objects of
+   * type csMeshFactoryWrapper*.
+   */
+  csNamedObjVector meshobj_factories;
+
+  /**
    * List of thing templates. This vector contains objects of
    * type csThing*.
    */
@@ -1186,6 +1192,8 @@ public:
   virtual iSprite *FindSprite (const char *iName, bool regionOnly = false);
   /// Find a sprite template by name
   virtual iSpriteTemplate *FindSpriteTemplate (const char *iName, bool regionOnly = false);
+  /// Find a mesh factory by name
+  virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName, bool regionOnly = false);
 
   /// Find a loaded texture by name.
   virtual iTextureWrapper* FindTexture (const char* iName, bool regionOnly = false);

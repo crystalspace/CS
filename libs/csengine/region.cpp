@@ -20,6 +20,7 @@
 #include "qint.h"
 #include "csengine/region.h"
 #include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
 #include "csengine/thing.h"
 #include "csengine/texture.h"
@@ -112,6 +113,17 @@ void csRegion::Region::DeleteAll ()
       csSpriteTemplate* o = (csSpriteTemplate*)copy[i];
       scfParent->engine->sprite_templates.Delete (
         scfParent->engine->sprite_templates.Find (o));
+      copy[i] = NULL;
+    }
+  // @@@ Should mesh factories be deleted if there are still mesh objects
+  // (in other regions) using them? Maybe a ref counter. Also make
+  // sure to ObjRelease when you don't delete a mesh factory.
+  for (i = 0 ; i < copy.Length () ; i++)
+    if (copy[i] && ((csObject*)copy[i])->GetType () == csMeshFactoryWrapper::Type)
+    {
+      csMeshFactoryWrapper* o = (csMeshFactoryWrapper*)copy[i];
+      scfParent->engine->meshobj_factories.Delete (
+        scfParent->engine->meshobj_factories.Find (o));
       copy[i] = NULL;
     }
 
@@ -403,6 +415,14 @@ iSpriteTemplate* csRegion::Region::FindSpriteTemplate (const char *iName)
     scfParent->FindObject (iName, csSpriteTemplate::Type, false);
   if (!obj) return NULL;
   return &obj->scfiSpriteTemplate;
+}
+
+iMeshFactoryWrapper* csRegion::Region::FindMeshFactory (const char *iName)
+{
+  csMeshFactoryWrapper* obj = (csMeshFactoryWrapper*)
+    scfParent->FindObject (iName, csMeshFactoryWrapper::Type, false);
+  if (!obj) return NULL;
+  return &obj->scfiMeshFactoryWrapper;
 }
 
 iTextureWrapper* csRegion::Region::FindTexture (const char *iName)

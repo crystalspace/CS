@@ -34,6 +34,7 @@
 #include "csengine/thing.h"
 #include "csengine/csview.h"
 #include "csengine/cssprite.h"
+#include "csengine/meshobj.h"
 #include "csengine/csspr2d.h"
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
@@ -774,6 +775,7 @@ void csEngine::Clear ()
   things.DeleteAll ();
   skies.DeleteAll ();
   sprite_templates.DeleteAll ();
+  meshobj_factories.DeleteAll ();
   curve_templates.DeleteAll ();
   thing_templates.DeleteAll ();
   sectors.DeleteAll ();
@@ -1841,6 +1843,7 @@ bool csEngine::DeleteLibrary (const char *iName)
   DELETE_ALL_OBJECTS (collections, csCollection)
   DELETE_ALL_OBJECTS (sprites, csSprite)
   DELETE_ALL_OBJECTS (sprite_templates, csSpriteTemplate)
+  DELETE_ALL_OBJECTS (meshobj_factories, csMeshFactoryWrapper)
   DELETE_ALL_OBJECTS (curve_templates, csCurveTemplate)
   DELETE_ALL_OBJECTS (thing_templates, csThing)
   DELETE_ALL_OBJECTS (sectors, csSector)
@@ -2060,6 +2063,16 @@ iSprite *csEngine::FindSprite (const char *iName, bool regionOnly)
   return sprite ? &sprite->scfiSprite : NULL;
 }
 
+iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName, bool regionOnly)
+{
+  csMeshFactoryWrapper* fact;
+  if (regionOnly && region)
+    fact = (csMeshFactoryWrapper*)FindObjectInRegion (region, meshobj_factories, iName);
+  else
+    fact = (csMeshFactoryWrapper*)meshobj_factories.FindByName (iName);
+  return fact ? &fact->scfiMeshFactoryWrapper : NULL;
+}
+
 iSpriteTemplate *csEngine::FindSpriteTemplate (const char *iName, bool regionOnly)
 {
   csSpriteTemplate* sprite;
@@ -2067,7 +2080,7 @@ iSpriteTemplate *csEngine::FindSpriteTemplate (const char *iName, bool regionOnl
     sprite = (csSpriteTemplate*)FindObjectInRegion (region, sprite_templates, iName);
   else
     sprite = (csSpriteTemplate*)sprite_templates.FindByName (iName);
-  return &sprite->scfiSpriteTemplate;
+  return sprite ? &sprite->scfiSpriteTemplate : NULL;
 }
 
 iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
@@ -2077,7 +2090,7 @@ iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
     wr = (csMaterialWrapper*)FindObjectInRegion (region, *materials, iName);
   else
     wr = materials->FindByName (iName);
-  return &wr->scfiMaterialWrapper;
+  return wr ? &wr->scfiMaterialWrapper : NULL;
 }
 
 csMaterialWrapper* csEngine::FindCsMaterial (const char* iName, bool regionOnly)

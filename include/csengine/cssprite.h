@@ -466,7 +466,7 @@ public:
   void MergeNormals ();
 
   CSOBJTYPE;
-  DECLARE_IBASE;
+  DECLARE_IBASE_EXT (csPObject);
 
   //--------------------- iSpriteTemplate implementation --------------------//
   struct SpriteTemplate : public iSpriteTemplate

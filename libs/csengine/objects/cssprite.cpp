@@ -118,7 +118,6 @@ csSpriteTemplate::csSpriteTemplate ()
   : csPObject (), frames (8, 8), actions (8, 8),
     texels (8, 8), vertices (8, 8), normals (8, 8)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiSpriteTemplate);
   cstxt = NULL;
   emerge_from = NULL;

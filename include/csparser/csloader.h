@@ -22,6 +22,7 @@
 
 #include "csengine/polyset.h"
 #include "csparser/loadinfo.h"
+#include "csutil/csvector.h"
 #include "csgeom/quaterni.h"
 
 struct iImage;
@@ -43,6 +44,8 @@ class csEngine;
 class csCurveTemplate;
 class csSoundDataObject;
 class csSpriteTemplate;
+class csMeshFactoryWrapper;
+class csMeshWrapper;
 class csSprite2D;
 class csSprite3D;
 class csParticleSystem;
@@ -66,6 +69,15 @@ class csFrame;
  */
 class csLoader
 {
+  struct LoadedPlugin
+  {
+    const char* name;
+    iPlugIn* plugin;
+  };
+  static csVector loaded_plugins;
+  static iPlugIn* FindPlugIn (const char* name);
+  static void NewPlugIn (const char* name, iPlugIn* plugin);
+  
   /// Parse a matrix definition
   static bool load_matrix (char* buf, csMatrix3 &m);
   /// Parse a vector definition
@@ -132,10 +144,18 @@ class csLoader
   /// Load the sprite template from the map file.
   static bool LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf);
 
+  /// Load a Mesh Object Factory from the map file.
+  static bool LoadMeshObjectFactory (csMeshFactoryWrapper* meshFact, char* buf);
+
   /**
    * Load the sprite from the map file.
    */
   static bool LoadSprite (csSprite3D* spr, char* buf);
+
+  /**
+   * Load the mesh object from the map file.
+   */
+  static bool LoadMeshObject (csMeshWrapper* mesh, char* buf);
 
   /**
    * Load the 2D sprite from the map file.

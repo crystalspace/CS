@@ -75,5 +75,17 @@ struct iMeshObjectFactory : public iPlugIn
   virtual iMeshObject* NewInstance () = 0;
 };
 
+SCF_VERSION (iMeshFactoryWrapper, 0, 0, 1);
+
+/**
+ * This interface corresponds to the object in the engine
+ * that holds reference to the real iMeshObjectFactory.
+ */
+struct iMeshFactoryWrapper : public iBase
+{
+  /// Get the iMeshObjectFactory.
+  virtual iMeshObjectFactory* GetMeshObjectFactory () = 0;
+};
+
 #endif
 
