@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __BITSET_H__
-#define __BITSET_H__
+#ifndef __CS_BITSET_H__
+#define __CS_BITSET_H__
 
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +28,7 @@
 #define MAX_BYTE_VALUE	0xff
 
 // Processor-dependent macros
-#if defined (PROC_INTEL) && defined (COMP_GCC)
+#if defined (PROC_INTEL) && defined (COMP_GCC) && !defined(OS_NEXT)
 #  define IMPLEMENT_BIT_SET \
    asm ("bts %1,%0" : : "o" (*bits), "r" (index));
 #  define IMPLEMENT_BIT_RESET \
@@ -103,7 +103,8 @@ public:
     unsigned char *start = bits + index / BITS_PER_BYTE;
     unsigned char smask = MAX_BYTE_VALUE << (index % BITS_PER_BYTE);
     unsigned char *end = bits + (index + count) / BITS_PER_BYTE;
-    unsigned char emask = MAX_BYTE_VALUE >> (8 - (index + count) % BITS_PER_BYTE);
+    unsigned char emask =
+      MAX_BYTE_VALUE >> (8 - (index + count) % BITS_PER_BYTE);
     if (start == end)
       *start |= smask & emask;
     else
@@ -145,15 +146,17 @@ public:
   inline csBitSet &operator |= (csBitSet &bs)
   {
     unsigned sz = MIN (size, bs.size);
-    ULong *src = (ULong *)bits;
-    ULong *dst = (ULong *)bs.bits;
+    ULong *ldst = (ULong *)bits;
+    ULong *lsrc = (ULong *)bs.bits;
     while (sz >= sizeof (ULong))
     {
-      *src++ |= *dst++;
+      *ldst++ |= *lsrc++;
       sz -= sizeof (ULong);
     }
+    UByte *bdst = (UByte *)ldst;
+    UByte *bsrc = (UByte *)lsrc;
     while (sz--)
-      *((UByte *)src++) |= *((UByte *)dst++);
+      *bdst++ |= *bsrc++;
     return *this;
   }
 
@@ -161,17 +164,19 @@ public:
   inline csBitSet &operator &= (csBitSet &bs)
   {
     unsigned sz = MIN (size, bs.size);
-    ULong *src = (ULong *)bits;
-    ULong *dst = (ULong *)bs.bits;
+    ULong *ldst = (ULong *)bits;
+    ULong *lsrc = (ULong *)bs.bits;
     while (sz >= sizeof (ULong))
     {
-      *src++ &= *dst++;
+      *ldst++ &= *lsrc++;
       sz -= sizeof (ULong);
     }
+    UByte *bdst = (UByte *)ldst;
+    UByte *bsrc = (UByte *)lsrc;
     while (sz--)
-      *((UByte *)src++) &= *((UByte *)dst++);
+      *bdst++ &= *bsrc++;
     return *this;
   }
 };
 
-#endif // __BITSET_H__
+#endif // __CS_BITSET_H__
