@@ -41,7 +41,7 @@ SCF_IMPLEMENT_FACTORY (csFreeType2Server)
 
 csFt2FaceWrapper::csFt2FaceWrapper (csFreeType2Server* owner,
 				    iDataBuffer* data,
-				    const char* faceName) : face(0)
+				    char* faceName) : face(0)
 {
   csFt2FaceWrapper::owner = owner;
   csFt2FaceWrapper::data = data;
@@ -159,14 +159,14 @@ bool csFreeType2Server::FreetypeError (int errorCode, const char* message,
 }
 
 void csFreeType2Server::RemoveFT2Face (csFt2FaceWrapper* face, 
-				       const char* faceName)
+				       char* faceName)
 {
   ftfaces.Delete (faceName, face);
   delete[] faceName;
 }
 
 void csFreeType2Server::RemoveFont (iFont* font, 
-				    const char* fontId)
+				    char* fontId)
 {
   fonts.Delete (fontId, font);
   delete[] fontId;
@@ -273,7 +273,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, int size)
 	  }
 	}
 
-	const char* newFilename = csStrNew (filename);
+	char* newFilename = csStrNew (filename);
 	face.AttachNew (new csFt2FaceWrapper (this, fontdata, newFilename));
 	face->face = ftFace;
 	ftfaces.Put (newFilename, face);
@@ -293,7 +293,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, int size)
     }
   }
 
-  const char* newFontId = csStrNew (fontid);
+  char* newFontId = csStrNew (fontid);
   font.AttachNew (new csFreeType2Font (this, newFontId, face, size));
   fonts.Put (newFontId, font);
 
@@ -307,7 +307,7 @@ SCF_IMPLEMENT_IBASE (csFreeType2Font)
 SCF_IMPLEMENT_IBASE_END
 
 csFreeType2Font::csFreeType2Font (csFreeType2Server* server, 
-				  const char* fontid,
+				  char* fontid,
 				  csFt2FaceWrapper* face, 
 				  int iSize) :
   DeleteCallbacks (4, 4)

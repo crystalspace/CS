@@ -37,12 +37,12 @@ class csFreeType2Server;
 struct csFt2FaceWrapper : public csRefCount
 {
   FT_Face face;
-  const char* faceName;
+  char* faceName;
   csFreeType2Server* owner;
   csRef<iDataBuffer> data;
 
   csFt2FaceWrapper (csFreeType2Server* owner, iDataBuffer* data,
-    const char* faceName);
+    char* faceName);
   virtual ~csFt2FaceWrapper ();
 };
 
@@ -57,9 +57,9 @@ protected:
 public:
   csRef<csFreeType2Server> server;
   // font filename (for identification)
-  const char *name;
+  char *name;
   // The font id, used to identify a face/size pair
-  const char* fontid;
+  char* fontid;
   // Size of this font
   int fontSize;
   // The list of delete callbacks
@@ -76,7 +76,7 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Constructor
-  csFreeType2Font (csFreeType2Server* server, const char* fontid, 
+  csFreeType2Font (csFreeType2Server* server, char* fontid, 
     csFt2FaceWrapper* face, int iSize);
 
   /// Destructor
@@ -181,9 +181,9 @@ public:
     ...);
 
   /// Unregister a FT face. Called by face's dtor
-  void RemoveFT2Face (csFt2FaceWrapper* face, const char* faceName);
+  void RemoveFT2Face (csFt2FaceWrapper* face, char* faceName);
   /// Unregister a font. Called by font's dtor
-  void RemoveFont (iFont* font, const char* fontId);
+  void RemoveFont (iFont* font, char* fontId);
 
   /**
    * Load a font by name.

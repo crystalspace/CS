@@ -64,7 +64,7 @@ private:
   friend struct csFontLoadOrderEntry;
 
   csRef<csFontServerMultiplexor> parent;
-  const char* fontid;
+  char* fontid;
   int size;
   iFont* primaryFont;
 
@@ -74,7 +74,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csFontPlexer (csFontServerMultiplexor* parent, 
-    const char* fontid, iFont* primary, 
+    char* fontid, iFont* primary, 
     int size, csFontLoaderOrder* order);
   virtual ~csFontPlexer ();
 
@@ -143,7 +143,7 @@ private:
     const char* str);
   csPtr<iFontServer> ResolveFontServer (const char* name);
 public:
-  void NotifyDelete (csFontPlexer* font, const char* fontid);
+  void NotifyDelete (csFontPlexer* font, char* fontid);
 
   SCF_DECLARE_IBASE;
 

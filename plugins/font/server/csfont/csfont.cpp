@@ -99,15 +99,6 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, int size)
   int i;
 
   // First of all, look for an already loaded font
-  /*for (i = 0; i < fonts.Length (); i++)
-  {
-    csDefaultFont *font = fonts.Get (i);
-    if (!strcmp (filename, font->Name))
-    {
-      font->IncRef ();
-      return font;
-    }
-  }*/
   csDefaultFont* font = fonts.Get (filename, 0);
   if (font != 0)
   {
@@ -159,13 +150,11 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, int size)
   else
   {
     // Otherwise try to load the font as a .csf file
-    //csDefaultFont *fontdef = ReadFontFile (filename);
     newfont.AttachNew (ReadFontFile (filename));
     if (newfont)
     {
       delete [] newfont->Name;
       newfont->Name = csStrNew (filename);
-      //return fontdef;
     }
   }
 
@@ -180,19 +169,11 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, int size)
 
 void csDefaultFontServer::NotifyCreate (csDefaultFont *font)
 {
-  //fonts.Push (font);
 }
 
 void csDefaultFontServer::NotifyDelete (csDefaultFont *font)
 {
   fonts.Delete (font->Name, font);
-  /*int index = fonts.Find (font);
-  if (index >= 0)
-  {
-    // Extract the element from the array instead of Delete to avoid
-    // the array from deleting it again.
-    fonts.Extract (index);
-  }*/
 }
 
 csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)

@@ -18,6 +18,13 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+#ifdef _MSC_VER
+// Silence some warnings on MSVC
+#pragma warning (disable:4018)	// signed/unsigned mismatch
+#pragma warning (disable:4047)	// 'type' differs in levels of indirection 
+								// from 'type'
+#endif
+
 static reg_errcode_t re_compile_internal (regex_t *preg, const char * pattern,
 					  int length, reg_syntax_t syntax);
 static void re_compile_fastmap_iter (regex_t *bufp,
