@@ -439,6 +439,11 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH, int &desc
   desc = Baseline;
 }
 
+void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH, int &, int &, int &)
+{
+  // @@@ Added to fix compile error
+}
+
 int csDefaultFont::GetLength (const char *text, int maxwidth)
 {
   if (!IndividualWidth)

@@ -254,6 +254,22 @@ void csFreeTypeFont::GetDimensions (const char *text, int &oW, int &oH)
   }
 }
 
+void csFreeTypeFont::GetDimensions (const char *text, int &oW, int &oH, int &desc)
+{
+  if (!text || !current)
+  {
+    oW = oH = 0;
+    return;
+  }
+
+  oW = 0; oH = current->maxH;
+  while (*text)
+  {
+    oW += current->glyphs [*(const uint8 *)text].w;
+    text++;
+  }
+}
+
 void csFreeTypeFont::GetDimensions (const char *text, int &oW, int &oH, int &, int &, int &)
 {
   if (!text || !current)
