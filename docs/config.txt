@@ -355,6 +355,49 @@ in the config file.
 	Choose 'crystalspace.network.null' this time. In future more
 	networking devices will be supported.
 
+  CD/JUMPSPEED=<value> (default 0.08)
+  	Initial speed used to jump upwards.
 
+  CD/WALKACCELERATE=<value> (default 0.007)
+  	Acceleration value for walking and strafing.
+
+  CD/WALKMAXSPEED=<value> (default 0.1)
+  	Maximum speed for walking and strafing.
+
+  CD/WALKBRAKE=<value> (default 0.014)
+  	Brake deceleration for walking and strafing.
+
+  CD/ROTATEACCELERATE=<value> (default 0.005)
+  	Acceleration value for rotation.
+
+  CD/ROTATEMAXSPEED=<value> (default 0.03)
+  	Maximum speed for rotation.
+
+  CD/ROTATEBRAKE=<value> (default 0.015)
+  	Brake deceleration for rotation.
+
+  CD/LOOKACCELERATE=<value> (default 0.028)
+  	Acceleration value for looking up/down.
+
+  CD/BODYHEIGHT=<value> (default 1.4)
+  	Height of the body.
+
+  CD/BODYWIDTH=<value> (default 0.5)
+  	Width of the body.
+
+  CD/BODYDEPTH=<value> (default 0.5)
+  	Depth of the body.
+
+  CD/EYEOFFSET=<value> (default -0.7)
+  	Offset of the eye.
+
+  CD/LEGSWIDTH=<value> (default 0.4)
+  	Width of the legs.
+
+  CD/LEGSDEPTH=<value> (default 0.4)
+  	Depth of the legs.
+
+  CD/LEGSOFFSET=<value> (default -1.1)
+  	Offset of the legs.
 
 
