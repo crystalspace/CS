@@ -182,6 +182,8 @@ public:
   csGLProcTexType proc_tex_type;
   /// Sharpen mipmaps?
   int sharpen_mipmaps;
+  /// downsample textures?
+  int texture_downsample;
   // The first instance of a sharing software texture
   csOpenGLProcSoftware *head_soft_proc_tex;
   static formatDescription glformats [];

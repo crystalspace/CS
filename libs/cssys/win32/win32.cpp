@@ -483,35 +483,38 @@ bool csPlatformStartup(iObjectRegistry* r)
   installDir[idlen] = 0;
   
   const char* path = getenv("PATH");
-  char *mypath = new char[strlen(path) + 1];
-  ToLower (mypath, path);
-
-  char* ppos = strstr (mypath, installDir);
-  while (!gotpath && ppos)
+  if (path)
   {
-    char* npos = strchr (ppos, ';');
-    if (npos) *npos = 0;
+    char *mypath = new char[strlen(path) + 1];
+    ToLower (mypath, path);
 
-    if ((strlen (ppos) == idlen) || (strlen (ppos) == idlen+1))
+    char* ppos = strstr (mypath, installDir);
+    while (!gotpath && ppos)
     {
-      if (ppos[idlen] == '\\') ppos[idlen] = 0;
-      if (!strcmp (ppos, installDir))
+      char* npos = strchr (ppos, ';');
+      if (npos) *npos = 0;
+
+      if ((strlen (ppos) == idlen) || (strlen (ppos) == idlen+1))
       {
-        // found it
-        gotpath = true;
+	if (ppos[idlen] == '\\') ppos[idlen] = 0;
+	if (!strcmp (ppos, installDir))
+	{
+	  // found it
+	  gotpath = true;
+	}
       }
+      ppos = npos ? strstr (npos+1, installDir) : NULL;
     }
-    ppos = npos ? strstr (npos+1, installDir) : NULL;
+    delete[] mypath;
   }
-  delete[] mypath;
 
   if (!gotpath)
   {
     // put CRYSTAL path into PATH environment.
-    char *newpath = new char[strlen(path) + strlen(installDir) + 2];
+    char *newpath = new char[(path?strlen(path):0) + strlen(installDir) + 2];
     strcpy (newpath, installDir);
     strcat (newpath, ";");
-    strcat (newpath, path);
+    if (path) strcat (newpath, path);
     SetEnvironmentVariable ("PATH", newpath);
     delete[] newpath;
   }
