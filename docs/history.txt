@@ -1,6 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
 12-Aug-2000
+	- Martin Geisse added some missing error output in WalkTest.
+	- Martin also added a missing dependency entry in the MSVC
+	  workspace file.
+	- Martin fixed a compile-time error in the perfstat plugin.
+	- Thomas Hieber removed some warnings in the perfstat plugin.
 	- Wouter Wijngaards did the following:
 	  Make install now works on Linux, set CRYSTAL to the installdir,
 	  including a trailing /. For this I made some changes. engine: now
