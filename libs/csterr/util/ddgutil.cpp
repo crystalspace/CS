@@ -17,15 +17,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 // For timing info.
-#ifndef WIN32
+#if !defined(WIN32) || defined(COMP_GCC)
 #include <sys/types.h>
 #include <sys/times.h>
 #else
-#ifdef COMP_GCC
-# include <sys/types.h>
-#else
-#include <sys/time.h>
-#endif
+#include <time.h>
 #endif
 #include "util/ddgutil.h"
 // ----------------------------------------------------------------------
