@@ -112,3 +112,9 @@ PROBLEM: Semi-translucent sprites display bizarre color anomalies in RGBA
     when color masks are shifted to the right.
 SOLUTION: Unknown.
 DIFFICULTY: Unknown.
+
+PROBLEM: A bug in the software renderer's texture manager/cache causes the
+    wrong texture or garbage to be mapped to certain polygons.  This appears
+    to be a memory management bug of some sort.
+SOLUTION: Unknown.
+DIFFICULTY: Unknown.
