@@ -110,7 +110,7 @@ public:
     OpSetFog::density = density;
   }
 
-  virtual void Do (csTicks /*dt*/)
+  virtual void Do (csTicks /*dt*/, iBase*)
   {
     if (density < 0.001)
       sector->DisableFog ();
@@ -143,17 +143,18 @@ public:
     OpFadeFog::eseqmgr = eseqmgr;
   }
 
-  virtual void Do (csTicks dt)
+  virtual void Do (csTicks dt, iBase* params)
   {
     csFog* fog = sector->GetFog ();
     start_col.red = fog->red;
     start_col.green = fog->green;
     start_col.blue = fog->blue;
     start_density = fog->density;
-    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation);
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation,
+    	params);
   }
 
-  void DoTimed (float time)
+  void DoTimed (float time, iBase*)
   {
     float density = (1-time) * start_density + time * end_density;
     if (density < 0.001)
@@ -173,9 +174,9 @@ public:
   struct SequenceTimedOperation : public iSequenceTimedOperation
   {
     SCF_DECLARE_EMBEDDED_IBASE (OpFadeFog);
-    virtual void Do (float time)
+    virtual void Do (float time, iBase* params)
     {
-      scfParent->DoTimed (time);
+      scfParent->DoTimed (time, params);
     }
   } scfiSequenceTimedOperation;
   friend struct SequenceTimedOperation;
@@ -243,7 +244,7 @@ public:
     type = SETMATERIALTYPE_POLYGON;
   }
 
-  virtual void Do (csTicks /*dt*/)
+  virtual void Do (csTicks /*dt*/, iBase*)
   {
     switch (type)
     {
@@ -276,7 +277,7 @@ public:
     OpSetLight::color = color;
   }
 
-  virtual void Do (csTicks /*dt*/)
+  virtual void Do (csTicks /*dt*/, iBase*)
   {
     light->SetColor (color);
   }
@@ -304,13 +305,14 @@ public:
     OpFadeLight::eseqmgr = eseqmgr;
   }
 
-  virtual void Do (csTicks dt)
+  virtual void Do (csTicks dt, iBase* params)
   {
     start_col = light->GetColor ();
-    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation);
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation,
+    	params);
   }
 
-  void DoTimed (float time)
+  void DoTimed (float time, iBase*)
   {
     csColor color;
     color.red = (1-time) * start_col.red + time * end_col.red;
@@ -324,9 +326,9 @@ public:
   struct SequenceTimedOperation : public iSequenceTimedOperation
   {
     SCF_DECLARE_EMBEDDED_IBASE (OpFadeLight);
-    virtual void Do (float time)
+    virtual void Do (float time, iBase* params)
     {
-      scfParent->DoTimed (time);
+      scfParent->DoTimed (time, params);
     }
   } scfiSequenceTimedOperation;
   friend struct SequenceTimedOperation;
@@ -392,7 +394,7 @@ public:
     if (stars) return; type++;
   }
 
-  virtual void Do (csTicks /*dt*/)
+  virtual void Do (csTicks /*dt*/, iBase*)
   {
     switch (type)
     {
@@ -455,7 +457,7 @@ public:
     if (stars) return; type++;
   }
 
-  virtual void Do (csTicks dt)
+  virtual void Do (csTicks dt, iBase* params)
   {
     switch (type)
     {
@@ -468,10 +470,11 @@ public:
       case SETCOLORTYPE_STARS: start_col = stars->GetColor (); break;
       case SETCOLORTYPE_UNKNOWN: break;
     }
-    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation);
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation,
+    	params);
   }
 
-  void DoTimed (float time)
+  void DoTimed (float time, iBase*)
   {
     csColor color;
     color.red = (1-time) * start_col.red + time * end_col.red;
@@ -495,9 +498,9 @@ public:
   struct SequenceTimedOperation : public iSequenceTimedOperation
   {
     SCF_DECLARE_EMBEDDED_IBASE (OpFadeMeshColor);
-    virtual void Do (float time)
+    virtual void Do (float time, iBase* params)
     {
-      scfParent->DoTimed (time);
+      scfParent->DoTimed (time, params);
     }
   } scfiSequenceTimedOperation;
   friend struct SequenceTimedOperation;
@@ -548,14 +551,15 @@ public:
     OpRotate::eseqmgr = eseqmgr;
   }
 
-  virtual void Do (csTicks dt)
+  virtual void Do (csTicks dt, iBase* params)
   {
     iMovable* movable = mesh->GetMovable ();
     start_transform = movable->GetTransform ();
-    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation);
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation,
+    	params);
   }
 
-  void DoTimed (float time)
+  void DoTimed (float time, iBase*)
   {
     csReversibleTransform trans = start_transform;
     trans.Translate (-offset);
@@ -613,9 +617,9 @@ public:
   struct SequenceTimedOperation : public iSequenceTimedOperation
   {
     SCF_DECLARE_EMBEDDED_IBASE (OpRotate);
-    virtual void Do (float time)
+    virtual void Do (float time, iBase* params)
     {
-      scfParent->DoTimed (time);
+      scfParent->DoTimed (time, params);
     }
   } scfiSequenceTimedOperation;
   friend struct SequenceTimedOperation;
@@ -655,14 +659,15 @@ public:
     OpMove::eseqmgr = eseqmgr;
   }
 
-  virtual void Do (csTicks dt)
+  virtual void Do (csTicks dt, iBase* params)
   {
     iMovable* movable = mesh->GetMovable ();
     start_pos = movable->GetTransform ().GetOrigin ();
-    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation);
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation,
+    	params);
   }
 
-  void DoTimed (float time)
+  void DoTimed (float time, iBase*)
   {
     csVector3 new_pos = start_pos + time * offset;
     mesh->GetMovable ()->GetTransform ().SetOrigin (new_pos);
@@ -675,9 +680,9 @@ public:
   struct SequenceTimedOperation : public iSequenceTimedOperation
   {
     SCF_DECLARE_EMBEDDED_IBASE (OpMove);
-    virtual void Do (float time)
+    virtual void Do (float time, iBase* params)
     {
-      scfParent->DoTimed (time);
+      scfParent->DoTimed (time, params);
     }
   } scfiSequenceTimedOperation;
   friend struct SequenceTimedOperation;
@@ -709,7 +714,7 @@ public:
     OpTriggerState::en = en;
   }
 
-  virtual void Do (csTicks /*dt*/)
+  virtual void Do (csTicks /*dt*/, iBase*)
   {
     trigger->SetEnabled (en);
   }
@@ -733,7 +738,7 @@ public:
     OpCheckTrigger::delay = delay;
   }
 
-  virtual void Do (csTicks /*dt*/)
+  virtual void Do (csTicks /*dt*/, iBase*)
   {
     trigger->TestConditions (delay);
   }
@@ -755,7 +760,7 @@ public:
     CondTestTrigger::trigger = trigger;
   }
 
-  virtual bool Condition (csTicks /*dt*/)
+  virtual bool Condition (csTicks /*dt*/, iBase*)
   {
     return trigger->CheckState ();
   }
@@ -1177,7 +1182,7 @@ public:
     CondTestConditions::delay = delay;
   }
 
-  virtual bool Condition (csTicks /*dt*/)
+  virtual bool Condition (csTicks /*dt*/, iBase*)
   {
     // The sequence which loops this condition will end
     // automatically when the delay in the trigger is
@@ -1290,13 +1295,13 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
       csTimedOperation* op = timed_operations[i];
       if (curtime >= op->end)
       {
-        op->op->Do (1.0);
+        op->op->Do (1.0, op->GetParams ());
         timed_operations.Delete (i);
       }
       else
       {
 	float time = float (curtime-op->start) / float (op->end-op->start);
-        op->op->Do (time);
+        op->op->Do (time, op->GetParams ());
       }
       i--;
     }
@@ -1434,16 +1439,16 @@ iSequenceWrapper* csEngineSequenceManager::FindSequenceByName (
 }
 
 void csEngineSequenceManager::FireTimedOperation (csTicks delta,
-	csTicks duration, iSequenceTimedOperation* op)
+	csTicks duration, iSequenceTimedOperation* op, iBase* params)
 {
   csTicks curtime = seqmgr->GetMainTime ();
   if (delta >= duration)
   {
-    op->Do (1.0);
+    op->Do (1.0, params);
     return;	// Already done.
   }
 
-  csTimedOperation* top = new csTimedOperation (op);
+  csTimedOperation* top = new csTimedOperation (op, params);
   top->start = curtime-delta;
   top->end = top->start + duration;
 

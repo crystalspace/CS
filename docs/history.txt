@@ -1,6 +1,11 @@
 The history order is reversed so that new features are at the top.
 
 1-Oct-2002
+	- Added the notion of parameters to the base sequence manager.
+	  A parameter is a generic iBase* parameter which can be any
+	  SCF interface internally.
+	- Fixed csdemo and the engine sequence manager for the changes
+	  above.
 	- Eric Sunshine made CS/bin/arch.sh more robust.  It now correctly
 	  handles the case on Linux where the user does not have permission to
 	  read /proc/cpuinfo.

@@ -265,7 +265,7 @@ struct iSequenceTimedOperation : public iBase
   /**
    * Do the operation. 'time' will be between 0 and 1.
    */
-  virtual void Do (float time) = 0;
+  virtual void Do (float time, iBase* params) = 0;
 };
 
 SCF_VERSION (iEngineSequenceManager, 0, 0, 1);
@@ -364,9 +364,11 @@ struct iEngineSequenceManager : public iBase
    * Start a timed operation with a given delta (in ticks).
    * The delta has to be interpreted as the amount of time that has
    * already elapsed since the beginning of the timed operation.
+   * The params block is increffed for as long as is needed so you
+   * can release your reference.
    */
   virtual void FireTimedOperation (csTicks delta, csTicks duration,
-  	iSequenceTimedOperation* op) = 0;
+  	iSequenceTimedOperation* op, iBase* params = NULL) = 0;
 
   //-----------------------------------------------------------------------
 };

@@ -46,7 +46,7 @@ SCF_IMPLEMENT_IBASE_END
 
 //-----------------------------------------------------------------------------
 
-void FadeOp::Do (csTicks dt)
+void FadeOp::Do (csTicks dt, iBase*)
 {
   DemoSequenceManager::demoseq->SetupFade (start_fade,
   	end_fade, total_fade_time, dt);
@@ -64,7 +64,7 @@ RotatePartOp::RotatePartOp (const char* meshName, csTicks total,
   }
 }
 
-void RotatePartOp::Do (csTicks dt)
+void RotatePartOp::Do (csTicks dt, iBase*)
 {
   DemoSequenceManager::demoseq->SetupRotatePart (mesh, angle_speed,
   	total_rotate_time, dt);
@@ -94,7 +94,7 @@ AttachOp::AttachOp (const char* meshName, const char* pathName)
   }
 }
 
-void AttachOp::Do (csTicks /*dt*/)
+void AttachOp::Do (csTicks /*dt*/, iBase*)
 {
   DemoSequenceManager::demoseq->ReplacePathObject (path, mesh);
 }
@@ -124,7 +124,7 @@ PathOp::PathOp (csTicks t, const char* meshName, const char* pathName)
   }
 }
 
-void PathOp::Do (csTicks dt)
+void PathOp::Do (csTicks dt, iBase*)
 {
   DemoSequenceManager::demoseq->SetupPath (path, mesh,
   	total_path_time, dt);
@@ -152,7 +152,7 @@ SetupMeshOp::SetupMeshOp (const char* meshName, const char* sectName,
   }
 }
 
-void SetupMeshOp::Do (csTicks /*dt*/)
+void SetupMeshOp::Do (csTicks /*dt*/, iBase*)
 {
   if (mesh)
   {
@@ -176,7 +176,7 @@ ShowMeshOp::ShowMeshOp (const char* meshName)
   }
 }
 
-void ShowMeshOp::Do (csTicks /*dt*/)
+void ShowMeshOp::Do (csTicks /*dt*/, iBase*)
 {
   if (mesh)
   {
@@ -197,7 +197,7 @@ HideMeshOp::HideMeshOp (const char* meshName)
   }
 }
 
-void HideMeshOp::Do (csTicks /*dt*/)
+void HideMeshOp::Do (csTicks /*dt*/, iBase*)
 {
   if (mesh)
   {
@@ -205,7 +205,7 @@ void HideMeshOp::Do (csTicks /*dt*/)
   }
 }
 
-void TestOp::Do (csTicks dt)
+void TestOp::Do (csTicks dt, iBase*)
 {
   printf ("dt=%ld fps=%g\n", (long)dt,
   	DemoSequenceManager::demoseq->GetFPS ()); fflush (stdout);

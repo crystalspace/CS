@@ -53,7 +53,7 @@ public:
 class TestOp : public StandardOp
 {
 public:
-  virtual void Do (csTicks dt);
+  virtual void Do (csTicks dt, iBase* params);
 };
 
 /**
@@ -71,7 +71,7 @@ public:
   {
   }
 
-  virtual void Do (csTicks dt);
+  virtual void Do (csTicks dt, iBase* params);
 };
 
 /**
@@ -87,7 +87,7 @@ private:
 public:
   RotatePartOp (const char* meshname, csTicks total, float aspeed);
 
-  virtual void Do (csTicks dt);
+  virtual void Do (csTicks dt, iBase* params);
 };
 
 /**
@@ -102,7 +102,7 @@ private:
 
 public:
   SetupMeshOp (const char* meshName, const char* sectName, const csVector3& p);
-  virtual void Do (csTicks dt);
+  virtual void Do (csTicks dt, iBase* params);
 };
 
 /**
@@ -115,7 +115,7 @@ private:
 
 public:
   ShowMeshOp (const char* meshName);
-  virtual void Do (csTicks dt);
+  virtual void Do (csTicks dt, iBase* params);
 };
 
 /**
@@ -128,7 +128,7 @@ private:
 
 public:
   HideMeshOp (const char* meshName);
-  virtual void Do (csTicks dt);
+  virtual void Do (csTicks dt, iBase* params);
 };
 
 /**
@@ -142,7 +142,7 @@ private:
 
 public:
   AttachOp (const char* meshName, const char* pathName);
-  virtual void Do (csTicks dt);
+  virtual void Do (csTicks dt, iBase* params);
 };
 
 /**
@@ -157,7 +157,7 @@ private:
 
 public:
   PathOp (csTicks t, const char* meshName, const char* pathName);
-  virtual void Do (csTicks dt);
+  virtual void Do (csTicks dt, iBase* params);
 };
 
 #endif // DEMOOP_H

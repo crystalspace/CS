@@ -23,7 +23,7 @@
 
 struct iSequenceManager;
 
-SCF_VERSION (iSequenceOperation, 0, 0, 1);
+SCF_VERSION (iSequenceOperation, 0, 1, 0);
 
 /**
  * A sequence operation. This is effectively a callback
@@ -39,10 +39,10 @@ struct iSequenceOperation : public iBase
    * was called one second late. This latency can happen because the
    * sequence manager only kicks in every frame and frame rate can be low.
    */
-  virtual void Do (csTicks dt) = 0;
+  virtual void Do (csTicks dt, iBase* params) = 0;
 };
 
-SCF_VERSION (iSequenceCondition, 0, 0, 1);
+SCF_VERSION (iSequenceCondition, 0, 1, 0);
 
 /**
  * A sequence condition. This is also a callback to the application.
@@ -58,10 +58,10 @@ struct iSequenceCondition : public iBase
    * was called one second late. This latency can happen because the
    * sequence manager only kicks in every frame and frame rate can be low.
    */
-  virtual bool Condition (csTicks dt) = 0;
+  virtual bool Condition (csTicks dt, iBase* params) = 0;
 };
 
-SCF_VERSION (iSequence, 0, 0, 1);
+SCF_VERSION (iSequence, 0, 0, 2);
 
 /**
  * A sequence of operations tagged with relative time information.
@@ -75,13 +75,15 @@ struct iSequence : public iBase
    * Add an operation to this sequence. This function will call IncRef()
    * on the operation.
    */
-  virtual void AddOperation (csTicks time, iSequenceOperation* operation) = 0;
+  virtual void AddOperation (csTicks time, iSequenceOperation* operation,
+  	iBase* params = NULL) = 0;
 
   /**
    * Add a standard operation to execute another sequence. This function
    * will call IncRef() on the sequence.
    */
-  virtual void AddRunSequence (csTicks time, iSequence* sequence) = 0;
+  virtual void AddRunSequence (csTicks time, iSequence* sequence,
+  	iBase* params = NULL) = 0;
 
   /**
    * Add a standard operation to perform a condition and execute the right
@@ -89,14 +91,15 @@ struct iSequence : public iBase
    * IncRef() on the condition and sequences.
    */
   virtual void AddCondition (csTicks time, iSequenceCondition* condition,
-  	iSequence* trueSequence, iSequence* falseSequence) = 0;
+  	iSequence* trueSequence, iSequence* falseSequence,
+	iBase* params = NULL) = 0;
 
   /**
    * Perform the sequence for as long as the condition is valid.
    * This function will call IncRef() on the condition and sequence.
    */
   virtual void AddLoop (csTicks time, iSequenceCondition* condition,
-  	iSequence* sequence) = 0;
+  	iSequence* sequence, iBase* params = NULL) = 0;
 
   /**
    * Clear all operations in this sequence (call DecRef()).
@@ -109,7 +112,7 @@ struct iSequence : public iBase
   virtual bool IsEmpty () = 0;
 };
 
-SCF_VERSION (iSequenceManager, 0, 0, 2);
+SCF_VERSION (iSequenceManager, 0, 0, 3);
 
 /**
  * The sequence manager. The sequence manager is a plugin that will perform
@@ -186,8 +189,14 @@ struct iSequenceManager : public iBase
    * Modifications on a sequence after it has been added have no effect.
    * You can also remove the sequence (with DecRef()) immediatelly after
    * running it.
+   * <p>
+   * The optional params instance will be given to all operations that
+   * are added on the main sequence. Ref counting is used to keep track
+   * of this object. So you can safely DecRef() your own reference after
+   * calling RunSequence.
    */
-  virtual void RunSequence (csTicks time, iSequence* sequence) = 0;
+  virtual void RunSequence (csTicks time, iSequence* sequence,
+  	iBase* params = NULL) = 0;
 };
 
 #endif // __IVARIA_SEQUENCE_H__

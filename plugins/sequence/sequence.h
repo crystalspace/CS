@@ -31,10 +31,11 @@ struct csSequenceOp
 {
   csSequenceOp* next, * prev;
   csTicks time;
-  iSequenceOperation* operation;
+  csRef<iBase> params;
+  csRef<iSequenceOperation> operation;
 
-  csSequenceOp () : operation (NULL) { }
-  ~csSequenceOp () { if (operation) operation->DecRef (); }
+  csSequenceOp () { }
+  ~csSequenceOp () { }
 };
 
 class csSequence : public iSequence
@@ -68,16 +69,16 @@ public:
   class RunSequenceOp : public StandardOperation
   {
   private:
-    iSequence* sequence;
+    csRef<iSequence> sequence;
   protected:
-    virtual ~RunSequenceOp () { sequence->DecRef (); }
+    virtual ~RunSequenceOp () { }
   public:
     RunSequenceOp (iSequenceManager* sm, iSequence* seq) :
-    	StandardOperation (sm), sequence (seq)
+    	StandardOperation (sm)
     {
-      seq->IncRef ();
+      sequence = seq;
     }
-    virtual void Do (csTicks dt);
+    virtual void Do (csTicks dt, iBase* params);
   };
 
   //=====
@@ -86,27 +87,20 @@ public:
   class RunCondition : public StandardOperation
   {
   private:
-    iSequenceCondition* condition;
-    iSequence* trueSequence;
-    iSequence* falseSequence;
+    csRef<iSequenceCondition> condition;
+    csRef<iSequence> trueSequence;
+    csRef<iSequence> falseSequence;
   protected:
-    virtual ~RunCondition ()
-    {
-      if (trueSequence) trueSequence->DecRef ();
-      if (falseSequence) falseSequence->DecRef ();
-      condition->DecRef ();
-    }
+    virtual ~RunCondition () { }
   public:
     RunCondition (iSequenceManager* sm, iSequenceCondition* cond,
-    	iSequence* trueSeq, iSequence* falseSeq) :
-	StandardOperation (sm), condition (cond), trueSequence (trueSeq),
-	falseSequence (falseSeq)
+    	iSequence* trueSeq, iSequence* falseSeq) : StandardOperation (sm)
     {
-      if (trueSeq) trueSeq->IncRef ();
-      if (falseSeq) falseSeq->IncRef ();
-      cond->IncRef ();
+      trueSequence = trueSeq;
+      falseSequence = falseSeq;
+      condition = cond;
     }
-    virtual void Do (csTicks dt);
+    virtual void Do (csTicks dt, iBase* params);
   };
 
   //=====
@@ -115,22 +109,18 @@ public:
   class RunLoop : public StandardOperation
   {
   private:
-    iSequenceCondition* condition;
-    iSequence* sequence;
+    csRef<iSequenceCondition> condition;
+    csRef<iSequence> sequence;
   protected:
-    virtual ~RunLoop ()
-    {
-      sequence->DecRef ();
-      condition->DecRef ();
-    }
+    virtual ~RunLoop () { }
   public:
     RunLoop (iSequenceManager* sm, iSequenceCondition* cond, iSequence* seq) :
-    	StandardOperation (sm), condition (cond), sequence (seq)
+    	StandardOperation (sm)
     {
-      seq->IncRef ();
-      cond->IncRef ();
+      sequence = seq;
+      condition = cond;
     }
-    virtual void Do (csTicks dt);
+    virtual void Do (csTicks dt, iBase* params);
   };
 
 public:
@@ -142,12 +132,15 @@ public:
   csSequenceOp* GetFirstSequence () { return first; }
   void DeleteFirstSequence ();
 
-  virtual void AddOperation (csTicks time, iSequenceOperation* operation);
-  virtual void AddRunSequence (csTicks time, iSequence* sequence);
+  virtual void AddOperation (csTicks time, iSequenceOperation* operation,
+  	iBase* params = NULL);
+  virtual void AddRunSequence (csTicks time, iSequence* sequence,
+  	iBase* params = NULL);
   virtual void AddCondition (csTicks time, iSequenceCondition* condition,
-  	iSequence* trueSequence, iSequence* falseSequence);
+  	iSequence* trueSequence, iSequence* falseSequence,
+	iBase* params = NULL);
   virtual void AddLoop (csTicks time, iSequenceCondition* condition,
-  	iSequence* sequence);
+  	iSequence* sequence, iBase* params = NULL);
   virtual void Clear ();
   virtual bool IsEmpty () { return first == NULL; }
 };
@@ -190,7 +183,8 @@ public:
   virtual void TimeWarp (csTicks time, bool skip);
   virtual csTicks GetMainTime () { return main_time; }
   virtual iSequence* NewSequence ();
-  virtual void RunSequence (csTicks time, iSequence* sequence);
+  virtual void RunSequence (csTicks time, iSequence* sequence,
+  	iBase* params = NULL);
 
   struct eiComponent : public iComponent
   {

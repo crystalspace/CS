@@ -68,12 +68,13 @@ void csSequence::DeleteFirstSequence ()
   }
 }
 
-void csSequence::AddOperation (csTicks time, iSequenceOperation* operation)
+void csSequence::AddOperation (csTicks time, iSequenceOperation* operation,
+	iBase* params)
 {
   csSequenceOp* op = new csSequenceOp ();
   op->time = time;
   op->operation = operation;
-  op->operation->IncRef ();
+  op->params = params;
   // Insert this operation at the right time.
   if (first)
   {
@@ -108,53 +109,55 @@ void csSequence::AddOperation (csTicks time, iSequenceOperation* operation)
   }
 }
 
-void csSequence::AddRunSequence (csTicks time, iSequence* sequence)
+void csSequence::AddRunSequence (csTicks time, iSequence* sequence,
+	iBase* params)
 {
   RunSequenceOp* op = new RunSequenceOp (seqmgr, sequence);
-  AddOperation (time, op);
+  AddOperation (time, op, params);
   op->DecRef ();
 }
 
-void csSequence::RunSequenceOp::Do (csTicks dt)
+void csSequence::RunSequenceOp::Do (csTicks dt, iBase* params)
 {
-  seqmgr->RunSequence (-(signed)dt, sequence);
+  seqmgr->RunSequence (-(signed)dt, sequence, params);
 }
 
 void csSequence::AddCondition (csTicks time, iSequenceCondition* condition,
-  	iSequence* trueSequence, iSequence* falseSequence)
+  	iSequence* trueSequence, iSequence* falseSequence,
+	iBase* params)
 {
   RunCondition* op = new RunCondition (seqmgr, condition, trueSequence,
   	falseSequence);
-  AddOperation (time, op);
+  AddOperation (time, op, params);
   op->DecRef ();
 }
 
-void csSequence::RunCondition::Do (csTicks dt)
+void csSequence::RunCondition::Do (csTicks dt, iBase* params)
 {
-  if (condition->Condition (dt))
+  if (condition->Condition (dt, params))
   {
     if (trueSequence)
-      seqmgr->RunSequence (-(signed)dt, trueSequence);
+      seqmgr->RunSequence (-(signed)dt, trueSequence, params);
   }
   else
   {
     if (falseSequence)
-      seqmgr->RunSequence (-(signed)dt, falseSequence);
+      seqmgr->RunSequence (-(signed)dt, falseSequence, params);
   }
 }
 
 void csSequence::AddLoop (csTicks time, iSequenceCondition* condition,
-  	iSequence* sequence)
+  	iSequence* sequence, iBase* params)
 {
   RunLoop* op = new RunLoop (seqmgr, condition, sequence);
-  AddOperation (time, op);
+  AddOperation (time, op, params);
   op->DecRef ();
 }
 
-void csSequence::RunLoop::Do (csTicks dt)
+void csSequence::RunLoop::Do (csTicks dt, iBase* params)
 {
-  while (condition->Condition (dt))
-    seqmgr->RunSequence (-(signed)dt, sequence);
+  while (condition->Condition (dt, params))
+    seqmgr->RunSequence (-(signed)dt, sequence, params);
 }
 
 //---------------------------------------------------------------------------
@@ -265,17 +268,17 @@ void csSequenceManager::TimeWarp (csTicks time, bool skip)
     // queue we take care to first unlink this sequence operation
     // before performing it. Because DeleteFirstSequence() does a
     // DecRef() we first IncRef() it.
-    iSequenceOperation* op = seqOp->operation;
+    csRef<iSequenceOperation> op = seqOp->operation;
     csTicks opt = seqOp->time;
-    op->IncRef ();
     main_sequence->DeleteFirstSequence ();
 
     if (!skip)
     {
-      op->Do (main_time - opt);
+      op->Do (main_time - opt, seqOp->params);
     }
     // Now really delete the operation.
-    op->DecRef ();
+    op = NULL;
+
     // And fetch the next one.
     seqOp = main_sequence->GetFirstSequence ();
   }
@@ -287,13 +290,15 @@ iSequence* csSequenceManager::NewSequence ()
   return n;
 }
 
-void csSequenceManager::RunSequence (csTicks time, iSequence* sequence)
+void csSequenceManager::RunSequence (csTicks time, iSequence* sequence,
+	iBase* params)
 {
   csSequence* seq = (csSequence*)sequence;
   csSequenceOp* op = seq->GetFirstSequence ();
   while (op)
   {
-    main_sequence->AddOperation (main_time + time + op->time, op->operation);
+    main_sequence->AddOperation (main_time + time + op->time, op->operation,
+    	params);
     op = op->next;
   }
 }
