@@ -78,6 +78,7 @@
 #include "csutil/physfile.h"
 #include "csutil/plugldr.h"
 #include "csutil/plugmgr.h"
+#include "csutil/pooledscfclass.h"
 #include "csutil/prfxcfg.h"
 #include "csutil/radixsort.h"
 #include "csutil/randomgen.h"
