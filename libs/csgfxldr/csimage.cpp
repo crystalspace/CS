@@ -151,7 +151,7 @@ csImageFile::csImageFile (int iFormat)
 
 csImageFile::~csImageFile ()
 {
-  free_image ();
+  FreeImage ();
   CHK (delete [] fName);
 }
 
@@ -205,10 +205,10 @@ void csImageFile::set_dimensions (int w, int h)
 {
   Width = w;
   Height = h;
-  free_image ();
+  FreeImage ();
 }
 
-void csImageFile::free_image ()
+void csImageFile::FreeImage ()
 {
   switch (Format & CS_IMGFMT_MASK)
   {
@@ -416,7 +416,7 @@ void csImageFile::convert_rgba (RGBPixel *iImage)
       break;
     case CS_IMGFMT_TRUECOLOR:
       if (Image != iImage)
-        free_image ();
+        FreeImage ();
       Image = iImage;
       break;
   }

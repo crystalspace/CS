@@ -50,16 +50,16 @@ csTextureGlide::~csTextureGlide ()
 csTextureMMGlide::csTextureMMGlide (iImage* image, int flags) : 
   csTextureMM (image, flags)
 {
-  if ( flags & CS_TEXTURE_3D ) adjust_size_po2 ();
+  if ( flags & CS_TEXTURE_3D ) AdjustSizePo2 ();
   else printf( "no 3d tex: dim %d, %d\n", image->GetWidth(), image->GetHeight() );
 }
 
-csTexture *csTextureMMGlide::new_texture (iImage *Image)
+csTexture *csTextureMMGlide::NewTexture (iImage *Image)
 {
   return new csTextureGlide (this, Image);
 }
 
-void csTextureMMGlide::compute_mean_color ()
+void csTextureMMGlide::ComputeMeanColor ()
 {
   csTextureGlide *tex;
   int i, pixels;
@@ -148,8 +148,8 @@ void csTextureManagerGlide::PrepareTextures ()
   for (i = 0 ; i < textures.Length () ; i++)
   {
     csTextureMM* txt = textures.Get (i);
-    txt->apply_gamma ();
-    txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+    txt->ApplyGamma ();
+    txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
     ((csTextureMMGlide *)txt)->remap_mm();
   }
 }
@@ -169,7 +169,7 @@ void csTextureManagerGlide::PrepareTexture (iTextureHandle *handle)
   if (!handle) { printf( "NULL image\n"); return; }
 
   csTextureMMGlide *txt = (csTextureMMGlide *)handle->GetPrivateObject ();
-  txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
   txt->remap_mm ();
 }
 

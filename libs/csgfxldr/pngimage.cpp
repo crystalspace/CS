@@ -86,7 +86,7 @@ bool ImagePngFile::Load (UByte *iBuffer, ULong iSize)
   if (!png)
   {
 nomem:
-    free_image ();
+    FreeImage ();
     return false;
   }
   info = png_create_info_struct (png);

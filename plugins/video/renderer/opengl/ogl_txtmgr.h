@@ -41,9 +41,9 @@ public:
   /// Delete the texture object
   virtual ~csTextureMMOpenGL ();
   /// Create a new texture object
-  virtual csTexture *new_texture (iImage *Image);
+  virtual csTexture *NewTexture (iImage *Image);
   /// Compute the mean color for the just-created texture
-  virtual void compute_mean_color ();
+  virtual void ComputeMeanColor ();
 };
 
 /**

@@ -63,7 +63,7 @@ struct iImage;
  * At the time client calls TextureManager::PrepareTextures() the
  * mipmaps and the 2D textures are created, if needed. After this
  * you can call TextureManager::FreeImages() which in turn will call
- * csTextureMM::free_image () for each registered texture and the
+ * csTextureMM::FreeImage () for each registered texture and the
  * original texture will be released. This means you will free the
  * memory occupied by the original textures, but it also means you
  * cannot call TextureManager::Prepare() again.
@@ -99,38 +99,35 @@ public:
   virtual ~csTextureMM ();
 
   /// Get texture usage flags
-  int get_flags () { return flags; }
+  int GetFlags () { return flags; }
 
   /// Release the original image (iImage) as given by the engine.
-  void free_image ();
+  void FreeImage ();
 
   /// Create all mipmapped bitmaps from the first level.
-  virtual void create_mipmaps (bool verynice, bool blend_mipmap0);
+  virtual void CreateMipmaps (bool verynice, bool blend_mipmap0);
 
   /// Get the texture at the corresponding mipmap level (0..3)
   virtual csTexture *get_texture (int mipmap);
-
-  /// Set the transparent color.
-  void set_transparent (int red, int green, int blue);
 
   /**
    * Adjusts the textures size, to ensure some restrictions like
    * power of two dimension are met.
    */
-  void adjust_size_po2 ();
+  void AdjustSizePo2 ();
 
   /// Get the transparent color as a RGB pixel
   RGBPixel *get_transparent ()
   { return &transp_color; }
 
   /// Create a new texture object (should be implemented by heirs)
-  virtual csTexture *new_texture (iImage *Image) = 0;
+  virtual csTexture* NewTexture (iImage *Image) = 0;
 
   /// Compute the mean color for the just-created texture
-  virtual void compute_mean_color () = 0;
+  virtual void ComputeMeanColor () = 0;
 
   /// Apply gamma to the base image. NOP if called second time.
-  void apply_gamma ();
+  void ApplyGamma ();
 
   ///---------------------- iTextureHandle implementation ----------------------
   DECLARE_IBASE;

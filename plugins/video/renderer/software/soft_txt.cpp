@@ -131,7 +131,7 @@ csTextureMMSoftware::csTextureMMSoftware (iImage *image, int flags) :
 {
   pal2glob = NULL;
   if (flags & CS_TEXTURE_3D)
-    adjust_size_po2 ();
+    AdjustSizePo2 ();
 }
 
 csTextureMMSoftware::~csTextureMMSoftware ()
@@ -139,12 +139,12 @@ csTextureMMSoftware::~csTextureMMSoftware ()
   delete [] (UByte *)pal2glob;
 }
 
-csTexture *csTextureMMSoftware::new_texture (iImage *Image)
+csTexture *csTextureMMSoftware::NewTexture (iImage *Image)
 {
   return new csTextureSoftware (this, Image);
 }
 
-void csTextureMMSoftware::compute_mean_color ()
+void csTextureMMSoftware::ComputeMeanColor ()
 {
   int i;
 
@@ -475,8 +475,8 @@ void csTextureManagerSoftware::PrepareTextures ()
   {
     csTextureMM *txt = textures.Get (i);
     if (!pfmt.PalEntries)
-      txt->apply_gamma ();
-    txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+      txt->ApplyGamma ();
+    txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
   }
 
   // The only thing left to do is to compute the palette
@@ -504,8 +504,8 @@ void csTextureManagerSoftware::PrepareTexture (iTextureHandle *handle)
 
   csTextureMMSoftware *txt = (csTextureMMSoftware *)handle->GetPrivateObject ();
   if (!pfmt.PalEntries)
-    txt->apply_gamma ();
-  txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+    txt->ApplyGamma ();
+  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
   txt->remap_texture (this);
 }
 

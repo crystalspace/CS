@@ -59,17 +59,17 @@ csTextureMM::~csTextureMM ()
 {
   for (int i = 0; i < 4; i++)
     CHKB (delete tex [i]);
-  free_image ();
+  FreeImage ();
 }
 
-void csTextureMM::free_image ()
+void csTextureMM::FreeImage ()
 {
   if (!image) return;
   image->DecRef ();
   image = NULL;
 }
 
-void csTextureMM::create_mipmaps (bool verynice, bool blend_mipmap0)
+void csTextureMM::CreateMipmaps (bool verynice, bool blend_mipmap0)
 {
   if (!image) return;
 
@@ -99,19 +99,19 @@ void csTextureMM::create_mipmaps (bool verynice, bool blend_mipmap0)
     iImage *i3 = ++n <= maxMM ? image->MipMap (step++, tc) : NULL;
 #endif
 
-    tex [0] = new_texture (i0);
-    tex [1] = i1 ? new_texture (i1) : NULL;
-    tex [2] = i2 ? new_texture (i2) : NULL;
-    tex [3] = i3 ? new_texture (i3) : NULL;
+    tex [0] = NewTexture (i0);
+    tex [1] = i1 ? NewTexture (i1) : NULL;
+    tex [2] = i2 ? NewTexture (i2) : NULL;
+    tex [3] = i3 ? NewTexture (i3) : NULL;
   }
   else
   {
     // 2D textures uses just the top-level mipmap
     image->IncRef ();
-    tex [0] = new_texture (image);
+    tex [0] = NewTexture (image);
   }
 
-  compute_mean_color ();
+  ComputeMeanColor ();
 }
 
 void csTextureMM::SetTransparent (bool Enable)
@@ -171,7 +171,7 @@ void *csTextureMM::GetMipMapData (int mipmap)
   return txt ? txt->get_bitmap () : NULL;
 }
 
-void csTextureMM::adjust_size_po2 ()
+void csTextureMM::AdjustSizePo2 ()
 {
   int newwidth  = image->GetWidth();
   int newheight = image->GetHeight();
@@ -186,7 +186,7 @@ void csTextureMM::adjust_size_po2 ()
     image->Rescale (newwidth, newheight);
 }
 
-void csTextureMM::apply_gamma ()
+void csTextureMM::ApplyGamma ()
 {
   if (gamma_aplied || !image)
     return;
@@ -278,7 +278,7 @@ void csTextureManager::read_config (csIniFile *config)
 void csTextureManager::FreeImages ()
 {
   for (int i = 0 ; i < textures.Length () ; i++)
-    textures.Get (i)->free_image ();
+    textures.Get (i)->FreeImage ();
 }
 
 int csTextureManager::GetTextureFormat ()

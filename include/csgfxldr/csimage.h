@@ -99,7 +99,7 @@ protected:
   /**
    * Free all image data: pixels and palette. Takes care of image data format.
    */
-  void free_image ();
+  void FreeImage ();
 
   /// Return the closest color index to given. Fails if image has no palette.
   int closest_index (RGBPixel *iColor);

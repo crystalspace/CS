@@ -322,7 +322,7 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-  if (txt_mm->get_flags () & CS_TEXTURE_3D)
+  if (txt_mm->GetFlags () & CS_TEXTURE_3D)
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
       rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
 

@@ -107,10 +107,10 @@ protected:
   int palette_size;
 
   /// Create a new texture object
-  virtual csTexture *new_texture (iImage *Image);
+  virtual csTexture *NewTexture (iImage *Image);
 
   /// Compute the mean color for the just-created texture
-  virtual void compute_mean_color ();
+  virtual void ComputeMeanColor ();
 
 public:
   /// Create the mipmapped texture object

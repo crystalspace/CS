@@ -62,7 +62,7 @@ csTextureMMOpenGL::csTextureMMOpenGL (iImage *image, int flags,
   csGraphics3DOpenGL *iG3D) : csTextureMM (image, flags)
 {
   G3D = iG3D;
-  adjust_size_po2 ();
+  AdjustSizePo2 ();
 }
 
 csTextureMMOpenGL::~csTextureMMOpenGL ()
@@ -71,12 +71,12 @@ csTextureMMOpenGL::~csTextureMMOpenGL ()
     G3D->texture_cache->Uncache (this);
 }
 
-csTexture *csTextureMMOpenGL::new_texture (iImage *Image)
+csTexture *csTextureMMOpenGL::NewTexture (iImage *Image)
 {
   return new csTextureOpenGL (this, Image);
 }
 
-void csTextureMMOpenGL::compute_mean_color ()
+void csTextureMMOpenGL::ComputeMeanColor ()
 {
   // Compute the mean color from the smallest mipmap available
   csTextureOpenGL *tex = NULL;
@@ -129,8 +129,8 @@ void csTextureManagerOpenGL::PrepareTextures ()
   for (int i = 0; i < textures.Length (); i++)
   {
     csTextureMM *txt = textures.Get (i);
-    txt->apply_gamma ();
-    txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+    txt->ApplyGamma ();
+    txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
   }
 }
 
@@ -149,8 +149,8 @@ void csTextureManagerOpenGL::PrepareTexture (iTextureHandle *handle)
   if (!handle) return;
 
   csTextureMMOpenGL *txt = (csTextureMMOpenGL *)handle->GetPrivateObject ();
-  txt->apply_gamma ();
-  txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+  txt->ApplyGamma ();
+  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
 }
 
 void csTextureManagerOpenGL::UnregisterTexture (iTextureHandle* handle)

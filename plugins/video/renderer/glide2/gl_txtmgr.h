@@ -36,9 +36,9 @@ public:
   /// Create a mipmapped texture object
   csTextureMMGlide (iImage* image, int flags);
   /// Create a new csTextureGlide object
-  virtual csTexture *new_texture (iImage *Image);
+  virtual csTexture *NewTexture (iImage *Image);
   /// Compute the mean color
-  virtual void compute_mean_color ();
+  virtual void ComputeMeanColor ();
   /// Encode 24 bit data into 16 bit ( 565 RGB scheme )
   virtual void remap_mm ();
   

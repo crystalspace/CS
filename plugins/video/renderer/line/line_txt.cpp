@@ -135,12 +135,12 @@ csTextureMMLine::~csTextureMMLine ()
 {
 }
 
-csTexture *csTextureMMLine::new_texture (iImage *Image)
+csTexture *csTextureMMLine::NewTexture (iImage *Image)
 {
   return new csTextureLine (this, Image);
 }
 
-void csTextureMMLine::compute_mean_color ()
+void csTextureMMLine::ComputeMeanColor ()
 {
   int i;
 
@@ -458,7 +458,7 @@ void csTextureManagerLine::PrepareTextures ()
   // Create mipmaps for all textures
   int i;
   for (i = 0; i < textures.Length (); i++)
-    ((csTextureMMLine*)textures[i])->create_mipmaps (
+    ((csTextureMMLine*)textures[i])->CreateMipmaps (
       mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
 
   // The only thing left to do is to compute the palette
@@ -485,7 +485,7 @@ void csTextureManagerLine::PrepareTexture (iTextureHandle *handle)
   if (!handle) return;
 
   csTextureMMLine *txt = (csTextureMMLine *)handle->GetPrivateObject ();
-  txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
   txt->remap_texture (this);
 }
 
