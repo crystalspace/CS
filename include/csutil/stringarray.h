@@ -116,6 +116,19 @@ public:
   }
 
   /**
+   * Insert an element at a sorted position.
+   * Assumes array is already sorted.
+   */
+  size_t InsertSorted (const char* item, bool case_sensitive = true,
+    size_t* equal_index = 0)
+  {
+    int(*cf)(char const* const&, char const* const&) =
+      case_sensitive ? CaseSensitiveCompare : CaseInsensitiveCompare;
+    return superclass::InsertSorted (item,
+    	csArrayCmp<char const*, char const*>(item, cf), equal_index);
+  }
+
+  /**
    * Pop an element from tail end of array.  Caller is responsible for
    * invoking delete[] on the returned string when no longer needed.
    */
