@@ -38,14 +38,14 @@ class csClipper;
 class csIniFile;
 class csTextureCacheSoftware;
 
-// Max number of fog tables in indexed (8-bit) modes
-// This is maximal number of instantly visible fogs without noticeable slowdowns
+// Maximum number of fog tables in indexed (8-bit) modes.  This is maximum
+// number of instantly visible fogs without noticeable slowdowns.
 #define MAX_INDEXED_FOG_TABLES	8
 
 /// This structure is used to hold references to all current fog objects.
 struct FogBuffer
 {
-  FogBuffer* next, * prev;
+  FogBuffer *next, *prev;
   CS_ID id;
   float density;
   float red, green, blue;
@@ -63,9 +63,9 @@ protected:
   /// ID/window name of this context
   const char *title;
 
-  /// Z buffer for software renderer only. Hardware rendering uses own Z buffer.
+  /// Z buffer.
   unsigned long* z_buffer;
-  /// Size of Z buffer for software renderer.
+  /// Size of Z buffer.
   long z_buf_size;
 
   /**
@@ -76,9 +76,7 @@ protected:
    */
   UByte** line_table;
 
-  /**
-   * If true the we are really rendering with a smaller size inside a larger window.
-   */
+  /// If true then really rendering with a smaller size inside a larger window.
   bool do_smaller_rendering;
 
   /// Buffer for smaller rendering.
@@ -94,10 +92,11 @@ protected:
    * Shift amount in bits used to normalize and denormalize pixel data.  Most
    * drawing routines expect RGB pixel data to occupy least significant part
    * of RGBA tuple.  This value is used shift the RGB data to the expected
-   * position and back.  For instance, uses pixel data in the form RGBA, and
-   * the drawing routines expect ARGB, then this value will be 8, which means
-   * that the data must be shifted by 8 bits in order to transform it to the
-   * proper format.  Currently only used for 4-byte pixel data.
+   * position and back.  For instance, if a 2D driver uses pixel data in the
+   * form RGBA, and the drawing routines expect ARGB, then this value will be
+   * 8, which means that the data must be shifted by 8 bits in order to
+   * transform it to the proper format.  Currently only used for 4-byte pixel
+   * data.
    */
   int pixel_adjust;
 
@@ -166,14 +165,17 @@ protected:
   csDrawPIScanlineGouraud* ScanProcPIFX [4];
 
   /// The routine for getting the address of needed scanline_xxx_alpha
-  csDrawScanline* (*ScanProc_Alpha) (csGraphics3DSoftwareCommon *This, int alpha);
+  csDrawScanline* (*ScanProc_Alpha) (csGraphics3DSoftwareCommon*, int alpha);
 
   /// ScanProc_Alpha for 8 bpp modes
-  static csDrawScanline* ScanProc_8_Alpha (csGraphics3DSoftwareCommon *This, int alpha);
+  static csDrawScanline* ScanProc_8_Alpha (csGraphics3DSoftwareCommon*,
+    int alpha);
   /// ScanProc_Alpha for 16 bpp modes
-  static csDrawScanline* ScanProc_16_Alpha (csGraphics3DSoftwareCommon *This, int alpha);
+  static csDrawScanline* ScanProc_16_Alpha (csGraphics3DSoftwareCommon*,
+    int alpha);
   /// ScanProc_Alpha for 32 bpp modes
-  static csDrawScanline* ScanProc_32_Alpha (csGraphics3DSoftwareCommon *This, int alpha);
+  static csDrawScanline* ScanProc_32_Alpha (csGraphics3DSoftwareCommon*,
+    int alpha);
 
   /// Look for a given fog buffer
   FogBuffer* find_fog_buffer (CS_ID id);
@@ -228,8 +230,8 @@ public:
   /// Do interlacing? (-1 - no, 0/1 - yes)
   int do_interlaced;
   /**
-   * For interlacing. Temporary set to true if we moved quickly. This will decrease
-   * the bluriness a little.
+   * For interlacing.  Temporary set to true if we moved quickly.  This will
+   * decrease the bluriness a little.
    */
   bool ilace_fastmove;
 
@@ -247,22 +249,26 @@ public:
   /// Initialize new state from config file
   void NewInitialize ();
 
-  /// Initialize state from other driver (used when there are multiple contexts
-  /// in the system).
+  /**
+   * Initialize state from other driver (used when there are multiple contexts
+   * in the system).
+   */
   void SharedInitialize (csGraphics3DSoftwareCommon *p);
 
   virtual bool Open (const char *Title);
 
-  /// Gathers all that has to be done when opening from 
-  /// scratch. 
+  /// Gathers all that has to be done when opening from scratch.
   bool NewOpen ();
 
-  /// Used when multiple contexts are in system, opens sharing information from   /// other driver
+  /**
+   * Used when multiple contexts are in system, opens sharing information from
+   * other driver.
+   */
   bool SharedOpen ();
 
-  ///
+  /// Scan setup.
   void ScanSetup ();
-  ///
+  /// Close.
   virtual void Close ();
 
   /// Change the dimensions of the display.
@@ -278,27 +284,25 @@ public:
   virtual void DrawPolygon (G3DPolygonDP& poly);
 
   /**
-   * Draw the projected polygon with light and texture.
-   * Debugging version. This one does not actually draw anything
-   * but it just prints debug information about what it would have
-   * done.
+   * Draw the projected polygon with light and texture.  Debugging version.
+   * This one does not actually draw anything but it just prints debug
+   * information about what it would have done.
    */
   virtual void DrawPolygonDebug (G3DPolygonDP& poly);
 
   /**
-   * Initiate a volumetric fog object. This function will be called
-   * before front-facing and back-facing fog polygons are added to
-   * the object. The fog object will be convex but not necesarily closed.
-   * The given CS_ID can be used to identify multiple fog objects when
-   * multiple objects are started.
+   * Initiate a volumetric fog object.  This function will be called before
+   * front-facing and back-facing fog polygons are added to the object.  The
+   * fog object will be convex but not necesarily closed.  The given CS_ID can
+   * be used to identify multiple fog objects when multiple objects are
+   * started.
    */
   virtual void OpenFogObject (CS_ID id, csFog* fog);
 
   /**
-   * Add a front or back-facing fog polygon in the current fog object.
-   * Note that it is guaranteed that all back-facing fog polygons
-   * will have been added before the first front-facing polygon.
-   * fogtype can be:
+   * Add a front or back-facing fog polygon in the current fog object.  Note
+   * that it is guaranteed that all back-facing fog polygons will have been
+   * added before the first front-facing polygon.  fogtype can be:
    * <ul>
    *    <li>CS_FOG_FRONT:       a front-facing polygon
    *    <li>CS_FOG_BACK:        a back-facing polygon
@@ -308,15 +312,15 @@ public:
   virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype);
 
   /**
-   * Close a volumetric fog object. After the volumetric object is
-   * closed it should be rendered on screen (whether you do it here
-   * or in DrawFrontFog/DrawBackFog is not important).
+   * Close a volumetric fog object.  After the volumetric object is closed it
+   * should be rendered on screen (whether you do it here or in
+   * DrawFrontFog/DrawBackFog() is not important).
    */
   virtual void CloseFogObject (CS_ID id);
 
   /// Draw a line in camera space.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
-  	float fov, int color);
+    float fov, int color);
 
   /// Start a series of DrawPolygonFX
   virtual void StartPolygonFX (iTextureHandle* handle, UInt mode);
@@ -334,8 +338,8 @@ public:
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op);
 
   /**
-   * Get the current driver's capabilities. Each driver implements their
-   * own function.
+   * Get the current driver's capabilities.  Each driver implements their own
+   * function.
    */
   virtual csGraphics3DCaps *GetCaps ()
   { return &Caps; }
@@ -401,7 +405,7 @@ public:
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
-    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+    DefaultDrawTriangleMesh(mesh, this, o2c, clipper, aspect, width2, height2);
   }
 
   /// Draw a polygon mesh.
@@ -430,8 +434,8 @@ public:
    * Draw a sprite (possibly rescaled to given width (sw) and height (sh))
    * using given rectangle from given texture clipped with G2D's clipper.
    */
-  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th);
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw,
+    int sh, int tx, int ty, int tw, int th);
 };
 
 #endif // __CSSFT3DCOM_H__
