@@ -1,6 +1,11 @@
 The history order is reversed so that new features are at the top.
 
 6-Mar-2002
+	- Matt Reda made the iso engine explicitly remove all mesh factories 
+	  at iso engine destruction for clarity.
+	- Matt Reda removed extra assignment where g3dpolyfx.mixmode was 
+	  being assigned the same value twice for isometric sprites
+	- Matt Reda removed extra screen to world calculation in iso views
 	- Matt Reda added support for splitting walktest into two views. 
 	  Shift-S splits to 2 views, Shift-T toggles between the two views
 	  (allowing the user to navigate the level in the two views), and
