@@ -120,7 +120,8 @@ void csSoundRenderSoftware::Close()
   if (SoundDriver) {
     iSoundDriver *d = SoundDriver;
     SoundDriver = NULL;
-    d->Close();
+    d->Close ();
+    d->DecRef ();
   }
 
   if (Listener) {
