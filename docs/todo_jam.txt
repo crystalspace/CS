@@ -72,9 +72,7 @@ W - Wishlist (the build also works without this feature)
     without this information.
 [L] msvcgen.jam: When modules reference sources or headers outside of the local
     source directory via some number of ".."'s, these resources appear as
-    "../../foo/bar/../../this/module" in the generated project file.  (If MSVC6
-    & 7 don't care about this, then we can lower the priority of this item, and
-    instead consider it just an ugly but not dangerous anomaly.)
+    "../../foo/bar/../../this/module" in the generated project file.
 [L] msvcgen.jam: Provide rules to copy the generated files back to the source
     tree upon explicit request so that they can be committed to the CVS
     respository if desired.
