@@ -59,21 +59,6 @@ iSoundHandle* csSoundWrapper::GetSound ()
   return SoundHandle;
 }
 
-iSoundHandle* csSoundWrapper::GetSound (iObject* iobj, const char* name)
-{
-  csObject &csobj = *((csObject*)iobj);
-  if (!name) return NULL;
-  csObjIterator i = csobj.GetIterator (csObject::Type, true);
-  while (!i.IsNull ())
-  {
-    csSoundWrapper *sw = QUERY_OBJECT_TYPE (i.GetObj (), csSoundWrapper);
-    if (sw && strcmp (name, (*i).GetName ()) == 0)
-      return sw->GetSound ();
-    ++i;
-  }
-  return NULL;
-}
-
 iSoundHandle *csSoundWrapper::SoundWrapper::GetSound ()
 {
   return scfParent->GetSound ();

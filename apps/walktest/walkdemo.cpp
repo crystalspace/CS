@@ -1167,19 +1167,15 @@ void light_statics ()
   for (int i = 0 ; i < e->meshes.Length () ; i++)
   {
     csMeshWrapper* sp = (csMeshWrapper*)e->meshes [i];
-    if (sp->GetType () == csMeshWrapper::Type)
+    iSprite3DState* state = QUERY_INTERFACE (sp->GetMeshObject (), iSprite3DState);
+    if (state != NULL)
     {
-      csMeshWrapper* wrap = (csMeshWrapper*)sp;
-      iSprite3DState* state = QUERY_INTERFACE (wrap->GetMeshObject (), iSprite3DState);
-      if (state != NULL)
+      if (state->GetSkeletonState ())
       {
-        if (state->GetSkeletonState ())
-	{
-          const char* name = wrap->GetName ();
-          if (!strcmp (name, "__skelghost__")) move_ghost (wrap);
-	}
-	state->DecRef ();
+        const char* name = sp->GetName ();
+        if (!strcmp (name, "__skelghost__")) move_ghost (sp);
       }
+      state->DecRef ();
     }
     sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }

@@ -1642,7 +1642,8 @@ bool csLoader::LoadSounds (char* buf)
           System->Printf (MSG_FATAL_ERROR, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
           fatal_exit (0, false);
         }
-        iSoundHandle *snd = csSoundWrapper::GetSound (Engine->QueryObject(), name);
+        iSoundWrapper *snd =
+	  GET_NAMED_CHILD_OBJECT (Engine->QueryObject (), iSoundWrapper, name);
         if (!snd)
           LoadSound(name, filename);
       }

@@ -1907,10 +1907,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (Sys->Sound)
     {
-      iSoundHandle *sb =
-        csSoundWrapper::GetSound(Sys->view->GetEngine()->QueryObject(), arg);
+      iSoundWrapper *sb = GET_NAMED_CHILD_OBJECT (Sys->view->GetEngine ()->
+        QueryObject (), iSoundWrapper, arg);
       if (sb)
-        sb->Play();
+        sb->GetSound ()->Play();
       else
         Sys->Printf (MSG_CONSOLE, "Sound '%s' not found!\n", arg);
     }

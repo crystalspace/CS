@@ -58,6 +58,7 @@ DECLARE_OBJECT_TYPE (GhostSpriteInfo);
 DECLARE_OBJECT_TYPE (csDoor);
 DECLARE_OBJECT_TYPE (csRotatingObject);
 DECLARE_OBJECT_TYPE (csLightObject);
+DECLARE_OBJECT_TYPE (iSoundWrapper);
 
 // Several map modes.
 #define MAP_OFF 0

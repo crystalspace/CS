@@ -157,16 +157,15 @@ void csMovable::RemoveListener (iMovableListener* listener)
 void csMovable::UpdateMove ()
 {
   updatenr++;
-  if (object->GetType () >= csMeshWrapper::Type)
-  {
-    csMeshWrapper* sp = (csMeshWrapper*)object;
+  csMeshWrapper* sp = QUERY_OBJECT_TYPE (object, csMeshWrapper);
+  if (sp)
     sp->UpdateMove ();
-  }
   else
   {
-    csCollection* col = (csCollection*)object;
-    col->UpdateMove ();
+    csCollection* col = QUERY_OBJECT_TYPE (object, csCollection);
+    if (col) col->UpdateMove ();
   }
+
   int i;
   for (i = 0 ; i < listeners.Length () ; i++)
   {

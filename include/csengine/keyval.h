@@ -42,9 +42,6 @@ public:
   /// Get the value string of the pair
   const char *GetValue () const { return m_Value; }
 
-  /// Get the value of a key in an object. (shortcut)
-  static const char *GetValue (csObject *pObject, const char *key);
-
   /// Set the value of a key in an object.
   void SetValue (const char* value);
 
@@ -52,32 +49,6 @@ private:
   char *m_Value;
   CSOBJTYPE;
   DECLARE_OBJECT_INTERFACE;
-};
-
-/**
- * Iterator for key value pairs.
- */
-class csKeyValueIterator
-{
-public:
-  /// The constructor. Requires the Object to search within!
-  csKeyValueIterator (const csObject* pObject);
-  /// The destructor as usual
-  ~csKeyValueIterator ();
-
-  /// Reuse the iterator for an other search
-  void Reset (const csObject *pObject);
-  /// Get the object we are pointing at
-  csKeyValuePair *GetPair ();
-  /// Move forward
-  void Next ();
-  /// Check if there are other keys
-  bool IsFinished () const;
-  /// Search for a key
-  bool FindKey (const char *Name) { return m_Iterator.FindName (Name); }
-
-protected:
-  csObjIterator m_Iterator;
 };
 
 /**

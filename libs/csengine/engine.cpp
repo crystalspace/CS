@@ -1790,13 +1790,15 @@ bool csEngine::DeleteLibrary (const char *iName)
   if (!lib) return false;
 
 #define DELETE_ALL_OBJECTS(vector,type)				\
-  { for (csObjIterator iter = lib->GetIterator (type::Type);	\
-         !iter.IsFinished (); ++iter)				\
+  {								\
+    for (iObjectIterator *iter = lib->GetIterator (OBJECT_TYPE_ID(type)); \
+         !iter->IsFinished (); iter->Next ())			\
     {								\
-      type &x = (type&)*iter;					\
-      int idx = vector.Find (&x);					\
-      if (idx >= 0) vector.Delete (idx);				\
-  } }
+      type *x = (type*)iter->GetTypedObj ();			\
+      int idx = vector.Find (x);				\
+      if (idx >= 0) vector.Delete (idx);			\
+    }								\
+  }
 
   DELETE_ALL_OBJECTS (collections, csCollection)
   DELETE_ALL_OBJECTS (meshes, csMeshWrapper)
@@ -1808,12 +1810,12 @@ bool csEngine::DeleteLibrary (const char *iName)
 
 #undef DELETE_ALL_OBJECTS
 #define DELETE_ALL_OBJECTS(vector,type)				\
-  for (csObjIterator iter = lib->GetIterator (type::Type);	\
-       !iter.IsFinished (); ++iter)				\
+  for (iObjectIterator *iter = lib->GetIterator (OBJECT_TYPE_ID(type));	\
+       !iter->IsFinished (); iter->Next ())			\
   {								\
-    type &x = (type&)*iter;					\
-    int idx = vector.Find (&x);					\
-    if (idx >= 0) { x.DecRef (); vector [idx] = 0; }		\
+    type *x = (type*)iter->GetTypedObj ();			\
+    int idx = vector.Find (x);					\
+    if (idx >= 0) { x->DecRef (); vector [idx] = 0; }		\
   }
 
   DELETE_ALL_OBJECTS (planes, csPolyTxtPlane)

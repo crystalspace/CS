@@ -86,6 +86,8 @@ Blocks* Sys = NULL;
 REGISTER_STATIC_LIBRARY (engine)
 REGISTER_STATIC_LIBRARY (lvlload)
 
+DECLARE_OBJECT_TYPE (iSoundWrapper);
+
 int Blocks::white, Blocks::black, Blocks::red;
 
 //-----------------------------------------------------------------------------
@@ -2195,8 +2197,9 @@ void Blocks::InitEngine ()
 #ifdef DO_SOUND
   // Load the blocks.zip library where sound refs are stored
   LevelLoader->LoadLibraryFile ("/data/blocks/Library");
-  iSoundHandle* w = csSoundWrapper::GetSound(engine->QueryObject(), "background.wav");
-  if (w) w->Play (true);
+  iSoundWrapper* w = GET_NAMED_CHILD_OBJECT (
+    engine->QueryObject (), iSoundWrapper, "background.wav");
+  if (w) w->GetSound ()->Play (true);
 #endif
 }
 

@@ -45,45 +45,6 @@ void csKeyValuePair::SetValue (const char* value)
   m_Value = strnew (value);
 }
 
-const char *csKeyValuePair::GetValue (csObject *pObject, const char *key)
-{
-  csKeyValueIterator Iter (pObject);
-  if (Iter.FindKey (key))
-    return Iter.GetPair ()->GetValue ();
-  return "";
-}
-
-//---------------------------------------------------------------------------
-
-csKeyValueIterator::csKeyValueIterator (const csObject *pObject)
-  : m_Iterator (csKeyValuePair::Type, *pObject)
-{
-}
-
-csKeyValueIterator::~csKeyValueIterator ()
-{
-}
-
-void csKeyValueIterator::Reset (const csObject* pObject)
-{
-  m_Iterator.Reset (csKeyValuePair::Type, *pObject);
-}
-
-csKeyValuePair *csKeyValueIterator::GetPair ()
-{
-  return (csKeyValuePair *) m_Iterator.GetObj ();
-}
-
-void csKeyValueIterator::Next ()
-{
-  m_Iterator.Next ();
-}
-
-bool csKeyValueIterator::IsFinished () const
-{
-  return m_Iterator.IsFinished ();
-}
-
 //---------------------------------------------------------------------------
 
 IMPLEMENT_CSOBJTYPE (csMapNode,csObject);
@@ -165,8 +126,9 @@ void csNodeIterator::SkipWrongClassname ()
     while (!m_Iterator.IsFinished ())
     {
       csMapNode *pNode = GetNode ();
-      const char *Nodeclass = csKeyValuePair::GetValue (pNode, "classname");
-      if (strcmp (Nodeclass, m_Classname) != 0)
+      csKeyValuePair *KeyVal =
+        GET_NAMED_CHILD_OBJECT (pNode, csKeyValuePair, "classname");
+      if (!KeyVal || strcmp (KeyVal->GetValue (), m_Classname) != 0)
         m_Iterator.Next ();
       else
         return;

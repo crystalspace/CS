@@ -72,8 +72,7 @@ bool csCollider::Collide (csCollider& otherCollider,
                           csTransform* pTransform1, 
                           csTransform* pTransform2)
 {
-  if (otherCollider.GetType() != csCollider::Type) return false;
-  csCollider *pCollider2 = (csCollider *)&otherCollider;
+  csCollider *pCollider2 = &otherCollider;
   if (pCollider2 == this) return false;
 
   return collide_system->Collide (collider, pTransform1,
@@ -82,8 +81,6 @@ bool csCollider::Collide (csCollider& otherCollider,
 
 csCollider* csCollider::GetCollider (csObject &object) 
 {
-  csObject* o = object.GetChild (csCollider::Type);
-  if (o) return (csCollider*) o;
-  return NULL;
+  return GET_CHILD_OBJECT (&object, csCollider);
 }
 
