@@ -45,14 +45,14 @@ void csGraphics3DNull::DrawPixmap (iTextureHandle *hTex,
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
   if (pfmt.PixelBytes == 1)
-    DrawPixmap8 (G2D, texman, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
+    DrawPixmap8 (G2D, texmgrnull, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
   else if (pfmt.PixelBytes == 2)
   {
     if (pfmt.GreenBits == 5)
-      DrawPixmap16_555 (G2D, texman, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
+      DrawPixmap16_555 (G2D, texmgrnull, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
     else
-      DrawPixmap16_565 (G2D, texman, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
+      DrawPixmap16_565 (G2D, texmgrnull, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
   }
   else
-    DrawPixmap32 (G2D, texman, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
+    DrawPixmap32 (G2D, texmgrnull, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
 }

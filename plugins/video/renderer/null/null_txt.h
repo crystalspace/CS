@@ -95,13 +95,18 @@ public:
     bitmap = NULL;
     alphamap = NULL;
     image = Image;
+    image->IncRef();
     w = Image->GetWidth ();
     h = Image->GetHeight ();
     compute_masks ();
   }
   /// Destroy the texture
   virtual ~csTextureNull ()
-  { delete [] bitmap; delete [] alphamap; if (image) image->DecRef (); }
+  { delete [] bitmap;
+    delete [] alphamap;
+    if (image) image->DecRef ();
+  }
+
   /// Return a pointer to texture data
   uint8 *get_bitmap ()
   { return bitmap; }

@@ -16,7 +16,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: null3d
+.PHONY: null3d null3dclean
 all plugins drivers drivers3d: null3d
 
 null3d:

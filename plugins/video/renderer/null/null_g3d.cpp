@@ -65,7 +65,7 @@ csGraphics3DNull::csGraphics3DNull (iBase *iParent) : G2D (NULL)
 
   scfiEventHandler = NULL;
 
-  texman = NULL;
+  texmgrnull = NULL;
   vbufmgr = NULL;
 
   Caps.CanClip = false;
@@ -92,8 +92,6 @@ csGraphics3DNull::~csGraphics3DNull ()
   }
 
   Close ();
-  texman->Clear ();
-  texman->DecRef (); texman = NULL;
   vbufmgr->DecRef (); vbufmgr = NULL;
   if (G2D)
     G2D->DecRef ();
@@ -127,7 +125,7 @@ bool csGraphics3DNull::Initialize (iObjectRegistry *r)
     return false;
   }
 
-  texman = new csTextureManagerNull (object_reg, G2D, config);
+  texmgrnull = new csTextureManagerNull (object_reg, G2D, config);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
   if (!scfiEventHandler)
@@ -196,7 +194,7 @@ bool csGraphics3DNull::Open ()
     pfmt.GreenBits  = RGB2PAL_BITS_G;
     pfmt.BlueBits   = RGB2PAL_BITS_B;
   }
-  texman->SetPixelFormat (pfmt);
+  texmgrnull->SetPixelFormat (pfmt);
 
   SetDimensions (nWidth, nHeight);
 
@@ -214,8 +212,8 @@ void csGraphics3DNull::Close()
   if ((width == height) && (width == -1))
     return;
 
-  texman->Clear ();
-  texman->DecRef (); texman = NULL;
+  texmgrnull->Clear ();
+  texmgrnull->DecRef (); texmgrnull = NULL;
   vbufmgr->DecRef (); vbufmgr = NULL;
 
   G2D->Close ();

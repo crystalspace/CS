@@ -83,7 +83,7 @@ public:
   csConfigAccess config;
 
   /// The texture manager.
-  csTextureManagerNull* texman;
+  csTextureManagerNull* texmgrnull;
   /// The vertex buffer manager.
   csPolArrayVertexBufferManager* vbufmgr;
 
@@ -238,7 +238,7 @@ public:
 
   /// Get the ITextureManager.
   virtual iTextureManager *GetTextureManager ()
-  { return texman; }
+  { return texmgrnull; }
 
   /// Get the vertex buffer manager.
   virtual iVertexBufferManager* GetVertexBufferManager ()
