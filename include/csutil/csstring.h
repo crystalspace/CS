@@ -756,6 +756,11 @@ public:
   template<typename T>
   csStringBase &operator += (T const& s) { return Append (s); }
 
+  // Specialization which prevents gcc from barfing on strings allocated via
+  // CS_ALLOC_STACK_ARRAY().
+  csStringBase &operator += (char const* s)
+  { return Append(s); }
+
   /// Add another string to this one and return the result as a new string.
   csStringBase operator + (const csStringBase &iStr) const
   { return Clone ().Append (iStr); }
@@ -890,6 +895,11 @@ inline csStringBase operator + (const csStringBase& iStr1, const char* iStr2)
 template <typename T>
 inline csStringBase &operator <<(csStringBase &s, T const& v)
 { return s.Append (v); }
+
+// Specialization which prevents gcc from barfing on strings allocated via
+// CS_ALLOC_STACK_ARRAY().
+inline csStringBase &operator <<(csStringBase &s, char const* v)
+{ return s.Append(v); }
 
 /**
  * Subclass of csStringBase that contains an internal buffer which is faster

@@ -30,6 +30,9 @@ chronological order.
 	- Eric Sunshine added a couple missing `operator=(char const*)' methods
 	  to csstring.h which were omitted accidentally from yesterday's added
 	  batch of assignment operators.
+	- Eric Sunshine added a couple specializations of templated operators
+	  << and += in csstring.h in order to prevent gcc from barfing when the
+	  right-hand argument has been allocated via CS_ALLOC_STACK_ARRAY().
 14-Mar-2005
 	- Eric Sunshine propagated yesterday's csString ShrinkBestFit() and
 	  Empty() additions to iString and scfString for API consistency.
