@@ -37,28 +37,28 @@
 
 //---------------------------------------------------------------
 // Define the appropriate PROC_ flag for the current architecture
-// for NextStep/OpenStep/Rhapsody multi-architecture binary (MAB)
-// compilations.
+// for MacOS/X Server, OpenStep, and NextStep multi-architecture
+// binary (MAB) compilations.
 //---------------------------------------------------------------
 
 #if defined(OS_NEXT)
-#  if defined(m68k)
+#  if defined(__m68k__)
 #    if !defined(PROC_M68K)
 #      define PROC_M68K
 #    endif
-#  elif defined(i386)
+#  elif defined(__i386__)
 #    if !defined(PROC_INTEL)
 #      define PROC_INTEL
 #    endif
-#  elif defined(sparc)
+#  elif defined(__sparc__)
 #    if !defined(PROC_SPARC)
 #      define PROC_SPARC
 #    endif
-#  elif defined(hppa)
+#  elif defined(__hppa__)
 #    if !defined(PROC_HPPA)
 #      define PROC_HPPA
 #    endif
-#  elif defined(ppc)
+#  elif defined(__ppc__)
 #    if !defined(PROC_POWERPC)
 #      define PROC_POWERPC
 #    endif
