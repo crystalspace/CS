@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+2-Jul-2001
+	- Eric Sunshine eliminated a compilation warning about unused variable
+	  in mdltool.cpp.  (In fact, this particular variable was being
+	  shadowed by another variable in another scope.)
 31-Jul-2001
 	- Martin Geisse moved high-level model data manipulation functions
 	  out of the model data classes themselves and into their own

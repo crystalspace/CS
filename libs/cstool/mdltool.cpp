@@ -421,7 +421,7 @@ void csModelDataTools::MergeObjects (iModelData *Scene, bool MultiTexture)
 
 void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
 {
-  csModelDataObjectVector OldObjects, NewObjects;
+  csModelDataObjectVector OldObjects;
 
   ExtractObjects (Scene, OldObjects);
 
