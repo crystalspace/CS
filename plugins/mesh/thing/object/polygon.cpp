@@ -84,6 +84,7 @@ csPolygon3DStatic::csPolygon3DStatic ()
 
 csPolygon3DStatic::~csPolygon3DStatic ()
 {
+  SetNumVertices (0);	// Clear vertices.
   delete[] name;
 
   thing_static->thing_type->blk_lightmapmapping.Free (mapping);

@@ -14,6 +14,9 @@ chronological order.
 	- Eric Sunshine fixed problem in cssys/general/platformconfig.cpp where
 	  it was trying to pass a csString into fprintf() rather than passing
 	  in the (char const*) equivalent.
+	- Jorrit fixed a memory leak in thing polygons. They were not
+	  releasing the vertex indices from the block allocators. This caused
+	  simple1 to crash at exit due to an assert in csBlockAllocator.
 13-Oct-2003
 	- Eric Sunshine eliminated several compilation warnings from Walktest.
 	- Jorrit fixed phystut for the latest polygon changes.
