@@ -56,6 +56,13 @@ public:
   csNamedObjVector sprites;
 
   /**
+   * List of 2D sprites in this sector. Note that sprites also
+   * need to be in the world list. This vector contains objects
+   * of type csSprite2D*.
+   */
+  csNamedObjVector sprites2d;
+
+  /**
    * All static and pseudo-dynamic lights in this sector.
    * This vector contains objects of type csStatLight*.
    */

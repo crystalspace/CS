@@ -84,6 +84,9 @@ csSector::~csSector ()
   for (i = 0 ; i < sprites.Length (); i++) sprites[i] = NULL;
   sprites.DeleteAll ();
 
+  for (i = 0 ; i < sprites2d.Length (); i++) sprites2d[i] = NULL;
+  sprites2d.DeleteAll ();
+
   lights.DeleteAll ();
 
   terrains.DeleteAll ();

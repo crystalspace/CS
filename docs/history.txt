@@ -27,6 +27,8 @@ Short-term cleanups that need to be done:
 	  which made unportable and potentially unsafe assumptions about the
 	  exact layout of the structure.
 	- More Texinfo updates from Martin Geisse.
+	- Started implementation of csSprite2D for the engine. Not working
+	  right now.
 2-Mar-2000
 	- Norman Kramer completely rewrote the glide texture cache
 	  handling. It now holds alphamaps too. On single TMU systems the
