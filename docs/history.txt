@@ -1,6 +1,8 @@
 he history order is reversed so that new features are at the top.
 
 14-Jan-2002
+	- Matt Reda added 3 OSX drivers (2 canvases and an audio driver)
+	  and updated various Makefiles to support these changes.
 	- Fixed a bug in the OpenGL renderer which 'res' introduced
 	  by forgetting to test if txt_mm is non-NULL in FlushDrawPolygon().
 	- Eric Sunshine committed the following changes on behalf of Matthew
