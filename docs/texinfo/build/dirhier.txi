@@ -8,8 +8,9 @@
 @emph{Written by Thomas Hieber, @email{thieber@@gmx.net}.}
 
 This section is intended to explain the general CS directory structure. It
-contains all directories so maybe some will be missing if you just
-downloaded the files for a specific port like Linux or Win32.
+lists all the directories, however some may be missing from your copy of 
+Crystal Space if you just downloaded the files for a specific port like 
+Linux or Win32.
 
 Crystal Space consists of the following directories:
 
@@ -22,7 +23,7 @@ Crystal Space consists of the following directories:
 The main directory for Crystal Space.  You can choose any path for it, as long
 as it is supported by your operating system.  This is the path that all
 compiled programs end up in.  This should be your working directory for these
-executables. 
+executables. The two files @file{vfs.cfg} and @file{scf.cfg} also reside in this directory.
 
 @item CS/apps
 This is where all applications which ship with Crystal Space reside.
@@ -62,7 +63,7 @@ directory.
 
 @item CS/docs/html
 This directory contains the @sc{html} conversion of the Texinfo Crystal Space
-documentation.  Most users will want to look at @file{CS/docs/html/index.htm}
+documentation.  Most users will want to look at the @file{CS/docs/html/index.htm}
 that resides here.
 
 @item CS/docs/incoming
@@ -77,15 +78,15 @@ rendered in @sc{html} format.
 
 @item CS/include
 Here are the headers that can be used from other modules. The path for the
-headers reflect the structure of the modules in the lib directory. So for
-furter explanation of a specific directory see the @file{CS/lib} section.
+headers reflect the structure of the modules in the @file{CS/lib} directory. So for
+further explanation of a specific directory see the @file{CS/lib} section.
 Include files which live in this directory itself (i.e. not deeper in the
 hierarchy) contain definitions for @sc{scf} interfaces.
 @xref{SCF}.
 
 @item CS/libs
-Here is all the Modules provided by Crystal Space. Some modules will consist of
-only one subdirectory in libs, some will be a combination of several
+Here is where all the modules provided by Crystal Space live. Some modules will 
+consist of only one subdirectory, others will be a combination of several
 subdirectories.
 
 @table @code

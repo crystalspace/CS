@@ -8,7 +8,8 @@ To utilize Crystal Space you need at least the following resources:
 @itemize @bullet
 @item
 Hardware: A good computer with hardware accelerated graphics is best. What
-you really need depends on the situation (the map file). Just try it.
+you really need depends on the situation and the map file. The minimum 
+recommended system is a Pentium (133 MHz) or equivalent.
 
 @item
 Operating System: One of the supported systems. Currently supported
@@ -17,7 +18,8 @@ NextStep, OS/2, BeOS, MacOS/9, and MS-DOS.
 
 @item
 C++ Development Environment: Crystal Space must be built with a C++
-compiler and other standard development tools.
+compiler such as the GNU C++, Microsoft Visual C/++, and Metrowerks 
+CodeWarrior compilers and other standard development tools.
 
 @item
 The main Crystal Space package.  In fact you need the compiled library, an

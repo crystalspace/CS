@@ -683,7 +683,7 @@ Space Shell). He added the (now non-existant) @file{newdoc} directory with
 LaTeX documentation.
 
 @item
-Wyatt Miler (@email{wmiler@@milertronics.com}
+Wyatt Miler (@email{wmiler@@milertronics.com})
 
 Wyatt has performed some editing of Crystal Space's (now defunct) LaTeX
 documentation files. He has also helped to maintain the Mac port. Wyatt added
