@@ -4,18 +4,19 @@
 */
 #ifndef __VOLATILE_H__
 #define __VOLATILE_H__
-#define OS_MACOS
-#define PROC_M68K
-#define COMP_MWERKS
-#define DO_SOUND
-#define DO_GIF
-#define DO_BMP
-#define DO_TGA
-#define DO_PNG
-#define DO_JPG
-#define DO_AIFF
-#define DO_IFF
-#define DO_WAV
-#define DO_AU
-#define DO_MMX
+#define OS_MACOS		1
+#define PROC_POWERPC	1
+// #define PROC_M68K	0
+#define COMP_MWERKS		1
+#define DO_SOUND		1
+#define DO_GIF			1
+// #define DO_BMP		1
+// #define DO_TGA		1
+#define DO_PNG			1
+#define DO_JPG			1
+#define DO_AIFF			1
+#define DO_IFF			1
+#define DO_WAV			1
+#define DO_AU			1
+// #define DO_MMX		0
 #endif // __VOLATILE_H__
