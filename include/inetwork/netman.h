@@ -50,7 +50,7 @@ struct iNetworkPacket : public iBase
   /// Returns the packet as flat data which can be sent over the network.
   /// Sets length to the length of the buffer.
   /// Read-only packets may ignore this.
-  virtual const char* Write (size_t &length) = 0;
+  virtual char* Write (size_t &length) = 0;
 
   /// Return a new instance of this implementation.
   /// Used for packets associated with listeners to create a new packet
