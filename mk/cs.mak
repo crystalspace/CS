@@ -9,7 +9,6 @@
 include mk/user.mak
 include mk/common.mak
 -include config.mak
-include mk/nasm.mak
 
 .PHONY: doc api depend clean cleanlib cleandep
 
@@ -37,6 +36,7 @@ O=.o
 # The following include should re/define system-dependent variables
 MAKESECTION=defines
 include mk/subs.mak
+include mk/nasm.mak
 
 ifeq ($(USE_DLL),no)
   override MAKE_DLL=no
