@@ -104,7 +104,21 @@ iFont *csDefaultFontServer::LoadFont (const char *filename)
   else
   {
     // Otherwise try to load the font as a .csf file
-    //@@todo
+    /// if it is a .fnt file we can load it
+    int len = strlen(filename);
+    if ( ((len > 4) && (strcmp(filename+len-4, ".fnt" )==0))
+     || ((len > 4) && (strcmp(filename+len-4, ".csf" )==0)) )
+    {
+      csDefaultFont *fontdef = ReadFntFile(filename);
+      if (fontdef)
+      {
+        /// add to registered fonts
+        if (fontdef->Name) delete [] fontdef->Name;
+        fontdef->Name = strnew(filename);
+        fonts.Push(fontdef);
+        return fontdef;
+      }
+    }
   }
 
   return NULL;
@@ -135,6 +149,202 @@ void csDefaultFontServer::NotifyDelete (csDefaultFont *font)
     fonts.Delete (iIndex);
   }
 }
+
+
+csDefaultFont* csDefaultFontServer::ReadFntFile(const char *file)
+{
+  // read a .fnt file, originally meant for use as #include into CS.
+  // renamed to .csf file
+  iVFS *VFS = QUERY_PLUGIN(System, iVFS);
+  iDataBuffer *fntfile = VFS->ReadFile(file);
+  VFS->DecRef();
+  if(!fntfile)
+  {
+    System->Printf(MSG_WARNING, "Could not read file %s.\n", file);
+    return 0;
+  }
+  
+  /// the new fontdef to store info into
+  csDefaultFont *resultfont = 0;
+  csFontDef fontdef;
+  fontdef.Name = 0;
+  fontdef.Width = 0;
+  fontdef.Height = 0;
+  fontdef.BytesPerChar = 0;
+  fontdef.FontBitmap = 0;
+  fontdef.IndividualWidth = 0;
+
+  /// parse file
+  int skip = 0; 
+  char *cp = **fntfile;
+  int val = 0;
+  int FontSize = 10;
+  int span = 0;
+  /// find the //XX parts
+  while ((cp = strstr(cp, "//XX")) != 0)
+  {
+    // parse info
+    char option[50];
+    if(sscanf(cp, "//XX %50s %n", option, &skip)==1)
+    {
+      char *arg = cp+skip;
+      if(strcmp(option, "Name:")==0)
+      {
+        char name[50];
+        sscanf(arg, "%50s", name);
+        fontdef.Name = strnew(name);
+      }
+      else if(strcmp(option, "Size:")==0)
+      {
+        sscanf(arg, "%d", &val);
+        FontSize = val;
+      }
+      else if(strcmp(option, "MaxWidth:")==0)
+      {
+        sscanf(arg, "%d", &val);
+        fontdef.Width = val;
+      }
+      else if(strcmp(option, "MaxHeight:")==0)
+      {
+        sscanf(arg, "%d", &val);
+        fontdef.Height = val;
+      }
+      else if(strcmp(option, "BytesPerChar:")==0)
+      {
+        sscanf(arg, "%d", &val);
+        fontdef.BytesPerChar = val;
+      }
+      //// ignore unknown options...
+    }
+    // shift cp a little so that the current //XX is not found again
+    cp += 2;
+  }
+  
+  int bitmaplen = 256*fontdef.BytesPerChar;
+  if (fontdef.Width  <= 0 || fontdef.Height <= 0 || bitmaplen <= 0)
+  {
+      System->Printf(MSG_WARNING, "File %s contains invalid font metrics.\n",
+        file);
+      goto error_exit;
+  }
+
+#if defined(CS_DEBUG)
+  printf("Reading Font %s, size %d, width %d, height %d, bytesperchar %d.\n",
+    fontdef.Name, FontSize, fontdef.Width, fontdef.Height, 
+    fontdef.BytesPerChar);
+#endif
+
+  /// alloc
+  fontdef.FontBitmap = new unsigned char [bitmaplen];
+  fontdef.IndividualWidth = new unsigned char [256];
+  
+  cp = **fntfile;
+
+  /// if this is a binary fnt file we can do it faster
+  if (strncmp (**fntfile, "FNTBINARY", 9) == 0)
+  {
+    const char * startstr = "STARTBINARY";
+    cp = strstr(cp, startstr);
+    if(!cp)
+    {
+      System->Printf(MSG_WARNING, "File %s has no binary part.\n", file);
+      goto error_exit;
+    }
+    cp += strlen(startstr) +1; /// also skip \n
+    if( fntfile->GetSize () - (cp - **fntfile) < (unsigned int)( bitmaplen + 256 ) )
+    {
+      System->Printf(MSG_WARNING, "File %s is too short.\n", file);
+      goto error_exit;
+    }
+    memcpy(fontdef.FontBitmap, cp, bitmaplen);
+    cp += bitmaplen;
+    for(int i=0; i<256; i++)
+      fontdef.IndividualWidth[i] = cp[i];
+    goto success_exit;
+  }
+
+  /// read fontbitmaps
+  /// find first 'unsigned char' then the '{' after that.
+  cp = strstr(cp, "unsigned char");
+  if(cp)
+    cp = strchr(cp, '{');
+  if(!cp) 
+  {
+    System->Printf(MSG_WARNING, "File %s has no font bitmap.\n", file);
+    goto error_exit;
+  }
+  cp++; /// skip the {
+
+  int i;
+  int byte;
+  for(i=0; i<bitmaplen; i++)
+  {
+    if(sscanf(cp, " %x%n", &byte, &skip)==1)
+    {
+      fontdef.FontBitmap[i] = byte;
+      cp += skip;
+    }
+    else 
+    {
+      //printf("i = %d, cp %c%c%c%c\n", i, cp[0], cp[1], cp[2], cp[3]);
+      printf("Could not read font bitmap byte\n");
+      goto error_exit;
+    }
+    cp++; // go one further, to skip the ','
+  }
+  
+  /// read widths
+  cp = strstr(cp, "unsigned char");
+  if(cp)
+    cp = strchr(cp, '{');
+  if(!cp) 
+  {
+    System->Printf(MSG_WARNING, "File %s has no font bitmap.\n", file);
+    goto error_exit;
+  }
+  cp++;
+
+  for(span=0; span<16; span++)
+  {
+    for(i=span*16; i<span*16+16; i++)
+    {
+      if(sscanf(cp, " %d%n", &byte, &skip)==1)
+      {
+        fontdef.IndividualWidth[i] = byte;
+        cp += skip;
+      }
+      else 
+      {
+        //printf("i = %d, cp %c%c%c%c\n", i, cp[0], cp[1], cp[2], cp[3]);
+        printf("Could not read font character width\n");
+        goto error_exit;
+      }
+      cp ++; /// skip ,
+    }
+    // skip the comment to end of line
+    cp = strchr(cp, '\n');
+  }
+
+success_exit:
+  fntfile->DecRef ();
+  resultfont = new csDefaultFont(this, fontdef.Name, fontdef.Width,
+    fontdef.Height, fontdef.BytesPerChar, fontdef.FontBitmap, 
+    fontdef.IndividualWidth);
+  if (fontdef.Name)
+    delete[] fontdef.Name;
+  return resultfont ;
+
+error_exit:
+   if (fontdef.Name)
+     delete[] fontdef.Name;
+   if (fontdef.FontBitmap)
+     delete[] fontdef.FontBitmap;
+   if (fontdef.IndividualWidth)
+     delete[] fontdef.IndividualWidth;
+   fntfile->DecRef();
+   return 0;
+}
+
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//- The font object --//--//
 

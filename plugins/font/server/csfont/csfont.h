@@ -118,6 +118,9 @@ private:
   // A list of csDefaultFont pointers.
   DECLARE_TYPED_VECTOR (csFontList, csDefaultFont) fonts;
 
+  /// read a font file from vfs
+  csDefaultFont* ReadFntFile(const char *file);
+
 public:
   DECLARE_IBASE;
 
