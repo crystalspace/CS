@@ -5,15 +5,15 @@
 # build flags needed to incorporate Crystal Space into your project.
 #
 # You will need to edit this makefile template so it is suitable for your
-# project.
-#
-# You need to change at least the following variables after copying this
-# template makefile into your project.
+# project.  You may need to change at least the following variables after
+# copying this template makefile into your project:
 #
 #	TARGET_TYPE -- either `exe' or `plugin'
 #       TARGET_NAME -- name of the executable or plugin (sans .exe, .dll)
 #       SRC -- all source files comprising your program or plugin
 #       LINKFLAGS -- linker flags and libraries that your project requires
+#	VERSION -- product version number
+#	RELEASE_DATE -- date of product release
 #
 # If you installed Crystal Space in a non-standard location, then you will also
 # need to set the CRYSTAL environment variable to point at the root of the
@@ -21,6 +21,10 @@
 #
 # This makefile supports the following targets: all, clean, depend.
 #==============================================================================
+
+VERSION = 1.0
+RELEASE_DATE = 01-Jan-2005
+SRCDIR = .
 
 #------
 # Type of project: `exe' or `plugin'
@@ -51,7 +55,7 @@ OUT=.
 #------
 CXX=g++ 
 LINK=$(CXX)
-RM=rm -f
+RM=rm -rf
 
 #------
 # Abstractions
@@ -65,24 +69,16 @@ CFLAGS.I = -I
 # Flags for compiler and linker.
 # Make sure to update the required libraries for your own project
 #------
-CSCONFIG.MAK=csconfig.mak
--include $(CSCONFIG.MAK)
-
 CFLAGS := $(shell cs-config --cflags)
 CXXFLAGS := $(shell cs-config --cxxflags)
 LINKFLAGS := $(shell cs-config --libs cstool csgfx csgeom csutil)
 
-#------
-# Rules
-#------
-.PHONY: all depend clean
-.SUFFIXES: .cpp
 DO.SHARED.PLUGIN.CORE=$(LINK) $(LFLAGS.DLL) -o $@ $^ $(PLUGIN.POSTFLAGS)
 DO.PLUGIN = \
   $(DO.SHARED.PLUGIN.PREAMBLE) \
-  $(DO.SHARED.PLUGIN.CORE) \
+  $(DO.SHARED.PLUGIN.CORE) $(LINKFLAGS) \
   $(DO.SHARED.PLUGIN.POSTAMBLE)
-DO.EXE = $(LINK) -o $@ $^ $(LFLAGS.EXE) $(LIBS.EXE.PLATFORM)
+DO.EXE = $(LINK) -o $@ $^ $(LFLAGS.EXE) $(LINKFLAGS) $(LIBS.EXE.PLATFORM)
 
 ifeq ($(TARGET_TYPE),exe)
   DO.TARGET = $(DO.EXE)
@@ -90,16 +86,26 @@ else
   DO.TARGET = $(DO.PLUGIN)
 endif
 
+CSCONFIG.MAK=csconfig.mak
+-include $(CSCONFIG.MAK)
+
+#------
+# Rules
+#------
+.PHONY: all depend clean
+.SUFFIXES: .cpp
+
 .cpp.o: $<
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 all: $(CSCONFIG.MAK) $(TARGET)
 
 $(TARGET): $(OBJS) 
-	$(DO.TARGET) $(LINKFLAGS)
+	$(DO.TARGET)
 
 clean:
-	$(RM) $(TARGET) $(OBJS) $(CSCONFIG.MAK) makefile.dep *.def
+	$(RM) $(TARGET) $(TARGET).app $(OBJS) $(CSCONFIG.MAK) \
+	makefile.dep *.def
 
 #------
 # Create dependencies

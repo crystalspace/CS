@@ -11,13 +11,23 @@ chronological order.
 	  macro-centric.
 	- Rhad fixed use_manual_colors in genmeshes by adding handling to
 	  csGenmeshMeshObject::PreGetShaderVariableValues.
-	- Rhad altered csGenmeshMeshObject::PreGetShaderVariableValues to use the
-	  existing renderbuffer if the new data set will still fit inside.
+	- Rhad altered csGenmeshMeshObject::PreGetShaderVariableValues to use
+	  the existing renderbuffer if the new data set will still fit inside.
 	- res fixed constness support in the GL extension manager.
 	- res changed the simple mesh to use some const members.
 	- res changed iRenderBuffer->CopyToBuffer() to accept const data.
 	- res slightly changed the genmesh color buffer size check to use
 	  '!=' instead of '<'.
+	- Eric Sunshine upgraded the "Creating an External Application" HOWTO
+	  so that it discusses the 'jamtemplate' utility, and so that it
+	  discusses MacOS/X in the older Makefile-based section.
+	- Eric Sunshine fixed cs-config/Makfile.template and the
+	  cs-config/makevar.macosx fragment so that it works for creation of
+	  external Makefile-based projects on MacOS/X.  Previously, it was
+	  quite broken.  Added cs-config/appwrap.sh, which allows external
+	  application Makfiles to create proper Cocoa application wrappers on
+	  MacOS/X when using a Makefile-based build.  (This is documented in
+	  the HOWTO.)
 12-Jun-2004
 	- res made all Win32 platforms, not only VC, use CS' own opendir() etc 
 	  functions.

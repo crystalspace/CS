@@ -6,23 +6,21 @@ CFLAGS.I = -I
 EXE = .app
 DLL = .csbundle
 MACOSX.APP_EXE  = $@/Contents/MacOS/$(notdir $(basename $@))
-MACOSX.APP_ICON = $(SRCDIR)/libs/csutil/macosx/appicon.icns
 MACOSX.APP_DIR  = .
 CFLAGS.GENERAL = -force_cpusubtype_ALL -Wno-precomp -fno-common -pipe
-LFLAGS.GENERAL = $(MACOSX.LFLAGS.CONFIG)
-LFLAGS.EXE = -framework AppKit -framework Foundation
-LFLAGS.CONSOLE.EXE = -framework AppKit -framework Foundation
+LFLAGS.GENERAL =
+LFLAGS.EXE =
+LFLAGS.CONSOLE.EXE =
 LFLAGS.DLL = -bundle -framework AppKit -framework Foundation
-LIBS.EXE.PLATFORM=$(LFLAGS.GENERAL) $(LFLAGS.EXE)
+LIBS.EXE.PLATFORM=$(LFLAGS.GENERAL) -framework AppKit -framework Foundation
 AR = libtool
 ARFLAGS = -static -o
 ifeq (,$(RANLIB))
 RANLIB = ranlib
 endif
 RANLIB += -s
-define DO.LINK.EXE
-  sh $(SRCDIR)/libs/csutil/macosx/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(SRCDIR)/include/csver.h
-  $(NEWLINE)$(LINK) $(LFLAGS) $(LFLAGS.EXE) -o $(MACOSX.APP_EXE) $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+define DO.EXE
+  sh $(SRCDIR)/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) "$(VERSION)" "$(RELEASE_DATE)"
+  $(NEWLINE)$(LINK) $(LFLAGS) $(LFLAGS.EXE) -o $(MACOSX.APP_EXE) $(^) $(L^) $(LIBS) $(LINKFLAGS) $(LIBS.EXE.PLATFORM)
   touch $@
 endef
-      
