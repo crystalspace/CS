@@ -95,6 +95,7 @@ private:
   csGLTextureCache *txtcache;
   csGLTextureManager *txtmgr;
 
+  bool color_enabled;
   int current_drawflags;
   int current_shadow_state;
   csZBufMode current_zmode;
@@ -294,11 +295,13 @@ public:
 
   /// Enables writing of color values to framebuffer
   virtual void EnableColorWrite ()
-    { glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); }
+    { color_enabled = true;
+      glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); }
 
   /// Disables writing of color values to framebuffer
   virtual void DisableColorWrite ()
-    { glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); }
+    { color_enabled = false;
+      glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); }
 
   /// Enables offsetting of Z values
   virtual void EnableZOffset ()

@@ -112,6 +112,7 @@ csGLRender3D::csGLRender3D (iBase *parent)
 
   render_target = NULL;
 
+  color_enabled = false;
   current_shadow_state = 0;
 
   //@@@ Test default. Will have to be autodetected later.
@@ -368,27 +369,43 @@ void csGLRender3D::SetupStencil ()
     //stencilclipnum++;
     //if (stencilclipnum>255)
     {
-      glClearStencil (0);
-      glClear (GL_STENCIL_BUFFER_BIT);
+      /*glStencilMask (128);
+      glClearStencil (128);
+      glClear (GL_STENCIL_BUFFER_BIT);*/
       stencilclipnum = 1;
     }
-    statecache->SetStencilFunc (GL_ALWAYS, stencilclipnum, (unsigned)-1);
-    statecache->SetStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
     int nv = clipper->GetVertexCount ();
     csVector2* v = clipper->GetClipPoly ();
     glColor4f (1, 0, 0, 0);
     statecache->SetShadeModel (GL_FLAT);
     SetZMode (CS_ZBUF_NONE);
-    statecache->Disable_GL_TEXTURE_2D ();
-    //glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+    statecache->Disable_GL_TEXTURE_2D;
+    if (color_enabled)
+      glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    statecache->SetStencilFunc (GL_ALWAYS, 128, 128);
+    statecache->SetStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
+    glBegin (GL_TRIANGLE_FAN);
+      glVertex2f ( 1, -1);
+      glVertex2f (-1, -1);
+      glVertex2f (-1,  1);
+      glVertex2f ( 1,  1);
+    glEnd ();
+    glColor4f (0, 1, 0, 0);
+    statecache->SetStencilFunc (GL_ALWAYS, 0, 128);
+
     glBegin (GL_TRIANGLE_FAN);
     int i;
     for (i = 0 ; i < nv ; i++)
-      glVertex2f (/*2.0**/v[i].x/(float)viewwidth-1.0,
-                  /*2.0**/v[i].y/(float)viewheight-1.0);
+      glVertex2f (2.0*v[i].x/(float)viewwidth-1.0,
+                  2.0*v[i].y/(float)viewheight-1.0);
     glEnd ();
-    glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+    if (color_enabled)
+      glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
     //statecache->Disable_GL_STENCIL_TEST ();
+
     glPopMatrix ();
     glMatrixMode (GL_PROJECTION);
     glPopMatrix ();
@@ -579,7 +596,7 @@ void csGLRender3D::SetupClipper (int clip_portal,
     stencil_enabled = true;
     // Use the stencil area.
     statecache->Enable_GL_STENCIL_TEST ();
-    statecache->SetStencilFunc (GL_EQUAL, stencilclipnum, (unsigned)-1);
+    //statecache->SetStencilFunc (GL_EQUAL, stencilclipnum, (unsigned)-1);
     statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
   }
 
@@ -687,7 +704,7 @@ bool csGLRender3D::Open ()
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
 
-  if ( /*false &&*/ ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if ( false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
@@ -948,28 +965,30 @@ void csGLRender3D::DrawLine(const csVector3 & v1, const csVector3 & v2, float fo
 
 void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 {
-  csRef<iStreamSource> source = mymesh->GetStreamSource ();
-  csRef<iRenderBuffer> vertexbuf =
-    source->GetBuffer (string_vertices);
-  csRef<iRenderBuffer> texcoordbuf =
-    source->GetBuffer (string_texture_coordinates);
-  csRef<iRenderBuffer> normalbuf = 
-    source->GetBuffer (string_normals);
-  csRef<iRenderBuffer> colorbuf = 
-    source->GetBuffer (string_colors);
-  csRef<iRenderBuffer> indexbuf =
-    source->GetBuffer (string_indices);
-
-  if (!vertexbuf)
-    return;
-  if (!indexbuf)
-    return;
-
   SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane);
 
   SetZMode (mymesh->z_buf_mode);
+
+  switch (current_shadow_state)
+  {
+  case CS_SHADOW_VOLUME_PASS1:
+    statecache->SetStencilOp (GL_KEEP, GL_INCR, GL_KEEP);
+    statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
+    break;
+  case CS_SHADOW_VOLUME_PASS2:
+    statecache->SetStencilOp (GL_KEEP, GL_DECR, GL_KEEP);
+    statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
+    break;
+  case CS_SHADOW_VOLUME_USE:
+    statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+    if (stencil_enabled)
+      statecache->SetStencilFunc (GL_EQUAL, 0, 255);
+    else
+      statecache->SetStencilFunc (GL_EQUAL, 0, 127);
+    break;
+  }
 
   if (current_shadow_state == CS_SHADOW_VOLUME_PASS1)
     SetMirrorMode (!mymesh->do_mirror);
@@ -979,46 +998,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   csMaterialHandle* mathandle = 
     (csMaterialHandle*)(mymesh->GetMaterialHandle ());
 
-  glVertexPointer (3, GL_FLOAT, 0,
-    (float*)vertexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
-  glEnableClientState (GL_VERTEX_ARRAY);
-
-  if (texcoordbuf)
-  {
-    glTexCoordPointer (2, GL_FLOAT, 0, (float*)
-      texcoordbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
-    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-  }
-  if (normalbuf)
-  {
-    glNormalPointer (GL_FLOAT, 0, (float*)
-      normalbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
-    glEnableClientState (GL_NORMAL_ARRAY);
-  }
-  if (colorbuf)
-  {
-    glColorPointer (4, GL_FLOAT, 0, (float*)
-      colorbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
-    glEnableClientState (GL_COLOR_ARRAY);
-  }
-
   statecache->SetShadeModel (GL_SMOOTH);
-
-  /*glMatrixMode (GL_PROJECTION);
-  glLoadIdentity ();
-  SetGlOrtho (false);
-  glViewport (1, -1, viewwidth+1, viewheight+1);
-  glTranslatef (viewwidth/2, viewheight/2, 0);
-
-  GLfloat matrixholder[16];
-  int i;
-  for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
-  matrixholder[0] = matrixholder[5] = 1.0;
-  matrixholder[11] = 1.0/aspect;
-  matrixholder[14] = -matrixholder[11];
-  glMultMatrixf (matrixholder);
-
-  ApplyObjectToCamera ();*/
 
   tricnt += (mymesh->GetIndexEnd ()-mymesh->GetIndexStart ())/3;
 
@@ -1066,7 +1046,13 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   {
     useshader = true;
     csRef<iShaderTechnique> tech = shader->GetBestTechnique();
-    
+
+    csRef<iStreamSource> source = mymesh->GetStreamSource ();
+    csRef<iRenderBuffer> indexbuf =
+      source->GetBuffer (string_indices);
+    if (!indexbuf)
+      return;
+
     int currp;
     for(currp = 0; currp< tech->GetPassCount(); ++currp)
     {
@@ -1079,7 +1065,48 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       +mymesh->GetIndexStart ());
       tech->GetPass(currp)->Deactivate(mymesh);
     }
-  }else{
+    indexbuf->Release ();
+  } else {
+    csRef<iStreamSource> source = mymesh->GetStreamSource ();
+    csRef<iRenderBuffer> vertexbuf =
+      source->GetBuffer (string_vertices);
+    csRef<iRenderBuffer> texcoordbuf =
+      source->GetBuffer (string_texture_coordinates);
+    csRef<iRenderBuffer> normalbuf = 
+      source->GetBuffer (string_normals);
+    csRef<iRenderBuffer> colorbuf = 
+      source->GetBuffer (string_colors);
+    csRef<iRenderBuffer> indexbuf =
+      source->GetBuffer (string_indices);
+
+    if (!vertexbuf)
+      return;
+    if (!indexbuf)
+      return;
+
+    glVertexPointer (3, GL_FLOAT, 0,
+      (float*)vertexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+    glEnableClientState (GL_VERTEX_ARRAY);
+
+    if (texcoordbuf)
+    {
+      glTexCoordPointer (2, GL_FLOAT, 0, (float*)
+        texcoordbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+      glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+    }
+    if (normalbuf)
+    {
+      glNormalPointer (GL_FLOAT, 0, (float*)
+        normalbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+      glEnableClientState (GL_NORMAL_ARRAY);
+    }
+    if (colorbuf)
+    {
+      glColorPointer (4, GL_FLOAT, 0, (float*)
+        colorbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+      glEnableClientState (GL_COLOR_ARRAY);
+    }
+
     glDrawElements (
       GL_TRIANGLES,
       mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
@@ -1138,28 +1165,26 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
         glPopMatrix ();
       }
     }
-  }
 
-
-  vertexbuf->Release();
-  glDisableClientState (GL_VERTEX_ARRAY);
-  if (texcoordbuf)
-  {
-    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-    texcoordbuf->Release();
-  }
-  if (colorbuf)
-  {
-    glDisableClientState (GL_COLOR_ARRAY);
-    colorbuf->Release();
-  }
-  if (normalbuf)
-  {
-    glDisableClientState (GL_NORMAL_ARRAY);
-    normalbuf->Release();
-  }
-  if (indexbuf)
+    vertexbuf->Release();
+    glDisableClientState (GL_VERTEX_ARRAY);
     indexbuf->Release();
+    if (texcoordbuf)
+    {
+      glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+      texcoordbuf->Release();
+    }
+    if (colorbuf)
+    {
+      glDisableClientState (GL_COLOR_ARRAY);
+      colorbuf->Release();
+    }
+    if (normalbuf)
+    {
+      glDisableClientState (GL_NORMAL_ARRAY);
+      normalbuf->Release();
+    }
+  }
 
   if (clip_planes_enabled)
   {
@@ -1169,8 +1194,8 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   }
   if (stencil_enabled)
   {
-    stencil_enabled = false;
-    statecache->Disable_GL_STENCIL_TEST ();
+    //stencil_enabled = false;
+    //statecache->Disable_GL_STENCIL_TEST ();
   }
 }
 
@@ -1181,6 +1206,7 @@ void csGLRender3D::SetShadowState (int state)
   case CS_SHADOW_VOLUME_BEGIN:
     current_shadow_state = CS_SHADOW_VOLUME_BEGIN;
     glClearStencil (0);
+    stencil_initialized = false;
     glClear (GL_STENCIL_BUFFER_BIT);
     statecache->Enable_GL_STENCIL_TEST ();
     glStencilFunc (GL_ALWAYS, 0, 127);
@@ -1189,21 +1215,17 @@ void csGLRender3D::SetShadowState (int state)
     break;
   case CS_SHADOW_VOLUME_PASS1:
     current_shadow_state = CS_SHADOW_VOLUME_PASS1;
-    glStencilOp (GL_KEEP, GL_INCR, GL_KEEP);
     break;
   case CS_SHADOW_VOLUME_PASS2:
     current_shadow_state = CS_SHADOW_VOLUME_PASS2;
-    glStencilOp (GL_KEEP, GL_DECR, GL_KEEP);
     break;
   case CS_SHADOW_VOLUME_USE:
     current_shadow_state = CS_SHADOW_VOLUME_USE;
     statecache->Disable_GL_POLYGON_OFFSET_FILL ();
-    glStencilFunc (GL_EQUAL, 0, 127);
-    glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     break;
   case CS_SHADOW_VOLUME_FINISH:
-    statecache->Disable_GL_STENCIL_TEST ();
     current_shadow_state = 0;
+    statecache->Disable_GL_STENCIL_TEST ();
     break;
   }
 }
