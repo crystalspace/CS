@@ -81,7 +81,7 @@ void csTransformationManager::NewFrame ()
   if (last_alloced)
   {
     last_alloced->next = freed;
-    freed = last_alloced;
+    freed = alloced;
     alloced = last_alloced = NULL;
   }
 

@@ -181,20 +181,33 @@ bool csPolyTexture::RecalcDynamicLights ()
   long lm_size = lm->GetSize ();
   csRGBLightMap& stmap = lm->GetStaticMap ();
   csRGBLightMap& remap = lm->GetRealMap ();
-  csRGBLightMap oldmap;
+  // @@@ Memory leak here:
+  static csRGBLightMap oldmap;
 
-  if (dm) { oldmap.AllocRed (lm_size); memcpy (oldmap.mapR, remap.mapR, lm_size); }
+  if (dm)
+  {
+    if (lm_size > oldmap.max_sizeR) oldmap.AllocRed (lm_size);
+    memcpy (oldmap.mapR, remap.mapR, lm_size);
+  }
   memcpy (remap.mapR, stmap.mapR, lm_size);
 
   if (remap.mapG)
   {
-    if (dm) { oldmap.AllocGreen (lm_size); memcpy (oldmap.mapG, remap.mapG, lm_size); }
+    if (dm)
+    {
+      if (lm_size > oldmap.max_sizeG) oldmap.AllocGreen (lm_size);
+      memcpy (oldmap.mapG, remap.mapG, lm_size);
+    }
     memcpy (remap.mapG, stmap.mapG, lm_size);
   }
 
   if (remap.mapB)
   {
-    if (dm) { oldmap.AllocBlue (lm_size); memcpy (oldmap.mapB, remap.mapB, lm_size); }
+    if (dm)
+    {
+      if (lm_size > oldmap.max_sizeB) oldmap.AllocBlue (lm_size);
+      memcpy (oldmap.mapB, remap.mapB, lm_size);
+    }
     memcpy (remap.mapB, stmap.mapB, lm_size);
   }
 
@@ -325,9 +338,10 @@ bool csPolyTexture::RecalcDynamicLights ()
       
       	    for (uu = 0 ; uu <= numu ; uu++)
       	    {
-              // If we find a difference this sub-texture is dirty. I would like to have
-              // a multi-break statement but unfortunatelly C++ does not have this. That's
-              // why I use the goto. Yes I know! goto's are EVIL!
+              // If we find a difference this sub-texture is dirty. I would
+	      // like to have a multi-break statement but unfortunatelly C++
+	      // does not have this. That's why I use the goto. Yes I know!
+	      // goto's are EVIL!
               if ((oldmap.mapR[luv] != remap.mapR[luv]) ||
                   (oldmap.mapG && (oldmap.mapG[luv] != remap.mapG[luv])) ||
                   (oldmap.mapB && (oldmap.mapB[luv] != remap.mapB[luv])))

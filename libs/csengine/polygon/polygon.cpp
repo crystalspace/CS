@@ -32,6 +32,7 @@
 #include "csengine/camera.h"
 #include "csengine/portal.h"
 #include "csengine/dumper.h"
+#include "csengine/lppool.h"
 #include "csobject/nameobj.h"
 #include "csutil/cleanup.h"
 #include "igraph3d.h"
@@ -402,9 +403,11 @@ csPolygon3D::~csPolygon3D ()
   CHK (delete [] vertices_idx);
   if (delete_tex_info)
     CHKB (delete txt_info);
+  txt_info = NULL;
   if (plane && delete_plane) CHKB (delete plane);
   if (portal && delete_portal) CHKB (delete portal);
-  while (light_info.lightpatches) CHKB (delete light_info.lightpatches);
+  while (light_info.lightpatches)
+    csWorld::current_world->lightpatch_pool->Free (light_info.lightpatches);
 }
 
 void csPolygon3D::SetTextureType (int type)
@@ -1433,13 +1436,12 @@ void csPolygon3D::FillLightMap (csLightView& lview)
   {
     // We are working for a dynamic light. In this case we create
     // a light patch for this polygon.
-    CHK (csLightPatch* lp = new csLightPatch ());
+    csLightPatch* lp = csWorld::current_world->lightpatch_pool->Alloc ();
     AddLightpatch (lp);
     csDynLight* dl = (csDynLight*)lview.l;
     dl->AddLightpatch (lp);
 
-    lp->num_vertices = lview.light_frustrum->GetNumVertices ();
-    CHK (lp->vertices = new csVector3 [lp->num_vertices]);
+    lp->Initialize (lview.light_frustrum->GetNumVertices ());
 
     // Copy shadow frustrums.
     csShadowFrustrum* sf, * copy_sf;

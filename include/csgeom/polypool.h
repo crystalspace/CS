@@ -21,14 +21,18 @@
 
 #include "csgeom/poly2d.h"
 
+class Dumper;
+
 /**
  * This is an object pool which holds objects of type
- * csPolygon2D. You can ask new instance from this pool.
+ * csPolygon2D. You can ask new instances from this pool.
  * If needed it will allocate one for you but ideally it can
  * give you one which was allocated earlier.
  */
 class csPoly2DPool
 {
+  friend class Dumper;
+
 private:
   struct PoolObj
   {

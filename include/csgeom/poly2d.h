@@ -22,6 +22,7 @@
 #include "csgeom/math2d.h"
 
 class csClipper;
+class Dumper;
 
 /**
  * The following class represents a general 2D polygon with
@@ -29,6 +30,8 @@ class csClipper;
  */
 class csPoly2D
 {
+  friend class Dumper;
+
 protected:
   /// The 2D vertices.
   csVector2* vertices;

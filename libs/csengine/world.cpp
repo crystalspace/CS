@@ -19,6 +19,7 @@
 #include "sysdef.h"
 #include "csengine/sysitf.h"
 #include "csengine/world.h"
+#include "csengine/dumper.h"
 #include "csengine/halo.h"
 #include "csengine/camera.h"
 #include "csengine/light.h"
@@ -40,7 +41,9 @@
 #include "csengine/cspmeter.h"
 #include "csengine/csppulse.h"
 #include "csengine/cbuffer.h"
+#include "csengine/lppool.h"
 #include "csgeom/fastsqrt.h"
+#include "csgeom/polypool.h"
 #include "csobject/nameobj.h"
 #include "csutil/archive.h"
 #include "csutil/inifile.h"
@@ -70,6 +73,7 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
   textures = NULL;
   c_buffer = NULL;
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
+  CHK (lightpatch_pool = new csLightPatchPool ());
   CHK (cfg_engine = new csEngineConfig ());
   BuildSqrtTable ();
 }
@@ -81,6 +85,7 @@ csWorld::~csWorld ()
   CHK (delete textures);
   CHK (delete cfg_engine);
   CHK (delete render_pol2d_pool);
+  CHK (delete lightpatch_pool);
 }
 
 void csWorld::Clear ()
@@ -106,6 +111,8 @@ void csWorld::Clear ()
   CHK (delete c_buffer); c_buffer = NULL;
   CHK (delete render_pol2d_pool);
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
+  CHK (delete lightpatch_pool);
+  CHK (lightpatch_pool = new csLightPatchPool ());
 }
 
 void csWorld::EnableLightingCache (bool en)
@@ -555,14 +562,16 @@ supports_halos = false;
 void csWorld::DrawFunc (IGraphics3D* g3d, csCamera* c, csClipper* view,
 	csDrawFunc* callback, void* callback_data)
 {
-  tr_manager.NewFrame ();
-
   IGraphics2D* g2d;
   g3d->Get2dDriver (&g2d);
   csRenderView rview (*c, view, g3d, g2d);
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
   rview.callback = callback;
   rview.callback_data = callback_data;
+
+  tr_manager.NewFrame ();
+
+  if (c_buffer) c_buffer->Initialize ();
 
   csSector* s = c->GetSector ();
   s->Draw (rview);

@@ -21,7 +21,6 @@
 
 #include "cscom/com.h"
 #include "csgeom/math3d.h"
-#include "csgeom/polypool.h"
 #include "csengine/csobjvec.h"
 #include "csengine/rview.h"
 #include "csengine/tranman.h"
@@ -48,6 +47,8 @@ class csHaloInformation;
 class csIniFile;
 class csEngineConfig;
 class csCBuffer;
+class csPoly2DPool;
+class csLightPatchPool;
 interface IHaloRasterizer;
 interface IGraphics3D;
 interface IGraphicsInfo;
@@ -165,6 +166,8 @@ public:
   static csWorld* current_world;
   // An object pool for 2D polygons used by the rendering process.
   csPoly2DPool* render_pol2d_pool;
+  // An object pool for lightpatches.
+  csLightPatchPool* lightpatch_pool;
   // The transformation manager.
   csTransformationManager tr_manager;
 

@@ -38,6 +38,8 @@ class csBspTree;
 class csBspNode;
 class csPolygonClipper;
 class csFrustrum;
+class csPoly2DPool;
+class csLightPatchPool;
 
 /**
  * This class knows how to dump debug information about several
@@ -69,6 +71,8 @@ public:
   static void dump (csBspTree* tree);
   static void dump (csPolygonClipper* clipper, char* name);
   static void dump (csFrustrum* frustrum, char* name);
+  static void dump (csPoly2DPool* pool, char* name);
+  static void dump (csLightPatchPool* pool, char* name);
 };
 
 #endif

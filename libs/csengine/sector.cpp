@@ -347,7 +347,8 @@ void csSector::Draw (csRenderView& rview)
       fog_info->next = rview.fog_info;
       if (rview.portal_polygon)
       {
-        fog_info->incoming_plane = rview.portal_polygon->GetPlane ()->GetCameraPlane ();
+        fog_info->incoming_plane = rview.portal_polygon->GetPlane ()->
+		GetCameraPlane ();
         fog_info->incoming_plane.Invert ();
 	fog_info->has_incoming_plane = true;
       }
@@ -373,14 +374,16 @@ void csSector::Draw (csRenderView& rview)
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()+
       	static_thing->GetNumPolygons ()));
       static_thing->UpdateTransformation (rview);
-      static_bsp->Front2Back (rview.GetOrigin (), &TestQueuePolygons, (void*)&rview);
+      static_bsp->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
+      	(void*)&rview);
     }
     else
     {
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()));
     }
     csPolygon2DQueue* queue = poly_queue;
-    TestQueuePolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&rview);
+    TestQueuePolygons ((csPolygonParentInt*)this, polygons, num_polygon,
+    	(void*)&rview);
     DrawPolygonsFromQueue (queue, &rview);
     CHK (delete queue);
   }
@@ -388,7 +391,8 @@ void csSector::Draw (csRenderView& rview)
     bsp->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);
   else
   {
-    DrawPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&rview);
+    DrawPolygons ((csPolygonParentInt*)this, polygons, num_polygon,
+    	(void*)&rview);
     if (static_thing && do_things)
     {
       static_thing->UpdateTransformation (rview);
@@ -489,7 +493,8 @@ void csSector::Draw (csRenderView& rview)
     // In those cases we draw the sprite anyway. @@@ Note that we should
     // draw it clipped (in 3D) to the portal polygon. This is currently not
     // done.
-    csSector* previous_sector = rview.portal_polygon ? rview.portal_polygon->GetSector () : (csSector*)NULL;
+    csSector* previous_sector = rview.portal_polygon ?
+    	rview.portal_polygon->GetSector () : (csSector*)NULL;
     for (i = 0 ; i < sprites.Length () ; i++)
     {
       csSprite3D* sp3d = (csSprite3D*)sprites[i];
@@ -501,7 +506,8 @@ void csSector::Draw (csRenderView& rview)
       else
       {
         if (
-	  ((csPolygonSet*)rview.portal_polygon->GetParent ())->GetType () == csThing::Type () ||
+	  ((csPolygonSet*)rview.portal_polygon->GetParent ())->GetType ()
+	  	== csThing::Type () ||
 	  previous_sector->HasFog () ||
 	  rview.portal_polygon->IsTransparent () ||
 	  rview.portal_polygon->GetPortal ()->IsSpaceWarped ()
@@ -537,7 +543,8 @@ void csSector::Draw (csRenderView& rview)
       {
         float iz = rview.aspect/cshaloinfo->v.z;
         cshaloinfo->v.x = cshaloinfo->v.x * iz + csWorld::shift_x;
-        cshaloinfo->v.y = csWorld::frame_height - 1 - (cshaloinfo->v.y * iz + csWorld::shift_y);
+        cshaloinfo->v.y = csWorld::frame_height - 1 -
+		(cshaloinfo->v.y * iz + csWorld::shift_y);
 
         cshaloinfo->pLight = light;
         
@@ -548,7 +555,8 @@ void csSector::Draw (csRenderView& rview)
         
         if (piHR->TestHalo(&cshaloinfo->v) == S_OK)
         {
-          piHR->CreateHalo(cshaloinfo->r, cshaloinfo->g, cshaloinfo->b, &cshaloinfo->haloinfo);
+          piHR->CreateHalo(cshaloinfo->r, cshaloinfo->g, cshaloinfo->b,
+	  	&cshaloinfo->haloinfo);
           csWorld::current_world->AddHalo (cshaloinfo);
         }
       }
@@ -613,7 +621,8 @@ void csSector::Draw (csRenderView& rview)
   draw_busy--;
 }
 
-void* csSector::CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** polygon, int num, void* data)
+void* csSector::CalculateLightingPolygons (csPolygonParentInt*,
+	csPolygonInt** polygon, int num, void* data)
 {
   csPolygon3D* p;
   csLightView* lview = (csLightView*)data;

@@ -22,8 +22,10 @@
 #include "csgeom/math2d.h"
 #include "csgeom/bsp.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/polypool.h"
 #include "csgeom/frustrum.h"
 #include "csengine/sysitf.h"
+#include "csengine/lppool.h"
 #include "csengine/camera.h"
 #include "csengine/polyplan.h"
 #include "csengine/polygon.h"
@@ -318,4 +320,52 @@ void Dumper::dump (csFrustrum* frustrum, char* name)
     dump (frustrum->GetBackPlane ());
   }
 }
+
+void Dumper::dump (csPoly2DPool* pool, char* name)
+{
+  int cnt;
+  ULong tot_size;
+  int max_size;
+
+  cnt = 0;
+  tot_size = 0;
+  max_size = 0;
+  csPoly2DPool::PoolObj* po = pool->alloced;
+  while (po)
+  {
+    tot_size += po->pol2d->max_vertices;
+    if (po->pol2d->max_vertices > max_size) max_size = po->pol2d->max_vertices;
+    cnt++;
+    po = po->next;
+  }
+  CsPrintf (MSG_DEBUG_0, "Poly2D pool (%s): %d allocated (max=%d, tot=%ld), ",
+  	name, cnt, max_size, tot_size);
+  cnt = 0;
+  tot_size = 0;
+  max_size = 0;
+  po = pool->freed;
+  while (po)
+  {
+    tot_size += po->pol2d->max_vertices;
+    if (po->pol2d->max_vertices > max_size) max_size = po->pol2d->max_vertices;
+    cnt++;
+    po = po->next;
+  }
+  CsPrintf (MSG_DEBUG_0, "%d freed (max=%d, tot=%ld).\n",
+  	cnt, max_size, tot_size);
+}
+
+void Dumper::dump (csLightPatchPool* pool, char* name)
+{
+  int cnt;
+  cnt = 0;
+  csLightPatchPool::PoolObj* po = pool->alloced;
+  while (po) { cnt++; po = po->next; }
+  CsPrintf (MSG_DEBUG_0, "LightPatch pool (%s): %d allocated, ", name, cnt);
+  cnt = 0;
+  po = pool->freed;
+  while (po) { cnt++; po = po->next; }
+  CsPrintf (MSG_DEBUG_0, "%d freed.\n", cnt);
+}
+
 

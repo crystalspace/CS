@@ -72,6 +72,9 @@ private:
 class csRGBLightMap
 {
 public:
+  int max_sizeR;
+  int max_sizeG;
+  int max_sizeB;
   unsigned char* mapR;
   unsigned char* mapG;
   unsigned char* mapB;
@@ -82,16 +85,19 @@ public:
     CHK (delete [] mapR); mapR = NULL;
     CHK (delete [] mapG); mapG = NULL;
     CHK (delete [] mapB); mapB = NULL;
+    max_sizeR = max_sizeG = max_sizeB = 0;
   }
 
   ///
-  csRGBLightMap () : mapR (NULL), mapG (NULL), mapB (NULL) { }
+  csRGBLightMap () : max_sizeR (0), max_sizeG (0), max_sizeB (0),
+  	mapR (NULL), mapG (NULL), mapB (NULL) { }
   ///
   ~csRGBLightMap () { Clear (); }
 
   ///
   void AllocRed (int size)
   {
+    max_sizeR = size;
     CHK (delete [] mapR);
     CHK (mapR = new unsigned char [size]);
   }
@@ -99,6 +105,7 @@ public:
   ///
   void AllocGreen (int size)
   {
+    max_sizeG = size;
     CHK (delete [] mapG);
     CHK (mapG = new unsigned char [size]);
   }
@@ -106,6 +113,7 @@ public:
   ///
   void AllocBlue (int size)
   {
+    max_sizeB = size;
     CHK (delete [] mapB);
     CHK (mapB = new unsigned char [size]);
   }

@@ -25,6 +25,7 @@
 #include "csengine/polygon.h"
 #include "csengine/cssprite.h"
 #include "csengine/world.h"
+#include "csengine/lppool.h"
 
 //---------------------------------------------------------------------------
 
@@ -263,6 +264,7 @@ csLightPatch::csLightPatch ()
   next_poly = prev_poly = NULL;
   next_light = prev_light = NULL;
   num_vertices = 0;
+  max_vertices = 0;
   vertices = NULL;
   polygon = NULL;
   light = NULL;
@@ -271,9 +273,25 @@ csLightPatch::csLightPatch ()
 csLightPatch::~csLightPatch ()
 {
   CHK (delete [] vertices);
+  RemovePatch ();
+}
+
+void csLightPatch::RemovePatch ()
+{
   if (polygon) polygon->UnlinkLightpatch (this);
   if (light) light->UnlinkLightpatch (this);
   shadows.DeleteFrustrums ();
+}
+
+void csLightPatch::Initialize (int n)
+{
+  if (n > max_vertices)
+  {
+    CHK (delete [] vertices);
+    max_vertices = n;
+    CHK (vertices = new csVector3 [max_vertices]);
+  }
+  num_vertices = n;
 }
 
 //---------------------------------------------------------------------------
@@ -289,13 +307,15 @@ csDynLight::csDynLight (float x, float y, float z, float dist,
 
 csDynLight::~csDynLight ()
 {
-  while (lightpatches) CHKB (delete lightpatches);
+  while (lightpatches)
+    csWorld::current_world->lightpatch_pool->Free (lightpatches);
 }
 
 void csDynLight::Setup ()
 {
   csWorld::current_world->tr_manager.NewFrame ();
-  while (lightpatches) CHKB (delete lightpatches);
+  while (lightpatches)
+    csWorld::current_world->lightpatch_pool->Free (lightpatches);
   csLightView lview;
   lview.l = this;
   lview.mirror = false;

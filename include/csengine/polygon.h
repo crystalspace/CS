@@ -488,7 +488,7 @@ public:
    */
   csLightMapped* GetLightMapInfo ()
   {
-    if (txt_info->GetTextureType () == POLYTXT_LIGHTMAP) return (csLightMapped*)txt_info;
+    if (txt_info && txt_info->GetTextureType () == POLYTXT_LIGHTMAP) return (csLightMapped*)txt_info;
     else return NULL;
   }
 
@@ -498,7 +498,7 @@ public:
    */
   csGouraudShaded* GetGouraudInfo ()
   {
-    if (txt_info->GetTextureType () == POLYTXT_GOURAUD) return (csGouraudShaded*)txt_info;
+    if (txt_info && txt_info->GetTextureType () == POLYTXT_GOURAUD) return (csGouraudShaded*)txt_info;
     else return NULL;
   }
 

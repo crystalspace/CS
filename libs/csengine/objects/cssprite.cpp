@@ -406,8 +406,11 @@ void csSprite3D::AddVertexColor (int i, const csColor& col)
 
 void csSprite3D::ResetVertexColors ()
 {
-  CHK (delete [] vertex_colors);
-  vertex_colors = NULL;
+  if (vertex_colors)
+    for (int i = 0 ; i < tpl->GetNumVertices (); i++)
+      vertex_colors [i].Set (0, 0, 0);
+  //CHK (delete [] vertex_colors);
+  //vertex_colors = NULL;
 }
 
 void csSprite3D::FixVertexColors ()

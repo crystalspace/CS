@@ -31,6 +31,7 @@ class csPolygon3D;
 class csDynLight;
 class Dumper;
 class csThing;
+class csLightPatchPool;
 
 /**
  * If CS_LIGHT_THINGSHADOWS is set for a light then things will also
@@ -405,6 +406,7 @@ class csLightPatch
   friend class csPolyTexture;
   friend class csDynLight;
   friend class Dumper;
+  friend class csLightPatchPool;
 
 private:
   csLightPatch* next_poly;
@@ -412,8 +414,12 @@ private:
   csLightPatch* next_light;
   csLightPatch* prev_light;
 
-  int num_vertices;
+  /// Vertices.
   csVector3* vertices;
+  /// Current number of vertices.
+  int num_vertices;
+  /// Maximum number of vertices.
+  int max_vertices;
 
   /// Polygon that this light patch is for.
   csPolygon3D* polygon;
@@ -423,7 +429,7 @@ private:
   /// List of shadow frustrums.
   csFrustrumList shadows;
 
-public:
+private:
   /**
    * Create an empty light patch (infinite frustrum).
    */
@@ -434,6 +440,18 @@ public:
    * and then destroy.
    */
   ~csLightPatch ();
+
+public:
+  /**
+   * Make room for the specified number of vertices and
+   * initialize to start a new light patch.
+   */
+  void Initialize (int n);
+
+  /**
+   * Remove this light patch (unlink from all lists).
+   */
+  void RemovePatch ();
 
   /**
    * Get the polygon that this light patch belongs too.
