@@ -9,5 +9,7 @@ Plugin glshader_cg
 LinkWith glshader_cg : csgeom csgfx csutil ;
 ExternalLibs glshader_cg : CG ;
 
+CompileGroups glshader_cg : nrall ;
+
 Help glshader_cg : "Crystal Space Render3d Shaderplugin for CG" ;
 }

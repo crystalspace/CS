@@ -5,5 +5,7 @@ Plugin shadermgr
 ;
 LinkWith shadermgr : csgfx csgeom cstool csutil ;
 
+CompileGroups shadermgr : nrall ;
+
 Help shadermgr : "Crystal Space Shadermanager plug-in" ;
 

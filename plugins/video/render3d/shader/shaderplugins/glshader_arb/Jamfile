@@ -8,6 +8,8 @@ Plugin glshader_arb
 LinkWith glshader_arb : csgeom csgfx csutil ;
 ExternalLibs glshader_arb :  GL ;
 
+CompileGroups glshader_arb : nrall ;
+
 Help glshader_arb : "Crystal Space Render3d Shaderplugin for ARB_vp" ;
 
 }

@@ -5,5 +5,7 @@ Plugin xmlshader
 ;
 LinkWith xmlshader : csgfx csgeom cstool csutil ;
 
+CompileGroups xmlshader : nrall ;
+
 Help xmlshader : "Crystal Space XML-format shader compiler" ;
 

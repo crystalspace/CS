@@ -17,6 +17,13 @@ chronological order.
 	  platform.h) manually.
 	- Jorrit removed the rest of r3dtest. Marten apparently only
 	  removed the .cpp file.
+	- Jorrit fixed the 'nrall' target that was removed because it
+	  was part of the r3dtest Jamfile. Now nrall is a compile group
+	  to which every relevant target adds itself.
+	- Jorrit also fixed 'walkall' target and 'walktest_static' for new
+	  renderer.
+	- Jorrit fixed some bugs in the jamfiles related to the new renderer.
+	- Jorrit fixed ball jamfile so it links with csgfx library now.
 15-Dec-2003
 	- Matze reworked some jam rules so that subdirs are more robust now.
 	  This should also fix some msvcgen problems on jam.

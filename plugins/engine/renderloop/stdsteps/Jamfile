@@ -5,5 +5,7 @@ Plugin rendstep_std
 ;
 LinkWith rendstep_std : renderstepcommon csgeom csutil csgfx cstool ;
 
+CompileGroups rendstep_std : nrall ;
+
 Help rendstep_std : "Crystal Space standard render loop steps" ;
 

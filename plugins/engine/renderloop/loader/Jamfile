@@ -5,5 +5,7 @@ Plugin rendloop_loader
 ;
 LinkWith rendloop_loader : renderstepcommon csutil ;
 
+CompileGroups rendloop_loader : nrall ;
+
 Help rendloop_loader : "Crystal Space render loop loader" ;
 

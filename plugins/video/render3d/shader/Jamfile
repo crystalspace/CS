@@ -3,3 +3,4 @@ SubDir TOP plugins video render3d shader;
 SubInclude TOP plugins video render3d shader common ;
 SubInclude TOP plugins video render3d shader shadermgr ;
 SubInclude TOP plugins video render3d shader shaderplugins ;
+SubInclude TOP plugins video render3d shader shadercompiler ;

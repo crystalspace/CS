@@ -8,5 +8,7 @@ Plugin glshader_fixed
 LinkWith glshader_fixed : csgeom csgfx csutil ;
 ExternalLibs glshader_fixed :  GL ;
 
+CompileGroups glshader_fixed : nrall ;
+
 Help glshader_fixed : "Crystal Space Render3d Shaderplugin for fixed function pipeline" ;
 }

@@ -5,5 +5,7 @@ Plugin rendstep_stencil
 ;
 LinkWith rendstep_stencil : renderstepcommon csgfx csgeom csutil ;
 
+CompileGroups rendstep_stencil : nrall ;
+
 Help rendstep_stencil : "Crystal Space stencil render loop steps" ;
 

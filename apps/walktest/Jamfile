@@ -34,14 +34,8 @@ CompileGroups stdpt : walkall ;
 CompileGroups gtreeldr : walkall ;
 if $(USE_NEW_RENDERER) = "yes"
 {
-  CompileGroups glrender3d : walkall ;
-  CompileGroups shadermgr : walkall ;
-  CompileGroups rendloop_loader : walkall ;
-  CompileGroups rendstep_std : walkall ;
-  CompileGroups rendstep_stencil : walkall ;
-  CompileGroups glshader_arb : walkall ;
-  CompileGroups glshader_fixed : walkall ;
-  
+  CompileGroups nrall : walkall ;
+
   #CompileGroups softrender3d : walkall ; # not yet ready for prime time.
   #CompileGroups softshader : walkall ;
 }
@@ -50,6 +44,8 @@ else
   CompileGroups gl3d : walkall ;
   CompileGroups soft3d : walkall ;
 }
+
+CompileGroups walktest : nrall ;
 
 SubVariant static ;
 Application walktest_static
