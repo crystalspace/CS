@@ -21,7 +21,6 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include <stdio.h>
-#include <initguid.h>
 
 #include "csutil/scf.h"
 #include "iutil/cfgfile.h"
@@ -31,6 +30,7 @@
 #include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 
+#define INITGUID
 #include "sndrdr.h"
 #include "sndlstn.h"
 #include "sndsrc.h"

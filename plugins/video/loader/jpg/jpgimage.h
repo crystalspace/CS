@@ -33,6 +33,7 @@ class csJPGImageIO : public iImageIO
 {
  protected:
   csVector formats;
+  iObjectRegistry* object_reg;
 
  public:
   SCF_DECLARE_IBASE;
@@ -48,10 +49,14 @@ class csJPGImageIO : public iImageIO
   virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL,
     const char* extraoptions = NULL);
 
+  bool Initialize (iObjectRegistry* p) 
+    { object_reg = p; return true; }
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csJPGImageIO);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
+    virtual bool Initialize (iObjectRegistry* p) 
+      { return scfParent->Initialize(p); }
   } scfiComponent;
 };
 
@@ -64,8 +69,11 @@ class ImageJpgFile : public csImageFile
   friend class csJPGImageIO;
 
 private:
+  iObjectRegistry* object_reg;
+
   /// Initialize the image object
-  ImageJpgFile (int iFormat) : csImageFile (iFormat) { };
+  ImageJpgFile (int iFormat, iObjectRegistry* p) : csImageFile (iFormat) 
+    { object_reg = p; };
   /// Try to read the PNG file from the buffer and return success status
   bool Load (uint8* iBuffer, uint32 iSize);
 };

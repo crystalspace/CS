@@ -22,17 +22,23 @@
 #include <string.h>
 
 #include "cssysdef.h"
+#include "csutil/scf.h"
 #include "jpgimage.h"
 #include "csgfx/rgbpixel.h"
 #include "csutil/databuf.h"
+#include "ivaria/reporter.h"
 
 extern "C"
 {
-#if defined (OS_WIN32)
+#define jpeg_boolean boolean
+/*#if defined (OS_WIN32)
 #if !defined (COMP_GCC) // Avoid defining "boolean" in libjpeg headers
-#  define HAVE_BOOLEAN
+#  define HAVE_BOOLEAN	// we need int booleans, not Windows unsigned char bools
+#  define boolean int
+#  undef jpeg_boolean 
+#  define jpeg_boolean int
 #endif
-#endif
+#endif*/
 #define JDCT_DEFAULT JDCT_FLOAT	// use floating-point for decompression
 #define INT32 JPEG_INT32
 #include <jpeglib.h>
@@ -66,6 +72,27 @@ static iImageIO::FileFormatDescription formatlist[2] =
   {JPG_MIME, "Grayscale", CS_IMAGEIO_LOAD},
   {JPG_MIME, "Truecolor", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE}
 };
+
+/// report something
+void Report (iObjectRegistry *object_reg, int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (rep)
+  {
+    rep->ReportV (severity, "crystalspace.graphic.image.io.jpeg", 
+      msg, arg);
+    rep->DecRef ();
+  }
+  else
+  {
+    csPrintf ("crystalspace.graphic.image.io.jpeg: ");
+    csPrintfV (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
 
 csJPGImageIO::csJPGImageIO (iBase *pParent)
 {
@@ -130,7 +157,7 @@ static void init_destination (j_compress_ptr cinfo)
   dest->pub.free_in_buffer = my_dst_mgr::buf_len;
 }
 
-static boolean empty_output_buffer (j_compress_ptr cinfo)
+static jpeg_boolean empty_output_buffer (j_compress_ptr cinfo)
 {
   my_dst_mgr *dest = (my_dst_mgr*)cinfo->dest;
 
@@ -180,7 +207,7 @@ static void jpeg_buffer_dest (j_compress_ptr cinfo, jpg_datastore *ds)
 
 iImage *csJPGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
-  ImageJpgFile* i = new ImageJpgFile (iFormat);
+  ImageJpgFile* i = new ImageJpgFile (iFormat, object_reg);
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
@@ -266,6 +293,10 @@ iDataBuffer *csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*,
   if (setjmp (jerr.setjmp_buffer))
   {
     delete [] row;
+    char errmsg [256];
+    cinfo.err->format_message ((jpeg_common_struct *)&cinfo, errmsg);
+    Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
+      "%s\n", errmsg);
     jpeg_destroy_compress (&cinfo);
     return NULL;
   }
@@ -348,7 +379,7 @@ static void init_source (j_decompress_ptr cinfo)
  * Fill the input buffer --- called whenever buffer is emptied.
  * should never happen except in jpg files with errors :)
  */
-static boolean fill_input_buffer (j_decompress_ptr cinfo)
+static jpeg_boolean fill_input_buffer (j_decompress_ptr cinfo)
 {
   /* no-op */ (void)cinfo;
   return FALSE;
@@ -441,13 +472,13 @@ bool ImageJpgFile::Load (uint8* iBuffer, uint32 iSize)
   jerr.pub.error_exit = my_error_exit;
   if (setjmp (jerr.setjmp_buffer))
   {
-#if 0
-    // We dont actually need this as we want to know
-    // just whenever a error occured or not
     char errmsg [256];
-    cinfo.err->format_message ((jpeg_common_struct *)&cinfo, errmsg);
-    fprintf (stderr, "%s\n", errmsg);
-#endif
+    if (cinfo.err->msg_code != JERR_NO_SOI)
+    {
+      cinfo.err->format_message ((jpeg_common_struct *)&cinfo, errmsg);
+      Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	"%s\n", errmsg);
+    }
     jpeg_destroy_decompress (&cinfo);
     return false;
   }
