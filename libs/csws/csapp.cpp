@@ -112,6 +112,7 @@ csApp::csApp (iSystem *SysDriver) : csComponent (NULL), scfiPlugIn (this)
   insert = true;
   SetFontSize (12);
   GfxPpl = NULL;
+  VFS = NULL;
   InFrame = false;
   (System = SysDriver)->IncRef ();
 
@@ -136,7 +137,7 @@ csApp::~csApp ()
 
   delete Mouse;
   delete GfxPpl;
-
+  if (VFS) VFS->DecRef ();
   // Delete all textures prior to deleting the texture manager
   Textures.DeleteAll ();
 
