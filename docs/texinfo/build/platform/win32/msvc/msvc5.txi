@@ -37,10 +37,12 @@ and install @file{winlibs}.  Winlibs is a package containing all
 third party header, pre-built library and dll files used by Crystal
 Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll} and
 @file{xmlparse.dll}.  The latest version of the winlibs package
-@file{winlibs0.19e.zip} can be downloaded from:
+@file{winlibs0.19f.zip} can be downloaded from:
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19e.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19f.zip}
+or
+@uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/winlibs0.19f.zip}
 
 Once you have downloaded the winlbs package, extract it too your @file{CS\}
 root directory.
