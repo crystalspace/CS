@@ -1,7 +1,0 @@
-@c -*-texinfo-*-
-@node Dungeon, csPython, MeshObject, Plug-In Drivers
-@section Dungeon
-@cindex Dungeon Plug-In
-
-This section will describe the random level generator for Crystal Space
-(@emph{Dungeon} Plug-In). Currently there is no documentation available.

@@ -41,7 +41,6 @@
 
 MSVC.PLUGINS.REQUIRED =         \
   cscript/cspython              \
-  csgame/gamecore               \
   font/server/freefont          \
   sound/driver/waveoutsd        \
   sound/renderer/ds3d           \

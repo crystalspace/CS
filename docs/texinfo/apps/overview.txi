@@ -49,13 +49,6 @@ development, the CrystalSpace maze editor (MazeD).  @xref{CSWS}.
 @item demosky
 An application demonstrating the sky procedural texture.
 
-@cindex @file{dnapp}
-@cindex Applications, @file{dnapp}
-@item dnapp
-A test application for the dungeon plug-in module, the random level generator.
-It allows to set the output options for the plug-in via command-line
-parameters.
-
 @cindex @file{g2dtest}
 @cindex Applications, @file{g2dtest}
 @item g2dtest
@@ -66,29 +59,12 @@ The Crystal Space canvas plugin test application.
 @item gfxtest
 The Crystal Space image manipulator.
 
-@cindex @file{levtool}
-@cindex Applications, @file{levtool}
-@item levtool
-A level maintenance tool (work in progress!).
-
-@cindex @file{makedep}
-@cindex Applications, @file{makedep}
-@item makedep
-A header file dependency generation tool for platforms which are otherwise
-lacking such a tool.
-
 @cindex @file{map2cs}
 @cindex Applications, @file{map2cs}
 @item map2cs
 A map convertors which converts between Quake style @file{.map} format to the
 native Crystal Space map format. It is known to work with WorldCraft
 2.1 Beta and QuArK (Quake Army Knife). @xref{map2cs}.
-
-@cindex @file{MazeD}
-@cindex Applications, @file{MazeD}
-@item MazeD
-This application is the Crystal Space map editor.  It is a work currently in
-progress.
 
 @cindex @file{mdl2spr}
 @cindex Applications, @file{mdl2spr}
@@ -135,46 +111,10 @@ hardware renderers, with Crystal Space's @sc{scf} mechanism.
 An tutorial demonstrating the ins and outs of Crystal Space's @sc{scf} system.
 @xref{SCF}.
 
-@cindex @file{simple}
-@cindex Applications, @file{simple}
-@item simple
-Developers should use this application as a guide when devloping their new
-programs. Its code tends to be much cleaner than that of @file{walktest}, and
-makes proper use of various modules in the engine.  The @file{simple}
-application is the subject of a Crystal Space programming tutorial,
-@ref{Tutorials}.
-
-@cindex @file{squawk}
-@cindex Applications, @file{squawk}
-@item squawk
-A demonstration of a @dfn{sky box} and the use of creative camera and view
-systems.  @xref{Squawk}.
-
-@cindex @file{t3d2cs}
-@cindex Applications, @file{t3d2cs}
-@item t3d2cs
-This is a utility to convert Unreal maps (@file{t3d}) to Crystal Space maps.
-
-@cindex @file{textconv}
-@cindex Applications, @file{textconv}
-@item textconv
-A @sc{dos}/Unix line termination conversion tool.
-
 @cindex @file{uninst}
 @cindex Applications, @file{uninst}
 @item uninst
 An uninstall program.
-
-@cindex @file{vfstest}
-@cindex Applications, @file{vfstest}
-@item vfstest
-A simple test program which measures the speed of the Virtual File System
-(@sc{vfs}).  @xref{VFS}.
-
-@cindex @file{video}
-@cindex Applications, @file{video}
-@item video
-An application demonstrating playing video files with Crystal Space.
 
 @cindex @file{vsh}
 @cindex Applications, @file{vsh}

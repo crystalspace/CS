@@ -64,27 +64,15 @@ There is currently only one collision plug-in, using the @sc{rapid} algorithm.
 Collision is based on testing for intersection of two non-moving objects.
 
 @item
-@emph{Console} and @emph{Console Input}
+@emph{Console Output} and @emph{Console Input}
 
 These plug-in modules can be used for console-like text input and output,
 similar to the console in Quake.
 
 @item
-@emph{Metaballs}
-
-The Metaballs plug-in module can be used to build blob-shaped polygon
-structures based on points in 3d space with size and strength values.
-
-@item
-@emph{Dungeon}
-
-The Dungeon Plug-In can be used to create random levels based on simple
-parts created by a level editor. @xref{Dungeon}.
-
-@item
 @emph{Scripting}
 
-The scripting plug-in modules allows support for Python and Java scripts.
+The scripting plug-in modules allows support for Python and Lua scripts.
 @xref{csPython}.
 
 @item
@@ -96,11 +84,6 @@ The font server can be used to display different fonts in your application.
 @emph{Motion Manager}
 
 Skeletal motion manager.
-
-@item
-@emph{Game Core}
-
-This plug-in tries to make writing games easier.
 
 @item
 @emph{Performance Statistics}

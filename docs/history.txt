@@ -14,6 +14,9 @@ The history order is reversed so that new features are at the top.
 	    - Updated command line docs to add -canvas.
 	- Removed t3d2cs app since it doesn't work and is unmaintained.
 	- Created apps/import and moved map2cs, mdl2spr, 3ds2lev there.
+	- Eric Sunshine eliminated additional resources and references to
+	  obsolete applications and modules such as dungeon, vfstest, MazeD,
+	  t3d2cs, etc.
 3-Jul-2001
 	- Fixed the Python plugin after Martin's changes.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter

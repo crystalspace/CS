@@ -207,7 +207,7 @@ slowly (for debugging). The second argument is 0 or 1. If 1 we will move very
 fast. This command only works if @samp{move3d} is enabled.
 
 @item addbot
-Add a sprite that moves randomly through the dungeon.
+Add a sprite that moves randomly through the map.
 
 @item delbot
 Remove the last added bot.
