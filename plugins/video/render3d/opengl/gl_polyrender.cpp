@@ -291,6 +291,7 @@ void csGLPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
   sv = mesh.variablecontext->GetVariableAdd (color_name);
   sv->SetValue (color_buffer);
 
+  mesh.geometryInstance = this;
 }
 
 void csGLPolygonRenderer::Clear ()

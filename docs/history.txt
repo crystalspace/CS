@@ -32,6 +32,10 @@ chronological order.
 	- Jorrit fixed a bug in the NR texture manager. It would use
 	  SCF_QUERY_INTERFACE to get the shader manager from the object
 	  registry instead of CS_QUERY_REGISTRY in some case.
+	- Anders Stenberg optimized rendermesh sorting in NR to minimize
+	  vertex buffer switches. This requires mesh plugins to supply an
+	  ID for geometry to be effective, which currently only genmesh
+	  and thing (through polygonmesh) is augmented to do.
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights

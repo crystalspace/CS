@@ -41,6 +41,7 @@ class csColor;
 class csReversibleTransform;
 struct iTextureHandle;
 struct iMaterialWrapper;
+struct iMeshFactory;
 struct iPortalContainer;
 
 /// Document me! @@@
@@ -56,6 +57,7 @@ struct csRenderMesh
     do_mirror = false;
     indexstart = indexend = 0;
     portal = 0;
+    geometryInstance = 0;
   }
 
   ~csRenderMesh () {}
@@ -97,6 +99,13 @@ struct csRenderMesh
   csRef<iShaderVariableContext> variablecontext;
   
   csAlphaMode::AlphaType alphaType;
+
+  /**
+   * Some unique ID for the geometry used to render this mesh
+   * Used for sorting purposes, and is allowed to be 0, although
+   * that means non-optimal mesh sorting at rendering
+   */
+  void *geometryInstance;
 
   //pointer to a portalcontainer, if there is any
   iPortalContainer* portal;
