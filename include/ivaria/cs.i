@@ -41,7 +41,6 @@
 #include "imesh/thing/thing.h"
 #include "imesh/thing/lightmap.h"
 #include "imap/parser.h"
-#include "plugins/cscript/cspython/cspython.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/halo.h"

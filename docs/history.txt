@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+28-Dec-2001
+	- Small change to the scripting cs.i file so that it no longer
+	  includes from plugins/csscript/cspython.
 27-Dec-2001
 	- Added a new csStringSet::Request() which can return the string
 	  based on the ID (i.e. exactly the opposite of the old Request()
