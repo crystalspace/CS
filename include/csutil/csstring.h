@@ -31,27 +31,7 @@
 
 #define PRINTF printf
 
-class csException {
-public:
-	csSTR Error, Hint;
-	INT64 ErrorVal;
-
-	csException(const char* tError, const char* tHint="", INT64 tErrorVal=0)
-		:Error(tError), Hint(tHint), ErrorVal(tErrorVal) {}
-
-	csSTR GetMessage() {
-		csSTR Msg("Exception: ");
-		Msg+=Error;
-
-		if(!Hint.IsNull())
-			Msg+="\nHint: "+Hint;
-
-		if(ErrorVal)
-			Msg+="\nErrorValue: "+IntToStr(ErrorVal);
-
-		return Msg;
-	}	
-};
+class csException;
 
 #ifndef NO_EXCEPTIONS
 #define csTHROW(Exception) { throw csException Exception; }
@@ -355,4 +335,27 @@ inline csSTR GuidToStr(const GUID& guid) {
 	return WideToStr(wszGUID, 40);
 }
 */
+
+class csException {
+public:
+	csSTR Error, Hint;
+	INT64 ErrorVal;
+
+	csException(const char* tError, const char* tHint="", INT64 tErrorVal=0)
+		:Error(tError), Hint(tHint), ErrorVal(tErrorVal) {}
+
+	csSTR GetMessage() {
+		csSTR Msg("Exception: ");
+		Msg+=Error;
+
+		if(!Hint.IsNull())
+			Msg+="\nHint: "+Hint;
+
+		if(ErrorVal)
+			Msg+="\nErrorValue: "+IntToStr(ErrorVal);
+
+		return Msg;
+	}	
+};
+
 #endif
