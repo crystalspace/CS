@@ -317,7 +317,7 @@ void load_sprite (char *filename, char *templatename, char* txtname)
 
   // add this sprite to the world
   result->SetName (templatename);
-  result->SetMaterial (Sys->view->GetWorld ()->GetMaterials (), txtname);
+  result->SetMaterial (Sys->view->GetWorld ()->GetMaterials ()->FindByName (txtname));
 
   Sys->view->GetWorld ()->sprite_templates.Push (result);
 }

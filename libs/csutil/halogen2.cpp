@@ -23,19 +23,19 @@ unsigned char *GenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundn
 
   float *spoke = (float *)alloca ((iNumSpokes + 2) * sizeof (float));
   for (int i = 0; i < iNumSpokes; i++)
-    spoke [i] = iRoundness + rnd.Get () * (1 - iRoundness);
+    spoke [i] = rnd.Get ();//iRoundness + rnd.Get () * (1 - iRoundness);
   spoke [iNumSpokes] = spoke [0];
   spoke [iNumSpokes + 1] = spoke [1];
 
   for (int y = 0; y < iSize; y++)
     for (int x = 0; x < iSize; x++)
     {
-      // u is in 0..1 interval
+      // u is in -1..1 interval
       float u = float (x - center) / radius;
-      // v is in 0..1 interval
+      // v is in -1..1 interval
       float v = float (y - center) / radius;
       // l will never exceed sqrt(2) e.g. 1.4142...
-      float l = sqrt (u * u + v * v);
+      float l = u * u + v * v;
 
       // c is a float from 0..iNumSpokes
       float c = (atan2 (u, v) / (2 * M_PI) + .5) * iNumSpokes;
@@ -46,11 +46,9 @@ unsigned char *GenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundn
 
       // w1 is the pixel intensity depending on spokes, 0..1
       float w1 = spoke [i] * (1 - c) + spoke [i + 1] * c;
-      // w is the inverse of distance between center and current point
-      float w = 0.9 / (l + 0.001);
-      c = w1 * w1 * w * w;
-      if (c > 4.0) c = 4.0;
-      image [x + y * iSize] = QInt (c * 63.9);
+      float w = 1.1 - pow (l, iRoundness);
+      if (w < 0) w = 0; if (w > 1) w = 1;
+      image [x + y * iSize] = QInt (w * (w + (1 - w) * w1) * 255.9);
     }
 
   return image;

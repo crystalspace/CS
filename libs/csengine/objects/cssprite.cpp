@@ -274,21 +274,8 @@ csSpriteAction* csSpriteTemplate::AddAction ()
   return a;
 }
 
-void csSpriteTemplate::SetMaterial (csMaterialList* materials, const char *matname)
+void csSpriteTemplate::SetMaterial (csMaterialWrapper *material)
 {
-  if (!materials)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "There are no materials defined in this world file!\n");
-    fatal_exit (0, true);
-    return;
-  }
-  csMaterialWrapper* material = materials->FindByName (matname);
-  if (material == NULL)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Couldn't find material named '%s'!\n", matname);
-    fatal_exit (0, true);
-    return;
-  }
   cstxt = material;
 }
 
@@ -593,15 +580,9 @@ void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
   EnableTweening (tmpl->IsTweeningEnabled ());
 }
 
-void csSprite3D::SetMaterial (const char* name, csMaterialList* materials)
+void csSprite3D::SetMaterial (csMaterialWrapper *material)
 {
   force_otherskin = true;
-  csMaterialWrapper* material = materials->FindByName (name);
-  if (material == NULL)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Couldn't find material named '%s'!\n", name);
-    exit (0);
-  }
   cstxt = material;
 }
 

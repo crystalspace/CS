@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
 
 int main (int argc, char *argv[])
 {
@@ -36,6 +37,9 @@ int main (int argc, char *argv[])
     fprintf (stderr, "Usage: startfs <executable>\n");
     return -1;
   }
+
+  // Wait for session switch to finish...
+  sleep (1);
 
   execv (argv [1], &argv [1]);
 

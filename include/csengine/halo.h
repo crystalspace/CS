@@ -16,12 +16,66 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef HALO_H
-#define HALO_H
+#ifndef __HALO_H__
+#define __HALO_H__
 
 #include "csgeom/math3d.h"
-#include "light.h"
+#include "csengine/light.h"
 #include "ihalo.h"
+
+/** 
+ * This is the basic class for all types of halos.
+ * The csLight class contains a pointer to a object derived from this class.
+ */
+class csHalo
+{
+public:
+  /// the current intensity of the attached halo; if >0 halo is in halo queue.
+  float Intensity;
+
+  /// Constructor
+  csHalo ();
+  /// Destructor
+  virtual ~csHalo ();
+
+  /// Generate the alphamap for this halo of size Size x Size
+  virtual unsigned char *Generate (int Size) = 0;
+};
+
+/**
+ * This is a halo which ressembles a cross.
+ */
+class csCrossHalo : public csHalo
+{
+public:
+  /// Halo intensity factor
+  float IntensityFactor;
+  /// Halo cross-ressemblance factor
+  float CrossFactor;
+
+  /// Create a halo object
+  csCrossHalo (float intensity_factor, float cross_factor);
+
+  /// Generate the alphamap for this halo of size Size x Size
+  virtual unsigned char *Generate (int Size);
+};
+
+class csNovaHalo : public csHalo
+{
+public:
+  /// Random seed for generating halo
+  int Seed;
+  /// Number of halo spokes
+  int NumSpokes;
+  /// The "roundness" factor
+  float Roundness;
+
+  /// Create a halo object
+  csNovaHalo (int seed, int num_spokes, float roundness);
+
+  /// Generate the alphamap for this halo of size Size x Size
+  virtual unsigned char *Generate (int Size);
+};
 
 /**
  * This is used to keep track of halos.<p>
@@ -46,7 +100,7 @@ public:
   csLightHalo (csLight *iLight, iHalo *iHandle)
   {
     Handle = iHandle;
-    (Light = iLight)->SetHaloInQueue (true);
+    (Light = iLight)->flags.SetBool (CS_LIGHT_ACTIVEHALO, true);
   }
 
   /// Destroy the light halo object
@@ -55,8 +109,8 @@ public:
     if (Handle)
       Handle->DecRef ();
     if (Light)
-      Light->SetHaloInQueue (false);
+      Light->flags.SetBool (CS_LIGHT_ACTIVEHALO, false);
   }
 };
 
-#endif /*HALO_H*/
+#endif // __HALO_H__

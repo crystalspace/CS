@@ -55,7 +55,6 @@
 #include "csgeom/polypool.h"
 #include "csgfxldr/csimage.h"
 #include "csutil/util.h"
-#include "csutil/halogen.h"
 #include "iimage.h"
 #include "ivfs.h"
 #include "ihalo.h"
@@ -199,15 +198,15 @@ csCurve* csCurveIt::Fetch ()
 
     // Recurse.
     if (thing) return Fetch ();
-    
+
     // No things. Go to next sector.
     sector_idx++;
-    
+
     if (sector_idx >= world->sectors.Length ()) return NULL;
-    
+
     // Initialize iterator to start of sector and recurse.
     thing = NULL;
-    
+
     return Fetch ();
   }
 
@@ -1205,7 +1204,7 @@ void csWorld::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
   rview.world = this;
 
   // This flag is set in HandleEvent on a cscmdContextResize event
-  if (resize) 
+  if (resize)
   {
     resize = false;
     Resize ();
@@ -1279,7 +1278,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
 }
 
 void csWorld::DrawFunc (csCamera* c, csClipper* view,
-	csDrawFunc* callback, void* callback_data)
+  csDrawFunc* callback, void* callback_data)
 {
   csRenderView rview (*c, view, G3D, G2D);
   StartDraw (c, view, rview);
@@ -1293,8 +1292,7 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
 
 void csWorld::AddHalo (csLight* Light)
 {
-  if (!Light->flags.Check (CS_LIGHT_HALO)
-   || Light->GetHaloInQueue ())
+  if (!Light->GetHalo () || Light->flags.Check (CS_LIGHT_ACTIVEHALO))
     return;
 
   // Transform light pos into camera space and see if it is directly visible
@@ -1320,9 +1318,7 @@ void csWorld::AddHalo (csLight* Light)
 
   // Halo size is 1/4 of the screen height; also we make sure its odd
   int hs = (frame_height / 4) | 1;
-  float hi, hc;
-  Light->GetHaloType (hi, hc);
-  unsigned char *Alpha = GenerateHalo (hs, hi, hc);
+  unsigned char *Alpha = Light->GetHalo ()->Generate (hs);
 
   // Okay, put the light into the queue: first we generate the alphamap
   iHalo *handle = G3D->CreateHalo (Light->GetColor ().red,
@@ -1336,11 +1332,6 @@ void csWorld::AddHalo (csLight* Light)
     return;
 
   halos.Push (new csLightHalo (Light, handle));
-}
-
-bool csWorld::HasHalo (csLight* Light)
-{
-  return halos.FindKey (Light) >= 0;
 }
 
 void csWorld::RemoveHalo (csLight* Light)
@@ -1401,14 +1392,13 @@ bool csWorld::ProcessHalo (csLightHalo *Halo)
     }
   }
 
-  float hintensity = Halo->Light->GetHaloIntensity ();
+  float hintensity = Halo->Light->GetHalo ()->Intensity;
   if (halo_vis)
   {
-    float maxintensity = Halo->Light->GetHaloMaxIntensity ();
-    if (hintensity < maxintensity - HALO_INTENSITY_STEP)
+    if (hintensity < 1.0 - HALO_INTENSITY_STEP)
       hintensity += HALO_INTENSITY_STEP;
     else
-      hintensity = maxintensity;
+      hintensity = 1.0;
   }
   else
   {
@@ -1418,7 +1408,7 @@ bool csWorld::ProcessHalo (csLightHalo *Halo)
     if (hintensity <= 0)
       return false;
   }
-  Halo->Light->SetHaloIntensity (hintensity);
+  Halo->Light->GetHalo ()->Intensity = hintensity;
 
   if (draw_halo)
     Halo->Handle->Draw (xtl, ytl, -1, -1, hintensity, HaloClip, HaloVCount);
@@ -1967,7 +1957,7 @@ void csWorld::csWorldStateVector::Close (iGraphics2D *g2d)
 }
 
 void csWorld::csWorldStateVector::Resize (iGraphics2D *g2d)
-{ 
+{
   // With the glide back buffer implementation of procedural textures
   // circumstances are that many G3D can be associated with one G2D, so
   // we test for width and height also.
@@ -1977,7 +1967,7 @@ void csWorld::csWorldStateVector::Resize (iGraphics2D *g2d)
     if (state->G2D == g2d)
       if ((state->G2D->GetWidth() == state->G3D->GetWidth ()) &&
 	  (state->G2D->GetHeight() == state->G3D->GetHeight ()))
-	  ((csWorldState*)root [i])->resize = true; 
+	  ((csWorldState*)root [i])->resize = true;
   }
 }
 
@@ -1988,7 +1978,7 @@ void csWorld::SetContext (iGraphics3D* g3d)
   {
     if (G3D) G3D->DecRef ();
     G3D = g3d;
-    if (!world_states) 
+    if (!world_states)
     {
       world_states = new csWorldStateVector();
       Resize ();
@@ -2017,6 +2007,6 @@ void csWorld::SetContext (iGraphics3D* g3d)
     }
     G3D->IncRef ();
   }
-}  
+}
 
 //-------------------End-Multi-Context-Support--------------------------------

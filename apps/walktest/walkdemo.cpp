@@ -472,7 +472,7 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
     tmpl = new csSpriteTemplate ();
     tmpl->SetName (skelname);
     Sys->world->sprite_templates.Push (tmpl);
-    tmpl->SetMaterial (Sys->world->GetMaterials (), "white.gif");
+    tmpl->SetMaterial (Sys->world->GetMaterials ()->FindByName ("white.gif"));
     int vertex_idx = 0;
     csFrame* fr = tmpl->AddFrame ();
     fr->SetName ("f");
@@ -669,7 +669,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
     tmpl = new csSpriteTemplate ();
     tmpl->SetName (skelname);
     Sys->world->sprite_templates.Push (tmpl);
-    tmpl->SetMaterial (Sys->world->GetMaterials (), "green.gif");
+    tmpl->SetMaterial (Sys->world->GetMaterials ()->FindByName ("green.gif"));
     int vertex_idx = 0;
     csFrame* fr = tmpl->AddFrame ();
     fr->SetName ("f");

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef LIGHT_H
-#define LIGHT_H
+#ifndef __LIGHT_H__
+#define __LIGHT_H__
 
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
@@ -36,19 +36,21 @@ class csDynLight;
 class Dumper;
 class csThing;
 class csLightPatchPool;
+class csHalo;
 
 /**
  * If CS_LIGHT_THINGSHADOWS is set for a light then things will also
  * cast shadows. This flag is set by default for static lights and unset
  * for dynamic lights.
  */
-#define CS_LIGHT_THINGSHADOWS 1
+#define CS_LIGHT_THINGSHADOWS	0x00000001
 
 /**
- * If CS_LIGHT_HALO is set for a light then the light generates an additional halo.
- * This flag is unset by default.
+ * If this flag is set, the halo for this light is active and is in the 
+ * world's queue of active halos. When halo become inactive, this flag
+ * is reset.
  */
-#define CS_LIGHT_HALO 2
+#define CS_LIGHT_ACTIVEHALO	0x80000000
 
 /**
  * Attenuation controls how the brightness of a light fades with distance.
@@ -106,17 +108,8 @@ protected:
   float inv_dist;
   /// Color.
   csColor color;
-
-  /// the current intensity of the attached halo.
-  float halo_intensity;
-  /// the maximum intensity of the attached halo.
-  float halo_max_intensity;
-  /// whether this light is in the halo queue or not.
-  bool in_halo_queue;
-  /// Halo intensity factor
-  float intensity_factor;
-  /// Halo cross-ressemblance factor
-  float cross_factor;
+  /// The associated halo (if not NULL)
+  csHalo *halo;
 
   /// Attenuation type
   int attenuation;
@@ -195,42 +188,15 @@ public:
   virtual void SetColor (const csColor& col) { color = col; }
 
   /**
-   * Return the maximum intensity of the halo.
+   * Return the associated halo
    */
-  float GetHaloMaxIntensity () const { return halo_max_intensity; }
+  csHalo *GetHalo () { return halo; }
 
   /**
-   * Set the intensity of the halo.
+   * Set the halo associated with this light.
    */
-  void SetHaloIntensity (float newI) { halo_intensity = newI; }
-
-  /**
-   * Get the intensity of the halo.
-   */
-  float GetHaloIntensity () const { return halo_intensity; }
-
-  /**
-   * Set whether or not the halo is in the queue.
-   */
-  void SetHaloInQueue (bool bNew) { in_halo_queue = bNew; }
-
-  /**
-   * Query if the halo is in the queue.
-   */
-  bool GetHaloInQueue () const { return in_halo_queue; }
-
-  /**
-   * Set light halo's intensity and cross-ressemblance factors.
-   */
-  void SetHaloType (float iFactor, float iCross)
-  { intensity_factor = iFactor; cross_factor = iCross; }
-
-  /**
-   * Query light halo's intensity and cross-ressemblance factors.
-   */
-  void GetHaloType (float &oFactor, float &oCross)
-  { oFactor = intensity_factor; oCross = cross_factor; }
-
+  void SetHalo (csHalo *Halo);
+ 
   /**
    * Get the light's attenuation type
    */
@@ -631,4 +597,4 @@ public:
   CSOBJTYPE;
 };
 
-#endif /*LIGHT_H*/
+#endif // __LIGHT_H__

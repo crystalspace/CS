@@ -887,11 +887,6 @@ public:
   void AddHalo (csLight* Light);
 
   /**
-   * Check if a light has a halo attached.
-   */
-  bool HasHalo (csLight* Light);
-
-  /**
    * Remove halo attached to given light from the world.
    */
   void RemoveHalo (csLight* Light);

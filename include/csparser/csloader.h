@@ -25,6 +25,7 @@
 
 struct iImage;
 struct csRGBcolor;
+struct Color;
 class csTextureWrapper;
 class csMaterialWrapper;
 class csSkeletonLimb;
@@ -184,6 +185,18 @@ class csLoader
    * or an action name and a frame number
    */
   static csFrame* LoadFrame (csSpriteTemplate* stemp, char* buf);
+
+  /// Find a material (and create one from texture if possible)
+  static csMaterialWrapper *csLoader::FindMaterial (const char *iName);
+
+  /// Load texture definition
+  static void load_tex (char** buf, Color* colors, int num_colors, char* name);
+
+  /**
+   * If the polygon is a portal and has no special functions,
+   * the texturing mode is reset to POLYTXT_NONE.
+   */
+  static void OptimizePolygon (csPolygon3D *p);
 
 public:
   /// Load file into a world.

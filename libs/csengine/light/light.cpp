@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -23,13 +23,13 @@
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
-//#include "csengine/polygon.h"
 #include "csengine/lghtmap.h"
 #include "csengine/cssprite.h"
 #include "csengine/world.h"
 #include "csengine/lppool.h"
 #include "csengine/polygon.h"
 #include "csengine/curve.h"
+#include "csutil/halogen.h"
 
 int csLight::ambient_red = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
@@ -52,22 +52,25 @@ csLight::csLight (float x, float y, float z, float d,
   dist = d;
   sqdist = d * d;
   inv_dist = 1 / d;
+  halo = NULL;
 
   color.red = red;
   color.green = green;
   color.blue = blue;
-
-  halo_intensity = 0.0f;
-  halo_max_intensity = 1.0f;
-  in_halo_queue = false;
 
   attenuation = CS_ATTN_LINEAR;
 }
 
 csLight::~csLight ()
 {
-  if (in_halo_queue)
+  if (flags.Check (CS_LIGHT_ACTIVEHALO))
     csWorld::current_world->RemoveHalo (this);
+}
+
+void csLight::SetHalo (csHalo *Halo)
+{
+  delete halo;
+  halo = Halo;
 }
 
 float csLight::GetBrightnessAtDistance (float d)
@@ -467,5 +470,36 @@ void csDynLight::AddLightedSprite (csLightHitsSprite* lp)
   lp->light = this;
 }
 
-
 //---------------------------------------------------------------------------
+
+csHalo::csHalo ()
+{
+  Intensity = 0;
+}
+
+csHalo::~csHalo ()
+{
+}
+
+csCrossHalo::csCrossHalo (float intensity_factor, float cross_factor) : csHalo ()
+{
+  IntensityFactor = intensity_factor;
+  CrossFactor = cross_factor;
+}
+
+unsigned char *csCrossHalo::Generate (int Size)
+{
+  return GenerateHalo (Size, IntensityFactor, CrossFactor);
+}
+
+csNovaHalo::csNovaHalo (int seed, int num_spokes, float roundness) : csHalo ()
+{
+  Seed = seed;
+  NumSpokes = num_spokes;
+  Roundness = roundness;
+}
+
+unsigned char *csNovaHalo::Generate (int Size)
+{
+  return GenerateNova (Size, Seed, NumSpokes, Roundness);
+}

@@ -41,9 +41,11 @@
 #if (HALO_BPP == 32) && defined (TOP8BITS_R8G8B8_USED)
 #define PIXEL_PREPROC(x)  ((x) >> pixel_adjust)
 #define PIXEL_POSTPROC(x) ((x) << pixel_adjust)
+#define RED_PREPROC(r)    (r >> 1)
 #else
 #define PIXEL_PREPROC(x)  (x)
 #define PIXEL_POSTPROC(x) (x)
+#define RED_PREPROC(r)    r
 #endif
 
 static void HALO_NAME(void *src, void *dest, int count, int delta,
@@ -56,7 +58,7 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
   if (delta == 0x10000)
     while (D < E)
     {
-      uint8 a = (*A++ * Scan.FogDensity) >> 8;
+      int a = (*A++ * Scan.FogDensity) >> 8;
       if (a)
       {
         // Get the destination pixel from framebuffer
@@ -69,9 +71,9 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
         uint32 dg = d & HALO_GM;
         uint32 db = d & HALO_BM;
         // Apply alpha
-        dr = dr + (int (a * (Scan.FogR - dr)) >> 8);
-        dg = dg + (int (a * (Scan.FogG - dg)) >> 8);
-        db = db + (int (a * (Scan.FogB - db)) >> 8);
+        dr = dr + ((a * (Scan.FogR - dr)) >> 7);
+        dg = dg + ((a * (Scan.FogG - dg)) >> 7);
+        db = db + ((a * (Scan.FogB - db)) >> 7);
         // Clamp the values if needed
 #ifdef HALO_CLAMP
         if (dr > HALO_RM) dr = HALO_RM; else dr &= HALO_RM;
@@ -108,9 +110,9 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
         uint32 dg = d & HALO_GM;
         uint32 db = d & HALO_BM;
         // Apply alpha
-        dr = dr + (int (a * (Scan.FogR - dr)) >> 8);
-        dg = dg + (int (a * (Scan.FogG - dg)) >> 8);
-        db = db + (int (a * (Scan.FogB - db)) >> 8);
+        dr = dr + ((a * (Scan.FogR - dr)) >> 7);
+        dg = dg + ((a * (Scan.FogG - dg)) >> 7);
+        db = db + ((a * (Scan.FogB - db)) >> 7);
         // Clamp the values if needed
 #ifdef HALO_CLAMP
         if (dr > HALO_RM) dr = HALO_RM; else dr &= HALO_RM;

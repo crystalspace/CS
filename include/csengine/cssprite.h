@@ -305,7 +305,7 @@ public:
   /// Get the material handle.
   iMaterialHandle* GetMaterialHandle () const { return cstxt->GetMaterialHandle (); }
   /// Set the material used for this sprite
-  void SetMaterial (csMaterialList* materials, const char *matname);
+  void SetMaterial (csMaterialWrapper *material);
 
   /**
    * Compute all normals in a frame.
@@ -684,7 +684,7 @@ public:
   csSkeletonState* GetSkeletonState () { return skeleton_state; }
 
   /// force a new material skin other than default
-  void SetMaterial (const char* name, csMaterialList* materials);
+  void SetMaterial (csMaterialWrapper *material);
 
   /// Enable or disable tweening frames (default false).
   void EnableTweening (bool en) { do_tweening = en; }

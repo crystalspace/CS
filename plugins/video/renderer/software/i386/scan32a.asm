@@ -548,9 +548,9 @@
 		mov	dl,[esi+ebp]					; 9
 		mov	ebp,%$paltable					; 9
 		add	eax,%$duu					; 10/2
-		mov	dx,[ebp+edx*4]					; 10
-		mov	[edi],dx					; 12
-		add	edi,2						; 12
+		mov	edx,[ebp+edx*4]					; 10
+		mov	[edi],edx					; 12
+		add	edi,4						; 12
 		cmp	edi,%$destend					; 13
 		jb	%$sloop						; 13
 

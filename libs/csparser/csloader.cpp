@@ -381,6 +381,46 @@ bool csLoader::load_color (char *buf, csRGBcolor &c)
   return true;
 }
 
+csMaterialWrapper *csLoader::FindMaterial (const char *iName)
+{
+  csMaterialWrapper *mat = World->GetMaterials ()->FindByName (iName);
+  if (mat)
+    return mat;
+
+  csTextureWrapper *tex = World->GetTextures ()->FindByName (iName);
+  if (tex)
+  {
+    // Add a default material with the same name as the texture
+    csMaterial *material = new csMaterial ();
+    csMaterialWrapper *mat = World->GetMaterials ()->NewMaterial (material);
+    material->SetTextureWrapper (tex);
+    mat->SetName (iName);
+    material->DecRef ();
+    return mat;
+  } /* endif */
+
+  CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", iName);
+  fatal_exit (0, true);
+  return NULL;
+}
+
+void csLoader::OptimizePolygon (csPolygon3D *p)
+{
+  if (!p->GetPortal () || p->GetAlpha ())
+    return;
+
+  csMaterialWrapper *mat = p->GetMaterialWrapper ();
+  if (mat)
+  {
+    iMaterial *m = mat->GetMaterial ();
+    iTextureHandle *th = m ? m->GetTexture () : NULL;
+    if (th && th->GetKeyColor ())
+      return;
+  }
+
+  p->SetTextureType (POLYTXT_NONE);
+}
+
 //---------------------------------------------------------------------------
 
 csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
@@ -690,7 +730,7 @@ csParticleSystem* csLoader::load_fountain (char* name, char* buf)
         break;
       case TOKEN_TEXTURE: //@@@MAT
         ScanStr (params, "%s", str);
-        material = World->GetMaterials ()->FindByName (str);
+        material = FindMaterial (str);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -793,7 +833,7 @@ csParticleSystem* csLoader::load_fire (char* name, char* buf)
         break;
       case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        material = World->GetMaterials ()->FindByName (str);
+        material = FindMaterial (str);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -881,7 +921,7 @@ csParticleSystem* csLoader::load_rain (char* name, char* buf)
         break;
       case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        material = World->GetMaterials ()->FindByName (str);
+        material = FindMaterial (str);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -970,7 +1010,7 @@ csParticleSystem* csLoader::load_snow (char* name, char* buf)
         break;
       case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        material = World->GetMaterials ()->FindByName (str);
+        material = FindMaterial (str);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -1041,16 +1081,33 @@ csStatLight* csLoader::load_statlight (char* name, char* buf)
   csLoaderStat::lights_loaded++;
   float x, y, z, dist = 0, r, g, b;
   int dyn, attenuation = CS_ATTN_LINEAR;
-  bool halo = false;
-  float haloIntensity = 0.0;
-  float haloCross     = 0.0;
+  char str [100];
+  struct csHaloDef
+  {
+    int type;
+    union
+    {
+      struct
+      {
+        float Intensity;
+        float Cross;
+      } cross;
+      struct
+      {
+        int Seed;
+        int NumSpokes;
+        float Roundness;
+      } nova;
+    };
+  } halo;
+
+  memset (&halo, 0, sizeof (halo));
 
   if (strchr (buf, ':'))
   {
     // Still support old format for backwards compatibility.
     ScanStr (buf, "%f,%f,%f:%f,%f,%f,%f,%d",
           &x, &y, &z, &dist, &r, &g, &b, &dyn);
-    halo = false;
   }
   else
   {
@@ -1076,12 +1133,30 @@ csStatLight* csLoader::load_statlight (char* name, char* buf)
           dyn = 1;
           break;
         case TOKEN_HALO:
-          halo = true;
-          haloIntensity = 2.0; haloCross = 0.45;
-          ScanStr (params, "%f,%f", &haloIntensity, &haloCross);
+          ScanStr (params, "%s", str);
+          if (!strncmp (str, "CROSS", 5))
+          {
+            params = strchr (str, ',');
+            if (params) params++;
+defaulthalo:
+            halo.type = 1;
+            halo.cross.Intensity = 2.0; halo.cross.Cross = 0.45;
+            if (params)
+              ScanStr (params, "%f,%f", &halo.cross.Intensity, &halo.cross.Cross);
+          }
+          else if (!strncmp (str, "NOVA", 5))
+          {
+            params = strchr (str, ',');
+            if (params) params++;
+            halo.type = 2;
+            halo.nova.Seed = 0; halo.nova.NumSpokes = 100; halo.nova.Roundness = 0.5;
+            if (params)
+              ScanStr (params, "%d,%d,%f", &halo.nova.Seed, &halo.nova.NumSpokes, &halo.nova.Roundness);
+          }
+          else
+            goto defaulthalo;
           break;
         case TOKEN_ATTENUATION:
-          char str [100];
           ScanStr (params, "%s", str);
           if (strcmp (str, "none")      == 0) attenuation = CS_ATTN_NONE;
           if (strcmp (str, "linear")    == 0) attenuation = CS_ATTN_LINEAR;
@@ -1113,10 +1188,14 @@ csStatLight* csLoader::load_statlight (char* name, char* buf)
 
   csStatLight* l = new csStatLight (x, y, z, dist, r, g, b, dyn);
   l->SetName (name);
-  if (halo)
+  switch (halo.type)
   {
-    l->flags.Set (CS_LIGHT_HALO, CS_LIGHT_HALO);
-    l->SetHaloType (haloIntensity, haloCross);
+    case 1:
+      l->SetHalo (new csCrossHalo (halo.cross.Intensity, halo.cross.Cross));
+      break;
+    case 2:
+      l->SetHalo (new csNovaHalo (halo.nova.Seed, halo.nova.NumSpokes, halo.nova.Roundness));
+      break;
   }
   l -> SetAttenuation (attenuation);
   return l;
@@ -1300,7 +1379,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
       //@@OBSOLETE, retained for backward compatibility
     case TOKEN_MATERIAL:
       ScanStr (params, "%s", str);
-      info.default_material = World->GetMaterials ()->FindByName (str);
+      info.default_material = FindMaterial (str);
       if (info.default_material == NULL)
       {
         CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -1448,7 +1527,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
         break;
       case TOKEN_TEXTURE: //@@@MAT
         ScanStr (params, "%s", str);
-        material = World->GetMaterials ()->FindByName (str);
+        material = FindMaterial (str);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -1871,7 +1950,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
         //@@OBSOLETE, retained for backward compatibility
       case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
-        mat = World->GetMaterials ()->FindByName (str);
+        mat = FindMaterial (str);
         if (mat == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -2217,6 +2296,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     poly3d->GetPortal ()->SetWarp (csTransform::GetReflect (
     	*(poly3d->GetPolyPlane ()) ));
 
+  OptimizePolygon (poly3d);
+
   return poly3d;
 }
 
@@ -2287,7 +2368,7 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
         //@@OBSOLETE, retained for backward compatibility
       case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
-        mat = World->GetMaterials ()->FindByName (str);
+        mat = FindMaterial (str);
         if (mat == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -2517,11 +2598,11 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   // not have power-of-two dimensions...
 
   // Add a default material with the same name as the texture.
-  csMaterial* material = new csMaterial ();
-  csMaterialWrapper* mat = World->GetMaterials ()->NewMaterial (material);
+//csMaterial *material = new csMaterial ();
+//csMaterialWrapper *mat = World->GetMaterials ()->NewMaterial (material);
 
   csTextureWrapper *tex = World->GetTextures ()->NewTexture (image);
-  material->SetTextureWrapper (tex);
+//material->SetTextureWrapper (tex);
   tex->flags = flags;
   if (prefix)
   {
@@ -2530,17 +2611,17 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
     strcat (prefixedname, "_");
     strcat (prefixedname, name);
     tex->SetName (prefixedname);
-    mat->SetName (prefixedname);
+//  mat->SetName (prefixedname);
     delete [] prefixedname;
   }
   else
   {
     tex->SetName (name);
-    mat->SetName (name);
+//  mat->SetName (name);
   }
   // dereference image pointer since tex already incremented it
   image->DecRef ();
-  material->DecRef ();
+//material->DecRef ();
 
   if (do_transp)
     tex->SetKeyColor (QInt (transp.red * 255.99),
@@ -2688,7 +2769,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
         //@@OBSOLETE, retained for backward compatibility
       case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
-        mat = World->GetMaterials ()->FindByName (str);
+        mat = FindMaterial (str);
         if (mat == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -2933,7 +3014,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
         //@@OBSOLETE, retained for backward compatibility
       case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
-        mat = World->GetMaterials ()->FindByName (str);
+        mat = FindMaterial (str);
         if (mat == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -3153,7 +3234,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
         //@@OBSOLETE, retained for backward compatibility
       case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
-        default_material = World->GetMaterials ()->FindByName (str);
+        default_material = FindMaterial (str);
         if (default_material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -3283,7 +3364,7 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
         break;
       case TOKEN_TEXTURE: //@@@MAT
         ScanStr (params, "%s", str);
-        material = World->GetMaterials ()->FindByName (str);
+        material = FindMaterial (str);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -3549,7 +3630,7 @@ void add_to_todo (Todo* todo, int& todo_end, char* poly,
   todo_end++;
 }
 
-void load_tex (char** buf, Color* colors, int num_colors, char* name)
+void csLoader::load_tex (char** buf, Color* colors, int num_colors, char* name)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXTURE)
@@ -3572,7 +3653,7 @@ void load_tex (char** buf, Color* colors, int num_colors, char* name)
     {
       case TOKEN_TEXTURE://@@@MAT
         ScanStr (params, "%s", str);
-        colors[num_colors].material = World->GetMaterials ()->FindByName (str);
+        colors[num_colors].material = FindMaterial (str);
         if (colors[num_colors].material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -3729,7 +3810,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         break;
       case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        material = World->GetMaterials ()->FindByName (str);
+        material = FindMaterial (str);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -3745,7 +3826,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
       case TOKEN_CEIL_TEXTURE:
       case TOKEN_FLOOR_TEXTURE:
         ScanStr (params, "%s", str);
-        colors[num_colors].material = World->GetMaterials ()->FindByName (str);
+        colors[num_colors].material = FindMaterial (str);
         if (colors[num_colors].material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -4123,6 +4204,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
       p->flags.Set (CS_POLY_LIGHTING, (no_lighting ? 0 : CS_POLY_LIGHTING));
       csPolyTexLightMap* pol_lm = p->GetLightMapInfo ();
       if (pol_lm) pol_lm->SetUniformDynLight (todo[done].light);
+      OptimizePolygon (p);
     }
     done++;
   }
@@ -4561,7 +4643,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
   for (i = 0 ; i < num_mat ; i++)
   {
     sprintf (matname, texturebasename, i);
-    csMaterialWrapper* mat = World->GetMaterials ()->FindByName (matname);
+    csMaterialWrapper* mat = FindMaterial (matname);
     if (mat == NULL) mat = first_mat;
     first_mat = mat;
     terr->SetMaterial (i, mat);
@@ -5272,7 +5354,14 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
       case TOKEN_MATERIAL:
         {
           ScanStr (params, "%s", str);
-          stemp->SetMaterial (World->GetMaterials (), str);
+          csMaterialWrapper *mat = FindMaterial (str);
+          if (mat)
+            stemp->SetMaterial (mat);
+          else
+          {
+            CsPrintf (MSG_FATAL_ERROR, "Material `%s' not found!\n", str);
+            fatal_exit (0, true);
+          }
         }
         break;
 
@@ -5532,7 +5621,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
       case TOKEN_MATERIAL:
         {
           ScanStr (params, "%s", str);
-          csMaterialWrapper* mat = World->GetMaterials ()->FindByName (str);
+          csMaterialWrapper* mat = FindMaterial (str);
           if (mat == NULL)
           {
             CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", params);
@@ -5648,7 +5737,15 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
         //@@OBSOLETE, retained for backward compatibility
       case TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
-        spr->SetMaterial (str, World->GetMaterials ());
+        FindMaterial (str);
+        csMaterialWrapper *mat = FindMaterial (str);
+        if (!mat)
+        {
+          CsPrintf (MSG_FATAL_ERROR, "No material named `%s' found!\n", str);
+          fatal_exit (0, true);
+        }
+        else
+          spr->SetMaterial (mat);
         // unset_texture ();
         break;
     }

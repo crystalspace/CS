@@ -320,7 +320,7 @@ void csApp::LoadConfig ()
         LoadTexture (name, params, CS_TEXTURE_2D);
         break;
       default:
-        printf (MSG_FATAL_ERROR, "Unknown token in csws.cfg! (%s)\n", cfg);
+        printf (MSG_FATAL_ERROR, "Unknown token in "CSWS_CFG"! (%s)\n", cfg);
         fatal_exit (0, false);			// Unknown token
     }
   delete[] cswscfg;

@@ -84,8 +84,7 @@ void halo_dscan_8 (void *src, void *dest, int count, int delta, int /*post_shift
     while (D < E)
     {
       unsigned int a = (*A++ * Scan.FogDensity) & 0x1f00;
-      if (a)
-        *D = Scan.Fog8 [(a ^ 0x1f00) | *D];
+      if (a) *D = Scan.Fog8 [(a ^ 0x1f00) | *D];
       D++;
     }
   else
@@ -94,8 +93,7 @@ void halo_dscan_8 (void *src, void *dest, int count, int delta, int /*post_shift
     while (D < E)
     {
       unsigned int a = (A [ax >> 16] * Scan.FogDensity) & 0x1f00;
-      if (a)
-        *D = Scan.Fog8 [(a ^ 0x1f00) | *D];
+      if (a) *D = Scan.Fog8 [(a ^ 0x1f00) | *D];
       D++;
       ax += delta;
     }
@@ -177,6 +175,8 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   // Check if halo is visible
   if (iIntensity <= 0)
     return;
+  if (iIntensity > 1)
+    iIntensity = 1;
 
   if (w < 0) w = Width;
   if (h < 0) h = Height;
@@ -206,8 +206,8 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
     Scan.FogB = QRound (B * ((1 << pfmt.BlueBits ) - 1))
       << (pfmt.BlueShift - pixel_adjust);
 
-    // halo intensity (0..255)
-    Scan.FogDensity = QRound (iIntensity * 255);
+    // halo intensity (0..127)
+    Scan.FogDensity = QRound (iIntensity * 127);
     // Detect when the halo will possibly overflow
     clamp = (Scan.FogR > (pfmt.RedMask >> pixel_adjust))
          || (Scan.FogG > (pfmt.GreenMask >> pixel_adjust))
@@ -390,6 +390,10 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
 iHalo *csGraphics3DSoftwareCommon::CreateHalo (float iR, float iG, float iB,
   unsigned char *iAlpha, int iWidth, int iHeight)
 {
+  // Allow R,G,B in range 0..2
+  if (iR > 2.0) iR = 2.0;
+  if (iG > 2.0) iG = 2.0;
+  if (iB > 2.0) iB = 2.0;
   csSoftHalo *h = new csSoftHalo (iR, iG, iB, iAlpha, iWidth, iHeight, this);
   return h;
 }
