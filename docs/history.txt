@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Apr-2004
+	- Eric Sunshine fixed CS/bin/autogen.sh so that it returns the exit
+	  status of 'autoconf' as its own exit status. This allows invokers of
+	  autogen.sh to determine if Autoconf failed.  Also removed out-of-date
+	  comment in autogen.sh.
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support
