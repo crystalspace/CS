@@ -22,7 +22,7 @@
 #include "csobject/csobject.h"
 #include "csobject/nobjvec.h"
 #include "csgeom/vector3.h"
-#include "camera.h"
+#include "csengine/camera.h"
 
 class csWorld;
 
