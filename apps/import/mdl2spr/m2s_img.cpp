@@ -40,6 +40,15 @@ void SkinImage::SetFormat (int) {}
 iImage *SkinImage::Clone () { return NULL; }
 iImage *SkinImage::Crop (int, int, int, int) { return NULL; }
 
+iImage* SkinImage::Sharpen (csRGBpixel *transp, int strength)
+{
+  // Following block added so silence compiler warnings ONLY
+  transp = NULL;
+  strength = 0;
+
+  return NULL;
+}
+
 SkinImage::SkinImage(void* Data, const void* Pal, int w, int h) :
   Image(Data), Width(w), Height(h), Size(w * h)
 {
