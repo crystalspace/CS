@@ -25,6 +25,10 @@ Short-term cleanups that need to be done:
 	    - The background is now erased prior to activation of the 3D views
 	      in order to clear away console text which incorrectly appeared
 	      in gaps between views.
+	- Eric Sunshine fixed oodles of new compilation warnings and a few
+	  compilation errors in MazeD.  Also fixed a link error caused by a
+	  second definition of csTextureMM::fIgnoreLoadingErrors which
+	  incorrectly appeared in me_world.cpp for some unknown reason.
 3-Aug-1999
 	- Added 'FILE' keyword in SPRITE template loader so that you can load
 	  3DS and MD2 files from within a world file (and every other format
