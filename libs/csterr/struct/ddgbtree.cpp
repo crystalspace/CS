@@ -222,7 +222,7 @@ inline ddgTBinTree *ddgTBinTree::neighbourTree( ddgTriIndex i)
  *  for the purpose of reading data.  If the cacheIndex = 0, we will
  *  get back the default node.
  */
-inline ddgTNode *ddgTBinTree::gnode(ddgTriIndex tindex)
+ddgTNode *ddgTBinTree::gnode(ddgTriIndex tindex)
 {
 	return _mesh->tcache()->get(tcacheId(tindex));
 }
@@ -232,7 +232,7 @@ inline ddgTNode *ddgTBinTree::gnode(ddgTriIndex tindex)
  * for the purpose of setting data.  If the cacheIndex = 0, we redirect
  * to the scratch entry.
  */
-inline ddgTNode *ddgTBinTree::snode(ddgTriIndex tindex)
+ddgTNode *ddgTBinTree::snode(ddgTriIndex tindex)
 {
 	return _mesh->tcache()->get(tcacheId(tindex)?tcacheId(tindex):1);
 }

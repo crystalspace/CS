@@ -919,7 +919,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   if (!collide_system)
   {
     Printf (MSG_FATAL_ERROR, "No Collision Detection plugin found!\n");
-    return false;
+    //return false;
   }
 
   // Initialize the command processor with the world and camera.

@@ -293,32 +293,32 @@ public:
    */
 
   /// Load any standard libraries here.
-  virtual void MyAppInitialize1(void) { };
+  virtual void MyAppInitialize1(void) { }
   /// Load any standard textures here.
-  virtual void MyAppInitialize2(void) { };
+  virtual void MyAppInitialize2(void) { }
   /// Load any 2D sprites.
-  virtual void MyAppInitialize3(void) { };
+  virtual void MyAppInitialize3(void) { }
   /// Do any remaining initializations here.
-  virtual void MyAppInitialize4(void) { };
+  virtual void MyAppInitialize4(void) { }
   /// Called at the end of WalkTest's constructor.
-  virtual void MyAppConstructor(void) { };
+  virtual void MyAppConstructor(void) { }
   /// Called at the beginning of WalkTest's destructor.
-  virtual void MyAppDestructor1(void) { };
+  virtual void MyAppDestructor1(void) { }
   /// Called at the end of WalkTest's destructor.
-  virtual void MyAppDestructor2(void) { };
+  virtual void MyAppDestructor2(void) { }
   /// Draw the first 2D sprites within this function call.
-  virtual void MyAppDrawFrame1(void) { };
+  virtual void MyAppDrawFrame1(void) { }
   /// Draw the last 2D sprites within this function call.
-  virtual void MyAppDrawFrame2(void) { };
+  virtual void MyAppDrawFrame2(void) { }
   /// Near the beginning of NextFrame
-  virtual void MyAppNextFrame1(time_t elapsed_time, time_t current_time) { elapsed_time; current_time;};
+  virtual void MyAppNextFrame1(time_t elapsed_time, time_t current_time) { (void)elapsed_time; (void)current_time;}
   /// Near the end of NextFrame
-  virtual void MyAppNextFrame2(time_t elapsed_time, time_t current_time) { elapsed_time; current_time;};
-  virtual void MyAppShowHelp(void) { };
-  virtual bool MyAppCommandHandler(const char *cmd, const char *arg) { cmd; arg; return false; };
-  virtual bool MyAppMouseClick1Handler(csEvent &Event) { Event; return false; };
-  virtual bool MyAppMouseClick2Handler(csEvent &Event) { Event; return false; };
-  virtual bool MyAppMouseClick3Handler(csEvent &Event) { Event; return false; };
+  virtual void MyAppNextFrame2(time_t elapsed_time, time_t current_time) { (void)elapsed_time; (void)current_time;}
+  virtual void MyAppShowHelp(void) { }
+  virtual bool MyAppCommandHandler(const char *cmd, const char *arg) { (void)cmd; (void)arg; return false; }
+  virtual bool MyAppMouseClick1Handler(csEvent &Event) { (void)Event; return false; }
+  virtual bool MyAppMouseClick2Handler(csEvent &Event) { (void)Event; return false; }
+  virtual bool MyAppMouseClick3Handler(csEvent &Event) { (void)Event; return false; }
 };
 
 extern csVector2 coord_check_vector;
