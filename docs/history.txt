@@ -24,6 +24,13 @@ chronological order.
 	  renderer.
 	- Jorrit fixed some bugs in the jamfiles related to the new renderer.
 	- Jorrit fixed ball jamfile so it links with csgfx library now.
+	- Jorrit fixed a problem in the generic renderstep plugin. It is
+	  possible that when rendersteps are created the shader manager
+	  was not yet loaded by the GL renderer. This happens in particular
+	  when the engine creates the default render loops in its
+	  Initialize() function. Solved this by testing if shaderManager
+	  is not 0 in the RenderMeshes() call and querying it from the
+	  object registry if 0.
 15-Dec-2003
 	- Matze reworked some jam rules so that subdirs are more robust now.
 	  This should also fix some msvcgen problems on jam.

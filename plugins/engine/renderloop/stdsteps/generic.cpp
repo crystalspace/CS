@@ -150,8 +150,7 @@ csGenericRenderStep::csGenericRenderStep (
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.renderer.stringset", iStringSet);
-  shaderManager = CS_QUERY_REGISTRY (object_reg,
-    iShaderManager);
+  shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
 
   shadertype = 0;
   zOffset = false;
@@ -170,6 +169,10 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
 {
   if (num == 0) return;
   csArray<iShaderVariableContext*> dynDomain;
+  if (!shaderManager)
+  {
+    shaderManager = CS_QUERY_REGISTRY (objreg, iShaderManager);
+  }
 
   int numPasses = shader->GetNumberOfPasses ();
   for (int p=0; p < numPasses; p++)
