@@ -95,6 +95,18 @@ struct iGenMeshSkeletonControlState : public iBase
    * Stop execution of the given script.
    */
   virtual void Stop (iGenMeshSkeletonScript *script) = 0;
+
+  /**
+   * If always_update is false, then animation will 
+   * be updated only if object is visible.
+   * By default always_update flag is true.
+   */
+  virtual void SetAlwaysUpdate(bool always_update) = 0;
+
+  /**
+   * Get always_update value
+   */
+  virtual bool GetAlwaysUpdate() = 0;
 };
 
 SCF_VERSION  (iGenMeshSkeletonBone, 0, 0, 1);
@@ -193,7 +205,7 @@ struct iGenMeshSkeletonScript : public iBase
 
   /**
    * Get script influence factor.
-   * Sscript's influence is available only if there are
+   * Script's influence is available only if there are
    * two or more executing scripts.
    *
    * Example: We have script "walk" an script "run"

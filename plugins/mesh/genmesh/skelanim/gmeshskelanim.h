@@ -25,6 +25,7 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/quaterni.h"
 #include "csutil/array.h"
 #include "csutil/parray.h"
 #include "csutil/stringarray.h"
@@ -34,8 +35,9 @@
 #include "imesh/gmeshskel.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
+#include "iutil/virtclk.h"
 #include "csutil/refarr.h"
-
+#include "csutil/hashmap.h"
 //#include "iphysics/dynamics.h"
 #include "ivaria/dynamics.h"
 
@@ -50,10 +52,10 @@ class csSkelAnimControlRunnable;
  */
 struct sac_vertex_data
 {
-  int idx;
-  float weight;
-  float col_weight;
-  csVector3 pos;
+	int idx;
+	float weight;
+	float col_weight;
+	csVector3 pos;
 };
 
 /**
@@ -63,21 +65,6 @@ struct sac_bone_data
 {
 	int idx;
 	int v_idx;
-};
-
-struct bone_transform_data
-{
-	bool active;
-	union
-	{
-		float data[3];
-		struct
-		{
-			float x;
-			float y;
-			float z;
-		};
-	};
 };
 
 /**
@@ -99,15 +86,11 @@ private:
 	BoneTransformMode bone_mode;
 	iRigidBody *rigid_body;
 
-	csHash<bone_transform_data> script_rotations;
-	csHash<bone_transform_data> script_positions;
-	csGenmeshSkelAnimationControl *animation_control;
+	csGenmeshSkelAnimationControl *anim_control;
 
 	struct bone_rotation
 	{
-		csMatrix3 mx;
-		csMatrix3 my;
-		csMatrix3 mz;
+		csQuaternion quat;
 		union 
 		{
 			float data[3];
@@ -120,26 +103,8 @@ private:
 		};
 	} rot;
 
-	struct bone_position
-	{
-	union 
-	{
-		float data[3];
-		struct
-		{
-			float x;
-			float y;
-			float z;
-		};
-	};
-} pos;
-
 public:
-	bone_transform_data* ActivateScriptRotation (csSkelAnimControlRunnable *script_runnable);
-	bone_transform_data* ActivateScriptPosition (csSkelAnimControlRunnable *script_runnable);
-	void DeactivateScriptRotation (csSkelAnimControlRunnable *script_runnable);
-	void DeactivateScriptPosition (csSkelAnimControlRunnable *script_runnable);
-
+	csQuaternion & GetQuaternion () { return rot.quat; };
 	void CopyFrom (csSkelBone *other);
 	void AddVertex (int idx, float weight, float col_weight);
 	csArray<sac_vertex_data>& GetVertexData () { return vertices; }
@@ -149,12 +114,12 @@ public:
 	void SetParent (csSkelBone* p) { parent = p; }
 	void UpdateBones ();
 	void UpdateBones (iRigidBody* parent_body);
-	void UpdateRotation (int axis, float angle);
-	void UpdateRotation (int axis, float angle, csSkelAnimControlRunnable *script_runnable);
-	void UpdatePosition (float posx, float posy, float posz);
-	void UpdatePosition (float posx, float posy, float posz, csSkelAnimControlRunnable *script_runnable);
-	float GetRotation (int axis);
-	const csVector3& GetPosition () { return transform.GetOrigin (); }
+
+	void SetAxisAngle (int axis, float angle);
+	float GetAxisAngle (int axis);
+
+	void UpdateRotation();
+	void UpdatePosition();
 	//------------------------------------------------------------------------
 
 	csSkelBone (csGenmeshSkelAnimationControl *animation_control);
@@ -171,7 +136,6 @@ public:
 	virtual BoneTransformMode GetMode () { return bone_mode; }
 	virtual void SetRigidBody (iRigidBody *r_body) { rigid_body = r_body; }
 	virtual iRigidBody *GetRigidBody () { return rigid_body; }
-
 	virtual int GetChildrenCount () { return bones.Length () ;}
 	virtual iGenMeshSkeletonBone *GetChild (int i) { return bones[i]; }
 	virtual iGenMeshSkeletonBone *FindChild (const char *name);
@@ -186,9 +150,7 @@ enum sac_opcode
 	AC_DELAY,
 	AC_REPEAT,
 	AC_MOVE,
-	AC_ROTX,
-	AC_ROTY,
-	AC_ROTZ
+	AC_ROT
 };
 
 /**
@@ -213,6 +175,10 @@ struct sac_instruction
 			size_t bone_id;
 			csTicks duration;
 			float angle;
+			float quat_x;
+			float quat_y;
+			float quat_z;
+			float quat_r;
 		} rotate;
 		struct
 		{
@@ -251,25 +217,42 @@ public:
 	csTicks& GetTime () { return time; }
 };
 
+struct bone_transform_data
+{
+	csQuaternion quat;
+	union
+	{
+		float data[3];
+		struct
+		{
+			float x;
+			float y;
+			float z;
+		};
+	};
+};
+
 /**
  * A running rotate operation.
  */
 struct sac_rotate_execution
 {
 	csSkelBone* bone;
+	bone_transform_data* bone_rotation;
 	csTicks final;
-	int axis;
-	float delta_angle_per_tick;
-	float final_angle;
+	csTicks duration;
 	bool flag;
+	csQuaternion quat, current_quat;
 };
 
 /**
  * A running movement operation.
  */
+
 struct sac_move_execution
 {
 	csSkelBone* bone;
+	bone_transform_data* bone_position;
 	csTicks final;
 	csVector3 delta_per_tick;
 	csVector3 final_position;
@@ -279,6 +262,7 @@ struct sac_move_execution
  * The runtime state information for a running script. This class does
  * the actual operations in the script in a time based fashion.
  */
+
 class csSkelAnimControlRunnable : public iGenMeshSkeletonScript
 {
 private:
@@ -298,10 +282,20 @@ private:
 		csTicks final;
 	} delay;
 
+	csHashMap rotations;
+	csHashMap positions;
+
 public:
 	// Return true if one of the bone transforms was actually modified.
 	// 'stop' will be set to true if the runnable needs to end.
 	bool Do (csTicks current, bool& stop);
+
+	bone_transform_data *GetBoneRotation(csSkelBone *bone);
+	csHashMap & GetRotations() { return rotations; };
+
+	bone_transform_data *GetBonePosition(csSkelBone *bone);
+	csHashMap & GetPositions() { return positions; };
+
 	//------------------------------------------
 
 	csSkelAnimControlRunnable (csSkelAnimControlScript* script,
@@ -324,6 +318,9 @@ class csGenmeshSkelAnimationControl :
 	public iGenMeshSkeletonControlState
 {
 private:
+	iObjectRegistry* object_reg;
+	csRef<iVirtualClock> virt_clk;
+
 	csGenmeshSkelAnimationControlFactory* factory;
 
 	csRefArray<csSkelAnimControlRunnable> running_scripts;
@@ -355,13 +352,16 @@ private:
 	bool dirty_colors;
 	bool dirty_normals;
 
+	bool always_update;
+
 	// Update the arrays to have correct size. If a realloc was
 	// needed then last_version_id will be forced to ~0.
 	void UpdateArrays (int num_verts);
 
 	// Update animation state. Set the 'dirty_XXX' flags to true if
 	// the arrays need updating too.
-	void UpdateAnimation (csTicks current, int num_verts, uint32 version_id);
+	//void UpdateAnimation (csTicks current, int num_verts, uint32 version_id);
+	void UpdateAnimation (csTicks current);
 
 	bool vertices_mapped;
 	void TransformVerticesToBones (const csVector3* verts, int num_verts);
@@ -371,8 +371,31 @@ public:
 	csArray<size_t>& GetParentBones () { return parent_bones; }
 	csRefArray<csSkelAnimControlRunnable> & GetRunningScripts () { return running_scripts; }
 
+	bool HandleEvent (iEvent& ev);
+
+	class EventHandler : public iEventHandler
+	{
+	private:
+		csGenmeshSkelAnimationControl* parent;
+	public:
+		EventHandler (csGenmeshSkelAnimationControl* parent)
+		{
+			SCF_CONSTRUCT_IBASE (0);
+			EventHandler::parent = parent;
+		}
+		virtual ~EventHandler ()
+		{
+			SCF_DESTRUCT_IBASE ();
+		}
+		SCF_DECLARE_IBASE;
+		virtual bool HandleEvent (iEvent& ev)
+		{
+			return parent->HandleEvent (ev);
+		}
+	} *scfiEventHandler;
+
 	/// Constructor.
-	csGenmeshSkelAnimationControl (csGenmeshSkelAnimationControlFactory* fact);
+	csGenmeshSkelAnimationControl (csGenmeshSkelAnimationControlFactory* fact, iObjectRegistry* object_reg);
 	/// Destructor.
 	virtual ~csGenmeshSkelAnimationControl ();
 
@@ -404,6 +427,11 @@ public:
 	virtual void StopAll ();
 	virtual void Stop (const char* scriptname);
 	virtual void Stop (iGenMeshSkeletonScript *script);
+
+	virtual void SetAlwaysUpdate(bool always_update) 
+		{ csGenmeshSkelAnimationControl::always_update = always_update; }
+	virtual bool GetAlwaysUpdate() 
+		{ return always_update; }
 };
 
 /**
@@ -493,8 +521,6 @@ public:
 	virtual ~csGenmeshSkelAnimationControlType ();
 	/// Initialize.
 	bool Initialize (iObjectRegistry* object_reg);
-	/// Event handler.
-	bool HandleEvent (iEvent& ev);
 
 	virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory ();
 
@@ -508,27 +534,6 @@ public:
 			return scfParent->Initialize (object_reg);
 		}
 	} scfiComponent;
-
-	class EventHandler : public iEventHandler
-	{
-	private:
-		csGenmeshSkelAnimationControlType* parent;
-	public:
-		EventHandler (csGenmeshSkelAnimationControlType* parent)
-		{
-			SCF_CONSTRUCT_IBASE (0);
-			EventHandler::parent = parent;
-		}
-		virtual ~EventHandler ()
-		{
-			SCF_DESTRUCT_IBASE ();
-		}
-		SCF_DECLARE_IBASE;
-		virtual bool HandleEvent (iEvent& ev)
-		{
-			return parent->HandleEvent (ev);
-		}
-	} *scfiEventHandler;
 };
 
 #endif // __CS_GENMESHSKELANIM_H__
