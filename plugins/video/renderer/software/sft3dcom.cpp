@@ -222,25 +222,24 @@ int csGraphics3DSoftwareCommon::filter_bf = 1;
 SCF_IMPLEMENT_IBASE(csGraphics3DSoftwareCommon)
   SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftwareCommon::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftwareCommon::eiEventHandler)
+SCF_IMPLEMENT_IBASE (csGraphics3DSoftwareCommon::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent) :
   G2D (NULL)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 
   tcache = NULL;
+  scfiEventHandler = NULL;
   texman = NULL;
   vbufmgr = NULL;
   partner = NULL;
@@ -288,6 +287,17 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent) :
 
 csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
+
   Close ();
   if (G2D) G2D->DecRef ();
   if (partner) partner->DecRef ();
@@ -302,10 +312,12 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 bool csGraphics3DSoftwareCommon::Initialize (iObjectRegistry* p)
 {
   object_reg = p;
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     q->DecRef ();
   }
   return true;

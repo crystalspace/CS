@@ -156,7 +156,7 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
   if (q != 0)
   {
     // Tell event queue to call us on every frame
-    q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
     q->DecRef ();

@@ -37,7 +37,6 @@
 SCF_IMPLEMENT_IBASE(csGraphics2D)
   SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iConfig)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNativeWindowManager)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNativeWindow)
@@ -45,10 +44,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::CanvasConfig)
@@ -63,14 +58,18 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::NativeWindowManager)
   SCF_IMPLEMENTS_INTERFACE (iNativeWindowManager)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_IBASE (csGraphics2D::EventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
+
 csGraphics2D::csGraphics2D (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindow);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindowManager);
+  scfiEventHandler = NULL;
   Memory = NULL;
   FontServer = NULL;
   LineAddress = NULL;
@@ -131,10 +130,12 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
     Palette [i].blue = 0;
   }
 
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     q->DecRef ();
   }
 
@@ -149,9 +150,18 @@ void csGraphics2D::ChangeDepth (int d)
 
 csGraphics2D::~csGraphics2D ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
   if (plugin_mgr) plugin_mgr->DecRef ();
-  if (FontServer)
-    FontServer->DecRef ();
+  if (FontServer) FontServer->DecRef ();
   Close ();
   delete [] Palette;
   delete [] win_title;

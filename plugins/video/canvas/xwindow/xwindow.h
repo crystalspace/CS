@@ -134,11 +134,19 @@ public:
     virtual bool Initialize (iObjectRegistry *o) 
     { return scfParent->Initialize(o); }
   } scfiComponent;
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csXWindow);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
+  private:
+    csXWindow* parent;
+  public:
+    EventHandler (csXWindow* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+  } * scfiEventHandler;
 
   //------------------------ iEventPlug interface ---------------------------//
 

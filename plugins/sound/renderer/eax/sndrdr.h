@@ -66,11 +66,19 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderEAX);
     virtual bool Initialize (iObjectRegistry* p) { return scfParent->Initialize(p); }
   } scfiComponent;
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderEAX);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
+  private:
+    csSoundRenderEAX* parent;
+  public:
+    EventHandler (csSoundRenderEAX* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+  } * scfiEventHandler;
 
 
   LPDIRECTSOUND AudioRenderer;

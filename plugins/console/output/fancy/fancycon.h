@@ -124,11 +124,19 @@ public:
     { return scfParent->Initialize(p); }
   } scfiComponent;
   // Implement iEventHandler interface.
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csFancyConsole);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
+  private:
+    csFancyConsole* parent;
+  public:
+    EventHandler (csFancyConsole* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+  } * scfiEventHandler;
 };
 
 #endif // __FANCYCON_H__

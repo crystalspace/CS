@@ -872,11 +872,19 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csEngine);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
+  private:
+    csEngine* parent;
+  public:
+    SCF_DECLARE_IBASE;
+    EventHandler (csEngine* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+  } * scfiEventHandler;
 
   //--------------------- iEngine interface implementation --------------------
 

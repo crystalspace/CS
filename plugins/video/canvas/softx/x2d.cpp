@@ -141,7 +141,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   if (q != 0)
   {
     // Tell event queue to call us on broadcast messages
-    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
     q->DecRef ();

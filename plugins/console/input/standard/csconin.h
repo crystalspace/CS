@@ -110,11 +110,19 @@ public:
     { return scfParent->Initialize(p); }
   } scfiComponent;
   // Implement iEventHandler interface.
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csConsoleInput);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
+  private:
+    csConsoleInput* parent;
+  public:
+    EventHandler (csConsoleInput* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+  } * scfiEventHandler;
 
   // Implement iConsoleWatcher interface.
   struct eiConsoleWatcher : public iConsoleWatcher

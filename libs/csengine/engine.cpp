@@ -669,7 +669,6 @@ bool csEngine::do_rad_debug = false;
 SCF_IMPLEMENT_IBASE (csEngine)
   SCF_IMPLEMENTS_INTERFACE (iEngine)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
 SCF_IMPLEMENT_IBASE_END
@@ -678,14 +677,14 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::iObjectInterface)
   void *itf = csObject::QueryInterface (iInterfaceID, iVersion);
   if (itf) return itf;
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_IBASE (csEngine::EventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csEngine)
 
@@ -701,7 +700,6 @@ csEngine::csEngine (iBase *iParent) : sectors (true)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   DG_TYPE (&scfiObject, "csEngine");
@@ -721,6 +719,7 @@ csEngine::csEngine (iBase *iParent) : sectors (true)
   current_engine = this;
   current_iengine = SCF_QUERY_INTERFACE_FAST (this, iEngine);
   current_iengine->DecRef ();
+  scfiEventHandler = NULL;
   use_pvs = false;
   use_pvs_only = false;
   freeze_pvs = false;
@@ -749,6 +748,17 @@ iCamera* camera_hack = NULL;
 
 csEngine::~csEngine ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
+
   DeleteAll ();
   int i;
   for (i = 0 ; i < render_priorities.Length () ; i++)
@@ -808,10 +818,12 @@ bool csEngine::Initialize (iObjectRegistry* object_reg)
   Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
   // Tell event queue that we want to handle broadcast events
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     q->DecRef ();
   }
 

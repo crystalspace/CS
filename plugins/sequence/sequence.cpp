@@ -164,22 +164,21 @@ SCF_EXPORT_CLASS_TABLE_END
 SCF_IMPLEMENT_IBASE (csSequenceManager)
   SCF_IMPLEMENTS_INTERFACE (iSequenceManager)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSequenceManager::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSequenceManager::eiEventHandler)
+SCF_IMPLEMENT_IBASE (csSequenceManager::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csSequenceManager::csSequenceManager (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  scfiEventHandler = NULL;
   object_reg = NULL;
   main_sequence = new csSequence (this);
   previous_time_valid = false;
@@ -189,16 +188,28 @@ csSequenceManager::csSequenceManager (iBase *iParent)
 
 csSequenceManager::~csSequenceManager ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
   main_sequence->DecRef ();
 }
 
 bool csSequenceManager::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
     q->DecRef ();
   }
   return true;

@@ -45,16 +45,15 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE(csFancyConsole)
   SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csFancyConsole::eiComponent)
   SCF_IMPLEMENTS_INTERFACE(iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFancyConsole::eiEventHandler)
+SCF_IMPLEMENT_IBASE (csFancyConsole::EventHandler)
   SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csFancyConsole)
 
@@ -89,11 +88,21 @@ csFancyConsole::csFancyConsole (iBase *p) :
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  scfiEventHandler = NULL;
 }
 
 csFancyConsole::~csFancyConsole ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
   if (ImageLoader)
     ImageLoader->DecRef();
   if (G2D)
@@ -132,10 +141,12 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
   ImageLoader = NULL;
 
   // Tell event queue that we want to handle broadcast events
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     q->DecRef ();
   }
 

@@ -163,11 +163,19 @@ public:
     { return scfParent->Initialize(p); }
   } scfiComponent;
   // Implement iEventHandler interface.
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csConsoleOutput);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
+  private:
+    csConsoleOutput* parent;
+  public:
+    EventHandler (csConsoleOutput* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+  } * scfiEventHandler;
 
 private:
   void GetPosition (int &x, int &y, int &width, int &height) const;

@@ -78,7 +78,6 @@ protected:
   //------------------------------------------------------------------------
 
   iObjectRegistry* object_reg;
-  iPluginManager* plugin_mgr;
   iEngine *Engine;
   /// The name of the sub/section utilised within an output file
   char *name;
@@ -203,11 +202,19 @@ protected:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csPerfStats);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
+  private:
+    csPerfStats* parent;
+  public:
+    EventHandler (csPerfStats* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+  } * scfiEventHandler;
 };
 
 #endif // __CS_PERFSTAT_H__

@@ -47,16 +47,15 @@ SCF_IMPLEMENT_IBASE(csXWindow)
   SCF_IMPLEMENTS_INTERFACE(iXWindow)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csXWindow::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csXWindow::eiEventHandler)
+SCF_IMPLEMENT_IBASE (csXWindow::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 #define CS_XEXT_XF86VM_SCF_ID "crystalspace.window.x.extf86vm"
 #define CS_XEXT_XF86VM "XFree86-VidModeExtension"
@@ -65,7 +64,8 @@ csXWindow::csXWindow (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
+
+  scfiEventHandler = NULL;
 
   EmptyMouseCursor = 0;
   memset (&MouseCursor, 0, sizeof (MouseCursor));
@@ -104,6 +104,16 @@ void csXWindow::Report (int severity, const char* msg, ...)
 
 csXWindow::~csXWindow ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
   if (xf86vm) 
     xf86vm->DecRef ();
   if (EventOutlet)
@@ -335,10 +345,12 @@ bool csXWindow::Open ()
   Canvas->AllowResize (false);
 
   // Tell event queue to call us on every frame
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
     q->DecRef ();
   }
 

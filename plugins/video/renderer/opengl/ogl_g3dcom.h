@@ -526,7 +526,6 @@ public:
 
   /// The System interface. 
   iObjectRegistry* object_reg;
-  iPluginManager* plugin_mgr;
 
   /// Constructor.
   csGraphics3DOGLCommon (iBase*);
@@ -781,11 +780,19 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);
-    virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
-  } scfiEventHandler;
+  private:
+    csGraphics3DOGLCommon* parent;
+  public:
+    EventHandler (csGraphics3DOGLCommon* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& ev) { return parent->HandleEvent (ev); }
+  } * scfiEventHandler;
 };
 
 #endif // __OGL3DCOM_H__

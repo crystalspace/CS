@@ -58,7 +58,6 @@ SCF_EXPORT_CLASS_TABLE_END
 SCF_IMPLEMENT_IBASE (csGraphics3DInfinite)
   SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 SCF_IMPLEMENT_IBASE_END
 
@@ -66,13 +65,13 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DInfinite::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DInfinite::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DInfinite::eiInfiniteConfig)
   SCF_IMPLEMENTS_INTERFACE (iConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_IBASE (csGraphics3DInfinite::EventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics3DInfinite::csGraphics3DInfinite (iBase *iParent) :
   G2D (NULL)
@@ -80,7 +79,8 @@ csGraphics3DInfinite::csGraphics3DInfinite (iBase *iParent) :
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+
+  scfiEventHandler = NULL;
 
   clipper = NULL;
   texman = NULL;
@@ -115,6 +115,17 @@ csGraphics3DInfinite::csGraphics3DInfinite (iBase *iParent) :
 
 csGraphics3DInfinite::~csGraphics3DInfinite ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
+
   Close ();
   texman->Clear();
   texman->DecRef(); texman = NULL;
@@ -147,10 +158,12 @@ bool csGraphics3DInfinite::Initialize (iObjectRegistry *r)
   texman = new csTextureManagerInfinite (object_reg, G2D, config);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     q->DecRef ();
   }
 

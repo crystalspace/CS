@@ -68,7 +68,6 @@ SCF_EXPORT_CLASS_TABLE_END
 SCF_IMPLEMENT_IBASE (csGraphics3DLine)
   SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 SCF_IMPLEMENT_IBASE_END
 
@@ -76,20 +75,21 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DLine::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DLine::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DLine::eiLineConfig)
   SCF_IMPLEMENTS_INTERFACE (iConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_IBASE (csGraphics3DLine::EventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+
+  scfiEventHandler = NULL;
 
   clipper = NULL;
   texman = NULL;
@@ -107,6 +107,17 @@ csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 
 csGraphics3DLine::~csGraphics3DLine ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
+
   Close ();
   if (texman)
     texman->Clear();
@@ -151,10 +162,12 @@ bool csGraphics3DLine::Initialize (iObjectRegistry *r)
   texman = new csTextureManagerLine (object_reg, G2D, config);
   vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     q->DecRef ();
   }
 

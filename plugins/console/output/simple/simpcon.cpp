@@ -47,16 +47,15 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csSimpleConsole)
   SCF_IMPLEMENTS_INTERFACE (iConsoleOutput)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleConsole::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleConsole::eiEventHandler)
+SCF_IMPLEMENT_IBASE (csSimpleConsole::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSimpleConsole)
 
@@ -70,7 +69,7 @@ csSimpleConsole::csSimpleConsole (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  scfiEventHandler = NULL;
   LineMessage = NULL;
   Line = NULL;
   LinesChanged = NULL;
@@ -90,6 +89,16 @@ csSimpleConsole::csSimpleConsole (iBase *iParent)
 
 csSimpleConsole::~csSimpleConsole ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
   FreeLineMessage ();
   FreeBuffer ();
 
@@ -159,10 +168,12 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
   CursorTime = csGetTicks ();
 
   // We want to see broadcast events
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     q->DecRef ();
   }
 

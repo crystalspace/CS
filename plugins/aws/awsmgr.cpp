@@ -8,6 +8,7 @@
 
 #include "cssysdef.h"
 #include "iutil/plugin.h"
+#include "iutil/eventq.h"
 #include "aws.h"
 #include "awsprefs.h"
 #include "awsfparm.h"
@@ -57,11 +58,22 @@ canvas(NULL), flags(0)
 {
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  scfiEventHandler = NULL;
 }
 
 awsManager::~awsManager()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
+
   SCF_DEC_REF (prefmgr);
   SCF_DEC_REF (sinkmgr);
 

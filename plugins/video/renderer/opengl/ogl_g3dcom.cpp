@@ -97,16 +97,15 @@ static CS_DECLARE_GROWING_ARRAY_REF (clipped_fog, G3DFogInfo);
 SCF_IMPLEMENT_IBASE(csGraphics3DOGLCommon)
   SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DOGLCommon::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DOGLCommon::eiEventHandler)
+SCF_IMPLEMENT_IBASE (csGraphics3DOGLCommon::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = NULL;
 
@@ -135,9 +134,9 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 
-  plugin_mgr = NULL;
+  scfiEventHandler = NULL;
+
   ogl_g3d = this;
   texture_cache = NULL;
   lightmap_cache = NULL;
@@ -195,9 +194,19 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
 
 csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
+
   Close ();
   if (G2D) G2D->DecRef ();
-  if (plugin_mgr) plugin_mgr->DecRef ();
 
   // see note above
   tr_verts.DecRef ();
@@ -235,11 +244,12 @@ bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
 {
   object_reg = p;
   CS_ASSERT (object_reg != NULL);
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     q->DecRef ();
   }
   return true;
@@ -418,7 +428,9 @@ bool csGraphics3DOGLCommon::NewInitialize ()
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
+  plugin_mgr->DecRef ();
   if (!G2D)
     return false;
   if (!object_reg->Register (G2D, "iGraphics2D"))

@@ -264,11 +264,19 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DNull);
-    virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
-  } scfiEventHandler;
+  private:
+    csGraphics3DNull* parent;
+  public:
+    EventHandler (csGraphics3DNull* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& ev) { return parent->HandleEvent (ev); }
+  } * scfiEventHandler;
 };
 
 #endif // __NULL_G3D_H__

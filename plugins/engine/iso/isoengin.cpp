@@ -48,7 +48,6 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csIsoEngine)
   SCF_IMPLEMENTS_INTERFACE (iIsoEngine)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csIsoEngine)
@@ -57,9 +56,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoEngine::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoEngine::eiEventHandler)
+SCF_IMPLEMENT_IBASE (csIsoEngine::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 SCF_EXPORT_CLASS_TABLE (iso)
   SCF_EXPORT_CLASS_DEP (csIsoEngine, "crystalspace.engine.iso",
@@ -89,7 +88,7 @@ csIsoEngine::csIsoEngine (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  scfiEventHandler = NULL;
   object_reg = NULL;
   g2d = NULL;
   g3d = NULL;
@@ -99,6 +98,16 @@ csIsoEngine::csIsoEngine (iBase *iParent)
 
 csIsoEngine::~csIsoEngine ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
   materials.scfiMaterialList.RemoveAll ();
   if (g3d) g3d->DecRef();
 }
@@ -107,10 +116,12 @@ bool csIsoEngine::Initialize (iObjectRegistry* p)
 {
   object_reg = p;
   // Tell system driver that we want to handle broadcast events
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     q->DecRef ();
   }
   return true;

@@ -127,7 +127,7 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
   {
     // Tell event queue to call us on broadcast events
     //@@@ why is this needed???
-    //q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    //q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
     q->DecRef ();

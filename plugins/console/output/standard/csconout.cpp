@@ -42,16 +42,15 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE(csConsoleOutput)
   SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleOutput::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleOutput::eiEventHandler)
+SCF_IMPLEMENT_IBASE (csConsoleOutput::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csConsoleOutput)
 
@@ -65,7 +64,7 @@ csConsoleOutput::csConsoleOutput (iBase *base)
 {
   SCF_CONSTRUCT_IBASE (base);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  scfiEventHandler = NULL;
   fg_rgb.Set (255, 255, 255);	// Foreground defaults to white
   bg_rgb.Set (0, 0, 0);		// Background defaults to black
   transparent = false;		// Default to no transparency
@@ -89,6 +88,16 @@ csConsoleOutput::csConsoleOutput (iBase *base)
 
 csConsoleOutput::~csConsoleOutput ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
   if (font)
     font->DecRef ();
   if (G2D)
@@ -118,10 +127,12 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   flash_time = csGetTicks ();
 
   // We want to see broadcast events
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
     q->DecRef ();
   }
   return true;

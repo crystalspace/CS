@@ -29,7 +29,6 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csConsoleInput)
   SCF_IMPLEMENTS_INTERFACE (iConsoleInput)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConsoleWatcher)
 SCF_IMPLEMENT_IBASE_END
 
@@ -37,13 +36,13 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleInput::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleInput::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleInput::eiConsoleWatcher)
   SCF_IMPLEMENTS_INTERFACE (iConsoleWatcher)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_IBASE (csConsoleInput::EventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csConsoleInput)
 
@@ -56,8 +55,8 @@ csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiConsoleWatcher);
+  scfiEventHandler = NULL;
   Callback = NULL;
   Console = NULL;
   Prompt = NULL;
@@ -73,6 +72,16 @@ csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
 
 csConsoleInput::~csConsoleInput ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
   delete [] Prompt;
 
   if (Console)

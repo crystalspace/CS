@@ -30,16 +30,15 @@ SCF_IMPLEMENT_IBASE (csArtsRenderer)
   SCF_IMPLEMENTS_INTERFACE (iSoundRender)
   SCF_IMPLEMENTS_INTERFACE (iSoundListener)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csArtsRenderer::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csArtsRenderer::eiEventHandler)
+SCF_IMPLEMENT_IBASE (csArtsRenderer::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csArtsRenderer);
 
@@ -52,7 +51,7 @@ csArtsRenderer::csArtsRenderer (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  scfiEventHandler = NULL;
   dispatcher = NULL;
   bInit = false;
   SetVolume (1.0f);

@@ -49,22 +49,21 @@ SCF_EXPORT_CLASS_TABLE_END;
 SCF_IMPLEMENT_IBASE(csSoundRenderEAX)
   SCF_IMPLEMENTS_INTERFACE(iSoundRender)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END;
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundRenderEAX::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundRenderEAX::eiEventHandler)
+SCF_IMPLEMENT_IBASE (csSoundRenderEAX::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csSoundRenderEAX::csSoundRenderEAX(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  scfiEventHandler = NULL;
   Listener = NULL;
   AudioRenderer = NULL;
   object_reg = NULL;
@@ -73,10 +72,12 @@ csSoundRenderEAX::csSoundRenderEAX(iBase *piBase)
 bool csSoundRenderEAX::Initialize(iObjectRegistry *r)
 {
   object_reg = r;
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener(&scfiEventHandler,
+    q->RegisterListener (scfiEventHandler,
       CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
     q->DecRef ();
   }
@@ -89,6 +90,16 @@ bool csSoundRenderEAX::Initialize(iObjectRegistry *r)
 
 csSoundRenderEAX::~csSoundRenderEAX() 
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
   Close();
 }
 

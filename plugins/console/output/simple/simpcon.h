@@ -225,11 +225,19 @@ public:
     { return scfParent->Initialize(p); }
   } scfiComponent;
   // Implement iEventHandler interface.
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csSimpleConsole);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
+  private:
+    csSimpleConsole* parent;
+  public:
+    EventHandler (csSimpleConsole* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+  } * scfiEventHandler;
 
 private:
   /// Time left until messages will scroll up

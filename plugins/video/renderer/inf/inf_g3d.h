@@ -305,11 +305,19 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public iEventHandler
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DInfinite);
-    virtual bool HandleEvent (iEvent& ev) { return scfParent->HandleEvent (ev); }
-  } scfiEventHandler;
+  private:
+    csGraphics3DInfinite* parent;
+  public:
+    EventHandler (csGraphics3DInfinite* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& ev) { return parent->HandleEvent (ev); }
+  } * scfiEventHandler;
 
   struct eiInfiniteConfig : public iConfig
   {

@@ -47,22 +47,21 @@ SCF_EXPORT_CLASS_TABLE_END
 SCF_IMPLEMENT_IBASE (csPerfStats)
   SCF_IMPLEMENTS_INTERFACE (iPerfStats)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csPerfStats::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPerfStats::eiEventHandler)
+SCF_IMPLEMENT_IBASE (csPerfStats::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csPerfStats::csPerfStats (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  scfiEventHandler = NULL;
   Engine = NULL;
   file_name = NULL;
   statlog_section = NULL;
@@ -76,27 +75,36 @@ csPerfStats::csPerfStats (iBase *iParent)
   paused = false;
   frame_start = 0;
   frame_count = 0;
-  plugin_mgr = NULL;
   ResetStats ();
 }
 
 csPerfStats::~csPerfStats ()
 {
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q != 0)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
   delete [] name;
   delete [] file_name;
   delete [] margin;
   delete frame;
-  if (plugin_mgr) plugin_mgr->DecRef ();
 }
 
 bool csPerfStats::Initialize (iObjectRegistry *object_reg)
 {
   csPerfStats::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  if (!scfiEventHandler)
+    scfiEventHandler = EventHandler (this);
   iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
     q->DecRef ();
   }
   sub_section = super_section = NULL;
