@@ -128,6 +128,7 @@ void csIsoCell::RemoveSprite(iIsoSprite *sprite, const csVector3& pos)
     else leftmostparent->left = leftmost->right;
     delete leftmost;
   }
+  sprite->DecRef ();
 }
 
 
