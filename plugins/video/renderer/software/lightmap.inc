@@ -72,167 +72,286 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   csRGBpixel *tx_palette = texmm->GetColorMap ();
   uint8 *tx_bitmap = tx->get_bitmap ();
 
-  int pt_min_u = pt->GetIMinU () >> mipmap;
-  int pt_min_v = pt->GetIMinV () >> mipmap;
   int pt_cell_size = pt->GetLightCellSize () >> mipmap;
-  int pt_cell_shift = pt->GetLightCellShift () - mipmap;
-  int pt_shfw = pt->GetShiftU () - mipmap;
-  int pt_w = 1 << pt_shfw;
-  int pt_h = (pt->GetHeight () + mipmap_delta) >> mipmap;
-
-  iLightMap *lm = pt->GetLightMap ();
-  int lm_w = lm->GetWidth ();
-  csRGBpixel *lm_data = lm->GetMapData ();
-  int lm_size = lm->GetSize ();
-
-  void *dst = ct->get_bitmap ();
-  uint32 *old_lm = (uint32 *)ct->get_lightmap ();
-
-  int tx_shfw = tx->get_w_shift ();
-  int tx_andw = tx->get_w_mask ();
-  int tx_andh = tx->get_h_mask ();
-
-/*
-    The textures are lighted in squares. A single lightmap value corresponds
-    to all pixels in a square on the texture. To get more pleasant results,
-    we interpolate the lightmap along square edges. The square edges are
-    labeled 00, 10, 01 and 11 as shown below.
-                We hold the R/G/B values for all four corners of the square
-    00      10  in variables called r00, g00, b00, r10, g10 and so on.
-    *--------*  The square is scanned from top to bottom; during this scan
-    |        |  the corresponding R/G/B values are kept in r0, g0, b0 and
-   0*--------*1 r1, g1, b1 and interpolated while moving from top to bottom
-    |        |  using r0d/g0d/b0d and r1d/g1d/b1d deltas. When scanning
-    |        |  from left to right the deltas are kept in rd, gd and bd.
-    *--------*
-    01      11
-*/
-
-  // Get the multiplication tables for red, green and blue
-  uint8 *lt_R = texman->lightmap_tables [0];
-  uint8 *lt_G = texman->lightmap_tables [1];
-  uint8 *lt_B = texman->lightmap_tables [2];
-
-  int min_lu = QRound (floor (u_min)) >> pt_cell_shift;
-  int max_lu = (QRound (ceil (u_max)) + pt_cell_size - 1) >> pt_cell_shift;
-  int min_lv = QRound (floor (v_min)) >> pt_cell_shift;
-  int max_lv = (QRound (ceil (v_max)) + pt_cell_size - 1) >> pt_cell_shift;
-
-  if (min_lu < 0) min_lu = 0;
-  if (min_lv < 0) min_lv = 0;
-
-  if (min_lu >= max_lu) return;
-  if (min_lv >= max_lv) return;
-
-  int max_lu2 = ((((pt->GetOriginalWidth () + mipmap_delta) >> mipmap) +
-    pt_cell_size - 1) >> pt_cell_shift);
-  if (max_lu > max_lu2) max_lu = max_lu2;
-
-  int max_lv2 = lm->GetHeight ();
-  if (max_lv > max_lv2) max_lv = max_lv2;
-
-  int src = min_lu + min_lv * lm_w;
-  CS_ASSERT (src >= 0);
-  int src_dlu = lm_w - (max_lu - min_lu);
-
-  // @@@ Jorrit: the code below is a bit clumsy. For some reason
-  // the loop below can easily go beyond lightmap boundary. To avoid
-  // this problem there is now a test to see if we stay within bounds.
-  int src_end = lm_size - lm_w - 1;
-
-  for (int lv = min_lv; lv < max_lv; lv++)
+  
+  if (!pt_cell_size)
   {
-    for (int lu = min_lu; lu < max_lu; lu++)
-    {
-      if (src >= src_end) return;
-#define GET(map, col, col_long)                 \
-      uint8 col##00, col##10, col##01, col##11; \
-      col##00 = map [src].col_long;             \
-      col##10 = map [src + 1].col_long;         \
-      col##01 = map [src + lm_w].col_long;      \
-      col##11 = map [src + lm_w + 1].col_long;
+  // this happens when the lightcell size is <8
+  // so a texel on the current mipmap spans multiple
+  // lightmap texels
+  // so we need a different algorithm:
+  // multiple lightmap texels are averaged
+  
+    int pt_min_u = pt->GetIMinU () >> mipmap;
+    int pt_min_v = pt->GetIMinV () >> mipmap;
+	int pt_cell_shift = -pt->GetLightCellShift () + mipmap;
+	pt_cell_size = 1 << pt_cell_shift;
+	int pt_shfw = pt->GetShiftU () - mipmap;
+	int pt_w = 1 << pt_shfw;
+	int pt_h = (pt->GetHeight () + mipmap_delta) >> mipmap;
+	
+	int lm_color_shift = 6 - pt_cell_shift*2;
 
-      GET (lm_data, r, red);
-      GET (lm_data, g, green);
-      GET (lm_data, b, blue);
-#undef GET
+	iLightMap *lm = pt->GetLightMap ();
+	int lm_w = lm->GetWidth ();
+	csRGBpixel *lm_data = lm->GetMapData ();
+	int lm_size = lm->GetSize ();
+    
+	void *dst = ct->get_bitmap ();
+	uint32 *old_lm = (uint32 *)ct->get_lightmap ();
 
-      // this is somewhat tricky but in practice it works well
-#if 0
-      uint32 cellid = ((r00 + g00 + b00)      ) ^
-                     ((r01 + g01 + b01) << 8 ) ^
-                     ((r10 + g10 + b10) << 16) ^
-                     ((r11 + g11 + b11) << 24);
-#else
-      uint32 cellid =
-        ((r00 + hash_table [r01] + hash_table [r10 + 64] + hash_table [r11 + 128])      ) +
-        ((g00 + hash_table [g01] + hash_table [g10 + 64] + hash_table [g11 + 128]) << 11) +
-        ((b00 + hash_table [b01] + hash_table [b10 + 64] + hash_table [b11 + 128]) << 22);
-#endif
+	int tx_shfw = tx->get_w_shift ();
+	int tx_andw = tx->get_w_mask ();
+	int tx_andh = tx->get_h_mask ();
 
-      // If this lightmap cell did not change, do not recalculate
-      if (old_lm [src] == cellid)
-      { src++; continue; }
+	// Get the multiplication tables for red, green and blue
+	uint8 *lt_R = texman->lightmap_tables [0];
+	uint8 *lt_G = texman->lightmap_tables [1];
+	uint8 *lt_B = texman->lightmap_tables [2];
 
-      old_lm [src] = cellid;
-      src++;
+	int min_lu = QRound (floor (u_min));
+	int max_lu = QRound (ceil (u_max));
+	int min_lv = QRound (floor (v_min));
+	int max_lv = QRound (ceil (v_max));
 
-      int u = lu << pt_cell_shift;
-      int v = lv << pt_cell_shift;
-      PI_PIXTYPE *out = ((PI_PIXTYPE *)dst) + (v << pt_shfw) + u;
+	if (min_lu < 0) min_lu = 0;
+	if (min_lv < 0) min_lv = 0;
 
-      int r0 = r00 << 6, r0d = ((r01 - r00) << (6 - pt_cell_shift));
-      int r1 = r10 << 6, r1d = ((r11 - r10) << (6 - pt_cell_shift));
-      int g0 = g00 << 6, g0d = ((g01 - g00) << (6 - pt_cell_shift));
-      int g1 = g10 << 6, g1d = ((g11 - g10) << (6 - pt_cell_shift));
-      int b0 = b00 << 6, b0d = ((b01 - b00) << (6 - pt_cell_shift));
-      int b1 = b10 << 6, b1d = ((b11 - b10) << (6 - pt_cell_shift));
+	if (min_lu >= max_lu) return;
+	if (min_lv >= max_lv) return;
 
-      // If the texture is less than one lightcell width,
-      // we shouldn't fill past the borders of the texture
-      int lc_w = pt_w - u;
-      if (lc_w > pt_cell_size) lc_w = pt_cell_size;
+	int max_lu2 = ((pt->GetOriginalWidth () + mipmap_delta) >> mipmap);
+	if (max_lu > max_lu2) max_lu = max_lu2;
 
-      int lc_h = pt_h - v;
-      if (lc_h > pt_cell_size) lc_h = pt_cell_size;
+	int max_lv2 = (lm->GetHeight ()) >> pt_cell_shift;
+	if (max_lv > max_lv2) max_lv = max_lv2;
 
-      for (int vv = 0; vv < lc_h; vv++)
-      {
-        int tx_idx = ((v + vv + pt_min_v) & tx_andh) << tx_shfw;
-        PI_PIXTYPE *__out = out;
+	int src = (min_lu << pt_cell_shift) + (min_lv << pt_cell_shift) * lm_w;
+	CS_ASSERT (src >= 0);
+	int src_dlu = (lm_w - (max_lu - min_lu)) << pt_cell_shift;
 
-        int r = r0, rd = (r1 - r0) >> pt_cell_shift;
-        int g = g0, gd = (g1 - g0) >> pt_cell_shift;
-        int b = b0, bd = (b1 - b0) >> pt_cell_shift;
+	int src_end = lm_size - lm_w - 1;
+	
+	PI_PIXTYPE *out = (PI_PIXTYPE *)dst + (min_lv << pt_shfw) + min_lu;
+	
+	for (int vv = min_lv; vv < max_lv; vv++)
+	{
+		int tx_idx = ((pt_min_v + vv) & tx_andh) << tx_shfw;
+		PI_PIXTYPE *__out = out;
 
-        int uu = u + pt_min_u;
-        int end_uu = uu + lc_w;
+		if (src >= src_end) return;
+		
+		for (int uu = min_lu; uu < max_lu; uu++)
+		{
+			int r = 0;
+			int g = 0;
+			int b = 0;
+		
+			uint32 cellid = ((uint32*) lm_data) [src];
 
-        for (; uu < end_uu; uu++)
-        {
-          csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + (uu & tx_andw)]];
-	  *out++ =
-#if defined (PI_INDEX8)
-            Scan.inv_cmap [
-#endif
-            (lt_R [pix.red   | (r & 0x3f00)] << PI_RS) |
-            (lt_G [pix.green | (g & 0x3f00)] << PI_GS) |
-            (lt_B [pix.blue  | (b & 0x3f00)] << PI_BS)
-#if defined (PI_INDEX8)
-            ]
-#endif
-          ;
-          r += rd; g += gd; b += bd;
-        }
+			// If this lightmap cell did not change, do not recalculate
+			if (old_lm [src] == cellid)
+			{ src += pt_cell_size; out++; continue; }
 
-        out = __out + pt_w;
+			old_lm [src] = cellid;
+			
+			for (int lv = 0; lv < pt_cell_size; lv++)
+			{
+				for (int lu = 0; lu < pt_cell_size; lu++)
+				{
+					r += lm_data [src + lu + lv * lm_w].red;
+					g += lm_data [src + lu + lv * lm_w].green;
+					b += lm_data [src + lu + lv * lm_w].blue;
+				}
+			}
+			src += pt_cell_size;
+			
+			r <<= lm_color_shift;
+			g <<= lm_color_shift;
+			b <<= lm_color_shift;
+			
+			csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + ((pt_min_u + uu) & tx_andw)]];
+		*out++ =
+	#if defined (PI_INDEX8)
+				Scan.inv_cmap [
+	#endif
+				(lt_R [pix.red   | (r & 0x3f00)] << PI_RS) |
+				(lt_G [pix.green | (g & 0x3f00)] << PI_GS) |
+				(lt_B [pix.blue  | (b & 0x3f00)] << PI_BS)
+	#if defined (PI_INDEX8)
+				]
+	#endif
+			;
+		}
 
-        r0 += r0d; r1 += r1d;
-        g0 += g0d; g1 += g1d;
-        b0 += b0d; b1 += b1d;
-      }
-    }
-    src += src_dlu;
+		src += src_dlu;
+				
+		out = __out + pt_w;
+	}
+  }
+  else
+  {
+    int pt_min_u = pt->GetIMinU () >> mipmap;
+    int pt_min_v = pt->GetIMinV () >> mipmap;
+	int pt_cell_shift = pt->GetLightCellShift () - mipmap;
+	int pt_shfw = pt->GetShiftU () - mipmap;
+	int pt_w = 1 << pt_shfw;
+	int pt_h = (pt->GetHeight () + mipmap_delta) >> mipmap;
+
+	iLightMap *lm = pt->GetLightMap ();
+	int lm_w = lm->GetWidth ();
+	csRGBpixel *lm_data = lm->GetMapData ();
+	int lm_size = lm->GetSize ();
+
+	void *dst = ct->get_bitmap ();
+	uint32 *old_lm = (uint32 *)ct->get_lightmap ();
+
+	int tx_shfw = tx->get_w_shift ();
+	int tx_andw = tx->get_w_mask ();
+	int tx_andh = tx->get_h_mask ();
+
+	/*
+		The textures are lighted in squares. A single lightmap value corresponds
+		to all pixels in a square on the texture. To get more pleasant results,
+		we interpolate the lightmap along square edges. The square edges are
+		labeled 00, 10, 01 and 11 as shown below.
+					We hold the R/G/B values for all four corners of the square
+		00      10  in variables called r00, g00, b00, r10, g10 and so on.
+		*--------*  The square is scanned from top to bottom; during this scan
+		|        |  the corresponding R/G/B values are kept in r0, g0, b0 and
+	0*--------*1 r1, g1, b1 and interpolated while moving from top to bottom
+		|        |  using r0d/g0d/b0d and r1d/g1d/b1d deltas. When scanning
+		|        |  from left to right the deltas are kept in rd, gd and bd.
+		*--------*
+		01      11
+	*/
+
+	// Get the multiplication tables for red, green and blue
+	uint8 *lt_R = texman->lightmap_tables [0];
+	uint8 *lt_G = texman->lightmap_tables [1];
+	uint8 *lt_B = texman->lightmap_tables [2];
+
+	int min_lu = QRound (floor (u_min)) >> pt_cell_shift;
+	int max_lu = (QRound (ceil (u_max)) + pt_cell_size - 1) >> pt_cell_shift;
+	int min_lv = QRound (floor (v_min)) >> pt_cell_shift;
+	int max_lv = (QRound (ceil (v_max)) + pt_cell_size - 1) >> pt_cell_shift;
+
+	if (min_lu < 0) min_lu = 0;
+	if (min_lv < 0) min_lv = 0;
+
+	if (min_lu >= max_lu) return;
+	if (min_lv >= max_lv) return;
+
+	int max_lu2 = ((((pt->GetOriginalWidth () + mipmap_delta) >> mipmap) +
+		pt_cell_size - 1) >> pt_cell_shift);
+	if (max_lu > max_lu2) max_lu = max_lu2;
+
+	int max_lv2 = lm->GetHeight ();
+	if (max_lv > max_lv2) max_lv = max_lv2;
+
+	int src = min_lu + min_lv * lm_w;
+	CS_ASSERT (src >= 0);
+	int src_dlu = lm_w - (max_lu - min_lu);
+
+	// @@@ Jorrit: the code below is a bit clumsy. For some reason
+	// the loop below can easily go beyond lightmap boundary. To avoid
+	// this problem there is now a test to see if we stay within bounds.
+	int src_end = lm_size - lm_w - 1;
+
+	for (int lv = min_lv; lv < max_lv; lv++)
+	{
+		for (int lu = min_lu; lu < max_lu; lu++)
+		{
+		if (src >= src_end) return;
+	#define GET(map, col, col_long)                 \
+		uint8 col##00, col##10, col##01, col##11; \
+		col##00 = map [src].col_long;             \
+		col##10 = map [src + 1].col_long;         \
+		col##01 = map [src + lm_w].col_long;      \
+		col##11 = map [src + lm_w + 1].col_long;
+
+		GET (lm_data, r, red);
+		GET (lm_data, g, green);
+		GET (lm_data, b, blue);
+	#undef GET
+
+		// this is somewhat tricky but in practice it works well
+	#if 0
+		uint32 cellid = ((r00 + g00 + b00)      ) ^
+						((r01 + g01 + b01) << 8 ) ^
+						((r10 + g10 + b10) << 16) ^
+						((r11 + g11 + b11) << 24);
+	#else
+		uint32 cellid =
+			((r00 + hash_table [r01] + hash_table [r10 + 64] + hash_table [r11 + 128])      ) +
+			((g00 + hash_table [g01] + hash_table [g10 + 64] + hash_table [g11 + 128]) << 11) +
+			((b00 + hash_table [b01] + hash_table [b10 + 64] + hash_table [b11 + 128]) << 22);
+	#endif
+
+		// If this lightmap cell did not change, do not recalculate
+		if (old_lm [src] == cellid)
+		{ src++; continue; }
+
+		old_lm [src] = cellid;
+		src++;
+
+		int u = lu << pt_cell_shift;
+		int v = lv << pt_cell_shift;
+		PI_PIXTYPE *out = ((PI_PIXTYPE *)dst) + (v << pt_shfw) + u;
+
+		int r0 = r00 << 6, r0d = ((r01 - r00) << (6 - pt_cell_shift));
+		int r1 = r10 << 6, r1d = ((r11 - r10) << (6 - pt_cell_shift));
+		int g0 = g00 << 6, g0d = ((g01 - g00) << (6 - pt_cell_shift));
+		int g1 = g10 << 6, g1d = ((g11 - g10) << (6 - pt_cell_shift));
+		int b0 = b00 << 6, b0d = ((b01 - b00) << (6 - pt_cell_shift));
+		int b1 = b10 << 6, b1d = ((b11 - b10) << (6 - pt_cell_shift));
+
+		// If the texture is less than one lightcell width,
+		// we shouldn't fill past the borders of the texture
+		int lc_w = pt_w - u;
+		if (lc_w > pt_cell_size) lc_w = pt_cell_size;
+
+		int lc_h = pt_h - v;
+		if (lc_h > pt_cell_size) lc_h = pt_cell_size;
+
+		for (int vv = 0; vv < lc_h; vv++)
+		{
+			int tx_idx = ((v + vv + pt_min_v) & tx_andh) << tx_shfw;
+			PI_PIXTYPE *__out = out;
+
+			int r = r0, rd = (r1 - r0) >> pt_cell_shift;
+			int g = g0, gd = (g1 - g0) >> pt_cell_shift;
+			int b = b0, bd = (b1 - b0) >> pt_cell_shift;
+
+			int uu = u + pt_min_u;
+			int end_uu = uu + lc_w;
+
+			for (; uu < end_uu; uu++)
+			{
+			csRGBpixel pix = tx_palette [tx_bitmap [tx_idx + (uu & tx_andw)]];
+		*out++ =
+	#if defined (PI_INDEX8)
+				Scan.inv_cmap [
+	#endif
+				(lt_R [pix.red   | (r & 0x3f00)] << PI_RS) |
+				(lt_G [pix.green | (g & 0x3f00)] << PI_GS) |
+				(lt_B [pix.blue  | (b & 0x3f00)] << PI_BS)
+	#if defined (PI_INDEX8)
+				]
+	#endif
+			;
+			r += rd; g += gd; b += bd;
+			}
+
+			out = __out + pt_w;
+
+			r0 += r0d; r1 += r1d;
+			g0 += g0d; g1 += g1d;
+			b0 += b0d; b1 += b1d;
+		}
+		}
+		src += src_dlu;
+	}
   }
 }
 
