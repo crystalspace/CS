@@ -14,8 +14,8 @@
 //-----------------------------------------------------------------------------
 // NeXTFrameBuffer.h
 //
-//	A mostly abstract 2D frame buffer which is capable of converting a
-//	raw Crystal Space frame buffer into a NeXT-format frame buffer.
+//	An abstract 2D frame buffer which is capable of converting a raw
+//	Crystal Space frame buffer into a NeXT-format frame buffer.
 //
 //	Subclasses must implement the following methods:
 //
