@@ -14,6 +14,8 @@ The history order has been reversed so that new features are at the top.
 	  glVertex,glNormal, glTexCoords, ... calls between glBegin/glEnd.
 	  So I changed DrawPolygon so that it first calculates and copies
 	  the results in a few arrays.
+	- Fixed a bug in csString as reported by George Yohng
+	  <yohng@drivex.dosware.8m.com>.
 18-Jun-2000
 	- Norman Kramer fixed Squawk and csgame following the recent modifications
 	  in sprite creation.

@@ -160,6 +160,7 @@ csString &csString::Append (const csString &iStr, size_t iCount)
 
 csString &csString::Append (const char *iStr, size_t iCount)
 {
+  if (!iStr) return *this;
   if (iCount == (size_t)-1)
     iCount = strlen (iStr);
 
