@@ -126,6 +126,9 @@ distclean: clean
 
 clean:
 	-$(RMDIR) $(subst /,,$(OUTBASE))
+ifneq ($(strip $(OUTDLL)),)
+	-$(RMDIR) $(subst /,,$(OUTDLL))
+endif
 	-$(RM) debug.txt
 	-$(RM) precalc.zip
 
