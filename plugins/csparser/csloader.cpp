@@ -692,7 +692,7 @@ bool csLoader::LoadSounds (char* buf)
 
 iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
 {
-  if (!Engine) return false;
+  if (!Engine) return NULL;
 
   iDataBuffer *databuff = VFS->ReadFile (fname);
 
@@ -955,7 +955,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 
 iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
 {
-  if (!Engine) return false;
+  if (!Engine) return NULL;
 
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)
@@ -1660,7 +1660,7 @@ bool csLoader::LoadRenderPriorities (char* buf)
 
 iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
 {
-  if (!Engine) return false;
+  if (!Engine) return NULL;
 
   iDataBuffer *databuff = VFS->ReadFile (fname);
   iMeshWrapper* mesh = NULL;
