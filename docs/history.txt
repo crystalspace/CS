@@ -12,6 +12,8 @@ chronological order.
 	  with 3 (in the NR OpenGL renderer) to avoid flickering in case
 	  stencil lighting is used. This still doesn't completely avoid
 	  flickering but it helps considerably.
+	- Neil Mosafi changed the custom cursor plugin to use iReporter instead
+	  of a comment and also to use csHash<> instead of csHashMapReversible
 12-Jan-2004
 	- Peter Amstutz added a preliminary version of a VOS 
 	  plugin for CS, along with a test program.  The configure script
