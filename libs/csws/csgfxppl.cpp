@@ -483,7 +483,13 @@ bool csGraphicsPipeline::BeginDraw ()
 
 void csGraphicsPipeline::FinishDraw ()
 {
+  /*
   if (!RefreshRect.IsEmpty ())
     G3D->Print (&RefreshRect);
   G3D->FinishDraw ();
+  */
+  G3D->FinishDraw ();
+  if (!RefreshRect.IsEmpty ())
+  G3D->Print (&RefreshRect);
+
 }
