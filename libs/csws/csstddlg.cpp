@@ -393,11 +393,11 @@ bool cspFileDialog::BuildAndSetPath ()
     buff [0] = 0;
 
   char pathsep = usevfs ? VFS_PATH_SEPARATOR : PATH_SEPARATOR;
-  int maxlen = usevfs ? VFS_MAX_PATH_LEN : MAXPATHLEN;
+  //int maxlen = usevfs ? VFS_MAX_PATH_LEN : MAXPATHLEN;
 
   while (cur->id == CSFDI_PATHCOMPONENT)
   {
-    char tmp [maxlen + 1];
+    char tmp [MAXPATHLEN + 1];
     strcpy (tmp, buff);
     strcpy (buff, cur->GetText ());
     int sl = strlen (buff);
@@ -405,7 +405,7 @@ bool cspFileDialog::BuildAndSetPath ()
    	&& (buff [sl - 1] != '/')
       	&& (buff [sl - 1] != pathsep))
       buff [sl++] = pathsep;
-    strncpy (&buff [sl], tmp, maxlen - sl);
+    strncpy (&buff [sl], tmp, MAXPATHLEN - sl);
     cur = cur->prev;
   } /* endwhile */
 
@@ -466,7 +466,7 @@ void cspFileDialog::Reread ()
   SetName ("");
 
   char pathsep = usevfs ? VFS_PATH_SEPARATOR : PATH_SEPARATOR;
-  int maxlen = usevfs ? VFS_MAX_PATH_LEN : MAXPATHLEN;
+  //int maxlen = usevfs ? VFS_MAX_PATH_LEN : MAXPATHLEN;
 
   // Now decompose path into components
   char *curp = path;
@@ -478,7 +478,7 @@ void cspFileDialog::Reread ()
         && (*sep != '/')
         && (*sep != pathsep))
       sep++;
-    char name [maxlen + 1];
+    char name [MAXPATHLEN + 1];
     if ((sep == curp)
 #if defined (OS_OS2) || defined (OS_DOS) || defined (OS_WIN32)
      || ((level == 0) && (sep [-1] == ':'))
