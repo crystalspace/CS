@@ -25,6 +25,8 @@ The history order is reversed so that new features are at the top.
 	  an object while walking around an application can choose to call
 	  this function manually in order to increase load time but decrease
 	  the time need to setup things later.
+	- Eric Sunshine moved crystal.fgd from scripts/worldcraft to
+	  scripts/hammer at the request of its author.
 2-Mar-2003
         - Rudolf Potucek updated makefiles in the apps/ directory to 
 	  remove vpath and generate object files in individual 
