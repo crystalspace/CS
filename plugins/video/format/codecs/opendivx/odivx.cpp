@@ -21,14 +21,14 @@
 #include "odivx.h"
 
 IMPLEMENT_IBASE (csOpenDivX)
-  IMPLEMENTS_INTERFACE (iCodec)
+  IMPLEMENTS_INTERFACE (iAVICodec)
   IMPLEMENTS_INTERFACE (iBase)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_FACTORY (csOpenDivX)
 EXPORT_CLASS_TABLE (odivx)
-  EXPORT_CLASS (csOpenDivX, "crystalspace.video.codec.dvx1", "CrystalSpace OpenDivX codec")
-  EXPORT_CLASS (csOpenDivX, "crystalspace.video.codec.divx", "CrystalSpace OpenDivX codec")
+  EXPORT_CLASS (csOpenDivX, "crystalspace.video.codec.avi.dvx1", "CrystalSpace OpenDivX codec")
+  EXPORT_CLASS (csOpenDivX, "crystalspace.video.codec.avi.divx", "CrystalSpace OpenDivX codec")
 EXPORT_CLASS_TABLE_END
 
 csOpenDivX::csOpenDivX (iBase *pParent)
@@ -48,7 +48,7 @@ csOpenDivX::~csOpenDivX ()
   delete [] vdata;
 }
 
-bool csOpenDivX::Initialize (csStreamDescription *desc, UByte *, ULong)
+bool csOpenDivX::Initialize (csStreamDescription *desc, UByte *, ULong, UByte *, ULong)
 {
   csVideoStreamDescription *vd = (csVideoStreamDescription *)desc;
   w = vd->width;

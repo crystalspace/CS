@@ -20,8 +20,9 @@
 #define _ODIVX_H_
 
 #include "ivideo/ividecod.h"
+#include "plugins/video/format/avi/iavicdec.h"
 
-class csOpenDivX : public iCodec
+class csOpenDivX : public iAVICodec
 {
  protected:
   bool bOK;
@@ -38,7 +39,7 @@ class csOpenDivX : public iCodec
   csOpenDivX (iBase *pParent);
   virtual ~csOpenDivX ();
 
-  virtual bool Initialize (csStreamDescription *desc, UByte *, ULong);
+  virtual bool Initialize (csStreamDescription *desc, UByte *, ULong, UByte *, ULong);
   virtual void GetCodecDescription (csCodecDescription &desc);
   virtual bool Decode (char *indata, ULong inlength, void *&outdata);
   virtual bool Encode (void *indata, char *outdata, ULong &outlength);
