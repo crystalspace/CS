@@ -26,6 +26,7 @@
 #define CS_SYSDEF_PROVIDE_ACCESS
 #define CS_SYSDEF_PROVIDE_MKDIR
 #define CS_SYSDEF_PROVIDE_UNLINK
+#define CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "vfs.h"
@@ -716,11 +717,14 @@ int VfsNode::Expand (csVFS *Parent, char *dst, char *src, int size)
         while (level && *src)
         {
           if (*src == '(')
+	  {
             level++;
-          else if (*src == ')')
+	  }
+          else if (*src == ')') 
+	  {
             level--;
-          else
-            src++;
+	  } 
+	  if (level) src++; // don't skip over the last parenthesis
         } /* endwhile */
         // Replace closing parenthesis with \0
         *src++ = 0;
@@ -746,8 +750,11 @@ int VfsNode::Expand (csVFS *Parent, char *dst, char *src, int size)
       }
       else
       {
-        strcpy (dst, value);
-        dst = strchr (dst, 0);
+	char *tmp = csStrNew(value);
+	strcpy(tmp, value);
+        dst += Expand (Parent, dst, tmp, size - (dst - org));
+	// @@@ ... circular references may occur ...
+	delete [] tmp;
       }
     } /* endif */
     else
@@ -786,6 +793,14 @@ const char *VfsNode::GetValue (csVFS *Parent, const char *VarName)
 
   // Handle predefined variables here so that user
   // can override them in config file or environment
+
+  // check for OS-specific predefined variables
+#ifdef CS_SYSDEF_VFS_CHECK_VAR
+  CS_SYSDEF_VFS_CHECK_VAR (VarName)
+#endif
+  if (value)
+    return value;
+
   static char path_separator [] = {VFS_PATH_SEPARATOR, 0};
   if (strcmp (VarName, path_separator) == 0)	// Path separator variable?
   {

@@ -32,7 +32,7 @@
   #pragma warning(disable:4097)   // use of xxx as synonym for a classname
   #pragma warning(disable:4127)   // conditional expression is constant
   #pragma warning(disable:4189)   // local variable is intialized but not referenced
-  #pragma warning(disable:4706)   // Assignmet in conditional expression
+  #pragma warning(disable:4706)   // Assignment in conditional expression
   #pragma warning(disable:4611)   // interaction between _setjmp and C++ destructors not portable
   #pragma warning(disable:4710)   // function not inlined
   #pragma warning(disable:4201)   // structure/ union without name. (Only relevant on MSVC 5.0)
@@ -118,6 +118,28 @@
 #      define MAXPATHLEN 260 /* not 256 */
 #    endif
 #  endif
+#endif
+
+// Windows has built-in var "SystemRoot" 
+// (env var on NT, but not 9x; so we provide it this way)
+// @@@ provide HOME(DIR) ??? ("My Docs" maybe?) 
+#ifdef CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
+
+char* __WindowsDirectory()
+{
+  static char lpWindowsDirectory[MAX_PATH+1] = {'\0'};
+
+  if (!*lpWindowsDirectory) {
+    GetWindowsDirectoryA(lpWindowsDirectory, MAX_PATH);  
+  }
+
+  return lpWindowsDirectory;
+}
+
+#define CS_SYSDEF_VFS_CHECK_VAR(VarName) \
+  if (!stricmp(VarName, "systemroot")) { \
+    value = __WindowsDirectory(); \
+  }
 #endif
 
 // COMP_GCC has generic opendir(), readdir(), closedir()
