@@ -3,6 +3,7 @@ The history order has been reversed so that new features are at the top.
 6-Sep-2000
 	- Patch from Mark Welch to fix a compile error on MSVC.
 	- Small fix to OpenGL canvas from Nicholas Blumire.
+	- Removed an assertion error from curve.cpp
 5-Sep-2000
 	- Norman Kramer corrected writestring function signature in glide
 	  canvas.
