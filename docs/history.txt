@@ -62,6 +62,8 @@ chronological order.
 	- Jorrit fixed csStringBase::LTrim(). It forget to use GetData().
 	- Eric Sunshine fixed win32/csconfig.h so that CS_HAVE_STDINT_H is
 	  defined for Borland.
+	- Eric Sunshine fixed csutil/win32/winprintf.cpp so that it #defines
+	  _fileno(), _isatty(), etc. for Borland.
 13-Mar-2005
 	- res made the following changes to csStringBase:
 	    - Removed static Pad*() methods. Provided nothing that can't 

@@ -26,7 +26,7 @@
 #include <windows.h>
 #include "csutil/win32/wintools.h"
 
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(CS_COMPILER_BCC)
 #define _fileno(x) fileno(x)
 #define _isatty(x) isatty(x)
 #define _get_osfhandle(x) get_osfhandle(x)
