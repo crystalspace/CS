@@ -374,13 +374,8 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &w, int &h)
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 {
-  if(images.IsValid() && images->GetImage (0).IsValid())
-  {
-    //mw = images->GetImage (0)->GetWidth() << txtmgr->texture_downsample;
-    //mh = images->GetImage (0)->GetHeight() << txtmgr->texture_downsample;
-    mw = orig_width;
-    mh = orig_height;
-  }
+  mw = orig_width;
+  mh = orig_height;
 }
 
 // Check the two below for correctness

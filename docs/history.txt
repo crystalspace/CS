@@ -51,6 +51,10 @@ chronological order.
 	    - Worked around problem where recent Swig's unconditionally #undef
 	      Perl's 'ENTER' macro. This caused inline code in perlpost.i,
 	      which utilizes that macro, to fail to compile.
+	- Wouter removed test for images.IsValid() in GetOrigSize(), since
+	  the orig size fields are set correctly already. Also the routine
+	  was returning without touching the w and h, causing unpredictable
+	  results. This fixes an Image View component in AWS.
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.
