@@ -41,6 +41,7 @@
 #include "csutil/util.h"
 #include "imesh/thing/polygon.h"
 #include "qint.h"
+#include "gl_polybufext.h"
 
 csPolygonBufferEXT::csPolygonBufferEXT(iGraphics3D *g3d)
 {
@@ -56,6 +57,7 @@ void csPolygonBufferEXT::AddPolygon (int* verts, int num_verts,
 	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
 	iPolygonTexture* poly_texture)
 {
+
 }
 
 void csPolygonBufferEXT::SetVertexArray (csVector3* verts, int num_verts)
