@@ -97,11 +97,8 @@ bool csSoftShader_FP::Load(iDocumentNode* program)
       if(child->GetType() != CS_NODE_ELEMENT) continue;
       const char* value = child->GetValue ();
       csStringID id = xmltokens.Request (value);
-      switch(id)
-      {
-        default:
-          return false;
-      }
+      (void)id;
+      // @@@ FIXME: Implement this.
     }
   }
 
@@ -110,6 +107,7 @@ bool csSoftShader_FP::Load(iDocumentNode* program)
 
 bool csSoftShader_FP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
+  // @@@ FIXME: Implement this.
   return true;
 }
  
