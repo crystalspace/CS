@@ -2043,7 +2043,7 @@ bool csSpriteCal3DMeshObject::AddAnimCycle(int idx, float weight, float delay)
 int csSpriteCal3DMeshObject::FindAnimCyclePos(int idx) const
 {
   for (size_t i = active_anims.Length(); i-- > 0; )
-    if (idx == active_anims[i].anim->index)
+    if (active_anims[i].anim->index == idx)
       return (int)i;
   return -1;
 }
@@ -2051,7 +2051,7 @@ int csSpriteCal3DMeshObject::FindAnimCyclePos(int idx) const
 int csSpriteCal3DMeshObject::FindAnimCycleNamePos(char const* name) const
 {
   for (size_t i = active_anims.Length(); i-- > 0; )
-    if (name == active_anims[i].anim->name)
+    if (active_anims[i].anim->name == name)
       return (int)i;
   return -1;
 }

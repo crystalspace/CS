@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Nov-2004
+	- Eric Sunshine fixed a bogus string comparison in
+	  csSpriteCal3DMeshObject::FindAnimCycleNamePos() which failed always.
 16-Nov-2004
 	- Eric Sunshine enhanced CS_CHECK_LIB_WITH() in checklib.m4 so that it
 	  knows about MacOS/X frameworks, and automatically tests for the
