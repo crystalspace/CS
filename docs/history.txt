@@ -24,7 +24,8 @@ chronological order.
 	  respects CS_CONFIGDIR if defined, in addition to checking the
 	  CrystalSpaceRoot default and the CRYSTAL environment variable. If the
 	  above fail, now also checks a couple other likely (hard-coded)
-	  locations.
+	  locations. Also upgraded to understand LFS installation structure
+	  used by Jam build system.
 17-Sep-2004
 	- Eric Sunshine fixed a couple methods in odedynam which were returning
 	  a value despite being declared as returning void. Reported by Brendon
