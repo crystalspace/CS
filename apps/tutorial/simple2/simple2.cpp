@@ -79,35 +79,36 @@ void Simple::SetupFrame ()
 
   iCamera* c = view->GetCamera();
 
-  if (kbd->GetKeyState (CSKEY_SHIFT)) {
-      // If the user is holding down shift, the arrow keys will cause
-      // the camera to strafe up, down, left or right from it's
-      // current position.
-      if (kbd->GetKeyState (CSKEY_RIGHT))
-          c->Move (CS_VEC_RIGHT * 4 * speed);
-      if (kbd->GetKeyState (CSKEY_LEFT))
-          c->Move (CS_VEC_LEFT * 4 * speed);
-      if (kbd->GetKeyState (CSKEY_UP))
-          c->Move (CS_VEC_UP * 4 * speed);
-      if (kbd->GetKeyState (CSKEY_DOWN))
-          c->Move (CS_VEC_DOWN * 4 * speed);
+  if (kbd->GetKeyState (CSKEY_SHIFT))
+  {
+    // If the user is holding down shift, the arrow keys will cause
+    // the camera to strafe up, down, left or right from it's
+    // current position.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      c->Move (CS_VEC_RIGHT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      c->Move (CS_VEC_LEFT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_UP * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_DOWN * 4 * speed);
   } else {
-      // left and right cause the camera to rotate on the global Y
-      // axis; page up and page down cause the camera to rotate on the
-      // _camera's_ X axis (more on this in a second) and up and down
-      // arrows cause the camera to go forwards and backwards.
-      if (kbd->GetKeyState (CSKEY_RIGHT))
-          rotY += speed;
-      if (kbd->GetKeyState (CSKEY_LEFT))
-          rotY -= speed;
-      if (kbd->GetKeyState (CSKEY_PGUP))
-          rotX += speed;
-      if (kbd->GetKeyState (CSKEY_PGDN))
-          rotX -= speed;
-      if (kbd->GetKeyState (CSKEY_UP))
-          c->Move (CS_VEC_FORWARD * 4 * speed);
-      if (kbd->GetKeyState (CSKEY_DOWN))
-          c->Move (CS_VEC_BACKWARD * 4 * speed);
+    // left and right cause the camera to rotate on the global Y
+    // axis; page up and page down cause the camera to rotate on the
+    // _camera's_ X axis (more on this in a second) and up and down
+    // arrows cause the camera to go forwards and backwards.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      rotY += speed;
+    if (kbd->GetKeyState (CSKEY_LEFT))
+        rotY -= speed;
+    if (kbd->GetKeyState (CSKEY_PGUP))
+        rotX += speed;
+    if (kbd->GetKeyState (CSKEY_PGDN))
+        rotX -= speed;
+    if (kbd->GetKeyState (CSKEY_UP))
+        c->Move (CS_VEC_FORWARD * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+        c->Move (CS_VEC_BACKWARD * 4 * speed);
   }
 
   // We now assign a new rotation transformation to the camera.  You
@@ -118,9 +119,9 @@ void Simple::SetupFrame ()
   // individual rotations on each axis together to get a single
   // rotation matrix.  The rotations are applied in right to left
   // order .
-  csMatrix3 rot =  csXRotMatrix3(rotX) * csYRotMatrix3(rotY);
-  csOrthoTransform ot(rot, c->GetTransform().GetOrigin());
-  c->SetTransform(ot);
+  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  c->SetTransform (ot);
 
 
   // Tell 3D driver we're going to display 3D things.
