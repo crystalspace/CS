@@ -17,6 +17,9 @@ chronological order.
 	  more optimal routine is selected for flushing the operations.
 	- Jorrit cleaned up the coverage buffer Flush() routine by splitting
 	  it up in all different cases.
+	- Jorrit reenabled the dynavis_debug target in the Dynavis jamfile
+	  after Matze applied some fixes to the metadata embedding code
+	  on windows.
 22-Oct-2003
 	- Jorrit fixed a bug in csMovableSectorList which did all the needed
 	  SCF stuff EXCEPT inherit from iBase. This is an old bug but for
