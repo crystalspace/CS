@@ -1040,13 +1040,15 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
   m.mixmode = MixMode;
   CS_ASSERT (!vbuf->IsLocked ());
   const csBox3& b = factory->GetObjectBoundingBox ();
-  const csColor* c = do_manual_colors ? factory->GetColors () : lit_mesh_colors,
+  csColor* c = do_manual_colors ? factory->GetColors() : lit_mesh_colors;
+  // @@@ FIXME: const_cast<> == BAD!
   vbufmgr->LockBuffer (vbuf,
-    anim_ctrl_verts ? AnimControlGetVertices () : factory->GetVertices (),
-    anim_ctrl_texels ? AnimControlGetTexels () : factory->GetTexels (),
-    anim_ctrl_colors ? AnimControlGetColors (c) : c,
-    factory->GetVertexCount (), 0,
-    b);
+    anim_ctrl_verts  ? CS_CONST_CAST(csVector3*,AnimControlGetVertices()) :
+		       factory->GetVertices (),
+    anim_ctrl_texels ? CS_CONST_CAST(csVector2*,AnimControlGetTexels()) :
+		       factory->GetTexels (),
+    anim_ctrl_colors ? CS_CONST_CAST(csColor*,AnimControlGetColors(c)) : c,
+    factory->GetVertexCount (), 0, b);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), m);
   g3d->DrawTriangleMesh (m);
   vbufmgr->UnlockBuffer (vbuf);

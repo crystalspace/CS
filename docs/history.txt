@@ -74,13 +74,18 @@ chronological order.
 	  genmesh objects themselves can actually execute different scripts
 	  and be in a different animation state. This wasn't possible in the
 	  previous design.
-	- Implemented gmeshanim to support 'jitter' animation. This is just
-	  a test to show that the system works. gmeshanim still needs to have
-	  a real scripting system. In data/flarge/world there is one box
+	- Jorrit implemented gmeshanim to support 'jitter' animation. This is
+	  just a test to show that the system works. gmeshanim still needs to
+	  have a real scripting system. In data/flarge/world there is one box
 	  that uses this 'jitter' script.
-	- PK fixed a few bugs in csSaver::SaveMaterials.
+	- PK fixed a few bugs in csSaver::SaveMaterials().
 	- PK implemented about 70% of the particlessaver.
-	- PK fixed a bug in the xmlshader by adding a csNewStr() in SetFilename().
+	- PK fixed a bug in the xmlshader by adding a csNewStr() in
+	  SetFilename().
+	- Eric Sunshine fixed OR compilation error in genmesh.cpp. Also add
+	  extremely ugly const_cast<>'s to allow invocation of
+	  iVertexBuffer::LockBuffer() to compile. (Someone, please fix this in
+	  the cleanest way possible.)
 12-Sep-2004
 	- Jorrit fixed genmesh so it compiles with OR again.
 	- Jorrit did some more work on gmeshanim. Still unfinished.
