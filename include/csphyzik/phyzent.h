@@ -27,6 +27,9 @@
 #include "csphyzik/refframe.h"
 //#include <iostream>
 
+// flags
+#define CTF_NOREWIND 0x1
+
 #define DEFAULT_ENTITY_MASS 10.0
 
 #define PHYSICALENTITY_STATESIZE 12  // Rmatrix, x
@@ -95,7 +98,8 @@ public:
 	void print_force(){/*cout << "F: " << F*F << "\n";*/ }
 
   // collision routines
-  virtual void resolve_collision( ctCollidingContact &cont );
+  // resolve collision with a body.  warning: original cont may be modified
+  virtual void resolve_collision( ctCollidingContact *cont );
   // can use this to impart and impulse to this object.
   virtual void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector );
   virtual real get_impulse_m(){ return DEFAULT_ENTITY_MASS; }
@@ -115,11 +119,15 @@ public:
 	
 	ctReferenceFrame *get_RF(){ return &RF; }
 
+  // flags
+  unsigned long flags;
+
 protected:
 
 	ctVector3 v;
 	ctVector3 w;
-	
+
+
   //!me gotta try to garauntee that this is not modified in the middle
 	// of an ODE run.......
 	//bool use_ODE;
