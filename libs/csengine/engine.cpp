@@ -2799,11 +2799,7 @@ iMaterialWrapper *csEngine::CreateMaterial (
   const char *iName,
   iTextureWrapper *texture)
 {
-#ifdef CS_USE_NEW_RENDERER
   csMaterial *mat = new csMaterial (this, texture);
-#else
-  csMaterial *mat = new csMaterial (texture);
-#endif
   iMaterialWrapper *wrapper = materials->NewMaterial (mat);
   wrapper->QueryObject ()->SetName (iName);
   mat->DecRef ();
@@ -2845,29 +2841,24 @@ iSector *csEngine::CreateSector (const char *iName)
 
 csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
 {
-#ifdef CS_USE_NEW_RENDERER
   csMaterial *mat = new csMaterial (this);
-  if (txt) mat->SetTextureWrapper (mat->nameDiffuseTexture, txt);
-#else
-  csMaterial *mat = new csMaterial ();
   if (txt) mat->SetTextureWrapper (txt);
-#endif
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
   mat->DecRef ();
   return csPtr<iMaterial> (imat);
 }
 
-#ifndef CS_USE_NEW_RENDERER
 csPtr<iMaterial> csEngine::CreateBaseMaterial (
   iTextureWrapper *txt,
   int num_layers,
   iTextureWrapper **wrappers,
   csTextureLayer *layers)
 {
-  csMaterial *mat = new csMaterial ();
+  csMaterial *mat = new csMaterial (this);
   if (txt) mat->SetTextureWrapper (txt);
 
+#ifndef CS_USE_NEW_RENDERER
   int i;
   for (i = 0; i < num_layers; i++)
   {
@@ -2879,12 +2870,12 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (
         layers[i].ushift,
         layers[i].vshift);
   }
+#endif
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
   mat->DecRef ();
   return csPtr<iMaterial> (imat);
 }
-#endif
 
 iTextureList *csEngine::GetTextureList () const
 {

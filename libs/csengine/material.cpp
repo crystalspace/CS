@@ -36,11 +36,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterial::MaterialEngine)
   SCF_IMPLEMENTS_INTERFACE(iMaterialEngine)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csMaterial::csMaterial (
-#ifdef CS_USE_NEW_RENDERER
-			csEngine* engine
-#endif
-			)
+csMaterial::csMaterial (csEngine* engine)
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
@@ -56,11 +52,7 @@ csMaterial::csMaterial (
   nameDiffuseTexture = engine->Strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 #endif // CS_USE_NEW_RENDERER
 
-#ifdef CS_USE_NEW_RENDERER
-  SetTextureWrapper (nameDiffuseTexture, 0);
-#else
   SetTextureWrapper (0);
-#endif
   // @@@ This will force the shader vars to be created...
   // @@@ So you can't globally override them
   SetFlatColor (csRGBcolor (255, 255, 255));
@@ -74,10 +66,7 @@ csMaterial::csMaterial (
 #endif
 }
 
-csMaterial::csMaterial (
-#ifdef CS_USE_NEW_RENDERER
-			csEngine* engine,
-#endif
+csMaterial::csMaterial (csEngine* engine,
 			iTextureWrapper *w)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -94,11 +83,7 @@ csMaterial::csMaterial (
   nameDiffuseTexture = engine->Strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 #endif // CS_USE_NEW_RENDERER
 
-#ifdef CS_USE_NEW_RENDERER
-  SetTextureWrapper (nameDiffuseTexture, w);
-#else
   SetTextureWrapper (w);
-#endif
   SetFlatColor (csRGBcolor (255, 255, 255));
   SetDiffuse (CS_DEFMAT_DIFFUSE);
   SetAmbient (CS_DEFMAT_AMBIENT);
@@ -278,14 +263,17 @@ void csMaterial::SetReflection (float oDiffuse, float oAmbient,
 }
 #endif
 
-#ifndef CS_USE_NEW_RENDERER
 
 void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
 {
+#ifdef CS_USE_NEW_RENDERER
+  SetTextureWrapper (nameDiffuseTexture, tex);
+#else
   texture = tex;
+#endif
 }
 
-#else
+#ifdef CS_USE_NEW_RENDERER
 
 iTextureWrapper* csMaterial::GetTextureWrapper (csStringID name)
 {

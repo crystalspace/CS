@@ -24,6 +24,11 @@ chronological order.
 	      the correct value should be 'false' for index.
 	    - Added 'nrall' target for jam to compile all that is specific
 	      for the new renderer.
+	    - Added iMaterialWrapper::SetTextureWrapper() for new renderer
+	      too. This will set the diffuse texture and is a conveniance
+	      function.
+	    - Enabled iEngine->CreateBaseMaterial() again which was disabled
+	      for some bizare reason. This fixes bugplug again.
 	- Jorrit added stdpt, ieplex, motion, and gtreeldr to walkall target
 	  for jam.
 26-Aug-2003

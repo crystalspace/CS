@@ -126,18 +126,11 @@ public:
   /**
    * create an empty material
    */
-  csMaterial (
-#ifdef CS_USE_NEW_RENDERER
-    csEngine* engine
-#endif
-    );
+  csMaterial (csEngine* engine);
   /**
    * create a material with only the texture given.
    */
-  csMaterial (
-#ifdef CS_USE_NEW_RENDERER
-    csEngine* engine,
-#endif
+  csMaterial (csEngine* engine,
     iTextureWrapper *txt);
 
   /**
@@ -163,12 +156,20 @@ public:
   /// Set reflection of the material
   void SetReflection (float val);
 
-#ifndef CS_USE_NEW_RENDERER
-  /// Get the texture (if none 0 is returned)
+#ifdef CS_USE_NEW_RENDERER
+  /// Get the base diffuse texture (if none 0 is returned)
+  iTextureWrapper* GetTextureWrapper ()
+  {
+    return GetTextureWrapper (nameDiffuseTexture);
+  }
+#else
+  /// Get the base diffuse texture (if none 0 is returned)
   iTextureWrapper* GetTextureWrapper () const { return texture; }
-  /// Set the texture (pass 0 to set no texture)
+#endif
+  /// Set the base diffuse texture (pass 0 to set no texture)
   void SetTextureWrapper (iTextureWrapper* tex);
 
+#ifndef CS_USE_NEW_RENDERER
   /// Add a texture layer (currently only one supported).
   void AddTextureLayer (iTextureWrapper* txtwrap, uint mode,
         float uscale, float vscale, float ushift, float vshift);

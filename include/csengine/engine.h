@@ -769,10 +769,8 @@ public:
    * Create a base material.
    */
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt);
-#ifndef CS_USE_NEW_RENDERER
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt,
   	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers);
-#endif
 
   virtual iSharedVariableList* GetVariableList () const;
   virtual iMaterialList* GetMaterialList () const;
