@@ -52,17 +52,12 @@ void csShaderGLCGVP::Activate()
 
   if (nvTrackMatrices)
   {
+
     for(int i = 0; i < matrixtrackers.Length(); ++i)
     {
-      const matrixtrackerentry& mt = matrixtrackers[i];
+      matrixtrackerentry& mt = matrixtrackers[i];
 
-      shaderPlug->ext->glTrackMatrixNV (GL_VERTEX_PROGRAM_NV,
-	mt.nvAddress, mt.nvMatrix, mt.nvTransform);
-
-      /*cgGLSetStateMatrixParameter (
-	matrixtrackers[i].parameter, 
-	matrixtrackers[i].matrix, 
-	matrixtrackers[i].modifier);*/
+      cgGLSetStateMatrixParameter(mt.cgParameter,mt.nvMatrix,mt.nvTransform);
     }
   }
 }
@@ -115,6 +110,8 @@ static bool TokenEquals (const char* token, size_t tokenLen, const char* cmp)
 {
   return (tokenLen == strlen (cmp)) && (strncmp (token, cmp, tokenLen) == 0);
 }
+
+
 
 bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
@@ -245,9 +242,9 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
       const char* pname = cgGetParameterName (param);
     #define TRACKERENTRY(Matrix, Modifier)		  \
       matrixtrackerentry map;				  \
-      map.nvMatrix = Matrix;				  \
-      map.nvTransform = Modifier;			  \
-      map.nvAddress = cgGetParameterResource (param);	  \
+      map.nvMatrix = (CGGLenum)Matrix;				  \
+      map.nvTransform = (CGGLenum)Modifier;			  \
+      map.cgParameter = param; \
       matrixtrackers.Push (map);
     #define NAMEDTRACKERENTRY(Name, Matrix, Modifier)	  \
       if (!strcmp (pname, Name))			  \
@@ -257,13 +254,13 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
       else
     #define NAMEDENTRIES(Basename, Matrix)		  \
       NAMEDTRACKERENTRY (Basename, Matrix,		  \
-	GL_IDENTITY_NV)					  \
+	CG_GL_MATRIX_IDENTITY)					  \
       NAMEDTRACKERENTRY (Basename "I", Matrix,	  	  \
-	GL_INVERSE_NV)					  \
+	CG_GL_MATRIX_INVERSE)					  \
       NAMEDTRACKERENTRY (Basename "T", Matrix,	  	  \
-	GL_TRANSPOSE_NV)				  \
+	CG_GL_MATRIX_TRANSPOSE)				  \
       NAMEDTRACKERENTRY (Basename "IT", Matrix,	  	  \
-	GL_INVERSE_TRANSPOSE_NV)			  
+	CG_GL_MATRIX_INVERSE_TRANSPOSE)			  
 
     #define MATRIX_MAP(name, nvMatrix, arbMatrix)	  \
       NAMEDENTRIES (# name, nvMatrix)

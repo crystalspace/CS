@@ -35,9 +35,9 @@ class csShaderGLCGVP : public csShaderGLCGCommon
 {
   struct matrixtrackerentry
   {
-    GLenum nvMatrix;
-    GLenum nvTransform;
-    GLuint nvAddress;
+    CGGLenum nvMatrix;
+    CGGLenum nvTransform;
+    CGparameter cgParameter;
   };
 
   bool nvTrackMatrices;
