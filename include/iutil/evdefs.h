@@ -37,7 +37,7 @@
 
 /// System Events
 // take care not to define more than 32 event types
-enum csEventType
+typedef enum _csEventType
 {
   /// Nothing happened	
   csevNothing = 0,
@@ -83,16 +83,16 @@ enum csEventType
   csevGroupOff,         
   /// The frame is about to draw.
   csevFrameStart        
-};
+} csEventType;
 
 /// Keyboard event type
-enum csKeyEventType
+typedef enum _csKeyEventType
 {
   /// A 'key down' event
   csKeyEventTypeUp = 0,
   /// A 'key up' event
   csKeyEventTypeDown
-};
+} csKeyEventType;
 
 /** \name Event masks
  * The event masks can be used by plugins to tell an event queue, via
@@ -181,7 +181,7 @@ enum csKeyEventType
  * \sa \ref Keyboard, Modifier key masks
  * @{ */
 /// Modifier types
-enum csKeyModifierType
+typedef enum _csKeyModifierType
 {
   /// 'Shift' is held
   csKeyModifierTypeShift = 0,
@@ -198,10 +198,10 @@ enum csKeyModifierType
   
   /// \internal Can be used to get the number of defined modifier types.
   csKeyModifierTypeLast
-};
+} csKeyModifierType;
 
 /// Modifier numbers
-enum csKeyModifierNumType
+typedef enum _csKeyModifierNumType
 {
   /// The default number for a 'left' version of a key.
   csKeyModifierNumLeft = 0,
@@ -213,7 +213,7 @@ enum csKeyModifierNumType
    * multiple modifier keys of the same type.
    */
   csKeyModifierNumAny = 0x1f
-};
+} csKeyModifierNumType;
 
 /// Flags for all currently pressed modifiers.
 typedef struct _csKeyModifiers
@@ -478,13 +478,13 @@ typedef struct _csKeyModifiers
   CSKEY_MODIFIER(csKeyModifierTypeScrollLock,csKeyModifierNumAny)
 
 /// Character types
-enum csKeyCharType
+typedef enum _csKeyCharType
 {
   /// Normal character
   csKeyCharTypeNormal = 0,
   /// "Dead" character
   csKeyCharTypeDead
-};
+} csKeyCharType;
 
 /** @} */
 
@@ -521,7 +521,7 @@ enum csKeyCharType
  * }
  *</pre>
  */
-enum csCommandEventCode
+typedef enum _csCommandEventCode
 {
   /**
    * No command. Dunno really why it is needed but traditionally
@@ -633,7 +633,7 @@ enum csCommandEventCode
    * visible (such as being uniconified).
    */
   cscmdCanvasExposed
-};
+} csCommandEventCode;
 
 /** @} */
 
