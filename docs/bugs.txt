@@ -1,90 +1,114 @@
 PROBLEM: AMD and K6 processors seem to have problems with CS?
-SOLUTION: No idea yet. This needs to be investigated. Does every AMD
-and K6 owner have problems?
-DIFFICULTY: moderate to hard?
+SOLUTION: No idea yet.  This needs to be investigated.  Does every AMD and K6
+    owner have problems?
+DIFFICULTY: Moderate to hard?
 
-PROBLEM: Halos are missing in some 3D hardware accelerated drivers
-(OpenGL and Glide).
+PROBLEM: Halos are missing in some 3D hardware accelerated drivers (OpenGL and
+    Glide).
 SOLUTION: A more general solution (alpha mapped texture?) may solve all
-problems at once. Or else implement it ad hoc again.
-DIFFICULTY: moderate to hard
+    problems at once.  Or else implement it ad hoc again.
+DIFFICULTY: Moderate to hard.
 
 PROBLEM: When standing VERY close to the portal engine sometimes draw it
-(shouldn't -- for example I found one position near the exit from the
-startup room in large.zip. But it's pretty hard to find)
-SOLUTION: I think projecting code should be revisited to change it's
-operation when Z-value of polygon vertices is very little. Maybe bug in
-the clipper. (mrsigma@surrey.quik.com)
+    (shouldn't -- for example I found one position near the exit from the
+    startup room in large.zip.  But it's pretty hard to find)
+SOLUTION: I think projecting code should be revisited to change it's operation
+    when Z-value of polygon vertices is very little.  Maybe bug in the
+    clipper.  (mrsigma@surrey.quik.com)
 DIFFICULTY: Jorrit: solved more or less by reducing SMALL_Z from 0.1 to 0.01.
-This will not avoid the problem completely but the chance of it occuring
-will be very small now.
+    This will not avoid the problem completely but the chance of it occuring
+    will be very small now.
 
-PROBLEM: Turn on 'freelook' and look around in mirror.zip. After some time
-CS will crash while trying to draw a polygon.
+PROBLEM: Turn on 'freelook' and look around in mirror.zip.  After some time CS
+    will crash while trying to draw a polygon.
 SOLUTION: No idea?
-DIFFICULTY: moderate?
+DIFFICULTY: Moderate?
 
-PROBLEM: Bots are unstable. Cause crashes often because of faulty
-collision detection.
-SOLUTION: probably rewrite them using CD system. However bug may be indicative
-of something internal which is wrong in CS since in principle the ad hoc
-CD method should work.
-DIFFICULTY: moderate
+PROBLEM: Bots are unstable.  Cause crashes often because of faulty collision
+    detection.
+SOLUTION: probably rewrite them using CD system.  However bug may be
+    indicative of something internal which is wrong in CS since in principle
+    the ad hoc CD method should work.
+DIFFICULTY: Moderate.
 
 PROBLEM: The missile sometimes gets stuck in the wall.
-SOLUTION: This is also due to broken collision detection which should
-be rewritten using the real CD system.
-DIFFICULTY: moderate
+SOLUTION: This is also due to broken collision detection which should be
+    rewritten using the real CD system.
+DIFFICULTY: Moderate.
 
 PROBLEM: Lightmapping of curves is still a bit wrong.
-SOLUTION: further investigation is needed.
-DIFFICULTY: moderate
+SOLUTION: Further investigation is needed.
+DIFFICULTY: Moderate.
 
 PROBLEM: Glide doesn't support 2D text yet.
 SOLUTION: It is coming.
-DIFFICULTY: moderate
+DIFFICULTY: Moderate.
 
-PROBLEM: Unlighted texture mapper distorts textures when looking
-in a strange direction to them.
+PROBLEM: Unlighted texture mapper distorts textures when looking in a strange
+    direction to them.
 SOLUTION: Further investigation is needed.
-DIFFICULTY: moderate
+DIFFICULTY: Moderate
 
-PROBLEM: Lightmaps on OpenGL in Win32 look very rough. There are no
-smooth transitions from level to level. - RivaTNT, Detonator drivers.
-(thieber@gmx.net)
+PROBLEM: Lightmaps on OpenGL in Win32 look very rough.  There are no smooth
+    transitions from level to level.  - RivaTNT, Detonator drivers.
+    (thieber@gmx.net)
 SOLUTION: Investigation?
-DIFFICULTY: moderate?
+DIFFICULTY: Moderate?
 
 PROBLEM: Lightmapping in Glide is still broken.
-SOLUTION: Don't know (someone who manages Glide port just have to look,
-since OpenGL and DirectX have correct mapping)
+SOLUTION: Don't know (someone who manages Glide port just have to look, since
+    OpenGL and DirectX have correct mapping)
 DIFFICULTY: Moderate?
 
 PROBLEM: No halos in 8-bit and 32-bit display mode.
-SOLUTION: 32-bit display mode is easy. It just
-needs to be done. 8-bit is another matter.
-DIFFICULTY: easy to moderate
+SOLUTION: 32-bit display mode is easy.  It just needs to be done.  8-bit is
+    another matter.
+DIFFICULTY: Easy to moderate.
 
 PROBLEM: Semi-transparent textures (textures in which one color is completely
-transparent and the rest is opaque) only work correctly in 16-bit color. In
-32-bit color there is no transparancy and in 8-bit color there is only
-transparency in some cases.
+    transparent and the rest is opaque) only work correctly in 16-bit color.
+    In 32-bit color there is no transparancy and in 8-bit color there is only
+    transparency in some cases.
 SOLUTION: For the 8-bit problem I suspect there is a problem in the texture
-cache here (maybe the difference between 'white light only' and 'general color').
-32-bit transparancy needs to be investigated.
-DIFFICULTY: easy
+    cache here (maybe the difference between 'white light only' and 'general
+    color').  32-bit transparancy needs to be investigated.
+DIFFICULTY: Easy.
 
 PROBLEM: MazeD only works in windowed mode (on Windows).
 SOLUTION: Rewrite buggy getpage() method in Windows renderer.
-DIFFICULTY: easy
+DIFFICULTY: Easy
 
-PROBLEM: Lighting still has a bug that it sometimes rejects polygons
-which are affected by the light but it thinks they are not.
-SOLUTION: just need a better test.
-DIFFICULTY: easy
+PROBLEM: Lighting still has a bug that it sometimes rejects polygons which are
+    affected by the light but it thinks they are not.
+SOLUTION: Just need a better test.
+DIFFICULTY: Easy.
 
 PROBLEM: Enabling texel filtering causes incorrect selection of scanline
-drawers depending on mipmap level. This causes things to disappear
-when they are close.
-SOLUTION: just have a look.
-DIFFICULTY: probably easy
+    drawers depending on mipmap level.  This causes things to disappear when
+    they are close.
+SOLUTION: Just have a look.
+DIFFICULTY: Probably easy.
+
+PROBLEM: Mirrored surfaces display incorrect colors in RGBA 32-bit mode on
+    big-endian hardware.  The code is almost certainly using hardcoded shift
+    amounts when composing and decomposing colors which only work for ARGB or
+    ABGR.
+SOLUTION: Allow the shift amounts to be specified on a platform by platform
+    basis in osdefs.h.
+DIFFICULTY: Easy (hopefully).
+
+PROBLEM: Sprites display incorrect colors in RGBA 32-bit mode on little- and
+    big-endian hardware.  On little-endian hardware, a sprite lit by red light
+    appears blue.  On big-endian hardware, a sprite lit by red light appears
+    green.  The code is almost certainly using hardcoded shift amounts when
+    composing and decomposing colors which only work for ARGB and ABGR.
+SOLUTION: Allow the shift amounts to be specified on a platform by platform
+    basis in osdefs.h.
+DIFFICULTY: Easy (hopefully).
+
+PROBLEM: Semi-translucent sprites display bizarre color anomalies in RGBA
+    32-bit mode on big-endian hardware.  It is suspected that hardcoded shift
+    amounts may be the cause of the problem, or even accidental sign-extension
+    when color masks are shifted to the right.
+SOLUTION: Unknown.
+DIFFICULTY: Unknown.
