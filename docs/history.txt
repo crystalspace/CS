@@ -10,6 +10,7 @@ The history order has been reversed so that new features are at the top.
 	  traversed now. Slower, but looks great. More array bound
 	  errors, though. Perhaps the frustum code is buggy.
 	  Radiosity can also handle portals without lightmaps now.
+	- More debugging on octree/PVS stuff...
 22-May-2000
 	- Added csPoly2D::GetSignedArea() and csPoly3D::GetSignedArea()
 	  to calculate the signed area of a polygon.

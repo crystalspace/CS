@@ -29,6 +29,7 @@
 #include "csengine/cbuffer.h"
 #include "csengine/polygon.h"
 #include "csengine/thing.h"
+#include "csengine/dumper.h"
 #include "isystem.h"
 #include "ivfs.h"
 
@@ -1619,6 +1620,9 @@ void csOctree::BuildPVS (csThing* thing,
 
 void csOctree::BuildPVS (csThing* thing)
 {
+//@@@###
+Dumper::dump (this);
+
   // First setup a dummy PVS which will cause all the nodes in the
   // world to be added as visible to every other node.
   SetupDummyPVS ();
@@ -1677,14 +1681,26 @@ void csOctree::BuildPVS (csThing* thing)
 
 void node_pvs_func (csOctreeNode* node, csFrustumView* lview)
 {
+//@@@###
+CsPrintf (MSG_DEBUG_0, "  node_pvs_func %f,%f,%f %f,%f,%f\n",
+node->GetBox ().MinX (), node->GetBox ().MinY (), node->GetBox ().MinZ (),
+node->GetBox ().MaxX (), node->GetBox ().MaxY (), node->GetBox ().MaxZ ());
   csOctreeNode* leaf = (csOctreeNode*)(lview->userdata);
   csPVS& pvs = leaf->GetPVS ();
   csOctreeVisible* ovis = pvs.FindNode (node);
   ovis->MarkReallyVisible ();
 }
 
-void poly_pvs_func (csObject*, csFrustumView*)
+void poly_pvs_func (csObject* obj, csFrustumView*)
 {
+//@@@###
+csPolygon3D* p = (csPolygon3D*)obj;
+CsPrintf (MSG_DEBUG_0, "  poly_pvs_func %s\n",
+p->GetName ());
+int i;
+for (i = 0 ; i < p->GetNumVertices () ; i++)
+CsPrintf (MSG_DEBUG_0, "    %d: %f,%f,%f\n", i, p->Vwor (i).x,
+p->Vwor (i).y, p->Vwor (i).z);
 }
 
 void curve_pvs_func (csObject*, csFrustumView*)
@@ -1697,6 +1713,10 @@ void csOctree::BuildQADPVS (csOctreeNode* node)
 
   if (node->IsLeaf ())
   {
+//@@@###
+CsPrintf (MSG_DEBUG_0, "BuildQADPVS for leaf %f,%f,%f %f,%f,%f\n",
+node->GetBox ().MinX (), node->GetBox ().MinY (), node->GetBox ().MinZ (),
+node->GetBox ().MaxX (), node->GetBox ().MaxY (), node->GetBox ().MaxZ ());
     // We have a leaf, here we start our QAD pvs building.
     csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
     csCovcube* cc = csWorld::current_world->GetCovcube ();
@@ -1726,6 +1746,8 @@ void csOctree::BuildQADPVS (csOctreeNode* node)
       ovis = pvs.GetNext (ovis);
     }
     total_total_cull_node += total_cull_node;
+//@@@###
+CsPrintf (MSG_DEBUG_0, "count_leaves=%d total_cull_node=%d\n", count_leaves, total_cull_node);
     if (total_cull_node)
       printf (" %d:-%d ", count_leaves, total_cull_node);
     else
