@@ -1,5 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+20-Jun-2002
+	- Considerably optimized AppendWriteQueue() in Dynavis. Profiling
+	  showed that this is now the function that does most work.
+	  The optimization I did makes this function a LOT faster but
+	  less accurate meaning that the benefit of the write queue
+	  will be less. In future we need to use the OBB instead of the
+	  AABB to transform to camera space. That will improve accuracy
+	  again without much additional performance cost.
+	- Added csOBB class to csgeom. This is a subclass of csBox3
+	  representing an oriented bounding box (OBB). Thanks to Daniel
+	  Duhprey for making this.
 19-Jun-2002
 	- Clarified an API comment to indicate that the OFTEN moving
 	  option for things doesn't work yet.

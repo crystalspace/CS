@@ -1542,74 +1542,19 @@ iString* csTiledCoverageBuffer::Debug_UnitTest ()
   //csCoverageTile* t;
   iString* s;
 
-  //Initialize ();
-  //COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
-  //poly[0].Set (50, 50);
-  //poly[1].Set (600, 50);
-  //poly[2].Set (600, 430);
-  //poly[3].Set (50, 430);
-  //InsertPolygon (poly, 4, 10.0);
-  //COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
-  //COV_ASSERT (TestPoint (csVector2 (100, 100), 15) == false, "tp");
-  //COV_ASSERT (TestPoint (csVector2 (599, 100), 5) == true, "tp");
-  //COV_ASSERT (TestPoint (csVector2 (599, 100), 15) == false, "tp");
-  //COV_ASSERT (TestPoint (csVector2 (601, 100), 5) == true, "tp");
-  //COV_ASSERT (TestPoint (csVector2 (601, 100), 15) == true, "tp");
-
   Initialize ();
-  poly[0].Set (194, 315);
-  poly[1].Set (358, 203);
-  poly[2].Set (443, 376);
-  InsertPolygon (poly, 3, 10.0);
-s=Debug_Dump ();
-printf ("%s\n", s->GetData ());
-s->DecRef ();
-    COV_ASSERT (TestPoint (csVector2 (194-5, 315), 15) == true, "tp");
-
-
-
-  int i;
-  for (i = 0 ; i < 10000 ; i++)
-  {
-    Initialize ();
-    float x1 = rnd (640, 10, 330);
-    float y1 = rnd (480, 1, 1);
-    float x2 = rnd (640, 330, 10);
-    float y2 = rnd (480, 1, 230);
-    float x3 = rnd (640, 330, 10);
-    float y3 = rnd (480, 250, 1);
-    float cx = (x1+x2+x3)/3.0;
-    float cy = (y1+y2+y3)/3.0;
-    poly[0].Set (x1, y1);
-    poly[1].Set (x2, y2);
-    poly[2].Set (x3, y3);
-    InsertPolygon (poly, 3, 10.0);
-printf ("%g,%g  %g,%g  %g,%g  (%g,%g)\n", x1, y1, x2, y2, x3, y3, cx, cy); fflush (stdout);
-s=Debug_Dump ();
-printf ("%s\n", s->GetData ());
-s->DecRef ();
-    COV_ASSERT (TestPoint (csVector2 (x1-5, y1), 15) == true, "tp");
-    COV_ASSERT (TestPoint (csVector2 (x2+5, y2), 15) == true, "tp");
-    COV_ASSERT (TestPoint (csVector2 (x3+5, y3), 15) == true, "tp");
-    COV_ASSERT (TestPoint (csVector2 (cx, cy), 5) == true, "tp");
-    COV_ASSERT (TestPoint (csVector2 (cx, cy), 15) == false, "tp");
-  }
-
-  //Initialize ();
-  //poly[0].Set (50, 50);
-  //poly[1].Set (600, 400);
-  //poly[2].Set (600, 430);
-  //poly[3].Set (50, 70);
-  //InsertPolygon (poly, 4, 10.0);
-//
-//s = Debug_Dump ();
-//printf ("%s\n", s->GetData ());
-//s->DecRef ();
-
-  //Initialize ();
-  //DrawLine (-10, 10, -40, 40, 0);
-  //t = GetTile (0, 0); t->FlushOperations ();
-  //s = t->Debug_Dump_Cache (); printf ("%s\n", s->GetData ()); s->DecRef ();
+  COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
+  poly[0].Set (50, 50);
+  poly[1].Set (600, 50);
+  poly[2].Set (600, 430);
+  poly[3].Set (50, 430);
+  InsertPolygon (poly, 4, 10.0);
+  COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
+  COV_ASSERT (TestPoint (csVector2 (100, 100), 15) == false, "tp");
+  COV_ASSERT (TestPoint (csVector2 (599, 100), 5) == true, "tp");
+  COV_ASSERT (TestPoint (csVector2 (599, 100), 15) == false, "tp");
+  COV_ASSERT (TestPoint (csVector2 (601, 100), 5) == true, "tp");
+  COV_ASSERT (TestPoint (csVector2 (601, 100), 15) == true, "tp");
 
   rc->DecRef ();
   return NULL;

@@ -565,58 +565,33 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
   	csObjectModel* model, csVisibilityObjectWrapper* obj)
 {
-  iMovable* movable = visobj->GetMovable ();
-  iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetSmallerPolygonMesh ();
+  //@@@@ Use OBB instead of AABB to project to camera space!
+  // Much more accurate.
 
-  const csVector3* verts = polymesh->GetVertices ();
-  int vertex_count = polymesh->GetVertexCount ();
-
-  csReversibleTransform movtrans = movable->GetFullTransform ();
-  const csReversibleTransform& camtrans = camera->GetTransform ();
-  csReversibleTransform trans = camtrans / movtrans;
-  float fov = camera->GetFOV ();
-  float sx = camera->GetShiftX ();
-  float sy = camera->GetShiftY ();
-
-  int i;
-  // First calculate the bounding box of this occluder in 2D.
+  const csBox3& obj_bbox = obj->child->GetBBox ();
+  float min_depth, max_depth;
   csBox2 box;
-  box.StartBoundingBox ();
-  float max_depth = -1.0;
-  for (i = 0 ; i < vertex_count ; i++)
+  if (obj_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
+    	camera->GetShiftX (), camera->GetShiftY (), box,
+	min_depth, max_depth))
   {
-    csVector3 camv = trans.Other2This (verts[i]);
-    if (camv.z <= 0.0)
+    // Then append to queue if box is actually on screen.
+    if (box.MaxX () > 0 && box.MaxY () > 0 &&
+        box.MinX () < scr_width && box.MinY () < scr_height)
     {
-      // @@@ Later we should clamp instead of ignoring this outline.
-      return;
+      write_queue->Append (box, max_depth, obj);
+      if (do_state_dump)
+      {
+        iObject* iobj = SCF_QUERY_INTERFACE (visobj, iObject);
+        if (iobj)
+        {
+          printf ("AppendWriteQueue of object %s (max_depth=%g)\n",
+      	    iobj->GetName () ? iobj->GetName () : "<noname>",
+	    max_depth);
+          iobj->DecRef ();
+        }
+      }
     }
-    if (camv.z > max_depth) max_depth = camv.z;
-    //@@@@@@@@ If we have up-to-date outline information
-    // we could use that here to prevent perspective projection
-    // @@@@@@@ if (outline_info.outline_verts[i])
-    csVector2 tr_vert;
-    Perspective (camv, tr_vert, fov, sx, sy);
-    box.AddBoundingVertex (tr_vert);
-  }
-
-  if (do_state_dump)
-  {
-    iObject* iobj = SCF_QUERY_INTERFACE (visobj, iObject);
-    if (iobj)
-    {
-      printf ("AppendWriteQueue of object %s (max_depth=%g)\n",
-      	iobj->GetName () ? iobj->GetName () : "<noname>",
-	max_depth);
-      iobj->DecRef ();
-    }
-  }
-
-  // Then append to queue if box is actually on screen.
-  if (box.MaxX () > 0 && box.MaxY () > 0 &&
-      box.MinX () < scr_width && box.MinY () < scr_height)
-  {
-    write_queue->Append (box, max_depth, obj);
   }
 }
 

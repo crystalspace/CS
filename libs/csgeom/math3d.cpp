@@ -28,6 +28,7 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/segment.h"
 #include "csgeom/box.h"
+#include "csgeom/obb.h"
 #include "csgeom/pmtools.h"
 #include "igeom/polymesh.h"
 #include "csutil/scfstr.h"
@@ -981,6 +982,10 @@ iString* csGeomDebugHelper::UnitTest ()
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
 
+  //==========================================================================
+  // Tests for csIntersect3::BoxSegment.
+  //==========================================================================
+
   csSegment3 seg (csVector3 (0, 0, 0), csVector3 (0, 0, 100));
   csBox3 b (-10, -10, 50, 10, 10, 70);
   float r;
@@ -990,6 +995,10 @@ iString* csGeomDebugHelper::UnitTest ()
   GEO_ASSERT (isect.x == 0 && isect.y == 0 && ABS (isect.z-50.0) < .00001,
   	"BoxSegment");
   GEO_ASSERT (ABS (r-.5) < .00001, "BoxSegment");
+
+  //==========================================================================
+  // Tests for csPolygonMeshTools.
+  //==========================================================================
 
   UnitCubeMesh* mesh = new UnitCubeMesh ();
   int num_edges;
@@ -1124,6 +1133,25 @@ iString* csGeomDebugHelper::UnitTest ()
 
   delete[] edges;
   delete mesh;
+
+  //==========================================================================
+  // Tests for csOBB.
+  //==========================================================================
+
+  csVector3 vertex_table[4];
+  vertex_table[0].Set (10, 10, 10);
+  vertex_table[1].Set (0, 0, 2);
+  vertex_table[2].Set (1, 0, 3);
+  vertex_table[3].Set (2, 0, 0);
+  csOBB obb;
+  obb.FindOBB (vertex_table, 4);
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+  {
+    csVector3 v = obb.GetCorner (i);
+    printf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
+    fflush (stdout);
+  }
 
   rc->DecRef ();
   return NULL;

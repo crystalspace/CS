@@ -889,6 +889,11 @@ Daniel Fannar Gudbjartsson (@email{dfg@@decode.is})
 Daniel helped work on the physics engine and collision detection.
 
 @item
+Daniel Duhprey (@email{duhprey@@yahoo.com})
+
+Daniel made the csOBB class in Crystal Space (Oriented Bounding Box).
+
+@item
 Desmond Fletcher (@email{desmond.fletcher@@usm.edu})
 
 Desmond helped a bit on @file{map2cs} and updated its documentation.  He also
