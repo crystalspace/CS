@@ -131,11 +131,8 @@ void csSoundRenderSoftware::Close()
     Listener = NULL;
   }
 
-  for (long i=0;i<Sources.Length();i++) {
-    csSoundSourceSoftware *src=(csSoundSourceSoftware*)Sources.Get(i);
-    src->DecRef();
-  }
-  Sources.DeleteAll();
+  while (Sources.Length()>0)
+    ((iSoundSource*)Sources.Get(0))->Stop();
 }
 
 IMPLEMENT_SOUNDRENDER_CONVENIENCE_METHODS(csSoundRenderSoftware);
