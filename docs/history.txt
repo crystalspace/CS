@@ -42,6 +42,8 @@ The history order is reversed so that new features are at the top.
 	- Renamed PolyMeshHelper class in bezier mesh plugin so that it
 	  doesn't conflict with PolyMeshHelper in thing plugin when doing
 	  a static compile.
+	- Fixed a major bug in csThingStatic::Prepare() which caused massive
+	  performance degradation. Now it should be better :-)
 9-Apr-2003
         - Rhad fixed OpenAL compile with compilers other than MSVC.
           - Changed FillMemory() to memset()

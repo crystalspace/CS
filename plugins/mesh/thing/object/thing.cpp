@@ -139,6 +139,7 @@ csThingStatic::~csThingStatic ()
 
 void csThingStatic::Prepare ()
 {
+  if (prepared) return;
   prepared = true;
 
   if (thing_type->engine)
