@@ -23,6 +23,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define CS_CSUTIL_LIB
+
 // added for Crystal Space to avoid a lot of compiler warnings
 #include "cssysdef.h"
 

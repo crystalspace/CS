@@ -18,6 +18,8 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+#define CS_CSUTIL_LIB
+
 #ifdef _LIBC
 /* We have to keep the namespace clean.  */
 #  define regfree(preg) __regfree (preg)
