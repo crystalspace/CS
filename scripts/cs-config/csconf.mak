@@ -16,7 +16,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 all: cs-config
 cs-config:
-	$(MAKE_TARGET) DO_CREATE_CSCONFIG=yes
+	$(MAKE_APP) DO_CREATE_CSCONFIG=yes
 cs-configclean:
 	$(MAKE_CLEAN)
 
