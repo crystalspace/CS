@@ -30,7 +30,7 @@
 #include "csengine/polytmap.h"
 #include "csengine/light.h"
 #include "csengine/camera.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/stats.h"
 #include "csengine/csppulse.h"
 #include "csengine/cbuffer.h"
@@ -70,20 +70,20 @@ IMPLEMENT_EMBEDDED_IBASE (csSector::eiSector)
   IMPLEMENTS_INTERFACE (iSector)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSector::csSector (csWorld* world) : csPolygonSet (world)
+csSector::csSector (csEngine* engine) : csPolygonSet (engine)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   beam_busy = 0;
   level_r = level_g = level_b = 0;
   static_tree = NULL;
   static_thing = NULL;
-  world->AddToCurrentRegion (this);
+  engine->AddToCurrentRegion (this);
 }
 
 csSector::~csSector ()
 {
   // Sprites, things, and collections are not deleted by the calls below. They
-  // belong to csWorld.
+  // belong to csEngine.
   things.DeleteAll ();
   skies.DeleteAll ();
   sprites.DeleteAll ();
@@ -124,7 +124,7 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
   delete static_tree; static_tree = NULL;
 
   if (static_thing) return;
-  static_thing = new csThing (world);
+  static_thing = new csThing (engine);
   static_thing->SetName ("__static__");
 
   // First copy the vector of things locally.
@@ -148,7 +148,7 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
   static_thing->GetMovable ().SetSector (this);
   static_thing->GetMovable ().UpdateMove ();
   static_thing->CreateBoundingBox ();
-  world->things.Push (static_thing);
+  engine->things.Push (static_thing);
 
   csBox3 bbox;
   static_thing->GetBoundingBox (bbox);
@@ -156,9 +156,9 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
 
   csString str ("vis/octree_");
   str += GetName ();
-  csWorld* w = world;
+  csEngine* w = engine;
   bool recalc_octree = true;
-  if (!csWorld::do_force_revis && w->VFS->Exists ((const char*)str))
+  if (!csEngine::do_force_revis && w->VFS->Exists ((const char*)str))
   {
     recalc_octree = false;
     CsPrintf (MSG_INITIALIZATION, "Loading bsp/octree...\n");
@@ -187,7 +187,7 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
   str = "vis/pvs_";
   str += GetName ();
   bool recalc_pvs = true;
-  if ((!csWorld::do_force_revis || csWorld::do_not_force_revis) &&
+  if ((!csEngine::do_force_revis || csEngine::do_not_force_revis) &&
   	w->VFS->Exists ((const char*)str))
   {
     recalc_pvs = false;
@@ -195,7 +195,7 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
     recalc_pvs = !((csOctree*)static_tree)->ReadFromCachePVS (
     	w->VFS, (const char*)str);;
   }
-  if (csWorld::do_not_force_revis) recalc_pvs = false;
+  if (csEngine::do_not_force_revis) recalc_pvs = false;
   if (recalc_pvs)
   {
 #   if 0
@@ -507,7 +507,7 @@ void* csSector::TestQueuePolygons (csSector* sector,
 {
   csRenderView* d = (csRenderView*)data;
   return sector->TestQueuePolygonArray (polygon, num, d, poly_queue,
-    d->world->IsPVS ());
+    d->engine->IsPVS ());
 }
 
 void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
@@ -515,7 +515,7 @@ void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
 {
   csPolygon3D* poly3d;
   csPolygon2D* poly2d;
-  csPoly2DPool* render_pool = rview->world->render_pol2d_pool;
+  csPoly2DPool* render_pool = rview->engine->render_pol2d_pool;
   while (queue->Pop (&poly3d, &poly2d))
   {
     poly3d->CamUpdate ();
@@ -560,7 +560,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   csRenderView* rview = (csRenderView*)data;
   static csPolygon2D persp;
   csVector3 array[7];
-  csWorld* w = rview->world;
+  csEngine* w = rview->engine;
 
   if (w->IsPVS ())
   {
@@ -839,7 +839,7 @@ void csSector::Draw (csRenderView& rview)
   }
   else if (HasFog ())
   {
-    if ((fogmethod = rview.world->fogmethod) == G3DFOGMETHOD_VERTEX)
+    if ((fogmethod = rview.engine->fogmethod) == G3DFOGMETHOD_VERTEX)
     {
       csFogInfo* fog_info = new csFogInfo ();
       fog_info->next = rview.fog_info;
@@ -879,7 +879,7 @@ void csSector::Draw (csRenderView& rview)
   // If the following flag is true the queues are actually used.
   bool use_object_queues = false;
 
-  int engine_mode = rview.world->GetEngineMode ();
+  int engine_mode = rview.engine->GetEngineMode ();
   if (engine_mode == CS_ENGINE_FRONT2BACK)
   {
     //-----
@@ -924,11 +924,11 @@ void csSector::Draw (csRenderView& rview)
 
       // Using the PVS, mark all sectors and polygons that are visible
       // from the current node.
-      if (rview.world->IsPVS ())
+      if (rview.engine->IsPVS ())
       {
         csOctree* otree = (csOctree*)static_tree;
-	if (rview.world->IsPVSFrozen ())
-	  otree->MarkVisibleFromPVS (rview.world->GetFrozenPosition ());
+	if (rview.engine->IsPVSFrozen ())
+	  otree->MarkVisibleFromPVS (rview.engine->GetFrozenPosition ());
 	else
 	  otree->MarkVisibleFromPVS (rview.GetOrigin ());
       }
@@ -1145,8 +1145,8 @@ void csSector::Draw (csRenderView& rview)
   // queue all halos in this sector to be drawn.
   if (!rview.callback)
     for (i = lights.Length () - 1; i >= 0; i--)
-      // Tell the world to try to add this light into the halo queue
-      rview.world->AddHalo ((csLight *)lights.Get (i));
+      // Tell the engine to try to add this light into the halo queue
+      rview.engine->AddHalo ((csLight *)lights.Get (i));
 
   // Handle the fog, if any
   if (fogmethod != G3DFOGMETHOD_NONE)
@@ -1214,7 +1214,7 @@ void* csSector::CheckFrustumPolygons (csSector*,
     else
     {
       //@@@ ONLY DO THIS WHEN QUADTREE IS USED!!!
-      //csWorld::current_world->GetQuadcube ()->InsertPolygon (poly, p->GetNumVertices ());
+      //csEngine::current_engine->GetQuadcube ()->InsertPolygon (poly, p->GetNumVertices ());
       lview->poly_func ((csObject*)p, lview);
     }
   }
@@ -1224,8 +1224,8 @@ void* csSector::CheckFrustumPolygons (csSector*,
 //@@@ Needs to be part of sector?
 void CompressShadowFrustums (csFrustumList* list)
 {
-  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
-  csCovcube* cc = csWorld::current_world->GetCovcube ();
+  csCBufferCube* cb = csEngine::current_engine->GetCBufCube ();
+  csCovcube* cc = csEngine::current_engine->GetCovcube ();
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
 
@@ -1268,8 +1268,8 @@ void* CheckFrustumPolygonsFB (csSector* sector,
   CheckFrustData* fdata = (CheckFrustData*)data;
   csFrustumView* lview = fdata->lview;
   csVector3& center = lview->light_frustum->GetOrigin ();
-  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
-  csCovcube* cc = csWorld::current_world->GetCovcube ();
+  csCBufferCube* cb = csEngine::current_engine->GetCBufCube ();
+  csCovcube* cc = csEngine::current_engine->GetCovcube ();
   bool cw = true;	// @@@ Mirror flag?
   int i, j;
   for (i = 0 ; i < num ; i++)
@@ -1415,8 +1415,8 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
     int i;
     for (i = 0 ; i < num_outline ; i++)
       outline[i] -= center;
-    csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
-    csCovcube* cc = csWorld::current_world->GetCovcube ();
+    csCBufferCube* cb = csEngine::current_engine->GetCBufCube ();
+    csCovcube* cc = csEngine::current_engine->GetCovcube ();
     if (cb)
     {
       if (!cb->TestPolygon (outline, num_outline))
@@ -1529,8 +1529,8 @@ csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
 
 void csSector::CheckFrustum (csFrustumView& lview)
 {
-  csCBufferCube* cb = world->GetCBufCube ();
-  csCovcube* cc = world->GetCovcube ();
+  csCBufferCube* cb = engine->GetCBufCube ();
+  csCovcube* cc = engine->GetCovcube ();
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   RealCheckFrustum (lview);

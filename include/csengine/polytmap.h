@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLYTMAP_H
-#define POLYTMAP_H
+#ifndef __CS_POLYTMAP_H__
+#define __CS_POLYTMAP_H__
 
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
@@ -137,4 +137,4 @@ public:
   CSOBJTYPE;
 };
 
-#endif /*POLYTMAP_H*/
+#endif // __CS_POLYTMAP_H__

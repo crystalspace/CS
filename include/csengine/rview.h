@@ -34,14 +34,14 @@ struct csFog;
 struct iGraphics3D;
 struct iGraphics2D;
 
-/// A callback function for csWorld::DrawFunc().
+/// A callback function for csEngine::DrawFunc().
 typedef void (csDrawFunc) (csRenderView* rview, int type, void* entity);
 
 /// A callback function for csLight::LightingFunc().
 typedef void (csLightingFunc) (csFrustumView* lview, int type, void* entity);
 
 /**
- * Flags for the callbacks called via csWorld::DrawFunc() or
+ * Flags for the callbacks called via csEngine::DrawFunc() or
  * csLight::LightingFunc().
  * (type csDrawFunc or csLightingFunc).
  */
@@ -96,8 +96,8 @@ public:
 class csRenderView : public csCamera
 {
 public:
-  /// A pointer to the world.
-  csWorld* world;
+  /// Engine handle.
+  csEngine* engine;
 
   /// The 2D polygon describing how everything drawn inside should be clipped.
   csClipper* view;

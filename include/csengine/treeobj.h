@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TREEOBJ_H
-#define TREEOBJ_H
+#ifndef __CS_TREEOBJ_H__
+#define __CS_TREEOBJ_H__
 
 #include "csutil/csvector.h"
 #include "csgeom/math3d.h"
@@ -392,5 +392,4 @@ public:
 	float z);
 };
 
-#endif /*TREEOBJ_H*/
-
+#endif // __CS_TREEOBJ_H__

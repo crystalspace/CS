@@ -21,7 +21,7 @@
 #include "csgeom/frustum.h"
 #include "csgeom/poly2d.h"
 #include "csengine/quadtree.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "isystem.h"
 
 

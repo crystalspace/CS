@@ -141,13 +141,13 @@ Dynamic gouraud shaded sky spheres.
 Curved surfaces.
 
 @item
-@sc{zip} archive format to pack the world file, the textures and all other
+@sc{zip} archive format to pack the map file, the textures and all other
 needed data files for one level inside one file. Crystal Space will also
 use the same @sc{zip} file to automatically add lightmap data. This will
 greatly speed up the start-up of Crystal Space.
 
 @item
-Powerful text-based world file format allows you to easily redefine the world.
+Powerful text-based map file format allows you to easily redefine the world.
 
 @item
 Libraries of commonly used objects and textures are supported.
@@ -166,7 +166,7 @@ Reading and writing @sc{zip} files as data files.
 
 @item
 Simple parser that you can use if @sc{ini} files are not enough. It is used
-by the engine to read world files.
+by the engine to read map files.
 
 @item
 Defining an interface for shared libraries (@file{.so} or @sc{.dll}).  This is

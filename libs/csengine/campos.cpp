@@ -18,14 +18,15 @@
 
 #include "cssysdef.h"
 #include "csengine/campos.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csgeom/matrix3.h"
 #include "csutil/util.h"
 
 IMPLEMENT_CSOBJTYPE (csCameraPosition,csObject);
 
 csCameraPosition::csCameraPosition (const char *iName, const char *iSector,
-  const csVector3 &iPosition, const csVector3 &iForward, const csVector3 &iUpward)
+  const csVector3 &iPosition, const csVector3 &iForward,
+  const csVector3 &iUpward)
 {
   SetName (iName);
   Sector = strnew (iSector);
@@ -49,9 +50,9 @@ void csCameraPosition::Set (const char *iSector, const csVector3 &iPosition,
   Upward = iUpward;
 }
 
-bool csCameraPosition::Load (csCamera &oCamera, csWorld *iWorld)
+bool csCameraPosition::Load (csCamera &oCamera, csEngine *e)
 {
-  csSector *room = (csSector *)iWorld->sectors.FindByName (Sector);
+  csSector *room = (csSector *)e->sectors.FindByName (Sector);
   if (!room) return false;
   oCamera.SetSector (room);
   oCamera.SetPosition (Position);

@@ -132,7 +132,7 @@ the src folder and drop them on the scfreg application.
 @item
 Choose an application to build.  I generally start with walktest.  Make it.
 @item
-Make sure the world file @file{flarge.zip} is in the data folder.
+Make sure the map file @file{flarge.zip} is in the data folder.
 @end enumerate
 
 @noindent

@@ -27,7 +27,7 @@
 #include "csengine/dumper.h"
 #include "csengine/camera.h"
 #include "csengine/octree.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/csview.h"
 #include "csengine/wirefrm.h"
 #include "csengine/cssprite.h"
@@ -644,7 +644,7 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   extern bool check_light;
   extern void select_object (csRenderView* rview, int type, void* entity);
   check_light = true;
-  view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (), select_object);
+  view->GetEngine ()->DrawFunc (view->GetCamera (), view->GetClipper (), select_object);
 }
 
 // right mouse button
@@ -763,9 +763,9 @@ csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVe
   }
 
   // @@@ This routine ignores 2D sprites for the moment.
-  for (spriteIndex = 0; spriteIndex < Sys->world->sprites.Length(); spriteIndex++)
+  for (spriteIndex = 0; spriteIndex < Sys->engine->sprites.Length(); spriteIndex++)
   {
-    csSprite* sp = (csSprite*)Sys->world->sprites[spriteIndex];
+    csSprite* sp = (csSprite*)Sys->engine->sprites[spriteIndex];
     if (sp->GetType () != csSprite3D::Type) continue;
     nextSprite = (csSprite3D*)sp;
 

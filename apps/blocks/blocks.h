@@ -29,7 +29,7 @@
 
 class csMaterialWrapper;
 class csSector;
-class csWorld;
+class csEngine;
 class csThing;
 class csDynLight;
 struct iTextureManager;
@@ -270,7 +270,7 @@ private:
   /// If true we are paused.
   bool pause;
 
-  // When true clear world and start a new game. Usually false,
+  // When true clear engine and start a new game. Usually false,
   // 'cause we are playing.
   bool initscreen;
 
@@ -302,7 +302,7 @@ private:
   KeyMapping key_zoomout;
 
 public:
-  csWorld* world;
+  csEngine* engine;
   iTextureManager* txtmgr;
   static int white, black, red;
 
@@ -319,7 +319,7 @@ public:
   bool IsServer;
 
   void InitTextures ();
-  void InitWorld ();
+  void InitEngine ();
   void InitGameRoom ();
   void InitDemoRoom ();
   void InitMainMenu ();

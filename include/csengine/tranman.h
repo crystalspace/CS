@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TRANMAN_H
-#define TRANMAN_H
+#ifndef __CS_TRANMAN_H__
+#define __CS_TRANMAN_H__
 
 #include "csutil/scf.h"
 #include "csgeom/math3d.h"
@@ -101,7 +101,7 @@ public:
   /// Destruct.
   virtual ~csTransformationManager ();
 
-  /// Initialize (useful when the world has been cleared).
+  /// Initialize (useful when the engine has been cleared).
   void Initialize ();
 
   /**
@@ -226,4 +226,4 @@ public:
   	const csVector3& trans);
 };
 
-#endif /*TRANMAN_H*/
+#endif // __CS_TRANMAN_H__

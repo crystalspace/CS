@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CURVE_H
-#define CURVE_H
+#ifndef __CS_CURVE_H__
+#define __CS_CURVE_H__
 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
@@ -372,4 +372,4 @@ public:
   CSOBJTYPE;
 };
 
-#endif /*CURVE_H*/
+#endif // __CS_CURVE_H__

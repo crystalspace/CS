@@ -147,10 +147,16 @@ LFLAGS.DLL = $(NEXT.LFLAGS.DLL)
 NASMFLAGS.SYSTEM =
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS))) \
+SRC.SYS_CSSYS = \
   libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp
+# @@@ Disabled for testing if rest of system compiles.
+# @@@The NeXT-specific code does not compile currently.  Will fix later.
+#SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS))) \
+#  libs/cssys/general/findlib.cpp \
+#  libs/cssys/general/getopt.cpp \
+#  libs/cssys/general/printf.cpp
 
 # Where to put dynamic libraries on this system?
 OUTDLL = $(NEXT.PLUGIN_DIR)

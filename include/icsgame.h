@@ -42,10 +42,10 @@ SCF_VERSION (iPosition, 0, 1, 0);
 
 /**
  * A position in the Crystal Space world, coupled together with an orientation
- * You can create a position by using the CREATE_INSTANCE function or if you 
- * want to create a linked position (where one object follows an other like they
- * would be mechanically linked) by calling CreateLinkedPosition in an existing
- * objects. 
+ * You can create a position by using the CREATE_INSTANCE function or if you
+ * want to create a linked position (where one object follows an other like
+ * they would be mechanically linked) by calling CreateLinkedPosition in an
+ * existing objects.
  */
 struct iPosition : public iBase
 {
@@ -399,7 +399,8 @@ struct iEntityComponentIterator : public iBase
 
 #define FOREACH_ENTITYCOMPONENT(classname, var, entity) \
   classname* var = NULL; \
-  iEntityComponentIterator* iter## __LINE__ = entity->GetComponents(#classname); \
+  iEntityComponentIterator* iter## __LINE__ = \
+    entity->GetComponents(#classname); \
   for (var = (classname*) iter## __LINE__ ->GetFirst(); var; \
        var = (classname*) iter## __LINE__ ->GetNext()) 
 
@@ -431,7 +432,7 @@ struct iEntity : public iBase
    * - iEntityAttributes
    * - iPositition
    * - iEntityClassInformation
-   * - iEntityEventhandler (But you should use GetComponents instead for this!)
+   * - iEntityEventhandler (But you should use GetComponents instead of this!)
    */
   virtual void* GetFirstComponent(const char* ScfClassname, int Version) = 0;
 
@@ -815,17 +816,17 @@ struct iGameCore : public iBase
   virtual void RegisterSprite3DModel(iDataLoader* pLoader);
 
   /**
-   * Starts moving an entity to a new position and automatically stops the Entity
-   * at that position. Of course, if there occurs a collision on the way, the 
-   * object is stopped also, and the collision is being handled by the involved
-   * entities
+   * Starts moving an entity to a new position and automatically stops the
+ * Entity * at that position.  Of course, if there occurs a collision on the
+ * way, the * object is stopped also, and the collision is being handled by the
+ * involved * entities
    */
-  virtual void MoveEntityTo(iEntity* pEntity, csVector3 Destination, float speed);
+  virtual void MoveEntityTo(iEntity*, csVector3 Destination, float speed);
 
   /**
-   * Starts rotating an entity. The Rotation vector gives the amount of rotation
-   * per second, so by picing smaller numbers you get slower roation and by
-   * picking larger numbers you get faster rotation.
+   * Starts rotating an entity.  The Rotation vector gives the amount of
+ * rotation * per second, so by picing smaller numbers you get slower roation
+ * and by * picking larger numbers you get faster rotation.
    */
   virtual void RotateEntity(iEntity* pEntity, csVector3 Rotation);
 
@@ -921,4 +922,3 @@ struct iGameCore : public iBase
 };
 
 #endif // __ICSGAME_H__
-

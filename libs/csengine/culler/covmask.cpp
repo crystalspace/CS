@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csgeom/math2d.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/covmask.h"
 #include "igraph2d.h"
 
@@ -612,6 +612,3 @@ csCovMask csCovMaskLUT::GetMask (csVector2* verts, int num_verts,
   }
   return mask;
 }
-
-
-

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CSLOADER_H_
-#define _CSLOADER_H_
+#ifndef __CS_CSLOADER_H__
+#define __CS_CSLOADER_H__
 
 #include "csengine/polyset.h"
 #include "csparser/loadinfo.h"
@@ -40,7 +40,7 @@ class csPolyTxtPlane;
 class csCollection;
 class csStatLight;
 class csThing;
-class csWorld;
+class csEngine;
 class csCurveTemplate;
 class csSoundDataObject;
 class csSpriteTemplate;
@@ -63,7 +63,7 @@ class csFrame;
 #define CS_LOADER_NOTRANSFORM	0x00000004
 
 /**
- * The loader for Crystal Space worlds.
+ * The loader for Crystal Space maps.
  */
 class csLoader
 {
@@ -104,7 +104,7 @@ class csLoader
   /// Load a sixface (i.e. box) definition (obsolete, should not be used)
   static csThing* load_sixface (char* name, char* buf, csSector* sec);
   /// Parse the definition for a thing and create a thing object
-  static csThing* load_thing (char* name, char* buf, csSector* sec, bool is_sky);
+  static csThing* load_thing (char* name, char* buf, csSector*, bool is_sky);
   /// Parse a 3D polygon definition and return a new object
   static csPolygon3D* load_poly3d (char* polyname, char* buf,
     csMaterialWrapper* default_material, float default_texlen,
@@ -135,18 +135,18 @@ class csLoader
   static csSector* load_sector (char* secname, char* buf);
 
   /// Load a skeleton part.
-  static bool LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection);
+  static bool LoadSkeleton (csSkeletonLimb*, char* buf, bool is_connection);
 
-  /// Load the sprite template from the world file.
+  /// Load the sprite template from the map file.
   static bool LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf);
 
   /**
-   * Load the sprite from the world file.
+   * Load the sprite from the map file.
    */
   static bool LoadSprite (csSprite3D* spr, char* buf);
 
   /**
-   * Load the 2D sprite from the world file.
+   * Load the 2D sprite from the map file.
    */
   static bool LoadSprite (csSprite2D* spr, char* buf);
 
@@ -157,13 +157,13 @@ class csLoader
   static bool LoadSounds (char* buf);
 
   /**
-   * Load all the texture descriptions from the world file
+   * Load all the texture descriptions from the map file
    * (no actual images). 
    */
   static bool LoadTextures (char* buf);
 
   /**
-   * Load all the material descriptions from the world file
+   * Load all the material descriptions from the map file
    * (no actual images).If a prefix is given, all material names will be
    * prefixed with the corresponding string.
    */
@@ -172,7 +172,7 @@ class csLoader
   /**
    * Loads a skeletal motion from a file
    */
-  static iMotion* LoadMotion (csWorld* world, const char* fname);
+  static iMotion* LoadMotion (csEngine*, const char* fname);
 
   /**
    * Loads a skeletal motion from an existing stream
@@ -180,14 +180,14 @@ class csLoader
   static bool LoadMotion (iMotion* mot, char* buf);
 
   /**
-   * Load a library into given world.<p>
-   * A library is just a world file that contains just sprite templates,
+   * Load a library into given engine.<p>
+   * A library is just a map file that contains just sprite templates,
    * thing templates, sounds and textures.
    */
   static bool LoadLibrary (char* buf);
 
-  /// Load world from a memory buffer
-  static bool LoadWorld (char* buf, bool onlyRegion);
+  /// Load map from a memory buffer
+  static bool LoadMap (char* buf, bool onlyRegion);
 
   /**
    * Get a sprite template frame from a frame number
@@ -208,35 +208,34 @@ class csLoader
   static void OptimizePolygon (csPolygon3D *p);
 
 public:
-  /// Load file into a world.
-  static bool LoadWorldFile (csWorld* world, const char* filename);
+  /// Load map file into engine.
+  static bool LoadMapFile (csEngine*, const char* filename);
 
   /**
-   * Append file into a world (i.e. don't clear the current world
+   * Merge map file into engine (i.e. don't clear the current engine
    * contents first). If 'onlyRegion' is true then portals will only
    * connect to the sectors in the current region, things will only use
    * thing templates defined in the current region and sprites will
    * only use sprite templates defined in the current region.
    */
-  static bool AppendWorldFile (csWorld* world, const char* filename,
+  static bool AppendMapFile (csEngine*, const char* filename,
   	bool onlyRegion = true);
 
   /// Load library from a VFS file
-  static bool LoadLibraryFile (csWorld* world, const char* filename);
+  static bool LoadLibraryFile (csEngine*, const char* filename);
 
   /**
-   * Load a texture and add it to the world.
+   * Load a texture and add it to the engine.
    * The texture will be registered for 3d use only.
    * A corresponding material with the same name will be added too.
    */
-  static csTextureWrapper* LoadTexture (csWorld* world, const char* name,
+  static csTextureWrapper* LoadTexture (csEngine*, const char* name,
     const char* fname);
 
   /**
    * Load a sprite template from a file.
    */
-  static csSpriteTemplate* LoadSpriteTemplate (csWorld* world, const
-  	char* fname);
+  static csSpriteTemplate* LoadSpriteTemplate (csEngine*, const char* fname);
 
   /// Load a image and return an iImage object
   static iImage* LoadImage (const char* name)
@@ -245,12 +244,12 @@ public:
   /// Load a sound and return an iSoundData object
   static iSoundData *LoadSoundData (const char *filename);
 
-  /// Load a sound and add it to the world
-  static csSoundDataObject *LoadSoundObject (csWorld* world, char* name,
+  /// Load a sound and add it to the engine
+  static csSoundDataObject *LoadSoundObject (csEngine*, char* name,
     const char* fname);
 
   /// Set loader mode (see CS_LOADER_XXX flags above)
   static void SetMode (int iFlags);
 };
 
-#endif
+#endif // __CS_CSLOADER_H__

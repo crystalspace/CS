@@ -20,16 +20,16 @@
 #include "cssysdef.h"
 #include "csgeom/polyclip.h"
 #include "csengine/csview.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/pol2d.h"
 #include "csengine/camera.h"
 #include "igraph3d.h"
 #include "qint.h"
 
-csView::csView (csWorld *iWorld, iGraphics3D* ig3d)
+csView::csView (csEngine *e, iGraphics3D* ig3d)
 {
   bview = NULL;
-  world = iWorld;
+  engine = e;
   (G3D = ig3d)->IncRef ();
 
   pview = new csPolygon2D ();
@@ -151,8 +151,8 @@ void csView::Draw ()
   G3D->SetPerspectiveCenter ( (int)camera->GetShiftX (), 
 			      (int)camera->GetShiftY () );
 
-  world->SetContext (G3D);
-  world->Draw (camera, clipper);
+  engine->SetContext (G3D);
+  engine->Draw (camera, clipper);
 }
 
 void csView::UpdateClipper ()

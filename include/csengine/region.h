@@ -22,7 +22,7 @@
 #include "csobject/csobject.h"
 #include "iregion.h"
 
-class csWorld;
+class csEngine;
 
 /**
  * A region. A region is basically a collection of objects in the
@@ -33,13 +33,13 @@ class csRegion : public csObjectNoDel, public iRegion
   friend class Dumper;
 
 private:
-  csWorld* world;
+  csEngine* engine;
 
 public:
   /**
    * Initialize an empty region.
    */
-  csRegion (csWorld* world);
+  csRegion (csEngine*);
 
   /**
    * Delete the region without deleting the entities in it. The entities

@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/polyaa.h"
 #include "csengine/radiosty.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/sector.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
@@ -152,8 +152,8 @@ void csRadElement::GetSummedDelta(int suv, int w, int h, csColor& sum)
 }
 
 
-void csRadElement::AddDelta(csRadElement *src, int suv, int ruv, float fraction,
-                            const csColor& filtercolor)
+void csRadElement::AddDelta(csRadElement *src, int suv, int ruv,
+			    float fraction, const csColor& filtercolor)
 {
   deltamap->GetRed()[ruv] +=
     (fraction * src->deltamap->GetRed()[suv] * filtercolor.red);
@@ -427,7 +427,7 @@ void csRadPoly::CalcLumel2World(csVector3& res, int x, int y)
 
   // see polytext.cpp for more info.
   int ww=0, hh=0;
-  polygon->GetMaterialHandle ()->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  polygon->GetMaterialHandle()->GetTexture()->GetMipMapDimensions(0, ww, hh);
   float invww = 1. / (float)ww;
   float invhh = 1. / (float)hh;
 
@@ -803,25 +803,25 @@ float csRadiosity::stop_improvement = 10000.0;
 int   csRadiosity::stop_iterations = 1000;
 int   csRadiosity::source_patch_size = 2;
 
-csRadiosity :: csRadiosity(csWorld *current_world)
+csRadiosity :: csRadiosity(csEngine *current_engine)
 {
   CsPrintf (MSG_INITIALIZATION, "\nPreparing radiosity...\n");
   iterations = 0;
-  world = current_world;
-  meter = new csProgressMeter(world->System, 1000);
+  engine = current_engine;
+  meter = new csProgressMeter(engine->System, 1000);
   meter->SetGranularity(1);
-  pulse = new csProgressPulse();
+  pulse = new csProgressPulse(engine->System);
   // copy data needed, create list and all radpolys
   list = new csRadList();
 
   // fill list with polygons
-  csPolyIt poly_it(world);
+  csPolyIt poly_it(engine);
 
   csPolygon3D* poly;
   while ( (poly = poly_it.Fetch()) != NULL)
   {
     if( (poly->GetUnsplitPolygon() == NULL) && // only for original polygons 
-                               // in the list, not the split children also in list.
+	   // in the list, not the split children also in list.
          poly->GetLightMapInfo() && // only for lightmapped polys
          poly->GetLightMapInfo()->GetPolyTex()->GetCSLightMap())
     {
@@ -830,7 +830,7 @@ csRadiosity :: csRadiosity(csWorld *current_world)
   }
 
   // fill list with curves
-  csCurveIt curve_it(world);
+  csCurveIt curve_it(engine);
   csCurve* curve;
   while ( (curve = curve_it.Fetch()) != NULL)
   {
@@ -1143,7 +1143,8 @@ void csRadiosity :: StartFrustum()
 
 static void frustum_curve_report_func (csObject *obj, csFrustumView* lview)
 { 
-  csRadElement *dest = csRadElement::GetRadElement(*(csCurve*)obj); // obtain RadCurve
+  // obtain RadCurve
+  csRadElement *dest = csRadElement::GetRadElement(*(csCurve*)obj);
 
   if(dest)
   {
@@ -1157,8 +1158,9 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
 {
   // radiosity works with the base, unsplit polygon.
   csPolygon3D *destpoly3d = ((csPolygon3D*)obj)->GetBasePolygon();
-  csRadElement *dest = csRadElement::GetRadElement(*destpoly3d); // obtain radpoly
-  // if polygon not lightmapped / radiosity rendered, it can still be a portal.
+  // obtain radpoly
+  csRadElement *dest = csRadElement::GetRadElement(*destpoly3d);
+  // if polygon not lightmapped/radiosity rendered, it can still be a portal.
 
   // check poly -- on right side of us?
   const csPlane3& wplane = destpoly3d->GetPlane ()->GetWorldPlane ();
@@ -1223,7 +1225,7 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
       poly[j] = destpoly3d->Vwor (j) - center;
  
   delete new_lview.light_frustum;
-  new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vertices);
+  new_lview.light_frustum = lview->light_frustum->Intersect(poly,num_vertices);
   if (!new_lview.light_frustum) return;
 
   po->CheckFrustum (new_lview, destpoly3d->GetAlpha ());
@@ -1274,7 +1276,8 @@ bool csRadiosity :: PrepareShootDest(csRadElement *dest, csFrustumView *lview)
   // smoother, i.e. compute the normal for the location again.
   // The Normal must have length 1, in order to work here.
 
-  // @@@: this will be calculated elsewhere dest_normal = - shoot_dest->GetNormal();
+  // @@@: this will be calculated elsewhere:
+  // dest_normal = - shoot_dest->GetNormal();
 
   // use filter colour from lview
   trajectory_color.Set(lview->r, lview->g, lview->b);
@@ -1295,7 +1298,8 @@ void csRadiosity :: ShootRadiosityToElement(csRadElement* dest)
 #if 1
   csRadPoly* rp_src = (csRadPoly*)shoot_src;
   csRadPoly* rp_dest = (csRadPoly*)dest;
-  CsPrintf(MSG_STDOUT, "Shooting from RadPoly %x (%s in %s sz %d) to %x (%s in %s sz %d).\n",
+  CsPrintf(MSG_STDOUT,
+        "Shooting from RadPoly %x (%s in %s sz %d) to %x (%s in %s sz %d).\n",
   	(int)shoot_src, rp_src->GetPolygon3D()->GetName(), 
 	rp_src->GetSector()->GetName(), 
 	shoot_src->GetSize(), 
@@ -1498,8 +1502,8 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   csVector3 viewdir = dest_normal;
 
-  csVector3 reflectdir = (2.0f * dest_normal * (cosdestangle) - path) * 
-    dest_normal;
+  csVector3 reflectdir =
+    (2.0f * dest_normal * (cosdestangle) - path) * dest_normal;
  
   double val = ( reflectdir * viewdir );
   
@@ -1522,7 +1526,8 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 #endif
 
   // add delta using both gloss and totalfactor
-  //shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss*totalfactor, src_lumel_color);
+  //shoot_dest->AddDelta(shoot_src, src_uv, ruv, gloss*totalfactor,
+  //  src_lumel_color);
 
   gloss *= source_patch_area * visibility / sqdistance;
   // add gloss seperately -- too much light this way
@@ -1553,7 +1558,8 @@ static void calc_ambient_func(csRadElement *p)
 
 #if 0
   CsPrintf(MSG_STDOUT, "added %x (%g) delta %g, %g, %g.\n",
-   (int)p, p->GetPriority(), red/ p->GetSize(), green/ p->GetSize(), blue/ p->GetSize());
+   (int)p, p->GetPriority(),
+   red/ p->GetSize(), green/ p->GetSize(), blue/ p->GetSize());
 #endif
 
   total_delta_color_red += red * p->GetOneLumelArea() ;
@@ -1629,5 +1635,3 @@ void csRadiosity :: ApplyDeltaAndAmbient()
   /// add deltamaps
   list->Traverse(add_delta_func);
 }
-
-

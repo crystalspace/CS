@@ -20,7 +20,7 @@
 
 #include "cssysdef.h"
 #include "csengine/texture.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "iimage.h"
 #include "itxtmgr.h"
 
@@ -35,7 +35,7 @@ csTextureWrapper::csTextureWrapper (iImage* Image) :
   key_col_r = -1;
   if(image->HasKeycolor ())
     image->GetKeycolor( key_col_r, key_col_g, key_col_b );
-  csWorld::current_world->AddToCurrentRegion (this);
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csTextureWrapper::csTextureWrapper (csTextureWrapper &th) :
@@ -50,7 +50,7 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &th) :
   SetName (th.GetName ());
   if (handle)
     SetKeyColor (key_col_r, key_col_g, key_col_b);
-  csWorld::current_world->AddToCurrentRegion (this);
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
@@ -65,7 +65,7 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
     SetKeyColor ((int)r, (int)g, (int)b);
   }
   handle = ith;
-  csWorld::current_world->AddToCurrentRegion (this);
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csTextureWrapper::~csTextureWrapper ()

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TRANSFORM_H
-#define TRANSFORM_H
+#ifndef __CS_TRANSFORM_H__
+#define __CS_TRANSFORM_H__
 
 #include "csgeom/matrix3.h"
 #include "csgeom/plane3.h"
@@ -321,4 +321,4 @@ public:
   { m_t2o = m;  m_o2t = m_t2o.GetTranspose (); }
 };
 
-#endif /*TRANSFORM_H*/
+#endif // __CS_TRANSFORM_H__

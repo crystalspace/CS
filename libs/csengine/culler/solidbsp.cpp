@@ -20,7 +20,7 @@
 #include "qint.h"
 #include "csengine/solidbsp.h"
 #include "csengine/pol2d.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "igraph2d.h"
 #include "itxtmgr.h"
 
@@ -268,14 +268,21 @@ for (i = 0 ; i < ddd_level ; i++) ddd_spaces[i] = ' ';
 ddd_spaces[ddd_level] = 0;
 printf ("%s === InsertPolygon ===\n", ddd_spaces);
 for (i = 0 ; i < poly->GetNumEdges () ; i++)
-printf ("%s   %d (%f,%f)-(%f,%f)\n", ddd_spaces, i, (*poly)[i].Start ().x, (*poly)[i].Start ().y,
+printf ("%s   %d (%f,%f)-(%f,%f)\n",
+ddd_spaces, i, (*poly)[i].Start ().x, (*poly)[i].Start ().y,
 (*poly)[i].End ().x, (*poly)[i].End ().y);
-if (node->left) printf ("%s   children. Splitter=%f,%f,%f\n", ddd_spaces, node->splitter.A (),
+if (node->left)
+printf ("%s   children. Splitter=%f,%f,%f\n", ddd_spaces, node->splitter.A (),
 node->splitter.B (), node->splitter.C ());
 if (node->solid) printf ("%s   solid\n", ddd_spaces);
 }
-  if (node->solid) { if (ddd) printf ("%s   FALSE(1)\n", ddd_spaces); return false; }
-  if (poly->GetNumEdges () == 0) { if (ddd) printf ("%s   FALSE(2)\n", ddd_spaces); return false; }
+  if (node->solid) {
+    if (ddd) printf ("%s   FALSE(1)\n", ddd_spaces); return false;
+  }
+  if (poly->GetNumEdges () == 0)
+  {
+    if (ddd) printf ("%s   FALSE(2)\n", ddd_spaces); return false;
+  }
 
   if (node->left)
   {
@@ -347,11 +354,14 @@ if (ddd) printf ("%s   BRANCH: left solid\n", ddd_spaces);
       }
       else
       {
-if (ddd) printf ("%s   BRANCH: BEFORE LEFT left->insert right->insert\n", ddd_spaces);
+if (ddd)
+printf ("%s   BRANCH: BEFORE LEFT left->insert right->insert\n", ddd_spaces);
         rc1 = InsertPolygon (node->left, left_poly);
-if (ddd) printf ("%s   BRANCH: BEFORE RIGHT left->insert right->insert\n", ddd_spaces);
+if (ddd)
+printf ("%s   BRANCH: BEFORE RIGHT left->insert right->insert\n", ddd_spaces);
         rc2 = InsertPolygon (node->right, right_poly);
-if (ddd) printf ("%s   BRANCH: END left->insert right->insert\n", ddd_spaces);
+if (ddd)
+printf ("%s   BRANCH: END left->insert right->insert\n", ddd_spaces);
       }
     }
     else
@@ -639,7 +649,7 @@ bool csSolidBsp::InsertPolygon (csVector2* verts, int num_verts)
   csPoly2DEdges* poly = poly_pool.Alloc ();
   poly->SetNumEdges (0);
   debug_poly2d.SetNumVertices (0);
-  ddd = csWorld::ProcessLastPolygon ();
+  ddd = csEngine::ProcessLastPolygon ();
 if (ddd)
 {
 printf ("====================================\n");
@@ -730,8 +740,10 @@ void csSolidBsp::GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
   if (node->solid)
   {
     csVector2 v;
-    for (v.y = poly.GetBoundingBox ().Min ().y ; v.y < poly.GetBoundingBox ().Max ().y ; v.y += 4)
-      for (v.x = poly.GetBoundingBox ().Min ().x ; v.x < poly.GetBoundingBox ().Max ().x ; v.x += 4)
+    for (v.y = poly.GetBoundingBox ().Min ().y;
+         v.y < poly.GetBoundingBox ().Max ().y; v.y += 4)
+      for (v.x = poly.GetBoundingBox ().Min ().x;
+           v.x < poly.GetBoundingBox ().Max ().x ; v.x += 4)
         if (poly.In (v))
 	  ig2d->DrawPixel ((int)v.x, (int)(height-v.y), red);
   }
@@ -792,5 +804,3 @@ void csSolidBsp::GfxDump (iGraphics2D* ig2d, iTextureManager* itxtmgr,
   poly.AddVertex (0, 0);
   GfxDump (root, ig2d, depth, poly);
 }
-
-//---------------------------------------------------------------------------

@@ -5,13 +5,13 @@
 This section describes how to access game-specific data from the Crytal Space
 engine.
 
-@subsubheading Support in the Crystal Space ``world format''
+@subsubheading Support in the Crystal Space ``map format''
 
-To support game-specific data, the Crystal Space world format has been
-extended, thus allowing you to embed the required data directly in the world
+To support game-specific data, the Crystal Space map format has been
+extended, thus allowing you to embed the required data directly in the map
 file.
 
-You can add key / value pairs to the world file itself; both to @dfn{things}
+You can add key / value pairs to the map file itself; both to @dfn{things}
 and @dfn{sectors}.  To do this, just add @samp{KEY("@var{keyname}",
 "@var{keyvalue}")} to the appropriate sections.  You can use any number of
 keys.  Because not all game-specific information can be bound to actual
@@ -51,7 +51,7 @@ positions.)
 @subsubheading How Does Crystal Space Support Game-Specific Data?
 
 @samp{csLoader} generates an instance of @samp{csKeyValuePair} for every
-@dfn{key} found in the world file and attaches it to the appropriate Crystal
+@dfn{key} found in the map file and attaches it to the appropriate Crystal
 Space object by calling @code{ObjAdd()}.  Each nodes generates an instance of
 @samp{csMapNode}, and this is added to the sector with @code{ObjAdd()} as
 well.

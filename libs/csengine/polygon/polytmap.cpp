@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csengine/polytmap.h"
 #include "csengine/textrans.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csgeom/transfrm.h"
 
 //---------------------------------------------------------------------------
@@ -29,7 +29,7 @@ IMPLEMENT_CSOBJTYPE (csPolyTxtPlane,csObject);
 csPolyTxtPlane::csPolyTxtPlane () : csObject ()
 {
   ref_count = 1;
-  csWorld::current_world->AddToCurrentRegion (this);
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csPolyTxtPlane::~csPolyTxtPlane ()
@@ -176,5 +176,3 @@ void csPolyTxtPlane::HardTransform (
   m_obj2tex = m_world2tex;
   v_obj2tex = v_world2tex;
 }
-
-//---------------------------------------------------------------------------

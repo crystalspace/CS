@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __LIGHT_H__
-#define __LIGHT_H__
+#ifndef __CS_LIGHT_H__
+#define __CS_LIGHT_H__
 
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
@@ -47,7 +47,7 @@ class csHalo;
 
 /**
  * If this flag is set, the halo for this light is active and is in the 
- * world's queue of active halos. When halo become inactive, this flag
+ * engine's queue of active halos. When halo become inactive, this flag
  * is reset.
  */
 #define CS_LIGHT_ACTIVEHALO	0x80000000
@@ -597,4 +597,4 @@ public:
   CSOBJTYPE;
 };
 
-#endif // __LIGHT_H__
+#endif // __CS_LIGHT_H__

@@ -16,15 +16,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __PERFSTAT_H__
-#define __PERFSTAT_H__
+#ifndef __CS_PERFSTAT_H__
+#define __CS_PERFSTAT_H__
 
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "iperstat.h"
 
 struct iSystem;
-struct iWorld;
+struct iEngine;
 
 // For more complete comments see iperfstat.h For usage see walktest
 
@@ -74,12 +74,15 @@ protected:
   //------------------------------------------------------------------------
 
   iSystem *System;
-  iWorld *World;
+  iEngine *Engine;
   /// The name of the sub/section utilised within an output file
   char *name;
   /// The name of the file to be outputted
   char *file_name;
-  /// Multiple concurrent subsections of subsections have increasingly wide margins
+  /**
+   * Multiple concurrent subsections of subsections have increasingly wide
+   * margins
+   */
   char *margin;
   int indent;
   /// whether paused
@@ -98,7 +101,10 @@ protected:
 
   /// The sub/section from which stats are to be outputted to file
   csPerfStats *statlog_section;
-  /// Vector to hold summary information from all subsections and statlog_section
+  /**
+   * Vector to hold summary information from all subsections and
+   * statlog_section
+   */
   StatVector *statvec;
   /// The vector which records stats from every resolution number of frames
   FrameVector *framevec;
@@ -112,12 +118,12 @@ protected:
   float highest_fps;
   float mean_fps;
 
-  // not yet
-/*    int total_polygons_considered; */
-/*    int total_polygons_rejected; */
-/*    int total_polygons_accepted; */
-/*    int total_polygons_drawn; */
-/*    int total_portals_drawn; */
+  // Unimplemented.
+/*  int total_polygons_considered; */
+/*  int total_polygons_rejected; */
+/*  int total_polygons_accepted; */
+/*  int total_polygons_drawn; */
+/*  int total_portals_drawn; */
 
   cs_time frame_start;
   int frame_count;
@@ -160,9 +166,9 @@ protected:
   virtual float GetFPS ()
   { return frame->fps; }
   /**
-   * Start a new set of performance statistics as a subsection, with an optional
-   * name. If you intend to print all the stats to file then this name will
-   * identify the subsection.
+   * Start a new set of performance statistics as a subsection, with an
+   * optional name.  If you intend to print all the stats to file then this
+   * name will identify the subsection.
    */
   virtual iPerfStats *StartNewSubsection (const char *name);
   /// Finish the subsection. This will DecRef () the subsection.
@@ -172,19 +178,18 @@ protected:
   { return (sub_section != NULL); }
 
   /**
-   * Print this sections current summary stats, where sysflags is MSG_STDOUT etc 
-   * as defined in iSystem.h
+   * Print this sections current summary stats, where sysflags is MSG_STDOUT
+   * etc as defined in iSystem.h
    */
   virtual void PrintSectionStats (int sysflags);
   virtual void PrintSubsectionStats (int sysflags);
   /**
    * When ran with a debugger, this should cause it to break when starting this
-   * frame number, if compiled without CS_DEBUG it will have no effect. If you
+   * frame number, if compiled without CS_DEBUG it will have no effect.  If you
    * load this plugin last (like in walktest) then set frame_num to one less.
    */
   virtual void DebugSetBreak (int frame_num)
   { break_frame = frame_num; }
 };
 
-
-#endif // __PERFSTAT_H__
+#endif // __CS_PERFSTAT_H__

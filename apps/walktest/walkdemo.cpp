@@ -27,7 +27,7 @@
 #include "csengine/dumper.h"
 #include "csengine/camera.h"
 #include "csengine/octree.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/csview.h"
 #include "csengine/wirefrm.h"
 #include "csengine/cssprite.h"
@@ -83,7 +83,7 @@ extern void move_sprite (csSprite3D* sprite, csSector* where,
 void add_particles_rain (csSector* sector, char* matname, int num, float speed)
 {
   // First check if the material exists.
-  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -127,7 +127,7 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
     bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
 
     csRainParticleSystem* exp = new csRainParticleSystem (
-    	  Sys->view->GetWorld (), num,
+    	  Sys->view->GetEngine (), num,
   	  mat, CS_FX_ADD, false, .3/50., .3,
 	  bbox.Min (), bbox.Max (),
 	  csVector3 (0, -speed, 0));
@@ -143,7 +143,7 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
 void add_particles_snow (csSector* sector, char* matname, int num, float speed)
 {
   // First check if the material exists.
-  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -187,7 +187,7 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
     bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
 
     csSnowParticleSystem* exp = new csSnowParticleSystem (
-    	  Sys->view->GetWorld (), num,
+    	  Sys->view->GetEngine (), num,
   	  mat, CS_FX_ADD, false, .07, .07,
 	  bbox.Min (), bbox.Max (),
 	  csVector3 (0, -speed, 0), .2);
@@ -204,7 +204,7 @@ void add_particles_fire (csSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
   // First check if the material exists.
-  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -213,7 +213,7 @@ void add_particles_fire (csSector* sector, char* matname, int num,
   }
 
    csFireParticleSystem* exp = new csFireParticleSystem(
-     Sys->view->GetWorld (), num, mat,
+     Sys->view->GetEngine (), num, mat,
      CS_FX_ADD, false, 0.02, 0.04,
      3.0, csVector3(0,1.0,0), origin,
      0.6, 0.20);
@@ -228,7 +228,7 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
   // First check if the material exists.
-  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -237,7 +237,7 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
   }
 
   csFountainParticleSystem* exp = new csFountainParticleSystem(
-      Sys->view->GetWorld (), num, mat,
+      Sys->view->GetEngine (), num, mat,
       CS_FX_ADD, false, 0.1, 0.1,
       origin, csVector3(0, -1.0, 0), 5.0,
       3.0, 0.2,
@@ -255,7 +255,7 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
 void add_particles_explosion (csSector* sector, const csVector3& center, char* matname)
 {
   // First check if the material exists.
-  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -264,7 +264,7 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   }
 
   csParSysExplosion* exp = new csParSysExplosion (
-  	Sys->view->GetWorld (), 100,
+  	Sys->view->GetEngine (), 100,
   	center, csVector3 (0, 0, 0), mat, 6, 0.15, true, .6, 2., 2.);
   exp->GetMovable ().SetSector (sector);
   exp->SetSelfDestruct (3000);
@@ -274,7 +274,7 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   exp->SetFadeSprites (500);
   exp->SetColor( csColor(1,1,0) );
   exp->SetChangeColor( csColor(0,-1.0/3.2,0) );
-  exp->AddLight (Sys->world, sector, 1000);
+  exp->AddLight (Sys->engine, sector, 1000);
   exp->GetMovable ().UpdateMove ();
 }
 
@@ -284,7 +284,7 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
 void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matname)
 {
   // First check if the material exists.
-  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -293,7 +293,7 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
   }
 
   csSpiralParticleSystem* exp = new csSpiralParticleSystem (
-  	Sys->view->GetWorld (), 500,
+  	Sys->view->GetEngine (), 500,
   	bottom, mat);
   exp->GetMovable ().SetSector (sector);
   //exp->SetSelfDestruct (3000);
@@ -303,7 +303,7 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
   //exp->SetFadeSprites (500);
   exp->SetColor( csColor(1,1,0) );
   exp->SetChangeColor( csColor(+0.01,0.,-0.012) );
-  //exp->AddLight (Sys->world, sector, 1000);
+  //exp->AddLight (Sys->engine, sector, 1000);
   exp->GetMovable ().UpdateMove ();
 }
 
@@ -474,13 +474,13 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
   char skelname[50];
   sprintf (skelname, "__skeltree__%d,%d\n", depth, width);
   csSpriteTemplate* tmpl = (csSpriteTemplate*)
-  	Sys->view->GetWorld ()->sprite_templates.FindByName (skelname);
+  	Sys->view->GetEngine ()->sprite_templates.FindByName (skelname);
   if (!tmpl)
   {
     tmpl = new csSpriteTemplate ();
     tmpl->SetName (skelname);
-    Sys->world->sprite_templates.Push (tmpl);
-    tmpl->SetMaterial (Sys->world->GetMaterials ()->FindByName ("white"));
+    Sys->engine->sprite_templates.Push (tmpl);
+    tmpl->SetMaterial (Sys->engine->GetMaterials ()->FindByName ("white"));
     int vertex_idx = 0;
     csFrame* fr = tmpl->AddFrame ();
     fr->SetName ("f");
@@ -672,13 +672,13 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
   char skelname[50];
   sprintf (skelname, "__skelghost__\n");
   csSpriteTemplate* tmpl = (csSpriteTemplate*)
-  	Sys->view->GetWorld ()->sprite_templates.FindByName (skelname);
+  	Sys->view->GetEngine ()->sprite_templates.FindByName (skelname);
   if (!tmpl)
   {
     tmpl = new csSpriteTemplate ();
     tmpl->SetName (skelname);
-    Sys->world->sprite_templates.Push (tmpl);
-    tmpl->SetMaterial (Sys->world->GetMaterials ()->FindByName ("green"));
+    Sys->engine->sprite_templates.Push (tmpl);
+    tmpl->SetMaterial (Sys->engine->GetMaterials ()->FindByName ("green"));
     int vertex_idx = 0;
     csFrame* fr = tmpl->AddFrame ();
     fr->SetName ("f");
@@ -799,17 +799,17 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
     RandomColor (r, g, b);
     //@@@ MEMORY LEAK?
     dyn = new csDynLight (pos.x, pos.y, pos.z, dyn_radius, r, g, b);
-    Sys->view->GetWorld ()->AddDynLight (dyn);
+    Sys->view->GetEngine ()->AddDynLight (dyn);
     dyn->SetSector (where);
     dyn->Setup ();
   }
   csSpriteTemplate* tmpl = (csSpriteTemplate*)
-  	Sys->view->GetWorld ()->sprite_templates.FindByName ("bot");
+  	Sys->view->GetEngine ()->sprite_templates.FindByName ("bot");
   if (!tmpl) return;
   Bot* bot;
-  bot = new Bot (tmpl, Sys->view->GetWorld());
+  bot = new Bot (tmpl, Sys->view->GetEngine());
   bot->SetName ("bot");
-  Sys->view->GetWorld ()->sprites.Push (bot);
+  Sys->view->GetEngine ()->sprites.Push (bot);
   bot->GetMovable ().SetSector (where);
   csMatrix3 m; m.Identity (); m = m * size;
   bot->GetMovable ().SetTransform (m);
@@ -829,7 +829,7 @@ void del_bot ()
   {
     Bot* bot = first_bot;
     first_bot = bot->next;
-    Sys->view->GetWorld ()->RemoveSprite (bot);
+    Sys->view->GetEngine ()->RemoveSprite (bot);
   }
 }
 
@@ -913,7 +913,7 @@ void HandleDynLight (csDynLight* dyn)
             add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
 	  }
 	  ms->sprite->GetMovable ().ClearSectors ();
-	  Sys->view->GetWorld ()->RemoveSprite (ms->sprite);
+	  Sys->view->GetEngine ()->RemoveSprite (ms->sprite);
 	}
         dyn->ObjRemove(dyn->GetChild (csDataObject::Type));
         delete ms;
@@ -958,7 +958,7 @@ void HandleDynLight (csDynLight* dyn)
             es->snd->DecRef ();
 	  }
 	  delete es;
-          Sys->view->GetWorld ()->RemoveDynLight (dyn);
+          Sys->view->GetEngine ()->RemoveDynLight (dyn);
           delete dyn;
 	  return;
 	}
@@ -996,7 +996,7 @@ void fire_missile ()
   float r, g, b;
   RandomColor (r, g, b);
   csDynLight* dyn = new csDynLight (pos.x, pos.y, pos.z, 4, r, g, b);
-  Sys->view->GetWorld ()->AddDynLight (dyn);
+  Sys->view->GetEngine ()->AddDynLight (dyn);
   dyn->SetSector (Sys->view->GetCamera ()->GetSector ());
   dyn->Setup ();
   MissileStruct* ms = new MissileStruct;
@@ -1016,14 +1016,14 @@ void fire_missile ()
   sprintf (misname, "missile%d", ((rand () >> 3) & 1)+1);
 
   csSpriteTemplate* tmpl = (csSpriteTemplate*)
-  	Sys->view->GetWorld ()->sprite_templates.FindByName (misname);
+  	Sys->view->GetEngine ()->sprite_templates.FindByName (misname);
   if (!tmpl)
     Sys->Printf (MSG_CONSOLE, "Could not find '%s' sprite template!\n", misname);
   else
   {
-    csSprite3D* sp = tmpl->NewSprite (Sys->view->GetWorld ());
+    csSprite3D* sp = tmpl->NewSprite (Sys->view->GetEngine ());
     sp->SetName ("missile");
-    Sys->view->GetWorld ()->sprites.Push (sp);
+    Sys->view->GetEngine ()->sprites.Push (sp);
     sp->GetMovable ().SetSector (Sys->view->GetCamera ()->GetSector ());
     ms->sprite = sp;
     sp->GetMovable ().SetPosition (pos);
@@ -1052,10 +1052,10 @@ void AttachRandomLight (csDynLight* light)
 // not test if the sprite is visible or not.
 void light_statics ()
 {
-  csWorld *w = Sys->view->GetWorld ();
-  for (int i = 0 ; i < w->sprites.Length () ; i++)
+  csEngine *e = Sys->view->GetEngine ();
+  for (int i = 0 ; i < e->sprites.Length () ; i++)
   {
-    csSprite *sp = (csSprite*)w->sprites [i];
+    csSprite *sp = (csSprite*)e->sprites [i];
     if (sp->GetType () == csSprite3D::Type)
     {
       csSprite3D *sp3d = (csSprite3D *)sp;
@@ -1076,9 +1076,9 @@ void OpenPortal (csView* view, char* lev)
 {
   csSector* room = view->GetCamera ()->GetSector ();
   csVector3 pos = view->GetCamera ()->Camera2World (csVector3 (0, 0, 1));
-  csMaterialWrapper* tm = Sys->world->GetMaterials ()->FindByName ("spark");
-  csThing* thing = new csThing (Sys->world);
-  Sys->world->things.Push (thing);
+  csMaterialWrapper* tm = Sys->engine->GetMaterials ()->FindByName ("spark");
+  csThing* thing = new csThing (Sys->engine);
+  Sys->engine->things.Push (thing);
   thing->SetName ("portal");
   thing->GetMovable ().SetSector (room);
   float dx = 1, dy = 3, dz = .3;
@@ -1134,13 +1134,13 @@ void OpenPortal (csView* view, char* lev)
   thing->GetMovable ().SetPosition (pos);
   thing->GetMovable ().UpdateMove ();
 
-  Sys->world->SelectRegion (lev);
+  Sys->engine->SelectRegion (lev);
   // @@@ No error checking!
   char buf[255];
   sprintf (buf, "/lev/%s", lev);
   Sys->VFS->ChDir (buf);
-  csLoader::AppendWorldFile (Sys->world, "world");
-  Sys->world->GetCsCurrentRegion ()->Prepare ();
-  Sys->world->SelectRegion (NULL);
+  csLoader::AppendMapFile (Sys->engine, "world");
+  Sys->engine->GetCsCurrentRegion ()->Prepare ();
+  Sys->engine->SelectRegion (NULL);
 }
 

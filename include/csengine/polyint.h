@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLYINT_H
-#define POLYINT_H
+#ifndef __CS_POLYINT_H__
+#define __CS_POLYINT_H__
 
 #include "csgeom/math3d.h"
 #include "csgeom/poly3d.h"
@@ -70,11 +70,11 @@ public:
   virtual csPlane3* GetPolyPlane () = 0;
 
   /**
-   * Classify this polygon with regards to a plane (in world space). If this poly
-   * is on same plane it returns POL_SAME_PLANE. If this poly is
-   * completely in front of the given plane it returnes POL_FRONT. If this poly
-   * is completely back of the given plane it returnes POL_BACK. Otherwise it
-   * returns POL_SPLIT_NEEDED.
+   * Classify this polygon with regards to a plane (in world space).  If this
+   * poly is on same plane it returns POL_SAME_PLANE.  If this poly is
+   * completely in front of the given plane it returnes POL_FRONT.  If this
+   * poly is completely back of the given plane it returnes POL_BACK.
+   * Otherwise it returns POL_SPLIT_NEEDED.
    */
   virtual int Classify (const csPlane3& pl) = 0;
 
@@ -349,4 +349,4 @@ public:
   }
 };
 
-#endif /*POLYINT_H*/
+#endif // __CS_POLYINT_H__

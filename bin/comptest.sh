@@ -19,8 +19,18 @@ ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_FAKE_BOOL_TYPE = yes"
 #------------------------------------------------------------------------------
 # Check if C++ compiler understands new-style C++ casting syntax.
 # For example: `static_cast<int>(foo)' vs. `(int)foo'
+#
+# Specifically check for all four new casting operators since some botched
+# compilers have been known to implement only a partial set.  (The OpenStep
+# Objective-C++ compiler is one such botched implementation.  It fails to
+# recognize reinterpret_cast even though it recognizes the others.)
 #------------------------------------------------------------------------------
-echo "int func() { long n = 1; return static_cast<int>(n); }" > comptest.cpp
+cat << TEST > comptest.cpp
+int func1() { long n = 1; return static_cast<int>(n); }
+char* func2() { char const* s = "const"; return const_cast<char*>(s); }
+struct A {}; A* func3(A* a) { return dynamic_cast<A*>(a); }
+A* func4(void* p) { return reinterpret_cast<A*>(p); }
+TEST
 ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_OLD_STYLE_CASTS = yes"
 
 #------------------------------------------------------------------------------

@@ -28,8 +28,7 @@
 #include "ivfs.h"
 #include "ievent.h"
 
-#include "iworld.h"
-//  #include "csengine/stats.h"
+#include "iengine.h"
 
 IMPLEMENT_FACTORY (csPerfStats)
 
@@ -48,7 +47,7 @@ IMPLEMENT_IBASE_END
 csPerfStats::csPerfStats (iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
-  World = NULL;
+  Engine = NULL;
   file_name = NULL;
   statlog_section = NULL;
   statvec = NULL;
@@ -85,9 +84,9 @@ bool csPerfStats::Initialize (iSystem *system)
   name = NULL;
   head_section = this;
 
-//    iWorld *iworld = QUERY_PLUGIN_ID (System, CS_FUNCID_ENGINE, iWorld);
-//    if (iworld) 
-//      World = iworld->GetCsWorld ();
+// iEngine *iengine = QUERY_PLUGIN_ID (System, CS_FUNCID_ENGINE, iEngine);
+// if (iengine) 
+//   Engine = iengine->GetCsEngine ();
   return true;
 }
 
@@ -155,12 +154,12 @@ void csPerfStats::ResetStats ()
 {
   frame_num = 0;
   total_time = 0;
-//    total_polygons_considered = 0;
-//    total_polygons_rejected = 0;
- 
-//    total_polygons_accepted = 0;
-//    total_polygons_drawn = 0;
-//    total_portals_drawn = 0;
+
+//  total_polygons_considered = 0;
+//  total_polygons_rejected = 0;
+//  total_polygons_accepted = 0;
+//  total_polygons_drawn = 0;
+//  total_portals_drawn = 0;
 
   lowest_fps = 10000;
   highest_fps = 0;
@@ -199,12 +198,12 @@ void csPerfStats::AccumulateTotals (cs_time elapsed_time)
 #endif
   total_time += elapsed_time;
   mean_fps = total_time ? (frame_num * 1000.0f / total_time) : 0;
-//    total_polygons_considered += Stats::polygons_considered;
-//    total_polygons_rejected += Stats::polygons_rejected;
- 
-//    total_polygons_accepted += Stats::polygons_accepted;
-//    total_polygons_drawn += Stats::polygons_drawn;
-//    total_portals_drawn += Stats::portals_drawn;
+
+//  total_polygons_considered += Stats::polygons_considered;
+//  total_polygons_rejected += Stats::polygons_rejected;
+//  total_polygons_accepted += Stats::polygons_accepted;
+//  total_polygons_drawn += Stats::polygons_drawn;
+//  total_portals_drawn += Stats::portals_drawn;
 }
 
 void csPerfStats::CalculateFpsStats ()
@@ -239,7 +238,7 @@ iPerfStats *csPerfStats::StartNewSubsection (const char *name)
   sub_section->SetName (name);
   sub_section->System = System;
   sub_section->resolution = resolution;
-  sub_section->World = World;
+  sub_section->Engine = Engine;
   sub_section->statlog_section = statlog_section;
   sub_section->super_section = this;
   sub_section->sub_section = NULL;
@@ -359,36 +358,36 @@ void csPerfStats::WriteMainHeader ()
     char endianness [] = "little";
 #endif
     char buf [] = 
-      "================================================================================\n"
-      "Crystal Space Version %s (%s)\n"
-      "================================================================================\n"
-      "csGfx Info\n"
-      "                  Video Card : ?\n"
-      "                Video Memory : ?\n"
-      "                Video Driver : ?\n"
-      "                      Screen : %dx%d\n"
-      "                     CanClip : %s\n"
-      "                      MinTex : %dx%d\n"
-      "                      MaxTex : %dx%d\n"
-      "             MaxAspectRation : %d\n"
-      "             Double Buffered : %s\n"
-      "                Pixel Format : R%dG%dB%d\n"
-      "                 Full Screen : %s\n\n"
-      "csSound Info\n"
-      "                  Sound Card : ?\n"
-      "                Sound Memory : ?\n"
-      "                Sound Driver : ?\n\n"
-      "csSys Info\n"
-      "                  Endianness : %s\n"
-      "               System Memory : ?\n"
-      "================================================================================\n"
-      "                                                 %s Executable\n"
-      "--------------------------------------------------------------------------------\n"
-      "Demo Section : %s\n"
-      "--------------------------------------------------------------------------------\n"
-      "Summary:\n"
-      "--------\n"
-      "%sResolution   : %d frames per entry";
+"===========================================================================\n"
+"Crystal Space Version %s (%s)\n"
+"===========================================================================\n"
+"csGfx Info\n"
+"                  Video Card : ?\n"
+"                Video Memory : ?\n"
+"                Video Driver : ?\n"
+"                      Screen : %dx%d\n"
+"                     CanClip : %s\n"
+"                      MinTex : %dx%d\n"
+"                      MaxTex : %dx%d\n"
+"             MaxAspectRation : %d\n"
+"             Double Buffered : %s\n"
+"                Pixel Format : R%dG%dB%d\n"
+"                 Full Screen : %s\n\n"
+"csSound Info\n"
+"                  Sound Card : ?\n"
+"                Sound Memory : ?\n"
+"                Sound Driver : ?\n\n"
+"csSys Info\n"
+"                  Endianness : %s\n"
+"               System Memory : ?\n"
+"===========================================================================\n"
+" %s Executable\n"
+"---------------------------------------------------------------------------\n"
+"Demo Section : %s\n"
+"---------------------------------------------------------------------------\n"
+"Summary:\n"
+"--------\n"
+"%sResolution   : %d frames per entry";
 
     // 16 unknown entries...
     int len_guess = strlen (buf) + 18*15;
@@ -413,7 +412,7 @@ void csPerfStats::WriteMainHeader ()
     entry->frame_num = statlog_section->frame_num;
     if (entry->len > len_guess)
       System->Printf (MSG_STDOUT, 
-		      "WARNING MEMORY OVER-RUN IN PERFSTAT (WriteMainHeader)\n");
+        "WARNING MEMORY OVER-RUN IN PERFSTAT (WriteMainHeader)\n");
 
     statvec->Push (entry);
     g3d->DecRef ();
@@ -434,7 +433,7 @@ void csPerfStats::WriteSubSummary ()
     entry->frame_num = statlog_section->frame_num;
     if (entry->len > len_guess)
       System->Printf (MSG_STDOUT, 
-		      "WARNING MEMORY OVER-RUN IN PERFSTAT (WriteSubSummary)\n");
+        "WARNING MEMORY OVER-RUN IN PERFSTAT (WriteSubSummary)\n");
     statlog_section->statvec->Push (entry);
   }
 }
@@ -461,9 +460,10 @@ void csPerfStats::WriteFrameHeader ()
 {
   StatEntry *entry = new StatEntry ();
   char buf [] = 
-    "\n---------------------------------------------------------------------------------\n"
-        "Frame    FPS\n"
-        "-----    ---";
+"\n"
+"---------------------------------------------------------------------------\n"
+"Frame    FPS\n"
+"-----    ---";
   entry->len = strlen(buf)+1;
   entry->buf = new char [entry->len];
   strcpy (entry->buf, buf);

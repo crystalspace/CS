@@ -1,5 +1,5 @@
 # Library description
-DESCRIPTION.csparser = Crystal Space world/model parser library
+DESCRIPTION.csparser = Crystal Space map/model parser library
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

@@ -29,7 +29,7 @@ public:
 
   csSoundDataRaw(iBase *iParent, void *Data, long NumSamples,
     csSoundFormat Format);
-  ~csSoundDataRaw();
+  virtual ~csSoundDataRaw();
 
   void Convert(const csSoundFormat *NewFormat);
 
@@ -53,7 +53,7 @@ public:
   // constructor
   csSoundStreamRaw(csSoundDataRaw *sndData);
   // destructor
-  ~csSoundStreamRaw();
+  virtual ~csSoundStreamRaw();
 
   // return the format descriptor
   virtual const csSoundFormat *GetFormat();

@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/polyclip.h"
 #include "csengine/covcube.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/dumper.h"
 
 bool csCoverageMaskTreePersp::DoPerspective (csVector3* verts, int num_verts,
@@ -76,7 +76,8 @@ bool csCoverageMaskTreePersp::DoPerspective (csVector3* verts, int num_verts,
       {
 	if (verts[i1].z < EPSILON)
 	{
-	  // We need to intersect and add both intersection point and this point.
+	  // We need to intersect and add both intersection point and this
+	  // point.
 	  csIntersect3::ZPlane (EPSILON, verts[i], verts[i1], isect);
 	  persp.AddPerspectiveAspect (isect, 512, 512);
 	}
@@ -369,4 +370,3 @@ int csCovcube::TestPoint (const csVector3& point)
   (void) point;
   return 0;
 }
-

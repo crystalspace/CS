@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CSCOLL_H
-#define CSCOLL_H
+#ifndef __CS_CSCOLL_H__
+#define __CS_CSCOLL_H__
 
 #include "csgeom/matrix3.h"
 #include "csobject/csobject.h"
@@ -25,7 +25,7 @@
 #include "csengine/movable.h"
 
 class csSector;
-class csWorld;
+class csEngine;
 
 /**
  * A collection object is for conveniance of the script language.
@@ -45,14 +45,14 @@ private:
   /// Position in the world.
   csMovable movable;
 
-  /// World.
-  csWorld* world;
+  /// Handle to the engine plug-in.
+  csEngine* engine;
 
 protected:
   /// Move this collection to the specified sector. Can be called multiple times.
   virtual void MoveToSector (csSector* s);
 
-  /// Remove this collection from all sectors it is in (but not from the world).
+  /// Remove this collection from all sectors it is in (but not from the engine).
   virtual void RemoveFromSectors ();
 
   /**
@@ -68,7 +68,7 @@ public:
   /**
    * Create a new csCollection with the given name.
    */
-  csCollection (csWorld* world);
+  csCollection (csEngine* engine);
 
   ///
   virtual ~csCollection ();
@@ -101,4 +101,4 @@ public:
   CSOBJTYPE;
 };
 
-#endif /*CSCOLL_H*/
+#endif // __CS_CSCOLL_H__

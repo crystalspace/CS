@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_BOX_H
-#define __CS_BOX_H
+#ifndef __CS_BOX_H__
+#define __CS_BOX_H__
 
 #include "cstypes.h"	// for bool
 #include "vector2.h"
@@ -408,8 +408,8 @@ protected:
 
   struct bEdge
   {
-    UByte v1, v2;	// Indices of vertex in bounding box (BOX_CORNER_...)
-    UByte fl, fr;	// Indices of left/right faces sharing edge (BOX_SIDE_...)
+    UByte v1, v2; // Indices of vertex in bounding box (BOX_CORNER_...)
+    UByte fl, fr; // Indices of left/right faces sharing edge (BOX_SIDE_...)
   };
   typedef UByte bFace[4];	// Indices of four clock-wise edges (0..23)
   // Index by edge number. Edge e and e+1 with e even are opposite edges.
@@ -431,9 +431,11 @@ public:
   ///
   float MaxZ () const { return maxbox.z; }
   /// Get Min component for 0 (x), 1 (y), or 2 (z).
-  float Min (int idx) const { return idx == 1 ? minbox.y : idx == 0 ? minbox.x : minbox.z; }
+  float Min (int idx) const
+  { return idx == 1 ? minbox.y : idx == 0 ? minbox.x : minbox.z; }
   /// Get Max component for 0 (x), 1 (y), or 2 (z).
-  float Max (int idx) const { return idx == 1 ? maxbox.y : idx == 0 ? maxbox.x : maxbox.z; }
+  float Max (int idx) const
+  { return idx == 1 ? maxbox.y : idx == 0 ? maxbox.x : maxbox.z; }
   ///
   const csVector3& Min () const { return minbox; }
   ///
@@ -755,4 +757,4 @@ public:
   friend bool operator< (const csVector3& point, const csBox3& box);
 };
 
-#endif // __CS_BOX_H
+#endif // __CS_BOX_H__

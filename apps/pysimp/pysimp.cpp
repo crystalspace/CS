@@ -21,7 +21,7 @@
 #include "csutil/scanstr.h"
 #include "pysimp.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/csview.h"
 #include "csengine/camera.h"
 #include "csengine/light.h"
@@ -41,7 +41,7 @@ REGISTER_STATIC_LIBRARY (engine)
 PySimple::PySimple ()
 {
   view = NULL;
-  world = NULL;
+  engine = NULL;
   motion_flags = 0;
 }
 
@@ -63,15 +63,15 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
-  // Find the pointer to world plugin
-  iWorld *World = QUERY_PLUGIN (this, iWorld);
-  if (!World)
+  // Find the pointer to engine plugin
+  iEngine *Engine = QUERY_PLUGIN (this, iEngine);
+  if (!Engine)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iWorld plugin!\n");
+    CsPrintf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
-  world = World->GetCsWorld ();
-  World->DecRef ();
+  engine = Engine->GetCsEngine ();
+  Engine->DecRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Simple Crystal Space Python Application"))
@@ -88,7 +88,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
-  world->EnableLightingCache (false);
+  engine->EnableLightingCache (false);
 
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
@@ -96,14 +96,14 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // Initialize the python plugin.
   iScript* is = LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
 
-  csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
+  csLoader::LoadTexture (engine, "stone", "/lib/std/stone4.gif");
 
   // Load a python module (scripts/python/pysimp.py).
   if (!is->LoadModule ("pysimp"))
     return 0;
 
   // Set up our room.
-  csSector *room = world->CreateCsSector ("room");
+  csSector *room = engine->CreateCsSector ("room");
 
   // Execute one method defined in pysimp.py
   // This will create the polygons in the room.
@@ -121,7 +121,7 @@ printf ("poly:%d\n", room->GetNumPolygons ());
   light = new csStatLight (0, 5, 0, 10, 1, 0, 0, false);
   room->AddLight(light);
 
-  world->Prepare ();
+  engine->Prepare ();
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
@@ -129,8 +129,8 @@ printf ("poly:%d\n", room->GetNumPolygons ());
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (world, G3D);
-  view->SetSector((csSector*)world->sectors[0]);
+  view = new csView (engine, G3D);
+  view->SetSector((csSector*)engine->sectors[0]);
   view->GetCamera()->SetPosition (csVector3 (0, 2, 0));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
 
@@ -196,7 +196,7 @@ int main (int argc, char* argv[])
   // Create our main class.
   System = new PySimple ();
   // temp hack until we find a better way
-  csWorld::System = System;
+  csEngine::System = System;
 
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");

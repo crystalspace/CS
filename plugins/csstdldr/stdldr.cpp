@@ -1,5 +1,5 @@
 /*
-    The Crystal Space world file loader
+    The Crystal Space map file loader
     Copyright (C) 2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@
 
 #include "itxtmgr.h"
 #include "isystem.h"
-#include "iworld.h"
+#include "iengine.h"
 #include "ivfs.h"
 #include "ipolygon.h"
 #include "iportal.h"
@@ -45,7 +45,7 @@
 // but not at the beginning of it
 #define NEXT_KEYWORD_CHAR ".*+-"
 
-//------------------------------------------------------- Helper functions -----
+//------------------------------------------------------ Helper functions -----
 
 #define KEYWORD_PREFIX		"KW_"
 #define KEYWORD_PREFIX_LEN	3
@@ -62,7 +62,7 @@ public:
   { return strcmp (token_list [(int)Item1] + KEYWORD_PREFIX_LEN,
                    token_list [(int)Item2] + KEYWORD_PREFIX_LEN); }
   virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
-  { return strcmp (token_list [(int)Item] + KEYWORD_PREFIX_LEN, (char *)Key); }
+  { return strcmp (token_list [(int)Item] + KEYWORD_PREFIX_LEN, (char*)Key); }
 } *token_idx = NULL;
 
 // Initialize token table (pre-sort and such)
@@ -82,7 +82,7 @@ void init_token_table (const char *const *yytname)
   token_idx->QuickSort ();
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 /*
     The tokenizer converts the plain ASCII text into a sequence of tokens.
@@ -138,7 +138,7 @@ EXPORT_CLASS_TABLE_END
 csStandardLoader::csStandardLoader (iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
-  system = NULL; vfs = NULL; world = NULL;
+  system = NULL; vfs = NULL; engine = NULL;
   line = -1;
   strings = NULL;
   lineoffs = NULL;
@@ -148,7 +148,7 @@ csStandardLoader::csStandardLoader (iBase *iParent)
 
 csStandardLoader::~csStandardLoader ()
 {
-  if (world) world->DecRef ();
+  if (engine) engine->DecRef ();
   if (vfs) vfs->DecRef ();
   if (system) system->DecRef ();
 }
@@ -158,7 +158,7 @@ bool csStandardLoader::Initialize (iSystem *iSys)
   (system = iSys)->IncRef ();
   if (!(vfs = QUERY_PLUGIN (system, iVFS)))
     return false;
-  if (!(world = QUERY_PLUGIN (system, iWorld)))
+  if (!(engine = QUERY_PLUGIN (system, iEngine)))
     return false;
   return true;
 }
@@ -207,7 +207,8 @@ bool csStandardLoader::Load (const char *iName)
     databuffer = vfs->ReadFile (iName);
     if (!databuffer)
     {
-      system->Printf (MSG_FATAL_ERROR, "Cannot read geometry file '%s'!\n", iName);
+      system->Printf (MSG_FATAL_ERROR,
+        "Cannot read geometry file '%s'!\n", iName);
       return false;
     }
     data = Tokenize (**databuffer, src->GetSize ());
@@ -288,7 +289,8 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &ioSize)
   for (;;)
   {
     // Skip initial white spaces
-    while (*iData && (*iData == ' ' || *iData == '\t' || *iData == '\r' || *iData == '\n'))
+    while (*iData &&
+      (*iData == ' ' || *iData == '\t' || *iData == '\r' || *iData == '\n'))
     {
       if (*iData == '\n')
         line++;
@@ -297,7 +299,8 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &ioSize)
 
     enum { ltkEOF, ltkNUMBER, ltkSTRING, ltkKEYWORD, ltkSYMBOL } token =
       (*iData == 0) ? ltkEOF :
-      *iData == '+' || *iData == '-' || *iData == '.' || isdigit (*iData) ? ltkNUMBER :
+      *iData == '+' || *iData == '-' || *iData == '.' ||
+      isdigit (*iData) ? ltkNUMBER :
       *iData == '\'' || *iData == '"' ? ltkSTRING :
       isalpha (*iData) || strchr (FIRST_KEYWORD_CHAR, *iData) ? ltkKEYWORD :
       ltkSYMBOL;
@@ -379,7 +382,8 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &ioSize)
         tmp = QInt (f);
         if (f == tmp)
           if (tmp >= 0)
-            outtoken = (tmp < 256) ? tokNUMBER8 : (tmp < 65536) ? tokNUMBER16 : tokNUMBER32;
+            outtoken = (tmp < 256) ?
+	      tokNUMBER8 : (tmp < 65536) ? tokNUMBER16 : tokNUMBER32;
           else
             outtoken = (tmp > -256) ? tokNUMBER8N : tokNUMBER32;
         else
@@ -401,9 +405,10 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &ioSize)
             tmp = little_endian_long (float2long (f));
         }
         data = &tmp;
-        datasize = (outtoken == tokNUMBER8 || outtoken == tokNUMBER8N) ? sizeof (char) :
-                   (outtoken == tokNUMBER16 || outtoken == tokNUMBER16F) ? sizeof (short) :
-                   sizeof (long);
+        datasize = (outtoken == tokNUMBER8 || outtoken == tokNUMBER8N) ?
+	  sizeof (char) :
+          (outtoken == tokNUMBER16 || outtoken == tokNUMBER16F) ?
+	  sizeof (short) : sizeof (long);
         break;
       }
       case ltkSTRING:
@@ -522,7 +527,7 @@ csTokenList csStandardLoader::Tokenize (char *iData, size_t &ioSize)
 
 bool csStandardLoader::yyinit (csTokenList iInput, size_t iSize)
 {
-  if (!iInput || !world || !system)
+  if (!iInput || !engine || !system)
     return false;
 
   curtoken = NULL;
@@ -553,10 +558,11 @@ void csStandardLoader::yydone (bool iSuccess)
     for (int i = portals->Length () - 1; i >= 0; i--)
     {
       csPPortal *port = portals->Get (i);
-      iSector *isect = world->FindSector (port->destsec);
+      iSector *isect = engine->FindSector (port->destsec);
       if (!isect)
       {
-        system->Printf (MSG_WARNING, "invalid sector `%s' for portal target!", port->destsec);
+        system->Printf (MSG_WARNING,
+	  "invalid sector `%s' for portal target!", port->destsec);
         continue;
       }
 
@@ -611,7 +617,7 @@ void csStandardLoader::yyerror (char *s)
 int csStandardLoader::yylex (void *lval)
 {
   YYSTYPE *yylval = (YYSTYPE *)lval;
-  // Remember the position of last token in the case we'll need to display error
+  // Remember position of last token in the case we'll need to display error
   ofs = input - (startinput - sizeof (long) * 2);
 
   UByte th;
@@ -698,7 +704,8 @@ bool csStandardLoader::RecursiveLoad (const char *iName)
 {
   if (recursion_depth > MAX_RECURSION_DEPTH)
   {
-    system->Printf (MSG_FATAL_ERROR, "Max recursive depth exceeded (cyclic LIBRARY statements?)\n");
+    system->Printf (MSG_FATAL_ERROR,
+      "Max recursive depth exceeded (cyclic LIBRARY statements?)\n");
     return false;
   }
 
@@ -731,7 +738,7 @@ bool csStandardLoader::RecursiveLoad (const char *iName)
   return rc;
 }
 
-//--------------------------------------- Geometry loader parser helpers -----//
+//-------------------------------------- Geometry loader parser helpers -----//
 
 void csStandardLoader::InitTexture (char *name)
 {
@@ -756,7 +763,7 @@ bool csStandardLoader::CreateTexture ()
   }
 
   // Now tell the engine to register the respective texture
-  return world->CreateTexture (new_name, storage.tex.filename,
+  return engine->CreateTexture (new_name, storage.tex.filename,
     storage.tex.do_transp ? (csColor *)&storage.tex.transp : NULL,
     storage.tex.flags);
 }
@@ -781,7 +788,7 @@ bool csStandardLoader::CreateCamera ()
     return false;
   }
 
-  return world->CreateCamera (storage.camera.name, storage.camera.sector,
+  return engine->CreateCamera (storage.camera.name, storage.camera.sector,
     (csVector3 &)storage.camera.pos, (csVector3 &)storage.camera.forward,
     (csVector3 &)storage.camera.upward);
 }
@@ -857,7 +864,7 @@ bool csStandardLoader::CreatePlane (const char *name)
            f.z, s.z, z.z);
   }
 
-  return world->CreatePlane (name, o, m);
+  return engine->CreatePlane (name, o, m);
 }
 
 bool csStandardLoader::CreateTexturePlane (iPolygon3D *iPolygon)

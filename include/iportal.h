@@ -85,7 +85,10 @@ struct iPortal : public iBase
   /// Set portal to point to specified sector
   virtual void SetPortal (iSector *iDest) = 0;
 
-  /// Set the warping transformation for this portal in object space and world space.
+  /**
+   * Set the warping transformation for this portal in object space and world
+   * space.
+   */
   virtual void SetWarp (const csMatrix3 &m_w, const csVector3 &v_w_before,
     const csVector3 &v_w_after) = 0;
   /// Set warping transformation to mirror around given polygon

@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
-    (C) W.C.A. Wijngaards, 2000
+    Copyright (C) 2000 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CSPARTIC_H
-#define CSPARTIC_H
+#ifndef __CS_PARTICLE_H__
+#define __CS_PARTICLE_H__
 
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
@@ -29,7 +28,7 @@
 
 class csSprite2D;
 class csMaterialWrapper;
-class csWorld;
+class csEngine;
 class csSector;
 class csDynLight;
 class csLight;
@@ -76,15 +75,15 @@ protected:
 public:
   /**
    * Make a new system. 
-   * Also adds the particle system to the list of the current world.
+   * Also adds the particle system to the list of the current engine.
    */
   csParticleSystem (csObject* theParent);
 
   /**
    * Destroy particle system, and all particles.
    * Perhaps SetDelete(true) is easier, which will delete the part.sys.
-   * at the next world->UpdateParticleSystems, and also remove the
-   * particle system from the world list for you.
+   * at the next engine->UpdateParticleSystems, and also remove the
+   * particle system from the engine list for you.
    */
   virtual ~csParticleSystem ();
 
@@ -100,14 +99,14 @@ public:
   
   /** 
    * Add an rectangle shaped csSprite2d particle. Pass along half w and h.
-   * adds sprite to world list.
+   * adds sprite to engine list.
    */
   void AppendRectSprite (float width, float height, csMaterialWrapper* mat,
     bool lighted);
 
   /** 
    * Add a csSprite2d n-gon with material, and given radius.
-   * adds sprite to world list.
+   * adds sprite to engine list.
    */
   void AppendRegularSprite (int n, float radius, csMaterialWrapper* mat,
     bool lighted);
@@ -190,24 +189,16 @@ public:
    */
   virtual void Update (cs_time elapsed_time);
 
-  /**
-   * Draw the particle system.
-   */
+  /// Draw the particle system.
   virtual void Draw (csRenderView& rview);
 
-  /**
-   * Light part sys according to the given array of lights.
-   */
+  /// Light part sys according to the given array of lights.
   virtual void UpdateLighting (csLight** lights, int num_lights);
 
-  /**
-   * Get the location of the part sys.
-   */
+  /// Get the location of the part sys.
   virtual const csVector3& GetPosition () const;
 
-  /**
-   * Update lighting as soon as the part sys becomes visible.
-   */
+  /// Update lighting as soon as the part sys becomes visible.
   virtual void DeferUpdateLighting (int flags, int num_lights);
 
   /**
@@ -215,8 +206,9 @@ public:
    * Return the collision point in object space coordinates.
    * @@@ TO BE IMPLEMENTED!
    */
-  virtual bool HitBeamObject (const csVector3& /*start*/, const csVector3& /*end*/,
-  	csVector3& /*isect*/, float* /*pr*/) { return false; }
+  virtual bool HitBeamObject (const csVector3& /*start*/,
+    const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
+    { return false; }
 
   CSOBJTYPE;
 };
@@ -242,15 +234,15 @@ public:
   virtual void Update (cs_time elapsed_time);
 
   /// Get a particles speed. speeds are in metres/second.
-  inline csVector3& GetSpeed (int idx) { return part_speed[idx]; }
+  csVector3& GetSpeed (int idx) { return part_speed[idx]; }
   /// Set a particles speed. speeds are in metres/second.
-  inline void SetSpeed (int idx, const csVector3& spd) 
+  void SetSpeed (int idx, const csVector3& spd) 
   { part_speed[idx] = spd; }
 
   /// Get a particles acceleration. accelerations are in metres/second.
-  inline csVector3& GetAccel (int idx) { return part_accel[idx]; }
+  csVector3& GetAccel (int idx) { return part_accel[idx]; }
   /// Set a particles acceleration. accelerations are in metres/second.
-  inline void SetAccel (int idx, const csVector3& acl) 
+  void SetAccel (int idx, const csVector3& acl) 
   { part_accel[idx] = acl; }
 
   CSOBJTYPE;
@@ -275,8 +267,9 @@ protected:
 
 public:
   /// Specify max number of particles.
-  csSpiralParticleSystem (csObject* theParent, int max, const csVector3& source,
-  	csMaterialWrapper* mat);
+  csSpiralParticleSystem (csObject* theParent, int max,
+    const csVector3& source, csMaterialWrapper* mat);
+  /// Destructor.
   virtual ~csSpiralParticleSystem ();
 
   /// Moves the particles depending on their acceleration and speed.
@@ -297,7 +290,7 @@ protected:
   /// Dynamic light at center.
   bool has_light;
   csSector *light_sector;
-  csWorld *light_world;
+  csEngine *light_engine;
   csDynLight *explight;
   cs_time light_fade;
   /// scaling of particles.
@@ -326,12 +319,10 @@ public:
 	float part_radius = 0.25, bool lighted_particles = false,
 	float spread_pos = 0.6, 
 	float spread_speed = 0.5, float spread_accel = 1.5);
-  ///
+  /// Destructor.
   virtual ~csParSysExplosion ();
 
-  /**
-   * Update and light is flickered as well. particles will be scaled.
-   */
+  /// Update and light is flickered as well. particles will be scaled.
   virtual void Update (cs_time elapsed_time);
 
   /// Get the center of the explosion.
@@ -343,7 +334,7 @@ public:
    * Add a light at explosion center. add msec when light starts fading,
    * which is used when time_to_live is set / SelfDestruct is used.
    */
-  void AddLight (csWorld *world, csSector *sec, cs_time fade = 200);
+  void AddLight (csEngine*, csSector*, cs_time fade = 200);
   /// Remove the light.
   void RemoveLight ();
 
@@ -385,18 +376,16 @@ public:
    *   You can make slanted rain this way. Although you would also want to
    *   slant the particles in that case...
    */
-  csRainParticleSystem(csObject* theParent, int number, csMaterialWrapper* mat,
-    UInt mixmode,
+  csRainParticleSystem(csObject* theParent, int number,
+    csMaterialWrapper* mat, UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
     const csVector3& rainbox_min, const csVector3& rainbox_max,
     const csVector3& fall_speed
     );
-  /// 
+  /// Destructor.
   virtual ~csRainParticleSystem();
 
-  /**
-   * Update and light is flickered as well. particles will be scaled.
-   */
+  /// Update and light is flickered as well. particles will be scaled.
   virtual void Update (cs_time elapsed_time);
 
   CSOBJTYPE;
@@ -418,31 +407,29 @@ protected:
 
 public:
   /**
-   * creates a rain particle system given parameters.
+   * creates a snow particle system given parameters.
    * number : number of raindrops visible at one time
    * mat: material of raindrops. mixmode = mixmode used.
    * lighted: the particles will be lighted if true.
    * drop_width, drop_height: size of rectangular raindrops.
-   * rainbox_min and max: give the box in the world where it will rain.
-   *   raindrops will start ...
+   * rainbox_min and max: give the box in the world where it will snow.
+   *   snow flakes will start ...
    *   and when they exit this box they will disappear.
-   * fall_speed: the direction and speed of the falling raindrops.
-   *   You can make slanted rain this way. Although you would also want to
+   * fall_speed: the direction and speed of the falling snow flakes.
+   *   You can make slanted slow this way. Although you would also want to
    *   slant the particles in that case...
    * swirl: is the amount of swirl for a flake, 0.0 is like rain.
    */
-  csSnowParticleSystem(csObject* theParent, int number, csMaterialWrapper* mat,
-    UInt mixmode,
+  csSnowParticleSystem(csObject* theParent, int number,
+    csMaterialWrapper* mat, UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
     const csVector3& rainbox_min, const csVector3& rainbox_max,
     const csVector3& fall_speed, float swirl
     );
-  /// 
+  /// Destructor.
   virtual ~csSnowParticleSystem();
 
-  /**
-   * Update 
-   */
+  /// Update the particle system.
   virtual void Update (cs_time elapsed_time);
 
   CSOBJTYPE;
@@ -496,12 +483,10 @@ public:
     const csVector3& spot, const csVector3& accel, float fall_time,
     float speed, float opening, float azimuth, float elevation
     );
-  /// 
+  /// Destructor.
   virtual ~csFountainParticleSystem();
 
-  /**
-   * Update
-   */
+  /// Update the particle system.
   virtual void Update (cs_time elapsed_time);
 
   CSOBJTYPE;
@@ -525,11 +510,10 @@ protected:
   float time_left; // from previous update
   int next_oldest;
 
-  /// light
   csLight *light;
   int light_time;
   bool delete_light;
-  csWorld *light_world;
+  csEngine *light_engine;
 
   int FindOldest();
   void RestartParticle(int index, float pre_move);
@@ -554,12 +538,10 @@ public:
     float total_time, const csVector3& dir, const csVector3& origin,
     float swirl, float color_scale
     );
-  /// 
+  /// Destructor.
   virtual ~csFireParticleSystem();
 
-  /**
-   * Update
-   */
+  /// Update the particle system.
   virtual void Update (cs_time elapsed_time);
 
   /// You can set a pseudo-static light here
@@ -568,9 +550,9 @@ public:
    * Add a new dynamic light (no need to call SetControlledLight). 
    * NB Will not move upon SetSector.
    */
-  void AddLight(csWorld *world, csSector *sec);
+  void AddLight(csEngine*, csSector*);
 
   CSOBJTYPE;
 };
-#endif //CSPARTIC_H
 
+#endif // __CS_PARTICLE_H__

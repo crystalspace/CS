@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include "csengine/world.h"
 #include "csengine/cspmeter.h"
 
 csProgressMeter::csProgressMeter(iSystem* s, int n, int t) : sys(s), type(t),

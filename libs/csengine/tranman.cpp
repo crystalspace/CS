@@ -225,6 +225,3 @@ void csTransformedSet::Translate (csVector3* wor_verts, int num_vertices,
   for (i = 0 ; i < num_vertices ; i++)
     cam_verts[i] = wor_verts[i]-trans;
 }
- 
-//---------------------------------------------------------------------------
-

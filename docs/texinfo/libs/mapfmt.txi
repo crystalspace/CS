@@ -79,44 +79,44 @@
 @token{)}
 @end macro
 
-@node World File Format, , csParser, csParser
-@subsection Format of World File
-@cindex Format of World File
-@cindex World File Format
+@node Map File Format, , csParser, csParser
+@subsection Format of Map File
+@cindex Format of Map File
+@cindex Map File Format
 
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
 The next couple sections of this document describe the format of the standard
-Crystal Space world file.  The first section describes the syntax of the file.
-The second section contains extra discussions and hints regarding the world
-file and the objects contained within it.
+Crystal Space map file.  The first section describes the syntax of the file.
+The second section contains extra discussions and hints regarding the map file
+and the objects contained within it.
 
 The Crystal Space engine, itself, does not care about the external format of
 world data, nor does it care about how that information was obtained.  It is
-possible to create additional world loaders as plug-in modules which
-understand world data stored in other formats, such as binary.  A world
-loading plug-in module could even load worlds over the network from a world
-file server, or generate worlds randomly based upon some set of input
-properties.  There are many possiblities.
+possible to create additional map loaders as plug-in modules which understand
+world data stored in other formats, such as binary.  A map loading plug-in
+module could even load maps over the network from a map file server, or
+generate worlds randomly based upon some set of input properties.  There are
+many possiblities.
 
-The world file syntax described in this section, however, is that which is
-understood by the standard world file loader which accompanies Crystal Space.
+The map file syntax described in this section, however, is that which is
+understood by the standard map file loader which accompanies Crystal Space.
 It deals strictly with plain-text files.
 
 @menu
-* World File Grammar:: Grammar
-* World File Syntax:: Syntax
-* World File Hints:: Hints
+* Map File Grammar:: Grammar
+* Map File Syntax:: Syntax
+* Map File Hints:: Hints
 @end menu
 
-@node World File Grammar, World File Syntax, World File Format, World File Format
+@node Map File Grammar, Map File Syntax, Map File Format, Map File Format
 @subsubsection Grammar
 
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
-The syntax for the standard Crystal Space world file is specified as a
+The syntax for the standard Crystal Space map file is specified using a
 context-free grammar using a modified @sc{bnf} (@emph{Backus-Naur Form})
 notation.
 
@@ -154,7 +154,7 @@ WAGER EITHER (81, 15)
 WAGER (72, 91)
 @end example
 
-@node World File Syntax, World File Hints, World File Grammar, World File Format
+@node Map File Syntax, Map File Hints, Map File Grammar, Map File Format
 @subsubsection Syntax
 
 @noindent
@@ -262,7 +262,7 @@ points forward.
 @production{key,
     @token{KEY} @LP{} @nonterm{keyname} @COMMA{} @nonterm{keyvalue} @RP{}}
 
-@subsubheading WorldFMT Lighting
+@subsubheading Lighting
 @production{tex-lighting,
     @token{TEXTURE_LIGHTING} @LP{} @nonterm{yes-no} @RP{}}@*
 @production{lighting, @token{LIGHTING} @LP{} @nonterm{yes-no} @RP{}}
@@ -974,7 +974,7 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
 @production{library,
     @token{LIBRARY} @LP{} [ @nonterm{library-comp} @dots{} ] @RP{}}
 
-@node World File Hints, , World File Syntax, World File Format
+@node Map File Hints, , Map File Syntax, Map File Format
 @subsubsection Hints
 
 @noindent
@@ -982,7 +982,7 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.  Mathematical typesetting for
 @TeX{} performed by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
-This section contains extra discussions and hints regarding the world file and
+This section contains extra discussions and hints regarding the map file and
 the objects contained within it.
 
 First, a little explanation about @samp{LEN} and @samp{TEXLEN}.  With these

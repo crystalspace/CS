@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Ivan Avramovic <ivan@avramovic.com>
+    Copyright (C) 1998 by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,13 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _LOADINFO_H_
-#define _LOADINFO_H_
+#ifndef __CS_LOADINFO_H__
+#define __CS_LOADINFO_H__
 
 #include "csgeom/transfrm.h"
 
 class csMaterialWrapper;
-class csWorld;
 class csTextureList;
 
 class PSLoadInfo
@@ -50,4 +48,4 @@ public:
   }   
 };
 
-#endif
+#endif // __CS_LOADINFO_H__

@@ -190,7 +190,7 @@ void csGridBagLayout::LayoutCells (CellInfo* cells, int xCnt, int yCnt,
       // elimniate round-off errors at the expence of last column
       if (x == xCnt - 1)
         colSize = outterSize - spaceUsed;
-      for (int y = 0; y != yCnt; ++y)
+      for (y = 0; y != yCnt; ++y)
         CELL_AT(x,y).finalSize = colSize;
 
       spaceUsed += colSize;

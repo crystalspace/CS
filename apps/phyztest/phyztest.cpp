@@ -20,7 +20,7 @@
 #include "cssys/system.h"
 #include "apps/phyztest/phyztest.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/csview.h"
 #include "csengine/camera.h"
 #include "csengine/light.h"
@@ -97,9 +97,9 @@ csSprite3D *add_test_sprite( csSpriteTemplate *tmpl, csSector *aroom, csView *vi
 {
   csSprite3D *tsprt;
   
-  tsprt = new csSprite3D(view->GetWorld ());
+  tsprt = new csSprite3D(view->GetEngine ());
   tsprt->SetTemplate( tmpl );
-  view->GetWorld ()->sprites.Push (tsprt);
+  view->GetEngine ()->sprites.Push (tsprt);
   tsprt->GetMovable ().SetSector (aroom);
   csMatrix3 m; m.Identity ();
   tsprt->GetMovable ().SetTransform (m);
@@ -117,7 +117,7 @@ Phyztest::Phyztest ()
 {
   debug_level = 1;
   view = NULL;
-  world = NULL;
+  engine = NULL;
   dynlight = NULL;
   motion_flags = 0;
   cdsys = NULL;
@@ -140,15 +140,15 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
-  // Find the pointer to world plugin
-  iWorld *World = QUERY_PLUGIN (this, iWorld);
-  if (!World)
+  // Find the pointer to engine plugin
+  iEngine *Engine = QUERY_PLUGIN (this, iEngine);
+  if (!Engine)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iWorld plugin!\n");
+    CsPrintf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
-  world = World->GetCsWorld ();
-  World->DecRef ();
+  engine = Engine->GetCsEngine ();
+  Engine->DecRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Phyztest Crystal Space Application"))
@@ -167,20 +167,20 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
-  world->EnableLightingCache (false);
+  engine->EnableLightingCache (false);
 
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
 
-  if( !csLoader::LoadLibraryFile (world, "/lib/std/library" ) ){
+  if( !csLoader::LoadLibraryFile (engine, "/lib/std/library" ) ){
     Printf (MSG_INITIALIZATION, "LIBRARY NOT LOADED!...\n");
     Shutdown = true;
     return false;
   }
-  csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
-  csMaterialWrapper* tm = world->GetMaterials ()->FindByName ("stone");
+  csLoader::LoadTexture (engine, "stone", "/lib/std/stone4.gif");
+  csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
 
-  room = world->CreateCsSector ("room");
+  room = engine->CreateCsSector ("room");
   csPolygon3D* p;
   p = room->NewPolygon (tm);
   p->AddVertex (-5, 5, 5);
@@ -235,12 +235,12 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   iPolygonMesh* mesh = QUERY_INTERFACE (room, iPolygonMesh);
   (void)new csCollider(*room, cdsys, mesh);
 
-  world->Prepare ();
+  engine->Prepare ();
 
   // Create a dynamic light.
  /* angle = 0;
   dynlight = new csDynLight (cos (angle)*3, 17, sin (angle)*3, 7, 1, 0, 0);
-  world->AddDynLight (dynlight);
+  engine->AddDynLight (dynlight);
   dynlight->SetSector (room);
   dynlight->Setup ();
 */
@@ -250,7 +250,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (world, G3D);
+  view = new csView (engine, G3D);
   view->SetSector (room);
   view->GetCamera ()->SetPosition (csVector3 (0, 8, -4));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
@@ -291,7 +291,7 @@ void Phyztest::NextFrame ()
 
  //   CsPrintf (MSG_DEBUG_0, "adding chain\n");
     // use box template
-    csSpriteTemplate* bxtmpl = (csSpriteTemplate*)view->GetWorld ()->sprite_templates.FindByName ("box");
+    csSpriteTemplate* bxtmpl = (csSpriteTemplate*)view->GetEngine ()->sprite_templates.FindByName ("box");
     if (!bxtmpl){     
       Printf (MSG_INITIALIZATION, "couldn't load template 'box'\n");
       return;
@@ -339,14 +339,14 @@ void Phyztest::NextFrame ()
   // simple mass on a spring demo
   if( GetKeyState (CSKEY_TAB) && bot == NULL ){
     // add a sprite
-    csSpriteTemplate* tmpl = (csSpriteTemplate*)view->GetWorld ()->sprite_templates.FindByName ("box");
+    csSpriteTemplate* tmpl = (csSpriteTemplate*)view->GetEngine ()->sprite_templates.FindByName ("box");
     if (!tmpl){     
       Printf (MSG_INITIALIZATION, "couldn't load template 'bot'\n");
       return;
     }
-    bot = new csSprite3D(view->GetWorld ());
+    bot = new csSprite3D(view->GetEngine ());
     bot->SetTemplate( tmpl );
-    view->GetWorld ()->sprites.Push (bot);
+    view->GetEngine ()->sprites.Push (bot);
     bot->GetMovable ().SetSector (room);
     m.Identity (); //m = m * 2.0;
     bot->GetMovable ().SetTransform (m);
@@ -385,13 +385,13 @@ void Phyztest::NextFrame ()
 */
   // evolve the physics world by time step.  Slowed down by 4x due to speed of demo objects
   //!me phyz_world.evolve( 0, 0.25*elapsed_time / 1000.0 );  //!me .25 needed to balance test samples..
-  csRigidSpaceTimeObj::evolve_system( 0, 0.25*elapsed_time / 1000.0, &phyz_world, world );
+  csRigidSpaceTimeObj::evolve_system( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine );
 
   // if we have a spring and mass demo started
   if( bot ){
     csVector3 new_p = rb_bot->get_pos();
     csLight* lights[2];
-    int num_lights = world->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+    int num_lights = engine->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     bot->UpdateLighting (lights, num_lights);  
   
   }
@@ -423,7 +423,7 @@ void Phyztest::NextFrame ()
         m *= M_scale;
         chain[i]->sprt->GetMovable ().SetTransform(m);
 	chain[i]->sprt->GetMovable ().UpdateMove ();
-        num_lights = world->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+        num_lights = engine->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
               chain[i]->sprt->UpdateLighting (lights, num_lights);      
       }
     }
@@ -476,7 +476,7 @@ int main (int argc, char* argv[])
   // Create our main class.
   Sys = new Phyztest ();
   // temp hack until we find a better way
-  csWorld::System = Sys;
+  csEngine::System = Sys;
 
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");

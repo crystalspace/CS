@@ -80,7 +80,7 @@ in the src folder and drop them on the scfreg application.
 
 3. Choose an application to build.  I generally start with walktest.  Make it.
 
-4. Make sure the world file flarge.zip is in the data folder.
+4. Make sure the map file flarge.zip is in the data folder.
 
 5. You're all set to run the application.
 

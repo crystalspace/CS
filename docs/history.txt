@@ -1,5 +1,70 @@
 The history order has been reversed so that new features are at the top.
 
+7-Dec-2000
+	- Eric Sunshine made the following changes:
+	    - Renamed the following classes and SCF interfaces.  Fixed all
+	      source files, header files, and documentation to reflect these
+	      changes.
+		    iWorld --> iEngine
+		    csWorld --> csEngine
+		    csWorldConfig --> csEngineConfig
+		    csWorldState --> csEngineState
+		    csWorldStateVector --> csEngineStateVector
+	    - Renamed the following files.  Fixed all source files, header
+	      files, and documentation to reflect these changes.
+		    iworld.h --> iengine.h
+		    world.h --> engine.h
+		    world.cpp --> engine.cpp
+		    worldfmt.txi --> mapfmt.txi
+	    - Eliminated the old iEngine SCF interface and the iengine.h header
+	      file.  This interface was just a very thin wrapper around the
+	      existing iWorld (now iEngine) functionality.  However, since the
+	      engine library already contains sufficient SCF goop to pass as a
+	      plug-in module, the old thin iEngine wrapper was not actually
+	      needed.  The new iEngine is now the one and only interface for
+	      accessing the engine regardless of whether or not it is in a
+	      plug-in module or statically linked.  There is no longer any
+	      distinction.
+	    - Renamed all `world' variables to 'engine' throughout the project
+	      and documentation.  Renamed all variations of `world' (such as
+	      `World', etc.), as well.  Also renamed `world file' references to
+	      `map file' references.  Code and documentation which specifically
+	      refers to `world space' or `world coordinates' has not changed.
+	      In this case, the `world' terminology is appropriate and has been
+	      retained.
+	    - Added a bunch of missing `const' qualifiers to Dumper class.
+	    - Renamed Dungeon plug-in's SCF name from
+	      crystalspace.worldrnd.dungeon.std to crystalspace.dungeon.random.
+	    - csProgressPulse now uses iSystem::Printf() rather than
+	      CsPrintf(), thus it is no longer tied to the engine.  Also added
+	      Doxygen comments.
+	    - Enhanced the check for new C++ casting syntax in comptest.sh to
+	      be more thorough.  It now checks for all casting variations.
+	      This was necessary, since someone at NeXT botched the OpenStep
+	      Objective-C++ compiler so that it fails to understand
+	      reinterpret_cast even though it understands static_cast,
+	      const_cast, and dynamic_cast.
+	    - Eliminated compilation warning in csbaglay.cpp regarding one
+	      variable shadowing another.
+	    - NeXT csosdefs.h now defines __NEED_GENERIC_ISDIR for SYSDEF_DIR
+	      so that the generic isdir() gets defined.  This is now required
+	      by CSWS.
+	    - Added missing `const' qualifier to SetName() and GetName()
+	      methods of csFrame and csSpriteAction.
+	    - Eliminated several compilation warnings from the sound loader
+	      plug-in.
+	    - Eliminated compilation warning about redefinition of RED_PREPROC
+	      macro in haloscan.inc.  This warning only showed up on platforms
+	      which have TOP8BITS_R8G8B8_USED defined.
+	    - Eliminated several compilation warnings in g2dtest regarding
+	      implicit conversion of float to int.
+	    - Added missing `const' qualifiers to several methods in
+	      mz3DSprite.
+	    - Fixed quite a lot of multiple-include protection macros in
+	      include/csengine so that they are now prefixed by `CS' (for
+	      instance __CS_STATS_H__ rather than STATS_H).  This should help
+	      to avoid naming collisions with non-CS packages.
+	    - Eliminated compilation warning in ptlab.cpp.
 6-Dec-2000
 	- Fixed a comment in iGraphics2D.
 	- Extend csObject::GetChild() with a new 'derived' parameter similar

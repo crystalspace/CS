@@ -23,7 +23,7 @@
 #include "csengine/sector.h"
 #include "csengine/thing.h"
 #include "csengine/light.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/curve.h"
 #include "csutil/util.h"
 #include "ivfs.h"
@@ -220,7 +220,7 @@ void CacheName (char *buf, csPolygonSet *owner, int index, char *suffix)
 }
 
 bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
-  csObject* obj, bool isPolygon, int index, csWorld* world)
+  csObject* obj, bool isPolygon, int index, csEngine* engine)
 {
   char buf[200];
   PolySave ps, pswanted;
@@ -250,7 +250,7 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
 
   CacheName (buf, owner, index, "");
 
-  iDataBuffer* data = world->VFS->ReadFile (buf);
+  iDataBuffer* data = engine->VFS->ReadFile (buf);
   if (!data) return false;
 
   char *d = **data;
@@ -297,7 +297,7 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
   // Now load the dynamic data.
   //-------------------------------
   CacheName (buf, owner, index, "_d");
-  data = world->VFS->ReadFile (buf);
+  data = engine->VFS->ReadFile (buf);
   if (!data) return true;	// No dynamic data. @@@ Recalculate dynamic data?
 
   d = **data;
@@ -310,7 +310,7 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
     memcpy (&ls.id, d, sizeof (CS_ID)); d += sizeof (CS_ID);
     ls.id = convert_endian (ls.id);
 
-    light = world->FindLight (ls.id);
+    light = engine->FindLight (ls.id);
     if (light)
     {
       if (light->GetType () == csStatLight::Type && obj)
@@ -344,9 +344,9 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
   return true;
 }
 
-void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWorld* world)
+void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csEngine* engine)
 {
-  (void) world;
+  (void) engine;
   char buf[200];
   PolySave ps;
   long l;
@@ -373,7 +373,7 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
   // Write the normal lightmap data.
   //-------------------------------
   CacheName (buf, owner, index, "");
-  iFile *cf = world->VFS->Open (buf, VFS_FILE_WRITE);
+  iFile *cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
   cf->Write (ps.header, 4);
   s = ps.x1;      cf->Write ((char*)&s, sizeof (s));
   s = ps.y1;      cf->Write ((char*)&s, sizeof (s));
@@ -405,7 +405,7 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
     smap = first_smap;
 
     CacheName (buf, owner, index, "_d");
-    cf = world->VFS->Open (buf, VFS_FILE_WRITE);
+    cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
     cf->Write (lh.header, 4);
     l = convert_endian (lh.dyn_cnt);
     cf->Write ((char*)&l, 4);

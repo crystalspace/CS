@@ -21,7 +21,7 @@
 #include "csengine/pol2d.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
@@ -83,8 +83,8 @@ bool csDDGTerrain::Initialize (const void* heightMapFile, unsigned long size)
   context = new ddgContext ();
   context->control (&control);
   context->clipbox ()->min.set (0, 0, 0.1);
-  int fw = csWorld::current_world->G3D->GetWidth ();
-  int fh = csWorld::current_world->G3D->GetHeight ();
+  int fw = csEngine::current_engine->G3D->GetWidth ();
+  int fh = csEngine::current_engine->G3D->GetHeight ();
   context->clipbox ()->max.set (fw, fh, 1000);
 
   vbuf = new ddgVArray ();

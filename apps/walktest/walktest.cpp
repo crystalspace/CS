@@ -45,7 +45,7 @@
 #include "csengine/pol2d.h"
 #include "csengine/cbuffer.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/covtree.h"
 #include "csengine/solidbsp.h"
 #include "csengine/cspixmap.h"
@@ -93,7 +93,7 @@ REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------
 
-char WalkTest::world_dir [100];
+char WalkTest::map_dir [100];
 bool WalkTest::move_3d = false;
 
 WalkTest::WalkTest () :
@@ -108,7 +108,7 @@ WalkTest::WalkTest () :
   wMissile_boom = NULL;
   wMissile_whoosh = NULL;
   cslogo = NULL;
-  world = NULL;
+  engine = NULL;
   anim_sky = NULL;
 
   wf = NULL;
@@ -181,7 +181,7 @@ WalkTest::~WalkTest ()
   delete pllegs;
   delete [] recorded_perf_stats_name;
   if (perf_stats) perf_stats->DecRef ();
-  if (World) World->DecRef ();
+  if (Engine) Engine->DecRef ();
 }
 
 void WalkTest::SetSystemDefaults (iConfigFile *Config)
@@ -194,7 +194,7 @@ void WalkTest::SetSystemDefaults (iConfigFile *Config)
   const char *val;
   if (!(val = GetNameCL ()))
     val = Config->GetStr ("World", "WORLDFILE", "world");
-  sprintf (world_dir, "/lev/%s", val);
+  sprintf (map_dir, "/lev/%s", val);
 
   if (GetOptionCL ("clear"))
   {
@@ -265,10 +265,10 @@ void WalkTest::Help ()
   Sys->Printf (MSG_STDOUT, "  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
   Sys->Printf (MSG_STDOUT, "  -[no]fps           frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
   Sys->Printf (MSG_STDOUT, "  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
-  Sys->Printf (MSG_STDOUT, "  -infinite          special infinite level generation (ignores world file!)\n");
-  Sys->Printf (MSG_STDOUT, "  -huge              special huge level generation (ignores world file!)\n");
+  Sys->Printf (MSG_STDOUT, "  -infinite          special infinite level generation (ignores map file!)\n");
+  Sys->Printf (MSG_STDOUT, "  -huge              special huge level generation (ignores map file!)\n");
   Sys->Printf (MSG_STDOUT, "  -bots              allow random generation of bots\n");
-  Sys->Printf (MSG_STDOUT, "  <path>             load world from VFS <path> (default '%s')\n", Config->GetStr ("World", "WORLDFILE", "world"));
+  Sys->Printf (MSG_STDOUT, "  <path>             load map from VFS <path> (default '%s')\n", Config->GetStr ("World", "WORLDFILE", "world"));
 }
 
 //-----------------------------------------------------------------------------
@@ -368,7 +368,7 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
   }
 
   // Move all particle systems.
-  Sys->world->UpdateParticleSystems (elapsed_time);
+  Sys->engine->UpdateParticleSystems (elapsed_time);
 
   // Record the first time this routine is called.
   extern bool do_bots;
@@ -455,11 +455,11 @@ void WalkTest::DrawFrameDebug ()
   extern void draw_edges (csRenderView*, int, void*);
   if (do_edges)
   {
-    view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (),
+    view->GetEngine ()->DrawFunc (view->GetCamera (), view->GetClipper (),
     	draw_edges);
   }
   if (selected_polygon || selected_light)
-    view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (),
+    view->GetEngine ()->DrawFunc (view->GetCamera (), view->GetClipper (),
 	draw_edges, (void*)1);
   if (do_light_frust && selected_light)
   {
@@ -480,7 +480,7 @@ void WalkTest::DrawFrameDebug ()
   }
   if (do_show_cbuffer)
   {
-    csCBuffer* cbuf = view->GetWorld ()->GetCBuffer ();
+    csCBuffer* cbuf = view->GetEngine ()->GetCBuffer ();
     if (cbuf)
     {
       cbuf->GfxDump (Gfx2D, Gfx3D);
@@ -495,7 +495,7 @@ void WalkTest::DrawFrameDebug ()
 
 void WalkTest::DrawFrameExtraDebug ()
 {
-  csCoverageMaskTree* covtree = Sys->world->GetCovtree ();
+  csCoverageMaskTree* covtree = Sys->engine->GetCovtree ();
   if (covtree)
   {
     Gfx2D->Clear (0);
@@ -601,15 +601,15 @@ void WalkTest::DrawFrameConsole ()
 void WalkTest::DrawFrame3D (int drawflags, cs_time current_time)
 {
   // Tell Gfx3D we're going to display 3D things
-  if (!Gfx3D->BeginDraw (world->GetBeginDrawFlags () | drawflags
+  if (!Gfx3D->BeginDraw (engine->GetBeginDrawFlags () | drawflags
   	| CSDRAW_3DGRAPHICS))
     return;
 
   // Advance sprite frames
-  Sys->world->AdvanceSpriteFrames (current_time);
+  Sys->engine->AdvanceSpriteFrames (current_time);
 
   // Apply lighting BEFORE the very first frame
-  csDynLight* dyn = Sys->world->GetFirstDynLight ();
+  csDynLight* dyn = Sys->engine->GetFirstDynLight ();
   while (dyn)
   {
     extern void HandleDynLight (csDynLight*);
@@ -655,7 +655,7 @@ void WalkTest::DrawFrameMap ()
   if (map_mode == MAP_TXT)
   {
     // Texture mapped map.
-    csPolyIt* pi = view->GetWorld ()->NewPolyIterator ();
+    csPolyIt* pi = view->GetEngine ()->NewPolyIterator ();
     csPolygon3D* p;
     csCamera* cam = wf->GetCamera ();
     const csVector3& c = cam->GetOrigin ();
@@ -663,7 +663,7 @@ void WalkTest::DrawFrameMap ()
     csBox2 box (2, 2, FRAME_WIDTH-2, FRAME_HEIGHT-2);
     csClipper* clipper = new csBoxClipper (box);
     csVector2 maxdist (FRAME_WIDTH/(2*scale), FRAME_HEIGHT/(2*scale));
-    csPoly2DPool* render_pool = view->GetWorld ()->render_pol2d_pool;
+    csPoly2DPool* render_pool = view->GetEngine ()->render_pol2d_pool;
     Gfx3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
     int i;
     bool in;
@@ -751,7 +751,7 @@ void WalkTest::DrawFrameMap ()
     // Wireframe map.
     wf->GetWireframe ()->Clear ();
     extern void draw_map (csRenderView*, int, void*);
-    view->GetWorld ()->DrawFunc (view->GetCamera (),
+    view->GetEngine ()->DrawFunc (view->GetCamera (),
     	view->GetClipper (), draw_map);
     wf->GetWireframe ()->Draw (Gfx3D, wf->GetCamera (), map_projection);
   }
@@ -998,8 +998,8 @@ void debug_dump ()
   Sys->Printf (MSG_DEBUG_0, "Camera saved in coord.bug\n");
   Dumper::dump (Sys->view->GetCamera ());
   Sys->Printf (MSG_DEBUG_0, "Camera dumped in debug.txt\n");
-  Dumper::dump (Sys->world);
-  Sys->Printf (MSG_DEBUG_0, "World dumped in debug.txt\n");
+  Dumper::dump (Sys->engine);
+  Sys->Printf (MSG_DEBUG_0, "Engine dumped in debug.txt\n");
 }
 
 //---------------------------------------------------------------------------
@@ -1009,7 +1009,7 @@ void cleanup ()
 {
   Sys->console_out ("Cleaning up...\n");
   free_keymap ();
-  Sys->EndWorld ();
+  Sys->EndEngine ();
   delete Sys; Sys = NULL;
 }
 
@@ -1031,21 +1031,21 @@ void start_console ()
   txtmgr->SetPalette ();
 }
 
-void WalkTest::EndWorld ()
+void WalkTest::EndEngine ()
 {
   delete view; view = NULL;
 }
 
-void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
+void WalkTest::InitEngine (csEngine* engine, csCamera* /*camera*/)
 {
   Sys->Printf (MSG_INITIALIZATION, "Computing OBBs ...\n");
 
   iPolygonMesh* mesh;
-  int sn = world->sectors.Length ();
+  int sn = engine->sectors.Length ();
   while (sn > 0)
   {
     sn--;
-    csSector* sp = (csSector*)world->sectors[sn];
+    csSector* sp = (csSector*)engine->sectors[sn];
     // Initialize the sector itself.
     mesh = QUERY_INTERFACE (sp, iPolygonMesh);
     (void)new csCollider (*sp, collide_system, mesh);
@@ -1062,9 +1062,9 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
   // @@@ This routine ignores 2D sprites for the moment.
   csSprite3D* spp;
   int i;
-  for (i = 0 ; i < world->sprites.Length () ; i++)
+  for (i = 0 ; i < engine->sprites.Length () ; i++)
   {
-    csSprite* sp = (csSprite*)world->sprites[i];
+    csSprite* sp = (csSprite*)engine->sprites[i];
     if (sp->GetType () != csSprite3D::Type) continue;
     spp = (csSprite3D*)sp;
     mesh = QUERY_INTERFACE (spp, iPolygonMesh);
@@ -1081,13 +1081,13 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
 void WalkTest::LoadLibraryData(void)
 {
   // Load the "standard" library
-  csLoader::LoadLibraryFile (world, "/lib/std/library");
+  csLoader::LoadLibraryFile (engine, "/lib/std/library");
 }
 
 void WalkTest::Inititalize2DTextures ()
 {
   csTextureWrapper *texh;
-  csTextureList *texlist = world->GetTextures ();
+  csTextureList *texlist = engine->GetTextures ();
 
   // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
   // the use in the 2D part.
@@ -1102,7 +1102,7 @@ void WalkTest::Create2DSprites(void)
   int w, h;
   csTextureWrapper *texh;
   iTextureHandle* phTex;
-  csTextureList *texlist = world->GetTextures ();
+  csTextureList *texlist = engine->GetTextures ();
 
   // Create a 2D sprite for the Logo.
   texh = texlist->FindByName ("cslogo");
@@ -1182,14 +1182,14 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
-  // Find the world plugin and query the csWorld object from it...
-  World = QUERY_PLUGIN (Sys, iWorld);
-  if (!World)
+  // Find the engine plugin and query the csEngine object from it...
+  Engine = QUERY_PLUGIN (Sys, iEngine);
+  if (!Engine)
   {
-    Printf (MSG_FATAL_ERROR, "No iWorld plugin!\n");
+    Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     return false;
   }
-  world = World->GetCsWorld ();
+  engine = Engine->GetCsEngine ();
 
   // performance statistics module, also takes care of fps
   perf_stats = QUERY_PLUGIN (this, iPerfStats);
@@ -1202,7 +1202,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (world, Gfx3D);
+  view = new csView (engine, Gfx3D);
 
   // Get the collide system plugin.
   const char* p = Config->GetStr ("WalkTest", "COLLDET_PLUGIN",
@@ -1214,12 +1214,12 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     return false;
   }
 
-  // Initialize the command processor with the world and camera.
-  csCommandProcessor::Initialize (world, view->GetCamera (), Gfx3D, System->Console, System);
+  // Initialize the command processor with the engine and camera.
+  csCommandProcessor::Initialize (engine, view->GetCamera (), Gfx3D, System->Console, System);
 
   // Now we have two choices. Either we create an infinite
   // maze (random). This happens when the '-infinite' commandline
-  // option is given. Otherwise we load the given world.
+  // option is given. Otherwise we load the given map.
   csSector* room;
 
   if (do_infinite || do_huge)
@@ -1233,7 +1233,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     }
 
     Printf (MSG_INITIALIZATION, "Creating initial room!...\n");
-    world->EnableLightingCache (false);
+    engine->EnableLightingCache (false);
 
     // Unfortunately the current movement system does not allow the user to
     // move around the maze unless collision detection is enabled, even
@@ -1243,27 +1243,27 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     do_cd = true;
 
     // Load two textures that are used in the maze.
-    csLoader::LoadTexture (world, "txt", "/lib/std/stone4.gif");
-    csLoader::LoadTexture (world, "txt2", "/lib/std/mystone2.gif");
+    csLoader::LoadTexture (engine, "txt", "/lib/std/stone4.gif");
+    csLoader::LoadTexture (engine, "txt2", "/lib/std/mystone2.gif");
 
     if (do_infinite)
     {
       // Create the initial (non-random) part of the maze.
       infinite_maze = new InfiniteMaze ();
-      room = infinite_maze->create_six_room (world, 0, 0, 0)->sector;
-      infinite_maze->create_six_room (world, 0, 0, 1);
-      infinite_maze->create_six_room (world, 0, 0, 2);
-      infinite_maze->create_six_room (world, 1, 0, 2);
-      infinite_maze->create_six_room (world, 0, 1, 2);
-      infinite_maze->create_six_room (world, 1, 1, 2);
-      infinite_maze->create_six_room (world, 0, 0, 3);
-      infinite_maze->create_six_room (world, 0, 0, 4);
-      infinite_maze->create_six_room (world, -1, 0, 4);
-      infinite_maze->create_six_room (world, -2, 0, 4);
-      infinite_maze->create_six_room (world, 0, -1, 3);
-      infinite_maze->create_six_room (world, 0, -2, 3);
-      infinite_maze->create_six_room (world, 0, 1, 3);
-      infinite_maze->create_six_room (world, 0, 2, 3);
+      room = infinite_maze->create_six_room (engine, 0, 0, 0)->sector;
+      infinite_maze->create_six_room (engine, 0, 0, 1);
+      infinite_maze->create_six_room (engine, 0, 0, 2);
+      infinite_maze->create_six_room (engine, 1, 0, 2);
+      infinite_maze->create_six_room (engine, 0, 1, 2);
+      infinite_maze->create_six_room (engine, 1, 1, 2);
+      infinite_maze->create_six_room (engine, 0, 0, 3);
+      infinite_maze->create_six_room (engine, 0, 0, 4);
+      infinite_maze->create_six_room (engine, -1, 0, 4);
+      infinite_maze->create_six_room (engine, -2, 0, 4);
+      infinite_maze->create_six_room (engine, 0, -1, 3);
+      infinite_maze->create_six_room (engine, 0, -2, 3);
+      infinite_maze->create_six_room (engine, 0, 1, 3);
+      infinite_maze->create_six_room (engine, 0, 2, 3);
       infinite_maze->connect_infinite (0, 0, 0, 0, 0, 1);
       infinite_maze->connect_infinite (0, 0, 1, 0, 0, 2);
       infinite_maze->connect_infinite (0, 0, 2, 0, 0, 3);
@@ -1284,24 +1284,24 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     {
       // Create the huge world.
       huge_room = new HugeRoom ();
-      room = huge_room->create_huge_world (world);
+      room = huge_room->create_huge_world (engine);
     }
 
-    // Prepare the world. This will calculate all lighting and
+    // Prepare the engine. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
-    world->Prepare ();
+    engine->Prepare ();
   }
   else
   {
-    // Load from a world file.
-    Printf (MSG_INITIALIZATION, "Loading world '%s'...\n", world_dir);
+    // Load from a map file.
+    Printf (MSG_INITIALIZATION, "Loading map '%s'...\n", map_dir);
 
-    // Check the world and mount it if required
+    // Check the map and mount it if required
     char tmp [100];
-    sprintf (tmp, "%s/", world_dir);
-    if (!VFS->Exists (world_dir))
+    sprintf (tmp, "%s/", map_dir);
+    if (!VFS->Exists (map_dir))
     {
-      char *name = strrchr (world_dir, '/');
+      char *name = strrchr (map_dir, '/');
       if (name)
       {
         name++;
@@ -1315,21 +1315,21 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 	}
         sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
            name, valfiletype, name, valfiletype, name, valfiletype );
-        VFS->Mount (world_dir, tmp);
+        VFS->Mount (map_dir, tmp);
       }
     }
 
-    if (!VFS->ChDir (world_dir))
+    if (!VFS->ChDir (map_dir))
     {
-      Printf (MSG_FATAL_ERROR, "The directory on VFS for world file does not exist!\n");
+      Printf (MSG_FATAL_ERROR, "The directory on VFS for map file does not exist!\n");
       return false;
     }
 
 
-    // Load the world from the file.
-    if (!csLoader::LoadWorldFile (world, "world"))
+    // Load the map from the file.
+    if (!csLoader::LoadMapFile (engine, "world"))
     {
-      Printf (MSG_FATAL_ERROR, "Loading of world failed!\n");
+      Printf (MSG_FATAL_ERROR, "Loading of map failed!\n");
       return false;
     }
 
@@ -1337,59 +1337,59 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     Inititalize2DTextures ();
     ParseKeyCmds ();
 
-    // Prepare the world. This will calculate all lighting and
+    // Prepare the engine. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
-    world->Prepare ();
+    engine->Prepare ();
 
     Create2DSprites ();
 
-    // Look for the start sector in this world.
-    csCameraPosition *cp = (csCameraPosition *)world->camera_positions.FindByName ("Start");
+    // Look for the start sector in this map.
+    csCameraPosition *cp = (csCameraPosition *)engine->camera_positions.FindByName ("Start");
     const char *room_name;
     if (cp)
     {
       room_name = cp->Sector;
-      if (!cp->Load (*view->GetCamera (), world))
+      if (!cp->Load (*view->GetCamera (), engine))
         room_name = "room";
     }
     else
       room_name = "room";
 
-    room = (csSector *)world->sectors.FindByName (room_name);
+    room = (csSector *)engine->sectors.FindByName (room_name);
     if (!room)
     {
-      Printf (MSG_FATAL_ERROR,  "World file does not contain a room called '%s'"
+      Printf (MSG_FATAL_ERROR,  "Map does not contain a room called '%s'"
         " which is used\nas a starting point!\n", room_name);
       return false;
     }
   }
 
   // Initialize collision detection system (even if disabled so that we can enable it later).
-  InitWorld (world, view->GetCamera ());
+  InitEngine (engine, view->GetCamera ());
 
   // Create a wireframe object which will be used for debugging.
   wf = new csWireFrameCam (txtmgr);
 
   // Load a few sounds.
 #ifdef DO_SOUND
-  //csSoundData* w = csSoundDataObject::GetSound(*world, "tada.wav");
+  //csSoundData* w = csSoundDataObject::GetSound(*engine, "tada.wav");
   //if (w && Sound) Sound->PlaySound (w);
 
-  wMissile_boom = csSoundDataObject::GetSound(*world, "boom.wav");
-  wMissile_whoosh = csSoundDataObject::GetSound(*world, "whoosh.wav");
+  wMissile_boom = csSoundDataObject::GetSound(*engine, "boom.wav");
+  wMissile_whoosh = csSoundDataObject::GetSound(*engine, "whoosh.wav");
   //For 2D (nonmoveable) background sound, no control, loop
-  csObjIterator sobj = world->GetIterator (csSoundDataObject::Type);
+  csObjIterator sobj = engine->GetIterator (csSoundDataObject::Type);
   while (!sobj.IsNull ())
   {
-    //sounds (other than standard) are from a zip specified in world file
+    //sounds (other than standard) are from a zip specified in map file
     //SOUNDS section and specified in vfs.cfg in lib/sounds
     iSoundData* wSoundData = ((csSoundDataObject&)(*sobj)).GetSound();
     if (wSoundData && Sound)
     {
       //don't play now if loaded for missile
-      if ( wSoundData == csSoundDataObject::GetSound(*world, "tada.wav") ||
-	   wSoundData == csSoundDataObject::GetSound(*world, "boom.wav") ||
-	   wSoundData == csSoundDataObject::GetSound(*world, "whoosh.wav"))
+      if ( wSoundData == csSoundDataObject::GetSound(*engine, "tada.wav") ||
+	   wSoundData == csSoundDataObject::GetSound(*engine, "boom.wav") ||
+	   wSoundData == csSoundDataObject::GetSound(*engine, "whoosh.wav"))
       {
         ///++sobj;
       }

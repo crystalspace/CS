@@ -127,7 +127,7 @@ for Sprites.
 
 @item
 Sprite transparency effects (alpha, and keycolor) should be configurable in
-world file
+map file
 
 @item
 Dynamic skies (like Alex Pfaffe's DDG program?).

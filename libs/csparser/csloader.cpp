@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998,2000 by Jorrit Tyberghein
-    Written by Ivan Avramovic <ivan@avramovic.com>
+    Copyright (C) 1998,2000 by Ivan Avramovic <ivan@avramovic.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -33,7 +32,7 @@
 #include "csengine/polygon.h"
 #include "csengine/polytmap.h"
 #include "csengine/textrans.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/light.h"
 #include "csengine/texture.h"
 #include "csengine/curve.h"
@@ -61,8 +60,8 @@
 #include "imotion.h"
 
 typedef char ObName[30];
-/// The world we are currently processing
-static csWorld* World;
+/// The engine we are currently processing
+static csEngine* Engine;
 /// Loader flags
 static int flags = 0;
 
@@ -401,17 +400,17 @@ bool csLoader::load_color (char *buf, csRGBcolor &c)
 
 csMaterialWrapper *csLoader::FindMaterial (const char *iName)
 {
-  csMaterialWrapper *mat = World->GetMaterials ()->FindByName (iName);
+  csMaterialWrapper *mat = Engine->GetMaterials ()->FindByName (iName);
   if (mat)
     return mat;
 
-  csTextureWrapper *tex = World->GetTextures ()->FindByName (iName);
+  csTextureWrapper *tex = Engine->GetTextures ()->FindByName (iName);
   if (tex)
   {
     // Add a default material with the same name as the texture
     csMaterial *material = new csMaterial ();
     material->SetTextureWrapper (tex);
-    csMaterialWrapper *mat = World->GetMaterials ()->NewMaterial (material);
+    csMaterialWrapper *mat = Engine->GetMaterials ()->NewMaterial (material);
     mat->SetName (iName);
     material->DecRef ();
     return mat;
@@ -569,7 +568,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
   long cmd;
   char* params;
 
-  csCollection* collection = new csCollection (World);
+  csCollection* collection = new csCollection (Engine);
   collection->SetName (name);
 
   char str[255];
@@ -586,7 +585,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
       case CS_TOKEN_THING:
         {
           ScanStr (params, "%s", str);
-          csThing* th = (csThing*)World->things.FindByName (str);
+          csThing* th = (csThing*)Engine->things.FindByName (str);
           if (!th)
           {
             CsPrintf (MSG_FATAL_ERROR, "Thing '%s' not found!\n", str);
@@ -598,7 +597,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
       case CS_TOKEN_SPRITE:
         {
           ScanStr (params, "%s", str);
-          csSprite* spr = (csSprite*)World->sprites.FindByName (str);
+          csSprite* spr = (csSprite*)Engine->sprites.FindByName (str);
           if (!spr)
           {
             CsPrintf (MSG_FATAL_ERROR, "Sprite '%s' not found!\n", str);
@@ -610,7 +609,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
       case CS_TOKEN_LIGHT:
         {
           ScanStr (params, "%s", str);
-	  csStatLight* l = World->FindLight (str);
+	  csStatLight* l = Engine->FindLight (str);
           if (!l)
             CsPrintf (MSG_WARNING, "Light '%s' not found!\n", str);
 	  else
@@ -620,7 +619,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
       case CS_TOKEN_SECTOR:
         {
           ScanStr (params, "%s", str);
-          csSector* s = (csSector*)World->sectors.FindByName (str);
+          csSector* s = (csSector*)Engine->sectors.FindByName (str);
           if (!s)
           {
             CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found!\n", str);
@@ -632,7 +631,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
       case CS_TOKEN_COLLECTION:
         {
           ScanStr (params, "%s", str);
-          csCollection* th = (csCollection*)World->collections.FindByName (str);
+          csCollection* th = (csCollection*)Engine->collections.FindByName (str);
           if (!th)
           {
             CsPrintf (MSG_FATAL_ERROR, "Collection '%s' not found!\n", str);
@@ -812,7 +811,7 @@ csParticleSystem* csLoader::load_fountain (char* name, char* buf)
   }
 
   csFountainParticleSystem* partsys = new csFountainParticleSystem (
-  	World, number, material, mixmode, lighted_particles, drop_width,
+  	Engine, number, material, mixmode, lighted_particles, drop_width,
 	drop_height, origin, accel, fall_time, speed, opening,
 	azimuth, elevation);
   partsys->SetName (name);
@@ -906,7 +905,7 @@ csParticleSystem* csLoader::load_fire (char* name, char* buf)
   }
 
   csFireParticleSystem* partsys = new csFireParticleSystem (
-  	World, number, material, mixmode, lighted_particles, drop_width,
+  	Engine, number, material, mixmode, lighted_particles, drop_width,
 	drop_height, total_time, speed, origin, swirl, colorscale);
   partsys->SetName (name);
   return partsys;
@@ -992,7 +991,7 @@ csParticleSystem* csLoader::load_rain (char* name, char* buf)
   }
 
   csRainParticleSystem* partsys = new csRainParticleSystem (
-  	World, number, material, mixmode, lighted_particles, drop_width,
+  	Engine, number, material, mixmode, lighted_particles, drop_width,
 	drop_height, box.Min (), box.Max (), speed);
   partsys->SetName (name);
   partsys->SetColor (color);
@@ -1084,7 +1083,7 @@ csParticleSystem* csLoader::load_snow (char* name, char* buf)
   }
 
   csSnowParticleSystem* partsys = new csSnowParticleSystem (
-  	World, number, material, mixmode, lighted_particles, drop_width,
+  	Engine, number, material, mixmode, lighted_particles, drop_width,
 	drop_height, box.Min (), box.Max (), speed, swirl);
   partsys->SetName (name);
   partsys->SetColor (color);
@@ -1400,7 +1399,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
         csCurveTemplate* ct = load_beziertemplate (name, params,
 	    info.default_material, info.default_texlen,
 	    ps.GetCurveVertices ());
-	World->curve_templates.Push (ct);
+	Engine->curve_templates.Push (ct);
 	csCurve* p = ct->MakeCurve ();
 	p->SetName (ct->GetName ());
 	p->SetParent (&ps);
@@ -1505,7 +1504,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
 
   char* xname;
 
-  csThing* thing = new csThing (World);
+  csThing* thing = new csThing (Engine);
   thing->SetName (name);
 
   csLoaderStat::things_loaded++;
@@ -1795,7 +1794,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
 
   char* xname;
 
-  csThing* thing = new csThing (World, is_sky);
+  csThing* thing = new csThing (Engine, is_sky);
   thing->SetName (name);
 
   csLoaderStat::things_loaded++;
@@ -1862,7 +1861,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
       case CS_TOKEN_TEMPLATE:
         {
           ScanStr (params, "%s", str);
-          csThing* t = (csThing*)World->thing_templates.FindByName (str);
+          csThing* t = (csThing*)Engine->thing_templates.FindByName (str);
           if (!t)
           {
             CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing template '%s'!\n", str);
@@ -1870,7 +1869,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
           }
 	  if (info.use_mat_set)
           {
-            thing->MergeTemplate (t, sec, World->GetMaterials (), info.mat_set_name,
+            thing->MergeTemplate (t, sec, Engine->GetMaterials (), info.mat_set_name,
               info.default_material, info.default_texlen, false);
             info.use_mat_set = false;
 	  }
@@ -1883,7 +1882,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
       case CS_TOKEN_CLONE:
         {
           ScanStr (params, "%s", str);
-          csThing* t = (csThing*)World->things.FindByName (str);
+          csThing* t = (csThing*)Engine->things.FindByName (str);
           if (!t)
           {
             CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing '%s'!\n", str);
@@ -1891,7 +1890,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
           }
 	  if (info.use_mat_set)
           {
-            thing->MergeTemplate (t, sec, World->GetMaterials (), info.mat_set_name,
+            thing->MergeTemplate (t, sec, Engine->GetMaterials (), info.mat_set_name,
               info.default_material, info.default_texlen, true);
             info.use_mat_set = false;
 	  }
@@ -2087,7 +2086,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
       case CS_TOKEN_PORTAL:
         {
           ScanStr (params, "%s", str);
-          csSector *s = new csSector (World);
+          csSector *s = new csSector (Engine);
           s->SetName (str);
           poly3d->SetCSPortal (s);
           csLoaderStat::portals_loaded++;
@@ -2391,7 +2390,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
                              tx1.x, tx1.y, tx1.z, tx1_len);
   }
   else if (plane_name[0])
-    poly3d->SetTextureSpace ((csPolyTxtPlane*)World->planes.FindByName (plane_name));
+    poly3d->SetTextureSpace ((csPolyTxtPlane*)Engine->planes.FindByName (plane_name));
   else if (tx_len)
   {
     // If a length is given (with 'LEN') we will take the first two vertices
@@ -2439,7 +2438,7 @@ iImage* csLoader::load_image (const char* name)
     return NULL;
   }
 
-  ifile = csImageLoader::Load (buf->GetUint8 (), buf->GetSize (), World->GetTextureFormat ());
+  ifile = csImageLoader::Load (buf->GetUint8 (), buf->GetSize (), Engine->GetTextureFormat ());
   buf->DecRef ();
 
   if (!ifile)
@@ -2548,9 +2547,9 @@ void csLoader::txt_process (char *name, char* buf)
 
   // Add a default material with the same name as the texture.
 //csMaterial *material = new csMaterial ();
-//csMaterialWrapper *mat = World->GetMaterials ()->NewMaterial (material);
+//csMaterialWrapper *mat = Engine->GetMaterials ()->NewMaterial (material);
 
-  csTextureWrapper *tex = World->GetTextures ()->NewTexture (image);
+  csTextureWrapper *tex = Engine->GetTextures ()->NewTexture (image);
 //material->SetTextureWrapper (tex);
   tex->flags = flags;
   tex->SetName (name);
@@ -2587,7 +2586,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
       case CS_TOKEN_TEXTURE:
       {
         ScanStr (params, "%s", str);
-        csTextureWrapper *texh = World->GetTextures ()->FindByName (str);
+        csTextureWrapper *texh = Engine->GetTextures ()->FindByName (str);
         if (texh)
           material->SetTextureWrapper (texh);
         else
@@ -2621,7 +2620,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
     fatal_exit (0, false);
   }
 
-  csMaterialWrapper *mat = World->GetMaterials ()->NewMaterial (material);
+  csMaterialWrapper *mat = Engine->GetMaterials ()->NewMaterial (material);
   if (prefix)
   {
     char *prefixedname = new char [strlen (name) + strlen (prefix) + 2];
@@ -2981,7 +2980,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
   int i1, i2, i3, i4;
   bool do_stat_bsp = false;
 
-  csSector* sector = new csSector (World);
+  csSector* sector = new csSector (Engine);
   sector->SetName (secname);
 
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
@@ -3173,32 +3172,32 @@ csSector* csLoader::load_room (char* secname, char* buf)
         break;
       case CS_TOKEN_SPRITE:
         {
-          csSprite3D* sp = new csSprite3D (World);
+          csSprite3D* sp = new csSprite3D (Engine);
           sp->SetName (name);
           LoadSprite (sp, params);
-          World->sprites.Push (sp);
+          Engine->sprites.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
         }
         break;
       case CS_TOKEN_SPRITE2D:
         {
-          csSprite2D* sp = new csSprite2D (World);
+          csSprite2D* sp = new csSprite2D (Engine);
           sp->SetName (name);
           LoadSprite (sp, params);
-          World->sprites.Push (sp);
+          Engine->sprites.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
         }
         break;
       case CS_TOKEN_SKY:
-        World->skies.Push (load_thing (name, params, sector, true));
+        Engine->skies.Push (load_thing (name, params, sector, true));
         break;
       case CS_TOKEN_THING:
-        World->things.Push (load_thing (name, params, sector, false));
+        Engine->things.Push (load_thing (name, params, sector, false));
         break;
       case CS_TOKEN_SIXFACE:
-        World->things.Push (load_sixface (name, params, sector));
+        Engine->things.Push (load_sixface (name, params, sector));
         break;
       case CS_TOKEN_PORTAL:
         {
@@ -3440,7 +3439,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         p->SetTextureSpace (sector->Vwor (todo[done].tv1),
                               sector->Vwor (todo[done].tv2), len);
       else
-        p->SetTextureSpace ((csPolyTxtPlane*)World->planes.FindByName (colors[idx].plane));
+        p->SetTextureSpace ((csPolyTxtPlane*)Engine->planes.FindByName (colors[idx].plane));
       p->flags.Set (CS_POLY_LIGHTING, (no_lighting ? 0 : CS_POLY_LIGHTING));
       OptimizePolygon (p);
     }
@@ -3460,7 +3459,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
     }
 
     // This will later be defined correctly
-    portal = new csSector (World) ;
+    portal = new csSector (Engine) ;
     portal->SetName (portals[i].sector);
     p->SetCSPortal (portal);
     csLoaderStat::portals_loaded++;
@@ -3527,7 +3526,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   char* params;
   bool do_stat_bsp = false;
 
-  csSector* sector = new csSector (World) ;
+  csSector* sector = new csSector (Engine) ;
   sector->SetName (secname);
 
   csLoaderStat::sectors_loaded++;
@@ -3575,30 +3574,30 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 	partsys->GetMovable ().UpdateMove ();
         break;
       case CS_TOKEN_SKY:
-        World->skies.Push (load_thing (name, params, sector, true));
+        Engine->skies.Push (load_thing (name, params, sector, true));
         break;
       case CS_TOKEN_THING:
-        World->things.Push (load_thing (name, params, sector, false));
+        Engine->things.Push (load_thing (name, params, sector, false));
         break;
       case CS_TOKEN_SIXFACE:
-        World->things.Push (load_sixface (name, params, sector));
+        Engine->things.Push (load_sixface (name, params, sector));
         break;
       case CS_TOKEN_SPRITE:
         {
-          csSprite3D* sp = new csSprite3D (World);
+          csSprite3D* sp = new csSprite3D (Engine);
           sp->SetName (name);
           LoadSprite (sp, params);
-          World->sprites.Push (sp);
+          Engine->sprites.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
         }
         break;
       case CS_TOKEN_SPRITE2D:
         {
-          csSprite2D* sp = new csSprite2D (World);
+          csSprite2D* sp = new csSprite2D (Engine);
           sp->SetName (name);
           LoadSprite (sp, params);
-          World->sprites.Push (sp);
+          Engine->sprites.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
         }
@@ -3970,10 +3969,10 @@ iSoundData* csLoader::LoadSoundData(const char* filename) {
 }
 
 
-csSoundDataObject *csLoader::LoadSoundObject (csWorld* world,
+csSoundDataObject *csLoader::LoadSoundObject (csEngine* engine,
   char* name, const char* fname) {
 
-  World=world;
+  Engine=engine;
   /* load the sound data */
   iSoundData *Sound = LoadSoundData(fname);
 
@@ -3981,15 +3980,15 @@ csSoundDataObject *csLoader::LoadSoundObject (csWorld* world,
   csSoundDataObject* sndobj = new csSoundDataObject (Sound);
   sndobj->SetName (name);
 
-  /* add it to the world */
-// @@@ world->GetSounds()->Add(sndobj);
+  /* add it to the engine */
+// @@@ engine->GetSounds()->Add(sndobj);
 
   return sndobj;
 }
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadWorld (char* buf, bool onlyRegion)
+bool csLoader::LoadMap (char* buf, bool onlyRegion)
 {
   (void)onlyRegion;
 
@@ -4032,7 +4031,7 @@ bool csLoader::LoadWorld (char* buf, bool onlyRegion)
     long cmd;
     char* params;
 
-    World->SelectLibrary (name); //@@@? Don't do this for regions!
+    Engine->SelectLibrary (name); //@@@? Don't do this for regions!
 
     while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
     {
@@ -4067,9 +4066,9 @@ bool csLoader::LoadWorld (char* buf, bool onlyRegion)
 	    char str[255];
 	    ScanStr (params, "%s", str);
 	    if (*str)
-	      World->SelectRegion (str);
+	      Engine->SelectRegion (str);
 	    else
-	      World->SelectRegion (NULL);
+	      Engine->SelectRegion (NULL);
 	  }
 	  break;
         case CS_TOKEN_INCLUDESPRITE:
@@ -4077,38 +4076,38 @@ bool csLoader::LoadWorld (char* buf, bool onlyRegion)
 	    char str[255];
 	    ScanStr (params, "%s", str);
 	    CsPrintf (MSG_WARNING, "Loading sprite '%s'\n", str);
-	    LoadSpriteTemplate(World, str);
+	    LoadSpriteTemplate(Engine, str);
 	  }
 	  break;
         case CS_TOKEN_SPRITE:
           {
-            csSpriteTemplate* t = (csSpriteTemplate*)World->sprite_templates.FindByName (name);
+            csSpriteTemplate* t = (csSpriteTemplate*)Engine->sprite_templates.FindByName (name);
             if (!t)
             {
               t = new csSpriteTemplate ();
               t->SetName (name);
-              World->sprite_templates.Push (t);
+              Engine->sprite_templates.Push (t);
             }
             LoadSpriteTemplate (t, params);
           }
           break;
         case CS_TOKEN_THING:
-          if (!World->thing_templates.FindByName (name))
-            World->thing_templates.Push (load_thing (name, params, NULL, false));
+          if (!Engine->thing_templates.FindByName (name))
+            Engine->thing_templates.Push (load_thing (name, params, NULL, false));
           break;
         case CS_TOKEN_SIXFACE:
-          if (!World->thing_templates.FindByName (name))
-            World->thing_templates.Push (load_sixface (name, params, NULL));
+          if (!Engine->thing_templates.FindByName (name))
+            Engine->thing_templates.Push (load_sixface (name, params, NULL));
           break;
         case CS_TOKEN_SECTOR:
-          if (!World->sectors.FindByName (name))
-            World->sectors.Push (load_sector (name, params));
+          if (!Engine->sectors.FindByName (name))
+            Engine->sectors.Push (load_sector (name, params));
           break;
         case CS_TOKEN_PLANE:
-          World->planes.Push (load_polyplane (params, name));
+          Engine->planes.Push (load_polyplane (params, name));
           break;
         case CS_TOKEN_COLLECTION:
-          World->collections.Push (load_collection (name, params));
+          Engine->collections.Push (load_collection (name, params));
           break;
         case CS_TOKEN_SCRIPT:
           CsPrintf (MSG_WARNING, "Warning! SCRIPT statement is obsolete"
@@ -4120,14 +4119,14 @@ bool csLoader::LoadWorld (char* buf, bool onlyRegion)
           break;
         case CS_TOKEN_TEXTURES:
           {
-            World->GetTextures ()->DeleteAll ();
+            Engine->GetTextures ()->DeleteAll ();
             if (!LoadTextures (params))
               return false;
           }
           break;
         case CS_TOKEN_MATERIALS:
           {
-            World->GetMaterials ()->DeleteAll ();
+            Engine->GetMaterials ()->DeleteAll ();
             if (!LoadMaterials (params))
               return false;
           }
@@ -4138,42 +4137,42 @@ bool csLoader::LoadWorld (char* buf, bool onlyRegion)
           break;
         case CS_TOKEN_ROOM:
           // Not an object but it is translated to a special sector.
-          if (!World->sectors.FindByName (name))
-            World->sectors.Push (load_room (name, params));
+          if (!Engine->sectors.FindByName (name))
+            Engine->sectors.Push (load_room (name, params));
           break;
         case CS_TOKEN_LIGHTX:
           CsPrintf (MSG_WARNING, "Warning! LIGHTX statement is obsolete"
                                  " and does not do anything!\n");
           break;
         case CS_TOKEN_LIBRARY:
-          LoadLibraryFile (World, name);
+          LoadLibraryFile (Engine, name);
           break;
         case CS_TOKEN_START:
         {
           char start_sector [100];
           csVector3 pos (0, 0, 0);
           ScanStr (params, "%s,%f,%f,%f", &start_sector, &pos.x, &pos.y, &pos.z);
-          World->camera_positions.Push (new csCameraPosition ("Start",
+          Engine->camera_positions.Push (new csCameraPosition ("Start",
             start_sector, pos, csVector3 (0, 0, 1), csVector3 (0, 1, 0)));
           break;
         }
         case CS_TOKEN_KEY:
-          load_key (params, World);
+          load_key (params, Engine);
           break;
       }
     }
     if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
-      CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a world!\n", csGetLastOffender ());
+      CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a map!\n", csGetLastOffender ());
       fatal_exit (0, false);
     }
   }
 
-  int sn = World->sectors.Length ();
+  int sn = Engine->sectors.Length ();
   while (sn > 0)
   {
     sn--;
-    csSector* s = (csSector*)(World->sectors)[sn];
+    csSector* s = (csSector*)(Engine->sectors)[sn];
     int st = s->things.Length ();
     int j = -1;
     while (j < st)
@@ -4189,7 +4188,7 @@ bool csLoader::LoadWorld (char* buf, bool onlyRegion)
         {
           csPortal *portal = p->GetPortal ();
           csSector *stmp = portal->GetSector ();
-          csSector *snew = (csSector*)(World->sectors).FindByName(stmp->GetName ());
+          csSector *snew = (csSector*)(Engine->sectors).FindByName(stmp->GetName ());
           if (!snew)
           {
             CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found for portal in"
@@ -4208,16 +4207,16 @@ bool csLoader::LoadWorld (char* buf, bool onlyRegion)
   return true;
 }
 
-bool csLoader::LoadWorldFile (csWorld* world, const char* file)
+bool csLoader::LoadMapFile (csEngine* engine, const char* file)
 {
-  world->StartWorld ();
-  return AppendWorldFile (world, file);
+  engine->StartEngine ();
+  return AppendMapFile (engine, file);
 }
 
-bool csLoader::AppendWorldFile (csWorld* world, const char* file,
+bool csLoader::AppendMapFile (csEngine* engine, const char* file,
 	bool onlyRegion)
 {
-  World = world;
+  Engine = engine;
 
   csLoaderStat::Init ();
 
@@ -4226,11 +4225,11 @@ bool csLoader::AppendWorldFile (csWorld* world, const char* file,
   if (!buf || !buf->GetSize ())
   {
     if (buf) buf->DecRef ();
-    CsPrintf (MSG_FATAL_ERROR, "Could not open world file \"%s\" on VFS!\n", file);
+    CsPrintf (MSG_FATAL_ERROR, "Could not open map file \"%s\" on VFS!\n", file);
     return false;
   }
 
-  csIniFile* cfg = new csIniFile ("world.cfg", System->VFS);
+  csIniFile* cfg = new csIniFile ("map.cfg", System->VFS);
   if (cfg)
   {
     csLightMap::SetLightCellSize (cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",
@@ -4240,12 +4239,12 @@ bool csLoader::AppendWorldFile (csWorld* world, const char* file,
   CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d.\n",
       csLightMap::lightcell_size, csLightMap::lightcell_size);
 
-  if (!LoadWorld (**buf, onlyRegion))
+  if (!LoadMap (**buf, onlyRegion))
     return false;
 
   if (csLoaderStat::polygons_loaded)
   {
-    CsPrintf (MSG_INITIALIZATION, "Loaded world file:\n");
+    CsPrintf (MSG_INITIALIZATION, "Loaded map file:\n");
     CsPrintf (MSG_INITIALIZATION, "  %d polygons (%d portals),\n", csLoaderStat::polygons_loaded,
       csLoaderStat::portals_loaded);
     CsPrintf (MSG_INITIALIZATION, "  %d sectors, %d things, %d sprites, \n", csLoaderStat::sectors_loaded,
@@ -4358,7 +4357,7 @@ bool csLoader::LoadLibrary (char* buf)
     long cmd;
     char* params;
 
-    World->SelectLibrary (name);
+    Engine->SelectLibrary (name);
 
     while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
     {
@@ -4371,10 +4370,10 @@ bool csLoader::LoadLibrary (char* buf)
       switch (cmd)
       {
         case CS_TOKEN_PLANE:
-          World->planes.Push ( load_polyplane (params, name) );
+          Engine->planes.Push ( load_polyplane (params, name) );
           break;
         case CS_TOKEN_TEXTURES:
-          // Append textures to world.
+          // Append textures to engine.
           if (!LoadTextures (params))
             return false;
           break;
@@ -4388,19 +4387,19 @@ bool csLoader::LoadLibrary (char* buf)
           break;
         case CS_TOKEN_SPRITE:
           {
-            csSpriteTemplate* t = (csSpriteTemplate*)World->sprite_templates.FindByName (name);
+            csSpriteTemplate* t = (csSpriteTemplate*)Engine->sprite_templates.FindByName (name);
             if (!t)
             {
               t = new csSpriteTemplate ();
               t->SetName (name);
-              World->sprite_templates.Push (t);
+              Engine->sprite_templates.Push (t);
             }
             LoadSpriteTemplate (t, params);
           }
           break;
         case CS_TOKEN_THING:
-          if (!World->thing_templates.FindByName (name))
-            World->thing_templates.Push (load_thing (name, params, NULL, false));
+          if (!Engine->thing_templates.FindByName (name))
+            Engine->thing_templates.Push (load_thing (name, params, NULL, false));
           break;
       }
     }
@@ -4413,7 +4412,7 @@ bool csLoader::LoadLibrary (char* buf)
   return true;
 }
 
-bool csLoader::LoadLibraryFile (csWorld* world, const char* fname)
+bool csLoader::LoadLibraryFile (csEngine* engine, const char* fname)
 {
   iDataBuffer *buf = System->VFS->ReadFile (fname);
 
@@ -4424,7 +4423,7 @@ bool csLoader::LoadLibraryFile (csWorld* world, const char* fname)
     return false;
   }
 
-  World = world;
+  Engine = engine;
   bool retcode = LoadLibrary (**buf);
 
   buf->DecRef ();
@@ -4432,19 +4431,19 @@ bool csLoader::LoadLibraryFile (csWorld* world, const char* fname)
   return retcode;
 }
 
-csTextureWrapper* csLoader::LoadTexture (csWorld* world, const char* name, const char* fname)
+csTextureWrapper* csLoader::LoadTexture (csEngine* engine, const char* name, const char* fname)
 {
-  World = world;
+  Engine = engine;
   iImage *image = load_image (fname);
   if (!image)
     return NULL;
-  csTextureWrapper *th = world->GetTextures ()->NewTexture (image);
+  csTextureWrapper *th = engine->GetTextures ()->NewTexture (image);
   th->SetName (name);
   // dereference image pointer since th already incremented it
   image->DecRef ();
 
   csMaterial* material = new csMaterial ();
-  csMaterialWrapper* mat = World->GetMaterials ()->NewMaterial (material);
+  csMaterialWrapper* mat = Engine->GetMaterials ()->NewMaterial (material);
   mat->SetName (name);
   material->SetTextureWrapper (th);
   material->DecRef ();
@@ -4489,13 +4488,13 @@ bool csLoader::LoadSounds (char* buf)
           CsPrintf (MSG_FATAL_ERROR, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
           fatal_exit (0, false);
         }
-        iSoundData *snd = csSoundDataObject::GetSound (*World, name);
+        iSoundData *snd = csSoundDataObject::GetSound (*Engine, name);
         if (!snd)
         {
-          csSoundDataObject *s = LoadSoundObject(World, name, filename);
+          csSoundDataObject *s = LoadSoundObject(Engine, name, filename);
           if (s)
           {
-            World->ObjAdd(s);
+            Engine->ObjAdd(s);
             csLoaderStat::sounds_loaded++;
           }
         }
@@ -4603,10 +4602,10 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
 
 //---------------------------------------------------------------------------
 
-csSpriteTemplate* csLoader::LoadSpriteTemplate (csWorld* world,
+csSpriteTemplate* csLoader::LoadSpriteTemplate (csEngine* engine,
 	const char* fname)
 {
-  World = world;
+  Engine = engine;
 
   iDataBuffer *databuff = System->VFS->ReadFile (fname);
 
@@ -4636,7 +4635,7 @@ csSpriteTemplate* csLoader::LoadSpriteTemplate (csWorld* world,
     tmpl->SetName (name);
     if (LoadSpriteTemplate (tmpl, data))
     {
-      World->sprite_templates.Push (tmpl);
+      Engine->sprite_templates.Push (tmpl);
       databuff->DecRef ();
       return tmpl;
     }
@@ -5052,7 +5051,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
         memset (str, 0, 255);
         memset (str2, 0, 255);
         ScanStr (params, "%s,%s", str, str2);
-        tpl = (csSpriteTemplate*)World->sprite_templates.FindByName (str);
+        tpl = (csSpriteTemplate*)Engine->sprite_templates.FindByName (str);
         if (tpl == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find sprite template '%s'!\n", str);
@@ -5143,9 +5142,9 @@ csFrame* csLoader::LoadFrame (csSpriteTemplate* stemp, char* buf)
     return stemp->GetFrame(frame);
 }
 
-iMotion* csLoader::LoadMotion (csWorld* world, const char* fname)
+iMotion* csLoader::LoadMotion (csEngine* engine, const char* fname)
 {
-  World = world;
+  Engine = engine;
 
   iDataBuffer *databuff = System->VFS->ReadFile (fname);
 
@@ -5290,4 +5289,3 @@ bool csLoader::LoadMotion (iMotion* mot, char* buf)
   }
   return true;
 }
-//---------------------------------------------------------------------------

@@ -48,7 +48,7 @@
 #include "itxtmgr.h"
 #include "iview.h"
 #include "itexture.h"
-#include "iworld.h"
+#include "iengine.h"
 #include "ipolyset.h"
 #endif
 

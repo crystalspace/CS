@@ -43,7 +43,7 @@ the engine via a pointer to your body.  That value would be used to
 update the position of the object that represents your body in the renderer.
 
 @menu
-* csPhyziks World:: The World
+* csPhyziks World:: Physical World
 * csPhyziks Bodies:: Bodies
 * csPhyziks Forces:: Forces
 * csPhyziks Articulated Bodies:: Articulated Bodies
@@ -55,7 +55,7 @@ update the position of the object that represents your body in the renderer.
 @end menu
 
 @node csPhyziks World, csPhyziks Bodies, csPhyziks, csPhyziks
-@subsection The World
+@subsection Physical World
 
 There is a convenient header file that includes all the other headers you
 will probably need.

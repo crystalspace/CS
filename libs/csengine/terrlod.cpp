@@ -21,7 +21,7 @@
 #include "csengine/pol2d.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
@@ -551,5 +551,3 @@ int csLODTerrain::CollisionDetect (csTransform* transform)
     return 1;
 #endif
 }
-
-

@@ -35,7 +35,7 @@
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/keyval.h"
 #include "csengine/collider.h"
 #include "csengine/cspixmap.h"
@@ -83,7 +83,7 @@ void WalkTest::CreateColliders ()
 {
   csPolygon3D *p;
   iPolygonMesh* mesh;
-  plbody = new csPolygonSet (world);
+  plbody = new csPolygonSet (engine);
   plbody->SetName ("Player's Body");
 
   plbody->AddVertex(-DX_2, OY,    -DZ_2);
@@ -130,7 +130,7 @@ void WalkTest::CreateColliders ()
   body = new csCollider (*plbody, collide_system, mesh);
   body_radius = plbody->GetRadius ();
 
-  pllegs = new csPolygonSet (world);
+  pllegs = new csPolygonSet (engine);
 
   pllegs->AddVertex(-DX_2L, OYL,     -DZ_2L);
   pllegs->AddVertex(-DX_2L, OYL,     DZ_2L);
@@ -191,7 +191,7 @@ int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
   int c = 0;
   // @@@ Avoid this sqrt somehow? i.e. by having it in the objects.
   float size = sqrt (d.x * d.x + d.y * d.y + d.z * d.z);
-  csSectorIt* it = Sys->world->GetNearbySectors (s, v, size);
+  csSectorIt* it = Sys->engine->GetNearbySectors (s, v, size);
   csSector* sector;
   while ((sector = it->Fetch ()) != NULL)
   {

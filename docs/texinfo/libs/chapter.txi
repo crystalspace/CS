@@ -15,7 +15,7 @@ graph.  @xref{Dependencies}.
 * csUtil:: Utility Library (@code{csUtil})
 * SCF:: Shared Class Facility (@sc{scf})
 * csGeom:: Geometry Library (@code{csGeom})
-* csParser:: World File Parser (@code{csParser})
+* csParser:: Map File Parser (@code{csParser})
 * CSWS:: Crystal Space Windowing System (@sc{csws})
 * csPhyziks:: csPhyziks Library (@code{csphyzik})
 @end menu

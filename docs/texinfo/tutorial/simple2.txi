@@ -61,7 +61,7 @@ bool Simple::Initialize(int argc, char const* const argv[],
 
   // Load a texture for our sprite and fetch the material.
   csTextureHandle* txt =
-    csLoader::LoadTexture (world, "spark", "/lib/std/spark.png");
+    csLoader::LoadTexture (engine, "spark", "/lib/std/spark.png");
   if (txt == NULL)
   @{
     Printf (MSG_FATAL_ERROR, "Error loading texture!\n");
@@ -72,13 +72,13 @@ bool Simple::Initialize(int argc, char const* const argv[],
   txtmgr->PrepareTexture (txt->GetTextureHandle ());
 
   csMaterialWrapper* mat =
-    world->GetMaterials ()->FindByName ("spark");
+    engine->GetMaterials ()->FindByName ("spark");
   mat->Register (txtmgr);
   txtmgr->PrepareMaterial (mat->GetMaterialHandle ());
 @}
 @end example
 
-This code first loads a texture in our world with
+This code first loads a texture in our engine with
 @code{csLoader::LoadTexture()}.  The third argument is the file name for our
 texture (@sc{vfs} path) and the second argument is how that texture should be
 named in the engine.  In this case we use @samp{spark} for that because that's
@@ -86,7 +86,7 @@ how the @file{sprite1} definition wants it.
 
 If this loading succeeds we need to register our texture with the
 texture manager. This is because we didn't put the loading of our texture
-before the @code{world->Prepare()} call (which takes care of this
+before the @code{engine->Prepare()} call (which takes care of this
 registering automatically). The lines @code{txt->Register()} and
 @code{txtmgr->PrepareTexture()} can be used at any time while the
 application is running to dynamically load additional textures. The
@@ -118,7 +118,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 @{
   @dots{}
   // Load a sprite template from disk.
-  csSpriteTemplate* spritetmpl = csLoader::LoadSpriteTemplate (world,
+  csSpriteTemplate* spritetmpl = csLoader::LoadSpriteTemplate (engine,
   	"/lib/std/sprite1");
   if (spritetmpl == NULL)
   @{
@@ -135,7 +135,7 @@ sprite template from the given location. The name of the sprite template
 will be 'box' as that is the name given in the file @file{sprite1} itself.
 
 This is all there is to it. After this call the sprite template is loaded
-in the world and can be used to create sprites. This is what we'll do
+in the engine and can be used to create sprites. This is what we'll do
 in the next section.
 
 @node Simple Creating Sprite, , Simple Loading Sprite Template, Tutorial Simple 2
@@ -152,10 +152,10 @@ bool Simple::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 @{
   @dots{}
-  // Add the sprite to the world.
-  csSprite3D* sprite = spritetmpl->NewSprite (world);
+  // Add the sprite to the engine.
+  csSprite3D* sprite = spritetmpl->NewSprite (engine);
   sprite->SetName ("MySprite");
-  world->sprites.Push (sprite);
+  engine->sprites.Push (sprite);
   sprite->GetMovable ().SetSector (room);
   csMatrix3 m; m.Identity (); m *= 5.;
   sprite->GetMovable ().SetTransform (m);
@@ -172,8 +172,8 @@ This is not enough however. First we give the sprite a name. This is not
 required but it is useful in a game context. If you have scripts controlling
 game logic you sometimes might want to refer to objects by their name.
 
-The @code{world->sprites.Push(sprite)} line is important.  It registers the
-sprite with the world.  If you don't do this then Crystal Space will not know
+The @code{engine->sprites.Push(sprite)} line is important.  It registers the
+sprite with the engine.  If you don't do this then Crystal Space will not know
 about this sprite.  The @code{sprite->GetMovable().SetSector(room)} is
 equally important as it actually places the sprite in a sector (our room).
 @code{SetSector()} is a conveniance function to quickly position a sprite in

@@ -41,7 +41,7 @@ associated values which may appear in each section.
 
 Specifies the name of the texture, that will be used, when the original
 texture is not found.  If the default texture will not be found, the resulting
-map will not be useable.  You need to manually edit the world file then.  (I
+map will not be useable.  You need to manually edit the map file then.  (I
 don't recommend doing so, but there are users, who just want to do that.)
 
 @item

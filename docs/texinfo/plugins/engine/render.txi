@@ -26,19 +26,19 @@ basics for using Crystal Space.  This document is baseed upon the
 looks a lot like a tutorial.
 
 First we start in @file{apps/simple/simple.cpp}.  In the @code{main()}
-function we initialize our world.  This is an instance of the class
-@samp{csWorld} which actually represents the engine.  I will not explain how
+function we initialize our engine.  This is an instance of the class
+@samp{csEngine} which actually represents the engine.  I will not explain how
 all the initialization works.  This is explained in the tutorial.  But I will
-go straight to @code{csWorld::Draw()} which is called indirectly from within
+go straight to @code{csEngine::Draw()} which is called indirectly from within
 @code{Simple::NextFrame()}.  It is called indirectly because first we call
-@code{csView::Draw()} which then calls @code{csWorld::Draw()}.
+@code{csView::Draw()} which then calls @code{csEngine::Draw()}.
 
-@subsubheading World Rendering (@code{csWorld::Draw()})
+@subsubheading World Rendering (@code{csEngine::Draw()})
 
-The method @code{csWorld::Draw()} is located in the file
-@file{CS/libs/csengine/world.cpp}.
+The method @code{csEngine::Draw()} is located in the file
+@file{CS/libs/csengine/engine.cpp}.
 
-@code{csWorld::Draw()} first sets up the initial @samp{csRenderView}
+@code{csEngine::Draw()} first sets up the initial @samp{csRenderView}
 structure.  This structure is defined in @file{CS/include/csengine/rview.h}
 and is the main structure which is used throughout the entire rendering
 process.  It collects all data that is required for rendering the recursive
@@ -72,10 +72,10 @@ Another important thing is that @samp{csRenderView} is actually a subclass of
 @samp{csCamera} (@file{CS/include/csengine/camera.h}) so all camera
 functionality is present as well.
 
-To set up the initial @samp{csRenderView} structure @code{csWorld::Draw()}
+To set up the initial @samp{csRenderView} structure @code{csEngine::Draw()}
 creates a new instance based upon the given camera.
 
-After this @code{csWorld::Draw()} gets the current sector from the camera and
+After this @code{csEngine::Draw()} gets the current sector from the camera and
 calls @code{csSector::Draw()} (@file{CS/libs/csengine/sector.cpp}).  This will
 essentially draw the whole screen as discussed below.
 

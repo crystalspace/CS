@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef LIGHTMAP_H
-#define LIGHTMAP_H
+#ifndef __CS_LIGHTMAP_H__
+#define __CS_LIGHTMAP_H__
 
 #include "csutil/scf.h"
 #include "csgfxldr/rgbpixel.h"
@@ -27,7 +27,7 @@ class csPolyTexture;
 class csPolygonSet;
 class csPolygon3D;
 class csLight;
-class csWorld;
+class csEngine;
 class Dumper;
 class csDelayedLightingInfo;
 class csObject;
@@ -267,13 +267,12 @@ public:
    * for identifying the lightmap on disk.
    */
   bool ReadFromCache (int w, int h, csPolygonSet* owner,
-    csObject* obj, bool isPolygon, int index, csWorld* world);
+    csObject* obj, bool isPolygon, int index, csEngine*);
 
   /**
    * Cache the lightmaps in the precalculation area.
    */
-  void Cache (csPolygonSet* owner, csPolygon3D* poly, int index,
-    csWorld* world);
+  void Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csEngine*);
 
   /**
    * Convert the lightmaps to the correct mixing mode.
@@ -326,4 +325,4 @@ public:
   { return lm_size; }
 };
 
-#endif // LIGHTMAP_H
+#endif // __CS_LIGHTMAP_H__

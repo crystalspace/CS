@@ -24,7 +24,7 @@
 
 class csSector;
 class csDynLight;
-class csWorld;
+class csEngine;
 
 /**
  * A bot which moves randomly through the dungeon.
@@ -32,8 +32,8 @@ class csWorld;
 class Bot : public csSprite3D
 {
 private:
-  /// Remember world
-  csWorld *world;
+  /// Engine handle.
+  csEngine *engine;
   /// Current movement vector (unit vector).
   csVector3 d;
   /// Position that is followed.
@@ -49,7 +49,7 @@ public:
 
 public:
   /// Constructor.
-  Bot (csSpriteTemplate* tmpl, csWorld *World);
+  Bot (csSpriteTemplate* tmpl, csEngine *Engine);
   /// Destructor.
   virtual ~Bot ();
 

@@ -20,13 +20,13 @@
 #include "bot.h"
 #include "csengine/sector.h"
 #include "csengine/light.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 
 IMPLEMENT_CSOBJTYPE (Bot,csSprite3D);
 
-Bot::Bot (csSpriteTemplate* tmpl, csWorld *World) : csSprite3D (World)
+Bot::Bot (csSpriteTemplate* tmpl, csEngine *Engine) : csSprite3D (Engine)
 {
-  world = World;
+  engine = Engine;
   SetTemplate (tmpl);
   do
   {
@@ -93,7 +93,7 @@ void Bot::move (cs_time elapsed_time)
   {
     GetMovable ().SetSector (s);
     csLight* lights[2];
-    int num_lights = world->GetNearbyLights (s, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+    int num_lights = engine->GetNearbyLights (s, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     UpdateLighting (lights, num_lights);
     if (light)
     {

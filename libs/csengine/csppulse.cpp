@@ -18,16 +18,13 @@
 */
 
 #include "cssysdef.h"
-#include "csengine/world.h"
 #include "csengine/csppulse.h"
 
 static char const ANIMATION[] = "-\\|/";
 int const ANIMATION_COUNT = sizeof(ANIMATION) / sizeof(ANIMATION[0]) - 1;
 
-csProgressPulse::csProgressPulse() :
-    type(MSG_INITIALIZATION), state(0), drawn(false)
-{
-}
+csProgressPulse::csProgressPulse(iSystem* s) :
+    sys(s), type(MSG_INITIALIZATION), state(0), drawn(false) {}
 
 csProgressPulse::~csProgressPulse()
 {
@@ -38,7 +35,7 @@ void csProgressPulse::Erase()
 {
   if (drawn)
   {
-    CsPrintf (type, "\b \b");
+    sys->Printf(type, "\b \b");
     drawn = false;
   }
 }
@@ -53,7 +50,7 @@ void csProgressPulse::Step()
 {
   char const* prefix = (drawn ? "\b" : "");
   drawn = true;
-  CsPrintf (type, "%s%c", prefix, ANIMATION[state]);
+  sys->Printf(type, "%s%c", prefix, ANIMATION[state]);
   if (++state >= ANIMATION_COUNT)
     state = 0;
 }

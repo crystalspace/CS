@@ -23,7 +23,7 @@
 #include "csengine/sector.h"
 #include "csengine/portal.h"
 #include "csengine/polygon.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
 #include "csengine/light.h"
@@ -119,17 +119,17 @@ float rand2 (float max)
   return max*(f/(RAND_MAX/2)-1);
 }
 
-InfRoomData* InfiniteMaze::create_six_room (csWorld* world, int x, int y, int z)
+InfRoomData* InfiniteMaze::create_six_room (csEngine* engine, int x, int y, int z)
 {
   char buf[50];
   sprintf (buf, "r%d_%d_%d", x, y, z);
-  csSector* room = world->CreateCsSector (buf);
+  csSector* room = engine->CreateCsSector (buf);
   float dx, dy, dz;
   dx = 2.0*(float)x;
   dy = 2.0*(float)y;
   dz = 2.0*(float)z;
-  csMaterialWrapper* t = world->GetMaterials ()->FindByName ("txt");
-  csMaterialWrapper* t2 = world->GetMaterials ()->FindByName ("txt2");
+  csMaterialWrapper* t = engine->GetMaterials ()->FindByName ("txt");
+  csMaterialWrapper* t2 = engine->GetMaterials ()->FindByName ("txt2");
   float s = 1;
 
   create_one_side (room, "n", t, t2, dx-s,dy+s,dz+s,  dx+s,dy+s,dz+s,  dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);
@@ -233,7 +233,7 @@ void InfPortalCS::CompleteSector ()
 {
   extern WalkTest* Sys;
   InfiniteMaze* infinite_maze = Sys->infinite_maze;
-  csSector* s = infinite_maze->create_six_room (Sys->world, x2, y2, z2)->sector;
+  csSector* s = infinite_maze->create_six_room (Sys->engine, x2, y2, z2)->sector;
   infinite_maze->connect_infinite (x1, y1, z1, x2, y2, z2, false);
   SetSector (s);
   infinite_maze->random_loose_portals (x2, y2, z2);

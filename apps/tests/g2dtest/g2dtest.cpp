@@ -581,7 +581,7 @@ void G2DTestSystemDriver::DrawLineTest ()
   int w = G2D->GetWidth ();
   float x = (w / 2) + 0.5;
   float y = G2D->GetHeight () - 50.5;
-  G2D->DrawPixel (x, y, white);
+  G2D->DrawPixel (int(x), int(y), white);
   G2D->DrawLine (0, y - 0.5, x - 0.5, y - 0.5, red);
   G2D->DrawLine (x + 0.5, y + 0.49, w, y + 0.49, red);
 
@@ -701,7 +701,7 @@ void G2DTestSystemDriver::DrawTextTest ()
     {
       float x = sx + rng.Get () * sw;
       float y = sy + rng.Get () * sh;
-      G2D->Write (font, x, y, colors [rng.Get (4)], black, text);
+      G2D->Write (font, int(x), int(y), colors [rng.Get (4)], black, text);
       char_count += cc;
     }
     G2D->PerformExtension ("flush");
@@ -751,7 +751,7 @@ void G2DTestSystemDriver::DrawTextTest2 ()
     {
       float x = sx + rng.Get () * sw;
       float y = sy + rng.Get () * sh;
-      G2D->Write (font, x, y, colors [rng.Get (4)], -1, text);
+      G2D->Write (font, int(x), int(y), colors [rng.Get (4)], -1, text);
       char_count += cc;
     }
     G2D->PerformExtension ("flush");

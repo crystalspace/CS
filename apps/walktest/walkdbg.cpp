@@ -32,7 +32,7 @@
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/covtree.h"
 #include "csengine/solidbsp.h"
 #include "csengine/cssprite.h"
@@ -95,7 +95,7 @@ int collcount = 0;
 
 //------------------------------------------------------------------------
 // The following series of functions are all special callback functions
-// which are called by csWorld::DrawFunc() or csLight::LightingFunc().
+// which are called by csEngine::DrawFunc() or csLight::LightingFunc().
 //------------------------------------------------------------------------
 
 // Callback for LightingFunc() to show the lighting frustum for the
@@ -167,10 +167,10 @@ void select_object (csRenderView* rview, int type, void* entity)
       {
         iz = rview->GetFOV ()/v.z;
         px = QInt (v.x * iz + rview->GetShiftX ());
-        py = csWorld::frame_height - 1 - QInt (v.y * iz + rview->GetShiftY ());
+        py = csEngine::frame_height - 1 - QInt (v.y * iz + rview->GetShiftY ());
         r = QInt (.3 * iz);
         if (ABS (coord_check_vector.x - px) < 5 &&
-		ABS (coord_check_vector.y - (csWorld::frame_height-1-py)) < 5)
+		ABS (coord_check_vector.y - (csEngine::frame_height-1-py)) < 5)
         {
 	  csLight* light = (csLight*)sector->lights[i];
 	  if (check_light)
@@ -354,9 +354,9 @@ static void WalkDbgDrawMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       for (j = 0 ; j < poly.num ; j++)
       {
         g2d->DrawLine (poly.vertices[j].sx,
-	  csWorld::frame_height - 1 - poly.vertices[j].sy,
+	  csEngine::frame_height - 1 - poly.vertices[j].sy,
       	  poly.vertices[j1].sx,
-	  csWorld::frame_height - 1 - poly.vertices[j1].sy, green);
+	  csEngine::frame_height - 1 - poly.vertices[j1].sy, green);
         j1 = j;
       }
     }
@@ -402,9 +402,9 @@ void draw_edges (csRenderView* rview, int type, void* entity)
       for (i = 0 ; i < dpfx->num ; i++)
       {
         rview->g2d->DrawLine (dpfx->vertices[i].sx,
-	  csWorld::frame_height - 1 - dpfx->vertices[i].sy,
+	  csEngine::frame_height - 1 - dpfx->vertices[i].sy,
       	  dpfx->vertices[i1].sx,
-	  csWorld::frame_height - 1 - dpfx->vertices[i1].sy, blue);
+	  csEngine::frame_height - 1 - dpfx->vertices[i1].sy, blue);
         i1 = i;
       }
     }
@@ -434,7 +434,7 @@ void draw_edges (csRenderView* rview, int type, void* entity)
         {
           iz = rview->GetFOV ()/v.z;
           px = QInt (v.x * iz + rview->GetShiftX ());
-          py = csWorld::frame_height - 1 - QInt (v.y * iz + rview->GetShiftY ());
+          py = csEngine::frame_height - 1 - QInt (v.y * iz + rview->GetShiftY ());
           r = QInt (.3 * iz);
           rview->g2d->DrawLine (px-r, py-r, px+r, py+r, selcol);
           rview->g2d->DrawLine (px+r, py-r, px-r, py+r, selcol);
@@ -841,7 +841,7 @@ static csVector3 GetVector3 (int plane_nr, float plane_pos,
   return v;
 }
 
-void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int depth)
+void CreateSolidThings (csEngine* engine, csSector* room, csOctreeNode* node, int depth)
 {
   if (!node) return;
   int side;
@@ -877,8 +877,8 @@ void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int 
 	    v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4;
 	    v.y = cor_xy.y + (y+1)*(cor_XY.y-cor_xy.y)/4;
 	    csVector3 v4 = GetVector3 (plane_nr, plane_pos, v);
-	    csMaterialWrapper* white = world->GetMaterials ()->FindByName ("white");
-	    csThing* thing = new csThing (world);
+	    csMaterialWrapper* white = engine->GetMaterials ()->FindByName ("white");
+	    csThing* thing = new csThing (engine);
 	    thing->AddVertex (v1);
 	    thing->AddVertex (v2);
 	    thing->AddVertex (v3);
@@ -929,7 +929,7 @@ void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int 
   }
   int i;
   for (i = 0 ; i < 8 ; i++)
-    CreateSolidThings (world, room, node->GetChild (i), depth+1);
+    CreateSolidThings (engine, room, node->GetChild (i), depth+1);
 }
 
 struct db_frust
@@ -1001,7 +1001,7 @@ void ShowCheckFrustum (csView* view,
   lview.light_frustum = new csFrustum (pos);
   lview.light_frustum->MakeInfinite ();
   room->CheckFrustum (lview);
-  view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (),
+  view->GetEngine ()->DrawFunc (view->GetCamera (), view->GetClipper (),
     	draw_frust_edges);
 }
 

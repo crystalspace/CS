@@ -21,7 +21,7 @@
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/tranman.h"
 #include "csengine/stats.h"
 #include "csengine/cbuffer.h"
@@ -103,11 +103,11 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   // Initialize the 2D/3D culler. We only traverse through portals
   // after the culler has been used in the previous sector so this is
   // safe to do here.
-  if (rview.world->GetEngineMode () == CS_ENGINE_FRONT2BACK)
+  if (rview.engine->GetEngineMode () == CS_ENGINE_FRONT2BACK)
   {
-    csCBuffer* c_buffer = rview.world->GetCBuffer ();
-    csCoverageMaskTree* covtree = rview.world->GetCovtree ();
-    csQuadTree3D* quad3d = rview.world->GetQuad3D ();
+    csCBuffer* c_buffer = rview.engine->GetCBuffer ();
+    csCoverageMaskTree* covtree = rview.engine->GetCovtree ();
+    csQuadTree3D* quad3d = rview.engine->GetQuad3D ();
     if (c_buffer)
     {
       c_buffer->Initialize ();
@@ -118,11 +118,11 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
       csVector3 corners[4];
       rview.InvPerspective (csVector2 (0, 0), 1, corners[0]);
       corners[0] = rview.Camera2World (corners[0]);
-      rview.InvPerspective (csVector2 (rview.world->frame_width-1, 0), 1, corners[1]);
+      rview.InvPerspective (csVector2 (rview.engine->frame_width-1, 0), 1, corners[1]);
       corners[1] = rview.Camera2World (corners[1]);
-      rview.InvPerspective (csVector2 (rview.world->frame_width-1, rview.world->frame_height-1), 1, corners[2]);
+      rview.InvPerspective (csVector2 (rview.engine->frame_width-1, rview.engine->frame_height-1), 1, corners[2]);
       corners[2] = rview.Camera2World (corners[2]);
-      rview.InvPerspective (csVector2 (0, rview.world->frame_height-1), 1, corners[3]);
+      rview.InvPerspective (csVector2 (0, rview.engine->frame_height-1), 1, corners[3]);
       corners[3] = rview.Camera2World (corners[3]);
       quad3d->SetMainFrustum (rview.GetOrigin (), corners);
       quad3d->MakeEmpty ();
@@ -158,13 +158,13 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
     bool mirror = new_rview.IsMirrored ();
     WarpSpace (new_rview, mirror);
     new_rview.SetMirrored (mirror);
-    old_cookie = csWorld::current_world->tr_manager.NewCameraFrame ();
+    old_cookie = csEngine::current_engine->tr_manager.NewCameraFrame ();
   }
 
   sector->Draw (new_rview);
 
   if (flags.Check (CS_PORTAL_WARP))
-    csWorld::current_world->tr_manager.RestoreCameraFrame (old_cookie);
+    csEngine::current_engine->tr_manager.RestoreCameraFrame (old_cookie);
 
   return true;
 }
@@ -222,7 +222,7 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
   csTranCookie old_cookie = 0;
   if (flags.Check (CS_PORTAL_WARP))
   {
-    old_cookie = csWorld::current_world->tr_manager.NewCameraFrame ();
+    old_cookie = csEngine::current_engine->tr_manager.NewCameraFrame ();
     new_lview.light_frustum->Transform (&warp_wor);
 
     if (flags.Check (CS_PORTAL_MIRROR)) new_lview.mirror = !lview.mirror;
@@ -297,7 +297,7 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
   sector->RealCheckFrustum (new_lview);
 
   if (flags.Check (CS_PORTAL_WARP))
-    csWorld::current_world->tr_manager.RestoreCameraFrame (old_cookie);
+    csEngine::current_engine->tr_manager.RestoreCameraFrame (old_cookie);
 
   if (copied_frustums)
   {

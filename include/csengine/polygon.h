@@ -75,7 +75,7 @@ struct csPolygonLightInfo
   bool dyn_dirty;
 };
 
-/*----------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
 
 /**
  * Polygon has no texture mapping.
@@ -387,7 +387,7 @@ public:
   iLightMap* GetLightMap () { return tex->GetLightMap (); }
 };
 
-/*----------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
 
 /**
  * Additional polygon flags. These flags are private,
@@ -453,7 +453,10 @@ class csPolygon3D : public csPolygonInt, public iBase, public csObject
   friend class csPolyTexture;
 
 private:
-  /// A table of indices into the vertices of the parent csPolygonSet (container).
+  /*
+   * A table of indices into the vertices of the parent csPolygonSet
+   * (container).
+   */
   csPolyIndexed vertices;
 
   /**
@@ -512,9 +515,9 @@ private:
   ULong pvs_vis_nr;
 
   /**
-   * Return twice the signed area of the polygon in world space coordinates using
-   * the yz, zx, and xy components. In effect this calculates the (P,Q,R) or the
-   * plane normal of the polygon.
+   * Return twice the signed area of the polygon in world space coordinates
+   * using the yz, zx, and xy components.  In effect this calculates the
+   * (P,Q,R) or the plane normal of the polygon.
    */
   void PlaneNormal (float* yz, float* zx, float* xy);
 
@@ -710,10 +713,9 @@ public:
   csPolygonSet* GetParent () { return poly_set; }
 
   /**
-   * Return the plane of this polygon. This function returns
-   * a 3D engine type csPolyPlane which encapsulates object,
-   * world, and camera space planes as well as the texture
-   * transformation.
+   * Return the plane of this polygon.  This function returns a 3D engine type
+   * csPolyPlane which encapsulates object, world, and camera space planes as
+   * well as the texture transformation.
    */
   csPolyPlane* GetPlane () { return plane; }
 
@@ -788,7 +790,7 @@ public:
    * Set the material for this polygon.
    * This material handle will only be used as soon as 'Finish()'
    * is called. So you can safely wait preparing the materials
-   * until finally csWorld::Prepare() is called (which in the end
+   * until finally csEngine::Prepare() is called (which in the end
    * calls Finish() for every polygon).
    */
   void SetMaterial (csMaterialWrapper* material);
@@ -911,7 +913,7 @@ public:
    * The most general function. With these you provide the matrix
    * directly.
    */
-  void SetTextureSpace (const csMatrix3& tx_matrix, const csVector3& tx_vector);
+  void SetTextureSpace (csMatrix3 const&, csVector3 const&);
 
   /**
    * Prepare the lightmaps for use.
@@ -1121,11 +1123,11 @@ public:
 	bool mirror);
 
   /**
-   * Classify this polygon with regards to a plane (in world space). If this poly
-   * is on same plane it returns POL_SAME_PLANE. If this poly is
-   * completely in front of the given plane it returnes POL_FRONT. If this poly
-   * is completely back of the given plane it returnes POL_BACK. Otherwise it
-   * returns POL_SPLIT_NEEDED.
+   * Classify this polygon with regards to a plane (in world space).  If this
+   * poly is on same plane it returns POL_SAME_PLANE.  If this poly is
+   * completely in front of the given plane it returnes POL_FRONT.  If this
+   * poly is completely back of the given plane it returnes POL_BACK.
+   * Otherwise it returns POL_SPLIT_NEEDED.
    */
   int Classify (const csPlane3& pl);
 
@@ -1232,7 +1234,7 @@ public:
   CSOBJTYPE;
   DECLARE_IBASE;
 
-  //-------------------- iPolygon3D interface implementation -------------------
+  //------------------- iPolygon3D interface implementation -------------------
 
   struct eiPolygon3D : public iPolygon3D
   {
@@ -1297,7 +1299,8 @@ public:
     { scfParent->SetAlpha (iAlpha); }
 
     /// Create a private polygon texture mapping plane
-    virtual void CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix);
+    virtual void CreatePlane (const csVector3 &iOrigin,
+      const csMatrix3 &iMatrix);
     /// Set polygon texture mapping plane
     virtual bool SetPlane (const char *iName);
 
@@ -1310,7 +1313,7 @@ public:
 
     /// Set Gouraud vs lightmap polygon lighting
     virtual void SetLightingMode (bool iGouraud)
-    { scfParent->SetTextureType (iGouraud ? POLYTXT_GOURAUD : POLYTXT_LIGHTMAP); }
+    { scfParent->SetTextureType(iGouraud ? POLYTXT_GOURAUD:POLYTXT_LIGHTMAP); }
 
     /// Create a portal object pointing to given sector
     virtual iPortal *CreatePortal (iSector *iTarget)

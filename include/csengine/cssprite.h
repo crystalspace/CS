@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CSSPRITE_H
-#define CSSPRITE_H
+#ifndef __CS_CSSPRITE_H__
+#define __CS_CSSPRITE_H__
 
 #include "csutil/cscolor.h"
 #include "csgeom/math3d.h"
@@ -82,9 +82,9 @@ public:
   void SetNormalsCalculated (bool n) { normals_calculated = n; }
 
   ///
-  void SetName (char * n);
+  void SetName (char const*);
   ///
-  char* GetName () { return name; }
+  char const* GetName () const { return name; }
 
   /**
    * Compute the object space bounding box for this frame.
@@ -113,9 +113,9 @@ public:
   /// Add a frame to this action
   void AddFrame (csFrame * frame, int delay);
   /// Set action name
-  void SetName (char *n);
+  void SetName (char const*);
   /// Get action name
-  char * GetName ()
+  char const* GetName () const
   { return name; }
   /// Get total number of frames in this action
   int GetNumFrames ()
@@ -367,7 +367,7 @@ protected:
 
   /**
    * Points to the parent container object of this sprite.
-   * This is usually csWorld or csParticleSystem.
+   * This is usually csEngine or csParticleSystem.
    */
   csObject* parent;
 
@@ -431,7 +431,7 @@ protected:
   /// Move this sprite to the specified sector. Can be called multiple times.
   virtual void MoveToSector (csSector* s);
 
-  /// Remove this sprite from all sectors it is in (but not from the world).
+  /// Remove this sprite from all sectors it is in (but not from the engine).
   virtual void RemoveFromSectors ();
 
   /**
@@ -482,7 +482,7 @@ public:
 
   /**
    * Update lighting as soon as the sprite becomes visible.
-   * This will call world->GetNearestLights with the supplied
+   * This will call engine->GetNearestLights with the supplied
    * parameters.
    */
   virtual void DeferUpdateLighting (int flags, int num_lights);
@@ -965,4 +965,4 @@ public:
 
 };
 
-#endif /*CSSPRITE_H*/
+#endif // __CS_CSSPRITE_H__

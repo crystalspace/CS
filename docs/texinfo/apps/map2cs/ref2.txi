@@ -230,7 +230,7 @@ Classname: @code{light}
 Identifies a static (non-moving) light source.  The color and radius of the
 light source are determined by the key @samp{light} in that entity (Quake
 style) or by the key @samp{_light} (Half-Life style).  The radius in the
-Crystal Space world file will be the original radius scaled with
+Crystal Space map file will be the original radius scaled with
 @samp{lightscale} (@pxref{map2cs.cfg lightscale}) and the @samp{scaling}
 factor (@pxref{map2cs.cfg scaling}).  The intensity of the light source will
 be @samp{(colorvalue / 255) * (quakelight_radius / 128)}, for each color
@@ -291,7 +291,7 @@ Classname: @code{info_player_start} and @code{info_player_deathmatch}
 
 Determines where the default player starts.  This setting will only be
 interpreted for position, because Crystal Space has no way yet to have the
-player's orientation on start stored in the world file.
+player's orientation on start stored in the map file.
 
 @itemize @minus
 @item

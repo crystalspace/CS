@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CS_RADIOSTY_H
-#define CS_RADIOSTY_H
+#ifndef __CS_RADIOSTY_H__
+#define __CS_RADIOSTY_H__
 
 #include "csobject/csobject.h"
 #include "csgeom/vector3.h"
@@ -27,7 +27,7 @@
 #include "csengine/polytext.h"
 #include "csengine/lghtmap.h"
 
-class csWorld;
+class csEngine;
 class csPolygon3D;
 class csLightMap;
 class csRGBLightMap;
@@ -536,7 +536,7 @@ public:
 
 private:
   /// world being radiosity rendered
-  csWorld *world;
+  csEngine *engine;
   /// list of all radiosity polygon info
   csRadList *list;
 
@@ -588,7 +588,7 @@ private:
 
 public:
   /// create all radiosity data.
-  csRadiosity(csWorld *current_world);
+  csRadiosity(csEngine *current_engine);
   /// get rid of radiosity data.
   ~csRadiosity();
   /// Does the whole radiosity thing. This is the one to call.
@@ -637,5 +637,4 @@ public:
 
 };
 
-
-#endif //CS_RADIOSTY_H
+#endif // __CS_RADIOSTY_H__

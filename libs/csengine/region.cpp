@@ -24,7 +24,7 @@
 #include "csengine/thing.h"
 #include "csengine/texture.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/polytmap.h"
 #include "csengine/curve.h"
 #include "csobject/objiter.h"
@@ -38,10 +38,10 @@ IMPLEMENT_IBASE_END
 
 IMPLEMENT_CSOBJTYPE (csRegion,csObjectNoDel);
 
-csRegion::csRegion (csWorld* world) : csObjectNoDel ()
+csRegion::csRegion (csEngine* engine) : csObjectNoDel ()
 {
   CONSTRUCT_IBASE (NULL);
-  csRegion::world = world;
+  csRegion::engine = engine;
 }
 
 csRegion::~csRegion ()
@@ -83,7 +83,7 @@ void csRegion::DeleteAll ()
     if (((csObject*)copy[i])->GetType () == csCollection::Type)
     {
       csCollection* o = (csCollection*)copy[i];
-      world->RemoveCollection (o);
+      engine->RemoveCollection (o);
       copy[i] = NULL;
     }
 
@@ -91,7 +91,7 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () >= csSprite::Type)
     {
       csSprite* o = (csSprite*)copy[i];
-      world->RemoveSprite (o);
+      engine->RemoveSprite (o);
       copy[i] = NULL;
     }
 
@@ -102,7 +102,7 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csSpriteTemplate::Type)
     {
       csSpriteTemplate* o = (csSpriteTemplate*)copy[i];
-      world->sprite_templates.Delete (world->sprite_templates.Find (o));
+      engine->sprite_templates.Delete (engine->sprite_templates.Find (o));
       copy[i] = NULL;
     }
 
@@ -110,7 +110,7 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csCurveTemplate::Type)
     {
       csCurveTemplate* o = (csCurveTemplate*)copy[i];
-      world->curve_templates.Delete (world->curve_templates.Find (o));
+      engine->curve_templates.Delete (engine->curve_templates.Find (o));
       copy[i] = NULL;
     }
 
@@ -119,7 +119,7 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csThing::Type)
     {
       csThing* o = (csThing*)copy[i];
-      int idx = world->thing_templates.Find (o);
+      int idx = engine->thing_templates.Find (o);
       if (idx == -1)
       {
         delete o;
@@ -133,10 +133,10 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csThing::Type)
     {
       csThing* o = (csThing*)copy[i];
-      int idx = world->thing_templates.Find (o);
+      int idx = engine->thing_templates.Find (o);
       if (idx != -1)
       {
-        world->thing_templates.Delete (idx);
+        engine->thing_templates.Delete (idx);
 	copy[i] = NULL;
       }
     }
@@ -145,9 +145,9 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csSector::Type)
     {
       csSector* o = (csSector*)copy[i];
-      int idx = world->sectors.Find (o);
+      int idx = engine->sectors.Find (o);
       if (idx != -1)
-        world->sectors.Delete (idx);
+        engine->sectors.Delete (idx);
       else
         delete o;
       copy[i] = NULL;
@@ -157,9 +157,9 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csMaterialWrapper::Type)
     {
       csMaterialWrapper* o = (csMaterialWrapper*)copy[i];
-      int idx = world->GetMaterials ()->Find (o);
+      int idx = engine->GetMaterials ()->Find (o);
       if (idx != -1)
-        world->GetMaterials ()->Delete (idx);
+        engine->GetMaterials ()->Delete (idx);
       else
         delete o;
       copy[i] = NULL;
@@ -169,9 +169,9 @@ void csRegion::DeleteAll ()
     if (copy[i] && ((csObject*)copy[i])->GetType () == csTextureWrapper::Type)
     {
       csTextureWrapper* o = (csTextureWrapper*)copy[i];
-      int idx = world->GetTextures ()->Find (o);
+      int idx = engine->GetTextures ()->Find (o);
       if (idx != -1)
-        world->GetTextures ()->Delete (idx);
+        engine->GetTextures ()->Delete (idx);
       else
         delete o;
       copy[i] = NULL;
@@ -185,10 +185,10 @@ void csRegion::DeleteAll ()
       // polygons not belonging to this sector and we want to be sure
       // to release it from this region.
       ObjRelease (o);
-      int idx = world->planes.Find (o);
+      int idx = engine->planes.Find (o);
       o->DecRef ();
       if (idx != -1)
-        world->planes[idx] = 0;
+        engine->planes[idx] = 0;
       copy[i] = NULL;
     }
 
@@ -228,4 +228,3 @@ void csRegion::ReleaseFromRegion (csObject* obj)
 {
   ObjRelease (obj);
 }
-

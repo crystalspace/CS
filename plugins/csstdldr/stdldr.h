@@ -1,5 +1,5 @@
 /*
-    The Crystal Space world file loader
+    The Crystal Space map file loader
     Copyright (C) 2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __STDLDR_H__
-#define __STDLDR_H__
+#ifndef __CS_STDLDR_H__
+#define __CS_STDLDR_H__
 
 #include "iloader.h"
 #include "csgeom/math3d.h"
@@ -26,7 +26,7 @@
 #include "csutil/csstrvec.h"
 #include "csutil/flags.h"
 
-struct iWorld;
+struct iEngine;
 struct iVFS;
 struct iSector;
 struct iPolygonSet;
@@ -149,8 +149,8 @@ class csStandardLoader : public iLoader
   iSystem *system;
   // The Virtual File System
   iVFS *vfs;
-  // The current world we are loading into
-  iWorld *world;
+  // The current engine we are loading into
+  iEngine *engine;
 
 public:
   DECLARE_IBASE;
@@ -236,7 +236,7 @@ private:
   {
     // A matrix
     csMatrix3 matrix;
-    // Yet another matrix (used as scratch space by `matrix' non-terminal symbol)
+    // Another matrix (used as scratch space by `matrix' non-terminal symbol)
     csMatrix3 matrix2;
     // Whenever the matrix has been defined
     bool matrix_valid;
@@ -246,7 +246,7 @@ private:
     bool vector_valid;
     // Current texture prefix
     char *tex_prefix;
-    // The name of currently loaded library/world
+    // The name of currently loaded library/map
     char *cur_library;
     // A union containing miscelaneous parameters for different basic entities
     union
@@ -357,4 +357,4 @@ private:
   bool CreateTexturePlane (iPolygon3D *iPolygon);
 };
 
-#endif // __STDLDR_H__
+#endif // __CS_STDLDR_H__

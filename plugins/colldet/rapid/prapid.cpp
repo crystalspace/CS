@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998,2000 by Jorrit Tyberghein
-    Written by Alex Pfaffe
+    Copyright (C) 1998,2000 by Written by Alex Pfaffe
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -305,7 +304,7 @@ int project6 (csVector3 ax, csVector3 p1, csVector3 p2, csVector3 p3,
     isect1 = VV0 + (VV2 - VV0) * D0 / (D0 - D2);\
   }
 
-#define COMPUTE_INTERVALS(VV0, VV1, VV2, D0, D1, D2, D0D1, D0D2, isect0, isect1) \
+#define COMPUTE_INTERVALS(VV0,VV1,VV2,D0,D1,D2,D0D1,D0D2,isect0,isect1) \
   if (D0D1 > 0.0f)					\
     /* here we know that D0D2<=0.0 */			\
     /* that is D0, D1 are on the same side, */		\
@@ -437,8 +436,8 @@ int coplanar_tri_tri (float N[3],
   return 0;
 }
 
-int tri_contact (const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
-                 const csVector3 &U0, const csVector3 &U1, const csVector3 &U2)
+int tri_contact(const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
+                const csVector3 &U0, const csVector3 &U1, const csVector3 &U2)
 {
   float E1 [3], E2 [3];
   float N1 [3], N2 [3], d1, d2;
@@ -458,7 +457,8 @@ int tri_contact (const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
   d1 = -DOT (N1, V0);
   /* plane equation 1: N1.X+d1=0 */
 
-  /* put U0,U1,U2 into plane equation 1 to compute signed distances to the plane*/
+  /* put U0,U1,U2 into plane equation 1 to compute signed distances to
+     the plane */
   du0 = DOT (N1, U0) + d1;
   du1 = DOT (N1, U1) + d1;
   du2 = DOT (N1, U2) + d1;
@@ -522,10 +522,12 @@ int tri_contact (const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
   up2 = U2 [index];
 
   /* compute interval for triangle 1 */
-  COMPUTE_INTERVALS (vp0, vp1, vp2, dv0, dv1, dv2, dv0dv1, dv0dv2, isect1 [0], isect1 [1]);
+  COMPUTE_INTERVALS (
+    vp0, vp1, vp2, dv0, dv1, dv2, dv0dv1, dv0dv2, isect1 [0], isect1 [1]);
 
   /* compute interval for triangle 2 */
-  COMPUTE_INTERVALS (up0, up1, up2, du0, du1, du2, du0du1, du0du2, isect2 [0], isect2 [1]);
+  COMPUTE_INTERVALS (
+    up0, up1, up2, du0, du1, du2, du0du1, du0du2, isect2 [0], isect2 [1]);
 
   SORT (isect1 [0], isect1 [1]);
   SORT (isect2 [0], isect2 [1]);
@@ -804,7 +806,8 @@ int csRAPIDCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
   if (b2->IsLeaf() || (!b1->IsLeaf() && (b1->GetSize() > b2->GetSize())))
   {
     // here we descend to children of b1.  The transform from
-    // a child of b1 to b1 is stored in [b1->N->m_Rotation,b1->N->m_Translation],
+    // a child of b1 to b1 is stored in
+    // [b1->N->m_Rotation,b1->N->m_Translation],
     // but we will denote it [B1 T1] for short.
 
     // Here, we compute [B1 T1]'[B T] = [B1'B B1'(T-T1)]
@@ -812,13 +815,15 @@ int csRAPIDCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
     // test queue.
 
     cR = b1->m_pChild[1]->m_Rotation.GetTranspose () * R;
-    cT = b1->m_pChild[1]->m_Rotation.GetTranspose () * (T - b1->m_pChild[1]->m_Translation);
+    cT = b1->m_pChild[1]->m_Rotation.GetTranspose () *
+      (T - b1->m_pChild[1]->m_Translation);
 
     if ((rc = CollideRecursive (b1->m_pChild[1], b2, cR, cT)) != false)
       return rc;
 	
     cR = b1->m_pChild[0]->m_Rotation.GetTranspose () * R;
-    cT = b1->m_pChild[0]->m_Rotation.GetTranspose () * (T - b1->m_pChild[0]->m_Translation);
+    cT = b1->m_pChild[0]->m_Rotation.GetTranspose () *
+      (T - b1->m_pChild[0]->m_Translation);
 
     if ((rc = CollideRecursive (b1->m_pChild[0], b2, cR, cT)) != false)
       return rc;
@@ -865,14 +870,18 @@ bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2)
   // assume just one triangle in each box.
 
   // the vertices of the CDTriangle in b2 is in model1 C.S.  The vertices of
-  // the other triangle is in model2 CS.  Use csRAPIDCollider::mR, csRAPIDCollider::mT, and
-  // to transform into model2 CS.
+  // the other triangle is in model2 CS.
+  // Use csRAPIDCollider::mR, csRAPIDCollider::mT, and to transform into
+  // model2 CS.
 
   int rc;  // return code
 
-  csVector3 i1 = ((csRAPIDCollider::mR * pBox1->m_pTriangle->p1) + csRAPIDCollider::mT);
-  csVector3 i2 = ((csRAPIDCollider::mR * pBox1->m_pTriangle->p2) + csRAPIDCollider::mT);
-  csVector3 i3 = ((csRAPIDCollider::mR * pBox1->m_pTriangle->p3) + csRAPIDCollider::mT);
+  csVector3 i1 =
+    ((csRAPIDCollider::mR * pBox1->m_pTriangle->p1) + csRAPIDCollider::mT);
+  csVector3 i2 =
+    ((csRAPIDCollider::mR * pBox1->m_pTriangle->p2) + csRAPIDCollider::mT);
+  csVector3 i3 =
+    ((csRAPIDCollider::mR * pBox1->m_pTriangle->p3) + csRAPIDCollider::mT);
 
   csRAPIDCollider::trianglesTested++;
 
@@ -901,5 +910,3 @@ const csCdBBox* csRAPIDCollider::GetBbox(void) const
 {
   return m_pCollisionModel->GetTopLevelBox();
 }
-
-

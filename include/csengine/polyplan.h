@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLYPLANE_H
-#define POLYPLANE_H
+#ifndef __CS_POLYPLANE_H__
+#define __CS_POLYPLANE_H__
 
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
@@ -152,4 +152,4 @@ public:
   void GetCameraNormal (float* p_A, float* p_B, float* p_C, float* p_D) const;
 };
 
-#endif /*POLYPLANE_H*/
+#endif // __CS_POLYPLANE_H__

@@ -130,12 +130,12 @@ make -k apps
 @node BeOS Running, BeOS Notes, BeOS Building, BeOS
 @subsubsection Running the Applications
 
-You will need to have a world file to do anything.  It is suggested that you
-download @file{flarge.zip} or any of the other world files offered on the
+You will need to have a map file to do anything.  It is suggested that you
+download @file{flarge.zip} or any of the other map files offered on the
 Crystal Space web site.  Place the downloaded file in the @file{CS/data}
 directory.
 
-To use a particular world file, mention it on the command line when invoking
+To use a particular map file, mention it on the command line when invoking
 the WalkTest application.  If you wish this file to be used by default, you
 may want to edit @file{cryst.cfg} to set the @samp{WORLDFILE} variable to the
 chosen file.
@@ -171,7 +171,7 @@ walktest -video=glide     # @r{Runs in Glide mode}
 If you are using the OpenGL renderer, then invoking @kbd{@key{ALT}-f} will
 switch in and out of full screen.
 
-Note that walktest requires a good world file to show off effectively (like
+Note that walktest requires a good map file to show off effectively (like
 @file{flarge.zip}).  Make sure that @file{cryst.cfg} is correctly set to
 identify this file or type it on the command line:
 

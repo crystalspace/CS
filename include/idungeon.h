@@ -55,17 +55,18 @@ public:
  * This is the randomizer plug-in itself. This is how to use it:
  * 1. Set all options via SetOption. These options SHOULD NOT be changed
  *    after this (unexpected results).
- * 2. Call PrepareInput with the path to the main dungeon.gen file as a parameter.
- *    This will read the necessary data for the randomizer. It will fill the
- *    NumAreaTemplates and AreaTemplateNames fields of the statistics. Calling this
- *    function more than once will overwrite the old data. 
- * 3. Call CreateWorld. This will run the randomizer and create the world, as well
- *    as fill the remaining fields of the statistics. You can run it again if you
- *    don't like the result.
- * 4. Call WriteWorld to save the generated world in CS world format. This will
- *    first clear the precalculated stuff (optionally), then write the world text
- *    file into the given virtual directory and finally copy the textures
- *    (optionally).
+ * 2. Call PrepareInput with the path to the main dungeon.gen file as a
+ *    parameter.  This will read the necessary data for the randomizer.  It
+ *    will fill the NumAreaTemplates and AreaTemplateNames fields of the
+ *    statistics.  Calling this function more than once will overwrite the old
+ *    data.
+ * 3. Call CreateWorld.  This will run the randomizer and create the world, as
+ *    well as fill the remaining fields of the statistics.  You can run it
+ *    again if you don't like the result.
+ * 4. Call WriteWorld to save the generated world in CS map file format.  This
+ *    will first clear the precalculated stuff (optionally), then write the
+ *    map text file into the given virtual directory and finally copy the
+ *    textures (optionally).
  */
 SCF_VERSION (iDungeon, 2, 0, 0);
 class iDungeon : public iPlugIn {
@@ -80,8 +81,8 @@ public:
   virtual int GetOption(int opt)=0;
 
   /**
-   * Read the main dungeon.gen file from the given virtual directory and prepare
-   * its contents for the dungeon randomizer.
+   * Read the main dungeon.gen file from the given virtual directory and
+   * prepare its contents for the dungeon randomizer.
    */
   virtual void PrepareInput(const char *InputDirectory)=0;
 
@@ -94,7 +95,7 @@ public:
    * Write the generated world to a file. OutputDirectory must be a valid VFS
    * directory with write access. It should be empty (no hard restriction),
    * because it will be filled with a text file and several textures to look
-   * like a world directory. Note : due to the many small write operations,
+   * like a map directory. Note : due to the many small write operations,
    * writing to an archive directory may take some seconds.
    */
   virtual void WriteWorld(const char *OutputDirectory)=0;

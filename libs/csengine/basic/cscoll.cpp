@@ -19,21 +19,22 @@
 #include "cssysdef.h"
 #include "csengine/cscoll.h"
 #include "csengine/thing.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/sector.h"
 
 IMPLEMENT_CSOBJTYPE (csCollection,csObject);
 
-csCollection::csCollection (csWorld* world) : csObject(), objects (8,8), movable ()
+csCollection::csCollection (csEngine* engine) :
+  csObject(), objects (8,8), movable ()
 {
   movable.SetObject (this);
-  csCollection::world = world;
-  world->AddToCurrentRegion (this);
+  csCollection::engine = engine;
+  engine->AddToCurrentRegion (this);
 }
 
 csCollection::~csCollection ()
 {
-  world->UnlinkCollection (this);
+  engine->UnlinkCollection (this);
 }
 
 csObject* csCollection::FindObject (char* name)
@@ -73,5 +74,3 @@ void csCollection::RemoveFromSectors ()
     }
   }
 }
-
-//---------------------------------------------------------------------------

@@ -15,7 +15,7 @@ configuration file are:
 
 @table @code
 @item [World] worldfile=<file>
-Select the world file to be loaded at startup.
+Select the map file to be loaded at startup.
 
 @item [Walktest] FPS=<yesno>
 Enable/disable the FPS counter (default is @samp{yes}). You can disable the

@@ -25,7 +25,7 @@
 #include "csengine/thing.h"
 #include "csengine/lghtmap.h"
 #include "csengine/cssprite.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/lppool.h"
 #include "csengine/polygon.h"
 #include "csengine/curve.h"
@@ -64,7 +64,7 @@ csLight::csLight (float x, float y, float z, float d,
 csLight::~csLight ()
 {
   if (flags.Check (CS_LIGHT_ACTIVEHALO))
-    csWorld::current_world->RemoveHalo (this);
+    csEngine::current_engine->RemoveHalo (this);
   delete halo;
 }
 
@@ -379,14 +379,14 @@ csDynLight::csDynLight (float x, float y, float z, float dist,
 csDynLight::~csDynLight ()
 {
   while (lightpatches)
-    csWorld::current_world->lightpatch_pool->Free (lightpatches);
-  csWorld::current_world->RemoveDynLight (this);
+    csEngine::current_engine->lightpatch_pool->Free (lightpatches);
+  csEngine::current_engine->RemoveDynLight (this);
 }
 
 void csDynLight::Setup ()
 {
   while (lightpatches)
-    csWorld::current_world->lightpatch_pool->Free (lightpatches);
+    csEngine::current_engine->lightpatch_pool->Free (lightpatches);
   csFrustumView lview;
   lview.userdata = (void*)this;
   lview.poly_func = poly_light_func;

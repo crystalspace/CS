@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef STATS_H
-#define STATS_H
+#ifndef __CS_STATS_H__
+#define __CS_STATS_H__
 
 /**
  * Class containing statistics information for
@@ -39,5 +39,4 @@ public:
   static int portals_drawn;
 };
 
-#endif
-
+#endif // __CS_STATS_H__

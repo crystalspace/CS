@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MOVABLE_H
-#define MOVABLE_H
+#ifndef __CS_MOVABLE_H__
+#define __CS_MOVABLE_H__
 
 #include "csgeom/transfrm.h"
 #include "csutil/csvector.h"
@@ -27,7 +27,7 @@ class csSector;
 class csObject;
 
 /**
- * This class represents an entity that can move in the world.
+ * This class represents an entity that can move in the engine.
  * It has a list of sectors and a position (a list of sectors
  * because an entity can overlap several sectors at the same time
  * through portals). This class itself does not have geometry.
@@ -250,4 +250,4 @@ public:
   } scfiMovable;
 };
 
-#endif /*MOVABLE_H*/
+#endif // __CS_MOVABLE_H__

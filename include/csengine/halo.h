@@ -16,14 +16,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __HALO_H__
-#define __HALO_H__
+#ifndef __CS_HALO_H__
+#define __CS_HALO_H__
 
 #include "csgeom/math3d.h"
 #include "csengine/light.h"
 #include "ihalo.h"
 
-class csWorld;
+class csEngine;
 
 enum csHaloType
 {
@@ -99,7 +99,7 @@ public:
  * This is used to keep track of halos.<p>
  * When the engine detects that a light that is marked to have an halo
  * is directly visible, an object of this type is created and put into
- * a global queue maintained within the world object. The light starts
+ * a global queue maintained within the engine object. The light starts
  * to brighten until it reaches maximal intensity; when the halo becomes
  * obscured by something or goes out of view the intensity starts to
  * decrease until it reaches zero; upon this event the halo object is
@@ -129,7 +129,7 @@ public:
    * reached zero intensity and should be removed from halo queue.
    * The function also actually projects, clips and draws the halo.
    */
-  bool Process (cs_time ElapsedTime, const csWorld &World);
+  bool Process (cs_time ElapsedTime, csEngine const&);
 };
 
-#endif // __HALO_H__
+#endif // __CS_HALO_H__

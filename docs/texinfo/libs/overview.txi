@@ -48,7 +48,7 @@ internally in the same format. This library supports @sc{jpg}, @sc{gif},
 be converted to a plug-in.
 
 @item csParser
-A library which parses @sc{ascii} world files and creates a world in the 3D
+A library which parses @sc{ascii} map files and creates a world in the 3D
 Engine. @xref{csParser}.
 
 @item csWS

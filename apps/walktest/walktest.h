@@ -27,7 +27,7 @@
 #include "csengine/collider.h"
 #include "csengine/light.h"
 #include "walktest/wentity.h"
-#include "iworld.h"
+#include "iengine.h"
 #include "iconsole.h"
 #include "iconinp.h"
 #include "ivfs.h"
@@ -36,7 +36,7 @@
 class Polygon3D;
 class WalkTest;
 class csView;
-class csWorld;
+class csEngine;
 class csPixmap;
 class csWireFrameCam;
 class PhysicsLibrary;
@@ -113,8 +113,8 @@ class WalkTest : public SysSystemDriver
   typedef SysSystemDriver superclass;
 
 public:
-  /// The startup directory on VFS with needed world file
-  static char world_dir [100];
+  /// The startup directory on VFS with needed map file
+  static char map_dir [100];
   /// A script to execute at startup.
   char* auto_script;
 
@@ -213,11 +213,11 @@ public:
    */
   bool do_edges;
 
-  /// The world.
-  csWorld *world;
+  /// Engine plug-in handle.
+  csEngine *engine;
   /// The main engine interface
-  /// (when interface will be complete, csWorld will not be needed anymore)
-  iWorld *World;
+  /// (when interface will be complete, csEngine will not be needed anymore)
+  iEngine *Engine;
 
   /// The view on the world.
   csView* view;
@@ -392,10 +392,10 @@ public:
   virtual void Help ();
 
   /// Inits all the collision detection stuff
-  virtual void InitWorld(csWorld* world, csCamera* /*camera*/);
+  virtual void InitEngine(csEngine* engine, csCamera* /*camera*/);
 
   /// Destroys all the collision detection stuff
-  virtual void EndWorld();
+  virtual void EndEngine();
 
   /// Creates Colliders
   virtual void CreateColliders();

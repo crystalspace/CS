@@ -17,12 +17,12 @@
 */
 
 #include "cssysdef.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/sector.h"
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
 
-IMPLEMENT_EMBEDDED_IBASE (csWorld::csWorldConfig)
+IMPLEMENT_EMBEDDED_IBASE (csEngine::csEngineConfig)
   IMPLEMENTS_INTERFACE (iConfig)
 IMPLEMENT_EMBEDDED_IBASE_END
 
@@ -32,26 +32,29 @@ static const csOptionDescription config_options [] =
   {  1, "rad",      "Pseudo-radiosity system", CSVAR_BOOL },
   {  2, "cosfact",  "Cosinus factor for lighting", CSVAR_FLOAT },
   {  3, "reflect",  "Max number of reflections for radiosity", CSVAR_LONG },
-  {  4, "recalc",   "Force/inhibit recalculation of all cached information", CSVAR_BOOL },
+  {  4, "recalc",   "Force/inhibit recalculation of all cached information",
+                     CSVAR_BOOL },
   {  5, "relight",  "Force/inhibit recalculation of lightmaps", CSVAR_BOOL },
-  {  6, "revis",    "Force/inhibit recalculation of visibility data", CSVAR_BOOL },
+  {  6, "revis",    "Force/inhibit recalculation of visibility data",
+                     CSVAR_BOOL },
   {  7, "cache",    "Enable caching of generated lightmaps", CSVAR_BOOL },
   {  8, "radstep",  "Enable radiosity step-by-step", CSVAR_BOOL }
 };
-const int NUM_OPTIONS = (sizeof (config_options) / sizeof (config_options [0]));
+const int NUM_OPTIONS =
+  (sizeof (config_options) / sizeof (config_options [0]));
 
-static bool config_relight () { return csWorld::do_force_relight; }
+static bool config_relight () { return csEngine::do_force_relight; }
 static void config_relight (bool flag)
 {
-  csWorld::do_force_relight = flag;
-  csWorld::do_not_force_relight = !flag;
+  csEngine::do_force_relight = flag;
+  csEngine::do_not_force_relight = !flag;
 }
 
-static bool config_revis () { return csWorld::do_force_revis; }
+static bool config_revis () { return csEngine::do_force_revis; }
 static void config_revis (bool flag)
 {
-  csWorld::do_force_revis = flag;
-  csWorld::do_not_force_revis = !flag;
+  csEngine::do_force_revis = flag;
+  csEngine::do_not_force_revis = !flag;
 }
 
 static bool config_recalc () { return config_relight() || config_revis(); }
@@ -61,11 +64,12 @@ static void config_recalc (bool flag)
   config_revis   (flag);
 }
 
-bool csWorld::csWorldConfig::SetOption (int id, csVariant* value)
+bool csEngine::csEngineConfig::SetOption (int id, csVariant* value)
 {
   switch (id)
   {
-    case 0:  csCamera::SetDefaultFOV (value->v.l, scfParent->G3D->GetWidth ()); break;
+    case 0:  csCamera::SetDefaultFOV (value->v.l, scfParent->G3D->GetWidth ());
+             break;
     case 1:  csSector::do_radiosity = value->v.b; break;
     case 2:  csPolyTexture::cfg_cosinus_factor = value->v.f; break;
     case 3:  csSector::cfg_reflections = value->v.l; break;
@@ -73,13 +77,13 @@ bool csWorld::csWorldConfig::SetOption (int id, csVariant* value)
     case 5:  config_relight (value->v.b); break;
     case 6:  config_revis   (value->v.b); break;
     case 7:  csPolygon3D::do_cache_lightmaps = value->v.b; break;
-    case 8:  csWorld::do_rad_debug = value->v.b; break;
+    case 8:  csEngine::do_rad_debug = value->v.b; break;
     default: return false;
   }
   return true;
 }
 
-bool csWorld::csWorldConfig::GetOption (int id, csVariant* value)
+bool csEngine::csEngineConfig::GetOption (int id, csVariant* value)
 {
   value->type = config_options[id].type;
   switch (id)
@@ -92,13 +96,13 @@ bool csWorld::csWorldConfig::GetOption (int id, csVariant* value)
     case 5:  value->v.b = config_relight(); break;
     case 6:  value->v.b = config_revis  (); break;
     case 7:  value->v.b = csPolygon3D::do_cache_lightmaps; break;
-    case 8:  value->v.b = csWorld::do_rad_debug; break;
+    case 8:  value->v.b = csEngine::do_rad_debug; break;
     default: return false;
   }
   return true;
 }
 
-bool csWorld::csWorldConfig::GetOptionDescription (
+bool csEngine::csEngineConfig::GetOptionDescription (
   int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS) return false;

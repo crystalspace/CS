@@ -4,16 +4,16 @@ $$$ (libs/csparser/csloader.cpp) and the stdldr plugin.
 $$$
 $$$ The differences between old loader and the new loader plugin
 $$$ are caused by the need to balance between 100% compatibility with
-$$$ the legacy worlds and a more logical and strict format. Another
+$$$ the legacy maps and a more logical and strict format. Another
 $$$ goal was to simplify the loader by removing obsolete keywords,
 $$$ duplicate functionality and so on. Thus in the end we don't have
-$$$ 100% compatibility, but the loader should perfectly load world
-$$$ files written by map2cs and MazeD. In general, worlds that use
+$$$ 100% compatibility, but the loader should perfectly load map
+$$$ files written by map2cs and MazeD. In general, maps that use
 $$$ deprecated keywords (e.g. ROOM, SIXFACE etc) should be loaded into
 $$$ MazeD (while its using the old loader) and saved back; this will
 $$$ automatically make them compatible with the new loader. Thus when
-$$$ MazeD will be able to save worlds without data loss (e.g. scripts,
-$$$ beziers) the legacy world files should be converted and the old
+$$$ MazeD will be able to save maps without data loss (e.g. scripts,
+$$$ beziers) the legacy map files should be converted and the old
 $$$ loader should be deprecated.
 $$$
 
@@ -107,7 +107,7 @@ $$$
 -*- TEXTURES won't delete all textures loaded previously into engine.
     In general, the goal of the loader is to *merge* data into engine,
     without automatically clearing the data that is already loaded.
-    Thus YOU decide when to clear the world by calling iWorld::DeleteAll()
+    Thus YOU decide when to clear the engine by calling iEngine::DeleteAll()
     method.
 
 -*- The KEY () format has been changed. The old format is:

@@ -143,6 +143,7 @@ static void HALO_NAME(void *src, void *dest, int count, int delta,
   } /* endif */
 }
 
+#undef RED_PREPROC
 #undef PIXEL_PREPROC
 #undef PIXEL_POSTPROC
 #undef HALO_NAME

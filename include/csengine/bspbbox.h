@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BSPBBOX_H
-#define BSPBBOX_H
+#ifndef __CS_BSPBBOX_H__
+#define __CS_BSPBBOX_H__
 
 #include "csgeom/math3d.h"
 #include "csgeom/polyidx.h"
@@ -328,4 +328,4 @@ public:
 	float z);
 };
 
-#endif /*BSPBBOX_H*/
+#endif // __CS_BSPBBOX_H__

@@ -15,7 +15,7 @@ these textures.  It is called Terragen.
 @uref{http://www.planetside.co.uk/}
 
 Please consult the terragen documentation about how to create a world, as
-I will only explain, how to export the world file to Crystal Space.
+I will only explain, how to export the map file to Crystal Space.
 
 @subsubheading Exporting to Crystal Space
 

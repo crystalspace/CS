@@ -465,7 +465,7 @@ GetCacheData(idx)
 
 SetCacheData(idx,d)
 
-1.16.  class iWorld
+1.16.  class iEngine
 -------------------
 
 GetTextureFormat()
@@ -497,7 +497,7 @@ FindMaterial(iName)
 1.17.  class iSystem
 --------------------
 
-Query_iWorld()
+Query_iEngine()
 
 Query_iGraphics3D()
 

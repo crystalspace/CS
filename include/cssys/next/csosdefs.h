@@ -151,6 +151,7 @@ static inline char* getcwd( char* p, size_t size )
 #include <sys/dirent.h>	// Just so it gets included *before* #define below.
 #define dirent direct
 
+#define __NEED_GENERIC_ISDIR
 #endif // SYSDEF_DIR
 
 

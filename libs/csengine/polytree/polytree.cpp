@@ -20,7 +20,7 @@
 #include "csengine/polytree.h"
 #include "csengine/polygon.h"
 #include "csengine/treeobj.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "cssys/csendian.h"
 #include "ivfs.h"
 #include "isystem.h"
@@ -363,4 +363,3 @@ bool csPolygonTree::ClassifyPoint (const csVector3& p)
   Front2Back (p, ClassifyPointTraverse, (void*)&data, NULL, NULL);
   return data.cnt_solid >= data.wanted_solid;
 }
-

@@ -17,36 +17,17 @@
 */
 
 #include "cssysdef.h"
-#include "plugins/engine/enginep.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 
-IMPLEMENT_IBASE (csEngine)
-  IMPLEMENTS_INTERFACE (iEngine)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-IMPLEMENT_IBASE_END
-
-IMPLEMENT_FACTORY (csEngine)
-
-EXPORT_CLASS_TABLE (enginep)
-  EXPORT_CLASS (csEngine, "crystalspace.engine.plugin", 
-		"Crystal Space Engine Plugin" )
-EXPORT_CLASS_TABLE_END
-
-csEngine::csEngine (iBase* parent)
+/*
+ * Package the engine library into a plug-in module.
+ * Since the engine is already entirely plug-in compatible (that is, it already
+ * implements all necessary SCF goop), all we need to do here is to create a
+ * dummy reference to it in order to force the linker to include the engine
+ * library in the generated plug-in file.
+ */
+void EnginePluginDummyReference()
 {
-  CONSTRUCT_IBASE (parent);
-  world = NULL;
+  csEngine* p = new csEngine(0);
+  delete p;
 }
-
-csEngine::~csEngine ()
-{
-  delete world;
-}
-
-bool csEngine::Initialize (iSystem* sys)
-{
-  world = new csWorld (NULL);
-  world->Initialize (sys);
-  return true;
-}
-

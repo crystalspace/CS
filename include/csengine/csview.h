@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CSVIEW_H
-#define CSVIEW_H
+#ifndef __CS_CSVIEW_H__
+#define __CS_CSVIEW_H__
 
 #include "csutil/csbase.h"
 #include "csgeom/math2d.h"
@@ -26,7 +26,7 @@
 
 class csPolygon2D;
 class csCamera;
-class csWorld;
+class csEngine;
 class csSector;
 class csClipper;
 struct iGraphics3D;
@@ -52,22 +52,22 @@ private:
 
   // csCamera.
   csCamera *camera;
-  // World.
-  csWorld *world;
+  // Engine handle.
+  csEngine *engine;
 
   /// Update view on context rescale or change (automatic)
   void UpdateView ();
 
 public:
   /// Constructor.
-  csView (csWorld *iWorld, iGraphics3D* ig3d);
+  csView (csEngine *iEngine, iGraphics3D* ig3d);
   /// Destructor.
   ~csView ();
 
-  /// Get world.
-  csWorld* GetWorld () { return world; }
-  /// Set the world.
-  void SetWorld (csWorld* w) { world = w; }
+  /// Get engine handle.
+  csEngine* GetEngine () { return engine; }
+  /// Set engine handle.
+  void SetEngine (csEngine* e) { engine = e; }
   /// Get current camera.
   csCamera* GetCamera () { return camera; }
   /// Set current camera.
@@ -83,7 +83,7 @@ public:
   void AddViewVertex (int x, int y);
   /// Update the Clipper. This is usually called from Draw.
   void UpdateClipper();
-  /// Draw world as seen from the camera.
+  /// Draw 3D world as seen from the camera.
   void Draw ();
   /// Set sector for the current camera.
   void SetSector (csSector *sector);
@@ -97,5 +97,4 @@ public:
   void SetPerspectiveCenter (float x, float y);
 };
 
-#endif //  CSVIEW_H
-
+#endif // __CS_CSVIEW_H__

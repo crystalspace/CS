@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef PORTAL_H
-#define PORTAL_H
+#ifndef __CS_PORTAL_H__
+#define __CS_PORTAL_H__
 
 #include "csgeom/transfrm.h"
 #include "csengine/rview.h"
@@ -99,7 +99,8 @@ public:
   void HardTransform (const csReversibleTransform& t);
 
   /**
-   * Set the warping transformation for this portal in object space and world space.
+   * Set the warping transformation for this portal in object space and world
+   * space.
    */
   void SetWarp (const csTransform& t);
 
@@ -116,7 +117,8 @@ public:
   /**
    * Set the filter (instead of the texture).
    */
-  void SetFilter (float r, float g, float b) { filter_r = r; filter_g = g; filter_b = b; filter_texture = NULL; }
+  void SetFilter (float r, float g, float b)
+  { filter_r = r; filter_g = g; filter_b = b; filter_texture = NULL; }
 
   /**
    * Warp a position in world space.
@@ -132,8 +134,8 @@ public:
    * the warping change.<p>
    *
    * 't' is the transformation from world to camera space.<br>
-   * 'mirror' is true if the camera transformation transforms all polygons
-   * so that the vertices are ordered anti-clockwise. 'mirror' will be modified
+   * 'mirror' is true if the camera transformation transforms all polygons so
+   * that the vertices are ordered anti-clockwise.  'mirror' will be modified
    * by warp_space if needed.
    */
   void WarpSpace (csReversibleTransform& t, bool& mirror);
@@ -198,11 +200,14 @@ public:
   /// Set portal to point to specified sector
   virtual void SetPortal (iSector *iDest);
 
-  /// Set the warping transformation for this portal in object space and world space.
+  /*
+   * Set the warping transformation for this portal in object space and world
+   * space.
+   */
   virtual void SetWarp (const csMatrix3 &m_w, const csVector3 &v_w_before,
     const csVector3 &v_w_after);
   /// Set warping transformation to mirror
   virtual void SetMirror (iPolygon3D *iPoly);
 };
 
-#endif /*PORTAL_H*/
+#endif // __CS_PORTAL_H__

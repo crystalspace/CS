@@ -21,7 +21,7 @@
 
 #include "csgeom/math3d.h"
 
-class csWorld;
+class csEngine;
 class csSector;
 class csPolygon3D;
 class csPolygonSet;
@@ -35,7 +35,7 @@ class HugeRoom
 {
 private:
   ///
-  csWorld* world;
+  csEngine* engine;
   ///
   unsigned int seed;
   /// Dimensions of outer wall.
@@ -112,7 +112,7 @@ public:
   ~HugeRoom () { }
 
   ///
-  csSector* create_huge_world (csWorld* world);
+  csSector* create_huge_world (csEngine* engine);
 };
 
 #endif //HUGEROOM_H

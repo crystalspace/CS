@@ -31,7 +31,7 @@
 #include "csengine/dumper.h"
 #include "csengine/camera.h"
 #include "csengine/octree.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/csview.h"
 #include "csengine/wirefrm.h"
 #include "csengine/cssprite.h"
@@ -181,7 +181,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
     {
       char buf[100];
       cf->Read (buf, 1+len);
-      s = (csSector*)Sys->world->sectors.FindByName (buf);
+      s = (csSector*)Sys->engine->sectors.FindByName (buf);
     }
     reccam->sector = s;
     prev_sector = s;
@@ -266,13 +266,13 @@ bool LoadCamera (iVFS* vfs, const char *fName)
     &imirror,
     &Sys->angle.x, &Sys->angle.y, &Sys->angle.z);
 
-  csSector* s = (csSector*)Sys->world->sectors.FindByName (sector_name);
+  csSector* s = (csSector*)Sys->engine->sectors.FindByName (sector_name);
   delete[] sector_name;
   data->DecRef ();
   if (!s)
   {
     CsPrintf (MSG_FATAL_ERROR, "Sector `%s' in coordinate file does not "
-      "exist in this world!\n", sector_name);
+      "exist in this map!\n", sector_name);
     return false;
   }
 
@@ -296,7 +296,7 @@ void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
 void load_sprite (char *filename, char *templatename, char* txtname)
 {
   // First check if the texture exists.
-  if (!Sys->view->GetWorld ()->GetMaterials ()->FindByName (txtname))
+  if (!Sys->view->GetEngine ()->GetMaterials ()->FindByName (txtname))
   {
     Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", txtname);
     return;
@@ -316,11 +316,11 @@ void load_sprite (char *filename, char *templatename, char* txtname)
   csSpriteTemplate *result = (csSpriteTemplate *)builder.CrossBuild (*filedata);
   delete filedata;
 
-  // add this sprite to the world
+  // add this sprite to the engine
   result->SetName (templatename);
-  result->SetMaterial (Sys->view->GetWorld ()->GetMaterials ()->FindByName (txtname));
+  result->SetMaterial (Sys->view->GetEngine ()->GetMaterials ()->FindByName (txtname));
 
-  Sys->view->GetWorld ()->sprite_templates.Push (result);
+  Sys->view->GetEngine ()->sprite_templates.Push (result);
 }
 
 
@@ -330,15 +330,15 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
 	csVector3 const& pos, float size)
 {
   csSpriteTemplate* tmpl = (csSpriteTemplate*)
-  	Sys->view->GetWorld ()->sprite_templates.FindByName (tname);
+  	Sys->view->GetEngine ()->sprite_templates.FindByName (tname);
   if (!tmpl)
   {
     Sys->Printf (MSG_CONSOLE, "Unknown sprite template '%s'!\n", tname);
     return NULL;
   }
-  csSprite3D* spr = tmpl->NewSprite (Sys->view->GetWorld ());
+  csSprite3D* spr = tmpl->NewSprite (Sys->view->GetEngine ());
   spr->SetName (sname);
-  Sys->view->GetWorld ()->sprites.Push (spr);
+  Sys->view->GetEngine ()->sprites.Push (spr);
   spr->GetMovable ().SetSector (where);
   spr->GetMovable ().SetPosition (pos);
   csMatrix3 m; m.Identity (); m = m * size;
@@ -356,11 +356,11 @@ void list_sprites(void)
   const char* sprite_name;
   csSprite* sprite;
 
-  num_sprites = Sys->world->sprites.Length();
+  num_sprites = Sys->engine->sprites.Length();
 
   for(int i = 0; i < num_sprites; i++)
   {
-    sprite = (csSprite*) Sys->world->sprites[i];
+    sprite = (csSprite*) Sys->engine->sprites[i];
     sprite_name = sprite->GetName();
 
     if(sprite_name)
@@ -369,7 +369,7 @@ void list_sprites(void)
       Sys->Printf (MSG_CONSOLE, "A sprite with no name.\n");
   }
   Sys->Printf (MSG_CONSOLE, "There are:%d sprites\n",
-	       Sys->world->sprites.Length());
+	       Sys->engine->sprites.Length());
 }
 
 
@@ -436,7 +436,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
 	  sector_name, light_name,
 	  &start_col.red, &start_col.green, &start_col.blue,
 	  &end_col.red, &end_col.green, &end_col.blue, &act_time);
-	csSector* sect = (csSector*)world->sectors.FindByName (sector_name);
+	csSector* sect = (csSector*)engine->sectors.FindByName (sector_name);
 	if (!sect)
 	{
 	  CsPrintf (MSG_WARNING, "Sector '%s' not found! 'entity_Light' is ignored!\n",
@@ -471,9 +471,9 @@ void WalkTest::ParseKeyCmds (csObject* src)
 void WalkTest::ParseKeyCmds ()
 {
   int i;
-  for (i = 0 ; i < world->sectors.Length () ; i++)
+  for (i = 0 ; i < engine->sectors.Length () ; i++)
   {
-    csSector* sector = (csSector*)world->sectors[i];
+    csSector* sector = (csSector*)engine->sectors[i];
     ParseKeyCmds (sector);
 
     int j;
@@ -721,7 +721,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     dump_visible_indent = 0;
     Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
     extern void dump_visible (csRenderView* rview, int type, void* entity);
-    Sys->view->GetWorld ()->DrawFunc (Sys->view->GetCamera (), Sys->view->GetClipper (), dump_visible);
+    Sys->view->GetEngine ()->DrawFunc (Sys->view->GetCamera (), Sys->view->GetClipper (), dump_visible);
     Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
   }
   else if (!strcasecmp (cmd, "bind"))
@@ -848,7 +848,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       printf ("1\n");
       Dumper::dump_stubs (otree);
     }
-    csSprite* spr = (csSprite*)Sys->world->sprites[0];
+    csSprite* spr = (csSprite*)Sys->engine->sprites[0];
     if (spr)
     {
       Dumper::dump_stubs (spr->GetPolyTreeObject ());
@@ -857,19 +857,19 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "db_osolid"))
   {
-    extern void CreateSolidThings (csWorld*, csSector*, csOctreeNode*, int);
+    extern void CreateSolidThings (csEngine*, csSector*, csOctreeNode*, int);
     csSector* room = Sys->view->GetCamera ()->GetSector ();
     csPolygonTree* tree = room->GetStaticTree ();
     if (tree)
     {
       csOctree* otree = (csOctree*)tree;
-      CreateSolidThings (Sys->world, room, otree->GetRoot (), 0);
+      CreateSolidThings (Sys->engine, room, otree->GetRoot (), 0);
     }
   }
   else if (!strcasecmp (cmd, "db_radstep"))
   {
     csRadiosity* rad;
-    if ((rad = Sys->world->GetRadiosity ()) != NULL)
+    if ((rad = Sys->engine->GetRadiosity ()) != NULL)
     {
       int steps;
       if (arg)
@@ -878,22 +878,22 @@ bool CommandHandler (const char *cmd, const char *arg)
         steps = 1;
       if (steps < 1) steps = 1;
       rad->DoRadiosityStep (steps);
-      Sys->world->InvalidateLightmaps ();
+      Sys->engine->InvalidateLightmaps ();
     }
   }
   else if (!strcasecmp (cmd, "db_radtodo"))
   {
     csRadiosity* rad;
-    if ((rad = Sys->world->GetRadiosity ()) != NULL)
+    if ((rad = Sys->engine->GetRadiosity ()) != NULL)
     {
       rad->ToggleShowDeltaMaps ();
-      Sys->world->InvalidateLightmaps ();
+      Sys->engine->InvalidateLightmaps ();
     }
   }
   else if (!strcasecmp (cmd, "db_radhi"))
   {
     csRadiosity* rad;
-    if ((rad = Sys->world->GetRadiosity ()) != NULL)
+    if ((rad = Sys->engine->GetRadiosity ()) != NULL)
       Sys->selected_polygon = rad->GetNextPolygon ();
   }
   else if (!strcasecmp (cmd, "palette"))
@@ -902,45 +902,45 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_boolean (arg, &Sys->move_3d, "move3d");
   else if (!strcasecmp (cmd, "pvs"))
   {
-    bool en = Sys->world->IsPVS ();
+    bool en = Sys->engine->IsPVS ();
     csCommandProcessor::change_boolean (arg, &en, "pvs");
     if (en) 
-      Sys->world->EnablePVS ();
+      Sys->engine->EnablePVS ();
     else
-      Sys->world->DisablePVS ();
+      Sys->engine->DisablePVS ();
   }
   else if (!strcasecmp (cmd, "pvsonly"))
   {
-    bool en = Sys->world->IsPVSOnly ();
+    bool en = Sys->engine->IsPVSOnly ();
     csCommandProcessor::change_boolean (arg, &en, "pvs only");
     if (en) 
-      Sys->world->EnablePVSOnly ();
+      Sys->engine->EnablePVSOnly ();
     else
-      Sys->world->DisablePVSOnly ();
+      Sys->engine->DisablePVSOnly ();
   }
   else if (!strcasecmp (cmd, "freezepvs"))
   {
-    bool en = Sys->world->IsPVSFrozen ();
+    bool en = Sys->engine->IsPVSFrozen ();
     csCommandProcessor::change_boolean (arg, &en, "freeze pvs");
     if (en) 
-      Sys->world->FreezePVS (Sys->view->GetCamera ()->GetOrigin ());
+      Sys->engine->FreezePVS (Sys->view->GetCamera ()->GetOrigin ());
     else
-      Sys->world->UnfreezePVS ();
+      Sys->engine->UnfreezePVS ();
   }
   else if (!strcasecmp (cmd, "culler"))
   {
     const char* const choices[4] = { "cbuffer", "quad3d", "covtree", NULL };
-    int culler = Sys->world->GetCuller ();
+    int culler = Sys->engine->GetCuller ();
     csCommandProcessor::change_choice (arg, &culler, "culler", choices, 3);
-    Sys->world->SetCuller (culler);
+    Sys->engine->SetCuller (culler);
   }
   else if (!strcasecmp (cmd, "emode"))
   {
     const char* const choices[5] = { "auto", "back2front", "front2back",
     	"zbuffer", NULL };
-    int emode = Sys->world->GetEngineMode ();
+    int emode = Sys->engine->GetEngineMode ();
     csCommandProcessor::change_choice (arg, &emode, "engine mode", choices, 4);
-    Sys->world->SetEngineMode (emode);
+    Sys->engine->SetEngineMode (emode);
   }
   else if (!strcasecmp (cmd, "freelook"))
   {
@@ -1030,7 +1030,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       csOctree* octree = (csOctree*)(c->GetSector ()->GetStaticTree ());
       Dumper::dump_stubs (octree);
-      csNamedObjVector& sprites = Sys->view->GetWorld ()->sprites;
+      csNamedObjVector& sprites = Sys->view->GetEngine ()->sprites;
       int i;
       for (i = 0 ; i < sprites.Length () ; i++)
       {
@@ -1315,9 +1315,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg)
     {
       ScanStr (arg, "%s", name);
-      csObject* obj = Sys->view->GetWorld ()->sprites.FindByName (name);
+      csObject* obj = Sys->view->GetEngine ()->sprites.FindByName (name);
       if (obj)
-        Sys->view->GetWorld ()->RemoveSprite ((csSprite*)obj);
+        Sys->view->GetEngine ()->RemoveSprite ((csSprite*)obj);
       else
         CsPrintf (MSG_CONSOLE, "Can't find sprite with that name!\n");
     }
@@ -1343,7 +1343,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       // See if the sprite exists.
       
-      csSprite3D* aspr = (csSprite3D *) Sys->world->sprites.FindByName(name);
+      csSprite3D* aspr = (csSprite3D *) Sys->engine->sprites.FindByName(name);
       
       if(aspr)
       { 
@@ -1380,7 +1380,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // Test to see if the sprite exists.
-      csSprite3D* aspr = (csSprite3D *) Sys->world->sprites.FindByName(name);
+      csSprite3D* aspr = (csSprite3D *) Sys->engine->sprites.FindByName(name);
       
       if(aspr)
       {
@@ -1416,7 +1416,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // Test to see if the sprite exists.
-      csSprite3D* aspr = (csSprite3D *) Sys->world->sprites.FindByName (name);
+      csSprite3D* aspr = (csSprite3D *) Sys->engine->sprites.FindByName (name);
       if (aspr)
       {
 	iSkeletonBone *sb=QUERY_INTERFACE(aspr->GetSkeletonState(), iSkeletonBone);
@@ -1483,7 +1483,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "clrlights"))
   {
     RECORD_CMD (cmd);
-    csLightIt* lit = Sys->view->GetWorld ()->NewLightIterator ();
+    csLightIt* lit = Sys->view->GetEngine ()->NewLightIterator ();
     csLight* l;
     while ((l = lit->Fetch ()) != NULL)
     {
@@ -1525,7 +1525,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       dyn = new csDynLight (pos.x, pos.y, pos.z, 6, 1, 1, 1);
       rnd = true;
     }
-    Sys->view->GetWorld ()->AddDynLight (dyn);
+    Sys->view->GetEngine ()->AddDynLight (dyn);
     dyn->SetSector (Sys->view->GetCamera ()->GetSector ());
     dyn->Setup ();
     extern void AttachRandomLight (csDynLight* light);
@@ -1536,9 +1536,9 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "dellight"))
   {
     csDynLight* dyn;
-    if ((dyn = Sys->view->GetWorld ()->GetFirstDynLight ()) != NULL)
+    if ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != NULL)
     {
-      Sys->view->GetWorld ()->RemoveDynLight (dyn);
+      Sys->view->GetEngine ()->RemoveDynLight (dyn);
       delete dyn;
       Sys->Printf (MSG_CONSOLE, "Dynamic light deleted.\n");
     }
@@ -1547,9 +1547,9 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     RECORD_CMD (cmd);
     csDynLight* dyn;
-    while ((dyn = Sys->view->GetWorld ()->GetFirstDynLight ()) != NULL)
+    while ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != NULL)
     {
-      Sys->view->GetWorld ()->RemoveDynLight (dyn);
+      Sys->view->GetEngine ()->RemoveDynLight (dyn);
       delete dyn;
     }
     Sys->Printf (MSG_CONSOLE, "All dynamic lights deleted.\n");
@@ -1557,7 +1557,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "picklight"))
   {
 #   if 0
-    pickup_light = Sys->view->GetWorld ()->GetFirstFltLight ();
+    pickup_light = Sys->view->GetEngine ()->GetFirstFltLight ();
     if (pickup_light) Sys->Printf (MSG_CONSOLE, "Floating light taken.\n");
     else Sys->Printf (MSG_CONSOLE, "No floating light to take.\n");
 #   endif
@@ -1587,7 +1587,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (Sys->Sound)
     {
       iSoundData *sb =
-        csSoundDataObject::GetSound(*(Sys->view->GetWorld()), arg);
+        csSoundDataObject::GetSound(*(Sys->view->GetEngine()), arg);
       if (sb)
         Sys->Sound->PlaySound(sb);
       else

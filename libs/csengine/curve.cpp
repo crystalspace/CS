@@ -27,7 +27,7 @@
 #include "csengine/polygon.h"
 #include "csengine/thing.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/lppool.h"
 
 // Initialize the cache for Bezier curves
@@ -237,7 +237,7 @@ void csBezierCurve::GetObjectBoundingBox (csBox3& bbox)
 csCurve::~csCurve ()
 {
   while (lightpatches)
-    csWorld::current_world->lightpatch_pool->Free (lightpatches);
+    csEngine::current_engine->lightpatch_pool->Free (lightpatches);
   delete _o2w;
   delete lightmap;
   delete[] _uv2World;
@@ -272,18 +272,19 @@ void csCurve::InitLightMaps (csPolygonSet* owner, csSector* sector,
   if (!IsLightable ()) return;
   lightmap = new csLightMap ();
 
-  // Allocate space for the lightmap and initialize it current sector ambient color.
+  // Allocate space for the lightmap and initialize it current sector
+  // ambient color.
   int r, g, b;
   sector->GetAmbientColor (r, g, b);
   lightmap->Alloc (CURVE_LM_SIZE*csLightMap::lightcell_size, 
                    CURVE_LM_SIZE*csLightMap::lightcell_size, r, g, b);
 
   if (!do_cache) { lightmap_up_to_date = false; return; }
-  if (csWorld::do_force_relight) lightmap_up_to_date = false;
+  if (csEngine::do_force_relight) lightmap_up_to_date = false;
   else 
     if (!lightmap->ReadFromCache ( CURVE_LM_SIZE*csLightMap::lightcell_size,
            CURVE_LM_SIZE*csLightMap::lightcell_size, owner, this, false, 
-           index, csWorld::current_world))
+           index, csEngine::current_engine))
     lightmap_up_to_date = true;
   else lightmap_up_to_date = true;
 }
@@ -454,7 +455,7 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
       pos = _uv2World[uv];
 
       // is the point contained within the light frustrum? 
-      if (!lview.light_frustum->Contains(pos - lview.light_frustum->GetOrigin()))
+      if (!lview.light_frustum->Contains(pos-lview.light_frustum->GetOrigin()))
         // No, skip it
         continue;
 
@@ -485,14 +486,15 @@ void csCurve::CalculateLighting (csFrustumView& lview)
   {
     // We are working for a dynamic light. In this case we create
     // a light patch for this polygon.
-    csLightPatch* lp = csWorld::current_world->lightpatch_pool->Alloc ();
+    csLightPatch* lp = csEngine::current_engine->lightpatch_pool->Alloc ();
 
     AddLightPatch (lp);
   
     csDynLight* dl = (csDynLight*)lview.userdata;
     dl->AddLightpatch (lp);
 
-    // this light patch has exactly 4 vertices because it fits around our lightmap
+    // This light patch has exactly 4 vertices because it fits around our
+    // lightmap
     lp->Initialize (4);
 
     // Copy shadow frustums.
@@ -560,7 +562,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     float cosfact = csPolyTexture::cfg_cosinus_factor;
 
     // get our coverage matrix
-    csCoverageMatrix *shadow_matrix = new csCoverageMatrix(lm_width, lm_height);
+    csCoverageMatrix *shadow_matrix = new csCoverageMatrix(lm_width,lm_height);
     GetCoverageMatrix(lview, *shadow_matrix);
 
     // calculate the static lightmap
@@ -687,7 +689,7 @@ void csCurve::CacheLightMaps (csPolygonSet* owner, int index)
   if (!lightmap_up_to_date)
   {
     lightmap_up_to_date = true;
-    lightmap->Cache (owner, NULL, index, csWorld::current_world);
+    lightmap->Cache (owner, NULL, index, csEngine::current_engine);
   }
   lightmap->ConvertToMixingMode ();
 }
@@ -756,7 +758,8 @@ void csCurve::CalcUVBuffers()
   }
 }
 
-csBezierCurve::csBezierCurve (csBezierTemplate* parent_tmpl) : csCurve (parent_tmpl) 
+csBezierCurve::csBezierCurve (csBezierTemplate* parent_tmpl) :
+  csCurve (parent_tmpl) 
 {
   int i,j;
   for (i=0 ; i<3 ; i++)
@@ -816,7 +819,7 @@ void csBezierCurve::Normal (csVector3& vec, double u, double v)
 
 csCurveTemplate::csCurveTemplate () : csObject ()
 {
-  csWorld::current_world->AddToCurrentRegion (this);
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 //------------------------------------------------------------------

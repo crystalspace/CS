@@ -6,8 +6,8 @@ The @code{[World]} section contains options for the engine.
 
 @table @code
 @item WORLDFILE=<file>
-Use the specified file as the default world file. Default is @samp{world}.
-Note that you can also specify the world file on the command line.
+Use the specified file as the default map file. Default is @samp{world}.
+Note that you can also specify the map file on the command line.
 
 @item Ambient.White=<ambient>
 Controls the amount of ambient light that is present on all textures even

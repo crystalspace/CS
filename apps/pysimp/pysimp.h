@@ -26,7 +26,7 @@
 
 class csSector;
 class csView;
-class csWorld;
+class csEngine;
 class csDynLight;
 
 class PySimple : public SysSystemDriver
@@ -34,7 +34,7 @@ class PySimple : public SysSystemDriver
   typedef SysSystemDriver superclass;
 public:
   csView* view;
-  csWorld* world;
+  csEngine* engine;
   int motion_flags;
 
 public:

@@ -24,7 +24,7 @@
 #include "csengine/bsp2d.h"
 #include "csengine/treeobj.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/covcube.h"
 #include "csengine/cbufcube.h"
 #include "csengine/cbuffer.h"

@@ -120,7 +120,7 @@ run-time type information and for management of attributes like names that can
 dynamically be attached to objects at run-time.
 
 @item CS/libs/csparser
-A library which parses @sc{ascii} world files and imports the world into the
+A library which parses @sc{ascii} map files and imports the map into the
 3D engine.
 
 @item CS/libs/cssys

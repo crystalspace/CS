@@ -22,7 +22,7 @@
 #include "csengine/polytmap.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/camera.h"
 #include "csengine/sector.h"
 #include "csengine/curve.h"
@@ -61,7 +61,7 @@ IMPLEMENT_EMBEDDED_IBASE_END
 
 long csPolygonSet::current_light_frame_number = 0;
 
-csPolygonSet::csPolygonSet (csWorld* world) : csObject(),
+csPolygonSet::csPolygonSet (csEngine* engine) : csObject(),
   polygons (64, 64), curves (16, 16)
 {
   CONSTRUCT_IBASE (NULL);
@@ -85,9 +85,9 @@ csPolygonSet::csPolygonSet (csWorld* world) : csObject(),
 
   light_frame_number = -1;
 
-  cam_verts_set.SetTransformationManager (&world->tr_manager);
+  cam_verts_set.SetTransformationManager (&engine->tr_manager);
 
-  csPolygonSet::world = world;
+  csPolygonSet::engine = engine;
 }
 
 csPolygonSet::~csPolygonSet ()
@@ -463,7 +463,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   csVector3* verts;
   int num_verts;
   int i;
-  csPoly2DPool* render_pool = d->world->render_pol2d_pool;
+  csPoly2DPool* render_pool = d->engine->render_pol2d_pool;
   csPolygon2D* clip;
   
   for (i = 0 ; i < num ; i++)
@@ -581,16 +581,16 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   csVector3* verts;
   int num_verts;
   int i, j;
-  csCBuffer* c_buffer = d->world->GetCBuffer ();
-  csCoverageMaskTree* covtree = d->world->GetCovtree ();
-  csQuadTree3D* quad3d = d->world->GetQuad3D ();
+  csCBuffer* c_buffer = d->engine->GetCBuffer ();
+  csCoverageMaskTree* covtree = d->engine->GetCovtree ();
+  csQuadTree3D* quad3d = d->engine->GetQuad3D ();
   bool visible;
-  csPoly2DPool* render_pool = d->world->render_pol2d_pool;
+  csPoly2DPool* render_pool = d->engine->render_pol2d_pool;
   csPolygon2D* clip;
   
   for (i = 0 ; i < num ; i++)
   {
-    if (!csWorld::ProcessPolygon ()) return (void*)1;
+    if (!csEngine::ProcessPolygon ()) return (void*)1;
     // For every polygon we perform some type of culling (2D or 3D culling).
     // If 2D culling (c-buffer) then transform it to screen space
     // and perform clipping to Z plane. Then test against the c-buffer
@@ -708,7 +708,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       {
         // Don't draw this polygon.
       }
-      else if (quad3d && !d->world->IsPVSOnly ())
+      else if (quad3d && !d->engine->IsPVSOnly ())
       {
 	csPlane3* wplane = p->GetPolyPlane ();
 	float cl = wplane->Classify (quad3d->GetCenter ());
@@ -737,7 +737,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
          && clip->ClipAgainst (d->view))
         {
           po = p->GetPortal ();
-	  if (d->world->IsPVSOnly ())
+	  if (d->engine->IsPVSOnly ())
             visible = true;
 	  if (covtree)
             visible = covtree->InsertPolygon (clip->GetVertices (),
@@ -1173,6 +1173,3 @@ csMeshedPolygon* csPolygonSet::PolyMesh::GetPolygons ()
   }
   return polygons;
 }
-
-//---------------------------------------------------------------------------------------------------------
-

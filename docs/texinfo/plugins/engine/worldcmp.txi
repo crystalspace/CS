@@ -4,13 +4,13 @@
 @cindex World, Components
 
 This section describes the objects used to build a world.  This is useful to
-understand the format of the Crystal Space world file as described in the next
-section.  To understand this you should know the basics of the @ref{Portal
-Engine}.  This section describes the compenents of the world independent from
-the file format, so it is also useful if you want to build a world from within
-your program.
+understand the format of the Crystal Space map file
+(@pxref{Map File Format}).  To understand this you should know the basics of
+the @ref{Portal Engine}.  This section describes the compenents of the world
+independent from the file format, so it is also useful if you want to build a
+world from within your program.
 
-Some objects appear in the world file but are not described here, like the
+Some objects appear in the map file but are not described here, like the
 @dfn{skydome}.  Rather than being core components of the world as described
 here, such objects are shortcuts for creating complex structures out of the
 core components.
@@ -32,7 +32,7 @@ performance.
 
 @item
 @emph{Sprites}.  Depending on the structure of your program it is more or less
-useful to define sprites directly in the world file, because your program
+useful to define sprites directly in the map file, because your program
 might have little control over them.  You'll then want to use @dfn{Nodes}
 instead.  @xref{3D Sprites}.
 

@@ -26,7 +26,7 @@
 #include "csengine/texture.h"
 #include "csengine/polyplan.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
 #include "csengine/camera.h"
@@ -47,7 +47,7 @@ void csPolygon2D::AddPerspective (const csVector3& v)
   if (num_vertices >= max_vertices)
     MakeRoom (max_vertices+5);
 
-  csWorld::current_world->current_camera->Perspective (v, vertices[num_vertices]);
+  csEngine::current_engine->current_camera->Perspective (v, vertices[num_vertices]);
   bbox.AddBoundingVertex (vertices[num_vertices]);
   num_vertices++;
 }
@@ -91,7 +91,7 @@ void csPolygon2D::Draw (iGraphics2D* g2d, int col)
   {
     x2 = QRound (vertices[i].x);
     y2 = QRound (vertices[i].y);
-    g2d->DrawLine (x1, csWorld::frame_height - 1 - y1, x2, csWorld::frame_height - 1 - y2, col);
+    g2d->DrawLine (x1, csEngine::frame_height - 1 - y1, x2, csEngine::frame_height - 1 - y2, col);
 
     x1 = x2;
     y1 = y2;
@@ -943,7 +943,7 @@ void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
   static G3DPolygonDFP g3dpoly;
   memset(&g3dpoly, 0, sizeof(g3dpoly));
   g3dpoly.num = num_vertices;
-  g3dpoly.inv_aspect = csWorld::current_world->current_camera->GetInvFOV ();
+  g3dpoly.inv_aspect = csEngine::current_engine->current_camera->GetInvFOV ();
 #if 0
   memcpy (g3dpoly.vertices, vertices, num_vertices * sizeof (csVector2));
 #else
@@ -998,5 +998,3 @@ bool csPolygon2DQueue::Pop (csPolygon3D** poly3d, csPolygon2D** poly2d)
   *poly2d = queue[num_queue].poly2d;
   return true;
 }
-
-//---------------------------------------------------------------------------

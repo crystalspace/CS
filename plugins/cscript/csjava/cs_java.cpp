@@ -2119,29 +2119,29 @@ JNIEXPORT void JNICALL Java_cspace_iPolygonTexture_1SetCacheData(JNIEnv *jenv, j
 }
 
 
-static void *SwigiWorldToiPlugIn(void *ptr) {
-    iWorld *src;
+static void *SwigiEngineToiPlugIn(void *ptr) {
+    iEngine *src;
     iPlugIn *dest;
-    src = (iWorld *) ptr;
+    src = (iEngine *) ptr;
     dest = (iPlugIn *) src;
     return (void *) dest;
 }
 
-static void *SwigiWorldToiBase(void *ptr) {
-    iWorld *src;
+static void *SwigiEngineToiBase(void *ptr) {
+    iEngine *src;
     iBase *dest;
-    src = (iWorld *) ptr;
+    src = (iEngine *) ptr;
     dest = (iBase *) src;
     return (void *) dest;
 }
 
 extern "C"
-JNIEXPORT jint JNICALL Java_cspace_iWorld_1GetTextureFormat(JNIEnv *jenv, jclass jcls, jlong jarg0) {
+JNIEXPORT jint JNICALL Java_cspace_iEngine_1GetTextureFormat(JNIEnv *jenv, jclass jcls, jlong jarg0) {
     jint _jresult = 0 ;
-    iWorld *arg0 ;
+    iEngine *arg0 ;
     int result ;
     
-    arg0 = *(iWorld **)&jarg0;
+    arg0 = *(iEngine **)&jarg0;
     result = arg0->GetTextureFormat();
     _jresult = (jint) result;
     return _jresult;
@@ -2149,11 +2149,11 @@ JNIEXPORT jint JNICALL Java_cspace_iWorld_1GetTextureFormat(JNIEnv *jenv, jclass
 
 
 extern "C"
-JNIEXPORT void JNICALL Java_cspace_iWorld_1SelectLibrary(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1) {
-    iWorld *arg0 ;
+JNIEXPORT void JNICALL Java_cspace_iEngine_1SelectLibrary(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1) {
+    iEngine *arg0 ;
     char *arg1 ;
     
-    arg0 = *(iWorld **)&jarg0;
+    arg0 = *(iEngine **)&jarg0;
     arg1 = (jarg1) ? (char *)jenv->GetStringUTFChars(jarg1, 0) : NULL;
     arg0->SelectLibrary((const char*)arg1);
     if(arg1) jenv->ReleaseStringUTFChars(jarg1, arg1);
@@ -2161,13 +2161,13 @@ JNIEXPORT void JNICALL Java_cspace_iWorld_1SelectLibrary(JNIEnv *jenv, jclass jc
 
 
 extern "C"
-JNIEXPORT jboolean JNICALL Java_cspace_iWorld_1DeleteLibrary(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1) {
+JNIEXPORT jboolean JNICALL Java_cspace_iEngine_1DeleteLibrary(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1) {
     jboolean _jresult = 0 ;
-    iWorld *arg0 ;
+    iEngine *arg0 ;
     char *arg1 ;
     bool result ;
     
-    arg0 = *(iWorld **)&jarg0;
+    arg0 = *(iEngine **)&jarg0;
     arg1 = (jarg1) ? (char *)jenv->GetStringUTFChars(jarg1, 0) : NULL;
     result = arg0->DeleteLibrary((const char*)arg1);
     _jresult = (jboolean) result;
@@ -2177,25 +2177,25 @@ JNIEXPORT jboolean JNICALL Java_cspace_iWorld_1DeleteLibrary(JNIEnv *jenv, jclas
 
 
 extern "C"
-JNIEXPORT void JNICALL Java_cspace_iWorld_1DeleteAll(JNIEnv *jenv, jclass jcls, jlong jarg0) {
-    iWorld *arg0 ;
+JNIEXPORT void JNICALL Java_cspace_iEngine_1DeleteAll(JNIEnv *jenv, jclass jcls, jlong jarg0) {
+    iEngine *arg0 ;
     
-    arg0 = *(iWorld **)&jarg0;
+    arg0 = *(iEngine **)&jarg0;
     arg0->DeleteAll();
 }
 
 
 extern "C"
-JNIEXPORT jboolean JNICALL Java_cspace_iWorld_1CreateTexture(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1, jstring jarg2, jlong jarg3, jint jarg4) {
+JNIEXPORT jboolean JNICALL Java_cspace_iEngine_1CreateTexture(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1, jstring jarg2, jlong jarg3, jint jarg4) {
     jboolean _jresult = 0 ;
-    iWorld *arg0 ;
+    iEngine *arg0 ;
     char *arg1 ;
     char *arg2 ;
     csColor *arg3 ;
     int arg4 ;
     bool result ;
     
-    arg0 = *(iWorld **)&jarg0;
+    arg0 = *(iEngine **)&jarg0;
     arg1 = (jarg1) ? (char *)jenv->GetStringUTFChars(jarg1, 0) : NULL;
     arg2 = (jarg2) ? (char *)jenv->GetStringUTFChars(jarg2, 0) : NULL;
     arg3 = *(csColor **)&jarg3;
@@ -2209,9 +2209,9 @@ JNIEXPORT jboolean JNICALL Java_cspace_iWorld_1CreateTexture(JNIEnv *jenv, jclas
 
 
 extern "C"
-JNIEXPORT jboolean JNICALL Java_cspace_iWorld_1CreateCamera(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1, jstring jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
+JNIEXPORT jboolean JNICALL Java_cspace_iEngine_1CreateCamera(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1, jstring jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
     jboolean _jresult = 0 ;
-    iWorld *arg0 ;
+    iEngine *arg0 ;
     char *arg1 ;
     char *arg2 ;
     csVector3 *arg3 ;
@@ -2219,7 +2219,7 @@ JNIEXPORT jboolean JNICALL Java_cspace_iWorld_1CreateCamera(JNIEnv *jenv, jclass
     csVector3 *arg5 ;
     bool result ;
     
-    arg0 = *(iWorld **)&jarg0;
+    arg0 = *(iEngine **)&jarg0;
     arg1 = (jarg1) ? (char *)jenv->GetStringUTFChars(jarg1, 0) : NULL;
     arg2 = (jarg2) ? (char *)jenv->GetStringUTFChars(jarg2, 0) : NULL;
     arg3 = *(csVector3 **)&jarg3;
@@ -2234,14 +2234,14 @@ JNIEXPORT jboolean JNICALL Java_cspace_iWorld_1CreateCamera(JNIEnv *jenv, jclass
 
 
 extern "C"
-JNIEXPORT jboolean JNICALL Java_cspace_iWorld_1CreateKey(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1, jstring jarg2) {
+JNIEXPORT jboolean JNICALL Java_cspace_iEngine_1CreateKey(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1, jstring jarg2) {
     jboolean _jresult = 0 ;
-    iWorld *arg0 ;
+    iEngine *arg0 ;
     char *arg1 ;
     char *arg2 ;
     bool result ;
     
-    arg0 = *(iWorld **)&jarg0;
+    arg0 = *(iEngine **)&jarg0;
     arg1 = (jarg1) ? (char *)jenv->GetStringUTFChars(jarg1, 0) : NULL;
     arg2 = (jarg2) ? (char *)jenv->GetStringUTFChars(jarg2, 0) : NULL;
     result = arg0->CreateKey((const char*)arg1,(const char*)arg2);
@@ -2253,15 +2253,15 @@ JNIEXPORT jboolean JNICALL Java_cspace_iWorld_1CreateKey(JNIEnv *jenv, jclass jc
 
 
 extern "C"
-JNIEXPORT jboolean JNICALL Java_cspace_iWorld_1CreatePlane(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1, jlong jarg2, jlong jarg3) {
+JNIEXPORT jboolean JNICALL Java_cspace_iEngine_1CreatePlane(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1, jlong jarg2, jlong jarg3) {
     jboolean _jresult = 0 ;
-    iWorld *arg0 ;
+    iEngine *arg0 ;
     char *arg1 ;
     csVector3 *arg2 ;
     csMatrix3 *arg3 ;
     bool result ;
     
-    arg0 = *(iWorld **)&jarg0;
+    arg0 = *(iEngine **)&jarg0;
     arg1 = (jarg1) ? (char *)jenv->GetStringUTFChars(jarg1, 0) : NULL;
     arg2 = *(csVector3 **)&jarg2;
     arg3 = *(csMatrix3 **)&jarg3;
@@ -2273,13 +2273,13 @@ JNIEXPORT jboolean JNICALL Java_cspace_iWorld_1CreatePlane(JNIEnv *jenv, jclass 
 
 
 extern "C"
-JNIEXPORT jlong JNICALL Java_cspace_iWorld_1CreateSector(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1) {
+JNIEXPORT jlong JNICALL Java_cspace_iEngine_1CreateSector(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1) {
     jlong _jresult = 0 ;
-    iWorld *arg0 ;
+    iEngine *arg0 ;
     char *arg1 ;
     iSector *result ;
     
-    arg0 = *(iWorld **)&jarg0;
+    arg0 = *(iEngine **)&jarg0;
     arg1 = (jarg1) ? (char *)jenv->GetStringUTFChars(jarg1, 0) : NULL;
     result = arg0->CreateSector((const char*)arg1);
     *(iSector **)&_jresult = result;
@@ -2289,14 +2289,14 @@ JNIEXPORT jlong JNICALL Java_cspace_iWorld_1CreateSector(JNIEnv *jenv, jclass jc
 
 
 extern "C"
-JNIEXPORT jlong JNICALL Java_cspace_iWorld_1CreateThing(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1, jlong jarg2) {
+JNIEXPORT jlong JNICALL Java_cspace_iEngine_1CreateThing(JNIEnv *jenv, jclass jcls, jlong jarg0, jstring jarg1, jlong jarg2) {
     jlong _jresult = 0 ;
-    iWorld *arg0 ;
+    iEngine *arg0 ;
     char *arg1 ;
     iSector *arg2 ;
     iThing *result ;
     
-    arg0 = *(iWorld **)&jarg0;
+    arg0 = *(iEngine **)&jarg0;
     arg1 = (jarg1) ? (char *)jenv->GetStringUTFChars(jarg1, 0) : NULL;
     arg2 = *(iSector **)&jarg2;
     result = arg0->CreateThing((const char*)arg1,arg2);

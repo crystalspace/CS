@@ -1,5 +1,5 @@
 /*
-    The Crystal Space world file parser definition
+    The Crystal Space map file parser definition
     Copyright (C) 2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
-#include "iworld.h"
+#include "iengine.h"
 #include "itxtmgr.h"
 #include "isector.h"
 #include "ipolyset.h"
@@ -258,10 +258,10 @@
 
 input:
   KW_WORLD name '('
-  { world->SelectLibrary (storage.cur_library = $2); }
+  { engine->SelectLibrary (storage.cur_library = $2); }
   world_ops ')'
 | KW_LIBRARY name '('
-  { world->SelectLibrary (storage.cur_library = $2); }
+  { engine->SelectLibrary (storage.cur_library = $2); }
   world_ops ')'
 ;
 
@@ -284,7 +284,7 @@ world_op:
   { printf ("SOUNDS\n"); }
 | KW_START '(' STRING ',' vector ')'
   {
-    if (!world->CreateCamera ("Start", $3,
+    if (!engine->CreateCamera ("Start", $3,
       (csVector3 &)$5, csVector3 (0, 0, 1), csVector3 (0, 1, 0)))
       YYABORT;
   }
@@ -301,7 +301,7 @@ world_op:
   { if (!CreatePlane ($2)) YYABORT; }
 | KW_SECTOR name '('
   {
-    SECTOR.object = world->CreateSector ($2);
+    SECTOR.object = engine->CreateSector ($2);
     SECTOR.polyset = QUERY_INTERFACE (SECTOR.object, iPolygonSet);
     SECTOR.texname = NULL;
     SECTOR.texlen = 1.0;
@@ -314,7 +314,7 @@ world_op:
     SECTOR.polyset->DecRef ();
   }
 | KW_KEY STRING '(' STRING ')'
-  { if (!world->CreateKey ($2, $4)) ABORTMSG; }
+  { if (!engine->CreateKey ($2, $4)) ABORTMSG; }
 | KW_COLLECTION name '(' collection_ops ')'
   { printf ("COLLECTION [%s]\n", $2); }
 | KW_SCRIPT name '(' STRING ':' STRING ')'
@@ -424,7 +424,7 @@ sector_op:
   { SECTOR.statbsp = $2; }
 | KW_THING name '('
   {
-    thing.object = world->CreateThing ($2, SECTOR.object);
+    thing.object = engine->CreateThing ($2, SECTOR.object);
     thing.polyset = QUERY_INTERFACE (thing.object, iPolygonSet);
     thing.texname = NULL;
     thing.texlen = 1.0;

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLYTREE_H
-#define POLYTREE_H
+#ifndef __CS_POLYTREE_H__
+#define __CS_POLYTREE_H__
 
 #include "csgeom/math3d.h"
 #include "csgeom/plane3.h"
@@ -228,5 +228,4 @@ public:
   bool ClassifyPoint (const csVector3& p);
 };
 
-#endif /*POLYTREE_H*/
-
+#endif // __CS_POLYTREE_H__

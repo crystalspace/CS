@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLY3D_H
-#define POLY3D_H
+#ifndef __CS_POLY3D_H__
+#define __CS_POLY3D_H__
 
 #include "csgeom/math3d.h"
 
@@ -107,7 +107,7 @@ public:
    * Get the last vertex.
    */
   csVector3* GetLast () const
-  { if (num_vertices<=0) return NULL;  else return &vertices[num_vertices-1]; }
+  { if (num_vertices<=0) return NULL; else return &vertices[num_vertices-1]; }
 
   /**
    * Test if this vector is inside the polygon.
@@ -183,8 +183,8 @@ public:
    * on the plane. This function assumes that there actually is
    * a projection. Plane_nr is 0 for the X plane, 1 for Y, and 2 for Z.
    */
-  bool ProjectAxisPlane (const csVector3& point, int plane_nr, float plane_pos,
-  	csPoly2D* poly2d) const
+  bool ProjectAxisPlane (const csVector3& point, int plane_nr,
+	float plane_pos, csPoly2D* poly2d) const
   {
     switch (plane_nr)
     {
@@ -196,11 +196,11 @@ public:
   }
 
   /**
-   * Classify this polygon with regards to a plane (in world space). If this poly
-   * is on same plane it returns POL_SAME_PLANE. If this poly is
-   * completely in front of the given plane it returnes POL_FRONT. If this poly
-   * is completely back of the given plane it returnes POL_BACK. Otherwise it
-   * returns POL_SPLIT_NEEDED.
+   * Classify this polygon with regards to a plane (in world space).
+   * If this poly is on same plane it returns POL_SAME_PLANE.  If this poly is
+   * completely in front of the given plane it returnes POL_FRONT.  If this
+   * poly is completely back of the given plane it returnes POL_BACK.
+   * Otherwise it returns POL_SPLIT_NEEDED.
    */
   int Classify (const csPlane3& pl) const;
 
@@ -281,4 +281,4 @@ public:
   int AddVertexSmart (float x, float y, float z);
 };
 
-#endif /*POLY3D_H*/
+#endif // __CS_POLY3D_H__

@@ -20,8 +20,8 @@
 // Graphics3DGlide Class Declaration
 // Written by xtrochu and Nathaniel
 
-#ifndef G3D_GLIDE_H
-#define G3D_GLIDE_H
+#ifndef __CS_G3D_GLIDE_H__
+#define __CS_G3D_GLIDE_H__
 
 #include <glide.h>
 
@@ -108,9 +108,6 @@ private:
 
   static csGraphics3DGlide *G3D;
   
-  /// The world driver
-  //IWorld* m_piWorld;
-
   /// width 'n' height
   int m_nWidth;
   int m_nHeight;
@@ -332,4 +329,4 @@ private:
                                                 float& M,  float& N,  float& O  );
 };
 
-#endif // G3D_GLIDE_H
+#endif // __CS_G3D_GLIDE_H__

@@ -24,7 +24,7 @@
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
 #include "csengine/light.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/stats.h"
 #include "csengine/sector.h"
 #include "csengine/cbufcube.h"
@@ -49,8 +49,8 @@ IMPLEMENT_EMBEDDED_IBASE (csThing::eiThing)
   IMPLEMENTS_INTERFACE (iThing)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csThing::csThing (csWorld* world, bool is_sky) :
-	csPolygonSet (world), tree_bbox (NULL), movable ()
+csThing::csThing (csEngine* engine, bool is_sky) :
+	csPolygonSet (engine), tree_bbox (NULL), movable ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiThing);
   movable.scfParent = &scfiThing;
@@ -59,15 +59,15 @@ csThing::csThing (csWorld* world, bool is_sky) :
   tree_bbox.SetOwner (this);
   csThing::is_sky = is_sky;
   movable.SetObject (this);
-  world->AddToCurrentRegion (this);
+  engine->AddToCurrentRegion (this);
 }
 
 csThing::~csThing ()
 {
   if (is_sky)
-    world->UnlinkSky (this);
+    engine->UnlinkSky (this);
   else
-    world->UnlinkThing (this);
+    engine->UnlinkThing (this);
 }
 
 void csThing::SetConvex (bool c)
@@ -276,7 +276,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     // why not do it to the smallest possible clip area.
     if (!do_clip)
     {
-      box_class = world->top_clipper->ClassifyBox (bbox);
+      box_class = engine->top_clipper->ClassifyBox (bbox);
       if (box_class == 0) do_clip = true;
     }
 
@@ -383,7 +383,7 @@ void csThing::DrawFoggy (csRenderView& d)
   csVector3* verts;
   int num_verts;
   int i;
-  csPoly2DPool* render_pool = world->render_pol2d_pool;
+  csPoly2DPool* render_pool = engine->render_pol2d_pool;
   csPolygon2D* clip;
 
   // @@@ Wouldn't it be nice if we checked all vertices against the Z plane?
@@ -462,8 +462,8 @@ void csThing::DrawFoggy (csRenderView& d)
 
 void csThing::CheckFrustum (csFrustumView& lview)
 {
-  csCBufferCube* cb = world->GetCBufCube ();
-  csCovcube* cc = world->GetCovcube ();
+  csCBufferCube* cb = engine->GetCBufCube ();
+  csCovcube* cc = engine->GetCovcube ();
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   RealCheckFrustum (lview);
@@ -706,4 +706,3 @@ void csThing::UpdateInPolygonTrees ()
     tree_bbox.GetBaseStub ()->DecRef ();
   }
 }
-

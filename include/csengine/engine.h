@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_WORLD_H__
-#define __CS_WORLD_H__
+#ifndef __CS_ENGINE_H__
+#define __CS_ENGINE_H__
 
 #include "csutil/scf.h"
 #include "csgeom/math3d.h"
@@ -28,7 +28,7 @@
 #include "csobject/csobject.h"
 #include "igraph3d.h"
 #include "isystem.h"
-#include "iworld.h"
+#include "iengine.h"
 #include "iconfig.h"
 
 class csRegion;
@@ -48,7 +48,7 @@ class csClipper;
 class csCovcube;
 class csCBufferCube;
 class csRenderView;
-class csWorld;
+class csEngine;
 class Dumper;
 class csLight;
 class csCBuffer;
@@ -136,16 +136,16 @@ struct iRegion;
 
 
 /**
- * Iterator to iterate over all polygons in the world.
+ * Iterator to iterate over all polygons in the engine.
  * This iterator assumes there are no fundamental changes
- * in the world while it is being used.
- * If changes to the world happen the results are unpredictable.
+ * in the engine while it is being used.
+ * If changes to the engine happen the results are unpredictable.
  */
 class csPolyIt
 {
 private:
-  // The world for this iterator.
-  csWorld* world;
+  // The engine for this iterator.
+  csEngine* engine;
   // Current sector index.
   int sector_idx;
   // Current thing index.
@@ -155,7 +155,7 @@ private:
 
 public:
   /// Construct an iterator and initialize to start.
-  csPolyIt (csWorld* w);
+  csPolyIt (csEngine*);
 
   /// Restart iterator.
   void Restart ();
@@ -168,16 +168,16 @@ public:
 };
 
 /**
- * Iterator to iterate over all curves in the world.
+ * Iterator to iterate over all curves in the engine.
  * This iterator assumes there are no fundamental changes
- * in the world while it is being used.
- * If changes to the world happen the results are unpredictable.
+ * in the engine while it is being used.
+ * If changes to the engine happen the results are unpredictable.
  */
 class csCurveIt
 {
 private:
-  // The world for this iterator.
-  csWorld* world;
+  // The engine for this iterator.
+  csEngine* engine;
   // Current sector index.
   int sector_idx;
   // Current thing index.
@@ -187,7 +187,7 @@ private:
 
 public:
   /// Construct an iterator and initialize to start.
-  csCurveIt (csWorld* w);
+  csCurveIt (csEngine*);
 
   /// Restart iterator.
   void Restart ();
@@ -197,16 +197,16 @@ public:
 };
 
 /**
- * Iterator to iterate over all static lights in the world.
+ * Iterator to iterate over all static lights in the engine.
  * This iterator assumes there are no fundamental changes
- * in the world while it is being used.
- * If changes to the world happen the results are unpredictable.
+ * in the engine while it is being used.
+ * If changes to the engine happen the results are unpredictable.
  */
 class csLightIt
 {
 private:
-  // The world for this iterator.
-  csWorld* world;
+  // The engine for this iterator.
+  csEngine* engine;
   // Current sector index.
   int sector_idx;
   // Current light index.
@@ -214,7 +214,7 @@ private:
 
 public:
   /// Construct an iterator and initialize to start.
-  csLightIt (csWorld* w);
+  csLightIt (csEngine*);
 
   /// Restart iterator.
   void Restart ();
@@ -224,11 +224,11 @@ public:
 };
 
 /**
- * Iterator to iterate over sectors in the world which are within
+ * Iterator to iterate over sectors in the engine which are within
  * a radius from a given point.
  * This iterator assumes there are no fundamental changes
- * in the world while it is being used.
- * If changes to the world happen the results are unpredictable.
+ * in the engine while it is being used.
+ * If changes to the engine happen the results are unpredictable.
  */
 class csSectorIt
 {
@@ -269,18 +269,18 @@ public:
 };
 
 /**
- * Iterator to iterate over objects in the world.
+ * Iterator to iterate over objects in the engine.
  * This iterator assumes there are no fundamental changes
- * in the world while it is being used.
- * If changes to the world happen the results are unpredictable.
+ * in the engine while it is being used.
+ * If changes to the engine happen the results are unpredictable.
  */
 class csObjectIt
 {
-  friend class csWorld;
+  friend class csEngine;
 
 private:
-  // The world for this iterator.
-  csWorld* world;
+  // The engine for this iterator.
+  csEngine* engine;
   // The type to use.
   const csIdType* type;
   bool derived;
@@ -313,7 +313,7 @@ private:
   void EndSearch ();
 
   /// Construct an iterator and initialize to start.
-  csObjectIt (csWorld* w, const csIdType& type, bool derived,
+  csObjectIt (csEngine*, const csIdType& type, bool derived,
   	csSector* sector, const csVector3& pos, float radius);
 
 public:
@@ -328,17 +328,18 @@ public:
 };
 
 /**
- * The world! This class basicly represents the 3D engine.
- * It is the main anchor class for working with Crystal Space.
+ * The 3D engine.
+ * This class manages all components which comprise a 3D world including
+ * sectors, polygons, curves, sprites, etc.
  */
-class csWorld : public iWorld, public csObject
+class csEngine : public iEngine, public csObject
 {
   friend class Dumper;
 
 public:
   /**
    * This is the Virtual File System object where all the files
-   * used in this world live. Textures, models, data, everything -
+   * used by the engine live. Textures, models, data, everything -
    * reside on this virtual disk volume. You should avoid using
    * the standard file functions (such as fopen(), fread() and so on)
    * since they are highly system-dependent (for example, DOS uses
@@ -348,21 +349,21 @@ public:
 
   /**
    * This is a vector which holds objects of type 'csCleanable'.
-   * They will be destroyed when the world is destroyed. That's
+   * They will be destroyed when the engine is destroyed. That's
    * the only special thing. This is useful for holding memory
    * which you allocate locally in a function but you want
    * to reuse accross function invocations. There is no general
    * way to make sure that the memory will be freed it only exists
    * as a static pointer in your function code. Adding a class
    * encapsulating that memory to this array will ensure that the
-   * memory is removed once the world is destroyed.
+   * memory is removed once the engine is destroyed.
    */
   csObjVector cleanup;
 
   /**
-   * List of sectors in the world. This vector contains
+   * List of sectors in the engine. This vector contains
    * objects of type csSector*. Use CreateCsSector() or CreateSector()
-   * to add sectors to the world.
+   * to add sectors to the engine.
    */
   csNamedObjVector sectors;
 
@@ -375,7 +376,7 @@ public:
   csNamedObjVector planes;
 
   /**
-   * List of all collections in the world. This vector contains objects
+   * List of all collections in the engine. This vector contains objects
    * of type csCollection*. Use UnlinkCollection() and RemoveCollection()
    * to unlink and/or remove collections from this list. These functions
    * take care of correctly removing the collections from all sectors
@@ -403,7 +404,7 @@ public:
   csNamedObjVector curve_templates;
 
   /**
-   * List of all sprites in the world. This vector contains objects
+   * List of all sprites in the engine. This vector contains objects
    * of type csSprite*. Use UnlinkSprite() and RemoveSprite()
    * to unlink and/or remove sprites from this list. These functions
    * take care of correctly removing the sprites from all sectors
@@ -413,7 +414,7 @@ public:
   csNamedObjVector sprites;
 
   /**
-   * List of all things in the world. This vector contains objects
+   * List of all things in the engine. This vector contains objects
    * of type csThing*. Use UnlinkThing() and RemoveThing() to
    * unlink and/or remove things from this list. These functions
    * take care of correctly removing the things from all sectors
@@ -423,7 +424,7 @@ public:
   csNamedObjVector things;
 
   /**
-   * List of all skies in the world. This vector contains objects
+   * List of all skies in the engine. This vector contains objects
    * of type csThing*. Use UnlinkSky() and RemoveSky() to
    * unlink and/or remove skies from this list. These functions
    * take care of correctly removing the skies from all sectors
@@ -441,8 +442,8 @@ public:
   static int frame_width, frame_height;
   /// Remember iSystem interface.
   static iSystem* System;
-  /// Current world.
-  static csWorld* current_world;
+  /// The shared engine instance.
+  static csEngine* current_engine;
   /// Need to render using newradiosity?
   static bool use_new_radiosity;
   /// An object pool for 2D polygons used by the rendering process.
@@ -567,25 +568,26 @@ public:
 
 public:
   /**
-   * Initialize an empty world. The only thing that is valid just
-   * after creating the world is the configurator object which you
-   * can use to configure the world before continuing (see GetEngineConfig()).
+   * Initialize an empty engine.  The only thing that is valid just after
+   * creating the engine is the configurator object which you can use to
+   * configure the engine before continuing (see GetEngineConfig()).
    */
-  csWorld (iBase *iParent);
+  csEngine (iBase *iParent);
 
   /**
-   * Delete the world and all entities in the world. All objects added to this
-   * world by the user (like Things, Sectors, ...) will be deleted as well. If
-   * you don't want this then you should unlink them manually before destroying
-   * the world.
+   * Delete the engine and all entities it contains.  All objects added to this
+   * engine by the user (like Things, Sectors, ...) will be deleted as well.
+   * If you don't want this then you should unlink them manually before
+   * destroying the engine.
    */
-  virtual ~csWorld ();
+  virtual ~csEngine ();
 
   /**
-   * Check consistency of the loaded world. Currently this function only
-   * checks if polygons have three or more vertices and if the vertices
-   * are coplanar (if more than three). This function prints out warnings
-   * for all found errors. Returns true if everything is in order.
+   * Check consistency of the loaded elements which comprise the world.
+   * Currently this function only checks if polygons have three or more
+   * vertices and if the vertices are coplanar (if more than three).  This
+   * function prints out warnings for all found errors.  Returns true if
+   * everything is in order.
    */
   bool CheckConsistency ();
 
@@ -606,7 +608,7 @@ public:
 
   /**
    * Calls UpdateMove for all sprites to initialise bsp bounding boxes.
-   * Call this after creating a BSP tree. csWorld::Prepare() will call
+   * Call this after creating a BSP tree. csEngine::Prepare() will call
    * this function automatically so you normally don't have to call it.
    */
   void PrepareSprites ();
@@ -618,7 +620,7 @@ public:
   void ShineLights ();
 
   /**
-   * Prepare the world. This function must be called after
+   * Prepare the engine. This function must be called after
    * you loaded/created the world. It will prepare all lightmaps
    * for use and also free all images that were loaded for
    * the texture manager (the texture manager should have them
@@ -674,7 +676,7 @@ public:
    * One of the CS_ENGINE_... flags. Default is CS_ENGINE_AUTODETECT.
    * If you select CS_ENGINE_AUTODETECT then the mode will be
    * auto-detected (depending on level and/or hardware capabilities)
-   * the first time csWorld::Draw() is called.
+   * the first time csEngine::Draw() is called.
    */
   void SetEngineMode (int mode)
   {
@@ -800,7 +802,7 @@ public:
 
   /**
    * Cache lighting. If true (default) then lighting will be cached in
-   * either the world file or else 'precalc.zip'. If false then this
+   * either the map file or else 'precalc.zip'. If false then this
    * will not happen and lighting will be calculated at startup.
    * If set to 'false' recalculating of lightmaps will be forced.
    * If set to 'true' recalculating of lightmaps will depend on
@@ -823,10 +825,10 @@ public:
    * by Initialize() so you normally do not need to call it
    * yourselves.
    */
-  void StartWorld ();
+  void StartEngine ();
 
   /**
-   * Clear everything in the world.
+   * Clear everything in the engine.
    */
   void Clear ();
 
@@ -846,17 +848,17 @@ public:
   csSector* CreateCsSector (const char *iName);
 
   /**
-   * Add a dynamic light to the world.
+   * Add a dynamic light to the engine.
    */
   void AddDynLight (csDynLight* dyn);
 
   /**
-   * Remove a dynamic light from the world.
+   * Remove a dynamic light from the engine.
    */
   void RemoveDynLight (csDynLight* dyn);
 
   /**
-   * Return the first dynamic light in this world.
+   * Return the first dynamic light in this engine.
    */
   csDynLight* GetFirstDynLight () { return first_dyn_lights; }
 
@@ -903,17 +905,17 @@ public:
   	csSector* sector, const csVector3& pos, float radius);
 
   /**
-   * Add a halo attached to given light to the world.
+   * Add a halo attached to given light to the engine.
    */
   void AddHalo (csLight* Light);
 
   /**
-   * Remove halo attached to given light from the world.
+   * Remove halo attached to given light from the engine.
    */
   void RemoveHalo (csLight* Light);
 
   /**
-   * Draw the world given a camera and a clipper. Note that
+   * Draw the 3D world given a camera and a clipper. Note that
    * in order to be able to draw using the given 3D driver
    * all textures must have been registered to that driver (using
    * Prepare()). Note that you need to call Prepare() again if
@@ -959,55 +961,55 @@ public:
   void UpdateParticleSystems (cs_time elapsed_time);
 
   /**
-   * Unlink a sprite from the world (but do not delete it).
+   * Unlink a sprite from the engine (but do not delete it).
    * It is also removed from all sectors.
    */
   void UnlinkSprite (csSprite* sprite);
 
   /**
-   * Unlink and delete a sprite from the world.
+   * Unlink and delete a sprite from the engine.
    * It is also removed from all sectors.
    */
   void RemoveSprite (csSprite* sprite);
 
   /**
-   * Unlink a thing from the world (but do not delete it).
+   * Unlink a thing from the engine (but do not delete it).
    * It is also removed from all sectors.
    */
   void UnlinkThing (csThing* thing);
 
   /**
-   * Unlink and delete a thing from the world.
+   * Unlink and delete a thing from the engine.
    * It is also removed from all sectors.
    */
   void RemoveThing (csThing* thing);
 
   /**
-   * Unlink a sky from the world (but do not delete it).
+   * Unlink a sky from the engine (but do not delete it).
    * It is also removed from all sectors.
    */
   void UnlinkSky (csThing* thing);
 
   /**
-   * Unlink and delete a sky from the world.
+   * Unlink and delete a sky from the engine.
    * It is also removed from all sectors.
    */
   void RemoveSky (csThing* thing);
 
   /**
-   * Unlink a collection from the world (but do not delete it).
+   * Unlink a collection from the engine (but do not delete it).
    * It is also removed from all sectors.
    */
   void UnlinkCollection (csCollection* collection);
 
   /**
-   * Unlink and delete a collection from the world.
+   * Unlink and delete a collection from the engine.
    * It is also removed from all sectors.
    */
   void RemoveCollection (csCollection* collection);
 
   /**
-   * Create an iterator to iterate over all polygons of the world.
+   * Create an iterator to iterate over all polygons of the engine.
    */
   csPolyIt* NewPolyIterator ()
   {
@@ -1017,7 +1019,7 @@ public:
   }
 
   /**
-   * Create an iterator to iterate over all static lights of the world.
+   * Create an iterator to iterate over all static lights of the engine.
    */
   csLightIt* NewLightIterator ()
   {
@@ -1046,7 +1048,7 @@ public:
   //--------------------- iPlugIn interface implementation --------------------
 
   /**
-   * Initialize the world. This is automatically called by system driver
+   * Initialize the engine. This is automatically called by system driver
    * at startup so that plugin can do basic initialization stuff, register
    * with the system driver and so on.
    */
@@ -1055,9 +1057,9 @@ public:
   /// We need to handle some events
   virtual bool HandleEvent (iEvent &Event);
 
-  //--------------------- iWorld interface implementation ---------------------
+  //--------------------- iEngine interface implementation --------------------
 
-  virtual csWorld *GetCsWorld () { return this; };
+  virtual csEngine *GetCsEngine () { return this; };
 
   /// Query the format to load textures (usually this depends on texture manager)
   virtual int GetTextureFormat ();
@@ -1075,7 +1077,7 @@ public:
   virtual iRegion* GetCurrentRegion ();
 
   /**
-   * Create or select a new object library (name can be NULL for world).
+   * Create or select a new object library (name can be NULL for engine).
    * All new objects will be marked as belonging to this library.
    * You can then delete a whole library at once, for example.
    * @@@ Libraries are obsolete!!! When regions are finished use them
@@ -1084,7 +1086,7 @@ public:
   virtual void SelectLibrary (const char *iName);
   /// Delete a whole library (all objects that are part of library)
   virtual bool DeleteLibrary (const char *iName);
-  /// Clear the entire world (delete all libraries)
+  /// Clear the entire engine (delete all libraries)
   virtual void DeleteAll ();
 
   /// Register a texture to be loaded during Prepare()
@@ -1103,7 +1105,7 @@ public:
   /// Create a empty thing with given name.
   virtual iThing *CreateThing (const char *iName, iSector *iParent);
 
-  /// Query number of sectors in world
+  /// Query number of sectors in engine
   virtual int GetSectorCount ()
   { return sectors.Length (); }
   /// Get a sector by index
@@ -1121,9 +1123,9 @@ public:
 
   //--------------------- iConfig interface implementation --------------------
 
-  struct csWorldConfig : public iConfig
+  struct csEngineConfig : public iConfig
   {
-    DECLARE_EMBEDDED_IBASE (csWorld);
+    DECLARE_EMBEDDED_IBASE (csEngine);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
@@ -1140,14 +1142,14 @@ private:
   /// Flag set when window requires resizing.
   bool resize;
   /**
-   * Private class which keeps state information about the world specific to 
+   * Private class which keeps state information about the engine specific to 
    * each context.
    */
 
-  class csWorldState
+  class csEngineState
   {
   public:
-    csWorld *world;
+    csEngine *engine;
     bool resize;
     iGraphics2D *G2D;
     iGraphics3D *G3D;
@@ -1155,49 +1157,48 @@ private:
     csCBufferCube* cbufcube;
     csQuadTree3D* quad3d;
     csCoverageMaskTree* covtree;
-    /// Creates a world state by copying the relevant data members
-    csWorldState (csWorld *this_world);
+    /// Creates an engine state by copying the relevant data members
+    csEngineState (csEngine *this_engine);
 
     /// Destroys buffers and trees
-    virtual ~csWorldState ();
+    virtual ~csEngineState ();
 
-    /// Swaps state into world and deals with resizing issues.
+    /// Swaps state into engine and deals with resizing issues.
     void Activate ();
   };
 
-  friend class csWorldState;
+  friend class csEngineState;
 
-  class csWorldStateVector : public csVector
+  class csEngineStateVector : public csVector
   {
   public:
      // Constructor
-    csWorldStateVector () : csVector (8, 8) {}
+    csEngineStateVector () : csVector (8, 8) {}
     // Destructor
-    virtual ~csWorldStateVector () { DeleteAll (); }
+    virtual ~csEngineStateVector () { DeleteAll (); }
     // Free an item from array
     virtual bool FreeItem (csSome Item)
-    { delete (csWorldState *)Item; return true; }
+    { delete (csEngineState *)Item; return true; }
     // Find a state by referenced g2d
     virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
-    { return ((csWorldState *)Item)->G3D == (iGraphics3D *)Key ? 0 : -1; }
-    // Get world state according to index
-    inline csWorldState *Get (int n) const
-    { return (csWorldState *)csVector::Get (n); }
+    { return ((csEngineState *)Item)->G3D == (iGraphics3D *)Key ? 0 : -1; }
+    // Get engine state according to index
+    inline csEngineState *Get (int n) const
+    { return (csEngineState *)csVector::Get (n); }
 
-    // Mark world state to be resized
+    // Mark engine state to be resized
     void Resize (iGraphics2D *g2d);
 
-    // Dispose of world state dependent on g2d
+    // Dispose of engine state dependent on g2d
     void Close (iGraphics2D *g2d);
   };
 
-  csWorldStateVector *world_states;
+  csEngineStateVector *engine_states;
 
   //------------End-Multi-Context-Support-------------------------------------
-
 };
 
 // This is a global replacement for printf ()
-#define CsPrintf csWorld::System->Printf
+#define CsPrintf csEngine::System->Printf
 
-#endif // __CS_WORLD_H__
+#endif // __CS_ENGINE_H__

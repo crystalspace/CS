@@ -23,7 +23,7 @@
 #include "csengine/light.h"
 #include "csengine/triangle.h"
 #include "csengine/camera.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/texture.h"
 #include "csengine/sector.h"
 #include "csengine/bspbbox.h"
@@ -57,7 +57,7 @@ csFrame::~csFrame ()
   delete [] name;
 }
 
-void csFrame::SetName (char * n)
+void csFrame::SetName (char const* n)
 {
   delete [] name;
   if (n)
@@ -66,7 +66,7 @@ void csFrame::SetName (char * n)
     strcpy (name, n);
   }
   else
-    name = n;
+    name = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -81,7 +81,7 @@ csSpriteAction::~csSpriteAction()
   delete [] name;
 }
 
-void csSpriteAction::SetName (char *n)
+void csSpriteAction::SetName (char const* n)
 {
   delete [] name;
   if (n)
@@ -90,7 +90,7 @@ void csSpriteAction::SetName (char *n)
     strcpy (name, n);
   }
   else
-    name = n;
+    name = 0;
 }
 
 void csSpriteAction::AddFrame (csFrame * f, int d)
@@ -506,16 +506,16 @@ csSprite::csSprite (csObject* theParent) : csObject ()
     csSprite* sparent = (csSprite*)parent;
     movable.SetParent (&sparent->GetMovable ());
   }
-  csWorld::current_world->AddToCurrentRegion (this);
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csSprite::~csSprite ()
 {
   while (dynamiclights) delete dynamiclights;
-  if (parent->GetType () == csWorld::Type)
+  if (parent->GetType () == csEngine::Type)
   {
-    csWorld* world = (csWorld*)parent;
-    world->UnlinkSprite (this);
+    csEngine* engine = (csEngine*)parent;
+    engine->UnlinkSprite (this);
   }
 }
 
@@ -533,7 +533,7 @@ void csSprite::RemoveFromSectors ()
 {
   if (GetPolyTreeObject ())
     GetPolyTreeObject ()->RemoveFromTree ();
-  if (parent->GetType () != csWorld::Type) return;
+  if (parent->GetType () != csEngine::Type) return;
   int i;
   csVector& sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors.Length () ; i++)
@@ -562,7 +562,7 @@ void csSprite::UpdateDeferedLighting (const csVector3& pos)
       light_worktable.SetLimit (defered_num_lights);
 
     csSector* sect = movable.GetSector (0);
-    int num_lights = csWorld::current_world->GetNearbyLights (sect,
+    int num_lights = csEngine::current_engine->GetNearbyLights (sect,
       pos, defered_lighting_flags,
       light_worktable.GetArray (), defered_num_lights);
     UpdateLighting (light_worktable.GetArray (), num_lights);
@@ -907,7 +907,7 @@ csVector3 csSprite3D::GetRadius ()
 
 void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
 {
-  csTranCookie cur_cookie = csWorld::current_world->tr_manager.GetCookie ();
+  csTranCookie cur_cookie = csEngine::current_engine->tr_manager.GetCookie ();
   if (camera_cookie == cur_cookie)
   {
     cbox = camera_bbox;
@@ -1036,7 +1036,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // why not do it to the smallest possible clip area.
   if (!do_clip)
   {
-    box_class = csWorld::current_world->top_clipper->ClassifyBox (bbox);
+    box_class = csEngine::current_engine->top_clipper->ClassifyBox (bbox);
     if (box_class == 0) do_clip = true;
   }
 
@@ -1237,7 +1237,7 @@ void csSprite3D::InitSprite ()
 
   if (!cur_action) { SetFrame (0); cur_action = tpl->GetFirstAction (); }
 
-  last_time = csWorld::System->GetTime ();
+  last_time = csEngine::System->GetTime ();
 
   MixMode = CS_FX_COPY;
 }
@@ -1620,7 +1620,6 @@ bool csSprite3D::HitBeamObject (const csVector3& start, const csVector3& end,
   return false;
 }
 
-
 //--------------------------------------------------------------------------
 
 csMeshedPolygon* csSprite3D::PolyMesh::GetPolygons ()
@@ -1639,6 +1638,3 @@ csMeshedPolygon* csSprite3D::PolyMesh::GetPolygons ()
   }
   return polygons;
 }
-
-//--------------------------------------------------------------------------
-

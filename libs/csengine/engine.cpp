@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csutil/scf.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/dumper.h"
 #include "csengine/halo.h"
 #include "csengine/camera.h"
@@ -64,7 +64,7 @@
 
 //---------------------------------------------------------------------------
 
-csPolyIt::csPolyIt (csWorld* w) : world(w)
+csPolyIt::csPolyIt (csEngine* e) : engine(e)
 {
   Restart();
 }
@@ -86,8 +86,8 @@ csPolygon3D* csPolyIt::Fetch ()
     polygon_idx = -1;
   }
 
-  if (sector_idx >= world->sectors.Length ()) return NULL;
-  sector = (csSector*)(world->sectors[sector_idx]);
+  if (sector_idx >= engine->sectors.Length ()) return NULL;
+  sector = (csSector*)(engine->sectors[sector_idx]);
 
   // Try next polygon.
   polygon_idx++;
@@ -111,7 +111,7 @@ csPolygon3D* csPolyIt::Fetch ()
     {
       // There are no more things left. Go to the next sector.
       sector_idx++;
-      if (sector_idx >= world->sectors.Length ()) return NULL;
+      if (sector_idx >= engine->sectors.Length ()) return NULL;
       // Initialize iterator to start of sector and recurse.
       thing_idx = -1;
       polygon_idx = -1;
@@ -129,7 +129,7 @@ csPolygon3D* csPolyIt::Fetch ()
       return Fetch ();
     // No things. Go to next sector.
     sector_idx++;
-    if (sector_idx >= world->sectors.Length ()) return NULL;
+    if (sector_idx >= engine->sectors.Length ()) return NULL;
     // Initialize iterator to start of sector and recurse.
     thing_idx = -1;
     return Fetch ();
@@ -142,12 +142,12 @@ csPolygon3D* csPolyIt::Fetch ()
 
 csSector* csPolyIt::GetLastSector ()
 {
-  return (csSector*)(world->sectors[sector_idx]);
+  return (csSector*)(engine->sectors[sector_idx]);
 }
 
 //--------------------- csCurveIt -------------------------------------------
 
-csCurveIt::csCurveIt (csWorld* w) : world(w)
+csCurveIt::csCurveIt (csEngine* e) : engine(e)
 {
   Restart();
 }
@@ -169,8 +169,8 @@ csCurve* csCurveIt::Fetch ()
     curve_idx = -1;
   }
 
-  if (sector_idx >= world->sectors.Length ()) return NULL;
-  sector = (csSector*)(world->sectors[sector_idx]);
+  if (sector_idx >= engine->sectors.Length ()) return NULL;
+  sector = (csSector*)(engine->sectors[sector_idx]);
 
   // Try next polygon.
   curve_idx++;
@@ -194,7 +194,7 @@ csCurve* csCurveIt::Fetch ()
     {
       // There are no more things left. Go to the next sector.
       sector_idx++;
-      if (sector_idx >= world->sectors.Length ()) return NULL;
+      if (sector_idx >= engine->sectors.Length ()) return NULL;
       // Initialize iterator to start of sector and recurse.
       thing_idx = -1;
       curve_idx = -1;
@@ -215,7 +215,7 @@ csCurve* csCurveIt::Fetch ()
     // No things. Go to next sector.
     sector_idx++;
 
-    if (sector_idx >= world->sectors.Length ()) return NULL;
+    if (sector_idx >= engine->sectors.Length ()) return NULL;
 
     // Initialize iterator to start of sector and recurse.
     thing_idx = -1;
@@ -229,7 +229,7 @@ csCurve* csCurveIt::Fetch ()
 
 //---------------------------------------------------------------------------
 
-csLightIt::csLightIt (csWorld* w) : world(w)
+csLightIt::csLightIt (csEngine* e) : engine(e)
 {
   Restart();
 }
@@ -249,8 +249,8 @@ csLight* csLightIt::Fetch ()
     light_idx = -1;
   }
 
-  if (sector_idx >= world->sectors.Length ()) return NULL;
-  sector = (csSector*)(world->sectors[sector_idx]);
+  if (sector_idx >= engine->sectors.Length ()) return NULL;
+  sector = (csSector*)(engine->sectors[sector_idx]);
 
   // Try next light.
   light_idx++;
@@ -260,7 +260,7 @@ csLight* csLightIt::Fetch ()
     // Go to next sector.
     light_idx = -1;
     sector_idx++;
-    if (sector_idx >= world->sectors.Length ()) return NULL;
+    if (sector_idx >= engine->sectors.Length ()) return NULL;
     // Initialize iterator to start of sector and recurse.
     return Fetch ();
   }
@@ -350,10 +350,10 @@ csSector* csSectorIt::Fetch ()
 
 //---------------------------------------------------------------------------
 
-csObjectIt::csObjectIt (csWorld* w, const csIdType& type, bool derived,
+csObjectIt::csObjectIt (csEngine* e, const csIdType& type, bool derived,
   	csSector* sector, const csVector3& pos, float radius)
 {
-  csObjectIt::world = w;
+  csObjectIt::engine = e;
   csObjectIt::type = &type;
   csObjectIt::derived = derived;
   csObjectIt::start_sector = sector;
@@ -384,7 +384,7 @@ bool csObjectIt::CheckType (const csIdType* ctype)
 void csObjectIt::Restart ()
 {
   cur_type = &csDynLight::Type;
-  cur_object = world->GetFirstDynLight ();
+  cur_object = engine->GetFirstDynLight ();
   sectors_it->Restart ();
 }
 
@@ -525,36 +525,36 @@ csObject* csObjectIt::Fetch ()
 
 //---------------------------------------------------------------------------
 
-int csWorld::frame_width;
-int csWorld::frame_height;
-iSystem* csWorld::System = NULL;
-csWorld* csWorld::current_world = NULL;
-bool csWorld::use_new_radiosity = false;
-int csWorld::max_process_polygons = 2000000000;
-int csWorld::cur_process_polygons = 0;
-bool csWorld::do_lighting_cache = true;
-bool csWorld::do_not_force_relight = false;
-bool csWorld::do_force_relight = false;
-bool csWorld::do_not_force_revis = false;
-bool csWorld::do_force_revis = false;
-bool csWorld::do_rad_debug = false;
+int csEngine::frame_width;
+int csEngine::frame_height;
+iSystem* csEngine::System = NULL;
+csEngine* csEngine::current_engine = NULL;
+bool csEngine::use_new_radiosity = false;
+int csEngine::max_process_polygons = 2000000000;
+int csEngine::cur_process_polygons = 0;
+bool csEngine::do_lighting_cache = true;
+bool csEngine::do_not_force_relight = false;
+bool csEngine::do_force_relight = false;
+bool csEngine::do_not_force_revis = false;
+bool csEngine::do_force_revis = false;
+bool csEngine::do_rad_debug = false;
 
-IMPLEMENT_CSOBJTYPE (csWorld,csObject);
+IMPLEMENT_CSOBJTYPE (csEngine,csObject);
 
-IMPLEMENT_IBASE (csWorld)
+IMPLEMENT_IBASE (csEngine)
   IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iWorld)
+  IMPLEMENTS_INTERFACE (iEngine)
   IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csWorld)
+IMPLEMENT_FACTORY (csEngine)
 
 EXPORT_CLASS_TABLE (engine)
-  EXPORT_CLASS_DEP (csWorld, "crystalspace.engine.core",
+  EXPORT_CLASS_DEP (csEngine, "crystalspace.engine.core",
     "Crystal Space 3D Engine", "crystalspace.kernel., crystalspace.graphics3d.")
 EXPORT_CLASS_TABLE_END
 
-csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
+csEngine::csEngine (iBase *iParent) : csObject (), camera_positions (16, 16)
 {
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
@@ -573,12 +573,12 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   covtree = NULL;
   covtree_lut = NULL;
   current_camera = NULL;
-  current_world = this;
+  current_engine = this;
   use_pvs = false;
   use_pvs_only = false;
   freeze_pvs = false;
   library = NULL;
-  world_states = NULL;
+  engine_states = NULL;
   rad_debug = NULL;
 
   if (!covtree_lut)
@@ -603,7 +603,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
 // @@@ Hack
 csCamera* camera_hack = NULL;
 
-csWorld::~csWorld ()
+csEngine::~csEngine ()
 {
   Clear ();
   if (G3D) G3D->DecRef ();
@@ -626,7 +626,7 @@ csWorld::~csWorld ()
   camera_hack = NULL;
 }
 
-bool csWorld::Initialize (iSystem* sys)
+bool csEngine::Initialize (iSystem* sys)
 {
 #if defined(JORRIT_DEBUG)
   printf ("csPolygon3D %ld\n", (long)sizeof (csPolygon3D));
@@ -659,7 +659,7 @@ bool csWorld::Initialize (iSystem* sys)
 }
 
 // Handle some system-driver broadcasts
-bool csWorld::HandleEvent (iEvent &Event)
+bool csEngine::HandleEvent (iEvent &Event)
 {
   if (Event.Type == csevBroadcast)
     switch (Event.Command.Code)
@@ -687,14 +687,14 @@ bool csWorld::HandleEvent (iEvent &Event)
         // Allow context resizing since we handle cscmdContextResize
         G2D->AllowCanvasResize (true);
 
-        StartWorld ();
+        StartEngine ();
 
         return true;
       } /* endif */
       case cscmdContextResize:
       {
-	if (world_states)
-	  world_states->Resize ((iGraphics2D*) Event.Command.Info);
+	if (engine_states)
+	  engine_states->Resize ((iGraphics2D*) Event.Command.Info);
 	else
 	  if (((iGraphics2D*) Event.Command.Info) == G2D)
 	    resize = true;
@@ -702,13 +702,13 @@ bool csWorld::HandleEvent (iEvent &Event)
       }
       case cscmdContextClose:
       {
-	if (world_states)
+	if (engine_states)
 	{
-	  world_states->Close ((iGraphics2D*) Event.Command.Info);
-	  if (!world_states->Length())
+	  engine_states->Close ((iGraphics2D*) Event.Command.Info);
+	  if (!engine_states->Length())
 	  {
-	    delete world_states;
-	    world_states = NULL;
+	    delete engine_states;
+	    engine_states = NULL;
 	  }
 	}
 	return false;
@@ -718,7 +718,7 @@ bool csWorld::HandleEvent (iEvent &Event)
   return false;
 }
 
-void csWorld::Clear ()
+void csEngine::Clear ()
 {
   if (G3D) G3D->ClearCache ();
   halos.DeleteAll ();
@@ -753,13 +753,13 @@ void csWorld::Clear ()
   materials = NULL;
   materials = new csMaterialList ();
 
-  // Delete world states and their references to cullers before cullers are
+  // Delete engine states and their references to cullers before cullers are
   // deleted in SetCuller below.
-  if (world_states)
+  if (engine_states)
   {
-    world_states->DeleteAll ();
-    delete world_states;
-    world_states = NULL;
+    engine_states->DeleteAll ();
+    delete engine_states;
+    engine_states = NULL;
   }
 
   SetCuller (CS_CULLER_CBUFFER);
@@ -780,7 +780,7 @@ void csWorld::Clear ()
   tr_manager.Initialize ();
 }
 
-void csWorld::ResolveEngineMode ()
+void csEngine::ResolveEngineMode ()
 {
   if (engine_mode == CS_ENGINE_AUTODETECT)
   {
@@ -818,14 +818,14 @@ void csWorld::ResolveEngineMode ()
   }
 }
 
-void csWorld::EnableLightingCache (bool en)
+void csEngine::EnableLightingCache (bool en)
 {
   do_lighting_cache = en;
   if (!do_lighting_cache) do_force_relight = true;
   else do_force_relight = false;
 }
 
-void csWorld::SetCuller (int culler)
+void csEngine::SetCuller (int culler)
 {
   delete c_buffer; c_buffer = NULL;
   delete covtree; covtree = NULL;
@@ -860,7 +860,7 @@ void csWorld::SetCuller (int culler)
   }
 }
 
-void csWorld::PrepareTextures ()
+void csEngine::PrepareTextures ()
 {
   int i;
 
@@ -890,7 +890,7 @@ void csWorld::PrepareTextures ()
   txtmgr->PrepareMaterials ();
 }
 
-void csWorld::PrepareSectors()
+void csEngine::PrepareSectors()
 {
   // Now precalculate some stuff for all loaded polygons.
   for (int i = 0 ; i < sectors.Length () ; i++)
@@ -901,8 +901,8 @@ void csWorld::PrepareSectors()
 }
 
 // If a STAT_BSP level the loader call to UpdateMove is redundant when called
-// before csWorld::Prepare().
-void csWorld::PrepareSprites ()
+// before csEngine::Prepare().
+void csEngine::PrepareSprites ()
 {
   int i;
   for (i = 0 ; i < sprites.Length () ; i++)
@@ -912,7 +912,7 @@ void csWorld::PrepareSprites ()
   }
 }
 
-bool csWorld::Prepare ()
+bool csEngine::Prepare ()
 {
   PrepareTextures ();
   PrepareSectors ();
@@ -949,7 +949,7 @@ bool csWorld::Prepare ()
   return true;
 }
 
-void csWorld::ShineLights ()
+void csEngine::ShineLights ()
 {
   tr_manager.NewFrame ();
 
@@ -1149,7 +1149,7 @@ void csWorld::ShineLights ()
   delete lit;
 }
 
-void csWorld::InvalidateLightmaps ()
+void csEngine::InvalidateLightmaps ()
 {
   csPolyIt* pit = NewPolyIterator ();
   csPolygon3D* p;
@@ -1162,7 +1162,7 @@ void csWorld::InvalidateLightmaps ()
   delete pit;
 }
 
-bool csWorld::CheckConsistency ()
+bool csEngine::CheckConsistency ()
 {
   csPolyIt* pit = NewPolyIterator ();
   bool error = false;
@@ -1219,12 +1219,12 @@ bool csWorld::CheckConsistency ()
   return error;
 }
 
-void csWorld::StartWorld ()
+void csEngine::StartEngine ()
 {
   Clear ();
 }
 
-void csWorld::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
+void csEngine::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
 {
   Stats::polygons_considered = 0;
   Stats::polygons_drawn = 0;
@@ -1236,7 +1236,7 @@ void csWorld::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
   ResolveEngineMode ();
 
   current_camera = c;
-  rview.world = this;
+  rview.engine = this;
 
   // This flag is set in HandleEvent on a cscmdContextResize event
   if (resize)
@@ -1292,7 +1292,7 @@ void csWorld::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
   cur_process_polygons = 0;
 }
 
-void csWorld::Draw (csCamera* c, csClipper* view)
+void csEngine::Draw (csCamera* c, csClipper* view)
 {
   csRenderView rview (*c, view, G3D, G2D);
   StartDraw (c, view, rview);
@@ -1309,7 +1309,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
       halos.Delete (halo);
 }
 
-void csWorld::DrawFunc (csCamera* c, csClipper* view,
+void csEngine::DrawFunc (csCamera* c, csClipper* view,
   csDrawFunc* callback, void* callback_data)
 {
   csRenderView rview (*c, view, G3D, G2D);
@@ -1322,7 +1322,7 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   s->Draw (rview);
 }
 
-void csWorld::AddHalo (csLight* Light)
+void csEngine::AddHalo (csLight* Light)
 {
   if (!Light->GetHalo () || Light->flags.Check (CS_LIGHT_ACTIVEHALO))
     return;
@@ -1366,14 +1366,14 @@ void csWorld::AddHalo (csLight* Light)
   halos.Push (new csLightHalo (Light, handle));
 }
 
-void csWorld::RemoveHalo (csLight* Light)
+void csEngine::RemoveHalo (csLight* Light)
 {
   int idx = halos.FindKey (Light);
   if(idx!=-1)
     halos.Delete (idx);
 }
 
-csStatLight* csWorld::FindLight (float x, float y, float z, float dist)
+csStatLight* csEngine::FindLight (float x, float y, float z, float dist)
 {
   csStatLight* l;
   int sn = sectors.Length ();
@@ -1387,7 +1387,7 @@ csStatLight* csWorld::FindLight (float x, float y, float z, float dist)
   return NULL;
 }
 
-csStatLight* csWorld::FindLight (CS_ID id)
+csStatLight* csEngine::FindLight (CS_ID id)
 {
   csStatLight* l;
   int sn = sectors.Length ();
@@ -1401,7 +1401,7 @@ csStatLight* csWorld::FindLight (CS_ID id)
   return NULL;
 }
 
-csStatLight* csWorld::FindLight (const char* name)
+csStatLight* csEngine::FindLight (const char* name)
 {
   csStatLight* l;
   int sn = sectors.Length ();
@@ -1415,7 +1415,7 @@ csStatLight* csWorld::FindLight (const char* name)
   return NULL;
 }
 
-void csWorld::AddDynLight (csDynLight* dyn)
+void csEngine::AddDynLight (csDynLight* dyn)
 {
   dyn->SetNext (first_dyn_lights);
   dyn->SetPrev (NULL);
@@ -1423,7 +1423,7 @@ void csWorld::AddDynLight (csDynLight* dyn)
   first_dyn_lights = dyn;
 }
 
-void csWorld::RemoveDynLight (csDynLight* dyn)
+void csEngine::RemoveDynLight (csDynLight* dyn)
 {
   if (dyn->GetNext ()) dyn->GetNext ()->SetPrev (dyn->GetPrev ());
   if (dyn->GetPrev ()) dyn->GetPrev ()->SetNext (dyn->GetNext ());
@@ -1432,7 +1432,7 @@ void csWorld::RemoveDynLight (csDynLight* dyn)
   dyn->SetPrev (NULL);
 }
 
-void csWorld::UpdateParticleSystems (cs_time elapsed_time)
+void csEngine::UpdateParticleSystems (cs_time elapsed_time)
 {
   int i;
   for (i = 0 ; i < sprites.Length () ; i++)
@@ -1461,7 +1461,7 @@ void csWorld::UpdateParticleSystems (cs_time elapsed_time)
 
 }
 
-void csWorld::AdvanceSpriteFrames (cs_time current_time)
+void csEngine::AdvanceSpriteFrames (cs_time current_time)
 {
   int i;
   for (i = 0 ; i < sprites.Length () ; i++)
@@ -1475,7 +1475,7 @@ void csWorld::AdvanceSpriteFrames (cs_time current_time)
   }
 }
 
-void csWorld::ReadConfig ()
+void csEngine::ReadConfig ()
 {
   if (!System) return;
   iConfigFile *Config = System->GetConfig ();
@@ -1499,8 +1499,8 @@ void csWorld::ReadConfig ()
   csSector::do_radiosity = Config->GetYesNo ("Lighting", "Radiosity", csSector::do_radiosity);
 
   // radiosity options
-  csWorld::use_new_radiosity = Config->GetYesNo ("Lighting",
-    "Radiosity.Enable", csWorld::use_new_radiosity);
+  csEngine::use_new_radiosity = Config->GetYesNo ("Lighting",
+    "Radiosity.Enable", csEngine::use_new_radiosity);
   csRadiosity::do_static_specular = Config->GetYesNo ("Lighting",
     "Radiosity.DoStaticSpecular", csRadiosity::do_static_specular);
   csRadiosity::static_specular_amount = Config->GetFloat ("Lighting",
@@ -1519,7 +1519,7 @@ void csWorld::ReadConfig ()
     "Radiosity.SourcePatchSize", csRadiosity::source_patch_size);
 }
 
-void csWorld::UnlinkSprite (csSprite* sprite)
+void csEngine::UnlinkSprite (csSprite* sprite)
 {
   sprite->GetMovable ().ClearSectors ();
   int idx = sprites.Find (sprite);
@@ -1528,7 +1528,7 @@ void csWorld::UnlinkSprite (csSprite* sprite)
   sprites.Delete (idx);
 }
 
-void csWorld::RemoveSprite (csSprite* sprite)
+void csEngine::RemoveSprite (csSprite* sprite)
 {
   sprite->GetMovable ().ClearSectors ();
   int idx = sprites.Find (sprite);
@@ -1538,7 +1538,7 @@ void csWorld::RemoveSprite (csSprite* sprite)
   delete sprite;
 }
 
-void csWorld::UnlinkThing (csThing* thing)
+void csEngine::UnlinkThing (csThing* thing)
 {
   thing->GetMovable ().ClearSectors ();
   int idx = things.Find (thing);
@@ -1547,7 +1547,7 @@ void csWorld::UnlinkThing (csThing* thing)
   things.Delete (idx);
 }
 
-void csWorld::RemoveThing (csThing* thing)
+void csEngine::RemoveThing (csThing* thing)
 {
   thing->GetMovable ().ClearSectors ();
   int idx = things.Find (thing);
@@ -1557,7 +1557,7 @@ void csWorld::RemoveThing (csThing* thing)
   delete thing;
 }
 
-void csWorld::UnlinkSky (csThing* thing)
+void csEngine::UnlinkSky (csThing* thing)
 {
   thing->GetMovable ().ClearSectors ();
   int idx = skies.Find (thing);
@@ -1566,7 +1566,7 @@ void csWorld::UnlinkSky (csThing* thing)
   skies.Delete (idx);
 }
 
-void csWorld::RemoveSky (csThing* thing)
+void csEngine::RemoveSky (csThing* thing)
 {
   thing->GetMovable ().ClearSectors ();
   int idx = skies.Find (thing);
@@ -1576,7 +1576,7 @@ void csWorld::RemoveSky (csThing* thing)
   delete thing;
 }
 
-void csWorld::UnlinkCollection (csCollection* collection)
+void csEngine::UnlinkCollection (csCollection* collection)
 {
   collection->GetMovable ().ClearSectors ();
   int idx = collections.Find (collection);
@@ -1585,7 +1585,7 @@ void csWorld::UnlinkCollection (csCollection* collection)
   collections.Delete (idx);
 }
 
-void csWorld::RemoveCollection (csCollection* collection)
+void csEngine::RemoveCollection (csCollection* collection)
 {
   collection->GetMovable ().ClearSectors ();
   int idx = collections.Find (collection);
@@ -1602,7 +1602,7 @@ struct LightAndDist
 };
 
 // csLightArray is a subclass of csCleanable which is registered
-// to csWorld.cleanup.
+// to csEngine.cleanup.
 class csLightArray : public csBase
 {
 public:
@@ -1644,7 +1644,7 @@ int compare_light (const void* p1, const void* p2)
   return 0;
 }
 
-int csWorld::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flags,
+int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flags,
   	csLight** lights, int max_num_lights)
 {
   int i;
@@ -1657,13 +1657,13 @@ int csWorld::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flag
   // this approach is that we don't have a static array which can
   // overflow. And we don't have to do allocation every time we
   // come here. We register this memory to the 'cleanup' array
-  // in csWorld so that it will be freed later.
+  // in csEngine so that it will be freed later.
 
   static csLightArray* light_array = NULL;
   if (!light_array)
   {
     light_array = new csLightArray ();
-    csWorld::current_world->cleanup.Push (light_array);
+    csEngine::current_engine->cleanup.Push (light_array);
   }
   light_array->Reset ();
 
@@ -1713,31 +1713,31 @@ int csWorld::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flag
   }
 }
 
-csSectorIt* csWorld::GetNearbySectors (csSector* sector,
+csSectorIt* csEngine::GetNearbySectors (csSector* sector,
 	const csVector3& pos, float radius)
 {
   csSectorIt* it = new csSectorIt (sector, pos, radius);
   return it;
 }
 
-csObjectIt* csWorld::GetNearbyObjects (const csIdType& type, bool derived,
+csObjectIt* csEngine::GetNearbyObjects (const csIdType& type, bool derived,
   	csSector* sector, const csVector3& pos, float radius)
 {
   csObjectIt* it = new csObjectIt (this, type, derived, sector, pos, radius);
   return it;
 }
 
-int csWorld::GetTextureFormat ()
+int csEngine::GetTextureFormat ()
 {
   iTextureManager* txtmgr = G3D->GetTextureManager ();
   return txtmgr->GetTextureFormat ();
 }
 
-void csWorld::SelectRegion (const char *iName)
+void csEngine::SelectRegion (const char *iName)
 {
   if (iName == NULL)
   {
-    region = NULL; // Default world region.
+    region = NULL; // Default engine region.
     return;
   }
 
@@ -1750,12 +1750,12 @@ void csWorld::SelectRegion (const char *iName)
   }
 }
 
-iRegion* csWorld::GetCurrentRegion ()
+iRegion* csEngine::GetCurrentRegion ()
 {
   return (iRegion*)region;
 }
 
-void csWorld::AddToCurrentRegion (csObject* obj)
+void csEngine::AddToCurrentRegion (csObject* obj)
 {
   if (region)
   {
@@ -1763,7 +1763,7 @@ void csWorld::AddToCurrentRegion (csObject* obj)
   }
 }
 
-void csWorld::SelectLibrary (const char *iName)
+void csEngine::SelectLibrary (const char *iName)
 {
   library = libraries.FindByName (iName);
   if (!library)
@@ -1774,7 +1774,7 @@ void csWorld::SelectLibrary (const char *iName)
   }
 }
 
-bool csWorld::DeleteLibrary (const char *iName)
+bool csEngine::DeleteLibrary (const char *iName)
 {
   csObject *lib = libraries.FindByName (iName);
   if (!lib) return false;
@@ -1822,12 +1822,12 @@ bool csWorld::DeleteLibrary (const char *iName)
   return true;
 }
 
-void csWorld::DeleteAll ()
+void csEngine::DeleteAll ()
 {
   Clear ();
 }
 
-bool csWorld::CreateTexture (const char *iName, const char *iFileName,
+bool csEngine::CreateTexture (const char *iName, const char *iFileName,
   csColor *iTransp, int iFlags)
 {
   // First of all, load the image file
@@ -1874,7 +1874,7 @@ bool csWorld::CreateTexture (const char *iName, const char *iFileName,
   return true;
 }
 
-bool csWorld::CreateCamera (const char *iName, const char *iSector,
+bool csEngine::CreateCamera (const char *iName, const char *iSector,
   const csVector3 &iPos, const csVector3 &iForward, const csVector3 &iUpward)
 {
   csCameraPosition *cp = (csCameraPosition *)camera_positions.FindByName (iName);
@@ -1887,13 +1887,13 @@ bool csWorld::CreateCamera (const char *iName, const char *iSector,
   return true;
 }
 
-bool csWorld::CreateKey (const char *iName, const char *iValue)
+bool csEngine::CreateKey (const char *iName, const char *iValue)
 {
   ObjAdd (new csKeyValuePair (iName, iValue));
   return true;
 }
 
-bool csWorld::CreatePlane (const char *iName, const csVector3 &iOrigin,
+bool csEngine::CreatePlane (const char *iName, const csVector3 &iOrigin,
   const csMatrix3 &iMatrix)
 {
   csPolyTxtPlane *ppl = new csPolyTxtPlane ();
@@ -1903,7 +1903,7 @@ bool csWorld::CreatePlane (const char *iName, const csVector3 &iOrigin,
   return true;
 }
 
-csSector* csWorld::CreateCsSector (const char *iName)
+csSector* csEngine::CreateCsSector (const char *iName)
 {
   csSector* sector = new csSector (this);
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
@@ -1912,7 +1912,7 @@ csSector* csWorld::CreateCsSector (const char *iName)
   return sector;
 }
 
-iSector* csWorld::CreateSector (const char *iName)
+iSector* csEngine::CreateSector (const char *iName)
 {
   csSector* sector = CreateCsSector (iName);
   iSector *s = QUERY_INTERFACE (sector, iSector);
@@ -1920,7 +1920,7 @@ iSector* csWorld::CreateSector (const char *iName)
   return s;
 }
 
-iThing *csWorld::CreateThing (const char *iName, iSector *iParent)
+iThing *csEngine::CreateThing (const char *iName, iSector *iParent)
 {
   csThing *thing = new csThing (this);
   thing->SetName (iName);
@@ -1932,37 +1932,37 @@ iThing *csWorld::CreateThing (const char *iName, iSector *iParent)
   return p;
 }
 
-iSector *csWorld::GetSector (int iIndex)
+iSector *csEngine::GetSector (int iIndex)
 {
   return &((csSector *)sectors.Get (iIndex))->scfiSector;
 }
 
-iSector *csWorld::FindSector (const char *iName)
+iSector *csEngine::FindSector (const char *iName)
 {
   csSector *sec = (csSector *)sectors.FindByName (iName);
   return sec ? &sec->scfiSector : NULL;
 }
 
-iThing *csWorld::FindThing (const char *iName)
+iThing *csEngine::FindThing (const char *iName)
 {
   csThing* thing = (csThing*)things.FindByName (iName);
   return thing ? &thing->scfiThing : NULL;
 }
 
-iSprite *csWorld::FindSprite (const char *iName)
+iSprite *csEngine::FindSprite (const char *iName)
 {
   (void)iName;
   return NULL; /*not implemented yet*/
 }
 
-iMaterialWrapper* csWorld::FindMaterial (const char* iName)
+iMaterialWrapper* csEngine::FindMaterial (const char* iName)
 {
   return (iMaterialWrapper*)materials->FindByName (iName);
 }
 
 //----------------Begin-Multi-Context-Support------------------------------
 
-void csWorld::Resize ()
+void csEngine::Resize ()
 {
   frame_width = G3D->GetWidth ();
   frame_height = G3D->GetHeight ();
@@ -1970,29 +1970,29 @@ void csWorld::Resize ()
   SetCuller (GetCuller ());
 }
 
-csWorld::csWorldState::csWorldState (csWorld *w)
+csEngine::csEngineState::csEngineState (csEngine *e)
 {
-  world    = w;
-  c_buffer = w->c_buffer;
-  cbufcube = w->cbufcube;
-  covtree  = w->covtree;
-  quad3d   = w->quad3d;
-  G2D      = w->G2D;
-  G3D      = w->G3D;
+  engine    = e;
+  c_buffer = e->c_buffer;
+  cbufcube = e->cbufcube;
+  covtree  = e->covtree;
+  quad3d   = e->quad3d;
+  G2D      = e->G2D;
+  G3D      = e->G3D;
   resize   = false;
 }
 
-csWorld::csWorldState::~csWorldState ()
+csEngine::csEngineState::~csEngineState ()
 {
-  if (world->G2D == G2D)
+  if (engine->G2D == G2D)
   {
-    world->G3D->DecRef ();
-    world->G3D      = NULL;
-    world->G2D      = NULL;
-    world->c_buffer = NULL;
-    world->quad3d   = NULL;
-    world->covtree  = NULL;
-    world->cbufcube = NULL;
+    engine->G3D->DecRef ();
+    engine->G3D      = NULL;
+    engine->G2D      = NULL;
+    engine->c_buffer = NULL;
+    engine->quad3d   = NULL;
+    engine->covtree  = NULL;
+    engine->cbufcube = NULL;
   }
   delete c_buffer;
   delete cbufcube;
@@ -2000,28 +2000,28 @@ csWorld::csWorldState::~csWorldState ()
   delete covtree;
 }
 
-void csWorld::csWorldState::Activate ()
+void csEngine::csEngineState::Activate ()
 {
-  world->c_buffer     = c_buffer;
-  world->cbufcube     = cbufcube;
-  world->quad3d       = quad3d;
-  world->covtree      = covtree;
-  world->frame_width  = G3D->GetWidth ();
-  world->frame_height = G3D->GetHeight ();
+  engine->c_buffer     = c_buffer;
+  engine->cbufcube     = cbufcube;
+  engine->quad3d       = quad3d;
+  engine->covtree      = covtree;
+  engine->frame_width  = G3D->GetWidth ();
+  engine->frame_height = G3D->GetHeight ();
 
   if (resize)
   {
-    world->Resize ();
+    engine->Resize ();
 
-    c_buffer = world->c_buffer;
-    cbufcube = world->cbufcube;
-    quad3d   = world->quad3d;
-    covtree  = world->covtree;
+    c_buffer = engine->c_buffer;
+    cbufcube = engine->cbufcube;
+    quad3d   = engine->quad3d;
+    covtree  = engine->covtree;
     resize   = false;
   }
 }
 
-void csWorld::csWorldStateVector::Close (iGraphics2D *g2d)
+void csEngine::csEngineStateVector::Close (iGraphics2D *g2d)
 {
   // Hack-- with the glide back buffer implementations of procedural textures
   // circumstances are that many G3D can be associated with one G2D.
@@ -2029,44 +2029,44 @@ void csWorld::csWorldStateVector::Close (iGraphics2D *g2d)
   // regeneration the next time the context is set to the surviving G3Ds associated
   // with this G2D
   for (int i = 0; i < Length (); i++)
-    if (((csWorldState*)root [i])->G2D == g2d)
+    if (((csEngineState*)root [i])->G2D == g2d)
     {
       //Delete (i);
       break;
     }
 }
 
-void csWorld::csWorldStateVector::Resize (iGraphics2D *g2d)
+void csEngine::csEngineStateVector::Resize (iGraphics2D *g2d)
 {
   // With the glide back buffer implementation of procedural textures
   // circumstances are that many G3D can be associated with one G2D, so
   // we test for width and height also.
   for (int i = 0; i < Length (); i++)
   {
-    csWorldState *state = (csWorldState*)root [i];
+    csEngineState *state = (csEngineState*)root [i];
     if (state->G2D == g2d)
       if ((state->G2D->GetWidth() == state->G3D->GetWidth ()) &&
 	  (state->G2D->GetHeight() == state->G3D->GetHeight ()))
-	  ((csWorldState*)root [i])->resize = true;
+	  ((csEngineState*)root [i])->resize = true;
   }
 }
 
-void csWorld::SetContext (iGraphics3D* g3d)
+void csEngine::SetContext (iGraphics3D* g3d)
 {
   G2D = g3d->GetDriver2D ();
   if (g3d != G3D)
   {
     if (G3D) G3D->DecRef ();
     G3D = g3d;
-    if (!world_states)
+    if (!engine_states)
     {
-      world_states = new csWorldStateVector();
+      engine_states = new csEngineStateVector();
       Resize ();
-      world_states->Push (new csWorldState (this));
+      engine_states->Push (new csEngineState (this));
     }
     else
     {
-      int idg3d = world_states->FindKey (g3d);
+      int idg3d = engine_states->FindKey (g3d);
       if (idg3d < 0)
       {
 	int c = GetCuller ();
@@ -2079,11 +2079,11 @@ void csWorld::SetContext (iGraphics3D* g3d)
 	frame_height = G3D->GetHeight ();
 	cbufcube = new csCBufferCube (1024);
 	SetCuller (c);
-	world_states->Push (new csWorldState (this));
+	engine_states->Push (new csEngineState (this));
       }
       else
       {
-	csWorldState *state = (csWorldState *)world_states->Get (idg3d);
+	csEngineState *state = (csEngineState *)engine_states->Get (idg3d);
 	state->Activate ();
       }
     }

@@ -9,7 +9,7 @@
 #include "csphyzik/phyztype.h"
 
 #ifdef __CRYSTALSPACE__
-#include "csengine/world.h"
+#include "csengine/engine.h"
 //class csSystemDriver;
 #endif
 //#include <string>
@@ -30,7 +30,7 @@
 
 #ifdef __CRYSTALSPACE__
 #define CT_DEBUG_LEVEL MSG_DEBUG_1
-#define Debug csWorld
+#define Debug csEngine
 #define logf System->Printf
 #define log System->Printf
 // only takes two args....

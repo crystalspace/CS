@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CAMERA_H__
-#define __CAMERA_H__
+#ifndef __CS_CAMERA_H__
+#define __CS_CAMERA_H__
 
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
@@ -41,7 +41,7 @@
 class csSector;
 class csPolygon3D;
 class Vertex;
-class csWorld;
+class csEngine;
 class Dumper;
 
 /**
@@ -329,4 +329,4 @@ private:
 #define GetICameraFromCamera(a)  &a->m_xCamera
 #define GetCameraFromICamera(a)  ((csCamera*)((size_t)a - offsetof(csCamera, m_xCamera)))
 
-#endif // __CAMERA_H__
+#endif // __CS_CAMERA_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLYTEXT_H
-#define POLYTEXT_H
+#ifndef __CS_POLYTEXT_H__
+#define __CS_POLYTEXT_H__
 
 #include "csgeom/math3d.h"
 #include "csengine/rview.h"
@@ -237,4 +237,4 @@ public:
   virtual void SetCacheData (int idx, void *d);
 };
 
-#endif /*POLYTEXT_H*/
+#endif // __CS_POLYTEXT_H__

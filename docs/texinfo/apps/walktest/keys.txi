@@ -49,7 +49,7 @@ Fire a missile (a moving sprite and a dynamic light).
 Toggle lighting (default on).
 
 @item e
-Toggle edges on/off (default off). This is useful for debugging world
+Toggle edges on/off (default off). This is useful for debugging map
 files. When edges are on you will also see where all the lights are.
 Clicking on a light will select it (useful for the next key).
 

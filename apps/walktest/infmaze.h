@@ -22,7 +22,7 @@
 #include "csgeom/math3d.h"
 #include "csengine/portal.h"
 
-class csWorld;
+class csEngine;
 class Sparse3D;
 class WideSparse3D;
 class csSector;
@@ -66,7 +66,7 @@ public:
    * Create a six-sided room. This is used by the infinite maze.
    * x, y, z are the coordinates in integer units.
    */
-  InfRoomData* create_six_room (csWorld* world, int x, int y, int z);
+  InfRoomData* create_six_room (csEngine* engine, int x, int y, int z);
 
   ///
   void connect_infinite (int x1, int y1, int z1, int x2, int y2, int z2, bool create_portal1 = true);

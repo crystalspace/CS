@@ -34,7 +34,7 @@
 
 class csPolygonInt;
 class csSector;
-class csWorld;
+class csEngine;
 class csCamera;
 class csMaterialWrapper;
 class csPolygon2D;
@@ -102,8 +102,8 @@ class csPolygonSet : public csObject, public iBase
   friend class Dumper;
 
 protected:
-  /// The pointer to the world.
-  csWorld* world;
+  /// Engine handle.
+  csEngine* engine;
 
   /// Number of vertices
   int num_vertices;
@@ -216,7 +216,7 @@ public:
   int max_curve_vertices;
 
   /// Construct a csPolygonSet.
-  csPolygonSet (csWorld* world);
+  csPolygonSet (csEngine*);
 
   /**
    * Delete all contents of this polygonset (vertices,
@@ -227,7 +227,7 @@ public:
   /**
    * Prepare all polygons for use. This function MUST be called
    * AFTER the texture manager has been prepared. This function
-   * is normally called by csWorld::Prepare() so you only need
+   * is normally called by csEngine::Prepare() so you only need
    * to worry about this function when you add sectors or things
    * later.
    */
@@ -391,8 +391,8 @@ public:
     return cam_verts;
   }
 
-  /// Get the world for this polygonset.
-  csWorld* GetWorld () { return world; }
+  /// Get the engine for this polygonset.
+  csEngine* GetEngine () { return engine; }
 
   /**
    * Return a list of shadow frustums which extend from

@@ -35,7 +35,7 @@ Controls whether or not dithering is applied while reducing textures from
 any difference with this option enabled.  On the other hand it is CPU
 intensive (during preprocessing stage).  Note that if
 @samp{DITHER_TEXTURES=no} you still can use the @samp{DITHER(yes|no)}
-per-texture option in world file.  @code{DITHER_TEXTURES} is a global switch
+per-texture option in map file.  @code{DITHER_TEXTURES} is a global switch
 that overrides the per-texture option to always be @emph{yes}.  Default is
 @emph{no}.
 

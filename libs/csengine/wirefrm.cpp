@@ -21,7 +21,7 @@
 #include "qint.h"
 #include "csgeom/math3d.h"
 #include "csengine/wirefrm.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/camera.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
@@ -62,7 +62,7 @@ bool csWfObject::Perspective (csCamera* c, csVector3& v, csVector2& persp, float
   {
     float iz = c->GetFOV ()/cam.z;
     persp.x = cam.x * iz + c->GetShiftX ();
-    persp.y = csWorld::frame_height - 1 - (cam.y * iz + c->GetShiftY ());
+    persp.y = csEngine::frame_height - 1 - (cam.y * iz + c->GetShiftY ());
     pradius = radius * iz;
     return true;
   }
@@ -80,8 +80,8 @@ bool csWfObject::Orthographic (csCamera* c, int ortho,
     case WF_ORTHO_Y: persp.x = v2.x; persp.y = v2.z; break;
     case WF_ORTHO_Z: persp.x = v2.x; persp.y = v2.y; break;
   }
-  persp.x += csWorld::frame_width/2;
-  persp.y += csWorld::frame_height/2;
+  persp.x += csEngine::frame_width/2;
+  persp.y += csEngine::frame_height/2;
   return true;
 }
 
@@ -456,4 +456,3 @@ void csWireFrameCam::KeyPgDn (float speed, bool slow, bool fast)
   else if (fast) c->Rotate (VEC_TILT_DOWN, speed*.2);
   else c->Rotate (VEC_TILT_DOWN, speed*.1);
 }
-

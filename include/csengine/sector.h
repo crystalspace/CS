@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SECTOR_H
-#define SECTOR_H
+#ifndef __CS_SECTOR_H__
+#define __CS_SECTOR_H__
 
 #include "csobject/nobjvec.h"
 #include "csengine/polyset.h"
@@ -28,7 +28,7 @@
 
 struct LightInfo;
 class csThing;
-class csWorld;
+class csEngine;
 class csStatLight;
 class csPolygon3D;
 class Polygon2D;
@@ -54,7 +54,7 @@ class csSector : public csPolygonSet
 public:
   /**
    * List of sprites in this sector. Note that sprites also
-   * need to be in the world list. This vector contains objects
+   * need to be in the engine list. This vector contains objects
    * of type csSprite*.
    */
   csVector sprites;
@@ -178,7 +178,7 @@ public:
   /**
    * Construct a sector. This sector will be completely empty.
    */
-  csSector (csWorld* world);
+  csSector (csEngine*);
 
   /**
    * Destroy this sector. All things in this sector are also destroyed.
@@ -190,7 +190,7 @@ public:
   /**
    * Prepare all polygons for use. This function MUST be called
    * AFTER the texture manager has been prepared. This function
-   * is normally called by csWorld::Prepare() so you only need
+   * is normally called by csEngine::Prepare() so you only need
    * to worry about this function when you add sectors later.
    */
   virtual void Prepare (csSector* sector);
@@ -377,8 +377,8 @@ public:
   //------------------------------------------------
 
   /**
-   * The whole setup starts with csWorld::shine_lights calling
-   * csSector::shine_lights for every sector in the world.
+   * The whole setup starts with csEngine::shine_lights calling
+   * csSector::shine_lights for every sector in the engine.
    * This function will call csStatLight::shine_lightmaps for every
    * light in the sector.
    * csStatLight::shine_light will generate a view frustum from the
@@ -428,4 +428,4 @@ public:
   } scfiSector;
 };
 
-#endif /*SECTOR_H*/
+#endif // __CS_SECTOR_H__

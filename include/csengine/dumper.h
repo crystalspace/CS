@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C)1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef DUMPER_H
-#define DUMPER_H
+#ifndef __CS_DUMPER_H__
+#define __CS_DUMPER_H__
 
 class csMatrix3;
 class csVector3;
@@ -36,7 +36,7 @@ class csThing;
 class csPolygonSet;
 class csPolyTexture;
 class csSector;
-class csWorld;
+class csEngine;
 class csSpriteTemplate;
 class csSprite3D;
 class csOctree;
@@ -65,56 +65,56 @@ class csHashSet;
 class Dumper
 {
 private:
-  static void dump (csBspTree* tree, csBspNode* node, int indent);
-  static void dump (csOctree* tree, csOctreeNode* node, int indent);
-  static void dump (csBspTree2D* tree, csBspNode2D* node, int indent);
-  //static void dump (csQuadtreeNode* node, char* buf, int bufdim,
+  static void dump (csBspTree*, csBspNode*, int indent);
+  static void dump (csOctree*, csOctreeNode*, int indent);
+  static void dump (csBspTree2D*, csBspNode2D*, int indent);
+  //static void dump (csQuadtreeNode*, char* buf, int bufdim,
   //	int depth, int x1, int y1, int x2, int y2);
-  static void dump_stubs_node (csObjectStub* stub, char* name, int level);
-  static void dump_stubs_obj (csObjectStub* stub, char* name, int level);
-  static void dump_stubs (csBspNode* bnode, char* name, int level);
-  static void dump_stubs (csOctreeNode* onode, char* name, int level);
-  static bool check_stubs (csOctreeNode* node);
-  static bool check_stubs (csBspNode* node);
+  static void dump_stubs_node (csObjectStub*, char const* name, int level);
+  static void dump_stubs_obj (csObjectStub*, char const* name, int level);
+  static void dump_stubs (csBspNode*, char const* name, int level);
+  static void dump_stubs (csOctreeNode*, char const* name, int level);
+  static bool check_stubs (csOctreeNode*);
+  static bool check_stubs (csBspNode*);
 
 public:
-  static void dump (csMatrix3* m, char* name);
-  static void dump (csVector3* v, char* name);
-  static void dump (csVector2* v, char* name);
-  static void dump (csPlane3* p);
-  static void dump (csBox2* b);
-  static void dump (csCamera* c);
-  static void dump (csPolyTxtPlane* p);
-  static void dump (csPolygon2D* p, char* name);
-  static void dump (csPolygon3D* p);
-  static void dump (csPolygonSet* p);
-  static void dump (csPolyTexture* p, char* name);
-  static void dump (csSector* s);
-  static void dump (csWorld* w);
-  static void dump (csSpriteTemplate* s);
-  static void dump (csSprite3D* s);
-  static void dump (csBspTree* tree);
-  static void dump (csBspTree2D* tree);
-  static void dump (csOctree* tree);
-  static void dump (csPolygonClipper* clipper, char* name);
-  static void dump (csFrustum* frustum, char* name);
-  static void dump (csPoly2DPool* pool, char* name);
-  static void dump (csLightPatchPool* pool, char* name);
-  //static void dump (csQuadcube* cube);
-  static void dump (csQuadtree* tree);
-  static void dump_stubs (csOctree* octree);
-  static void dump_stubs (csPolyTreeObject* ptobj);
+  static void dump (csMatrix3*, char const* name);
+  static void dump (csVector3*, char const* name);
+  static void dump (csVector2*, char const* name);
+  static void dump (csPlane3*);
+  static void dump (csBox2*);
+  static void dump (csCamera*);
+  static void dump (csPolyTxtPlane*);
+  static void dump (csPolygon2D*, char const* name);
+  static void dump (csPolygon3D*);
+  static void dump (csPolygonSet*);
+  static void dump (csPolyTexture*, char const* name);
+  static void dump (csSector*);
+  static void dump (csEngine*);
+  static void dump (csSpriteTemplate*);
+  static void dump (csSprite3D*);
+  static void dump (csBspTree*);
+  static void dump (csBspTree2D*);
+  static void dump (csOctree*);
+  static void dump (csPolygonClipper*, char const* name);
+  static void dump (csFrustum*, char const* name);
+  static void dump (csPoly2DPool*, char const* name);
+  static void dump (csLightPatchPool*, char const* name);
+  //static void dump (csQuadcube*);
+  static void dump (csQuadtree*);
+  static void dump_stubs (csOctree*);
+  static void dump_stubs (csPolyTreeObject*);
 
-  static long Memory (csCurve* c, int verbose_level, csHashSet* done = NULL);
-  static long Memory (csPolygon3D* p, int verbose_level, csHashSet* done = NULL);
-  static long Memory (csPolygonSet* pset, int verbose_level, csHashSet* done = NULL);
-  static long Memory (csThing* thing, int verbose_level, csHashSet* done = NULL);
-  static long Memory (csSector* sect, int verbose_level, csHashSet* done = NULL);
-  static long Memory (csBspNode* bnode, int verbose_level, csHashSet* done = NULL);
-  static long Memory (csBspTree* btree, int verbose_level, csHashSet* done = NULL);
-  static long Memory (csOctreeNode* onode, int verbose_level, csHashSet* done = NULL);
-  static long Memory (csOctree* otree, int verbose_level, csHashSet* done = NULL);
-  static long TotalTexels (csTextureList* txtlist);
+  static long Memory (csCurve*, int verbose_level, csHashSet* done = 0);
+  static long Memory (csPolygon3D*, int verbose_level, csHashSet* done = 0);
+  static long Memory (csPolygonSet*, int verbose_level, csHashSet* done = 0);
+  static long Memory (csThing*, int verbose_level, csHashSet* done = 0);
+  static long Memory (csSector*, int verbose_level, csHashSet* done = 0);
+  static long Memory (csBspNode*, int verbose_level, csHashSet* done = 0);
+  static long Memory (csBspTree*, int verbose_level, csHashSet* done = 0);
+  static long Memory (csOctreeNode*, int verbose_level, csHashSet* done = 0);
+  static long Memory (csOctree*, int verbose_level, csHashSet* done = 0);
+  static long TotalTexels (csTextureList*);
 };
 
-#endif
+#endif // __CS_DUMPER_H__

@@ -131,7 +131,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
-#include "iworld.h"
+#include "iengine.h"
 #include "itxtmgr.h"
 #include "isector.h"
 #include "ipolyset.h"
@@ -1358,11 +1358,11 @@ yyreduce:
 
 case 1:
 #line 261 "plugins/csstdldr/stdparse.y"
-{ world->SelectLibrary (storage.cur_library = yyvsp[-1].string); ;
+{ engine->SelectLibrary (storage.cur_library = yyvsp[-1].string); ;
     break;}
 case 3:
 #line 264 "plugins/csstdldr/stdparse.y"
-{ world->SelectLibrary (storage.cur_library = yyvsp[-1].string); ;
+{ engine->SelectLibrary (storage.cur_library = yyvsp[-1].string); ;
     break;}
 case 8:
 #line 278 "plugins/csstdldr/stdparse.y"
@@ -1383,7 +1383,7 @@ case 11:
 case 12:
 #line 286 "plugins/csstdldr/stdparse.y"
 {
-    if (!world->CreateCamera ("Start", yyvsp[-3].string,
+    if (!engine->CreateCamera ("Start", yyvsp[-3].string,
       (csVector3 &)yyvsp[-1].vect, csVector3 (0, 0, 1), csVector3 (0, 1, 0)))
       YYABORT;
   ;
@@ -1410,7 +1410,7 @@ case 16:
 case 17:
 #line 303 "plugins/csstdldr/stdparse.y"
 {
-    SECTOR.object = world->CreateSector (yyvsp[-1].string);
+    SECTOR.object = engine->CreateSector (yyvsp[-1].string);
     SECTOR.polyset = QUERY_INTERFACE (SECTOR.object, iPolygonSet);
     SECTOR.texname = NULL;
     SECTOR.texlen = 1.0;
@@ -1427,7 +1427,7 @@ case 18:
     break;}
 case 19:
 #line 317 "plugins/csstdldr/stdparse.y"
-{ if (!world->CreateKey (yyvsp[-3].string, yyvsp[-1].string)) ABORTMSG; ;
+{ if (!engine->CreateKey (yyvsp[-3].string, yyvsp[-1].string)) ABORTMSG; ;
     break;}
 case 20:
 #line 319 "plugins/csstdldr/stdparse.y"
@@ -1528,7 +1528,7 @@ case 49:
 case 50:
 #line 426 "plugins/csstdldr/stdparse.y"
 {
-    thing.object = world->CreateThing (yyvsp[-1].string, SECTOR.object);
+    thing.object = engine->CreateThing (yyvsp[-1].string, SECTOR.object);
     thing.polyset = QUERY_INTERFACE (thing.object, iPolygonSet);
     thing.texname = NULL;
     thing.texlen = 1.0;

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CS_OCTREE_H
-#define _CS_OCTREE_H
+#ifndef __CS_OCTREE_H__
+#define __CS_OCTREE_H__
 
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
@@ -525,5 +525,4 @@ public:
   bool ReadFromCachePVS (iVFS* vfs, const char* name);
 };
 
-#endif /*_CS_OCTREE_H*/
-
+#endif // __CS_OCTREE_H__

@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csengine/csspr2d.h"
 #include "csengine/light.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/particle.h"
 #include "csengine/rview.h"
 #include "csengine/sector.h"
@@ -28,7 +28,6 @@
 #include "csgeom/fastsqrt.h"
 #include <math.h>
 #include <stdlib.h>
-
 
 IMPLEMENT_CSOBJTYPE (csParticleSystem, csSprite)
 IMPLEMENT_CSOBJTYPE (csNewtonianParticleSystem, csParticleSystem)
@@ -50,8 +49,8 @@ csParticleSystem :: csParticleSystem(csObject* theParent)
   self_destruct = false;
   time_to_live = 0;
   to_delete = false;
-  // add me to the world
-  csWorld::current_world->sprites.Push (this);
+  // add me to the engine
+  csEngine::current_engine->sprites.Push (this);
   // defaults
   change_size = false;
   change_color = false;
@@ -113,7 +112,7 @@ void csParticleSystem :: AppendRectSprite(float width, float height,
 {
   csSprite2D *part = new csSprite2D(this);
   iParticle *pTicle;
-  //csWorld::current_world->sprites.Push(part);
+  //csEngine::current_engine->sprites.Push(part);
   csColoredVertices& vs = part->GetVertices();
   vs.SetLimit(4);
   vs.SetLength(4);
@@ -136,7 +135,7 @@ void csParticleSystem :: AppendRegularSprite(int n, float radius,
 {
   csSprite2D *part = new csSprite2D(this);
   iParticle *pTicle;
-  //csWorld::current_world->sprites.Push(part);
+  //csEngine::current_engine->sprites.Push(part);
   part->CreateRegularVertices(n, true);
   part->ScaleBy(radius);
   part->SetMaterial (mat);
@@ -481,15 +480,15 @@ void csParSysExplosion :: MoveToSector(csSector *sector)
 }
 
 
-void csParSysExplosion :: AddLight(csWorld *world, csSector *sec, cs_time fade)
+void csParSysExplosion :: AddLight(csEngine *engine, csSector *sec, cs_time fade)
 {
   if(has_light) return;
-  light_world = world;
+  light_engine = engine;
   light_sector = sec;
   light_fade = fade;
   has_light = true;
   explight = new csDynLight(center.x, center.y, center.z, 5, 1, 1, 0);
-  light_world->AddDynLight(explight);
+  light_engine->AddDynLight(explight);
   explight->SetSector(light_sector);
   explight->Setup();
 }
@@ -499,11 +498,11 @@ void csParSysExplosion :: RemoveLight()
 {
   if(!has_light) return;
   has_light = false;
-  light_world->RemoveDynLight(explight);
+  light_engine->RemoveDynLight(explight);
   delete explight;
   explight = NULL;
   light_sector = NULL;
-  light_world = NULL;
+  light_engine = NULL;
 }
 
 
@@ -786,7 +785,7 @@ csFireParticleSystem :: csFireParticleSystem(csObject* theParent,
   : csParticleSystem(theParent)
 {
   light = NULL;
-  light_world = NULL;
+  light_engine = NULL;
   delete_light = false;
   part_pos = new csVector3[number];
   part_speed = new csVector3[number];
@@ -820,7 +819,7 @@ csFireParticleSystem :: ~csFireParticleSystem()
 {
   if(light && delete_light)
   {
-    light_world->RemoveDynLight( (csDynLight*)light);
+    light_engine->RemoveDynLight( (csDynLight*)light);
     delete light;
     light = NULL;
   }
@@ -917,15 +916,15 @@ void csFireParticleSystem :: Update(cs_time elapsed_time)
 }
 
 
-void csFireParticleSystem :: AddLight(csWorld *world, csSector *sec)
+void csFireParticleSystem :: AddLight(csEngine *engine, csSector *sec)
 {
   if(light) return;
   csDynLight *explight = new csDynLight(origin.x, origin.y, origin.z, 
     5, 1, 1, 0);
-  world->AddDynLight(explight);
+  engine->AddDynLight(explight);
   explight->SetSector(sec);
   explight->Setup();
   light = explight;
   delete_light = true;
-  light_world = world;
+  light_engine = engine;
 }

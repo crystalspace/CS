@@ -1,14 +1,14 @@
 @c -*-texinfo-*-
 @node csParser, CSWS, csGeom, Libraries
-@section World File Parser (@code{csParser})
-@cindex World File Parser
+@section Map File Parser (@code{csParser})
+@cindex Map File Parser
 @cindex csParser
 
-This section will describe the world file parser (@code{csParser}). Currently
-there is only a section describing the format of the world files.
+This section will describe the map file parser (@code{csParser}). Currently
+there is only a section describing the format of the map files.
 
 @menu
-* World File Format:: Format of World File
+* Map File Format:: Format of Map File
 @end menu
 
-@imports{libs,worldfmt.txi}
+@imports{libs,mapfmt.txi}

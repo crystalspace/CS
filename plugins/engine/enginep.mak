@@ -27,11 +27,11 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp plugins/engine
 
 ifeq ($(USE_PLUGINS),yes)
-  ENGINE = $(OUTDLL)enginep$(DLL)
+  ENGINE = $(OUTDLL)engine$(DLL)
   LIB.ENGINE = $(foreach d,$(DEP.ENGINE),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(ENGINE)
 else
-  ENGINE = $(OUT)$(LIB_PREFIX)enginep$(LIB)
+  ENGINE = $(OUT)$(LIB_PREFIX)engine$(LIB)
   DEP.EXE += $(ENGINE)
   CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_ENGINE
   TO_INSTALL.STATIC_LIBS += $(ENGINE)
@@ -43,7 +43,7 @@ OBJ.ENGINE = $(addprefix $(OUT),$(notdir $(SRC.ENGINE:.cpp=$O)))
 DEP.ENGINE = CSENGINE CSTERR CSUTIL CSSYS CSGEOM CSOBJECT CSGFXLDR CSUTIL CSSYS
 
 MSVC.DSP += ENGINE
-DSP.ENGINE.NAME = enginep
+DSP.ENGINE.NAME = engine
 DSP.ENGINE.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)

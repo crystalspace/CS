@@ -42,12 +42,12 @@
 #include "csengine/triangle.h"
 #include "csengine/thing.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/cssprite.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
 
-void Dumper::dump (csMatrix3* m, char* name)
+void Dumper::dump (csMatrix3* m, char const* name)
 {
   CsPrintf (MSG_DEBUG_0, "Matrix '%s':\n", name);
   CsPrintf (MSG_DEBUG_0, "/\n");
@@ -57,12 +57,12 @@ void Dumper::dump (csMatrix3* m, char* name)
   CsPrintf (MSG_DEBUG_0, "\\\n");
 }
 
-void Dumper::dump (csVector3* v, char* name)
+void Dumper::dump (csVector3* v, char const* name)
 {
   CsPrintf (MSG_DEBUG_0, "Vector '%s': (%f,%f,%f)\n", name, v->x, v->y, v->z);
 }
 
-void Dumper::dump (csVector2* v, char* name)
+void Dumper::dump (csVector2* v, char const* name)
 {
   CsPrintf (MSG_DEBUG_0, "Vector '%s': (%f,%f)\n", name, v->x, v->y);
 }
@@ -203,13 +203,13 @@ void Dumper::dump (csSector* s)
   }
 }
 
-void Dumper::dump (csWorld* w)
+void Dumper::dump (csEngine* e)
 {
-  int sn = w->sectors.Length ();
+  int sn = e->sectors.Length ();
   while (sn > 0)
   {
     sn--;
-    csSector* s = (csSector*)w->sectors[sn];
+    csSector* s = (csSector*)e->sectors[sn];
     dump (s);
   }
 }
@@ -242,7 +242,7 @@ void Dumper::dump (csSprite3D* s)
 #endif
 }
 
-void Dumper::dump (csPolyTexture* p, char* name)
+void Dumper::dump (csPolyTexture* p, char const* name)
 {
   CsPrintf (MSG_DEBUG_0, "  PolyTexture '%s'\n", name);
   CsPrintf (MSG_DEBUG_0, "    Imin_u=%d Imin_v=%d Imax_u=%d Imax_v=%d\n", p->Imin_u, p->Imin_v, p->Imax_u, p->Imax_v);
@@ -261,7 +261,7 @@ void Dumper::dump (csPolyTexture* p, char* name)
   CsPrintf (MSG_DEBUG_0, "    w=%d h=%d w_orig=%d\n", p->w, p->h, p->w_orig);
 }
 
-void Dumper::dump (csPolygon2D* p, char* name)
+void Dumper::dump (csPolygon2D* p, char const* name)
 {
   CsPrintf (MSG_DEBUG_0, "Dump polygon 2D '%s':\n", name);
   CsPrintf (MSG_DEBUG_0, "    num_vertices=%d  max_vertices=%d\n", p->num_vertices, p->max_vertices);
@@ -365,7 +365,7 @@ void Dumper::dump (csBspTree2D* tree)
   dump (tree, tree->root, 0);
 }
 
-void Dumper::dump (csPolygonClipper* clipper, char* name)
+void Dumper::dump (csPolygonClipper* clipper, char const* name)
 {
   CsPrintf (MSG_DEBUG_0, "PolygonClipper '%s'\n", name);
   int i;
@@ -373,7 +373,7 @@ void Dumper::dump (csPolygonClipper* clipper, char* name)
     CsPrintf (MSG_DEBUG_0, "  %d: (%f,%f)\n", i, clipper->ClipPoly[i].x, clipper->ClipPoly[i].y);
 }
 
-void Dumper::dump (csFrustum* frustum, char* name)
+void Dumper::dump (csFrustum* frustum, char const* name)
 {
   CsPrintf (MSG_DEBUG_0, "csFrustum '%s'\n", name);
   if (!frustum)
@@ -407,7 +407,7 @@ void Dumper::dump (csFrustum* frustum, char* name)
   }
 }
 
-void Dumper::dump (csPoly2DPool* pool, char* name)
+void Dumper::dump (csPoly2DPool* pool, char const* name)
 {
   int cnt;
   ULong tot_size;
@@ -441,7 +441,7 @@ void Dumper::dump (csPoly2DPool* pool, char* name)
   	cnt, max_size, tot_size);
 }
 
-void Dumper::dump (csLightPatchPool* pool, char* name)
+void Dumper::dump (csLightPatchPool* pool, char const* name)
 {
   int cnt;
   cnt = 0;
@@ -568,7 +568,7 @@ bool Dumper::check_stubs (csOctreeNode* node)
   return false;
 }
 
-void Dumper::dump_stubs_node (csObjectStub* stub, char* name, int level)
+void Dumper::dump_stubs_node (csObjectStub* stub, char const* name, int level)
 {
   while (stub)
   {
@@ -599,7 +599,7 @@ void Dumper::dump_stubs_node (csObjectStub* stub, char* name, int level)
   }
 }
 
-void Dumper::dump_stubs_obj (csObjectStub* stub, char* name, int level)
+void Dumper::dump_stubs_obj (csObjectStub* stub, char const* name, int level)
 {
   while (stub)
   {
@@ -630,7 +630,7 @@ void Dumper::dump_stubs_obj (csObjectStub* stub, char* name, int level)
   }
 }
 
-void Dumper::dump_stubs (csBspNode* bnode, char* name, int level)
+void Dumper::dump_stubs (csBspNode* bnode, char const* name, int level)
 {
   if (!bnode) return;
   CsPrintf (MSG_DEBUG_0, "%s bnode(%s)\n", spaces (level), name);
@@ -640,7 +640,7 @@ void Dumper::dump_stubs (csBspNode* bnode, char* name, int level)
   dump_stubs (bnode->front, "front", level+1);
   dump_stubs (bnode->back, "back", level+1);
 }
-void Dumper::dump_stubs (csOctreeNode* onode, char* name, int level)
+void Dumper::dump_stubs (csOctreeNode* onode, char const* name, int level)
 {
   if (!onode) return;
   CsPrintf (MSG_DEBUG_0, "%s onode(%s) (%f,%f,%f)\n", spaces (level),
@@ -992,4 +992,3 @@ long Dumper::TotalTexels (csTextureList* txtlist)
 
   return texels;
 }
-

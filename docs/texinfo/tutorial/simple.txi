@@ -16,7 +16,7 @@ directory.  This directory contains all header files you need to be able to
 use the Crystal Space components and libraries in your own applications.  On
 one hand, the include directory contains @sc{scf} interface definitions.
 These pure interface file names start with the letter @samp{i} (as in
-@file{iworld.h}).  On the other hand we also have plain C++ include files for
+@file{iengine.h}).  On the other hand we also have plain C++ include files for
 interfacing with the libraries of Crystal Space.  When you install Crystal
 Space on your development system (for instance, by invoking @samp{make
 install}), these headers are placed in a location where they can be easily
@@ -55,13 +55,13 @@ file @file{simple.h} with the following contents:
 #include <stdarg.h>
 #include "cssys/sysdriv.h"
 
-class csWorld;
+class csEngine;
 
 class Simple : public SysSystemDriver
 @{
   typedef SysSystemDriver superclass;
 public:
-  csWorld* world;
+  csEngine* engine;
 
 public:
   Simple ();
@@ -81,7 +81,7 @@ In the source file @file{simple.cpp} we place the following:
 #include "cssys/system.h"
 #include "apps/simple/simple.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/csview.h"
 #include "csengine/camera.h"
 #include "csengine/light.h"
@@ -97,7 +97,7 @@ REGISTER_STATIC_LIBRARY (engine)
 
 Simple::Simple ()
 @{
-  world = NULL;
+  engine = NULL;
 @}
 
 Simple::~Simple ()
@@ -115,15 +115,15 @@ bool Simple::Initialize (int argc, char const* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
-  // Find the pointer to world plugin
-  iWorld* World = QUERY_PLUGIN (this, iWorld);
-  if (!World)
+  // Find the pointer to engine plugin
+  iEngine* Engine = QUERY_PLUGIN (this, iEngine);
+  if (!Engine)
   @{
-    CsPrintf (MSG_FATAL_ERROR, "No iWorld plugin!\n");
+    CsPrintf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     exit (1);
   @}
-  world = World->GetCsWorld ();
-  World->DecRef ();
+  engine = Engine->GetCsEngine ();
+  Engine->DecRef ();
 
   // Open the main system. This will open all
   // the previously loaded plug-ins.
@@ -139,11 +139,11 @@ bool Simple::Initialize (int argc, char const* const argv[],
 
   // First disable the lighting cache.
   // Our app is simple enough not to need this.
-  world->EnableLightingCache (false);
+  engine->EnableLightingCache (false);
 
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world...\n");
-  world->Prepare ();
+  engine->Prepare ();
   Printf (MSG_INITIALIZATION, "Created.\n");
 
   return true;
@@ -193,7 +193,7 @@ Before we start making this application more useful lets have a look at what
 actually happens here.  The main routine first creates an instance of our
 @samp{Simple} class.  The next step is the creation of the world.  The world
 is actually the main 3D engine class and is one of the most important classes
-for interfacing with the engine (see @samp{csWorld} reference for more
+for interfacing with the engine (see @samp{csEngine} reference for more
 information).
 
 To initialize the system, we call @code{Initialize()} on our @samp{Simple}
@@ -203,7 +203,7 @@ parsing the command line and feeding all the options to the appropriate
 handlers.  Note that you should always test for failure of such routines as
 there may be various reasons for failure.
 
-@samp{Initialize()} retrieves a pointer to the world via a call to the
+@samp{Initialize()} retrieves a pointer to the engine via a call to the
 @sc{scf} function @code{QUERY_PLUGIN()} and then ``opens'' the system, which
 basically means that all graphics subsystems are opened (i.e.  a window will
 be opened).  This function can also fail, so again test for this.
@@ -273,14 +273,14 @@ that it looks like this:
 
 class csSector;
 class csView;
-class csWorld;
+class csEngine;
 
 class Simple : public SysSystemDriver
 @{
   typedef SysSystemDriver superclass;
 public:
   csSector* room;
-  csWorld* world;
+  csEngine* engine;
   @dots{}
 @end example
 
@@ -307,10 +307,10 @@ bool Simple::Initialize (int argc, char const* const argv[],
   // Create the world.
   Printf (MSG_INITIALIZATION, "Creating world...\n");
 
-  csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
-  csMaterialWrapper* tm = world->GetMaterials ()->FindByName ("stone");
+  csLoader::LoadTexture (engine, "stone", "/lib/std/stone4.gif");
+  csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
 
-  room = world->CreateCsSector ("room");
+  room = engine->CreateCsSector ("room");
   csPolygon3D* p;
   p = room->NewPolygon (tm);
   p->AddVertex (-5, 0,  5);
@@ -362,7 +362,7 @@ bool Simple::Initialize (int argc, char const* const argv[],
   light = new csStatLight ( 0, 5, -3, 10, 0, 1, 0, false);
   room->AddLight (light);
 
-  world->Prepare ();
+  engine->Prepare ();
   Printf (MSG_INITIALIZATION, "Created.\n");
 
   txtmgr->SetPalette ();
@@ -371,8 +371,8 @@ bool Simple::Initialize (int argc, char const* const argv[],
 @end example
 
 This extra code first loads a texture with @code{LoadTexture()}.  The first
-parameter is the world into which to load the texture; the second parameter is
-the name of the texture as it will be known in the world; and the third is the
+parameter is the engine into which to load the texture; the second parameter is
+the name of the texture as it will be known in the engine; and the third is the
 actual filename on the @sc{vfs} volume (@pxref{VFS}).  Note, if you don't have
 the @file{stone4.gif} texture you can use another one.  The only requirement
 is that it must have sizes which are a power of 2 (e.g. 64x64). This functions
@@ -413,7 +413,7 @@ pseudo-dynamic light still cannot move but it can change intensity.  There are
 some performance costs associated with pseudo-dynamic lights so it is not
 enabled by default.
 
-The call to @code{Prepare()} prepares the world for rendering your scene.  It
+The call to @code{Prepare()} prepares the engine for rendering your scene.  It
 will prepare all textures and create all lightmaps if needed.  Only after this
 call can you start rendering your world, because lightmaps may have to be
 converted to a format more suitable for the chosen 3D renderer.
@@ -440,7 +440,7 @@ to make use of @samp{csView}:
 @dots{}
 class csView;
 @dots{}
-class csWorld;
+class csEngine;
 
 class Simple : public SysSystemDriver
 @{
@@ -449,7 +449,7 @@ public:
   @dots{}
   csView* view;
   @dots{}
-  csWorld* world;
+  csEngine* engine;
   @dots{}
 @end example
 
@@ -462,7 +462,7 @@ Simple::Simple ()
   @dots{}
   view = NULL;
   @dots{}
-  world = NULL;
+  engine = NULL;
 @}
 
 Simple::~Simple ()
@@ -482,7 +482,7 @@ bool Simple::Initialize (int argc, char const* const argv[],
   @dots{}
   Printf (MSG_INITIALIZATION, "Created.\n");
 
-  view = new csView (world, G3D);
+  view = new csView (engine, G3D);
   view->SetSector (room);
   view->GetCamera ()->SetPosition (csVector3 (0, 5, 0));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
@@ -515,7 +515,7 @@ void Simple::NextFrame ()
 
   // Tell 3D driver we're going to display 3D things.
   if (!G3D->BeginDraw (
-      world->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+      engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
       return;
 
   // Tell the camera to render into the frame buffer.
@@ -531,7 +531,7 @@ void Simple::NextFrame ()
 First we indicate to the 3D rasterizer that we want to start drawing 3D
 graphics.  This call makes sure that the needed buffers are set up and
 performs all necessary initialization. The engine often needs extra settings
-for this as well so you @emph{must} call @code{world->GetBeginDrawFlags()} to
+for this as well so you @emph{must} call @code{engine->GetBeginDrawFlags()} to
 get these flags and or them with the ones that you want.
 Then we draw through our view by calling @code{csView::Draw()} which
 updates the view area with the 3D world data as seen through the camera.
@@ -596,4 +596,4 @@ Space system for use, how to create a simple room with some lights, event
 handling, and how to handle some basic camera operations.
 
 You can now go on to the next tutorial (@pxref{Tutorial Simple 2})) to learn
-how to add a 3D sprite to this world.
+how to add a 3D sprite to this engine.

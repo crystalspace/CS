@@ -17,11 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSPPULSE_H__
-#define __CSPPULSE_H__
+#ifndef __CS_CSPPULSE_H__
+#define __CS_CSPPULSE_H__
 
 #include "csutil/csbase.h"
 #include "cstypes.h"
+#include "isystem.h"
 
 /**
  * The csProgressPulse class provides a simple twirling textual cursor built
@@ -42,20 +43,28 @@
 class csProgressPulse : public csBase
 {
 private:
+  iSystem* sys;
   int type;	// One of MSG_INITIALIZATION, MSG_CONSOLE, MSG_STDOUT, etc.
   int state;
   bool drawn;
 
 public:
-  csProgressPulse();
+  /// Constructs a new progress pulse.
+  csProgressPulse(iSystem*);
+  /// Destroys the progress pulse.
   ~csProgressPulse();
 
+  /// Set the message type for iSystem::Printf().
   void SetMessageType(int n) { type = n; }
+  /// Get the message type used for iSystem::Printf().
   int GetMessageType() const { return type; }
 
+  /// Increment the progress by one pulse.
   void Step();
+  /// Erase the pulse indicator.
   void Erase();
+  /// Reset the state and erase the indicator.
   void Reset();
 };
 
-#endif // __CSPPULSE_H__
+#endif // __CS_CSPPULSE_H__

@@ -35,12 +35,12 @@
 #include "csutil/inifile.h"
 #include "csgfxldr/csimage.h"
 #include "csengine/dumper.h"
+#include "csengine/engine.h"
 #include "csengine/texture.h"
 #include "csengine/material.h"
 #include "csengine/sector.h"
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
-#include "csengine/world.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
 #include "csengine/thing.h"
@@ -55,12 +55,10 @@
 #include "inetdrv.h"
 #include "ifontsrv.h"
 
-// ----------------------------------------------------
+//-----------------------------------------------------------------------------
 // Networking stuff.
 
-#define BLOCKS_SERVER 1
-
-bool do_network = true;
+static bool do_network = false;
 // Maybe move these into Blocks class.
 static iNetworkListener* Listener = NULL;
 static iNetworkConnection* Connection = NULL;
@@ -68,7 +66,7 @@ static iNetworkConnection* Connection = NULL;
 static long LastConnectTime = 0;
 
 // End networking stuff.
-// ------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 Blocks* Sys = NULL;
 
@@ -275,7 +273,7 @@ char* TextEntryMenu::GetSelectedEntry ()
 //-----------------------------------------------------------------------------
 Blocks::Blocks ()
 {
-  world = NULL;
+  engine = NULL;
 
   full_rotate_x = create_rotate_x (M_PI/2);
   full_rotate_y = create_rotate_y (M_PI/2);
@@ -346,15 +344,10 @@ Blocks::Blocks ()
 Blocks::~Blocks ()
 {
   delete dynlight;
-  if (world) world->Clear ();
+  if (engine) engine->Clear ();
   delete keyconf_menu;
   TerminateConnection();
 }
-
-
-
-
-
 
 void Blocks::InitGame ()
 {
@@ -441,7 +434,7 @@ csPolygon3D* add_polygon_template (csThing* tmpl,
 void Blocks::add_pillar_template ()
 {
   float dim = CUBE_DIM/2.;
-  pillar_tmpl = new csThing (world);
+  pillar_tmpl = new csThing (engine);
   pillar_tmpl->SetName ("pillar");
   pillar_tmpl->AddVertex (-dim, 0, dim);
   pillar_tmpl->AddVertex (dim, 0, dim);
@@ -493,13 +486,13 @@ void Blocks::add_pillar_template ()
       	pillar_tmpl->Vobj (6), pillar_tmpl->Vobj (5), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  world->thing_templates.Push (pillar_tmpl);
+  engine->thing_templates.Push (pillar_tmpl);
 }
 
 void Blocks::add_vrast_template ()
 {
   float dim = RAST_DIM;
-  vrast_tmpl = new csThing (world);
+  vrast_tmpl = new csThing (engine);
   vrast_tmpl->SetName ("vrast");
   vrast_tmpl->AddVertex (-dim, 0, dim);
   vrast_tmpl->AddVertex (dim, 0, dim);
@@ -525,13 +518,13 @@ void Blocks::add_vrast_template ()
   p->SetTextureSpace (tx_matrix, tx_vector);
 #endif
 
-  world->thing_templates.Push (vrast_tmpl);
+  engine->thing_templates.Push (vrast_tmpl);
 }
 
 void Blocks::add_hrast_template ()
 {
   float dim = RAST_DIM;
-  hrast_tmpl = new csThing (world);
+  hrast_tmpl = new csThing (engine);
   hrast_tmpl->SetName ("hrast");
 
   // zone_dim s were BIG here changed.
@@ -565,15 +558,15 @@ void Blocks::add_hrast_template ()
   p->SetTextureSpace (tx_matrix, tx_vector);
 #endif
 
-  world->thing_templates.Push (hrast_tmpl);
+  engine->thing_templates.Push (hrast_tmpl);
 }
 
 
 void Blocks::add_pillar (int x, int y)
 {
   csThing* pillar;
-  pillar = new csThing (world);
-  world->things.Push (pillar);
+  pillar = new csThing (engine);
+  engine->things.Push (pillar);
   pillar->SetName ("pillar");
   pillar->GetMovable ().SetSector (room);
   pillar->flags.Set (CS_ENTITY_MOVEABLE, 0);
@@ -588,8 +581,8 @@ void Blocks::add_pillar (int x, int y)
 void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
 {
   csThing* vrast;
-  vrast = new csThing (world);
-  world->things.Push (vrast);
+  vrast = new csThing (engine);
+  engine->things.Push (vrast);
   vrast->SetName ("vrast");
   vrast->GetMovable ().SetSector (room);
   vrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
@@ -606,8 +599,8 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
 void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
 {
   csThing* hrast;
-  hrast = new csThing (world);
-  world->things.Push (hrast);
+  hrast = new csThing (engine);
+  engine->things.Push (hrast);
   hrast->SetName ("hrast");
   hrast->GetMovable ().SetSector (room);
   hrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
@@ -633,7 +626,7 @@ void Blocks::ChangeThingMaterial (csThing* thing, csMaterialWrapper* mat)
 void Blocks::add_cube_template ()
 {
   float dim = CUBE_DIM/2.;
-  cube_tmpl = new csThing (world);
+  cube_tmpl = new csThing (engine);
   cube_tmpl->SetName ("cube");
   cube_tmpl->AddVertex (-dim, -dim, dim);
   cube_tmpl->AddVertex (dim, -dim, dim);
@@ -678,7 +671,7 @@ void Blocks::add_cube_template ()
   p = add_polygon_template (cube_tmpl, "r2", cube_mat, 6, 1, 2);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  world->thing_templates.Push (cube_tmpl);
+  engine->thing_templates.Push (cube_tmpl);
 }
 
 void set_uv (csPolygon3D* p, float u1, float v1, float u2, float v2,
@@ -697,8 +690,8 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
 	csThing* tmpl)
 {
   csThing* cube;
-  cube = new csThing (world);
-  world->things.Push (cube);
+  cube = new csThing (engine);
+  engine->things.Push (cube);
   cube->SetName ("cubexxx");
   cube->GetMovable ().SetSector (room);
   cube->flags.Set (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
@@ -1724,39 +1717,40 @@ void Blocks::HandleMovement (cs_time elapsed_time)
 
 void Blocks::InitTextures ()
 {
-  if (world) world->Clear ();
+  if (engine) engine->Clear ();
+  csEngine* const e = Sys->engine;
 
-  csLoader::LoadTexture (Sys->world, "pillar", "stone4.png");
-  Sys->set_pillar_material (Sys->world->GetMaterials ()->FindByName ("pillar"));
+  csLoader::LoadTexture (e, "pillar", "stone4.png");
+  Sys->set_pillar_material (e->GetMaterials ()->FindByName ("pillar"));
 
-  csLoader::LoadTexture (Sys->world, "cube", "cube.png");
-  Sys->set_cube_material (Sys->world->GetMaterials ()->FindByName ("cube"));
-  csLoader::LoadTexture (Sys->world, "raster", "clouds_thick1.jpg");
-  Sys->set_raster_material (Sys->world->GetMaterials ()->FindByName ("raster"));
-  csLoader::LoadTexture (Sys->world, "room", "mystone2.png");
-  csLoader::LoadTexture (Sys->world, "clouds", "clouds.jpg");
+  csLoader::LoadTexture (e, "cube", "cube.png");
+  Sys->set_cube_material (e->GetMaterials ()->FindByName ("cube"));
+  csLoader::LoadTexture (e, "raster", "clouds_thick1.jpg");
+  Sys->set_raster_material (e->GetMaterials ()->FindByName ("raster"));
+  csLoader::LoadTexture (e, "room", "mystone2.png");
+  csLoader::LoadTexture (e, "clouds", "clouds.jpg");
 
-  csLoader::LoadTexture (Sys->world, "cubef1", "cubef1.png");
-  Sys->set_cube_f1_material (Sys->world->GetMaterials ()->FindByName ("cubef1"));
-  csLoader::LoadTexture (Sys->world, "cubef2", "cubef2.png");
-  Sys->set_cube_f2_material (Sys->world->GetMaterials ()->FindByName ("cubef2"));
-  csLoader::LoadTexture (Sys->world, "cubef3", "cubef3.png");
-  Sys->set_cube_f3_material (Sys->world->GetMaterials ()->FindByName ("cubef3"));
-  csLoader::LoadTexture (Sys->world, "cubef4", "cubef4.png");
-  Sys->set_cube_f4_material (Sys->world->GetMaterials ()->FindByName ("cubef4"));
+  csLoader::LoadTexture (e, "cubef1", "cubef1.png");
+  Sys->set_cube_f1_material (e->GetMaterials ()->FindByName ("cubef1"));
+  csLoader::LoadTexture (e, "cubef2", "cubef2.png");
+  Sys->set_cube_f2_material (e->GetMaterials ()->FindByName ("cubef2"));
+  csLoader::LoadTexture (e, "cubef3", "cubef3.png");
+  Sys->set_cube_f3_material (e->GetMaterials ()->FindByName ("cubef3"));
+  csLoader::LoadTexture (e, "cubef4", "cubef4.png");
+  Sys->set_cube_f4_material (e->GetMaterials ()->FindByName ("cubef4"));
 
-  csLoader::LoadTexture (Sys->world, "menu_novice", "novice.png");
-  csLoader::LoadTexture (Sys->world, "menu_back", "back.png");
-  csLoader::LoadTexture (Sys->world, "menu_average", "average.png");
-  csLoader::LoadTexture (Sys->world, "menu_expert", "expert.png");
-  csLoader::LoadTexture (Sys->world, "menu_high", "high.png");
-  csLoader::LoadTexture (Sys->world, "menu_quit", "quit.png");
-  csLoader::LoadTexture (Sys->world, "menu_3x3", "p3x3.png");
-  csLoader::LoadTexture (Sys->world, "menu_4x4", "p4x4.png");
-  csLoader::LoadTexture (Sys->world, "menu_5x5", "p5x5.png");
-  csLoader::LoadTexture (Sys->world, "menu_6x6", "p6x6.png");
-  csLoader::LoadTexture (Sys->world, "menu_keyconfig", "keys.png");
-  csLoader::LoadTexture (Sys->world, "menu_start", "start.png");
+  csLoader::LoadTexture (e, "menu_novice", "novice.png");
+  csLoader::LoadTexture (e, "menu_back", "back.png");
+  csLoader::LoadTexture (e, "menu_average", "average.png");
+  csLoader::LoadTexture (e, "menu_expert", "expert.png");
+  csLoader::LoadTexture (e, "menu_high", "high.png");
+  csLoader::LoadTexture (e, "menu_quit", "quit.png");
+  csLoader::LoadTexture (e, "menu_3x3", "p3x3.png");
+  csLoader::LoadTexture (e, "menu_4x4", "p4x4.png");
+  csLoader::LoadTexture (e, "menu_5x5", "p5x5.png");
+  csLoader::LoadTexture (e, "menu_6x6", "p6x6.png");
+  csLoader::LoadTexture (e, "menu_keyconfig", "keys.png");
+  csLoader::LoadTexture (e, "menu_start", "start.png");
 }
 
 void Blocks::DrawMenu (int menu)
@@ -1838,9 +1832,9 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
 
 void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 {
-  csMaterialWrapper* tm_front = world->GetMaterials ()->FindByName (mat);
-  csThing* thing = new csThing (world);
-  world->things.Push (thing);
+  csMaterialWrapper* tm_front = engine->GetMaterials ()->FindByName (mat);
+  csThing* thing = new csThing (engine);
+  engine->things.Push (thing);
 
   thing->AddVertex (-1, .25, 0);
   thing->AddVertex (1, .25, 0);
@@ -1870,9 +1864,9 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 
 csThing* Blocks::CreateMenuArrow (bool left)
 {
-  csMaterialWrapper* tm_front = world->GetMaterials ()->FindByName ("menu_back");
-  csThing* thing = new csThing (world);
-  world->things.Push (thing);
+  csMaterialWrapper* tm_front = engine->GetMaterials ()->FindByName ("menu_back");
+  csThing* thing = new csThing (engine);
+  engine->things.Push (thing);
 
   float pointx;
   float rearx;
@@ -1946,8 +1940,8 @@ void Blocks::ReplaceMenuItem (int idx, int menu_nr)
 
 void Blocks::ChangePlaySize (int new_size)
 {
-  int idx = Sys->world->sectors.Find ((csSome)room);
-  Sys->world->sectors.Delete (idx);
+  int idx = Sys->engine->sectors.Find ((csSome)room);
+  Sys->engine->sectors.Delete (idx);
   player1->zone_dim = new_size;
   WriteConfig ();
   InitGameRoom ();
@@ -1990,8 +1984,8 @@ void Blocks::StartKeyConfig ()
 
 void Blocks::InitGameRoom ()
 {
-  csMaterialWrapper* tm = world->GetMaterials ()->FindByName ("room");
-  room = Sys->world->CreateCsSector ("room");
+  csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("room");
+  room = Sys->engine->CreateCsSector ("room");
   Sys->set_cube_room (room);
   csPolygon3D* p;
   p = room->NewPolygon (tm);
@@ -2064,8 +2058,8 @@ void Blocks::InitGameRoom ()
 
 void Blocks::InitDemoRoom ()
 {
-  csMaterialWrapper* demo_tm = world->GetMaterials ()->FindByName ("clouds");
-  demo_room = Sys->world->CreateCsSector ("room");
+  csMaterialWrapper* demo_tm = engine->GetMaterials ()->FindByName ("clouds");
+  demo_room = Sys->engine->CreateCsSector ("room");
 
   csPolygon3D* p;
   p = demo_room->NewPolygon (demo_tm);
@@ -2102,18 +2096,18 @@ void Blocks::InitDemoRoom ()
   arrow_right = CreateMenuArrow (false);
 }
 
-void Blocks::InitWorld ()
+void Blocks::InitEngine ()
 {
   InitTextures ();
   InitGameRoom ();
   InitDemoRoom ();
-  Sys->world->Prepare ();
+  Sys->engine->Prepare ();
 
 //#undef DO_SOUND
 #ifdef DO_SOUND
   // Load the blocks.zip library where sound refs are stored
-  csLoader::LoadLibraryFile (world, "/data/blocks/Library");
-  iSoundData* w = csSoundDataObject::GetSound(*world, "background.wav");
+  csLoader::LoadLibraryFile (engine, "/data/blocks/Library");
+  iSoundData* w = csSoundDataObject::GetSound(*engine, "background.wav");
   if (w && Sound) Sound->PlaySound (w, true);
 #endif
 }
@@ -2129,7 +2123,7 @@ void Blocks::StartDemo ()
   delete dynlight;
   dynlight = new csDynLight (dynlight_x, dynlight_y, dynlight_z, 7, 3, 0, 0);
 
-  Sys->world->AddDynLight (dynlight);
+  Sys->engine->AddDynLight (dynlight);
   dynlight->SetSector (demo_room);
   dynlight->Setup ();
 
@@ -2168,7 +2162,7 @@ void Blocks::StartNewGame ()
 
   delete dynlight; dynlight = NULL;
 
-  // First delete all cubes that may still be in the world.
+  // First delete all cubes that may still be in the engine.
   int i = 0;
   while (i < room->things.Length ())
   {
@@ -2398,8 +2392,6 @@ void Blocks::NextFrame ()
       }
       
     }
-    
-    
   }
   else  // aren't up to the number of frames yet.
   {
@@ -2413,7 +2405,7 @@ void Blocks::NextFrame ()
   {
     if (initscreen) StartDemo ();
     HandleMovement (elapsed_time);
-    if (!Gfx3D->BeginDraw (world->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) return;
+    if (!Gfx3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) return;
     view->Draw ();
     Gfx3D->FinishDraw ();
     Gfx3D->Print (NULL);
@@ -2476,7 +2468,7 @@ void Blocks::NextFrame ()
     if (player1->cur_speed > MAX_SPEED) player1->cur_speed = MAX_SPEED;
 
     // Tell Gfx3D we're going to display 3D things
-    if (!Gfx3D->BeginDraw (world->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) return;
+    if (!Gfx3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS)) return;
     view->Draw ();
   }
 
@@ -2649,7 +2641,6 @@ const char* Blocks::KeyName (const KeyMapping& map)
   return buf;
 }
 
-
 void Blocks::ReadConfig ()
 {
   csIniFile keys ("/config/blocks.cfg", Sys->VFS);
@@ -2790,9 +2781,6 @@ void Blocks::ClientCheckConnection()
       Connection = NULL;
     }
   }
-
-
-
 }
 
 void Blocks::ServerCheckConnection()
@@ -2847,9 +2835,6 @@ void Blocks::ServerCheckConnection()
       Connection->Send(buff, (ST_ENCODED_LENGTH +ST_CLIENT_EXTRA));
 
     }
-    
-    
-    
   }
 }
 
@@ -2924,7 +2909,7 @@ int main (int argc, char* argv[])
   Sys = new Blocks ();
 
   // temp hack until we find a better way
-  csWorld::System = Sys;
+  csEngine::System = Sys;
 
   if (!Sys->Initialize (argc, argv, "/config/blocks.cfg"))
   {
@@ -2941,15 +2926,15 @@ int main (int argc, char* argv[])
     fatal_exit (0, false);
   }
 
-  // Find the pointer to world plugin
-  iWorld *world = QUERY_PLUGIN (Sys, iWorld);
-  if (!world)
+  // Find the pointer to engine plugin
+  iEngine *engine = QUERY_PLUGIN (Sys, iEngine);
+  if (!engine)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iWorld plugin!\n");
+    CsPrintf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     return -1;
   }
-  Sys->world = world->GetCsWorld ();
-  world->DecRef ();
+  Sys->engine = engine->GetCsEngine ();
+  engine->DecRef ();
 
   // Get a font handle
   Sys->font = Sys->G2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
@@ -2969,11 +2954,11 @@ int main (int argc, char* argv[])
   // manually creating a camera and a clipper but it makes things a little
   // easier.
 
-  view = new csView (Sys->world, Gfx3D);
+  view = new csView (Sys->engine, Gfx3D);
 
   // Create our world.
   Sys->Printf (MSG_INITIALIZATION, "Creating world!...\n");
-  Sys->world->EnableLightingCache (false);
+  Sys->engine->EnableLightingCache (false);
 
   // Change to virtual directory where Blocks data is stored
   //if (!)
@@ -2990,7 +2975,7 @@ int main (int argc, char* argv[])
 
   Sys->VFS->ChDir (world_file.GetData());
   Sys->ReadConfig ();
-  Sys->InitWorld ();
+  Sys->InitEngine ();
 
   Sys->txtmgr->SetPalette ();
   Sys->white = Sys->txtmgr->FindRGB (255, 255, 255);

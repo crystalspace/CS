@@ -8,7 +8,7 @@
 //  if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
 //    return false;
 //
-// inside world.cpp (method csWorld::Initialize) and temporarily
+// inside engine.cpp (method csEngine::Initialize) and temporarily
 // comment them out with an #if 0 ... #endif.
 //
 
@@ -16,7 +16,7 @@
 #include "cssys/system.h"
 #include "csutil/inifile.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/csview.h"
 #include "csengine/camera.h"
 #include "csengine/light.h"
@@ -43,7 +43,7 @@ public:
 int main (int argc, char* argv[])
 {
   System = new MyApp ();
-  csWorld::System = System;
+  csEngine::System = System;
 
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
   System->RequestPlugin ("crystalspace.engine.core:Engine");
@@ -62,7 +62,7 @@ int main (int argc, char* argv[])
     exit (1);
   }
 
-  printf ("Success: %d\n", ldr->Load ("/this/plugins/csstdldr/test/world.test"));
+  printf ("Success: %d\n", ldr->Load ("/this/plugins/csstdldr/test/map.test"));
 
   delete ldr;
 //delete System;

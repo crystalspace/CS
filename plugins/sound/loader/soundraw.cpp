@@ -75,13 +75,13 @@ void *ConvertBuffer16To8Bit(void *buf, unsigned long Num) {
   Type *OldData=(Type*)d;                           \
   if (newfmt->Channels==1) {                        \
     Type *NewData=new Type[NumSamples];             \
-    for (unsigned long i=0;i<NumSamples;i++) {      \
+    for (long i=0;i<NumSamples;i++) {      \
       NewData[i]=(OldData[2*i]+OldData[2*i+1])/2;   \
     }                                               \
     return NewData;                                 \
   } else {                                          \
     Type *NewData=new Type[NumSamples*2];           \
-    for (unsigned long i=0;i<NumSamples;i++) {      \
+    for (long i=0;i<NumSamples;i++) {      \
       NewData[2*i]=NewData[2*i+1]=OldData[i];       \
     }                                               \
     return NewData;                                 \

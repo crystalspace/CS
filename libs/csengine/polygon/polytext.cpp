@@ -29,7 +29,7 @@
 #include "csengine/polygon.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/quadcube.h"
 #include "csengine/lghtmap.h"
 #include "csutil/bitset.h"
@@ -271,7 +271,7 @@ csPolyTexture::csPolyTexture ()
 
 csPolyTexture::~csPolyTexture ()
 {
-  csWorld::current_world->G3D->RemoveFromCache (this);
+  csEngine::current_engine->G3D->RemoveFromCache (this);
   if (lm) lm->DecRef ();
 }
 

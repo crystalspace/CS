@@ -26,7 +26,7 @@
 
 class csSector;
 class csView;
-class csWorld;
+class csEngine;
 class csDynLight;
 struct iCollideSystem;
 
@@ -36,7 +36,7 @@ class Phyztest : public SysSystemDriver
 public:
   csSector* room;
   csView* view;
-  csWorld* world;
+  csEngine* engine;
   csDynLight* dynlight;
   float angle;
   int motion_flags;

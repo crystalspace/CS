@@ -21,7 +21,7 @@
 #include "walktest/walktest.h"
 #include "csengine/sector.h"
 #include "csengine/polygon.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/texture.h"
 #include "csengine/light.h"
 #include "csengine/thing.h"
@@ -104,8 +104,8 @@ csPolygon3D* HugeRoom::create_polygon (csSector*, csPolygonSet* thing,
   switch (txt)
   {
     case 0: tm = NULL; break;
-    case 1: tm = world->GetMaterials ()->FindByName ("txt"); break;
-    case 2: tm = world->GetMaterials ()->FindByName ("txt2"); break;
+    case 1: tm = engine->GetMaterials ()->FindByName ("txt"); break;
+    case 2: tm = engine->GetMaterials ()->FindByName ("txt2"); break;
   }
 
   csPolygon3D* p = new csPolygon3D (tm);
@@ -140,7 +140,7 @@ csPolygon3D* HugeRoom::create_polygon (csSector*, csPolygonSet* thing,
 
 csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
 {
-  csThing* thing = new csThing (sector->GetWorld ());
+  csThing* thing = new csThing (sector->GetEngine ());
   thing->SetName ("t"); 
 
 #ifdef ROOM_SMALL
@@ -214,7 +214,7 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
 csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
 	float xdim, float ydim, float zdim, float angle_y)
 {
-  csThing* thing = new csThing (sector->GetWorld ());
+  csThing* thing = new csThing (sector->GetEngine ());
   thing->SetName ("t"); 
 
   float y_low = -wall_dim+1;
@@ -248,10 +248,10 @@ csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
 }
 
 
-csSector* HugeRoom::create_huge_world (csWorld* world)
+csSector* HugeRoom::create_huge_world (csEngine* engine)
 {
-  this->world = world;
-  csSector* room = world->CreateCsSector ("sector");
+  this->engine = engine;
+  csSector* room = engine->CreateCsSector ("sector");
 
   if (seed == 0) seed = rand ();
   srand (seed);
@@ -396,7 +396,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   }
 
 #if defined(ROOM_CITY)
-  csThing* floorthing = new csThing (world);
+  csThing* floorthing = new csThing (engine);
   floorthing->SetName ("floor"); 
   create_wall (room, floorthing,
   	csVector3 (-wall_dim, -wall_dim+1, wall_dim),
@@ -406,7 +406,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   floorthing->GetMovable ().SetSector (room);
   floorthing->GetMovable ().UpdateMove ();
 #elif !defined(ROOM_SMALL)
-  csThing* floorthing = new csThing (world);
+  csThing* floorthing = new csThing (engine);
   floorthing->SetName ("floor"); 
   create_wall (room, floorthing, csVector3 (-3, -1, 3), csVector3 (3, -1, 3),
   	csVector3 (3, -1, -3), csVector3 (-3, -1, -3), 4, 4, 0);

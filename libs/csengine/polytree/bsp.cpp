@@ -21,7 +21,7 @@
 #include "csengine/treeobj.h"
 #include "csengine/bsp.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/polygon.h"
 #include "isystem.h"
 
@@ -701,6 +701,3 @@ int csBspTree::ClassifyPolygon (csBspNode* node, const csPoly3D& poly)
   }
   return -1;
 }
-
-//---------------------------------------------------------------------------
-

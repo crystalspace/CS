@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csengine/halo.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csgeom/polyclip.h"
 #include "csutil/halogen.h"
 
@@ -28,7 +28,7 @@
 // The speed at which halo brightens/vanishes in 0..1 units
 #define HALO_INTENSITY_STEP    0.05
 
-//---------------------------------------------------------------+ csHalo +---//
+//--------------------------------------------------------------+ csHalo +---//
 
 csHalo::csHalo (csHaloType iType)
 {
@@ -40,7 +40,7 @@ csHalo::~csHalo ()
 {
 }
 
-//----------------------------------------------------------+ csCrossHalo +---//
+//---------------------------------------------------------+ csCrossHalo +---//
 
 csCrossHalo::csCrossHalo (float intensity_factor, float cross_factor)
   : csHalo (cshtCross)
@@ -54,7 +54,7 @@ uint8 *csCrossHalo::Generate (int Size)
   return GenerateHalo (Size, IntensityFactor, CrossFactor);
 }
 
-//-----------------------------------------------------------+ csNovaHalo +---//
+//----------------------------------------------------------+ csNovaHalo +---//
 
 csNovaHalo::csNovaHalo (int seed, int num_spokes, float roundness)
   : csHalo (cshtNova)
@@ -69,7 +69,7 @@ uint8 *csNovaHalo::Generate (int Size)
   return GenerateNova (Size, Seed, NumSpokes, Roundness);
 }
 
-//----------------------------------------------------------+ csLightHalo +---//
+//---------------------------------------------------------+ csLightHalo +---//
 
 csLightHalo::csLightHalo (csLight *iLight, iHalo *iHandle)
 {
@@ -86,7 +86,7 @@ csLightHalo::~csLightHalo ()
     Light->flags.SetBool (CS_LIGHT_ACTIVEHALO, false);
 }
 
-bool csLightHalo::Process (cs_time ElapsedTime, const csWorld &World)
+bool csLightHalo::Process (cs_time ElapsedTime, const csEngine &Engine)
 {
   // Whenever the center of halo (the light) is directly visible
   bool halo_vis = false;
@@ -96,7 +96,7 @@ bool csLightHalo::Process (cs_time ElapsedTime, const csWorld &World)
   float xtl = 0, ytl = 0;
 
   // Project the halo.
-  csVector3 v = World.current_camera->World2Camera (Light->GetCenter ());
+  csVector3 v = Engine.current_camera->World2Camera (Light->GetCenter ());
   // The clipped halo polygon
   csVector2 HaloClip [32];
   // Number of vertices in HaloClip array
@@ -104,13 +104,14 @@ bool csLightHalo::Process (cs_time ElapsedTime, const csWorld &World)
 
   if (v.z > SMALL_Z)
   {
-    float iz = World.current_camera->GetFOV () / v.z;
-    v.x = v.x * iz + World.current_camera->GetShiftX ();
-    v.y = World.frame_height - 1 - (v.y * iz + World.current_camera->GetShiftY ());
+    float iz = Engine.current_camera->GetFOV () / v.z;
+    v.x = v.x * iz + Engine.current_camera->GetShiftX ();
+    v.y = Engine.frame_height - 1 -
+      (v.y * iz + Engine.current_camera->GetShiftY ());
 
-    if (World.top_clipper->IsInside (v.x, v.y))
+    if (Engine.top_clipper->IsInside (v.x, v.y))
     {
-      float zv = World.G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
+      float zv = Engine.G3D->GetZBuffValue (QRound (v.x), QRound (v.y));
       halo_vis = (v.z <= zv);
     }
 
@@ -127,7 +128,7 @@ bool csLightHalo::Process (cs_time ElapsedTime, const csWorld &World)
       csVector2 (v.x + hw2, v.y - hh2)
     };
     // Clip the halo against clipper
-    if (World.top_clipper->Clip (HaloPoly, 4, HaloClip, HaloVCount))
+    if (Engine.top_clipper->Clip (HaloPoly, 4, HaloClip, HaloVCount))
     {
       xtl = HaloPoly [0].x;
       ytl = HaloPoly [0].y;

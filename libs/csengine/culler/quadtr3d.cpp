@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 #include "csengine/quadtr3d.h"
-#include "csengine/world.h" /* for CsPrintf() -- bleh */
+#include "csengine/engine.h" /* for CsPrintf() -- bleh */
 #include "csgeom/frustum.h"
 #include "csgeom/poly2d.h"
 #include "isystem.h"

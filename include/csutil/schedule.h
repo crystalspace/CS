@@ -24,7 +24,7 @@ class csSchedulePart;
 /**
  * The csSchedule class provides an easy way to get timers in applications.
  * It can handle both repeating and single-shot callbacks. It is useful
- * for handling time in 3d virtual worlds.
+ * for handling time in 3D virtual worlds.
  *
  * Use it like this:
  * <PRE>
@@ -62,7 +62,7 @@ class csSchedulePart;
  * in the NextFrame() method, you must call the TimePassed(elapsed_time)
  * function.
  *
- * This class is useful for callbacks in 3d virtual worlds, but the
+ * This class is useful for callbacks in 3D virtual worlds, but the
  * callbacks can have some jitter due to framerates. For mission-critical
  * hardware IO calls (like controlling a floppy drive or controlling the UART)
  * this jitter will be too big. In those cases use interrupt-driven callbacks,

@@ -21,7 +21,7 @@
 #include "qint.h"
 #include "csengine/camera.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 
 IMPLEMENT_IBASE (csCamera)
   IMPLEMENTS_INTERFACE (iCamera)
@@ -39,8 +39,8 @@ csCamera::csCamera () : csOrthoTransform()
   aspect = default_aspect;
   inv_aspect = default_inv_aspect;
   fov_angle = default_fov_angle;
-  shift_x = csWorld::frame_width / 2;
-  shift_y = csWorld::frame_height / 2;
+  shift_x = csEngine::frame_width / 2;
+  shift_y = csEngine::frame_height / 2;
   use_farplane = false;
   fp = NULL;
 }
@@ -224,4 +224,3 @@ void csCamera::ComputeDefaultAngle (int width)
   float disp_radius = sqrt (rview_fov*rview_fov + disp_width*disp_width);
   default_fov_angle = 2. * acos (disp_width / disp_radius) * (360./(2.*M_PI));
 }
-

@@ -24,7 +24,7 @@
 #include "csengine/polyplan.h"
 #include "csengine/polytmap.h"
 #include "csengine/sector.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
 #include "csengine/camera.h"
@@ -48,7 +48,7 @@ bool csPolygon3D::do_cache_lightmaps = true;
 // overflow. And we don't have to do allocation every time we
 // come here. We do an IncRef on this object each time a new
 // csPolygon3D is created and an DecRef each time it is deleted.
-// Thus, when the world is cleaned, the array is automatically
+// Thus, when the engine is cleaned, the array is automatically
 // cleaned too.
 static DECLARE_GROWING_ARRAY_REF (VectorArray, csVector3);
 
@@ -281,7 +281,7 @@ csPolygon3D::~csPolygon3D ()
   if (plane) { plane->DecRef (); plane = NULL; }
   if (flags.Check (CS_POLY_DELETE_PORTAL)) { delete portal; portal = NULL; }
   while (light_info.lightpatches)
-    csWorld::current_world->lightpatch_pool->Free (light_info.lightpatches);
+    csEngine::current_engine->lightpatch_pool->Free (light_info.lightpatches);
   VectorArray.DecRef ();
 #ifdef DO_HW_UVZ
   if ( uvz ) delete [] uvz;
@@ -464,7 +464,7 @@ void csPolygon3D::eiPolygon3D::CreatePlane (const csVector3 &iOrigin, const csMa
 bool csPolygon3D::eiPolygon3D::SetPlane (const char *iName)
 {
   csPolyTxtPlane *ppl =
-    (csPolyTxtPlane *)csWorld::current_world->planes.FindByName (iName);
+    (csPolyTxtPlane *)csEngine::current_engine->planes.FindByName (iName);
   if (!ppl) return false;
   scfParent->SetTextureSpace (ppl);
   return true;
@@ -672,8 +672,8 @@ void csPolygon3D::CreateLightMaps (iGraphics3D* /*g3d*/)
   if (!lmi || !lmi->tex->lm) return;
 
   if (lmi->tex->lm)
-    lmi->tex->lm->ConvertFor3dDriver (csWorld::current_world->NeedPO2Maps,
-      csWorld::current_world->MaxAspectRatio);
+    lmi->tex->lm->ConvertFor3dDriver (csEngine::current_engine->NeedPO2Maps,
+      csEngine::current_engine->MaxAspectRatio);
 }
 
 float csPolygon3D::GetArea()
@@ -1301,10 +1301,10 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     float rx, ry, rpointx, rpointy;
 
     // Perspective correct the point.
-    float iz = csWorld::current_world->current_camera->GetFOV ()/reentern->z;
+    float iz = csEngine::current_engine->current_camera->GetFOV ()/reentern->z;
     csVector2 rvert;
-    rvert.x = reentern->x * iz + csWorld::current_world->current_camera->GetShiftX ();
-    rvert.y = reentern->y * iz + csWorld::current_world->current_camera->GetShiftY ();
+    rvert.x = reentern->x * iz + csEngine::current_engine->current_camera->GetShiftX ();
+    rvert.y = reentern->y * iz + csEngine::current_engine->current_camera->GetShiftY ();
 
     if (reenter == exit && reenter->z > -SMALL_EPSILON)
     { rx = ex;  ry = ey; }
@@ -1529,13 +1529,13 @@ void csPolygon3D::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
   csPolyTexLightMap* lmi = GetLightMapInfo ();
   if (!lmi || lmi->tex->lm == NULL) return;
   if (!do_cache) { lmi->lightmap_up_to_date = false; return; }
-  if (csWorld::do_force_relight || !csWorld::current_world->IsLightingCacheEnabled ())
+  if (csEngine::do_force_relight || !csEngine::current_engine->IsLightingCacheEnabled ())
   {
     lmi->tex->InitLightMaps ();
     lmi->lightmap_up_to_date = false;
   }
   else if (!lmi->tex->lm->ReadFromCache (lmi->tex->w_orig, lmi->tex->h,
-    owner, this, true, index, csWorld::current_world))
+    owner, this, true, index, csEngine::current_engine))
   {
     lmi->tex->InitLightMaps ();
     lmi->lightmap_up_to_date = true;
@@ -1597,7 +1597,7 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
   {
     // We are working for a dynamic light. In this case we create
     // a light patch for this polygon.
-    csLightPatch* lp = csWorld::current_world->lightpatch_pool->Alloc ();
+    csLightPatch* lp = csEngine::current_engine->lightpatch_pool->Alloc ();
     GetBasePolygon ()->AddLightpatch (lp);
     csDynLight* dl = (csDynLight*)lview.userdata;
     dl->AddLightpatch (lp);
@@ -1940,8 +1940,8 @@ void csPolygon3D::CacheLightMaps (csPolygonSet* owner, int index)
   if (!lmi->lightmap_up_to_date)
   {
     lmi->lightmap_up_to_date = true;
-    if (csWorld::current_world->IsLightingCacheEnabled () && do_cache_lightmaps)
-      lmi->tex->lm->Cache (owner, this, index, csWorld::current_world);
+    if (csEngine::current_engine->IsLightingCacheEnabled () && do_cache_lightmaps)
+      lmi->tex->lm->Cache (owner, this, index, csEngine::current_engine);
   }
   lmi->tex->lm->ConvertToMixingMode ();
 }

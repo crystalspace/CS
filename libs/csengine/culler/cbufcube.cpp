@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/polyclip.h"
 #include "csengine/cbufcube.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 
 bool csCBufferPersp::DoPerspective (csVector3* verts, int num_verts,
 	csPolygon2D& persp)
@@ -75,7 +75,8 @@ bool csCBufferPersp::DoPerspective (csVector3* verts, int num_verts,
       {
 	if (verts[i1].z < EPSILON)
 	{
-	  // We need to intersect and add both intersection point and this point.
+	  // We need to intersect and add both intersection point and this
+	  // point.
 	  csIntersect3::ZPlane (EPSILON, verts[i], verts[i1], isect);
 	  persp.AddPerspectiveAspect (isect, 512, 512);
 	}
@@ -311,4 +312,3 @@ bool csCBufferCube::TestPolygon (csVector3* verts, int num_verts)
 
   return false;
 }
-

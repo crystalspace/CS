@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BSP_H
-#define BSP_H
+#ifndef __CS_BSP_H__
+#define __CS_BSP_H__
 
 #include "csgeom/math3d.h"
 #include "csengine/polytree.h"
@@ -282,5 +282,4 @@ public:
   }
 };
 
-#endif /*BSP_H*/
-
+#endif // __CS_BSP_H__

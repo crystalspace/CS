@@ -7,7 +7,7 @@
 #include "csengine/collider.h"
 #include "icollide.h"
 
-class csWorld;
+class csEngine;
 class csSprite3D;
 class ctRigidBody;
 class ctCollidingContact;
@@ -40,7 +40,7 @@ public:
 	static csRigidSpaceTimeObj *space_time_continuum[ MAX_SPACE_TIME_NUM ];
 	static long continuum_end;
 
-  static void evolve_system( real t1, real t2, ctWorld *time_world, csWorld *space_world );
+  static void evolve_system( real t1, real t2, ctWorld *time_world, csEngine *space_engine );
 
 	csCollider *col;
 	csSprite3D *sprt;

@@ -71,7 +71,7 @@ Steve made the Macintosh port of Crystal Space.  He also did some
 optimizations on the assembler @samp{draw_scanline()} routines.  Steve made
 the first preliminary physics system and also implemented an easy uniform kind
 of dynamic lighting useful for fluorescent lights and such.  Steve greatly
-enhanced the routines to parse the world format.
+enhanced the routines to parse the map format.
 
 @item
 Bill Bohan (@email{zorn@@technologist.com})
@@ -258,9 +258,9 @@ Nathaniel)!
 @item
 Thomas Ogbuji, Chimezie (@email{thomasog@@uiuc.edu})
 
-Thomas Ogbuji wrote the Crystal Space world file to @sc{vrml} convertor in
-Java.  He also wrote the Java Crystal Space world file editor (not really a
-level editor, but for editing world files).
+Thomas Ogbuji wrote the Crystal Space map file to @sc{vrml} convertor in
+Java.  He also wrote the Java Crystal Space map file editor (not really a
+level editor, but for editing map files).
 
 @item
 Helge Foerster (@email{Helge.Foerster@@t-online.de})

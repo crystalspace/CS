@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csengine/cbuffer.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
@@ -570,6 +570,3 @@ void csCBuffer::GfxDump (iGraphics2D* ig2d, iGraphics3D* ig3d)
     }
   }
 }
-
-//---------------------------------------------------------------------------
-

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef THING_H
-#define THING_H
+#ifndef __CS_THING_H__
+#define __CS_THING_H__
 
 #include "csgeom/transfrm.h"
 #include "csengine/polyset.h"
@@ -29,7 +29,7 @@
 #include "imovable.h"
 
 class csSector;
-class csWorld;
+class csEngine;
 class csStatLight;
 class csMaterialWrapper;
 class csMaterialList;
@@ -120,7 +120,7 @@ protected:
   /// Move this thing to the specified sector. Can be called multiple times.
   virtual void MoveToSector (csSector* s);
 
-  /// Remove this thing from all sectors it is in (but not from the world).
+  /// Remove this thing from all sectors it is in (but not from the engine).
   virtual void RemoveFromSectors ();
 
   /**
@@ -140,7 +140,7 @@ public:
   /**
    * Create an empty thing.
    */
-  csThing (csWorld* world, bool is_sky = false);
+  csThing (csEngine*, bool is_sky = false);
 
   /// Destructor.
   virtual ~csThing ();
@@ -299,4 +299,4 @@ public:
   friend struct eiThing;
 };
 
-#endif /*THING_H*/
+#endif // __CS_THING_H__

@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csengine/material.h"
 #include "csengine/texture.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "itxtmgr.h"
 
 IMPLEMENT_IBASE (csMaterial)
@@ -64,7 +64,8 @@ void csMaterial::GetFlatColor (csRGBpixel &oColor)
   }
 }
 
-void csMaterial::GetReflection (float &oDiffuse, float &oAmbient, float &oReflection)
+void csMaterial::GetReflection (float &oDiffuse, float &oAmbient,
+  float &oReflection)
 {
   oDiffuse = diffuse;
   oAmbient = ambient;
@@ -85,7 +86,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterial* material) :
   CONSTRUCT_IBASE (NULL);
   csMaterialWrapper::material = material;
   material->IncRef ();
-  csWorld::current_world->AddToCurrentRegion (this);
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &th) :
@@ -95,7 +96,7 @@ csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &th) :
   (material = th.material)->IncRef ();
   handle = th.GetMaterialHandle ();
   SetName (th.GetName ());
-  csWorld::current_world->AddToCurrentRegion (this);
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
@@ -104,7 +105,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
   CONSTRUCT_IBASE (NULL);
   ith->IncRef ();
   handle = ith;
-  csWorld::current_world->AddToCurrentRegion (this);
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMaterialWrapper::~csMaterialWrapper ()
@@ -128,7 +129,7 @@ void csMaterialWrapper::Register (iTextureManager *txtmgr)
   handle = txtmgr->RegisterMaterial (material);
 }
 
-//-------------------------------------------------------- csMaterialList -----//
+//------------------------------------------------------ csMaterialList -----//
 
 csMaterialList::~csMaterialList ()
 {

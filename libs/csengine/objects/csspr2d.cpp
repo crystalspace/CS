@@ -20,13 +20,11 @@
 #include "cssysdef.h"
 #include "csgeom/polyclip.h"
 #include "csengine/csspr2d.h"
-#include "csengine/world.h"
+#include "csengine/engine.h"
 #include "csengine/sector.h"
 #include "csengine/pol2d.h"
 #include "csengine/light.h"
 #include <math.h>
-
-//=============================================================================
 
 IMPLEMENT_CSOBJTYPE (csSprite2D, csSprite)
 

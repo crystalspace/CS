@@ -114,9 +114,9 @@ private:
  * The alogorithm works as follows. First, a dependency matrix is built. Here
  * is a example of a simple dependency matrix:
  * <pre>
- *                iWorld       iVFS     iGraphics3D iGraphics2D
+ *                iEngine      iVFS     iGraphics3D iGraphics2D
  *             +-----------+-----------+-----------+-----------+
- * iWorld      |           |     X     |     X     |     X     |
+ * iEngine     |           |     X     |     X     |     X     |
  *             +-----------+-----------+-----------+-----------+
  * iVFS        |           |           |           |           |
  *             +-----------+-----------+-----------+-----------+
@@ -125,38 +125,38 @@ private:
  * iGraphics2D |           |     X     |           |           |
  *             +-----------+-----------+-----------+-----------+
  * </pre>
- * Thus, we see that the iWorld plugin depends on iVFS, iGraphics3D and
+ * Thus, we see that the iEngine plugin depends on iVFS, iGraphics3D and
  * iGraphics2D plugins (this is an abstract example, in reality the
  * things are simpler), iVFS does not depend on anything, iGraphics3D
  * wants the iVFS and the iGraphics2D plugins, and finally iGraphics2D
  * wants just the iVFS.
  * <p>
  * The sort algorithm works as follows: we take each plugin, one by one
- * starting from first (iWorld) and examine each of them. If some plugin
+ * starting from first (iEngine) and examine each of them. If some plugin
  * depends on others, we recursively launch this algorithm on those plugins.
  * If we don't have any more dependencies, we put the plugin into the
  * load list and return to the previous recursion level. To detect loops
- * we need to maintain an "recurse list", thus if we found that iWorld
+ * we need to maintain an "recurse list", thus if we found that iEngine
  * depends on iGraphics3D, iGraphics3D depends on iGraphics2D and we're
  * examining iGraphics2D for dependencies, we have the following
- * loop-detection array: iWorld, iGraphics3D, iGraphics2D. If we find that
+ * loop-detection array: iEngine, iGraphics3D, iGraphics2D. If we find that
  * iGraphics2D depends on anyone that is in the loop array, we found a loop.
  * If we find that the plugin depends on anyone that is already in the load
  * list, its not a loop but just an already-fullfilled dependency.
  * Thus, the above table will be traversed this way (to the left is the
  * load list, to the right is the loop detection list):
  * <pre><ol>
- *   <li> []                                    [iWorld]
- *   <li> []                                    [iWorld,iVFS]
- *   <li> [iVFS]                                [iWorld]
- *   <li> [iVFS]                                [iWorld,iGraphics3D]
- *   <li> [iVFS]                                [iWorld,iGraphics3D,iGraphics2D]
- *   <li> [iVFS,iGraphics2D]                    [iWorld,iGraphics3D]
- *   <li> [iVFS,iGraphics2D,iGraphics3D]        [iWorld]
- *   <li> [iVFS,iGraphics2D,iGraphics3D,iWorld] []
+ *   <li> []                                     [iEngine]
+ *   <li> []                                     [iEngine,iVFS]
+ *   <li> [iVFS]                                 [iEngine]
+ *   <li> [iVFS]                                 [iEngine,iGraphics3D]
+ *   <li> [iVFS]                                 [iEngine,iGraphics3D,iGraphics2D]
+ *   <li> [iVFS,iGraphics2D]                     [iEngine,iGraphics3D]
+ *   <li> [iVFS,iGraphics2D,iGraphics3D]         [iEngine]
+ *   <li> [iVFS,iGraphics2D,iGraphics3D,iEngine] []
  * </ol></pre>
  * In this example we traversed all plugins in one go. If we didn't, we
- * just take the next one (iWorld, iVFS, iGraphics3D, iGraphics2D) and if
+ * just take the next one (iEngine, iVFS, iGraphics3D, iGraphics2D) and if
  * it is not already in the load list, recursively traverse it.
  */
 bool csPluginList::Sort (csSystemDriver *iSys)

@@ -72,7 +72,7 @@ lacking such a tool.
 @cindex Applications, @file{map2cs}
 @item map2cs
 A map convertors which converts between Quake style @file{.map} format to the
-native Crystal Space @samp{world} format. It is known to work with WorldCraft
+native Crystal Space map format. It is known to work with WorldCraft
 2.1 Beta and QuArK (Quake Army Knife). @xref{map2cs}.
 
 @cindex @file{MazeD}

@@ -37,7 +37,7 @@ instance:
 
 @example
 [World]
-; Start world file
+; Start map file
 WORLDFILE=flarge
 @end example
 
