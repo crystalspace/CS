@@ -307,7 +307,6 @@
 // CS Util
 #ifndef NO_CSUTIL
 #include "csutil/2bitary.h"
-#include "csutil/archive.h"
 #include "csutil/bitarray.h"
 #include "csutil/bitary2d.h"
 #include "csutil/bitset.h"
@@ -366,7 +365,6 @@
 #include "csutil/typedvec.h"
 #include "csutil/util.h"
 #include "csutil/virtclk.h"
-//#include "csutil/zip.h"
 #endif
 
 // CS Gfx

@@ -65,7 +65,7 @@ map2csclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/map2cs.dep
 $(OUTOS)/map2cs.dep: $(SRC.MAP2CS)
-	$(DO.DEP)
+	$(DO.DEP1) $(ZLIB.CFLAGS) $(DO.DEP2)
 else
 -include $(OUTOS)/map2cs.dep
 endif

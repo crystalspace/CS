@@ -58,11 +58,11 @@ tbconvertclean:
 	-$(RMDIR) $(TBCONVERT.EXE) $(OBJ.TBCONVERT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)tbconvert.dep
-$(OUTOS)tbconvert.dep: $(SRC.TBCONVERT)
+dep: $(OUTOS)/tbconvert.dep
+$(OUTOS)/tbconvert.dep: $(SRC.TBCONVERT)
 	$(DO.DEP)
 else
--include $(OUTOS)tbconvert.dep
+-include $(OUTOS)/tbconvert.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

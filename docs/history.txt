@@ -65,6 +65,8 @@ The history order is reversed so that new features are at the top.
 	  the X11-related plugins are built only if the configuration phase
 	  discovered the presence of X11, and the OpenGL-related plugins are
 	  built only if the configuration phase discovered OpenGL.
+	- Eric Sunshine eliminated several warnings issued during invocation of
+	  "make depend".
 12-Oct-2002
 	- Jonathan Tarbox eliminated some MSVC warnings from the opcode plugin.
 11-Oct-2002
