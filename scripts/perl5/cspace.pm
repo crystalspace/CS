@@ -53,7 +53,6 @@ package cspace;
 *csPrintf = *cspacec::csPrintf;
 *csFPutErr = *cspacec::csFPutErr;
 *csPrintfErr = *cspacec::csPrintfErr;
-*csPrintfErrV = *cspacec::csPrintfErrV;
 *csGetTicks = *cspacec::csGetTicks;
 *csSleep = *cspacec::csSleep;
 *csGetUsername = *cspacec::csGetUsername;
