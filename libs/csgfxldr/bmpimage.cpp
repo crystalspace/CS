@@ -112,7 +112,7 @@ ImageBMPFile::ImageBMPFile (UByte* ptr, long filesize) : csImageFile ()
 
   if( (memcmp( ptr, BM, 2 )==0) && 
       (*BISIZE(ptr)) == WinHSize && 
-      (*BICOMP(ptr)) == BI_RGB )
+      ((*BICOMP(ptr)) == BI_RGB || (*BICOMP(ptr)) == BI_RLE8))
   {
      const int bmp_width  = (*BIWIDTH(ptr));
      const int bmp_height = (*BIHEIGHT(ptr));
@@ -136,28 +136,77 @@ ImageBMPFile::ImageBMPFile (UByte* ptr, long filesize) : csImageFile ()
      {
        char *pal = BIPALETTE(ptr);
 
-       while( iPtr < ptr + filesize && pixelIdx < bmp_size )
-       {
-          char *palEnt = PALENT(pal,*iPtr++);
-
-          RGBPixel *buf = &bufPtr[buffer_y + buffer_x];
-          buf->blue    = *palEnt;
-          buf->green   = *(palEnt+1);
-          buf->red     = *(palEnt+2);
+       if ( (*BICOMP(ptr)) == BI_RGB ){
+         while( iPtr < ptr + filesize && pixelIdx < bmp_size )
+         {
+            char *palEnt = PALENT(pal,*iPtr++);
+  
+            RGBPixel *buf = &bufPtr[buffer_y + buffer_x];
+            buf->blue    = *palEnt;
+            buf->green   = *(palEnt+1);
+            buf->red     = *(palEnt+2);
           
-          if(++buffer_x >= bmp_width)
-          {
-            buffer_x  = 0;
-            buffer_y -= bmp_width;
-          }
+            if(++buffer_x >= bmp_width)
+            {
+              buffer_x  = 0;
+              buffer_y -= bmp_width;
+            }
 
-          pixelIdx++;
+            pixelIdx++;
+         }
+       }else if ((*BICOMP(ptr)) == BI_RLE8) {
+         char *palEnt;
+         UByte rl, rl1, i; // runlength
+         UByte clridx, clridx1; // colorindex
+         while( iPtr < ptr + filesize && pixelIdx < bmp_size )
+         {
+	    rl = rl1 = *iPtr++;
+	    clridx = clridx1 = *iPtr++;
+	    if ( rl == 0 )
+	       if ( clridx == 0 ){
+		  // new scanline
+	          pixelIdx += ( bmp_width - buffer_x );
+	          buffer_x  = 0;
+	          buffer_y -= bmp_width;
+	          continue;
+		}else if ( clridx == 1 ){
+		  // end of bitmap
+		  pixelIdx = bmp_size;
+		  continue;
+		}else if ( clridx == 2 ){
+		  // next 2 bytes mean column- and scanlineoffset
+		  buffer_x += *iPtr;
+		  pixelIdx += *iPtr++;
+		  buffer_y -= ( bmp_width * (*iPtr) );
+		  pixelIdx += ( bmp_width * (*iPtr++) );
+		  continue;
+		}else if ( clridx > 2 )
+		  rl1 = clridx;
+		  
+            for ( i = 0; i < rl1; i++ ){
+	      if ( !rl )
+	         clridx1 = *iPtr++;
+	      palEnt = PALENT(pal,clridx1);	    
+              RGBPixel *buf = &bufPtr[buffer_y + buffer_x];
+              buf->blue    = *palEnt;
+              buf->green   = *(palEnt+1);
+              buf->red     = *(palEnt+2);
+          
+              if(++buffer_x >= bmp_width)
+              {
+                buffer_x  = 0;
+                buffer_y -= bmp_width;
+              }
+
+              pixelIdx++;
+	    }
+	    // pad in case rl == 0 and clridx in [3..255]
+	    if ( rl == 0 && ( clridx & 0x01 )) iPtr++;
+         }
        }
        status = IFE_OK;
      }
-     else if( !(*BICLRUSED(ptr)) && 
-              !(*BICLRIMP(ptr)) &&
-              (*BITCOUNT(ptr)) == TRUECOLOR24 )
+     else if( !(*BICLRUSED(ptr)) && (*BITCOUNT(ptr)) == TRUECOLOR24 )
      {
        while( iPtr < ptr + filesize && pixelIdx < bmp_size )
        {
