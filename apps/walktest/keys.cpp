@@ -67,13 +67,6 @@ void RandomColor (float& r, float& g, float& b)
   }
 }
 
-void light_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
-{
-  csLight *lights [10];
-  int num_lights = Sys->world->GetNearbyLights (where, pos, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 10);
-  sprite->UpdateLighting (lights, num_lights);
-}
-
 void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
 {
   sprite->SetMove (pos);
@@ -99,7 +92,7 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where, csVector3 con
   CHK (csDataObject* sprdata = new csDataObject ((void*)1));
   spr->ObjAdd (sprdata);
 
-  light_sprite (spr, where, pos);
+  spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   return spr;
 }
 
@@ -646,7 +639,7 @@ void light_statics ()
       const char* name = csNameObject::GetName (*spr);
       if (!strcmp (name, "__testSkel__")) animate_skeleton (sk_state);
     }
-    light_sprite (spr, (csSector*)(spr->sectors[0]), spr->GetW2TTranslation ());
+    spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
 }
 

@@ -279,6 +279,8 @@ csSprite3D::csSprite3D () : csObject ()
   skeleton_state = NULL;
   MixMode = FX_Copy;
   Alpha   = 0.0f;
+  defered_num_lights = 0;
+  defered_lighting_flags = 0;
 }
 
 csSprite3D::~csSprite3D ()
@@ -440,6 +442,8 @@ float* csSprite3D::z_verts = NULL;
 csVector2* csSprite3D::uv_verts = NULL;
 csVector2* csSprite3D::persp = NULL;
 bool* csSprite3D::visible = NULL;
+static int csSprite3D::max_light_worktable = 0;
+csLight** csSprite3D::light_worktable = NULL;
 
 void csSprite3D::UpdateWorkTables (int max_size)
 {
@@ -459,6 +463,23 @@ void csSprite3D::UpdateWorkTables (int max_size)
   }
 }
 
+void csSprite3D::UpdateDeferedLighting ()
+{
+  if (defered_num_lights)
+  {
+    if (defered_num_lights > max_light_worktable)
+    {
+      CHK (delete [] light_worktable);
+      CHK (light_worktable = new csLight* [defered_num_lights]);
+      max_light_worktable = defered_num_lights;
+    }
+    csSector* sect = (csSector*)sectors[0];
+    int num_lights = csWorld::current_world->GetNearbyLights (sect,
+      GetW2TTranslation (), defered_lighting_flags, light_worktable, defered_num_lights);
+    UpdateLighting (light_worktable, num_lights);
+  }
+}
+
 void csSprite3D::Draw (csRenderView& rview)
 {
   if (!tpl->cstxt)
@@ -468,6 +489,7 @@ void csSprite3D::Draw (csRenderView& rview)
   }
 
   UpdateWorkTables (tpl->num_vertices);
+  UpdateDeferedLighting ();
 
   int i;
   csFrame * cframe = cur_action->GetFrame (cur_frame);
@@ -724,15 +746,17 @@ void csSprite3D::RemoveFromSectors ()
   }
 }
 
-#if 0
-void csSprite3D::DeferUpdateLighting (csLight** lights, int num_lights)
+void csSprite3D::DeferUpdateLighting (int flags, int num_lights)
 {
+  defered_num_lights = num_lights;
+  defered_lighting_flags = flags;
 }
-#endif
 
 void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 {
   int i, j;
+
+  defered_num_lights = 0;
 
   csFrame* this_frame = tpl->GetFrame (cur_frame);
   csVector3* object_vertices;

@@ -285,9 +285,15 @@ private:
   static csVector2* persp;
   /// Array which indicates which vertices are visible and which are not.
   static bool* visible;
+  /// Array for lighting.
+  static csLight** light_worktable;
+  static int max_light_worktable;
 
   /// Update the above tables with a new size.
   static void UpdateWorkTables (int max_size);
+
+  /// Update defered lighting.
+  void UpdateDeferedLighting ();
 
 public:
   /// List of sectors where this sprite is.
@@ -350,6 +356,12 @@ private:
   /// Skeleton state (optional).
   csSkeletonState* skeleton_state;
 
+  /// Defered lighting. If > 0 then we have defered lighting.
+  int defered_num_lights;
+
+  /// Flags to use for defered lighting.
+  int defered_lighting_flags;
+
 public:
   ///
   csSprite3D ();
@@ -400,6 +412,13 @@ public:
    * but this will do for now.
    */
   void UpdateLighting (csLight** lights, int num_lights);
+
+  /**
+   * Update lighting as soon as the sprite becomes visible.
+   * This will call world->GetNearestLights with the supplied
+   * parameters.
+   */
+  void DeferUpdateLighting (int flags, int num_lights);
 
   ///
   void UnsetTexture ()
