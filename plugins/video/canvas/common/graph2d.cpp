@@ -561,7 +561,7 @@ iImage *csGraphics2D::ScreenShot ()
 
 iGraphics2D *csGraphics2D::CreateOffScreenCanvas  
   (int width, int height, void *buffer, csOffScreenBuffer hint, 
-   csPixelFormat *pfmt = NULL, RGBPixel *palette = NULL, int pal_size = 0)
+   csPixelFormat *pfmt, RGBPixel *palette, int pal_size)
 {
   // default return a software canvas
   csProcTextureSoft2D *tex = new csProcTextureSoft2D (System);

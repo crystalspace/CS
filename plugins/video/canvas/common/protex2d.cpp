@@ -44,7 +44,7 @@ csProcTextureSoft2D::~csProcTextureSoft2D ()
 
 iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas 
   (int width, int height, void *buffer, csOffScreenBuffer hint, 
-   csPixelFormat *ipfmt, RGBPixel *palette = NULL, int pal_size = 0)
+   csPixelFormat *ipfmt, RGBPixel *palette, int pal_size)
 {
   Width = width;
   Height = height;
