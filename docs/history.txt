@@ -18,6 +18,10 @@ Short-term cleanups that need to be done:
 	  and PlayerEntity).
 	- Denis Dmitriev fixed some CHK macro uses.
 	- Denis also fixed a memory leak in c-buffer code.
+	- Transformed quadtree stuff to 2D instead of 3D. This already
+	  makes it somewhat faster but I have plans for even more speed-ups.
+	- I moved csQuadcube from csgeom to csengine. Update the project
+	  files for this.
 18-Oct-1999
 	- Scott Wood <scott@geekland.cx> sent me patches to allow CS
 	  to compile on Alpha machines.
