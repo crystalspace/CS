@@ -772,15 +772,16 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   csFrustumView new_lview = *lview;
   csVector3 poly[40];
   int num_vert = 4;
-  if( !destpoly3d->GetLightMapInfo()->GetPolyTex()->
-    GetLightmapBounds(lview, poly) )
-    /// empty intersection or lightmap has already been seen by frustum.
-    return;
-  new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vert);
-  // empty intersection, none covered (will be skipped)
-  if(!new_lview.light_frustum) return;
+  if(dest)
+  {
+    if( !destpoly3d->GetLightMapInfo()->GetPolyTex()->
+      GetLightmapBounds(lview, poly) )
+      /// empty intersection or lightmap has already been seen by frustum.
+      return;
+    new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vert);
+    // empty intersection, none covered (will be skipped)
+    if(!new_lview.light_frustum) return;
 
-  if(dest) {
     /// radiosity to this polygon.
     csRadiosity *rad = (csRadiosity*)lview->userdata;
     rad->ProcessDest(dest, &new_lview);
@@ -810,7 +811,8 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
     for (j = 0 ; j < num_vertices ; j++)
       poly[j] = destpoly3d->Vwor (j) - center;
  
-  delete new_lview.light_frustum;
+  if(dest)
+    delete new_lview.light_frustum;
   new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vertices);
   if (!new_lview.light_frustum) return;
 
