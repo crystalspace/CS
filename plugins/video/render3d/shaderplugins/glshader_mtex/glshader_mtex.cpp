@@ -241,7 +241,10 @@ bool csShaderGLMTEX::LoadLayer(mtexlayer* layer, iDocumentNode* node)
           if (engine)
             layer->texturehandle = 
               engine->FindTexture (texname)->GetTextureHandle ();
-        } else {
+        } 
+        
+        if (child->GetAttributeValue ("number"))
+        {
           int tnum = child->GetAttributeValueAsInt("number");
           if(tnum < 0) continue;
           layer->texnum = tnum;
@@ -429,7 +432,7 @@ void csShaderGLMTEX::SetupState (iShaderPass *curret, csRenderMesh *mesh)
     GLuint texturehandle = 0;
     iTextureHandle* txt_handle = layer->texturehandle;
 
-    if (!txt_handle)
+    if (layer->texnum >= 0)
     {
       csRef<csMaterialHandle> mathand ((csMaterialHandle*)(mesh->GetMaterialHandle ()));
       if(layer->texnum == 0)
@@ -442,7 +445,8 @@ void csShaderGLMTEX::SetupState (iShaderPass *curret, csRenderMesh *mesh)
         txt_handle = matlayer->txt_handle;
       }
     }
-    r3d->ActivateTexture (txt_handle, i);
+    if (txt_handle)
+      r3d->ActivateTexture (txt_handle, i);
   }
   ext->glActiveTextureARB(GL_TEXTURE0_ARB);
   ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
