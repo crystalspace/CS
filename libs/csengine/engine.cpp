@@ -1989,7 +1989,7 @@ int csEngine::GetNearbyLights (
       {
         sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
 #ifdef CS_USE_NEW_RENDERER
-        if (sqrt (sqdist) < dl->GetInfluenceRadius ())
+        if (sqdist < dl->GetInfluenceRadiusSq ())
 #else
         if (sqdist < dl->GetSquaredRadius ())
 #endif

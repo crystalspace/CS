@@ -40,6 +40,9 @@ The history order is reversed so that new features are at the top.
 	  action is to clear the polygon mesh for that specific type (colldet
 	  or viscull). This basically disables collision detection or
 	  occlusion writing for that object.
+	- Fixed two cases (in engine and genmesh) where a comparison was done
+	  with the influence radius of a light (for new renderer) instead
+	  of with the squared radius. Avoid qsqrt or sqrt at all cost!
 15-Apr-2003
 	- Fixed a bug in the thing plugin.  If the dynavis culler was already
 	  mentioned before all other objects in the sector then this could
