@@ -13,6 +13,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+14-Sep-1999
+	- Eric Sunshine fixed a bug in VFS where csFile::GetSize() was
+	  incorrectly reporting the file's size for "real" disk-based files.
+	- Eric Sunshine fixed a bug in VFS where csFile::GetStatus() would
+	  crash with a BUS error if the file had failed to open.
 13-Sep-1999
 	- Added djgpp.html doc from Seth Galbraith.  Seth also updated
 	  tutorial.html.
