@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+8-Aug-2002
+	- Removed support/doom2cs again. This doom2cs utility can now be
+	  found at ftp://sunsite.dk/projects/crystal/contrib/doom2cs.zip
 7-Aug-2002
 	- Eric Sunshine fixed a couple problems with csconf.mak.  First, it was
 	  using " instead of $".  It was using the hardcoded path "out/"
