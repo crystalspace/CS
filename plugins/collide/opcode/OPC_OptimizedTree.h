@@ -21,43 +21,43 @@
 #define __OPC_OPTIMIZEDTREE_H__
 
 	//! Common interface for a node of an implicit tree
-	#define IMPLEMENT_IMPLICIT_NODE(base_class, volume)														\
-		public:																								\
-		/* Constructor / Destructor */																		\
-		inline_								base_class() : mData(0)	{}										\
-		inline_								~base_class()			{}										\
-		/* Leaf test */																						\
-		inline_			BOOL				IsLeaf()		const	{ return mData&1;					}	\
-		/* Data access */																					\
-		inline_			const base_class*	GetPos()		const	{ return (base_class*)mData;		}	\
-		inline_			const base_class*	GetNeg()		const	{ return ((base_class*)mData)+1;	}	\
-		inline_			udword				GetPrimitive()	const	{ return (mData>>1);				}	\
-		/* Stats */																							\
-		inline_			udword				GetNodeSize()	const	{ return SIZEOFOBJECT;				}	\
-																											\
-						volume				mAABB;															\
-						udword				mData;
+	#define IMPLEMENT_IMPLICIT_NODE(base_class, volume)						\
+		public:											\
+		/* Constructor / Destructor */								\
+		inline_	base_class() : mData(0)	{}							\
+		inline_	~base_class() {}								\
+		/* Leaf test */										\
+		inline_	bool IsLeaf() const { return mData&1; }						\
+		/* Data access */									\
+		inline_	const base_class* GetPos() const { return (base_class*)mData;		}	\
+		inline_	const base_class* GetNeg() const { return ((base_class*)mData)+1;	}	\
+		inline_	/*udword*/uintptr_t GetPrimitive() const { return (mData>>1);		}	\
+		/* Stats */										\
+		inline_	udword GetNodeSize() const { return SIZEOFOBJECT;			}	\
+													\
+		volume mAABB;										\
+		/*udword*/uintptr_t mData;
 
 	//! Common interface for a node of a no-leaf tree
 	#define IMPLEMENT_NOLEAF_NODE(base_class, volume)														\
-		public:																								\
-		/* Constructor / Destructor */																		\
-		inline_								base_class() : mPosData(0), mNegData(0)	{}						\
-		inline_								~base_class()							{}						\
-		/* Leaf tests */																					\
-		inline_			BOOL				HasPosLeaf()		const	{ return mPosData&1;			}	\
-		inline_			BOOL				HasNegLeaf()		const	{ return mNegData&1;			}	\
-		/* Data access */																					\
-		inline_			const base_class*	GetPos()			const	{ return (base_class*)mPosData;	}	\
-		inline_			const base_class*	GetNeg()			const	{ return (base_class*)mNegData;	}	\
-		inline_			udword				GetPosPrimitive()	const	{ return (mPosData>>1);			}	\
-		inline_			udword				GetNegPrimitive()	const	{ return (mNegData>>1);			}	\
-		/* Stats */																							\
-		inline_			udword				GetNodeSize()		const	{ return SIZEOFOBJECT;			}	\
-																											\
-						volume				mAABB;															\
-						udword				mPosData;														\
-						udword				mNegData;
+		public:											\
+		/* Constructor / Destructor */								\
+		inline_	base_class() : mPosData(0), mNegData(0)	{}					\
+		inline_	~base_class() {}								\
+		/* Leaf tests */									\
+		inline_	bool HasPosLeaf() const	{ return mPosData&1;			}		\
+		inline_	bool HasNegLeaf() const	{ return mNegData&1;			}		\
+		/* Data access */									\
+		inline_	const base_class* GetPos() const { return (base_class*)mPosData;	}	\
+		inline_	const base_class* GetNeg() const { return (base_class*)mNegData;	}	\
+		inline_	/*udword*/uintptr_t GetPosPrimitive() const { return (mPosData>>1);	}	\
+		inline_	/*udword*/uintptr_t GetNegPrimitive() const { return (mNegData>>1);	}	\
+		/* Stats */										\
+		inline_	udword GetNodeSize() const { return SIZEOFOBJECT;			}	\
+													\
+		volume mAABB;								  		\
+		/*udword*/uintptr_t mPosData;								\
+		/*udword*/uintptr_t mNegData;
 
 	class OPCODE_API AABBCollisionNode
 	{

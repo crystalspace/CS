@@ -143,7 +143,7 @@ struct iCollideSystem : public iBase
    * Get number of collision pairs in array.
    * \return the number of collision pairs.
    */
-  virtual int GetCollisionPairCount () = 0;
+  virtual size_t GetCollisionPairCount () = 0;
 
   /**
    * Reset the array with collision pairs. It is very important to call

@@ -290,23 +290,23 @@ bool AABBTreeNode::Subdivide(AABBTreeBuilder* builder)
 		AABBTreeNode* Pool = (AABBTreeNode*)builder->mNodeBase;
 		udword Count = builder->GetCount() - 1;	// Count begins to 1...
 		// Set last bit to tell it shouldn't be freed ### pretty ugly, find a better way. Maybe one bit in mNbPrimitives
-		ASSERT(!(udword(&Pool[Count+0])&1));
-		ASSERT(!(udword(&Pool[Count+1])&1));
-		mPos = udword(&Pool[Count+0])|1;
+		ASSERT(!(uintptr_t(&Pool[Count+0])&1));
+		ASSERT(!(uintptr_t(&Pool[Count+1])&1));
+		mPos = uintptr_t(&Pool[Count+0])|1;
 #ifndef OPC_NO_NEG_VANILLA_TREE
-		mNeg = udword(&Pool[Count+1])|1;
+		mNeg = uintptr_t(&Pool[Count+1])|1;
 #endif
 	}
 	else
 	{
 		// Non-complete trees and/or Opcode 1.2 allocate nodes on-the-fly
 #ifndef OPC_NO_NEG_VANILLA_TREE
-		mPos = (udword)new AABBTreeNode;	CHECKALLOC(mPos);
-		mNeg = (udword)new AABBTreeNode;	CHECKALLOC(mNeg);
+		mPos = (uintptr_t)new AABBTreeNode;	CHECKALLOC(mPos);
+		mNeg = (uintptr_t)new AABBTreeNode;	CHECKALLOC(mNeg);
 #else
 		AABBTreeNode* PosNeg = new AABBTreeNode[2];
 		CHECKALLOC(PosNeg);
-		mPos = (udword)PosNeg;
+		mPos = (uintptr_t)PosNeg;
 #endif
 	}
 

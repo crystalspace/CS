@@ -33,6 +33,7 @@ chronological order.
 	- Jorrit fixed pvscalc so that the kdtree calculation now actually
 	  works. The kdtree is also stored in the cache and pvsvis is able
 	  to read and use it. No visibility information yet.
+	- res silenced some 64bit warnings in the Opcode plugin.
 30-Jan-2005
 	- res fixed a leak in spr2d.
 	- res fixed a leak in the VBO buffer manager.

@@ -237,7 +237,7 @@ bool csOPCODECollideSystem::CollideRay (
       for (i = 0 ; i < collision_faces.Length () ; i++)
       {
         int idx = collision_faces[i] * 3;
-	int it_idx = intersecting_triangles.Push (csIntersectingTriangle ());
+	int it_idx = (int)intersecting_triangles.Push (csIntersectingTriangle ());
 	c = &vertholder[indexholder[idx+0]];
 	intersecting_triangles[it_idx].a.Set (c->x, c->y, c->z);
 	c = &vertholder[indexholder[idx+1]];
@@ -272,7 +272,7 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
   Point* current;
   int i, j;
 
-  int oldlen = pairs.Length ();
+  size_t oldlen = pairs.Length ();
   pairs.SetLength (oldlen + N_pairs);
 
   // it really sucks having to copy all this each Collide query, but
@@ -319,7 +319,7 @@ csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
   return pairs.GetArray ();
 }
 
-int csOPCODECollideSystem::GetCollisionPairCount ()
+size_t csOPCODECollideSystem::GetCollisionPairCount ()
 {
   return pairs.Length ();
 }

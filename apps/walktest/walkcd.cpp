@@ -124,7 +124,7 @@ int CollisionDetect (iEngine* Engine, iCollider *c, iSector* sp,
 	csReversibleTransform *cdt)
 {
   int hit = 0;
-  int j;
+  size_t j;
 
   // Check collision with this sector.
   csCollisionPair* CD_contact;

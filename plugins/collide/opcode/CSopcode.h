@@ -91,7 +91,7 @@ public:
   /**
    * Get number of collision pairs in array.
    */
-  virtual int GetCollisionPairCount ();
+  virtual size_t GetCollisionPairCount ();
 
   /**
    * Reset the array with collision pairs.
