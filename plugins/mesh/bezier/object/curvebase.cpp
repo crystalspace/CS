@@ -724,7 +724,7 @@ float csCurve::GetArea ()
   for (i = 0; i < ct->GetTriangleCount (); i++)
   {
     t = ct->GetTriangle (i);
-    area += ABS (csMath3::Area3 (vertex[t.a], vertex[t.b], vertex[t.c]));
+    area += csMath3::DoubleArea3 (vertex[t.a], vertex[t.b], vertex[t.c]);
   }
 
   return area / 2.0f;

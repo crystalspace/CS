@@ -271,9 +271,9 @@ public:
   }
 
   /**
-   * Calculate the signed area of this polygon.
+   * Calculate the area of this polygon.
    */
-  float GetSignedArea() const;
+  float GetArea() const;
 
   /**
    * Compute and get the central vertex of this polygon.

@@ -496,17 +496,16 @@ public:
   }
 
   /**
-   * Compute twice the signed area of triangle composed by three points.
+   * Compute twice the area of triangle composed by three points.
    * This function returns 2 x the area of the triangle formed by the points
    * a, b, and c.
    */
-  inline static double Area3 (const csDVector3 &a, const csDVector3 &b,
+  inline static double DoubleArea3 (const csDVector3 &a, const csDVector3 &b,
                              const csDVector3 &c)
   {
     csDVector3 v1 = b - a;
     csDVector3 v2 = c - a;
-    return ((v1.y * v2.z + v1.z * v2.x + v1.x * v2.y) -
-            (v1.y * v2.x + v1.x * v2.z + v1.z * v2.y));
+    return (v1 % v2).Norm ();
   }
 
   /**

@@ -647,14 +647,15 @@ csPlane3 csPoly3D::ComputePlane (csVector3 *vertices, int num_vertices)
   return csPlane3 (pl, D);
 }
 
-float csPoly3D::GetSignedArea () const
+float csPoly3D::GetArea () const
 {
   float area = 0.0f;
 
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
   int i;
   for (i = 0; i < num_vertices - 2; i++)
-    area += csMath3::Area3 (vertices[0], vertices[i + 1], vertices[i + 2]);
+    area += csMath3::DoubleArea3 (vertices[0], vertices[i + 1],
+    	vertices[i + 2]);
   return area / 2.0f;
 }
 

@@ -111,9 +111,10 @@ void ConstructPolygonMeshTask::doTask()
         // Is this desireable?
         if(n > 2)
         {
-          float a = csMath3::Area3(thingfac->GetPolygonVertex(polymap[i], n-2),
-                                   thingfac->GetPolygonVertex(polymap[i], n-1),
-                                   thingfac->GetPolygonVertex(polymap[i], n));
+          float a = csMath3::Direction3(
+	  	thingfac->GetPolygonVertex(polymap[i], n-2),
+                thingfac->GetPolygonVertex(polymap[i], n-1),
+                thingfac->GetPolygonVertex(polymap[i], n));
           if(ABS(a) < EPSILON) flat = true;
         }
       }

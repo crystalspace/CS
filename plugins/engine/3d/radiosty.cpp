@@ -520,8 +520,8 @@ void csRadPoly::Setup ()
   CalcLumel2World (lumel_origin, 0, 0);
   CalcLumel2World (lumel_x_axis, 1, 0);
   CalcLumel2World (lumel_y_axis, 0, 1);
-  one_lumel_area = ABS (
-      csMath3::Area3 (lumel_origin, lumel_x_axis, lumel_y_axis));
+  one_lumel_area = csMath3::DoubleArea3 (lumel_origin, lumel_x_axis,
+  	lumel_y_axis);
   csEngine::current_engine->Report ("The one lumel area is %g in size", one_lumel_area);
   lumel_x_axis -= lumel_origin;
   lumel_y_axis -= lumel_origin;

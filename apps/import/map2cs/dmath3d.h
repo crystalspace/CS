@@ -455,20 +455,6 @@ public:
   }
 
   /**
-   * Compute twice the signed area of triangle composed by three points.
-   * This function returns 2 x the area of the triangle formed by the points
-   * a, b, and c.
-   */
-  inline static double Area3 (const CdVector3 &a, const CdVector3 &b,
-                             const CdVector3 &c)
-  {
-    CdVector3 v1 = b - a;
-    CdVector3 v2 = c - a;
-    return ((v1.y * v2.z + v1.z * v2.x + v1.x * v2.y) -
-            (v1.y * v2.x + v1.x * v2.z + v1.z * v2.y));
-  }
-
-  /**
    * Calculate a plane normal given three vectors.
    * This function will calculate the normal to the plane formed by vectors
    * v1, v2, and v3, and store the result in norm.

@@ -229,7 +229,7 @@ bool csPortal::PointOnPolygon (const csVector3& v)
   i1 = vertex_indices.Length () - 1;
   for (i = 0; i < vertex_indices.Length (); i++)
   {
-    float ar = csMath3::Area3 (v, (*vt)[vertex_indices[i1]],
+    float ar = csMath3::Direction3 (v, (*vt)[vertex_indices[i1]],
     	(*vt)[vertex_indices[i]]);
     if (ar < 0)
       neg = true;

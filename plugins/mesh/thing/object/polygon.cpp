@@ -862,7 +862,7 @@ bool csPolygon3DStatic::PointOnPolygon (const csVector3 &v)
   i1 = polygon_data.num_vertices - 1;
   for (i = 0; i < polygon_data.num_vertices; i++)
   {
-    float ar = csMath3::Area3 (v, Vobj (i1), Vobj (i));
+    float ar = csMath3::Direction3 (v, Vobj (i1), Vobj (i));
     if (ar < 0)
       neg = true;
     else if (ar > 0)
@@ -1302,11 +1302,11 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
 	    const csVector3& v_i1 = thing->Vwor (vt_idx[i1]);
 	    const csVector3& v_i = thing->Vwor (vt_idx[i]);
 	    const csVector3& sfp_v_j1 = sfp_thing->Vwor (sfp_vt_idx[j1]);
-            float a1 = csMath3::Area3 (v_i1, v_i, sfp_v_j1);
+            float a1 = csMath3::Direction3 (v_i1, v_i, sfp_v_j1);
             for (j = 0 ; j < sfp_vt_cnt ; j++)
             {
 	      const csVector3& sfp_v_j = sfp_thing->Vwor (sfp_vt_idx[j]);
-              float a = csMath3::Area3 (v_i1, v_i, sfp_v_j);
+              float a = csMath3::Direction3 (v_i1, v_i, sfp_v_j);
               if (ABS (a) < EPSILON && ABS (a1) < EPSILON)
               {
                 // The two points of the shadow frustum are on the same
