@@ -505,11 +505,13 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
 
 void csSCF::UnloadUnusedModules ()
 {
+#ifndef CS_STATIC_LINKED
   for (int i = LibraryRegistry->Length () - 1; i >= 0; i--)
   {
     scfSharedLibrary *sl = (scfSharedLibrary *)LibraryRegistry->Get (i);
     sl->TryUnload ();
   }
+#endif
 }
 
 bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
@@ -524,6 +526,8 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   return true;
 #else
   (void)iLibraryName;
+  (void)iClassID;
+  (void)Dependencies;
   return false;
 #endif
 }
