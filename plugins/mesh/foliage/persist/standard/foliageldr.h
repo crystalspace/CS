@@ -24,6 +24,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "imesh/foliage.h"
 
 struct iEngine;
 struct iReporter;
@@ -43,6 +44,14 @@ private:
   csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
+  bool ParseGeometry (iLoaderContext* ldr_context, iDocumentNode* node,
+      iFoliageGeometry* geom);
+  bool ParseObject (iLoaderContext* ldr_context, iDocumentNode* node,
+      iFoliageObject* obj);
+  bool ParseFoliagePalette (iDocumentNode* node, iFoliageFactoryState* fact);
+  bool ParseFoliagePalette (iDocumentNode* node, iFoliageFactoryState* fact,
+      int index);
+  
 public:
   SCF_DECLARE_IBASE;
 

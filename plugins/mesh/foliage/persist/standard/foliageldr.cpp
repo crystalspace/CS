@@ -41,12 +41,23 @@
 #include "imap/ldrctxt.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector4.h"
+#include "ivaria/terraform.h"
 
 CS_IMPLEMENT_PLUGIN
 
 enum
 {
-  XMLTOKEN_FACTORY = 1
+  XMLTOKEN_FACTORY = 1,
+  XMLTOKEN_TERRAFORMER,
+  XMLTOKEN_SAMPLEREGION,
+  XMLTOKEN_OBJECT,
+  XMLTOKEN_GEOMETRY,
+  XMLTOKEN_V,
+  XMLTOKEN_T,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_FOLIAGEPALETTE,
+  XMLTOKEN_PALETTE,
+  XMLTOKEN_FOLIAGE
 };
 
 SCF_IMPLEMENT_IBASE (csFoliageFactoryLoader)
@@ -109,7 +120,161 @@ bool csFoliageFactoryLoader::Initialize (iObjectRegistry* object_reg)
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
-  //xmltokens.Register ("t", XMLTOKEN_T);
+  xmltokens.Register ("terraformer", XMLTOKEN_TERRAFORMER);
+  xmltokens.Register ("sampleregion", XMLTOKEN_SAMPLEREGION);
+  xmltokens.Register ("object", XMLTOKEN_OBJECT);
+  xmltokens.Register ("geometry", XMLTOKEN_GEOMETRY);
+  xmltokens.Register ("v", XMLTOKEN_V);
+  xmltokens.Register ("t", XMLTOKEN_T);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("foliagepalette", XMLTOKEN_FOLIAGEPALETTE);
+  xmltokens.Register ("palette", XMLTOKEN_PALETTE);
+  xmltokens.Register ("foliage", XMLTOKEN_FOLIAGE);
+  return true;
+}
+
+bool csFoliageFactoryLoader::ParseGeometry (iLoaderContext* ldr_context,
+    iDocumentNode* node, iFoliageGeometry* geom)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_V:
+	{
+	  csVector3 pos;
+	  csVector2 texel;
+	  csColor color;
+	  csVector3 normal;
+	  pos.x = child->GetAttributeValueAsFloat ("x");
+	  pos.y = child->GetAttributeValueAsFloat ("y");
+	  pos.z = child->GetAttributeValueAsFloat ("z");
+	  texel.x = child->GetAttributeValueAsFloat ("u");
+	  texel.y = child->GetAttributeValueAsFloat ("v");
+	  color.red = child->GetAttributeValueAsFloat ("red");
+	  color.green = child->GetAttributeValueAsFloat ("green");
+	  color.blue = child->GetAttributeValueAsFloat ("blue");
+	  normal.x = child->GetAttributeValueAsFloat ("nx");
+	  normal.y = child->GetAttributeValueAsFloat ("ny");
+	  normal.z = child->GetAttributeValueAsFloat ("nz");
+	  geom->AddVertex (pos, texel, color, normal);
+	}
+	break;
+      case XMLTOKEN_T:
+	{
+	  csTriangle t;
+	  t.a = child->GetAttributeValueAsInt ("v1");
+	  t.b = child->GetAttributeValueAsInt ("v2");
+	  t.c = child->GetAttributeValueAsInt ("v3");
+	  geom->AddTriangle (t);
+	}
+	break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.foliagefactoryloader.parse.unknownmaterial",
+		child, "Couldn't find material '%s'!", matname);
+            return 0;
+	  }
+	  geom->SetMaterialWrapper (mat);
+	}
+	break;
+      default:
+	synldr->ReportBadToken (child);
+	return false;
+    }
+  }
+  return true;
+}
+
+bool csFoliageFactoryLoader::ParseObject (iLoaderContext* ldr_context,
+    iDocumentNode* node, iFoliageObject* obj)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_GEOMETRY:
+	{
+	  int lod = child->GetAttributeValueAsInt ("lod");
+	  csRef<iFoliageGeometry> geom = obj->CreateGeometry (lod);
+	  if (!ParseGeometry (ldr_context, child, geom))
+	    return false;
+	}
+	break;
+      default:
+	synldr->ReportBadToken (child);
+	return false;
+    }
+  }
+  return true;
+}
+
+bool csFoliageFactoryLoader::ParseFoliagePalette (iDocumentNode* node,
+    iFoliageFactoryState* fact, int index)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_FOLIAGE:
+	{
+	  const char* name = child->GetAttributeValue ("name");
+	  float relative_density = child->GetAttributeValueAsFloat ("density");
+	  fact->AddPaletteEntry (index, name, relative_density);
+	}
+	break;
+      default:
+	synldr->ReportBadToken (child);
+	return false;
+    }
+  }
+  return true;
+}
+
+bool csFoliageFactoryLoader::ParseFoliagePalette (iDocumentNode* node,
+    iFoliageFactoryState* fact)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_PALETTE:
+	{
+	  int index = child->GetAttributeValueAsInt ("index");
+	  if (!ParseFoliagePalette (child, fact, index))
+	    return false;
+	}
+	break;
+      default:
+	synldr->ReportBadToken (child);
+	return false;
+    }
+  }
   return true;
 }
 
@@ -147,9 +312,46 @@ csPtr<iBase> csFoliageFactoryLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_FACTORY:
-        // @@@ Write me.
-        // break; (fall through for now)
+      case XMLTOKEN_TERRAFORMER:
+        {
+          const char* name = child->GetContentsValue ();
+          csRef<iTerraFormer> form = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+	    name, iTerraFormer);
+	  if (form == 0) 
+	  {
+            synldr->ReportError ("crystalspace.foliage.factory.loader",
+              child, "Unable to find TerraFormer %s", name);
+            return 0;
+	  }
+          state->SetTerraFormer (form);
+        }
+        break;
+      case XMLTOKEN_SAMPLEREGION:
+        {
+          csBox3 box;
+          if (!synldr->ParseBox (child, box)) 
+	  {
+            synldr->ReportError ("crystalspace.foliage.factory.loader",
+              child, "Unable to parse sampleregion");
+            return 0;
+	  }
+          state->SetSamplerRegion (csBox2(box.MinX(), box.MinY(), 
+		                          box.MaxX(), box.MaxY()));
+        }
+        break;
+      case XMLTOKEN_OBJECT:
+        {
+	  const char* name = child->GetAttributeValue ("name");
+	  csRef<iFoliageObject> obj = state->CreateObject (name);
+	  if (!ParseObject (ldr_context, child, obj))
+	    return 0;
+        }
+	break;
+      case XMLTOKEN_FOLIAGEPALETTE:
+        if (!ParseFoliagePalette (child, state))
+	  return false;
+	break;
+
       default:
 	synldr->ReportBadToken (child);
 	return 0;

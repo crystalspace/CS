@@ -168,6 +168,22 @@
         <min x="-256" y="-256" />
         <max x="256" y="256" />
       </sampleregion>
+      <object name="oak">
+	<geometry lod="0">
+	  <v x="0" y="0" z="0" u="0" v="u" nx="0" ny="0" nz="0" red="0" green="0" blue="0" />
+	  ...
+	  <t v1="0" v2="1" v3="2" />
+	  ...
+	  <material>xxx</material>
+	</geometry>
+	<geometry lod="1">
+	  <v x="0" y="0" z="0" u="0" v="u" nx="0" ny="0" nz="0" red="0" green="0" blue="0" />
+	  ...
+	  <t v1="0" v2="1" v3="2" />
+	  ...
+	  <material>xxx</material>
+	</geometry>
+      </object>
       <foliagepalette>
 	<palette index="0">
 	  <foliage name="oak" density="1" />

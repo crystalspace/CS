@@ -21,10 +21,12 @@
 
 #include "csutil/scf.h"
 #include "csutil/garray.h"
+#include "csutil/refarr.h"
 #include "csutil/cscolor.h"
 #include "csgeom/tri.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"
+#include "csgeom/box.h"
 
 struct iMaterialWrapper;
 struct iTerraFormer;
