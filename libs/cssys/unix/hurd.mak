@@ -83,8 +83,7 @@ SOUND_LIBS=
 CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
-# -fno-exceptions and -fno-rtti have effect only for gcc >= 2.8.x
-CFLAGS.GENERAL=-Wall -Wunused -W $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS)
+CFLAGS.GENERAL=$(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS)
 
 # Flags for the compiler which are used when optimizing.
 ifeq ($(PROC),X86)

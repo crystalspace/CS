@@ -127,12 +127,50 @@ else
   msg_result "no"
 fi
 
-# Check for GCC-version-specific command-line options
+
+#------------------------------------------------------------------------------
+# Check if exceptions can be disabled.
+#------------------------------------------------------------------------------
 msg_checking "how to disable C++ exceptions"
 ${CXX} -c -fno-exceptions comptest.cpp 2>/dev/null
 if [ $? -eq 0 ]; then 
   echo "CFLAGS.SYSTEM += -fno-exceptions"
   msg_result "-fno-exceptions"
+else
+  msg_result "no"
+fi
+
+
+#------------------------------------------------------------------------------
+# Check how to enable compilation warnings.
+# Note: On some platforms, it is more appropriate to use -Wmost rather than
+# -Wall even if the compiler understands both.
+#------------------------------------------------------------------------------
+msg_checking "how to enable compilation warnings"
+${CXX} -c -Wmost comptest.cpp 2>/dev/null
+if [ $? -eq 0 ]; then
+  echo "CFLAGS.SYSTEM += -Wmost"
+  msg_result "-Wmost"
+else
+  ${CXX} -c -Wall comptest.cpp 2>/dev/null
+  if [ $? -eq 0 ]; then
+    echo "CFLAGS.SYSTEM += -Wall"
+    msg_result "-Wall"
+  else
+    msg_result "no"
+  fi
+fi
+
+
+#------------------------------------------------------------------------------
+# Check if warnings about unknown pragmas can be disabled.  (MSVC and Borland
+# use a number of pragmas not understood by GCC, for instance.)
+#------------------------------------------------------------------------------
+msg_checking "how to disable unknown #pragma warnings"
+${CXX} -c -Wno-unknown-pragmas comptest.cpp 2>/dev/null
+if [ $? -eq 0 ]; then
+  echo "CFLAGS.SYSTEM += -Wno-unknown-pragmas"
+  msg_result "-Wno-unknown-pragmas"
 else
   msg_result "no"
 fi

@@ -83,7 +83,7 @@ SOUND_LIBS=
 CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall -Wunused -W $(CFLAGS.SYSTEM) $(CFLAGS.CSTHREAD)
+CFLAGS.GENERAL=$(CFLAGS.SYSTEM) $(CFLAGS.CSTHREAD)
 
 # Flags for the compiler which are used when optimizing.
 ifeq ($(PROC),X86)

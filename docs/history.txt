@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+15-Nov-2002
+	- Eric Sunshine made the following changes:
+	    - Augmented the project configuration phase so that it determines
+	      automatically how to enable warnings (i.e. -Wall or -Wmost), and
+	      how to disable warnings about unknown #pragmas.
+	    - Removed hard-coded -Wall, -Wmost and -Wno-unknown-pragmas
+	      directives from makefiles.
+	    - Eliminated several compilation warnings from the project.
 11-Nov-2002
 	- Genmesh factories now support HardTransform().
 10-Nov-2002

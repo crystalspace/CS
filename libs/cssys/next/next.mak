@@ -125,9 +125,9 @@ CFLAGS.GENERAL = \
   $(NEXT.CFLAGS.GENERAL) \
   $(NEXT.CFLAGS.CONFIG) \
   $(NEXT.ARCH_FLAGS) \
-  -Wno-precomp -fno-common -pipe \
   $(CFLAGS.SYSTEM) \
-  $(CSTHREAD.CFLAGS)
+  $(CSTHREAD.CFLAGS) \
+  -Wno-precomp -fno-common -pipe
 
 # Special option for the software 3D renderer to force it to ARGB mode
 CFLAGS.PIXEL_LAYOUT = -DCS_24BIT_PIXEL_LAYOUT=CS_24BIT_PIXEL_ARGB

@@ -71,7 +71,7 @@ SOUND_LIBS=
 CFLAGS.INCLUDE=$(CFLAGS.I)/usr/local/include
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS)
+CFLAGS.GENERAL=$(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS)
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-O -fomit-frame-pointer
