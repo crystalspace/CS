@@ -366,7 +366,12 @@ csSystemDriver::~csSystemDriver ()
   OptionList.DeleteAll ();
 
   // Deregister all known drivers and plugins
-  if (VFS) VFS->DecRef ();
+
+  // @@ either comment the following out or the appropriate CHECK () in UnloadPlugins
+  // i'm not sure whats nicer. I'd prefer to decref it here but then a special
+  // treating of VFS is still needed in UnloadPlugin. Since the system class wont 
+  // live forever, we can simply wait for the biological solution.
+  //  if (VFS) VFS->DecRef ();
 
   // Free all plugins.
   int i;
@@ -411,7 +416,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   iConfigFile *cfg = new csConfigFile();
   iConfigManager* Config = new csConfigManager(cfg, true);
   object_reg.Register (Config, "ConfigManager");
-  // @@@ Config->DecRef (); uncomment when object reg outside system driver
+  Config->DecRef ();
   cfg->DecRef ();
   Config->SetDomainPriority(cfg, iConfigManager::ConfigPriorityApplication);
   VFS = CS_LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
@@ -530,7 +535,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     // If plugin is VFS then skip if already loaded earlier.
     if (VFS && r.FuncID && strcmp (r.FuncID, CS_FUNCID_VFS) == 0)
       continue;
-    LoadPlugin (r.ClassID, r.FuncID, NULL, 0);
+    iBase *plg = LoadPlugin (r.ClassID, r.FuncID, NULL, 0);
+    if (plg) plg->DecRef ();
   }
 
   // See if user wants help
