@@ -22,6 +22,7 @@
 
 
 #include "csutil/scf.h"
+#include "ivideo/rndbuf.h"
 /** \file
  * New 3D graphics interface
  */
@@ -308,14 +309,10 @@ struct iRender3D : public iBase
   /// Get a pointer to our texture manager
   virtual iTextureManager* GetTextureManager () = 0;
 
-  /**
-   * Get a pointer to the VB-manager
-   * Always use the manager referenced here to get VBs
-   */
-  virtual iRenderBufferManager* GetBufferManager () = 0;
-
-  /// Get a pointer to lighting manager
-  virtual iLightingManager* GetLightingManager () = 0;
+  /// Create a renderbuffer
+  virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
+    csRenderBufferType type, csRenderBufferComponentType componentType, 
+    int componentCount) = 0;
 
   /// Activate a vertex buffer
   virtual bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer) = 0;

@@ -31,13 +31,11 @@
 #include "csutil/strset.h"
 
 #include "ivideo/material.h"
-#include "ivideo/render3d.h"
 
 class csVector3;
 class csVector2;
 class csColor;
-
-struct iLightingInfo;
+class csReversibleTransform;
 struct iTextureHandle;
 struct iMaterialWrapper;
 
@@ -115,95 +113,12 @@ struct iRenderBuffer : public iBase
 
 };
 
-SCF_VERSION (iRenderBufferManager, 0, 0, 2);
-
-struct iRenderBufferManager : public iBase
-{
-  /// Allocate a buffer of the specified type and return it
-  virtual csPtr<iRenderBuffer> CreateBuffer(int buffersize, 
-    csRenderBufferType type,
-    csRenderBufferComponentType comptype,
-    int compcount) = 0;
-
-};
-
 SCF_VERSION (iStreamSource, 0, 0, 1);
 
 struct iStreamSource : public iBase
 {
   /// Get a named buffer
   virtual iRenderBuffer* GetBuffer (csStringID name) = 0;
-};
-
-/// Type of mesh
-enum csRenderMeshType
-{
-  CS_MESHTYPE_TRIANGLES,
-  CS_MESHTYPE_QUADS,
-  CS_MESHTYPE_TRIANGLESTRIP,
-  CS_MESHTYPE_TRIANGLEFAN,
-  CS_MESHTYPE_POINTS,
-  CS_MESHTYPE_LINES,
-  CS_MESHTYPE_LINESTRIP
-};
-
-class csRenderMesh
-{
-public:
-
-public:
-
-  csRenderMesh () 
-  {
-    mixmode = CS_FX_COPY;
-  }
-
-  virtual ~csRenderMesh () {}
-
-  /*/// Special attributes. Please don't change, it's used as flags
-  typedef enum
-  {
-    SPECIAL_NONE = 0,
-    SPECIAL_BILLBOARD = 1,
-    SPECIAL_ZFILL = 2
-  } specialattributes;*/
-
-  /// Z mode to use
-  csZBufMode z_buf_mode;
-
-  /// mixmode to use
-  uint mixmode;
-
-  /// Clipping parameter
-  int clip_portal;
-  
-  /// Clipping parameter
-  int clip_plane;
-  
-  /// Clipping parameter
-  int clip_z_plane;
-
-  /// Mirror mode
-  bool do_mirror;
-
-  /// Mesh type
-  csRenderMeshType meshtype;
-
-  /// Start of the range of indices to use
-  unsigned int indexstart;
-
-  /// End of the range of indices to use
-  unsigned int indexend;
-
-  /// Streamsource to get buffers from
-  iStreamSource* streamsource;
-
-  /// Material used for this mesh
-  //iMaterialHandle* mathandle;
-  iMaterialWrapper* material;
-
-  /// Transform to use for this mesh
-  csReversibleTransform *transform;
 };
 
 /** @} */

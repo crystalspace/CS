@@ -39,6 +39,7 @@
 #ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rndbuf.h"
 #include "csutil/csvector.h"
+#include "ivideo/rendermesh.h"
 #endif
 
 struct iMaterialWrapper;
@@ -80,29 +81,8 @@ private:
 #ifdef CS_USE_NEW_RENDERER
   csRenderMesh mesh;
   csRenderMesh* meshPtr;
-  csRef<iRenderBuffer> shadow_index_buffer;
-  csStringID shadow_index_name;
   csRef<iRender3D> r3d;
 
-  struct csGenmeshShadowCacheEntry
-  {
-    csGenmeshShadowCacheEntry () 
-    {
-      memset (lightID, 0xff, sizeof (lightID));
-      lightPos = csVector3(0,0,0);
-      shadow_index_buffer = 0;
-      edge_start = 0;
-      index_range = 0;
-    }
-
-    char lightID[16];
-    uint32 lightNr;
-    csVector3 lightPos;
-    csRef<iRenderBuffer> shadow_index_buffer;
-    int edge_start, index_range;
-  };
-
-  csBasicVector shadowCache;
   csReversibleTransform tr_o2c;
 #endif
   csGenmeshMeshObjectFactory* factory;
@@ -217,19 +197,11 @@ public:
     return (iMeshObjectFactory*)factory;
   }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
-#ifdef CS_USE_NEW_RENDERER
-  // virtual void EnableShadowCaps ()
-  // { shadow_caps = true; }
-  // virtual void DisableShadowCaps ()
-  // { shadow_caps = false; }
-#endif
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
 #ifdef CS_USE_NEW_RENDERER
   virtual csRenderMesh** GetRenderMeshes (int &n);
-  // virtual bool DrawShadow (iRenderView* rview, iMovable* movable, csZBufMode zbufMode, iLight *light);
-  // virtual bool DrawLight (iRenderView* rview, iMovable* movable, csZBufMode zbufMode, iLight *light);
 #endif // CS_USE_NEW_RENDERER
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
@@ -429,16 +401,11 @@ private:
   int num_mesh_vertices;
   csVector3* mesh_tri_normals;
 #ifdef CS_USE_NEW_RENDERER
-  int* edge_indices;
-  csVector4* edge_normals;
-  csVector4* edge_midpts;
   csTriangle* mesh_triangles;
   int num_mesh_triangles;
 
   bool mesh_vertices_dirty_flag;
-  bool mesh_shadow_vertices_dirty_flag;
   bool mesh_texels_dirty_flag;
-  bool mesh_tri_normals_dirty_flag;
   bool mesh_normals_dirty_flag;
   bool mesh_colors_dirty_flag;
   bool mesh_triangle_dirty_flag;
@@ -448,14 +415,12 @@ private:
   csRef<iRender3D> r3d;
 
   csRef<iRenderBuffer> vertex_buffer;
-  csRef<iRenderBuffer> shadow_vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
-  csRef<iRenderBuffer> trinormal_buffer;
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
 
-  csStringID vertex_name, shadow_vertex_name, texel_name, normal_name, trinormal_name, color_name, index_name;
+  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
 
   csRefArray<iRenderBuffer> anon_buffers;
   csGrowingArray<csStringID> anon_names;
@@ -533,8 +498,7 @@ public:
   csVector3* GetNormals () { SetupFactory (); return mesh_normals; }
   csColor* GetColors () { SetupFactory (); return mesh_colors; }
 #else
-  csVector3* GetVertices () { mesh_vertices_dirty_flag = true; 
-    mesh_tri_normals_dirty_flag = true; return mesh_vertices; }
+  csVector3* GetVertices () { mesh_vertices_dirty_flag = true; return mesh_vertices; }
   csVector2* GetTexels () { mesh_texels_dirty_flag = true; return mesh_texels; }
   csVector3* GetNormals () { mesh_normals_dirty_flag = true; return mesh_normals; }
   csColor* GetColors () { mesh_colors_dirty_flag = true; return mesh_colors; }
@@ -546,10 +510,6 @@ public:
 #else
   int GetTriangleCount () const { return num_mesh_triangles; }
   csTriangle* GetTriangles () { mesh_triangle_dirty_flag = true; return mesh_triangles; }
-  csVector3* GetFaceNormals () { return mesh_tri_normals; }
-  int* GetEdgeIndices () { return edge_indices; }
-  csVector4* GetEdgeNormals () { return edge_normals; }
-  csVector4* GetEdgeMidpoint () { return edge_midpts; }
 #endif
   void Invalidate ();
   void CalculateNormals ();
