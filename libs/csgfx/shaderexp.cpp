@@ -61,6 +61,10 @@ enum {
   OP_FUNC_SIN,
   OP_FUNC_COS,
   OP_FUNC_TAN,
+  OP_FUNC_DOT,
+  OP_FUNC_CROSS,
+  OP_FUNC_VEC_LEN, 
+  OP_FUNC_NORMAL,
 
   OP_FUNC_TIME,
   OP_FUNC_FRAME,
@@ -137,6 +141,11 @@ static op_args_info optimize_arg_table[] = {
   { 1, 1, false }, //  OP_FUNC_COS
   { 1, 1, false }, //  OP_FUNC_TAN
 
+  { 1, 1, false }, // OP_FUNC_DOT
+  { 1, 1, false }, // OP_FUNC_CROSS
+  { 1, 1, false }, // OP_FUNC_VEC_LEN
+  { 1, 1, false }, // OP_FUNC_NORMAL
+
   { 0, 0, false }, // OP_FUNC_TIME
   { 0, 0, false }, // OP_FUNC_FRAME
 
@@ -173,6 +182,10 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     xmltokens.Register("sin", OP_FUNC_SIN);
     xmltokens.Register("cos", OP_FUNC_COS);
     xmltokens.Register("tan", OP_FUNC_TAN);
+    xmltokens.Register("dot", OP_FUNC_DOT);
+    xmltokens.Register("cross", OP_FUNC_CROSS);
+    xmltokens.Register("vec-len", OP_FUNC_VEC_LEN);
+    xmltokens.Register("norm", OP_FUNC_NORMAL);
     
     xmltokens.Register("time", OP_FUNC_TIME);
     xmltokens.Register("frame", OP_FUNC_FRAME);
@@ -201,6 +214,10 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     sexptokens.Register("sin", OP_FUNC_SIN);
     sexptokens.Register("cos", OP_FUNC_COS);
     sexptokens.Register("tan", OP_FUNC_TAN);
+    sexptokens.Register("dot", OP_FUNC_DOT);
+    sexptokens.Register("cross", OP_FUNC_CROSS);
+    sexptokens.Register("vec-len", OP_FUNC_VEC_LEN);
+    sexptokens.Register("norm", OP_FUNC_NORMAL);
     
     sexptokens.Register("time", OP_FUNC_TIME);
     sexptokens.Register("frame", OP_FUNC_FRAME);
@@ -221,13 +238,18 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     mnemonics.Register("SIN", OP_FUNC_SIN);
     mnemonics.Register("COS", OP_FUNC_COS);
     mnemonics.Register("TAN", OP_FUNC_TAN);
+    sexptokens.Register("DOT", OP_FUNC_DOT);
+    sexptokens.Register("CROSS", OP_FUNC_CROSS);
+    sexptokens.Register("VLEN", OP_FUNC_VEC_LEN);
+    sexptokens.Register("NORM", OP_FUNC_NORMAL);
+    
 
-    mnemonics.Register("FRM", OP_FUNC_FRAME);
-    mnemonics.Register("TIM", OP_FUNC_TIME);
+    mnemonics.Register("FRAME", OP_FUNC_FRAME);
+    mnemonics.Register("TIME", OP_FUNC_TIME);
 
     mnemonics.Register("SELT12", OP_INT_SELT12);
     mnemonics.Register("SELT34", OP_INT_SELT34);
-    mnemonics.Register("ILD", OP_INT_LOAD);
+    mnemonics.Register("LOAD", OP_INT_LOAD);
   }
 }
 
@@ -676,6 +698,8 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
   case OP_SUB:  return eval_sub(arg1, arg2, output);
   case OP_MUL:  return eval_mul(arg1, arg2, output);
   case OP_DIV:  return eval_div(arg1, arg2, output);
+  case OP_FUNC_DOT:  return eval_dot(arg1, arg2, output);
+  case OP_FUNC_CROSS: return eval_cross(arg1, arg2, output);
   case OP_INT_SELT12: return eval_selt12(arg1, arg2, output);
   case OP_INT_SELT34: return eval_selt34(arg1, arg2, output);
 
@@ -709,6 +733,8 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output) {
   case OP_FUNC_SIN:  return eval_sin(arg1, output);
   case OP_FUNC_COS:  return eval_cos(arg1, output);
   case OP_FUNC_TAN:  return eval_tan(arg1, output);
+  case OP_FUNC_VEC_LEN: return eval_vec_len(arg1, output);
+  case OP_FUNC_NORMAL: return eval_normal(arg1, output);
 
   case OP_INT_LOAD: return eval_load(arg1, output);
     
@@ -920,6 +946,86 @@ bool csShaderExpression::eval_tan(const oper_arg & arg1, oper_arg & output) cons
   output.num = tan(arg1.num);
 
   return true;  
+}
+
+bool csShaderExpression::eval_dot(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
+  if (arg1.type != TYPE_VECTOR2 ||
+      arg1.type != TYPE_VECTOR3 ||
+      arg1.type != TYPE_VECTOR4) {
+    DEBUG_PRINTF("Argument 1 to dot is not a vector.\n");
+
+    return false;
+  }
+
+  if (arg2.type != TYPE_VECTOR2 ||
+      arg2.type != TYPE_VECTOR3 ||
+      arg2.type != TYPE_VECTOR4) {
+    DEBUG_PRINTF("Argument 2 to dot is not a vector.\n");
+
+    return false;
+  }
+
+  output.type = TYPE_NUMBER;
+  output.num = arg1.vec4 * arg2.vec4;
+
+  return true;
+}
+
+bool csShaderExpression::eval_cross(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
+  if (arg1.type != TYPE_VECTOR2 ||
+      arg1.type != TYPE_VECTOR3 ||
+      arg1.type != TYPE_VECTOR4) {
+    DEBUG_PRINTF("Argument 1 to cross is not a vector.\n");
+
+    return false;
+  }
+
+  if (arg1.type != arg2.type) {
+    DEBUG_PRINTF("Argument 2 to cross doesn't match type of arg 1.\n");
+
+    return false;
+  }
+
+  output.type = arg1.type;
+  output.vec4 = arg1.vec4 % arg2.vec4;
+
+  if (arg1.type != TYPE_VECTOR4)
+    output.vec4.w = 0;
+
+  if (arg1.type == TYPE_VECTOR2)
+    output.vec4.z = 0;
+
+  return true;
+}
+
+bool csShaderExpression::eval_vec_len(const oper_arg & arg1, oper_arg & output) const {
+  if (arg1.type != TYPE_VECTOR2 ||
+      arg1.type != TYPE_VECTOR3 ||
+      arg1.type != TYPE_VECTOR4) {
+    DEBUG_PRINTF("Argument to vec-len is not a vector.\n");
+
+    return false;
+  }
+
+  output.type = TYPE_NUMBER;
+  output.num = arg1.vec4.Norm();
+
+  return true;
+}
+
+bool csShaderExpression::eval_normal(const oper_arg & arg1, oper_arg & output) const {
+  if (arg1.type != TYPE_VECTOR2 ||
+      arg1.type != TYPE_VECTOR3 ||
+      arg1.type != TYPE_VECTOR4) {
+    DEBUG_PRINTF("Argument to norm is not a vector.\n");
+
+    return false;
+  }
+
+  output.type = arg1.type;
+  output.vec4 = csVector4::Unit(arg1.vec4);
+  
+  return true;
 }
 
 bool csShaderExpression::eval_time(oper_arg & output) const {

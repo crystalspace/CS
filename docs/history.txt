@@ -47,6 +47,8 @@ chronological order.
 	  signalListBoxStateChanged called when the state of a stateful
 	  column is changed.  Added documentation for both signals as well
 	  as the existing implemented signalListBoxFocused.
+	- DeSigna implemented dot, cross, norm and vec-len ops for 
+	  csShaderExpression.
 17-Oct-2003
 	- res added some files he forgot with his recent commit.
 	- Jorrit fixed the engine sequence manager a better way. With
