@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+11-Mar-200
+	- Eric Sunshine applied patches to mdl2spr from Matt Keith
+	  <keith@www.keithcom.com> which allow mdl2spr to generate sprite files
+	  which conform to the new mesh plugin architecture.
 7-Mar-2001
 	- Eric Sunshine added `autoexec.cfg' to CFG.WALKTEST in walktest.mak.
 	  This ensures that it will get installed with `make install'.
