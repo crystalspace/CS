@@ -41,6 +41,7 @@ The history order is reversed so that new features are at the top.
 	  black-box run-loop mechanism.  Therefore, by removing this code, the
 	  Apple/NeXT ports are now 100% API clean (that is, they now use only
 	  public AppKit API).
+	- Eric Sunshine eliminated the unmaintained `ggi' and `mgl2d' canvases.
 2-Jul-2001
 	- Removed the bad and global 'thisclass' pointer from the Python
 	  plugin.  Removed the 'GetSystem()' call from 'cs.i'.  The Python
