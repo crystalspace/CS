@@ -1,6 +1,3 @@
-#ifndef __CS_VIDEO_CURSOR_H__
-#define __CS_VIDEO_CURSOR_H__
-
 /*
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -16,6 +13,9 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+#ifndef __CS_VIDEO_CURSOR_H__
+#define __CS_VIDEO_CURSOR_H__
 
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
