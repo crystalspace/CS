@@ -16,6 +16,8 @@ chronological order.
 	- Jorrit fixed another initialization error with current_visnr in
 	  csSector. Please people! Don't forget to initialize variables
 	  in the constructor!
+	- Jorrit fixed wrong calculation of the radius of a thing which
+	  could cause things to be culled wrong in some rare cases.
 	- res reverted an accidential commit of msvcgen.mak and committed the
 	  originally intended win32.mak.
 	- Eric Sunshine changed configure.ac so that it only checks for

@@ -2159,10 +2159,7 @@ void csThing::DrawPolygonArrayDPM (
   csVector3 radius;
   csSphere sphere;
   static_data->GetRadius (radius, sphere.GetCenter ());
-  float max_radius = radius.x;
-  if (max_radius < radius.y) max_radius = radius.y;
-  if (max_radius < radius.z) max_radius = radius.z;
-  sphere.SetRadius (max_radius);
+  sphere.SetRadius (static_data->max_obj_radius);
   if (rview->ClipBSphere (tr_o2c, sphere, mesh.clip_portal, mesh.clip_plane,
   	mesh.clip_z_plane) == false)
     return;	// Not visible.
