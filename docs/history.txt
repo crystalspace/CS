@@ -58,6 +58,8 @@ The history order is reversed so that new features are at the top.
 	- Implemented XML version of the haze loader.
 	- Cs2Xml now considers '-' as a valid token in a string without
 	  quotes.
+	- Fixed an error in the new XML loading stuff. Thanks to
+	  MatzeB for finding this using valgrind.
 19-Aug-2002
 	- Implemented XML version of the ball mesh object loader.
 	- Fixed a memory leak in SKELETON statement of spr3d loader.

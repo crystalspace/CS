@@ -4188,7 +4188,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 {
   if (!Engine) return false;
 
-  const char* priority;
+  const char* priority = NULL;
 
   Stats->meshes_loaded++;
   iLoaderPlugin* plug = NULL;
