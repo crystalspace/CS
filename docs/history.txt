@@ -50,6 +50,8 @@ The history order is reversed so that new features are at the top.
 		- Augment static linking to work with the new facility.
 		- Eliminate the hard-coded SCF registration information in each
 		  plugin's source code.
+	- Eric Sunshine eliminated several comilation warnings from
+	  clothldr.cpp.
 27-May-2003
 	- Boyan made the following changes:
 	    - Fixed kyboard focusing component bug in AWS 

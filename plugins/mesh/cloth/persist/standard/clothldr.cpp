@@ -680,11 +680,10 @@ csPtr<iBase> csClothFactoryLoader::Parse (iDocumentNode* node,
   fact = type->NewFactory ();
   state = SCF_QUERY_INTERFACE (fact, iClothFactoryState);
   
-  csVector3*  VerticeBuffer   ;
-  csVector2*  TexelBuffer     ;
-  csColor*    ColorBuffer     ;  
-  csTriangle* TriangleBuffer  ; 
-  
+  csVector3*  VerticeBuffer  = 0;
+  csVector2*  TexelBuffer    = 0;
+  csColor*    ColorBuffer    = 0;  
+  csTriangle* TriangleBuffer = 0; 
   
   type->DecRef ();
 
