@@ -101,7 +101,8 @@ connection_item_list: connection_item
 ;
 
 component_item: TOKEN_ATTR ':' TOKEN_STR                                        { kcont[klevel].Add(new awsStringKey(new scfString($1), new scfString($3)));         }
-			  | TOKEN_ATTR ':' exp                                              { kcont[klevel].Add(new awsIntKey(new scfString($1), $3));                           }
+	      | TOKEN_ATTR ':' exp                                              { kcont[klevel].Add(new awsIntKey(new scfString($1), $3));                           }
+	      | TOKEN_ATTR ':' exp ',' exp ',' exp                              { kcont[klevel].Add(new awsRGBKey(new scfString($1), $3, $5, $7));                   }
               | TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'      { kcont[klevel].Add(new awsRectKey(new scfString($1), csRect($4, $6, $10, $12)));    }
 			  | TOKEN_CONNECT													{ ++klevel; /* go down a level (mid-action rule) */ }
 				     '{' connection_item_list '}'						        { awsConnectionNode *cn = new awsConnectionNode();

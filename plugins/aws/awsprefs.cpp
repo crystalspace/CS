@@ -147,6 +147,17 @@ iTextureHandle *awsPrefManager::GetTexture (char *name, char *filename)
     return NULL;
 }
 
+iTextureHandle *awsPrefManager::GetTexture (char *name, char *filename, 
+                                            unsigned char key_r,
+                                            unsigned char key_g,
+                                            unsigned char key_b)
+{
+  if (awstxtmgr)
+    return awstxtmgr->GetTexture (name, filename, false, key_r, key_g, key_b);
+  else
+    return NULL;
+}
+
 iFont *awsPrefManager::GetDefaultFont ()
 {
   return default_font;
@@ -445,6 +456,31 @@ bool awsPrefManager::GetInt (awsComponentNode *node, char *name, int &val)
     if (k->Type () == KEY_INT)
     {
       val = ((awsIntKey *)k)->Value ();
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool awsPrefManager::GetRGB (awsComponentNode *node, char *name, 
+                             unsigned char &red,
+                             unsigned char &green,
+                             unsigned char &blue)
+{
+  awsKey *k = ((awsKeyContainer *)node)->Find (NameToId (name));
+
+  if (k)
+  {
+    if (k->Type () == KEY_RGB)
+    {
+      awsRGBKey::RGB rgb;
+      rgb = ((awsRGBKey *)k)->Value ();
+
+      red = rgb.red;
+      green = rgb.green;
+      blue = rgb.blue;
+
       return true;
     }
   }

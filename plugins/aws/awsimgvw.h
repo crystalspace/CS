@@ -33,7 +33,8 @@ class awsImageView :
   bool was_down;
 
   /// Holds the texture handle for the image we are viewing
-  iTextureHandle *img;
+ iTextureHandle *img1; // via Texture
+ iTextureHandle *img2; // via Image
 
   /// Flags for frame style.
   int frame_style;
@@ -52,6 +53,11 @@ public:
   static const int fsSunken;
   static const int fsFlat;
   static const int fsNone;
+  static const int fsScaled;
+  static const int fsTiled;
+  static const int fsFixed;
+  static const int frameMask;
+  static const int imageMask;
 
   /******* Signals **********************/
 

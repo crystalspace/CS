@@ -480,6 +480,9 @@ public:
   /// Get the value of an integer from a given component node
   virtual bool GetString (awsComponentNode *node, char *name, iString * &val);
 
+  /// Get the a color from a given component node
+  virtual bool GetRGB(awsComponentNode *node, char *name, unsigned char& r, unsigned char& g, unsigned char& b);
+
   /// Find window definition and return the component node holding it, Null otherwise
   virtual awsComponentNode *FindWindowDef (char *name);
 public:
@@ -518,6 +521,13 @@ public:
 
   /// Gets a texture from the global AWS cache
   virtual iTextureHandle *GetTexture (char *name, char *filename = NULL);
+
+  /// Gets a texture from the global AWS cache, if its loaded for the first time then
+  /// the keycolor (key_r,key_g,key_b) is set
+  virtual iTextureHandle *GetTexture (char *name, char *filename, 
+                                      unsigned char key_r,
+                                      unsigned char key_g,
+                                      unsigned char key_b);
 
   /** Changes the texture manager: unregisters all current textures, and then re-registers them
      *  with the new manager */

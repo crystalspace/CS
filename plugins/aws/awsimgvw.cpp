@@ -21,12 +21,20 @@ const int awsImageView:: fsRaised = 0x2;
 const int awsImageView:: fsSunken = 0x3;
 const int awsImageView:: fsFlat = 0x4;
 const int awsImageView:: fsNone = 0x5;
+const int awsImageView:: fsScaled = 0x8;
+const int awsImageView:: fsTiled = 0x10;
+const int awsImageView:: fsFixed = 0x20;
+
+const int awsImageView:: frameMask = 0x7;
+const int awsImageView:: imageMask = ~awsImageView::frameMask;
+
 
 awsImageView::awsImageView () :
   is_down(false),
   mouse_is_over(false),
   was_down(false),
-  img(NULL),
+  img1(NULL),
+  img2(NULL),
   frame_style(0),
   alpha_level(92)
 {
@@ -50,7 +58,17 @@ bool awsImageView::Setup (iAws *_wmgr, awsComponentNode *settings)
   pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);  // global get
   pm->GetInt (settings, "Style", frame_style);
   pm->GetInt (settings, "Alpha", alpha_level);            // local overrides, if present.
-  img = pm->GetTexture ("Texture");
+
+  iString *file = NULL;
+  pm->GetString (settings, "Image", file);
+  if (file) 
+  {
+    unsigned char r=0,g=0,b=0;
+    pm->GetRGB (settings, "KeyColor", r, g, b);
+    img1 = pm->GetTexture (file->GetData (), file->GetData (), r, g, b);
+  }
+
+  img2 = pm->GetTexture ("Texture");
 
   return true;
 }
@@ -77,9 +95,62 @@ void awsImageView::OnDraw (csRect /*clip*/)
       WindowManager (),
       Window (),
       Frame (),
-      frame_style,
-      img,
-      alpha_level);
+      frame_style & frameMask,
+      img2,
+      255);
+
+  // now draw the image
+  iTextureHandle *img = (img1 ? img1 : img2);
+  if (img)
+  {
+    csRect r, t;
+    iGraphics3D *g3d = WindowManager ()->G3D ();
+
+    r = Frame ();
+    switch (frame_style & frameMask)
+    {
+    case fsBump:
+      r.Set (r.xmin + 4, r.ymin + 4, r.xmax - 3, r.ymax - 3);
+      break;
+    case fsFlat:
+    case fsRaised:
+    case fsSunken:
+      r = Frame ();
+      r.Set (r.xmin, r.ymin, r.xmax + 1 , r.ymax + 1);
+      break;
+    }
+
+    int img_w, img_h;
+    img->GetOriginalDimensions (img_w, img_h);
+
+    switch (frame_style & imageMask)
+    {
+    case fsTiled:
+      t.SetSize (r.Width (), r.Height ());
+      break;
+    case fsScaled:
+      t.Set (0, 0, img_w, img_h);
+      break;
+    case fsFixed:
+      t.Set (0, 0, MIN (img_w, r.Width ()), MIN (img_h, r.Height ()));
+      r.SetSize (t.Width (), t.Height ());
+      break;
+    default:
+      t.Set (0, 0, img_w, img_h);
+      break;
+    }
+
+    g3d->DrawPixmap (img,
+                     r.xmin,
+                     r.ymin,
+                     r.Width (),
+                     r.Height (),
+                     t.xmin,
+                     t.ymin,
+                     t.Width (),
+                     t.Height (),
+                     0);
+  }
 }
 
 bool awsImageView::OnMouseDown (int, int, int)
@@ -169,6 +240,9 @@ awsImageViewFactory::awsImageViewFactory (
   RegisterConstant ("ivfsSunken", awsImageView::fsSunken);
   RegisterConstant ("ivfsFlat", awsImageView::fsFlat);
   RegisterConstant ("ivfsNone", awsImageView::fsNone);
+  RegisterConstant ("ivfsScaled", awsImageView::fsScaled);
+  RegisterConstant ("ivfsTiled", awsImageView::fsTiled);
+  RegisterConstant ("ivfsFixed", awsImageView::fsFixed);
 
   RegisterConstant ("signalImageViewClicked", awsImageView::signalClicked);
   RegisterConstant ("signalImageViewMouseUp", awsImageView::signalMouseUp);

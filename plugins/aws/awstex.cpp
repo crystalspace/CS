@@ -89,16 +89,24 @@ void awsTextureManager::Initialize (iObjectRegistry *obj_reg)
 iTextureHandle *awsTextureManager::GetTexture (
   char *name,
   char *filename,
-  bool replace)
+  bool replace,
+  unsigned char key_r,
+  unsigned char key_g,
+  unsigned char key_b
+  )
 {
   unsigned long id = NameToId (name);
-  return GetTexturebyID (id, filename, replace);
+  return GetTexturebyID (id, filename, replace, key_r, key_g, key_b);
 }
 
 iTextureHandle *awsTextureManager::GetTexturebyID (
   unsigned long id,
   char *filename,
-  bool replace)
+  bool replace,
+  unsigned char key_r,
+  unsigned char key_g,
+  unsigned char key_b
+  )
 {
   awsTexture *awstxt = NULL;
   bool txtfound = false;
@@ -206,7 +214,7 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   awstxt->id = id;
 
   // Post load work...
-  awstxt->tex->SetKeyColor (255, 0, 255);
+  awstxt->tex->SetKeyColor (key_r, key_g, key_b);
   awstxt->tex->Prepare ();
 
   textures.Push (awstxt);

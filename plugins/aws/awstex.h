@@ -65,7 +65,11 @@ public:
   iTextureHandle *GetTexture (
                     char *name,
                     char *filename = NULL,
-                    bool replace = false);
+                    bool replace = false,
+                    unsigned char key_r = 255,
+                    unsigned char key_g = 0,
+                    unsigned char key_r = 255
+                    );
 
   /** Get's a texture.  If the texture is already cached, it returns the cached texture.
   * If the texture has not been cached, and a filename is specified, the file is loaded.
@@ -74,7 +78,11 @@ public:
   iTextureHandle *GetTexturebyID (
                     unsigned long id,
                     char *filename = NULL,
-                    bool replace = false);
+                    bool replace = false,
+                    unsigned char key_r = 255,
+                    unsigned char key_g = 0,
+                    unsigned char key_r = 255
+                    );
 
   /** Changes the texture manager: unregisters all current textures, and then re-registers them
    * with the new manager */
