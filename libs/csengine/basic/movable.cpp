@@ -61,7 +61,7 @@ bool csMovableSectorList::PrepareItem (csSome item)
     return false;
 
   sector->IncRef ();
-  iMeshWrapper* mw = movable->GetMeshWrapper ();
+  csMeshWrapper* mw = movable->GetMeshWrapper ();
   if (mw)
     mw->MoveToSector (sector->GetPrivateObject ());
   return true;
