@@ -20,7 +20,7 @@
 #ifndef __CS_NULL_TXT_H__
 #define __CS_NULL_TXT_H__
 
-#include "video/render3d/common/txtmgr.h"
+#include "plugins/video/render3d/common/txtmgr.h"
 #include "igraphic/image.h"
 
 class csTextureManagerNull;

@@ -35,7 +35,7 @@
 #include "igraphic/image.h"
 #include "../common/txtmgr.h"
 
-#include "video/canvas/openglcommon/glextmanager.h"
+#include "plugins/video/canvas/openglcommon/glextmanager.h"
 
 //---------------------------------------------------------------------------
 

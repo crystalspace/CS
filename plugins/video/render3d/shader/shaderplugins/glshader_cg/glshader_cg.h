@@ -24,7 +24,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "../../common/shaderplugin.h"
 #include "ivideo/shader/shader.h"
 
-#include "video/canvas/openglcommon/glextmanager.h"
+#include "plugins/video/canvas/openglcommon/glextmanager.h"
 
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>

@@ -27,7 +27,7 @@
 #include "ogl_g3dcom.h"
 #include "ivideo/halo.h"
 #include "ogl_txtcache.h"
-#include "video/canvas/openglcommon/glstates.h"
+#include "plugins/video/canvas/openglcommon/glstates.h"
 
 class csOpenGLHalo : public iHalo
 {

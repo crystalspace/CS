@@ -25,7 +25,7 @@
 #include "ogl_g3dcom.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/reporter.h"
-#include "video/canvas/openglcommon/glstates.h"
+#include "plugins/video/canvas/openglcommon/glstates.h"
 
 #include "igraphic/imageio.h"
 #include "iutil/vfs.h"

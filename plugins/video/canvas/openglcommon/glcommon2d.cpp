@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "glcommon2d.h"
 #include "csutil/csendian.h"
-#include "video/canvas/common/scrshot.h"
+#include "plugins/video/canvas/common/scrshot.h"
 #include "csgeom/csrect.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
@@ -27,10 +27,10 @@
 #include "qint.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
-#include "video/canvas/openglcommon/glstates.h"
+#include "plugins/video/canvas/openglcommon/glstates.h"
 
 // This header should be moved
-#include "video/renderer/common/pixfmt.h"
+#include "plugins/video/renderer/common/pixfmt.h"
 
 
 SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLCommon)

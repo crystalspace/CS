@@ -40,7 +40,7 @@
 #include "ivaria/reporter.h"
 
 #if defined (DO_MMX)
-#  include "video/renderer/software/i386/cpuid.h"
+#  include "plugins/video/renderer/software/i386/cpuid.h"
 #endif
 
 int csGraphics3DSoftwareCommon::filter_bf = 1;

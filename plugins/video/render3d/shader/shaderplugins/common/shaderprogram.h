@@ -44,7 +44,7 @@ protected:
   csStringHash commonTokens;
 #define CS_INIT_TOKEN_TABLE_NAME InitCommonTokens
 #define CS_TOKEN_ITEM_FILE \
-  "video/render3d/shader/shaderplugins/common/shaderprogram.tok"
+  "plugins/video/render3d/shader/shaderplugins/common/shaderprogram.tok"
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
 #undef CS_INIT_TOKEN_TABLE_NAME

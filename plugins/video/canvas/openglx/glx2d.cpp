@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
-#include "video/canvas/openglx/glx2d.h"
+#include "plugins/video/canvas/openglx/glx2d.h"
 #include "csutil/scf.h"
 #include "csutil/csinput.h"
 #include "csgeom/csrect.h"

@@ -26,7 +26,7 @@
 #include "gl_render3d.h"
 #include "gl_txtcache.h"
 #include "gl_txtmgr.h"
-#include "video/canvas/openglcommon/glextmanager.h"
+#include "plugins/video/canvas/openglcommon/glextmanager.h"
 
 // need definitions of R24(), G24(), and B24()
 #ifndef CS_NORMAL_LIGHT_LEVEL

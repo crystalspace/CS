@@ -53,7 +53,7 @@ public:
 private:
   csStringHash tokens;
 #define CS_TOKEN_ITEM_FILE \
-  "video/render3d/shader/shaderplugins/glshader_fixed/glshader_fvp.tok"
+  "plugins/video/render3d/shader/shaderplugins/glshader_fixed/glshader_fvp.tok"
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
 

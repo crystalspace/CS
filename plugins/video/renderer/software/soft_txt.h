@@ -23,7 +23,7 @@
 #include "csutil/blockallocator.h"
 #include "csutil/debug.h"
 #include "csgeom/csrect.h"
-#include "video/renderer/common/txtmgr.h"
+#include "plugins/video/renderer/common/txtmgr.h"
 #include "igraphic/image.h"
 #include "ivideo/graph2d.h"
 

@@ -19,10 +19,10 @@
 #ifndef __CS_X2D_H__
 #define __CS_X2D_H__
 
-#include "video/canvas/common/graph2d.h"
+#include "plugins/video/canvas/common/graph2d.h"
 #include "iutil/event.h"
-#include "video/canvas/xwindowcommon/xwindow.h"
-#include "video/canvas/xwindowcommon/xextshm.h"
+#include "plugins/video/canvas/xwindowcommon/xwindow.h"
+#include "plugins/video/canvas/xwindowcommon/xextshm.h"
 
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>

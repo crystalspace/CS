@@ -47,7 +47,7 @@
 #include "soft_polyrender.h"
 
 #if defined (DO_MMX)
-#  include "video/renderer/software/i386/cpuid.h"
+#  include "plugins/video/renderer/software/i386/cpuid.h"
 #endif
 
 int csSoftwareGraphics3DCommon::filter_bf = 1;

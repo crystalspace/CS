@@ -26,7 +26,7 @@
 #include <GL/gl.h>
 #endif
 
-#include "video/canvas/openglcommon/glextmanager.h"
+#include "plugins/video/canvas/openglcommon/glextmanager.h"
 
 #define IMPLEMENT_CACHED_BOOL(name) \
   bool enabled_##name; \

@@ -22,7 +22,7 @@
 #define __CS_CSAA_H__
 
 #include "csutil/scf.h"
-#include "video/canvas/common/graph2d.h"
+#include "plugins/video/canvas/common/graph2d.h"
 #include <aalib.h>
 #include "iutil/event.h"
 

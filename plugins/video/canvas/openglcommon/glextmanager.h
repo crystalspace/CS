@@ -112,7 +112,7 @@ typedef uint32 GLhandleARB;
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "video/canvas/openglcommon/iogl.h"
+#include "plugins/video/canvas/openglcommon/iogl.h"
 #include "ivideo/graph2d.h"
 #include "csutil/cfgacc.h"
 

@@ -20,7 +20,7 @@
 #ifndef __CS_CANVAS_OPENGLCOMMON_GLSS_H__
 #define __CS_CANVAS_OPENGLCOMMON_GLSS_H__
 
-#include "video/canvas/common/scrshot.h"
+#include "plugins/video/canvas/common/scrshot.h"
 
 class csGraphics2DGLCommon;
 

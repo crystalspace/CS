@@ -33,7 +33,7 @@ class csGLShaderFFP : public csShaderProgram
 private:
   csStringHash tokens;
 #define CS_TOKEN_ITEM_FILE \
-  "video/render3d/shader/shaderplugins/glshader_fixed/glshader_ffp.tok"
+  "plugins/video/render3d/shader/shaderplugins/glshader_fixed/glshader_ffp.tok"
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
 

@@ -233,7 +233,7 @@ private:
   /// XML Token and management
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \
-  "video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"
+  "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"
 #include "cstool/tokenlist.h"
 
   //Standard vars

@@ -26,7 +26,7 @@
 #endif
 
 #include "csutil/scf.h"
-#include "video/canvas/common/graph2d.h"
+#include "plugins/video/canvas/common/graph2d.h"
 #include "glfontcache.h"
 #include "iutil/event.h"
 #include "glstates.h"

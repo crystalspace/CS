@@ -24,7 +24,7 @@
 #include "csutil/scf.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "video/canvas/xwindowcommon/xextf86vm.h"
+#include "plugins/video/canvas/xwindowcommon/xextf86vm.h"
 #include "ivideo/graph2d.h"
 
 #define XK_MISCELLANY 1

@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 #include "csutil/blockallocator.h"
 #include "csgeom/csrect.h"
-#include "video/renderer/common/txtmgr.h"
+#include "plugins/video/renderer/common/txtmgr.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "igraphic/image.h"

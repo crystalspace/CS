@@ -32,7 +32,7 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "video/canvas/common/scancode.h"
+#include "plugins/video/canvas/common/scancode.h"
 #include "igraphic/image.h"
 
 // Define this if you want keyboard-grabbing behavior enabled.  For now it is

@@ -14,7 +14,7 @@
 #include "iutil/eventq.h"
 #include "ivaria/reporter.h"
 #include "csver.h"
-#include "video/canvas/common/scrshot.h"
+#include "plugins/video/canvas/common/scrshot.h"
 #include "GLOSXDriver2D.h"
 
 #include <ApplicationServices/ApplicationServices.h>

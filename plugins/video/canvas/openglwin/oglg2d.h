@@ -21,9 +21,9 @@
 
 #include <GL/gl.h>
 #include "csutil/scf.h"
-#include "video/canvas/common/graph2d.h"
-#include "video/canvas/openglcommon/glcommon2d.h"
-#include "video/canvas/openglcommon/iogl.h"
+#include "plugins/video/canvas/common/graph2d.h"
+#include "plugins/video/canvas/openglcommon/glcommon2d.h"
+#include "plugins/video/canvas/openglcommon/iogl.h"
 
 struct iWin32Assistant;
 

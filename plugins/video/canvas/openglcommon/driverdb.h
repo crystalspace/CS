@@ -28,7 +28,7 @@ public:
   csGraphics2DGLCommon* ogl2d;
 
   csStringHash tokens;
-#define CS_TOKEN_ITEM_FILE "video/canvas/openglcommon/driverdb.tok"
+#define CS_TOKEN_ITEM_FILE "plugins/video/canvas/openglcommon/driverdb.tok"
 #include "cstool/tokenlist.h"
 
   csGLDriverDatabase ();

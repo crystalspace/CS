@@ -36,7 +36,7 @@ class csShaderGLCGCommon : public csShaderProgram
 protected:
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \
-  "video/render3d/shader/shaderplugins/glshader_cg/glshader_cg.tok"
+  "plugins/video/render3d/shader/shaderplugins/glshader_cg/glshader_cg.tok"
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
 

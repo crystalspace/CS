@@ -58,7 +58,7 @@
 #include "gl_txtmgr.h"
 #include "gl_polyrender.h"
 
-#include "video/canvas/openglcommon/glextmanager.h"
+#include "plugins/video/canvas/openglcommon/glextmanager.h"
 
 #include "../common/txtmgr.h"
 

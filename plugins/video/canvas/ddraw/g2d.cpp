@@ -29,10 +29,10 @@
 #include "iutil/cmdline.h"
 
 #define INITGUID
-#include "video/canvas/directxcommon/directdetection.h"
+#include "plugins/video/canvas/directxcommon/directdetection.h"
 
 #include "csutil/win32/wintools.h"
-#include "video/canvas/common/softfontcache.h"
+#include "plugins/video/canvas/common/softfontcache.h"
 
 #include "g2d.h"
 

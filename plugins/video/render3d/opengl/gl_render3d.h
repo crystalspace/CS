@@ -43,11 +43,11 @@
 #include "ivideo/graph3d.h"
 
 #include "ivideo/shader/shader.h"
-#include "video/canvas/openglcommon/glstates.h"
+#include "plugins/video/canvas/openglcommon/glstates.h"
 
 #include "ivaria/bugplug.h"
 
-#include "video/canvas/openglcommon/glextmanager.h"
+#include "plugins/video/canvas/openglcommon/glextmanager.h"
 
 
 class csGLTextureCache;
