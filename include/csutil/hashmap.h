@@ -22,7 +22,7 @@
 #include "csutil/csvector.h"
 
 class csHashMap;
-typedef int csHashKey;
+typedef uint32 csHashKey;
 typedef void* csHashObject;
 
 /**
@@ -92,7 +92,7 @@ private:
   /// Current index in bucket.
   int element_index;
   /// Current bucket index in hashmap.
-  int bucket_index;
+  uint32 bucket_index;
   /// If true we are iterating over a key.
   bool do_iterate_key;
   /// Key to iterate over.
@@ -138,7 +138,7 @@ private:
   /// A hashmap is implemented as a csVector of csVectors.
   csVectorVector buckets;
   /// Max size of this vector.
-  int max_size;
+  uint32 max_size;
 
 public:
   /**
@@ -151,7 +151,7 @@ public:
    * For a bigger list go to www.utm.edu/research/primes.
    * The map will grow dynamically if needed (@@@ Not implemented yet).
    */
-  csHashMap (int size = 211);
+  csHashMap (uint32 size = 211);
 
   /**
    * Destructor. The objects referenced too in this hash
@@ -216,7 +216,7 @@ public:
    * Construct a new empty set.
    * The given size will be given to the hasmap.
    */
-  csHashSet (int size = 211);
+  csHashSet (uint32 size = 211);
 
   /**
    * Add an object to this set.

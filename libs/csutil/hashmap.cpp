@@ -35,10 +35,10 @@ void csHashIterator::GotoNextElement ()
   {
     // Next bucket.
     bucket_index++;
-    while (bucket_index < hash->buckets.Length () &&
-    	!hash->buckets[bucket_index])
+    uint32 const nbuckets = (uint32)hash->buckets.Length();
+    while (bucket_index < nbuckets && !hash->buckets[bucket_index])
       bucket_index++;
-    if (bucket_index >= hash->buckets.Length ())
+    if (bucket_index >= nbuckets)
       bucket = NULL;	// The end
     else
     {
@@ -76,12 +76,11 @@ void csHashIterator::DeleteNext ()
 
 //---------------------------------------------------------------------------
 
-csHashMap::csHashMap (int size)
+csHashMap::csHashMap (uint32 size)
 {
   max_size = size;
   buckets.SetLength (max_size);
-  int i;
-  for (i = 0 ; i < max_size ; i++)
+  for (uint32 i = 0 ; i < max_size ; i++)
     buckets[i] = NULL;
 }
 
@@ -92,7 +91,7 @@ csHashMap::~csHashMap ()
 
 void csHashMap::Put (csHashKey key, csHashObject object)
 {
-  int idx = key % max_size;
+  uint32 idx = key % max_size;
   if (!buckets[idx]) buckets[idx] = new csHashBucket ();
   csHashBucket& bucket = *(csHashBucket*)buckets[idx];
   csHashElement* element = new csHashElement ();
@@ -103,11 +102,10 @@ void csHashMap::Put (csHashKey key, csHashObject object)
 
 csHashObject csHashMap::Get (csHashKey key) const
 {
-  int idx = key % max_size;
+  uint32 idx = key % max_size;
   if (!buckets[idx]) return NULL;
   csHashBucket& bucket = *(csHashBucket*)buckets[idx];
-  int i;
-  for (i = 0 ; i < bucket.Length () ; i++)
+  for (int i = 0 ; i < bucket.Length () ; i++)
   {
     csHashElement* element = (csHashElement*)bucket[i];
     if (element->key == key) return element->object;
@@ -117,7 +115,7 @@ csHashObject csHashMap::Get (csHashKey key) const
 
 csHashIterator* csHashMap::GetIterator (csHashKey key)
 {
-  int idx = key % max_size;
+  uint32 idx = key % max_size;
 
   csHashIterator* iterator = new csHashIterator (this);
   iterator->bucket = (csHashBucket*)buckets[idx]; // Will be NULL if bucket empty.
@@ -135,7 +133,7 @@ csHashIterator* csHashMap::GetIterator ()
   csHashIterator* iterator = new csHashIterator (this);
   iterator->bucket = NULL;
   iterator->element_index = 0;
-  iterator->bucket_index = -1;
+  iterator->bucket_index = (uint32)-1;
   iterator->do_iterate_key = false;
   iterator->GotoNextElement ();
 
@@ -144,11 +142,10 @@ csHashIterator* csHashMap::GetIterator ()
 
 void csHashMap::DeleteAll (csHashKey key)
 {
-  int idx = key % max_size;
+  uint32 idx = key % max_size;
   if (!buckets[idx]) return;
   csHashBucket& bucket = *(csHashBucket*)buckets[idx];
-  int i;
-  for (i = bucket.Length () ; i >= 0 ; i--)
+  for (uint32 i = bucket.Length () ; i-- > 0 ; )
   {
     csHashElement* element = (csHashElement*)bucket[i];
     if (element->key == key)
@@ -158,14 +155,13 @@ void csHashMap::DeleteAll (csHashKey key)
 
 void csHashMap::DeleteAll ()
 {
-  int b;
-  for (b = buckets.Length ()-1 ; b >= 0 ; b--)
+  for (uint32 b = buckets.Length () ; b-- > 0 ; )
     buckets.Delete (b);
 }
 
 //---------------------------------------------------------------------------
 
-csHashSet::csHashSet (int size) : map (size)
+csHashSet::csHashSet (uint32 size) : map (size)
 {
 }
 
