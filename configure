@@ -3958,7 +3958,7 @@ echo "${ECHO_T}$cs_prog_jam_okay" >&6
 fi
 
 
-if test cs_prog_jam_ok != yes; then
+if test $cs_prog_jam_okay != yes; then
   JAM=./jam$EXEEXT CS_NEED_LOCAL_JAM=yes
 fi
 

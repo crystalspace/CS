@@ -146,7 +146,7 @@ AS_IF([test -z "$JAM"],
 	[cs_prog_jam_okay=no])
     AC_MSG_RESULT([$cs_prog_jam_okay])])
 
-AS_IF([test cs_prog_jam_ok != yes],
+AS_IF([test $cs_prog_jam_okay != yes],
     [JAM=./cs_jam_local_exe CS_NEED_LOCAL_JAM=yes])
 CS_EMIT_BUILD_PROPERTY([JAM], [$JAM])
 
