@@ -22,7 +22,12 @@ Windows and @sc{dos} users can download a single package containing all three
 libraries in precompiled form from the following location at the Crystal Space
 site:
 
-@uref{ftp://ftp.linuxgames.com/crystal/support/winlibs14.zip}
+@uref{ftp://ftp.linuxgames.com/crystal/support/win32/winlibs14.zip}
+
+If you are using the MingW compiler, then you will need the compression
+@sc{dll} @file{z.dll}, which you can find at:
+
+@uref{ftp://ftp.linuxgames.com/crystal/support/mingw32/zlib-win32-1.1.3.zip}
 
 @subheading zlib
 @cindex zlib
