@@ -44,9 +44,16 @@ csIsoLight::~csIsoLight ()
 
 void csIsoLight::SetGrid(iIsoGrid *grid)
 {
-  if(csIsoLight::grid) csIsoLight::grid->UnRegisterLight(this);
+  if(csIsoLight::grid) 
+  {
+    if(flags.Check(CSISO_LIGHT_DYNAMIC))
+      csIsoLight::grid->UnRegisterDynamicLight(this);
+    else csIsoLight::grid->UnRegisterLight(this);
+  }
   csIsoLight::grid = grid;
-  grid->RegisterLight(this);
+  if(flags.Check(CSISO_LIGHT_DYNAMIC))
+    grid->RegisterDynamicLight(this);
+  else grid->RegisterLight(this);
   delete[] vismap;
   visw = grid->GetWidth() * grid->GetGroundMultX();
   vish = grid->GetHeight() * grid->GetGroundMultY();
@@ -57,12 +64,16 @@ void csIsoLight::SetGrid(iIsoGrid *grid)
 
 void csIsoLight::SetPosition(const csVector3& pos)
 {
+  if(grid && !flags.Check(CSISO_LIGHT_DYNAMIC))
+    grid->RegisterLight(this); // force recalc
   position = pos;
   recalc_vis = true;
 }
 
 void csIsoLight::SetRadius(float radius)
 {
+  if(grid && !flags.Check(CSISO_LIGHT_DYNAMIC))
+    grid->RegisterLight(this); // force recalc
   csIsoLight::radius = radius;
   inv_radius = 1./radius;
   recalc_vis = true;
@@ -226,6 +237,7 @@ void csIsoLight::ShineSprite(iIsoSprite *sprite)
   csVector3 relpos = position - sprite->GetPosition();
   int sprx = QInt(sprite->GetPosition().z * multx) - mingridx*QInt(multx); 
   int spry = QInt(sprite->GetPosition().x * multy) - mingridy*QInt(multy);
+  bool dynamic = flags.Check(CSISO_LIGHT_DYNAMIC);
   for(int i=0; i<sprite->GetNumVertices(); i++)
   {
     csVector3 vpos = sprite->GetVertexPosition(i);
@@ -240,7 +252,9 @@ void csIsoLight::ShineSprite(iIsoSprite *sprite)
     float light = vis*GetAttenuation(dist);
     /// no normal vectors taken into account atm.
     // light *= path.Unit()*normal;
-    sprite->AddToVertexColor(i, color*light);
+    if(dynamic)
+      sprite->AddToVertexColor(i, color*light);
+    else sprite->AddToVertexStaticColor(i, color*light);
   }
 }
 

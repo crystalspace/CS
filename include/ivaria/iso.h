@@ -23,6 +23,7 @@
 #include "isys/plugin.h"
 #include "csutil/csrect.h"
 #include "csutil/cscolor.h"
+#include "csutil/flags.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
@@ -163,10 +164,16 @@ struct iIsoGrid : public iBase
 
   /// Set all the lighting in the grid to given color.
   virtual void SetAllLight(const csColor& color) = 0;
+  /// Set all the static lighting in the grid to given color.
+  virtual void SetAllStaticLight(const csColor& color) = 0;
   /// register a light with this grid
   virtual void RegisterLight(iIsoLight *light) = 0;
   /// unregister a light with this grid
   virtual void UnRegisterLight(iIsoLight *light) = 0;
+  /// register a dynamic light with this grid
+  virtual void RegisterDynamicLight(iIsoLight *light) = 0;
+  /// unregister a dynamic light with this grid
+  virtual void UnRegisterDynamicLight(iIsoLight *light) = 0;
 
   /// Add a sprite to this grid
   virtual void AddSprite(iIsoSprite *sprite) = 0;
@@ -329,6 +336,12 @@ struct iIsoSprite : public iBase
   virtual void SetAllColors(const csColor& color) = 0;
   /// add color to color of vertex
   virtual void AddToVertexColor(int i, const csColor& color) = 0;
+  /// reset all vertex colors to their static values
+  virtual void ResetAllColors() = 0;
+  /// set all static vertex colors to given
+  virtual void SetAllStaticColors(const csColor& color) = 0;
+  /// add color to static color of vertex
+  virtual void AddToVertexStaticColor(int i, const csColor& color) = 0;
 
   /// Get the world position of the sprite
   virtual const csVector3& GetPosition() const = 0;
@@ -382,6 +395,11 @@ struct iIsoSprite : public iBase
 #define CSISO_ATTN_INVERSE   2
 #define CSISO_ATTN_REALISTIC 3
 
+/// Flags for the light, the light is declared static
+#define CSISO_LIGHT_STATIC 0x0000
+/// the light changes,moves a lot, almost every frame
+#define CSISO_LIGHT_DYNAMIC 0x0001
+
 SCF_VERSION (iIsoLight, 0, 0, 1);
 
 /**
@@ -389,10 +407,12 @@ SCF_VERSION (iIsoLight, 0, 0, 1);
 */
 struct iIsoLight : public iBase
 {
-  /// set the grid for this light
+  /// set the grid for this light, first set the light dynamic if you want
   virtual void SetGrid(iIsoGrid *grid) = 0;
   /// get the grid for this light
   virtual iIsoGrid* GetGrid() const = 0;
+  /// get the light flags (for get and set) (CSISO_LIGHT above)
+  virtual csFlags& Flags() = 0;
   /// set attentuation type of light (CSISO_ATTN_... see above)
   virtual void SetAttenuation(int attn) = 0;
   /// get attentuation type of light 

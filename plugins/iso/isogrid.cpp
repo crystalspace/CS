@@ -38,6 +38,7 @@ csIsoGrid::csIsoGrid (iBase *iParent, iIsoWorld *world, int w, int h)
   mingridx = 0; mingridy = 0;
   box.Set(0,-9999,0, height,+9999,width);
   groundmap = new csIsoGroundMap(this, 1, 1);
+  recalc_staticlight = true;
 }
 
 csIsoGrid::~csIsoGrid ()
@@ -221,11 +222,21 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
     float myminz = box.MinZ() - box.MaxX() - 10.;
     if(myminz < rview->GetMinZ()) rview->SetMinZ(myminz);
 
+    // calc static lights if needed
+    if(recalc_staticlight) RecalcStaticLight();
     // calculate dyn lighting
-    SetAllLight(csColor(0.,0.,0.));
-    for(int l=0; l<lights.Length(); l++)
-      ((iIsoLight*)(lights[l]))->ShineGrid();
+    ResetAllLight();
+    for(int l=0; l<dynamiclights.Length(); l++)
+      ((iIsoLight*)(dynamiclights[l]))->ShineGrid();
   }
+}
+
+void csIsoGrid::RecalcStaticLight()
+{
+  SetAllStaticLight(csColor(0.,0.,0.));
+  for(int l=0; l<lights.Length(); l++)
+    ((iIsoLight*)(lights[l]))->ShineGrid();
+  recalc_staticlight = false;
 }
 
 void csIsoGrid::SetSpace(int minx, int minz, float miny = -1.0,
@@ -274,6 +285,17 @@ int csIsoGrid::GetGroundMultY() const
   return groundmap->GetMultY();
 }
 
+static void resetspritelight(iIsoSprite* spr, void * /*dat*/)
+{
+  spr->ResetAllColors();
+}
+
+void csIsoGrid::ResetAllLight()
+{
+  for(int i=0; i<width*height; i++) 
+    if(grid[i]) 
+      grid[i]->Traverse(resetspritelight, NULL);
+}
 
 static void setspritecolor(iIsoSprite* spr, void *dat)
 {
@@ -293,8 +315,26 @@ void csIsoGrid::SetAllLight(const csColor& color)
     }
 }
 
+static void setspritestaticcolor(iIsoSprite* spr, void *dat)
+{
+  const csColor *col = (const csColor*)dat;
+  spr->SetAllStaticColors(*col);
+}
+
+void csIsoGrid::SetAllStaticLight(const csColor& color)
+{
+  csColor col = color;
+  for(int i=0; i<width*height; i++) 
+    if(grid[i]) 
+    {
+      grid[i]->Traverse(setspritestaticcolor, &col);
+    }
+}
+
+
 void csIsoGrid::RegisterLight(iIsoLight *light)
 {
+  recalc_staticlight = true;
   if(lights.Find(light)==-1)
     lights.Push(light);
 }
@@ -303,9 +343,24 @@ void csIsoGrid::UnRegisterLight(iIsoLight *light)
 {
   int idx = lights.Find(light);
   if(idx!=-1)
+  {
     lights.Delete(idx);
+    recalc_staticlight = true;
+  }
 }
 
+void csIsoGrid::RegisterDynamicLight(iIsoLight *light)
+{
+  if(dynamiclights.Find(light)==-1)
+    dynamiclights.Push(light);
+}
+
+void csIsoGrid::UnRegisterDynamicLight(iIsoLight *light)
+{
+  int idx = dynamiclights.Find(light);
+  if(idx!=-1)
+    dynamiclights.Delete(idx);
+}
 
 //-------------- csIsoGroundMap -------------------------------------------
 csIsoGroundMap::csIsoGroundMap(iIsoGrid *grid, int multx, int multy)

@@ -199,8 +199,9 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   sprite->SetMixmode(CS_FX_ADD);
   world->AddSprite(sprite);
 
-  // add a light for the player, above players head.
+  // add a dynamic light for the player, above players head.
   light = engine->CreateLight();
+  light->Flags().Set(CSISO_LIGHT_DYNAMIC);
   light->SetPosition(startpos+csVector3(0,5,0));
   light->SetGrid(grid);
   light->SetRadius(5.0);

@@ -49,6 +49,10 @@ private:
   csIsoGroundMap *groundmap;
   /// the lights in this grid, type iIsoLight
   csBasicVector lights;
+  /// the dynamic lights in this grid, type iIsoLight
+  csBasicVector dynamiclights;
+  /// recalc static lighting?
+  bool recalc_staticlight;
 
 public:
   DECLARE_IBASE;
@@ -76,6 +80,11 @@ public:
   inline void SetCell(const csVector3& pos, iIsoCell *x)
   { SetCell(QInt(pos.z)-mingridx, QInt(pos.x)-mingridy, x); }
 
+  /// recalculate the static lighting
+  void RecalcStaticLight();
+  /// reset all lighting to static values
+  void ResetAllLight();
+
   //------ iIsoGrid ----------------------------------------
   virtual bool Contains(const csVector3& pos);
   virtual void AddSprite(iIsoSprite *sprite);
@@ -99,8 +108,11 @@ public:
   virtual int GetGroundMultX() const;
   virtual int GetGroundMultY() const;
   virtual void SetAllLight(const csColor& color);
+  virtual void SetAllStaticLight(const csColor& color);
   virtual void RegisterLight(iIsoLight *light);
   virtual void UnRegisterLight(iIsoLight *light);
+  virtual void RegisterDynamicLight(iIsoLight *light);
+  virtual void UnRegisterDynamicLight(iIsoLight *light);
   virtual iIsoCell* GetGridCell(int x, int y) { return GetCell(x,y); }
   virtual const csBox3& GetBox() const {return box;}
 };

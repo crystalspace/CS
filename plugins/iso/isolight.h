@@ -42,6 +42,8 @@ private:
   int visw, vish;
   /// force recalc of vismap
   bool recalc_vis;
+  /// my flags
+  csFlags flags;
 
 public:
   DECLARE_IBASE;
@@ -75,6 +77,7 @@ public:
   virtual float GetRadius() const { return radius; }
   virtual void ShineGrid();
   virtual void ShineSprite(iIsoSprite *sprite);
+  virtual csFlags& Flags() {return flags;}
 
 };
 

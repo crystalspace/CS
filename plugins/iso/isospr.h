@@ -40,8 +40,10 @@ private:
   csPoly3D poly;
   /// the (u,v) coordinates for the polygon (x=u, y=v)
   csPoly2D uv;
-  /// the colors of the vertices (x=red, y=green, z=blue)
+  /// the (dynamic) colors of the vertices (x=red, y=green, z=blue)
   csPoly3D colors;
+  /// the static (precalc) colors of the vertices (x=red, y=green, z=blue)
+  csPoly3D static_colors;
   /// drawing prealloc
   G3DPolygonDPFX g3dpolyfx;
   /// the grid change callback
@@ -79,6 +81,10 @@ public:
   virtual void GetGridChangeCallback(GridChangeCallbackType &func, void *&data)
     const {func = gridcall; data = gridcalldata;}
   virtual void ForcePosition(const csVector3& pos) {position = pos;}
+  virtual void ResetAllColors(); 
+  virtual void SetAllStaticColors(const csColor& color);
+  virtual void AddToVertexStaticColor(int i, const csColor& color);
+
 };
 
 #endif

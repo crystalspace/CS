@@ -55,6 +55,7 @@ void csIsoSprite::AddVertex(const csVector3& coord, float u, float v)
   poly.AddVertex(coord);
   uv.AddVertex(u,v);
   colors.AddVertex(1.,1.,1.);
+  static_colors.AddVertex(1.,1.,1.);
 }
 
 void csIsoSprite::SetPosition(const csVector3& newpos) 
@@ -285,4 +286,34 @@ void csIsoSprite::AddToVertexColor(int i, const csColor& color)
   if(colors[i].z>1.0f) colors[i].z=1.0f;
   else if(colors[i].z < 0.0f) colors[i].z = 0.0f;
 }
+
+void csIsoSprite::ResetAllColors()
+{
+  for(int i=0; i<poly.GetNumVertices(); i++)
+  {
+    colors[i] = static_colors[i];
+  }
+}
+
+void csIsoSprite::SetAllStaticColors(const csColor& color)
+{
+  for(int i=0; i<poly.GetNumVertices(); i++)
+  {
+    static_colors[i].Set(color.red, color.green, color.blue);
+  }
+}
+
+void csIsoSprite::AddToVertexStaticColor(int i, const csColor& color)
+{
+  static_colors[i].x += color.red; 
+  if(static_colors[i].x>1.0f) static_colors[i].x=1.0f;
+  else if(static_colors[i].x < 0.0f) static_colors[i].x = 0.0f;
+  static_colors[i].y += color.green; 
+  if(static_colors[i].y>1.0f) static_colors[i].y=1.0f;
+  else if(static_colors[i].y < 0.0f) static_colors[i].y = 0.0f;
+  static_colors[i].z += color.blue; 
+  if(static_colors[i].z>1.0f) static_colors[i].z=1.0f;
+  else if(static_colors[i].z < 0.0f) static_colors[i].z = 0.0f;
+}
+
 
