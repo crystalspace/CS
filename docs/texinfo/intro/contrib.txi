@@ -1356,7 +1356,7 @@ several minor patches. He also added the original version of the @samp{make
 install} target.
 
 @item
-Wyatt Miler (@email{wmiler@@milertronics.com})
+Wyatt Miler (@email{wmiler@@nyx.net})
 
 Wyatt had performed some editing of Crystal Space's (long defunct) LaTeX
 documentation files. Wyatt added the background music to Blocks. He has also
