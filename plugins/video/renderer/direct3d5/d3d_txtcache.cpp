@@ -37,10 +37,10 @@
 
 
 const int    LightmapBrightness = 0;   //can be 0 (darkest) to 254 (everything becomes white)
-const double LightmapGamma      = 0.7; //can be from 0.01   to 1.0 (1.0= no effect)
+const double LightmapGamma      = 0.6; //can be from 0.01   to 1.0 (1.0= no effect)
   
 const int    TextureBrightness = 0;   //can be 0 (darkest) to 254 (everything becomes white)
-const double TextureGamma      = 0.7; //can be from 0.01   to 1.0 (1.0= no effect)
+const double TextureGamma      = 0.9; //can be from 0.01   to 1.0 (1.0= no effect)
 
 ///////////////////////////////////
 // D3DTextureCache Implementation//
