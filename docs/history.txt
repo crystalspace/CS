@@ -32,6 +32,10 @@ chronological order.
 	      use them.
 	    - Fixed the problem that the shader manager only accepted 
 	      technique priorities > 0.
+	- Norman Kraemer extended pythmod_setup.py to handle "-l" prefixed
+	  additional libraries between the two "--".
+	- Norman Kraemer augmented PYTHMOD.LIBS.PLATFORM flags to include
+	  LIBBFD.LFLAGS. He thinks this should probably go into configure.ac.
 24-Sep-2003
 	- Jorrit finished implemented basic drawing of portals in
 	  csPortalContainer. Still some optimizations and testing to do.

@@ -28,7 +28,9 @@ else:
     lib_dir = sys.argv[i] ; i += 1
 libs = []
 while i < len(sys.argv) and sys.argv[i] != '--':
-    libs.append(sys.argv[i])
+    thelib = sys.argv[i]
+    thelib = thelib[:2] == "-l" and thelib[2:] or thelib
+    libs.append(thelib)
     i += 1
 sys.argv[1:i + 1] = []
 
