@@ -473,13 +473,9 @@ void csOctree::Build (
   if (num == 0)
   {
     // The only reason we create a BSP tree here is to solve a
-
     // bug related to sprite visibility. Previously when a sprite
-
     // enters an octree node containing no polygons it would not
-
     // be marked visible because that node contained no bsp tree
-
     // to be used for marking the visibility stubs.
     csBspTree *bsp;
     bsp = new csBspTree (thing, mode);
@@ -519,12 +515,9 @@ void csOctree::Build (
 
   for (k = 0; k < num; k++)
   {
-    // The following is approach is most likely not the best way
-
+    // The following approach is most likely not the best way
     // to do it. We should have a routine which can split a polygon
-
     // immediatelly to the eight octree nodes.
-
     // But since polygons will not often be split that heavily
 
     // it probably doesn't really matter much.
@@ -544,9 +537,7 @@ void csOctree::Build (
   for (i = 0; i < 8; i++)
   {
     // Even if there are no polygons in the node we create
-
     // a child octree node because some of the visibility stuff
-
     // depends on that (i.e. adding dynamic objects).
     node->children[i] = new csOctreeNode;
 
@@ -1091,14 +1082,10 @@ bool csOctree::ReadFromCache (
 
   for (k = 0; k < num; k++)
   {
-    // The following is approach is most likely not the best way
-
+    // The following approach is most likely not the best way
     // to do it. We should have a routine which can split a polygon
-
     // immediatelly to the eight octree nodes.
-
     // But since polygons will not often be split that heavily
-
     // it probably doesn't really matter much.
     csPolygonInt *npF, *npB, *npFF, *npFB, *npBF, *npBB;
     csPolygonInt *nps[8];
@@ -1126,9 +1113,7 @@ bool csOctree::ReadFromCache (
     }
 
     // Even if there are no polygons in the node we create
-
     // a child octree node because some of the visibility stuff
-
     // depends on that (i.e. adding dynamic objects).
     node->children[i] = new csOctreeNode;
 
@@ -1203,7 +1188,7 @@ bool csOctree::ReadFromCache (
   iDataBuffer *data = cache_mgr->ReadCache ("octree", NULL, 0);
   if (!data) return false;	// File doesn't exist
 
-  csMemFile* cf = new csMemFile (*(char**)data, data->GetSize (),
+  csMemFile* cf = new csMemFile ((char*)data->GetData (), data->GetSize (),
   	csMemFile::DISPOSITION_IGNORE);
   char buf[10];
   ReadString (cf, buf, 4);

@@ -1310,7 +1310,6 @@ void csEngine::PrepareTextures ()
 }
 
 // If a STAT_BSP level the loader call to UpdateMove is redundant when called
-
 // before csEngine::Prepare().
 void csEngine::PrepareMeshes ()
 {

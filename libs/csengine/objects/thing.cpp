@@ -796,22 +796,22 @@ void csThing::BuildStaticTree (const char *name, int mode)
   csEngine *w = csEngine::current_engine;
   iCacheManager* cache_mgr = w->GetCacheManager ();
 
+  if (GetCacheName ())
+  {
+    char buf[100];
+    sprintf (buf, "%s_%s", GetCacheName (), name);
+    cache_mgr->SetCurrentScope (buf);
+  }
+  else
+  {
+    char buf[100];
+    sprintf (buf, "defO_%s", name);
+    cache_mgr->SetCurrentScope (buf);
+  }
+
   bool recalc_octree = true;
   if (!csEngine::do_force_revis)
   {
-    if (GetCacheName ())
-    {
-      char buf[100];
-      sprintf (buf, "%s_%s", GetCacheName (), name);
-      cache_mgr->SetCurrentScope (buf);
-    }
-    else
-    {
-      char buf[100];
-      sprintf (buf, "defO_%s", name);
-      cache_mgr->SetCurrentScope (buf);
-    }
-
     recalc_octree = false;
     csEngine::current_engine->Report ("Loading bsp/octree...");
     recalc_octree = !((csOctree *)static_tree)->ReadFromCache (
@@ -836,18 +836,6 @@ void csThing::BuildStaticTree (const char *name, int mode)
   {
     csEngine::current_engine->Report ("Calculate bsp/octree...");
     static_tree->Build (GetPolygonArray ());
-    if (GetCacheName ())
-    {
-      char buf[100];
-      sprintf (buf, "%s_%s", GetCacheName (), name);
-      cache_mgr->SetCurrentScope (buf);
-    }
-    else
-    {
-      char buf[100];
-      sprintf (buf, "defO_%s", name);
-      cache_mgr->SetCurrentScope (buf);
-    }
 
     csEngine::current_engine->Report ("Caching bsp/octree...");
     ((csOctree *)static_tree)->Cache (cache_mgr);
