@@ -380,10 +380,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
   SetupObject ();
-  //@@@ TODO. This is an initial test....and is invalid
-  csVector2 st = bbox_2d.Min(), end = bbox_2d.Max();
-  bbox.StartBoundingBox(csVector3(st.x,st.y,0));
-  bbox.AddBoundingVertexSmart(csVector3(end.x,end.y,0));
+  bbox.Set (-radius, radius);
 }
 
 void csSprite2DMeshObject::HardTransform (const csReversibleTransform& t)
