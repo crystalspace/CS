@@ -1486,6 +1486,22 @@ AS_IF([test "$with_vos" != no],
     AS_IF([test $cs_cv_libvos = yes],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libvos], [VOS])])])
 
+#------------------------------------------------------------------------------
+# Check whether to build the WxWidgets Canvas
+#------------------------------------------------------------------------------
+AC_CHECK_TOOLS([WXCONFIG], [wx-config])
+AC_CACHE_CHECK([for WxWidgets], [cs_cv_wxwidgets],
+    [AS_IF([test -n "$WXCONFIG"],
+    	[cs_cv_wxwidgets=yes
+    	cs_cv_wxwidgets_cflags="`AC_RUN_LOG(
+    	    [$WXCONFIG --cxxflags])`"
+    	cs_cv_wxwidgets_lflags="`AC_RUN_LOG(
+    	    [$WXCONFIG --ldflags])`"
+    	cs_cv_wxwidgets_libs="`AC_RUN_LOG(
+    	    [$WXCONFIG --libs --gl-libs])`"],
+        [cs_cv_wxwidgets=no])])
+AS_IF([test $cs_cv_wxwidgets = yes],
+	[CS_EMIT_BUILD_RESULT([cs_cv_wxwidgets], [WX])])
 
 
 #------------------------------------------------------------------------------
