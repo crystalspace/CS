@@ -33,7 +33,6 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 use Digest::MD5 qw(md5_hex);
-use HTMLEntities qw(encode_entities);
 
 my $PROG_NAME = 'msvc7gen.pl';
 my $PROG_VERSION = 3;
@@ -103,6 +102,7 @@ my @script_options = (
 
 $main::verbosity = 0;
 $main::makefile = '';
+$main::guid = '';
 $main::groups = {};
 @main::vpi_fragments = ();
 @main::dpi_fragments = ();
@@ -222,7 +222,9 @@ sub guid_from_name {
 sub clean_string {
     my ($result) = @_;
     $result = join(' ', @{$result}) if ref($result) and ref($result) eq 'ARRAY';
-    encode_entities ($result);
+    $result =~ s/\"/\&quot\;/g;
+    $result =~ s/\</\&lt\;/g;
+    $result =~ s/\>/\&gt\;/g;
     return $result;
 }
 
@@ -356,7 +358,7 @@ sub interpolate_sln_project {
     my $result = $main::sln_group_template;
     interpolate('%project%', $main::opt_project, \$result);
     interpolate('%vcproj%', basename($main::opt_output), \$result);
-    interpolate('%guid%', guid_from_name($main::opt_project), \$result);
+    interpolate('%guid%', $main::guid, \$result);
     return $result;
 }
 
@@ -370,7 +372,7 @@ sub interpolate_sln_dependency {
     foreach $dependency (sort(@main::opt_depend)) {
 	my $buffer = $main::sln_depend_template;
 	interpolate('%depnum%', $depcnt, \$buffer);
-	interpolate('%guid%', guid_from_name($main::opt_project), \$buffer);
+	interpolate('%guid%', $main::guid, \$buffer);
 	interpolate('%depguid%', guid_from_name($dependency), \$buffer);
 	$result .= $buffer;
 	$depcnt++;
@@ -383,7 +385,7 @@ sub interpolate_sln_dependency {
 #------------------------------------------------------------------------------
 sub interpolate_sln_config {
     my $result = $main::sln_config_template;
-    interpolate('%guid%', guid_from_name($main::opt_project), \$result);
+    interpolate('%guid%', $main::guid, \$result);
     return $result;
 }
 
@@ -417,7 +419,10 @@ sub interpolate_sln {
 sub create_vcproj {
     save_file($main::opt_output, interpolate_vcproj());
     print "Generated: $main::opt_output\n" unless quiet();
+    
     if (defined($main::opt_fragment)) {
+    	$main::guid = guid_from_name($main::opt_project);
+    	
 	save_file($main::opt_fragment, '');
 	print "Generated: $main::opt_fragment\n" unless quiet();
 	
