@@ -3747,7 +3747,14 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   G3DTriangleMesh& mesh, bool setup_trans,
   GLuint lightmap, csVector2* lightmapcoords)
 {
-  int i, l;
+  if (mesh.do_fog)
+  {
+    // Because EffectDrawTriangleMesh doesn't seem to work properly with
+    // fog I switch back to OldDrawTriangleMesh in case of fog.
+    OldDrawTriangleMesh (mesh, setup_trans);
+    return;
+  }
+
   if (!lightmap)
   {
     if (!mesh.mat_handle)
@@ -3758,6 +3765,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       return;
     }
   }
+  int i, l;
 
   iMaterial* material = NULL;
   iEffectDefinition* effect = NULL;

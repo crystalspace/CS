@@ -22,6 +22,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine disabled the annoying, abusive message in aclocal.m4
 	  about missing FreeType2 library.  We don't need to abuse the user
 	  when an optional library is absent.
+	- Apparently EffectDrawTriangleMesh() in OpenGL doesn't correctly work
+	  with fog enabled. As a temporary work around I switch to
+	  OldDrawTriangleMesh() in case fog is enabled.
 	- Eric Sunshine fixed a double-delete[] bug in win32/loadlib.cpp on
 	  Cygwin reported by Dan Mahoney <domahoneyii@users.sourceforge.net>.
 	- Eric Sunshine fixed a bug recently introduced into csconfig.mak where
