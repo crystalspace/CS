@@ -135,7 +135,7 @@ endif
 DO.PLUGIN = $(DO.PLUGIN.PREAMBLE) $(DO.PLUGIN.CORE) $(DO.PLUGIN.POSTAMBLE)
 
 # The sed script used to build dependencies
-SED_DEPEND=-e "s/^\([^ \#].*\)/$(BUCK)\(OUT\)\1/" $(SYS_SED_DEPEND)
+SED_DEPEND=-e "s:^\([^ \#].*\):$(BUCK)\(OUT\)/\1:" $(SYS_SED_DEPEND)
 # How to build a source dependency file
 ifndef DO.DEP
   ifeq ($(DEPEND_TOOL),cc)
@@ -152,7 +152,7 @@ dep: build.makedep
         MAKEDEP := makedep
       endif
       DO.DEP1 = $(MAKEDEP) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) )
-      DO.DEP2 = $(filter-out %.asm,$^) -o $(BUCK)O -p $(BUCK)\(OUT\) -r -c -f $@
+      DO.DEP2 = $(filter-out %.asm,$^) -o $(BUCK)O -p $(BUCK)\(OUT\)/ -r -c -f $@
       DO.DEP = $(DO.DEP1) $(DO.DEP2)
     else
       DO.DEP = echo Building dependencies is not supported on this platform
