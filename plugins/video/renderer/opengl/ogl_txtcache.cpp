@@ -38,7 +38,7 @@
 #define NORMAL_LIGHT_LEVEL 128
 #endif
 
-static int const MAX_MIPMAP_LEVELS = 4;
+static int const MAX_MIPMAP_LEVELS = 1;
 
 OpenGLTextureCache::OpenGLTextureCache(int size, int bitdepth)
   : HighColorCache(size,HIGHCOLOR_TEXCACHE,bitdepth)
@@ -72,6 +72,8 @@ void OpenGLTextureCache::Load (HighColorCache_Data *d)
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
 
     csTexture* txt_unl = txt_mm->get_texture (0);
     int texture_width = txt_unl->get_width ();
