@@ -114,17 +114,17 @@ public:
 class DirectDetection  
 {
 public:
-	bool Have2DDevice();
-	bool Have3DDevice();
-	DirectDetection();
-	virtual ~DirectDetection();
+  bool Have2DDevice();
+  bool Have3DDevice();
+  DirectDetection();
+  virtual ~DirectDetection();
   DirectDetectionDevice * findBestDevice3D(bool fscreen);
   DirectDetectionDevice * findBestDevice2D();
-	int addDevice(DirectDetection2D * dd2d);
-	int addDevice(DirectDetection3D * dd3d);
-	bool checkDevices();
-	bool checkDevices2D();
-	bool checkDevices3D();
+  int addDevice(DirectDetection2D * dd2d);
+  int addDevice(DirectDetection3D * dd3d);
+  bool checkDevices();
+  bool checkDevices2D();
+  bool checkDevices3D();
 
   DirectDetectionDevice * Devices; // list of devices
 };
