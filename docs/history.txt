@@ -2,6 +2,9 @@ The history order is reversed so that new features are at the top.
 
 17-Sep-2002
 	- Clarified some iMovable Doxygen comments.
+	- Fixed a serious bug in the csRef assignment operator for
+	  csRef and normal pointers. It would first DecRef() the old
+	  pointer and then IncRef() the new one. This can cause crashes.
 16-Sep-2002
 	- Fixed a DecRef() problem with the g2d plugin (ddraw). Please
 	  people! When replacing a normal pointer with a csRef you

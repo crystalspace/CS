@@ -170,10 +170,10 @@ public:
       // it is easy to get in infinite loops with objects being
       // destructed forever (when ref=NULL is used for example).
       obj = newobj;
-      if (oldobj)
-	oldobj->DecRef ();
       if (newobj)
 	newobj->IncRef ();
+      if (oldobj)
+	oldobj->DecRef ();
     }
     return *this;
   }
