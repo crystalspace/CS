@@ -301,7 +301,7 @@ public:
    * Version of Flush that handles the case where there is no depth checking.
    * Returns true if the tile was modified.
    */
-  bool FlushNoDepth (csTileCol& fvalue, float maxdepth);
+  bool FlushNoDepth (csTileCol& fvalue);
 
   /**
    * General Flush (slowest version).
@@ -540,6 +540,14 @@ public:
   void InsertPolygonInverted (csVector2* verts, int num_verts, float max_depth);
 
   /**
+   * Insert an inverted polygon in the coverage buffer.
+   * <p>
+   * This function ignores depth in the depth buffer and should only
+   * be used if you don't plan to use depth information nor depend on it.
+   */
+  void InsertPolygonInvertedNoDepth (csVector2* verts, int num_verts);
+
+  /**
    * Insert a polygon in the coverage buffer.
    * This function will not do any backface culling and it will work
    * perfectly in all orientations. Polygon has to be convex.
@@ -550,6 +558,22 @@ public:
    * If this function returns the number of tiles that were modified.
    */
   int InsertPolygon (csVector2* verts, int num_verts, float max_depth,
+  	csBox2Int& modified_bbox);
+
+  /**
+   * Insert a polygon in the coverage buffer.
+   * This function will not do any backface culling and it will work
+   * perfectly in all orientations. Polygon has to be convex.
+   * It will update the screen buffer. 'modified_bbox' will be updated to
+   * contain the union of the previous contents of 'modified_bbox' and also
+   * the screen space box that was modified by this function.
+   * <p>
+   * If this function returns the number of tiles that were modified.
+   * <p>
+   * This function ignores depth in the depth buffer and should only
+   * be used if you don't plan to use depth information nor depend on it.
+   */
+  int InsertPolygonNoDepth (csVector2* verts, int num_verts,
   	csBox2Int& modified_bbox);
 
   /**

@@ -87,7 +87,6 @@ void csCoverageTile::PushLine (int x1, int y1, int x2, int y2, int dx)
   CS_ASSERT (y2 < NUM_TILEROW);
   CS_ASSERT (x1+ABS (y2-y1)*dx >= 0);
   CS_ASSERT (x1+ABS (y2-y1)*dx < (NUM_TILECOL<<16));
-  //@@@ VERY SUSPICIOUS! These asserts are triggerred in some cases!
   CS_ASSERT (x2-ABS (y1-y2)*dx >= 0);
   CS_ASSERT (x2-ABS (y1-y2)*dx < (NUM_TILECOL<<16));
   csLineOperation& op = AddOperation ();
@@ -574,7 +573,7 @@ bool csCoverageTile::FlushForFull (csTileCol& fvalue, float maxdepth)
   return modified;
 }
 
-bool csCoverageTile::FlushNoDepth (csTileCol& fvalue, float maxdepth)
+bool csCoverageTile::FlushNoDepth (csTileCol& fvalue)
 {
   FlushOperations ();
 
@@ -791,7 +790,7 @@ bool csCoverageTile::Flush (csTileCol& fvalue, float maxdepth)
 
   if (tile_min_depth < INIT_MIN_DEPTH_CMP && maxdepth <= tile_min_depth)
   {
-    return FlushNoDepth (fvalue, maxdepth);
+    return FlushNoDepth (fvalue);
   }
 
   return FlushGeneral (fvalue, maxdepth);
@@ -2102,6 +2101,27 @@ void csTiledCoverageBuffer::InsertPolygonInverted (csVector2* verts,
   }
 }
 
+void csTiledCoverageBuffer::InsertPolygonInvertedNoDepth (csVector2* verts,
+	int num_verts)
+{
+  csBox2Int bbox;
+  if (!DrawPolygon (verts, num_verts, bbox))
+    return;
+
+  int tx, ty;
+
+  for (ty = 0 ; ty <= num_tile_rows-1 ; ty++)
+  {
+    csTileCol fvalue = TILECOL_FULL;
+    csCoverageTile* tile = GetTile (0, ty);
+    for (tx = 0 ; tx <= (width_po2 >> SHIFT_TILECOL)-1 ; tx++)
+    {
+      tile->FlushNoDepth (fvalue);
+      tile++;
+    }
+  }
+}
+
 int csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
 	float max_depth, csBox2Int& modified_bbox)
 {
@@ -2127,6 +2147,45 @@ int csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
       bool mod = tile->Flush (fvalue, max_depth);
+      if (mod)
+      {
+        modified++;
+	if (tx < modified_bbox.minx) modified_bbox.minx = tx;
+	if (tx > modified_bbox.maxx) modified_bbox.maxx = tx;
+	if (ty < modified_bbox.miny) modified_bbox.miny = ty;
+	if (ty > modified_bbox.maxy) modified_bbox.maxy = ty;
+      }
+      tile++;
+    }
+  }
+  return modified;
+}
+
+int csTiledCoverageBuffer::InsertPolygonNoDepth (csVector2* verts,
+	int num_verts, csBox2Int& modified_bbox)
+{
+  csBox2Int bbox;
+  if (!DrawPolygon (verts, num_verts, bbox))
+    return 0;
+
+  int tx, ty;
+  int startrow, endrow;
+  startrow = bbox.miny >> SHIFT_TILEROW;
+  if (startrow < 0) startrow = 0;
+  endrow = bbox.maxy >> SHIFT_TILEROW;
+  if (endrow >= num_tile_rows) endrow = num_tile_rows-1;
+
+  int modified = 0;
+  for (ty = startrow ; ty <= endrow ; ty++)
+  {
+    csTileCol fvalue = TILECOL_EMPTY;
+    csCoverageTile* tile = GetTile (dirty_left[ty], ty);
+    int dr = dirty_right[ty];
+    if (dr >= (width_po2 >> SHIFT_TILECOL))
+      dr = (width_po2 >> SHIFT_TILECOL)-1;
+    for (tx = dirty_left[ty] ; tx <= dr ; tx++)
+    {
+      bool mod = tile->FlushNoDepth (fvalue);
       if (mod)
       {
         modified++;

@@ -15,6 +15,9 @@ chronological order.
 	- Jorrit added a version of csBox3::ProjectOutline() that accepts
 	  a csArray<csVector2> instead of csPoly2D.
 	- Jorrit did some additional work on pvscalc.
+	- Jorrit extended csTiledCoverageBuffer so that there are functions
+	  to insert polygons (inverted or not inverted) without caring for
+	  depth. PVS calculations will not require the depth buffer.
 9-Feb-2005
 	- Jorrit implemented sorting in csChainHull2D::SortXY.
 	- Jorrit worked a bit further on pvscalc.
