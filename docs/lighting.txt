@@ -1,3 +1,7 @@
+WARNING! Although the basic principle described here is still valid,
+much more is going on now. I need to update this document.
+
+
 This document gives a VERY short explanation of the static lighting
 system used in version 0.10 of Crystal Space (not in the earlier versions).
 

@@ -12,6 +12,30 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+30-Jun-99:
+	- I extended the movement system of Denis Dmitriev to implement the
+	  old 3d-movement functions again. There are a set of new commands
+	  which can be bound to keys for that purpose. The docs/console.txt
+	  document has been updated with all new commands.
+	- Update documentation.
+	- *** Release of 0.13_012 ***
+29-Jun-99:
+	- I had to remove the optimization mentioned below with regards
+	  to triangle drawing. It is more complicated than that. The
+	  optimization is still possible though but it needs a little
+	  more thinking.
+	- Various changes in preparation of the next beta release.
+	- Dynamic lighting for missile is now correct immediatelly
+	  after creation.
+	- Added faster version of csPolygonSet::TransformWorld2Cam()
+	  which makes better use of the processor L2 cache. Thanks to
+	  Bruce Williams for suggesting this to me.
+	- Much improved fog routine for the software renderer. This one
+	  is MUCH faster. Thanks to Andrew Zabolotny for this one. Note
+	  that the code for 32-bit fog seems not to work correctly on
+	  non-Intel platforms (like the SPARC).
+	- Andrew also fixed the problem with gouraud shaded triangles which
+	  were sometimes rendered wrong.
 28-Jun-99:
 	- Removed test on rstate_gouraud in software renderer because it
 	  is plain wrong.
@@ -20,6 +44,12 @@ Short-term cleanups that need to be done:
 	- BIG BIG improvement in speed in PreparePolygonQuick(). This should
 	  make a huge difference when showing sprites (and curved surfaces).
 	  And not only for the software renderer. It was the engine!
+	- Small fix to [] operator in csVector3 from Denis Dmitriev.
+	- Denis Dmitriev replaced old tri_context code by code from Tomas
+	  Moller since old was incorrect in some cases.
+	- I removed currentSector from csSprite3D since it is redundant.
+	- Denis Dmitriev implemented a new movement system in WalkTest.
+	- Serguei Narojnyi (Snaar) fixed another bug in the network code.
 26-Jun-99:
 	- Serguei Narojnyi (Snaar) SQUASHED a bug in the network driver :-)
 25-Jun-99:
