@@ -204,14 +204,14 @@ void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) cons
 
 bool csGLTextureHandle::GetRendererDimensions (int &mw, int &mh)
 {
-  PrepareInt ();
+  AdjustSizePo2 ();
   mw = actual_width; mh = actual_height;
   return true;
 }
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 {
-  PrepareInt ();
+  AdjustSizePo2 ();
   mw = orig_width;
   mh = orig_height;
 }
@@ -219,7 +219,7 @@ void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 // Check the two below for correctness
 bool csGLTextureHandle::GetRendererDimensions (int &mw, int &mh, int &md)
 {
-  PrepareInt ();
+  AdjustSizePo2 ();
   mw = actual_width;
   mh = actual_height;
   md = actual_d;
@@ -228,7 +228,7 @@ bool csGLTextureHandle::GetRendererDimensions (int &mw, int &mh, int &md)
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
 {
-  PrepareInt ();
+  AdjustSizePo2 ();
   mw = orig_width;
   mh = orig_height;
   md = orig_d;
@@ -293,6 +293,13 @@ void csGLTextureHandle::PrepareInt ()
   size_t i;
   for(i = 0; i < images->Length(); i++)
   {
+    // Do any resizing, if needed
+    if (actual_width != orig_width || actual_height != orig_height)
+    {
+      images->SetImage (i, csImageManipulate::Rescale (
+	images->GetImage (i), actual_width, actual_height));
+    }
+
     csAlphaMode::AlphaType newAlphaType = csAlphaMode::alphaNone;
     if (IsTransp())
       PrepareKeycolor (images->GetImage (i), transp_color, newAlphaType);
@@ -316,6 +323,9 @@ void csGLTextureHandle::PrepareInt ()
 
 void csGLTextureHandle::AdjustSizePo2 ()
 {
+  if (IsSizeAdjusted ()) return;
+  SetSizeAdjusted (true);
+
   size_t i;
   actual_d = orig_d = images->Length();
   for(i = 0; i < images->Length(); i++)
@@ -328,9 +338,6 @@ void csGLTextureHandle::AdjustSizePo2 ()
     csTextureHandle::CalculateNextBestPo2Size (
       orig_width, orig_height, newwidth, newheight);
 
-    actual_width = newwidth;
-    actual_height = newheight;
-
     // If necessary rescale if bigger than maximum texture size,
     // but only if a dimension has changed. For textures that are
     // already PO2, a lower mipmap will be selected in CreateMipMaps()
@@ -339,11 +346,8 @@ void csGLTextureHandle::AdjustSizePo2 ()
     if ((newheight != orig_width) && (newheight > txtmgr->max_tex_size)) 
       newheight = txtmgr->max_tex_size;
 
-    if (newwidth != orig_width || newheight != orig_height)
-    {
-      images->SetImage (i, csImageManipulate::Rescale (
-	images->GetImage (i), newwidth, newheight));
-    }
+    actual_width = newwidth;
+    actual_height = newheight;
   }
 }
 

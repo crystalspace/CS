@@ -61,6 +61,8 @@ class CS_CSUTIL_EXPORT csThreadJobQueue : public iJobQueue
   QueueAndRunnableShared sharedData;
   csRef<iJob> currentJob;
   csRef<csMutex> jobFinishMutex;
+  // stats
+  uint jobsAdded, jobsPulled, jobsWaited, jobsUnqueued;
 public:
   SCF_DECLARE_IBASE;
 

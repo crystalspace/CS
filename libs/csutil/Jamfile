@@ -21,6 +21,7 @@ case MACOS_X :					# MacOS/X
 		[ ConcatDirs generic csprocessorcap.cpp ]
 		[ ConcatDirs generic cspthrd.cpp ] 
 		[ ConcatDirs generic cspthrd.h ]
+		[ ConcatDirs generic expandname.cpp ]
 		[ ConcatDirs generic findlib.cpp ]
 		[ ConcatDirs generic getopt.cpp ]
 		[ ConcatDirs generic mmap.cpp ]
@@ -29,6 +30,7 @@ case MACOS_X :					# MacOS/X
 		[ ConcatDirs generic printf.cpp ]
 		[ ConcatDirs generic scanplugins.cpp ]
 		[ ConcatDirs generic sysroot.cpp ] ;
+		[ ConcatDirs generic vfsplat.cpp ] ;
 case * :					# Posix, Unix, Linux, etc.
   CSSYS_SRC += [ Filter [ Wildcard unix : *.cpp *.cc *.c *.h ] :
 			unix/bfdplugins.cpp ]
@@ -37,6 +39,7 @@ case * :					# Posix, Unix, Linux, etc.
 		[ ConcatDirs generic csprocessorcap.cpp ]
 		[ ConcatDirs generic cspthrd.cpp ]
 		[ ConcatDirs generic cspthrd.h ]
+		[ ConcatDirs generic expandname.cpp ]
 		[ ConcatDirs generic findlib.cpp ]
 		[ ConcatDirs generic getopt.cpp ]
 		[ ConcatDirs generic mmap.cpp ]
@@ -47,6 +50,7 @@ case * :					# Posix, Unix, Linux, etc.
 		[ ConcatDirs generic resdir.cpp ]
 		[ ConcatDirs generic runloop.cpp ] 
 		[ ConcatDirs generic sysroot.cpp ] ;
+		[ ConcatDirs generic vfsplat.cpp ] ;
   if $(EMBED_META) = "yes" && $(LIBBFD.AVAILABLE) = "yes"
   {
     CSSYS_SRC += [ ConcatDirs unix bfdplugins.cpp ] ;

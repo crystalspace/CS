@@ -26,6 +26,10 @@ chronological order.
 	      auto-detected value was available).
 	    - Removed a couple of tokens related to the obsolete effects 
 	      system from csparser.
+	- res made GL textures only query image data when really needed (and 
+	  not already when just querying the size of a texture). This actually
+	  makes the use of threaded image loading beneficial.
+	- res enabled threaded image loading.
 2-Feb-2005
 	- Jorrit removed CS_PROFSETUP. Setup is now automatic the first time
 	  you use CS_PROFSTART.

@@ -92,7 +92,7 @@ public:
   virtual void ApplyTo (csImageMemory* image);
 };
 
-//#define THREADED_LOADING
+#define THREADED_LOADING
 
 /**
  * A base class for image loader plugin iImage implementations.

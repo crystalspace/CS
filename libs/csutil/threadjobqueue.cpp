@@ -27,9 +27,16 @@ SCF_IMPLEMENT_IBASE(csThreadJobQueue)
   SCF_IMPLEMENTS_INTERFACE(iJobQueue)
 SCF_IMPLEMENT_IBASE_END
 
+//#define THREADJOBQUEUE_PRINT_STATS
+
 csThreadJobQueue::csThreadJobQueue()
 {
   SCF_CONSTRUCT_IBASE(0);
+
+  jobsAdded = 0;
+  jobsPulled = 0;
+  jobsUnqueued = 0;
+  jobsWaited = 0;
 
   jobFinishMutex = csMutex::Create ();
   sharedData.jobFifo = new JobFifo ();
@@ -57,19 +64,22 @@ csThreadJobQueue::~csThreadJobQueue()
   queueThread->Wait();
 
   delete sharedData.jobFifo;
+#ifdef THREADJOBQUEUE_PRINT_STATS
+  csPrintf ("csThreadJobQueue %pp: %u added, %u pulled, %u waited, %u unqueued\n",
+    this, jobsAdded, jobsPulled, jobsWaited, jobsUnqueued);
+#endif
   SCF_DESTRUCT_IBASE();
 }
 
 void csThreadJobQueue::Enqueue (iJob* job)
 {
   CS_ASSERT (job != 0);
-  bool newJob;
+  jobsAdded++;
   {
     csScopedMutexLock fifoLock (sharedData.fifoXS);
-    newJob = sharedData.jobFifo->Length() == 0;
+    sharedData.jobFifo->Length();
     sharedData.jobFifo->Push (job);
-    if (newJob)
-      sharedData.queueWake->Signal();
+    sharedData.queueWake->Signal();
   }
 }
 
@@ -84,15 +94,20 @@ void csThreadJobQueue::PullAndRun (iJob* job)
   }
   if (!jobEnqueued)
   {
+    bool didWait = false;
     while (currentJob == job)
     {
       sharedData.jobXS->Release();
       // wait for the job completion
       csScopedMutexLock jobLock (jobFinishMutex);
       sharedData.jobFinish->Wait (jobFinishMutex);
+      didWait = true;
       sharedData.jobXS->LockTry();
     }
+    if (didWait) jobsWaited++;
   }
+  else
+    jobsPulled++;
   sharedData.jobXS->Release();
   // If it was in the queue, run now.
   // if it was not, it either was waited for above or already finished.
@@ -110,19 +125,26 @@ void csThreadJobQueue::Unqueue (iJob* job, bool waitIfCurrent)
   }
   if (!jobEnqueued && waitIfCurrent)
   {
+    bool didWait = false;
     while (currentJob == job)
     {
       sharedData.jobXS->Release();
       // wait for the job completion
       csScopedMutexLock jobLock (jobFinishMutex);
       sharedData.jobFinish->Wait (jobFinishMutex);
+      didWait = true;
       sharedData.jobXS->LockTry();
     }
+    if (didWait) jobsWaited++;
   }
+  else
+    jobsUnqueued++;
   sharedData.jobXS->Release();
 }
 
 //---------------------------------------------------------------------------
+
+//#define RUNNABLE_CHATTY
 
 csThreadJobQueue::QueueRunnable::QueueRunnable (
   const QueueAndRunnableShared& sharedData)
@@ -142,7 +164,13 @@ void csThreadJobQueue::QueueRunnable::Run ()
   bool jobbing = false;
   while (true)
   {
+#ifdef RUNNABLE_CHATTY
+    if (!jobbing) csPrintf ("csThreadJobQueue::QueueRunnable::Run(): zzzz\n");
+#endif
     if (!jobbing) sharedData.queueWake->Wait (awakenMutex);
+#ifdef RUNNABLE_CHATTY
+    if (!jobbing) csPrintf ("csThreadJobQueue::QueueRunnable::Run(): *yawn*\n");
+#endif
 
     csRef<iJob> newJob;
     {
@@ -168,6 +196,9 @@ void csThreadJobQueue::QueueRunnable::Run ()
     if (newJob.IsValid())
     {
       newJob->Run();
+#ifdef RUNNABLE_CHATTY
+      csPrintf ("csThreadJobQueue::QueueRunnable::Run(): finished a job, yay\n");
+#endif
       {
 	csScopedMutexLock jobLock (sharedData.jobXS);
 	*sharedData.currentJob = 0;
