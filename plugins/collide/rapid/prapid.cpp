@@ -204,21 +204,23 @@ bool csRapidCollider::Collide (csRapidCollider &otherCollider,
   csVector3 T1 (0, 0, 0);
   if (pTransform1 && pTransform2)
   {
-    csReversibleTransform trans1 = (*pTransform1) / *pTransform2;
+    csReversibleTransform trans1 = (*pTransform2) / (*pTransform1);
     T1 = trans1.GetO2TTranslation ();
     R1 = trans1.GetO2T ();
   }
   else if (pTransform1)
   {
-    T1 = pTransform1->GetO2TTranslation ();
-    R1 = pTransform1->GetO2T ();
-  }
-  else if (pTransform2)
-  {
-    csReversibleTransform trans1 = pTransform2->GetInverse ();
+    csReversibleTransform trans1 = (pTransform1->GetInverse ());
     T1 = trans1.GetO2TTranslation ();
     R1 = trans1.GetO2T ();
   }
+  else if (pTransform2)
+  {
+    T1 = pTransform2->GetO2TTranslation ();
+    R1 = pTransform2->GetO2T ();
+  }
+
+  T1 = -R1*T1;
 
   // [R1,T1] is how the first triangle set is positioned relative to the
   // second one (combination of two transforms) (in world space).
