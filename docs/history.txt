@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+2-Sep-2001
+	- Various documentation changes:
+	    - Updated the engine/portals document.
+	    - Updated the engine/lighting document.
+	    - Updated the engine/viscull document.
 1-Sep-2001
 	- Various documentation changes:
 	    - Updated plugins overview so it mentions recent developments.

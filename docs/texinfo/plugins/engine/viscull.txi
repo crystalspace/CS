@@ -32,19 +32,20 @@ system are implemented though.
 @cindex sectors
 
 A sector is the basic building block in Crystal Space. A world will be made out
-of several sectors connected with portals. Normally adjacent sectors
-can be connected with a straight portal but portals can also warp space
-so that you can connect any point in space to any other point in space.
-This effect can be used to create mirrors for example.
+of several sectors connected with portals (@pxref{Portal Engine}).
+Normally adjacent sectors can be connected with a straight portal but
+portals can also warp space so that you can connect any point in space to
+any other point in space. This effect can be used to create mirrors for
+example.
 
 This effect of portals makes them very powerful. It also means that
 you can have overlapping sectors and in general other weird portal
 constructs.
 
-Portals starting in arbitrary space (i.e. on a thing) are called
-floating portals. Some special care needs to be taken for those because
-we can't rely on the Z-buffer to be useful here. So this is a case
-where clipping to the 2D boundary of the portal must happen.
+Portals starting in arbitrary space (i.e. in the middle of
+a sector) are called floating portals. Some special care needs to be taken
+for those because we can't rely on the Z-buffer to be useful here. So this
+is a case where clipping to the 2D boundary of the portal must happen.
 
 Important for this discussion is the fact that we have two important
 areas where culling happens. We have in-sector visibility culling which
@@ -64,9 +65,9 @@ the entities below.
 @cindex Sprites, Visibility
 @cindex Models Visibility
 
-Crystal Space supports both 3D and 2D sprites. A 3D sprite is basicly a
-set of triangles or a triangle mesh. I will not go into much more
-detail here because this document is related to visibility. A 2D sprite
+Crystal Space supports (among others) both 3D and 2D sprites. A 3D sprite
+is basically a set of triangles or a triangle mesh. I will not go into much
+more detail here because this document is related to visibility. A 2D sprite
 is a general polygon which always faces the camera. Both are considered
 detail objects (more on that later).
 
@@ -74,11 +75,10 @@ detail objects (more on that later).
 @cindex Visibility of Things
 @cindex Things, Visibility
 
-Things are general objects used to enhance geometry. They can move
-and rotate but in general their most important use is to enhance
-geometry of a level (i.e. a painting on the wall, a staircase,
-a chair, etc.). Large things can be merged with sector geometry (more
-on that later). Small and detailed things will be tagged as detail
+Things are general objects used to define the basic geometry in a level.
+They can move and rotate but in general their most important use is to define
+level geometry (i.e. walls, floor, ceiling, a painting on the wall, a staircase,
+a chair, etc.). Small and detailed things will be tagged as detail
 objects. Polygons on things can also be portals to other areas.
 
 @subsubheading Curved Surfaces
@@ -95,15 +95,17 @@ objects as they represent a rather large triangle mesh.
 
 A terrain surface is a large entity that can be in a sector.
 It is not a detail object (obviously). Handling of terrain and visibility
-is not ready yet. We need to do more work on this part.
+is not ready yet. We need to do more work on this part. At this moment
+the terrain engine already has a visibility algorithm inside which is
+used for visibility culling of its own triangles but this algorithm should
+also be used to cull objects that are on the terrain.
 
 @node VIS sector structure, VIS visibility culling, VIS entities, Visibility Culling
 @subsubsection Sector Structure
 
 In this subsection we go deeper into the structure of a sector.
-A sector is always convex.  This means that all the polygons making
-up the boundary of a sector must form a convex (and in most cases closed)
-hull.
+A very common case to use sectors is to define a sector with one
+thing which is convex and makes up the outer hull of the sector.
 
 Then we have two possibilities. Either we stop here and add entities
 from the above list to this sector and use outgoing portals to define
@@ -125,8 +127,9 @@ Space uses @sc{bsp} trees mostly to get perfect Z ordering of polygons (i.e.
 front to back or back to front).  Why Crystal Space needs this will be
 explained later.
 
-To build a @sc{bsp} tree you take the entire sector (i.e. all polygons
-from the merged things) and you select one polygon to split all the others.
+To build a @sc{bsp} tree you define one big thing containing all the
+polygons that will make the octree and mark it using the @dfn{VISTREE}
+keyword. The algorithm will then select one polygon to split all the others.
 This will create two child nodes. All polygons on the same plane as the
 splitter will be added to the current node. All polygons at the left side
 of the splitter will be added to the left node and all polygons at the
@@ -186,9 +189,9 @@ types of geometry:
 @emph{World Geometry}
 
 World geometry is the basic geometry that makes up the world.
-Sector walls are part of world geometry. In general world geometry
-are big polygons that define large boundaries in some world or
-level.
+In general world geometry are big polygons that define large boundaries
+in some world or level. They usually represent walls, floors, and
+ceilings.
 
 @item
 @emph{Detail Objects}
@@ -223,9 +226,7 @@ added to the octree if there is one.
 @cindex View frustum
 
 View frustum culling is the most obvious type of culling.  Crystal Space does
-not do it right now (see the following section about portal/sector visibility
-for the reason) but there are some areas where we should certainly do this.
-Detail objects are one example.
+this for all detail objects.
 
 @node VIS portal/Sector visibility, VIS in Sector Visibility, VIS view frustum culling, Visibility Culling
 @subsubsection Portal/Sector Visibility
@@ -451,3 +452,4 @@ once.
 
 This is the basic algorithm. More detail will follow later (about the
 @sc{pvs} for polygons and so on).
+

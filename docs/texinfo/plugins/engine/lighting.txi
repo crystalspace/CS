@@ -19,14 +19,6 @@ In the interest of accuracy, it is actually possible to change the so-called
 doing so, it is necessary to perform time-consuming recalculation of lightmaps
 in order for the changes to be reflected in the rendered world.
 
-Crystal Space supports three different lighting tables.  Every light in the
-scene can emit some amount of each variety of light.  For example, if the
-three tables are red, green, and blue a light could emit light with
-intensity---specified as an (@var{r},@var{g},@var{b}) tuple---(0.5, 0, 1),
-which means ``half intensity red, no green, and full intensity blue''.  With
-the @samp{MIXLIGHTS} setting you can control how the three colors are defined
-and how the mixing happens, as described below.
-
 Every light has a position in world space coordinates and a current
 @dfn{sector}.  Every light also has a radius (expressed in squared distance).
 This radius indicates where the light levels of the three light tables will
@@ -73,10 +65,6 @@ specific beam of light.  We need to test for that.
 If there is a successful hit then calculate the distance between the light and
 the point on the polygon and update the intensity there.
 @end enumerate
-
-Note that light patches are slightly expanded before clipping and also before
-using in the lightmap-updater.  This is to accomplish better results at
-boundaries of polygons (though still not perfect).
 
 To create the three lightmaps for every polygon a 2D bounding box in texture
 space is calculated.  This defines a rectangle that overlaps with the texture

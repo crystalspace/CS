@@ -7,13 +7,18 @@
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
-The world in Crystal Space is defined with @dfn{Sectors} connected by
-@dfn{Portals} and possibly augmented with @dfn{Things}.  This is, in a
-nutshell, how the portal engine works.
+The world in Crystal Space is defined with @dfn{Sectors}. A sector is
+a region of space that itself does not represent geometry but can
+contain objects that represent geometry. In this discussion we will limit
+ourselves to mesh objects of the @dfn{Thing} type since things implement
+@dfn{portals}.
+
+You can define multiple sectors and connect them together by using
+portals in one or more of the things.
 
 Assume that you want to define a large room with a pillar in the middle of the
-room.  You can do this two ways; either with four sectors, or with one Sector
-and one Thing.  First let us define it with four sectors.
+room.  You can do this two ways; either with four sectors, or with one sector.
+First let us define it with four sectors.
 
 @noindent
 As seen from above, the sectors would look something like this:
@@ -43,8 +48,9 @@ To the person standing in this room this makes no difference at all.
 
 There are many other ways to define this room using the four sectors.  One
 important thing to note is that four is the minimum number of Sectors that you
-need to define this room (unless you use a Thing as described below).  The
-reason for this is that sectors are @dfn{convex}.
+need to define this room if you want to render the polygons using Z-fill
+mode (this means that the Z-buffer is updated but not tested). If you want
+to be able to render using Z-fill mode a sector has to be @dfn{convex}.
 
 An easier way to define this room is by using only one Sector and one Thing
 to define the pillar, as shown below.
@@ -55,14 +61,17 @@ Again this makes no difference for the person standing in this room.  There
 is, however, a difference in performance.  If the pillar is very large and
 wide the first approach will probably be faster.  If the pillar is very thin
 it is more efficient to use only one sector with one thing.  The reason (as
-will be made clear later) is that Things are drawn after the Sectors have been
-drawn and thus cause overdraw.
+will be made clear later) is that the pillar Thing has to be rendered
+using Z-use mode (i.e. full use of the Z-buffer). In this scenario there
+is a lot more overdraw compared to the four sector approach (sidenote:
+on fast 3D cards this overdraw actually does not matter so this approach
+is now considered to be better in all cases).
 
-Things are provided to make defining worlds easier. If they are small enough
-they will probably also enhance performance.
+Using Things like this make it easier to define worlds. If they are small
+enough they will also enhance performance.
 
 With Sectors, Portals, and Things you can describe virtually any world that
-you want.  Note that all polygons of a sector can be portals, even the floor
+you want.  Note that all polygons of a Thing can be portals, even the floor
 and ceiling polygons.  In fact there is no special attribute for a floor or
 ceiling polygon.  All polygons are equivalent.
 
@@ -70,42 +79,39 @@ ceiling polygon.  All polygons are equivalent.
 @cindex Sectors
 
 In this section I will describe Sectors a bit more thoroughly.  As stated
-before sectors are 3D convex objects.  The faces of a sector are made up of
-convex 3D polygons.  The fact that sectors need to be convex is a serious
-restriction but this is solved by the use of Portals.
-
-Sectors contain a set of vertices which can be shared by all the polygons of
-the sector.  Sectors should be closed.  In other words, all polygons of the
-sector must completely cover it.
+before sectors are regions of space. You can fill a sector with geometry
+by using mesh objects (@pxref{MeshObject}).
 
 It is also possible to add a @sc{bsp} tree to a sector.  This is useful if you
-want to define non-convex sectors.  The @sc{bsp} is local to the sector.  A
-different sector can use its own @sc{bsp} if it so chooses.  The sector still
-uses portals to go to other sectors.
+want to define very big non-convex sectors.  The @sc{bsp} is local to the
+sector.  A different sector can use its own @sc{bsp} if it so chooses.
+The sector still uses portals to go to other sectors.
 
 @subsubheading Things
 @cindex Things
 
-A Thing is very similar to a sector in many ways.  In the code this is
-reflected by the fact that both inherit from the same class, @samp{csPolySet}.
+A Thing is one of the basic building blocks to create geometry in
+Crystal Space. A Thing is made from convex polygons and/or bezier curves.
 
-One of the major differences between Things and Sectors is that a Thing need
-not be convex (but the polygons making up the Thing should still be convex).
-Z-buffering is used to draw Things so the polygons can be oriented in any way
-possible.  You could for example make a Thing with several polygons which are
-not even connected with each other.
+Things (and other mesh objects for that matter) can be rendered using
+Z-fill or Z-use mode. With Z-fill the previous contents of the Z-buffer
+(where that Thing is rendered) is just overwritten. With Z-use the
+previous contents is checked in order to see if the Thing is in front
+or behind the polygons that are already on screen. If you have a convex
+object (like the outer polygons of a room) then you can use Z-fill because
+the polygons will not overlap. Things which are then inside those walls
+will need to use Z-use in order not to overwrite each other.
 
 Note that polygons have a visible side and an invisible side (backface
 culling).
 
-Currently polygons in Things can not be portals.  In future this limitation
-may be removed.  With this feature you could have very interesting effects
-(like a television Thing with the screen a portal to some sector).
+All polygons can be portals. Portals can point to another sector
+or to the same sector (in case of a mirror).
 
 @subsubheading Polygons
 @cindex Polygons
 
-Sectors and Things are made of 3D polygons.  As mentioned before polygons must
+Things are made of 3D polygons.  As mentioned before polygons must
 be convex.  The vertices of polygons are oriented clockwise.  This fact is
 used for backface culling; a polygon has only one visible side.
 
@@ -127,8 +133,7 @@ texture mapped unless the texture is semi-transparent.
 @subsubheading Portals
 @cindex Portals
 
-A Portal is a special kind of polygon.  Currently, portal polygons can only
-exist within sectors (but not Things).
+A Portal is a special kind of polygon.
 
 Instead of texture mapping a portal polygon, the renderer will recursively
 draw the sector that this portal points to.  After this, if the texture is
@@ -172,14 +177,14 @@ Space warping can be used as described above.
 @item
 In theory it would be rather easy to make dynamic worlds.  Because the portals
 are explicit it is easy to define them so that certain sectors can move and
-transform in certain ways.  Currently this does not work because the code to
-enable it has not yet been written.  There are also some problems with static
-lighting but this is not severe if the movement is not too drastic.
+transform in certain ways.
+Note that static lighting makes this a bit difficult in some cases.
 @end itemize
 
 One disadvantage a portal engine is that it can be more difficult to define
 worlds.  You have to make sure that all sectors are convex.  A @sc{bsp} tree
-approach, on the other hand, would solve this problem automatically.
+approach, on the other hand, would solve this problem automatically. Crystal
+Space also supports this.
 
 @subsubheading Rendering The World
 @cindex Rendering The World
@@ -190,13 +195,14 @@ render the world.  The camera and a view 2D polygon are given as parameters
 
 @enumerate
 @item
-First the current sector is transformed from world to camera space using the
-given camera (this means that all of the vertices are transformed).
+First the mesh objects of the current sector are transformed from world to
+camera space using the given camera (this means that all of the vertices are
+transformed).
 
 @item
-Then, for every polygon of the current sector do the following (if there is a
-@sc{bsp} for this sector then the following is also done but in back to front
-order as defined by the @sc{bsp}):
+Then, for every polygon of the current mesh object do the following
+(if there is a @sc{bsp} for this sector then the following is also done but
+in back to front order as defined by the @sc{bsp}):
 
 @enumerate a
 @item
@@ -238,54 +244,9 @@ a new view polygon.  If the texture of the portal polygon is semi-transparent
 it is drawn over the resulting image.
 @end enumerate
 
-@item
-After the current sector has been drawn, do the following for every Thing in
-this sector:
-
-@enumerate a
-@item
-First the Thing is transformed from world to camera space using the given
-camera.  If all vertices are behind the viewplane the entire Thing is not
-visible and we need not draw it.
-
-@item
-Otherwise, for every polygon of the Thing do the following:
-
-@itemize @bullet
-@item
-Perform perspective correction (division by @samp{Z}) on all the vertices of
-the polygon.
-
-@item
-If all of the vertices are behind the viewplane (@samp{Z=EPSILON}) then the
-polygon is not visible and need not be drawn.
-
-@item
-Perform backface culling to see if the polygon can be visible.
-
-@item
-If all of the vertices are in front of the viewplane then the polygon is
-completely visible.  Skip the following step.
-
-@item
-Otherwise clip the polygon against the viewplane.
-
-@item
-If the polygon is still visible after all these steps transform the texture
-mapping matrix from world@result{}texture to camera@result{}texture.  Also
-transform the plane normal of the polygon to camera space.
-
-@item
-Now clip the polygon against the view polygon.
-
-@item
-Draw the polygon with a Z-buffering scan line drawer.
-@end itemize
-@end enumerate
 @end enumerate
 
 @noindent
-Before this algorithm is performed the Z-buffer is cleared once.
 
 A consequence of this algorithm is that there is no overdraw when drawing the
 sectors.  The 2D polygon clipping algorithm takes care of that.  One may think
@@ -296,3 +257,4 @@ resort to S-buffer or other similar techniques.
 There is overdraw when Things are drawn.  This is difficult to avoid.  One
 could consider another clipping algorithm but this would result in concave
 polygons which our polygon drawer can not handle.
+
