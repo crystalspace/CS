@@ -49,6 +49,8 @@ chronological order.
 		  If flag is false then animation is updated 
 		  only if mesh is visible (default is true)
 	- Erotoman replaced skeletal animation model with new one.
+	- Erotoman added maxscript for exporting genmesh skeletal animation
+	  from Character Studio.
 		  
 3-Mar-2005
 	- Jorrit fixed a compile error in spr2d. ||= is not a valid
