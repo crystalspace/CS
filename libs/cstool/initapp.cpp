@@ -88,7 +88,7 @@ iObjectRegistry* csInitializer::CreateEnvironment (
           CreateCommandLineParser(r, argc, argv) &&
           CreateConfigManager(r) &&
           CreateInputDrivers(r) &&
-	  csPlatformStartup(r))
+    csPlatformStartup(r))
         reg = r;
       else
         r->DecRef();
@@ -115,33 +115,33 @@ static void ScanScfDir (const char* dir)
         int const n = strlen(de->d_name);
         if (n >= 4 && strcasecmp(de->d_name + n - 4, ".scf") == 0)
         {
-	  csString scffilepath = dir;
-	  scffilepath += PATH_SEPARATOR;
-	  scffilepath += de->d_name;
-	  scfconfig.Clear();
-	  scfconfig.Load(scffilepath);
-	  int scfver = scfconfig.GetInt(".scfVersion", 0);
-	  switch (scfver)
-	  {
-	    case 1:
-	      {
-	        csRef<iConfigIterator> it (scfconfig.Enumerate());
-	        while (it->Next())
-	        {
-		  char const* key = it->GetKey();
-		  if (*key == '.')
-		    scfconfig.DeleteKey(key);
-	        }
-	        scfInitialize (&scfconfig);
-	      }
-	      break;
-	    default:
-	      printf ("Didn't recognize SCF version in '%s'\n", 
-					(const char*) scffilepath);
-	      /* unrecognized version */;
-	  }
-	  scfInitialize (&scfconfig);
-	}
+    csString scffilepath = dir;
+    scffilepath += PATH_SEPARATOR;
+    scffilepath += de->d_name;
+    scfconfig.Clear();
+    scfconfig.Load(scffilepath);
+    int scfver = scfconfig.GetInt(".scfVersion", 0);
+    switch (scfver)
+    {
+      case 1:
+        {
+          csRef<iConfigIterator> it (scfconfig.Enumerate());
+          while (it->Next())
+          {
+      char const* key = it->GetKey();
+      if (*key == '.')
+        scfconfig.DeleteKey(key);
+          }
+          scfInitialize (&scfconfig);
+        }
+        break;
+      default:
+        printf ("Didn't recognize SCF version in '%s'\n", 
+          (const char*) scffilepath);
+        /* unrecognized version */;
+    }
+    scfInitialize (&scfconfig);
+  }
       }
     }
     closedir(dh);
@@ -188,7 +188,7 @@ iObjectRegistry* csInitializer::CreateObjectRegistry ()
 iPluginManager* csInitializer::CreatePluginManager (iObjectRegistry* r)
 {
   csRef<csPluginManager> plugmgr = csPtr<csPluginManager> (
-	new csPluginManager (r));
+  new csPluginManager (r));
   r->Register (plugmgr, "iPluginManager");
   return plugmgr;
 }
@@ -228,7 +228,7 @@ iCommandLineParser* csInitializer::CreateCommandLineParser(
   iObjectRegistry* r, int argc, char const* const argv[])
 {
   csRef<iCommandLineParser> c = csPtr<iCommandLineParser> (
-		  new csCommandLineParser (argc, argv));
+      new csCommandLineParser (argc, argv));
   r->Register (c, "iCommandLineParser");
   return c;
 }
@@ -237,7 +237,7 @@ iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
 {
   csRef<iConfigFile> cfg = csPtr<iConfigFile> (new csConfigFile ());
   csRef<iConfigManager> Config = csPtr<iConfigManager> (
-		new csConfigManager (cfg, true));
+    new csConfigManager (cfg, true));
   r->Register (Config, "iConfigManager");
   return Config;
 }
@@ -309,13 +309,13 @@ bool csInitializer::SetupConfigManager (
     {
       // Open the user-specific, application-neutral config domain.
       cfg = new csPrefixConfig ("/config/user.cfg", VFS, "Global",
-      	"User.Global");
+        "User.Global");
       Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserGlobal);
       cfg->DecRef ();
 
       // Open the user-and-application-specific config domain.
       cfg = new csPrefixConfig ("/config/user.cfg", VFS,
-      	cfgacc->GetStr ("System.ApplicationID", AppID),
+        cfgacc->GetStr ("System.ApplicationID", AppID),
         "User.Application");
       Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserApp);
       Config->SetDynamicDomain (cfg);
@@ -436,11 +436,15 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
 {
   CloseApplication (r);
   csPlatformShutdown (r);
-  if (installed_event_handler)
+
+  //  if (installed_event_handler)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (r, iEventQueue));
     CS_ASSERT (q != NULL);
-    q->RemoveListener (installed_event_handler);
+    // This will remove the installed_event_handler (if used) as well as free
+    // all other event handlers which are registered through plug-ins or
+    // other sources.
+    q->RemoveAllListeners ();
   }
   delete global_sys;
 
