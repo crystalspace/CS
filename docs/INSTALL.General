@@ -9,14 +9,15 @@ by consulting the following table.
 
     Amiga                       INSTALL.Amiga
     BeOS                        INSTALL.BeOS
-    DOS / DJGPP                 NOTES.DOS
+    DOS / DJGPP                 INSTALL.DOS
     FreeBSD                     INSTALL.Unix
+    Irix                        INSTALL.IRIX
     Linux                       INSTALL.Unix
     Macintosh                   INSTALL.Mac
     MacOS/X Server              INSTALL.NeXT
     OpenStep                    INSTALL.NeXT
     NextStep                    INSTALL.NeXT
-    OS/2                        NOTES.OS2
+    OS/2                        INSTALL.OS2
     Solaris                     INSTALL.Unix
     Unix                        INSTALL.Unix
     Windows 95 / Visual C++     INSTALL.Win

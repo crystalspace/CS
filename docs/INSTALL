@@ -17,14 +17,15 @@ document as indicated below.
 
     Amiga                       INSTALL.Amiga
     BeOS                        INSTALL.BeOS
-    DOS / DJGPP                 INSTALL.General NOTES.DOS
+    DOS / DJGPP                 INSTALL.DOS INSTALL.General
     FreeBSD                     INSTALL.Unix
+    Irix                        INSTALL.IRIX
     Linux                       INSTALL.Unix
     Macintosh                   INSTALL.Mac
     MacOS/X Server              INSTALL.NeXT
     OpenStep                    INSTALL.NeXT
     NextStep                    INSTALL.NeXT
-    OS/2                        INSTALL.General NOTES.OS2
+    OS/2                        INSTALL.OS2 INSTALL.General
     Solaris                     INSTALL.Unix
     Unix                        INSTALL.Unix
     Windows 95 / Visual C++     INSTALL.Win
