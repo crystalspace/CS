@@ -1,3 +1,9 @@
+crystalspace (0.96-20030205-4) unstable; urgency=low
+
+  * Hope to fix the remaining mixture of PIC and non PIC for build on hppa 
+
+ -- Christian Bayle <bayle@debian.org>  Thu, 27 Feb 2003 21:46:28 +0100
+
 crystalspace (0.96-20030205-3) unstable; urgency=low
 
   * CFLAGS += -fsigned-char for build failure on arm (Closes: bug#181222)
