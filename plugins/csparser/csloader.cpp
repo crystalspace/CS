@@ -799,6 +799,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  else
 	  {
 	    stemp->SetMeshObjectFactory ((iMeshObjectFactory *)mof);
+	    mof->DecRef ();
 	  }
 	}
         break;
@@ -883,6 +884,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  }
 	  stemp->GetChildren ()->AddMeshFactory (t);
 	  t->SetTransform (child_transf);
+	  t->DecRef ();
         }
 	break;
 
