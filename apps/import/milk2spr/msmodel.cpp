@@ -273,7 +273,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       {
         return setError("Couldn't scan for number of indices.",file);
       }
-      struct TempVertex tempVertices[nbVertices];
+      ALLOC_STACK_ARRAY (tempVertices, struct TempVertex, nbVertices);
       for (int vertexIndex = 0; vertexIndex < nbVertices; vertexIndex++)
       {
         //Here we scan for vertexes,
@@ -314,7 +314,7 @@ bool MsModel::ReadMsFile(const char* msfile)
       {
         return setError("Couldn't scan for number of normals.",file);
       }
-      struct TempNormal tempNormals[nbNormals];
+      ALLOC_STACK_ARRAY (tempNormals, struct TempNormal, nbNormals);
       for (int normalIndex = 0; normalIndex < nbNormals; normalIndex++)
       {
         // We don't use normals in CS.

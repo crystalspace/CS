@@ -415,6 +415,8 @@ class Win32Assistant :
 private:
   iObjectRegistry* registry;
   bool console_window;
+  bool cmdline_help_wanted;
+  bool is_console_app;
   HCURSOR m_hCursor;
   csRef<iEventOutlet> EventOutlet;
   void SetWinCursor (HCURSOR);
@@ -444,7 +446,7 @@ public:
 };
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
-static bool is_console_app = false;
+//static bool is_console_app = false;
 
 SCF_IMPLEMENT_IBASE (Win32Assistant)
   SCF_IMPLEMENTS_INTERFACE (iWin32Assistant)
@@ -546,10 +548,15 @@ bool csPlatformShutdown(iObjectRegistry* r)
 }
 
 Win32Assistant::Win32Assistant (iObjectRegistry* r) :
-  console_window (false),
+  console_window (false),  
+  cmdline_help_wanted(false),
+  is_console_app(false),
   EventOutlet (0)
 {
   SCF_CONSTRUCT_IBASE(0);
+
+  if (ModuleHandle == NULL)
+    ModuleHandle = GetModuleHandle(NULL);
 
 // Cygwin has problems with freopen()
 #if defined(CS_DEBUG) || defined(__CYGWIN__)
@@ -562,22 +569,42 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   if (cmdline->GetOption ("console")) console_window = true;
   if (cmdline->GetOption ("noconsole")) console_window = false;
 
-  if (is_console_app && !console_window)
+  /*
+     to determine if we are actually a console we app we look up
+     the subsystem field in the PE header.
+   */
+  PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)ModuleHandle;
+  PIMAGE_NT_HEADERS NTheader = (PIMAGE_NT_HEADERS)((int)dosHeader + dosHeader->e_lfanew);
+  if (NTheader->Signature == 0x00004550) // check for PE sig
   {
-    DisableConsole ();
+    is_console_app = 
+      (NTheader->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_CUI);
   }
-  else if (!is_console_app && console_window)
+
+  cmdline_help_wanted = cmdline->GetOption ("help");
+
+  /*
+    - console apps won't do anything about it. 
+      (you can't hide the con either)
+    - GUI apps will open a console window if desired.
+   */
+  if (!is_console_app)
   {
-    AllocConsole ();
-    freopen("CONOUT$", "a", stderr);
-    freopen("CONOUT$", "a", stdout);
+    if (console_window || cmdline_help_wanted)
+    {
+      AllocConsole ();
+      freopen("CONOUT$", "a", stderr);
+      freopen("CONOUT$", "a", stdout);
+      freopen("CONIN$", "a", stdin);
+    }
+    else 
+    {
+      DisableConsole ();
+    }
   }
 
   registry = r;
   registry->IncRef();
-
-  if (ModuleHandle == NULL)
-    ModuleHandle = GetModuleHandle(NULL);
 
   WNDCLASS wc;
   wc.hCursor        = NULL;
@@ -634,6 +661,18 @@ void Win32Assistant::Shutdown()
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
   if (q != 0)
     q->RemoveListener(this);
+  if (cmdline_help_wanted && !is_console_app)
+  {
+    printf ("\nPress a key to close this window...");
+    HANDLE hConsole = GetStdHandle (STD_INPUT_HANDLE);
+    INPUT_RECORD ir;
+    DWORD events_read;
+    do 
+    {
+      ReadConsoleInput (hConsole, &ir, 1, &events_read);
+    } while ((events_read == 0) || (ir.EventType != KEY_EVENT));
+    CloseHandle (hConsole);
+  }
 }
 
 void Win32Assistant::SetWinCursor (HCURSOR cur)
@@ -707,8 +746,10 @@ bool Win32Assistant::HandleEvent (iEvent& e)
       m_hThread = NULL;
     }
 #   endif
-  } else if (e.Command.Code == cscmdCommandLineHelp)
+  } 
+  else if (e.Command.Code == cscmdCommandLineHelp)
   {
+
    #ifdef CS_DEBUG 
     const char *defcon = "yes";
    #else
@@ -1051,8 +1092,6 @@ extern int _cs_main (int argc, char* argv[]);
 
 int main (int argc, char* argv[]) 
 { 
-  is_console_app = true;
-
   CS_DEBUG_MSVC_INIT_GOOP; 
   int ret = _cs_main(argc, argv); 
   CS_DEBUG_MSVC_EXIT_GOOP; 

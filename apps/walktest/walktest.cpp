@@ -1173,7 +1173,7 @@ bool WalkTest::SetMapDir (const char* map_dir)
       else
       {
         // Add the extension.
-        sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
+        sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s ",
             name, valfiletype, name, valfiletype, name, valfiletype);
       }
       myVFS->Mount (map_dir, tmp);
@@ -1221,6 +1221,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
     csCommandLineHelper::Help (object_reg);
+    csInitializer::DestroyApplication (object_reg);
     exit (0);
   }
 
