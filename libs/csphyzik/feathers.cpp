@@ -144,7 +144,7 @@ ctFeatherstoneAlgorithm *out_link_solver;
 	// applied force and torque + centripital force goes into here.
 	// -applied because this is actualy force and torque needed to 
 	// keep link from NOT accelerating.
-	Za.set_a( pe_g->get_T()*(-1.0)*pe_g->get_F());
+	Za.set_a( pe_g->get_T()*(-pe_g->get_F()));
   Za.set_b( ab.w_body % (pe_g->get_I() * ab.w_body) - (pe_g->get_T()*pe_g->get_torque()) );  
 
 	jnt = ab.inboard_joint;

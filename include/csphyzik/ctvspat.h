@@ -23,18 +23,79 @@
 
 #include "csphyzik/ctvector.h"
 
+class ctSpatialVector6;
+class ctSpatialMatrix6;
+
 #define ctSpatialVector ctSpatialVector6
 
-class ctSpatialVector6 : public ctVector6
+class ctVectorTranspose6
+{
+public:
+  ctVectorTranspose6(){
+    elements[0] = elements[1] = elements[2] = 0.0;
+    elements[3] = elements[4] = elements[5] = 0.0;
+  }
+
+  ctVectorTranspose6( real pfirst, real psecond, real pthird, real p2first, real p2second, real p2third )
+  {
+
+    elements[0] = pfirst;
+    elements[1] = psecond;
+    elements[2] = pthird;
+    elements[3] = p2first;
+    elements[4] = p2second;
+    elements[5] = p2third;
+
+
+  }
+
+  void set( real pfirst, real psecond, real pthird, real p2first, real p2second, real p2third ){
+    elements[0] = pfirst;
+    elements[1] = psecond;
+    elements[2] = pthird;
+    elements[3] = p2first;
+    elements[4] = p2second;
+    elements[5] = p2third;
+
+  }
+
+  void set( int pnum, real *pele ){
+    for( int idx = 0; idx < pnum; idx++ ){
+      elements[idx] = *pele;
+      pele++;
+    }
+  }
+
+  void set( real *pele ){
+    for( int idx = 0; idx < 6; idx++ ){
+      elements[idx] = *pele;
+      pele++;
+    }
+  }
+
+  real operator[](const int index) const { return elements[index]; } 
+  real& operator[](const int index) { return elements[index]; }
+
+  ctVectorTranspose6 operator*( const real pk ) { 
+    ctVectorTranspose6 scaled;
+    for( int idx = 0; idx < 6; idx++ ) 
+      scaled.elements[idx] = elements[idx] * pk;  
+    return scaled;
+  }
+  
+  void operator*=(const real p) { for (int idx=0; idx<6; ++idx) elements[idx] *= p;} 
+  void operator/=(const real p) { for (int idx=0; idx<6; ++idx) elements[idx] /= p;} 
+
+  real operator* ( const ctSpatialVector6 &bs );
+
+protected:
+  real elements[ 6 ];
+};
+
+class ctSpatialVector6
 {
 public:
 
-	ctSpatialVector6(){
-		for( int idx = 0; idx < 6; idx++ )
-			elements[idx] = 0.0;
-	}
-
-	//!me should specialize this for <6> if I can figure out the right syntax
 	ctSpatialVector6( const ctVector3 &pa, const ctVector3 &pb ){
 		elements[0] = pa[0];
 		elements[1] = pa[1];
@@ -44,28 +105,24 @@ public:
 		elements[5] = pb[2];
 	}
 
-	//!me this is really error prone, so use with CAUTION!!!
-	// make sure all args are real's and NOT INT's!!!!
-	// ctVector a( 1,2,3 ) BAD!!!!!
-	// ctVector a( 1.0, 2.0, 3.0 )  correct
-	ctSpatialVector6( real pfirst, real psecond, ... )
-	{
-	va_list parg;
-	real next_element;
+  ctSpatialVector6(){
+    elements[0] = elements[1] = elements[2] = 0.0;
+    elements[3] = elements[4] = elements[5] = 0.0;
+  }
 
-		elements[0] = pfirst;
-		elements[1] = psecond;
+  ctSpatialVector6( real pone, real ptwo, real pthree, real p2one, real p2two, real p2three ){
+    elements[0] = pone;
+    elements[1] = ptwo;
+    elements[2] = pthree;
+    elements[3] = p2one;
+    elements[4] = p2two;
+    elements[5] = p2three;
+  }
 
-		va_start( parg, psecond );
+  real operator[](const int index) const { return elements[index]; } 
+  real& operator[](const int index) { return elements[index]; }
 
-		for( int tidx = 2; tidx < 6; tidx++ ){
-			next_element = va_arg( parg, real );
-			elements[tidx] = next_element;
-		}
-
-		va_end( parg );
-	}
-
+  // spatial transpose is a special operation.
 	ctVectorTranspose6 transpose(){
 		ctVectorTranspose6 trans;
 		trans[0] = elements[3];
@@ -93,23 +150,180 @@ public:
 		elements[5] = pb[2];
 	}
 
-	void operator=( const ctVector6 &pm ){
+	void operator=( const ctSpatialVector6 &pm ){
 		for( int idx = 0; idx < 6; idx++ )
 			elements[idx] = pm[idx];
 	}
 
+  // return length of this vector
+  real length();
+
+  // return a vector of unit length in same direction as this vector
+  ctSpatialVector6 unit();
+  void normalize();
+
+  // set all elements to zero
+  void zero(){
+    for( int idx = 0; idx < 6; idx++ ) elements[idx] = 0.0;
+  }
+
+  // this = this + x
+  void add( const ctSpatialVector6 & px ){
+    elements[0] += px.elements[0];
+    elements[1] += px.elements[1];
+    elements[2] += px.elements[2];
+    elements[3] += px.elements[3];
+    elements[4] += px.elements[4];
+    elements[5] += px.elements[5];
+  }
+
+  // this = x + y
+  void add2(const ctSpatialVector6 & px, const ctSpatialVector6 & py){
+    elements[0] = px.elements[0] + py.elements[0];  
+    elements[1] = px.elements[1] + py.elements[1];  
+    elements[2] = px.elements[2] + py.elements[2];  
+    elements[3] = px.elements[3] + py.elements[3];  
+    elements[4] = px.elements[4] + py.elements[4];  
+    elements[5] = px.elements[5] + py.elements[5];  
+  }
+
+  // dest = x + y
+  void add3(ctSpatialVector6 & pdest, const ctSpatialVector6 & px, const ctSpatialVector6 & py){
+    pdest.elements[0] = px.elements[0] + py.elements[0];  
+    pdest.elements[1] = px.elements[1] + py.elements[1];  
+    pdest.elements[2] = px.elements[2] + py.elements[2];  
+    pdest.elements[3] = px.elements[3] + py.elements[3];  
+    pdest.elements[4] = px.elements[4] + py.elements[4];  
+    pdest.elements[5] = px.elements[5] + py.elements[5];  
+
+  }
+  
+  void add_scaled( ctSpatialVector6 & padme, real pk ){
+    elements[0] += pk*padme.elements[0];    
+    elements[1] += pk*padme.elements[1];    
+    elements[2] += pk*padme.elements[2];
+    elements[3] += pk*padme.elements[3];    
+    elements[4] += pk*padme.elements[4];    
+    elements[5] += pk*padme.elements[5];
+  }
+
+  void add_scaled( real pk, ctSpatialVector6 & padme ){
+    elements[0] += pk*padme.elements[0];    
+    elements[1] += pk*padme.elements[1];    
+    elements[2] += pk*padme.elements[2];
+    elements[3] += pk*padme.elements[3];    
+    elements[4] += pk*padme.elements[4];    
+    elements[5] += pk*padme.elements[5];
+  }
+
+  void operator+=(const ctSpatialVector6 & p){
+    for( int idx = 0; idx < 6; idx++ ) elements[idx] += p.elements[idx];  }
+
+  ctSpatialVector6 operator+( const ctSpatialVector6 & p) const {
+    ctSpatialVector6 sum;
+    for( int idx = 0; idx < 6; idx++ ) 
+      sum.elements[idx] = elements[idx] + p.elements[idx];  
+    return sum;
+  }
+
+    // this = this + x
+  void subtract( const ctSpatialVector6 & px ){
+    for( int idx = 0; idx < 6; idx++ )  elements[idx] -= px.elements[idx]; }
+
+  // this = x + y
+  void subtract2(const ctSpatialVector6 & px, const ctSpatialVector6 & py){
+    for( int idx = 0; idx < 6; idx++ ) elements[idx] = px.elements[idx] - py.elements[idx];}
+
+  // dest = x + y
+  void subtract3(ctSpatialVector6 & pdest, const ctSpatialVector6 & px, const ctSpatialVector6 & py){
+    for( int idx = 0; idx < 6; idx++ )  pdest.elements[idx] = px.elements[idx] - py.elements[idx];  }
+  
+  void operator-=(const ctSpatialVector6 & p){
+    for( int idx = 0; idx < 6; idx++ ) elements[idx] -= p.elements[idx];  }
+
+  ctSpatialVector6 operator-(const ctSpatialVector6 & p){
+    ctSpatialVector6 sum;
+    for( int idx = 0; idx < 6; idx++ ) 
+      sum.elements[idx] = elements[idx] - p.elements[idx];  
+    return sum;
+  }
+
+  ctSpatialVector6 operator-(const ctSpatialVector6 & p) const {
+    ctSpatialVector6 sum;
+    for( int idx = 0; idx < 6; idx++ ) 
+      sum.elements[idx] = elements[idx] - p.elements[idx];  
+    return sum;
+  }
+
+  real operator*( const ctSpatialVector6 & p ){
+    real dotp = 0.0;
+    for( int idx = 0; idx < 6; idx++ ) dotp += elements[idx] * p.elements[idx]; 
+    return dotp;
+  }
+
+  real operator*( const ctSpatialVector6 & p ) const {
+    real dotp = 0.0;
+    for( int idx = 0; idx < 6; idx++ ) dotp += elements[idx] * p.elements[idx]; 
+    return dotp;
+  }
+
+  ctSpatialVector6 operator*( const real pk ) { 
+    ctSpatialVector6 scaled;
+    for( int idx = 0; idx < 6; idx++ ) 
+      scaled.elements[idx] = elements[idx] * pk;  
+    return scaled;
+  }
+
+  ctSpatialVector6 operator*( const real pk ) const { 
+    ctSpatialVector6 scaled;
+    for( int idx = 0; idx < 6; idx++ ) 
+      scaled.elements[idx] = elements[idx] * pk;  
+    return scaled;
+  }
+
+  ctSpatialVector6 operator/( const real pk ) { 
+    ctSpatialVector6 scaled;
+    for( int idx = 0; idx < 6; idx++ ) 
+      scaled.elements[idx] = elements[idx] / pk;  
+    return scaled;
+  }
+
+  void operator*=(const real p) { for (int idx=0; idx<6; ++idx) elements[idx] *= p;} 
+  void operator/=(const real p) { for (int idx=0; idx<6; ++idx) elements[idx] /= p;}
+
+  ctSpatialMatrix6 operator*( const ctVectorTranspose6 &pvt );
+
+  int get_dimension(){ return 6; }
+
+  real *get_elements(){ return elements; }
+
+protected:
+  real elements[ 6 ];
+
 };
 
-/*
-inline ctVectorTranspose6 ctSpatialVector::transpose(){
-	ctVectorTranspose6 trans;
-	trans[0] = elements[3];
-	trans[1] = elements[4];
-	trans[2] = elements[5];
-	trans[3] = elements[0];
-	trans[4] = elements[1];
-	trans[5] = elements[2];
-	return trans;
+inline real ctSpatialVector6::length() {
+  return sqrt( elements[0]*elements[0] + elements[1]*elements[1] + elements[2]*elements[2] +
+        elements[3]*elements[3] + elements[4]*elements[4] + elements[5]*elements[5]);
 }
-*/
+
+inline ctSpatialVector6 ctSpatialVector6::unit() {
+  return ((*this)/this->length() );
+}
+
+inline void ctSpatialVector6::normalize() {
+real len;
+  len = this->length();
+  if( len > MIN_REAL )
+    *this /= len;
+  
+}
+
+inline real ctVectorTranspose6::operator*( const ctSpatialVector6 &pv )
+{ 
+real dotp = 0.0;
+  for( int idx = 0; idx < 6; idx++ ) dotp += elements[idx] * pv[idx]; 
+  return dotp;
+}
+
 #endif
