@@ -43,7 +43,8 @@ INC.CSUTIL = $(INC.SYS_CSUTIL) \
   $(wildcard $(addprefix $(SRCDIR)/,include/csutil/*.h))
 
 SRC.CSUTIL.LOCAL = \
-  $(wildcard $(addprefix $(SRCDIR)/,libs/csutil/*.cpp libs/csutil/*.c))
+  $(wildcard $(addprefix $(SRCDIR)/,libs/csutil/*.cpp)) \
+  $(addprefix $(SRCDIR)/,libs/csutil/regexp_impl.c)
 SRC.CSUTIL = $(SRC.SYS_CSUTIL) $(SRC.CSUTIL.LOCAL)
 
 # Platform-specific makefiles may want to provide their own value for

@@ -27,6 +27,7 @@ chronological order.
 	  this command.
 	- Jorrit extended walktest demo playback so that it shows the fps after
 	  finishing one run.
+	- res fixed csutil.mak to not use all .c files, but only regexp_impl.c.
 26-Feb-2004
 	- Eric Sunshine fixed the old renderer gl3d, soft3d, null3d, and the
 	  ISO engine plugins so that they once again build successfully
@@ -78,7 +79,7 @@ chronological order.
 	    - Added support for regular expressions. Uses implementation from
 	      the system's runtime, if available, otherwise uses built-in
 	      implementation borrowed from glibc.
-	    - Added a "GL driver database". The depending on a set of rules
+	    - Added a "GL driver database". Depending on a set of rules
 	      the GL canvases now load certain config settings. See
 	      data/config/gldrivers.xml.
 	- res fixed a cut'n'paste error in the regexp configure check.
