@@ -1791,7 +1791,7 @@ void csComponent::SetState (int mask, bool enable)
   // If it changes to true, select us if parent's focused is not selectable
   if ((mask & CSS_SELECTABLE)
    && (parent))
-    if (state & CSS_SELECTABLE == 0)
+    if ((state & CSS_SELECTABLE) == 0)
       parent->SetFocused (parent->PrevChild ());
     else if (!parent->focused->GetState (CSS_SELECTABLE))
       parent->focused = this;
