@@ -875,7 +875,7 @@ chronological order.
 	  %ignores from javapre.i to cspace.i. They are sufficiently general
 	  that they can be applied to all supported scripting interfaces.
 	- Eric Sunshine fixed crasher in csjava's CS.requestPlugin() where it
-	  was incorrectly invoking the doStencil2thing constructor of
+	  was incorrectly invoking the do-nothing constructor of
 	  csPluginRequestArray which did not even create the underlying C++
 	  object. Therefore, later method invocations on that object crashed.
 	- Eric Sunshine fixed nasty bug in csjava's <iface/iface_ver> typemap
