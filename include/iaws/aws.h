@@ -15,6 +15,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
+
 #ifndef __CS_IAWS_AWS_H__
 #define __CS_IAWS_AWS_H__
 
@@ -67,37 +68,42 @@ const   bool aws_debug=false;  // set to true to turn on debugging printf's
  * \addtogroup aws_sys_flags
  * @{ */
 
-/** This flag makes the windowing system perform erases before drawing.  This slows
- * the engine down somewhat, but is necessary in some circumstances (such as when using
- * the single proctex mode as a surface, or to draw to the high level visible context.)
+/**
+ * This flag makes the windowing system perform erases before drawing.
+ * This slows the engine down somewhat, but is necessary in some circumstances
+ * (such as when using the single proctex mode as a surface, or to draw to the
+ * high level visible context.)
  */
 const int AWSF_AlwaysEraseWindows=1;
 
-/** This flag makes the windowing system redraw every time, which is necessary when
- * drawing to the screen context since this gets erased every frame by the engine.
- * Note that this flag is NOT necessary if the engine will not be drawing to the
- * background with AWS.  In other words, if AWS has complete control of the screen
- * context.
+/**
+ * This flag makes the windowing system redraw every time, which is necessary
+ * when drawing to the screen context since this gets erased every frame by
+ * the engine. Note that this flag is NOT necessary if the engine will not be
+ * drawing to the background with AWS.  In other words, if AWS has complete
+ * control of the screen context.
  */
 const int AWSF_AlwaysRedrawWindows=2;
 
-/** This flag makes windows come to the front solely by moving the mouse over them. If
-  * it is disabled then windows will only come to the front by having the mouse clicked
-  * in them
-  */
+/**
+ * This flag makes windows come to the front solely by moving the mouse over
+ * them. If it is disabled then windows will only come to the front by having
+ * the mouse clicked in them.
+*/
 const int AWSF_RaiseOnMouseOver = 4;
 
-/** This flag allwos focusing controls using TAB (CTR + TAB) key, calling Click events
-  * using ENTER key and some other features that are not finished yet.
-  */
+/**
+ * This flag allows focusing controls using TAB (CTR + TAB) key, calling
+ * Click events using ENTER key and some other features that are not finished
+ * yet.
+ */
 const int AWSF_KeyboardControl = 8;
 
 /** @} */
 
-
-
 SCF_VERSION(iAwsKey, 0, 0, 1)
 
+/// Document me!@@@
 struct iAwsKey : public iBase
 {
   /// returns the type of key
@@ -109,6 +115,7 @@ struct iAwsKey : public iBase
 
 SCF_VERSION(iAwsIntKey, 0, 0, 1)
 
+/// Document me!@@@
 struct iAwsIntKey : public iAwsKey
 {
   /// Gets the value of this key as an integer
@@ -117,6 +124,7 @@ struct iAwsIntKey : public iAwsKey
 
 SCF_VERSION(iAwsStringKey, 0, 0, 1);
 
+/// Document me!@@@
 struct iAwsStringKey : public iAwsKey
 {
   /// Gets the value of this key as an iString
@@ -125,6 +133,7 @@ struct iAwsStringKey : public iAwsKey
 
 SCF_VERSION(iAwsRectKey, 0, 0, 1);
 
+/// Document me!@@@
 struct iAwsRectKey : public iAwsKey
 {
   /// Gets the value of this key as a rectangle
@@ -133,6 +142,7 @@ struct iAwsRectKey : public iAwsKey
 
 SCF_VERSION(iAwsRGBKey, 0, 0, 1);
 
+/// Document me!@@@
 struct iAwsRGBKey : public iAwsKey
 {
   struct RGB
@@ -146,6 +156,7 @@ struct iAwsRGBKey : public iAwsKey
 
 SCF_VERSION(iAwsPointKey, 0, 0, 1);
 
+/// Document me!@@@
 struct iAwsPointKey : public iAwsKey
 {
   /// Gets the value of this key as a point
@@ -154,6 +165,7 @@ struct iAwsPointKey : public iAwsKey
 
 SCF_VERSION(iAwsConnectionKey, 0, 0, 1);
 
+/// Document me!@@@
 struct iAwsConnectionKey : public iAwsKey
 {
   /// Gets the sink for this key
@@ -168,6 +180,7 @@ struct iAwsConnectionKey : public iAwsKey
 
 SCF_VERSION(iAwsKeyContainer, 0, 0, 1);
 
+/// Document me!@@@
 struct iAwsKeyContainer : public iAwsKey
 {
   /// Looks up a key based on it's name.
@@ -199,22 +212,21 @@ struct iAwsKeyContainer : public iAwsKey
   /// Removes all items from the container
   virtual void RemoveAll () = 0;
 
-  /// Consumes an entire list by moving all of it's member's to this one, and removing them from it.
+  /**
+   * Consumes an entire list by moving all of it's member's to this one,
+   * and removing them from it.
+   */
   virtual void Consume (iAwsKeyContainer *c) = 0;
 };
 
 SCF_VERSION(iAwsComponentNode, 0, 0, 1);
 
+/// Document me!@@@
 struct iAwsComponentNode : public iAwsKeyContainer
 {
   /// So that we can find out what sort of component type this should be
   virtual iString *ComponentTypeName () = 0;
 };
-
-
-
-
-
 
 
 /**
@@ -236,8 +248,12 @@ public:
   /// Set the preference manager used by the window system
   virtual void SetPrefMgr(iAwsPrefManager *pmgr)=0;
 
-  /// Allows a component to register itself for dynamic template instatiation via definition files.
-  virtual void RegisterComponentFactory(iAwsComponentFactory *factory, const char* name)=0;
+  /**
+   * Allows a component to register itself for dynamic template instatiation
+   * via definition files.
+   */
+  virtual void RegisterComponentFactory(iAwsComponentFactory *factory,
+  	const char* name)=0;
 
   /// Find a component factory
   virtual iAwsComponentFactory *FindComponentFactory (const char* name)=0;
@@ -263,7 +279,10 @@ public:
   /// Returns true if the mouse is inside any of the top-level components.
   virtual bool MouseInComponent(int x, int y)=0;
 
-  /// Causes the current view of the window system to be drawn to the given graphics device.
+  /**
+   * Causes the current view of the window system to be drawn to the
+   * given graphics device.
+   */
   virtual void Print(iGraphics3D *g3d, uint8 Alpha=0)=0;
 
   /// Redraw whatever portions of the screen need it.
@@ -275,16 +294,25 @@ public:
   /// Mark a section of the screen clean.
   virtual void Unmark(const csRect &rect)=0;
 
-  /// Erase a section of the screen next round (only useful if AlwaysEraseWindows flag is set)
+  /**
+   * Erase a section of the screen next round (only useful if
+   * AlwaysEraseWindows flag is set)
+   */
   virtual void Erase(const csRect &rect)=0;
 
-  /// Mask off a section that has been marked to erase.  This part won't be erased.
+  /**
+   * Mask off a section that has been marked to erase.  This part won't be
+   * erased.
+   */
   virtual void MaskEraser(const csRect &rect)=0;
 
   /// Tell the system to rebuild the update store
   virtual void InvalidateUpdateStore()=0;
 
-  /// Capture all mouse events until release is called, no matter where the mouse is
+  /**
+   * Capture all mouse events until release is called, no matter where the
+   * mouse is
+   */
   virtual void CaptureMouse(iAwsComponent *comp)=0;
 
   /// Release the mouse events to go where they normally would.
@@ -299,13 +327,20 @@ public:
   /// Dispatches events to the proper components
   virtual bool HandleEvent(iEvent&)=0;
 
-  /** Sets up the canvas to draw on.
-   * @param newCanvas The canvas to draw on.  If this parameter is 0, then g2d and g3d MUST be present.  AWS will use them to create a default, direct to screen canvas. 
-   * @param g2d A pointer to a valid iGraphics2D instance. (If newCanvas is NOT null, this param may be ommitted.)
-   * @param g3d A pointer to a valid iGraphics3D instance. (If newCanvas is NOT null, this param may be ommitted.)
-   * @return True if everything works, False otherwise.  If this function returns False AWS will NOT work.
+  /**
+   * Sets up the canvas to draw on.
+   * @param newCanvas The canvas to draw on.  If this parameter is 0, then
+   *        g2d and g3d MUST be present.  AWS will use them to create a
+   *        default, direct to screen canvas. 
+   * @param g2d A pointer to a valid iGraphics2D instance. (If newCanvas is
+   *        NOT null, this param may be ommitted.)
+   * @param g3d A pointer to a valid iGraphics3D instance. (If newCanvas is
+   *        NOT null, this param may be ommitted.)
+   * @return True if everything works, False otherwise.  If this function
+   *        returns False AWS will NOT work.
    */
-  virtual bool SetupCanvas(iAwsCanvas *newCanvas, iGraphics2D *g2d=0, iGraphics3D *g3d=0)=0;
+  virtual bool SetupCanvas (iAwsCanvas *newCanvas, iGraphics2D *g2d=0,
+  	iGraphics3D *g3d=0)=0;
 
   /// Get the current context
   virtual iAwsCanvas* GetCanvas()=0;
@@ -340,14 +375,17 @@ public:
    * <code>transition_type</code> is one of AWS_TRANSITION_*.
    * \sa \ref aws_window_trans
    */
-  virtual void CreateTransition(iAwsComponent *win, unsigned transition_type, float step_size=0.1)=0;
+  virtual void CreateTransition(iAwsComponent *win, unsigned transition_type,
+  	float step_size=0.1)=0;
 
   /**
-   * Creates and enables a transition for a window, using a user specified start or finish (transition type defines which).
+   * Creates and enables a transition for a window, using a user specified
+   * start or finish (transition type defines which).
    * <code>transition_type</code> is one of AWS_TRANSITION_*.
    * \sa \ref aws_window_trans
    */
-  virtual void CreateTransitionEx(iAwsComponent *win, unsigned transition_type, float step_size, csRect &user)=0;
+  virtual void CreateTransitionEx(iAwsComponent *win,
+  	unsigned transition_type, float step_size, csRect &user)=0;
 
   /**
    * Sets one or more flags for different operating modes. 
@@ -393,7 +431,10 @@ public:
   /// Maps a name to an id
   virtual unsigned long NameToId (const char*name)=0;
 
-  /// Select which skin is the default for components, the skin must be loaded.  True on success, false otherwise.
+  /**
+   * Select which skin is the default for components, the skin must be
+   * loaded.  True on success, false otherwise.
+   */
   virtual bool SelectDefaultSkin (const char* skin_name)=0;
 
   /// Lookup the value of an int key by name (from the skin def)
@@ -415,10 +456,12 @@ public:
   virtual bool LookupRectKey(unsigned long id, csRect &rect)=0;
 
   /// Lookup the value of an RGB key by name (from the skin def)
-  virtual bool LookupRGBKey(const char* name, unsigned char &red, unsigned char &green, unsigned char &blue)=0;
+  virtual bool LookupRGBKey(const char* name, unsigned char &red,
+  	unsigned char &green, unsigned char &blue)=0;
 
   /// Lookup the value of an RGB key by name (from the skin def)
-  virtual bool LookupRGBKey(unsigned long id, unsigned char &red, unsigned char &green, unsigned char &blue)=0;
+  virtual bool LookupRGBKey(unsigned long id, unsigned char &red,
+  	unsigned char &green, unsigned char &blue)=0;
 
   /// Lookup the value of a point key by name (from the skin def)
   virtual bool LookupPointKey(const char* name, csPoint &point)=0;
@@ -430,15 +473,21 @@ public:
   virtual bool GetInt(iAwsComponentNode *node, const char* name, int &val)=0;
 
   /// Get the a rect from a given component node
-  virtual bool GetRect(iAwsComponentNode *node, const char* name, csRect &rect)=0;
+  virtual bool GetRect(iAwsComponentNode *node, const char* name,
+  	csRect &rect)=0;
 
   /// Get the value of an integer from a given component node
-  virtual bool GetString(iAwsComponentNode *node, const char* name, iString *&val)=0;
+  virtual bool GetString(iAwsComponentNode *node, const char* name,
+  	iString *&val)=0;
 
   /// Get the a color from a given component node
-  virtual bool GetRGB(iAwsComponentNode *node, const char* name, unsigned char& r, unsigned char& g, unsigned char& b)=0;
+  virtual bool GetRGB(iAwsComponentNode *node, const char* name,
+  	unsigned char& r, unsigned char& g, unsigned char& b)=0;
 
-  /// Find window definition and return the component node holding it, Null otherwise
+  /**
+   * Find window definition and return the component node holding it,
+   * Null otherwise
+   */
   virtual iAwsComponentNode *FindWindowDef(const char* name)=0;
 
   /// Find skin def and return key container, Null if not found
@@ -472,10 +521,13 @@ public:
   virtual iFont *GetFont(const char* filename)=0;
 
   /// Gets a texture from the global AWS cache
-  virtual iTextureHandle *GetTexture(const char* name, const char* filename=0)=0;
+  virtual iTextureHandle *GetTexture(const char* name,
+  	const char* filename=0)=0;
 
-  /// Gets a texture from the global AWS cache, if its loaded for the first time then
-  /// the keycolor (key_r,key_g,key_b) is set
+  /**
+   * Gets a texture from the global AWS cache, if its loaded for the first
+   * time then the keycolor (key_r,key_g,key_b) is set.
+   */
   virtual iTextureHandle *GetTexture (const char* name, const char* filename, 
                                       unsigned char key_r,
                                       unsigned char key_g,
@@ -490,26 +542,31 @@ public:
   /// Sets the window manager that the preference manager uses
   virtual void SetWindowMgr(iAws *wmgr)=0;
 
-  /** Sets up the AWS palette so that the colors are valid reflections of
-       user preferences.  Although SetColor can be used, it's recommended
-       that you do not.  Colors should always be a user preference, and
-       should be read from the window and skin definition files (as
-       happens automatically normally. */
+  /**
+   * Sets up the AWS palette so that the colors are valid reflections of
+   * user preferences.  Although SetColor can be used, it's recommended
+   * that you do not.  Colors should always be a user preference, and
+   * should be read from the window and skin definition files (as
+   * happens automatically normally.
+   */
   virtual void SetupPalette()=0;
 
-  /** Allows a component to specify it's own constant values for parsing. */
+  /// Allows a component to specify it's own constant values for parsing.
   virtual void RegisterConstant(const char* name, int value)=0;
 
-  /** Returns true if the constant has been registered, false otherwise.  */
+  /// Returns true if the constant has been registered, false otherwise.
   virtual bool ConstantExists(const char* name)=0;
 
-  /** Allows a component to retrieve the value of a constant, or the parser as well. */
+  /**
+   * Allows a component to retrieve the value of a constant, or the parser
+   * as well.
+   */
   virtual int  GetConstantValue(const char* name)=0;
 
-  /** Creates a new key factory */
+  /// Creates a new key factory
   virtual iAwsKeyFactory *CreateKeyFactory()=0;
 
-  /** Creates a new connection node factory */
+  /// Creates a new connection node factory
   virtual iAwsConnectionNodeFactory *CreateConnectionNodeFactory()=0;
 };
 
@@ -527,13 +584,13 @@ struct iAwsSinkManager : public iBase
   /// Finds a sink by name for connection.
   virtual iAwsSink* FindSink(const char *name)=0;
 
-  /// Create a new embeddable sink, with parm as the void * passed into the triggers.
+  /**
+   * Create a new embeddable sink, with parm as the void * passed into the
+   * triggers.
+   */
   virtual iAwsSink *CreateSink(void *parm)=0;
 
-
-
   /// Create a new embeddable slot
-
   virtual iAwsSlot *CreateSlot ()=0;
 };
 
@@ -550,10 +607,12 @@ struct iAwsSink : public iBase
   virtual void HandleTrigger(int trigger_id, iAwsSource *source)=0;
 
   /// A sink should call this to register trigger events
-  virtual void RegisterTrigger(const char *name, void (*Trigger)(void *, iAwsSource *))=0;
+  virtual void RegisterTrigger(const char *name,
+  	void (*Trigger)(void *, iAwsSource *))=0;
 
   /**
-   * Returns the last error code set.  This code is good until the next call to this sink.
+   * Returns the last error code set.  This code is good until the next
+   * call to this sink.
    * Return value is one of AWS_ERR_SINK_*.
    * \sa \ref aws_sink_errors
    */
@@ -569,7 +628,10 @@ struct iAwsSource : public iBase
   /// Gets the component owner for this (sources are embedded)
   virtual iAwsComponent *GetComponent()=0;
 
-  /// Registers a slot for any one of the signals defined by a source.  Each sources's signals exist in it's own namespace
+  /**
+   * Registers a slot for any one of the signals defined by a source.
+   * Each sources's signals exist in it's own namespace
+   */
   virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal)=0;
 
   /// Unregisters a slot for a signal.
@@ -585,35 +647,47 @@ SCF_VERSION (iAwsSlot, 0, 0, 1);
 /// Interface for signal slots (conduits)
 struct iAwsSlot : public iBase
 {
-  /** Connect sets us up to receive signals from some other component.  You can connect to as many different sources
-   * and signals as you'd like.  You may connect to multiple signals from the same source.
+  /**
+   * Connect sets us up to receive signals from some other component.
+   * You can connect to as many different sources and signals as you'd like.
+   * You may connect to multiple signals from the same source.
    */
-  virtual void Connect(iAwsSource *source, unsigned long signal, iAwsSink *sink, unsigned long trigger)=0;
+  virtual void Connect(iAwsSource *source, unsigned long signal,
+  	iAwsSink *sink, unsigned long trigger)=0;
 
-  /**  Disconnects us from the specified source and signal.  This may happen automatically if the signal source
-   *  goes away.  You will receive disconnect notification always (even if you request the disconnection.)
+  /**
+   * Disconnects us from the specified source and signal.  This may happen
+   * automatically if the signal source goes away.  You will receive
+   * disconnect notification always (even if you request the disconnection.)
    */
-  virtual void Disconnect(iAwsSource *source, unsigned long signal, iAwsSink *sink, unsigned long trigger)=0;
+  virtual void Disconnect(iAwsSource *source, unsigned long signal,
+  	iAwsSink *sink, unsigned long trigger)=0;
 
-  /** Invoked by a source to emit the signal to this slot's sink.
+  /**
+   * Invoked by a source to emit the signal to this slot's sink.
    */
   virtual void Emit(iAwsSource &source, unsigned long signal)=0;
 };
 
 SCF_VERSION(iAwsLayoutManager, 0, 0, 1);
 
+/// Document me!@@@
 struct iAwsLayoutManager : public iBase
 {
-  /**  Sets the owner.  Normally the owner should never change, but in some rare
-    * cases (like in the Window class) the owner is set improperly by the setup
-    * code and must be fixed by the embedder.  This should ALWAYS be used by widgets
-    * which embed the component and use delegate wrappers (i.e. awsecomponent)
-    */
+  /**
+   * Sets the owner.  Normally the owner should never change, but in some rare
+   * cases (like in the Window class) the owner is set improperly by the setup
+   * code and must be fixed by the embedder.  This should ALWAYS be used by
+   * widgets which embed the component and use delegate wrappers (i.e.
+   * awsecomponent)
+   */
   virtual void SetOwner (iAwsComponent *_owner) = 0;
 
-  /** Adds a component to the layout, returning it's actual rect. 
-    */
-  virtual csRect AddComponent (iAwsComponent *cmp, iAwsComponentNode* settings) = 0;
+  /**
+   * Adds a component to the layout, returning it's actual rect. 
+   */
+  virtual csRect AddComponent (iAwsComponent *cmp,
+  	iAwsComponentNode* settings) = 0;
 
   /// Removes a component from the layout
   virtual void RemoveComponent(iAwsComponent* ) = 0;
@@ -628,28 +702,40 @@ SCF_VERSION (iAwsComponent, 0, 1, 3);
 struct iAwsComponent : public iAwsSource
 {
   
-  /** This function takes care of the creation tasks required to prepare this
-    * component for use. If you create a component via the window manager's creation functions
-    * then you should not call this, the window manager has done it for you. If you create
-    * components programatically then you are encouraged to call this func to make setup
-    * easier. For component developers, you should not need to override Create but 
-    * rather do your setup work in Setup. 
-    *
-    * If it returns false then the component was not able to initialize properly and
-    * shouldn't be used.
-    **/
-  virtual bool Create(iAws* mgr, iAwsComponent* parent, iAwsComponentNode* settings)=0;
+  /**
+   * This function takes care of the creation tasks required to prepare this
+   * component for use. If you create a component via the window manager's
+   * creation functions then you should not call this, the window manager has
+   * done it for you. If you create components programatically then you are
+   * encouraged to call this func to make setup easier. For component
+   * developers, you should not need to override Create but rather do your
+   * setup work in Setup. 
+   * <p>
+   * If it returns false then the component was not able to initialize
+   * properly and shouldn't be used.
+   */
+  virtual bool Create(iAws* mgr, iAwsComponent* parent,
+  	iAwsComponentNode* settings)=0;
 
   /// Sets up a component.
   virtual bool Setup(iAws *wmgr, iAwsComponentNode *settings)=0;
 
-  /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
+  /**
+   * Event dispatcher, demultiplexes events and sends them off to the proper
+   * event handler.
+   */
   virtual bool HandleEvent(iEvent& Event)=0;
 
-  /// Gets a copy of the property, put it in parm.  Returns false if the property does not exist.
+  /**
+   * Gets a copy of the property, put it in parm.  Returns false if the
+   * property does not exist.
+   */
   virtual bool GetProperty(const char* name, void **parm)=0;
 
-  /// Sets the property specified to whatever is in parm. Returns false if there's no such property.
+  /**
+   * Sets the property specified to whatever is in parm. Returns false if
+   * there's no such property.
+   */
   virtual bool SetProperty(const char* name, void *parm)=0;
 
   /// Executes a scriptable action
@@ -781,7 +867,10 @@ struct iAwsComponent : public iAwsSource
   /// Get's the unique id of this component.
   virtual unsigned long GetID()=0;
 
-  /// Set's the unique id of this component. Note: only to be used by window manager.
+  /**
+   * Set's the unique id of this component. Note: only to be used by window
+   * manager.
+   */
   virtual void SetID(unsigned long _id)=0;
 
   /// Gets a child component by name, returns 0 on failure.
@@ -817,19 +906,23 @@ struct iAwsComponent : public iAwsSource
   /// Set's the component below this one
   virtual void SetComponentBelow(iAwsComponent *comp)=0;
 
-	//Add child to TabOrder
-
-	/*Actually at this moment TabOrder is csVector that contains all children
-	of component ordered by their creation.*/ 
-
+  /**
+   * Add child to TabOrder
+   * Actually at this moment TabOrder is csVector that contains all children
+   * of component ordered by their creation. 
+   */ 
   virtual bool AddToTabOrder(iAwsComponent *child)=0;
 
-  /// Get's next child component in parent TabOrder, 
-	//  First if there is none, 0, if child not belongs to this component
+  /**
+   * Get's next child component in parent TabOrder, 
+   * First if there is none, 0, if child not belongs to this component
+   */
   virtual iAwsComponent *TabNext(iAwsComponent *child)=0;
 
-  /// Get's previous child component in parent TabOrder,
-	//  Last if there is none, 0, if child not belongs to this component
+  /**
+   * Get's previous child component in parent TabOrder,
+   * Last if there is none, 0, if child not belongs to this component
+   */
   virtual iAwsComponent *TabPrev(iAwsComponent *child)=0;
 
   /// Returns TabOrder length
@@ -921,18 +1014,17 @@ struct iAwsComponent : public iAwsSource
 
   /* Only awsComponent should make use of the funcs below. Nothing else =) */
 
-    /// Removes a component from the hierarchy
-    virtual void Unlink()=0;
+  /// Removes a component from the hierarchy
+  virtual void Unlink()=0;
 
-    /// Links a component into the hierarchy as a sibling above comp
-    virtual void LinkAbove(iAwsComponent* comp)=0;
+  /// Links a component into the hierarchy as a sibling above comp
+  virtual void LinkAbove(iAwsComponent* comp)=0;
 
-    /// Links a component into the hierarchy as a sibling below comp
-    virtual void LinkBelow(iAwsComponent* comp)=0;
+  /// Links a component into the hierarchy as a sibling below comp
+  virtual void LinkBelow(iAwsComponent* comp)=0;
 
-	/// Sets the top child
-	virtual void SetTopChild(iAwsComponent* child)=0;
-
+  /// Sets the top child
+  virtual void SetTopChild(iAwsComponent* child)=0;
 };
 
 
@@ -957,7 +1049,10 @@ SCF_VERSION (iAwsKeyFactory, 0, 0, 4);
 /// Interface for key factories.
 struct iAwsKeyFactory : public iBase
 {
-   /// Initializes the factory , name is the name of this component, component type is it's type.
+   /**
+    * Initializes the factory , name is the name of this component,
+    * component type is it's type.
+    */
    virtual void Initialize(const char* name, const char* component_type)=0;
    /// Adds this factory's base to the window manager IF the base is a window
    virtual void AddToWindowList(iAwsPrefManager *pm)=0;
@@ -970,11 +1065,13 @@ struct iAwsKeyFactory : public iBase
    /// Add a rect key
    virtual void AddRectKey (const char* name, csRect v)=0;
    /// Add an RGB key
-   virtual void AddRGBKey (const char* name, unsigned char r, unsigned char g, unsigned char b)=0;
+   virtual void AddRGBKey (const char* name, unsigned char r,
+   	unsigned char g, unsigned char b)=0;
    /// Add a point key
    virtual void AddPointKey (const char* name, csPoint v)=0;
    /// Add a connection key
-   virtual void AddConnectionKey (const char* name, iAwsSink *s, unsigned long t, unsigned long sig)=0;
+   virtual void AddConnectionKey (const char* name, iAwsSink *s,
+   	unsigned long t, unsigned long sig)=0;
    /// Add a connection node (from a factory)
    virtual void AddConnectionNode (iAwsConnectionNodeFactory *node)=0;
    
@@ -1004,3 +1101,4 @@ struct iAwsConnectionNodeFactory : public iBase
 /* @} */
 
 #endif // __CS_IAWS_AWS_H__
+

@@ -15,6 +15,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
+
 #ifndef __CS_AWS_FLEXIBLE_PARAMETER_LIST_INTERFACE_H__
 #define __CS_AWS_FLEXIBLE_PARAMETER_LIST_INTERFACE_H__
 
@@ -27,11 +28,11 @@
 SCF_VERSION (iAwsParmList, 0, 0, 2);
 
 /**
- * Provides support for safely passing named parameters through to different functions
- * in a portable manner.  Note that awsParmList does not utilize copy semantics.  In
- * the interests of space and speed, it simply takes a reference to the pointers passed
- * in.  This means that you should NOT use an awsParmList if any parm it references
- * has gone out of scope!
+ * Provides support for safely passing named parameters through to different
+ * functions in a portable manner.  Note that awsParmList does not utilize
+ * copy semantics.  In the interests of space and speed, it simply takes a
+ * reference to the pointers passed in.  This means that you should NOT use
+ * an awsParmList if any parm it references has gone out of scope!
  */
 struct iAwsParmList : public iBase
 {
@@ -51,29 +52,57 @@ struct iAwsParmList : public iBase
   virtual void AddRect(const char *name, csRect *value)=0;
   /// Adds a point to the parmeter list
   virtual void AddPoint(const char *name, csPoint *value)=0;
-  /** Adds an opaque, undefined value to the parm list. This is stored as a void *, but
-   * should never be assumed to be anything at all, except some value that fits in
-   * sizeof(void *)
+  /**
+   * Adds an opaque, undefined value to the parm list. This is stored as a
+   * void *, but should never be assumed to be anything at all, except some
+   * value that fits in sizeof(void *)
    */
   virtual void AddOpaque (const char *name, void *value)=0;
 
-  /// Returns the int named "name" in value.  True if it was found, otherwise false.
+  /**
+   * Returns the int named "name" in value.  True if it was found, otherwise
+   * false.
+   */
   virtual bool GetInt(const char *name, int *value)=0;
-  /// Returns the float named "name" in value.  True if it was found, otherwise false.
+  /**
+   * Returns the float named "name" in value.  True if it was found,
+   * otherwise false.
+   */
   virtual bool GetFloat(const char *name, float *value)=0;
-  /// Returns the bool named "name" in value.  True if it was found, otherwise false.
+  /**
+   * Returns the bool named "name" in value.  True if it was found,
+   * otherwise false.
+   */
   virtual bool GetBool(const char *name, bool *value)=0;
-  /// Returns the string named "name" in value.  True if it was found, otherwise false.
+  /**
+   * Returns the string named "name" in value.  True if it was found,
+   * otherwise false.
+   */
   virtual bool GetString(const char *name, iString **value)=0;
-  /// Returns the basic vector named "name" in value.  True if it was found, otherwise false.
+  /**
+   * Returns the basic vector named "name" in value.  True if it was found,
+   * otherwise false.
+   */
   virtual bool GetBasicVector(const char *name, csBasicVector **value)=0;
-  /// Returns the string vector named "name" in value.  True if it was found, otherwise false.
+  /**
+   * Returns the string vector named "name" in value.  True if it was found,
+   * otherwise false.
+   */
   virtual bool GetStringVector(const char *name, csStrVector **value)=0;
-  /// Returns the rect named "name" in value.  True if it was found, otherwise false.
+  /**
+   * Returns the rect named "name" in value.  True if it was found, otherwise
+   * false.
+   */
   virtual bool GetRect(const char *name, csRect **value)=0;
-  /// Returns the point named "name" in value.  True if it was found, otherwise false.
+  /**
+   * Returns the point named "name" in value.  True if it was found, otherwise
+   * false.
+   */
   virtual bool GetPoint(const char *name, csPoint **value)=0;
-  /// Returns the opaque value named "name" in value.  True if it was found, otherwise false.
+  /**
+   * Returns the opaque value named "name" in value.  True if it was found,
+   * otherwise false.
+   */
   virtual bool GetOpaque (const char *name, void **value)=0;
 
   /// Clears the parameter list

@@ -15,6 +15,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
+
 #ifndef __CS_AWSCNVS_H__
 #define __CS_AWSCNVS_H__
 
@@ -33,7 +34,10 @@ SCF_VERSION (iAwsCanvas, 0, 0, 1);
 struct iAwsCanvas : public iBase
 {
 public:
-  /// This is actually not used ever.  The window manager doesn't "animate", and only refreshes the canvas when needed.
+  /**
+   * This is actually not used ever.  The window manager doesn't "animate",
+   * and only refreshes the canvas when needed.
+   */
   virtual void Animate (csTicks current_time)=0;
 
   /// Get the iGraphics2D interface so that components can use it.
