@@ -73,7 +73,7 @@ csTextureCacheSoftware::~csTextureCacheSoftware ()
 void csTextureCacheSoftware::set_cache_size (long size)
 {
   Clear ();
-  cache_size = size * texman->pfmt.PixelBytes;
+  cache_size = size * bytes_per_texel;
 }
 
 void csTextureCacheSoftware::Clear ()
@@ -148,8 +148,8 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (iPolygonTexture* p
 
     int margin_size = H_MARGIN * pt->GetWidth () * bytes_per_texel;
     UByte *bitmap = new UByte [bitmap_size];
-    memset (bitmap, 0, margin_size);
-    memset (bitmap + bitmap_size - margin_size, 0, margin_size);
+    //memset (bitmap, 0, margin_size);
+    //memset (bitmap + bitmap_size - margin_size, 0, margin_size);
     cached_texture->data = bitmap;
     cached_texture->bitmap = bitmap + margin_size; // Skip margin.
     cached_texture->size = bitmap_size;

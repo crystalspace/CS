@@ -97,6 +97,11 @@ void LM_NAME (csBitSet *dirty, iPolygonTexture *pt,
   UByte *inv_cmap = texman->inv_cmap;
 #endif
 
+  // The pointer to the end of the texture minus the mipmap size.
+  // This is used to check for overflow in the loops below.
+  PI_PIXTYPE* out_end = (((PI_PIXTYPE*)dst)-H_MARGIN*pt_deltaw)
+	-pt_mipmap_size+pt->GetSize ();
+
   int dirty_bit = 0;
   for (int lv = 0; lv < max_lv; lv++)
   {
@@ -143,10 +148,14 @@ void LM_NAME (csBitSet *dirty, iPolygonTexture *pt,
         int uu = u + pt_minu;
         int end_uu = uu + pt_mipmap_size;
 
+	// Test for horizontal overflow.
+	int overflow = (out-out_end);
+	if (overflow > 0) end_uu -= overflow;
+
         for (; uu < end_uu; uu++)
         {
           RGBPixel pix = tx_palette [tx_bitmap [tx_idx + (uu & tx_andw)]];
-          *out++ =
+	  *out++ =
 #if defined (PI_INDEX8)
             inv_cmap [
 #endif
