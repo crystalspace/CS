@@ -271,7 +271,7 @@ int main (int argc, char* argv[])
   System->RequestPlugin ("crystalspace.kernel.vfs:" CS_FUNCID_VFS);
   System->RequestPlugin ("crystalspace.font.server.freetype:" CS_FUNCID_FONTSERVER);
 
-  if (!System->Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv))
   {
     fprintf (stderr, "Initialization error!\n");
     return -1;
