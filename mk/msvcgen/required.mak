@@ -41,6 +41,7 @@
 
 MSVC.PLUGINS.REQUIRED =         \
   apps/import/caltocs		\
+  cscript/csperl5              \
   cscript/cspython              \
   font/server/freefnt2          \
   mesh/impexp/3ds               \
