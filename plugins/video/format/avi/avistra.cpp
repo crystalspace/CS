@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "avistra.h"
 #include "isys/system.h"
+#include <ctype.h>
 
 IMPLEMENT_IBASE (csAVIStreamAudio)
   IMPLEMENTS_INTERFACE (iAudioStream)
@@ -57,6 +58,8 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
   int i;
   for (i=3; i>=0 && strdesc.codec[i] == ' '; i--);
   strdesc.codec[i+1] = '\0';
+  for (i=0; strdesc.codec[i]; i++)
+    strdesc.codec[i] = tolower (strdesc.codec[i]);
 
   delete pChunk;
   pChunk = new csAVIFormat::AVIDataChunk;

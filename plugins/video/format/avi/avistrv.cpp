@@ -22,6 +22,7 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "ivideo/txtmgr.h"
+#include <ctype.h>
 
 IMPLEMENT_IBASE (csAVIStreamVideo)
   IMPLEMENTS_INTERFACE (iVideoStream)
@@ -64,6 +65,8 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   int i;
   for (i=3; i>=0 && strdesc.codec[i] == ' '; i--);
   strdesc.codec[i+1] = '\0';
+  for (i=0; strdesc.codec[i]; i++)
+    strdesc.codec[i] = tolower (strdesc.codec[i]);
 
   delete pChunk;
   pChunk = new csAVIFormat::AVIDataChunk;
@@ -312,14 +315,14 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
     {
       if (uvidx != (sc>>1)) // this YUV is a 1:4:4 scheme
       {
-		uvidx = (sr>>1) * sw + (sc>>1);
-		u=((float)(unsigned char)udata[uvidx]) - 128.f;
-		v=((float)(unsigned char)vdata[uvidx]) - 128.f;
-		uf1 = 2.018f * u;
-		uf2 = 0.813f * u;
-		vf1 = 0.391f * v;
-		vf2 = 1.596f * v;
-		uvidx = sc  >>1;
+	uvidx = (sr * sw  + sc)/4;
+	u=((float)(unsigned char)udata[uvidx]) - 128.f;
+	v=((float)(unsigned char)vdata[uvidx]) - 128.f;
+	uf1 = 2.018f * u;
+	uf2 = 0.813f * u;
+	vf1 = 0.391f * v;
+	vf2 = 1.596f * v;
+	uvidx = sc  >>1;
       }
       y=1.164f*(((float)(unsigned char)ydata[idx]) - 16.f);
       pixel[tidx].blue = FIX_RANGE(y + uf1);
