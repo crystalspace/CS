@@ -14,6 +14,20 @@ can be given:
 	- **: bug or feature has been fixed or implemented.
 
 Bugs to fix:
+	[S]  Line drawing in software renderer is not stable (overwriting
+	     memory). This shows with BugPlug and also with AWS in some
+	     cases.
+	[O]  Add the ability to get different kinds of polygon meshes from
+	     objects: lower-lod version for culling, version for collision
+	     detection, version for lighting (casting shadows), ...
+	[O]  Mark polygons as being visible, used for shadow casting,
+	     used for culling, used for collision detection, ... (more
+	     general system).
+	[O]  Remove old octree based culler when Dynavis is ok and levtool
+	     can convert to Dynavis levels.
+	[O]  Implement splatting in Dynavis.
+	[O]  Implement 3-bit outline renderer in Dynavis.
+	[O]  Implement better kd-tree balancing in Dynavis.
 	[V]  Investigate if LOD for sprites is still working.
 	[S]  Investigate if there are any more memory leaks after
 	     unloading a level and if so fix them.
@@ -98,14 +112,6 @@ Bugs to fix:
 	     to portals in general.
 	     (For example: [Bug 473597])
 	     There also seem to be several clipping bugs still.
-	[V]  Visibility culling does not work correctly on objects that
-	     are scaled using the movable (it works correctly with objects
-	     scaled using HardTransform).
-	     Problem here is that the bounding box is not recalculated when
-	     the movable is changed.
-	     [Bug 478072]
-	[S]  Using software renderer proctexes with OpenGL causes a crash
-	     (At some place the OpenGL texture's images get NULL).
 	[F]  When mounting a real directory on a VFS path you need to do:
 	        Mount ("this/is/a/dir$/", "/lib/whatever");
 	     i.e. the last '/' has to be preceeded with '$'. This needs
