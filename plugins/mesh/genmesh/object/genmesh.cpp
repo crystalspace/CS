@@ -199,7 +199,6 @@ void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
                                       int tricount,
                                       iMaterialWrapper *material)
 {
-  SetupShaderVariableContext ();
   csGenmeshSubMesh *subMesh = new csGenmeshSubMesh();
   subMesh->material = material;
   subMesh->index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
@@ -218,8 +217,6 @@ void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
   subMesh->bufferHolder.AttachNew (new csRenderBufferHolder);
   subMesh->bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX,
     subMesh->index_buffer);
-  subMesh->bufferHolder->SetAccessor (scfiRenderBufferAccessor, 
-    CS_BUFFER_ALL_MASK & (~CS_BUFFER_MAKE_MASKABLE(CS_BUFFER_INDEX)));
 
   subMeshes.Push (subMesh);
 }
@@ -1112,6 +1109,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       bufferHolder->SetAccessor (scfiRenderBufferAccessor, 
 	bufferHolder->GetAccessorMask() 
 	& (~CS_BUFFER_MAKE_MASKABLE (CS_BUFFER_INDEX)));
+
     } 
 
     meshPtr->mixmode = MixMode;
@@ -1165,6 +1163,20 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       meshPtr->camera_origin = camera_origin;
       meshPtr->camera_transform = &camera->GetTransform();
       meshPtr->variablecontext = svcontext;
+
+      subMeshes[i]->bufferHolder->SetAccessor (scfiRenderBufferAccessor, 
+        bufferHolder->GetAccessorMask() 
+        & (~CS_BUFFER_MAKE_MASKABLE (CS_BUFFER_INDEX)));
+
+      for (size_t b=0; b<CS_BUFFER_COUNT; ++b)
+      {
+        if (b != CS_BUFFER_INDEX)
+        {
+          subMeshes[i]->bufferHolder->SetRenderBuffer ((csRenderBufferName)b, 
+            bufferHolder->GetRenderBuffer ((csRenderBufferName)b));
+        }
+      }
+
       meshPtr->buffers = subMeshes[i]->bufferHolder;
       meshPtr->geometryInstance = (void*)factory;
 
