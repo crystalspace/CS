@@ -9212,6 +9212,12 @@ if test "$no_x" != yes; then
 "
     cs_makefile_text="${cs_makefile_text}X_EXTRA_LIBS = $X_EXTRA_LIBS
 "
+    cs_jamconfig_text="${cs_jamconfig_text}X_PRE_LIBS ?= \"$X_PRE_LIBS\" ;
+"
+    cs_jamconfig_text="${cs_jamconfig_text}X_LIBS ?= \"$X_LIBS\" ;
+"
+    cs_jamconfig_text="${cs_jamconfig_text}X_EXTRA_LIBS ?= \"$X_EXTRA_LIBS\" ;
+"
     cs_jamconfig_text="${cs_jamconfig_text}X11.CFLAGS ?= \"$X_CFLAGS\" ;
 "
     cs_jamconfig_text="${cs_jamconfig_text}X11.LFLAGS ?= \"\$(X_PRE_LIBS) \$(X_LIBS) -lXext -lX11 \$(X_EXTRA_LIBS)\" ;
