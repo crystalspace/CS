@@ -12,6 +12,9 @@ The history order has been reversed so that new features are at the top.
 	  to let it implement iShadowReceiver. The basic idea is that
 	  csShadowFrustum must become a private concept of the shadow
 	  blocks and that only csFrustum is used.
+	- Eric Sunshine applied patches to mdl2spr from Matt Keith
+	  <keith@www.keithcom.com> which allow mdl2spr to generate sprite files
+	  which conform to the new mesh plugin architecture.
 10-Mar-2001
 	- Cleaned up layout in DDG loader and also made a small fix
 	  in csTerrainWrapper constructor declaration.
