@@ -1538,7 +1538,6 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
                 mymesh->clip_z_plane);
 
   SetObjectToCamera (&mymesh->object2camera);
-  //SetObjectToCamera (mymesh->transform);
 
   CS_ASSERT(mymesh->dynDomain);
   csShaderVariable* indexBufSV = mymesh->dynDomain->GetVariable (string_indices);
@@ -1547,7 +1546,7 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
   indexBufSV->GetValue (iIndexbuf);
   CS_ASSERT(iIndexbuf);
   csGLRenderBuffer* indexbuf = (csGLRenderBuffer*)iIndexbuf;
-    //(csGLRenderBuffer*)indexBufSV->  source->GetRenderBuffer (string_indices);
+
 
   GLenum primitivetype;
   switch (mymesh->meshtype)
@@ -1633,21 +1632,9 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
   else
     SetMirrorMode (mymesh->do_mirror);
 
-  /* 
-  csMaterialHandle* mathandle = mymesh->material ?
-    ((csMaterialHandle*)(mymesh->material->GetMaterialHandle())) :
-    0;
-  */
 
   statecache->SetShadeModel (GL_SMOOTH);
 
-  /*iRenderBufferSource* source = mymesh->buffersource;
-  csGLRenderBuffer* indexbuf =
-    (csGLRenderBuffer*)source->GetRenderBuffer (string_indices);
-  if (!indexbuf)
-    return;*/
-
-  //indexbuf->Lock(CS_BUF_LOCK_RENDER);
   void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
   if (bufData != (void*)-1)
   {

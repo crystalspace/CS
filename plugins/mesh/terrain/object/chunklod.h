@@ -105,7 +105,7 @@ private:
   csRef<iGraphics3D> r3d;
   csRef<iShaderManager> shmgr;
 
-  class MeshTreeNode : public iRenderBufferSource
+  class MeshTreeNode
   {
   private:
     csChunkLodTerrainFactory *pFactory;

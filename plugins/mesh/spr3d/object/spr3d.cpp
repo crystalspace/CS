@@ -930,8 +930,6 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DState)
 #ifndef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
-#else
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
 #endif // CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
   {
@@ -963,10 +961,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #ifndef CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-#else
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::RenderBufferSource)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif // CS_USE_NEW_RENDERER
 
@@ -1007,8 +1001,6 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
 #ifndef CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#else
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
 #endif // CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
   logparent = 0;
@@ -1084,8 +1076,6 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
 #ifndef CS_USE_NEW_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#else
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
 #endif // CS_USE_NEW_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
   SCF_DESTRUCT_IBASE ();

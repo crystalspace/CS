@@ -30,7 +30,6 @@
 
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer)
   SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
-//  SCF_IMPLEMENTS_INTERFACE(iRenderBufferSource)
 SCF_IMPLEMENT_IBASE_END
 
 csStringID csGLPolygonRenderer::vertex_name   = csInvalidStringID;
@@ -273,12 +272,6 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
   lmcoords_buffer->Release ();
 }
 
-/*iRenderBufferSource* csGLPolygonRenderer::GetBufferSource (uint& indexStart, 
-                                                           uint& indexEnd)
-{
-  PrepareBuffers (indexStart, indexEnd);
-  return ((iRenderBufferSource*)this);
-}*/
 
 void csGLPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
 {

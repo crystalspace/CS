@@ -118,18 +118,6 @@ struct iRenderBuffer : public iBase
   virtual void SetOffset(int offset) = 0;
 };
 
-SCF_VERSION (iRenderBufferSource, 0, 0, 1);
-
-/**
-* This interface is implemented by meshes, and exposes a call for the 
-* renderer to use to fetch vertex data.
-*/
-struct iRenderBufferSource : public iBase
-{
-  /// Get a named buffer
-  virtual iRenderBuffer* GetRenderBuffer (csStringID name) = 0;
-};
-
 /** @} */
 
 #endif // __CS_IVIDEO_RNDBUF_H__

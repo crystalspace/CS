@@ -254,15 +254,6 @@ public:
   }
 
   iRenderBuffer *GetRenderBuffer (csStringID name);
-  //----------------------- iRenderBufferSource implementation ----------------
-  class BufferSource : public iRenderBufferSource
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
-    iRenderBuffer *GetRenderBuffer (csStringID name)
-    { return scfParent->GetRenderBuffer (name); }
-  } scfiRenderBufferSource;
-  friend class BufferSource;
-
   void UpdateBufferSV();
 #endif
 

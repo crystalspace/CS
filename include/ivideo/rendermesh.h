@@ -40,7 +40,6 @@ class csColor;
 class csReversibleTransform;
 struct iTextureHandle;
 struct iMaterialWrapper;
-struct iRenderBufferSource;
 struct iPortalContainer;
 
 /// Document me! @@@

@@ -55,9 +55,6 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-#ifdef CS_USE_NEW_RENDERER
-  //SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
-#endif
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowReceiver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iGeneralMeshState)
@@ -79,12 +76,6 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
     }
   }
 SCF_IMPLEMENT_IBASE_END
-
-#ifdef CS_USE_NEW_RENDERER
-/*SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::BufferSource)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END*/
-#endif
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::ShadowCaster)
   SCF_IMPLEMENTS_INTERFACE (iShadowCaster)
@@ -117,9 +108,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
 #endif
 {
   SCF_CONSTRUCT_IBASE (0);
-#ifdef CS_USE_NEW_RENDERER
-  //SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
-#endif
   //SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralMeshState);
@@ -169,9 +157,6 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
 
   ClearPseudoDynLights ();
 
-#ifdef CS_USE_NEW_RENDERER
-  //SCF_DESTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
-#endif
   //SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiGeneralMeshState);
@@ -1184,20 +1169,11 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
       return CS_STATIC_CAST(iPolygonMesh*, Object);
     }
   }
-#ifdef CS_USE_NEW_RENDERER
-  //SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
-#endif
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iGeneralFactoryState)
 #ifndef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 #endif
 SCF_IMPLEMENT_IBASE_END
-
-#ifdef CS_USE_NEW_RENDERER
-/*SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::BufferSource)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END*/
-#endif
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::GeneralFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iGeneralFactoryState)
@@ -1232,9 +1208,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
 #endif
 {
   SCF_CONSTRUCT_IBASE (pParent);
-#ifdef CS_USE_NEW_RENDERER
-  //SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
-#endif
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
 #ifndef CS_USE_NEW_RENDERER
@@ -1329,9 +1302,6 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
   delete [] mesh_triangles;
 #endif
 
-#ifdef CS_USE_NEW_RENDERER
-  //SCF_DESTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
-#endif
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
 #ifndef CS_USE_NEW_RENDERER

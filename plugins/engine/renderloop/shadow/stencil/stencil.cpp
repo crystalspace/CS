@@ -57,7 +57,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csStencilShadowCacheEntry)
   SCF_IMPLEMENTS_INTERFACE (iObjectModelListener)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource);
 SCF_IMPLEMENT_IBASE_END
 
 csStencilShadowCacheEntry::csStencilShadowCacheEntry (
@@ -497,9 +496,6 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   rmesh.z_buf_mode = CS_ZBUF_TEST;
   //rmesh.mixmode = shader->GetMixmodeOverride (); //CS_FX_COPY;
   rmesh.material = 0;
-  //csRef<iRenderBufferSource> buffer_source = 
-    //SCF_QUERY_INTERFACE (shadowCacheEntry, iRenderBufferSource);
-//  rmesh.buffersource = buffer_source;
   rmesh.dynDomain = shadowCacheEntry->dynDomain;
   rmesh.meshtype = CS_MESHTYPE_TRIANGLES;
 

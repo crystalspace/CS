@@ -240,19 +240,7 @@ public:
   	csVector3& isect, float* pr, int* polygon_idx = 0);
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-#ifdef CS_USE_NEW_RENDERER
 
-  /*iRenderBuffer *GetRenderBuffer (csStringID name);
-  //------------------------- iStreamSource implementation ----------------
-  class BufferSource : public iRenderBufferSource 
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
-    iRenderBuffer *GetRenderBuffer (csStringID name)
-	{ return scfParent->GetRenderBuffer (name); }
-  } scfiRenderBufferSource;
-  friend class BufferSource;*/
-
-#endif
 
   virtual iObjectModel* GetObjectModel ();
   virtual bool SetColor (const csColor& col) { color = col; return true; }

@@ -34,7 +34,7 @@
 
 #include "fullquad.h"
 
-class csFullscreenQuad : public iRenderBufferSource
+class csFullscreenQuad
 {
 private:
   csRef<iGraphics3D> g3d;
@@ -104,7 +104,6 @@ public:
 };
 
 SCF_IMPLEMENT_IBASE (csFullscreenQuad)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource)
 SCF_IMPLEMENT_IBASE_END
 
 //---------------------------------------------------------------------------

@@ -22,8 +22,7 @@
 
 class csGLGraphics3D;
 
-class csGLPolygonRenderer : public iPolygonRenderer/*,
-                            public iRenderBufferSource*/
+class csGLPolygonRenderer : public iPolygonRenderer
 {
   csGLGraphics3D* parent;
   uint renderBufferNum;
@@ -58,14 +57,10 @@ public:
   virtual ~csGLPolygonRenderer ();
 
   // ---- iPolygonRenderer ----
-  /*virtual iRenderBufferSource* GetBufferSource (uint& indexStart, 
-    uint& indexEnd);*/
   virtual void PrepareRenderMesh (csRenderMesh& mesh);
   
   virtual void Clear ();
   virtual void AddPolygon (csPolygonRenderData* poly);
 
-  // ---- iRenderBufferSource ----
-  //virtual iRenderBuffer* GetRenderBuffer (csStringID name);
 };
 

@@ -1351,14 +1351,6 @@ private:
   friend struct eiVertexBufferManagerClient;
 #else
   iRenderBuffer *GetRenderBuffer (csStringID name);
-  //------------------------- iStreamSource implementation ----------------
-  class RenderBufferSource : public iRenderBufferSource
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
-    iRenderBuffer *GetRenderBuffer (csStringID name)
-	{ return scfParent->GetRenderBuffer (name); }
-  } scfiRenderBufferSource;
-  friend class RenderBufferSource;
 #endif // CS_USE_NEW_RENDERER
 
 private:

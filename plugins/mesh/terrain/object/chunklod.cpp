@@ -335,8 +335,8 @@ csVector3 csChunkLodTerrainFactory::CollisionDetect (const csVector3 &p)
   return csVector3 (p.x, (d > p.y) ? d : p.y, p.z);
 }
 
+
 SCF_IMPLEMENT_IBASE (csChunkLodTerrainFactory::MeshTreeNode)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource)
 SCF_IMPLEMENT_IBASE_END
 
 csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (

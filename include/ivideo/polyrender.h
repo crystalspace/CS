@@ -32,8 +32,6 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
 
-struct iRenderBufferSource;
-
 /**
  * This structure is used for communicating polygon information to the
  * polygon renderer.
@@ -63,8 +61,6 @@ SCF_VERSION (iPolygonRenderer, 0, 1, 0);
 // @@@ Document me.
 struct iPolygonRenderer : public iBase
 {
-  /*virtual iRenderBufferSource* GetBufferSource (uint& indexStart, 
-    uint& indexEnd) = 0;*/
   virtual void PrepareRenderMesh (csRenderMesh& mesh) = 0;
   
   virtual void Clear () = 0;

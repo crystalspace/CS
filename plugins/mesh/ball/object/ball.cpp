@@ -44,9 +44,7 @@ SCF_IMPLEMENT_IBASE (csBallMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iBallState)
-#ifdef CS_USE_NEW_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
-#else
+#ifndef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 #endif
   {
@@ -67,11 +65,7 @@ SCF_IMPLEMENT_IBASE (csBallMeshObject)
   }
 SCF_IMPLEMENT_IBASE_END
 
-#ifdef CS_USE_NEW_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::BufferSource)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource) 
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-#else
+#ifndef CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
@@ -94,9 +88,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
-#ifdef CS_USE_NEW_RENDERER
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
-#else
+#ifndef CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
   csBallMeshObject::factory = factory;
@@ -181,9 +173,7 @@ csBallMeshObject::~csBallMeshObject ()
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiBallState);
-#ifdef CS_USE_NEW_RENDERER
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
-#else
+#ifndef CS_USE_NEW_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
   SCF_DESTRUCT_IBASE();

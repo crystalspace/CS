@@ -44,8 +44,7 @@
 class csStencilShadowStep;
 class csStencilShadowType;
 
-class csStencilShadowCacheEntry : public iObjectModelListener,
-				  public iRenderBufferSource
+class csStencilShadowCacheEntry : public iObjectModelListener				  
 {
 private:
   csStencilShadowStep* parent;
