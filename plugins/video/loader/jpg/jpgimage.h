@@ -21,6 +21,7 @@
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
+#include "csutil/leakguard.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
@@ -30,10 +31,11 @@
  */
 class csJPGImageIO : public iImageIO
 {
- protected:
+protected:
   csImageIOFileFormatDescriptions formats;
   iObjectRegistry* object_reg;
- public:
+
+public:
   SCF_DECLARE_IBASE;
 
   csJPGImageIO (iBase *pParent);
@@ -44,7 +46,8 @@ class csJPGImageIO : public iImageIO
   virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
     const char* extraoptions = 0);
-  virtual csPtr<iDataBuffer> Save (iImage *image, iImageIO::FileFormatDescription *format = 0,
+  virtual csPtr<iDataBuffer> Save (iImage *image,
+      	iImageIO::FileFormatDescription *format = 0,
     const char* extraoptions = 0);
 
   bool Initialize (iObjectRegistry* p) 
@@ -75,6 +78,9 @@ private:
     { object_reg = p; };
   /// Try to read the PNG file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);
+
+public:
+  CS_LEAKGUARD_DECLARE (ImageJpgFile);
 };
 
 #endif // __CS_JPGIMAGE_H__

@@ -23,6 +23,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/refarr.h"
+#include "csutil/leakguard.h"
 #include "igraphic/image.h"
 #include "igraphic/imgvec.h"
 
@@ -33,6 +34,7 @@ struct CS_CSGFX_EXPORT csImageVector : public iImageVector
 private:
   csRefArray<iImage> image;
 public:
+  CS_LEAKGUARD_DECLARE (csImageVector);
 
   csImageVector();
   virtual ~csImageVector();

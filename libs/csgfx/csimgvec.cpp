@@ -20,7 +20,10 @@
 #include "csgfx/csimgvec.h"
 
 SCF_IMPLEMENT_IBASE(csImageVector);
+  SCF_IMPLEMENTS_INTERFACE (iImageVector);
 SCF_IMPLEMENT_IBASE_END;
+
+CS_LEAKGUARD_IMPLEMENT (csImageVector)
 
 csImageVector::csImageVector()
 {
