@@ -2325,7 +2325,9 @@ csPlatformShutdown = _cspace.csPlatformShutdown
 
 csPrintf = _cspace.csPrintf
 
-csFPutErr = _cspace.csFPutErr
+csFPrintf = _cspace.csFPrintf
+
+csFPrintfV = _cspace.csFPrintfV
 
 csPrintfErr = _cspace.csPrintfErr
 
