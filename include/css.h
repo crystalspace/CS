@@ -274,6 +274,7 @@
 #include "csutil/dataobj.h"
 #include "csutil/datastrm.h"
 #include "csutil/debug.h"
+#include "csutil/event.h"
 #include "csutil/evoutlet.h"
 #include "csutil/flags.h"
 #include "csutil/garray.h"
