@@ -158,11 +158,28 @@ void csShaderGLMTEX::BuildTokenHash()
   xmltokens.Register ("texturesource", XMLTOKEN_TEXTURESOURCE);
   xmltokens.Register ("texturecoordinatesource", XMLTOKEN_TEXCOORDSOURCE);
   xmltokens.Register ("layer", XMLTOKEN_LAYER);
-  
+
   xmltokens.Register("integer", 100+iShaderVariable::INT);
   xmltokens.Register("float", 100+iShaderVariable::VECTOR1);
   xmltokens.Register("string", 100+iShaderVariable::STRING);
   xmltokens.Register("vector3", 100+iShaderVariable::VECTOR3);
+
+  xmltokens.Register("primary color", GL_PRIMARY_COLOR);
+  xmltokens.Register("texture", GL_TEXTURE);
+  xmltokens.Register("constant color", GL_CONSTANT_ARB);
+  xmltokens.Register("pervious layer", GL_PREVIOUS_ARB);
+  
+  xmltokens.Register("color", GL_SRC_COLOR);
+  xmltokens.Register("invertcolor", GL_ONE_MINUS_SRC_COLOR);
+  xmltokens.Register("alpha", GL_SRC_ALPHA);
+  xmltokens.Register("invertalpha", GL_ONE_MINUS_SRC_ALPHA);
+
+  xmltokens.Register("replace", GL_REPLACE);
+  xmltokens.Register("modulate", GL_MODULATE);
+  xmltokens.Register("add", GL_ADD);
+  xmltokens.Register("add signed", GL_ADD_SIGNED_ARB);
+  xmltokens.Register("interpolate", GL_INTERPOLATE_ARB);
+  xmltokens.Register("subtract", GL_SUBTRACT_ARB);
 }
 
 
@@ -225,8 +242,130 @@ bool csShaderGLMTEX::LoadLayer(mtexlayer* layer, iDocumentNode* node)
       break;
     case XMLTOKEN_TEXCOORDSOURCE:
       {
-        const char* tcs = child->GetAttributeValue("sourcetype");
+        const char* tcs = child->GetAttributeValue("source");
+        if(strncmp(tcs, "mesh", 4) == 0)
+        {
+          layer->tcoordsource = CS_TEXCOORDSOURCE_MESH;
+        }
+        else if (strncmp(tcs, "stream", 5) == 0)
+        {
+          layer->tcoordsource = CS_TEXCOORDSOURCE_STREAM;
+          int ln = strlen(child->GetAttributeValue("stream"));
+          layer->tcoordstream = new char[ln+1];
+          strcpy(layer->tcoordstream, child->GetAttributeValue("stream"));
+        }
+        else
+        {
+          layer->tcoordsource = CS_TEXCOORDSOURCE_NONE;
+        }
+      }
+      break;
+    case XMLTOKEN_COLORSOURCE:
+      {
+        const char* cs = child->GetAttributeValue("source");
+        if(strncmp(cs, "mesh", 4) == 0)
+        {
+          layer->ccsource = CS_COLORSOURCE_MESH;
+        }
+        else if(strncmp(cs, "stream", 5) == 0)
+        {
+          layer->ccsource = CS_COLORSOURCE_STREAM;
+          int ln = strlen(child->GetAttributeValue("stream"));
+          layer->colorstream = new char[ln+1];
+          strcpy(layer->colorstream, child->GetAttributeValue("stream"));
+        } 
+        else
+        {
+          layer->ccsource = CS_COLORSOURCE_NONE;
+        }
+      }
+      break;
+    case XMLTOKEN_ENVIRONMENT:
+      {
+        LoadEnvironment(layer, child);
+      }
+      break;
+    }
+  }
+  return true;
+}
 
+bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
+{
+  if(layer == NULL || node == NULL)
+    return false;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes();
+
+  while(it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next();
+    if(child->GetType() != CS_NODE_ELEMENT) continue;
+    csStringID id = xmltokens.Request(child->GetValue());
+    switch (id)
+    {
+    case XMLTOKEN_COLORSOURCE:
+      {
+        int num = child->GetAttributeValueAsInt("num");
+        
+        if(num <= 0 || num > 3 )
+          continue;
+        
+        int i = xmltokens.Request(child->GetAttributeValue("source"));
+        if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
+          layer->colorsource[num] = i;
+      }
+      break;
+    case XMLTOKEN_ALPHASOURCE:
+      {
+        int num = child->GetAttributeValueAsInt("num");
+        
+        if(num <= 0 || num > 3 )
+          continue;
+        
+        int i = xmltokens.Request(child->GetAttributeValue("source"));
+        if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
+          layer->alphasource[num] = i;
+      }
+      break;
+    case XMLTOKEN_COLORMOD:
+      {
+        int num = child->GetAttributeValueAsInt("num");
+        
+        if(num <= 0 || num > 3 )
+          continue;
+
+        int m = xmltokens.Request(child->GetAttributeValue("modifier"));
+        if(m == GL_SRC_COLOR ||m == GL_ONE_MINUS_SRC_COLOR||m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
+          layer->colormod[num] = m;
+      }
+      break;
+    case XMLTOKEN_ALPHAMOD:
+      {
+        int num = child->GetAttributeValueAsInt("num");
+        
+        if(num <= 0 || num > 3 )
+          continue;
+
+        int m = xmltokens.Request(child->GetAttributeValue("modifier"));
+        if(m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
+          layer->colormod[num] = m;
+      }
+      break;
+    case XMLTOKEN_COLOROP:
+      {
+        int o = xmltokens.Request(child->GetAttributeValue("operation"));
+        if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD||o == GL_ADD_SIGNED_ARB||
+          o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB)
+          layer->colorp = o;
+      }
+      break;
+    case XMLTOKEN_ALPHAOP:
+      {
+        int o = xmltokens.Request(child->GetAttributeValue("operation"));
+        if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD||o == GL_ADD_SIGNED_ARB||
+          o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB)
+          layer->colorp = o;
       }
       break;
     }

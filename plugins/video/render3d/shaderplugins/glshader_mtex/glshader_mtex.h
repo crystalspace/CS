@@ -94,7 +94,7 @@ private:
     XMLTOKEN_COLOROP,
     XMLTOKEN_ALPHAOP,
     XMLTOKEN_COLORSCALE,
-    XMLTOKEN_ALPHASCALE
+    XMLTOKEN_ALPHASCALE,
   };
 
   csStringHash xmltokens;
@@ -105,13 +105,15 @@ private:
   enum COLORSOURCE
   {
     CS_COLORSOURCE_MESH,
-    CS_COLORSOURCE_STREAM
+    CS_COLORSOURCE_STREAM,
+    CS_COLORSOURCE_NONE
   };
 
   enum TEXCOORDSOURCE
   {
     CS_TEXCOORDSOURCE_MESH,
-    CS_TEXCOORDSOURCE_STREAM
+    CS_TEXCOORDSOURCE_STREAM,
+    CS_TEXCOORDSOURCE_NONE
   };
 
   struct mtexlayer
@@ -152,6 +154,7 @@ private:
     {
       texnum = -1;
       ccsource = CS_COLORSOURCE_MESH;
+      tcoordsource = CS_TEXCOORDSOURCE_MESH;
       colorsource[0] = GL_PREVIOUS_ARB; colorsource[1] = GL_TEXTURE; colorsource[2] = -1;
       colormod[0] = GL_SRC_COLOR; colormod[1] = GL_SRC_COLOR; colormod[2] = GL_SRC_COLOR;
       colorp = GL_MODULATE;
@@ -183,7 +186,7 @@ private:
   void UpdateValid();
   
   bool LoadLayer(mtexlayer* layer, iDocumentNode* node);
-
+  bool LoadEnvironment(mtexlayer* layer, iDocumentNode* node);
 public:
   SCF_DECLARE_IBASE;
 
