@@ -379,6 +379,47 @@ Consequently, also use @samp{iMeshWrapper} instead of @samp{csMeshWrapper}, and
 will make the transition to version 1.0 easier when the engine will be fully
 accessible as a plugin.
 
+@subheading Sound System Changes
+
+There have been three main changes in the sound system:
+
+@itemize @bullet
+@item
+Some of the options in the config file have become redundant. The others have
+been moved to @file{CS/data/config/sound.cfg}. Have a look at this file to
+see which options are left.
+
+@item
+As before, a sound can be loaded as a static or streamed sound, but this
+difference is now expressed in using different classes: @code{iSoundData} and
+@code{iSoundStream}. You can create any number of instances (sources) of a
+static sound, but only one instance of a streamed sound. In fact, whenever
+you play a static sound, a separate sound stream is created from it. The
+definition of a static sound is now explicitly @samp{a sound of which any
+number of instances can be created}.
+
+@item
+The system of 3d and non-3d sources has been changed a bit. Every sound source
+now has a new attribute, the 3d mode. This mode can also be changed after the
+source is created. It can be set to the following values:
+@table @code
+@item SOUND3D_DISABLE
+This will cause the sound source to produce no 3d effect. This is also the
+only mode in which the original stereo effects are preserved (this does not
+work correctly at the moment).
+
+@item SOUND3D_ABSOLUTE
+This will interpret the position of the sound source and the listener as
+absolute coordinates and create the 3d effect based on this.
+
+@item SOUND3D_RELATIVE
+This will ignore the listener's position and interpret the position of the
+sound source as relative coordinated to the listener. In other words, it
+calculates the 3d effect as if the listener was positioned at @code{(0,0,0)}
+with default orientation.
+@end table
+@end itemize
+
 @subheading Various smaller changes
 
 @itemize @bullet
