@@ -986,10 +986,10 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       SetZMode (CS_ZBUF_NONE);
 
       glBegin (GL_QUADS);
-      glTexCoord2f (0, 0); glVertex2i (0, viewheight-txt_h+1);
-      glTexCoord2f (0, 1); glVertex2i (0, viewheight-0+1);
-      glTexCoord2f (1, 1); glVertex2i (txt_w, viewheight-0+1);
-      glTexCoord2f (1, 0); glVertex2i (txt_w, viewheight-txt_h+1);
+      glTexCoord2f (0, 0); glVertex2i (0, viewheight-txt_h);
+      glTexCoord2f (0, 1); glVertex2i (0, viewheight);
+      glTexCoord2f (1, 1); glVertex2i (txt_w, viewheight);
+      glTexCoord2f (1, 0); glVertex2i (txt_w, viewheight-txt_h);
       glEnd ();
       rt_onscreen = true;
     }
