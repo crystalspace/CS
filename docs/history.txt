@@ -61,6 +61,8 @@ The history order is reversed so that new features are at the top.
 	  made to csThingStatic.
 	- res augmented the API modification docs with information about the
 	  iPolygonMesh and procedural textures changes.
+	- res cured the Bezier plugin from leaks caused by the 
+	  'embedded iPolygonMesh syndrome'.
 7-May-2003
 	- Eric Sunshine removed MSVC project-related variables from
 	  csjoylin.mak.  This module is Linux-specific, therefore there is no

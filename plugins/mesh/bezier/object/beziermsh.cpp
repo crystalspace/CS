@@ -68,11 +68,26 @@ SCF_IMPLEMENT_IBASE(csBezierMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iBezierFactoryState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowReceiver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObjectFactory)
+  {
+    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
+    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
+      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
+    if (iInterfaceID == iPolygonMesh_scfID &&				
+      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
+    {
+#ifdef CS_DEBUG
+      printf ("Deprecated feature use: iPolygonMesh queried from Bezier "
+	"factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
+#endif
+      iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
+      (Object)->IncRef ();						
+      return STATIC_CAST(iPolygonMesh*, Object);				
+    }
+  }
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::BezierState)
@@ -89,10 +104,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE(iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierMesh::ShadowCaster)
@@ -159,7 +170,6 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBezierFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
@@ -1139,6 +1149,12 @@ csPtr<iMeshObject> csBezierMesh::MeshObjectFactory::NewInstance ()
   thing->MergeTemplate (&(scfParent->scfiBezierFactoryState), NULL);
   return csPtr<iMeshObject> (&thing->scfiMeshObject);
 }
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csBezierMesh::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
 
 //---------------------------------------------------------------------------
 

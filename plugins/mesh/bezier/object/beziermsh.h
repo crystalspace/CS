@@ -681,8 +681,9 @@ public:
   //-------------------- iPolygonMesh interface implementation ---------------
   struct PolyMesh : public BezierPolyMeshHelper
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    PolyMesh () : BezierPolyMeshHelper () { }
+    SCF_DECLARE_IBASE;
+    PolyMesh () : BezierPolyMeshHelper () 
+    { SCF_CONSTRUCT_IBASE (NULL); }
   } scfiPolygonMesh;
 
   //------------------- Lower detail iPolygonMesh implementation ---------------
