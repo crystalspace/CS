@@ -30,7 +30,7 @@ MsvcGenTemplateDir TOP mk msvcgen ;
 
 if [ Property build : projgen ] = msvc
 {
-  IncludeDir "include" crystalspace win32 ;
+  IncludeDir "include" csutil win32 ;
 }
 
 # We need to customize the list of build configurations.
