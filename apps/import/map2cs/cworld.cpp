@@ -675,10 +675,10 @@ bool CCSWorld::WritePlayerStart()
           WriteIndent();
 	  CdVector3 forw(0,0,1);
 	  // rotate angle
-	  double angle;
+	  double angle = 0.0;
 	  if (pEntity->GetNumValueOfKey("angle", angle))
 	  {
-	    angle = M_PI * angle/180;
+	    angle = PI * angle/180;
 	    forw = CdMatrix3 (cos(angle), 0, -sin(angle),
 			       0,          1,           0,
 			       sin(angle), 0, cos(angle)) * forw;
