@@ -488,7 +488,7 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
   csVector3 &v_t2w = txt_pl->v_world2tex;
 
-  // Cosinus fucktor
+  // Cosinus factor
   float cosfact = polygon->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
