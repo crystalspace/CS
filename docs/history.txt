@@ -19,6 +19,10 @@ The history order is reversed so that new features are at the top.
 	- Also added CORRECTSEAMS keyword to terrfunc loader.
 	- Added MULTIPLY keyword to HEIGHTGEN in parser. This makes it easier
 	  to quickly switch texture sizes for the generated terrain.
+	- Added csIntersect3::IntersectSegment() to intersect a segment
+	  with a frustum given by planes.
+	- Continued working on a faster clipper for OpenGL meshes. It is
+	  *almost* working but not yet :-)
 6-May-2001
 	- Martin Geisse made the following changes:
 	    - csengine now depends on the string server. All apps have

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
 
     This library is free software; you can redistribute it and/or
@@ -256,6 +256,16 @@ public:
    */
   static bool IntersectPolygon (const csPlane3& plane, csPoly3D* poly,
   	csSegment3& segment);
+
+  /**
+   * Intersect a segment with a frustum (given as a set of planes).
+   * Returns the clipped segment (i.e. the part of the segment that is
+   * visible in the frustum). Returns -1 if the segment is entirely
+   * outside the frustum. Returns 0 if the segment is not modified and
+   * returns 1 otherwise. The input segment will be modified.
+   */
+  static int IntersectSegment (csPlane3* planes, int num_planes,
+  	csSegment3& seg);
 
   /**
    * Intersect a 3D segment with a triangle. Returns true if there

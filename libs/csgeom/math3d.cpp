@@ -333,6 +333,38 @@ float csSquaredDist::PointPoly (const csVector3& p, csVector3 *V, int n,
 
 //---------------------------------------------------------------------------
 
+int csIntersect3::IntersectSegment (csPlane3* planes, int num_planes,
+  	csSegment3& seg)
+{
+  csVector3& v1 = seg.Start ();
+  csVector3& v2 = seg.End ();
+  csVector3 isect;
+  float dist;
+  bool mod = false;
+  int i;
+  for (i = 0 ; i < num_planes ; i++)
+  {
+    csPlane3& pl = planes[i];
+    float c1 = pl.Classify (v1);
+    float c2 = pl.Classify (v2);
+    if (c1 < 0 && c2 > 0)
+    {
+      mod = true;
+      Plane (v1, v2, pl, isect, dist);
+      v1 = isect;
+      if ((v2 - v1) < .0001) return -1;
+    }
+    else if (c1 > 0 && c2 < 0)
+    {
+      mod = true;
+      Plane (v1, v2, pl, isect, dist);
+      v2 = isect;
+      if ((v2 - v1) < .0001) return -1;
+    }
+  }
+  return mod ? 1 : 0;
+}
+
 bool csIntersect3::IntersectPolygon (const csPlane3& plane,
 	csPoly3D* poly, csSegment3& seg)
 {
@@ -351,8 +383,7 @@ bool csIntersect3::IntersectPolygon (const csPlane3& plane,
     c = plane.Classify ((*poly)[i]);
     if ((c < 0 && c1 > 0) || (c1 < 0 && c > 0))
     {
-      csIntersect3::Plane ((*poly)[i1], (*poly)[i],
-      	  plane, isect, dist);
+      Plane ((*poly)[i1], (*poly)[i], plane, isect, dist);
       if (!found_v1) { v1 = isect; found_v1 = true; }
       else { v2 = isect; found_v2 = true; break; }
     }

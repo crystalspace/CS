@@ -45,6 +45,7 @@
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
 #include "csgfx/rgbpixel.h"
+#include "qsqrt.h"
 
 #include <GL/gl.h>
 
@@ -1477,6 +1478,106 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
   }
 }
 
+static int AddVertex (
+	int i1, int i2, float r,
+	int& num_verts,
+	csVector3* overts, csVector2* otexels,
+	csColor* ocolors, G3DFogInfo* ofog,
+	csVector3* verts, csVector2* texels,
+	csColor* colors, G3DFogInfo* fog)
+{
+  verts[num_verts] = overts[i1] * (1-r) + overts[i2] * r;
+  texels[num_verts] = otexels[i1] * (1-r) + otexels[i2] * r;
+  if (ocolors)
+  {
+    colors[num_verts].red = ocolors[i1].red * (1-r) + ocolors[i2].red * r;
+    colors[num_verts].green = ocolors[i1].green * (1-r) + ocolors[i2].green * r;
+    colors[num_verts].blue = ocolors[i1].blue * (1-r) + ocolors[i2].blue * r;
+  }
+  if (ofog)
+  {
+    fog[num_verts].intensity = ofog[i1].intensity*(1-r)+ofog[i2].intensity*r;
+    fog[num_verts].r = ofog[i1].r * (1-r) + ofog[i2].r * r;
+    fog[num_verts].g = ofog[i1].g * (1-r) + ofog[i2].g * r;
+    fog[num_verts].b = ofog[i1].b * (1-r) + ofog[i2].b * r;
+  }
+  num_verts++;
+  return num_verts-1;
+}
+
+static void ClipSegment (
+	int tri1, int tri2,
+	int* vert_idx, int& num_verts,
+	int& num_clipped_vertices,
+	int* clipped_translate,
+	csPlane3* frustum_planes, int num_planes,
+	const csVector3& frust_origin,
+	csVector3* vertices, csVector2* texels,
+	csColor* vertex_colors, G3DFogInfo* vertex_fog,
+	csVector3* clipped_vertices, csVector2* clipped_texels,
+	csColor* clipped_colors, G3DFogInfo* clipped_fog)
+{
+  csSegment3 seg (vertices[tri1]-frust_origin, vertices[tri2]-frust_origin);
+  csSegment3 orig_seg = seg;
+  if (clipped_translate[tri1] == -1 && clipped_translate[tri2] == -1)
+  {
+    if (csIntersect3::IntersectSegment (frustum_planes, num_planes, seg) != -1)
+    {
+      float len = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
+	  	orig_seg.End ()));
+      float l1 = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
+	  	seg.Start ()));
+      float r1 = l1 / len;
+      float l2 = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
+	  	seg.End ()));
+      float r2 = l2 / len;
+      vert_idx[num_verts++] = AddVertex (
+	  	tri1, tri2, r1, num_clipped_vertices,
+		vertices, texels, vertex_colors, vertex_fog,
+		clipped_vertices, clipped_texels,
+		clipped_colors, clipped_fog);
+      vert_idx[num_verts++] = AddVertex (
+	  	tri1, tri2, r2, num_clipped_vertices,
+		vertices, texels, vertex_colors, vertex_fog,
+		clipped_vertices, clipped_texels,
+		clipped_colors, clipped_fog);
+    }
+  }
+  else if (clipped_translate[tri1] == -1)
+  {
+    csIntersect3::IntersectSegment (frustum_planes, num_planes, seg);
+    float len = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
+		orig_seg.End ()));
+    float l1 = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
+		seg.Start ()));
+    float r1 = l1 / len;
+    vert_idx[num_verts++] = AddVertex (
+		tri1, tri2, r1, num_clipped_vertices,
+		vertices, texels, vertex_colors, vertex_fog,
+		clipped_vertices, clipped_texels,
+		clipped_colors, clipped_fog);
+    vert_idx[num_verts++] = clipped_translate[tri2];
+  }
+  else if (clipped_translate[tri2] == -1)
+  {
+    csIntersect3::IntersectSegment (frustum_planes, num_planes, seg);
+    float len = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
+		orig_seg.End ()));
+    float l2 = qsqrt (csSquaredDist::PointPoint (orig_seg.Start (),
+		seg.End ()));
+    float r2 = l2 / len;
+    vert_idx[num_verts++] = AddVertex (
+		tri1, tri2, r2, num_clipped_vertices,
+		vertices, texels, vertex_colors, vertex_fog,
+		clipped_vertices, clipped_texels,
+		clipped_colors, clipped_fog);
+  }
+  else
+  {
+    vert_idx[num_verts++] = clipped_translate[tri2];
+  }
+}
+
 void csGraphics3DOGLCommon::ClipTriangleMesh (
     int num_triangles,
     int num_vertices,
@@ -1488,26 +1589,36 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     int& num_clipped_triangles,
     int& num_clipped_vertices)
 {
-#define NEW_CLIP 0
-#if NEW_CLIP
   // Make sure the frustum is ok.
   CalculateFrustum ();
 
   // Now calculate the frustum as seen in object space for the given
   // mesh.
+  csPlane3 frustum_planes[100];	// @@@ Arbitrary number.
   csPoly3D obj_frustum;
   int i, j, j1;
   for (i = 0 ; i < frustum.GetNumVertices () ; i++)
   {
     obj_frustum.AddVertex (o2c.This2OtherRelative (frustum[i]));
   }
-  csVector3 obj_frust_origin = o2c.This2Other (csVector3 (0));
+  j1 = frustum.GetNumVertices ()-1;
+  for (j = 0 ; j < frustum.GetNumVertices () ; j++)
+  {
+    frustum_planes[j].Set (csVector3 (0), obj_frustum[j], obj_frustum[j1]);
+    j1 = j;
+  }
+  csVector3 frust_origin = o2c.This2Other (csVector3 (0));
+
+  // Setup the viewing plane.
+  //@@@frustum_planes[frustum.GetNumVertices ()].Set (0, 0, -1, .01);
 
   // Make sure our worktables are big enough for the clipped mesh.
-  if (num_triangles*2 > clipped_triangles.Limit ())
+  int num_tri = num_triangles*2;
+  if (num_tri < 50) num_tri += 50;	// Increase for low # of triangles.
+  if (num_tri > clipped_triangles.Limit ())
   {
     // Use two times as many triangles. Hopefully this is enough.
-    clipped_triangles.SetLimit (num_triangles*2);
+    clipped_triangles.SetLimit (num_tri);
   }
   if (num_vertices*2 > clipped_vertices.Limit ())
   {
@@ -1531,7 +1642,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     j1 = obj_frustum.GetNumVertices ()-1;
     for (j = 0 ; j < obj_frustum.GetNumVertices () ; j++)
     {
-      if (csMath3::WhichSide3D (v-obj_frust_origin, obj_frustum[j],
+      if (csMath3::WhichSide3D (v-frust_origin, obj_frustum[j],
 	    obj_frustum[j1]) >= 0)
       {
 	inside = false;
@@ -1590,20 +1701,45 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //=====
       // Difficult case: clipping will result in several triangles.
       //=====
-      // @@@@@@@@@@@@@@@@@@@ NOT OPTIMAL!!! AVOID csFrustum AND COPY
-      // BETTER CODE HERE!
-      csFrustum* pol = csFrustum::Intersect (obj_frust_origin,
-	  obj_frustum.GetVertices (), obj_frustum.GetNumVertices (),
-	  vertices[tri.a], vertices[tri.b], vertices[tri.c]);
-      // Now triangulate.
-      clipped_vertices[];@@@@@@@@@@@@@@@@
-      for (j = 2 ; j < pol->GetNumVertices () ; j++)
+      // @@@ NOT OPTIMAL!!!
+      int vert_idx[100];	// @@@ Arbitrary limit
+      int num_verts = 0;
+      //if (clipped_translate[tri.a] != -1)
+        //vert_idx[num_verts++] = clipped_translate[tri.a];
+      ClipSegment (tri.a, tri.b, vert_idx, num_verts,
+        num_clipped_vertices, clipped_translate.GetArray (),
+	frustum_planes, obj_frustum.GetNumVertices (), frust_origin,
+	vertices, texels, vertex_colors, vertex_fog,
+	clipped_vertices.GetArray (),
+	clipped_texels.GetArray (),
+	clipped_colors.GetArray (),
+	clipped_fog.GetArray ());
+      ClipSegment (tri.b, tri.c, vert_idx, num_verts,
+        num_clipped_vertices, clipped_translate.GetArray (),
+	frustum_planes, obj_frustum.GetNumVertices (), frust_origin,
+	vertices, texels, vertex_colors, vertex_fog,
+	clipped_vertices.GetArray (),
+	clipped_texels.GetArray (),
+	clipped_colors.GetArray (),
+	clipped_fog.GetArray ());
+      ClipSegment (tri.c, tri.a, vert_idx, num_verts,
+        num_clipped_vertices, clipped_translate.GetArray (),
+	frustum_planes, obj_frustum.GetNumVertices (), frust_origin,
+	vertices, texels, vertex_colors, vertex_fog,
+	clipped_vertices.GetArray (),
+	clipped_texels.GetArray (),
+	clipped_colors.GetArray (),
+	clipped_fog.GetArray ());
+      // Triangulate the resulting polygon.
+      for (j = 2 ; j < num_verts ; j++)
       {
+        clipped_triangles[num_clipped_triangles].a = vert_idx[0];
+        clipped_triangles[num_clipped_triangles].b = vert_idx[j-1];
+        clipped_triangles[num_clipped_triangles].c = vert_idx[j];
+        num_clipped_triangles++;
       }
-      delete pol;
     }
   }
-#endif
 }
 
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
@@ -1644,12 +1780,11 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
     else
     {
-#     if !NEW_CLIP
+    // @@@@ NEW_CLIP
       // If we have no stencil buffer then we just use the default version.
       DefaultDrawTriangleMesh (mesh, this, o2c, clipper, cliptype, aspect,
     	  width2, height2);
       return;
-#     endif
     }
   }
 
@@ -1718,7 +1853,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   csTriangle *triangles = mesh.triangles;
   G3DFogInfo* work_fog = mesh.vertex_fog;
 
-#if NEW_CLIP
+#if 0
+//@@@ NEW_CLIP
   // If we need clipping then we do this here.
   if (want_clipping)
   {
@@ -1778,7 +1914,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     matrixholder[8] = orientation.m13;
     matrixholder[9] = orientation.m23;
     matrixholder[10] = orientation.m33;
-
 
     matrixholder[3] = matrixholder[7] = matrixholder[11] =
     matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
