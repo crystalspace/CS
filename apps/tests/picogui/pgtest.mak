@@ -27,15 +27,16 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/apps/tests/picogui
-
 PGTEST.EXE = pgtest$(EXE)
+DIR.PGTEST = apps/tests/picogui
+OUT.PGTEST = $(OUT)/$(DIR.PGTEST)
+INC.PGTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PGTEST)/*.h))
+SRC.PGTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PGTEST)/*.cpp))
+OBJ.PGTEST = $(addprefix $(OUT.PGTEST)/,$(notdir $(SRC.PGTEST:.cpp=$O)))
+DEP.PGTEST = CSTOOL CSGFX CSUTIL CSSYS CSUTIL
 LIB.PGTEST = $(foreach d,$(DEP.PGTEST),$($d.LIB))
 
-INC.PGTEST = $(wildcard $(addprefix $(SRCDIR)/,apps/tests/picogui/*.h))
-SRC.PGTEST = $(wildcard $(addprefix $(SRCDIR)/,apps/tests/picogui/*.cpp))
-OBJ.PGTEST = $(addprefix $(OUT)/,$(notdir $(SRC.PGTEST:.cpp=$O)))
-DEP.PGTEST = CSTOOL CSGFX CSUTIL CSSYS CSUTIL
+OUTDIRS += $(OUT.PGTEST)
 
 MSVC.DSP += PGTEST
 DSP.PGTEST.NAME = pgtest
@@ -46,23 +47,30 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: pgtest pgtestclean
+.PHONY: build.pgtest pgtestclean pgtestcleandep
 
-all: $(PGTEST.EXE)
 build.pgtest: $(OUTDIRS) $(PGTEST.EXE)
+clean: pgtestclean
+
+$(OUT.PGTEST)/%$O: $(SRCDIR)/$(DIR.PGTEST)/%.cpp
+	$(DO.COMPILE.CPP)
+
 $(PGTEST.EXE): $(DEP.EXE) $(OBJ.PGTEST) $(LIB.PGTEST)
 	$(DO.LINK.EXE)
 
-clean: pgtestclean
 pgtestclean:
-	-$(RMDIR) $(PGTEST.EXE) $(OBJ.PGTEST)
+	-$(RMDIR) $(PGTEST.EXE) $(OBJ.PGTEST) pgtest.txt
+
+cleandep: pgtestcleandep
+pgtestcleandep:
+	-$(RM) $(OUT.PGTEST)/pgtest.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/pgtest.dep
-$(OUTOS)/pgtest.dep: $(SRC.PGTEST)
-	$(DO.DEP)
+dep: $(OUT.PGTEST) $(OUT.PGTEST)/pgtest.dep
+$(OUT.PGTEST)/pgtest.dep: $(SRC.PGTEST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/pgtest.dep
+-include $(OUT.PGTEST)/pgtest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

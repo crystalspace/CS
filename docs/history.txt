@@ -24,6 +24,15 @@ The history order is reversed so that new features are at the top.
 	  emitted $(SRCDIR)/TO_INSTALL.CONFIG+=FOO and $(SRCDIR)/MSVC.DSP+=FOO
 	  in a couple makefiles rather than TO_INSTALL.CONFIG+=FOO and
 	  MSVC.DSP+=FOO.  (The SRCDIR prefix should not have been added.)
+	- Eric Sunshine made the following changes to pgtest.mak:
+	    - Fixed bug which caused pgtest to be rebuilt every time the pgtest
+	      makefile target was invoked (directly or indirectly) even if the
+	      program was already up-to-date.
+	    - Converted the makefile over to the new style where the object
+	      files are placed in their own module-specific output directory.
+	      Please use this style for all new makefiles (either by copying
+	      from an existing makefile which has been converted, or by
+	      consulting CS/mk/template.mak).
 27-Apr-2003
 	- Philip Wyett fixed the DDS plugin compilation under MSVC, by
 	  replacing struct with static (don't ask) and giving the the array an
