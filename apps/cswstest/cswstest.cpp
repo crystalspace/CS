@@ -39,6 +39,8 @@ public:
   virtual bool HandleEvent (iEvent &Event);
 
   virtual bool InitialSetup ();
+
+  virtual void StartFrame ();
 };
 
 //csWsTest *cswstest_app;                        // The main Windowing System object
@@ -139,6 +141,14 @@ csWsTest::csWsTest (iSystem *SysDriver) : csApp (SysDriver)
 {
   SetPalette (palette_csWsTest, sizeof (palette_csWsTest) / sizeof (int));
 }
+
+void csWsTest::StartFrame ()
+{
+  // JAS:  Transparency is buggy.  This works around the problem for now.
+  Invalidate();
+  csApp::StartFrame();
+}
+
 
 bool csWsTest::InitialSetup ()
 {
@@ -310,6 +320,9 @@ bool csWsTest::InitialSetup ()
 
     but = new csButton (this, 9991);
     but->SetText ("~Red background"); but->SetRect (20, 240, 190, 260);
+
+    but = new csButton (this, 9990);
+    but->SetText ("~Alpha Background"); but->SetRect (20, 280, 190, 300);
   }
 
   return true;
@@ -626,6 +639,7 @@ bool csWsTest::HandleEvent (iEvent &Event)
           csThemeWindow * thwin = (csThemeWindow *) theme->GetThemeComponent("csWindow");
           int Color = FindColor(0,0,0);
           thwin->SetBackgroundColor(Color);
+          thwin->SetBackgroundPixmap(NULL);
           thwin->BroadcastThemeChange();
           return true;
         }
@@ -634,6 +648,7 @@ bool csWsTest::HandleEvent (iEvent &Event)
           csThemeWindow * thwin = (csThemeWindow *) theme->GetThemeComponent("csWindow");
           int Color = FindColor(255,255,255);
           thwin->SetBackgroundColor(Color);
+          thwin->SetBackgroundPixmap(NULL);
           thwin->BroadcastThemeChange();
           return true;
         }
@@ -642,6 +657,14 @@ bool csWsTest::HandleEvent (iEvent &Event)
           csThemeWindow * thwin = (csThemeWindow *) theme->GetThemeComponent("csWindow");
           int Color = FindColor(255,0,0);
           thwin->SetBackgroundColor(Color);
+          thwin->SetBackgroundPixmap(NULL);
+          thwin->BroadcastThemeChange();
+          return true;
+        }
+        case 9990:
+        {
+          csThemeWindow * thwin = (csThemeWindow *) theme->GetThemeComponent("csWindow");
+          thwin->SetBackgroundPixmap(thwin->GetCloseButtonP());
           thwin->BroadcastThemeChange();
           return true;
         }

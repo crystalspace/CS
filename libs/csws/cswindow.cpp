@@ -100,19 +100,19 @@ csWindow::csWindow (csComponent *iParent, char *iTitle, int iWindowStyle,
     tb->SetState (CSS_SELECTABLE, false);
   } /* endif */
 
-  memset(&ThemeActive,0xff,sizeof(ThemeActive));
-#if 0
-  ThemeActive.BorderWidth=1;
-  ThemeActive.BorderHeight=1;
-  ThemeActive.TitlebarHeight=1;
-  ThemeActive.MenuHeight=1;
-  ThemeActive.CloseButton=1;
-  ThemeActive.HideButton=1;
-  ThemeActive.MaximizeButton=1;
-  ThemeActive.TitleBar=1;
-#endif
-
+  ResetTheme();
+  // If the incoming FrameStyle was not the default then assume the user wanted the framestyle
+  // a specific way for a reason.
+  if (FrameStyle != cswfsTheme)
+    ThemeActive.FrameStyle=0;
   ThemeChanged();
+}
+
+void csWindow::ResetTheme()
+{
+  // This should work for all situations of our bitfield struct.
+  memset(&ThemeActive,0xff,sizeof(ThemeActive));
+  csComponent::ResetTheme();
 }
 
 void csWindow::SetButtBitmap (csButton *button, char *id_n, char *id_p)
@@ -284,10 +284,20 @@ void csWindow::Draw ()
       } /* endif */
       break;
     }
+    case cswfsTexture:
+      thwin->DrawBorder(*this,csthfsTexture,bw,bh,li,di,BorderPixmap);
+      break;
+    case cswfsTheme:
+      CS_ASSERT(true);
+      break;
   } /* endswitch */
 
   if (!GetState (CSS_TRANSPARENT))
+  {
     Box (bw, bh, bound.Width () - bw, bound.Height () - bh,back);
+  }
+  if (BackgroundPixmap != NULL)
+    Sprite2DTiledShifted(BackgroundPixmap,bw, bh, bound.Width () - bw, bound.Height () - bh,0,0);
 
   if (WindowStyle & CSWS_CLIENTBORDER)
   {
@@ -511,18 +521,26 @@ void csWindow::ThemeChanged ()
   CS_ASSERT(thwin != NULL);
 
 
+  if (ThemeActive.FrameStyle == 1)
+    FrameStyle = (csWindowFrameStyle) thwin->GetFrameStyle();
+
   if (ThemeActive.BorderLightColor == 1)
     BorderLightColor = thwin->GetBorderLightColor();
   if (ThemeActive.BorderDarkColor == 1)
     BorderDarkColor = thwin->GetBorderDarkColor();
   if (ThemeActive.BackgroundColor == 1)
     BackgroundColor = thwin->GetBackgroundColor();
+  if (ThemeActive.BorderWidth == 1)
+    BorderWidth = thwin->GetBorderWidth();
+  if (ThemeActive.BorderHeight == 1)
+    BorderHeight = thwin->GetBorderHeight();
 
   if (ThemeActive.BorderWidth == 1 || ThemeActive.BorderHeight == 1)
   {
     // JAS:  Preload with stored values.  That allows texture style borders not be wacked.
     bw = BorderWidth;
     bh = BorderHeight;
+
     switch (FrameStyle)
     {
       case cswfsNone:
@@ -542,6 +560,12 @@ void csWindow::ThemeChanged ()
         } /* endif */
         break;
       }
+    case cswfsTexture:
+      thwin->GetBorderSize(*this,csthfsTexture,bw,bh);
+      break;
+    case cswfsTheme:
+      CS_ASSERT(true);
+      break;
     } /* endswitch */
     if (ThemeActive.BorderWidth == 1) BorderWidth=bw;
     if (ThemeActive.BorderWidth == 1) BorderHeight=bh;
@@ -568,6 +592,11 @@ void csWindow::ThemeChanged ()
   {
     thwin->GetTitleBar(this,GetText());
   }
+
+  if (ThemeActive.BorderPixmap == 1)
+    BorderPixmap = thwin->GetBorderPixmap();
+  if (ThemeActive.BackgroundPixmap == 1)
+    BackgroundPixmap = thwin->GetBackgroundPixmap();
 
   // JAS:  This triggers a reset of the order matrix, heights, buttons, etc
 //  SetRect(bound.xmin, bound.ymin, bound.xmax, bound.ymax);

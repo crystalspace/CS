@@ -82,7 +82,7 @@ enum csWindowFrameStyle
   cswfsThin,
   cswfs3D,
   cswfsTexture,
-  cswfsTextureAlpha
+  cswfsTheme
 };
 
 /**
@@ -133,12 +133,18 @@ protected:
   int BorderDarkColor;
   /// Background Color index
   int BackgroundColor;
+  /// Background Pixmap
+  csPixmap * BackgroundPixmap;
+  /// Border Pixmap
+  csPixmap * BorderPixmap;
 
   /// Record if the theme is active for various pieces
   struct ThemeWindowActive
   {
+    unsigned int FrameStyle:1;
     unsigned int BorderWidth:1;
     unsigned int BorderHeight:1;
+    unsigned int BorderPixmap:1;
     unsigned int TitlebarHeight:1;
     unsigned int MenuHeight:1;
     unsigned int CloseButton:1;
@@ -148,12 +154,13 @@ protected:
     unsigned int BorderLightColor:1;
     unsigned int BorderDarkColor:1;
     unsigned int BackgroundColor:1;
+    unsigned int BackgroundPixmap:1;
   } ThemeActive;
 
 public:
   /// Create a window object
   csWindow (csComponent *iParent, char *iTitle, int iWindowStyle = CSWS_DEFAULTVALUE,
-    csWindowFrameStyle iFrameStyle = cswfs3D);
+    csWindowFrameStyle iFrameStyle = cswfsTheme);
 
   /// Rescale titlebar, menu etc before passing to original SetRect
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);
@@ -164,9 +171,6 @@ public:
   /// Handle input events
   virtual bool HandleEvent (iEvent &Event);
 
-  /// Set window border width and height
-  void SetBorderSize (int w, int h);
-
   /// Don't allow too small windows
   virtual void FixSize (int &newW, int &newH);
 
@@ -175,12 +179,6 @@ public:
 
   /// Restore window if it is maximized and if DragStyle has CS_DRAG_SIZEABLE
   virtual bool Restore ();
-
-  /// Set title bar height and redraws the window
-  void SetTitleHeight (int iHeight);
-
-  /// Set menu bar height and redraws the window
-  void SetMenuBarHeight (int iHeight);
 
   /// Change titlebar text
   virtual void SetText (const char *iText);
@@ -191,20 +189,53 @@ public:
 
   /// Handle a theme change event
   virtual void ThemeChanged ();
+  /// Reset the window to use all theme values.
+  virtual void ResetTheme();
 
+  /// Set window border width and height
+  void SetBorderSize (int w, int h);
   /// Get window border width and height
   void GetBorderSize (int &bw, int &bh)
   { bw = BorderWidth; bh = BorderHeight; }
+
+  /// Set title bar height and redraws the window
+  void SetTitleHeight (int iHeight);
   /// Get window titlebar height
   int GetTitlebarHeight ()
   { return TitlebarHeight; }
+
+  /// Set menu bar height and redraws the window
+  void SetMenuBarHeight (int iHeight);
   /// Get window menu height
   int GetMenuHeight ()
   { return MenuHeight; }
 
-  /// Transform client window size into window size and back
+  /// Transform client window size into window size
   void ClientToWindow (int &ClientW, int &ClientH);
+  /// Transform window size into client window size
   void WindowToClient (int &ClientW, int &ClientH);
+
+  /// Set background color of the window
+  void SetBackgroundColor(int Color);
+  /// Set background Pixmap of the window
+  void SetBackgroundPixmap(csPixmap *pixmap);
+  /// Get background color of the window
+  int GetBackgroundColor();
+  /// Get background Pixmap of the window
+  csPixmap * GetBackgroundPixmap();
+
+  /// Set BorderDarkColor
+  void SetBorderDarkColor(int Color);
+  /// Set BorderLightColor
+  void SetBorderLightColor(int Color);
+  /// Set BorderPixmap
+  void SetBorderPixmap(csPixmap * pixmap);
+  /// Get BorderDarkColor
+  int GetBorderDarkColor();
+  /// Get BorderLightColor
+  int GetBorderLightColor();
+  /// Get BorderPixmap
+  csPixmap * GetBorderPixmap();
 
 protected:
   /// Set button bitmaps to one of those read from csws.cfg

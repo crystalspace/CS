@@ -1,6 +1,6 @@
 /*
     Crystal Space Windowing System: Theme Class
-    Copyright (C) 2000 by Jerry Segler <jasegler@gerf.org>
+    Copyright (C) 2000 by Jerry A. Segler, Jr <jasegler@gerf.org>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -73,7 +73,7 @@ protected:
 public:
   csTheme(csApp * napp);
 
-  void DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh,int li,int di);
+  void DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh,int li,int di, csPixmap * pixmap = NULL);
   void GetBorderSize(csComponent &comp,int FrameStyle,int &bw, int &bh);
 
   void BroadcastThemeChange(csThemeComponent *tcomp);
@@ -88,14 +88,21 @@ class csThemeComponent
 protected:
   char * name;
   csTheme * theme;
+  int BorderWidth;
+  int BorderHeight;
 
 public:
   csThemeComponent(csTheme * ntheme);
   csTheme * GetTheme(void){return theme;};
 
+  inline int GetBorderWidth(){return BorderWidth;};
+  inline void SetBorderWidth(int width){BorderWidth=width;};
+  inline int GetBorderHeight(){return BorderHeight;};
+  inline void SetBorderHeight(int height){BorderHeight=height;};
+
   inline char *GetName() {return name;};
-  inline void DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh,int li,int di) \
-    {theme->DrawBorder(comp,FrameStyle,bw,bh,li,di);};
+  inline void DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh,int li,int di, csPixmap * pixmap = NULL) \
+    {theme->DrawBorder(comp,FrameStyle,bw,bh,li,di,pixmap);};
   inline void GetBorderSize(csComponent &comp,int FrameStyle,int &bw, int &bh) \
     {theme->GetBorderSize(comp,FrameStyle,bw,bh);};
 
@@ -119,12 +126,12 @@ class csThemeWindow : public csThemeComponent
 protected:
   int TitleBarHeight;
   int MenuHeight;
-  int BorderWidth;
-  int BorderHeight;
   int BorderLightColor;
   int BorderDarkColor;
   int BackgroundColor;
-  csPixmap *BorderTexture;
+  int FrameStyle;
+  csPixmap *BackgroundPixmap;
+  csPixmap *BorderPixmap;
   csPixmap *bmpClosen;
   csPixmap *bmpClosep;
   csPixmap *bmpHiden;
@@ -134,6 +141,9 @@ protected:
 
 public:
   csThemeWindow(csTheme * ntheme);
+
+  int GetFrameStyle(){return FrameStyle;};
+  void SetFrameStyle(int fs){FrameStyle=fs;};
 
   int GetTitleBarHeight(){return TitleBarHeight;};
   void SetTitleBarHeight(int Height){TitleBarHeight=Height;};
@@ -150,7 +160,18 @@ public:
   int GetBackgroundColor(){return BackgroundColor;};
   void SetBackgroundColor(int Color){BackgroundColor = Color;};
 
+  csPixmap * GetBackgroundPixmap();
+  void SetBackgroundPixmap(csPixmap * pixmap)
+    {if (BackgroundPixmap != NULL) delete BackgroundPixmap; BackgroundPixmap = pixmap;};
+
+  csPixmap * GetBorderPixmap();
+  void SetBorderPixmap(csPixmap * pixmap)
+    {if (BorderPixmap != NULL) delete BorderPixmap; BorderPixmap = pixmap;};
+
   csButton * GetCloseButton(csComponent *window);
+  csPixmap * GetCloseButtonP();
+  csPixmap * GetCloseButtonN();
+
   csButton * GetHideButton(csComponent *window);
   csButton * GetMaximizeButton(csComponent *window);
   csTitleBar * GetTitleBar(csComponent *window, const char *iTitle);
@@ -162,7 +183,7 @@ public:
   void GetMenuBar();
 };
 
-/// This class holds a number of scfFactory structures
+/// This class holds a number of csThemeComponent classes
 class csVectorThemeComponent : public csVector
 {
 public:

@@ -1304,6 +1304,35 @@ void csComponent::Sprite2D (csPixmap *s2d, int x, int y, int w, int h)
     app->pplRestoreClipRect ();
 }
 
+void csComponent::Sprite2DTiledShifted (csPixmap *s2d, int x, int y, int w, int h, int shiftx, int shifty)
+{
+  if (!s2d)
+    return;
+
+ /* Do clipping as follows: create a minimal rectangle which fits the sprite,
+  * clip the rectangle against children & parents, then clip the sprite against
+  * all resulting rectangles.
+  */
+  csObjVector rect (8, 4);
+  csRect *sb = new csRect (x, y, x + w, y + h);
+  sb->Intersect (dirty);
+  if (!clip.IsEmpty ())
+    sb->Intersect (clip);
+  rect.Push (sb);
+  Clip (rect, this);
+
+  LocalToGlobal (x, y);
+  bool restoreclip = false;
+  for (int i = rect.Length () - 1; i >= 0; i--)
+  {
+    csRect *cur = (csRect *)rect[i];
+    app->pplSetClipRect (*cur); restoreclip = true;
+    s2d->DrawTiledShifted(app->GetG3D(),x,y,w,h,shiftx,shifty);
+  } /* endfor */
+  if (restoreclip)
+    app->pplRestoreClipRect ();
+}
+
 void csComponent::Rect3D (int xmin, int ymin, int xmax, int ymax, int darkindx,
   int lightindx)
 {
@@ -1717,4 +1746,9 @@ void csComponent::SetTheme(csThemeComponent * nTheme)
 void csComponent::ThemeChanged(void)
 {
   Invalidate();
+}
+
+void csComponent::ResetTheme()
+{
+  // No Op
 }

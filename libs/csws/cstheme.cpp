@@ -1,6 +1,6 @@
 /*
     Crystal Space Windowing System: Windowing System Component
-    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 2000 by Jerry A. Segler, Jr <jasegler@gerf.org>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -60,8 +60,9 @@ csThemeComponent * csTheme::GetThemeComponent(char * name)
   return (csThemeComponent *) themeComponents->Get(themeComponents->FindKey(name));
 }
 
-void csTheme::DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh, int li, int di)
+void csTheme::DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh, int li, int di, csPixmap * pixmap)
 {
+  int bwi,bhi;
   GetBorderSize(comp,FrameStyle,bw,bh);
   switch (FrameStyle)
   {
@@ -96,6 +97,19 @@ void csTheme::DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh, int 
         break;
       } // otherwise fallback to no frame.
     case csthfsNone:
+      break;
+    case csthfsTexture:
+      // Top Piece
+      CS_ASSERT(pixmap != NULL);
+      bwi=comp.bound.Width()-bw;
+      bhi=comp.bound.Height()-bh;
+      comp.Sprite2DTiledShifted(pixmap,0,0,comp.bound.Width(),bh,0,0);
+      // Bottom Piece
+      comp.Sprite2DTiledShifted(pixmap,0,bhi,comp.bound.Width(),comp.bound.Height(),0,bhi);
+      // Left Side Piece
+      comp.Sprite2DTiledShifted(pixmap,0,bh,bw,bhi,0,bh);
+      // Right Side Piece
+      comp.Sprite2DTiledShifted(pixmap,bwi,bh,comp.bound.Width(),bhi,bwi,bh);
       break;
   } /* endswitch */
 }
@@ -224,6 +238,8 @@ void csTheme::GetBorderSize(csComponent &comp,int FrameStyle,int &bw, int &bh)
     case csthfsNone:
       bw = bh = 0;
       break;
+    case csthfsTexture:
+      break;
   } /* endswitch */
 }
 
@@ -232,6 +248,8 @@ csThemeComponent::csThemeComponent(csTheme * ntheme)
 {
   theme = ntheme;
   name = "csComponent";
+  BorderWidth=16;
+  BorderHeight=16;
 }
 
 void csThemeComponent::BroadcastThemeChange()
@@ -246,7 +264,8 @@ csThemeWindow::csThemeWindow(csTheme * ntheme) : csThemeComponent(ntheme)
   BorderLightColor=CSPAL_WINDOW_2LIGHT3D;
   BorderDarkColor=CSPAL_WINDOW_2DARK3D;
   BackgroundColor=CSPAL_WINDOW_BORDER;
-  BorderTexture=NULL;
+  BorderPixmap=NULL;
+  BackgroundPixmap=NULL;
   bmpClosep = NULL;
   bmpClosen = NULL;
   bmpHidep = NULL;
@@ -255,6 +274,7 @@ csThemeWindow::csThemeWindow(csTheme * ntheme) : csThemeComponent(ntheme)
   bmpMaximizen = NULL;
   TitleBarHeight=16;
   MenuHeight=16;
+  FrameStyle = cswfs3D;
 }
 
 void csThemeWindow::SetDefaultPallet(csComponent *window)
@@ -269,4 +289,36 @@ csThemeButton::csThemeButton(csTheme * ntheme) : csThemeComponent(ntheme)
   BorderDarkColor=CSPAL_BUTTON_DARK3D;
   BackgroundColor=CSPAL_BUTTON_BACKGROUND;
   BorderTexture=NULL;
+}
+
+csPixmap * csThemeWindow::GetBackgroundPixmap()
+{
+  if (BackgroundPixmap != NULL)
+    return new csPixmap(*BackgroundPixmap);
+  else
+    return NULL;
+}
+
+csPixmap * csThemeWindow::GetBorderPixmap()
+{
+  if (BorderPixmap != NULL)
+    return new csPixmap(*BorderPixmap);
+  else
+    return NULL;
+}
+
+csPixmap * csThemeWindow::GetCloseButtonP()
+{
+  if (bmpClosep != NULL)
+    return new csPixmap(*bmpClosep);
+  else
+    return NULL;
+}
+
+csPixmap * csThemeWindow::GetCloseButtonN()
+{
+  if (bmpClosen != NULL)
+    return new csPixmap(*bmpClosen);
+  else
+    return NULL;
 }

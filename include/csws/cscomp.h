@@ -620,6 +620,8 @@ public:
   /// Draw a (non-scaled) 2D sprite
   void Sprite2D (csPixmap *s2d, int x, int y)
   { Sprite2D (s2d, x, y, s2d->Width (), s2d->Height ()); }
+  /// Draw a (Tiled) 2D sprite
+  void Sprite2DTiledShifted (csPixmap *s2d, int x, int y, int w, int h, int shiftx, int shifty);
 
   /// Return the width of given text using currently selected font
   int TextWidth (const char *text);
@@ -655,6 +657,8 @@ public:
   char * GetName(){return name;};
   /// Handle a theme change event
   virtual void ThemeChanged ();
+  /// Reset the window to use all theme values.
+  virtual void ResetTheme();
 
 protected:
   /**
