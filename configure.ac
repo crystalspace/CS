@@ -47,7 +47,7 @@ m4_define([cs_lib_paths_default],
 
 
 #------------------------------------------------------------------------------
-# CS_BUILD_PROPERTY(KEY, VALUE, [APPEND])
+# CS_BUILD_PROPERTY(KEY, VALUE, [APPEND], [EMPTY-OKAY])
 #	A utility function which invokes both CS_MAKEFILE_PROPERTY() and
 #	CS_JAMCONFIG_PROPERTY(), thereby emitting a build property suitable for
 #	each build system (GNU make & Jam).  Some variable names differ between
@@ -57,15 +57,23 @@ m4_define([cs_lib_paths_default],
 #	automatically, so if you have a situation in which a build variable is
 #	mentioned in VALUE, then you should instead invoke
 #	CS_MAKEFILE_PROPERTY() and CS_JAMCONFIG_PROPERTY() manually with the
-#	appropriate values.  As a convenience, the property is emitted only if
-#	the value is non-empty (after stripping whitespace).
+#	appropriate values.  If APPEND is not the empty string, then VALUE is
+#	appended to the existing value of the makefile variable using a
+#	suitable construct (such as "+=").  As a convenience, if EMPTY-OKAY is
+#	the empty string, then the property is emitted only if the value is
+#	non-empty (after stripping whitespace).  If EMPTY-OKAY is not the empty
+#	string, then the property is emitted unconditionally.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_BUILD_PROPERTY],
     [cs_build_prop_val=CS_TRIM([$2])
-    AS_IF([test -n "$cs_build_prop_val"],
-	[CS_MAKEFILE_PROPERTY([$1], [$cs_build_prop_val], [$3])
-	CS_JAMCONFIG_PROPERTY([_CS_TRANSLATE_MAKE_TO_JAM([$1])],
-	    [$cs_build_prop_val], [$3])])])
+    m4_ifval([$4],
+	[_CS_BUILD_PROPERTY([$1], [$cs_build_prop_val], [$3])],
+	AS_IF([test -n "$cs_build_prop_val"],
+	    [_CS_BUILD_PROPERTY([$1], [$cs_build_prop_val], [$3])]))])
+
+AC_DEFUN([_CS_BUILD_PROPERTY],
+    [CS_MAKEFILE_PROPERTY([$1], [$2], [$3])
+    CS_JAMCONFIG_PROPERTY([_CS_TRANSLATE_MAKE_TO_JAM([$1])], [$2], [$3])])
 
 
 
@@ -979,12 +987,21 @@ AC_PATH_X
 AC_PATH_XTRA
 
 AS_IF([test "$no_x" != yes],
-    [CS_BUILD_PROPERTY([X11.AVAILABLE], [yes])
-    CS_BUILD_PROPERTY([X_CFLAGS], [$X_CFLAGS])
-    CS_BUILD_PROPERTY([X_LIBS], [$X_LIBS])
-    CS_BUILD_PROPERTY([X_PRE_LIBS], [$X_PRE_LIBS])
-    CS_BUILD_PROPERTY([X_EXTRA_LIBS], [$X_EXTRA_LIBS])
-    CS_JAMCONFIG_PROPERTY([X11.CFLAGS], [$X_CFLAGS])
+    [# We must be especially careful to instruct CS_BUILD_PROPERTY() to emit
+    # the following properties even if their values are empty.  This is
+    # necessary because of the way that Jam performs "product-wise" variable
+    # expansion.  For example, if X is "x" and Y is undefined, Jam will expand
+    # "$(X) $(Y)" to "", whereas every other tool in the world will expand it
+    # to "x ".  Since the emitted X11.CFLAGS, X11.LFLAGS, XFREE86VM.CFLAGS, and
+    # XFREE86VM.LFLAGS properties reference the other variables by name, we
+    # must ensure that those other variables are defined (even if only with an
+    # empty string).
+    CS_BUILD_PROPERTY([X11.AVAILABLE], [yes])
+    CS_BUILD_PROPERTY([X_CFLAGS], [$X_CFLAGS], [], [Y])
+    CS_BUILD_PROPERTY([X_LIBS], [$X_LIBS], [], [Y])
+    CS_BUILD_PROPERTY([X_PRE_LIBS], [$X_PRE_LIBS], [], [Y])
+    CS_BUILD_PROPERTY([X_EXTRA_LIBS], [$X_EXTRA_LIBS], [], [Y])
+    CS_JAMCONFIG_PROPERTY([X11.CFLAGS], [AS_ESCAPE([$(X_CFLAGS)])])
     CS_JAMCONFIG_PROPERTY([X11.LFLAGS],
       [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)])])
 
@@ -997,7 +1014,7 @@ AS_IF([test "$no_x" != yes],
 	    #include <X11/extensions/xf86vmode.h>],
 	    [XF86VidModeLockModeSwitch(0, 0, 0)])], [], [],
 	[CS_BUILD_PROPERTY([USE_XFREE86VM], [yes])
-	CS_JAMCONFIG_PROPERTY([XFREE86VM.CFLAGS], [$X_CFLAGS])
+	CS_JAMCONFIG_PROPERTY([XFREE86VM.CFLAGS], [AS_ESCAPE([$(X_CFLAGS)])])
 	CS_JAMCONFIG_PROPERTY([XFREE86VM.LFLAGS],
 	    [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXxf86vm -lXext -lX11 dnl
 	    $(X_EXTRA_LIBS)])])], [],

@@ -2751,7 +2751,7 @@ cs_build_prop_val=`echo x$FLEXBIN | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}FLEXBIN = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.FLEX ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.FLEX ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -2850,7 +2850,7 @@ if test "$cs_cv_prog_bison_version_ok" = yes; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}BISONBIN = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.BISON ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.BISON ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -2905,7 +2905,7 @@ cs_build_prop_val=`echo x$DOXYGEN | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CMD.DOXYGEN = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.DOXYGEN ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.DOXYGEN ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -2954,7 +2954,7 @@ cs_build_prop_val=`echo x$TEXI2DVI | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CMD.TEXI2DVI = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2DVI ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2DVI ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3003,7 +3003,7 @@ cs_build_prop_val=`echo x$DVIPS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CMD.DVIPS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3052,7 +3052,7 @@ cs_build_prop_val=`echo x$DVIPDF | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CMD.DVIPDF = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPDF ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPDF ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3101,7 +3101,7 @@ cs_build_prop_val=`echo x$MAKEINFO | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CMD.MAKEINFO = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.MAKEINFO ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.MAKEINFO ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3150,7 +3150,7 @@ cs_build_prop_val=`echo x$INSTALL | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CMD.INSTALL = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.INSTALL ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.INSTALL ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3239,7 +3239,7 @@ cs_build_prop_val=`echo x$RANLIB | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CMD.RANLIB = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.RANLIB ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.RANLIB ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3350,7 +3350,7 @@ if test "$cs_cv_prog_swig_version_ok" = yes; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}SWIGBIN = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3493,7 +3493,7 @@ cs_build_prop_val=`echo x$cs_cv_shell_mkdir | sed 's/^x//;s/   */ /g;s/^ //;s/ $
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CMD.MKDIR = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIR ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIR ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3518,7 +3518,7 @@ if test "${cs_cv_shell_mkdir_p+set}" = set; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CMD.MKDIRS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIRS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIRS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3600,7 +3600,7 @@ echo "${ECHO_T}$cs_cv_prog_nasm_ok" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}NASM.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}NASM.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}NASM.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3608,7 +3608,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}NASM.BIN = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.NASM ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.NASM ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3773,7 +3773,7 @@ if test $ac_cv_lib_m_pow = yes; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LIBS.EXE += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3841,7 +3841,7 @@ if test $ac_cv_lib_dl_dlopen = yes; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LIBS.EXE += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3909,7 +3909,7 @@ if test $ac_cv_lib_nsl_gethostbyname = yes; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LIBS.EXE += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4230,7 +4230,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PTHREAD.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4238,7 +4238,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PTHREAD.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4246,7 +4246,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PTHREAD.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4758,7 +4758,7 @@ if test -n "$PERL"; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PERL5.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PERL5.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4766,7 +4766,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PERL5 = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PERL5 ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5 ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4774,7 +4774,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PERL = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PERL ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4782,7 +4782,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CMD.PERL5 = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.PERL5 ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.PERL5 ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4810,7 +4810,7 @@ echo "${ECHO_T}$cs_cv_perl_mod_embed" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PERL5.EXTUTILS.EMBED.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PERL5.EXTUTILS.EMBED.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.EXTUTILS.EMBED.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4838,7 +4838,7 @@ echo "${ECHO_T}$cs_cv_perl_mod_dynaloader" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PERL5.DYNALOADER.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PERL5.DYNALOADER.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.DYNALOADER.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4912,7 +4912,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PERL5.SDK.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PERL5.SDK.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.SDK.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4920,7 +4920,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PERL5.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PERL5.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -4928,7 +4928,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PERL5.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PERL5.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PERL5.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -5009,7 +5009,7 @@ cs_build_prop_val=`echo x$PYTHON | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PYTHON = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PYTHON ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PYTHON ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -5038,7 +5038,7 @@ echo "${ECHO_T}$cs_cv_python_distutils" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PYTHON.DISTUTILS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PYTHON.DISTUTILS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PYTHON.DISTUTILS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -5547,7 +5547,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PYTHON.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PYTHON.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PYTHON.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -5555,7 +5555,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PYTHON.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PYTHON.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PYTHON.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -5563,7 +5563,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PYTHON.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PYTHON.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PYTHON.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -5590,7 +5590,7 @@ cs_build_prop_val=`echo x$CPPFLAGS $CFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $/
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -5598,7 +5598,7 @@ cs_build_prop_val=`echo x$CPPFLAGS $CXXFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ 
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CXXFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -5606,7 +5606,7 @@ cs_build_prop_val=`echo x$LDFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -5759,7 +5759,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_enable_warnings" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -6056,7 +6056,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_disable_pragma_warnings" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -6211,7 +6211,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_disable_exceptions" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CXXFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -6369,7 +6369,7 @@ echo "${ECHO_T}$cs_cv_prog_link_suppress_multiple" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}MACOSX.LFLAGS.CONFIG += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -6533,7 +6533,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_vtable_thunks" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CXXFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -6690,7 +6690,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_pipe" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -7838,7 +7838,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_code_gen" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -8000,7 +8000,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_optimize" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.optimize += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -8151,7 +8151,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_omit_frame_pointer" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.optimize += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -8301,7 +8301,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_fast_math" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.optimize += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -8456,7 +8456,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_debug" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.debug += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.debug += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.debug += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -8469,7 +8469,7 @@ if test $cs_cv_prog_cxx_debug != no; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LFLAGS.debug += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.debug += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.debug += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -8641,7 +8641,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -8656,7 +8656,7 @@ if test -d /usr/local/lib; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -10642,47 +10642,44 @@ fi
 
 
 if test "$no_x" != yes; then
-  cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  # We must be especially careful to instruct CS_BUILD_PROPERTY() to emit
+    # the following properties even if their values are empty.  This is
+    # necessary because of the way that Jam performs "product-wise" variable
+    # expansion.  For example, if X is "x" and Y is undefined, Jam will expand
+    # "$(X) $(Y)" to "", whereas every other tool in the world will expand it
+    # to "x ".  Since the emitted X11.CFLAGS, X11.LFLAGS, XFREE86VM.CFLAGS, and
+    # XFREE86VM.LFLAGS properties reference the other variables by name, we
+    # must ensure that those other variables are defined (even if only with an
+    # empty string).
+    cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}X11.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}X11.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}X11.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
     cs_build_prop_val=`echo x$X_CFLAGS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}X_CFLAGS = $cs_build_prop_val
+    cs_makefile_text="${cs_makefile_text}X_CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}X_CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}X_CFLAGS ?= \"$cs_build_prop_val\" ;
 "
-fi
-
     cs_build_prop_val=`echo x$X_LIBS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}X_LIBS = $cs_build_prop_val
+    cs_makefile_text="${cs_makefile_text}X_LIBS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}X_LIBS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}X_LIBS ?= \"$cs_build_prop_val\" ;
 "
-fi
-
     cs_build_prop_val=`echo x$X_PRE_LIBS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}X_PRE_LIBS = $cs_build_prop_val
+    cs_makefile_text="${cs_makefile_text}X_PRE_LIBS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}X_PRE_LIBS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}X_PRE_LIBS ?= \"$cs_build_prop_val\" ;
 "
-fi
-
     cs_build_prop_val=`echo x$X_EXTRA_LIBS | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}X_EXTRA_LIBS = $cs_build_prop_val
+    cs_makefile_text="${cs_makefile_text}X_EXTRA_LIBS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}X_EXTRA_LIBS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}X_EXTRA_LIBS ?= \"$cs_build_prop_val\" ;
 "
-fi
-
-    cs_jamconfig_text="${cs_jamconfig_text}X11.CFLAGS ?= \"$X_CFLAGS\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}X11.CFLAGS ?= \"\$(X_CFLAGS)\" ;
 "
     cs_jamconfig_text="${cs_jamconfig_text}X11.LFLAGS ?= \"\$(X_PRE_LIBS) \$(X_LIBS) -lXext -lX11 \$(X_EXTRA_LIBS)\" ;
 "
@@ -11113,11 +11110,11 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}USE_XFREE86VM = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-	cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.CFLAGS ?= \"$X_CFLAGS\" ;
+	cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.CFLAGS ?= \"\$(X_CFLAGS)\" ;
 "
 	cs_jamconfig_text="${cs_jamconfig_text}XFREE86VM.LFLAGS ?= \"\$(X_PRE_LIBS) \$(X_LIBS) -lXxf86vm -lXext -lX11 	    \$(X_EXTRA_LIBS)\" ;
 "
@@ -11648,7 +11645,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GL.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GL.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GL.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -11656,7 +11653,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GL.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GL.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GL.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -11664,7 +11661,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GL.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GL.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GL.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -12002,7 +11999,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GLU.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GLU.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLU.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -12010,7 +12007,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GLU.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GLU.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLU.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -12018,7 +12015,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GLU.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GLU.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLU.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -12353,7 +12350,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GLUT.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GLUT.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLUT.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -12361,7 +12358,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GLUT.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GLUT.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLUT.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -12369,7 +12366,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GLUT.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GLUT.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLUT.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -12672,7 +12669,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GLX.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GLX.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLX.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -12680,7 +12677,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GLX.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GLX.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLX.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -12688,7 +12685,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}GLX.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}GLX.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}GLX.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -13354,7 +13351,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}DIRECTX.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -13362,7 +13359,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}DIRECTX.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -13370,7 +13367,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}DIRECTX.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}DIRECTX.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -13809,7 +13806,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}ZLIB.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}ZLIB.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ZLIB.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -13817,7 +13814,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}ZLIB.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}ZLIB.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ZLIB.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -13825,7 +13822,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}ZLIB.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}ZLIB.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ZLIB.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -14268,7 +14265,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PNG.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PNG.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PNG.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -14276,7 +14273,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PNG.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PNG.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PNG.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -14284,7 +14281,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PNG.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PNG.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PNG.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -14726,7 +14723,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}JPEG.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}JPEG.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}JPEG.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -14734,7 +14731,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}JPEG.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}JPEG.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}JPEG.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -14742,7 +14739,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}JPEG.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}JPEG.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}JPEG.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -15179,7 +15176,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}MNG.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}MNG.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MNG.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -15187,7 +15184,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}MNG.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}MNG.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MNG.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -15195,7 +15192,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}MNG.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}MNG.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MNG.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -15633,7 +15630,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}MIKMOD.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -15641,7 +15638,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}MIKMOD.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -15649,7 +15646,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}MIKMOD.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MIKMOD.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -16086,7 +16083,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OGG.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}OGG.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OGG.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -16094,7 +16091,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OGG.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}OGG.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OGG.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -16102,7 +16099,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OGG.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}OGG.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OGG.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -16533,7 +16530,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}VORBIS.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}VORBIS.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBIS.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -16541,7 +16538,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}VORBIS.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}VORBIS.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBIS.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -16549,7 +16546,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}VORBIS.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}VORBIS.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBIS.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -16986,7 +16983,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}VORBISFILE.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -16994,7 +16991,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}VORBISFILE.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -17002,7 +16999,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}VORBISFILE.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}VORBISFILE.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -17441,7 +17438,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PGSERVER.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PGSERVER.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PGSERVER.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -17449,7 +17446,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PGSERVER.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PGSERVER.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PGSERVER.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -17457,7 +17454,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PGSERVER.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}PGSERVER.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}PGSERVER.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -18181,7 +18178,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}3DS.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}3DS.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}3DS.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -18189,7 +18186,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}3DS.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}3DS.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}3DS.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -18197,7 +18194,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}3DS.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}3DS.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}3DS.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -18927,7 +18924,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}ODE.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}ODE.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ODE.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -18935,7 +18932,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}ODE.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}ODE.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ODE.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -18943,7 +18940,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}ODE.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}ODE.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}ODE.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -19276,7 +19273,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OPENAL.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}OPENAL.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OPENAL.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -19284,7 +19281,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OPENAL.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}OPENAL.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OPENAL.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -19292,7 +19289,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OPENAL.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}OPENAL.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OPENAL.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -19501,7 +19498,7 @@ echo "${ECHO_T}yes" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}FT2.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}FT2.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}FT2.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -19509,7 +19506,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}FT2.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}FT2.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}FT2.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -19517,7 +19514,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}FT2.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}FT2.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}FT2.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -19715,7 +19712,7 @@ if test $cs_cv_libmingwex = yes; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LIBS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -20146,7 +20143,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}SVGA.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}SVGA.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SVGA.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -20154,7 +20151,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}SVGA.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}SVGA.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SVGA.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -20162,7 +20159,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}SVGA.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}SVGA.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SVGA.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -20885,7 +20882,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CAL3D.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CAL3D.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CAL3D.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -20893,7 +20890,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CAL3D.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CAL3D.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CAL3D.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -20901,7 +20898,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CAL3D.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CAL3D.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CAL3D.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -20982,7 +20979,7 @@ if test -n "$SDLCONFIG"; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}SDL.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}SDL.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SDL.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -20990,7 +20987,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}SDL.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}SDL.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SDL.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -20998,7 +20995,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}SDL.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}SDL.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SDL.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -21317,7 +21314,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LINUXJOYSTICK.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}LINUXJOYSTICK.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}LINUXJOYSTICK.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -22066,7 +22063,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LIBBFD.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -22074,7 +22071,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LIBBFD.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -22082,7 +22079,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LIBBFD.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -22092,7 +22089,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -22100,7 +22097,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LFLAGS.SYSTEM += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -22108,7 +22105,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}LIBS.EXE += $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -22172,7 +22169,7 @@ if test -n "$OBJCOPY"; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OBJCOPY.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}OBJCOPY.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OBJCOPY.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -22180,7 +22177,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CMD.OBJCOPY = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -22236,7 +22233,7 @@ cs_build_prop_val=`echo x$CGC | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CGC = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CGC ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CGC ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -23087,7 +23084,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CG.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CG.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CG.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -23095,7 +23092,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CG.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CG.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CG.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -23103,7 +23100,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}CG.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CG.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}CG.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -23177,7 +23174,7 @@ cs_build_prop_val=`echo x$cs_host_cpu_normalized | sed 's/^x//;s/   */ /g;s/^ //
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}PROC = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -25597,7 +25594,7 @@ if test $cs_cv_header_soundcard_h = yes; then
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}OSS.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}OSS.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}OSS.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -26147,7 +26144,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}SOCKET.AVAILABLE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}SOCKET.AVAILABLE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SOCKET.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -26155,7 +26152,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}SOCKET.CFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}SOCKET.CFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SOCKET.CFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -26163,7 +26160,7 @@ fi
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}SOCKET.LFLAGS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}SOCKET.LFLAGS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}SOCKET.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -26997,7 +26994,7 @@ cs_build_prop_val=`echo x$cs_build_mode | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}MODE = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}MODE ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}MODE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -27024,7 +27021,7 @@ cs_build_prop_val=`echo x$enable_plugins | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}USE_PLUGINS = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}USE_PLUGINS ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}USE_PLUGINS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -27050,7 +27047,7 @@ echo "${ECHO_T}$enable_meta_info_embedding" >&6
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}EMBED_META = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}EMBED_META ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}EMBED_META ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -27064,7 +27061,7 @@ else
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}EMBED_META = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}EMBED_META ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}EMBED_META ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -27091,7 +27088,7 @@ cs_build_prop_val=`echo x$enable_extensive_memory_debugger | sed 's/^x//;s/   */
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}EXTENSIVE_MEMDEBUG = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}EXTENSIVE_MEMDEBUG ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}EXTENSIVE_MEMDEBUG ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -27121,7 +27118,7 @@ cs_build_prop_val=`echo x$enable_new_renderer | sed 's/^x//;s/   */ /g;s/^ //;s/
     if test -n "$cs_build_prop_val"; then
   cs_makefile_text="${cs_makefile_text}USE_NEW_RENDERER = $cs_build_prop_val
 "
-	cs_jamconfig_text="${cs_jamconfig_text}USE_NEW_RENDERER ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}USE_NEW_RENDERER ?= \"$cs_build_prop_val\" ;
 "
 fi
 

@@ -26,6 +26,17 @@ chronological order.
 	  glrender_cg plugin.
 	- Eric Sunshine eliminated use of magic constants in favor of sizeof()
 	  in numerous locations throughout the project.
+	- Eric Sunshine worked around a problem where X11-related plugins
+	  failed to link when built with Jam.  This problem arose on
+	  12-Sep-2003 when configure was "fixed" to not emit empty properties
+	  to the generated Jamconfig file.  Jam performs variable expansion in
+	  the odd and usually annoying "product-wise" manner in which
+	  "$(X) $(Y)" with X set to "x" and Y undefined will expand to ""
+	  rather than "x " which would be the case with every other tool on the
+	  planet.  The Jam expansion method broke the build because X11.LFLAGS
+	  referenced other X11-related variables by name, and one or more of
+	  those variables were undefined because configure omitted them from
+	  Jamconfig since their values were empty.
 13-Sep-2003
 	- Philipp Aumayr removed changed a delete data; to delete[] data; in
 	  plugins/video/openglcommon/glfontcache.h. mentioned by unaek in 
