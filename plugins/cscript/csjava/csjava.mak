@@ -71,11 +71,11 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csjava csjavaclean csjavaswig
+.PHONY: csjava csjavaclean csjavaswig csjavaswigclean
 
 all: $(CSJAVA.LIB)
 csjava: $(OUTDIRS) $(CSJAVA)
-clean: csjavaclean csjavaswigclean
+clean: csjavaclean
 
 $(OUT)%$O: plugins/cscript/csjava/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.JAVA)

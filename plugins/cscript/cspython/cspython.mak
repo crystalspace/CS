@@ -70,7 +70,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cspython cspythonclean cspythonswig
+.PHONY: cspython cspythonclean cspythonswig csjavaswigclean
 
 all: $(CSPYTHON.LIB)
 cspython: $(OUTDIRS) $(CSPYTHON)
