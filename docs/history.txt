@@ -1,8 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
 9-Nov-2000
-	- Small type problem in ogl_halo.cpp (GLuint instead of GLenum
-	  for blend mode).
+	- Small type problem in ogl_halo.cpp (GLuint instead of GLenum for
+	  blend mode).
+	- Eric Sunshine made a small correction to canvas.mak in response to a
+	  bug report from Jorrit regarding glx2d.mak's failure to correctly
+	  build files from the canvas/openglcommon directory following Eric's
+	  major makefile changes on 6-Nov-2000.  I (Eric) can not actually test
+	  this fix, but I think that it should correct the problem.  It was a
+	  vpath issue.  The Glide canvases were probably also broken in the
+	  same fashion.
 8-Nov-2000
 	- Andrew Zabolotny did the following changes:
 	    - Fixed the SIGSEGV at program exit when OpenGL driver is used

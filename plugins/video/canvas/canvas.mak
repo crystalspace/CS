@@ -4,10 +4,7 @@
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp \
-  plugins/video/canvas/common \
-  plugins/video/canvas/openglcommon \
-  plugins/video/canvas/glide2common
+vpath %.cpp plugins/video/canvas/common
 
 INC.COMMON.DRV2D = \
   plugins/video/canvas/common/graph2d.h \
