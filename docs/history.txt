@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Dec-2004
+	- Jorrit added a dependency from csparser plugin to
+	  'crystalspace.documentsystem' so that it will now correctly
+	  use the xmlread plugin.
 29-Dec-2004
 	- Jorrit added an optimization to sprcal3d. Based on the distance
 	  it will now skip frames for animation. This greatly helps with speed
