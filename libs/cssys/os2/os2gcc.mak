@@ -8,6 +8,8 @@
 # can be found in libs/cssys/os2 subdirectory
 #------------------------------------------------------------------------------
 
+SHELL = $(COMSPEC)
+
 # Friendly names for building environment
 DESCRIPTION.os2gcc = OS/2-GCC/EMX
 DESCRIPTION.OS.os2gcc = OS/2
