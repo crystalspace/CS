@@ -104,6 +104,7 @@
 typedef char GLcharARB;
 typedef uint32 GLhandleARB;
 
+#include "iutil/cmdline.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "video/canvas/openglcommon/iogl.h"
@@ -12606,6 +12607,12 @@ private:
 
   void Report (const char* msg, ...)
   {
+    csRef<iCommandLineParser> cmdline (
+      CS_QUERY_REGISTRY (object_reg, iCommandLineParser));
+    
+    if (cmdline->GetOption ("verbose") == 0)
+      return;
+    
     va_list arg;
     va_start (arg, msg);
     csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
