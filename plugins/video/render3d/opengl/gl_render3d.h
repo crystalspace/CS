@@ -188,6 +188,9 @@ private:
   GLuint stencil_clip_value;
   GLuint stencil_shadow_mask;
   //GLuint stencil_shadow_value;
+  bool stencilClearWithZ; /* When clearing the stencil buffer is needed, 
+			     also clear the Z buffer. Possibly faster on 
+			     some HW. */
 
   bool shadow_stencil_enabled;
   bool clipping_stencil_enabled;

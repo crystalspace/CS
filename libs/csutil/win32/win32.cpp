@@ -525,6 +525,10 @@ Win32Assistant::~Win32Assistant ()
     FreeConsole();
   if (exceptHandlerDLL != 0)
     FreeLibrary ((HMODULE)exceptHandlerDLL);
+  if (cswinIsWinNT ())
+    UnregisterClassW (CS_WIN32_WINDOW_CLASS_NAMEW, ModuleHandle);
+  else
+    UnregisterClassA (CS_WIN32_WINDOW_CLASS_NAME, ModuleHandle); 
   SCF_DESTRUCT_IBASE();
 }
 

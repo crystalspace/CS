@@ -6,6 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Jan-2005
+	- res made the following changes:
+	    - Let the GL renderer always clear the stencil buffer in 
+	      BeginDraw() when stencil clipping is used. Previously, stencil
+	      was only cleared when teh Z buffer was cleared, too, but in e.g.
+	      flarge this was not the case, causing the mirror door to have 
+	      stuff drawn outside the portal.
+	    - Improved the z-dump a bit.
+	    - Moved SetMirrorMode() in csGLGraphics3D::FinishDraw() after the
+	      G2D->FinishDraw() call. This fixes text not appearing on render
+	      targets unless some other 2D op was done prior FinishDraw().
+	    - Made the Win32Assistant unregister the CS window class on
+	      destruction.
 19-Jan-2005
 	- Jorrit fixed a bug in csMeshList::Add() and csMeshFactoryList::Add().
 	  It was returning true on success instead of the last added index.

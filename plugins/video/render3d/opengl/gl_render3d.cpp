@@ -777,8 +777,6 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_cube_map();
   ext->InitGL_EXT_texture3D ();
-  ext->InitGL_ARB_texture_compression ();
-  ext->InitGL_EXT_texture_compression_s3tc (); 
   ext->InitGL_ARB_vertex_buffer_object ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
@@ -904,6 +902,12 @@ bool csGLGraphics3D::Open ()
 	  "Plane clipping is preferred.");
       }
     }
+
+  stencilClearWithZ = config->GetBool ("Video.OpenGL.StencilClearWithZ", true);
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+    "Clearing Z buffer when stencil clear is needed %s", 
+    stencilClearWithZ ? "enabled" : "disabled");
 
   CS_QUERY_REGISTRY_PLUGIN(shadermgr, object_reg,
     "crystalspace.graphics3d.shadermanager", iShaderManager);
@@ -1117,7 +1121,11 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     }
   }
 
-  if (drawflags & CSDRAW_CLEARZBUFFER)
+  const bool doStencilClear = 
+    (drawflags & CSDRAW_3DGRAPHICS) && stencil_clipping_available;
+  const bool doZbufferClear = (drawflags & CSDRAW_CLEARZBUFFER)
+    || (doStencilClear && stencilClearWithZ);
+  if (doZbufferClear)
   {
     const GLbitfield stencilFlag = 
       stencil_clipping_available ? GL_STENCIL_BUFFER_BIT : 0;
@@ -1130,6 +1138,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
     glClear (GL_COLOR_BUFFER_BIT);
+  else if (doStencilClear)
+    glClear (GL_STENCIL_BUFFER_BIT);
 
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
@@ -1223,10 +1233,10 @@ void csGLGraphics3D::PrepareAsRenderTarget (csGLTextureHandle* tex_mm)
 
 void csGLGraphics3D::FinishDraw ()
 {
-  SetMirrorMode (false);
-
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
+
+  SetMirrorMode (false);
 
   if (render_target)
   {
@@ -3001,6 +3011,7 @@ void csGLGraphics3D::DumpZBuffer (const char* path)
     GLfloat maxValue = 0.0f;
     for (int i = 0; i < num; i++)
     {
+      if (zvalues[i] == 0.0f) continue;	 // possibly leftovers from a Z buffer clean
       if (zvalues[i] < minValue)
 	minValue = zvalues[i];
       else if (zvalues[i] > maxValue)
@@ -3020,6 +3031,7 @@ void csGLGraphics3D::DumpZBuffer (const char* path)
 	zv *= zMul;
 	float cif = zv * (float)colorMax;
 	int ci = csQint (cif);
+	ci = MAX (0, MIN (ci, colorMax));
 	if (ci == colorMax)
 	{
 	  (imgPtr++)->Set (zBufColors[ci][0], zBufColors[ci][1],
@@ -3030,9 +3042,9 @@ void csGLGraphics3D::DumpZBuffer (const char* path)
 	  float ratio = cif - (float)ci;
 	  float invRatio = 1.0f - ratio;
 	  (imgPtr++)->Set (
-	    csQint (zBufColors[ci][0] * ratio + zBufColors[ci+1][0] * invRatio), 
-	    csQint (zBufColors[ci][1] * ratio + zBufColors[ci+1][1] * invRatio), 
-	    csQint (zBufColors[ci][2] * ratio + zBufColors[ci+1][2] * invRatio));
+	    csQint (zBufColors[ci+1][0] * ratio + zBufColors[ci][0] * invRatio), 
+	    csQint (zBufColors[ci+1][1] * ratio + zBufColors[ci][1] * invRatio), 
+	    csQint (zBufColors[ci+1][2] * ratio + zBufColors[ci][2] * invRatio));
 
 	}
       }

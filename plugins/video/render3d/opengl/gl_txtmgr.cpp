@@ -985,6 +985,10 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
   G3D = iG3D;
   max_tex_size = G3D->GetMaxTextureSize ();
 
+  G3D->ext->InitGL_ARB_texture_compression ();
+  if (G3D->ext->CS_GL_ARB_texture_compression)
+    G3D->ext->InitGL_EXT_texture_compression_s3tc (); 
+
 #define CS_GL_TEXTURE_FORMAT(fmt)					    \
   textureFormats.Put (#fmt, TextureFormat (fmt, true));		
 #define CS_GL_TEXTURE_FORMAT_EXT(fmt, Ext)				    \
