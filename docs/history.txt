@@ -21,6 +21,35 @@ The history order is reversed so that new features are at the top.
 	  csMemFile.
 	- Eric Sunshine eliminated several compilation warnings from
 	  win32/registrycfg.cpp.
+	- Eric Sunshine performed Phase Two of the elimination of the
+	  monolithic scf.cfg:
+	    - Converted SCF to understand XML format meta-information resources
+	      associated with plugins.  More specifically, it understands
+	      resources accessed via the iDocument interface.
+	    - SCF now actually utilizes the .csplugin meta-information
+	      resources associated with plugins.  It no longer consults scf.cfg
+	      nor the individual .scf files.  (Presently, the old code for
+	      locating .scf files is being re-used to locate the new .csplugin
+	      files.  Fully dynamic, recursive discovery of plugin modules is
+	      not yet implemented.  See To-Do below.)
+	    - Eliminated scf.cfg, as well as all remaining code references to
+	      it.  (Some other non-SCF code was accessing scf.cfg for other
+	      purposes.)
+	    - Eliminated the now obsolete scfreg.  Eliminated references to
+	      scfreg from install.jam.
+	    - Still To-Do:
+		- Remove references to scf.cfg and scfreg from documentation.
+		  Also document new .csplugin resources.
+		- Add platform-specific function to scan and locate plugins
+		  automatically rather than using the ad-hoc approach inherited
+		  from scanning for .scf files.
+		- Add platform-specific function to query a plugin's
+		  meta-information.  This should be used by SCF to do the raw
+		  extraction.  Provide and finalize API for higher-level
+		  clients to access meta-information.
+		- Augment static linking to work with the new facility.
+		- Eliminate the hard-coded SCF registration information in each
+		  plugin's source code.
 27-May-2003
 	- Boyan made the following changes:
 	    - Fixed kyboard focusing component bug in AWS 

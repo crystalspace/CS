@@ -35,7 +35,7 @@ SRC.CSUTIL = \
   $(wildcard $(addprefix $(SRCDIR)/,libs/csutil/*.cpp libs/csutil/*.c))
 OBJ.CSUTIL = \
   $(addprefix $(OUT)/,$(notdir $(patsubst %.c,%$O,$(SRC.CSUTIL:.cpp=$O))))
-CFG.CSUTIL = $(SRCDIR)/scf.cfg $(SRCDIR)/data/config/mouse.cfg
+CFG.CSUTIL = $(SRCDIR)/data/config/mouse.cfg
 
 TO_INSTALL.CONFIG += $(CFG.CSUTIL)
 TO_INSTALL.STATIC_LIBS += $(CSUTIL.LIB)

@@ -59,15 +59,6 @@ rule InstallPlugin
 
   InstallPluginPlatform $(target) : $(<) ;
   Depends install_plugins : $(target) ;
-
-  # @@@ Remove this once new .csplugins are utilized.  Presently, .csplugin
-  # files are present, but not consulted at run-time.
-  if $(CMD.SCFREG)
-  {
-    local scf = $(<:R=$(dir):S=.scf:G=installscf) ;
-    ScfFileGen $(scf) : $(target) ;
-    Depends install_plugins : $(scf) ;
-  }
 }
 
 ##  InstallPluginPlatform installplugin : plugin
@@ -291,18 +282,6 @@ Depends install : $(INSTALLTARGETS) ;
 actions Install
 {
   $(CMD.INSTALL) -m$(MODE) $(>) $(<) $(INSTALLFLAGS) ;
-}
-
-# @@@ Remove this rule once new .csplugins are utilized.  Presently, .csplugin
-# files are present, but not consulted at run-time.
-rule ScfFileGen
-{
-  Depends $(<) : $(>) ;
-}
-
-actions ScfFileGen
-{
-  $(CMD.SCFREG) $(>) > /dev/null
 }
 
 actions CopyDirs

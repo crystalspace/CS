@@ -19,13 +19,14 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "csutil/scf.h"
-#include "csutil/cfgfile.h"
 #include "csutil/csvector.h"
 #include "csutil/scfstrv.h"
+#include "csutil/csstring.h"
 #include "csutil/strset.h"
 #include "csutil/util.h"
 #include "csutil/ref.h"
 #include "csutil/scopedmutexlock.h"
+#include "iutil/document.h"
 
 /// This is the registry for all class factories
 static class scfClassRegistry *ClassRegistry = NULL;
@@ -35,7 +36,7 @@ static bool SortClassRegistry = false;
 static class csSCF *PrivateSCF = NULL;
 
 /**
- * This class manages all SCF functionality
+ * This class manages all SCF functionality.
  * The SCF module loader routines (CreateInstance, RegisterClass, ...)
  * are all thread-safe.
  */
@@ -43,6 +44,7 @@ class csSCF : public iSCF
 {
 private:
   csRef<csMutex> mutex;
+  void RegisterClasses (char const* pluginname, iDocumentNode* scfnode);
 
 public:
   SCF_DECLARE_IBASE;
@@ -55,7 +57,7 @@ public:
   /// destructor
   virtual ~csSCF ();
 
-  virtual void RegisterConfigClassList (iConfigFile *cfg);
+  virtual void RegisterClasses (iDocument*);
   virtual bool ClassRegistered (const char *iClassID);
   virtual void *CreateInstance (const char *iClassID,
     const char *iInterfaceID, int iVersion);
@@ -418,12 +420,12 @@ SCF_IMPLEMENT_IBASE (csSCF);
   SCF_IMPLEMENTS_INTERFACE (iSCF);
 SCF_IMPLEMENT_IBASE_END;
 
-void scfInitialize (iConfigFile *iConfig)
+void scfInitialize (iDocument* doc)
 {
   if (!PrivateSCF)
     PrivateSCF = new csSCF ();
-  if (iConfig)
-    PrivateSCF->RegisterConfigClassList (iConfig);
+  if (doc)
+    PrivateSCF->RegisterClasses (doc);
 }
 
 csSCF::csSCF ()
@@ -458,28 +460,73 @@ csSCF::~csSCF ()
   SCF = PrivateSCF = NULL;
 }
 
-void csSCF::RegisterConfigClassList (iConfigFile *iConfig)
+void csSCF::RegisterClasses (iDocument* doc)
 {
+  (void)doc;
 #ifndef CS_STATIC_LINKED
-  if (iConfig)
+  if (doc)
   {
-    csRef<iConfigIterator> iterator (iConfig->Enumerate ());
-    if (iterator)
+    csRef<iDocumentNode> rootnode = doc->GetRoot();
+    if (rootnode != 0)
     {
-      while (iterator->Next ())
+      csRef<iDocumentNode> pluginnode = rootnode->GetNode("plugin");
+      if (pluginnode)
       {
-        const char *data = iterator->GetStr ();
-        CS_ALLOC_STACK_ARRAY (char, val, strlen(data) + 1);
-        strcpy (val, data);
-        char *depend = strchr (val, ':');
-        if (depend) *depend++ = 0;
-        RegisterClass (iterator->GetKey (true), val, depend);
+        csRef<iDocumentNode> namenode = pluginnode->GetNode("name");
+	if (namenode)
+	{
+	  csRef<iDocumentNode> scfnode = pluginnode->GetNode("scf");
+	  if (scfnode.IsValid())
+	    RegisterClasses(namenode->GetContentsValue(), scfnode);
+	  else
+	    fprintf(stderr, "csSCF::RegisterClasses: Missing <scf> node.\n");
+	}
+	else
+	  fprintf(stderr, "csSCF::RegisterClasses: Missing <name> node.\n");
       }
+      else
+        fprintf(stderr,
+	  "csSCF::RegisterClasses: Missing root <plugin> node.\n");
     }
   }
-#else
-  (void)iConfig;
 #endif
+}
+
+void csSCF::RegisterClasses (char const* pluginname, iDocumentNode* scfnode)
+{
+  csRef<iDocumentNode> classesnode = scfnode->GetNode("classes");
+  if (classesnode)
+  {
+    csRef<iDocumentNodeIterator> classiter = classesnode->GetNodes("class");
+    csRef<iDocumentNode> classnode;
+    while ((classnode = classiter->Next()))
+    {
+      csString classname;
+      csRef<iDocumentNode> namenode = classnode->GetNode("name");
+      if (namenode.IsValid())
+	classname = namenode->GetContentsValue();
+
+      // For backward compatibility, we build a comma-delimited dependency
+      // string from the individual dependency nodes.  In the future,
+      // iSCF::GetClassDependencies() should be updated to return an
+      // iStrVector, rather than a simple comma-delimited string.
+      csString depend;
+      csRef<iDocumentNode> depnode = classnode->GetNode("requires");
+      if (depnode)
+      {
+	csRef<iDocumentNodeIterator> depiter = depnode->GetNodes("class");
+	csRef<iDocumentNode> depclassnode;
+	while ((depclassnode = depiter->Next()))
+	{
+	  if (!depend.IsEmpty()) depend << ", ";
+	  depend << depclassnode->GetContentsValue();
+	}
+      }
+
+      char const* pdepend = (depend.IsEmpty() ? 0 : depend.GetData());
+      RegisterClass(classname, pluginname, pdepend);
+    }
+  }
 }
 
 void csSCF::Finish ()

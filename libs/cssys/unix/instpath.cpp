@@ -43,8 +43,8 @@ char* csGetConfigPath ()
   if (!crystal)
   {
     // no setting, use the default.
-    // is the current dir a possible install? try opening scf.cfg,
-    if (!access ("scf.cfg", F_OK))                                    
+    // is the current dir a possible install? try opening vfs.cfg,
+    if (!access ("vfs.cfg", F_OK))
     {
       return csStrNew (".");
     }
@@ -53,7 +53,7 @@ char* csGetConfigPath ()
     // system works...
 #if 1
     // debian install place
-    if (!access ("/usr/lib/crystalspace/scf.cfg", F_OK))
+    if (!access ("/usr/lib/crystalspace/vfs.cfg", F_OK))
     {
       return csStrNew ("/usr/lib/crystalspace/");
     }
@@ -66,25 +66,25 @@ char* csGetConfigPath ()
   // check for $CRYSTAL/etc
   path = new char[320];
   strncpy (path, crystal, 300);
-  strcat (path, "/etc/scf.cfg");
+  strcat (path, "/etc/vfs.cfg");
   if (!access (path, F_OK))
   {
     strncpy (path, crystal, 300);
     strcat (path, "/etc");
     return path;
   }
-  
+
   // check for $CRYSTAL
   strncpy (path, crystal, 300);
-  strcat (path, "/scf.cfg");
+  strcat (path, "/vfs.cfg");
   if (!access (path, F_OK))
   {
     strncpy (path, crystal, 320);
     return path;
   }
-    
-  fprintf (stderr, 
-      "Couldn't find scf.cfg in '%s' (defined by CRYSTAL var).\n", crystal);
+
+  fprintf (stderr,
+      "Couldn't find vfs.cfg in '%s' (defined by CRYSTAL var).\n", crystal);
 
   delete[] path;
   return NULL;
@@ -100,7 +100,7 @@ char** csGetPluginPaths ()
     paths[0] = csStrNew(CS_PLUGINDIR);
     paths[1] = csStrNew(".");
     paths[2] = 0;
-  
+
     return paths;
   }
 
@@ -112,7 +112,7 @@ char** csGetPluginPaths ()
   paths[1] = temp;
   paths[2] = csStrNew(".");
   paths[3] = 0;
-  
+
   return paths;
 }
 

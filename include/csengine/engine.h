@@ -70,6 +70,7 @@ struct iCacheManager;
 struct iString;
 struct iEngineSequenceManager;
 struct iRenderLoop;
+struct iConfigFile;
 
 /**
  * Iterator to iterate over all static lights in the engine.

@@ -19,8 +19,7 @@
 
 #include <stdio.h>
 #include "cssysdef.h"
-#include "csutil/scf.h"
-#include "csutil/cfgfile.h"
+#include "cstool/initapp.h"
 
 /// include our needed headers
 #include "inetwork/driver2.h"
@@ -123,9 +122,7 @@ int main(int argc, char *argv[])
 	printf("server running udp on port %d.\n",port);
   }
   
-  // This method requires you register dlls with scfreg (or manually) in scf.cfg
-  csConfigFile config ("scf.cfg");
-  scfInitialize (&config);
+  csInitializer::InitializeSCF();
 
   /// load our ensocket plugin
   driver = SCF_CREATE_INSTANCE("crystalspace.network.driver.sockets2", iNetworkDriver2);

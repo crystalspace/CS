@@ -17,50 +17,52 @@
 */
 #define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
-#include "cssys/sysdriv.h"
-#include "cssys/system.h"
-#include "cssys/sysfunc.h"
 #include "cssys/csshlib.h"
+#include "cssys/sysdriv.h"
+#include "cssys/sysfunc.h"
+#include "cssys/system.h"
 #include "cstool/initapp.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/objreg.h"
-#include "iutil/vfs.h"
-#include "iutil/plugin.h"
-#include "csutil/cseventq.h"
-#include "csutil/cmdline.h"
+#include "csutil/cfgacc.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
-#include "csutil/cfgacc.h"
-#include "csutil/prfxcfg.h"
-#include "csutil/objreg.h"
-#include "csutil/virtclk.h"
+#include "csutil/cmdline.h"
+#include "csutil/cseventq.h"
 #include "csutil/csinput.h"
-#include "csutil/plugmgr.h"
+#include "csutil/objreg.h"
+#include "csutil/physfile.h"
 #include "csutil/plugldr.h"
-#include "iutil/eventq.h"
-#include "iutil/evdefs.h"
-#include "iutil/virtclk.h"
-#include "iutil/cmdline.h"
-#include "iutil/cfgmgr.h"
-#include "isound/renderer.h"
-#include "isound/loader.h"
-#include "inetwork/driver.h"
+#include "csutil/plugmgr.h"
+#include "csutil/prfxcfg.h"
+#include "csutil/virtclk.h"
+#include "csutil/xmltiny.h"
+#include "iengine/engine.h"
+#include "iengine/motion.h"
 #include "igraphic/imageio.h"
-#include "ivideo/fontserv.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
 #include "imap/parser.h"
 #include "imesh/crossbld.h"
 #include "imesh/mdlconv.h"
-#include "iengine/motion.h"
-#include "iengine/engine.h"
-#include "ivaria/iso.h"
+#include "inetwork/driver.h"
+#include "isound/loader.h"
+#include "isound/renderer.h"
+#include "iutil/cfgmgr.h"
+#include "iutil/cmdline.h"
+#include "iutil/comp.h"
+#include "iutil/evdefs.h"
+#include "iutil/eventh.h"
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
+#include "iutil/virtclk.h"
 #include "ivaria/conin.h"
+#include "ivaria/conout.h"
+#include "ivaria/iso.h"
+#include "ivaria/perfstat.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
-#include "ivaria/conout.h"
-#include "ivaria/perfstat.h"
+#include "ivideo/fontserv.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
 
 #ifdef CS_DEBUG
 #define CS_LOAD_LIB_VERBOSE true
@@ -88,7 +90,7 @@ iObjectRegistry* csInitializer::CreateEnvironment (
           CreateCommandLineParser(r, argc, argv) &&
           CreateConfigManager(r) &&
           CreateInputDrivers(r) &&
-    csPlatformStartup(r))
+          csPlatformStartup(r))
         reg = r;
       else
         r->DecRef();
@@ -97,51 +99,32 @@ iObjectRegistry* csInitializer::CreateEnvironment (
   return reg;
 }
 
-// Scan a directory for .scf files
+// Scan a directory for .csplugin files
 static void ScanScfDir (const char* dir)
 {
-  // Initialize Shared Class Facility|
   struct dirent* de;
-  DIR* dh;
-  csConfigFile scfconfig;
-  
-  dh = opendir(dir);
+  DIR* dh = opendir(dir);
   if (dh != 0)
   {
     while ((de = readdir(dh)) != 0)
     {
-      if (!(isdir(dir, de)))
+      if (!isdir(dir, de))
       {
         int const n = strlen(de->d_name);
-        if (n >= 4 && strcasecmp(de->d_name + n - 4, ".scf") == 0)
+        if (n >= 9 && strcasecmp(de->d_name + n - 9, ".csplugin") == 0)
         {
-    csString scffilepath = dir;
-    scffilepath += PATH_SEPARATOR;
-    scffilepath += de->d_name;
-    scfconfig.Clear();
-    scfconfig.Load(scffilepath);
-    int scfver = scfconfig.GetInt(".scfVersion", 0);
-    switch (scfver)
-    {
-      case 1:
-        {
-          csRef<iConfigIterator> it (scfconfig.Enumerate());
-          while (it->Next())
-          {
-      char const* key = it->GetKey();
-      if (*key == '.')
-        scfconfig.DeleteKey(key);
-          }
-          scfInitialize (&scfconfig);
+	  csString scffilepath;
+	  scffilepath << dir << PATH_SEPARATOR << de->d_name;
+	  csPhysicalFile file(scffilepath, "rb");
+	  csTinyDocumentSystem docsys;
+	  csRef<iDocument> doc = docsys.CreateDocument();
+	  char const* errmsg = doc->Parse(&file);
+	  if (errmsg == 0)
+	    scfInitialize(doc);
+	  else
+	    fprintf(stderr, "csInitializer::InitializeSCF: "
+	      "Error parsing %s: %s\n", scffilepath.GetData(), errmsg);
         }
-        break;
-      default:
-        printf ("Didn't recognize SCF version in '%s'\n", 
-          (const char*) scffilepath);
-        /* unrecognized version */;
-    }
-    scfInitialize (&scfconfig);
-  }
       }
     }
     closedir(dh);
@@ -150,15 +133,7 @@ static void ScanScfDir (const char* dir)
 
 bool csInitializer::InitializeSCF ()
 {
-  // Find scf.cfg and initialize SCF
-  char* configpath = csGetConfigPath ();
-  csString scfconfpath = configpath;
-  scfconfpath += PATH_SEPARATOR;
-  scfconfpath += "scf.cfg";
-  delete[] configpath;
-    
-  csConfigFile scfconfig (scfconfpath);
-  scfInitialize (&scfconfig);
+  scfInitialize();
 
 #ifndef CS_STATIC_LINKED
   // Search plugins in pluginpaths
@@ -169,7 +144,6 @@ bool csInitializer::InitializeSCF ()
     temp += PATH_SEPARATOR;
     csAddLibraryPath(temp);
     ScanScfDir (pluginpaths[i]);
-    
     delete[] pluginpaths[i];
   }
   delete[] pluginpaths;

@@ -94,7 +94,7 @@ static inline char* FindConfigPath ()
   // override the default to get install path from
   // 1. CRYSTAL environment variable
   // 2. this machine's system registry
-  // 3. if current working directory contains 'scf.cfg' use this dir.
+  // 3. if current working directory contains 'vfs.cfg' use this dir.
   // 4. The dir where the app is
   // 5. A "Crystal" subfolder under the "Program Files" dir.
   // 6. hard-wired default path
@@ -117,7 +117,7 @@ static inline char* FindConfigPath ()
     return NewPathWOTrailingDelim (path);
 
   // perhaps current drive/dir?
-  FILE *test = fopen("scf.cfg", "r");
+  FILE *test = fopen("vfs.cfg", "r");
   if(test != NULL)
   {
     // use current dir
@@ -134,7 +134,7 @@ static inline char* FindConfigPath ()
 
   char testfn[MAX_PATH];
   strcpy(testfn, apppath);
-  strcat(testfn, "scf.cfg");
+  strcat(testfn, "vfs.cfg");
 
   test = fopen(testfn, "r");
   if(test != NULL)

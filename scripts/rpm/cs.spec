@@ -43,7 +43,6 @@ rm -rf "$RPM_BUILD_ROOT"
 /usr/local/crystal/bin/milk2spr
 /usr/local/crystal/bin/perftest
 /usr/local/crystal/bin/python.cex
-/usr/local/crystal/bin/scfreg
 /usr/local/crystal/bin/tbconvert
 /usr/local/crystal/bin/vsh
 /usr/local/crystal/bin/walktest
@@ -101,7 +100,6 @@ rm -rf "$RPM_BUILD_ROOT"
 
 /usr/local/crystal/lib/*.so
    
-/usr/local/crystal/scf.cfg
 /usr/local/crystal/scripts/python/*.py
 /usr/local/crystal/uninst
 /usr/local/crystal/vfs.cfg

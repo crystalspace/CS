@@ -601,7 +601,7 @@ struct iFactory : public iBase
 
 //----------------------------------------------- Client-side functions -----//
 
-struct iConfigFile;
+struct iDocument;
 struct iStrVector;
 
 /**
@@ -652,13 +652,15 @@ inline static scfInterfaceID Name##_scfGetID ()				\
   Interface##_scfGetID (), Interface##_VERSION)))
 
 /**
- * This function should be called to initialize client SCF library.
- * If you provide a iConfig object, the SCF-related registry section
- * will be read from it. It is legal to call scfInitialize more than once
- * (possibly providing a different iConfig object each time). If you
- * don't specify this parameter, this argument is ignored.
+ * This function should be called to initialize client SCF library.  If you
+ * provide an iDocument, the SCF-related registry section will be read from it.
+ * The root node within the document should be named "plugin", and the
+ * SCF-related information should be in a child node of the root named "scf".
+ * It is legal to call scfInitialize more than once (possibly providing a
+ * different iDocument each time).  If you don't specify this parameter, this
+ * argument is ignored.
  */
-extern void scfInitialize (iConfigFile *iConfig = 0);
+extern void scfInitialize (iDocument* = 0);
 
 /**
  * This function checks whenever an interface is compatible with given version.
@@ -700,10 +702,10 @@ struct iSCF : public iBase
 #endif
 
   /**
-   * Read additional class descriptions from the given config file. This does
+   * Read additional class descriptions from the given iDocument.  This does
    * the same as additional calls to scfInitialize ().
    */
-  virtual void RegisterConfigClassList (iConfigFile *Config) = 0;
+  virtual void RegisterClasses (iDocument*) = 0;
 
   /**
    * Check whenever the class is present in SCF registry.
