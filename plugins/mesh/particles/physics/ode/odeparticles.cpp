@@ -329,8 +329,8 @@ bool csODEParticlePhysics::HandleEvent (iEvent &event)
       {
 	csColor constant = po.particles->GetConstantColor ();
 	part.color.x = constant.red;
-	part.color.y = constant.blue;
-	part.color.z = constant.green;
+	part.color.y = constant.green;
+	part.color.z = constant.blue;
 	part.color.w = 1.0;
         break;
       }

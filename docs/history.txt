@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Jun-2004
+	- Rhad fixed a typo in the ode and simple physics plugins for particles
+	  that was swapping the green and blue components of constant colors.
 18-Jun-2004
 	- Eric Sunshine added a bunch of missing 'const' directives to csSpline
 	  and its subclasses.

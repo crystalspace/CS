@@ -346,8 +346,8 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
     {
       csColor constant_color = part->particles->GetConstantColor ();
       point.color.x = constant_color.red;
-      point.color.y = constant_color.blue;
-      point.color.z = constant_color.green;
+      point.color.y = constant_color.green;
+      point.color.z = constant_color.blue;
       point.color.w = 1.0f;
       break;
     }
