@@ -58,7 +58,7 @@ $(CSLIGHT.EXE): $(DEP.EXE) $(OBJ.CSLIGHT) $(LIB.CSLIGHT)
 	$(DO.LINK.EXE)
 
 cslightclean:
-	-$(RM) $(CSLIGHT.EXE) $(OBJ.CSLIGHT)
+	-$(RMDIR) $(CSLIGHT.EXE) $(OBJ.CSLIGHT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/cslight.dep

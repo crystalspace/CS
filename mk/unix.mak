@@ -8,8 +8,11 @@
 
 RUN_SCRIPT=$(SHELL)
 
-# Typical extension for executables on this system (e.g. EXE=.exe)
+# Typical extension for GUI executables on this system (e.g. EXE=.exe)
 EXE=
+
+# Typical extension for console executables on this system (e.g. EXE=.exe)
+EXE.CONSOLE=
 
 # Typical extension for dynamic libraries on this system.
 DLL=.so

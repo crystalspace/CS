@@ -56,7 +56,7 @@ $(simplevp.EXE): $(DEP.EXE) $(OBJ.simplevp) $(LIB.simplevp)
 	$(DO.LINK.EXE)
 
 simplevpclean:
-	-$(RM) $(simplevp.EXE) $(OBJ.simplevp)
+	-$(RMDIR) $(simplevp.EXE) $(OBJ.simplevp)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/simplevp.dep

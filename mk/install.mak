@@ -171,7 +171,7 @@ install_staticlibs: $(INSTALL_LIB.DIR)
 
 # Install executables.
 install_exe: $(INSTALL_DIR)/bin
-	$(CP) $(TO_INSTALL.EXE) $(INSTALL_DIR)/bin
+	$(CP) -r $(TO_INSTALL.EXE) $(INSTALL_DIR)/bin
 	@echo $(addprefix $(INSTALL_DIR)/bin/, \
 	  $(notdir $(TO_INSTALL.EXE))) >> $(INSTALL_LOG)
 

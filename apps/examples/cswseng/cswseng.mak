@@ -57,7 +57,7 @@ $(CSWSENG.EXE): $(DEP.EXE) $(OBJ.CSWSENG) $(LIB.CSWSENG)
 	$(DO.LINK.EXE)
 
 cswsengclean:
-	-$(RM) $(CSWSENG.EXE) $(OBJ.CSWSENG)
+	-$(RMDIR) $(CSWSENG.EXE) $(OBJ.CSWSENG)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/cswseng.dep

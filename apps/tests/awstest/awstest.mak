@@ -60,7 +60,7 @@ $(AWSTEST.EXE): $(DEP.EXE) $(OBJ.AWSTEST) $(LIB.AWSTEST)
 	$(DO.LINK.EXE)
 
 awstestclean:
-	-$(RM) $(AWSTEST.EXE) $(OBJ.AWSTEST)
+	-$(RMDIR) $(AWSTEST.EXE) $(OBJ.AWSTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/awstest.dep

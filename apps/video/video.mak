@@ -58,7 +58,7 @@ $(CSVID.EXE): $(DEP.EXE) $(OBJ.CSVID) $(LIB.CSVID)
 	$(DO.LINK.EXE)
 
 csvidclean:
-	-$(RM) $(CSVID.EXE) $(OBJ.CSVID)
+	-$(RMDIR) $(CSVID.EXE) $(OBJ.CSVID)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csvid.dep

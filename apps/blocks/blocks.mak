@@ -58,7 +58,7 @@ $(BLOCKS.EXE): $(DEP.EXE) $(OBJ.BLOCKS) $(LIB.BLOCKS)
 	$(DO.LINK.EXE)
 
 blocksclean:
-	-$(RM) $(BLOCKS.EXE) $(OBJ.BLOCKS)
+	-$(RMDIR) $(BLOCKS.EXE) $(OBJ.BLOCKS)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/blocks.dep

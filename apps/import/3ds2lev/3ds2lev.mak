@@ -27,7 +27,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/import/3ds2lev
 
-3DS2LEV.EXE = 3ds2lev$(EXE)
+3DS2LEV.EXE = 3ds2lev$(EXE.CONSOLE)
 INC.3DS2LEV = $(wildcard apps/import/3ds2lev/*.h)
 SRC.3DS2LEV = $(wildcard apps/import/3ds2lev/*.cpp)
 OBJ.3DS2LEV = $(addprefix $(OUT)/,$(notdir $(SRC.3DS2LEV:.cpp=$O)))
@@ -55,7 +55,7 @@ $(3DS2LEV.EXE): $(OBJ.3DS2LEV) $(LIB.3DS2LEV)
 	$(DO.LINK.CONSOLE.EXE) -l3ds
 
 3ds2levclean:
-	-$(RM) $(3DS2LEV.EXE) $(OBJ.3DS2LEV)
+	-$(RMDIR) $(3DS2LEV.EXE) $(OBJ.3DS2LEV)
 
 ifdef DO_DEPEND
 3ds2levdep: $(OUTOS)/3ds2lev.dep

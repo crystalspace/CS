@@ -58,7 +58,7 @@ $(CSDEMO.EXE): $(DEP.EXE) $(OBJ.CSDEMO) $(LIB.CSDEMO)
 	$(DO.LINK.EXE)
 
 csdemoclean:
-	-$(RM) $(CSDEMO.EXE) $(OBJ.CSDEMO)
+	-$(RMDIR) $(CSDEMO.EXE) $(OBJ.CSDEMO)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csdemo.dep

@@ -56,7 +56,7 @@ $(PATHTUT.EXE): $(DEP.EXE) $(OBJ.PATHTUT) $(LIB.PATHTUT)
 	$(DO.LINK.EXE)
 
 pathtutclean:
-	-$(RM) $(PATHTUT.EXE) $(OBJ.PATHTUT)
+	-$(RMDIR) $(PATHTUT.EXE) $(OBJ.PATHTUT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/pathtut.dep

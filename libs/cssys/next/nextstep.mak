@@ -71,7 +71,8 @@ NEXT.LFLAGS.GENERAL=
 NEXT.LFLAGS.EXE=-u libNeXT_s -u libsys_s
 NEXT.LFLAGS.EXE.CONSOLE=$(NEXT.LFLAGS.EXE)
 NEXT.LFLAGS.DLL=-nostdlib -r
-NEXT.SYSCONFIG=
+NEXT.APP.EXE=$@/$(notdir $(basename $@))
+NEXT.APP.ICON=libs/cssys/next/appicon.tiff
 
 NEXT.FRIEND=yes
 include libs/cssys/next/next.mak

@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tools/scfreg
 
-SCFREG.EXE = scfreg$(EXE)
+SCFREG.EXE = scfreg$(EXE.CONSOLE)
 INC.SCFREG =
 SRC.SCFREG = apps/tools/scfreg/scfreg.cpp
 OBJ.SCFREG = $(addprefix $(OUT)/,$(notdir $(SRC.SCFREG:.cpp=$O)))
@@ -58,7 +58,7 @@ $(SCFREG.EXE): $(OBJ.SCFREG) $(LIB.SCFREG)
 	$(DO.LINK.CONSOLE.EXE)
 
 scfregclean:
-	-$(RM) $(SCFREG.EXE) $(OBJ.SCFREG)
+	-$(RMDIR) $(SCFREG.EXE) $(OBJ.SCFREG)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/scfreg.dep

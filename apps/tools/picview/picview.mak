@@ -57,7 +57,7 @@ $(PICVIEW.EXE): $(DEP.EXE) $(OBJ.PICVIEW) $(LIB.PICVIEW)
 	$(DO.LINK.EXE)
 
 picviewclean:
-	-$(RM) $(PICVIEW.EXE) $(OBJ.PICVIEW)
+	-$(RMDIR) $(PICVIEW.EXE) $(OBJ.PICVIEW)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/picview.dep

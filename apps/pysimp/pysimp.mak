@@ -59,7 +59,7 @@ $(PYSIMP.EXE): $(DEP.EXE) $(OBJ.PYSIMP) $(LIB.PYSIMP)
 	$(DO.LINK.EXE)
 
 pysimpclean:
-	-$(RM) $(PYSIMP.EXE) $(OBJ.PYSIMP)
+	-$(RMDIR) $(PYSIMP.EXE) $(OBJ.PYSIMP)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/pysimp.dep

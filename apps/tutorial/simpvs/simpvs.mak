@@ -56,7 +56,7 @@ $(SIMPVS.EXE): $(DEP.EXE) $(OBJ.SIMPVS) $(LIB.SIMPVS)
 	$(DO.LINK.EXE)
 
 simpvsclean:
-	-$(RM) $(SIMPVS.EXE) $(OBJ.SIMPVS)
+	-$(RMDIR) $(SIMPVS.EXE) $(OBJ.SIMPVS)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/simpvs.dep

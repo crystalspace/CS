@@ -33,6 +33,8 @@ NEXT.LFLAGS.GENERAL=
 NEXT.LFLAGS.EXE=-framework AppKit -framework Foundation
 NEXT.LFLAGS.EXE.CONSOLE=-framework AppKit -framework Foundation
 NEXT.LFLAGS.DLL=-bundle -framework AppKit -framework Foundation
+NEXT.APP.EXE=$@/Contents/MacOS/$(notdir $(basename $@))
+NEXT.APP.ICON=libs/cssys/next/appicon.icns
 
 NEXT.PLUGINS+=video/renderer/opengl
 NEXT.PLUGINS+=video/canvas/macosx/coregraphics

@@ -55,7 +55,7 @@ $(CSFEDIT.EXE): $(DEP.EXE) $(OBJ.CSFEDIT) $(LIB.CSFEDIT)
 	$(DO.LINK.EXE)
 
 csfeditclean:
-	-$(RM) $(CSFEDIT.EXE) $(OBJ.CSFEDIT)
+	-$(RMDIR) $(CSFEDIT.EXE) $(OBJ.CSFEDIT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csfedit.dep

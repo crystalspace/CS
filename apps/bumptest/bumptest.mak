@@ -56,7 +56,7 @@ $(BUMPTEST.EXE): $(DEP.EXE) $(OBJ.BUMPTEST) $(LIB.BUMPTEST)
 	$(DO.LINK.EXE)
 
 bumptestclean:
-	-$(RM) $(BUMPTEST.EXE) $(OBJ.BUMPTEST)
+	-$(RMDIR) $(BUMPTEST.EXE) $(OBJ.BUMPTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/bumptest.dep

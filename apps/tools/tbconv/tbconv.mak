@@ -27,19 +27,18 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tools/tbconv
 
-TBCONVERT.EXE = tbconvert$(EXE)
+TBCONVERT.EXE = tbconvert$(EXE.CONSOLE)
 INC.TBCONVERT = $(wildcard apps/tools/tbconv/*.h)
 SRC.TBCONVERT = $(wildcard apps/tools/tbconv/*.cpp)
 OBJ.TBCONVERT = $(addprefix $(OUT)/,$(notdir $(SRC.TBCONVERT:.cpp=$O)))
 DEP.TBCONVERT = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.TBCONVERT = $(foreach d,$(DEP.TBCONVERT),$($d.LIB))
 
-TO_INSTALL.EXE    += $(TBCONVERT.EXE)
+TO_INSTALL.EXE += $(TBCONVERT.EXE)
 
 MSVC.DSP += TBCONVERT
 DSP.TBCONVERT.NAME = tbconvert
 DSP.TBCONVERT.TYPE = appcon
-#DSP.TBCONVERT.RESOURCES = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -53,10 +52,10 @@ build.tbconvert: $(OUTDIRS) $(TBCONVERT.EXE)
 clean: tbconvertclean
 
 $(TBCONVERT.EXE): $(DEP.EXE) $(OBJ.TBCONVERT) $(LIB.TBCONVERT)
-	$(DO.LINK.EXE)
+	$(DO.LINK.CONSOLE.EXE)
 
 tbconvertclean:
-	-$(RM) $(TBCONVERT.EXE) $(OBJ.TBCONVERT)
+	-$(RMDIR) $(TBCONVERT.EXE) $(OBJ.TBCONVERT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)tbconvert.dep

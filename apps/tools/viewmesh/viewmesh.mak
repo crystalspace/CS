@@ -56,7 +56,7 @@ $(VIEWMESH.EXE): $(DEP.EXE) $(OBJ.VIEWMESH) $(LIB.VIEWMESH)
 	$(DO.LINK.EXE)
 
 viewmeshclean:
-	-$(RM) $(VIEWMESH.EXE) $(OBJ.VIEWMESH)
+	-$(RMDIR) $(VIEWMESH.EXE) $(OBJ.VIEWMESH)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/viewmesh.dep

@@ -27,7 +27,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tools/levtool
 
-LEVTOOL.EXE = levtool$(EXE)
+LEVTOOL.EXE = levtool$(EXE.CONSOLE)
 INC.LEVTOOL = $(wildcard apps/tools/levtool/*.h)
 SRC.LEVTOOL = $(wildcard apps/tools/levtool/*.cpp)
 OBJ.LEVTOOL = $(addprefix $(OUT)/,$(notdir $(SRC.LEVTOOL:.cpp=$O)))
@@ -54,10 +54,10 @@ build.levtool: $(OUTDIRS) $(LEVTOOL.EXE)
 clean: levtoolclean
 
 $(LEVTOOL.EXE): $(DEP.EXE) $(OBJ.LEVTOOL) $(LIB.LEVTOOL)
-	$(DO.LINK.EXE)
+	$(DO.LINK.CONSOLE.EXE)
 
 levtoolclean:
-	-$(RM) $(LEVTOOL.EXE) $(OBJ.LEVTOOL)
+	-$(RMDIR) $(LEVTOOL.EXE) $(OBJ.LEVTOOL)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/levtool.dep

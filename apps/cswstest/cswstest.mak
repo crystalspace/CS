@@ -57,7 +57,7 @@ $(CSWSTEST.EXE): $(DEP.EXE) $(OBJ.CSWSTEST) $(LIB.CSWSTEST)
 	$(DO.LINK.EXE)
 
 cswstestclean:
-	-$(RM) $(CSWSTEST.EXE) $(OBJ.CSWSTEST)
+	-$(RMDIR) $(CSWSTEST.EXE) $(OBJ.CSWSTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/cswstest.dep

@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tests/unittest
 
-UNITTEST.EXE = unittest$(EXE)
+UNITTEST.EXE = unittest$(EXE.CONSOLE)
 INC.UNITTEST = $(wildcard apps/tests/unittest/*.h)
 SRC.UNITTEST = $(wildcard apps/tests/unittest/*.cpp)
 OBJ.UNITTEST = $(addprefix $(OUT)/,$(notdir $(SRC.UNITTEST:.cpp=$O)))
@@ -43,8 +43,6 @@ TO_INSTALL.DATA   += data/stdtex.zip
 MSVC.DSP += UNITTEST
 DSP.UNITTEST.NAME = unittest
 DSP.UNITTEST.TYPE = appcon
-
-#$(UNITTEST.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -59,10 +57,10 @@ clean: unittestclean
 check: unittestcheck
 
 $(UNITTEST.EXE): $(DEP.EXE) $(OBJ.UNITTEST) $(LIB.UNITTEST)
-	$(DO.LINK.EXE)
+	$(DO.LINK.CONSOLE.EXE)
 
 unittestclean:
-	-$(RM) $(UNITTEST.EXE) $(OBJ.UNITTEST)
+	-$(RMDIR) $(UNITTEST.EXE) $(OBJ.UNITTEST)
 
 unittestcheck: $(UNITTEST.EXE)
 	$(RUN_TEST)$(UNITTEST.EXE)

@@ -56,7 +56,7 @@ $(SIMPCD.EXE): $(DEP.EXE) $(OBJ.SIMPCD) $(LIB.SIMPCD)
 	$(DO.LINK.EXE)
 
 simpcdclean:
-	-$(RM) $(SIMPCD.EXE) $(OBJ.SIMPCD)
+	-$(RMDIR) $(SIMPCD.EXE) $(OBJ.SIMPCD)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/simpcd.dep

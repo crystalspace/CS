@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.walktest = Crystal Space WalkTest demo executable
+DESCRIPTION.walktest = Crystal Space WalkTest demo
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -66,7 +66,7 @@ $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) $(LIB.WALKTEST)
 	$(DO.LINK.EXE)
 
 walktestclean:
-	-$(RM) $(WALKTEST.EXE) $(OBJ.WALKTEST)
+	-$(RMDIR) $(WALKTEST.EXE) $(OBJ.WALKTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/walktest.dep

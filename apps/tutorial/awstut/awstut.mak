@@ -60,7 +60,7 @@ $(AWSTUT.EXE): $(DEP.EXE) $(OBJ.AWSTUT) $(LIB.AWSTUT)
 	$(DO.LINK.EXE)
 
 awstutclean:
-	-$(RM) $(AWSTUT.EXE) $(OBJ.AWSTUT)
+	-$(RMDIR) $(AWSTUT.EXE) $(OBJ.AWSTUT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/awstut.dep

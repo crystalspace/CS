@@ -56,7 +56,7 @@ $(TBTUT.EXE): $(DEP.EXE) $(OBJ.TBTUT) $(LIB.TBTUT)
 	$(DO.LINK.EXE)
 
 tbtutclean:
-	-$(RM) $(TBTUT.EXE) $(OBJ.TBTUT)
+	-$(RMDIR) $(TBTUT.EXE) $(OBJ.TBTUT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/tbtut.dep

@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tools/vsh
 
-VSH.EXE = vsh$(EXE)
+VSH.EXE = vsh$(EXE.CONSOLE)
 INC.VSH =
 SRC.VSH = apps/tools/vsh/vsh.cpp
 OBJ.VSH = $(addprefix $(OUT)/,$(notdir $(SRC.VSH:.cpp=$O)))
@@ -56,7 +56,7 @@ $(VSH.EXE): $(DEP.EXE) $(OBJ.VSH) $(LIB.VSH)
 	$(DO.LINK.CONSOLE.EXE)
 
 vshclean:
-	-$(RM) $(VSH.EXE) $(OBJ.VSH)
+	-$(RMDIR) $(VSH.EXE) $(OBJ.VSH)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/vsh.dep

@@ -55,6 +55,10 @@ OS_FAMILY = UNIX
 # Compiler. Can be one of: GCC, MPWERKS, VC (Visual C++), UNKNOWN
 COMP = GCC
 
+# Application wrapper support.
+NEXT.APP_DIR = .
+NEXT.APP_EXT = .app
+
 # Plug-in component support.
 NEXT.PLUGIN_DIR = components
 NEXT.PLUGIN_EXT = .csplugin
@@ -94,7 +98,10 @@ NEXT.SOURCE_PATHS = $(addprefix libs/cssys/next/,$(NEXT.SEARCH_PATH))
 # Select next config file for inclusion with install.
 TO_INSTALL.CONFIG += data/config/next.cfg
 
-# Typical extension for dynamic libraries on this system.
+# Extension for applications on this system
+EXE = $(NEXT.APP_EXT)
+
+# Extension for dynamic libraries on this system.
 DLL = $(NEXT.PLUGIN_EXT)
 
 # Extra libraries needed on this system.
@@ -200,7 +207,7 @@ OUTSUFX.yes =
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#----------------------------------------------------------------- defines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # Add support for Objective-C (.m) source code.
@@ -216,6 +223,14 @@ OBJ.CSSYS = $(addprefix $(OUT)/,$(notdir $(subst .s,$O,$(subst .c,$O,\
 
 vpath %.m  libs/cssys $(filter-out libs/cssys/general/,$(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
 vpath %.mm libs/cssys $(filter-out libs/cssys/general/,$(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
+
+# Override default method of creating a GUI application.  For Apple/NeXT, we
+# need to place the executable inside an application wrapper.
+define DO.LINK.EXE
+  sh libs/cssys/next/appwrap.sh $(NEXT.TARGET) $(notdir $(basename $@)) $(NEXT.APP_DIR) $(NEXT.APP.ICON)
+  $(NEWLIN)$(LINK) $(LFLAGS) $(LFLAGS.EXE) -o $(NEXT.APP.EXE) $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+  touch $@
+endef
 
 # Multiple -arch flags cause the compiler to barf when generating dependency
 # information, so we filter out -arch commands.  This step is performed under
@@ -277,7 +292,7 @@ ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
 
-SYSCONFIG += $(NEXT.SYSCONFIG) \
+SYSCONFIG += \
   $(NEWLINE)sh libs/cssys/next/nextconf.sh>>config.tmp
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 

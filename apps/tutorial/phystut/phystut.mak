@@ -56,7 +56,7 @@ $(PHYSTUT.EXE): $(DEP.EXE) $(OBJ.PHYSTUT) $(LIB.PHYSTUT)
 	$(DO.LINK.EXE)
 
 phystutclean:
-	-$(RM) $(PHYSTUT.EXE) $(OBJ.PHYSTUT)
+	-$(RMDIR) $(PHYSTUT.EXE) $(OBJ.PHYSTUT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/phys.dep

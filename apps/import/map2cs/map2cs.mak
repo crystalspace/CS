@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/import/map2cs
 
-MAP2CS.EXE = map2cs$(EXE)
+MAP2CS.EXE = map2cs$(EXE.CONSOLE)
 INC.MAP2CS = $(wildcard apps/import/map2cs/*.h)
 SRC.MAP2CS = $(wildcard apps/import/map2cs/*.cpp)
 OBJ.MAP2CS = $(addprefix $(OUT)/,$(notdir $(SRC.MAP2CS:.cpp=$O)))
@@ -60,7 +60,7 @@ $(MAP2CS.EXE): $(OBJ.MAP2CS) $(LIB.MAP2CS)
 	$(DO.LINK.CONSOLE.EXE)
 
 map2csclean:
-	-$(RM) $(MAP2CS.EXE) $(OBJ.MAP2CS)
+	-$(RMDIR) $(MAP2CS.EXE) $(OBJ.MAP2CS)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/map2cs.dep

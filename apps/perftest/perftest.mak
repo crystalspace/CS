@@ -55,7 +55,7 @@ $(PERFTEST.EXE): $(DEP.EXE) $(OBJ.PERFTEST) $(LIB.PERFTEST)
 	$(DO.LINK.EXE)
 
 perftestclean:
-	-$(RM) $(PERFTEST.EXE) $(OBJ.PERFTEST)
+	-$(RMDIR) $(PERFTEST.EXE) $(OBJ.PERFTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/perftest.dep

@@ -56,7 +56,7 @@ $(SIMPLE1.EXE): $(DEP.EXE) $(OBJ.SIMPLE1) $(LIB.SIMPLE1)
 	$(DO.LINK.EXE)
 
 simple1clean:
-	-$(RM) $(SIMPLE1.EXE) $(OBJ.SIMPLE1)
+	-$(RMDIR) $(SIMPLE1.EXE) $(OBJ.SIMPLE1)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/simple1.dep

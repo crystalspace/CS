@@ -57,7 +57,7 @@ $(ISOMAP.EXE): $(DEP.EXE) $(OBJ.ISOMAP) $(LIB.ISOMAP)
 	$(DO.LINK.EXE)
 
 isomapclean:
-	-$(RM) $(ISOMAP.EXE) $(OBJ.ISOMAP)
+	-$(RMDIR) $(ISOMAP.EXE) $(OBJ.ISOMAP)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/isomap.dep

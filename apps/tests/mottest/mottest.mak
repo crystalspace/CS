@@ -60,7 +60,7 @@ $(MOTTEST.EXE): $(DEP.EXE) $(OBJ.MOTTEST) $(LIB.MOTTEST)
 	$(DO.LINK.EXE)
 
 mottestclean:
-	-$(RM) $(MOTTEST.EXE) $(OBJ.MOTTEST)
+	-$(RMDIR) $(MOTTEST.EXE) $(OBJ.MOTTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/mottest.dep

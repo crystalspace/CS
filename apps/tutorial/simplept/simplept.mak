@@ -56,7 +56,7 @@ $(SIMPLEPT.EXE): $(DEP.EXE) $(OBJ.SIMPLEPT) $(LIB.SIMPLEPT)
 	$(DO.LINK.EXE)
 
 simpleptclean:
-	-$(RM) $(SIMPLEPT.EXE) $(OBJ.SIMPLEPT)
+	-$(RMDIR) $(SIMPLEPT.EXE) $(OBJ.SIMPLEPT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/simplept.dep

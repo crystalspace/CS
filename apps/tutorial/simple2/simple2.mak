@@ -56,7 +56,7 @@ $(SIMPLE2.EXE): $(DEP.EXE) $(OBJ.SIMPLE2) $(LIB.SIMPLE2)
 	$(DO.LINK.EXE)
 
 simple2clean:
-	-$(RM) $(SIMPLE2.EXE) $(OBJ.SIMPLE2)
+	-$(RMDIR) $(SIMPLE2.EXE) $(OBJ.SIMPLE2)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/simple2.dep

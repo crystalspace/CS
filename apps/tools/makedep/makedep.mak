@@ -27,7 +27,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tools/makedep
 
-MAKEDEP.EXE=makedep$(EXE)
+MAKEDEP.EXE=makedep$(EXE.CONSOLE)
 INC.MAKEDEP = $(wildcard apps/tools/makedep/*.h)
 SRC.MAKEDEP = $(wildcard apps/tools/makedep/*.cpp)
 OBJ.MAKEDEP = $(addprefix $(OUT)/,$(notdir $(SRC.MAKEDEP:.cpp=$O)))
@@ -58,7 +58,7 @@ $(MAKEDEP.EXE): $(OBJ.MAKEDEP) $(LIB.MAKEDEP)
 	$(DO.LINK.CONSOLE.EXE)
 
 makedepclean:
-	-$(RM) $(MAKEDEP.EXE) $(OBJ.MAKEDEP)
+	-$(RMDIR) $(MAKEDEP.EXE) $(OBJ.MAKEDEP)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/makedep.dep

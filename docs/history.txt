@@ -1,34 +1,53 @@
 The history order is reversed so that new features are at the top.
 
 3-Oct-2002
-	- Finalized the implementation of the indexed operations in the
-	  engine sequence manager.
-	- Started work on actually being able to pass parameters to
-	  sequences.
-	- Made sure sequences and triggers are always parsed at the end
-	  even if they are not specified at the end.
+	- Finalized the implementation of the indexed operations in the engine
+	  sequence manager.
+	- Started work on actually being able to pass parameters to sequences.
+	- Made sure sequences and triggers are always parsed at the end even if
+	  they are not specified at the end.
 	- Added parsing of <params> blocks with sequences.
 	- Completely changed the way parameters are fetched in the engine
-	  sequence manager. Added new iParameterESM interface which is
-	  a parameter resolver. Removed all indexed operation versions.
-	- Parameters in sequences now seem to work. Flarge has an example.
+	  sequence manager.  Added new iParameterESM interface which is a
+	  parameter resolver.  Removed all indexed operation versions.
+	- Parameters in sequences now seem to work.  Flarge has an example.
 	  There are still a few limitations left:
-	      - When running one sequence from another running sequence
-	        it is not possible to give parameters to that other
-		sequence. It is only possible to give parameters from
-		within a trigger. When a sequence fires another sequence
-		the parameters from that sequence are given to the other
-		sequence. This is potentially dangerous and I will fix
-		this.
-	      - Some of the operations will not work properly with
-	        parameters. More importantly the fade, move, and rotate
-		type of operations (the ones that cause a timed operation
-		will not work properly).
+	      - When running one sequence from another running sequence it is
+	        not possible to give parameters to that other sequence.  It is
+	        only possible to give parameters from within a trigger.  When a
+	        sequence fires another sequence the parameters from that
+	        sequence are given to the other sequence.  This is potentially
+	        dangerous and I will fix this.
+	      - Some of the operations will not work properly with parameters.
+	        More importantly the fade, move, and rotate type of operations
+	        (the ones that cause a timed operation will not work properly).
 	- Eric Sunshine eliminated comilation warnings.
-	- Changed the way that timed operations are created in the
-	  engine sequence manager. They are now much more optimal (only
-	  query for the object on which they operate once instead of
-	  every frame) and they also work properly with parameters now.
+	- Changed the way that timed operations are created in the engine
+	  sequence manager.  They are now much more optimal (only query for the
+	  object on which they operate once instead of every frame) and they
+	  also work properly with parameters now.
+	- Eric Sunshine upgraded the build process so that the Apple/NeXT ports
+	  now create application wrappers for generated GUI programs.  The new
+	  script CS/libs/cssys/next/appwrap.sh knows how to wrap applications
+	  for MacOS/X, MacOS/X Server (Rhapsody), OpenStep, and NextStep.
+	  Support files appropriate to each platform, such as Info.plist, are
+	  inserted into the wrapper.  Added .icns and .tiff application icons.
+	  These are also copied into the wrapper and referenced from the
+	  synthesized .plist files.  There are a couple important reasons for
+	  creating appication wrappers for the CS programs:
+	    - It allows programs to be launched from the Finder/Workspace.
+	      Without application wrappers, programs can only be launched from
+	      the command-line.  Note that you must set the user default
+	      CrystalSpaceRoot to point at the Crystal Space directory (either
+	      the installed or development directory) in order for this to work
+	      since Crystal Space programs need to be able to find their
+	      resources.
+	    - Presumably this will solve the problem on MacOS/X where CS
+	      programs can not obtain keyboard input.  Apparently, Cocoa
+	      considers programs not contained within app wrappers to be
+	      "background" programs, thus they are never allowed to have
+	      keyboard focus.  A properly formed application wrapper is
+	      reported to cure this problem.
 2-Oct-2002
 	- Cleaned up new thing smoothing code (code style, please people
 	  a tab == 8 spaces but indentation MUST be with 2 spaces!!!).

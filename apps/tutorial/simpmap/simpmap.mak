@@ -55,7 +55,7 @@ $(SIMPMAP.EXE): $(DEP.EXE) $(OBJ.SIMPMAP) $(LIB.SIMPMAP)
 	$(DO.LINK.EXE)
 
 simpmapclean:
-	-$(RM) $(SIMPMAP.EXE) $(OBJ.SIMPMAP)
+	-$(RMDIR) $(SIMPMAP.EXE) $(OBJ.SIMPMAP)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/simpmap.dep

@@ -57,7 +57,7 @@ $(ISOTEST.EXE): $(DEP.EXE) $(OBJ.ISOTEST) $(LIB.ISOTEST)
 	$(DO.LINK.EXE)
 
 isotestclean:
-	-$(RM) $(ISOTEST.EXE) $(OBJ.ISOTEST)
+	-$(RMDIR) $(ISOTEST.EXE) $(OBJ.ISOTEST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/isotest.dep

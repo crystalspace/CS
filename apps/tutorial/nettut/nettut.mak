@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tutorial/nettut
 
-NETTUT.EXE = nettut$(EXE)
+NETTUT.EXE = nettut$(EXE.CONSOLE)
 INC.NETTUT = $(wildcard apps/tutorial/nettut/*.h)
 SRC.NETTUT = $(wildcard apps/tutorial/nettut/*.cpp)
 OBJ.NETTUT = $(addprefix $(OUT)/,$(notdir $(SRC.NETTUT:.cpp=$O)))
@@ -53,10 +53,10 @@ build.nettut: $(OUTDIRS) $(NETTUT.EXE)
 clean: nettutclean
 
 $(NETTUT.EXE): $(DEP.EXE) $(OBJ.NETTUT) $(LIB.NETTUT)
-	$(DO.LINK.EXE)
+	$(DO.LINK.CONSOLE.EXE)
 
 nettutclean:
-	-$(RM) $(NETTUT.EXE) $(OBJ.NETTUT)
+	-$(RMDIR) $(NETTUT.EXE) $(OBJ.NETTUT)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/nettut.dep

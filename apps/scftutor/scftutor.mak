@@ -34,7 +34,7 @@ vpath %.cpp apps/scftutor
 DEP.SCFTUTOR = CSUTIL CSSYS CSUTIL CSGEOM
 LIB.SCFTUTOR = $(foreach d,$(DEP.SCFTUTOR),$($d.LIB))
 
-ZOO.EXE = zoo$(EXE)
+ZOO.EXE = zoo$(EXE.CONSOLE)
 INC.ZOO = $(wildcard apps/scftutor/*.h)
 SRC.ZOO = apps/scftutor/zoo.cpp apps/scftutor/frog.cpp
 OBJ.ZOO = $(addprefix $(OUT)/,$(notdir $(SRC.ZOO:.cpp=$O)))
@@ -104,7 +104,7 @@ $(WORM.DLL): $(OBJ.WORM) $(LIB.WORM)
 	$(DO.PLUGIN.POSTAMBLE)
 
 scftutclean:
-	-$(RM) $(ZOO.EXE) $(DOG.DLL) $(WORM.DLL) $(OBJ.ZOO) $(OBJ.DOG) \
+	-$(RMDIR) $(ZOO.EXE) $(DOG.DLL) $(WORM.DLL) $(OBJ.ZOO) $(OBJ.DOG) \
 	$(OBJ.WORM)
 
 ifdef DO_DEPEND

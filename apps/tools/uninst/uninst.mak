@@ -27,7 +27,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tools/uninst
 
-UNINST.EXE = uninst$(EXE)
+UNINST.EXE = uninst$(EXE.CONSOLE)
 INC.UNINST =
 SRC.UNINST = apps/tools/uninst/uninst.cpp
 OBJ.UNINST = $(addprefix $(OUT)/,$(notdir $(SRC.UNINST:.cpp=$O)))
@@ -56,7 +56,7 @@ $(UNINST.EXE): $(OBJ.UNINST) $(LIB.UNINST)
 	$(DO.LINK.CONSOLE.EXE)
 
 uninstclean:
-	-$(RM) $(UNINST.EXE) $(OBJ.UNINST)
+	-$(RMDIR) $(UNINST.EXE) $(OBJ.UNINST)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/uninst.dep

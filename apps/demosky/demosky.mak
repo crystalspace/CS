@@ -55,7 +55,7 @@ $(DEMOSKY.EXE): $(DEP.EXE) $(OBJ.DEMOSKY) $(LIB.DEMOSKY)
 	$(DO.LINK.EXE)
 
 demoskyclean:
-	-$(RM) $(DEMOSKY.EXE) $(OBJ.DEMOSKY)
+	-$(RMDIR) $(DEMOSKY.EXE) $(OBJ.DEMOSKY)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/demosky.dep

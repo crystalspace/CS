@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/import/mdl2spr
 
-MDL2SPR.EXE = mdl2spr$(EXE)
+MDL2SPR.EXE = mdl2spr$(EXE.CONSOLE)
 INC.MDL2SPR = $(wildcard apps/import/mdl2spr/*.h)
 SRC.MDL2SPR = $(wildcard apps/import/mdl2spr/*.cpp)
 OBJ.MDL2SPR = $(addprefix $(OUT)/,$(notdir $(SRC.MDL2SPR:.cpp=$O)))
@@ -56,7 +56,7 @@ $(MDL2SPR.EXE): $(OBJ.MDL2SPR) $(LIB.MDL2SPR)
 	$(DO.LINK.CONSOLE.EXE)
 
 mdl2sprclean:
-	-$(RM) $(MDL2SPR.EXE) $(OBJ.MDL2SPR)
+	-$(RMDIR) $(MDL2SPR.EXE) $(OBJ.MDL2SPR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/mdl2spr.dep

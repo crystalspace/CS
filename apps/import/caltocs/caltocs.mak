@@ -29,7 +29,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/import/caltocs
 
-CALTOCS.EXE = caltocs$(EXE)
+CALTOCS.EXE = caltocs$(EXE.CONSOLE)
 SRC.CALTOCS = $(wildcard apps/import/caltocs/*.cpp)
 OBJ.CALTOCS = $(addprefix $(OUT)/,$(notdir $(SRC.CALTOCS:.cpp=$O)))
 
@@ -55,7 +55,7 @@ $(CALTOCS.EXE): $(OBJ.CALTOCS)
 	$(DO.LINK.CONSOLE.EXE) -lcal3d -lstdc++
 
 caltocsclean:
-	-$(RM) $(CALTOCS.EXE) $(OBJ.CALTOCS)
+	-$(RMDIR) $(CALTOCS.EXE) $(OBJ.CALTOCS)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/caltocs.dep

@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/import/milk2spr
 
-MILK2SPR.EXE = milk2spr$(EXE)
+MILK2SPR.EXE = milk2spr$(EXE.CONSOLE)
 INC.MILK2SPR = $(wildcard apps/import/milk2spr/*.h)
 SRC.MILK2SPR = $(wildcard apps/import/milk2spr/*.cpp)
 OBJ.MILK2SPR = $(addprefix $(OUT)/,$(notdir $(SRC.MILK2SPR:.cpp=$O)))
@@ -56,7 +56,7 @@ $(MILK2SPR.EXE): $(OBJ.MILK2SPR) $(LIB.MILK2SPR)
 	$(DO.LINK.CONSOLE.EXE)
 
 milk2sprclean:
-	-$(RM) $(MILK2SPR.EXE) $(OBJ.MILK2SPR)
+	-$(RMDIR) $(MILK2SPR.EXE) $(OBJ.MILK2SPR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/milk2spr.dep

@@ -30,7 +30,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/tools/csfgen
 
-CSFGEN.EXE = csfgen$(EXE)
+CSFGEN.EXE = csfgen$(EXE.CONSOLE)
 INC.CSFGEN = $(wildcard apps/tools/csfgen/*.h)
 SRC.CSFGEN = $(wildcard apps/tools/csfgen/*.cpp)
 OBJ.CSFGEN = $(addprefix $(OUT)/,$(notdir $(SRC.CSFGEN:.cpp=$O)))
@@ -58,7 +58,7 @@ $(CSFGEN.EXE): $(OBJ.CSFGEN) $(LIB.CSFGEN)
 	$(DO.LINK.CONSOLE.EXE)
 
 csfgenclean:
-	-$(RM) $(CSFGEN.EXE) $(OBJ.CSFGEN)
+	-$(RMDIR) $(CSFGEN.EXE) $(OBJ.CSFGEN)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csfgen.dep
