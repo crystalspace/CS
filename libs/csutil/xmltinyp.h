@@ -208,7 +208,7 @@ public:
 class csTinyXmlDocument : public iDocument
 {
 private:
-  csRef<iDocumentNode> root;
+  TiDocument* root;
   // We keep a reference to 'sys' to avoid it being cleaned up too early.
   csRef<csTinyDocumentSystem> sys;
 

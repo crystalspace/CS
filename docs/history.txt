@@ -49,6 +49,11 @@ The history order is reversed so that new features are at the top.
 	  embedded iPolygonMesh interface now. Queries for iPolygonMesh returns
 	  the result of iObjectModel->GetPolygonMeshColldet() and also printfs
 	  a notification.
+	- res fixed a leak in the Tiny XML parser. csTinyXmlDocument kept the 
+	  root as a ref to a csTinyXmlNode, which in turn kept a ref to the 
+	  document, leading to a circular reference. Solved by keeping the 
+	  root as a pointer to the TiDocument. New csTinyXmlNodes are created
+	  when the root is requested.
 7-May-2003
 	- Eric Sunshine removed MSVC project-related variables from
 	  csjoylin.mak.  This module is Linux-specific, therefore there is no

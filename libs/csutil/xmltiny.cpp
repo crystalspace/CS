@@ -474,6 +474,7 @@ csTinyXmlDocument::csTinyXmlDocument (csTinyDocumentSystem* sys)
   SCF_CONSTRUCT_IBASE (NULL);
   csTinyXmlDocument::sys = sys;	// Increase ref.
   pool = NULL;
+  root = NULL;
 }
 
 csTinyXmlDocument::~csTinyXmlDocument ()
@@ -491,23 +492,20 @@ csTinyXmlDocument::~csTinyXmlDocument ()
 void csTinyXmlDocument::Clear ()
 {
   if (!root) return;
-  TiDocument* doc = (TiDocument*)(((csTinyXmlNode*)(iDocumentNode*)root)
-  	->GetTiNode ());
-  delete doc;
-  root = 0;
+  delete root;
+  root = NULL;
 }
 
 csRef<iDocumentNode> csTinyXmlDocument::CreateRoot ()
 {
   Clear ();
-  TiDocument* doc = new TiDocument ();
-  root = csPtr<iDocumentNode> (Alloc (doc));
-  return root;
+  root = new TiDocument ();
+  return csPtr<iDocumentNode> (Alloc (root));
 }
 
 csRef<iDocumentNode> csTinyXmlDocument::GetRoot ()
 {
-  return root;
+  return csPtr<iDocumentNode> (Alloc (root));
 }
 
 const char* csTinyXmlDocument::Parse (iFile* file)
@@ -546,11 +544,9 @@ const char* csTinyXmlDocument::Parse (iString* str)
 const char* csTinyXmlDocument::Parse (const char* buf)
 {
   CreateRoot ();
-  TiDocument* doc = (TiDocument*)(((csTinyXmlNode*)(iDocumentNode*)root)
-  	->GetTiNode ());
-  doc->Parse (doc, buf);
-  if (doc->Error ())
-    return doc->ErrorDesc ();
+  root->Parse (root, buf);
+  if (root->Error ())
+    return root->ErrorDesc ();
   return NULL;
 }
 
