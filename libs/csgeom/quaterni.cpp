@@ -59,10 +59,8 @@ csQuaternion csQuaternion::ToAxisAngle() const
 
 	tr = (float)acos(r);
 	invscale = 1.0f / ((float)sin(tr));
-	return csQuaternion(x * invscale,
-											y * invscale,
-                      z * invscale,
-                      tr * (float)QUATTOAXISANGLECONST);
+	return csQuaternion(tr * (float)QUATTOAXISANGLECONST, 
+                            x * invscale, y * invscale, z * invscale);
 }
 
 
@@ -91,18 +89,18 @@ csQuaternion csQuaternion::Slerp(const csQuaternion &quat2, float slerp) const
 			scale0 = 1.0 - slerp;
 			scale1 = slerp;
 		}
-		return csQuaternion(scale0 * x + scale1 * quat2.x,
-												scale0 * y + scale1 * quat2.y,
-												scale0 * z + scale1 * quat2.z,
-												scale0 * r + scale1 * quat2.r);
+		return csQuaternion(scale0 * r + scale1 * quat2.r, 
+                                    scale0 * x + scale1 * quat2.x, 
+                                    scale0 * y + scale1 * quat2.y, 
+                                    scale0 * z + scale1 * quat2.z);
 	}
 	// The quaternions are nearly opposite so to avoid a divided by zero error
 	// Calculate a perpendicular quaternion and slerp that direction
 	scale0 = sin((1.0 - slerp) * (float)M_PI_2);
 	scale1 = sin(slerp * (float)M_PI_2);
-	return csQuaternion(scale0 * x + scale1 * -quat2.y,
-											scale0 * y + scale1 * quat2.x,
-											scale0 * z + scale1 * -quat2.r,
-											scale0 * r + scale1 * quat2.z);
+	return csQuaternion(scale0 * r + scale1 * quat2.z, 
+                            scale0 * x + scale1 * -quat2.y, 
+                            scale0 * y + scale1 * quat2.x, 
+                            scale0 * z + scale1 * -quat2.r);
 }
 
