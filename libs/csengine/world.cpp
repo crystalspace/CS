@@ -224,7 +224,6 @@ csWorld::~csWorld ()
   if (HaloRast) HaloRast->DecRef ();
   if (G3D) G3D->DecRef ();
   if (VFS) VFS->DecRef ();
-  if (System) System->DecRef ();
   if (textures)
     CHKB (delete textures);
   CHK (delete render_pol2d_pool);
@@ -241,7 +240,6 @@ csWorld::~csWorld ()
 bool csWorld::Initialize (iSystem* sys)
 {
   System = sys;
-  System->IncRef ();
 
   if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
     return false;
