@@ -72,11 +72,6 @@ public:
   /**
    * Get the number of vertices.
    */
-  int GetVertexCount () { return num_vertices; }
-
-  /**
-   * Get the number of vertices.
-   */
   int GetVertexCount () const { return num_vertices; }
 
   /**
