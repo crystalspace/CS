@@ -41,11 +41,11 @@ public:
    * <ul>
    * <li> When an iConfigFile is added via AddDomain(name, vfs), the
    *      configuration manager first looks through all registered iConfigFile
-   *      objects. If an object with the same * name and VFS pointer are found,
-   *      it is added a second time, so the file is * not loaded twice.
+   *      objects. If an object with the same name and VFS pointer are found,
+   *      it is added a second time, so the file is not loaded twice.
    * <li> When an iConfigFile is removed, the configuration manager keeps a
-   *      reference * to it until Flush() is called. If you add the iConfigFile
-   *      again in the meantime * with AddDomain(name, vfs), this reference is
+   *      reference to it until Flush() is called. If you add the iConfigFile
+   *      again in the meantime with AddDomain(name, vfs), this reference is
    *      used instead.
    * </ul>
    */
