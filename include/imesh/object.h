@@ -85,7 +85,11 @@ struct iMeshObjectDrawCallback : public iBase
 SCF_VERSION (iMeshObject, 0, 0, 19);
 
 /**
- * This is a general mesh object that the engine can interact with.
+ * This is a general mesh object that the engine can interact with. The mesh
+ * object only manages its shape, texture etc. but *not* its position, sector
+ * or similar information. For this reason, a mesh object can only be used
+ * in the engine if a hook object is created for it in the engine that does
+ * the required management. The hook object is called mesh wrapper.
  */
 struct iMeshObject : public iBase
 {
@@ -258,7 +262,10 @@ SCF_VERSION (iMeshObjectFactory, 0, 0, 4);
  * mesh objects of a certain type. For example, if you want to have
  * multiple sets of sprites from the same sprite template then
  * you should have an instance of iMeshObjectFactory for evey sprite
- * template and an instance of iMeshObject for every sprite.
+ * template and an instance of iMeshObject for every sprite. <p>
+ *
+ * To use a mesh factory in the engine, you have to create a mesh factory
+ * wrapper for it.
  */
 struct iMeshObjectFactory : public iBase
 {

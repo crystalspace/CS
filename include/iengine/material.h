@@ -30,9 +30,11 @@ struct iObject;
 SCF_VERSION (iMaterialWrapper, 0, 0, 4);
 
 /**
- * This class represents a material wrapper which holds
- * the mapping between a material in the engine and a material
- * in the 3D rasterizer.
+ * A material wrapper is an engine-level object that wraps around an actual
+ * material (iMaterialHandle). Every material in the engine is represented
+ * by a material wrapper, which keeps the pointer to the material handle, its
+ * name, and possibly the base material object that was registered to create
+ * the material handle.
  */
 struct iMaterialWrapper : public iBase
 {

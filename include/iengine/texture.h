@@ -42,9 +42,10 @@ struct iTextureCallback : public iBase
 SCF_VERSION (iTextureWrapper, 0, 0, 4);
 
 /**
- * This class represents a texture wrapper which holds
- * the mapping between a texture in the engine and a texture
- * in the 3D rasterizer.
+ * A texture wrapper is an engine-level object that wraps around an actual
+ * texture (iTextureHandle). Every texture in the engine is represented
+ * by a texture wrapper, which keeps the pointer to the texture handle, its
+ * name, and possibly the base image object.
  */
 struct iTextureWrapper : public iBase
 {

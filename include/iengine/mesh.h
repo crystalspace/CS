@@ -116,8 +116,16 @@ struct iMeshDrawCallback : public iBase
 SCF_VERSION (iMeshWrapper, 0, 1, 17);
 
 /**
- * This interface corresponds to the object in the engine
- * that holds reference to the real iMeshObject.
+ * A mesh wrapper is an engine-level object that wraps around an actual
+ * mesh object (iMeshObject). Every mesh object in the engine is represented
+ * by a mesh wrapper, which keeps the pointer to the mesh object, its position,
+ * its name, etc. <p>
+ *
+ * Think of the mesh wrapper as the hook that holds the mesh object in the
+ * engine. An effect of this is that the i???State interfaces (e.g.
+ * iSprite3DState) must be queried from the mesh *objects*, not the wrappers! <p>
+ *
+ * Note that a mesh object should never be contained in more than one wrapper.
  */
 struct iMeshWrapper : public iBase
 {
@@ -324,8 +332,15 @@ struct iMeshWrapper : public iBase
 SCF_VERSION (iMeshFactoryWrapper, 0, 1, 6);
 
 /**
- * This interface corresponds to the object in the engine
- * that holds reference to the real iMeshObjectFactory.
+ * A mesh factory wrapper is an engine-level object that wraps around a
+ * mesh object factory (iMeshObjectFactory). Every mesh object factory in
+ * the engine is represented by a mesh factory wrapper, which keeps the
+ * pointer to the mesh factory, its name, etc. <p>
+ *
+ * Think of the mesh factory wrapper as the hook that holds the mesh
+ * factory in the engine. An effect of this is that the i???FactoryState
+ * interfaces (e.g. iSprite3DFactoryState) must be queried from the mesh
+ * *factories*, not the wrappers!
  */
 struct iMeshFactoryWrapper : public iBase
 {
