@@ -50,7 +50,7 @@ protected:
 
     static int CompareEvent (mlEvent* const& Item, iEvent* const& Key)
     {
-      return Item->inputDef.Compare (Key);
+      return Item->inputDef.Compare (csInputDefinition (Key));
     }
 
     static csArrayCmp<mlEvent*,iEvent*> EventCmp(iEvent* e)
