@@ -182,11 +182,12 @@ lineloop:
 	dec ecx
 	jnz NEAR lineloop
 	lea eax, [eax+4*ebp]		; skip next line
+	lea edx, [edx+ebp]		; skip next line
 	DEC DWORD %$height
 	DEC DWORD %$height
 	jnz NEAR newline
 	emms
-
+         				
 	pop ebp				
 	endproc yuv2rgba_mmx
 
