@@ -46,15 +46,15 @@ public:
   DECLARE_IBASE;
 
   //
-  csSoundDataWave(iBase *);
+  csSoundDataWave(iBase *iParent);
   //
-  ~csSoundDataWave();
+  virtual ~csSoundDataWave();
 
   // delete all stored data
   void Cleanup();
 
   // store the raw data. The sound data will delete this buffer
-  void Initialize(int frequency, int Bits, int Channels, long numsmp, void *data);
+  void Initialize(int frequency, int Bits, int Channels, long numsmp, unsigned char *data);
 
   // prepare the sound
   void Prepare(const csSoundFormat *RequestFormat);
@@ -74,7 +74,7 @@ private:
   // format descriptor for prepared sound
   csSoundFormat Format;
   // prepared data for mono output
-  void *Data;
+  unsigned char *Data;
 };
 
 class csSoundStreamWave : public iSoundStream {

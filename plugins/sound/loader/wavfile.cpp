@@ -129,7 +129,7 @@ iSoundData *csSoundLoader_WAV::Load(UByte* buf, ULong size,
     wavhdr.bits_per_sample,
     wavhdr.channel,
     (wavhdr.bits_per_sample==16)?(wavchk.len/2)-1:wavchk.len-1,
-    data);
+    (unsigned char*)data);
   sb->Prepare(fmt);
 
   goto exit_ok;

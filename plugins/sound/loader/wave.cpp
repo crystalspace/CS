@@ -26,8 +26,8 @@ IMPLEMENT_IBASE(csSoundDataWave)
   IMPLEMENTS_INTERFACE(iSoundData)
 IMPLEMENT_IBASE_END
 
-csSoundDataWave::csSoundDataWave(iBase *scfParent) {
-  CONSTRUCT_IBASE(scfParent);
+csSoundDataWave::csSoundDataWave(iBase *iParent) {
+  CONSTRUCT_IBASE(iParent);
   Data=NULL;
 }
 
@@ -40,7 +40,7 @@ void csSoundDataWave::Cleanup() {
   Data=NULL;
 }
 
-void csSoundDataWave::Initialize(int frequency, int bits, int channels, long numsmp, void *data)
+void csSoundDataWave::Initialize(int frequency, int bits, int channels, long numsmp, unsigned char *data)
 {
   Cleanup();
 
@@ -77,14 +77,14 @@ unsigned long csSoundDataWave::GetNumSamples() {
       NewData[i]=(OldData[2*i]+OldData[2*i+1])/2;   \
     }                                               \
     delete[] OldData;                               \
-    Data=NewData;                                   \
+    Data=(unsigned char*)NewData;                   \
   } else {                                          \
     Type *NewData=new Type[NumSamples*2];           \
     for (unsigned long i=0;i<NumSamples;i++) {      \
       NewData[2*i]=NewData[2*i+1]=OldData[i];       \
     }                                               \
     delete[] OldData;                               \
-    Data=NewData;                                   \
+    Data=(unsigned char*)NewData;                   \
   }                                                 \
 }
 
@@ -118,7 +118,7 @@ void csSoundDataWave::ConvertChannels(int Channels) {
     }                                                           \
   }                                                             \
   delete[] OldData;                                             \
-  Data=NewData;                                                 \
+  Data=(unsigned char*)NewData;                                 \
   NumSamples=NewNumSamples;                                     \
 }
 
@@ -136,7 +136,7 @@ void csSoundDataWave::ConvertFreq(int NewFreq) {
 void *ConvertBuffer8To16Bit(void *buf, unsigned long Num) {
   unsigned char *in=(unsigned char *)buf;
   short *out=new short[Num];
-  for (long i=0;i<Num;i++) {
+  for (unsigned long i=0;i<Num;i++) {
     out[i]=((short)in[i]-128)*256;
   }
   return out;
@@ -145,7 +145,7 @@ void *ConvertBuffer8To16Bit(void *buf, unsigned long Num) {
 void *ConvertBuffer16To8Bit(void *buf, unsigned long Num) {
   short *in=(short *)buf;
   unsigned char *out=new unsigned char[Num];
-  for (long i=0;i<Num;i++) {
+  for (unsigned long i=0;i<Num;i++) {
     out[i]=(in[i]/256)+128;
   }
   return out;
@@ -158,7 +158,7 @@ void csSoundDataWave::ConvertBits(int Bits) {
   else Proc=ConvertBuffer16To8Bit;
   void *d=Proc(Data,NumSamples*Format.Channels);
   delete[] Data;
-  Data=d;
+  Data=(unsigned char*)d;
   Format.Bits=Bits;
 }
 

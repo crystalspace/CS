@@ -145,7 +145,7 @@ iSoundData* csSoundLoader_AU::Load(UByte* buf, ULong size,
     (flag==BIT16 || flag==BIT8ULAW)?16:8,
     nchannels,
     (flag==BIT16)?(nbytes/2)-1:nbytes-1,
-    data);
+    (unsigned char*)data);
   sb->Prepare(fmt);
 
   goto exit_ok;

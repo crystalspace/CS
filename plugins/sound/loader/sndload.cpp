@@ -31,10 +31,10 @@ public:
   DECLARE_IBASE;
 
   /// constructor
-  csSoundLoader(iBase *scfParent);
+  csSoundLoader(iBase *iParent);
 
   /// destructor
-  ~csSoundLoader();
+  virtual ~csSoundLoader();
 
   /// Initialize the Sound Loader.
   virtual bool Initialize (iSystem *sys);
@@ -47,20 +47,13 @@ public:
   void RegisterFormatLoader(csSoundFormatLoader *Loader);
 };
 
-IMPLEMENT_FACTORY(csSoundLoader);
-
-EXPORT_CLASS_TABLE (sndload)
-EXPORT_CLASS (csSoundLoader, "crystalspace.sound.loader",
-    "Sound Loader plug-in")
-EXPORT_CLASS_TABLE_END;
-
 IMPLEMENT_IBASE(csSoundLoader)
   IMPLEMENTS_INTERFACE(iSoundLoader)
   IMPLEMENTS_INTERFACE(iPlugIn)
 IMPLEMENT_IBASE_END;
 
-csSoundLoader::csSoundLoader(iBase *scfParent) {
-  CONSTRUCT_IBASE(scfParent);
+csSoundLoader::csSoundLoader(iBase *iParent) {
+  CONSTRUCT_IBASE(iParent);
 }
 
 csSoundLoader::~csSoundLoader() {
@@ -71,6 +64,7 @@ csSoundLoader::~csSoundLoader() {
 }
 
 bool csSoundLoader::Initialize(iSystem *sys) {
+  (void)sys;
 #ifdef DO_AIFF
   RegisterFormatLoader(new csSoundLoader_AIFF());
 #endif
@@ -122,3 +116,11 @@ short int csSndFunc::ulaw2linear(unsigned char ulawbyte)
   if (sign != 0) sample = -sample;
   return(sample);
 }
+
+IMPLEMENT_FACTORY(csSoundLoader);
+
+EXPORT_CLASS_TABLE (sndload)
+EXPORT_CLASS (csSoundLoader, "crystalspace.sound.loader",
+    "Sound Loader plug-in")
+EXPORT_CLASS_TABLE_END;
+

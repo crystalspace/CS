@@ -137,7 +137,7 @@ iSoundData* csSoundLoader_IFF::Load(UByte* buf, ULong size,
   if(data==NULL) goto exit_read;
 
   sb = new csSoundDataWave(NULL);
-  sb->Initialize(freq, 8, 1, samples_size, data);
+  sb->Initialize(freq, 8, 1, samples_size, (unsigned char*)data);
   sb->Prepare(fmt);
 
   goto exit_ok;

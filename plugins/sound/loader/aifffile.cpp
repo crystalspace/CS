@@ -173,7 +173,7 @@ iSoundData *csSoundLoader_AIFF::Load(UByte* buf, ULong size,
     (flag==BIT16)?16:8,
     nchannels,
     (flag==BIT16)?samples_size/2:samples_size,
-    data);
+    (unsigned char*)data);
   sb->Prepare(fmt);
 
   goto exit_ok;
