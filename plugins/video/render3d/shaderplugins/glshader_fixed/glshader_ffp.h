@@ -23,12 +23,15 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 #include "imap/services.h"
 
+class csGLShader_FIXED;
+
 class csGLShaderFFP : public iShaderProgram
 {
 private:
   csRef<iGraphics3D> g3d;
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
+  csGLShader_FIXED* shaderPlug;
 
   /// Parser for common stuff like MixModes, vectors, matrices, ...
   csRef<iSyntaxService> SyntaxService;
@@ -126,6 +129,8 @@ private:
   //maximum number of layers
   int maxlayers;
 
+  void Report (int severity, const char* msg, ...);
+
   void UpdateValid();
   
   bool LoadLayer(mtexlayer* layer, iDocumentNode* node);
@@ -133,7 +138,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csGLShaderFFP(iObjectRegistry* objreg, csGLExtensionManager* ext);
+  csGLShaderFFP(csGLShader_FIXED* shaderPlug);
 
   virtual ~csGLShaderFFP ()
   {

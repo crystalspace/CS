@@ -70,6 +70,13 @@ chronological order.
 	- Eric Sunshine renamed csArray<T>::Iterator::Return() to Reset() to
 	  match the name Marten specified in his CVS log message when he added
 	  the method (also because Reset is a more sensible name than Return).
+        - res made the following changes:
+            - glshader_fixed now reports the number of available texture 
+              units.
+            - Added some helper #defines to deal with CS_VATTRIB ids.
+            - Added a technique to do dot3 lighting in a single pass.
+            - Added a new 'srcalphaadd' blending mode, needed for single pass
+              dot3.
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer

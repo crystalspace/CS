@@ -68,6 +68,15 @@ csGLShader_FIXED::~csGLShader_FIXED()
 
 }
 
+void csGLShader_FIXED::Report (int severity, const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csReportV (object_reg, severity, "crystalspace.graphics3d.shader.fixed", 
+    msg, args);
+  va_end (args);
+}
+
 ////////////////////////////////////////////////////////////////////
 //                      iShaderProgramPlugin
 ////////////////////////////////////////////////////////////////////
@@ -85,12 +94,14 @@ bool csGLShader_FIXED::SupportType(const char* type)
 csPtr<iShaderProgram> csGLShader_FIXED::CreateProgram(const char* type)
 {
   if( strcasecmp(type, "gl_fixed_fp") == 0)
-    return csPtr<iShaderProgram>(new csGLShaderFFP(object_reg, ext));
+    return csPtr<iShaderProgram>(new csGLShaderFFP(this));
   else if( strcasecmp(type, "gl_fixed_vp") == 0)
     return csPtr<iShaderProgram>(new csGLShaderFVP(object_reg, ext));
   else
     return 0;
 }
+
+#define FUNNY_TEXTURE_UNIT_COUNT
 
 void csGLShader_FIXED::Open()
 {
@@ -106,14 +117,53 @@ void csGLShader_FIXED::Open()
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
     f->QueryClassID ()) == 0)
     enable = true;
+
+  glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
+
+#ifdef FUNNY_TEXTURE_UNIT_COUNT
+  const char* descr = 0;
+  if (texUnits <= 0)
+  {
+    descr = "unbelievable";
+  }
+  else if (texUnits <= 2)
+  {
+    descr = "puny";
+  }
+  else if (texUnits <= 4)
+  {
+    descr = "moderate";
+  }
+  else if (texUnits <= 6)
+  {
+    descr = "acceptable";
+  }
+  else if (texUnits <= 8)
+  {
+    descr = "whopping";
+  }
+  else 
+  {
+    descr = "unseen before";
+  }
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Texture units: %s %d", descr, texUnits);
+#else
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Texture units: %d", texUnits);
+#endif
 }
 
 csPtr<iString> csGLShader_FIXED::GetProgramID(const char* programstring)
 {
-  csMD5::Digest d = csMD5::Encode(programstring);
+  csMD5::Digest digest = csMD5::Encode (programstring);
   scfString* str = new scfString();
-  str->Append((const char*)d.data[0], 16);
-  return csPtr<iString>(str);
+  str->Format (
+    "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+    digest.data[0], digest.data[1], digest.data[2], digest.data[3],
+    digest.data[4], digest.data[5], digest.data[6], digest.data[7],
+    digest.data[8], digest.data[9], digest.data[10], digest.data[11],
+    digest.data[12], digest.data[13], digest.data[14], digest.data[15]);
+
+  return csPtr<iString> (str);
 }
 
 ////////////////////////////////////////////////////////////////////

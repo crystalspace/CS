@@ -42,6 +42,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "video/canvas/openglcommon/glstates.h"
 
 #include "glshader_ffp.h"
+#include "glshader_fixed.h"
 
 
 ////////////////////////////////////////////////////////////////////
@@ -52,16 +53,26 @@ SCF_IMPLEMENT_IBASE(csGLShaderFFP)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
-csGLShaderFFP::csGLShaderFFP(iObjectRegistry* objreg, csGLExtensionManager* ext)
+csGLShaderFFP::csGLShaderFFP(csGLShader_FIXED* shaderPlug)
 {
   SCF_CONSTRUCT_IBASE (0);
 
-  object_reg = objreg;
-  csGLShaderFFP::ext = ext;
+  csGLShaderFFP::shaderPlug = shaderPlug;
+  object_reg = shaderPlug->object_reg;
+  ext = shaderPlug->ext;
   programstring = 0;
   validProgram = true;
 
   SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+}
+
+void csGLShaderFFP::Report (int severity, const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csReportV (object_reg, severity, "crystalspace.graphics3d.shader.fixed.fp", 
+    msg, args);
+  va_end (args);
 }
 
 void csGLShaderFFP::BuildTokenHash()
@@ -239,8 +250,7 @@ bool csGLShaderFFP::Load(iDataBuffer* program)
   const char* error = doc->Parse (program);
   if (error != 0)
   { 
-    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, 
-      "crystalspace.graphics3d.shader.fixed", "Document error '%s'!", error);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Document error '%s'!", error);
     return false;
   }
   return Load(doc->GetRoot());
@@ -248,7 +258,7 @@ bool csGLShaderFFP::Load(iDataBuffer* program)
 
 bool csGLShaderFFP::Prepare()
 {
-  glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &maxlayers);
+  maxlayers = shaderPlug->texUnits;
 
   //get a statecache
   csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
@@ -259,7 +269,7 @@ bool csGLShaderFFP::Prepare()
   csRef<iShaderRenderInterface> sri = 
     SCF_QUERY_INTERFACE (g3d, iShaderRenderInterface);
 
-  ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
+  ext = (csGLExtensionManager*) sri->GetPrivateObject ("ext");
 
   if (texlayers.Length () > maxlayers)
     return false;
@@ -337,10 +347,16 @@ void csGLShaderFFP::ResetState ()
 {
 }
 
-csPtr<iString> csGLShaderFFP::GetProgramID()
+csPtr<iString> csGLShaderFFP::GetProgramID ()
 {
-  csMD5::Digest d = csMD5::Encode(programstring);
+  csMD5::Digest digest = csMD5::Encode (programstring);
   scfString* str = new scfString();
-  str->Append((const char*)d.data[0], 16);
-  return csPtr<iString>(str);
+  str->Format (
+    "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+    digest.data[0], digest.data[1], digest.data[2], digest.data[3],
+    digest.data[4], digest.data[5], digest.data[6], digest.data[7],
+    digest.data[8], digest.data[9], digest.data[10], digest.data[11],
+    digest.data[12], digest.data[13], digest.data[14], digest.data[15]);
+
+  return csPtr<iString> (str);
 }

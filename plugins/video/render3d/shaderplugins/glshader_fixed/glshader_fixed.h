@@ -24,11 +24,14 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 class csGLShader_FIXED : public iShaderProgramPlugin
 {
-private:
+public:
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 
   bool enable;
+  int texUnits;
+
+  void Report (int severity, const char* msg, ...);
 public:
   SCF_DECLARE_IBASE;
   

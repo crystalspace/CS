@@ -271,6 +271,10 @@ void csGLGraphics3D::SetMixMode (uint mode)
       // Color = DEST + DestAlpha * SRC
       statecache->SetBlendFunc (GL_DST_ALPHA, GL_ONE);
       break;
+    case CS_FX_SRCALPHAADD:
+      // Color = DEST + SrcAlpha * SRC
+      statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE);
+      break;
     case CS_FX_ALPHA:
       // Color = Alpha * DEST + (1-Alpha) * SRC
       statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -621,9 +625,6 @@ void csGLGraphics3D::ApplyObjectToCamera ()
   //glTranslatef (-translation.x, -translation.y, -translation.z);
 }
 
-
-
-
 ////////////////////////////////////////////////////////////////////
 // iGraphics3D
 ////////////////////////////////////////////////////////////////////
@@ -634,18 +635,21 @@ void FillNormalizationMapSide (unsigned char *normdata, int size,
                           int yx, int yy, int yo,
                           int zx, int zy, int zo)
 {
-  for (int y=0; y<size; y++)
+  const float halfSize = size / 2;
+  for (int y=0; y < size; y++)
   {
-    float yv = (y-size/2+0.5)/(float)(size/2);
-    for (int x=0; x<size; x++)
+    float yv = (y + 0.5) / halfSize - 1.0f;
+    for (int x=0; x < size; x++)
     {
-      float xv = (x-size/2+0.5)/(float)(size/2);
+      float xv = (x + 0.5) / halfSize - 1.0f;
       csVector3 norm = csVector3 (
-        xo+xv*xx+yv*xy, yo+xv*yx+yv*yy, zo+xv*zx+yv*zy);
+        xo + xv*xx + yv*xy, 
+        yo + xv*yx + yv*yy, 
+        zo + xv*zx + yv*zy);
       norm.Normalize ();
-      *normdata++ = 127.5+norm.x*127.5;
-      *normdata++ = 127.5+norm.y*127.5;
-      *normdata++ = 127.5+norm.z*127.5;
+      *normdata++ = 127.5f + norm.x*127.5f;
+      *normdata++ = 127.5f + norm.y*127.5f;
+      *normdata++ = 127.5f + norm.z*127.5f;
       *normdata++ = 0;
     }
   }
@@ -1127,18 +1131,18 @@ const csReversibleTransform& csGLGraphics3D::GetObjectToCamera()
   return object2camera;
 }
 
-void csGLGraphics3D::SetObjectToCamera(csReversibleTransform* wvmatrix)
+void csGLGraphics3D::SetObjectToCamera (csReversibleTransform* object2cam)
 {
   const csMatrix3 &orientation1 = object2camera.GetO2T();
   const csVector3 &translation1 = object2camera.GetO2TTranslation();
-  const csMatrix3 &orientation2 = wvmatrix->GetO2T();
-  const csVector3 &translation2 = wvmatrix->GetO2TTranslation();
+  const csMatrix3 &orientation2 = object2cam->GetO2T();
+  const csVector3 &translation2 = object2cam->GetO2TTranslation();
   if (translation1 == translation2 &&
       orientation1.Col1 () == orientation2.Col1 () &&
       orientation1.Col2 () == orientation2.Col2 () &&
       orientation1.Col3 () == orientation2.Col3 ())
       return;
-  object2camera = *wvmatrix;
+  object2camera = *object2cam;
   ApplyObjectToCamera ();
 }
 
@@ -1534,7 +1538,7 @@ void csGLGraphics3D::DrawMesh(csRenderMesh* mymesh)
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane);*/
 
-  // @@@ maybe GL can do this for us? or in the VPs, maybe?
+  //SetObjectToCamera (&mymesh->object2camera);
   SetObjectToCamera (mymesh->transform);
 
   GLenum primitivetype;
@@ -1546,6 +1550,7 @@ void csGLGraphics3D::DrawMesh(csRenderMesh* mymesh)
   case CS_MESHTYPE_TRIANGLESTRIP:
     primitivetype = GL_TRIANGLE_STRIP;
     break;
+  //case CS_MESHTYPE_POLYGON:
   case CS_MESHTYPE_TRIANGLEFAN:
     primitivetype = GL_TRIANGLE_FAN;
     break;
@@ -1624,12 +1629,32 @@ void csGLGraphics3D::DrawMesh(csRenderMesh* mymesh)
     }
 
     glColor4f (1, 1, 1, 1);
-    glDrawElements (
-      primitivetype,
-      mymesh->indexend - mymesh->indexstart,
-      indexbuf->compGLType,
-      ((uint8*)bufData) +
-      	(indexbuf->compcount * indexbuf->compSize * mymesh->indexstart));
+/*    if (mymesh->meshtype == CS_MESHTYPE_POLYGON)
+    {
+      const int indexSize = indexbuf->compcount * indexbuf->compSize;
+      int indexPos = mymesh->indexstart;
+      int p = 0;
+      while (indexPos < mymesh->indexend)
+      {
+        int vc = mymesh->polyNumVerts[p++];
+        glDrawElements (
+          GL_TRIANGLE_FAN,
+          vc,
+          indexbuf->compGLType,
+          ((uint8*)bufData) +
+      	    (indexSize * indexPos));
+        indexPos += vc;
+      }
+    }
+    else*/
+    {
+      glDrawElements (
+        primitivetype,
+        mymesh->indexend - mymesh->indexstart,
+        indexbuf->compGLType,
+        ((uint8*)bufData) +
+      	  (indexbuf->compcount * indexbuf->compSize * mymesh->indexstart));
+    }
 
     indexbuf->Release();
   }

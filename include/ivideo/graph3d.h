@@ -1,4 +1,4 @@
-  /*
+/*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
     Written by Jorrit Tyberghein, Dan Ogles, and Gary Clark.
 
@@ -154,6 +154,18 @@ enum csZBufMode
   CS_ZBUF_INVERT   = 0x00000006
 };
 
+// @@@ Keep in sync with values below
+// @@@ Document me better!
+#define CS_VATTRIB_GENERIC_FIRST     0
+#define CS_VATTRIB_GENERIC_LAST     15
+#define CS_VATTRIB_SPECIFIC_FIRST  100
+#define CS_VATTRIB_SPECIFIC_LAST   111
+
+#define CS_VATTRIB_IS_GENERIC(va)   \
+  ((va >= CS_VATTRIB_GENERIC_FIRST) && (va <=CS_VATTRIB_GENERIC_LAST))
+#define CS_VATTRIB_IS_SPECIFIC(va)   \
+  ((va >= CS_VATTRIB_SPECIFIC_FIRST) && (va <=CS_VATTRIB_SPECIFIC_LAST))
+
 /**
  * For NR:
  * Vertex attributes.
@@ -177,18 +189,18 @@ enum csVertexAttrib
   CS_VATTRIB_13 = 13,
   CS_VATTRIB_14 = 14,
   CS_VATTRIB_15 = 15,
-  CS_VATTRIB_POSITION = 100,
-  CS_VATTRIB_WEIGHT = 101,
-  CS_VATTRIB_NORMAL = 102,
-  CS_VATTRIB_COLOR = 103,
-  CS_VATTRIB_PRIMARY_COLOR = 103,
-  CS_VATTRIB_SECONDARY_COLOR = 104,
-  CS_VATTRIB_FOGCOORD = 105,
-  CS_VATTRIB_TEXCOORD = 108,
-  CS_VATTRIB_TEXCOORD0 = 108,
-  CS_VATTRIB_TEXCOORD1 = 109,
-  CS_VATTRIB_TEXCOORD2 = 110,
-  CS_VATTRIB_TEXCOORD3 = 111
+  CS_VATTRIB_POSITION = CS_VATTRIB_SPECIFIC_FIRST + 0,
+  CS_VATTRIB_WEIGHT = CS_VATTRIB_SPECIFIC_FIRST + 1,
+  CS_VATTRIB_NORMAL = CS_VATTRIB_SPECIFIC_FIRST + 2,
+  CS_VATTRIB_COLOR = CS_VATTRIB_SPECIFIC_FIRST + 3,
+  CS_VATTRIB_PRIMARY_COLOR = CS_VATTRIB_SPECIFIC_FIRST + 3,
+  CS_VATTRIB_SECONDARY_COLOR = CS_VATTRIB_SPECIFIC_FIRST + 4,
+  CS_VATTRIB_FOGCOORD = CS_VATTRIB_SPECIFIC_FIRST + 5,
+  CS_VATTRIB_TEXCOORD = CS_VATTRIB_SPECIFIC_FIRST + 8,
+  CS_VATTRIB_TEXCOORD0 = CS_VATTRIB_SPECIFIC_FIRST + 8,
+  CS_VATTRIB_TEXCOORD1 = CS_VATTRIB_SPECIFIC_FIRST + 9,
+  CS_VATTRIB_TEXCOORD2 = CS_VATTRIB_SPECIFIC_FIRST + 10,
+  CS_VATTRIB_TEXCOORD3 = CS_VATTRIB_SPECIFIC_FIRST + 11
 };
 
 /// 
@@ -218,6 +230,8 @@ enum G3D_FOGMETHOD
 #define CS_FX_TRANSPARENT  0x50000000 
 /// =(dstalpha)*SRC + DST
 #define CS_FX_DESTALPHAADD 0x60000000 
+/// =(srcalpha)*SRC + DST
+#define CS_FX_SRCALPHAADD  0x70000000 
 /// color 0 is transparent
 #define CS_FX_KEYCOLOR     0x08000000 
 /// Gouraud shading
@@ -621,16 +635,16 @@ struct iGraphics3D : public iBase
   virtual float GetPerspectiveAspect () const = 0;
 
   /**
-   * Set world to camera transformation (currently only used by
+   * Set object to camera transformation (currently only used by
    * DrawTriangleMesh and DrawPolygonMesh).
    */
   virtual void SetObjectToCamera (csReversibleTransform* o2c) = 0;
 
   /**
-   * Get world to camera transformation.
+   * Get object to camera transformation.
    */
   virtual const csReversibleTransform& GetObjectToCamera () = 0;
-
+  
   /**
    * Set the target of rendering. If this is 0 then the target will
    * be the main screen. Otherwise it is a texture. After calling
