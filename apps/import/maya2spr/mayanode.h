@@ -22,20 +22,11 @@
 #ifndef MAYANODE_H
 #define MAYANODE_H
 
-#include <csutil/csdllist.h>
-
+#include <csutil/array.h>
 #include <csgeom/vector3.h>
 #include <ivideo/graph3d.h>
 
 #include "mayafile.h"
-
-struct Animation
-{
-    int startframe;
-    csString name;
-    int duration;
-    csDLinkList /* <DisplacementFrame> */ displacements;
-};
 
 struct DisplacementGroup
 {
@@ -44,15 +35,21 @@ struct DisplacementGroup
     int stopframe;
 };
 
+struct Animation
+{
+    int startframe;
+    csString name;
+    int duration;
+    csArray<DisplacementGroup> displacements;
+};
+
 class DAGNode
 {
 protected:
-
     csString name;
     csString parentname;
     DAGNode *parentnode;
-    csDLinkList /* <DAGNode> */ children;
-
+    csArray<DAGNode*> children;
 
     void PrintSpaces(FILE *s,int level)
     {
@@ -75,7 +72,7 @@ public:
     DAGNode *Find(const char *)            { return NULL; };
     void AddChild(DAGNode *child)
     {
-        children.AddItem(child);
+        children.Push (child);
         child->SetParentNode(this);
         child->SetParentName(name);
     };

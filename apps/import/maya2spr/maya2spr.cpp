@@ -31,8 +31,8 @@
 CS_IMPLEMENT_APPLICATION
 
 
-csDLinkList /* <Animation> */ anims;
-csDLinkList /* <Animation> */ sockets;
+csArray<Animation*> anims;
+csArray<Animation*> sockets;
 
 static void usage(FILE* s, int rc)
 {
@@ -85,7 +85,7 @@ int proc_arg(int argc, char *argv[], int which)
             anim->startframe = atoi(argv[i+1]);
 	    anim->duration   = atoi(argv[i+2]);
 
-            anims.AddItem(anim);
+            anims.Push(anim);
 
 	    printf("Defined Animation: %s starting with frame %d.\n",
 		   (const char *)anim->name, anim->startframe);
@@ -102,7 +102,7 @@ int proc_arg(int argc, char *argv[], int which)
             Animation *socket = new Animation;
             socket->name = argv[i];
             socket->startframe = atoi(argv[i+1]);
-            sockets.AddItem(socket);
+            sockets.Push(socket);
 
 	    printf("Defined Socket: %s at polygon %d.\n",
 		   (const char *)socket->name,socket->startframe);
@@ -114,15 +114,15 @@ int proc_arg(int argc, char *argv[], int which)
     	int i;
         for (i = which+1; i < argc-1 && argv[i][0]!='-'; i+=3)
         {
-            DisplacementGroup *df = new DisplacementGroup;
-            df->vertex = atoi(argv[i]);
-            df->startframe = atoi(argv[i+1]);
-            df->stopframe = atoi(argv[i+2]);
+            DisplacementGroup df;
+            df.vertex = atoi(argv[i]);
+            df.startframe = atoi(argv[i+1]);
+            df.stopframe = atoi(argv[i+2]);
 
-            last_anim->displacements.AddItem(df);
+            last_anim->displacements.Push(df);
 
 	    printf("Defined displacement group: Frames %d thru %d, using vertex %d\n",
-		   df->startframe, df->stopframe, df->vertex);
+		   df.startframe, df.stopframe, df.vertex);
         }
 	return i;
     }
@@ -152,7 +152,7 @@ int main(int argc,char *argv[])
 	     fatal_usage();
      }
   }
-  if (!anims.GetFirstItem() ) // no anims means we need to specify a default one
+  if (!anims.Length() ) // no anims means we need to specify a default one
   {
         printf("Warning: Only default action being generated!\n");
 
@@ -160,7 +160,7 @@ int main(int argc,char *argv[])
         anim->name = "default";
         anim->startframe = 1;
 
-        anims.AddItem(anim);
+        anims.Push(anim);
   }
 
   const char* mdlfile = argv[1];

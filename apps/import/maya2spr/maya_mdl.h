@@ -50,7 +50,7 @@ public:
   virtual ~Maya4Model();
   virtual void dumpstats(FILE*);
   virtual bool ReadMAFile(const char* mdlfile);
-  virtual bool WriteSPR(const char *spritename, csDLinkList& /* <Animation> */ anims);
+  virtual bool WriteSPR(const char *spritename, csArray<Animation*>& anims);
 
 protected:
   void Clear();

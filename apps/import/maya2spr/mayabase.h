@@ -23,13 +23,14 @@
 #define __MAYABASE_H__
 
 #include "csutil/csstring.h"
-#include <csutil/csdllist.h>
+#include <csutil/array.h>
 
 #include "cstypes.h"
 #include <stdio.h>
 
 typedef float scalar_t;       // Scalar value,
 
+class Animation;
 
 class MayaModel
 {
@@ -50,7 +51,7 @@ public:
   bool getError() const { return bError; }
 
   virtual bool ReadMAFile(const char* mdlfile) = 0;
-  virtual bool WriteSPR(const char *spritename, csDLinkList& anims) = 0;
+  virtual bool WriteSPR(const char *spritename, csArray<Animation*>& anims) = 0;
 };
 
 #endif // __MAYABASE_H__

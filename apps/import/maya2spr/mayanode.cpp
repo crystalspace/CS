@@ -26,20 +26,8 @@
 
 void DAGNode::PrintStats(FILE *s,int level) 
 {
-  DAGNode *first,*where;
-
-  first = (DAGNode *)children.GetFirstItem();
-  if (!first)
-      return;
-
-  where = first;
-  do 
-  {
-      where->PrintStats(s,level+1);
-      where = (DAGNode *)children.GetNextItem();
-
-  } while (where != first);
-
+  for (int i=0;i<children.Length();i++)
+    children[i]->PrintStats (s, level+1);
 }
 
 NodeTransform::NodeTransform()

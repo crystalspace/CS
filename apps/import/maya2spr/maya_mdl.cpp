@@ -32,7 +32,7 @@
 #include "iutil/databuff.h"
 #include "igraphic/imageio.h"
 
-extern csDLinkList /* <Animation> */ sockets;
+extern csArray<Animation*> sockets;
 
 bool Maya4Model::IsFileMayaModel(const char* mdlfile)
 {
@@ -173,7 +173,7 @@ void Maya4Model::dumpstats(FILE* s)
   tree.PrintStats(s,0);
 }
 
-bool Maya4Model::WriteSPR(const char* spritename, csDLinkList& /* <Animation> */ anims) 
+bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims) 
 {
   FILE *f;
   Maya4Model spr;
@@ -220,16 +220,17 @@ bool Maya4Model::WriteSPR(const char* spritename, csDLinkList& /* <Animation> */
     }
 
     // Now write out animation actions
-    Animation *first,*anim;
-    first = (Animation *)anims.GetFirstItem();
-    if (!first)
+    if (!anims.Length())
     {
-        setError("At least one action animation is required.");
-        return false;
+      setError("At least one action animation is required.");    
+      return false;
     }
-    anim = first;
-    do
+
+    int i;
+    for (i=0;i<anims.Length();i++)
     {
+      Animation* anim = anims[i];
+      
         int stop,start = anim->startframe;
         csString name = anim->name;
 	int frame_duration = anim->duration;
@@ -237,8 +238,7 @@ bool Maya4Model::WriteSPR(const char* spritename, csDLinkList& /* <Animation> */
 
         printf("Writing out Animation %s\n",(const char *)name);
 
-        anim = (Animation *)anims.GetNextItem();
-        if (anim != first)
+        if (i != anims.Length()-1)
             stop = anim->startframe-1;
         else
             stop = (animnode)?animnode->GetFrames():start;
@@ -252,31 +252,32 @@ bool Maya4Model::WriteSPR(const char* spritename, csDLinkList& /* <Animation> */
 	    frame_duration = 67; // default is 15 fps.
 
 	// now determine displacement to use
-	DisplacementGroup *dg = (DisplacementGroup *)curr_anim->displacements.GetCurrentItem();
+	DisplacementGroup &dg = curr_anim->displacements[0];
+	int displacementnum = 1;
 
         fprintf(f,"     <action name=\"%s\">\n",(const char *)name);
 
         for (int i=start; i<=stop; i++)
         {
-	    if (!dg || i<dg->startframe || i>dg->stopframe)
+	    if (i<dg.startframe || i>dg.stopframe)
 	    {
                 fprintf(f,"       <f name=\"f%d\" delay=\"%d\" />\n",i,frame_duration);
 	    }
 	    else
 	    {
 		int frame2 = (i+1>stop)?start:i+1;
-		float displacement = meshnode->GetDisplacement(animnode, i-1, frame2-1, dg->vertex);
+		float displacement = meshnode->GetDisplacement(animnode, i-1,
+		    frame2-1, dg.vertex);
 		fprintf(f,"       <f name=\"f%d\" displacement=\"%f\" />\n",i,displacement);
-		if (i==dg->stopframe) // get next displacement group
+		if (i==dg.stopframe) // get next displacement group
 		{
-		    dg = (DisplacementGroup *)curr_anim->displacements.GetNextItem();
+		    dg = curr_anim->displacements[displacementnum++];
 		}
 	    }
         }
 
         fprintf(f,"     </action>\n");
-
-    } while (anim!=first);
+    }
 
     printf("Writing out Triangles.\n");
 
@@ -284,22 +285,16 @@ bool Maya4Model::WriteSPR(const char* spritename, csDLinkList& /* <Animation> */
     meshnode->WriteTriangles(f);
     
     // Now write out sockets
-    Animation *socket,*first_socket = (Animation *)sockets.GetFirstItem();
-    if (first_socket)
+    for (i=0;i<sockets.Length();i++)
     {
-      socket = first_socket;
-      do
-      {
-        csString name = socket->name;
-	int      tri  = socket->startframe; // really triangle #
+      Animation* socket = sockets[i];
+      
+      csString name = socket->name;
+      int      tri  = socket->startframe; // really triangle #
 
-        printf("Writing out Socket %s Tri %d\n",(const char *)name,tri);
+      printf("Writing out Socket %s Tri %d\n",(const char *)name,tri);
 
-	fprintf(f,"     <socket name=\"%s\" tri=\"%d\" />\n",(const char *)name, tri);
-
-	socket = (Animation *)sockets.GetNextItem();
-
-      } while (socket!=first_socket);
+      fprintf(f,"     <socket name=\"%s\" tri=\"%d\" />\n",(const char *)name, tri);
     }
 
     // Wrap up the file
