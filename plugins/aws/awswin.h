@@ -131,7 +131,7 @@ private:
     virtual void MoveChildren(int delta_x, int delta_y);
   
     /// Adds a child
-    virtual void AddChild(iAwsComponent* child, bool owner=true);
+    virtual void AddChild(iAwsComponent* child, bool owner);
 
     /// Removes a child
     virtual void RemoveChild(iAwsComponent *child);
