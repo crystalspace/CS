@@ -87,7 +87,7 @@ class csCrossBuild_Factory
   CHK (delete filedata);
 
   // add this sprite to the world
-  csNameObject::AddName (*result, templatename);
+  results->SetName(templatename);
   result->SetTexture (Sys->view->GetWorld ()->GetTextures (), txtname);
 
   Sys->view->GetWorld ()->sprite_templates.Push (result);
