@@ -7,12 +7,14 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 8-Mar-2004
-        - Philip Wyett eliminated warning in odeparticles.cpp.
+    - Philip Wyett eliminated warning in odeparticles.cpp.
 	- Jorrit fixed the old OpenGL renderer so that disabling texture
 	  mapping again works correctly (only lightmaps are rendered).
 	- Wouter removed old comment from sector::GetLights that
 	  instructed the user not to add dynamic lights to the list,
 	  but to use SetSector instead. This method has been removed.
+	- John Harger finally implemented the cylinder emitter type in 
+	  particles. 
 7-Mar-2004
 	- Jorrit added a db_mesh_name field to csRenderMesh (but only
 	  in debug mode!). This field is updated by the engine (before

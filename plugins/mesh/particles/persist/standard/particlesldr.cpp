@@ -365,6 +365,10 @@ bool csParticlesFactoryLoader::ParseEmitter (iDocumentNode *node,
   {
     state->SetBoxEmitType (x_size, y_size, z_size);
   }
+  else if (!strcmp (type, "cylinder"))
+  {
+    state->SetCylinderEmitType (x_size, y_size);
+  }
   else
   {
     synldr->ReportError ("crystalspace.particles.factory.loader",
@@ -946,6 +950,10 @@ bool csParticlesObjectLoader::ParseEmitter (iDocumentNode *node,
   else if (!strcmp (type, "box"))
   {
     state->SetBoxEmitType (x_size, y_size, z_size);
+  }
+  else if (!strcmp (type, "cylinder"))
+  {
+    state->SetCylinderEmitType (x_size, y_size);
   }
   else
   {

@@ -204,9 +204,9 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
     {
     case CS_PART_EMIT_SPHERE:
     {
-      start = csVector3((rng.Get() - 0.5f) * 2,
-                        (rng.Get() - 0.5f) * 2,
-			                  (rng.Get() - 0.5f) * 2);
+      start = csVector3((rng.Get() - 0.5f) * 2.0f,
+                        (rng.Get() - 0.5f) * 2.0f,
+			                  (rng.Get() - 0.5f) * 2.0f);
       start.Normalize ();
       float inner_radius = part->particles->GetSphereEmitInnerRadius ();
       float outer_radius = part->particles->GetSphereEmitOuterRadius ();
@@ -231,7 +231,14 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
       start += emitter;
       break;
     case CS_PART_EMIT_CYLINDER:
-      // @@@ FIXME: Implement this?
+      start = csVector3((rng.Get() - 0.5f) * 2.0f,
+        0.0f,
+			  (rng.Get() - 0.5f) * 2.0f);
+      start.Normalize ();
+      start *= part->particles->GetEmitXSize () * rng.Get();
+      start.y = (rng.Get() - 0.5f) * part->particles->GetEmitYSize ();
+      start = part->particles->GetRotation () * start;
+      start += emitter;
       break;
     }
 
@@ -394,8 +401,10 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
           / (part->particles->GetTimeToLive ()
           + part->particles->GetTimeVariation ());
         csColor color = color_callback->GetColor(colortime);
-        // @@@ FIXME: Do something with the retrieved color.
-	      (void)color;
+        point.color.x = color.red;
+        point.color.y = color.green;
+        point.color.z = color.blue;
+        point.color.w = colortime;
       }
       break;
     }
