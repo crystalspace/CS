@@ -2593,10 +2593,13 @@ void csSprite3DMeshObject::PositionChild (iMeshObject* child,csTicks current_tim
   int i;
   for(i=0;i<sockets.Length();i++)
   {
-    if (sockets[i]->GetMeshWrapper()->GetMeshObject() == child)
+    if(sockets[i]->GetMeshWrapper())
     {
-      socket = sockets[i];
-      break;
+      if (sockets[i]->GetMeshWrapper()->GetMeshObject() == child)
+      {
+	socket = sockets[i];
+	break;
+      }
     }
   }
   if(socket)
