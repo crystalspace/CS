@@ -45,7 +45,14 @@
 #include "iutil/cache.h"
 #include "iutil/object.h"
 #include "iutil/cmdline.h"
+
 #include "qsqrt.h"
+
+#ifdef CS_USE_NEW_RENDERER
+  #if _MSC_VER >= 1300
+    #include <xmmintrin.h>
+  #endif
+#endif
 
 CS_IMPLEMENT_PLUGIN
 
@@ -145,8 +152,16 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
   delete[] lit_mesh_colors;
+#ifdef CS_USE_NEW_RENDERER
+  while (shadowCache.Length () > 0)
+  {
+    delete (csGenmeshShadowCacheEntry*) shadowCache.Pop ();
+  }
+#endif
+
   delete hard_transform;
   delete hard_bbox;
+
 }
 
 void csGenmeshMeshObject::CheckLitColors ()
@@ -265,73 +280,35 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
   cache_mgr->SetCurrentScope (cachename);
   delete[] cachename;
 
-  const char* error = NULL;
+  bool rc = false;
   csRef<iDataBuffer> db = cache_mgr->ReadCache ("genmesh_lm", NULL, ~0);
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
     char magic[5];
-    if (mf.Read (magic, 4) != 4)
-    {
-      error = "File too short while reading magic number!";
-      goto stop;
-    }
+    if (mf.Read (magic, 4) != 4) goto stop;
     magic[4] = 0;
-    if (strcmp (magic, LMMAGIC))
-    {
-      error = "Magic number doesn't match!";
-      goto stop;
-    }
+    if (strcmp (magic, LMMAGIC)) goto stop;
 
     char cont;
-    if (mf.Read ((char*)&cont, 1) != 1)
-    {
-      error = "File too short while reading continuation data!";
-      goto stop;
-    }
+    if (mf.Read ((char*)&cont, 1) != 1) goto stop;
     while (cont)
     {
       char lid[16];
-      if (mf.Read (lid, 16) != 16)
-      {
-        error = "File too short while reading light id!";
-        goto stop;
-      }
+      if (mf.Read (lid, 16) != 16) goto stop;
       iStatLight *il = factory->engine->FindLightID (lid);
-      if (!il)
-      {
-        error = "Could not find light!";
-        goto stop;
-      }
+      if (!il) goto stop;
       iLight* l = il->QueryLight ();
       affecting_lights.Add (l);
       il->AddAffectedLightingInfo (&scfiLightingInfo);
-      if (mf.Read ((char*)&cont, 1) != 1)
-      {
-        error = "File too short while reading continuation data!";
-        goto stop;
-      }
+      if (mf.Read ((char*)&cont, 1) != 1) goto stop;
     }
+    rc = true;
   }
 
 stop:
   cache_mgr->SetCurrentScope (NULL);
-  if (error != NULL)
-  {
-    bool do_verbose = factory->genmesh_type->do_verbose;
-    if (do_verbose)
-    {
-      const char* genmesh_name = NULL;
-      if (logparent)
-      {
-        csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
-        if (mw) genmesh_name = mw->QueryObject ()->GetName ();
-      }
-      printf ("  Genmesh '%s': %s\n", genmesh_name, error);
-    }
-    return false;
-  }
-  return true;
+  return rc;
 }
 
 bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
@@ -780,7 +757,7 @@ bool csGenmeshMeshObject::DrawZ (iRenderView* rview, iMovable* /*movable*/,
 bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
 	csZBufMode mode, iLight* light)
 {
-
+  int i;
   iCamera* camera = rview->GetCamera ();
   // First create the transformation from object to camera space directly:
   //   W = Mow * O - Vow;
@@ -802,52 +779,174 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   mater->Visit ();
   if(!factory->GetEdgeMidpoint()) return false; //bad hack.. EdgeMidpoint might not be initialized on first rendering
 
-  r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
-  //set the light-parameters
-  r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION, light->GetCenter ());
-
   // Prepare for rendering.
   mesh.z_buf_mode = CS_ZBUF_TEST;
   mesh.mixmode = CS_FX_COPY;
+  
 
   mesh.SetMaterialHandle (mater->GetMaterialHandle ());
   mesh.SetStreamSource (&scfiStreamSource);
   mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
 
-  int *ibuf = factory->GetEdgeIndices();
+  unsigned int *ibuf = ( unsigned int *)factory->GetEdgeIndices();
   if (!shadow_index_buffer)
     shadow_index_buffer = r3d->GetBufferManager ()->CreateBuffer (
       sizeof (unsigned int)*factory->GetTriangleCount()*12, CS_BUF_INDEX,
       CS_BUFCOMP_UNSIGNED_INT, 1);
 
 
-  unsigned int *buf = (unsigned int *)shadow_index_buffer->Lock(CS_BUF_LOCK_NORMAL);
-  csVector3 lightpos = light->GetCenter() * movable->GetFullTransform();
-  int i;
-  int edge_start = factory->GetTriangleCount()*3;
-  int index_range = edge_start;
+  bool regenerateShadowvolume = true;
 
-  memcpy (buf, ibuf, edge_start*sizeof(int));
+  csVector3 lightpos = light->GetCenter () * movable->GetFullTransform ();
+  uint32 lightID = light->GetLightNumber ();
   
-  csVector3 *enormals = factory->GetEdgeNormals();
-  csVector3 *emid = factory->GetEdgeMidpoint();
+  csGenmeshShadowCacheEntry* shadowCacheEntry = NULL;
 
-  for (i = 0; i < edge_start; i += 2)
+  //check if this light exists in cache, and if it is ok
+  for (i = 0; i < shadowCache.Length (); i++)
   {
-    csVector3 lightdir = lightpos - emid[i];
-    if (((lightdir * enormals[i]) * 
-         (lightdir * enormals[i+1])) < 0) 
+    shadowCacheEntry = (csGenmeshShadowCacheEntry*) shadowCache.Get (i);
+    if (shadowCacheEntry->lightID = lightID )
     {
-      buf[index_range ++] = ibuf[edge_start + i*3 + 0];
-      buf[index_range ++] = ibuf[edge_start + i*3 + 1];
-      buf[index_range ++] = ibuf[edge_start + i*3 + 2];
-      buf[index_range ++] = ibuf[edge_start + i*3 + 3];
-      buf[index_range ++] = ibuf[edge_start + i*3 + 4];
-      buf[index_range ++] = ibuf[edge_start + i*3 + 5];
+      if ( (shadowCacheEntry->lightPos - lightpos).SquaredNorm () < 0.02 ) //make configurable
+      {
+        // no need to regenerate them
+        regenerateShadowvolume = false;
+        break;
+      }
+      else
+      {
+        regenerateShadowvolume = true;
+        break;
+      }
     }
   }
 
-  shadow_index_buffer->Release ();
+  int edge_start;
+  int index_range;
+
+  if (regenerateShadowvolume)
+  {
+    if (!shadowCacheEntry)
+    {
+      shadow_index_buffer = r3d->GetBufferManager ()->CreateBuffer (
+       sizeof (unsigned int)*factory->GetTriangleCount()*12, CS_BUF_INDEX,
+        CS_BUFCOMP_UNSIGNED_INT, 1);
+    }
+
+    unsigned int *buf = (unsigned int *)shadow_index_buffer->Lock (CS_BUF_LOCK_NORMAL);
+    
+    edge_start = factory->GetTriangleCount ()*3;
+    index_range = edge_start;
+
+    memcpy (buf, ibuf, edge_start*sizeof(int));
+    int source_index = edge_start;
+
+    csVector4* midPoints = factory->GetEdgeMidpoint();
+    csVector4* normals = factory->GetEdgeNormals();
+
+    float tempBuf[4];
+    csVector4 lightPos4 = lightpos;
+    lightPos4.w = 0;
+
+#if _MSC_VER >= 1300 
+
+    float* dotTable = new float [edge_start];
+    csVector4 lightdir;
+
+    for (i = 0; i < edge_start; i += 2)
+    {
+      lightdir = lightPos4 - midPoints[i];
+      dotTable[i] = (lightdir * normals[i]);
+      dotTable[i+1] = (lightdir * normals[i+1]);
+    }
+
+    for (i = 0; i < edge_start; i+= 2)
+    {
+      source_index = edge_start + 3*i;
+
+      if (dotTable[i] * dotTable[i+1] < 0)
+      {
+      /*csVector4 lightdir = lightPos4 - midPoints[i];
+      if (((lightdir * normals[i]) * 
+          (lightdir * normals[i+1])) < 0) 
+      {*/
+        __asm
+        {
+          push esi
+          push edi
+          push ecx
+
+          mov esi, [ibuf]
+          mov edi, [buf]
+          
+          mov ecx, source_index
+          shl ecx, 2
+          add esi, ecx
+
+          mov ecx, index_range
+          shl ecx, 2
+          add edi, ecx
+
+          //do copy with mmx-routines
+          movq mm0, [esi]
+          movq mm1, [esi+8]
+          movq mm2, [esi+16]
+
+          movq [edi], mm0        
+          movq [edi+8], mm1
+          movq [edi+16], mm2
+          
+          emms
+          pop esi
+          pop edi
+          pop ecx
+        }
+        index_range += 6;
+      }
+    }
+
+    delete [] dotTable;
+    
+#else
+    for (i = 0; i < edge_start; i += 2)
+    {
+      csVector4 lightdir = lightPos4 - midPoints[i];
+      if (((lightdir * normals[i]) * 
+          (lightdir * normals[i+1])) < 0) 
+      {
+        buf[index_range ++] = ibuf[edge_start + i*3 + 0];
+        buf[index_range ++] = ibuf[edge_start + i*3 + 1];
+        buf[index_range ++] = ibuf[edge_start + i*3 + 2];
+        buf[index_range ++] = ibuf[edge_start + i*3 + 3];
+        buf[index_range ++] = ibuf[edge_start + i*3 + 4];
+        buf[index_range ++] = ibuf[edge_start + i*3 + 5];
+
+      }
+    }
+#endif
+    shadow_index_buffer->Release ();
+
+    //store it
+    if (!shadowCacheEntry)
+    {
+      //add a new entry if we don't have any
+      shadowCacheEntry = new csGenmeshShadowCacheEntry ();
+      shadowCacheEntry->lightID = lightID;
+      shadowCacheEntry->lightPos = lightpos;
+      shadowCache.Push (shadowCacheEntry);
+    }
+
+    shadowCacheEntry->index_range = index_range;
+    shadowCacheEntry->edge_start = edge_start;
+    shadowCacheEntry->shadow_index_buffer = shadow_index_buffer;
+  }
+  else
+  {
+    shadow_index_buffer = shadowCacheEntry->shadow_index_buffer;
+    index_range = shadowCacheEntry->index_range;
+    edge_start = shadowCacheEntry->edge_start;
+  }
 
   if (shadow_caps) 
     mesh.SetIndexRange (0, index_range);
@@ -870,9 +969,22 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   return true;
 }
 
-bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* /*movable*/,
+bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* movable,
 	csZBufMode mode, iLight *light)
 {
+  iCamera* camera = rview->GetCamera ();
+  // First create the transformation from object to camera space directly:
+  //   W = Mow * O - Vow;
+  //   C = Mwc * (W - Vwc)
+  // ->
+  //   C = Mwc * (Mow * O - Vow - Vwc)
+  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+  if (hard_transform)
+    tr_o2c /= *hard_transform;
+
   iMaterialWrapper* mater = material;
   if (!mater) mater = factory->GetMaterialWrapper ();
   if (!mater)
@@ -901,19 +1013,13 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* /*movable*/,
   color.green *= (matcolor.green/255);
   color.blue *= (matcolor.blue/255);
 
-  r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
-  //r3d->SetObjectToCamera (&tr_o2c);
-  //set the light-parameters
-  r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-  	light->GetCenter ());
+
   //set this to be lightcolor * diffuse material
   r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE,
   	csVector3 (color.red, color.green, color.blue)*diffuse);
   r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR,
     csVector3 (color.red, color.green, color.blue)*specular);
 
-  r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
-  	light->GetAttenuationVector() );
       
   // Prepare for rendering.
   mesh.z_buf_mode = CS_ZBUF_TEST;
@@ -1125,7 +1231,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
   csGenmeshMeshObjectFactory::object_reg = object_reg;
-  genmesh_type = (csGenmeshMeshObjectType*)pParent;
   logparent = NULL;
   initialized = false;
   object_bbox_valid = false;
@@ -1473,9 +1578,9 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
         if (edge_indices) delete [] edge_indices;
           edge_indices = new int[num_mesh_triangles*12];
         if (edge_normals) delete [] edge_normals;
-          edge_normals = new csVector3[num_mesh_triangles*3];
+          edge_normals = new csVector4[num_mesh_triangles*3];
         if (edge_midpts) delete [] edge_midpts;
-          edge_midpts = new csVector3[num_mesh_triangles*3];
+          edge_midpts = new csVector4[num_mesh_triangles*3];
 
         unsigned int *ibuf = (unsigned int *)index_buffer->Lock(CS_BUF_LOCK_NORMAL);
 
@@ -1511,10 +1616,19 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
                 edge_indices[QuadsIndex ++] = TriIndex - 2;
                 edge_indices[QuadsIndex ++] = e->ind_b;
                 edge_indices[QuadsIndex ++] = e->ind_a;
+                
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = e->norm;
+                edge_midpts[EdgeNormal].w = 0;
+                
+                edge_normals[EdgeNormal] = e->norm;
+                edge_normals[EdgeNormal++].w = 0;
+
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+                edge_midpts[EdgeNormal].w = 0;
+                
+                edge_normals[EdgeNormal] = mesh_tri_normals[i];
+                edge_normals[EdgeNormal++].w = 0;
+
                 EdgeStack.Delete (j);
                 delete e;
                 found_a = true;
@@ -1529,9 +1643,17 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
                 edge_indices[QuadsIndex ++] = e->ind_b;
                 edge_indices[QuadsIndex ++] = e->ind_a;
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = e->norm;
+                edge_midpts[EdgeNormal].w = 0;
+
+                edge_normals[EdgeNormal] = e->norm;
+                edge_normals[EdgeNormal++].w = 0;
+
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+                edge_midpts[EdgeNormal].w = 0;
+
+                edge_normals[EdgeNormal] = mesh_tri_normals[i];
+                edge_normals[EdgeNormal++].w = 0;
+
                 EdgeStack.Delete (j);
                 delete e;
                 found_a = true;
@@ -1547,10 +1669,19 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
                 edge_indices[QuadsIndex ++] = TriIndex - 1; 
                 edge_indices[QuadsIndex ++] = e->ind_a; 
                 edge_indices[QuadsIndex ++] = e->ind_b;
+
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = e->norm;
+                edge_midpts[EdgeNormal].w = 0;
+
+                edge_normals[EdgeNormal] = e->norm;
+                edge_normals[EdgeNormal++].w = 0;
+
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+                edge_midpts[EdgeNormal].w = 0;
+
+                edge_normals[EdgeNormal] = mesh_tri_normals[i];
+                edge_normals[EdgeNormal++].w = 0;
+
                 EdgeStack.Delete (j);
                 delete e;
                 found_b = true;
@@ -1564,10 +1695,19 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
                 edge_indices[QuadsIndex ++] = TriIndex - 2;
                 edge_indices[QuadsIndex ++] = e->ind_b; 
                 edge_indices[QuadsIndex ++] = e->ind_a;
+
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = e->norm;
+                edge_midpts[EdgeNormal].w = 0;
+
+                edge_normals[EdgeNormal] = e->norm;
+                edge_normals[EdgeNormal++].w = 0;
+
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+                edge_midpts[EdgeNormal].w = 0;
+
+                edge_normals[EdgeNormal] = mesh_tri_normals[i];
+                edge_normals[EdgeNormal++].w = 0;
+
                 EdgeStack.Delete (j);
                 delete e;
                 found_b = true;
@@ -1583,10 +1723,19 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
                 edge_indices[QuadsIndex ++] = TriIndex - 3; 
                 edge_indices[QuadsIndex ++] = e->ind_b; 
                 edge_indices[QuadsIndex ++] = e->ind_a;
+
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = e->norm;
+                edge_midpts[EdgeNormal].w = 0;
+
+                edge_normals[EdgeNormal] = e->norm;
+                edge_normals[EdgeNormal++].w = 0;
+                
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+                edge_midpts[EdgeNormal].w = 0;
+
+                edge_normals[EdgeNormal] = mesh_tri_normals[i];
+                edge_normals[EdgeNormal++].w = 0;
+
                 EdgeStack.Delete (j);
                 delete e;
                 found_c = true;
@@ -1600,10 +1749,19 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
                 edge_indices[QuadsIndex ++] = TriIndex - 1; 
                 edge_indices[QuadsIndex ++] = e->ind_b; 
                 edge_indices[QuadsIndex ++] = e->ind_a;
+
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = e->norm;
+                edge_midpts[EdgeNormal].w = 0;
+
+                edge_normals[EdgeNormal] = e->norm;
+                edge_normals[EdgeNormal++].w = 0;
+
                 edge_midpts[EdgeNormal] = (e->a + e->b) / 2;
-                edge_normals[EdgeNormal++] = mesh_tri_normals[i];
+                edge_midpts[EdgeNormal].w = 0;
+
+                edge_normals[EdgeNormal] = mesh_tri_normals[i];
+                edge_normals[EdgeNormal++].w = 0;
+
                 EdgeStack.Delete (j);
                 delete e;
                 found_c = true;
@@ -2150,11 +2308,20 @@ csGenmeshMeshObjectType::csGenmeshMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  do_verbose = false;
 }
 
 csGenmeshMeshObjectType::~csGenmeshMeshObjectType ()
 {
+}
+
+csPtr<iMeshObjectFactory> csGenmeshMeshObjectType::NewFactory ()
+{
+  csGenmeshMeshObjectFactory* cm = new csGenmeshMeshObjectFactory (this,
+  	object_reg);
+  csRef<iMeshObjectFactory> ifact (
+  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  cm->DecRef ();
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 
 bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
@@ -2171,13 +2338,4 @@ bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csPtr<iMeshObjectFactory> csGenmeshMeshObjectType::NewFactory ()
-{
-  csGenmeshMeshObjectFactory* cm = new csGenmeshMeshObjectFactory (this,
-  	object_reg);
-  csRef<iMeshObjectFactory> ifact (
-  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
-  cm->DecRef ();
-  return csPtr<iMeshObjectFactory> (ifact);
-}
 

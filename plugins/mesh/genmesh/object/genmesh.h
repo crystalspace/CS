@@ -20,6 +20,7 @@
 #define __CS_GENMESH_H__
 
 #include "csgeom/vector3.h"
+#include "csgeom/vector4.h"
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
@@ -37,6 +38,7 @@
 #include "iengine/shadcast.h"
 #ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rndbuf.h"
+#include "csutil/csvector.h"
 #endif
 
 struct iMaterialWrapper;
@@ -79,6 +81,26 @@ private:
   csRef<iRenderBuffer> shadow_index_buffer;
   csStringID shadow_index_name;
   csRef<iRender3D> r3d;
+
+  struct csGenmeshShadowCacheEntry
+  {
+    csGenmeshShadowCacheEntry () 
+    {
+      lightID = -1;
+      lightPos = csVector3(0,0,0);
+      shadow_index_buffer = NULL;
+      edge_start = 0;
+      index_range = 0;
+    }
+
+    uint32 lightID;
+    csVector3 lightPos;
+    csRef<iRenderBuffer> shadow_index_buffer;
+    int edge_start, index_range;
+  };
+
+  csBasicVector shadowCache;
+
 #endif
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
@@ -440,8 +462,8 @@ private:
   csVector3* mesh_tri_normals;
 #ifdef CS_USE_NEW_RENDERER
   int* edge_indices;
-  csVector3* edge_normals;
-  csVector3* edge_midpts;
+  csVector4* edge_normals;
+  csVector4* edge_midpts;
   csTriangle* mesh_triangles;
   int num_mesh_triangles;
 
@@ -558,8 +580,8 @@ public:
   csTriangle* GetTriangles () { mesh_triangle_dirty_flag = true; return mesh_triangles; }
   csVector3* GetFaceNormals () { return mesh_tri_normals; }
   int* GetEdgeIndices () { return edge_indices; }
-  csVector3* GetEdgeNormals () { return edge_normals; }
-  csVector3* GetEdgeMidpoint () { return edge_midpts; }
+  csVector4* GetEdgeNormals () { return edge_normals; }
+  csVector4* GetEdgeMidpoint () { return edge_midpts; }
 #endif
   void Invalidate ();
   void CalculateNormals ();
