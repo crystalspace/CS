@@ -1,0 +1,9 @@
+SubDir TOP libs csappframe ;
+
+Library csappframe
+	: [ Wildcard *.cpp *.h ]
+;
+
+Help csappframe : "Crystal Space application framework" ;
+LibDepends csappframe : cstool csutil cssys ;
+
