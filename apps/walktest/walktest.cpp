@@ -1363,8 +1363,8 @@ int main (int argc, char* argv[])
     Sys->do_cd = true;
 
     // Load two textures that are used in the maze.
-    csLoader::LoadTexture (world, "txt", "stone4.gif");
-    csLoader::LoadTexture (world, "txt2", "mystone2.gif");
+    csLoader::LoadTexture (world, "txt", "/lib/std/stone4.gif");
+    csLoader::LoadTexture (world, "txt2", "/lib/std/mystone2.gif");
 
     if (Sys->do_infinite)
     {
