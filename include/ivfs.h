@@ -25,7 +25,11 @@
 
 // forward declarations
 struct iStrVector;
+#if defined( OS_MACOS ) && defined( _MSL_USING_NAMESPACE )
+struct std::tm;
+#else
 struct tm;
+#endif
 
 /// Composite path divider
 #define VFS_PATH_DIVIDER        ','
