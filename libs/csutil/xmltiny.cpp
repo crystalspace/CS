@@ -105,6 +105,11 @@ csTinyXmlAttributeIterator::csTinyXmlAttributeIterator (TiDocumentNode* parent)
     return;
   }
   count = csTinyXmlAttributeIterator::parent->GetAttributeCount ();
+  if (!count) 
+  {
+    current = -1;
+    return;
+  }
   current = 0;
 }
 
