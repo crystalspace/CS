@@ -737,6 +737,32 @@ float csIntersect3::Z0Plane (
   return r;
 }
 
+float csIntersect3::XPlane (
+  float xval,
+  const csVector3 &u,
+  const csVector3 &v,
+  csVector3 &isect)
+{
+  float r = (xval - u.x) / (v.x - u.x);
+  isect.x = xval;
+  isect.y = r * (v.y - u.y) + u.y;
+  isect.z = r * (v.z - u.z) + u.z;
+  return r;
+}
+
+float csIntersect3::YPlane (
+  float yval,
+  const csVector3 &u,
+  const csVector3 &v,
+  csVector3 &isect)
+{
+  float r = (yval - u.y) / (v.y - u.y);
+  isect.x = r * (v.x - u.x) + u.x;
+  isect.y = yval;
+  isect.z = r * (v.z - u.z) + u.z;
+  return r;
+}
+
 float csIntersect3::ZPlane (
   float zval,
   const csVector3 &u,

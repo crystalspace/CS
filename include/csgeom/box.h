@@ -1057,6 +1057,14 @@ public:
   	csPoly2D& poly, float& min_z, float& max_z) const;
 
   /**
+   * Project this box to the 2D outline given the origin and an axis aligned
+   * plane. If this fails (because some of the points cannot be projected)
+   * then it will return false.
+   */
+  bool ProjectOutline (const csVector3& origin,
+	int axis, float where, csPoly2D& poly) const;
+
+  /**
    * Project this box to the 2D outline given the view point
    * transformation and also the field-of-view and shift values (for
    * perspective correction). The minimum and maximum z are also

@@ -96,9 +96,9 @@ public:
    * is in line[0] and the end of the line is in line[1] and the method
    * return true;
    */
-  static bool FindIntersection(const csVector3  tri1[3],
-                               const csVector3  tri2[3],
-                               csVector3        line[2]);
+  static bool FindIntersection (const csVector3  tri1[3],
+                                const csVector3  tri2[3],
+                                csVector3        line[2]);
 
   /**
    * Calculates a vector lying a specified distance between two other vectors.
@@ -300,10 +300,12 @@ public:
 	const csSegment3& seg, csVector3& isect);
 
   /**
-   * If a number of planes enclose a convex space (with their normals pointing outwards).
+   * If a number of planes enclose a convex space (with their normals
+   * pointing outwards).
    * This method returns true if they are intersected by a segment.
    * isect contains the closest intersection point.
-   * dist contains the distance to that point (with distance between u and v being 1)
+   * dist contains the distance to that point (with distance between u and v
+   * being 1)
    */
   static bool Planes(
      const csVector3& u, const csVector3& v,
@@ -420,6 +422,52 @@ public:
   }
 
   /**
+   * Intersect a 3D segment with the plane x = xval. Assumes that there
+   * is an intersection (fails if the segment is parallel to the plane),
+   * and returns the distance from u to the intersection point.
+   * The intersection point is returned in isect.
+   */
+  static float XPlane (float xval,      // plane x = xval
+    const csVector3& u, const csVector3& v,
+    csVector3& isect);                    // intersection point
+
+  /**
+   * Intersect a 3D segment with the plane x = xval. Assumes that there
+   * is an intersection (fails if the segment is parallel to the plane),
+   * and returns the distance from u to the intersection point.
+   * The intersection point is returned in isect.
+   */
+  static float XPlane (float xval,      // plane x = xval
+    const csSegment3& uv,
+    csVector3& isect)                     // intersection point
+  {
+    return XPlane (xval, uv.Start (), uv.End (), isect);
+  }
+
+  /**
+   * Intersect a 3D segment with the plane y = yval. Assumes that there
+   * is an intersection (fails if the segment is parallel to the plane),
+   * and returns the distance from u to the intersection point.
+   * The intersection point is returned in isect.
+   */
+  static float YPlane (float yval,      // plane y = yval
+    const csVector3& u, const csVector3& v,
+    csVector3& isect);                    // intersection point
+
+  /**
+   * Intersect a 3D segment with the plane y = yval. Assumes that there
+   * is an intersection (fails if the segment is parallel to the plane),
+   * and returns the distance from u to the intersection point.
+   * The intersection point is returned in isect.
+   */
+  static float YPlane (float yval,      // plane y = yval
+    const csSegment3& uv,
+    csVector3& isect)                     // intersection point
+  {
+    return YPlane (yval, uv.Start (), uv.End (), isect);
+  }
+
+  /**
    * Intersect a 3D segment with the plane z = zval. Assumes that there
    * is an intersection (fails if the segment is parallel to the plane),
    * and returns the distance from u to the intersection point.
@@ -440,6 +488,24 @@ public:
     csVector3& isect)                     // intersection point
   {
     return ZPlane (zval, uv.Start (), uv.End (), isect);
+  }
+
+  /**
+   * Intersect a 3D segment with an axis aligned plane and
+   * return the intersection (fails if segment is parallel to the plane),
+   * and returns the distance from u to the intersection point.
+   * The intersection point is returned in isect.
+   */
+  static float AxisPlane (const csVector3& u, const csVector3& v,
+  	int nr, float pos, csVector3& isect)
+  {
+    switch (nr)
+    {
+      case 0: return XPlane (pos, u, v, isect);
+      case 1: return YPlane (pos, u, v, isect);
+      case 2: return ZPlane (pos, u, v, isect);
+    }
+    return 0.0;
   }
 
   /**

@@ -22,6 +22,7 @@
 #include "csgeom/box.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/poly2d.h"
+#include "csgeom/math3d.h"
 
 //---------------------------------------------------------------------------
 csBox2::bEdge csBox2:: edges[8] =
@@ -775,6 +776,32 @@ bool csBox3::ProjectBox (const csTransform& trans, float fov,
     Perspective (v, oneCorner, fov, sx, sy);
   sbox.AddBoundingVertexSmart (oneCorner);
 
+  return true;
+}
+
+bool csBox3::ProjectOutline (const csVector3& origin,
+	int axis, float where,
+  	csPoly2D& poly) const
+{
+  int idx = CalculatePointSegment (origin);
+  const Outline &ol = outlines[idx];
+  int num_array = MIN (ol.num, 6);
+  poly.SetVertexCount (num_array);
+
+  int i;
+  for (i = 0 ; i < num_array ; i++)
+  {
+    csVector3 isect;
+    if (!csIntersect3::AxisPlane (origin, ol.vertices[i], axis, where,
+    	isect))
+      return false;
+    switch (axis)
+    {
+      case 0: poly[i].x = isect.y; poly[i].y = isect.z; break;
+      case 1: poly[i].x = isect.x; poly[i].y = isect.z; break;
+      case 2: poly[i].x = isect.x; poly[i].y = isect.y; break;
+    }
+  }
   return true;
 }
 
