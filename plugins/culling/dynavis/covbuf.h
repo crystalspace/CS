@@ -95,8 +95,10 @@ private:
   /**
    * Draw an outline on the coverage buffer.
    * Returns false if outline is outside screen.
+   * The 'used_verts' contains true for all vertices that are used.
    */
   bool DrawOutline (csVector2* verts, int num_verts,
+  	bool* used_verts,
   	int* edges, int num_edges, csBox2Int& bbox);
 
   /**
@@ -137,8 +139,10 @@ public:
    * screen buffer was not modified).
    * The given array of edges is an array of two integers (vertex indices)
    * per edge.
+   * The 'used_verts' contains true for all vertices that are used.
    */
   bool InsertOutline (csVector2* verts, int num_verts,
+  	bool* used_verts,
   	int* edges, int num_edges, float max_depth);
 
   /**

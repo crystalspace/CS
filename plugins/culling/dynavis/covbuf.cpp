@@ -236,17 +236,18 @@ void csCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     y2 = height-1;
     yfurther = 0;
   }
+  if (y1 == y2) return;	// Return if clipping results in one pixel.
 
   if (x1 >= 0 && x2 >= 0 && x1 < width && x2 < width)
   {
     //------
     // The normal case, no clipping needed at all.
     //------
-    int dy = (y2-y1)+1;
+    int dy = y2-y1;
+
     int x = x1<<16;
     int y = y1;
     int dx = ((x2-x1)<<16) / (dy-yfurther);
-    dy--;
     while (dy > 0)
     {
       uint32* buf = &buffer[(y>>5) << w_shift];
@@ -261,11 +262,10 @@ void csCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     //------
     // In this case we need to clip horizontally.
     //------
-    int dy = (y2-y1)+1;
+    int dy = y2-y1;
     int x = x1<<16;
     int y = y1;
     int dx = ((x2-x1)<<16) / (dy-yfurther);
-    dy--;
     while (dy > 0)
     {
       uint32* buf = &buffer[(y>>5) << w_shift];
@@ -367,6 +367,7 @@ bool csCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
 }
 
 bool csCoverageBuffer::DrawOutline (csVector2* verts, int num_verts,
+	bool* used_verts,
 	int* edges, int num_edges,
 	csBox2Int& bbox)
 {
@@ -389,29 +390,32 @@ bool csCoverageBuffer::DrawOutline (csVector2* verts, int num_verts,
     xa = new int[num_xa];
     ya = new int[num_xa];
   }
-  int top_vt = 0;
-  int bot_vt = 0;
-  xa[0] = QRound (verts[0].x);
-  ya[0] = QRound (verts[0].y);
-  bbox.minx = bbox.maxx = xa[0];
-  bbox.miny = bbox.maxy = ya[0];
-  for (i = 1 ; i < num_verts ; i++)
+  int top_vt = -1;
+  int bot_vt = -1;
+  bbox.minx = 1000000;
+  bbox.maxx = -1000000;
+  bbox.miny = 1000000;
+  bbox.maxy = -1000000;
+  for (i = 0 ; i < num_verts ; i++)
   {
-    xa[i] = QRound (verts[i].x);
-    ya[i] = QRound (verts[i].y);
-
-    if (xa[i] < bbox.minx) bbox.minx = xa[i];
-    else if (xa[i] > bbox.maxx) bbox.maxx = xa[i];
-
-    if (ya[i] < bbox.miny)
+    if (used_verts[i])
     {
-      bbox.miny = ya[i];
-      top_vt = i;
-    }
-    else if (ya[i] > bbox.maxy)
-    {
-      bbox.maxy = ya[i];
-      bot_vt = i;
+      xa[i] = QRound (verts[i].x);
+      ya[i] = QRound (verts[i].y);
+
+      if (xa[i] < bbox.minx) bbox.minx = xa[i];
+      if (xa[i] > bbox.maxx) bbox.maxx = xa[i];
+
+      if (ya[i] < bbox.miny)
+      {
+        bbox.miny = ya[i];
+        top_vt = i;
+      }
+      if (ya[i] > bbox.maxy)
+      {
+        bbox.maxy = ya[i];
+        bot_vt = i;
+      }
     }
   }
 
@@ -558,10 +562,11 @@ bool csCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
 }
 
 bool csCoverageBuffer::InsertOutline (csVector2* verts, int num_verts,
+	bool* used_verts,
 	int* edges, int num_edges, float max_depth)
 {
   csBox2Int bbox;
-  if (!DrawOutline (verts, num_verts, edges, num_edges, bbox))
+  if (!DrawOutline (verts, num_verts, used_verts, edges, num_edges, bbox))
     return false;
 
   // In this routine we render the polygon to the polygon buffer

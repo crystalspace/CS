@@ -21,6 +21,12 @@ The history order is reversed so that new features are at the top.
 	- Fixed a severe memory overwrite bug in the coverage buffer
 	  (InitializePolygonBuffer() function).
 	- Fixed a newly introduced bug in the coverage buffer.
+	- Corrected line-drawing in the coverage buffer of Dynavis a little.
+	- Fixed a significant bug in the outline coverage buffer updating
+	  which could cause severe performance degradation in some cases.
+	  The problem was that the bounding box used for outline rendering
+	  was using uninitialized vertices and so could result in a bounding
+	  box that was too big.
 28-May-2002
 	- Fixed visibility culling in Dynavis when the camera was inside
 	  the bounding box of an object.
