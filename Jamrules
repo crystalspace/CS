@@ -36,5 +36,5 @@ STATIC.PLUGINLIST = reporter stdrep csfont engine vfs frustvis
 include $(TOP)/mk/jam/build.jam ;
 
 # common include directory
-IncludeDir $(BUILDTOP) $(TOP)/include $(TOP)/plugins $(TOP)/apps $(TOP)/libs ;
+IncludeDir $(BUILDTOP)/include $(TOP) $(TOP)/include $(TOP)/plugins $(TOP)/apps $(TOP)/libs ;
 
