@@ -113,6 +113,9 @@ The history order has been reversed so that new features are at the top.
 	- Norman fixed glide renderer after Jorrit broke it yesterday.
 	- Norman added ForceFullRedraw() to CSWS for integration of CSWS
 	  into usual 3D programs.
+	- Norman added wscs3d app to demonstrate how to combine CSWS
+	  with the 3D engine. Press 'd' when running this app to open
+	  a CSWS dialog.
 25-Jun-2000
 	- New tree control in CSWS from Norman Kramer.
 	- Did an experiment for speeding up OpenGL by putting the setup
