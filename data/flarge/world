@@ -23054,16 +23054,27 @@
 	    <delay>6000</delay>
 	    <runsequence>openbox</runsequence>
 	</sequence>
+
+	<sequence name="opendoor">
+	    <rotate mesh="rot_door1" duration="2000">
+	        <roty>-1.5707963</roty>
+                <v x="-2.5" y="-1" z="20" />
+	    </rotate>
+        </sequence>
     </sequences>
 
     <triggers>
         <trigger name="setfog">
-	    <sectorvis>kamer2l</sectorvis>
+	    <sectorvis>
+	        <sector>kamer2l</sector>
+	    </sectorvis>
 	    <fire delay=100>fog</fire>
 	</trigger>
 
         <trigger name="animlight">
-	    <sectorvis>large</sectorvis>
+	    <sectorvis>
+	        <sector>large</sector>
+	    </sectorvis>
 	    <fire delay=0>animlight</fire>
 	</trigger>
 	
@@ -23072,13 +23083,25 @@
 	</trigger>
 
 	<trigger name="animhugelight">
-	    <sectorvis>kamer2lhuge</sectorvis>
+	    <sectorvis>
+	        <sector>kamer2lhuge</sector>
+	    </sectorvis>
 	    <fire delay=0>animhugelight</fire>
 	</trigger>
 
 	<trigger name="openbox">
-	    <sectorvis>kamer2lhuge</sectorvis>
+	    <sectorvis>
+	        <sector>kamer2lhuge</sector>
+	    </sectorvis>
 	    <fire delay=1000>dobox</fire>
+	</trigger>
+
+	<trigger name="opendoor">
+	    <sectorvis>
+	        <sector>large</sector>
+		<sphere x="-3.75" y="0.5" z="20" radius="5" />
+	    </sectorvis>
+	    <fire delay=0>opendoor</fire>
 	</trigger>
     </triggers>
 

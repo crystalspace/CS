@@ -76,7 +76,16 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
     {
       case XMLTOKEN_SECTORVIS:
 	{
-	  const char* sectname = child->GetContentsValue ();
+	  csRef<iDocumentNode> secnode = child->GetNode ("sector");
+	  if (!secnode)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.trigger",
+		child, "Couldn't find <sector> in trigger '%s'!", trigname);
+	    return NULL;
+	  }
+
+	  const char* sectname = secnode->GetContentsValue ();
 	  iSector* sector = ldr_context->FindSector (sectname);
 	  if (!sector)
 	  {
@@ -86,7 +95,33 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
 		trigname);
 	    return NULL;
 	  }
-	  trigger->AddConditionSectorVisible (sector);
+	  bool insideonly = false;
+	  csRef<iDocumentNode> ionode = child->GetNode ("insideonly");
+	  csRef<iDocumentNode> boxnode = child->GetNode ("box");
+	  csRef<iDocumentNode> spherenode = child->GetNode ("sphere");
+	  if (ionode)
+	    if (!SyntaxService->ParseBool (ionode, insideonly, true))
+	      return NULL;
+	  if (boxnode)
+	  {
+	    csBox3 box;
+	    if (!SyntaxService->ParseBox (boxnode, box))
+	      return NULL;
+	    trigger->AddConditionInSector (sector, box);
+	  }
+	  else if (spherenode)
+	  {
+	    csSphere s;
+	    s.GetCenter ().x = spherenode->GetAttributeValueAsFloat ("x");
+	    s.GetCenter ().y = spherenode->GetAttributeValueAsFloat ("y");
+	    s.GetCenter ().z = spherenode->GetAttributeValueAsFloat ("z");
+	    s.SetRadius (spherenode->GetAttributeValueAsFloat ("radius"));
+	    trigger->AddConditionInSector (sector, s);
+	  }
+	  else if (insideonly)
+	    trigger->AddConditionInSector (sector);
+	  else
+	    trigger->AddConditionSectorVisible (sector);
 	}
         break;
       case XMLTOKEN_FIRE:

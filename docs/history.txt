@@ -20,6 +20,16 @@ The history order is reversed so that new features are at the top.
 	- Cleaned up the timed operations code in the engine sequencer
 	  a bit. Also made it more efficient by not requiring as much
 	  object creation.
+	- Engine sequence manager: added support for testing if camera is
+	  in a sector. In addition you can also test if the camera
+	  is in a box or sphere in that sector at the same time.
+	  Extended the <sectorvis> trigger so you can specify
+	  <insideonly> tag (to test if camera is in sector instead
+	  of the sector being visible alone). Also added <box>
+	  and <sphere>.
+	- Modified flarge so that the only door flarge has, finally
+	  opens when you come near it :-)  Expect it to close too
+	  in a later commit.
 23-Sep-2002
 	- Added new iEngineSequenceManager API. This is going to be used
 	  for an engine sequence manager. More info on this new feature

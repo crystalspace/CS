@@ -31,6 +31,8 @@ struct iLight;
 class csColor;
 class csReversibleTransform;
 class csVector3;
+class csBox3;
+class csSphere;
 
 SCF_VERSION (iSequenceWrapper, 0, 0, 1);
 
@@ -147,6 +149,18 @@ struct iSequenceTrigger : public iBase
    * Condition: true if camera is in some sector.
    */
   virtual void AddConditionInSector (iSector* sector) = 0;
+
+  /**
+   * Condition: true if camera is in some sector and bbox.
+   */
+  virtual void AddConditionInSector (iSector* sector,
+	const csBox3& box) = 0;
+
+  /**
+   * Condition: true if camera is in some sector and sphere.
+   */
+  virtual void AddConditionInSector (iSector* sector,
+	const csSphere& sphere) = 0;
 
   /**
    * Condition: true if (part of) sector is visible.

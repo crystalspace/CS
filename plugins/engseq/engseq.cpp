@@ -20,8 +20,11 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csgeom/matrix3.h"
-#include "engseq.h"
+#include "csgeom/box.h"
+#include "csgeom/sphere.h"
+#include "csgeom/math3d.h"
 #include "csutil/scf.h"
+#include "csutil/cscolor.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -35,8 +38,9 @@
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
+#include "iengine/camera.h"
 #include "iengine/rview.h"
-#include "csutil/cscolor.h"
+#include "engseq.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -243,7 +247,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 //---------------------------------------------------------------------------
 
 /**
- * Operate operation.
+ * Rotate operation.
  */
 class OpRotate : public OpStandard
 {
@@ -361,7 +365,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 //---------------------------------------------------------------------------
 
 /**
- * Operate operation.
+ * Move operation.
  */
 class OpMove : public OpStandard
 {
@@ -561,13 +565,38 @@ class csTriggerSectorCallback : public iSectorCallback
 {
 private:
   csSequenceTrigger* trigger;
+  bool insideonly;
+  bool do_box;
+  csBox3 box;
+  bool do_sphere;
+  csSphere sphere;
   uint32 framenr;
 
 public:
-  csTriggerSectorCallback (csSequenceTrigger* trigger)
+  csTriggerSectorCallback (csSequenceTrigger* trigger,
+	bool insideonly, const csBox3* box, const csSphere* sphere)
   {
     SCF_CONSTRUCT_IBASE (NULL);
     csTriggerSectorCallback::trigger = trigger;
+    csTriggerSectorCallback::insideonly = insideonly;
+    if (box)
+    {
+      do_box = true;
+      csTriggerSectorCallback::box = *box;
+    }
+    else
+    {
+      do_box = false;
+    }
+    if (sphere)
+    {
+      do_sphere = true;
+      csTriggerSectorCallback::sphere = *sphere;
+    }
+    else
+    {
+      do_sphere = false;
+    }
     framenr = 0;
   }
   virtual ~csTriggerSectorCallback () { }
@@ -583,6 +612,26 @@ public:
       	->GetGlobalFrameNr ();
       if (framenr != global_framenr)
       {
+	// It is potentially useful to fire. So we try to see if
+	// all conditions are met.
+	if (insideonly && rview->GetPreviousSector () != NULL)
+	  return;
+	if (do_sphere)
+	{
+	  const csVector3& pos = rview->GetCamera ()
+		  ->GetTransform ().GetOrigin ();
+	  float sqd = csSquaredDist::PointPoint (pos, sphere.GetCenter ());
+	  if (sqd > sphere.GetRadius () * sphere.GetRadius ())
+	    return;
+	}
+	if (do_box)
+	{
+	  const csVector3& pos = rview->GetCamera ()
+		  ->GetTransform ().GetOrigin ();
+	  if (!box.In (pos))
+	    return;
+	}
+
         framenr = global_framenr;
 	trigger->Fire ();
       }
@@ -645,13 +694,11 @@ csSequenceTrigger::~csSequenceTrigger ()
   ClearConditions ();
 }
 
-void csSequenceTrigger::AddConditionInSector (iSector* sector)
+void csSequenceTrigger::AddConditionInSector (iSector* sector,
+	bool insideonly, const csBox3* box, const csSphere* sphere)
 {
-}
-
-void csSequenceTrigger::AddConditionSectorVisible (iSector* sector)
-{
-  csTriggerSectorCallback* trig = new csTriggerSectorCallback (this);
+  csTriggerSectorCallback* trig = new csTriggerSectorCallback (this,
+		  insideonly, box, sphere);
   sector->SetSectorCallback (trig);
 
   csConditionCleanupSectorCB* cleanup = new csConditionCleanupSectorCB (

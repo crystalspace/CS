@@ -199,8 +199,8 @@ public:
   csSequenceTrigger (csEngineSequenceManager* eseqmgr);
   virtual ~csSequenceTrigger ();
 
-  void AddConditionInSector (iSector* sector);
-  void AddConditionSectorVisible (iSector* sector);
+  void AddConditionInSector (iSector* sector, bool insideonly,
+		  const csBox3* box, const csSphere* sphere);
   void AddConditionInMeshSphere (iMeshWrapper* mesh);
   void AddConditionInMeshBox (iMeshWrapper* mesh);
   void AddConditionMeshVisible (iMeshWrapper* mesh);
@@ -231,11 +231,21 @@ public:
     }
     virtual void AddConditionInSector (iSector* sector)
     {
-      scfParent->AddConditionInSector (sector);
+      scfParent->AddConditionInSector (sector, true, NULL, NULL);
+    }
+    virtual void AddConditionInSector (iSector* sector,
+	const csBox3& box)
+    {
+      scfParent->AddConditionInSector (sector, true, &box, NULL);
+    }
+    virtual void AddConditionInSector (iSector* sector,
+	const csSphere& sphere)
+    {
+      scfParent->AddConditionInSector (sector, true, NULL, &sphere);
     }
     virtual void AddConditionSectorVisible (iSector* sector)
     {
-      scfParent->AddConditionSectorVisible (sector);
+      scfParent->AddConditionInSector (sector, false, NULL, NULL);
     }
     virtual void AddConditionInMeshSphere (iMeshWrapper* mesh)
     {
