@@ -238,6 +238,16 @@ void csFrustumVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
 
 void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 {
+#ifdef CS_DEBUG
+  int i;
+  for (i = 0 ; i < visobj_vector.Length () ; i++)
+  {
+    if (((csFrustVisObjectWrapper*)visobj_vector[i])->visobj == visobj)
+    {
+      CS_ASSERT (false);
+    }
+  }
+#endif
   csFrustVisObjectWrapper* visobj_wrap = new csFrustVisObjectWrapper (
 		  this);
   visobj_wrap->visobj = visobj;

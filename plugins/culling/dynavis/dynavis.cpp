@@ -296,6 +296,16 @@ void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
 
 void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
 {
+#ifdef CS_DEBUG
+  int i;
+  for (i = 0 ; i < visobj_vector.Length () ; i++)
+  {
+    if (((csVisibilityObjectWrapper*)visobj_vector[i])->visobj == visobj)
+    {
+      CS_ASSERT (false);
+    }
+  }
+#endif
   csVisibilityObjectWrapper* visobj_wrap = new csVisibilityObjectWrapper (
 		  this);
   visobj_wrap->visobj = visobj;
