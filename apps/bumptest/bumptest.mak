@@ -36,6 +36,7 @@ LIB.BUMPTEST = $(foreach d,$(DEP.BUMPTEST),$($d.LIB))
 CFG.BUMPTEST = data/config/csbumptest.cfg
 
 #TO_INSTALL.EXE += $(BUMPTEST.EXE)
+#TO_INSTALL.CONFIG += $(CFG.BUMPTEST)
 
 MSVC.DSP += BUMPTEST
 DSP.BUMPTEST.NAME = bumptest

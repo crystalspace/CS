@@ -36,6 +36,7 @@ LIB.CSDEMO = $(foreach d,$(DEP.CSDEMO),$($d.LIB))
 CFG.CSDEMO = data/config/csdemo.cfg
 
 TO_INSTALL.EXE += $(DEMO.EXE)
+TO_INSTALL.CONFIG = $(CFG.CSDEMO)
 
 MSVC.DSP += CSDEMO
 DSP.CSDEMO.NAME = csdemo
