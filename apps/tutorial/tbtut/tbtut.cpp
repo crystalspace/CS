@@ -254,20 +254,20 @@ bool TerrBigTut::Initialize ()
 
   mesh->SetRenderPriority (engine->GetRenderPriority ("object"));
   mesh->SetZBufMode (CS_ZBUF_USE);
-  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  // mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
   csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (0, csVector3 (-50, 20, 0), 10,
+  light = engine->CreateLight (0, csVector3 (-50, 20, 0), 50,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (0, csVector3 (50, 20,  0), 10,
+  light = engine->CreateLight (0, csVector3 (50, 20,  0), 50,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
 
-  light = engine->CreateLight (0, csVector3 (0, 20, -50), 10,
+  light = engine->CreateLight (0, csVector3 (0, 20, -50), 50,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
 
