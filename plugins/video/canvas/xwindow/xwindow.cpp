@@ -101,6 +101,8 @@ void csXWindow::Report (int severity, const char* msg, ...)
 
 csXWindow::~csXWindow ()
 {
+  if (xf86vm) 
+    xf86vm->DecRef ();
   if (EventOutlet)
     EventOutlet->DecRef ();
 }
