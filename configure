@@ -5019,14 +5019,11 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 # recursive mutex extension.
 #------------------------------------------------------------------------------
 
-
-
-
-
     case $host_os in
 	cygwin*)
 	    cs_cv_sys_pthread=no
 	    ;;
+
 	*)
 	    if test "" != yes; then
   echo "$as_me:$LINENO: checking for pthread" >&5
@@ -5345,30 +5342,7 @@ echo "${ECHO_T}$cs_cv_sys_pthread" >&6
 fi
 
     if test $cs_cv_sys_pthread = yes; then
-  if test "$cs_cv_sys_pthread" = yes; then
-  cs_build_prop_val="yes"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.AVAILABLE ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val="$cs_cv_sys_pthread_cflags"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.CFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val="$cs_cv_sys_pthread_lflags $cs_cv_sys_pthread_libs"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.LFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-fi
-
+  :
 else
   cs_cv_sys_pthread_cflags=''
 	cs_cv_sys_pthread_lflags=''
@@ -5379,27 +5353,26 @@ fi
 	    ;;
     esac
 
-if test $cs_cv_sys_pthread = yes; then
-
-echo "$as_me:$LINENO: checking for pthread recursive mutexes" >&5
+    if test $cs_cv_sys_pthread = yes; then
+  echo "$as_me:$LINENO: checking for pthread recursive mutexes" >&5
 echo $ECHO_N "checking for pthread recursive mutexes... $ECHO_C" >&6
 if test "${cs_cv_sys_pthread_recursive+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  ac_ext=cc
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-    cs_cflags_save="$CXXFLAGS"
+    cs_cflags_save="$CFLAGS"
     cs_lflags_save="$LDFLAGS"
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
 
     for cs_build_item in `echo @-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE@@ | sed 'y% %#%'` \
-	    `echo @-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP@@ | sed 'y% %#%'`
+		`echo @-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -5455,7 +5428,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE $cs_cflags_save"
+	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -5469,7 +5442,7 @@ int
 main ()
 {
 pthread_mutexattr_t attr;
-		pthread_mutexattr_settype (&attr, CS_RECURSIVE);
+		    pthread_mutexattr_settype (&attr, CS_RECURSIVE);
   ;
   return 0;
 }
@@ -5483,7 +5456,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag"
+	 { ac_try='test -z "$ac_c_werror_flag"
 			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
@@ -5511,7 +5484,7 @@ fi
     done
 
 
-    CXXFLAGS=$cs_cflags_save
+    CFLAGS=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
     ac_ext=c
@@ -5526,7 +5499,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_sys_pthread_recursive=`echo $cs_build_cflags | \
-		sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`
+		    sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`
 else
   cs_cv_sys_pthread_recursive=no
 fi
@@ -5534,11 +5507,35 @@ fi
 fi
 echo "$as_me:$LINENO: result: $cs_cv_sys_pthread_recursive" >&5
 echo "${ECHO_T}$cs_cv_sys_pthread_recursive" >&6
-    if test $cs_cv_sys_pthread_recursive != no; then
-  cs_header_text="${cs_header_text}#define CS_PTHREAD_MUTEX_RECURSIVE $cs_cv_sys_pthread_recursive
+fi
+
+if test "$cs_cv_sys_pthread" = yes; then
+  cs_build_prop_val="yes"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
+	cs_build_prop_val="$cs_cv_sys_pthread_cflags"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.CFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_sys_pthread_lflags $cs_cv_sys_pthread_libs"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.LFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
+if test $cs_cv_sys_pthread_recursive != no; then
+  cs_header_text="${cs_header_text}#define CS_PTHREAD_MUTEX_RECURSIVE $cs_cv_sys_pthread_recursive
+"
 fi
 
 
@@ -7845,6 +7842,7 @@ fi
 # more appropriate to use -Wmost rather than -Wall even if the compiler
 # understands both, thus we attempt -Wmost before -Wall.
 #------------------------------------------------------------------------------
+
 echo "$as_me:$LINENO: checking how to enable compilation warnings" >&5
 echo $ECHO_N "checking how to enable compilation warnings... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_enable_warnings+set}" = set; then

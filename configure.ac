@@ -227,52 +227,11 @@ CS_CHECK_COMMON_LIBS
 # Check for pthread.  Also check if pthread implementation supports the
 # recursive mutex extension.
 #------------------------------------------------------------------------------
-m4_define([cs_pthread_flags],
-    [CS_CREATE_TUPLE() \
-    CS_CREATE_TUPLE([], [], [-lpthread]) \
-    CS_CREATE_TUPLE([-pthread], [-pthread], []) \
-    CS_CREATE_TUPLE([-pthread], [-pthread], [-lpthread]) \
-    CS_CREATE_TUPLE([-pthread], [-pthread], [-lc_r])])
-
-AC_DEFUN([CS_CHECK_PTHREAD],
-    [AC_REQUIRE([AC_CANONICAL_HOST])
-    case $host_os in
-	cygwin*)
-	    cs_cv_sys_pthread=no
-	    ;;
-	*)
-	    CS_CHECK_BUILD([for pthread], [cs_cv_sys_pthread],
-		[AC_LANG_PROGRAM(
-		    [[#include <pthread.h>
-		    void* worker(void* p) { (void)p; return p; }]],
-		    [pthread_t tid; pthread_create(&tid, 0, worker, 0);])],
-		[cs_pthread_flags], [],
-		[CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])])
-	    ;;
-    esac])
-
-CS_CHECK_PTHREAD
-
-AS_IF([test $cs_cv_sys_pthread = yes],
-    [AC_CACHE_CHECK([for pthread recursive mutexes],
-	[cs_cv_sys_pthread_recursive],
-	[CS_BUILD_IFELSE(
-	    [AC_LANG_PROGRAM(
-		[[#include <pthread.h>]],
-		[pthread_mutexattr_t attr;
-		pthread_mutexattr_settype (&attr, CS_RECURSIVE);])],
-	    [CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
-	    CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP])],
-	    [C++],
-	    [cs_cv_sys_pthread_recursive=`echo $cs_build_cflags | \
-		sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`],
-	    [cs_cv_sys_pthread_recursive=no],
-	    [$cs_cv_sys_pthread_cflags -D_GNU_SOURCE],
-	    [$cs_cv_sys_pthread_lflags],
-	    [$cs_cv_sys_pthread_libs])])
-    AS_IF([test $cs_cv_sys_pthread_recursive != no],
-	[CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
-	    [$cs_cv_sys_pthread_recursive])])])
+CS_CHECK_PTHREAD([cygwin*])
+CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])
+AS_IF([test $cs_cv_sys_pthread_recursive != no],
+    [CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
+	[$cs_cv_sys_pthread_recursive])])
 
 
 
