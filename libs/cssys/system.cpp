@@ -339,7 +339,7 @@ csSystemDriver::~csSystemDriver ()
   console_close ();
 }
 
-bool csSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName)
+bool csSystemDriver::Initialize (int argc, const char* const argv[], const char *iConfigName)
 {
   // Increment our reference count to not get dumped when
   // someone will do an IncRef() and then an DecRef().
@@ -398,7 +398,7 @@ bool csSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName
   Config->EnumData ("PlugIns", &PluginList);
   while (n < PluginList.Length ())
   {
-    const char *classID = Config->GetStr ("PlugIns", (char *)PluginList.Get (n));
+    const char *classID = Config->GetStr ("PlugIns", (const char*)PluginList.Get (n));
     // If -video was used to override 3D driver, then respect it.
     if (g3d_override && strncmp(classID, g3d_str, g3d_len) == 0)
       PluginList.Delete(n);
@@ -415,7 +415,7 @@ bool csSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName
 
   // Load all plugins
   for (n = 0; n < PluginList.Length (); n++)
-    LoadPlugIn ((char *)PluginList.Get (n), NULL, 0);
+    LoadPlugIn ((const char*)PluginList.Get (n), NULL, 0);
 
   // See if user wants help
   if ((val = GetOptionCL ("help")))
@@ -544,18 +544,18 @@ bool csSystemDriver::HandleEvent (csEvent &Event)
   return false;
 }
 
-void csSystemDriver::CollectOptions (int argc, char *argv[])
+void csSystemDriver::CollectOptions (int argc, const char* const argv[])
 {
   for (int i = 1; i < argc; i++)
   {
-    char *opt = argv [i];
+    const char *opt = argv [i];
     if (*opt == '-')
     {
       while (*opt == '-') opt++;
-      opt = strnew (opt);
-      char *arg = strchr (opt, '=');
-      if (arg) *arg++ = 0; else arg = opt + strlen (opt);
-      CHK (CommandLine.Push (new csCommandLineOption (opt, arg)));
+      char* wopt = strnew (opt);
+      char *arg = strchr (wopt, '=');
+      if (arg) *arg++ = 0; else arg = wopt + strlen (wopt);
+      CHK (CommandLine.Push (new csCommandLineOption (wopt, arg)));
     }
     else
       CommandLineNames.Push (strnew (opt));
@@ -973,37 +973,37 @@ bool csSystemDriver::GetShutdown ()
   return Shutdown;
 }
 
-int csSystemDriver::ConfigGetInt (char *Section, char *Key, int Default)
+int csSystemDriver::ConfigGetInt (const char *Section, const char *Key, int Default)
 {
   return Config->GetInt (Section, Key, Default);
 }
 
-char *csSystemDriver::ConfigGetStr (char *Section, char *Key, char *Default)
+const char *csSystemDriver::ConfigGetStr (const char *Section, const char *Key, const char *Default)
 {
   return Config->GetStr (Section, Key, Default);
 }
 
-bool csSystemDriver::ConfigGetYesNo (char *Section, char *Key, bool Default)
+bool csSystemDriver::ConfigGetYesNo (const char *Section, const char *Key, bool Default)
 {
   return Config->GetYesNo (Section, Key, Default);
 }
 
-float csSystemDriver::ConfigGetFloat (char *Section, char *Key, float Default)
+float csSystemDriver::ConfigGetFloat (const char *Section, const char *Key, float Default)
 {
   return Config->GetFloat (Section, Key, Default);
 }
 
-bool csSystemDriver::ConfigSetInt (char *Section, char *Key, int Value)
+bool csSystemDriver::ConfigSetInt (const char *Section, const char *Key, int Value)
 {
   return Config->SetInt (Section, Key, Value);
 }
 
-bool csSystemDriver::ConfigSetStr (char *Section, char *Key, char *Value)
+bool csSystemDriver::ConfigSetStr (const char *Section, const char *Key, const char *Value)
 {
   return Config->SetStr (Section, Key, Value);
 }
 
-bool csSystemDriver::ConfigSetFloat (char *Section, char *Key, float Value)
+bool csSystemDriver::ConfigSetFloat (const char *Section, const char *Key, float Value)
 {
   return Config->SetFloat (Section, Key, Value);
 }

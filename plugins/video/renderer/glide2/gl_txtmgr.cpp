@@ -110,7 +110,7 @@ void csTextureManagerGlide::Initialize ()
 
 void csTextureManagerGlide::read_config ()
 {
-  char* p;
+  const char* p;
 //  iSystem* sys = m_piSystem;
   // @@@ WARNING! The following code only examines the
   // main cryst.cfg file and not the one which overrides values

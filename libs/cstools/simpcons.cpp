@@ -64,7 +64,7 @@ csSimpleConsole::csSimpleConsole (csIniFile *iConfig, csSimpleCommand* pc) : com
   LineMessageMax = config->GetInt ("SimpleConsole", "LINEMAX", 4);
   HistoryMax = config->GetInt ("SimpleConsole", "LINEHISTORY", SIZE_HISTORY);
   console_transparent_bg = config->GetYesNo ("SimpleConsole", "TRANSPBG", 1);
-  char *buf = config->GetStr ("SimpleConsole", "CONFG", "255,255,255");
+  const char *buf = config->GetStr ("SimpleConsole", "CONFG", "255,255,255");
   sscanf (buf, "%d,%d,%d", &console_fg_r, &console_fg_g, &console_fg_b);
   buf = config->GetStr ("SimpleConsole", "CONBG", "0,0,0");
   sscanf (buf, "%d,%d,%d", &console_bg_r, &console_bg_g, &console_bg_b);

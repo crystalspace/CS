@@ -179,7 +179,7 @@ void SysSystemDriver::Warn(const char* s)
 }
 
 
-bool SysSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName )
+bool SysSystemDriver::Initialize (int argc, const char* const argv[], const char *iConfigName )
 {
 	Handle			theMenuBar;
 	MenuHandle		theMenu;

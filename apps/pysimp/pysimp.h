@@ -41,7 +41,8 @@ public:
   PySimple ();
   virtual ~PySimple ();
 
-  virtual bool Initialize (int argc, char *argv[], const char *iConfigName);
+  virtual bool Initialize (int argc, const char* const argv[],
+    const char *iConfigName);
   virtual void NextFrame (time_t elapsed_time, time_t current_time);
   virtual bool HandleEvent (csEvent &Event);
 };

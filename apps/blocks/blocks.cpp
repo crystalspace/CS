@@ -88,7 +88,7 @@ void TextEntryMenu::Clear ()
   num_entries = 0;
 }
 
-void TextEntryMenu::Add (char* txt, char* entry, void* userdata)
+void TextEntryMenu::Add (const char* txt, const char* entry, void* userdata)
 {
   TextEntry* n = new TextEntry;
   n->txt = new char [strlen (txt+1)];
@@ -1424,7 +1424,7 @@ void Blocks::DrawMenu (float menu_transition, int old_menu, int new_menu)
   }
 }
 
-void Blocks::CreateMenuEntry (char* txt, int menu_nr)
+void Blocks::CreateMenuEntry (const char* txt, int menu_nr)
 {
   csTextureHandle* tm_back = world->GetTextures ()->GetTextureMM ("menu_back");
   csTextureHandle* tm_front = world->GetTextures ()->GetTextureMM (txt);
@@ -1926,22 +1926,21 @@ long time0 = -1;
 
 //-----------------------------------------------------
 
-void Blocks::NamedKey (char* keyname, KeyMapping& map)
+void Blocks::NamedKey (const char* keyname, KeyMapping& map)
 {
   map.shift = false;
   map.alt = false;
   map.ctrl = false;
-  char* dash = strchr (keyname, '-');
+  const char* dash = strchr (keyname, '-');
   while (dash)
   {
-    *dash = 0;
-    if (!strcmp (keyname, "shift")) map.shift = true;
-    else if (!strcmp (keyname, "alt")) map.alt = true;
-    else if (!strcmp (keyname, "ctrl")) map.ctrl = true;
-
-    *dash = '-';
-    keyname = dash+1;
-    dash = strchr (dash+1, '-');
+    const int len = dash - keyname;
+    if (len > 0)
+      if (!strncmp (keyname, "shift", len)) map.shift = true;
+      else if (!strncmp (keyname, "alt", len)) map.alt = true;
+      else if (!strncmp (keyname, "ctrl", len)) map.ctrl = true;
+    keyname = dash + 1;
+    dash = strchr (keyname, '-');
   }
 
   if (!strcmp (keyname, "tab")) map.key = CSKEY_TAB;
@@ -1984,7 +1983,7 @@ void Blocks::NamedKey (char* keyname, KeyMapping& map)
   else map.key = *keyname;
 }
 
-char* Blocks::KeyName (const KeyMapping& map)
+const char* Blocks::KeyName (const KeyMapping& map)
 {
   static char buf[100];
   buf[0] = 0;

@@ -59,7 +59,8 @@ void cleanup ()
   delete System;
 }
 
-bool PySimple::Initialize (int argc, char *argv[], const char *iConfigName)
+bool PySimple::Initialize (int argc, const char* const argv[],
+  const char *iConfigName)
 {
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;

@@ -50,7 +50,7 @@ void csTextureManagerOpenGL::Initialize ()
 
 void csTextureManagerOpenGL::read_config ()
 {
-  char *p;
+  const char *p;
   do_blend_mipmap0 = config->GetYesNo ("Mipmapping", "BLEND_MIPMAP", false);
   prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);
   prefered_col_dist = config->GetInt ("TextureManager", "RGB_COL_DIST", PREFERED_COL_DIST);

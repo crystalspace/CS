@@ -40,7 +40,7 @@ public:
 
 	virtual void Close();
 
-	virtual bool Initialize ( int argc, char *argv[], const char *iConfigName );
+	virtual bool Initialize ( int argc, const char* const argv[], const char *iConfigName );
 	virtual void Loop();
 
 	virtual void Alert( const char* s );

@@ -22,7 +22,7 @@
 #include "csengine/sysitf.h"
 #include "csengine/world.h"
 
-void CsPrintf (int mode, char* str, ...)
+void CsPrintf (int mode, const char* str, ...)
 {
   char buf[1024];
   va_list arg;

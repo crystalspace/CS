@@ -217,7 +217,7 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   if (!System->RegisterDriver ("iGraphics3D", this))
     return false;
 
-  char *driver = config->GetStr ("Hardware", "Driver2D", SOFTWARE_2D_DRIVER);
+  const char *driver = config->GetStr ("Hardware", "Driver2D", SOFTWARE_2D_DRIVER);
   G2D = LOAD_PLUGIN (System, driver, iGraphics2D);
   if (!G2D)
     return false;

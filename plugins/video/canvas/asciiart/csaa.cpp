@@ -73,7 +73,7 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   aa_defparams.recwidth = config->GetInt ("Console", "Width", 80);
   aa_defparams.height =
   aa_defparams.recheight = config->GetInt ("Console", "Height", 25);
-  char *font = config->GetStr ("Console", "Font", "vga16");
+  const char *font = config->GetStr ("Console", "Font", "vga16");
   for (int i = 0; aa_fonts [i]; i++)
     if ((strcasecmp (font, aa_fonts [i]->name) == 0)
      || (strcasecmp (font, aa_fonts [i]->shortname) == 0))
@@ -99,7 +99,7 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
 #undef SETFLAG
 
   aa_defrenderparams.inversion = config->GetYesNo ("Rendering", "Inverse", false);
-  char *dither = config->GetStr ("Rendering", "Dither", "none");
+  const char *dither = config->GetStr ("Rendering", "Dither", "none");
   if (strcasecmp (dither, "none") == 0)
     aa_defrenderparams.dither = 0;
   else if (strcasecmp (dither, "floyd-steinberg") == 0)

@@ -206,7 +206,7 @@ bool csGraphics3DOpenGL::Open (const char *Title)
   m_config_options.m_lightmap_dst_blend = GL_ZERO;
 
   // try to match user's blend name with a name in the blendstyles table
-  char *lightmapstyle = config->GetStr("OpenGL", "LIGHTMAP_MODE","multiplydouble");
+  const char *lightmapstyle = config->GetStr("OpenGL", "LIGHTMAP_MODE","multiplydouble");
   int blendstyleindex = 0;
   while (blendstyles[blendstyleindex].blendstylename != NULL)
   {

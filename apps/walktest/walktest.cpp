@@ -1279,7 +1279,7 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
 }
 
 
-bool WalkTest::Initialize (int argc, char *argv[], const char *iConfigName)
+bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConfigName)
 {
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
     return false;

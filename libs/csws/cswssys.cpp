@@ -62,7 +62,7 @@ cswsSystemDriver::~cswsSystemDriver ()
   application = NULL;
 }
 
-bool cswsSystemDriver::Initialize (int argc, char *argv[],
+bool cswsSystemDriver::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName))

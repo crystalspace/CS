@@ -77,8 +77,8 @@ protected:
   time_t CurrentTime;
 
   /// Set up initial application layout (read configs, create windows, menus etc)
-  virtual bool InitialSetup (int argc, char *argv[], const char *iConfigName,
-    const char* iDataDir);
+  virtual bool InitialSetup (int argc, const char* const argv[],
+    const char *iConfigName, const char* iDataDir);
 
 public:
   /// The system driver

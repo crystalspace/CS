@@ -122,8 +122,8 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   m_b16Bits = bit16;
   m_bStereo = stereo;
 
-  char *callback_func=configwodrv->GetStr("SoundDriver.waveOut", "CALLBACK", "function");
-  char *thread_func=configwodrv->GetStr("SoundDriver.waveOut", "THREAD_PRIORITY", "normal");
+  const char *callback_func=configwodrv->GetStr("SoundDriver.waveOut", "CALLBACK", "function");
+  const char *thread_func=configwodrv->GetStr("SoundDriver.waveOut", "THREAD_PRIORITY", "normal");
   bool threading = false;
 
   if(stricmp(callback_func, "thread")==0)

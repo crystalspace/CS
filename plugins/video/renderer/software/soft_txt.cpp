@@ -421,7 +421,7 @@ void csTextureManagerSoftware::Initialize ()
 
 void csTextureManagerSoftware::read_config ()
 {
-  char *p;
+  const char *p;
 
   do_blend_mipmap0 = config->GetYesNo ("Mipmapping", "BLEND_MIPMAP", false);
   prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);

@@ -49,7 +49,7 @@ void csTextureManagerDirect3D::Initialize ()
 
 void csTextureManagerDirect3D::read_config ()
 {
-  char* p;
+  const char* p;
   iSystem* sys = System;
   // @@@ WARNING! The following code only examines the
   // main cryst.cfg file and not the one which overrides values

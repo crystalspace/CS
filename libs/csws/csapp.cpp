@@ -116,8 +116,8 @@ void csApp::ShutDown ()
   System->StartShutdown ();
 }
 
-bool csApp::InitialSetup (int argc, char *argv[], const char *iConfigName,
-  const char* iDataDir)
+bool csApp::InitialSetup (int argc, const char* const argv[],
+  const char *iConfigName, const char* iDataDir)
 {
   if (!System->Initialize (argc, argv, iConfigName))
     return false;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,11 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SYSITF_H
-#define SYSITF_H
+#ifndef __CS_SYSITF_H__
+#define __CS_SYSITF_H__
 
 #include "isystem.h"
 
-extern void CsPrintf (int mode, char* str, ...);
+void CsPrintf (int mode, const char* str, ...);
 
-#endif
+#endif // __CS_SYSITF_H__

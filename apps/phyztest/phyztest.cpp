@@ -135,7 +135,7 @@ void cleanup ()
   delete Sys;
 }
 
-bool Phyztest::Initialize (int argc, char *argv[], const char *iConfigName)
+bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConfigName)
 {
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;

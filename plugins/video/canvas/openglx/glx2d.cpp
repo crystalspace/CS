@@ -61,7 +61,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   csIniFile *config = new csIniFile( "opengl.cfg" );
   
   dispdriver = NULL;
-  char *strDriver;
+  const char *strDriver;
   if ( config ){  
   if ( (strDriver = config->GetStr( "Display", "Driver", DEF_OGLDISP )) ){
       dispdriver = LOAD_PLUGIN( pSystem, strDriver, iOpenGLDisp );

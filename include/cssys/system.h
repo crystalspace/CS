@@ -97,7 +97,7 @@ class csSystemDriver : public iSystem
     bool Value;				// If Type is CSVAR_BOOL
     iConfig *Config;
 
-    csPluginOption (char *iName, csVariantType iType, int iID, bool iValue, iConfig* iConfig)
+    csPluginOption (const char *iName, csVariantType iType, int iID, bool iValue, iConfig* iConfig)
     {
       Name = strnew (iName);
       Type = iType;
@@ -133,7 +133,7 @@ class csSystemDriver : public iSystem
     virtual bool FreeItem (csSome Item)
     { CHK (delete (csCommandLineOption *)Item); return true; }
     virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
-    { return strcmp (((csCommandLineOption *)Item)->Name, (char *)Key); }
+    { return strcmp (((csCommandLineOption *)Item)->Name, (const char*)Key); }
   };
 
 public:
@@ -196,10 +196,10 @@ public:
   virtual ~csSystemDriver ();
 
   /// This is usually called right after object creation.
-  virtual bool Initialize (int argc, char *argv[], const char *iConfigName);
+  virtual bool Initialize (int argc, const char* const argv[], const char *iConfigName);
 
   /// Collect all options from command line
-  virtual void CollectOptions (int argc, char *argv[]);
+  virtual void CollectOptions (int argc, const char* const argv[]);
 
   /// Query all options supported by given plugin and place into OptionList
   void QueryOptions (iPlugIn *iObject);
@@ -359,19 +359,19 @@ public:
   /// check if system is shutting down
   virtual bool GetShutdown ();
   /// Get a integer configuration value
-  virtual int ConfigGetInt (char *Section, char *Key, int Default = 0);
+  virtual int ConfigGetInt (const char *Section, const char *Key, int Default = 0);
   /// Get a string configuration value
-  virtual char *ConfigGetStr (char *Section, char *Key, char *Default = NULL);
+  virtual const char *ConfigGetStr (const char *Section, const char *Key, const char *Default = NULL);
   /// Get a string configuration value
-  virtual bool ConfigGetYesNo (char *Section, char *Key, bool Default = false);
+  virtual bool ConfigGetYesNo (const char *Section, const char *Key, bool Default = false);
   /// Get a float configuration value
-  virtual float ConfigGetFloat (char *Section, char *Key, float Default = 0);
+  virtual float ConfigGetFloat (const char *Section, const char *Key, float Default = 0);
   /// Set an integer configuration value
-  virtual bool ConfigSetInt (char *Section, char *Key, int Value);
+  virtual bool ConfigSetInt (const char *Section, const char *Key, int Value);
   /// Set an string configuration value
-  virtual bool ConfigSetStr (char *Section, char *Key, char *Value);
+  virtual bool ConfigSetStr (const char *Section, const char *Key, const char *Value);
   /// Set an float configuration value
-  virtual bool ConfigSetFloat (char *Section, char *Key, float Value);
+  virtual bool ConfigSetFloat (const char *Section, const char *Key, float Value);
   /// Save system configuration file
   virtual bool ConfigSave ();
   /// Put a keyboard event into event queue 
@@ -407,7 +407,7 @@ public:
 extern csSystemDriver *System;
 
 // Most used routine used for console/debug/etc output ...
-extern void CsPrintf (int mode, char* str, ...);
+void CsPrintf (int mode, const char* str, ...);
 
 // Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);

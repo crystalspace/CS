@@ -156,7 +156,7 @@ public:
   TextEntryMenu () { entries = last = NULL; num_entries = 0; selected = 0; }
   ~TextEntryMenu ();
   void Clear ();
-  void Add (char* txt, char* entry, void* userdata);
+  void Add (const char* txt, const char* entry, void* userdata);
   void Draw ();
   int GetSelected () { return selected; }
   int GetNumEntries () { return num_entries; }
@@ -357,13 +357,13 @@ public:
   void StartKeyConfig ();
   void set_cube_room (csSector* s) { room = s; }
   void InitGame ();
-  void CreateMenuEntry (char* txt, int menu_nr);
+  void CreateMenuEntry (const char* txt, int menu_nr);
   void ChangePlaySize (int new_size);
 
   void ReadConfig ();
   void WriteConfig ();
-  void NamedKey (char* keyname, KeyMapping& map);
-  char* KeyName (const KeyMapping& map);
+  void NamedKey (const char* keyname, KeyMapping& map);
+  const char* KeyName (const KeyMapping& map);
 
   void DrawMenu (int menu);
   void DrawMenu (float menu_transition, int old_menu, int new_menu);

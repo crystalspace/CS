@@ -30,7 +30,7 @@ public:
   ///
   virtual bool HandleEvent (csEvent &Event);
 
-  virtual bool InitialSetup (int argc, char *argv[],
+  virtual bool InitialSetup (int argc, const char* const argv[],
     const char *ConfigName, const char* DataDir);
 };
 
@@ -52,7 +52,7 @@ csWsTest::csWsTest (char *AppTitle) : csApp (AppTitle)
   SetPalette (palette_csWsTest, sizeof (palette_csWsTest) / sizeof (int));
 }
 
-bool csWsTest::InitialSetup (int argc, char *argv[],
+bool csWsTest::InitialSetup (int argc, const char* const argv[],
   const char *ConfigName, const char* DataDir)
 {
   if (!csApp::InitialSetup (argc, argv, ConfigName, DataDir))

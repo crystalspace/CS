@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
     Written by Dan Ogles
 
     This library is free software; you can redistribute it and/or
@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISYSTEM_H__
-#define __ISYSTEM_H__
+#ifndef __CS_ISYSTEM_H__
+#define __CS_ISYSTEM_H__
 
 #include "csutil/scf.h"
 
@@ -84,19 +84,19 @@ struct iSystem : public iBase
   /// check if system is shutting down
   virtual bool GetShutdown () = 0;
   /// Get a integer configuration value
-  virtual int ConfigGetInt (char *Section, char *Key, int Default = 0) = 0;
+  virtual int ConfigGetInt (const char *Section, const char *Key, int Default = 0) = 0;
   /// Get a string configuration value
-  virtual char *ConfigGetStr (char *Section, char *Key, char *Default = NULL) = 0;
+  virtual const char *ConfigGetStr (const char *Section, const char *Key, const char *Default = NULL) = 0;
   /// Get a string configuration value
-  virtual bool ConfigGetYesNo (char *Section, char *Key, bool Default = false) = 0;
+  virtual bool ConfigGetYesNo (const char *Section, const char *Key, bool Default = false) = 0;
   /// Get a float configuration value
-  virtual float ConfigGetFloat (char *Section, char *Key, float Default = 0) = 0;
+  virtual float ConfigGetFloat (const char *Section, const char *Key, float Default = 0) = 0;
   /// Set an integer configuration value
-  virtual bool ConfigSetInt (char *Section, char *Key, int Value) = 0;
+  virtual bool ConfigSetInt (const char *Section, const char *Key, int Value) = 0;
   /// Set an string configuration value
-  virtual bool ConfigSetStr (char *Section, char *Key, char *Value) = 0;
+  virtual bool ConfigSetStr (const char *Section, const char *Key, const char *Value) = 0;
   /// Set an float configuration value
-  virtual bool ConfigSetFloat (char *Section, char *Key, float Value) = 0;
+  virtual bool ConfigSetFloat (const char *Section, const char *Key, float Value) = 0;
   /// Save system configuration file
   virtual bool ConfigSave () = 0;
   /// Put a keyboard event into event queue 
@@ -128,4 +128,4 @@ struct iSystem : public iBase
   virtual iSCF* GetSCF()=0;
 };
 
-#endif
+#endif // __CS_ISYSTEM_H__

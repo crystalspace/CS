@@ -41,7 +41,8 @@ public:
   /// Destroy the system driver object
   virtual ~cswsSystemDriver ();
   /// Initialize system driver and debug console
-  virtual bool Initialize (int argc, char *argv[], const char *iConfigName);
+  virtual bool Initialize (int argc, const char* const argv[],
+    const char *iConfigName);
   /// Call application on each frame
   virtual void NextFrame (time_t elapsed_time, time_t current_time);
   /// Called from NextFrame() to process all events
