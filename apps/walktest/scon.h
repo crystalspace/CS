@@ -47,8 +47,8 @@ protected:
   int console_bg;
   /// RGB version of above
   int console_bg_r, console_bg_g, console_bg_b;
-  /// Colored console background? (what for? :-)
-  bool console_colored_bg;
+  /// Transparent console background?
+  bool console_transparent_bg;
   /// Console mode
   int ConsoleMode;
   /// Select font (-1 = automatic, else one of cs_Font_...)
@@ -76,11 +76,11 @@ public:
    * Test if the console is transparent and if we should allow
    * the renderer to draw.
    */
-  bool IsTransparent () { return !console_colored_bg; }
+  bool IsTransparent () { return console_transparent_bg; }
 
   /**
-   * Set transparency mode for console. 0 = off,
-   * 1 = on, -1 = read from config.
+   * Set transparency mode for console.
+   * 0 = off, 1 = on, -1 = read from config.
    */
   void SetTransparent (int t = -1);
 
@@ -130,7 +130,7 @@ private:
   /// Characters per line
   int LineSize;
   /// Lines changed since last 'Print'
-  char *LinesChanged;
+  bool *LinesChanged;
 
   /// Messages overlapped onto renderer screen
   char **LineMessage;
