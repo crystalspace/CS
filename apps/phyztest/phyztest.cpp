@@ -131,8 +131,8 @@ Phyztest::~Phyztest ()
 
 void cleanup ()
 {
-  System->console_out ("Cleaning up...\n");
-  delete System;
+  Sys->console_out ("Cleaning up...\n");
+  delete Sys;
 }
 
 bool Phyztest::Initialize (int argc, char *argv[], const char *iConfigName)
@@ -473,21 +473,21 @@ int main (int argc, char* argv[])
   csWorld::System = Sys;
 
   // We want at least the minimal set of plugins
-  System->RequestPlugin ("crystalspace.kernel.vfs");
-  System->RequestPlugin ("crystalspace.graphics3d.software");
-  System->RequestPlugin ("crystalspace.engine.core");
+  Sys->RequestPlugin ("crystalspace.kernel.vfs");
+  Sys->RequestPlugin ("crystalspace.graphics3d.software");
+  Sys->RequestPlugin ("crystalspace.engine.core");
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!Sys->Initialize (argc, argv, NULL))
   {
-    System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
+    Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
     exit (1);
   }
 
   // Main loop.
-  System->Loop ();
+  Sys->Loop ();
 
   // Cleanup.
   cleanup ();
