@@ -13,6 +13,9 @@ chronological order.
 	- Jorrit fixed wrong header protector in cstool/meshobjtmpl.h.
 	- Anders Stenberg implemented operator/= for csDVector3, since it
 	  wasn't implemented by some reason, just declared in the header.
+	- Eric Sunshine changed the `objcopy' check in configure.ac to employ
+	  AC_CHECK_TOOL() rather AC_CHECK_PROGS() in order to support
+	  cross-builds.
 20-Sep-2003
 	- Jorrit reverted nearly all his changes of yesterday. The only two
 	  changes that remain are the iPortalContainer object (but now

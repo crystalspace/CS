@@ -1570,7 +1570,7 @@ AS_IF([test $cs_cv_libbfd = yes],
 #------------------------------------------------------------------------------
 # Check if objcopy is present (part of GNU binutils).
 #------------------------------------------------------------------------------
-AC_CHECK_PROGS([OBJCOPY], [objcopy])
+AC_CHECK_TOOL([OBJCOPY], [objcopy])
 AS_IF([test -n "$OBJCOPY"],
     [CS_BUILD_PROPERTY([OBJCOPY.AVAILABLE], [yes])
     CS_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY])])
