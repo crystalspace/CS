@@ -1312,6 +1312,8 @@ class csIntersect3(_object):
     if _newclass:IntersectSegment = staticmethod(_cspace.csIntersect3_IntersectSegment)
     __swig_getmethods__["IntersectTriangle"] = lambda x: _cspace.csIntersect3_IntersectTriangle
     if _newclass:IntersectTriangle = staticmethod(_cspace.csIntersect3_IntersectTriangle)
+    __swig_getmethods__["Planes"] = lambda x: _cspace.csIntersect3_Planes
+    if _newclass:Planes = staticmethod(_cspace.csIntersect3_Planes)
     __swig_getmethods__["Plane"] = lambda x: _cspace.csIntersect3_Plane
     if _newclass:Plane = staticmethod(_cspace.csIntersect3_Plane)
     __swig_getmethods__["Plane"] = lambda x: _cspace.csIntersect3_Plane
