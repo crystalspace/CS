@@ -92,6 +92,8 @@
 #define CS_FUNCID_IMGLOADER	"ImageLoader"
 /// Sound loader
 #define CS_FUNCID_SNDLOADER	"SoundLoader"
+/// Image loader
+#define CS_FUNCID_LVLLOADER	"LevelLoader"
 /// Font server
 #define CS_FUNCID_FONTSERVER	"FontServer"
 /// Network driver

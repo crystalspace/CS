@@ -24,6 +24,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "ivideo/codec.h"
+#include "imap/parser.h"
 
 class csSector;
 class csView;
@@ -38,6 +39,7 @@ private:
   csEngine* engine;
   iStreamFormat *pVideoFormat;
   iVideoStream *pVStream;
+  iLoaderNew *LevelLoader;
 
   bool InitProcDemo ();
 

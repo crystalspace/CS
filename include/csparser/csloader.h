@@ -20,17 +20,20 @@
 #ifndef __CS_CSLOADER_H__
 #define __CS_CSLOADER_H__
 
+#include "imap/parser.h"
+
 #include "csparser/loadinfo.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csgeom/quaterni.h"
 
-struct iBase;
-struct iImage;
+struct iImageLoader;
+struct iSoundLoader;
+struct iEngine;
+struct iVFS;
 struct csRGBcolor;
 struct iMotion;
 struct iMotionAnim;
-struct iSoundHandle;
 struct iSkeletonLimb;
 struct iPlugIn;
 class csTextureWrapper;
@@ -70,7 +73,7 @@ class csTerrainWrapper;
 /**
  * The loader for Crystal Space maps.
  */
-class csLoader
+class csLoader : public iLoaderNew
 {
   struct LoadedPlugin
   {
@@ -144,8 +147,6 @@ class csLoader
     csMaterialWrapper* default_material, float default_texlen,
     csThing* parent, int vt_offset);
 
-  /// Load a image and return an iImage object
-  static iImage* load_image(const char* name);
   /// Parse and load a single texture
   static void txt_process (char *name, char* buf);
   /// Parse and load a single material
@@ -268,10 +269,6 @@ public:
    */
   static csThing* LoadThingTemplate (csEngine*, const char* fname);
 
-  /// Load a image and return an iImage object
-  static iImage* LoadImage (const char* name)
-  { return load_image (name); }
-
   /// Load a sound and return an iSoundData object
   static iSoundHandle* LoadSoundHandle(const char* filename);
 
@@ -281,6 +278,35 @@ public:
 
   /// Set loader mode (see CS_LOADER_XXX flags above)
   static void SetMode (int iFlags);
+
+
+  /********** iLoaderNew implementation **********/
+
+  // this is temporarily used by the rest of csLoader
+  static iLoaderNew *GlobalLoader;
+  
+  DECLARE_IBASE;
+  
+  // temporary wrapper to avoid name collision
+  struct {
+    // virtual file system
+    iVFS *VFS;
+    // image loader
+    iImageLoader *ImageLoader;
+    // sound loader
+    iSoundLoader *SoundLoader;
+    // engine
+    iEngine *Engine;
+  } tmpWrap;
+
+  // constructor
+  csLoader(iBase *p);
+  // destructor
+  virtual ~csLoader();
+  // initialize the plug-in
+  virtual bool Initialize(iSystem *System);
+
+  virtual iImage *LoadImage (const char* name);
 };
 
 #endif // __CS_CSLOADER_H__

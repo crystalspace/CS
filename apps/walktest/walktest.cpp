@@ -90,6 +90,7 @@ converter *ImportExport;
 //------------------------------------------------- We need the 3D engine -----
 
 REGISTER_STATIC_LIBRARY (engine)
+REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 

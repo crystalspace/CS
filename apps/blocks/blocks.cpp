@@ -54,6 +54,7 @@
 #include "isound/handle.h"
 #include "ivideo/fontserv.h"
 #include "iutil/cfgmgr.h"
+#include "imap/parser.h"
 
 #if defined(BLOCKS_NETWORKING)
 #include "inetwork/driver.h"
@@ -84,6 +85,7 @@ csView* view = NULL;
 //------------------------------------------------- We need the 3D engine -----
 
 REGISTER_STATIC_LIBRARY (engine)
+REGISTER_STATIC_LIBRARY (lvlload)
 
 int Blocks::white, Blocks::black, Blocks::red;
 
@@ -280,6 +282,7 @@ char* TextEntryMenu::GetSelectedEntry ()
 Blocks::Blocks ()
 {
   engine = NULL;
+  LevelLoader = NULL;
 
   full_rotate_x = create_rotate_x (M_PI/2);
   full_rotate_y = create_rotate_y (M_PI/2);
@@ -358,6 +361,7 @@ Blocks::~Blocks ()
 #if defined(BLOCKS_NETWORKING)
   TerminateConnection();
 #endif
+  if (LevelLoader) LevelLoader->DecRef();
 }
 
 void Blocks::InitGame ()
@@ -2975,6 +2979,14 @@ int main (int argc, char* argv[])
 
   // Get a font handle
   Sys->font = Sys->G2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
+
+  // Get the level loader
+  Sys->LevelLoader = QUERY_PLUGIN_ID(Sys, CS_FUNCID_LVLLOADER, iLoaderNew);
+  if (!Sys->LevelLoader)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "No iLoaderNew plugin!\n");
+    return -1;
+  }
 
   // Some settings.
   Gfx3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, (long)false);

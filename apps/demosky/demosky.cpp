@@ -43,6 +43,7 @@
 //------------------------------------------------- We need the 3D engine -----
 
 REGISTER_STATIC_LIBRARY (engine)
+REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
@@ -58,12 +59,14 @@ Simple::Simple ()
   sky_u = NULL;
   sky_d = NULL;
   flock = NULL;
+  LevelLoader = NULL;
 }
 
 Simple::~Simple ()
 {
   delete view;
   if(font) font->DecRef();
+  if (LevelLoader) LevelLoader->DecRef();
 
   delete sky;
   delete sky_f;
@@ -118,6 +121,13 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
   engine = Engine->GetCsEngine ();
   Engine->DecRef ();
+
+  LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoaderNew);
+  if (!LevelLoader)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "No iLoaderNew plugin!\n");
+    abort ();
+  }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Crystal Space Procedural Sky Demo"))
@@ -469,6 +479,7 @@ int main (int argc, char* argv[])
   System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
   System->RequestPlugin ("crystalspace.engine.core:Engine");
   System->RequestPlugin ("crystalspace.console.output.standard:Console.Output");
+  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.

@@ -36,6 +36,7 @@ class csPolygon3D;
 struct iFont;
 struct iMeshWrapper;
 struct iMaterialWrapper;
+struct iLoaderNew;
 
 class Flock;
 
@@ -48,6 +49,7 @@ private:
   csEngine* engine;
   csMaterialWrapper* matPlasma;
   iFont *font;
+  iLoaderNew *LevelLoader;
 
   /// the flock of birds
   Flock *flock;

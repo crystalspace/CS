@@ -1741,52 +1741,10 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 
 //---------------------------------------------------------------------------
 
-iImage* csLoader::load_image (const char* name)
-{
-  static bool TriedToLoadImage = false;
-  iImageLoader *ImageLoader =
-    QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageLoader);
-  if (ImageLoader == NULL)
-  {
-    if (!TriedToLoadImage)
-    {
-      CsPrintf (MSG_WARNING, "Trying to load image \"%s\" without "
-        "image loader\n", name);
-      TriedToLoadImage = true;
-    }
-    return NULL;
-  }
-
-  iImage *ifile = NULL;
-  iDataBuffer *buf = System->VFS->ReadFile (name);
-
-  if (!buf || !buf->GetSize ())
-  {
-    if (buf) buf->DecRef ();
-    ImageLoader->DecRef ();
-    CsPrintf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", name);
-    return NULL;
-  }
-
-  ifile = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Engine->GetTextureFormat ());
-  buf->DecRef ();
-  ImageLoader->DecRef ();
-
-  if (!ifile)
-  {
-    CsPrintf (MSG_WARNING, "'%s': Cannot load image. Unknown format or wrong extension!\n",name);
-    return NULL;
-  }
-
-  iDataBuffer *xname = System->VFS->ExpandPath (name);
-  ifile->SetName (**xname);
-  xname->DecRef ();
-
-  return ifile;
-}
-
 void csLoader::txt_process (char *name, char* buf)
 {
+  if (!GlobalLoader) return;
+
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (TRANSPARENT)
     CS_TOKEN_TABLE (FILTER)
@@ -1868,7 +1826,7 @@ void csLoader::txt_process (char *name, char* buf)
     fatal_exit (0, false);
   }
 
-  iImage *image = load_image (filename);
+  iImage *image = GlobalLoader->LoadImage (filename);
   if (!image)
     return;
 
@@ -2846,8 +2804,10 @@ bool csLoader::LoadLibraryFile (csEngine* engine, const char* fname)
 
 csTextureWrapper* csLoader::LoadTexture (csEngine* engine, const char* name, const char* fname)
 {
+  if (!GlobalLoader) return NULL;
+
   Engine = engine;
-  iImage *image = load_image (fname);
+  iImage *image = GlobalLoader->LoadImage (fname);
   if (!image)
     return NULL;
   csTextureWrapper *th = engine->GetTextures ()->NewTexture (image);
@@ -3811,4 +3771,101 @@ bool csLoader::LoadMotion (iMotion* mot, char* buf)
     fatal_exit (0, false);
   }
   return true;
+}
+
+
+/************ iLoaderNew implementation **************/
+
+iLoaderNew *csLoader::GlobalLoader = NULL;
+
+IMPLEMENT_IBASE(csLoader);
+  IMPLEMENTS_INTERFACE(iLoaderNew);
+  IMPLEMENTS_INTERFACE(iPlugIn);
+IMPLEMENT_IBASE_END;
+
+IMPLEMENT_FACTORY(csLoader);
+
+EXPORT_CLASS_TABLE (lvlload)
+  EXPORT_CLASS_DEP (csLoader, "crystalspace.level.loader",
+    "Level and library file loader", "crystalspace.kernel., "
+    "crystalspace.sound.loader., crystalspace.image.loader, "
+    "crystalspace.mesh.loader., crystalspace.terrain.loader., "
+    "crystalspace.engine.core")
+EXPORT_CLASS_TABLE_END
+
+csLoader::csLoader(iBase *p)
+{
+  CONSTRUCT_IBASE(p);
+
+  tmpWrap.VFS = NULL;
+  tmpWrap.ImageLoader = NULL;
+  tmpWrap.SoundLoader = NULL;
+  tmpWrap.Engine = NULL;
+
+  GlobalLoader = this;
+}
+
+csLoader::~csLoader()
+{
+  DEC_REF(tmpWrap.VFS);
+  DEC_REF(tmpWrap.ImageLoader);
+  DEC_REF(tmpWrap.SoundLoader);
+  DEC_REF(tmpWrap.Engine);
+
+  GlobalLoader = NULL;
+}
+
+#define GET_PLUGIN(var, func, intf, msgname)		\
+  var = QUERY_PLUGIN_ID(System, func, intf);		\
+  if (!var)						\
+    System->Printf(MSG_INITIALIZATION,			\
+      "  Failed to query "msgname" plug-in.\n");	\
+
+
+bool csLoader::Initialize(iSystem *System)
+{
+  System->Printf(MSG_INITIALIZATION, "Initializing loader plug-in...\n");
+
+  // get the virtual file system plugin
+  GET_PLUGIN(tmpWrap.VFS, CS_FUNCID_VFS, iVFS, "VFS");
+  if (!tmpWrap.VFS) return false;
+
+  // get all optional plugins
+  GET_PLUGIN(tmpWrap.ImageLoader, CS_FUNCID_IMGLOADER, iImageLoader, "image loader");
+  GET_PLUGIN(tmpWrap.SoundLoader, CS_FUNCID_SNDLOADER, iSoundLoader, "sound loader");
+  GET_PLUGIN(tmpWrap.Engine, CS_FUNCID_ENGINE, iEngine, "engine");
+
+  return true;
+}
+
+iImage* csLoader::LoadImage (const char* name)
+{
+  if (!tmpWrap.Engine || !tmpWrap.ImageLoader)
+     return NULL;
+
+  iImage *ifile = NULL;
+  iDataBuffer *buf = tmpWrap.VFS->ReadFile (name);
+
+  if (!buf || !buf->GetSize ())
+  {
+    if (buf) buf->DecRef ();
+    System->Printf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", name);
+    return NULL;
+  }
+
+  ifile = tmpWrap.ImageLoader->Load (buf->GetUint8 (), buf->GetSize (),
+    tmpWrap.Engine->GetTextureFormat ());
+  buf->DecRef ();
+
+  if (!ifile)
+  {
+    CsPrintf (MSG_WARNING, "'%s': Cannot load image. Unknown format or wrong extension!\n",name);
+    return NULL;
+  }
+
+  iDataBuffer *xname = tmpWrap.VFS->ExpandPath (name);
+  ifile->SetName (**xname);
+  xname->DecRef ();
+
+  return ifile;
 }

@@ -22,6 +22,12 @@
 
 #include "isys/plugin.h"
 
+struct iImage;
+struct iTextureHandle;
+struct iTextureWrapper;
+struct iSoundData;
+struct iSoundHandle;
+
 SCF_VERSION (iLoader, 0, 0, 1);
 
 /**
@@ -48,6 +54,16 @@ struct iLoader : public iPlugIn
    * back) but in any case for performance reasons this memory could be used.
    */
   virtual bool Parse (char *iData) = 0;
+};
+
+SCF_VERSION (iLoaderNew, 0, 0, 1);
+/**
+ * This interface will replace iLoader somewhere in the future.
+ */
+struct iLoaderNew : public iPlugIn
+{
+  /// Load an image file
+  virtual iImage *LoadImage (const char* name) = 0;
 };
 
 #endif // __IMAP_PARSER_H__

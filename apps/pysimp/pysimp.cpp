@@ -35,6 +35,7 @@
 //------------------------------------------------- We need the 3D engine -----
 
 REGISTER_STATIC_LIBRARY (engine)
+REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
@@ -43,12 +44,15 @@ PySimple::PySimple ()
   view = NULL;
   engine = NULL;
   motion_flags = 0;
+  LevelLoader = NULL;
 }
 
 PySimple::~PySimple ()
 {
   if(view)
     delete view;
+  if (LevelLoader)
+    LevelLoader->DecRef();
 }
 
 void cleanup ()
@@ -72,6 +76,13 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   }
   engine = Engine->GetCsEngine ();
   Engine->DecRef ();
+
+  LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoaderNew);
+  if (!LevelLoader)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "No iLoaderNew plugin!\n");
+    abort ();
+  }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Simple Crystal Space Python Application"))
@@ -222,6 +233,7 @@ int main (int argc, char* argv[])
   System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
   System->RequestPlugin ("crystalspace.font.server.default:FontServer");
   System->RequestPlugin ("crystalspace.engine.core:Engine");
+  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.

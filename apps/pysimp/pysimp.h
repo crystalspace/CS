@@ -28,6 +28,7 @@ class csSector;
 class csView;
 class csEngine;
 class csDynLight;
+struct iLoaderNew;
 
 class PySimple : public SysSystemDriver
 {
@@ -36,6 +37,7 @@ public:
   csView* view;
   csEngine* engine;
   int motion_flags;
+  iLoaderNew *LevelLoader;
 
 public:
   PySimple ();

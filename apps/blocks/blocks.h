@@ -34,6 +34,7 @@ class csThing;
 class csDynLight;
 struct iTextureManager;
 struct iFont;
+struct iLoaderNew;
 
 class KeyMapping
 {
@@ -304,6 +305,7 @@ public:
 
   // The font we are typing with
   iFont *font;
+  iLoaderNew *LevelLoader;
 
 public:
   Blocks ();
