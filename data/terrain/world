@@ -22,7 +22,7 @@
       <file>/lib/std/stone4.gif</file>
     </texture>
     <texture name="stone2DOT3.png">
-      <file>/lib/std/stone2DOT3.png</file>
+      <file>/lib/stdtex/stone2DOT3.png</file>
     </texture>
     <texture name="grass.png">
       <file>/lev/terrain/grass.png</file>

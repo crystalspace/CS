@@ -66,6 +66,7 @@ public:
 class CS_CSTOOL_EXPORT csRenderMeshHolderMultiple
 {
   csArray<csDirtyAccessArray<csRenderMesh*>*> rmHolderList;
+  csArray<csDirtyAccessArray<csRenderMesh*>*> clearQueue;
   int rmHolderListIndex;
 public:
   /**
@@ -87,6 +88,16 @@ public:
    *  meshes.
    */
   csDirtyAccessArray<csRenderMesh*>& GetUnusedMeshes (uint frameNumber);
+
+  /**
+   * Instruct the mesh holder to throw away all currently used csRenderMesh*
+   * arrays, effectively using clean arrays on subsequent calls when an 
+   * unused array is needed.
+   * \remark The arrays are *not* immediately deleted, this is delayed until
+   *  they really aren't used any more (determined by the frame number).
+   *  This has to be considered if manual mesh deletion was enabled.
+   */
+  void Clear();
 };
 
 #endif // __CS_CSTOOL_RENDERMESHHOLDER_H__

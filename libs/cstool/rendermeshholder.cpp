@@ -77,7 +77,8 @@ csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created,
 
 //---------------------------------------------------------------------------
 
-csRenderMeshHolderMultiple::csRenderMeshHolderMultiple (bool deleteMeshes)
+csRenderMeshHolderMultiple::csRenderMeshHolderMultiple (bool deleteMeshes) :
+  clearQueue (0, 4)
 {
   rmHolderListIndex = rmHolderList.Push (
     new csDirtyAccessArray<csRenderMesh*>);
@@ -126,5 +127,43 @@ csRenderMeshHolderMultiple::GetUnusedMeshes(uint frameNumber)
     }
   }
 
+  if (clearQueue.Length() > 0)
+  {
+    int i = 0;
+    while (i < clearQueue.Length())
+    {
+      csDirtyAccessArray<csRenderMesh*>* clearArray = clearQueue[i];
+      if ((clearArray->Length() == 0) || ((*clearArray)[0]->lastFrame != frameNumber))
+      {
+	if (deleteMeshes)
+	{
+	  for (int j = 0; j < clearArray->Length(); j++)
+	  {
+	    csRenderMesh* rm = (*clearArray)[j];
+	    delete rm;
+	  }
+	}
+	delete clearArray;
+	clearQueue.DeleteIndex (i);
+      }
+      else
+	i++;
+    }
+    if (clearQueue.Length() == 0)
+      clearQueue.ShrinkBestFit();
+  }
+
   return *rmH;
+}
+
+void csRenderMeshHolderMultiple::Clear()
+{
+  clearQueue.SetCapacity (rmHolderList.Length());
+  while (rmHolderList.Length() > 0)
+  {
+    clearQueue.Push (rmHolderList.Pop ());
+  }
+
+  rmHolderListIndex = rmHolderList.Push (
+    new csDirtyAccessArray<csRenderMesh*>);
 }

@@ -130,9 +130,8 @@ bool CsBench::CreateGeometry ()
         "Error loading 'stone4' texture!");
     return false;
   }
-  if (!loader->LoadTexture ("stone_normal", "/lib/std/stone2DOT3.png",
-  	CS_TEXTURE_3D,
-    0, false, false))
+  if (!loader->LoadTexture ("stone_normal", "/lib/stdtex/stone2DOT3.png", 
+  	CS_TEXTURE_3D, 0, false, false))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.simple1",
@@ -302,9 +301,10 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   return true;
 }
 
-#define BENCHTIME 3000
+#define BENCHTIME 1000
 
-void CsBench::BenchMark (const char* name, const char* description)
+void CsBench::BenchMark (const char* name, const char* description, 
+			 uint drawFlags)
 {
   Report ("================================================================");
   Report ("Benchmark %s (%s)...", name, description);
@@ -316,7 +316,7 @@ void CsBench::BenchMark (const char* name, const char* description)
   {
     cnt++;
 
-    g3d->BeginDraw (CSDRAW_CLEARSCREEN | CSDRAW_3DGRAPHICS);
+    g3d->BeginDraw (CSDRAW_CLEARSCREEN | CSDRAW_3DGRAPHICS | drawFlags);
     view->Draw ();
     g3d->FinishDraw ();
     g3d->Print (0);
@@ -374,8 +374,8 @@ iDocumentSystem* CsBench::GetDocumentSystem ()
   return docsys;
 }
 
-void CsBench::PerformShaderTest (const char* shaderPath, const char* shname,
-		const char* shtype, const char* shaderPath2, const char* shtype2)
+void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype, 
+				 const char* shaderPath2, const char* shtype2)
 {
   csRef<iShaderCompiler> shcom = GetShaderManager ()->GetCompiler ("XMLShader");
   csRef<iDocument> shaderDoc = GetDocumentSystem ()->CreateDocument ();
@@ -398,6 +398,10 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shname,
 
   csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
   int i;
+  iMaterialWrapper* oldmat = material;
+  csRef<iMeshWrapper> walls (engine->FindMeshObject ("walls"));
+  csRef<iThingState> ws =
+    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   for (i = 0 ; i < prilist->GetCount () ; i++)
   {
     int pri = prilist->GetPriority (i);
@@ -405,18 +409,24 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shname,
     if (shader)
     {
       csRef<iMaterial> matinput = engine->CreateBaseMaterial (
-		      engine->GetTextureList ()->FindByName ("stone"));
+	engine->GetTextureList ()->FindByName ("stone"));
+      csShaderVariable* normalSV = 
+	matinput->GetVariableAdd (strings->Request ("tex normal"));
+      normalSV->SetValue (engine->GetTextureList()->FindByName ("stone_normal"));
       matinput->SetShader (shadertype, shader);
       if (shader2)
 	matinput->SetShader (shadertype2, shader2);
       iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (matinput);
       mat->Register (g3d->GetTextureManager ());
       genmesh->SetMaterialWrapper (mat);
+      ws->ReplaceMaterial (oldmat, mat);
+
       char name[256];
-      sprintf (name, "%s_%d", shname, pri);
+      sprintf (name, "%s_%d", shader->GetName(), pri);
       char description[256];
-      sprintf (description, "Shader %s with priority %d", shname, pri);
-      BenchMark (name, description);
+      sprintf (description, "Shader %s with priority %d", shader->GetName(), pri);
+      BenchMark (name, description, CSDRAW_CLEARZBUFFER);
+      ws->ClearReplacedMaterials();
     }
   }
 }
@@ -443,15 +453,14 @@ void CsBench::PerformTests ()
   g3d->SetOption ("StencilThreshold", "100000000");
   BenchMark ("planeclip", "glClipPlane clipping is used");
 
-  PerformShaderTest ("/shader/or_lighting.xml", "or_lighting",
-		  "OR compatibility", 0, 0);
+  PerformShaderTest ("/shader/or_lighting.xml", "OR compatibility", 0, 0);
 
   iRenderLoopManager* rlmgr = engine->GetRenderLoopManager ();
   csRef<iRenderLoop> loop = rlmgr->Load ("/shader/std_rloop_diffuse.xml");
   engine->SetCurrentDefaultRenderloop (loop);
 
-  PerformShaderTest ("/shader/light_bumpmap.xml", "light_bumpmap",
-		  "diffuse", "/shader/ambient.xml", "ambient");
+  PerformShaderTest ("/shader/light_bumpmap.xml", "diffuse", 
+    "/shader/ambient.xml", "ambient");
 }
 
 /*---------------------------------------------------------------------*

@@ -60,11 +60,11 @@ private:
   iMaterialWrapper* material;
 
   bool CreateGeometry ();
-  void BenchMark (const char* name, const char* description);
+  void BenchMark (const char* name, const char* description, uint drawFlags = 0);
   iDocumentSystem* GetDocumentSystem ();
   iShaderManager* GetShaderManager ();
-  void PerformShaderTest (const char* shaderPath, const char* shname,
-		  const char* shtype, const char* shaderPath2, const char* shtype2);
+  void PerformShaderTest (const char* shaderPath, const char* shtype, 
+    const char* shaderPath2, const char* shtype2);
 
 public:
   CsBench ();

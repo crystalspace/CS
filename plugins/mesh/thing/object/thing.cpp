@@ -1080,7 +1080,16 @@ void csThingStatic::FillRenderMeshes (
       polyRenderer = polyRenderers[i];
 
     rm->mixmode = mixmode; 
-    rm->material = pg.material;
+    iMaterialWrapper* material = pg.material;
+    for (int m = 0; i < repMaterials.Length(); m++)
+    {
+      if (repMaterials[m].old_mat == material)
+      {
+	material = repMaterials[m].new_mat;
+	break;
+      }
+    }
+    rm->material = material;
     rm->meshtype = CS_MESHTYPE_POLYGON;
     rm->variablecontext.AttachNew (new csShaderVariableContext ());
     csRef<csShaderVariable> sv (
@@ -1844,6 +1853,8 @@ void csThing::Prepare ()
 	polybuf->DecRef ();
 	polybuf = 0;
       }
+#else
+      rmHolder.Clear();
 #endif // CS_USE_NEW_RENDERER
 
       polybuf_materials.DeleteAll ();
@@ -1882,6 +1893,8 @@ void csThing::Prepare ()
     polybuf->DecRef ();
     polybuf = 0;
   }
+#else
+  rmHolder.Clear();
 #endif // CS_USE_NEW_RENDERER
 
   polybuf_materials.DeleteAll ();
