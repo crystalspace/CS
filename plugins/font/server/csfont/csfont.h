@@ -33,7 +33,7 @@ class csDefaultFontServer;
 class csDefaultFont : public iFont
 {
 public:
-  const char *Name;
+  char *Name;
   int Width;
   int MaxWidth;
   int Height;

@@ -152,7 +152,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
   if (name [0] != '*')
     Name = strnew (name);
   else
-    Name = name;
+    Name = CONST_CAST(char*)(name);
   Width = width;
   Height = height;
   BytesPerChar = bytesperchar;
