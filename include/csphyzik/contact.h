@@ -41,8 +41,8 @@ public:
   }
 
   // set body_b to NULL if it is an immovable object. e.g. the ground.
-  ctReferenceFrameEntity *body_a;  // body a.  this. ignored in collisions
-  ctReferenceFrameEntity *body_b;  // body b.  other body involved in the contact
+  ctEntity *body_a;  // body a.  one of the bodies in a collision. ingnored for "next" contacts
+  ctEntity *body_b;  // body b.  other body involved in the contact
 
   ctVector3 contact_p;  // point of contact in world coords
 	
@@ -77,7 +77,7 @@ public:
   }
 
   // set body_b to NULL if it is an immovable object. e.g. the ground.
-  ctRigidBody *body_a;  // body a.  this. ignored in collisions
+  ctRigidBody *body_a;  // body a.  one of the bodies in a collision. ingnored for "next" contacts
   ctRigidBody *body_b;  // body b.  other body involved in the contact
 
   ctVector3 contact_p;  // point of contact in world coords

@@ -50,6 +50,17 @@ ctReferenceFrame& ctReferenceFrame::universe()
 } 
 
 
+ctDeltaReferenceFrame& ctDeltaReferenceFrame::universe()
+{ 
+	static ctDeltaReferenceFrame basis;
+	static bool initialized = false;
+	if (!initialized) {
+		initialized = true;
+		basis.is_universe_frame = true; 
+	}
+	return basis;
+} 
+
 // calculate tranform from world coords to this coords by going from
 // root ( world ) and combining all transfroms up to this frame.
 //void ctReferenceFrame::calc_T_world()

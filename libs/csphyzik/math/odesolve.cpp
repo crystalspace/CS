@@ -22,6 +22,8 @@
 #include "cssysdef.h"
 #include "csphyzik/odesolve.h"
 
+static const real ONE_OVER_SIX = 1.0/6.0;
+static const real ONE_OVER_THREE = 1.0/3.0;
 
 OdeSolver::OdeSolver()
 {
@@ -124,8 +126,8 @@ void OdeRungaKutta4::calc_step(real y0[], real y1[], unsigned int len, real t0, 
   }
 
   for (i = 0; i < len; i++) {
-    y1[i] = y0[i] + (k1[i] * 1.0/6.0) + (k2[i] * 1.0/3.0)
-                    + (k3[i] * 1.0/3.0) + (k4[i] * 1.0/6.0);
+    y1[i] = y0[i] + (k1[i] * ONE_OVER_SIX) + (k2[i] * ONE_OVER_THREE)
+                    + (k3[i] * ONE_OVER_THREE) + (k4[i] * ONE_OVER_SIX);
   }
 }
 

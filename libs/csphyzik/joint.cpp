@@ -179,3 +179,48 @@ void ctRevoluteJoint::calc_coriolus( const ctVector3 &r, const ctVector3 &w_f, c
   c[5] = vwork[2] + 2.0*(w_f[0]*Vo[1] - w_f[1]*Vo[0]) + (V[0]*Vo[1] - V[1]*Vo[0]);
 
 }
+
+
+ctConstrainedRevoluteJoint::ctConstrainedRevoluteJoint( ctArticulatedBody *in, ctVector3 &in_offset, ctArticulatedBody *out, ctVector3 &out_offset, ctVector3 &paxis)
+ : ctRevoluteJoint( in,  in_offset,  out,  out_offset, paxis)
+{	
+	max_angle = 0;
+	min_angle = 0;
+	k = 10.0;  //!me set to a #define default
+	damping_k = 50.0;
+}
+
+
+//!me best thing to do would be exert -external_f and apply impulse to stop qv....  That would be perfect
+real ctConstrainedRevoluteJoint::get_actuator_magnitude( real external_f, real inertail_comp )
+{
+	real internal_f;
+	real response_sign = 0;
+	real spring_response;
+	if( outboard && outboard->get_handle() ){
+		if( q < min_angle ){
+			response_sign = 1.0;
+			spring_response = k*( min_angle - q) * inertail_comp;
+		}else if( q > max_angle ){
+			response_sign = -1.0;
+			spring_response = k*( max_angle - q) * inertail_comp;
+		}
+		
+		if( response_sign != 0 ){
+			internal_f = -external_f;  //!me intertal_comp is never negative is it?
+			// only have a response force if it is working to satisfy constraint, not make it worse.
+			// if working to maintain constraint one will be + and the other will be -.
+			if( -response_sign * internal_f > 0.0 ){
+				internal_f = 0.0;
+			}
+			internal_f += spring_response;
+
+			// add in drag to damp things
+			if( qv*response_sign < 0 ){
+				internal_f += - k*(qv)*0.25 * inertail_comp * damping_k;  
+			}
+			return internal_f;
+		}
+	}
+	return ctRevoluteJoint::get_actuator_magnitude( external_f, inertail_comp );
+} 

@@ -31,6 +31,7 @@
 #include "csphyzik/articula.h"
 #include "csphyzik/joint.h"
 #include "csphyzik/debug.h"
+#include "csphyzik/kinemat.h"
 
 // resolve dynamics
 void ctFeatherstoneAlgorithm::solve( real t )
@@ -98,7 +99,21 @@ ctFeatherstoneAlgorithm *out_link_solver;
 
 	// compute joint and spatial acceleration of links
 	// link 0 is fixed and doesn't accelerate
-	a.zero();
+	if( ab.attached_to == NULL ){
+		a.zero();
+	// or it accelerates according to some other object it is attached to
+	}else{ 
+		//!me optimize
+		ctVector3 angular_v = ab.attached_to->get_angular_v();
+		ctVector3 angular_a = ab.attached_to->get_angular_a();
+		ctVector3 r = ab.handle->get_pos() - ab.attached_to->get_x();
+		// angular acceleration
+		a.set_a( angular_a );
+
+		// linear acceleration
+		a.set_b( ab.attached_to->get_a() + angular_a%r + angular_v%angular_v%r );
+	}
+
 	out_link = ab.outboard_links.get_first();
 	while( out_link ){
 		out_link_solver = (ctFeatherstoneAlgorithm *)out_link->solver;
@@ -240,7 +255,6 @@ ctArticulatedBody *ab_f;
 ctFeatherstoneAlgorithm *out_link_solver;
 ctFeatherstoneAlgorithm *svr_f;
 //ctMatrix3 Mwork;
-/* initialize vwork to something to avoid compiler warning */
 ctVector3 vwork(0);
 ctSpatialVector svwork;
 //ctSpatialMatrix sMwork;
@@ -368,7 +382,6 @@ void ctFeatherstoneAlgorithm::test_impulse_response()
     if( inboard_link != NULL ){
       in_feather = (ctFeatherstoneAlgorithm *)inboard_link->solver;
 	    ctSpatialMatrix fXg;
-      /* initialize vwork to something to avoid compiler warning */
       ctVector3 vwork(0);
       s = ab.inboard_joint->get_spatial_joint_axis();
       // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
@@ -441,8 +454,7 @@ void ctFeatherstoneAlgorithm::propagate_impulse()
     inboard_link = ab.inboard_joint->inboard;
     if( inboard_link != NULL ){
       in_feather = (ctFeatherstoneAlgorithm *)inboard_link->solver;
-          ctSpatialMatrix fXg;
-      /* initialize vwork to something to avoid compiler warning */
+	  ctSpatialMatrix fXg;
       ctVector3 vwork(0);
       ctSpatialVector s = ab.inboard_joint->get_spatial_joint_axis();
       // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );

@@ -78,8 +78,8 @@ int max_order_row_index;
 
 
 				factor = 0.0;  // the whole row was 0.0, so fail nicely
-				printf( "shit singular matrix\n");
-				exit(1);
+//				printf( "shit singular matrix\n");
+//				exit(1);
 			}else{
 				if( fabs(A[elimrow][elimcol]) < MIN_REAL ){  
 	//			exit(1);
@@ -109,7 +109,7 @@ int max_order_row_index;
 		}
 
 		if( A[order[backcol]][backcol] == 0 ){
-				exit(1);
+		//		exit(1);
 			x[backcol] = 0;  //!me fail nicely
 		}else{
 			x[backcol] = x[backcol]/A[order[backcol]][backcol];

@@ -46,7 +46,7 @@ class AllocNode {
   int size;
 };
 
-class ctWorld : public ctPhysicalEntity
+class ctWorld : public ctEntity
 {
 public:
 
@@ -61,6 +61,9 @@ public:
   // rewind the state of the system to the time just before evolve was called.
   // pass in the correct time frame.
   errorcode rewind( real t1, real t2 );  
+
+ // maximum number of times to back-up in an evolve loop.
+  void set_max_time_subdivisions( long pmt ){ max_time_subdivisions = pmt; }
 
   void register_catastrophe_manager( ctCatastropheManager *pcm );
   
@@ -83,6 +86,18 @@ public:
   // ctWorld objects that use nondefault derivatives (like catastrophes,
   // constraints, and certain forces) can be created.
   virtual void dydt_eval(real t, const real y[], real dy[]);
+
+  // collision response routines and utils
+  void resolve_collision( ctCollidingContact *cont );
+  ctVector3 get_relative_v( ctPhysicalEntity *body_a, ctPhysicalEntity *body_b, const ctVector3 &the_p );
+
+  virtual int get_state_size() { return 0; }
+  // Add this body's state to the state vector buffer passed in. 
+  virtual int set_state( real * ){return 0;}
+  // download state from buffer into this entity
+  virtual int get_state( const real * ){return 0;}
+  // add change in state vector over time to state buffer parameter.
+  virtual int set_delta_state( real * ){return 0;}
 
   // Static state-alloc stuff
   int            state_size;
@@ -151,6 +166,9 @@ protected:
   //!me should be a per "group" member ( when groups are implemented )
   // indicate if there was a catstrophe last frame
   bool was_catastrophe_last_frame;
+
+  // maximum number of times to back-up in an evolve loop.
+  long max_time_subdivisions;  
 
   long y_save_size;
   long max_state_size;

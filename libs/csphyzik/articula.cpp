@@ -42,16 +42,18 @@ ctArticulatedBody::ctArticulatedBody() :
 {
 	handle = NULL; inboard_joint = NULL; 
 	is_grounded = false;
+	attached_to = NULL;
 	solver = new ctFeatherstoneAlgorithm( *this );
 //	solver = new ctInverseKinematics( *this );
 }
 
 // construct with a handle
-ctArticulatedBody::ctArticulatedBody( ctRigidBody *phandle ) : 
+ctArticulatedBody::ctArticulatedBody( ctRigidBody *phandle ) : ctPhysicalEntity( *(phandle->get_RF()), *(phandle->get_dRF()) ),
   r_fg(0)
 {
 	handle = phandle; inboard_joint = NULL; 
 	is_grounded = false;
+	attached_to = NULL;
 	solver = new ctFeatherstoneAlgorithm( *this );
 //	solver = new ctInverseKinematics( *this );
 }
@@ -122,7 +124,7 @@ int ctArticulatedBody::get_state_size()
 ctArticulatedBody *out_link;
 int sze = 0;
 
-	if( !is_grounded && handle ){
+	if( handle ){
 		sze += handle->get_state_size();
 	}
 
@@ -263,7 +265,7 @@ int ctArticulatedBody::set_state( real *state_array )
 {
 int ret = 0;
 
-	if( !is_grounded && handle ){
+	if( handle ){
 		ret += handle->set_state( state_array );
 		state_array += ret;
 	}
@@ -298,7 +300,7 @@ int ctArticulatedBody::get_state( const real *state_array )
 {
 int ret = 0;
 
-	if( !is_grounded && handle ){
+	if( handle ){
 		ret += handle->get_state( state_array );
 		state_array += ret;
 	}
@@ -337,7 +339,7 @@ int ctArticulatedBody::set_delta_state( real *state_array )
 {
 int ret = 0;
 
-	if( !is_grounded && handle && solver ){
+	if( handle && solver ){
 		// calc F and T from spatial acceleration
 		// F = ma
 		// HAHA!!!!!  a^ is relative to body frame!!!!
@@ -441,6 +443,15 @@ void ctArticulatedBody::link_revolute( ctArticulatedBody *child, ctVector3 &pin_
 {
   ctJoint *jnt = new ctRevoluteJoint( this, pin_joint_offset, child, 
                                    pout_joint_offset, pjoint_axis );
+
+  child->inboard_joint = jnt;
+  child->calc_relative_frame();
+  outboard_links.add_link( child );
+}
+
+// link together two articulated bodies via a hing joint that hinges along given axis
+void ctArticulatedBody::link_joint( ctJoint *jnt, ctArticulatedBody *child )
+{
 
   child->inboard_joint = jnt;
   child->calc_relative_frame();

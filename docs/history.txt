@@ -25,6 +25,17 @@ The history order has been reversed so that new features are at the top.
 	      handle brush locations. I have also moved setFloatVal
 	      to setDoubleVal and changed the handling of precision
 	      variables accordingly to doubles instead of floats.
+	- Big update to csphyziks from Michael Ewert. Two changes:
+	    - First are joint angle constraints.  So you can say a
+	      joint only swings between 0 and 180 degrees, like an
+	      elbow.
+	    - Second is connecting a jointed body to a kinematically
+	      controled entity, that moves however the user
+	      specifies.  This is used to attach a jointed body to
+	      other game-world objects that are not controlled by
+	      physics, like a character or door or whatever.  The
+	      correct physical behavior will still result even
+	      though one entity isn't in the physics engine.
 24-Jul-2000
 	- Started work on new engine plugin. This plugin will link statically
 	  with csengine but will itself be a plugin that can be used

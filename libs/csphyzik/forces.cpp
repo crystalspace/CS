@@ -85,9 +85,9 @@ ctVector3 a2;
 		ctVector3 *orig_a1 = attachment_point_vector.get_first();
 		ctVector3 *orig_a2 = attachment_point_vector.get_next();
 
-		if( b1 && b2 && orig_a1 && orig_a2 ){
+		if( b1 && orig_a1 && orig_a2 ){
 			ctReferenceFrame *r1 = b1->get_RF();
-			ctReferenceFrame *r2 = b2->get_RF();
+			ctReferenceFrame *r2 = ( b2 == NULL ) ? &(ctReferenceFrame::universe()) : b2->get_RF();
 			if( r1 && r2 ){
 				r1->this_to_world( a1, *orig_a1 );
 				r2->this_to_world( a2, *orig_a2 );
@@ -117,7 +117,7 @@ ctVector3 a2;
 						b1->sum_force(f);
 						d = a1 - r1->get_world_offset();
 						b1->sum_torque( d % f );
-					}else if( &pe == b2 ){
+					}else if( &pe == b2 && b2 != NULL ){
 						b2->sum_force(f);
 						d = a2 - r2->get_world_offset();
 						b2->sum_torque( d % f );

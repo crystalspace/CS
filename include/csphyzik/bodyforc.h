@@ -27,6 +27,7 @@
 class ctPhysicalEntity;
 
 // parent class for all N-body forces 
+// generally a body added as NULL indicates the world.
 class ctNBodyForce : public ctForce
 {
 public:

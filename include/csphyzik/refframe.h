@@ -103,4 +103,34 @@ protected:
 //	ctReferenceFrame *parent_frame;
 };
 
+class ctDeltaReferenceFrame
+{
+public:
+
+  static ctDeltaReferenceFrame& universe();
+  bool is_universe(){ return is_universe_frame; }
+	bool not_universe(){ return !is_universe_frame; }
+	static void add_ref( ctDeltaReferenceFrame &rf )
+	{ 
+		rf.reference_count++; 
+	}
+
+	static void remove_ref( ctDeltaReferenceFrame &rf )
+	{ 
+		if( --rf.reference_count <= 0 ){
+			if( rf.not_universe() )
+				delete &rf;
+		}
+	}
+
+  ctDeltaReferenceFrame(){reference_count = 0; is_universe_frame = false; }
+
+  ctVector3 v;
+  ctVector3 w;
+
+protected:
+  int reference_count;
+	bool is_universe_frame; // true if this is the top-most reference frame
+};
+
 #endif

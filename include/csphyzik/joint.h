@@ -119,5 +119,29 @@ public:
 	virtual ctSpatialVector get_spatial_joint_axis();
 };
 
+// a hinge with a joint angle "constraint" enforced by PID controller techniques.
+// adjust spring and damping constants on a per joint basis to get it behaving right.
+// e.g. if your joint is bouncing back at the constrained angle, then reduce spring_constant.
+class ctConstrainedRevoluteJoint : public ctRevoluteJoint
+{
+public:
+
+	ctConstrainedRevoluteJoint( ctArticulatedBody *in, ctVector3 &in_offset, ctArticulatedBody *out, ctVector3 &out_offset, ctVector3 &paxis );
+
+  // internal force generated at joint.  can be used to simulate a robotic
+  // motor or muscle force on a limb.
+	virtual real get_actuator_magnitude( real external_f, real inertail_comp );
+
+	void set_constraint( real pmax_angle, real pmin_angle ){ max_angle = pmax_angle; min_angle = pmin_angle; }
+	void set_spring_constant( real pk ){ k = pk; }
+	void set_damping_constant( real pk ){ damping_k = pk; }
+
+	real max_angle;
+	real min_angle;
+
+	//!me tweak these for better stability, depending on your situation.
+	real k;   // spring konstant
+	real damping_k; // damping konstant.  
+};
 
 #endif

@@ -34,7 +34,7 @@ public:
 **	Constructors/destructors/statics
 */
 	ctRigidBody();
-	ctRigidBody( ctReferenceFrame &ref );
+	ctRigidBody( ctReferenceFrame &ref, ctDeltaReferenceFrame &dref );
 //	ctRigidBody( ctReferenceFrame &ref,  );
 	virtual ~ctRigidBody();
 

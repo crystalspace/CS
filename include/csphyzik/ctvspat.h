@@ -92,6 +92,8 @@ protected:
   real elements[ 6 ];
 };
 
+/// wacky vectors that have certain mathematical properties that allow for an O(n) 
+/// forward dynamics articulated body solver.
 class ctSpatialVector6
 {
 public:
@@ -144,24 +146,28 @@ public:
 		return transpose();
 	}
 
+	/// angular component.  *Danger* notational collision.  a is NOT linear acceleration.
 	void set_a( const ctVector3 &pa ){
 		elements[0] = pa[0];
 		elements[1] = pa[1];
 		elements[2] = pa[2];
 	}
 
+	/// linear component
 	void set_b( const ctVector3 &pb ){
 		elements[3] = pb[0];
 		elements[4] = pb[1];
 		elements[5] = pb[2];
 	}
 
+	/// angular component.  *Danger* notational collision.  a is NOT linear acceleration.
 	ctVector3 get_a(){
  		return ctVector3(elements[0],
 		          elements[1],
 		          elements[2]);
 	}
 
+	/// linear component
 	ctVector3 get_b(){
  		return ctVector3(elements[3],
 		          elements[4],

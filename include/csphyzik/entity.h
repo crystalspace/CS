@@ -32,7 +32,7 @@
 #define CTF_NOREWIND 0x1
 
 class ctSolver;
-//class ctCollidingContact;
+class ctPhysicalEntity;
 
 // parent class of all physical bodies ( or even some non-physical ones... )
 class ctEntity
@@ -88,13 +88,8 @@ protected:
   virtual void apply_given_F( ctForce &frc );
   void print_force() {}
 
-  // collision routines
-  // resolve collision with a body.  warning: original cont may be modified
-  //virtual void resolve_collision( ctCollidingContact *cont );
-
-  // can use this to impart an impulse to this object.
-  //virtual void apply_impulse( ctVector3 impulse_point,
-  //                          ctVector3 impulse_vector ) = 0;
+  // collision routines.  return something we can collide with if possible
+  virtual ctPhysicalEntity *get_collidable_entity(){ return NULL; }
 
   // Stereotype of funcs to replace flags array
   virtual bool will_rewind() { return !(flags & CTF_NOREWIND); }

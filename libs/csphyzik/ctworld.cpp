@@ -27,6 +27,7 @@
 #include "csphyzik/rigidbod.h"
 #include "csphyzik/debug.h"
 #include "csphyzik/ctcat.h"
+#include "csphyzik/contact.h"
 
 //#define __CT_NOREWINDENABLED__
 
@@ -60,6 +61,7 @@ ctWorld::ctWorld()
   y_save = new real[max_state_size];
   y_save_size = 0;
   was_catastrophe_last_frame = false;
+  max_time_subdivisions = 10;
 }
 
 //!me delete _lists and ode
@@ -173,10 +175,9 @@ void fcn_set_no_rewind( ctEntity *ppe )
   ppe->set_rewind(false);
 }
 
-// using sloooooooow but accurate collision detection.
+// using sloooooooow but accurate collision detection.  ( collision = catastrophe )
 // this can be sped up in many ways.
 // - use eulers method or mid-point for ODE just during CD
-// - use prune and sweep algorithm with axis aligned, sorted bounding boxes
 // - only evolve objects related to colliding objects when searching for c-time
 // - don't forget to handle 'tunneling' problem as well.
 errorcode ctWorld::evolve( real t1, real t2 )
@@ -187,7 +188,7 @@ errorcode ctWorld::evolve( real t1, real t2 )
   ctLinkList<ctCatastropheManager> *recent_cat = new ctLinkList<ctCatastropheManager>();
   ctLinkList<ctCatastropheManager> *swap_cat;
 
-  long loops = 30;  //make sure we don't go into an infinite loop
+  long loops = max_time_subdivisions;  //make sure we don't go into an infinite loop
 
   ta = t1;
   tb = t2;
@@ -238,7 +239,6 @@ errorcode ctWorld::evolve( real t1, real t2 )
         }else{
           tb -= (tb - ta)*0.5;
         }
-        //}
     // if we have not arrived at the end of our time interval 
     }else if( is_unhandled_catastrophe ){
       // search forward in time for time of impact for collision(s)
@@ -269,6 +269,34 @@ errorcode ctWorld::evolve( real t1, real t2 )
       ta = tb;
       tb = t2;
     }
+  }
+
+  // we barfed out without handling catastrophe, so let's do the best we can in an ugly situation.
+  if( is_unhandled_catastrophe ){
+
+    // evolve to the end of our time-slice
+    tb = t2;
+	do_time_step( ta, tb );
+	// should check for catastrophes
+	this_slice_cat->remove_all();
+    cat = catastrophe_list.get_first();
+    while( cat != NULL ){
+      this_cat_dist = cat->check_catastrophe();
+      if( this_cat_dist > 0 ){
+        this_slice_cat->add_link( cat );
+      }
+      cat = catastrophe_list.get_next();
+    }
+
+   // resolve all catastrophes that occured, not caring about getting the proper time-resolution.
+    cat = this_slice_cat->get_first();
+    while( cat ){
+      cat->handle_catastrophe();
+      cat = this_slice_cat->get_next();
+    }
+    this_slice_cat->remove_all();
+    was_catastrophe_last_frame = is_unhandled_catastrophe;
+    is_unhandled_catastrophe = false;
   }
 
   delete this_slice_cat;
@@ -432,6 +460,179 @@ void ctWorld::apply_function_to_body_list( void(*fcn)( ctEntity *ppe ) )
   } 
 
 }
+
+
+// return the relative velocity between up to two bodies at a point in world space
+ctVector3 ctWorld::get_relative_v( ctPhysicalEntity *body_a, ctPhysicalEntity *body_b, const ctVector3 &the_p )
+{
+  if( (!body_a) || (!body_b) ){
+    return ctVector3(0,0,0);	
+  }
+
+  ctVector3 v_rel;
+  ctVector3 body_x = body_a->get_pos();
+  ctVector3 ra = the_p - body_x;
+
+  ctVector3 ra_v = body_a->get_angular_v()%ra + body_a->get_v();
+
+  if( body_b == NULL ){
+    v_rel = ra_v;
+  }else{
+    ctVector3 rb = the_p - body_b->get_pos();
+    ctVector3 rb_v = body_b->get_angular_v()%rb + body_b->get_v();
+    v_rel = (ra_v - rb_v);
+  }
+
+  return v_rel;
+
+}
+
+// PONG collision model
+// basic collision model for for objects with no mass.
+/*void ctPhysicalEntity::resolve_collision( ctCollidingContact *cont )
+{
+ctVector3 j;
+
+  if( cont == NULL )
+    return;
+
+  j = ( cont->n*((get_v())*cont->n) )*( -1.0 - cont->restitution );
+  apply_impulse( cont->contact_p, j );
+
+  if( cont->body_b != NULL ){
+    j = ( cont->n*((cont->body_b->get_v())*cont->n) )
+      *( -1.0 - cont->restitution );
+    cont->body_b->apply_impulse( cont->contact_p, j );
+  }
+}
+*/
+
+// collision response
+void ctWorld::resolve_collision( ctCollidingContact *cont )
+{
+ctVector3 j;
+real v_rel;       // relative velocity of collision points
+//ctVector3 ra_v, rb_v;
+real j_magnitude;
+real bottom;
+ctMatrix3 imp_I_inv;
+real ma_inv, mb_inv;   // 1/mass_body
+real rota, rotb;       // contribution from rotational inertia
+ctVector3 n;
+ctVector3 ra, rb;      // center of body to collision point in inertail ref frame 
+// keep track of previous object collided with.
+// in simultaneous collisions with the same object the restituion should
+// only be factored in once.  So all subsequent collisions are handled as
+// seperate collisions, but with a restitution of 1.0
+// if they are different objects then treat them as multiple collisions with
+// normal restitution.
+//!me this isn't actually a very good method.... maybe something better can be 
+//!me implemented once contact force solver is implemented
+ctPhysicalEntity *prev;
+ctPhysicalEntity *ba;
+ctPhysicalEntity *bb;
+ctCollidingContact *head_cont = cont;
+
+  // since NULL is used for an immovable object we need a 
+  // different "nothing" pointer
+  prev = (ctPhysicalEntity *)this; 
+
+  if( (cont != NULL) && (cont->body_a != NULL) ){
+    ba = cont->body_a->get_collidable_entity();
+  }else{
+    return;
+	}
+
+  if( ba == NULL ) return;
+
+  while( cont != NULL ){
+
+    if( cont->body_b != NULL ){
+      bb = cont->body_b->get_collidable_entity();
+    }else{
+      bb = NULL;
+    }
+
+    n = cont->n;
+    // get component of relative velocity along collision normal
+    v_rel = n*get_relative_v( ba, bb, cont->contact_p );
+
+    // if the objects are traveling towards each other do collision response
+    if( v_rel < 0 ){
+
+      ra = cont->contact_p - ba->get_pos();
+
+      ba->get_impulse_m_and_I_inv( &ma_inv, &imp_I_inv, ra, n );
+      ma_inv = 1.0/ma_inv;
+      rota = n * ((imp_I_inv*( ra%n ) )%ra);  
+
+      if( bb == NULL ){
+        // hit some kind of immovable object
+        mb_inv = 0;
+        rotb = 0;
+      }else{
+        rb = cont->contact_p - bb->get_pos();
+        bb->get_impulse_m_and_I_inv( &mb_inv, &imp_I_inv, rb, n*(-1.0) );
+        mb_inv = 1.0/mb_inv;
+        rotb = n * ((imp_I_inv*( rb%n ) )%rb);
+      }
+
+      // bottom part of equation
+      bottom = ma_inv + mb_inv + rota + rotb;
+      
+      if( prev != cont->body_b ){
+        j_magnitude = -(1.0 + cont->restitution ) * v_rel / bottom;
+      }else{
+        // if we are dealing with a simulatneous collisin with with
+        // same object.
+        j_magnitude = -(1.0 + 1.0 ) * v_rel / bottom;
+      }
+
+      j = n*j_magnitude;
+      ba->apply_impulse( ra, j );
+
+      if( bb != NULL ){
+        bb->apply_impulse( rb, j*(-1.0) );
+      }
+
+      // treat next simultaneous collision as a seperate collision.
+      prev = bb;
+
+    }
+    cont = cont->next;  
+  }
+
+  // now check if any of the contacts are in resting contact
+  cont = head_cont;
+
+/*  while( cont != NULL ){
+    // get component of relative velocity along collision normal
+    v_rel = cont->n*get_relative_v( cont->body_b, cont->contact_p );
+
+    if( fabs(v_rel) < MIN_CONTACT ){
+      ctContact *r_cont = new ctContact;
+
+      r_cont->body_a = (ctRigidBody *)(cont->body_a);  //!me bad but works for now
+      r_cont->body_b = (ctRigidBody *)(cont->body_b);
+      r_cont->n = cont->n;
+      r_cont->ea = cont->ea;
+      r_cont->eb = cont->eb;
+      r_cont->vf = cont->vf;
+      r_cont->contact_p = cont->contact_p;
+   
+    }
+
+    cont = cont->next;
+  }
+*/
+
+}
+
+
+
+
+
+// alloc stuff
 
 // Remove block matching "offset" from the used_blocks list and return it
 AllocNode *ctWorld::sa_make_unused(int offset) {

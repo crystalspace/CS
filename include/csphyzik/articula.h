@@ -29,12 +29,12 @@
 class ctJoint;
 class ctFeatherstoneAlgorithm;
 class ctInverseKinematics;
+class ctKinematicEntity; 
 
+//!me some of these methods probably don't need to be virtual anymore, esp. those dealing with RF and dRF
 // articulated body.  Definition: a handle ( rigid body ) with 0 or more  
 // articulated bodies attached to it via joints
-//!me problem here needs to be ctPhysicalEntity for CD/CR, but then
-//!me things get fucked up because of v and w vars in here....
-class ctArticulatedBody : public ctReferenceFrameEntity
+class ctArticulatedBody : public ctPhysicalEntity
 {
 public:
 
@@ -49,20 +49,22 @@ public:
 
 	virtual ~ctArticulatedBody();
 
-	// return reference frame for this handle ( to world )
+	/// return reference frame for this handle ( to world )
 	ctReferenceFrame *get_handle_RF(){ if( handle ) return handle->get_RF(); else return NULL; }
 
-	// return the physical body that is the root of this articulated figure
+	/// return the physical body that is the root of this articulated figure
 	ctRigidBody *get_handle(){ return handle; }
 
-	// rotate this link around it's axis by ptheta radians.
+	/// rotate this link around it's axis by ptheta radians.
 	void rotate_around_axis( real ptheta );
 
-	// link two bodies together with a revolute joint.
-	// pin_joint_offset is the offset from the inboard( parent ) link to joint 
-	// pout_joint_offset is from the outbaord (child) link to the joint.
-	// all offsets are directed from a link's C.O.M. to the joint
+	/// link two bodies together with a revolute joint.
+	/// pin_joint_offset is the offset from the inboard( parent ) link to joint 
+	/// pout_joint_offset is from the outbaord (child) link to the joint.
+	/// all offsets are directed from a link's C.O.M. to the joint
 	void link_revolute( ctArticulatedBody *child, ctVector3 &pin_joint_offset, ctVector3 &pout_joint_offset, ctVector3 &pjoint_axis );
+
+	void link_joint( ctJoint *jnt, ctArticulatedBody *child );
 
 	virtual void apply_given_F( ctForce &frc );
 
@@ -92,14 +94,19 @@ public:
 	int get_state_links( const real *sa );
 	int set_delta_state_links( real *state_array );
 	
-	// ungrounded articulated bodies are not staticaly attached to the world frame
+	/// ungrounded articulated bodies are not staticaly attached to the world frame
 	void make_grounded(){ is_grounded = true; };
 	void make_ungrounded(){ is_grounded = false; };
 
-	// forward dynamics algorithm.  The default solver
+	/// this articulated body is attached to some other entity.  
+	/// it will respond to the accelerations of the entity it is attached to.
+	void attach_to_entity( ctKinematicEntity *pattache ){ is_grounded = true;  attached_to = pattache; };
+	void detattached_from_entity(){ is_grounded = false;  attached_to = NULL; };	
+
+	/// forward dynamics algorithm.  The default solver.
 	ctFeatherstoneAlgorithm *install_featherstone_solver();
 
-	// inverse kinematics algorithm.  set the goal after this
+	/// inverse kinematics algorithm.  set the goal after this
 	ctInverseKinematics *install_IK_solver();
 
 	// propagates velocities from base link to ends of articulated bodies
@@ -111,25 +118,8 @@ public:
 
 	void update_links();
 
-//* ctReferenceFrameEntity interface implentation
-
-  virtual ctVector3 get_v(){ return handle->get_v(); }
-  virtual void set_v( const ctVector3 &pv ){ handle->set_v( pv ); }
-  virtual const ctVector3 &get_pos(){ return handle->get_pos(); }
-  virtual void set_pos( const ctVector3 &px ){ handle->set_pos(px); }
-  virtual void set_angular_v( const ctVector3 &pw ){ handle->set_angular_v(pw); }
-  virtual ctVector3 get_angular_v(){ return handle->get_angular_v(); }
-
-  virtual const ctMatrix3 &get_R(){ return handle->get_R(); }
-  virtual const ctMatrix3 &get_T(){ return handle->get_T(); }
-
-  virtual const ctMatrix3 &get_world_to_this(){ return handle->get_world_to_this(); }
-  virtual const ctMatrix3 &get_this_to_world(){ return handle->get_this_to_world(); }
-  virtual void v_this_to_world( ctVector3 &pv ){ handle->v_this_to_world(pv); }
-  virtual ctVector3 get_v_this_to_world( ctVector3 &pv ){ return handle->get_v_this_to_world(pv); }
-
-	friend class ctFeatherstoneAlgorithm;
-	friend class ctInverseKinematics;
+  friend class ctFeatherstoneAlgorithm;
+  friend class ctInverseKinematics;
   friend class ctJoint;
 protected:
 
@@ -138,6 +128,8 @@ protected:
 	ctLinkList<ctArticulatedBody> outboard_links;  // children 
 
 	bool is_grounded;  // is it fixed to the world frame?
+
+	ctKinematicEntity *attached_to;
 
 	// work variables
 

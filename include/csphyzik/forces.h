@@ -75,6 +75,7 @@ protected:
 	real rest_length;
 	
 public:
+	// body b2 can be NULL to indicate it is attached to the immovable world
 	ctSpringF( ctPhysicalEntity *b1, ctVector3 p1, ctPhysicalEntity *b2, ctVector3 p2 )
 	{
 		body_vector.add_link( b1 );

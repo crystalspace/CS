@@ -34,53 +34,8 @@ class ctForce;
 class ctSolver;
 class ctCollidingContact;
 
-//!me not totaly happy with this... too many virtual fcns. 
-//!me had to do this to integrate articulated bodies into collision repsonse
-//!me in a reasonable manner.  
-/// any entity that has a linear/angular position and velocities
-/// i.e. frame of reference and first derivitave of that frame.
-/// any subclass of this can repond to collisions and impulses
-class ctReferenceFrameEntity : public ctEntity
-{
-public:
-
-  virtual ctVector3 get_v() = 0;
-  virtual void set_v( const ctVector3 &pv ) = 0;
-  virtual const ctVector3 &get_pos() = 0;
-  virtual void set_pos( const ctVector3 &px ) = 0;
-  virtual void set_angular_v( const ctVector3 &pw ) = 0;
-  virtual ctVector3 get_angular_v()= 0;
-
-  // resolve collision with a body.  warning: original cont may be modified
-  void resolve_collision( ctCollidingContact *cont );
-
-  /// can use this to impart and impulse to this object.
-  /// impulse_point is vector from center of body to point of collision in 
-  /// world coordinates.  impulse_vector is in world coords
-  virtual void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector ) = 0;
-
-  // fill out mass and inverse inertia tensor behaviour for an impulse response
-  // impulse_point is point of collision in world frame
-  virtual void get_impulse_m_and_I_inv( real *pm, ctMatrix3 *pI_inv, const ctVector3 &impulse_point,
-			      const ctVector3 &unit_length_impulse_vector  ) = 0;
-
-  // get relative velocity of two ( or one ) body from perspective of a 
-  // point in world space attached to first body ( //!me I think that is right )
-  ctVector3 get_relative_v( ctReferenceFrameEntity *body_b, const ctVector3 &the_p );
-
-  virtual const ctMatrix3 &get_R() = 0;
-  virtual const ctMatrix3 &get_T() = 0;
-
-  virtual const ctMatrix3 &get_world_to_this() = 0;
-  virtual const ctMatrix3 &get_this_to_world() = 0;
-  virtual void v_this_to_world( ctVector3 &pv ) = 0;
-  virtual ctVector3 get_v_this_to_world( ctVector3 &pv ) = 0;
-
-};
-
-
 /// parent class of physical bodies
-class ctPhysicalEntity : public ctReferenceFrameEntity
+class ctPhysicalEntity : public ctEntity
 {
 public:
 /*
@@ -89,7 +44,7 @@ public:
   // default refrence frame will be inertial frame
   ctPhysicalEntity();
   // use specified reference frame
-  ctPhysicalEntity( ctReferenceFrame &ref );
+  ctPhysicalEntity( ctReferenceFrame &ref, ctDeltaReferenceFrame &dref );
   virtual ~ctPhysicalEntity();
 
 /*
@@ -114,14 +69,14 @@ public:
 
   // change orientation in radians
   virtual void rotate_around_line( ctVector3 &paxis, real ptheta );
-  virtual ctVector3 get_v(){ return v; }
+  virtual ctVector3 get_v(){ return dRF.v; }
   // virtual because v is calculated from P ( momentum ) in rigid bodies
   virtual void set_v( const ctVector3 &pv );
   virtual void set_pos( const ctVector3 &px ) {
     RF.set_offset( px );
   }
   virtual void set_angular_v( const ctVector3 &pw );
-  virtual ctVector3 get_angular_v(){ return w; }
+  virtual ctVector3 get_angular_v(){ return dRF.w; }
 
   ctVector3 get_F(){ return F; }
   ctVector3 get_torque(){ return T; }
@@ -137,7 +92,7 @@ public:
   void print_force(){/*cout << "F: " << F*F << "\n";*/ }
 
   // collision routines
-
+  virtual ctPhysicalEntity *get_collidable_entity(){ return this; }
   /// can use this to impart and impulse to this object.
   /// impulse_point is vector from center of body to point of collision in 
   /// world coordinates.  impulse_vector is in world coords
@@ -171,14 +126,14 @@ public:
   }
   
   ctReferenceFrame *get_RF(){ return &RF; }
+  ctDeltaReferenceFrame *get_dRF(){ return &dRF; }
 
 protected:
 
-  ctVector3 v;
-  ctVector3 w;
-
   // frame of reference. orientation and position are stored here
   ctReferenceFrame &RF;
+  // change of RF wrt time.  ( angular and linear velocity )
+  ctDeltaReferenceFrame &dRF;
 
   ctVector3 F;  // total added Force for a frame
   ctVector3 T;  // total Torque for a frame
@@ -193,7 +148,7 @@ class ctDynamicEntity : public ctPhysicalEntity
 {
 public:
   ctDynamicEntity();
-  ctDynamicEntity( ctReferenceFrame &ref );
+  ctDynamicEntity( ctReferenceFrame &ref, ctDeltaReferenceFrame &dref );
   virtual ~ctDynamicEntity();
 
   virtual void apply_given_F( ctForce &frc );
