@@ -67,16 +67,22 @@ void csGfxProgressMeter::Step()
   if (current < total)
   {
     current++;
-    int w = System->g2d->GetWidth ();
-    int h = System->g2d->GetHeight ();
-    int where = current * (w-20) / total;
+    int fw = System->g2d->GetWidth ();
+    int fh = System->g2d->GetHeight ();
+    int where = current * (fw-20) / total;
     System->g3d->BeginDraw (CSDRAW_2DGRAPHICS);
     System->g2d->Clear (System->color_bg);
+    int lw, lh;
+    System->logo->GetMipMapDimensions (0, lw, lh);
+    int w = lw * fw / 300;
+    int h = lh * fh / 200;
+    System->g3d->DrawPixmap (System->logo, (fw - w)/2, 20, w, h,
+	0, 0, lw, lh);
     if (System->font)
-      System->g2d->Write (System->font, 20, h/2-40, System->color_bg,
+      System->g2d->Write (System->font, 20, fh*3/4-40, System->color_bg,
       	System->color_text, cur_description);
-    System->g2d->DrawBox (10, h/2-10, where, 20, System->color_done);
-    System->g2d->DrawBox (10+where, h/2-10, w-where-20, 20, System->color_todo);
+    System->g2d->DrawBox (10, fh*3/4-10, where, 20, System->color_done);
+    System->g2d->DrawBox (10+where, fh*3/4-10, fw-where-20, 20, System->color_todo);
     System->g3d->FinishDraw ();
     System->g3d->Print (NULL);
   }
@@ -181,6 +187,11 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   }
   else
     font = NULL;
+
+  // Load logo.
+  logo = loader->LoadTexture ("/lib/std/cslogo.gif",
+	CS_TEXTURE_2D, txtmgr);
+  logo->SetKeyColor (0, 0, 255);
 
   engine->SetLightingCacheMode (CS_ENGINE_CACHE_WRITE);
 

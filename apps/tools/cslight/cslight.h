@@ -28,6 +28,7 @@ struct iLoader;
 struct iGraphics3D;
 struct iGraphics2D;
 struct iFont;
+struct iTextureHandle;
 
 /**
  * Graphical progress meter.
@@ -97,6 +98,7 @@ public:
   iGraphics3D* g3d;
   iGraphics2D* g2d;
   iFont* font;
+  iTextureHandle* logo;
   int color_bg;
   int color_text;
   int color_done;

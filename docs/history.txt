@@ -3,6 +3,10 @@ The history order is reversed so that new features are at the top.
 8-Jul-2001
 	- Fixed a bug in the destructor of the emit particle system
 	  which could cause crashes at exit.
+	- Fixed a bug in the handling of precalc_info in the engine
+	  lightmap calculator. This would prevent cslight from writing
+	  out a precalc_info file.
+	- Added the Crystal Space logo to cslight.
 6-Jul-2001
 	- Fixed a bug in Blocks with the vertical raster lines. Some of
 	  them were visible from the wrong side.

@@ -869,8 +869,6 @@ bool csEngine::Prepare (iProgressMeter* meter)
 
 void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
 {
-  if (lightcache_mode & CS_ENGINE_CACHE_READ)
-  {
     // If we have to read from the cache then we check if the 'precalc_info'
     // file exists on the VFS. If not then we cannot use the cache.
     // If the file exists but is not valid (some flags are different) then
@@ -956,7 +954,6 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
       Report ("Lightmap data is not up to date (reason: %s).", reason);
       lightcache_mode &= ~CS_ENGINE_CACHE_READ;
     }
-  }
 
   if (!(lightcache_mode & CS_ENGINE_CACHE_READ))
   {
