@@ -129,6 +129,7 @@ csMovable::csMovable ()
   object = NULL;
   updatenr = 0;
   sectors.SetMovable (this);
+  is_identity = true;
 }
 
 csMovable::~csMovable ()
@@ -203,12 +204,16 @@ void csMovable::UpdateMove ()
     iMovableListener *ml = listeners[i];
     ml->MovableChanged (&scfiMovable);
   }
+
+  is_identity = obj.IsIdentity ();
 }
 
 csReversibleTransform csMovable::GetFullTransform () const
 {
   if (parent == NULL)
     return GetTransform ();
+  else if (is_identity)
+    return parent->GetFullTransform ();
   else
     return GetTransform () * parent->GetFullTransform ();
 }

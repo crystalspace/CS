@@ -233,11 +233,21 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
   int tri_num = factory->GetTriangleCount ();
   csVector3* vt = factory->GetVertices ();
   int vt_num = factory->GetVertexCount ();
-  csVector3* vt_world = new csVector3 [vt_num];
+  csVector3* vt_world, * vt_array_to_delete;
   int i;
-  csReversibleTransform movtrans = movable->GetFullTransform ();
-  for (i = 0 ; i < vt_num ; i++)
-    vt_world[i] = movtrans.This2Other (vt[i]);
+  if (movable->IsFullTransformIdentity ())
+  {
+    vt_array_to_delete = NULL;
+    vt_world = vt;
+  }
+  else
+  {
+    vt_array_to_delete = new csVector3 [vt_num];
+    vt_world = vt_array_to_delete;
+    csReversibleTransform movtrans = movable->GetFullTransform ();
+    for (i = 0 ; i < vt_num ; i++)
+      vt_world[i] = movtrans.This2Other (vt[i]);
+  }
 
   iShadowBlock *list = shadows->NewShadowBlock (tri_num);
   csFrustum *frust;
@@ -259,7 +269,7 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
     frust->GetVertex (2).Set (vt_world[tri->c] - origin);
   }
 
-  delete[] vt_world;
+  delete[] vt_array_to_delete;
 }
 
 void csGenmeshMeshObject::GetTransformedBoundingBox (long cameranr,
@@ -388,7 +398,9 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = camera->GetTransform () / movable->GetFullTransform ();
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
 
   csVector3 radius;
   csSphere sphere;

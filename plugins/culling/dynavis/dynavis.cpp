@@ -265,17 +265,24 @@ void csDynaVis::Setup (const char* /*name*/)
 void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
 {
   iMovable* movable = visobj->GetMovable ();
-  csBox3 box;
-  visobj->GetObjectModel ()->GetObjectBoundingBox (box, CS_BBOX_MAX);
-  csReversibleTransform trans = movable->GetFullTransform ();
-  bbox.StartBoundingBox (trans.This2Other (box.GetCorner (0)));
-  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (1)));
-  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (2)));
-  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (3)));
-  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (4)));
-  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (5)));
-  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (6)));
-  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (7)));
+  if (movable->IsFullTransformIdentity ())
+  {
+    visobj->GetObjectModel ()->GetObjectBoundingBox (bbox, CS_BBOX_MAX);
+  }
+  else
+  {
+    csBox3 box;
+    visobj->GetObjectModel ()->GetObjectBoundingBox (box, CS_BBOX_MAX);
+    csReversibleTransform trans = movable->GetFullTransform ();
+    bbox.StartBoundingBox (trans.This2Other (box.GetCorner (0)));
+    bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (1)));
+    bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (2)));
+    bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (3)));
+    bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (4)));
+    bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (5)));
+    bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (6)));
+    bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (7)));
+  }
 }
 
 void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
@@ -540,15 +547,23 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
   int vertex_count = polymesh->GetVertexCount ();
   int poly_count = polymesh->GetPolygonCount ();
 
-  csReversibleTransform movtrans = movable->GetFullTransform ();
-  const csReversibleTransform& camtrans = camera->GetTransform ();
-  csReversibleTransform trans = camtrans / movtrans;
+  csReversibleTransform trans = camera->GetTransform ();
+  // Camera position in object space.
+  csVector3 campos_object;
+  if (movable->IsFullTransformIdentity ())
+  {
+    campos_object = trans.GetOrigin ();
+  }
+  else
+  {
+    csReversibleTransform movtrans = movable->GetFullTransform ();
+    campos_object = movtrans.Other2This (trans.GetOrigin ());
+    trans /= movtrans;
+  }
+
   float fov = camera->GetFOV ();
   float sx = camera->GetShiftX ();
   float sy = camera->GetShiftY ();
-
-  // Calculate camera position in object space.
-  csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin ());
 
   int i;
 
@@ -700,15 +715,24 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   const csVector3* verts = polymesh->GetVertices ();
   int vertex_count = polymesh->GetVertexCount ();
 
-  csReversibleTransform movtrans = movable->GetFullTransform ();
-  const csReversibleTransform& camtrans = camera->GetTransform ();
-  csReversibleTransform trans = camtrans / movtrans;
+  csReversibleTransform trans = camera->GetTransform ();
+  // Camera position in object space.
+  csVector3 campos_object;
+  if (movable->IsFullTransformIdentity ())
+  {
+    campos_object = trans.GetOrigin ();
+  }
+  else
+  {
+    csReversibleTransform movtrans = movable->GetFullTransform ();
+    campos_object = movtrans.Other2This (trans.GetOrigin ());
+    trans /= movtrans;
+  }
+
   float fov = camera->GetFOV ();
   float sx = camera->GetShiftX ();
   float sy = camera->GetShiftY ();
 
-  // Calculate camera position in object space.
-  csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin ());
   model->UpdateOutline (campos_object);
   const csOutlineInfo& outline_info = model->GetOutlineInfo ();
 
@@ -810,9 +834,13 @@ void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
   if (!obj->model->HasOBB ()) return;	// Object is not ment for writing.
 
   iMovable* movable = visobj->GetMovable ();
-  csReversibleTransform movtrans = movable->GetFullTransform ();
-  const csReversibleTransform& camtrans = camera->GetTransform ();
-  csReversibleTransform trans = camtrans / movtrans;
+
+  csReversibleTransform trans = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+  {
+    csReversibleTransform movtrans = movable->GetFullTransform ();
+    trans /= movtrans;
+  }
 
   const csOBB& obb = obj->model->GetOBB ();
   csOBBFrozen frozen_obb (obb, trans);
@@ -900,9 +928,14 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     {
       iCamera* camera = data->rview->GetCamera ();
       iMovable* movable = obj->visobj->GetMovable ();
-      csReversibleTransform movtrans = movable->GetFullTransform ();
+
       const csReversibleTransform& camtrans = camera->GetTransform ();
-      csReversibleTransform trans = camtrans / movtrans;
+      csReversibleTransform trans = camtrans;
+      if (!movable->IsFullTransformIdentity ())
+      {
+        csReversibleTransform movtrans = movable->GetFullTransform ();
+        trans /= movtrans;
+      }
 
       float max_depth;
       bool rc = false;
@@ -1453,12 +1486,23 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 	  if (!visobj_wrap->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
 	  {
 	    // Transform our vector to object space.
-	    //@@@ Consider the ability to check if
-	    // object==world space for objects in general?
-	    csReversibleTransform movtrans (visobj_wrap->visobj->
-		  GetMovable ()->GetFullTransform ());
-	    csVector3 obj_start = movtrans.Other2This (data->seg.Start ());
-	    csVector3 obj_end = movtrans.Other2This (data->seg.End ());
+	    csVector3 obj_start;
+	    csVector3 obj_end;
+	    iMovable* movable = visobj_wrap->visobj->GetMovable ();
+	    bool identity = movable->IsFullTransformIdentity ();
+	    csReversibleTransform movtrans;
+	    if (identity)
+	    {
+	      obj_start = data->seg.Start ();
+	      obj_end = data->seg.End ();
+	    }
+	    else
+	    {
+	      movtrans = movable->GetFullTransform ();
+	      obj_start = movtrans.Other2This (data->seg.Start ());
+	      obj_end = movtrans.Other2This (data->seg.End ());
+	    }
+
 	    csVector3 obj_isect;
 	    float r;
 
@@ -1472,7 +1516,10 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 	      {
 		data->r = r;
 		data->polygon = p;
-		data->isect = movtrans.This2Other (obj_isect);
+		if (identity)
+		  data->isect = obj_isect;
+		else
+		  data->isect = movtrans.This2Other (obj_isect);
 		data->sqdist = csSquaredDist::PointPoint (
 			data->seg.Start (), data->isect);
 		data->mesh = visobj_wrap->mesh;
@@ -1487,7 +1534,10 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 		{
 		  data->r = r;
 		  data->polygon = NULL;
-		  data->isect = movtrans.This2Other (obj_isect);
+		  if (identity)
+		    data->isect = obj_isect;
+		  else
+		    data->isect = movtrans.This2Other (obj_isect);
 		  data->sqdist = csSquaredDist::PointPoint (
 			data->seg.Start (), data->isect);
 		  data->mesh = visobj_wrap->mesh;

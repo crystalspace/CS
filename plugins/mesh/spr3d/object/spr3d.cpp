@@ -1265,7 +1265,9 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = camera->GetTransform () / movable->GetFullTransform ();
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
 
 #if 1
   csVector3 radius;
@@ -1478,7 +1480,11 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     csBox3 obox;
     GetObjectBoundingBox (obox);
     csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
-    csVector3 wor_center = movable->GetFullTransform ().This2Other (obj_center);
+    csVector3 wor_center;
+    if (movable->IsFullTransformIdentity ())
+      wor_center = obj_center;
+    else
+      wor_center = movable->GetFullTransform ().This2Other (obj_center);
     csVector3 cam_origin = camera->GetTransform ().GetOrigin ();
     float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
     level_of_detail /= MAX (wor_sq_dist, SMALL_EPSILON);
@@ -1881,8 +1887,16 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
   csBox3 obox;
   GetObjectBoundingBox (obox);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
-  csReversibleTransform movtrans = movable->GetFullTransform ();
-  csVector3 wor_center = movtrans.This2Other (obj_center);
+  csVector3 wor_center;
+  csReversibleTransform movtrans;
+  bool identity = movable->IsFullTransformIdentity ();
+  if (identity)
+    wor_center = obj_center;
+  else
+  {
+    movtrans = movable->GetFullTransform ();
+    wor_center = movtrans.This2Other (obj_center);
+  }
   csColor color;
 
   csColor light_color;
@@ -1914,7 +1928,11 @@ void csSprite3DMeshObject::UpdateLightingFast (iLight** lights, int num_lights,
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
     if (wor_sq_dist >= sq_light_radius) continue;
 
-    csVector3 obj_light_pos = movtrans.Other2This (wor_light_pos);
+    csVector3 obj_light_pos;
+    if (identity)
+      obj_light_pos = wor_light_pos;
+    else
+      obj_light_pos = movtrans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
     float inv_obj_dist = qisqrt (obj_sq_dist);
     float wor_dist = qsqrt (wor_sq_dist);
@@ -1988,8 +2006,16 @@ void csSprite3DMeshObject::UpdateLightingLQ (iLight** lights, int num_lights,
   csBox3 obox;
   GetObjectBoundingBox (obox);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
-  csReversibleTransform movtrans = movable->GetFullTransform ();
-  csVector3 wor_center = movtrans.This2Other (obj_center);
+  csVector3 wor_center;
+  csReversibleTransform movtrans;
+  bool identity = movable->IsFullTransformIdentity ();
+  if (identity)
+    wor_center = obj_center;
+  else
+  {
+    movtrans = movable->GetFullTransform ();
+    wor_center = movtrans.This2Other (obj_center);
+  }
   csColor color;
 
   for (i = 0 ; i < num_lights ; i++)
@@ -1999,7 +2025,11 @@ void csSprite3DMeshObject::UpdateLightingLQ (iLight** lights, int num_lights,
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
     if (wor_sq_dist >= lights[i]->GetSquaredRadius ()) continue;
 
-    csVector3 obj_light_pos = movtrans.Other2This (wor_light_pos);
+    csVector3 obj_light_pos;
+    if (identity)
+      obj_light_pos = wor_light_pos;
+    else
+      obj_light_pos = movtrans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
 
     float in_obj_dist = 0.0f;

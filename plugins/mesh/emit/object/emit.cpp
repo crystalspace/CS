@@ -604,11 +604,11 @@ bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
 
   // draw back to front
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
-  csReversibleTransform trans = movable->GetFullTransform ();
 
   // sort
   int i;
-  csReversibleTransform tr_o2c = rview->GetCamera()->GetTransform() / trans; // object to camera space
+  csReversibleTransform trans = movable->GetFullTransform ();
+  csReversibleTransform tr_o2c = rview->GetCamera()->GetTransform() / trans;
   cpa->SetLength(number);
   for (i = 0 ; i < number ; i++)
   {

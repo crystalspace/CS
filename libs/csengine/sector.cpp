@@ -124,7 +124,6 @@ csSector::csSector (csEngine *engine) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReferencedObject);
   DG_TYPE (this, "csSector");
   csSector::engine = engine;
-  culler_mesh = NULL;
   engine->AddToCurrentRegion (this);
 #ifndef CS_USE_NEW_RENDERER
   fog.enabled = false;
@@ -221,7 +220,6 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 bool csSector::UseCullerPlugin (const char *plugname)
 {
   culler = NULL;
-  culler_mesh = NULL;
 
   // Load the culler plugin.
   csRef<iPluginManager> plugmgr (CS_QUERY_REGISTRY (csEngine::object_reg,
@@ -314,8 +312,6 @@ csPolygon3D *csSector::IntersectSegment (
 
   if (!only_portals)
   {
-    // culler_mesh has option CS_THING_MOVE_NEVER so
-    // object space == world space.
     iMeshWrapper *mesh;
     iPolygon3D* poly;
     bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly);
@@ -324,8 +320,7 @@ csPolygon3D *csSector::IntersectSegment (
       best_p = poly->GetPrivateObject ();
       best_r = r;
       if (p_mesh)
-        *p_mesh = mesh ? mesh->GetPrivateObject ()
-		: culler_mesh ? culler_mesh->GetPrivateObject () : NULL;
+        *p_mesh = mesh ? mesh->GetPrivateObject () : NULL;
     }
     if (pr) *pr = best_r;
     return best_p;
@@ -345,6 +340,8 @@ csPolygon3D *csSector::IntersectSegment (
     iMeshWrapper* mesh = vo->GetMeshWrapper ();
     if (!mesh || mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
 
+    bool has_not_moved = mesh->GetMovable ()->IsFullTransformIdentity ();
+
     // @@@ UGLY!!!
     csRef<iThingState> ith (SCF_QUERY_INTERFACE (
         mesh->GetMeshObject (),
@@ -354,8 +351,7 @@ csPolygon3D *csSector::IntersectSegment (
       csThing *sp = (csThing *) (ith->GetPrivateObject ());
       r = best_r;
 
-      //@@@ Put this in csMeshWrapper???
-      if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
+      if (has_not_moved)
       {
         obj_start = start;
         obj_end = end;
@@ -376,7 +372,7 @@ csPolygon3D *csSector::IntersectSegment (
 
       if (p && r < best_r)
       {
-        if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
+        if (has_not_moved)
           cur_isect = obj_isect;
         else
           cur_isect = movtrans.This2Other (obj_isect);
@@ -454,7 +450,8 @@ csPolygon3D *csSector::IntersectSphere (
   for (i = 0; i < things.Length (); i++)
   {
     csThing *sp = (csThing *)things[i];
-    if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
+    bool has_not_moved = sp->GetMovable ()->IsFullTransformIdentity ();
+    if (has_not_moved)
       obj_center = center;
     else
     {

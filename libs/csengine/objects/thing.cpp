@@ -335,16 +335,33 @@ void csThing::WorUpdate ()
       {
         movablenr = cached_movable->GetUpdateNumber ();
 
-        csReversibleTransform movtrans = cached_movable->GetFullTransform ();
-        for (i = 0; i < num_vertices; i++)
-          wor_verts[i] = movtrans.This2Other (obj_verts[i]);
-        for (i = 0; i < polygons.Length (); i++)
-        {
-          csPolygon3D *p = GetPolygon3D (i);
-          p->ObjectToWorld (movtrans, p->Vwor (0));
-        }
+	if (cached_movable->IsFullTransformIdentity ())
+	{
+	  memcpy (wor_verts, obj_verts, num_vertices * (sizeof (csVector3)));
+	  csReversibleTransform movtrans;	// Identity.
+	  // @@@ It is possible to optimize the below too. Don't know
+	  // if it is worth it though.
+          for (i = 0; i < polygons.Length (); i++)
+          {
+            csPolygon3D *p = GetPolygon3D (i);
+            p->ObjectToWorld (movtrans, p->Vwor (0));
+          }
 
-        UpdateCurveTransform (movtrans);
+          UpdateCurveTransform (movtrans);
+	}
+	else
+	{
+          csReversibleTransform movtrans = cached_movable->GetFullTransform ();
+          for (i = 0; i < num_vertices; i++)
+            wor_verts[i] = movtrans.This2Other (obj_verts[i]);
+          for (i = 0; i < polygons.Length (); i++)
+          {
+            csPolygon3D *p = GetPolygon3D (i);
+            p->ObjectToWorld (movtrans, p->Vwor (0));
+          }
+
+          UpdateCurveTransform (movtrans);
+	}
 
         // If the movable changed we invalidate the camera number as well
         // to make sure the camera vertices are recalculated as well.
@@ -1643,8 +1660,9 @@ void csThing::DrawPolygonArrayDPM (
   PreparePolygonBuffer ();
 
   iCamera *icam = rview->GetCamera ();
-  csReversibleTransform tr_o2c = icam->GetTransform ()
-  	/ movable->GetFullTransform ();
+  csReversibleTransform tr_o2c = icam->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
 
   G3DPolygonMesh mesh;
   csBox2 bbox;
@@ -1959,17 +1977,23 @@ void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
     wor_bbox_movablenr = movable->GetUpdateNumber ();
 
     // @@@ Maybe it would be better to really calculate the bounding box
-
     // here instead of just transforming the object space bounding box?
-    csReversibleTransform mt = movable->GetFullTransform ();
-    wor_bbox.StartBoundingBox (mt.This2Other (obj_bbox.GetCorner (0)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (1)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (2)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (3)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (4)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (5)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (6)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (7)));
+    if (movable->IsFullTransformIdentity ())
+    {
+      wor_bbox = obj_bbox;
+    }
+    else
+    {
+      csReversibleTransform mt = movable->GetFullTransform ();
+      wor_bbox.StartBoundingBox (mt.This2Other (obj_bbox.GetCorner (0)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (1)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (2)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (3)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (4)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (5)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (6)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (7)));
+    }
   }
 
   box = wor_bbox;
@@ -2403,7 +2427,9 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
   sphere.SetRadius (max_obj_radius);
   if (can_move)
   {
-    csReversibleTransform tr_o2c = camtrans / movable->GetFullTransform ();
+    csReversibleTransform tr_o2c = camtrans;
+    if (!movable->IsFullTransformIdentity ())
+      tr_o2c /= movable->GetFullTransform ();
     bool rc = rview->TestBSphere (tr_o2c, sphere);
     return rc;
   }

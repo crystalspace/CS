@@ -7,6 +7,22 @@ The history order is reversed so that new features are at the top.
 	- Removed a bad DecRef() in the genmesh loader. This fixes the
 	  crash at exit in walktest. Thanks to Daniel Duhprey for finding
 	  this.
+	- Removed 'culler_mesh' in csSector. That is no longer valid
+	  with the removal of the octree.
+	- Added iMovable::IsTransformIdentity() and TransformIdentity().
+	  With this feature the movable will track if the transform
+	  is still an identity transform. If that's the case then some
+	  entities (like engine and cullers) can optimize based on that
+	  fact. These two functions also make sure the engine doesn't have
+	  to use the equivalent thing flags to do the same optimization.
+	- Added csTransform::Identity() and IsIdentity().
+	- Also added iMovable::IsFullTransformIdentity() which corresponds
+	  to the GetFullTransform() being an identity transform.
+	- Optimized Dynavis and Frustvis by using IsFullTransformIdentity()
+	  and avoiding the transforms in that case.
+	- Additionally optimized all mesh objects and parts of the engine
+	  to test for the identity transform and avoid some matrix
+	  manipulations or even more in some cases.
 17-Dec-2002
 	- Fixed the fix on reparenting of a mesh object for the culler.
 	- Added 'do_popup' parameter to iStandardReporterListener->

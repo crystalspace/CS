@@ -253,7 +253,11 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
   csBox3 obox;
   GetWorldBoundingBox (obox);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
-  csVector3 wor_center = movable.GetFullTransform ().This2Other (obj_center);
+  csVector3 wor_center;
+  if (movable.IsFullTransformIdentity ())
+    wor_center = obj_center;
+  else
+    wor_center = movable.GetFullTransform ().This2Other (obj_center);
   csVector3 cam_origin = camera->GetTransform ().GetOrigin ();
   float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
   float dist = min_imposter_distance->Get ();
@@ -373,7 +377,8 @@ void csMeshWrapper::PlaceMesh ()
   if (max_radius < radius.y) max_radius = radius.y;
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
-  sphere = movable.GetFullTransform ().This2Other (sphere);
+  if (!movable.IsFullTransformIdentity ())
+    sphere = movable.GetFullTransform ().This2Other (sphere);
   max_radius = sphere.GetRadius ();
 
   float max_sq_radius = max_radius * max_radius;
@@ -462,14 +467,29 @@ bool csMeshWrapper::HitBeam (
   csVector3 &isect,
   float *pr)
 {
-  csReversibleTransform trans = movable.GetFullTransform ();
-  csVector3 startObj = trans.Other2This (start);
-  csVector3 endObj = trans.Other2This (end);
+  csVector3 startObj;
+  csVector3 endObj;
+  csReversibleTransform trans;
+  if (movable.IsFullTransformIdentity ())
+  {
+    startObj = start;
+    endObj = end;
+  }
+  else
+  {
+    trans = movable.GetFullTransform ();
+    startObj = trans.Other2This (start);
+    endObj = trans.Other2This (end);
+  }
   bool rc = false;
   if (HitBeamBBox (startObj, endObj, isect, NULL) > -1)
   {
     rc = HitBeamOutline (startObj, endObj, isect, pr);
-    if (rc) isect = trans.This2Other (isect);
+    if (rc)
+    {
+      if (!movable.IsFullTransformIdentity ())
+        isect = trans.This2Other (isect);
+    }
   }
 
   return rc;
@@ -493,21 +513,25 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
   {
     wor_bbox_movablenr = movable.GetUpdateNumber ();
 
-    csBox3 obj_bbox;
-    meshobj->GetObjectModel ()->GetObjectBoundingBox (obj_bbox, CS_BBOX_MAX);
+    if (movable.IsFullTransformIdentity ())
+      meshobj->GetObjectModel ()->GetObjectBoundingBox (wor_bbox, CS_BBOX_MAX);
+    else
+    {
+      csBox3 obj_bbox;
+      meshobj->GetObjectModel ()->GetObjectBoundingBox (obj_bbox, CS_BBOX_MAX);
 
-    // @@@ Maybe it would be better to really calculate the bounding box
-
-    // here instead of just transforming the object space bounding box?
-    csReversibleTransform mt = movable.GetFullTransform ();
-    wor_bbox.StartBoundingBox (mt.This2Other (obj_bbox.GetCorner (0)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (1)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (2)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (3)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (4)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (5)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (6)));
-    wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (7)));
+      // @@@ Maybe it would be better to really calculate the bounding box
+      // here instead of just transforming the object space bounding box?
+      csReversibleTransform mt = movable.GetFullTransform ();
+      wor_bbox.StartBoundingBox (mt.This2Other (obj_bbox.GetCorner (0)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (1)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (2)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (3)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (4)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (5)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (6)));
+      wor_bbox.AddBoundingVertexSmart (mt.This2Other (obj_bbox.GetCorner (7)));
+    }
   }
 
   cbox = wor_bbox;
@@ -568,7 +592,9 @@ float csMeshWrapper::GetScreenBoundingBox (
   csBox3 &cbox)
 {
   csVector2 oneCorner;
-  csReversibleTransform tr_o2c = camera->GetTransform () / movable.GetFullTransform ();
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  if (!movable.IsFullTransformIdentity ())
+    tr_o2c /= movable.GetFullTransform ();
   GetTransformedBoundingBox (tr_o2c, cbox);
 
   // if the entire bounding box is behind the camera, we're done

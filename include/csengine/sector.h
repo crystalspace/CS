@@ -138,12 +138,6 @@ private:
 #endif // CS_USE_NEW_RENDERER
 
   /**
-   * This is a pointer to the csMeshWrapper which implements the visibility
-   * culler.
-   */
-  iMeshWrapper* culler_mesh;
-
-  /**
    * The visibility culler for this sector or NULL if none.
    * In future we should support more than one visibility culler probably.
    */

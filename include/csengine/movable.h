@@ -76,6 +76,8 @@ class csMovable : public iBase
 private:
   /// World to object transformation.
   csReversibleTransform obj;
+  /// The following flag is true if the transform is still identity.
+  bool is_identity;
   /// List of sectors.
   csMovableSectorList sectors;
   /// List of listeners to this movable.
@@ -246,6 +248,22 @@ public:
    */
   long GetUpdateNumber () const { return updatenr; }
 
+  bool IsTransformIdentity () const
+  {
+    return is_identity;
+  }
+  bool IsFullTransformIdentity () const
+  {
+    if (!is_identity) return false;
+    if (parent != NULL)
+      return parent->IsFullTransformIdentity ();
+    return true;
+  }
+  void TransformIdentity ()
+  {
+    obj.Identity ();
+  }
+
   SCF_DECLARE_IBASE;
 
   //------------------------- iMovable interface -------------------------------
@@ -275,6 +293,18 @@ public:
     virtual void RemoveListener (iMovableListener* listener);
     virtual void UpdateMove ();
     virtual long GetUpdateNumber () const;
+    virtual bool IsTransformIdentity () const
+    {
+      return scfParent->IsTransformIdentity ();
+    }
+    virtual bool IsFullTransformIdentity () const
+    {
+      return scfParent->IsFullTransformIdentity ();
+    }
+    virtual void TransformIdentity ()
+    {
+      scfParent->TransformIdentity ();
+    }
   } scfiMovable;
   friend struct eiMovable;
 };

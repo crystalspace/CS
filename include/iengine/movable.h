@@ -49,7 +49,7 @@ struct iMovableListener : public iBase
   virtual void MovableDestroyed (iMovable* movable) = 0;
 };
 
-SCF_VERSION (iMovable, 0, 1, 1);
+SCF_VERSION (iMovable, 0, 1, 2);
 
 /**
  * This interface describes a movable entity. It is usually
@@ -69,12 +69,16 @@ struct iMovable : public iBase
    * This function does not update the corresponding list in
    * the sector. It only does a local update here.
    * This function does not do anything if the parent is not NULL.
+   * You have to call UpdateMove() after changing the sector
+   * information.
    */
   virtual void SetSector (iSector* sector) = 0;
 
   /**
    * Clear the list of sectors.
    * This function does not do anything if the parent is not NULL.
+   * You have to call UpdateMove() after changing the sector
+   * information.
    */
   virtual void ClearSectors () = 0;
 
@@ -93,12 +97,16 @@ struct iMovable : public iBase
   /**
    * Set the transformation vector and sector to move to
    * some position.
+   * You have to call UpdateMove() after changing the position
+   * of an object.
    */
   virtual void SetPosition (iSector* home, const csVector3& v) = 0;
 
   /**
    * Set the transformation vector for this object. Note
    * that the sectors are unchanged.
+   * You have to call UpdateMove() after changing the position
+   * of an object.
    */
   virtual void SetPosition (const csVector3& v) = 0;
 
@@ -115,6 +123,8 @@ struct iMovable : public iBase
 
   /**
    * Set the transformation matrix for this entity.
+   * You have to call UpdateMove() after changing the transform
+   * of an object.
    */
   virtual void SetTransform (const csMatrix3& matrix) = 0;
 
@@ -124,13 +134,16 @@ struct iMovable : public iBase
    * as some parts of CS don't work properly in that case.
    * It is better to scale your object using
    * iMeshWrapper or iMeshFactoryWrapper->HardTransform().
+   * You have to call UpdateMove() after changing the transform
+   * of an object.
    */
   virtual void SetTransform (const csReversibleTransform& t) = 0;
 
   /**
    * Get the world to object tranformation. This==object
    * and Other==world so This2Other()
-   * transforms from object to world space.
+   * transforms from object to world space. If you modify this
+   * transform you have to call UpdateMove() later.
    */
   virtual csReversibleTransform& GetTransform () = 0;
 
@@ -166,6 +179,11 @@ struct iMovable : public iBase
    * call UpdateMove() to make the final changes to the entity
    * that is controlled by this movable. This is very important!
    * This function is responsible for calling all movement listeners.
+   * If you do not call this function then the visibility cullers
+   * will not work right (among other things).
+   * <p>
+   * UpdateMove() will also check for the transform being the identity
+   * transform and in that case it will set the identity flag to true.
    */
   virtual void UpdateMove () = 0;
 
@@ -175,6 +193,37 @@ struct iMovable : public iBase
    * has changed since the last time it was checked.
    */
   virtual long GetUpdateNumber () const = 0;
+
+  /**
+   * This function returns true if the movable transformation is an
+   * identity transformation. As soon as the object is moved this function
+   * will return false. You can use 'TransformIdentity()' to go back to the
+   * identity transform which will again let this flag return true.
+   * Note that this flag is only relevant for the transform of this
+   * movable and doesn't look at the transforms of the parents. Use
+   * IsFullTransformIdentity() for that.
+   * <p>
+   * The engine and visibility cullers can use this information to
+   * optimize stuff a bit.
+   */
+  virtual bool IsTransformIdentity () const = 0;
+
+  /**
+   * Return true if the movable transformation is an identity transformation
+   * and the (optional) parent of this movable also is has identity
+   * transformation. Only in this case can you know that the object has
+   * the same object space coordinates as world space coordinates.
+   * Basically this function will return true if GetFullTransform() would
+   * return the identity transform.
+   */
+  virtual bool IsFullTransformIdentity () const = 0;
+
+  /**
+   * Set the transform of this movable to the identity transform (i.e.
+   * not moving at all). You have to call UpdateMove() after calling
+   * this.
+   */
+  virtual void TransformIdentity () = 0;
 };
 
 /** @} */

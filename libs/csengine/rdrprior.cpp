@@ -152,8 +152,10 @@ void csRenderQueueSet::Sort (iRenderView *rview, int priority)
     csVector3 rad, cent;
     mesh->GetRadius (rad, cent);
 
-    csReversibleTransform tr_o2c = camtrans / mesh->GetMovable ()->
-    	GetFullTransform ();
+    csReversibleTransform tr_o2c = camtrans;
+    iMovable* movable = mesh->GetMovable ();
+    if (!movable->IsFullTransformIdentity ())
+      tr_o2c /= movable->GetFullTransform ();
     csVector3 tr_cent = tr_o2c.Other2This (cent);
     comp_mesh_z[i].z = rendsort == CS_RENDPRI_FRONT2BACK
     	? tr_cent.z

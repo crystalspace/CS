@@ -63,6 +63,36 @@ public:
   	m_o2t (other2this), v_o2t (origin_pos) {}
 
   /**
+   * Reset this transform to the identity transform.
+   */
+  void Identity ()
+  {
+    SetO2TTranslation (csVector3 (0));
+    SetO2T (csMatrix3 ());
+  }
+
+  /**
+   * Returns true if this transform is an identity transform.
+   * This tests all fields so don't call this before every operation.
+   */
+  bool IsIdentity () const
+  {
+    if (ABS (v_o2t.x) >= SMALL_EPSILON) return false;
+    if (ABS (v_o2t.y) >= SMALL_EPSILON) return false;
+    if (ABS (v_o2t.z) >= SMALL_EPSILON) return false;
+    if (ABS (m_o2t.m11-1) >= SMALL_EPSILON) return false;
+    if (ABS (m_o2t.m12) >= SMALL_EPSILON) return false;
+    if (ABS (m_o2t.m13) >= SMALL_EPSILON) return false;
+    if (ABS (m_o2t.m21) >= SMALL_EPSILON) return false;
+    if (ABS (m_o2t.m22-1) >= SMALL_EPSILON) return false;
+    if (ABS (m_o2t.m23) >= SMALL_EPSILON) return false;
+    if (ABS (m_o2t.m31) >= SMALL_EPSILON) return false;
+    if (ABS (m_o2t.m32) >= SMALL_EPSILON) return false;
+    if (ABS (m_o2t.m33-1) >= SMALL_EPSILON) return false;
+    return true;
+  }
+
+  /**
    * Get 'other' to 'this' transformation matrix. This is the 3x3
    * matrix M from the transform equation T=M*(O-V).
    */

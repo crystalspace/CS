@@ -245,9 +245,18 @@ bool csStarsMeshObject::Draw (iRenderView* rview, iMovable* movable,
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   iCamera* camera = rview->GetCamera ();
-  csReversibleTransform tr_o2c = camera->GetTransform () / movable->GetFullTransform ();
-  const csVector3& origin = movable->GetFullTransform ().GetInverse () *
-    camera->GetTransform().GetOrigin();
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  csVector3 origin;
+  if (movable->IsFullTransformIdentity ())
+  {
+    origin = camera->GetTransform().GetOrigin();
+  }
+  else
+  {
+    csReversibleTransform movtrans = movable->GetFullTransform ();
+    tr_o2c /= movtrans;
+    origin = movtrans.GetInverse () * camera->GetTransform().GetOrigin();
+  }
 
   if(max_dist <= 0.0) return false; // protect against divide by zero
   srand (seed);

@@ -172,8 +172,10 @@ bool csStuffObject::DrawTest(iRenderView *rview, iMovable *movable) {
  //printf(" draw test \n");
 // SetupMesh();
 
- iCamera* camera = rview->GetCamera ();
- csReversibleTransform tr_o2c = camera->GetTransform () / movable->GetFullTransform ();
+  iCamera* camera = rview->GetCamera ();
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
 
   csVector3 radius;
   csSphere sphere;

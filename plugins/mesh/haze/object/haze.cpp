@@ -581,7 +581,9 @@ bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   //iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
 
-  csReversibleTransform tr_o2c = camera->GetTransform () / movable->GetFullTransform ();
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
   float fov = camera->GetFOV ();
   float shiftx = camera->GetShiftX ();
   float shifty = camera->GetShiftY ();
@@ -792,12 +794,15 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
   csVector3 campos = camera->GetTransform().GetOrigin();
-  campos = movable->GetFullTransform() * campos;
+  if (!movable->IsFullTransformIdentity ())
+    campos = movable->GetFullTransform() * campos;
   float fov = camera->GetFOV ();
   float shx = camera->GetShiftX ();
   float shy = camera->GetShiftY ();
   /// obj to camera space
-  csReversibleTransform tr_o2c = camera->GetTransform () / movable->GetFullTransform ();
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
 
   // Prepare for rendering.
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
