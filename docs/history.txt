@@ -33,6 +33,24 @@ Short-term cleanups that need to be done:
 	  driver.
 	- Finally Wouter also pointed me to a weird construct in
 	  libs/csutil/inifile.cpp. I fixed it.
+	- Andrew Zabolotny did the following changes:
+	    - Re-inspected the polygon clipper. The methods were enhanced
+	      a little, this also helped to catch a bug with software fog
+	      (in Sector::Draw). It was not too (visually) noticeable, but
+	      it was there.
+	    - Re-implemented the box clipper. Now both polygon and box
+	      clipper uses same core routine that makes fixing bugs
+	      easier (changes are propagated to both clippers).
+	    - Added the required functionality to the clipper to be able
+	      to clip Gouraud-shaded polygons (and possibly other kinds
+	      of polygons) correctly.
+	    - Renamed AddFogPolygon into DrawFogPolygon. No other changes
+	      to the interface.
+	    - Fixed a serious bug with fog (affected only the software
+	      renderer). The fog in mirrors was not drawn (approach to a
+	      mirroring floor in old walktest and you will see).
+	- Removed some buggy debug code in the polygon clipper left over
+	  by Andrew.
 19-Mar-2000
 	- Thomas Hieber added proper support for skyboxes in maps without
 	  manual sectoring.

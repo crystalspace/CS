@@ -131,10 +131,5 @@
       memcpy (OutPolygon, InP, OutV * sizeof (csVector2));
   }
 
-//<debug>
-else if (OutV > 2 && InP != OutPolygon)
-asm("int $3");
-//</debug>
-
 #undef BOXCLIP_HAVEBOX
 #undef OUTPUT_VERTEX_STATUS

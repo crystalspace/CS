@@ -69,9 +69,4 @@
   for (edge = 0; edge < ClipPolyVertices; edge++)
 #include "edgeclip.inc"
 
-//<debug>
-if (OutV > 2 && InP != OutPolygon)
-asm("int $3");
-//</debug>
-
 #undef OUTPUT_VERTEX_STATUS
