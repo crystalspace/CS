@@ -366,6 +366,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	  iEmitGen3D *gen;
 	  gen = ParseEmit(params, fstate, &amt);
 	  emix->AddEmitter(amt, gen);
+	  SCF_DEC_REF (gen);
 	  result = emix;
 	}
 	break;
@@ -437,6 +438,7 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
   iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
   imeshwrap->DecRef ();
 
+  iEmitGen3D *emit;
   iMeshObject* mesh = NULL;
   iParticleState* partstate = NULL;
   iEmitFactoryState* emitfactorystate = NULL;
@@ -448,8 +450,10 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
     if (!params)
     {
       // @@@ Error handling!
-      if (partstate) partstate->DecRef ();
-      if (emitstate) emitstate->DecRef ();
+      SCF_DEC_REF (mesh);
+      SCF_DEC_REF (partstate);
+      SCF_DEC_REF (emitstate);
+      SCF_DEC_REF (emitfactorystate);
       return NULL;
     }
     switch (cmd)
@@ -462,8 +466,10 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
-	    if (partstate) partstate->DecRef ();
-	    if (emitstate) emitstate->DecRef ();
+            SCF_DEC_REF (mesh);
+            SCF_DEC_REF (partstate);
+            SCF_DEC_REF (emitstate);
+            SCF_DEC_REF (emitfactorystate);
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -483,9 +489,10 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	  {
 	    printf ("Could not find material '%s'!\n", str);
             // @@@ Error handling!
-            mesh->DecRef ();
-	    if (partstate) partstate->DecRef ();
-	    if (emitstate) emitstate->DecRef ();
+            SCF_DEC_REF (mesh);
+            SCF_DEC_REF (partstate);
+            SCF_DEC_REF (emitstate);
+            SCF_DEC_REF (emitfactorystate);
             return NULL;
 	  }
 	  partstate->SetMaterialWrapper (mat);
@@ -542,20 +549,23 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_STARTPOS:
 	{
-	  emitstate->SetStartPosEmit (ParseEmit(params, emitfactorystate,
-	  	NULL));
+	  emit = ParseEmit(params, emitfactorystate, NULL);
+	  emitstate->SetStartPosEmit (emit);
+	  SCF_DEC_REF (emit);
 	}
 	break;
       case CS_TOKEN_STARTSPEED:
 	{
-	  emitstate->SetStartSpeedEmit (ParseEmit(params, emitfactorystate,
-	  	NULL));
+	  emit = ParseEmit(params, emitfactorystate, NULL);
+	  emitstate->SetStartSpeedEmit (emit);
+	  SCF_DEC_REF (emit);
 	}
 	break;
       case CS_TOKEN_STARTACCEL:
 	{
-	  emitstate->SetStartAccelEmit (ParseEmit(params, emitfactorystate,
-	  	NULL));
+	  emit = ParseEmit(params, emitfactorystate, NULL);
+	  emitstate->SetStartAccelEmit (emit);
+	  SCF_DEC_REF (emit);
 	}
 	break;
       case CS_TOKEN_ATTRACTORFORCE:
@@ -567,16 +577,17 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 	break;
       case CS_TOKEN_ATTRACTOR:
 	{
-	  emitstate->SetAttractorEmit (ParseEmit(params, emitfactorystate,
-	  	NULL));
+	  emit = ParseEmit(params, emitfactorystate, NULL);
+	  emitstate->SetAttractorEmit (emit);
+	  SCF_DEC_REF (emit);
 	}
 	break;
     }
   }
 
-  if (partstate) partstate->DecRef ();
-  if (emitstate) emitstate->DecRef ();
-  if (emitfactorystate) emitfactorystate->DecRef ();
+  SCF_DEC_REF (partstate);
+  SCF_DEC_REF (emitstate);
+  SCF_DEC_REF (emitfactorystate);
   return mesh;
 }
 
