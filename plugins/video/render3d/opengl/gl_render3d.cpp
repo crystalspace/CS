@@ -1,20 +1,20 @@
 /*
-Copyright (C) 2002 by Mårten Svanfeldt
-                      Anders Stenberg
+  Copyright (C) 2002 by Mårten Svanfeldt
+                        Anders Stenberg
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
 
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free
-Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -44,14 +44,15 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/lighting.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/render3d.h"
-#include "ivideo/rndbuf.h"
+#include "ivideo/rendermesh.h"
 
 #include "ivideo/shader/shader.h"
 
 #include "gl_render3d.h"
-#include "gl_sysbufmgr.h"
+#include "gl_renderbuffer.h"
 #include "gl_txtcache.h"
 #include "gl_txtmgr.h"
+
 #include "video/canvas/openglcommon/glextmanager.h"
 
 #include "../common/txtmgr.h"
@@ -114,6 +115,8 @@ csGLRender3D::csGLRender3D (iBase *parent)
   alpha_enabled = false;
   current_shadow_state = 0;
 
+  use_hw_render_buffers = false;
+
   //@@@ Test default. Will have to be autodetected later.
   clip_optional[0] = CS_GL_CLIP_PLANES;
   clip_optional[1] = CS_GL_CLIP_STENCIL;
@@ -138,7 +141,6 @@ csGLRender3D::csGLRender3D (iBase *parent)
 
 csGLRender3D::~csGLRender3D()
 {
-  delete buffermgr;
   delete txtcache;
   delete txtmgr;
 
@@ -172,6 +174,8 @@ int csGLRender3D::GetMaxTextureSize () const
 {
   GLint max;
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max);
+  if (max == 0)
+    max = 128; //@@ Assume we support at least 128x128 textures
   return max;
 }
 
@@ -704,18 +708,11 @@ bool csGLRender3D::Open ()
   asp_center_x = w/2;
   asp_center_y = h/2;
 
-  /*effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
-  if( !effectserver )
-  {
-  effectserver = CS_LOAD_PLUGIN (plugin_mgr,
-  "crystalspace.video.effects.stdserver", iEffectServer);
-  object_reg->Register (effectserver, "iEffectServer");
-  }*/
-
   // The extension manager requires to initialize all used extensions with
   // a call to Init<ext> first.
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_compression ();
+  ext->InitGL_ARB_vertex_buffer_object ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
   ext->InitGL_EXT_texture_lod_bias ();
@@ -726,8 +723,7 @@ bool csGLRender3D::Open ()
    */
   if (config->GetBool ("Video.OpenGL.UseNVidiaExt", true))
   {
-    ext->InitGL_NV_vertex_array_range ();
-    ext->InitGL_NV_fence ();
+    //no special nvidia extensions atm
   }
   /*
     Check whether to init ATI-only exts.
@@ -736,10 +732,10 @@ bool csGLRender3D::Open ()
    */
   if (config->GetBool ("Video.OpenGL.UseATIExt", true))
   {
-    ext->InitGL_ATI_vertex_array_object ();
-    ext->InitGL_ATI_vertex_attrib_array_object ();
+    //no special ati extensions atm
   }
-  varr.ext = ext;
+  // check for support of VBO
+  use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
 
   shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
   if( !shadermgr )
@@ -767,24 +763,6 @@ bool csGLRender3D::Open ()
   shvar_light_0_attenuation->SetType(iShaderVariable::VECTOR4);
   shadermgr->AddVariable(shvar_light_0_attenuation);
 
-  if (ext->CS_GL_NV_vertex_array_range && ext->CS_GL_NV_fence)
-  {
-    csVARRenderBufferManager * bm = new csVARRenderBufferManager();
-    bm->Initialize(this);
-    buffermgr = bm;
-  } 
-  else if ( ext->CS_GL_ATI_vertex_array_object && 
-    ext->CS_GL_ATI_vertex_attrib_array_object)
-  {
-    csVaoRenderBufferManager* bm = new csVaoRenderBufferManager();
-    bm->Initialize(this);
-    buffermgr = bm;
-    varr.IsATI = true;
-  }
-  else
-  {
-    buffermgr.AttachNew (new csSysRenderBufferManager());
-  }
 
   txtcache = new csGLTextureCache (1024*1024*32, this);
   txtmgr.AttachNew (new csGLTextureManager (object_reg, GetDriver2D (), config, this));
@@ -818,7 +796,6 @@ void csGLRender3D::Close ()
     txtcache->Clear ();
     //delete txtcache; txtcache = 0;
   }
-  buffermgr = 0;
   shadermgr = 0;
 
   if (G2D)
@@ -1113,9 +1090,17 @@ bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   {
     ext->glEnableVertexAttribArrayARB (attrib);
     if (bind)
-      varr.VertexAttribPointer (
-        attrib, buffer->GetComponentCount (), 
-        type[buffer->GetComponentType ()], true, 0, data);
+    {
+      if (use_hw_render_buffers)
+      {
+        ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, (uint)data);
+        ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount ()
+          , type[buffer->GetComponentType ()], true, 0, 0);
+      }
+      else
+        ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount ()
+        , type[buffer->GetComponentType ()], true, 0, data);
+    }
     vertattrib[attrib] = buffer;
     vertattribenabled[attrib] = true;
   }
@@ -1384,227 +1369,34 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   else
     SetMirrorMode (mymesh->do_mirror);
 
-//  csMaterialHandle* mathandle = 
-//    (csMaterialHandle*)(mymesh->mathandle);
   csMaterialHandle* mathandle = mymesh->material ?
     ((csMaterialHandle*)(mymesh->material->GetMaterialHandle())) :
     0;
 
   statecache->SetShadeModel (GL_SMOOTH);
 
-  /*csRef<iTextureHandle> txthandle;
-  if (mathandle)
-    txthandle = mathandle->GetTexture ();
-
-  float red = 1, green = 1, blue = 1, alpha = 1;
-  if (txthandle)
-  {
-
-    alpha = 1.0f - BYTE_TO_FLOAT (mymesh->mixmode & CS_FX_MASK_ALPHA);
-    alpha = SetMixMode (mymesh->mixmode, alpha, 
-      txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
-
-  } else {
-    statecache->Disable_GL_TEXTURE_2D ();
-
-    csRGBpixel color;
-    if (mathandle)
-      mathandle->GetFlatColor (color);
-    
-    red = BYTE_TO_FLOAT (color.red);
-    green = BYTE_TO_FLOAT (color.green);
-    blue = BYTE_TO_FLOAT (color.blue);
-    alpha = SetMixMode (mymesh->mixmode, 1, false);
-  }
-
-  glColor4f (red, green, blue, alpha);*/
-
-  /*csRef<iShader> shader;
-  if (mathandle)
-     shader = mathandle->GetMaterial()->GetShader();*/
 
   glEnableClientState(GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV);
-  bool useshader = false;
-  if(true/*shader && shader->IsValid()*/)
-  {
-    useshader = true;
-    //iShaderTechnique* tech = shader->GetBestTechnique();
 
-    iStreamSource* source = mymesh->streamsource;
-    iRenderBuffer* indexbuf =
-      source->GetBuffer (string_indices);
-    if (!indexbuf)
-      return;
+  iStreamSource* source = mymesh->streamsource;
+  iRenderBuffer* indexbuf =
+    source->GetBuffer (string_indices);
+  if (!indexbuf)
+    return;
 
-    SetMixMode (mymesh->mixmode, 0, true);
+  SetMixMode (mymesh->mixmode, 0, true);
 
-    /*int currp;
-    for(currp = 0; currp< tech->GetPassCount(); ++currp)
-    {
-      iShaderPass *pass = tech->GetPass (currp);
-      uint mixmode = pass->GetMixmodeOverride ();
-      if (mixmode != 0)
-        SetMixMode (mixmode, 0, true);
+  if (bugplug)
+    bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
 
-      if (pass != lastUsedShaderpass)
-      {
-        if (lastUsedShaderpass)
-        {
-          lastUsedShaderpass->Deactivate ();
-        }
+  glDrawElements (
+    primitivetype,
+    mymesh->indexend-mymesh->indexstart,
+    GL_UNSIGNED_INT,
+    ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
+    +mymesh->indexstart);
 
-        pass->Activate (mymesh);
-      }
-      pass->SetupState (mymesh);*/
-
-      if (bugplug)
-        bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
-
-      glDrawElements (
-        primitivetype,
-        mymesh->indexend-mymesh->indexstart,
-        GL_UNSIGNED_INT,
-        ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
-        +mymesh->indexstart);
-
-      //pass->Deactivate(mymesh);
-      /*pass->ResetState ();
-      lastUsedShaderpass = pass;*/
-      indexbuf->Release ();
-    //}
-  } else {
-    /*if (lastUsedShaderpass)
-    {
-      lastUsedShaderpass->ResetState ();
-      lastUsedShaderpass->Deactivate ();
-      lastUsedShaderpass = 0;
-    }*/
-
-    iStreamSource* source = mymesh->streamsource;
-    iRenderBuffer* vertexbuf =
-      source->GetBuffer (string_vertices);
-    iRenderBuffer* texcoordbuf = 0;
-      //source->GetBuffer (string_texture_coordinates);
-    iRenderBuffer* normalbuf = 0;
-      //source->GetBuffer (string_normals);
-    iRenderBuffer* colorbuf = 0;
-      //source->GetBuffer (string_colors);
-    iRenderBuffer* indexbuf =
-      source->GetBuffer (string_indices);
-
-    if (!vertexbuf || vertexbuf->IsDiscarded())
-      return;
-    if (!indexbuf)
-      return;
-
-    varr.VertexPointer (3, GL_FLOAT, 0,
-      (float*)vertexbuf->Lock(CS_BUF_LOCK_RENDER));
-    glEnableClientState (GL_VERTEX_ARRAY);
-
-    /*if (texcoordbuf && !texcoordbuf->IsDiscarded())
-    {
-      varr.TexCoordPointer (2, GL_FLOAT, 0, (float*)
-        texcoordbuf->Lock(CS_BUF_LOCK_RENDER));
-      glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-    }
-    if (normalbuf && !normalbuf->IsDiscarded())
-    {
-      varr.NormalPointer (GL_FLOAT, 0, (float*)
-        normalbuf->Lock(CS_BUF_LOCK_RENDER));
-      glEnableClientState (GL_NORMAL_ARRAY);
-    }
-    if (colorbuf && !colorbuf->IsDiscarded())
-    {
-      varr.ColorPointer (4, GL_FLOAT, 0, (float*)
-        colorbuf->Lock(CS_BUF_LOCK_RENDER));
-      glEnableClientState (GL_COLOR_ARRAY);
-    }*/
-
-    if (bugplug)
-        bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
-
-    glColor4f (0, 0, 0, 0);
-    glDrawElements (
-      primitivetype,
-      mymesh->indexend-mymesh->indexstart,
-      GL_UNSIGNED_INT,
-      ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
-      +mymesh->indexstart);
-
-    /*if (mathandle)
-    {
-      for (int l=0; l<mathandle->GetTextureLayerCount (); l++)
-      {
-        if (indexbuf) // must make sure that the indexbuffer is aviable for locking
-          indexbuf->Release();
-
-        csTextureLayer* layer = mathandle->GetTextureLayer (l);
-        txthandle = layer->txt_handle;
-        if (txthandle)
-        {
-          ActivateTexture (txthandle);
-          txtcache->Cache (txthandle);
-          csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
-            txthandle->GetPrivateObject ();
-          csTxtCacheData *cachedata =
-            (csTxtCacheData *)gltxthandle->GetCacheData ();
-
-          statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
-          statecache->Enable_GL_TEXTURE_2D ();
-        } else continue;
-
-        alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
-        alpha = SetMixMode (layer->mode, alpha, 
-          txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
-        glColor4f (1, 1, 1, alpha);
-
-        glMatrixMode (GL_TEXTURE);
-        glPushMatrix ();
-        GLfloat scalematrix[16];
-        int i;
-        for (i = 0 ; i < 16 ; i++) scalematrix[i] = 0.0;
-        scalematrix[0] = layer->uscale;
-        scalematrix[5] = layer->vscale;
-        scalematrix[10] = 1;
-        scalematrix[15] = 1;
-        scalematrix[12] = layer->ushift*layer->uscale; 
-        scalematrix[13] = layer->vshift*layer->vscale;
-        // @@@ Shift is ignored for now.
-        glLoadMatrixf (scalematrix);
-
-        if (bugplug)
-          bugplug->AddCounter ("Triangle Count", (mymesh->indexend-mymesh->indexstart)/3);
-
-        glDrawElements (
-          primitivetype,
-          mymesh->indexend-mymesh->indexstart,
-          GL_UNSIGNED_INT,
-          ((unsigned int*)indexbuf->Lock(CS_BUF_LOCK_RENDER))
-          +mymesh->indexstart);
-
-        glPopMatrix ();
-      }
-    }*/
-
-    vertexbuf->Release();
-    glDisableClientState (GL_VERTEX_ARRAY);
-    indexbuf->Release();
-    /*if (texcoordbuf)
-    {
-      glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-      texcoordbuf->Release();
-    }
-    if (colorbuf)
-    {
-      glDisableClientState (GL_COLOR_ARRAY);
-      colorbuf->Release();
-    }
-    if (normalbuf)
-    {
-      glDisableClientState (GL_NORMAL_ARRAY);
-      normalbuf->Release();
-    }*/
-  }
+  indexbuf->Release();
   glDisableClientState(GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV);
 
   /*if (clip_planes_enabled)
@@ -1785,8 +1577,6 @@ void* csGLRender3D::eiShaderRenderInterface::GetPrivateObject(const char* name)
     return (void*) (scfParent->ext);
   if(strcasecmp(name, "txtcache") == 0)
     return (void*) (scfParent->txtcache);
-  if(strcasecmp(name, "varr") == 0)
-    return (void*) (&scfParent->varr);
   return 0;
 }
 

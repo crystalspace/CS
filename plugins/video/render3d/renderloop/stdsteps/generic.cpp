@@ -21,6 +21,8 @@
 
 #include "iutil/document.h"
 #include "ivideo/rndbuf.h"
+#include "ivideo/render3d.h"
+#include "ivideo/rendermesh.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
 #include "iengine/mesh.h"

@@ -21,6 +21,13 @@ The history order is reversed so that new features are at the top.
 	- Jorrit replaced _X86_ with PROC_X86 in csProcessorCapabilities.
 	- Jorrit fixed a bug in csNodeIterator. It was not working correctly
 	  at all.
+	- Marten made a few changes to buffers in render3d:
+	    - Remade the buffer-management in render3d. The buffermanager is
+	      removed and replaced by a CreateRenderBuffer in iRender3D.
+	    - Removed VAR and VBO buffers
+	    - Added VBO (vertex_buffer_object) based buffers.
+	- Marten cleaned up code in gl_render3d and genmesh. Removed old
+	  deprecated code and some general cleanup.
 15-Jun-2003
         - Boyan added property "Image" that can be set in AWS component "Image
 	  View".

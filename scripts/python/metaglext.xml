@@ -5668,4 +5668,87 @@
     </FUNCTION>
   </EXTENSION>
   <EXTENSION name="GL_NV_vertex_program2" type="GL" />
+  <EXTENSION name="GL_ARB_vertex_buffer_object" type="GL">
+    <TOKEN name="GL_ARRAY_BUFFER_ARB" value="34962" />
+    <TOKEN name="GL_ELEMENT_ARRAY_BUFFER_ARB" value="34963" />
+    <TOKEN name="GL_ARRAY_BUFFER_BINDING_ARB" value="34964" />
+    <TOKEN name="GL_ELEMENT_ARRAY_BUFFER_BINDING_ARB" value="34965" />
+    <TOKEN name="GL_VERTEX_ARRAY_BUFFER_BINDING_ARB" value="34966" />
+    <TOKEN name="GL_NORMAL_ARRAY_BUFFER_BINDING_ARB" value="34967" />
+    <TOKEN name="GL_COLOR_ARRAY_BUFFER_BINDING_ARB" value="34968" />
+    <TOKEN name="GL_INDEX_ARRAY_BUFFER_BINDING_ARB" value="34969" />
+    <TOKEN name="GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING_ARB" value="34970" />
+    <TOKEN name="GL_EDGE_FLAG_ARRAY_BUFFER_BINDING_ARB" value="34971" />
+    <TOKEN name="GL_SECONDARY_COLOR_ARRAY_BUFFER_BINDING_ARB" value="34972" />
+    <TOKEN name="GL_FOG_COORDINATE_ARRAY_BUFFER_BINDING_ARB" value="34973" />
+    <TOKEN name="GL_WEIGHT_ARRAY_BUFFER_BINDING_ARB" value="34974" />
+    <TOKEN name="GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING_ARB" value="34975" />
+    <TOKEN name="GL_STREAM_DRAW_ARB" value="35040" />
+    <TOKEN name="GL_STREAM_READ_ARB" value="35041" />
+    <TOKEN name="GL_STREAM_COPY_ARB" value="35042" />
+    <TOKEN name="GL_STATIC_DRAW_ARB" value="35044" />
+    <TOKEN name="GL_STATIC_READ_ARB" value="35045" />
+    <TOKEN name="GL_STATIC_COPY_ARB" value="35046" />
+    <TOKEN name="GL_DYNAMIC_DRAW_ARB" value="35048" />
+    <TOKEN name="GL_DYNAMIC_READ_ARB" value="35049" />
+    <TOKEN name="GL_DYNAMIC_COPY_ARB" value="35050" />
+    <TOKEN name="GL_READ_ONLY_ARB" value="35000" />
+    <TOKEN name="GL_WRITE_ONLY_ARB" value="35001" />
+    <TOKEN name="GL_READ_WRITE_ARB" value="35002" />
+    <TOKEN name="GL_BUFFER_SIZE_ARB" value="34660" />
+    <TOKEN name="GL_BUFFER_USAGE_ARB" value="34661" />
+    <TOKEN name="GL_BUFFER_ACCESS_ARB" value="35003" />
+    <TOKEN name="GL_BUFFER_MAPPED_ARB" value="35004" />
+    <TOKEN name="GL_BUFFER_MAP_POINTER_ARB" value="35005" />
+    <FUNCTION name="glBindBufferARB" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="buffer" type="GLuint" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glDeleteBuffersARB" return="GLvoid" pointer="FALSE">
+      <ARG name="n" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="buffers" type="GLuint" const="TRUE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGenBuffersARB" return="GLvoid" pointer="FALSE">
+      <ARG name="n" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="buffers" type="GLuint" const="FALSE" pointer="TRUE" />      
+    </FUNCTION>
+    <FUNCTION name="glBufferDataARB" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="size" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="data" type="GLvoid" const="TRUE" pointer="TRUE" />
+      <ARG name="usage" type="GLenum" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glBufferSubDataARB" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="offset" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="size" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="data" type="GLvoid" const="TRUE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glMapBufferARB" return="GLvoid" pointer="TRUE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="access" type="GLenum" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glUnmapBufferARB" return="GLboolean" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glIsBufferARB" return="GLboolean" pointer="FALSE">
+      <ARG name="buffer" type="GLuint" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glGetBufferSubDataARB" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="offset" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="size" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="data" type="GLvoid" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetBufferPointervARB" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLvoid*" const="FALSE" pointer="TRUE" />
+    </FUNCTION>     
+    <FUNCTION name="glGetBufferParameterivARB" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLint" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+  </EXTENSION>
 </EXTENSIONLIST>

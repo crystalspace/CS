@@ -38,6 +38,7 @@
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/rndbuf.h"
 #include "ivideo/render3d.h"
 
 #include "ivideo/shader/shader.h"
@@ -46,10 +47,7 @@
 #include "ivaria/bugplug.h"
 
 #include "video/canvas/openglcommon/glextmanager.h"
-#include "gl_sysbufmgr.h"
-#include "gl_varbufmgr.h"
-#include "gl_vaobufmgr.h"
-#include "gl_helper.h"
+
 
 class csGLTextureCache;
 class csGLTextureHandle;
@@ -79,10 +77,6 @@ class csGLRender3D : public iRender3D
 {
 private:
   //friend declarations
-  friend class csVARRenderBufferManager;
-  friend class csSysRenderBufferManager;
-  friend class csVARRenderBuffer;
-  friend class csVaoRenderBuffer;
   friend class csGLTextureHandle;
   friend class csGLTextureCache;
   friend class csGLTextureManager;
@@ -91,8 +85,6 @@ private:
 
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics2D> G2D;
-  csRef<iRenderBufferManager> buffermgr;
-  csRef<iLightingManager> lightmgr;
   csRef<iShaderManager> shadermgr;
 
   csRef<iBugPlug> bugplug;
@@ -100,7 +92,6 @@ private:
   static csGLStateCache* statecache;
 
   csGLExtensionManager *ext;
-  csGLVertexArrayHelper varr;
   csGLTextureCache *txtcache;
   //csGLTextureManager *txtmgr;
   csRef<csGLTextureManager> txtmgr;
@@ -168,6 +159,8 @@ private:
   /// Old clip rect to restore after rendering on a proc texture.
   int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
 
+  /// Should we use special buffertype (VBO) or just systemmeory
+  bool use_hw_render_buffers;
 
   ////////////////////////////////////////////////////////////////////
   //                         Private helpers
@@ -240,16 +233,10 @@ public:
   iTextureManager* GetTextureManager () 
     { return (iTextureManager*)((csGLTextureManager*)txtmgr); }
 
-  /**
-   * Get a pointer to the VB-manager
-   * Always use the manager referenced here to get VBs
-   */
-  iRenderBufferManager* GetBufferManager () 
-    { return buffermgr; }
-
-  /// Get a pointer to lighting manager
-  iLightingManager* GetLightingManager () 
-    { return lightmgr; }
+  /// Create a renderbuffer
+  virtual csPtr<iRenderBuffer> CreateRenderBuffer (int size, 
+    csRenderBufferType type, csRenderBufferComponentType componentType, 
+    int componentCount);
 
   /// Activate a vertex buffer
   virtual bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer);
