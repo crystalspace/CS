@@ -65,7 +65,7 @@ Other than that you usually do not need to make any other modifications.
 
 If you installed Crystal Space (usually in @file{/usr/local/crystal}), then
 this is all you need to do.  If not, then you must set the @samp{CRYSTAL}
-environment variable to point to the location where the installed Crystal Space
+environment variable to point to the location where Crystal Space
 resides.  For instance, using the Bourne shell, you can do this with the
 following command:
 

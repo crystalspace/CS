@@ -50,6 +50,8 @@ The history order is reversed so that new features are at the top.
 	  Application HOWTO:
 	    - Fixed a number of Texinfo mark-up problems.
 	    - Minor re-writing of some paragraphs.
+	- Fixed a small error in project.txi where it refered to the
+	  non installed CS as installed CS.
 22-Oct-2001
 	- Fixed a bug in the 'addghost' console command. It would fail
 	  if you used it more than once.
