@@ -1168,6 +1168,7 @@ int csThingStatic::AddTriangle (const csVector3& v1, const csVector3& v2,
   sp->SetVertex (2, v3);
   last_range.Set (idx);
   sp->SetTextureSpace (v1, v2, 1);
+  SetObjBboxValid(false);
   return idx;
 }
 
@@ -1183,6 +1184,7 @@ int csThingStatic::AddQuad (const csVector3& v1, const csVector3& v2,
   sp->SetVertex (3, v4);
   last_range.Set (idx);
   sp->SetTextureSpace (v1, v2, 1);
+  SetObjBboxValid(false);
   return idx;
 }
 
@@ -1198,6 +1200,7 @@ int csThingStatic::AddPolygon (csVector3* vertices, int num)
   }
   last_range.Set (idx);
   sp->SetTextureSpace (vertices[0], vertices[1], 1);
+  SetObjBboxValid(false);
   return idx;
 }
 
@@ -1255,6 +1258,7 @@ int csThingStatic::AddOutsideBox (const csVector3& bmin, const csVector3& bmax)
   	box.GetCorner (CS_BOX_CORNER_xYz));
 
   last_range.Set (firstidx, firstidx+5);
+  SetObjBboxValid(false);
   return firstidx;
 }
 
@@ -1293,6 +1297,7 @@ int csThingStatic::AddInsideBox (const csVector3& bmin, const csVector3& bmax)
   	box.GetCorner (CS_BOX_CORNER_xYZ));
 
   last_range.Set (firstidx, firstidx+5);
+  SetObjBboxValid(false);
   return firstidx;
 }
 
