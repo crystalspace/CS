@@ -221,11 +221,7 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   delete kdtree;
   delete tcovbuf; tcovbuf = 0;
 
-#ifdef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
-#else
-  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
-#endif
   if (g3d)
   {
     scr_width = g3d->GetWidth ();

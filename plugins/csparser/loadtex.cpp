@@ -277,11 +277,7 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* node,
   if (!ctx->HasImage() || !ctx->GetImage())
     return 0;
 
-#ifdef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#else
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#endif
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;
@@ -351,11 +347,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
   Image.AttachNew (csCreateXORPatternImage (w, h, depth, color.red, color.green,
     color.blue));
 
-#ifdef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#else
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#endif
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;

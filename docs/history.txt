@@ -80,6 +80,7 @@ chronological order.
 	- res worked around compile problems in the fullscreen quad render
 	  step.
 	- Jorrit renamed iRender3D to iGraphics3D for the new renderer.
+	- Jorrit removed a few ifdef's related to iRender3D vs iGraphics3D.
 11-Aug-2003
         - Philip Wyett changed #include "cal3d/cal3d" to
           #include <cal3d/cal3d.h> and dropped below other includes fixing

@@ -39,11 +39,7 @@ class R3DTest
 private:
   csRef<iObjectRegistry> object_reg;
   csRef<iEngine> engine;
-#ifdef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> r3d;
-#else
-  csRef<iGraphics3D> r3d;
-#endif
   csRef<iView> view;
   csRef<iKeyboardDriver> kbd;
   csRef<iMouseDriver> mouse;

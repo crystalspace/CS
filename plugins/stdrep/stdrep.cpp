@@ -235,11 +235,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
       if (l > 0)
       {
 	int i;
-#ifdef CS_USE_NEW_RENDERER
         csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#else
-        csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#endif // CS_USE_NEW_RENDERER
 
         csRef<iGraphics2D> g2d = g3d->GetDriver2D ();
         iFontServer* fntsvr = g2d->GetFontServer ();
@@ -321,11 +317,7 @@ void csReporterListener::SetDefaults ()
 {
   console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
   nativewm = 0;
-#ifndef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
-#else
-  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
-#endif // CS_USE_NEW_RENDERER
   if (g3d)
   {
     iGraphics2D* g2d = g3d->GetDriver2D ();
