@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 
 struct iLoaderContext;
-struct iXmlNode;
+struct iDocumentNode;
 
 SCF_VERSION (iLoaderPlugin, 0, 2, 0);
 
@@ -36,7 +36,7 @@ struct iLoaderPlugin : public iBase
   	iBase* context) = 0;
 
   /// Parse a given XML node and return a new object for it.
-  virtual iBase* Parse (iXmlNode* node, iLoaderContext* ldr_context,
+  virtual iBase* Parse (iDocumentNode* node, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };
 

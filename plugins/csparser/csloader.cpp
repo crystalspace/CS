@@ -470,16 +470,16 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   if (*b == '<')
   {
     // XML.
-    // First try to find out if there is an iXmlSystem registered in the
+    // First try to find out if there is an iDocumentSystem registered in the
     // object registry. If that's the case we will use that. Otherwise
     // we'll use tinyxml.
-    csRef<iXmlSystem> xml;
-    xml.Take (CS_QUERY_REGISTRY (object_reg, iXmlSystem));
+    csRef<iDocumentSystem> xml;
+    xml.Take (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
     if (!xml)
     {
-      xml.Take (new csTinyXmlSystem ());
+      xml.Take (new csTinyDocumentSystem ());
     }
-    csRef<iXmlDocument> doc = xml->CreateDocument ();
+    csRef<iDocument> doc = xml->CreateDocument ();
     const char* error = doc->ParseXML (buf);
     if (error == NULL)
     {
@@ -3253,17 +3253,17 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 // will be the only ones remaining.
 //========================================================================
 
-bool csLoader::LoadMap (iXmlNode* node)
+bool csLoader::LoadMap (iDocumentNode* node)
 {
   if (!Engine) return false;
 
-  csRef<iXmlNode> worldnode = node->GetNode ("world");
+  csRef<iDocumentNode> worldnode = node->GetNode ("world");
   if (worldnode)
   {
-    csRef<iXmlNodeIterator> it = worldnode->GetNodes ();
+    csRef<iDocumentNodeIterator> it = worldnode->GetNodes ();
     while (it->HasNext ())
     {
-      csRef<iXmlNode> child = it->Next ();
+      csRef<iDocumentNode> child = it->Next ();
       if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
       const char* value = child->GetValue ();
       csStringID id = xmltokens.Request (value);
@@ -3373,12 +3373,12 @@ bool csLoader::LoadMap (iXmlNode* node)
   return true;
 }
 
-bool csLoader::LoadPlugins (iXmlNode* node)
+bool csLoader::LoadPlugins (iDocumentNode* node)
 {
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -3397,33 +3397,33 @@ bool csLoader::LoadPlugins (iXmlNode* node)
   return true;
 }
 
-bool csLoader::LoadLibrary (iXmlNode* node)
+bool csLoader::LoadLibrary (iDocumentNode* node)
 {
   return true;
 }
 
-bool csLoader::LoadSounds (iXmlNode* node)
+bool csLoader::LoadSounds (iDocumentNode* node)
 {
   return true;
 }
 
-bool csLoader::LoadLodControl (iLODControl* lodctrl, iXmlNode* node)
+bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
 {
   return true;
 }
 
 bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
-	iXmlNode* node, csReversibleTransform* transf)
+	iDocumentNode* node, csReversibleTransform* transf)
 {
   return true;
 }
 
-iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iXmlNode* node)
+iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 {
   return NULL;
 }
 
-bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iXmlNode* node)
+bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 {
   if (!Engine) return false;
 
@@ -3432,10 +3432,10 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iXmlNode* node)
   Stats->meshes_loaded++;
   iLoaderPlugin* plug = NULL;
 
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -3561,7 +3561,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iXmlNode* node)
 	    return false;
 	  }
 	  csReversibleTransform tr;
-	  csRef<iXmlNode> matrix_node = child->GetNode ("matrix");
+	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
 	  if (matrix_node)
 	  {
 	    csMatrix3 m;
@@ -3569,7 +3569,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iXmlNode* node)
 	      return false;
 	    tr.SetT2O (m);
 	  }
-	  csRef<iXmlNode> vector_node = child->GetNode ("v");
+	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
 	  if (vector_node)
 	  {
 	    csVector3 v;
@@ -3584,7 +3584,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iXmlNode* node)
         {
           mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
           mesh->GetMovable ()->SetPosition (csVector3 (0));
-	  csRef<iXmlNode> matrix_node = child->GetNode ("matrix");
+	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
 	  if (matrix_node)
 	  {
 	    csMatrix3 m;
@@ -3592,7 +3592,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iXmlNode* node)
 	      return false;
             mesh->GetMovable ()->SetTransform (m);
 	  }
-	  csRef<iXmlNode> vector_node = child->GetNode ("v");
+	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
 	  if (vector_node)
 	  {
 	    csVector3 v;
@@ -3762,32 +3762,32 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iXmlNode* node)
   return true;
 }
 
-bool csLoader::LoadAddOn (iXmlNode* node, iBase* context)
+bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 {
   return true;
 }
 
-bool csLoader::LoadSettings (iXmlNode* node)
+bool csLoader::LoadSettings (iDocumentNode* node)
 {
   return true;
 }
 
-bool csLoader::LoadRenderPriorities (iXmlNode* node)
+bool csLoader::LoadRenderPriorities (iDocumentNode* node)
 {
   return true;
 }
 
-iCollection* csLoader::ParseCollection (iXmlNode* node)
+iCollection* csLoader::ParseCollection (iDocumentNode* node)
 {
   return NULL;
 }
 
-bool csLoader::ParseStart (iXmlNode* node, iCameraPosition* campos)
+bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
 {
   return true;
 }
 
-iStatLight* csLoader::ParseStatlight (iXmlNode* node)
+iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 {
   const char* lightname = node->GetAttributeValue ("name");
 
@@ -3837,10 +3837,10 @@ iStatLight* csLoader::ParseStatlight (iXmlNode* node)
   color.red = color.green = color.blue = 1;
   dyn = false;
 
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -4052,17 +4052,17 @@ defaulthalo:
   return l;
 }
 
-iKeyValuePair* csLoader::ParseKey (iXmlNode* node, iObject* pParent)
+iKeyValuePair* csLoader::ParseKey (iDocumentNode* node, iObject* pParent)
 {
   return NULL;
 }
 
-iMapNode* csLoader::ParseNode (iXmlNode* node, iSector* sec)
+iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
 {
   return NULL;
 }
 
-iSector* csLoader::ParseSector (iXmlNode* node)
+iSector* csLoader::ParseSector (iDocumentNode* node)
 {
   const char* secname = node->GetAttributeValue ("name");
 
@@ -4077,10 +4077,10 @@ iSector* csLoader::ParseSector (iXmlNode* node)
     Stats->sectors_loaded++;
   }
 
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);

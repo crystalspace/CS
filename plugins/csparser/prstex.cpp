@@ -489,14 +489,14 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 
 // XML versions -------------------------------------------------------------
 
-bool csLoader::ParseMaterialList (iXmlNode* node, const char* prefix)
+bool csLoader::ParseMaterialList (iDocumentNode* node, const char* prefix)
 {
   if (!Engine) return false;
 
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -515,14 +515,14 @@ bool csLoader::ParseMaterialList (iXmlNode* node, const char* prefix)
   return true;
 }
 
-bool csLoader::ParseTextureList (iXmlNode* node)
+bool csLoader::ParseTextureList (iDocumentNode* node)
 {
   if (!Engine || !ImageLoader) return false;
 
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -549,7 +549,7 @@ bool csLoader::ParseTextureList (iXmlNode* node)
   return true;
 }
 
-iTextureWrapper* csLoader::ParseTexture (iXmlNode* node)
+iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 {
   const char* txtname = node->GetAttributeValue ("name");
 
@@ -559,10 +559,10 @@ iTextureWrapper* csLoader::ParseTexture (iXmlNode* node)
   bool do_transp = false;
   int flags = CS_TEXTURE_3D;
 
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -674,13 +674,13 @@ iTextureWrapper* csLoader::ParseTexture (iXmlNode* node)
   return tex;
 }
 
-iTextureWrapper* csLoader::ParseProcTex (iXmlNode* node)
+iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
 {
   if (!Engine) return NULL;
   return NULL;
 }
 
-iMaterialWrapper* csLoader::ParseMaterial (iXmlNode* node, const char *prefix)
+iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node, const char *prefix)
 {
   if (!Engine) return NULL;
 
@@ -696,10 +696,10 @@ iMaterialWrapper* csLoader::ParseMaterial (iXmlNode* node, const char *prefix)
   csTextureLayer layers[4];
   iTextureWrapper* txt_layers[4];
 
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -757,10 +757,10 @@ iMaterialWrapper* csLoader::ParseMaterial (iXmlNode* node, const char *prefix)
 	  layers[num_txt_layer].ushift = 0;
 	  layers[num_txt_layer].vshift = 0;
 	  layers[num_txt_layer].mode = CS_FX_ADD | CS_FX_TILING;
-	  csRef<iXmlNodeIterator> layer_it = child->GetNodes ();
+	  csRef<iDocumentNodeIterator> layer_it = child->GetNodes ();
 	  while (layer_it->HasNext ())
 	  {
-	    csRef<iXmlNode> layer_child = layer_it->Next ();
+	    csRef<iDocumentNode> layer_child = layer_it->Next ();
 	    if (layer_child->GetType () != CS_XMLNODE_ELEMENT) continue;
 	    const char* layer_value = layer_child->GetValue ();
 	    csStringID layer_id = xmltokens.Request (layer_value);

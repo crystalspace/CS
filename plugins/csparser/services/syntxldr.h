@@ -110,12 +110,12 @@ public:
   virtual const char* MixmodeToText (
   	uint mixmode, int indent, bool newline = true);
 
-  virtual bool ParseBool (iXmlNode* node, bool& result, bool def_result);
-  virtual bool ParseMatrix (iXmlNode* node, csMatrix3 &m);
-  virtual bool ParseVector (iXmlNode* node, csVector3 &v);
-  virtual bool ParseColor (iXmlNode* node, csColor &c);
-  virtual bool ParseMixmode (iXmlNode* node, uint &mixmode);
-  virtual bool ParseTextureMapping (iXmlNode* node,
+  virtual bool ParseBool (iDocumentNode* node, bool& result, bool def_result);
+  virtual bool ParseMatrix (iDocumentNode* node, csMatrix3 &m);
+  virtual bool ParseVector (iDocumentNode* node, csVector3 &v);
+  virtual bool ParseColor (iDocumentNode* node, csColor &c);
+  virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode);
+  virtual bool ParseTextureMapping (iDocumentNode* node,
   			     const csVector3* vref, uint &texspec,
 			     csVector3 &tx_orig, csVector3 &tx1,
 			     csVector3 &tx2, csVector3 &len,
@@ -125,13 +125,13 @@ public:
 			     int &idx2, csVector2 &uv2,
 			     int &idx3, csVector2 &uv3,
 			     char *plane, const char *polyname);
-  virtual  bool ParsePortal (iXmlNode* node, iLoaderContext* ldr_context,
+  virtual  bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
 		  	   iPolygon3D* poly_3d,
 		  	   csVector &flags, bool &mirror,
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
 			   csVector3 &after);
-  virtual bool ParsePoly3d (iXmlNode* node,
+  virtual bool ParsePoly3d (iDocumentNode* node,
    			    iLoaderContext* ldr_context,
   			    iEngine* engine, iPolygon3D* poly3d,
 			    float default_texlen,

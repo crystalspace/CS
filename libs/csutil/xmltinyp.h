@@ -25,29 +25,29 @@
 /**
  * This is an SCF compatible wrapper for an attribute iterator.
  */
-struct csTinyXmlAttributeIterator : public iXmlAttributeIterator
+struct csTinyXmlAttributeIterator : public iDocumentAttributeIterator
 {
 private:
-  TiXmlAttribute* current;
+  TiDocumentAttribute* current;
   TiXmlElement* parent;
 
 public:
-  csTinyXmlAttributeIterator (TiXmlNode* parent);
+  csTinyXmlAttributeIterator (TiDocumentNode* parent);
   virtual ~csTinyXmlAttributeIterator () { }
 
   SCF_DECLARE_IBASE;
 
   virtual bool HasNext ();
-  virtual csRef<iXmlAttribute> Next ();
+  virtual csRef<iDocumentAttribute> Next ();
 };
 
 /**
  * This is an SCF compatible wrapper for an attribute in TinyXml.
  */
-struct csTinyXmlAttribute : public iXmlAttribute
+struct csTinyXmlAttribute : public iDocumentAttribute
 {
 private:
-  TiXmlAttribute* attr;
+  TiDocumentAttribute* attr;
 
 public:
   csTinyXmlAttribute ()
@@ -56,7 +56,7 @@ public:
     attr = NULL;
   }
 
-  csTinyXmlAttribute (TiXmlAttribute* attr)
+  csTinyXmlAttribute (TiDocumentAttribute* attr)
   {
     SCF_CONSTRUCT_IBASE (NULL);
     csTinyXmlAttribute::attr = attr;
@@ -117,90 +117,90 @@ public:
 /**
  * This is an SCF compatible wrapper for a node iterator.
  */
-struct csTinyXmlNodeIterator : public iXmlNodeIterator
+struct csTinyXmlNodeIterator : public iDocumentNodeIterator
 {
 private:
-  TiXmlNode* current;
-  TiXmlNode* parent;
+  TiDocumentNode* current;
+  TiDocumentNode* parent;
   char* value;
 
 public:
-  csTinyXmlNodeIterator (TiXmlNode* parent, const char* value);
+  csTinyXmlNodeIterator (TiDocumentNode* parent, const char* value);
   virtual ~csTinyXmlNodeIterator () { delete[] value; }
 
   SCF_DECLARE_IBASE;
 
   virtual bool HasNext ();
-  virtual csRef<iXmlNode> Next ();
+  virtual csRef<iDocumentNode> Next ();
 };
 
 /**
  * This is an SCF compatible wrapper for a node in TinyXml.
  */
-struct csTinyXmlNode : public iXmlNode
+struct csTinyXmlNode : public iDocumentNode
 {
 private:
-  TiXmlNode* node;
+  TiDocumentNode* node;
 
 public:
   csTinyXmlNode ();
-  csTinyXmlNode (TiXmlNode* node);
+  csTinyXmlNode (TiDocumentNode* node);
   virtual ~csTinyXmlNode ();
 
-  TiXmlNode* GetTiNode () { return node; }
+  TiDocumentNode* GetTiNode () { return node; }
 
   SCF_DECLARE_IBASE;
 
   virtual csXmlNodeType GetType ();
   virtual const char* GetValue ();
   virtual void SetValue (const char* value);
-  virtual csRef<iXmlNode> GetParent ();
+  virtual csRef<iDocumentNode> GetParent ();
 
-  virtual csRef<iXmlNodeIterator> GetNodes ();
-  virtual csRef<iXmlNodeIterator> GetNodes (const char* type);
-  virtual csRef<iXmlNode> GetNode (const char* type);
-  virtual void RemoveNode (const csRef<iXmlNode>& child);
+  virtual csRef<iDocumentNodeIterator> GetNodes ();
+  virtual csRef<iDocumentNodeIterator> GetNodes (const char* type);
+  virtual csRef<iDocumentNode> GetNode (const char* type);
+  virtual void RemoveNode (const csRef<iDocumentNode>& child);
   virtual void RemoveNodes ();
-  virtual csRef<iXmlNode> CreateNode (const char* type);
-  virtual csRef<iXmlNode> CreateNodeBefore (const char* type,
-  	const csRef<iXmlNode>& node);
-  virtual csRef<iXmlNode> CreateNodeAfter (const char* type,
-  	const csRef<iXmlNode>& node);
-  virtual void MoveNodeBefore (const csRef<iXmlNode>& node,
-  	const csRef<iXmlNode>& before);
-  virtual void MoveNodeAfter (const csRef<iXmlNode>& node,
-  	const csRef<iXmlNode>& after);
+  virtual csRef<iDocumentNode> CreateNode (const char* type);
+  virtual csRef<iDocumentNode> CreateNodeBefore (const char* type,
+  	const csRef<iDocumentNode>& node);
+  virtual csRef<iDocumentNode> CreateNodeAfter (const char* type,
+  	const csRef<iDocumentNode>& node);
+  virtual void MoveNodeBefore (const csRef<iDocumentNode>& node,
+  	const csRef<iDocumentNode>& before);
+  virtual void MoveNodeAfter (const csRef<iDocumentNode>& node,
+  	const csRef<iDocumentNode>& after);
 
   virtual const char* GetContentsValue ();
   virtual int GetContentsValueAsInt ();
   virtual float GetContentsValueAsFloat ();
 
-  virtual csRef<iXmlAttributeIterator> GetAttributes ();
-  virtual csRef<iXmlAttribute> GetAttribute (const char* name);
+  virtual csRef<iDocumentAttributeIterator> GetAttributes ();
+  virtual csRef<iDocumentAttribute> GetAttribute (const char* name);
   virtual int GetAttributeValueAsInt (const char* name);
   virtual float GetAttributeValueAsFloat (const char* name);
   virtual const char* GetAttributeValue (const char* name);
-  virtual void RemoveAttribute (const csRef<iXmlAttribute>& attr);
+  virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr);
   virtual void RemoveAttributes ();
   virtual void SetAttribute (const char* name, const char* value);
-  virtual csRef<iXmlAttribute> CreateAttribute ();
-  virtual csRef<iXmlAttribute> CreateAttributeBefore (
-  	const csRef<iXmlAttribute>& attr);
-  virtual csRef<iXmlAttribute> CreateAttributeAfter (
-  	const csRef<iXmlAttribute>& attr);
-  virtual void MoveAttributeBefore (const csRef<iXmlAttribute>& attr,
-  	const csRef<iXmlAttribute>& before);
-  virtual void MoveAttributeAfter (const csRef<iXmlAttribute>& attr,
-  	const csRef<iXmlAttribute>& after);
+  virtual csRef<iDocumentAttribute> CreateAttribute ();
+  virtual csRef<iDocumentAttribute> CreateAttributeBefore (
+  	const csRef<iDocumentAttribute>& attr);
+  virtual csRef<iDocumentAttribute> CreateAttributeAfter (
+  	const csRef<iDocumentAttribute>& attr);
+  virtual void MoveAttributeBefore (const csRef<iDocumentAttribute>& attr,
+  	const csRef<iDocumentAttribute>& before);
+  virtual void MoveAttributeAfter (const csRef<iDocumentAttribute>& attr,
+  	const csRef<iDocumentAttribute>& after);
 };
 
 /**
  * This is an SCF compatible wrapper for a document in TinyXml.
  */
-class csTinyXmlDocument : public iXmlDocument
+class csTinyXmlDocument : public iDocument
 {
 private:
-  csRef<iXmlNode> root;
+  csRef<iDocumentNode> root;
 
 public:
   csTinyXmlDocument ();
@@ -209,8 +209,8 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual void Clear ();
-  virtual csRef<iXmlNode> CreateRoot ();
-  virtual csRef<iXmlNode> GetRoot ();
+  virtual csRef<iDocumentNode> CreateRoot ();
+  virtual csRef<iDocumentNode> GetRoot ();
   virtual const char* ParseXML (iFile* file);
   virtual const char* ParseXML (iDataBuffer* buf);
   virtual const char* ParseXML (iString* str);

@@ -24,6 +24,13 @@ The history order is reversed so that new features are at the top.
 	  By doing this I could confirm that XML map loading works for very simple
 	  levels now (sectors, textures, materials, lights, and thing mesh objects).
 	  This is a very nice step indeed.
+	- Did the following renames:
+	    iXmlSystem -> iDocumentSystem
+	    iXmlNode -> iDocumentNode
+	    iXmlAttribute -> iDocumentAttribute
+	    iXmlDocument -> iDocument
+	    iXmlAttributeIterator -> iDocumentAttributeIterator
+	    iXmlNodeIterator -> iDocumentNodeIterator
 12-Aug-2002
 	- Renamed the XML version of ParseTexture() to ParseTextureMapping()
 	  as that more accuratelly reflects what happens (in syntax

@@ -49,7 +49,7 @@ struct iPluginManager;
 struct iModelConverter;
 struct iCrossBuilder;
 struct iCameraPosition;
-struct iXmlNode;
+struct iDocumentNode;
 
 struct iObject;
 struct iThingState;
@@ -330,51 +330,51 @@ private:
   //========================================================================
 
   /// Parse a quaternion definition
-  bool ParseQuaternion (iXmlNode* node, csQuaternion &q);
+  bool ParseQuaternion (iDocumentNode* node, csQuaternion &q);
   /// Parse a color definition
-  bool ParseColor (iXmlNode* node, csRGBcolor &c);
+  bool ParseColor (iDocumentNode* node, csRGBcolor &c);
   /// Parse a color definition
-  bool ParseColor (iXmlNode* node, csColor &c);
+  bool ParseColor (iDocumentNode* node, csColor &c);
 
   /// Parse a list of textures and add them to the engine.
-  bool ParseTextureList (iXmlNode* node);
+  bool ParseTextureList (iDocumentNode* node);
   /**
    * Parse a list of materials and add them to the engine. If a prefix is
    * given, all material names will be prefixed with the corresponding string.
    */
-  bool ParseMaterialList (iXmlNode* node, const char* prefix = NULL);
+  bool ParseMaterialList (iDocumentNode* node, const char* prefix = NULL);
   /// Parse a texture definition and add the texture to the engine
-  iTextureWrapper* ParseTexture (iXmlNode* node);
+  iTextureWrapper* ParseTexture (iDocumentNode* node);
   /// Parse a proc texture definition and add the texture to the engine
-  iTextureWrapper* ParseProcTex (iXmlNode* node);
+  iTextureWrapper* ParseProcTex (iDocumentNode* node);
   /// Parse a material definition and add the material to the engine
-  iMaterialWrapper* ParseMaterial (iXmlNode* node, const char* prefix = NULL);
+  iMaterialWrapper* ParseMaterial (iDocumentNode* node, const char* prefix = NULL);
   /// Parse a collection definition and add the collection to the engine
-  iCollection* ParseCollection (iXmlNode* node);
+  iCollection* ParseCollection (iDocumentNode* node);
   /// Parse a camera position.
-  bool ParseStart (iXmlNode* node, iCameraPosition* campos);
+  bool ParseStart (iDocumentNode* node, iCameraPosition* campos);
   /// Parse a static light definition and add the light to the engine
-  iStatLight* ParseStatlight (iXmlNode* node);
+  iStatLight* ParseStatlight (iDocumentNode* node);
   /// Parse a key definition and add the key to the given object
-  iKeyValuePair* ParseKey (iXmlNode* node, iObject* pParent);
+  iKeyValuePair* ParseKey (iDocumentNode* node, iObject* pParent);
   /// Parse a map node definition and add the node to the given sector
-  iMapNode* ParseNode (iXmlNode* node, iSector* sec);
+  iMapNode* ParseNode (iDocumentNode* node, iSector* sec);
   /// Parse a sector definition and add the sector to the engine
-  iSector* ParseSector (iXmlNode* node);
+  iSector* ParseSector (iDocumentNode* node);
 
   /// -----------------------------------------------------------------------
 
   /// For heightgen.
-  csGenerateImageTexture* ParseHeightgenTexture (iXmlNode* node);
+  csGenerateImageTexture* ParseHeightgenTexture (iDocumentNode* node);
   /// For heightgen.
-  csGenerateImageValue* ParseHeightgenValue (iXmlNode* node);
+  csGenerateImageValue* ParseHeightgenValue (iDocumentNode* node);
   /// Parse and load a height texture
-  bool ParseHeightgen (iXmlNode* node);
+  bool ParseHeightgen (iDocumentNode* node);
 
   /**
    * Load a LOD control object.
    */
-  bool LoadLodControl (iLODControl* lodctrl, iXmlNode* node);
+  bool LoadLodControl (iLODControl* lodctrl, iDocumentNode* node);
 
   /**
    * Load a Mesh Object Factory from the map file.
@@ -382,58 +382,58 @@ private:
    * mesh object factory and the transformation will be filled in with
    * the relative transform (from MOVE keyword).
    */
-  bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact, iXmlNode* node,
+  bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact, iDocumentNode* node,
   	csReversibleTransform* transf = NULL);
 
   /**
    * Load the mesh object from the map file.
    */
-  bool LoadMeshObject (iMeshWrapper* mesh, iXmlNode* node);
+  bool LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node);
 
   /**
    * Load the mesh object from the map file.
    * This version will parse FACTORY statement to directly create
    * a mesh from a factory.
    */
-  iMeshWrapper* LoadMeshObjectFromFactory (iXmlNode* node);
+  iMeshWrapper* LoadMeshObjectFromFactory (iDocumentNode* node);
 
   /**
    * Load a plugin in general.
    */
-  bool LoadAddOn (iXmlNode* node, iBase* context);
+  bool LoadAddOn (iDocumentNode* node, iBase* context);
 
   /**
    * Load the render priority section.
    */
-  bool LoadRenderPriorities (iXmlNode* node);
+  bool LoadRenderPriorities (iDocumentNode* node);
 
   /**
    * Load the settings section.
    */
-  bool LoadSettings (iXmlNode* node);
+  bool LoadSettings (iDocumentNode* node);
 
   /**
    * Load sounds from a SOUNDS(...) argument.
    * This function is normally called automatically by the parser.
    */
-  bool LoadSounds (iXmlNode* node);
+  bool LoadSounds (iDocumentNode* node);
 
 
   /**
    * Load all the plugin descriptions from the map file
    * (the plugins are not actually loaded yet).
    */
-  bool LoadPlugins (iXmlNode* node);
+  bool LoadPlugins (iDocumentNode* node);
 
   /**
    * Load a library into given engine.<p>
    * A library is just a map file that contains just mesh factories,
    * thing templates, sounds and textures.
    */
-  bool LoadLibrary (iXmlNode* node);
+  bool LoadLibrary (iDocumentNode* node);
 
   /// Load map from a memory buffer
-  bool LoadMap (iXmlNode* node);
+  bool LoadMap (iDocumentNode* node);
 
   //========================================================================
   //========================================================================

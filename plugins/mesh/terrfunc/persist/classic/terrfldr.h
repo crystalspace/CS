@@ -51,7 +51,7 @@ public:
     iLoaderContext* ldr_context, iBase* context);
 
   /// Parse a given node and return a new object for it.
-  virtual iBase* Parse (iXmlNode* node,
+  virtual iBase* Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context)
   {
     return NULL;
@@ -90,7 +90,7 @@ public:
     iLoaderContext* ldr_context,  iBase* context);
 
   /// Parse a given node and return a new object for it.
-  virtual iBase* Parse (iXmlNode* node,
+  virtual iBase* Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context)
   {
     return NULL;

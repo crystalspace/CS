@@ -34,7 +34,7 @@ struct iSector;
 struct iMaterialWrapper;
 struct iThingState;
 struct iLoaderContext;
-struct iXmlNode;
+struct iDocumentNode;
 
 #define CSTEX_UV 1  // UV is given in texture description
 #define CSTEX_V1 2  // vector1 is given in texture description
@@ -188,27 +188,27 @@ struct iSyntaxService : public iBase
    * <li>(everyting else) -> error
    * </ul>
    */
-  virtual bool ParseBool (iXmlNode* node, bool& result, bool def_result) = 0;
+  virtual bool ParseBool (iDocumentNode* node, bool& result, bool def_result) = 0;
   
   /**
    * Parse a matrix description. Returns true if successful.
    */
-  virtual bool ParseMatrix (iXmlNode* node, csMatrix3 &m) = 0;
+  virtual bool ParseMatrix (iDocumentNode* node, csMatrix3 &m) = 0;
 
   /**
    * Parse a vector description. Returns true if successful.
    */
-  virtual bool ParseVector (iXmlNode* node, csVector3 &v) = 0;
+  virtual bool ParseVector (iDocumentNode* node, csVector3 &v) = 0;
 
   /**
    * Parse a color description. Returns true if successful.
    */
-  virtual bool ParseColor (iXmlNode* node, csColor &c) = 0;
+  virtual bool ParseColor (iDocumentNode* node, csColor &c) = 0;
 
   /**
    * Parse a mixmode description. Returns true if successful.
    */
-  virtual bool ParseMixmode (iXmlNode* node, uint &mixmode) = 0;
+  virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode) = 0;
 
   /**
    * Parse a texture mapping specification.
@@ -231,7 +231,7 @@ struct iSyntaxService : public iBase
    *     This is used to make errormessages more verbose.
    * </ul>
    */
-  virtual bool ParseTextureMapping (iXmlNode* node,
+  virtual bool ParseTextureMapping (iDocumentNode* node,
   			     const csVector3* vref, uint &texspec,
 			     csVector3 &tx_orig, csVector3 &tx1,
 			     csVector3 &tx2, csVector3 &len,
@@ -246,7 +246,7 @@ struct iSyntaxService : public iBase
    * Parses a portal definition specification.
    * flags: contains all flags found in the description.
    */
-  virtual  bool ParsePortal (iXmlNode* node, iLoaderContext* ldr_context,
+  virtual  bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
 		  	   iPolygon3D* poly3d,
 		  	   csVector &flags, bool &mirror,
   			   bool& warp, int& msv,
@@ -257,7 +257,7 @@ struct iSyntaxService : public iBase
   /**
    * Parses a POLYGON.
    */
-  virtual bool ParsePoly3d (iXmlNode* node,
+  virtual bool ParsePoly3d (iDocumentNode* node,
    			    iLoaderContext* ldr_context,
   			    iEngine* engine, iPolygon3D* poly3d,
 			    float default_texlen,

@@ -31,22 +31,22 @@
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csTinyXmlSystem)
-  SCF_IMPLEMENTS_INTERFACE (iXmlSystem)
+SCF_IMPLEMENT_IBASE (csTinyDocumentSystem)
+  SCF_IMPLEMENTS_INTERFACE (iDocumentSystem)
 SCF_IMPLEMENT_IBASE_END
 
-csTinyXmlSystem::csTinyXmlSystem ()
+csTinyDocumentSystem::csTinyDocumentSystem ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
-csTinyXmlSystem::~csTinyXmlSystem ()
+csTinyDocumentSystem::~csTinyDocumentSystem ()
 {
 }
 
-csRef<iXmlDocument> csTinyXmlSystem::CreateDocument ()
+csRef<iDocument> csTinyDocumentSystem::CreateDocument ()
 {
-  csRef<iXmlDocument> doc;
+  csRef<iDocument> doc;
   doc.Take (new csTinyXmlDocument ());
   return doc;
 }
@@ -54,10 +54,10 @@ csRef<iXmlDocument> csTinyXmlSystem::CreateDocument ()
 //------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csTinyXmlAttributeIterator)
-  SCF_IMPLEMENTS_INTERFACE (iXmlAttributeIterator)
+  SCF_IMPLEMENTS_INTERFACE (iDocumentAttributeIterator)
 SCF_IMPLEMENT_IBASE_END
 
-csTinyXmlAttributeIterator::csTinyXmlAttributeIterator (TiXmlNode* parent)
+csTinyXmlAttributeIterator::csTinyXmlAttributeIterator (TiDocumentNode* parent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   csTinyXmlAttributeIterator::parent = parent->ToElement ();
@@ -74,9 +74,9 @@ bool csTinyXmlAttributeIterator::HasNext ()
   return current != NULL;
 }
 
-csRef<iXmlAttribute> csTinyXmlAttributeIterator::Next ()
+csRef<iDocumentAttribute> csTinyXmlAttributeIterator::Next ()
 {
-  csRef<iXmlAttribute> attr;
+  csRef<iDocumentAttribute> attr;
   if (current != NULL)
   {
     attr.Take (new csTinyXmlAttribute (current));
@@ -88,10 +88,10 @@ csRef<iXmlAttribute> csTinyXmlAttributeIterator::Next ()
 //------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csTinyXmlNodeIterator)
-  SCF_IMPLEMENTS_INTERFACE (iXmlNodeIterator)
+  SCF_IMPLEMENTS_INTERFACE (iDocumentNodeIterator)
 SCF_IMPLEMENT_IBASE_END
 
-csTinyXmlNodeIterator::csTinyXmlNodeIterator (TiXmlNode* parent,
+csTinyXmlNodeIterator::csTinyXmlNodeIterator (TiDocumentNode* parent,
 	const char* value)
 {
   SCF_CONSTRUCT_IBASE (NULL);
@@ -108,9 +108,9 @@ bool csTinyXmlNodeIterator::HasNext ()
   return current != NULL;
 }
 
-csRef<iXmlNode> csTinyXmlNodeIterator::Next ()
+csRef<iDocumentNode> csTinyXmlNodeIterator::Next ()
 {
-  csRef<iXmlNode> node;
+  csRef<iDocumentNode> node;
   if (current != NULL)
   {
     node.Take (new csTinyXmlNode (current));
@@ -125,13 +125,13 @@ csRef<iXmlNode> csTinyXmlNodeIterator::Next ()
 //------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csTinyXmlAttribute)
-  SCF_IMPLEMENTS_INTERFACE (iXmlAttribute)
+  SCF_IMPLEMENTS_INTERFACE (iDocumentAttribute)
 SCF_IMPLEMENT_IBASE_END
 
 //------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csTinyXmlNode)
-  SCF_IMPLEMENTS_INTERFACE (iXmlNode)
+  SCF_IMPLEMENTS_INTERFACE (iDocumentNode)
 SCF_IMPLEMENT_IBASE_END
 
 csTinyXmlNode::csTinyXmlNode ()
@@ -140,7 +140,7 @@ csTinyXmlNode::csTinyXmlNode ()
   node = NULL;
 }
 
-csTinyXmlNode::csTinyXmlNode (TiXmlNode* node)
+csTinyXmlNode::csTinyXmlNode (TiDocumentNode* node)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   csTinyXmlNode::node = node;
@@ -150,9 +150,9 @@ csTinyXmlNode::~csTinyXmlNode ()
 {
 }
 
-csRef<iXmlNode> csTinyXmlNode::GetParent ()
+csRef<iDocumentNode> csTinyXmlNode::GetParent ()
 {
-  csRef<iXmlNode> child;
+  csRef<iDocumentNode> child;
   if (!node->Parent ()) return child;
   child.Take (new csTinyXmlNode (node->Parent ()));
   return child;
@@ -162,11 +162,11 @@ csXmlNodeType csTinyXmlNode::GetType ()
 {
   switch (node->Type ())
   {
-    case TiXmlNode::DOCUMENT: return CS_XMLNODE_DOCUMENT;
-    case TiXmlNode::ELEMENT: return CS_XMLNODE_ELEMENT;
-    case TiXmlNode::COMMENT: return CS_XMLNODE_COMMENT;
-    case TiXmlNode::TEXT: return CS_XMLNODE_TEXT;
-    case TiXmlNode::DECLARATION: return CS_XMLNODE_DECLARATION;
+    case TiDocumentNode::DOCUMENT: return CS_XMLNODE_DOCUMENT;
+    case TiDocumentNode::ELEMENT: return CS_XMLNODE_ELEMENT;
+    case TiDocumentNode::COMMENT: return CS_XMLNODE_COMMENT;
+    case TiDocumentNode::TEXT: return CS_XMLNODE_TEXT;
+    case TiDocumentNode::DECLARATION: return CS_XMLNODE_DECLARATION;
     default: return CS_XMLNODE_UNKNOWN;
   }
 }
@@ -181,33 +181,33 @@ void csTinyXmlNode::SetValue (const char* value)
   node->SetValue (value);
 }
 
-csRef<iXmlNodeIterator> csTinyXmlNode::GetNodes ()
+csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes ()
 {
-  csRef<iXmlNodeIterator> it;
+  csRef<iDocumentNodeIterator> it;
   it.Take (new csTinyXmlNodeIterator (node, NULL));
   return it;
 }
 
-csRef<iXmlNodeIterator> csTinyXmlNode::GetNodes (const char* type)
+csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes (const char* type)
 {
-  csRef<iXmlNodeIterator> it;
+  csRef<iDocumentNodeIterator> it;
   it.Take (new csTinyXmlNodeIterator (node, type));
   return it;
 }
 
-csRef<iXmlNode> csTinyXmlNode::GetNode (const char* type)
+csRef<iDocumentNode> csTinyXmlNode::GetNode (const char* type)
 {
-  csRef<iXmlNode> child;
-  TiXmlNode* c = node->FirstChild (type);
+  csRef<iDocumentNode> child;
+  TiDocumentNode* c = node->FirstChild (type);
   if (!c) return child;
   child.Take (new csTinyXmlNode (c));
   return child;
 }
 
-void csTinyXmlNode::RemoveNode (const csRef<iXmlNode>& child)
+void csTinyXmlNode::RemoveNode (const csRef<iDocumentNode>& child)
 {
   CS_ASSERT (child.IsValid ());
-  node->RemoveChild (((csTinyXmlNode*)(iXmlNode*)child)->GetTiNode ());
+  node->RemoveChild (((csTinyXmlNode*)(iDocumentNode*)child)->GetTiNode ());
 }
 
 void csTinyXmlNode::RemoveNodes ()
@@ -215,47 +215,47 @@ void csTinyXmlNode::RemoveNodes ()
   node->Clear ();
 }
 
-csRef<iXmlNode> csTinyXmlNode::CreateNode (const char* type)
+csRef<iDocumentNode> csTinyXmlNode::CreateNode (const char* type)
 {
-  csRef<iXmlNode> child;
+  csRef<iDocumentNode> child;
   // @@@ TODO
   return child;
 }
 
-csRef<iXmlNode> csTinyXmlNode::CreateNodeBefore (const char* type,
-  	const csRef<iXmlNode>& node)
+csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (const char* type,
+  	const csRef<iDocumentNode>& node)
 {
-  csRef<iXmlNode> child;
+  csRef<iDocumentNode> child;
   // @@@ TODO
   return child;
 }
 
-csRef<iXmlNode> csTinyXmlNode::CreateNodeAfter (const char* type,
-  	const csRef<iXmlNode>& node)
+csRef<iDocumentNode> csTinyXmlNode::CreateNodeAfter (const char* type,
+  	const csRef<iDocumentNode>& node)
 {
-  csRef<iXmlNode> child;
+  csRef<iDocumentNode> child;
   // @@@ TODO
   return child;
 }
 
-void csTinyXmlNode::MoveNodeBefore (const csRef<iXmlNode>& node,
-  	const csRef<iXmlNode>& before)
+void csTinyXmlNode::MoveNodeBefore (const csRef<iDocumentNode>& node,
+  	const csRef<iDocumentNode>& before)
 {
   // @@@ TODO
 }
 
-void csTinyXmlNode::MoveNodeAfter (const csRef<iXmlNode>& node,
-  	const csRef<iXmlNode>& after)
+void csTinyXmlNode::MoveNodeAfter (const csRef<iDocumentNode>& node,
+  	const csRef<iDocumentNode>& after)
 {
   // @@@ TODO
 }
 
 const char* csTinyXmlNode::GetContentsValue ()
 {
-  TiXmlNode* child = node->FirstChild ();
+  TiDocumentNode* child = node->FirstChild ();
   while (child)
   {
-    if (child->Type () == TiXmlNode::TEXT)
+    if (child->Type () == TiDocumentNode::TEXT)
     {
       return child->Value ();
     }
@@ -282,23 +282,23 @@ float csTinyXmlNode::GetContentsValueAsFloat ()
   return val;
 }
 
-csRef<iXmlAttributeIterator> csTinyXmlNode::GetAttributes ()
+csRef<iDocumentAttributeIterator> csTinyXmlNode::GetAttributes ()
 {
-  csRef<iXmlAttributeIterator> it;
+  csRef<iDocumentAttributeIterator> it;
   it.Take (new csTinyXmlAttributeIterator (node));
   return it;
 }
 
-csRef<iXmlAttribute> csTinyXmlNode::GetAttribute (const char* name)
+csRef<iDocumentAttribute> csTinyXmlNode::GetAttribute (const char* name)
 {
-  csRef<iXmlAttributeIterator> it = GetAttributes ();
+  csRef<iDocumentAttributeIterator> it = GetAttributes ();
   while (it->HasNext ())
   {
-    csRef<iXmlAttribute> attr = it->Next ();
+    csRef<iDocumentAttribute> attr = it->Next ();
     if (strcmp (name, attr->GetName ()) == 0)
       return attr;
   }
-  csRef<iXmlAttribute> attr;
+  csRef<iDocumentAttribute> attr;
   return attr;
 }
 
@@ -311,19 +311,19 @@ const char* csTinyXmlNode::GetAttributeValue (const char* name)
 
 int csTinyXmlNode::GetAttributeValueAsInt (const char* name)
 {
-  csRef<iXmlAttribute> attr = GetAttribute (name);
+  csRef<iDocumentAttribute> attr = GetAttribute (name);
   if (!attr) return 0;
   return attr->GetValueAsInt ();
 }
 
 float csTinyXmlNode::GetAttributeValueAsFloat (const char* name)
 {
-  csRef<iXmlAttribute> attr = GetAttribute (name);
+  csRef<iDocumentAttribute> attr = GetAttribute (name);
   if (!attr) return 0;
   return attr->GetValueAsFloat ();
 }
 
-void csTinyXmlNode::RemoveAttribute (const csRef<iXmlAttribute>& attr)
+void csTinyXmlNode::RemoveAttribute (const csRef<iDocumentAttribute>& attr)
 {
   // @@@ TODO
 }
@@ -338,37 +338,37 @@ void csTinyXmlNode::SetAttribute (const char* name, const char* value)
   // @@@ TODO
 }
 
-csRef<iXmlAttribute> csTinyXmlNode::CreateAttribute ()
+csRef<iDocumentAttribute> csTinyXmlNode::CreateAttribute ()
 {
-  csRef<iXmlAttribute> attr;
+  csRef<iDocumentAttribute> attr;
   // @@@ TODO
   return attr;
 }
 
-csRef<iXmlAttribute> csTinyXmlNode::CreateAttributeBefore (
-  	const csRef<iXmlAttribute>& before)
+csRef<iDocumentAttribute> csTinyXmlNode::CreateAttributeBefore (
+  	const csRef<iDocumentAttribute>& before)
 {
-  csRef<iXmlAttribute> attr;
+  csRef<iDocumentAttribute> attr;
   // @@@ TODO
   return attr;
 }
 
-csRef<iXmlAttribute> csTinyXmlNode::CreateAttributeAfter (
-  	const csRef<iXmlAttribute>& after)
+csRef<iDocumentAttribute> csTinyXmlNode::CreateAttributeAfter (
+  	const csRef<iDocumentAttribute>& after)
 {
-  csRef<iXmlAttribute> attr;
+  csRef<iDocumentAttribute> attr;
   // @@@ TODO
   return attr;
 }
 
-void csTinyXmlNode::MoveAttributeBefore (const csRef<iXmlAttribute>& attr,
-  	const csRef<iXmlAttribute>& before)
+void csTinyXmlNode::MoveAttributeBefore (const csRef<iDocumentAttribute>& attr,
+  	const csRef<iDocumentAttribute>& before)
 {
   // @@@ TODO
 }
 
-void csTinyXmlNode::MoveAttributeAfter (const csRef<iXmlAttribute>& attr,
-  	const csRef<iXmlAttribute>& after)
+void csTinyXmlNode::MoveAttributeAfter (const csRef<iDocumentAttribute>& attr,
+  	const csRef<iDocumentAttribute>& after)
 {
   // @@@ TODO
 }
@@ -376,7 +376,7 @@ void csTinyXmlNode::MoveAttributeAfter (const csRef<iXmlAttribute>& attr,
 //------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csTinyXmlDocument)
-  SCF_IMPLEMENTS_INTERFACE (iXmlDocument)
+  SCF_IMPLEMENTS_INTERFACE (iDocument)
 SCF_IMPLEMENT_IBASE_END
 
 csTinyXmlDocument::csTinyXmlDocument ()
@@ -393,15 +393,15 @@ void csTinyXmlDocument::Clear ()
   root = NULL;
 }
 
-csRef<iXmlNode> csTinyXmlDocument::CreateRoot ()
+csRef<iDocumentNode> csTinyXmlDocument::CreateRoot ()
 {
   Clear ();
-  TiXmlDocument* doc = new TiXmlDocument ();
+  TiDocument* doc = new TiDocument ();
   root.Take (new csTinyXmlNode (doc));
   return root;
 }
 
-csRef<iXmlNode> csTinyXmlDocument::GetRoot ()
+csRef<iDocumentNode> csTinyXmlDocument::GetRoot ()
 {
   return root;
 }
@@ -424,7 +424,7 @@ const char* csTinyXmlDocument::ParseXML (iString* str)
 const char* csTinyXmlDocument::ParseXML (const char* buf)
 {
   CreateRoot ();
-  TiXmlDocument* doc = (TiXmlDocument*)(((csTinyXmlNode*)(iXmlNode*)root)
+  TiDocument* doc = (TiDocument*)(((csTinyXmlNode*)(iDocumentNode*)root)
   	->GetTiNode ());
   doc->Parse (buf);
   if (doc->Error ())

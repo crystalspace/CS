@@ -1447,7 +1447,7 @@ const char* csTextSyntaxService::MixmodeToText (
   return text;
 }
 
-bool csTextSyntaxService::ParseBool (iXmlNode* node, bool& result,
+bool csTextSyntaxService::ParseBool (iDocumentNode* node, bool& result,
 		bool def_result)
 {
   const char* v = node->GetContentsValue ();
@@ -1461,12 +1461,12 @@ bool csTextSyntaxService::ParseBool (iXmlNode* node, bool& result,
   return false;
 }
 
-bool csTextSyntaxService::ParseMatrix (iXmlNode* node, csMatrix3 &m)
+bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, csMatrix3 &m)
 {
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -1524,7 +1524,7 @@ bool csTextSyntaxService::ParseMatrix (iXmlNode* node, csMatrix3 &m)
   return true;
 }
 
-bool csTextSyntaxService::ParseVector (iXmlNode* node, csVector3 &v)
+bool csTextSyntaxService::ParseVector (iDocumentNode* node, csVector3 &v)
 {
   v.x = node->GetAttributeValueAsFloat ("x");
   v.y = node->GetAttributeValueAsFloat ("y");
@@ -1532,7 +1532,7 @@ bool csTextSyntaxService::ParseVector (iXmlNode* node, csVector3 &v)
   return true;
 }
 
-bool csTextSyntaxService::ParseColor (iXmlNode* node, csColor &c)
+bool csTextSyntaxService::ParseColor (iDocumentNode* node, csColor &c)
 {
   c.red = node->GetAttributeValueAsFloat ("red");
   c.green = node->GetAttributeValueAsFloat ("green");
@@ -1540,13 +1540,13 @@ bool csTextSyntaxService::ParseColor (iXmlNode* node, csColor &c)
   return true;
 }
 
-bool csTextSyntaxService::ParseMixmode (iXmlNode* node, uint &mixmode)
+bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
 {
   mixmode = 0;
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -1576,7 +1576,7 @@ bool csTextSyntaxService::ParseMixmode (iXmlNode* node, uint &mixmode)
 }
 
 bool csTextSyntaxService::ParseTextureMapping (
-	iXmlNode* node, const csVector3* vref, uint &texspec,
+	iDocumentNode* node, const csVector3* vref, uint &texspec,
 	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
 	csMatrix3 &tx_m, csVector3 &tx_v,
 	csVector2 &uv_shift,
@@ -1585,10 +1585,10 @@ bool csTextSyntaxService::ParseTextureMapping (
 	int &idx3, csVector2 &uv3,
 	char *plane, const char *polyname)
 {
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -1685,7 +1685,7 @@ bool csTextSyntaxService::ParseTextureMapping (
       case XMLTOKEN_UV:
         {
           texspec |= CSTEX_UV;
-	  csRef<iXmlNode> spec = child->GetNode ("vt1");
+	  csRef<iDocumentNode> spec = child->GetNode ("vt1");
 	  if (!spec)
 	  {
             ReportError (reporter, "crystalspace.syntax.texture",
@@ -1756,15 +1756,15 @@ bool csTextSyntaxService::ParseTextureMapping (
 }
 
 bool csTextSyntaxService::ParsePortal (
-	iXmlNode* node, iLoaderContext* ldr_context,
+	iDocumentNode* node, iLoaderContext* ldr_context,
 	iPolygon3D* poly3d,
 	csVector &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after)
 {
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -1836,7 +1836,7 @@ bool csTextSyntaxService::ParsePortal (
 }
 
 bool csTextSyntaxService::ParsePoly3d (
-        iXmlNode* node,
+        iDocumentNode* node,
 	iLoaderContext* ldr_context,
 	iEngine* , iPolygon3D* poly3d,
 	float default_texlen,
@@ -1882,10 +1882,10 @@ bool csTextSyntaxService::ParsePoly3d (
 
   char str[255];
 
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -2266,9 +2266,9 @@ iString* csTextSyntaxService::Debug_UnitTest ()
   //==========================================================================
   // Tests for XML parsing.
   //==========================================================================
-  csRef<iXmlSystem> xml;
-  xml.Take (new csTinyXmlSystem ());
-  csRef<iXmlDocument> doc = xml->CreateDocument ();
+  csRef<iDocumentSystem> xml;
+  xml.Take (new csTinyDocumentSystem ());
+  csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->ParseXML ("\
     <root>\
       <v x=1 y=2 z=3/>\
@@ -2283,8 +2283,8 @@ iString* csTextSyntaxService::Debug_UnitTest ()
   ");
   SYN_ASSERT (error == NULL, error);
 
-  csRef<iXmlNode> root = doc->GetRoot ()->GetNode ("root");
-  csRef<iXmlNode> vector_node = root->GetNode ("v");
+  csRef<iDocumentNode> root = doc->GetRoot ()->GetNode ("root");
+  csRef<iDocumentNode> vector_node = root->GetNode ("v");
   SYN_ASSERT (vector_node != NULL, "vector_node");
   csVector3 v;
   SYN_ASSERT (ParseVector (vector_node, v) == true, "");
@@ -2292,7 +2292,7 @@ iString* csTextSyntaxService::Debug_UnitTest ()
   SYN_ASSERT (v.y == 2, "y");
   SYN_ASSERT (v.z == 3, "z");
 
-  csRef<iXmlNode> matrix_node = root->GetNode ("matrix");
+  csRef<iDocumentNode> matrix_node = root->GetNode ("matrix");
   SYN_ASSERT (matrix_node != NULL, "matrix_node");
   csMatrix3 m;
   SYN_ASSERT (ParseMatrix (matrix_node, m) == true, "");
@@ -2306,7 +2306,7 @@ iString* csTextSyntaxService::Debug_UnitTest ()
   SYN_ASSERT (m.m32 == 0, "m");
   SYN_ASSERT (m.m33 == 3, "m");
 
-  csRef<iXmlNode> mixmode_node = root->GetNode ("mixmode");
+  csRef<iDocumentNode> mixmode_node = root->GetNode ("mixmode");
   SYN_ASSERT (mixmode_node != NULL, "mixmode_node");
   uint mixmode;
   SYN_ASSERT (ParseMixmode (mixmode_node, mixmode) == true, "");

@@ -24,15 +24,15 @@
 /**
  * This is an SCF compatible wrapper for the TinyXml parser in csutil.
  */
-class csTinyXmlSystem : public iXmlSystem
+class csTinyDocumentSystem : public iDocumentSystem
 {
 public:
-  csTinyXmlSystem ();
-  virtual ~csTinyXmlSystem ();
+  csTinyDocumentSystem ();
+  virtual ~csTinyDocumentSystem ();
 
   SCF_DECLARE_IBASE;
 
-  virtual csRef<iXmlDocument> CreateDocument ();
+  virtual csRef<iDocument> CreateDocument ();
 };
 
 #endif // __CSUTIL_XMLTINY_H__

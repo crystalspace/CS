@@ -67,7 +67,7 @@ private:
   iReporter* reporter;
   csStringHash xmltokens;
 
-  bool LoadThingPart (iXmlNode* node, iLoaderContext* ldr_context,
+  bool LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
 	iEngine* engine, iThingState* thing_state,
@@ -88,7 +88,7 @@ public:
     iLoaderContext* ldr_context, iBase* context);
 
   /// Parse a given node and return a new object for it.
-  virtual iBase* Parse (iXmlNode* node,
+  virtual iBase* Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
@@ -159,7 +159,7 @@ public:
     iLoaderContext* ldr_context, iBase* context);
 
   /// Parse a given node and return a new object for it.
-  virtual iBase* Parse (iXmlNode* node,
+  virtual iBase* Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
@@ -229,7 +229,7 @@ public:
     iLoaderContext* ldr_context, iBase* context);
 
   /// Parse a given node and return a new object for it.
-  virtual iBase* Parse (iXmlNode* node,
+  virtual iBase* Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent

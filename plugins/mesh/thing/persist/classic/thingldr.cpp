@@ -663,16 +663,16 @@ iBase* csThingLoader::Parse (const char* string,
 
 // XML versions: -------------------------------------------------
 
-bool csThingLoader::LoadThingPart (iXmlNode* node, iLoaderContext* ldr_context,
+bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
 	iEngine* engine, iThingState* thing_state,
 	int vt_offset, bool isParent)
 {
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -894,7 +894,7 @@ Nag to Jorrit about this feature if you want it.");
   return true;
 }
 
-iBase* csThingLoader::Parse (iXmlNode* node,
+iBase* csThingLoader::Parse (iDocumentNode* node,
 			     iLoaderContext* ldr_context, iBase*)
 {
   // Things only work with the real 3D engine and not with the iso engine.
@@ -1156,7 +1156,7 @@ iBase* csPlaneLoader::Parse (const char* string,
   return ppl;
 }
 
-iBase* csPlaneLoader::Parse (iXmlNode* node,
+iBase* csPlaneLoader::Parse (iDocumentNode* node,
 			     iLoaderContext* /*ldr_context*/,
 			     iBase* /*context*/)
 {
@@ -1177,10 +1177,10 @@ iBase* csPlaneLoader::Parse (iXmlNode* node,
   csVector3 tx_vector (0, 0, 0);
   char name[255]; name[0] = 0;
 
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
@@ -1419,7 +1419,7 @@ iBase* csBezierLoader::Parse (const char* string,
   return tmpl;
 }
 
-iBase* csBezierLoader::Parse (iXmlNode* node,
+iBase* csBezierLoader::Parse (iDocumentNode* node,
 			      iLoaderContext* ldr_context, iBase* /*context*/)
 {
   // Things only work with the real 3D engine and not with the iso engine.
@@ -1435,10 +1435,10 @@ iBase* csBezierLoader::Parse (iXmlNode* node,
   iMaterialWrapper* mat = NULL;
 
   int num_v = 0;
-  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
-    csRef<iXmlNode> child = it->Next ();
+    csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);

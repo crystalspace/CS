@@ -255,7 +255,7 @@ const char* TiXmlBase::ReadText(	const char* p,
 
 #ifdef TIXML_USE_STL
 
-void TiXmlDocument::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
+void TiDocument::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
 {
 	// The basic issue with a document is that we don't know what we're
 	// streaming. Read something presumed to be a tag (and hope), then
@@ -284,7 +284,7 @@ void TiXmlDocument::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
 			// We now have something we presume to be a node of 
 			// some sort. Identify it, and call the node to
 			// continue streaming.
-			TiXmlNode* node = Identify( tag->c_str() + tagIndex );
+			TiDocumentNode* node = Identify( tag->c_str() + tagIndex );
 
 			if ( node )
 			{
@@ -313,7 +313,7 @@ void TiXmlDocument::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
 
 #endif
 
-const char* TiXmlDocument::Parse( const char* p )
+const char* TiDocument::Parse( const char* p )
 {
 	// Parse away, at the document level. Since a document
 	// contains nothing but other tags, most of what happens
@@ -338,7 +338,7 @@ const char* TiXmlDocument::Parse( const char* p )
 
 	while ( p && *p )
 	{
-		TiXmlNode* node = Identify( p );
+		TiDocumentNode* node = Identify( p );
 		if ( node )
 		{
 			p = node->Parse( p );
@@ -355,9 +355,9 @@ const char* TiXmlDocument::Parse( const char* p )
 }
 
 
-TiXmlNode* TiXmlNode::Identify( const char* p )
+TiDocumentNode* TiDocumentNode::Identify( const char* p )
 {
-	TiXmlNode* returnNode = 0;
+	TiDocumentNode* returnNode = 0;
 
 	p = SkipWhiteSpace( p );
 	if( !p || !*p || *p != '<' )
@@ -365,7 +365,7 @@ TiXmlNode* TiXmlNode::Identify( const char* p )
 		return 0;
 	}
 
-	TiXmlDocument* doc = GetDocument();
+	TiDocument* doc = GetDocument();
 	p = SkipWhiteSpace( p );
 
 	if ( !p || !*p )
@@ -519,7 +519,7 @@ void TiXmlElement::StreamIn (TIXML_ISTREAM * in, TIXML_STRING * tag)
 			{
 				// If not a closing tag, id it, and stream.
 				const char* tagloc = tag->c_str() + tagIndex;
-				TiXmlNode* node = Identify( tagloc );
+				TiDocumentNode* node = Identify( tagloc );
 				if ( !node )
 					return;
 				node->StreamIn( in, tag );
@@ -536,7 +536,7 @@ void TiXmlElement::StreamIn (TIXML_ISTREAM * in, TIXML_STRING * tag)
 const char* TiXmlElement::Parse( const char* p )
 {
 	p = SkipWhiteSpace( p );
-	TiXmlDocument* document = GetDocument();
+	TiDocument* document = GetDocument();
 
 	if ( !p || !*p || *p != '<' )
 	{
@@ -604,7 +604,7 @@ const char* TiXmlElement::Parse( const char* p )
 		else
 		{
 			// Try to read an element:
-			TiXmlAttribute attrib;
+			TiDocumentAttribute attrib;
 			attrib.SetDocument( document );
 			p = attrib.Parse( p );
 
@@ -622,7 +622,7 @@ const char* TiXmlElement::Parse( const char* p )
 
 const char* TiXmlElement::ReadValue( const char* p )
 {
-	TiXmlDocument* document = GetDocument();
+	TiDocument* document = GetDocument();
 
 	// Read in text and elements in any order.
 	p = SkipWhiteSpace( p );
@@ -656,7 +656,7 @@ const char* TiXmlElement::ReadValue( const char* p )
 			}
 			else
 			{
-				TiXmlNode* node = Identify( p );
+				TiDocumentNode* node = Identify( p );
 				if ( node )
 				{
 					p = node->Parse( p );
@@ -699,7 +699,7 @@ void TiXmlUnknown::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
 
 const char* TiXmlUnknown::Parse( const char* p )
 {
-	TiXmlDocument* document = GetDocument();
+	TiDocument* document = GetDocument();
 	p = SkipWhiteSpace( p );
 	if ( !p || !*p || *p != '<' )
 	{
@@ -746,7 +746,7 @@ void TiXmlComment::StreamIn( TIXML_ISTREAM * in, TIXML_STRING * tag )
 
 const char* TiXmlComment::Parse( const char* p )
 {
-	TiXmlDocument* document = GetDocument();
+	TiDocument* document = GetDocument();
 	value = "";
 
 	p = SkipWhiteSpace( p );
@@ -764,7 +764,7 @@ const char* TiXmlComment::Parse( const char* p )
 }
 
 
-const char* TiXmlAttribute::Parse( const char* p )
+const char* TiDocumentAttribute::Parse( const char* p )
 {
 	p = SkipWhiteSpace( p );
 	if ( !p || !*p ) return 0;
@@ -841,7 +841,7 @@ const char* TiXmlText::Parse( const char* p )
 {
 	value = "";
 
-	//TiXmlDocument* doc = GetDocument();
+	//TiDocument* doc = GetDocument();
 	bool ignoreWhite = true;
 //	if ( doc && !doc->IgnoreWhiteSpace() ) ignoreWhite = false;
 
@@ -874,7 +874,7 @@ const char* TiXmlDeclaration::Parse( const char* p )
 	p = SkipWhiteSpace( p );
 	// Find the beginning, find the end, and look for
 	// the stuff in-between.
-	TiXmlDocument* document = GetDocument();
+	TiDocument* document = GetDocument();
 	if ( !p || !*p || !StringEqual( p, "<?xml", true ) )
 	{
 		if ( document ) document->SetError( TIXML_ERROR_PARSING_DECLARATION );
@@ -901,21 +901,21 @@ const char* TiXmlDeclaration::Parse( const char* p )
 		if ( StringEqual( p, "version", true ) )
 		{
 //			p += 7;
-			TiXmlAttribute attrib;
+			TiDocumentAttribute attrib;
 			p = attrib.Parse( p );		
 			version = attrib.Value();
 		}
 		else if ( StringEqual( p, "encoding", true ) )
 		{
 //			p += 8;
-			TiXmlAttribute attrib;
+			TiDocumentAttribute attrib;
 			p = attrib.Parse( p );		
 			encoding = attrib.Value();
 		}
 		else if ( StringEqual( p, "standalone", true ) )
 		{
 //			p += 10;
-			TiXmlAttribute attrib;
+			TiDocumentAttribute attrib;
 			p = attrib.Parse( p );		
 			standalone = attrib.Value();
 		}

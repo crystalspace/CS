@@ -412,7 +412,7 @@ bool csLoader::ParseHeightgen (char* buf)
 
 // XML versions -------------------------------------------------------------------
 
-bool csLoader::ParseHeightgen (iXmlNode* node)
+bool csLoader::ParseHeightgen (iDocumentNode* node)
 {
   return true;
 }

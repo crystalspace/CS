@@ -23,8 +23,8 @@
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 
-struct iXmlNode;
-struct iXmlAttribute;
+struct iDocumentNode;
+struct iDocumentAttribute;
 struct iFile;
 struct iDataBuffer;
 struct iString;
@@ -44,27 +44,27 @@ enum csXmlNodeType
 
 //===========================================================================
 
-SCF_VERSION (iXmlAttributeIterator, 0, 0, 1);
+SCF_VERSION (iDocumentAttributeIterator, 0, 0, 1);
 
 /**
  * An iterator over attributes.
  */
-struct iXmlAttributeIterator : public iBase
+struct iDocumentAttributeIterator : public iBase
 {
   /// Are there more elements?
   virtual bool HasNext () = 0;
   /// Get next element.
-  virtual csRef<iXmlAttribute> Next () = 0;
+  virtual csRef<iDocumentAttribute> Next () = 0;
 };
 
 //===========================================================================
 
-SCF_VERSION (iXmlAttribute, 0, 0, 1);
+SCF_VERSION (iDocumentAttribute, 0, 0, 1);
 
 /**
  * This represents an attribute in XML.
  */
-struct iXmlAttribute : public iBase
+struct iDocumentAttribute : public iBase
 {
   /// Get name of this attribute.
   virtual const char* GetName () const = 0;
@@ -86,27 +86,27 @@ struct iXmlAttribute : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iXmlNodeIterator, 0, 0, 1);
+SCF_VERSION (iDocumentNodeIterator, 0, 0, 1);
 
 /**
  * An iterator over nodes.
  */
-struct iXmlNodeIterator : public iBase
+struct iDocumentNodeIterator : public iBase
 {
   /// Are there more elements?
   virtual bool HasNext () = 0;
   /// Get next element.
-  virtual csRef<iXmlNode> Next () = 0;
+  virtual csRef<iDocumentNode> Next () = 0;
 };
 
 //===========================================================================
 
-SCF_VERSION (iXmlNode, 0, 1, 0);
+SCF_VERSION (iDocumentNode, 0, 1, 0);
 
 /**
  * This represents a node in XML.
  */
-struct iXmlNode : public iBase
+struct iDocumentNode : public iBase
 {
   /**
    * Get the type of this node (one of CS_XMLNODE_...).
@@ -140,42 +140,42 @@ struct iXmlNode : public iBase
    */
   virtual void SetValue (const char* value) = 0;
   /// Get the parent.
-  virtual csRef<iXmlNode> GetParent () = 0;
+  virtual csRef<iDocumentNode> GetParent () = 0;
 
   //---------------------------------------------------------------------
   
   /// Get an iterator over all children.
-  virtual csRef<iXmlNodeIterator> GetNodes () = 0;
+  virtual csRef<iDocumentNodeIterator> GetNodes () = 0;
   /// Get an iterator over all children of the specified type.
-  virtual csRef<iXmlNodeIterator> GetNodes (const char* type) = 0;
+  virtual csRef<iDocumentNodeIterator> GetNodes (const char* type) = 0;
   /// Get the first node of the given type.
-  virtual csRef<iXmlNode> GetNode (const char* type) = 0;
+  virtual csRef<iDocumentNode> GetNode (const char* type) = 0;
 
   /// Remove a child.
-  virtual void RemoveNode (const csRef<iXmlNode>& child) = 0;
+  virtual void RemoveNode (const csRef<iDocumentNode>& child) = 0;
   /// Remove all children.
   virtual void RemoveNodes () = 0;
 
   /// Create a new node of the given type at the end.
-  virtual csRef<iXmlNode> CreateNode (const char* type) = 0;
+  virtual csRef<iDocumentNode> CreateNode (const char* type) = 0;
   /// Create a new node of the given type before the specified node.
-  virtual csRef<iXmlNode> CreateNodeBefore (const char* type,
-  	const csRef<iXmlNode>& node) = 0;
+  virtual csRef<iDocumentNode> CreateNodeBefore (const char* type,
+  	const csRef<iDocumentNode>& node) = 0;
   /// Create a new node of the given type after the specified node.
-  virtual csRef<iXmlNode> CreateNodeAfter (const char* type,
-  	const csRef<iXmlNode>& node) = 0;
+  virtual csRef<iDocumentNode> CreateNodeAfter (const char* type,
+  	const csRef<iDocumentNode>& node) = 0;
   /**
    * Move a node (which should be a child of this node) before the given
    * node.
    */
-  virtual void MoveNodeBefore (const csRef<iXmlNode>& node,
-  	const csRef<iXmlNode>& before) = 0;
+  virtual void MoveNodeBefore (const csRef<iDocumentNode>& node,
+  	const csRef<iDocumentNode>& before) = 0;
   /**
    * Move a node (which should be a child of this node) after the given
    * node.
    */
-  virtual void MoveNodeAfter (const csRef<iXmlNode>& node,
-  	const csRef<iXmlNode>& after) = 0;
+  virtual void MoveNodeAfter (const csRef<iDocumentNode>& node,
+  	const csRef<iDocumentNode>& after) = 0;
 
   /**
    * Get the value of a node. What this does is scan all child nodes
@@ -199,9 +199,9 @@ struct iXmlNode : public iBase
   //---------------------------------------------------------------------
 
   /// Get an iterator over all attributes.
-  virtual csRef<iXmlAttributeIterator> GetAttributes () = 0;
+  virtual csRef<iDocumentAttributeIterator> GetAttributes () = 0;
   /// Get an attribute by name.
-  virtual csRef<iXmlAttribute> GetAttribute (const char* name) = 0;
+  virtual csRef<iDocumentAttribute> GetAttribute (const char* name) = 0;
   /// Get an attribute value by name.
   virtual const char* GetAttributeValue (const char* name) = 0;
   /// Get an attribute value by name.
@@ -210,7 +210,7 @@ struct iXmlNode : public iBase
   virtual float GetAttributeValueAsFloat (const char* name) = 0;
 
   /// Remove an attribute.
-  virtual void RemoveAttribute (const csRef<iXmlAttribute>& attr) = 0;
+  virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr) = 0;
   /// Remove all attributes.
   virtual void RemoveAttributes () = 0;
 
@@ -219,48 +219,48 @@ struct iXmlNode : public iBase
   /**
    * Create a new attribute at the end.
    */
-  virtual csRef<iXmlAttribute> CreateAttribute () = 0;
+  virtual csRef<iDocumentAttribute> CreateAttribute () = 0;
   /**
    * Create a new attribute before the given attribute.
    */
-  virtual csRef<iXmlAttribute> CreateAttributeBefore (
-  	const csRef<iXmlAttribute>& attr) = 0;
+  virtual csRef<iDocumentAttribute> CreateAttributeBefore (
+  	const csRef<iDocumentAttribute>& attr) = 0;
   /**
    * Create a new attribute after the given attribute.
    */
-  virtual csRef<iXmlAttribute> CreateAttributeAfter (
-  	const csRef<iXmlAttribute>& attr) = 0;
+  virtual csRef<iDocumentAttribute> CreateAttributeAfter (
+  	const csRef<iDocumentAttribute>& attr) = 0;
   /**
    * Move an attribute (which should be a child of this node) before the
    * given attribute.
    */
-  virtual void MoveAttributeBefore (const csRef<iXmlAttribute>& attr,
-  	const csRef<iXmlAttribute>& before) = 0;
+  virtual void MoveAttributeBefore (const csRef<iDocumentAttribute>& attr,
+  	const csRef<iDocumentAttribute>& before) = 0;
   /**
    * Move an attribute (which should be a child of this node) after the
    * given attribute.
    */
-  virtual void MoveAttributeAfter (const csRef<iXmlAttribute>& attr,
-  	const csRef<iXmlAttribute>& after) = 0;
+  virtual void MoveAttributeAfter (const csRef<iDocumentAttribute>& attr,
+  	const csRef<iDocumentAttribute>& after) = 0;
 };
 
 //===========================================================================
 
-SCF_VERSION (iXmlDocument, 0, 0, 1);
+SCF_VERSION (iDocument, 0, 0, 1);
 
 /**
  * This represents a document in XML.
  */
-struct iXmlDocument : public iBase
+struct iDocument : public iBase
 {
   /// Clear the document fully.
   virtual void Clear () = 0;
 
   /// Create a root node. This will clear the previous root node if any.
-  virtual csRef<iXmlNode> CreateRoot () = 0;
+  virtual csRef<iDocumentNode> CreateRoot () = 0;
 
   /// Get the current root node.
-  virtual csRef<iXmlNode> GetRoot () = 0;
+  virtual csRef<iDocumentNode> GetRoot () = 0;
 
   /**
    * Parse XML file from an iFile.
@@ -311,15 +311,15 @@ struct iXmlDocument : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iXmlSystem, 0, 0, 1);
+SCF_VERSION (iDocumentSystem, 0, 0, 1);
 
 /**
  * The XML plugin.
  */
-struct iXmlSystem : public iBase
+struct iDocumentSystem : public iBase
 {
   /// Create a new empty document.
-  virtual csRef<iXmlDocument> CreateDocument () = 0;
+  virtual csRef<iDocument> CreateDocument () = 0;
 };
 
 
