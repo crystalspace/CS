@@ -610,7 +610,7 @@ void csSCF::RegisterClasses (char const* xml, const char* context)
   csMemFile file(xml, strlen(xml));
   csTinyDocumentSystem docsys;
   csRef<iDocument> doc = docsys.CreateDocument();
-  if (doc->Parse(&file) == 0)
+  if (doc->Parse(&file, true) == 0)
     RegisterClasses(doc, context);
 }
 

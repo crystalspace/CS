@@ -15,6 +15,10 @@ chronological order.
 	- res fixed the '*' appearing on the API doc front page. (Apparently,
 	  doxygen doesn't remove the '*'s at the beginning in \htmlonly 
 	  blocks.)
+	- Eric Sunshine fixed a few places (csparser, vfs) where the
+	  26-Oct-2004 change to preserve whitespace, by default, in
+	  iDocument::Parse() had a potentially negative impact. These places
+	  now request Parse() to (once again) condense whitespace.
 29-Oct-2004
 	- Rhad changed the software renderer to account for the OSS driver
 	  blocking for long periods on calls to UnlockMemory().

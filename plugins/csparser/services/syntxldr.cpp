@@ -1059,7 +1059,7 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
         <tiling/> <alpha>.5</alpha>\
       </mixmode>\
     </root>\
-  ");
+  ", true);
   SYN_ASSERT (error == 0, error);
 
   csRef<iDocumentNode> root = doc->GetRoot ()->GetNode ("root");

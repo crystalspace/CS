@@ -596,7 +596,7 @@ bool csLoader::LoadStructuredDoc (const char* file, iFile* buf,
       CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
   if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   doc = docsys->CreateDocument ();
-  const char* error = doc->Parse (buf);
+  const char* error = doc->Parse (buf, true);
   if (error != 0)
   {
     ReportError (
@@ -5100,7 +5100,7 @@ bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
 	  if (docsys == 0)
 	    docsys.AttachNew (new csTinyDocumentSystem ());
 	  csRef<iDocument> shaderDoc = docsys->CreateDocument ();
-	  const char* err = shaderDoc->Parse (shaderFile);
+	  const char* err = shaderDoc->Parse (shaderFile, true);
 	  if (err != 0)
 	  {
 	    ReportWarning ("crystalspace.maploader",
