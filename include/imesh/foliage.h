@@ -30,6 +30,7 @@
 
 struct iMaterialWrapper;
 struct iTerraFormer;
+struct iLODControl;
 
 /**
  * Vertex data for the foliage mesh.
@@ -130,6 +131,11 @@ struct iFoliageObject : public iBase
    * yet.
    */
   virtual size_t GetMaxLodSlot () const = 0;
+
+  /**
+   * Return the LOD control for this object.
+   */
+  virtual iLODControl* GetLODControl () = 0;
 };
 
 

@@ -79,12 +79,15 @@ void csFoliageGeometry::SetMaterialWrapper (iMaterialWrapper* material)
 
 SCF_IMPLEMENT_IBASE (csFoliageObject)
   SCF_IMPLEMENTS_INTERFACE (iFoliageObject)
+  SCF_IMPLEMENTS_INTERFACE (iLODControl)
 SCF_IMPLEMENT_IBASE_END
 
 csFoliageObject::csFoliageObject (const char* name)
 {
   SCF_CONSTRUCT_IBASE (0);
   csFoliageObject::name = csStrNew (name);
+  lod_m = 0;
+  lod_a = 1;
 }
 
 csFoliageObject::~csFoliageObject ()
@@ -122,6 +125,54 @@ size_t csFoliageObject::GetMaxLodSlot () const
     if (geometry[i]) return i;
   }
   return (size_t)~0;
+}
+
+void csFoliageObject::ClearLODListeners ()
+{
+  if (lod_varm)
+  {
+    lod_varm->RemoveListener (lod_varm_listener);
+    lod_varm_listener = 0;
+    lod_varm = 0;
+  }
+  if (lod_vara)
+  {
+    lod_vara->RemoveListener (lod_vara_listener);
+    lod_vara_listener = 0;
+    lod_vara = 0;
+  }
+}
+
+void csFoliageObject::SetLOD (float m, float a)
+{
+  ClearLODListeners ();
+  lod_m = m;
+  lod_a = a;
+}
+
+void csFoliageObject::GetLOD (float& m, float& a) const
+{
+  m = lod_m;
+  a = lod_a;
+}
+
+void csFoliageObject::SetLOD (iSharedVariable* varm, iSharedVariable* vara)
+{
+  ClearLODListeners ();
+  lod_varm = varm;
+  lod_vara = vara;
+  lod_varm_listener.AttachNew (new csFoliageLODListener (&lod_m));
+  lod_varm->AddListener (lod_varm_listener);
+  lod_vara_listener.AttachNew (new csFoliageLODListener (&lod_a));
+  lod_vara->AddListener (lod_vara_listener);
+  lod_m = varm->Get ();
+  lod_a = vara->Get ();
+}
+
+int csFoliageObject::GetLODPolygonCount (float lod) const
+{
+  // @@@ Not implemented yet.
+  return 0;
 }
 
 //----------------------------------------------------------------------

@@ -33,6 +33,8 @@
 #include "csqint.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
+#include "iengine/sharevar.h"
+#include "iengine/lod.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
@@ -57,7 +59,8 @@ enum
   XMLTOKEN_MATERIAL,
   XMLTOKEN_FOLIAGEPALETTE,
   XMLTOKEN_PALETTE,
-  XMLTOKEN_FOLIAGE
+  XMLTOKEN_FOLIAGE,
+  XMLTOKEN_LODDISTANCE
 };
 
 SCF_IMPLEMENT_IBASE (csFoliageFactoryLoader)
@@ -130,6 +133,7 @@ bool csFoliageFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("foliagepalette", XMLTOKEN_FOLIAGEPALETTE);
   xmltokens.Register ("palette", XMLTOKEN_PALETTE);
   xmltokens.Register ("foliage", XMLTOKEN_FOLIAGE);
+  xmltokens.Register ("loddistance", XMLTOKEN_LODDISTANCE);
   return true;
 }
 
@@ -216,6 +220,42 @@ bool csFoliageFactoryLoader::ParseObject (iLoaderContext* ldr_context,
 	    return false;
 	}
 	break;
+      case XMLTOKEN_LODDISTANCE:
+	// @@@ Put this in the syntax services?
+	{
+	  iLODControl* lodctrl = obj->GetLODControl ();
+	  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+	  csRef<iDocumentAttribute> at;
+	  at = child->GetAttribute ("varm");
+	  if (at)
+	  {
+	    // We use variables.
+	    iSharedVariable *varm = Engine->GetVariableList()->FindByName (
+	    	child->GetAttributeValue ("varm"));
+	    iSharedVariable *vara = Engine->GetVariableList()->FindByName (
+	    	child->GetAttributeValue ("vara"));
+	    lodctrl->SetLOD (varm, vara);
+	    break;
+	  }
+
+	  at = child->GetAttribute ("m");
+	  if (at)
+	  {
+	    float lodm = child->GetAttributeValueAsFloat ("m");
+	    float loda = child->GetAttributeValueAsFloat ("a");
+	    lodctrl->SetLOD (lodm, loda);
+	  }
+	  else
+	  {
+	    float d0 = child->GetAttributeValueAsFloat ("d0");
+	    float d1 = child->GetAttributeValueAsFloat ("d1");
+	    float lodm = 1.0 / (d1-d0);
+	    float loda = -lodm * d0;
+	    lodctrl->SetLOD (lodm, loda);
+	  }
+	}
+	break;
+
       default:
 	synldr->ReportBadToken (child);
 	return false;
@@ -351,7 +391,6 @@ csPtr<iBase> csFoliageFactoryLoader::Parse (iDocumentNode* node,
         if (!ParseFoliagePalette (child, state))
 	  return false;
 	break;
-
       default:
 	synldr->ReportBadToken (child);
 	return 0;

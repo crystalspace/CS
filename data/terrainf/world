@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <world>
+  <variables>
+    <variable name="LodM" value="-0.00666667" />
+    <variable name="LodA" value="1.33333" />
+  </variables>
+
   <plugins>
     <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
     <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
@@ -169,6 +174,7 @@
         <max x="256" y="256" />
       </sampleregion>
       <object name="oak">
+	<loddistance varm="LodM" vora="LodA" />
 	<geometry lod="0">
 	  <v x="0" y="0" z="0" u="0" v="u" nx="0" ny="0" nz="0" red="0" green="0" blue="0" />
 	  ...

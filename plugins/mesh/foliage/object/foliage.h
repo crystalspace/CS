@@ -30,6 +30,8 @@
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/terraform.h"
+#include "iengine/lod.h"
+#include "iengine/sharevar.h"
 
 class csFoliageMeshObjectFactory;
 struct iObjectRegistry;
@@ -70,11 +72,43 @@ public:
   }
 };
 
-class csFoliageObject : public iFoliageObject
+// Listen to LOD variable changes.
+// @@@ This class is also used in meshlod.cpp. Put somewhere
+// global?
+class csFoliageLODListener : public iSharedVariableListener
+{
+private:
+  float* variable;
+public:
+  SCF_DECLARE_IBASE;
+  csFoliageLODListener (float* variable)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    csFoliageLODListener::variable = variable;
+  }
+
+  virtual ~csFoliageLODListener() { SCF_DESTRUCT_IBASE(); }
+
+  virtual void VariableChanged (iSharedVariable* var)
+  {
+    *variable = var->Get ();
+  }
+};
+
+class csFoliageObject : public iFoliageObject, public iLODControl
 {
 private:
   char* name;
   csRefArray<iFoliageGeometry> geometry;
+
+  /// Function for lod.
+  float lod_m, lod_a;
+  /// Or using variables.
+  csRef<iSharedVariable> lod_varm;
+  csRef<iSharedVariable> lod_vara;
+  csRef<csFoliageLODListener> lod_varm_listener;
+  csRef<csFoliageLODListener> lod_vara_listener;
+  void ClearLODListeners ();
 
 public:
   csFoliageObject (const char* name);
@@ -90,6 +124,16 @@ public:
       size_t toslot, float factory);
   virtual iFoliageGeometry* GetGeometry (size_t lodslot);
   virtual size_t GetMaxLodSlot () const;
+  virtual iLODControl* GetLODControl () { return (iLODControl*)this; }
+
+  //-------------------- iLODControl implementation -------------------
+
+  virtual void SetLOD (float m, float a);
+  virtual void GetLOD (float& m, float& a) const;
+  virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara);
+  virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara)
+  	const;
+  virtual int GetLODPolygonCount (float lod) const;
 };
 
 
