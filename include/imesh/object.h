@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "csgeom/box.h"
 #include "ivideo/graph3d.h"
+#include "igeom/polymesh.h"
 #include "csutil/flags.h"
 
 struct iMeshObject;
@@ -29,7 +30,6 @@ struct iMeshObjectFactory;
 struct iRenderView;
 struct iMovable;
 struct iLight;
-struct iPolygonMesh;
 struct iObjectModel;
 struct iMaterialWrapper;
 struct iPortal;

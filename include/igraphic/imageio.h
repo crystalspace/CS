@@ -31,7 +31,7 @@
 #include "csutil/scf.h"
 #include "csutil/array.h"
 #include "igraphic/image.h"
-struct iDataBuffer;
+#include "iutil/databuff.h"
 
 SCF_VERSION (iImageIO, 1, 0, 0);
 

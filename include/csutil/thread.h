@@ -66,6 +66,8 @@ public:
   virtual void IncRef() = 0;
   /// Decrement reference count.
   virtual void DecRef() = 0;
+  /// Get reference count.
+  virtual int GetRefCount() = 0;
 };
 
 

@@ -180,6 +180,7 @@ public:
     virtual void IncRef () {mutex_count->LockWait(); count++; mutex_count->Release(); }
     virtual void DecRef () {mutex_count->LockWait(); if (--count == 0) { mutex_count->Release(); delete this; } else mutex_count->Release();}
     virtual void Run () {sr->ThreadProc();}
+    virtual int GetRefCount () { return count; }
   };
   friend class DS3DRunnable;
 

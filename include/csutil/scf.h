@@ -98,6 +98,16 @@ struct iBase
   virtual void RemoveRefOwner (iBase** ref_owner) = 0;
 };
 
+#ifdef CS_REF_TRACKER
+ #include <typeinfo>
+ #define CS_TYPENAME(x)		    typeid(x).name()
+ /// @@@ HACK: Force an AddAlias() call for every contained interface
+ #define SCF_INIT_TRACKER_ALIASES    QueryInterface ((scfInterfaceID)-1, -1);
+#else
+ #define CS_TYPENAME(x)		    0
+ #define SCF_INIT_TRACKER_ALIASES
+#endif
+
 /**
  * This macro should be embedded into any SCF-capable class definition
  * to declare the minimal functionality required by iBase interface.
@@ -132,9 +142,12 @@ public:									\
  * it is okay to use null as the argument to this macro.
  */
 #define SCF_CONSTRUCT_IBASE(Parent)					\
+  csRefTrackerAccess::TrackConstruction (this);				\
+  csRefTrackerAccess::SetDescription (this, CS_TYPENAME(*this));	\
   scfRefCount = 1;							\
   scfWeakRefOwners = 0;							\
-  scfParent = Parent; if (scfParent) scfParent->IncRef();
+  scfParent = Parent; if (scfParent) scfParent->IncRef();		\
+  SCF_INIT_TRACKER_ALIASES 						
 
 /**
  * The SCF_CONSTRUCT_EMBEDDED_IBASE macro should be invoked inside the
@@ -146,7 +159,8 @@ public:									\
  * object is known (typically something like `scfiFooBar').
  */
 #define SCF_CONSTRUCT_EMBEDDED_IBASE(Interface)				\
-  Interface.scfParent = this;
+  Interface.scfParent = this;						\
+  csRefTrackerAccess::AddAlias (&Interface, this);
 
 /**
  * The SCF_DESTRUCT_IBASE macro should be invoked inside the destructor
@@ -154,6 +168,7 @@ public:									\
  * initialization performed by the SCF_CONSTRUCT_IBASE() macro.
  */
 #define SCF_DESTRUCT_IBASE()						\
+  csRefTrackerAccess::TrackDestruction (this, scfRefCount);		\
   scfRemoveRefOwners ();
 
 /**
@@ -163,6 +178,7 @@ public:									\
  * performed by the SCF_CONSTRUCT_EMBEDDED_IBASE() macro.
  */
 #define SCF_DESTRUCT_EMBEDDED_IBASE(Interface)				\
+  csRefTrackerAccess::RemoveAlias (&Interface, this);			\
   Interface.scfParent = 0;
 
 /**
@@ -174,6 +190,7 @@ public:									\
 void Class::IncRef ()							\
 {									\
   SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfRefCount + 1));\
+  csRefTrackerAccess::TrackIncRef (this, scfRefCount);			\
   scfRefCount++;							\
 }
 
@@ -188,6 +205,8 @@ void Class::IncRef ()							\
 #define SCF_IMPLEMENT_IBASE_DECREF(Class)				\
 void Class::DecRef ()							\
 {									\
+  /*SCF_TRACK_DECREF;*/							\
+  csRefTrackerAccess::TrackDecRef (this, scfRefCount);			\
   if (scfRefCount == 1)							\
   {									\
     SCF_TRACE ((" delete (%s *)%p\n", #Class, this));			\
@@ -391,6 +410,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
  * return a pointer to that interface if everything is correct.
  */
 #define SCF_IMPLEMENTS_INTERFACE(Interface)				\
+  csRefTrackerAccess::AddAlias (CS_STATIC_CAST(Interface*, this), this);\
   SCF_IMPLEMENTS_INTERFACE_COMMON (Interface, this)
 
 /**
@@ -1046,6 +1066,9 @@ struct iSCF : public iBase
 SCF_VERSION (iFactory, 0, 0, 1);
 SCF_VERSION (iBase, 0, 1, 0);
 SCF_VERSION (iSCF, 0, 2, 1);
+
+// A bit hacky.
+#include "csutil/reftrackeraccess.h"
 
 /* @} */
 

@@ -20,12 +20,11 @@
 #define __CS_IUTIL_CACHE_H__
 
 #include "csutil/scf.h"
+#include "iutil/databuff.h"
 
 /**\file
  * Cache manager interface
  */
-
-struct iDataBuffer;
 
 SCF_VERSION (iCacheManager, 0, 0, 1);
 

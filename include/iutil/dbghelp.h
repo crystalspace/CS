@@ -24,9 +24,9 @@
 /**\addtogroup util
  * @{ */
 #include "cstypes.h"
+#include "iutil/string.h"
 #include "csutil/scf.h"
 
-struct iString;
 struct iGraphics3D;
 
 SCF_VERSION (iDebugHelper, 0, 0, 1);

@@ -31,6 +31,10 @@
 #include "csutil/xmltiny.h"
 #include "iutil/document.h"
 
+#ifdef CS_REF_TRACKER
+#include "reftrack.h"
+#endif
+
 /// This is the registry for all class factories
 static class scfClassRegistry *ClassRegistry = 0;
 /// If this bool is true, we should sort the registery
@@ -53,6 +57,9 @@ private:
 
   void RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
     const char* context = 0);
+#ifdef CS_REF_TRACKER
+  csRefTracker* refTracker;
+#endif
 public:
   SCF_DECLARE_IBASE;
 
@@ -439,7 +446,14 @@ const char *scfFactory::QueryClassID ()
 //------------------------------------ Implementation of csSCF functions ----//
 
 SCF_IMPLEMENT_IBASE (csSCF);
-  SCF_IMPLEMENTS_INTERFACE (iSCF);
+  /// @@@ plain IMPL_INTF calls the ref tracker,  problematic
+  SCF_IMPLEMENTS_INTERFACE_COMMON (iSCF, this) 
+#ifdef CS_REF_TRACKER
+    if (refTracker) 
+    { 
+      SCF_IMPLEMENTS_INTERFACE_COMMON (iRefTracker, refTracker); 
+    }
+#endif
 SCF_IMPLEMENT_IBASE_END;
 
 static void scfScanPlugins (csPluginPaths* pluginPaths, const char* context)
@@ -522,12 +536,20 @@ void scfInitialize (int argc, const char* const argv[])
   delete pluginPaths;
 }
 
-
-csSCF::csSCF ()
+			       
+csSCF::csSCF () : 
+#ifdef CS_REF_TRACKER
+  refTracker(0), 
+#endif
+  scfRefCount(1), scfWeakRefOwners(0), scfParent(0)
 {
   SCF = PrivateSCF = this;
 #ifdef CS_DEBUG
   object_reg = 0;
+#endif
+
+#ifdef CS_REF_TRACKER
+  refTracker = new csRefTracker();
 #endif
 
   if (!ClassRegistry)
@@ -554,6 +576,11 @@ csSCF::~csSCF ()
   LibraryRegistry = 0;
 #endif
 
+  mutex = 0;
+#ifdef CS_REF_TRACKER
+  refTracker->Report ();
+  delete refTracker;
+#endif
   SCF = PrivateSCF = 0;
 }
 
@@ -924,6 +951,17 @@ char const* csSCF::GetInterfaceName (scfInterfaceID i) const
 
 scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)
 {
+#ifdef CS_REF_TRACKER
+  /*
+    Bit of a hack: when 'mutex' is assigned, this very function
+    is called (to get the iRefTracker id). So mutex is 0 in this
+    case, we need to test for that.
+   */
+  if (!mutex)
+  {
+    return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
+  }
+#endif
   csScopedMutexLock lock (mutex);
   return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
 }

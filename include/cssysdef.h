@@ -567,9 +567,11 @@ Type &Class::getterFunc ()                                                      
 // defines its own 'new' operator, since this version will interfere with your
 // own.
 // CS_MEMORY_TRACKER is treated like CS_EXTENSIVE_MEMDEBUG here.
+// Same for CS_REF_TRACKER.
 #ifndef CS_DEBUG
 #  undef CS_EXTENSIVE_MEMDEBUG
 #  undef CS_MEMORY_TRACKER
+#  undef CS_REF_TRACKER
 #else
 #  if defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_MEMORY_TRACKER)
 #    error Do not use CS_EXTENSIVE_MEMDEBUG and CS_MEMORY_TRACKER at the same time!

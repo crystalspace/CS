@@ -125,7 +125,7 @@ bool csWindowsJoystick::HandleEvent (iEvent &)
 
 BOOL CALLBACK DIEnumDevicesCallback(
   LPCDIDEVICEINSTANCE lpddi,  
-  LPVOID pvRef  )
+  LPVOID pvRef)
 {
   csWindowsJoystick* po;
   po = (csWindowsJoystick*) pvRef;

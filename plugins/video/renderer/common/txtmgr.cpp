@@ -252,8 +252,6 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
     {
 #ifndef CS_USE_NEW_RENDERER
       texture_layers[i] = *(material->GetTextureLayer (i));
-#else
-      texture_layers[i] = 0;
 #endif
       texture_layer_translate[i] =
 	texture_layers[i].uscale != 1 ||

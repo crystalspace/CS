@@ -6,6 +6,21 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Feb-2004
+	- res made the following changes:
+	    - A few minor cosmetic changes.
+	    - In the common texture manager code, 0 was assigned to a struct 
+	      in NR builds.
+	    - The iBase implementation of csGenericRenderStepFactory 
+	      errorneously used SCF_IMPLEMENT_EMBEDDED_IBASE_END instead of 
+	      SCF_IMPLEMENT_IBASE_END.
+	    - Enabled RTTI for VC debug builds.
+	    - Commented out "RTTI enabled" #error in opcode.
+	    - Added an interface to obtain call stacks.
+	    - Added an call stack implementation for Win32. Pretty much only
+	      supports VC debug symbols atm, tho.
+	    - Added a mechanism to track where interfaces and references are 
+	      increased resp. decreased.
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:

@@ -51,4 +51,6 @@
   #define CS_PLATFORM_IS_64BITS
 #endif
 
+//#define CS_REF_TRACKER
+
 #endif // __CS_WIN32_VOLATILE_H__

@@ -50,6 +50,7 @@ class csSoundRenderSoftware : public iSoundRender
     virtual void IncRef () {count++;}
     virtual void DecRef () {if (--count == 0) delete this;}
     virtual void Run () {sr->ThreadedMix ();}
+    virtual int GetRefCount () { return count; }
   };
   friend class MixerRunnable;
 

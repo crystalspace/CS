@@ -30,6 +30,35 @@ template <class T> class csRef;
 #  undef CS_TEST_VOIDPTRUSAGE
 #endif
 
+#ifdef CS_REF_TRACKER
+ #include <typeinfo>
+ #include "csutil/reftrackeraccess.h"
+
+ #define CSREF_TRACK(x, cmd, refCount, obj, tag)    \
+  {						    \
+    const int rc = obj ? refCount : -1;		    \
+    if (obj) cmd;				    \
+    if (obj)					    \
+    {						    \
+      csRefTrackerAccess::SetDescription (obj,	    \
+	typeid(T).name());			    \
+      csRefTrackerAccess::Match ## x (obj, rc, tag);\
+    }						    \
+  }
+ #define CSREF_TRACK_INCREF(obj,tag)	\
+  CSREF_TRACK(IncRef, obj->IncRef(), obj->GetRefCount(), obj, tag);
+ #define CSREF_TRACK_DECREF(obj,tag)	\
+  CSREF_TRACK(DecRef, obj->DecRef(), obj->GetRefCount(), obj, tag);
+ #define CSREF_TRACK_ASSIGN(obj,tag)	\
+  CSREF_TRACK(IncRef, (0), obj->GetRefCount() - 1, obj, tag);
+#else
+ #define CSREF_TRACK_INCREF(obj,tag) \
+  if (obj) obj->IncRef();
+ #define CSREF_TRACK_DECREF(obj,tag) \
+  if (obj) obj->DecRef();
+ #define CSREF_TRACK_ASSIGN(obj,tag)
+#endif
+
 /**
  * A normal pointer. This class should ONLY be used for functions
  * returning pointers that are already IncRef()'ed for the caller.
@@ -48,10 +77,13 @@ private:
   T* obj;
 
 public:
-  csPtr (T* p) : obj (p) { }
+  csPtr (T* p) : obj (p) { CSREF_TRACK_ASSIGN(obj, this); }
 
   template <class T2>
-  explicit csPtr (csRef<T2> const& r) : obj((T2*)r) { if (obj) obj->IncRef(); }
+  explicit csPtr (csRef<T2> const& r) : obj((T2*)r) 
+  { 
+    CSREF_TRACK_INCREF (obj, this);
+  }
 
 #ifdef CS_TEST_VOIDPTRUSAGE
   ~csPtr ()
@@ -116,8 +148,7 @@ public:
    */
   csRef (T* newobj) : obj (newobj)
   {
-    if (obj)
-      obj->IncRef ();
+    CSREF_TRACK_INCREF (obj, this);
   }
   
   /**
@@ -125,8 +156,7 @@ public:
    */
   csRef (csRef const& other) : obj (other.obj)
   {
-    if (obj)
-      obj->IncRef ();
+    CSREF_TRACK_INCREF (obj, this);
   }
 
   /**
@@ -134,8 +164,7 @@ public:
    */
   ~csRef ()
   {
-    if (obj)
-      obj->DecRef ();
+    CSREF_TRACK_DECREF (obj, this);
   }
 
   /**
@@ -158,8 +187,7 @@ public:
     // The following line is outside the ifdef to make sure
     // we have binary compatibility.
     ((csPtr<T>&)newobj).obj = (T*)CS_VOIDED_PTR;
-    if (oldobj)
-      oldobj->DecRef ();
+    CSREF_TRACK_DECREF (oldobj, this);
     return *this;
   }
 
@@ -185,10 +213,8 @@ public:
       // it is easy to get in infinite loops with objects being
       // destructed forever (when ref=0 is used for example).
       obj = newobj;
-      if (newobj)
-	newobj->IncRef ();
-      if (oldobj)
-	oldobj->DecRef ();
+      CSREF_TRACK_INCREF (newobj, this);
+      CSREF_TRACK_DECREF (oldobj, this);
     }
     return *this;
   }
@@ -283,5 +309,9 @@ public:
   bool IsValid () const
   { return (obj != 0); }
 };
+
+#undef CSREF_TRACK_INCREF
+#undef CSREF_TRACK_DECREF
+#undef CSREF_TRACK_ASSIGN
 
 #endif // __CS_REF_H__

@@ -38,6 +38,7 @@
 				ProgramDataBaseFileName=".\csrelease\temp\%project%/%project%.pdb"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems=""
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -57,7 +58,8 @@
 				SubSystem="2"
 				OptimizeReferences="1"
 				ImportLibrary=".\csrelease\temp\%project%/%project%.lib"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				BaseAddress="%base%" />
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -102,6 +104,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;WIN32_VOLATILE;__CRYSTAL_SPACE__;CS_DEBUG;CS_STRICT_SMART_POINTERS"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
+				RuntimeTypeInfo="TRUE"
 				PrecompiledHeaderFile=".\csdebug\temp\%project%/%project%.pch"
 				AssemblerListingLocation=".\csdebug\temp\%project%/"
 				ObjectFile=".\csdebug\temp\%project%/"
@@ -110,6 +113,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"
+				Detect64BitPortabilityProblems=""
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -129,7 +133,8 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				ProgramDatabaseFile=".\csdebug\temp\%project%/%project%.pdb"
 				SubSystem="2"
 				ImportLibrary=".\csdebug\temp\%project%/%project%.lib"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				BaseAddress="%base%" />
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -174,6 +179,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;WIN32_VOLATILE;__CRYSTAL_SPACE__;CS_DEBUG;CS_EXTENSIVE_MEMDEBUG;CS_STRICT_SMART_POINTERS"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
+				RuntimeTypeInfo="TRUE"
 				PrecompiledHeaderFile=".\csmemdbg\temp\%project%/%project%.pch"
 				AssemblerListingLocation=".\csmemdbg\temp\%project%/"
 				ObjectFile=".\csmemdbg\temp\%project%/"
@@ -182,6 +188,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"
+				Detect64BitPortabilityProblems=""
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -201,7 +208,8 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				ProgramDatabaseFile=".\csmemdbg\temp\%project%/%project%.pdb"
 				SubSystem="2"
 				ImportLibrary=".\csmemdbg\temp\%project%/%project%.lib"
-				TargetMachine="1"/>
+				TargetMachine="1"
+				BaseAddress="%base%" />
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -322,6 +330,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;WIN32_VOLATILE;__CRYSTAL_SPACE__;CS_DEBUG;CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
+				RuntimeTypeInfo="TRUE"
 				PrecompiledHeaderFile=".\csdebug\temp\%project%/%project%.pch"
 				AssemblerListingLocation=".\csdebug\temp\%project%/"
 				ObjectFile=".\csdebug\temp\%project%/"

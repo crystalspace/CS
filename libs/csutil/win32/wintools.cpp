@@ -23,7 +23,8 @@
 #include <windows.h>
 #include "csutil/win32/wintools.h"
 
-struct _WinVersion {
+struct _WinVersion 
+{
   bool IsWinNT;
 
   _WinVersion()

@@ -141,14 +141,42 @@ void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)
   return ptr;
 }
 
+#if (defined(CS_EXTENSIVE_MEMDEBUG) && defined(COMP_VC)) || \
+  defined(CS_MEMORY_TRACKER) || defined(CS_REF_TRACKER)
+/*
+  Lazily unload libs - Because if unloading happens immediately,
+  the source file information for leaked objects would get lost.
+  But unload them nevertheless so memory checker don't report leaked
+  handles.
+  Similar for reftracking - but here it's debug symbols.
+ */
+#define LAZY_UNLOAD
+
+struct LazyUnloader
+{
+  csArray<HMODULE> modules;
+
+  LazyUnloader() {}
+  ~LazyUnloader()
+  {
+    for (int i = 0; i < modules.Length(); i++)
+    {
+      FreeLibrary (modules[i]);
+    }
+  }
+};
+
+static LazyUnloader lazyUnloader;
+
+#endif
+
 bool csUnloadLibrary (csLibraryHandle Handle)
 {
-#if (defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)) && defined(COMP_VC)
-  // Why not? - Because the source file information
-  // for leaked objects would get lost
+#ifdef LAZY_UNLOAD
+  lazyUnloader.modules.Push ((HMODULE)Handle);
   return true;
 #else
-  return FreeLibrary ((HMODULE)Handle)!=0;
+  return FreeLibrary ((HMODULE)Handle) != 0;
 #endif
 }
 
