@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/param.h>
 
 #include "sysdef.h"
 #include "cs2d/openglbe/glbe2d.h"
@@ -43,11 +44,11 @@ CrystGLView::~CrystGLView(){}
 
 void CrystGLView::KeyDown(const char *bytes, int32 numBytes)
 {
-printf("got a key\n");
+// printf("got a key\n");
 	if(numBytes == 1) {
 		doKey((int)*bytes, true);
 	} else if(numBytes == 2 && bytes[0]==B_FUNCTION_KEY) {
-		printf("got a function key=%x\n",bytes[1]);
+//		printf("got a function key=%x\n",bytes[1]);
 	}
 }
 
@@ -80,7 +81,7 @@ void CrystGLView::MouseMoved(BPoint point, uint32 transit, const BMessage *messa
 
 void CrystGLView::MouseDown(BPoint point)
 {
-printf("got a mouse\n");
+// printf("got a mouse\n");
 	uint32 buttons;
 	BPoint p;
 	uint32 kinfo = modifiers();
@@ -160,7 +161,6 @@ CrystGLWindow::~CrystGLWindow()
 
 bool CrystGLWindow::QuitRequested()
 {
-	status_t exit_value;
 	bool sys_shutdown;
 	
 	pi_BeG2D->system->GetShutdown(sys_shutdown);
@@ -184,6 +184,7 @@ bool CrystGLWindow::QuitRequested()
 	// but don't destroy the window till LoopThread has had a chance to finish!
 	pi_BeG2D->system->Shutdown();
 	Unlock();//dh: will this allow things to finish?
+	status_t exit_value;
 	wait_for_thread(find_thread("LoopThread"), &exit_value);
 	Lock();//dh: BWindows insist that the window is locked before blowing it away.
 	

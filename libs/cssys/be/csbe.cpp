@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <Beep.h>
+#include <sys/param.h>
 
 #include "sysdef.h"
 #include "cssys/common/system.h"
@@ -124,7 +125,7 @@ bool CrystApp::QuitRequested()
 	snooze(200000);
 	err_code = wait_for_thread(find_thread("LoopThread"), &exit_value);//put in because I have moved drawing into that thread.
 	
-	printf("LoopThread blown away. err code is %x \n");
+	printf("LoopThread blown away. err code is %lx \n", err_code);
 	return(TRUE);
 }
 
@@ -152,7 +153,7 @@ void CrystApp::MessageReceived(BMessage *msg)
 //	bigtime_t	time = system_time();
 //	bigtime_t pre_draw_microsecs, post_draw_microsecs;//dhdebug
 //	static long prev_frame_time = csSystemDriver::Time();//dhdebug
-	long curr_time;//dhdebug
+//	long curr_time;//dhdebug
 //	printf("got something %4s\n",&msg->what);
 	switch(msg->what) {
 	// Switch between full-screen mode and windowed mode.
@@ -304,6 +305,11 @@ void SysSystemDriver::SysFocusChange (void *Self, int Enable)
     ((SysSystemDriver *)Self)->do_focus (Enable);
 }
 
+static int32 begin_loop(void* data)
+{
+  return ((SysSystemDriver*)data)->LoopThread();
+}
+
 // System loop !
 void SysSystemDriver::Loop(void)
 {
@@ -324,7 +330,7 @@ void SysSystemDriver::Loop(void)
 
 	if(firstRun) {
 		firstRun = false;
-		my_thread = spawn_thread(SysSystemDriver::LoopThread, "LoopThread",
+		my_thread = spawn_thread(begin_loop, "LoopThread",
 							 B_DISPLAY_PRIORITY, (void*)this);
 		resume_thread(my_thread);
 //		app->SetPulseRate(1000000/reqfps);//dhdebug
@@ -476,17 +482,15 @@ bool ModuleIsStopping ()
 
 
 // This is the thread doing the loop itself.
-long SysSystemDriver::LoopThread(void *data)
+long SysSystemDriver::LoopThread()
 {
-	bigtime_t			delay;
-	static bigtime_t	prev_frame = csSystemDriver::Time();
+//	bigtime_t			delay;
+	static bigtime_t	prev_frame = Time();
 	bigtime_t			curr_time;
-	SysSystemDriver		*sys;
-	bool				*fConnected, *fConnectionDisabled;
-	bool	shutdown = false;
+//	SysSystemDriver		*sys = this;
+//	bool				*fConnected, *fConnectionDisabled;
+//	bool	shutdown = false;
 	
-	// receive a pointer to the CrystWindow object.
-	sys = (SysSystemDriver*)data;
 	snooze(100000);
 	
 	// initialise pointer-pointers
@@ -511,12 +515,12 @@ long SysSystemDriver::LoopThread(void *data)
 		//acquire_sem(w->drawing_lock);
 //		app->PostMessage('next');//dhdebug
 //		printf("LoopThread: NextFrame executing\n");
-		curr_time = csSystemDriver::Time();
+		curr_time = Time();
 		before = curr_time;
 		/*driver->*/NextFrame(curr_time - prev_frame, curr_time);
-		after = csSystemDriver::Time();
+		after = Time();
 		render_time = (after - before);
-		printf ("render time is %d milliseconds.\n", render_time);
+//		printf ("render time is %d milliseconds.\n", render_time);
 		prev_frame=curr_time;
 //		if(be_app->Lock()) {
 //			shutdown = sys->Shutdown;
@@ -535,5 +539,3 @@ long SysSystemDriver::LoopThread(void *data)
 	printf("LoopThread: Shutdown detected.\n");//dh
 	return 0;
 }
-
-		

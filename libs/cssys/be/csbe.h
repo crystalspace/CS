@@ -52,7 +52,7 @@ public:
   // Display system-specific help
   virtual void Help ();
 
-  long LoopThread(void *data);
+  long LoopThread();
 
   /// Implementation of IBeLibSystemDriver
   class XBeLibSystemDriver : public IBeLibSystemDriver

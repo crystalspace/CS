@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/param.h>
 #include "sysdef.h"
 #include "cs2d/be/belibg2d.h"
 #ifndef CRYST_WINDOW_H
@@ -39,7 +40,7 @@ void CrystView::KeyDown(const char *bytes, int32 numBytes)
 	if(numBytes == 1) {
 		doKey((int)*bytes, true);
 	} else if(numBytes == 2 && bytes[0]==B_FUNCTION_KEY) {
-		printf("got a function key=%x\n",bytes[1]);
+//		printf("got a function key=%x\n",bytes[1]);
 	}
 }
 
@@ -126,7 +127,7 @@ CrystWindow::CrystWindow(BRect frame, const char *name, CrystView *theview, csGr
 	
 	HRESULT hRes = piBeG2D->QueryInterface ((REFIID)IID_IBeLibGraphicsInfo, (void**)&piG2D);
 	if (SUCCEEDED(hRes))	{
-		printf("piBeG2D->QueryInterface succeeded \n");
+//		printf("piBeG2D->QueryInterface succeeded \n");
 	}
 
 	view->SetViewColor(0, 0, 0);// remove for direct framebuffer access
@@ -172,7 +173,7 @@ void CrystWindow::MessageReceived(BMessage *message)
 
 void CrystWindow::DirectConnected(direct_buffer_info *info)
 {
-printf("Entered CrystWindow::DirectConnected \n");
+//printf("Entered CrystWindow::DirectConnected \n");
 //HRESULT hRes = piG2D->DirectConnect(info);//dh:uncomment this to get direct framebuffer access
 
 //	this bit just keeps conventional window behaviour until I've sorted out DirectConnected

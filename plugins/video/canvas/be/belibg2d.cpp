@@ -18,6 +18,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <sys/param.h>
 #include "sysdef.h"
 #include "cscom/com.h"
 #include "cs2d/be/belibg2d.h"
@@ -71,10 +72,6 @@ csGraphics2DBeLib::~csGraphics2DBeLib(void)
 
 void csGraphics2DBeLib::Initialize ()
 {
-
-//  color_space curr_color_space;
-  unsigned long RedMask, GreenMask, BlueMask;
-  
   // this sets system parameters (screen size, "depth", fullscreen mode, default pixelformats)
   csGraphics2D::Initialize();
 

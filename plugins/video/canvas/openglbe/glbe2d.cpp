@@ -17,6 +17,7 @@
 */
 
 #include <stdarg.h>
+#include <sys/param.h>
 #include "sysdef.h"
 #include "cs2d/openglbe/glbe2d.h"
 #include "cs3d/opengl/ogl_txtmgr.h"  //dh: is this needed?
@@ -249,9 +250,8 @@ void csGraphics2DGLBe::SetRGB(int i, int r, int g, int b)
 */	//dh: moved into glcommon2d.cpp
 void csGraphics2DGLBe::ProcessEvents (void *Param)
 {
-  csGraphics2DGLBe *Self = (csGraphics2DGLBe *)Param;
-printf("Events...\n");
 #if 0
+  csGraphics2DGLBe *Self = (csGraphics2DGLBe *)Param;
   XEvent event;
   int state, key;
   bool down;
