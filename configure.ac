@@ -1205,7 +1205,7 @@ CS_CHECK_BUILD([for DirectX], [cs_cv_libdirectx],
 	[DirectDrawCreate(0,0,0); 
 	 DirectSoundCreate(0,0,0); 
 	 DirectInputCreate(0,0,0,0)])],
-    [CS_CREATE_TUPLE([],[],[-lddraw -ldsound -ldinput -ldxguid]) \
+    [CS_CREATE_TUPLE([],[],[-lddraw -ldsound -ldinput]) \
     CS_CREATE_TUPLE([-I/usr/include/directx],[],[-lddraw -ldsound -ldinput])], 
     [], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx], [DIRECTX])])
 

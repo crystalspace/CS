@@ -21808,7 +21808,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput -ldxguid | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
     `echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
     do
 
@@ -21968,7 +21968,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput -ldxguid | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
     `echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
     do
 

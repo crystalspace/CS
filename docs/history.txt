@@ -21,6 +21,8 @@ chronological order.
 	  csplugincommon/renderstep/parserenderstep.h.
 	- Eric Sunshine fixed problem in csutil/win32/callstack.cpp where it
 	  failed to compile with MSVC6 on account of missing ULONG_PTR type.
+	- res fixed the missing IID_ symbols on MinGW by having 
+	  csplugincommon_dx provide them via INITGUID.
 23-Feb-2005
 	- res moved the code from the various "common" libraries into a
 	  library "csplugincommon" (and libraries with Win32, OpenGL and

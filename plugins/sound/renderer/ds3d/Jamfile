@@ -4,7 +4,7 @@ if $(DIRECTX.AVAILABLE) = "yes"
 {
 Description sndds3d : "DirectSound 3D sound renderer" ;
 Plugin sndds3d : [ Wildcard *.cpp *.h ] ;
-LinkWith sndds3d : csplugincommon csgeom csutil ;
+LinkWith sndds3d : csplugincommon csplugincommon_dx csgeom csutil ;
 ExternalLibs sndds3d : DIRECTX ;
 CompileGroups sndds3d : sounddrivers ;
 }
