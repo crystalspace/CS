@@ -64,6 +64,7 @@
 #include "ivideo/effects/eftech.h"
 #include "ivideo/effects/efpass.h"
 #include "ivideo/effects/eflayer.h"
+#include "effectdata.h"
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
@@ -5574,10 +5575,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   SetClientStates( CS_CLIENTSTATE_ALL );
 
-  ////////////////////////////////////////////////
-  // MASSIVE IF STATEMENTS DEAD AHEAD, CAPTAIN! //
-  ////////////////////////////////////////////////
+	///@@@EXPERIMENTAL!!
+	///CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Mårten Svanfeldt
 
+	
   int maxlayers = 0;
   for( int p=0; p<technique->GetPassCount(); p++ )
   {
@@ -5586,67 +5587,66 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     iEffectPass* pass = technique->GetPass(p);
     csStringID string;
 
+		//get rendererdata to use
+		csRef<csOpenGlEffectPassData> pass_data = SCF_QUERY_INTERFACE(pass->GetRendererData(), csOpenGlEffectPassData);
+
     if( p == 0 )
         SetGLZBufferFlags (z_buf_mode);
     else if( p == 1 )
         SetGLZBufferFlagsPass2 (z_buf_mode, true);
 
-    string = pass->GetStateString( csEffectStrings::blending );
-    if( string != csInvalidStringID )
-    {
-      if( string == csEffectStrings::enabled ) 
-      {
-        statecache->EnableState( GL_BLEND );
+		if( pass_data->vertex_program > 0)
+		{
+			///@@@HACK.. THESE SHOULD BE CHANEGD
+			glTrackMatrixNV( GL_VERTEX_PROGRAM_NV, 0, GL_MODELVIEW_PROJECTION_NV, GL_IDENTITY_NV );
+			csEffectVector4 vec;
+			//set all constants
+			vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_1);
+			glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 4, vec.x, vec.y, vec.z, vec.w );
 
-        string = pass->GetStateString( csEffectStrings::source_blend_mode );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::destination_color ) sblend = GL_DST_COLOR;
-          else if( string == csEffectStrings::inverted_destination_color ) sblend = GL_ONE_MINUS_DST_COLOR;
-          else if( string == csEffectStrings::source_alpha ) sblend = GL_SRC_ALPHA;
-          else if( string == csEffectStrings::inverted_source_alpha ) sblend = GL_ONE_MINUS_SRC_ALPHA;
-          else if( string == csEffectStrings::destination_alpha ) sblend = GL_DST_ALPHA;
-          else if( string == csEffectStrings::inverted_destination_alpha ) sblend = GL_ONE_MINUS_DST_ALPHA;
-          else if( string == csEffectStrings::saturated_source_alpha ) sblend = GL_SRC_ALPHA_SATURATE;
-          else if( string == csEffectStrings::one ) sblend = GL_ONE;
-          else if( string == csEffectStrings::zero ) sblend = GL_ZERO;
-        }
-        string = pass->GetStateString( csEffectStrings::destination_blend_mode );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::source_color ) dblend = GL_SRC_COLOR;
-          else if( string == csEffectStrings::inverted_source_color ) dblend = GL_ONE_MINUS_SRC_COLOR;
-          else if( string == csEffectStrings::source_alpha ) dblend = GL_SRC_ALPHA;
-          else if( string == csEffectStrings::inverted_source_alpha ) dblend = GL_ONE_MINUS_SRC_ALPHA;
-          else if( string == csEffectStrings::destination_alpha ) dblend = GL_DST_ALPHA;
-          else if( string == csEffectStrings::inverted_destination_alpha ) dblend = GL_ONE_MINUS_DST_ALPHA;
-          else if( string == csEffectStrings::one ) dblend = GL_ONE;
-          else if( string == csEffectStrings::zero ) dblend = GL_ZERO;
-        }
-        statecache->SetBlendFunc( sblend, dblend );
-      }
-      else statecache->DisableState( GL_BLEND );
+			vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_2);
+			glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 5, vec.x, vec.y, vec.z, vec.w );
+
+			vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_3);
+			glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 6, vec.x, vec.y, vec.z, vec.w );
+
+			vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_4);
+			glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 7, vec.x, vec.y, vec.z, vec.w );
+
+			vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_5);
+			glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 8, vec.x, vec.y, vec.z, vec.w );
+
+			vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_6);
+			glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 9, vec.x, vec.y, vec.z, vec.w );
+
+			vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_7);
+			glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 10, vec.x, vec.y, vec.z, vec.w );
+
+			vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_8);
+			glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 11, vec.x, vec.y, vec.z, vec.w );
+
+			vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_9);
+			glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 12, vec.x, vec.y, vec.z, vec.w );
+
+			vec = pass->GetStateVector4(csEffectStrings::nvvertex_const_10);
+			glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV, 13, vec.x, vec.y, vec.z, vec.w );
+
+			glBindProgramNV( GL_VERTEX_PROGRAM_NV, pass_data->vertex_program );
+			glEnable( GL_VERTEX_PROGRAM_NV);
+		}
+
+    if( pass_data->doblending )
+    {
+      statecache->EnableState( GL_BLEND );
+      statecache->SetBlendFunc( pass_data->sblend, pass_data->dblend );
     } else statecache->DisableState( GL_BLEND );
     
-    string = pass->GetStateString( csEffectStrings::shade_mode );
-    if( string != csInvalidStringID )
+    statecache->SetShadeModel( pass_data->shade_state );
+    
+		if( pass_data->vcsource == ED_VC_SOURCE_FOG )
     {
-      if( string == csEffectStrings::flat ) statecache->SetShadeModel( GL_FLAT );
-      else statecache->SetShadeModel( GL_SMOOTH );
-    } else statecache->SetShadeModel( GL_SMOOTH );
-
-    string = pass->GetStateString( csEffectStrings::vertex_color_source );
-    if( string != csInvalidStringID )
-    {
-      if( string == csEffectStrings::fog )
-      {
-        glColorPointer (3, GL_FLOAT, sizeof(G3DFogInfo), & work_fog[0].r);
-        glEnableClientState(GL_COLOR_ARRAY);
-      } else if( string == csEffectStrings::mesh )
-      {
-        glColorPointer (3, GL_FLOAT, 0, & work_colors[0]);
-        glEnableClientState(GL_COLOR_ARRAY);
-      }
+      glColorPointer (3, GL_FLOAT, sizeof(G3DFogInfo), & work_fog[0].r);
+      glEnableClientState(GL_COLOR_ARRAY);
     } else {
       glColorPointer (3, GL_FLOAT, 0, & work_colors[0]);
       glEnableClientState(GL_COLOR_ARRAY);
@@ -5657,10 +5657,12 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     for( l=0; l<pass->GetLayerCount(); l++ )
     {
       iEffectLayer* layer = pass->GetLayer(l);
+			
+			csRef<csOpenGlEffectLayerData> layer_data = SCF_QUERY_INTERFACE(layer->GetRendererData(), csOpenGlEffectLayerData);
 
-      int colorsource[4] = { GL_PREVIOUS_ARB, GL_TEXTURE, -1, -1 };
-      int colormod[4] = { GL_SRC_COLOR, GL_SRC_COLOR, GL_SRC_COLOR, GL_SRC_COLOR };
-      int colorop = GL_MODULATE;
+      //int colorsource[4] = { GL_PREVIOUS_ARB, GL_TEXTURE, -1, -1 };
+      //int colormod[4] = { GL_SRC_COLOR, GL_SRC_COLOR, GL_SRC_COLOR, GL_SRC_COLOR };
+      //int colorop = GL_MODULATE;
       int alphasource[4] = { GL_PREVIOUS_ARB, GL_TEXTURE, -1, -1 };
       int alphamod[4] = { GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA };
       int alphaop = GL_MODULATE;
@@ -5671,22 +5673,16 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
         glClientActiveTextureARB( GL_TEXTURE0_ARB + l );
       }
 
-      string = layer->GetStateString( csEffectStrings::constant_color_source );
-      if( string != csInvalidStringID )
+      if( layer_data->ccsource == ED_SOURCE_FOG )
       {
         //float tmp[4] = {1, 0, 0, 1};
-        if( string == csEffectStrings::fog )
-          glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, & work_fog[0].r );
+        glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, & work_fog[0].r );
       }
 
-      string = layer->GetStateString( csEffectStrings::texture_coordinate_source );
-      if( string != csInvalidStringID )
+      if( layer_data->vcord_source == ED_SOURCE_FOG )
       {
-        if( string == csEffectStrings::fog )
-        {
           glTexCoordPointer (2, GL_FLOAT, sizeof(G3DFogInfo), &work_fog[0].intensity);
           glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        }
       } else {
         glTexCoordPointer (2, GL_FLOAT, 0, mesh.buffers[0]->GetTexels());
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -5695,33 +5691,20 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       GLuint texturehandle = 0;
       iTextureHandle* txt_handle = NULL;
 
-      int inputtex = 0;
-
-      string = layer->GetStateString( csEffectStrings::texture_source );
-      if( string != csInvalidStringID )
-      {
-        if( string == csEffectStrings::fog ) 
-          inputtex = -1;
-      }
-      else
-      {
-	// @@@ This is suspicious: inputtex is int but routine returns float?
-	inputtex = (int)layer->GetStateFloat( csEffectStrings::texture_source );
-      }
-      
-      if( inputtex==-1 )
+            
+      if( layer_data->inputtex==-1 )
       {
         statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
         statecache->EnableState (GL_TEXTURE_2D, l);
       }
-      else if( inputtex==1 )
+      else if( layer_data->inputtex==1 )
       {
         CacheTexture (mesh.mat_handle);
         txt_handle = mesh.mat_handle->GetTexture ();
       }
-      else if( inputtex-2<((csMaterialHandle*)mesh.mat_handle)->GetTextureLayerCount()) 
+      else if( layer_data->inputtex-2<((csMaterialHandle*)mesh.mat_handle)->GetTextureLayerCount()) 
       {
-        csTextureLayer* lay = ((csMaterialHandle*)mesh.mat_handle)->GetTextureLayer (inputtex-2);
+        csTextureLayer* lay = ((csMaterialHandle*)mesh.mat_handle)->GetTextureLayer (layer_data->inputtex-2);
         txt_handle = lay->txt_handle;
       }
 
@@ -5737,149 +5720,36 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
       if (ARB_texture_env_combine || EXT_texture_env_combine)
       {
-        string = layer->GetStateString( csEffectStrings::color_source_1 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::vertex_color ) colorsource[0] = GL_PRIMARY_COLOR_ARB;
-          else if( string == csEffectStrings::texture_color ) colorsource[0] = GL_TEXTURE;
-          else if( string == csEffectStrings::constant_color ) colorsource[0] = GL_CONSTANT_ARB;
-          else if( string == csEffectStrings::previous_layer_color ) colorsource[0] = GL_PREVIOUS_ARB;
-        }
-        string = layer->GetStateString( csEffectStrings::color_source_modifier_1 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::source_color ) colormod[0] = GL_SRC_COLOR;
-          else if( string == csEffectStrings::inverted_source_color ) colormod[0] = GL_ONE_MINUS_SRC_COLOR;
-          else if( string == csEffectStrings::source_alpha ) colormod[0] = GL_SRC_ALPHA;
-          else if( string == csEffectStrings::inverted_source_alpha ) colormod[0] = GL_ONE_MINUS_SRC_ALPHA;
-        }
-        string = layer->GetStateString( csEffectStrings::color_source_2 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::vertex_color ) colorsource[1] = GL_PRIMARY_COLOR_ARB;
-          else if( string == csEffectStrings::texture_color ) colorsource[1] = GL_TEXTURE;
-          else if( string == csEffectStrings::constant_color ) colorsource[1] = GL_CONSTANT_ARB;
-          else if( string == csEffectStrings::previous_layer_color ) colorsource[1] = GL_PREVIOUS_ARB;
-        }
-        string = layer->GetStateString( csEffectStrings::color_source_modifier_2 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::source_color ) colormod[1] = GL_SRC_COLOR;
-          else if( string == csEffectStrings::inverted_source_color ) colormod[1] = GL_ONE_MINUS_SRC_COLOR;
-          else if( string == csEffectStrings::source_alpha ) colormod[1] = GL_SRC_ALPHA;
-          else if( string == csEffectStrings::inverted_source_alpha ) colormod[1] = GL_ONE_MINUS_SRC_ALPHA;
-        }
-        string = layer->GetStateString( csEffectStrings::color_source_3 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::vertex_color ) colorsource[2] = GL_PRIMARY_COLOR_ARB;
-          else if( string == csEffectStrings::texture_color ) colorsource[2] = GL_TEXTURE;
-          else if( string == csEffectStrings::constant_color ) colorsource[2] = GL_CONSTANT_ARB;
-          else if( string == csEffectStrings::previous_layer_color ) colorsource[2] = GL_PREVIOUS_ARB;
-        }
-        string = layer->GetStateString( csEffectStrings::color_source_modifier_3 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::source_color ) colormod[2] = GL_SRC_COLOR;
-          else if( string == csEffectStrings::inverted_source_color ) colormod[2] = GL_ONE_MINUS_SRC_COLOR;
-          else if( string == csEffectStrings::source_alpha ) colormod[2] = GL_SRC_ALPHA;
-          else if( string == csEffectStrings::inverted_source_alpha ) colormod[2] = GL_ONE_MINUS_SRC_ALPHA;
-        }
-        string = layer->GetStateString( csEffectStrings::color_operation );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::use_source_1 ) colorop = GL_REPLACE;
-          else if( string == csEffectStrings::multiply ) colorop = GL_MODULATE;
-          else if( string == csEffectStrings::add ) colorop = GL_ADD;
-          else if( string == csEffectStrings::add_signed ) colorop = GL_ADD_SIGNED_ARB;
-          else if( string == csEffectStrings::subtract ) colorop = GL_SUBTRACT_ARB;
-          else if( string == csEffectStrings::interpolate ) colorop = GL_INTERPOLATE_ARB;
-          else if( string == csEffectStrings::dot_product ) colorop = GL_DOT3_RGB_ARB;
-          else if( string == csEffectStrings::dot_product_to_alpha ) colorop = GL_DOT3_RGBA_ARB;
-        }
-
-        string = layer->GetStateString( csEffectStrings::alpha_source_1 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::vertex_alpha ) alphasource[0] = GL_PRIMARY_COLOR_ARB;
-          else if( string == csEffectStrings::texture_alpha ) alphasource[0] = GL_TEXTURE;
-          else if( string == csEffectStrings::constant_alpha ) alphasource[0] = GL_CONSTANT_ARB;
-          else if( string == csEffectStrings::previous_layer_alpha ) alphasource[0] = GL_PREVIOUS_ARB;
-        }
-        string = layer->GetStateString( csEffectStrings::alpha_source_modifier_1 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::source_alpha ) colormod[0] = GL_SRC_ALPHA;
-          else if( string == csEffectStrings::inverted_source_alpha ) colormod[0] = GL_ONE_MINUS_SRC_ALPHA;
-        }
-        string = layer->GetStateString( csEffectStrings::alpha_source_2 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::vertex_alpha ) alphasource[1] = GL_PRIMARY_COLOR_ARB;
-          else if( string == csEffectStrings::texture_alpha ) alphasource[1] = GL_TEXTURE;
-          else if( string == csEffectStrings::constant_alpha ) alphasource[1] = GL_CONSTANT_ARB;
-          else if( string == csEffectStrings::previous_layer_alpha ) alphasource[1] = GL_PREVIOUS_ARB;
-        }
-        string = layer->GetStateString( csEffectStrings::alpha_source_modifier_2 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::source_alpha ) colormod[1] = GL_SRC_ALPHA;
-          else if( string == csEffectStrings::inverted_source_alpha ) colormod[1] = GL_ONE_MINUS_SRC_ALPHA;
-        }
-        string = layer->GetStateString( csEffectStrings::alpha_source_3 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::vertex_alpha ) alphasource[2] = GL_PRIMARY_COLOR_ARB;
-          else if( string == csEffectStrings::texture_alpha ) alphasource[2] = GL_TEXTURE;
-          else if( string == csEffectStrings::constant_alpha ) alphasource[2] = GL_CONSTANT_ARB;
-          else if( string == csEffectStrings::previous_layer_alpha ) alphasource[2] = GL_PREVIOUS_ARB;
-        }
-        string = layer->GetStateString( csEffectStrings::alpha_source_modifier_3 );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::source_alpha ) colormod[2] = GL_SRC_ALPHA;
-          else if( string == csEffectStrings::inverted_source_alpha ) colormod[2] = GL_ONE_MINUS_SRC_ALPHA;
-        }
-        string = layer->GetStateString( csEffectStrings::alpha_operation );
-        if( string != csInvalidStringID )
-        {
-          if( string == csEffectStrings::use_source_1 ) alphaop = GL_REPLACE;
-          else if( string == csEffectStrings::multiply ) alphaop = GL_MODULATE;
-          else if( string == csEffectStrings::add ) alphaop = GL_ADD;
-          else if( string == csEffectStrings::add_signed ) alphaop = GL_ADD_SIGNED_ARB;
-          else if( string == csEffectStrings::subtract ) alphaop = GL_SUBTRACT_ARB;
-          else if( string == csEffectStrings::interpolate ) alphaop = GL_INTERPOLATE_ARB;
-          else if( string == csEffectStrings::dot_product ) alphaop = GL_DOT3_RGB_ARB;
-          else if( string == csEffectStrings::dot_product_to_alpha ) alphaop = GL_DOT3_RGBA_ARB;
-        }
-
+       
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
         
-        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, colorsource[0]);
-        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, colormod[0]);
-        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, colorsource[1]);
-        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, colormod[1]);
-        if( colorsource[2] != -1 )
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, layer_data->colorsource[0]);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, layer_data->colormod[0]);
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, layer_data->colorsource[1]);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, layer_data->colormod[1]);
+        if( layer_data->colorsource[2] != -1 )
         {
-          glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, colorsource[2]);
-          glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, colormod[2]);
+          glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, layer_data->colorsource[2]);
+          glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, layer_data->colormod[2]);
         }
-        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, colorop);
+        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer_data->colorp );
         
-        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, alphasource[0]);
-        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, alphamod[0]);
-        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, alphasource[1]);
-        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, alphamod[1]);
-        if( colorsource[2] != -1 )
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, layer_data->alphasource[0]);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, layer_data->alphamod[0]);
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, layer_data->alphasource[1]);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, layer_data->alphamod[1]);
+        if( layer_data->colorsource[2] != -1 )
         {
-          glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA_ARB, alphasource[2]);
-          glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA_ARB, alphamod[2]);
+          glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA_ARB, layer_data->alphasource[2]);
+          glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA_ARB, layer_data->alphamod[2]);
         }
-        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, alphaop);
+        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer_data->alphap);
       }
     }
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
+			if(pass_data->vertex_program > 0)
+				glDisable(GL_VERTEX_PROGRAM_NV);
   }
   if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))
   {
@@ -7269,69 +7139,124 @@ bool csGraphics3DOGLCommon::IsLightmapOK (iPolygonTexture* poly_texture)
   return lightmap_cache->IsLightmapOK (poly_texture);
 }
 
+
+///@@@EXPERIMENTAL!!
+///CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Mårten Svanfeldt
 bool csGraphics3DOGLCommon::Validate (iEffectTechnique* technique)
 {
   int p, l;
   for( p=0; p<technique->GetPassCount(); p++ )
   {
+		csRef<csOpenGlEffectPassData> pass_data = new csOpenGlEffectPassData();
+
     iEffectPass* pass = technique->GetPass(p);
     csStringID pass_state = pass->GetFirstState();
     csStringID pass_statestring;
+		csStringID string;
+		
     while(pass_state != csInvalidStringID )
     {
       if( pass_state == csEffectStrings::blending )
       {
         pass_statestring = pass->GetStateString( pass_state );
-        if( (pass_statestring != csEffectStrings::enabled) &&
-            (pass_statestring != csEffectStrings::disabled) )
-          return false;
+				if( pass_statestring == csEffectStrings::enabled)
+					pass_data->doblending = true;
+				else if( pass_statestring == csEffectStrings::disabled)
+					pass_data->doblending = false;
+				else
+					return false;
+
       } else if( pass_state == csEffectStrings::shade_mode )
+			{
+        pass_statestring = pass->GetStateString( pass_state );
+				if(pass_statestring == csEffectStrings::flat)
+					pass_data->shade_state = GL_FLAT;
+				else if(pass_statestring == csEffectStrings::smooth)
+					pass_data->shade_state = GL_SMOOTH;
+				else
+					return false;
+			} else if( pass_state == csEffectStrings::source_blend_mode )
       {
         pass_statestring = pass->GetStateString( pass_state );
-        if( (pass_statestring != csEffectStrings::flat) &&
-            (pass_statestring != csEffectStrings::smooth) )
-          return false;
-      } else if( pass_state == csEffectStrings::source_blend_mode )
-      {
-        pass_statestring = pass->GetStateString( pass_state );
-        if( (pass_statestring != csEffectStrings::destination_color) &&
-            (pass_statestring != csEffectStrings::inverted_destination_color) &&
-            (pass_statestring != csEffectStrings::source_alpha) &&
-            (pass_statestring != csEffectStrings::inverted_source_alpha) &&
-            (pass_statestring != csEffectStrings::destination_alpha) &&
-            (pass_statestring != csEffectStrings::inverted_destination_alpha) &&
-            (pass_statestring != csEffectStrings::saturated_source_alpha) &&
-            (pass_statestring != csEffectStrings::one) &&
-            (pass_statestring != csEffectStrings::zero) )
-          return false;
+        if( pass_statestring == csEffectStrings::destination_color ) pass_data->sblend = GL_DST_COLOR;
+				else if( pass_statestring == csEffectStrings::inverted_destination_color ) pass_data->sblend = GL_ONE_MINUS_DST_COLOR;
+				else if( pass_statestring == csEffectStrings::source_alpha ) pass_data->sblend = GL_SRC_ALPHA;
+				else if( pass_statestring == csEffectStrings::inverted_source_alpha ) pass_data->sblend = GL_ONE_MINUS_SRC_ALPHA;
+				else if( pass_statestring == csEffectStrings::destination_alpha ) pass_data->sblend = GL_DST_ALPHA;
+				else if( pass_statestring == csEffectStrings::inverted_destination_alpha ) pass_data->sblend = GL_ONE_MINUS_DST_ALPHA;
+				else if( pass_statestring == csEffectStrings::saturated_source_alpha )pass_data->sblend = GL_SRC_ALPHA_SATURATE;
+				else if( pass_statestring == csEffectStrings::one ) pass_data->sblend = GL_ONE;
+				else if( pass_statestring == csEffectStrings::zero ) pass_data->sblend = GL_ZERO;
+				else return false;
       } else if( pass_state == csEffectStrings::destination_blend_mode )
       {
         pass_statestring = pass->GetStateString( pass_state );
-        if( (pass_statestring != csEffectStrings::source_color) &&
-            (pass_statestring != csEffectStrings::inverted_source_color) &&
-            (pass_statestring != csEffectStrings::source_alpha) &&
-            (pass_statestring != csEffectStrings::inverted_source_alpha) &&
-            (pass_statestring != csEffectStrings::destination_alpha) &&
-            (pass_statestring != csEffectStrings::inverted_destination_alpha) &&
-            (pass_statestring != csEffectStrings::one) &&
-            (pass_statestring != csEffectStrings::zero) )
-          return false;
-        break;
-        } else if( (pass_state == csEffectStrings::vertex_color_source) )
-        {
+				if( pass_statestring == csEffectStrings::source_color ) pass_data->dblend = GL_SRC_COLOR;
+				else if( pass_statestring == csEffectStrings::inverted_source_color ) pass_data->dblend = GL_ONE_MINUS_SRC_COLOR;
+				else if( pass_statestring == csEffectStrings::source_alpha ) pass_data->dblend = GL_SRC_ALPHA;
+				else if( pass_statestring == csEffectStrings::inverted_source_alpha ) pass_data->dblend = GL_ONE_MINUS_SRC_ALPHA;
+				else if( pass_statestring == csEffectStrings::destination_alpha ) pass_data->dblend = GL_DST_ALPHA;
+				else if( pass_statestring == csEffectStrings::inverted_destination_alpha ) pass_data->dblend = GL_ONE_MINUS_DST_ALPHA;
+				else if( pass_statestring == csEffectStrings::one ) pass_data->dblend = GL_ONE;
+				else if( pass_statestring == csEffectStrings::zero ) pass_data->dblend = GL_ZERO;
+				else return false;
+				break;
+			} else if( (pass_state == csEffectStrings::vertex_color_source) )
+			{
           pass_statestring = pass->GetStateString( pass_state );
-          if( (pass_statestring != csEffectStrings::fog) &&
-              (pass_statestring != csEffectStrings::mesh))
-            return false;
-      } else 
-        return false;
+					if(pass_statestring == csEffectStrings::fog)
+						pass_data->vcsource = ED_VC_SOURCE_FOG;
+					else if(pass_statestring == csEffectStrings::mesh)
+						pass_data->vcsource = ED_VC_SOURCE_MESH;
+					else return false;
+			} else if ( pass_state == csEffectStrings::nvvertex_program_gl )
+			{
+				if( (!NV_vertex_program) || !(glBindProgramNV && 
+																			glGenProgramsNV && 
+																			glDeleteProgramsNV &&
+																			glLoadProgramNV))
+          return false;
+				csStringID vp_s = pass->GetStateString(pass_state);
+				unsigned char* vp;
+				if(vp_s != csInvalidStringID)
+				{
+					//get a program 
+					vp = (unsigned char*)effectserver->RequestString(vp_s);
+				}else
+				{
+					vp = (unsigned char*)pass->GetStateOpaque(pass_state);
+				}
+				if (!vp) return false;
+				//create and load vertex program
+				glGenProgramsNV(1, &pass_data->vertex_program);
+				glLoadProgramNV(GL_VERTEX_PROGRAM_NV, pass_data->vertex_program, strlen((const char*)vp), vp);
+				if(glGetError() != GL_NO_ERROR)
+				{
+					return false;
+				}
+			} else if ( (pass_state == csEffectStrings::nvvertex_const_1) ||
+									(pass_state == csEffectStrings::nvvertex_const_2) ||
+									(pass_state == csEffectStrings::nvvertex_const_3) ||
+									(pass_state == csEffectStrings::nvvertex_const_4) ||
+									(pass_state == csEffectStrings::nvvertex_const_5) ||
+									(pass_state == csEffectStrings::nvvertex_const_6) ||
+									(pass_state == csEffectStrings::nvvertex_const_7) ||
+									(pass_state == csEffectStrings::nvvertex_const_8) ||
+									(pass_state == csEffectStrings::nvvertex_const_9) ||
+									(pass_state == csEffectStrings::nvvertex_const_10))
+			{
+				if(!NV_vertex_program) return false;
+			} else 
+					return false;
       pass_state = pass->GetNextState();
     }
     if( ARB_multitexture && (pass->GetLayerCount() > m_config_options.do_multitexture_level) )
       return false;
     for( l=0; l<pass->GetLayerCount(); l++ )
-    {
+		{
       iEffectLayer* layer = pass->GetLayer(l);
+			csRef<csOpenGlEffectLayerData> layer_data = new csOpenGlEffectLayerData();
+
       csStringID layer_state = layer->GetFirstState();
       csStringID layer_statestring;
       while(layer_state != csInvalidStringID )
@@ -7339,89 +7264,163 @@ bool csGraphics3DOGLCommon::Validate (iEffectTechnique* technique)
         if( (layer_state == csEffectStrings::color_source_1) ||
             (layer_state == csEffectStrings::color_source_2) ||
             (layer_state == csEffectStrings::color_source_3) )
-        {
+				{
           if (!ARB_texture_env_combine && !EXT_texture_env_combine) return false;
           layer_statestring = layer->GetStateString( layer_state );
-          if( (layer_statestring != csEffectStrings::vertex_color) &&
-              (layer_statestring != csEffectStrings::texture_color) &&
-              (layer_statestring != csEffectStrings::constant_color) &&
-              (layer_statestring != csEffectStrings::previous_layer_color) &&
-              (layer_statestring != csEffectStrings::vertex_alpha) &&
-              (layer_statestring != csEffectStrings::texture_alpha) &&
-              (layer_statestring != csEffectStrings::constant_alpha) &&
-              (layer_statestring != csEffectStrings::previous_layer_alpha) )
-            return false;
-        } else if( (layer_state == csEffectStrings::color_source_modifier_1) ||
+          
+					//which texture-unit
+					int tu = 0;
+					if(layer_state == csEffectStrings::color_source_1) tu = 0;
+					else if(layer_state == csEffectStrings::color_source_2) tu = 1;
+					else if(layer_state == csEffectStrings::color_source_3) tu = 2;
+					//which source
+					if( layer_statestring == csEffectStrings::vertex_color ) layer_data->colorsource[tu] = GL_PRIMARY_COLOR_ARB;
+          else if( layer_statestring == csEffectStrings::texture_color ) layer_data->colorsource[tu] = GL_TEXTURE;
+          else if( layer_statestring == csEffectStrings::constant_color ) layer_data->colorsource[tu] = GL_CONSTANT_ARB;
+          else if( layer_statestring == csEffectStrings::previous_layer_color ) layer_data->colorsource[tu] = GL_PREVIOUS_ARB;
+					else return false;
+
+				} else if( (layer_state == csEffectStrings::color_source_modifier_1) ||
                    (layer_state == csEffectStrings::color_source_modifier_2) ||
                    (layer_state == csEffectStrings::color_source_modifier_3) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine) return false;
           layer_statestring = layer->GetStateString( layer_state );
-          if( (layer_statestring != csEffectStrings::source_color) &&
-              (layer_statestring != csEffectStrings::inverted_source_color) &&
-              (layer_statestring != csEffectStrings::source_alpha) &&
-              (layer_statestring != csEffectStrings::inverted_source_alpha) )
-            return false;
+
+					//tu to use..
+					int tu = 0;
+					if(layer_state == csEffectStrings::color_source_modifier_1) tu = 0;
+					else if(layer_state == csEffectStrings::color_source_modifier_2) tu = 1;
+					else if(layer_state == csEffectStrings::color_source_modifier_3) tu = 2;
+					
+					if( layer_statestring == csEffectStrings::source_color ) layer_data->colormod[tu] = GL_SRC_COLOR;
+          else if( layer_statestring == csEffectStrings::inverted_source_color ) layer_data->colormod[tu]  = GL_ONE_MINUS_SRC_COLOR;
+          else if( layer_statestring == csEffectStrings::source_alpha ) layer_data->colormod[tu]  = GL_SRC_ALPHA;
+          else if( layer_statestring == csEffectStrings::inverted_source_alpha ) layer_data->colormod[tu]  = GL_ONE_MINUS_SRC_ALPHA;
+					else return false;
         } else if( (layer_state == csEffectStrings::alpha_source_1) ||
                    (layer_state == csEffectStrings::alpha_source_2) ||
                    (layer_state == csEffectStrings::alpha_source_3) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine) return false;
           layer_statestring = layer->GetStateString( layer_state );
-          if( (layer_statestring != csEffectStrings::vertex_alpha) &&
-              (layer_statestring != csEffectStrings::texture_alpha) &&
-              (layer_statestring != csEffectStrings::constant_alpha) &&
-              (layer_statestring != csEffectStrings::previous_layer_alpha) )
-            return false;
+
+					int tu = 0;
+					if( layer_state == csEffectStrings::alpha_source_1) tu = 0;
+					else if( layer_state == csEffectStrings::alpha_source_2) tu = 1;
+					else if( layer_state == csEffectStrings::alpha_source_3) tu = 2;
+
+					if( layer_statestring == csEffectStrings::vertex_alpha ) layer_data->alphasource[tu] = GL_PRIMARY_COLOR_ARB;
+          else if( layer_statestring == csEffectStrings::texture_alpha ) layer_data->alphasource[tu] = GL_TEXTURE;
+          else if( layer_statestring == csEffectStrings::constant_alpha ) layer_data->alphasource[tu] = GL_CONSTANT_ARB;
+          else if( layer_statestring == csEffectStrings::previous_layer_alpha ) layer_data->alphasource[tu] = GL_PREVIOUS_ARB;
+					else return false;
         } else if( (layer_state == csEffectStrings::alpha_source_modifier_1) ||
                    (layer_state == csEffectStrings::alpha_source_modifier_2) ||
                    (layer_state == csEffectStrings::alpha_source_modifier_3) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine) return false;
           layer_statestring = layer->GetStateString( layer_state );
-          if( (layer_statestring != csEffectStrings::source_alpha) &&
-              (layer_statestring != csEffectStrings::inverted_source_alpha) )
-            return false;
-        } else if( (layer_state == csEffectStrings::color_operation) ||
-                   (layer_state == csEffectStrings::alpha_operation) )
+          
+					int tu = 0;
+					if( layer_state == csEffectStrings::alpha_source_modifier_1) tu = 0;
+					else if( layer_state == csEffectStrings::alpha_source_modifier_2) tu = 1;
+					else if( layer_state == csEffectStrings::alpha_source_modifier_3) tu = 2;
+
+					if( layer_statestring == csEffectStrings::source_alpha ) layer_data->alphamod[tu] = GL_SRC_ALPHA;
+          else if( layer_statestring == csEffectStrings::inverted_source_alpha ) layer_data->alphamod[tu] = GL_ONE_MINUS_SRC_ALPHA;
+					else return false;
+				} else if (layer_state == csEffectStrings::alpha_operation)
+				{
+					if (!ARB_texture_env_combine && !EXT_texture_env_combine) return false;
+          layer_statestring = layer->GetStateString( layer_state );
+          
+					if( layer_statestring == csEffectStrings::use_source_1 ) layer_data->alphap = GL_REPLACE;
+          else if( layer_statestring == csEffectStrings::multiply ) layer_data->alphap = GL_MODULATE;
+          else if( layer_statestring == csEffectStrings::add ) layer_data->alphap = GL_ADD;
+          else if( layer_statestring == csEffectStrings::add_signed ) layer_data->alphap = GL_ADD_SIGNED_ARB;
+          else if( layer_statestring == csEffectStrings::subtract ) layer_data->alphap = GL_SUBTRACT_ARB;
+          else if( layer_statestring == csEffectStrings::interpolate ) layer_data->alphap = GL_INTERPOLATE_ARB;
+          else if( layer_statestring == csEffectStrings::dot_product ) 
+					{
+						if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+							layer_data->alphap = GL_DOT3_RGB_ARB;
+						else
+							return false;
+					}
+          else if( layer_statestring == csEffectStrings::dot_product_to_alpha ) 
+					{
+						if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+							layer_data->alphap = GL_DOT3_RGBA_ARB;
+						else
+							return false;
+					}
+					else return false;
+
+        } else if( (layer_state == csEffectStrings::color_operation) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine) return false;
           layer_statestring = layer->GetStateString( layer_state );
-          if( (layer_statestring != csEffectStrings::use_source_1) &&
-              (layer_statestring != csEffectStrings::multiply) &&
-              (layer_statestring != csEffectStrings::add) &&
-              (layer_statestring != csEffectStrings::add_signed) &&
-              (layer_statestring != csEffectStrings::subtract) &&
-              (layer_statestring != csEffectStrings::interpolate) &&
-              ( (layer_statestring != csEffectStrings::dot_product) ||
-                ( (layer_statestring == csEffectStrings::dot_product) &&
-                  (!ARB_texture_env_dot3 && !EXT_texture_env_dot3) ) ) &&
-              ( (layer_statestring != csEffectStrings::dot_product_to_alpha) ||
-                ( (layer_statestring == csEffectStrings::dot_product_to_alpha) &&
-                  (!ARB_texture_env_dot3 && !EXT_texture_env_dot3)) )
-              )
-            return false;
-        } else if( (layer_state == csEffectStrings::texture_source) ||
-                   (layer_state == csEffectStrings::texture_coordinate_source) )
+
+					if( layer_statestring == csEffectStrings::use_source_1 ) layer_data->colorp = GL_REPLACE;
+          else if( layer_statestring == csEffectStrings::multiply ) layer_data->colorp = GL_MODULATE;
+          else if( layer_statestring == csEffectStrings::add ) layer_data->colorp = GL_ADD;
+          else if( layer_statestring == csEffectStrings::add_signed ) layer_data->colorp = GL_ADD_SIGNED_ARB;
+          else if( layer_statestring == csEffectStrings::subtract ) layer_data->colorp = GL_SUBTRACT_ARB;
+          else if( layer_statestring == csEffectStrings::interpolate ) layer_data->colorp = GL_INTERPOLATE_ARB;
+          else if( layer_statestring == csEffectStrings::dot_product ) 
+					{
+						if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+							layer_data->colorp = GL_DOT3_RGB_ARB;
+						else
+							return false;
+					}
+          else if( layer_statestring == csEffectStrings::dot_product_to_alpha )
+					{
+						if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
+							layer_data->colorp = GL_DOT3_RGBA_ARB;
+						else
+							return false;
+					}
+
+				} else if( (layer_state == csEffectStrings::texture_source) )
         {
           if( (layer->GetStateString( layer_state ) == csInvalidStringID) &&
               (layer->GetStateFloat( layer_state ) == 0) &&
               layer->GetStateOpaque( layer_state ) == NULL )
               return false;
-        } else if( (layer_state == csEffectStrings::constant_color_source) )
-        {
-          layer_statestring = layer->GetStateString( layer_state );
-          if( (layer_statestring != csEffectStrings::fog) )
-            return false;
-        } else if( (layer_state == csEffectStrings::constant_color_source) )
-        {
-          if( layer->GetStateString( layer_state ) != csEffectStrings::fog )
+					if( layer->GetStateString( layer_state) == csEffectStrings::fog)
+						layer_data->inputtex = -1;
+					else
+					// @@@SUSPICIOUS. IS INT, BUT FUNCTION RETURNS FLAOT
+						layer_data->inputtex = (int)layer->GetStateFloat(layer_state);
+				} else if(  (layer_state == csEffectStrings::texture_coordinate_source) )
+				{
+					if( (layer->GetStateString( layer_state ) == csInvalidStringID) &&
+              (layer->GetStateFloat( layer_state ) == 0) &&
+              layer->GetStateOpaque( layer_state ) == NULL )
               return false;
+					if( layer->GetStateString( layer_state ) == csEffectStrings::texture_coordinate_source)
+						layer_data->vcord_source = ED_SOURCE_FOG;
+					else
+						layer_data->vcord_source = ED_SOURCE_NONE;
+        } else if( (layer_state == csEffectStrings::constant_color_source) )
+        {
+					layer_statestring = layer->GetStateString( layer_state );
+          if( layer_statestring != csEffectStrings::fog )
+            return false;
+					if( layer_statestring == csEffectStrings::fog)
+						layer_data->ccsource = ED_SOURCE_FOG;
+					else
+						layer_data->ccsource = ED_SOURCE_NONE;
         } else 
           return false;
         layer_state = layer->GetNextState();
       }
+			layer->SetRendererData( SCF_QUERY_INTERFACE(layer_data, iBase) );
     }
+		//csRef<iBase> pass_data_b = ;
+		pass->SetRendererData( SCF_QUERY_INTERFACE(pass_data, iBase) );
   }
   return true;
 }
