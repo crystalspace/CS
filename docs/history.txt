@@ -7,6 +7,15 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 4-Aug-2003
+	- Oktal added the following to csutil:
+	    - A template class, csHash<T>, intended to replace csHashMap soon.
+	      It is 1 to 3 times faster than csHashMap, depending on the data.
+	      It currently lacks an iterator companion class, but that will be
+	      easy to add, and the GetAll() function provides much of that
+	      functionality already.
+	    - A csTree<T> class, which is a binary tree.
+	    - In csArray, csPDelArray and csRefArray, added default sorting
+	      callbacks DefaultCompare, DefaultCompareKey and DefaultSort.
 	- Anders Stenberg changed pico plugin to use pico's internal 
 	  framebuffer drawing. Now pico handles all drawing (to a 
 	  memory framebuffer), and CS just relays this to the real 
@@ -55,12 +64,13 @@ chronological order.
 	  csStringArray.
 	- Jorrit moved const Get() and [] operator implementations to
 	  csArrayBase.
+>>>>>>> 1.4591
 3-Aug-2003
 	- Paul G. implemented a very nasty (and hopefully very temporary) hack
 	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for
 	  Win32/COMP_GCC platform (Mingw).
 	- Jorrit removed iAwsParmList->AddBasicVector() and GetBasicVector().
-	  These functions were not used in CS and I thikn they are not safe
+	  These functions were not used in CS and I think they are not safe
 	  (i.e. should use SCF parameter and not csBasicVector). And
 	  csBasicVector is being removed.
 	- Jorrit replaced pointer to sink inside SinkMap (for awsSinkManager)
