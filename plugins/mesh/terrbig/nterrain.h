@@ -356,7 +356,7 @@ public:
     virtual void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials)
     { scfParent->SetMaterialsList(matlist, nMaterials); }
   } scfiTerrBigState;
-  friend class eiTerrBigState;
+  friend struct eiTerrBigState;
 
   ////////////////////////////// iObjectModel implementation ///////////////////////////
 
@@ -379,7 +379,7 @@ public:
 			scfParent->GetRadius( rad, cent );
 		}
 	}	scfiObjectModel;
-  friend class eiObjectModel;
+  friend struct eiObjectModel;
 
   ////////////////////////////// iVertexBufferManagerClient implementation ///////////////////////////
 
