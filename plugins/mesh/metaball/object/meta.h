@@ -47,10 +47,11 @@ struct iMeshObject;
 #else
 
 #include "ivideo/rndbuf.h"
-
+#include "ivideo/rendermesh.h"
+#include "csgeom/transfrm.h"
 struct iMaterialHandle;
-class csRenderMesh;
 struct iRender3D;
+
 
 #endif
 
@@ -81,11 +82,17 @@ class csMetaBall : public iMeshObject
 
   csStringID vertex_name, texel_name, color_name, index_name;
 
-  csRef<iRenderBufferManager> rndbufmgr;
   csRef<iRenderBuffer> rndbuf_verts;
+  bool rndbuf_verts_dirty;
+
   csRef<iRenderBuffer> rndbuf_texels;
+  bool rndbuf_texels_dirty;
+
   csRef<iRenderBuffer> rndbuf_colors;
+  bool rndbuf_colors_dirty;
+
   csRef<iRenderBuffer> rndbuf_index;
+  bool rndbuf_index_dirty;
 
   csRef<iRender3D> r3d;
 
@@ -102,6 +109,8 @@ class csMetaBall : public iMeshObject
   G3DTriangleMesh mesh;
 #else
   csRenderMesh mesh;
+  csRenderMesh* meshPtr;
+  csReversibleTransform tr_o2c;
 #endif
 
   MetaBall *meta_balls;
@@ -182,22 +191,18 @@ public:
   { radius =  rad; cent = object_bbox.GetCenter(); }
 
 #ifdef CS_USE_NEW_RENDERER
-  virtual bool DrawZ (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
-  virtual bool DrawShadow (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
-  virtual bool DrawLight (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
 
-  iRenderBuffer *GetBuffer (csStringID name);
-  int GetComponentCount (csStringID name);
+  virtual csRenderMesh** GetRenderMeshes (int &n);
+
+  iRenderBuffer *GetRenderBuffer (csStringID name);
   //------------------------- iStreamSource implementation ----------------
-  class StreamSource : public iStreamSource 
+  class RenderBufferSource : public iRenderBufferSource 
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMetaBall);
-    iRenderBuffer *GetBuffer (csStringID name)
-	{ return scfParent->GetBuffer (name); }
-    int GetComponentCount (csStringID name)
-	{ return scfParent->GetComponentCount (name); }
-  } scfiStreamSource;
-  friend class StreamSource;
+    iRenderBuffer *GetRenderBuffer (csStringID name)
+	{ return scfParent->GetRenderBuffer (name); }
+  } scfiRenderBufferSource;
+  friend class RenderBufferSource;
 
 #endif // CS_USE_NEW_RENDERER
 

@@ -39,12 +39,16 @@
 
 #include "meta.h"
 
+#ifdef CS_USE_NEW_RENDERER
+  #include "iutil/strset.h"
+#endif
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csMetaBall)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
 #ifdef CS_USE_NEW_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iStreamSource)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
 #endif
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMetaBallState)
@@ -62,8 +66,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBall::MetaBallState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #ifdef CS_USE_NEW_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBall::StreamSource)
-  SCF_IMPLEMENTS_INTERFACE (iStreamSource) 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBall::RenderBufferSource)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource) 
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif
 
@@ -84,7 +88,7 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
 #ifndef CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #else
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStreamSource);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
 #endif
 
 
@@ -178,15 +182,14 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
     SetupVertexBuffer ();
     mesh.num_vertices_pool = 1;
     mesh.triangles = new csTriangle[int(max_vertices/3)];
+    mesh.vertex_fog = new G3DFogInfo[max_vertices];
 #endif
     mesh_vertices = new csVector3[max_vertices];
     mesh_texels = new csVector2[max_vertices];
     mesh_colors = new csColor[max_vertices];
     mesh_indices = new csTriangle[int(max_vertices/3)];
-#ifndef CS_USE_NEW_RENDERER
-    mesh.vertex_fog = new G3DFogInfo[max_vertices];
-#endif
-	int i;
+
+    int i;
     for (i = 0; i < max_vertices; i++)
     {
       mesh_vertices[i].Set(0,0,0);
@@ -194,8 +197,9 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
       mesh_colors[i].Set(1,1,1);
     }
     InitTables();
+    
+#ifndef CS_USE_NEW_RENDERER
     mesh.do_mirror = false;
-#ifndef CS_USE_NEW_RENDERER 
     mesh.do_fog = false;
     mesh.do_morph_texels = false;
     mesh.do_morph_colors = false;
@@ -205,10 +209,19 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
 
 #ifdef CS_USE_NEW_RENDERER
     r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
-    vertex_name = r3d->GetStringContainer ()->Request ("vertices");
-    texel_name = r3d->GetStringContainer ()->Request ("texture coordinates");
-    color_name = r3d->GetStringContainer ()->Request ("colors");
-    index_name = r3d->GetStringContainer ()->Request ("indices");
+    csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+                      "crystalspace.renderer.stringset", iStringSet);
+
+    vertex_name = strings->Request ("vertices");
+    texel_name = strings->Request ("texture coordinates");
+    color_name = strings->Request ("colors");
+    index_name = strings->Request ("indices");
+
+    bool rndbuf_verts_dirty = true;
+    bool rndbuf_texels_dirty = true;
+    bool rndbuf_colors_dirty = true;
+    bool rndbuf_index_dirty = true;
+
 #endif
   }
   return true;
@@ -269,35 +282,17 @@ static void LitVertex( const csVector3 &n, csColor &c )
 #endif
 
 #ifdef CS_USE_NEW_RENDERER
-bool csMetaBall::DrawZ (iRenderView* rview, iMovable* movable, csZBufMode zbufMode)
+
+csRenderMesh** csMetaBall::GetRenderMeshes (int &n)
 {
-  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
-
-  iRender3D* r3d = rview->GetGraphics3D ();
-
-  // Prepare for rendering.
-  mesh.z_buf_mode = zbufMode;
-
-  mesh.SetIndexRange (0, num_mesh_triangles * 3);
-  mesh.SetMaterialHandle (th->GetMaterialHandle());
-  mesh.SetStreamSource (&this->scfiStreamSource);
-  mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
-  r3d->DrawMesh (&mesh);
-
-  return true;
+  n = 1;
+     
+  meshPtr = &mesh;
+  return &meshPtr;
 }
 
-bool csMetaBall::DrawShadow (iRenderView* rview, iMovable* movable, csZBufMode zbufMode)
-{
-  return true;
-}
 
-bool csMetaBall::DrawLight (iRenderView* rview, iMovable* movable, csZBufMode zbufMode)
-{
-  return true;
-}
-
-iRenderBuffer *csMetaBall::GetBuffer (csStringID name)
+iRenderBuffer *csMetaBall::GetRenderBuffer (csStringID name)
 {
   /*
   csRef<iRenderBuffer> rndbuf_verts;
@@ -310,24 +305,24 @@ iRenderBuffer *csMetaBall::GetBuffer (csStringID name)
   {
     if (!rndbuf_verts.IsValid())
     {
-      rndbuf_verts = r3d->GetBufferManager ()->GetBuffer (
-        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
-      csVector3* vbuf = (csVector3*)rndbuf_verts->Lock(
-        iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if (vbuf)
-        memcpy (vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
+      rndbuf_verts = r3d->CreateRenderBuffer(
+        sizeof (csVector3)*max_vertices, 
+        CS_BUF_STATIC, 
+        CS_BUFCOMP_FLOAT, 3);
 
-      rndbuf_verts->Release ();
+      rndbuf_verts_dirty = true;
     }
-    if ( !rndbuf_verts) return 0;
-    if ( rndbuf_verts->IsDiscarded()|| true )
+
+    if(rndbuf_verts_dirty)
     {
-      csVector3* tmpbuf = (csVector3*)rndbuf_verts->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if(tmpbuf)
-        memcpy(tmpbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
-      rndbuf_verts->Release ();
+      csVector3* vbuf = (csVector3*)rndbuf_verts->Lock(CS_BUF_LOCK_NORMAL);
+
+      if(vbuf)
+        memcpy(vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
+
+      rndbuf_verts->Release();
+      rndbuf_verts_dirty = false;
     }
-    rndbuf_verts->CanDiscard(false);
     return rndbuf_verts;
   }
 
@@ -335,25 +330,25 @@ iRenderBuffer *csMetaBall::GetBuffer (csStringID name)
   {
     if (!rndbuf_texels.IsValid())
     {
-      rndbuf_texels = r3d->GetBufferManager ()->GetBuffer (
-        sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC);
-      csVector2* vbuf = (csVector2*)rndbuf_texels->Lock(
-        iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if (vbuf)
-        memcpy (vbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
+      rndbuf_texels = r3d->CreateRenderBuffer(
+        sizeof (csVector2)*max_vertices, 
+        CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 2);
 
-      rndbuf_texels->Release ();
+      rndbuf_texels_dirty = true;
+
     }
-    if( !rndbuf_texels) return 0;
-    if( rndbuf_texels->IsDiscarded() || true)
+
+    if(rndbuf_texels_dirty)
     {
-      csVector2 *tmpbuf = (csVector2*)rndbuf_texels->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if(tmpbuf)
-        memcpy(tmpbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
+      csVector2* vbuf = (csVector2*)rndbuf_texels->Lock(CS_BUF_LOCK_NORMAL);
+
+      if(vbuf)
+        memcpy(vbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
+
       rndbuf_texels->Release();
-      
+      rndbuf_texels_dirty = false;
     }
-    rndbuf_texels->CanDiscard(false);
     return rndbuf_texels;
   }
 
@@ -361,63 +356,57 @@ iRenderBuffer *csMetaBall::GetBuffer (csStringID name)
   {
     if (!rndbuf_colors.IsValid())
     {
-      rndbuf_colors = r3d->GetBufferManager ()->GetBuffer (
-        sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC);
-      csColor* vbuf = (csColor*)rndbuf_colors->Lock(
-        iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      rndbuf_colors = r3d->CreateRenderBuffer(
+        sizeof (csColor)*max_vertices, 
+        CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 3);
+      
+      rndbuf_colors_dirty = true;
+      
+    }
 
-      memset(mesh_colors, 0xffffffff, sizeof (csColor)*num_mesh_vertices);
+    if(rndbuf_colors_dirty)
+    {
+      csColor* vbuf = (csColor*)rndbuf_colors->Lock(CS_BUF_LOCK_NORMAL);
+
+      memset(mesh_colors, 0xff, sizeof (csColor)*num_mesh_vertices);
       if (vbuf)
         memcpy (vbuf, mesh_colors, sizeof (csColor)*num_mesh_vertices);
-
+      
       rndbuf_colors->Release ();
+      rndbuf_colors_dirty = false;
     }
-    if( !rndbuf_colors ) return 0;
-    if( rndbuf_colors->IsDiscarded() || true)
-    {
-      csColor *tmpbuf = (csColor*)rndbuf_colors->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if(tmpbuf)
-        memcpy(tmpbuf, mesh_colors, sizeof(csColor)*num_mesh_vertices);
-      rndbuf_colors->Release();
-    }
-    rndbuf_colors->CanDiscard(false);
+
     return rndbuf_colors;
   }
   if (name == index_name)
   {
     if (!rndbuf_index.IsValid())
     {
-      rndbuf_index = r3d->GetBufferManager ()->GetBuffer (
-        sizeof (csTriangle)*int(max_vertices / 3), CS_BUF_INDEX);
-      csColor* vbuf = (csColor*)rndbuf_index->Lock(
-        iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      rndbuf_index = r3d->CreateRenderBuffer(
+        sizeof (csTriangle)*int(max_vertices / 3), 
+        CS_BUF_INDEX,
+        CS_BUFCOMP_UNSIGNED_INT,
+        1);
+
+      rndbuf_index_dirty = true;
+    }
+
+    if(rndbuf_index_dirty)
+    {
+      unsigned int * vbuf = (unsigned int*)rndbuf_index->Lock(CS_BUF_LOCK_NORMAL);
+
       if (vbuf)
         memcpy (vbuf, mesh_indices, sizeof (csTriangle)*num_mesh_triangles);
 
       rndbuf_index->Release ();
+      rndbuf_index_dirty = false;
     }
-    if( !rndbuf_index ) return 0;
-    if( rndbuf_index->IsDiscarded() || true)
-    {
-      csTriangle *tmpbuf = (csTriangle*)rndbuf_index->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
-      if(tmpbuf)
-        memcpy(tmpbuf, mesh_indices, sizeof(csTriangle) * num_mesh_triangles);
-      rndbuf_index->Release();
-    }
-    rndbuf_index->CanDiscard(false);
     return rndbuf_index;
   }
   return 0;
 }
 
-int csMetaBall::GetComponentCount (csStringID name)
-{
-  if (name == vertex_name) return 3;
-  if (name == texel_name) return 2;
-  if (name == color_name) return 4;
-  if (name == index_name) return 1;
-  return 0;
-}
 #endif
 
 bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
@@ -453,29 +442,38 @@ bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
 
   iRender3D * r3d = rview->GetGraphics3D();
   iCamera *cam = rview->GetCamera();
-  csReversibleTransform tr_o2c = cam->GetTransform();
-  if (!movable->IsFullTransformIdentity())
-    tr_o2c /= movable->GetFullTransform();
 
-  float fov = cam->GetFOV();
-  float shftx = cam->GetShiftX();
-  float shfty = cam->GetShiftY();
-  csBox2 sbox;
-  csBox3 cbox;
+  // Shouldn't this be done in the renderer?
+  tr_o2c = cam->GetTransform ();
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
 
-  if( GetScreenBoundingBox( cam->GetCameraNumber(), 
-      movable->GetUpdateNumber(), fov, shftx, shfty, tr_o2c, sbox, cbox ) < 0)
-      return false;
   int clip_portal, clip_plane, clip_z_plane;
-  if (rview->ClipBBox( sbox,cbox, clip_portal, clip_plane, clip_z_plane) == false)
-      return false;
+  csVector3 radius;
+  csSphere sphere;
+  GetRadius (radius, sphere.GetCenter ());
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  sphere.SetRadius (max_radius);
+  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
+  	clip_z_plane) == false)
+    return false;
 
   r3d->SetObjectToCamera( &tr_o2c );
+ 
+  mesh.material = th;
+  mesh.indexstart = 0;
+  mesh.indexend = num_mesh_triangles * 3;
+  mesh.meshtype = CS_MESHTYPE_TRIANGLES;
+  mesh.buffersource = &scfiRenderBufferSource;
+  mesh.transform = &tr_o2c;
+
   mesh.clip_portal = clip_portal;
   mesh.clip_plane = clip_plane;
   mesh.clip_z_plane = clip_z_plane;
   mesh.do_mirror = cam->IsMirrored();
-
+ 
   return true;
 
 
@@ -732,6 +730,9 @@ void csMetaBall::NextFrame(csTicks, const csVector3& /*pos*/)
   mesh.num_triangles = trigs;
 #else
   num_mesh_triangles = trigs;
+  rndbuf_index_dirty = true;
+  rndbuf_verts_dirty = true;
+
 #endif
   num_mesh_vertices = vertices_tesselated;
   CreateBoundingBox();
@@ -755,7 +756,7 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   mesh.mat_handle = th->GetMaterialHandle();
   mesh.use_vertex_color = true;
 #else
-  mesh.SetMaterialHandle(th->GetMaterialHandle());
+  mesh.material = th;
 #endif
 
   
@@ -791,15 +792,16 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   vbufmgr->UnlockBuffer (vbuf);
   return true;
 #else
-  iRender3D* r3D = rview->GetGraphics3D();
-  mesh.SetIndexRange (0, num_mesh_triangles * 3);
-  mesh.SetMaterialHandle (th->GetMaterialHandle());
-  mesh.SetStreamSource (&this->scfiStreamSource);
-  mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
-  r3D->DrawMesh (&mesh);
+ /* iRender3D* r3D = rview->GetGraphics3D();
+  csRenderMesh::
+  mesh.indexstart = 0;
+  mesh.indexend = num_mesh_triangles * 3;
+  mesh.material = th;
+  mesh.buffersource = &this->scfiRenderBufferSource;
+  mesh.tMESHTYPE_TRIANGLES);
+  r3D->DrawMesh (&mesh);*/
   return true;
 #endif
-  
 }
 
 #ifndef CS_USE_NEW_RENDERER
