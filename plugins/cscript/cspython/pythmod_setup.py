@@ -1,63 +1,44 @@
 #!/usr/bin/env python
 
+# Copyright (C) 2003 Rene Jager <renej@frog.nl>
+# License: LGPL
+
+# Arguments: install <gen-files-dir> <include-dir> <libraries-dir> <setup-args>
+# See cspython.mak for example usage.
+
 import sys, os, string, traceback, re
 from distutils import ccompiler, sysconfig
 from distutils.core import setup, Extension
 
-if sys.argv[1] == 'pythmod_clean':
+# get non-distutils args and remove them
+src_dir = sys.argv[1]
+inc_dir = sys.argv[2]
+lib_dir = sys.argv[3]
+sys.argv[1:4] = []
 
-    try:
-        f = open('pythmod_files')
-        for l in f.readlines():
-            try:
-                os.remove(string.strip(l))
-            except:
-                pass
-        f.close()
-        os.remove('pythmod_files')
-    except:
-        #traceback.print_exc()
-        pass
-    sys.exit(0)
+ext_module = Extension(
+    '_cspace',
+    [src_dir+'/cs_pyth.cpp', 'plugins/cscript/cspython/pythmod.cpp'],
+    include_dirs=[inc_dir],
+    library_dirs=[lib_dir],
+    libraries=['cstool', 'csgfx', 'csgeom', 'cssys', 'csutil',
+               'cssys', 'csutil'
+              ]
+)
 
-elif sys.argv[1] == 'pythmod_install':
+setup_kwargs = {
+    'name'         : 'cspace',
+    'description'  : 'Python Crystal Space Module',
+    'url'          : 'http://www.crystalspace.org',
+    'license'      : 'LGPL',
+    'package_dir'  : {'' : src_dir},
+    'py_modules'   : ['cspace'],
+    'ext_modules'  : [ext_module],
+}
 
-    OUT = sys.argv[2]
-    SCRIPTDIR = sys.argv[3]
-    INCDIRS = sys.argv[4:]
+if ccompiler.get_default_compiler() == 'unix':
+    ldshared = re.sub('gcc', 'g++', sysconfig.get_config_var('LDSHARED'))
+    sysconfig.get_config_vars()['LDSHARED'] = ldshared
 
-    argv = ['install',
-            '--install-purelib', SCRIPTDIR,
-            '--install-platlib', SCRIPTDIR,
-            '--record', 'pythmod_files'
-           ]
-    sys.argv[1:] = argv
-
-    ext_module = Extension(
-        '_cspace',
-        ['cs_pyth.cpp', 'pythmod.cpp'],
-        include_dirs=INCDIRS,
-        library_dirs=[OUT],
-        libraries=['cstool', 'csgfx', 'csgeom', 'cssys', 'csutil',
-                   'cssys', 'csutil'
-                  ]
-    )
-
-    setup_kwargs = {
-        'name'         : 'cspace',
-        #'version'      : '1.0.1',
-        'description'  : 'Python Crystal Space Module',
-        'url'          : 'http://www.crystalspace.org',
-        'license'      : 'LGPL',
-        'py_modules'   : ['cspace'],
-        'ext_modules'  : [ext_module],
-        'author'       : 'Rene Jager',
-        'author_email' : 'renej.frog@yucom.be'
-    }
-
-    if ccompiler.get_default_compiler() == 'unix':
-        ldshared = re.sub('gcc', 'g++', sysconfig.get_config_var('LDSHARED'))
-        sysconfig.get_config_vars()['LDSHARED'] = ldshared
-
-    dist = apply(setup, [], setup_kwargs)
+dist = apply(setup, [], setup_kwargs)
 

@@ -4,7 +4,8 @@ ifneq (,$(findstring cspython,$(PLUGINS)))
 # Plugin description
 DESCRIPTION.cspython = Crystal Script Python plug-in
 DESCRIPTION.pythmod = Crystal Space Python module
-DESCRIPTION.cspythonswig = Crystal Script Python SWIG interface
+DESCRIPTION.swigpythgen = Generate (forced) SWIG python files
+DESCRIPTION.swigpythinst = Install SWIG generated python files
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -22,23 +23,28 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cspython pythmod cspythonclean cspythonswig
+.PHONY: cspython pythmod cspythonclean swigpythinst swigpythgen
 ifneq ($(MAKE_PYTHON_MODULE),no)
-all plugins: cspython pythmod
+all: cspython pythmod
+plugins: cspython
 else
 all plugins: cspython
 endif
 
 cspython:
 	$(MAKE_TARGET) MAKE_DLL=yes
-ifneq ($(MAKE_PYTHON_MODULE),no)
-pythmod:
-	$(MAKE_TARGET) MAKE_DLL=yes
-endif
 cspythonclean:
 	$(MAKE_CLEAN)
-cspythonswig:
-	$(MAKE_TARGET) MAKE_DLL=yes
+ifneq ($(MAKE_PYTHON_MODULE),no)
+pythmod:
+	$(MAKE_TARGET)
+pythmodclean:
+	$(MAKE_CLEAN)
+endif
+swigpythgen:
+	$(MAKE_TARGET)
+swigpythinst:
+	$(MAKE_TARGET)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -60,17 +66,17 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSPYTHON)
 endif
 
-PYTHMOD = scripts/python/_cspace$(DLL)
+PYTHMOD.BUILDBASE=$(OUT)/python
+PYTHMOD.INSTALLDIR=$(OUTPROC)/python
+PYTHMOD = $(PYTHMOD.INSTALLDIR)/_cspace$(DLL)
 LIB.PYTHMOD = $(LIB.CSPYTHON)
 LIB.PYTHMOD.LOCAL = $(LIB.CSPYTHON.LOCAL)
 
 TO_INSTALL.EXE += python.cex
 
-CSPYTHON.ROOT.BUILD = $(shell $(PWD))
-CSPYTHON.ROOT.SRC = $(shell cd $(SRCDIR) ; $(PWD))
-
+SWIG.OUTDIR = $(OUTDERIVED)
 SWIG.INTERFACE = $(SRCDIR)/include/ivaria/cspace.i
-SWIG.CSPYTHON = $(SRCDIR)/plugins/cscript/cspython/cs_pyth.cpp
+SWIG.CSPYTHON = $(SWIG.OUTDIR)/cs_pyth.cpp
 SWIG.CSPYTHON.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
 
 TRASH.CSPYTHON = $(wildcard $(addprefix $(SRCDIR)/scripts/python/,*.pyc *.pyo))
@@ -97,7 +103,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cspython pythmod cspythonclean cspythonswig csjavaswigclean
+.PHONY: cspython pythmod cspythonclean swigpythinst swigpythgen
 
 ifneq ($(MAKE_PYTHON_MODULE),no)
 all: $(CSPYTHON.LIB) $(PYTHMOD.LIB)
@@ -106,7 +112,7 @@ all: $(CSPYTHON.LIB)
 endif
 cspython: $(OUTDIRS) $(CSPYTHON) python.cex
 ifneq ($(MAKE_PYTHON_MODULE),no)
-pythmod: $(OUTDIRS) $(PYTHMOD) python.cex
+pythmod: $(OUTDIRS) $(PYTHMOD)
 clean: cspythonclean pythmodclean
 else
 clean: cspythonclean
@@ -132,7 +138,6 @@ SWIG.CSPYTHON.DEPS=\
 
 $(SWIG.CSPYTHON): $(SWIG.INTERFACE) $(SWIG.CSPYTHON.DEPS)
 	$(SWIGBIN) $(SWIGFLAGS) -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
-	$(CP) $(SRCDIR)/plugins/cscript/cspython/cspace.py $(SRCDIR)/scripts/python/
 
 python.cex: $(SRCDIR)/plugins/cscript/cspython/python.cin
 	@echo Generate python cs-config extension...
@@ -149,9 +154,12 @@ $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 	$(DO.PLUGIN.CORE) $(LIB.CSPYTHON.LOCAL) \
 	$(DO.PLUGIN.POSTAMBLE)
 
+$(PYTHMOD.INSTALLDIR):
+	-$(MKDIR) $(@)
+
 ifeq ($(PYTHON.DISTUTILS),yes)
-$(PYTHMOD): $(OBJ.PYTHMOD) $(LIB.PYTHMOD)
-	cd $(SRCDIR)/plugins/cscript/cspython ; $(PYTHON) pythmod_setup.py pythmod_install $(CSPYTHON.ROOT.BUILD)/$(OUT) $(CSPYTHON.ROOT.SRC)/scripts/python $(CSPYTHON.ROOT.SRC)/include $(CSPYTHON.ROOT.BUILD)/include
+$(PYTHMOD): $(PYTHMOD.INSTALLDIR) $(SRC.PYTHMOD) $(LIB.PYTHMOD)
+	$(PYTHON) plugins/cscript/cspython/pythmod_setup.py $(SWIG.OUTDIR) $(SRCDIR)/include $(OUT) build -q --build-base=$(PYTHMOD.BUILDBASE) install -q --install-lib=$(PYTHMOD.INSTALLDIR)
 else
 $(PYTHMOD):
 	@echo $(DESCRIPTION.pythmod)" not supported: distutils not available!"
@@ -159,18 +167,27 @@ endif
 
 ifeq ($(PYTHON.DISTUTILS),yes)
 pythmodclean:
-	cd $(SRCDIR)/plugins/cscript/cspython ; $(PYTHON) pythmod_setup.py pythmod_clean
-	$(RMDIR) $(SRCDIR)/plugins/cscript/cspython/build
+	-$(RMDIR) $(PYTHMOD.BUILDBASE)
 else
 pythmodclean:
 endif
 
+swigpythinst: $(SRCDIR)/plugins/cscript/cspython/cs_pyth.cpp $(SRCDIR)/scripts/python/cspace.py
+
+$(SRCDIR)/plugins/cscript/cspython/cs_pyth.cpp: $(SWIG.OUTDIR)/cs_pyth.cpp
+	$(RM) $(@)
+	$(CP) $(SWIG.OUTDIR)/cs_pyth.cpp $(@)
+
+$(SRCDIR)/scripts/python/cspace.py: $(SWIG.OUTDIR)/cspace.py
+	$(RM) $(@)
+	$(CP) $(SWIG.OUTDIR)/cspace.py $(@)
+
 cspythonclean:
 	-$(RM) $(CSPYTHON) $(OBJ.CSPYTHON) $(TRASH.CSPYTHON) python.cex
 
-cspythonswig: cspythonswigclean cspython
+swigpythgen: swigpythclean cspython
 
-cspythonswigclean:
+swigpythclean:
 	-$(RM) $(CSPYTHON) $(PYTHMOD) $(SWIG.CSPYTHON)
 
 ifdef DO_DEPEND
