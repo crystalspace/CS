@@ -404,7 +404,7 @@ bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
 	dsz > dsx &&
 	dsz > dsy)
   {
-    axis = 1;
+    axis = 2;
     where = dest.MaxZ ();
     return true;
   }
@@ -597,6 +597,11 @@ int PVSCalcSector::CastShadowsUntilFull (const csBox3& source)
   float minsource = source.Min (plane.axis);
   float maxsource = source.Max (plane.axis);
 
+  DB(("  Cast Shadows between %g and %g (plane %d/%g)\n",
+  	plane.where < minsource ? plane.where : maxsource,
+	plane.where < minsource ? minsource : plane.where,
+	plane.axis, plane.where));
+
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     if (CheckRelevantPolygon (minsource, maxsource, polygons[i]))
@@ -639,16 +644,16 @@ void PVSCalcSector::RecurseDestNodes (void* sourcenode, void* destnode,
   // traversing to the children so we only skip the testing part.
   if (!dest.Overlap (source))
   {
+    DB(("\nTEST (%g,%g,%g)-(%g,%g,%g) -> (%g,%g,%g)-(%g,%g,%g)\n",
+	source.MinX (), source.MinY (), source.MinZ (),
+	source.MaxX (), source.MaxY (), source.MaxZ (),
+	dest.MinX (), dest.MinY (), dest.MinZ (),
+	dest.MaxX (), dest.MaxY (), dest.MaxZ ()));
+
     // If the projection plane failed to set up we still have to test
     // children.
     if (SetupProjectionPlane (source, dest))
     {
-      DB(("TEST (%g,%g,%g)-(%g,%g,%g) -> (%g,%g,%g)-(%g,%g,%g) plane=%d/%g\n",
-	source.MinX (), source.MinY (), source.MinZ (),
-	source.MaxX (), source.MaxY (), source.MaxZ (),
-	dest.MinX (), dest.MinY (), dest.MinZ (),
-	dest.MaxX (), dest.MaxY (), dest.MaxZ (), plane.axis, plane.where));
-
       int level = CastShadowsUntilFull (source);
       if (level == 1)
       {
@@ -778,7 +783,7 @@ PVSCalc::~PVSCalc ()
 {
 }
 
-bool PVSCalc::OnInitialize(int argc, char* argv[])
+bool PVSCalc::OnInitialize (int argc, char* argv[])
 {
   // RequestPlugins() will load all plugins we specify. In addition
   // it will also check if there are plugins that need to be loaded
@@ -797,20 +802,27 @@ bool PVSCalc::OnInitialize(int argc, char* argv[])
       CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
+  // Change the standard reporter listener so that it reports info to
+  // standard output.
+  csRef<iStandardReporterListener> stdrep = CS_QUERY_REGISTRY (object_reg,
+  	iStandardReporterListener);
+  stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_NOTIFY, true, false,
+  	false, false, false, false);
+
   // Now we need to setup an event handler for our application.
   // Crystal Space is fully event-driven. Everything (except for this
   // initialization) happens in an event.
-  if (!RegisterQueue(GetObjectRegistry()))
+  if (!RegisterQueue (GetObjectRegistry ()))
     return ReportError ("Failed to set up event handler!");
 
   return true;
 }
 
-void PVSCalc::OnExit()
+void PVSCalc::OnExit ()
 {
 }
 
-bool PVSCalc::Application()
+bool PVSCalc::Application ()
 {
   // Open the main system. This will open all the previously loaded plug-ins.
   // i.e. all windows will be opened.

@@ -9,6 +9,8 @@ chronological order.
 14-Feb-2005
 	- Chris made the minimum polygon UV determinant into a #define
 	  so that it would be more amenable to experimentation. 
+	- Jorrit fixed a bug in pvscalc that would mess up the calculations
+	  for some boxes.
 13-Feb-2005
 	- Peter Amstutz reorganized loading in the csVosA3DL plugin so
 	  that texture, material or geometry changes to 3D objects are
