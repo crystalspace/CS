@@ -302,7 +302,7 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8),
   G2D = NULL;
   NetDrv = NULL;
   NetMan = NULL;
-  Protocol = NULL;
+  NetProtocol = NULL;
   CmdManager = NULL;
   Sound = NULL;
 
@@ -335,7 +335,7 @@ csSystemDriver::~csSystemDriver ()
   if (Sound) Sound->DecRef ();
   if (NetDrv) NetDrv->DecRef ();
   if (NetMan) NetMan->DecRef ();
-  if (Protocol) Protocol->DecRef ();
+  if (NetProtocol) NetProtocol->DecRef ();
   if (CmdManager) CmdManager->DecRef();
   if (Console) Console->DecRef ();
 
@@ -437,7 +437,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   Sound = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
   NetDrv = QUERY_PLUGIN_ID (this, CS_FUNCID_NETDRV, iNetworkDriver);
   NetMan = QUERY_PLUGIN_ID (this, CS_FUNCID_NETMAN, iNetworkManager);
-  Protocol = QUERY_PLUGIN_ID (this, CS_FUNCID_PROTOCOL, iPROTO);
+  NetProtocol = QUERY_PLUGIN_ID (this, CS_FUNCID_PROTOCOL, iPROTO);
   CmdManager = QUERY_PLUGIN_ID (this, CS_FUNCID_CMDMGR, iCMDMGR);
   Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsole);
 
@@ -489,8 +489,8 @@ void csSystemDriver::Close ()
     NetMan->Close ();
   if (NetDrv)
     NetDrv->Close ();
-  if (Protocol)
-    Protocol->Close ();
+  if (NetProtocol)
+    NetProtocol->Close ();
   if (CmdManager)
     CmdManager->Close ();
   if (G3D)

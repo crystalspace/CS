@@ -164,7 +164,7 @@ public:
   /// Network manager
   iNetworkManager* NetMan;
   /// Network User Protocol Layer
-  iPROTO *Protocol;
+  iPROTO *NetProtocol;
   /// Network Command Manager
   iCMDMGR *CmdManager;
   /// System console
