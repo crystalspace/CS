@@ -80,7 +80,7 @@ class csSystemDriver : public iSystem
   };
 
   /*
-   * This is a superset of csObjVector that can find by pointer a plugin.
+   * This is a superset of csVector that can find by pointer a plugin.
    */
   class csPlugInsVector : public csVector
   {
@@ -100,7 +100,7 @@ class csSystemDriver : public iSystem
     csPlugIn *Get (int idx)
     { return (csPlugIn *)csVector::Get (idx); }
     
-    virtual bool FreeItem (csSome *Item)
+    virtual bool FreeItem (csSome Item)
     { delete (csPlugIn*)Item; return true; }
   };
 
