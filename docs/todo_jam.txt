@@ -1,67 +1,90 @@
-This is a list of issues which should be addressed in the jam based build
+This is a list of issues which should be addressed in the Jam-based build
 system.
 
 H - High Prioriy (important showstopper)
 M - Medium Priority
 L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
-* - Done
+* - Completed
 
-[H] Auto-generated files like the MSVC project files, Bison/Flex and Swig
-    should be generated into the build directory rather than the source tree,
-    since the source tree might be read-only or shared.  We should provide
-    rules to copy the generated files back to the source tree upon explicit
-    request so that they can be committed to the CVS respository if desired.
+[H] Auto-generated Swig files should be generated into the build directory
+    rather than the source tree, since the source tree might be read-only or
+    shared.  We should provide rules to copy the generated files back to the
+    source tree upon explicit request so that they can be committed to the CVS
+    respository if desired.
+[H] msvcgen.jam: Auto-generated MSVC project files should be generated into the
+    build directory rather than the source tree, since the source tree might be
+    read-only or shared.  We should provide rules to copy the generated files
+    back to the source tree upon explicit request so that they can be committed
+    to the CVS respository if desired.
+[H] msvcgen.jam: Add support to create multiple, customizable workspaces rather
+    than always creating only wksall.  Obvious examples of workspaces are the
+    ones presently created by the GNU make system: wksall, wkstypical,
+    wkswalkall, wksnewrenderer.
+[H] msvcgen.jam: Add support to create specified pseudo-groups in generated
+    workspaces, such as grpall-typical, grplibs-typical, etc.
+[H] msvcgen.jam: Either respect ExternaLibs() or fix all the Jamfiles which
+    require special Windows libraries to invoke MsvcExternalLibrary().  This is
+    necessary for modules such as cssocket and ensocket which require
+    wsock32.lib, for instance.  There are a number of other such modules.  The
+    current monlithic solution of placing this information in
+    CS/mk/msvcgen/Jamconfig is ugly, error-prone, and a maintenance headache.
+[H] msvcgen.jam: When PERL5.SDK.AVAILABLE is "yes", Jam reports that it doesn't
+    know how to locate or create <grist>csperlxs.c.
+[H] msvcgen.jam: Eliminate the ugly and monolithic mk/msvcgen/msvcgen.sh and
+    mk/msvcgen/Jamconfig.  Instead, it should be possible to run the entire
+    process using the normal Jamconfig created by the configuration process.
+[H] msvcgen.jam: Should override the Help rule to capture the help message for
+    a target, rather than relying upon the ugly, out-of-place "$(<)_help =
+    $(>)" hack which was added to help.jam, to allow msvcgen.jam to access the
+    help string.  msvcgen.jam should be responsible for its own requirements.
 [H] There are no rules for building the pure Python module yet (only the Python
     plugin works).
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
 [H] The `jobber' scripts on SourceForge should use jam instead of make.
-[H] The MSVC generation rules still have a significant number of problems.  See
-    msvcgen.jam for a complete list.
 [H] Write complete documentation about the Jam build system for the CS user
     manual.
 
 [M] Write a tutorial (maybe we could just link to the text in the RoboRun
-    project)?  Another interesting topic would be integrating Crystal Space
+    project?).  Another interesting topic would be integrating Crystal Space
     with other build systems like Automake or Ant.
 [M] Re-work the provided m4 scripts to provide functionality like CS_CHECK_HOST
     and INITJAMFILE. Would be also nice to extract more of the detection scripts
     in CS (perl, python, nasm, problematic cflags?)
-[M] See if there's a way to create some suitable msvc templates for external
-    projects, so that we autogenrate msvc-makefiles there too.
 
-[L] The present technique does not correctly associate configuration files
-    with the modules to which they belong, thus configuration files are not
-    included (as they ought to be) in the generate MSVC project files.
-[L] It would be nice to have the configure files regenerated and execute if the
-    configure.ac file has changed. Unfortunately it is not possible to force jam
-    to reread it's config files, so this isn't 100% possible...
-    Would it be possible to somehow recreate the configure files and then exit
-    jam with a message telling that you should rerun configure?
-    or at least output a big warning?
+[L] msvcgen.jam: Overhaul the "configuration" file handling rule so that it
+    associates configuration files with built targets.  This will allow the
+    generated projects to reference configuration files.  Rather than the
+    present InstallConfig rule, we either need a ConfigFile:<target>:<configs>
+    rule, or we should upgrade the Application and Plugin rules to also accept
+    configuration files. (The GNU msvcgen does this.)
+[L] msvcgen.jam: Provide a generic Resources() rule which allows specification
+    of additional textual resources for inclusion in generated projects.  (The
+    GNU msvcgen does this.)
 [L] Eliminate the need for the documentation-building shell scripts. Jam is
     sufficiently expressive that it should be able to handle the image-copying
     and other functionality without depending upon these external tools.
 
+[W] See if there's a way to create some suitable MSVC templates for external
+    projects, so that we autogenrate msvc-makefiles there too.
 [W] Finish the tool for extracting the documentation from the rules files.
-[W] Create templates for some IDEs. Generating a template for kdevelop3.x is
-    very easy in theory as it comes with a great plugin architecture allowing
-    for custom build plugins. However there are only a standard plugin for
-    make, ant and qmake. We'd have to write a custom jam plugin first, there's
-    no way to have a "standard" plugin where you specify just some commands
-    for building/updating.
-    Seems we have a similar situation in anjuta. Creating projectfiles would
-    be easy but they also rely on make. Anjuta2 seems to be better here and
-    provides support for custom commands being run for building, however the
-    code seems to have a bug at the moment and always adds -k to the
-    commandline :-(
-[W] We should try to get dependencies for system headers as well.  Sometimes
-    people update their system packages too (apt-get, ...) and this might break
-    stuff like OpenGL.  The question is if this is a wanted feature as it
-    increases dependency scanning time.  Also I have no idea yet how to detect
-    the system include directories.
-
+[W] Create templates for some IDEs.  Generating a template for KDevelop3.x is
+    very easy, in theory, as it comes with a great plugin architecture allowing
+    for custom build plugins.  However, there are only standard plugins for
+    make, ant, and qmake.  We'd have to write a custom Jam plugin first; there
+    is no way to have a "standard" plugin where you specify just some commands
+    for building/updating.  Seems we have a similar situation in Anjuta.
+    Creating project files would be easy but they also rely on make.  Anjuta2
+    seems to be better, and provides support for custom commands being run for
+    building, however the code seems to have a bug at the moment and always
+    adds -k to the command-line.  :-(
+[W] It would be nice to have the configure files regenerated and execute if the
+    configure.ac file has changed.  Unfortunately it is not possible to force
+    jam to re-read its configuration files, so this isn't 100% possible...
+    Would it be possible to somehow recreate the configure files and then exit
+    Jam with a message telling that you should rerun configure, or at least
+    emit a big warning?
 
 [*] The MSVC-generated project file for csutil is missing all of the sources
     (and headers) from the cssys directory.
@@ -69,32 +92,33 @@ W - Wishlist (the build also works without this feature)
     files for a single target): It should be possible to reference files in
     parent subdirs (ie. ../bla/blup.cpp). Also it should be possible to have
     several files with same name in different subdirs.
-[*] Improve handling of rc files on win32. jam should know about them and you
+[*] Improve handling of rc files on Win32. Jam should know about them and you
     should be able to specify them like normal source files. (Caveats:
     mingw/cygwin only allow 1 rc file per plugin/application, creating a
-    correct version resource file is hard when doing it purely in jam, but I
-    don't want to rely on external shell scripts)
-[*] external projects on win32 and macosx shouldn't fail. The problem here is
+    correct version resource file is hard when doing it purely in Jam, but I
+    don't want to rely on external shell scripts.)
+[*] External projects on Win32 and MacoSX shouldn't fail. The problem here is
     that the shell scripts in libs/csutil/win32 and libs/csutil/macosx aren't
-    there in external projects. Should we collect scripts which are used by
-    the build system or should we try to avoid these in the jambuild (these 2
-    scripts can probably be solved by improving the jamrules)
+    present in external projects. Should we collect scripts which are used by
+    the build system or should we try to avoid these in the Jamb uild (these 2
+    scripts can probably be solved by improving the Jam rules).
 [*] MacOSX rules should be aware of the struture of an application wrapper
     instead of using external shell scripts for generating them. Probably we
     also want some rules to add additional stuff into the application wrappers.
-[*] rework static plugin linking: This should not be a mode, and the
-    intelligence should not be globally put into the Application and Plugin
-    rules. Rather the Plugin rules should create a 2nd target where they
-    compile into a static library instead of a dynamic plugin. For linking
-    static application you should have to use a 2nd rule where you have to
-    specify which plugins you want to have linked into the application.
-[*] CS is using -fvtable-thunks flag on win32 with gcc 2.x on msys.  This makes
-    CS libs incompatible with other apps.  Someone should check if we really
-    need -fvtable-thunks in general or if we could specify it for the ddraw
-    plugin only.  (Eric says: Checking if -fvtable-thunks is needed is the
-    responsibility of the CS configure script, and indeed it has performed this
-    check for quite a long time now.  I see now evidence that the Jam build
-    utilizes this flag when unwarranted, thus I marked this item as `done'.)
+[*] Re-work static plugin linking: This should not be an independent `mode',
+    and the intelligence should not be put globally into the Application and
+    Plugin rules.  Rather the Plugin rules should create a 2nd target where
+    they compile into a static library instead of a dynamic plugin.  For
+    linking a static application you should have to use a 2nd rule where you
+    have to specify which plugins you want to have linked into the application.
+[*] CS is using -fvtable-thunks flag on Win32 with gcc 2.x on MSYS.  This makes
+    CS libraries incompatible with other applications.  Someone should check if
+    we really need -fvtable-thunks in general or if we could specify it for the
+    `ddraw' plugin only.  (Eric says: Checking if -fvtable-thunks is needed is
+    the responsibility of the CS configure script, and indeed it has performed
+    this check for quite a long time now.  I now see evidence that the Jam
+    build utilizes this flag when unwarranted, thus I marked this item as
+    `done'.)
 [*] Auto-generated Bison & Flex files should be generated into the build
     directory rather than the source tree, since the source tree might be
     read-only or shared.  We should provide rules to copy the generated files

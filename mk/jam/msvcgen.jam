@@ -2,49 +2,6 @@
 # Rules for creating msvc projectfiles
 #============================================================================
 
-# BUGS & TODO 
-#------------
-# - Add support to create multiple, customizable workspaces rather than always
-#   creating only wksall.  Obvious examples of workspaces are the ones
-#   presently created by the GNU make system: wksall, wkstypical, wkswalkall,
-#   wksnewrenderer.
-#
-# - Create a secondary target (such as "msvcinst") which copies the generated
-#   project files from the build/"out" directory back into the source
-#   directory.  This is useful for maintainers who, after having created and
-#   tested a new set of project files, want to then commit them to the CVS
-#   repository.
-#
-# - Either respect ExternaLibs() or fix all the Jamfiles which require special
-#   Windows libraries to invoke MsvcExternalLibrary().  This is necessary for
-#   modules such as cssocket and ensocket which require wsock32.lib, for
-#   instance.  There are a number of other such modules.  The current monlithic
-#   solution of placing this information in CS/mk/msvcgen/Jamconfig is ugly,
-#   error-prone, and a maintenance headache.
-#
-# - Overhaul the "config" file handling rule so that it associates
-#   configuration files with built targets.  This will allow the generated
-#   projects to reference configuration files.  Rather than the present
-#   InstallConfig rule, we either need a ConfigFile:<target>:<configs> rule, or
-#   we should upgrade the Application and Plugin rules to also accept
-#   configuration files.
-#
-# - Likewise, provide a generic Resources() rule which allows specification of
-#   additional textual resources for inclusion in generated projects.
-#
-# - When PERL5.SDK.AVAILABLE is "yes", Jam reports that it doesn't know how to
-#   locate or create <grist>csperlxs.c.
-#
-# - Eliminate the ugly mk/msvcgen/msvcgen.sh and mk/msvcgen/Jamconfig.
-#   Instead, it should be possible to run the entire process using the normal
-#   Jamconfig created by the configuration process.
-#
-# - This file should also override the Help rule to capture the help message
-#   for a target, rather than relying upon "$(<)_help = $(>)" in help.jam,
-#   since help.jam does not utilize that itself, and it is likely to be removed
-#   by an unsuspecting person.  msvcgen.jam should be responsible for its own
-#   needs.
-
 if "$(MSVCGEN_CONFIG)"
 {
 MSVCGEN = "$(PERL) $(TOP)/mk/msvcgen/msvcgen.pl" ;
