@@ -1178,16 +1178,15 @@ void csBugPlug::Dump (iCamera* c)
 {
   const char* sn = c->GetSector ()->QueryObject ()->GetName ();
   if (!sn) sn = "?";
-  csPlane3 far_plane;
-  bool has_far_plane = c->GetFarPlane (far_plane);
+  csPlane3* far_plane = c->GetFarPlane ();
   Report (CS_REPORTER_SEVERITY_DEBUG,
   	"Camera: %s (mirror=%d, fov=%d, fovangle=%g,",
   	sn, c->IsMirrored (), c->GetFOV (), c->GetFOVAngle ());
   Report (CS_REPORTER_SEVERITY_DEBUG, "    shiftx=%g shifty=%g camnr=%d)",
   	c->GetShiftX (), c->GetShiftY (), c->GetCameraNumber ());
-  if (has_far_plane)
+  if (far_plane)
     Report (CS_REPORTER_SEVERITY_DEBUG, "    far_plane=(%g,%g,%g,%g)",
-    	far_plane.A (), far_plane.B (), far_plane.C (), far_plane.D ());
+    	far_plane->A (), far_plane->B (), far_plane->C (), far_plane->D ());
   csReversibleTransform& trans = c->GetTransform ();
   Dump (4, trans.GetO2TTranslation (), "Camera vector");
   Dump (4, trans.GetO2T (), "Camera matrix");

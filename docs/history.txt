@@ -1,5 +1,26 @@
 The history order is reversed so that new features are at the top.
 
+19-Dec-2001
+	- Rationalized the far plane in the camera:
+	    - Removed the special csFarPlane class in the engine and instead
+	      extended csPlane3 with the ClipPolygon() routine.
+	    - Added SetFarPlane() to iCamera.
+	    - Changed GetFarPlane() in iCamera to return a pointer to the
+	      far plane instead of the copy it does now. Should be more
+	      efficient.
+	    - Changed SetFarPlane() in csCamera to make a copy of the given
+	      plane. csCamera is now responsible for cleaning up the far
+	      plane on its own.
+	    - Fixed the copy constructors of csCamera to make a new copy
+	      of the far plane if present. Also fixed the destructor of
+	      csCamera to actually clean up the far plane.
+	    - Removed csCamera::UseFarPlane(). The fact that there is a
+	      far plane is enough to indicate we want to use it.
+	- Started new apimod doc for 0.92 to 0.94.
+	- Moved cs.i (for python and lua scripting) from plugins/cscript/common
+	  to include/ivaria. The reason is that this is also a public include
+	  file. If you want to make a python plugin in your own project you
+	  will need to include this file.
 14-Dec-2001
 	- Reverted a patch from 'res' on the OpenGL windows canvas
 	  related to the calculation of 'wwidth' and 'wheight'. This

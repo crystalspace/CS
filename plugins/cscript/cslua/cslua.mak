@@ -57,7 +57,7 @@ else
 # TO_INSTALL.STATIC_LIBS += $(CSLUA)
 endif
 
-SWIG.INTERFACE = plugins/cscript/common/cs.i
+SWIG.INTERFACE = include/ivaria/cs.i
 SWIG.CSLUA = plugins/cscript/cslua/cs_lua.cpp
 SWIG.CSLUA.OBJ = $(addprefix $(OUT),$(notdir $(SWIG.CSLUA:.cpp=$O)))
 

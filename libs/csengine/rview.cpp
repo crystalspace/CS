@@ -582,13 +582,13 @@ bool csRenderView::TestBSphere (const csReversibleTransform& o2c,
   //------
   // Test against far plane if needed.
   //------
-  csPlane3 far_plane;
-  if (ctxt->icamera->GetFarPlane (far_plane))
+  csPlane3* far_plane = ctxt->icamera->GetFarPlane ();
+  if (far_plane)
   {
     // Ok, so this is not really far plane clipping - we just dont draw this
     // object if the bounding sphere is further away than the D
     // part of the farplane.
-    if (tr_center.z-radius > far_plane.D ())
+    if (tr_center.z-radius > far_plane->D ())
       return false;
   }
 
@@ -644,13 +644,13 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
   //------
   // Test against far plane if needed.
   //------
-  csPlane3 far_plane;
-  if (ctxt->icamera->GetFarPlane (far_plane))
+  csPlane3* far_plane = ctxt->icamera->GetFarPlane ();
+  if (far_plane)
   {
     // Ok, so this is not really far plane clipping - we just dont draw this
     // object if the bounding sphere is further away than the D
     // part of the farplane.
-    if (tr_center.z-radius > far_plane.D ())
+    if (tr_center.z-radius > far_plane->D ())
       return false;
   }
 
@@ -734,13 +734,13 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
   //------
   // Test against far plane if needed.
   //------
-  csPlane3 far_plane;
-  if (ctxt->icamera->GetFarPlane (far_plane))
+  csPlane3* far_plane = ctxt->icamera->GetFarPlane ();
+  if (far_plane)
   {
     // Ok, so this is not really far plane clipping - we just dont draw this
     // object if no point of the camera_bounding box is further than the D
     // part of the farplane.
-    if (cbox.SquaredOriginDist () > far_plane.D ()*far_plane.D ())
+    if (cbox.SquaredOriginDist () > far_plane->D ()*far_plane->D ())
       return false;	
   }
   

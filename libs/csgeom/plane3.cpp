@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csgeom/plane3.h"
 #include "csgeom/math3d.h"
+#include "csutil/garray.h"
 
 //---------------------------------------------------------------------------
 
@@ -35,6 +36,67 @@ void csPlane3::Set (const csVector3& v1, const csVector3& v2,
 {
   csMath3::CalcNormal (norm, v1, v2, v3);
   DD = - norm * v1;
+}
+
+static CS_DECLARE_GROWING_ARRAY (verts, csVector3);
+static CS_DECLARE_GROWING_ARRAY (vis, bool);
+static void CPInit (int len) { verts.SetLimit (len); vis.SetLimit (len); }
+
+bool csPlane3::ClipPolygon (csVector3*& pverts, int& num_verts)
+{
+  int i,i1, num_vertices = num_verts, cnt_vis = 0;
+  bool zs, z1s;
+  float r;
+
+  if (num_verts > verts.Limit())
+    CPInit (num_verts);
+
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    vis[i] = Classify (pverts[i]) >= 0;
+    if (vis[i])
+      cnt_vis++;
+  }
+
+  if (cnt_vis == 0)
+    return false; // Polygon is not visible.
+
+  // If all vertices are visible then everything is ok.
+  if (cnt_vis == num_vertices)
+  {
+    num_verts = num_vertices;
+    return true;
+  }
+
+  // We really need to clip.
+  num_verts = 0;
+
+  i1 = num_vertices - 1;
+
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    zs = vis[i];
+    z1s = vis[i1];
+
+    if (!z1s && zs)
+    {
+      csIntersect3::Plane(pverts[i1], pverts[i], *this, verts[num_verts], r);
+      num_verts++;
+      verts[num_verts++] = pverts[i];
+    }
+    else if (z1s && !zs)
+    {
+      csIntersect3::Plane(pverts[i1], pverts[i], *this, verts[num_verts], r);
+      num_verts++;
+    }
+    else if (z1s && zs)
+    {
+      verts[num_verts++] = pverts[i];
+    }
+    i1 = i;
+  }
+  pverts = verts.GetArray();
+  return true;
 }
 
 //---------------------------------------------------------------------------

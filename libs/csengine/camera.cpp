@@ -49,7 +49,6 @@ csCamera::csCamera () : csOrthoTransform()
   fov_angle = default_fov_angle;
   shift_x = csEngine::frame_width / 2;
   shift_y = csEngine::frame_height / 2;
-  use_farplane = false;
   fp = NULL;
   cameranr = cur_cameranr++;
   only_portals = true;
@@ -58,6 +57,11 @@ csCamera::csCamera () : csOrthoTransform()
 csCamera::csCamera (csCamera* c) : csOrthoTransform ()
 {
   *this = *c;
+  if (fp)
+  {
+    // Make a copy of the plane.
+    fp = new csPlane3 (*fp);
+  }
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   cameranr = cur_cameranr++;
@@ -66,6 +70,11 @@ csCamera::csCamera (csCamera* c) : csOrthoTransform ()
 csCamera::csCamera (const csCamera& c) : csOrthoTransform (), iBase ()
 {
   *this = c;
+  if (fp)
+  {
+    // Make a copy of the plane.
+    fp = new csPlane3 (*fp);
+  }
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
   cameranr = cur_cameranr++;
@@ -73,6 +82,16 @@ csCamera::csCamera (const csCamera& c) : csOrthoTransform (), iBase ()
 
 csCamera::~csCamera ()
 {
+  delete fp;
+}
+
+void csCamera::SetFarPlane (const csPlane3* farplane)
+{
+  delete fp;
+  if (farplane)
+    fp = new csPlane3 (*farplane);
+  else
+    fp = NULL;
 }
 
 csPolygon3D* csCamera::GetHit (csVector3& v)

@@ -1,0 +1,15 @@
+@c -*-texinfo-*-
+@node API Modifications 94, API Modifications 90, API Modifications, API Modifications
+@appendixsec @sc{api} Changes from 0.92 to 0.94
+@cindex @sc{api} Changes
+
+This section documents the major changes between versions 0.92 and 0.94 of of
+Crystal Space.
+
+@subheading iCamera changes
+@cindex @code{iCamera}
+
+Added @code{iCamera::SetFarPlane()} and changed @code{iCamera::GetFarPlane()}
+to return a pointer to the far plane. This function will return @code{NULL} if
+no far plane is used.
+

@@ -22,7 +22,6 @@
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 #include "iengine/camera.h"
-#include "csengine/planeclp.h"
 #include "csengine/sector.h"
 #include "csengine/polygon.h"
 
@@ -48,8 +47,7 @@ private:
   bool only_portals;
 
   /// a farplane to cut everything thats behind it
-  csPlaneClip *fp;
-  bool use_farplane;
+  csPlane3 *fp;
 
   ///
   int aspect;
@@ -149,14 +147,9 @@ public:
   float GetShiftY () const { return shift_y; }
 
   /// Set farplane, everything behind this will be cut
-  void SetFarPlane (csPlaneClip* farplane) { fp = farplane; }
+  void SetFarPlane (const csPlane3* farplane);
   /// Get the Farplane
-  csPlaneClip* GetFarPlane () const { return fp; }
-  
-  /// do we actually use the farplane ?
-  bool UseFarPlane () const { return use_farplane; }
-  /// Set whether we use farplane or not. Farplane must been set before
-  void UseFarPlane (bool useit) { use_farplane = fp && useit; }
+  csPlane3* GetFarPlane () const { return fp; }
   
   /**
    * Set the sector that the camera resides in.
@@ -408,15 +401,13 @@ public:
     {
       scfParent->SetMirrored (m);
     }
-    virtual bool GetFarPlane (csPlane3& pl) const
+    virtual csPlane3* GetFarPlane () const
     {
-      if (scfParent->fp)
-      {
-        pl = *scfParent->fp;
-	return scfParent->use_farplane;
-      }
-      else
-        return false;
+      return scfParent->GetFarPlane ();
+    }
+    virtual void SetFarPlane (csPlane3* fp)
+    {
+      scfParent->SetFarPlane (fp);
     }
     virtual long GetCameraNumber () const
     {

@@ -42,7 +42,7 @@ class csVector2;
 struct iSector;
 struct iPolygon3D;
 
-SCF_VERSION (iCamera, 0, 0, 12);
+SCF_VERSION (iCamera, 0, 0, 13);
 
 /**
  * Camera class. This class represents camera objects which can be used to
@@ -54,9 +54,7 @@ SCF_VERSION (iCamera, 0, 0, 12);
  *      camera. The position should be inside the home sector.
  * <li> Field of View: Controls the size on screen of the rendered objects and
  *      can be used for zooming effects. The FOV can be given either in pixels
- *      or as an angle in radians. The view is not zoomed if the FOV (in pixels)
- *      is equal to the display height (@@@correct?), or (in radians) equal to
- *      (@@@ to what?).
+ *      or as an angle in radians.
  * <li> Shift amount: The projection center in screen coordinates.
  * <li> Mirrored Flag: Should be set to true if the transformation is mirrored.
  * <li> Far Plane: A distant plane that is orthogonal to the view direction. It
@@ -178,11 +176,19 @@ struct iCamera : public iBase
 
   /**
    * Get the 3D far plane that should be used to clip all geometry.
-   * If this function returns false then this plane is invalid and should
-   * not be used. Otherwise it must be used to clip the object before
+   * If this function returns NULL no far clipping is required.
+   * Otherwise it must be used to clip the object before
    * drawing.
    */
-  virtual bool GetFarPlane (csPlane3& pl) const = 0;
+  virtual csPlane3* GetFarPlane () const = 0;
+
+  /**
+   * Set the 3D far plane used to clip all geometry.
+   * If the pointer is NULL then far plane clipping will be disabled.
+   * Otherwise it will be enabled and the plane will be copied (so you
+   * can free or reuse the pointer you give here).
+   */
+  virtual void SetFarPlane (csPlane3* fp) = 0;
 
   /**
    * Get the camera number. This number is changed for every new camera

@@ -25,6 +25,7 @@
 class csIsoRenderView;
 class csBoxClipper;
 class csIsoFakeCamera;
+class csPlane3;
 
 /**
  *  isometric view
@@ -147,7 +148,8 @@ public:
   virtual void Correct(int) {}
   virtual bool IsMirrored() const {return mirror;}
   virtual void SetMirrored(bool m) {mirror = m;}
-  virtual bool GetFarPlane(class csPlane3 &) const {return false;}
+  virtual void SetFarPlane(csPlane3*) { }
+  virtual csPlane3* GetFarPlane() const {return NULL;}
   virtual long GetCameraNumber() const {return camnum;}
   virtual iPolygon3D *GetHit (csVector3 &) {return NULL;}
 

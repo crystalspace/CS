@@ -1236,8 +1236,7 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
   bool do_clip_plane = d->GetClipPlane (clip_plane);
   if (do_clip_plane) pclip_plane = &clip_plane;
   else pclip_plane = NULL;
-  csPlaneClip plclip;
-  bool do_plclip = icam->GetFarPlane (plclip);
+  csPlane3* plclip = icam->GetFarPlane ();
 
   for (i = 0 ; i < num ; i++)
   {
@@ -1248,7 +1247,7 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
     if (p->ClipToPlane (pclip_plane,
 	 	camtrans.GetOrigin (), verts, num_verts)) //@@@Pool for verts?
     {
-      if (!do_plclip || plclip.ClipPolygon (verts, num_verts))
+      if (!plclip || plclip->ClipPolygon (verts, num_verts))
       {
         clip = (csPolygon2D*)(render_pool->Alloc ());
 	if (p->DoPerspective (camtrans, verts, num_verts, clip, NULL,
@@ -1538,9 +1537,8 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         if ( bsppol->ClipToPlane (pclip_plane, camtrans.GetOrigin (),
 	  	verts, num_verts))
 	{
-      	  csPlaneClip plclip;
-      	  bool do_plclip = icam->GetFarPlane (plclip);
-	  if (!do_plclip || plclip.ClipPolygon (verts, num_verts))   
+      	  csPlane3* plclip = icam->GetFarPlane ();
+	  if (!plclip || plclip->ClipPolygon (verts, num_verts))   
 	  {
             if (bsppol->DoPerspective (camtrans, verts,
 	       		num_verts, clip, icam->IsMirrored ()) 
@@ -1586,13 +1584,12 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
     	bool do_clip_plane = d->GetClipPlane (clip_plane);
     	if (do_clip_plane) pclip_plane = &clip_plane;
     	else pclip_plane = NULL;
-      	csPlaneClip plclip;
-      	bool do_plclip = icam->GetFarPlane (plclip);
+      	csPlane3* plclip = icam->GetFarPlane ();
 
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if (
          p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts)
-	 && (!do_plclip || plclip.ClipPolygon (verts, num_verts))		    
+	 && (!plclip || plclip->ClipPolygon (verts, num_verts))		    
          && p->DoPerspective (camtrans, verts, num_verts, clip, NULL,
                               icam->IsMirrored ())
          && clip->ClipAgainst (d->GetClipper ()))
@@ -1615,12 +1612,11 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
     	bool do_clip_plane = d->GetClipPlane (clip_plane);
     	if (do_clip_plane) pclip_plane = &clip_plane;
     	else pclip_plane = NULL;
-      	csPlaneClip plclip;
-      	bool do_plclip = icam->GetFarPlane (plclip);
+      	csPlane3* plclip = icam->GetFarPlane ();
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if (!(
            p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts)
-           && (!do_plclip || plclip.ClipPolygon (verts, num_verts))		    
+           && (!plclip || plclip->ClipPolygon (verts, num_verts))
            && p->DoPerspective (camtrans, verts, num_verts, clip, NULL,
                                 icam->IsMirrored ())
            && clip->ClipAgainst (d->GetClipper ())))
@@ -2218,9 +2214,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   if (!node) return false;
   if (node->Type () != NODE_OCTREE) return true;
 
-  csPlane3 far_plane;
-  bool use_far_plane;
-
   int i;
   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
@@ -2242,8 +2235,8 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 
   c_buffer = w->GetCBuffer ();
   int num_array;
-  use_far_plane = icam->GetFarPlane (far_plane);
-  otree->GetConvexOutline (onode, pos, array, num_array, use_far_plane);
+  csPlane3* far_plane = icam->GetFarPlane ();
+  otree->GetConvexOutline (onode, pos, array, num_array, far_plane != NULL);
 
   if (num_array)
   {
@@ -2277,12 +2270,12 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
       return false;
     }
     
-    if (use_far_plane)
+    if (far_plane)
     {
       if (num_array == 7) // we havent transformed the 7th yet
        cam[6] = camtrans.Other2This (array[6]);
       for (i = 0 ; i < num_array ; i++)
-        if (far_plane.Classify (cam[i]) > SMALL_EPSILON) 
+        if (far_plane->Classify (cam[i]) > SMALL_EPSILON) 
 	  break;
       if (i == num_array) return false;
     }
