@@ -251,7 +251,7 @@ bool csIniFile::Load (bool (*ReadLine)(csSome Stream, void *data, size_t size),
     if (b64mode)                        // Base64 mode
     {
       int i, len;
-      char *s;
+      char const *s;
       bool finish = false;
 
       // Check for end-of-base64-sequence character(s) -- '='
