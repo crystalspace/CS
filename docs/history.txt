@@ -69,6 +69,10 @@ chronological order.
 	      unpredicted results. It now resembles behavior of a real
 	      filesystem more closely: Creating/Writing a file more than once
 	      simply overwrites the previous version in cache.
+	- Rhad fixed a typo that caused a lot of havok with components that 
+	  implemented signals.  If AWS was crashing today, update.  The
+	  SetOwner() member of awsSource was incorrectly ignoring the passed
+	  parameter, and setting the owner class member to itself.
 23-Oct-2003
 	- Jorrit reduced the 'yellow-message-time' in the standard reporter
 	  from 10 to 5 seconds.

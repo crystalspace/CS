@@ -151,7 +151,7 @@ public:
 
   /// Initializes a couple things.
   awsSource ();
-  void SetOwner (iAwsComponent *_owner) { owner = owner; }
+  void SetOwner (iAwsComponent *_owner) { owner = _owner; }
 
   /// Does nothing
   virtual ~awsSource ();
