@@ -58,6 +58,14 @@ const   bool aws_debug=false;  // set to true to turn on debugging printf's
  */
 const int AWSF_AlwaysEraseWindows=1;
 
+/** This flag makes the windowing system redraw every time, which is necessary when
+ * drawing to the screen context since this gets erased every frame by the engine.
+ * Note that this flag is NOT necessary if the engine will not be drawing to the
+ * background with AWS.  In other words, if AWS has complete control of the screen
+ * context.
+ */
+const int AWSF_AlwaysRedrawWindows=2;
+
 
 SCF_VERSION (iAws, 0, 1, 0);
 
@@ -124,6 +132,9 @@ public:
   /// Create a default canvas, just a single proctex
   virtual iAwsCanvas *CreateDefaultCanvas(iEngine* engine, iTextureManager* txtmgr, 
     int width, int height, const char *name)=0;
+
+  /// Create a canvas that uses custom graphics devices
+  virtual iAwsCanvas *CreateCustomCanvas(iGraphics2D *g2d, iGraphics3D *g3d)=0;
 
   /// Get the iGraphics2D interface so that components can use it.
   virtual iGraphics2D *G2D()=0;
