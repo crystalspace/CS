@@ -172,6 +172,7 @@ ifeq ($(CAL3D.AVAILABLE),yes)
 PLUGINS.DYNAMIC += mesh/sprcal3d/object
 PLUGINS.DYNAMIC += mesh/sprcal3d/persist
 endif
+PLUGINS.DYNAMIC += terraformer/simpleformer
 PLUGINS.DYNAMIC += font/server/fontplex
 ifeq ($(FT2.AVAILABLE),yes)
 PLUGINS.DYNAMIC += font/server/freefnt2

@@ -21,6 +21,13 @@ chronological order.
 	  instead just perform memberwise copy/assignment.  For this reason, we
 	  need to have copy-constructors and assignment operators for both T
 	  and T2.
+	- Eric Sunshine made the following changes to the new TerraFormer
+	  plugin:
+	    - Fixed nasty copy/paste errors in the makefile.
+	    - Added reference for plugin to user.mak.
+	    - Added missing Jamfile.
+	    - Added missing .csplugin meta-information file.
+	    - Fixed several compilation errors and warnings.
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.

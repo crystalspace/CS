@@ -71,7 +71,7 @@ private:
   csStringID stringMaterialIndices;
 
   // Allow csSimpleSampler to access the data of this class
-  friend csSimpleSampler;
+  friend class csSimpleSampler;
 
 public:
   SCF_DECLARE_IBASE;
@@ -82,7 +82,7 @@ public:
   /// csSimpleFormer destructor
   virtual ~csSimpleFormer ();
 
-  // --------- iSimpleFormerState implementation --------- \\
+  // --------- iSimpleFormerState implementation ---------
 
   /// Set what heightmap to use
   void SetHeightmap (iImage *heightmap);
@@ -116,14 +116,14 @@ public:
   } scfiSimpleFormerState;
 
 
-  // ------------ iTerraFormer implementation ------------ \\
+  // ------------ iTerraFormer implementation ------------
 
   /// Creates and returns a sampler. See interface for details
   virtual csPtr<iTerraSampler> GetSampler (csBox2 region, 
                                            unsigned int resolution);
 
   
-  // ------------- iComponent implementation ------------- \\
+  // ------------- iComponent implementation -------------
 
   /// Initializes this object
   bool Initialize (iObjectRegistry* objectRegistry);
@@ -175,7 +175,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  // ------------ iTerraSampler implementation ----------- \\
+  // ------------ iTerraSampler implementation -----------
 
   /// csSimpleSampler constructor
   csSimpleSampler (csSimpleFormer* terraFormer,

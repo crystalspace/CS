@@ -1,15 +1,10 @@
-# This is a subinclude file used to define the rules needed
-# to build the simpleformer plug-in.
-
-# Driver description
-DESCRIPTION.simpleformer = Crystal Space Terraformer plug-in
+DESCRIPTION.simpleformer = Crystal Space simple terraformer
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
-# Driver-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make simpleformer     Make the $(DESCRIPTION.simpleformer)$"
+  $(NEWLINE)echo $"  make simpleformer Make the $(DESCRIPTION.simpleformer)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -40,43 +35,50 @@ else
   TO_INSTALL.STATIC_LIBS += $(SIMPLEFORMER)
 endif
 
-INF.SIMPLEFORMER = $(SRCDIR)/plugins/physics/simpleformer/simpleformer.csplugin
-INC.SIMPLEFORMER = $(wildcard $(addprefix $(SRCDIR)/,plugins/physics/simpleformer/*.h))
-SRC.SIMPLEFORMER = $(wildcard $(addprefix $(SRCDIR)/,plugins/physics/simpleformer/*.cpp))
-OBJ.SIMPLEFORMER = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPLEFORMER:.cpp=$O)))
+DIR.SIMPLEFORMER = plugins/terraformer/simpleformer
+OUT.SIMPLEFORMER = $(OUT)/$(DIR.SIMPLEFORMER)
+INF.SIMPLEFORMER = $(SRCDIR)/$(DIR.SIMPLEFORMER)/simpleformer.csplugin
+INC.SIMPLEFORMER = $(wildcard $(SRCDIR)/$(DIR.SIMPLEFORMER)/*.h)
+SRC.SIMPLEFORMER = $(wildcard $(SRCDIR)/$(DIR.SIMPLEFORMER)/*.cpp)
+OBJ.SIMPLEFORMER = \
+  $(addprefix $(OUT.SIMPLEFORMER)/,$(notdir $(SRC.SIMPLEFORMER:.cpp=$O)))
 DEP.SIMPLEFORMER = CSGEOM CSUTIL
+
+OUTDIRS += $(OUT.SIMPLEFORMER)
 
 MSVC.DSP += SIMPLEFORMER
 DSP.SIMPLEFORMER.NAME = simpleformer
 DSP.SIMPLEFORMER.TYPE = plugin
+
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: simpleformer simpleformerclean
+.PHONY: simpleformer simpleformerclean simpleformercleandep
+
 simpleformer: $(OUTDIRS) $(SIMPLEFORMER)
 
-$(OUT)/%$O: $(SRCDIR)/plugins/physics/simpleformer/%.cpp
-	$(DO.COMPILE.CPP) $(ODE.CFLAGS)
+$(OUT.SIMPLEFORMER)/%$O: $(SRCDIR)/$(DIR.SIMPLEFORMER)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(SIMPLEFORMER): $(OBJ.SIMPLEFORMER) $(LIB.SIMPLEFORMER)
-	$(DO.PLUGIN.PREAMBLE) \
-	$(DO.PLUGIN.CORE) $(ODE.LFLAGS) \
-	$(DO.PLUGIN.POSTAMBLE)
+	$(DO.PLUGIN)
 
 clean: simpleformerclean
 simpleformerclean:
 	-$(RMDIR) $(SIMPLEFORMER) $(OBJ.SIMPLEFORMER) $(OUTDLL)/$(notdir $(INF.SIMPLEFORMER))
 
+cleandep: simpleformercleandep
+simpleformercleandep:
+	-$(RM) $(OUT.SIMPLEFORMER)/simpleformer.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/simpleformer.dep
-$(OUTOS)/simpleformer.dep: $(SRC.SIMPLEFORMER)
-	$(DO.DEP1) \
-	$(ODE.CFLAGS) \
-	$(DO.DEP2)
+dep: $(OUT.SIMPLEFORMER) $(OUT.SIMPLEFORMER)/simpleformer.dep
+$(OUT.SIMPLEFORMER)/simpleformer.dep: $(SRC.SIMPLEFORMER)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/simpleformer.dep
+-include $(OUT.SIMPLEFORMER)/simpleformer.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
