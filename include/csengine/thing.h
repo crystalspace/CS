@@ -900,10 +900,16 @@ public:
     virtual int GetVertexCount () { return scfParent->num_vertices; }
     virtual const csVector3 &GetVertex (int i) const
     { return scfParent->obj_verts[i]; }
+    virtual const csVector3* GetVertices () const
+    { return scfParent->obj_verts; }
     virtual const csVector3 &GetVertexW (int i) const
     { return scfParent->wor_verts[i]; }
+    virtual const csVector3* GetVerticesW () const
+    { return scfParent->wor_verts; }
     virtual const csVector3 &GetVertexC (int i) const
     { return scfParent->cam_verts[i]; }
+    virtual const csVector3* GetVerticesC () const
+    { return scfParent->cam_verts; }
     virtual int CreateVertex (const csVector3 &iVertex)
     { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
     virtual void CheckFrustum (iFrustumView* fview, iMovable* movable)
