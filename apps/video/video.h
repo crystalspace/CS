@@ -26,17 +26,17 @@
 #include "ivideo/codec.h"
 #include "imap/parser.h"
 
-class csSector;
-class csView;
-class csEngine;
+struct iSector;
+struct iView;
+struct iEngine;
 
 class Video : public SysSystemDriver
 {
   typedef SysSystemDriver superclass;
 private:
-  csSector* room;
-  csView* view;
-  csEngine* engine;
+  iSector* room;
+  iView* view;
+  iEngine* engine;
   iStreamFormat *pVideoFormat;
   iVideoStream *pVStream;
   iLoader *LevelLoader;

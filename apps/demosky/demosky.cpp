@@ -38,8 +38,7 @@
 #include "iengine/thing.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
-
-#include "csengine/material.h"
+#include "iengine/material.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

@@ -19,19 +19,23 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "apps/video/video.h"
-#include "csengine/sector.h"
-#include "csengine/engine.h"
-#include "csengine/csview.h"
-#include "csengine/camera.h"
-#include "csengine/light.h"
-#include "csengine/polygon.h"
-#include "csengine/meshobj.h"
-#include "csengine/texture.h"
-#include "csengine/thing.h"
+#include "csutil/cscolor.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
 #include "imap/parser.h"
+#include "iengine/sector.h"
+#include "iengine/engine.h"
+#include "iengine/view.h"
+#include "iengine/camera.h"
+#include "iengine/light.h"
+#include "iengine/statlght.h"
+#include "iengine/polygon.h"
+#include "iengine/mesh.h"
+#include "iengine/texture.h"
+#include "iengine/thing.h"
+#include "iengine/material.h"
+#include "imesh/object.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -57,8 +61,9 @@ Video::~Video ()
     pVideoFormat->Unload ();
     pVideoFormat->DecRef ();
   }
-  delete view;
+  if (view) view->DecRef ();
   if (LevelLoader) LevelLoader->DecRef();
+  if (engine) engine->DecRef ();
 }
 
 void cleanup ()
@@ -74,20 +79,18 @@ bool Video::Initialize (int argc, const char* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  iEngine *Engine = QUERY_PLUGIN (this, iEngine);
-  if (!Engine)
+  engine = QUERY_PLUGIN (this, iEngine);
+  if (!engine)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
-  engine = Engine->GetCsEngine ();
-  Engine->DecRef ();
 
   // Find the pointer to level loader plugin
   LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
@@ -127,11 +130,11 @@ bool Video::Initialize (int argc, const char* const argv[],
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
-  csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   iMaterialWrapper *iMW = QUERY_INTERFACE (tm, iMaterialWrapper);
  
-  room = engine->CreateCsSector ("room");
+  room = engine->CreateSector ("room");
   iThingState* walls = QUERY_INTERFACE (engine->CreateSectorWallsMesh (room, "walls")->GetMeshObject (), iThingState);
   csVector3 
 	   f1 (-5, 20, 5),
@@ -194,12 +197,12 @@ bool Video::Initialize (int argc, const char* const argv[],
   iMW->DecRef ();
   walls->DecRef ();
   
-  csStatLight* light;
-  light = new csStatLight (-3, 5, 0, 10, 1, 0, 0, false);
+  iStatLight* light;
+  light = engine->CreateLight (NULL, csVector3(-3, 5, 0), 10, csColor(1, 0, 0), false);
   room->AddLight (light);
-  light = new csStatLight (3, 5, 0, 10, 0, 0, 1, false);
+  light = engine->CreateLight (NULL, csVector3(3, 5, 0), 10, csColor(0, 0, 1), false);
   room->AddLight (light);
-  light = new csStatLight (0, 5, -3, 10, 0, 1, 0, false);
+  light = engine->CreateLight (NULL, csVector3(0, 5, -3), 10, csColor(0, 1, 0), false);
   room->AddLight (light);
 
   engine->Prepare ();
@@ -210,8 +213,8 @@ bool Video::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (engine, G3D);
-  view->GetCamera ()->SetSector (&room->scfiSector);
+  view = engine->CreateView (G3D);
+  view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
 

@@ -52,8 +52,6 @@
 #include "iengine/camera.h"
 #include "igraphic/loader.h"
 
-#include "csengine/material.h"
-
 //------------------------------------------------- We need the 3D engine -----
 
 REGISTER_STATIC_LIBRARY (engine)
