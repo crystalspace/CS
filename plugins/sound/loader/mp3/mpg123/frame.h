@@ -141,7 +141,7 @@ class csMPGFrame
   int copyright;
   int original;
   int emphasis;
-  int framesize; /* computed framesize */
+  unsigned int framesize; /* computed framesize */
 
   csPCMBuffer *GetPCMBuffer () {return pcm;}
 

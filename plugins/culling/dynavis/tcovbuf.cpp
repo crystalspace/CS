@@ -1626,7 +1626,7 @@ iString* csTiledCoverageBuffer::Debug_UnitTest ()
 
   csVector2 poly[4];
   //csCoverageTile* t;
-  iString* s;
+  //iString* s;
 
   Initialize ();
   COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");

@@ -41,6 +41,13 @@
   #pragma warning(disable:4100)   // Use of void* as a formal function parameter
   #pragma warning(disable:4390)   // Empty control statement
   #pragma warning(disable:4514)   // Removed unreferenced inlines. Only MSVC 6 relevant.
+  #pragma warning(disable:4505)
+  #pragma warning(disable:4146)
+  #pragma warning(disable:4701)
+  #pragma warning(disable:4355)
+  #pragma warning(disable:4101)
+  #pragma warning(disable:4102)
+  #pragma warning(disable:4005)
 
   #pragma inline_depth (255)
   #pragma inline_recursion (on)

@@ -49,7 +49,7 @@ void ToLower(char *dst, const char *src) {
   char *d=dst;
   const char *s=src;
   for(; *s; s++, d++) {
-    *d=tolower(*s);
+    *d= (char)tolower(*s);
   }
   *d=0;
 }
@@ -82,7 +82,7 @@ void WriteBone(FILE *f, int ind, float scale, CalCoreSkeleton *skel, CalCoreBone
 }
 
 void CalQuatInverse(CalQuaternion &qdest, const CalQuaternion &qin) {
-  float inverselen=1.0f / qsqrt(qin[0]*qin[0]+qin[1]*qin[1]+qin[2]*qin[2]+qin[3]*qin[3]);
+  float inverselen= float(1.0f / qsqrt(qin[0]*qin[0]+qin[1]*qin[1]+qin[2]*qin[2]+qin[3]*qin[3]));
   qdest[0]=-inverselen*qin[0];
   qdest[1]=-inverselen*qin[1];
   qdest[2]=-inverselen*qin[2];
@@ -307,7 +307,8 @@ int ConvertModel(const char *filename) {
   float scale=1.0f;
   float timescale=1.0f;
 
-  while(1) {
+  int xx = 1;
+  while(xx) {
     char buf[1000];
     if(!fgets(buf, 1000, f))
       break;
@@ -328,10 +329,10 @@ int ConvertModel(const char *filename) {
     param[s]=0;
 
     if(strcmp(cmd, "geomscale")==0) {
-      scale=atof(param);
+      scale= (float) atof(param);
       printf("Scale Geom to %f\n", scale);
     } else if(strcmp(cmd, "timescale")==0) {
-      timescale=atof(param);
+      timescale= (float) atof(param);
       printf("Scale Time to %f\n", timescale);
     } else if(strcmp(cmd, "skeleton")==0) {
       if(!calCoreModel.loadCoreSkeleton(param)) {
