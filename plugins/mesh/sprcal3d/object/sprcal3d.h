@@ -25,6 +25,7 @@
 #include "csutil/garray.h"
 #include "csutil/refarr.h"
 #include "csutil/hash.h"
+#include "csutil/weakref.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/poly2d.h"
@@ -169,7 +170,7 @@ public:
   iObjectRegistry* object_reg;
   iVirtualClock* vc;
 
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
   csRef<iLightManager> light_mgr;
 
   /**
@@ -494,7 +495,7 @@ public:
 class csSpriteCal3DMeshObject : public iMeshObject
 {
 private:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   iMeshObjectDrawCallback* vis_cb;
   uint32 current_features;  // LOD Control thing
   iBase* logparent;
@@ -568,7 +569,7 @@ private:
   csDirtyAccessArray<csRenderMesh*> allRenderMeshes;
   csArray<csArray<csRenderMesh> > renderMeshes;
   csRenderMeshHolderMultiple rmHolder;
-  csRef<iGraphics3D> G3D;
+  csWeakRef<iGraphics3D> G3D;
   iMovable* currentMovable;
 #endif
   uint meshVersion;

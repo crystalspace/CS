@@ -36,6 +36,7 @@
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
 #include "csutil/util.h"
+#include "csutil/weakref.h"
 #include "cstool/rendermeshholder.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
@@ -292,7 +293,7 @@ public:
   float cosinus_factor;
 
 #ifdef CS_USE_NEW_RENDERER
-  csRef<iGraphics3D> r3d;
+  csWeakRef<iGraphics3D> r3d;
 
   csRefArray<iPolygonRenderer> polyRenderers;
 
@@ -1159,7 +1160,7 @@ public:
    * csThingObjectType must keep a reference to G3D because when polygons
    * are destructed they actually refer to G3D to clear the cache.
    */
-  csRef<iGraphics3D> G3D;
+  csWeakRef<iGraphics3D> G3D;
   /// An object pool for lightpatches.
   csLightPatchPool* lightpatch_pool;
 

@@ -32,8 +32,9 @@
 #include "csutil/csstring.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
-#include "csgfx/shadervarcontext.h"
+#include "csutil/weakref.h"
 #include "iutil/strset.h"
+#include "csgfx/shadervarcontext.h"
 
 #include "iutil/comp.h"
 #include "iutil/event.h"
@@ -75,11 +76,11 @@ private:
   friend class csShaderGLMTEX;
   friend class csGLPolygonRenderer;
 
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;
   csRef<iShaderManager> shadermgr;
 
-  csRef<iBugPlug> bugplug;
+  csWeakRef<iBugPlug> bugplug;
 
   csRef<csGLTextureCache> txtcache;
   csRef<csGLTextureManager> txtmgr;
@@ -159,7 +160,7 @@ private:
   int stencilclipnum;
   bool stencil_initialized;	// Stencil clipper is initialized from 'clipper'
   bool clip_planes_enabled;	// glClipPlane is enabled.
-  csRef<iClipper2D> clipper;	// Current clipper from engine.
+  csWeakRef<iClipper2D> clipper;// Current clipper from engine.
   int cliptype;			// One of CS_CLIPPER_...
   int cache_clip_portal;	// Cache values for SetupClipper().
   int cache_clip_plane;
@@ -516,7 +517,7 @@ public:
   class eiShaderRenderInterface : public iShaderRenderInterface
   {
   private:
-    csRef<iObjectRegistry> object_reg;
+    iObjectRegistry* object_reg;
   public:
     SCF_DECLARE_EMBEDDED_IBASE(csGLGraphics3D);
     eiShaderRenderInterface();

@@ -74,8 +74,8 @@ csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node,
 				       iLoaderContext* ldr_context,      
 				       iBase* context)
 {
-  csRef<iLightIterRenderStep> step = 
-    new csLightIterRenderStep (object_reg);
+  csRef<iLightIterRenderStep> step;
+  step.AttachNew (new csLightIterRenderStep (object_reg));
   csRef<iRenderStepContainer> steps =
     SCF_QUERY_INTERFACE (step, iRenderStepContainer);
 

@@ -23,6 +23,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
+#include "csutil/weakref.h"
 #include "iengine/light.h"
 #include "iengine/renderloop.h"
 #include "iengine/viscull.h"
@@ -61,7 +62,9 @@ public:
 
 class csGenericRenderStepFactory : public iRenderStepFactory
 {
-  csRef<iObjectRegistry> object_reg;
+private:
+  iObjectRegistry* object_reg;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -82,7 +85,7 @@ private:
   bool portalTraversal;
   csZBufMode zmode;
   csRef<iStringSet> strings;
-  csRef<iShaderManager> shaderManager;
+  csWeakRef<iShaderManager> shaderManager;
   iObjectRegistry *objreg;
 
   bool currentSettings;

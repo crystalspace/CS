@@ -90,7 +90,7 @@ public:
   iMeshObjectType* chunklod_type;
   iObjectRegistry *object_reg;
   csFlags flags;
-  csRef<iEngine> engine;
+  csWeakRef<iEngine> engine;
   csRef<iLightManager> light_mgr;
 
   csVector3 scale;
@@ -127,7 +127,7 @@ public:
   csStringID texcors_name, compressed_texcors_name;
   csStringID color_name, compressed_color_name;
   csStringID index_name;
-  csRef<iGraphics3D> r3d;
+  csWeakRef<iGraphics3D> r3d;
   csRef<iShaderManager> shmgr;
 
   class MeshTreeNode

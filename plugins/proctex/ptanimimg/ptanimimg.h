@@ -33,7 +33,7 @@ class csProcTexture;
 class csAnimateProctexLoader : public iLoaderPlugin, public iComponent  
 {
 protected:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
 
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
 public:
@@ -50,6 +50,7 @@ public:
 
 class csProcAnimated : public csProcTexture
 {
+private:
   csRef<iImage> image;
   csRef<iAnimatedImage> animation;
 

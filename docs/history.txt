@@ -22,6 +22,57 @@ chronological order.
 	- Jorrit fixed regions so that they can now unload shaders.
 	- Jorrit added FindShader() to iLoaderContext so that shader finding
 	  now also respects the restrictions on finding on region and such.
+	- Jorrit reports: the following classes were keeping a csRef to the
+	  iObjectRegistry (bad idea):
+	      - csSprite2DMeshObjectType
+	      - csWaterDemo
+	      - csBaseTextureFactory
+	      - eiShaderRenderInterface
+	      - csSpriteCal3DMeshObject
+	      - csBaseTextureLoader
+	      - csBaseRenderStepLoader
+	      - csBaseRenderStepType
+	      - csRenderStepParser
+	      - csRenderLoopLoader
+	      - csStencilShadowStep
+	      - csStencilShadowFactory
+	      - csFullScreenQuadRenderStepFactory
+	      - csFullScreenQuadRenderStep
+	      - csGenericRenderStepFactory
+	      - csLightIterRenderStepFactory
+	      - csLightIterRenderStep
+	      - csTargetRenderStepFactory
+	      - csFontServerMultiplexor
+	      - csPhysicsLoader
+	      - csODEDynamics
+	      - csAnimateProctexLoader
+	      - csBaseProctexType
+	      - csBaseProctexLoader
+	      - csFuncTexLoader
+	      - csSoundRenderDS3D
+	      - csSoundRenderOpenAL
+	      - csSimpleFormerLoader
+	      - csDDSImageIO
+	      - csDDSImageFile
+	      - csNullGraphics3D
+	      - csGLGraphics3D
+	      - csXMLShaderCompiler
+	      - csShaderManager
+	      - csShaderProgram
+	      - csGLShader_ARB
+	      - csGLShader_CG
+	      - csGLShader_FIXED
+	      - csGLShader_PS1
+	      - csSoftShader
+	      - csSoftShader_FP
+	      - csSoftShader_VP
+	- Jorrit fixed several plugins to keep weak references to some modules
+	  instead of real references in the hope that this minimizes the
+	  chances of having memory leaks. And indeed, it fixes the memory
+	  leaks with walktest flarge, stenciltest, partsys, isomap, and
+	  r3dtest but not with terrain, terrainf, and particles.
+	- Jorrit fixed a bug in ODE plugin. It would use a csRef to
+	  an event handler but still use DecRef() later.
 18-Aug-2004
 	- Jorrit fixed the NR null renderer so that it also returns a
 	  valid iPolygonRenderer instance on calling

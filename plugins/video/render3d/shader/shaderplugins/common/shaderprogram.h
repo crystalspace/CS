@@ -50,7 +50,7 @@ protected:
 #undef CS_INIT_TOKEN_TABLE_NAME
 
 protected:
-  csRef<iObjectRegistry> objectReg;
+  iObjectRegistry* objectReg;
   csRef<iSyntaxService> synsrv;
   csRef<iStringSet> strings;
 

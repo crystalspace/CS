@@ -572,7 +572,7 @@ private:
   uint32 global_framenr;
 
   /// Set the camera to use for some features.
-  csRef<iCamera> camera;
+  csWeakRef<iCamera> camera;
 
 public:
   SCF_DECLARE_IBASE;

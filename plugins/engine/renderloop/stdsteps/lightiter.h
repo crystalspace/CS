@@ -22,6 +22,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
+#include "csutil/weakref.h"
 #include "iengine/renderloop.h"
 #include "iengine/rendersteps/irenderstep.h"
 #include "iengine/rendersteps/ilightiter.h"
@@ -59,7 +60,9 @@ public:
 
 class csLightIterRenderStepFactory : public iRenderStepFactory
 {
-  csRef<iObjectRegistry> object_reg;
+private:
+  iObjectRegistry* object_reg;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -76,7 +79,7 @@ class csLightIterRenderStep : public iRenderStep,
 private:
   csRefArray<iLightRenderStep> steps;
 
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   csRef<csShaderVariable> shvar_light_0_position;
   csRef<csShaderVariable> shvar_light_0_position_world;
   csRef<csShaderVariable> shvar_light_0_diffuse;
@@ -117,7 +120,7 @@ private:
 
   LightSVAccessor* GetLightAccessor (iLight* light);
 public:
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
 
   SCF_DECLARE_IBASE;
 

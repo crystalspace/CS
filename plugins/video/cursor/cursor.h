@@ -29,6 +29,7 @@
 #include "csutil/csstring.h"
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
+#include "csutil/weakref.h"
 #include "cstool/cspixmap.h"
 
 struct iObjectRegistry;
@@ -61,9 +62,9 @@ private:
   };
 
   iObjectRegistry* reg;
-  csRef<iEventQueue> eventq;
-  csRef<iGraphics3D> g3d;
-  csRef<iTextureManager> txtmgr;
+  csWeakRef<iEventQueue> eventq;
+  csWeakRef<iGraphics3D> g3d;
+  iTextureManager* txtmgr;
   csRef<iImageIO> io;
   csHash<CursorInfo *, csStrKey, csConstCharHashKeyHandler> cursors;
   

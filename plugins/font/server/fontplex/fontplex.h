@@ -23,6 +23,7 @@
 #define __CS_FONTPLEX_H__
 
 #include "ivideo/fontserv.h"
+#include "csutil/weakref.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/refarr.h"
@@ -63,7 +64,7 @@ class csFontPlexer : public iFont
 private:
   friend struct csFontLoadOrderEntry;
 
-  csRef<csFontServerMultiplexor> parent;
+  csFontServerMultiplexor* parent;
   char* fontid;
   int size;
   iFont* primaryFont;
@@ -118,7 +119,7 @@ public:
 class csFontServerMultiplexor : public iFontServer
 {
 private:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   csRefArray<iFontServer> fontservers;
 
   csConfigAccess config;

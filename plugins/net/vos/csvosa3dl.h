@@ -114,7 +114,7 @@ public:
   virtual bool Initialize (iObjectRegistry *objreg);
   virtual bool HandleEvent (iEvent &ev);
 
-  csRef<iObjectRegistry> GetObjectRegistry()
+  iObjectRegistry* GetObjectRegistry()
   {
     return objreg;
   }

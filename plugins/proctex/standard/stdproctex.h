@@ -31,7 +31,7 @@ class csProcTexture;
 class csBaseProctexType : public iComponent, public iTextureType
 {
 protected:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
 public:
   SCF_DECLARE_IBASE;
 
@@ -44,7 +44,7 @@ public:
 class csBaseProctexLoader : public iLoaderPlugin
 {
 protected:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
 
   csPtr<iBase> PrepareProcTex (csProcTexture* pt);
 public:

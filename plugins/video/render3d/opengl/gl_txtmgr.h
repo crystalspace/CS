@@ -32,6 +32,7 @@
 #include "csutil/blockallocator.h"
 #include "csutil/scf.h"
 #include "csutil/refarr.h"
+#include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
 #include "csutil/blockallocator.h"
 #include "igraphic/image.h"
@@ -116,7 +117,7 @@ public:
   int texelbytes;
   int orig_width, orig_height;
   csArray<csGLTexture*> vTex;
-  csRef<csGLGraphics3D> G3D;
+  csWeakRef<csGLGraphics3D> G3D;
   long size;
   int flags;
   int target;
@@ -445,7 +446,7 @@ class csGLTextureManager : public iTextureManager
   iObjectRegistry *object_reg;
 public:
   csGLTextureCache* txtcache;
-  csRef<csGLGraphics3D> G3D;
+  csWeakRef<csGLGraphics3D> G3D;
 
   /// All SLMs currently in use.
   csArray<csGLSuperLightmap*> superLMs;

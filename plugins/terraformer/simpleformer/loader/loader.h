@@ -51,7 +51,7 @@ public:
   friend struct eiComponent;
 
 private:
-  csRef<iObjectRegistry> objreg;
+  iObjectRegistry* objreg;
   csRef<iLoader> loader;
   csRef<iSyntaxService> synldr;
   csRef<iPluginManager> pluginmgr;

@@ -71,7 +71,7 @@ RelightTask::RelightTask(csVosA3DL* va)
 
 void RelightTask::doTask()
 {
-  csRef<iObjectRegistry> objreg = vosa3dl->GetObjectRegistry();
+  iObjectRegistry* objreg = vosa3dl->GetObjectRegistry();
   csRef<iEngine> engine = CS_QUERY_REGISTRY(objreg, iEngine);
 
   LOG ("RelightTask", 2, "Performing relight");

@@ -39,11 +39,13 @@ class csODEParticlePhysics : public iParticlesPhysics
   csRef<iVirtualClock> clock;
   csRef<iODEDynamicState> odestate;
 
-  struct SortableBody {
+  struct SortableBody
+  {
     float sort;
     csRef<iRigidBody> body;
   };
-  struct ParticleObjects {
+  struct ParticleObjects
+  {
     iParticlesObjectState *particles;
     csArray<csParticlesData> data;
     float total_elapsed_time;
@@ -64,7 +66,8 @@ class csODEParticlePhysics : public iParticlesPhysics
     }
     return 0;
   }
-  static int DataSort(csParticlesData const& item1, csParticlesData const& item2)
+  static int DataSort(csParticlesData const& item1,
+  	csParticlesData const& item2)
   { 
     float sort = item2.sort - item1.sort; 
     return (sort < 0.0f) ? -1 : ((sort > 0.0f) ? 1 : 0);
@@ -109,7 +112,8 @@ public:
     { return scfParent->HandleEvent (event); }
   } scfiEventHandler;
 
-  const csArray<csParticlesData> *RegisterParticles (iParticlesObjectState *particles);
+  const csArray<csParticlesData> *RegisterParticles (
+  	iParticlesObjectState *particles);
 
   void RemoveParticles (iParticlesObjectState *particles);
 

@@ -28,6 +28,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/array.h"
 #include "csutil/refarr.h"
+#include "csutil/weakref.h"
 #include "igeom/polymesh.h"
 #include "csgeom/objmodel.h"
 #include "csgeom/pmtools.h"
@@ -857,7 +858,7 @@ public:
    * csBezierMeshObjectType must keep a reference to G3D because when polygons
    * are destructed they actually refer to G3D to clear the cache.
    */
-  csRef<iGraphics3D> G3D;
+  csWeakRef<iGraphics3D> G3D;
   /// An object pool for lightpatches.
   csBezierLightPatchPool* lightpatch_pool;
 

@@ -185,7 +185,7 @@ private:
   csRef<csThread> bgThread;
 
   // Object registry pointer
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
 
   // List of current registered handles
   csRefArray<csSoundHandleOpenAL> SoundHandles;

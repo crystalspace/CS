@@ -219,9 +219,8 @@ void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
 
 int csTargetRenderStep::AddStep (iRenderStep* step)
 {
-  csRef<iRenderStep> lrs = SCF_QUERY_INTERFACE (step, iRenderStep);
-  if (!lrs) return -1;
-  return steps.Push (lrs);
+  if (!step) return -1;
+  return steps.Push (step);
 }
 
 int csTargetRenderStep::GetStepCount ()

@@ -63,7 +63,7 @@ public:
 class csBaseTextureLoader : public iLoaderPlugin, public iComponent  
 {
 protected:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
 public:
   SCF_DECLARE_IBASE;
 

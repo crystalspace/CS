@@ -146,7 +146,6 @@ csODEDynamics::~csODEDynamics ()
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
       q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef();
   }
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiODEDynamicState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
@@ -943,7 +942,8 @@ void csODEDynamics::SetStepFastIterations (int iter)
 
 void csODEDynamics::EnableEventProcessing (bool enable)
 {
-  if (enable && !process_events) {
+  if (enable && !process_events)
+  {
     process_events = true;
 
     if (!scfiEventHandler) 
@@ -951,7 +951,9 @@ void csODEDynamics::EnableEventProcessing (bool enable)
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
       q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
-  } else if (!enable && process_events) {
+  }
+  else if (!enable && process_events)
+  {
     process_events = false;
 
     if (scfiEventHandler)
@@ -959,7 +961,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
       csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
       if (q)
         q->RemoveListener (scfiEventHandler);
-      scfiEventHandler->DecRef();
+      scfiEventHandler = 0;
     }
   }
 }

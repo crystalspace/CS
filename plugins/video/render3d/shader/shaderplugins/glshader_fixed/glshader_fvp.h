@@ -21,6 +21,7 @@
 #define __GLSHADER_FVP_H__
 
 #include "ivideo/shader/shader.h"
+#include "csutil/weakref.h"
 #include "csgfx/shadervar.h"
 #include "csutil/strhash.h"
 #include "../../common/shaderplugin.h"
@@ -58,7 +59,7 @@ private:
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
 
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
   csGLShader_FIXED* shaderPlug;
 
   struct lightingentry

@@ -28,6 +28,7 @@
 #include "csutil/refcount.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
+#include "csutil/weakref.h"
 
 class csFreeType2Server;
 

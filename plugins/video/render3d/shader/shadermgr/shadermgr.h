@@ -52,7 +52,7 @@
 class csShaderManager : public iShaderManager
 {
 private:
-  csRef<iObjectRegistry> objectreg;
+  iObjectRegistry* objectreg;
   csRef<iVirtualClock> vc;
   csRef<iTextureManager> txtmgr;
   csRef<iStringSet> strings;

@@ -33,7 +33,7 @@ private:
     XMLTOKEN_SOFTFP = 1
   };
 
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
 
   csStringHash xmltokens;
 

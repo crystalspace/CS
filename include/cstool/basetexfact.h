@@ -39,7 +39,7 @@ class CS_CSTOOL_EXPORT csBaseTextureFactory : public iTextureFactory
 {
 protected:
   /// object registry
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   /// Width parameter
   int width;
   /// Height parameter

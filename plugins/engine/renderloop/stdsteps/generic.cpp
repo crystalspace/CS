@@ -63,8 +63,8 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
 				       iLoaderContext* ldr_context,      
 				       iBase* context)
 {
-  csRef<iGenericRenderStep> step = 
-    new csGenericRenderStep (object_reg);
+  csRef<iGenericRenderStep> step;
+  step.AttachNew (new csGenericRenderStep (object_reg));
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())

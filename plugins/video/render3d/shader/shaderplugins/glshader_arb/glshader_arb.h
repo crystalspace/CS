@@ -32,7 +32,7 @@ private:
 
 public:
   csGLExtensionManager* ext;
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
 
   SCF_DECLARE_IBASE;
   

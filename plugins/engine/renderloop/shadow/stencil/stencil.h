@@ -36,6 +36,7 @@
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"
 #include "csutil/garray.h"
+#include "csutil/weakref.h"
 #include "csgfx/shadervarcontext.h"
 #include "../../common/basesteptype.h"
 #include "../../common/basesteploader.h"
@@ -118,9 +119,9 @@ class csStencilShadowStep : public iRenderStep,
 private:
   friend class csStencilShadowCacheEntry;
 
-  csRef<iObjectRegistry> object_reg;
-  csRef<iGraphics3D> g3d;
-  csRef<iShaderManager> shmgr;
+  iObjectRegistry* object_reg;
+  csWeakRef<iGraphics3D> g3d;
+  csWeakRef<iShaderManager> shmgr;
   csRef<csStencilShadowType> type;
 
   static csStringID shadow_vertex_name;
@@ -137,8 +138,8 @@ private:
     iShader *shader, int pass);
 
   void Report (int severity, const char* msg, ...);
-public:
 
+public:
   SCF_DECLARE_IBASE;
 
   csStencilShadowStep (csStencilShadowType* type);
@@ -170,7 +171,7 @@ public:
 
 class csStencilShadowFactory : public iRenderStepFactory
 {
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   csRef<csStencilShadowType> type;
 public:
   SCF_DECLARE_IBASE;

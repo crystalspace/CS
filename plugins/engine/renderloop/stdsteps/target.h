@@ -23,6 +23,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
+#include "csutil/weakref.h"
 #include "iengine/renderloop.h"
 #include "iengine/rendersteps/icontainer.h"
 #include "iengine/rendersteps/irenderstep.h"
@@ -60,7 +61,9 @@ public:
 
 class csTargetRenderStepFactory : public iRenderStepFactory
 {
-  csRef<iObjectRegistry> object_reg;
+private:
+  iObjectRegistry* object_reg;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -75,7 +78,7 @@ class csTargetRenderStep : public iRenderStep,
 {
 private:
   csRefArray<iRenderStep> steps;
-  csRef<iEngine> engine;
+  csWeakRef<iEngine> engine;
   csString target;
   bool doCreate;
   int newW, newH;

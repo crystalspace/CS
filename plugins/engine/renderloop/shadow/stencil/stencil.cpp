@@ -876,7 +876,7 @@ csPtr<iBase> csStencilShadowLoader::Parse (iDocumentNode* node,
 	iRenderStepType));
 
   csRef<iRenderStepFactory> factory = type->NewFactory();
-  csRef<iRenderStep> step = factory->Create ();;
+  csRef<iRenderStep> step = factory->Create ();
 
   csRef<iRenderStepContainer> steps =
     SCF_QUERY_INTERFACE (step, iRenderStepContainer);

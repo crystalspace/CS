@@ -28,7 +28,8 @@
 class csBaseRenderStepType : public iComponent, public iRenderStepType
 {
 protected:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
+
 public:
   SCF_DECLARE_IBASE;
 

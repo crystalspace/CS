@@ -21,13 +21,14 @@
 #define __CS_PARSERENDERSTEP_H__
 
 #include "csutil/strhash.h"
+#include "csutil/weakref.h"
 #include "iutil/plugin.h"
 
 class csRenderStepParser
 {
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
-  csRef<iPluginManager> plugmgr;
+  csWeakRef<iPluginManager> plugmgr;
 
   csStringHash tokens;
   enum {

@@ -21,6 +21,7 @@
 #define __GLSHADER_FIXEDFP_H__
 
 #include "ivideo/shader/shader.h"
+#include "csutil/weakref.h"
 #include "csgfx/shadervar.h"
 #include "imap/services.h"
 #include "../../common/shaderplugin.h"
@@ -37,7 +38,7 @@ private:
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
 
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
   csGLExtensionManager* ext;
   csGLShader_FIXED* shaderPlug;
 

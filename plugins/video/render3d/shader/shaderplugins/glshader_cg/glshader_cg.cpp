@@ -39,7 +39,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "glshader_cg.h"
 
-csRef<iObjectRegistry> csGLShader_CG::object_reg;
+iObjectRegistry* csGLShader_CG::object_reg = 0;
 CGcontext csGLShader_CG::context;
 
 CS_IMPLEMENT_PLUGIN

@@ -38,7 +38,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "softshader.h"
 
-csRef<iObjectRegistry> csSoftShader::object_reg;
+iObjectRegistry* csSoftShader::object_reg = 0;
 
 CS_IMPLEMENT_PLUGIN
 

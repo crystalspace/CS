@@ -24,6 +24,7 @@
 #include "csutil/array.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
+#include "csutil/weakref.h"
 #include "csutil/randomgen.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
@@ -377,7 +378,7 @@ public:
   iObjectRegistry* object_reg;
   iVirtualClock* vc;
 
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
   csRef<iLightManager> light_mgr;
 
 #ifdef CS_USE_NEW_RENDERER
@@ -991,8 +992,8 @@ public:
    * It is also possible to use variables. If these are not 0 then the
    * lod values are taken from variables.
    */
-  static csRef<iSharedVariable> global_lod_varm;
-  static csRef<iSharedVariable> global_lod_vara;
+  static csWeakRef<iSharedVariable> global_lod_varm;
+  static csWeakRef<iSharedVariable> global_lod_vara;
 
 private:
   /**

@@ -45,8 +45,8 @@ class csImposterMesh;
 class csImposterProcTex : public csProcTexture
 {
 private:
-  csRef<iEngine> Engine;
-  csRef<iRenderView> View;
+  iEngine* Engine;
+  iRenderView* View;
   csImposterMesh *mesh;
   bool imposter_ready;
 

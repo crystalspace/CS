@@ -26,6 +26,7 @@
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "csutil/cfgacc.h"
+#include "csutil/weakref.h"
 #include "null_txt.h"
 
 struct iObjectRegistry;
@@ -174,11 +175,11 @@ public:
   void SetWorldToCamera (csReversibleTransform* w2c) { }
   void DrawSimpleMesh (const csSimpleRenderMesh& mesh, uint flags = 0) { }
 private:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;
   csRef<iShaderManager> shadermgr;
   csRef<iStringSet> strings;
-  csRef<iBugPlug> bugplug;
+  csWeakRef<iBugPlug> bugplug;
   csRef<csTextureManagerNull> txtmgr;
 
   csConfigAccess config;

@@ -28,6 +28,7 @@
 #include "csutil/csstring.h"
 #include "csutil/refcount.h"
 #include "csutil/refarr.h"
+#include "csutil/weakref.h"
 #include "csutil/util.h"
 #include "csutil/scopedmutexlock.h"
 
@@ -67,8 +68,8 @@ class csReporterListener : public iStandardReporterListener
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iConsoleOutput> console;
-  csRef<iNativeWindowManager> nativewm;
+  csWeakRef<iConsoleOutput> console;
+  csWeakRef<iNativeWindowManager> nativewm;
   iReporter* reporter;	// Not a csRef! We don't want to keep a reference.
   csString debug_filename;
   csRef<iFile> debug_file;

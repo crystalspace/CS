@@ -22,6 +22,7 @@
 
 #include <stdarg.h>
 #include "csutil/scf.h"
+#include "csutil/weakref.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/natwin.h"
@@ -68,7 +69,7 @@ public:
   /// The object registry.
   iObjectRegistry* object_reg;
   /// The plugin manager.
-  csRef<iPluginManager> plugin_mgr;
+  csWeakRef<iPluginManager> plugin_mgr;
 
   /**
    * Callback to use for informing an external agent when several
@@ -77,7 +78,7 @@ public:
   csRef<iOffscreenCanvasCallback> ofscb;
 
   /// The font server
-  csRef<iFontServer> FontServer;
+  csWeakRef<iFontServer> FontServer;
   /// The font cache
   csFontCache* fontCache;
 

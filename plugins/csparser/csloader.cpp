@@ -4980,9 +4980,12 @@ bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
 	}
 	csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
 	csRef<iShader> shader = shcom->CompileShader (shaderNode);
-	AddToRegion (ldr_context, shader->QueryObject ());
-
-	shaderMgr->RegisterShader (shader);
+	if (shader)
+	{
+	  AddToRegion (ldr_context, shader->QueryObject ());
+	  shaderMgr->RegisterShader (shader);
+        }
+	else return false;
       }
       break;
     }

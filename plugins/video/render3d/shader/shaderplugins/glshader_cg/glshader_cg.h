@@ -37,7 +37,7 @@ private:
   bool enable;
   bool isOpen;
 public:
-  static csRef<iObjectRegistry> object_reg; // @@@ Should use STATIC macros
+  static iObjectRegistry* object_reg;
   static CGcontext context;
   csRef<iShaderProgramPlugin> psplg;
   csRef<iShaderProgramPlugin> arbplg;

@@ -29,6 +29,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/thread.h"
 #include "csutil/list.h"
 #include "csutil/sysfunc.h"
+#include "csutil/weakref.h"
 #include "iengine/mesh.h"
 #include "imesh/object.h"
 #include "imesh/terrain.h"
@@ -237,7 +238,7 @@ private:
   float lod_distance;
 
   iObjectRegistry* object_reg;
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
   iBase* logparent;
   csRef<iMeshObjectFactory> pFactory;
   csRef<iMeshObjectDrawCallback> vis_cb;

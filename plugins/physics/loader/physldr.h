@@ -77,7 +77,7 @@ public:
 
 private:
 
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
   csRef<iEngine> engine;

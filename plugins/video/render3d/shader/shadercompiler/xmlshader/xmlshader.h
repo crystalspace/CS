@@ -242,11 +242,11 @@ private:
 #include "cstool/tokenlist.h"
 
   //Standard vars
-  csRef<iObjectRegistry> objectreg;
+  iObjectRegistry* objectreg;
   csRef<iStringSet> strings;
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
   csRef<iSyntaxService> synldr;
-  csRef<iShaderManager> shadermgr;
+  csWeakRef<iShaderManager> shadermgr;
 
   bool do_verbose;
   csString fail_reason;

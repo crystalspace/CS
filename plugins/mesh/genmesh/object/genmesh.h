@@ -27,6 +27,7 @@
 #include "csutil/hashmap.h"
 #include "csutil/hash.h"
 #include "csutil/garray.h"
+#include "csutil/weakref.h"
 #include "imesh/object.h"
 #include "imesh/genmesh.h"
 #include "imesh/lighting.h"
@@ -87,7 +88,7 @@ private:
 #ifdef CS_USE_NEW_RENDERER
   csRenderMeshHolderSingle rmHolder;
   csShaderVariableContext* svcontext;
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
   bool mesh_colors_dirty_flag;
 
   uint buffers_version;
@@ -467,7 +468,7 @@ private:
 
   bool autonormals;
 
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
   csRef<iStringSet> strings;
 
   csRef<iRenderBuffer> vertex_buffer;
@@ -546,7 +547,8 @@ public:
   iEngine* engine;
 
   /// Constructor.
-  csGenmeshMeshObjectFactory (iMeshObjectType *pParent, iObjectRegistry* object_reg);
+  csGenmeshMeshObjectFactory (iMeshObjectType *pParent,
+  	iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csGenmeshMeshObjectFactory ();

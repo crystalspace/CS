@@ -50,7 +50,7 @@ public:
 
 private:
   csImageIOFileFormatDescriptions formats;
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
 };
 
 class csDDSImageFile : public csImageFile
@@ -69,7 +69,7 @@ private:
 
   csRefArray<iImage> mipmaps;
   int mipmapcount;
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
 
   void Report (int severity, const char* msg, ...);
 };

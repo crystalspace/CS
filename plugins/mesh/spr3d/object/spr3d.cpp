@@ -1131,8 +1131,8 @@ void csSprite3DMeshObject::FixVertexColors ()
 
 float csSprite3DMeshObject::global_lod_m = 0;
 float csSprite3DMeshObject::global_lod_a = 1;
-csRef<iSharedVariable> csSprite3DMeshObject::global_lod_varm;
-csRef<iSharedVariable> csSprite3DMeshObject::global_lod_vara;
+csWeakRef<iSharedVariable> csSprite3DMeshObject::global_lod_varm;
+csWeakRef<iSharedVariable> csSprite3DMeshObject::global_lod_vara;
 
 // Set the default lighting quality.
 int csSprite3DMeshObject::global_lighting_quality = DEFAULT_LIGHTING;

@@ -27,6 +27,7 @@
 #include "iengine/lightmgr.h"
 #include "csgfx/shadervarcontext.h"
 #include "csutil/garray.h"
+#include "csutil/weakref.h"
 
 /**
  * flag value to indicate that the system should be deleted when all
@@ -76,7 +77,7 @@ protected:
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
 
-  csRef<iGraphics3D> g3d;
+  csWeakRef<iGraphics3D> g3d;
 #else
   /// The vertex buffer.
   csRef<iVertexBuffer> vbuf;

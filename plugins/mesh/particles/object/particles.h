@@ -23,6 +23,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/garray.h"
 #include "csutil/ref.h"
+#include "csutil/weakref.h"
 
 #include "csgeom/objmodel.h"
 #include "csgeom/transfrm.h"
@@ -79,8 +80,8 @@ private:
   csParticlesType* particles_type;
   iObjectRegistry *object_reg;
 
-  csRef<iGraphics3D> g3d;
-  csRef<iShaderManager> shmgr;
+  csWeakRef<iGraphics3D> g3d;
+  csWeakRef<iShaderManager> shmgr;
   csRef<iMaterialWrapper> material;
 
   csParticleEmitType emit_type;

@@ -23,6 +23,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
+#include "csutil/weakref.h"
 #include "iengine/light.h"
 #include "iengine/renderloop.h"
 #include "iengine/rendersteps/irenderstep.h"
@@ -41,7 +42,9 @@ public:
 
 class csFullScreenQuadRenderStepFactory : public iRenderStepFactory
 {
-  csRef<iObjectRegistry> object_reg;
+private:
+  iObjectRegistry* object_reg;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -65,9 +68,9 @@ public:
     csRef<csShaderVariableContext> svContext;
   };
 private:
-  csRef<iEngine> engine;
-  csRef<iShaderManager> shaderMgr;
-  csRef<iObjectRegistry> object_reg;
+  csWeakRef<iEngine> engine;
+  csWeakRef<iShaderManager> shaderMgr;
+  iObjectRegistry* object_reg;
 
   DrawSettings firstPass;
   DrawSettings otherPasses;

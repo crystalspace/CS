@@ -94,7 +94,7 @@ typedef csDirtyAccessArray<ContactEntry> csContactList;
 class csODEDynamics : public iDynamics
 {
 private:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   csRef<iVirtualClock> clock;
 
   bool process_events;

@@ -27,6 +27,7 @@
 #include "iutil/plugin.h"
 #include "csutil/cfgacc.h"
 #include "csutil/refarr.h"
+#include "csutil/weakref.h"
 
 /**
  * Through this plugin you can load/save a set of different formats.
@@ -39,7 +40,7 @@ class csMultiplexImageIO : public iImageIO
   csImageIOFileFormatDescriptions formats;
   csConfigAccess config;
   csRef<iStringArray> classlist;
-  csRef<iPluginManager> plugin_mgr;
+  csWeakRef<iPluginManager> plugin_mgr;
   bool global_dither;
 
   void StoreDesc (const csImageIOFileFormatDescriptions& format);

@@ -25,7 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 class csSoftShader : public iShaderProgramPlugin
 {
 private:
-  static csRef<iObjectRegistry> object_reg;
+  static iObjectRegistry* object_reg;
 
   bool enable;
 public:

@@ -41,7 +41,7 @@ SCF_VERSION (iStringSet, 0, 1, 0);
  * similar to the following:
  *
  * \code
- * csRef<iObjectRegistry> object_reg = ...;
+ * iObjectRegistry* object_reg = ...;
  * csRef<iStringSet> Strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
  *   object_reg, "crystalspace.shared.stringset", iStringSet);
  * \endcode

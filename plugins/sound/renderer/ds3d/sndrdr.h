@@ -99,7 +99,7 @@ public:
   LPDIRECTSOUND AudioRenderer;
  
   csRef<iWin32Assistant> win32Assistant;
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry* object_reg;
   /// Contains information about how the sound should be heard
   csRef<csSoundListenerDS3D> Listener;
   /// The requested playback format that this renderer should request from sound data objects.

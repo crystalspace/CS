@@ -27,8 +27,8 @@
 #include "csutil/cscolor.h"
 #include "csutil/array.h"
 #include "csutil/refarr.h"
-#include "cstool/rendermeshholder.h"
 #include "csutil/weakref.h"
+#include "cstool/rendermeshholder.h"
 #include "imesh/object.h"
 #include "imesh/sprite2d.h"
 #include "imesh/particle.h"
@@ -345,11 +345,12 @@ public:
   G3DPolygonDPFX g3dpolyfx;
 
   csRef<iLightManager> light_mgr;
-  csRef<iObjectRegistry> object_reg;
-  csRef<iGraphics3D> g3d;
+  iObjectRegistry* object_reg;
+  csWeakRef<iGraphics3D> g3d;
 public:
   /// Constructor.
-  csSprite2DMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry* object_reg);
+  csSprite2DMeshObjectFactory (iMeshObjectType* pParent,
+  	iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSprite2DMeshObjectFactory ();
