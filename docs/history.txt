@@ -25,7 +25,9 @@ chronological order.
 	  publish-worthy headers.
 	- Squee added GetMounts() and GetRealMountPaths() to VFS to get more
 	  information about current mounts.
-	- Squee added commands to vsh to test new VFS methods.	  
+	- Squee added commands to vsh to test new VFS methods.
+	- Squee fixed GetMounts() and GetRealMountPaths() to use iStringArray
+	  rather than csStringArray.
 18-Oct-2004
 	- res enhanced the OpenGL canvases so blending is always functioning
 	  (lack of an alpha channel in the frame buffer isn't really a reason

@@ -228,10 +228,10 @@ public:
   virtual csPtr<iDataBuffer> GetRealPath (const char *FileName);
 
   /// Get all current virtual mount paths
-  virtual csStringArray GetMounts ();
+  virtual csRef<iStringArray> GetMounts ();
 
   /// Get the real paths associated with a mount
-  virtual csStringArray GetRealMountPaths (const char *VirtualPath);
+  virtual csRef<iStringArray> GetRealMountPaths (const char *VirtualPath);
 
   struct eiComponent : public iComponent
   {

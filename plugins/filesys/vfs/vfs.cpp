@@ -2222,26 +2222,36 @@ done:
   	new csDataBuffer (csStrNew (path), strlen (path) + 1));
 }
 
-csStringArray csVFS::GetMounts ()
+csRef<iStringArray> csVFS::GetMounts ()
 {
-  csStringArray mounts;
+  scfStringArray* mounts = new scfStringArray;
   for (size_t i=0; i<NodeList.Length (); i++)
   {
-    mounts.Push (NodeList[i]->VPath);
+    mounts->Push (NodeList[i]->VPath);
   }
-  return mounts;
+  
+  csRef<iStringArray> m (mounts);
+  mounts->DecRef ();
+  return m;
 }
 
-csStringArray csVFS::GetRealMountPaths (const char *VirtualPath)
+csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
 {
   if (!VirtualPath)
     return 0;
 
+  scfStringArray* rmounts = new scfStringArray;
+
   VfsNode *node;
   char suffix [2];
-  if (!PreparePath (VirtualPath, true, node, suffix, sizeof (suffix))
-    || suffix [0])
-    return csStringArray ();
+  if (PreparePath (VirtualPath, true, node, suffix, sizeof (suffix))
+    && !suffix [0])
+  {
+    for (size_t i=0; i<node->RPathV.Length (); i++)
+      rmounts->Push (node->RPathV[i]);
+  }
 
-  return node->RPathV;
+  csRef<iStringArray> r (rmounts);
+  rmounts->DecRef ();
+  return r;
 }

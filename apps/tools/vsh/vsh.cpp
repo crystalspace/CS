@@ -512,13 +512,13 @@ static void cmd_rpath (char *args)
 
 static void cmd_mounts (char *args)
 {
-  csStringArray mounts = VFS->GetMounts ();
-  if (mounts.Length ())
+  csRef<iStringArray> mounts = VFS->GetMounts ();
+  if (mounts->Length ())
   {
     bool nl = false;
-    for (size_t i=0; i<mounts.Length (); i++)
+    for (size_t i=0; i<mounts->Length (); i++)
     {
-      printf ("%-19s", mounts[i]);
+      printf ("%-19s", mounts->Get (i));
       nl = true;
       if ((i & 3) == 3)
       {
@@ -540,13 +540,13 @@ static void cmd_rmounts (char *args)
     return;
   }
 
-  csStringArray rpaths = VFS->GetRealMountPaths (args);
-  if (rpaths.Length ())
+  csRef<iStringArray> rpaths = VFS->GetRealMountPaths (args);
+  if (rpaths->Length ())
   {
     bool nl = false;
-    for (size_t i=0; i<rpaths.Length (); i++)
+    for (size_t i=0; i<rpaths->Length (); i++)
     {
-      printf ("%s\n", rpaths[i]);
+      printf ("%s\n", rpaths->Get (i));
     }
   }
   else
