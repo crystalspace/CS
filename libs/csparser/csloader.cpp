@@ -145,6 +145,8 @@ TOKEN_DEF_START
   TOKEN_DEF (FLOOR_HEIGHT)
   TOKEN_DEF (FLOOR_TEXTURE)
   TOKEN_DEF (FOG)
+  TOKEN_DEF (FOR_2D)
+  TOKEN_DEF (FOR_3D)
   TOKEN_DEF (FOUNTAIN)
   TOKEN_DEF (FRAME)
   TOKEN_DEF (GOURAUD)
@@ -230,9 +232,6 @@ TOKEN_DEF_START
   TOKEN_DEF (TEXTURE_SCALE)
   TOKEN_DEF (TEX_SET)
   TOKEN_DEF (TEX_SET_SELECT)
-  TOKEN_DEF (TEX2D)
-  TOKEN_DEF (TEX2D3D)
-  TOKEN_DEF (TEX3D)
   TOKEN_DEF (THING)
   TOKEN_DEF (TOTALTIME)
   TOKEN_DEF (TRANSFORM)
@@ -2328,9 +2327,8 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
     TOKEN_TABLE (DITHER)
     TOKEN_TABLE (PROCEDURAL)
     TOKEN_TABLE (PERSISTENT)
-    TOKEN_TABLE (TEX2D3D)
-    TOKEN_TABLE (TEX2D)
-    TOKEN_TABLE (TEX3D)
+    TOKEN_TABLE (FOR_2D)
+    TOKEN_TABLE (FOR_3D)
   TOKEN_TABLE_END
 
   long cmd;
@@ -2338,23 +2336,27 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   char *params;
   csColor transp (0, 0, 0);
   bool do_transp = false;
-  int flags = 0;
-  int not_flags = 0;
+  int flags = CS_TEXTURE_3D;
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
-      case TOKEN_TEX2D:
-        flags |= CS_TEXTURE_2D;
-	not_flags |= CS_TEXTURE_3D;
+      case TOKEN_FOR_2D:
+        if (strcasecmp (params, "yes") == 0)
+          flags |= CS_TEXTURE_2D;
+        else if (strcasecmp (params, "no") == 0)
+          flags &= ~CS_TEXTURE_2D;
+        else
+          CsPrintf (MSG_WARNING, "Warning! Invalid FOR_2D() value, 'yes' or 'no' expected\n");
         break;
-      case TOKEN_TEX3D:
-        flags |= CS_TEXTURE_3D;
-	not_flags |= CS_TEXTURE_2D;
-        break;
-      case TOKEN_TEX2D3D:
-        flags |= CS_TEXTURE_2D | CS_TEXTURE_3D;
+      case TOKEN_FOR_3D:
+        if (strcasecmp (params, "yes") == 0)
+          flags |= CS_TEXTURE_3D;
+        else if (strcasecmp (params, "no") == 0)
+          flags &= ~CS_TEXTURE_3D;
+        else
+          CsPrintf (MSG_WARNING, "Warning! Invalid FOR_3D() value, 'yes' or 'no' expected\n");
         break;
       case TOKEN_PERSISTENT:
         flags |= CS_TEXTURE_PROC_PERSISTENT;
@@ -2407,8 +2409,7 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   // not have power-of-two dimensions...
 
   csTextureHandle *tex = World->GetTextures ()->NewTexture (image);
-  tex->flags |= flags;
-  tex->flags &= ~not_flags;
+  tex->flags = flags;
   if (prefix)
   {
     char *prefixedname = new char [strlen (name) + strlen (prefix) + 2];
