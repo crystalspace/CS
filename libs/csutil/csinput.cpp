@@ -40,9 +40,14 @@ char ShiftedKey [128-32] =
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Input driver <--//--//--
 
+SCF_IMPLEMENT_IBASE (csInputDriver::FocusListener)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
+
 csInputDriver::csInputDriver(iObjectRegistry* r) : Registry(r), Queue(0)
 {
-  Listener = NULL;
+  Listener.Parent = this;
+  StartListening();
 }
 
 csInputDriver::~csInputDriver()
@@ -64,13 +69,13 @@ iEventQueue* csInputDriver::GetEventQueue()
 void csInputDriver::StartListening()
 {
   if (Queue == 0 && GetEventQueue() != 0) // Not already registered.
-    Queue->RegisterListener(Listener, CSMASK_Command);
+    Queue->RegisterListener(&Listener, CSMASK_Command);
 }
 
 void csInputDriver::StopListening()
 {
   if (Queue != 0) // Already registered.
-    Queue->RemoveListener(Listener);
+    Queue->RemoveListener(&Listener);
 }
 
 void csInputDriver::Post(iEvent* e)
@@ -82,12 +87,12 @@ void csInputDriver::Post(iEvent* e)
     e->DecRef();
 }
 
-bool csInputDriver::HandleEvent(iEvent& ev)
+bool csInputDriver::FocusListener::HandleEvent(iEvent& e)
 {
-  bool const mine = (ev.Type == csevBroadcast && 
-    ev.Command.Code == cscmdFocusChanged && !ev.Command.Info);
+  bool const mine = (e.Type == csevBroadcast && 
+    e.Command.Code == cscmdFocusChanged && !e.Command.Info);
   if (mine) // Application lost focus.
-    LostFocus();
+    Parent->LostFocus();
   return mine;
 }
 
@@ -95,20 +100,13 @@ bool csInputDriver::HandleEvent(iEvent& ev)
 
 SCF_IMPLEMENT_IBASE(csKeyboardDriver)
   SCF_IMPLEMENTS_INTERFACE(iKeyboardDriver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csKeyboardDriver::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csKeyboardDriver::csKeyboardDriver (iObjectRegistry* r) :
   csInputDriver(r), KeyState (256 + (CSKEY_LAST - CSKEY_FIRST + 1))
 {
   SCF_CONSTRUCT_IBASE(0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  Listener = &scfiEventHandler;
-  StartListening();
+  Listener.scfParent = this;
   KeyState.Reset();
 }
 
@@ -166,17 +164,11 @@ SCF_IMPLEMENT_IBASE(csMouseDriver)
   SCF_IMPLEMENTS_INTERFACE(iMouseDriver)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMouseDriver::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csMouseDriver::csMouseDriver (iObjectRegistry* r) :
   csInputDriver(r), Keyboard(0)
 {
   SCF_CONSTRUCT_IBASE(0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  Listener = &scfiEventHandler;
-  StartListening();
+  Listener.scfParent = this;
 
   LastX = LastY = 0;
   memset (&Button, 0, sizeof (Button));
@@ -191,8 +183,7 @@ csMouseDriver::csMouseDriver (iObjectRegistry* r) :
 
 void csMouseDriver::Reset ()
 {
-  int i;
-  for (i = 0; i < CS_MAX_MOUSE_BUTTONS; i++)
+  for (int i = 0; i < CS_MAX_MOUSE_BUTTONS; i++)
     if (Button[i])
       DoButton (i + 1, false, LastX, LastY);
   LastClickButton = -1;
@@ -271,17 +262,11 @@ SCF_IMPLEMENT_IBASE(csJoystickDriver)
   SCF_IMPLEMENTS_INTERFACE(iJoystickDriver)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csJoystickDriver::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
   csInputDriver(r), Keyboard(0)
 {
   SCF_CONSTRUCT_IBASE(0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  Listener = &scfiEventHandler;
-  StartListening();
+  Listener.scfParent = this;
   memset (&Button, 0, sizeof (Button));
   memset (&LastX, sizeof (LastX), 0);
   memset (&LastY, sizeof (LastY), 0);
@@ -289,9 +274,8 @@ csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
 
 void csJoystickDriver::Reset ()
 {
-  int i, j;
-  for (i = 0; i < CS_MAX_JOYSTICK_COUNT; i++)
-    for (j = 0; j < CS_MAX_JOYSTICK_BUTTONS; j++)
+  for (int i = 0; i < CS_MAX_JOYSTICK_COUNT; i++)
+    for (int j = 0; j < CS_MAX_JOYSTICK_BUTTONS; j++)
       if (Button [i][j])
         DoButton (i + 1, j + 1, false, LastX [i], LastY [i]);
 }

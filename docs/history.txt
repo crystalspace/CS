@@ -6,6 +6,10 @@ The history order is reversed so that new features are at the top.
 	  Now it will return NULL.
 	- Fixed a bug in perftest with initialization of G3DTriangleMesh
 	  structure.
+	- Eric Sunshine reverted Norman's complex change to csinput and applied
+	  a simple 3-line patch instead.  (In fact, when Eric designed the
+	  csInputDriver class, he had intended that these three lines be
+	  present, but simply forgot to type them.)
 5-Sep-2001
 	- Eric Sunshine eliminated several compilation warnings from aseie.cpp.
 	- Eric Sunshine removed the obsolete igame/csgame.h.
