@@ -66,7 +66,7 @@ public:
   void Union (const csVector3& ocenter, float oradius);
 
   /// Calculate the union of two spheres.
-  csSphere friend operator+ (const csSphere& s1, const csSphere& s2);
+  friend csSphere operator+ (const csSphere& s1, const csSphere& s2);
   /// Calculate the union of this sphere and another one.
   csSphere& operator+= (const csSphere& s)
   {
