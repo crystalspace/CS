@@ -18,37 +18,55 @@
 
 #include "cssysdef.h"
 #include "avistrv.h"
+#include "isystem.h"
+#include "itxtmgr.h"
 
 IMPLEMENT_IBASE (csAVIStreamVideo)
   IMPLEMENTS_INTERFACE (iVideoStream)
   IMPLEMENTS_INTERFACE (iStream)
 IMPLEMENT_IBASE_END
 
-csAVIStreamVideo::csAVIStreamVideo (iBase *pBase)
+csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
 {
   CONSTRUCT_IBASE (pBase);
   pChunk = NULL;
-  pAVI = NULL;
+  pAVI = (csAVIFormat*)pBase;
   pSystem = NULL;
   pG3D = NULL;
   pCodec = NULL;
   pMaterial = NULL;
 }
 
-bool csAVIStreamVideo::Initialize (const csVideoStreamDescription &desc, 
-				   csAVIStreamFormat *pTheAVI, 
-				   iSystem *pTheSystem)
+bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph, 
+				   const csAVIFormat::StreamHeader *psh, 
+				   const csAVIFormat::VideoStreamFormat *pf, 
+				   UShort nStreamNumber, iSystem *pTheSystem)
 {
-  memcpy (strdesc, desc, sizeof (csVideoStreamDescription));
+
+  strdesc.type = CS_STREAMTYPE_VIDEO;
+  memcpy (strdesc.codec, psh->handler, 4);
+  strdesc.codec[4] = '\0';
+  strdesc.colordepth = pf->planes * pf->bitcount;
+  strdesc.framecount = ph->framecount;
+  strdesc.width = ph->width;
+  strdesc.height = ph->height;
+  strdesc.framerate = 1000./ph->msecperframe;
+  strdesc.duration = psh->length / psh->scale;
+
   delete pChunk;
-  pChunk = new DataChunk;
-  pAVI = pTheAVI;
+  pChunk = new csAVIFormat::AVIDataChunk;
+  pChunk->currentframe = 0;
+  pChunk->currentframepos = NULL;
+  sprintf (pChunk->id, "%2dd", nStreamNumber);
+  pChunk->id[3] = '\0';
+
+  nStream = nStreamNumber;
   if (pSystem) pSystem->DecRef ();
   (pSystem = pTheSystem)->IncRef ();
   if (pG3D) pG3D->DecRef ();
   pG3D = QUERY_PLUGIN (pSystem, iGraphics3D);
-  SetRect (0, 0, width, height);
-  pos = 0;
+  SetRect (0, 0, strdesc.width, strdesc.height);
+
   bTimeSynced = false;
   fxmode = CS_FX_COPY;
   if (pMaterial) pMaterial->DecRef ();
@@ -73,12 +91,7 @@ void csAVIStreamVideo::GetStreamDescription (csStreamDescription &desc)
 
 bool csAVIStreamVideo::GotoFrame (ULong frameindex)
 {
-  if (pAVI->HasChunk (frameindex))
-  {
-    pos = frameindex;
-    return true;
-  }
-  return false;
+  return pAVI->GetChunk (frameindex, pChunk);
 }
 
 bool csAVIStreamVideo::GotoTime (ULong timeindex)
@@ -121,30 +134,37 @@ bool csAVIStreamVideo::SetFXMode (UInt mode)
 
 iMaterialHandle* csAVIStreamVideo::NextFrameGetMaterial ()
 {
-  pAVI->Chunk (pos++, pChunk);
-  pCodec->Decode (pChunk->data, pChunk->length, outdata);
-  if (pCodecDesc->decodeoutput == CS_CODECFORMAT_YUV_CHANNEL)
-    yuv_channel_2_rgba_interleave (outdata);
-  else
-  if (pCodecDesc->decodeoutput == CS_CODECFORMAT_RGB_CHANNEL)
-    rgb_channel_2_rgba_interleave (outdata);
-  else
-  if (pCodecDesc->decodeoutput == CS_CODECFORMAT_RGBA_CHANNEL)
-    rgba_channel_2_rgba_interleave (outdata);
-  else
-  if (pCodecDesc->decodeoutput != CS_CODECFORMAT_RGBA_INTERLEAVE)
-    return NULL;
-  makeMaterial ();
-  return pMaterial;
+  void *outdata;
+
+  if (pAVI->GetChunk (pChunk->currentframe++, pChunk))
+  {
+    pCodec->Decode ((char*)pChunk->data, pChunk->length, outdata);
+    if (cdesc.decodeoutput == CS_CODECFORMAT_YUV_CHANNEL)
+      yuv_channel_2_rgba_interleave ((char **)outdata);
+    else
+    if (cdesc.decodeoutput == CS_CODECFORMAT_RGB_CHANNEL)
+      rgb_channel_2_rgba_interleave ((char **)outdata);
+    else
+    if (cdesc.decodeoutput == CS_CODECFORMAT_RGBA_CHANNEL)
+      rgba_channel_2_rgba_interleave ((char **)outdata);
+    else
+    if (cdesc.decodeoutput != CS_CODECFORMAT_RGBA_INTERLEAVED)
+      return NULL;
+    makeMaterial ();
+    return pMaterial;
+  }
+  return NULL;
 }
 
 void csAVIStreamVideo::NextFrame ()
 {
-  NextFrameGetMaterial ();
-  polyfx.mat_handle = pMaterial;
-  pG3D->StartPolygonFX (polyfx.mat_handle, fxmode);
-  pG3D->DrawPolygonFX (polyfx);
-  pG3D->FinishPolygonFX ();
+  if (NextFrameGetMaterial ())
+  {
+    polyfx.mat_handle = pMaterial;
+    pG3D->StartPolygonFX (polyfx.mat_handle, fxmode);
+    pG3D->DrawPolygonFX (polyfx);
+    pG3D->FinishPolygonFX ();
+  }
 }
 
 void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
@@ -153,8 +173,8 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
   char *udata = data[1];
   char *vdata = data[2];
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (int idx=0, y=0; y < h; y++)
-    for (int x=0; x < w; x++)
+  for (int idx=0, y=0; y < rc.Height (); y++)
+    for (int x=0; x < rc.Width (); x++)
     {
       pixel[idx].red = (unsigned char)(ydata[idx] + (1.4075 * ((int)vdata[idx] - 128)));
       pixel[idx].green = (unsigned char)(ydata[idx] - (0.3455 * ((int)udata[idx] - 128) 
@@ -170,8 +190,8 @@ void csAVIStreamVideo::rgb_channel_2_rgba_interleave (char *data[3])
   char *gdata = data[1];
   char *bdata = data[2];
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (int idx=0, y=0; y < h; y++)
-    for (int x=0; x < w; x++)
+  for (int idx=0, y=0; y < rc.Height (); y++)
+    for (int x=0; x < rc.Width (); x++)
     {
       pixel[idx].red   = rdata[idx];
       pixel[idx].green = gdata[idx];
@@ -187,8 +207,8 @@ void csAVIStreamVideo::rgba_channel_2_rgba_interleave (char *data[4])
   char *bdata = data[2];
   char *adata = data[2];
   csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (int idx=0, y=0; y < h; y++)
-    for (int x=0; x < w; x++)
+  for (int idx=0, y=0; y < rc.Height (); y++)
+    for (int x=0; x < rc.Width (); x++)
     {
       pixel[idx].red   = rdata[idx];
       pixel[idx].green = gdata[idx];
@@ -207,4 +227,39 @@ void csAVIStreamVideo::makeMaterial ()
   iTextureHandle *pFrameTex = txtmgr->RegisterTexture (&memimage, CS_TEXTURE_NOMIPMAPS);
   pMaterial = txtmgr->RegisterMaterial (pFrameTex);
   pMaterial->Prepare ();
+}
+
+bool csAVIStreamVideo::LoadCodec ()
+{
+  // based on the codec id we try to load the apropriate codec
+  iSCF *pSCF = QUERY_INTERFACE (pSystem, iSCF);
+  if (pSCF)
+  {
+    // create a classname from the coec id
+    char cn[128];
+    sprintf (cn, "crystalspace.video.codec.%s", strdesc.codec);
+    // try open this class
+    pCodec = (iCodec*)pSCF->scfCreateInstance (cn, "iCodec", 0);
+    pSCF->DecRef ();
+    if (pCodec)
+    {
+      // codec exists, now try to initialize it
+      if (pCodec->Initialize (&strdesc))
+      {
+	pCodec->GetCodecDescription (cdesc);
+       	return true;
+      }
+      else
+      {
+	pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
+	pCodec->DecRef ();
+	pCodec = NULL;
+      }
+    }
+    else
+      pSystem->Printf (MSG_WARNING, "CODEC class \"%s\" could not be loaded !", cn);
+  }
+  else
+    pSystem->Printf (MSG_DEBUG_0, "Could not get an SCF interface from the systemdriver !");
+  return false;
 }

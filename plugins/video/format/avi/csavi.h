@@ -21,24 +21,50 @@
 
 #include "ividecod.h"
 #include "ivfs.h"
+#include "csutil/csvector.h"
 
 struct iSystem;
+class csAVIStreamVideo;
+class csAVIStreamAudio;
 
 class csAVIFormat : public iStreamFormat
 {
+ protected:
   class streamiterator : public iStreamIterator
   {
-  private:
+    friend class csAVIFormat;
+  protected:
     streamiterator (iBase *pBase);
     csAVIFormat *pAVI;
     int pos;
   public:
-    DECALRE_IBASE;
+    DECLARE_IBASE;
+    virtual ~streamiterator ();
     bool HasNext ();
     iStream *GetNext ();
   };
 
+  // @@@TODO: handle optional chunklists in AVI files
+  class ChunkList
+  {
+  public:
+    ChunkList () {}
+    bool HasChunk (ULong idx){(void)idx; return false;}
+    char *GetPos (ULong idx) {(void)idx; return NULL;}
+  };
+
   friend class streamiterator;
+  friend class csAVIStreamVideo;
+  friend class csAVIStreamAudio;
+
+  struct AVIDataChunk
+  {
+    char id[4];
+    ULong currentframe;
+    char *currentframepos;
+    void *data;
+    ULong length; // in byte
+  };
 
   struct RIFFheader
   {
@@ -57,7 +83,7 @@ class csAVIFormat : public iStreamFormat
     ULong listsize;
     char type[4];
   };
-  struct AVIheader
+  struct AVIHeader
   {
     ULong msecperframe; // milliseconds per frame
     ULong maxbytespersec; // max. transfer rate in bytes/sec
@@ -65,7 +91,7 @@ class csAVIFormat : public iStreamFormat
     ULong flags;
     ULong framecount;
     ULong initialframecount;
-    ULong framecount;
+    ULong streamcount;
     ULong suggestedbuffersize;
     ULong width;
     ULong height;
@@ -101,7 +127,7 @@ class csAVIFormat : public iStreamFormat
     ULong ypelspermeter;
     ULong colorsused;
     ULong colorsimportant;
-  }
+  };
   struct AudioStreamFormat
   {
     UShort formattag;
@@ -117,23 +143,40 @@ class csAVIFormat : public iStreamFormat
   iSystem *pSystem;
   iFile *pFile;
 
-  char *pData;
+  char *pData, *p;
+  UShort nAudio, nVideo; // streamcounter
+  ULong maxframe; // max. frame visited to date
+  char *maxframepos;
+  char *pmovi; // right before movi LIST
+  char *moviendpos; // right behind last LIST within movi LIST
+  char *startframepos; // right before 1st LIST within movi LIST
+  bool no_recl;
+
 
   RIFFheader fileheader;
   RIFFlist hdrl, strl;
-  RIFFchunk avih, strh;
+  RIFFchunk avih, strh, avichunk;
+  ChunkList *pChunkList;
 
   AVIHeader aviheader;
   StreamHeader streamheader;
+  AudioStreamFormat audsf;
+  VideoStreamFormat vidsf;
 
   csVector vStream;
   iAudioStream *pAudio;
   iVideoStream *pVideo;
 
   bool InitVideoData ();
+  bool ValidateStreams ();
+  ULong CreateStream (StreamHeader *streamheader);
+  bool HasChunk (ULong frameindex);
+  bool GetChunk (ULong frameindex, AVIDataChunk *pChunk);
+  UShort stream_number (const char c1, const char c2);
 
  public:
   DECLARE_IBASE;
+
   csAVIFormat (iBase *pParent);
   virtual ~csAVIFormat ();
 
@@ -144,5 +187,6 @@ class csAVIFormat : public iStreamFormat
   virtual void Select (iAudioStream *pAudio, iVideoStream *pVideo);
   virtual void NextFrame ();
   virtual bool Load (iFile *pVideoData);
+  virtual void Unload ();
 };
 #endif

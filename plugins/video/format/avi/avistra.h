@@ -16,51 +16,35 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _AVI_VIDEOSTREAM_H_
-#define _AVI_VIDEOSTREAM_H_
+#ifndef _AVI_AUDIOSTREAM_H_
+#define _AVI_AUDIOSTREAM_H_
 
 #include "ividecod.h"
 #include "csavi.h"
-#include "csutil/csrect.h"
-#include "imater.h"
-#include "igraph3d.h"
-#include "csgfxldr/memimage.h"
 
-class csAVIStreamVideo : public iVideoStream
+class csAVIStreamAudio : public iAudioStream
 {
  protected:
-  csRect rc;
-  UInt fxmode;
+  csAVIFormat *pAVI;
   bool bTimeSynced;
-  G3DPolygonDPFX polyfx;
-  csImageMemory memimage;
   csAVIFormat::AVIDataChunk *pChunk;
   UShort nStream;
-  csVideoStreamDescription strdesc;
-  csAVIFormat *pAVI;
+  csAudioStreamDescription strdesc;
 
-  iMaterialHandle *pMaterial;
-  iGraphics3D *pG3D;
   iSystem *pSystem;
   iCodec *pCodec;
-  csCodecDescription cdesc;
-
-  void yuv_channel_2_rgba_interleave (char *data[3]);
-  void rgb_channel_2_rgba_interleave (char *data[3]);
-  void rgba_channel_2_rgba_interleave (char *data[4]);
 
   bool LoadCodec ();
-  void makeMaterial ();
 
  public:
   DECLARE_IBASE;
 
-  csAVIStreamVideo (iBase *pBase);
+  csAVIStreamAudio (iBase *pBase);
   bool Initialize (const csAVIFormat::AVIHeader *ph, 
 		   const csAVIFormat::StreamHeader *psh, 
-		   const csAVIFormat::VideoStreamFormat *pf, 
+		   const csAVIFormat::AudioStreamFormat *pf, 
 		   UShort nStreamNumber, iSystem *pTheSystem);
-  virtual ~csAVIStreamVideo ();
+  virtual ~csAVIStreamAudio ();
 
   // iStream
   virtual void GetStreamDescription (csStreamDescription &desc);
@@ -68,11 +52,8 @@ class csAVIStreamVideo : public iVideoStream
   virtual bool GotoTime (ULong timeindex);
   virtual bool SetPlayMethod (bool bTimeSynced);
   virtual void NextFrame ();
-  // iVideoStream
-  virtual void GetStreamDescription (csVideoStreamDescription &desc);
-  virtual bool SetRect (int x, int y, int w, int h);
-  virtual bool SetFXMode (UInt mode);
-  virtual iMaterialHandle* NextFrameGetMaterial ();
+  // iAudioStream
+  virtual void GetStreamDescription (csAudioStreamDescription &desc);
 };
 
 #endif

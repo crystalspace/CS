@@ -21,7 +21,7 @@
 #include "odivx.h"
 
 IMPLEMENT_IBASE (csOpenDivX)
-  IMPLEMENTS_INTERFACE (iVideoCodec)
+  IMPLEMENTS_INTERFACE (iCodec)
   IMPLEMENTS_INTERFACE (iBase)
 IMPLEMENT_IBASE_END
 
@@ -48,10 +48,11 @@ csOpenDivX::~csOpenDivX ()
   delete [] vdata;
 }
 
-bool csOpenDivX::Initialize (csVideoDescription &desc)
+bool csOpenDivX::Initialize (csStreamDescription *desc)
 {
-  w = desc.width;
-  h = desc.height;
+  csVideoStreamDescription *vd = (csVideoStreamDescription *)desc;
+  w = vd->width;
+  h = vd->height;
   bOK = false;
 
   ydata = new char[w*h];
@@ -79,10 +80,10 @@ void csOpenDivX::GetCodecDescription (csCodecDescription &desc)
   desc.bEncode = false; // not implemented yet
   desc.bDecode = true;
   desc.decodeoutput = CS_CODECFORMAT_YUV_CHANNEL;
-  desc.decodeinput = CS_CODECFORMAT_YUV_CHANNEL;
+  desc.encodeinput = CS_CODECFORMAT_YUV_CHANNEL;
 }
 
-bool csOpenDivX::Decode (char *indata, long inlength, void *&outdata);
+bool csOpenDivX::Decode (char *indata, ULong inlength, void *&outdata)
 {
   if (bOK)
   {
@@ -98,7 +99,7 @@ bool csOpenDivX::Decode (char *indata, long inlength, void *&outdata);
   return false;
 }
 
-bool csOpenDivX::Encode (void *indata, char *outdata, long &outlength)
+bool csOpenDivX::Encode (void *indata, char *outdata, ULong &outlength)
 {
   (void)indata;
   (void)outdata;

@@ -21,7 +21,7 @@
 
 #include "ividecod.h"
 
-class csOpenDivX : public iVideoCodec
+class csOpenDivX : public iCodec
 {
  protected:
   bool bOK;
@@ -38,9 +38,9 @@ class csOpenDivX : public iVideoCodec
   csOpenDivX (iBase *pParent);
   virtual ~csOpenDivX ();
 
-  virtual bool Initialize (csVideoDescription &desc);
+  virtual bool Initialize (csStreamDescription *desc);
   virtual void GetCodecDescription (csCodecDescription &desc);
-  virtual bool Decode (char *indata, long inlength, void *&outdata);
-  virtual bool Encode (void *indata, char *outdata, long &outlength);
+  virtual bool Decode (char *indata, ULong inlength, void *&outdata);
+  virtual bool Encode (void *indata, char *outdata, ULong &outlength);
 };
 #endif
