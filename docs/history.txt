@@ -16,6 +16,10 @@ chronological order.
 	- Squee improved the Win32 OpenGL canvas SetFullscreen() and
 	  Resize() functions to more properly toggle/resize when called
 	  by an app after the canvas is open
+	- Squee fixed fonts with backgrounds not displaying correctly
+	  after above alpha changes.
+	- Squee updated g2dtest to test alpha transparency (currently does not
+	  always work).
 11-Oct-2004
 	- Jorrit generalized the csTriangleMeshLOD class and related
 	  so that you can now generate LOD using different cost

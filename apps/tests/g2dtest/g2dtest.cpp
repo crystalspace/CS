@@ -69,6 +69,7 @@ class G2DTestSystemDriver
     stWindowFixed,
     stWindowResize,
     stCustomCursor,
+    stAlphaTest,
     stBackBufferON,
     stBackBufferOFF,
     stTestUnicode1,
@@ -134,7 +135,7 @@ private:
   void EnterState (appState newstate, int arg = 0);
   void LeaveState ();
 
-  int MakeColor (int r, int g, int b);
+  int MakeColor (int r, int g, int b, int a = 255);
   void WriteCentered (int mode, int dy, int fg, int bg, const char *format, ...);
   void WriteCenteredWrapped (int mode, int dy, int &h, int fg, int bg, 
     const char *format, ...);
@@ -149,6 +150,7 @@ private:
   void DrawWindowScreen ();
   void DrawWindowResizeScreen ();
   void DrawCustomCursorScreen ();
+  void DrawAlphaTestScreen ();
   void DrawBackBufferText ();
   void DrawBackBufferON ();
   void DrawBackBufferOFF ();
@@ -279,7 +281,7 @@ void G2DTestSystemDriver::SetupFrame ()
     blue = MakeColor (0, 0, 255);
     gray = MakeColor (128, 128, 128);
     dsteel = MakeColor (80, 100, 112);
-    black = 0;
+    black = MakeColor (0, 0, 0);
   }
 
   if (state_sptr == 0)
@@ -297,6 +299,7 @@ void G2DTestSystemDriver::SetupFrame ()
     case stWindowFixed:
     case stWindowResize:
     case stCustomCursor:
+    case stAlphaTest:
     case stBackBufferON:
     case stBackBufferOFF:
     case stTestUnicode1:
@@ -368,12 +371,17 @@ void G2DTestSystemDriver::SetupFrame ()
           DrawCustomCursorScreen ();
 	  SetCustomCursor ();
 	  if (lastkey9)
-            EnterState (stBackBufferON);
+            EnterState (stAlphaTest);
 	  else
             EnterState (stCustomCursor);
           break;
+  case stAlphaTest:
+          SetNormalCursor ();
+          DrawAlphaTestScreen ();
+          EnterState (stBackBufferON);
+          EnterState (stWaitKey);
+          break;
         case stBackBufferON:
-	  SetNormalCursor ();
           myG2D->AllowResize (false);
           EnterState (stBackBufferOFF);
           if (myG2D->DoubleBuffer (true))
@@ -580,12 +588,13 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
   return false;
 }
 
-int G2DTestSystemDriver::MakeColor (int r, int g, int b)
+int G2DTestSystemDriver::MakeColor (int r, int g, int b, int a)
 {
   if (!pfmt.PalEntries)
     return ((r >> (8 - pfmt.RedBits)) << pfmt.RedShift)
          | ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift)
-         | ((b >> (8 - pfmt.BlueBits)) << pfmt.BlueShift);
+         | ((b >> (8 - pfmt.BlueBits)) << pfmt.BlueShift)
+         | ((a >> (8 - pfmt.AlphaBits)) << pfmt.AlphaShift);
 
   // In paletted mode this is easy since we have a uniform 3-3-2 palette
   return ((r >> 5) << 5) | ((g >> 5) << 2) | (b >> 6);
@@ -734,14 +743,14 @@ void G2DTestSystemDriver::DrawContextInfoScreen ()
   if (pfmt.PalEntries)
     sprintf (pixfmt, "%d colors (Indexed)", pfmt.PalEntries);
   else
-    sprintf (pixfmt, "R%dG%dB%d", pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
+    sprintf (pixfmt, "R%dG%dB%dA%d", pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, pfmt.AlphaBits);
   WriteCentered (0,-16*1, gray,  -1, "Pixel format: %d BPP, %s", pfmt.PixelBytes * 8, pixfmt);
 
   if (pfmt.PalEntries)
     sprintf (pixfmt, "not available");
   else
-    sprintf (pixfmt, "R[%08X] G[%08X] B[%08X] ", pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask);
-  WriteCentered (0, 16*0, gray,  -1, "R/G/B masks: %s", pixfmt);
+    sprintf (pixfmt, "R[%08X] G[%08X] B[%08X] A[%08X]", pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask, pfmt.AlphaMask);
+  WriteCentered (0, 16*0, gray,  -1, "R/G/B/A masks: %s", pixfmt);
 
   WriteCentered (0, 16*1, gray,  -1, "More than one backbuffer available: %s",
     myG2D->GetDoubleBufferState () ? "yes" : "no");
@@ -885,6 +894,25 @@ void G2DTestSystemDriver::DrawCustomCursorScreen ()
   SetFont (fontLarge);
   WriteCentered (0, tpos + 16*2, black,  -1, "If your current canvas supports custom mouse cursors");
   WriteCentered (0, tpos + 16*3, black,  -1, "you shouldn't see your systems default cursor now.");
+}
+
+void G2DTestSystemDriver::DrawAlphaTestScreen ()
+{
+  int w = myG2D->GetWidth ();
+  int h = myG2D->GetHeight ();
+  myG2D->SetClipRect(0,0,w,h);
+  myG2D->DrawBox(0,0,w,h, dsteel);
+
+  SetFont (fontItalic);
+  WriteCentered (1, 1, white, -1, "ALPHA COLOR TEST");
+
+  SetFont (fontLarge);
+  WriteCentered (1, 16*2, black, -1, "If your current canvas is in 32-bit mode, you should");
+  WriteCentered (1, 16*3, black, -1, "see various text and geometry at various transparencies.");
+
+  myG2D->DrawBox (190, 80, 50, 100, black);
+  myG2D->DrawBox (20, 100, 150, 75, MakeColor (205, 0, 125, 200));
+  myG2D->DrawBox (120, 100, 100, 50, MakeColor (120, 50, 50, 100));
 }
 
 void G2DTestSystemDriver::DrawUnicodeTest1 ()

@@ -339,7 +339,7 @@ void csGLFontCache::FlushArrays ()
     if (doFG || doBG)
     {
       statecache->SetTexture (GL_TEXTURE_2D, job.texture);
-      if (job.bg >= 0)
+      if (job.bg != -1)
       {
 	if (envColor != job.bg)
 	{
@@ -417,7 +417,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
 
   size_t textLen = strlen ((char*)text);
 
-  if (bg >= 0)
+  if (bg != -1)
   {
     texcoords.GetExtend (numFloats + textLen * 16);
     verts2d.GetExtend (numFloats + textLen * 16);
@@ -495,7 +495,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
     y2 = y1 - cacheData->bmetrics.height;
 
     bool needBgJob = false;
-    if (bg >= 0)
+    if (bg != -1)
     {
       float bx1 = x2;
       float bx2 = x2; //x2;
@@ -608,7 +608,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
   }
 
   // "Trailing" background
-  if ((bg >= 0) & (advance > 0))
+  if ((bg != -1) & (advance > 0))
   {
     float bx1 = x2;
     float bx2 = bx1 + (float)advance;
@@ -635,7 +635,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
     bgVertOffset += 8;
   }
 
-  if (bg >= 0)
+  if (bg != -1)
   {
     // Make sure the next data added to the cached comes in after the
     // BG stuff

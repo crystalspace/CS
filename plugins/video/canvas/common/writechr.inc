@@ -157,7 +157,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
       firstchar = false;
     }
    
-    if (bg >= 0)
+    if (bg != -1)
     {
       while (advance > 0)
       {
@@ -232,7 +232,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
 	    // If we are advancing less than the last char was wide, the current
 	    // and last chars overlap. So we can't draw opaque, but have to draw
 	    // transparent instead.
-	    if ((bg >= 0) && (advance >= 0))
+	    if ((bg != -1) && (advance >= 0))
 	    {
 	      for (int j = lX; j < rX; j++)
 	      {
@@ -286,7 +286,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
 	    CharImage = p + lBytes;
 	    register uint8 CharLine = (*CharImage++) << shiftX;
 	    register WS_PIXTYPE *VRAM = (WS_PIXTYPE *)G2D->GetPixelAt (lAbsX, cury);
-	    if (bg >= 0)
+	    if (bg != -1)
 	    {
 	      for (int j = lX; j < rX; j++)
 	      {
@@ -341,7 +341,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
 	    for (pix = pixW; pix > 0; pix--)
 	    {
 	      register uint8 CharLine = (*CharImageAlpha++);
-	      if ((bg < 0) || (advance < 0))
+	      if ((bg == -1) || (advance < 0))
 	      {
 		if (CharLine == 0xff)
 		{
@@ -385,7 +385,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
 	      register int pix;
 	      for (pix = pixW < 8 ? pixW : 8, pixW -= pix; CharLine && pix; pix--)
 	      {
-		if ((bg < 0) || (advance < 0))
+		if ((bg == -1) || (advance < 0))
 		{
 		  if (CharLine & 0x80)
 		    *VRAM++ = fg;
@@ -407,7 +407,7 @@ void WS_NAME (iFont *font, int pen_x, int pen_y,
 		VRAM -= advance;
 		pix += advance;
 	      }
-	      if (bg < 0)
+	      if (bg == -1)
 	      {
 		VRAM += pix;
 	      }
