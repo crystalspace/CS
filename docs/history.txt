@@ -43,6 +43,10 @@ The history order is reversed so that new features are at the top.
 	      from building on some platforms (Mingw, NextStep, etc.).
 	    - Fixed the module description in the makefile's DESCRIPTION
 	      variable.
+	- Eric Sunshine added class-level comments to csConfigFile and
+	  csConfigManager so that Doxygen will emit documentation for these
+	  classes.  (Doxygen ignores classes which have no class-level comment
+	  even if the class is documented internally.
 17-Jun-2001
 	- Fixed a bug in 'facedown'/'faceup' commands (walktest). Reported
 	  by Thiago Ramon.

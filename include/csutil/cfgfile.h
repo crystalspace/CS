@@ -24,6 +24,9 @@
 class csConfigNode;
 class csConfigIterator;
 
+/**
+ * Configuration file which implements the iConfigFile SCF interface.
+ */
 class csConfigFile : public iConfigFile
 {
 public:

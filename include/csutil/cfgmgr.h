@@ -22,6 +22,11 @@
 #include "iutil/cfgmgr.h"
 #include "csutil/csvector.h"
 
+/**
+ * A configuration manager makes a number of individual configuration files
+ * appear to be a single configuration object.  See the description of the SCF
+ * interface iConfigManager for full details.
+ */
 class csConfigManager : public iConfigManager
 {
 public:
