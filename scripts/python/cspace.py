@@ -2429,7 +2429,9 @@ class csPluginRequestArray(_object):
     def Truncate(*args): return _cspace.csPluginRequestArray_Truncate(*args)
     def Empty(*args): return _cspace.csPluginRequestArray_Empty(*args)
     def DeleteIndex(*args): return _cspace.csPluginRequestArray_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _cspace.csPluginRequestArray_DeleteIndexFast(*args)
     def DeleteRange(*args): return _cspace.csPluginRequestArray_DeleteRange(*args)
+    def DeleteFast(*args): return _cspace.csPluginRequestArray_DeleteFast(*args)
 
 class csPluginRequestArrayPtr(csPluginRequestArray):
     def __init__(self, this):

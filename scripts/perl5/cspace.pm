@@ -2797,7 +2797,9 @@ sub new {
 *Truncate = *cspacec::csPluginRequestArray_Truncate;
 *Empty = *cspacec::csPluginRequestArray_Empty;
 *DeleteIndex = *cspacec::csPluginRequestArray_DeleteIndex;
+*DeleteIndexFast = *cspacec::csPluginRequestArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csPluginRequestArray_DeleteRange;
+*DeleteFast = *cspacec::csPluginRequestArray_DeleteFast;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
