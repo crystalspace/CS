@@ -56,6 +56,15 @@ public:
   /// Mark a region dirty
   virtual void       Mark(csRect &rect)=0;
 
+  /// Mark a section of the screen clean.
+  virtual void       Unmark(csRect &rect)=0;
+
+  /// Capture all mouse events until release is called, no matter where the mouse is
+  virtual void       CaptureMouse()=0;
+
+  /// Release the mouse events to go where they normally would.
+  virtual void       ReleaseMouse()=0;
+
   /// Dispatches events to the proper components
   virtual bool HandleEvent(iEvent&)=0;
   
