@@ -29,7 +29,7 @@ class csThing;
  * An entity can push itself onto this list when it wants something
  * to happen for a time. Then it can remove itself.
  */
-class csBusyList : public csObject
+class csEntityList : public csObject
 {
   CSOBJTYPE;
 };
@@ -41,8 +41,6 @@ class csBusyList : public csObject
 class csWalkEntity : public csObject
 {
 public:
-  virtual ~csWalkEntity () { }
-
   /// Activate this entity.
   virtual void Activate () = 0;
 
@@ -71,8 +69,6 @@ private:
   csThing* parent;
 
 public:
-  virtual ~csDoor () { }
-
   /// Create this door.
   csDoor (csThing* p);
 

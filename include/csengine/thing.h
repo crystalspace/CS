@@ -21,6 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csengine/polyset.h"
+#include "csengine/bspbbox.h"
 #include "csengine/rview.h"
 #include "csengine/texture.h"
 #include "csutil/flags.h"
@@ -80,10 +81,6 @@ struct iGraphics3D;
 class csThing : public csPolygonSet
 {
 private:
-  /// Where is this thing located?
-  csSector* home;
-  /// OBSOLETE.
-  csSector* other;
   /// World to object transformation.
   csReversibleTransform obj;
 
@@ -102,6 +99,17 @@ private:
   /// Internal draw function.
   void DrawInt (csRenderView& rview, bool use_z_buf);
 
+  /// Bounding box for polygon trees.
+  csPolyTreeBBox tree_bbox;
+
+  /// If true this thing is visible.
+  bool is_visible;
+
+  /**
+   * Update this thing in the polygon trees.
+   */
+  void UpdateInPolygonTrees ();
+
 public:
   /// Set of flags
   csFlags flags;
@@ -114,6 +122,13 @@ public:
 
   /// Destructor.
   virtual ~csThing ();
+
+  /// Set the sector for this thing.
+  virtual void SetSector (csSector* sector)
+  {
+    csPolygonSet::SetSector (sector);
+    UpdateInPolygonTrees ();
+  }
 
   /**
    * Set convexity flag of this thing. You should call this instead
@@ -128,6 +143,30 @@ public:
    * calculated by 'setConvex(true)'.
    */
   int GetCenter () { return center_idx; }
+
+  /**
+   * Do some initialization needed for visibility testing.
+   * i.e. clear camera transformation.
+   */
+  void VisTestReset ()
+  {
+    tree_bbox.ClearTransform ();
+  }
+
+  /// Mark this thing as visible.
+  void MarkVisible () { is_visible = true; }
+
+  /// Mark this thing as invisible.
+  void MarkInvisible () { is_visible = false; }
+
+  /// Return if this thing is visible.
+  bool IsVisible () { return is_visible; }
+
+  /// Get the pointer to the object to place in the polygon tree.
+  csPolyTreeObject* GetPolyTreeObject ()
+  {
+    return &tree_bbox;
+  }
 
   /**
    * Merge the given Thing into this one. The other polygons and

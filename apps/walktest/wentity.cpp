@@ -20,10 +20,11 @@
 #include "walktest/wentity.h"
 #include "walktest/walktest.h"
 #include "csengine/thing.h"
+#include "csgeom/matrix3.h"
 
 extern WalkTest* Sys;
 
-IMPLEMENT_CSOBJTYPE (csBusyList, csObject);
+IMPLEMENT_CSOBJTYPE (csEntityList, csObject);
 IMPLEMENT_CSOBJTYPE (csWalkEntity, csObject);
 IMPLEMENT_CSOBJTYPE (csDoor, csWalkEntity);
 
@@ -42,19 +43,24 @@ printf ("Activate Door!\n");
   // activate the door while in mid-transition it will
   // just go back from that point.
   transition = 1-transition;
-  printf ("%d\n", is_open);
   // Push ourselves on to the busy list if we're not already there.
-printf ("Before Release!\n");
   Sys->busy_entities.ObjRelease (this);
-printf ("After Release!\n");
   Sys->busy_entities.ObjAdd (this);
-printf ("After Add!\n");
 }
 
 void csDoor::NextFrame (float elapsed_time)
 {
-  if (!transition) return;
-  printf ("!!!!!\n");
-  Sys->busy_entities.ObjRelease (this);
+  if (!transition)
+  {
+    Sys->busy_entities.ObjRelease (this);
+printf ("Done opening door.\n");
+    return;
+  }
+  transition -= (float)elapsed_time/1000.;
+  if (transition < 0) transition = 0;
+  csYRotMatrix3 mat ((M_PI/2.)*transition);
+  mat.Invert ();
+  parent->SetTransform (mat);
+  parent->Transform ();
 }
 

@@ -34,7 +34,6 @@
 #include "csengine/stats.h"
 #include "csengine/csppulse.h"
 #include "csengine/cbuffer.h"
-#include "csengine/solidbsp.h"
 #include "csengine/covtree.h"
 #include "csengine/bspbbox.h"
 #include "csengine/terrain.h"
@@ -79,6 +78,8 @@ csSector::csSector () : csPolygonSet ()
   level_r = level_g = level_b = 0;
   static_tree = NULL;
   static_thing = NULL;
+  num_sky_things = 0;
+  num_things = 0;
 }
 
 csSector::~csSector ()
@@ -130,6 +131,7 @@ void csSector::AddSky (csThing* thing)
   if (thing->GetParent ()) return;
   thing->SetNext (this, first_sky);
   first_sky = thing;
+  num_sky_things++;
 }
 
 bool csSector::RemoveSky (csThing* thing)
@@ -138,6 +140,7 @@ bool csSector::RemoveSky (csThing* thing)
   {
     first_sky = (csThing*)thing->GetNext();
     thing->SetNext (NULL, NULL);
+    num_sky_things--;
     return true;
   }
   else
@@ -150,6 +153,7 @@ bool csSector::RemoveSky (csThing* thing)
       {
         th->SetNext (this, next->GetNext());
         thing->SetNext (NULL, NULL);
+        num_sky_things--;
         return true;
       }
       th = next;
@@ -163,6 +167,7 @@ void csSector::AddThing (csThing* thing)
   if (thing->GetParent ()) return;
   thing->SetNext (this, first_thing);
   first_thing = thing;
+  num_things++;
 }
 
 bool csSector::RemoveThing (csThing* thing)
@@ -171,6 +176,7 @@ bool csSector::RemoveThing (csThing* thing)
   {
     first_thing = (csThing*)thing->GetNext();
     thing->SetNext (NULL, NULL);
+    num_things--;
     return true;
   }
   else
@@ -183,6 +189,7 @@ bool csSector::RemoveThing (csThing* thing)
       {
         th->SetNext (this, next->GetNext());
         thing->SetNext (NULL, NULL);
+        num_things--;
         return true;
       }
       th = next;
@@ -220,17 +227,19 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
       delete sp;
       if (sp_prev) sp_prev->SetNext (this, n);
       else first_thing = n;
+      num_things--;
     }
     else sp_prev = sp;
     sp = n;
   }
   static_thing->SetNext (this, first_thing);
   first_thing = static_thing;
+  num_things++;
   static_thing->CreateBoundingBox ();
 
-  csVector3 min_bbox, max_bbox;
-  static_thing->GetBoundingBox (min_bbox, max_bbox);
-  static_tree = new csOctree (this, min_bbox, max_bbox, 150/*15*/, mode);
+  csBox3 bbox;
+  static_thing->GetBoundingBox (bbox);
+  static_tree = new csOctree (this, bbox.Min (), bbox.Max (), 150/*15*/, mode);
 
   csString str ("vis/octree_");
   str += GetName ();
@@ -246,7 +255,7 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
     if (recalc_octree)
     {
       delete static_tree;
-      static_tree = new csOctree (this, min_bbox, max_bbox, 150/*15*/, mode);
+      static_tree = new csOctree (this, bbox.Min (), bbox.Max (), 150/*15*/, mode);
     }
   }
   if (recalc_octree)
@@ -287,6 +296,16 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
     ((csOctree*)static_tree)->CachePVS (w->VFS, (const char*)str);
   }
   static_tree->Statistics ();
+
+  // Loop through all things and update their bounding box in the
+  // polygon trees.
+  csThing* th = GetFirstThing ();
+  while (th)
+  {
+    th->Transform ();
+    th = (csThing*)(th->GetNext ());
+  }
+  
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
 }
 
@@ -579,7 +598,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   csOctreeNode* onode = (csOctreeNode*)node;
 
   csCBuffer* c_buffer;
-  csSolidBsp* solidbsp;
   csCoverageMaskTree* covtree;
   csRenderView* rview = (csRenderView*)data;
   static csPolygon2D persp;
@@ -593,7 +611,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   }
 
   c_buffer = csWorld::current_world->GetCBuffer ();
-  solidbsp = csWorld::current_world->GetSolidBsp ();
   covtree = csWorld::current_world->GetCovtree ();
   int num_array;
   otree->GetConvexOutline (onode, pos, array, num_array);
@@ -672,9 +689,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     if (covtree)
       vis = covtree->TestPolygon (persp.GetVertices (),
 	persp.GetNumVertices (), persp.GetBoundingBox ());
-    else if (solidbsp)
-      vis = solidbsp->TestPolygon (persp.GetVertices (),
-	persp.GetNumVertices ());
     else
       vis = c_buffer->TestPolygon (persp.GetVertices (),
       	persp.GetNumVertices ());
@@ -860,40 +874,62 @@ void csSector::Draw (csRenderView& rview)
   }
 
   // First draw all 'sky' things using Z-fill.
-  csThing* sp = first_sky;
-  while (sp)
+  csThing* th = first_sky;
+  while (th)
   {
-    sp->Draw (rview, false);
-    sp = (csThing*)(sp->GetNext ());
+    th->Draw (rview, false);
+    th = (csThing*)(th->GetNext ());
   }
 
   // In some cases this queue will be filled with all visible
   // sprites.
   csSprite** sprite_queue = NULL;
   int num_sprite_queue = 0;
+  // For things we have a similar queue.
+  csThing** thing_queue = NULL;
+  int num_thing_queue = 0;
+  // If the following flag is true the queues are actually used.
+  bool use_object_queues = false;
 
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
-  csSolidBsp* solidbsp = csWorld::current_world->GetSolidBsp ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
-  if (solidbsp || c_buffer || covtree)
+  if (c_buffer || covtree)
   {
+    //-----
+    // In this part of the rendering we use the c-buffer and or another
+    // 2D visibility culler.
+    //-----
+
     // @@@ We should make a pool for queues. The number of queues allocated
     // at the same time is bounded by the recursion through portals. So a
     // pool would be ideal.
-    if (static_thing && do_things)
+    if (static_thing)
     {
+      //-----
+      // This sector has a static polygon tree (octree).
+      //-----
+    
       // Mark all sprites as invisible and clear the camera transformation
       // for their bounding boxes.
       if (sprites.Length () > 0)
-      {
         for (i = 0 ; i < sprites.Length () ; i++)
         {
           csSprite* sp = (csSprite*)sprites[i];
 	  sp->MarkInvisible ();
 	  sp->VisTestReset ();
         }
+      // Similarly mark all things as invisible and clear the camera
+      // transformation for their bounding boxes.
+      th = first_thing;
+      while (th)
+      {
+	th->MarkInvisible ();
+	th->VisTestReset ();
+	th = (csThing*)(th->GetNext ());
       }
 
+      // Using the PVS, mark all sectors and polygons that are visible
+      // from the current node.
       if (csWorld::current_world->IsPVS ())
       {
         csOctree* otree = (csOctree*)static_tree;
@@ -903,12 +939,27 @@ void csSector::Draw (csRenderView& rview)
 	  otree->MarkVisibleFromPVS (rview.GetOrigin ());
       }
 
+      // Initialize a queue on which all visible polygons will be pushed.
+      // The octree is traversed front to back but we want to render
+      // back to front. That's one of the reasons for this queue.
       poly_queue = new csPolygon2DQueue (polygons.Length ()+
       	static_thing->GetNumPolygons ());
+
+      // Update the transformation for the static tree. This will
+      // not actually transform all vertices from world to camera but
+      // it will make sure that when a node (octree node) is visited,
+      // the transformation will happen at that time.
       static_thing->UpdateTransformation ();
+
+      // Traverse the tree front to back and push all visible polygons
+      // on the queue. This traversal will also mark all visible
+      // sprites and things. They will be put on a queue later.
       static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
       	&rview, CullOctreeNode, &rview);
 
+      // Fill the sprite and thing queues for all sprites and things
+      // that were visible.
+      use_object_queues = true;
       if (sprites.Length () > 0)
       {
 	// Push all visible sprites in a queue.
@@ -921,21 +972,45 @@ void csSector::Draw (csRenderView& rview)
 	  if (sp->IsVisible ()) sprite_queue[num_sprite_queue++] = sp;
 	}
       }
+      if (num_things > 0)
+      {
+        // Push all visible things in a queue.
+	// @@@ Avoid memory allocation?
+	thing_queue = new csThing* [num_things];
+	num_thing_queue = 0;
+	th = first_thing;
+	while (th)
+	{
+	  if (th->IsVisible ()) thing_queue[num_thing_queue++] = th;
+	  th = (csThing*)(th->GetNext ());
+	}
+      }
     }
     else
     {
+      // There is no static thing (i.e. octree) in this sector so
+      // we just make room for the polygons from the sector.
       poly_queue = new csPolygon2DQueue (polygons.Length ());
     }
+
+    // Also add/queue the polygons of the current sector (which are expected
+    // to be behind all other polygons from entities inside the sector).
     csPolygon2DQueue* queue = poly_queue;
     TestQueuePolygonArray (polygons.GetArray (), polygons.Length (), &rview,
     	queue, false);
+
+    // Render all polygons that are visible back to front.
     DrawPolygonsFromQueue (queue, &rview);
     delete queue;
   }
   else
   {
+    //-----
+    // Here we don't use the c-buffer or 2D culler but just render back
+    // to front.
+    //-----
     DrawPolygons (this, polygons.GetArray (), polygons.Length (), false, &rview);
-    if (static_thing && do_things)
+    if (static_thing)
     {
       static_thing->UpdateTransformation (rview);
       static_tree->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);
@@ -944,53 +1019,40 @@ void csSector::Draw (csRenderView& rview)
 
   if (do_things)
   {
+    // If the queues are not used for things we still fill the queue here
+    // just to make the code below easier.
+    if (!use_object_queues)
+    {
+      thing_queue = new csThing* [num_things];
+      num_thing_queue = 0;
+      th = first_thing;
+      while (th)
+      {
+        thing_queue[num_thing_queue++] = th;
+        th = (csThing*)(th->GetNext ());
+      }
+    }
+
     // All csThings which are not merged with the static bsp still need to
-    // be drawn. If there is a static bsp then we cannot do something special
-    // for convex things (hulls). In that case we first draw the non-merged
-    // things using normal Z-buffer and only Z sort the foggy things and draw
-    // them back to front. If there is no static bsp then we can also Z sort
-    // the hulls and draw then back to front using Z-fill.
-    //
-    // A consequence of this algorithm is that if you use a static bsp then
-    // you can only use portals in csThings that do not move (i.e. the csThing
-    // needs to be merged with the bsp). But the csThing need not be convex in
-    // that case. If you don't use a static bsp then you can use portals in
-    // moving csThings but the csThings containing portals need to be convex.
-    // a static bsp then you can only use portals
+    // be drawn. Unless they are fog objects (or transparent, this is a todo!)
+    // we just render them using the Z-buffer. Fog or transparent objects
+    // are z-sorted and rendered back to front.
     //
     // We should see if there are better alternatives to Z-sort which are
     // more accurate in more cases (@@@).
-    csThing* sort_list[100];    // @@@HARDCODED == BAD == EASY!
+    csThing* sort_list[256];    // @@@HARDCODED == BAD == EASY!
     int sort_idx = 0;
     int i;
-    csThing* sp = first_thing;
-    if (static_thing)
+
+    // First we do z-sorting for fog objects so that they are rendered
+    // correctly from back to front. All other objects are drawn using
+    // the z-buffer.
+    for (i = 0 ; i < num_thing_queue ; i++)
     {
-      // Here we have a static bsp. So we draw all csThings using the
-      // Z-buffer and put all foggy csThings in the sort_list.
-      while (sp)
-      {
-        if (sp != static_thing)
-          if (sp->GetFog ().enabled) sort_list[sort_idx++] = sp;
-          else sp->Draw (rview);
-        sp = (csThing*)(sp->GetNext ());
-      }
-    }
-    else
-    {
-      // Here we don't have a static bsp. In this case we put all
-      // hulls (convex csThings) and foggy csThings in the sort_list.
-      while (sp)
-      {
-        // @@@ Note from Jorrit: temporarily disabled the option of
-	// Z sorting convex objects. The reason is that Z sort is not
-	// perfect and we really need something better here. So we
-	// only Z sort fog objects.
-        // @@@ if (sp->flags.Check (CS_ENTITY_CONVEX) || sp->GetFog ().enabled)
-        if (sp->GetFog ().enabled)
-          sort_list[sort_idx++] = sp;
-        sp = (csThing*)(sp->GetNext ());
-      }
+      th = thing_queue[i];
+      if (th != static_thing)
+        if (th->GetFog ().enabled) sort_list[sort_idx++] = th;
+        else th->Draw (rview);
     }
 
     if (sort_idx)
@@ -1001,27 +1063,13 @@ void csSector::Draw (csRenderView& rview)
       // Draw them back to front.
       for (i = 0 ; i < sort_idx ; i++)
       {
-        sp = sort_list[i];
-        if (sp->GetFog ().enabled) sp->DrawFoggy (rview);
-        else if (sp->flags.Check (CS_ENTITY_CONVEX))
-          sp->Draw (rview, false);
+        th = sort_list[i];
+        if (th->GetFog ().enabled) th->DrawFoggy (rview);
+        else th->Draw (rview, false);
       }
     }
 
-    // If there is no static bsp then we still need to draw the remaining
-    // non-convex csThings.
-    if (!static_thing)
-    {
-      sp = first_thing;
-      while (sp)
-      {
-        // @@@ Note from Jorrit: temporarily disabled the option of Z sorting
-	// convex objects. (see note above).
-        // @@@ if (!sp->flags.Check (CS_ENTITY_CONVEX) && !sp->GetFog ().enabled) sp->Draw (rview);
-        if (!sp->GetFog ().enabled) sp->Draw (rview);
-        sp = (csThing*)(sp->GetNext ());
-      }
-    }
+    delete [] thing_queue;
 
     // Draw sprites.
     // To correctly support sprites in multiple sectors we only draw a
@@ -1514,6 +1562,8 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
   // Calculate lighting for all things in the current sector.
   // @@@ If there is an octree/bsp tree then this should be done
   // differently by adding those things dynamically to the BSP tree.
+
+//@@@@@@@@@@ USE THE NEW DYN BSP OBJ FEATURE FOR THIS! i.e. a queue
   for (i = 0 ; i < num_visible_things ; i++)
   {
     sp = visible_things[i];

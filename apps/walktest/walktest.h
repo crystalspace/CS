@@ -130,7 +130,9 @@ public:
   csRecordVector recording;
 
   /// A list with all busy entities.
-  csBusyList busy_entities;
+  csEntityList busy_entities;
+  /// A vector that is used to temporarily store references to busy entities.
+  csVector busy_vector;
 
   // Various configuration values for collision detection.
   /// If >= 0 then we're recording. The value is the current frame entry.

@@ -79,9 +79,13 @@ public:
 private:
   /// First thing in this sector.
   csThing* first_thing;
+  /// Number of things in this sector.
+  int num_things;
 
   /// First sky in this sector.
   csThing* first_sky;
+  /// Number of sky things in this sector.
+  int num_sky_things;
 
   /// Ambient light level for red in this sector.
   int level_r;
@@ -202,6 +206,11 @@ public:
   bool RemoveSky (csThing* thing);
 
   /**
+   * Get the number of sky things in this sector.
+   */
+  int GetNumSkyThings () { return num_sky_things; }
+
+  /**
    * Add a thing to this sector.
    */
   void AddThing (csThing* thing);
@@ -210,6 +219,11 @@ public:
    * Remove a thing from this sector.
    */
   bool RemoveThing (csThing* thing);
+
+  /**
+   * Get the number of things in this sector.
+   */
+  int GetNumThings () { return num_things; }
 
   /**
    * Add a static or pseudo-dynamic light to this sector.

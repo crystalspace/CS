@@ -22,7 +22,8 @@
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 #include "csgeom/math3d.h"
-#include "csgeom/math2d.h" // texel coords
+#include "csgeom/math2d.h"
+#include "csgeom/box.h"
 #include "csobject/csobject.h"
 #include "csengine/tranman.h"
 #include "csengine/arrays.h"
@@ -133,6 +134,12 @@ protected:
 
   /// Optional oriented bounding box.
   csPolygonSetBBox* bbox;
+
+  /// Bounding box in object space.
+  csBox3 obj_bbox;
+
+  /// If true then the bounding box in object space is valid.
+  bool obj_bbox_valid;
 
   /**
    * Light frame number. Using this number one can see if gouraud shaded
@@ -393,7 +400,7 @@ public:
    * This is either the polygonset itself if it is a sector
    * or else the sector that this thing is in.
    */
-  void SetSector (csSector* sector) { csPolygonSet::sector = sector; }
+  virtual void SetSector (csSector* sector) { csPolygonSet::sector = sector; }
 
   /// Return the sector that this polygonset belongs to.
   csSector* GetSector () { return sector; }
@@ -429,7 +436,7 @@ public:
    * Get the bounding box in object space for this polygon set.
    * This is calculated based on the oriented bounding box.
    */
-  void GetBoundingBox (csVector3& min_bbox, csVector3& max_bbox);
+  void GetBoundingBox (csBox3& box);
 
   /// Return true if this has fog.
   bool HasFog () { return fog.enabled; }

@@ -38,7 +38,6 @@
 #include "csengine/csspr2d.h"
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
-#include "csengine/solidbsp.h"
 #include "csengine/covcube.h"
 #include "csengine/cbufcube.h"
 #include "csengine/texture.h"
@@ -295,7 +294,6 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   G2D = NULL;
   textures = NULL;
   c_buffer = NULL;
-  solidbsp = NULL;
   covcube = NULL;
   cbufcube = NULL;
   covtree = NULL;
@@ -463,7 +461,6 @@ void csWorld::Clear ()
   delete textures; textures = NULL;
   textures = new csTextureList ();
   delete c_buffer; c_buffer = NULL;
-  delete solidbsp; solidbsp = NULL;
   delete covtree; covtree = NULL;
   delete render_pol2d_pool;
   render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory());
@@ -489,27 +486,10 @@ void csWorld::EnableLightingCache (bool en)
   if (!do_lighting_cache) do_force_relight = true;
 }
 
-void csWorld::EnableSolidBsp (bool en)
-{
-  if (en)
-  {
-    delete c_buffer; c_buffer = NULL;
-    delete covtree; covtree = NULL;
-    if (solidbsp) return;
-    solidbsp = new csSolidBsp ();
-  }
-  else
-  {
-    delete solidbsp;
-    solidbsp = NULL;
-  }
-}
-
 void csWorld::EnableCBuffer (bool en)
 {
   if (en)
   {
-    delete solidbsp; solidbsp = NULL;
     delete covtree; covtree = NULL;
     if (c_buffer) return;
     c_buffer = new csCBuffer (0, frame_width-1, frame_height);
@@ -525,7 +505,6 @@ void csWorld::EnableCovtree (bool en)
 {
   if (en)
   {
-    delete solidbsp; solidbsp = NULL;
     delete c_buffer; c_buffer = NULL;
     if (covtree) return;
     csBox2 box (0, 0, frame_width, frame_height);
@@ -1056,11 +1035,6 @@ void csWorld::Draw (csCamera* c, csClipper* view)
     c_buffer->Initialize ();
     c_buffer->InsertPolygon (view->GetClipPoly (), view->GetNumVertices (), true);
   }
-  else if (solidbsp)
-  {
-    solidbsp->MakeEmpty ();
-    solidbsp->InsertPolygonInv (view->GetClipPoly (), view->GetNumVertices ());
-  }
   else if (covtree)
   {
     covtree->MakeEmpty ();
@@ -1139,7 +1113,6 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   tr_manager.NewFrame ();
 
   if (c_buffer) c_buffer->Initialize ();
-  if (solidbsp) solidbsp->MakeEmpty ();
   if (covtree) covtree->MakeEmpty ();
 
   csSector* s = c->GetSector ();
@@ -1717,17 +1690,11 @@ void csWorld::Resize ()
   { 
     EnableCBuffer (false); 
     EnableCBuffer (true);  
-    EnableSolidBsp (false); 
   }
   if (covtree) 
   { 
     EnableCovtree (false); 
     EnableCovtree (true); 
-    EnableSolidBsp (false); 
-  }
-  if (solidbsp) 
-  { 
-    EnableSolidBsp (true); 
   }
 }
 
@@ -1736,7 +1703,6 @@ csWorld::csWorldState::csWorldState (csWorld *w)
   world    = w;
   c_buffer = w->c_buffer;
   covtree  = w->covtree;
-  solidbsp = w->solidbsp;
   G2D      = w->G2D;
   G3D      = w->G3D;
   resize   = false;
@@ -1746,7 +1712,6 @@ csWorld::csWorldState::~csWorldState ()
 {
   if (c_buffer) delete c_buffer;
   if (covtree)  delete covtree;
-  if (solidbsp) delete solidbsp;
 }
 
 void csWorld::csWorldState::Activate ()
@@ -1762,7 +1727,6 @@ void csWorld::csWorldState::Activate ()
 
     c_buffer = world->c_buffer;
     covtree  = world->covtree;
-    solidbsp = world->solidbsp;
     resize   = false;
   }
 }

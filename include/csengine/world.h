@@ -43,7 +43,6 @@ class csStatLight;
 class csDynLight;
 class csSpriteTemplate;
 class csClipper;
-class csSolidBsp;
 class csCovcube;
 class csCBufferCube;
 class csWorld;
@@ -329,9 +328,6 @@ private:
   /// Optional c-buffer used for rendering.
   csCBuffer* c_buffer;
 
-  /// Optional solid BSP used for rendering.
-  csSolidBsp* solidbsp;
-
   /// Optional coverage mask tree used for rendering.
   csCoverageMaskTree* covtree;
 
@@ -480,16 +476,6 @@ public:
    * Return the lookup table used for the coverage mask tree.
    */
   csCovMaskLUT* GetCovMaskLUT () { return covtree_lut; }
-
-  /**
-   * Enable/disable solidbsp.
-   */
-  void EnableSolidBsp (bool en);
-
-  /**
-   * Return solidbsp (or NULL if not used).
-   */
-  csSolidBsp* GetSolidBsp () { return solidbsp; }
 
   /**
    * Return coverage mask cube.
@@ -826,7 +812,6 @@ private:
     iGraphics3D *G3D;
     csCBuffer* c_buffer;
     csCoverageMaskTree* covtree;
-    csSolidBsp* solidbsp;
     /// Creates a world state by copying the relevant data members
     csWorldState (csWorld *this_world);
 

@@ -31,7 +31,7 @@
 #include "csengine/stats.h"
 #include "csengine/dumper.h"
 #include "csengine/cbuffer.h"
-#include "csengine/solidbsp.h"
+#include "csengine/thing.h"
 #include "csengine/covtree.h"
 #include "csengine/bspbbox.h"
 #include "csengine/cssprite.h"
@@ -75,6 +75,7 @@ csPolygonSet::csPolygonSet () : csObject(),
   draw_busy = 0;
   fog.enabled = false;
   bbox = NULL;
+  obj_bbox_valid = false;
 
   light_frame_number = -1;
 
@@ -82,6 +83,7 @@ csPolygonSet::csPolygonSet () : csObject(),
 
   next = NULL;
   parent = NULL;
+  sector = NULL;
 }
 
 csPolygonSet::~csPolygonSet ()
@@ -548,7 +550,6 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   csVector3* verts;
   int num_verts;
   int i;
-  csSolidBsp* solidbsp = csWorld::current_world->GetSolidBsp ();
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
   bool visible;
@@ -562,29 +563,43 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
     {
       // We're dealing with a csBspPolygon.
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
-      csSprite* sp = (csSprite*)(bsppol->GetOriginator ());
+      csObject* obj = bsppol->GetOriginator ();
+      bool obj_vis;
+      csPolyTreeBBox* tbb;
+      if (obj->GetType () >= csSprite::Type)
+      {
+        csSprite* sp = (csSprite*)obj;
+	obj_vis = sp->IsVisible ();
+	tbb = (csPolyTreeBBox*)(sp->GetPolyTreeObject ());
+      }
+      else
+      {
+        csThing* th = (csThing*)obj;
+	obj_vis = th->IsVisible ();
+	tbb = (csPolyTreeBBox*)(th->GetPolyTreeObject ());
+      }
 
 //@@@ Don't remove this debug code until we fully debugged
 //the bounding box of skeletal sprites!
 //bool bspsp_debug = true;
 
-      // If the sprite is already marked visible then we don't have
+      // If the object is already marked visible then we don't have
       // to do any of the other processing for this polygon.
 //if (bspsp_debug || !sp->IsVisible ())
-      if (!sp->IsVisible ())
+      if (!obj_vis)
       {
 	// Since we have a csBspPolygon we know that the poly tree object
 	// is a csPolyTreeBBox instance.
-        csPolyTreeBBox* tbb = (csPolyTreeBBox*)(sp->GetPolyTreeObject ());
         if (!tbb->IsTransformed ())
 	{
-	  // The bbox of this sprite has not yet been transformed
+	  // The bbox of this object has not yet been transformed
 	  // to camera space.
 	  tbb->World2Camera (*d);
 	}
 
         // Transform it to screen space and perform clipping to Z plane.
         // Then test against the c-buffer to see if it is visible.
+	bool mark_vis = false;
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if ( bsppol->ClipToPlane (d->do_clip_plane ? &d->clip_plane :
 		(csPlane3*)NULL, d->GetOrigin (), verts, num_verts) &&
@@ -596,13 +611,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  {
 	    if (covtree->TestPolygon (clip->GetVertices (),
 	    	clip->GetNumVertices (), clip->GetBoundingBox ()))
-              sp->MarkVisible ();
-	  }
-	  else if (solidbsp)
-	  {
-	    if (solidbsp->TestPolygon (clip->GetVertices (),
-	    	clip->GetNumVertices ()))
-              sp->MarkVisible ();
+	      mark_vis = true;
 	  }
 	  else if (c_buffer->TestPolygon (clip->GetVertices (),
 	  	clip->GetNumVertices ()))
@@ -611,7 +620,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 //	    {
 //	      clip->Draw (d->g2d, d->g3d->GetTextureManager ()->FindRGB (255, 0, 0));
 //	    }
-            sp->MarkVisible ();
+	    mark_vis = true;
 	  }
 //	  else
 //	    if (bspsp_debug)
@@ -619,6 +628,19 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 //	      clip->Draw (d->g2d, d->g3d->GetTextureManager ()->FindRGB (0, 0, 255));
 //	    }
         }
+	if (mark_vis)
+	{
+          if (obj->GetType () >= csSprite::Type)
+          {
+            csSprite* sp = (csSprite*)obj;
+            sp->MarkVisible ();
+	  }
+	  else
+	  {
+            csThing* th = (csThing*)obj;
+            th->MarkVisible ();
+	  }
+	}
         render_pool->Free (clip);
       }
     }
@@ -655,9 +677,6 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  if (covtree)
             visible = covtree->TestPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
-	  else if (solidbsp)
-            visible = solidbsp->TestPolygon (clip->GetVertices (),
-		  clip->GetNumVertices ());
 	  else
             visible = c_buffer->TestPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
@@ -667,9 +686,6 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  if (covtree)
             visible = covtree->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
-	  else if (solidbsp)
-            visible = solidbsp->InsertPolygon (clip->GetVertices (),
-		  clip->GetNumVertices ());
 	  else
             visible = c_buffer->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
@@ -681,7 +697,6 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	Stats::polygons_accepted++;
 	if (c_buffer && c_buffer->IsFull ()) return (void*)1;	// End BSP processing
 	if (covtree && covtree->IsFull ()) return (void*)1;	// End BSP processing
-	if (solidbsp && solidbsp->IsFull ()) return (void*)1;	// End BSP processing
       }
       else
       {
@@ -750,13 +765,16 @@ void csPolygonSet::CreateBoundingBox ()
 {
   float minx, miny, minz, maxx, maxy, maxz;
   delete bbox; bbox = NULL;
-  if (num_vertices <= 0) return;
+  if (num_vertices <= 0 && num_curve_vertices <= 0) return;
   bbox = new csPolygonSetBBox ();
-  minx = maxx = obj_verts[0].x;
-  miny = maxy = obj_verts[0].y;
-  minz = maxz = obj_verts[0].z;
+  minx = 100000000.;
+  miny = 100000000.;
+  minz = 100000000.;
+  maxx = -100000000.;
+  maxy = -100000000.;
+  maxz = -100000000.;
   int i;
-  for (i = 1 ; i < num_vertices ; i++)
+  for (i = 0 ; i < num_vertices ; i++)
   {
     if (obj_verts[i].x < minx) minx = obj_verts[i].x;
     else if (obj_verts[i].x > maxx) maxx = obj_verts[i].x;
@@ -786,14 +804,18 @@ void csPolygonSet::CreateBoundingBox ()
   bbox->i2 = AddVertex (maxx, maxy, maxz);
 }
 
-void csPolygonSet::GetBoundingBox (csVector3& min_bbox, csVector3& max_bbox)
+void csPolygonSet::GetBoundingBox (csBox3& box)
 {
+  if (obj_bbox_valid) { box = obj_bbox; return; }
+  obj_bbox_valid = true;
+
   if (!obj_verts)
   {
-    min_bbox.Set (0, 0, 0);
-    max_bbox.Set (0, 0, 0);
+    obj_bbox.Set (0, 0, 0, 0, 0, 0);
+    box = obj_bbox;
     return;
   }
+  csVector3 min_bbox, max_bbox;
   min_bbox = max_bbox = Vobj (bbox->i1);
   if (Vobj (bbox->i2).x < min_bbox.x) min_bbox.x = Vobj (bbox->i2).x;
   else if (Vobj (bbox->i2).x > max_bbox.x) max_bbox.x = Vobj (bbox->i2).x;
@@ -837,6 +859,8 @@ void csPolygonSet::GetBoundingBox (csVector3& min_bbox, csVector3& max_bbox)
   else if (Vobj (bbox->i8).y > max_bbox.y) max_bbox.y = Vobj (bbox->i8).y;
   if (Vobj (bbox->i8).z < min_bbox.z) min_bbox.z = Vobj (bbox->i8).z;
   else if (Vobj (bbox->i8).z > max_bbox.z) max_bbox.z = Vobj (bbox->i8).z;
+  obj_bbox.Set (min_bbox, max_bbox);
+  box = obj_bbox;
 }
 
 //---------------------------------------------------------------------------------------------------------

@@ -187,7 +187,7 @@ void csObjIterator::Next ()
       }
       if (derived)
       {
-        if (&Container->obj [Index]->GetType () >= Type) break;
+        if (Container->obj [Index]->GetType () >= *Type) break;
       }
       else
       {

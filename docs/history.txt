@@ -1,7 +1,41 @@
 The history order has been reversed so that new features are at the top.
 
-
 11-Jul-2000
+	- Andrew Zabolotny did some fixes to dos configuration batch
+	  files.
+	- Seth Galbraith fixed one of the files that Andrew fixed.
+	- Changed csPolygonSet::GetBoundingBox() to fill in a csBox3
+	  instead of two vectors.
+	- Implemented support for dynamic bounding boxes in polygon trees
+	  (octrees and BSP trees) for moveable and detail things.
+	- Added is_visible flag for a thing.
+	- Addd GetNumSkyThings() and GetNumThings() to csSector to get
+	  the number of sky and normal things.
+	- Removed 'home' and 'other' pointers in csThing because they
+	  were not used and obsolete.
+	- Detail and moveable things are now only drawn when visible
+	  through the c-buffer. This greatly speeds up rendering big
+	  levels with lots of small detail objects.
+	- Removed support for 'solidbsp' for rendering. It wasn't properly
+	  working in any case. Also removed 'solidbsp' console command.
+	- The 'thing' toggle to render things (console command) now doesn't
+	  affect the static thing anymore. This means that on a level using
+	  an octree only detail and moveable things will not be rendered
+	  when this flag is set.
+	- Cleaned up the very important csSector::Draw() a little and added
+	  more comments to make it clearer.
+	- Fixed a bug in the derived iterator change from yesterday (in
+	  csObject). It was not actually iterating over derived types
+	  but doing something completely bogus instead. This fixes the
+	  crash bug that I had in the new WalkTest entity system.
+	- Renamed csBusyList to csEntityList.
+	- Fixed a bug with flat-shading. This could cause crashes
+	  with for example funky.zip (recent bug).
+	- Made csPolygonSet::GetBoundingBox() more efficient.
+	- Fixed csPolygonSet::GetBoundingBox() and CreateBoundingBox()
+	  for polygon sets that contained nothing but curved surfaces.
+	  These fixes visibility algorithm using c-buffer and curved
+	  surfaces.
 	- Samuel Humphreys did the following changes:
 	    - Fixed bug in software drivers where if the viewing rectangle was
               set to the window co-ordinates, polys where being unnecessarily

@@ -358,17 +358,12 @@ void WalkTest::ParseKeyCmds ()
 
 void WalkTest::ActivateObject (csObject* src)
 {
-printf ("ActivateObject\n");
   csObjIterator it = src->GetIterator (csWalkEntity::Type, true);
   while (!it.IsFinished ())
   {
-printf ("it\n");
-    csWalkEntity* wentity = (csWalkEntity*)it.GetObj ();
-printf ("wentity=%08lx\n", wentity);
-printf ("wentity->Type='%s'\n", wentity->Type.ID);
-printf ("before\n");
+    csObject* obj = it.GetObj ();
+    csWalkEntity* wentity = (csWalkEntity*)obj;
     wentity->Activate ();
-printf ("after\n");
     it.Next ();
   }
 }
@@ -391,7 +386,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 #   define CONPRI(m) Sys->Printf (MSG_CONSOLE, m);
     CONPRI("-*- Additional commands -*-\n");
     CONPRI("Visibility:\n");
-    CONPRI("  dumpvis cbuffer covtree solidbsp pvs freezepvs pvsonly\n");
+    CONPRI("  dumpvis cbuffer covtree pvs freezepvs pvsonly\n");
     CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum\n");
     CONPRI("  db_curleaf\n");
     CONPRI("Lights:\n");
@@ -595,12 +590,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     bool en = Sys->world->GetCBuffer () != NULL;
     Command::change_boolean (arg, &en, "cbuffer");
     Sys->world->EnableCBuffer (en);
-  }
-  else if (!strcasecmp (cmd, "solidbsp"))
-  {
-    bool en = Sys->world->GetSolidBsp () != NULL;
-    Command::change_boolean (arg, &en, "solidbsp");
-    Sys->world->EnableSolidBsp (en);
   }
   else if (!strcasecmp (cmd, "covtree"))
   {
