@@ -3421,14 +3421,14 @@ cs_prog_bison_min_suffix_done=
 
 
 
-test -z $cs_prog_bison_is_version && cs_prog_bison_is_version=`$BISON --version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_bison_is_version && cs_prog_bison_is_version=`$BISON --version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_bison_is_version" && test -z $cs_prog_bison_is_suffix_done  && { cs_prog_bison_is_suffix_done=yes ; cs_prog_bison_is_suffix= ; }
 
 
 
 
 
-test -z $cs_prog_bison_min_version && cs_prog_bison_min_version=`echo 1.35 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_bison_min_version && cs_prog_bison_min_version=`echo 1.35 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_bison_min_version" && test -z $cs_prog_bison_min_suffix_done  && { cs_prog_bison_min_suffix_done=yes ; cs_prog_bison_min_suffix= ; }
 
 
@@ -3816,10 +3816,10 @@ cs_prog_swig_min_suffix_done=
 
 
 
-test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIG -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIG -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && { cs_prog_swig_is_suffix_done=yes ; cs_prog_swig_is_suffix= ; }
 
-test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIG -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIG -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && { cs_prog_swig_is_suffix_done=yes ; cs_prog_swig_is_suffix=.0 ; }
 
 
@@ -3827,10 +3827,10 @@ test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && {
 
 
 
-test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.14 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.14 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_swig_min_version" && test -z $cs_prog_swig_min_suffix_done  && { cs_prog_swig_min_suffix_done=yes ; cs_prog_swig_min_suffix= ; }
 
-test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.14 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.14 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_swig_min_version" && test -z $cs_prog_swig_min_suffix_done  && { cs_prog_swig_min_suffix_done=yes ; cs_prog_swig_min_suffix=.0 ; }
 
 
@@ -4387,10 +4387,10 @@ cs_prog_jam_min_suffix_done=
 
 
 
-test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`"$JAM" -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`"$JAM" -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_jam_is_version" && test -z $cs_prog_jam_is_suffix_done  && { cs_prog_jam_is_suffix_done=yes ; cs_prog_jam_is_suffix= ; }
 
-test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`"$JAM" -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_jam_is_version && cs_prog_jam_is_version=`"$JAM" -v 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_jam_is_version" && test -z $cs_prog_jam_is_suffix_done  && { cs_prog_jam_is_suffix_done=yes ; cs_prog_jam_is_suffix=.0 ; }
 
 
@@ -4398,10 +4398,10 @@ test -n "$cs_prog_jam_is_version" && test -z $cs_prog_jam_is_suffix_done  && { c
 
 
 
-test -z $cs_prog_jam_min_version && cs_prog_jam_min_version=`echo 2.4 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_jam_min_version && cs_prog_jam_min_version=`echo 2.4 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_jam_min_version" && test -z $cs_prog_jam_min_suffix_done  && { cs_prog_jam_min_suffix_done=yes ; cs_prog_jam_min_suffix= ; }
 
-test -z $cs_prog_jam_min_version && cs_prog_jam_min_version=`echo 2.4 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+test -z $cs_prog_jam_min_version && cs_prog_jam_min_version=`echo 2.4 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_jam_min_version" && test -z $cs_prog_jam_min_suffix_done  && { cs_prog_jam_min_suffix_done=yes ; cs_prog_jam_min_suffix=.0 ; }
 
 
@@ -27496,6 +27496,8 @@ fi
 fi
 
 
+
+
 #------------------------------------------------------------------------------
 # Check whether to build the WxWidgets Canvas
 #------------------------------------------------------------------------------
@@ -27585,8 +27587,8 @@ done
   WXCONFIG=$ac_ct_WXCONFIG
 fi
 
-echo "$as_me:$LINENO: checking for WxWidgets" >&5
-echo $ECHO_N "checking for WxWidgets... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking for wxWidgets" >&5
+echo $ECHO_N "checking for wxWidgets... $ECHO_C" >&6
 if test "${cs_cv_wxwidgets+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -27640,6 +27642,7 @@ fi
 fi
 
 fi
+
 
 
 

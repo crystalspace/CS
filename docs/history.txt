@@ -14,6 +14,13 @@ chronological order.
 	    Windows : csjava.dll
 	- Eric Sunshine fixed the Java SDK check in configure.ac so that it
 	  adds "-framework JavaVM" to JAVA.LFLAGS on MacOS/X.
+	- Eric Sunshine fixed bug in CS_CHECK_PROG_VERSION() (progver.m4) where
+	  it would become confused and crash if the version output of a program
+	  included multiple lines containing strings which appeared to be
+	  version numbers. For instance, on MacOS/X, `swig -version' emits two
+	  lines which fit the Swig check version number template:
+	    SWIG Version 1.3.21
+	    Compiled with g++ [powerpc-apple-darwin7.4.0]
 27-Jul-2004
 	- Peter Amstutz added the wxgl canvas (initially developed by
 	  Daniel Fryer) which makes it fairly easy to embed Crystal Space
