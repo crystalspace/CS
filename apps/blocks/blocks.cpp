@@ -2996,8 +2996,8 @@ void cleanup ()
 {
   Sys->console_out ("Cleaning up...\n");
   delete view;
-  delete Sys;
   Sys = NULL;
+  delete Sys;
 }
 
 //----------------------------------------------------------------------------
