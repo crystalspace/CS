@@ -26,6 +26,7 @@
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/camera.h"
+#include "iutil/objreg.h"
 #include "plugins/engine/3d/portalcontainer.h"
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/meshobj.h"
@@ -101,7 +102,7 @@ SCF_IMPLEMENT_IBASE_EXT(csPortalContainer)
   SCF_IMPLEMENTS_INTERFACE (iShadowReceiver)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-csPortalContainer::csPortalContainer (iEngine* engine) :
+csPortalContainer::csPortalContainer (iEngine* engine, iObjectRegistry *object_reg) :
 	csMeshObject (engine),
 	scfiPolygonMesh (0),
 	scfiPolygonMeshCD (CS_PORTAL_COLLDET),
@@ -122,6 +123,9 @@ csPortalContainer::csPortalContainer (iEngine* engine) :
   scfiPolygonMesh.SetPortalContainer (this);
   scfiPolygonMeshCD.SetPortalContainer (this);
   scfiPolygonMeshLOD.SetPortalContainer (this);
+
+  shader_man = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  fog_shader = shader_man->GetShader ("or_lighting_portal");
 }
 
 csPortalContainer::~csPortalContainer ()
@@ -827,6 +831,38 @@ void csPortalContainer::DrawOnePortal (
       FillZBuf (poly, rview, keep_camera_z, keep_plane);
 #endif
   }
+
+#ifdef CS_USE_NEW_RENDERER
+  if (is_this_fog && fog_shader)
+  {
+    csSimpleRenderMesh mesh;
+    mesh.meshtype = CS_MESHTYPE_TRIANGLEFAN;
+    mesh.indexCount = po->GetVertexIndices ().Length ();
+    // @@@ Weirdo overloads approaching, captain!
+    mesh.indices = (const uint*)(int*)po->GetVertexIndices ().GetArray ();
+    mesh.vertexCount = vertices.Length ();
+    mesh.vertices = vertices.GetArray ();
+    mesh.texcoords = 0;
+    mesh.texture = 0;
+    mesh.colors = 0;
+    mesh.object2camera = rview->GetCamera ()->GetTransform ();
+    mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
+    mesh.alphaType.autoAlphaMode = false;
+    mesh.shader = fog_shader;
+    // @@@ Hackish...
+    csShaderVariableContext varContext;
+    csShaderVarStack &stacks = shader_man->GetShaderVariableStack ();
+    for (size_t i=0; i<stacks.Length (); i++)
+    {
+      if (stacks[i].Length ()>0)
+        varContext.AddVariable (stacks[i].Top ());
+    }
+    mesh.dynDomain = &varContext;
+    // @@@ Could be used for z-fill and stuff, while we're at it?
+    mesh.z_buf_mode = CS_ZBUF_TEST;
+    g3d->DrawSimpleMesh (mesh);
+  }
+#endif
 
   // Make sure to close the portal again.
   bool use_zfill_portal = po->flags.Check (CS_PORTAL_ZFILL);

@@ -238,7 +238,7 @@ private:
   // Dump various structures.
   void Dump (iEngine* engine);
   void Dump (iSector* sector);
-  void Dump (iMeshWrapper* mesh);
+  void Dump (int indent, iMeshWrapper* mesh);
   void Dump (iMeshFactoryWrapper* meshfact);
   void Dump (iCamera* c);
   void Dump (iThingFactoryState* fact, int polyidx);

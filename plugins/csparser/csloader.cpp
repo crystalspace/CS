@@ -1366,10 +1366,13 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
         }
         case XMLTOKEN_KEY:
 	  {
-            iKeyValuePair* kvp = ParseKey (child, Engine->QueryObject());
-	    if (kvp)
+            iKeyValuePair* kvp = 0;
+            SyntaxService->ParseKey (child, kvp);
+            if (kvp)
+            {
+              Engine->QueryObject()->ObjAdd (kvp->QueryObject ());
 	      kvp->DecRef ();
-	    else
+            } else
 	      return false;
 	  }
           break;
@@ -1618,11 +1621,13 @@ bool csLoader::LoadSounds (iDocumentNode* node)
               {
                 case XMLTOKEN_KEY:
                   {
-                    iKeyValuePair *kvp =
-                        ParseKey (child2, snd->QueryObject ());
+                    iKeyValuePair *kvp = 0;
+                    SyntaxService->ParseKey (child2, kvp);
                     if (kvp)
+                    {
+                      snd->QueryObject ()->ObjAdd (kvp->QueryObject ());
                       kvp->DecRef ();
-                    else
+                    } else
                       return false;
                   }
                   break;
@@ -2013,10 +2018,13 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_KEY:
         {
-          iKeyValuePair* kvp = ParseKey (child, stemp->QueryObject());
+          iKeyValuePair* kvp = 0;
+          SyntaxService->ParseKey (child, kvp);
 	  if (kvp)
+          {
+            stemp->QueryObject()->ObjAdd (kvp->QueryObject ());
 	    kvp->DecRef ();
-	  else
+          } else
 	    return false;
         }
         break;
@@ -2776,10 +2784,13 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
-        iKeyValuePair* kvp = ParseKey (child, mesh->QueryObject());
+        iKeyValuePair* kvp = 0;
+        SyntaxService->ParseKey (child, kvp);
 	if (kvp)
+        {
+          mesh->QueryObject()->ObjAdd (kvp->QueryObject ());
 	  kvp->DecRef ();
-	else
+        } else
 	  return false;
       }
       break;
@@ -3870,10 +3881,13 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
 	return 0;
       case XMLTOKEN_KEY:
 	{
-          iKeyValuePair* kvp = ParseKey (child, collection->QueryObject ());
+          iKeyValuePair* kvp = 0;
+          SyntaxService->ParseKey (child, kvp);
           if (kvp)
+          {
+            collection->QueryObject ()->ObjAdd (kvp->QueryObject ());
 	    kvp->DecRef ();
-	  else
+          } else
 	    return 0;
 	}
         break;
@@ -4117,10 +4131,13 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_KEY:
 	{
-          iKeyValuePair* kvp = ParseKey (child, &Keys);
+          iKeyValuePair* kvp = 0;
+          SyntaxService->ParseKey (child, kvp);
           if (kvp)
+          {
+            Keys.ObjAdd (kvp->QueryObject ());
 	    kvp->DecRef ();
-	  else
+          } else
 	    return 0;
 	}
         break;
@@ -4383,30 +4400,6 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   return l;
 }
 
-iKeyValuePair* csLoader::ParseKey (iDocumentNode* node, iObject* pParent)
-{
-  const char* name = node->GetAttributeValue ("name");
-  if (!name)
-  {
-    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.key",
-    	        node, "Missing 'name' attribute for 'key'!");
-    return 0;
-  }
-  csKeyValuePair* cskvp = new csKeyValuePair (name);
-  csRef<iDocumentAttributeIterator> atit = node->GetAttributes ();
-  while (atit->HasNext ())
-  {
-    csRef<iDocumentAttribute> at = atit->Next ();
-    cskvp->SetValue (at->GetName (), at->GetValue ());
-  }
-  csRef<iKeyValuePair> kvp = SCF_QUERY_INTERFACE (cskvp, iKeyValuePair);
-  if (pParent)
-    pParent->ObjAdd (kvp->QueryObject ());
-    
-  return kvp;
-}
-
 iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
 {
   iMapNode* pNode = (iMapNode*)(new csMapNode (
@@ -4431,10 +4424,13 @@ iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
 	return 0;
       case XMLTOKEN_KEY:
         {
-          iKeyValuePair* kvp = ParseKey (child, pNode->QueryObject ());
+          iKeyValuePair* kvp = 0;
+          SyntaxService->ParseKey (child, kvp);
           if (kvp)
+          {
+            pNode->QueryObject ()->ObjAdd (kvp->QueryObject ());
 	    kvp->DecRef ();
-	  else
+          } else
 	    return 0;
 	}
         break;
@@ -4618,10 +4614,13 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   size_t i;
   for (i = 0 ; i < key_nodes.Length () ; i++)
   {
-    iKeyValuePair* kvp = ParseKey (key_nodes[i], container_mesh->QueryObject());
+    iKeyValuePair* kvp = 0;
+    SyntaxService->ParseKey (key_nodes[i], kvp);
     if (kvp)
+    {
+      container_mesh->QueryObject()->ObjAdd (kvp->QueryObject ());
       kvp->DecRef ();
-    else
+    } else
       return false;
   }
 
@@ -4907,22 +4906,23 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_FOG:
         {
-#ifndef CS_USE_NEW_RENDERER
           csFog *f = sector->GetFog ();
           f->enabled = true;
 	  f->red = child->GetAttributeValueAsFloat ("red");
 	  f->green = child->GetAttributeValueAsFloat ("green");
 	  f->blue = child->GetAttributeValueAsFloat ("blue");
 	  f->density = child->GetAttributeValueAsFloat ("density");
-#endif // CS_USE_NEW_RENDERER
         }
         break;
       case XMLTOKEN_KEY:
         {
-          iKeyValuePair* kvp = ParseKey (child, sector->QueryObject());
+          iKeyValuePair* kvp = 0;
+          SyntaxService->ParseKey (child, kvp);
 	  if (kvp)
+          {
+            sector->QueryObject()->ObjAdd (kvp->QueryObject ());
 	    kvp->DecRef ();
-	  else
+          } else
 	    goto error;
         }
         break;

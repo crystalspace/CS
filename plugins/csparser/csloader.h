@@ -514,8 +514,6 @@ private:
   bool ParseStart (iDocumentNode* node, iCameraPosition* campos);
   /// Parse a static light definition and add the light to the engine
   iLight* ParseStatlight (iLoaderContext* ldr_context, iDocumentNode* node);
-  /// Parse a key definition and add the key to the given object
-  iKeyValuePair* ParseKey (iDocumentNode* node, iObject* pParent);
   /// Parse a map node definition and add the node to the given sector
   iMapNode* ParseNode (iDocumentNode* node, iSector* sec);
   /**

@@ -95,6 +95,8 @@ public:
     bool allowZmesh);
   virtual bool WriteZMode (iDocumentNode* node, csZBufMode* zmode,
     bool allowZmesh);
+  virtual bool ParseKey (iDocumentNode* node, iKeyValuePair* &keyvalue);
+  virtual bool WriteKey (iDocumentNode* node, iKeyValuePair* keyvalue);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);

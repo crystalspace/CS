@@ -1014,7 +1014,7 @@ bool csEngine::HandleEvent (iEvent &Event)
             csRef<iShaderCompiler> shcom (ShaderManager->
               GetCompiler ("XMLShader"));
 
-	    char const* const shaderPath = "/shader/or_lighting.xml";
+	    char const* shaderPath = "/shader/or_lighting.xml";
             csRef<iFile> shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
 	    if (shaderFile.IsValid())
               shaderDoc->Parse (shaderFile);
@@ -1025,6 +1025,18 @@ bool csEngine::HandleEvent (iEvent &Event)
               GetNode ("shader"));
             ShaderManager->RegisterShader (default_shader);
             default_shadertype = Strings->Request ("OR compatibility");
+
+            shaderDoc = docsys->CreateDocument ();
+            shaderPath = "/shader/or_lighting_portal.xml";
+            shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
+            if (shaderFile.IsValid())
+              shaderDoc->Parse (shaderFile);
+            else
+              Report("WARNING: Shader %s not available  Failure imminent!",
+              shaderPath);
+            csRef<iShader> portal_shader = shcom->CompileShader (shaderDoc->GetRoot ()->
+              GetNode ("shader"));
+            ShaderManager->RegisterShader (portal_shader);
 
 #endif // CS_USE_NEW_RENDERER
             frame_width = G3D->GetWidth ();
@@ -3328,7 +3340,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
 csPtr<iMeshWrapper> csEngine::CreatePortalContainer (const char* name,
   	iSector* sector, const csVector3& pos)
 {
-  csPortalContainer* pc = new csPortalContainer (this);
+  csPortalContainer* pc = new csPortalContainer (this, object_reg);
   csRef<iMeshWrapper> mesh = CreateMeshWrapper ((iMeshObject*)pc,
   	name, sector, pos);
   csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)(iMeshWrapper*)mesh)

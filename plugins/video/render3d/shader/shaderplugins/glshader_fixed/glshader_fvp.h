@@ -39,7 +39,8 @@ public:
   {
     TEXGEN_NONE = 0,
     TEXGEN_REFLECT_SPHERE,
-    TEXGEN_REFLECT_CUBE
+    TEXGEN_REFLECT_CUBE,
+    TEXGEN_FOG
   };
   enum TexMatrixOpType
   {
@@ -93,6 +94,9 @@ private:
     TEXGENMODE texgen;
     ProgramParam constcolor;
     csArray<TexMatrixOp> texMatrixOps;
+    
+    csStringID fogplane;
+    csStringID fogdensity;
 
     layerentry () : texgen(TEXGEN_NONE) {}
   };

@@ -135,6 +135,9 @@ private:
   csVector3 object_radius;
   float max_object_radius;
 
+  csRef<iShaderManager> shader_man;
+  csRef<iShader> fog_shader;
+
   // World space data. movable_nr is used to detect if it needs to be
   // recalculated.
   long movable_nr;
@@ -174,7 +177,7 @@ protected:
 
 public:
   /// Constructor.
-  csPortalContainer (iEngine* engine);
+  csPortalContainer (iEngine* engine, iObjectRegistry *object_reg);
   void SetMeshWrapper (csMeshWrapper* meshwrapper)
   {
     csPortalContainer::meshwrapper = meshwrapper;

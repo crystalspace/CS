@@ -12,8 +12,22 @@ chronological order.
 	  three functions to iImage: Copy, CopyScale, and CopyTile. Only
 	  csImage implements those. The other implementations of iImage
 	  simply return false here.
-    - Andrew Robberts fixed a bug in particles simpphys where a for loop
-      iterated the wrong way.
+	- Andrew Robberts fixed a bug in particles simpphys where a for loop
+	  iterated the wrong way.
+	- Anders did the following changes:
+	  - Moved key/value reading & writing to syntax services, and added 
+	    key/value loading to xml shaders.
+	  - Updated bugplug scene info dump to write child meshes too 
+	    (and changed the method of indentation a bit)
+	  - Made DrawSimpleMesh actually care about the "dyndomain" 
+	    member of the mesh
+	  - Added fog to NR. There are still issues though:
+	      - Fog looks crappy when looking perpendicular to a portal. 
+	        This is actually due to properties of z-based fog, but 
+		maybe could be tweaked to look better.
+	      - All shaders aren't updated to support fog, only the 
+	        standard or_lighting, best technique.
+	  
 26-Nov-2004
 	- Eric Sunshine added capability to cscript/csperl5/Jamfile to create
 	  pure-Perl extension module `cspace' (Jam target `perl5mod'). This

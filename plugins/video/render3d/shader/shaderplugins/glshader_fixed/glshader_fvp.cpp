@@ -267,7 +267,100 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
       glLoadMatrixf (mAutoTextureMatrix);
 	  */
     }
+      else
+    if (layers[i].texgen == TEXGEN_FOG)
+    {
+      csRef<csShaderVariable> planeVar;
+      csRef<csShaderVariable> densityVar;
 
+      if (layers[i].fogplane < (csStringID)stacks.Length ()
+        && stacks[layers[i].fogplane].Length () > 0)
+        planeVar = stacks[layers[i].fogplane].Top ();
+
+      if (layers[i].fogdensity < (csStringID)stacks.Length ()
+        && stacks[layers[i].fogdensity].Length () > 0)
+        densityVar = stacks[layers[i].fogdensity].Top ();
+
+      if (planeVar && densityVar)
+      {
+        // Initialize some stuff
+        csVector4 fogplane;
+        float density;
+        planeVar->GetValue (fogplane);
+        densityVar->GetValue (density);
+        statecache->SetMatrixMode (GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity ();
+        glTexGeni (GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+        glTexGeni (GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+        statecache->Enable_GL_TEXTURE_GEN_S ();
+        statecache->Enable_GL_TEXTURE_GEN_T ();
+
+        // This is where the magic starts
+        // If you understand this initially (or at all) I salute you
+
+        // First we intialize our texgen planes with the case where
+        // viewplane & fogplane are equal, i.e we want U==Z and
+        // V==1. (The fog lookup texture pretty much does "min(U, V)")
+        // We also offset the fogplane a bit, to avoid ugly clipping 
+        // when fogged portals cuts the near plane.
+        GLfloat coeff1[] = {0, 0, density, -0.1*density};
+        GLfloat coeff2[] = {0, 0, 0, 1};
+        
+        // Then we see if we're looking away from the fogplane
+        // If we are, we can just go with the viewplane==fogplane fog,
+        // but if we aren't we're in trouble...
+        if (fogplane.z>0) 
+        {
+          // Okay, so we weren't. Tough luck. Time to try to do the
+          // best out of things. We start by calculating a blend factor
+          // to blend to viewplane==fogplane fog when we approach the
+          // fogplane, to avoid some ugly skipping. The "pow" is there
+          // tweak the curve to get a bit smoother blend.
+          float blend = MIN(MAX(1-pow(1+fogplane.w*0.2, 5), 0), 1);
+
+          // Okay, here's the serious magic. Basically what we want to do
+          // is to calculate the distance from the vertex to the viewplane
+          // along Z,and the distance from the vertex to the fogplane, 
+          // and use the smallest.
+          
+          /*
+                             fogplane
+                ||||||||||||/ 
+                ||||fog||||/   ^ 
+                ||||||||||/    |z+
+                ---------/-----O------------ viewplane
+                        /
+                       /
+          */
+
+          // The distance to the viewplane is just the Z value, so that's easy
+          // The distance to the fogplane (along Z) is the normal of the 
+          // fogplane <dot> the vertex (i.e. the perpendicular distance), 
+          // divided by the Z component of the fogplane normal. Finally
+          // it's scaled by "density" to get that into the equation too.
+          // The actual MIN part is done by the "standardtex fog" texture.
+
+          // This one is already the viewplane distance, i.e. Z.
+          // We throw in a little offset, to cope with the
+          // fact that during the blend we haven't actually reached
+          // the fogplane yet. Nothing scientific, but does the job.
+          coeff1[3] = (MIN(MAX(fogplane.w*density, -1), 0)-0.1*density);
+
+          // This one is the fogplane distance, i.e. 
+          // vertex<dot>fogplane/fogplane.z. We blend this to just a
+          // fixed 1 as we approach the fogplane.
+          coeff2[0] = fogplane.x*density/fogplane.z;
+          coeff2[1] = fogplane.y*density/fogplane.z;
+          coeff2[2] = density;
+          coeff2[3] = (1-blend)+(fogplane.w/fogplane.z-0.1)*density;
+        }
+
+        glTexGenfv (GL_S, GL_EYE_PLANE, (GLfloat*)&coeff1);
+        glTexGenfv (GL_T, GL_EYE_PLANE, (GLfloat*)&coeff2);
+        glPopMatrix();
+      }
+    }
 
     if (layers[i].texMatrixOps.Length() > 0)
     {
@@ -587,6 +680,26 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
                     layers[layer].texgen = TEXGEN_REFLECT_SPHERE;
                   }
                 }
+              } else if (!strcasecmp(str, "fog"))
+              {
+                int layer = child->GetAttributeValueAsInt ("layer");
+                if (layers.Length () <= (size_t)layer)
+                  layers.SetLength (layer+1);
+                layers[layer].texgen = TEXGEN_FOG;
+
+                if ((str = child->GetAttributeValue("plane")))
+                  layers[layer].fogplane = strings->Request (str);
+                else
+                {
+                  layers[layer].fogplane = strings->Request ("fogplane");
+                }
+
+                if ((str = child->GetAttributeValue("density")))
+                  layers[layer].fogdensity = strings->Request (str);
+                else
+                {
+                  layers[layer].fogdensity = strings->Request ("fog density");
+                }
               }
             }
           }
@@ -652,6 +765,8 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
 bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
   shaderPlug->Open ();
+
+  g3d = CS_QUERY_REGISTRY (objectReg, iGraphics3D);
 
   //get a statecache
   csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (objectReg, iGraphics2D);

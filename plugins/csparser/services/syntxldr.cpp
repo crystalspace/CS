@@ -32,6 +32,7 @@
 #include "csgeom/transfrm.h"
 #include "csgfx/gradient.h"
 #include "csgfx/shadervar.h"
+#include "cstool/keyval.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "iengine/engine.h"
@@ -919,6 +920,36 @@ bool csTextSyntaxService::WriteZMode (iDocumentNode* node,
   //TBD
   node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
     ("SyntaxService: WriteMixmode not yet supported!");
+  return true;
+}
+
+bool csTextSyntaxService::ParseKey (iDocumentNode *node, iKeyValuePair* &keyvalue)
+{
+  const char* name = node->GetAttributeValue ("name");
+  if (!name)
+  {
+    ReportError ("crystalspace.syntax.key",
+    	        node, "Missing 'name' attribute for 'key'!");
+    return false;
+  }
+  csKeyValuePair* cskvp = new csKeyValuePair (name);
+  csRef<iDocumentAttributeIterator> atit = node->GetAttributes ();
+  while (atit->HasNext ())
+  {
+    csRef<iDocumentAttribute> at = atit->Next ();
+    cskvp->SetValue (at->GetName (), at->GetValue ());
+  }
+  csRef<iKeyValuePair> kvp = SCF_QUERY_INTERFACE (cskvp, iKeyValuePair);
+  
+  keyvalue = kvp;
+  return true;
+}
+
+bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue)
+{
+  //TBD
+  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
+    ("SyntaxService: WriteKey not yet supported!");
   return true;
 }
 

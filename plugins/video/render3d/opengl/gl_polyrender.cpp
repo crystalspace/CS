@@ -27,17 +27,12 @@
 #include "gl_render3d.h"
 
 CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer);
-CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::FogAccesor);
 CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::NormalAccesor);
 CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::BiNormalAccesor);
 CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::TangentAccesor);
 
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer)
   SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE(csGLPolygonRenderer::FogAccesor)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer::NormalAccesor)
@@ -59,12 +54,6 @@ csStringID csGLPolygonRenderer::index_name    = csInvalidStringID;
 csStringID csGLPolygonRenderer::tangent_name  = csInvalidStringID;
 csStringID csGLPolygonRenderer::binormal_name = csInvalidStringID;
 csStringID csGLPolygonRenderer::lmcoords_name = csInvalidStringID;
-csStringID csGLPolygonRenderer::fog_name      = csInvalidStringID;
-
-csStringID csGLPolygonRenderer::o2c_matrix_name = csInvalidStringID;
-csStringID csGLPolygonRenderer::o2c_vector_name = csInvalidStringID;
-csStringID csGLPolygonRenderer::fogplane_name   = csInvalidStringID;
-csStringID csGLPolygonRenderer::fogdensity_name = csInvalidStringID;
 
 csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
 {
@@ -72,7 +61,6 @@ csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
   csGLPolygonRenderer::parent = parent;
   renderBufferNum = ~0;
   polysNum = 0;
-  fog_accessor.AttachNew (new FogAccesor(this));
   normal_accessor.AttachNew (new NormalAccesor(this));
   binormal_accessor.AttachNew (new BiNormalAccesor(this));
   tangent_accessor.AttachNew (new TangentAccesor(this));
@@ -103,11 +91,6 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     tangent_name  = strings->Request ("tangents");
     binormal_name = strings->Request ("binormals");
     lmcoords_name = strings->Request ("lightmap coordinates");
-    fog_name      = strings->Request ("fog value");
-    o2c_matrix_name = strings->Request ("object2camera matrix");
-    o2c_vector_name = strings->Request ("object2camera vector");
-    fogplane_name = strings->Request ("fogplane");
-    fogdensity_name = strings->Request ("fog density");
   }
 
   if (renderBufferNum != polysNum)
@@ -306,8 +289,6 @@ void csGLPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
   sv->SetAccessor (tangent_accessor);
   sv = mesh.variablecontext->GetVariableAdd (lmcoords_name);
   sv->SetValue (lmcoords_buffer);
-  sv = mesh.variablecontext->GetVariableAdd (fog_name);
-  sv->SetAccessor (fog_accessor);
 
   mesh.geometryInstance = this;
 }
@@ -322,83 +303,6 @@ void csGLPolygonRenderer::AddPolygon (csPolygonRenderData* poly)
 {
   polys.Push (poly);
   polysNum++;
-}
-
-void csGLPolygonRenderer::FogAccesor::PreGetValue (csShaderVariable *variable)
-{
-  //get the variables we need
-  csShaderVariable *sv;
-  csShaderVarStack& svStack = renderer->shadermanager->GetShaderVariableStack();
-
-  csMatrix3 transMatrix;
-  csVector3 transVector;
-  csVector4 planeAsVector;
-  float density;
-
-  sv = svStack[renderer->o2c_matrix_name].Top();
-  if (!sv->GetValue (transMatrix)) return;
-  sv = svStack[renderer->o2c_vector_name].Top();
-  if (!sv->GetValue (transVector)) return;
-  sv = svStack[renderer->fogplane_name].Top();
-  if (!sv->GetValue (planeAsVector)) return;
-  sv = svStack[renderer->fogdensity_name].Top();
-  if (!sv->GetValue (density)) return;
-
-
-  csPlane3 fogPlane;
-  fogPlane.norm = csVector3 (planeAsVector.x, planeAsVector.y, planeAsVector.z);
-  fogPlane.DD = planeAsVector.w;
-
-  if (fogVerticesNum != renderer->polysNum)
-  {
-    int num_verts = 0;
-    size_t i;
-
-    for (i = 0; i < renderer->polys.Length(); i++)
-    {
-      csPolygonRenderData* poly = renderer->polys[i];
-      num_verts += poly->num_vertices;
-    }
-
-    fog_buffer = renderer->parent->CreateRenderBuffer (
-    	num_verts * sizeof (csVector3), 
-        CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-    void *buf = fog_buffer->Lock(CS_BUF_LOCK_NORMAL);
-    memset (buf,0,num_verts*sizeof(csVector3));
-    fog_buffer->Release();
-    fogVerticesNum = renderer->polysNum;
-  }
-
-  csVector3* fog = (csVector3*)fog_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
-  
-  csReversibleTransform rt(transMatrix, transVector);
-  csVector3 planeNormal = fogPlane.Normal ();
-  csVector3 refpos = rt.GetO2TTranslation();
-  
-  for (size_t i = 0; i < renderer->polys.Length(); i++)
-  {
-    csPolygonRenderData* static_data = renderer->polys[i];
-
-    // First, fill the normal/texel/vertex buffers.
-    csVector3* obj_verts = *(static_data->p_obj_verts);
-    int j, vc = static_data->num_vertices;
-    for (j = 0; j < vc; j++)
-    {
-      //int vidx = *poly_indices++;
-      const csVector3& vertex = obj_verts[static_data->vertices[j]];
-      csVector3 diff = vertex-refpos;
-      float f=density*(fogPlane.Classify (diff))/(diff.Unit ()*planeNormal); 
-      f = MAX(MIN(f,1.0f), 0.0f); //clamp at 0
-      *fog = csVector3(f,f,f);
-      fog++;
-    }
-  }
-  
-  
-  fog_buffer->Release ();
-
-  variable->SetValue(fog_buffer);
 }
 
 void csGLPolygonRenderer::NormalAccesor::PreGetValue (

@@ -442,10 +442,13 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     size_t i;
     for (i = 0 ; i < key_nodes.Length () ; i++)
     {
-      iKeyValuePair* kvp = ParseKey (key_nodes[i], tex->QueryObject());
+      iKeyValuePair* kvp = 0;
+      SyntaxService->ParseKey (key_nodes[i], kvp);
       if (kvp)
+      {
+        tex->QueryObject()->ObjAdd (kvp->QueryObject ());
 	kvp->DecRef ();
-      else
+      } else
 	return 0;
     }
 
@@ -722,10 +725,13 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 
   for (i = 0 ; i < key_nodes.Length () ; i++)
   {
-    iKeyValuePair* kvp = ParseKey (key_nodes[i], mat->QueryObject ());
+    iKeyValuePair* kvp = 0;
+    SyntaxService->ParseKey (key_nodes[i], kvp);
     if (kvp)
+    {
+      mat->QueryObject ()->ObjAdd (kvp->QueryObject ());
       kvp->DecRef ();
-    else
+    } else
       return 0;
   }
   AddToRegion (ldr_context, mat->QueryObject ());

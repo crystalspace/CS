@@ -985,6 +985,7 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
   data.polygon_idx = -1;
   data.vector = 0;
   data.accurate = accurate;
+  data.isect = 0;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
   if (p_mesh) *p_mesh = data.mesh;

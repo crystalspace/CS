@@ -22,6 +22,7 @@
 #include "iutil/vfs.h"
 #include "iutil/cmdline.h"
 #include "imap/services.h"
+#include "ivaria/keyval.h"
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
 #include "csutil/util.h"
@@ -1080,6 +1081,15 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
     shader->DumpStats (str);
     Report(CS_REPORTER_SEVERITY_NOTIFY, 
       "Shader %s: %s", shader->GetName (), str.GetData ());
+  }
+
+  csRef<iDocumentNodeIterator> tagIt = templ->GetNodes ("key");
+  while (tagIt->HasNext ())
+  {
+    iKeyValuePair *keyvalue = 0;
+    synldr->ParseKey (tagIt->Next (), keyvalue);
+    if (keyvalue)
+      shader->QueryObject ()->ObjAdd (keyvalue->QueryObject ());
   }
 
   csRef<iShader> ishader (shader);

@@ -30,6 +30,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
 
+#include "cstool/fogmath.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
@@ -949,7 +950,7 @@ bool csGLGraphics3D::Open ()
   /* @@@ All those default textures, better put them into the engine? */
 
   // @@@ These shouldn't be here, I guess.
-  #define CS_FOGTABLE_SIZE 64
+  #define CS_FOGTABLE_SIZE 256
   // Each texel in the fog table holds the fog alpha value at a certain
   // (distance*density).  The median distance parameter determines the
   // (distance*density) value represented by the texel at the center of
@@ -959,20 +960,24 @@ bool csGLGraphics3D::Open ()
   #define CS_FOGTABLE_MAXDISTANCE (CS_FOGTABLE_MEDIANDISTANCE * 2.0f)
   #define CS_FOGTABLE_DISTANCESCALE (1.0f / CS_FOGTABLE_MAXDISTANCE)
 
-  unsigned char *transientfogdata = new unsigned char[CS_FOGTABLE_SIZE * 4];
-  for (unsigned int fogindex = 0; fogindex < CS_FOGTABLE_SIZE; fogindex++)
+  unsigned char *transientfogdata = new unsigned char[CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE * 4];
+  memset(transientfogdata, 255, CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE * 4);
+  for (unsigned int fogindex1 = 0; fogindex1 < CS_FOGTABLE_SIZE; fogindex1++)
   {
-    transientfogdata[fogindex * 4 + 0] = (unsigned char) 255;
-    transientfogdata[fogindex * 4 + 1] = (unsigned char) 255;
-    transientfogdata[fogindex * 4 + 2] = (unsigned char) 255;
-    double fogalpha = (256 * (1.0 - exp (-float (fogindex)
-      * CS_FOGTABLE_MAXDISTANCE / CS_FOGTABLE_SIZE)));
-    transientfogdata[fogindex * 4 + 3] = (unsigned char) fogalpha;
+    for (unsigned int fogindex2 = 0; fogindex2 < CS_FOGTABLE_SIZE; fogindex2++)
+    {
+      unsigned char fogalpha1 = (255 * FogRamp((float)fogindex1 / CS_FOGTABLE_SIZE));
+      if (fogindex1 == (CS_FOGTABLE_SIZE - 1))
+        fogalpha1 = 255;
+      unsigned char fogalpha2 = (255 * FogRamp((float)fogindex2 / CS_FOGTABLE_SIZE));
+      if (fogindex2 == (CS_FOGTABLE_SIZE - 1))
+        fogalpha2 = 255;
+      transientfogdata[(fogindex1+fogindex2*CS_FOGTABLE_SIZE) * 4 + 3] = MIN(fogalpha1, fogalpha2);
+    }
   }
-  transientfogdata[(CS_FOGTABLE_SIZE - 1) * 4 + 3] = 0;
 
   csRef<iImage> img = csPtr<iImage> (new csImageMemory (
-    CS_FOGTABLE_SIZE, 1, transientfogdata, true, 
+    CS_FOGTABLE_SIZE, CS_FOGTABLE_SIZE, transientfogdata, true, 
     CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
   csRef<iImageVector> imgvec = csPtr<iImageVector> (new csImageVector ());
   imgvec->AddImage (img);
@@ -2394,6 +2399,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   csShaderVarStack stacks;
   shadermgr->PushVariables (stacks);
   scrapContext.PushVariables (stacks);
+  mesh.dynDomain->PushVariables (stacks);
 
   if (mesh.alphaType.autoAlphaMode)
   {

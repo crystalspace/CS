@@ -2247,7 +2247,7 @@ void csBugPlug::Dump (iEngine* engine)
   for (i = 0 ; i < meshes->GetCount () ; i++)
   {
     iMeshWrapper* mesh = meshes->Get (i);
-    Dump (mesh);
+    Dump (0, mesh);
   }
   Report (CS_REPORTER_SEVERITY_DEBUG,
   	"===========================================");
@@ -2271,46 +2271,54 @@ void csBugPlug::Dump (iSector* sector)
   }
 }
 
-void csBugPlug::Dump (iMeshWrapper* mesh)
+void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
 {
   const char* mn = mesh->QueryObject ()->GetName ();
-  Report (CS_REPORTER_SEVERITY_DEBUG, "    Mesh wrapper '%s' (%08lx)",
-  	mn ? mn : "?", mesh);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s    Mesh wrapper '%s' (%08lx)", 
+    indent, "", mn ? mn : "?", mesh);
   iMeshObject* obj = mesh->GetMeshObject ();
   if (!obj)
   {
-    Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh object missing!");
+    Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Mesh object missing!",
+      indent, "");
   }
   else
   {
     csRef<iFactory> fact (SCF_QUERY_INTERFACE (obj, iFactory));
     if (fact)
-      Report (CS_REPORTER_SEVERITY_DEBUG, "        Plugin '%s'",
-  	  fact->QueryDescription () ? fact->QueryDescription () : "0");
+      Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Plugin '%s'",
+  	  indent, "",
+          fact->QueryDescription () ? fact->QueryDescription () : "0");
     csBox3 bbox;
     obj->GetObjectModel ()->GetObjectBoundingBox (bbox);
-    Report (CS_REPORTER_SEVERITY_DEBUG, "        Object bounding box:");
-    Dump (8, bbox);
+    Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Object bounding box:",
+      indent, "");
+    Dump (indent+8, bbox);
   }
   iMovable* movable = mesh->GetMovable ();
   if (!movable)
   {
-    Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh object missing!");
+    Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Mesh object missing!",
+      indent, "");
   }
   else
   {
     csReversibleTransform& trans = movable->GetTransform ();
-    Dump (8, trans.GetOrigin (), "Movable origin");
-    Dump (8, trans.GetO2T (), "Movable O2T");
+    Dump (indent+8, trans.GetOrigin (), "Movable origin");
+    Dump (indent+8, trans.GetO2T (), "Movable O2T");
     int cnt = movable->GetSectors ()->GetCount ();
     int i;
     for (i = 0 ; i < cnt ; i++)
     {
       iSector* sec = movable->GetSectors ()->Get (i);
       const char* sn = sec->QueryObject ()->GetName ();
-      Report (CS_REPORTER_SEVERITY_DEBUG, "        In sector '%s'",
-      	sn ? sn : "?");
+      Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        In sector '%s'",
+      	indent, "", sn ? sn : "?");
     }
+  }
+  for (size_t i=0; i<mesh->GetChildren ()->GetCount (); ++i)
+  {
+    Dump (indent+4, mesh->GetChildren ()->Get (i));
   }
 }
 
@@ -2323,49 +2331,33 @@ void csBugPlug::Dump (iMeshFactoryWrapper* meshfact)
 
 void csBugPlug::Dump (int indent, const csMatrix3& m, char const* name)
 {
-  char ind[255];
-  int i;
-  for (i = 0 ; i < indent ; i++) ind[i] = ' ';
-  ind[i] = 0;
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%sMatrix '%s':", ind, name);
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%s/", ind);
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%s| %3.2f %3.2f %3.2f",
-  	ind, m.m11, m.m12, m.m13);
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%s| %3.2f %3.2f %3.2f",
-  	ind, m.m21, m.m22, m.m23);
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%s| %3.2f %3.2f %3.2f",
-  	ind, m.m31, m.m32, m.m33);
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%s\\", ind);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*sMatrix '%s':", indent, "", name);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s/", indent, "");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s| %3.2f %3.2f %3.2f", indent,
+  	"", m.m11, m.m12, m.m13);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s| %3.2f %3.2f %3.2f", indent,
+  	"", m.m21, m.m22, m.m23);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s| %3.2f %3.2f %3.2f", indent,
+  	"", m.m31, m.m32, m.m33);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s\\", indent, "");
 }
 
 void csBugPlug::Dump (int indent, const csVector3& v, char const* name)
 {
-  char ind[255];
-  int i;
-  for (i = 0 ; i < indent ; i++) ind[i] = ' ';
-  ind[i] = 0;
   Report (CS_REPORTER_SEVERITY_DEBUG,
-  	"%sVector '%s': (%f,%f,%f)", ind, name, v.x, v.y, v.z);
+  	"%*sVector '%s': (%f,%f,%f)", indent, "", name, v.x, v.y, v.z);
 }
 
 void csBugPlug::Dump (int indent, const csVector2& v, char const* name)
 {
-  char ind[255];
-  int i;
-  for (i = 0 ; i < indent ; i++) ind[i] = ' ';
-  ind[i] = 0;
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%sVector '%s': (%f,%f)",
-  	ind, name, v.x, v.y);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*sVector '%s': (%f,%f)",
+  	indent, "", name, v.x, v.y);
 }
 
 void csBugPlug::Dump (int indent, const csPlane3& p)
 {
-  char ind[255];
-  int i;
-  for (i = 0 ; i < indent ; i++) ind[i] = ' ';
-  ind[i] = 0;
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%sA=%2.2f B=%2.2f C=%2.2f D=%2.2f",
-            ind, p.norm.x, p.norm.y, p.norm.z, p.DD);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*sA=%2.2f B=%2.2f C=%2.2f D=%2.2f",
+            indent, "", p.norm.x, p.norm.y, p.norm.z, p.DD);
 }
 
 void csBugPlug::Dump (int indent, const csBox2& b)
@@ -2374,7 +2366,7 @@ void csBugPlug::Dump (int indent, const csBox2& b)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%s(%2.2f,%2.2f)-(%2.2f,%2.2f)", ind,
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s(%2.2f,%2.2f)-(%2.2f,%2.2f)", indent, "",
   	b.MinX (), b.MinY (), b.MaxX (), b.MaxY ());
 }
 
@@ -2384,8 +2376,8 @@ void csBugPlug::Dump (int indent, const csBox3& b)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%s(%2.2f,%2.2f,%2.2f)-(%2.2f,%2.2f,%2.2f)",
-  	ind, b.MinX (), b.MinY (), b.MinZ (), b.MaxX (), b.MaxY (), b.MaxZ ());
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s(%2.2f,%2.2f,%2.2f)-(%2.2f,%2.2f,%2.2f)",
+  	indent, "", b.MinX (), b.MinY (), b.MinZ (), b.MaxX (), b.MaxY (), b.MaxZ ());
 }
 
 void csBugPlug::Dump (iCamera* c)

@@ -47,42 +47,7 @@ private:
   static csStringID binormal_name;
   static csStringID lmcoords_name;
   
-  //fog-calc related
-  static csStringID fog_name;
-  static csStringID o2c_matrix_name;
-  static csStringID o2c_vector_name;
-  static csStringID fogplane_name;
-  static csStringID fogdensity_name;
-
   void PrepareBuffers (uint& indexStart, uint& indexEnd);
-
-  class FogAccesor : public iShaderVariableAccessor
-  {
-  private:
-    csGLPolygonRenderer *renderer;
-    csRef<iRenderBuffer> fog_buffer;
-    
-    uint fogVerticesNum;
-  public:
-    CS_LEAKGUARD_DECLARE (FogAccesor);
-    SCF_DECLARE_IBASE;
-
-    FogAccesor (csGLPolygonRenderer *renderer)
-      : fogVerticesNum (0)
-    {
-      SCF_CONSTRUCT_IBASE(0);
-      this->renderer = renderer;    
-    }
-
-    virtual ~FogAccesor()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
-
-    void PreGetValue (csShaderVariable *variable);
-  };
-  friend class FogAccesor;
-  csRef<FogAccesor> fog_accessor;
 
   class NormalAccesor : public iShaderVariableAccessor
   {

@@ -43,6 +43,7 @@ struct iLoaderContext;
 struct iDocumentNode;
 struct iString;
 struct iStringSet;
+struct iKeyValuePair;
 
 /**\name Texture transformation description
  * @{ */
@@ -232,6 +233,19 @@ struct iSyntaxService : public iBase
    */
   virtual bool WriteZMode (iDocumentNode* node, csZBufMode* zmode,
     bool allowZmesh) = 0;
+
+  /**
+   * Parse a key definition. A iKeyValuePair instance is
+   * return in "keyvalue", with refcount 1
+   * Returns true if successful.
+   */
+  virtual bool ParseKey (iDocumentNode* node, iKeyValuePair* &keyvalue) = 0;
+
+  /**
+   * Write a key definition and add the key to the given object, 
+   * Returns true if successful.
+   */
+  virtual bool WriteKey (iDocumentNode* node, iKeyValuePair* keyvalue) = 0;
 };
 
 /** @} */

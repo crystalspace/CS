@@ -89,12 +89,13 @@ private:
   iObjectRegistry *objreg;
 
   bool currentSettings;
-  csShaderVariableContext shadervars;
+  csArray<csShaderVariableContext> shadervars;
 
   static csStringID o2c_matrix_name;
   static csStringID o2c_vector_name;
   static csStringID fogplane_name;
   static csStringID fogdensity_name;
+  static csStringID fogcolor_name;
 public:
   SCF_DECLARE_IBASE;
 

@@ -20,6 +20,7 @@
 
 #include "cssysdef.h"
 
+#include "cstool/fogmath.h"
 #include "iutil/document.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/graph3d.h"
@@ -141,6 +142,7 @@ csStringID csGenericRenderStep::o2c_matrix_name;
 csStringID csGenericRenderStep::o2c_vector_name;
 csStringID csGenericRenderStep::fogplane_name;
 csStringID csGenericRenderStep::fogdensity_name;
+csStringID csGenericRenderStep::fogcolor_name;
 
 SCF_IMPLEMENT_IBASE(csGenericRenderStep)
   SCF_IMPLEMENTS_INTERFACE(iRenderStep)
@@ -168,9 +170,7 @@ csGenericRenderStep::csGenericRenderStep (
   o2c_vector_name = strings->Request ("object2camera vector");
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
-  
-  shadervars.GetVariableAdd (o2c_matrix_name);
-  shadervars.GetVariableAdd (o2c_vector_name);
+  fogcolor_name = strings->Request ("fog color");
 }
 
 csGenericRenderStep::~csGenericRenderStep ()
@@ -205,9 +205,9 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       if ((!portalTraversal) && mesh->portal != 0) continue;
       csShaderVariable *sv;
       
-      sv = shadervars.GetVariable (o2c_matrix_name);
+      sv = shadervars.Top ().GetVariable (o2c_matrix_name);
       sv->SetValue (mesh->object2camera.GetO2T ());
-      sv = shadervars.GetVariable (o2c_vector_name);
+      sv = shadervars.Top ().GetVariable (o2c_vector_name);
       sv->SetValue (mesh->object2camera.GetO2TTranslation ());
 
       if (mesh->material->GetMaterial () != material)
@@ -221,7 +221,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
         shader->PushVariables (stacks);
         material->PushVariables (stacks);
       }
-      shadervars.PushVariables (stacks);
+      shadervars.Top ().PushVariables (stacks);
       if (mesh->variablecontext)
         mesh->variablecontext->PushVariables (stacks);
       
@@ -231,7 +231,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       shader->TeardownPass (ticket);
       if (mesh->variablecontext)
         mesh->variablecontext->PopVariables (stacks);
-      shadervars.PopVariables (stacks);
+      shadervars.Top ().PopVariables (stacks);
     }
     shader->DeactivatePass (ticket);
   }
@@ -358,39 +358,40 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   iShader* shader = 0;
   size_t currentTicket = ~0;
 
+  shadervars.Push (csShaderVariableContext ());
+  shadervars.Top ().GetVariableAdd (o2c_matrix_name);
+  shadervars.Top ().GetVariableAdd (o2c_vector_name);
+
   csRef<csShaderVariable> sv;
-  sv = shadervars.GetVariableAdd (fogdensity_name);
   if (sector->HasFog())
+  {
+    sv = shadervars.Top ().GetVariableAdd (fogdensity_name);
     sv->SetValue (sector->GetFog()->density);
-  else
-    sv->SetValue (0.04f);
+    sv = shadervars.Top ().GetVariableAdd (fogcolor_name);
+    sv->SetValue (csVector3(sector->GetFog()->red, sector->GetFog()->green, sector->GetFog()->blue));
 
-  //construct a cameraplane
-  csVector4 fogPlane;
-  iPortal *lastPortal = rview->GetLastPortal();
-  if(lastPortal)
-  {
-    csPlane3 plane;
-    lastPortal->ComputeCameraPlane(rview->GetCamera()->GetTransform(), plane);
-    fogPlane = plane.norm;
-    fogPlane.w = plane.DD;
+    //construct a cameraplane
+    csVector4 fogPlane;
+    iPortal *lastPortal = rview->GetLastPortal();
+    if(lastPortal)
+    {
+      csPlane3 plane;
+      lastPortal->ComputeCameraPlane(rview->GetCamera()->GetTransform(), plane);
+      fogPlane = plane.norm;
+      fogPlane.w = plane.DD;
+    }
+    else
+    {
+      fogPlane = csVector4(0.0,0.0,1.0,0.0);
+    }
+    sv = shadervars.Top ().GetVariableAdd (fogplane_name);
+    sv->SetValue (fogPlane);
+  } else {
+    sv = shadervars.Top ().GetVariableAdd (fogdensity_name);
+    sv->SetValue (0);
   }
-  else
-  {
-    fogPlane = csVector4(0.0,0.0,1.0,0.0);
-  }
-  sv = csPtr<csShaderVariable> (
-    new csShaderVariable (fogplane_name));
-  sv->SetValue (fogPlane);
 
-  if (stacks.Length () <= (size_t)fogplane_name)
-    stacks.SetLength (fogplane_name+1);
-  stacks[fogplane_name].Push (sv);
-
-  /*sv = shadervars.GetVariableAdd (fogplane_name);
-  sv->SetValue (fogPlane);*/
-
-  ShaderTicketHelper ticketHelper (stacks, shadervars);
+  ShaderTicketHelper ticketHelper (stacks, shadervars.Top ());
 
   for (size_t n = 0; n < num; n++)
   {
@@ -412,7 +413,9 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       if (portalTraversal)
       {
         ToggleStepSettings (g3d, false);
+        shadervars.Top ().PushVariables (stacks);
         mesh->portal->Draw (rview);
+        shadervars.Top ().PopVariables (stacks);
       }
     }
     else 
@@ -462,7 +465,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
         sameShaderMeshes + lastidx, numSSM, stacks);
   }
 
-  stacks[fogplane_name].Pop ();
+  shadervars.Pop ();
 
   ToggleStepSettings (g3d, false);
 }

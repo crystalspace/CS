@@ -11,7 +11,6 @@
   </pass>
 </technique>
 -->
-
     <technique priority="100">
 	<pass>
 	    <buffer name="vertices" destination="position" />
@@ -52,16 +51,35 @@
 	      <?if vars."tex lightmap".texture ?>
 		<buffer name="lightmap coordinates" destination="texture coordinate 1" />
 		<texture name="tex lightmap" destination="unit 1" />
+    <?if vars."fog density".float &gt; 0 ?>
+		<texture name="standardtex fog" destination="unit 2" />
+	      <vp plugin="glfixed">
+		<fixedvp>
+      <texgen type="fog" layer="2"/>
+		  <constantcolor layer="2" type="shadervar">fog color</constantcolor>
+		</fixedvp>
+	      </vp>
+    <?endif?>
+        <?else?>
+    <?if vars."fog density".float &gt; 0 ?>
+		<texture name="standardtex fog" destination="unit 1" />
+	      <vp plugin="glfixed">
+		<fixedvp>
+      <texgen type="fog" layer="1"/>
+		  <constantcolor layer="1" type="shadervar">fog color</constantcolor>
+		</fixedvp>
+	      </vp>
+    <?endif?>
 	      <?endif?>
 	      <fp plugin="glfixed">
-		  <fixedfp>
+  	  <fixedfp>
 		      <layer>
 			  <colorsource num="0" source="texture" modifier="color"/>
 			  <colorsource num="1" source="primary color" modifier="color"/>
 			  <coloroperation operation="modulate" />
 			  <alphasource num="0" source="texture" modifier="alpha"/>
 			  <alphasource num="1" source="primary color" modifier="alpha"/>
-			  <alphaoperation operation="modulate" />
+			  <alphaoperation operation="replace" />
 		      </layer>
 		      <?if vars."tex lightmap".texture ?>
 			<layer>
@@ -72,6 +90,17 @@
 			    <alphaoperation operation="replace"/>
 			</layer>
 		      <?endif?>
+          <?if vars."fog density".float &gt; 0 ?>
+			<layer>
+			    <colorsource num="0" source="constant color" modifier="color"/>
+			    <colorsource num="1" source="previous layer" modifier="color"/>
+          <colorsource num="2" source="texture" modifier="alpha"/>
+			    <coloroperation operation="interpolate" />
+			    <alphasource num="0" source="texture" modifier="alpha"/>
+			    <alphasource num="1" source="previous layer" modifier="alpha"/>
+			    <alphaoperation operation="replace"/>
+			</layer>
+          <?endif?>
 		  </fixedfp>
 	      </fp>
 	    <?endif?>
