@@ -157,7 +157,7 @@ csGraphics2DOpenGLFontServer::GLFontInfo::GLFontInfo (FontDef &newfont)
 
   // shove all the data at OpenGL...
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
-  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, 1 /* bytes-per-pixel */,
+  glTexImage2D (GL_TEXTURE_2D, 0 /*mipmap level */, GL_ALPHA /* bytes-per-pixel */,
     basetexturewidth, basetextureheight, 0 /*border*/,
     GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
 
