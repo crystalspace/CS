@@ -136,17 +136,8 @@ following line to @file{CS/config.mak} after the configuration step.
 USE_ALLEGRO = yes
 @end example
 
-@subsubheading additional Download location
-
-The pre-compiled libraries on the Crystal Space site didn't work for me, so I
-made my own.  You can download them from here:
-
-@uref{http://asp.planetquake.com/dl/dl.asp?simitar/doslibsb.zip}
-Note that this library does not follow the CS directory layout, so you have to extract it yourself
-into the @sc{CS/libs/cssys/djgpp} directory.
-
 @subsubheading Platform
 
-I tested compilation on a WinNT4.0 sp6 system with cmd.exe as shell.
+I tested compilation on a WinNT4.0 sp6 system with cmd.exe as shell and on linux in a dosemu (where i had to fiddle with the configuration step - this is only for the adventurous people).
 Note that there are issues with djgpp and Win2k/WinXP. I did not try either so you are on 
 your own here, but be told there is a FAQ on www.delorie.com/djgpp regarding this issue.
