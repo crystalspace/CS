@@ -5503,6 +5503,16 @@ void csGraphics3DOGLCommon::CloseFogObject (CS_ID)
   // OpenGL driver implements vertex-based fog ...
 }
 
+void csGraphics3DOGLCommon::OpenPortal (csVector2* poly, int num_poly)
+{
+  (void)poly;
+  (void)num_poly;
+}
+
+void csGraphics3DOGLCommon::ClosePortal ()
+{
+}
+
 void csGraphics3DOGLCommon::CacheTexture (iMaterialHandle *imat_handle)
 {
   csMaterialHandle* mat_handle = (csMaterialHandle*)imat_handle;

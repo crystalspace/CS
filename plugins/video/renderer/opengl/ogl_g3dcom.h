@@ -796,6 +796,12 @@ public:
    */
   virtual void CloseFogObject (CS_ID id);
 
+  /// Open a clipped portal.
+  virtual void OpenPortal (csVector2* poly, int num_poly);
+
+  /// Close a portal previously opened with OpenPortal().
+  virtual void ClosePortal ();
+
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int x, int y);
 

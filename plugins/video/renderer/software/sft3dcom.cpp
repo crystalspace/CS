@@ -2643,6 +2643,16 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
   } /* endfor */
 }
 
+void csGraphics3DSoftwareCommon::OpenPortal (csVector2* poly, int num_poly)
+{
+  (void)poly;
+  (void)num_poly;
+}
+
+void csGraphics3DSoftwareCommon::ClosePortal ()
+{
+}
+
 // Calculate round (f) of a 16:16 fixed pointer number
 // and return a long integer.
 inline long round16 (long f)

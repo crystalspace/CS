@@ -4,6 +4,10 @@ The history order is reversed so that new features are at the top.
 	- Cleaned up indentation in new event code. Note to Jonathan:
 	  a tab == 8 spaces. Indentation == 2 spaces.
 	  Also put curly opening brace on following line.
+	- Added iGraphics3D->OpenPortal() and ClosePortal(). These new
+	  functions (currently unimplemented) will be used for more specialized
+	  portal clipping where a portal wants to restrict drawing to a
+	  certain area AND also keep current Z-buffer contents into account.
 23-Mar-2003
 	- Jonathan Tarbox Added initial Flatten/Unflatten code, don't
 	  expect it to work just yet.

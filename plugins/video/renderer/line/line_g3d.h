@@ -136,6 +136,12 @@ public:
   ///
   virtual void CloseFogObject (CS_ID) { }
 
+  /// Open a clipped portal.
+  virtual void OpenPortal (csVector2*, int) { }
+
+  /// Close a portal previously opened with OpenPortal().
+  virtual void ClosePortal () { }
+
   /// Draw a line in camera space.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
   	float fov, int color);

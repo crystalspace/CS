@@ -481,7 +481,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 5, 0, 3);
+SCF_VERSION (iGraphics3D, 5, 1, 0);
 
 /**
  * This is the standard 3D graphics interface.
@@ -673,6 +673,22 @@ struct iGraphics3D : public iBase
    * or in DrawFogPolygon is not important).
    */
   virtual void CloseFogObject (CS_ID id) = 0;
+
+  /**
+   * Enter a new clipped portal. Basically this routine will restrict
+   * all further drawing to the given 2D area and it will also respect
+   * the current contents of the Z-buffer so that geometry will only
+   * render where the Z-buffer allows it (even if zfill or znone is used).
+   * Remember to close a portal later using ClosePortal().
+   * Basically this represents a stacked layer of portals. Each one
+   * gradually smaller.
+   */
+  virtual void OpenPortal (csVector2* poly, int num_poly) = 0;
+
+  /**
+   * Close a portal previously opened with OpenPortal().
+   */
+  virtual void ClosePortal () = 0;
 
   /**
    *  Draw a line in camera space. Warning! This is a 2D operation
