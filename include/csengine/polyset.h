@@ -172,7 +172,7 @@ protected:
    * Test a number of polygons against the c-buffer and insert them to the
    * c-buffer if visible and also add them to a queue.
    */
-  void TestQueuePolygonArray (csPolygonInt** polygon, int num, csRenderView* d,
+  void* TestQueuePolygonArray (csPolygonInt** polygon, int num, csRenderView* d,
   	csPolygon2DQueue* poly_queue);
 
 private:

@@ -59,6 +59,16 @@ csCBufferLine::~csCBufferLine ()
   }
 }
 
+void csCBufferLine::MakeFull ()
+{
+  while (first_span)
+  {
+    csCBufferSpan* n = first_span->next;
+    parent->FreeSpan (first_span);
+    first_span = n;
+  }
+}
+
 bool csCBufferLine::TestSpan (int startx, int endx)
 {
   csCBufferSpan* s = first_span;
@@ -170,11 +180,11 @@ csCBuffer::csCBuffer (int sx, int ex, int n_lines)
   startx = sx;
   endx = ex;
   CHK (lines = new csCBufferLine [num_lines]);
-  CHK (full = new bool [num_lines]);
   first_unused = NULL;
   int i;
   for (i = 0 ; i < num_lines ; i++)
     lines[i].SetParent (this);
+  vert_line.SetParent (this);
 }
 
 csCBuffer::~csCBuffer ()
@@ -186,31 +196,14 @@ csCBuffer::~csCBuffer ()
     first_unused = n;
   }
   CHK (delete [] lines);
-  CHK (delete [] full);
 }
 
 void csCBuffer::Initialize ()
 {
   int y;
   for (y = 0 ; y < num_lines ; y++)
-  {
     lines[y].Initialize (startx, endx);
-    full[y] = false;
-  }
-  not_full_lines = num_lines;
-}
-
-bool csCBuffer::InsertSpan (int s_spanx, int e_spanx, int y)
-{
-  if (y < 0 || y >= num_lines) return false;
-  bool rc = lines[y].InsertSpan (s_spanx, e_spanx);
-  if (rc)
-  {
-    // If the line is full now, it could not have been full previously.
-    // So we know we have a new full line and we can decrease 'not_full_lines'.
-    if (lines[y].IsFull ()) { full[y] = true; not_full_lines--; }
-  }
-  return rc;
+  vert_line.Initialize (0, num_lines-1);
 }
 
 #define VERTEX_NEAR_THRESHOLD   0.001
@@ -254,6 +247,11 @@ bool csCBuffer::TestPolygon (csVector2* verts, int num_verts)
   sxL = sxR = dxL = dxR = 0;
   scanL2 = scanR2 = max_i;
   sy = fyL = fyR = QRound (verts [scanL2].y);
+
+  // First test if the min/max y range isn't already full in the
+  // c-buffer. In that case we don't need to do anything.
+  int miny = QRound (verts [min_i].y);
+  if (!vert_line.TestSpan (miny, sy)) return false;
 
   for ( ; ; )
   {
@@ -341,7 +339,7 @@ finish:
   return false;
 }
 
-bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts)
+bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
 {
   bool vis = false;
 
@@ -383,6 +381,26 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts)
   sxL = sxR = dxL = dxR = 0;
   scanL2 = scanR2 = max_i;
   sy = fyL = fyR = QRound (verts [scanL2].y);
+
+  // First test if the min/max y range isn't already full in the
+  // c-buffer. In that case we don't need to do anything.
+  int miny = QRound (verts [min_i].y);
+  if (!vert_line.TestSpan (miny, sy)) return false;
+
+  // If in_full is true we are in a full region.
+  bool in_full = false;
+  int start_full = sy;
+
+  // If we are in 'negative' mode then we make the lines
+  // above and below the polygon full.
+  if (negative)
+  {
+    int yy;
+    for (yy = 0 ; yy < miny ; yy++) lines[yy].MakeFull ();
+    vert_line.InsertSpan (0, miny-1);
+    for (yy = sy+1 ; yy < num_lines ; yy++) lines[yy].MakeFull ();
+    vert_line.InsertSpan (sy+1, num_lines-1);
+  }
 
   for ( ; ; )
   {
@@ -457,7 +475,35 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts)
       // Compute the rounded screen coordinates of horizontal strip
       xL = QRound (sxL);
       xR = QRound (sxR);
-      if (InsertSpan (xL, xR, sy)) vis = true;
+      if (negative)
+      {
+        if (InsertSpan (startx, xL-1, sy)) vis = true;
+        if (InsertSpan (xR+1, endx, sy)) vis = true;
+      }
+      else
+        if (InsertSpan (xL, xR, sy)) vis = true;
+
+      // See if we need to update the full-line buffer.
+      if (IsFull (sy))
+      {
+        if (!in_full)
+	{
+	  // We are full but we were not full in the previous line.
+	  // In that case we start a new full span.
+	  in_full = true;
+	  start_full = sy;
+	}
+      }
+      else
+      {
+        if (in_full)
+	{
+	  // We are not full but we were full in the previous line.
+	  // In that case we end the previous full span.
+	  vert_line.InsertSpan (sy-1, start_full);
+	  in_full = false;
+	}
+      }
 
       sxL += dxL;
       sxR += dxR;
@@ -466,6 +512,14 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts)
   }
 
 finish:
+  if (in_full)
+  {
+    // We are not full but we were full in the previous line.
+    // In that case we end the previous full span.
+    vert_line.InsertSpan (miny, start_full);
+    in_full = false;
+  }
+
   // If we come here polygon was not visible.
   return vis;
 }

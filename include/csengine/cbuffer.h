@@ -52,11 +52,11 @@ class csCBufferLine
   friend class csCBuffer;
 
 private:
-  // List of all empty spans on this line.
+  /// List of all empty spans on this line.
   csCBufferSpan* first_span;
-  // Pointer to last span in the list of empty spans.
+  /// Pointer to last span in the list of empty spans.
   csCBufferSpan* last_span;
-  // Parent C-buffer.
+  /// Parent C-buffer.
   csCBuffer* parent;
 
 private:
@@ -79,6 +79,9 @@ private:
   /// Return true if this line if full (i.e. no empty spans left).
   bool IsFull () { return first_span == NULL; }
 
+  /// Make this line full.
+  void MakeFull ();
+
   /**
    * Take a full span and test if it would have changed this c-buffer
    * line on insertion. This means that the span is visible.
@@ -90,6 +93,12 @@ private:
    * true if the span line was modified (i.e. the span is visible).
    */
   bool InsertSpan (int startx, int endx);
+
+  /**
+   * Test if a given one-element-scan is full or empty (i.e. return
+   * true if visible).
+   */
+  bool TestSingle (int x) { return TestSpan (x, x); }
 
   /// Dump information about this scanline.
   void Dump ();
@@ -104,20 +113,24 @@ class csCBuffer
   friend class csCBufferLine;
 
 private:
-  // The lines of this c-buffer.
+  /// The lines of this c-buffer.
   csCBufferLine* lines;
-  // Number of vertical lines.
+  /// Number of vertical lines.
   int num_lines;
-  // A value for every line indicating if it is full or not.
+  /// A value for every line indicating if it is full or not.
   bool* full;
-  // Horizontal start and end (inclusive).
+  /// Horizontal start and end (inclusive).
   int startx, endx;
-  // Total number of not-full lines.
-  int not_full_lines;
-  // List of all unused spans on screen.
+  /// List of all unused spans on screen.
   csCBufferSpan* first_unused;
+  /**
+   * A vertical c-buffer line which is used to indicate
+   * which horizontal lines of the c-buffer are full.
+   * Again spans indicate not-full regions.
+   */
+  csCBufferLine vert_line;
 
-  // Allocate a span (possible from the unused list).
+  /// Allocate a span (possible from the unused list).
   csCBufferSpan* AllocSpan ()
   {
     csCBufferSpan* s;
@@ -130,24 +143,12 @@ private:
       CHKB (s = new csCBufferSpan ());
     return s;
   }
-  // Free a span (put in the unused list).
+  /// Free a span (put in the unused list).
   void FreeSpan (csCBufferSpan* span)
   {
     span->next = first_unused;
     first_unused = span;
   }
-
-public:
-  /// Create a new c-buffer with the given dimensions.
-  csCBuffer (int sx, int ex, int n_lines);
-  /// Destroy the c-buffer.
-  ~csCBuffer ();
-
-  /// Initialize the c-buffer to empty.
-  void Initialize ();
-
-  /// Return true if the screen (c-buffer) is full.
-  bool IsFull () { return not_full_lines <= 0; }
 
   /**
    * Take a full span and test if it would have changed the c-buffer
@@ -163,7 +164,30 @@ public:
    * Take a full span and insert it into the c-buffer line. Return
    * true if the span modified the buffer (i.e. span is visible).
    */
-  bool InsertSpan (int s_spanx, int e_spanx, int y);
+  bool InsertSpan (int s_spanx, int e_spanx, int y)
+  {
+    if (y < 0 || y >= num_lines) return false;
+    return lines[y].InsertSpan (s_spanx, e_spanx);
+  }
+
+  /// Test if a line is full.
+  bool IsFull (int y)
+  {
+    if (y < 0 || y >= num_lines) return false;
+    return lines[y].IsFull ();
+  }
+
+public:
+  /// Create a new c-buffer with the given dimensions.
+  csCBuffer (int sx, int ex, int n_lines);
+  /// Destroy the c-buffer.
+  ~csCBuffer ();
+
+  /// Initialize the c-buffer to empty.
+  void Initialize ();
+
+  /// Return true if the screen (c-buffer) is full.
+  bool IsFull () { return vert_line.IsFull (); }
 
   /**
    * Take a polygon and test if it would have changed the c-buffer.
@@ -181,8 +205,9 @@ public:
    * Note that this function will work with both clockwise and anti-
    * clockwise oriented polygons and will assume both orientations
    * are visible. Backface culling needs to be done elsewhere.
+   * If 'negative' is true the polygons in inserted inverted.
    */
-  bool InsertPolygon (csVector2* verts, int num_verts);
+  bool InsertPolygon (csVector2* verts, int num_verts, bool negative = false);
 
   /// Dump debug information for a scanline.
   void DumpLine (int y) { lines[y].Dump (); }

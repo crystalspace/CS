@@ -487,7 +487,15 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
 
   tr_manager.NewFrame ();
 
-  if (c_buffer) c_buffer->Initialize ();
+  if (c_buffer)
+  {
+    c_buffer->Initialize ();
+    csVector2 verts[50];	// @@@ BAD! Hardcoded!
+    int i, num;
+    num = view->GetNumVertices ();
+    for (i = 0 ; i < num ; i++) verts[i] = view->GetVertex (i);
+    c_buffer->InsertPolygon (verts, num, true);
+  }
 
   csSector* s = c->GetSector ();
   s->Draw (rview);

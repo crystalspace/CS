@@ -283,7 +283,8 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius, float* 
   return min_p;
 }
 
-void* csSector::DrawPolygons (csPolygonParentInt* pi, csPolygonInt** polygon, int num, void* data)
+void* csSector::DrawPolygons (csPolygonParentInt* pi,
+	csPolygonInt** polygon, int num, void* data)
 {
   csRenderView* d = (csRenderView*)data;
   csSector* sector = (csSector*)pi;
@@ -293,12 +294,12 @@ void* csSector::DrawPolygons (csPolygonParentInt* pi, csPolygonInt** polygon, in
 
 csPolygon2DQueue* poly_queue;
 
-void* csSector::TestQueuePolygons (csPolygonParentInt* pi, csPolygonInt** polygon, int num, void* data)
+void* csSector::TestQueuePolygons (csPolygonParentInt* pi,
+	csPolygonInt** polygon, int num, void* data)
 {
   csRenderView* d = (csRenderView*)data;
   csSector* sector = (csSector*)pi;
-  sector->TestQueuePolygonArray (polygon, num, d, poly_queue);
-  return NULL;
+  return sector->TestQueuePolygonArray (polygon, num, d, poly_queue);
 }
 
 void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue,

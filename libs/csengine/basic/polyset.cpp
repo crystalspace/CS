@@ -430,7 +430,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   }
 }
 
-void csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
+void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	csRenderView* d, csPolygon2DQueue* poly_queue)
 {
   csPolygon3D* p;
@@ -457,12 +457,13 @@ void csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         // Transform it to screen space and perform clipping to Z plane.
         // Then test against the c-buffer to see if it is visible.
         clip = (csPolygon2D*)(render_pool->Alloc ());
-        if ( bsppol->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
-	 	    d->GetOrigin (), verts, num_verts) &&
+        if ( bsppol->ClipToPlane (d->do_clip_plane ? &d->clip_plane :
+		(csPlane*)NULL, d->GetOrigin (), verts, num_verts) &&
              bsppol->DoPerspective (*d, verts, num_verts, clip,
-	 	    d->IsMirrored ()))
+	 	d->IsMirrored ()))
         {
-          if (c_buffer->TestPolygon (clip->GetVertices (), clip->GetNumVertices ()))
+          if (c_buffer->TestPolygon (clip->GetVertices (),
+	  	clip->GetNumVertices ()))
             sp3d->MarkVisible ();
         }
         render_pool->Free (clip);
@@ -497,6 +498,7 @@ void csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       {
         poly_queue->Push (p, clip);
 	Stats::polygons_accepted++;
+	if (c_buffer->IsFull ()) return (void*)1;	// End BSP processing
       }
       else
       {
@@ -505,6 +507,7 @@ void csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       }
     }
   }
+  return NULL;
 }
 
 

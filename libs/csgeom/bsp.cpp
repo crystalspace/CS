@@ -132,34 +132,48 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num, int mode)
   poly_idx = -1;
   if (mode == BSP_RANDOM)
   {
-    poly_idx = 0;
+    poly_idx = rand () % num;
   }
-  else if (mode == BSP_MINIMIZE_SPLITS || mode == BSP_ALMOST_MINIMIZE_SPLITS)
+  else if (mode == BSP_MINIMIZE_SPLITS)
   {
     // Choose the polygon which generates the least number of splits.
     int min_splits = 32767;
-    int n = num;
-    if (mode == BSP_ALMOST_MINIMIZE_SPLITS && n > 20) n = 20;
-    for (i = 0 ; i < n ; i++)
+    for (i = 0 ; i < num ; i++)
     {
       int cnt = 0;
-      for (j = 0 ; j < n ; j++)
+      for (j = 0 ; j < num ; j++)
         if (polygons[j]->Classify (polygons[i]) == POL_SPLIT_NEEDED) cnt++;
       if (cnt < min_splits) { min_splits = cnt; poly_idx = i; }
     }
   }
-  else if (mode == BSP_BALANCED || mode == BSP_ALMOST_BALANCED)
+  else if (mode == BSP_ALMOST_MINIMIZE_SPLITS)
+  {
+    // Choose the polygon which generates the least number of splits.
+    int min_splits = 32767;
+    int n = num;
+    if (n > 20) n = 20;
+    for (i = 0 ; i < n ; i++)
+    {
+      int ii = rand () % num;
+      int cnt = 0;
+      for (j = 0 ; j < n ; j++)
+      {
+        int jj = rand () % num;
+        if (polygons[jj]->Classify (polygons[ii]) == POL_SPLIT_NEEDED) cnt++;
+      }
+      if (cnt < min_splits) { min_splits = cnt; poly_idx = ii; }
+    }
+  }
+  else if (mode == BSP_BALANCED)
   {
     // Choose the polygon which generates a balanced tree.
     int min_front_back_diff = 32767;
     int min_splits = 32767;
-    int n = num;
-    if (mode == BSP_ALMOST_BALANCED && n > 20) n = 20;
-    for (i = 0 ; i < n ; i++)
+    for (i = 0 ; i < num ; i++)
     {
       int front = 0, back = 0;
       int splits = 0;
-      for (j = 0 ; j < n ; j++)
+      for (j = 0 ; j < num ; j++)
       {
         int c = polygons[j]->Classify (polygons [i]);
 	if (c == POL_FRONT) front++;
@@ -175,6 +189,38 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num, int mode)
       else if (ABS (front-back) == min_front_back_diff)
       {
         if (splits < min_splits) { min_splits = splits; poly_idx = i; }
+      }
+    }
+  }
+  else if (mode == BSP_ALMOST_BALANCED)
+  {
+    // Choose the polygon which generates a balanced tree.
+    int min_front_back_diff = 32767;
+    int min_splits = 32767;
+    int n = num;
+    if (n > 20) n = 20;
+    for (i = 0 ; i < n ; i++)
+    {
+      int ii = rand () % num;
+      int front = 0, back = 0;
+      int splits = 0;
+      for (j = 0 ; j < n ; j++)
+      {
+        int jj = rand () % num;
+        int c = polygons[jj]->Classify (polygons [ii]);
+	if (c == POL_FRONT) front++;
+	else if (c == POL_BACK) back++;
+	else if (c == POL_SPLIT_NEEDED) splits++;
+      }
+      if (ABS (front-back) < min_front_back_diff)
+      {
+        min_splits = 32767;
+        min_front_back_diff = ABS (front-back);
+	poly_idx = ii;
+      }
+      else if (ABS (front-back) == min_front_back_diff)
+      {
+        if (splits < min_splits) { min_splits = splits; poly_idx = ii; }
       }
     }
   }
