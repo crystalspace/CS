@@ -53,7 +53,7 @@ ifneq (,$(SWIGBIN))
 swigpythgen:
 	$(MAKE_TARGET)
 swigpythinst:
-	$(MAKE_TARGET) DO_SWIGPYTHINST=yes
+	$(MAKE_TARGET)
 endif
 swigpythclean:
 	$(MAKE_CLEAN)
@@ -161,20 +161,37 @@ SWIG.CSPYTHON.DEPS=\
 	$(SRCDIR)/include/ivaria/pythpre.i \
 	$(SRCDIR)/include/ivaria/pythpost.i
 
-ifneq (,$(SWIGBIN))
-$(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY): \
-  $(SWIG.CSPYTHON.INTERFACE) $(SWIG.CSPYTHON.DEPS)
-	$(SWIGBIN) $(SWIGFLAGS) -o $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.INTERFACE)
-	$(SED) '/$(BUCK)Header:/d' < $(SWIG.CSPYTHON) > $(SWIG.CSPYTHON).sed
-	$(RM) $(SWIG.CSPYTHON)
-	$(MV) $(SWIG.CSPYTHON).sed $(SWIG.CSPYTHON)
-else
+ifeq (,$(SWIGBIN))
 $(SWIG.CSPYTHON): $(SWIG.CSPYTHON.CVS)
 	-$(RM) $(SWIG.CSPYTHON)
 	$(CP) $(SWIG.CSPYTHON.CVS) $(SWIG.CSPYTHON)
 $(SWIG.CSPYTHON.PY): $(SWIG.CSPYTHON.PY.CVS)
 	-$(RM) $(SWIG.CSPYTHON.PY)
 	$(CP) $(SWIG.CSPYTHON.PY.CVS) $(SWIG.CSPYTHON.PY)
+else
+$(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY): \
+  $(SWIG.CSPYTHON.INTERFACE) $(SWIG.CSPYTHON.DEPS)
+	$(SWIGBIN) $(SWIGFLAGS) -o $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.INTERFACE)
+	$(SED) '/$(BUCK)Header:/d' < $(SWIG.CSPYTHON) > $(SWIG.CSPYTHON).sed
+	$(RM) $(SWIG.CSPYTHON)
+	$(MV) $(SWIG.CSPYTHON).sed $(SWIG.CSPYTHON)
+
+swigpythgen: $(OUTDIRS) swigpythclean $(SWIG.CSPYTHON)
+
+swigpythinst: $(OUTDIRS) $(SWIG.CSPYTHON.CVS) $(SWIG.CSPYTHON.PY.CVS)
+
+$(SWIG.CSPYTHON.CVS): $(SWIG.CSPYTHON)
+	-$(RM) $@
+	$(CP) $(SWIG.CSPYTHON) $@
+
+$(SWIG.CSPYTHON.PY.CVS): $(SWIG.CSPYTHON.PY)
+	-$(RM) $@
+	$(CP) $(SWIG.CSPYTHON.PY) $@
+
+cspythonclean: swigpythclean
+	-$(RMDIR) $(CSPYTHON) $(OBJ.CSPYTHON) \
+	$(OUTDLL)/$(notdir $(INF.CSPYTHON)) $(TRASH.CSPYTHON) python.cex \
+	$(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY) $(SWIG.CSPYTHON.OUTDIR)
 endif
 
 python.cex: $(SRCDIR)/plugins/cscript/cspython/python.cin
@@ -207,25 +224,6 @@ endif
 pythmodclean:
 	-$(RMDIR) $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY) $(PYTHMOD) \
 	$(PYTHMOD.BUILDBASE) $(PYTHMOD.INSTALLDIR) $(SWIG.CSPYTHON.OUTDIR)
-
-ifeq ($(DO_SWIGPYTHINST),yes)
-swigpythinst: $(OUTDIRS) $(SWIG.CSPYTHON.CVS) $(SWIG.CSPYTHON.PY.CVS)
-
-$(SWIG.CSPYTHON.CVS): $(SWIG.CSPYTHON)
-	-$(RM) $@
-	$(CP) $(SWIG.CSPYTHON) $@
-
-$(SWIG.CSPYTHON.PY.CVS): $(SWIG.CSPYTHON.PY)
-	-$(RM) $@
-	$(CP) $(SWIG.CSPYTHON.PY) $@
-endif
-
-cspythonclean: swigpythclean
-	-$(RMDIR) $(CSPYTHON) $(OBJ.CSPYTHON) \
-	$(OUTDLL)/$(notdir $(INF.CSPYTHON)) $(TRASH.CSPYTHON) python.cex \
-	$(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY) $(SWIG.CSPYTHON.OUTDIR)
-
-swigpythgen: $(OUTDIRS) swigpythclean $(SWIG.CSPYTHON)
 
 swigpythclean:
 	-$(RM) $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY)

@@ -2,6 +2,14 @@
 # Alternate Window Manager plugin submakefile
 #------------------------------------------------------------------------------
 DESCRIPTION.aws = Alternate Windowing System plug-in
+DESCRIPTION.awsgen = Flex and Bison generated files (forcibly)
+DESCRIPTION.awsinst = Flex and Bison generated files
+
+ifneq (,$(FLEXBIN))
+ifneq (,$(BISONBIN))
+AWS.CAN_GEN = yes
+endif
+endif
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -13,19 +21,25 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: aws awsclean
+.PHONY: aws awsclean awsgen awsinst awsgenclean
 all plugins: aws
 
 aws:
 	$(MAKE_TARGET) MAKE_DLL=yes
 awsclean:
 	$(MAKE_CLEAN)
+ifeq ($(AWS.CAN_GEN),yes)
+awsgen:
+	$(MAKE_TARGET)
+awsinst:
+	$(MAKE_TARGET)
+endif
+awsgenclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
-
-FLEX.SED = $(OUTDERIVED)/flex.sed
 
 ifeq ($(USE_PLUGINS),yes)
   AWS = $(OUTDLL)/aws$(DLL)
@@ -38,20 +52,27 @@ else
   TO_INSTALL.STATIC_LIBS += $(AWS)
 endif
 
+FLEX.SED = $(OUTDERIVED)/flex.sed
+AWS.DERIVED.DIR = $(OUTDERIVED)/aws
+
 DIR.AWS = plugins/aws
 OUT.AWS = $(OUT)/$(DIR.AWS)
 INF.AWS = $(SRCDIR)/$(DIR.AWS)/aws.csplugin
+ifeq ($(DO_MSVCGEN),yes)
 INC.AWS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWS)/*.h include/iaws/*.h))
-# We add skinlex.cpp and skinpars.cpp explicitly since they might not be
-# present (thus need to be regenerated automatically).  We use $(sort) for its
-# side-effect of folding out duplicate entries to ensure that skinlex.cpp and
-# skinpars.cpp only appear in the list once each.
-SRC.AWS = $(sort $(wildcard $(SRCDIR)/$(DIR.AWS)/*.cpp) \
-  $(addprefix $(SRCDIR)/,$(DIR.AWS)/skinlex.cpp $(DIR.AWS)/skinpars.cpp))
+SRC.AWS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWS)/*.cpp))
+else
+INC.AWS = $(AWS.DERIVED.DIR)/skinpars.hpp \
+  $(filter-out $(SRCDIR)/$(DIR.AWS)/skinpars.hpp, \
+  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWS)/*.h include/iaws/*.h)))
+SRC.AWS = $(AWS.DERIVED.DIR)/skinlex.cpp $(AWS.DERIVED.DIR)/skinpars.cpp \
+  $(filter-out $(addprefix $(SRCDIR)/$(DIR.AWS)/,skinlex.cpp skinpars.cpp), \
+  $(wildcard $(SRCDIR)/$(DIR.AWS)/*.eep))
+endif
 OBJ.AWS = $(addprefix $(OUT.AWS)/,$(notdir $(SRC.AWS:.cpp=$O)))
-DEP.AWS = CSUTIL CSUTIL CSGEOM CSTOOL CSGFX
+DEP.AWS = CSTOOL CSGFX CSGEOM CSUTIL
 
-OUTDIRS += $(OUT.AWS)
+OUTDIRS += $(OUT.AWS) $(AWS.DERIVED.DIR)
 
 TO_INSTALL.DATA += $(SRCDIR)/data/awsdef.zip
 
@@ -64,37 +85,33 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: aws awsclean awscleandep
+.PHONY: aws awsclean awscleandep awsgen awsinst awsgenclean
 aws: $(OUTDIRS) $(AWS)
 
-# Work around bizarre preprocessor bug on older MacOS/X installations where it
-# fails to search the CS/plugins/aws directory for headers #included by
-# skinpars.cpp.  Work around is to add appropriate -I directive.  Also silence
-# compiler warnings via -Wno-unused in auto-generated code (skinlex.cpp and
-# skinpars.cpp), over which we have no control.  NOTE: It would be cleaner to
-# have only two special implicit rules: one for skinlex.cpp and one for
-# skinpars.cpp, rather than a catch-all rule for everything in AWS.
-# Unfortunately, buggy GNU make on MacOS/X prevents us from doing so because
-# it resolves implicit rules incorrectly (seemingly randomly).  For instance,
-# if we use a special rule for skinpars.cpp, then GNU make bogusly tries
-# building almost every object file in the entire project from the
-# skinpars.cpp source.  An attempt to work around this bug by adding a
-# catch-all implicit rule for AWS for files other than skinpars.cpp also
-# misbehaves incorrectly.  If the catch-all rule is defined after the
-# skinpars.cpp rule, then the catch-all rule is ignored.  If it is defined
-# before the skinpars.cpp rule, then the skinpars.cpp rule is ignored.  Using
-# just the catch-all rule alone for AWS at least allows the module to be
-# built, ugly though it is.  @@@ FIXME: Configure script should check if
+# Auto-generated files (skinlex.cpp and skinpars.cpp) are compiled from within
+# $(OUTDERIVED), so we need to use -I to let them know where the AWS headers
+# are.  Also silence compiler warnings via -Wno-unused in auto-generated code,
+# over which we have no control.  @@@ FIXME: Configure script should check if
 # compiler recognizes -Wno-unused, rather than blatently assuming that it does.
-$(OUT.AWS)/%$O: $(SRCDIR)/$(DIR.AWS)/%.cpp
+$(OUT.AWS)/skinpars$O: $(AWS.DERIVED.DIR)/skinpars.cpp
+	$(DO.COMPILE.CPP) -Wno-unused $(CFLAGS.I)$(SRCDIR)/$(DIR.AWS)
+$(OUT.AWS)/skinlex$O: $(AWS.DERIVED.DIR)/skinlex.cpp
 	$(DO.COMPILE.CPP) -Wno-unused $(CFLAGS.I)$(SRCDIR)/$(DIR.AWS)
 
 $(AWS): $(OBJ.AWS) $(LIB.AWS)
 	$(DO.PLUGIN)
 
-ifneq (,$(FLEXBIN))
-ifneq (,$(BISONBIN))
-
+ifneq ($(AWS.CAN_GEN),yes)
+$(AWS.DERIVED.DIR)/skinlex.cpp: $(SRCDIR)/$(DIR.AWS)/skinlex.cpp
+	-$(RM) $@
+	$(CP) $(SRCDIR)/$(DIR.AWS)/skinlex.cpp $@
+$(AWS.DERIVED.DIR)/skinpars.cpp: $(SRCDIR)/$(DIR.AWS)/skinpars.cpp
+	-$(RM) $@
+	$(CP) $(SRCDIR)/$(DIR.AWS)/skinpars.cpp $@
+$(AWS.DERIVED.DIR)/skinpars.hpp: $(SRCDIR)/$(DIR.AWS)/skinpars.hpp
+	-$(RM) $@
+	$(CP) $(SRCDIR)/$(DIR.AWS)/skinpars.hpp $@
+else
 # Some versions of Flex-generated files want to include <unistd.h> which is not
 # normally available on Windows, so we need to protect it.  We also filter out
 # CVS `Header' keywords in order to prevent CVS from thinking that the file has
@@ -108,27 +125,47 @@ $(FLEX.SED):
 	echo $"#endif/$">>$@
 	echo $"/$(BUCK)Header:/d$">>$@
 
-$(SRCDIR)/$(DIR.AWS)/skinlex.cpp: \
-  $(SRCDIR)/$(DIR.AWS)/skinpars.hpp \
-  $(SRCDIR)/$(DIR.AWS)/skinlex.ll \
-  $(SRCDIR)/$(DIR.AWS)/skinpars.cpp \
-  $(FLEX.SED)
+$(AWS.DERIVED.DIR)/skinlex.cpp: $(SRCDIR)/$(DIR.AWS)/skinlex.ll $(FLEX.SED)
 	$(FLEXBIN) -L -t $(SRCDIR)/$(DIR.AWS)/skinlex.ll | \
-	$(SED) -f $(FLEX.SED) > $(SRCDIR)/$(DIR.AWS)/skinlex.cpp
+	$(SED) -f $(FLEX.SED) > $@
 
-$(SRCDIR)/$(DIR.AWS)/skinpars.cpp: $(SRCDIR)/$(DIR.AWS)/skinpars.yy
+$(AWS.DERIVED.DIR)/skinpars.cpp: $(SRCDIR)/$(DIR.AWS)/skinpars.yy
 	$(BISONBIN) --no-lines -d -p aws -o $@ $(<)
 
-$(SRCDIR)/$(DIR.AWS)/skinpars.hpp: $(SRCDIR)/$(DIR.AWS)/skinpars.cpp
+$(AWS.DERIVED.DIR)/skinpars.hpp: $(AWS.DERIVED.DIR)/skinpars.cpp
 	@if [ -f "$(SRCDIR)/$(DIR.AWS)/skinpars.cpp.hpp" ]; then \
-	$(MV) $(SRCDIR)/$(DIR.AWS)/skinpars.cpp.hpp \
-	$(SRCDIR)/$(DIR.AWS)/skinpars.hpp; \
+	$(MV) $(AWS.DERIVED.DIR)/skinpars.cpp.hpp \
+	$(AWS.DERIVED.DIR)/skinpars.hpp; \
 	fi
+
+awsgen: $(OUTDIRS) awsgenclean \
+  $(AWS.DERIVED.DIR)/skinlex.cpp \
+  $(AWS.DERIVED.DIR)/skinpars.cpp \
+  $(AWS.DERIVED.DIR)/skinpars.hpp
+
+awsinst: $(OUTDIRS) \
+  $(SRCDIR)/$(DIR.AWS)/skinlex.cpp \
+  $(SRCDIR)/$(DIR.AWS)/skinpars.cpp \
+  $(SRCDIR)/$(DIR.AWS)/skinpars.hpp
+
+$(SRCDIR)/$(DIR.AWS)/skinlex.cpp: $(AWS.DERIVED.DIR)/skinlex.cpp
+	-$(RM) $@
+	$(CP) $(AWS.DERIVED.DIR)/skinlex.cpp $@
+$(SRCDIR)/$(DIR.AWS)/skinpars.cpp: $(AWS.DERIVED.DIR)/skinpars.cpp
+	-$(RM) $@
+	$(CP) $(AWS.DERIVED.DIR)/skinpars.cpp $@
+$(SRCDIR)/$(DIR.AWS)/skinpars.hpp: $(AWS.DERIVED.DIR)/skinpars.hpp
+	-$(RM) $@
+	$(CP) $(AWS.DERIVED.DIR)/skinpars.hpp $@
 endif
-endif
-clean: awsclean
+
+clean: awsclean awsgenclean
 awsclean:
 	-$(RMDIR) $(AWS) $(OBJ.AWS) $(OUTDLL)/$(notdir $(INF.AWS)) $(FLEX.SED)
+
+awsgenclean:
+	-$(RM) $(addprefix $(AWS.DERIVED.DIR)/, \
+	skinlex.cpp skinpars.cpp skinpars.hpp)
 
 cleandep: awscleandep
 awscleandep:

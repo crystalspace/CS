@@ -35,7 +35,7 @@ ifneq (,$(SWIGBIN))
 swigperl5gen:
 	$(MAKE_TARGET)
 swigperl5inst:
-	$(MAKE_TARGET) DO_SWIGPERL5INST=yes
+	$(MAKE_TARGET)
 swigperl5clean:
 	$(MAKE_CLEAN)
 endif
@@ -167,9 +167,9 @@ $(SWIG.PERL5.PM.IN) $(SWIG.PERL5.C.IN): $(SWIG.I)
 	$(SED) '/$(BUCK)Header:/d' < $(SWIG.PERL5.C.IN) > $(SWIG.PERL5.C.IN).sed
 	$(RM) $(SWIG.PERL5.C.IN)
 	$(MV) $(SWIG.PERL5.C.IN).sed $(SWIG.PERL5.C.IN)
-endif
 
-ifeq ($(DO_SWIGPERL5INST),yes)
+swigperl5gen: $(OUTDIRS) swigperl5clean $(SWIG.PERL5.C.IN) $(SWIG.PERL5.PM.IN)
+
 swigperl5inst: $(OUTDIRS) $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
 
 $(SWIG.PERL5.C): $(SWIG.PERL5.C.IN)
@@ -204,8 +204,6 @@ $(CEX.CSPERL5): $(CIN.CSPERL5)
 	@echo Generating perl5 cs-config extension...
 	$(PERL5) $(CIN.CSPERL5) \
 	$"CFLAGS=$(PERL5.CFLAGS)$" $"LFLAGS=$(PERL5.LFLAGS)$" > $@
-
-swigperl5gen: $(OUTDIRS) swigperl5clean $(SWIG.PERL5.C.IN) $(SWIG.PERL5.PM.IN)
 
 clean: csperl5clean
 maintainerclean: csperl5maintainerclean

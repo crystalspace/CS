@@ -42,6 +42,17 @@ chronological order.
 	  output to appear all on one line.
 	- Eric Sunshine fixed bug in static.mak.  It was not cleaning up the
 	  files it created when the 'clean' target was invoked.
+	- Eric Sunshine changed behavior of aws.mak so that Flex and Bison
+	  output files are placed into a subdirectory of $(OUTDERIVED) rather
+	  than being placed back into the source tree.  This allows AWS to be
+	  built even when the source code is on a read-only volume or on a
+	  shared drive, etc.  Added 'awsgen' target which forcibly runs Flex
+	  and Bison.  Added 'awsinst' which copies the generated files back
+	  into the source directory so that they can be committed to CVS.
+	- Eric Sunshine eliminated need for DO_SWIGPYTHINST conditional from
+	  cspython.mak by slightly reorganizing the rules.
+	- Eric Sunshine eliminated need for DO_SWIGPERL5INST conditional from
+	  csperl5.mak by slightly reorganizing the rules.
 1-Feb-2004
 	- Eric Sunshine applied a couple small patches from Randall Foreman
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration
