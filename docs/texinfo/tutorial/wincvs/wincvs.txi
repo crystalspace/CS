@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node WinCVS Tutorial, HOWTO, Tutorial CrystalClear, Tutorials
+@node WinCVS Tutorial, HOWTO, map2cs Tutorial, Tutorials
 @section WinCVS Tutorial
 @cindex Tutorial, WinCVS
 @cindex WinCVS, Tutorial

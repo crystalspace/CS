@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject, CrystalClear, csEngine, Plug-In Drivers
+@node MeshObject, Dungeon, csEngine, Plug-In Drivers
 @section Mesh Object Plug-In System
 @cindex MeshObject Plug-In
 @cindex Plug-In, MeshObject

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Squawk, mdl2spr, CCtest, Applications
+@node Squawk, mdl2spr, map2cs, Applications
 @section Squawk
 @cindex @file{squawk}
 @cindex Applications, @file{squawk}

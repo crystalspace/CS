@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Dungeon, csPython, CrystalClear, Plug-In Drivers
+@node Dungeon, csPython, MeshObject, Plug-In Drivers
 @section Dungeon
 @cindex Dungeon Plug-In
 
