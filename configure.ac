@@ -1811,8 +1811,7 @@ CS_CHECK_LIB_WITH([aa],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([caca],
     [AC_LANG_PROGRAM([[#include <caca.h>]], [caca_init(); caca_end();])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [LIBCACA])], [], [], [], [],
-    [libcaca])
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [LIBCACA])])
 
 
 
@@ -2222,40 +2221,27 @@ AS_IF([test $cs_cv_cxx_explicit_template_specialization = no],
 
 #------------------------------------------------------------------------------
 # CS_CHECK_QSQRT
-#	Check if gcc is able to understand csqsqrt.h.  This test will catch not
-#	only versions of gcc which do not understand the assembly content, but
-#	also buggy versions which fail with an internal error on this file
-#	(such as the RedHat 7 gcc).  Furthermore, it is reported that some
-#	versions of gcc 3.2.x cause csQsqrt() to return bogus results when
-#	compiled in optimize mode on Intel hardware.  It is reported that this
-#	same compiler crashes with an internal error when -fPIC is used, so we
-#	use -fPIC as a way to detect this buggy compiler.  The MacOS/X PowerPC
-#	version of csQsqrt() requires the -force_cpusubtype_ALL flag, so we use
-#	that flag when available.  Sets the shell variable cs_cv_cxx_qsqrt_ok
-#	to "yes" if csqsqrt.h is usable, otherwise "no".
+#	Check if compiler is able to understand the assembly code in csqsqrt.h.
+#	The MacOS/X PowerPC version of csQsqrt() requires the
+#	-force_cpusubtype_ALL flag, so we use that flag when available.  Sets
+#	the shell variable cs_cv_cxx_qsqrt_ok to "yes" if csqsqrt.h is usable,
+#	otherwise "no".
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_QSQRT],
     [AC_REQUIRE([CS_CHECK_HOST_CPU])
     AC_REQUIRE([AC_PROG_CXX])
-    AC_REQUIRE([CS_CHECK_OPTIMIZE_FLAGS])
     AC_REQUIRE([CS_CHECK_FORCE_CPUSUBTYPE_ALL])
-    AC_REQUIRE([CS_CHECK_LONG_BITS])
     AC_CACHE_CHECK([if csQsqrt() compiles], [cs_cv_cxx_qsqrt_ok],
-	[AS_IF([test $cs_long_bits -eq 32 && test $ac_compiler_gnu = yes],
+	[AS_IF([test $ac_compiler_gnu = yes],
 	    [CS_BUILD_IFELSE(
 		[AC_LANG_PROGRAM(
 		    [[#define CS_PROCESSOR_$cs_host_cpu_normalized
 		    #define CS_COMPILER_GCC
-		    #include <csqsqrt.h>
-		    ]],
+		    #include <csqsqrt.h>]],
 		    [float n = csQsqrt(1.0f); (void)n;])],
 		[CS_CREATE_TUPLE([-I$srcdir/include])], [C++],
 		[cs_cv_cxx_qsqrt_ok=yes], [cs_cv_cxx_qsqrt_ok=no],
-		[$cs_optimize_flags \
-		$cs_cv_prog_cxx_enable_warnings \
-		$cs_cv_prog_cxx_enable_errors \
-		$cs_cv_prog_cxx_pic \
-		$cs_cv_prog_cxx_force_cpusubtype_all])],
+		[$cs_cv_prog_cxx_force_cpusubtype_all])],
 	    [cs_cv_cxx_qsqrt_ok=no])])])
 
 CS_CHECK_QSQRT

@@ -19,6 +19,13 @@ chronological order.
 	  with the underlying buffer, then you can use the nearly equally
 	  abominable csString::Detach() to take ownership of the underlying
 	  buffer, and absolve csString of any further responsibility.)
+	- Eric Sunshine removed the hand-coded x86 assembly versions of
+	  csQsqrt() and csQisqrt(). In the best cases, the platform-supplied
+	  sqrt() function was 17-19 times faster than the assembly versions; in
+	  the worst cases, 2-4 times faster than the assembly versions. (The
+	  PowerPC assembly version of csQsqrt() written by Matt Reda, on the
+	  other hand, is 4-5 times faster than the MacOS/X-supplied sqrt(), so
+	  this assembly version remains.)
 26-Mar-2005
 	- res added a check for setenv() and some (Win32 only) code to fake it
 	  up if not present.
