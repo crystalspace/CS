@@ -31,6 +31,7 @@
 #include "csgeom/vector3.h"
 #include "ivaria/collider.h"
 #include "csutil/csdllist.h"
+#include "csgeom/transfrm.h"
 #include "CSopcodecollider.h"
 #include "Opcode.h"
 
@@ -45,10 +46,14 @@ public:
 //  CollisionFaces CollideFaces;
 //  csDLinkList CacheList;
 	Opcode::BVTCache ColCache;
+	csOPCODECollider* col1;
+	csReversibleTransform T1;
+	csOPCODECollider* col2;
+	csReversibleTransform T2;
   csCollisionPair *pairs;
   unsigned int N_pairs;
   iObjectRegistry *object_reg;
-
+ 
  SCF_DECLARE_IBASE;
 
   csOPCODECollideSystem (iBase* parent);
