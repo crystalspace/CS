@@ -11,6 +11,9 @@ chronological order.
 	  bug in aws where unsigned can't be used.
 	- res fixed some occasions of wrong array index comparisons.
 	- res fixed an MSVC compile error in glcommon2d.h.
+	- Jorrit fixed the NR GL renderer so that it doesn't attempt to
+	  implement floating portals if the stencil buffer is broken
+	  or not available.
 2-Jul-2004
 	- Jorrit fixed compile errors in sprcal3d and terrfunc.
 	- res changed the type of csArray<> indices and sizes from int to
