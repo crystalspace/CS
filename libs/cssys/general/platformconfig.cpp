@@ -20,43 +20,39 @@
  * create the config files in $HOME/.crystal which is apporpriate for most
  * posixish systems.
  */
-#include "cssysdef.h"
-
 #include <sys/stat.h>
 
-#include "csutil/snprintf.h"
+#include "cssysdef.h"
 #include "csutil/cfgfile.h"
+#include "csutil/csstring.h"
 #include "cssys/sysfunc.h"
 
 csPtr<iConfigFile> csGetPlatformConfig(const char* key)
 {
-  // is $HOME set? otherwise fallback to standard mode
+  // Is $HOME set? otherwise fallback to standard mode
   const char* home = getenv("HOME");
-  if (!home)
+  if (home == 0)
     return 0;
   
-  // construct directory and filename of the config file
-  char fname[1000];
-  char dir[1000];
-  cs_snprintf(dir, 1000, "%s/.crystal", home);
-  cs_snprintf(fname, 1000, "%s/%s.cfg", dir, key);
+  // Construct directory and filename of the config file
+  csString dir, fname;
+  dir << home << PATH_SEPARATOR << ".crystal";
+  fname << dir << PATH_SEPARATOR << key << ".cfg";
 
-  // try to create the directory (we assume that $HOME is already created)
+  // Try to create the directory (we assume that $HOME is already created)
   struct stat stats;
   if (stat(dir, &stats) != 0)
   {
-    if (mkdir(dir, S_IWUSR | S_IXUSR | S_IRUSR) != 0)
+    mode_t const m =
+      S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IWGRPS_IXGRP|S_IROTH|S_IWOTH|S_IXOTH;
+    if (mkdir(dir, m) != 0)
     {
       fprintf(stderr,
-  	  "couldn't create directory '%s' for configuration files.\n", dir);
+  	  "Failed to create `%s' for configuration files (errno %d).\n",
+	  dir, errno);
       return 0;
     }
   }
 
-  // create/read a config file
-  csRef<csConfigFile> configfile 
-      = csPtr<csConfigFile> (new csConfigFile(fname));
-    
-  return csPtr<iConfigFile> (configfile);
+  return new csConfigFile(fname);
 }
-

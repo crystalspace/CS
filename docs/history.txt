@@ -18,6 +18,8 @@ chronological order.
 	  libs/cssys/defaultsconfig.mm, the MacOS/X-specific iConfigFile
 	  implementation which utilizes Cocoa's NSUserDefaults for storing
 	  user-specific settings.  Also upgraded to CS formatting standards.
+	- Eric Sunshine simplified overly complex code in
+	  cssys/general/platformconfig.cpp and cssys/win32/filesysconfig.cpp.
 12-Oct-2003
 	- Eric Sunshine clarified documentation for csGetResourceDir(),
 	  iCommandLineParser::GetResourceDir(), and

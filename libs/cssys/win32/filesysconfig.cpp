@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 2003 by Jorrit Tyberghein
-	      (C) 2003 by Matthias Braun
-	      (C) 2003 by Frank Richter
+    Copyright (C) 2003 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,12 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
-
 #include <sys/stat.h>
 
+#include "cssysdef.h"
 #include "csutil/cfgfile.h"
-
 #include "shellstuff.h"
 
 static void ReplaceReserved (char* key)
@@ -31,9 +27,7 @@ static void ReplaceReserved (char* key)
   size_t len = (size_t)strlen (key);
   size_t p;
   while ((p = strcspn (key, "<>:\"\\/|*?")) < len)
-  {
     *(key + p) = '_';
-  }
 }
 
 static void ReplaceSeparators (char* key)
@@ -41,26 +35,24 @@ static void ReplaceSeparators (char* key)
   size_t len = (size_t)strlen (key);
   size_t p;
   while ((p = strcspn (key, ".")) < len)
-  {
     *(key + p) = '\\';
-  }
 }
 
 static void MakeDir (char* name)
 {
   struct stat stats;
-  if (stat (name, &stats) == 0) return;
+  if (stat (name, &stats) == 0)
+    return;
 
   char* bslash = strrchr (name, '\\');
-  if (!bslash) return;
+  if (!bslash)
+    return;
   *bslash = 0;
-  CS_ALLOC_STACK_ARRAY (char, upPath,
-    strlen (name) + 1);
+  CS_ALLOC_STACK_ARRAY (char, upPath, strlen (name) + 1);
   strcpy (upPath, name);
   *bslash = '\\';
 
   MakeDir (upPath);
-
   CreateDirectoryEx (upPath, name, 0);
 }
 
@@ -71,16 +63,16 @@ csPtr<iConfigFile> csGetPlatformConfig(const char* Key)
   // Try to retrieve "Application Data" directory
   if (!GetShellFolderPath (CSIDL_APPDATA, appDataPath))
   {
-    // fall back to My Documents
+    // Fall back to My Documents
     if (!GetShellFolderPath (CSIDL_PERSONAL, appDataPath))
     {
-      // fail
+      // Fail
       return 0;
     }
   }
 
-  CS_ALLOC_STACK_ARRAY (char, realPath, 
-    strlen (appDataPath) + 1 + strlen (Key) + 5); 
+  CS_ALLOC_STACK_ARRAY (
+    char, realPath, strlen (appDataPath) + 1 + strlen (Key) + 5); 
   sprintf (realPath, "%s\\%s", appDataPath, Key);
   char* rpKey = realPath + strlen (appDataPath) + 1;
   ReplaceReserved (rpKey);
@@ -88,18 +80,14 @@ csPtr<iConfigFile> csGetPlatformConfig(const char* Key)
   strcat (realPath, ".cfg");
 
   char* bslash = strrchr (realPath, '\\');
-  if (bslash) *bslash = 0;
-  // @@@ Would be nicer if this was only done when the cfg file is really 
-  //     saved to disk.
+  if (bslash)
+    *bslash = 0;
+  // @@@ Would be nicer if this was only done when the config file is really 
+  // saved to disk.
   MakeDir (realPath);
-  if (bslash) *bslash = '\\';
+  if (bslash)
+    *bslash = '\\';
 
-  // create/read a config file
-  csRef<csConfigFile> configfile = csPtr<csConfigFile> (new csConfigFile (realPath));
-  /*
-    It is NOT a failure if the config can't load. 
-    When it's saved, the file is created automatically.
-   */
-    
-  return csPtr<iConfigFile> (configfile);
+  // Create/read a config file; okay if missing; will be created when written
+  return new csConfigFile (realPath);
 }
