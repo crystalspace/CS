@@ -1,5 +1,17 @@
 The history order has been reversed so that new features are at the top.
 
+
+11-Jul-2000
+	- Samuel Humphreys did the following changes:
+	    - Fixed bug in software drivers where if the viewing rectangle was
+              set to the window co-ordinates, polys where being unnecessarily
+              clipped. When the clipper clips to x=0,y=0 double precision
+              calculations on occasion gave slight negative values. The software
+              drivers silently rejected these polys. I have added an EPSILON
+              fuzz so vertex +/- EPSILON is tested instead. I notice that the 
+              draw fog polygon member doesnt test at all for the cases where
+              vertices exceed screen dimensions, perhaps its safe now to do away
+              with these tests altogether?
 10-Jul-2000
 	- Samuel Humphreys did the following changes:
             - Added messages to distinguish between backbuffer and software GL

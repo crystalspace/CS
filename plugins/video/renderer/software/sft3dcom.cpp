@@ -988,6 +988,12 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   int num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
+    // Sometimes double precision in the clipper is not enough. Do an epsilon fuzz
+    // so not to reject cases when bounds exceeded by less than epsilon. smgh
+    if (((poly.vertices[i].sx + EPSILON) < 0) || 
+	((poly.vertices[i].sx - EPSILON) > width))
+      return;
+
     if (poly.vertices[i].sy > max_y)
     {
       max_y = poly.vertices[i].sy;
@@ -1003,13 +1009,10 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
     if ((ABS (poly.vertices [i].sx - poly.vertices [i - 1].sx)
        + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
-
-    if (poly.vertices[i].sx < 0 || poly.vertices[i].sx > width)
-      return;
   }
 
-  // If the polygon exceeds the screen, it is a engine failure
-  if (max_y > height || min_y < 0)
+  if (((min_y + EPSILON) < 0) || 
+      ((max_y - EPSILON) > height))
     return;
 
   // if this is a 'degenerate' polygon, skip it.
@@ -1254,6 +1257,13 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   // We are going to use these to scan the polygon from top to bottom.
   // Also compute the min_z in camera space coordinates. This is going to be
   // used for mipmapping.
+
+  // Sometimes double precision in the clipper is not enough. Do an epsilon fuzz
+  // so not to reject cases when bounds exceeded by less than epsilon. smgh
+  if (((poly.vertices[0].sx + EPSILON) < 0) || 
+      ((poly.vertices[0].sx - EPSILON) > width))
+    return;
+
   min_i = max_i = min_z_i = 0;
   min_y = max_y = poly.vertices[0].sy;
   min_z = M * (poly.vertices[0].sx - width2)
@@ -1262,6 +1272,10 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   int num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
   {
+    if (((poly.vertices[i].sx + EPSILON) < 0) || 
+	((poly.vertices[i].sx - EPSILON) > width))
+      return;
+
     if (poly.vertices[i].sy > max_y)
     {
       max_y = poly.vertices[i].sy;
@@ -1284,13 +1298,10 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
     if ((ABS (poly.vertices [i].sx - poly.vertices [i - 1].sx)
        + ABS (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
-
-    if (poly.vertices[i].sx < 0 || poly.vertices[i].sx > width)
-      return;
   }
 
-  // If the polygon exceeds the screen, it is a engine failure
-  if (max_y > height || min_y < 0)
+  if (((min_y + EPSILON) < 0) || 
+      ((max_y - EPSILON) > height))
     return;
 
   // if this is a 'degenerate' polygon, skip it.
@@ -2259,8 +2270,9 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
       bot_y = poly.vertices [bot = i].sy;
   }
 
-  // If the polygon exceeds the screen, it is a engine failure
-  if (top_y > height || bot_y < 0)
+  // If the polygon exceeds the screen, it is an engine failure
+  if (((bot_y + EPSILON) < 0) || 
+      ((top_y - EPSILON) > height))
     return;
 
   float inv_dd = 1 / dd;
