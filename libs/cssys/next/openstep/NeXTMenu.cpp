@@ -114,14 +114,15 @@ static void menu_add_item( NSMenu* menu, char const* key,
 static void menu_add_submenu( NSMenu* menu, char const* key,
     csIniFile const& config )
     {
-    char const* section = [[NSString stringWithFormat:@"Menu.%s",key] cString];
-    NSMenu* const sub = build_menu( section, config );
+    NSMenu* const sub = build_menu( key, config );
     if (sub != 0)
 	{
 	NSMenuItem* const item =
 		[menu addItemWithTitle:[sub title] action:0 keyEquivalent:@""];
 	[menu setSubmenu:sub forItem:item];
 
+	char const* section =
+	    [[NSString stringWithFormat:@"Menu.%s",key] cString];
 	char const* type = config.GetStr( section, "type", 0 );
 	if (type != 0)
 	    {
