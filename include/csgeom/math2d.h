@@ -186,6 +186,17 @@ public:
   inline float Distance (const csVector2& pt) const
   { return ABS (Classify (pt)); }
 
+  /**
+   * Compute the squared distance between the given vector and
+   * this plane. This function works even if the plane is not
+   * normalized. Note that the returned distance will be negative
+   * if the point is left of the plane and positive otherwise.
+   */
+  inline float SquaredDistance (const csVector2& pt) const
+  {
+    return Classify (pt) / norm.SquaredNorm ();
+  }
+
   /// Reverses the direction of the plane while maintianing the plane itself.
   void Invert () { norm = -norm;  CC = -CC; }
 

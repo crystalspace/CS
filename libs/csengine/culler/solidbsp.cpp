@@ -185,9 +185,23 @@ if (ddd) printf ("%s   BRANCH: onplane\n", ddd_spaces);
       {
 if (ddd) printf ("%s   BRANCH: left->edges==0 right->edges==0\n", ddd_spaces);
         rc1 = rc2 = false;
-        csPlane2 edge_plane ((*poly)[0].v1, (*poly)[0].v2);
-	if (SIGN (edge_plane.A ()) == SIGN (node->splitter.A ()) &&
-	    SIGN (edge_plane.B ()) == SIGN (node->splitter.B ()))
+	// Here we need to take care of the case that the edges in the
+	// original polygon are not coplanar themselves. This can happen
+	// if we have a very small polygon. In that case we just ignore
+	// the polygon.
+	bool left_solid = false, right_solid = false;
+	int i;
+	for (i = 0 ; i < poly->GetNumEdges () ; i++)
+	{
+          csPlane2 edge_plane ((*poly)[0].v1, (*poly)[0].v2);
+	  if (SIGN (edge_plane.A ()) == SIGN (node->splitter.A ()) &&
+	      SIGN (edge_plane.B ()) == SIGN (node->splitter.B ()))
+	    right_solid = true;
+	  else
+	    left_solid = true;
+	}
+
+	if (right_solid && !left_solid)
 	{
 if (ddd) printf ("%s   BRANCH: planes equal -> right solid\n", ddd_spaces);
 	  // Two planes are equal. This means that the right node
@@ -201,7 +215,7 @@ if (ddd) printf ("%s   BRANCH: right solid\n", ddd_spaces);
 	    rc2 = true;
 	  }
 	}
-	else
+	else if (left_solid && !right_solid)
 	{
 	  // Two planes are negated. This means that the left node
 	  // will be solid.
@@ -234,7 +248,7 @@ if (ddd) printf ("%s   BRANCH: left->edges==0\n", ddd_spaces);
         // Left polygon has no edges. We test if the left node
         // is completely contained in the right polygon. In that
         // case we can clear the subtree and mark it as solid.
-        if (!node->left->solid && right_poly->In (node->split_left_center))
+        if (!node->left->solid && right_poly->In (node->left->split_center))
         {
 if (ddd) printf ("%s   BRANCH: left->solid=true\n", ddd_spaces);
           node->left->solid = true;
@@ -254,7 +268,7 @@ if (ddd) printf ("%s   BRANCH: END left->insert\n", ddd_spaces);
       if (right_poly->GetNumEdges () == 0)
       {
 if (ddd) printf ("%s   BRANCH: right->edges==0\n", ddd_spaces);
-        if (!node->right->solid && left_poly->In (node->split_right_center))
+        if (!node->right->solid && left_poly->In (node->right->split_center))
         {
 if (ddd) printf ("%s   BRANCH: right->solid=true\n", ddd_spaces);
           node->right->solid = true;
@@ -289,8 +303,11 @@ if (ddd) printf ("%s   BRANCH: both are solid\n", ddd_spaces);
 if (ddd) printf ("%s   BRANCH: no children\n", ddd_spaces);
     // Node has no children so we take a new splitter and
     // create children.
-    // @@@ Consider a lazy option where you don't subdivide
-    // the polygon until really needed.
+
+    // This flag indicates wether or not we added an edge.
+    // If false then we ignored everything.
+    bool edge_added = false;
+
     csSolidBspNode* n = node;
     int i, i1;
     i1 = poly->GetNumEdges ()-1;
@@ -308,20 +325,24 @@ if (ddd) printf ("%s   BRANCH: no children\n", ddd_spaces);
 	  i1 = i;
 	  continue;
 	}
+      edge_added = true;
       csVector2 start = (*poly)[i].v1;
       csVector2 end = (*poly)[i].v2;
       n->splitter.Set (start, end);
       n->split_center = (start + end) / 2;
-      n->split_right_center = n->split_center+n->splitter.norm;
-      n->split_left_center = n->split_center-n->splitter.norm;
      n->split_start = start;
      n->split_end = end;
       n->left = node_pool.Alloc ();
       n->right = node_pool.Alloc ();
+      // @@@ This can potentially go wrong if we have a very thin node.
+      // In that case the calculated split_center might be outside the node.
+      // So we should have a more robust way to calculate this.
+      n->left->split_center = n->split_center-n->splitter.norm / 20.;
+      n->right->split_center = n->split_center+n->splitter.norm / 20.;
       n = n->right;
       i1 = i;
     }
-    n->solid = true;
+    if (edge_added) n->solid = true;
 
     return true;
   }
@@ -338,10 +359,13 @@ void csSolidBsp::InsertPolygonInv (csSolidBspNode* node, csPoly2DEdges* poly)
   {
     n->splitter.Set ((*poly)[i].v1, (*poly)[i].v2);
     n->split_center = ((*poly)[i].v1 + (*poly)[i].v2) / 2;
-    n->split_right_center = n->split_center+n->splitter.norm;
-    n->split_left_center = n->split_center-n->splitter.norm;
     n->left = node_pool.Alloc ();
     n->right = node_pool.Alloc ();
+    // @@@ This can potentially go wrong if we have a very thin node.
+    // In that case the calculated split_center might be outside the node.
+    // So we should have a more robust way to calculate this.
+    n->left->split_center = n->split_center-n->splitter.norm / 20.;
+    n->right->split_center = n->split_center+n->splitter.norm / 20.;
     n->left->solid = true;
     n = n->right;
   }
@@ -369,14 +393,27 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
       // the polygon can not be both in the left and the right side.
       if (left_poly->GetNumEdges () == 0 && right_poly->GetNumEdges () == 0)
       {
-        csPlane2 edge_plane ((*poly)[0].v1, (*poly)[0].v2);
-	if (SIGN (edge_plane.A ()) == SIGN (node->splitter.A ()) &&
-	    SIGN (edge_plane.B ()) == SIGN (node->splitter.B ()))
+	// Here we need to take care of the case that the edges in the
+	// original polygon are not coplanar themselves. This can happen
+	// if we have a very small polygon. In that case we just ignore
+	// the polygon.
+	bool left_solid = false, right_solid = false;
+	int i;
+	for (i = 0 ; i < poly->GetNumEdges () ; i++)
+	{
+          csPlane2 edge_plane ((*poly)[0].v1, (*poly)[0].v2);
+	  if (SIGN (edge_plane.A ()) == SIGN (node->splitter.A ()) &&
+	      SIGN (edge_plane.B ()) == SIGN (node->splitter.B ()))
+	    right_solid = true;
+	  else
+	    left_solid = true;
+	}
+	if (right_solid && !left_solid)
 	{
 	  // Two planes are equal.
 	  if (!node->right->solid) { rc = true; goto end; }
 	}
-	else
+	else if (left_solid && !right_solid)
 	{
 	  // Two planes are negated.
 	  if (!node->left->solid) { rc = true; goto end; }
@@ -395,14 +432,14 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
         // Left polygon has no edges. We test if the left node
         // is completely contained in the right polygon. In that
         // case the solid state of that node is important for visibility.
-        if (!node->left->solid && right_poly->In (node->split_left_center))
+        if (!node->left->solid && right_poly->In (node->left->split_center))
         { rc = true; goto end; }
       }
       else if (TestPolygon (node->left, left_poly)) { rc = true; goto end; }
 
       if (right_poly->GetNumEdges () == 0)
       {
-        if (!node->right->solid && left_poly->In (node->split_right_center))
+        if (!node->right->solid && left_poly->In (node->right->split_center))
         { rc = true; goto end; }
       }
       else if (TestPolygon (node->right, right_poly)) { rc = true; goto end; }

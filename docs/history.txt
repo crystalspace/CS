@@ -12,6 +12,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+22-Mar-2000
+	- Continued debugging work on solid BSP. Still not perfect
+	  although I'm getting closer all the time.
+	- Added csPlane2::SquaredDistance.
 21-Mar-2000
 	- Norman Kramer added lines to draw 3D part of console if available.
 	  (and made the console window smaller to enjoy the funky console

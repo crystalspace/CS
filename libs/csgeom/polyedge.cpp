@@ -85,12 +85,14 @@ int csPoly2DEdges::AddEdge (const csVector2& v1, const csVector2& v2)
   return num_edges-1;
 }
 
-#define EPS .05
-#define ONPLANE(c) ((c) > -EPS && (c) < EPS)
-#define ATLEFT(c) ((c) <= -EPS)
-#define ATLEFTORPLANE(c) ((c) < EPS)
-#define ATRIGHT(c) ((c) >= EPS)
-#define ATRIGHTORPLANE(c) ((c) > -EPS)
+// The thickness of the plane used in the intersection routine below.
+#define THICK (EPSILON*EPSILON)
+
+#define ONPLANE(c) ((c) > -THICK && (c) < THICK)
+#define ATLEFT(c) ((c) <= -THICK)
+#define ATLEFTORPLANE(c) ((c) < THICK)
+#define ATRIGHT(c) ((c) >= THICK)
+#define ATRIGHTORPLANE(c) ((c) > -THICK)
 
 void csPoly2DEdges::Intersect (const csPlane2& plane,
 	csPoly2DEdges* left, csPoly2DEdges* right, bool& onplane)
@@ -107,8 +109,8 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
 
   for (i = 0 ; i < num_edges ; i++)
   {
-    c1 = plane.Classify (edges[i].v1);
-    c2 = plane.Classify (edges[i].v2);
+    c1 = plane.SquaredDistance (edges[i].v1);
+    c2 = plane.SquaredDistance (edges[i].v2);
 
     if (ONPLANE (c1))
     {
