@@ -331,7 +331,7 @@ iMaterialHandle* csTextureManager::RegisterMaterial (iTextureHandle* txthandle)
 void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
 {
   int idx = materials.Find (handle);
-  if (idx >= 0) materials.Delete (idx, (bool)handle->GetRefCount());
+  if (idx >= 0) materials.Delete (idx);
 }
 
 void csTextureManager::PrepareMaterials ()

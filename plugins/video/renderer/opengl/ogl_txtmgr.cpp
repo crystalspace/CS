@@ -246,5 +246,5 @@ iTextureHandle *csTextureManagerOpenGL::RegisterTexture (iImage* image,
 void csTextureManagerOpenGL::UnregisterTexture (csTextureHandleOpenGL *handle)
 {
   int idx = textures.Find (handle);
-  if (idx >= 0) textures.Delete (idx, (bool)handle->GetRefCount());
+  if (idx >= 0) textures.Delete (idx);
 }

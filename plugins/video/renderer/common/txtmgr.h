@@ -303,13 +303,13 @@ class csTextureManager : public iTextureManager
 {
 protected:
 
-  CS_DECLARE_TYPED_VECTOR_DECREF (csTexVector, csTextureHandle);
+  CS_DECLARE_TYPED_VECTOR_NODELETE (csTexVector, csTextureHandle);
 
   /// List of textures.
   csTexVector textures;
 
   // Private class used to keep a list of objects derived from csMaterialHandle
-  CS_DECLARE_TYPED_VECTOR_DECREF (csMatVector, csMaterialHandle);
+  CS_DECLARE_TYPED_VECTOR_NODELETE (csMatVector, csMaterialHandle);
 
   /// List of materials.
   csMatVector materials;

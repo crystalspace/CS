@@ -134,5 +134,5 @@ iTextureHandle *csTextureManagerInfinite::RegisterTexture (iImage* image,
 void csTextureManagerInfinite::UnregisterTexture (csTextureHandleInfinite* handle)
 {
   int idx = textures.Find (handle);
-  if (idx >= 0) textures.Delete (idx, (bool)handle->GetRefCount());
+  if (idx >= 0) textures.Delete (idx);
 }
