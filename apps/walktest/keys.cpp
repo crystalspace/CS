@@ -154,7 +154,7 @@ void load_sprite (char *filename, char *templatename, char* txtname)
 
   // read in the model file
   CHK (converter * filedata = new converter);
-  if (filedata->ivcon (filename) == ERROR)
+  if (filedata->ivcon (filename, true, false, NULL, Sys->Vfs) == ERROR)
   {
     Sys->Printf (MSG_CONSOLE, "There was an error reading the data!\n");
     CHK (delete filedata);
