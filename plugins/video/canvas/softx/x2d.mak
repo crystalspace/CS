@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 # We need also the X libs
 CFLAGS.X2D+=-I$(X11_PATH)/include
-LIBS._X2D+=-L$(X11_PATH)/lib -lXext -lX11
+LIBS.X2D+=-L$(X11_PATH)/lib -lXext -lX11
  
 ifeq ($(DO_SHM),yes)
   CFLAGS.X2D += $(CFLAGS.D)DO_SHM
@@ -40,12 +40,12 @@ endif
 # The 2D Xlib driver
 ifeq ($(USE_DLL),yes)
   XLIB2D=$(OUTDLL)x2d$(DLL)
-  LIBS.X2D=$(LIBS._X2D)
+  LIBS.LOCAL.X2D=$(LIBS.X2D)
   DEP.X2D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   XLIB2D=$(OUT)$(LIB_PREFIX)x2d$(LIB)
   DEP.EXE+=$(XLIB2D)
-  LIBS.EXE+=$(LIBS._X2D)
+  LIBS.EXE+=$(LIBS.X2D)
   CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_X2D
 endif
 DESCRIPTION.$(XLIB2D) = $(DESCRIPTION.x2d)
@@ -69,7 +69,7 @@ $(OUT)%$O: libs/cs2d/softx/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.X2D)
  
 $(XLIB2D): $(OBJ.XLIB2D) $(DEP.X2D)
-	$(DO.LIBRARY) $(LIBS.X2D)
+	$(DO.LIBRARY) $(LIBS.LOCAL.X2D)
 
 libxclean:
 	$(RM) $(XLIB2D)
