@@ -156,4 +156,3 @@ ifeq ($(ROOTCONFIG),config)
 SYSCONFIG=
 
 endif # ifeq ($(ROOTCONFIG),config)
-
