@@ -1,4 +1,4 @@
-@node csGeom, csParser, SCF, Libraries
+@node csGeom, CSWS, SCF, Libraries
 @section Geometry Library (@code{csGeom})
 @cindex csGeom
 @cindex Libraries,csGeom

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node csParser
+@node csParser, MeshObject, csEngine, Plug-In Drivers
 @section The Map File Parser (@code{csParser})
 @cindex Map File Parser
 @cindex csParser
