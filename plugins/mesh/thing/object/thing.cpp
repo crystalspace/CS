@@ -23,7 +23,6 @@
 #include "pol2d.h"
 #include "polytext.h"
 #include "lppool.h"
-#include "curve.h"
 #include "csgeom/polypool.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/frustum.h"
@@ -68,22 +67,16 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingFactoryState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowReceiver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ThingState)
   SCF_IMPLEMENTS_INTERFACE(iThingState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ThingFactoryState)
-  SCF_IMPLEMENTS_INTERFACE(iThingFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::LightingInfo)
@@ -110,52 +103,688 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::MeshObject)
   SCF_IMPLEMENTS_INTERFACE(iMeshObject)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::MeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 int csThing:: last_thing_id = 0;
 
-csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
-  static_polygons(32, 64), polygons(32, 64),
-  curves(4, 16)
-{
-  csThing::thing_type = thing_type;
+//----------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE(csThingStatic)
+  SCF_IMPLEMENTS_INTERFACE(iThingFactoryState)
+  SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
+SCF_IMPLEMENT_IBASE_END
+
+csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
+	: static_polygons (32, 64)
+{
+  SCF_CONSTRUCT_IBASE (parent);
+  csThingStatic::thing_type = thing_type;
+  static_polygons.SetThingType (thing_type);
+
+  max_vertices = num_vertices = 0;
+  obj_verts = NULL;
+  obj_normals = NULL;
+  smoothed = false;
+
+  obj_bbox_valid = false;
+
+  static_data_nr = 1;
+  prepared = false;
+  cosinus_factor = -1;
+}
+
+csThingStatic::~csThingStatic ()
+{
+  delete[] obj_verts;
+  delete[] obj_normals;
+}
+
+void csThingStatic::Prepare ()
+{
+  prepared = true;
+
+  if (thing_type->engine)
+  {
+    if (static_polygons.Length () >= thing_type->engine->
+    	GetFastMeshThresshold () &&
+	portal_polygons.Length () == 0)
+    {
+      flags.Set (CS_THING_FASTMESH);
+    }
+  }
+
+  if (!flags.Check (CS_THING_NOCOMPRESS))
+  {
+    CompressVertices ();
+    RemoveUnusedVertices ();
+  }
+
+  if (smoothed)
+    CalculateNormals();
+
+  int i;
+  csPolygon3DStatic* sp;
+  portal_polygons.DeleteAll ();
+  for (i = 0; i < static_polygons.Length (); i++)
+  {
+    sp = static_polygons.Get (i);
+    sp->Finish ();
+    if (sp->GetPortal ())
+      portal_polygons.Push (i);
+  }
+}
+
+void csThingStatic::UpdatePortalList ()
+{
+  int i;
+  csPolygon3DStatic* sp;
+  portal_polygons.DeleteAll ();
+  for (i = 0; i < static_polygons.Length (); i++)
+  {
+    sp = static_polygons.Get (i);
+    if (sp->GetPortal ())
+      portal_polygons.Push (i);
+  }
+}
+
+int csThingStatic::AddVertex (float x, float y, float z)
+{
+  if (!obj_verts)
+  {
+    max_vertices = 10;
+    obj_verts = new csVector3[max_vertices];
+  }
+
+  while (num_vertices >= max_vertices)
+  {
+    if (max_vertices < 10000)
+      max_vertices *= 2;
+    else
+      max_vertices += 10000;
+
+    csVector3 *new_obj_verts = new csVector3[max_vertices];
+    memcpy (new_obj_verts, obj_verts, sizeof (csVector3) * num_vertices);
+    delete[] obj_verts;
+    obj_verts = new_obj_verts;
+  }
+
+  obj_verts[num_vertices].Set (x, y, z);
+  num_vertices++;
+  StaticDataChanged ();
+  return num_vertices - 1;
+}
+
+void csThingStatic::SetVertex (int idx, const csVector3 &vt)
+{
+  CS_ASSERT (idx >= 0 && idx < num_vertices);
+  obj_verts[idx] = vt;
+  StaticDataChanged ();
+}
+
+void csThingStatic::DeleteVertex (int idx)
+{
+  CS_ASSERT (idx >= 0 && idx < num_vertices);
+
+  int copysize = sizeof (csVector3) * (num_vertices - idx - 1);
+  memmove (obj_verts + idx, obj_verts + idx + 1, copysize);
+  StaticDataChanged ();
+}
+
+void csThingStatic::DeleteVertices (int from, int to)
+{
+  if (from <= 0 && to >= num_vertices - 1)
+  {
+    // Delete everything.
+    delete[] obj_verts;
+    max_vertices = num_vertices = 0;
+    obj_verts = NULL;
+  }
+  else
+  {
+    if (from < 0) from = 0;
+    if (to >= num_vertices) to = num_vertices - 1;
+
+    int rangelen = to - from + 1;
+    int copysize = sizeof (csVector3) * (num_vertices - from - rangelen);
+    memmove (obj_verts + from,
+    	obj_verts + from + rangelen, copysize);
+    num_vertices -= rangelen;
+  }
+
+  StaticDataChanged ();
+}
+
+struct CompressVertex
+{
+  int orig_idx;
+  float x, y, z;
+  int new_idx;
+  bool used;
+};
+
+static int compare_vt (const void *p1, const void *p2)
+{
+  CompressVertex *sp1 = (CompressVertex *)p1;
+  CompressVertex *sp2 = (CompressVertex *)p2;
+  if (sp1->x < sp2->x)
+    return -1;
+  else if (sp1->x > sp2->x)
+    return 1;
+  if (sp1->y < sp2->y)
+    return -1;
+  else if (sp1->y > sp2->y)
+    return 1;
+  if (sp1->z < sp2->z)
+    return -1;
+  else if (sp1->z > sp2->z)
+    return 1;
+  return 0;
+}
+
+static int compare_vt_orig (const void *p1, const void *p2)
+{
+  CompressVertex *sp1 = (CompressVertex *)p1;
+  CompressVertex *sp2 = (CompressVertex *)p2;
+  if (sp1->orig_idx < sp2->orig_idx)
+    return -1;
+  else if (sp1->orig_idx > sp2->orig_idx)
+    return 1;
+  return 0;
+}
+
+void csThingStatic::CompressVertices ()
+{
+  if (num_vertices <= 0) return ;
+
+  // Copy all the vertices.
+  CompressVertex *vt = new CompressVertex[num_vertices];
+  int i, j;
+  for (i = 0; i < num_vertices; i++)
+  {
+    vt[i].orig_idx = i;
+    vt[i].x = (float)ceil (obj_verts[i].x * 1000000);
+    vt[i].y = (float)ceil (obj_verts[i].y * 1000000);
+    vt[i].z = (float)ceil (obj_verts[i].z * 1000000);
+  }
+
+  // First sort so that all (nearly) equal vertices are together.
+  qsort (vt, num_vertices, sizeof (CompressVertex), compare_vt);
+
+  // Count unique values and tag all doubles with the index of the unique one.
+  // new_idx in the vt table will be the index inside vt to the unique vector.
+  int count_unique = 1;
+  int last_unique = 0;
+  vt[0].new_idx = last_unique;
+  for (i = 1; i < num_vertices; i++)
+  {
+    if (
+      vt[i].x != vt[last_unique].x ||
+      vt[i].y != vt[last_unique].y ||
+      vt[i].z != vt[last_unique].z)
+    {
+      last_unique = i;
+      count_unique++;
+    }
+
+    vt[i].new_idx = last_unique;
+  }
+
+  // If count_unique == num_vertices then there is nothing to do.
+  if (count_unique == num_vertices)
+  {
+    delete[] vt;
+    return ;
+  }
+
+  // Now allocate and fill new vertex tables.
+  // After this new_idx in the vt table will be the new index
+  // of the vector.
+  csVector3 *new_obj = new csVector3[count_unique];
+  new_obj[0] = obj_verts[vt[0].orig_idx];
+
+  vt[0].new_idx = 0;
+  j = 1;
+  for (i = 1; i < num_vertices; i++)
+  {
+    if (vt[i].new_idx == i)
+    {
+      new_obj[j] = obj_verts[vt[i].orig_idx];
+      vt[i].new_idx = j;
+      j++;
+    }
+    else
+    {
+      vt[i].new_idx = j - 1;
+    }
+  }
+
+  // Now we sort the table back on orig_idx so that we have
+  // a mapping from the original indices to the new one (new_idx).
+  qsort (vt, num_vertices, sizeof (CompressVertex),
+  	compare_vt_orig);
+
+  // Replace the old vertex tables.
+  delete[] obj_verts;
+  obj_verts = new_obj;
+  num_vertices = max_vertices = count_unique;
+
+  // Now we can remap the vertices in all polygons.
+  for (i = 0; i < static_polygons.Length (); i++)
+  {
+    csPolygon3DStatic *p = static_polygons.Get (i);
+    csPolyIndexed &pi = p->GetVertices ();
+    int *idx = pi.GetVertexIndices ();
+    for (j = 0; j < pi.GetVertexCount (); j++) idx[j] = vt[idx[j]].new_idx;
+  }
+
+  delete[] vt;
+  StaticDataChanged ();
+}
+
+void csThingStatic::RemoveUnusedVertices ()
+{
+  if (num_vertices <= 0) return ;
+
+  // Copy all the vertices that are actually used by polygons.
+  bool *used = new bool[num_vertices];
+  int i, j;
+  for (i = 0; i < num_vertices; i++) used[i] = false;
+
+  // Mark all vertices that are used as used.
+  for (i = 0; i < static_polygons.Length (); i++)
+  {
+    csPolygon3DStatic *p = static_polygons.Get (i);
+    csPolyIndexed &pi = p->GetVertices ();
+    int *idx = pi.GetVertexIndices ();
+    for (j = 0; j < pi.GetVertexCount (); j++) used[idx[j]] = true;
+  }
+
+  // Count relevant values.
+  int count_relevant = 0;
+  for (i = 0; i < num_vertices; i++)
+  {
+    if (used[i]) count_relevant++;
+  }
+
+  // If all vertices are relevant then there is nothing to do.
+  if (count_relevant == num_vertices)
+  {
+    delete[] used;
+    return ;
+  }
+
+  // Now allocate and fill new vertex tables.
+  // Also fill the 'relocate' table.
+  csVector3 *new_obj = new csVector3[count_relevant];
+  int *relocate = new int[num_vertices];
+  j = 0;
+  for (i = 0; i < num_vertices; i++)
+  {
+    if (used[i])
+    {
+      new_obj[j] = obj_verts[i];
+      relocate[i] = j;
+      j++;
+    }
+    else
+      relocate[i] = -1;
+  }
+
+  // Replace the old vertex tables.
+  delete[] obj_verts;
+  obj_verts = new_obj;
+  num_vertices = max_vertices = count_relevant;
+
+  // Now we can remap the vertices in all polygons.
+  for (i = 0; i < static_polygons.Length (); i++)
+  {
+    csPolygon3DStatic *p = static_polygons.Get (i);
+    csPolyIndexed &pi = p->GetVertices ();
+    int *idx = pi.GetVertexIndices ();
+    for (j = 0; j < pi.GetVertexCount (); j++) idx[j] = relocate[idx[j]];
+  }
+
+  delete[] relocate;
+  delete[] used;
+
+  obj_bbox_valid = false;
+  StaticDataChanged ();
+}
+
+struct PolygonsForVertex
+{
+  csArray<int> poly_indices;
+};
+
+void csThingStatic::CalculateNormals ()
+{
+  int polyCount = static_polygons.Length();
+  int i, j;
+
+  delete[] obj_normals;
+  obj_normals = new csVector3[num_vertices];
+
+  // First build a table so that we can find all polygons that connect
+  // to a vertex easily.
+  PolygonsForVertex* pvv = new PolygonsForVertex[num_vertices];
+  for (i = 0 ; i < polyCount ; i++)
+  {
+    csPolygon3DStatic* p = static_polygons.Get (i);
+    int* vtidx = p->GetVertexIndices ();
+    for (j = 0 ; j < p->GetVertexCount () ; j++)
+    {
+      CS_ASSERT (vtidx[j] >= 0 && vtidx[j] < num_vertices);
+      pvv[vtidx[j]].poly_indices.Push (i);
+    }
+  }
+
+  // Now calculate normals.
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    csVector3 n (0);
+    for (j = 0 ; j < pvv[i].poly_indices.Length () ; j++)
+    {
+      csPolygon3DStatic* p = static_polygons.Get (pvv[i].poly_indices[j]);
+      const csVector3& normal = p->GetObjectPlane ().Normal();
+      n += normal;
+    }
+    float norm = n.Norm ();
+    if (norm) n /= norm;
+    obj_normals[i] = n;
+  }
+
+  delete[] pvv;
+}
+
+int csThingStatic::FindPolygonIndex (iPolygon3DStatic *polygon) const
+{
+  csPolygon3DStatic *p = polygon->GetPrivateObject ();
+  return static_polygons.Find (p);
+}
+
+iPolygon3DStatic *csThingStatic::GetPolygon (int idx)
+{
+  return &(static_polygons.Get (idx)->scfiPolygon3DStatic);
+}
+
+iPolygon3DStatic *csThingStatic::GetPolygon (const char* name)
+{
+  int idx = static_polygons.FindKey (name);
+  return idx >= 0 ? &(static_polygons.Get (idx)->scfiPolygon3DStatic) : NULL;
+}
+
+void csThingStatic::AddPolygon (csPolygon3DStatic* spoly)
+{
+  spoly->SetParent (this);
+  spoly->EnableTextureMapping (true);
+  static_polygons.Push (spoly);
+  StaticDataChanged ();
+}
+
+iPolygon3DStatic *csThingStatic::CreatePolygon (const char *name)
+{
+  csPolygon3DStatic* sp = thing_type->blk_polygon3dstatic.Alloc ();
+  if (name) sp->SetName (name);
+  AddPolygon (sp);
+  return &(sp->scfiPolygon3DStatic);
+}
+
+void csThingStatic::RemovePolygon (int idx)
+{
+  static_polygons.Delete (idx);
+  StaticDataChanged ();
+}
+
+void csThingStatic::RemovePolygons ()
+{
+  static_polygons.DeleteAll ();
+  portal_polygons.DeleteAll ();
+  StaticDataChanged ();
+}
+
+iPortal *csThingStatic::GetPortal (int idx) const
+{
+  csPolygon3DStatic *p = static_polygons.Get (portal_polygons[idx]);
+  return &(p->GetPortal ()->scfiPortal);
+}
+
+iPolygon3DStatic *csThingStatic::GetPortalPolygon (int idx) const
+{
+  csPolygon3DStatic *p = (static_polygons.Get (portal_polygons[idx]));
+  return &(p->scfiPolygon3DStatic);
+}
+
+int csThingStatic::IntersectSegmentIndex (
+  const csVector3 &start, const csVector3 &end,
+  csVector3 &isect,
+  float *pr,
+  bool only_portals)
+{
+  if (only_portals)
+  {
+    int i;
+    float r, best_r = 2000000000.;
+    csVector3 cur_isect;
+    int best_p = -1;
+    for (i = 0 ; i < portal_polygons.Length () ; i++)
+    {
+      int polygon_index = portal_polygons[i];
+      csPolygon3DStatic *p = static_polygons.Get (polygon_index);
+      if (p->IntersectSegment (start, end, cur_isect, &r))
+      {
+        if (r < best_r)
+        {
+          best_r = r;
+          best_p = polygon_index;
+          isect = cur_isect;
+        }
+      }
+    }
+
+    if (pr) *pr = best_r;
+    return best_p;
+  }
+
+  int i;
+  float r, best_r = 2000000000.;
+  csVector3 cur_isect;
+  int best_p = -1;
+
+  // @@@ This routine is not very optimal. Especially for things
+  // with large number of polygons.
+  for (i = 0; i < static_polygons.Length (); i++)
+  {
+    csPolygon3DStatic *p = static_polygons.Get (i);
+    if (p->IntersectSegment (start, end, cur_isect, &r))
+    {
+      if (r < best_r)
+      {
+        best_r = r;
+        best_p = i;
+        isect = cur_isect;
+      }
+    }
+  }
+
+  if (pr) *pr = best_r;
+  return best_p;
+}
+
+iPolygon3DStatic* csThingStatic::IntersectSegment (
+	const csVector3& start,
+	const csVector3& end, csVector3& isect,
+	float* pr, bool only_portals)
+{
+  int p = IntersectSegmentIndex (start, end, isect, pr,
+  	only_portals);
+  return p != -1 ? &(static_polygons.Get (p)->scfiPolygon3DStatic) : NULL;
+}
+
+void csThingStatic::MergeTemplate (
+  iThingFactoryState *tpl,
+  iMaterialWrapper *default_material,
+  csVector3 *shift,
+  csMatrix3 *transform)
+{
+  int i, j;
+  int *merge_vertices;
+
+  flags.SetAll (tpl->GetFlags ().Get ());
+
+  merge_vertices = new int[tpl->GetVertexCount () + 1];
+  for (i = 0; i < tpl->GetVertexCount (); i++)
+  {
+    csVector3 v;
+    v = tpl->GetVertex (i);
+    if (transform) v = *transform * v;
+    if (shift) v += *shift;
+    merge_vertices[i] = AddVertex (v);
+  }
+
+  for (i = 0; i < tpl->GetPolygonCount (); i++)
+  {
+    iPolygon3DStatic *pt = tpl->GetPolygon (i);
+    csPolygon3DStatic *ps;
+    iMaterialWrapper *mat = pt->GetMaterial ();
+    ps = thing_type->blk_polygon3dstatic.Alloc ();
+    ps->SetMaterial (mat);
+    AddPolygon (ps);
+    ps->SetName (pt->GetName ());
+
+    iMaterialWrapper *wrap = pt->GetMaterial ();
+    if (!wrap && default_material)
+      ps->SetMaterial (default_material);
+
+    int *idx = pt->GetVertexIndices ();
+    for (j = 0; j < pt->GetVertexCount (); j++)
+      ps->AddVertex (merge_vertices[idx[j]]);
+
+    ps->flags.SetAll (pt->GetFlags ().Get ());
+    ps->CopyTextureType (pt);
+  }
+
+  delete[] merge_vertices;
+}
+
+csPtr<csThingStatic> csThingStatic::Clone ()
+{
+  csThingStatic* clone = new csThingStatic (scfParent, thing_type);
+  clone->flags.SetAll (GetFlags ().Get ());
+  clone->smoothed = smoothed;
+  clone->obj_bbox = obj_bbox;
+  clone->obj_bbox_valid = obj_bbox_valid;
+  clone->obj_radius = obj_radius;
+  clone->max_obj_radius = max_obj_radius;
+  clone->prepared = prepared;
+  clone->static_data_nr = static_data_nr;
+  clone->cosinus_factor = cosinus_factor;
+
+  clone->num_vertices = num_vertices;
+  clone->max_vertices = max_vertices;
+  if (obj_verts)
+  {
+    clone->obj_verts = new csVector3[max_vertices];
+    memcpy (clone->obj_verts, obj_verts, sizeof (csVector3)*num_vertices);
+  }
+  else
+  {
+    clone->obj_verts = NULL;
+  }
+  if (obj_normals)
+  {
+    clone->obj_normals = new csVector3[max_vertices];
+    memcpy (clone->obj_normals, obj_normals, sizeof (csVector3)*num_vertices);
+  }
+  else
+  {
+    clone->obj_normals = NULL;
+  }
+
+  int i;
+  for (i = 0 ; i < static_polygons.Length () ; i++)
+  {
+    csPolygon3DStatic* p = static_polygons.Get (i)->Clone ();
+    p->SetParent (clone);
+    clone->static_polygons.Push (p);
+  }
+
+  clone->portal_polygons = portal_polygons;
+
+  return csPtr<csThingStatic> (clone);
+}
+
+void csThingStatic::ReplaceMaterials (iMaterialList *matList,
+	const char *prefix)
+{
+  int i;
+  for (i = 0; i < GetPolygonCount (); i++)
+  {
+    csPolygon3DStatic *p = GetPolygon3DStatic (i);
+    const char *txtname = p->GetMaterialWrapper ()->QueryObject ()->GetName ();
+    char *newname = new char[strlen (prefix) + strlen (txtname) + 2];
+    sprintf (newname, "%s_%s", prefix, txtname);
+
+    iMaterialWrapper *mw = matList->FindByName (newname);
+    if (mw != NULL) p->SetMaterial (mw);
+    delete[] newname;
+  }
+}
+
+void csThingStatic::HardTransform (const csReversibleTransform &t)
+{
+  int i;
+
+  for (i = 0; i < num_vertices; i++)
+  {
+    obj_verts[i] = t.This2Other (obj_verts[i]);
+  }
+
+  //-------
+  // Now transform the polygons.
+  //-------
+  for (i = 0; i < static_polygons.Length (); i++)
+  {
+    csPolygon3DStatic *p = GetPolygon3DStatic (i);
+    p->HardTransform (t);
+  }
+
+  StaticDataChanged ();
+}
+
+csPtr<iMeshObject> csThingStatic::NewInstance ()
+{
+  csThing *thing = new csThing ((iBase*)(iThingFactoryState*)this, this);
+  return csPtr<iMeshObject> (&thing->scfiMeshObject);
+}
+
+
+//----------------------------------------------------------------------------
+
+csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64)
+{
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
   DG_TYPE (this, "csThing");
 
-  scfiPolygonMesh.SetThing (this);
-  scfiPolygonMeshLOD.SetThing (this);
+  csThing::static_data = static_data;
+  polygons.SetThingType (static_data->thing_type);
+
+  scfiPolygonMesh.SetThing (static_data);
+  scfiPolygonMeshLOD.SetThing (static_data);
 
   last_thing_id++;
   thing_id = last_thing_id;
   logparent = NULL;
 
-  curves_center.x = curves_center.y = curves_center.z = 0;
-  curves_scale = 40;
-  curve_vertices = NULL;
-  curve_texels = NULL;
-  num_curve_vertices = max_curve_vertices = 0;
-
-  max_vertices = num_vertices = 0;
   wor_verts = NULL;
-  obj_verts = NULL;
   cam_verts = NULL;
   num_cam_verts = 0;
 
   draw_busy = 0;
-  bbox = NULL;
-  obj_bbox_valid = false;
 
   dynamic_ambient.Set (0,0,0);
   light_version = 1;
@@ -171,22 +800,17 @@ csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
   cfg_moving = CS_THING_MOVE_NEVER;
 
   prepared = false;
-  static_data_changed = false;
+  static_data_nr = 0;
 
   current_lod = 1;
   current_features = 0;
-
-  curves_transf_ok = false;
 
 #ifndef CS_USE_NEW_RENDERER
   polybuf = NULL;
 #endif // CS_USE_NEW_RENDERER
   polybuf_materials = NULL;
 
-  obj_normals = NULL;
-  smoothed = false;
   current_visnr = 1;
-  cosinus_factor = -1;
 }
 
 csThing::~csThing ()
@@ -196,21 +820,14 @@ csThing::~csThing ()
 #endif // CS_USE_NEW_RENDERER
   delete[] polybuf_materials;
 
-  if (wor_verts == obj_verts)
-    delete[] obj_verts;
-  else
+  if (wor_verts != static_data->obj_verts)
   {
     delete[] wor_verts;
-    delete[] obj_verts;
   }
 
   delete[] cam_verts;
-  delete[] curve_vertices;
-  delete[] curve_texels;
-  delete bbox;
 
   polygons.DeleteAll ();          // delete prior to portal_poly array !
-  delete [] obj_normals;
 }
 
 char* csThing::GenerateCacheName ()
@@ -220,13 +837,9 @@ char* csThing::GenerateCacheName ()
 
   csMemFile mf;
   int32 l;
-  l = convert_endian ((int32)num_vertices);
+  l = convert_endian ((int32)static_data->num_vertices);
   mf.Write ((char*)&l, 4);
   l = convert_endian ((int32)polygons.Length ());
-  mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)num_curve_vertices);
-  mf.Write ((char*)&l, 4);
-  l = convert_endian ((int32)curves.Length ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)
@@ -292,11 +905,6 @@ void csThing::DynamicLightDisconnect (iDynLight* dynlight)
     csPolygon3D *p = GetPolygon3D (i);
     p->DynamicLightDisconnect (dynlight);
   }
-  for (i = 0; i < curves.Length (); i++)
-  {
-    csCurve *c = GetCurve (i);
-    c->DynamicLightDisconnect (dynlight);
-  }
 }
 
 void csThing::StaticLightChanged (iStatLight* /*statlight*/)
@@ -307,27 +915,28 @@ void csThing::StaticLightChanged (iStatLight* /*statlight*/)
 void csThing::SetMovingOption (int opt)
 {
   cfg_moving = opt;
-  curves_transf_ok = false;
   switch (cfg_moving)
   {
     case CS_THING_MOVE_NEVER:
-      if (wor_verts != obj_verts) delete[] wor_verts;
-      wor_verts = obj_verts;
+      if (wor_verts != static_data->obj_verts) delete[] wor_verts;
+      wor_verts = static_data->obj_verts;
       break;
 
     case CS_THING_MOVE_OCCASIONAL:
-      if ((wor_verts == NULL || wor_verts == obj_verts) && max_vertices)
+      if ((wor_verts == NULL || wor_verts == static_data->obj_verts)
+      	&& static_data->max_vertices)
       {
-        wor_verts = new csVector3[max_vertices];
-        memcpy (wor_verts, obj_verts, max_vertices * sizeof (csVector3));
+        wor_verts = new csVector3[static_data->max_vertices];
+        memcpy (wor_verts, static_data->obj_verts,
+		static_data->max_vertices * sizeof (csVector3));
       }
 
       cached_movable = NULL;
       break;
 
     case CS_THING_MOVE_OFTEN:
-      if (wor_verts != obj_verts) delete[] wor_verts;
-      wor_verts = obj_verts;
+      if (wor_verts != static_data->obj_verts) delete[] wor_verts;
+      wor_verts = static_data->obj_verts;
       break;
   }
 
@@ -340,7 +949,6 @@ void csThing::WorUpdate ()
   switch (cfg_moving)
   {
     case CS_THING_MOVE_NEVER:
-      UpdateCurveTransform ();
       return ;
 
     case CS_THING_MOVE_OCCASIONAL:
@@ -350,7 +958,8 @@ void csThing::WorUpdate ()
 
 	if (cached_movable->IsFullTransformIdentity ())
 	{
-	  memcpy (wor_verts, obj_verts, num_vertices * (sizeof (csVector3)));
+	  memcpy (wor_verts, static_data->obj_verts,
+	  	static_data->num_vertices * (sizeof (csVector3)));
 	  csReversibleTransform movtrans;	// Identity.
 	  // @@@ It is possible to optimize the below too. Don't know
 	  // if it is worth it though.
@@ -360,21 +969,17 @@ void csThing::WorUpdate ()
             csPolygon3D *p = GetPolygon3D (i);
             p->ObjectToWorld (movtrans, p->Vwor (0));
           }
-
-          UpdateCurveTransform (movtrans);
 	}
 	else
 	{
           csReversibleTransform movtrans = cached_movable->GetFullTransform ();
-          for (i = 0; i < num_vertices; i++)
-            wor_verts[i] = movtrans.This2Other (obj_verts[i]);
+          for (i = 0; i < static_data->num_vertices; i++)
+            wor_verts[i] = movtrans.This2Other (static_data->obj_verts[i]);
           for (i = 0; i < polygons.Length (); i++)
           {
             csPolygon3D *p = GetPolygon3D (i);
             p->ObjectToWorld (movtrans, p->Vwor (0));
           }
-
-          UpdateCurveTransform (movtrans);
 	}
 
         // If the movable changed we invalidate the camera number as well
@@ -391,11 +996,11 @@ void csThing::WorUpdate ()
 
 void csThing::UpdateTransformation (const csTransform &c, long cam_cameranr)
 {
-  if (!cam_verts || num_vertices != num_cam_verts)
+  if (!cam_verts || static_data->num_vertices != num_cam_verts)
   {
     delete[] cam_verts;
-    cam_verts = new csVector3[num_vertices];
-    num_cam_verts = num_vertices;
+    cam_verts = new csVector3[static_data->num_vertices];
+    num_cam_verts = static_data->num_vertices;
     cameranr = cam_cameranr - 1;  // To make sure we will transform.
   }
 
@@ -404,542 +1009,103 @@ void csThing::UpdateTransformation (const csTransform &c, long cam_cameranr)
     cameranr = cam_cameranr;
 
     int i;
-    for (i = 0; i < num_vertices; i++)
+    for (i = 0; i < static_data->num_vertices; i++)
       cam_verts[i] = c.Other2This (wor_verts[i]);
   }
 }
 
-
-void csThing::SetSmoothingFlag (bool smooth)
+void csThing::HardTransform (const csReversibleTransform& t)
 {
-  smoothed = smooth;
-}
-
-struct PolygonsForVertex
-{
-  csArray<int> poly_indices;
-};
-
-void csThing::CalculateNormals ()
-{
-  int polyCount = polygons.Length();
-  int i, j;
-
-  delete[] obj_normals;
-  obj_normals = new csVector3[num_vertices];
-
-  // First build a table so that we can find all polygons that connect
-  // to a vertex easily.
-  PolygonsForVertex* pvv = new PolygonsForVertex[num_vertices];
-  for (i = 0 ; i < polyCount ; i++)
-  {
-    csPolygon3DStatic* p = static_polygons.Get (i);
-    int* vtidx = p->GetVertexIndices ();
-    for (j = 0 ; j < p->GetVertexCount () ; j++)
-    {
-      CS_ASSERT (vtidx[j] >= 0 && vtidx[j] < num_vertices);
-      pvv[vtidx[j]].poly_indices.Push (i);
-    }
-  }
-
-  // Now calculate normals.
-  for (i = 0 ; i < num_vertices ; i++)
-  {
-    csVector3 n (0);
-    for (j = 0 ; j < pvv[i].poly_indices.Length () ; j++)
-    {
-      csPolygon3D* p = polygons.Get (pvv[i].poly_indices[j]);
-      const csVector3& normal = p->GetPolyPlane ().Normal();
-      n += normal;
-    }
-    float norm = n.Norm ();
-    if (norm) n /= norm;
-    obj_normals[i] = n;
-  }
-
-  delete[] pvv;
-}
-
-void csThing::UpdatePortalList ()
-{
-  int i;
-  csPolygon3DStatic* sp;
-  portal_polygons.DeleteAll ();
-  for (i = 0; i < static_polygons.Length (); i++)
-  {
-    sp = static_polygons.Get (i);
-    if (sp->GetPortal ())
-      portal_polygons.Push (i);
-  }
+  csRef<csThingStatic> new_static_data = static_data->Clone ();
+  static_data = new_static_data;
+  static_data->HardTransform (t);
 }
 
 void csThing::Prepare ()
 {
+  static_data->Prepare ();
+
   if (prepared)
   {
-    if (static_data_changed)
+    if (static_data_nr != static_data->static_data_nr)
     {
-      static_data_changed = false;
-      int i;
-      for (i = 0 ; i < polygons.Length () ; i++)
+      static_data_nr = static_data->static_data_nr;
+
+      if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
       {
-        csPolygon3D* p = polygons.Get (i);
+        if (wor_verts != static_data->obj_verts)
+          delete[] wor_verts;
+	wor_verts = new csVector3[static_data->max_vertices];
+      }
+      else
+      {
+        wor_verts = static_data->obj_verts;
+      }
+      if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
+      else movablenr--;
+
+      int i;
+      csPolygon3D *p;
+      polygons.DeleteAll ();
+      for (i = 0 ; i < static_data->static_polygons.Length () ; i++)
+      {
+	p = static_data->thing_type->blk_polygon3d.Alloc ();
+	p->SetStaticData (static_data->static_polygons.Get (i));
+	p->SetParent (this);
+	polygons.Push (p);
 	p->RefreshFromStaticData ();
+	p->Finish ();
       }
     }
     return;
   }
 
   prepared = true;
-  static_data_changed = false;
   shapenr++;
-  if (thing_type->engine)
-  {
-    if (polygons.Length () >= thing_type->engine->GetFastMeshThresshold () &&
-	portal_polygons.Length () == 0 &&
-	GetCurveCount () == 0)
-    {
-      flags.Set (CS_THING_FASTMESH);
-    }
-  }
 
   scfiPolygonMeshLOD.Cleanup ();
   scfiPolygonMesh.Cleanup ();
-  if (!flags.Check (CS_THING_NOCOMPRESS))
-  {
-    CompressVertices ();
-    RemoveUnusedVertices ();
-  }
 
-  if (smoothed)
-    CalculateNormals();
+  static_data_nr = static_data->static_data_nr;
+
+  if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+  {
+    if (wor_verts != static_data->obj_verts)
+      delete[] wor_verts;
+    wor_verts = new csVector3[static_data->max_vertices];
+  }
+  else
+  {
+    wor_verts = static_data->obj_verts;
+  }
+  if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
+  else movablenr--;
+
+#ifndef CS_USE_NEW_RENDERER
+  if (polybuf)
+  {
+    polybuf->DecRef ();
+    polybuf = NULL;
+  }
+#endif // CS_USE_NEW_RENDERER
+
+  delete[] polybuf_materials;
+  polybuf_materials = NULL;
 
   int i;
   csPolygon3D *p;
-  csPolygon3DStatic* sp;
-  portal_polygons.DeleteAll ();
-  for (i = 0; i < polygons.Length (); i++)
+  polygons.DeleteAll ();
+  for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
-    sp = static_polygons.Get (i);
-    sp->Finish ();
-    p = polygons.Get (i);
+    p = static_data->thing_type->blk_polygon3d.Alloc ();
+    p->SetStaticData (static_data->static_polygons.Get (i));
+    p->SetParent (this);
+    polygons.Push (p);
     p->RefreshFromStaticData ();
     p->Finish ();
-    if (sp->GetPortal ())
-      portal_polygons.Push (i);
   }
 
   FireListeners ();
-}
-
-int csThing::AddCurveVertex (const csVector3 &v, const csVector2 &t)
-{
-  if (!curve_vertices)
-  {
-    max_curve_vertices = 10;
-    curve_vertices = new csVector3[max_curve_vertices];
-    curve_texels = new csVector2[max_curve_vertices];
-  }
-
-  while (num_curve_vertices >= max_curve_vertices)
-  {
-    max_curve_vertices += 10;
-
-    csVector3 *new_vertices = new csVector3[max_curve_vertices];
-    csVector2 *new_texels = new csVector2[max_curve_vertices];
-    memcpy (
-      new_vertices,
-      curve_vertices,
-      sizeof (csVector3) * num_curve_vertices);
-    memcpy (
-      new_texels,
-      curve_texels,
-      sizeof (csVector2) * num_curve_vertices);
-    delete[] curve_vertices;
-    delete[] curve_texels;
-    curve_vertices = new_vertices;
-    curve_texels = new_texels;
-  }
-
-  curve_vertices[num_curve_vertices] = v;
-  curve_texels[num_curve_vertices] = t;
-  num_curve_vertices++;
-  return num_curve_vertices - 1;
-}
-
-void csThing::SetCurveVertex (int idx, const csVector3 &vt)
-{
-  CS_ASSERT (idx >= 0 && idx < num_curve_vertices);
-  curve_vertices[idx] = vt;
-  obj_bbox_valid = false;
-  delete bbox;
-  bbox = NULL;
-  curves_transf_ok = false;
-}
-
-void csThing::SetCurveTexel (int idx, const csVector2 &vt)
-{
-  CS_ASSERT (idx >= 0 && idx < num_curve_vertices);
-  curve_texels[idx] = vt;
-}
-
-void csThing::ClearCurveVertices ()
-{
-  delete[] curve_vertices;
-  curve_vertices = NULL;
-  delete[] curve_texels;
-  curve_texels = NULL;
-  obj_bbox_valid = false;
-  delete bbox;
-  bbox = NULL;
-  curves_transf_ok = false;
-}
-
-int csThing::AddVertex (float x, float y, float z)
-{
-  if (!obj_verts)
-  {
-    max_vertices = 10;
-    obj_verts = new csVector3[max_vertices];
-
-    // Only if we occasionally move do we use the world vertex cache.
-    if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
-      wor_verts = new csVector3[max_vertices];
-    else
-      wor_verts = obj_verts;
-  }
-
-  while (num_vertices >= max_vertices)
-  {
-    if (max_vertices < 10000)
-      max_vertices *= 2;
-    else
-      max_vertices += 10000;
-
-    csVector3 *new_obj_verts = new csVector3[max_vertices];
-    memcpy (new_obj_verts, obj_verts, sizeof (csVector3) * num_vertices);
-    delete[] obj_verts;
-    obj_verts = new_obj_verts;
-
-    if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
-    {
-      csVector3 *new_wor_verts = new csVector3[max_vertices];
-      memcpy (new_wor_verts, wor_verts, sizeof (csVector3) * num_vertices);
-      delete[] wor_verts;
-      wor_verts = new_wor_verts;
-    }
-    else
-      wor_verts = obj_verts;
-  }
-
-  // By default all vertices are set with the same object space and world space.
-  obj_verts[num_vertices].Set (x, y, z);
-  if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
-    wor_verts[num_vertices].Set (x, y, z);
-  num_vertices++;
-  return num_vertices - 1;
-}
-
-int csThing::AddVertexSmart (float x, float y, float z)
-{
-  if (!obj_verts)
-  {
-    AddVertex (x, y, z);
-    return 0;
-  }
-
-  int i;
-  for (i = 0; i < num_vertices; i++)
-  {
-    if (
-      ABS (x - obj_verts[i].x) < SMALL_EPSILON &&
-      ABS (y - obj_verts[i].y) < SMALL_EPSILON &&
-      ABS (z - obj_verts[i].z) < SMALL_EPSILON)
-    {
-      return i;
-    }
-  }
-
-  AddVertex (x, y, z);
-  return num_vertices - 1;
-}
-
-void csThing::SetVertex (int idx, const csVector3 &vt)
-{
-  CS_ASSERT (idx >= 0 && idx < num_vertices);
-  obj_verts[idx] = vt;
-  if (wor_verts && wor_verts != obj_verts) wor_verts[idx] = vt;
-}
-
-void csThing::DeleteVertex (int idx)
-{
-  CS_ASSERT (idx >= 0 && idx < num_vertices);
-
-  int copysize = sizeof (csVector3) * (num_vertices - idx - 1);
-  memmove (obj_verts + idx, obj_verts + idx + 1, copysize);
-  if (wor_verts && wor_verts != obj_verts)
-    memmove (wor_verts + idx, wor_verts + idx + 1, copysize);
-  if (cam_verts) memmove (cam_verts + idx, cam_verts + idx + 1, copysize);
-  num_vertices--;
-}
-
-void csThing::DeleteVertices (int from, int to)
-{
-  if (from <= 0 && to >= num_vertices - 1)
-  {
-    // Delete everything.
-    if (wor_verts == obj_verts)
-      delete[] obj_verts;
-    else
-    {
-      delete[] wor_verts;
-      delete[] obj_verts;
-    }
-
-    delete[] cam_verts;
-    max_vertices = num_vertices = 0;
-    wor_verts = NULL;
-    obj_verts = NULL;
-    cam_verts = NULL;
-    num_cam_verts = 0;
-  }
-  else
-  {
-    if (from < 0) from = 0;
-    if (to >= num_vertices) to = num_vertices - 1;
-
-    int rangelen = to - from + 1;
-    int copysize = sizeof (csVector3) * (num_vertices - from - rangelen);
-    memmove (obj_verts + from, obj_verts + from + rangelen, copysize);
-    if (wor_verts && wor_verts != obj_verts)
-      memmove (wor_verts + from, wor_verts + from + rangelen, copysize);
-    if (cam_verts)
-      memmove (cam_verts + from, cam_verts + from + rangelen, copysize);
-    num_vertices -= rangelen;
-  }
-}
-
-struct CompressVertex
-{
-  int orig_idx;
-  float x, y, z;
-  int new_idx;
-  bool used;
-};
-
-static int compare_vt (const void *p1, const void *p2)
-{
-  CompressVertex *sp1 = (CompressVertex *)p1;
-  CompressVertex *sp2 = (CompressVertex *)p2;
-  if (sp1->x < sp2->x)
-    return -1;
-  else if (sp1->x > sp2->x)
-    return 1;
-  if (sp1->y < sp2->y)
-    return -1;
-  else if (sp1->y > sp2->y)
-    return 1;
-  if (sp1->z < sp2->z)
-    return -1;
-  else if (sp1->z > sp2->z)
-    return 1;
-  return 0;
-}
-
-static int compare_vt_orig (const void *p1, const void *p2)
-{
-  CompressVertex *sp1 = (CompressVertex *)p1;
-  CompressVertex *sp2 = (CompressVertex *)p2;
-  if (sp1->orig_idx < sp2->orig_idx)
-    return -1;
-  else if (sp1->orig_idx > sp2->orig_idx)
-    return 1;
-  return 0;
-}
-
-void csThing::CompressVertices ()
-{
-  if (num_vertices <= 0) return ;
-
-  // Copy all the vertices.
-  CompressVertex *vt = new CompressVertex[num_vertices];
-  int i, j;
-  for (i = 0; i < num_vertices; i++)
-  {
-    vt[i].orig_idx = i;
-    vt[i].x = (float)ceil (obj_verts[i].x * 1000000);
-    vt[i].y = (float)ceil (obj_verts[i].y * 1000000);
-    vt[i].z = (float)ceil (obj_verts[i].z * 1000000);
-  }
-
-  // First sort so that all (nearly) equal vertices are together.
-  qsort (vt, num_vertices, sizeof (CompressVertex), compare_vt);
-
-  // Count unique values and tag all doubles with the index of the unique one.
-  // new_idx in the vt table will be the index inside vt to the unique vector.
-  int count_unique = 1;
-  int last_unique = 0;
-  vt[0].new_idx = last_unique;
-  for (i = 1; i < num_vertices; i++)
-  {
-    if (
-      vt[i].x != vt[last_unique].x ||
-      vt[i].y != vt[last_unique].y ||
-      vt[i].z != vt[last_unique].z)
-    {
-      last_unique = i;
-      count_unique++;
-    }
-
-    vt[i].new_idx = last_unique;
-  }
-
-  // If count_unique == num_vertices then there is nothing to do.
-  if (count_unique == num_vertices)
-  {
-    delete[] vt;
-    return ;
-  }
-
-  // Now allocate and fill new vertex tables.
-  // After this new_idx in the vt table will be the new index
-  // of the vector.
-  csVector3 *new_obj = new csVector3[count_unique];
-  new_obj[0] = obj_verts[vt[0].orig_idx];
-
-  csVector3 *new_wor = 0;
-  if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
-  {
-    new_wor = new csVector3[count_unique];
-    new_wor[0] = wor_verts[vt[0].orig_idx];
-  }
-
-  vt[0].new_idx = 0;
-  j = 1;
-  for (i = 1; i < num_vertices; i++)
-  {
-    if (vt[i].new_idx == i)
-    {
-      new_obj[j] = obj_verts[vt[i].orig_idx];
-      if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
-        new_wor[j] = wor_verts[vt[i].orig_idx];
-      vt[i].new_idx = j;
-      j++;
-    }
-    else
-      vt[i].new_idx = j - 1;
-  }
-
-  // Now we sort the table back on orig_idx so that we have
-  // a mapping from the original indices to the new one (new_idx).
-  qsort (vt, num_vertices, sizeof (CompressVertex), compare_vt_orig);
-
-  // Replace the old vertex tables.
-  delete[] obj_verts;
-  obj_verts = new_obj;
-  if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
-  {
-    delete[] wor_verts;
-    wor_verts = new_wor;
-  }
-  else
-    wor_verts = obj_verts;
-  num_vertices = max_vertices = count_unique;
-
-  // Now we can remap the vertices in all polygons.
-  for (i = 0; i < static_polygons.Length (); i++)
-  {
-    csPolygon3DStatic *p = static_polygons.Get (i);
-    csPolyIndexed &pi = p->GetVertices ();
-    int *idx = pi.GetVertexIndices ();
-    for (j = 0; j < pi.GetVertexCount (); j++) idx[j] = vt[idx[j]].new_idx;
-  }
-
-  delete[] vt;
-
-  // If there is a bounding box we recreate it.
-  if (bbox) CreateBoundingBox ();
-}
-
-void csThing::RemoveUnusedVertices ()
-{
-  if (num_vertices <= 0) return ;
-
-  // Copy all the vertices that are actually used by polygons.
-  bool *used = new bool[num_vertices];
-  int i, j;
-  for (i = 0; i < num_vertices; i++) used[i] = false;
-
-  // Mark all vertices that are used as used.
-  for (i = 0; i < static_polygons.Length (); i++)
-  {
-    csPolygon3DStatic *p = static_polygons.Get (i);
-    csPolyIndexed &pi = p->GetVertices ();
-    int *idx = pi.GetVertexIndices ();
-    for (j = 0; j < pi.GetVertexCount (); j++) used[idx[j]] = true;
-  }
-
-  // Count relevant values.
-  int count_relevant = 0;
-  for (i = 0; i < num_vertices; i++)
-  {
-    if (used[i]) count_relevant++;
-  }
-
-  // If all vertices are relevant then there is nothing to do.
-  if (count_relevant == num_vertices)
-  {
-    delete[] used;
-    return ;
-  }
-
-  // Now allocate and fill new vertex tables.
-  // Also fill the 'relocate' table.
-  csVector3 *new_obj = new csVector3[count_relevant];
-  csVector3 *new_wor = 0;
-  int *relocate = new int[num_vertices];
-  if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
-    new_wor = new csVector3[count_relevant];
-  j = 0;
-  for (i = 0; i < num_vertices; i++)
-  {
-    if (used[i])
-    {
-      new_obj[j] = obj_verts[i];
-      if (cfg_moving == CS_THING_MOVE_OCCASIONAL) new_wor[j] = wor_verts[i];
-      relocate[i] = j;
-      j++;
-    }
-    else
-      relocate[i] = -1;
-  }
-
-  // Replace the old vertex tables.
-  delete[] obj_verts;
-  obj_verts = new_obj;
-  if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
-  {
-    delete[] wor_verts;
-    wor_verts = new_wor;
-  }
-  else
-    wor_verts = obj_verts;
-  num_vertices = max_vertices = count_relevant;
-
-  // Now we can remap the vertices in all polygons.
-  for (i = 0; i < static_polygons.Length (); i++)
-  {
-    csPolygon3DStatic *p = static_polygons.Get (i);
-    csPolyIndexed &pi = p->GetVertices ();
-    int *idx = pi.GetVertexIndices ();
-    for (j = 0; j < pi.GetVertexCount (); j++) idx[j] = relocate[idx[j]];
-  }
-
-  delete[] relocate;
-  delete[] used;
-
-  // If there is a bounding box we recreate it.
-  if (bbox) CreateBoundingBox ();
 }
 
 csPolygon3D *csThing::GetPolygon3D (const char *name)
@@ -948,24 +1114,10 @@ csPolygon3D *csThing::GetPolygon3D (const char *name)
   return idx >= 0 ? polygons.Get (idx) : NULL;
 }
 
-int csThing::FindPolygonIndex (iPolygon3DStatic *polygon) const
-{
-  csPolygon3DStatic *p = polygon->GetPrivateObject ();
-  return static_polygons.Find (p);
-}
-
 int csThing::FindPolygonIndex (iPolygon3D *polygon) const
 {
   csPolygon3D *p = polygon->GetPrivateObject ();
   return polygons.Find (p);
-}
-
-csPolygon3D *csThing::NewPolygon (iMaterialWrapper *material)
-{
-  csPolygon3DStatic *sp = new csPolygon3DStatic (material);
-  csPolygon3D *p = new csPolygon3D (sp);
-  AddPolygon (sp, p);
-  return p;
 }
 
 void csThing::InvalidateThing ()
@@ -981,220 +1133,18 @@ void csThing::InvalidateThing ()
   delete[] polybuf_materials;
   polybuf_materials = NULL;
   prepared = false;
-  obj_bbox_valid = false;
-  delete bbox;
-  bbox = NULL;
+  static_data->obj_bbox_valid = false;
 
   shapenr++;
   scfiPolygonMeshLOD.Cleanup ();
   scfiPolygonMesh.Cleanup ();
-  delete [] obj_normals; obj_normals = NULL;
+  delete [] static_data->obj_normals; static_data->obj_normals = NULL;
   FireListeners ();
-}
-
-void csThing::RemovePolygon (int idx)
-{
-  InvalidateThing ();
-  static_polygons.Delete (idx);
-  polygons.Delete (idx);
 }
 
 iPolygonMesh* csThing::GetWriteObject ()
 {
   return &scfiPolygonMeshLOD;
-}
-
-void csThing::RemovePolygons ()
-{
-  InvalidateThing ();
-  polygons.DeleteAll ();          // delete prior to portal_poly array !
-  if (portal_polygons.Length ()) portal_polygons.DeleteAll ();
-}
-
-void csThing::AddPolygon (csPolygon3DStatic* spoly, csPolygon3D *poly)
-{
-  InvalidateThing ();
-
-  spoly->SetParent (this);
-  poly->SetParent (this);
-  static_polygons.Push (spoly);
-  polygons.Push (poly);
-}
-
-csCurve *csThing::GetCurve (char *name) const
-{
-  int i;
-  for (i = 0 ; i < curves.Length () ; i++)
-  {
-    const char* n = curves[i]->GetName ();
-    if (n && !strcmp (n, name))
-      return curves[i];
-  }
-  return NULL;
-}
-
-void csThing::AddCurve (csCurve *curve)
-{
-  curve->SetParentThing (this);
-  curves.Push (curve);
-  curves_transf_ok = false;
-  obj_bbox_valid = false;
-  delete bbox;
-  bbox = NULL;
-}
-
-iCurve *csThing::CreateCurve ()
-{
-  csCurve *c = new csBezierCurve (thing_type);
-  c->SetParentThing (this);
-  AddCurve (c);
-  return &(c->scfiCurve);
-}
-
-int csThing::FindCurveIndex (iCurve *curve) const
-{
-  return curves.Find (curve->GetOriginalObject ());
-}
-
-void csThing::RemoveCurve (int idx)
-{
-  curves.Delete (idx);
-  curves_transf_ok = false;
-  obj_bbox_valid = false;
-  delete bbox;
-  bbox = NULL;
-}
-
-void csThing::RemoveCurves ()
-{
-  curves.DeleteAll ();
-  curves_transf_ok = false;
-  obj_bbox_valid = false;
-  delete bbox;
-  bbox = NULL;
-}
-
-void csThing::HardTransform (const csReversibleTransform &t)
-{
-  int i;
-
-  for (i = 0; i < num_vertices; i++)
-  {
-    obj_verts[i] = t.This2Other (obj_verts[i]);
-    if (cfg_moving == CS_THING_MOVE_OCCASIONAL) wor_verts[i] = obj_verts[i];
-  }
-
-  curves_center = t.This2Other (curves_center);
-  if (curve_vertices)
-    for (i = 0; i < num_curve_vertices; i++)
-      curve_vertices[i] = t.This2Other (curve_vertices[i]);
-
-  //-------
-  // Now transform the polygons.
-  //-------
-  for (i = 0; i < static_polygons.Length (); i++)
-  {
-    csPolygon3DStatic *p = GetPolygon3DStatic (i);
-    p->HardTransform (t);
-  }
-
-  curves_transf_ok = false;
-  for (i = 0; i < curves.Length (); i++)
-  {
-    csCurve *c = GetCurve (i);
-    c->HardTransform (t);
-  }
-}
-
-csPolygon3DStatic *csThing::IntersectSegmentFull (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  float *pr,
-  csMeshWrapper **p_mesh)
-{
-  if (p_mesh) *p_mesh = NULL;
-
-  int i;
-  float r, best_r = 2000000000.;
-  csVector3 cur_isect;
-  csPolygon3DStatic *best_p = NULL;
-
-  // @@@ This routine is not very optimal. Especially for things
-  // with large number of polygons.
-  for (i = 0; i < static_polygons.Length (); i++)
-  {
-    csPolygon3DStatic *p = static_polygons.Get (i);
-    if (p->IntersectSegment (start, end, cur_isect, &r))
-    {
-      if (r < best_r)
-      {
-        best_r = r;
-        best_p = p;
-        isect = cur_isect;
-      }
-    }
-  }
-
-  if (pr) *pr = best_r;
-  if (p_mesh) *p_mesh = NULL;
-  return best_p;
-}
-
-csPolygon3D *csThing::IntersectSegment (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  float *pr,
-  bool only_portals)
-{
-  if (only_portals)
-  {
-    int i;
-    float r, best_r = 2000000000.;
-    csVector3 cur_isect;
-    csPolygon3D *best_p = NULL;
-    for (i = 0; i < portal_polygons.Length (); i++)
-    {
-      csPolygon3DStatic *p = static_polygons.Get (portal_polygons[i]);
-      if (p->IntersectSegment (start, end, cur_isect, &r))
-      {
-        if (r < best_r)
-        {
-          best_r = r;
-          best_p = polygons.Get (portal_polygons[i]);
-          isect = cur_isect;
-        }
-      }
-    }
-
-    if (pr) *pr = best_r;
-    return best_p;
-  }
-
-  int i;
-  float r, best_r = 2000000000.;
-  csVector3 cur_isect;
-  csPolygon3D *best_p = NULL;
-
-  // @@@ This routine is not very optimal. Especially for things
-  // with large number of polygons.
-  for (i = 0; i < static_polygons.Length (); i++)
-  {
-    csPolygon3DStatic *p = static_polygons.Get (i);
-    if (p->IntersectSegment (start, end, cur_isect, &r))
-    {
-      if (r < best_r)
-      {
-        best_r = r;
-        best_p = polygons.Get (i);
-        isect = cur_isect;
-      }
-    }
-  }
-
-  if (pr) *pr = best_r;
-  return best_p;
 }
 
 bool csThing::HitBeamOutline (const csVector3& start,
@@ -1205,9 +1155,9 @@ bool csThing::HitBeamOutline (const csVector3& start,
 
   // @@@ This routine is not very optimal. Especially for things
   // with large number of polygons.
-  for (i = 0; i < static_polygons.Length (); i++)
+  for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
-    csPolygon3DStatic *p = static_polygons.Get (i);
+    csPolygon3DStatic *p = static_data->static_polygons.Get (i);
     if (p->IntersectSegment (start, end, isect, &r))
     {
       if (pr) *pr = r;
@@ -1221,9 +1171,9 @@ bool csThing::HitBeamOutline (const csVector3& start,
 bool csThing::HitBeamObject (const csVector3& start,
   const csVector3& end, csVector3& isect, float *pr)
 {
-  csPolygon3D* poly = IntersectSegment (start, end, isect, pr, false);
-  if (poly) return true;
-  return false;
+  int idx = static_data->IntersectSegmentIndex (start, end, isect, pr, false);
+  if (idx == -1) return false;
+  return true;
 }
 
 #ifndef CS_USE_NEW_RENDERER
@@ -1340,7 +1290,8 @@ void csThing::DrawPolygonArray (
   csVector3 *verts;
   int num_verts;
   int i;
-  csPoly2DPool *render_pool = thing_type->render_pol2d_pool;
+  //@@@@ TOO MANY POINTERS:
+  csPoly2DPool *render_pool = static_data->thing_type->render_pol2d_pool;
   csPolygon2D *clip;
   iCamera *icam = d->GetCamera ();
   const csReversibleTransform &camtrans = icam->GetTransform ();
@@ -1416,20 +1367,20 @@ void csThing::PreparePolygonBuffer ()
 #ifndef CS_USE_NEW_RENDERER
   if (polybuf) return ;
 
-  iVertexBufferManager *vbufmgr = thing_type->G3D->
+  iVertexBufferManager *vbufmgr = static_data->thing_type->G3D->
     GetVertexBufferManager ();
   polybuf = vbufmgr->CreatePolygonBuffer ();
-  polybuf->SetVertexArray (obj_verts, num_vertices);
+  polybuf->SetVertexArray (static_data->obj_verts, static_data->num_vertices);
 
   int i;
 
   //-----
   // First collect all material wrappers and polygons.
   //-----
-  MatPol *matpol = new MatPol[static_polygons.Length ()];
-  for (i = 0; i < static_polygons.Length (); i++)
+  MatPol *matpol = new MatPol[static_data->static_polygons.Length ()];
+  for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
-    matpol[i].spoly = GetPolygon3DStatic (i);
+    matpol[i].spoly = static_data->GetPolygon3DStatic (i);
     matpol[i].poly = GetPolygon3D (i);
     matpol[i].mat = matpol[i].spoly->GetMaterialWrapper ();
   }
@@ -1479,12 +1430,12 @@ void csThing::PreparePolygonBuffer ()
   //-----
   // Now add the polygons to the polygon buffer sorted by material.
   //-----
-  for (i = 0; i < static_polygons.Length (); i++)
+  for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
     csPolygon3DStatic *spoly = matpol[i].spoly;
     csLightMapMapping *mapping = spoly->GetLightMapMapping ();
     csPolygon3D *poly = matpol[i].poly;
-    csPolyTexLightMap* lmi = poly->GetLightMapInfo ();
+    csPolyTexture* lmi = poly->GetPolyTexture ();
 
     // @@@ what if lmi == NULL?
     //CS_ASSERT (lmi != NULL);
@@ -1497,7 +1448,7 @@ void csThing::PreparePolygonBuffer ()
           matpol[i].mat_index,
           mapping->m_obj2tex,
           mapping->v_obj2tex,
-          lmi->GetPolyTex ());
+          lmi);
     }
     else
     {
@@ -1519,83 +1470,6 @@ void csThing::PreparePolygonBuffer ()
 #endif // CS_USE_NEW_RENDERER
 }
 
-void csThing::GetTransformedBoundingBox (
-  const csReversibleTransform &trans,
-  csBox3 &cbox)
-{
-  //@@@@@@@@@@@@@@
-
-  // @@@ Shouldn't we try to cache this depending on camera/movable number?
-
-  // Similar to what happens in csSprite3D.
-  csBox3 box;
-  GetBoundingBox (box);
-  cbox.StartBoundingBox (trans * box.GetCorner (0));
-  cbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
-  cbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
-  cbox.AddBoundingVertexSmart (trans * box.GetCorner (3));
-  cbox.AddBoundingVertexSmart (trans * box.GetCorner (4));
-  cbox.AddBoundingVertexSmart (trans * box.GetCorner (5));
-  cbox.AddBoundingVertexSmart (trans * box.GetCorner (6));
-  cbox.AddBoundingVertexSmart (trans * box.GetCorner (7));
-}
-
-static void Perspective (
-  const csVector3 &v,
-  csVector2 &p,
-  float fov,
-  float sx,
-  float sy)
-{
-  float iz = fov / v.z;
-  p.x = v.x * iz + sx;
-  p.y = v.y * iz + sy;
-}
-
-float csThing::GetScreenBoundingBox (
-  float fov,
-  float sx,
-  float sy,
-  const csReversibleTransform &trans,
-  csBox2 &sbox,
-  csBox3 &cbox)
-{
-  csVector2 oneCorner;
-
-  GetTransformedBoundingBox (trans, cbox);
-
-  // if the entire bounding box is behind the camera, we're done
-  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
-  {
-    return -1;
-  }
-
-  // Transform from camera to screen space.
-  if (cbox.MinZ () <= 0)
-  {
-    // Sprite is very close to camera.
-
-    // Just return a maximum bounding box.
-    sbox.Set (-10000, -10000, 10000, 10000);
-  }
-  else
-  {
-    Perspective (cbox.Max (), oneCorner, fov, sx, sy);
-    sbox.StartBoundingBox (oneCorner);
-
-    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
-    Perspective (v, oneCorner, fov, sx, sy);
-    sbox.AddBoundingVertexSmart (oneCorner);
-    Perspective (cbox.Min (), oneCorner, fov, sx, sy);
-    sbox.AddBoundingVertexSmart (oneCorner);
-    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
-    Perspective (v, oneCorner, fov, sx, sy);
-    sbox.AddBoundingVertexSmart (oneCorner);
-  }
-
-  return cbox.MaxZ ();
-}
-
 #ifndef CS_USE_NEW_RENDERER
 void csThing::DrawPolygonArrayDPM (
   csPolygon3D ** /*polygon*/,
@@ -1612,31 +1486,23 @@ void csThing::DrawPolygonArrayDPM (
     tr_o2c /= movable->GetFullTransform ();
 
   G3DPolygonMesh mesh;
-  csBox2 bbox;
-  csBox3 bbox3;
-  if (
-    GetScreenBoundingBox (
-        (float) icam->GetFOV (),
-        icam->GetShiftX (),
-        icam->GetShiftY (),
-        tr_o2c,
-        bbox,
-        bbox3) < 0)
-    return ;  // Not visible.
-  if (
-    !rview->ClipBBox (
-        bbox,
-        bbox3,
-        mesh.clip_portal,
-        mesh.clip_plane,
-        mesh.clip_z_plane))
-    return ;  // Not visible.
-  int i;
+  csVector3 radius;
+  csSphere sphere;
+  GetRadius (radius, sphere.GetCenter ());
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  sphere.SetRadius (max_radius);
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBSphere (tr_o2c, sphere, mesh.clip_portal, mesh.clip_plane,
+  	mesh.clip_z_plane) == false)
+    return;	// Not visible.
 
   rview->GetGraphics3D ()->SetObjectToCamera (&tr_o2c);
   rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
 
   mesh.polybuf = polybuf;
+  int i;
   for (i = 0; i < polybuf_material_count; i++)
   {
     polybuf_materials[i]->Visit ();
@@ -1654,7 +1520,7 @@ void csThing::DrawPolygonArrayDPM (
 }
 #endif // CS_USE_NEW_RENDERER
 
-// @@@ We need a more clever algorithm here. We should try
+// @@@ We need a better algorithm here. We should try
 // to recognize convex sub-parts of a polygonset and return
 // convex shadow frustums for those. This will significantly
 // reduce the number of shadow frustums. There are basicly
@@ -1671,6 +1537,7 @@ void csThing::AppendShadows (
   iShadowBlockList *shadows,
   const csVector3 &origin)
 {
+  Prepare ();
   //@@@ Ok?
   cached_movable = movable;
   WorUpdate ();
@@ -1682,9 +1549,9 @@ void csThing::AppendShadows (
   csPolygon3DStatic *sp;
   csPolygon3D *p;
   bool cw = true;                   //@@@ Use mirroring parameter here!
-  for (i = 0; i < static_polygons.Length (); i++)
+  for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
-    sp = static_polygons.Get (i);
+    sp = static_data->static_polygons.Get (i);
     if (sp->GetPortal ()) continue;  // No portals
     p = polygons.Get (i);
 
@@ -1706,204 +1573,46 @@ void csThing::AppendShadows (
   }
 }
 
-void csThing::CreateBoundingBox ()
-{
-  float minx, miny, minz, maxx, maxy, maxz;
-  minx = miny = minz = maxx = maxy = maxz = 0.0f;
-  delete bbox;
-  bbox = NULL;
-  if (num_vertices <= 0 && num_curve_vertices <= 0) return ;
-  bbox = new csThingBBox ();
-  int i;
-  if (num_vertices > 0)
-  {
-    minx = maxx = obj_verts[0].x;
-    miny = maxy = obj_verts[0].y;
-    minz = maxz = obj_verts[0].z;
-
-    for (i = 1; i < num_vertices; i++)
-    {
-      if (obj_verts[i].x < minx)
-        minx = obj_verts[i].x;
-      else if (obj_verts[i].x > maxx)
-        maxx = obj_verts[i].x;
-      if (obj_verts[i].y < miny)
-        miny = obj_verts[i].y;
-      else if (obj_verts[i].y > maxy)
-        maxy = obj_verts[i].y;
-      if (obj_verts[i].z < minz)
-        minz = obj_verts[i].z;
-      else if (obj_verts[i].z > maxz)
-        maxz = obj_verts[i].z;
-    }
-  }
-  else if (num_curve_vertices == 0)
-  {
-    minx = 10000000.;
-    miny = 10000000.;
-    minz = 10000000.;
-    maxx = -10000000.;
-    maxy = -10000000.;
-    maxz = -10000000.;
-  }
-
-  if (num_curve_vertices > 0)
-  {
-    int stidx = 0;
-    if (num_vertices == 0)
-    {
-      csVector3 &cv = curve_vertices[0];
-      minx = maxx = cv.x;
-      miny = maxy = cv.y;
-      minz = maxz = cv.z;
-      stidx = 1;
-    }
-
-    for (i = stidx ; i < num_curve_vertices ; i++)
-    {
-      csVector3 &cv = curve_vertices[i];
-      if (cv.x < minx)
-        minx = cv.x;
-      else if (cv.x > maxx)
-        maxx = cv.x;
-      if (cv.y < miny)
-        miny = cv.y;
-      else if (cv.y > maxy)
-        maxy = cv.y;
-      if (cv.z < minz)
-        minz = cv.z;
-      else if (cv.z > maxz)
-        maxz = cv.z;
-    }
-  }
-
-  bbox->i7 = AddVertex (minx, miny, minz);
-  bbox->i3 = AddVertex (minx, miny, maxz);
-  bbox->i5 = AddVertex (minx, maxy, minz);
-  bbox->i1 = AddVertex (minx, maxy, maxz);
-  bbox->i8 = AddVertex (maxx, miny, minz);
-  bbox->i4 = AddVertex (maxx, miny, maxz);
-  bbox->i6 = AddVertex (maxx, maxy, minz);
-  bbox->i2 = AddVertex (maxx, maxy, maxz);
-}
-
 void csThing::GetRadius (csVector3 &rad, csVector3 &cent)
 {
   csBox3 b;
   GetBoundingBox (b);
-  rad = obj_radius;
+  rad = static_data->obj_radius;
   cent = b.GetCenter ();
 }
 
 void csThing::GetBoundingBox (csBox3 &box)
 {
-  if (obj_bbox_valid)
+  int i;
+
+  if (static_data->obj_bbox_valid)
   {
-    box = obj_bbox;
+    box = static_data->obj_bbox;
     return ;
   }
 
-  obj_bbox_valid = true;
+  static_data->obj_bbox_valid = true;
 
-  if (!bbox) CreateBoundingBox ();
-
-  if (!obj_verts)
+  if (!static_data->obj_verts)
   {
-    obj_bbox.Set (0, 0, 0, 0, 0, 0);
-    box = obj_bbox;
+    static_data->obj_bbox.Set (0, 0, 0, 0, 0, 0);
+    box = static_data->obj_bbox;
     return ;
   }
 
-  csVector3 min_bbox, max_bbox;
-  min_bbox = max_bbox = Vobj (bbox->i1);
-  if (Vobj (bbox->i2).x < min_bbox.x)
-    min_bbox.x = Vobj (bbox->i2).x;
-  else if (Vobj (bbox->i2).x > max_bbox.x)
-    max_bbox.x = Vobj (bbox->i2).x;
-  if (Vobj (bbox->i2).y < min_bbox.y)
-    min_bbox.y = Vobj (bbox->i2).y;
-  else if (Vobj (bbox->i2).y > max_bbox.y)
-    max_bbox.y = Vobj (bbox->i2).y;
-  if (Vobj (bbox->i2).z < min_bbox.z)
-    min_bbox.z = Vobj (bbox->i2).z;
-  else if (Vobj (bbox->i2).z > max_bbox.z)
-    max_bbox.z = Vobj (bbox->i2).z;
-  if (Vobj (bbox->i3).x < min_bbox.x)
-    min_bbox.x = Vobj (bbox->i3).x;
-  else if (Vobj (bbox->i3).x > max_bbox.x)
-    max_bbox.x = Vobj (bbox->i3).x;
-  if (Vobj (bbox->i3).y < min_bbox.y)
-    min_bbox.y = Vobj (bbox->i3).y;
-  else if (Vobj (bbox->i3).y > max_bbox.y)
-    max_bbox.y = Vobj (bbox->i3).y;
-  if (Vobj (bbox->i3).z < min_bbox.z)
-    min_bbox.z = Vobj (bbox->i3).z;
-  else if (Vobj (bbox->i3).z > max_bbox.z)
-    max_bbox.z = Vobj (bbox->i3).z;
-  if (Vobj (bbox->i4).x < min_bbox.x)
-    min_bbox.x = Vobj (bbox->i4).x;
-  else if (Vobj (bbox->i4).x > max_bbox.x)
-    max_bbox.x = Vobj (bbox->i4).x;
-  if (Vobj (bbox->i4).y < min_bbox.y)
-    min_bbox.y = Vobj (bbox->i4).y;
-  else if (Vobj (bbox->i4).y > max_bbox.y)
-    max_bbox.y = Vobj (bbox->i4).y;
-  if (Vobj (bbox->i4).z < min_bbox.z)
-    min_bbox.z = Vobj (bbox->i4).z;
-  else if (Vobj (bbox->i4).z > max_bbox.z)
-    max_bbox.z = Vobj (bbox->i4).z;
-  if (Vobj (bbox->i5).x < min_bbox.x)
-    min_bbox.x = Vobj (bbox->i5).x;
-  else if (Vobj (bbox->i5).x > max_bbox.x)
-    max_bbox.x = Vobj (bbox->i5).x;
-  if (Vobj (bbox->i5).y < min_bbox.y)
-    min_bbox.y = Vobj (bbox->i5).y;
-  else if (Vobj (bbox->i5).y > max_bbox.y)
-    max_bbox.y = Vobj (bbox->i5).y;
-  if (Vobj (bbox->i5).z < min_bbox.z)
-    min_bbox.z = Vobj (bbox->i5).z;
-  else if (Vobj (bbox->i5).z > max_bbox.z)
-    max_bbox.z = Vobj (bbox->i5).z;
-  if (Vobj (bbox->i6).x < min_bbox.x)
-    min_bbox.x = Vobj (bbox->i6).x;
-  else if (Vobj (bbox->i6).x > max_bbox.x)
-    max_bbox.x = Vobj (bbox->i6).x;
-  if (Vobj (bbox->i6).y < min_bbox.y)
-    min_bbox.y = Vobj (bbox->i6).y;
-  else if (Vobj (bbox->i6).y > max_bbox.y)
-    max_bbox.y = Vobj (bbox->i6).y;
-  if (Vobj (bbox->i6).z < min_bbox.z)
-    min_bbox.z = Vobj (bbox->i6).z;
-  else if (Vobj (bbox->i6).z > max_bbox.z)
-    max_bbox.z = Vobj (bbox->i6).z;
-  if (Vobj (bbox->i7).x < min_bbox.x)
-    min_bbox.x = Vobj (bbox->i7).x;
-  else if (Vobj (bbox->i7).x > max_bbox.x)
-    max_bbox.x = Vobj (bbox->i7).x;
-  if (Vobj (bbox->i7).y < min_bbox.y)
-    min_bbox.y = Vobj (bbox->i7).y;
-  else if (Vobj (bbox->i7).y > max_bbox.y)
-    max_bbox.y = Vobj (bbox->i7).y;
-  if (Vobj (bbox->i7).z < min_bbox.z)
-    min_bbox.z = Vobj (bbox->i7).z;
-  else if (Vobj (bbox->i7).z > max_bbox.z)
-    max_bbox.z = Vobj (bbox->i7).z;
-  if (Vobj (bbox->i8).x < min_bbox.x)
-    min_bbox.x = Vobj (bbox->i8).x;
-  else if (Vobj (bbox->i8).x > max_bbox.x)
-    max_bbox.x = Vobj (bbox->i8).x;
-  if (Vobj (bbox->i8).y < min_bbox.y)
-    min_bbox.y = Vobj (bbox->i8).y;
-  else if (Vobj (bbox->i8).y > max_bbox.y)
-    max_bbox.y = Vobj (bbox->i8).y;
-  if (Vobj (bbox->i8).z < min_bbox.z)
-    min_bbox.z = Vobj (bbox->i8).z;
-  else if (Vobj (bbox->i8).z > max_bbox.z)
-    max_bbox.z = Vobj (bbox->i8).z;
-  obj_bbox.Set (min_bbox, max_bbox);
-  box = obj_bbox;
-  obj_radius = (max_bbox - min_bbox) * 0.5f;
-  max_obj_radius = qsqrt (csSquaredDist::PointPoint (max_bbox, min_bbox)) * 0.5f;
+  if (static_data->num_vertices > 0)
+  {
+    static_data->obj_bbox.StartBoundingBox (static_data->obj_verts[0]);
+    for (i = 1; i < static_data->num_vertices; i++)
+    {
+      static_data->obj_bbox.AddBoundingVertexSmart (static_data->obj_verts[i]);
+    }
+  }
+
+  static_data->obj_radius = (static_data->obj_bbox.Max () - static_data->obj_bbox.Min ()) * 0.5f;
+  static_data->max_obj_radius = qsqrt (csSquaredDist::PointPoint (
+  	static_data->obj_bbox.Max (), static_data->obj_bbox.Min ())) * 0.5f;
+  box = static_data->obj_bbox;
 }
 
 void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
@@ -1913,6 +1622,7 @@ void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
     // First make sure obj_bbox is valid.
     GetBoundingBox (box);
     wor_bbox_movablenr = movable->GetUpdateNumber ();
+    csBox3& obj_bbox = static_data->obj_bbox;
 
     // @@@ Maybe it would be better to really calculate the bounding box
     // here instead of just transforming the object space bounding box?
@@ -1966,55 +1676,25 @@ void PolyMeshHelper::Setup ()
   num_verts = thing->GetVertexCount ();
   num_poly = 0;
 
-  int i, j;
+  int i;
   const csPolygonStaticArray &pol = thing->static_polygons;
-  for (i = 0; i < thing->GetPolygonCount (); i++)
+  for (i = 0 ; i < pol.Length () ; i++)
   {
     csPolygon3DStatic *p = pol.Get (i);
     if (p->flags.Check (poly_flag)) num_poly++;
   }
 
-  // Check curves.
-  for (i = 0; i < thing->GetCurveCount (); i++)
-  {
-    csCurve *c = thing->curves.Get (i);
-    csCurveTesselated *tess = c->Tesselate (1000);    // @@@ High quality?
-    num_poly += tess->GetTriangleCount ();
-    num_verts += tess->GetVertexCount ();
-  }
-
   // Allocate the arrays and the copy the data.
   if (num_verts)
   {
-    // If there are no curves we don't need to copy vertex data.
-    if (thing->GetCurveCount () == 0)
-    {
-      vertices = thing->obj_verts;
-    }
-    else
-    {
-      alloc_vertices = new csVector3[num_verts];
-      vertices = alloc_vertices;
-
-      // Copy the polygon vertices.
-      // Set num_verts to the number of vertices in polygon set so
-      // that we can continue copying vertices from curves.
-      num_verts = thing->GetVertexCount ();
-      if (num_verts)
-      {
-        memcpy (
-          vertices,
-          thing->obj_verts,
-          sizeof (csVector3) * num_verts);
-      }
-    }
+    vertices = thing->obj_verts;
   }
 
   if (num_poly)
   {
     polygons = new csMeshedPolygon[num_poly];
     num_poly = 0;
-    for (i = 0; i < thing->GetPolygonCount (); i++)
+    for (i = 0 ; i < pol.Length () ; i++)
     {
       csPolygon3DStatic *p = pol.Get (i);
       if (p->flags.Check (poly_flag))
@@ -2024,264 +1704,19 @@ void PolyMeshHelper::Setup ()
         num_poly++;
       }
     }
-
-    // Indicate that polygons after and including this index need to
-    // have their 'vertices' array cleaned up. These polygons were generated
-    // from curves.
-    curve_poly_start = num_poly;
-#ifndef CS_USE_NEW_RENDERER
-    for (i = 0; i < thing->GetCurveCount (); i++)
-    {
-      csCurve *c = thing->curves.Get (i);
-      csCurveTesselated *tess = c->Tesselate (1000);  // @@@ High quality?
-      csTriangle *tris = tess->GetTriangles ();
-      int tri_count = tess->GetTriangleCount ();
-      for (j = 0; j < tri_count; j++)
-      {
-        polygons[num_poly].num_vertices = 3;
-        polygons[num_poly].vertices = new int[3];
-
-        // Adjust indices to skip the original polygon set vertices and
-
-        // preceeding curves.
-        polygons[num_poly].vertices[0] = tris[j].a + num_verts;
-        polygons[num_poly].vertices[1] = tris[j].b + num_verts;
-        polygons[num_poly].vertices[2] = tris[j].c + num_verts;
-        num_poly++;
-      }
-
-      csVector3 *vts = tess->GetVertices ();
-      int num_vt = tess->GetVertexCount ();
-      memcpy (vertices + num_verts, vts, sizeof (csVector3) * num_vt);
-      num_verts += num_vt;
-    }
-#endif // CS_USE_NEW_RENDERER
   }
 }
 
 void PolyMeshHelper::Cleanup ()
 {
-  int i;
-
-  // Delete all polygons which were generated from curved surfaces.
-  // The other polygons just have a reference to the original polygons
-  // from the parent.
-  if (polygons)
-  {
-    for (i = curve_poly_start; i < num_poly; i++)
-    {
-      delete[] polygons[i].vertices;
-    }
-
-    delete[] polygons;
-    polygons = NULL;
-  }
-
+  delete[] polygons;
+  polygons = NULL;
   delete[] alloc_vertices;
   alloc_vertices = NULL;
   vertices = NULL;
 }
 
 //-------------------------------------------------------------------------
-
-void csThing::UpdateCurveTransform (const csReversibleTransform &movtrans)
-{
-  if (GetCurveCount () == 0) return ;
-
-  // since obj has changed (possibly) we need to tell all of our curves
-  csReversibleTransform o2w = movtrans.GetInverse ();
-  int i;
-  for (i = 0; i < GetCurveCount (); i++)
-  {
-    csCurve *c = curves.Get (i);
-    c->SetObject2World (&o2w);
-  }
-}
-
-void csThing::UpdateCurveTransform ()
-{
-  if (curves_transf_ok) return ;
-  curves_transf_ok = true;
-  if (GetCurveCount () == 0) return ;
-
-  csReversibleTransform o2w;                    // Identity transform.
-  int i;
-  for (i = 0; i < GetCurveCount (); i++)
-  {
-    csCurve *c = curves.Get (i);
-    c->SetObject2World (&o2w);
-  }
-}
-
-csPolygon3DStatic *csThing::IntersectSphere (
-  csVector3 &center,
-  float radius,
-  float *pr)
-{
-  float d, min_d = radius;
-  int i;
-  csPolygon3DStatic *p, *min_p = NULL;
-  csVector3 hit;
-
-  for (i = 0; i < static_polygons.Length (); i++)
-  {
-    p = GetPolygon3DStatic (i);
-
-    const csPlane3 &wpl = p->GetObjectPlane ();
-    d = wpl.Distance (center);
-    if (d < min_d && csMath3::Visible (center, wpl))
-    {
-      hit = -center;
-      hit -= wpl.Normal ();
-      hit *= d;
-      hit += center;
-      if (p->IntersectRay (center, hit))
-      {
-        min_d = d;
-        min_p = p;
-      }
-    }
-  }
-
-  if (pr) *pr = min_d;
-  return min_p;
-}
-
-/// The list of fog vertices
-#ifndef CS_USE_NEW_RENDERER
-typedef csGrowingArray<G3DFogInfo> engine3d_StaticFogVerts;
-CS_IMPLEMENT_STATIC_VAR (GetStaticFogVerts, engine3d_StaticFogVerts,())
-
-bool csThing::DrawCurves (
-  iRenderView *rview,
-  iMovable *movable,
-  csZBufMode zMode)
-{
-  static engine3d_StaticFogVerts &fog_verts = *GetStaticFogVerts ();
-  if (GetCurveCount () <= 0) return false;
-
-  iCamera *icam = rview->GetCamera ();
-  const csReversibleTransform &camtrans = icam->GetTransform ();
-
-  csReversibleTransform movtrans;
-
-  // Only get the transformation if this thing can move.
-  bool can_move = false;
-  if (movable && cfg_moving != CS_THING_MOVE_NEVER)
-  {
-    movtrans = movable->GetFullTransform ();
-    can_move = true;
-  }
-
-  int i;
-  int res = 1;
-
-  // Calculate tesselation resolution
-  csVector3 wv = curves_center;
-  csVector3 world_coord;
-  if (can_move)
-    world_coord = movtrans.This2Other (wv);
-  else
-    world_coord = wv;
-
-  csVector3 camera_coord = camtrans.Other2This (world_coord);
-
-  if (camera_coord.z >= SMALL_Z)
-  {
-    res = (int)(curves_scale / camera_coord.z);
-  }
-  else
-    res = 1000;                                 // some big tesselation value...
-
-  // Create the combined transform of object to camera by
-  // combining object to world and world to camera.
-  csReversibleTransform obj_cam = camtrans;
-  if (can_move) obj_cam /= movtrans;
-  rview->GetGraphics3D ()->SetObjectToCamera (&obj_cam);
-  rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
-
-  // Base of the mesh.
-  G3DTriangleMesh mesh;
-  mesh.morph_factor = 0;
-  mesh.num_vertices_pool = 1;
-  mesh.do_mirror = icam->IsMirrored ();
-  mesh.do_morph_texels = false;
-  mesh.do_morph_colors = false;
-  mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-
-  iVertexBufferManager *vbufmgr = rview->GetGraphics3D ()
-    ->GetVertexBufferManager ();
-
-  // Loop over all curves
-  csCurve *c;
-  for (i = 0; i < GetCurveCount (); i++)
-  {
-    c = curves.Get (i);
-
-    // First get a bounding box in camera space.
-    csBox3 cbox;
-    csBox2 sbox;
-    if (c->GetScreenBoundingBox (obj_cam, icam, cbox, sbox) < 0)
-      continue;                                 // Not visible.
-    int clip_portal, clip_plane, clip_z_plane;
-    if (!rview->ClipBBox (sbox, cbox, clip_portal, clip_plane, clip_z_plane))
-      continue;                                 // Not visible.
-
-    // If we have a dirty lightmap recombine the curves and the shadow maps.
-    bool updated_lm = c->RecalculateDynamicLights ();
-
-    // Create a new tesselation reuse an old one.
-    csCurveTesselated *tess = c->Tesselate (res);
-
-    // If the lightmap was updated or the new tesselation doesn't yet
-    // have a valid colors table we need to update colors here.
-    if (updated_lm || !tess->AreColorsValid ())
-      tess->UpdateColors (c->LightMap);
-
-    // Setup the structure for DrawTriangleMesh.
-    if (tess->GetVertexCount () > fog_verts.Limit ())
-    {
-      fog_verts.SetLimit (tess->GetVertexCount ());
-    }
-
-    c->GetMaterial ()->Visit ();
-
-    iVertexBuffer *vbuf = c->GetVertexBuffer ();
-
-    mesh.mat_handle = c->GetMaterialHandle ();
-    mesh.buffers[0] = vbuf;
-    mesh.num_triangles = tess->GetTriangleCount ();
-    mesh.triangles = tess->GetTriangles ();
-    mesh.clip_portal = clip_portal;
-    mesh.clip_plane = clip_plane;
-    mesh.clip_z_plane = clip_z_plane;
-    mesh.vertex_fog = fog_verts.GetArray ();
-
-    bool gouraud = !!c->LightMap;
-    mesh.mixmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);
-    mesh.use_vertex_color = gouraud;
-    if (mesh.mat_handle == NULL)
-    {
-      thing_type->Warn ("Warning! Curve without material!");
-      continue;
-    }
-
-    CS_ASSERT (!vbuf->IsLocked ());
-    vbufmgr->LockBuffer (
-        vbuf,
-        tess->GetVertices (),
-        tess->GetTxtCoords (),
-        tess->GetColors (),
-        tess->GetVertexCount (),
-        0, obj_bbox);
-    rview->CalculateFogMesh (obj_cam, mesh);
-    rview->GetGraphics3D ()->DrawTriangleMesh (mesh);
-    vbufmgr->UnlockBuffer (vbuf);
-  }
-
-  return true;                                  //@@@ RETURN correct vis info
-}
-#endif // CS_USE_NEW_RENDERER
 
 void csThing::FireListeners ()
 {
@@ -2327,7 +1762,7 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
 
   csSphere sphere;
   sphere.SetCenter (b.GetCenter ());
-  sphere.SetRadius (max_obj_radius);
+  sphere.SetRadius (static_data->max_obj_radius);
   if (can_move)
   {
     csReversibleTransform tr_o2c = camtrans;
@@ -2388,9 +1823,7 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 
   draw_busy++;
 
-  DrawCurves (rview, movable, zMode);
-
-  if (flags.Check (CS_THING_FASTMESH))
+  if (static_data->flags.Check (CS_THING_FASTMESH))
     DrawPolygonArrayDPM (
       polygons.GetArray (),
       polygons.Length (),
@@ -2417,6 +1850,7 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 
 void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
 {
+  Prepare ();
   //@@@ Ok?
   cached_movable = movable;
   WorUpdate ();
@@ -2462,15 +1896,6 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
       poly->CalculateLightingStatic (lview, movable, lptq, true);
   }
 
-  for (i = 0; i < GetCurveCount (); i++)
-  {
-    csCurve* curve = curves.Get (i);
-    if (dyn)
-      curve->CalculateLightingDynamic (lview);
-    else
-      curve->CalculateLightingStatic (lview, true);
-  }
-
   draw_busy--;
 }
 
@@ -2481,8 +1906,6 @@ void csThing::InitializeDefault ()
   int i;
   for (i = 0; i < polygons.Length (); i++)
     polygons.Get (i)->InitializeDefault ();
-  for (i = 0; i < GetCurveCount (); i++)
-    curves.Get (i)->InitializeDefaultLighting ();
 }
 
 bool csThing::ReadFromCache (iCacheManager* cache_mgr)
@@ -2494,7 +1917,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
 
   // For error reporting.
   const char* thing_name = NULL;
-  if (thing_type->do_verbose && logparent)
+  if (static_data->thing_type->do_verbose && logparent)
   {
     csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
     if (mw) thing_name = mw->QueryObject ()->GetName ();
@@ -2512,25 +1935,10 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
       if (error != NULL)
       {
         rc = false;
-        if (thing_type->do_verbose)
+        if (static_data->thing_type->do_verbose)
 	{
 	  printf ("  Thing '%s' Poly '%s': %s\n",
-	  	thing_name, static_polygons.Get (i)->GetName (),
-		error);
-	  fflush (stdout);
-        }
-      }
-    }
-    for (i = 0; i < GetCurveCount (); i++)
-    {
-      const char* error = curves.Get (i)->ReadFromCache (&mf);
-      if (error != NULL)
-      {
-        rc = false;
-        if (thing_type->do_verbose)
-	{
-	  printf ("  Thing '%s' Curve '%s': %s\n",
-	  	thing_name, curves.Get (i)->GetName (),
+	  	thing_name, static_data->static_polygons.Get (i)->GetName (),
 		error);
 	  fflush (stdout);
         }
@@ -2539,7 +1947,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
   }
   else
   {
-    if (thing_type->do_verbose)
+    if (static_data->thing_type->do_verbose)
     {
       printf ("  Thing '%s': Could not find cached lightmap file for thing!\n",
       	thing_name);
@@ -2563,8 +1971,6 @@ bool csThing::WriteToCache (iCacheManager* cache_mgr)
   csMemFile mf;
   for (i = 0; i < polygons.Length (); i++)
     if (!polygons.Get (i)->WriteToCache (&mf)) goto stop;
-  for (i = 0; i < GetCurveCount (); i++)
-    if (!curves.Get (i)->WriteToCache (&mf)) goto stop;
   if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
     	"thing_lm", NULL, (uint32) ~0))
     goto stop;
@@ -2581,149 +1987,36 @@ void csThing::PrepareLighting ()
   int i;
   for (i = 0; i < polygons.Length (); i++)
     polygons.Get (i)->PrepareLighting ();
-  for (i = 0; i < GetCurveCount (); i++) curves.Get (i)->PrepareLighting ();
 }
 
 void csThing::Merge (csThing *other)
 {
   int i, j;
-  int *merge_vertices = new int[other->GetVertexCount () + 1];
-  for (i = 0; i < other->GetVertexCount (); i++)
-    merge_vertices[i] = AddVertex (other->Vwor (i));
+  int *merge_vertices = new int[other->static_data->GetVertexCount () + 1];
+  for (i = 0; i < other->static_data->GetVertexCount (); i++)
+    merge_vertices[i] = static_data->AddVertex (other->Vwor (i));
 
   for (i = 0; i < other->polygons.Length (); i++)
   {
-    csPolygon3D *p = other->GetPolygon3D (i);
-    csPolygon3DStatic *sp = other->GetPolygon3DStatic (i);
+    //csPolygon3D *p = other->GetPolygon3D (i);
+    csPolygon3DStatic *sp = other->static_data->GetPolygon3DStatic (i);
     int *idx = sp->GetVertices ().GetVertexIndices ();
     for (j = 0; j < sp->GetVertices ().GetVertexCount (); j++)
       idx[j] = merge_vertices[idx[j]];
-    AddPolygon (sp, p);
+    static_data->AddPolygon (sp);
     other->polygons[i] = NULL;
   }
 
-  for (i = 0; i < other->GetCurveVertexCount (); i++)
-    AddCurveVertex (other->GetCurveVertex (i), other->GetCurveTexel (i));
-
-  while (other->curves.Length () > 0)
-  {
-    csCurve *c = other->curves.Extract (0);
-    AddCurve (c);
-  }
-
   delete[] merge_vertices;
-}
-
-void csThing::MergeTemplate (
-  iThingFactoryState *tpl,
-  iMaterialWrapper *default_material,
-  csVector3 *shift,
-  csMatrix3 *transform)
-{
-  int i, j;
-  int *merge_vertices;
-
-  flags.SetAll (tpl->GetFlags ().Get ());
-
-  //TODO should merge? take averages or something?
-  curves_center = tpl->GetCurvesCenter ();
-  curves_scale = tpl->GetCurvesScale ();
-
-  //@@@ TEMPORARY
-  csRef<iThingState> ith (SCF_QUERY_INTERFACE (tpl, iThingState));
-  ParentTemplate = (csThing *) (ith->GetPrivateObject ());
-
-  merge_vertices = new int[tpl->GetVertexCount () + 1];
-  for (i = 0; i < tpl->GetVertexCount (); i++)
-  {
-    csVector3 v;
-    v = tpl->GetVertex (i);
-    if (transform) v = *transform * v;
-    if (shift) v += *shift;
-    merge_vertices[i] = AddVertex (v);
-  }
-
-  for (i = 0; i < tpl->GetPolygonCount (); i++)
-  {
-    iPolygon3DStatic *pt = tpl->GetPolygon (i);
-    csPolygon3D *p;
-    iMaterialWrapper *mat = pt->GetMaterial ();
-    p = NewPolygon (mat);
-    csPolygon3DStatic* ps = p->GetStaticData ();
-    ps->SetName (pt->GetName ());
-
-    iMaterialWrapper *wrap = pt->GetMaterial ();
-    if (!wrap && default_material)
-      ps->SetMaterial (default_material);
-
-    int *idx = pt->GetVertexIndices ();
-    for (j = 0; j < pt->GetVertexCount (); j++)
-      ps->AddVertex (merge_vertices[idx[j]]);
-
-    ps->flags.SetAll (pt->GetFlags ().Get ());
-    ps->CopyTextureType (pt);
-  }
-
-  for (i = 0; i < tpl->GetCurveVertexCount (); i++)
-  {
-    csVector3 v = tpl->GetCurveVertex (i);
-    if (transform) v = *transform * v;
-    if (shift) v += *shift;
-    AddCurveVertex (v, tpl->GetCurveTexel (i));
-  }
-
-  for (i = 0; i < tpl->GetCurveCount (); i++)
-  {
-    iCurve *orig_curve = tpl->GetCurve (i);
-    iCurve *p = CreateCurve ();
-    int j;
-    for (j = 0 ; j < orig_curve->GetVertexCount () ; j++)
-      p->SetVertex (j, orig_curve->GetVertex (j));
-    p->QueryObject ()->SetName (orig_curve->QueryObject ()->GetName ());
-    if (orig_curve->GetMaterial ())
-      p->SetMaterial (orig_curve->GetMaterial ());
-    else
-      p->SetMaterial (default_material);
-  }
-
-  delete[] merge_vertices;
-}
-
-void csThing::ReplaceMaterials (iMaterialList *matList, const char *prefix)
-{
-  int i;
-  for (i = 0; i < GetPolygonCount (); i++)
-  {
-    csPolygon3DStatic *p = GetPolygon3DStatic (i);
-    const char *txtname = p->GetMaterialWrapper ()->QueryObject ()->GetName ();
-    char *newname = new char[strlen (prefix) + strlen (txtname) + 2];
-    sprintf (newname, "%s_%s", prefix, txtname);
-
-    iMaterialWrapper *mw = matList->FindByName (newname);
-    if (mw != NULL) p->SetMaterial (mw);
-    delete[] newname;
-  }
 }
 
 //---------------------------------------------------------------------------
-iCurve *csThing::ThingFactoryState::GetCurve (int idx) const
-{
-  csCurve *c = scfParent->GetCurve (idx);
-  return &(c->scfiCurve);
-}
 
 iPolygon3D *csThing::ThingState::GetPolygon (int idx)
 {
   csPolygon3D *p = scfParent->GetPolygon3D (idx);
   if (!p) return NULL;
   return &(p->scfiPolygon3D);
-}
-
-iPolygon3DStatic *csThing::ThingFactoryState::GetPolygon (int idx)
-{
-  csPolygon3DStatic *p = scfParent->GetPolygon3DStatic (idx);
-  if (!p) return NULL;
-  return &(p->scfiPolygon3DStatic);
 }
 
 iPolygon3D *csThing::ThingState::GetPolygon (const char *name)
@@ -2733,57 +2026,11 @@ iPolygon3D *csThing::ThingState::GetPolygon (const char *name)
   return &(p->scfiPolygon3D);
 }
 
-iPolygon3DStatic *csThing::ThingFactoryState::GetPolygon (
-	const char *name)
-{
-  csPolygon3D *p = scfParent->GetPolygon3D (name);
-  if (!p) return NULL;
-  return &(p->GetStaticData ()->scfiPolygon3DStatic);
-}
-
-iPolygon3DStatic *csThing::ThingFactoryState::CreatePolygon (const char *name)
-{
-  csPolygon3DStatic *sp = new csPolygon3DStatic ((iMaterialWrapper *)NULL);
-  if (name) sp->SetName (name);
-  csPolygon3D* p = new csPolygon3D (sp);
-  scfParent->AddPolygon (sp, p);
-  return &(sp->scfiPolygon3DStatic);
-}
-
-int csThing::ThingFactoryState::GetPortalCount () const
-{
-  return scfParent->portal_polygons.Length ();
-}
-
-iPortal *csThing::ThingFactoryState::GetPortal (int idx) const
-{
-  csPolygon3DStatic *p = scfParent->static_polygons.Get (
-		  scfParent->portal_polygons[idx]);
-  return &(p->GetPortal ()->scfiPortal);
-}
-
-iPolygon3DStatic *csThing::ThingFactoryState::GetPortalPolygon (int idx) const
-{
-  csPolygon3DStatic *p = (scfParent->static_polygons.Get (
-		  scfParent->portal_polygons[idx]));
-  return &(p->scfiPolygon3DStatic);
-}
-
 iPolygon3D *csThing::ThingState::GetPortalPolygon (int idx) const
 {
   csPolygon3D *p = (scfParent->polygons.Get (
-		  scfParent->portal_polygons[idx]));
+		  scfParent->static_data->portal_polygons[idx]));
   return &(p->scfiPolygon3D);
-}
-
-iPolygon3DStatic* csThing::ThingFactoryState::IntersectSegment (
-	const csVector3& start,
-	const csVector3& end, csVector3& isect,
-	float* pr, bool only_portals)
-{
-  csPolygon3D* p = scfParent->IntersectSegment (start, end, isect, pr,
-  	only_portals);
-  return p ? &(p->GetStaticData ()->scfiPolygon3DStatic) : NULL;
 }
 
 iPolygon3D* csThing::ThingState::IntersectSegment (
@@ -2791,24 +2038,16 @@ iPolygon3D* csThing::ThingState::IntersectSegment (
 	const csVector3& end, csVector3& isect,
 	float* pr, bool only_portals)
 {
-  csPolygon3D* p = scfParent->IntersectSegment (start, end, isect, pr,
+  int p = scfParent->static_data->IntersectSegmentIndex (start, end, isect, pr,
   	only_portals);
-  return p ? &(p->scfiPolygon3D) : NULL;
+  return p != -1 ? &(scfParent->polygons.Get (p)->scfiPolygon3D) : NULL;
 }
 
 //---------------------------------------------------------------------------
 iMeshObjectFactory *csThing::MeshObject::GetFactory () const
 {
   if (!scfParent->ParentTemplate) return NULL;
-  return &scfParent->ParentTemplate->scfiMeshObjectFactory;
-}
-
-//---------------------------------------------------------------------------
-csPtr<iMeshObject> csThing::MeshObjectFactory::NewInstance ()
-{
-  csThing *thing = new csThing (scfParent, scfParent->thing_type);
-  thing->MergeTemplate (&(scfParent->scfiThingFactoryState), NULL);
-  return csPtr<iMeshObject> (&thing->scfiMeshObject);
+  return (iMeshObjectFactory*)(scfParent->ParentTemplate->GetStaticData ());
 }
 
 //---------------------------------------------------------------------------
@@ -2840,9 +2079,14 @@ SCF_EXPORT_CLASS_TABLE (thing)
 	"Crystal Space Thing Mesh Type")
 SCF_EXPORT_CLASS_TABLE_END
 
-csThingObjectType::csThingObjectType (
-  iBase *pParent)
+csThingObjectType::csThingObjectType (iBase *pParent) :
+	blk_polygon3d (2000),
+	blk_polygon3dstatic (2000),
+	blk_lightmapmapping (2000),
+	blk_polytex (2000),
+	blk_lightmap (2000)
 {
+printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"); fflush (stdout);
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingEnvironment);
@@ -2856,6 +2100,7 @@ csThingObjectType::~csThingObjectType ()
 {
   delete render_pol2d_pool;
   delete lightpatch_pool;
+printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n"); fflush (stdout);
 }
 
 bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
@@ -2893,7 +2138,7 @@ void csThingObjectType::Clear ()
 
 csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
 {
-  csThing *cm = new csThing (this, this);
+  csThingStatic *cm = new csThingStatic (this, this);
   csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (
       cm, iMeshObjectFactory));
   cm->DecRef ();

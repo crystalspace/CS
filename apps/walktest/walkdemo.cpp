@@ -1270,9 +1270,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
   csRef<iThingState> thing_state (
   	SCF_QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState));
-  csRef<iThingFactoryState> thing_fact_state (
-  	SCF_QUERY_INTERFACE (thing->GetMeshObject (),
-  	iThingFactoryState));
+  csRef<iThingFactoryState> thing_fact_state = thing_state->GetFactory ();
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   thing->GetMovable ()->SetSector (room);
   float dx = 1, dy = 3, dz = .3;

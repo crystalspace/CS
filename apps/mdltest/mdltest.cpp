@@ -452,10 +452,11 @@ bool Simple::Initialize (const char *iConfigName)
     exit (1);
   }
 
-  csRef<iMeshObjectFactory> ThingFactory (ThingType->NewFactory ());
+  csRef<iMeshObjectFactory> ThingFactory = ThingType->NewFactory ();
+  csRef<iMeshObject> ThingObject = ThingFactory->NewInstance ();
 
-  csRef<iThingFactoryState> fState (
-	SCF_QUERY_INTERFACE (ThingFactory, iThingFactoryState));
+  csRef<iThingState> fs = SCF_QUERY_INTERFACE (ThingObject, iThingState);
+  csRef<iThingFactoryState> fState = fs->GetFactory ();
   csRef<iModelDataObject> mdo (
   	CS_GET_CHILD_OBJECT (Model->QueryObject (), iModelDataObject));
   crossbuilder->BuildThing (mdo, fState, tm);
@@ -463,7 +464,7 @@ bool Simple::Initialize (const char *iConfigName)
   iMeshFactoryWrapper *sfWrapper = crossbuilder->BuildSpriteFactoryHierarchy (
   	Model, engine, tm);
 
-  csRef<iMeshObject> ThingObject (ThingFactory->NewInstance ());
+  ThingObject = ThingFactory->NewInstance ();
   csRef<iMeshWrapper> ThingWrapper (engine->CreateMeshWrapper (ThingObject, "thing"));
   csRef<iMeshWrapper> SpriteWrapper (engine->CreateMeshWrapper (sfWrapper, "sprite"));
 

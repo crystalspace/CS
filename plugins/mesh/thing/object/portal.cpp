@@ -68,6 +68,20 @@ csPortal::~csPortal ()
   }
 }
 
+csPortal* csPortal::Clone ()
+{
+  csPortal* clone = new csPortal ();
+  clone->SetSector (sector);
+  clone->flags.SetAll (flags.Get ());
+  clone->warp_obj = warp_obj;
+  clone->max_sector_visit = max_sector_visit;
+  clone->filter_texture = filter_texture;
+  clone->filter_r = filter_r;
+  clone->filter_g = filter_g;
+  clone->filter_b = filter_b;
+  return clone;
+}
+
 iReferencedObject *csPortal::GetReferencedObject () const
 {
   if (!sector) return NULL;

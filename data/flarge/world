@@ -248,6 +248,8 @@
         </priority>
     </renderpriorities>
     <plugins>
+        <plugin name="bezier">crystalspace.mesh.loader.bezier</plugin>
+        <plugin name="bezierFact">crystalspace.mesh.loader.factory.bezier</plugin>
         <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
         <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
         <plugin name="spr3dFact">crystalspace.mesh.loader.factory.sprite.3d</plugin>
@@ -1100,7 +1102,7 @@
         </params>
     </meshfact>
     <meshfact name="tunnel">
-        <plugin>thingFact</plugin>
+        <plugin>bezierFact</plugin>
         <params>
             <curvecenter x="0" y="0" z="0" />
             <curvescale>80</curvescale>
@@ -1432,6 +1434,7 @@
                 <v>11</v>
                 <v>0</v>
             </p>
+            <smooth />
         </params>
     </meshfact>
     <meshfact name="band">
@@ -1775,6 +1778,7 @@
                 <v>36</v>
                 <v>47</v>
             </p>
+            <smooth />
         </params>
     </meshfact>
     <meshfact name="metablobfact">
@@ -6859,7 +6863,6 @@
             <params>
                 <factory>circle</factory>
                 <moveable />
-                <smooth />
             </params>
             <move>
                 <v x="-16" y="1" z="30" />
@@ -6870,7 +6873,6 @@
             <params>
                 <factory>band</factory>
                 <moveable />
-                <smooth />
             </params>
             <move>
                 <matrix>
@@ -6884,7 +6886,6 @@
             <params>
                 <factory>band</factory>
                 <moveable />
-                <smooth />
             </params>
             <move>
                 <matrix>
@@ -13124,7 +13125,7 @@
             <priority>alpha</priority>
         </meshobj>
         <meshobj name="tunnel_1">
-            <plugin>thing</plugin>
+            <plugin>bezier</plugin>
             <params>
                 <factory>tunnel</factory>
             </params>

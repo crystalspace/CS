@@ -22,14 +22,9 @@ geometry of a sector so that it represents a closed space. Things are not
 very dynamic in nature (although you can have things that move) so they
 are most often used for static geometry.
 
-Things support both polygons and curved surfaces (bezier surfaces only
-at this moment). Things also support portals which means that they can
+Things support polygons. Things also support portals which means that they can
 be used to define transition polygons between adjacent or non-adjacent
 sectors.
-
-One important aspect of the thing mesh object is that there is no difference
-between a mesh object and a mesh factory. You can create a mesh factory
-and use it as a mesh object.
 
 @subsubheading Basic Structure
 
@@ -42,10 +37,6 @@ Type plugin: @samp{crystalspace.mesh.object.thing}
 Loader plugin: @samp{crystalspace.mesh.loader.thing}
 @item
 Factory loader plugin: @samp{crystalspace.mesh.loader.factory.thing}
-@item
-Plane loader addon plugin: @samp{crystalspace.mesh.loader.thing.plane}
-@item
-Bezier curve loader addon plugin: @samp{crystalspace.mesh.loader.thing.bezier}
 @end itemize
 
 Objects in this plugin implement the following @sc{scf} interfaces (get
@@ -53,16 +44,20 @@ with @code{SCF_QUERY_INTERFACE()}):
 
 @itemize @bullet
 @item
-@emph{MeshObject} and @emph{MeshObjectFactory}
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iThingFactoryState}
+@end itemize
+@item
+@emph{MeshObject}
 @itemize @bullet
 @item
 Implements @samp{iMeshObject}
 @item
-Implements @samp{iMeshObjectFactory}
-@item
 Implements @samp{iThingState}
-@item
-Implements @samp{iThingFactoryState}
 @item
 Implements @samp{iPolygonMesh}
 @item
@@ -92,8 +87,8 @@ curved surfaces, and various other configuration parameters for a thing.
 @samp{iThingState} is for thing instances.
 
 All include files for the thing mesh can be found in the
-@file{CS/include/imesh/thing} directory. There are include files for the
-curve definition, for lightmaps, polygons, portals, ...
+@file{CS/include/imesh/thing} directory. There are include files for
+lightmaps, polygons, portals, ...
 
 @subsubheading Factory and Object Loader
 
@@ -120,42 +115,9 @@ table always starts at index 0. Every vertex you add will use a new index.
 @item vertex <v x="" y="" z="" />
 Define a single vertex given three coordinates. The coordinates are given
 in local object space for this thing.
-@item vblock(minx,miny,minz,maxx,maxy,maxz) FIXME: obsolete ?
-This is a conveniance command that creates eight vertices shaped in a block.
-You can then easily define polygons that use some of these vertices to form
-one surface of the block. vblock expects six parameters which
-are the dimensions of the block.
-@item vroom(minx,miny,minz,maxx,maxy,maxz) FIXME: obsolete ?
-This command is similar to vblock. Except that it will generate the vertices
-in a different order so that later created polygons will
-be visible from the inside instead of the outside.
-@item circle(x,y,z,rx,ry,rz,num) FIXME: obsolete ?
-Generate a circle of vertices.
-@samp{x,y,z} is the centre of the circle. @samp{rx,ry,rz} is the radius of
-the circle. @samp{num} is the number of vertices to generate. If @samp{num}
-is negative the vertices will be generated in a different direction.
 @item polygon <p name=""> @dots{}
 This defines a single polygon using the vertices described above. The
 definition of a polygon is given below.
-@end table
-
-@item
-Curve related commands. Currently only 3x3 bezier patches are supported.
-Note that to use a curve in a thing mesh object you need to describe
-a curve template first (more on this later).
-@table @code
-@item <curvecontrol x="" y="" z="" u="" v="" />
-A control point for a curve. There are 9 control points (for a 3x3
-bezier patch). Every control point has the following format: @samp{x,y,z,u,v}.
-@samp{x,y,z} is the location of the point in object space. @samp{u,v} is
-the texture mapping coordinate for this control point.
-@item <curvecenter x="" y="" z="" />
-Set the center point (@samp{x,y,z}) of the curve.
-@item <curvescale>scaleValue</curvescale>
-Set the scale of the curve.
-@item <curve name="curveTemplateName">curveName</curve>
-Get the name of the curve template to use for this curve. Read about curve
-templates later.
 @end table
 
 @item
@@ -187,14 +149,19 @@ illegal to later move the thing.
 @item <fastmesh>yes/no</fastmesh>
 This command only works for the top-level thing. It indicates that this
 mesh will be rendered using a faster technique. At this moment this is
-not properly implemented though.
+default if the number of polygons exceeds some threshold.
 @item <factory>factoryName</factory>
 This thing will be made from the given thing factory.
-@item template(factoryName) FIXME: obsolete ?
-Same as @samp{factory}
 @item <clone>thingName</clone>
 This is similar to @samp{factory} but the thing will be made from the
 given thing instead. i.e. it is a clone.
+@item <cosfact>factorValue</cosfact>
+The cosinus factor to use for lighting. The default is 0 which means
+that the strength of the light falling on this polygon will depend
+completely on the angle of the light and a polygon. This is the most
+realistic setting but in some cases it doesn't look right. To completely
+disable dependence on angle you can use 1. In between values are also
+possible.
 @end table
 @end itemize
 
@@ -244,19 +211,19 @@ using angle.
 @item <color red="" green="" blue="" @dots{} />
 When using @samp{uv} you can use this command to give colors (r,g,b) for
 every vertex.
-@item colldet(boolean) FIXME: where is this now ?
+@item colldet(boolean)
 Enable/disable collision detection for this polygon. By default a normal
 polygon will have collision detection enabled. If the polygon has a portal
 then collision detection will be disabled unless the portal is a mirror in
 which case it will be enabled again. But using @samp{colldet} allows you to
 override all this.
-@item <cosfact>factorValue</cosfact>
-The cosinus factor to use for lighting. The default is 0 which means
-that the strength of the light falling on this polygon will depend
-completely on the angle of the light and this polygon. This is the most
-realistic setting but in some cases it doesn't look right. To completely
-disable dependence on angle you can use 1. In between values are also
-possible.
+@item viscull(boolean)
+Enable/disable visibility culling for this polygon. By default a normal
+polygon will have visibility culling enabled. If the polygon has alpha
+then it will be disabled. However if the polygon uses a transparent texture
+then CS cannot easily detect that so in that case you have to disable it
+manually. This flag tells the visibility culler that this polygon should NOT
+be used to cull other objects (i.e. to block visibility).
 @item <alpha>alphaValue</alpha>
 Using this you can set the alpha transparency factor of this polygon.
 This is a value between 0 and 100.
@@ -346,9 +313,6 @@ mapping planes for polygons that share the same texture mapping.
 The following keywords are supported by the plane loader:
 
 @table @code
-@item <name>planeName</name>
-The name of this plane. This can then be used later in @samp{p} commands
-for the texture or polygon.
 @item <orig x="" y="" z="" />
 The origin for texture mapping (3D coord).
 @item <first x="" y="" z="" />
@@ -371,20 +335,3 @@ Most general way to describe texture mapping using the transformation matrix.
 Most general way to describe texture mapping using the transformation vector.
 @end table
 
-@subsubheading Bezier Curve Add-on Loader
-
-The thing loader also supports an additional plugin which can load curve
-template definitions.
-
-The following keywords are supported by the bezier curve loader:
-
-@table @code
-@item <name>curveTemplateName</name>
-The name of this curve template. This can then be used later in @samp{curve}
-commands in the thing part definition.
-@item <material>materialName</material>
-The material to use for this curve.
-@item vertices <v>number</v> @dots{} nine times
-Nine vertex indices (the exact position and texture mapping coordinate will
-be defined in the thing mesh object using @samp{curvecontrol}).
-@end table

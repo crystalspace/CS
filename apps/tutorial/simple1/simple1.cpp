@@ -72,7 +72,6 @@ void Simple::SetupFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
-
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
@@ -236,8 +235,9 @@ bool Simple::Initialize ()
 
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state (
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingFactoryState));
+  csRef<iThingState> ws =
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
   iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);

@@ -37,11 +37,14 @@ mesh object plugin instead.
 @cindex Bezier Curve Changes
 @cindex @code{iCurveTemplate}
 @cindex @code{iCurve}
+@cindex @code{iBezierState}
+@cindex @code{iBezierFactoryState}
 
 The notion of curve templates has been reworked. @code{iCurveTemplate} has
 been removed and it's functionality has moved to @code{iCurve} itself.
 As a consequence of this change the bezier addon loader has been removed.
-A curve like this in the past:
+Also curves have been seperated from the thing plugin and now live in the
+'bezier' plugin. So a curve like this in the past:
 @example
 <addon>
   <plugin>crystalspace.mesh.loader.thing.bezier</plugin>
@@ -65,11 +68,11 @@ A curve like this in the past:
 </meshfact>
 @end example
 
-should now become:
+should now become (mark the new plugin line):
 
 @example
 <meshfact name="tunnel">
-  <plugin>crystalspace.mesh.loader.factory.thing</plugin>
+  <plugin>crystalspace.mesh.loader.factory.bezier</plugin>
   <params>
     <curvecenter x="0" y="0" z="0" />
     <curvescale>80</curvescale>
@@ -85,10 +88,20 @@ should now become:
 </meshfact>
 @end example
 
+On the @sc{api} side nothing much changes except that when you use
+the bezier mesh plugin you need to use @code{iBezierState} and
+@code{iBezierFactoryState}.
+
+The @code{iThingEnvironment} no longer has code to maintain bezier curve
+templates.
+
 @subheading iThingState and iPolygon3D Changes
 @cindex @code{iThingState}
+@cindex @code{iThingFactoryState}
 @cindex @code{iPolygon3D}
 @cindex @code{iObject}
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
 
 @code{iPolygon3D} and @code{iThingState} no longer implement @code{iObject}.
 So the @code{QueryObject()} function has been removed. Polygons can still
@@ -100,7 +113,18 @@ can be put in a factory. Several functions like
 @code{iThingState->CreatePolygon()} will now return @code{iPolygon3DStatic}.
 
 @code{iThingState} has been split in @code{iThingState} and
-@code{iThingFactoryState}.
+@code{iThingFactoryState}. A thing mesh no longer implements both a mesh
+object and a mesh object factory. Instead things now work like usual
+mesh objects where @code{iMeshObjectType->NewFactory()} creates a
+factory that implements @code{iThingFactoryState} and
+@code{iMeshObjectFactory->NewInstance()} creates an instance that implements
+@code{iThingState}. The engine conveniance functions to create a thing
+mesh will automatically create both the factory and mesh so you don't
+have to worry about that. You can use @code{iThingState->GetFactory()}
+from a thing mesh object to get the @code{iThingFactoryState} so you can
+build the polygons. Note that @code{SCF_QUERY_INTERFACE} of
+@code{iThingFactoryState} no longer works on a thing mesh object. You must
+use @code{GetFactory}.
 
 @subheading Polygon Planes
 @cindex @code{iPolyTxtPlane}

@@ -31,7 +31,6 @@ struct iPolygon3DStatic;
 struct iPortal;
 struct iGraphics3D;
 struct iFrustumView;
-struct iCurve;
 struct iMaterialWrapper;
 struct iMaterialList;
 struct iMovable;
@@ -131,54 +130,6 @@ struct iThingFactoryState : public iBase
 
   /// Set thing flags (see CS_THING_... values above)
   virtual csFlags& GetFlags () = 0;
-
-  /**
-   * Get the center of the curves.
-   */
-  virtual const csVector3& GetCurvesCenter () const = 0;
-  /**
-   * Set the center of the curves.
-   */
-  virtual void SetCurvesCenter (const csVector3& cen) = 0;
-
-  /**
-   * Get the scale of the curves.
-   */
-  virtual float GetCurvesScale () const = 0;
-  /**
-   * Set the scale of the curves.
-   */
-  virtual void SetCurvesScale (float scale) = 0;
-
-  /// Add a curve vertex.
-  virtual void AddCurveVertex (const csVector3& v, const csVector2& uv) = 0;
-  /// Get the number of curves.
-  virtual int GetCurveCount () const = 0;
-  /// Get the curve.
-  virtual iCurve* GetCurve (int idx) const = 0;
-  /// Get the number of curve vertices.
-  virtual int GetCurveVertexCount () const = 0;
-  /// Get the specified curve vertex.
-  virtual csVector3& GetCurveVertex (int i) const = 0;
-  /// Get the curve vertices.
-  virtual csVector3* GetCurveVertices () const = 0;
-  /// Get the specified curve texture coordinate (texel).
-  virtual csVector2& GetCurveTexel (int i) const = 0;
-  /// Set a curve vertex.
-  virtual void SetCurveVertex (int idx, const csVector3& vt) = 0;
-  /// Set a curve texel.
-  virtual void SetCurveTexel (int idx, const csVector2& vt) = 0;
-  /// Clear all curve vertices (and texels too).
-  virtual void ClearCurveVertices () = 0;
-
-  /// Create a new curve for this thing.
-  virtual iCurve* CreateCurve () = 0;
-  /// Find the index for a curve. Returns -1 if curve cannot be found.
-  virtual int FindCurveIndex (iCurve* curve) const = 0;
-  /// Delete a curve given an index.
-  virtual void RemoveCurve (int idx) = 0;
-  /// Delete all curves.
-  virtual void RemoveCurves () = 0;
 
   /**
    * Add polygons and vertices from the specified thing (seen as template).

@@ -41,68 +41,13 @@ class csLightMap;
 class csLightPatch;
 class csPolyTexture;
 class csThing;
+class csThingStatic;
 struct iFile;
 struct iLight;
 struct iGraphics2D;
 struct iGraphics3D;
 struct iCacheManager;
 struct iMaterialWrapper;
-
-/**
- * Structure containing all required information
- * for lightmapped polygons.
- */
-class csPolyTexLightMap
-{
-  friend class csPolygon3D;
-
-public:
-  /// Transformation from world to texture space.
-  csMatrix3 m_world2tex;
-  /// Translation from world to texture space.
-  csVector3 v_world2tex;
-
-private:
-  /// The transformed texture for this polygon.
-  csPolyTexture *tex;
-
-  /**
-   * This bool indicates if the lightmap is up-to-date (read from the
-   * cache). If set to false the polygon still needs to be lit.
-   */
-  bool lightmap_up_to_date;
-
-private:
-  /// Constructor.
-  csPolyTexLightMap (csLightMapMapping* mapping);
-
-  /// Destructor.
-  ~csPolyTexLightMap ();
-
-public:
-  /// Get the polytexture (lighted texture)
-  csPolyTexture* GetPolyTex ();
-
-  /**
-   * Get the lightmap belonging with this polygon.
-   */
-  iLightMap* GetLightMap () { return tex->GetLightMap (); }
-
-  /**
-   * Transform this plane from object space to world space using
-   * the given transform.
-   */
-  void ObjectToWorld (const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
-  	const csReversibleTransform& obj);
-
-  /**
-   * Transform this plane from world space to camera space using
-   * the given transform. The resulting transform is put in m_cam2tex
-   * and v_cam2tex.
-   */
-  void WorldToCamera (const csReversibleTransform& t,
-  	csMatrix3& m_cam2tex, csVector3& v_cam2tex);
-};
 
 /*---------------------------------------------------------------------------*/
 
@@ -156,7 +101,7 @@ private:
    * new thing (things keep a list of all polygons having a portal
    * on them).
    */
-  csThing* thing;
+  csThingStatic* thing_static;
 
   /**
    * If not-null, this polygon is a portal.
@@ -177,7 +122,11 @@ private:
    */
   iMaterialWrapper* material;
 
-  /// How to map the lightmap on the polygon.
+  /**
+   * How to map the lightmap on the polygon.
+   * Warning! Objects of this type are allocated on
+   * csThingObjectType->blk_lightmapmapping.
+   */
   csLightMapMapping* mapping;
 
   /**
@@ -209,8 +158,10 @@ public:
 public:
   /**
    * Construct a new polygon with the given material.
+   * Warning! Objects of this type are allocated on
+   * csThingObjectType->blk_polygon3dstatic.
    */
-  csPolygon3DStatic (iMaterialWrapper *mat);
+  csPolygon3DStatic ();
 
   /**
    * Delete everything related to this polygon. Less is
@@ -345,12 +296,12 @@ public:
   /**
    * Set the thing that this polygon belongs to.
    */
-  void SetParent (csThing* thing);
+  void SetParent (csThingStatic* thing_static);
 
   /**
    * Get the polygonset (container) that this polygons belongs to.
    */
-  csThing* GetParent () { return thing; }
+  csThingStatic* GetParent () { return thing_static; }
 
   /// Name handling.
   const char* GetName () const { return name; }
@@ -405,7 +356,7 @@ public:
    * a reference to the vertex in object-space is returned.
    */
   const csVector3& Vobj (int idx) const
-  { return thing->Vobj (vertices.GetVertexIndices ()[idx]); }
+  { return thing_static->Vobj (vertices.GetVertexIndices ()[idx]); }
 
   /**
    * Set the material for this polygon.
@@ -628,6 +579,9 @@ public:
     return (MixMode | Alpha);
   }
 
+  /// Make a clone of this static polygon.
+  csPolygon3DStatic* Clone ();
+
   SCF_DECLARE_IBASE;
 
   //--------------- iPolygon3DStatic interface implementation ---------------
@@ -639,7 +593,7 @@ public:
     virtual csPolygon3DStatic *GetPrivateObject () { return scfParent; }
     virtual const char* GetName () const { return scfParent->GetName (); }
     virtual void SetName (const char* name) { scfParent->SetName (name); }
-    virtual iThingState *GetParent ();
+    virtual iThingFactoryState *GetParent ();
     virtual iMaterialHandle *GetMaterialHandle ()
     { return scfParent->GetMaterialHandle (); }
     virtual void SetMaterial (iMaterialWrapper* mat)
@@ -659,16 +613,16 @@ public:
     { return scfParent->Vobj (idx); }
     virtual int CreateVertex (int idx)
     { return scfParent->AddVertex (idx); }
-    virtual int CreateVertex (const csVector3 &iVertex)
-    { return scfParent->AddVertex (iVertex); }
+    virtual int CreateVertex (const csVector3 &vertex)
+    { return scfParent->AddVertex (vertex); }
 
     virtual int GetAlpha ()
     { return scfParent->GetAlpha (); }
     virtual void SetAlpha (int iAlpha)
     { scfParent->SetAlpha (iAlpha); }
 
-    virtual void CreatePlane (const csVector3 &iOrigin,
-      const csMatrix3 &iMatrix);
+    virtual void CreatePlane (const csVector3 &origin,
+      const csMatrix3 &matrix);
 
     virtual csFlags& GetFlags ()
     { return scfParent->flags; }
@@ -678,9 +632,9 @@ public:
       scfParent->SetCSPortal (NULL, true);
       return &(scfParent->GetPortal ()->scfiPortal);
     }
-    virtual iPortal* CreatePortal (iSector *iTarget)
+    virtual iPortal* CreatePortal (iSector *target)
     {
-      scfParent->SetCSPortal (iTarget);
+      scfParent->SetCSPortal (target);
       return &(scfParent->GetPortal ()->scfiPortal);
     }
     virtual iPortal* GetPortal ()
@@ -807,16 +761,19 @@ private:
   csLightPatch *lightpatches;
 
   /**
-   * Texture type specific information for this polygon. Can be
-   * csPolyTexLightMap.
+   * Texture type specific information for this polygon.
+   * Warning! Objects of this type are allocated on
+   * csThingObjectType->blk_polytex.
    */
-  csPolyTexLightMap *txt_info;
+  csPolyTexture *txt_info;
 
 public:
   /**
    * Construct a new polygon with the given material.
+   * Warning! Objects of this type are allocated on
+   * csThingObjectType->blk_polygon3d.
    */
-  csPolygon3D (csPolygon3DStatic* static_data);
+  csPolygon3D ();
 
   /**
    * Delete everything related to this polygon. Less is
@@ -828,10 +785,14 @@ public:
   /**
    * Get the lightmap information.
    */
-  csPolyTexLightMap *GetLightMapInfo () const { return txt_info; }
+  csPolyTexture* GetPolyTexture () const { return txt_info; }
 
   /**
-   * @@@@@@@@ NEEDED?
+   * Set the static data.
+   */
+  void SetStaticData (csPolygon3DStatic* static_data);
+
+  /**
    * After the plane normal and the texture matrices have been set
    * up this routine makes some needed pre-calculations for this polygon.
    * It will create a texture space bounding box that
@@ -1091,12 +1052,6 @@ public:
 	int fov, float shift_x, float shift_y,
 	const csPlane3& plane_cam);
 
-  /// Get the handle to the polygon texture object
-  iPolygonTexture *GetTexture ()
-  {
-    return txt_info ? txt_info->GetPolyTex () : (iPolygonTexture*)NULL;
-  }
-
   SCF_DECLARE_IBASE;
 
   //------------------- iPolygon3D interface implementation -------------------
@@ -1114,10 +1069,13 @@ public:
 
     virtual iLightMap *GetLightMap ()
     {
-      csPolyTexLightMap *lm = scfParent->txt_info;
+      csPolyTexture *lm = scfParent->txt_info;
       return lm ? lm->GetLightMap () : (iLightMap*)NULL;
     }
-    virtual iPolygonTexture *GetTexture () { return scfParent->GetTexture(); }
+    virtual iPolygonTexture *GetTexture ()
+    {
+      return scfParent->GetPolyTexture ();
+    }
     virtual const csVector3 &GetVertexW (int idx) const
     { return scfParent->Vwor (idx); }
     virtual const csVector3 &GetVertexC (int idx) const

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_LIGHTMAP_H__
-#define __CS_LIGHTMAP_H__
+#ifndef __CS_BEZIER_LIGHTMAP_H__
+#define __CS_BEZIER_LIGHTMAP_H__
 
 #include "csutil/scf.h"
 #include "csutil/sarray.h"
@@ -27,6 +27,7 @@
 class csPolyTexture;
 class csThing;
 class csPolygon3D;
+class csCurve;
 class csDelayedLightingInfo;
 class csObject;
 struct iLight;
@@ -35,27 +36,27 @@ struct iFile;
 struct iEngine;
 
 CS_DECLARE_STATIC_ARRAY (csRGBMap, csRGBpixel);
-CS_DECLARE_STATIC_ARRAY (csShadowMapHelper, unsigned char);
+CS_DECLARE_STATIC_ARRAY (csCurveShadowMapHelper, unsigned char);
 
 /// Shadow map.
-class csShadowMap : public csShadowMapHelper
+class csCurveShadowMap : public csCurveShadowMapHelper
 {
 public:
   iLight *Light;
-  csShadowMap *next;
+  csCurveShadowMap *next;
   unsigned char max_shadow;
 
-  csShadowMap ();
-  virtual ~csShadowMap ();
+  csCurveShadowMap ();
+  virtual ~csCurveShadowMap ();
   void Alloc (iLight *l, int w, int h);
-  void Copy (const csShadowMap *other);
+  void Copy (const csCurveShadowMap *other);
   void CalcMaxShadow();
 };
 
 /**
  * The static and all dynamic lightmaps for one polygon.
  */
-class csLightMap : public iLightMap
+class csCurveLightMap : public iLightMap
 {
   ///
   friend class csPolyTexture;
@@ -85,7 +86,7 @@ private:
    * Linked list of shadow-maps (for the pseudo-dynamic lights).
    * These shadowmaps are applied to static_lm to get real_lm.
    */
-  csShadowMap* first_smap;
+  csCurveShadowMap* first_smap;
 
   /// Size of the lightmap.
   long lm_size;
@@ -111,6 +112,20 @@ private:
 
   /// Calculate and save max_static_color_values after static_lm is loaded.
   void CalcMaxStatic ();
+
+#if 0
+  /**
+   * Convert three lightmap tables to the right mixing mode.
+   * This function assumes that mixing mode is one of FAST_Wxx
+   * and will not function correctly if called with NOCOLOR, TRUE_RGB
+   * or FAST_RGB.<br>
+   * This function correctly recognizes a dynamic lightmap which only
+   * contains shadow information and does not do the conversion in that
+   * case.
+   */
+  void ConvertToMixingMode (unsigned char* mr, unsigned char* mg,
+			    unsigned char* mb, int sz);
+#endif
 
   /**
    * Calculate the sizes of this lightmap.
@@ -139,9 +154,9 @@ public:
   }
 
   ///
-  csLightMap ();
+  csCurveLightMap ();
   ///
-  virtual ~csLightMap ();
+  virtual ~csCurveLightMap ();
 
   /**
    * Rebuilds the lightmap for the poly from all the lightmaps + the ambient
@@ -164,10 +179,13 @@ public:
    */
   void Alloc (int w, int h, int r, int g, int b);
 
+  /// Copy a lightmap.
+  void CopyLightMap (csCurveLightMap* source);
+
   /**
    * Create a ShadowMap for this LightMap.
    */
-  csShadowMap* NewShadowMap (iLight* light, int w, int h);
+  csCurveShadowMap* NewShadowMap (iLight* light, int w, int h);
 
   /**
    * Allocate the static csRGBMap.
@@ -177,7 +195,7 @@ public:
   /**
    * Find a ShadowMap for a specific pseudo-dynamic light.
    */
-  csShadowMap* FindShadowMap (iLight* light);
+  csCurveShadowMap* FindShadowMap (iLight* light);
 
   /**
    * Delete a ShadowMap. NOTE!!! This function only works
@@ -185,19 +203,19 @@ public:
    * It is ment for dynamic lights that do not reach the polygon
    * but this can only be seen after trying.
    */
-  void DelShadowMap (csShadowMap* plm);
+  void DelShadowMap (csCurveShadowMap* plm);
 
   /**
    * Read lightmap from a file. Return NULL if succesful and
    * otherwise a description of the error.
    */
   const char* ReadFromCache (iFile* file, int w, int h,
-    csPolygon3D* poly, iEngine*);
+    csCurve* curve, iEngine*);
 
   /**
    * Write lightmap to a file.
    */
-  void Cache (iFile* file, csPolygon3D* poly, iEngine*);
+  void Cache (iFile* file, csCurve* curve, iEngine*);
 
   /**
    * Convert the lightmaps to the correct mixing mode.
@@ -258,4 +276,4 @@ public:
   { return lm_size; }
 };
 
-#endif // __CS_LIGHTMAP_H__
+#endif // __CS_BEZIER_LIGHTMAP_H__

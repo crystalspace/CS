@@ -24,20 +24,19 @@
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
-#include "bezier.h"
-#include "lghtmap.h"
+#include "bezier2.h"
+#include "clightmap.h"
 #include "csutil/csobject.h"
-#include "imesh/thing/curve.h"
+#include "imesh/bezier.h"
 #include "iengine/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 
 
-class csThing;
-class csThingObjectType;
+class csBezierMesh;
+class csBezierMeshObjectType;
 class csCurveTemplate;
-class csLightPatch;
-class csRadCurve;
+class csBezierLightPatch;
 struct iFrustumView;
 struct csCoverageMatrix;
 struct iMaterialHandle;
@@ -107,7 +106,7 @@ public:
    * a lightmap. This should be called whenever the lightmap
    * changes and the curve needs to be rendered.
    */
-  void UpdateColors (csLightMap* lightmap);
+  void UpdateColors (csCurveLightMap* lightmap);
 };
 
 /**
@@ -115,17 +114,14 @@ public:
  */
 class csCurve : public csObject
 {
-  /// allow csRadCurve to use our UV Buffers
-  friend class csRadCurve;
-
 private:
-  csThingObjectType* thing_type;
+  csBezierMeshObjectType* thing_type;
 
   /// Material for this curve
   csRef<iMaterialWrapper> Material;
 
   /// list of light patches
-  csLightPatch* LightPatches;
+  csBezierLightPatch* LightPatches;
 
   /**
    * Object to world transformation (Needed by CalculateLighting &
@@ -170,10 +166,10 @@ private:
 
 public:
   /// The polygon set parent.
-  csThing* ParentThing;
+  csBezierMesh* ParentThing;
 
   /// This is the lightmap to be placed on the curve.
-  csLightMap* LightMap;
+  csCurveLightMap* LightMap;
 
   /// This flag indicates whether the lightmap is up-to-date
   bool LightmapUpToDate;
@@ -184,7 +180,7 @@ public:
 public:
 
   /// Constructor
-  csCurve (csThingObjectType* thing_type);
+  csCurve (csBezierMeshObjectType* thing_type);
   /// Destructor
   virtual ~csCurve ();
 
@@ -203,13 +199,13 @@ public:
   /// @@@
   void DynamicLightDisconnect (iDynLight* dynlight);
   /// Add a lightpatch to this curves list of light patches
-  void AddLightPatch (csLightPatch* lp);
+  void AddLightPatch (csBezierLightPatch* lp);
   /// Remove a lightpatch from this curves list
-  void UnlinkLightPatch (csLightPatch* lp);
+  void UnlinkLightPatch (csBezierLightPatch* lp);
   /// update the real lightmap with all light info
   bool RecalculateDynamicLights ();
   /// update the real lightmap with info from the lightpatch
-  void ShineDynLight (csLightPatch* lp);
+  void ShineDynLight (csBezierLightPatch* lp);
 
   /// Set the current object to world space transformation.
   void SetObject2World (const csReversibleTransform *o2w);
@@ -217,12 +213,12 @@ public:
   inline const csReversibleTransform *GetObject2World () const;
 
   /// Set the parent thing for this curve
-  inline void SetParentThing (csThing* p);
+  inline void SetParentThing (csBezierMesh* p);
   /// Return the parent thing for this curve
-  inline csThing* GetParentThing () const;
+  inline csBezierMesh* GetParentThing () const;
 
   /// Get the lightmap.
-  inline csLightMap* GetLightMap () const;
+  inline csCurveLightMap* GetLightMap () const;
   /// Calculate the lighting for this curve (static).
   void CalculateLightingStatic (iFrustumView* lview, bool vis);
   /// Calculate the lighting for this curve (dynamic).
@@ -257,7 +253,7 @@ public:
 
   /**
    * set control index for a control point (referring to the controls
-   * in the parent csThing)
+   * in the parent csBezierMesh)
    */
   virtual void SetControlPoint (int index, int control_id) = 0;
 
@@ -361,7 +357,7 @@ private:
 
 public:
   ///
-  csBezierCurve (csThingObjectType* thing_type);
+  csBezierCurve (csBezierMeshObjectType* thing_type);
   ///
   ~csBezierCurve ();
 
@@ -425,11 +421,11 @@ inline iMaterialHandle* csCurve::GetMaterialHandle () const
 { return Material ? Material->GetMaterialHandle() : NULL; }
 inline iMaterialWrapper* csCurve::GetMaterial () const
 { return Material; }
-inline csLightMap* csCurve::GetLightMap () const
+inline csCurveLightMap* csCurve::GetLightMap () const
 { return LightMap; }
-inline void csCurve::SetParentThing (csThing* p)
+inline void csCurve::SetParentThing (csBezierMesh* p)
 { ParentThing = p; }
-inline csThing* csCurve::GetParentThing () const
+inline csBezierMesh* csCurve::GetParentThing () const
 { return ParentThing; }
 inline const csReversibleTransform *csCurve::GetObject2World () const
 { return O2W; }

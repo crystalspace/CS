@@ -89,6 +89,7 @@ PLUGINS += mesh/metagen/object
 PLUGINS += mesh/stars/object       mesh/stars/persist/standard
 PLUGINS += mesh/haze/object        mesh/haze/persist/standard
 PLUGINS += mesh/thing/object       mesh/thing/persist/standard
+PLUGINS += mesh/bezier/object      mesh/bezier/persist/standard
 PLUGINS += mesh/cloth/object
 PLUGINS += motion/standard/object  motion/standard/persist/standard
 PLUGINS += engine/3d

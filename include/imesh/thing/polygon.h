@@ -35,6 +35,7 @@ struct iLightMap;
 struct iPortal;
 struct iSector;
 struct iThingState;
+struct iThingFactoryState;
 struct iPolyTexType;
 
 class csReversibleTransform;
@@ -80,9 +81,9 @@ struct iPolygon3DStatic : public iBase
 
   /**
    * Get the thing (container) that this polygon belongs to.
-   * The reference counter on iThingState is NOT incremented.
+   * The reference counter on iThingFactoryState is NOT incremented.
    */
-  virtual iThingState *GetParent () = 0;
+  virtual iThingFactoryState *GetParent () = 0;
   /// Get the material handle for the texture manager.
   virtual iMaterialHandle *GetMaterialHandle () = 0;
   /**

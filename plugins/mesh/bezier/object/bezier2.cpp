@@ -17,7 +17,7 @@
 */
 #include <math.h>
 #include "cssysdef.h"
-#include "bezier.h"
+#include "bezier2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"
 

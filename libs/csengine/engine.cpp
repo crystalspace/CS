@@ -64,7 +64,6 @@
 #include "ivaria/engseq.h"
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
-#include "imesh/thing/curve.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
 #include "ivideo/graph3d.h"

@@ -16,13 +16,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_LPPOOL_H__
-#define __CS_LPPOOL_H__
+#ifndef __CS_LIGHTPOOL_H__
+#define __CS_LIGHTPOOL_H__
 
 #include "csutil/objpool.h"
 
-class csLightPatchPool;
-class csPolygon3D;
+class csBezierLightPatchPool;
+class csCurve;
+class csFrustum;
 struct iDynLight;
 struct iShadowBlock;
 
@@ -34,13 +35,13 @@ struct iShadowBlock;
  * is a list of light patches in every dynamic light (representing all
  * polygons that are hit by that particular light).
  */
-class csLightPatch
+class csBezierLightPatch
 {
-  friend class csLightPatchPool;
+  friend class csBezierLightPatchPool;
 
 private:
-  csLightPatch* next;
-  csLightPatch* prev;
+  csBezierLightPatch* next;
+  csBezierLightPatch* prev;
 
   /// Vertices.
   csVector3* vertices;
@@ -49,8 +50,8 @@ private:
   /// Maximum number of vertices.
   int max_vertices;
 
-  /// Polygon that this light patch is for.
-  csPolygon3D* polygon;
+  /// Curve that this light patch is for
+  csCurve* curve;
 
   /// Light that this light patch originates from.
   iDynLight* light;
@@ -65,13 +66,13 @@ public:
   /**
    * Create an empty light patch (infinite frustum).
    */
-  csLightPatch ();
+  csBezierLightPatch ();
 
   /**
    * Unlink this light patch from the polygon and the light
    * and then destroy.
    */
-  ~csLightPatch ();
+  ~csBezierLightPatch ();
 
   /**
    * Make room for the specified number of vertices and
@@ -85,9 +86,9 @@ public:
   void RemovePatch ();
 
   /**
-   * Get the polygon that this light patch belongs too.
+   * Get the curve that this light patch belongs too.
    */
-  csPolygon3D* GetPolygon () { return polygon; }
+  csCurve* GetCurve () { return curve; }
 
   /**
    * Get the light that this light patch belongs too.
@@ -115,14 +116,14 @@ public:
   /**
    * Get next light patch.
    */
-  csLightPatch* GetNext () { return next; }
+  csBezierLightPatch* GetNext () { return next; }
 
-  /// Set polygon.
-  void SetPolyCurve (csPolygon3D* pol) { polygon = pol; }
+  /// Set curve.
+  void SetPolyCurve (csCurve* c) { curve = c; }
   /// Set light.
   void SetLight (iDynLight* l) { light = l; }
   /// Add to list.
-  void AddList (csLightPatch*& first)
+  void AddList (csBezierLightPatch*& first)
   {
     next = first;
     prev = NULL;
@@ -131,13 +132,13 @@ public:
     first = this;
   }
   /// Remove from list.
-  void RemoveList (csLightPatch*& first)
+  void RemoveList (csBezierLightPatch*& first)
   {
     if (next) next->prev= prev;
     if (prev) prev->next= next;
     else first = next;
     prev= next= NULL;
-    polygon = NULL;
+    curve = NULL;
   }
 
   /// Set the light frustum.
@@ -148,19 +149,19 @@ public:
 
 /**
  * This is an object pool which holds objects of type
- * csLightPatch. You can ask new instances from this pool.
+ * csBezierLightPatch. You can ask new instances from this pool.
  * If needed it will allocate one for you but ideally it can
  * give you one which was allocated earlier.
  */
-class csLightPatchPool : public csObjectPool<csLightPatch>
+class csBezierLightPatchPool : public csObjectPool<csBezierLightPatch>
 {
 public:
-  void Free (csLightPatch* o)
+  void Free (csBezierLightPatch* o)
   {
     o->RemovePatch ();
-    csObjectPool<csLightPatch>::Free (o);
+    csObjectPool<csBezierLightPatch>::Free (o);
   }
 };
 
-#endif // __CS_LPPOOL_H__
+#endif // __CS_LIGHTPOOL_H__
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2003 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_THINGLDR_H__
-#define __CS_THINGLDR_H__
+#ifndef __CS_BEZIERLDR_H__
+#define __CS_BEZIERLDR_H__
 
 #include "imap/reader.h"
 #include "imap/writer.h"
@@ -30,66 +30,49 @@ struct iPluginManager;
 struct iObjectRegistry;
 struct iSyntaxService;
 struct iReporter;
-struct iThingState;
-struct iThingFactoryState;
-struct iMeshObject;
-struct iMeshObjectType;
 
 /**
  * Private information during the loading process of a thing.
  */
-class ThingLoadInfo
+class BezierLoadInfo
 {
 public:
-  csRef<iMeshObjectType> type;
-  csRef<iMeshObject> obj;
-  csRef<iThingState> thing_state;
-  csRef<iThingFactoryState> thing_fact_state;
   iMaterialWrapper* default_material;
   float default_texlen;
-  bool use_mat_set;
-  char* mat_set_name;
-  bool load_factory;	// If true we are loading a factory.
-  bool global_factory;	// We are using a global factory ('factory' or 'clone').
 
-  ThingLoadInfo () : default_material (NULL),
-    default_texlen (1),
-    use_mat_set (false), mat_set_name (NULL)
+  BezierLoadInfo () : default_material (NULL),
+    default_texlen (1)
     {}
-
-  void SetTextureSet (const char* name)
-  {
-    delete [] mat_set_name;
-    mat_set_name = new char [strlen (name) + 1];
-    strcpy (mat_set_name, name);
-  }
 };
 
 /**
  * Thing loader.
  */
-class csThingLoader : public iLoaderPlugin
+class csBezierLoader : public iLoaderPlugin
 {
-public:
+private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
   csRef<iReporter> reporter;
-  
   csStringHash xmltokens;
 
-  bool LoadThingPart (iThingEnvironment* te,
+  bool ParseCurve (iCurve* curve, iLoaderContext* ldr_context,
+  	iDocumentNode* node);
+  bool LoadThingPart (
   	iDocumentNode* node, iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
-	iSyntaxService *synldr, ThingLoadInfo& info,
-	iEngine* engine, int vt_offset, bool isParent);
+	iSyntaxService *synldr, BezierLoadInfo& info,
+	iEngine* engine, iBezierState* thing_state,
+	iBezierFactoryState* thing_fact_state,
+	bool isParent);
 
 public:
   SCF_DECLARE_IBASE;
 
   /// Constructor.
-  csThingLoader (iBase*);
+  csBezierLoader (iBase*);
   /// Destructor.
-  virtual ~csThingLoader ();
+  virtual ~csBezierLoader ();
 
   bool Initialize (iObjectRegistry* p);
 
@@ -99,7 +82,7 @@ public:
 
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csThingLoader);
+    SCF_DECLARE_EMBEDDED_IBASE(csBezierLoader);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
   } scfiComponent;
@@ -107,25 +90,9 @@ public:
 };
 
 /**
- * Thing factory loader.
- */
-class csThingFactoryLoader : public csThingLoader
-{
-public:
-  /// Constructor.
-  csThingFactoryLoader (iBase* parent) : csThingLoader (parent) { }
-  /// Destructor.
-  virtual ~csThingFactoryLoader () { }
-
-  /// Parse a given node and return a new object for it.
-  virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context);
-};
-
-/**
  * Thing saver.
  */
-class csThingSaver : public iSaverPlugin
+class csBezierSaver : public iSaverPlugin
 {
 private:
   iObjectRegistry* object_reg;
@@ -135,9 +102,9 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Constructor.
-  csThingSaver (iBase*);
+  csBezierSaver (iBase*);
   /// Destructor.
-  virtual ~csThingSaver ();
+  virtual ~csBezierSaver ();
 
   bool Initialize (iObjectRegistry* p);
 
@@ -146,11 +113,11 @@ public:
 
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csThingSaver);
+    SCF_DECLARE_EMBEDDED_IBASE(csBezierSaver);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
   } scfiComponent;
   friend struct eiComponent;
 };
 
-#endif // __CS_THINGLDR_H__
+#endif // __CS_BEZIERLDR_H__

@@ -17,65 +17,66 @@
 */
 #include "cssysdef.h"
 #include "cssys/csendian.h"
-#include "lghtmap.h"
-#include "polygon.h"
-#include "thing.h"
+#include "clightmap.h"
+#include "beziermsh.h"
+#include "curvebase.h"
 #include "csutil/util.h"
 #include "csutil/debug.h"
 #include "csutil/memfile.h"
 #include "iutil/vfs.h"
 #include "iutil/cache.h"
 #include "iengine/statlght.h"
+#include "iengine/light.h"
 
 #define LMMAGIC	    "LM04" // must be 4 chars!
 
 
-csShadowMap::csShadowMap ()
+csCurveShadowMap::csCurveShadowMap ()
 {
   Light = NULL;
   max_shadow = 255;  // use worst case until calc'd
 }
 
-csShadowMap::~csShadowMap ()
+csCurveShadowMap::~csCurveShadowMap ()
 {
 }
 
-void csShadowMap::Alloc (iLight *l, int w, int h)
+void csCurveShadowMap::Alloc (iLight *l, int w, int h)
 {
   Light = l;
 
-  int lw = csLightMap::CalcLightMapWidth (w);
-  int lh = csLightMap::CalcLightMapHeight (h);
-  csShadowMapHelper::Alloc (lw * lh);
+  int lw = csCurveLightMap::CalcLightMapWidth (w);
+  int lh = csCurveLightMap::CalcLightMapHeight (h);
+  csCurveShadowMapHelper::Alloc (lw * lh);
   memset (GetArray (), 0, GetSize ());
 }
 
-void csShadowMap::Copy (const csShadowMap *source)
+void csCurveShadowMap::Copy (const csCurveShadowMap *source)
 {
-  csShadowMapHelper::Copy (source);
+  csCurveShadowMapHelper::Copy (source);
   Light = source->Light;
   max_shadow = source->max_shadow;
 }
 
-void csShadowMap::CalcMaxShadow()
+void csCurveShadowMap::CalcMaxShadow()
 {
   max_shadow=0;
   int len = GetSize();
   for (int i=0; i<len; i++)
-      if (GetArray()[i] > max_shadow)
-          max_shadow = GetArray()[i];
+    if (GetArray()[i] > max_shadow)
+      max_shadow = GetArray()[i];
 }
 
 //---------------------------------------------------------------------------
-int csLightMap::lightcell_size = 16;
-int csLightMap::lightcell_shift = 4;
-int csLightMap::default_lightmap_cell_size = 16;
+int csCurveLightMap::lightcell_size = 16;
+int csCurveLightMap::lightcell_shift = 4;
+int csCurveLightMap::default_lightmap_cell_size = 16;
 
-SCF_IMPLEMENT_IBASE(csLightMap)
+SCF_IMPLEMENT_IBASE(csCurveLightMap)
   SCF_IMPLEMENTS_INTERFACE(iLightMap)
 SCF_IMPLEMENT_IBASE_END
 
-csLightMap::csLightMap ()
+csCurveLightMap::csCurveLightMap ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
   first_smap = NULL;
@@ -85,12 +86,12 @@ csLightMap::csLightMap ()
   max_static_color_values.Set(255,255,255);  // use slowest safest method by default
 }
 
-csLightMap::~csLightMap ()
+csCurveLightMap::~csCurveLightMap ()
 {
   CS_ASSERT (cachedata == NULL);
   while (first_smap)
   {
-    csShadowMap *smap = first_smap->next;
+    csCurveShadowMap *smap = first_smap->next;
     delete first_smap;
     first_smap = smap;
   }
@@ -99,21 +100,21 @@ csLightMap::~csLightMap ()
   real_lm.Clear ();
 }
 
-void csLightMap::SetLightCellSize (int size)
+void csCurveLightMap::SetLightCellSize (int size)
 {
   lightcell_size = size;
   lightcell_shift = csLog2 (size);
 }
 
-void csLightMap::DelShadowMap (csShadowMap *smap)
+void csCurveLightMap::DelShadowMap (csCurveShadowMap *smap)
 {
   first_smap = smap->next;
   delete smap;
 }
 
-csShadowMap *csLightMap::NewShadowMap (iLight *light, int w, int h)
+csCurveShadowMap *csCurveLightMap::NewShadowMap (iLight *light, int w, int h)
 {
-  csShadowMap *smap = new csShadowMap ();
+  csCurveShadowMap *smap = new csCurveShadowMap ();
   smap->Light = light;
   smap->next = first_smap;
   first_smap = smap;
@@ -123,9 +124,9 @@ csShadowMap *csLightMap::NewShadowMap (iLight *light, int w, int h)
   return smap;
 }
 
-csShadowMap *csLightMap::FindShadowMap (iLight *light)
+csCurveShadowMap *csCurveLightMap::FindShadowMap (iLight *light)
 {
-  csShadowMap *smap = first_smap;
+  csCurveShadowMap *smap = first_smap;
   while (smap)
   {
     if (smap->Light == light) return smap;
@@ -135,14 +136,14 @@ csShadowMap *csLightMap::FindShadowMap (iLight *light)
   return NULL;
 }
 
-void csLightMap::SetSize (int w, int h)
+void csCurveLightMap::SetSize (int w, int h)
 {
-  rwidth = lwidth = csLightMap::CalcLightMapWidth (w);
-  rheight = lheight = csLightMap::CalcLightMapHeight (h);
+  rwidth = lwidth = csCurveLightMap::CalcLightMapWidth (w);
+  rheight = lheight = csCurveLightMap::CalcLightMapHeight (h);
   lm_size = lwidth * lheight;
 }
 
-void csLightMap::Alloc (int w, int h, int r, int g, int b)
+void csCurveLightMap::Alloc (int w, int h, int r, int g, int b)
 {
   SetSize (w, h);
   static_lm.Clear ();
@@ -161,11 +162,39 @@ void csLightMap::Alloc (int w, int h, int r, int g, int b)
   for (i = 0; i < lm_size; i++) map[i] = def;
 }
 
+void csCurveLightMap::CopyLightMap (csCurveLightMap *source)
+{
+  lm_size = source->lm_size;
+  static_lm.Copy (&source->static_lm);
+  real_lm.Copy (&source->real_lm);
+  lwidth = source->lwidth;
+  lheight = source->lheight;
+  rwidth = source->rwidth;
+  rheight = source->rheight;
+
+  csCurveShadowMap *smap, *smap2;
+  while (first_smap)
+  {
+    smap = first_smap->next;
+    delete first_smap;
+    first_smap = smap;
+  }
+
+  smap = source->first_smap;
+  while (smap)
+  {
+    smap2 = new csCurveShadowMap ();
+    smap2->next = first_smap;
+    first_smap = smap2;
+    smap2->Copy (smap);
+    smap = smap->next;
+  }
+  max_static_color_values = source->max_static_color_values;
+}
+
 struct PolySave
 {
   char header[4];
-  int16 x1, y1, z1;         // Coordinate of vertex 1
-  int16 x2, y2, z2;         // Coordinate of vertex 2
   int32 lm_size;            // Size of lightmap
   int32 lm_cnt;             // Number of non-dynamic lightmaps (normally 3)
 };
@@ -181,11 +210,11 @@ struct LightHeader
   int32 dyn_cnt;             // Number of dynamic maps
 };
 
-const char* csLightMap::ReadFromCache (
+const char* csCurveLightMap::ReadFromCache (
   iFile* file,
   int w,
   int h,
-  csPolygon3D* poly,
+  csCurve* curve,
   iEngine *engine)
 {
   PolySave ps, pswanted;
@@ -194,21 +223,12 @@ const char* csLightMap::ReadFromCache (
   iLight *light;
   int i;
 
-  csThing* parent = poly->GetParent ();
+  csBezierMesh* parent;
+  parent = curve->GetParentThing ();
 
   SetSize (w, h);
 
   strcpy (pswanted.header, LMMAGIC);
-  if (poly)
-  {
-    csPolygon3DStatic* spoly = poly->GetStaticData ();
-    pswanted.x1 = float2short (spoly->Vobj (0).x);
-    pswanted.y1 = float2short (spoly->Vobj (0).y);
-    pswanted.z1 = float2short (spoly->Vobj (0).z);
-    pswanted.x2 = float2short (spoly->Vobj (1).x);
-    pswanted.y2 = float2short (spoly->Vobj (1).y);
-    pswanted.z2 = float2short (spoly->Vobj (1).z);
-  }
   pswanted.lm_size = lm_size;
   pswanted.lm_cnt = 111;
 
@@ -223,12 +243,6 @@ const char* csLightMap::ReadFromCache (
     return "File too short while reading lightmap info header!";
 
   // Endian convert the file header.
-  ps.x1 = convert_endian (ps.x1);
-  ps.y1 = convert_endian (ps.y1);
-  ps.z1 = convert_endian (ps.z1);
-  ps.x2 = convert_endian (ps.x2);
-  ps.y2 = convert_endian (ps.y2);
-  ps.z2 = convert_endian (ps.z2);
   ps.lm_size = convert_endian (ps.lm_size);
   ps.lm_cnt = convert_endian (ps.lm_cnt);
 
@@ -244,7 +258,7 @@ const char* csLightMap::ReadFromCache (
   *error_buf = 0;
   if (strncmp (ps.header, pswanted.header, 4) != 0)
     sprintf (error_buf, "Cached lightmap header doesn't match!");
-  else if (poly)
+  else
   {
     if (ps.lm_cnt != pswanted.lm_cnt)
       sprintf (error_buf,
@@ -254,12 +268,6 @@ const char* csLightMap::ReadFromCache (
       sprintf (error_buf,
       	"Cached lightmap base texture mismatch (got size=%d, expected %d)!",
 	ps.lm_size, pswanted.lm_size);
-    else if (ps.x1 != pswanted.x1 || ps.y1 != pswanted.y1
-    		|| ps.z1 != pswanted.z1)
-      sprintf (error_buf, "Cached lightmap first vertex mismatch!");
-    else if (ps.x2 != pswanted.x2 || ps.y2 != pswanted.y2
-    		|| ps.z2 != pswanted.z2)
-      sprintf (error_buf, "Cached lightmap second vertex mismatch!");
   }
   if (*error_buf)
   {
@@ -361,7 +369,7 @@ const char* csLightMap::ReadFromCache (
     if (il)
     {
       light = il->QueryLight ();
-      csShadowMap *smap = NewShadowMap (light, w, h);
+      csCurveShadowMap *smap = NewShadowMap (light, w, h);
 
       il->AddAffectedLightingInfo (li);
 
@@ -387,9 +395,9 @@ stop:
   return NULL;
 }
 
-void csLightMap::Cache (
+void csCurveLightMap::Cache (
   iFile* file,
-  csPolygon3D *poly,
+  csCurve *curve,
   iEngine *engine)
 {
   (void)engine;
@@ -397,16 +405,6 @@ void csLightMap::Cache (
   PolySave ps;
 
   strcpy (ps.header, LMMAGIC);
-  if (poly)
-  {
-    csPolygon3DStatic* spoly = poly->GetStaticData ();
-    ps.x1 = convert_endian (float2short (spoly->Vobj (0).x));
-    ps.y1 = convert_endian (float2short (spoly->Vobj (0).y));
-    ps.z1 = convert_endian (float2short (spoly->Vobj (0).z));
-    ps.x2 = convert_endian (float2short (spoly->Vobj (1).x));
-    ps.y2 = convert_endian (float2short (spoly->Vobj (1).y));
-    ps.z2 = convert_endian (float2short (spoly->Vobj (1).z));
-  }
 
   if (file->Write ("lmpn", 4) != 4)
     return;
@@ -433,7 +431,7 @@ void csLightMap::Cache (
   //-------------------------------
   LightHeader lh;
 
-  csShadowMap *smap = first_smap;
+  csCurveShadowMap *smap = first_smap;
   if (smap)
   {
     uint8 have_dyn = 1;
@@ -479,7 +477,7 @@ void csLightMap::Cache (
   }
 }
 
-bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
+bool csCurveLightMap::UpdateRealLightMap (float dyn_ambient_r,
                                      float dyn_ambient_g,
                                      float dyn_ambient_b,
                                      bool  dyn_dirty)
@@ -544,7 +542,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
 
   if (first_smap)
   {
-    csShadowMap *smap = first_smap;
+    csCurveShadowMap *smap = first_smap;
 
     // Color mode.
     do
@@ -607,11 +605,11 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   return true;
 }
 
-void csLightMap::ConvertToMixingMode ()
+void csCurveLightMap::ConvertToMixingMode ()
 {
 }
 
-void csLightMap::CalcMaxStatic()
+void csCurveLightMap::CalcMaxStatic()
 {
   max_static_color_values.Set(0,0,0);
 
@@ -628,7 +626,7 @@ void csLightMap::CalcMaxStatic()
   }
 }
 
-void csLightMap::CalcMeanLighting ()
+void csCurveLightMap::CalcMeanLighting ()
 {
   int i;
   int mer, meg, meb;
@@ -682,7 +680,7 @@ static void ResizeMap (
     memcpy (new_map + neww * row, old_map + oldw * row, oldw);
 }
 
-void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
+void csCurveLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
 {
   if (!requirePO2) return ; // Nothing to do.
   int oldw = lwidth, oldh = lheight;
@@ -721,7 +719,7 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
     lheight);
 
   // Convert all shadowmaps.
-  csShadowMap *smap = first_smap;
+  csCurveShadowMap *smap = first_smap;
   while (smap)
   {
     unsigned char *old_map = smap->GetArray ();
@@ -732,12 +730,12 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   }
 }
 
-csRGBpixel *csLightMap::GetMapData ()
+csRGBpixel *csCurveLightMap::GetMapData ()
 {
   return GetRealMap ().GetArray ();
 }
 
-void csLightMap::GetMeanLighting (int &r, int &g, int &b)
+void csCurveLightMap::GetMeanLighting (int &r, int &g, int &b)
 { 
   if (mean_recalc)
   {

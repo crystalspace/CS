@@ -32,7 +32,6 @@
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "imesh/thing/thing.h"
-#include "imesh/thing/curve.h"
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csRegion)

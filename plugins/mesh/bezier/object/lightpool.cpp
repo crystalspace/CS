@@ -18,31 +18,30 @@
 
 #include "cssysdef.h"
 #include "csgeom/frustum.h"
-#include "lppool.h"
-#include "polygon.h"
+#include "lightpool.h"
+#include "curvebase.h"
 #include "iengine/shadows.h"
 
-csLightPatch::csLightPatch ()
+csBezierLightPatch::csBezierLightPatch ()
 {
   next = prev = NULL;
   num_vertices = 0;
   max_vertices = 0;
   vertices = NULL;
-  polygon = NULL;
   light = NULL;
   light_frustum = NULL;
 }
 
-csLightPatch::~csLightPatch ()
+csBezierLightPatch::~csBezierLightPatch ()
 {
   delete[] vertices;
   if (light_frustum) light_frustum->DecRef ();
   RemovePatch ();
 }
 
-void csLightPatch::RemovePatch ()
+void csBezierLightPatch::RemovePatch ()
 {
-  if (polygon) polygon->UnlinkLightpatch (this);
+  if (curve) curve->UnlinkLightPatch (this);
   shadows->DeleteShadows ();
   if (light_frustum)
   {
@@ -51,7 +50,7 @@ void csLightPatch::RemovePatch ()
   }
 }
 
-void csLightPatch::Initialize (int n)
+void csBezierLightPatch::Initialize (int n)
 {
   if (n > max_vertices)
   {
@@ -63,7 +62,7 @@ void csLightPatch::Initialize (int n)
   num_vertices = n;
 }
 
-void csLightPatch::SetShadowBlock (iShadowBlock* bl)
+void csBezierLightPatch::SetShadowBlock (iShadowBlock* bl)
 {
   shadows = bl;
 }

@@ -237,7 +237,19 @@ class csPolyTexture : public iPolygonTexture
   friend class csPolygon3D;
   friend class csPolygon2D;
 
+public:
+  /// Transformation from world to texture space.
+  csMatrix3 m_world2tex;
+  /// Translation from world to texture space.
+  csVector3 v_world2tex;
+
 private:
+  /**
+   * This bool indicates if the lightmap is up-to-date (read from the
+   * cache). If set to false the polygon still needs to be lit.
+   */
+  bool lightmap_up_to_date;
+
   /// The corresponding polygon.
   csPolygon3D* polygon;
 
@@ -271,9 +283,12 @@ public:
   static float cfg_cosinus_factor;
 
   /// Constructor.
-  csPolyTexture (csLightMapMapping* mapping);
+  csPolyTexture ();
   /// Destructor.
   virtual ~csPolyTexture ();
+
+  /// Set Lightmap mapping.
+  void SetLightMapMapping (csLightMapMapping* mapping);
 
   /**
    * Set the corresponding polygon for this polytexture.
@@ -321,6 +336,21 @@ public:
    * (used for a dynamic light).
    */
   void ShineDynLightMap (csLightPatch* lp);
+
+  /**
+   * Transform this plane from object space to world space using
+   * the given transform.
+   */
+  void ObjectToWorld (const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
+  	const csReversibleTransform& obj);
+
+  /**
+   * Transform this plane from world space to camera space using
+   * the given transform. The resulting transform is put in m_cam2tex
+   * and v_cam2tex.
+   */
+  void WorldToCamera (const csReversibleTransform& t,
+  	csMatrix3& m_cam2tex, csVector3& v_cam2tex);
 
   //--------------------- iPolygonTexture implementation ---------------------
   SCF_DECLARE_IBASE;

@@ -517,7 +517,7 @@ static csRef<iMeshFactoryWrapper> CreateMeshFactoryWrapper (
 static csRef<iMeshWrapper> CreateMeshWrapper (const char* name)
 {
   csRef<iMeshObjectFactory> thing_fact (Sys->thing_type->NewFactory ());
-  csRef<iMeshObject> mesh_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
+  csRef<iMeshObject> mesh_obj = thing_fact->NewInstance ();
 
   csRef<iMeshWrapper> wrap (Sys->engine->CreateMeshWrapper (name));
   wrap->SetMeshObject (mesh_obj);
@@ -1928,12 +1928,10 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
   iMaterialWrapper* tm_front = engine->GetMaterialList ()->FindByName (mat);
 
   csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper ("menu"));
-  csRef<iThingFactoryState> thing_fact_state (
-  	SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
-  	iThingFactoryState));
   csRef<iThingState> thing_state (
   	SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
   	iThingState));
+  csRef<iThingFactoryState> thing_fact_state = thing_state->GetFactory ();
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
   thing_fact_state->CreateVertex (csVector3 (-1, .25, 0));
@@ -1966,9 +1964,7 @@ csRef<iMeshWrapper> Blocks::CreateMenuArrow (bool left)
   csRef<iThingState> thing_state (
   	SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
   	iThingState));
-  csRef<iThingFactoryState> thing_fact_state (
-  	SCF_QUERY_INTERFACE (thing_wrap->GetMeshObject (),
-  	iThingFactoryState));
+  csRef<iThingFactoryState> thing_fact_state = thing_state->GetFactory ();
   thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
   float pointx;
@@ -2108,8 +2104,9 @@ void Blocks::InitGameRoom ()
   room = Sys->engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (
   	Sys->engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state (
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingFactoryState));
+  csRef<iThingState> walls_tstate (
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
+  csRef<iThingFactoryState> walls_state = walls_tstate->GetFactory ();
   Sys->set_cube_room (room);
   iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
@@ -2208,8 +2205,9 @@ void Blocks::InitDemoRoom ()
   demo_room = Sys->engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (
   	Sys->engine->CreateSectorWallsMesh (demo_room, "walls"));
-  csRef<iThingFactoryState> walls_state (SCF_QUERY_INTERFACE (
-  	walls->GetMeshObject (), iThingFactoryState));
+  csRef<iThingState> walls_tstate (
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
+  csRef<iThingFactoryState> walls_state = walls_tstate->GetFactory ();
 
   iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();

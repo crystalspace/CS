@@ -357,8 +357,9 @@ void GenerateThing (iObjectRegistry* object_reg,
       continue;
     }
     csRef<iMeshObjectFactory> thingFactory (thingType->NewFactory());
-    csRef<iThingFactoryState> thingFactoryState (
-    	SCF_QUERY_INTERFACE(thingFactory, iThingFactoryState));
+    csRef<iThingState> thingState =
+    	SCF_QUERY_INTERFACE(thingFactory, iThingState);
+    csRef<iThingFactoryState> thingFactoryState = thingState->GetFactory ();
     if(!thingFactoryState)
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
@@ -905,10 +906,11 @@ void WalkTest::ParseKeyCmds (iObject* src)
       csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
       if (wrap)
       {
-        csRef<iThingFactoryState> thing (SCF_QUERY_INTERFACE (
-		wrap->GetMeshObject (), iThingFactoryState));
-	if (thing)
+        csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (
+		wrap->GetMeshObject (), iThingState));
+	if (thing_state)
 	{
+	  iThingFactoryState* thing = thing_state->GetFactory ();
 	  char polyname[255];
 	  int xyz;
 	  float max_angle, speed;

@@ -132,8 +132,7 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState));
-  csRef<iThingFactoryState> walls_fact_state (SCF_QUERY_INTERFACE (
-  	walls->GetMeshObject (), iThingFactoryState));
+  csRef<iThingFactoryState> walls_fact_state = walls_state->GetFactory ();
   float dx, dy, dz;
   dx = 2.0*(float)x;
   dy = 2.0*(float)y;

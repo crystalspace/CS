@@ -22,13 +22,10 @@
 
 #include "csutil/csvector.h"
 #include "csutil/parray.h"
-#include "curve.h"
 
 class csPolygon3D;
 class csPolygon3DStatic;
-
-/// A dynamic array of csCurve objects
-typedef csPDelArray<csCurve> csCurvesArray;
+class csThingObjectType;
 
 /**
  * An dynamic array of csPolygon3DStatic objects.
@@ -37,13 +34,24 @@ typedef csPDelArray<csCurve> csCurvesArray;
  */
 class csPolygonStaticArray : public csVector
 {
+private:
+  csThingObjectType* thing_type;
+
 public:
   /// Create the polygon array object
   csPolygonStaticArray (int iLimit, int iDelta) : csVector (iLimit, iDelta)
-  { }
+  {
+    thing_type = NULL;
+  }
 
   /// Destroy the polygon array and all inserted polygons
   virtual ~csPolygonStaticArray ();
+
+  /// Set the thing type used to destroy polygons.
+  void SetThingType (csThingObjectType* thing_type)
+  {
+    csPolygonStaticArray::thing_type = thing_type;
+  }
 
   /// Delete a particular array element
   virtual bool FreeItem (void* Item);
@@ -66,13 +74,24 @@ public:
  */
 class csPolygonArray : public csVector
 {
+private:
+  csThingObjectType* thing_type;
+
 public:
   /// Create the polygon array object
   csPolygonArray (int iLimit, int iDelta) : csVector (iLimit, iDelta)
-  { }
+  {
+    thing_type = NULL;
+  }
 
   /// Destroy the polygon array and all inserted polygons
   virtual ~csPolygonArray ();
+
+  /// Set the thing type used to destroy polygons.
+  void SetThingType (csThingObjectType* thing_type)
+  {
+    csPolygonArray::thing_type = thing_type;
+  }
 
   /// Delete a particular array element
   virtual bool FreeItem (void* Item);

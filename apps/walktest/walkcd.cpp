@@ -82,11 +82,11 @@ void WalkTest::CreateColliders ()
     ThingType = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.mesh.object.thing", iMeshObjectType);
 
-  csRef<iMeshObjectFactory> thing_fact (ThingType->NewFactory ());
-  csRef<iMeshObject> mesh_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
+  csRef<iMeshObjectFactory> thing_fact = ThingType->NewFactory ();
+  csRef<iMeshObject> mesh_obj = thing_fact->NewInstance ();
   plbody = Engine->CreateMeshWrapper (mesh_obj, "Player's Body");
-  csRef<iThingFactoryState> thing_state (
-  	SCF_QUERY_INTERFACE (mesh_obj, iThingFactoryState));
+  csRef<iThingState> ws = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
+  csRef<iThingFactoryState> thing_state = ws->GetFactory ();
 
   thing_state->CreateVertex (csVector3 (-DX_2, OY,    -DZ_2));
   thing_state->CreateVertex (csVector3 (-DX_2, OY,    DZ_2));
@@ -133,9 +133,10 @@ void WalkTest::CreateColliders ()
   plbody->GetRadius (body_radius, body_center);
 
   thing_fact = ThingType->NewFactory ();
-  mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
+  mesh_obj = thing_fact->NewInstance ();
   pllegs = Engine->CreateMeshWrapper (mesh_obj, "Player's Legs");
-  thing_state = SCF_QUERY_INTERFACE (mesh_obj, iThingFactoryState);
+  ws = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
+  thing_state = ws->GetFactory ();
 
   thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     -DZ_2L));
   thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     DZ_2L));

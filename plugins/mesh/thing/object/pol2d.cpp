@@ -139,8 +139,8 @@ void csPolygon2D::DrawFilled (
   }
 
   g3dpoly.z_value = poly->Vcam (0).z;
-  csPolyTexLightMap* lmi = poly->GetLightMapInfo ();
-  g3dpoly.poly_texture = lmi->GetPolyTex ();
+  csPolyTexture* lmi = poly->GetPolyTexture ();
+  g3dpoly.poly_texture = lmi;
   g3dpoly.do_fullbright = spoly->flags.Check (CS_POLY_LM_REFUSED);
 
   csMatrix3 m_cam2tex;

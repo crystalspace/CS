@@ -46,16 +46,57 @@ SCF_IMPLEMENT_IBASE(csPolyTexture)
   SCF_IMPLEMENTS_INTERFACE(iPolygonTexture)
 SCF_IMPLEMENT_IBASE_END
 
-csPolyTexture::csPolyTexture (csLightMapMapping* mapping)
+csPolyTexture::csPolyTexture ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  DG_ADDI (this, NULL);
-  DG_TYPE (this, "csPolyTexture");
   lm = NULL;
   cache_data = NULL;
   polygon = NULL;
   shadow_bitmap = NULL;
   light_version = 0;
+  mapping = NULL;
+  lightmap_up_to_date = false;
+}
+
+void csPolyTexture::WorldToCamera (
+  const csReversibleTransform &t,
+  csMatrix3 &m_cam2tex,
+  csVector3 &v_cam2tex)
+{
+  // Create the matrix to transform camera space to texture space.
+  // From: T = Mwt * (W - Vwt)
+  //       C = Mwc * (W - Vwc)
+  // To:   T = Mct * (C - Vct)
+  // Mcw * C + Vwc = W
+  // T = Mwt * (Mcw * C + Mcw * Mwc * (Vwc - Vwt))
+  // T = Mwt * Mcw * (C - Mwc * (Vwt-Vwc))
+  // ===>
+  // Mct = Mwt * Mcw
+  // Vct = Mwc * (Vwt - Vwc)
+  m_cam2tex = m_world2tex;
+  m_cam2tex *= t.GetT2O ();
+
+  v_cam2tex = t.Other2This (v_world2tex);
+}
+
+void csPolyTexture::ObjectToWorld (const csMatrix3& m_obj2tex,
+	const csVector3& v_obj2tex, const csReversibleTransform &obj)
+{
+  // From: T = Mot * (O - Vot)
+  //       W = Mow * O - Vow
+  // To:   T = Mwt * (W - Vwt)
+  // Mwo * (W + Vow) = O
+  // T = Mot * (Mwo * (W + Vow) - (Mwo * Mow) * Vot)
+  // T = Mot * Mwo * (W + Vow - Mow * Vot)
+  // ===>
+  // Mwt = Mot * Mwo
+  // Vwt = Mow * Vot - Vow
+  m_world2tex = m_obj2tex;
+  m_world2tex *= obj.GetO2T ();
+  v_world2tex = obj.This2Other (v_obj2tex);
+}
+void csPolyTexture::SetLightMapMapping (csLightMapMapping* mapping)
+{
   csPolyTexture::mapping = mapping;
 }
 
@@ -64,7 +105,7 @@ csPolyTexture::~csPolyTexture ()
 #ifndef CS_USE_NEW_RENDERER
   if (polygon && polygon->GetParent ())
   {
-    iGraphics3D* G3D = polygon->GetParent ()->thing_type->G3D;
+    iGraphics3D* G3D = polygon->GetParent ()->GetStaticData ()->thing_type->G3D;
     if (G3D) G3D->RemoveFromCache (this);
   }
 #endif // CS_USE_NEW_RENDERER
@@ -77,13 +118,10 @@ csPolyTexture::~csPolyTexture ()
     delete[] cache_data;
   }
   delete shadow_bitmap;
-  if (lm)
+  if (polygon && lm)
   {
-    DG_UNLINK (this, lm);
-    lm->DecRef ();
+    polygon->static_data->thing_static->thing_type->blk_lightmap.Free (lm);
   }
-
-  DG_REM (this);
 }
 
 iMaterialHandle *csPolyTexture::GetMaterialHandle ()
@@ -119,18 +157,6 @@ void csPolyTexture::SetCacheData (int idx, void *d)
 
 void csPolyTexture::SetLightMap (csLightMap *lightmap)
 {
-  if (lightmap)
-  {
-    DG_LINK (this, lightmap);
-    lightmap->IncRef ();
-  }
-
-  if (lm)
-  {
-    DG_UNLINK (this, lm);
-    lm->DecRef ();
-  }
-
   lm = lightmap;
 }
 
@@ -290,8 +316,6 @@ void csPolyTexture::FillLightMap (
   else
     ww = hh = 64;
 
-  csPolyTexLightMap* lmi = polygon->GetLightMapInfo ();
-
   if (!shadow_bitmap)
   {
     int lm_w = lm->rwidth;
@@ -329,8 +353,8 @@ void csPolyTexture::FillLightMap (
     csVector3 poly[4];
     csPolygon3D *base_poly = polygon;
     int num_vertices = 4;
-    csMatrix3 m_t2w = lmi->m_world2tex.GetInverse ();
-    csVector3 &v_t2w = lmi->v_world2tex;
+    csMatrix3 m_t2w = m_world2tex.GetInverse ();
+    csVector3 &v_t2w = v_world2tex;
     csVector3 v;
     float inv_ww = 1.0f / float (ww);
     float inv_hh = 1.0f / float (hh);
@@ -382,8 +406,8 @@ void csPolyTexture::FillLightMap (
     //    T.y = m21 * F.x + m22 * F.y + m23 * F.z + TL.y
     //    L.x = m11*wl * F.x + m12*wl * F.y + m13*wl * F.z + TL.x*wl + ul
     //    L.y = m11*hl * F.x + m12*hl * F.y + m13*hl * F.z + TL.y*hl + vl
-    csMatrix3 &Mw2t = lmi->m_world2tex;
-    csVector3 &Vw2t = lmi->v_world2tex;
+    csMatrix3 &Mw2t = m_world2tex;
+    csVector3 &Vw2t = v_world2tex;
     csVector3 TL = Mw2t * (lightpos - Vw2t);
     float wl = float (ww) * inv_lightcell_size;
     float hl = float (hh) * inv_lightcell_size;
@@ -505,16 +529,15 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
   iMaterialHandle* mat_handle = polygon->GetStaticData ()->GetMaterialHandle ();
   mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
 
-  csPolyTexLightMap* lmi = polygon->GetLightMapInfo ();
-  float cosfact = polygon->GetParent ()->GetCosinusFactor ();
+  float cosfact = polygon->GetParent ()->GetStaticData ()->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
   // From: T = Mwt * (W - Vwt)
   // ===>
   // Mtw * T = W - Vwt
   // Mtw * T + Vwt = W
-  csMatrix3 m_t2w = lmi->m_world2tex.GetInverse ();
-  csVector3 vv = lmi->v_world2tex;
+  csMatrix3 m_t2w = m_world2tex.GetInverse ();
+  csVector3 vv = v_world2tex;
 
   csVector3 v1, v2;
 
@@ -553,8 +576,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
 
       // T = Mwt * (W - Vwt)
       //v1 = pl->m_world2tex * (lp->vertices[mi] + lp->center - pl->v_world2tex);
-      v1 = lmi->m_world2tex * (lp->GetVertex (mi) + lightpos
-      	- lmi->v_world2tex);
+      v1 = m_world2tex * (lp->GetVertex (mi) + lightpos - v_world2tex);
       f_uv[i].x = (v1.x * ww - mapping->Imin_u) * inv_lightcell_size;
       f_uv[i].y = (v1.y * hh - mapping->Imin_v) * inv_lightcell_size;
       if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
@@ -812,12 +834,11 @@ void csPolyTexture::UpdateFromShadowBitmap (
   // ===>
   // Mtw * T = W - Vwt
   // Mtw * T + Vwt = W
-  csPolyTexLightMap* lmi = polygon->GetLightMapInfo ();
-  csMatrix3 m_t2w = lmi->m_world2tex.GetInverse ();
-  csVector3 &v_t2w = lmi->v_world2tex;
+  csMatrix3 m_t2w = m_world2tex.GetInverse ();
+  csVector3 &v_t2w = v_world2tex;
 
   // Cosinus factor
-  float cosfact = polygon->GetParent ()->GetCosinusFactor ();
+  float cosfact = polygon->GetParent ()->GetStaticData ()->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
   if (dyn)
@@ -1282,10 +1303,11 @@ void csShadowBitmap::UpdateLightMap (
 
       // Initialize normal with the flat one
       csVector3 normal = poly->GetPolyPlane().Normal ();
-      if (poly->GetParent ()->GetSmoothingFlag())
+      if (poly->GetParent ()->GetStaticData ()->GetSmoothingFlag())
       {
 	int* vertexs = poly->GetStaticData ()->GetVertexIndices ();
-	csVector3* normals = poly->GetParent ()->GetNormals ();
+	csVector3* normals = poly->GetParent ()->GetStaticData ()
+		->GetNormals ();
 	int vCount = poly->GetStaticData ()->GetVertexCount ();
 
 	csVector3* nearestNormals = new csVector3[vCount];
@@ -1422,6 +1444,7 @@ bool csShadowBitmap::UpdateShadowMap (
   v_rv *= rv_step;
   v_ru *= ru_step;
 
+  csThingStatic* static_data = poly->GetParent ()->GetStaticData ();
   bool relevant = false;
   for (i = 0; i < lm_h; i++)
   {
@@ -1453,10 +1476,10 @@ bool csShadowBitmap::UpdateShadowMap (
       d = qsqrt (d);
 
       csVector3 normal = poly->GetPolyPlane().Normal ();
-      if ( poly->GetParent ()->GetSmoothingFlag() ) 
+      if ( static_data->GetSmoothingFlag() ) 
       {
 	int* vertexs = poly->GetStaticData ()->GetVertexIndices ();
-	csVector3* normals = poly->GetParent ()->GetNormals ();
+	csVector3* normals = static_data->GetNormals ();
 	int vCount = poly->GetStaticData ()->GetVertexCount ();
 	csSegment3* segments = new csSegment3[vCount];
 

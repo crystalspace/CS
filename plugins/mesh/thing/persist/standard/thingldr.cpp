@@ -38,7 +38,6 @@
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
-#include "imesh/thing/curve.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
@@ -55,10 +54,6 @@ enum
 {
   XMLTOKEN_CLONE = 1,
   XMLTOKEN_COSFACT,
-  XMLTOKEN_CURVE,
-  XMLTOKEN_CURVECENTER,
-  XMLTOKEN_CURVECONTROL,
-  XMLTOKEN_CURVESCALE,
   XMLTOKEN_FACTORY,
   XMLTOKEN_FASTMESH,
   XMLTOKEN_FOG,
@@ -67,22 +62,9 @@ enum
   XMLTOKEN_MOVEABLE,
   XMLTOKEN_PART,
   XMLTOKEN_P,
-  XMLTOKEN_RADIUS,
   XMLTOKEN_TEXLEN,
   XMLTOKEN_VISTREE,
   XMLTOKEN_V,
-
-  // Below is for plane loader.
-  XMLTOKEN_ORIG,
-  XMLTOKEN_FIRSTLEN,
-  XMLTOKEN_FIRST,
-  XMLTOKEN_SECONDLEN,
-  XMLTOKEN_SECOND,
-  XMLTOKEN_MATRIX,
-  //XMLTOKEN_V,
-  XMLTOKEN_NAME,
-  XMLTOKEN_UVEC,
-  XMLTOKEN_VVEC,
   XMLTOKEN_SMOOTH
 };
 
@@ -105,10 +87,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingSaver::eiComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csThingLoader)
+SCF_IMPLEMENT_FACTORY (csThingFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csThingSaver)
 
 SCF_EXPORT_CLASS_TABLE (thingldr)
-  SCF_EXPORT_CLASS (csThingLoader, "crystalspace.mesh.loader.factory.thing",
+  SCF_EXPORT_CLASS (csThingFactoryLoader,
+    "crystalspace.mesh.loader.factory.thing",
     "Crystal Space Thing Mesh Factory Loader")
   SCF_EXPORT_CLASS (csThingSaver, "crystalspace.mesh.saver.factory.thing",
     "Crystal Space Thing Mesh Factory Saver")
@@ -140,10 +124,6 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
 
   xmltokens.Register ("clone", XMLTOKEN_CLONE);
   xmltokens.Register ("cosfact", XMLTOKEN_COSFACT);
-  xmltokens.Register ("curve", XMLTOKEN_CURVE);
-  xmltokens.Register ("curvecenter", XMLTOKEN_CURVECENTER);
-  xmltokens.Register ("curvecontrol", XMLTOKEN_CURVECONTROL);
-  xmltokens.Register ("curvescale", XMLTOKEN_CURVESCALE);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
   xmltokens.Register ("fastmesh", XMLTOKEN_FASTMESH);
   xmltokens.Register ("fog", XMLTOKEN_FOG);
@@ -153,66 +133,9 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("part", XMLTOKEN_PART);
   xmltokens.Register ("p", XMLTOKEN_P);
   xmltokens.Register ("smooth", XMLTOKEN_SMOOTH);
-  xmltokens.Register ("radius", XMLTOKEN_RADIUS);
   xmltokens.Register ("texlen", XMLTOKEN_TEXLEN);
   xmltokens.Register ("vistree", XMLTOKEN_VISTREE);
   xmltokens.Register ("v", XMLTOKEN_V);
-  return true;
-}
-
-bool csThingLoader::ParseCurve (iCurve* curve, iLoaderContext* ldr_context,
-	iDocumentNode* node)
-{
-  int num_v = 0;
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_MATERIAL:
-	{
-	  const char* matname = child->GetContentsValue ();
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-          if (mat == NULL)
-          {
-	    synldr->ReportError (
-	      "crystalspace.bezierloader.parse.material",
-              child, "Couldn't find material named '%s'!", matname);
-            return false;
-          }
-          curve->SetMaterial (mat);
-	}
-        break;
-      case XMLTOKEN_V:
-        {
-          if (num_v >= 9)
-          {
-	    synldr->ReportError (
-	      "crystalspace.bezierloader.parse.vertices",
-              child, "Wrong number of vertices to bezier! Should be 9!");
-            return false;
-          }
-	  curve->SetVertex (num_v, child->GetContentsValueAsInt ());
-	  num_v++;
-        }
-        break;
-      default:
-	synldr->ReportBadToken (child);
-	return false;
-    }
-  }
-  
-  if (num_v != 9)
-  {
-    synldr->ReportError (
-      "crystalspace.bezierloader.parse.vertices",
-      node, "Wrong number of vertices to bezier! %d should be 9!", num_v);
-    return false;
-  }
   return true;
 }
 
@@ -220,10 +143,46 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
 	iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
-	iEngine* engine, iThingState* thing_state,
-	iThingFactoryState* thing_fact_state,
-	int vt_offset, bool isParent)
+	iEngine* engine, int vt_offset, bool isParent)
 {
+#define CHECK_TOPLEVEL(m) \
+if (!isParent) { \
+synldr->ReportError ("crystalspace.thingloader.parse", child, \
+	"'%s' flag only for top-level thing!", m); \
+return false; \
+}
+
+#define CHECK_OBJECTONLY(m) \
+if (info.load_factory) { \
+synldr->ReportError ("crystalspace.thingloader.parse", child, \
+	"'%s' is not for factories!", m); \
+return false; \
+} \
+if (!info.thing_state) { \
+synldr->ReportError ("crystalspace.thingloader.parse", child, \
+	"Factory must be given before using '%s'!", m); \
+return false; \
+}
+
+#define CHECK_DONTEXTENDFACTORY \
+if ((!info.load_factory) && info.global_factory) { \
+synldr->ReportError ("crystalspace.thingloader.parse", child, \
+	"Can't change the object when using 'factory' or 'clone'!"); \
+return false; \
+}
+
+#define CREATE_FACTORY_IF_NEEDED \
+if (!info.thing_fact_state) \
+{ \
+  csRef<iMeshObjectFactory> fact; \
+  fact = info.type->NewFactory (); \
+  info.thing_fact_state = SCF_QUERY_INTERFACE (fact, \
+	iThingFactoryState); \
+  info.obj = fact->NewInstance (); \
+  info.thing_state = SCF_QUERY_INTERFACE (info.obj, \
+	iThingState); \
+}
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -234,62 +193,47 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
     switch (id)
     {
       case XMLTOKEN_VISTREE:
-        if (!isParent)
-	{
-	  synldr->ReportError (
-	    "crystalspace.thingloader.parse.vistree",
-	    child, "'vistree' flag only for top-level thing!");
-	  return false;
-	}
-        else
-	{
-	  synldr->ReportError (
+	synldr->ReportError (
 	    "crystalspace.thingloader.parse.vistree",
 	    child, "'vistree' no longer supported! Convert your level to Dynavis using 'levtool'!\n");
-	  printf ("'vistree' no longer supported! Convert your level to Dynavis using 'levtool'!\n");
-	  return false;
-	}
-        break;
+	printf ("'vistree' no longer supported! Convert your level to Dynavis using 'levtool'!\n");
+	return false;
       case XMLTOKEN_COSFACT:
-        if (!isParent)
-	{
-	  synldr->ReportError (
-	    "crystalspace.thingloader.parse.fastmesh",
-	    child, "'cosfact' flag only for top-level thing!");
-	  return false;
-	}
-        else thing_fact_state->SetCosinusFactor (
+        CHECK_TOPLEVEL("cosfact");
+	CHECK_DONTEXTENDFACTORY;
+	CREATE_FACTORY_IF_NEEDED;
+        info.thing_fact_state->SetCosinusFactor (
 		child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_FASTMESH:
-        if (!isParent)
-	{
-	  synldr->ReportError (
-	    "crystalspace.thingloader.parse.fastmesh",
-	    child, "'fastmesh' flag only for top-level thing!");
-	  return false;
-	}
-        else thing_fact_state->GetFlags ().Set (CS_THING_FASTMESH);
+        CHECK_TOPLEVEL("fastmesh");
+	CHECK_DONTEXTENDFACTORY;
+	CREATE_FACTORY_IF_NEEDED;
+        info.thing_fact_state->GetFlags ().Set (CS_THING_FASTMESH);
         break;
       case XMLTOKEN_MOVEABLE:
-        if (!isParent)
-	{
-	  synldr->ReportError (
-	    "crystalspace.thingloader.parse.moveable",
-	    child, "'moveable' flag only for top-level thing!");
-	  return false;
-	}
-        else thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
+        CHECK_TOPLEVEL("moveable");
+	CHECK_OBJECTONLY("moveable");
+        info.thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
         break;
       case XMLTOKEN_FACTORY:
-        if (!isParent)
+        CHECK_TOPLEVEL("factory");
+        if (info.load_factory)
 	{
 	  synldr->ReportError (
 	    "crystalspace.thingloader.parse.factory",
-	    child, "'factory' statement only for top-level thing!");
+	    child, "Can't use 'factory' when parsing a factory!");
 	  return false;
 	}
-	else
+        if (info.thing_fact_state)
+	{
+	  synldr->ReportError (
+	    "crystalspace.thingloader.parse.factory",
+	    child, "'factory' already specified!");
+	  return false;
+	}
+	info.global_factory = true;
+
         {
 	  const char* factname = child->GetContentsValue ();
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
@@ -300,34 +244,45 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
               child, "Couldn't find thing factory '%s'!", factname);
             return false;
           }
-	  csRef<iThingFactoryState> tmpl_thing_state (SCF_QUERY_INTERFACE (
-	  	fact->GetMeshObjectFactory (), iThingFactoryState));
-	  if (!tmpl_thing_state)
+	  info.thing_fact_state = SCF_QUERY_INTERFACE (
+	  	fact->GetMeshObjectFactory (), iThingFactoryState);
+	  if (!info.thing_fact_state)
 	  {
 	    synldr->ReportError (
 	      "crystalspace.thingloader.parse.factory",
-              child, "Object '%s' is not a thing!", factname);
+              child, "Object '%s' is not a thing factory!", factname);
             return false;
 	  }
-	  thing_fact_state->MergeTemplate (tmpl_thing_state,
-	  	info.default_material);
+	  info.obj = fact->GetMeshObjectFactory ()->NewInstance ();
+	  info.thing_state = SCF_QUERY_INTERFACE (info.obj, iThingState);
+
+	  //@@@@@@@@@@@@@@
 	  if (info.use_mat_set)
           {
-	    thing_fact_state->ReplaceMaterials (engine->GetMaterialList (),
+	    info.thing_fact_state->ReplaceMaterials (engine->GetMaterialList (),
 	      info.mat_set_name);
 	    info.use_mat_set = false;
 	  }
         }
         break;
       case XMLTOKEN_CLONE:
-        if (!isParent)
+        CHECK_TOPLEVEL("clone");
+        if (info.load_factory)
 	{
 	  synldr->ReportError (
-	    "crystalspace.thingloader.parse.clone",
-	    child, "CLONE statement only for top-level thing!");
+	    "crystalspace.thingloader.parse.factory",
+	    child, "Parsing a factory, so can't use 'clone'!");
 	  return false;
 	}
-	else
+        if (info.thing_fact_state)
+	{
+	  synldr->ReportError (
+	    "crystalspace.thingloader.parse.factory",
+	    child, "'factory' already specified, so can't use 'clone'!");
+	  return false;
+	}
+	info.global_factory = true;
+
         {
 	  const char* meshname = child->GetContentsValue ();
 	  iMeshWrapper* wrap = ldr_context->FindMeshObject (meshname);
@@ -339,20 +294,24 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
             return false;
           }
 
-	  csRef<iThingFactoryState> tmpl_thing_state (SCF_QUERY_INTERFACE (
-	  	wrap->GetMeshObject (), iThingFactoryState));
-	  if (!tmpl_thing_state)
+	  csRef<iThingState> other_thing_state (SCF_QUERY_INTERFACE (
+	  	wrap->GetMeshObject (), iThingState));
+	  if (!other_thing_state)
 	  {
 	    synldr->ReportError (
 	      "crystalspace.thingloader.parse.clone",
               child, "Object '%s' is not a thing!", meshname);
             return false;
 	  }
-	  thing_fact_state->MergeTemplate (tmpl_thing_state,
-	  	info.default_material);
+	  info.thing_fact_state = other_thing_state->GetFactory ();
+	  info.obj = wrap->GetFactory ()->GetMeshObjectFactory ()
+	  	->NewInstance ();
+	  info.thing_state = SCF_QUERY_INTERFACE (info.obj, iThingState);
+
+	  //@@@@@@@@@@@@@@
 	  if (info.use_mat_set)
           {
-	    thing_fact_state->ReplaceMaterials (engine->GetMaterialList (),
+	    info.thing_fact_state->ReplaceMaterials (engine->GetMaterialList (),
 	      info.mat_set_name);
 	    info.use_mat_set = false;
 	  }
@@ -360,16 +319,19 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
         break;
       case XMLTOKEN_PART:
 	if (!LoadThingPart (te, child, ldr_context, object_reg, reporter,
-		synldr, info, engine, thing_state, thing_fact_state,
-		thing_fact_state->GetVertexCount (), false))
+		synldr, info, engine, info.thing_fact_state
+			? info.thing_fact_state->GetVertexCount () : 0,
+		false))
 	  return false;
         break;
       case XMLTOKEN_V:
+	CHECK_DONTEXTENDFACTORY;
+	CREATE_FACTORY_IF_NEEDED;
         {
 	  csVector3 v;
 	  if (!synldr->ParseVector (child, v))
 	    return false;
-          thing_fact_state->CreateVertex (v);
+          info.thing_fact_state->CreateVertex (v);
         }
         break;
       case XMLTOKEN_FOG:
@@ -380,14 +342,16 @@ Nag to Jorrit about this feature if you want it.");
 	return false;
 
       case XMLTOKEN_P:
+	CHECK_DONTEXTENDFACTORY;
+	CREATE_FACTORY_IF_NEEDED;
         {
-	  iPolygon3DStatic* poly3d = thing_fact_state->CreatePolygon (
+	  iPolygon3DStatic* poly3d = info.thing_fact_state->CreatePolygon (
 			  child->GetAttributeValue ("name"));
 	  if (info.default_material)
 	    poly3d->SetMaterial (info.default_material);
 	  if (!synldr->ParsePoly3d (child, ldr_context,
 	  			    engine, poly3d,
-				    info.default_texlen, thing_fact_state,
+				    info.default_texlen, info.thing_fact_state,
 				    vt_offset))
 	  {
 	    poly3d->DecRef ();
@@ -396,43 +360,9 @@ Nag to Jorrit about this feature if you want it.");
         }
         break;
 
-      case XMLTOKEN_CURVE:
-        {
-	  iCurve* p = thing_fact_state->CreateCurve ();
-	  p->QueryObject()->SetName (child->GetAttributeValue ("name"));
-	  if (!ParseCurve (p, ldr_context, child))
-	    return false;
-        }
-        break;
-
-      case XMLTOKEN_CURVECENTER:
-        {
-          csVector3 c;
-	  if (!synldr->ParseVector (child, c))
-	    return false;
-          thing_fact_state->SetCurvesCenter (c);
-        }
-        break;
-      case XMLTOKEN_CURVESCALE:
-        {
-	  float f = child->GetContentsValueAsFloat ();
-	  thing_fact_state->SetCurvesScale (f);
-          break;
-        }
-      case XMLTOKEN_CURVECONTROL:
-        {
-          csVector3 v;
-          csVector2 t;
-	  v.x = child->GetAttributeValueAsFloat ("x");
-	  v.y = child->GetAttributeValueAsFloat ("y");
-	  v.z = child->GetAttributeValueAsFloat ("z");
-	  t.x = child->GetAttributeValueAsFloat ("u");
-	  t.y = child->GetAttributeValueAsFloat ("v");
-          thing_fact_state->AddCurveVertex (v, t);
-        }
-        break;
-
       case XMLTOKEN_MATERIAL:
+	CHECK_DONTEXTENDFACTORY;
+	CREATE_FACTORY_IF_NEEDED;
 	{
 	  const char* matname = child->GetContentsValue ();
           info.default_material = ldr_context->FindMaterial (matname);
@@ -453,7 +383,9 @@ Nag to Jorrit about this feature if you want it.");
         info.use_mat_set = true;
         break;
       case XMLTOKEN_SMOOTH:
-	thing_fact_state->SetSmoothingFlag (true);
+	CHECK_DONTEXTENDFACTORY;
+	CREATE_FACTORY_IF_NEEDED;
+	info.thing_fact_state->SetSmoothingFlag (true);
 	break;
       default:
         synldr->ReportBadToken (child);
@@ -466,39 +398,71 @@ Nag to Jorrit about this feature if you want it.");
 csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 			     iLoaderContext* ldr_context, iBase*)
 {
+  ThingLoadInfo info;
+  info.load_factory = false;
+  info.global_factory = false;
+
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType));
-  if (!type)
+  info.type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  if (!info.type)
   {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.thing",
+    info.type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.thing",
     	iMeshObjectType);
   }
-  if (!type)
+  if (!info.type)
   {
     synldr->ReportError (
 		"crystalspace.thingloader.setup.objecttype",
 		node, "Could not load the thing mesh object plugin!");
     return NULL;
   }
-  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
+  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (info.type,
+  	iThingEnvironment);
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+
+  if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
+  	engine, 0, true))
+  {
+    info.obj = NULL;
+  }
+  return csPtr<iBase> (info.obj);
+}
+
+csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
+			     iLoaderContext* ldr_context, iBase*)
+{
+  ThingLoadInfo info;
+  info.load_factory = true;
+  info.global_factory = false;
+
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  info.type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  if (!info.type)
+  {
+    info.type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.thing",
+    	iMeshObjectType);
+  }
+  if (!info.type)
+  {
+    synldr->ReportError (
+		"crystalspace.thingloader.setup.objecttype",
+		node, "Could not load the thing mesh object plugin!");
+    return NULL;
+  }
+  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (info.type,
   	iThingEnvironment);
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   csRef<iMeshObjectFactory> fact;
-  csRef<iThingState> thing_state;
-  csRef<iThingFactoryState> thing_fact_state;
+  fact = info.type->NewFactory ();
+  info.thing_fact_state = SCF_QUERY_INTERFACE (fact, iThingFactoryState);
 
-  // We always do NewFactory() even for mesh objects.
-  // That's because csThing implements both so a factory is a mesh object.
-  fact = type->NewFactory ();
-  thing_state = SCF_QUERY_INTERFACE (fact, iThingState);
-  thing_fact_state = SCF_QUERY_INTERFACE (fact, iThingFactoryState);
-
-  ThingLoadInfo info;
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
-  	engine, thing_state, thing_fact_state, 0, true))
+  	engine, 0, true))
   {
     fact = NULL;
   }

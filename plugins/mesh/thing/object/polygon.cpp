@@ -64,61 +64,6 @@ static engine3d_VectorArray *VectorArray = NULL;
 
 //---------------------------------------------------------------------------
 
-csPolyTexLightMap::csPolyTexLightMap (csLightMapMapping* mapping)
-{
-  tex = new csPolyTexture (mapping);
-  lightmap_up_to_date = false;
-}
-
-csPolyTexLightMap::~csPolyTexLightMap ()
-{
-  if (tex) tex->DecRef ();
-}
-
-csPolyTexture *csPolyTexLightMap::GetPolyTex ()
-{
-  return tex;
-}
-
-void csPolyTexLightMap::WorldToCamera (
-  const csReversibleTransform &t,
-  csMatrix3 &m_cam2tex,
-  csVector3 &v_cam2tex)
-{
-  // Create the matrix to transform camera space to texture space.
-  // From: T = Mwt * (W - Vwt)
-  //       C = Mwc * (W - Vwc)
-  // To:   T = Mct * (C - Vct)
-  // Mcw * C + Vwc = W
-  // T = Mwt * (Mcw * C + Mcw * Mwc * (Vwc - Vwt))
-  // T = Mwt * Mcw * (C - Mwc * (Vwt-Vwc))
-  // ===>
-  // Mct = Mwt * Mcw
-  // Vct = Mwc * (Vwt - Vwc)
-  m_cam2tex = m_world2tex;
-  m_cam2tex *= t.GetT2O ();
-
-  v_cam2tex = t.Other2This (v_world2tex);
-}
-
-void csPolyTexLightMap::ObjectToWorld (const csMatrix3& m_obj2tex,
-	const csVector3& v_obj2tex, const csReversibleTransform &obj)
-{
-  // From: T = Mot * (O - Vot)
-  //       W = Mow * O - Vow
-  // To:   T = Mwt * (W - Vwt)
-  // Mwo * (W + Vow) = O
-  // T = Mot * (Mwo * (W + Vow) - (Mwo * Mow) * Vot)
-  // T = Mot * Mwo * (W + Vow - Mow * Vot)
-  // ===>
-  // Mwt = Mot * Mwo
-  // Vwt = Mow * Vot - Vow
-  m_world2tex = m_obj2tex;
-  m_world2tex *= obj.GetO2T ();
-  v_world2tex = obj.This2Other (v_obj2tex);
-}
-
-//---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csPolygon3DStatic)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygon3DStatic)
 SCF_IMPLEMENT_IBASE_END
@@ -127,22 +72,20 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3DStatic::eiPolygon3DStatic)
   SCF_IMPLEMENTS_INTERFACE(iPolygon3DStatic)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csPolygon3DStatic::csPolygon3DStatic (iMaterialWrapper *material) : vertices(4)
+csPolygon3DStatic::csPolygon3DStatic () : vertices(4)
 {
   VectorArray = GetStaticVectorArray();
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3DStatic);
-  thing = NULL;
+  thing_static = NULL;
 
-  csPolygon3DStatic::material = material;
+  material = NULL;
   name = NULL;
 
   mapping = NULL;
   portal = NULL;
 
   flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET | CS_POLY_VISCULL);
-
-  EnableTextureMapping (true);
 
   VectorArray->IncRef ();
 
@@ -156,7 +99,7 @@ csPolygon3DStatic::~csPolygon3DStatic ()
 {
   delete[] name;
 
-  delete mapping;
+  thing_static->thing_type->blk_lightmapmapping.Free (mapping);
 
   if (portal && flags.Check (CS_POLY_DELETE_PORTAL))
   {
@@ -166,6 +109,47 @@ csPolygon3DStatic::~csPolygon3DStatic ()
   }
 
   VectorArray->DecRef ();
+}
+
+csPolygon3DStatic* csPolygon3DStatic::Clone ()
+{
+  csPolygon3DStatic* clone = thing_static->thing_type
+  	->blk_polygon3dstatic.Alloc ();
+  clone->SetMaterial (material);
+  clone->SetName (name);
+  clone->vertices = vertices;
+  if (portal)
+    clone->portal = portal->Clone ();
+  else
+    clone->portal = NULL;
+  clone->plane_obj = plane_obj;
+  if (mapping)
+  {
+    clone->mapping = thing_static->thing_type->blk_lightmapmapping.Alloc ();
+    clone->mapping->m_obj2tex = mapping->m_obj2tex;
+    clone->mapping->v_obj2tex = mapping->v_obj2tex;
+    clone->mapping->fdu = mapping->fdu;
+    clone->mapping->fdv = mapping->fdv;
+    clone->mapping->Imin_u = mapping->Imin_u;
+    clone->mapping->Imin_v = mapping->Imin_v;
+    clone->mapping->Fmin_u = mapping->Fmin_u;
+    clone->mapping->Fmin_v = mapping->Fmin_v;
+    clone->mapping->Fmax_u = mapping->Fmax_u;
+    clone->mapping->Fmax_v = mapping->Fmax_v;
+    clone->mapping->shf_u = mapping->shf_u;
+    clone->mapping->w = mapping->w;
+    clone->mapping->h = mapping->h;
+    clone->mapping->w_orig = mapping->w_orig;
+  }
+  else
+  {
+    clone->mapping = NULL;
+  }
+  clone->Alpha = Alpha;
+  clone->MixMode = MixMode;
+  clone->flags.SetAll (flags.Get ());
+
+  return clone;
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -200,7 +184,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       x1, y1, z1,
       len1,
       A, B, C);
-  thing->StaticDataChanged ();
+  thing_static->StaticDataChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -215,7 +199,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       v_orig, v1,
       len1, v2,
       len2);
-  thing->StaticDataChanged ();
+  thing_static->StaticDataChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -229,7 +213,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       v_orig,
       v_u,
       v_v);
-  thing->StaticDataChanged ();
+  thing_static->StaticDataChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -242,7 +226,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   const csVector3 v (xv, yv, zv);
   csTextureTrans::compute_texture_space (mapping->m_obj2tex,
   	mapping->v_obj2tex, o, u, v);
-  thing->StaticDataChanged ();
+  thing_static->StaticDataChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -257,7 +241,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       xu, yu, zu,
       xv, yv, zv,
       xw, yw, zw);
-  thing->StaticDataChanged ();
+  thing_static->StaticDataChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -266,7 +250,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
 {
   mapping->m_obj2tex = tx_matrix;
   mapping->v_obj2tex = tx_vector;
-  thing->StaticDataChanged ();
+  thing_static->StaticDataChanged ();
 }
 
 void csPolygon3DStatic::MappingGetTextureSpace (
@@ -277,9 +261,9 @@ void csPolygon3DStatic::MappingGetTextureSpace (
   tx_vector = mapping->v_obj2tex;
 }
 
-void csPolygon3DStatic::SetParent (csThing *thing)
+void csPolygon3DStatic::SetParent (csThingStatic *thing_static)
 {
-  csPolygon3DStatic::thing = thing;
+  csPolygon3DStatic::thing_static = thing_static;
 }
 
 void csPolygon3DStatic::EnableTextureMapping (bool enable)
@@ -287,14 +271,14 @@ void csPolygon3DStatic::EnableTextureMapping (bool enable)
   if (enable && mapping != NULL) return;
   if (!enable && mapping == NULL) return;
 
-  if (thing) thing->StaticDataChanged ();
+  if (thing_static) thing_static->StaticDataChanged ();
   if (enable)
   {
-    mapping = new csLightMapMapping ();
+    mapping = thing_static->thing_type->blk_lightmapmapping.Alloc ();
   }
   else
   {
-    delete mapping;
+    thing_static->thing_type->blk_lightmapmapping.Free (mapping);
     mapping = NULL;
   }
 }
@@ -327,7 +311,7 @@ void csPolygon3DStatic::SetCSPortal (iSector *sector, bool null)
   {
     delete portal;
     portal = NULL;
-    if (thing) thing->UpdatePortalList ();
+    if (thing_static) thing_static->UpdatePortalList ();
   }
 
   if (!null && !sector) return ;
@@ -339,7 +323,7 @@ void csPolygon3DStatic::SetCSPortal (iSector *sector, bool null)
   else
     portal->SetSector (NULL);
   flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
-  if (thing) thing->UpdatePortalList ();
+  if (thing_static) thing_static->UpdatePortalList ();
 }
 
 void csPolygon3DStatic::SetPortal (csPortal *prt)
@@ -349,13 +333,13 @@ void csPolygon3DStatic::SetPortal (csPortal *prt)
     portal->SetSector (NULL);
     delete portal;
     portal = NULL;
-    if (thing) thing->UpdatePortalList ();
+    if (thing_static) thing_static->UpdatePortalList ();
   }
 
   portal = prt;
   flags.Set (CS_POLY_DELETE_PORTAL);
   flags.Reset (CS_POLY_COLLDET);         // Disable CD by default for portals.
-  if (thing) thing->UpdatePortalList ();
+  if (thing_static) thing_static->UpdatePortalList ();
 }
 
 bool csPolygon3DStatic::Overlaps (csPolygon3DStatic *overlapped)
@@ -403,9 +387,9 @@ iMaterialHandle *csPolygon3DStatic::GetMaterialHandle ()
   return material ? material->GetMaterialHandle () : NULL;
 }
 
-iThingState *csPolygon3DStatic::eiPolygon3DStatic::GetParent ()
+iThingFactoryState *csPolygon3DStatic::eiPolygon3DStatic::GetParent ()
 {
-  return &(scfParent->GetParent ()->scfiThingState);
+  return (iThingFactoryState*)(scfParent->GetParent ());
 }
 
 void csPolygon3DStatic::eiPolygon3DStatic::CreatePlane (
@@ -518,7 +502,7 @@ void csPolygon3DStatic::ComputeNormal ()
 
   // By default the world space normal is equal to the object space normal.
   plane_obj.Set (A, B, C, D);
-  thing->StaticDataChanged ();
+  thing_static->StaticDataChanged ();
 }
 
 void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
@@ -527,7 +511,7 @@ void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
   csPlane3 new_plane;
   t.This2Other (GetObjectPlane (), Vobj (0), new_plane);
   GetObjectPlane () = new_plane;
-  thing->StaticDataChanged ();
+  thing_static->StaticDataChanged ();
   if (mapping)
   {
     mapping->m_obj2tex *= t.GetO2T ();
@@ -537,7 +521,8 @@ void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
 
 void csPolygon3DStatic::CreateBoundingTextureBox ()
 {
-  if (!mapping) mapping = new csLightMapMapping ();
+  if (!mapping)
+    mapping = thing_static->thing_type->blk_lightmapmapping.Alloc ();
 
   // First we compute the bounding box in 2D texture space (uv-space).
   float min_u = 1000000000.;
@@ -597,7 +582,7 @@ void csPolygon3DStatic::Finish ()
 {
 #ifndef CS_USE_NEW_RENDERER
 
-  if (thing->flags.Check (CS_ENTITY_NOLIGHTING))
+  if (thing_static->flags.Check (CS_ENTITY_NOLIGHTING))
     flags.Reset (CS_POLY_LIGHTING);
 
   if (IsTextureMappingEnabled ())
@@ -622,10 +607,10 @@ void csPolygon3DStatic::Finish ()
     int lmw = csLightMap::CalcLightMapWidth (mapping->w_orig);
     int lmh = csLightMap::CalcLightMapHeight (mapping->h);
     int max_lmw, max_lmh;
-    thing->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
+    thing_static->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
     if ((lmw > max_lmw) || (lmh > max_lmh))
     {
-      thing->thing_type->Notify ("Oversize lightmap (%dx%d > %dx%d) "
+      thing_static->thing_type->Notify ("Oversize lightmap (%dx%d > %dx%d) "
         "for polygon '%s'", lmw, lmh, 
 	max_lmw, max_lmh, GetName());
     }
@@ -701,7 +686,7 @@ void csPolygon3DStatic::SetTextureSpace (
 
   if (ABS (det) < 0.0001f)
   {
-    thing->thing_type->Warn (
+    thing_static->thing_type->Warn (
       "Warning: bad UV coordinates for poly '%s'!",
       GetName ());
     SetTextureSpace (p1, p2, 1);
@@ -799,19 +784,19 @@ void csPolygon3DStatic::SetTextureSpace (
 
 int csPolygon3DStatic::AddVertex (int v)
 {
-  if (v >= thing->GetVertexCount ())
+  if (v >= thing_static->GetVertexCount ())
   {
-    thing->thing_type->Bug (
+    thing_static->thing_type->Bug (
         "Index number %d is too high for a polygon (max=%d) (polygon '%s')!",
         v,
-        thing->GetVertexCount (),
+        thing_static->GetVertexCount (),
         GetName () ? GetName () : "<noname>");
     return 0;
   }
 
   if (v < 0)
   {
-    thing->thing_type->Bug ("Bad negative vertex index %d!", v);
+    thing_static->thing_type->Bug ("Bad negative vertex index %d!", v);
     return 0;
   }
 
@@ -821,14 +806,14 @@ int csPolygon3DStatic::AddVertex (int v)
 
 int csPolygon3DStatic::AddVertex (const csVector3 &v)
 {
-  int i = thing->AddVertex (v);
+  int i = thing_static->AddVertex (v);
   AddVertex (i);
   return i;
 }
 
 int csPolygon3DStatic::AddVertex (float x, float y, float z)
 {
-  int i = thing->AddVertex (x, y, z);
+  int i = thing_static->AddVertex (x, y, z);
   AddVertex (i);
   return i;
 }
@@ -1063,14 +1048,13 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
   SCF_IMPLEMENTS_INTERFACE(iPolygon3D)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csPolygon3D::csPolygon3D (csPolygon3DStatic* static_data)
+csPolygon3D::csPolygon3D ()
 {
   VectorArray = GetStaticVectorArray();
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
   thing = NULL;
-
-  csPolygon3D::static_data = static_data;
+  static_data = NULL;
 
   txt_info = NULL;
   lightpatches = NULL;
@@ -1078,7 +1062,8 @@ csPolygon3D::csPolygon3D (csPolygon3DStatic* static_data)
 
 csPolygon3D::~csPolygon3D ()
 {
-  delete txt_info;
+  static_data->thing_static->thing_type->blk_polytex.Free (txt_info);
+  //delete txt_info;
 
   if (thing)
   {
@@ -1087,14 +1072,18 @@ csPolygon3D::~csPolygon3D ()
       iDynLight* dl = lightpatches->GetLight ();
       if (dl)
         dl->RemoveAffectedLightingInfo (&(thing->scfiLightingInfo));
-      thing->thing_type->lightpatch_pool->Free (lightpatches);
+      thing->GetStaticData ()->thing_type->lightpatch_pool->Free (lightpatches);
     }
   }
 }
 
+void csPolygon3D::SetStaticData (csPolygon3DStatic* static_data)
+{
+  csPolygon3D::static_data = static_data;
+}
+
 void csPolygon3D::SetParent (csThing *thing)
 {
-  if (thing == csPolygon3D::thing) return ;           // Nothing to do.
   csPolygon3D::thing = thing;
 }
 
@@ -1105,11 +1094,13 @@ iThingState *csPolygon3D::eiPolygon3D::GetParent ()
 
 void csPolygon3D::RefreshFromStaticData ()
 {
-  delete txt_info;
+  static_data->thing_static->thing_type->blk_polytex.Free (txt_info);
+  //delete txt_info;
   txt_info = NULL;
   if (static_data->IsTextureMappingEnabled ())
   {
-    txt_info = new csPolyTexLightMap (static_data->GetLightMapMapping ());
+    txt_info = static_data->thing_static->thing_type->blk_polytex.Alloc ();
+    txt_info->SetLightMapMapping (static_data->GetLightMapMapping ());
     txt_info->m_world2tex = static_data->GetLightMapMapping ()->m_obj2tex;
     txt_info->v_world2tex = static_data->GetLightMapMapping ()->v_obj2tex;
   }
@@ -1156,28 +1147,28 @@ void csPolygon3D::Finish ()
 
   if (static_data->IsTextureMappingEnabled ())
   {
-    txt_info->tex->SetPolygon (this);
-    txt_info->tex->SetLightMap (NULL);
+    txt_info->SetPolygon (this);
+    txt_info->SetLightMap (NULL);
     if (static_data->flags.Check (CS_POLY_LIGHTING))
     {
-      csLightMap *lm = new csLightMap ();
-      txt_info->tex->SetLightMap (lm);
+      csLightMap *lm = static_data->thing_static->thing_type
+      	->blk_lightmap.Alloc ();
+      txt_info->SetLightMap (lm);
 
       csColor ambient;
-      thing->thing_type->engine->GetAmbientLight (ambient);
+      thing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
       lm->Alloc (static_data->mapping->w_orig, static_data->mapping->h,
       	  int(ambient.red * 255.0f),
       	  int(ambient.green * 255.0f),
       	  int(ambient.blue * 255.0f));
   
-      if (!thing->thing_type->G3D->IsLightmapOK (txt_info->GetPolyTex()))
+      csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;
+      if (!thing_type->G3D->IsLightmapOK (txt_info))
       {
-        thing->thing_type->Notify ("Renderer can't handle lightmap "
+        thing_type->Notify ("Renderer can't handle lightmap "
 	    "for polygon '%s'", static_data->GetName());
         static_data->flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
       }
-
-      lm->DecRef ();
     }
   }
 
@@ -1191,7 +1182,7 @@ void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
   {
     csLightPatch* lpnext = lp->GetNext ();
     if (lp->GetLight () == dynlight)
-      thing->thing_type->lightpatch_pool->Free (lp);
+      thing->GetStaticData ()->thing_type->lightpatch_pool->Free (lp);
     lp = lpnext;
   }
 }
@@ -1738,8 +1729,8 @@ void csPolygon3D::InitializeDefault ()
 {
   if (txt_info)
   {
-    if (txt_info->tex->lm == NULL) return ;
-    txt_info->tex->InitLightMaps ();
+    if (txt_info->lm == NULL) return ;
+    txt_info->InitLightMaps ();
     txt_info->lightmap_up_to_date = false;
     return ;
   }
@@ -1750,17 +1741,16 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
   if (txt_info)
   {
     CS_ASSERT (txt_info != NULL);
-    if (txt_info->tex->lm == NULL) return NULL;
-    const char* error = txt_info->tex->lm->ReadFromCache (
+    if (txt_info->lm == NULL) return NULL;
+    const char* error = txt_info->lm->ReadFromCache (
           file,
           static_data->mapping->w_orig,
           static_data->mapping->h,
           this,
-	  NULL,
-	  thing->thing_type->engine);
+	  thing->GetStaticData ()->thing_type->engine);
     if (error != NULL)
     {
-      txt_info->tex->InitLightMaps ();
+      txt_info->InitLightMaps ();
     }
     txt_info->lightmap_up_to_date = true;
     return error;
@@ -1773,12 +1763,12 @@ bool csPolygon3D::WriteToCache (iFile* file)
 {
   if (txt_info)
   {
-    if (txt_info->tex->lm == NULL) return true;
+    if (txt_info->lm == NULL) return true;
     txt_info->lightmap_up_to_date = true;
-    if (thing->thing_type->engine->GetLightingCacheMode ()
+    if (thing->GetStaticData ()->thing_type->engine->GetLightingCacheMode ()
     	& CS_ENGINE_CACHE_WRITE)
-      txt_info->tex->lm->Cache (file, this, NULL,
-	  thing->thing_type->engine);
+      txt_info->lm->Cache (file, this,
+	  thing->GetStaticData ()->thing_type->engine);
     return true;
   }
 
@@ -1787,11 +1777,11 @@ bool csPolygon3D::WriteToCache (iFile* file)
 
 void csPolygon3D::PrepareLighting ()
 {
-  if (!txt_info || !txt_info->tex->lm) return ;
-  txt_info->tex->lm->ConvertToMixingMode ();
-  txt_info->tex->lm->ConvertFor3dDriver (
-      thing->thing_type->engine->GetLightmapsRequirePO2 (),
-      thing->thing_type->engine->GetMaxLightmapAspectRatio ());
+  if (!txt_info || !txt_info->lm) return ;
+  txt_info->lm->ConvertToMixingMode ();
+  txt_info->lm->ConvertFor3dDriver (
+      thing->GetStaticData ()->thing_type->engine->GetLightmapsRequirePO2 (),
+      thing->GetStaticData ()->thing_type->engine->GetMaxLightmapAspectRatio ());
 }
 
 void csPolygon3D::FillLightMapDynamic (iFrustumView* lview)
@@ -1800,7 +1790,9 @@ void csPolygon3D::FillLightMapDynamic (iFrustumView* lview)
 
   // We are working for a dynamic light. In this case we create
   // a light patch for this polygon.
-  csLightPatch *lp = thing->thing_type->lightpatch_pool->Alloc ();
+  // @@@ Lots of pointers to get the lightpatch pool!!!
+  csLightPatch *lp = thing->GetStaticData ()->thing_type->
+  	lightpatch_pool->Alloc ();
   csRef<iShadowBlock> sb = lview->CreateShadowBlock ();
   lp->SetShadowBlock (sb);
   AddLightpatch (lp);
@@ -2065,7 +2057,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
 	iMovable* movable,
 	csLightingPolyTexQueue* lptq, bool vis)
 {
-  bool do_smooth = GetParent ()->GetSmoothingFlag ();
+  bool do_smooth = GetParent ()->GetStaticData ()->GetSmoothingFlag ();
 
   bool maybeItsVisible = false;
   csFrustum *light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
@@ -2106,8 +2098,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   // that are adjacent.
   bool calc_lmap;
   if (txt_info)
-    calc_lmap = txt_info->tex && txt_info->tex->lm
-    	&& !txt_info->lightmap_up_to_date;
+    calc_lmap = txt_info->lm && !txt_info->lightmap_up_to_date;
   else
     calc_lmap = true;
 
@@ -2164,7 +2155,7 @@ void csPolygon3D::FillLightMapStatic (iFrustumView *lview,
   if (txt_info)
   {
     if (txt_info->lightmap_up_to_date) return ;
-    txt_info->tex->FillLightMap (lview, lptq, vis, this);
+    txt_info->FillLightMap (lview, lptq, vis, this);
   }
 }
 

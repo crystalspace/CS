@@ -479,8 +479,9 @@ bool Simple::Initialize ()
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (
     engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state (
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingFactoryState));
+  csRef<iThingState> thing_state (
+    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
+  iThingFactoryState* walls_state = thing_state->GetFactory ();
   iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -575,21 +576,22 @@ object. Because this is a very common case there is a convenience function
 in the engine (called @code{CreateSectorWallsMesh()}) which will create a
 thing mesh and add it to the given sector. The only thing that has to be
 done after this is add polygons to that mesh. To do this we first query
-the interface called @code{iThingFactoryState} from the thing mesh object.
+the interface called @code{iThingState} from the thing mesh object.
 We use the macro @code{SCF_QUERY_INTERFACE} which is part of @sc{scf}
 (@pxref{SCF}). This will see if the mesh object (which is wrapped by
-the mesh wrapper) actually implements @code{iThingFactoryState} (which should
+the mesh wrapper) actually implements @code{iThingState} (which should
 be the case here) and if so it will return a pointer to the implementation
-of @code{iThingFactoryState}. All mesh objects implement some kind of state
+of @code{iThingState}. All mesh objects implement some kind of state
 interface which is used to set up or query the state of that mesh object.
 Note that all interfaces which you query using @code{SCF_QUERY_INTERFACE}
 should be released when you no longer need them (by calling @code{DecRef()}).
 However in this example we assign them to a @code{csRef} which takes care of
 @code{DecRef()} for us.
 
-The returned thing state we can now use to create polygons by calling
+From the returned thing state we now get the factory state
+(@code{iThingFactoryState}) which we can now use to create polygons by calling
 @code{CreatePolygon()} for every wall. This will return a pointer to a
-polygon (@code{iPolygon3D}). On this we can set various parameters like
+polygon (@code{iPolygon3DStatic}). On this we can set various parameters like
 the material. Then we add four vertices (note that in Crystal Space
 a polygon is visible if vertices are oriented clock-wise). The location
 given to @code{CreateVertex()} is in object space (in contrast with

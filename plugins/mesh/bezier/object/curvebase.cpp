@@ -19,12 +19,10 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "qsqrt.h"
-#include "bezier.h"
-#include "curve.h"
-#include "polytext.h"
-#include "polygon.h"
-#include "thing.h"
-#include "lppool.h"
+#include "bezier2.h"
+#include "curvebase.h"
+#include "beziermsh.h"
+#include "lightpool.h"
 #include "csgeom/frustum.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
@@ -101,7 +99,7 @@ csCurveTesselated::~csCurveTesselated ()
 #endif // CS_USE_NEW_RENDERER
 }
 
-void csCurveTesselated::UpdateColors (csLightMap *LightMap)
+void csCurveTesselated::UpdateColors (csCurveLightMap *LightMap)
 {
   if (!LightMap)
   {
@@ -163,7 +161,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csCurve::eiVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif // CS_USE_NEW_RENDERER
 
-csCurve::csCurve (csThingObjectType* thing_type) :
+csCurve::csCurve (csBezierMeshObjectType* thing_type) :
   csObject(),
   LightPatches(NULL),
   O2W(NULL),
@@ -225,23 +223,23 @@ void csCurve::SetMaterial (iMaterialWrapper *m)
 
 void csCurve::DynamicLightDisconnect (iDynLight* dynlight)
 {
-  csLightPatch* lp = LightPatches;
+  csBezierLightPatch* lp = LightPatches;
   while (lp)
   {
-    csLightPatch* lpnext = lp->GetNext ();
+    csBezierLightPatch* lpnext = lp->GetNext ();
     if (lp->GetLight () == dynlight)
       thing_type->lightpatch_pool->Free (lp);
     lp = lpnext;
   }
 }
 
-void csCurve::AddLightPatch (csLightPatch *lp)
+void csCurve::AddLightPatch (csBezierLightPatch *lp)
 {
   lp->AddList (LightPatches);
   lp->SetPolyCurve (this);
 }
 
-void csCurve::UnlinkLightPatch (csLightPatch *lp)
+void csCurve::UnlinkLightPatch (csBezierLightPatch *lp)
 {
   lp->RemoveList (LightPatches);
 }
@@ -259,7 +257,7 @@ bool csCurve::RecalculateDynamicLights ()
   //---
   // Now add all dynamic lights.
   //---
-  csLightPatch *lp = LightPatches;
+  csBezierLightPatch *lp = LightPatches;
   while (lp)
   {
     ShineDynLight (lp);
@@ -269,7 +267,7 @@ bool csCurve::RecalculateDynamicLights ()
   return true;
 }
 
-void csCurve::ShineDynLight (csLightPatch *lp)
+void csCurve::ShineDynLight (csBezierLightPatch *lp)
 {
   CS_ASSERT (O2W);
   if (!uv2World) CalcUVBuffers ();
@@ -290,7 +288,7 @@ void csCurve::ShineDynLight (csLightPatch *lp)
   csVector3 &center = lp->GetLightFrustum ()->GetOrigin ();
 
   int lval;
-  float cosfact = csPolyTexture::cfg_cosinus_factor;
+  float cosfact = csBezierMesh::cfg_cosinus_factor;
 
   // now add to the map
   csVector3 pos;
@@ -353,21 +351,21 @@ void csCurve::ShineDynLight (csLightPatch *lp)
       {
         lval = map[uv].red + QRound (color.red * brightness);
         if (lval > 255) lval = 255;
-        map[uv].red = (unsigned char) lval;
+        map[uv].red = lval;
       }
 
       if (color.green > 0)
       {
         lval = map[uv].green + QRound (color.green * brightness);
         if (lval > 255) lval = 255;
-        map[uv].green = (unsigned char) lval;
+        map[uv].green = lval;
       }
 
       if (color.blue > 0)
       {
         lval = map[uv].blue + QRound (color.blue * brightness);
         if (lval > 255) lval = 255;
-        map[uv].blue = (unsigned char) lval;
+        map[uv].blue = lval;
       }
     }
   }
@@ -377,7 +375,7 @@ void csCurve::ShineDynLight (csLightPatch *lp)
 
 void csCurve::SetObject2World (const csReversibleTransform *o2w)
 {
-  if (!LightMap) return ;                     // Return if there is no LightMap yet.
+  if (!LightMap) return;                // Return if there is no LightMap yet.
   int lm_width = LightMap->GetWidth ();
   int lm_height = LightMap->GetHeight ();
 
@@ -439,7 +437,7 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
   iLight* l = lpi->GetLight ();
   bool dyn = l->IsDynamic ();
 
-  csShadowMap *smap;
+  csCurveShadowMap *smap;
   uint8 *ShadowMap = 0;
   csRGBpixel *Lightmap = 0;
 
@@ -452,8 +450,8 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
     if (!smap)
     {
       smap = LightMap->NewShadowMap (l,
-		      CURVE_LM_SIZE * csLightMap::lightcell_size,
-		      CURVE_LM_SIZE * csLightMap::lightcell_size);
+		      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
+		      CURVE_LM_SIZE * csCurveLightMap::lightcell_size);
     }
 
     ShadowMap = smap->GetArray ();
@@ -466,7 +464,7 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
 
   int lval;
 
-  float cosfact = csPolyTexture::cfg_cosinus_factor;
+  float cosfact = csBezierMesh::cfg_cosinus_factor;
 
   // get our coverage matrix
   csCoverageMatrix *shadow_matrix = new csCoverageMatrix (
@@ -518,7 +516,7 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
       {
         lval = ShadowMap[uv] + QRound (CS_NORMAL_LIGHT_LEVEL * brightness);
         if (lval > 255) lval = 255;
-        ShadowMap[uv] = (unsigned char) lval;
+        ShadowMap[uv] = lval;
       }
       else
       {
@@ -526,21 +524,21 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
         {
           lval = Lightmap[uv].red + QRound (color.red * brightness);
           if (lval > 255) lval = 255;
-          Lightmap[uv].red = (unsigned char) lval;
+          Lightmap[uv].red = lval;
         }
 
         if (col.green > 0)
         {
           lval = Lightmap[uv].green + QRound (color.green * brightness);
           if (lval > 255) lval = 255;
-          Lightmap[uv].green = (unsigned char) lval;
+          Lightmap[uv].green = lval;
         }
 
         if (col.blue > 0)
         {
           lval = Lightmap[uv].blue + QRound (color.blue * brightness);
           if (lval > 255) lval = 255;
-          Lightmap[uv].blue = (unsigned char) lval;
+          Lightmap[uv].blue = lval;
         }
       }
     }
@@ -556,7 +554,7 @@ void csCurve::CalculateLightingDynamic (iFrustumView *lview)
 
   // We are working for a dynamic light. In this case we create
   // a light patch for this polygon.
-  csLightPatch *lp = thing_type->lightpatch_pool->Alloc ();
+  csBezierLightPatch *lp = thing_type->lightpatch_pool->Alloc ();
   csRef<iShadowBlock> sb = lview->CreateShadowBlock ();
   lp->SetShadowBlock (sb);
   AddLightPatch (lp);
@@ -585,14 +583,14 @@ void csCurve::CalculateLightingDynamic (iFrustumView *lview)
 void csCurve::InitializeDefaultLighting ()
 {
   if (!IsLightable ()) return ;
-  LightMap = new csLightMap ();
+  LightMap = new csCurveLightMap ();
 
   // Allocate space for the LightMap and initialize it to ambient color.
   csColor ambient;
-  ParentThing->thing_type->engine->GetAmbientLight (ambient);
+  ParentThing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
   LightMap->Alloc (
-      CURVE_LM_SIZE * csLightMap::lightcell_size,
-      CURVE_LM_SIZE * csLightMap::lightcell_size,
+      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
+      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
       	int(ambient.red * 255.0f),
       	int(ambient.green * 255.0f),
       	int(ambient.blue * 255.0f));
@@ -602,23 +600,22 @@ void csCurve::InitializeDefaultLighting ()
 const char* csCurve::ReadFromCache (iFile* file)
 {
   if (!IsLightable ()) return NULL;
-  LightMap = new csLightMap ();
+  LightMap = new csCurveLightMap ();
 
   // Allocate space for the LightMap and initialize it to ambient color.
   csColor ambient;
-  ParentThing->thing_type->engine->GetAmbientLight (ambient);
+  ParentThing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
   LightMap->Alloc (
-      CURVE_LM_SIZE * csLightMap::lightcell_size,
-      CURVE_LM_SIZE * csLightMap::lightcell_size,
+      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
+      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
       	int(ambient.red * 255.0f),
 	int(ambient.green * 255.0f),
       	int(ambient.blue * 255.0f));
 
   const char* error = LightMap->ReadFromCache (
       file,
-      CURVE_LM_SIZE * csLightMap::lightcell_size,
-      CURVE_LM_SIZE * csLightMap::lightcell_size,
-      NULL,
+      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
+      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
       this,
       thing_type->engine);
   LightmapUpToDate = true;
@@ -634,7 +631,7 @@ bool csCurve::WriteToCache (iFile* file)
     if (
       thing_type->engine->GetLightingCacheMode ()
         & CS_ENGINE_CACHE_WRITE)
-      LightMap->Cache (file, NULL, this, thing_type->engine);
+      LightMap->Cache (file, this, thing_type->engine);
   }
 
   return true;
@@ -791,7 +788,7 @@ float csCurve::GetScreenBoundingBox (
 {
   csVector2 oneCorner;
 
-  float aspect = (float) camera->GetFOV ();
+  float aspect = camera->GetFOV ();
   float shift_x = camera->GetShiftX ();
   float shift_y = camera->GetShiftY ();
 
@@ -967,7 +964,7 @@ void csBezierCurve::GetObjectBoundingBox (csBox3 &bbox)
   bbox = object_bbox;
 }
 
-csBezierCurve::csBezierCurve (csThingObjectType* thing_type)
+csBezierCurve::csBezierCurve (csBezierMeshObjectType* thing_type)
 	: csCurve (thing_type)
 {
   int i, j;
@@ -992,8 +989,8 @@ csBezierCurve::~csBezierCurve ()
 
 void csBezierCurve::SetControlPoint (int index, int control_id)
 {
-  GetControlPoint (index) = ParentThing->GetCurveVertex (control_id);
-  GetTextureCoord (index) = ParentThing->GetCurveTexel (control_id);
+  GetControlPoint (index) = ParentThing->GetStaticData ()->GetCurveVertex (control_id);
+  GetTextureCoord (index) = ParentThing->GetStaticData ()->GetCurveTexel (control_id);
   cpt[index][0] = GetControlPoint (index).x;
   cpt[index][1] = GetControlPoint (index).y;
   cpt[index][2] = GetControlPoint (index).z;

@@ -133,7 +133,7 @@
 #include "imesh/sprite3d.h"
 #include "imesh/stars.h"
 #include "imesh/terrfunc.h"
-#include "imesh/thing/curve.h"
+#include "imesh/bezier.h"
 #include "imesh/thing/lightmap.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"

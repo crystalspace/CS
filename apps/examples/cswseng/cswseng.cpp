@@ -276,8 +276,9 @@ void ceCswsEngineApp::SetupDefaultWorld ()
 
   iSector* room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state (
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingFactoryState));
+  csRef<iThingState> ws =
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
   start_sector = room;
   iPolygon3DStatic* p;
   p = walls_state->CreatePolygon ();

@@ -6,6 +6,34 @@ The history order is reversed so that new features are at the top.
 10-Apr-2003
 	- Fixed a compile error in binary XML reader. I wonder if people
 	  compile after changing something...
+	- Thing changes:
+	    - Removed obsolete csThingBBox bounding box in csThing.
+	    - Split bezier curves in seperate mesh object plugin (bezier
+	      plugin).
+	    - Greatly cleaned up the csThingStatic stuff and moved all static
+	      stuff to that.
+	    - Updated API modification document.
+	    - Also updated various other parts in the documentation for these
+	      changes.
+	    - Fixed map2cs to export curves using the new bezier plugin.
+	    - Changed the way thing factories and objects work. A thing factory
+	      and a mesh object no longer are the same object. So first you
+	      have to make a factory and then the object. This also allows
+	      sharing of factories between objects.
+	    - As a consequence of all these changes the lightmap format has
+	      changed again.
+	    - Doing a HardTransform() on a thing mesh object will automatically
+	      cause the factory of that thing to be cloned so that other
+	      things sharing that factory will not be transformed.
+	      Doing a HardTransform() on a thing factory will have an
+	      effect on all instances created from that.
+	    - Used csBlockAllocator<T> for a lot of polygon objects in the
+	      thing mesh plugin. This speeds up loading/unloading and also
+	      improves memory usage.
+	    - Merged csPolyTexLightMap into csPolyTexture. This improved
+	      both speed, memory usage, and source code readability.
+	    - Thing now uses ClipBSphere() instead of ClipBBox(). This is
+	      faster.
 	- Reverted endian changes from res again because they cause a
 	  compile error with mingw/msys.
 	- res augmented the configure process to check for a working INT64_C

@@ -139,13 +139,13 @@ bool BumpTest::InitProcDemo ()
     return false;
   }
 
-  csRef<iMeshObjectFactory> thing_fact (thing_type->NewFactory ());
-  csRef<iMeshObject> thing_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
+  csRef<iMeshObjectFactory> thing_fact = thing_type->NewFactory ();
+  csRef<iMeshObject> thing_obj = thing_fact->NewInstance ();
 
   csRef<iMaterialWrapper> imatBump (
   	SCF_QUERY_INTERFACE (matBump, iMaterialWrapper));
-  csRef<iThingFactoryState> thing_state (
-  	SCF_QUERY_INTERFACE (thing_obj, iThingFactoryState));
+  csRef<iThingState> ts = SCF_QUERY_INTERFACE (thing_obj, iThingState);
+  csRef<iThingFactoryState> thing_state = ts->GetFactory ();
   float dx = 1, dy = 1, dz = 1;
   iPolygon3DStatic* p;
 
@@ -364,8 +364,9 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   iPolygon3DStatic* p;
-  csRef<iThingFactoryState> walls_state (
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingFactoryState));
+  csRef<iThingState> ws = SCF_QUERY_INTERFACE (
+  	walls->GetMeshObject (), iThingState);
+  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->CreateVertex (csVector3 (-5, 0, 5));

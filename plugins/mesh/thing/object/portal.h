@@ -75,6 +75,9 @@ public:
   /// Destructor.
   virtual ~csPortal ();
 
+  /// Create a clone of this portal.
+  csPortal* Clone ();
+
   //---- misc. manipulation functions ---------------------------------------
 
   /// For iReference.

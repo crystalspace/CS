@@ -16,11 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_THING_H__
-#define __CS_THING_H__
+#ifndef __CS_BEZIERMESH_H__
+#define __CS_BEZIERMESH_H__
 
 #include "csgeom/transfrm.h"
-#include "parrays.h"
+#include "carrays.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csutil/util.h"
@@ -29,29 +29,22 @@
 #include "csutil/csvector.h"
 #include "csutil/array.h"
 #include "csutil/refarr.h"
-#include "csutil/blockallocator.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
-#include "imesh/thing/thing.h"
-#include "imesh/thing/polygon.h"
+#include "imesh/bezier.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/config.h"
-#include "lghtmap.h"
+#include "clightmap.h"
 
-class csThing;
-class csThingStatic;
-class csThingObjectType;
-class csPolygon3D;
-class csPolygon2D;
-class csPoly2DPool;
-class csLightPatchPool;
-class csPolyTexLightMap;
+class csBezierMesh;
+class csBezierMeshObjectType;
+class csBezierLightPatchPool;
 struct iShadowBlockList;
 struct csVisObjInfo;
 struct iGraphics3D;
@@ -59,10 +52,9 @@ struct iRenderView;
 struct iMovable;
 struct iFrustumView;
 struct iMaterialWrapper;
-struct iPolygonBuffer;
 
 /**
- * A helper class for iPolygonMesh implementations used by csThing.
+ * A helper class for iPolygonMesh implementations used by csBezierMesh.
  */
 class PolyMeshHelper : public iPolygonMesh
 {
@@ -71,13 +63,12 @@ public:
    * Make a polygon mesh helper which will accept polygons which match
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
-  PolyMeshHelper (uint32 flag) :
-  	polygons (NULL), vertices (NULL), alloc_vertices (NULL),
-	poly_flag (flag) { }
+  PolyMeshHelper () :
+  	polygons (NULL), vertices (NULL) { }
   virtual ~PolyMeshHelper () { Cleanup (); }
 
   void Setup ();
-  void SetThing (csThingStatic* thing) { PolyMeshHelper::thing = thing; }
+  void SetThing (csBezierMesh* thing) { PolyMeshHelper::thing = thing; }
 
   virtual int GetVertexCount ()
   {
@@ -105,42 +96,21 @@ public:
   virtual uint32 GetChangeNumber() const { return 0; }
 
 private:
-  csThingStatic* thing;
+  csBezierMesh* thing;
   csMeshedPolygon* polygons;	// Array of polygons.
-  csVector3* vertices;		// Array of vertices (points to alloc_vertices
-  				// or else obj_verts of scfParent).
-  csVector3* alloc_vertices;	// Optional copy of vertices from parent.
-    				// This copy is used if there are curve
-				// vertices.
+  csVector3* vertices;		// Array of vertices.
   int num_poly;			// Total number of polygons.
   int num_verts;		// Total number of vertices.
-  uint32 poly_flag;		// Polygons must match with this flag.
 };
 
 /**
- * The static data for a thing.
+ * The static data for a bezier.
  */
-class csThingStatic : public iThingFactoryState, public iMeshObjectFactory
+class csBezierMeshStatic
 {
 public:
-  csRef<csThingObjectType> thing_type;
-  /// Pointer to logical parent.
-  iBase* logparent;
-
-  /// Set of flags
-  csFlags flags;
-
-  /// Number of vertices
-  int num_vertices;
-  /// Maximal number of vertices
-  int max_vertices;
-  /// Vertices in object space.
-  csVector3* obj_verts;  
-  /// Normals in object space
-  csVector3* obj_normals;
-
-  /// Smooth flag
-  bool smoothed;
+  csBezierMeshObjectType* thing_type;
+  csBezierMesh* thing;	// @@@@ TEMPORARY
 
   /// Bounding box in object space.
   csBox3 obj_bbox;
@@ -153,15 +123,26 @@ public:
   /// Full radius of object in object space.
   float max_obj_radius;
 
-  /// The array of static polygon data (csPolygon3DStatic).
-  csPolygonStaticArray static_polygons;
-
   /**
-   * Polygon indices to polygons that contain portals (optimization).
-   * csPolygon3DStatic will make sure to call AddPortalPolygon() and
-   * RemovePortalPolygon() when appropriate.
+   * Tesselation parameter:
+   * Center of thing to determine distance from
    */
-  csArray<int> portal_polygons;
+  csVector3 curves_center;
+  /**
+   * Scale param (the larger this param it, the more the curves are
+   * tesselated).
+   */
+  float curves_scale;
+
+  /// Curve vertices.
+  csVector3* curve_vertices;
+  /// Texture coords of curve vertices
+  csVector2* curve_texels;
+
+  /// Number of vertices.
+  int num_curve_vertices;
+  /// Maximum number of vertices.
+  int max_curve_vertices;
 
   /// If true then this thing has been prepared (Prepare() function).
   bool prepared;
@@ -172,25 +153,12 @@ public:
    */
   uint32 static_data_nr;
 
-  /**
-   * This field describes how the light hitting polygons of this thing is
-   * affected by the angle by which the beam hits the polygon. If this value is
-   * equal to -1 (default) then the global csPolyTexture::cfg_cosinus_factor
-   * will be used.
-   */
-  float cosinus_factor;
-
+  iBezierFactoryState* factory_state;
 
 public:
-  csThingStatic (iBase* parent, csThingObjectType* thing_type);
-  virtual ~csThingStatic ();
-
-  /**
-   * When a portal is added/removed the portal list must be updated.
-   * Prepare() does this automatically But this function is useful in
-   * cases where you don't want the overhead of a full prepare.
-   */
-  void UpdatePortalList ();
+  csBezierMeshStatic (csBezierMesh* thing, csBezierMeshObjectType* thing_type,
+  	iBezierFactoryState* factory_state);
+  ~csBezierMeshStatic ();
 
   /**
    * Prepare the thing for use. This function MUST be called
@@ -201,8 +169,8 @@ public:
    */
   void Prepare ();
 
-  /// Calculates the interpolated normals of all vertices
-  void CalculateNormals ();
+  /// Get the factory state for this static data. @@@
+  iBezierFactoryState* GetFactoryState () { return factory_state; }
 
   /**
    * Called if static data in some polygon has changed.
@@ -214,158 +182,53 @@ public:
    */
   uint32 GetStaticDataNumber () const { return static_data_nr; }
 
-  /// Get the specified polygon from this set.
-  csPolygon3DStatic *GetPolygon3DStatic (int idx)
-  { return static_polygons.Get (idx); }
+  /// Get the number of curve vertices.
+  int GetCurveVertexCount () const { return num_curve_vertices; }
 
-  /// Clone this static data in a seperate instance.
-  csPtr<csThingStatic> Clone ();
+  /// Get the specified curve vertex.
+  csVector3& GetCurveVertex (int i) const { return curve_vertices[i]; }
 
-  //----------------------------------------------------------------------
-  // Vertex handling functions
-  //----------------------------------------------------------------------
+  /// Get the curve vertices.
+  csVector3* GetCurveVertices () const { return curve_vertices; }
 
-  /// Just add a new vertex to the thing.
-  int AddVertex (const csVector3& v) { return AddVertex (v.x, v.y, v.z); }
+  /// Get the specified curve texture coordinate (texel).
+  csVector2& GetCurveTexel (int i) const { return curve_texels[i]; }
 
-  /// Just add a new vertex to the thing.
-  int AddVertex (float x, float y, float z);
+  /// Get the curve scale.
+  float GetCurvesScale () const { return curves_scale; }
 
-  virtual int CreateVertex (const csVector3 &iVertex)
-  { return AddVertex (iVertex.x, iVertex.y, iVertex.z); }
+  /// Set the curve scale.
+  void SetCurvesScale (float f) { curves_scale = f; }
 
-  /**
-   * Compress the vertex table so that all nearly identical vertices
-   * are compressed. The polygons in the set are automatically adapted.
-   * This function can be called at any time in the creation of the object
-   * and it can be called multiple time but it normally only makes sense
-   * to call this function after you have finished adding all polygons
-   * and all vertices.<p>
-   * Note that calling this function will make the camera vertex array
-   * invalid.
-   */
-  virtual void CompressVertices ();
+  /// Get the curves center.
+  const csVector3& GetCurvesCenter () const { return curves_center; }
 
-  /**
-   * Optimize the vertex table so that all unused vertices are deleted.
-   * Note that calling this function will make the camera vertex array
-   * invalid.
-   */
-  void RemoveUnusedVertices ();
-
-  /// Change a vertex.
-  virtual void SetVertex (int idx, const csVector3& vt);
-
-  /// Delete a vertex.
-  virtual void DeleteVertex (int idx);
-
-  /// Delete a range of vertices.
-  virtual void DeleteVertices (int from, int to);
-
-  /// Return the object space vector for the vertex.
-  const csVector3& Vobj (int idx) const { return obj_verts[idx]; }
-
-  /// Return the number of vertices.
-  virtual int GetVertexCount () const { return num_vertices; }
-
-  virtual const csVector3 &GetVertex (int i) const
-  { return obj_verts[i]; }
-  virtual const csVector3* GetVertices () const
-  { return obj_verts; }
-
-  /// Add a polygon to this thing.
-  void AddPolygon (csPolygon3DStatic* spoly);
-
-  /**
-   * Intersect object-space segment with polygons of this set. Return
-   * polygon index it intersects with (or -1) and the intersection point
-   * in object coordinates.<p>
-   *
-   * If 'pr' != NULL it will also return a value between 0 and 1
-   * indicating where on the 'start'-'end' vector the intersection
-   * happened.<p>
-   *
-   * If only_portals == true then only portals are checked.
-   */
-  int IntersectSegmentIndex (
-    const csVector3 &start, const csVector3 &end,
-    csVector3 &isect,
-    float *pr,
-    bool only_portals);
-
-  SCF_DECLARE_IBASE;
-
-  virtual void* GetPrivateObject () { return (void*)this; }
-  virtual int GetPolygonCount () { return static_polygons.Length (); }
-  virtual iPolygon3DStatic *GetPolygon (int idx);
-  virtual iPolygon3DStatic *GetPolygon (const char* name);
-  virtual iPolygon3DStatic *CreatePolygon (const char *iName);
-  virtual int FindPolygonIndex (iPolygon3DStatic* polygon) const;
-  virtual void RemovePolygon (int idx);
-  virtual void RemovePolygons ();
-
-  virtual int GetPortalCount () const { return portal_polygons.Length (); }
-  virtual iPortal* GetPortal (int idx) const;
-  virtual iPolygon3DStatic* GetPortalPolygon (int idx) const;
-
-  virtual csFlags& GetFlags () { return flags; }
-
-  virtual void MergeTemplate (iThingFactoryState* tpl,
-  	iMaterialWrapper* default_material = NULL,
-	csVector3* shift = NULL, csMatrix3* transform = NULL);
-  virtual void ReplaceMaterials (iMaterialList* materials,
-    	const char* prefix);
-
-  virtual iPolygon3DStatic* IntersectSegment (const csVector3& start,
-	const csVector3& end, csVector3& isect,
-	float* pr = NULL, bool only_portals = false);
-
-  virtual void SetSmoothingFlag (bool smoothing) { smoothed = smoothing; }
-  virtual bool GetSmoothingFlag () { return smoothed; }
-  virtual csVector3* GetNormals () { return obj_normals; }
-    
-  virtual float GetCosinusFactor () const { return cosinus_factor; }
-  virtual void SetCosinusFactor (float c) { cosinus_factor = c; }
-
-
-  //-------------------- iMeshObjectFactory interface implementation ---------
-
-  virtual csPtr<iMeshObject> NewInstance ();
-  /**
-   * Do a hard transform of the object vertices.
-   * This transformation and the original coordinates are not
-   * remembered but the object space coordinates are directly
-   * computed.
-   */
-  virtual void HardTransform (const csReversibleTransform& t);
-  virtual bool SupportsHardTransform () const { return true; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  /// Set the curves center.
+  void SetCurvesCenter (csVector3& v) { curves_center = v; }
 };
 
 
 /**
- * A Thing is a set of polygons. A thing can be used for the
- * outside of a sector or else to augment the sector with
- * features that are difficult to describe with convex sectors alone.<p>
- *
- * Every polygon in the set has a visible and an invisible face;
- * if the vertices of the polygon are ordered clockwise then the
- * polygon is visible. Using this feature it is possible to define
- * two kinds of things: in one kind the polygons are oriented
- * such that they are visible from within the hull. In other words,
- * the polygons form a sort of container or room where the camera
- * can be located. This kind of thing can be used for the outside
- * walls of a sector. In another kind the polygons are
- * oriented such that they are visible from the outside.
+ * A bezier is a set of bezier curves.
  */
-class csThing : public iBase
+class csBezierMesh : public iBase
 {
   friend class PolyMeshHelper;
 
+public:
+  /**
+   * Option variable: control how much the angle of the light with the polygon
+   * it hits affects the final light value. Values ranges from -1 to 1.
+   * With -1 the polygons will get no light at all. With 0 it will be perfect
+   * cosine rule. With 1 the cosine is ignored and it will be like Crystal Space
+   * was in the past. Note that changing this value at runtime only has an
+   * effect on dynamic lights.
+   */
+  static float cfg_cosinus_factor;
+
 private:
   /// Static data for this thing.
-  csRef<csThingStatic> static_data;
+  csBezierMeshStatic* static_data;
 
   /// ID for this thing (will be >0).
   unsigned int thing_id;
@@ -375,15 +238,12 @@ private:
   uint32 current_visnr;
 
   /**
-   * Vertices in world space.
-   * It is possible that this array is equal to obj_verts. In that
-   * case this is a thing that never moves.
+   * This field describes how the light hitting polygons of this thing is
+   * affected by the angle by which the beam hits the polygon. If this value is
+   * equal to -1 (default) then the global csBezierMesh::cfg_cosinus_factor
+   * will be used.
    */
-  csVector3* wor_verts;
-  /// Vertices in camera space.
-  csVector3* cam_verts;
-  /// Number of vertices for cam_verts.
-  int num_cam_verts;
+  float cosinus_factor;
 
   /// Camera number for which the above camera vertices are valid.
   long cameranr;
@@ -403,27 +263,15 @@ private:
    * The last movable used to move this object.
    */
   iMovable* cached_movable;
-  /**
-   * How is moving of this thing controlled? This is one of the
-   * CS_THING_MOVE_... flags above.
-   */
-  int cfg_moving;
 
-  /// The array of dynamic polygon data (csPolygon3D).
-  csPolygonArray polygons;
+  /// The array of curves forming the outside of the set
+  csCurvesArray curves;
 
-#ifndef CS_USE_NEW_RENDERER
   /**
-   * If we are a detail object then this will contain a reference to a
-   * polygon buffer for the 3D renderer. This can be used by DrawPolygonMesh.
+   * If true the transforms of the curves are set up (in case
+   * CS_BEZIERMESH_MOVE_NEVER is used).
    */
-  iPolygonBuffer* polybuf;
-#endif // CS_USE_NEW_RENDERER
-  /**
-   * An array of materials that are used with the polygon buffer.
-   */
-  iMaterialWrapper** polybuf_materials;
-  int polybuf_material_count;
+  bool curves_transf_ok;
 
   /**
    * Bounding box in world space.
@@ -443,7 +291,7 @@ private:
   uint32 light_version;
 
   /// Pointer to the Thing Template which it derived from.
-  csThing* ParentTemplate;
+  csBezierMesh* ParentTemplate;
   /// Pointer to logical parent.
   iBase* logparent;
 
@@ -460,23 +308,7 @@ private:
   float current_lod;
   uint32 current_features;
 
-public:
-  /**
-   * How many times are we busy drawing this thing (recursive).
-   * This is an important variable as it indicates to
-   * 'new_transformation' which set of camera vertices it should
-   * use.
-   */
-  int draw_busy;
-
 private:
-  /**
-   * Prepare the polygon buffer for use by DrawPolygonMesh.
-   * If the polygon buffer is already made then this function will do
-   * nothing.
-   */
-  void PreparePolygonBuffer ();
-
   /**
    * Invalidate a thing. This has to be called when new polygons are
    * added or removed.
@@ -484,30 +316,17 @@ private:
   void InvalidateThing ();
 
   /**
-   * Draw the given array of polygons in the current thing.
-   * This version uses iGraphics3D->DrawPolygonMesh()
-   * for more efficient rendering. WARNING! This version only works for
-   * lightmapped polygons right now and is far from complete.
-   * 't' is the movable transform.
+   * Utility function to be called whenever movable changes so the
+   * object to world transforms in all the curves have to be updated.
    */
-  void DrawPolygonArrayDPM (csPolygon3D** polygon, int num,
-	iRenderView* rview, iMovable* movable, csZBufMode zMode);
+  void UpdateCurveTransform (const csReversibleTransform& movtrans);
 
   /**
-   * Draw the given array of polygons.
+   * Utility function to call when the thing never moves but the
+   * curve transform has to be updated. The identity transformation
+   * is used.
    */
-  void DrawPolygonArray (csPolygon3D** polygon, int num,
-	const csReversibleTransform& t,
-	iRenderView* rview, csZBufMode zMode);
-
-  /**
-   * Draw one 3D/2D polygon combination. The 2D polygon is the transformed
-   * and clipped version of the 3D polygon.
-   * 't' is the movable transform.
-   */
-  static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
-	const csReversibleTransform& t,
-	iRenderView* d, csZBufMode zMode, const csPlane3& camera_plane);
+  void UpdateCurveTransform ();
 
   /// Generate a cachename based on geometry.
   char* GenerateCacheName ();  
@@ -516,65 +335,55 @@ public:
   /**
    * Create an empty thing.
    */
-  csThing (iBase* parent, csThingStatic* static_data);
+  csBezierMesh (iBase* parent, csBezierMeshObjectType* thing_type);
 
   /// Destructor.
-  virtual ~csThing ();
+  virtual ~csBezierMesh ();
 
   /// Get the pointer to the static data.
-  csThingStatic* GetStaticData () { return static_data; }
+  csBezierMeshStatic* GetStaticData () { return static_data; }
 
   //----------------------------------------------------------------------
-  // Vertex handling functions
+  // Curve handling functions
   //----------------------------------------------------------------------
 
-  /**
-   * Return the world space vector for the vertex.
-   * Make sure you recently called WorUpdate(). Otherwise it is
-   * possible that this coordinate will not be valid.
-   */
-  const csVector3& Vwor (int idx) const { return wor_verts[idx]; }
+  /// Add a curve to this thing.
+  void AddCurve (csCurve* curve);
 
-  /**
-   * Return the camera space vector for the vertex.
-   * Make sure you recently called UpdateTransformation(). Otherwise it is
-   * possible that this coordinate will not be valid.
-   */
-  const csVector3& Vcam (int idx) const { return cam_verts[idx]; }
+  /// Get the number of curves in this thing.
+  int GetCurveCount () const
+  { return curves.Length (); }
 
-  //----------------------------------------------------------------------
-  // Polygon handling functions
-  //----------------------------------------------------------------------
+  /// Get the specified curve from this set.
+  csCurve* GetCurve (int idx) const
+  { return curves.Get (idx); }
 
-  /// Get the number of polygons in this thing.
-  int GetPolygonCount ()
-  { return polygons.Length (); }
+  /// Create a curve from a template.
+  iCurve* CreateCurve ();
 
-  /// Get the specified polygon from this set.
-  csPolygon3DStatic *GetPolygon3DStatic (int idx)
-  { return static_data->GetPolygon3DStatic (idx); }
+  /// Find a curve index.
+  int FindCurveIndex (iCurve* curve) const;
 
-  /// Get the specified polygon from this set.
-  csPolygon3D *GetPolygon3D (int idx)
-  { return polygons.Get (idx); }
+  /// Delete a curve given an index.
+  void RemoveCurve (int idx);
 
-  /// Get the named polygon from this set.
-  csPolygon3D *GetPolygon3D (const char* name);
+  /// Delete all curves.
+  void RemoveCurves ();
 
-  /// Get the entire array of polygons.
-  csPolygonArray& GetPolygonArray () { return polygons; }
+  /// Get the named curve from this set.
+  csCurve* GetCurve (char* name) const;
 
-  /// Find a polygon index.
-  int FindPolygonIndex (iPolygon3D* polygon) const;
+  /// Get the specified curve coordinate.
+  void SetCurveVertex (int idx, const csVector3& vt);
 
-  /// Find a polygon index.
-  int FindPolygonIndex (iPolygon3DStatic* polygon) const;
+  /// Set the specified curve texture coordinate (texel).
+  void SetCurveTexel (int idx, const csVector2& vt);
 
-  /// Remove a single polygon.
-  void RemovePolygon (int idx);
+  /// Clear the curve vertices.
+  void ClearCurveVertices ();
 
-  /// Remove all polygons.
-  void RemovePolygons ();
+  /// Add a curve vertex and return the index of the vertex.
+  int AddCurveVertex (const csVector3& v, const csVector2& t);
 
   //----------------------------------------------------------------------
   // Setup
@@ -595,14 +404,21 @@ public:
    * be removed. Warning! All Things are merged in world space
    * coordinates and not in object space as one could expect!
    */
-  void Merge (csThing* other);
+  void Merge (csBezierMesh* other);
+
+  /**
+   * Add polygons and vertices from the specified thing (seen as template).
+   */
+  void MergeTemplate (iBezierFactoryState* tpl,
+  	iMaterialWrapper* default_material = NULL,
+	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
   /// Set parent template.
-  void SetTemplate (csThing *t)
+  void SetTemplate (csBezierMesh *t)
   { ParentTemplate = t; }
 
   /// Query parent template.
-  csThing *GetTemplate () const
+  csBezierMesh *GetTemplate () const
   { return ParentTemplate; }
 
   void FireListeners ();
@@ -612,6 +428,21 @@ public:
   //----------------------------------------------------------------------
   // Bounding information
   //----------------------------------------------------------------------
+
+  void WorUpdate ();
+
+  /**
+   * Get bounding box given some transformation.
+   */
+  void GetTransformedBoundingBox (
+	const csReversibleTransform& trans, csBox3& cbox);
+
+  /**
+   * Get bounding box in screen space.
+   */
+  float GetScreenBoundingBox (
+	float fov, float sx, float sy,
+	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
   /**
    * Get the bounding box in object space for this polygon set.
@@ -648,6 +479,11 @@ public:
    */
   bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zMode);
 
+  /**
+   * Draw all curves in this thing given a view and transformation.
+   */
+  bool DrawCurves (iRenderView* rview, iMovable* movable, csZBufMode zMode);
+
   //----------------------------------------------------------------------
   // Lighting
   //----------------------------------------------------------------------
@@ -676,6 +512,11 @@ public:
   /// Marks the whole object as it is affected by any light.
   void MarkLightmapsDirty ();
 
+  /// Get cosinus setting.
+  float GetCosinusFactor () const { return cosinus_factor; }
+  /// Set cosinus factor.
+  void SetCosinusFactor (float c) { cosinus_factor = c; }
+
   //----------------------------------------------------------------------
   // Utility functions
   //----------------------------------------------------------------------
@@ -693,57 +534,22 @@ public:
   void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
   	const csVector3& origin);
 
-  /**
-   * Test a beam with this thing.
-   */
-  bool HitBeamOutline (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr);
-
-  /**
-   * Test a beam with this thing.
-   */
-  bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr);
-
   //----------------------------------------------------------------------
   // Transformation
   //----------------------------------------------------------------------
 
   /**
-   * Transform to the given camera if needed. This function will use
-   * the camera number to avoid unneeded transformation.
+   * Do a hard transform of the object vertices.
+   * This transformation and the original coordinates are not
+   * remembered but the object space coordinates are directly
+   * computed (world space coordinates are set to the object space
+   * coordinates by this routine).
    */
-  void UpdateTransformation (const csTransform& c, long cam_cameranr);
-
-  /// Make sure the world vertices are up-to-date.
-  void WorUpdate ();
-
-  /// Get the array of camera vertices.
-  csVector3* GetCameraVertices (const csTransform& c, long cam_cameranr)
-  {
-    UpdateTransformation (c, cam_cameranr);
-    return cam_verts;
-  }
+  void HardTransform (const csReversibleTransform& t);
 
   //----------------------------------------------------------------------
   // Various
   //----------------------------------------------------------------------
-
-  /**
-   * Do a hardtransform. This will make a clone of the factory
-   * to avoid other meshes using this factory to be hard transformed too.
-   */
-  void HardTransform (const csReversibleTransform& t);
-
-  /**
-   * Control how this thing will be moved.
-   */
-  void SetMovingOption (int opt);
-
-  /**
-   * Get the moving option.
-   */
-  int GetMovingOption () const { return cfg_moving; }
 
   /// Sets dynamic ambient light for this thing
   void SetDynamicAmbientLight(const csColor& color)
@@ -768,56 +574,90 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  //------------------------- iThingState interface -------------------------
-  struct ThingState : public iThingState
+  //--------------------- iBezierFactoryState interface -----------------------
+  struct BezierFactoryState : public iBezierFactoryState
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
+    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
     virtual void* GetPrivateObject () { return (void*)scfParent; }
-    virtual iThingFactoryState* GetFactory ()
+    virtual const csVector3& GetCurvesCenter () const
+    { return scfParent->static_data->curves_center; }
+    virtual void SetCurvesCenter (const csVector3& cen)
+    { scfParent->static_data->curves_center = cen; }
+    virtual float GetCurvesScale () const
+    { return scfParent->static_data->curves_scale; }
+    virtual void SetCurvesScale (float scale)
+    { scfParent->static_data->curves_scale = scale; }
+    virtual int GetCurveCount () const
+    { return scfParent->GetCurveCount (); }
+    virtual int GetCurveVertexCount () const
+    { return scfParent->static_data->GetCurveVertexCount (); }
+    virtual csVector3& GetCurveVertex (int i) const
+    { return scfParent->static_data->GetCurveVertex (i); }
+    virtual csVector3* GetCurveVertices () const
+    { return scfParent->static_data->GetCurveVertices (); }
+    virtual csVector2& GetCurveTexel (int i) const
+    { return scfParent->static_data->GetCurveTexel (i); }
+    virtual void SetCurveVertex (int idx, const csVector3& vt)
+    { scfParent->SetCurveVertex (idx, vt); }
+    virtual void SetCurveTexel (int idx, const csVector2& vt)
+    { scfParent->SetCurveTexel (idx, vt); }
+    virtual void ClearCurveVertices ()
+    { scfParent->ClearCurveVertices (); }
+    virtual iCurve* GetCurve (int idx) const;
+    virtual iCurve* CreateCurve ()
+    { return scfParent->CreateCurve (); }
+    virtual int FindCurveIndex (iCurve* curve) const
+    { return scfParent->FindCurveIndex (curve); }
+    virtual void RemoveCurve (int idx)
+    { scfParent->RemoveCurve (idx); }
+    virtual void RemoveCurves ()
+    { scfParent->RemoveCurves (); }
+
+    virtual void MergeTemplate (iBezierFactoryState* tpl,
+  	iMaterialWrapper* default_material = NULL,
+	csVector3* shift = NULL, csMatrix3* transform = NULL)
     {
-      return (iThingFactoryState*)(scfParent->static_data);
+      scfParent->MergeTemplate (tpl, default_material, shift, transform);
+    }
+    virtual void AddCurveVertex (const csVector3& v, const csVector2& uv)
+    {
+      scfParent->AddCurveVertex (v, uv);
     }
 
-    virtual iPolygon3D *GetPolygon (int idx);
-    virtual iPolygon3D *GetPolygon (const char* name);
-    virtual int FindPolygonIndex (iPolygon3D* polygon) const
-    { return scfParent->FindPolygonIndex (polygon); }
+    virtual float GetCosinusFactor () const
+    {
+      return scfParent->GetCosinusFactor ();
+    }
+    virtual void SetCosinusFactor (float cosfact)
+    {
+      scfParent->SetCosinusFactor (cosfact);
+    }
+  } scfiBezierFactoryState;
+  friend struct BezierFactoryState;
 
-    virtual iPolygon3D* GetPortalPolygon (int idx) const;
-
-    virtual const csVector3 &GetVertexW (int i) const
-    { return scfParent->wor_verts[i]; }
-    virtual const csVector3* GetVerticesW () const
-    { return scfParent->wor_verts; }
-    virtual const csVector3 &GetVertexC (int i) const
-    { return scfParent->cam_verts[i]; }
-    virtual const csVector3* GetVerticesC () const
-    { return scfParent->cam_verts; }
-
-    virtual int GetMovingOption () const
-    { return scfParent->GetMovingOption (); }
-    virtual void SetMovingOption (int opt)
-    { scfParent->SetMovingOption (opt); }
-
-    virtual iPolygon3D* IntersectSegment (const csVector3& start,
-	const csVector3& end, csVector3& isect,
-	float* pr = NULL, bool only_portals = false);
+  //------------------------- iBezierState interface -------------------------
+  struct BezierState : public iBezierState
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
+    virtual void* GetPrivateObject () { return (void*)scfParent; }
+    virtual iBezierFactoryState* GetFactory ()
+    {
+      return &(scfParent->scfiBezierFactoryState);
+    }
 
     /// Prepare.
     virtual void Prepare ()
     {
       scfParent->Prepare ();
-      if (scfParent->static_data->flags.Check (CS_THING_FASTMESH))
-        scfParent->PreparePolygonBuffer ();
     }
-  } scfiThingState;
-  friend struct ThingState;
+  } scfiBezierState;
+  friend struct BezierState;
 
   //------------------------- iLightingInfo interface -------------------------
   /// iLightingInfo implementation.
   struct LightingInfo : public iLightingInfo
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
+    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
     virtual void InitializeDefault ()
     {
       scfParent->InitializeDefault ();
@@ -850,8 +690,8 @@ public:
   //-------------------- iPolygonMesh interface implementation ---------------
   struct PolyMesh : public PolyMeshHelper
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    PolyMesh () : PolyMeshHelper (CS_POLY_COLLDET) { }
+    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
+    PolyMesh () : PolyMeshHelper () { }
   } scfiPolygonMesh;
 
   //------------------- Lower detail iPolygonMesh implementation ---------------
@@ -859,16 +699,15 @@ public:
   {
     PolyMeshLOD ();
     // @@@ Not embedded because we can't have two iPolygonMesh implementations
-    // in csThing.
+    // in csBezierMesh.
     SCF_DECLARE_IBASE;
   } scfiPolygonMeshLOD;
 
   //-------------------- iShadowCaster interface implementation ----------
   struct ShadowCaster : public iShadowCaster
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
-    	const csVector3& origin)
+    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
+    virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows, const csVector3& origin)
     {
       scfParent->AppendShadows (movable, shadows, origin);
     }
@@ -878,7 +717,7 @@ public:
   //-------------------- iShadowReceiver interface implementation ----------
   struct ShadowReceiver : public iShadowReceiver
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
+    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
     virtual void CastShadows (iMovable* movable, iFrustumView* fview)
     {
       scfParent->CastShadows (fview, movable);
@@ -889,7 +728,7 @@ public:
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public iObjectModel
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
+    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
     virtual long GetShapeNumber () const { return scfParent->shapenr; }
     virtual iPolygonMesh* GetPolygonMeshColldet ()
     {
@@ -924,7 +763,7 @@ public:
   //-------------------- iMeshObject interface implementation ----------
   struct MeshObject : public iMeshObject
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
+    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
     virtual iMeshObjectFactory* GetFactory () const;
     virtual bool DrawTest (iRenderView* rview, iMovable* movable)
     {
@@ -969,12 +808,12 @@ public:
     virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
       csVector3& isect, float* pr)
     {
-      return scfParent->HitBeamOutline (start, end, isect, pr);
+      return false;
     }
     virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr)
     {
-      return scfParent->HitBeamObject (start, end, isect, pr);
+      return false;
     }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
@@ -988,45 +827,49 @@ public:
     virtual iMaterialWrapper* GetMaterialWrapper () const { return NULL; }
   } scfiMeshObject;
   friend struct MeshObject;
+
+  //-------------------- iMeshObjectFactory interface implementation ---------
+  struct MeshObjectFactory : public iMeshObjectFactory
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
+    virtual csPtr<iMeshObject> NewInstance ();
+    virtual void HardTransform (const csReversibleTransform& t)
+    {
+      scfParent->HardTransform (t);
+    }
+    virtual bool SupportsHardTransform () const { return true; }
+    virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
+    virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
+  } scfiMeshObjectFactory;
+  friend struct MeshObjectFactory;
 };
 
 /**
  * Thing type. This is the plugin you have to use to create instances
- * of csThing.
+ * of csBezierMesh.
  */
-class csThingObjectType : public iMeshObjectType
+class csBezierMeshObjectType : public iMeshObjectType
 {
 public:
   iObjectRegistry* object_reg;
   bool do_verbose;	// Verbose error reporting.
   iEngine* engine;
   /**
-   * csThingObjectType must keep a reference to G3D because when polygons
+   * csBezierMeshObjectType must keep a reference to G3D because when polygons
    * are destructed they actually refer to G3D to clear the cache.
    */
   csRef<iGraphics3D> G3D;
-  /// An object pool for 2D polygons used by the rendering process.
-  csPoly2DPool* render_pol2d_pool;
   /// An object pool for lightpatches.
-  csLightPatchPool* lightpatch_pool;
-
-  /**
-   * Block allocators for various types of objects in thing.
-   */
-  csBlockAllocator<csPolygon3D> blk_polygon3d;
-  csBlockAllocator<csPolygon3DStatic> blk_polygon3dstatic;
-  csBlockAllocator<csLightMapMapping> blk_lightmapmapping;
-  csBlockAllocator<csPolyTexture> blk_polytex;
-  csBlockAllocator<csLightMap> blk_lightmap;
+  csBezierLightPatchPool* lightpatch_pool;
 
 public:
   SCF_DECLARE_IBASE;
 
   /// Constructor.
-  csThingObjectType (iBase*);
+  csBezierMeshObjectType (iBase*);
 
   /// Destructor.
-  virtual ~csThingObjectType ();
+  virtual ~csBezierMeshObjectType ();
 
   /// Register plugin with the system driver
   virtual bool Initialize (iObjectRegistry *object_reg);
@@ -1040,32 +883,10 @@ public:
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  /// iThingEnvironment implementation.
-  struct eiThingEnvironment : public iThingEnvironment
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
-    virtual void Clear ()
-    {
-      scfParent->Clear ();
-    }
-    virtual int GetLightmapCellSize () const
-    {
-      return csLightMap::lightcell_size;
-    }
-    virtual void SetLightmapCellSize (int size)
-    {
-      csLightMap::SetLightCellSize (size);
-    }
-    virtual int GetDefaultLightmapCellSize () const
-    {
-      return csLightMap::default_lightmap_cell_size;
-    }
-  } scfiThingEnvironment;
-
   /// iComponent implementation.
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
+    SCF_DECLARE_EMBEDDED_IBASE(csBezierMeshObjectType);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
@@ -1073,11 +894,11 @@ public:
   /// iConfig implementation.
   struct eiConfig : public iConfig
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
+    SCF_DECLARE_EMBEDDED_IBASE(csBezierMeshObjectType);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
   } scfiConfig;
 };
 
-#endif // __CS_THING_H__
+#endif // __CS_BEZIERMESH_H__

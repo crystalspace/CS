@@ -18,8 +18,8 @@
 */
 #include "cssysdef.h"
 #include "parrays.h"
-#include "curve.h"
 #include "polygon.h"
+#include "thing.h"
 
 //------------------------------------------------------+ csPolygonArray +----//
 csPolygonArray::~csPolygonArray ()
@@ -29,7 +29,8 @@ csPolygonArray::~csPolygonArray ()
 
 bool csPolygonArray::FreeItem (void* Item)
 {
-  delete (csPolygon3D *)Item;
+  thing_type->blk_polygon3d.Free ((csPolygon3D*)Item);
+  //delete (csPolygon3D *)Item;
   return true;
 }
 
@@ -54,7 +55,8 @@ csPolygonStaticArray::~csPolygonStaticArray ()
 
 bool csPolygonStaticArray::FreeItem (void* Item)
 {
-  delete (csPolygon3DStatic *)Item;
+  thing_type->blk_polygon3dstatic.Free ((csPolygon3DStatic*)Item);
+  //delete (csPolygon3DStatic *)Item;
   return true;
 }
 
