@@ -25,6 +25,12 @@ Short-term cleanups that need to be done:
 	  contributed by Michael Ewert <mewert99@yahoo.com>. Have a look
 	  in include/csphyzik and also try out the test application which
 	  is included. Press the del and tab key to see two examples.
+	- Eric Sunshine fixed a bug in phyztest where it failed to call
+	  Initialize() in its immediate superclass, SysSystemDriver.  Was
+	  incorrectly sending message to csSystemDriver instead.
+	- Eric Sunshine made minor changes to the new csphyziks library to
+	  eliminate some compilation warnings and allow it to compile on
+	  NextStep.
 22-Nov-1999
 	- Alex Pfaffe added support for Z sorted triangles to terrain
 	  engine.
@@ -66,7 +72,7 @@ Short-term cleanups that need to be done:
 	  missing symbols correctly.
 	- Updates to CrystalClear and addition of MD5 class from Michael
 	  Dale Long.
-	- Updates from Andrew Zabolotny: 
+	- Updates from Andrew Zabolotny:
 	     - Small fixes to DOS port (Allegro).
 	     - Modified SCF a little such that each SCF class has an
 	       associated dependency string. The string format is
