@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+29-Apr-2003
+	- Matze fixed bad filepermission for jam install
+	- Matze moved crystal.m4 around to mk/autoconf and merged to make and
+	  jam versions of the script.
 28-Apr-2003
 	- Matze fixed vfs.cfg generation when doing jam install.
 	- Eric Sunshine made the following changes to the cspython build
