@@ -122,7 +122,7 @@ Tester* SinglePolygonTesterFlat::NextTester ()
 
 //-----------------------------------------------------------------------------
 
-void SinglePolygonTesterAlpha::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
+void SinglePolygonTesterAlpha::Setup (iGraphics3D* g3d, PerfTest* perftest)
 {
   draw = 0;
   SetupPolygonDPFX (g3d, poly, 10, 10, g3d->GetWidth ()-10, g3d->GetHeight ()-10);
