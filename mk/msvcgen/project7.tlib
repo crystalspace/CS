@@ -63,7 +63,7 @@ END -%]
 				ProgramDataBaseFileName="[% workbuild([my.doc.project.0,'.pdb']) %]"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				Detect64BitPortabilityProblems="TRUE"
+				Detect64BitPortabilityProblems=""
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
