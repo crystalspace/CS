@@ -1,8 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+27-Mar-2002
+	- Preparation for release 0.94. Updated version numbers.
 26-Mar-2002
 	- Matze added a farplane command to walktest. This command set's a
-	    farplane to	the camera (surprise, surprise).
+	  farplane to the camera (surprise, surprise).
 24-Mar-2002
 	- Matze checked in some of his 3ds2lev changes in, the face
 	  optimisation is disabled by default because it still fails on
