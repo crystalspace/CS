@@ -37,22 +37,26 @@
 #include "ivideo/vbufmgr.h"
 #include "csgeom/matrix3.h"
 #include "csutil/garray.h"
+#include "csutil/typedvec.h"
 
-struct csPolygonBufferPolyEXT
-{
-  int *       m_vertices;
-  int         m_num_verts;
-  csPlane3    m_normal;
-  int         m_materialindex;
-  csMatrix3   m_mobj2tex;
-  csVector3   m_vobj2tex;
-};
+
 
 class csPolygonBufferEXT : public iPolygonBuffer
 {
 public:
   csPolygonBufferEXT(iGraphics3D *g3d);
   virtual ~csPolygonBufferEXT();
+
+  struct csPolygonBufferPolyEXT
+  {
+    int *       m_vertices;
+    int         m_num_verts;
+    csPlane3    m_normal;
+    int         m_materialindex;
+    csMatrix3   m_mobj2tex;
+    csVector3   m_vobj2tex;
+  };
+
   /**
    * Add a polygon to this buffer. The data pointed to by 'verts'
    * is copied so it can be discarded after calling AddPolygon.
@@ -107,18 +111,15 @@ public:
   */
   virtual void MarkLightmapsDirty();
 
+  SCF_DECLARE_IBASE;
+
 private:
 
   CS_DECLARE_GROWING_ARRAY (m_polygons, csPolygonBufferPolyEXT);
-
+  csVector  m_mathandles;
+  
   iGraphics3D *m_g3d;
   iVertexBuffer *m_vbuf;
-
-  iMaterialHandle *m_mathandles;
-  int m_mathandle_count;
-
-
-
 
 };
 

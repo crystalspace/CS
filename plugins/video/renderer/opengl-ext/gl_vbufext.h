@@ -35,6 +35,7 @@
  * ----------------------------------------------------------------- */
 
 #include "ivideo/vbufmgr.h"
+#include "csutil/garray.h"
 
 struct iObjectRegistry;
 class csVector3;
@@ -60,6 +61,17 @@ class csVertexBufferEXT : public iVertexBuffer
   // -------------------------------------------------------
   // Public Constructors and Destructors
   // -------------------------------------------------------
+
+  struct csVertexBufferEXTuserarray
+  {
+    csVertexBufferEXTuserarray(float *d, int c)
+    {
+      data = d;
+      count = c;
+    }
+    float *data;
+    int count;
+  };
 
   public:
     csVertexBufferEXT (iVertexBufferManager* mgr);
@@ -91,6 +103,13 @@ class csVertexBufferEXT : public iVertexBuffer
     * Get the current array of colors.
     */
     virtual csColor* GetColors () const;
+
+    
+    /**
+    * Get the number of vertices.
+    */
+    virtual int GetVertexCount () const;
+
     /**
     * Get all of the current user arrays.
     */
@@ -99,10 +118,8 @@ class csVertexBufferEXT : public iVertexBuffer
     * Get the number of components of one of the current user arrays.
     */
     virtual int GetUserArrayComponentCount (int index) const;
-    /**
-    * Get the number of vertices.
-    */
-    virtual int GetVertexCount () const;
+ 
+
 
     void SetBuffers (csVector3 *verts, 
                      csVector2 *texcoords, 
@@ -111,6 +128,9 @@ class csVertexBufferEXT : public iVertexBuffer
 
     void LockBuffer();
     void UnLockBuffer();
+
+    void AddUserArray (int index, float *data, int count);
+    void DropUserArray(int index);
 
     SCF_DECLARE_IBASE;
     // -------------------------------------------------------
@@ -125,6 +145,7 @@ class csVertexBufferEXT : public iVertexBuffer
     csVector2 * m_texcoords;
     iVertexBufferManager* mgr;
  
+    CS_DECLARE_GROWING_ARRAY(m_userarrays, csVertexBufferEXTuserarray);
 };
 
 

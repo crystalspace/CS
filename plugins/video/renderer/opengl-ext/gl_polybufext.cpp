@@ -43,8 +43,14 @@
 #include "qint.h"
 #include "gl_polybufext.h"
 
+SCF_IMPLEMENT_IBASE (csPolygonBufferEXT)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonBuffer)
+SCF_IMPLEMENT_IBASE_END
+
 csPolygonBufferEXT::csPolygonBufferEXT(iGraphics3D *g3d)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
+  m_g3d = g3d;
 }
  
 csPolygonBufferEXT::~csPolygonBufferEXT()

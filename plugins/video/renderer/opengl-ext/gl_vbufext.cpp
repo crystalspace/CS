@@ -118,22 +118,6 @@ csColor* csVertexBufferEXT::GetColors () const
 }
 
 /**
-* Get all of the current user arrays.
-*/
-float* csVertexBufferEXT::GetUserArray (int index) const
-{
-  return NULL; // Dummy return to avoid compiler errors
-}
-
-/**
-* Get the number of components of one of the current user arrays.
-*/
-int csVertexBufferEXT::GetUserArrayComponentCount (int index) const
-{
-  return 0; // Dummy return to avoid compiler errors
-}
-
-/**
 * Get the number of vertices.
 */
 int csVertexBufferEXT::GetVertexCount () const
@@ -165,4 +149,28 @@ void csVertexBufferEXT::UnLockBuffer()
 void csVertexBufferEXT::SetPriority(int priority)
 {
   m_priority = priority;
+}
+
+float* csVertexBufferEXT::GetUserArray (int index) const
+{
+  return m_userarrays[index].data;
+}
+
+int csVertexBufferEXT::GetUserArrayComponentCount (int index) const
+{
+  return m_userarrays[index].count;
+}
+
+void csVertexBufferEXT::AddUserArray (int index, float *data, int count)
+{
+  m_userarrays.SetLength(index);
+  m_userarrays[index] = csVertexBufferEXTuserarray(data, count);
+}
+    
+void csVertexBufferEXT::DropUserArray(int index)
+{
+  // we don't remove the whole struct.. 8 bytes don't hurt us
+  // and i don't think it's being used to often anyhow
+  m_userarrays[index].data = 0;
+  m_userarrays[index].count = 0;
 }

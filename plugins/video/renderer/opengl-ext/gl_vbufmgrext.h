@@ -107,6 +107,10 @@ public:
 	csColor* colors,
 	int num_verts, int buf_number);
 
+   virtual bool LockUserArray (iVertexBuffer* buf,
+		int index, float* user, 
+		int num_components, int buf_number);
+
   /**
    * Unlock a vertex buffer.
    */

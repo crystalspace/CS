@@ -166,3 +166,11 @@ void csVertexBufferManagerEXT::RemoveClient (iVertexBufferManagerClient *client)
   if (idx != -1)
     vClients.Delete (idx);
 }
+
+bool csVertexBufferManagerEXT::LockUserArray (iVertexBuffer* buf,
+		int index, float* user, 
+		int num_components, int buf_number)
+{
+  ((csVertexBufferEXT*)buf)->AddUserArray(index, user, num_components);
+  return true;
+}
