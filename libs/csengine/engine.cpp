@@ -1493,7 +1493,11 @@ void csEngine::ControlMeshes ()
   {
     iMeshWrapper* sp = (iMeshWrapper*)meshes[i];
     if (sp->WantToDie ())
+    {
+      sp->IncRef (); // mesh checks while destructed not being in a sector -- see DeleteAll ()
       GetMeshes ()->RemoveMesh (sp);
+      sp->DecRef ();
+    }
     i--;
   }
 }
