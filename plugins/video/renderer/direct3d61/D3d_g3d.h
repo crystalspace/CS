@@ -304,7 +304,7 @@ public:
   /// Draw a polygon mesh.
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
   {
-    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect, width2, height2);
+	DefaultDrawPolygonMesh (mesh, this, m_o2c, m_pClipper, m_Aspect, m_InvAspect, m_nWidth, m_nHeight);
   }
 
   /** Adjust the given texture size to an optimal size. This will take into

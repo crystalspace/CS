@@ -211,9 +211,10 @@ void csPolygonSet::CompressVertices ()
   for (i = 0 ; i < num_vertices ; i++)
   {
     vt[i].orig_idx = i;
-    vt[i].x = rint (obj_verts[i].x*1000000);
-    vt[i].y = rint (obj_verts[i].y*1000000);
-    vt[i].z = rint (obj_verts[i].z*1000000);
+	//changed rint to int to allow win32 compile (frank@oconnors.org)
+    vt[i].x = int (obj_verts[i].x*1000000);
+    vt[i].y = int (obj_verts[i].y*1000000);
+    vt[i].z = int (obj_verts[i].z*1000000);
   }
 
   // First sort so that all (nearly) equal vertices are together.

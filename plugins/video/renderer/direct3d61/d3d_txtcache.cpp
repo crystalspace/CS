@@ -52,7 +52,9 @@ void D3DCache::cache_texture (iTextureHandle *texture)
   if (type != CS_TEXTURE)
     return;
     
-  iTextureMap *piTM = NULL;
+  // commented out by Frank O'Connor (frank@oconnors.org)
+  // to allow compile. piTM isn't referenced anyhow.
+  //iTextureMap *piTM = NULL;
   int size = 0;
     
   for (int c =0; c < 4; c++)
