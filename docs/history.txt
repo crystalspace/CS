@@ -19,6 +19,9 @@ Short-term cleanups that need to be done:
 	  of initialization of instance variables was incorrect.
 	- Eric Sunshine adjusted the initial position of the CS window in the
 	  BeOS port to be more pleasing to the eye.
+	- Eric Sunshine fixed the BeOS port so that vsh can link.  To do so,
+	  it was necessary to break csSystemDriver::Time() out into its own
+	  source file.
 30-Sep-1999
 	- Eric Sunshine ported map2cs to Unix.  He created map2cs.mak which
 	  conforms to the CS makefile system.  He was also forced to renamed
