@@ -13,6 +13,10 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 27-Feb-2000
+	- Eric Sunshine fixed a bug in polytext.cpp where a recent "patch"
+	  following Andrew's "Big Change" broke CleanIfDirty().  The 'src' and
+	  'dst' pointers were incorrectly being incremented by four bytes
+	  rather than one byte.
 	- Eric Sunshine fixed several additional compilation and run-time
 	  problems which resulted from Andrew's "Big Change".
 	- Eric Sunshine fixed the LOAD_PLUGIN() macro so that it correctly
