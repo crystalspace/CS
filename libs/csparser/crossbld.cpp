@@ -391,6 +391,7 @@ void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh(csThingTemplate& mesh
     ptemp->SetUV (0, buildsource.cor3_uv[0][a], buildsource.cor3_uv[1][a]);
     ptemp->SetUV (1, buildsource.cor3_uv[0][b], buildsource.cor3_uv[1][b]);
     ptemp->SetUV (2, buildsource.cor3_uv[0][c], buildsource.cor3_uv[1][c]);
+    ptemp->SetGouraud ();
     meshsource.AddPolygon (ptemp);
   }
 }
