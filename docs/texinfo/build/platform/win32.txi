@@ -5,11 +5,12 @@
 
 @emph{Originally written by Dan Ogles, @email{dogles@@peachtree.com}; updated
 by Nathaniel ``Noote'' Saint Martin, @email{noote@@bigfoot.com}; and
-maintained by Thmoas Hieber, @email{thieber@@gmx.net}.  Last updated 20
-January 2000.}
+Thomas Hieber, @email{thieber@@gmx.net}. 
+maintained by Frank O''Connor @email{frank@@oconnors.org};
+Last updated 20 January 2000.}
 
-The Windows port of Crystal Space is maintained by Thomas Hieber,
-@email{thieber@@gmx.net}.  Crystal Space supports a wide variety of Windows
+The Windows port of Crystal Space is maintained by Frank O'Connor,
+@email{frank@@oconnors.org}.  Crystal Space supports a wide variety of Windows
 installations and optional technologies such as DirectInput, DirectX, and
 Direct3D.
 
@@ -32,7 +33,7 @@ Microsoft Visual C++ 6.0.  If anything doesn't work, see the Win32 @sc{faq},
 Load @file{mk/visualc/csall.dsw}.
 
 @item
-Make ``All Files'' your active project.
+Make ``grpAll Files'' your active project.
 
 @item
 Select menu @emph{Build/Rebuild All}.
@@ -52,18 +53,18 @@ WORLDFILE = flarge
 @end example
 
 This will set up CrystalSpace to run in software mode using the world file
-@file{flarge}.  Make sure that you have downloaded a worldfile from the
-Crystal Space Website before this.  These files are in @sc{zip} format and
+@file{flarge}.  @emph{Make sure that you have downloaded a worldfile from the
+Crystal Space Website before this}.  These files are in @sc{zip} format and
 should be placed in the @file{$/CS/data} directory.  Do not attempt to extract
 this archive---Crystal Space decompresses the @sc{zip} file on the fly.
 
 @item
 Open @emph{Project/Settings}, select WalkTest on the left list.  Select the
-``Debug'' tab in the register, select category ``General'' and enter the the
-same directory the @file{exe} sits in as workdirectory.  If the executable
+``Debug'' tab in the register, select category ``General'' and enter the
+same directory the @file{exe} sits in as work directory.  If the executable
 would be in @file{E:\cvs\Cs\walktest.exe}, you should select @file{E:\cvs\Cs\}
 as working directory.  Make sure you do these settings for ``Win32 Debug'' and
-``Win32 Release'' (Using the combobox on top of the left list).  Then confirm
+``Win32 Release'' (Using the combo box on top of the left list).  Then confirm
 the settings by pressing @sc{ok}.  Now select ``WalkTest Files'' in the
 Workspace files tab, click the right mouse button and select ``Set as Active
 Project''.  Now call @emph{Build/Execute walktest.exe}.  Alternatively, you
@@ -75,116 +76,214 @@ can switch to the windows explorer and run @file{walktest}.
 
 The Crystal Space workspace is divided into several projects.  They all exist
 as separate project files (@file{*.dsp}).  All of them are being bound
-together by a workspace.  You can choose either @file{csall.dsw} or
-@file{csexperimental.dsw}.  This workspace will also ensure correct linking
-between the various projects, so you need to use a predefined workspace or, if
-you create your own, you will have to set project dependencies right.
+together by a workspace @file{csall.dsw}.  This workspace will also ensure 
+correct linking between the various projects, so you need to use a predefined 
+workspace or, if you create your own, you will have to set project 
+dependencies right.
 
-Currently the project files are created by using @sc{ms} Visual C++ 6.0.  I
-can't tell you anything about other compilers or other versions of @sc{msvc},
-because 6.0 is the only version I have at home.  (It was reported, that for
-using @sc{msvc} 5.0 you could use the project files, but would have to create
-a new workspace.)
+Currently the project files are created by using @sc{ms} Visual C++ 6.0. You can
+use @sc{msvc} 5.0 but need to create your own workspace to hold the project 
+files (@file{*.dsp}).
 
-These are the libraries maintained by the workspace:
+The workspace uses a prefix system for naming the projects and grouping them. 
+There are currently four prefixes in use. The prefix @emph{grp} is used to group 
+the projects into the three main categories: Libraries, Plugins, and Applications. 
+There is also a special group @emph{grpAll} that contains the three major 
+groups @emph{grpLibs, grpApplications, grpPlugins}. These groups hold the following
+respectively: 
+
+@enumerate
+@item
+Projects that output a library (lib) are prefixed with lib. 
 
 @table @code
-@item CsWs
-The window manager library (need for Mazed editor).
+@item libCSclear
+More information on the CrystalClear project can be found at the CrystalClear project page. http://crystalclear.sourceforge.net/ 
 
-@item CSpace
-The static linked library, which includes the majority of the code.
+@item libCSengine
+The core of CrystalSpace 3D engine.
 
-@item csgame
+@item libCSgame
 A library intended to make creation of games simpler by providing a more game
 oriented @sc{api} of the engine.
+
+@item libCSgeom
+This library holds commonly used 2D and 3D geometry classes.
+
+@item libCSgfxldr
+This library contains the graphic loaders and savers for the various formats.
+
+@item libCSobject
+Library that holds csObject implementation.
+
+@item libCSparser
+Library contains the components needed to load and parse a map file.
+
+@item libCSphyzik
+The Phyziks library is a dynamics modeling and simulation engine. The core of the engine is a numerical integrator that solves the equations of motion for given bodies. Different types of bodies will have different equations of motion. A simple example would be the equations of motion for the center of mass of a rigid body. 
+
+@item libCSscript
+Library contains the current simple scripting system.
+
+@item libCSsfxldr
+Library is used to load various sound formats.
+
+@item libCSsys
+Library contains the platform specific implementation of the CS Engine.
+
+@item libCSterr
+Library contains the terrain rendering code.
+
+@item libCStools
+Library holds the original statically linked CS Simple Console. New plugin based consoles now exist.
+
+@item libCSutil
+Holds the implementation of SCF, and various helper classes.
+
+@item libCSws
+The goal of Crystal Space Windowing System (CSWS) is to provide a clean, effective and cross-platform base for creating Crystal Space-related utilites.
+@item libCSwin32dll
+Handles the dll entry for win32 dll's.
+
+@item libCSwin32exe
+Handles the exe entry for win32 exe's.
+
 @end table
 
-These are the drivers:
+@item
+Projects that output a plugin (dll) are prefixed with plg. 
 
 @table @code
-@item SoftwareRender
-The SoftwareRender @sc{dll}, which includes the 3D graphics driver for
-software rasterization.  This is loaded by the CrystalSpace @sc{exe}.
+@item plgCrystalClear
+Contains the bulk of the Crystal Clear application framwork.
 
-@item Direct3D5Render
-The Direct3D Dx5 Render @sc{dll}, which includes the 3D graphics driver for
-Direct3D-accelerated rasterization.  This is loaded by the CrystalSpace
-@sc{exe}.
+@item plgCSfont
+Font plugin that implements the basic CS fonts.
 
-@item Direct3D61Render
-The Direct3D Dx6.1 Render @sc{dll}, which includes the 3D graphics driver for
-Direct3D-accelerated rasterization.  This is loaded by the CrystalSpace
-@sc{exe}.
+@item plgCSNetMan
 
-@item Glide2xRender
-The Glide2x Render @sc{dll}, which includes the 3D graphics driver for
-Glide-accelerated rasterization.  This is loaded by the CrystalSpace @sc{exe}.
+@item plgDirectDraw3dDX61render
+DX Render plugin designed to work on DX6.1 and later.
 
-@item Glide3xRender
-The Glide3x Render @sc{dll}, which includes the 3D graphics driver for
-Glide-accelerated rasterization.  This is loaded by the CrystalSpace @sc{exe}.
-(Not yet working, and therefore not included in csall workspace)
+@item plgDirectDraw2D
+Canvas driver (2d) designed to run on any version of DX.
 
-@item OpenGLRender
-The OpenGLRender @sc{dll}, which includes the 3D graphics driver for
-OpenGL-accelerated rasterization.  This is loaded by the CrystalSpace
-@sc{exe}.
+@item plgDirectDraw2dDX61
+Canvas driver (2d) specifically written for DX6.1 and later.
 
-@item DirectDraw2D
-The DirectDraw Dx3 Graphics @sc{dll}, which includes the 2D graphics layer for
-DirectDraw screen devices.  This is loaded by the CrystalSpace @sc{exe}.
+@item plgDungeon
+Random level generator plugin for Crystal Space
+Written by Martin Geisse (@email{mgeisse@gmx.net})
 
-@item DirectDraw2D6dx61
-The DirectDraw Dx6.1 Graphics @sc{dll}, which includes the 2D graphics layer
-for DirectDraw screen devices.  This is loaded by the CrystalSpace @sc{exe}.
-Tt's Dx6.1 compatible and used by Direct3D Dx6.1 Render.
+@item plgFreeFont
+Font plugin that implements the FreeType system for Crystal Space. Allows the use of TrueType fonts in CrystalSpace. (Fonts not provided)
 
-@item SoundDriverWaveOut
-A simple sound driver.
+@item plgOpenGL2D
+Canvas plugin for OpenGL render to use.
 
-@item SoundRenderA3D
-A special 3D sound render.  To use this, you will need the according @sc{sdk},
-which I don't have, so I don't know if this project will even compile.
-Normally you will unload that project.
+@item plgOpenGLRender
+OpenGL renderer plugin.
 
-@item SoundRenderEAX
-A special 3D sound render.  To use this, you will need the according @sc{sdk},
-which I don't have, so I don't know if this project will even compile.
-Normally you will unload that project.
+@item plgSoftwareRender
+Software renderer plugin.
 
-@item SoundRenderDS3D
-A DirectX 3D sound driver.
+@item plgSoundDriverWaveOut
+Sound Driver plugin for wav based sound devices.
 
-@item NetworkDriverSock
-The @sc{bsd} Sockets network Driver, This is loaded by the CrystalSpace
-@sc{exe}.
+@item plgSoundRenderDS3D
+Sound renderer plugin for the DirectSound 3D API
 
-@item NetworkManagerSimple
-Dummy Network Manager. (The network manager is an layer above simple
-network services and offers more game oriented functions)
+@item plgSoundRenderSoftware
+Software based sound renderer plugin.
+
+@item plgCScon
+Plugin containing Funky Console and a standard console implementation.
+
+@item plgCSSocket
+Basic Socket based network plugin (cross-platform).
+
+@item plgColDetRapid
+Plugin that implements the RAPID system of collision detection.
+
+@item plgMetaBalls
+Plugin that encapsulate the MetaBall code. 
+
+@item plgSCFDog
+Example plugin for the SCF Tutorial.
+
+@item plgSCFWorm
+Example plugin for the SCF Tutorial.
+
 @end table
 
-These are the applications:
+@item
+Projects that output an application (exe) are prefixed with app. 
 
-@table @samp
-@item WalkTest
-A walktest application, which includes key handling and such.
-@item MazeD
-An editor.  (Almost working, but progressing much slower, than the Crystal
-Space engine.)
-@item Simple
-A simple (minimum) CyrstalSpace application.
-@item map2cs
+@table @code
+@item appBlocks
+A 3D tetris like game built using CS.
+
+@item appCCTest
+A test application for the CrystalClear framework.
+
+@item appCSWSTest
+A test application for the CSWS subsystem.
+
+@item appDemoNets
+A test application for the Networking system.
+
+@item DTSimple
+A test application for procedural textures (used to be called Dynamic Textures). 
+
+@item Dungeon
+A test application which uses the Random Dungeon Generator (plgDungeon).
+
+@item Map2cs
 A convertor to convert Quake map files to Crystal Space.  See docs\map2cs for
 details.
-@item phyztest
-An application to show some of the abilitites of the Crystal Space physics
-system.
-@item Blocks
-A simple 3D tetris clone.
-@item shooter
-A simple first person shooter demo (using @file{csgame}).
+
+@item appMazeD
+An editor based on CS and CSWS.
+
+@item appMDS2SPR
+A MDL to SPR file converter.
+
+@item appMetademo
+A Test app for the MetaBall plugin.
+
+@item appPhyzTest
+A test application for libPhyzik.
+
+@item appSCFReg
+A scf application for registering dll's and updating SCF.CFG
+
+@item appSCFZoo
+A simple application for the SCF tutorial.
+
+@item appShooter
+A simple 3d shooter game created in CS.
+
+@item appSimple
+The simple application used in the main CS tutorial.
+
+@item appWalkTest
+The basic CS test application. Contains many bleeding-edge features of the engine (quite messy). 
+
+@item appNetdrvClient
+A test application for the Network subsystem
+
+@item appNetdrvServer
+A test application for the Network subsystem
+
+@item appNSTPc
+The client side of the NSTP implementation.
+
+@item appNSTPs
+The server side of the NSTP implementation.
+
+@item appSquawk
+Test application which implemented multiple views.
+
 @end table
 
 @node Win32 FAQ, Win32 Create, Win32 Workspace, Win32
@@ -399,103 +498,4 @@ question there.  @xref{Mailing Lists}.  As a last resort, you might also try
 contacting me, Thomas Hieber at @email{thieber@@gmx.net}.
 @end itemize
 
-@node Win32 Create, , Win32 FAQ, Win32
-@subsubsection Creating Your Own Application
 
-Once able to compile and run Crystal Space, many people want to start creating
-their own applications using it.  (In fact, this is the main intention of the
-Crystal Space project.) So here is a step by step explanation, on how to setup
-a project file for a Win32 application, that uses Crystal Space.
-
-@enumerate
-@item
-Load @file{csall.dsw}.
-@item
-Select @emph{File/New/Project}, then @emph{Win32 Application}.
-@item
-Enter a name for your project (for example @file{test}).
-@item
-Set the path to @file{E:\cvs\CS\mk\visualc} (or wherever you store Crystal
-Space.  Just make sure it ends with @file{visualc}).
-@item
-Select @emph{Add To Current Workspace}.  Do @strong{not} select
-@emph{Depenencies}.
-@item
-Press @sc{ok}.
-@item
-Select @emph{Create an Empty Project}.
-@item
-Select @emph{Finish}.
-@item
-Select @emph{Project/Depencencies}.
-@item
-Make @file{test} depend on @file{cspace}.
-@item
-Make @emph{Applications} depend on @file{test}.
-@item
-Add @file{Cs\libs\cssys\win32\exeentry.cpp} to the @file{test} project.
-@item
-Add all the remaining files to the project.
-@item
-Open the project settings for @file{test}.
-@item
-Select the ``C++'' tab.
-@item
-Select @emph{Win32 Debug}.
-@item
-Set ``Preprocessor Definitions'' to
-@samp{NDEBUG,_WINDOWS,WIN32,WIN32_VOLATILE}.
-@item
-Set ``Runtime Library'' to @emph{Multithreaded Debug}.
-@item
-Select @emph{Win32 Release}.
-@item
-Set Preprocessor Definitions to
-@samp{NDEBUG,_WINDOWS,WIN32,WIN32_VOLATILE}.
-@item
-Set Runtime Library to ``Multithreaded''.
-@item
-Select ``All Configurations''.
-@item
-Set the ``Additional Include Directories'' field to
-@file{..\..\include\cssys\win32, ..\..\include, ..\..\libs, ..\..\support,
-..\..,..\..\apps}.
-@item
-Select the ``Linker'' tab.
-@item
-Select @emph{All Configurations}.
-@item
-Set the ``Object/Library Modules'' field so that it lists these libraries:@*
-@code{kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib}@*
-@code{advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib}@*
-@code{odbccp32.lib zlib.lib png.lib libjpeg.lib dinput.lib dxguid.lib}
-@item
-Set ``Additional Library Path'' to @file{..\..\libs\cssys\win32\lib}.
-@item
-Set ``Name of Output File'' to @file{..\..\test.exe}.
-@item
-Select ``General'' tab.
-@item
-Select @emph{Win32 Debug}.
-@item
-Set ``Temporary Files'' to @file{Debug\test}.
-@item
-Set ``Output Files'' to @file{Debug}.
-@item
-Select @emph{Win32 Release}.
-@item
-Set ``Temporary Files'' to @file{Release\test}.
-@item
-Set ``Output Files'' to @file{Release}.
-@item
-Select the ``Debug'' tab.
-@item
-Set ``Working Directory'' to @file{e:\cvs\CS\} (or whereever the
-@file{exe} ends up).
-@item
-Save all.
-@end enumerate
-
-@noindent
-That should be it.  Call @emph{Project/Build test.exe} and then
-@emph{Project/Debug/Go}.
