@@ -723,6 +723,7 @@ public:
   void OldDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup_trans = true);
   void EffectDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup_trans = true,
     GLuint lightmap = 0, csVector2* lightmapcoords = 0);
+  void FogDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup_trans = true);
 
   /**
    * Debug version that draws outlines only. Is automatically

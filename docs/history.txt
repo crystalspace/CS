@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	  lazy clipping is forced in all cases.
 	- Keith Fulton fixed a bug flipping the do_tweening flag on saving
 	  of binary spr3d's.
+	- Fog now works for DrawPolygonMesh (OpenGL version).
+	- OpenGL/DrawPolygonMesh now respects the flag to disable lighting.
 	- Eric Sunshine changed the Linux joystick test in configure.ac so that
 	  it now reports its results to the user.  Also cleaned up the logic.
 	- Eric Sunshine disabled the annoying, abusive message in aclocal.m4

@@ -324,7 +324,9 @@ public:
   csTriangle* GetTriangles () { return orig_triangles.GetArray (); }
 
   /// Gets the original vertices count
-  virtual int GetVertexCount() const {return verticesCount;}
+  virtual int GetVertexCount () const {return verticesCount;}
+  /// Gets the original triangle count
+  int GetTriangleCount () const { return orig_triangles.Length (); }
 
   /// Given a polygon triangulize it and adds it to the polygon buffer
   void AddTriangles (csTrianglesPerMaterial* pol,

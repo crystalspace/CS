@@ -106,7 +106,7 @@ void csVertexBufferManager::ChangePriority (iVertexBuffer* buf,
 }
 
 bool csVertexBufferManager::LockBuffer (iVertexBuffer* buf,
-    csVector3* verts, csVector2* texels,
+  csVector3* verts, csVector2* texels,
   csColor* colors,
   int num_verts, int buf_number)
 {

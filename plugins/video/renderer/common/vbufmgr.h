@@ -76,7 +76,10 @@ public:
   /// Get one of the current user arrays.
 	virtual float* GetUserArray (int index) const { return user[index]; }
   /// Get the number of components of one of the current user arrays.
-  virtual int GetUserArrayComponentCount (int index) const { return usercmp[index]; }
+  virtual int GetUserArrayComponentCount (int index) const
+  {
+    return usercmp[index];
+  }
   /// Get number of vertices.
   virtual int GetVertexCount () const { return num_verts; }
   /// Set buffer.
@@ -87,18 +90,15 @@ public:
     csVertexBuffer::texels = texels;
     csVertexBuffer::colors = colors;
     csVertexBuffer::num_verts = num_verts;
-		for( int i=0; i<CS_VBUF_TOTAL_USERA; i++ )
-			user[i] = NULL;
+    for( int i=0; i<CS_VBUF_TOTAL_USERA; i++ )
+      user[i] = NULL;
   }
 
-  void SetUserArray (int index,
-		float* user, 
-		int num_components)
+  void SetUserArray (int index, float* user, int num_components)
   {
-		if (index>CS_VBUF_TOTAL_USERA)
-			return;
-		csVertexBuffer::user[index] = user;
-		csVertexBuffer::usercmp[index] = num_components;
+    if (index>CS_VBUF_TOTAL_USERA) return;
+    csVertexBuffer::user[index] = user;
+    csVertexBuffer::usercmp[index] = num_components;
   }
 
   SCF_DECLARE_IBASE;
