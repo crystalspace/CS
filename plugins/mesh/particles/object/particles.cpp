@@ -116,7 +116,6 @@ csParticlesFactory::csParticlesFactory (csParticlesType* p,
 
   force_amount = 1.0f;
   
-  max_particles = 1000;
   particles_per_second = 100;
   initial_particles = 100;
 
@@ -205,10 +204,8 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   particle_mass = p->particle_mass;
   dampener = p->dampener;
   
-  max_particles = p->max_particles;
   particles_per_second = p->particles_per_second;
   initial_particles = p->initial_particles;
-  if(initial_particles > max_particles) initial_particles = max_particles;
 
   gravity = p->gravity;
   
@@ -230,40 +227,8 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   emitter = csVector3(0.0f, 0.0f, 0.0f);
   radius = 1.0f;
+  dead_particles = 0;
   point_sprites = p->g3d->GetCaps ()->SupportsPointSprites;
-
-  int i;
-
-  if(point_sprites) 
-  {
-    vertex_count = max_particles;
-
-    indices = new unsigned int [max_particles];
-    index_count = max_particles;
-    for(i=0;i<index_count;i++) 
-    {
-      indices[i] = i;
-    }
-  } 
-  else 
-  {
-    vertex_count = max_particles * 4;
-
-    index_count = max_particles * 6;
-    indices = new unsigned int [index_count];
-    int j;
-    for(i=0,j=0;i<vertex_count;i+=4,j+=6) 
-    {
-      // First Triangle
-      indices[j] = i;
-      indices[j + 1] = i + 1;
-      indices[j + 2] = i + 2;
-      // Second Triangle
-      indices[j + 3] = i;
-      indices[j + 4] = i + 2;
-      indices[j + 5] = i + 3;
-    }
-  }
 
   dynDomain = new csShaderVariableContext ();
 
@@ -273,9 +238,9 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   sv = dynDomain->GetVariableAdd (color_name);
   sv->SetAccessor (&shaderVarAccessor);
   sv = dynDomain->GetVariableAdd (texcoord_name);
-  sv->SetValue (GetRenderBuffer (texcoord_name));
+  sv->SetAccessor (&shaderVarAccessor);
   sv = dynDomain->GetVariableAdd (index_name);
-  sv->SetValue (GetRenderBuffer (index_name));
+  sv->SetAccessor (&shaderVarAccessor);
   sv = dynDomain->GetVariableAdd (radius_name);
   sv->SetValue (particle_radius);
   sv = dynDomain->GetVariableAdd (scale_name);
@@ -332,10 +297,11 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   emitter = movable->GetFullPosition();
 
   int vertnum = 0;
-  if((vertnum = point_data.Length ()) < 1) return false;
+  if((vertnum = point_data.Length () - dead_particles) < 1) return false;
 
   if(!point_sprites) 
   {
+    vertnum *= 6;
     csMatrix3 m = tr_o2c.GetT2O();
     corners[0] = m * csVector3(-particle_radius, particle_radius, 0.0f);
     corners[1] = m * csVector3(particle_radius, particle_radius, 0.0f);
@@ -410,29 +376,76 @@ void csParticlesObject::PreGetShaderVariableValue (csShaderVariable* var)
 
 iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
 {
-  if (!vertex_buffer || !color_buffer)
+  if (!vertex_buffer || buffer_length != point_data.Length ())
   {
+    buffer_length = point_data.Length ();
     csArray<iRenderBuffer*> buffers;
-    pFactory->g3d->CreateInterleavedRenderBuffers (vertex_count
+    int bufsize = (point_sprites ? buffer_length : buffer_length * 4);
+    pFactory->g3d->CreateInterleavedRenderBuffers (bufsize      
       * sizeof(csParticlesData), CS_BUF_DYNAMIC, 2, buffers);
     vertex_buffer = buffers.Get(0);
     vertex_buffer->SetOffset (0);
     vertex_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
     vertex_buffer->SetComponentCount (3);
-    color_buffer = buffers.Get(1);
+    color_buffer = buffers.Get (1);
     color_buffer->SetOffset (sizeof(csVector3));
     color_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
     color_buffer->SetComponentCount (4);
+    color_buffer->SetStride (sizeof(csParticlesData));
+    texcoord_buffer = pFactory->g3d->CreateRenderBuffer (
+      sizeof (csVector2) * bufsize, CS_BUF_DYNAMIC, 
+      CS_BUFCOMP_FLOAT, 2, false);
+    csVector2 *texcoords = new csVector2 [bufsize];
     if(point_sprites)
     {
       vertex_buffer->SetStride (sizeof(csParticlesData));
       color_buffer->SetStride (sizeof(csParticlesData));
+
+      unsigned int *indices = new unsigned int[buffer_length];
+      for(int i=0;i<buffer_length;i++)
+      {
+        indices[i] = i;
+      }
+      index_buffer = pFactory->g3d->CreateRenderBuffer (
+        sizeof (unsigned int) * buffer_length, CS_BUF_STATIC, 
+        CS_BUFCOMP_UNSIGNED_INT, 1, true);
+        index_buffer->CopyToBuffer (indices, sizeof(unsigned int) * buffer_length);
     }
     else 
     {
       vertex_buffer->SetStride (sizeof(i_vertex));
       color_buffer->SetStride (sizeof(i_vertex));
+      for(int i=0;i<bufsize-4;i+=4)
+      {
+        texcoords[i].x = 0;
+        texcoords[i].y = 0;
+        texcoords[i+1].x = 0;
+        texcoords[i+1].y = 1;
+        texcoords[i+2].x = 1;
+        texcoords[i+2].y = 1;
+        texcoords[i+3].x = 1;
+        texcoords[i+3].y = 0;
+      }
+      unsigned int *indices = new unsigned int[buffer_length * 6];
+      int j;
+      for(i=0,j=0;i<buffer_length * 4;i+=4,j+=6)
+      {
+        // First triangle
+        indices[j] = i;
+        indices[j+1] = i + 1;
+        indices[j+2] = i + 2;
+        // Second triangle
+        indices[j+3] = i;
+        indices[j+4] = i + 2;
+        indices[j+5] = i + 3;
+      }
+      index_buffer = pFactory->g3d->CreateRenderBuffer (
+        sizeof (unsigned int) * buffer_length * 6, CS_BUF_STATIC, 
+        CS_BUFCOMP_UNSIGNED_INT, 1, true);
+        index_buffer->CopyToBuffer (indices, sizeof(unsigned int) * buffer_length * 6);
     }
+    texcoord_buffer->CopyToBuffer (texcoords, sizeof(csVector2) * bufsize);
+    delete [] texcoords;
   }
   if (name == vertex_name)
   {
@@ -445,8 +458,29 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     }
     else
     {
+      int len = point_data.Length ();
+      vertex_data.SetLength (len * 4);
+      int j = 0;
+      for(int i=0;i<len;i++)
+      {
+        csParticlesData &point = point_data[i];
+        i_vertex &vertex = vertex_data[j];
+        vertex.position = point.position + corners[0];
+        vertex.color = point.color;
+        vertex = vertex_data[j + 1];
+        vertex.position = point.position + corners[1];
+        vertex.color = point.color;
+        vertex = vertex_data[j + 2];
+        vertex.position = point.position + corners[2];
+        vertex.color = point.color;
+        vertex = vertex_data[j + 2];
+        vertex.position = point.position + corners[3];
+        vertex.color = point.color;
+        j+=4;
+      }
+
       data = vertex_data.GetArray ();
-      size = vertex_data.Length () * (sizeof(csParticlesData));
+      size = vertex_data.Length () * (sizeof(i_vertex));
     }
     // Vertex buffer is an interleaved buffer, so copy all the data into it
     vertex_buffer->CopyToBuffer (data, size);
@@ -458,47 +492,10 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
   }
   else if (name == texcoord_name)
   {
-    if (!texcoord_buffer)
-    {
-      texcoord_buffer = pFactory->g3d->CreateRenderBuffer (
-        sizeof (csVector2) * vertex_count, CS_BUF_DYNAMIC, 
-        CS_BUFCOMP_FLOAT, 2, false);
-      csVector2 *texcoords = new csVector2 [vertex_count];
-      if(point_sprites)
-      {
-        memset(texcoords, 0, sizeof(csVector2) * vertex_count);
-      }
-      else
-      {
-        for(int i=0;i<vertex_count-4;i+=4)
-        {
-          texcoords[i].x = 0;
-          texcoords[i].y = 0;
-          texcoords[i+1].x = 0;
-          texcoords[i+1].y = 1;
-          texcoords[i+2].x = 1;
-          texcoords[i+2].y = 1;
-          texcoords[i+3].x = 1;
-          texcoords[i+3].y = 0;
-        }
-      }
-
-      texcoord_buffer->CopyToBuffer (texcoords, sizeof(csVector2) * vertex_count);
-      delete [] texcoords;
-    }
-    
     return texcoord_buffer;
   }
   else if (name == index_name)
   {
-    if (!index_buffer)
-    {
-      index_buffer = pFactory->g3d->CreateRenderBuffer (
-        sizeof (unsigned int) * index_count, CS_BUF_STATIC, 
-        CS_BUFCOMP_UNSIGNED_INT, 1, true);
-        index_buffer->CopyToBuffer (indices, sizeof(unsigned int) * index_count);
-    }
-    
     return index_buffer;
   }
   return 0;
@@ -563,6 +560,19 @@ void csParticlesObject::GetRadius(csVector3 &rad, csVector3 &c)
 
 void csParticlesObject::Start ()
 {
+  int start_size = 1000;
+  if(initial_particles > start_size) start_size = initial_particles;
+
+  buffer_length = 0;
+
+  point_data.SetLength (start_size);
+  for(int i=0;i<start_size;i++) {
+    csParticlesData &p = point_data.Get (i);
+    p.position.z = FLT_MAX;
+    p.color.w = 0.0f;
+    p.time_to_live = -1.0f;
+  }
+
   new_particles = (float)initial_particles;
   total_elapsed_time = 0.0f;
 }
@@ -576,36 +586,7 @@ bool csParticlesObject::Update (float elapsed_time)
     new_particles += elapsed_time * (float)particles_per_second;
   }
 
-  while (new_particles >= 1.0f)
-  {
-    // Emission
-    csVector3 start;
-
-    switch(emit_type)
-    {
-    case CS_PART_EMIT_SPHERE:
-      start = csVector3((rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2);
-      start.Normalize ();
-      start = emitter + (start * ((rng.Get() * (emit_size_1 - emit_size_2)) + emit_size_2));
-      break;
-    case CS_PART_EMIT_PLANE:
-      break;
-    case CS_PART_EMIT_BOX:
-      break;
-    }
-
-    csParticlesData particle;
-    particle.position = start;
-    particle.color = csVector4 (0.0f, 0.0f, 0.0f, 0.0f);
-    particle.velocity = csVector3 (0.0f, 0.0f, 0.0f);
-    particle.time_to_live = time_to_live + (time_variation * rng.Get());
-
-    int i = point_data.InsertSorted (particle, ZSort);
-
-    new_particles -= 1.0f;
-  }
-
-  int dead_particles = 0;
+  dead_particles = 0;
 
   for(int i=0;i<point_data.Length ();i++)
   {
@@ -613,14 +594,42 @@ bool csParticlesObject::Update (float elapsed_time)
     
     if(point.time_to_live < 0.0f)
     {
-      // Deletion :(
-      point.color.x = 0.0f;
-      point.color.y = 0.0f;
-      point.color.z = 0.0f;
-      point.color.w = 0.0f;
-      point.position.z = 10000.0f;
-      dead_particles ++;
-      continue;
+      if(new_particles >= 1.0f)
+      {
+        // Emission
+        csVector3 start;
+
+        switch(emit_type)
+        {
+        case CS_PART_EMIT_SPHERE:
+          start = csVector3((rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2,(rng.Get() - 0.5) * 2);
+          start.Normalize ();
+          start = emitter + (start * ((rng.Get() * (emit_size_1 - emit_size_2)) + emit_size_2));
+          break;
+        case CS_PART_EMIT_PLANE:
+          break;
+        case CS_PART_EMIT_BOX:
+          break;
+        }
+
+        point.position = start;
+        point.color = csVector4 (0.0f, 0.0f, 0.0f, 0.0f);
+        point.velocity = csVector3 (0.0f, 0.0f, 0.0f);
+        point.time_to_live = time_to_live + (time_variation * rng.Get());
+
+        new_particles -= 1.0f;
+      }
+      else 
+      {
+        // Deletion :(
+        point.color.x = 0.0f;
+        point.color.y = 0.0f;
+        point.color.z = 0.0f;
+        point.color.w = 0.0f;
+        point.position.z = FLT_MAX;
+        dead_particles ++;
+        continue;
+      }
     }
 
     // Time until death
@@ -682,15 +691,20 @@ bool csParticlesObject::Update (float elapsed_time)
   }
   point_data.Sort (ZSort);
 
-  if(point_data.Length () >= max_particles || dead_particles > (max_particles >> 1))
+  if(dead_particles > (int)((float)point_data.Length () * 0.70f))
   {
-    int new_size = point_data.Length ();
-    for(int i = point_data.Length() - 1; i>=0;i--)
-    {
-      if(point_data.Get(i).time_to_live > 0.0f) break;
-      new_size --;
+    point_data.Truncate ((point_data.Length () >> 1));
+  }
+  else if(dead_particles < (int)((float)point_data.Length () * 0.30f))
+  {
+    int oldlen = point_data.Length ();
+    point_data.SetLength ((oldlen << 1));
+    for(int i=oldlen;i<point_data.Length ();i++) {
+      csParticlesData &p = point_data.Get (i);
+      p.position.z = FLT_MAX;
+      p.color.w = 0.0f;
+      p.time_to_live = -1.0f;
     }
-    point_data.Truncate (new_size);
   }
 
   radius = qsqrt(new_radius);
@@ -700,28 +714,5 @@ bool csParticlesObject::Update (float elapsed_time)
 
 void csParticlesObject::NextFrame (csTicks, const csVector3 &)
 {
-  if(!point_sprites)
-  {
-    int len = point_data.Length ();
-    vertex_data.SetLength (0);
-    vertex_data.SetCapacity (len * 4);
-    for(int i=0;i<len;i++)
-    {
-      csParticlesData &point = point_data[i];
-      i_vertex vertex;
-      vertex.position = point.position + corners[0];
-      vertex.color = point.color;
-      vertex_data.Push (vertex);
-      vertex.position = point.position + corners[1];
-      vertex.color = point.color;
-      vertex_data.Push (vertex);
-      vertex.position = point.position + corners[2];
-      vertex.color = point.color;
-      vertex_data.Push (vertex);
-      vertex.position = point.position + corners[3];
-      vertex.color = point.color;
-      vertex_data.Push (vertex);
-    }
-  }
 }
 

@@ -118,11 +118,13 @@ bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
 void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
   iParticlesObjectState *particles, csArray<csParticlesData> *data)
 {
+  float force_range = particles->GetForceRange ();
   for(int i=0;i<data->Length ();i++) 
   {
     // Setup for this particle
     csParticlesData &part = data->Get (i);
-    float force_range = particles->GetForceRange ();
+
+    if(part.time_to_live < 0.0f) break;
 
     // Diffusion
     csVector3 diff((rng.Get() * 2.0f) - 1.0f, (rng.Get() * 2.0f) - 1.0f, (rng.Get() * 2.0f) - 1.0f);
@@ -153,7 +155,6 @@ void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
       break;
     }
 
-
     csParticleFalloffType force_falloff, cone_falloff;
 
     particles->GetFalloffType (force_falloff, cone_falloff);
@@ -175,9 +176,9 @@ void csParticlesPhysicsSimple::StepPhysics (float elapsed_time,
     csVector3 gravity;
     particles->GetGravity (gravity);
 
-    part.velocity += dir * ((particles->GetForce() * falloff -
+    part.velocity += dir * (((particles->GetForce() * falloff -
       fabs(part.velocity.Norm()) * particles->GetDampener ())
-      / particles->GetMass ()) + gravity;
-    part.position += part.velocity;
+      / particles->GetMass ()) * elapsed_time) + gravity * elapsed_time;
+    part.position += part.velocity * elapsed_time;
   }
 }

@@ -171,12 +171,6 @@ struct iParticlesObjectState : public iBase
   /// Get the time variation
   virtual float GetTimeVariation () = 0;
 
-  /// Set the maximum particles (defaults to 1000)
-  virtual void SetMaxParticleCount (int count) = 0;
-
-  /// Get the maximum particles
-  virtual int GetMaxParticleCount () = 0;
-
   /// Set the particle heat function to a built-in function or a callback
   virtual void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist) = NULL) = 0;
 
@@ -272,9 +266,6 @@ struct iParticlesFactoryState : public iBase
 
   /// Set the random variation in particle time to live, in seconds
   virtual void SetTimeVariation (float variation) = 0;
-
-  /// Set the maximum particles (defaults to 1000)
-  virtual void SetMaxParticleCount (int count) = 0;
 
   /// Set the particle heat function to a built-in function or a callback
   virtual void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist) = NULL) = 0;

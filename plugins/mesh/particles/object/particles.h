@@ -103,7 +103,6 @@ private:
   float particle_mass;
   float dampener;
   
-  int max_particles;
   int particles_per_second;
   int initial_particles;
 
@@ -186,8 +185,6 @@ public:
   { time_to_live = time; }
   void SetTimeVariation (float variation)
   { time_variation = variation; }
-  void SetMaxParticleCount (int count)
-  { max_particles = count; }
 
   void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist))
   {
@@ -252,8 +249,6 @@ public:
     { scfParent->SetTimeToLive (time); }
     virtual void SetTimeVariation (float variation)
     { scfParent->SetTimeVariation (variation); }
-    virtual void SetMaxParticleCount (int count)
-    { scfParent->SetMaxParticleCount (count); }
     virtual void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist) = NULL)
     { scfParent->SetParticleHeatFunction (type, callback); }
     virtual void AddColor (csColor color)
@@ -324,7 +319,6 @@ private:
 
   float force_amount;
   
-  int max_particles;
   int particles_per_second;
   int initial_particles;
 
@@ -356,12 +350,10 @@ private:
   };
   csDirtyAccessArray<i_vertex> vertex_data;
 
-  int vertex_count;
-
-  unsigned int *indices;
-  int index_count;
+  int buffer_length;
 
   float new_particles;
+  int dead_particles;
 
   bool point_sprites;
 
@@ -496,8 +488,6 @@ public:
   { time_to_live = time; }
   void SetTimeVariation (float variation)
   { time_variation = variation; }
-  void SetMaxParticleCount (int count)
-  { max_particles = count; }
   void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist))
   {
     heat_function = type;
@@ -551,8 +541,6 @@ public:
   { return time_to_live; }
   float GetTimeVariation ()
   { return time_variation; }
-  int GetMaxParticleCount ()
-  { return max_particles; }
   float GetParticleRadius ()
   { return particle_radius; }
   void SetDampener (float damp)
@@ -605,8 +593,6 @@ public:
     { scfParent->SetTimeToLive (time); }
     virtual void SetTimeVariation (float variation)
     { scfParent->SetTimeVariation (variation); }
-    virtual void SetMaxParticleCount (int count)
-    { scfParent->SetMaxParticleCount (count); }
     virtual void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist) = NULL)
     { scfParent->SetParticleHeatFunction (type, callback); }
     virtual void AddColor (csColor color)
@@ -648,8 +634,6 @@ public:
     { return scfParent->GetTimeToLive (); }
     virtual float GetTimeVariation ()
     { return scfParent->GetTimeVariation (); }
-    virtual int GetMaxParticleCount ()
-    { return scfParent->GetMaxParticleCount (); }
     virtual float GetParticleRadius ()
     { return scfParent->GetParticleRadius (); }
     virtual void SetDampener (float damp)

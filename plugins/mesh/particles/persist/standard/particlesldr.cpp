@@ -62,7 +62,6 @@ enum
   XMLTOKEN_GRAVITY,
   XMLTOKEN_TIME_TO_LIVE,
   XMLTOKEN_TIME_VARIATION,
-  XMLTOKEN_MAX_PARTICLES,
   XMLTOKEN_INITIAL_PARTICLES,
   XMLTOKEN_PARTICLES_PER_SECOND,
   XMLTOKEN_HEAT_FUNCTION,
@@ -117,7 +116,6 @@ bool csParticlesFactoryLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("gravity", XMLTOKEN_GRAVITY);
   xmltokens.Register ("ttl", XMLTOKEN_TIME_TO_LIVE);
   xmltokens.Register ("timevariation", XMLTOKEN_TIME_VARIATION);
-  xmltokens.Register ("maxparticles", XMLTOKEN_MAX_PARTICLES);
   xmltokens.Register ("initial", XMLTOKEN_INITIAL_PARTICLES);
   xmltokens.Register ("pps", XMLTOKEN_PARTICLES_PER_SECOND);
   xmltokens.Register ("heatfunction", XMLTOKEN_HEAT_FUNCTION);
@@ -201,9 +199,6 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_GRADIENT:
         ParseGradient (child, state);
         break;
-      case XMLTOKEN_MAX_PARTICLES:
-        state->SetMaxParticleCount (child->GetContentsValueAsInt ());
-        break;
       case XMLTOKEN_INITIAL_PARTICLES:
         state->SetInitialParticleCount (child->GetContentsValueAsInt ());
         break;
@@ -215,6 +210,9 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         break;
       case XMLTOKEN_MASS:
         state->SetMass (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_DAMPENER:
+        state->SetDampener (child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_HEAT_FUNCTION:
       {
@@ -387,9 +385,6 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
       case XMLTOKEN_AMOUNT:
         state->SetForce (child->GetContentsValueAsFloat ());
         break;
-      case XMLTOKEN_DAMPENER:
-        state->SetDampener (child->GetContentsValueAsFloat ());
-        break;
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
@@ -524,7 +519,6 @@ bool csParticlesObjectLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("gravity", XMLTOKEN_GRAVITY);
   xmltokens.Register ("ttl", XMLTOKEN_TIME_TO_LIVE);
   xmltokens.Register ("timevariation", XMLTOKEN_TIME_VARIATION);
-  xmltokens.Register ("maxparticles", XMLTOKEN_MAX_PARTICLES);
   xmltokens.Register ("heatfunction", XMLTOKEN_HEAT_FUNCTION);
   xmltokens.Register ("gradient", XMLTOKEN_GRADIENT);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
@@ -608,9 +602,6 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_GRADIENT:
         ParseGradient (child, state);
         break;
-      case XMLTOKEN_MAX_PARTICLES:
-        state->SetMaxParticleCount (child->GetContentsValueAsInt ());
-        break;
       case XMLTOKEN_INITIAL_PARTICLES:
         state->SetInitialParticleCount (child->GetContentsValueAsInt ());
         break;
@@ -622,6 +613,9 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         break;
       case XMLTOKEN_MASS:
         state->SetMass (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_DAMPENER:
+        state->SetDampener (child->GetContentsValueAsFloat ());
         break;
       case XMLTOKEN_HEAT_FUNCTION:
       {
@@ -793,9 +787,6 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
       }
       case XMLTOKEN_AMOUNT:
         state->SetForce (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_DAMPENER:
-        state->SetDampener (child->GetContentsValueAsFloat ());
         break;
       default:
         synldr->ReportError ("crystalspace.particles.object.loader",
