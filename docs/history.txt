@@ -31,6 +31,8 @@ The history order has been reversed so that new features are at the top.
 	  ago.
 	- Eric Sunshine resolved a problem with the new ddg.mak makefile were
 	  CFLAGS.DDG was not being employed in all cases.
+	- Eric Sunshine fixed a potential #include problem in pol2d.h which was
+	  reported by Navdeep S. Tinna <nst7@cs.columbia.edu>.
 6-Mar-2001
 	- Changed the following functions to work in object space instead
 	  of world space:
