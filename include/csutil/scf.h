@@ -174,7 +174,8 @@ public:									\
  * The SCF_DESTRUCT_EMBEDDED_IBASE macro should be invoked inside the
  * destructor of an embedded class.
  */
-#define SCF_DESTRUCT_EMBEDDED_IBASE()
+#define SCF_DESTRUCT_EMBEDDED_IBASE(Interface)				\
+  Interface.scfParent = 0;
 
 /**
  * The SCF_IMPLEMENT_IBASE_INCREF() macro implements the IncRef() method for a

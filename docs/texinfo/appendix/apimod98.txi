@@ -862,6 +862,14 @@ longer required.
 
 @subsubheading Other @sc{scf} Changes
 
+The macros @code{SCF_DESTRUCT_IBASE()} and @code{SCF_DESTRUCT_EMBEDDED_IBASE()}
+have been introduced.  Just as a destructor reverses initialization performed
+by a constructor, these new macros reverse the initialization performed by the
+corresponding @code{SCF_CONSTRUCT_IBASE()} and
+@code{SCF_CONSTRUCT_EMBEDDED_IBASE()} macros.  Typically, you should invoke
+these macros within your class' destructor, just as you invoke the
+corresponding @sc{scf} construction macros in your class' constructor.
+
 The @code{SCF_CREATE_INSTANCE()} macro now returns @code{csPtr<>}, for
 consistency with the other @sc{scf} instantiation and query macros.  This means
 that you should now assign the result of @code{SCF_CREATE_INSTANCE()} to a

@@ -273,6 +273,7 @@ public:
 
 // Concrete implementation source (test.cpp)
 SCF_IMPLEMENT_FACTORY(Test)
+
 SCF_IMPLEMENT_IBASE(Test)
 @end example
 
@@ -288,6 +289,7 @@ code required to support all implemented interface inside
 
 @example
 SCF_IMPLEMENT_FACTORY(Test)
+
 SCF_IMPLEMENT_IBASE(Test)
   SCF_IMPLEMENTS_INTERFACE(iTest)
 SCF_IMPLEMENT_IBASE_END
@@ -323,6 +325,9 @@ constructor, this macro will initialize @samp{scfRefCount} to zero and
 should receive at least one argument of type @samp{iBase*}, which it should
 pass along to the @code{SCF_CONSTRUCT_IBASE()} macro.  It is also valid to
 specify @samp{NULL} as the parent if the instance should have no parent.
+Likewise, you should call @code{SCF_DESTRUCT_IBASE()} inside your class
+destructor.  This will reverse the initialization performed by the
+corresponding @code{SCF_CONSTRUCT_IBASE()} invocation.
 
 @node SCF Multiple Interfaces, SCF Versions, SCF Using, SCF
 @subsection Classes Implementing Multiple Interfaces
@@ -454,21 +459,31 @@ embedded interface objects with the
 @code{SCF_CONSTRUCT_EMBEDDED_IBASE(@var{InterfaceName})} macro.  This will
 initialize @samp{scfRefCount} and @samp{scfParent} fields within
 @samp{scf@var{InterfaceName}} member variables to appropriate values (zero and
-@samp{this}).  Here is how to do it:
+@samp{this}).  Likewise, you should destroy embedded interfaces with the
+@code{SCF_DESTRUCT_EMBEDDED_IBASE()} macro.  Here is how to do it:
 
 @example
 MyGraphics3D::MyGraphics3D(iBase* iParent)
 @{
   SCF_CONSTRUCT_IBASE(iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(iHalo);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(iBumpMap);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiHalo);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiBumpMap);
   @dots{}
+@}
+
+MyGraphics3D::~MyGraphics3D()
+@{
+  @dots{}
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiBumpMap);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiHalo);
+  SCF_DESTRUCT_IBASE();
 @}
 @end example
 
 You should not call @code{SCF_CONSTRUCT_IBASE()} within embedded object's
-constructor since all work needed to initialize @code{iBase} fields is done in
-the carrier object's constructor.
+constructor since all work needed to initialize @samp{iBase} fields is done in
+the carrier object's constructor.  Likewise, you should not call
+@code{SCF_DESTRUCT_IBASE()} within the embedded object's destructor.
 
 @node SCF Versions, SCF Client, SCF Multiple Interfaces, SCF
 @subsection Interface Versions
@@ -886,6 +901,8 @@ csDog::csDog(iBase* Parent)
 csDog::~csDog()
 @{
   free(Name);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiName);
+  SCF_DESTRUCT_IBASE();
 @}
 
 void csDog::Walk()
@@ -1070,5 +1087,11 @@ MyClass::MyClass()
 @{
   SCF_CONSTRUCT_IBASE(0)
   @dots{}
+@}
+
+MyClass::~MyClass()
+@{
+  @dots{}
+  SCF_DESTRUCT_IBASE()
 @}
 @end example

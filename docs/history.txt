@@ -22,6 +22,11 @@ chronological order.
 	  search when it found an unnamed child.  Instead, it should simply
 	  ignore that child and continue examining the others.  Problem noted
 	  by Frank Richter.
+	- Eric Sunshine fixed SCF bug: SCF_DESTRUCT_EMBEDDED_IBASE() macro did
+	  not accept any arguments, which made it impossible to specify
+	  exactly which embedded object was being destroyed.
+	- Eric Sunshine documented SCF_DESTRUCT_IBASE() and
+	  SCF_DESTRUCT_EMBEDDED_IBASE() in scf.txi and apimod98.txi.
 2-Nov-2003
 	- Eric Sunshine performed project-wide spelling corrections:
 	    seperate    --> separate
