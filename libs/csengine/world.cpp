@@ -220,7 +220,8 @@ csWorld::~csWorld ()
   CHK (delete lightpatch_pool);
   CHK (delete quadcube);
   cs->Release();
-  plugins->Release();
+  //  plugins->Release();
+  CHK (delete plugins);
 }
 
 void csWorld::Clear ()
