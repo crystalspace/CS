@@ -4,5 +4,4 @@
 
 #define __NEED_OPENDIR_PROTOTYPE	1
 
-#define SCAN_KEYBOARD		1
 #define MACOS_VOLATILE	1

@@ -43,6 +43,8 @@
 #include "igraph3d.h"
 #include "igraph2d.h"
 
+#define SCAN_KEYBOARD	0
+
 #define kAppleMenuID			128
 #define kFileMenuID				129
 #define kEditMenuID				130
@@ -240,6 +242,10 @@ void SysSystemDriver::Loop(void)
       	piG2D->SetColorPalette();
 	}
 
+#if ! SCAN_KEYBOARD
+	SetEventMask( everyEvent );
+#endif
+
     prev_time = current_time = Time();
 	while (( ! Shutdown ) && ( ! ExitLoop )) {
     	NextFrame( current_time - prev_time, current_time );
@@ -247,8 +253,6 @@ void SysSystemDriver::Loop(void)
 
 #if SCAN_KEYBOARD
 		ScanKeyboard( current_time );
-#else
-		Keyboard->Reset();
 #endif
 
 		if ( WaitNextEvent( everyEvent, &anEvent, 1, NULL ) ) {
@@ -298,7 +302,7 @@ void SysSystemDriver::DispatchEvent( time_t current_time, EventRecord *theEvent,
 			break;
 
 		case keyDown:
-		case autoKey:
+//		case autoKey:
 			{
 				char theKey = theEvent->message & charCodeMask;
 				char theCode = theEvent->message & keyCodeMask;
@@ -802,10 +806,10 @@ void SysSystemDriver::ScanKeyboard( time_t current_time )
 
 void SysSystemDriver::HandleKey(
 	time_t current_time,
-	const char key,
+	const unsigned char key,
 	const char /* keycode */,
 	const short modifiers,
-	bool /* down */ )
+	bool down )
 {
 	// A key has been pressed -- handle typical cases.
 	if (modifiers & cmdKey) {
@@ -820,56 +824,62 @@ void SysSystemDriver::HandleKey(
 	}
 
 #if ! SCAN_KEYBOARD
-	Keyboard->Key.shift = ( modifiers & shiftKey );
-	Keyboard->Key.ctrl = ( modifiers & controlKey );
-	Keyboard->Key.alt = ( modifiers & optionKey );
+	int keycode;
 
 	switch ( key ) {
 		case kHomeCharCode:
-        	Keyboard.do_press( CSKEY_HOME );
+			keycode = CSKEY_HOME;
 			break;
 
 		case kEndCharCode:
-        	Keyboard.do_press( CSKEY_END );
+			keycode = CSKEY_END;
 			break;
 
 		case kEscapeCharCode:
-			Keyboard.do_press( CSKEY_ESC );
+			keycode = CSKEY_ESC;
 			break;
 
 		case kReturnCharCode: 
-			Keyboard.do_press( CSKEY_ENTER );
+			keycode = CSKEY_ENTER;
 			break;
 
 		case kUpArrowCharCode:
-			Keyboard.do_press( CSKEY_UP );
+			keycode = CSKEY_UP;
 			break;
 
 		case kDownArrowCharCode:
-			Keyboard.do_press( CSKEY_DOWN );
+			keycode = CSKEY_DOWN;
 			break;
 
 		case kLeftArrowCharCode:
-			Keyboard.do_press( CSKEY_LEFT );
+			keycode = CSKEY_LEFT;
 			break;
 
 		case kRightArrowCharCode:
-			Keyboard.do_press( CSKEY_RIGHT );
+			keycode = CSKEY_RIGHT;
 			break;
 
 		case kPageUpCharCode:
-			Keyboard.do_press( CSKEY_PGUP );
+			keycode = CSKEY_PGUP;
 			break;
 
 		case kPageDownCharCode:
-			Keyboard.do_press( CSKEY_PGDN );
+			keycode = CSKEY_PGDN;
 			break;
 
 		default:
-			Keyboard.do_press( key );
-			Keyboard.do_release( key );
+			keycode = key;
 			break;
 	}
+
+	if ( modifiers & shiftKey )
+		keycode |= CSKEY_SHIFT;
+	if ( modifiers & controlKey )
+		keycode |= CSKEY_CTRL;
+	if ( modifiers & optionKey )
+		keycode |= CSKEY_ALT;
+
+	QueueKeyEvent( keycode, down );
 #endif
 }
 

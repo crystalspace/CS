@@ -53,7 +53,7 @@ private:
 	void		HandleMouseEvent( time_t current_time, EventRecord *theEvent, iMacGraphics* piG2D );
 	void		HandleMenuUpdate( void );
 	void		HandleMenuSelection( const short menuNum, const short itemNum );
-	void		HandleKey( time_t current_time, const char key, const char keycode, const short modifiers, bool down );
+	void		HandleKey( time_t current_time, const unsigned char key, const char keycode, const short modifiers, bool down );
 	void		HandleHLEvent( time_t current_time, EventRecord *theEvent );
 	void		HandleOSEvent( time_t current_time, EventRecord *theEvent, iMacGraphics* piG2D );
 	void		ScanKeyboard( time_t current_time );
