@@ -139,6 +139,9 @@ void OpenGLTextureCache::Load (csHighColorCacheData *d)
     texture_height /= 2;
     texture_width /= 2;
     mipmaplevel++;
+
+    // only 0 level mipmip for a 2d texture!
+    if (txt_mm->for_2d()) break;
   }
 
   delete [] tempdata;

@@ -92,16 +92,6 @@ private:
   // Some common shortcut functions that may or may not apply, depending
   // on the underlying hardware
 
-  /// Shortcut to Override standard polygon drawing when we have multitexture
-  bool MultitextureDrawPolygon(G3DPolygonDP &poly);
-
-  /// Shortcuts to replace the standard Start/Draw/Finish set of Draw...FX functions;
-  /// this set collects up polygons and then draws them in batches, instead
-  /// of drawing each individual poly with gl calls
-  bool BatchStartPolygonFX(iTextureHandle *handle, UInt mode);
-  bool BatchAccumulatePolygonFX(G3DPolygonDPFX &poly);
-  bool BatchFlushPolygonFX();
-
 protected:
   /// Z Buffer mode to use while rendering next polygon.
   G3DZBufMode z_buf_mode;
@@ -337,6 +327,9 @@ public:
    * closed.
    * The given CS_ID can be used to identify multiple fog objects when
    * multiple objects are started.
+   * On the OpenGL driver this function is not used.  Instead the
+   * fog is drawn as an additional texture on each polygon that
+   * is effected by the fog.
    */
   virtual void OpenFogObject (CS_ID id, csFog* fog);
     
@@ -350,6 +343,9 @@ public:
    *	<li>CS_FOG_BACK:	a back-facing polygon
    *	<li>CS_FOG_VIEW:	the view-plane
    * </ul>
+   * On the OpenGL driver this function is not used.  Instead the
+   * fog is drawn as an additional texture on each polygon that
+   * is effected by the fog.
    */
   virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
         
@@ -357,10 +353,13 @@ public:
    * Close a volumetric fog object. After the volumetric object is
    * closed it should be rendered on screen (whether you do it here
    * or in DrawFrontFog/DrawBackFog is not important).
+   * On the OpenGL driver this function is not used.  Instead the
+   * fog is drawn as an additional texture on each polygon that
+   * is effected by the fog.
    */
   virtual void CloseFogObject (CS_ID id);
 	  
-  /// Get the colorformat you want.
+  /// Get the colorformat you want.  The OpenGL driver only supports 24 bit color.
   virtual G3D_COLORMAPFORMAT GetColormapFormat ()
   { return G3DCOLORFORMAT_24BIT; }
 
@@ -370,9 +369,24 @@ public:
   virtual float GetZbuffValue (int x, int y);
 
   /// Create a halo of the specified color and return a handle.
-  virtual iHalo *CreateHalo (float /*iR*/, float /*iG*/, float /*iB*/,
-    unsigned char* /*iAlpha*/, int /*iWidth*/, int /*iHeight*/)
-  { return NULL; }
+  virtual iHalo *CreateHalo (float iR, float iG, float iB,
+    unsigned char* iAlpha, int iWidth, int iHeight);
+
+  /// If supported, this function will attempt to query the OpenGL driver
+  /// to see what extensions it supports so that other parts of the renderer
+  /// can use appropriate extensions where possible.
+  void DetectExtensions();
+
+  /// Draw a fully-featured polygon assuming one has an OpenGL renderer
+  /// that supports ARB_multitexture
+  bool DrawPolygonMultiTexture(G3DPolygonDP &poly);
+
+  /// Draw a fully-featured polygon assuming one has an OpenGL renderer
+  /// that only has a single texture unit.
+  void DrawPolygonSingleTexture(G3DPolygonDP &poly);
+
+  //Extension flags
+  bool ARB_multitexture;
 };
 
 #endif
