@@ -4471,11 +4471,15 @@ void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
       // We cannot use n,N,z, or Z if no_zbuf_clipping is true.
       if ((c == 'n' || c == 'N' || c == 'z' || c == 'Z') && no_zbuf_clipping)
         continue;
-      // We cannot use s or S if effect uses stencil.
-      if ((c == 's' || c == 'S')
-          && (ci.technique
-	  && (ci.technique->GetClientFlags() & EFFECTFLAG_RUINSSCLIPPING)))
-        continue;
+      // We cannot use s or S if effect uses stencil or if we have floating portals.
+      if ((c == 's' || c == 'S'))
+      {
+        if (ci.technique && (
+		ci.technique->GetClientFlags() & EFFECTFLAG_RUINSSCLIPPING))
+          continue;
+        if (use_clip_portals)
+	  continue;
+      }
       // We cannot use p or P if the clipper has more vertices than the
       // number of hardware planes minus one (for the view plane).
       if ((c == 'p' || c == 'P') &&
@@ -4544,6 +4548,9 @@ void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
 	ci.how_clip == '0' || ci.use_lazy_clipping);
   }
 
+  // Optionally set up clip portals that may be in use.
+  SetupClipPortals ();
+
   //===========
   // First setup the clipper that we need.
   //===========
@@ -4566,9 +4573,6 @@ void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
     for (i = 0 ; i < frustum.GetVertexCount ()+ci.reserved_planes ; i++)
       glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }
-
-  // Optionally set up clip portals that may be in use.
-  SetupClipPortals ();
 }
 
 void csGraphics3DOGLCommon::RestoreDTMClipping ()
@@ -5619,7 +5623,8 @@ void csGraphics3DOGLCommon::OpenPortal (G3DPolygonDFP* poly)
 void csGraphics3DOGLCommon::ClosePortal ()
 {
   if (clipportal_stack.Length () <= 0) return;
-  clipportal_stack.DeleteIndex (clipportal_stack.Length ()-1);
+  csClipPortal* cp = clipportal_stack.Pop ();
+  delete cp;
   clipportal_dirty = true;
 }
 

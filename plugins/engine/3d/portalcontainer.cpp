@@ -784,8 +784,6 @@ void csPortalContainer::DrawOnePortal (
     g3d->OpenPortal (&g3dpoly);
   }
 
-
-
   // Draw through the portal. If this fails we draw the original polygon
   // instead. Drawing through a portal can fail because we have reached
   // the maximum number that a sector is drawn (for mirrors).

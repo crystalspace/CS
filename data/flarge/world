@@ -4777,7 +4777,7 @@
                         <sector>large</sector>
                         <mirror />
                         <clip />
-                        <!--<float />-->
+                        <float />
                         <zfill />
                     </portal>
                 </p>

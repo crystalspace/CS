@@ -755,7 +755,7 @@ bool csThingLoader::ParsePoly3d (
       if (portal_pri == 0)
         portal_pri = mesh->GetRenderPriority ();
       char pc_name[100];
-      sprintf (pc_name, "__portals_%d__", portal_pri);
+      sprintf (pc_name, "__portals_%d_%s__", portal_pri, destSectorName.GetData ());
 
       iPortal* portal;
       csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (

@@ -28,6 +28,11 @@ chronological order.
 	  headers with #includes to ensure that class declarations are seen
 	  before the classes are used in csArray<> templates.  This should
 	  pacify some older compilers.
+	- Jorrit fixed the <float/> keyword for portals (g3d->OpenPortal())
+	  for the OR OpenGL renderer. The problem was that with some clipping
+	  modes the portal clipper would be disabled AFTER setting up the
+	  clipper. This would cause the stencil clipper to be disabled
+	  again with bad effects.
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it
