@@ -17,6 +17,14 @@ chronological order.
 	  they state explicitly that the "Release" or "Debug" build modes must
 	  be used when building wkstypical, and that "Release_NR" and
 	  "Debug_NR" must be avoided.
+	- Eric Sunshine augmented msvcgen/workspaces.mak so that the csjava,
+	  csperl5, and cspython modules are not included in the wksnewrenderer
+	  workspace.  The reason for this change is that the Swig-generated
+	  code in these modules is configuration-specific.  For instance, if
+	  Swig generates the code when configured for the old-renderer, then
+	  the code will not be buildable when configured for the new-renderer.
+	  Since the Swig-generated code stored in CVS is generated for the
+	  old-renderer, it should not be built by wksnewrenderer.
 18-Mar-2004
 	- Anders Stenberg changed the terraformer interface a bit (made Sample
 	  functions return pointers to data instead of filling out supplied

@@ -90,6 +90,9 @@ MSVC.WORKSPACE.TYPICAL.REJECT = \
 MSVC.WORKSPACES += NEWRENDERER
 MSVC.WORKSPACE.NEWRENDERER.NAME = newrenderer
 MSVC.WORKSPACE.NEWRENDERER.REJECT = \
+  csjava \
+  csperl5 \
+  cspython \
   gl3d \
   grp.+_(?!newrenderer\.) \
   null3d \
