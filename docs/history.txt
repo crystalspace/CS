@@ -45,6 +45,22 @@ The history order is reversed so that new features are at the top.
 		    </params>
 		</meshfact>
 	- Fixed map2cs to output the new curve format.
+	- res made the following changes to map2cs:
+	    * Fixed a bunch of bugs he introduced with the converison to
+	      iDocumentSystem.
+	    * Improved handling of keycolored HL textures.
+	    * A sky portal can now be created by assigning the "sky" texture
+	      to a brush face.
+	    * Less <part>s, more <meshobj>s are written.
+	    * Can now be instructed to specify dynavis as the culler (through 
+	      Hammer)
+	    * Lighmap cell size can now also be specified in the map file.
+	    * Various other small tweaks.
+	- res made the following changes to crystal.fgd:
+	    * Fixed some problems he introduced.
+	    * Added some new settings, like Dynavis activation.
+	- res fixed a possible endless loop in mesh ie multiplexer.
+	- res added csImageMemory::SetKeycolor() and ::ClearKeycolor()
 5-Mar-2003
 	- Worked a bit further on blocks: now no longer uses gouraud shaded
 	  polygons.

@@ -93,3 +93,16 @@ void csImageMemory::Rescale (int NewWidth, int NewHeight)
   else*/
     csImageFile::Rescale (NewWidth, NewHeight);
 }
+
+void csImageMemory::SetKeycolor (int r, int g, int b)
+{
+  has_keycolour = true;
+  keycolour_r = r;
+  keycolour_g = g;
+  keycolour_b = b;
+}
+
+void csImageMemory::ClearKeycolor ()
+{
+  has_keycolour = false;
+}

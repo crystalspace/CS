@@ -66,6 +66,11 @@ public:
 
   /// Rescale the image to the given size
   virtual void Rescale (int NewWidth, int NewHeight);
+
+  /// Set the keycolor
+  virtual void SetKeycolor (int r, int g, int b);
+  /// Remove the keycolor
+  virtual void ClearKeycolor ();
 };
 
 
