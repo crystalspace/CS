@@ -198,9 +198,9 @@ public:
    * \param collider is the collider of the object that we are going
    * to move along the path.
    * \param trans is the transform of that object (see Collide()).
-   * \param stepsize is the distance we want to recheck CD along the
-   * path. Typically this is set to a step size smaller then the size
-   * of the collider bbox.
+   * \param nbrsteps is the number of steps we want to check along the path.
+   * Typically the stepsize resulting from this number of steps is set
+   * to a step size smaller then the size of the collider bbox.
    * \param newpos is the new position of that object.
    * \param num_colliders is the number of colliders that we are going
    * to use to collide with.
@@ -215,7 +215,7 @@ public:
   static int CollidePath (
   	iCollideSystem* colsys,
   	iCollider* collider, const csReversibleTransform* trans,
-	float stepsize,
+	float nbrsteps,
 	csVector3& newpos,
 	int num_colliders,
 	iCollider** colliders,

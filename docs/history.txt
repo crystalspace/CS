@@ -12,6 +12,10 @@ chronological order.
 	  features of Cg 1.2.x (at minimum).
 	- Remi Bonnet fixed a bug in csColliderHelper::CollidePath. stepsize
 	  arg behaved like a nbr_steps one.
+	- Jorrit reverted the change from Remi because it is a dangerous
+	  behaviour change. Instead Jorrit renamed the parameter and API
+	  documentation to reflect what it really is and kept the old
+	  behaviour.
 	- Vincent Knecht updated cs.spec:
 	    - Specified datadir, libdir and sysconfig switches of configure.
 	    - Specified CS_CONFIGDIR in cslight commands.

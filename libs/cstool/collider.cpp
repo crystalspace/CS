@@ -211,7 +211,7 @@ int csColliderHelper::CollidePath (
 	iCollideSystem* colsys,
 	iCollider* collider,
   	const csReversibleTransform* trans,
-	float stepsize,
+	float nbrsteps,
 	csVector3& newpos,
 	int num_colliders,
 	iCollider** colliders,
@@ -221,7 +221,7 @@ int csColliderHelper::CollidePath (
   csVector3 start = test.GetOrigin ();
   csVector3 end = newpos;
   csVector3 testpos;
-  float step = stepsize / (end - start).Norm();
+  float step = 1.0f / nbrsteps;
   float curdist = 0;
   bool rc = false;
   bool firsthit = true;
