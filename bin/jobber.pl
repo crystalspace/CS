@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    Automated Processing, Publishing, and CVS Update Script
-#    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000,2001 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '10';
+my $PROG_VERSION = '11';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -122,6 +122,9 @@ my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 #        been configured before a makefile target can be invoked.  For
 #        instance, if this script runs on Linux, then this value should be
 #        "linux".
+#    TEMPDIR - The temporary working directory where all processing should
+#        occur.  The script cleans up after itself, so nothing will be left in
+#        this directory after the script terminates.
 #    BINARY - A list of regular expressions which are matched against the names
 #        of files which are being added to the CVS repository.  If a filename
 #        matches one of these expressions, then it is added to the repository
@@ -188,6 +191,7 @@ my $BROWSEABLE_DIR = "$PUBLIC_DOC_DIR/online";
 my $PACKAGE_DIR = "$PUBLIC_DOC_DIR/download";
 my $OWNER_GROUP = 'crystal';
 my $PLATFORM = 'linux';
+my $TEMPDIR = '/tmp';
 my @BINARY = ('(?i)\.(dsw|dsp)$');
 
 my @TARGETS =
@@ -246,14 +250,15 @@ my @ARCHIVERS =
 # Internal configuration.
 #------------------------------------------------------------------------------
 my $TESTING = undef;
-my $CONV_DIR = tmpnam();
+my $CONV_DIR = temporary_name($TEMPDIR);
 my $CAPTURED_OUTPUT = '';
 my $MAKE = 'make';
 
 my @SCRIPT_OPTIONS = (
-    'test!' => \$TESTING,
-    'help'   => \&option_help,
-    '<>'     => \&option_error
+    'test!'     => \$TESTING,
+    'help'      => \&option_help,
+    'version|V' => \&option_version,
+    '<>'        => \&option_error
 );
 
 #------------------------------------------------------------------------------
@@ -725,9 +730,11 @@ an automated mechanism.  The tasks which it performs are:
 Usage: $PROG_NAME [options]
 
 Options:
-    -h --help  Print this usage message.
-    -t --test  Process all tasks but do not actually modify the CVS
-               repository or export any files.
+    -t --test    Process all tasks but do not actually modify the CVS
+                 repository or export any files.
+    -h --help    Display this usage message.
+    -v --version Display the version number of @{[basename($0)]}
+
 EOT
 }
 
@@ -740,8 +747,9 @@ sub process_options {
     print "Non-destructive testing mode enabled.\n\n" if $TESTING;
 }
 
-sub option_help  { print_usage(\*STDOUT); exit(0); }
-sub option_error { usage_error("Unknown option: @_\n"); }
+sub option_help    { print_usage(\*STDOUT); exit(0); }
+sub option_version { banner(\*STDOUT); exit(0); }
+sub option_error   { usage_error("Unknown option: @_\n"); }
 
 sub usage_error {
     my $msg = shift;

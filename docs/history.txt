@@ -16,6 +16,10 @@ The history order has been reversed so that new features are at the top.
 	  in glcommon2d.cpp.
 	- Eric Sunshine fixed CS/include/cssys/next/csosdefs.h so that it
 	  respects SYSDEF_ACCESS.
+	- Eric Sunshine made the following changes to jobber.pl:
+	    - Now allows user-specification of the temporary working directory
+	      (default is "/tmp").
+	    - Added a --version option.
 29-Jan-2001
 	- Martin also modified the sound drivers so that they are now opened,
 	  closed, and updated via system events.
