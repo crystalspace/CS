@@ -29,6 +29,14 @@
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csModelFrameVector, iModelDataVertices);
 
+typedef struct {
+  int normal;
+  int texel;
+  int vidx;
+} UsedVertexInfo;
+
+CS_TYPEDEF_GROWING_ARRAY (UsedVerticesInfo, UsedVertexInfo);
+
 bool csSpriteBuilder::Build (iModelDataObject *Object)
 {
   int i,j;
@@ -83,6 +91,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   csIntArray SpriteNormals;
   csIntArray SpriteTexels;
 
+#if 0
   int vertices=0;
   // count polygons 
   it1 = Object->QueryObject ()->GetIterator ();
@@ -130,6 +139,84 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   }
   it1->DecRef ();
 
+#else
+/*
+  Every output vertex must have exactly on texture coordinate and one normal.
+  However, it can happen that actually more than one normal/texcoord
+  occurs for the same vertex (for example by hard edges in 3ds files).
+  So we make sure that every vertex/texcoord/normal combo gets its
+  own output vertex, but without the waste of vertices when simply every
+  point in every polygon gets its own output vertex.
+
+  the following is done:
+   - for every vertex a table with texcoord/normal combos and its output
+     vertex index is created
+   - for every vertex we encounter in the polys we check this table if that
+     texcoord/normal combo appeared. if yes take the output vertex index, 
+     otherwise add this combo.
+*/
+
+  int vertices=Frames[0]->GetVertexCount();
+  UsedVerticesInfo *usedvertices = new UsedVerticesInfo [vertices];
+
+  it1 = Object->QueryObject ()->GetIterator ();
+  while (!it1->IsFinished ())
+  {
+    iModelDataPolygon *poly =
+      SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataPolygon);
+    if (poly)
+    {
+      csIntArray PolyVertices;
+      for (i=0; i<poly->GetVertexCount(); i++)
+      {
+	int vertex = poly->GetVertex (i);
+	int normal = poly->GetNormal (i);
+	int texel = poly->GetTexel (i);
+
+	UsedVerticesInfo *vinfo = &usedvertices[vertex];
+	int index = -1;
+
+	for (j=0; j<vinfo->Length(); j++)
+	{
+	  if ((vinfo->Get(j).normal == normal) && (vinfo->Get(j).texel == texel))
+	  {
+	    index = vinfo->Get(j).vidx;
+	    break;
+	  }
+	}
+	if (index == -1)
+	{
+	  index = SpriteVertices.Push (vertex);
+	  SpriteNormals.Push (normal);
+	  SpriteTexels.Push (texel);
+	  UsedVertexInfo vtxinfo;
+	  vtxinfo.normal = normal;
+	  vtxinfo.texel = texel;
+	  vtxinfo.vidx = index;
+	  vinfo->Push (vtxinfo);
+	}
+	PolyVertices.Push (index);
+      }	  
+
+      // split the polygon into triangles and copy them
+      for (i=2; i<PolyVertices.Length (); i++)
+      {
+        StoreTriangle (PolyVertices[0], PolyVertices[i-1], PolyVertices[i]);
+      }
+
+      // store the material if we don't have any yet
+      if (!Material && poly->GetMaterial ())
+        Material = poly->GetMaterial ();
+
+      poly->DecRef ();
+    }
+    it1->Next ();
+  }
+  it1->DecRef ();
+
+  delete[] usedvertices;
+#endif
+
   // copy the first valid material
   if (Material) StoreMaterial (Material);
 
@@ -149,6 +236,8 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
     for (j=0; j<SpriteVertices.Length (); j++)
     {
       csVector2 t = Vertices->GetTexel (SpriteTexels [j]);
+      // @@@ hmmm... isn't 1 actually already wrapped around to 0?
+      // should be '>= 1', not just '> 1' then
       if (t.x < 0 || t.y < 0 || t.x > 1 || t.y > 1)
         NeedTiling = true;
 
