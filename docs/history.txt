@@ -7,7 +7,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine reverted Phil's change to win32.cpp where he removed an
 	  invocation of CreateSolidBrush().  Instead, Eric patched
 	  pythmod_setup.py, cspython.mak, and win32gcc.mak so that the _cspace
-	  Python module is linked against against gdi32.lib, which is where
+	  Python module is linked against gdi32.lib, which is where
 	  CreateSolidBrush() is located.  (This is untested.  If you still
 	  experience trouble, please attempt to satisfy the link requirements
 	  by editing the makefiles or pythmod_setup.py, rather than disabling
