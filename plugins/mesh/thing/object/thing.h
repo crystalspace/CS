@@ -37,6 +37,7 @@
 #include "csutil/refarr.h"
 #include "csutil/util.h"
 #include "csutil/weakref.h"
+#include "csutil/leakguard.h"
 #include "cstool/rendermeshholder.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
@@ -171,6 +172,8 @@ private:
 class csThingStatic : public iThingFactoryState, public iMeshObjectFactory
 {
 public:
+  CS_LEAKGUARD_DECLARE (csThingStatic);
+  
   csRef<csThingObjectType> thing_type;
   /// Pointer to logical parent.
   iBase* logparent;
@@ -716,6 +719,8 @@ private:
   char* GenerateCacheName ();
 
 public:
+  CS_LEAKGUARD_DECLARE (csThing);
+
   /// Option variable: quality for lightmap calculation.
   static int lightmap_quality;
 

@@ -27,6 +27,7 @@
 #include "csutil/hash.h"
 #include "csutil/blockallocator.h"
 #include "csutil/scf.h"
+#include "csutil/leakguard.h"
 #include "igeom/objmodel.h"
 #include "iengine/movable.h"
 #include "csgeom/plane3.h"
@@ -72,6 +73,8 @@ class csVisibilityObjectWrapper : public iObjectModelListener,
 	public iMovableListener
 {
 public:
+  CS_LEAKGUARD_DECLARE (csVisibilityObjectWrapper);
+  
   csDynaVis* dynavis;
   iVisibilityObject* visobj;
   csKDTreeChild* child;

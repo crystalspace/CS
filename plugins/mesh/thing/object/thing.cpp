@@ -80,6 +80,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+CS_LEAKGUARD_IMPLEMENT (csThingStatic)
+CS_LEAKGUARD_IMPLEMENT (csThing)
+
 int csThing::lightmap_quality = 3;
 bool csThingObjectType::do_verbose = false;
 

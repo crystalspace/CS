@@ -26,6 +26,7 @@
 #include "csutil/refarr.h"
 #include "csutil/weakref.h"
 #include "csutil/randomgen.h"
+#include "csutil/leakguard.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/poly2d.h"
@@ -994,6 +995,8 @@ public:
    */
   static csWeakRef<iSharedVariable> global_lod_varm;
   static csWeakRef<iSharedVariable> global_lod_vara;
+
+  CS_LEAKGUARD_DECLARE(csSprite3DMeshObject);
 
 private:
   /**

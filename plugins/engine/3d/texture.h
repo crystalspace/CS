@@ -22,6 +22,7 @@
 #include "cstypes.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
+#include "csutil/leakguard.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
@@ -88,7 +89,8 @@ private:
   virtual ~csTextureWrapper ();
 
 public:
-
+  CS_LEAKGUARD_DECLARE (csTextureWrapper);
+  
   /// Construct a texture handle given a image file
   csTextureWrapper (iImage* Image);
   /// Construct a csTextureWrapper from a pre-registered texture

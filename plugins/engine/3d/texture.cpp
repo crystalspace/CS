@@ -24,6 +24,8 @@
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
 
+CS_LEAKGUARD_IMPLEMENT (csTextureWrapper)
+
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csTextureWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iTextureWrapper)

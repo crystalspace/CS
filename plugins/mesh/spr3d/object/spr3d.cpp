@@ -47,6 +47,8 @@ CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangle
 
 CS_IMPLEMENT_PLUGIN
 
+CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObject)
+
 // Set the default lighting quality.
 // See header file for CS_SPR_LIGHTING_* definitions.
 //#define DEFAULT_LIGHTING CS_SPR_LIGHTING_HQ

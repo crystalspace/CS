@@ -23,6 +23,21 @@ chronological order.
 	  it was documented as accepting -1 for `count', but did not correctly
 	  handle the case.
 	- Wouter Wijngaards fixed compile errors in csbench.
+        - Philip Wyett fixed a compile error in prstex.cpp
+	- Jorrit added a new leak detector to CS. This class is very easy to
+	  use. In the class header you add:
+	    class csBla
+	    {
+	    public:
+	      CS_LEAKGUARD_DECLARE(csBla);
+	    };
+	  In the source you add:
+	    CS_LEAKGUARD_IMPLEMENT(csBla)
+	  And that's all. When the program exits the number of remaining
+	  instances will be printed (if > 0). This is only done in debug
+	  mode. In release/optimize mode the code does nothing.
+	- Jorrit added the new leak detector declarations to various classes
+	  in CS.
         - Philip Wyett fixed a compile error in prstex.cpp.
         - Philip Wyett eliminated compiler warnings in xmlshader.cpp.
 19-Aug-2004
