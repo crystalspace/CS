@@ -17,6 +17,7 @@
 */
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "csutil/scfstr.h"
 #include "iutil/vfs.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
@@ -56,8 +57,8 @@
 #include "imesh/emit.h"
 #include "iutil/plugin.h"
 
-#include "partedit.h"
 #include "awssink.h"
+#include "partedit.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -71,8 +72,6 @@ awsSink *s;
 PartEdit::PartEdit (iObjectRegistry* object_reg)
 {
   PartEdit::object_reg = object_reg;
-  width = 0.05;
-  part_time = 2000;
   keydown=false;
   value = 0;
 }
@@ -89,101 +88,105 @@ void PartEdit::SetupFrame ()
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
   iCamera* c = view->GetCamera();
-  if(s->GetUpdateState()) {
-  
-	  s->UpdateLabel("X",1);
-	  s->UpdateLabel("Y",2);
-	  s->UpdateLabel("Z",3); 
-	  s->UpdateLabel("Other",4);
 
-  printf("State: %i\n",s->GetState());
-  switch(s->GetState())
+  /*
+  if(s->GetUpdateState()) 
   {
+    s->UpdateLabel("X",1);
+    s->UpdateLabel("Y",2);
+    s->UpdateLabel("Z",3); 
+    s->UpdateLabel("Other",4);
+
+    printf("State: %i\n",s->GetState());
+    switch(s->GetState())
+    {
     case 0: 
-	  s->UpdateInput(0.0,1);
-	  s->UpdateInput(0.0,2);
-	  s->UpdateInput(0.0,3);
-	  s->UpdateInput(0.0,4);
-	  break;
-    case 1: 
-	  s->UpdateInput(s->GetValueX(0.001,-500),1);
-	  s->UpdateInput(s->GetValueY(0.001,-500),2);
-	  s->UpdateInput(s->GetValueZ(0.001,-500),3);
-      emitvector->SetValue(csVector3(s->GetValueX(0.001,-500),s->GetValueY(0.001,-500),s->GetValueZ(0.001,-500)));
-	  emitState->SetStartSpeedEmit(emitvector); 
+      s->UpdateInput(0.0,1);
+      s->UpdateInput(0.0,2);
+      s->UpdateInput(0.0,3);
+      s->UpdateInput(0.0,4);
       break;
-	case 2: 
-	  s->UpdateInput(s->GetValueX(0.002,-500),1);
-	  s->UpdateInput(s->GetValueY(0.002,-500),2);
-	  s->UpdateInput(s->GetValueZ(0.002,-500),3);
-	  emitvector->SetValue(csVector3(s->GetValueX(0.002,-500),s->GetValueY(0.002,-500),s->GetValueZ(0.002,-500)));
-	  emitState->SetStartAccelEmit(emitvector);
-	  break;
-	case 3:
-	  s->UpdateInput(s->GetValueX(0.002,-500),1);
-	  s->UpdateInput(s->GetValueY(0.002,-500),2);
-	  s->UpdateInput(s->GetValueZ(0.002,-500),3);
-	  emitvector->SetValue(csVector3(s->GetValueX(0.002,-500),s->GetValueY(0.002,-500),s->GetValueZ(0.002,-500)));
-	  emitState->SetStartPosEmit(emitvector);
-	  break;
-	case 4:
-	  s->UpdateInput(s->GetValueX(0.0005,0),1);
-	  s->UpdateInput(s->GetValueY(0.0005,0),2);
-	  emitState->SetRectParticles(s->GetValueX(0.0005,0),s->GetValueY(0.0005,0));
-	  break;
-	case 5:
-	  s->UpdateInput((int)(s->GetValueOther(0.2)),4);
-	  emitState->SetParticleCount((int)(s->GetValueOther(0.2)));
-	  break;
-	case 6:
-	  
-	  if(s->GetValueOther(5.0) <= 0) 
-	  {
-		s->UpdateInput(5.0,4);
-		emitState->SetParticleTime(5);
-	  }
-	  else 
-	  {
-		s->UpdateInput((s->GetValueOther(5.0)),4);
-		emitState->SetParticleTime(int(s->GetValueOther(5.0)));
-	  }
-	  break;
-	case 7:
-	  s->UpdateInput(s->GetValueX(0.001,0),1);
-	  s->UpdateInput(s->GetValueY(0.001,0),2);
-	  s->UpdateInput(s->GetValueZ(0.001,0),3);
-	  s->UpdateLabel("Red",1);
-	  s->UpdateLabel("Green",2);
-	  s->UpdateLabel("Blue",3);
-	  emitState->AddAge(0, csColor(s->GetValueX(0.001,0),s->GetValueY(0.001,0),s->GetValueZ(0.001,0)), 0.3,0.3, 1, 1);
-	  break;
+    case 1: 
+      s->UpdateInput(s->GetValueX(0.001,-500),1);
+      s->UpdateInput(s->GetValueY(0.001,-500),2);
+      s->UpdateInput(s->GetValueZ(0.001,-500),3);
+      emitvector->SetValue(csVector3(s->GetValueX(0.001,-500),s->GetValueY(0.001,-500),s->GetValueZ(0.001,-500)));
+      emitState->SetStartSpeedEmit(emitvector); 
+      break;
+    case 2: 
+      s->UpdateInput(s->GetValueX(0.002,-500),1);
+      s->UpdateInput(s->GetValueY(0.002,-500),2);
+      s->UpdateInput(s->GetValueZ(0.002,-500),3);
+      emitvector->SetValue(csVector3(s->GetValueX(0.002,-500),s->GetValueY(0.002,-500),s->GetValueZ(0.002,-500)));
+      emitState->SetStartAccelEmit(emitvector);
+      break;
+    case 3:
+      s->UpdateInput(s->GetValueX(0.002,-500),1);
+      s->UpdateInput(s->GetValueY(0.002,-500),2);
+      s->UpdateInput(s->GetValueZ(0.002,-500),3);
+      emitvector->SetValue(csVector3(s->GetValueX(0.002,-500),s->GetValueY(0.002,-500),s->GetValueZ(0.002,-500)));
+      emitState->SetStartPosEmit(emitvector);
+      break;
+    case 4:
+      s->UpdateInput(s->GetValueX(0.0005,0),1);
+      s->UpdateInput(s->GetValueY(0.0005,0),2);
+      emitState->SetRectParticles(s->GetValueX(0.0005,0),s->GetValueY(0.0005,0));
+      break;
+    case 5:
+      s->UpdateInput((int)(s->GetValueOther(0.2)),4);
+      emitState->SetParticleCount((int)(s->GetValueOther(0.2)));
+      break;
+    case 6:
+
+      if(s->GetValueOther(5.0) <= 0) 
+      {
+        s->UpdateInput(5.0,4);
+        emitState->SetParticleTime(5);
+      }
+      else 
+      {
+        s->UpdateInput((s->GetValueOther(5.0)),4);
+        emitState->SetParticleTime(int(s->GetValueOther(5.0)));
+      }
+      break;
+    case 7:
+      s->UpdateInput(s->GetValueX(0.001,0),1);
+      s->UpdateInput(s->GetValueY(0.001,0),2);
+      s->UpdateInput(s->GetValueZ(0.001,0),3);
+      s->UpdateLabel("Red",1);
+      s->UpdateLabel("Green",2);
+      s->UpdateLabel("Blue",3);
+      emitState->AddAge(0, csColor(s->GetValueX(0.001,0),s->GetValueY(0.001,0),s->GetValueZ(0.001,0)), 0.3,0.3, 1, 1);
+      break;
+    }
+    s->SetUpdateState(false);
   }
-	s->SetUpdateState(false);
-  }
+  */
 
   if (kbd->GetKeyState (CSKEY_RIGHT))
     c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
   if (kbd->GetKeyState (CSKEY_LEFT))
     c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-  if (kbd->GetKeyState (CSKEY_PGUP) && keydown == false) {
-    //c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-	keydown = true;
-	width = width + 0.1;
-	if(width <= 0.05)
-		    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.partedit",
-	"width did not increment");
-	  emitState->AddAge(0, csColor(0,width,1), 0.3,
-    0.3, 1, 1);
-	//emitState->SetRectParticles(width,0.05);
-	//printf("Y_speed value: %f\n",y_speed); 
-	//startspeed->SetValue(csVector3(0,y_speed,0));
-	//emitState->SetStartSpeedEmit(startspeed);
+  if (kbd->GetKeyState (CSKEY_PGUP) && keydown == false) 
+  {
+    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
+//    keydown = true;
+//    width = width + 0.1;
+//    if(width <= 0.05)
+//      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+//      "crystalspace.application.partedit",
+//      "width did not increment");
+//    emitState->AddAge(0, csColor(0,width,1), 0.3,
+//      0.3, 1, 1);
+    //emitState->SetRectParticles(width,0.05);
+    //printf("Y_speed value: %f\n",y_speed); 
+    //startspeed->SetValue(csVector3(0,y_speed,0));
+    //emitState->SetStartSpeedEmit(startspeed);
   }
   else
-	 // keydown = false;
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
+    // keydown = false;
+    if (kbd->GetKeyState (CSKEY_PGDN))
+      c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
   if (kbd->GetKeyState (CSKEY_UP))
     c->Move (CS_VEC_FORWARD * 4 * speed);
   if (kbd->GetKeyState (CSKEY_DOWN))
@@ -191,19 +194,55 @@ void PartEdit::SetupFrame ()
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;
-  
+
   // Tell the camera to render into the frame buffer.
   view->Draw ();
 
   // Start drawing 2D graphics.
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
-	return;
+    return;
   // Make sure invalidated areas get a chance to
   // redraw themselves.
   aws->Redraw ();
   // Draw the current view of the window system to a
   // graphics context with a certain alpha value.
   aws->Print (g3d, 64);
+
+  csString filestr;
+  if (s)
+  {
+    bool update=false;
+    EmitterState *estate;
+
+    if (s->EmitterStateChanged())
+    {
+      estate=s->GetEmitterState();
+      memcpy(&state_emitter,estate,sizeof(EmitterState));
+      s->ClearEmitterStateChanged();
+      update=true;
+    }
+
+    Emitter3DState *e3dstate;
+    if (s->InitialPositionStateChanged())
+    {
+      e3dstate=s->GetInitialPositionState();
+      memcpy(&state_initial_position,e3dstate,sizeof(Emitter3DState));
+      s->ClearInitialPositionStateChanged();
+      update=true;
+    }
+
+
+    filestr=s->GetGraphicFile();
+    if (filestr.Length()>0 && current_graphic != filestr.GetData())
+    {
+      update=true;
+    }
+
+    if (update)
+      RecreateParticleSystem(filestr.GetData());
+    
+  }
+ 
 }
 
 void PartEdit::FinishFrame ()
@@ -228,6 +267,9 @@ bool PartEdit::HandleEvent (iEvent& ev)
 
 bool PartEdit::EventHandler (iEvent& ev)
 {
+  if (!(System->running))
+      return false;
+
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
     System->SetupFrame ();
@@ -238,10 +280,183 @@ bool PartEdit::EventHandler (iEvent& ev)
     System->FinishFrame ();
     return true;
   }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdSystemClose)
+  {
+      // System window closed, app shutting down
+      System->running=false;
+      return true;
+  }
   else
   {
     return System ? System->HandleEvent (ev) : false;
   }
+}
+
+void PartEdit::UpdateEmitState()
+{
+    emitState->SetParticleCount(state_emitter.particle_count);
+    emitState->SetLighting (state_emitter.lighting);
+    if (state_emitter.rectangular_particles)
+      emitState->SetRectParticles(state_emitter.rect_w,state_emitter.rect_h);
+    else
+      emitState->SetRegularParticles(state_emitter.reg_number,state_emitter.reg_radius);
+
+    emitState->SetParticleTime(state_emitter.particle_max_age);
+    csVector3 min(state_emitter.bbox_minx,state_emitter.bbox_miny,state_emitter.bbox_minz);
+    csVector3 max(state_emitter.bbox_maxx,state_emitter.bbox_maxy,state_emitter.bbox_maxz);
+    emitState->SetContainerBox(state_emitter.using_bounding_box,min,max);
+}
+
+bool PartEdit::RecreateParticleSystem(const char *texturefile)
+{
+  Emitters use_emitter=EMITTER_NONE;
+
+  printf("Attempting to load texture file '%s'\n",texturefile);
+
+  // Unload old texture here?
+
+  if (!loader->LoadTexture (texturefile, texturefile))
+    return false;
+
+  iMaterialWrapper *mat_wrap=engine->GetMaterialList()->FindByName(texturefile);
+  if (mat_wrap == 0)
+  {
+    printf("Warning!  Could not find material named '%s' after load.\n");
+    return false;
+  }
+
+
+  if (mw != 0 && mw->QueryObject() != 0)
+    engine->RemoveObject(mw->QueryObject());
+
+  // The meshobject reference is now kept around to change the material as needed
+  csRef<iMeshObject> mesh = EmitObjectFactory->NewInstance();  
+  mesh->SetMaterialWrapper(mat_wrap);
+
+  emitState = SCF_QUERY_INTERFACE (mesh, iEmitState);
+
+  csRef<iEmitGen3D> startpos;
+
+  // Determine Position Emitter
+  if (state_initial_position.fixed_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_POINT : EMITTER_MIX); }
+  if (state_initial_position.line_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_LINE : EMITTER_MIX); }
+  if (state_initial_position.box_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_BOX : EMITTER_MIX); }
+  if (state_initial_position.sphere_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_SPHERE : EMITTER_MIX); }
+  if (state_initial_position.cylinder_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_CYLINDER : EMITTER_MIX); }
+  if (state_initial_position.cone_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_CONE : EMITTER_MIX); }
+  if (state_initial_position.spheretangent_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_SPHERETANGENT : EMITTER_MIX); }
+  if (state_initial_position.cylindertangent_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_CYLINDERTANGENT : EMITTER_MIX); }
+
+
+  csRef<iEmitFixed> e_pptr=EmitFactoryState->CreateFixed();
+  csRef<iEmitLine> e_lptr=EmitFactoryState->CreateLine();
+  csRef<iEmitBox> e_bptr=EmitFactoryState->CreateBox();
+  csRef<iEmitCylinder> e_cyptr=EmitFactoryState->CreateCylinder();
+  csRef<iEmitCone> e_coptr=EmitFactoryState->CreateCone();
+  csRef<iEmitSphere> e_sptr=EmitFactoryState->CreateSphere();
+  csRef<iEmitSphereTangent> e_stptr=EmitFactoryState->CreateSphereTangent();
+  csRef<iEmitCylinderTangent> e_cytptr=EmitFactoryState->CreateCylinderTangent();
+
+  
+  e_pptr->SetValue(state_initial_position.fixed_position);
+  e_lptr->SetContent(state_initial_position.line_start,state_initial_position.line_end);
+  e_bptr->SetContent(state_initial_position.box_min,state_initial_position.box_max);
+  e_cyptr->SetContent(state_initial_position.cylinder_start,state_initial_position.cylinder_end,
+                    state_initial_position.cylinder_min,state_initial_position.cylinder_max);
+  e_coptr->SetContent(state_initial_position.cone_elevation,state_initial_position.cone_elevation,
+                    state_initial_position.cone_azimuth,state_initial_position.cone_aperture,
+                    state_initial_position.cone_min,state_initial_position.cone_max);
+  e_sptr->SetContent(state_initial_position.sphere_center,state_initial_position.sphere_min,state_initial_position.sphere_max);
+  e_stptr->SetContent(state_initial_position.spheretangent_center,state_initial_position.spheretangent_min,state_initial_position.spheretangent_max);
+  e_cytptr->SetContent(state_initial_position.cylindertangent_start,state_initial_position.cylindertangent_end,
+                    state_initial_position.cylindertangent_min,state_initial_position.cylindertangent_max);
+
+
+  switch (use_emitter)
+  {
+    case EMITTER_LINE:
+     startpos=e_lptr;
+     break;
+    case EMITTER_BOX:
+     startpos=e_bptr;
+     break;
+    case EMITTER_CYLINDER:
+     startpos=e_cyptr;
+     break;
+    case EMITTER_CONE:
+     startpos=e_coptr;
+     break;
+    case EMITTER_SPHERE:
+     startpos=e_sptr;
+     break;
+    case EMITTER_SPHERETANGENT:
+     startpos=e_stptr;
+     break;
+    case EMITTER_CYLINDERTANGENT:
+     startpos=e_cytptr;
+     break;
+    case EMITTER_MIX:
+      {
+        csRef<iEmitMix> e_mptr=EmitFactoryState->CreateMix();
+        if (state_initial_position.fixed_weight>0)
+          e_mptr->AddEmitter(state_initial_position.fixed_weight,e_pptr);
+        if (state_initial_position.line_weight>0)
+          e_mptr->AddEmitter(state_initial_position.line_weight,e_lptr);
+        if (state_initial_position.box_weight>0)
+          e_mptr->AddEmitter(state_initial_position.box_weight,e_bptr);
+        if (state_initial_position.cylinder_weight>0)
+          e_mptr->AddEmitter(state_initial_position.cylinder_weight,e_cyptr);
+        if (state_initial_position.cone_weight>0)
+          e_mptr->AddEmitter(state_initial_position.cone_weight,e_coptr);
+        if (state_initial_position.sphere_weight>0)
+          e_mptr->AddEmitter(state_initial_position.sphere_weight,e_sptr);
+        if (state_initial_position.spheretangent_weight>0)
+          e_mptr->AddEmitter(state_initial_position.spheretangent_weight,e_stptr);
+        if (state_initial_position.cylindertangent_weight>0)
+          e_mptr->AddEmitter(state_initial_position.cylindertangent_weight,e_cytptr);
+        startpos=e_mptr;
+      }
+    case EMITTER_POINT:
+    default:
+     startpos=e_pptr;
+     break;
+  }
+
+
+  iEmitFixed* startspeed = EmitFactoryState->CreateFixed();
+  iEmitFixed* startaccel = EmitFactoryState->CreateFixed();
+  emitvector = EmitFactoryState->CreateFixed();
+  startspeed->SetValue(csVector3 (0,0.5,0));
+  startaccel->SetValue(csVector3 (0,0,0));
+  UpdateEmitState();
+  emitState->SetStartPosEmit(startpos);
+  emitState->SetStartSpeedEmit(startspeed);
+  emitState->SetStartAccelEmit(startaccel);
+
+
+
+
+  //emitState->AddAge(0, csColor(0,1,1), 0.3,0.3, 1, 1);
+
+  mw = engine->CreateMeshWrapper(mesh, "emit", room,csVector3 (0, 5, 0));
+
+
+  if (state_emitter.alpha_blend)
+  {
+    mw->SetRenderPriority(4);
+    mw->SetZBufMode(CS_ZBUF_TEST);
+  }
+  else
+  {
+    mw->SetZBufMode(CS_ZBUF_USE);
+  }
+
+  engine->Prepare ();
+
+  current_graphic=texturefile;
+
+
+  return true;
 }
 
 bool PartEdit::Initialize ()
@@ -298,6 +513,16 @@ bool PartEdit::Initialize ()
 	"No iEngine plugin!");
     return false;
   }
+
+  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (vfs == 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.partedit",
+    	"No iVFS plugin!");
+    return false;
+  }
+
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (loader == 0)
@@ -372,13 +597,6 @@ bool PartEdit::Initialize ()
     	"Error loading 'stone4' texture!");
     return false;
   }
-  if (!loader->LoadTexture ("energy", "/lib/std/energy.jpg"))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.partedit",
-    	"Error loading 'stone4' texture!");
-    return false;
-  }
 
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
@@ -410,36 +628,26 @@ bool PartEdit::Initialize ()
   	"crystalspace.mesh.object.emit", iMeshObjectType));  
 
    // Emit
-  csRef<iMeshObjectFactory> EmitObjectFactory = emit_type->NewFactory();
-  csRef<iEmitFactoryState> EmitFactoryState = SCF_QUERY_INTERFACE(EmitObjectFactory, iEmitFactoryState);
+  EmitObjectFactory = emit_type->NewFactory();
+  EmitFactoryState = SCF_QUERY_INTERFACE(EmitObjectFactory, iEmitFactoryState);
 
-  iEmitBox* box = EmitFactoryState->CreateBox ();
-  box->SetContent (csVector3 (0, 0, 0), csVector3 (1, 1, 1));
+  state_emitter.particle_count=25;
+  state_emitter.lighting=false;
+  state_emitter.using_bounding_box=false;
+  state_emitter.bbox_maxx=state_emitter.bbox_maxy=state_emitter.bbox_maxz=0.0f;
+  state_emitter.bbox_minx=state_emitter.bbox_miny=state_emitter.bbox_minz=0.0f;
+  state_emitter.rect_w=0.05f;
+  state_emitter.rect_h=0.05f;
+  state_emitter.rectangular_particles=true;
+  state_emitter.reg_number=1;
+  state_emitter.reg_radius=1.0f;
+  state_emitter.particle_max_age=2000;
+  state_emitter.alpha_blend=true;
 
-  csRef<iMeshObject> mesh = EmitObjectFactory->NewInstance();  
-  mesh->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
+  memset(&state_initial_position,0,sizeof(state_initial_position));
 
-  emitState = SCF_QUERY_INTERFACE (mesh, iEmitState);
+  RecreateParticleSystem("/lib/std/cslogo2.png");
 
-  iEmitFixed* startpos = EmitFactoryState->CreateFixed();
-  iEmitFixed* startspeed = EmitFactoryState->CreateFixed();
-  iEmitFixed* startaccel = EmitFactoryState->CreateFixed();
-  emitvector = EmitFactoryState->CreateFixed();
-  startpos->SetValue(csVector3 (0,0,0));
-  startspeed->SetValue(csVector3 (0,0.5,0));
-  startaccel->SetValue(csVector3 (0,0,0));
-  emitState->SetParticleCount(25);
-  emitState->SetLighting (false);
-  emitState->SetRectParticles(width,0.05);
-  emitState->SetParticleTime(int(part_time));
-  emitState->SetStartPosEmit(startpos);
-  emitState->SetStartSpeedEmit(startspeed);
-  emitState->SetStartAccelEmit(startaccel);
-  //emitState->AddAge(0, csColor(0,1,1), 0.3,0.3, 1, 1);
-
-  csRef<iMeshWrapper> mw = engine->CreateMeshWrapper(mesh, "emit", room,csVector3 (0, 5, 0));
- 
-  engine->Prepare ();
 
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
@@ -457,8 +665,15 @@ bool PartEdit::Initialize ()
 
   s->SetSink(sink);
   s->SetWindowManager(aws);
+  s->SetVFS(vfs);
+
+
 
   aws->GetSinkMgr()->RegisterSink("parteditSink", sink);
+
+
+  
+
 
   // now load preferences
   if (!aws->GetPrefMgr()->Load("/this/data/temp/partedit.def"))
@@ -468,14 +683,34 @@ bool PartEdit::Initialize ()
 
   aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
 
-  iAwsWindow *test = aws->CreateWindowFrom("Another");
-  if (test) test->Show ();
+
+
+  iAwsWindow *iawswindow_SectionSelection = aws->CreateWindowFrom("SectionSelection");
+  if (iawswindow_SectionSelection) iawswindow_SectionSelection->Show();
+
+  // Dont show these by default
+  iAwsWindow *iawswindow_GraphicSelection = aws->CreateWindowFrom("GraphicSelection");
+  if (iawswindow_GraphicSelection) iawswindow_GraphicSelection->Hide();
+  iAwsWindow *iawswindow_EmitterState = aws->CreateWindowFrom("EmitterState");
+  if (iawswindow_EmitterState) iawswindow_EmitterState->Hide();
+  iAwsWindow *iawswindow_InitialPosition = aws->CreateWindowFrom("InitialPosition");
+  if (iawswindow_InitialPosition) iawswindow_InitialPosition->Hide();
+
+
+
+  s->SetGraphicCWD("/lib/std/");
+  s->SetGraphicFilter("");
+  s->SetGraphicFile("cslogo2.png");
+  s->SetEmitterState(&state_emitter);
+  s->SetInitialPositionState(&state_initial_position);
+
 
   return true;
 }
 
 void PartEdit::Start ()
 {
+  running=true;
   csDefaultRunLoop (object_reg);
 }
 

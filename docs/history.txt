@@ -22,6 +22,12 @@ chronological order.
 	- res added an updated version of csParseKeyDef().
 	- res changed the logic when a key state is set; now it is set after
 	  the event is emitted for Down resp. before the event for Up events.
+	- Rhad changed signals for button presses on radio buttons 
+	  (signalRadButtonClicked) and checkboxes (signalCheckBoxClicked) 
+	  in AWS to occur AFTER the state change associated with them.  
+	  This makes these signals actually useful in a consistant manner.
+	- Rhad commited a partial rework of the partedit tool.  Still a lot
+	  of UI work and cleanup to do.
 18-Oct-2003
 	- DeSigna:
 	  - Considerable cleanups to the csShaderExpression optimizer pass.

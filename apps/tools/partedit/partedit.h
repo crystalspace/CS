@@ -47,6 +47,7 @@ private:
   csRef<iGraphics3D> g3d;
   csRef<iGraphics2D> g2d;
   csRef<iKeyboardDriver> kbd;
+  csRef<iVFS> vfs;
   csRef<iVirtualClock> vc;
   csRef<iView> view;
   csRef<iPluginManager> PluginManager;
@@ -56,15 +57,31 @@ private:
   iSector* room;
   csRef<iEmitState> emitState;
   iEmitFixed* emitvector;
-  float part_time;
-  float width;
   bool keydown;
   float value;
+  csString current_graphic;
+  csRef<iMeshWrapper> mw;  
+  csRef<iMeshObjectFactory> EmitObjectFactory;
+  csRef<iEmitFactoryState> EmitFactoryState;
    
   static bool EventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();
   void FinishFrame ();
+  bool RefreshFileList();
+  bool RecreateParticleSystem(const char *texturefile);
+
+  void UpdateEmitState();
+
+  EmitterState state_emitter;
+  Emitter3DState state_initial_position;
+
+  /** Set to true on start.  Set to false when a quit event is received.
+   *  When false, normal events are not processed (such as aws events) since the underlying objects
+   *  needed to process the events may already be destructed.
+   */
+
+  bool running; 
 
 public:
   PartEdit (iObjectRegistry* object_reg);
