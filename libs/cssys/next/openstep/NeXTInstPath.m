@@ -26,15 +26,17 @@ int NeXTGetInstallPath(char *oInstallPath, size_t iBufferSize, char pathSep)
         if (s != 0 && ![s isEqualToString:@""])
         {
             NSMutableString *path = [s mutableCopy];
-            result = 1;
-            if ([path characterAtIndex:[path length]] != pathSep)
+	    int const n = [path length];
+	    // >=2 to avoid stripping "/" from path if path is root directory.
+            if (n >= 2 && [path characterAtIndex:n - 1] != pathSep)
                 [path appendFormat:@"%c", pathSep];
                 
             [path getFileSystemRepresentation:oInstallPath maxLength:iBufferSize];
             [path release];
+            result = 1;
         }
     }
 
     [pool release];
     return result;
-};
+}

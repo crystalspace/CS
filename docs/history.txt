@@ -9,6 +9,8 @@ The history order is reversed so that new features are at the top.
 	  since the classic format is no longer supported.
 	- Eric Sunshine eliminated compilation warnings from g2dtest.cpp and
 	  walkcmd.cpp reported by gcc 3.1.
+	- Eric Sunshine fixed an access-beyond-end-of-string crasher in
+	  NeXTGetInstallPath().
 18-Sep-2002
 	- Fixed several memory leaks in CS introduced by the new csPtr(csRef)
 	  constructor added yesterday.
