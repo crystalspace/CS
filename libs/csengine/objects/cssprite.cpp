@@ -229,20 +229,15 @@ void csSpriteTemplate::GenerateLOD ()
 
   csLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
 
-//// DEBUG CODE ////
-//for (i = 0 ; i < GetNumTexels() ; i++)
-//translate [i] = (i + 1) % GetNumTexels();
-//translate [i] = i;
-////////////////////
-
-  for (i = 0 ; i < frames.Length () ; i++)
+  for (i = 0 ; i < texels.Length () ; i++)
   {
     int j;
     CHK (csVector2* new_texels = new csVector2 [GetNumTexels()]);
+    csPoly2D* tx = (csPoly2D*)(texels.Get(i));
     for (j = 0 ; j < GetNumTexels() ; j++)
-      new_texels[translate[j]] = GetTexel (GetFrame(i), j);
+      new_texels[translate[j]] = (*tx)[j];
     for (j = 0 ; j < GetNumTexels() ; j++)
-      GetTexel (GetFrame(i), j) = new_texels[j];
+      (*tx)[j] = new_texels[j];
     CHK (delete [] new_texels);
   }
 
@@ -255,16 +250,6 @@ void csSpriteTemplate::GenerateLOD ()
     tr.b = translate[tr.b];
     tr.c = translate[tr.c];
   }
-
-//// DEBUG CODE ////
-//for (i = 0 ; i < GetNumTexels() ; i++)
-//{
-// THIS LINE MAKES WEIRD LIGHTING EFFECTS
-//texel_to_vertex [(i + 1) % GetNumTexels()] = i;
-// THIS LINE HAS NO EFFECT
-//texel_to_normal [(i + 1) % GetNumTexels()] = i;
-//}
-////////////////////
 
   if (texel_to_normal != NULL)
   {
@@ -549,7 +534,11 @@ int csSpriteTemplate::MergeNormals (csFrame * frame)
 int csSpriteTemplate::MergeTexels ()
 {
   // Merge identical texel frames:
+
   int same_count = 0;
+  int frame, map, v;
+  bool same, unique;
+  csPoly2D* tx;
 
   // start a count and a list of unique texel maps
   int unique_texel_map_count;
@@ -560,13 +549,13 @@ int csSpriteTemplate::MergeTexels ()
   unique_texel_map_count = 1;
 
   // FOR each frame
-  for (int frame = 1;  frame < frames.Length(); frame ++)
+  for ( frame = 1;  frame < frames.Length(); frame++ )
   {
-    csPoly2D* tx = GetFrame (frame)->GetTexels();
-    bool unique = true;
+    tx = GetFrame (frame)->GetTexels();
+    unique = true;
 
     // FOR each unique texel map
-    for (int map = 0; map < unique_texel_map_count; map ++)
+    for ( map = 0; map < unique_texel_map_count; map++ )
     {
       // IF this texel map is already in our list
       if (tx == unique_texel_maps [map])
@@ -576,10 +565,10 @@ int csSpriteTemplate::MergeTexels ()
         break;
       }
       // IF all texture vertices are are the same in both
-      bool same = true;
-      for (int v = 0; v < GetNumTexels(); v ++)
+      same = true;
+      for ( v = 0; v < GetNumTexels(); v++ )
       {
-        if ((*tx)[v] != (*unique_texel_maps[map])[v])
+        if ((*tx)[v] != (*(unique_texel_maps[map]))[v])
         {
           same = false;
           break;
@@ -587,8 +576,6 @@ int csSpriteTemplate::MergeTexels ()
       }
       if (same)
       {
-        same_count++;
-
         // change the pointer in this frame to that texel map
         GetFrame(frame)->SetTexels(unique_texel_maps[map]);
 
@@ -605,9 +592,29 @@ int csSpriteTemplate::MergeTexels ()
     }
   }
 
-  //@@@ ADD EXTRA CODE TO DELETE UNUSED TEXEL FRAMES
+  // Delete unused texel frames
+  for ( frame = 0; frame < texels.Length(); frame++ )
+  {
+    unique = false;
+    tx = (csPoly2D *)(texels.Get(frame));
 
-  delete[] unique_texel_maps;
+    for ( map = 0; map < unique_texel_map_count; map++ )
+    {
+      if ( tx == unique_texel_maps[map])
+      {
+        unique = true;
+        break;
+      }
+    }
+    if (!unique)
+    {
+      texels.Delete(frame);
+      same_count++;
+      frame--;
+    }
+  }
+
+  CHK (delete[] unique_texel_maps);
 
   return same_count;
 }
