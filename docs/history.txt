@@ -21,6 +21,13 @@ chronological order.
 	  with the mixing function.
 	- Jorrit fixed callstack.cpp so that it compiles on Mingw. Please
 	  don't use single quotes in #error unless you also close the quote.
+	- Jorrit added a new VBOThresshold config value to r3dopengl.cfg.
+	  With this setting you can control when VBO buffers are used and
+	  when normal buffers are used. By default this is set to 0 which
+	  means that VBO is used all the time (if present). If you increase
+	  this value then VBO buffers will only be used if the buffer
+	  size (in bytes) exceeds that value. This may solve a problem
+	  that on some systems using VBO causes big memory overhead.
 28-Sep-2004
 	- Rhad mutexed some portions of the software renderer to reduce
 	  thread contention issues.  This is not a complete fix but should

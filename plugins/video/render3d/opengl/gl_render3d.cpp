@@ -120,6 +120,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   forceWireframe = false;
 
   use_hw_render_buffers = false;
+  vbo_thresshold = 0;
   stencil_threshold = 500;
   broken_stencil = false;
 
@@ -867,12 +868,23 @@ bool csGLGraphics3D::Open ()
   }
 
   // check for support of VBO
+  vbo_thresshold = config->GetInt ("Video.OpenGL.VBOThresshold", 0);
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
   if (verbose)
     if (use_hw_render_buffers)
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "VBO is supported.");
+    {
+      if (vbo_thresshold == 0)
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "VBO is supported and always used.");
+      else
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "VBO is supported and only used for buffers > %d bytes.",
+	  vbo_thresshold);
+    }
     else
+    {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "VBO is NOT supported.");
+    }
 
   stencil_shadow_mask = 127;
   {
@@ -1524,6 +1536,11 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
     vertattrib[att] = 0;
   }
 
+  if (use_hw_render_buffers && vbo_thresshold > 0)
+  {
+    ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+    ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+  }
   void* data = ((csGLRenderBuffer*)buffer)->RenderLock (
   	CS_GLBUF_RENDERLOCK_ARRAY); //buffer->Lock (CS_BUF_LOCK_RENDER);
   int stride = buffer->GetStride ();
@@ -1917,6 +1934,11 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   const uint mixmode = modes.mixmode;
   statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
 
+  if (use_hw_render_buffers && vbo_thresshold > 0)
+  {
+    ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+    ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+  }
   void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
   if (bufData != (void*)-1)
   {

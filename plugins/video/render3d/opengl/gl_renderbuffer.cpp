@@ -100,7 +100,7 @@ csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (size_t size,
   csRenderBufferType type, csRenderBufferComponentType componentType,
   int componentCount)
 {
-  if (use_hw_render_buffers)
+  if (use_hw_render_buffers && size >= vbo_thresshold)
   {
     csVBORenderBuffer *buffer = new csVBORenderBuffer 
       (size, type, componentType, componentCount, false, ext);
@@ -119,7 +119,7 @@ csPtr<iRenderBuffer> csGLGraphics3D::CreateIndexRenderBuffer (size_t size,
     csRenderBufferType type, csRenderBufferComponentType componentType,
     size_t rangeStart, size_t rangeEnd)
 {
-  if (use_hw_render_buffers)
+  if (use_hw_render_buffers && size >= vbo_thresshold)
   {
     csVBORenderBuffer *buffer = new csVBORenderBuffer 
       (size, type, componentType, 1, true, ext);
@@ -140,7 +140,7 @@ void csGLGraphics3D::CreateInterleavedRenderBuffers (size_t size,
   csRenderBufferType type, int count, csRefArray<iRenderBuffer>& buffers)
 {
   csRef<iRenderBuffer> buf;
-  if(use_hw_render_buffers)
+  if (use_hw_render_buffers && size >= vbo_thresshold)
   {
     csVBORenderBuffer* master = new csVBORenderBuffer (size, type,
       CS_BUFCOMP_BYTE, 1, false, ext);
