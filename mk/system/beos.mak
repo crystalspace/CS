@@ -91,8 +91,7 @@ LFLAGS.profile=-pg
 LFLAGS.DLL= -nostart
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS=libs/cssys/be/csbe.cpp libs/cssys/be/loadlib.cpp \
- libs/cssys/general/printf.cpp
+SRC.SYS_CSSYS=$(wildcard libs/cssys/be/*.cpp) libs/cssys/general/printf.cpp
 
 # Where to put dynamic libraries on this system?
 OUTDLL=add-ons/
