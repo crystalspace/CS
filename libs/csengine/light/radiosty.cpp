@@ -894,12 +894,14 @@ bool csRadiosity :: PrepareShootDest(csRadPoly *dest, csFrustumView *lview)
 void csRadiosity :: ShootRadiosityToPolygon(csRadPoly* dest)
 {
   // shoot from each lumel, also a radiosity patch, to each lumel on other.
+#if 0
   CsPrintf(MSG_STDOUT, "Shooting from RadPoly %x (%s in %s sz %d) to %x (%s in %s sz %d).\n",
   	(int)shoot_src, shoot_src->GetPolygon3D()->GetName(), 
 	shoot_src->GetPolygon3D()->GetSector()->GetName(), 
 	shoot_src->GetSize(), 
 	(int)dest, dest->GetPolygon3D()->GetName(), 
 	dest->GetPolygon3D()->GetSector()->GetName(), dest->GetSize());
+#endif
 
   int sx, sy, rx, ry; // shoot x,y, receive x,y
   int suv = 0, ruv = 0; // shoot uv index, receive uv index.
