@@ -34,6 +34,63 @@ The history order is reversed so that new features are at the top.
 	  very thin wrapper over PrintfV().
 	- Eric Sunshine eliminated a compilation warning about
 	  csMeshFactoryWrapper having private destructor but no `friend'.
+	- Philip Wyett did the following:
+	    - Added forward declaration struct csFog (to thing.h).
+	      This fixes compile error in Python plugin.
+	    - Changed some CrystalBall internal naming:
+	        - class crysVec -> class csCrystalBallVec
+	        - class trinode -> class csTriNode
+	      These 2 changes do not affect app writers...
+	    - Added another CSTOOL to eliminate link error for csdemo on
+	      MingW.
+	    - Changed cs_time to csTime. Now follows CS naming
+	      convention more closely and generally is a heck of alot more
+	      distinguishable/readable in code. :-)
+	    - Removed some no longer in existence includes from
+	      python plugin. Manually updated VC project files.
+	    - More function name standardization:
+		do_key ()    -> DoKey ()
+		do_button () -> DoButton ()
+		do_motion () -> DoMotion ()
+		debug_out () -> DebugTextOut ()
+		console_out  -> ConsoleOut ()
+		cleanup and CleanUp -> Cleanup ()
+		sys_fatalerror () -> SystemFatalError ()
+	    - Fixed on exit crasher under Windows for demosky.
+	    - Fixed "sys_fatalerror" to report a fatal error
+	      is in "glwin32.dll" and not "OpenGL2D.dll"
+	- Martin Geisse did the following:
+	    - Added iSector::Draw(), iThingState::HasFog() and
+	      iThingState::GetFog ().
+	    - Some changes to use engine-related objects though interfaces.
+	    - Removed several forward and 'friend' declarations of the
+	      Dumper class.
+	    - Cleanup of the curve code. Added some missing methods.
+	      Materials are now correctly reference-counted. Functions are
+	      sorted by class in the file, and bezier-specific code is
+	      clearly separated from the rest.
+	    - Moved csMapNode and csView from csengine to cstool.
+	    - Updated simple tutorial to take account of changes.
+	    - Continued to split up csparser into several files. Also
+	      renamed some functions to keep a uniform naming style. None
+	      of these changes affects the interface.
+	    - Removed the global 'System' variable. Applications can still
+	      use their own global system variable, but then they must
+	      define it themselves. Some of the CS applications do that.
+	      The Win32 system driver also requires a global system variable
+	      and thus defines it, but it does so as a 'static' variable to
+	      avoid pollution of the global namespace.
+	      WARNING: He could only test this for Win32 / MSVC!
+	    - Updated the documentation to take account of the removal of
+	      the global system variable.
+	    - Fixed a compile error in g2d.cpp.
+30-Jun-2001
+	- Martin Geisse did the following:
+	    - Removed the SoundDriver, NetworkDriver and MotionManager
+	      members from the system driver because they are not used
+	      anywhere.
+	    - Removed command line parsing code out of the system driver
+	      and into its own class which is then used by the system driver.
 29-Jun-2001
 	- Got an Insure log from Philip Wyett. Using this I fixed a number
 	  of small problems and one rather bad problem. The bad problem
@@ -115,6 +172,13 @@ The history order is reversed so that new features are at the top.
 	    SYSDEF_UNLINK  --> CS_SYSDEF_PROVIDE_UNLINK
 	- Eric Sunshine updated apimod19.txi to mention the above macro name
 	  changes.
+	- Martin Geisse fixed several compilation errors in g2d_dd8.cpp,
+	  wodrv.cpp, video.cpp, and texfile.cpp.
+	- Martin moved several functions out of csloader.cpp and in their
+	  own source files, grouped by their purpose. This is an attempt
+	  to make the loader code more readable.
+	- Norman Kramer fixed CallOnEvent in glx2d.cpp.
+	- Norman fixed bumptest.cpp and demo.cpp (loader -> imageio).
 28-Jun-2001
 	- Fixed error handling in spr2dldr (for mixmode) a little.
 	- Added error reporting to ballldr (using reporter plugin).
