@@ -28,6 +28,7 @@
 #include "csutil/scf.h"
 #include "cssys/win32/win32itf.h"
 #include "cssys/win32/winhelp.h"
+#include "iutil/event.h"
 #include <objbase.h>
 
 #include "cssys/system.h"

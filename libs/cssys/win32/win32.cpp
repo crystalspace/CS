@@ -22,7 +22,6 @@
 #include "cssys/system.h"
 #include "cssys/win32/win32.h"
 #include "iutil/cfgmgr.h"
-#include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -66,7 +65,7 @@ void SystemFatalError (char *s)
 
 // @@@ Get rid of this!
 static SysSystemDriver* System = NULL;
-static iEventOutlet *EventOutlet;
+static iEventOutlet *EventOutlet = NULL;
 
 //-----------------------------------------------// The System Driver //------//
 
@@ -455,7 +454,10 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 SysSystemDriver::~SysSystemDriver ()
 {
   if (EventOutlet)
+  {
     EventOutlet->DecRef ();
+    EventOutlet = NULL;
+  }
 
   if (need_console)
     FreeConsole();
@@ -506,8 +508,7 @@ void SysSystemDriver::NextFrame ()
   {
     if (!GetMessage (&msg, NULL, 0, 0))
     {
-      EventQueue.Put (new csEvent (csGetTicks (),
-      	csevBroadcast, cscmdQuit, NULL));
+      EventOutlet->Broadcast (cscmdQuit);
       return;
     }
 
