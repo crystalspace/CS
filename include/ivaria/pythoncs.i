@@ -171,9 +171,18 @@
 				ok = 0
 		return ok
 
+	def csInitializer_RegisterDocumentSystem (reg):
+		"""Register default iDocumentSystem"""
+		res = csInitializer._RegisterDocumentSystem (reg)
+		return res
+
 	csInitializer.RequestPlugins = staticmethod(csInitializer_RequestPlugins)
+	csInitializer.RegisterDocumentSystem = staticmethod(csInitializer_RegisterDocumentSystem)
 
 	csInitializer.SetupEventHandler = staticmethod(csInitializer_SetupEventHandler)
+
+}
+
 
 %}
 

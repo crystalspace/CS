@@ -49,6 +49,8 @@
 #include "ivaria/dynamics.h"
 #include "ivaria/engseq.h"
 #include "iutil/cache.h"
+#include "iutil/document.h"
+#include "csutil/xmltiny.h"
 
 %}
 
@@ -182,6 +184,12 @@ INTERFACE_PRE(iConfigIterator)
 INTERFACE_PRE(iConfigManager)
 INTERFACE_PRE(iDataBuffer)
 INTERFACE_PRE(iDebugHelper)
+INTERFACE_PRE(iDocumentAttributeIterator)
+INTERFACE_PRE(iDocumentAttribute)
+INTERFACE_PRE(iDocumentNodeIterator)
+INTERFACE_PRE(iDocumentNode)
+INTERFACE_PRE(iDocument)
+INTERFACE_PRE(iDocumentSystem)
 INTERFACE_PRE(iDynamics)
 INTERFACE_PRE(iDynamicSystem)
 INTERFACE_PRE(iEngine)
@@ -310,6 +318,7 @@ INTERFACE_PRE(iVisibilityCuller)
 %include "isound/source.h"
 %include "iutil/comp.h"
 %include "iutil/cache.h"
+%include "iutil/document.h"
 %include "iutil/vfs.h"
 %include "iutil/object.h"
 %include "iutil/dbghelp.h"
@@ -419,6 +428,12 @@ INTERFACE_POST(iConfigIterator)
 INTERFACE_POST(iConfigManager)
 INTERFACE_POST(iDataBuffer)
 INTERFACE_POST(iDebugHelper)
+INTERFACE_POST(iDocumentAttributeIterator)
+INTERFACE_POST(iDocumentAttribute)
+INTERFACE_POST(iDocumentNodeIterator)
+INTERFACE_POST(iDocumentNode)
+INTERFACE_POST(iDocument)
+INTERFACE_POST(iDocumentSystem)
 INTERFACE_POST(iDynamics)
 INTERFACE_POST(iDynamicSystem)
 INTERFACE_POST(iEngine)
@@ -583,6 +598,14 @@ INTERFACE_POST(iVisibilityCuller)
 		return csInitializer::RequestPlugins(
 			object_reg, plugName, intName, scfId, version, CS_REQUEST_END
 		);
+	}
+
+	static bool _RegisterDocumentSystem (iObjectRegistry * object_reg)
+	{
+	  iDocumentSystem *ds = new csTinyDocumentSystem;
+	  bool res = object_reg->Register (ds, "iDocumentSystem");
+	  ds->DecRef ();
+	  return res;
 	}
 }
 

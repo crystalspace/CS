@@ -74,8 +74,10 @@ TO_INSTALL.EXE += python.cex
 
 ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
 SWIG.INTERFACE = include/ivaria/cspace.i
+SWIG.INTERFACE.SRC = include/ivaria/cspace.i include/ivaria/pythoncs.i
 else
 SWIG.INTERFACE = include/ivaria/cs.i
+SWIG.INTERFACE.SRC = include/ivaria/cs.i
 endif
 SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
 SWIG.CSPYTHON.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
@@ -136,7 +138,7 @@ else
   SWIGFLAGS=-python -c++ -docstring -dascii -Sbefore -shadow -Iinclude/
 endif
 
-$(SWIG.CSPYTHON): $(SWIG.INTERFACE)
+$(SWIG.CSPYTHON): $(SWIG.INTERFACE.SRC)
 	$(SWIGBIN) $(SWIGFLAGS) -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
 	$(MV) plugins/cscript/cspython/cspace.py scripts/python/
 
