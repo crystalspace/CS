@@ -1,0 +1,8 @@
+usr/lib/crystalspace/data/standard.zip
+usr/lib/crystalspace/data/stdtex.zip
+usr/lib/crystalspace/data/csws.zip
+usr/lib/crystalspace/data/fancycon.zip
+usr/lib/crystalspace/data/awsdef.zip
+usr/lib/crystalspace/lib/*.so
+usr/lib/crystalspace/lib/*.csplugin
+etc/crystalspace
