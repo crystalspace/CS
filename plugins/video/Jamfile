@@ -6,7 +6,7 @@ SubInclude TOP plugins video format ;
 SubInclude TOP plugins video loader ;
 SubInclude TOP plugins video renderer ;
 
-if $(USE_NEW_RENDERER)
+if $(USE_NEW_RENDERER) = "yes"
 {
   SubInclude TOP plugins video render3d ;
 }
