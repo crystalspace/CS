@@ -35,7 +35,7 @@ struct iRenderView;
 struct iRenderView;
 struct iVFS;
 
-SCF_VERSION (iSpritCal3DeSocket, 0, 0, 1);
+SCF_VERSION (iSpriteCal3DSocket, 0, 0, 1);
 
 /**
  * A socket for specifying where sprites can plug into
