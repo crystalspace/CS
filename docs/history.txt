@@ -11,6 +11,9 @@ chronological order.
 	  include/iengine/rendersteps. Apparently this was forgotten during
 	  the move from the renderloop stuff from plugins/video to
 	  plugins/engine.
+	- Jorrit avoided a number of virtual calls in the sector visibility
+	  callback that is used for the new renderer (5 virtual calls per
+	  object per frame).
 7-Jan-2004
         - Andrew Craig fixed the Jamfile for sprcal3dldr to link in the
 	  required CAL3D library.

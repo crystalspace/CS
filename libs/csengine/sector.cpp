@@ -287,15 +287,18 @@ public:
     if (0==privMeshlist)
       return;
 
-    csMeshWrapper* csParent = 
-      ((csMeshWrapper::MeshWrapper*)mesh)->GetCsMeshWrapper ()->GetCsParent ();
+    csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
+    	->GetCsMeshWrapper ();
+    csMeshWrapper* csParent = cmesh->GetCsParent ();
     if (csParent && !csParent->IsChildVisible (mesh, rview)) return;
-    if (!mesh->GetMeshObject ()->DrawTest (rview, mesh->GetMovable ())) return;
+    if (!cmesh->GetMeshObject ()->DrawTest (rview,
+    	&(cmesh->GetCsMovable ()).scfiMovable))
+      return;
 
     int num;
-    csRenderMesh** meshes = mesh->GetRenderMeshes (num);
-    privMeshlist->AddRenderMeshes (meshes, num, mesh->GetRenderPriority (),
-	mesh->GetZBufMode ());
+    csRenderMesh** meshes = cmesh->GetRenderMeshes (num);
+    privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
+	cmesh->GetZBufMode ());
   }
 
 private:
