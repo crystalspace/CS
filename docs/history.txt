@@ -6,6 +6,30 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Nov-2004
+	- Eric Sunshine fixed _CS_CHECK_LIB_PKG_CONFIG_FLAGS() in checklib.m4
+	  so that it no longer checks for `pkg-config' only the very first time
+	  it is mentioned in configure.ac. This resulted in incorrect behavior
+	  if the first mention of this macro appeared inside the branch of a
+	  conditional, and that branch was not taken for a particular
+	  configuration run. Instead, the `pkg-config' check is now performed,
+	  if necessary, at each invocation of _CS_CHECK_LIB_PKG_CONFIG_FLAGS().
+	- Eric Sunshine fixed _CS_CHECK_LIB_CONFIG_FLAGS() in checklib.m4 so
+	  that the composed shell variable name is of the form
+	  `CONFIG_{library}', rather than `{library}_CONFIG', since {library}
+	  might begin with a numeric, which would result in an illegal shell
+	  variable name For instance, the library "3ds" resulted in the illegal
+	  shell variable name `3DS_CONFIG'.
+	- Eric Sunshine fixed _CS_CHECK_LIB_CONFIG_FLAGS() in checklib.m4 so
+	  that illegal characters are transliterated to underscore `_' in the
+	  composed shell variable name. For instance, the library alias
+	  "lib3ds-120" resulted in the illegal shell variable name
+	  `CONFIG_LIB3DS-120'.
+	- Eric Sunshine added cache support to CS_CHECK_PKG_CONFIG(),
+	  _CS_CHECK_LIB_PKG_CONFIG_FLAGS(), _CS_CHECK_LIB_CONFIG_FLAGS(), and
+	  _CS_CHECK_LIB_CONFIG_PROG_FLAGS() in checklib.m4.  This eliminates
+	  many unnecessary invocations of `pkg-config' and `{library}-config'
+	  during cached runs.
 14-Nov-2004
 	- Eric Sunshine updated cspace.i to take csPoly2D decomposition into
 	  account.

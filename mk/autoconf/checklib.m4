@@ -132,12 +132,17 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 #	to determine the linker flags. If `pkg-config' is found and is
 #	sufficiently recent, PKG_CONFIG is set and AC_SUBST() invoked.
 #------------------------------------------------------------------------------
-m4_define([CS_PKG_CONFIG_MIN_VER], [0.9.0])
+m4_define([CS_PKG_CONFIG_MIN], [0.9.0])
 AC_DEFUN([CS_CHECK_PKG_CONFIG],
-    [AC_CHECK_TOOLS([PKG_CONFIG], [pkg-config])
-    AS_IF([test -n "$PKG_CONFIG"],
-	[AS_IF([$PKG_CONFIG --atleast-pkgconfig-version=CS_PKG_CONFIG_MIN_VER],
-	    [], [PKG_CONFIG=''])])])
+    [AS_IF([test "$cs_prog_pkg_config_checked" != yes],
+	[AC_CHECK_TOOLS([PKG_CONFIG], [pkg-config])
+	cs_prog_pkg_config_checked=yes])
+    AS_IF([test -z "$cs_cv_prog_pkg_config_ok"],
+	[AS_IF([test -n "$PKG_CONFIG"],
+	    [AS_IF([$PKG_CONFIG --atleast-pkgconfig-version=CS_PKG_CONFIG_MIN],
+		[cs_cv_prog_pkg_config_ok=yes],
+		[cs_cv_prog_pkg_config_ok=no])],
+	    [cs_cv_prog_pkg_config_ok=no])])])
 
 
 
@@ -149,10 +154,16 @@ AC_DEFUN([CS_CHECK_PKG_CONFIG],
 #	tuples stored in the shell variable VARIABLE.
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_CHECK_LIB_PKG_CONFIG_FLAGS],
-    [AC_REQUIRE([CS_CHECK_PKG_CONFIG])
+    [CS_CHECK_PKG_CONFIG
     AS_IF([test -n "$PKG_CONFIG"],
-	[AS_IF([$PKG_CONFIG --exists $2],
-	    [_CS_CHECK_LIB_CONFIG_PROG_FLAGS([$1], [$PKG_CONFIG], [$2])])])])
+	[AC_CACHE_CHECK([if $PKG_CONFIG recognizes $2], [_CS_CLPCF_CVAR([$2])],
+	    [AS_IF([$PKG_CONFIG --exists $2],
+		[_CS_CLPCF_CVAR([$2])=yes], [_CS_CLPCF_CVAR([$2])=no])])
+	AS_IF([test $_CS_CLPCF_CVAR([$2]) = yes],
+	    [_CS_CHECK_LIB_CONFIG_PROG_FLAGS([$1], [pkg_config_$2],
+		[$PKG_CONFIG], [$2])])])])
+
+AC_DEFUN([_CS_CLPCF_CVAR], [AS_TR_SH([cs_cv_prog_pkg_config_$1])])
 
 
 
@@ -164,16 +175,22 @@ AC_DEFUN([_CS_CHECK_LIB_PKG_CONFIG_FLAGS],
 #	list of tuples stored in the shell variable VARIABLE.
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_CHECK_LIB_CONFIG_FLAGS],
-    [AC_CHECK_TOOLS(m4_toupper([$2_CONFIG]), [$2-config])
-    AS_IF([test -n "$m4_toupper([$2_CONFIG])"],
-	[AS_IF([$m4_toupper([$2_CONFIG]) --cflags --libs >/dev/null 2>&1],
-	    [_CS_CHECK_LIB_CONFIG_PROG_FLAGS([$1],
-		[$m4_toupper([$2_CONFIG])])])])])
+    [AC_CHECK_TOOLS(_CS_CLCF_SHVAR([$2]), [$2-config])
+    AS_IF([test -n "$_CS_CLCF_SHVAR([$2])"],
+	[AS_IF([test -z "$_CS_CLCF_CVAR([$2])"],
+	    [AS_IF([$_CS_CLCF_SHVAR([$2]) --cflags --libs >/dev/null 2>&1],
+		[_CS_CLCF_CVAR([$2])=yes], [_CS_CLCF_CVAR([$2])=no])])
+	AS_IF([test $_CS_CLCF_CVAR([$2]) = yes],
+	    [_CS_CHECK_LIB_CONFIG_PROG_FLAGS([$1], [config_$2],
+		[$_CS_CLCF_SHVAR([$2])])])])])
+
+AC_DEFUN([_CS_CLCF_CVAR], [AS_TR_SH([cs_cv_prog_config_$1_ok])])
+AC_DEFUN([_CS_CLCF_SHVAR], [m4_toupper(AS_TR_SH([CONFIG_$1]))])
 
 
 
 #------------------------------------------------------------------------------
-# _CS_CHECK_LIB_CONFIG_PROG_FLAGS(VARIABLE, CONFIG-PROGRAM, [ARGS])
+# _CS_CHECK_LIB_CONFIG_PROG_FLAGS(VARIABLE, TAG, CONFIG-PROGRAM, [ARGS])
 #	Helper macro for _CS_CHECK_LIB_PKG_CONFIG_FLAGS() and
 #	_CS_CHECK_LIB_CONFIG_FLAGS(). CONFIG-PROGRAM is a command which
 #	responds to the --cflags and --libs options and returns suitable
@@ -181,16 +198,22 @@ AC_DEFUN([_CS_CHECK_LIB_CONFIG_FLAGS],
 #	passed to CONFIG-PROGRAM after the --cflags or --libs argument. The
 #	results of the --cflags and --libs options are packed into a build
 #	tuple and appended to the list of tuples stored in the shell variable
-#	VARIABLE.
+#	VARIABLE. TAG is used to compose the name of the cache variable. A good
+#	choice for TAG is some unique combination of the library name and
+#	configuration program.
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_CHECK_LIB_CONFIG_PROG_FLAGS],
-    [cs_check_lib_cflag=CS_RUN_PATH_NORMALIZE([$2 --cflags $3])
-    cs_check_lib_lflag=''
-    cs_check_lib_libs=CS_RUN_PATH_NORMALIZE([$2 --libs $3])
-    $1="$$1 CS_CREATE_TUPLE(
-	[$cs_check_lib_cflag],
-	[$cs_check_lib_lflag],
-	[$cs_check_lib_libs])"])
+    [AS_IF([test -z "$_CS_CLCPF_CVAR([$2])"],
+	[cs_check_lib_cflag=CS_RUN_PATH_NORMALIZE([$3 --cflags $4])
+	cs_check_lib_lflag=''
+	cs_check_lib_libs=CS_RUN_PATH_NORMALIZE([$3 --libs $4])
+	_CS_CLCPF_CVAR([$2])=CS_CREATE_TUPLE(
+	    [$cs_check_lib_cflag],
+	    [$cs_check_lib_lflag],
+	    [$cs_check_lib_libs])])
+    $1="$$1 $_CS_CLCPF_CVAR([$2])"])
+
+AC_DEFUN([_CS_CLCPF_CVAR], [AS_TR_SH([cs_cv_prog_$1_flags])])
 
 
 
