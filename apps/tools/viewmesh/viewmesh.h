@@ -64,7 +64,15 @@ private:
    *                       want to attach to.
    * \param fileName The VFS path to the mesh we want to attach.
    */
-  bool AttachMeshToSocket( int socketNumber, char* fileName );
+  bool AttachMeshToSocket( int socketNumber, char* fileName, float xrot, float yrot, float zrot );
+  
+  /**
+   * Create the window for the rotation of a mesh attached to a slot.
+   * \param socketNumber  The number in the list of loaded sockets that we 
+   *                       want to attach to.
+   * \param fileName The VFS path to the mesh we want to attach.
+   */
+  void CreateRotationWindow(int socketNumber, char* filename);
   
 public:
   ViewMesh (iObjectRegistry *object_reg, csSkin &Skin);

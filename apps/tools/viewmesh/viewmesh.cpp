@@ -88,7 +88,14 @@ CS_IMPLEMENT_APPLICATION
 #define VIEWMESH_COMMAND_CLEAR          78400
 #define VIEWMESH_COMMAND_SOCKET         78500
 #define VIEWMESH_COMMAND_LOADSOCKET     79000
+#define VIEWMESH_COMMAND_ATTACH_SOCKET  80000
+
+#define DEFAULT_SOCKET_X_ROTATION -PI/2.0f
+#define DEFAULT_SOCKET_Y_ROTATION 0
+#define DEFAULT_SOCKET_Z_ROTATION 0
+
 //-----------------------------------------------------------------------------
+
 
 ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
     : csApp (object_reg, Skin)
@@ -122,6 +129,8 @@ void ViewMesh::Help ()
 struct ModalData : public iBase
 {
   uint code;
+  csString meshName;
+  uint socket;
   SCF_DECLARE_IBASE;
   ModalData() { SCF_CONSTRUCT_IBASE(0); }
   virtual ~ModalData() { SCF_DESTRUCT_IBASE(); }
@@ -248,30 +257,53 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  menu->Hide();
 	  return true;
 	case cscmdStopModal:
-	{
-	  char filename[1024];
-	  csQueryFileDialog (dialog, filename, sizeof(filename));
-	  delete dialog;
-	  dialog = 0;
-	  ModalData *data = (ModalData *) GetTopModalUserdata();
+	{        
+      char filename[1024];
+      csQueryFileDialog (dialog, filename, sizeof(filename));
+      ModalData *data = (ModalData *) GetTopModalUserdata();
 
+      /* If the dialog was the rotation one then pick out the 
+         rotation information and attach the mesh.
+      */
+      if ( data->code == VIEWMESH_COMMAND_ATTACH_SOCKET )
+      {
+        csComponent *rotX = 0;
+        csComponent *rotY = 0;
+        csComponent *rotZ = 0;
+        
+        csComponent * client = dialog->GetChild (1000);
+        if ( client )
+        {
+            rotX = client->GetChild(1001);
+            rotY = client->GetChild(1002);            
+            rotZ = client->GetChild(1003);            
+        }             
+            
+        if ( rotX && rotY && rotZ )
+        {
+        
+          AttachMeshToSocket( data->socket, data->meshName.GetData(), 
+                              atof( rotX->GetText() ),
+                              atof( rotY->GetText() ),
+                              atof( rotZ->GetText() ) );                                                                
+        }
+      }        
+      
+      delete dialog;
+      dialog = 0;
+      
       /* Check to see if this was from the dialog box to load a mesh for a
          socket.
        */            
       if (data->code >= VIEWMESH_COMMAND_LOADSOCKET &&
           data->code < VIEWMESH_COMMAND_LOADSOCKET + 100)
       {
-        if ( !AttachMeshToSocket( data->code - VIEWMESH_COMMAND_LOADSOCKET, filename ) )
-        {
-          Printf( CS_REPORTER_SEVERITY_ERROR, 
-                    "Could not attach %s to socket # %d",
-                  filename, data->code - VIEWMESH_COMMAND_LOADSOCKET );
-        }
+        CreateRotationWindow(data->code - VIEWMESH_COMMAND_LOADSOCKET, filename);
       }
-      
+                  
 	  switch (data->code)
-	  {      
-	    case VIEWMESH_COMMAND_LOADMESH:
+	  {     
+        case VIEWMESH_COMMAND_LOADMESH:
 	      if (!LoadSprite(filename, scale))
 	      {
 		Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load mesh %s",
@@ -972,7 +1004,8 @@ bool ViewMesh::Initialize ()
   return true;
 }
 
-bool ViewMesh::AttachMeshToSocket( int socketNumber, char* meshFile )
+bool ViewMesh::AttachMeshToSocket( int socketNumber, char* meshFile, 
+                                   float xRot, float yRot, float zRot )
 {
   csRef<iSpriteCal3DState> cal3dstate(
         SCF_QUERY_INTERFACE(sprite->GetMeshObject(), iSpriteCal3DState));
@@ -1004,10 +1037,26 @@ bool ViewMesh::AttachMeshToSocket( int socketNumber, char* meshFile )
     else
     {
       csRef<iMeshWrapper> meshWrap = engine->CreateMeshWrapper( factory, meshFile );
-                
-      meshWrap->GetFactory()->GetMeshObjectFactory()->
-      HardTransform( csTransform(csXRotMatrix3(PI/2),
-                     csVector3(0,0,0) ));                
+      
+      if ( xRot != 0 )          
+      {
+        meshWrap->GetFactory()->GetMeshObjectFactory()->
+            HardTransform( csTransform(csXRotMatrix3(xRot),
+                           csVector3(0,0,0) ));                
+      }
+      
+      if ( yRot != 0 )          
+      {
+        meshWrap->GetFactory()->GetMeshObjectFactory()->
+            HardTransform( csTransform(csYRotMatrix3(yRot),
+                           csVector3(0,0,0) ));                
+      }
+      if ( zRot != 0 )          
+      {
+        meshWrap->GetFactory()->GetMeshObjectFactory()->
+            HardTransform( csTransform(csZRotMatrix3(zRot),
+                           csVector3(0,0,0) ));                
+      }                                  
       sprite->GetChildren()->Add( meshWrap );
       socket->SetMeshWrapper( meshWrap );
     }                
@@ -1021,6 +1070,53 @@ bool ViewMesh::AttachMeshToSocket( int socketNumber, char* meshFile )
   
   
   return true;
+}
+
+
+void ViewMesh::CreateRotationWindow(int socket, char* filename)
+{
+  char buffer[100];
+                
+  dialog = new csWindow (this, "Select Rotation",
+                        CSWS_DEFAULTVALUE | CSWS_TOOLBAR | CSWS_CLIENTBORDER);
+  dialog->SetRect (10, 10, 200, 270);               
+  csComponent *client = new csDialog (dialog);        
+  client->id = 1000;
+        
+  csStatic *stat = new csStatic (client, 0, "RotX", csscsFrameLabel);
+  stat->SetRect (10, 10, 150, 50);           
+  csInputLine *il = new csInputLine (client, 40, csifsThickRect);
+  il->id = 1001;
+  il->SetRect (15, 20, 100, 36);        
+  sprintf(buffer, "%f", DEFAULT_SOCKET_X_ROTATION ),
+  il->SetText (buffer);        
+       
+  stat = new csStatic (client, 0, "RotY", csscsFrameLabel);
+  stat->SetRect (10, 60, 150, 110);                           
+  il = new csInputLine (client, 40, csifsThickRect);
+  il->id = 1002;
+  il->SetRect (15, 80, 100, 96);
+  sprintf(buffer, "%f", DEFAULT_SOCKET_Y_ROTATION ),  
+  il->SetText (buffer);        
+        
+  stat = new csStatic (client, 0, "RotZ", csscsFrameLabel);
+  stat->SetRect (10, 120, 150, 170);                           
+  il = new csInputLine (client, 40, csifsThickRect);
+  il->id = 1003;
+  il->SetRect (15, 140, 100, 157);
+  sprintf(buffer, "%f", DEFAULT_SOCKET_Z_ROTATION ),
+  il->SetText (buffer);        
+        
+  csButton* b = new csButton (client, cscmdStopModal, CSBS_DEFAULTVALUE | CSBS_DISMISS);
+  b->SetText ("~Ok");
+  b->SetRect (10, 180, 150, 200);
+      
+  ModalData *newData=new ModalData;
+  newData->meshName = filename;
+  newData->socket   = socket;
+       
+  newData->code = VIEWMESH_COMMAND_ATTACH_SOCKET;
+  StartModal (dialog, newData);               
 }
 
 
