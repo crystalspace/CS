@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+1-Feb-2003
+	- Lightmaps with DrawPolygonMesh were not correctly aligned. This
+	  is a very old bug that was fixed for normal lightmap rendering
+	  but not for DrawPolygonMesh.
 31-Jan-2003
 	- Another small optimization in the super lightmap cache. This time
 	  avoid virtual function calls.

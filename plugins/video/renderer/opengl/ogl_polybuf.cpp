@@ -295,25 +295,33 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
     return;
   }
 
+  iLightMap* piLM = poly_texture->GetLightMap();
+  float lm_width = float(piLM->GetWidth());
+  float lm_height = float(piLM->GetHeight());
+  int superLMsize = OpenGLLightmapCache::super_lm_size;
+
   float lm_low_u, lm_low_v, lm_high_u, lm_high_v;
   float lm_scale_u, lm_scale_v, lm_offset_u, lm_offset_v;
 
   poly_texture->GetTextureBox (lm_low_u,lm_low_v,lm_high_u,lm_high_v);
-  lm_low_u -= 0.125;
-  lm_low_v -= 0.125;
-  lm_high_u += 0.125;
-  lm_high_v += 0.125;
+  if (lm_high_u <= lm_offset_u)
+    lm_scale_u = 1.;       // @@@ Is this right?
+  else
+    lm_scale_u = 1. / (lm_high_u - lm_low_u);
 
-  CS_ASSERT((lm_high_u > lm_low_u) && (lm_high_v > lm_low_v));
+  if (lm_high_v <= lm_offset_v)
+    lm_scale_v = 1.;       // @@@ Is this right?
+  else
+    lm_scale_v = 1. / (lm_high_v - lm_low_v);
 
-  lm_scale_u = 1./(lm_high_u - lm_low_u);
-  lm_scale_v = 1./(lm_high_v - lm_low_v);
+  lm_low_u -= .75 / (float (lm_width) * lm_scale_u);
+  lm_high_u += .75 / (float (lm_width) * lm_scale_u);
 
-  iLightMap* piLM = poly_texture->GetLightMap();
+  lm_low_v -= .75 / (float (lm_height) * lm_scale_v);
+  lm_high_v += .75 / (float (lm_height) * lm_scale_v);
 
-  float lm_width = float(piLM->GetWidth());
-  float lm_height = float(piLM->GetHeight());
-  int superLMsize = OpenGLLightmapCache::super_lm_size;
+  lm_scale_u = 1. / ((lm_high_u - lm_low_u));
+  lm_scale_v = 1. / ((lm_high_v - lm_low_v));
 
   float dlm = 1./ float(superLMsize);
 
