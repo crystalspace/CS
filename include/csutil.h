@@ -60,7 +60,6 @@
 #include "csutil/flags.h"
 #include "csutil/floatrand.h"
 #include "csutil/fpu80x86.h"
-#include "csutil/getopt.h"
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
 #include "csutil/hashmap.h"

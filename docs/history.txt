@@ -16,6 +16,20 @@ chronological order.
 	  and added a new SortedInLine() routine that checks if a line
 	  is completely in the object.
 	- res enabled "Treat wchar_t as builtin type" for VC7 projects.
+	- Eric Sunshine once again sanitized the public CS headers for gcc's
+	  "-ansi" and "-pedantic" options.
+	- Eric Sunshine removed <csutil/getopt.h> from the <csutil.h>
+	  master-header since the symbols which it provides tend to conflict
+	  with platform-supplied symbols in getopt.h. (In the near future, we
+	  should prefix our getopt.h symbols with `cs' to avoid such
+	  conflicts.)
+	- Eric Sunshine added CS_SUBST_EMITTER() and CS_DEFINE_EMITTER() macros
+	  to emit.m4. These are wrappers around the standard AC_SUBST() and
+	  AC_DEFINE_UNQUOTED() macros, respectively. They can be used as the
+	  EMITTER argument of the many custom Autoconf macros which Eric wrote
+	  for CS (and complement the existing emitter macros, such as
+	  CS_JAMCONFIG_PROPERTY(), CS_MAKEFILE_PROPERTY(), CS_NULL_EMITTER(),
+	  etc.).
 2-Mar-2005
 	- Jorrit changed pvscalc to use the Description() method to print
 	  out boxes and vectors instead of the ugly B2F and other macros.

@@ -44,7 +44,7 @@
   Pool* scfPool;					\
   parentClass* poolNext;				\
   virtual void PoolRecycle ();				\
-  SCF_DECLARE_IBASE;					\
+  SCF_DECLARE_IBASE					\
   
 /**
  * Embed this macro instead of #SCF_DECLARE_IBASE into an SCF class that is to 
@@ -65,19 +65,19 @@
  *  called.
  * \remarks If you need to set instance-specific data, you need to provide a
  *  custom method for that.
- * \remarks You have to provide a method \code void PoolRecycle (); \endcode
+ * \remarks You have to provide a method \code void PoolRecycle(); \endcode
  *  to clean up instance-specific data (as due the pooling the destructor will
  *  not be called if all references are cleared). The 
  *  #SCF_IMPLEMENT_DEFAULT_POOLRECYCLE macro contains a default (empty)
  *  implementation.
  */
-#define	SCF_DECLARE_IBASE_POOLED(parentClass)			\
+#define	SCF_DECLARE_IBASE_POOLED(parentClass) \
   SCF_DECLARE_IBASE_POOLED_DECL(class, parentClass)
 
 /**
  * Same as SCF_DECLARE_IBASE_POOLED, use for external classes.
  */
-#define	SCF_DECLARE_IBASE_POOLED_EXTERN(Extern, parentClass)	\
+#define	SCF_DECLARE_IBASE_POOLED_EXTERN(Extern, parentClass) \
   SCF_DECLARE_IBASE_POOLED_DECL(class Extern, parentClass)
 
 /**
@@ -87,7 +87,7 @@
 #define SCF_CONSTRUCT_IBASE_POOLED(Pool)		\
   SCF_CONSTRUCT_IBASE(0);				\
   poolNext = 0;						\
-  scfPool = (Pool);
+  scfPool = (Pool)
   
 /**
  * Implement the constructor for the pool manager of \a Class.

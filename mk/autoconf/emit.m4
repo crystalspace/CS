@@ -140,3 +140,25 @@ AC_DEFUN([CS_EMITTER_OPTIONAL],
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_NULL_EMITTER], [:
 ])
+
+
+
+#------------------------------------------------------------------------------
+# CS_SUBST_EMITTER(KEY, VALUE, [APPEND])
+#	An emitter wrapped around AC_SUBST(). Invokes AC_SUBST(KEY,VALUE).  The
+#	APPEND argument is ignored.  Suitable for use as the EMITTER argument
+#	of one of the CS_EMIT_FOO() macros.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_SUBST_EMITTER], [AC_SUBST([$1],[$2])])
+
+
+
+#------------------------------------------------------------------------------
+# CS_DEFINE_EMITTER(KEY, VALUE, [APPEND])
+#	An emitter wrapped around AC_DEFINE_UNQUOTED(). Invokes
+#	AC_DEFINE_UNQUOTED(KEY,VALUE).  The APPEND argument is ignored.
+#	Suitable for use as the EMITTER argument of one of the CS_EMIT_FOO()
+#	macros.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_DEFINE_EMITTER],
+    [AC_DEFINE_UNQUOTED([$1],[$2],[Define when feature is available])])

@@ -508,6 +508,8 @@ OpenGL-specific.
 Windows-specific.
 @item csutil/archive.h
 Requires zlib indirectly via @file{csutil/zip.h}.
+@item csutil/getopt.h
+Conflicts with platform-supplied @file{<getopt.h>}.
 @item csutil/zip.h
 Requires zlib; @uref{http://www.gzip.org/zlib/}
 @item inetwork/vosapi.h

@@ -45,7 +45,7 @@ public:
     /// 'Set foreground color'
     cmdFormatAttrForeground,
     /// 'Set background color'
-    cmdFormatAttrBackground,
+    cmdFormatAttrBackground
   };
   /// Classification of the command sequence
   enum CommandClass
@@ -78,7 +78,7 @@ public:
     /// 'Dim' attribute
     attrDim,
     /// 'Invisible' attribute
-    attrInvisible,
+    attrInvisible
   };
   /// Values for foreground/background color
   enum FormatColor
