@@ -31,7 +31,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   FOUNT = $(OUT)$(LIB_PREFIX)fountain$(LIB)
   DEP.EXE += $(FOUNT)
-  SCF.STATIC += fount
+  SCF.STATIC += fountain
   TO_INSTALL.STATIC_LIBS += $(FOUNT)
 endif
 
