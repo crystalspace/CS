@@ -243,9 +243,12 @@ void IsoTest::NextFrame ()
   if (GetKeyState (CSKEY_PGDN)) playermotion += csVector3(0,-speed,0);
   if (GetKeyState (CSKEY_UP)) playermotion += csVector3(speed,0,0);
   if (GetKeyState (CSKEY_DOWN)) playermotion += csVector3(-speed,0,0);
-  player->MovePosition(playermotion);
-  view->MoveScroll(playermotion); 
-  light->SetPosition(player->GetPosition()+csVector3(0,1,0));
+  if(!playermotion.IsZero())
+  {
+    player->MovePosition(playermotion);
+    view->MoveScroll(playermotion); 
+    light->SetPosition(player->GetPosition()+csVector3(0,1,0));
+  }
 
   // Tell 3D driver we're going to display 3D things.
   if (!G3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
@@ -289,7 +292,7 @@ bool IsoTest::HandleEvent (iEvent &Event)
     {1./16., 1./16., 1./16., 0.6, 0.6},
     {1./16., 1./16., 1./16., 0.5, 0.5},
     {1./40., 1./40., 1./40., 0.5, 0.5},
-    {1./4., 1./4., 1./4., 0.5, 0.5},
+    {1./8., 1./8., 1./8., 0.5, 0.5},
     };
     static int nrsettings = 5;
     static int setting = 0;

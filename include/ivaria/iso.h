@@ -124,6 +124,8 @@ struct iIsoGrid : public iBase
     float maxy = +10.0) = 0;
   /// does this grid contain given position?
   virtual bool Contains(const csVector3& pos) = 0;
+  /// get the bounding box for the grid
+  virtual const csBox3& GetBox() const = 0;
   /// get the width of the grid
   virtual int GetWidth() const = 0;
   /// get the height of the grid

@@ -313,78 +313,54 @@ csIsoGroundMap::~csIsoGroundMap()
   delete[] map;
 }
 
-bool csIsoGroundMap::HitBeam(const csVector3& src, const csVector3& dest)
+bool csIsoGroundMap::HitBeam(const csVector3& gsrc, const csVector3& gdest)
 {
+  csVector3 src = gsrc, dest=gdest;
   /// go through each mapcell and keep track of visibility.
-  csVector3 delta = dest-src; // src + delta = dest
   int mingridx = 0, mingridy = 0;
   grid->GetGridOffset(mingridx, mingridy);
 
+  /// shift src/dest so that they both fall in the grid
+  csVector3 isect;
+  csSegment3 seg(src, dest);
+  if(!grid->Contains(src))
+    if(csIntersect3::BoxSegment(grid->GetBox(), seg, isect))
+    {
+      src = isect;
+      seg.SetStart(isect + 0.001*(dest-src)); // avoid 2nd hit on src
+    }
+  if(!grid->Contains(dest))
+    if(csIntersect3::BoxSegment(grid->GetBox(), seg, isect))
+    {
+      dest = isect;
+      //seg.SetEnd(isect);
+    }
+
+  csVector3 delta = dest-src; // src + delta = dest
+
   /// check each square along groundsquare size steps...
   if(delta.IsZero()) return true;
-  float len = qsqrt(delta.z*delta.z*float(multx*multx) + 
+  float len = 4.0*qsqrt(delta.z*delta.z*float(multx*multx) + 
     delta.x*delta.x*float(multy*multy));
   csVector3 m = delta/len;
+  m.z *= float(multx);
+  m.x *= float(multy);
   int steps = QInt(len);
   csVector3 pos = src;
+  pos.z *= float(multx);
+  pos.x *= float(multy);
+  int multminx = mingridx*multx;
+  int multminy = mingridy*multy;
   int x,y;
   for(int i=0; i<steps; pos+=m, i++)
   {
-    x = QInt(pos.z*float(multx)) - mingridx*multx;
-    y = QInt(pos.x*float(multy)) - mingridy*multy;
+    x = QInt(pos.z) - multminx;
+    y = QInt(pos.x) - multminy;
     //printf("Checking %d,%d (%g,%g,%g) %g\n", x,y, pos.x, pos.y, pos.z,
       //GetGround(x,y));
-    if(x<0) continue;
-    if(x>=width) continue;
-    if(y<0) continue;
-    if(y>=height) continue;
     if(pos.y <= GetGround(x,y)) return false;
   }
   return true;
-#if 0
-  /// old discreet
-  float dheight = delta.y;
-  int x0 = QInt(src.z*float(multx)) - mingridx;
-  int y0 = QInt(src.x*float(multy)) - mingridy;
-  int x1 = QInt(dest.z*float(multx)) - mingridx;
-  int y1 = QInt(dest.x*float(multy)) - mingridy;
-  int dx = x1-x0;
-  int dy = y1-y0;
-  float m,b;
-  float baseheight;
-
-  /// check x0,y0
-  if(src.y <= GetGround(x0, y0))
-    return false; // start is below ground
-  if (abs(dx) > abs(dy)) {            // slope < 1
-    m = (float) dy / (float) dx;      // compute slope
-    b = y0 - m*x0;
-    dheight = dheight / float(dx);
-    baseheight = src.y - dheight * x0;
-    dx = (dx < 0) ? -1 : 1;
-    x1-=dx; // do not check last pos
-    while (x0 != x1) {
-      x0 += dx;
-      //check (x0, round(m*x0 + b))
-      if(dheight*x0+baseheight <= GetGround(x0, QRound(m*x0 + b)))
-        return false;
-    }
-  } else if (dy != 0) {               // slope >= 1
-    m = (float) dx / (float) dy;      // compute slope
-    b = x0 - m*y0;
-    dheight = dheight / float(dy);
-    baseheight = src.y - dheight * y0;
-    dy = (dy < 0) ? -1 : 1;
-    y1-=dy; // do not check last pos
-    while (y0 != y1) {
-      y0 += dy;
-      //check (round(m*y0 + b), y0)
-      if(dheight*y0+baseheight <= GetGround(QRound(m*y0 + b), y0))
-        return false;
-    }
-  }
-  return true;
-#endif
 }
 
 

@@ -102,6 +102,7 @@ public:
   virtual void RegisterLight(iIsoLight *light);
   virtual void UnRegisterLight(iIsoLight *light);
   virtual iIsoCell* GetGridCell(int x, int y) { return GetCell(x,y); }
+  virtual const csBox3& GetBox() const {return box;}
 };
 
 
