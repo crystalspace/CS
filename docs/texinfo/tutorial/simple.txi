@@ -17,11 +17,11 @@ use the Crystal Space components and libraries in your own applications.  On
 one hand, the include directory contains @sc{scf} interface definitions.
 These pure interface file names start with the letter @samp{i} (as in
 @file{iworld.h}).  On the other hand we also have plain C++ include files for
-interfacing with the libraries of Crystal Space.  You can move this include
-directory somewhere on your system.  On Linux you could move it to
-@file{/usr/local/include/cs} for example.  It's your choice.  @emph{This will
-change in the future when Crystal Space has a standardized method for
-installing its development headers and libraries on your system.}
+interfacing with the libraries of Crystal Space.  When you install Crystal
+Space on your development system (for instance, by invoking @samp{make
+install}), these headers are placed in a location where they can be easily
+accessed when writing new programs based on Crystal Space.  On Unix systems,
+for instance, these files usually end up in @file{/usr/local/crystal/include}.
 
 Crystal Space also has a reference manual and @sc{api} documentation.
 The manual is included in @sc{html} form Crystal Space itself and is also
@@ -79,7 +79,6 @@ In the source file @file{simple.cpp} we place the following:
 @example
 #include "cssysdef.h"
 #include "cssys/system.h"
-#include "csutil/inifile.h"
 #include "apps/simple/simple.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
@@ -87,13 +86,13 @@ In the source file @file{simple.cpp} we place the following:
 #include "csengine/camera.h"
 #include "csengine/light.h"
 #include "csengine/polygon.h"
+#include "csengine/texture.h"
 #include "csparser/csloader.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "iconsole.h"
 
-// We need the VFS plugin and the 3D engine
-REGISTER_STATIC_LIBRARY (vfs)
+// We need the 3D engine
 REGISTER_STATIC_LIBRARY (engine)
 
 Simple::Simple ()
@@ -311,8 +310,7 @@ bool Simple::Initialize (int argc, char const* const argv[],
   csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
   csMaterialWrapper* tm = world->GetMaterials ()->FindByName ("stone");
 
-  room = world->NewSector ();
-  room->SetName ("room");
+  room = world->CreateCsSector ("room");
   csPolygon3D* p;
   p = room->NewPolygon (tm);
   p->AddVertex (-5, 0,  5);
@@ -377,12 +375,13 @@ parameter is the world into which to load the texture; the second parameter is
 the name of the texture as it will be known in the world; and the third is the
 actual filename on the @sc{vfs} volume (@pxref{VFS}).  Note, if you don't have
 the @file{stone4.gif} texture you can use another one.  The only requirement
-is that it must have sizes which are a power of 2 (e.g.  64x64). This functions
-returns a @code{csTextureWrapper} which we don't use. Instead we use
-the @code{csMaterialWrapper} which is created automatically with @code{LoadTexture}.
+is that it must have sizes which are a power of 2 (e.g. 64x64). This functions
+returns a @samp{csTextureWrapper} which we don't use.  Instead we use
+the @samp{csMaterialWrapper} which is created automatically bye
+@code{LoadTexture()}.
 
-Then we create our room with @samp{NewSector()}.  This room will initially be
-empty.  A room in Crystal Space is represented by @samp{csSector} which is
+Then we create our room with @code{CreateCsSector()}.  This room will initially
+be empty.  A room in Crystal Space is represented by @samp{csSector} which is
 basicly a convex set of polygons.
 
 Now we create the six walls of our room.  To do this we call
@@ -532,7 +531,7 @@ void Simple::NextFrame ()
 First we indicate to the 3D rasterizer that we want to start drawing 3D
 graphics.  This call makes sure that the needed buffers are set up and
 performs all necessary initialization. The engine often needs extra settings
-for this as well so you MUST call @code{world->GetBeginDrawFlags()} to
+for this as well so you @emph{must} call @code{world->GetBeginDrawFlags()} to
 get these flags and or them with the ones that you want.
 Then we draw through our view by calling @code{csView::Draw()} which
 updates the view area with the 3D world data as seen through the camera.
@@ -573,11 +572,20 @@ void Simple::NextFrame ()
     view->GetCamera ()->Rotate (VEC_ROT_RIGHT, speed);
   if (GetKeyState (CSKEY_LEFT))
     view->GetCamera ()->Rotate (VEC_ROT_LEFT, speed);
+  if (GetKeyState (CSKEY_PGUP))
+    view->GetCamera ()->Rotate (VEC_TILT_UP, speed);
+  if (GetKeyState (CSKEY_PGDN))
+    view->GetCamera ()->Rotate (VEC_TILT_DOWN, speed);
+  if (GetKeyState (CSKEY_UP))
+    view->GetCamera ()->Move (VEC_FORWARD * 4 * speed);
+  if (GetKeyState (CSKEY_DOWN))
+    view->GetCamera ()->Move (VEC_BACKWARD * 4 * speed);
   @dots{}
 @}
 @end example
 
-That's all!  With this simple change you can rotate the camera with the arrow
+That's all!  With this simple change you can rotate the camera with the left
+and right arrow keys and move forward and backward with the up and down arrow
 keys.  Try it out to see the effect.  To rotate the camera we use
 @code{Rotate()} which expects a vector to rotate along and an angle given in
 radians (the speed parameter).  There are a number of predefined vectors which
@@ -589,4 +597,3 @@ handling, and how to handle some basic camera operations.
 
 You can now go on to the next tutorial (@pxref{Tutorial Simple 2})) to learn
 how to add a 3D sprite to this world.
-

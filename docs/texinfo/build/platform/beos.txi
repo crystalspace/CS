@@ -22,7 +22,7 @@ documentation.
 
 This section contains configuration, compilation, and installation
 instructions.  A list of @BeOS{}-specific bugs and future plans is also
-presented.  @xref{BeOS Notes}
+presented.  @xref{BeOS Notes}.
 
 It is assumed that you will have obtained a full set of sources at this stage.
 Full sources includes the Crystal Space sources as well as those for the

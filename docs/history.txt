@@ -1,12 +1,17 @@
 The history order has been reversed so that new features are at the top.
 
 16-Oct-2000
-	- Changed the meaning of csBox3::GetEdge so that it more conforms
-	  to the new indices defined in GetEdgeInfo().
-	  Added a second variant of GetEdge which fills in a given
-	  csSegment3 structure.
+	- Changed the meaning of csBox3::GetEdge so that it more conforms to
+	  the new indices defined in GetEdgeInfo().  Added a second variant of
+	  GetEdge which fills in a given csSegment3 structure.
 	- Also did similar things to csBox2 (i.e. add GetEdgeInfo(), GetEdge(),
-	  ...).
+	  etc.).
+	- Eric Sunshine fixed a Texinfo error in beos.txi which was reported
+	  by 'makeinfo'.
+	- Eric Sunshine fixed some out-of-date information and discussion in
+	  simple.txi.
+	- Eric Sunshine fixed a number of mark-up problems and other errors in
+	  csws.txi.  Also eliminated 'overfull hbox' errors reported by TeX.
 15-Oct-2000
 	- Added csBox3::GetEdgeInfo() and GetFaceEdges() which can be
 	  used to extract winged-edge information from a csBox3.
