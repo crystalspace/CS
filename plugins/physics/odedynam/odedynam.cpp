@@ -753,8 +753,8 @@ int csODEDynamics::CollideMeshPlane (dGeomID mesh, dGeomID plane, int flags,
     {
       //Determining the places where the poly is cut
       int ind1 = polygon_list[i].vertices[vcount-1];
-      csVector3 v1;
-      csVector3 v2 = vertex_table[ind1] / mesht;
+      csVector3 v1 = vertex_table[ind1] / mesht;
+      csVector3 v2;
       for (j = 0; j < vcount && outcount < N; v1 = v2, j++)
       {
         int ind2 = polygon_list[i].vertices[j];
@@ -764,8 +764,8 @@ int csODEDynamics::CollideMeshPlane (dGeomID mesh, dGeomID plane, int flags,
         dGeomID oderay = dCreateRay (0, diff.Norm());
         dGeomRaySet (oderay, v1.x, v1.y, v1.z,
                     diff.x, diff.y, diff.z);
-        dContactGeom tempcontacts[5];
-        int count = dCollideRayPlane (oderay, plane, 5, tempcontacts, sizeof (dContactGeom));
+        dContactGeom tempcontacts[1];
+        int count = dCollideRayPlane (oderay, plane, 1, tempcontacts, sizeof (dContactGeom));
         dGeomDestroy (oderay);
         if(count==1)
         {
