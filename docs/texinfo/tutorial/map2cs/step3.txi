@@ -35,6 +35,7 @@ and contain the following commands:
 cd CS
 map2cs ..\maps\%1.map data\%1.zip
 walktest %1
+cd..
 @end example
 
 From the command-line (the @sc{ms-dos} prompt for Windows and @sc{dos} users)
