@@ -140,8 +140,10 @@ bool csGraphics2DDDraw3::Open ()
   HDC hdc = GetDC (m_hWnd);
   m_bAllowWindowed = (GetDeviceCaps (hdc, BITSPIXEL) == Depth);
   ReleaseDC (m_hWnd, hdc);
-  if (m_bAllowWindowed)
-    FullScreen = false;
+  if (FullScreen && !m_bAllowWindowed)
+    FullScreen = true;
+  else
+	FullScreen = false;
 
   // Get ahold of the main DirectDraw object...
   DDetection.checkDevices2D ();
@@ -736,7 +738,13 @@ void csGraphics2DDDraw3::ClearSystemPalette ()
   Palette->palNumEntries = 256;
   Palette->palVersion = 0x300;
   
+  Palette->palPalEntry [0].peRed = 0;
+  Palette->palPalEntry [0].peGreen = 0;
+  Palette->palPalEntry [0].peBlue = 0;
   Palette->palPalEntry [0].peFlags = 0;
+  Palette->palPalEntry [255].peRed = 255;
+  Palette->palPalEntry [255].peGreen = 255;
+  Palette->palPalEntry [255].peBlue = 255;
   Palette->palPalEntry [255].peFlags = 0;
 
   int c;
@@ -745,7 +753,7 @@ void csGraphics2DDDraw3::ClearSystemPalette ()
     Palette->palPalEntry [c].peRed = 0;
     Palette->palPalEntry [c].peGreen = 0;
     Palette->palPalEntry [c].peBlue = 0;
-    Palette->palPalEntry [c].peFlags = PC_NOCOLLAPSE;
+    Palette->palPalEntry [c].peFlags = 0;
   }
 
   hdc = GetDC (NULL);
@@ -774,15 +782,21 @@ bool csGraphics2DDDraw3::CreateIdentityPalette (csRGBpixel *p)
   Palette->palNumEntries = 256;
   Palette->palVersion = 0x300;
 
+  Palette->palPalEntry [0].peRed = 0;
+  Palette->palPalEntry [0].peGreen = 0;
+  Palette->palPalEntry [0].peBlue = 0;
   Palette->palPalEntry [0].peFlags = 0;
+  Palette->palPalEntry [255].peRed = 255;
+  Palette->palPalEntry [255].peGreen = 255;
+  Palette->palPalEntry [255].peBlue = 255;
   Palette->palPalEntry [255].peFlags = 0;
 
-  for (i = 1; i < 255; i++)
+  for (i = 0; i < 256; i++)
   {
     Palette->palPalEntry [i].peRed = p [i].red;
     Palette->palPalEntry [i].peGreen = p [i].green;
     Palette->palPalEntry [i].peBlue = p [i].blue;
-    Palette->palPalEntry [i].peFlags = PC_RESERVED;
+    Palette->palPalEntry [i].peFlags = PC_RESERVED | PC_NOCOLLAPSE;
   }
 
   m_hWndPalette = CreatePalette (Palette);
