@@ -969,7 +969,8 @@ An important benefit of the new @code{scfInterface<>} template class is that it
 is now possible for template authors to perform queries for interface-related
 information.  For example, the author of a new template class may know an
 @sc{scf} interface via only the opaque identifier @code{T}, yet it is still
-possible to query @code{T}'s version using @code{scfInterfce<T>::GetVersion()}.
+possible to query @code{T}'s version using
+@code{scfInterface<T>::GetVersion()}.
 
 The old hidden, semi-private @sc{api} for obtaining interface information via
 the global @samp{name_VERSION} constant and global @code{name_scfGetID()}
