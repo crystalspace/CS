@@ -30,6 +30,11 @@ chronological order.
 	- Eric Sunshine fixed formatting of "help" messages in terrainldr.mak
 	  and waterdemo.mak.
 	- Eric Sunshine added xmlshader to user.mak.
+	- Eric Sunshine added the auto-generated dinputdefs.h file to
+	  joystick/csjoywin since it is needed by Borland C++Builder.
+	  http://bbx.hp.infoseek.co.jp/dikeyboard.html
+	  http://bbx.hp.infoseek.co.jp/archive/GetDIDF.zip
+	  References provided by Randall Foreman <eidpers@comcast.net>.
 6-Jan-2004
 	- Eric Sunshine changed the libbfd check in configure.ac so that it is
 	  not performed on Windows.  Newer versions of Mingw supply libbfd and

@@ -30,7 +30,7 @@
 // @@@ Should be able build on older SDKs as well
 #include <dinput.h>
 #ifdef COMP_BC
-#include <dinputdefs.h>
+#include "dinputdefs.h"
 #endif
 
 /**
