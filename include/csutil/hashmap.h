@@ -110,8 +110,8 @@ public:
   bool HasNext () const;
   /// Get the next element.
   csHashObject Next ();
-  /// Const version of Next().
-  const csHashObject NextConst ();
+  /// deprecated. (matze: this function is totally pointless)
+  csHashObject NextConst ();
   /**
    * Delete next element and fetches new one.
    * @@@ Not implemented yet!
@@ -174,8 +174,8 @@ public:
   bool HasNext () const;
   /// Get the next element.
   csHashObject Next ();
-  /// Const version of Next().
-  const csHashObject NextConst ();
+  /// deprecated. (Matze: this function is totally pointless)
+  csHashObject NextConst ();
   /**
    * Delete next element and fetches new one.
    * @@@ Not implemented yet!

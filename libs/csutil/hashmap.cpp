@@ -106,7 +106,7 @@ csHashObject csGlobalHashIterator::Next ()
   return obj;
 }
 
-const csHashObject csGlobalHashIterator::NextConst ()
+csHashObject csGlobalHashIterator::NextConst ()
 {
   CS_ASSERT(cbucket);
   csHashObject obj = ((*cbucket)[element_index]).object;
@@ -191,7 +191,7 @@ csHashObject csHashIterator::Next ()
   return obj;
 }
 
-const csHashObject csHashIterator::NextConst ()
+csHashObject csHashIterator::NextConst ()
 {
   CS_ASSERT(cbucket);
   csHashObject obj = ((*bucket)[element_index]).object;
