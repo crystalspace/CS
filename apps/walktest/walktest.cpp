@@ -974,24 +974,8 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
   if (do_cd)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
-
-    csRef<iPolygonMesh> mesh;
-    // Initialize all mesh objects for collision detection.
-    int i;
-    iMeshList* meshes = engine->GetMeshes ();
-    for (i = 0 ; i < meshes->GetCount () ; i++)
-    {
-      iMeshWrapper* sp = meshes->Get (i);
-      if (region && !region->IsInRegion (sp->QueryObject ())) continue;
-      mesh = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
-      if (mesh)
-      {
-	csColliderWrapper *cw = new csColliderWrapper (sp->QueryObject (),
-						       collide_system, mesh);
-	cw->SetName (sp->QueryObject ()->GetName());
-	cw->DecRef ();
-      }
-    }
+    csColliderHelper::InitializeCollisionWrappers (collide_system,
+    	engine, region);
   }
 }
 

@@ -37,6 +37,17 @@ The history order is reversed so that new features are at the top.
 	  the maximum volume for samples to be exceeded. The results are 
 	  clamped, both in 16 and 8 bit mode. The speed decrease is 
 	  negligible.
+	- Added new csColliderHelper class with static methods to help
+	  implement some common collision detection functions. Currently
+	  contains only one function called InitializeCollisionWrappers()
+	  which will initialize collision detection (i.e. create
+	  csColliderWrapper) for all objects in the engine. If the optional
+	  region is given only the objects from that region will be
+	  initialized. This function will create csColliderWrapper objects
+	  for all mesh objects that don't already have one. It will check
+	  both the factory and mesh object for an iPolygonMesh that it can
+	  use (that part is not implemented yet).
+	- Walktest now uses the new function.
 10-Apr-2003
 	- Fixed a compile error in binary XML reader. I wonder if people
 	  compile after changing something...

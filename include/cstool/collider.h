@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2003 by Jorrit Tyberghein
     Written by Alex Pfaffe.
 
     This library is free software; you can redistribute it and/or
@@ -29,7 +29,8 @@ struct iPolygonMesh;
 struct iCollideSystem;
 struct iCollider;
 struct iObject;
-
+struct iEngine;
+struct iRegion;
 
 SCF_VERSION (csColliderWrapper, 0, 0, 3);
 
@@ -103,6 +104,25 @@ public:
   static csColliderWrapper* GetColliderWrapper (iObject* object);
 
   SCF_DECLARE_IBASE_EXT (csObject);
+};
+
+/**
+ * This is a class containing a few static member functions to help
+ * work with csColliderWrapper and collision detection in general.
+ */
+class csColliderHelper
+{
+public:
+  /**
+   * Initialize collision detection (i.e. create csColliderWrapper) for
+   * all objects in the engine. If the optional region is given only
+   * the objects from that region will be initialized. This function will
+   * create csColliderWrapper objects for all mesh objects that don't
+   * already have one. It will check both the factory and mesh object
+   * for an iPolygonMesh that it can use.
+   */
+  static void InitializeCollisionWrappers (iCollideSystem* colsys,
+  	iEngine* engine, iRegion* region = NULL);
 };
 
 #endif // __CS_COLLIDER_H__

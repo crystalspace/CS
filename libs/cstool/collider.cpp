@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000-2001 by Jorrit Tyberghein
+    Copyright (C) 2000-2003 by Jorrit Tyberghein
     Written by Daniel Gudbjartsson
 
     This library is free software; you can redistribute it and/or
@@ -20,6 +20,11 @@
 #include "cssysdef.h"
 #include "cstool/collider.h"
 #include "ivaria/collider.h"
+#include "iengine/engine.h"
+#include "iengine/region.h"
+#include "iengine/mesh.h"
+#include "imesh/object.h"
+#include "igeom/polymesh.h"
 
 //----------------------------------------------------------------------
 
@@ -92,5 +97,30 @@ csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object)
 {
   csRef<csColliderWrapper> w (CS_GET_CHILD_OBJECT (object, csColliderWrapper));
   return w;	// This will DecRef() but that's ok in this case.
+}
+
+//----------------------------------------------------------------------
+
+
+void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
+  	iEngine* engine, iRegion* region)
+{
+  csRef<iPolygonMesh> mesh;
+  // Initialize all mesh objects for collision detection.
+  int i;
+  iMeshList* meshes = engine->GetMeshes ();
+  for (i = 0 ; i < meshes->GetCount () ; i++)
+  {
+    iMeshWrapper* sp = meshes->Get (i);
+    if (region && !region->IsInRegion (sp->QueryObject ())) continue;
+    mesh = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
+    if (mesh)
+    {
+      csColliderWrapper *cw = new csColliderWrapper (sp->QueryObject (),
+	colsys, mesh);
+      cw->SetName (sp->QueryObject ()->GetName());
+      cw->DecRef ();
+    }
+  }
 }
 
