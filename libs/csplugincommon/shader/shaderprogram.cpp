@@ -421,6 +421,7 @@ void csShaderProgram::DumpVariableMappings (csString& output)
     output << '(' << vme.name << ") -> ";
     output << vme.destination << ' ';
     output << vme.userInt << ' ';
-    output << (csString().Format ("0x%p", (void*)vme.userPtr)) << '\n'; 
+    output.AppendFmt ("%p", (void*)vme.userPtr);
+    output << '\n'; 
   }
 }

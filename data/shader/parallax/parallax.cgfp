@@ -6,8 +6,8 @@
 struct vertex2fragment { 
 	float4 Position : POSITION;
 	float2 TexCoord : TEXCOORD0;
-	float3 LightDir : TEXCOORD1;
-	float3 EyeVec : TEXCOORD2;
+	float4 LightDir : TEXCOORD1;
+	float4 EyeVec : TEXCOORD2;
 };
 
 

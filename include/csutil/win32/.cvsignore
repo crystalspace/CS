@@ -1,3 +1,4 @@
+ft2build.h
 iconv.h
 ioapi.h
 jconfig.h
@@ -7,6 +8,7 @@ jmorecfg.h
 jpeglib.h
 lauxlib.h
 libmng.h
+libmng_chunk_descr.h
 libmng_chunk_io.h
 libmng_chunk_prc.h
 libmng_chunks.h
@@ -36,7 +38,8 @@ zlib.h
 zip.h
 AL
 cal3d
-freetype2
+Cg
+freetype
 lib3ds
 libxml
 ogg

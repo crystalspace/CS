@@ -54,7 +54,7 @@ public:
   csGLShader_CG (iBase *parent);
   virtual ~csGLShader_CG ();
 
-
+  void Report (int severity, const char* msg, ...) CS_GNUC_PRINTF(3, 4);
   
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgramPlugin

@@ -13,6 +13,11 @@ chronological order.
 	  had int and intptr_t in the same place, which at least VC7 didn't
 	  like. Fixed that by giving the int methods (which take an index)
 	  an "Index" suffix and the intptr_t methods an "Param" suffix.
+	- res updated the Cg plugin for Cg 1.3. This means the old vertex 
+	  program rewriting code was removed, just to be replaced with new
+	  rewriting code because Cg 1.3 generates vertex programs that ATI 
+	  drivers don't understand.
+	- res updated the sprcal3d plugin for the latest CVS of Cal3d.
 22-Mar-2005
 	- Jorrit removed the slow RAPID and memory consuming collision
 	  detection plugin. OPCODE is now a lot better.

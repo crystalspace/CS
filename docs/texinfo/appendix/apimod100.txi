@@ -1471,3 +1471,25 @@ methods will result in compilation errors. Alternately, defining
 @samp{void*} to generate compilation warnings, assuming that the compiler
 supports such deprecation warnings. (Presently, only modern version of the
 @sc{gnu} compiler are so configured.)
+
+@subheading Cg matrix bindings
+
+The semantics of a Cg vertex program matrix parameter were determined through
+the variable name; e.g. a name of @samp{ModelViewProj} bound the combined 
+model view and projection matrix to the variable. This is still supported but
+deprecated. CrystalSpace now requires Cg 1.3 which allows the matrix semantics 
+specification in a way similar to other semantics specification. For example:
+
+@example
+uniform float4x4 ModelViewProj
+@end example
+
+@noindent
+Becomes:
+
+@example
+uniform float4x4 ModelViewProj : state.matrix.mvp
+@end example
+
+Check the @file{data/shaders/} directory for more examples. For more detailed 
+information, consult the Cg and @samp{ARB_vertex_program} documentations.

@@ -117,6 +117,15 @@ bool csGLShader_CG::SupportType(const char* type)
   return false;
 }
 
+void csGLShader_CG::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  csReportV (object_reg, severity,
+    "crystalspace.graphics3d.shader.glcg", msg, arg);
+  va_end (arg);
+}
+
 csPtr<iShaderProgram> csGLShader_CG::CreateProgram(const char* type)
 {
   if (!Open())
@@ -157,8 +166,7 @@ bool csGLShader_CG::Open()
   if (config->KeyExists ("Video.OpenGL.Shader.Cg.PSRouting"))
   {
     route = config->GetBool ("Video.OpenGL.Shader.Cg.PSRouting");
-    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-      "crystalspace.graphics3d.shader.glcg",
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Routing Cg fragment programs to Pixel Shader plugin %s (forced).", 
       route ? "ON" : "OFF");
   }
@@ -171,24 +179,16 @@ bool csGLShader_CG::Open()
     // we default to routing Cg fragment programs to the Pixel Shader plugin
     route = !ext->CS_GL_ARB_fragment_program && 
             ext->CS_GL_ATI_fragment_shader;
-    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-      "crystalspace.graphics3d.shader.glcg",
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Routing Cg fragment programs to Pixel Shader plugin %s (default).", 
       route ? "ON" : "OFF");
   }
   ext->InitGL_ARB_vertex_program ();
-  ext->InitGL_NV_vertex_program ();
 
   debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
   if (debugDump)
     dumpDir = csStrNew (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
     "/tmp/cgdump/"));
-  doNVVPrealign = config->GetBool ("Video.OpenGL.Shader.Cg.NvVpRealign", true) &&
-    ext->CS_GL_NV_vertex_program;
-  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-    "crystalspace.graphics3d.shader.glcg",
-    "Realigning of NV vertex programs is %s.", 
-    doNVVPrealign ? "ON" : "OFF");
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
     iPluginManager);
@@ -202,8 +202,7 @@ bool csGLShader_CG::Open()
         "crystalspace.graphics3d.shader.glps1", iShaderProgramPlugin);
       if (!psplg)
       {
-        csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-          "crystalspace.graphics3d.shader.glcg",
+        Report (CS_REPORTER_SEVERITY_WARNING,
           "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
           "routing unavailable.");
       }
@@ -218,8 +217,7 @@ bool csGLShader_CG::Open()
       "crystalspace.graphics3d.shader.glarb", iShaderProgramPlugin);
     if (!arbplg)
     {
-      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	"crystalspace.graphics3d.shader.glcg",
+      Report (CS_REPORTER_SEVERITY_WARNING,
 	"Could not find crystalspace.graphics3d.shader.glarb. ARB Cg profile "
 	"support unavailable.");
     }

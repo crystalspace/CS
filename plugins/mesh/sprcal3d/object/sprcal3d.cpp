@@ -677,26 +677,32 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (
   {
     CalCoreAnimation *anim = calCoreModel.getCoreAnimation(i);
     if (!anim) continue;
+
+    const uint trackCount = anim->getTrackCount();
+    std::vector<CalTransform> poses = anim->getPoses();
+    const uint frameCount = poses.size() / trackCount;
+
     // loop through all root core bones
     std::list<int>::iterator iteratorRootCoreBoneId;
     for (iteratorRootCoreBoneId = pCoreSkeleton->getListRootCoreBoneId().begin()
     	; iteratorRootCoreBoneId != pCoreSkeleton->getListRootCoreBoneId().end()
 	; ++iteratorRootCoreBoneId)
     {
-      CalCoreTrack *track = anim->getCoreTrack(*iteratorRootCoreBoneId);
-      if (!track) continue;
-      for (int j=0; j<track->getCoreKeyframeCount(); j++)
+      int boneTrack = anim->getTrackAssignment (*iteratorRootCoreBoneId);
+      if (boneTrack < 0) continue;
+      for (uint j = 0; j < frameCount; j++)
       {
-	CalCoreKeyframe *frame = track->getCoreKeyframe(j);
-	CalQuaternion bonerot = frame->getRotation();
-	CalVector bonevec = frame->getTranslation();
+	CalTransform& tf = poses[j * trackCount + boneTrack];
+	CalQuaternion bonerot = tf.getRotation();
+	CalVector bonevec = tf.getTranslation();
 	bonerot *= quatrot;
 	bonevec *= quatrot;
 	bonevec += translation;
-	frame->setRotation(bonerot);
-	frame->setTranslation(bonevec);
+	tf.setRotation (bonerot);
+	tf.setTranslation (bonevec);
       }
     }
+    anim->setPoses (poses, trackCount);
   }
 //  calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }

@@ -113,7 +113,7 @@ void csShaderGLCGVP::ResetState()
 static const char* GetToken (const char* str, const char* separators,
 			     size_t& len)
 {
-  if (!str) return 0;
+  if (!str || (*str == 0)) return 0;
   while (strchr (separators, *str) != 0) str++;
 
   size_t charNum = strcspn (str, separators);
@@ -126,14 +126,7 @@ static bool TokenEquals (const char* token, size_t tokenLen, const char* cmp)
   return (tokenLen == strlen (cmp)) && (strncmp (token, cmp, tokenLen) == 0);
 }
 
-const CGGLenum CGMatrixMODELVIEW_PROJECTION = 
-  CG_GL_MODELVIEW_PROJECTION_MATRIX;
-const CGGLenum CGMatrixMODELVIEW = CG_GL_MODELVIEW_MATRIX;
-const CGGLenum CGMatrixPROJECTION = CG_GL_PROJECTION_MATRIX;
-
-const GLenum NVMatrixMODELVIEW_PROJECTION = GL_MODELVIEW_PROJECTION_NV;
-const GLenum NVMatrixMODELVIEW = GL_MODELVIEW;
-const GLenum NVMatrixPROJECTION = GL_PROJECTION;
+typedef csStringFast<8> csProgVarStr;
 
 bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
@@ -143,24 +136,42 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   csString programStr;
   programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
 
+  CGprofile progProf = CG_PROFILE_UNKNOWN;
+
+  // @@@ Hack: Make sure ARB_v_p is used
+  if (cg_profile != 0)
+    progProf = cgGetProfile (cg_profile);
+
+  if(progProf == CG_PROFILE_UNKNOWN)
+    progProf = cgGLGetLatestProfile (CG_GL_VERTEX);
+  if (progProf < CG_PROFILE_ARBVP1)
+  {
+    delete[] cg_profile;
+    cg_profile = csStrNew ("arbvp1");
+  }
+
   if (!DefaultLoadProgram (programStr, CG_GL_VERTEX, staticContexts))
     return false;
 
-  CGprofile progProf = cgGetProgramProfile (program);
+  progProf = cgGetProgramProfile (program);
   if (progProf == CG_PROFILE_ARBVP1)
   {
     if (!shaderPlug->arbplg)
       return false;
 
-    // Change the ARB VP to use state.matrix.... built-ins for ModelView etc.
+    /* Cg 1.3 generates ARB_v_p code that the ATI drivers can't grok,
+     * bah. Work around by rewriting the VP to a syntax ATI likes. */
+
     const char* compiledProgram = cgGetProgramString (program, 
       CG_COMPILED_PROGRAM);
         
     csStringReader reader (compiledProgram);
     csString newProgram;
 
-    csArray<const char*> remap;
+    csHash<csString, csProgVarStr, csConstCharHashKeyHandler> varSemantics;
 
+    /* Parser #blah information emitted by Cg from start of VP code, use it to
+     * glean state matrix semantic for certain vars. */
     csString line;
     while (reader.GetLine (line))
     {
@@ -168,9 +179,9 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
       const char* token = GetToken (line, " ", tokenLen);
       if (!token) continue;
 
-      do
+      if (TokenEquals (token, tokenLen, "#var"))
       {
-	if (TokenEquals (token, tokenLen, "#var"))
+	do
 	{
 	  token = GetToken (token + tokenLen, " ", tokenLen);
 	  if (!token || (!TokenEquals (token, tokenLen, "float4x4")))
@@ -179,62 +190,217 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 	  const char* varName = GetToken (token + tokenLen, " ", varLen);
 	  if (!varName) break;
 
+	  csString varNameCut; 
+	  varNameCut.Replace (varName, varLen);
+	  CGparameter parameter = cgGetNamedParameter (program, varNameCut);
+	  if (parameter == 0) break;
+	  if (cgGetParameterResource (parameter) == CG_UNDEFINED)
+	    break;
+	  unsigned long resIdx = cgGetParameterResourceIndex (parameter);
+	  csProgVarStr varStr;
+	  varStr.Format ("c[%lu]", resIdx);
+
 	  token = GetToken (varName + varLen, " ", tokenLen);
 	  if (!token || (!TokenEquals (token, tokenLen, ":")))
 	    break;
-	  token = GetToken (token + tokenLen, " ", tokenLen);
-	  if (!token || (!TokenEquals (token, tokenLen, ":")))
-	    break;
-	  token = GetToken (token + tokenLen, " ", tokenLen);
-	  if (!token) break;
+	  const char* semantic = GetToken (token + tokenLen, " ", tokenLen);
+	  if (!semantic || (*semantic == ':'))
+	  {
+	    bool backSemantic = true;
+	    // Backward compatibility: semantics from name
+	  #define REMAP(name, to)					    \
+	    if (TokenEquals (varName, varLen, name))			    \
+	      varSemantics.Put (varStr, "{ " to " }");			    \
+	    else
+	  #define REMAP_VARIANTS(name, to)				    \
+	    REMAP(name "IT", to ".invtrans")			    	    \
+	    REMAP(name "T", to ".transpose")			    	    \
+	    REMAP(name "I", to ".inverse")				    \
+	    REMAP(name, to)
+	  #define MATRIX_MAP(name, nvMatrix, arbMatrix)			    \
+	    REMAP_VARIANTS (# name, arbMatrix)
+	  #include "cgvp_matrixmap.inc"
+	    { /* last else */ backSemantic = false; }
+	  #undef REMAP
+	  #undef REMAP_VARIANTS
 
-	  int varIndex;
-	  if (sscanf (token, "c[%d], 4", &varIndex) != 1)
-	    break;
-
-	#define REMAP(name, to)						    \
-	  if (TokenEquals (varName, varLen, name))			    \
-	    remap.GetExtend (varIndex) = to;				    \
-	  else
-	#define REMAP_VARIANTS(name, to)				    \
-	  REMAP(name "IT", to ".invtrans")			    	    \
-	  REMAP(name "T", to ".transpose")			    	    \
-	  REMAP(name "I", to ".inverse")				    \
-	  REMAP(name, to)
-	#define MATRIX_MAP(name, nvMatrix, arbMatrix)			    \
-	  REMAP_VARIANTS (# name, arbMatrix)
-	#include "cgvp_matrixmap.inc"
-	  { /* last else */ }
-	#undef REMAP
-	#undef REMAP_VARIANTS
+	    if (backSemantic)
+	    {
+	      static bool deprecatedSemanticsWarn = false;
+	      if (!deprecatedSemanticsWarn)
+	      {
+		deprecatedSemanticsWarn = true;
+		shaderPlug->Report (CS_REPORTER_SEVERITY_NOTIFY, 
+		  "VP %s: matrix semantic via names are deprecated; "
+		  "use Cg ': state.matrix....' semantics instead", 
+		  description);
+	      }
+	    }
+	  }
+	  else if (strnicmp (semantic, "state.matrix.", 13) == 0)
+	  {
+	    // Semantics binding in Cg
+	    varSemantics.Put (varStr, 
+	      csString().Format ("{ %s }", 
+		csString ().Replace (semantic, tokenLen).GetData()).Downcase());
+	  }
 	}
-	else if (TokenEquals (token, tokenLen, "PARAM"))
+	while (0);
+      }    
+      else if ((*token != '!') && (*token != '#'))
+      {
+	// Reached end of #blah block
+	break;
+      }
+
+      newProgram << line << '\n';
+    }
+
+    // Write out our own PARAMs.
+    csArray<csShaderVarMapping> mappings;
+    csHash<csProgVarStr, csProgVarStr, csConstCharHashKeyHandler> progVarMap;
+
+    CGparameter parameter = cgGetFirstLeafParameter (program, CG_PROGRAM);
+    while (parameter)
+    {
+      CGresource resource = cgGetParameterResource (parameter);
+      if (resource != CG_UNDEFINED)
+      {
+	CGtype paramType = cgGetParameterType (parameter);
+	unsigned long resIdx = cgGetParameterResourceIndex (parameter);
+	if (resource == CG_C)
 	{
-	  size_t varLen;
-	  const char* varName = GetToken (token + tokenLen, " ", varLen);
-	  if (!varName) break;
+	  CGenum variability = cgGetParameterVariability (parameter);
+	  if (variability == CG_UNIFORM)
+	  {
+	    // Uniform values, usually state matrix or SV binding
+	    csString paramName;
+	    csString semantic;
+	    // Use right syntax depending on parameter type 
+#define CG_DATATYPE_MACRO(name, compiler_name, enum_name, nrows, ncols)	    \
+	    case enum_name:						    \
+	      if (nrows == 0)						    \
+	      {								    \
+		paramName.Format ("p%lu", resIdx);			    \
+		semantic.Format ("program.local[%lu]", resIdx);		    \
+		progVarMap.Put (csString().Format ("c[%lu]", resIdx),	    \
+		  paramName);						    \
+	      }								    \
+	      else							    \
+	      {								    \
+		paramName.Format ("p%lu[%d]", resIdx, nrows);		    \
+		semantic.Format ("program.local[%lu..%lu]", resIdx,	    \
+		  resIdx + nrows-1);					    \
+		for (int r = 0; r < nrows; r++)				    \
+		{							    \
+		  progVarMap.Put (csString().Format ("c[%lu]", resIdx+r),   \
+		    csString().Format ("p%lu[%d]", resIdx, r));		    \
+		}							    \
+	      }								    \
+	      break;
 
-	  int varIndex;
-	  if (sscanf (varName, "c%d[4]", &varIndex) != 1)
-	    break;
-	  
-	  if (((size_t)varIndex >= remap.Length()) || (remap[varIndex] == 0)) break;
+	    switch (paramType)
+	    {
+#include <Cg/cg_datatypes.h>
+	      default:
+		CS_ASSERT_MSG ("Invalid enum", false);
+	    }
+#undef CG_DATATYPE_MACRO
 
-	  line.Format ("PARAM c%d[4] = { %s };", varIndex, remap[varIndex]);
+	    csProgVarStr oldStr, newStr;
+	    oldStr.Format ("c[%lu]", resIdx);
+	    if (varSemantics.In (oldStr))
+	      semantic = *varSemantics.GetElementPointer (oldStr);
+	    newProgram.AppendFmt ("PARAM %s = %s;\n",
+	      paramName.GetData(), semantic.GetData());
+	  }
+	  else if (variability == CG_CONSTANT)
+	  {
+	    // Constant value
+	    int nValues;
+	    const double* values;
+	    csString paramName;
+	    csString valueStr;
+	    // Use right syntax depending on parameter type 
+#define CG_DATATYPE_MACRO(name, compiler_name, enum_name, nrows, ncols)	    \
+	    case enum_name:						    \
+	      values = cgGetParameterValues (parameter, CG_CONSTANT,	    \
+		&nValues);						    \
+	      if (nrows == 0)						    \
+	      {								    \
+		paramName.Format ("p%lu", resIdx);			    \
+		progVarMap.Put (csString().Format ("c[%lu]", resIdx),	    \
+		  paramName);						    \
+		if (nValues != 0)					    \
+		{							    \
+		  valueStr << values[0];				    \
+		  for (int v = 1; v < nValues; v++)			    \
+		  {							    \
+		    valueStr << ", " << values[v];			    \
+		  }							    \
+		}							    \
+	      }								    \
+	      else							    \
+	      {								    \
+		CS_ASSERT_MSG ("Add support for matrix constants...",	    \
+		  false);						    \
+	      }								    \
+	      break;
+
+	    switch (paramType)
+	    {
+#include <Cg/cg_datatypes.h>
+	      default:
+		CS_ASSERT_MSG ("Invalid enum", false);
+	    }
+#undef CG_DATATYPE_MACRO
+
+	    newProgram.AppendFmt ("PARAM %s = { %s };\n",
+	      paramName.GetData(), valueStr.GetData());
+	  }
+	  else
+	  {
+	    CS_ASSERT_MSG ("Add support for more Cg variabilities...", false);
+	  }
 	}
       }
-      while (0);
+      parameter = cgGetNextLeafParameter (parameter);
+    }
+
+    // Kill PARAM statement emitted by Cg
+    while (line[line.Length() - 1] != ';')
+    {
+      if (!reader.GetLine (line)) break;
+    }
+
+    // Copy remaining lines
+    while (reader.GetLine (line))
+    {
+      size_t tokenLen;
+      const char* token = GetToken (line, " ", tokenLen);
+      if (!token) continue;
+
+      do
+      {
+	if (*token != '#')
+	{
+	  // Process a line of code
+	  csHash<csProgVarStr, csProgVarStr, csConstCharHashKeyHandler>::GlobalIterator
+	    mapIt (progVarMap.GetIterator());
+	  while (mapIt.HasNext())
+	  {
+	    csProgVarStr oldStr;
+	    csProgVarStr newStr = mapIt.Next (oldStr);
+	    line.ReplaceAll (oldStr, newStr);
+	  }
+	}
+      } while(0);
 
       newProgram << line << '\n';
     }
     WriteAdditionalDumpInfo ("VP after processing", newProgram);
 
-    override = shaderPlug->arbplg->CreateProgram ("vp");
-    if (!override)
-      return false;
-
-    csArray<csShaderVarMapping> mappings;
-
+    // Generate variable map for ARB plugin
     for (size_t i = 0; i < variablemap.Length (); i++)
     {
       // Get the Cg parameter
@@ -245,303 +411,27 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
       if (resource == CG_C)
       {
         // Get the register number, and create a mapping
-        char regnum[20];
-        sprintf (regnum, "register %lu", cgGetParameterResourceIndex (parameter));
+	csStringFast<20> regnum;
+	regnum.Format ("register %lu", cgGetParameterResourceIndex (parameter));
         mappings.Push (csShaderVarMapping (variablemap[i].name, regnum));
       }
     }
     variablemap.DeleteAll();
+
+    override = shaderPlug->arbplg->CreateProgram ("vp");
+    if (!override)
+      return false;
 
     if (!override->Load (newProgram, mappings))
       return false;
 
     return override->Compile (staticContexts);
   }
-  else
+  else if (progProf < CG_PROFILE_ARBVP1)
   {
-    if (!shaderPlug->doNVVPrealign)
-    {
-      CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
-      while (param)
-      {
-	const char* pname = cgGetParameterName (param);
-      #define TRACKERENTRY(Matrix, Modifier)		  \
-	CGMatrixTrackerEntry map;			  \
-	map.cgMatrix = CGMatrix ## Matrix;		  \
-	map.cgTransform = Modifier;			  \
-	map.cgParameter = param;			  \
-	cgMatrixTrackers.Push (map);
-      #define NAMEDTRACKERENTRY(Name, Matrix, Modifier)	  \
-	if (!strcmp (pname, Name))			  \
-	{						  \
-	  TRACKERENTRY (Matrix, Modifier)		  \
-	}						  \
-	else
-      #define NAMEDENTRIES(Basename, Matrix)		  \
-	NAMEDTRACKERENTRY (Basename, Matrix,		  \
-	  CG_GL_MATRIX_IDENTITY)			  \
-	NAMEDTRACKERENTRY (Basename "I", Matrix,	  \
-	  CG_GL_MATRIX_INVERSE)				  \
-	NAMEDTRACKERENTRY (Basename "T", Matrix,	  \
-	  CG_GL_MATRIX_TRANSPOSE)			  \
-	NAMEDTRACKERENTRY (Basename "IT", Matrix,	  \
-	  CG_GL_MATRIX_INVERSE_TRANSPOSE)			  
-
-      #define MATRIX_MAP(name, nvMatrix, arbMatrix)	  \
-	NAMEDENTRIES (# name, nvMatrix)
-      #include "cgvp_matrixmap.inc"
-	{ /* last else */ }
-
-      #undef NAMEDENTRIES
-      #undef NAMEDTRACKERENTRY
-      #undef TRACKERENTRY
-
-	param = cgGetNextLeafParameter (param);
-      }
-
-      cgTrackMatrices = (cgMatrixTrackers.Length() != 0);
-    }
-    else
-    {
-      /*
-      * Realign float4x4 parameters on 4-register boundaries, keep all other
-      * variables were they are.
-      * @@@ PROBLEM: In complex VPs, it could happen that not enough registers
-      * are available for both aligning and keeping other regs were they are.
-      * Currently, this will likely result in load failure. Should be handled
-      * more gracefully.
-      */
-
-      const char* compiledProgram = cgGetProgramString (program, 
-	CG_COMPILED_PROGRAM);
-          
-      csStringReader reader (compiledProgram);
-      csString newProgram;
-
-      GLint numTemps = 0;
-      if (shaderPlug->ext->CS_GL_ARB_vertex_program)
-      {
-	// VP2.0+ are more or less additions to ARB_v_p.
-	// So query the param count from there.
-	shaderPlug->ext->glGetProgramivARB (GL_VERTEX_PROGRAM_ARB, 
-	  GL_MAX_PROGRAM_PARAMETERS_ARB, &numTemps);
-      }
-      else
-      {
-	// Else: Guess.
-	numTemps = (progProf == CG_PROFILE_VP20) ? 96 : 256;
-      }
-      csBitArray usedSlots (numTemps);
-      csArray<NVMatrixTrackerEntry> matrixParams;
-
-      // Pass 1: collect which params we need to realign.
-      csString line;
-      bool nextPass = false;
-      while (reader.GetLine (line) && !nextPass)
-      {
-	size_t tokenLen;
-	const char* token = GetToken (line, " ", tokenLen);
-	if (!token) continue;
-
-	do
-	{
-	  if (TokenEquals (token, tokenLen, "#var"))
-	  {
-	    token = GetToken (token + tokenLen, " ", tokenLen);
-	    if (!token)
-	      break;
-	    bool isMatrix = TokenEquals (token, tokenLen, "float4x4");
-	    size_t varLen;
-	    const char* varName = GetToken (token + tokenLen, " ", varLen);
-	    if (!varName) break;
-
-	    token = GetToken (varName + varLen, " ", tokenLen);
-	    if (!token || (!TokenEquals (token, tokenLen, ":")))
-	      break;
-	    token = GetToken (token + tokenLen, " ", tokenLen);
-	    if (!token || (!TokenEquals (token, tokenLen, ":")))
-	      break;
-	    token = GetToken (token + tokenLen, " ", tokenLen);
-	    if (!token) break;
-
-	    int varIndex;
-	    if (sscanf (token, "c[%d]", &varIndex) != 1)
-	      break;
-
-	    if (isMatrix)
-	    {
-	      // Align matrices on 4-register boundaries.
-	    #define TRACKERENTRY(Matrix, Modifier)		  \
-	      NVMatrixTrackerEntry map;				  \
-	      map.nvMatrix = NVMatrix ## Matrix;		  \
-	      map.nvTransform = Modifier;			  \
-	      map.nvParameter = varIndex;			  \
-	      matrixParams.Push (map);
-	    #define NAMEDTRACKERENTRY(Name, Matrix, Modifier)	  \
-	      if (TokenEquals (varName, varLen, Name))		  \
-	      {							  \
-		TRACKERENTRY (Matrix, Modifier)			  \
-	      }							  \
-	      else
-	    #define NAMEDENTRIES(Basename, Matrix)		  \
-	      NAMEDTRACKERENTRY (Basename, Matrix,		  \
-		GL_IDENTITY_NV)					  \
-	      NAMEDTRACKERENTRY (Basename "I", Matrix,	  	  \
-		GL_INVERSE_NV)					  \
-	      NAMEDTRACKERENTRY (Basename "T", Matrix,	  	  \
-		GL_TRANSPOSE_NV)				  \
-	      NAMEDTRACKERENTRY (Basename "IT", Matrix,	  	  \
-		GL_INVERSE_TRANSPOSE_NV)			  
-
-	    #define MATRIX_MAP(name, nvMatrix, arbMatrix)	  \
-	      NAMEDENTRIES (# name, nvMatrix)
-	    #include "cgvp_matrixmap.inc"
-	      { 
-		/* last else */ 
-		CGparameter param = cgGetNamedParameter (program, 
-		  varName);
-		if (cgIsParameterReferenced (param))
-		{
-		  for (int b = 0; b < 4; b++)
-		    usedSlots.SetBit (varIndex);
-		}
-	      }
-	    }
-	    else
-	    {
-	      csString nameOnly; nameOnly.Append (varName, varLen);
-	      CGparameter param = cgGetNamedParameter (program, 
-		nameOnly);
-	      if (cgIsParameterReferenced (param))
-		usedSlots.SetBit (varIndex);
-	    }
-	  }
-	  else if (TokenEquals (token, tokenLen, "#const"))
-	  {
-	    size_t varLen;
-	    const char* constName = GetToken (token + tokenLen, " ", varLen);
-	    if (!constName) break;
-
-	    int varIndex;
-	    if (sscanf (constName, "c[%d]", &varIndex) != 1)
-	      break;
-
-	    usedSlots.SetBit (varIndex);
-	  }
-	  else if (*token != '#')
-	  {
-	    const char* lineData = line.GetData();
-
-	    if (strncmp (lineData, "!!", 2) == 0)
-	      break;
-	    else
-	      // The end of the header with the var infos and so on.
-	      nextPass = true;
-	  }
-	} while(0);
-      }
-
-      // Pass 2: Realigning, rewriting of the VP code.
-      if (nextPass)
-      {
-	reader.Reset();
-
-	csHash<int, int> constRemap;
-
-	for (size_t m = 0; m < matrixParams.Length(); m++)
-	{
-	  NVMatrixTrackerEntry mte = matrixParams[m];
-	  int newIndex = 0;
-	  bool found = false;
-	  // Align matrices on 4-register boundaries.
-	  while (newIndex < numTemps)
-	  {
-	    if (!usedSlots.AreSomeBitsSet (newIndex, 4))
-	    {
-	      for (int b = 0; b < 4; b++)
-	      {
-		usedSlots.SetBit (newIndex + b);
-		constRemap.Put (mte.nvParameter + b, newIndex + b);
-	      }
-	      found = true;
-	      break;
-	    }
-	    newIndex += 4;
-	  }
-	  if (!found) return false;
-
-	  mte.nvParameter = newIndex;
-	  nvMatrixTrackers.Push (mte);
-	}
-
-	csString line;
-	while (reader.GetLine (line))
-	{
-	  size_t tokenLen;
-	  const char* token = GetToken (line, " ", tokenLen);
-	  if (!token) continue;
-
-	  do
-	  {
-	    if (*token != '#')
-	    {
-	      const char* lineData = line.GetData();
-
-	      if (strncmp (lineData, "!!", 2) == 0)
-		break;
-
-	      // Process a line of code
-
-	      csString newLine;
-
-	      while (lineData != 0)
-	      {
-		const char* param = strstr (lineData, "c[");
-		if (param != 0)
-		{
-		  param += 2;
-		  newLine.Append (lineData, param - lineData);
-		  int varIndex;
-		  if (sscanf (param, "%d", &varIndex) != 1)
-		  {
-		    newLine.Replace (line);
-		    break;
-		  }
-		  if (constRemap.In (varIndex))
-		    newLine << constRemap.Get (varIndex, -1);
-		  else
-		    newLine << varIndex;
-		  lineData = strchr (param, ']');
-		}
-		else
-		{
-		  newLine << lineData;
-		  lineData = 0;
-		}
-	      }
-
-	      line.Replace (newLine);
-	    }
-	  } while(0);
-
-	  newProgram << line << '\n';
-	}
-
-	nvTrackMatrices = (nvMatrixTrackers.Length() != 0);
-
-	WriteAdditionalDumpInfo ("VP after processing", newProgram);
-      }
-
-      // Now overwrite the VP program with our manipulated version.
-      cgGLEnableProfile (progProf);
-      cgGLUnbindProgram (progProf);
-
-      shaderPlug->ext->glLoadProgramNV (GL_VERTEX_PROGRAM_NV, 
-	cgGLGetProgramID (program), newProgram.Length(), 
-	(GLubyte*)newProgram.GetData());
-
-      cgGLDisableProfile (progProf);
-    }
+    shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING, 
+      "VP %s: profile '%s' not officially supported", 
+      description, cgGetProfileString (progProf));
   }
 
   return true;

@@ -19,19 +19,12 @@ struct vertex2fragment {
 };
 
 vertex2fragment main (app2vertex IN,
-	uniform float4x4 ModelView,		
-	  /* The CG plugin automatically binds the right matrices if the params
-	     are named appropriately.
-	     
-	     Currently supported base names:
-	       ModelView
-	       ModelViewProj
-	       Proj
-	     Currently supported suffixes:
-	       T - transpose, I - inverse, IT - inverse transposed
+	uniform float4x4 ModelViewI : state.matrix.modelview.inverse,
+	  /* The matrices are bound with the state.matrix.... semantics.
+	     For more info see the Cg and ARB_vertex_program docs.
 	     */
-	uniform float4x4 ModelViewIT,	
-	uniform float4x4 ModelViewProj,
+	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
+	uniform float4x4 ModelViewProj : state.matrix.mvp,
 	uniform float4 LightPos,
 	uniform float4 Attenuation,
 	uniform float3 LightColor)
