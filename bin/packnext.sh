@@ -1,7 +1,7 @@
 #!/bin/sh
 #==============================================================================
 #
-#	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+#	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # The contents of this file are copyrighted by Eric Sunshine.  This work is
 # distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -11,17 +11,21 @@
 #
 #==============================================================================
 #------------------------------------------------------------------------------
-# pack-binary.sh
+# packnext.sh
 #
 #	Create Crystal Space binary distribution packages for MacOS/X Server,
 #	OpenStep, and NextStep.
 #
-#	Run this script from the directory which contains the "cryst" source
+#	Run this script from the directory which contains the "CS" source
 #	directory.  It takes a single, optional argument which is the ambient
 #	light level for use with the cryst.cfg file.  Typically MacOS/X Server
-#	package should use 60 for this value, while OpenStep and NextStep
-#	packages should use 40.  The default, if not specified, is 40.
+#	package should use 70 for this value, while OpenStep and NextStep
+#	packages should use 50.  The default, if not specified, is 50.
 #
+# To-Do
+#	Update to support plug-in modules.  Need to include .dylib files
+#	and strip applications and plug-ins with appropriate flags for both
+#	NextStep and OpenStep.
 #------------------------------------------------------------------------------
 
 SRC=./CS
@@ -34,7 +38,7 @@ SRCFILES="autoexec.cfg blocks.cfg cryst.cfg softrndr.cfg coord MazeD.cfg \
 	metademo.cfg scf.cfg vfs.cfg"
 READMEFILES="README INSTALL.NeXT-Binary"
 
-AMBIENT=40
+AMBIENT=50
 if [ $# -gt 1 ]; then
     AMBIENT=$2
     shift;
@@ -107,11 +111,11 @@ echo ""
 
 mv ${PACK}/INSTALL.NeXT-Binary ${PACK}/INSTALL.NeXT
 echo -n "Patching INSTALL.NeXT:"
-PATTERN="./walktest \(-*[a-z]* *\)large.zip"
-REPLACE="./walktest \1data/large.zip"
+PATTERN="./walktest \(-*[a-z]* *\)large"
+REPLACE="./walktest \1data/large"
 PATCH_FILE INSTALL.NeXT "paths"
-PATTERN="large.zip"
-REPLACE="flarge.zip"
+PATTERN="large"
+REPLACE="flarge"
 PATCH_FILE INSTALL.NeXT "names "
 echo ""
 
