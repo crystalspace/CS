@@ -19,6 +19,13 @@ The history order has been reversed so that new features are at the top.
 	  with the plane of a polygon.
 	- Wyatt Miler did a few fixes to terrain engine as well.
 	- Debugging version of radiosity from Wouter Wijngaards.
+	- Eric Sunshine removed the Crystal Space-specific includes and macros
+	  which had been added to ddgutil.cpp.  In general, we want to keep
+	  the terrain files as free of CS stuff as possible so that the same
+	  code works well for Alex in DDG.  The typical place to put CS code
+	  is in ddg.h, and only within a __CRYSTAL_SPACE__ block.
+	- Eric Sunshine eliminated several compilation errors and warnings in
+	  the terrain library.
 29-May-2000
 	- Alex Pfaffe did some fixes on terrain engine. He also resynced
 	  with DDG. Various bug fixes and optimizations.
