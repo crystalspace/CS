@@ -63,13 +63,10 @@ private:
   {
   public:
     /// Create the vector
-    csPluginsVector (int iLimit, int iDelta)
-    	: csPDelArray<csPlugin> (iLimit, iDelta) {}
+    csPluginsVector (int l, int d) : csPDelArray<csPlugin> (l, d) {}
     /// Find a plugin by its address
     static int CompareAddress (csPlugin* const& Item, iComponent* const& Key)
-    {
-      return Item->Plugin == Key ? 0 : 1;
-    }
+    { return Item->Plugin == Key ? 0 : 1; }
   };
 
   /**

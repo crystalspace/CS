@@ -1,6 +1,8 @@
 /*
   Crystal Space Generic Array Template
   Copyright (C) 2003 by Matze Braun
+  Copyright (C) 2003 by Jorrit Tyberghein
+  Copyright (C) 2003 by Eric Sunshine
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -19,16 +21,108 @@
 #ifndef __CSUTIL_ARRAY_H__
 #define __CSUTIL_ARRAY_H__
 
-// hack: work around problems caused by #defining 'new'
+// Hack: Work around problems caused by #defining 'new'.
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 # undef new
 #endif
 #include <new>
 
-#ifdef CS_MEMORY_TRACKER
+#if defined(CS_MEMORY_TRACKER)
 #include "csutil/memdebug.h"
 #include <typeinfo>
 #endif
+
+// Define CSARRAY_INHIBIT_TYPED_KEYS if the compiler is too old or too buggy to
+// properly support templated functions within a templated class.  When this is
+// defined, rather than using a properly typed "key" argument, search methods
+// fall back to dealing with opaque void* for the "key" argument.  Note,
+// however, that this fact is completely hidden from the client; the client
+// simply creates csArrayCmp<> functors using correct types for the keys
+// regardless of whether the compiler actually supports this feature.  (The
+// MSVC6 compiler, for example, does support templated functions within a
+// template class but crashes and burns horribly when a function pointer or
+// functor is thrown into the mix; thus this should be defined for MSVC6.)
+#if !defined(CSARRAY_INHIBIT_TYPED_KEYS)
+
+/**
+ * A functor template which encapsulates a key and a comparison function for
+ * use with key-related csArray<> searching methods, such as FindKey() and
+ * FindSortedKey().  Being a template instaniated upon two (possibly distinct)
+ * types, this allows the searching methods to perform type-safe searches even
+ * when the search key type differs from the contained element type.  The
+ * supplied search function defines the relationship between the search key and
+ * the contained element.
+ */
+template <class T, class K>
+class csArrayCmp
+{
+public:
+  /**
+   * Type of the comparison function which compares a key against an element
+   * contained in a csArray<>.  T is the type of the contained element.  K is
+   * the type of the search key.
+   */
+  typedef int(*CF)(T const&, K const&);
+  /// Construct a functor from a search key and a comparison function.
+  csArrayCmp(K const& k, CF c) : key(k), cmp(c) {}
+  /// Construct a functor from another functor.
+  csArrayCmp(csArrayCmp const& o) : key(o.key), cmp(o.cmp) {}
+  /// Assign another functor to this one.
+  csArrayCmp& operator=(csArrayCmp const& o)
+    { key = o.key; cmp = o.cmp; return *this; }
+  /**
+   * Invoke the functor.
+   * \param r Reference to the element to which the key with which this functor
+   *   was constructed should be compared.
+   * \return Zero if the key matches the element; less-than-zero if the element
+   *   is less than the key; greater-than-zero if the element is greater than
+   *   the key.
+   */
+  int operator()(T const& r) const { return cmp(r, key); }
+  /// Return the comparison function with which this functor was constructed.
+  operator CF() const { return cmp; }
+  /// Return the key with which this functor was constructed.
+  operator K const&() const { return key; }
+private:
+  K const& key;
+  CF cmp;
+};
+
+#define csArrayTemplate(K) template <class K>
+#define csArrayCmpDecl(T1,T2) csArrayCmp<T1,T2>
+#define csArrayCmpInvoke(C,R) C(R)
+
+#else // CSARRAY_INHIBIT_TYPED_KEYS
+
+class csArrayCmpAbstract
+{
+public:
+  typedef int(*CF)(void const*, void const*);
+  virtual int operator()(void const*) const = 0;
+  virtual operator CF() const = 0;
+};
+
+template <class T, class K>
+class csArrayCmp : public csArrayCmpAbstract
+{
+public:
+  csArrayCmp(K const& k, int(*c)(T const&, K const&)) : key(k), cmp(CF(c)) {}
+  csArrayCmp(csArrayCmp const& o) : key(o.key), cmp(o.cmp) {}
+  csArrayCmp& operator=(csArrayCmp const& o)
+    { key = o.key; cmp = o.cmp; return *this; }
+  virtual int operator()(void const* p) const { return cmp(p, &key); }
+  virtual operator CF() const { return cmp; }
+  operator K const&() const { return key; }
+private:
+  K const& key;
+  CF cmp;
+};
+
+#define csArrayTemplate(K)
+#define csArrayCmpDecl(T1,T2) csArrayCmpAbstract const&
+#define csArrayCmpInvoke(C,R) C(&(R))
+
+#endif // CSARRAY_INHIBIT_TYPED_KEYS
 
 /**
  * The default element handler for csArray.
@@ -222,17 +316,9 @@ private:
 
 public:
   /**
-   * This default key comparison function is used by csArray::FindKey() in the
-   * simplest case when the key type is the same as the array element type.
+   * The default comparison function searching and sorting; assumes that both
+   * elements are of the same type, and that they can be compared with < and >.
    */
-  int DefaultCompareKey(T const& record, T const& key)
-  {
-    if (record < key) return -1;
-    else if (record > key) return 1;
-    else return 0;
-  }
-
-  /// The default element comparison function for Sort() and InsertSorted().
   static int DefaultCompare (T const &item1, T const &item2)
   {
     if (item1 < item2) return -1;
@@ -413,12 +499,11 @@ public:
   /**
    * Find an element based on some key.
    */
-  template <class K>
-  int FindKey (K const& key,
-    int (*comparekey)(T const&, K const&) = DefaultCompareKey) const
+  csArrayTemplate(K)
+  int FindKey (csArrayCmpDecl(T,K) comparekey) const
   {
     for (int i = 0 ; i < Length () ; i++)
-      if (comparekey (root[i], key) == 0)
+      if (csArrayCmpInvoke(comparekey, root[i]) == 0)
         return i;
     return -1;
   }
@@ -496,17 +581,14 @@ public:
    * Find an element based on some key, using a comparison function.
    * The array must be sorted. Returns -1 if element does not exist.
    */
-  template <class K>
-  int FindSortedKey (K const& key,
-    int (*comparekey)(T const&, K const&) = DefaultCompareKey,
-    int* candidate = 0) const
+  csArrayTemplate(K)
+  int FindSortedKey (csArrayCmpDecl(T,K) comparekey, int* candidate = 0) const
   {
     int m = 0, l = 0, r = Length () - 1;
     while (l <= r)
     {
       m = (l + r) / 2;
-      int cmp = comparekey (root [m], key);
-
+      int cmp = csArrayCmpInvoke(comparekey, root[m]);
       if (cmp == 0)
       {
         if (candidate) *candidate = -1;
@@ -576,9 +658,9 @@ public:
   /**
    * Sort array.
    */
-  void Sort (int (*compare)(T const&, T const&))
+  void Sort (int (*compare)(T const&, T const&) = DefaultCompare)
   {
-    qsort (root, Length (), sizeof (T),
+    qsort (root, Length(), sizeof(T),
       (int (*)(void const*, void const*))compare);
   }
 

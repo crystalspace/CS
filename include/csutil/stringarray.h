@@ -61,18 +61,6 @@ public:
   {
   }
 
-  static int CaseSensitiveCompareKey (char const* const& s,
-				      char const* const& k)
-  {
-    return strcmp (s, k);
-  }
-
-  static int CaseInsensitiveCompareKey (char const* const& s,
-					char const* const& k)
-  {
-    return strcasecmp (s, k);
-  }
-
   static int CaseSensitiveCompare (const char* const &item1,
 				   const char* const &item2)
   {
@@ -86,57 +74,45 @@ public:
   }
 
   /**
-   * Sort array based on case sensitive string compare function.
+   * Sort array based on comparison function.
    */
-  void Sort (int (*compare)(char const* const&, char const* const&))
+  void Sort (int(*compare)(char const* const&, char const* const&))
   {
     superclass::Sort (compare);
   }
 
   /**
-   * Sort array based on case sensitive string compare function.
+   * Sort array.
    */
   void Sort (bool case_sensitive = true)
   {
     if (case_sensitive)
-      superclass::Sort (CaseSensitiveCompare);
+      Sort (CaseSensitiveCompare);
     else
-      superclass::Sort (CaseInsensitiveCompare);
+      Sort (CaseInsensitiveCompare);
   }
 
   /**
-   * Find an element based on some key, using a csArrayCompareKeyFunction.
+   * Find an element based on some key, using a comparison function.
    * The array must be sorted. Returns -1 if element does not exist.
    */
-  int FindSortedKey (char const* key,
-    int (*comparekey)(char const* const& s, char const* const& k) =
-    CaseSensitiveCompareKey, int* candidate = 0) const
+  int FindSortedKey (csArrayCmpDecl(char const*, char const*) comparekey,
+    int* candidate = 0) const
   {
-#if !defined(COMP_VC)
-    return superclass::FindSortedKey(key, comparekey, candidate);
-#else
-    // @@@ Ugly MSVC6 work-around; duplicate superclass' implementation.  When
-    // calling superclass::FindSortedKey(), MSVC6 claims that template argument
-    // K is ambiguous: (char const*) or (char const* const&).
-    int m = 0, l = 0, r = Length () - 1;
-    while (l <= r)
-    {
-      m = (l + r) / 2;
-      int cmp = comparekey (Get(m), key);
+    return superclass::FindSortedKey(comparekey, candidate);
+  }
 
-      if (cmp == 0)
-      {
-        if (candidate) *candidate = -1;
-        return m;
-      }
-      else if (cmp < 0)
-        l = m + 1;
-      else
-        r = m - 1;
-    }
-    if (candidate) *candidate = m;
-    return -1;
-#endif
+  /**
+   * Find an element.  The array must be sorted.  Returns -1 if element does
+   * not exist.
+   */
+  int FindSortedKey (char const* key, bool case_sensitive = true,
+    int* candidate = 0) const
+  {
+    int(*cf)(char const* const&, char const* const&) =
+      case_sensitive ? CaseSensitiveCompare : CaseInsensitiveCompare;
+    return FindSortedKey(csArrayCmp<char const*, char const*>(key, cf),
+      candidate);
   }
 
   /**
@@ -181,12 +157,14 @@ public:
    * Insert a string element at a sorted position, using a specialized
    * csArrayCompareFunction. Assumes array is already sorted.
    */
+/*
   int InsertSorted (const char* const &newstr,
-    int (*compare)(char const* const&, char const* const&) =
-    CaseSensitiveCompare, int* equal_index = 0)
+    csArrayCmpDecl(char const*, char const*, compare) =
+    csArrayCmp(CaseSensitiveCompare), int* equal_index = 0)
   {
-    return superclass::InsertSorted(newstr, compare, equal_index);
+    return superclass::InsertSorted(newstr, csArrayCmp(compare), equal_index);
   }
+*/
 };
 
 #endif // __CS_STRINGARRAY_H__
