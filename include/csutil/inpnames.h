@@ -24,6 +24,9 @@
 #define CSAXIS_X -1
 #define CSAXIS_Y -2
 
+struct iEvent;
+class csEvent;
+
 /**
  * Convert a free-format string into an input event as understood by
  * the csinput library ("Ctrl+a", "alt+shift+mouse1" and so on).
