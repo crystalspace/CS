@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -44,6 +45,10 @@ csPixmap *csAnimationTemplate::GetFrameByTime(cs_time Time) {
   // this should never happen because it means that this class is buggy
   CS_ASSERT(false);
   return NULL;
+}
+
+csAnimatedPixmap *csAnimationTemplate::CreateInstance() {
+  return new csAnimatedPixmap(this);
 }
 
 /***************************************************************************/
