@@ -21,6 +21,9 @@
 #include <stdio.h>
 
 #include "sysdef.h"
+#ifdef OS_WIN32
+#include <windows.h>
+#endif
 #include "cs2d/common/graph2d.h"
 #include "isystem.h"
 #include "csutil/util.h"

@@ -19,6 +19,9 @@
 #include <stdarg.h>
 
 #include "sysdef.h"
+#ifdef OS_WIN32
+#include <windows.h>
+#endif
 #include "qint.h"
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"

@@ -19,6 +19,9 @@
 #include <stdarg.h>
 
 #include "sysdef.h"
+#ifdef OS_WIN32
+#include <windows.h>
+#endif
 #include "csutil/scf.h"
 #include "cs2d/openglcommon/glcommon2d.h"
 #include "cs3d/opengl/ogl_txtmgr.h"
