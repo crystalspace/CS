@@ -276,8 +276,10 @@ csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
 
 int csOPCODECollideSystem::GetCollisionPairCount ()
 {
+  if (!col1) return 0;
   Point* vertholder0 = col1->vertholder;
   if (!vertholder0) return 0;
+  if (!col2) return 0;
   Point* vertholder1 = col2->vertholder;
   if (!vertholder1) return 0;
   udword* indexholder0 = col1->indexholder;

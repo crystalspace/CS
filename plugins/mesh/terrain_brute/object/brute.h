@@ -23,6 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "cstool/rendermeshholder.h"
+#include "csutil/bitarray.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
 #include "csutil/thread.h"
@@ -93,6 +94,8 @@ public:
 
   csBox3 bbox;
 
+  csBitArray materialsChecked;
+  csBitArray materialsUsed;
 public:
   csTerrBlock (csTerrainObject *terr);
   ~csTerrBlock ();
@@ -120,6 +123,8 @@ public:
                  csReversibleTransform &transform);
 
   bool detach;
+
+  bool IsMaterialUsed (int index);
 };
 
 
@@ -243,8 +248,10 @@ private:
   csBlockBuilder *builder;
   csRef<csThread> buildthread;
 
-  //HeightmapFunction *terr_func;
   csRef<iTerraFormer> terraformer;
+
+  csArray<char> materialMap;
+  int materialMapW, materialMapH;
 
   csDirtyAccessArray<csRenderMesh*>* returnMeshes;
   csRenderMeshHolderSingle rmHolder;

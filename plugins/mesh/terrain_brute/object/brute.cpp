@@ -501,6 +501,8 @@ void csTerrBlock::DrawTest (iRenderView *rview, uint32 frustum_mask,
 
   for (int i=0; i<=(baseonly?0:terr->palette.Length ()); ++i)
   {
+    if ((i > 0) && !IsMaterialUsed (i - 1)) continue;
+
     bool meshCreated;
     csRenderMesh*& rm = terr->rmHolder.GetUnusedMesh (meshCreated,
       rview->GetCurrentFrameNumber ());
@@ -520,6 +522,48 @@ void csTerrBlock::DrawTest (iRenderView *rview, uint32 frustum_mask,
   }
 }
 
+bool csTerrBlock::IsMaterialUsed (int index)
+{
+  if ((materialsChecked.Length() <= (size_t)index) || 
+    (!materialsChecked[index]))
+  {
+    materialsChecked.SetLength (index + 1);
+    materialsChecked[index] = true;
+    materialsUsed.SetLength (index + 1);
+
+    csBox2 heightmapSpace (center.x - size / 2.0, 
+      center.z - size / 2.0, center.x + size / 2.0, 
+      center.z + size / 2.0);
+    const csBox2& terrRegion = terr->region;
+
+    int mmLeft = (int)floor (heightmapSpace.MinX() - terrRegion.MinX());
+    int mmTop = (int)floor (heightmapSpace.MinY() - terrRegion.MinY());
+    int mmRight = (int)ceil (((heightmapSpace.MaxX() - terrRegion.MinX()) /
+      (terrRegion.MaxX() - terrRegion.MinX())) * ((float)(terr->materialMapW - 1)));
+    int mmBottom = (int)ceil ((heightmapSpace.MaxY() - terrRegion.MinY()) /
+      (terrRegion.MaxY() - terrRegion.MinY()) * ((float)(terr->materialMapH - 1)));
+
+    bool matUsed = false;
+    for (int y = mmTop; y <= mmBottom; y++)
+    {
+      int ofs = y * terr->materialMapW;
+      for (int x = mmLeft; x <= mmRight; x++)
+      {
+	if (terr->materialMap[ofs + x] == index)
+	{
+	  matUsed = true;
+	  break;
+	}
+      }
+      if (matUsed) break;
+    }
+
+    materialsUsed[index] = matUsed;
+  }
+  return materialsUsed[index];
+}
+
+// ---------------------------------------------------------------
 
 csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
                                     iMeshObjectFactory *pFactory)
@@ -688,6 +732,10 @@ csArray<iMaterialWrapper*> csTerrainObject::GetMaterialPalette ()
 
 bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
 {
+  materialMap = data;
+  materialMapW = w;
+  materialMapH = h;
+
   csRef<iGraphics3D> g3d = 
     CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iStringSet> strings = 

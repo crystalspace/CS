@@ -31,8 +31,9 @@
 /// A one-dimensional array of bits, similar to STL bitset.
 class CS_CSUTIL_EXPORT csBitArray
 {
-private:
+public:
   typedef unsigned long store_type;
+private:
   enum
   {
     bits_per_byte = 8,
@@ -41,40 +42,56 @@ private:
 
   store_type *mpStore;
   store_type mSingleWord; // Use this buffer when mLength is 1
-  unsigned mLength;       // Length of mpStore in units of store_type
-  unsigned mNumBits;
+  size_t mLength;       // Length of mpStore in units of store_type
+  size_t mNumBits;
 
   /// Get the index and bit offset for a given bit number.
-  static unsigned GetIndex(unsigned bit_num)
+  static inline size_t GetIndex (size_t bit_num)
   {
     return bit_num / cell_size;
   }
 
-  static unsigned GetOffset(unsigned bit_num)
+  static inline size_t GetOffset (size_t bit_num)
   {
     return bit_num % cell_size;
   }
 
-  void Init(unsigned size)
+  void SetSize (size_t newSize)
   {
-    mNumBits = size;
-
-    if (size == 0)
-      mLength = 0;
+    size_t newLength;
+    if (newSize == 0)
+      newLength = 0;
     else
-      mLength = 1 + GetIndex(size - 1);
+      newLength = 1 + GetIndex (newSize - 1);
 
     // Avoid allocation if length is 1 (common case)
-    if (mLength <= 1)
-      mpStore = &mSingleWord;
+    store_type* newStore;
+    if (newLength <= 1)
+      newStore = &mSingleWord;
     else
-      mpStore = new store_type[mLength];
+      newStore = new store_type[newLength];
+    
+    if (newLength > 0)
+    {
+      if (mLength > 0)
+	memcpy (newStore, mpStore, 
+	  (MIN (mLength, newLength)) * sizeof (store_type));
+      else
+	memset (newStore, 0, newLength * sizeof (store_type));
+    }
+
+    if (mLength > 1)
+      delete mpStore;
+
+    mpStore = newStore;
+    mNumBits = newSize;
+    mLength = newLength;
   }
 
   /// Force overhang bits at the end to 0
   inline void Trim()
   {
-    unsigned extra_bits = mNumBits % cell_size;
+    size_t extra_bits = mNumBits % cell_size;
     if (mLength > 0 && extra_bits != 0)
       mpStore[mLength - 1] &= ~((~(store_type) 0) << extra_bits);
   }
@@ -87,32 +104,32 @@ public:
   {
   private:
     csBitArray &mArray;
-    unsigned  mPos;
+    size_t mPos;
   public:
     BitProxy(csBitArray &array, unsigned pos): mArray(array), mPos(pos)
     {}
 
     BitProxy &operator= (bool value)
     {
-      mArray.Set(mPos, value);
+      mArray.Set (mPos, value);
       return *this;
     }
 
     BitProxy &operator= (const BitProxy &that)
     {
-      mArray.Set(mPos, that.mArray.IsBitSet(that.mPos));
+      mArray.Set (mPos, that.mArray.IsBitSet (that.mPos));
       return *this;
     }
 
     operator bool() const
     {
-      return mArray.IsBitSet(mPos);
+      return mArray.IsBitSet (mPos);
     }
 
     bool Flip()
     {
-      mArray.FlipBit(mPos);
-      return mArray.IsBitSet(mPos);
+      mArray.FlipBit (mPos);
+      return mArray.IsBitSet (mPos);
     }
   };
 
@@ -123,18 +140,29 @@ public:
   // Constructors and destructor
   //
 
-  /// construct with <code>size</code> bits.
-  explicit csBitArray(unsigned size)
+  csBitArray () : mLength(0), mpStore(0)
   {
-    Init(size);
+    SetSize (0);
     // Clear last bits
     Trim();
   }
 
-  /// construct as duplicate of <code>that</code>.
-  csBitArray(const csBitArray &that)
+  /**
+   * Construct with a size of \a size bits.
+   */
+  explicit csBitArray(size_t size) : mLength(0), mpStore(0),
+    mSingleWord(0)
   {
-    mpStore = 0;
+    SetSize (size);
+    // Clear last bits
+    Trim();
+  }
+
+  /**
+   * construct as duplicate of \a that.
+   */
+  csBitArray (const csBitArray &that) : mLength(0), mpStore(0)
+  {
     *this = that;
   }
 
@@ -143,6 +171,19 @@ public:
   {
     if (mLength > 1)
       delete mpStore;
+  }
+
+  /// Return the number of bits store.
+  size_t Length() const
+  {
+    return mNumBits;
+  }
+
+  void SetLength (size_t newSize)
+  {
+    SetSize (newSize);
+    // Clear last bits
+    Trim ();
   }
 
   //
@@ -154,10 +195,7 @@ public:
   {
     if (this != &that)
     {
-      if (mLength > 1)
-        delete mpStore;
-
-      Init(that.mNumBits);
+      SetSize (that.mNumBits);
 
       memcpy (mpStore, that.mpStore, mLength * sizeof(store_type));
     }
@@ -165,14 +203,14 @@ public:
   }
 
   /// return bit at position <code>pos</code>
-  BitProxy operator[](unsigned pos)
+  BitProxy operator[] (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
     return BitProxy(*this, pos);
   }
 
   /// return bit at position <code>pos</code>
-  const BitProxy operator[](unsigned pos) const
+  const BitProxy operator[] (size_t pos) const
   {
     CS_ASSERT (pos < mNumBits);
     return BitProxy(CS_CONST_CAST(csBitArray&,*this), pos);
@@ -191,34 +229,34 @@ public:
   }
 
   /// not equal to other array
-  bool operator!=(const csBitArray &that) const
+  bool operator != (const csBitArray &that) const
   {
     return !(*this == that);
   }
 
   /// bit-wise and
-  csBitArray &operator&=(const csBitArray &that)
+  csBitArray& operator &= (const csBitArray &that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
-    for (unsigned i = 0; i < mLength; i++)
+    for (size_t i = 0; i < mLength; i++)
       mpStore[i] &= that.mpStore[i];
     return *this;
   }
 
   /// bit-wise or
-  csBitArray operator|=(const csBitArray &that)
+  csBitArray operator |= (const csBitArray &that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
-    for (unsigned i = 0; i < mLength; i++)
+    for (size_t i = 0; i < mLength; i++)
       mpStore[i] |= that.mpStore[i];
     return *this;
   }
 
   /// bit-wise xor
-  csBitArray operator^=(const csBitArray &that)
+  csBitArray operator ^= (const csBitArray &that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
-    for (unsigned i = 0; i < mLength; i++)
+    for (size_t i = 0; i < mLength; i++)
       mpStore[i] ^= that.mpStore[i];
     return *this;
   }
@@ -230,19 +268,19 @@ public:
   }
 
   /// bit-wise and
-  friend csBitArray operator&(const csBitArray &a1, const csBitArray &a2)
+  friend csBitArray operator& (const csBitArray &a1, const csBitArray &a2)
   {
     return csBitArray(a1) &= a2;
   }
 
   /// bit-wise or
-  friend csBitArray operator|(const csBitArray &a1, const csBitArray &a2)
+  friend csBitArray operator | (const csBitArray &a1, const csBitArray &a2)
   {
     return csBitArray(a1) |= a2;
   }
 
   /// bit-wise xor
-  friend csBitArray operator^(const csBitArray &a1, const csBitArray &a2)
+  friend csBitArray operator ^ (const csBitArray &a1, const csBitArray &a2)
   {
     return csBitArray(a1) ^= a2;
   }
@@ -258,34 +296,34 @@ public:
   }
 
   /// Set the bit at position pos to true.
-  void SetBit(unsigned pos)
+  void SetBit (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
     mpStore[GetIndex(pos)] |= 1 << GetOffset(pos);
   }
 
   /// Set the bit at position pos to false.
-  void ClearBit(unsigned pos)
+  void ClearBit (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
     mpStore[GetIndex(pos)] &= ~(1 << GetOffset(pos));
   }
 
   /// Toggle the bit at position pos.
-  void FlipBit(unsigned pos)
+  void FlipBit (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
     mpStore[GetIndex(pos)] ^= 1 << GetOffset(pos);
   }
 
   /// Set the bit at position pos to the given value.
-  void Set(unsigned pos, bool val)
+  void Set (size_t pos, bool val)
   {
     val ? SetBit(pos) : ClearBit(pos);
   }
 
   /// Returns true iff the bit at position pos is true.
-  bool IsBitSet(unsigned pos) const
+  bool IsBitSet (size_t pos) const
   {
     CS_ASSERT (pos < mNumBits);
     return (mpStore[GetIndex(pos)] & (1 << GetOffset(pos))) != 0;
@@ -320,7 +358,7 @@ public:
    * Gets quick access to the single-word (only useful when the bit
    * array <= the word size of the machine.)
    */
-  unsigned GetSingleWord()
+  store_type GetSingleWord()
   {
     return mSingleWord;
   }
@@ -329,9 +367,9 @@ public:
    * Sets the single-word very simply (only useful when the bit array <=
    * the word size of the machine.)
    */
-  void SetSingleWord(unsigned w)
+  void SetSingleWord (store_type sw)
   {
-    mSingleWord=w;
+    mSingleWord = sw;
   }
 };
 
