@@ -46,7 +46,7 @@
 
 #define NAME "Crystal"
 
-extern HINSTANCE ModuleHandle;		// defined in the COM library
+HINSTANCE ModuleHandle;
 bool ApplicationActive = true;
 int ApplicationShow;
 
@@ -68,20 +68,17 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message,WPARAM wParam, LPARAM lParam
 void SysSystemDriver::Alert (const char* s)
 {
   bool FullScreen = false;
+  int width, height, depth;
 
-  if (G2D)
-  {
-    //Check if we are in Fullscreenmode.
-    FullScreen = G2D->GetFullScreen();
-  }
+  System->GetSettings(width, height, depth, FullScreen);
 
   if (FullScreen)
   {
-    //if fullscreen mode is active, we switch to default screen, because 
-    //otherwise this message will not be seen. 
+    //if fullscreen mode is active, we switch to default screen, because
+    //otherwise this message will not be seen.
     ChangeDisplaySettings(NULL,0);
   }
-
+         
   MessageBox (NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
   debug_out (true, s);
 }
@@ -428,7 +425,7 @@ void SysSystemDriver::Loop ()
   MSG msg;
   iGraphics2DDDraw3* piG2Ddd3 = NULL;
 
-  piG2Ddd3 = QUERY_INTERFACE(System->G2D, iGraphics2DDDraw3);
+  piG2Ddd3 = QUERY_INTERFACE(System, iGraphics2DDDraw3);
 
   if (piG2Ddd3)
   {
