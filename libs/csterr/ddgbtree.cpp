@@ -602,12 +602,12 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	float zMin = tri(tva)->_cpqr[2];
 	if ( zMin < tri(tv0)->_cpqr[2]) zMin = tri(tv0)->_cpqr[2];
 	if ( zMin < tri(tv1)->_cpqr[2]) zMin = tri(tv1)->_cpqr[2];
-
+#ifdef DDG
 	if (zMin < 2*_mesh->progDist())
 		tri(tvc)->setDelay(2);
 	else if (zMin < _mesh->progDist())
 		tri(tvc)->setDelay(1);
-
+#endif
 	return tri(tvc)->priority();
 }
 
