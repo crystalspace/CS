@@ -1647,7 +1647,7 @@ wrap_csGraphics3DCaps_fog_set(lua_State *L)
 	if(!lua_isnumber(L, 2)) {
 		lua_error(L, "error in parameter type, `G3D_FOGMETHOD ' expected");
 	}
-	_arg1 = (G3D_FOGMETHOD )lua_tonumber(L, 2);
+// REDEYE: (cannot cast double to enum)	_arg1 = (G3D_FOGMETHOD )lua_tonumber(L, 2);
 }
 	lua_settop(L, 0);
     _result = (G3D_FOGMETHOD )csGraphics3DCaps_fog_set(_arg0,_arg1);

@@ -70,7 +70,7 @@ bool csLua::Initialize(iSystem* iSys)
 {
   Sys=iSys;
 
-  LUA_STATE() = lua_open(0); //Stacksize is 0, is there a better value?
+  lua_state = lua_open(0); //Stacksize is 0, is there a better value?
 
 //Userinit start
   lua_baselibopen(LUA_STATE());
