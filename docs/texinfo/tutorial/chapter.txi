@@ -1,7 +1,8 @@
 @c -*-texinfo-*-
 @node Tutorials, Libraries, Applications, Top
-@chapter Tutorials
+@chapter Tutorials and HOWTO's
 @cindex Tutorials
+@cindex HOWTO
 
 This chapter contains various tutorial to help you quickly familiarize
 yourself with the various aspects of the Crystal Space development

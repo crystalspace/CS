@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+21-Nov-2001
+	- Worked a bit on documentation. The 'intro' section in the
+	  tutorials was heavily outdated. It was still referring to
+	  the system driver for example.
+	- Moved the 'basic concepts' and 'minimum requirements' from the
+	  simple tutorial to the 'Tutorial Introduction' chapter.
 20-Nov-2001
 	- Small fix in csObject::SetName() with relation to the debugging
 	  graph.
@@ -19,9 +25,9 @@ The history order is reversed so that new features are at the top.
 	  geometrical data of the mesh object.
 	- partsys level in CVS now uses LMCACHE. This means you'll have to
 	  recalculate lighting for this.
-	- Fixed a bug in the engine. When adding polygons or curves the bounding
-	  box of the thing would be invalid. Added code to invalidate the bouding
-	  box so that it will be recalculated later.
+	- Fixed a bug in the engine. When adding polygons or curves the
+	  bounding box of the thing would be invalid. Added code to
+	  invalidate the bouding box so that it will be recalculated later.
 19-Nov-2001
 	- Added iEngine::RemoveObject() which is a conveniance function to
 	  'remove' a CS object from the engine. This will not clear the

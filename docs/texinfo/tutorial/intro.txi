@@ -1,6 +1,12 @@
 @c -*-texinfo-*-
 @node Tutorial Introduction, Tutorial Simple, Tutorials, Tutorials
 @section Developing a Crystal Space Application
+@cindex Object Registry
+@cindex Plugin Manager
+@cindex Plugin Loader
+@cindex CS_LOAD_PLUGIN
+@cindex @coce{csPluginLoader}
+@cindex @code{csInitializer}
 
 Crystal Space is a package of components and libraries which can all be useful
 for creating computer games.  Although some of the packages are intended more
@@ -48,7 +54,7 @@ the interface.  You as the user of Crystal Space will call functions that
 create the actual object, but only return the interface.  After that you can
 use the interface like a C++ object.  When you don't need it anymore, don't
 @samp{delete} it, but call @code{DecRef()}.  When you pass a pointer to the
-interface to anywhere, call @code{AddRef()} from there, and @code{DecRef()}
+interface to anywhere, call @code{IncRef()} from there, and @code{DecRef()}
 when you don't need the interface there anymore.
 
 As the user you'll only have to include a header that defines the interface,
@@ -128,112 +134,95 @@ you can find examples of plugin-to-library association in this file).
 @item
 How can I load the plug-in?
 
-To load a plug-in, you must tell the system driver two things: The first
-thing is the name of the plug-in as it was registered in the previous step.
-The second name is the so-called @dfn{functionality identifier}. This
-identifier is used to access the plug-in from your program. You could for
-example load the software graphics module with the identifier
-@samp{GFXDriver}. When you want to use the driver in your program you ask the
-system driver for the plug-in with this identifier.
+To load a plug-in, you must tell the plug-in manager the name
+of the plug-in as it was registered in the previous step. In the most
+common case you will probably use the plug-in loader to load the plug-in.
+This is a conveniance class that is able to load plug-in as specified
+in a config file, from the commandline, or as requested by the application
+programmer. In addition to loading the plug-in (the plug-in loader will
+use the plug-in manager to do that), the plug-in loader will optionally
+also register the plug-in with the @dfn{Object Registry}.
 
-Of course you may not load any driver at this identifier. For example, it
-doesn't make sense to load a sound driver and then use it as a graphics
-driver. Here we come back to the concept of @sc{scf} interfaces: All graphics
-drivers use one interface, and all sound drivers use one interface, but
-graphics and sound use different interfaces. Now you have loaded a driver
-with the @samp{GFXDriver} identifier. In your program, you actually ask for a
-plug-in that is loaded with this identifier @emph{and} implements the
-interface of the graphics driver. Alternatively, you may also search all
-identifiers for the first plug-in that implements the graphics driver's
-interface.
-
-If you loaded the sound driver instead, it doesn't implement the graphics
-interface, so you can't use it. To your program this looks like if no driver
-was loaded at all for this identifier.
+The object registry is a central location in the Crystal Space framework
+where any module can register @sc{scf} objects. The object registry is not
+only for plug-ins. It can contain any @sc{scf} object. Objects in the
+object registry also have a tag name associated with them. By convention
+the @emph{default} object for a given @sc{scf} interface will be
+added to the object registry with the tag name equal to the interface
+name. For example, a 3D renderer is a plug-in module that
+implements (among others) the @code{iGraphics3D} interface. At the same
+time there can be multiple 3D renderers in memory (for example, for
+procedural textures). But the default 3D renderer will be registered
+with the tag name 'iGraphics3D'.
 
 Note that the decision which graphics driver you use (e.g. Software or
-Direct3D) is done at the time you load the plug-in by passing the name of
+OpenGL) is done at the time you load the plug-in by passing the name of
 that driver. At the time you ask for the plug-in interface and use use it in
 your program, this does not make a difference anymore. This makes it possible
 to exchange the driver simply by loading another driver, but without changing
 your main program.
 
-The CS modules themselves look for some standard plug-ins at standardized
-identifiers. For example, the 3d engine looks for the graphics driver at the
-@samp{VideoDriver} identifier. So the engine will only work correctly if you
-use these standardized identifiers for the drivers. These are:
+The CS modules themselves will use the standard plug-ins with the
+default tag name as explained above. For example, the 3d engine looks
+for the graphics driver by looking in the object registry for an object
+with the tag 'iGraphics3D'.
 
-@table @code
-@item VFS
-the virtual file system
+Now how can you actually load the plug-in? You can either load them
+manually in the code using the @code{CS_LOAD_PLUGIN} macro or else
+you can use the plugin loader. As explained above, the plugin loader
+can load plugins specified on the commandline, a config file, or else
+explicitely requested in the code. This is done in a specific way:
+The commandline has highest priority. i.e. if the user specified the
+OpenGL video driver on the commandline then this will be the plugin that
+is loaded on the 'iGraphics3D' tag. The config file and plugins requested
+from the code are ignored then (for that tag at least). The plugins
+requested from the code have lowest priority and only serve as a default
+if neither the commandline nor the config file specified a plug-in for
+the given tag.
 
-@item VideoDriver
-standard graphics output
+There is a class called @code{csInitializer} which contains various
+conveniance routines to help initialize a Crystal Space application.
+This class also contains a routine (@code{RequestPlugins}) which will
+use the plugin loader automatically.
 
-@item SoundRender
-standard sound output
+There are several advantages to using the plugin loader as opposed
+to manually loading plug-ins using @code{CS_LOAD_PLUGIN}:
 
-@item NetDriver
-network driver
-
-@item Console
-the console
-
-@item Engine
-the 3d engine
-@end table
-
-Now how can you actually load the plug-in if you know the functionality
-identifier and the name? There are three ways how to do this (they can also
-be mixed). The first way is to add the following line in the @code{[Plugins]}
-section in your config file: @samp{@var{FuncID} = @var{PluginName}}. This is
-used in most cases.
-
-The second way is to call
-@code{@var{SystemDriver}->RequestPlugin("@var{PluginName}:@var{id}")}.
-You must do this before calling @code{YourSysDriver->Initialize()}. If you
-use this method, you may also load the plug-in without a functionality
-identifier, but then you will only be able to use it if you search through
-all identifiers for an interface. You can do this with
-@code{@var{SystemDriver}->RequestPlugin("@var{PluginName}")}.
-This way the name of the plug-in is just hardcoded, not stored in a config
-file. This can be used if you know that you will always need these plug-ins.
-
-At the time you call @code{SystemDriver->Initialize()}, all requested plugins
-are loaded. As said before, there are dependencies between the plug-ins, i.e.
-some plug-ins require others to work. Because of this, plug-ins are sorted
-in the correct order before they are loaded, so that if a plug-in is
-required by another, the first one is loaded first, no matter whether it
-appears first in the config file (or in the first @code{RequestPlugin} line).
-@emph{Note that this function does not work correctly yet, because it
-requires all plug-ins to correctly say which plug-ins they rely on, which only
-a few plug-ins do at this time.}
-
-The third possibility to load a plug-in is to use @code{CS_LOAD_PLUGIN()}.
-This can also be used after the system was initialized. The disadvantage is
-that a plug-in loaded this way is not included in the sorting process
-described above. So you must make sure that all plug-ins required by the one
-you want to load are already loaded at the time you use this. Also, if you
-use this function there is no need to query the plug-in anymore, as
-@code{CS_LOAD_PLUGIN()} directly returns the plug-in interface.
+@itemize @minus
+@item
+The plugin loader will sort all plug-ins based on dependencies.
+For example, the engine depends on a 3D rasterizer so the plugin
+loader will make sure that the engine is loaded later. If you manually
+load plugins you risk that the loading will fail because a plugin
+that it needs is not yet present.
+@item
+The user is able to override the plug-ins loaded by the plugin loader.
+He or she can modify the config file or specify an alternative
+plug-in on the commandline. There is no way to change what plugin is
+loaded using CS_LOAD_PLUGIN() unless by recompilation (unless of course
+you use some other way to read the config file and find out what plugin
+to load).
+@end itemize
 
 @item
 How can I query the plug-in interface?
 
 This is the last step before you can use the plug-in. It means that inside
-your program you ask the system driver for the plug-in interface:
-@code{CS_QUERY_PLUGIN_ID(@var{SystemDriver},@var{FuncID},@var{iInterface})}.
-This macro returns the pointer or NULL if the interface is not found. If you
-want to search through all identifiers for an interface, you can use
-@code{CS_QUERY_PLUGIN(@var{YourSysDriver},@var{iSomething})}.
+your program you ask the object registry for an object registered with
+the desired tag. The easiest way to do this is as follows:
+@code{CS_QUERY_REGISTRY(@var{object_reg},@var{iInterface})}.
+This macro will search the object registry for the default object
+implementing the given interface (i.e. the object registered with the
+tag equal to the interface name). Alternatively you can also use
+@code{CS_QUERY_REGISTRY_TAG} to get an object with a specific tag.
 
 @item
 Conclusion
 
 To sum it up, @sc{scf} is mainly used to provide common interfaces for
-@sc{dll}s, but it can also be used by statically linked libraries.  If you
+@sc{dll}s, but it can also be used by statically linked libraries. If you
 want to know how to write a plug-in yourself, you should read the complete
-@sc{scf} documentation.  @xref{SCF}.
+@sc{scf} documentation. @xref{SCF}.
 @end itemize
 
 For further information about modules and plug-in drivers, see the sections
@@ -242,3 +231,184 @@ on Libraries (@pxref{Libraries}) and plug-in modules
 
 Now that you have learned some basics about the Crystal Space environment,
 you can try writing your first program.
+
+@node TutIntro Basic Concepts, Simple Minimum Requirements, Tutorial Simple, Tutorial Simple
+@subsection Basic Crystal Space Concepts
+@cindex Basic Crystal Space Concepts
+@cindex Simple Tutorial
+
+In order to write a Crystal Space application there are several concepts
+that you need to know about. Here we will give a quick overview of all
+important things you need to know about when writing Crystal Space
+applications.
+
+@subsubheading The @sc{scf} Facility
+@cindex @sc{scf}
+
+The @sc{scf} (@pxref{SCF}) system is the core low-level memory framework
+for Crystal Space. You must initialize this before doing anything else
+(one way is to use @code{csInitializer::InitializeSCF()}).
+
+@subsubheading Reference Counting
+@cindex reference counting
+
+Reference counting is a very important part of the Crystal Space
+framework. Read the @sc{scf} (@pxref{SCF}) documentation for more information
+about this but keep in mind that it is very important and try to make
+sure you manage references correctly in your own code. Missing a
+@code{DecRef()} can cause big memory leaks.
+
+@subsubheading The Object Registry
+@cindex @code{iObjectRegistry}
+@cindex Object Registry
+
+The object registry is the central repository for all objects in
+Crystal Space. Everything in Crystal Space will use the object registry
+to get the pointer to the objects it is interested in. One of the first
+tasks a Crystal Space application has to do is to create the object
+registry. You can create an object registry using
+@code{csInitializer::CreateObjectRegistry()} or
+@code{csInitializer::CreateEnvironment()}.
+
+@subsubheading The Plugin Manager
+@cindex @code{iPluginManager}
+@cindex Plugin Manager
+
+The plugin manager is responsible for loading and unloading plugins. A
+plugin is a shared library of functions that can be loaded dynamically
+into a running Crystal Space application. On Unix a plugin has the @file{.so}
+extension and on Windows the @file{.dll} extension is used. Almost everything
+in the Crystal Space framework is itself a plugin. So the plugin manager
+is an important object. You can create the plugin manager with
+@code{csInitializer::CreatePluginManager()} or
+@code{csInitializer::CreateEnvironment()}.
+
+@subsubheading The Event Queue
+@cindex @code{iEventQueue}
+@cindex The Event Queue
+@cindex @code{iEventHandler}
+@cindex @code{cscmdProcess}
+
+Crystal Space is an event-driven framework. So a Crystal Space application
+will also be event driven. The event queue manages the event system and
+sends events to listeners. Every module or plugin that implements
+@code{iEventHandler} can register itself with the event queue so it gets
+notified when certain events happen. You can create the event queue
+with @code{csInitializer::CreateEventQueue()} or
+@code{csInitializer::CreateEnvironment()}.
+
+A Crystal Space application will also have to create an event handler
+on its own in order to actually be able to do something. This event handler
+will be responsible for actually rendering to the screen (this has to be
+done in response to the @code{cscmdProcess} event) and also catching
+keyboard/mouse input. But there is much more. To setup an event handler
+for the application you can use @code{csInitializer::SetupEventHandler()}.
+
+@subsubheading The Virtual Clock
+@cindex @code{iVirtualClock}
+@cindex Virtual Clock
+
+Most Crystal Space applications will be time-based. The virtual clock
+supports the notion of @sc{current time} and @sc{elapsed time}. It is
+called a virtual clock because it doesn't necessarily have to correspond
+with real time. A game can be paused for example. Note that a well-behaved
+game should always take elapsed time (between two frames) into consideration
+for calculating what could have happened in that time. This is important
+especially for physics calculations and also for speed of moving objects.
+You want an object moving at some speed to move with the same speed on a
+system with low framerates compared to a system with high framerates.
+The virtual clock can be created with
+@code{csInitializer::CreateVirtualClock()} or
+@code{csInitializer::CreateEnvironment()}.
+
+@subsubheading The Commandline Parser
+@cindex @code{iCommandLineParser}
+@cindex Commandline Parser
+
+The commandline parser is responsible for parsing options from
+the commandline. If you properly initialize it with @code{argc} and
+@code{argv} then you can use it to query options that have been given
+to the commandline. Several Crystal Space plugins and modules will also
+query the commandline so it is important to have this object correctly
+initialized. The commandline parser can be created with
+@code{csInitializer::CreateCommandLineParser()} or
+@code{csInitializer::CreateEnvironment()}. You can setup the commandline
+parser with @code{csInitializer::SetupCommandLineParser()}.
+
+@subsubheading The Configuration Manager
+@cindex @code{iConfigManager}
+@cindex Configuration Manager
+
+The configuration manager is responsible for reading options from configuration
+files.  All configuration files are put in a global pool which is managed by
+the configuration manager.  Several Crystal Space plugins and modules will
+query options from the configuration manager and Crystal Space applications can
+also do that if they want.
+
+You can create the configuration manager with:
+
+@code{csInitializer::CreateConfigManager()}@*
+
+@noindent
+or
+
+@code{csInitializer::CreateEnvironment()}
+
+You can setup the configuration manager with:
+
+@code{csInitializer::SetupConfigManager()}.
+
+@subsubheading The Input Drivers
+@cindex Input Drivers
+
+There are three standard input drivers included with Crystal Space:
+keyboard, mouse, and joystick. Calling
+
+@code{csInitializer::CreateInputDrivers()}
+
+@noindent
+or
+
+@code{csInitializer::CreateEnvironment()}
+
+will create the drivers and publish them via the object registry.  These
+drivers will post events to the global event queue.
+
+@subsubheading The @code{csInitializer} class
+@cindex @code{csInitializer}
+
+We already mentioned several of the functions above. This class (for which
+the definition can be found in @file{include/cstool/initapp.h}) is a
+conveniance class that can be used to help you setup everything needed to
+get the application running. In the tutorial below we will use several of the
+functions from @code{csInitializer}. This class contains only static member
+functions.
+
+@node TutIntro Minimum Requirements, Simple Header File, Simple Basic Concepts, Tutorial Simple
+@subsection Minimum Application Requirements
+@cindex Tutorial Minimum Application Requirements
+@cindex Minimum Application Requirements, Tutorial
+
+For an application to be considered a proper ``Crystal Space application'',
+there are a few requirements.  These are:
+
+@itemize @bullet
+@item
+Each and every source file (@file{.cpp}) must import @file{cssysdef.h} as the
+very first included Crystal Space header files.  @file{cssysdef.h} should never
+be included by a header file.
+
+@item
+@code{CS_IMPLEMENT_APPLICATION} needs to be put in the beginning of
+the file (@emph{after} the includes).
+
+@item
+The @code{main()} function must be declared with the following prototype:
+@example
+int main(int argc, char *argv[]);
+@end example
+@end itemize
+
+Following these guidelines will help to ensure that your application builds
+and runs on all platforms supported by Crystal Space.
+
