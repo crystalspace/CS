@@ -598,7 +598,7 @@ bool CCSWorld::WriteTextures()
     sprintf(replacename, "filename_%s", pTexture->GetTexturename());
     if (newtexfile = pEntity->GetValueOfKey(replacename) )
       pTexture->SetStored (false);
-    fprintf(m_fd, "TEXTURE '%s' (FILE (%s)",
+    fprintf(m_fd, "TEXTURE '%s' (FILE ('%s')",
                    pTexture->GetTexturename(),
 		   newtexfile?newtexfile:pTexture->GetFilename());
 
@@ -634,7 +634,7 @@ bool CCSWorld::WriteTextures()
     assert(pTexture);
 
     WriteIndent();
-    fprintf(m_fd, "MATERIAL '%s' (TEXTURE (%s))\n",
+    fprintf(m_fd, "MATERIAL '%s' (TEXTURE ('%s'))\n",
                   pTexture->GetTexturename(),
                   pTexture->GetTexturename());
   }
