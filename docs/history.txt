@@ -21,6 +21,9 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a 'delete[]' vs 'delete' bug in md2 loader.
 	- Eric Sunshine removed all remaining `csterr' library references from
 	  the project.
+	- Eric Sunshine added missing Texinfo mark-up to win32.txi.
+	- Eric Sunshine eliminated an "underfull hbox" warning from TeX in
+	  config.txi.
 6-Mar-2001
 	- Changed the following functions to work in object space instead
 	  of world space:

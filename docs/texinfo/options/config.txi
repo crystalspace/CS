@@ -56,9 +56,9 @@ This domain is intended for users who want to override the configuration from
 the lower-priority domains explained above. This is an application-neutral
 domain, so any options you define here are used by all applications.
 
-Currently this domain does not make use of multi-user environments. All
-options are stored in @file{CS/data/config/user.cfg} and are prepended with
-the string @samp{Global.}. So for example the option
+@emph{Warning}: Currently this domain does not yet properly support multi-user
+environments.  All options are stored in @file{CS/data/config/user.cfg} and are
+prepended with the string @samp{Global.}.  So for example the option
 @samp{Walktest.Settings.FPS} will be called
 @samp{Global.Walktest.Settings.FPS}.
 
@@ -68,10 +68,11 @@ application-neutral user domain, except that it is not application-neutral.
 A user may set options in this domain, for example, if he wants different
 screen size settings for different applications.
 
-This domain also does not yet make use of multi-user environments. All
-options are stored in @file{CS/data/config/user.cfg} and are prepended with
-the string @samp{ApplicationID.}, where @samp{ApplicationID} is defined in
-the user-neutral, application-specific config file (e.g. @file{walktest.cfg}).
+@emph{Warning}: Currently, this domain not yet properly support multi-user
+environments.  All options are stored in @file{CS/data/config/user.cfg} and are
+prepended with the string @samp{ApplicationID.}, where @samp{ApplicationID} is
+defined in the user-neutral, application-specific config file (e.g.
+@file{walktest.cfg}).
 
 @item
 The command-line parameters. @strong{Note}: This is not yet implemented.
