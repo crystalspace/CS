@@ -121,10 +121,7 @@ int main (int argc, char *argv[])
   int major, minor, micro;
   char *tmp_version;
 
-  /* This hangs on some systems (?)
-  system ("touch conf.cstest");
-  */
-  { FILE *fp = fopen("conf.cstest", "a"); if ( fp ) fclose(fp); }
+  { FILE *fp = fopen("conf.cstest", "a"); if (fp) fclose(fp); }
 
   /* HP/UX 9 writes to sscanf strings */
   tmp_version = my_strdup("$min_cs_version");
@@ -180,6 +177,4 @@ int main (int argc, char *argv[])
   AC_SUBST(CRYSTAL_VERSION)
   AC_SUBST(CRYSTAL_LONGVERSION)
   rm -f conf.cstest
-  # "If sex was gpl, everyone would want to join in" -- Diablo-D3
 ])
-
