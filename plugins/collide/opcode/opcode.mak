@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/collide/opcode
+vpath %.cpp $(SRCDIR)/plugins/collide/opcode
 
 ifeq ($(USE_PLUGINS),yes)
   OPCODE = $(OUTDLL)/opcode$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(OPCODE)
 endif
 
-INC.OPCODE = $(wildcard plugins/collide/opcode/*.h)
-SRC.OPCODE = $(wildcard plugins/collide/opcode/*.cpp)
+INC.OPCODE = $(wildcard $(addprefix $(SRCDIR)/,plugins/collide/opcode/*.h))
+SRC.OPCODE = $(wildcard $(addprefix $(SRCDIR)/,plugins/collide/opcode/*.cpp))
 OBJ.OPCODE = $(addprefix $(OUT)/,$(notdir $(SRC.OPCODE:.cpp=$O)))
 DEP.OPCODE = CSGEOM CSUTIL CSSYS CSUTIL
 

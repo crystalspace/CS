@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/impexp/spr
+vpath %.cpp $(SRCDIR)/plugins/mesh/impexp/spr
 
 ifeq ($(USE_PLUGINS),yes)
   SPRIE = $(OUTDLL)/sprie$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SPRIE)
 endif
 
-INC.SPRIE = $(wildcard plugins/mesh/impexp/spr/*.h)
-SRC.SPRIE = $(wildcard plugins/mesh/impexp/spr/*.cpp)
+INC.SPRIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/spr/*.h))
+SRC.SPRIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/spr/*.cpp))
 OBJ.SPRIE = $(addprefix $(OUT)/,$(notdir $(SRC.SPRIE:.cpp=$O)))
 DEP.SPRIE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL CSUTIL CSGEOM
 

@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/net/driver/socket
+vpath %.cpp $(SRCDIR)/plugins/net/driver/socket
 
 ifeq ($(USE_PLUGINS),yes)
   CSSOCKET = $(OUTDLL)/cssocket$(DLL)
@@ -40,8 +40,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSSOCKET)
 endif
 
-INC.CSSOCKET = $(wildcard plugins/net/driver/socket/*.h)
-SRC.CSSOCKET = $(wildcard plugins/net/driver/socket/*.cpp)
+INC.CSSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/socket/*.h))
+SRC.CSSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/socket/*.cpp))
 OBJ.CSSOCKET = $(addprefix $(OUT)/,$(notdir $(SRC.CSSOCKET:.cpp=$O)))
 DEP.CSSOCKET = CSUTIL CSSYS CSUTIL
 

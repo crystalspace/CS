@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/render3d/shaderplugins/glshader_cg
+vpath %.cpp $(SRCDIR)/plugins/video/render3d/shaderplugins/glshader_cg
 
 ifeq ($(USE_PLUGINS),yes)
   GLSHADER_CG = $(OUTDLL)/glshader_cg$(DLL)
@@ -71,7 +71,7 @@ clean: glshader_cgclean
 
 glshader_cg: $(OUTDIRS) $(GLSHADER_CG)
 
-$(OUT)/%$O: plugins/video/render3d/shaderpluginsglshader_cg/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shaderpluginsglshader_cg/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(CG.CFLAGS)
 
 $(GLSHADER_CG): $(OBJ.GLSHADER_CG) $(LIB.GLSHADER_CG)

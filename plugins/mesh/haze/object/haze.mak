@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/haze/object
+vpath %.cpp $(SRCDIR)/plugins/mesh/haze/object
 
 ifeq ($(USE_PLUGINS),yes)
   HAZE = $(OUTDLL)/haze$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(HAZE)
 endif
 
-INC.HAZE = $(wildcard plugins/mesh/haze/object/*.h)
-SRC.HAZE = $(wildcard plugins/mesh/haze/object/*.cpp)
+INC.HAZE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/haze/object/*.h))
+SRC.HAZE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/haze/object/*.cpp))
 OBJ.HAZE = $(addprefix $(OUT)/,$(notdir $(SRC.HAZE:.cpp=$O)))
 DEP.HAZE = CSGEOM CSUTIL CSSYS CSUTIL
 

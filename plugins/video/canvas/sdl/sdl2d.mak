@@ -46,8 +46,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SDL2D)
 endif
 
-INC.SDL2D = $(wildcard plugins/video/canvas/sdl/*.h   $(INC.COMMON.DRV2D))
-SRC.SDL2D = $(wildcard plugins/video/canvas/sdl/*.cpp $(SRC.COMMON.DRV2D))
+INC.SDL2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/sdl/*.h   $(INC.COMMON.DRV2D)))
+SRC.SDL2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/sdl/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.SDL2D = $(addprefix $(OUT)/,$(notdir $(SRC.SDL2D:.cpp=$O)))
 DEP.SDL2D = CSUTIL CSSYS CSUTIL CSGEOM
 
@@ -65,7 +65,7 @@ ifeq ($(MAKESECTION),targets)
 
 sdl2d: $(OUTDIRS) $(SDL2D)
 
-$(OUT)/%$O: plugins/video/canvas/sdl/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/sdl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SDL2D)
 
 $(SDL2D): $(OBJ.SDL2D) $(LIB.SDL2D)

@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/loader/iff plugins/sound/loader/common
+vpath %.cpp $(SRCDIR)/plugins/sound/loader/iff $(SRCDIR)/plugins/sound/loader/common
 
 ifeq ($(USE_PLUGINS),yes)
   SNDIFF = $(OUTDLL)/sndiff$(DLL)
@@ -39,10 +39,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDIFF)
 endif
 
-INC.SNDIFF = $(wildcard plugins/sound/loader/iff/*.h) \
-  $(wildcard plugins/sound/loader/common/*.h)
-SRC.SNDIFF = $(wildcard plugins/sound/loader/iff/*.cpp) \
-  $(wildcard plugins/sound/loader/common/*.cpp)
+INC.SNDIFF = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/sound/loader/iff/*.h plugins/sound/loader/common/*.h))
+SRC.SNDIFF = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/sound/loader/iff/*.cpp plugins/sound/loader/common/*.cpp))
 OBJ.SNDIFF = $(addprefix $(OUT)/,$(notdir $(SRC.SNDIFF:.cpp=$O)))
 DEP.SNDIFF = CSUTIL CSSYS CSUTIL
 

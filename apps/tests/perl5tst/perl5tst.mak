@@ -31,8 +31,8 @@ ifeq ($(MAKESECTION),postdefines)
 PERL5TEST.EXE = perl5tst$(EXE)
 DIR.PERL5TEST = apps/tests/perl5tst
 OUT.PERL5TEST = $(OUT)/$(DIR.PERL5TEST)
-INC.PERL5TEST = $(wildcard $(DIR.PERL5TEST)/*.h)
-SRC.PERL5TEST = $(wildcard $(DIR.PERL5TEST)/*.cpp)
+INC.PERL5TEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PERL5TEST)/*.h))
+SRC.PERL5TEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PERL5TEST)/*.cpp))
 OBJ.PERL5TEST = \
   $(addprefix $(OUT.PERL5TEST)/,$(notdir $(SRC.PERL5TEST:.cpp=$O)))
 DEP.PERL5TEST = CSTOOL CSUTIL CSSYS
@@ -54,7 +54,7 @@ ifeq ($(MAKESECTION),targets)
 build.perl5test: $(OUTDIRS) $(PERL5TEST.EXE)
 clean: perl5testclean
 
-$(OUT.PERL5TEST)/%$O: $(DIR.PERL5TEST)/%.cpp
+$(OUT.PERL5TEST)/%$O: $(SRCDIR)/$(DIR.PERL5TEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(PERL5TEST.EXE): $(OBJ.PERL5TEST) $(LIB.PERL5TEST)

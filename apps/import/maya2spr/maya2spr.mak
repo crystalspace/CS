@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 MAYA2SPR.EXE = maya2spr$(EXE.CONSOLE)
 DIR.MAYA2SPR = apps/import/maya2spr
 OUT.MAYA2SPR = $(OUT)/$(DIR.MAYA2SPR)
-INC.MAYA2SPR = $(wildcard $(DIR.MAYA2SPR)/*.h )
-SRC.MAYA2SPR = $(wildcard $(DIR.MAYA2SPR)/*.cpp )
+INC.MAYA2SPR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MAYA2SPR)/*.h ))
+SRC.MAYA2SPR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MAYA2SPR)/*.cpp ))
 OBJ.MAYA2SPR = $(addprefix $(OUT.MAYA2SPR)/,$(notdir $(SRC.MAYA2SPR:.cpp=$O)))
 DEP.MAYA2SPR = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MAYA2SPR = $(foreach d,$(DEP.MAYA2SPR),$($d.LIB))
@@ -54,7 +54,7 @@ all: $(MAYA2SPR.EXE)
 build.maya2spr: $(OUTDIRS) $(MAYA2SPR.EXE)
 clean: maya2sprclean
 
-$(OUT.MAYA2SPR)/%$O: $(DIR.MAYA2SPR)/%.cpp
+$(OUT.MAYA2SPR)/%$O: $(SRCDIR)/$(DIR.MAYA2SPR)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(MAYA2SPR.EXE): $(OBJ.MAYA2SPR) $(LIB.MAYA2SPR)

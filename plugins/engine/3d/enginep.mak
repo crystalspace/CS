@@ -24,7 +24,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/engine/3d
+vpath %.cpp $(SRCDIR)/plugins/engine/3d
 
 ifeq ($(USE_PLUGINS),yes)
   ENGINE = $(OUTDLL)/engine$(DLL)
@@ -37,8 +37,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(ENGINE)
 endif
 
-INC.ENGINE = $(wildcard plugins/engine/3d/*.h)
-SRC.ENGINE = $(wildcard plugins/engine/3d/*.cpp)
+INC.ENGINE = $(wildcard $(addprefix $(SRCDIR)/,plugins/engine/3d/*.h))
+SRC.ENGINE = $(wildcard $(addprefix $(SRCDIR)/,plugins/engine/3d/*.cpp))
 OBJ.ENGINE = $(addprefix $(OUT)/,$(notdir $(SRC.ENGINE:.cpp=$O)))
 DEP.ENGINE = CSENGINE CSTOOL CSGFX CSGEOM CSUTIL CSSYS
 

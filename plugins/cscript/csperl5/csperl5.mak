@@ -39,8 +39,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSPERL5)
 endif
 
-INC.CSPERL5 = $(wildcard plugins/cscript/csperl5/*.h)
-SRC.CSPERL5 = $(wildcard plugins/cscript/csperl5/*.cpp)
+INC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.h))
+SRC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.cpp))
 OBJ.CSPERL5 = $(addprefix $(OUT)/,$(notdir $(SRC.CSPERL5:.cpp=$O)))
 DEP.CSPERL5 = CSTOOL CSGEOM CSSYS CSUTIL CSSYS CSUTIL
 
@@ -149,7 +149,7 @@ $(CSPERL5): $(OBJ.CSPERL5) $(LIB.CSPERL5) $(PERLXSI.O) $(SWIG.PERL5.DLL)
 	$(DO.PLUGIN.CORE) $(PERL5.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
 
-$(OUT)/%$O: plugins/cscript/csperl5/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/cscript/csperl5/%.cpp
 	$(DO.COMPILE.CPP) $(PERL5.CFLAGS)
 
 $(PERLXSI.C): $(PERLXSI.DEP) $(PERLXSI.DIR)

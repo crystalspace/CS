@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/stars/persist/standard
+vpath %.cpp $(SRCDIR)/plugins/mesh/stars/persist/standard
 
 ifeq ($(USE_PLUGINS),yes)
   STARLDR = $(OUTDLL)/starldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(STARLDR)
 endif
 
-INC.STARLDR = $(wildcard plugins/mesh/stars/persist/standard/*.h)
-SRC.STARLDR = $(wildcard plugins/mesh/stars/persist/standard/*.cpp)
+INC.STARLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/stars/persist/standard/*.h))
+SRC.STARLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/stars/persist/standard/*.cpp))
 OBJ.STARLDR = $(addprefix $(OUT)/,$(notdir $(SRC.STARLDR:.cpp=$O)))
 DEP.STARLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

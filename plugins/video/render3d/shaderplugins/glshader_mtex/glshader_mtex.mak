@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/render3d/shaderplugins/glshader_mtex
+vpath %.cpp $(SRCDIR)/plugins/video/render3d/shaderplugins/glshader_mtex
 
 ifneq (,$(strip $(LIBS.OPENGL.SYSTEM)))
   LIB.GLSHADER_MTEX.LOCAL += $(LIBS.OPENGL.SYSTEM)
@@ -93,7 +93,7 @@ clean: glshader_mtexclean
 
 glshader_mtex: $(OUTDIRS) $(GLSHADER_MTEX)
 
-$(OUT)/%$O: plugins/video/render3d/shaderpluginsglshader_mtex/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shaderpluginsglshader_mtex/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.GLSHADER_MTEX)
 
 $(GLSHADER_MTEX): $(OBJ.GLSHADER_MTEX) $(LIB.GLSHADER_MTEX)

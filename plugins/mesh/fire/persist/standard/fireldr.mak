@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/fire/persist/standard
+vpath %.cpp $(SRCDIR)/plugins/mesh/fire/persist/standard
 
 ifeq ($(USE_PLUGINS),yes)
   FIRELDR = $(OUTDLL)/fireldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(FIRELDR)
 endif
 
-INC.FIRELDR = $(wildcard plugins/mesh/fire/persist/standard/*.h)
-SRC.FIRELDR = $(wildcard plugins/mesh/fire/persist/standard/*.cpp)
+INC.FIRELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/persist/standard/*.h))
+SRC.FIRELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/persist/standard/*.cpp))
 OBJ.FIRELDR = $(addprefix $(OUT)/,$(notdir $(SRC.FIRELDR:.cpp=$O)))
 DEP.FIRELDR = CSGEOM CSUTIL CSSYS CSUTIL
 

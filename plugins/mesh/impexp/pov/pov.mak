@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/impexp/pov
+vpath %.cpp $(SRCDIR)/plugins/mesh/impexp/pov
 
 ifeq ($(USE_PLUGINS),yes)
   POVIE = $(OUTDLL)/povie$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(POVIE)
 endif
 
-INC.POVIE = $(wildcard plugins/mesh/impexp/pov/*.h)
-SRC.POVIE = $(wildcard plugins/mesh/impexp/pov/*.cpp)
+INC.POVIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/pov/*.h))
+SRC.POVIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/pov/*.cpp))
 OBJ.POVIE = $(addprefix $(OUT)/,$(notdir $(SRC.POVIE:.cpp=$O)))
 DEP.POVIE = CSGEOM CSUTIL CSSYS CSUTIL
 

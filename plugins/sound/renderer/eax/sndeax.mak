@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/renderer/eax
+vpath %.cpp $(SRCDIR)/plugins/sound/renderer/eax
 
 ifeq ($(USE_PLUGINS),yes)
   SNDEAX = $(OUTDLL)/sndeax$(DLL)
@@ -39,9 +39,9 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDEAX)
 endif
 
-INC.SNDEAX = $(wildcard plugins/sound/renderer/eax/*.h) \
+INC.SNDEAX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/renderer/eax/*.h) \)
   $(wildcard plugins/sound/renderer/common/*.h)
-SRC.SNDEAX = $(wildcard plugins/sound/renderer/eax/*.cpp) \
+SRC.SNDEAX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/renderer/eax/*.cpp) \)
   $(wildcard plugins/sound/renderer/common/*.cpp)
 OBJ.SNDEAX = $(addprefix $(OUT)/,$(notdir $(SRC.SNDEAX:.cpp=$O)))
 DEP.SNDEAX = CSUTIL CSGEOM CSSYS CSUTIL

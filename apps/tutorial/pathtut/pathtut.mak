@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 PATHTUT.EXE = pathtut$(EXE)
 DIR.PATHTUT = apps/tutorial/pathtut
 OUT.PATHTUT = $(OUT)/$(DIR.PATHTUT)
-INC.PATHTUT = $(wildcard $(DIR.PATHTUT)/*.h )
-SRC.PATHTUT = $(wildcard $(DIR.PATHTUT)/*.cpp )
+INC.PATHTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PATHTUT)/*.h ))
+SRC.PATHTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PATHTUT)/*.cpp ))
 OBJ.PATHTUT = $(addprefix $(OUT.PATHTUT)/,$(notdir $(SRC.PATHTUT:.cpp=$O)))
 DEP.PATHTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.PATHTUT = $(foreach d,$(DEP.PATHTUT),$($d.LIB))
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 build.pathtut: $(OUTDIRS) $(PATHTUT.EXE)
 clean: pathtutclean
 
-$(OUT.PATHTUT)/%$O: $(DIR.PATHTUT)/%.cpp
+$(OUT.PATHTUT)/%$O: $(SRCDIR)/$(DIR.PATHTUT)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(PATHTUT.EXE): $(DEP.EXE) $(OBJ.PATHTUT) $(LIB.PATHTUT)

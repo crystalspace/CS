@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/loader/dds
+vpath %.cpp $(SRCDIR)/plugins/video/loader/dds
 
 ifeq ($(USE_PLUGINS),yes)
   CSDDSIMG = $(OUTDLL)/csddsimg$(DLL)
@@ -39,8 +39,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSDDSIMG)
 endif
 
-INC.CSDDSIMG = $(wildcard plugins/video/loader/dds/*.h)
-SRC.CSDDSIMG = $(wildcard plugins/video/loader/dds/*.cpp)
+INC.CSDDSIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/dds/*.h))
+SRC.CSDDSIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/dds/*.cpp))
 
 OBJ.CSDDSIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSDDSIMG:.cpp=$O)))
 DEP.CSDDSIMG = CSUTIL CSSYS CSGFX CSUTIL

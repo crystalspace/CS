@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/spiral/persist/standard
+vpath %.cpp $(SRCDIR)/plugins/mesh/spiral/persist/standard
 
 ifeq ($(USE_PLUGINS),yes)
   SPIRLDR = $(OUTDLL)/spirldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SPIRLDR)
 endif
 
-INC.SPIRLDR = $(wildcard plugins/mesh/spiral/persist/standard/*.h)
-SRC.SPIRLDR = $(wildcard plugins/mesh/spiral/persist/standard/*.cpp)
+INC.SPIRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spiral/persist/standard/*.h))
+SRC.SPIRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spiral/persist/standard/*.cpp))
 OBJ.SPIRLDR = $(addprefix $(OUT)/,$(notdir $(SRC.SPIRLDR:.cpp=$O)))
 DEP.SPIRLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

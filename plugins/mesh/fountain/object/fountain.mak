@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/fountain/object plugins/mesh/partgen
+vpath %.cpp $(SRCDIR)/plugins/mesh/fountain/object $(SRCDIR)/plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
   FOUNTAIN = $(OUTDLL)/fountain$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(FOUNTAIN)
 endif
 
-INC.FOUNTAIN = $(wildcard plugins/mesh/fountain/object/*.h plugins/mesh/partgen/*.h)
-SRC.FOUNTAIN = $(wildcard plugins/mesh/fountain/object/*.cpp plugins/mesh/partgen/*.cpp)
+INC.FOUNTAIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fountain/object/*.h plugins/mesh/partgen/*.h))
+SRC.FOUNTAIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fountain/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.FOUNTAIN = $(addprefix $(OUT)/,$(notdir $(SRC.FOUNTAIN:.cpp=$O)))
 DEP.FOUNTAIN = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 

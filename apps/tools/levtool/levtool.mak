@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 LEVTOOL.EXE = levtool$(EXE.CONSOLE)
 DIR.LEVTOOL = apps/tools/levtool
 OUT.LEVTOOL = $(OUT)/$(DIR.LEVTOOL)
-INC.LEVTOOL = $(wildcard $(DIR.LEVTOOL)/*.h )
-SRC.LEVTOOL = $(wildcard $(DIR.LEVTOOL)/*.cpp )
+INC.LEVTOOL = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.LEVTOOL)/*.h ))
+SRC.LEVTOOL = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.LEVTOOL)/*.cpp ))
 OBJ.LEVTOOL = $(addprefix $(OUT.LEVTOOL)/,$(notdir $(SRC.LEVTOOL:.cpp=$O)))
 DEP.LEVTOOL = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.LEVTOOL = $(foreach d,$(DEP.LEVTOOL),$($d.LIB))
@@ -43,7 +43,7 @@ MSVC.DSP += LEVTOOL
 DSP.LEVTOOL.NAME = levtool
 DSP.LEVTOOL.TYPE = appcon
 
-#$(LEVTOOL.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
+#$(LEVTOOL.EXE).WINRSRC = $(SRCDIR)/libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -56,7 +56,7 @@ all: $(LEVTOOL.EXE)
 build.levtool: $(OUTDIRS) $(LEVTOOL.EXE)
 clean: levtoolclean
 
-$(OUT.LEVTOOL)/%$O: $(DIR.LEVTOOL)/%.cpp
+$(OUT.LEVTOOL)/%$O: $(SRCDIR)/$(DIR.LEVTOOL)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(LEVTOOL.EXE): $(DEP.EXE) $(OBJ.LEVTOOL) $(LIB.LEVTOOL)

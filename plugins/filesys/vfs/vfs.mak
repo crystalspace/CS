@@ -43,11 +43,11 @@ else
   TO_INSTALL.STATIC_LIBS += $(VFS)
 endif
 
-INC.VFS = $(wildcard plugins/filesys/vfs/*.h)
-SRC.VFS = $(wildcard plugins/filesys/vfs/*.cpp)
+INC.VFS = $(wildcard $(addprefix $(SRCDIR)/,plugins/filesys/vfs/*.h))
+SRC.VFS = $(wildcard $(addprefix $(SRCDIR)/,plugins/filesys/vfs/*.cpp))
 OBJ.VFS = $(addprefix $(OUT)/,$(notdir $(SRC.VFS:.cpp=$O)))
 DEP.VFS = CSSYS CSUTIL CSSYS
-CFG.VFS = vfs.cfg
+CFG.VFS = $(SRCDIR)/vfs.cfg
 
 TO_INSTALL.ROOT += $(CFG.VFS)
 
@@ -67,7 +67,7 @@ clean: vfsclean
 
 vfs: $(OUTDIRS) $(VFS)
 
-$(OUT)/%$O: plugins/filesys/vfs/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/filesys/vfs/%.cpp
 	$(DO.COMPILE.CPP) $(ZLIB.CFLAGS)
 
 $(VFS): $(OBJ.VFS) $(LIB.VFS)

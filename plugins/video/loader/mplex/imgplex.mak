@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/loader/mplex
+vpath %.cpp $(SRCDIR)/plugins/video/loader/mplex
 
 ifeq ($(USE_PLUGINS),yes)
   IMGPLEX = $(OUTDLL)/imgplex$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(IMGPLEX)
 endif
 
-INC.IMGPLEX = $(wildcard plugins/video/loader/mplex/*.h)
-SRC.IMGPLEX = $(wildcard plugins/video/loader/mplex/*.cpp)
+INC.IMGPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/mplex/*.h))
+SRC.IMGPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/mplex/*.cpp))
 OBJ.IMGPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.IMGPLEX:.cpp=$O)))
 DEP.IMGPLEX = CSUTIL CSSYS CSGFX CSUTIL
 

@@ -44,8 +44,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SVGA2D)
 endif
 
-INC.SVGA2D = $(wildcard plugins/video/canvas/svgalib/*.h   $(INC.COMMON.DRV2D))
-SRC.SVGA2D = $(wildcard plugins/video/canvas/svgalib/*.cpp $(SRC.COMMON.DRV2D))
+INC.SVGA2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/svgalib/*.h   $(INC.COMMON.DRV2D)))
+SRC.SVGA2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/svgalib/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.SVGA2D = $(addprefix $(OUT)/,$(notdir $(SRC.SVGA2D:.cpp=$O)))
 DEP.SVGA2D = CSUTIL CSSYS CSUTIL
 
@@ -58,7 +58,7 @@ ifeq ($(MAKESECTION),targets)
 
 svgalib2d: $(OUTDIRS) $(SVGA2D)
 
-$(OUT)/%$O: plugins/video/canvas/svgalib/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/svgalib/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SVGA2D)
 
 $(SVGA2D): $(OBJ.SVGA2D) $(LIB.SVGA2D)

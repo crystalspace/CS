@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/stdrep
+vpath %.cpp $(SRCDIR)/plugins/stdrep
 
 ifeq ($(USE_PLUGINS),yes)
   STDREP = $(OUTDLL)/stdrep$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(STDREP)
 endif
 
-INC.STDREP = $(wildcard plugins/stdrep/*.h)
-SRC.STDREP = $(wildcard plugins/stdrep/*.cpp)
+INC.STDREP = $(wildcard $(addprefix $(SRCDIR)/,plugins/stdrep/*.h))
+SRC.STDREP = $(wildcard $(addprefix $(SRCDIR)/,plugins/stdrep/*.cpp))
 OBJ.STDREP = $(addprefix $(OUT)/,$(notdir $(SRC.STDREP:.cpp=$O)))
 DEP.STDREP = CSGEOM CSUTIL CSSYS CSUTIL
 

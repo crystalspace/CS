@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/physics/loader
+vpath %.cpp $(SRCDIR)/plugins/physics/loader
 
 ifeq ($(USE_PLUGINS),yes)
   physldr = $(OUTDLL)/physldr$(DLL)

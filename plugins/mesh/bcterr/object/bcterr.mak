@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/bcterr/object
+vpath %.cpp $(SRCDIR)/plugins/mesh/bcterr/object
 
 ifeq ($(USE_PLUGINS),yes)
   BCTERR = $(OUTDLL)/bcterr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(BCTERR)
 endif
 
-INC.BCTERR = $(wildcard plugins/mesh/bcterr/object/*.h)
-SRC.BCTERR = $(wildcard plugins/mesh/bcterr/object/*.cpp)
+INC.BCTERR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/object/*.h))
+SRC.BCTERR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/object/*.cpp))
 OBJ.BCTERR = $(addprefix $(OUT)/,$(notdir $(SRC.BCTERR:.cpp=$O)))
 DEP.BCTERR = CSGEOM CSUTIL CSSYS CSUTIL
 CFLAGS.BCTERR = $(CFLAGS.I)plugins/mesh/bcterr/object
@@ -57,7 +57,7 @@ clean: bcterrclean
 bcterrclean:
 	-$(RM) $(BCTERR) $(OBJ.BCTERR)
 
-$(OUT)/%$O: plugins/mesh/bcterr/object/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/mesh/bcterr/object/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.BCTERR)
 
 # Some (broken) versions of GNU make appear to be sensitive to the order in

@@ -29,12 +29,12 @@ ifeq ($(MAKESECTION),postdefines)
 MAP2CS.EXE = map2cs$(EXE.CONSOLE)
 DIR.MAP2CS = apps/import/map2cs
 OUT.MAP2CS = $(OUT)/$(DIR.MAP2CS)
-INC.MAP2CS = $(wildcard $(DIR.MAP2CS)/*.h )
-SRC.MAP2CS = $(wildcard $(DIR.MAP2CS)/*.cpp )
+INC.MAP2CS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MAP2CS)/*.h ))
+SRC.MAP2CS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MAP2CS)/*.cpp ))
 OBJ.MAP2CS = $(addprefix $(OUT.MAP2CS)/,$(notdir $(SRC.MAP2CS:.cpp=$O)))
 DEP.MAP2CS = CSTOOL CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MAP2CS = $(foreach d,$(DEP.MAP2CS),$($d.LIB))
-CFG.MAP2CS = data/config/map2cs.cfg
+CFG.MAP2CS = $(SRCDIR)/data/config/map2cs.cfg
 
 OUTDIRS += $(OUT.MAP2CS)
 
@@ -57,7 +57,7 @@ all: $(MAP2CS.EXE)
 build.map2cs: $(OUTDIRS) $(MAP2CS.EXE)
 clean: map2csclean
 
-$(OUT.MAP2CS)/%$O: $(DIR.MAP2CS)/%.cpp
+$(OUT.MAP2CS)/%$O: $(SRCDIR)/$(DIR.MAP2CS)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(MAP2CS.EXE): $(OBJ.MAP2CS) $(LIB.MAP2CS)

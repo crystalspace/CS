@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 CSFEDIT.EXE=csfedit$(EXE)
 DIR.CSFEDIT = apps/tools/csfedit
 OUT.CSFEDIT = $(OUT)/$(DIR.CSFEDIT)
-INC.CSFEDIT = $(wildcard $(DIR.CSFEDIT)/*.h )
-SRC.CSFEDIT = $(wildcard $(DIR.CSFEDIT)/*.cpp )
+INC.CSFEDIT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSFEDIT)/*.h ))
+SRC.CSFEDIT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSFEDIT)/*.cpp ))
 OBJ.CSFEDIT = $(addprefix $(OUT.CSFEDIT)/,$(notdir $(SRC.CSFEDIT:.cpp=$O)))
 DEP.CSFEDIT = CSGFX CSWS CSTOOL CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSFEDIT = $(foreach d,$(DEP.CSFEDIT),$($d.LIB))
@@ -54,7 +54,7 @@ all: $(CSFEDIT.EXE)
 build.csfedit: $(OUTDIRS) $(CSFEDIT.EXE)
 clean: csfeditclean
 
-$(OUT.CSFEDIT)/%$O: $(DIR.CSFEDIT)/%.cpp
+$(OUT.CSFEDIT)/%$O: $(SRCDIR)/$(DIR.CSFEDIT)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(CSFEDIT.EXE): $(DEP.EXE) $(OBJ.CSFEDIT) $(LIB.CSFEDIT)

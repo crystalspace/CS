@@ -44,8 +44,8 @@ else
   SCF.STATIC += oglglide
 endif
 
-INC.OGLGLIDE = $(wildcard plugins/video/canvas/openglx/glide/*.h)
-SRC.OGLGLIDE = $(wildcard plugins/video/canvas/openglx/glide/*.cpp)
+INC.OGLGLIDE = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/glide/*.h))
+SRC.OGLGLIDE = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/glide/*.cpp))
 OBJ.OGLGLIDE = $(addprefix $(OUT)/,$(notdir $(SRC.OGLGLIDE:.cpp=$O)))
 DEP.OGLGLIDE = CSUTIL CSSYS
 
@@ -58,7 +58,7 @@ ifeq ($(MAKESECTION),targets)
 
 oglglide: $(OUTDIRS) $(OGLGLIDE)
 
-$(OUT)/%$O: plugins/video/canvas/openglx/glide/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/openglx/glide/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.OGLGLIDE)
 
 $(OGLGLIDE): $(OBJ.OGLGLIDE) $(LIB.OGLGLIDE)

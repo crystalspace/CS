@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/driver/coreaudio
+vpath %.cpp $(SRCDIR)/plugins/sound/driver/coreaudio
 
 # The CoreAudio sound driver
 ifeq ($(USE_PLUGINS),yes)
@@ -43,7 +43,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CASNDDRV)
 endif
 
-SRC.CASNDDRV = $(wildcard plugins/sound/driver/coreaudio/*.cpp)
+SRC.CASNDDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/coreaudio/*.cpp))
 OBJ.CASNDDRV = $(addprefix $(OUT)/,$(notdir $(SRC.CASNDDRV:.cpp=$O)))
 LIB.CASNDDRV.COREAUDIO = -framework CoreAudio
 DEP.CASNDDRV = CSUTIL CSSYS CSUTIL

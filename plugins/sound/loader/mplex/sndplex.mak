@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/loader/mplex plugins/sound/loader/common
+vpath %.cpp $(SRCDIR)/plugins/sound/loader/mplex plugins/sound/loader/common
 
 ifeq ($(USE_PLUGINS),yes)
   SNDPLEX = $(OUTDLL)/sndplex$(DLL)
@@ -39,11 +39,11 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDPLEX)
 endif
 
-INC.SNDPLEX = $(wildcard plugins/sound/loader/mplex/*.h)
-SRC.SNDPLEX = $(wildcard plugins/sound/loader/mplex/*.cpp)
+INC.SNDPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mplex/*.h))
+SRC.SNDPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mplex/*.cpp))
 OBJ.SNDPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.SNDPLEX:.cpp=$O)))
 DEP.SNDPLEX = CSUTIL CSSYS CSUTIL
-CFG.SNDPLEX = data/config/sound.cfg
+CFG.SNDPLEX = $(SRCDIR)/data/config/sound.cfg
 
 TO_INSTALL.CONFIG += $(CFG.SNDPLEX)
 

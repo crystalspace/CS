@@ -26,11 +26,11 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/csgfx
+vpath %.cpp $(SRCDIR)/libs/csgfx
 
 CSGFX.LIB = $(OUT)/$(LIB_PREFIX)csgfx$(LIB_SUFFIX)
-INC.CSGFX = $(wildcard include/csgfx/*.h)
-SRC.CSGFX = $(wildcard libs/csgfx/*.cpp)
+INC.CSGFX = $(wildcard $(addprefix $(SRCDIR)/,include/csgfx/*.h))
+SRC.CSGFX = $(wildcard $(addprefix $(SRCDIR)/,libs/csgfx/*.cpp))
 OBJ.CSGFX = $(addprefix $(OUT)/,$(notdir $(SRC.CSGFX:.cpp=$O)))
 
 ifneq ($(USE_PLUGINS),yes)
@@ -44,7 +44,7 @@ TO_INSTALL.STATIC_LIBS += $(CSGFX.LIB)
 MSVC.DSP += CSGFX
 DSP.CSGFX.NAME = csgfx
 DSP.CSGFX.TYPE = library
-DSP.CSGFX.RESOURCES = libs/csgfx/mipmap.inc
+DSP.CSGFX.RESOURCES = $(SRCDIR)/libs/csgfx/mipmap.inc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

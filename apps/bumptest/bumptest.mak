@@ -29,12 +29,12 @@ ifeq ($(MAKESECTION),postdefines)
 BUMPTEST.EXE=bumptest$(EXE)
 DIR.BUMPTEST = apps/bumptest
 OUT.BUMPTEST = $(OUT)/$(DIR.BUMPTEST)
-INC.BUMPTEST = $(wildcard $(DIR.BUMPTEST)/*.h)
-SRC.BUMPTEST = $(wildcard $(DIR.BUMPTEST)/*.cpp)
+INC.BUMPTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BUMPTEST)/*.h))
+SRC.BUMPTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BUMPTEST)/*.cpp))
 OBJ.BUMPTEST = $(addprefix $(OUT.BUMPTEST)/,$(notdir $(SRC.BUMPTEST:.cpp=$O)))
 DEP.BUMPTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.BUMPTEST = $(foreach d,$(DEP.BUMPTEST),$($d.LIB))
-CFG.BUMPTEST = data/config/csbumptest.cfg
+CFG.BUMPTEST = $(SRCDIR)/data/config/csbumptest.cfg
 
 OUTDIRS += $(OUT.BUMPTEST)
 
@@ -56,7 +56,7 @@ all: $(BUMPTEST.EXE)
 build.bumptest: $(OUTDIRS) $(BUMPTEST.EXE)
 clean: bumptestclean
 
-$(OUT.BUMPTEST)/%$O: $(DIR.BUMPTEST)/%.cpp
+$(OUT.BUMPTEST)/%$O: $(SRCDIR)/$(DIR.BUMPTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(BUMPTEST.EXE): $(DEP.EXE) $(OBJ.BUMPTEST) $(LIB.BUMPTEST)

@@ -32,8 +32,8 @@ ifeq ($(MAKESECTION),postdefines)
 EVENTTEST.EXE = eventtest$(EXE.CONSOLE)
 DIR.EVENTTEST = apps/tests/eventtest
 OUT.EVENTTEST = $(OUT)/$(DIR.EVENTTEST)
-INC.EVENTTEST = $(wildcard $(DIR.EVENTTEST)/*.h)
-SRC.EVENTTEST = $(wildcard $(DIR.EVENTTEST)/*.cpp)
+INC.EVENTTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.EVENTTEST)/*.h))
+SRC.EVENTTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.EVENTTEST)/*.cpp))
 OBJ.EVENTTEST = \
   $(addprefix $(OUT.EVENTTEST)/,$(notdir $(SRC.EVENTTEST:.cpp=$O)))
 DEP.EVENTTEST = CSTOOL CSUTIL CSSYS
@@ -58,7 +58,7 @@ build.eventtest: $(OUTDIRS) $(EVENTTEST.EXE)
 clean: eventtestclean
 check: eventtestcheck
 
-$(OUT.EVENTTEST)/%$O: $(DIR.EVENTTEST)/%.cpp
+$(OUT.EVENTTEST)/%$O: $(SRCDIR)/$(DIR.EVENTTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(EVENTTEST.EXE): $(DEP.EXE) $(OBJ.EVENTTEST) $(LIB.EVENTTEST)

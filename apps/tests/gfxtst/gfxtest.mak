@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 GFXTEST.EXE = gfxtest$(EXE.CONSOLE)
 DIR.GFXTEST = apps/tests/gfxtst
 OUT.GFXTEST = $(OUT)/$(DIR.GFXTEST)
-INC.GFXTEST =
-SRC.GFXTEST = apps/tests/gfxtst/gfxtest.cpp
+INC.GFXTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.GFXTEST)/*.h))
+SRC.GFXTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.GFXTEST)/*.cpp))
 OBJ.GFXTEST = $(addprefix $(OUT.GFXTEST)/,$(notdir $(SRC.GFXTEST:.cpp=$O)))
 DEP.GFXTEST = CSGFX CSTOOL CSUTIL CSGEOM CSSYS
 LIB.GFXTEST = $(foreach d,$(DEP.GFXTEST),$($d.LIB))
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 build.gfxtest: $(OUTDIRS) $(GFXTEST.EXE)
 clean: gfxtestclean
 
-$(OUT.GFXTEST)/%$O: $(DIR.GFXTEST)/%.cpp
+$(OUT.GFXTEST)/%$O: $(SRCDIR)/$(DIR.GFXTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(GFXTEST.EXE): $(DEP.EXE) $(OBJ.GFXTEST) $(LIB.GFXTEST)

@@ -41,8 +41,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSJPGIMG)
 endif
 
-INC.CSJPGIMG = $(wildcard plugins/video/loader/jpg/*.h)
-SRC.CSJPGIMG = $(wildcard plugins/video/loader/jpg/*.cpp)
+INC.CSJPGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/jpg/*.h))
+SRC.CSJPGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/jpg/*.cpp))
 
 OBJ.CSJPGIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSJPGIMG:.cpp=$O)))
 DEP.CSJPGIMG = CSUTIL CSSYS CSGFX CSUTIL
@@ -61,7 +61,7 @@ ifeq ($(MAKESECTION),targets)
 
 csjpgimg: $(OUTDIRS) $(CSJPGIMG)
 
-$(OUT)/%$O: plugins/video/loader/jpg/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/loader/jpg/%.cpp
 	$(DO.COMPILE.CPP) $(JPEG.CFLAGS)
 
 $(CSJPGIMG): $(OBJ.CSJPGIMG) $(LIB.CSJPGIMG)

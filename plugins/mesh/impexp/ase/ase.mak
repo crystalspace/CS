@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/impexp/ase
+vpath %.cpp $(SRCDIR)/plugins/mesh/impexp/ase
 
 ifeq ($(USE_PLUGINS),yes)
   ASEIE = $(OUTDLL)/aseie$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(ASEIE)
 endif
 
-INC.ASEIE = $(wildcard plugins/mesh/impexp/ase/*.h)
-SRC.ASEIE = $(wildcard plugins/mesh/impexp/ase/*.cpp)
+INC.ASEIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ase/*.h))
+SRC.ASEIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ase/*.cpp))
 OBJ.ASEIE = $(addprefix $(OUT)/,$(notdir $(SRC.ASEIE:.cpp=$O)))
 DEP.ASEIE = CSGEOM CSUTIL CSSYS CSTOOL CSGEOM CSUTIL
 

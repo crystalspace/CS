@@ -28,8 +28,8 @@ ifeq ($(MAKESECTION),postdefines)
 ISOMAP.EXE = isomap$(EXE)
 DIR.ISOMAP = apps/isomap
 OUT.ISOMAP = $(OUT)/$(DIR.ISOMAP)
-INC.ISOMAP = $(wildcard $(DIR.ISOMAP)/*.h)
-SRC.ISOMAP = $(wildcard $(DIR.ISOMAP)/*.cpp)
+INC.ISOMAP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISOMAP)/*.h))
+SRC.ISOMAP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISOMAP)/*.cpp))
 OBJ.ISOMAP = $(addprefix $(OUT.ISOMAP)/,$(notdir $(SRC.ISOMAP:.cpp=$O)))
 DEP.ISOMAP = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.ISOMAP = $(foreach d,$(DEP.ISOMAP),$($d.LIB))
@@ -39,7 +39,7 @@ OUTDIRS += $(OUT.ISOMAP)
 
 TO_INSTALL.EXE    += $(ISOMAP.EXE)
 #TO_INSTALL.CONFIG += $(CFG.ISOMAP)
-TO_INSTALL.DATA   += data/isomap/world
+TO_INSTALL.DATA   += $(SRCDIR)/data/isomap/world
 
 MSVC.DSP += ISOMAP
 DSP.ISOMAP.NAME = isomap
@@ -56,7 +56,7 @@ all: $(ISOMAP.EXE)
 build.isomap: $(OUTDIRS) $(ISOMAP.EXE)
 clean: isomapclean
 
-$(OUT.ISOMAP)/%$O: $(DIR.ISOMAP)/%.cpp
+$(OUT.ISOMAP)/%$O: $(SRCDIR)/$(DIR.ISOMAP)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(ISOMAP.EXE): $(DEP.EXE) $(OBJ.ISOMAP) $(LIB.ISOMAP)

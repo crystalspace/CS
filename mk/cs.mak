@@ -12,9 +12,9 @@
 # makefile to work.  Please do not change the include order unless you know
 # what you are doing!
 include config.mak
-include $(TARGET_MAKEFILE)
-include mk/user.mak
-include mk/common.mak
+include $(SRCDIR)/$(TARGET_MAKEFILE)
+include $(SRCDIR)/mk/user.mak
+include $(SRCDIR)/mk/common.mak
 
 .PHONY: depend clean cleanlib cleandep distclean maintainerclean show
 
@@ -45,8 +45,8 @@ endif
 
 # The following include should re/define system-dependent variables
 MAKESECTION=defines
-include mk/subs.mak
-include mk/nasm.mak
+include $(SRCDIR)/mk/subs.mak
+include $(SRCDIR)/mk/nasm.mak
 
 ifeq ($(USE_SHARED_LIBS),yes)
   DO.LIBRARY = $(DO.SHARED.LIBRARY)
@@ -85,8 +85,13 @@ endif
 
 #==============================================================================
 
-CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
-  $(CFLAGS.I)./plugins $(CFLAGS.I)./apps
+CFLAGS.INCLUDE+=\
+  $(CFLAGS.I)$(SRCDIR) \
+  $(CFLAGS.I)$(SRCDIR)/include \
+  $(CFLAGS.I)$(SRCDIR)/libs \
+  $(CFLAGS.I)$(SRCDIR)/plugins \
+  $(CFLAGS.I)$(SRCDIR)/apps \
+  $(CFLAGS.I)./include
   
 CFLAGS=$(CFLAGS.D)__CRYSTAL_SPACE__ $(CFLAGS.GENERAL) $(CFLAGS.$(MODE))
 LFLAGS=$(LFLAGS.GENERAL) $(LFLAGS.$(MODE)) $(LFLAGS.L)$(OUT)
@@ -201,7 +206,7 @@ endif
 
 # The following include should make additional defines using above variables
 MAKESECTION = postdefines
-include mk/subs.mak
+include $(SRCDIR)/mk/subs.mak
 
 # Now remove duplicate include dirs and duplicate libraries
 CFLAGS.INCLUDE := $(sort $(CFLAGS.INCLUDE))
@@ -222,11 +227,16 @@ all: $(OUTDIRS)
 dep: $(OUTBASE) $(OUTOS)
 
 maintainerclean: distclean
-	-$(RMDIR) configure autom4te.cache
+	-$(RMDIR) $(SRCDIR)/configure $(SRCDIR)/autom4te.cache
 
+# We also remove the `include' directory if building outside of the CS tree
+# since that directory was created by the configure script (for volatile.h).
 distclean: clean
 	-$(RM) Makefile config.mak config.cache config.status \
 	include/volatile.h Jamfile Jamconfig
+ifneq ($(SRCDIR),.)
+	-$(RMDIR) include
+endif
 
 clean:
 	-$(RM) config.log
@@ -266,4 +276,4 @@ show:
 
 # The following include should define system-dependent targets
 MAKESECTION=targets
-include mk/subs.mak
+include $(SRCDIR)/mk/subs.mak

@@ -45,7 +45,7 @@ endif
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
-include mk/unix.mak
+include $(SRCDIR)/mk/unix.mak
 
 # Extra libraries needed on this system.
 ifndef LIBS.EXE
@@ -89,15 +89,15 @@ LFLAGS.DLL = -shared -Wl,-soname -Wl,$@
 NASMFLAGS.SYSTEM = -f elf
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS= $(wildcard libs/cssys/unix/*.cpp) \
-  libs/cssys/general/sysroot.cpp \
-  libs/cssys/general/findlib.cpp \
-  libs/cssys/general/getopt.cpp \
-  libs/cssys/general/printf.cpp \
-  libs/cssys/general/runloop.cpp \
-  libs/cssys/general/sysinit.cpp \
+SRC.SYS_CSSYS= $(wildcard $(SRCDIR)/libs/cssys/unix/*.cpp) \
+  $(SRCDIR)/libs/cssys/general/sysroot.cpp \
+  $(SRCDIR)/libs/cssys/general/findlib.cpp \
+  $(SRCDIR)/libs/cssys/general/getopt.cpp \
+  $(SRCDIR)/libs/cssys/general/printf.cpp \
+  $(SRCDIR)/libs/cssys/general/runloop.cpp \
+  $(SRCDIR)/libs/cssys/general/sysinit.cpp \
   $(CSTHREAD.SRC)
-INC.SYS_CSSYS = $(wildcard libs/cssys/unix/*.h) $(CSTHREAD.INC)
+INC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/unix/*.h) $(CSTHREAD.INC)
 
 # Use makedep to build dependencies
 DEPEND_TOOL = mkdep

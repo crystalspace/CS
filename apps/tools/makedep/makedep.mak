@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 MAKEDEP.EXE=makedep$(EXE.CONSOLE)
 DIR.MAKEDEP = apps/tools/makedep
 OUT.MAKEDEP = $(OUT)/$(DIR.MAKEDEP)
-INC.MAKEDEP = $(wildcard $(DIR.MAKEDEP)/*.h )
-SRC.MAKEDEP = $(wildcard $(DIR.MAKEDEP)/*.cpp )
+INC.MAKEDEP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MAKEDEP)/*.h ))
+SRC.MAKEDEP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MAKEDEP)/*.cpp ))
 OBJ.MAKEDEP = $(addprefix $(OUT.MAKEDEP)/,$(notdir $(SRC.MAKEDEP:.cpp=$O)))
 DEP.MAKEDEP =
 LIB.MAKEDEP = $(foreach d,$(DEP.MAKEDEP),$($d.LIB))
@@ -54,7 +54,7 @@ all: $(MAKEDEP.EXE)
 build.makedep: $(OUTDIRS) $(MAKEDEP.EXE)
 clean: makedepclean
 
-$(OUT.MAKEDEP)/%$O: $(DIR.MAKEDEP)/%.cpp
+$(OUT.MAKEDEP)/%$O: $(SRCDIR)/$(DIR.MAKEDEP)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(OUT)/main$O: apps/tools/makedep/main.cpp

@@ -63,7 +63,8 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc chmsupp
+.PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc \
+  chmsupp
 
 devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc chmsupp:
 	$(MAKE_TARGET) DO_DOC=yes
@@ -72,7 +73,7 @@ repairdoc:
 	@echo $(SEPARATOR)
 	@echo $"  Repairing $(DESCRIPTION.$@)$"
 	@echo $(SEPARATOR)
-	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
+	@$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak $@
 
 cleandoc:
 	$(MAKE_CLEAN)
@@ -82,14 +83,14 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-NODEFIX = docs/support/nodefix.pl
+NODEFIX = $(SRCDIR)/docs/support/nodefix.pl
 TEXI2HTML = docs/support/texi2html
 TEXI2DVI = texi2dvi
 DVIPS = dvips
 PS2PDF = ps2pdf
 MAKEINFO = makeinfo
 # TOP=. : Small hack for compatibility w/ files from docs/doxygen
-DOXYGEN = export TOP=.; doxygen
+DOXYGEN = TOP='.' ; export TOP ; doxygen
 
 # Root of the entire Crystal Space manual.
 CSMANUAL_DIR  = docs/texinfo
@@ -99,19 +100,20 @@ CSMANUAL_FILE = cs-unix.txi
 TEXI2HTMLINIT = docs/support/texi2html.init
 
 # Doxygen configuration files.
-DOXYGEN_PUBAPI = docs/doxygen/pubapi.dox
-DOXYGEN_DEVAPI = docs/doxygen/devapi.dox
+DOXYGEN_PUBAPI = $(SRCDIR)/docs/doxygen/pubapi.dox
+DOXYGEN_DEVAPI = $(SRCDIR)/docs/doxygen/devapi.dox
 
 # Copy additional images to doxygen output dir
-OUT.DOXYGEN.IMAGES = $(CP) docs/doxygen/*.jpg 
+OUT.DOXYGEN.IMAGES = $(CP) $(SRCDIR)/docs/doxygen/*.jpg 
 
 # Root of the target directory hierarchy.
 OUT.DOC = $(OUTBASE)/docs
 
-# Relative path which refers to main CS directory from within one of the
-# specific output directories, such as $(OUT.DOC.HTML).  The value of this
-# variable must reflect the value of $(OUT.DOC) and $(OUTBASE)/.
-OUT.DOC.UNDO = ../../..
+# Relative or absolute path which refers to main CS directory from within one
+# of the specific output directories, such as $(OUT.DOC.HTML).  The value of
+# this variable must reflect the value of $(OUT.DOC) and $(OUTBASE)/.
+OUT.DOC.UNDO = $(shell cd $(SRCDIR) ; $(PWD))
+OUT.DOC.UNDO.LOCAL = $(shell $(PWD))
 
 # This section is specially protected by DO_DOC in order to prevent the lengthy
 # $(wildcard) operations from impacting _all_ other build targets.  DO_DOC is
@@ -135,10 +137,10 @@ DOC.DVI.LOG = $(OUT.DOC.DVI)/$(addsuffix .log,$(basename $(CSMANUAL_FILE)))
 DOC.IMAGE.EXTS = png jpg gif eps txt
 
 # Source and target image lists.
-DOC.IMAGE.LIST = $(strip \
-  $(wildcard $(addprefix $(CSMANUAL_DIR),$(foreach ext,$(DOC.IMAGE.EXTS),\
+DOC.IMAGE.LIST = $(strip $(wildcard $(addprefix $(SRCDIR)/$(CSMANUAL_DIR),\
+  $(foreach ext,$(DOC.IMAGE.EXTS),\
   $(addsuffix $(ext),* */* */*/* */*/*/* */*/*/*/* */*/*/*/*/*)))))
-OUT.DOC.IMAGE.LIST = $(subst $(CSMANUAL_DIR)/,,$(DOC.IMAGE.LIST))
+OUT.DOC.IMAGE.LIST = $(subst $(SRCDIR)/$(CSMANUAL_DIR)/,,$(DOC.IMAGE.LIST))
 
 # Manual decomposition of image directories achieved by progressively
 # stripping off one layer of subdirectories at a time.
@@ -156,6 +158,10 @@ OUT.DOC.IMAGE.DIRS.9 := $(patsubst %/,%,$(dir $(OUT.DOC.IMAGE.DIRS.8)))
 # Recomposition of image directory components in an ordered list which can be
 # fed to $(MKDIR) in order to recreate entire source image directory hiearchy
 # within target directory.
+# @@@ FIXME: These days, this can be accomplished much more easily by using the
+# $(MKDIRS) variable which is defined in config.mak by configure.  There is no
+# longer any need to go through this hocus-pocus to create the output directory
+# tree.
 OUT.DOC.IMAGE.DIRS.ALL := $(sort $(filter-out .,\
   $(OUT.DOC.IMAGE.DIRS.0) \
   $(OUT.DOC.IMAGE.DIRS.1) \
@@ -224,7 +230,7 @@ $(OUT.DOC.IMAGE.DIRS.PDF)  $(OUT.DOC.IMAGE.DIRS.INFO):
 # Rule for copying $(CSMANUAL_FILE) to a target directory.  To copy file to
 # directory "foo", specify "foo.SOURCE" as dependency of some target.
 %.SOURCE:
-	$(CP) $(CSMANUAL_DIR)/$(CSMANUAL_FILE) $*
+	$(CP) $(SRCDIR)/$(CSMANUAL_DIR)/$(CSMANUAL_FILE) $*
 
 # Rule for removing $(CSMANUAL_FILE) from a target directory.  To remove file
 # from directory "foo", specify "foo.ZAPSOURCE" as dependency of some target.
@@ -240,7 +246,8 @@ ifeq ($(DOC.IMAGE.LIST),)
 else
 	@echo "Copying images." $(foreach file,$(filter $(foreach \
 	ext,$(subst ., ,$(notdir $*)),%.$(ext)),$(DOC.IMAGE.LIST)),\
-	$(NEWLINE)$(CP) $(file) $(subst $(CSMANUAL_DIR)/,$(dir $*),$(file)))
+	$(NEWLINE)$(CP) $(file) $(subst $(SRCDIR)/$(CSMANUAL_DIR)/,\
+	$(dir $*),$(file)))
 endif
 
 # Rule for removing a selected subset of the source image list from a target
@@ -289,7 +296,7 @@ htmldoc: \
 
 # Rule to perform actual DVI conversion of $(CSMANUAL_FILE).
 do-dvidoc:
-	$(CP) $(CSMANUAL_DIR)/texinfo.tex $(OUT.DOC.DVI)
+	$(CP) $(SRCDIR)/$(CSMANUAL_DIR)/texinfo.tex $(OUT.DOC.DVI)
 	$(CD) $(OUT.DOC.DVI); $(TEXI2DVI) --batch --quiet -I '.' -I `pwd` \
 	-I `$(CD) $(OUT.DOC.UNDO)/$(CSMANUAL_DIR); $(PWD)` $(CSMANUAL_FILE)
 	$(MV) $(OUT.DOC.DVI)/$(addsuffix .dvi,$(basename $(CSMANUAL_FILE))) \
@@ -314,7 +321,7 @@ dvidoc: \
 # Rule to perform actual PS conversion from DVI file.
 do-psdoc:
 	$(CD) $(OUT.DOC.DVI); \
-	$(DVIPS) -q -o $(OUT.DOC.UNDO)/$(OUT.DOC.PS)/cs.ps cs.dvi
+	$(DVIPS) -q -o $(OUT.DOC.UNDO.LOCAL)/$(OUT.DOC.PS)/cs.ps cs.dvi
 
 # Rule to generate PS format output.  Target images are incorporated directly
 # into PostScript file from within DVI target directory.
@@ -361,16 +368,18 @@ infodoc: \
   $(OUT.DOC.INFO)/txt.ZAPIMAGES
 
 chmsupp: 
-	$(CD) $(OUT.DOC); $(PERL) -I../../docs/support/winhelp ../../docs/support/winhelp/gendoctoc.pl
-	$(CP) docs/support/winhelp/csapi.hhp $(OUT.DOC)
-	$(CP) docs/support/winhelp/csdocs.hhp $(OUT.DOC)
+	$(CD) $(OUT.DOC); $(PERL) -I$(SRCDIR)/docs/support/winhelp \
+	$(SRCDIR)/docs/support/winhelp/gendoctoc.pl
+	$(CP) $(SRCDIR)/docs/support/winhelp/csapi.hhp $(OUT.DOC)
+	$(CP) $(SRCDIR)/docs/support/winhelp/csdocs.hhp $(OUT.DOC)
 
 endif # ifeq ($(DO_DOC),yes)
 
 # Repair out-of-date and broken @node and @menu directives in Texinfo source.
 .PHONY: repairdoc
 repairdoc:
-	$(PERL) $(NODEFIX) --include-dir=$(CSMANUAL_DIR) $(CSMANUAL_FILE)
+	$(PERL) $(NODEFIX) --include-dir=$(SRCDIR)/$(CSMANUAL_DIR) \
+	$(SRCDIR)/$(CSMANUAL_DIR)/$(CSMANUAL_FILE)
 
 # Remove all target documentation directories.
 .PHONY: cleandoc

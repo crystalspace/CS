@@ -4,14 +4,43 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 27-Apr-2003
-	- Philip Wyett fixed the DDS plugin compilation under MSVC,
-	  by replacing struct with static (don't ask) and giving the
-	  the array an element size.
-	    - Removed the Python 2.2 cs_pyth.cpp hack from the MSVC6
-              build docs. It is no longer needed after the expansion
-              and recent upgrade of the Python plugin.
-            - Eliminated MSVC compiler warning by casting rval of
-              csInvalidStringID.
+	- Philip Wyett fixed the DDS plugin compilation under MSVC, by
+	  replacing struct with static (don't ask) and giving the the array an
+	  element size.
+	- Philip Wyett removed the Python 2.2 cs_pyth.cpp hack from the MSVC6
+	  build docs.  It is no longer needed after the expansion and recent
+	  upgrade of the Python plugin.
+	- Philip Wyett eliminated MSVC compiler warning by casting rval of
+	  csInvalidStringID.
+	- Eric Sunshine made the following changes:
+	    - Modified configure.ac so that it emits a SRCDIR property to
+	      config.mak.  This value represents the --srcdir argument given to
+	      the configure script (or "." if --srcdir is omitted).  This
+	      points at the directory containing the CS source code (which may
+	      differ from the build directory, which is typically the current
+	      working directory).
+	    - Modified makefiles and build scripts throughout the project so
+	      that they respect $(SRCDIR).  This allows the project to be built
+	      in a directory other than the source directory, thus it is
+	      possible to place the source directory on a readonly filesystem
+	      (such as a CD-ROM), or to share a single NFS-mounted source
+	      directory among different builds, where each build inhabits its
+	      own directory.  For example, if CS resides at /home/CS and you
+	      wish to build the project in /home/build:
+		  % cd /home/build
+		  % ../CS/configure
+		  % make -k all
+		  % make install
+	      (Note that the Jam-base build system already supports this build
+	      paradigm.)
+	    - Modified configure.ac so that it emits EXTENSIVE_MEMDEBUG to
+	      config.mak since this variable is used by Makefile.in for the
+	      `showconfig' target.
+	    - Modified configure.ac so that it emits MONITOR_MAKEFILE_CACHE
+	      when the value is either "yes" or "no", instead of emitting it
+	      only when the value is "yes".  This was necessary because
+	      CS/mk/cache.mak prints the value of this variable as part of
+	      $(SYSMODIFIER).
 26-Apr-2003
 	- Norman Kraemer added a swig.jam file for custom swig rules and
 	  used the new power to rebuild the cs_pyth.cpp from cspace.i if

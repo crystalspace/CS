@@ -26,15 +26,16 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/csutil
-vpath %.c libs/csutil
+vpath %.cpp $(SRCDIR)/libs/csutil
+vpath %.c $(SRCDIR)/libs/csutil
 
 CSUTIL.LIB = $(OUT)/$(LIB_PREFIX)csutil$(LIB_SUFFIX)
-INC.CSUTIL = $(wildcard include/csutil/*.h)
-SRC.CSUTIL = $(wildcard libs/csutil/*.cpp libs/csutil/*.c)
+INC.CSUTIL = $(wildcard $(addprefix $(SRCDIR)/,include/csutil/*.h))
+SRC.CSUTIL = \
+  $(wildcard $(addprefix $(SRCDIR)/,libs/csutil/*.cpp libs/csutil/*.c))
 OBJ.CSUTIL = \
   $(addprefix $(OUT)/,$(notdir $(patsubst %.c,%$O,$(SRC.CSUTIL:.cpp=$O))))
-CFG.CSUTIL = scf.cfg data/config/mouse.cfg
+CFG.CSUTIL = $(SRCDIR)/scf.cfg $(SRCDIR)/data/config/mouse.cfg
 
 TO_INSTALL.CONFIG += $(CFG.CSUTIL)
 TO_INSTALL.STATIC_LIBS += $(CSUTIL.LIB)
@@ -54,7 +55,7 @@ all: $(CSUTIL.LIB)
 csutil: $(OUTDIRS) $(CSUTIL.LIB)
 clean: csutilclean
 
-$(OUT)/archive$O: libs/csutil/archive.cpp
+$(OUT)/archive$O: $(SRCDIR)/libs/csutil/archive.cpp
 	$(DO.COMPILE.CPP) $(ZLIB.CFLAGS)
 
 $(CSUTIL.LIB): $(OBJ.CSUTIL)

@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/explo/object plugins/mesh/partgen
+vpath %.cpp $(SRCDIR)/plugins/mesh/explo/object $(SRCDIR)/plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
   EXPLO = $(OUTDLL)/explo$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(EXPLO)
 endif
 
-INC.EXPLO = $(wildcard plugins/mesh/explo/object/*.h plugins/mesh/partgen/*.h)
-SRC.EXPLO = $(wildcard plugins/mesh/explo/object/*.cpp plugins/mesh/partgen/*.cpp)
+INC.EXPLO = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/explo/object/*.h plugins/mesh/partgen/*.h))
+SRC.EXPLO = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/explo/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.EXPLO = $(addprefix $(OUT)/,$(notdir $(SRC.EXPLO:.cpp=$O)))
 DEP.EXPLO = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 

@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 MILK2SPR.EXE = milk2spr$(EXE.CONSOLE)
 DIR.MILK2SPR = apps/import/milk2spr
 OUT.MILK2SPR = $(OUT)/$(DIR.MILK2SPR)
-INC.MILK2SPR = $(wildcard $(DIR.MILK2SPR)/*.h )
-SRC.MILK2SPR = $(wildcard $(DIR.MILK2SPR)/*.cpp )
+INC.MILK2SPR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MILK2SPR)/*.h ))
+SRC.MILK2SPR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MILK2SPR)/*.cpp ))
 OBJ.MILK2SPR = $(addprefix $(OUT.MILK2SPR)/,$(notdir $(SRC.MILK2SPR:.cpp=$O)))
 DEP.MILK2SPR = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MILK2SPR = $(foreach d,$(DEP.MILK2SPR),$($d.LIB))
@@ -54,7 +54,7 @@ all: $(MILK2SPR.EXE)
 build.milk2spr: $(OUTDIRS) $(MILK2SPR.EXE)
 clean: milk2sprclean
 
-$(OUT.MILK2SPR)/%$O: $(DIR.MILK2SPR)/%.cpp
+$(OUT.MILK2SPR)/%$O: $(SRCDIR)/$(DIR.MILK2SPR)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(MILK2SPR.EXE): $(OBJ.MILK2SPR) $(LIB.MILK2SPR)

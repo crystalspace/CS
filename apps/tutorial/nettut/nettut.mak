@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 NETTUT.EXE = nettut$(EXE.CONSOLE)
 DIR.NETTUT = apps/tutorial/nettut
 OUT.NETTUT = $(OUT)/$(DIR.NETTUT)
-INC.NETTUT = $(wildcard $(DIR.NETTUT)/*.h )
-SRC.NETTUT = $(wildcard $(DIR.NETTUT)/*.cpp )
+INC.NETTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.NETTUT)/*.h ))
+SRC.NETTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.NETTUT)/*.cpp ))
 OBJ.NETTUT = $(addprefix $(OUT.NETTUT)/,$(notdir $(SRC.NETTUT:.cpp=$O)))
 DEP.NETTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.NETTUT = $(foreach d,$(DEP.NETTUT),$($d.LIB))
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 build.nettut: $(OUTDIRS) $(NETTUT.EXE)
 clean: nettutclean
 
-$(OUT.NETTUT)/%$O: $(DIR.NETTUT)/%.cpp
+$(OUT.NETTUT)/%$O: $(SRCDIR)/$(DIR.NETTUT)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(NETTUT.EXE): $(DEP.EXE) $(OBJ.NETTUT) $(LIB.NETTUT)

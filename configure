@@ -22178,6 +22178,10 @@ else
 fi;
 echo "$as_me:$LINENO: result: $enable_extensive_memory_debugger" >&5
 echo "${ECHO_T}$enable_extensive_memory_debugger" >&6
+cs_makefile_text="${cs_makefile_text}EXTENSIVE_MEMDEBUG = $enable_extensive_memory_debugger
+"
+    cs_jamconfig_text="${cs_jamconfig_text}EXTENSIVE_MEMDEBUG ?= \"$enable_extensive_memory_debugger\" ;
+"
 if test $enable_extensive_memory_debugger = yes; then
   cs_header_text="${cs_header_text}#define CS_EXTENSIVE_MEMDEBUG
 "
@@ -22311,10 +22315,12 @@ else
 fi;
     echo "$as_me:$LINENO: result: $enable_makefile_cache_monitor" >&5
 echo "${ECHO_T}$enable_makefile_cache_monitor" >&6
-    cs_makefile_text="${cs_makefile_text}MONITOR_MAKEFILE_CACHE = $enable_makefile_cache_monitor
-"
+else
+  enable_makefile_cache_monitor=no
 fi
 
+cs_makefile_text="${cs_makefile_text}MONITOR_MAKEFILE_CACHE = $enable_makefile_cache_monitor
+"
 
 
 
@@ -22334,6 +22340,12 @@ cs_header_text="${cs_header_text}#endif // __CS_VOLATILE_H__
 #------------------------------------------------------------------------------
 # Boilerplate: config.mak
 #------------------------------------------------------------------------------
+cs_makefile_text="${cs_makefile_text}SRCDIR = $srcdir
+"
+
+# Hack: The makefile system presently assumes that CFLAGS.SYSTEM should be
+# used for both C and C++, and ignores CXXFLAGS.SYSTEM.  Eliminate this hack
+# when the makefile system has been repaired.
 cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += \$(CXXFLAGS.SYSTEM)
 "
 
@@ -22362,24 +22374,16 @@ cs_jamconfig_text="${cs_jamconfig_text}CONFIGURE_INVOCATION ?= \"$0 $ac_configur
 #------------------------------------------------------------------------------
           ac_config_commands="$ac_config_commands include/volatile.h"
 
+          ac_config_commands="$ac_config_commands config.mak"
+
           ac_config_commands="$ac_config_commands Jamconfig"
 
-          ac_config_files="$ac_config_files Jamfile"
+                    ac_config_files="$ac_config_files Makefile Jamfile"
 
 
-# Hack: Presently, the makefile system is incapable of building the project
-# outside of the source directory, therefore only emit makefile support files
-# if configuring within the source directory.
-if test -r Makefile.in; then
-            ac_config_files="$ac_config_files Makefile"
-
-              ac_config_commands="$ac_config_commands config.mak"
-
-    # Queue makefile cache creation if caching enabled.
-    if test $enable_makefile_cache = yes; then
+# Queue makefile cache creation if caching enabled.
+if test $enable_makefile_cache = yes; then
             ac_config_commands="$ac_config_commands cache.mak"
-
-fi
 
 fi
 
@@ -22972,13 +22976,13 @@ echo X"$as_dir" |
 echo "$as_me: error: cannot create directory \$cs_dir" >&2;}
    { (exit 1); exit 1; }; }; }
 
-cs_jamconfig_text='$cs_jamconfig_text' cs_dir=`(dirname Jamconfig) 2>/dev/null ||
-$as_expr XJamconfig : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-         XJamconfig : 'X\(//\)[^/]' \| \
-         XJamconfig : 'X\(//\)$' \| \
-         XJamconfig : 'X\(/\)' \| \
+cs_makefile_text='$cs_makefile_text' cs_dir=`(dirname config.mak) 2>/dev/null ||
+$as_expr Xconfig.mak : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+         Xconfig.mak : 'X\(//\)[^/]' \| \
+         Xconfig.mak : 'X\(//\)$' \| \
+         Xconfig.mak : 'X\(/\)' \| \
          .     : '\(.\)' 2>/dev/null ||
-echo XJamconfig |
+echo Xconfig.mak |
     sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
   	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
   	  /^X\(\/\/\)$/{ s//\1/; q; }
@@ -23009,13 +23013,13 @@ echo X"$as_dir" |
 echo "$as_me: error: cannot create directory \$cs_dir" >&2;}
    { (exit 1); exit 1; }; }; }
 
-cs_makefile_text='$cs_makefile_text' cs_dir=`(dirname config.mak) 2>/dev/null ||
-$as_expr Xconfig.mak : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-         Xconfig.mak : 'X\(//\)[^/]' \| \
-         Xconfig.mak : 'X\(//\)$' \| \
-         Xconfig.mak : 'X\(/\)' \| \
+cs_jamconfig_text='$cs_jamconfig_text' cs_dir=`(dirname Jamconfig) 2>/dev/null ||
+$as_expr XJamconfig : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+         XJamconfig : 'X\(//\)[^/]' \| \
+         XJamconfig : 'X\(//\)$' \| \
+         XJamconfig : 'X\(/\)' \| \
          .     : '\(.\)' 2>/dev/null ||
-echo Xconfig.mak |
+echo XJamconfig |
     sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
   	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
   	  /^X\(\/\/\)$/{ s//\1/; q; }
@@ -23057,11 +23061,11 @@ for ac_config_target in $ac_config_targets
 do
   case "$ac_config_target" in
   # Handling of arguments.
-  "Jamfile" ) CONFIG_FILES="$CONFIG_FILES Jamfile" ;;
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+  "Jamfile" ) CONFIG_FILES="$CONFIG_FILES Jamfile" ;;
   "include/volatile.h" ) CONFIG_COMMANDS="$CONFIG_COMMANDS include/volatile.h" ;;
-  "Jamconfig" ) CONFIG_COMMANDS="$CONFIG_COMMANDS Jamconfig" ;;
   "config.mak" ) CONFIG_COMMANDS="$CONFIG_COMMANDS config.mak" ;;
+  "Jamconfig" ) CONFIG_COMMANDS="$CONFIG_COMMANDS Jamconfig" ;;
   "cache.mak" ) CONFIG_COMMANDS="$CONFIG_COMMANDS cache.mak" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -23459,14 +23463,6 @@ echo "$as_me: include/volatile.h is unchanged" >&6;}
 		rm -f include/volatile.h
 		mv $tmp/tcache include/volatile.h
 	    fi ;;
-    Jamconfig ) echo $ECHO_N "$cs_jamconfig_text$ECHO_C"|sed 's/\${\([a-zA-Z_]\+\)}/$(\1)/g;s/\\/\\\\/g' > $tmp/tcache
-	    if diff Jamconfig $tmp/tcache >/dev/null 2>&1; then
-		{ echo "$as_me:$LINENO: Jamconfig is unchanged" >&5
-echo "$as_me: Jamconfig is unchanged" >&6;}
-	    else
-		rm -f Jamconfig
-		mv $tmp/tcache Jamconfig
-	    fi ;;
     config.mak ) echo $ECHO_N "$cs_makefile_text$ECHO_C" > $tmp/tcache
 	    if diff config.mak $tmp/tcache >/dev/null 2>&1; then
 		{ echo "$as_me:$LINENO: config.mak is unchanged" >&5
@@ -23474,6 +23470,14 @@ echo "$as_me: config.mak is unchanged" >&6;}
 	    else
 		rm -f config.mak
 		mv $tmp/tcache config.mak
+	    fi ;;
+    Jamconfig ) echo $ECHO_N "$cs_jamconfig_text$ECHO_C"|sed 's/\${\([a-zA-Z_]\+\)}/$(\1)/g;s/\\/\\\\/g' > $tmp/tcache
+	    if diff Jamconfig $tmp/tcache >/dev/null 2>&1; then
+		{ echo "$as_me:$LINENO: Jamconfig is unchanged" >&5
+echo "$as_me: Jamconfig is unchanged" >&6;}
+	    else
+		rm -f Jamconfig
+		mv $tmp/tcache Jamconfig
 	    fi ;;
     cache.mak ) rm -f cache.mak ; ${MAKE} recache ;;
   esac

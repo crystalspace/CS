@@ -28,12 +28,12 @@ ifeq ($(MAKESECTION),postdefines)
 CSDEMO.EXE=csdemo$(EXE)
 DIR.CSDEMO = apps/demo
 OUT.CSDEMO = $(OUT)/$(DIR.CSDEMO)
-INC.CSDEMO = $(wildcard $(DIR.CSDEMO)/*.h)
-SRC.CSDEMO = $(wildcard $(DIR.CSDEMO)/*.cpp)
+INC.CSDEMO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSDEMO)/*.h))
+SRC.CSDEMO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSDEMO)/*.cpp))
 OBJ.CSDEMO = $(addprefix $(OUT.CSDEMO)/,$(notdir $(SRC.CSDEMO:.cpp=$O)))
 DEP.CSDEMO = CSGFX CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSSYS
 LIB.CSDEMO = $(foreach d,$(DEP.CSDEMO),$($d.LIB))
-CFG.CSDEMO = data/config/csdemo.cfg
+CFG.CSDEMO = $(SRCDIR)/data/config/csdemo.cfg
 
 OUTDIRS += $(OUT.CSDEMO)
 
@@ -44,7 +44,7 @@ MSVC.DSP += CSDEMO
 DSP.CSDEMO.NAME = csdemo
 DSP.CSDEMO.TYPE = appcon
 
-$(CSDEMO.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
+$(CSDEMO.EXE).WINRSRC = $(SRCDIR)/libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -57,7 +57,7 @@ all: $(CSDEMO.EXE)
 build.csdemo: $(OUTDIRS) $(CSDEMO.EXE)
 clean: csdemoclean
 
-$(OUT.CSDEMO)/%$O: $(DIR.CSDEMO)/%.cpp
+$(OUT.CSDEMO)/%$O: $(SRCDIR)/$(DIR.CSDEMO)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(CSDEMO.EXE): $(DEP.EXE) $(OBJ.CSDEMO) $(LIB.CSDEMO)

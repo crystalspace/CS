@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/cloth/object
+vpath %.cpp $(SRCDIR)/plugins/mesh/cloth/object
 
 ifeq ($(USE_PLUGINS),yes)
   CLOTH = $(OUTDLL)/cloth$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CLOTH)
 endif
 
-INC.CLOTH = $(wildcard plugins/mesh/cloth/object/*.h)
-SRC.CLOTH = $(wildcard plugins/mesh/cloth/object/*.cpp)
+INC.CLOTH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/cloth/object/*.h))
+SRC.CLOTH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/cloth/object/*.cpp))
 OBJ.CLOTH = $(addprefix $(OUT)/,$(notdir $(SRC.CLOTH:.cpp=$O)))
 DEP.CLOTH = CSGEOM CSUTIL CSSYS CSUTIL
 

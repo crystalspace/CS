@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/reporter
+vpath %.cpp $(SRCDIR)/plugins/reporter
 
 ifeq ($(USE_PLUGINS),yes)
   REPORTER = $(OUTDLL)/reporter$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(REPORTER)
 endif
 
-INC.REPORTER = $(wildcard plugins/reporter/*.h)
-SRC.REPORTER = $(wildcard plugins/reporter/*.cpp)
+INC.REPORTER = $(wildcard $(addprefix $(SRCDIR)/,plugins/reporter/*.h))
+SRC.REPORTER = $(wildcard $(addprefix $(SRCDIR)/,plugins/reporter/*.cpp))
 OBJ.REPORTER = $(addprefix $(OUT)/,$(notdir $(SRC.REPORTER:.cpp=$O)))
 DEP.REPORTER = CSGEOM CSUTIL CSSYS CSUTIL
 

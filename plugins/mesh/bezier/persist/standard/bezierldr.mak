@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/bezier/persist/standard
+vpath %.cpp $(SRCDIR)/plugins/mesh/bezier/persist/standard
 
 ifeq ($(USE_PLUGINS),yes)
   BEZIERLDR = $(OUTDLL)/bezierldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(BEZIERLDR)
 endif
 
-INC.BEZIERLDR = $(wildcard plugins/mesh/bezier/persist/standard/*.h)
-SRC.BEZIERLDR = $(wildcard plugins/mesh/bezier/persist/standard/*.cpp)
+INC.BEZIERLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bezier/persist/standard/*.h))
+SRC.BEZIERLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bezier/persist/standard/*.cpp))
 OBJ.BEZIERLDR = $(addprefix $(OUT)/,$(notdir $(SRC.BEZIERLDR:.cpp=$O)))
 DEP.BEZIERLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

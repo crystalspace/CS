@@ -42,10 +42,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(GLX2D)
 endif
 
-INC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.h \
-  $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D))
-SRC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.cpp \
-  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
+INC.GLX2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/*.h \
+  $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D)))
+SRC.GLX2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/*.cpp \
+  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D)))
 OBJ.GLX2D = $(addprefix $(OUT)/,$(notdir $(SRC.GLX2D:.cpp=$O)))
 DEP.GLX2D = CSUTIL CSSYS CSGEOM CSUTIL
 
@@ -58,10 +58,10 @@ ifeq ($(MAKESECTION),targets)
 
 glx2d: $(OUTDIRS) $(GLX2D)
 
-$(OUT)/%$O: plugins/video/canvas/openglx/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/openglx/%.cpp
 	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
-$(OUT)/%$O: plugins/video/canvas/openglcommon/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
 $(GLX2D): $(OBJ.GLX2D) $(LIB.GLX2D)

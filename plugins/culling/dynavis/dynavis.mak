@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/culling/dynavis
+vpath %.cpp $(SRCDIR)/plugins/culling/dynavis
 
 ifeq ($(USE_PLUGINS),yes)
   DYNAVIS = $(OUTDLL)/dynavis$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(DYNAVIS)
 endif
 
-INC.DYNAVIS = $(wildcard plugins/culling/dynavis/*.h)
-SRC.DYNAVIS = $(wildcard plugins/culling/dynavis/*.cpp)
+INC.DYNAVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/dynavis/*.h))
+SRC.DYNAVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/dynavis/*.cpp))
 OBJ.DYNAVIS = $(addprefix $(OUT)/,$(notdir $(SRC.DYNAVIS:.cpp=$O)))
 DEP.DYNAVIS = CSUTIL CSGEOM CSUTIL CSSYS CSUTIL CSSYS
 

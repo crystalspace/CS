@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 MDLTEST.EXE = mdltest$(EXE)
 DIR.MDLTEST = apps/mdltest
 OUT.MDLTEST = $(OUT)/$(DIR.MDLTEST)
-INC.MDLTEST = $(wildcard $(DIR.MDLTEST)/*.h)
-SRC.MDLTEST = $(wildcard $(DIR.MDLTEST)/*.cpp)
+INC.MDLTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MDLTEST)/*.h))
+SRC.MDLTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MDLTEST)/*.cpp))
 OBJ.MDLTEST = $(addprefix $(OUT.MDLTEST)/,$(notdir $(SRC.MDLTEST:.cpp=$O)))
 DEP.MDLTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.MDLTEST = $(foreach d,$(DEP.MDLTEST),$($d.LIB))
@@ -54,7 +54,7 @@ all: $(MDLTEST.EXE)
 build.mdltest: $(OUTDIRS) $(MDLTEST.EXE)
 clean: mdltestclean
 
-$(OUT.MDLTEST)/%$O: $(DIR.MDLTEST)/%.cpp
+$(OUT.MDLTEST)/%$O: $(SRCDIR)/$(DIR.MDLTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(MDLTEST.EXE): $(DEP.EXE) $(OBJ.MDLTEST) $(LIB.MDLTEST)

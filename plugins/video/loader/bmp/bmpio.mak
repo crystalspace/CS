@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/loader/bmp
+vpath %.cpp $(SRCDIR)/plugins/video/loader/bmp
 
 ifeq ($(USE_PLUGINS),yes)
   CSBMPIMG = $(OUTDLL)/csbmpimg$(DLL)
@@ -39,8 +39,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSBMPIMG)
 endif
 
-INC.CSBMPIMG = $(wildcard plugins/video/loader/bmp/*.h)
-SRC.CSBMPIMG = $(wildcard plugins/video/loader/bmp/*.cpp)
+INC.CSBMPIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/bmp/*.h))
+SRC.CSBMPIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/bmp/*.cpp))
 
 OBJ.CSBMPIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSBMPIMG:.cpp=$O)))
 DEP.CSBMPIMG = CSUTIL CSSYS CSGFX CSUTIL

@@ -81,7 +81,7 @@ define MAKE_TARGET
   @echo $"  Building $(DESCRIPTION.$@)$"
   @echo $"  Building for $(OS)/$(COMP)/$(PROC) in $(MODE) mode$"
   @echo $(SEPARATOR)
-  +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
+  +@$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak $@
 endef
 
 # Macro used to make a sub-clean target
@@ -89,7 +89,7 @@ define MAKE_CLEAN
   @echo $(SEPARATOR)
   @echo $"  Cleaning up the $(DESCRIPTION.$(subst clean,,$@))$"
   @echo $(SEPARATOR)
-  +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
+  +@$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak $@
 endef
 
 # Macro used to build an application
@@ -98,7 +98,7 @@ define MAKE_APP
   @echo $"  Building $(DESCRIPTION.$@)$"
   @echo $"  Building for $(OS)/$(COMP)/$(PROC) in $(MODE) mode$"
   @echo $(SEPARATOR)
-  +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak build.$@
+  +@$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak build.$@
 endef
 
 # Macro used to build and run a unittest
@@ -106,5 +106,5 @@ define MAKE_CHECK
   @echo $(SEPARATOR)
   @echo $"  Testing $(DESCRIPTION.$(subst check,,$@))$"
   @echo $(SEPARATOR)
-  +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
+  +@$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak $@
 endef

@@ -47,9 +47,11 @@ else
   TO_INSTALL.STATIC_LIBS += $(LINEX2D)
 endif
 
-INC.LINEX2D = $(wildcard plugins/video/canvas/linex/*.h   $(INC.COMMON.DRV2D))
-SRC.LINEX2D = $(wildcard plugins/video/canvas/linex/*.cpp $(SRC.COMMON.DRV2D))\
-  plugins/video/canvas/common/x11-keys.cpp
+INC.LINEX2D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/canvas/linex/*.h $(INC.COMMON.DRV2D)))
+SRC.LINEX2D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/canvas/linex/*.cpp plugins/video/canvas/common/x11-keys.cpp \
+  $(SRC.COMMON.DRV2D)))
 OBJ.LINEX2D = $(addprefix $(OUT)/,$(notdir $(SRC.LINEX2D:.cpp=$O)))
 DEP.LINEX2D = CSUTIL CSSYS CSUTIL CSGEOM
 
@@ -62,7 +64,7 @@ ifeq ($(MAKESECTION),targets)
 
 linex2d: $(OUTDIRS) $(LINEX2D)
 
-$(OUT)/%$O: plugins/video/canvas/linex/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/linex/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.LINEX2D)
 
 $(LINEX2D): $(OBJ.LINEX2D) $(LIB.LINEX2D)

@@ -42,8 +42,8 @@ endif
 
 DIR.BINDOC = plugins/documentsystem/binary
 OUT.BINDOC = $(OUT)/$(DIR.BINDOC)
-INC.BINDOC = $(wildcard $(DIR.BINDOC)/*.h)
-SRC.BINDOC = $(wildcard $(DIR.BINDOC)/*.cpp)
+INC.BINDOC = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BINDOC)/*.h))
+SRC.BINDOC = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BINDOC)/*.cpp))
 OBJ.BINDOC = $(addprefix $(OUT.BINDOC)/,$(notdir $(SRC.BINDOC:.cpp=$O)))
 DEP.BINDOC = CSUTIL CSTOOL CSSYS CSUTIL
 
@@ -62,7 +62,7 @@ ifeq ($(MAKESECTION),targets)
 
 bindoc: $(OUTDIRS) $(BINDOC)
 
-$(OUT.BINDOC)/%$O: $(DIR.BINDOC)/%.cpp
+$(OUT.BINDOC)/%$O: $(SRCDIR)/$(DIR.BINDOC)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(BINDOC): $(OBJ.BINDOC) $(LIB.BINDOC)

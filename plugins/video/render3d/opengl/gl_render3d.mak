@@ -42,21 +42,22 @@ else
   TO_INSTALL.STATIC_LIBS += $(GLRENDER3D)
 endif
 
-INC.GLRENDER3D = $(wildcard plugins/video/render3d/opengl/*.h) \
-  plugins/video/render3d/common/txtmgr.h
-SRC.GLRENDER3D = $(wildcard plugins/video/render3d/opengl/*.cpp) \
-  plugins/video/render3d/common/txtmgr.cpp
+INC.GLRENDER3D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/render3d/opengl/*.h plugins/video/render3d/common/txtmgr.h))
+SRC.GLRENDER3D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/render3d/opengl/*.cpp plugins/video/render3d/common/txtmgr.cpp))
 OBJ.GLRENDER3D = $(addprefix $(OUT)/,$(notdir $(SRC.GLRENDER3D:.cpp=$O)))
 DEP.GLRENDER3D = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
-CFG.GLRENDER3D = \
-  data/config/render3d/render3d.cfg data/config/render3d/opengl.cfg
+CFG.GLRENDER3D = $(addprefix $(SRCDIR)/, \
+  data/config/render3d/render3d.cfg data/config/render3d/opengl.cfg)
 
 TO_INSTALL.CONFIG += $(CFG.GLRENDER3D)
 
 MSVC.DSP += GLRENDER3D
 DSP.GLRENDER3D.NAME = glrender3d
 DSP.GLRENDER3D.TYPE = plugin
-DSP.GLRENDER3D.RESOURCES = $(wildcard plugins/video/render3d/opengl/ext/*.inc)
+DSP.GLRENDER3D.RESOURCES = \
+  $(wildcard $(SRCDIR)/plugins/video/render3d/opengl/ext/*.inc)
 DSP.GLRENDER3D.LIBS = opengl32 glu32
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -70,7 +71,7 @@ clean: glrender3dclean
 
 glrender3d: $(OUTDIRS) $(GLRENDER3D)
 
-$(OUT)/%$O: plugins/video/render3d/opengl/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
 
 $(GLRENDER3D): $(OBJ.GLRENDER3D) $(LIB.GLRENDER3D)

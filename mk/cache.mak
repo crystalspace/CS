@@ -98,7 +98,11 @@ SYSMODIFIERS += \
   $(NEWLINE)echo $"  USE_MAKEFILE_CACHE=$(USE_MAKEFILE_CACHE)$" \
   $(NEWLINE)echo $"  MONITOR_MAKEFILE_CACHE=$(MONITOR_MAKEFILE_CACHE)$"
 
-CACHE_DEPS = mk/user.mak $(wildcard mk/local.mak) $(TARGET_MAKEFILE)
+CACHE_DEPS = \
+  $(SRCDIR)/mk/user.mak \
+  $(wildcard $(SRCDIR)/mk/local.mak) \
+  $(wildcard local.mak) \
+  $(SRCDIR)/$(TARGET_MAKEFILE)
 ifeq ($(MONITOR_MAKEFILE_CACHE),yes)
   CACHE_DEPS += $(SUBMAKEFILES)
 endif

@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/null/object
+vpath %.cpp $(SRCDIR)/plugins/mesh/null/object
 
 ifeq ($(USE_PLUGINS),yes)
   NULLMESH = $(OUTDLL)/nullmesh$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(NULLMESH)
 endif
 
-INC.NULLMESH = $(wildcard plugins/mesh/null/object/*.h)
-SRC.NULLMESH = $(wildcard plugins/mesh/null/object/*.cpp)
+INC.NULLMESH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/null/object/*.h))
+SRC.NULLMESH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/null/object/*.cpp))
 OBJ.NULLMESH = $(addprefix $(OUT)/,$(notdir $(SRC.NULLMESH:.cpp=$O)))
 DEP.NULLMESH = CSGEOM CSUTIL CSSYS CSUTIL
 

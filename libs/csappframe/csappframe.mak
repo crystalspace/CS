@@ -26,12 +26,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/csappframe libs/csappframe/basic \
+vpath %.cpp $(SRCDIR)/libs/csappframe libs/csappframe/basic \
   libs/csappframe/light libs/csappframe/objects
 
 CSAPPFRAME.LIB = $(OUT)/$(LIB_PREFIX)csappframe$(LIB_SUFFIX)
-INC.CSAPPFRAME = $(wildcard include/csappframe/*.h)
-SRC.CSAPPFRAME = $(wildcard libs/csappframe/*.cpp libs/csappframe/*/*.cpp)
+INC.CSAPPFRAME = $(wildcard $(addprefix $(SRCDIR)/,include/csappframe/*.h))
+SRC.CSAPPFRAME = $(wildcard $(addprefix $(SRCDIR)/,libs/csappframe/*.cpp libs/csappframe/*/*.cpp))
 OBJ.CSAPPFRAME = $(addprefix $(OUT)/,$(notdir $(SRC.CSAPPFRAME:.cpp=$O)))
 
 TO_INSTALL.STATIC_LIBS += $(CSAPPFRAME.LIB)

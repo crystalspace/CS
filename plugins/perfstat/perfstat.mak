@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/perfstat
+vpath %.cpp $(SRCDIR)/plugins/perfstat
 
 ifeq ($(USE_PLUGINS),yes)
   PERFSTAT = $(OUTDLL)/perfstat$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(PERFSTAT)
 endif
 
-INC.PERFSTAT = $(wildcard plugins/perfstat/*.h)
-SRC.PERFSTAT = $(wildcard plugins/perfstat/*.cpp)
+INC.PERFSTAT = $(wildcard $(addprefix $(SRCDIR)/,plugins/perfstat/*.h))
+SRC.PERFSTAT = $(wildcard $(addprefix $(SRCDIR)/,plugins/perfstat/*.cpp))
 OBJ.PERFSTAT = $(addprefix $(OUT)/,$(notdir $(SRC.PERFSTAT:.cpp=$O)))
 DEP.PERFSTAT = CSGEOM CSUTIL CSSYS CSUTIL
 

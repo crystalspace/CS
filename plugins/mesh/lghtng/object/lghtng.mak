@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/lghtng/object
+vpath %.cpp $(SRCDIR)/plugins/mesh/lghtng/object
 
 ifeq ($(USE_PLUGINS),yes)
   LGHTNG = $(OUTDLL)/lghtng$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(LGHTNG)
 endif
 
-INC.LGHTNG = $(wildcard plugins/mesh/lghtng/object/*.h)
-SRC.LGHTNG = $(wildcard plugins/mesh/lghtng/object/*.cpp)
+INC.LGHTNG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/lghtng/object/*.h))
+SRC.LGHTNG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/lghtng/object/*.cpp))
 OBJ.LGHTNG = $(addprefix $(OUT)/,$(notdir $(SRC.LGHTNG:.cpp=$O)))
 DEP.LGHTNG = CSGEOM CSUTIL CSSYS CSUTIL
 

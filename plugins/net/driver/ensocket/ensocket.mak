@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/net/driver/ensocket
+vpath %.cpp $(SRCDIR)/plugins/net/driver/ensocket
 
 ifeq ($(USE_PLUGINS),yes)
   ENSOCKET = $(OUTDLL)/ensocket$(DLL)
@@ -40,8 +40,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(ENSOCKET)
 endif
 
-INC.ENSOCKET = $(wildcard plugins/net/driver/ensocket/*.h)
-SRC.ENSOCKET = $(wildcard plugins/net/driver/ensocket/*.cpp)
+INC.ENSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/ensocket/*.h))
+SRC.ENSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/ensocket/*.cpp))
 OBJ.ENSOCKET = $(addprefix $(OUT)/,$(notdir $(SRC.ENSOCKET:.cpp=$O)))
 DEP.ENSOCKET = CSUTIL CSSYS CSUTIL
 

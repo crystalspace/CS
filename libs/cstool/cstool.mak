@@ -25,13 +25,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cstool libs/cstool/impexp
+vpath %.cpp $(SRCDIR)/libs/cstool libs/cstool/impexp
 
 CSTOOL.LIB = $(OUT)/$(LIB_PREFIX)cstool$(LIB_SUFFIX)
-INC.CSTOOL = $(wildcard include/cstool/*.h)
-SRC.CSTOOL = $(wildcard libs/cstool/*.cpp)
+INC.CSTOOL = $(wildcard $(addprefix $(SRCDIR)/,include/cstool/*.h))
+SRC.CSTOOL = $(wildcard $(addprefix $(SRCDIR)/,libs/cstool/*.cpp))
 OBJ.CSTOOL = $(addprefix $(OUT)/,$(notdir $(SRC.CSTOOL:.cpp=$O)))
-CFG.CSTOOL = data/config/system.cfg
+CFG.CSTOOL = $(SRCDIR)/data/config/system.cfg
 
 TO_INSTALL.CONFIG += $(CFG.CSTOOL)
 TO_INSTALL.STATIC_LIBS += $(CSTOOL.LIB)

@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/driver/oss
+vpath %.cpp $(SRCDIR)/plugins/sound/driver/oss
 
 # The OSS sound driver
 ifeq ($(USE_PLUGINS),yes)
@@ -43,7 +43,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDOSS)
 endif
 
-SRC.SNDOSS = $(wildcard plugins/sound/driver/oss/*.cpp)
+SRC.SNDOSS = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/oss/*.cpp))
 OBJ.SNDOSS = $(addprefix $(OUT)/,$(notdir $(SRC.SNDOSS:.cpp=$O)))
 DEP.SNDOSS = CSUTIL CSSYS CSUTIL
 

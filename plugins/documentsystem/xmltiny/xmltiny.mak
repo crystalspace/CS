@@ -38,8 +38,8 @@ endif
 
 DIR.XMLTINY = plugins/documentsystem/xmltiny
 OUT.XMLTINY = $(OUT)/$(DIR.XMLTINY)
-INC.XMLTINY = $(wildcard $(DIR.XMLTINY)/*.h)
-SRC.XMLTINY = $(wildcard $(DIR.XMLTINY)/*.cpp)
+INC.XMLTINY = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLTINY)/*.h))
+SRC.XMLTINY = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLTINY)/*.cpp))
 OBJ.XMLTINY = $(addprefix $(OUT.XMLTINY)/,$(notdir $(SRC.XMLTINY:.cpp=$O)))
 DEP.XMLTINY = CSUTIL CSTOOL CSSYS CSUTIL
 
@@ -56,7 +56,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: xmltiny xmltinyclean xmltinycleandep
 xmltiny: $(OUTDIRS) $(XMLTINY)
 
-$(OUT.XMLTINY)/%$O: $(DIR.XMLTINY)/%.cpp
+$(OUT.XMLTINY)/%$O: $(SRCDIR)/$(DIR.XMLTINY)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(XMLTINY): $(OBJ.XMLTINY) $(LIB.XMLTINY)

@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 SIMPLECLOTH.EXE = simplecloth$(EXE)
 DIR.SIMPLECLOTH = apps/tutorial/simplecloth
 OUT.SIMPLECLOTH = $(OUT)/$(DIR.SIMPLECLOTH)
-INC.SIMPLECLOTH = $(wildcard $(DIR.SIMPLECLOTH)/*.h )
-SRC.SIMPLECLOTH = $(wildcard $(DIR.SIMPLECLOTH)/*.cpp )
+INC.SIMPLECLOTH = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPLECLOTH)/*.h ))
+SRC.SIMPLECLOTH = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPLECLOTH)/*.cpp ))
 OBJ.SIMPLECLOTH = \
   $(addprefix $(OUT.SIMPLECLOTH)/,$(notdir $(SRC.SIMPLECLOTH:.cpp=$O)))
 DEP.SIMPLECLOTH = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
@@ -54,7 +54,7 @@ ifeq ($(MAKESECTION),targets)
 build.simplecloth: $(OUTDIRS) $(SIMPLECLOTH.EXE)
 clean: simpleclothclean
 
-$(OUT.SIMPLECLOTH)/%$O: $(DIR.SIMPLECLOTH)/%.cpp
+$(OUT.SIMPLECLOTH)/%$O: $(SRCDIR)/$(DIR.SIMPLECLOTH)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(SIMPLECLOTH.EXE): $(DEP.EXE) $(OBJ.SIMPLECLOTH) $(LIB.SIMPLECLOTH)

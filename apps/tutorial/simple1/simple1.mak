@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 SIMPLE1.EXE = simple1$(EXE)
 DIR.SIMPLE1 = apps/tutorial/simple1
 OUT.SIMPLE1 = $(OUT)/$(DIR.SIMPLE1)
-INC.SIMPLE1 = $(wildcard $(DIR.SIMPLE1)/*.h )
-SRC.SIMPLE1 = $(wildcard $(DIR.SIMPLE1)/*.cpp )
+INC.SIMPLE1 = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPLE1)/*.h ))
+SRC.SIMPLE1 = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPLE1)/*.cpp ))
 OBJ.SIMPLE1 = $(addprefix $(OUT.SIMPLE1)/,$(notdir $(SRC.SIMPLE1:.cpp=$O)))
 DEP.SIMPLE1 = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPLE1 = $(foreach d,$(DEP.SIMPLE1),$($d.LIB))
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 build.simple1: $(OUTDIRS) $(SIMPLE1.EXE)
 clean: simple1clean
 
-$(OUT.SIMPLE1)/%$O: $(DIR.SIMPLE1)/%.cpp
+$(OUT.SIMPLE1)/%$O: $(SRCDIR)/$(DIR.SIMPLE1)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(SIMPLE1.EXE): $(DEP.EXE) $(OBJ.SIMPLE1) $(LIB.SIMPLE1)

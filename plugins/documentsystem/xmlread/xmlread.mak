@@ -38,8 +38,8 @@ endif
 
 DIR.XMLREAD = plugins/documentsystem/xmlread
 OUT.XMLREAD = $(OUT)/$(DIR.XMLREAD)
-INC.XMLREAD = $(wildcard $(DIR.XMLREAD)/*.h)
-SRC.XMLREAD = $(wildcard $(DIR.XMLREAD)/*.cpp)
+INC.XMLREAD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLREAD)/*.h))
+SRC.XMLREAD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLREAD)/*.cpp))
 OBJ.XMLREAD = $(addprefix $(OUT.XMLREAD)/,$(notdir $(SRC.XMLREAD:.cpp=$O)))
 DEP.XMLREAD = CSUTIL CSTOOL CSSYS CSUTIL
 
@@ -56,7 +56,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: xmlread xmlreadclean xmlreadcleandep
 xmlread: $(OUTDIRS) $(XMLREAD)
 
-$(OUT.XMLREAD)/%$O: $(DIR.XMLREAD)/%.cpp
+$(OUT.XMLREAD)/%$O: $(SRCDIR)/$(DIR.XMLREAD)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(XMLREAD): $(OBJ.XMLREAD) $(LIB.XMLREAD)

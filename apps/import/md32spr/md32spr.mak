@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 MD32SPR.EXE = md32spr$(EXE.CONSOLE)
 DIR.MD32SPR = apps/import/md32spr
 OUT.MD32SPR = $(OUT)/$(DIR.MD32SPR)
-INC.MD32SPR = $(wildcard $(DIR.MD32SPR)/*.h )
-SRC.MD32SPR = $(wildcard $(DIR.MD32SPR)/*.cpp )
+INC.MD32SPR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MD32SPR)/*.h ))
+SRC.MD32SPR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MD32SPR)/*.cpp ))
 OBJ.MD32SPR = $(addprefix $(OUT.MD32SPR)/,$(notdir $(SRC.MD32SPR:.cpp=$O)))
 DEP.MD32SPR = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSSYS CSUTIL CSSYS
 LIB.MD32SPR = $(foreach d,$(DEP.MD32SPR),$($d.LIB))
@@ -55,7 +55,7 @@ all: $(MD32SPR.EXE)
 build.md32spr: $(OUTDIRS) $(MD32SPR.EXE)
 clean: md32sprclean
 
-$(OUT.MD32SPR)/%$O: $(DIR.MD32SPR)/%.cpp
+$(OUT.MD32SPR)/%$O: $(SRCDIR)/$(DIR.MD32SPR)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(MD32SPR.EXE): $(OBJ.MD32SPR) $(LIB.MD32SPR)

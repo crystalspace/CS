@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/loader/wav plugins/sound/loader/common
+vpath %.cpp $(SRCDIR)/plugins/sound/loader/wav $(SRCDIR)/plugins/sound/loader/common
 
 ifeq ($(USE_PLUGINS),yes)
   SNDWAV = $(OUTDLL)/sndwav$(DLL)
@@ -39,10 +39,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDWAV)
 endif
 
-INC.SNDWAV = $(wildcard plugins/sound/loader/wav/*.h) \
-  $(wildcard plugins/sound/loader/common/*.h)
-SRC.SNDWAV = $(wildcard plugins/sound/loader/wav/*.cpp) \
-  $(wildcard plugins/sound/loader/common/*.cpp)
+INC.SNDWAV = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/sound/loader/wav/*.h plugins/sound/loader/common/*.h))
+SRC.SNDWAV = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/sound/loader/wav/*.cpp plugins/sound/loader/common/*.cpp))
 OBJ.SNDWAV = $(addprefix $(OUT)/,$(notdir $(SRC.SNDWAV:.cpp=$O)))
 DEP.SNDWAV = CSUTIL CSSYS CSUTIL
 

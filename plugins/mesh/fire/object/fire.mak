@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/fire/object plugins/mesh/partgen
+vpath %.cpp $(SRCDIR)/plugins/mesh/fire/object $(SRCDIR)/plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
   FIRE = $(OUTDLL)/fire$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(FIRE)
 endif
 
-INC.FIRE = $(wildcard plugins/mesh/fire/object/*.h plugins/mesh/partgen/*.h)
-SRC.FIRE = $(wildcard plugins/mesh/fire/object/*.cpp plugins/mesh/partgen/*.cpp)
+INC.FIRE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/object/*.h plugins/mesh/partgen/*.h))
+SRC.FIRE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.FIRE = $(addprefix $(OUT)/,$(notdir $(SRC.FIRE:.cpp=$O)))
 DEP.FIRE = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 

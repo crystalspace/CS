@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/metagen/object
+vpath %.cpp $(SRCDIR)/plugins/mesh/metagen/object
 
 ifeq ($(USE_PLUGINS),yes)
   METAGEN = $(OUTDLL)/metagen$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(METAGEN)
 endif
 
-INC.METAGEN = $(wildcard plugins/mesh/metagen/object/*.h)
-SRC.METAGEN = $(wildcard plugins/mesh/metagen/object/*.cpp)
+INC.METAGEN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metagen/object/*.h))
+SRC.METAGEN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metagen/object/*.cpp))
 OBJ.METAGEN = $(addprefix $(OUT)/,$(notdir $(SRC.METAGEN:.cpp=$O)))
 DEP.METAGEN = CSGEOM CSUTIL CSSYS
 

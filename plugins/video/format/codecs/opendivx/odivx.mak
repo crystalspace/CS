@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/format/codecs/opendivx
+vpath %.cpp $(SRCDIR)/plugins/video/format/codecs/opendivx
 
 LIB.EXTERNAL.ODIVX = -ldivxdecore
 ifeq ($(USE_PLUGINS),yes)
@@ -36,16 +36,16 @@ else
   TO_INSTALL.STATIC_LIBS += $(ODIVX)
 endif
 
-INC.ODIVX = $(wildcard plugins/video/format/codecs/opendivx/*.h)
-SRC.ODIVX = $(wildcard plugins/video/format/codecs/opendivx/*.cpp)
+INC.ODIVX = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/opendivx/*.h))
+SRC.ODIVX = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/opendivx/*.cpp))
 OBJ.ODIVX = $(addprefix $(OUT)/,$(notdir $(SRC.ODIVX:.cpp=$O)))
 DEP.ODIVX = CSUTIL CSSYS
 CFG.ODIVX =
 
-TO_INSTALL.CONFIG += $(CFG.ODIVX)
+$(SRCDIR)/TO_INSTALL.CONFIG += $(CFG.ODIVX)
 TO_INSTALL.DATA +=
 
-MSVC.DSP += ODIVX
+$(SRCDIR)/MSVC.DSP += ODIVX
 DSP.ODIVX.NAME = odivx
 DSP.ODIVX.TYPE = plugin
 DSP.ODIVX.LIBS = decore

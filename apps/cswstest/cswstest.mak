@@ -28,12 +28,12 @@ ifeq ($(MAKESECTION),postdefines)
 CSWSTEST.EXE = cswstest$(EXE)
 DIR.CSWSTEST = apps/cswstest
 OUT.CSWSTEST = $(OUT)/$(DIR.CSWSTEST)
-INC.CSWSTEST = $(wildcard $(DIR.CSWSTEST)/*.h)
-SRC.CSWSTEST = $(wildcard $(DIR.CSWSTEST)/*.cpp)
+INC.CSWSTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSWSTEST)/*.h))
+SRC.CSWSTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSWSTEST)/*.cpp))
 OBJ.CSWSTEST = $(addprefix $(OUT.CSWSTEST)/,$(notdir $(SRC.CSWSTEST:.cpp=$O)))
 DEP.CSWSTEST = CSWS CSGFX CSGEOM CSSYS CSGEOM CSUTIL CSTOOL CSUTIL CSSYS CSUTIL
 LIB.CSWSTEST = $(foreach d,$(DEP.CSWSTEST),$($d.LIB))
-CFG.CSWSTEST = data/config/cswstest.cfg
+CFG.CSWSTEST = $(SRCDIR)/data/config/cswstest.cfg
 
 OUTDIRS += $(OUT.CSWSTEST)
 
@@ -55,7 +55,7 @@ all: $(CSWSTEST.EXE)
 build.cswstest: $(OUTDIRS) $(CSWSTEST.EXE)
 clean: cswstestclean
 
-$(OUT.CSWSTEST)/%$O: $(DIR.CSWSTEST)/%.cpp
+$(OUT.CSWSTEST)/%$O: $(SRCDIR)/$(DIR.CSWSTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(CSWSTEST.EXE): $(DEP.EXE) $(OBJ.CSWSTEST) $(LIB.CSWSTEST)

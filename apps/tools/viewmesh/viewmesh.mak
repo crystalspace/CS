@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 VIEWMESH.EXE = viewmesh$(EXE)
 DIR.VIEWMESH = apps/tools/viewmesh
 OUT.VIEWMESH = $(OUT)/$(DIR.VIEWMESH)
-INC.VIEWMESH = $(wildcard $(DIR.VIEWMESH)/*.h )
-SRC.VIEWMESH = $(wildcard $(DIR.VIEWMESH)/*.cpp )
+INC.VIEWMESH = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.VIEWMESH)/*.h ))
+SRC.VIEWMESH = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.VIEWMESH)/*.cpp ))
 OBJ.VIEWMESH = $(addprefix $(OUT.VIEWMESH)/,$(notdir $(SRC.VIEWMESH:.cpp=$O)))
 DEP.VIEWMESH = CSWS CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.VIEWMESH = $(foreach d,$(DEP.VIEWMESH),$($d.LIB))
@@ -54,7 +54,7 @@ all: $(VIEWMESH.EXE)
 build.viewmesh: $(OUTDIRS) $(VIEWMESH.EXE)
 clean: viewmeshclean
 
-$(OUT.VIEWMESH)/%$O: $(DIR.VIEWMESH)/%.cpp
+$(OUT.VIEWMESH)/%$O: $(SRCDIR)/$(DIR.VIEWMESH)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(VIEWMESH.EXE): $(DEP.EXE) $(OBJ.VIEWMESH) $(LIB.VIEWMESH)

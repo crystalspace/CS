@@ -40,8 +40,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(ODEDYNAM)
 endif
 
-INC.ODEDYNAM = $(wildcard plugins/physics/odedynam/*.h)
-SRC.ODEDYNAM = $(wildcard plugins/physics/odedynam/*.cpp)
+INC.ODEDYNAM = $(wildcard $(addprefix $(SRCDIR)/,plugins/physics/odedynam/*.h))
+SRC.ODEDYNAM = $(wildcard $(addprefix $(SRCDIR)/,plugins/physics/odedynam/*.cpp))
 OBJ.ODEDYNAM = $(addprefix $(OUT)/,$(notdir $(SRC.ODEDYNAM:.cpp=$O)))
 DEP.ODEDYNAM = CSGEOM CSUTIL CSSYS
 
@@ -58,7 +58,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: odedynam odedynamclean
 odedynam: $(OUTDIRS) $(ODEDYNAM)
 
-$(OUT)/%$O: plugins/physics/odedynam/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/physics/odedynam/%.cpp
 	$(DO.COMPILE.CPP) $(ODE.CFLAGS)
 
 $(ODEDYNAM): $(OBJ.ODEDYNAM) $(LIB.ODEDYNAM)

@@ -130,20 +130,20 @@ TO_INSTALL.EXE += $(FOOBAR.EXE)
 # This section defines files used by this module.
 DIR.FOOBAR = path/to/foobar
 OUT.FOOBAR = $(OUT)/$(DIR.FOOBAR)
-INC.FOOBAR = $(wildcard $(DIR.FOOBAR)/*.h)
-SRC.FOOBAR = $(wildcard $(DIR.FOOBAR)/*.cpp)
+INC.FOOBAR = $(wildcard $(SRCDIR)/$(DIR.FOOBAR)/*.h)
+SRC.FOOBAR = $(wildcard $(SRCDIR)/$(DIR.FOOBAR)/*.cpp)
 OBJ.FOOBAR = $(addprefix $(OUT.FOOBAR)/,$(notdir $(SRC.FOOBAR:.cpp=$O)))
 # Customise the following line.
 DEP.FOOBAR = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 # Omit this if your module does not have an associated configuration file.
-CFG.FOOBAR = data/config/foobar.cfg
+CFG.FOOBAR = $(SRCDIR)/data/config/foobar.cfg
 
 OUTDIRS += $(OUT.FOOBAR)
 
 # If your module should be installed and has associated resources, list them
 # here.
 TO_INSTALL.CONFIG += $(CFG.FOOBAR)
-TO_INSTALL.DATA += data/foobar.zip
+TO_INSTALL.DATA += $(SRCDIR)/data/foobar.zip
 
 # This section is read by the Microsoft Visual C++ project file synthesis tool.
 MSVC.DSP += FOOBAR
@@ -153,7 +153,7 @@ DSP.FOOBAR.TYPE = appcon
 DSP.FOOBAR.TYPE = library
 DSP.FOOBAR.TYPE = plugin
 # Add any custom flags and external libraries in the following lines.  Use
-# MSVC-style syntax (i.e.  /D "HAVE_FOOBAR").  You can safely omit this section
+# MSVC-style syntax (i.e. /D "HAVE_FOOBAR").  You can safely omit this section
 # if your project does not require any special MSVC flags.
 DSP.FOOBAR.CFLAGS =
 DSP.FOOBAR.LFLAGS =

@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/engseq
+vpath %.cpp $(SRCDIR)/plugins/engseq
 
 ifeq ($(USE_PLUGINS),yes)
   ENGSEQ = $(OUTDLL)/engseq$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(ENGSEQ)
 endif
 
-INC.ENGSEQ = $(wildcard plugins/engseq/*.h)
-SRC.ENGSEQ = $(wildcard plugins/engseq/*.cpp)
+INC.ENGSEQ = $(wildcard $(addprefix $(SRCDIR)/,plugins/engseq/*.h))
+SRC.ENGSEQ = $(wildcard $(addprefix $(SRCDIR)/,plugins/engseq/*.cpp))
 OBJ.ENGSEQ = $(addprefix $(OUT)/,$(notdir $(SRC.ENGSEQ:.cpp=$O)))
 DEP.ENGSEQ = CSGEOM CSUTIL CSSYS CSUTIL
 

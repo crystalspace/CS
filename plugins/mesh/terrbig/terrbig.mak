@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/terrbig
+vpath %.cpp $(SRCDIR)/plugins/mesh/terrbig
 
 ifeq ($(USE_PLUGINS),yes)
   TERRBIG = $(OUTDLL)/terrbig$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(TERRBIG)
 endif
 
-INC.TERRBIG = $(wildcard plugins/mesh/terrbig/*.h)
-SRC.TERRBIG = $(wildcard plugins/mesh/terrbig/*.cpp)
+INC.TERRBIG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrbig/*.h))
+SRC.TERRBIG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrbig/*.cpp))
 OBJ.TERRBIG = $(addprefix $(OUT)/,$(notdir $(SRC.TERRBIG:.cpp=$O)))
 DEP.TERRBIG = CSGEOM CSUTIL CSSYS CSUTIL
 CFLAGS.TERRBIG = $(CFLAGS.I)plugins/mesh/terrbig
@@ -57,7 +57,7 @@ clean: terrbigclean
 terrbigclean:
 	-$(RM) $(TERRBIG) $(OBJ.TERRBIG)
 
-$(OUT)/%$O: plugins/mesh/terrbig/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/mesh/terrbig/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.TERRBIG)
 
 # Some (broken) versions of GNU make appear to be sensitive to the order in

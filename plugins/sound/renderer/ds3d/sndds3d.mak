@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/renderer/ds3d
+vpath %.cpp $(SRCDIR)/plugins/sound/renderer/ds3d
 
 ifeq ($(USE_PLUGINS),yes)
   SNDDS3D = $(OUTDLL)/sndds3d$(DLL)
@@ -39,10 +39,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDDS3D)
 endif
 
-INC.SNDDS3D = $(wildcard plugins/sound/renderer/ds3d/*.h) \
-  $(wildcard plugins/sound/renderer/common/*.h)
-SRC.SNDDS3D = $(wildcard plugins/sound/renderer/ds3d/*.cpp) \
-  $(wildcard plugins/sound/renderer/common/*.cpp)
+INC.SNDDS3D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/sound/renderer/ds3d/*.h plugins/sound/renderer/common/*.h))
+SRC.SNDDS3D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/sound/renderer/ds3d/*.cpp plugins/sound/renderer/common/*.cpp))
 OBJ.SNDDS3D = $(addprefix $(OUT)/,$(notdir $(SRC.SNDDS3D:.cpp=$O)))
 DEP.SNDDS3D = CSUTIL CSGEOM CSSYS CSUTIL
 

@@ -28,8 +28,8 @@ ifeq ($(MAKESECTION),postdefines)
 G2DTEST.EXE = g2dtest$(EXE)
 DIR.G2DTEST = apps/tests/g2dtest
 OUT.G2DTEST = $(OUT)/$(DIR.G2DTEST)
-INC.G2DTEST =
-SRC.G2DTEST = apps/tests/g2dtest/g2dtest.cpp
+INC.G2DTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.G2DTEST)/*.h))
+SRC.G2DTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.G2DTEST)/*.cpp))
 OBJ.G2DTEST = $(addprefix $(OUT.G2DTEST)/,$(notdir $(SRC.G2DTEST:.cpp=$O)))
 DEP.G2DTEST = CSTOOL CSGFX CSSYS CSUTIL CSGEOM CSSYS
 LIB.G2DTEST = $(foreach d,$(DEP.G2DTEST),$($d.LIB))
@@ -52,7 +52,7 @@ ifeq ($(MAKESECTION),targets)
 build.g2dtest: $(OUTDIRS) $(G2DTEST.EXE)
 clean: g2dtestclean
 
-$(OUT.G2DTEST)/%$O: $(DIR.G2DTEST)/%.cpp
+$(OUT.G2DTEST)/%$O: $(SRCDIR)/$(DIR.G2DTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(G2DTEST.EXE): $(DEP.EXE) $(OBJ.G2DTEST) $(LIB.G2DTEST)

@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/effects
+vpath %.cpp $(SRCDIR)/plugins/video/effects
 
 ifeq ($(USE_PLUGINS),yes)
   EFFECTS = $(OUTDLL)/effects$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(EFFECTS)
 endif
 
-INC.EFFECTS = $(wildcard plugins/video/effects/*.h)
-SRC.EFFECTS = $(wildcard plugins/video/effects/*.cpp)
+INC.EFFECTS = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/effects/*.h))
+SRC.EFFECTS = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/effects/*.cpp))
 OBJ.EFFECTS = $(addprefix $(OUT)/,$(notdir $(SRC.EFFECTS:.cpp=$O)))
 DEP.EFFECTS = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 

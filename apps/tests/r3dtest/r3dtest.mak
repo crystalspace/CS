@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 R3DTEST.EXE = r3dtest$(EXE)
 DIR.R3DTEST = apps/tests/r3dtest
 OUT.R3DTEST = $(OUT)/$(DIR.R3DTEST)
-INC.R3DTEST = $(wildcard $(DIR.R3DTEST)/*.h )
-SRC.R3DTEST = $(wildcard $(DIR.R3DTEST)/*.cpp )
+INC.R3DTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.R3DTEST)/*.h ))
+SRC.R3DTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.R3DTEST)/*.cpp ))
 OBJ.R3DTEST = $(addprefix $(OUT.R3DTEST)/,$(notdir $(SRC.R3DTEST:.cpp=$O)))
 DEP.R3DTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.R3DTEST = $(foreach d,$(DEP.R3DTEST),$($d.LIB))
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 build.r3dtest: $(OUTDIRS) $(R3DTEST.EXE)
 clean: r3dtestclean
 
-$(OUT.R3DTEST)/%$O: $(DIR.R3DTEST)/%.cpp
+$(OUT.R3DTEST)/%$O: $(SRCDIR)/$(DIR.R3DTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(R3DTEST.EXE): $(DEP.EXE) $(OBJ.R3DTEST) $(LIB.R3DTEST)

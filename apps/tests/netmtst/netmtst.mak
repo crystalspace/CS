@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 NETMANTEST.EXE = netmtst$(EXE)
 DIR.NETMANTEST = apps/tests/netmtst
 OUT.NETMANTEST = $(OUT)/$(DIR.NETMANTEST)
-INC.NETMANTEST = $(wildcard $(DIR.NETMANTEST)/*.h)
-SRC.NETMANTEST = $(wildcard $(DIR.NETMANTEST)/*.cpp)
+INC.NETMANTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.NETMANTEST)/*.h))
+SRC.NETMANTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.NETMANTEST)/*.cpp))
 OBJ.NETMANTEST = \
   $(addprefix $(OUT.NETMANTEST)/,$(notdir $(SRC.NETMANTEST:.cpp=$O)))
 DEP.NETMANTEST = CSTOOL CSUTIL CSSYS CSGEOM CSGFX
@@ -52,7 +52,7 @@ ifeq ($(MAKESECTION),targets)
 build.netmantest: $(OUTDIRS) $(NETMANTEST.EXE)
 clean: netmantestclean
 
-$(OUT.NETMANTEST)/%$O: $(DIR.NETMANTEST)/%.cpp
+$(OUT.NETMANTEST)/%$O: $(SRCDIR)/$(DIR.NETMANTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(NETMANTEST.EXE): $(OBJ.NETMANTEST) $(LIB.NETMANTEST)

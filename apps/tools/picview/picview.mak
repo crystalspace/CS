@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 PICVIEW.EXE = picview$(EXE)
 DIR.PICVIEW = apps/tools/picview
 OUT.PICVIEW = $(OUT)/$(DIR.PICVIEW)
-INC.PICVIEW = $(wildcard $(DIR.PICVIEW)/*.h )
-SRC.PICVIEW = $(wildcard $(DIR.PICVIEW)/*.cpp )
+INC.PICVIEW = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PICVIEW)/*.h ))
+SRC.PICVIEW = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PICVIEW)/*.cpp ))
 OBJ.PICVIEW = $(addprefix $(OUT.PICVIEW)/,$(notdir $(SRC.PICVIEW:.cpp=$O)))
 DEP.PICVIEW = CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.PICVIEW = $(foreach d,$(DEP.PICVIEW),$($d.LIB))
@@ -55,7 +55,7 @@ all: $(PICVIEW.EXE)
 build.picview: $(OUTDIRS) $(PICVIEW.EXE)
 clean: picviewclean
 
-$(OUT.PICVIEW)/%$O: $(DIR.PICVIEW)/%.cpp
+$(OUT.PICVIEW)/%$O: $(SRCDIR)/$(DIR.PICVIEW)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(PICVIEW.EXE): $(DEP.EXE) $(OBJ.PICVIEW) $(LIB.PICVIEW)

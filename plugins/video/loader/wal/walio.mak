@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/loader/wal
+vpath %.cpp $(SRCDIR)/plugins/video/loader/wal
 
 ifeq ($(USE_PLUGINS),yes)
   CSWALIMG = $(OUTDLL)/cswalimg$(DLL)
@@ -39,8 +39,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSWALIMG)
 endif
 
-INC.CSWALIMG = $(wildcard plugins/video/loader/wal/*.h)
-SRC.CSWALIMG = $(wildcard plugins/video/loader/wal/*.cpp)
+INC.CSWALIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/wal/*.h))
+SRC.CSWALIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/wal/*.cpp))
 
 OBJ.CSWALIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSWALIMG:.cpp=$O)))
 DEP.CSWALIMG = CSUTIL CSSYS CSGFX CSUTIL

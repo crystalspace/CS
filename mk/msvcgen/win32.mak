@@ -57,13 +57,15 @@ MSVC.DSP.AUGMENTED = $(foreach d,$(MSVC.DSP),$(DSP.$d.TYPE).$d)
 MSVC.DSP += WIN32SYS
 DSP.WIN32SYS.NAME = cssys
 DSP.WIN32SYS.TYPE = library
-INC.WIN32SYS = $(wildcard include/cssys/win32/*.h) $(wildcard libs/cssys/win32/*.h)
+INC.WIN32SYS = \
+  $(wildcard $(SRCDIR)/include/cssys/win32/*.h) \
+  $(wildcard $(SRCDIR)/libs/cssys/win32/*.h)
 SRC.WIN32SYS = \
-  $(wildcard libs/cssys/*.cpp libs/cssys/win32/*.cpp) \
-  libs/cssys/general/findlib.cpp \
-  libs/cssys/general/getopt.cpp \
-  libs/cssys/general/printf.cpp \
-  libs/cssys/general/runloop.cpp
+  $(wildcard $(SRCDIR)/libs/cssys/*.cpp $(SRCDIR)/libs/cssys/win32/*.cpp) \
+  $(SRCDIR)/libs/cssys/general/findlib.cpp \
+  $(SRCDIR)/libs/cssys/general/getopt.cpp \
+  $(SRCDIR)/libs/cssys/general/printf.cpp \
+  $(SRCDIR)/libs/cssys/general/runloop.cpp
 
 # grpall -- represents all other projects indirectly through grpapps,
 # grpplugins, and grplibs.

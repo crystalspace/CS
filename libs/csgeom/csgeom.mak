@@ -25,11 +25,11 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/csgeom
+vpath %.cpp $(SRCDIR)/libs/csgeom
 
 CSGEOM.LIB = $(OUT)/$(LIB_PREFIX)csgeom$(LIB_SUFFIX)
-INC.CSGEOM = $(wildcard include/csgeom/*.h)
-SRC.CSGEOM = $(wildcard libs/csgeom/*.cpp)
+INC.CSGEOM = $(wildcard $(addprefix $(SRCDIR)/,include/csgeom/*.h))
+SRC.CSGEOM = $(wildcard $(addprefix $(SRCDIR)/,libs/csgeom/*.cpp))
 OBJ.CSGEOM = $(addprefix $(OUT)/,$(notdir $(SRC.CSGEOM:.cpp=$O)))
 
 TO_INSTALL.STATIC_LIBS += $(CSGEOM.LIB)
@@ -37,7 +37,7 @@ TO_INSTALL.STATIC_LIBS += $(CSGEOM.LIB)
 MSVC.DSP += CSGEOM
 DSP.CSGEOM.NAME = csgeom
 DSP.CSGEOM.TYPE = library
-DSP.CSGEOM.RESOURCES = $(wildcard libs/csgeom/*.inc)
+DSP.CSGEOM.RESOURCES = $(wildcard $(SRCDIR)/libs/csgeom/*.inc)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

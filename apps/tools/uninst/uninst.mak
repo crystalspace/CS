@@ -28,8 +28,8 @@ ifeq ($(MAKESECTION),postdefines)
 UNINST.EXE = uninst$(EXE.CONSOLE)
 DIR.UNINST = apps/tools/uninst
 OUT.UNINST = $(OUT)/$(DIR.UNINST)
-INC.UNINST = $(wildcard $(DIR.UNINST)/*.h)
-SRC.UNINST = $(wildcard $(DIR.UNINST)/*.cpp)
+INC.UNINST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.UNINST)/*.h))
+SRC.UNINST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.UNINST)/*.cpp))
 OBJ.UNINST = $(addprefix $(OUT.UNINST)/,$(notdir $(SRC.UNINST:.cpp=$O)))
 DEP.UNINST =
 LIB.UNINST =
@@ -54,7 +54,7 @@ all apps: uninst
 build.uninst: $(OUTDIRS) $(UNINST.EXE)
 clean: uninstclean
 
-$(OUT.UNINST)/%$O: $(DIR.UNINST)/%.cpp
+$(OUT.UNINST)/%$O: $(SRCDIR)/$(DIR.UNINST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(UNINST.EXE): $(OBJ.UNINST) $(LIB.UNINST)

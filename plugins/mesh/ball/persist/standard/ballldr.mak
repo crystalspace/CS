@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/ball/persist/standard
+vpath %.cpp $(SRCDIR)/plugins/mesh/ball/persist/standard
 
 ifeq ($(USE_PLUGINS),yes)
   BALLLDR = $(OUTDLL)/ballldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(BALLLDR)
 endif
 
-INC.BALLLDR = $(wildcard plugins/mesh/ball/persist/standard/*.h)
-SRC.BALLLDR = $(wildcard plugins/mesh/ball/persist/standard/*.cpp)
+INC.BALLLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/ball/persist/standard/*.h))
+SRC.BALLLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/ball/persist/standard/*.cpp))
 OBJ.BALLLDR = $(addprefix $(OUT)/,$(notdir $(SRC.BALLLDR:.cpp=$O)))
 DEP.BALLLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

@@ -55,8 +55,8 @@ endif # ifeq ($(MAKESECTION),defines)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(MACOSX.SOURCE_COCOA2D_PATHS)
-vpath %.m   $(MACOSX.SOURCE_COCOA2D_PATHS)
+vpath %.cpp $(SRCDIR)/$(MACOSX.SOURCE_COCOA2D_PATHS)
+vpath %.m   $(SRCDIR)/$(MACOSX.SOURCE_COCOA2D_PATHS)
 
 ifeq ($(USE_PLUGINS),yes)
   COCOA2D = $(OUTDLL)/cocoa2d$(DLL)
@@ -69,11 +69,11 @@ else
   TO_INSTALL.STATIC_LIBS += $(COCOA2D)
 endif
 
-INC.COCOA2D = $(wildcard $(INC.COMMON.DRV2D) \
-  $(addsuffix /*.h,$(MACOSX.SOURCE_COCOA2D_PATHS)))
-SRC.COCOA2D = $(wildcard $(SRC.COMMON.DRV2D) \
+INC.COCOA2D = $(wildcard $(addprefix $(SRCDIR)/,$(INC.COMMON.DRV2D) \
+  $(addsuffix /*.h,$(MACOSX.SOURCE_COCOA2D_PATHS))))
+SRC.COCOA2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) \
   $(addsuffix /*.cpp,$(MACOSX.SOURCE_COCOA2D_PATHS)) \
-  $(addsuffix /*.m,$(MACOSX.SOURCE_COCOA2D_PATHS)))
+  $(addsuffix /*.m,$(MACOSX.SOURCE_COCOA2D_PATHS))))
 OBJ.COCOA2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.COCOA2D:.m=$O))))
 DEP.COCOA2D = CSSYS CSUTIL

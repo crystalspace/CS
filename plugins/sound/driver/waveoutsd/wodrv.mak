@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/driver/waveoutsd
+vpath %.cpp $(SRCDIR)/plugins/sound/driver/waveoutsd
 
 # The WaveOut sound driver
 ifeq ($(USE_PLUGINS),yes)
@@ -45,8 +45,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(WOS)
 endif
 
-INC.WOS = $(wildcard plugins/sound/driver/waveoutsd/*.h)
-SRC.WOS = $(wildcard plugins/sound/driver/waveoutsd/*.cpp)
+INC.WOS = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/waveoutsd/*.h))
+SRC.WOS = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/waveoutsd/*.cpp))
 OBJ.WOS = $(addprefix $(OUT)/,$(notdir $(SRC.WOS:.cpp=$O)))
 DEP.WOS = CSUTIL CSSYS CSUTIL
 

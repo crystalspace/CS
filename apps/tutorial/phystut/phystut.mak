@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 PHYSTUT.EXE = phystut$(EXE)
 DIR.PHYSTUT = apps/tutorial/phystut
 OUT.PHYSTUT = $(OUT)/$(DIR.PHYSTUT)
-INC.PHYSTUT = $(wildcard $(DIR.PHYSTUT)/*.h )
-SRC.PHYSTUT = $(wildcard $(DIR.PHYSTUT)/*.cpp )
+INC.PHYSTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PHYSTUT)/*.h ))
+SRC.PHYSTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PHYSTUT)/*.cpp ))
 OBJ.PHYSTUT = $(addprefix $(OUT.PHYSTUT)/,$(notdir $(SRC.PHYSTUT:.cpp=$O)))
 DEP.PHYSTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.PHYSTUT = $(foreach d,$(DEP.PHYSTUT),$($d.LIB))
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 build.phystut: $(OUTDIRS) $(PHYSTUT.EXE)
 clean: phystutclean
 
-$(OUT.PHYSTUT)/%$O: $(DIR.PHYSTUT)/%.cpp
+$(OUT.PHYSTUT)/%$O: $(SRCDIR)/$(DIR.PHYSTUT)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(PHYSTUT.EXE): $(DEP.EXE) $(OBJ.PHYSTUT) $(LIB.PHYSTUT)

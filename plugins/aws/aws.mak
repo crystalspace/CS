@@ -25,7 +25,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/aws
+vpath %.cpp $(SRCDIR)/plugins/aws
 
 ifeq ($(USE_PLUGINS),yes)
   AWS = $(OUTDLL)/aws$(DLL)
@@ -38,14 +38,17 @@ else
   TO_INSTALL.STATIC_LIBS += $(AWS)
 endif
 
-INC.AWS = $(wildcard plugins/aws/*.h) $(wildcard include/iaws/*.h)
-SRC.AWS = $(filter-out plugins/aws/skinlex.cpp plugins/aws/skinpars.cpp, \
-  $(wildcard plugins/aws/*.cpp))				  \
-  plugins/aws/skinlex.cpp plugins/aws/skinpars.cpp
+INC.AWS = $(wildcard $(addprefix $(SRCDIR)/,plugins/aws/*.h include/iaws/*.h))
+# We add skinlex.cpp and skinpars.cpp explicitly since they might not be
+# present (thus need to be regenerated automatically).  We use $(sort) for its
+# side-effect of folding out duplicate entries to ensure that skinlex.cpp and
+# skinpars.cpp only appear in the list once each.
+SRC.AWS = $(sort $(wildcard $(SRCDIR)/plugins/aws/*.cpp) \
+  $(addprefix $(SRCDIR)/,plugins/aws/skinlex.cpp plugins/aws/skinpars.cpp))
 OBJ.AWS = $(addprefix $(OUT)/,$(notdir $(SRC.AWS:.cpp=$O)))
 DEP.AWS = CSUTIL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
 
-TO_INSTALL.DATA += data/awsdef.zip
+TO_INSTALL.DATA += $(SRCDIR)/data/awsdef.zip
 
 MSVC.DSP += AWS
 DSP.AWS.NAME = aws
@@ -65,16 +68,20 @@ $(AWS): $(OBJ.AWS) $(LIB.AWS)
 ifneq (,$(FLEXBIN))
 ifneq (,$(BISONBIN))
 
-plugins/aws/skinlex.cpp: plugins/aws/skinpars.hpp plugins/aws/skinlex.ll \
-			 plugins/aws/skinpars.cpp
-	flex -L -Splugins/aws/flex.skl -t plugins/aws/skinlex.ll > plugins/aws/skinlex.cpp
+$(SRCDIR)/plugins/aws/skinlex.cpp: \
+  $(SRCDIR)/plugins/aws/skinpars.hpp \
+  $(SRCDIR)/plugins/aws/skinlex.ll \
+  $(SRCDIR)/plugins/aws/skinpars.cpp
+	flex -L -S$(SRCDIR)/plugins/aws/flex.skl \
+	-t $(SRCDIR)/plugins/aws/skinlex.ll > $(SRCDIR)/plugins/aws/skinlex.cpp
 
-plugins/aws/skinpars.cpp: plugins/aws/skinpars.yy
+$(SRCDIR)/plugins/aws/skinpars.cpp: $(SRCDIR)/plugins/aws/skinpars.yy
 	bison --no-lines -d -p aws -o $@ $(<)
 
-plugins/aws/skinpars.hpp: plugins/aws/skinpars.cpp
-	@if [ -f "plugins/aws/skinpars.cpp.hpp" ]; then \
-	$(MV) plugins/aws/skinpars.cpp.hpp plugins/aws/skinpars.hpp; \
+$(SRCDIR)/plugins/aws/skinpars.hpp: $(SRCDIR)/plugins/aws/skinpars.cpp
+	@if [ -f "$(SRCDIR)/plugins/aws/skinpars.cpp.hpp" ]; then \
+	$(MV) $(SRCDIR)/plugins/aws/skinpars.cpp.hpp \
+	$(SRCDIR)/plugins/aws/skinpars.hpp; \
 	fi
 endif
 endif

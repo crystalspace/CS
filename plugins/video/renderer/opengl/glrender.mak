@@ -42,29 +42,33 @@ else
   TO_INSTALL.STATIC_LIBS += $(GL3D)
 endif
 
-INC.GL3D = $(wildcard plugins/video/renderer/opengl/*.h) \
+INC.GL3D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/renderer/opengl/*.h \
   plugins/video/renderer/common/txtmgr.h \
   plugins/video/renderer/common/dtmesh.h \
   plugins/video/renderer/common/dpmesh.h \
   plugins/video/renderer/common/vbufmgr.h \
   plugins/video/renderer/common/polybuf.h \
-  plugins/video/renderer/common/pixfmt.h
-SRC.GL3D = $(wildcard plugins/video/renderer/opengl/*.cpp) \
+  plugins/video/renderer/common/pixfmt.h))
+SRC.GL3D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/renderer/opengl/*.cpp \
   plugins/video/renderer/common/txtmgr.cpp \
   plugins/video/renderer/common/dtmesh.cpp \
   plugins/video/renderer/common/dpmesh.cpp \
   plugins/video/renderer/common/vbufmgr.cpp \
-  plugins/video/renderer/common/polybuf.cpp
+  plugins/video/renderer/common/polybuf.cpp))
 OBJ.GL3D = $(addprefix $(OUT)/,$(notdir $(SRC.GL3D:.cpp=$O)))
 DEP.GL3D = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
-CFG.GL3D = data/config/opengl.cfg data/config/glnvgf.cfg data/config/gl3dfx.cfg
+CFG.GL3D = $(addprefix $(SRCDIR)/, \
+  data/config/opengl.cfg data/config/glnvgf.cfg data/config/gl3dfx.cfg)
 
 TO_INSTALL.CONFIG += $(CFG.GL3D)
 
 MSVC.DSP += GL3D
 DSP.GL3D.NAME = gl3d
 DSP.GL3D.TYPE = plugin
-DSP.GL3D.RESOURCES = $(wildcard plugins/video/renderer/opengl/ext/*.inc)
+DSP.GL3D.RESOURCES = \
+  $(wildcard $(SRCDIR)/plugins/video/renderer/opengl/ext/*.inc)
 DSP.GL3D.LIBS = opengl32 glu32
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -79,7 +83,7 @@ clean: gl3dclean
 
 gl3d: $(OUTDIRS) $(GL3D)
 
-$(OUT)/%$O: plugins/video/renderer/opengl/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/renderer/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
 
 $(GL3D): $(OBJ.GL3D) $(LIB.GL3D)

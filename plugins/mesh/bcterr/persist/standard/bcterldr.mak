@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/bcterr/persist/standard
+vpath %.cpp $(SRCDIR)/plugins/mesh/bcterr/persist/standard
 
 ifeq ($(USE_PLUGINS),yes)
   BCTERRLDR = $(OUTDLL)/bcterrldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(BCTERRLDR)
 endif
 
-INC.BCTERRLDR = $(wildcard plugins/mesh/bcterr/persist/standard/*.h)
-SRC.BCTERRLDR = $(wildcard plugins/mesh/bcterr/persist/standard/*.cpp)
+INC.BCTERRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/persist/standard/*.h))
+SRC.BCTERRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/persist/standard/*.cpp))
 OBJ.BCTERRLDR = $(addprefix $(OUT)/,$(notdir $(SRC.BCTERRLDR:.cpp=$O)))
 DEP.BCTERRLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

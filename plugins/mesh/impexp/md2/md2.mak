@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/impexp/md2
+vpath %.cpp $(SRCDIR)/plugins/mesh/impexp/md2
 
 ifeq ($(USE_PLUGINS),yes)
   MD2IE = $(OUTDLL)/md2ie$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(MD2IE)
 endif
 
-INC.MD2IE = $(wildcard plugins/mesh/impexp/md2/*.h)
-SRC.MD2IE = $(wildcard plugins/mesh/impexp/md2/*.cpp)
+INC.MD2IE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/md2/*.h))
+SRC.MD2IE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/md2/*.cpp))
 OBJ.MD2IE = $(addprefix $(OUT)/,$(notdir $(SRC.MD2IE:.cpp=$O)))
 DEP.MD2IE = CSGEOM CSUTIL CSSYS CSUTIL CSTOOL CSUTIL CSGEOM
 

@@ -37,8 +37,8 @@ endif
 
 DIR.ISO = plugins/engine/iso
 OUT.ISO = $(OUT)/$(DIR.ISO)
-INC.ISO = $(wildcard $(DIR.ISO)/*.h)
-SRC.ISO = $(wildcard $(DIR.ISO)/*.cpp)
+INC.ISO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISO)/*.h))
+SRC.ISO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISO)/*.cpp))
 OBJ.ISO = $(addprefix $(OUT.ISO)/,$(notdir $(SRC.ISO:.cpp=$O)))
 DEP.ISO = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
 
@@ -56,7 +56,7 @@ ifeq ($(MAKESECTION),targets)
 
 iso: $(OUTDIRS) $(ISO)
 
-$(OUT.ISO)/%$O: $(DIR.ISO)/%.cpp
+$(OUT.ISO)/%$O: $(SRCDIR)/$(DIR.ISO)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(ISO): $(OBJ.ISO) $(LIB.ISO)

@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/console/output/standard
+vpath %.cpp $(SRCDIR)/plugins/console/output/standard
 
 ifeq ($(USE_PLUGINS),yes)
   CSCONOUT = $(OUTDLL)/csconout$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSCONOUT)
 endif
 
-INC.CSCONOUT = $(wildcard plugins/console/output/standard/*.h)
-SRC.CSCONOUT = $(wildcard plugins/console/output/standard/*.cpp)
+INC.CSCONOUT = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/standard/*.h))
+SRC.CSCONOUT = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/standard/*.cpp))
 OBJ.CSCONOUT = $(addprefix $(OUT)/,$(notdir $(SRC.CSCONOUT:.cpp=$O)))
 DEP.CSCONOUT = CSUTIL CSGEOM CSSYS CSUTIL
 

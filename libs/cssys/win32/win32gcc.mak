@@ -20,7 +20,7 @@ PLUGINS += sound/driver/waveoutsd
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
-include mk/dos.mak
+include $(SRCDIR)/mk/dos.mak
 
 # Typical object file extension
 O=.o
@@ -95,14 +95,14 @@ ARFLAGS = cr
 NASMFLAGS.SYSTEM = -f win32 $(CFLAGS.D)EXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.cpp) \
-  libs/cssys/general/findlib.cpp \
-  libs/cssys/general/getopt.cpp \
-  libs/cssys/general/printf.cpp \
-  libs/cssys/general/runloop.cpp \
-  libs/cssys/general/sysinit.cpp \
+SRC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/win32/*.cpp) \
+  $(SRCDIR)/libs/cssys/general/findlib.cpp \
+  $(SRCDIR)/libs/cssys/general/getopt.cpp \
+  $(SRCDIR)/libs/cssys/general/printf.cpp \
+  $(SRCDIR)/libs/cssys/general/runloop.cpp \
+  $(SRCDIR)/libs/cssys/general/sysinit.cpp \
   $(CSTHREAD.SRC)
-INC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.h) $(CSTHREAD.INC)
+INC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/win32/*.h) $(CSTHREAD.INC)
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND = -e "s/\.ob*j*\:/\$$O:/g"
@@ -134,8 +134,8 @@ else
 endif
 
 COMPILE_RES = windres --include-dir include $(RCFLAGS) 
-MAKEVERSIONINFO = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh
-MERGERES = $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh
+MAKEVERSIONINFO = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh
+MERGERES = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh
 
 DO.SHARED.PLUGIN.PREAMBLE = \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \

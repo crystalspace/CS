@@ -20,7 +20,7 @@ joylinclean:
 endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
-vpath %.cpp plugins/device/joystick/linux
+vpath %.cpp $(SRCDIR)/plugins/device/joystick/linux
 
 ifeq ($(USE_PLUGINS),yes)
   JOYLIN = $(OUTDLL)/csjoylin$(DLL)
@@ -33,11 +33,11 @@ else
   TO_INSTALL.STATIC_LIBS += $(JOYLIN)
 endif
 
-INC.JOYLIN = $(wildcard plugins/device/joystick/linux/*.h)
-SRC.JOYLIN = $(wildcard plugins/device/joystick/linux/*.cpp)
+INC.JOYLIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/device/joystick/linux/*.h))
+SRC.JOYLIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/device/joystick/linux/*.cpp))
 OBJ.JOYLIN = $(addprefix $(OUT)/,$(notdir $(SRC.JOYLIN:.cpp=$O)))
 DEP.JOYLIN = CSUTIL CSSYS
-CFG.JOYLIN = data/config/joystick.cfg
+CFG.JOYLIN = $(SRCDIR)/data/config/joystick.cfg
 
 TO_INSTALL.CONFIG += $(CFG.JOYLIN)
 

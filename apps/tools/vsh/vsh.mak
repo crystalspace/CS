@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 VSH.EXE = vsh$(EXE.CONSOLE)
 DIR.VSH = apps/tools/vsh
 OUT.VSH = $(OUT)/$(DIR.VSH)
-INC.VSH = $(wildcard $(DIR.VSH)/*.h)
-SRC.VSH = $(wildcard $(DIR.VSH)/*.cpp)
+INC.VSH = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.VSH)/*.h))
+SRC.VSH = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.VSH)/*.cpp))
 OBJ.VSH = $(addprefix $(OUT.VSH)/,$(notdir $(SRC.VSH:.cpp=$O)))
 DEP.VSH = CSUTIL CSGFX CSTOOL CSSYS CSUTIL CSSYS CSGEOM
 LIB.VSH = $(foreach d,$(DEP.VSH),$($d.LIB))
@@ -54,7 +54,7 @@ all: $(VSH.EXE)
 build.vsh: $(OUTDIRS) $(VSH.EXE)
 clean: vshclean
 
-$(OUT.VSH)/%$O: $(DIR.VSH)/%.cpp
+$(OUT.VSH)/%$O: $(SRCDIR)/$(DIR.VSH)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(VSH.EXE): $(DEP.EXE) $(OBJ.VSH) $(LIB.VSH)

@@ -45,8 +45,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(XEXTSHM)
 endif
 
-INC.XEXTSHM = $(wildcard plugins/video/canvas/xextshm/*.h)
-SRC.XEXTSHM = $(wildcard plugins/video/canvas/xextshm/*.cpp)
+INC.XEXTSHM = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/xextshm/*.h))
+SRC.XEXTSHM = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/xextshm/*.cpp))
 OBJ.XEXTSHM = $(addprefix $(OUT)/,$(notdir $(SRC.XEXTSHM:.cpp=$O)))
 DEP.XEXTSHM = CSUTIL CSSYS CSGEOM CSUTIL
 
@@ -59,7 +59,7 @@ ifeq ($(MAKESECTION),targets)
 
 xextshm: $(OUTDIRS) $(XEXTSHM)
 
-$(OUT)/%$O: plugins/video/canvas/xextshm/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/xextshm/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.XEXTSHM)
 
 $(XEXTSHM): $(OBJ.XEXTSHM) $(LIB.XEXTSHM)

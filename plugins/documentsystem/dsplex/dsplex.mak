@@ -38,8 +38,8 @@ endif
 
 DIR.DSPLEX = plugins/documentsystem/dsplex
 OUT.DSPLEX = $(OUT)/$(DIR.DSPLEX)
-INC.DSPLEX = $(wildcard $(DIR.DSPLEX)/*.h)
-SRC.DSPLEX = $(wildcard $(DIR.DSPLEX)/*.cpp)
+INC.DSPLEX = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.DSPLEX)/*.h))
+SRC.DSPLEX = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.DSPLEX)/*.cpp))
 OBJ.DSPLEX = $(addprefix $(OUT.DSPLEX)/,$(notdir $(SRC.DSPLEX:.cpp=$O)))
 DEP.DSPLEX = CSUTIL CSTOOL CSSYS CSUTIL
 
@@ -56,7 +56,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: dsplex dsplexclean dsplexcleandep
 dsplex: $(OUTDIRS) $(DSPLEX)
 
-$(OUT.DSPLEX)/%$O: $(DIR.DSPLEX)/%.cpp
+$(OUT.DSPLEX)/%$O: $(SRCDIR)/$(DIR.DSPLEX)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(DSPLEX): $(OBJ.DSPLEX) $(LIB.DSPLEX)

@@ -24,7 +24,7 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 # Application wrapper support.
 # <cs-config>
 MACOSX.APP_EXE  = $@/Contents/MacOS/$(notdir $(basename $@))
-MACOSX.APP_ICON = libs/cssys/macosx/appicon.icns
+MACOSX.APP_ICON = $(SRCDIR)/libs/cssys/macosx/appicon.icns
 MACOSX.APP_DIR  = .
 MACOSX.APP_EXT  = .app
 # </cs-config>
@@ -37,7 +37,7 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
-include mk/unix.mak
+include $(SRCDIR)/mk/unix.mak
 
 # Add support for Objective-C (.m) and Objective-C++ (.mm) source code.
 .SUFFIXES: .m .mm
@@ -49,10 +49,10 @@ DO.COMPILE.M = $(OBJC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 DO.COMPILE.MM = $(OBJCXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 
 # Directories containing platform-specific source code.
-MACOSX.SOURCE_PATHS = libs/cssys/macosx
+MACOSX.SOURCE_PATHS = $(SRCDIR)/libs/cssys/macosx
 
 # Select MacOS/X config file for inclusion with install.
-TO_INSTALL.CONFIG += data/config/macosx.cfg
+TO_INSTALL.CONFIG += $(SRCDIR)/data/config/macosx.cfg
 
 # Extension for applications on this system
 EXE = $(MACOSX.APP_EXT)
@@ -117,17 +117,18 @@ LFLAGS.DLL = -bundle -framework AppKit -framework Foundation
 NASMFLAGS.SYSTEM =
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = $(wildcard \
+SRC.SYS_CSSYS = $(wildcard $(addprefix $(SRCDIR)/, \
   $(addsuffix /*.cpp,$(MACOSX.SOURCE_PATHS)) \
   $(addsuffix /*.c,$(MACOSX.SOURCE_PATHS)) \
   $(addsuffix /*.m,$(MACOSX.SOURCE_PATHS)) \
-  $(addsuffix /*.mm,$(MACOSX.SOURCE_PATHS))) \
-  libs/cssys/general/findlib.cpp \
-  libs/cssys/general/getopt.cpp \
-  libs/cssys/general/printf.cpp \
-  libs/cssys/general/sysroot.cpp \
+  $(addsuffix /*.mm,$(MACOSX.SOURCE_PATHS)))) \
+  $(SRCDIR)/libs/cssys/general/findlib.cpp \
+  $(SRCDIR)/libs/cssys/general/getopt.cpp \
+  $(SRCDIR)/libs/cssys/general/printf.cpp \
+  $(SRCDIR)/libs/cssys/general/sysroot.cpp \
   $(CSTHREAD.SRC)
-INC.SYS_CSSYS = $(wildcard $(addsuffix /*.h,$(MACOSX.SOURCE_PATHS))) \
+INC.SYS_CSSYS = \
+  $(wildcard $(addprefix $(SRCDIR)/,$(addsuffix /*.h,$(MACOSX.SOURCE_PATHS))))\
   $(CSTHREAD.INC)
 
 # Where to put dynamic libraries on this system?
@@ -161,14 +162,14 @@ $(OUT)/%$O: %.mm
 OBJ.CSSYS = $(addprefix $(OUT)/,$(notdir $(subst .s,$O,$(subst .c,$O,\
   $(subst .cpp,$O,$(subst .mm,$O,$(SRC.CSSYS:.m=$O)))))))
 
-vpath %.m  libs/cssys $(filter-out libs/cssys/general/,$(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
-vpath %.mm libs/cssys $(filter-out libs/cssys/general/,$(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
+vpath %.m  $(SRCDIR)/libs/cssys $(filter-out $(SRCDIR)/libs/cssys/general/,$(sort $(dir $(SRC.SYS_CSSYS)))) $(SRCDIR)/libs/cssys/general
+vpath %.mm $(SRCDIR)/libs/cssys $(filter-out $(SRCDIR)/libs/cssys/general/,$(sort $(dir $(SRC.SYS_CSSYS)))) $(SRCDIR)/libs/cssys/general
 
 # Override default method of creating a GUI application.  For Cocoa, we need
 # to place the executable inside an application wrapper.
 # <cs-config>
 define DO.LINK.EXE
-  sh libs/cssys/macosx/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON)
+  sh $(SRCDIR)/libs/cssys/macosx/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(SRCDIR)/include/csver.h
   $(NEWLINE)$(LINK) $(LFLAGS) $(LFLAGS.EXE) -o $(MACOSX.APP_EXE) $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
   touch $@
 endef

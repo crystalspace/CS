@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 TBCONVERT.EXE = tbconvert$(EXE.CONSOLE)
 DIR.TBCONVERT = apps/tools/tbconv
 OUT.TBCONVERT = $(OUT)/$(DIR.TBCONVERT)
-INC.TBCONVERT = $(wildcard $(DIR.TBCONVERT)/*.h)
-SRC.TBCONVERT = $(wildcard $(DIR.TBCONVERT)/*.cpp)
+INC.TBCONVERT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.TBCONVERT)/*.h))
+SRC.TBCONVERT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.TBCONVERT)/*.cpp))
 OBJ.TBCONVERT = \
   $(addprefix $(OUT.TBCONVERT)/,$(notdir $(SRC.TBCONVERT:.cpp=$O)))
 DEP.TBCONVERT = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
@@ -54,7 +54,7 @@ ifeq ($(MAKESECTION),targets)
 build.tbconvert: $(OUTDIRS) $(TBCONVERT.EXE)
 clean: tbconvertclean
 
-$(OUT.TBCONVERT)/%$O: $(DIR.TBCONVERT)/%.cpp
+$(OUT.TBCONVERT)/%$O: $(SRCDIR)/$(DIR.TBCONVERT)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(TBCONVERT.EXE): $(DEP.EXE) $(OBJ.TBCONVERT) $(LIB.TBCONVERT)

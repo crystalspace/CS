@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/genmesh/persist/tree
+vpath %.cpp $(SRCDIR)/plugins/mesh/genmesh/persist/tree
 
 ifeq ($(USE_PLUGINS),yes)
   GTREELDR = $(OUTDLL)/gtreeldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(GTREELDR)
 endif
 
-INC.GTREELDR = $(wildcard plugins/mesh/genmesh/persist/tree/*.h)
-SRC.GTREELDR = $(wildcard plugins/mesh/genmesh/persist/tree/*.cpp)
+INC.GTREELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/tree/*.h))
+SRC.GTREELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/tree/*.cpp))
 OBJ.GTREELDR = $(addprefix $(OUT)/,$(notdir $(SRC.GTREELDR:.cpp=$O)))
 DEP.GTREELDR = CSGEOM CSUTIL CSSYS CSUTIL
 

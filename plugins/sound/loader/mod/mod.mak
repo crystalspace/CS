@@ -37,8 +37,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDMOD)
 endif
 
-INC.SNDMOD = $(wildcard plugins/sound/loader/mod/*.h)
-SRC.SNDMOD = $(wildcard plugins/sound/loader/mod/*.cpp)
+INC.SNDMOD = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mod/*.h))
+SRC.SNDMOD = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mod/*.cpp))
 OBJ.SNDMOD = $(addprefix $(OUT)/,$(notdir $(SRC.SNDMOD:.cpp=$O)))
 DEP.SNDMOD = CSUTIL CSSYS CSUTIL
 
@@ -55,7 +55,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: sndmod sndmodclean
 sndmod: $(OUTDIRS) $(SNDMOD)
 
-$(OUT)/%$O: plugins/sound/loader/mod/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/sound/loader/mod/%.cpp
 	$(DO.COMPILE.CPP) $(MIKMOD.CFLAGS)
 
 $(SNDMOD): $(OBJ.SNDMOD) $(LIB.SNDMOD)

@@ -30,8 +30,8 @@ ifeq ($(MAKESECTION),postdefines)
 3DS2LEV.EXE = 3ds2lev$(EXE.CONSOLE)
 DIR.3DS2LEV = apps/import/3ds2lev
 OUT.3DS2LEV = $(OUT)/$(DIR.3DS2LEV)
-INC.3DS2LEV = $(wildcard $(DIR.3DS2LEV)/*.h)
-SRC.3DS2LEV = $(wildcard $(DIR.3DS2LEV)/*.cpp)
+INC.3DS2LEV = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.3DS2LEV)/*.h))
+SRC.3DS2LEV = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.3DS2LEV)/*.cpp))
 OBJ.3DS2LEV = $(addprefix $(OUT.3DS2LEV)/,$(notdir $(SRC.3DS2LEV:.cpp=$O)))
 DEP.3DS2LEV = CSGEOM CSUTIL CSSYS CSUTIL
 LIB.3DS2LEV = $(foreach d,$(DEP.3DS2LEV),$($d.LIB))
@@ -55,7 +55,7 @@ ifeq ($(MAKESECTION),targets)
 build.3ds2lev: $(OUTDIRS) $(3DS2LEV.EXE)
 clean: 3ds2levclean
 
-$(OUT.3DS2LEV)/%$O: $(DIR.3DS2LEV)/%.cpp
+$(OUT.3DS2LEV)/%$O: $(SRCDIR)/$(DIR.3DS2LEV)/%.cpp
 	$(DO.COMPILE.CPP) $(3DS.CFLAGS)
 
 $(3DS2LEV.EXE): $(OBJ.3DS2LEV) $(LIB.3DS2LEV)

@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 TBTUT.EXE = tbtut$(EXE)
 DIR.TBTUT = apps/tutorial/tbtut
 OUT.TBTUT = $(OUT)/$(DIR.TBTUT)
-INC.TBTUT = $(wildcard $(DIR.TBTUT)/*.h )
-SRC.TBTUT = $(wildcard $(DIR.TBTUT)/*.cpp )
+INC.TBTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.TBTUT)/*.h ))
+SRC.TBTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.TBTUT)/*.cpp ))
 OBJ.TBTUT = $(addprefix $(OUT.TBTUT)/,$(notdir $(SRC.TBTUT:.cpp=$O)))
 DEP.TBTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.TBTUT = $(foreach d,$(DEP.TBTUT),$($d.LIB))
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 build.tbtut: $(OUTDIRS) $(TBTUT.EXE)
 clean: tbtutclean
 
-$(OUT.TBTUT)/%$O: $(DIR.TBTUT)/%.cpp
+$(OUT.TBTUT)/%$O: $(SRCDIR)/$(DIR.TBTUT)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(TBTUT.EXE): $(DEP.EXE) $(OBJ.TBTUT) $(LIB.TBTUT)

@@ -66,20 +66,23 @@ LIB.PYTHMOD.LOCAL = $(LIB.CSPYTHON.LOCAL)
 
 TO_INSTALL.EXE += python.cex
 
-SWIG.INTERFACE = include/ivaria/cspace.i
-SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
+CSPYTHON.ROOT.BUILD = $(shell $(PWD))
+CSPYTHON.ROOT.SRC = $(shell cd $(SRCDIR) ; $(PWD))
+
+SWIG.INTERFACE = $(SRCDIR)/include/ivaria/cspace.i
+SWIG.CSPYTHON = $(SRCDIR)/plugins/cscript/cspython/cs_pyth.cpp
 SWIG.CSPYTHON.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
 
-TRASH.CSPYTHON = $(wildcard $(addprefix scripts/python/,*.pyc *.pyo))
+TRASH.CSPYTHON = $(wildcard $(addprefix $(SRCDIR)/scripts/python/,*.pyc *.pyo))
 
-INC.CSPYTHON = $(wildcard plugins/cscript/cspython/*.h)
+INC.CSPYTHON = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/cspython/*.h))
 SRC.CSPYTHON = \
   $(filter-out plugins/cscript/cspython/pythmod.cpp, $(sort $(wildcard plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON)))
 OBJ.CSPYTHON = $(addprefix $(OUT)/, $(notdir $(SRC.CSPYTHON:.cpp=$O)))
 DEP.CSPYTHON = CSTOOL CSGFX CSGEOM CSSYS CSUTIL CSSYS CSUTIL
 
 INC.PYTHMOD =
-SRC.PYTHMOD = plugins/cscript/cspython/pythmod.cpp $(SWIG.CSPYTHON)
+SRC.PYTHMOD = $(SRCDIR)/plugins/cscript/cspython/pythmod.cpp $(SWIG.CSPYTHON)
 OBJ.PYTHMOD = $(addprefix $(OUT)/, $(notdir $(SRC.PYTHMOD:.cpp=$O)))
 DEP.PYTHMOD = $(DEP.CSPYTHON)
 
@@ -112,10 +115,10 @@ endif
 $(SWIG.CSPYTHON.OBJ): $(SWIG.CSPYTHON)
 	$(filter-out -W -Wunused -Wall -Wmost,$(DO.COMPILE.CPP) $(PYTHON.CFLAGS))
 
-$(OUT)/%$O: plugins/cscript/cspython/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/cscript/cspython/%.cpp
 	$(DO.COMPILE.CPP) $(PYTHON.CFLAGS)
 
-$(OUT)/%$O: plugins/cscript/cspython/%.c
+$(OUT)/%$O: $(SRCDIR)/plugins/cscript/cspython/%.c
 	$(DO.COMPILE.C) $(PYTHON.CFLAGS)
 
 ifeq (,$(SWIGBIN))
@@ -124,14 +127,14 @@ endif
 
 SWIGFLAGS=-python -c++ -shadow -Iinclude/
 SWIG.CSPYTHON.DEPS=\
-	include/ivaria/pythpre.i \
-	include/ivaria/pythpost.i
+	$(SRCDIR)/include/ivaria/pythpre.i \
+	$(SRCDIR)/include/ivaria/pythpost.i
 
 $(SWIG.CSPYTHON): $(SWIG.INTERFACE) $(SWIG.CSPYTHON.DEPS)
 	$(SWIGBIN) $(SWIGFLAGS) -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
-	$(CP) plugins/cscript/cspython/cspace.py scripts/python/
+	$(CP) $(SRCDIR)/plugins/cscript/cspython/cspace.py $(SRCDIR)/scripts/python/
 
-python.cex: plugins/cscript/cspython/python.cin
+python.cex: $(SRCDIR)/plugins/cscript/cspython/python.cin
 	@echo Generate python cs-config extension...
 	@echo $"#!/bin/sh$" > python.cex
 	@echo $"# WARNING: This file is generated automatically by cspython.mak$" >> python.cex
@@ -139,7 +142,7 @@ python.cex: plugins/cscript/cspython/python.cin
 	@echo $"PYTH_CFLAGS="$(PYTHON.CFLAGS)"$"    >> python.cex
 	@echo $"PYTH_CXXFLAGS="$(PYTHON.CFLAGS)"$"  >> python.cex
 	@echo $"PYTH_DEPS=""$"		            >> python.cex
-	@cat plugins/cscript/cspython/python.cin    >> python.cex
+	@cat $(SRCDIR)/plugins/cscript/cspython/python.cin >> python.cex
 
 $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 	$(DO.PLUGIN.PREAMBLE) \
@@ -148,7 +151,7 @@ $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 
 ifeq ($(PYTHON.DISTUTILS),yes)
 $(PYTHMOD): $(OBJ.PYTHMOD) $(LIB.PYTHMOD)
-	cd plugins/cscript/cspython ; $(PYTHON) pythmod_setup.py pythmod_install ../../../$(OUT)
+	cd $(SRCDIR)/plugins/cscript/cspython ; $(PYTHON) pythmod_setup.py pythmod_install $(CSPYTHON.ROOT.BUILD)/$(OUT) $(CSPYTHON.ROOT.SRC)/scripts/python $(CSPYTHON.ROOT.SRC)/include $(CSPYTHON.ROOT.BUILD)/include
 else
 $(PYTHMOD):
 	@echo $(DESCRIPTION.pythmod)" not supported: distutils not available!"
@@ -156,11 +159,10 @@ endif
 
 ifeq ($(PYTHON.DISTUTILS),yes)
 pythmodclean:
-	cd plugins/cscript/cspython ; $(PYTHON) pythmod_setup.py pythmod_clean
-	-$(RM) -fr plugins/cscript/cspython/build/
+	cd $(SRCDIR)/plugins/cscript/cspython ; $(PYTHON) pythmod_setup.py pythmod_clean
+	$(RMDIR) $(SRCDIR)/plugins/cscript/cspython/build
 else
 pythmodclean:
-	# ignore
 endif
 
 cspythonclean:

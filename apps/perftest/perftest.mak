@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 PERFTEST.EXE = perftest$(EXE)
 DIR.PERFTEST = apps/perftest
 OUT.PERFTEST = $(OUT)/$(DIR.PERFTEST)
-INC.PERFTEST = $(wildcard $(DIR.PERFTEST)/*.h)
-SRC.PERFTEST = $(wildcard $(DIR.PERFTEST)/*.cpp)
+INC.PERFTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PERFTEST)/*.h))
+SRC.PERFTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PERFTEST)/*.cpp))
 OBJ.PERFTEST = $(addprefix $(OUT.PERFTEST)/,$(notdir $(SRC.PERFTEST:.cpp=$O)))
 DEP.PERFTEST = CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSGFX CSSYS
 LIB.PERFTEST = $(foreach d,$(DEP.PERFTEST),$($d.LIB))
@@ -54,7 +54,7 @@ all: $(PERFTEST.EXE)
 build.perftest: $(OUTDIRS) $(PERFTEST.EXE)
 clean: perftestclean
 
-$(OUT.PERFTEST)/%$O: $(DIR.PERFTEST)/%.cpp
+$(OUT.PERFTEST)/%$O: $(SRCDIR)/$(DIR.PERFTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(PERFTEST.EXE): $(DEP.EXE) $(OBJ.PERFTEST) $(LIB.PERFTEST)

@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/renderer/null
+vpath %.cpp $(SRCDIR)/plugins/video/renderer/null
 
 ifeq ($(USE_PLUGINS),yes)
   NULL3D = $(OUTDLL)/null3d$(DLL)
@@ -42,24 +42,26 @@ else
   TO_INSTALL.STATIC_LIBS += $(NULL3D)
 endif
 
-INC.NULL3D = $(wildcard plugins/video/renderer/null/*.h) \
+INC.NULL3D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/renderer/null/*.h \
   plugins/video/renderer/common/txtmgr.h \
   plugins/video/renderer/common/vbufmgr.h \
-  plugins/video/renderer/common/polybuf.h
-SRC.NULL3D = $(wildcard plugins/video/renderer/null/*.cpp) \
+  plugins/video/renderer/common/polybuf.h))
+SRC.NULL3D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/renderer/null/*.cpp \
   plugins/video/renderer/common/txtmgr.cpp \
   plugins/video/renderer/common/vbufmgr.cpp \
-  plugins/video/renderer/common/polybuf.cpp
+  plugins/video/renderer/common/polybuf.cpp))
 OBJ.NULL3D = $(addprefix $(OUT)/,$(notdir $(SRC.NULL3D:.cpp=$O)))
 DEP.NULL3D = CSGFX CSUTIL CSSYS CSGEOM CSUTIL
-CFG.NULL3D = data/config/null3d.cfg
+CFG.NULL3D = $(SRCDIR)/data/config/null3d.cfg
 
 TO_INSTALL.CONFIG += $(CFG.NULL3D)
 
 MSVC.DSP += NULL3D
 DSP.NULL3D.NAME = null3d
 DSP.NULL3D.TYPE = plugin
-DSP.NULL3D.RESOURCES = $(wildcard plugins/video/renderer/null/*.inc)
+DSP.NULL3D.RESOURCES = $(wildcard $(SRCDIR)/plugins/video/renderer/null/*.inc)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -38,8 +38,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSJNGIMG)
 endif
 
-INC.CSJNGIMG = $(wildcard plugins/video/loader/jng/*.h)
-SRC.CSJNGIMG = $(wildcard plugins/video/loader/jng/*.cpp)
+INC.CSJNGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/jng/*.h))
+SRC.CSJNGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/jng/*.cpp))
 
 OBJ.CSJNGIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSJNGIMG:.cpp=$O)))
 DEP.CSJNGIMG = CSUTIL CSSYS CSGFX CSUTIL
@@ -60,7 +60,7 @@ ifeq ($(MAKESECTION),targets)
 
 csjngimg: $(OUTDIRS) $(CSJNGIMG)
 
-$(OUT)/%$O: plugins/video/loader/jng/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/loader/jng/%.cpp
 	$(DO.COMPILE.CPP) $(MNG.CFLAGS)
 
 $(CSJNGIMG): $(OBJ.CSJNGIMG) $(LIB.CSJNGIMG)

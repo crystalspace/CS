@@ -31,12 +31,12 @@ ifeq ($(MAKESECTION),postdefines)
 AWSTEST.EXE = awstest$(EXE)
 DIR.AWSTEST = apps/tests/awstest
 OUT.AWSTEST = $(OUT)/$(DIR.AWSTEST)
-INC.AWSTEST = $(wildcard $(DIR.AWSTEST)/*.h )
-SRC.AWSTEST = $(wildcard $(DIR.AWSTEST)/*.cpp )
+INC.AWSTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWSTEST)/*.h ))
+SRC.AWSTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWSTEST)/*.cpp ))
 OBJ.AWSTEST = $(addprefix $(OUT.AWSTEST)/,$(notdir $(SRC.AWSTEST:.cpp=$O)))
 DEP.AWSTEST = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.AWSTEST = $(foreach d,$(DEP.AWSTEST),$($d.LIB))
-CFG.AWSTEST = data/config/awstest.cfg
+CFG.AWSTEST = $(SRCDIR)/data/config/awstest.cfg
 
 OUTDIRS += $(OUT.AWSTEST)
 
@@ -58,7 +58,7 @@ all: $(AWSTEST.EXE)
 build.awstest: $(OUTDIRS) $(AWSTEST.EXE)
 clean: awstestclean
 
-$(OUT.AWSTEST)/%$O: $(DIR.AWSTEST)/%.cpp
+$(OUT.AWSTEST)/%$O: $(SRCDIR)/$(DIR.AWSTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(AWSTEST.EXE): $(DEP.EXE) $(OBJ.AWSTEST) $(LIB.AWSTEST)

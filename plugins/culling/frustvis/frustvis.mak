@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/culling/frustvis
+vpath %.cpp $(SRCDIR)/plugins/culling/frustvis
 
 ifeq ($(USE_PLUGINS),yes)
   FRUSTVIS = $(OUTDLL)/frustvis$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(FRUSTVIS)
 endif
 
-INC.FRUSTVIS = $(wildcard plugins/culling/frustvis/*.h)
-SRC.FRUSTVIS = $(wildcard plugins/culling/frustvis/*.cpp)
+INC.FRUSTVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/frustvis/*.h))
+SRC.FRUSTVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/frustvis/*.cpp))
 OBJ.FRUSTVIS = $(addprefix $(OUT)/,$(notdir $(SRC.FRUSTVIS:.cpp=$O)))
 DEP.FRUSTVIS = CSUTIL CSGEOM CSUTIL CSSYS CSUTIL CSSYS
 

@@ -45,8 +45,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(X2D)
 endif
 
-INC.X2D = $(wildcard plugins/video/canvas/softx/*.h $(INC.COMMON.DRV2D))
-SRC.X2D = $(wildcard plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D))
+INC.X2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/softx/*.h $(INC.COMMON.DRV2D)))
+SRC.X2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.X2D = $(addprefix $(OUT)/,$(notdir $(SRC.X2D:.cpp=$O)))
 DEP.X2D = CSUTIL CSSYS CSGEOM CSUTIL
 
@@ -59,7 +59,7 @@ ifeq ($(MAKESECTION),targets)
 
 x2d: $(OUTDIRS) $(X2D)
 
-$(OUT)/%$O: plugins/video/canvas/softx/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/softx/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.X2D)
 
 $(X2D): $(OBJ.X2D) $(LIB.X2D)

@@ -1658,6 +1658,8 @@ AC_ARG_ENABLE([extensive-memory-debugger],
 	management mistakes (default NO)])],
     [], [enable_extensive_memory_debugger=no])
 AC_MSG_RESULT([$enable_extensive_memory_debugger])
+CS_BUILD_PROPERTY([EXTENSIVE_MEMDEBUG],
+    [$enable_extensive_memory_debugger])
 AS_IF([test $enable_extensive_memory_debugger = yes],
     [CS_HEADER_PROPERTY([CS_EXTENSIVE_MEMDEBUG])])
 
@@ -1742,9 +1744,10 @@ AS_IF([test $enable_makefile_cache = yes],
 	    (default YES); auto-refresh entails very slight performance
 	    penalty but is more robust])],
 	[], [enable_makefile_cache_monitor=yes])
-    AC_MSG_RESULT([$enable_makefile_cache_monitor])
-    CS_MAKEFILE_PROPERTY([MONITOR_MAKEFILE_CACHE],
-	[$enable_makefile_cache_monitor])])
+    AC_MSG_RESULT([$enable_makefile_cache_monitor])],
+    [enable_makefile_cache_monitor=no])
+CS_MAKEFILE_PROPERTY([MONITOR_MAKEFILE_CACHE],
+    [$enable_makefile_cache_monitor])
 
 
 
@@ -1766,12 +1769,12 @@ CS_HEADER_APPEND(
 #------------------------------------------------------------------------------
 # Boilerplate: config.mak
 #------------------------------------------------------------------------------
-CS_MAKEFILE_APPEND(
-[dnl Hack: The makefile system presently assumes that CFLAGS.SYSTEM should be
-dnl used for both C and C++, and ignores CXXFLAGS.SYSTEM.  Eliminate this hack
-dnl when the makefile system has been repaired.
-CFLAGS.SYSTEM += AS_ESCAPE([$(CXXFLAGS.SYSTEM)])
-])
+CS_MAKEFILE_PROPERTY([SRCDIR], [$srcdir])
+
+# Hack: The makefile system presently assumes that CFLAGS.SYSTEM should be
+# used for both C and C++, and ignores CXXFLAGS.SYSTEM.  Eliminate this hack
+# when the makefile system has been repaired.
+CS_MAKEFILE_PROPERTY([CFLAGS.SYSTEM], [AS_ESCAPE([$(CXXFLAGS.SYSTEM)])], [+])
 
 
 
@@ -1791,18 +1794,13 @@ CS_JAMCONFIG_PROPERTY([CONFIGURE_INVOCATION], [$0 $ac_configure_args])
 # Output generated files.
 #------------------------------------------------------------------------------
 CS_HEADER_OUTPUT([include/volatile.h])
+CS_MAKEFILE_OUTPUT([config.mak])
 CS_JAMCONFIG_OUTPUT([Jamconfig])
-AC_CONFIG_FILES([Jamfile])
+AC_CONFIG_FILES([Makefile Jamfile])
 
-# Hack: Presently, the makefile system is incapable of building the project
-# outside of the source directory, therefore only emit makefile support files
-# if configuring within the source directory.
-AS_IF([test -r Makefile.in],
-    [AC_CONFIG_FILES([Makefile])
-    CS_MAKEFILE_OUTPUT([config.mak])
-    # Queue makefile cache creation if caching enabled.
-    AS_IF([test $enable_makefile_cache = yes],
-	[AC_CONFIG_COMMANDS([cache.mak],
-	    [rm -f cache.mak ; ${MAKE} recache], [MAKE=${MAKE-make}])])])
+# Queue makefile cache creation if caching enabled.
+AS_IF([test $enable_makefile_cache = yes],
+    [AC_CONFIG_COMMANDS([cache.mak],
+	[rm -f cache.mak ; ${MAKE} recache], [MAKE=${MAKE-make}])])
 
 AC_OUTPUT

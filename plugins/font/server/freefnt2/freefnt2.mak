@@ -32,11 +32,11 @@ else
   TO_INSTALL.STATIC_LIBS += $(FREEFONT2)
 endif
 
-INC.FREEFONT2 = $(wildcard plugins/font/server/freefnt2/*.h)
-SRC.FREEFONT2 = $(wildcard plugins/font/server/freefnt2/*.cpp)
+INC.FREEFONT2 = $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/freefnt2/*.h))
+SRC.FREEFONT2 = $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/freefnt2/*.cpp))
 OBJ.FREEFONT2 = $(addprefix $(OUT)/,$(notdir $(SRC.FREEFONT2:.cpp=$O)))
 DEP.FREEFONT2 = CSUTIL CSSYS
-CFG.FREEFONT2 = data/config/freetype.cfg
+CFG.FREEFONT2 = $(SRCDIR)/data/config/freetype.cfg
 
 TO_INSTALL.CONFIG += $(CFG.FREEFONT2)
 
@@ -55,7 +55,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: freefnt2 freefnt2clean
 freefnt2: $(OUTDIRS) $(FREEFONT2)
 
-$(OUT)/%$O: plugins/font/server/freefnt2/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/font/server/freefnt2/%.cpp
 	$(DO.COMPILE.CPP) $(FT2.CFLAGS)
 
 $(FREEFONT2): $(OBJ.FREEFONT2) $(LIB.FREEFONT2)

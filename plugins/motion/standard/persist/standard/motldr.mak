@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/motion/standard/persist/standard
+vpath %.cpp $(SRCDIR)/plugins/motion/standard/persist/standard
 
 ifeq ($(USE_PLUGINS),yes)
   MOTLDR = $(OUTDLL)/motldr$(DLL)
@@ -39,8 +39,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(MOTLDR)
 endif
 
-INC.MOTLDR = $(wildcard plugins/motion/standard/persist/standard/*.h)
-SRC.MOTLDR = $(wildcard plugins/motion/standard/persist/standard/*.cpp)
+INC.MOTLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/motion/standard/persist/standard/*.h))
+SRC.MOTLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/motion/standard/persist/standard/*.cpp))
 OBJ.MOTLDR = $(addprefix $(OUT)/,$(notdir $(SRC.MOTLDR:.cpp=$O)))
 DEP.MOTLDR = CSGEOM CSSYS CSUTIL
 

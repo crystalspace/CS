@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/renderer/common
+vpath %.cpp $(SRCDIR)/plugins/sound/renderer/common
 
 ifeq ($(USE_PLUGINS),yes)
   SNDOAL = $(OUTDLL)/sndoal$(DLL)
@@ -41,10 +41,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDOAL)
 endif
 
-INC.SNDOAL = $(wildcard plugins/sound/renderer/openal/*.h) \
-  $(wildcard plugins/sound/renderer/common/*.h)
-SRC.SNDOAL = $(wildcard plugins/sound/renderer/openal/*.cpp) \
-  $(wildcard plugins/sound/renderer/common/*.cpp)
+INC.SNDOAL = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/sound/renderer/openal/*.h plugins/sound/renderer/common/*.h))
+SRC.SNDOAL = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/sound/renderer/openal/*.cpp plugins/sound/renderer/common/*.cpp))
 OBJ.SNDOAL = $(addprefix $(OUT)/,$(notdir $(SRC.SNDOAL:.cpp=$O)))
 DEP.SNDOAL = CSUTIL CSGEOM CSSYS CSUTIL
 
@@ -62,7 +62,7 @@ ifeq ($(MAKESECTION),targets)
 
 sndoal: $(OUTDIRS) $(SNDOAL)
 
-$(OUT)/%$O: plugins/sound/renderer/openal/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/sound/renderer/openal/%.cpp
 	$(DO.COMPILE.CPP) $(OPENAL.CFLAGS)
 
 $(SNDOAL): $(OBJ.SNDOAL) $(LIB.SNDOAL)

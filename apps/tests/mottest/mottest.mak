@@ -31,8 +31,8 @@ ifeq ($(MAKESECTION),postdefines)
 MOTTEST.EXE = mottest$(EXE)
 DIR.MOTTEST = apps/tests/mottest
 OUT.MOTTEST = $(OUT)/$(DIR.MOTTEST)
-INC.MOTTEST = $(wildcard $(DIR.MOTTEST)/*.h )
-SRC.MOTTEST = $(wildcard $(DIR.MOTTEST)/*.cpp )
+INC.MOTTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MOTTEST)/*.h ))
+SRC.MOTTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MOTTEST)/*.cpp ))
 OBJ.MOTTEST = $(addprefix $(OUT.MOTTEST)/,$(notdir $(SRC.MOTTEST:.cpp=$O)))
 DEP.MOTTEST = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.MOTTEST = $(foreach d,$(DEP.MOTTEST),$($d.LIB))
@@ -58,7 +58,7 @@ all: $(MOTTEST.EXE)
 build.mottest: $(OUTDIRS) $(MOTTEST.EXE)
 clean: mottestclean
 
-$(OUT.MOTTEST)/%$O: $(DIR.MOTTEST)/%.cpp
+$(OUT.MOTTEST)/%$O: $(SRCDIR)/$(DIR.MOTTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(MOTTEST.EXE): $(DEP.EXE) $(OBJ.MOTTEST) $(LIB.MOTTEST)

@@ -28,7 +28,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp %.cc
+vpath %.cpp $(SRCDIR)/%.cc
 # plugins/sound/renderer/arts
 
 CSARTS.DIR = plugins/sound/renderer/arts
@@ -127,10 +127,10 @@ $(OUT)/%.lo: $(CSARTS.DIR)/%.cc
 $(OUT)/%.lo: $(CSARTS.DIR)/%.cpp
 	$(ARTS.CXX) -I$(MCOP.INCDIR) -c $^ -o $@
 
-$(OUT)/%$O: $(CSARTS.DIR)/%.cpp
+$(OUT)/%$O: $(SRCDIR)/$(CSARTS.DIR)/%.cpp
 	$(DO.COMPILE.CPP) -I$(MCOP.INCDIR)
 
-$(OUT)/%$O: $(CSARTS.DIR)/%.cc
+$(OUT)/%$O: $(SRCDIR)/$(CSARTS.DIR)/%.cc
 	$(DO.COMPILE.CPP) -I$(MCOP.INCDIR)
 
 $(CSARTS.DIR)/%.h $(CSARTS.DIR)/%.cc: $(CSARTS.DIR)/%.idl

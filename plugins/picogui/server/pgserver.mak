@@ -27,7 +27,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/picogui/server
+vpath %.cpp $(SRCDIR)/plugins/picogui/server
 
 ifeq ($(USE_PLUGINS),yes)
   PGSERVER = $(OUTDLL)/pgserver$(DLL)
@@ -41,8 +41,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(PGSERVER)
 endif
 
-INC.PGSERVER = $(wildcard plugins/picogui/server/*.h)
-SRC.PGSERVER = $(wildcard plugins/picogui/server/*.cpp)
+INC.PGSERVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/picogui/server/*.h))
+SRC.PGSERVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/picogui/server/*.cpp))
 OBJ.PGSERVER = $(addprefix $(OUT)/,$(notdir $(SRC.PGSERVER:.cpp=$O)))
 DEP.PGSERVER = CSTOOL CSGEOM CSGFX CSUTIL CSSYS CSUTIL
 

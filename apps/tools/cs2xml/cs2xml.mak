@@ -28,8 +28,8 @@ ifeq ($(MAKESECTION),postdefines)
 CS2XML.EXE = cs2xml$(EXE.CONSOLE)
 DIR.CS2XML = apps/tools/cs2xml
 OUT.CS2XML = $(OUT)/$(DIR.CS2XML)
-INC.CS2XML = $(wildcard $(DIR.CS2XML)/*.h )
-SRC.CS2XML = $(wildcard $(DIR.CS2XML)/*.cpp )
+INC.CS2XML = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CS2XML)/*.h ))
+SRC.CS2XML = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CS2XML)/*.cpp ))
 OBJ.CS2XML = $(addprefix $(OUT.CS2XML)/,$(notdir $(SRC.CS2XML:.cpp=$O)))
 DEP.CS2XML = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.CS2XML = $(foreach d,$(DEP.CS2XML),$($d.LIB))
@@ -53,7 +53,7 @@ all: $(CS2XML.EXE)
 build.cs2xml: $(OUTDIRS) $(CS2XML.EXE)
 clean: cs2xmlclean
 
-$(OUT.CS2XML)/%$O: $(DIR.CS2XML)/%.cpp
+$(OUT.CS2XML)/%$O: $(SRCDIR)/$(DIR.CS2XML)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(CS2XML.EXE): $(DEP.EXE) $(OBJ.CS2XML) $(LIB.CS2XML)

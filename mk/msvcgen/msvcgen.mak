@@ -188,7 +188,7 @@ PSEUDOHELP += \
 # normally build those plug-ins.  This list augments the normal PLUGINS list.
 # Also set MSVC.MAKE.FLAGS for additional flags for the child "make"
 # invocation.
-include mk/msvcgen/required.mak
+include $(SRCDIR)/mk/msvcgen/required.mak
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -201,7 +201,7 @@ define MSVCGEN_BUILD
   @echo $(SEPARATOR)
   @echo $"  Generating $(DESCRIPTION.$@)$"
   @echo $(SEPARATOR)
-  @$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak msvcgen \
+  @$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak msvcgen \
   DO_MSVCGEN=yes DO_ASM=no USE_MAKEFILE_CACHE=no $(MSVC.MAKE.FLAGS) \
   PLUGINS='$(PLUGINS) $(PLUGINS.DYNAMIC) $(MSVC.PLUGINS.REQUIRED)'
 endef
@@ -210,14 +210,14 @@ define MSVCGEN_INSTALL
   @echo $(SEPARATOR)
   @echo $"  Installing $(DESCRIPTION.$@)$"
   @echo $(SEPARATOR)
-  @$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak msvcinst
+  @$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak msvcinst
 endef
 
 define MSVCGEN_CLEAN
   @echo $(SEPARATOR)
   @echo $"  Cleaning up the $(DESCRIPTION.$(subst clean,,$@))$"
   @echo $(SEPARATOR)
-  +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak msvcgenclean
+  +@$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak msvcgenclean
 endef
 
 msvcgen:
@@ -243,21 +243,21 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-MSVCGEN = $(PERL) mk/msvcgen/msvcgen.pl
+MSVCGEN = $(PERL) $(SRCDIR)/mk/msvcgen/msvcgen.pl
 ifeq ($(MSVCGEN_VERSION),6)
 MSVCGEN.EXTRA = 
-MSVC.TEMPLATE.DIR = mk/msvcgen/template
+MSVC.TEMPLATE.DIR = $(SRCDIR)/mk/msvcgen/template
 MSVC.CVS.FLAGS = -kb
 else
 MSVCGEN.EXTRA = -htmlents
-MSVC.TEMPLATE.DIR = mk/msvcgen/template7
+MSVC.TEMPLATE.DIR = $(SRCDIR)/mk/msvcgen/template7
 MSVC.CVS.FLAGS =
 endif
 ifneq (,$(MSVC_QUIET))
 MSVC.SILENT = @
 endif
 
-MSVC.CVS.BASE = mk
+MSVC.CVS.BASE = $(SRCDIR)/mk
 MSVC.OUT.BASE.0 = $(OUTBASE)/mk
 MSVC.OUT.BASE = $(MSVC.OUT.BASE.0)/msvcgen
 ifeq ($(MSVCGEN_VERSION),6)
@@ -318,7 +318,7 @@ MSVC.VERSIONRC.CVS.group   =
 MSVC.VERSIONRC.OUT.group   =
 
 # Define extra Windows-specific targets which do not have associated makefiles.
-include mk/msvcgen/win32.mak
+include $(SRCDIR)/mk/msvcgen/win32.mak
 
 # Macro to compose project name. (ex: "CSGEOM" becomes "libcsgeom")
 MSVC.PROJECT = $(MSVC.PREFIX.$(DSP.$*.TYPE))$(DSP.$*.NAME)
@@ -341,16 +341,12 @@ MSVC.VERSIONRC.OUT = $(MSVC.VERSIONRC.OUT.$(DSP.$*.TYPE))
 MSVC.VERSIONRC.TEMP = $(MSVC.OUT.FRAGMENT)/version.tmp
 
 # Module name/description for project.rc.
-#MSVC.VERSIONDESC = \
-#  $(DESCRIPTION.$(shell echo $* | \
-#  sed -e y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/))
-MSVC.VERSIONDESC = \
-  $(DESCRIPTION.$(DSP.$*.NAME))
+MSVC.VERSIONDESC = $(DESCRIPTION.$(DSP.$*.NAME))
 
 # Command to generate the project.rc file.
-MSVC.MAKEVERRC.COMMAND = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
-  '$(MSVC.VERSIONRC.TEMP)' '$(MSVC.VERSIONDESC)'
-MSVC.MERGERC.COMMAND = $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh \
+MSVC.MAKEVERRC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh \
+  '$(MSVC.VERSIONRC.TEMP)' '$(MSVC.VERSIONDESC)' '$(SRCDIR)/include/csver.h'
+MSVC.MERGERC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh \
   '$(MSVC.VERSIONRC.OUT)' '$(MSVC.CVS.DIR)/' '$(MSVC.VERSIONRC.TEMP)' \
   '$($($*.EXE).WINRSRC)'
 
@@ -359,10 +355,8 @@ MSVC.MAKEVERRC = $(MSVC.MAKEVERRC.$(DSP.$*.TYPE))
 MSVC.MERGERC = $(MSVC.MERGERC.$(DSP.$*.TYPE))
 
 # Macro to compose entire list of resources which comprise a project.
-#MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) \
-#  $(MSVC.VERSIONRC.CVS)
-MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) \
-  $(MSVC.VERSIONRC.CVS)
+MSVC.CONTENTS = \
+  $(subst $(SRCDIR)/,,$(SRC.$*) $(INC.$*) $(CFG.$*) $(MSVC.VERSIONRC.CVS))
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
@@ -384,7 +378,9 @@ MSVC.DEPEND.LIST = $(foreach d,$(sort $(subst CSSYS,WIN32SYS,\
 MSVC.DEPEND.DIRECTIVES = $(foreach d,$(MSVC.DEPEND.LIST),--depend=$d)
 
 # Macro to compose list of --library directives from DSP.PROJECT.LIBS.
-MSVC.LIBRARY.DIRECTIVES = $(foreach l,$(DSP.$*.LIBS),--library=$l) $(foreach l,$(DSP.$*.DELAYLIBS),--delaylib=$l)
+MSVC.LIBRARY.DIRECTIVES = \
+  $(foreach l,$(DSP.$*.LIBS),--library=$l) \
+  $(foreach l,$(DSP.$*.DELAYLIBS),--delaylib=$l)
 
 # Macros to compose --lflags and --cflags directives from DSP.PROJECT.LFLAGS
 # and DSP.PROJECT.CFLAGS.  These are slightly complicated because it is valid

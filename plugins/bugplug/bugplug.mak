@@ -42,11 +42,11 @@ endif
 
 DIR.BUGPLUG = plugins/bugplug
 OUT.BUGPLUG = $(OUT)/$(DIR.BUGPLUG)
-INC.BUGPLUG = $(wildcard $(DIR.BUGPLUG)/*.h)
-SRC.BUGPLUG = $(wildcard $(DIR.BUGPLUG)/*.cpp)
+INC.BUGPLUG = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BUGPLUG)/*.h))
+SRC.BUGPLUG = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BUGPLUG)/*.cpp))
 OBJ.BUGPLUG = $(addprefix $(OUT.BUGPLUG)/,$(notdir $(SRC.BUGPLUG:.cpp=$O)))
 DEP.BUGPLUG = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
-CFG.BUGPLUG = data/config/bugplug.cfg
+CFG.BUGPLUG = $(SRCDIR)/data/config/bugplug.cfg
 
 OUTDIRS += $(OUT.BUGPLUG)
 
@@ -65,7 +65,7 @@ ifeq ($(MAKESECTION),targets)
 
 bugplug: $(OUTDIRS) $(BUGPLUG)
 
-$(OUT.BUGPLUG)/%$O: $(DIR.BUGPLUG)/%.cpp
+$(OUT.BUGPLUG)/%$O: $(SRCDIR)/$(DIR.BUGPLUG)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(BUGPLUG): $(OBJ.BUGPLUG) $(LIB.BUGPLUG)

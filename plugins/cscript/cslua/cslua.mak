@@ -57,13 +57,13 @@ else
 # TO_INSTALL.STATIC_LIBS += $(CSLUA)
 endif
 
-SWIG.INTERFACE = include/ivaria/cs.i
-SWIG.CSLUA = plugins/cscript/cslua/cs_lua.cpp
+SWIG.INTERFACE = $(SRCDIR)/include/ivaria/cs.i
+SWIG.CSLUA = $(SRCDIR)/plugins/cscript/cslua/cs_lua.cpp
 SWIG.CSLUA.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSLUA:.cpp=$O)))
 
-INC.CSLUA = $(wildcard plugins/cscript/cslua/*.h)
+INC.CSLUA = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/cslua/*.h))
 SRC.CSLUA = \
-  $(sort $(wildcard plugins/cscript/cslua/*.cpp) $(SWIG.CSLUA))
+  $(sort $(wildcard $(SRCDIR)/plugins/cscript/cslua/*.cpp) $(SWIG.CSLUA))
 OBJ.CSLUA = $(addprefix $(OUT)/,$(notdir $(SRC.CSLUA:.cpp=$O)))
 DEP.CSLUA = CSGEOM CSSYS CSUTIL CSSYS
 
@@ -87,16 +87,16 @@ clean: csluaclean
 $(SWIG.CSLUA.OBJ): $(SWIG.CSLUA)
 	$(filter-out -W -Wunused -Wall,$(DO.COMPILE.CPP) $(CFLAGS.LUA))
 
-$(OUT)/%$O: plugins/cscript/cslua/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/cscript/cslua/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.LUA)
 
-$(OUT)/%$O: plugins/cscript/cslua/%.c
+$(OUT)/%$O: $(SRCDIR)/plugins/cscript/cslua/%.c
 	$(DO.COMPILE.C) $(CFLAGS.LUA)
 
 ifdef LUASWIGBIN
 $(SWIG.CSLUA): $(SWIG.INTERFACE)
 	$(LUASWIGBIN) -shadow -c++ -o $(SWIG.CSLUA) $(SWIG.INTERFACE)
-	$(MV) plugins/cscript/cslua/cspace.lua scripts/lua/
+	$(MV) $(SRCDIR)/plugins/cscript/cslua/cspace.lua $(SRCDIR)/scripts/lua/
 endif
 
 $(CSLUA): $(OBJ.CSLUA) $(LIB.CSLUA)

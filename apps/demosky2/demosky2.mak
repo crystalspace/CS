@@ -28,8 +28,8 @@ ifeq ($(MAKESECTION),postdefines)
 DEMOSKY2.EXE=demosky2$(EXE)
 DIR.DEMOSKY2 = apps/demosky2
 OUT.DEMOSKY2 = $(OUT)/$(DIR.DEMOSKY2)
-INC.DEMOSKY2 = $(wildcard $(DIR.DEMOSKY2)/*.h)
-SRC.DEMOSKY2 = $(wildcard $(DIR.DEMOSKY2)/*.cpp)
+INC.DEMOSKY2 = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.DEMOSKY2)/*.h))
+SRC.DEMOSKY2 = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.DEMOSKY2)/*.cpp))
 OBJ.DEMOSKY2 = $(addprefix $(OUT.DEMOSKY2)/,$(notdir $(SRC.DEMOSKY2:.cpp=$O)))
 DEP.DEMOSKY2 = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.DEMOSKY2 = $(foreach d,$(DEP.DEMOSKY2),$($d.LIB))
@@ -53,7 +53,7 @@ all: $(DEMOSKY2.EXE)
 build.demosky2: $(OUTDIRS) $(DEMOSKY2.EXE)
 clean: demosky2clean
 
-$(OUT.DEMOSKY2)/%$O: $(DIR.DEMOSKY2)/%.cpp
+$(OUT.DEMOSKY2)/%$O: $(SRCDIR)/$(DIR.DEMOSKY2)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(DEMOSKY2.EXE): $(DEP.EXE) $(OBJ.DEMOSKY2) $(LIB.DEMOSKY2)

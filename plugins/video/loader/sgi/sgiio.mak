@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/loader/sgi
+vpath %.cpp $(SRCDIR)/plugins/video/loader/sgi
 
 ifeq ($(USE_PLUGINS),yes)
   CSSGIIMG = $(OUTDLL)/cssgiimg$(DLL)
@@ -39,8 +39,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSSGIIMG)
 endif
 
-INC.CSSGIIMG = $(wildcard plugins/video/loader/sgi/*.h)
-SRC.CSSGIIMG = $(wildcard plugins/video/loader/sgi/*.cpp)
+INC.CSSGIIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/sgi/*.h))
+SRC.CSSGIIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/sgi/*.cpp))
 
 OBJ.CSSGIIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSSGIIMG:.cpp=$O)))
 DEP.CSSGIIMG = CSUTIL CSSYS CSGFX CSUTIL

@@ -21,7 +21,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/font/server/csfont
+vpath %.cpp $(SRCDIR)/plugins/font/server/csfont
 
 ifeq ($(USE_PLUGINS),yes)
   CSFONT = $(OUTDLL)/csfont$(DLL)
@@ -34,15 +34,16 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSFONT)
 endif
 
-INC.CSFONT = $(wildcard plugins/font/server/csfont/*.h)
-SRC.CSFONT = $(wildcard plugins/font/server/csfont/*.cpp)
+INC.CSFONT = $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/csfont/*.h))
+SRC.CSFONT = \
+  $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/csfont/*.cpp))
 OBJ.CSFONT = $(addprefix $(OUT)/,$(notdir $(SRC.CSFONT:.cpp=$O)))
 DEP.CSFONT = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += CSFONT
 DSP.CSFONT.NAME = csfont
 DSP.CSFONT.TYPE = plugin
-DSP.CSFONT.RESOURCES = $(wildcard plugins/font/server/csfont/*.fnt)
+DSP.CSFONT.RESOURCES = $(wildcard $(SRCDIR)/plugins/font/server/csfont/*.fnt)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#

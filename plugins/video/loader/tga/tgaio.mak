@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/loader/tga
+vpath %.cpp $(SRCDIR)/plugins/video/loader/tga
 
 ifeq ($(USE_PLUGINS),yes)
   CSTGAIMG = $(OUTDLL)/cstgaimg$(DLL)
@@ -39,8 +39,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSTGAIMG)
 endif
 
-INC.CSTGAIMG = $(wildcard plugins/video/loader/tga/*.h)
-SRC.CSTGAIMG = $(wildcard plugins/video/loader/tga/*.cpp)
+INC.CSTGAIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/tga/*.h))
+SRC.CSTGAIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/tga/*.cpp))
 
 OBJ.CSTGAIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSTGAIMG:.cpp=$O)))
 DEP.CSTGAIMG = CSUTIL CSSYS CSGFX CSUTIL

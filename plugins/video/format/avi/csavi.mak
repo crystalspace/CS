@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/format/avi
+vpath %.cpp $(SRCDIR)/plugins/video/format/avi
 
 ifeq ($(USE_PLUGINS),yes)
   CSAVI = $(OUTDLL)/csavi$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSAVI)
 endif
 
-INC.CSAVI = $(wildcard plugins/video/format/avi/*.h)
-SRC.CSAVI = $(wildcard plugins/video/format/avi/*.cpp)
+INC.CSAVI = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/avi/*.h))
+SRC.CSAVI = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/avi/*.cpp))
 #SRC.CSAVI += $(wildcard plugins/video/format/avi/*.asm)
 OBJ.CSAVI = $(addprefix $(OUT)/,$(notdir $(subst .asm,$O,$(SRC.CSAVI:.cpp=$O))))
 
@@ -45,10 +45,10 @@ NASMFLAGS.CSAVI = -i./plugins/video/renderer/software/i386/
 DEP.CSAVI = CSGFX CSUTIL CSGEOM CSSYS CSUTIL
 CFG.CSAVI =
 
-TO_INSTALL.CONFIG += $(CFG.CSAVI)
+$(SRCDIR)/TO_INSTALL.CONFIG += $(CFG.CSAVI)
 TO_INSTALL.DATA +=
 
-MSVC.DSP += CSAVI
+$(SRCDIR)/MSVC.DSP += CSAVI
 DSP.CSAVI.NAME = csavi
 DSP.CSAVI.TYPE = plugin
 
@@ -59,7 +59,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: csavi csaviclean
 csavi: $(OUTDIRS) $(CSAVI)
 
-#$(OUT)/%$O: plugins/video/format/avi/%.asm
+#$(OUT)/%$O: $(SRCDIR)/plugins/video/format/avi/%.asm
 #	$(DO.COMPILE.ASM) $(NASMFLAGS.CSAVI)
 
 $(CSAVI): $(OBJ.CSAVI) $(LIB.CSAVI)

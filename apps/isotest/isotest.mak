@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 ISOTEST.EXE = isotest$(EXE)
 DIR.ISOTEST = apps/isotest
 OUT.ISOTEST = $(OUT)/$(DIR.ISOTEST)
-INC.ISOTEST = $(wildcard $(DIR.ISOTEST)/*.h)
-SRC.ISOTEST = $(wildcard $(DIR.ISOTEST)/*.cpp)
+INC.ISOTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISOTEST)/*.h))
+SRC.ISOTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISOTEST)/*.cpp))
 OBJ.ISOTEST = $(addprefix $(OUT.ISOTEST)/,$(notdir $(SRC.ISOTEST:.cpp=$O)))
 DEP.ISOTEST = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.ISOTEST = $(foreach d,$(DEP.ISOTEST),$($d.LIB))
@@ -56,7 +56,7 @@ all: $(ISOTEST.EXE)
 build.isotest: $(OUTDIRS) $(ISOTEST.EXE)
 clean: isotestclean
 
-$(OUT.ISOTEST)/%$O: $(DIR.ISOTEST)/%.cpp
+$(OUT.ISOTEST)/%$O: $(SRCDIR)/$(DIR.ISOTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(ISOTEST.EXE): $(DEP.EXE) $(OBJ.ISOTEST) $(LIB.ISOTEST)

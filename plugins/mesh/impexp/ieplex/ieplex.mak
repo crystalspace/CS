@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/impexp/ieplex
+vpath %.cpp $(SRCDIR)/plugins/mesh/impexp/ieplex
 
 ifeq ($(USE_PLUGINS),yes)
   IEPLEX = $(OUTDLL)/ieplex$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(IEPLEX)
 endif
 
-INC.IEPLEX = $(wildcard plugins/mesh/impexp/ieplex/*.h)
-SRC.IEPLEX = $(wildcard plugins/mesh/impexp/ieplex/*.cpp)
+INC.IEPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ieplex/*.h))
+SRC.IEPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ieplex/*.cpp))
 OBJ.IEPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.IEPLEX:.cpp=$O)))
 DEP.IEPLEX = CSGEOM CSUTIL CSSYS CSUTIL
 

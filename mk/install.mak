@@ -50,7 +50,8 @@ install:
 	@echo $"  Installing Crystal Space SDK$"
 	@echo $"  INSTALL_DIR=$(INSTALL_DIR)$"
 	@echo $(SEPARATOR)
-	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak install_all DO_INSTALL=yes
+	@$(MAKE) $(RECMAKEFLAGS) -f $(SRCDIR)/mk/cs.mak install_all \
+	DO_INSTALL=yes
 
 uninstall: uninstexe
 	uninst $(INSTALL_DIR)/install.log
@@ -73,35 +74,38 @@ INSTALL_DEPTH=* */* */*/* */*/*/* */*/*/*/* */*/*/*/*/*
 # For the 'include/' hierarchy, only the header files detected here
 # will be copied
 INSTALL_INCLUDE.FILES = \
-  $(wildcard $(addprefix include/,$(addsuffix .h,$(INSTALL_DEPTH))))
+  $(wildcard $(addprefix $(SRCDIR)/include/,$(addsuffix .h,$(INSTALL_DEPTH))))
 
 # Given all .h files in 'include/', take their directory parts, sort those,
 # and remove trailing '/', then add the INSTALL_DIR prefix
-INSTALL_INCLUDE.DIR = $(addprefix $(INSTALL_DIR)/, \
-  $(patsubst %/, %,$(sort $(dir $(INSTALL_INCLUDE.FILES)))))
+INSTALL_INCLUDE.DIR = $(addprefix $(INSTALL_DIR)/,$(patsubst %/,%,$(sort \
+  $(dir $(subst $(SRCDIR)/,,$(INSTALL_INCLUDE.FILES))))))
 INSTALL_INCLUDE.DESTFILES = $(addprefix $(INSTALL_DIR)/, \
-  $(patsubst %/, %,$(sort $(INSTALL_INCLUDE.FILES))))
+  $(patsubst %/,%,$(sort $(subst $(SRCDIR)/,,$(INSTALL_INCLUDE.FILES)))))
 
 # Install docs/html into INSTALL_DIR/docs/html, docs/pubapi to
 # INSTALL_DIR/docs/pubapi and copy docs/README.html & docs/history.{txt|old}.
-INSTALL_DOCS.FILES = docs/README.html docs/history.txt docs/history.old \
-  $(wildcard docs/html/*.html \
-    $(addprefix docs/html,\
+INSTALL_DOCS.FILES = \
+  $(SRCDIR)/docs/README.html \
+  $(SRCDIR)/docs/history.txt \
+  $(SRCDIR)/docs/history.old \
+  $(wildcard $(SRCDIR)/docs/html/*.html \
+    $(addprefix $(SRCDIR)/docs/html,\
       $(addsuffix .jpg,$(INSTALL_DEPTH)) \
       $(addsuffix .gif,$(INSTALL_DEPTH)) \
       $(addsuffix .png,$(INSTALL_DEPTH))) \
-    $(addprefix docs/pubapi/,*.html *.gif *.css))
+    $(addprefix $(SRCDIR)/docs/pubapi/,*.html *.gif *.css))
 INSTALL_DOCS.DIR = $(addprefix $(INSTALL_DIR)/, \
-  $(patsubst %/,%,$(sort $(dir $(INSTALL_DOCS.FILES)))))
-INSTALL_DOCS.DESTFILES = \
-  $(addprefix $(INSTALL_DIR)/,$(sort $(INSTALL_DOCS.FILES)))
+  $(patsubst %/,%,$(sort $(dir $(subst $(SRCDIR)/,,$(INSTALL_DOCS.FILES))))))
+INSTALL_DOCS.DESTFILES = $(addprefix $(INSTALL_DIR)/, \
+  $(sort $(subst $(SRCDIR)/,,$(INSTALL_DOCS.FILES))))
 
 # Files to install for scripts.
-INSTALL_SCRIPTS.FILES = $(wildcard scripts/python/*.py)
-INSTALL_SCRIPTS.DIR = $(addprefix $(INSTALL_DIR)/, \
-  $(patsubst %/,%,$(sort $(dir $(INSTALL_SCRIPTS.FILES)))))
-INSTALL_SCRIPTS.DESTFILES = \
-  $(addprefix $(INSTALL_DIR)/,$(sort $(INSTALL_SCRIPTS.FILES)))
+INSTALL_SCRIPTS.FILES = $(wildcard $(SRCDIR)/scripts/python/*.py)
+INSTALL_SCRIPTS.DIR = $(addprefix $(INSTALL_DIR)/,$(patsubst %/,%,$(sort \
+  $(dir $(subst $(SRCDIR)/,,$(INSTALL_SCRIPTS.FILES))))))
+INSTALL_SCRIPTS.DESTFILES = $(addprefix $(INSTALL_DIR)/,$(sort \
+  $(subst $(SRCDIR)/,,$(INSTALL_SCRIPTS.FILES))))
 
 # Static library and plugin directories.
 INSTALL_LIB.DIR = $(INSTALL_DIR)/lib
@@ -113,7 +117,7 @@ endif
 
 # Data directories.
 INSTALL_DATA.DIR = $(addprefix $(INSTALL_DIR)/, \
-  $(patsubst %/,%,$(sort $(dir $(TO_INSTALL.DATA)))))
+  $(patsubst %/,%,$(sort $(dir $(subst $(SRCDIR)/,,$(TO_INSTALL.DATA))))))
 
 # Command to copy a potentially deeply nested file to the installation
 # directory even while preserving the nesting.  The file to be copied must be
@@ -123,7 +127,7 @@ INSTALL_DATA.DIR = $(addprefix $(INSTALL_DIR)/, \
 # to be invoked from $(foreach) for a set of files, and we want the expansion
 # to be a series of copy commands, one per line.
 define INSTALL.DEEP_COPY
-  $(CP) $(F) $(INSTALL_DIR)/$(patsubst ./%,%,$(F))
+  $(CP) $(F) $(INSTALL_DIR)/$(subst $(SRCDIR)/,,$(F))
 
 endef
 
@@ -212,7 +216,7 @@ install_root: $(INSTALL_DIR)
 	  $(notdir $(TO_INSTALL.ROOT))) >> $(INSTALL_LOG)
 
 # Install headers.
-$(INSTALL_INCLUDE.DESTFILES): $(INSTALL_DIR)/% : %
+$(INSTALL_INCLUDE.DESTFILES): $(INSTALL_DIR)/% : $(SRCDIR)/%
 	$(CP) $< $@
 	@echo $@ >> $(INSTALL_LOG)
 
@@ -224,7 +228,7 @@ $(INSTALL_DOCS.DIR):
 	$(MKDIRS)
 	@echo $@/deleteme.dir >> $(INSTALL_LOG)
 
-$(INSTALL_DOCS.DESTFILES): $(INSTALL_DIR)/docs/% : docs/%
+$(INSTALL_DOCS.DESTFILES): $(INSTALL_DIR)/docs/% : $(SRCDIR)/docs/%
 	$(CP) $< $@
 	@echo $@ >> $(INSTALL_LOG)
 
@@ -236,7 +240,7 @@ $(INSTALL_DIR)/scripts $(INSTALL_SCRIPTS.DIR):
 	$(MKDIRS)
 	@echo $@/deleteme.dir >> $(INSTALL_LOG)
 
-$(INSTALL_SCRIPTS.DESTFILES): $(INSTALL_DIR)/scripts/% : scripts/%
+$(INSTALL_SCRIPTS.DESTFILES): $(INSTALL_DIR)/scripts/% : $(SRCDIR)/scripts/%
 	$(CP) $< $@
 	@echo $@ >> $(INSTALL_LOG)
 

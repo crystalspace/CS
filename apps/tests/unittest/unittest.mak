@@ -33,8 +33,8 @@ ifeq ($(MAKESECTION),postdefines)
 UNITTEST.EXE = unittest$(EXE.CONSOLE)
 DIR.UNITTEST = apps/tests/unittest
 OUT.UNITTEST = $(OUT)/$(DIR.UNITTEST)
-INC.UNITTEST = $(wildcard $(DIR.UNITTEST)/*.h )
-SRC.UNITTEST = $(wildcard $(DIR.UNITTEST)/*.cpp )
+INC.UNITTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.UNITTEST)/*.h ))
+SRC.UNITTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.UNITTEST)/*.cpp ))
 OBJ.UNITTEST = $(addprefix $(OUT.UNITTEST)/,$(notdir $(SRC.UNITTEST:.cpp=$O)))
 DEP.UNITTEST = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.UNITTEST = $(foreach d,$(DEP.UNITTEST),$($d.LIB))
@@ -59,7 +59,7 @@ build.unittest: $(OUTDIRS) $(UNITTEST.EXE)
 clean: unittestclean
 check: unittestcheck
 
-$(OUT.UNITTEST)/%$O: $(DIR.UNITTEST)/%.cpp
+$(OUT.UNITTEST)/%$O: $(SRCDIR)/$(DIR.UNITTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(UNITTEST.EXE): $(DEP.EXE) $(OBJ.UNITTEST) $(LIB.UNITTEST)

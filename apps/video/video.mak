@@ -31,8 +31,8 @@ ifeq ($(MAKESECTION),postdefines)
 CSVID.EXE=csvid$(EXE)
 DIR.CSVID = apps/video
 OUT.CSVID = $(OUT)/$(DIR.CSVID)
-INC.CSVID = $(wildcard $(DIR.CSVID)/*.h)
-SRC.CSVID = $(wildcard $(DIR.CSVID)/*.cpp)
+INC.CSVID = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSVID)/*.h))
+SRC.CSVID = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSVID)/*.cpp))
 OBJ.CSVID = $(addprefix $(OUT.CSVID)/,$(notdir $(SRC.CSVID:.cpp=$O)))
 DEP.CSVID = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSVID = $(foreach d,$(DEP.CSVID),$($d.LIB))
@@ -55,7 +55,7 @@ ifeq ($(MAKESECTION),targets)
 build.csvid: $(OUTDIRS) $(CSVID.EXE)
 clean: csvidclean
 
-$(OUT.CSVID)/%$O: $(DIR.CSVID)/%.cpp
+$(OUT.CSVID)/%$O: $(SRCDIR)/$(DIR.CSVID)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(CSVID.EXE): $(DEP.EXE) $(OBJ.CSVID) $(LIB.CSVID)

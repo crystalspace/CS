@@ -3,8 +3,8 @@
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/renderer/common
+vpath %.cpp $(SRCDIR)/plugins/video/renderer/common
 
-TO_INSTALL.CONFIG += data/config/video.cfg
+TO_INSTALL.CONFIG += $(SRCDIR)/data/config/video.cfg
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -27,13 +27,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tests/picogui
+vpath %.cpp $(SRCDIR)/apps/tests/picogui
 
 PGTEST.EXE = pgtest$(EXE)
 LIB.PGTEST = $(foreach d,$(DEP.PGTEST),$($d.LIB))
 
-INC.PGTEST = $(wildcard apps/tests/picogui/*.h)
-SRC.PGTEST = $(wildcard apps/tests/picogui/*.cpp)
+INC.PGTEST = $(wildcard $(addprefix $(SRCDIR)/,apps/tests/picogui/*.h))
+SRC.PGTEST = $(wildcard $(addprefix $(SRCDIR)/,apps/tests/picogui/*.cpp))
 OBJ.PGTEST = $(addprefix $(OUT)/,$(notdir $(SRC.PGTEST:.cpp=$O)))
 DEP.PGTEST = CSTOOL CSGFX CSUTIL CSSYS CSUTIL
 

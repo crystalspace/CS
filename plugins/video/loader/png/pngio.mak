@@ -41,8 +41,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSPNGIMG)
 endif
 
-INC.CSPNGIMG = $(wildcard plugins/video/loader/png/*.h)
-SRC.CSPNGIMG = $(wildcard plugins/video/loader/png/*.cpp)
+INC.CSPNGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/png/*.h))
+SRC.CSPNGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/png/*.cpp))
 
 OBJ.CSPNGIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSPNGIMG:.cpp=$O)))
 DEP.CSPNGIMG = CSUTIL CSSYS CSGFX CSUTIL
@@ -61,7 +61,7 @@ ifeq ($(MAKESECTION),targets)
 
 cspngimg: $(OUTDIRS) $(CSPNGIMG)
 
-$(OUT)/%$O: plugins/video/loader/png/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/loader/png/%.cpp
 	$(DO.COMPILE.CPP) $(PNG.CFLAGS)
 
 $(CSPNGIMG): $(OBJ.CSPNGIMG) $(LIB.CSPNGIMG)

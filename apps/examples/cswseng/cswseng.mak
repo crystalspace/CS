@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 CSWSENG.EXE = cswseng$(EXE)
 DIR.CSWSENG = apps/examples/cswseng
 OUT.CSWSENG = $(OUT)/$(DIR.CSWSENG)
-INC.CSWSENG = $(wildcard $(DIR.CSWSENG)/*.h)
-SRC.CSWSENG = $(wildcard $(DIR.CSWSENG)/*.cpp)
+INC.CSWSENG = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSWSENG)/*.h))
+SRC.CSWSENG = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSWSENG)/*.cpp))
 OBJ.CSWSENG = $(addprefix $(OUT.CSWSENG)/,$(notdir $(SRC.CSWSENG:.cpp=$O)))
 DEP.CSWSENG = CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSWSENG = $(foreach d,$(DEP.CSWSENG),$($d.LIB))
@@ -55,7 +55,7 @@ all: $(CSWSENG.EXE)
 build.cswseng: $(OUTDIRS) $(CSWSENG.EXE)
 clean: cswsengclean
 
-$(OUT.CSWSENG)/%$O: $(DIR.CSWSENG)/%.cpp
+$(OUT.CSWSENG)/%$O: $(SRCDIR)/$(DIR.CSWSENG)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(CSWSENG.EXE): $(DEP.EXE) $(OBJ.CSWSENG) $(LIB.CSWSENG)

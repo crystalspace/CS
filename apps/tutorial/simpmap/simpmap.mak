@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 SIMPMAP.EXE=simpmap$(EXE)
 DIR.SIMPMAP = apps/tutorial/simpmap
 OUT.SIMPMAP = $(OUT)/$(DIR.SIMPMAP)
-INC.SIMPMAP = $(wildcard $(DIR.SIMPMAP)/*.h )
-SRC.SIMPMAP = $(wildcard $(DIR.SIMPMAP)/*.cpp )
+INC.SIMPMAP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPMAP)/*.h ))
+SRC.SIMPMAP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPMAP)/*.cpp ))
 OBJ.SIMPMAP = $(addprefix $(OUT.SIMPMAP)/,$(notdir $(SRC.SIMPMAP:.cpp=$O)))
 DEP.SIMPMAP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.SIMPMAP = $(foreach d,$(DEP.SIMPMAP),$($d.LIB))
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 build.simpmap: $(OUTDIRS) $(SIMPMAP.EXE)
 clean: simpmapclean
 
-$(OUT.SIMPMAP)/%$O: $(DIR.SIMPMAP)/%.cpp
+$(OUT.SIMPMAP)/%$O: $(SRCDIR)/$(DIR.SIMPMAP)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(SIMPMAP.EXE): $(DEP.EXE) $(OBJ.SIMPMAP) $(LIB.SIMPMAP)

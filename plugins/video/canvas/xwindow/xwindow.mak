@@ -51,10 +51,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(XWIN)
 endif
 
-INC.XWIN = $(wildcard plugins/video/canvas/xwindow/*.h)\
-  plugins/video/canvas/common/scancode.h
-SRC.XWIN = $(wildcard plugins/video/canvas/xwindow/*.cpp) \
-  plugins/video/canvas/common/x11-keys.cpp
+INC.XWIN = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/canvas/xwindow/*.h plugins/video/canvas/common/scancode.h))
+SRC.XWIN = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/canvas/xwindow/*.cpp plugins/video/canvas/common/x11-keys.cpp))
 OBJ.XWIN = $(addprefix $(OUT)/,$(notdir $(SRC.XWIN:.cpp=$O)))
 DEP.XWIN = CSUTIL CSSYS CSGEOM CSUTIL
 
@@ -67,7 +67,7 @@ ifeq ($(MAKESECTION),targets)
 
 xwin: $(OUTDIRS) $(XWIN)
 
-$(OUT)/%$O: plugins/video/canvas/xwindow/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/xwindow/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.XWIN)
 
 $(XWIN): $(OBJ.XWIN) $(LIB.XWIN)

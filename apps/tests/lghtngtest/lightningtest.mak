@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 LGHTNGTEST.EXE = lghtngtest$(EXE)
 DIR.LGHTNGTEST = apps/tests/lghtngtest
 OUT.LGHTNGTEST = $(OUT)/$(DIR.LGHTNGTEST)
-INC.LGHTNGTEST = $(wildcard $(DIR.LGHTNGTEST)/*.h )
-SRC.LGHTNGTEST = $(wildcard $(DIR.LGHTNGTEST)/*.cpp )
+INC.LGHTNGTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.LGHTNGTEST)/*.h ))
+SRC.LGHTNGTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.LGHTNGTEST)/*.cpp ))
 OBJ.LGHTNGTEST = \
   $(addprefix $(OUT.LGHTNGTEST)/,$(notdir $(SRC.LGHTNGTEST:.cpp=$O)))
 DEP.LGHTNGTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
@@ -55,7 +55,7 @@ all: $(LGHTNGTEST.EXE)
 build.lghtngtest: $(OUTDIRS) $(LGHTNGTEST.EXE)
 clean: lghtngtestclean
 
-$(OUT.LGHTNGTEST)/%$O: $(DIR.LGHTNGTEST)/%.cpp
+$(OUT.LGHTNGTEST)/%$O: $(SRCDIR)/$(DIR.LGHTNGTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(LGHTNGTEST.EXE): $(DEP.EXE) $(OBJ.LGHTNGTEST) $(LIB.LGHTNGTEST)

@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/console/input/standard
+vpath %.cpp $(SRCDIR)/plugins/console/input/standard
 
 ifeq ($(USE_PLUGINS),yes)
   CSCONIN = $(OUTDLL)/csconin$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSCONIN)
 endif
 
-INC.CSCONIN = $(wildcard plugins/console/input/standard/*.h)
-SRC.CSCONIN = $(wildcard plugins/console/input/standard/*.cpp)
+INC.CSCONIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/input/standard/*.h))
+SRC.CSCONIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/input/standard/*.cpp))
 OBJ.CSCONIN = $(addprefix $(OUT)/,$(notdir $(SRC.CSCONIN:.cpp=$O)))
 DEP.CSCONIN = CSUTIL CSSYS CSUTIL
 

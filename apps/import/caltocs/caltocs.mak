@@ -31,7 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 CALTOCS.EXE = caltocs$(EXE.CONSOLE)
 DIR.CALTOCS = apps/import/caltocs
 OUT.CALTOCS = $(OUT)/$(DIR.CALTOCS)
-SRC.CALTOCS = $(wildcard $(DIR.CALTOCS)/*.cpp )
+SRC.CALTOCS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CALTOCS)/*.cpp ))
 OBJ.CALTOCS = $(addprefix $(OUT.CALTOCS)/,$(notdir $(SRC.CALTOCS:.cpp=$O)))
 DEP.CALTOCS = CSSYS CSUTIL
 
@@ -55,7 +55,7 @@ all: $(CALTOCS.EXE)
 build.caltocs: $(OUTDIRS) $(CALTOCS.EXE)
 clean: caltocsclean
 
-$(OUT.CALTOCS)/%$O: $(DIR.CALTOCS)/%.cpp
+$(OUT.CALTOCS)/%$O: $(SRCDIR)/$(DIR.CALTOCS)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(CALTOCS.EXE): $(OBJ.CALTOCS)

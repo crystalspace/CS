@@ -6,13 +6,16 @@
 
 #-----------------------------------------------------------------------------
 # If you prefer not to edit factory-supplied makefiles, such as this one, then
-# you can instead create and edit the file CS/mk/local.mak.  In this file, you
-# can augment the PLUGINS and PLUGINS.DYNAMIC lists and override any options
-# discovered automatically at project configuration time by the "configure"
-# script.  Overrideable options can be found by looking in the generated
-# CS/config.mak file after configuring the project.
+# you can instead create and edit the file CS/mk/local.mak or
+# <builddir>/local.mak, where <builddir> is the directory in which you are
+# building the project.  In local.mak, you can augment the PLUGINS and
+# PLUGINS.DYNAMIC lists and override any options discovered automatically at
+# project configuration time by the "configure" script.  Overrideable options
+# can be found by looking in the generated CS/config.mak file after
+# configuring the project.
 #-----------------------------------------------------------------------------
--include mk/local.mak
+-include $(SRCDIR)/mk/local.mak
+-include local.mak
 
 
 #-----------------------------------------------------------------------------

@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/render3d/shadermgr
+vpath %.cpp $(SRCDIR)/plugins/video/render3d/shadermgr
 
 ifeq ($(USE_PLUGINS),yes)
   SHADERMGR = $(OUTDLL)/shadermgr$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SHADERMGR)
 endif
 
-INC.SHADERMGR = $(wildcard plugins/video/render3d/shadermgr/*.h)
-SRC.SHADERMGR = $(wildcard plugins/video/render3d/shadermgr/*.cpp)
+INC.SHADERMGR = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/render3d/shadermgr/*.h))
+SRC.SHADERMGR = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/render3d/shadermgr/*.cpp))
 OBJ.SHADERMGR = $(addprefix $(OUT)/,$(notdir $(SRC.SHADERMGR:.cpp=$O)))
 DEP.SHADERMGR = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 

@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/console/output/fancy
+vpath %.cpp $(SRCDIR)/plugins/console/output/fancy
 
 ifeq ($(USE_PLUGINS),yes)
   FANCYCON = $(OUTDLL)/fancycon$(DLL)
@@ -35,14 +35,14 @@ else
   TO_INSTALL.STATIC_LIBS += $(FANCYCON)
 endif
 
-INC.FANCYCON = $(wildcard plugins/console/output/fancy/*.h)
-SRC.FANCYCON = $(wildcard plugins/console/output/fancy/*.cpp)
+INC.FANCYCON = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/fancy/*.h))
+SRC.FANCYCON = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/fancy/*.cpp))
 OBJ.FANCYCON = $(addprefix $(OUT)/,$(notdir $(SRC.FANCYCON:.cpp=$O)))
 DEP.FANCYCON = CSUTIL CSGEOM CSSYS CSUTIL
-CFG.FANCYCON = data/config/fancycon.cfg
+CFG.FANCYCON = $(SRCDIR)/data/config/fancycon.cfg
 
 TO_INSTALL.CONFIG += $(CFG.FANCYCON)
-TO_INSTALL.DATA += data/fancycon.zip
+TO_INSTALL.DATA += $(SRCDIR)/data/fancycon.zip
 
 MSVC.DSP += FANCYCON
 DSP.FANCYCON.NAME = fancycon

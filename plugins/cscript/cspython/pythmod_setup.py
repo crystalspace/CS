@@ -23,10 +23,12 @@ if sys.argv[1] == 'pythmod_clean':
 elif sys.argv[1] == 'pythmod_install':
 
     OUT = sys.argv[2]
+    SCRIPTDIR = sys.argv[3]
+    INCDIRS = sys.argv[4:]
 
     argv = ['install',
-            '--install-purelib', '../../../scripts/python',
-            '--install-platlib', '../../../scripts/python',
+            '--install-purelib', SCRIPTDIR,
+            '--install-platlib', SCRIPTDIR,
             '--record', 'pythmod_files'
            ]
     sys.argv[1:] = argv
@@ -34,7 +36,7 @@ elif sys.argv[1] == 'pythmod_install':
     ext_module = Extension(
         '_cspace',
         ['cs_pyth.cpp', 'pythmod.cpp'],
-        include_dirs=['../../../include'],
+        include_dirs=INCDIRS,
         library_dirs=[OUT],
         libraries=['cstool', 'csgfx', 'csgeom', 'cssys', 'csutil',
                    'cssys', 'csutil'

@@ -21,7 +21,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/font/server/fontplex
+vpath %.cpp $(SRCDIR)/plugins/font/server/fontplex
 
 ifeq ($(USE_PLUGINS),yes)
   FONTPLEX = $(OUTDLL)/fontplex$(DLL)
@@ -34,8 +34,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(FONTPLEX)
 endif
 
-INC.FONTPLEX = $(wildcard plugins/font/server/fontplex/*.h)
-SRC.FONTPLEX = $(wildcard plugins/font/server/fontplex/*.cpp)
+INC.FONTPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/fontplex/*.h))
+SRC.FONTPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/fontplex/*.cpp))
 OBJ.FONTPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.FONTPLEX:.cpp=$O)))
 DEP.FONTPLEX = CSUTIL CSSYS CSUTIL
 

@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/format/codecs/rle
+vpath %.cpp $(SRCDIR)/plugins/video/format/codecs/rle
 
 ifeq ($(USE_PLUGINS),yes)
   RLE = $(OUTDLL)/rlecodec$(DLL)
@@ -35,16 +35,16 @@ else
   TO_INSTALL.STATIC_LIBS += $(RLE)
 endif
 
-INC.RLE = $(wildcard plugins/video/format/codecs/rle/*.h)
-SRC.RLE = $(wildcard plugins/video/format/codecs/rle/*.cpp)
+INC.RLE = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/rle/*.h))
+SRC.RLE = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/rle/*.cpp))
 OBJ.RLE = $(addprefix $(OUT)/,$(notdir $(SRC.RLE:.cpp=$O)))
 DEP.RLE = CSUTIL CSSYS
 CFG.RLE =
 
-TO_INSTALL.CONFIG += $(CFG.RLE)
+$(SRCDIR)/TO_INSTALL.CONFIG += $(CFG.RLE)
 TO_INSTALL.DATA +=
 
-MSVC.DSP += RLE
+$(SRCDIR)/MSVC.DSP += RLE
 DSP.RLE.NAME = rlecodec
 DSP.RLE.TYPE = plugin
 

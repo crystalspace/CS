@@ -31,8 +31,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
-MACOSX.SOURCE_GLOSX2D_PATHS = \
-  plugins/video/canvas/macosx/opengl plugins/video/canvas/macosx/common
+MACOSX.SOURCE_GLOSX2D_PATHS = $(addprefix $(SRCDIR)/, \
+  plugins/video/canvas/macosx/opengl plugins/video/canvas/macosx/common)
 MACOSX.HEADER_GLOSX2D_PATHS = \
   $(addprefix $(CFLAGS.I),$(MACOSX.SOURCE_GLOSX2D_PATHS))
 
@@ -64,11 +64,11 @@ else
   TO_INSTALL.STATIC_LIBS += $(GLOSX2D)
 endif
 
-INC.GLOSX2D = $(wildcard $(INC.COMMON.DRV2D) $(INC.COMMON.DRV2D.OPENGL) \
-  $(addsuffix /*.h,$(MACOSX.SOURCE_GLOSX2D_PATHS)))
-SRC.GLOSX2D = $(wildcard $(SRC.COMMON.DRV2D) $(SRC.COMMON.DRV2D.OPENGL) \
+INC.GLOSX2D = $(wildcard $(addprefix $(SRCDIR)/,$(INC.COMMON.DRV2D) $(INC.COMMON.DRV2D.OPENGL) \
+  $(addsuffix /*.h,$(MACOSX.SOURCE_GLOSX2D_PATHS))))
+SRC.GLOSX2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) $(SRC.COMMON.DRV2D.OPENGL) \
   $(addsuffix /*.cpp,$(MACOSX.SOURCE_GLOSX2D_PATHS)) \
-  $(addsuffix /*.m,$(MACOSX.SOURCE_GLOSX2D_PATHS)))
+  $(addsuffix /*.m,$(MACOSX.SOURCE_GLOSX2D_PATHS))))
 OBJ.GLOSX2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.GLOSX2D:.m=$O))))
 DEP.GLOSX2D = CSSYS CSUTIL
@@ -83,17 +83,17 @@ ifeq ($(MAKESECTION),targets)
 glosx2d: $(OUTDIRS) $(GLOSX2D)
 
 # Rule to make common OpenGL source
-$(OUT)/%$O: plugins/video/canvas/openglcommon/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
 # Rules to make OSX sources
-$(OUT)/%$O: plugins/video/canvas/macosx/opengl/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/macosx/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
-$(OUT)/%$O: plugins/video/canvas/macosx/opengl/%.m
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/macosx/opengl/%.m
 	$(DO.COMPILE.C) $(GL.CFLAGS)
 
-$(OUT)/%$O: plugins/video/canvas/macosx/opengl/%.mm
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/macosx/opengl/%.mm
 	$(DO.COMPILE.MM) $(GL.CFLAGS)
 
 $(GLOSX2D): $(OBJ.GLOSX2D) $(LIB.GLOSX2D)

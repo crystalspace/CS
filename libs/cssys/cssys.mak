@@ -35,11 +35,11 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cssys $(filter-out libs/cssys/general/, $(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
-vpath %.c   libs/cssys $(filter-out libs/cssys/general/, $(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
+vpath %.cpp $(SRCDIR)/libs/cssys $(filter-out libs/cssys/general/, $(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
+vpath %.c   $(SRCDIR)/libs/cssys $(filter-out libs/cssys/general/, $(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
 
-INC.CSSYS = $(wildcard include/cssys/*.h $(INC.SYS_CSSYS))
-SRC.CSSYS = $(wildcard libs/cssys/*.cpp $(SRC.SYS_CSSYS))
+INC.CSSYS = $(wildcard $(addprefix $(SRCDIR)/,include/cssys/*.h $(INC.SYS_CSSYS)))
+SRC.CSSYS = $(wildcard $(addprefix $(SRCDIR)/,libs/cssys/*.cpp $(SRC.SYS_CSSYS)))
 ifeq ($(MAKE_DLL),yes)
   CSSYS.LIB = $(OUT)/$(LIB_PREFIX)cssys_D$(LIB_SUFFIX)
 else

@@ -25,7 +25,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/net/manager
+vpath %.cpp $(SRCDIR)/plugins/net/manager
 
 ifeq ($(USE_PLUGINS),yes)
   NETMAN = $(OUTDLL)/netman$(DLL)
@@ -38,8 +38,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(NETMAN)
 endif
 
-INC.NETMAN = $(wildcard plugins/net/manager/*.h)
-SRC.NETMAN = $(wildcard plugins/net/manager/*.cpp)
+INC.NETMAN = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/manager/*.h))
+SRC.NETMAN = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/manager/*.cpp))
 OBJ.NETMAN = $(addprefix $(OUT)/,$(notdir $(SRC.NETMAN:.cpp=$O)))
 DEP.NETMAN = CSUTIL CSSYS CSUTIL
 

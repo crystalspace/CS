@@ -31,8 +31,8 @@ ifeq ($(MAKESECTION),postdefines)
 SCFREG.EXE = scfreg$(EXE.CONSOLE)
 DIR.SCFREG = apps/tools/scfreg
 OUT.SCFREG = $(OUT)/$(DIR.SCFREG)
-INC.SCFREG =
-SRC.SCFREG = apps/tools/scfreg/scfreg.cpp
+INC.SCFREG = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SCFREG)/*.h))
+SRC.SCFREG = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SCFREG)/*.cpp))
 OBJ.SCFREG = $(addprefix $(OUT.SCFREG)/,$(notdir $(SRC.SCFREG:.cpp=$O)))
 DEP.SCFREG = CSSYS CSUTIL CSGEOM
 LIB.SCFREG = $(foreach d,$(DEP.SCFREG),$($d.LIB))
@@ -55,7 +55,7 @@ ifeq ($(MAKESECTION),targets)
 build.scfreg: $(OUTDIRS) $(SCFREG.EXE)
 clean: scfregclean
 
-$(OUT.SCFREG)/%$O: $(DIR.SCFREG)/%.cpp
+$(OUT.SCFREG)/%$O: $(SRCDIR)/$(DIR.SCFREG)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(SCFREG.EXE): $(OBJ.SCFREG) $(LIB.SCFREG)

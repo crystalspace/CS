@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 SIMPLEPT.EXE = simplept$(EXE)
 DIR.SIMPLEPT = apps/tutorial/simplept
 OUT.SIMPLEPT = $(OUT)/$(DIR.SIMPLEPT)
-INC.SIMPLEPT = $(wildcard $(DIR.SIMPLEPT)/*.h )
-SRC.SIMPLEPT = $(wildcard $(DIR.SIMPLEPT)/*.cpp )
+INC.SIMPLEPT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPLEPT)/*.h ))
+SRC.SIMPLEPT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPLEPT)/*.cpp ))
 OBJ.SIMPLEPT = $(addprefix $(OUT.SIMPLEPT)/,$(notdir $(SRC.SIMPLEPT:.cpp=$O)))
 DEP.SIMPLEPT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.SIMPLEPT = $(foreach d,$(DEP.SIMPLEPT),$($d.LIB))
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 build.simplept: $(OUTDIRS) $(SIMPLEPT.EXE)
 clean: simpleptclean
 
-$(OUT.SIMPLEPT)/%$O: $(DIR.SIMPLEPT)/%.cpp
+$(OUT.SIMPLEPT)/%$O: $(SRCDIR)/$(DIR.SIMPLEPT)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(SIMPLEPT.EXE): $(DEP.EXE) $(OBJ.SIMPLEPT) $(LIB.SIMPLEPT)

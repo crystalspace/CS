@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/renderer/line
+vpath %.cpp $(SRCDIR)/plugins/video/renderer/line
 
 ifeq ($(USE_PLUGINS),yes)
   LINE3D = $(OUTDLL)/line3d$(DLL)
@@ -42,18 +42,20 @@ else
   TO_INSTALL.STATIC_LIBS += $(LINE3D)
 endif
 
-INC.LINE3D = $(wildcard plugins/video/renderer/line/*.h) \
+INC.LINE3D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/renderer/line/*.h \
   plugins/video/renderer/common/txtmgr.h \
   plugins/video/renderer/common/dtmesh.h \
   plugins/video/renderer/common/dpmesh.h \
   plugins/video/renderer/common/vbufmgr.h \
-  plugins/video/renderer/common/polybuf.h
-SRC.LINE3D = $(wildcard plugins/video/renderer/line/*.cpp) \
+  plugins/video/renderer/common/polybuf.h))
+SRC.LINE3D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/renderer/line/*.cpp \
   plugins/video/renderer/common/txtmgr.cpp \
   plugins/video/renderer/common/dtmesh.cpp \
   plugins/video/renderer/common/dpmesh.cpp \
   plugins/video/renderer/common/vbufmgr.cpp \
-  plugins/video/renderer/common/polybuf.cpp
+  plugins/video/renderer/common/polybuf.cpp))
 OBJ.LINE3D = $(addprefix $(OUT)/,$(notdir $(SRC.LINE3D:.cpp=$O)))
 DEP.LINE3D = CSGEOM CSGFX CSUTIL CSSYS CSUTIL
 

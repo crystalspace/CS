@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 SIMPVS.EXE = simpvs$(EXE)
 DIR.SIMPVS = apps/tutorial/simpvs
 OUT.SIMPVS = $(OUT)/$(DIR.SIMPVS)
-INC.SIMPVS = $(wildcard $(DIR.SIMPVS)/*.h )
-SRC.SIMPVS = $(wildcard $(DIR.SIMPVS)/*.cpp )
+INC.SIMPVS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPVS)/*.h ))
+SRC.SIMPVS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPVS)/*.cpp ))
 OBJ.SIMPVS = $(addprefix $(OUT.SIMPVS)/,$(notdir $(SRC.SIMPVS:.cpp=$O)))
 DEP.SIMPVS = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPVS = $(foreach d,$(DEP.SIMPVS),$($d.LIB))
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 build.simpvs: $(OUTDIRS) $(SIMPVS.EXE)
 clean: simpvsclean
 
-$(OUT.SIMPVS)/%$O: $(DIR.SIMPVS)/%.cpp
+$(OUT.SIMPVS)/%$O: $(SRCDIR)/$(DIR.SIMPVS)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(SIMPVS.EXE): $(DEP.EXE) $(OBJ.SIMPVS) $(LIB.SIMPVS)

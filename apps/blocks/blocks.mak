@@ -28,18 +28,18 @@ ifeq ($(MAKESECTION),postdefines)
 BLOCKS.EXE = blocks$(EXE)
 DIR.BLOCKS = apps/blocks
 OUT.BLOCKS = $(OUT)/$(DIR.BLOCKS)
-INC.BLOCKS = $(wildcard $(DIR.BLOCKS)/*.h)
-SRC.BLOCKS = $(wildcard $(DIR.BLOCKS)/*.cpp)
+INC.BLOCKS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BLOCKS)/*.h))
+SRC.BLOCKS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BLOCKS)/*.cpp))
 OBJ.BLOCKS = $(addprefix $(OUT.BLOCKS)/,$(notdir $(SRC.BLOCKS:.cpp=$O)))
 DEP.BLOCKS = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.BLOCKS = $(foreach d,$(DEP.BLOCKS),$($d.LIB))
-CFG.BLOCKS = data/config/blocks.cfg
+CFG.BLOCKS = $(SRCDIR)/data/config/blocks.cfg
 
 OUTDIRS += $(OUT.BLOCKS)
 
 TO_INSTALL.EXE    += $(BLOCKS.EXE)
 TO_INSTALL.CONFIG += $(CFG.BLOCKS)
-TO_INSTALL.DATA   += data/blocks.zip
+TO_INSTALL.DATA   += $(SRCDIR)/data/blocks.zip
 
 MSVC.DSP += BLOCKS
 DSP.BLOCKS.NAME = blocks
@@ -55,7 +55,7 @@ ifeq ($(MAKESECTION),targets)
 build.blocks: $(OUTDIRS) $(BLOCKS.EXE)
 clean: blocksclean
 
-$(OUT.BLOCKS)/%$O: $(DIR.BLOCKS)/%.cpp
+$(OUT.BLOCKS)/%$O: $(SRCDIR)/$(DIR.BLOCKS)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(BLOCKS.EXE): $(DEP.EXE) $(OBJ.BLOCKS) $(LIB.BLOCKS)

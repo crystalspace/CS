@@ -33,8 +33,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(IE3DS)
 endif
 
-INC.IE3DS = $(wildcard plugins/mesh/impexp/3ds/*.h)
-SRC.IE3DS = $(wildcard plugins/mesh/impexp/3ds/*.cpp)
+INC.IE3DS = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/3ds/*.h))
+SRC.IE3DS = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/3ds/*.cpp))
 OBJ.IE3DS = $(addprefix $(OUT)/,$(notdir $(SRC.IE3DS:.cpp=$O)))
 DEP.IE3DS = CSUTIL CSSYS CSTOOL CSUTIL CSGEOM
 
@@ -55,7 +55,7 @@ $(IE3DS): $(OBJ.IE3DS) $(LIB.IE3DS)
 	$(DO.PLUGIN.CORE) $(3DS.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
 
-$(OUT)/%$O: plugins/mesh/impexp/3ds/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/mesh/impexp/3ds/%.cpp
 	$(DO.COMPILE.CPP) $(3DS.CFLAGS)
 
 clean: ie3dsclean

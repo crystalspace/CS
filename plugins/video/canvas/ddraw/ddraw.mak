@@ -29,8 +29,9 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/canvas/ddraw plugins/video/canvas/common \
-  plugins/video/canvas/directxcommon
+vpath %.cpp $(SRCDIR)/plugins/video/canvas/ddraw \
+  $(SRCDIR)/plugins/video/canvas/common \
+  $(SRCDIR)/plugins/video/canvas/directxcommon
 
 ifeq ($(USE_PLUGINS),yes)
   DDRAW2D = $(OUTDLL)/ddraw2d$(DLL)
@@ -45,11 +46,12 @@ else
   TO_INSTALL.STATIC_LIBS += $(DDRAW2D)
 endif
 
-INC.DDRAW2D = $(wildcard plugins/video/canvas/ddraw/*.h \
-  $(wildcard plugins/video/canvas/directxcommon/*.h $(INC.COMMON.DRV2D))) \
-  $(wildcard directx/*.h)
-SRC.DDRAW2D = $(wildcard plugins/video/canvas/ddraw/*.cpp \
-  $(wildcard plugins/video/canvas/directxcommon/*.cpp $(SRC.COMMON.DRV2D)))
+INC.DDRAW2D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/canvas/ddraw/*.h plugins/video/canvas/directxcommon/*.h \
+  $(INC.COMMON.DRV2D)))
+SRC.DDRAW2D = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/canvas/ddraw/*.cpp plugins/video/canvas/directxcommon/*.cpp \
+  $(SRC.COMMON.DRV2D)))
 OBJ.DDRAW2D = $(addprefix $(OUT)/,$(notdir $(SRC.DDRAW2D:.cpp=$O)))
 DEP.DDRAW2D = CSUTIL CSSYS CSUTIL
 

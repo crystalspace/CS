@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/genmesh/persist/standard
+vpath %.cpp $(SRCDIR)/plugins/mesh/genmesh/persist/standard
 
 ifeq ($(USE_PLUGINS),yes)
   GMESHLDR = $(OUTDLL)/gmeshldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(GMESHLDR)
 endif
 
-INC.GMESHLDR = $(wildcard plugins/mesh/genmesh/persist/standard/*.h)
-SRC.GMESHLDR = $(wildcard plugins/mesh/genmesh/persist/standard/*.cpp)
+INC.GMESHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/standard/*.h))
+SRC.GMESHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/standard/*.cpp))
 OBJ.GMESHLDR = $(addprefix $(OUT)/,$(notdir $(SRC.GMESHLDR:.cpp=$O)))
 DEP.GMESHLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

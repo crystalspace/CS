@@ -42,10 +42,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(GLWIN32)
 endif
 
-INC.GLWIN32 = $(wildcard plugins/video/canvas/openglwin/*.h \
-  $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D))
-SRC.GLWIN32 = $(wildcard plugins/video/canvas/openglwin/*.cpp \
-  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
+INC.GLWIN32 = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglwin/*.h \
+  $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D)))
+SRC.GLWIN32 = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglwin/*.cpp \
+  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D)))
 OBJ.GLWIN32 = $(addprefix $(OUT)/,$(notdir $(SRC.GLWIN32:.cpp=$O)))
 DEP.GLWIN32 = CSUTIL CSSYS CSUTIL
 
@@ -63,10 +63,10 @@ ifeq ($(MAKESECTION),targets)
 
 glwin32: $(OUTDIRS) $(GLWIN32)
 
-$(OUT)/%$O: plugins/video/canvas/openglwin/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/openglwin/%.cpp
 	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
-$(OUT)/%$O: plugins/video/canvas/openglcommon/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
 $(GLWIN32): $(OBJ.GLWIN32) $(LIB.GLWIN32)

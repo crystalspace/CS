@@ -26,14 +26,14 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/csengine libs/csengine/basic \
-  libs/csengine/light libs/csengine/objects
+vpath %.cpp $(SRCDIR)/libs/csengine $(SRCDIR)/libs/csengine/basic \
+  $(SRCDIR)/libs/csengine/light $(SRCDIR)/libs/csengine/objects
 
 CSENGINE.LIB = $(OUT)/$(LIB_PREFIX)csengine$(LIB_SUFFIX)
-INC.CSENGINE = $(wildcard include/csengine/*.h)
-SRC.CSENGINE = $(wildcard libs/csengine/*.cpp libs/csengine/*/*.cpp)
+INC.CSENGINE = $(wildcard $(addprefix $(SRCDIR)/,include/csengine/*.h))
+SRC.CSENGINE = $(wildcard $(addprefix $(SRCDIR)/,libs/csengine/*.cpp libs/csengine/*/*.cpp))
 OBJ.CSENGINE = $(addprefix $(OUT)/,$(notdir $(SRC.CSENGINE:.cpp=$O)))
-CFG.CSENGINE = data/config/engine.cfg
+CFG.CSENGINE = $(SRCDIR)/data/config/engine.cfg
 
 TO_INSTALL.CONFIG += $(CFG.CSENGINE)
 TO_INSTALL.STATIC_LIBS += $(CSENGINE.LIB)

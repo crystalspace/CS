@@ -31,12 +31,12 @@ ifeq ($(MAKESECTION),postdefines)
 AWSTUT.EXE = awstut$(EXE)
 DIR.AWSTUT = apps/tutorial/awstut
 OUT.AWSTUT = $(OUT)/$(DIR.AWSTUT)
-INC.AWSTUT = $(wildcard $(DIR.AWSTUT)/*.h )
-SRC.AWSTUT = $(wildcard $(DIR.AWSTUT)/*.cpp )
+INC.AWSTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWSTUT)/*.h ))
+SRC.AWSTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWSTUT)/*.cpp ))
 OBJ.AWSTUT = $(addprefix $(OUT.AWSTUT)/,$(notdir $(SRC.AWSTUT:.cpp=$O)))
 DEP.AWSTUT = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.AWSTUT = $(foreach d,$(DEP.AWSTUT),$($d.LIB))
-CFG.AWSTUT = data/config/awstut.cfg
+CFG.AWSTUT = $(SRCDIR)/data/config/awstut.cfg
 
 OUTDIRS += $(OUT.AWSTUT)
 
@@ -57,7 +57,7 @@ ifeq ($(MAKESECTION),targets)
 build.awstut: $(OUTDIRS) $(AWSTUT.EXE)
 clean: awstutclean
 
-$(OUT.AWSTUT)/%$O: $(DIR.AWSTUT)/%.cpp
+$(OUT.AWSTUT)/%$O: $(SRCDIR)/$(DIR.AWSTUT)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(AWSTUT.EXE): $(DEP.EXE) $(OBJ.AWSTUT) $(LIB.AWSTUT)

@@ -31,8 +31,8 @@ ifeq ($(MAKESECTION),postdefines)
 CSFGEN.EXE = csfgen$(EXE.CONSOLE)
 DIR.CSFGEN = apps/tools/csfgen
 OUT.CSFGEN = $(OUT)/$(DIR.CSFGEN)
-INC.CSFGEN = $(wildcard $(DIR.CSFGEN)/*.h )
-SRC.CSFGEN = $(wildcard $(DIR.CSFGEN)/*.cpp )
+INC.CSFGEN = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSFGEN)/*.h ))
+SRC.CSFGEN = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSFGEN)/*.cpp ))
 OBJ.CSFGEN = $(addprefix $(OUT.CSFGEN)/,$(notdir $(SRC.CSFGEN:.cpp=$O)))
 DEP.CSFGEN = CSTOOL CSUTIL CSSYS CSGEOM CSUTIL CSGFX
 LIB.CSFGEN = $(foreach d,$(DEP.CSFGEN),$($d.LIB))
@@ -55,7 +55,7 @@ ifeq ($(MAKESECTION),targets)
 build.csfgen: $(OUTDIRS) $(CSFGEN.EXE)
 clean: csfgenclean
 
-$(OUT.CSFGEN)/%$O: $(DIR.CSFGEN)/%.cpp
+$(OUT.CSFGEN)/%$O: $(SRCDIR)/$(DIR.CSFGEN)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(CSFGEN.EXE): $(OBJ.CSFGEN) $(LIB.CSFGEN)

@@ -25,7 +25,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/cssaver
+vpath %.cpp $(SRCDIR)/plugins/cssaver
 
 ifeq ($(USE_PLUGINS),yes)
   CSSAVER = $(OUTDLL)/cssaver$(DLL)
@@ -38,8 +38,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSSAVER)
 endif
 
-INC.CSSAVER = $(wildcard plugins/cssaver/*.h)
-SRC.CSSAVER = $(wildcard plugins/cssaver/*.cpp)
+INC.CSSAVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/cssaver/*.h))
+SRC.CSSAVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/cssaver/*.cpp))
 OBJ.CSSAVER = $(addprefix $(OUT)/,$(notdir $(SRC.CSSAVER:.cpp=$O)))
 DEP.CSSAVER = CSUTIL CSTOOL CSSYS CSUTIL
 

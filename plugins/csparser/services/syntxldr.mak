@@ -25,7 +25,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/csparser/services
+vpath %.cpp $(SRCDIR)/plugins/csparser/services
 
 ifeq ($(USE_PLUGINS),yes)
   CSSYNLDR = $(OUTDLL)/cssynldr$(DLL)
@@ -38,8 +38,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSSYNLDR)
 endif
 
-INC.CSSYNLDR = $(wildcard plugins/csparser/services/*.h)
-SRC.CSSYNLDR = $(wildcard plugins/csparser/services/*.cpp)
+INC.CSSYNLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/csparser/services/*.h))
+SRC.CSSYNLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/csparser/services/*.cpp))
 OBJ.CSSYNLDR = $(addprefix $(OUT)/,$(notdir $(SRC.CSSYNLDR:.cpp=$O)))
 DEP.CSSYNLDR = CSUTIL CSTOOL CSSYS CSUTIL CSGEOM CSTOOL
 

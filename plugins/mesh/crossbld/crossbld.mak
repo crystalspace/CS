@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/crossbld
+vpath %.cpp $(SRCDIR)/plugins/mesh/crossbld
 
 ifeq ($(USE_PLUGINS),yes)
   CROSSBLD = $(OUTDLL)/crossbld$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CROSSBLD)
 endif
 
-INC.CROSSBLD = $(wildcard plugins/mesh/crossbld/*.h)
-SRC.CROSSBLD = $(wildcard plugins/mesh/crossbld/*.cpp)
+INC.CROSSBLD = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/crossbld/*.h))
+SRC.CROSSBLD = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/crossbld/*.cpp))
 OBJ.CROSSBLD = $(addprefix $(OUT)/,$(notdir $(SRC.CROSSBLD:.cpp=$O)))
 DEP.CROSSBLD = CSGEOM CSTOOL CSUTIL CSSYS CSUTIL CSGEOM
 

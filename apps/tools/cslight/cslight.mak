@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 CSLIGHT.EXE = cslight$(EXE)
 DIR.CSLIGHT = apps/tools/cslight
 OUT.CSLIGHT = $(OUT)/$(DIR.CSLIGHT)
-INC.CSLIGHT = $(wildcard $(DIR.CSLIGHT)/*.h )
-SRC.CSLIGHT = $(wildcard $(DIR.CSLIGHT)/*.cpp )
+INC.CSLIGHT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSLIGHT)/*.h ))
+SRC.CSLIGHT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.CSLIGHT)/*.cpp ))
 OBJ.CSLIGHT = $(addprefix $(OUT.CSLIGHT)/,$(notdir $(SRC.CSLIGHT:.cpp=$O)))
 DEP.CSLIGHT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSLIGHT = $(foreach d,$(DEP.CSLIGHT),$($d.LIB))
@@ -43,7 +43,7 @@ MSVC.DSP += CSLIGHT
 DSP.CSLIGHT.NAME = cslight
 DSP.CSLIGHT.TYPE = appcon
 
-$(CSLIGHT.EXE).WINRSRC = apps/tools/cslight/cslight.rc
+$(CSLIGHT.EXE).WINRSRC = $(SRCDIR)/apps/tools/cslight/cslight.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -56,7 +56,7 @@ all: $(CSLIGHT.EXE)
 build.cslight: $(OUTDIRS) $(CSLIGHT.EXE)
 clean: cslightclean
 
-$(OUT.CSLIGHT)/%$O: $(DIR.CSLIGHT)/%.cpp
+$(OUT.CSLIGHT)/%$O: $(SRCDIR)/$(DIR.CSLIGHT)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(CSLIGHT.EXE): $(DEP.EXE) $(OBJ.CSLIGHT) $(LIB.CSLIGHT)

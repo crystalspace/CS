@@ -37,8 +37,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDOGG)
 endif
 
-INC.SNDOGG = $(wildcard plugins/sound/loader/ogg/*.h)
-SRC.SNDOGG = $(wildcard plugins/sound/loader/ogg/*.cpp)
+INC.SNDOGG = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/ogg/*.h))
+SRC.SNDOGG = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/ogg/*.cpp))
 OBJ.SNDOGG = $(addprefix $(OUT)/,$(notdir $(SRC.SNDOGG:.cpp=$O)))
 DEP.SNDOGG = CSUTIL CSSYS CSUTIL
 
@@ -61,7 +61,7 @@ $(SNDOGG): $(OBJ.SNDOGG) $(LIB.SNDOGG)
 	$(DO.PLUGIN.CORE) $(VORBISFILE.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
 
-$(OUT)/%$O: plugins/sound/loader/ogg/%.cpp
+$(OUT)/%$O: $(SRCDIR)/plugins/sound/loader/ogg/%.cpp
 	$(DO.COMPILE.CPP) $(VORBISFILE.CFLAGS)
 
 clean: sndoggclean

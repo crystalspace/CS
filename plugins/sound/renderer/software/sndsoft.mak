@@ -26,7 +26,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/renderer/software plugins/sound/renderer/common
+vpath %.cpp $(SRCDIR)/plugins/sound/renderer/software \
+  $(SRCDIR)/plugins/sound/renderer/common
 
 # COMP_GCC Linker assumes static libs have extension '.a'.  Mingw/Cygwin both
 # use libdsound.a (static lib) as the place from which to get MS DirectSound.
@@ -56,10 +57,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDSOFT)
 endif
 
-INC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.h) \
-  $(wildcard plugins/sound/renderer/common/*.h)
-SRC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.cpp) \
-  $(wildcard plugins/sound/renderer/common/*.cpp)
+INC.SNDSOFT = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/sound/renderer/software/*.h plugins/sound/renderer/common/*.h))
+SRC.SNDSOFT = $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/sound/renderer/software/*.cpp plugins/sound/renderer/common/*.cpp))
 OBJ.SNDSOFT = $(addprefix $(OUT)/,$(notdir $(SRC.SNDSOFT:.cpp=$O)))
 DEP.SNDSOFT = CSUTIL CSGEOM CSSYS CSUTIL
 

@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/video/canvas/memory
+vpath %.cpp $(SRCDIR)/plugins/video/canvas/memory
 
 # The 2D Memorylib driver
 ifeq ($(USE_PLUGINS),yes)
@@ -43,8 +43,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(MEMORY)
 endif
 
-INC.MEMORY = $(wildcard plugins/video/canvas/memory/*.h   $(INC.COMMON.DRV2D))
-SRC.MEMORY = $(wildcard plugins/video/canvas/memory/*.cpp $(SRC.COMMON.DRV2D))
+INC.MEMORY = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/memory/*.h   $(INC.COMMON.DRV2D)))
+SRC.MEMORY = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/memory/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.MEMORY = $(addprefix $(OUT)/,$(notdir $(SRC.MEMORY:.cpp=$O)))
 DEP.MEMORY = CSUTIL CSSYS
 
@@ -57,7 +57,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp plugins/video/canvas/memory
+vpath %.cpp $(SRCDIR)/plugins/video/canvas/memory
 
 .PHONY: memory memoryclean
 

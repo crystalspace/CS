@@ -35,25 +35,26 @@ ifeq ($(MAKESECTION),postdefines)
 WALKTEST.EXE = walktest$(EXE)
 DIR.WALKTEST = apps/walktest
 OUT.WALKTEST = $(OUT)/$(DIR.WALKTEST)
-INC.WALKTEST = $(wildcard $(DIR.WALKTEST)/*.h)
-SRC.WALKTEST = $(wildcard $(DIR.WALKTEST)/*.cpp)
+INC.WALKTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.WALKTEST)/*.h))
+SRC.WALKTEST = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.WALKTEST)/*.cpp))
 OBJ.WALKTEST = $(addprefix $(OUT.WALKTEST)/,$(notdir $(SRC.WALKTEST:.cpp=$O)))
 DEP.WALKTEST = CSTOOL CSENGINE CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.WALKTEST = $(foreach d,$(DEP.WALKTEST),$($d.LIB))
-CFG.WALKTEST = data/config/walktest.cfg data/config/autoexec.cfg
+CFG.WALKTEST = $(addprefix $(SRCDIR)/, \
+  data/config/walktest.cfg data/config/autoexec.cfg)
 
 OUTDIRS += $(OUT.WALKTEST)
 
 TO_INSTALL.EXE    += $(WALKTEST.EXE)
 TO_INSTALL.CONFIG += $(CFG.WALKTEST)
-TO_INSTALL.DATA   += \
-  data/stdtex.zip data/standard.zip data/flarge/world data/partsys/world
+TO_INSTALL.DATA   += $(addprefix $(SRCDIR)/, \
+  data/stdtex.zip data/standard.zip data/flarge/world data/partsys/world)
 
 MSVC.DSP += WALKTEST
 DSP.WALKTEST.NAME = walktest
 DSP.WALKTEST.TYPE = appcon
 
-$(WALKTEST.EXE).WINRSRC = libs/cssys/win32/rsrc/cs1.rc
+$(WALKTEST.EXE).WINRSRC = $(SRCDIR)/libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -65,7 +66,7 @@ ifeq ($(MAKESECTION),targets)
 build.walktest: $(OUTDIRS) $(WALKTEST.EXE)
 clean: walktestclean
 
-$(OUT.WALKTEST)/%$O: $(DIR.WALKTEST)/%.cpp
+$(OUT.WALKTEST)/%$O: $(SRCDIR)/$(DIR.WALKTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) $(LIB.WALKTEST)

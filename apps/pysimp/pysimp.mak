@@ -32,8 +32,8 @@ ifeq ($(MAKESECTION),postdefines)
 PYSIMP.EXE = pysimp$(EXE)
 DIR.PYSIMP = apps/pysimp
 OUT.PYSIMP = $(OUT)/$(DIR.PYSIMP)
-INC.PYSIMP = $(wildcard $(DIR.PYSIMP)/*.h)
-SRC.PYSIMP = $(wildcard $(DIR.PYSIMP)/*.cpp)
+INC.PYSIMP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PYSIMP)/*.h))
+SRC.PYSIMP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PYSIMP)/*.cpp))
 OBJ.PYSIMP = $(addprefix $(OUT.PYSIMP)/,$(notdir $(SRC.PYSIMP:.cpp=$O)))
 DEP.PYSIMP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.PYSIMP = $(foreach d,$(DEP.PYSIMP),$($d.LIB))
@@ -57,7 +57,7 @@ all: $(PYSIMP.EXE)
 build.pysimp: $(OUTDIRS) $(PYSIMP.EXE)
 clean: pysimpclean
 
-$(OUT.PYSIMP)/%$O: $(DIR.PYSIMP)/%.cpp
+$(OUT.PYSIMP)/%$O: $(SRCDIR)/$(DIR.PYSIMP)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(PYSIMP.EXE): $(DEP.EXE) $(OBJ.PYSIMP) $(LIB.PYSIMP)

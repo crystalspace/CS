@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sequence
+vpath %.cpp $(SRCDIR)/plugins/sequence
 
 ifeq ($(USE_PLUGINS),yes)
   SEQUENCE = $(OUTDLL)/sequence$(DLL)
@@ -42,8 +42,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SEQUENCE)
 endif
 
-INC.SEQUENCE = $(wildcard plugins/sequence/*.h)
-SRC.SEQUENCE = $(wildcard plugins/sequence/*.cpp)
+INC.SEQUENCE = $(wildcard $(addprefix $(SRCDIR)/,plugins/sequence/*.h))
+SRC.SEQUENCE = $(wildcard $(addprefix $(SRCDIR)/,plugins/sequence/*.cpp))
 OBJ.SEQUENCE = $(addprefix $(OUT)/,$(notdir $(SRC.SEQUENCE:.cpp=$O)))
 DEP.SEQUENCE = CSGEOM CSUTIL CSSYS CSUTIL
 

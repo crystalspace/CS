@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 SIMPCD.EXE = simpcd$(EXE)
 DIR.SIMPCD = apps/tutorial/simpcd
 OUT.SIMPCD = $(OUT)/$(DIR.SIMPCD)
-INC.SIMPCD = $(wildcard $(DIR.SIMPCD)/*.h )
-SRC.SIMPCD = $(wildcard $(DIR.SIMPCD)/*.cpp )
+INC.SIMPCD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPCD)/*.h ))
+SRC.SIMPCD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPCD)/*.cpp ))
 OBJ.SIMPCD = $(addprefix $(OUT.SIMPCD)/,$(notdir $(SRC.SIMPCD:.cpp=$O)))
 DEP.SIMPCD = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPCD = $(foreach d,$(DEP.SIMPCD),$($d.LIB))
@@ -53,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 build.simpcd: $(OUTDIRS) $(SIMPCD.EXE)
 clean: simpcdclean
 
-$(OUT.SIMPCD)/%$O: $(DIR.SIMPCD)/%.cpp
+$(OUT.SIMPCD)/%$O: $(SRCDIR)/$(DIR.SIMPCD)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(SIMPCD.EXE): $(DEP.EXE) $(OBJ.SIMPCD) $(LIB.SIMPCD)

@@ -29,8 +29,8 @@ ifeq ($(MAKESECTION),postdefines)
 SIMPLEVP.EXE = simplevp$(EXE)
 DIR.SIMPLEVP = apps/examples/simplevp
 OUT.SIMPLEVP = $(OUT)/$(DIR.SIMPLEVP)
-INC.SIMPLEVP = $(wildcard $(DIR.SIMPLEVP)/*.h)
-SRC.SIMPLEVP = $(wildcard $(DIR.SIMPLEVP)/*.cpp)
+INC.SIMPLEVP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPLEVP)/*.h))
+SRC.SIMPLEVP = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.SIMPLEVP)/*.cpp))
 OBJ.SIMPLEVP = $(addprefix $(OUT.SIMPLEVP)/,$(notdir $(SRC.SIMPLEVP:.cpp=$O)))
 DEP.SIMPLEVP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPLEVP = $(foreach d,$(DEP.SIMPLEVP),$($d.LIB))
@@ -54,7 +54,7 @@ all: $(SIMPLEVP.EXE)
 build.simplevp: $(OUTDIRS) $(SIMPLEVP.EXE)
 clean: simplevpclean
 
-$(OUT.SIMPLEVP)/%$O: $(DIR.SIMPLEVP)/%.cpp
+$(OUT.SIMPLEVP)/%$O: $(SRCDIR)/$(DIR.SIMPLEVP)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(SIMPLEVP.EXE): $(DEP.EXE) $(OBJ.SIMPLEVP) $(LIB.SIMPLEVP)
