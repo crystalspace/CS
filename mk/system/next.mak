@@ -191,7 +191,8 @@ ifeq ($(MAKESECTION),postdefines)
 
 # Other platforms link all $(LIBS) into DLL, but doing so breaks DLLs on
 # NeXT, so a custom link statement is required.
-DO.DYNAMIC.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(LFLAGS)
+DO.SHARED.PLUGIN  = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(LFLAGS)
+DO.SHARED.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(LFLAGS)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
