@@ -48,7 +48,7 @@ class csGLTextureCache;
 class csGLTexture
 {
 public:
-  csGLTexture(csGLTextureHandle *p, iImage* Image);
+  csGLTexture (csGLTextureHandle *p, iImage* Image);
   virtual ~csGLTexture();
 
   csGLTextureHandle *Parent;
@@ -123,7 +123,7 @@ public:
   csGLTextureHandle (iImage* image, int flags, int target, int bpp,
     GLenum sourceFormat, csGLGraphics3D *iG3D);
 
-  csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
+  csGLTextureHandle (iImageVector* image, int flags, int target, int bpp,
     GLenum sourceFormat, csGLGraphics3D *iG3D);
 
   csGLTextureHandle (int target, GLuint Handle, csGLGraphics3D *iG3D);

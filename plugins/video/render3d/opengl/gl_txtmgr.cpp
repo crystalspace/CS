@@ -121,7 +121,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
   was_render_target = false;
   Handle = 0;
 
-  images = new csImageVector();
+  images = csPtr<csImageVector> (new csImageVector());
   //image->IncRef();
   images->AddImage(image);
 
@@ -147,7 +147,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
   prepared = false;
 }
 
-csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image,
+csGLTextureHandle::csGLTextureHandle (iImageVector* image,
 	int flags, int target, int bpp, GLenum sourceFormat,
 	csGLGraphics3D *iG3D)
 {
@@ -163,9 +163,6 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image,
   Handle = 0;
 
   images = image;
-  int i=0;
-  //for (i=0; i < images->Length(); i++)
-    //images->GetImage (i)->IncRef();
 
   this->flags = flags;
   transp = false;
