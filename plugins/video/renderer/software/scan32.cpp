@@ -39,6 +39,14 @@
 
 //------------------------------------------------------------------
 
+#ifdef TOP8BITS_R8G8B8_USED
+#  define FOG_PRE(x) x >> 8
+#  define FOG_POST(x) x << 8
+#else
+#  define FOG_PRE(x) x
+#  define FOG_POST(x) x
+#endif
+
 #ifndef NO_draw_scanline_fog
 
 void csScan_32_draw_scanline_fog (int xx, unsigned char* d,
@@ -75,10 +83,11 @@ fd_done:
       if (fd < EXP_256_SIZE)
       {
         fd = Scan.exp_256 [fd];
-        register int r = (fd * ((*_dest & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
-        register int g = (fd * ((*_dest & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
-        register int b = (fd * ((*_dest & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
-        *_dest = (r & 0x00ff0000) | (g & 0x0000ff00) | b;
+        unsigned pix = FOG_PRE (*_dest);
+        register int r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
+        register int g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
+        register int b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
+        *_dest = FOG_POST ((r & 0x00ff0000) | (g & 0x0000ff00) | b);
       }
       else
         *_dest = fog_pix;
@@ -115,10 +124,11 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
       if (fd < EXP_256_SIZE)
       {
         fd = Scan.exp_256 [fd];
-        register int r = (fd * ((*_dest & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
-        register int g = (fd * ((*_dest & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
-        register int b = (fd * ((*_dest & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
-        *_dest = (r & 0x00ff0000) | (g & 0x0000ff00) | b;
+        unsigned pix = FOG_PRE (*_dest);
+        register int r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
+        register int g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
+        register int b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
+        *_dest = FIG_POST ((r & 0x00ff0000) | (g & 0x0000ff00) | b);
       }
       else
         *_dest = fog_pix;

@@ -94,8 +94,8 @@ void csTextureCacheSoftware::Clear ()
   total_textures = 0;
 }
 
-SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (int MipMap,
-  iPolygonTexture* pt)
+SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (bool verynice,
+  int MipMap, iPolygonTexture* pt)
 {
   SoftwareCachedTexture *cached_texture =
     (SoftwareCachedTexture *)pt->GetCacheData (MipMap);
@@ -126,10 +126,11 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (int MipMap,
   }
   else
   {
+    int mmshift = verynice && MipMap ? MipMap - 1 : MipMap;
     // Texture is not in the cache.
     int lightmap_size = pt->GetLightMap ()->GetSize () * sizeof (ULong);
-    int bitmap_w = (pt->GetWidth () >> MipMap);
-    int bitmap_h = ((pt->GetHeight () + (1 << MipMap) - 1) >> MipMap);
+    int bitmap_w = (pt->GetWidth () >> mmshift);
+    int bitmap_h = ((pt->GetHeight () + (1 << mmshift) - 1) >> mmshift);
     int bitmap_size = lightmap_size + bytes_per_texel * bitmap_w * (H_MARGIN * 2 + bitmap_h);
 
     total_textures++;
@@ -173,14 +174,14 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (int MipMap,
   return cached_texture;
 }
 
-void csTextureCacheSoftware::fill_texture (int MipMap, iPolygonTexture* pt,
-  float u_min, float v_min, float u_max, float v_max)
+void csTextureCacheSoftware::fill_texture (bool verynice, int MipMap,
+  iPolygonTexture* pt, float u_min, float v_min, float u_max, float v_max)
 {
   // Recalculate the lightmaps
   pt->RecalculateDynamicLights ();
 
   // Now cache the texture
-  SoftwareCachedTexture *cached_texture = cache_texture (MipMap, pt);
+  SoftwareCachedTexture *cached_texture = cache_texture (verynice, MipMap, pt);
 
   // Compute the rectangle on the lighted texture, if it is dirty
   create_lighted_texture (pt, cached_texture, texman, u_min, v_min, u_max, v_max);

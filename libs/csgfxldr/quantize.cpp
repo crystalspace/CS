@@ -17,8 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#define SYSDEF_ALLOCA
 #include "sysdef.h"
 #include "csgfxldr/quantize.h"
+#include "csgfxldr/inv_cmap.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -87,9 +89,9 @@
 
 // Compute masks for effectively separating R,G and B components from a ULong.
 // For a little-endian machine they are respectively
-// 0x000000f8, 0x0000fc00 and 0x00f00000
+// 0x000000f8, 0x0000fc00 and 0x00f80000
 // For a big-endian machine they are respectively
-// 0xf8000000, 0x00fc0000 and 0x0000f000
+// 0xf8000000, 0x00fc0000 and 0x0000f800
 #define R_MASK		((HIST_R_MAX - 1) << (R_BIT + 8 - HIST_R_BITS))
 #define G_MASK		((HIST_G_MAX - 1) << (G_BIT + 8 - HIST_G_BITS))
 #define B_MASK		((HIST_B_MAX - 1) << (B_BIT + 8 - HIST_B_BITS))
@@ -566,7 +568,8 @@ void csQuantizePalette (RGBPixel *&outpalette, int &maxcolors, RGBPixel *transp)
   maxcolors = boxcount + delta;
 }
 
-void csQuantizeRemap (RGBPixel *image, int pixels, UByte *&outimage, RGBPixel *transp)
+void csQuantizeRemap (RGBPixel *image, int pixels,
+  UByte *&outimage, RGBPixel *transp)
 {
   // Sanity check
   if (qState != qsCount && qState != qsRemap)
@@ -616,14 +619,163 @@ void csQuantizeRemap (RGBPixel *image, int pixels, UByte *&outimage, RGBPixel *t
     }
 }
 
-void csQuantizeRGB (RGBPixel *image, int pixels,
-  UByte *&outimage, RGBPixel *&outpalette, int maxcolors)
+void csQuantizeRemapDither (RGBPixel *image, int pixels, int pixperline,
+  RGBPixel *palette, int colors, UByte *&outimage, RGBPixel *transp)
+{
+  // Sanity check
+  if (qState != qsCount && qState != qsRemap)
+    return;
+
+  int count;
+
+  // We will re-use the histogram memory for a inverse colormap. However, we
+  // will need just a byte per element, so we'll assign the address of
+  // histogram memory block to a pointer of suitable type, and the second
+  // half of histogram storage remains unused.
+  UByte *icmap = (UByte *)hist;
+
+  int delta = transp ? 1 : 0;
+  if (qState == qsCount)
+  {
+    // Build an inverse colormap (since during dithering we can get color
+    // indices that did not existed in the original image)
+    csInverseColormap (colors - delta, palette + delta,
+      HIST_R_BITS, HIST_G_BITS, HIST_B_BITS, icmap);
+    if (transp)
+      for (int i = 0; i < HIST_R_MAX * HIST_G_MAX * HIST_B_MAX; i++)
+        icmap [i]++;
+    qState = qsRemap;
+  }
+
+  // Allocate the picture and the palette
+  if (!outimage) outimage = new UByte [pixels];
+
+  RGBPixel *src = image;
+  UByte *dst = outimage;
+  count = pixels;
+
+  int *fserr = (int *)alloca (2 * 3 * (pixperline + 2) * sizeof (int));
+  memset (fserr, 0, 3 * (pixperline + 2) * sizeof (int));
+  // odd/even row
+  unsigned char odd = 0;
+  while (count > 0)
+  {
+    // The alogorithm implements the widely-known and used Floyd-Steinberg
+    // error distribution - based dithering. The errors are distributed with
+    // the following weights to the surrounding pixels:
+    //
+    //       (here)   7/16
+    // 3/16   5/16    1/16
+    //
+    // Even lines are traversed left to right, odd lines backwards.
+
+    RGBPixel *cursrc;
+    UByte *curdst;
+    int *curerr, *nexterr;
+    int dir;
+
+    if (odd)
+    {
+      cursrc = src + pixperline - 1;
+      curdst = dst + pixperline - 1;
+      curerr = fserr + 2 * 3 * (pixperline + 2) - 6;
+      nexterr = fserr + 3 * (pixperline + 2) - 3;
+      dir = -1;
+    }
+    else
+    {
+      cursrc = src;
+      curdst = dst;
+      curerr = fserr + 3;
+      nexterr = fserr + 3 * (pixperline + 2);
+      dir = 1;
+    }
+    int dir3 = dir * 3;
+
+    // We will keep the errors for pixels (x+1, y) in the variable "err10",
+    // the error for the pixel right below us (x, y + 1) in "err01", and
+    // the error at (x + 1, y + 1) in "err11". The error for the pixel at
+    // (x - 1, y + 1) will be flushed into the errors array. This way, we
+    // will have just one memory read and one memory write per pixel.
+    // Well, in fact we have much more (x86 is terribly lacking registers)
+    // but anyway they go through the cache.
+    int err10r = 0, err01r = 0, err11r = 0;
+    int err10g = 0, err01g = 0, err11g = 0;
+    int err10b = 0, err01b = 0, err11b = 0;
+
+    for (int fspix = pixperline; fspix; fspix--,
+      cursrc += dir, curdst += dir,
+      curerr += dir3, nexterr += dir3)
+    {
+      RGBPixel srcpix = *cursrc;
+
+      if (transp && transp->eq (srcpix))
+      {
+        *curdst = 0;
+        err10r = err10g = err10b = 0;
+        nexterr [0] = err01r; nexterr [1] = err01g; nexterr [2] = err01b;
+        err01r = err11r; err01g = err11g; err01b = err11b;
+        err11r = err11g = err11b = 0;
+        continue;
+      }
+
+      int r = srcpix.red   + ((err10r + curerr [0]) / 16);
+      if (r < 0) r = 0; if (r > 255) r = 255;
+
+      int g = srcpix.green + ((err10g + curerr [1]) / 16);
+      if (g < 0) g = 0; if (g > 255) g = 255;
+
+      int b = srcpix.blue  + ((err10b + curerr [2]) / 16);
+      if (b < 0) b = 0; if (b > 255) b = 255;
+
+      UByte pix = icmap [((r >> (8 - HIST_R_BITS)) << (HIST_G_BITS + HIST_B_BITS)) |
+                         ((g >> (8 - HIST_G_BITS)) << HIST_B_BITS) |
+                         ((b >> (8 - HIST_B_BITS)))];
+      *curdst = pix;
+
+      RGBPixel realcolor = palette [pix];
+
+      err10r = r - realcolor.red;
+      nexterr [0] = err01r + err10r * 3;		// * 3
+      err01r = err11r + err10r * 5;			// * 5
+      err11r = err10r;					// * 1
+      err10r *= 7;					// * 7
+
+      err10g = g - realcolor.green;
+      nexterr [1] = err01g + err10g * 3;		// * 3
+      err01g = err11g + err10g * 5;			// * 5
+      err11g = err10g;					// * 1
+      err10g *= 7;					// * 7
+
+      err10b = b - realcolor.blue;
+      nexterr [2] = err01b + err10b * 3;		// * 3
+      err01b = err11b + err10b * 5;			// * 5
+      err11b = err10b;					// * 1
+      err10b *= 7;					// * 7
+    }
+    // flush cached errors into error array
+    nexterr [0] = err01r;
+    nexterr [1] = err01g;
+    nexterr [2] = err01b;
+
+    src += pixperline;
+    dst += pixperline;
+    odd ^= 1;
+    count -= pixperline;
+  }
+}
+
+void csQuantizeRGB (RGBPixel *image, int pixels, int pixperline,
+  UByte *&outimage, RGBPixel *&outpalette, int &maxcolors, bool dither)
 {
   csQuantizeBegin ();
 
   csQuantizeCount (image, pixels);
   csQuantizePalette (outpalette, maxcolors);
-  csQuantizeRemap (image, pixels, outimage);
+  if (dither)
+    csQuantizeRemapDither (image, pixels, pixperline, outpalette, maxcolors, outimage);
+  else
+    csQuantizeRemap (image, pixels, outimage);
 
   csQuantizeEnd ();
 }

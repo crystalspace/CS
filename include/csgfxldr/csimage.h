@@ -184,14 +184,14 @@ protected:
 
 public:
   /**
-   * Register a loader for a given image type.
+   * Register a loader for a given image type.<p>
    * Adds 'loader' to the list of image formats to be checked during an
    * csImageLoader::load(...) call.
    */
   static bool Register (csImageLoader *loader);
 
   /**
-   * Load an image from a buffer.
+   * Load an image from a buffer.<p>
    * This routine will read from the buffer buf of length size, try to
    * recognize the type of image contained within, and return an csImageFile
    * of the appropriate type.  Returns a pointer to the iImage on
@@ -202,6 +202,14 @@ public:
    * method of the image will return a value without that bit set.
    */
   static iImage *Load (UByte* iBuffer, ULong iSize, int iFormat);
+
+  /**
+   * Set global image dithering option.<p>
+   * By default this option is disabled. If you enable it, all images will
+   * be dithered both after loading and after mipmapping/scaling. This will
+   * affect all truecolor->paletted image conversions.
+   */
+  static void SetDithering (bool iEnable);
 };
 
 #endif // __CS_IMAGE_H__

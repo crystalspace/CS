@@ -204,7 +204,6 @@ public:
 
   /// Scale this vector to length = 1.0;
   void Normalize ();
-
 };
 
 /**
@@ -454,7 +453,7 @@ public:
 
   /// Set the value of the four plane components.
   inline void Set (float a, float b, float c, float d)
-   { norm.x = a; norm.y = b; norm.z = c; DD = d; }
+  { norm.x = a; norm.y = b; norm.z = c; DD = d; }
 
   /// Classify the given vector with regards to this plane.
   inline float Classify (const csVector3& pt) const { return norm*pt+DD; }
@@ -481,7 +480,6 @@ public:
     float f = norm.Norm();
     if (f) { norm /= f;  DD /= f; }
   }
-
 };
 
 /**

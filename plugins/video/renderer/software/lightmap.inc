@@ -46,7 +46,8 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   float u_min, float v_min, float u_max, float v_max)
 {
   int mipmap = ct->mipmap;
-  int mipmap_delta = (1 << mipmap) - 1;
+  int mmshift = texman->is_verynice () && mipmap ? mipmap - 1 : mipmap;
+  int mipmap_delta = (1 << mmshift) - 1;
 
   csTextureMMSoftware *texmm =
     (csTextureMMSoftware *)pt->GetTextureHandle ()->GetPrivateObject ();
@@ -54,13 +55,13 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   RGBPixel *tx_palette = texmm->GetColorMap ();
   UByte *tx_bitmap = (UByte *)tx->get_bitmap ();
 
-  int pt_minu = pt->GetIMinU () >> mipmap;
-  int pt_minv = pt->GetIMinV () >> mipmap;
-  int pt_cell_size = pt->GetLightCellSize () >> mipmap;
-  int pt_cell_shift = pt->GetLightCellShift () - mipmap;
-  int pt_shfw = pt->GetShiftU () - mipmap;
+  int pt_minu = pt->GetIMinU () >> mmshift;
+  int pt_minv = pt->GetIMinV () >> mmshift;
+  int pt_cell_size = pt->GetLightCellSize () >> mmshift;
+  int pt_cell_shift = pt->GetLightCellShift () - mmshift;
+  int pt_shfw = pt->GetShiftU () - mmshift;
   int pt_w = 1 << pt_shfw;
-  int pt_h = (pt->GetHeight () + mipmap_delta) >> mipmap;
+  int pt_h = (pt->GetHeight () + mipmap_delta) >> mmshift;
 
   iLightMap *lm = pt->GetLightMap ();
   int lm_w = lm->GetWidth ();
@@ -111,7 +112,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   if (min_lu >= max_lu) return;
   if (min_lv >= max_lv) return;
 
-  int max_lu2 = ((((pt->GetOriginalWidth () + mipmap_delta) >> mipmap) +
+  int max_lu2 = ((((pt->GetOriginalWidth () + mipmap_delta) >> mmshift) +
     pt_cell_size - 1) >> pt_cell_shift);
   if (max_lu > max_lu2) max_lu = max_lu2;
 

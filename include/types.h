@@ -24,6 +24,7 @@
 #define __CS_TYPES_H
 
 #include "platform.h"
+#include <float.h>
 
 //-----------------------------------------------------------------------------
 // If your compiler complains about 'true', 'false', and 'bool' it

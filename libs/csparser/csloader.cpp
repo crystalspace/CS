@@ -1675,9 +1675,9 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     fatal_exit (0, false);
   }
 
-  if (poly3d->GetNumVertices() == 0)
+  if (poly3d->GetNumVertices() < 3)
   {
-    CsPrintf (MSG_WARNING, "Polygon in line %d contains no vertices!\n", parser_line);
+    CsPrintf (MSG_WARNING, "Polygon in line %d contains just %d vertices!\n", parser_line, poly3d->GetNumVertices());
     return NULL;
   }
 

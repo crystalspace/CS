@@ -128,6 +128,9 @@ bool csApp::InitialSetup (int argc, const char* const argv[],
   // For GUI apps double buffering is a serious performance hit
   System->G2D->DoubleBuffer (false);
 
+  // Repaint console
+  System->RefreshConsole ();
+
   // Change to the directory on VFS where we keep our data
   System->VFS->ChDir (iDataDir);
 

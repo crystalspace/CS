@@ -214,8 +214,9 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
   // We want max quality, doesnt matter too much it can be a bit slow
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
   {
+    extern bool csImage_dither;
     cinfo.two_pass_quantize = TRUE;
-    cinfo.dither_mode = JDITHER_NONE; /* JDITHER_FS? transparency problems */
+    cinfo.dither_mode = csImage_dither ? JDITHER_FS : JDITHER_NONE;
     cinfo.quantize_colors = TRUE;
     cinfo.desired_number_of_colors = 256;
   }

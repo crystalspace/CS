@@ -53,6 +53,8 @@ public:
   virtual void Alert (const char *msg);
   /// Display a warning message
   virtual void Warn (const char *msg);
+  /// Refresh console
+  void RefreshConsole ();
 };
 
 #endif // __CSWSSYS_H__

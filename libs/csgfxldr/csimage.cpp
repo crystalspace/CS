@@ -132,6 +132,9 @@
 
 //-----------------------------------------------------------------------------
 
+// Apply dithering while converting to 8-bits?
+bool csImage_dither = false;
+
 IMPLEMENT_IBASE (csImageFile)
   IMPLEMENTS_INTERFACE (iImage)
 IMPLEMENT_IBASE_END
@@ -405,7 +408,9 @@ void csImageFile::convert_rgba (RGBPixel *iImage)
       if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
       {
         // The most complex case: reduce an RGB image to a paletted image.
-        csQuantizeRGB (iImage, pixels, (UByte *&)Image, Palette);
+        int maxcolors = 256;
+        csQuantizeRGB (iImage, pixels, Width, (UByte *&)Image, Palette,
+          maxcolors, csImage_dither);
       }
       delete [] iImage;
       break;

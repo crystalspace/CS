@@ -126,26 +126,30 @@ void cswsSystemDriver::DemoWrite (const char* buf)
   } /* endwhile */
   strcpy (textline [curline], buf);
   linecolor [curline] = textcolor;
+  RefreshConsole ();
+}
 
-  if (G2D)
+void cswsSystemDriver::RefreshConsole ()
+{
+  if (!G2D)
+    return;
+
+  if (G2D->BeginDraw ())
   {
-    if (G2D->BeginDraw ())
-    {
-      application->Invalidate(true);
-      G2D->Clear (application->Pal [cs_Color_Gray_D]);
-      G2D->SetFontID (application->GetFont ());
-      int fh = ((csComponent *) application)->TextHeight () + 2;
-      for (int i = 0; i < maxlines; i++)
-        if (*textline [i])
-        {
-          G2D->Write (1, 1 + i * fh,
-            application->Pal [cs_Color_Black], -1, textline [i]);
-          G2D->Write (0, 0 + i * fh,
-            application->Pal [linecolor [i]], -1, textline [i]);
-        } /* endfor */
-      G2D->FinishDraw ();
-      G2D->Print (NULL);
-    } /* endif */
+    application->Invalidate(true);
+    G2D->Clear (application->Pal [cs_Color_Gray_D]);
+    G2D->SetFontID (application->GetFont ());
+    int fh = ((csComponent *) application)->TextHeight () + 2;
+    for (int i = 0; i < maxlines; i++)
+      if (*textline [i])
+      {
+        G2D->Write (1, 1 + i * fh,
+          application->Pal [cs_Color_Black], -1, textline [i]);
+        G2D->Write (0, 0 + i * fh,
+          application->Pal [linecolor [i]], -1, textline [i]);
+      } /* endfor */
+    G2D->FinishDraw ();
+    G2D->Print (NULL);
   } /* endif */
 }
 

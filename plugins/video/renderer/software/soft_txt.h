@@ -199,6 +199,9 @@ private:
   iGraphics2D *G2D;
 
 public:
+  /// Apply dithering to textures while reducing from 24-bit to 8-bit paletted?
+  bool dither_textures;
+
   /// The global colormap (used in 256-color modes)
   csColorMap cmap;
 

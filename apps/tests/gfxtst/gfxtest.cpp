@@ -41,7 +41,8 @@ char *programname;
 static struct option long_options[] =
 {
   {"help", no_argument, 0, 'h'},
-  {"display", optional_argument, 0, 'd'},
+  {"display", optional_argument, 0, 'D'},
+  {"dither", no_argument, 0, 'd'},
   {"scale", required_argument, 0, 's'},
   {"mipmap", required_argument, 0, 'm'},
   {"transp", required_argument, 0, 't'},
@@ -57,6 +58,7 @@ static struct
   bool verbose;
   bool save;
   bool display;
+  bool dither;
   bool paletted;
   bool truecolor;
   int scaleX, scaleY;
@@ -67,6 +69,7 @@ static struct
 {
   false,
   true,
+  false,
   false,
   false,
   false,
@@ -83,7 +86,8 @@ static int display_help ()
   printf ("Crystal Space Graphics File Loader test application v%s\n", programversion);
   printf ("Copyright (C) 2000 Andrew Zabolotny\n\n");
   printf ("Usage: %s {option/s} [image file] [...]\n\n", programname);
-  printf ("  -d   --display{=#,#} Display the image in ASCII format :-)\n");
+  printf ("  -D   --display{=#,#} Display the image in ASCII format :-)\n");
+  printf ("  -d   --dither        Apply Floyd-Steinberg dithering when reducing to 8 bpp\n");
   printf ("  -s   --scale=#,#     Re-scale the image to given size #\n");
   printf ("  -m   --mipmap=#      Create mipmap level # (=0,1,2,3) from image\n");
   printf ("  -t   --transp=#,#,#  Treat color (R,G,B) as transparent\n");
@@ -273,6 +277,9 @@ int main (int argc, char **argv)
         opt.truecolor = true;
         break;
       case 'd':
+        opt.dither = true;
+        break;
+      case 'D':
         opt.save = false;
         opt.display = true;
         if (optarg &&
@@ -331,6 +338,8 @@ int main (int argc, char **argv)
 
   if (optind >= argc)
     return display_help ();
+
+  csImageLoader::SetDithering (opt.dither);
 
   for (; optind < argc; ++optind)
     if (!process_file (argv [optind]))

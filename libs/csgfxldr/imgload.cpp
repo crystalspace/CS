@@ -70,3 +70,9 @@ iImage* csImageLoader::Load (UByte* iBuffer, ULong iSize, int iFormat)
   }
   return NULL;
 }
+
+void csImageLoader::SetDithering (bool iEnable)
+{
+  extern bool csImage_dither;
+  csImage_dither = iEnable;
+}

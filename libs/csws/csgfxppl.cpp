@@ -359,6 +359,10 @@ void csGraphicsPipeline::Flush (int iCurPage)
   G2D->SetClipRect (old_xmin, old_ymin, old_xmax, old_ymax);
   G2D->SetFontID (old_font);
 
+  // to avoid fiddling too much with floating-point coords, we just enlarge
+  // the min/max bounding box in both directions by one pixel.
+  xmin--; xmax++; ymin--; ymax++;
+
   if (xmin < 0) xmin = 0; if (xmax > FrameWidth)  xmax = FrameWidth;
   if (ymin < 0) ymin = 0; if (ymax > FrameHeight) ymax = FrameHeight;
   SyncRect [CurPage].xmin = xmin; SyncRect [CurPage].xmax = xmax;

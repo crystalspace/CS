@@ -69,6 +69,9 @@ static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
          B_COEF_SQ * sB * sB * (32 - ((max - tB) >> 3));
 }
 
+/// Ugly but effective
+static csTextureManagerSoftware *texman = NULL;
+
 //------------------------------------------------------------- csColorMap ---//
 
 int csColorMap::find_rgb (int r, int g, int b, int *d)
@@ -169,8 +172,12 @@ void csTextureMMSoftware::compute_mean_color ()
       csTextureSoftware *t = (csTextureSoftware *)tex [i];
       if (!t->image) break;
 
-      csQuantizeRemap ((RGBPixel *)t->image->GetImageData (),
-        t->get_size (), t->bitmap, tc);
+      if (texman->dither_textures)
+        csQuantizeRemapDither ((RGBPixel *)t->image->GetImageData (),
+          t->get_size (), t->get_width (), pal, palette_size, t->bitmap, tc);
+      else
+        csQuantizeRemap ((RGBPixel *)t->image->GetImageData (),
+          t->get_size (), t->bitmap, tc);
 
       // Very well. Now we don'tex need the iImage anymore, so free it
       t->image->DecRef ();
@@ -257,6 +264,7 @@ csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
   read_config (config);
   G2D = iG2D;
   inv_cmap = NULL;
+  texman = this;
 }
 
 void csTextureManagerSoftware::SetPixelFormat (csPixelFormat &PixelFormat)
@@ -287,6 +295,7 @@ void csTextureManagerSoftware::read_config (csIniFile *config)
   prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);
   uniform_bias = config->GetInt ("TextureManager", "UNIFORM_BIAS", 75);
   if (uniform_bias > 100) uniform_bias = 100;
+  dither_textures = config->GetYesNo ("TextureManager", "DITHER_TEXTURES", true);
 }
 
 csTextureManagerSoftware::~csTextureManagerSoftware ()
@@ -448,7 +457,9 @@ void csTextureManagerSoftware::compute_palette ()
 
 void csTextureManagerSoftware::PrepareTextures ()
 {
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "Preparing textures...\n");
+  if (verbose)
+    SysPrintf (MSG_INITIALIZATION, "Preparing textures (%s dithering)...\n",
+      dither_textures ? "with" : "no");
 
   // Drop all "color allocated" flags to locked colors.
   // We won't clear the palette as we don't care about unused colors anyway.

@@ -35,9 +35,19 @@
  * the storage the pointers point to has enough size to store resulting
  * image and palette (the size of resulting image is exactly "pixels" bytes,
  * the size of resulting palette is palsize colors).
+ * <dl>
+ * <dt>image<dd>input image
+ * <dt>pixels<dd>number of pixels in input image
+ * <dt>pixperline<dd>number of pixels in one line
+ * <dt>outimage<dd>output image (allocated if NULL)
+ * <dt>outpalette<dd>output palette (allocated if NULL)
+ * <dt>maxcolors<dd>maximal number of colors in output palette
+ *     (actual number of colors on return)
+ * <dt>dither<dd>Use/do not use Floyd-Steinberg dithering
+ * </dl>
  */
-extern void csQuantizeRGB (RGBPixel *image, int pixels, 
-  UByte *&outimage, RGBPixel *&outpalette, int maxcolors = 256);
+extern void csQuantizeRGB (RGBPixel *image, int pixels, int pixperline,
+  UByte *&outimage, RGBPixel *&outpalette, int &maxcolors, bool dither);
 
 /**
  * The following routines can be used to split the quantization process
@@ -109,7 +119,10 @@ extern void csQuantizeBias (RGBPixel *colors, int count, int weight);
 extern void csQuantizePalette (RGBPixel *&outpalette, int &maxcolors,
   RGBPixel *transp = NULL);
 /// Remap a image to the palette computed by csQuantizePalette()
-extern void csQuantizeRemap (RGBPixel *image, int pixels, UByte *&outimage,
-  RGBPixel *transp = NULL);
+extern void csQuantizeRemap (RGBPixel *image, int pixels,
+  UByte *&outimage, RGBPixel *transp = NULL);
+/// Same but apply Floyd-Steinberg dithering for nicer (but slower) results
+extern void csQuantizeRemapDither (RGBPixel *image, int pixels, int pixperline,
+  RGBPixel *palette, int colors, UByte *&outimage, RGBPixel *transp = NULL);
 
 #endif // __QUANTIZE_H__

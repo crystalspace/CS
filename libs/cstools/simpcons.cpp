@@ -427,7 +427,7 @@ void csSimpleConsole::AddChar (int c)
       break;
 
     case CSKEY_BACKSPACE:
-      if (LineCommandCount >= 0)
+      if (LineCommandCount > 0)
         LineCommand[--LineCommandCount] = '\0';
       break;
 

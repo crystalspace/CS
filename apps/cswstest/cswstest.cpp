@@ -77,6 +77,7 @@ bool csWsTest::InitialSetup (int argc, const char* const argv[],
   printf (MSG_INITIALIZATION, "Crystal Space Windowing System test version %s (%s).\n", VERSION, RELEASE_DATE);
   printf (MSG_INITIALIZATION, "Created by Andrew Zabolotny and others...\n\n");
 
+#if 0
   // create a window
   csComponent *window = new csWindow (this, "-- Drag me --",
     CSWS_DEFAULTVALUE | CSWS_TOOLBAR | CSWS_CLIENTBORDER);
@@ -214,6 +215,7 @@ bool csWsTest::InitialSetup (int argc, const char* const argv[],
     but = new csButton (this, 9998);
     but->SetText ("Othello"); but->SetRect (210, 10, 300, 30);
   }
+#endif
   return true;
 }
 

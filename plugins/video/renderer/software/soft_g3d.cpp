@@ -1051,7 +1051,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   int i;
   float P1, P2, P3, P4;
   float Q1, Q2, Q3, Q4;
-  int max_i, min_i;
+  int max_i, min_i, min_z_i;
   float max_y, min_y;
   float min_z;
   unsigned char *d;
@@ -1095,7 +1095,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   // We are going to use these to scan the polygon from top to bottom.
   // Also compute the min_z in camera space coordinates. This is going to be
   // used for mipmapping.
-  min_i = max_i = 0;
+  min_i = max_i = min_z_i = 0;
   min_y = max_y = poly.vertices[0].sy;
   min_z = M * (poly.vertices[0].sx - width2)
         + N * (poly.vertices[0].sy - height2) + O;
@@ -1115,7 +1115,11 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     }
     float inv_z = M * (poly.vertices[i].sx - width2)
                 + N * (poly.vertices[i].sy - height2) + O;
-    if (inv_z > min_z) min_z = inv_z;
+    if (inv_z > min_z)
+    {
+      min_z = inv_z;
+      min_z_i = i;
+    }
     // theoretically we should do sqrt(dx^2+dy^2) here, but
     // we can approximate it by just abs(dx)+abs(dy)
     if ((fabs (poly.vertices [i].sx - poly.vertices [i - 1].sx)
@@ -1168,36 +1172,45 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   // Now we're in the right shape to determine the mipmap level.
   // We'll use the following formula to determine the required level of
   // mipmap: we'll take the x and y screen coordinates of nearest point.
-  // Now we compute u (x + delta, y) and u (x, y). Since u is expressed as:
+  // Now we compute the difference between u (x + 1, y + 1) and u (x, y),
+  // and between v (x + 1, y + 1) and v (x, y). We're using the following
+  // formulas in our texture mapping to compute u, v an z values at any
+  // given x, y screen point:
   //
-  //   u (x, y) = (J1 * x + J2 * y + J3) / (M * x + N * y + O)
+  //   u/z (x, y) = J1 * x + J2 * y + J3
+  //   v/z (x, y) = K1 * x + K2 * y + K3
+  //   1/z (x, y) = M * x + N * y + O
   //
-  // Now we compute u (x + delta, y + delta) - u (x, y), and we have:
+  // Thus u (x, y) = u/z (x, y) / 1/z (x, y). Similary for v (x, y).
+  // Also we know that at nearest polygon point (where we will research
+  // for texel density) the 1/z value is already stored in min_z variable
+  // (i.e. M * x + N * y + O = min_z). Thus we compute the formula for
+  // u (x + 1, y + 1) - u (x, y):
   //
-  //   J1 * delta + J2 * delta
-  //   -----------------------
-  //      M * x + N * y + O
+  //   J1 * (x + 1) + J2 * (y + 1) + J3     J1 * x + J2 * y + J3
+  //  ---------------------------------- - ---------------------- =
+  //    M * (x + 1) + N * (x + 1) + O        M * x + N * y + O
+  // 
+  //  min_z*(J1*(x+1) + J2*(y+1) + J3) - (min_z + M + N)*(J1*x + J2*y + J3)
+  //  --------------------------------------------------------------------- =
+  //                        min_z * (min_z + M + N)
   //
-  // As we know, M * x + N * y + O == 1/z. Since we will examine the closest
-  // Z point, we already have it (in the min_z variable). Thus final formula
-  // is: (J1 * delta + J2 * delta) / min_z. Similary we deduce the formula for
-  // v (x + delta, y + delta) - v (x, y) = (K1 * delta + K2 * delta) / min_z.
+  //   min_z * (J1 + J2) - (M + N) * (J1 * x + J2 * y + J3)
+  //  ------------------------------------------------------
+  //                     min_z * (min_z + M + N)
   //
-  // To get the texel density, we'll take delta = 1, and compute the following
-  // two values: u (x + 1, y + 1) - u (x, y) and v (x + 1, y + 1) - v (x, y).
-  // Thus, we have:
-  //
-  //   du = (J1 + J2) / inv_z
-  //   dv = (K1 + K2) / inv_z
+  // Thus we can compute delta U and delta V (we'll refer them as du and dv),
+  // the amount of texels we should move in texture space if we move by 1 in
+  // x and y direction.
   // 
   // Now we should take sqrt (du^2 + dv^2) and decide the mipmap level
   // depending on this value. We can ommit the square root and work with the
   // squared value. Thus, we can select the required mipmap level depending
   // on this value this way:
   //
-  //   if <= 2^2, mipmap level 0
-  //   if <= 4^2, mipmap level 1
-  //   if <= 8^2, mipmap level 2
+  //   if <= 2*2, mipmap level 0
+  //   if <= 4*4, mipmap level 1
+  //   if <= 8*8, mipmap level 2
   //   if above, mipmap level 3
 
   // Mipmapping.
@@ -1208,31 +1221,40 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   {
     if (!min_z)
       mipmap = 0;
+    else if (ABS (Dc) < SMALL_D)
+      mipmap = 3;
     else
     {
       // Mipmap level 0 size
       int m0w = tex_mm->get_texture (0)->get_width ();
       int m0h = tex_mm->get_texture (0)->get_height ();
-      float _J1 = (ABS (Dc) < SMALL_D) ? 0 : P1 * m0w * inv_aspect +
-                  (P4 * m0w - Scan.fdu) * M;
-      float _J2 = (ABS (Dc) < SMALL_D) ? 0 : P2 * m0w * inv_aspect +
-                  (P4 * m0w - Scan.fdu) * N;
-      float _K1 = (ABS (Dc) < SMALL_D) ? 0 : Q1 * m0h * inv_aspect +
-                  (Q4 * m0w - Scan.fdv) * M;
-      float _K2 = (ABS (Dc) < SMALL_D) ? 0 : Q2 * m0h * inv_aspect +
-                  (Q4 * m0w - Scan.fdv) * N;
-      min_z = 1 / min_z;
-      float _du = (_J1 + _J2) * min_z;
-      float _dv = (_K1 + _K2) * min_z;
 
-      _du = mipmap_coef * (_du * _du + _dv * _dv);
+      float _P1 = P1 * m0w, _P2 = P2 * m0w, _P3 = P3 * m0w, _P4 = P4 * m0w - Scan.fdu;
+      float _Q1 = Q1 * m0h, _Q2 = Q2 * m0h, _Q3 = Q3 * m0h, _Q4 = Q4 * m0h - Scan.fdv;
+
+      float J1 = _P1 * inv_aspect + _P4 * M;
+      float J2 = _P2 * inv_aspect + _P4 * N;
+      float J3 = _P3              + _P4 * O;
+      float K1 = _Q1 * inv_aspect + _Q4 * M;
+      float K2 = _Q2 * inv_aspect + _Q4 * N;
+      float K3 = _Q3              + _Q4 * O;
+
+      float x = poly.vertices [min_z_i].sx - width2;
+      float y = poly.vertices [min_z_i].sy - height2;
+
+      float du = (min_z * (J1 + J2) - (M + N) * (J1 * x + J2 * y + J3)) /
+                 (min_z * (min_z + M + N));
+      float dv = (min_z * (K1 + K2) - (M + N) * (K1 * x + K2 * y + K3)) /
+                 (min_z * (min_z + M + N));
+
+      float mipmap_sel = mipmap_coef * (du * du + dv * dv);
 
       // Now look which mipmap we should use
-      if (_du <= 2 * 2)
+      if (mipmap_sel <= 2 * 2)
         mipmap = 0;
-      else if (_du <= 4 * 4)
+      else if (mipmap_sel <= 4 * 4)
         mipmap = 1;
-      else if (_du <= 8 * 8)
+      else if (mipmap_sel <= 8 * 8)
         mipmap = 2;
       else
         mipmap = 3;
@@ -1242,13 +1264,14 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     mipmap = rstate_mipmap - 1;
 
   // If mipmap is too small, use the level that is still visible ...
-  int shf_u = tex->GetShiftU () - mipmap;
+  int mmshift = texman->is_verynice () && mipmap ? mipmap - 1 : mipmap;
+  int shf_u = tex->GetShiftU () - mmshift;
   if (shf_u < 0) mipmap += shf_u;
   if (mipmap < 0) mipmap = 0;
 
-  if (mipmap)
+  if (mmshift)
   {
-    int duv = (1 << mipmap);
+    int duv = (1 << mmshift);
     Scan.fdu /= duv;
     Scan.fdv /= duv;
   }
@@ -1347,7 +1370,6 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     float v_min = +99999999;
     float u_max = -99999999;
     float v_max = -99999999;
-    int fin_y = sy;
 
     // Do a quick polygon scan at the edges to find mi/max u and v
     for ( ; ; )
@@ -1420,26 +1442,26 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
       CHECK (sxR);
 
       // Find the trapezoid top (or bottom in inverted Y coordinates)
-      fin_y = sy;
+      int old_sy = sy;
       if (fyL > fyR)
         sy = fyL;
       else
         sy = fyR;
+
+      sxL += dxL * (old_sy - sy);
+      sxR += dxR * (old_sy - sy);
+
+      cy = (float (sy) - 0.5 - float (height2));
+      CHECK (sxL);
+      CHECK (sxR);
+#undef CHECK
     }
 texr_done:
 
-    float cy = (float (sy) - 0.5 - float (height2));
-    sxL += dxL * (fin_y - sy);
-    sxR += dxR * (fin_y - sy);
-    CHECK (sxL);
-    CHECK (sxR);
-
-#undef CHECK
-
     // In VERYNICE mode we need other texture sizes
-    tcache->fill_texture (mipmap, tex, u_min, v_min, u_max, v_max);
+    tcache->fill_texture (texman->is_verynice (), mipmap, tex, u_min, v_min, u_max, v_max);
   }
-  csScan_InitDraw (mipmap, this, tex, tex_mm, txt_unl);
+  csScan_InitDraw (texman->is_verynice (), mipmap, this, tex, tex_mm, txt_unl);
 
   // Select the right scanline drawing function.
   bool tex_transp = tex_mm->GetTransparent ();
@@ -1724,12 +1746,18 @@ void csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fog
       // trick: in 32-bit modes set FogR,G,B so that "R" uses bits 16-23,
       // "G" uses bits 8-15 and "B" uses bits 0-7. This is to accomodate
       // different pixel encodings such as RGB, BGR, RBG and so on...
-      unsigned long r = (pfmt.RedShift == 16) ? Scan.FogR :
-        (pfmt.GreenShift == 16) ? Scan.FogG : Scan.FogB;
-      unsigned long g = (pfmt.RedShift == 8) ? Scan.FogR :
-        (pfmt.GreenShift == 8) ? Scan.FogG : Scan.FogB;
-      unsigned long b = (pfmt.RedShift == 0) ? Scan.FogR :
-        (pfmt.GreenShift == 0) ? Scan.FogG : Scan.FogB;
+#ifdef TOP8BITS_R8G8B8_USED
+#  define X 8
+#else
+#  define X 0
+#endif
+      unsigned long r = (pfmt.RedShift == 16+X) ? Scan.FogR :
+        (pfmt.GreenShift == 16+X) ? Scan.FogG : Scan.FogB;
+      unsigned long g = (pfmt.RedShift == 8+X) ? Scan.FogR :
+        (pfmt.GreenShift == 8+X) ? Scan.FogG : Scan.FogB;
+      unsigned long b = (pfmt.RedShift == 0+X) ? Scan.FogR :
+        (pfmt.GreenShift == 0+X) ? Scan.FogG : Scan.FogB;
+#undef X
       Scan.FogR = r; Scan.FogG = g; Scan.FogB = b;
     }
   }
@@ -1853,14 +1881,7 @@ void csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fog
 
     while (sy > fin_y)
     {
-      //@@@ Normally I would not need to have to check against screen
-      // boundaries but apparantly there are cases where this test is
-      // needed (maybe a bug in the clipper?). I have to look at this later.
-#if 1
       if ((sy & 1) != do_interlaced)
-#else
-      if ((sy & 1) != do_interlaced && sxR >= 0 && sxL < width && screenY >= 0 && screenY < height)
-#endif
       {
         // Compute the rounded screen coordinates of horizontal strip
         xL = QRound (sxL);

@@ -47,13 +47,12 @@ static inline long QInt (float inval)
 {
 #if defined (COMP_GCC) && defined (PROC_INTEL)
   long ret;
-  asm ("fistpl %0" : "=m" (ret) : "t" (inval - 0.49999) : "st");
+  asm ("fistpl %0" : "=m" (ret) : "t" (double (inval) - (0.5 - FLT_EPSILON)) : "st");
   return ret;
 #else
-  // .4997 is max number we can use; if we use for example .4998
-  // the routine will truncate 1.0 to 0.0 which is much worse than
-  // the 0.00005 precision loss we get (i.e. 0.99995 and above will QInt to 1)
-  double dtemp = FIST_MAGIC1 + (inval - 0.4997);
+  // The magic constant you see has been deduced experimentally:
+  // it is enough to round "1 - FLT_EPSILON" to 0, and "1" to 1.
+  double dtemp = FIST_MAGIC1 + (double (inval) - 0.4997558593749999722444);
   return ((*(long *)&dtemp) - 0x80000000);
 #endif
 }
