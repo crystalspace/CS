@@ -150,7 +150,7 @@ iSoundSource *csSoundRenderSoftware::CreateSource(csSoundData *snd)
 	
 	if (!pNew) return NULL;
 	
-	pNew->set3D ();
+	pNew->set3D (false);
 	pNew->SetVolume (1.0);
 	
 	return pNew->CreateSource();
@@ -528,10 +528,10 @@ int csSoundRenderSoftware::setChannels ()
 			}
 			else
 			{
-				if(c->is3D())
-				{
-					CalculSound3D(c);
-				}
+ 				if(c->is3D())
+ 				{
+ 					CalculSound3D(c);
+ 				}
 				if(c->Volume > 0.0)
 				{
 					Channels [n] = c;
