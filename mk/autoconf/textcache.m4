@@ -56,7 +56,8 @@ AC_DEFUN([CS_TEXT_CACHE_OUTPUT],
 	AS_IF([diff $2 $tmp/tcache >/dev/null 2>&1],
 	    [AC_MSG_NOTICE([$2 is unchanged])],
 	    [rm -f $2
-	    mv $tmp/tcache $2])],
+	    cp $tmp/tcache $2])
+	rm -f $tmp/tcache],
 	[$1='$$1'
 	cs_dir=`AS_DIRNAME([$2])`
 	AS_ESCAPE(AS_MKDIR_P([$cs_dir]), [$`\])])])

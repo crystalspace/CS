@@ -67,6 +67,8 @@ chronological order.
 	- res removed a commented-out debug printf() in 
 	  csHashMap::ChangeBuckets(). The comment was errorneously line-broken,
 	  causing compile errors.
+	- Eric Sunshine fixed CS_TEXT_CACHE_OUTPUT() in textcache.m4 to do a
+	  better job of cleaning up after itself.
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only
