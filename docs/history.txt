@@ -49,6 +49,15 @@ chronological order.
 	- Eric Sunshine added java, javac, ant (Java build tool), and Java SDK
 	  checks to configure.ac.  Also added new --with-java option which is
 	  enabled by default.
+	- Eric Sunshine made some changes to pacify SourceForge.  They are
+	  concerned that we have been using >500MB of web server space even
+	  though we are alloted only 100MB.  Therefore, CVS snapshots are now
+	  only distributed in .tar.bz2 format (rather than .tar.bz2, .tgz, and
+	  .zip), and we only keep one snapshot around at a time rather than
+	  two.  This should free up about 130MB.  Further, we no longer publish
+	  "apidev" for online viewing or download.  This will save another
+	  100MB.  Finally, documentation offered for download is now only
+	  published in .tar.bz2 format (rather than .tar.bz2, .tgz, and .zip).
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.

@@ -59,7 +59,7 @@
 import commands, glob, grp, os, re, string, sys, tempfile, time
 
 prog_name = "snapshot.py"
-prog_version = "12"
+prog_version = "13"
 author_name = "Eric Sunshine"
 author_email = "sunshine@sunshineco.com"
 author_info = author_name + " <" + author_email + ">"
@@ -112,22 +112,27 @@ moduledir = "CS"
 ownergroup = "crystal"
 packprefix = "cs-"
 snapdir = "/home/groups/c/cr/crystal/htdocs/cvs-snapshots"
-keepsnapshots = 2
+keepsnapshots = 1
 keepdiffs = 14
 keeplogs = 14
 workdir = "/home/groups/c/cr/crystal"
 warnlevel = 0
 
 archivers = (
-    {"name": "gzip",
-     "dir": {"ext": "tgz", "cmd": "tar --create --file=- @S | gzip > @D"},
-     "file": {"ext": "gz", "cmd": "gzip --stdout @S > @D"}},
     {"name": "bzip2",
      "dir": {"ext": "tar.bz2", "cmd": "tar --create --file=- @S | bzip2 > @D"},
-     "file": {"ext": "bz2", "cmd": "bzip2 --stdout @S > @D"}},
-    {"name": "zip",
-     "dir": {"ext": "zip", "cmd": "zip -q -r @D @S"},
-     "file": {"ext": "zip", "cmd": "zip -q @D @S"}})
+     "file": {"ext": "bz2", "cmd": "bzip2 --stdout @S > @D"}})
+
+#archivers = (
+#    {"name": "gzip",
+#     "dir": {"ext": "tgz", "cmd": "tar --create --file=- @S | gzip > @D"},
+#     "file": {"ext": "gz", "cmd": "gzip --stdout @S > @D"}},
+#    {"name": "bzip2",
+#     "dir": {"ext": "tar.bz2", "cmd": "tar --create --file=- @S | bzip2 > @D"},
+#     "file": {"ext": "bz2", "cmd": "bzip2 --stdout @S > @D"}},
+#    {"name": "zip",
+#     "dir": {"ext": "zip", "cmd": "zip -q -r @D @S"},
+#     "file": {"ext": "zip", "cmd": "zip -q @D @S"}})
 
 #------------------------------------------------------------------------------
 # Directory Stack Class

@@ -87,7 +87,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '27';
+my $PROG_VERSION = '28';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -266,27 +266,30 @@ my @TARGETS =
 	     'appear' => "$PROJECT_ROOT/docs/html/api",
 	     'browseable-postprocess' =>
 	         'sh docs/support/annotate/transform.sh ~T' }},
-     { 'name'    => 'Developer API Reference',
-       'action'  => 'Generating',
-       'make'    => 'apidevhtml',
-       'newdirs' => ['out/docs/html/apidev'],
-       'export'  =>
-	   { 'dir'    => 'apidev',
-	     'name'   => 'csapidev-html',
-	     'appear' => "$PROJECT_ROOT/docs/html/apidev",
-	     'browseable-postprocess' =>
-	         'sh docs/support/annotate/transform.sh ~T' }});
+#      { 'name'    => 'Developer API Reference',
+#        'action'  => 'Generating',
+#        'make'    => 'apidevhtml',
+#        'newdirs' => ['out/docs/html/apidev'],
+#        'export'  =>
+# 	   { 'dir'    => 'apidev',
+# 	     'name'   => 'csapidev-html',
+# 	     'appear' => "$PROJECT_ROOT/docs/html/apidev",
+# 	     'browseable-postprocess' =>
+# 	         'sh docs/support/annotate/transform.sh ~T' }}
+     );
 
 my @ARCHIVERS =
-    ({ 'name' => 'gzip',
-       'ext'  => 'tgz',
-       'cmd'  => 'tar --create --file=- ~S | gzip > ~D' },
+    (
+#    { 'name' => 'gzip',
+#      'ext'  => 'tgz',
+#      'cmd'  => 'tar --create --file=- ~S | gzip > ~D' },
      { 'name' => 'bzip2',
        'ext'  => 'tar.bz2',
        'cmd'  => 'tar --create --file=- ~S | bzip2 > ~D' },
-     { 'name' => 'zip',
-       'ext'  => 'zip',
-       'cmd'  => 'zip -q -r ~D ~S' });
+#    { 'name' => 'zip',
+#      'ext'  => 'zip',
+#      'cmd'  => 'zip -q -r ~D ~S' }
+    );
 
 #------------------------------------------------------------------------------
 # Internal configuration.
