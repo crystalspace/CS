@@ -78,18 +78,9 @@ int main( int argc, char *argv[ ])
   Map.CreatePolygons();
   printf("Writing world '%s'\n", worldfile);
 
-  if (Map.GetIniInt("general", "usemanualsector", 0))
-  {
-    printf("Export using manual sectoring\n");
-    CCSWorld World;
-    World.Write(worldfile, &Map);
-  }
-  else
-  {
-    printf("Using traditional export\n");
-    CCSExporter Exporter;
-    Exporter.WriteWorld(worldfile, &Map);
-  }
+  printf("Export using manual sectoring\n");
+  CCSWorld World;
+  World.Write(worldfile, &Map);
 
   printf("done.");
   return 0;
