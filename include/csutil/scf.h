@@ -454,10 +454,12 @@ struct iConfigFile;
 /**
  * Shortcut macro to query given interface from given object. This is a
  * wrapper around iBase::QueryInterface method that uses an ID number to
- * identify the requested interface instead of its name.
+ * identify the requested interface instead of its name. This macro
+ * assumes that a variable with the ID number is known (see INTERFACE_ID_VAR
+ * and INITIALIZE_INTERFACE_VAR for details).
  */
-#define QUERY_INTERFACE_FAST(Object,Interface,InterfaceID)		\
-  (Interface *)(Object)->QueryInterface (InterfaceID, VERSION_##Interface)
+#define QUERY_INTERFACE_FAST(Object,Interface)				\
+  (Interface *)(Object)->QueryInterface (scfID_##Interface, VERSION_##Interface)
 
 /**
  * Shortcut macro to query given interface from given object.
@@ -467,6 +469,21 @@ struct iConfigFile;
 #define QUERY_INTERFACE_SAFE(Object,Interface)				\
   (Interface *)(iBase::QueryInterfaceSafe ((Object),			\
     iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface))
+
+/**
+ * This declares a variable to contain ID numbers for interfaces. The macro
+ * can be used just as any variable declaration. For example, prepend 'extern'
+ * to put the definition into a header file.
+ */
+#define INTERFACE_ID_VAR(iInterface)					\
+  uint32 scfID_##iInterface;
+
+/**
+ * Use this macro to initialize the ID container variables declared with
+ * INTERFACE_ID_VAR.
+ */
+#define INITIALIZE_INTERFACE_VAR(iInterface)				\
+  scfID_##iInterface = iSCF::SCF->GetInterfaceID (#iInterface);
 
 /**
  * This function should be called to initialize client SCF library.

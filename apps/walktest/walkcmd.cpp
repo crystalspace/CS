@@ -458,7 +458,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
     csKeyValuePair* kp = (csKeyValuePair*)it->GetTypedObj ();
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
-      csSector *Sector = QUERY_OBJECT_TYPE (src, csSector);
+      iSector *Sector = QUERY_INTERFACE_FAST (src, iSector);
       if (Sector)
       {
         char name[100], rot[100];
@@ -466,35 +466,39 @@ void WalkTest::ParseKeyCmds (csObject* src)
         if (rot[0] == 'x') anim_sky_rot = 0;
         else if (rot[0] == 'y') anim_sky_rot = 1;
         else anim_sky_rot = 2;
-        anim_sky = Sector->GetMesh (name);
+        anim_sky = Sector->GetPrivateObject ()->GetMesh (name);
+	Sector->DecRef ();
       }
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
     {
-      csTerrainWrapper *wrap = QUERY_OBJECT_TYPE (src, csTerrainWrapper);
+      iTerrainWrapper *wrap = QUERY_INTERFACE_FAST (src, iTerrainWrapper);
       if (wrap)
       {
-        anim_dirlight = wrap;
+        anim_dirlight = wrap->GetPrivateObject ();
+	wrap->DecRef ();
       }
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDynLight"))
     {
-      csLight* l = QUERY_OBJECT_TYPE (src, csLight);
+      iLight* l = QUERY_INTERFACE_FAST (src, iLight);
       if (l)
       {
-        anim_dynlight = l;
+        anim_dynlight = l->GetPrivateObject ();
+	l->DecRef ();
       }
     }
     else if (!strcmp (kp->GetKey (), "entity_Door"))
     {
-      csMeshWrapper *wrap = QUERY_OBJECT_TYPE (src, csMeshWrapper);
+      iMeshWrapper *wrap = QUERY_INTERFACE_FAST (src, iMeshWrapper);
       if (wrap)
       {
         csVector3 hinge;
         ScanStr (kp->GetValue (), "%f,%f,%f", &hinge.x, &hinge.y, &hinge.z);
-	csDoor* door = new csDoor (wrap);
+	csDoor* door = new csDoor (wrap->GetPrivateObject ());
 	door->SetHinge (hinge);
         src->ObjAdd (door);
+	wrap->DecRef ();
       }
     }
     else if (!strcmp (kp->GetKey (), "entity_Rotate"))
@@ -512,7 +516,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
     }
     else if (!strcmp (kp->GetKey (), "entity_Light"))
     {
-      csMeshWrapper *wrap = QUERY_OBJECT_TYPE (src, csMeshWrapper);
+      iMeshWrapper *wrap = QUERY_INTERFACE_FAST (src, iMeshWrapper);
       if (wrap)
       {
 	csColor start_col, end_col;
@@ -545,6 +549,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
             src->ObjAdd (lobj);
 	  }
 	}
+	wrap->DecRef ();
       }
     }
     else
@@ -555,15 +560,16 @@ void WalkTest::ParseKeyCmds (csObject* src)
   }
   it->DecRef ();
 
-  csMeshWrapper *mesh = QUERY_OBJECT_TYPE (src, csMeshWrapper);
+  iMeshWrapper *mesh = QUERY_INTERFACE_FAST (src, iMeshWrapper);
   if (mesh)
   {
     int k;
-    for (k = 0 ; k < mesh->GetChildren ().Length () ; k++)
+    for (k = 0 ; k < mesh->GetPrivateObject ()->GetChildren ().Length () ; k++)
     {
-      csMeshWrapper* spr = (csMeshWrapper*)(mesh->GetChildren ()[k]);
+      csMeshWrapper* spr = (csMeshWrapper*)(mesh->GetPrivateObject ()->GetChildren ()[k]);
       ParseKeyCmds (spr);
     }
+    mesh->DecRef ();
   }
 
 }

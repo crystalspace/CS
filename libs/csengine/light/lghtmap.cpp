@@ -115,8 +115,9 @@ csShadowMap *csLightMap::NewShadowMap (csLight* light, int w, int h)
 
   smap->Alloc (light, w, h);
 
-  csStatLight *slight = QUERY_OBJECT_TYPE (light, csStatLight);
-  slight->RegisterLightMap (this);
+  iStatLight *slight = QUERY_INTERFACE_FAST (light, iStatLight);
+  slight->GetPrivateObject ()->RegisterLightMap (this);
+  slight->DecRef ();
 
   return smap;
 }

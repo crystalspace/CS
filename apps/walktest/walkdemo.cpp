@@ -583,10 +583,14 @@ public:
 
 // Object added to the ghost sprite itself to hold some information
 // about movement.
+SCF_VERSION (GhostSpriteInfo, 0, 0, 1);
 class GhostSpriteInfo : public csObject
 {
 public:
   float dir;
+
+  DECLARE_IBASE_EXT (csObject);
+
   CSOBJTYPE;
   DECLARE_OBJECT_INTERFACE;
 };
@@ -595,6 +599,10 @@ IMPLEMENT_CSOBJTYPE (GhostSpriteInfo, csObject);
 
 IMPLEMENT_OBJECT_INTERFACE (GhostSpriteInfo)
 IMPLEMENT_OBJECT_INTERFACE_END
+
+IMPLEMENT_IBASE_EXT (GhostSpriteInfo)
+  IMPLEMENTS_INTERFACE (GhostSpriteInfo)
+IMPLEMENT_IBASE_EXT_END
 
 // Recursive function to add limbs to a skeletal ghost. This also builds
 // the sprite template.

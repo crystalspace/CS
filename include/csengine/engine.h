@@ -66,6 +66,18 @@ struct iLight;
 struct iImageIO;
 struct iClipper2D;
 
+extern INTERFACE_ID_VAR (iEngine);
+extern INTERFACE_ID_VAR (iSector);
+extern INTERFACE_ID_VAR (iMeshWrapper);
+extern INTERFACE_ID_VAR (iCollection);
+extern INTERFACE_ID_VAR (iMeshFactoryWrapper);
+extern INTERFACE_ID_VAR (iCurveTemplate);
+extern INTERFACE_ID_VAR (iMaterialWrapper);
+extern INTERFACE_ID_VAR (iTextureWrapper);
+extern INTERFACE_ID_VAR (iCameraPosition);
+extern INTERFACE_ID_VAR (iPolyTxtPlane);
+extern INTERFACE_ID_VAR (iStatLight);
+
 DECLARE_OBJECT_TYPE (iEngine)
 DECLARE_OBJECT_TYPE (csEngine)
 DECLARE_OBJECT_TYPE (iLight)
@@ -117,7 +129,6 @@ DECLARE_OBJECT_TYPE (csRadElement)
 DECLARE_OBJECT_TYPE (csRadPolygon)
 DECLARE_OBJECT_TYPE (csRegion)
 DECLARE_OBJECT_TYPE (iRegion)
-
 
 /**
  * Iterator to iterate over all static lights in the engine.

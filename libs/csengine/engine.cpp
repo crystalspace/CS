@@ -373,6 +373,18 @@ bool csEngine::do_not_force_revis = false;
 bool csEngine::do_force_revis = false;
 bool csEngine::do_rad_debug = false;
 
+INTERFACE_ID_VAR (iEngine);
+INTERFACE_ID_VAR (iSector);
+INTERFACE_ID_VAR (iMeshWrapper);
+INTERFACE_ID_VAR (iCollection);
+INTERFACE_ID_VAR (iMeshFactoryWrapper);
+INTERFACE_ID_VAR (iCurveTemplate);
+INTERFACE_ID_VAR (iMaterialWrapper);
+INTERFACE_ID_VAR (iTextureWrapper);
+INTERFACE_ID_VAR (iCameraPosition);
+INTERFACE_ID_VAR (iPolyTxtPlane);
+INTERFACE_ID_VAR (iStatLight);
+
 ALLOCATE_OBJECT_TYPE (iEngine)
 ALLOCATE_OBJECT_TYPE (csEngine)
 ALLOCATE_OBJECT_TYPE (iLight)
@@ -601,6 +613,17 @@ bool csEngine::Initialize (iSystem* sys)
   INITIALIZE_OBJECT_TYPE (StrServ, iRegion)
   StrServ->DecRef ();
 
+  INITIALIZE_INTERFACE_VAR (iEngine);
+  INITIALIZE_INTERFACE_VAR (iSector);
+  INITIALIZE_INTERFACE_VAR (iMeshWrapper);
+  INITIALIZE_INTERFACE_VAR (iCollection);
+  INITIALIZE_INTERFACE_VAR (iMeshFactoryWrapper);
+  INITIALIZE_INTERFACE_VAR (iCurveTemplate);
+  INITIALIZE_INTERFACE_VAR (iMaterialWrapper);
+  INITIALIZE_INTERFACE_VAR (iTextureWrapper);
+  INITIALIZE_INTERFACE_VAR (iCameraPosition);
+  INITIALIZE_INTERFACE_VAR (iPolyTxtPlane);
+  INITIALIZE_INTERFACE_VAR (iStatLight);
 
   if (!(G3D = QUERY_PLUGIN_ID (sys, CS_FUNCID_VIDEO, iGraphics3D)))
     return false;

@@ -96,12 +96,21 @@ REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
-//ALLOCATE_OBJECT_TYPE (csMeshWrapper);
 ALLOCATE_OBJECT_TYPE (csWalkEntity);
 ALLOCATE_OBJECT_TYPE (GhostSpriteInfo);
 ALLOCATE_OBJECT_TYPE (csDoor);
 ALLOCATE_OBJECT_TYPE (csRotatingObject);
 ALLOCATE_OBJECT_TYPE (csLightObject);
+
+INTERFACE_ID_VAR (csWalkEntity);
+INTERFACE_ID_VAR (GhostSpriteInfo);
+INTERFACE_ID_VAR (csDoor);
+INTERFACE_ID_VAR (csRotatingObject);
+INTERFACE_ID_VAR (csLightObject);
+INTERFACE_ID_VAR (iSoundWrapper);
+INTERFACE_ID_VAR (iTerrainWrapper);
+INTERFACE_ID_VAR (iLight);
+//INTERFACE_ID_VAR (iMeshWrapper);
 
 char WalkTest::map_dir [100];
 bool WalkTest::move_3d = false;
@@ -1342,13 +1351,23 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     Printf (MSG_FATAL_ERROR, "No string server plugin!\n");
     return false;
   }
-  INITIALIZE_OBJECT_TYPE (StringServer, csMeshWrapper);
   INITIALIZE_OBJECT_TYPE (StringServer, csWalkEntity);
   INITIALIZE_OBJECT_TYPE (StringServer, GhostSpriteInfo);
   INITIALIZE_OBJECT_TYPE (StringServer, csDoor);
   INITIALIZE_OBJECT_TYPE (StringServer, csRotatingObject);
   INITIALIZE_OBJECT_TYPE (StringServer, csLightObject);
+  INITIALIZE_OBJECT_TYPE (StringServer, iSoundWrapper);
   StringServer->DecRef ();
+
+  INITIALIZE_INTERFACE_VAR (csWalkEntity);
+  INITIALIZE_INTERFACE_VAR (GhostSpriteInfo);
+  INITIALIZE_INTERFACE_VAR (csDoor);
+  INITIALIZE_INTERFACE_VAR (csRotatingObject);
+  INITIALIZE_INTERFACE_VAR (csLightObject);
+  INITIALIZE_INTERFACE_VAR (iSoundWrapper);
+  INITIALIZE_INTERFACE_VAR (iTerrainWrapper);
+  INITIALIZE_INTERFACE_VAR (iLight);
+  INITIALIZE_INTERFACE_VAR (iMeshWrapper);
 
   // Find the level loader plugin
   LevelLoader = QUERY_PLUGIN_ID (Sys, CS_FUNCID_LVLLOADER, iLoader);

@@ -60,6 +60,16 @@ DECLARE_OBJECT_TYPE (csRotatingObject);
 DECLARE_OBJECT_TYPE (csLightObject);
 DECLARE_OBJECT_TYPE (iSoundWrapper);
 
+extern INTERFACE_ID_VAR (csWalkEntity);
+extern INTERFACE_ID_VAR (GhostSpriteInfo);
+extern INTERFACE_ID_VAR (csDoor);
+extern INTERFACE_ID_VAR (csRotatingObject);
+extern INTERFACE_ID_VAR (csLightObject);
+extern INTERFACE_ID_VAR (iSoundWrapper);
+extern INTERFACE_ID_VAR (iTerrainWrapper);
+extern INTERFACE_ID_VAR (iLight);
+extern INTERFACE_ID_VAR (iMeshWrapper);
+
 // Several map modes.
 #define MAP_OFF 0
 #define MAP_OVERLAY 1

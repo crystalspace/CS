@@ -94,20 +94,22 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      csCollection* o = QUERY_OBJECT_TYPE (obj, csCollection);
+      iCollection* o = QUERY_INTERFACE_FAST (obj, iCollection);
       if (!o) continue;
-      scfParent->engine->RemoveCollection (o);
+      scfParent->engine->RemoveCollection (((csCollection::Collection*)o)->scfParent);
       copy[i] = NULL;
+//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      csMeshWrapper* o = QUERY_OBJECT_TYPE (obj, csMeshWrapper);
+      iMeshWrapper* o = QUERY_INTERFACE_FAST (obj, iMeshWrapper);
       if (!o) continue;
-      scfParent->engine->RemoveMesh (o);
+      scfParent->engine->RemoveMesh (o->GetPrivateObject ());
       copy[i] = NULL;
+//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   // @@@ Should mesh factories be deleted if there are still mesh objects
@@ -117,95 +119,104 @@ void csRegion::Region::DeleteAll ()
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      csMeshFactoryWrapper* o = QUERY_OBJECT_TYPE (obj, csMeshFactoryWrapper);
+      iMeshFactoryWrapper* o = QUERY_INTERFACE_FAST (obj, iMeshFactoryWrapper);
       if (!o) continue;
       scfParent->engine->mesh_factories.Delete (
-        scfParent->engine->mesh_factories.Find (o));
+        scfParent->engine->mesh_factories.Find (o->GetPrivateObject ()));
       copy[i] = NULL;
+//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      csCurveTemplate* o = QUERY_OBJECT_TYPE (obj, csCurveTemplate);
+      iCurveTemplate* o = QUERY_INTERFACE_FAST (obj, iCurveTemplate);
       if (!o) continue;
       scfParent->engine->curve_templates.Delete (
-        scfParent->engine->curve_templates.Find (o));
+        scfParent->engine->curve_templates.Find (
+	  ((csCurveTemplate::CurveTemplate*)o)->scfParent));
       copy[i] = NULL;
+//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      csSector* o = QUERY_OBJECT_TYPE (obj, csSector);
+      iSector* o = QUERY_INTERFACE_FAST (obj, iSector);
       if (!o) continue;
-      int idx = scfParent->engine->sectors.Find (o);
+      int idx = scfParent->engine->sectors.Find (o->GetPrivateObject ());
       if (idx != -1)
         scfParent->engine->sectors.Delete (idx);
       else
-        delete o;
+        o->DecRef ();
       copy[i] = NULL;
+//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      csMaterialWrapper* o = QUERY_OBJECT_TYPE (obj, csMaterialWrapper);
+      iMaterialWrapper* o = QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
       if (!o) continue;
-      int idx = scfParent->engine->GetMaterials ()->Find (o);
+      int idx = scfParent->engine->GetMaterials ()->Find (o->GetPrivateObject ());
       if (idx != -1)
         scfParent->engine->GetMaterials ()->Delete (idx);
       else
-        delete o;
+        o->DecRef ();
       copy[i] = NULL;
+//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      csTextureWrapper* o = QUERY_OBJECT_TYPE (obj, csTextureWrapper);
+      iTextureWrapper* o = QUERY_INTERFACE_FAST (obj, iTextureWrapper);
       if (!o) continue;
-      int idx = scfParent->engine->GetTextures ()->Find (o);
+      int idx = scfParent->engine->GetTextures ()->Find (o->GetPrivateObject ());
       if (idx != -1)
         scfParent->engine->GetTextures ()->Delete (idx);
       else
-        delete o;
+        o->DecRef ();
       copy[i] = NULL;
+//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      csCameraPosition* o = QUERY_OBJECT_TYPE (obj, csCameraPosition);
+      iCameraPosition* o = QUERY_INTERFACE_FAST (obj, iCameraPosition);
       if (!o) continue;
-      int idx = scfParent->engine->camera_positions.Find (o);
+      int idx = scfParent->engine->camera_positions.Find (
+        ((csCameraPosition::CameraPosition*)o)->scfParent);
       if (idx != -1)
         scfParent->engine->camera_positions.Delete (idx);
       else
-        delete o;
+        o->DecRef ();
       copy[i] = NULL;
+//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
       iObject* obj = (iObject*)copy[i];
-      csPolyTxtPlane* o = QUERY_OBJECT_TYPE (obj, csPolyTxtPlane);
+      iPolyTxtPlane* o = QUERY_INTERFACE_FAST (obj, iPolyTxtPlane);
       if (!o) continue;
       // Do a release here because the plane may still be used by other
       // polygons not belonging to this sector and we want to be sure
       // to release it from this region.
-      scfParent->ObjRelease (o);
-      int idx = scfParent->engine->planes.Find (o);
+      scfParent->ObjRelease (o->QueryObject ());
+      int idx = scfParent->engine->planes.Find (o->GetPrivateObject ());
       o->DecRef ();
       if (idx != -1)
         scfParent->engine->planes[idx] = 0;
       copy[i] = NULL;
+//      o->DecRef (); @@@ Uncomment when the engine does a DecRef, not delete
     }
 
 #if defined(CS_DEBUG)

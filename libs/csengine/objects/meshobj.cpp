@@ -60,10 +60,11 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   parent = theParent;
   movable.SetObject (this);
 
-  csMeshWrapper *sparent = QUERY_OBJECT_TYPE (parent, csMeshWrapper);
+  iMeshWrapper *sparent = QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)
   {
-    movable.SetParent (&sparent->GetMovable ());
+    movable.SetParent (((csMovable::eiMovable*)sparent->GetMovable ())->scfParent);
+    sparent->DecRef ();
   }
 
   csEngine::current_engine->AddToCurrentRegion (this);
@@ -91,10 +92,11 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   parent = theParent;
   movable.SetObject (this);
 
-  csMeshWrapper *sparent = QUERY_OBJECT_TYPE (parent, csMeshWrapper);
+  iMeshWrapper *sparent = QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)
   {
-    movable.SetParent (&sparent->GetMovable ());
+    movable.SetParent (((csMovable::eiMovable*)sparent->GetMovable ())->scfParent);
+    sparent->DecRef ();
   }
 
   csEngine::current_engine->AddToCurrentRegion (this);
@@ -116,10 +118,11 @@ csMeshWrapper::~csMeshWrapper ()
 {
   if (mesh) mesh->DecRef ();
 
-  csEngine *engine = QUERY_OBJECT_TYPE (parent, csEngine);
+  iEngine *engine = QUERY_INTERFACE_FAST (parent, iEngine);
   if (engine)
   {
-    engine->UnlinkMesh (this);
+    engine->GetCsEngine ()->UnlinkMesh (this);
+    engine->DecRef ();
   }
 }
 
@@ -138,13 +141,18 @@ void csMeshWrapper::MoveToSector (csSector* s)
   // Only add this mesh to a sector if the parent is the engine.
   // Otherwise we have a hierarchical object and in that case
   // the parent object controls this.
-  if (QUERY_OBJECT_TYPE (parent, csEngine))
+  iEngine *e = QUERY_INTERFACE_FAST (parent, iEngine);
+  if (e)
+  {
     s->AddMesh (this);
+    e->DecRef ();
+  }
 }
 
 void csMeshWrapper::RemoveFromSectors ()
 {
-  if (!QUERY_OBJECT_TYPE (parent, csEngine)) return;
+  iEngine *e = QUERY_INTERFACE_FAST (parent, iEngine);
+  if (!e) return;
   int i;
   csVector& sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors.Length () ; i++)
@@ -153,12 +161,14 @@ void csMeshWrapper::RemoveFromSectors ()
     if (ss)
       ss->UnlinkMesh (this);
   }
+  e->DecRef ();
 }
 
 void csMeshWrapper::SetRenderPriority (long rp)
 {
   render_priority = rp;
-  if (!QUERY_OBJECT_TYPE (parent, csEngine)) return;
+  iEngine *e = QUERY_INTERFACE_FAST (parent, iEngine);
+  if (!e) return;
   int i;
   csVector& sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors.Length () ; i++)
@@ -166,6 +176,7 @@ void csMeshWrapper::SetRenderPriority (long rp)
     csSector* ss = (csSector*)sectors[i];
     if (ss) ss->RelinkMesh (this);
   }
+  e->DecRef ();
 }
 
 /// The list of lights that hit the mesh
@@ -381,9 +392,12 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
   csObject* par = c->GetParentContainer ();
   if (par)
   {
-    csEngine *engine = QUERY_OBJECT_TYPE (par, csEngine);
+    iEngine *engine = QUERY_INTERFACE_FAST (par, iEngine);
     if (engine)
-      engine->UnlinkMesh (c);
+    {
+      engine->GetCsEngine ()->UnlinkMesh (c);
+      engine->DecRef ();
+    }
     else
     {
       csMeshWrapper* old_mesh = (csMeshWrapper*)par;

@@ -92,9 +92,12 @@ csRotatingObject::csRotatingObject (csObject* p)
   tparent = p;
   angles.Set (90, 0, 0);
   remaining = 0;
-  csMeshWrapper *mw = QUERY_OBJECT_TYPE (p, csMeshWrapper);
+  iMeshWrapper *mw = QUERY_INTERFACE_FAST (p, iMeshWrapper);
   if (mw)
-    movable = &mw->GetMovable ();
+  {
+    movable = &mw->GetPrivateObject ()->GetMovable ();
+    mw->DecRef ();
+  }
 }
 
 void csRotatingObject::Activate ()

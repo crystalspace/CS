@@ -108,14 +108,20 @@ void csMovable::ClearSectors ()
 {
   if (parent == NULL)
   {
-    csMeshWrapper* sp = QUERY_OBJECT_TYPE (object, csMeshWrapper);
+    iMeshWrapper* sp = QUERY_INTERFACE_FAST (object, iMeshWrapper);
     if (sp)
-      sp->RemoveFromSectors ();
+    {
+      sp->GetPrivateObject ()->RemoveFromSectors ();
+      sp->DecRef ();
+    }
     else
     {
-      csCollection* col = QUERY_OBJECT_TYPE (object, csCollection);
+      iCollection* col = QUERY_INTERFACE_FAST (object, iCollection);
       if (col)
-        col->RemoveFromSectors ();
+      {
+        ((csCollection::Collection*)col)->scfParent->RemoveFromSectors ();
+        col->DecRef ();
+      }
     }
     sectors.SetLength (0);
   }
@@ -127,14 +133,20 @@ void csMovable::AddSector (csSector* sector)
   if (parent == NULL)
   {
     sectors.Push (sector);
-    csMeshWrapper* sp = QUERY_OBJECT_TYPE (object, csMeshWrapper);
+    iMeshWrapper* sp = QUERY_INTERFACE_FAST (object, iMeshWrapper);
     if (sp)
-      sp->MoveToSector (sector);
+    {
+      sp->GetPrivateObject ()->MoveToSector (sector);
+      sp->DecRef ();
+    }
     else
     {
-      csCollection* col = QUERY_OBJECT_TYPE (object, csCollection);
+      iCollection* col = QUERY_INTERFACE_FAST (object, iCollection);
       if (col)
-        col->MoveToSector (sector);
+      {
+        ((csCollection::Collection*)col)->scfParent->MoveToSector (sector);
+        col->DecRef ();
+      }
     }
   }
 }
@@ -157,13 +169,20 @@ void csMovable::RemoveListener (iMovableListener* listener)
 void csMovable::UpdateMove ()
 {
   updatenr++;
-  csMeshWrapper* sp = QUERY_OBJECT_TYPE (object, csMeshWrapper);
+  iMeshWrapper* sp = QUERY_INTERFACE_FAST (object, iMeshWrapper);
   if (sp)
-    sp->UpdateMove ();
+  {
+    sp->GetPrivateObject ()->UpdateMove ();
+    sp->DecRef ();
+  }
   else
   {
-    csCollection* col = QUERY_OBJECT_TYPE (object, csCollection);
-    if (col) col->UpdateMove ();
+    iCollection* col = QUERY_INTERFACE_FAST (object, iCollection);
+    if (col)
+    {
+      ((csCollection::Collection*)col)->scfParent->UpdateMove ();
+      col->DecRef ();
+    }
   }
 
   int i;
