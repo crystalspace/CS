@@ -156,16 +156,17 @@ public:
     UpdateTime (); // OpenStep compiler requires having seen this already.
 #ifdef VFS_DEBUG
     printf ("VFS: opening archive \"%s\"\n", filename);
-    if (FirstFile () == NULL)
-      printf ("VFS: archive is empty (will be created on writes)\n");
 #endif
   }
   virtual ~VfsArchive ()
   {
 #ifdef VFS_DEBUG
-    printf ("VFS: archive \"%s\" closed (%d)\n", GetName (), Writing);
+    printf ("VFS: archive \"%s\" closing (writing=%d)\n", GetName (), Writing);
 #endif
     Flush ();
+#ifdef VFS_DEBUG
+    printf ("VFS: archive \"%s\" closed\n", GetName ());
+#endif
   }
 };
 
@@ -357,7 +358,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
       CheckError ();
   }
 #ifdef VFS_DEBUG
-  if (file >= 0)
+  if (file)
     printf ("VFS: Successfully opened, handle = %d\n", fileno (file));
 #endif
 }
