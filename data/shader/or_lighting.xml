@@ -116,7 +116,7 @@
 	<fp plugin="software" />
       </pass>
     </technique>
-    <technique priority="500">
+    <technique priority="50">
 	<pass>
 	  <buffer name="vertices" destination="position" />
 	  <buffer name="colors" destination="primary color" />
