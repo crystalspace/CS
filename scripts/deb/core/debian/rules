@@ -39,7 +39,8 @@ configure-stamp:
 	# Temp? remove of openal
 	#perl -pi -e "s/^PLUGINS(.*openal.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# --disable-qsqrt was added for a gcc3.2 bug
-	cd CS; ./configure --prefix=/usr --disable-cpu-specific-instructions --disable-qsqrt
+	cd CS; cs_cv_cxx_qsqrt_ok=no ./configure --prefix=/usr --disable-cpu-specific-instructions 
+	# --disable-qsqrt
 	# Force -fPIC as compiling/linking option
 	echo "CFLAGS.SYSTEM += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	echo "LFLAGS.EXE += -fPIC"  >> $(CURDIR)/CS/config.mak 
@@ -148,6 +149,13 @@ install-arch:
 	mkdir -p $(CURDIR)/debian/tmp/usr/include
 	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/include \
 		$(CURDIR)/debian/tmp/usr/include/crystalspace
+
+	# config files in /etc/crystalspace
+	mkdir -p $(CURDIR)/debian/tmp/etc/crystalspace
+	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/data/config \
+		$(CURDIR)/debian/tmp/etc/crystalspace
+	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/*.cfg \
+		$(CURDIR)/debian/tmp/etc/crystalspace
 
 	dh_movefiles -a
 
