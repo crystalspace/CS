@@ -76,6 +76,10 @@ extern bool gInputUseMouse;
 extern ISpElementReference gInputElements[];
 #endif
 
+IMPLEMENT_IBASE_EXT (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iEventPlug)
+IMPLEMENT_IBASE_EXT_END
+
 SysSystemDriver::SysSystemDriver()
                  : csSystemDriver ()
 {
@@ -339,6 +343,7 @@ void SysSystemDriver::NextFrame ()
 {
     static iMacGraphics* piG2D = NULL;
     static bool driverNeedsEvent = false;
+    EventRecord anEvent;
 
     if (!piG2D)
     {
@@ -365,8 +370,6 @@ void SysSystemDriver::NextFrame ()
         }
     }
 
-    EventRecord anEvent;
-
 #if SCAN_KEYBOARD
     ScanKeyboard ();
 #endif
@@ -382,15 +385,19 @@ void SysSystemDriver::NextFrame ()
         /*
          *  If we got an event, check to see if sioux wants it
          */
-        if (SIOUXHandleOneEvent (&anEvent))
-            continue;
-
+        if (SIOUXHandleOneEvent ( &anEvent ))
+            { 
+//            continue; 
+            }
+        
         /*
          *  If sioux doesn't want it, check to see if the driver needs it.
          */
         if ((driverNeedsEvent) && (piG2D))
             if (piG2D->HandleEvent (&anEvent))
-                continue;
+            {
+//                continue;
+            }
 
         /*
          *  Otherwise handle it.
@@ -1266,7 +1273,7 @@ int SysSystemDriver::GetCommandLine(char ***arg)
      *  Allow an apple event to come in just in case it is an open file request.
      */
     if ( ::WaitNextEvent( kHighLevelEvent, &theEvent, 1, NULL )) {
-        HandleHLEvent( 0, &theEvent );
+        HandleHLEvent( &theEvent );
     }
 
     /*
