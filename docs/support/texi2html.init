@@ -45,6 +45,12 @@ sub T2H_InitGlobals  # For texi2html 1.65 and later.
   $T2H_EXTRA_HEAD = '';
 }
 
+$T2H_PRE_ABOUT = <<EOT;
+This document was generated using
+<A HREF="$T2H_HOMEPAGE"><I>texi2html</I></A>
+<P></P>  
+EOT
+
 sub T2H_DEFAULT_print_page_head
 {
   my $fh = shift; 
