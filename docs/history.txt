@@ -42,6 +42,9 @@ chronological order.
 	    - Fixed some crash-worthy code in csList<>::Iterator.
 	- Eric Sunshine updated simpmap.txi to reflect Frank's changes to
 	  keyboard event handling from several months ago.
+	- Eric Sunshine fixed bug in jamtemplate/Jamfile.template which
+	  prevented 'clean' targets from being removed when 'distclean' was
+	  invoked.
 6-May-2004
 	- res fixed the NR GL renderer to handle resize events.
 	- res fixed texture downsampling in the NR GL renderer. It could 

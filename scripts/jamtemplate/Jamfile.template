@@ -10,7 +10,7 @@ Clean distclean :
     config.cache
     Jamconfig ;
 CleanDir distclean :
-    autom4te.cache
+    autom4te.cache ;
 Depends distclean : clean ;
 
 Clean maintainerclean :
