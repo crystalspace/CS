@@ -624,14 +624,14 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
         }
 #endif //CS_USE_NEW_RENDERER
         break;
-      case XMLTOKEN_SHADERPARAM:
+      case XMLTOKEN_SHADERVAR:
 #ifdef CS_USE_NEW_RENDERER
         {
           csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg,
             iShaderManager);
           if (!shaderMgr)
           {
-            ReportNotify ("iShaderManager not found, ignoring shaderparam!");
+            ReportNotify ("iShaderManager not found, ignoring shadervar!");
             break;
           }
           //create a new variable
@@ -641,9 +641,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	  csRef<csShaderVariable> var;
 	  var.AttachNew (new csShaderVariable (strings->Request (varname)));
 
-          if (!SyntaxService->ParseShaderParam (child, var))
+          if (!SyntaxService->ParseShaderVar (child, *var))
           {
-            ReportNotify ("Error loading shader parameter '%s' in material '%s'.", 
+            ReportNotify ("Error loading shader variable '%s' in material '%s'.", 
               varname, matname);
             break;
           }

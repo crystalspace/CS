@@ -75,8 +75,7 @@ public:
 	iString* destSector, bool& handled);
   virtual bool ParseGradient (iDocumentNode* node,
 			      csGradient& gradient);
-  virtual bool ParseShaderParam (iDocumentNode* node,
-                                 csShaderVariable* var);
+  virtual bool ParseShaderVar (iDocumentNode* node, csShaderVariable& var);
   virtual bool ParseAlphaMode (iDocumentNode* node, iStringSet* strings,
     csAlphaMode& alphaMode);
   virtual bool ParseZMode (iDocumentNode* node, csZBufMode& zmode,

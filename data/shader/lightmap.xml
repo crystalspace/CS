@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <shader type="xmlshader" name="lightmap">
     <!-- This should be defined by renderloop somehow and track sector ambient -->
-    <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3" default="1.0, 1.0, 1.0" />
+    <shadervars name="STANDARD_LIGHT_AMBIENT" type="vector3">1.0, 1.0, 1.0</shadervar>
     <technique priority="50">
 	<pass>
 	    <mixmode><copy /></mixmode>

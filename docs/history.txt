@@ -23,6 +23,15 @@ chronological order.
 	  new nullrender3d module.
         - Andrew Craig fixed a ref problem in imgplex plugin that caused it
           the initialization function to segfault.
+	- res unified the shader var syntax for materials and shaders. Both 
+	  the material parser in csloader and the shaderparse in xmlshader
+	  utilize iSyntaxService->ParseShaderVar(). The syntax for a shadervar
+	  is now:
+	    <shadervar name="..." 
+	     type="[float|vector2|vector3|vector4|int|texture]">
+	     texture|x[,y[,z[,w]]]</shadervar>
+	  For SV blocks in shaders the syntax is now 
+	  <shadervars>...</shadervars>.
 20-Feb-2004
 	- Jorrit added a csArray::GetIndex() function which will return the
 	  index of an element in the array (as input you give a pointer to

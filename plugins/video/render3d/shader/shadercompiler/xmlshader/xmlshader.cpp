@@ -198,14 +198,14 @@ csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (
   if (parentSV)
   {
     csRef<iDocumentNode> varNode = parentSV->GetNode(
-      xmltokens.Request (XMLTOKEN_SHADERVAR));
+      xmltokens.Request (XMLTOKEN_SHADERVARS));
     if (varNode)
       LoadSVBlock (varNode, &newShader->staticVariables,
       	&newShader->dynamicVariables);
   }
 
   csRef<iDocumentNode> varNode = node->GetNode(
-    xmltokens.Request (XMLTOKEN_SHADERVAR));
+    xmltokens.Request (XMLTOKEN_SHADERVARS));
 
   if (varNode)
     LoadSVBlock (varNode, &newShader->staticVariables,
@@ -246,7 +246,7 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
 {
   //Load shadervar block
   csRef<iDocumentNode> varNode = node->GetNode(
-    xmltokens.Request (XMLTOKEN_SHADERVAR));
+    xmltokens.Request (XMLTOKEN_SHADERVARS));
  
   if (varNode)
     LoadSVBlock (varNode, &pass->staticVariables, &pass->dynamicVariables);
@@ -557,30 +557,15 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
   (void)dynamicVariables;
   csRef<csShaderVariable> svVar;
   
-  csRef<iDocumentNodeIterator> it = node->GetNodes ("define");
+  csRef<iDocumentNodeIterator> it = node->GetNodes ("shadervar");
   while (it->HasNext ())
   {
     csRef<iDocumentNode> var = it->Next ();
-    svVar.AttachNew (
-      new csShaderVariable(strings->Request(var->GetAttributeValue ("name"))));
+    svVar.AttachNew (new csShaderVariable (
+      strings->Request(var->GetAttributeValue ("name"))));
 
-    csStringID idtype = xmltokens.Request (var->GetAttributeValue ("type"));
-    switch (idtype)
-    {
-      case XMLTOKEN_INT:
-	svVar->SetValue (var->GetAttributeValueAsInt("default"));
-	break;
-      case XMLTOKEN_FLOAT:
-	svVar->SetValue (var->GetAttributeValueAsFloat("default"));
-	break;
-      case XMLTOKEN_VECTOR3:
-	const char* def = var->GetAttributeValue("default");
-	csVector3 v;
-	sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
-	svVar->SetValue (v);
-	break;
-    }
-    staticVariables->AddVariable(svVar);
+    if (synldr->ParseShaderVar (var, *svVar))
+      staticVariables->AddVariable(svVar);
   }
 
   return true;

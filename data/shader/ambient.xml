@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <shader type="xmlshader" name="ambient">
     <!-- This should be defined by renderloop somehow and track sector ambient -->
-    <shadervar>
-	<define name="STANDARD_LIGHT_AMBIENT" type="vector3" default="0.2, 0.2, 0.4" />
-    </shadervar>
+    <shadervars>
+	<shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">0.2, 0.2, 0.4</shadervar>
+    </shadervars>
     <technique priority="50">
 	<pass>
 	    <mixmode><copy/></mixmode>

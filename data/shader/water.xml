@@ -1,7 +1,7 @@
 <shader type="xmlshader" name="water">
-  <shadervar>
-      <define name="STANDARD_LIGHT_AMBIENT" type="vector3" default="1, 1, 1" />
-  </shadervar>
+  <shadervars>
+      <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">1, 1, 1</shadervar>
+  </shadervars>
   <technique priority="50">
     <pass>
       <mixmode><copy/></mixmode>

@@ -56,7 +56,7 @@ struct iStringSet;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
-SCF_VERSION (iSyntaxService, 1, 3, 3);
+SCF_VERSION (iSyntaxService, 1, 4, 0);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -127,8 +127,8 @@ struct iSyntaxService : public iBase
   /**
    * Parse a shader variable declaration
    */
-  virtual bool ParseShaderParam (iDocumentNode* node,
-                                 csShaderVariable* var) = 0;
+  virtual bool ParseShaderVar (iDocumentNode* node, 
+    csShaderVariable& var) = 0;
 			    
   /**
    * Report an error and also gives a path in the XML tree.

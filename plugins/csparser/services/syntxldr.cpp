@@ -507,64 +507,62 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
   return true;
 }
 
-bool csTextSyntaxService::ParseShaderParam (iDocumentNode* node,
-					    csShaderVariable* var)
+bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
+					  csShaderVariable& var)
 {
   const char *type = node->GetAttributeValue("type");
   if (!type)
+  {
+    Report (
+      "crystalspace.syntax.shadervariable",
+      CS_REPORTER_SEVERITY_WARNING,
+      node,
+      "Invalid shadervar type specified.");
     return false;
+  }
   csStringID idtype = xmltokens.Request (type);
   switch (idtype)
   {
     case XMLTOKEN_INTEGER:
-      var->SetType (csShaderVariable::INT);
-      var->SetValue (node->GetContentsValueAsInt ());
+      var.SetValue (node->GetContentsValueAsInt ());
       break;
     case XMLTOKEN_FLOAT:
-      var->SetType (csShaderVariable::FLOAT);
-      var->SetValue (node->GetContentsValueAsFloat ());
+      var.SetValue (node->GetContentsValueAsFloat ());
       break;
     case XMLTOKEN_VECTOR2:
-      var->SetType (csShaderVariable::VECTOR2);
       {
         const char* def = node->GetContentsValue ();
-        csVector2 v;
+        csVector2 v (0.0f, 0.0f);
         sscanf (def, "%f,%f", &v.x, &v.y);
-        var->SetValue (v);
+        var.SetValue (v);
       }
       break;
     case XMLTOKEN_VECTOR3:
-      var->SetType (csShaderVariable::VECTOR3);
       {
         const char* def = node->GetContentsValue ();
-        csVector3 v;
+        csVector3 v (0);
         sscanf (def, "%f,%f,%f", &v.x, &v.y, &v.z);
-        var->SetValue (v);
+        var.SetValue (v);
       }
       break;
     case XMLTOKEN_VECTOR4:
-      var->SetType (csShaderVariable::VECTOR4);
       {
         const char* def = node->GetContentsValue ();
-        csVector4 v;
+        csVector4 v (0);
         sscanf (def, "%f,%f,%f,%f", &v.x, &v.y, &v.z, &v.w);
-        var->SetValue (v);
+        var.SetValue (v);
       }
       break;
     case XMLTOKEN_TEXTURE:
-      var->SetType (csShaderVariable::TEXTURE);
       {
+	csRef<iTextureWrapper> tex;
         // @@@ This should be done in a better way...
         csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
         if (eng)
         {
           const char* texname = node->GetContentsValue ();
-          csRef<iTextureWrapper> tex = eng->FindTexture (texname);
-          if (tex)
-          {
-            var->SetValue (tex);
-          }
-	  else
+          tex = eng->FindTexture (texname);
+          if (!tex)
 	  {
             Report (
               "crystalspace.syntax.shadervariable",
@@ -581,8 +579,16 @@ bool csTextSyntaxService::ParseShaderParam (iDocumentNode* node,
             node,
             "Engine not found.");
         }
+        var.SetValue (tex);
       }
       break;
+    default:
+      Report (
+        "crystalspace.syntax.shadervariable",
+        CS_REPORTER_SEVERITY_WARNING,
+        node,
+	"Invalid shadervar type '%s'.", type);
+      return false;
   }
 
   return true;

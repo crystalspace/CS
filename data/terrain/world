@@ -21,6 +21,9 @@
     <texture name="stone4.gif">
       <file>/lib/std/stone4.gif</file>
     </texture>
+    <texture name="stone2DOT3.png">
+      <file>/lev/terrain/stone2DOT3.png</file>
+    </texture>
     <texture name="grass.png">
       <file>/lev/terrain/grass.png</file>
     </texture>
@@ -52,22 +55,22 @@
     </material>
     <material name="Marble">
       <texture>andrew_marble4.jpg</texture>
-      <shaderparam name="tex normal" type="texture">blobbyDOT3.png</shaderparam>
-      <shaderparam name="texture scale" type="vector2">16,16</shaderparam>
+      <shadervar name="tex normal" type="texture">blobbyDOT3.png</shadervar>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
       <shader type="diffuse">splatting_scattering</shader>
     </material>
     <material name="Stone">
       <texture>stone4.gif</texture>
-      <shaderparam name="tex normal" type="texture">blobbyDOT3.png</shaderparam>
-      <shaderparam name="texture scale" type="vector2">8,8</shaderparam>
+      <shadervar name="tex normal" type="texture">stone2DOT3.png</shadervar>
+      <shadervar name="texture scale" type="vector2">8,8</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
       <shader type="diffuse">splatting_scattering</shader>
     </material>
     <material name="Grass">
       <texture>grass.png</texture>
-      <shaderparam name="tex normal" type="texture">grassDOT3.png</shaderparam>
-      <shaderparam name="texture scale" type="vector2">16,16</shaderparam>
+      <shadervar name="tex normal" type="texture">grassDOT3.png</shadervar>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
       <shader type="diffuse">splatting_scattering</shader>
     </material>
@@ -145,6 +148,7 @@
       <plugin>crystalspace.mesh.object.terrain.chunklod</plugin>
       <scale x="1" y="30" z="1" />
       <heightmap image="/lev/terrain/heightmap_257x257.png"/>
+      <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
     </params>
   </meshfact>
 
@@ -182,7 +186,7 @@
 	  <material>Marble</material>
 	  <material>Stone</material>
 	</materialpalette>
-	<materialmap image="/lev/terrain/materialmap.png" /> 
+	<materialmap image="/lev/terrain/materialmap.png" />
 	<loddistance>200</loddistance>
 	<errortolerance>1</errortolerance>
       </params>

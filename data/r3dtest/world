@@ -101,43 +101,43 @@
     <materials>
       <material name="CRETE3_CEIL02A">
         <texture>CRETE3_CEIL02A</texture>
-        <shaderparam name="tex normal" type="texture">CRETE3_CEIL02A_NORM</shaderparam>
+        <shadervar name="tex normal" type="texture">CRETE3_CEIL02A_NORM</shadervar>
         <shader type="ambient">ambient</shader>
         <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="CRETE2_FLR01">
         <texture>CRETE2_FLR01</texture>
-        <shaderparam name="tex normal" type="texture">CRETE2_FLR01_NORM</shaderparam>
+        <shadervar name="tex normal" type="texture">CRETE2_FLR01_NORM</shadervar>
         <shader type="ambient">ambient</shader>
         <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="C2A1_W1">
         <texture>C2A1_W1</texture>
-        <shaderparam name="tex normal" type="texture">C2A1_W1_NORM</shaderparam>
+        <shadervar name="tex normal" type="texture">C2A1_W1_NORM</shadervar>
         <shader type="ambient">ambient</shader>
         <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="CRATE02B">
         <texture>CRATE02B</texture>
-        <shaderparam name="tex normal" type="texture">CRATE02B_NORM</shaderparam>
+        <shadervar name="tex normal" type="texture">CRATE02B_NORM</shadervar>
         <shader type="ambient">ambient</shader>
         <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="CRATE02">
         <texture>CRATE02</texture>
-        <shaderparam name="tex normal" type="texture">CRATE02_NORM</shaderparam>
+        <shadervar name="tex normal" type="texture">CRATE02_NORM</shadervar>
         <shader type="ambient">ambient</shader>
         <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="{GRATE2A">
         <texture>{GRATE2A</texture>
-        <shaderparam name="tex normal" type="texture">{GRATE2A_NORM</shaderparam>
+        <shadervar name="tex normal" type="texture">{GRATE2A_NORM</shadervar>
         <shader type="ambient">ambient</shader>
         <shader type="diffuse">light_bumpmap</shader>
       </material>
       <material name="C2A2_SATORB">
         <texture>C2A2_SATORB</texture>
-        <shaderparam name="tex normal" type="texture">C2A2_SATORB_NORM</shaderparam>
+        <shadervar name="tex normal" type="texture">C2A2_SATORB_NORM</shadervar>
         <shader type="ambient">ambient</shader>
         <shader type="diffuse">light_bumpmap</shader>
       </material>
