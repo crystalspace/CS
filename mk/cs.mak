@@ -270,6 +270,29 @@ cleanlib:
 cleandep:
 	-$(RM) $(OUTOS)/*.dep
 
+# A makefile debugging facility.  Prints out the expansion of the named
+# variable.  For instance, to print the expansion of SRC.SOFT3D, invoke
+# "make show V=SRC.SOFT3D" from the command-line.
+show:
+	@echo $"$V=$($V)$"
+
+# The following include should define system-dependent targets.
+# NOTE: We perform this operation before defining the default implicit rules
+# (below) in order to work around a bug in GNU make on MacOS/X in which it
+# sometimes resolves to the incorrect implicit rule, thus it invokes the wrong
+# commands to build a target.  Perfoming this `include' prior to the definition
+# of the fallback implicit rules works around the problem (by pure magic); such
+# that GNU make uses the correct implicit rules defined by the various module
+# makefiles (at least in the observed cases).  This bug has manifested on
+# several occassions.  The incident which prompted this particular comment and
+# movement of this `include' above the fallback implicit rules involved the
+# OpenGL renderer.  GNU make was using the wrong implicit rule, and thus the
+# wrong commands (specifically, it failed to consult GL.CFLAGS) when building
+# the OpenGL renderer.  Lack of GL.CFLAGS resulted in a build failure on
+# MacOS/X.
+MAKESECTION=targets
+include $(SRCDIR)/mk/subs.mak
+
 $(OUT)/%$O: %.cpp
 	$(DO.COMPILE.CPP)
 
@@ -287,13 +310,3 @@ $(OUT)/%$O: %.asm
 
 $(OUTDIRS):
 	$(MKDIRS)
-
-# A makefile debugging facility.  Prints out the expansion of the named
-# variable.  For instance, to print the expansion of SRC.SOFT3D, invoke
-# "make show V=SRC.SOFT3D" from the command-line.
-show:
-	@echo $"$V=$($V)$"
-
-# The following include should define system-dependent targets
-MAKESECTION=targets
-include $(SRCDIR)/mk/subs.mak

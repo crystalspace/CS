@@ -7,9 +7,18 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 27-Sep-2003
-	- Jorrit implemented csPortal::ComputeCameraPlane().
 	- Eric Sunshine made minor clarifications to the "SCF Changes" section
 	  of the "Release Notes 0.96 to 0.98" appendix in the user manual.
+	- Jorrit implemented csPortal::ComputeCameraPlane().
+	- Eric Sunshine worked around a GNU make bug on MacOS/X which caused
+	  compilation of `gl3d' to fail.  In particular, under certain "random"
+	  circumstances, GNU make incorrectly resolves implicit rules.  In this
+	  case, when building the gl3d source files, it neglected to use the
+	  gl3d implicit rule, thus GL.CFLAGS was not consulted and the build
+	  failed.  Worked around the problem magically by changing cs.mak so
+	  that the module makefiles define their own implicit rules before
+	  cs.mak defines the fallback implicit rules.  Previously, cs.mak
+	  defined implicit rules first.
 26-Sep-2003
 	- Jorrit fixed the static lod documentation which forgot to mention
 	  that you had to add the children to the parent too.
@@ -22,7 +31,7 @@ chronological order.
 	- Eric Sunshine changed mkdir.m4 so that _AS_MKDIR_P_PREPARE() removes
 	  the bogus "-p" directory using rmdir rather than "rm -rf" since rmdir
 	  is a bit safer in case someone actually has an existing directory
-	  named "-p" (as unlikely though that is).
+	  named "-p" (unlikely though that is).
 	- Eric Sunshine wrapped CS_TEXT_CACHE_OUTPUT's AS_MKDIR_P invocation
 	  inside AS_ESCAPE in order to ensure that AS_MKDIR_P works correctly
 	  even in cases when AS_MKDIR_P has to fall back to the non-"mkdir -p"
