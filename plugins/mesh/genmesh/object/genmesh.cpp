@@ -98,6 +98,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   MixMode = 0;
   vis_cb = NULL;
   lit_mesh_colors = NULL;
+  num_lit_mesh_colors = 0;
   shapenr = 0;
   do_lighting = true;
   do_manual_colors = false;
@@ -119,6 +120,16 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   delete[] lit_mesh_colors;
 }
 
+void csGenmeshMeshObject::CheckLitColors ()
+{
+  if (factory->GetVertexCount () != num_lit_mesh_colors)
+  {
+    num_lit_mesh_colors = factory->GetVertexCount ();
+    delete[] lit_mesh_colors;
+    lit_mesh_colors = new csColor [num_lit_mesh_colors];
+  }
+}
+
 void csGenmeshMeshObject::InitializeDefault ()
 {
   SetupObject ();
@@ -128,7 +139,8 @@ void csGenmeshMeshObject::InitializeDefault ()
 
   // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
   int i;
-  for (i = 0 ; i < factory->GetVertexCount () ; i++)
+  CheckLitColors ();
+  for (i = 0 ; i < num_lit_mesh_colors ; i++)
     lit_mesh_colors[i].Set (0, 0, 0);
 }
 
@@ -373,7 +385,10 @@ void csGenmeshMeshObject::SetupObject ()
     delete[] lit_mesh_colors;
     lit_mesh_colors = NULL;
     if (!do_manual_colors)
-      lit_mesh_colors = new csColor [factory->GetVertexCount ()];
+    {
+      num_lit_mesh_colors = factory->GetVertexCount ();
+      lit_mesh_colors = new csColor [num_lit_mesh_colors];
+    }
   }
 }
 
@@ -400,6 +415,8 @@ void csGenmeshMeshObject::RemoveListener (iObjectModelListener *listener)
 bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
+  CheckLitColors ();
+
 #ifndef CS_USE_NEW_RENDERER
   iGraphics3D* g3d = rview->GetGraphics3D ();
 #else
@@ -466,6 +483,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   const csVector3& light_pos = light_frust->GetOrigin ();
 
   int i;
+  CheckLitColors ();
   csColor* colors = lit_mesh_colors;
   csVector3* normals = factory->GetNormals ();
 
@@ -509,6 +527,7 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
     iMovable* movable)
 {
   SetupObject ();
+  CheckLitColors ();
 
   if (do_manual_colors) return;
   if (do_shadow_rec) return;

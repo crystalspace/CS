@@ -88,6 +88,7 @@ private:
   bool do_shadow_rec;
 
   csColor* lit_mesh_colors;
+  int num_lit_mesh_colors;	// Should be equal to factory number.
   /// Dynamic ambient light assigned to this genmesh.
   csColor dynamic_ambient;
   uint32 ambient_version;
@@ -113,6 +114,11 @@ private:
    * Setup this object. This function will check if setup is needed.
    */
   void SetupObject ();
+
+  /**
+   * Make sure the 'lit_mesh_colors' array has the right size.
+   */
+  void CheckLitColors ();
 
 public:
   /// Constructor.
