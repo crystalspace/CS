@@ -540,25 +540,23 @@ csConstructionObject::~csConstructionObject ()
   delete[] output_connectors;
 }
 
-void csConstructionObject::SetVertices (int num_vertices, int num_input_points,
-  	csVector3* vertices)
+void csConstructionObject::SetVertices (
+  int inum_vertices, int inum_input_points, csVector3* ivertices)
 {
-  delete[] csConstructionObject::vertices;
-  csConstructionObject::num_input_points = num_input_points;
-  csConstructionObject::num_vertices = num_vertices;
-  csConstructionObject::vertices = new csVector3 [num_vertices];
-  memcpy (csConstructionObject::vertices, vertices, num_vertices *
-  	sizeof (csVector3));
+  delete[] vertices;
+  num_input_points = inum_input_points;
+  num_vertices = inum_vertices;
+  vertices = new csVector3 [inum_vertices];
+  memcpy (vertices, ivertices, num_vertices * sizeof (csVector3));
 }
 
-void csConstructionObject::SetTriangles (int num_triangles,
-	csTriangle* triangles)
+void csConstructionObject::SetTriangles (
+  int inum_triangles, csTriangle* itriangles)
 {
-  delete[] csConstructionObject::triangles;
-  csConstructionObject::num_triangles = num_triangles;
-  csConstructionObject::triangles = new csTriangle [num_triangles];
-  memcpy (csConstructionObject::triangles, triangles, num_triangles *
-  	sizeof (csTriangle));
+  delete[] triangles;
+  num_triangles = inum_triangles;
+  triangles = new csTriangle [inum_triangles];
+  memcpy (triangles, itriangles, num_triangles * sizeof (csTriangle));
 }
 
 void csConstructionObject::AddConnector (csOutputConnector* con)
