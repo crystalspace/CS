@@ -125,6 +125,11 @@ bool csTerrain::Initialize (char* heightmap)
   return true;
 }
 
+// Z depth queue iterator
+static ddgSplayIterator		*_qzi = NULL, *qri;
+// Z depth queue.
+static ddgQueue		*_qz = NULL, *qr;
+
 void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 {
   G3DPolygonDPFX poly;
@@ -141,12 +146,58 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   grview = &rview;
   // For each frame.
   mesh->calculate ();
-  // Render
-  mesh->qsi()->reset ();
-  while (!mesh->qsi ()->end ())
+
+	// If we are not using Z-buffer...
+    // For all the triangle in the visible queue, insert them in z-order.
+/*
+  	if ( !use_z_buf )
+	{
+		if (!_qz)
+		{
+			_qz = new ddgQueue( mesh );
+			_qzi = new ddgSplayIterator(_qz);
+		}
+		_qzi->reset();
+		// Clear queue.
+		_qz->clear();
+		mesh->qsi()->reset();
+		while (!mesh->qsi()->end())
+		{
+			ddgTriIndex tvc = mesh->qs ()->index (mesh->qsi ()), tvp, tv0, tv1;
+            float d;
+			ddgTBinTree *bt = mesh->qs ()->tree (mesh->qsi ());
+
+            tvp = ddgTBinTree::parent(tvc);
+            tv0 = mesh->stri[tvc].v0;
+            tv1 = mesh->stri[tvc].v1;
+			ddgVector3 *p = bt->tri(tv0)->pos();
+    		// Use the nearest coord of the triangle.
+            d = p->v[2];
+			p = bt->tri(tv1)->pos();
+            if (p->v[2] < d)
+                d = p->v[2];
+			p = bt->tri(tvp)->pos();
+            if (p->v[2] < d)
+                d = p->v[2];
+            _qz->ddgSplayTree::insert(bt->index(),tvc,d);
+			mesh->qsi()->next();
+		}
+		qri = _qzi;
+		qr  = _qz;
+	}
+	else
+*/
+	{
+		qri = mesh->qsi();
+		qr  = mesh->qs();
+	}
+
+   // Render
+  qri->reset ();
+  while (!qri->end ())
   {
-    ddgTriIndex tvc = mesh->qs ()->index (mesh->qsi ());
-    ddgTBinTree *bt = mesh->qs ()->tree (mesh->qsi ());
+    ddgTriIndex tvc = qr->index (qri );
+    ddgTBinTree *bt = qr->tree (qri );
 
     if (!bt->tri (tvc)->vis ().flags.none)
     {
@@ -156,23 +207,23 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
       ddgVector3 n1, n2, n3;
       ddgVector2 t1, t2, t3;
       ddgColor3  c1, c2, c3;
-	  unsigned int tva = bt->parent (tvc),
+	  unsigned int tvp = bt->parent (tvc),
 		  tv0 = bt->v0 (tvc),
 		  tv1 = bt->v1 (tvc);
 	  // Camera space coords.
-	  p3 =	bt->tri(tva)->pos();
+	  p3 =	bt->tri(tvp)->pos();
 	  p2 =	bt->tri(tv0)->pos();
 	  p1 =	bt->tri(tv1)->pos();
 	  // World space coords.
-      bt->vertex(tva,&wp1);
+      bt->vertex(tvp,&wp1);
       bt->vertex(tv0,&wp2);
       bt->vertex(tv1,&wp3);
 	  // Normals.
-	  bt->normal(tva,&n1);
+	  bt->normal(tvp,&n1);
 	  bt->normal(tv0,&n2);
 	  bt->normal(tv1,&n3);
       // Texture coords from 0 - N where N is size of texture.
-	  bt->textureC(tva,t1);
+	  bt->textureC(tvp,t1);
 	  bt->textureC(tv0,t2);
 	  bt->textureC(tv1,t3);
 	  // Create some color scheme.
@@ -204,21 +255,21 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
       if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) goto not_vis;
       poly.num = rescount;
 
-      poly.vertices[0].z = 1.0/pz[0];
+      poly.vertices[0].z = pz[0];
       poly.vertices[0].u = 0;
       poly.vertices[0].v = 0;
       poly.vertices[0].r = (float)c1.v[0]/255.0;
       poly.vertices[0].g = (float)c1.v[1]/255.0;
       poly.vertices[0].b = (float)c1.v[2]/255.0;
 
-      poly.vertices[1].z = 1.0/pz[1];
+      poly.vertices[1].z = pz[1];
       poly.vertices[1].u = 1;
       poly.vertices[1].v = 0;
       poly.vertices[1].r = (float)c2.v[0]/255.0;
       poly.vertices[1].g = (float)c2.v[1]/255.0;
       poly.vertices[1].b = (float)c2.v[2]/255.0;
 
-      poly.vertices[2].z = 1.0/pz[2];
+      poly.vertices[2].z = pz[2];
       poly.vertices[2].u = 0;
       poly.vertices[2].v = 1;
       poly.vertices[2].r = (float)c3.v[0]/255.0;
@@ -231,7 +282,7 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
     }
 
     not_vis:
-    mesh->qsi ()->next ();
+    qri ->next ();
   }
 
   rview.g3d->FinishPolygonFX ();
