@@ -68,16 +68,16 @@ void litLightMapMapper::PolyToLM (const csVector3& vpoly, csVector2& vlm)
   switch (axis)
   {
     case LIT_AXIS_X:
-      vlm.x = vpoly.z * density + offset.x;
-      vlm.y = -vpoly.y * density + offset.y;
+      vlm.x = vpoly.z * density - offset.x;
+      vlm.y = -vpoly.y * density - offset.y;
       break;
     case LIT_AXIS_Y:
-      vlm.x = vpoly.x * density + offset.x;
-      vlm.y = -vpoly.z * density + offset.y;
+      vlm.x = vpoly.x * density - offset.x;
+      vlm.y = -vpoly.z * density - offset.y;
       break;
     case LIT_AXIS_Z:
-      vlm.x = vpoly.x * density + offset.x;
-      vlm.y = -vpoly.y * density + offset.y;
+      vlm.x = vpoly.x * density - offset.x;
+      vlm.y = -vpoly.y * density - offset.y;
       break;
   }
 }
