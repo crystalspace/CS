@@ -4517,6 +4517,8 @@ class iMeshWrapperIterator(iBase):
         try:
             if self.thisown: destroy(self)
         except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMeshWrapperIterator_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iMeshWrapperIterator_scfGetVersion)
 
 class iMeshWrapperIteratorPtr(iMeshWrapperIterator):
     def __init__(self, this):
@@ -4524,6 +4526,8 @@ class iMeshWrapperIteratorPtr(iMeshWrapperIterator):
         if not hasattr(self,"thisown"): _swig_setattr(self, iMeshWrapperIterator, 'thisown', 0)
         _swig_setattr(self, iMeshWrapperIterator,self.__class__,iMeshWrapperIterator)
 _cspace.iMeshWrapperIterator_swigregister(iMeshWrapperIteratorPtr)
+
+iMeshWrapperIterator_scfGetVersion = _cspace.iMeshWrapperIterator_scfGetVersion
 
 class iMovableListener(iBase):
     __swig_setmethods__ = {}
@@ -4775,6 +4779,132 @@ class iVisibilityObjectPtr(iVisibilityObject):
         if not hasattr(self,"thisown"): _swig_setattr(self, iVisibilityObject, 'thisown', 0)
         _swig_setattr(self, iVisibilityObject,self.__class__,iVisibilityObject)
 _cspace.iVisibilityObject_swigregister(iVisibilityObjectPtr)
+
+CS_PORTAL_CLIPDEST = _cspace.CS_PORTAL_CLIPDEST
+CS_PORTAL_CLIPSTRADDLING = _cspace.CS_PORTAL_CLIPSTRADDLING
+CS_PORTAL_ZFILL = _cspace.CS_PORTAL_ZFILL
+CS_PORTAL_WARP = _cspace.CS_PORTAL_WARP
+CS_PORTAL_MIRROR = _cspace.CS_PORTAL_MIRROR
+CS_PORTAL_STATICDEST = _cspace.CS_PORTAL_STATICDEST
+CS_PORTAL_FLOAT = _cspace.CS_PORTAL_FLOAT
+CS_PORTAL_COLLDET = _cspace.CS_PORTAL_COLLDET
+CS_PORTAL_VISCULL = _cspace.CS_PORTAL_VISCULL
+class iPortalCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iPortalCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iPortalCallback, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iPortalCallback instance at %s>" % (self.this,)
+    def Traverse(*args): return _cspace.iPortalCallback_Traverse(*args)
+    def __del__(self, destroy=_cspace.delete_iPortalCallback):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iPortalCallbackPtr(iPortalCallback):
+    def __init__(self, this):
+        _swig_setattr(self, iPortalCallback, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iPortalCallback, 'thisown', 0)
+        _swig_setattr(self, iPortalCallback,self.__class__,iPortalCallback)
+_cspace.iPortalCallback_swigregister(iPortalCallbackPtr)
+
+class iPortal(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iPortal, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iPortal, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iPortal instance at %s>" % (self.this,)
+    def QueryObject(*args): return _cspace.iPortal_QueryObject(*args)
+    def SetName(*args): return _cspace.iPortal_SetName(*args)
+    def GetName(*args): return _cspace.iPortal_GetName(*args)
+    def GetSector(*args): return _cspace.iPortal_GetSector(*args)
+    def GetVertices(*args): return _cspace.iPortal_GetVertices(*args)
+    def GetWorldVertices(*args): return _cspace.iPortal_GetWorldVertices(*args)
+    def GetVertexIndices(*args): return _cspace.iPortal_GetVertexIndices(*args)
+    def GetVertexIndicesCount(*args): return _cspace.iPortal_GetVertexIndicesCount(*args)
+    def GetObjectPlane(*args): return _cspace.iPortal_GetObjectPlane(*args)
+    def GetWorldPlane(*args): return _cspace.iPortal_GetWorldPlane(*args)
+    def ComputeCameraPlane(*args): return _cspace.iPortal_ComputeCameraPlane(*args)
+    def PointOnPolygon(*args): return _cspace.iPortal_PointOnPolygon(*args)
+    def SetSector(*args): return _cspace.iPortal_SetSector(*args)
+    def GetFlags(*args): return _cspace.iPortal_GetFlags(*args)
+    def SetMaximumSectorVisit(*args): return _cspace.iPortal_SetMaximumSectorVisit(*args)
+    def GetMaximumSectorVisit(*args): return _cspace.iPortal_GetMaximumSectorVisit(*args)
+    def SetPortalCallback(*args): return _cspace.iPortal_SetPortalCallback(*args)
+    def RemovePortalCallback(*args): return _cspace.iPortal_RemovePortalCallback(*args)
+    def GetPortalCallbackCount(*args): return _cspace.iPortal_GetPortalCallbackCount(*args)
+    def GetPortalCallback(*args): return _cspace.iPortal_GetPortalCallback(*args)
+    def SetMissingSectorCallback(*args): return _cspace.iPortal_SetMissingSectorCallback(*args)
+    def RemoveMissingSectorCallback(*args): return _cspace.iPortal_RemoveMissingSectorCallback(*args)
+    def GetMissingSectorCallbackCount(*args): return _cspace.iPortal_GetMissingSectorCallbackCount(*args)
+    def GetMissingSectorCallback(*args): return _cspace.iPortal_GetMissingSectorCallback(*args)
+    def GetTextureFilter(*args): return _cspace.iPortal_GetTextureFilter(*args)
+    def SetFilter(*args): return _cspace.iPortal_SetFilter(*args)
+    def GetColorFilter(*args): return _cspace.iPortal_GetColorFilter(*args)
+    def SetWarp(*args): return _cspace.iPortal_SetWarp(*args)
+    def SetMirror(*args): return _cspace.iPortal_SetMirror(*args)
+    def GetWarp(*args): return _cspace.iPortal_GetWarp(*args)
+    def HardTransform(*args): return _cspace.iPortal_HardTransform(*args)
+    def ObjectToWorld(*args): return _cspace.iPortal_ObjectToWorld(*args)
+    def Warp(*args): return _cspace.iPortal_Warp(*args)
+    def WarpSpace(*args): return _cspace.iPortal_WarpSpace(*args)
+    def CompleteSector(*args): return _cspace.iPortal_CompleteSector(*args)
+    def CheckFrustum(*args): return _cspace.iPortal_CheckFrustum(*args)
+    def HitBeamPortals(*args): return _cspace.iPortal_HitBeamPortals(*args)
+    def __del__(self, destroy=_cspace.delete_iPortal):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iPortal_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iPortal_scfGetVersion)
+
+class iPortalPtr(iPortal):
+    def __init__(self, this):
+        _swig_setattr(self, iPortal, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iPortal, 'thisown', 0)
+        _swig_setattr(self, iPortal,self.__class__,iPortal)
+_cspace.iPortal_swigregister(iPortalPtr)
+
+iPortal_scfGetVersion = _cspace.iPortal_scfGetVersion
+
+class iPortalContainer(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iPortalContainer, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iPortalContainer, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iPortalContainer instance at %s>" % (self.this,)
+    def GetPortalCount(*args): return _cspace.iPortalContainer_GetPortalCount(*args)
+    def GetPortal(*args): return _cspace.iPortalContainer_GetPortal(*args)
+    def CreatePortal(*args): return _cspace.iPortalContainer_CreatePortal(*args)
+    def RemovePortal(*args): return _cspace.iPortalContainer_RemovePortal(*args)
+    def Draw(*args): return _cspace.iPortalContainer_Draw(*args)
+    def __del__(self, destroy=_cspace.delete_iPortalContainer):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iPortalContainer_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iPortalContainer_scfGetVersion)
+
+class iPortalContainerPtr(iPortalContainer):
+    def __init__(self, this):
+        _swig_setattr(self, iPortalContainer, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iPortalContainer, 'thisown', 0)
+        _swig_setattr(self, iPortalContainer,self.__class__,iPortalContainer)
+_cspace.iPortalContainer_swigregister(iPortalContainerPtr)
+
+iPortalContainer_scfGetVersion = _cspace.iPortalContainer_scfGetVersion
 
 class iGeneralMeshState(iBase):
     __swig_setmethods__ = {}
@@ -9950,6 +10080,8 @@ class iStandardReporterListener(iBase):
         try:
             if self.thisown: destroy(self)
         except: pass
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iStandardReporterListener_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iStandardReporterListener_scfGetVersion)
 
 class iStandardReporterListenerPtr(iStandardReporterListener):
     def __init__(self, this):
@@ -9957,6 +10089,8 @@ class iStandardReporterListenerPtr(iStandardReporterListener):
         if not hasattr(self,"thisown"): _swig_setattr(self, iStandardReporterListener, 'thisown', 0)
         _swig_setattr(self, iStandardReporterListener,self.__class__,iStandardReporterListener)
 _cspace.iStandardReporterListener_swigregister(iStandardReporterListenerPtr)
+
+iStandardReporterListener_scfGetVersion = _cspace.iStandardReporterListener_scfGetVersion
 
 class iView(iBase):
     __swig_setmethods__ = {}
