@@ -810,7 +810,7 @@ struct
   { 8, 3, 8, 3, 8, 3, 8, 3 }            // 8-steps
 };
 
-static void inline SelectInterpolationStep (float M)
+inline static void SelectInterpolationStep (float M)
 {
   // Select the right interpolation factor based on the z-slope of our
   // polygon. This will greatly increase the speed of polygons which are
