@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2003 by Jorrit Tyberghein
-	      (C) 2003 by Frank Richter
+    Copyright (C) 2003 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,6 +21,9 @@
 #include "csutil/syspath.h"
 
 #include <windows.h>
+#ifdef __CYGWIN__
+#include <sys/cygwin.h>
+#endif
 #include "cachedll.h"
 
 typedef DWORD (STDAPICALLTYPE* PFNGETLONGPATHNAMEA) (LPCSTR lpszShortPath, 
@@ -102,24 +104,31 @@ static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath,
 
 char* csExpandPath (const char* path)
 {
-  if ((path == 0) || (*path == 0)) return 0;
+  if (path == 0 || *path == '\0')
+    return 0;
+
+#ifdef __CYGWIN__
+  char winpath[MAX_PATH];
+  if (cygwin_conv_to_win32_path(path, winpath) == 0)
+    path = winpath;
+#endif
 
   char fullName[MAX_PATH];
   GetFullPathName (path, sizeof(fullName), fullName, 0);
 
   DWORD result = 0;
-  PFNGETLONGPATHNAMEA GetLongPathName = 0;
+  PFNGETLONGPATHNAMEA GetLongPathNameFunc = 0;
   // unfortunately, GetLongPathName() is only supported on Win98+/W2k+
   static cswinCacheDLL hKernel32 ("kernel32.dll");
   if (hKernel32 != 0)
   {
-    GetLongPathName = 
+    GetLongPathNameFunc = 
       (PFNGETLONGPATHNAMEA)GetProcAddress (hKernel32, "GetLongPathNameA");
-    if (GetLongPathName == 0)
+    if (GetLongPathNameFunc == 0)
     {
-      GetLongPathName = MyGetLPN;
+      GetLongPathNameFunc = MyGetLPN;
     }
-    result = GetLongPathName (fullName, fullName, sizeof (fullName));
+    result = GetLongPathNameFunc (fullName, fullName, sizeof (fullName));
   }
   if (result == 0) 
   {

@@ -28,6 +28,12 @@ chronological order.
 	  otherwise especially meaningful to have around.  To make it easy to
 	  recover the program if revival is warranted or if testing needs to be
 	  done, it has been tagged in CVS as EVENTTEST_OBSOLETE.
+	- Eric Sunshine fixed bug in csExpandPath() for Windows
+	  (csutil/win32/winsyspath.cpp) where it neglected to convert
+	  Cygwin-format paths to Windows format before invoking the low-level
+	  Win32 path manipulation functions on the path.  Hopefully, this will
+	  resolve problem where csGetConfigPath() (csutil/win32/instpath.cpp)
+	  failed to respect CRYSTAL environment variable under CYGWIN.
 7-Jun-2004
 	- Jorrit added an assignement operator to csHashMapReversible.  This
 	  actually fixes the crash at exit bug for some of the CSWS apps.
