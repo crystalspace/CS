@@ -16,6 +16,13 @@ chronological order.
 	- Eric Sunshine added ConstructStaticLibraryTarget,
 	  ConstructSharedLibraryTarget, and ConstructSharedLibraryLinkLib rules
 	  to macosx.jam.
+	- Eric Sunshine fixed bugs in the Library rule (library.jam) and the
+	  LinkWith rule (flags.jam) where they incorrectly and unconditionally
+	  believed that the target was configured as a shared library
+	  regardless of its actual state and the state of BUILD_SHARED_LIBS.
+	  Among other issues, this problem manifested during msvcgen runs where
+	  the synthesized workspaces had incorrect dependency information for
+	  the static library project files.
 5-Dec-2004
 	- res made the following changes:
 	    - Fixed the Win32 shared library linking.

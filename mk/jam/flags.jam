@@ -27,7 +27,7 @@ rule LinkWith
 {
   local rawlibs = [ ResolveLibs $(>) ] ;
 
-  if ( $($(<)_TYPE) = library ) && ( "$(<)_SHARED" = "" )
+  if ( $($(<)_TYPE) = library ) && ( "$($(<)_SHARED)" = "" )
   {
     # LibDepends for shared libs invokes LinkWith, so prevent recursion
     LibDepends $(<) : $(rawlibs) ;

@@ -106,7 +106,7 @@ rule LibDepends
 {
   $(<)_depends += $(>) ;
   
-  if "$(<)_SHARED"
+  if "$($(<)_SHARED)"
   {
     LinkWith $(<) : $(>) ;
   }
