@@ -19,53 +19,87 @@ The world is built up from the following objects:
 
 @itemize @bullet
 @item
-@dfn{Sectors}, @dfn{Things} and @dfn{Polygons}.  For details, see the portal
-engine discussion (@pxref{Portal Engine}).  Things are also @dfn{keylist}
-objects (defined below).  There are also @dfn{Curves}, which are similar to
-Things except that they support a special type of @sc{lod} (@dfn{Level of
-Detail}).  All these objects are based on @dfn{Vertices}.
+@dfn{Sectors}. For details, see the portal engine discussion
+(@pxref{Portal Engine}). Basically sectors define a region of space
+that can contain several geometrical objects. As opposed to earlier
+versions of Crystal Space a sector does not itself represent geometry.
+Instead all geometry in a sector is made from @dfn{Mesh Objects}.
 
 @item
-@dfn{Texture Planes}.  These planes define the complete set of information for
-texture mapping and can be shared by several polygons.  This improves
-performance.
+@dfn{Mesh Objects}. See the mesh object section for more specific information
+about them (@pxref{MeshObject}). Mesh objects represent geometry in some
+sector. Everything you can see (walls, actors, particle systems, ...) is
+represented by some kind of mesh object.
 
 @item
-@dfn{Meshes}.  Depending on the structure of your program it is more or less
-useful to define meshes directly in the map file, because your program
-might have little control over them.  You'll then want to use @dfn{Nodes}
-instead.  @xref{3D Sprites}. @xref{MeshObject}.
+@dfn{Mesh Object Factories}. Mesh object factories are objects that
+can be used to create mesh objects that inherit characteristics
+from their mesh factory. Basically a mesh object factory is like
+a blue-print for creating a mesh object.
 
 @item
-@dfn{Thing Templates} and @dfn{Mesh Factories}.  These templates or
-factories can be shared by several Things or Meshes to save some memory.
-
-@item
-@dfn{Collection Objects}.  These are simply groups of other objects.
+@dfn{Portals}. Again see the portal discussion (@pxref{Portal Engine}) but
+the idea is that sectors are normally totally independent regions of
+space unless you connect them through portals. Portals are implemented
+inside the @dfn{Thing Mesh Object}. There you can assign a portal to some
+sector to a single polygon.
 
 @item
 @dfn{Light Sources}.  There are different ways how light is applied to objects
 to increase performance.  @xref{Lighting}.
 
 @item
-@dfn{Keylist objects}.  Keylist objects hold a list of
-@{@var{key},@var{value}@} tuples to describe their behaviour.  Key/value
-tuples are represented by a pair of string.  If you have built levels for
-Quake before, you are probably familiar with this concept from Quake's
-@dfn{Entities}.  There are two types of Keylist objects: @dfn{Things} bind a
-key list to world geometry; and @dfn{Nodes} bind a key list to a single point
-in space.  In theory it is up to your program as to how these key-value tuples
+@dfn{Collection Objects}.  These are simply groups of other objects.
+
+@item
+@dfn{Key/value Pairs}. A key/value pair is a
+@{@var{key},@var{value}@} tuple describing some game specific concept.
+Key/value tuples are represented by a pair of strings. If you have
+built levels for Quake before, you are probably familiar with this concept
+from Quake's @dfn{Entities}. Almost all objects in the Crystal Space
+engine support these key/value pairs so you can attach this kind of
+information to anything. Crystal Space itself will not use this information
+but your game can query it and perform the appropriate actions.
+In theory it is up to your program as to how these key-value tuples
 are interpreted.  However, Crystal Space has set some standards to make life
 easier for level designers and also to make levels as portable as possible
 between different Crystal Space games.  @xref{Keylist Standards}.
+
+@item
+@dfn{Nodes}. A node represents a point in space.
+@end itemize
+
+The @dfn{Thing Mesh Object} is probably the most important mesh object
+as it can be used to define how the basic structure of your world looks
+like. Here is a list of concepts that are related to @dfn{Things}:
+
+@itemize @bullet
+@item
+@dfn{Polygons and curves}. @dfn{Things} are made from polygons and/or
+curves. To define such an object you enumerate all polygons and curves
+that make up the geometry of such thing.
+
+@item
+@dfn{Portals}. As mention above portals are a special case of
+polygons that point to some other sector (or sometimes the same
+sector in case of a mirror).
+
+@item
+@dfn{Texture Planes}. Polygons in a thing are texture mapped
+using a transformation from object to texture space. A texture
+plane describes this transformation. Several polygons can share
+the same texture plane which means that they will be texture mapped
+the same way. If you place two polygons with the same texture
+plane next to each other the texture will appear to continue
+without interruption from one polygon to the other.
+
 @end itemize
 
 @anchor{Keylist Standards}
 @subsubheading Keylist Standards
 @cindex Keylist Standards
 
-This section describes some guidelines for key/value tuples in @emph{Things}
-and @emph{Nodes}.
+This section describes some guidelines for key/value tuples.
 
 The most important key is the @samp{classname} key.  It tells the program the
 type of an object.  All the following guidelines are set for special object

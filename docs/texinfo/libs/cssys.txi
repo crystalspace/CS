@@ -8,6 +8,9 @@ The system library is the basic module in every Crystal Space application. It
 contains one main class, the @dfn{system driver}. This driver helps in
 several ways:
 
+WARNING! The system library is currently being eliminated. Soon the
+information here will be outdated (and then rewritten).
+
 @itemize @bullet
 @item
 It handles the main system-specific operations, like loading dynamic libraries

@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+1-Sep-2001
+	- Various documentation changes:
+	    - Updated plugins overview so it mentions recent developments.
+	    - Updated library overview so it mentions recent developments.
+	    - Mention the pending removal of the system driver.
+	    - Significantly updated the world components section. It
+	      didn't even mention mesh objects...
 31-Aug-2001
 	- Fixed a bug with curved surfaces with dynamic lighting. If
 	  there were no lights in the level and/or the curve was never

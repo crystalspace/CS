@@ -21,7 +21,10 @@ several real directories together as a single virtual directory; and to treat
 
 The graphics modules provide ``low-level'' graphics output. This includes
 drawing pixels, lines and text, but also drawing polygons and polygon meshes
-to support hardware acceleration. @xref{Graphics Drivers}.
+to support hardware acceleration. @xref{Graphics Drivers}. The graphics
+drivers themselves uses a ``canvas'' plugin specific to the operating
+system and/or the graphics driver in order to open a window or setup the
+graphics base system.
 
 @item
 @emph{Sound Drivers}
@@ -39,29 +42,45 @@ internet or similar connection. @xref{Network Drivers}.
 @item
 @emph{3D Engine}
 
-This plug-in will replace the 3D engine in its current form as a static
-library. This module is currently not helpful for your own projects.
-@xref{csEngine}.
+Historically the engine was written as a library and it can still be used
+in that manner. However, it is now recommended to use the engine as a
+plugin instead. @xref{csEngine}.
 
 @item
 @emph{Mesh Objects}
 
 Mesh objects are 3D objects that can be used and displayed by the engine.
-Examples are 3D sprites, 2D sprites, and particle systems. This functionality
-used to be in the engine but has been removed from the engine for greater
-flexibility.
+Examples are 3D sprites, 2D sprites, particle systems, terrain mesh, ....
+This functionality used to be in the engine but has been removed from the
+engine for greater flexibility. @xref{MeshObject}
 
 @item
-@emph{Standard Loader}
+@emph{Map Loader}
 
-This plug-in will replace the @code{csParser} library once the engine is a
-plug-in module. Until then, it is not helpful for your own projects.
+This plug-in provides map loading capabilities for your game. In addition
+it also contains functions to load mesh objects, textures, and sounds.
+@xref{csParser}
+
+@item
+@emph{Model Converters}
+
+Helps loading model files of various formats (3DS, ASE, MDL, MD2, ...)
+and store them in a common data structure. @xref{Model Conversion}
+
+@item
+@emph{Image Loaders}
+
+In many cases you don't have to use these plugins directly as they
+are used automatically by the Map Loader. However in some cases you
+might want to access the image loaders in your own application. These
+plugins are responsible for loading various types of images (GIF,
+PNG, JPG, ...).
 
 @item
 @emph{Collision Detection}
 
 There is currently only one collision plug-in, using the @sc{rapid} algorithm.
-Collision is based on testing for intersection of two non-moving objects.
+Collision is based on testing for intersection of two objects.
 
 @item
 @emph{Console Output} and @emph{Console Input}
@@ -86,18 +105,26 @@ The font server can be used to display different fonts in your application.
 Skeletal motion manager.
 
 @item
+@emph{Reporter}
+
+The reporter plugin is used by all plugins in Crystal Space to report
+about errors, warnings, and other notification messages. A game or
+application can also use the reporter to report messages. You can set up
+a listener to listen to messages that arrive on the reporter or you can
+use the standard reporter listener plugin below.
+
+@item
+@emph{Standard Reporter Listener}
+
+This plugin listens to messages that arrive at the reporter and
+displays them in some manner. It is the easiest way to handle
+messages from the reporter. You can control what should happen with
+each type of message and to what output device it should go (i.e. things
+like output console, standard output, and so on).
+
+@item
 @emph{Performance Statistics}
 
 This plug-in helps to measure performance of the 3D engine.
 
-@item
-@emph{Model Converters}
-
-Helps loading model files of various formats and store them in a common
-data structure.
-
-@item
-@emph{Crossbuilder}
-
-Uses the structure created by a model converter to build a mesh object.
 @end itemize

@@ -16,11 +16,13 @@ to access the engine will be to use the engine plugin. At this moment
 this is still not fully possible because the @sc{scf} interfaces for the
 engine plugin are not complete yet.
 
-@item csFX
+@item csTool
 This library contains various things that are useful for Crystal Space
 but are too specialized in order to be placed in @sc{csEngine}. Currently
 it contains the @code{csPixmap} class for simple 2D graphics and
-a number of predefined procedural textures.
+a number of predefined procedural textures. It also contains basic support
+structures for the model importers, the csColliderWrapper class and the
+notion of key-value pairs (to be attached to csObject's).
 
 @item csSys
 All system dependent functionality (non-graphics and non-sound related) is in
@@ -32,7 +34,7 @@ make Crystal Space applications system-independent.
 This library contains various utilities. There is an Archive class which can
 read/write @sc{zip} archives. There is a vector class, a sparse matrix class
 and some other useful goodies. This library requires the use of the external
-ZLib library which is used to read/write @sc{zip} archives. One modules from
+ZLib library which is used to read/write @sc{zip} archives. One module from
 this library is explained in a separate section: @sc{scf}.
 
 @item SCF @r{(Shared Class Facility)}
@@ -44,30 +46,12 @@ in a separate section as it is both complex (compared to the rest of
 A library for 3d geometry operations. It provides 2d and 3d vectors, polygons
 and bounding boxes, 3d matrices and some other useful things. @xref{csGeom}.
 
-@item csObject
-This library provides classes that can be used to build a hierarchy for your
-objects, including a name for every object, faked run-time type information
-(pseudo-@sc{rtti}), tree-like object structures and resizable arrays
-(@code{csVector}) of these objects.
-
-@item csGfxldr
-Routines to support loading various graphic file formats and put them
-internally in the same format. This library supports @sc{jpg}, @sc{gif},
-@sc{tga}, @sc{png}, and @sc{bmp}. Note that in the future this library will
-be converted to a set of plug-ins.
-
-@item csParser
-A library which parses @sc{ascii} map files and creates a world in the 3D
-Engine. @xref{csParser}. In the future this library will be converted
-to a plug-in.
+@item csGfx
+Basic image support.
 
 @item csWS
 A window system nicely integrated with Crystal Space. It is also platform
 independent, as it is based on the CS graphics drivers. @xref{CSWS}.
-
-@item csGame
-This libary is an attempt to build a gaming system that is specialized on
-3d shooters.
 
 @item csPhyzik
 This module supports calculation of various physical properties.
