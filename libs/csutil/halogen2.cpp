@@ -24,13 +24,17 @@ csGenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundness)
   const int center = radius;
 
   float *spoke = (float *)alloca ((iNumSpokes + 2) * sizeof (float));
-  for (int i = 0; i < iNumSpokes; i++)
+  int i;
+  for (i = 0; i < iNumSpokes; i++)
     spoke [i] = rnd.Get ();//iRoundness + rnd.Get () * (1 - iRoundness);
   spoke [iNumSpokes] = spoke [0];
   spoke [iNumSpokes + 1] = spoke [1];
 
-  for (int y = 0; y < iSize; y++)
-    for (int x = 0; x < iSize; x++)
+  int y;
+  for (y = 0; y < iSize; y++)
+  {
+	int x;
+    for (x = 0; x < iSize; x++)
     {
       // u is in -1..1 interval
       float u = float (x - center) / radius;
@@ -52,6 +56,7 @@ csGenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundness)
       if (w < 0) w = 0; if (w > 1) w = 1;
       image [x + y * iSize] = QInt (w * (w + (1 - w) * w1) * 255.9);
     }
+  }
 
   return image;
 }

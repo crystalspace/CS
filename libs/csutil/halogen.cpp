@@ -40,8 +40,11 @@ unsigned char *csGenerateHalo (int iSize, float iFactor, float iCross)
   s3 *= s3;
 #endif
 
-  for (int x = 0; x <= s2; x++)
-    for (int y = /*s2*/x; y <= s2; y++)
+  int x;
+  for (x = 0; x <= s2; x++)
+  {
+	int y;
+    for (y = /*s2*/x; y <= s2; y++)
     {
       int dx = (s2 - x);
       int dy = (s2 - y);
@@ -67,6 +70,7 @@ unsigned char *csGenerateHalo (int iSize, float iFactor, float iCross)
         image [s1 - y + (s1 - x) * iSize] = uca;
       }
     }
+  }
 
   return image;
 }

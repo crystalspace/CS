@@ -128,7 +128,8 @@ csHashMap::csHashMap (uint32 size)
 {
   NumBuckets = size;
   Buckets.SetLength (size);
-  for (uint32 i = 0 ; i < size ; i++)
+  uint32 i;
+  for (i = 0 ; i < size ; i++)
     Buckets[i] = NULL;
 }
 
@@ -153,7 +154,8 @@ csHashObject csHashMap::Get (csHashKey key) const
   uint32 idx = key % NumBuckets;
   if (!Buckets[idx]) return NULL;
   csHashBucket* bucket = Buckets[idx];
-  for (int i = 0 ; i < bucket->Length () ; i++)
+  int i;
+  for (i = 0 ; i < bucket->Length () ; i++)
   {
     csHashElement* element = bucket->Get(i);
     if (element->key == key) return element->object;
@@ -166,7 +168,8 @@ void csHashMap::DeleteAll (csHashKey key)
   uint32 idx = key % NumBuckets;
   if (!Buckets[idx]) return;
   csHashBucket* bucket = Buckets[idx];
-  for (uint32 i = bucket->Length () ; i-- > 0 ; )
+  uint32 i;
+  for (i = bucket->Length () ; i-- > 0 ; )
   {
     csHashElement* element = bucket->Get(i);
     if (element->key == key)
@@ -176,7 +179,8 @@ void csHashMap::DeleteAll (csHashKey key)
 
 void csHashMap::DeleteAll ()
 {
-  for (uint32 b = Buckets.Length () ; b-- > 0 ; )
+  uint32 b;
+  for (b = Buckets.Length () ; b-- > 0 ; )
   {
     delete Buckets[b];
     Buckets[b] = NULL;
