@@ -80,12 +80,29 @@ SCF_IMPLEMENT_IBASE( csShaderPass )
   SCF_IMPLEMENTS_INTERFACE( iShaderPass )
 SCF_IMPLEMENT_IBASE_END
 
+//=================== csShaderVariable ================//
 
-SCF_IMPLEMENT_IBASE( csShaderVariable )
-  SCF_IMPLEMENTS_INTERFACE( iShaderVariable )
+SCF_IMPLEMENT_IBASE (csShaderVariable)
+  SCF_IMPLEMENTS_INTERFACE (iShaderVariable)
 SCF_IMPLEMENT_IBASE_END
 
+csShaderVariable::csShaderVariable ()
+{
+  SCF_CONSTRUCT_IBASE (0);
+
+  Name = 0;
+}
+
+csShaderVariable::~csShaderVariable ()
+{
+  delete[] Name;
+}
+
 //=================== csShaderWrapper ================//
+
+SCF_IMPLEMENT_IBASE (csShaderWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iShaderWrapper)
+SCF_IMPLEMENT_IBASE_END
 
 csShaderWrapper::csShaderWrapper (iShader* shader)
 {
@@ -204,7 +221,7 @@ csPtr<iShaderVariable> csShaderManager::CreateVariable(const char* name) const
 {
   csShaderVariable* myVar = new csShaderVariable();
   myVar->SetName(name);
-  return (iShaderVariable*)myVar;
+  return csPtr<iShaderVariable> (myVar);
 }
 
 iShaderVariable* csShaderManager::privateGetVariable(int namehash)
@@ -219,7 +236,7 @@ iShaderVariable* csShaderManager::privateGetVariable(int namehash)
   return 0;
 }
 
-csBasicVector csShaderManager::GetAllVariableNames()
+csBasicVector csShaderManager::GetAllVariableNames() const
 {
   csBasicVector vReturnValue;
 
@@ -230,6 +247,11 @@ csBasicVector csShaderManager::GetAllVariableNames()
   }
 
   return vReturnValue;
+}
+
+csSymbolTable* csShaderManager::GetSymbolTable()
+{
+  return 0;
 }
 
 bool csShaderManager::HandleEvent(iEvent& event)
@@ -264,11 +286,11 @@ csPtr<iShader> csShaderManager::CreateShader()
   seqnumber++;
 
   csShader* cshader = new csShader(name, this, objectreg);
-  cshader->IncRef();
+  //cshader->IncRef();
 
-  shaders.Push(cshader);
+  //shaders.Push(cshader);
   
-  return (iShader*)cshader;
+  return csPtr<iShader> (cshader);
 }
 
 
@@ -277,15 +299,21 @@ iShader* csShaderManager::GetShader(const char* name)
   int i;
   for (i = 0; i < shaders.Length(); ++i)
   {
-    if (strcasecmp(shaders.Get(i)->GetName(), name) == 0)
-      return shaders.Get(i);
+/*    if (strcasecmp(shaders.Get(i)->GetName(), name) == 0)
+      return shaders.Get(i);*/
+    // @@@ Inefficient!
+    iShader* shader = shaders.Get(i)->GetShader();
+    if (strcasecmp(shader->GetName(), name) == 0)
+      return shader;
   }
   return 0;
 }
 
 csPtr<iShaderWrapper> csShaderManager::CreateWrapper(iShader* shader)
 {
-  return csPtr<iShaderWrapper> (new csShaderWrapper (shader));
+  csShaderWrapper* wrapper = new csShaderWrapper (shader);
+  shaders.Push (wrapper);
+  return csPtr<iShaderWrapper> (wrapper);
 }
 
 csPtr<iShaderProgram> csShaderManager::CreateShaderProgram(const char* type)
@@ -348,7 +376,7 @@ csShader::~csShader()
   delete techniques;
 }
 
-bool csShader::IsValid()
+bool csShader::IsValid() const
 {
   //is valid if there are at least one valid technique
   for(int i = 0; i < techniques->Length(); ++i)
@@ -388,7 +416,7 @@ iShaderVariable* csShader::privateGetVariable(int namehash)
   return 0;
 }
 
-csBasicVector csShader::GetAllVariableNames()
+csBasicVector csShader::GetAllVariableNames() const
 {
   csBasicVector vReturnValue;
 
@@ -399,6 +427,11 @@ csBasicVector csShader::GetAllVariableNames()
   }
 
   return vReturnValue;
+}
+
+csSymbolTable* csShader::GetSymbolTable()
+{
+  return 0;
 }
 
 //technique-related
@@ -486,7 +519,7 @@ bool csShader::Load(iDocumentNode* node)
           case iShaderVariable::INT:
             var->SetValue( child->GetAttributeValueAsInt("default") );
             break;
-          case iShaderVariable::VECTOR1:
+          case iShaderVariable::FLOAT:
             var->SetValue( child->GetAttributeValueAsFloat("default") );
             break;
           case iShaderVariable::STRING:
@@ -683,7 +716,7 @@ void csShaderPass::AddStreamMapping (csStringID name, csVertexAttrib attribute)
   streammapping[attribute] = name;
 }
 
-csStringID csShaderPass::GetStreamMapping (csVertexAttrib attribute)
+csStringID csShaderPass::GetStreamMapping (csVertexAttrib attribute) const
 {
   return streammapping[attribute];
 }
@@ -699,7 +732,7 @@ void csShaderPass::AddTextureMapping (int layer, int unit)
   texmappinglayer[unit] = layer;
 }
 
-int csShaderPass::GetTextureMappingAsLayer (int unit)
+int csShaderPass::GetTextureMappingAsLayer (int unit) const
 {
   return texmappinglayer[unit];
 }
@@ -913,7 +946,7 @@ bool csShaderPass::Load(iDocumentNode* node)
           case iShaderVariable::INT:
             var->SetValue( child->GetAttributeValueAsInt("default") );
             break;
-          case iShaderVariable::VECTOR1:
+          case iShaderVariable::FLOAT:
             var->SetValue( child->GetAttributeValueAsFloat("default") );
             break;
           case iShaderVariable::STRING:
@@ -978,6 +1011,11 @@ bool csShaderPass::Prepare()
   return true;
 }
 
+csSymbolTable* csShaderPass::GetSymbolTable()
+{
+  return 0;
+}
+
 //================= csShaderTechnique ============//
 csShaderTechnique::csShaderTechnique(csShader* owner, iObjectRegistry* reg)
 {
@@ -1012,7 +1050,7 @@ iShaderPass* csShaderTechnique::GetPass(int pass)
   return (iShaderPass*)passes->Get(pass);
 }
 
-bool csShaderTechnique::IsValid()
+bool csShaderTechnique::IsValid() const
 {
   bool valid = false;
   //returns true if all passes are valid
@@ -1079,6 +1117,28 @@ bool csShaderTechnique::Prepare()
   }
   return true;
 }
+
+csSymbolTable* csShaderTechnique::GetSymbolTable()
+{
+  return 0;
+}
+
+bool csShaderTechnique::AddVariable(iShaderVariable* variable)
+{
+  return false;
+}
+
+iShaderVariable* csShaderTechnique::GetVariable(int namehash)
+{
+  return 0;
+}
+
+csBasicVector csShaderTechnique::GetAllVariableNames() const
+{
+  csBasicVector vReturnValue;
+  return vReturnValue;
+}
+
 
 #undef STREAMMAX
 #undef TEXTUREMAX

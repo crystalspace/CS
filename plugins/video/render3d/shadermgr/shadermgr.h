@@ -25,6 +25,7 @@
 #include "csutil/scf.h"
 #include "csutil/objreg.h"
 #include "csutil/csstring.h"
+#include "csutil/util.h"
 #include "csgfx/symtable.h"
 
 #include "iutil/event.h"
@@ -425,7 +426,7 @@ public:
   virtual bool Prepare();
 };
 
-class csShaderVariable : iShaderVariable
+class csShaderVariable : public iShaderVariable
 {
 private:
   char *Name;
@@ -442,7 +443,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csShaderVariable (iBase *);
+  csShaderVariable ();
   virtual ~csShaderVariable ();
 
   virtual VariableType GetType() const { return Type; }
@@ -451,14 +452,14 @@ public:
   virtual int GetHash() const { return NameHash; }
 
   virtual void SetName(const char* n)
-    { if (Name) free (Name); Name = strdup (n); }
+    { delete[] Name; Name = csStrNew (n); }
   virtual const char* GetName() const { return Name; }
 
   virtual bool GetValue(int& value) const
     { CS_ASSERT(Type == INT); value = Int; return true; }
   virtual bool GetValue(float& value) const
     { CS_ASSERT(Type == FLOAT); value = Float; return true; }
-  virtual bool GetValue(iString* value) const
+  virtual bool GetValue(iString*& value) const
     { CS_ASSERT(Type == STRING); value = String; return true; }
   virtual bool GetValue(csVector3& value) const
     { CS_ASSERT(Type == VECTOR3); value = Vector3; return true; }

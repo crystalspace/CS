@@ -19,6 +19,10 @@
 #include "cssysdef.h"
 #include "csgfx/symtable.h"
 
+csSymbolTable::~csSymbolTable ()
+{
+}
+
 inline void csSymbolTable::SetParent (csSymbolTable *p)
 {
   Parent = p;
