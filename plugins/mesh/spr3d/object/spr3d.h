@@ -202,6 +202,9 @@ private:
   iMaterialWrapper* cstxt;
   iBase* logparent;
 
+  /// Cache name for caching sprite specific data.
+  char* cachename;
+
   /// An optional skeleton.
   csSkel* skeleton;
 
@@ -273,13 +276,16 @@ private:
   /// If true then this factory has been initialized.
   bool initialized;
 
+  void GenerateCacheName ();
+  const char* GetCacheName ();
+
 public:
   iObjectRegistry* object_reg;
 
 public:
-  /// Create the sprite template
+  /// Create the sprite template.
   csSprite3DMeshObjectFactory (iBase *pParent);
-  /// Destroy the template
+  /// Destroy the template.
   virtual ~csSprite3DMeshObjectFactory ();
 
   void Report (int severity, const char* msg, ...);

@@ -31,6 +31,13 @@
 #include "iengine/light.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
+#include "iutil/cache.h"
+#include "iutil/object.h"
+#include "iutil/vfs.h"
+#include "csutil/memfile.h"
+#include "csutil/csmd5.h"
+#include "iengine/mesh.h"
+#include "cssys/csendian.h"
 #include "qsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -185,6 +192,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   cstxt = NULL;
   emerge_from = NULL;
   skeleton = NULL;
+  cachename = NULL;
 
   texel_mesh = new csTriangleMesh2 ();
 
@@ -204,11 +212,59 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
 csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
 {
   delete texel_mesh;
-  delete [] emerge_from;
+  delete[] emerge_from;
   delete skeleton;
   delete tri_verts;
+  delete[] cachename;
 }
 
+void csSprite3DMeshObjectFactory::GenerateCacheName ()
+{
+  csMemFile mf;
+  long l;
+  l = convert_endian ((long)frames.Length ());
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)actions.Length ());
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)GetVertexCount ());
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((long)GetTriangleCount ());
+  mf.Write ((char*)&l, 4);
+
+  if (logparent)
+  {
+    iMeshFactoryWrapper* mw = SCF_QUERY_INTERFACE (logparent,
+    	iMeshFactoryWrapper);
+    if (mw)
+    {
+      if (mw->QueryObject ()->GetName ())
+        mf.Write (mw->QueryObject ()->GetName (),
+		strlen (mw->QueryObject ()->GetName ()));
+      mw->DecRef ();
+    }
+  }
+  
+  csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
+
+  delete[] cachename;
+  cachename = new char[33];
+  sprintf (cachename,
+  	"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+  	digest.data[0], digest.data[1], digest.data[2], digest.data[3],
+  	digest.data[4], digest.data[5], digest.data[6], digest.data[7],
+  	digest.data[8], digest.data[9], digest.data[10], digest.data[11],
+  	digest.data[12], digest.data[13], digest.data[14], digest.data[15]);
+}
+
+const char* csSprite3DMeshObjectFactory::GetCacheName ()
+{
+  if (!cachename)
+  {
+    GenerateCacheName ();
+  }
+  return cachename;
+}
+  
 void csSprite3DMeshObjectFactory::AddVertices (int num)
 {
   int frame;
@@ -493,7 +549,38 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
     return;
   }
 
-  GetFrame(frame)->SetNormalsCalculated (true);
+  GetFrame (frame)->SetNormalsCalculated (true);
+
+  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  char buf[100];
+  iCacheManager* cache_mgr = NULL;
+  if (engine)
+  {
+    cache_mgr = engine->GetCacheManager ();
+    engine->DecRef ();
+    sprintf (buf, "spr3dnormals_%d_%d", base, frame);
+    iDataBuffer* db = cache_mgr->ReadCache (buf, GetCacheName (), 0);
+    if (db)
+    {
+      csMemFile* cf = new csMemFile ((char*)db->GetData (), db->GetSize (),
+  	  csMemFile::DISPOSITION_IGNORE);
+      csVector3* fr_normals = GetNormals (frame);
+      for (i = 0; i < GetVertexCount(); i++)
+      {
+        float f;
+	csVector3 v;
+        cf->Read ((char*)&f, 4); v.x = convert_endian (f);
+        cf->Read ((char*)&f, 4); v.y = convert_endian (f);
+        cf->Read ((char*)&f, 4); v.z = convert_endian (f);
+	fr_normals[i].Set (v);
+      }
+
+      cf->DecRef ();
+      db->DecRef ();
+      return;
+    }
+  }
+
 
   csVector3* obj_verts  = GetVertices (frame);
   csVector3* base_verts = GetVertices (base);
@@ -567,6 +654,29 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   for (i = 0; i < GetVertexCount(); i++)
   {
     fr_normals[i].Set (fr_normals[merge[i]]);
+  }
+
+  if (cache_mgr)
+  {
+    csMemFile m;
+    iFile* mf = SCF_QUERY_INTERFACE ((&m), iFile);
+
+    csVector3* fr_normals = GetNormals (frame);
+    for (i = 0; i < GetVertexCount(); i++)
+    {
+      float f;
+      csVector3& v = fr_normals[i];
+      f = convert_endian (v.x);
+      mf->Write ((char *) &f, 4);
+      f = convert_endian (v.y);
+      mf->Write ((char *) &f, 4);
+      f = convert_endian (v.z);
+      mf->Write ((char *) &f, 4);
+    }
+
+    cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),
+  	  buf, GetCacheName (), 0);
+    mf->DecRef ();
   }
 
   delete[] tri_normals;

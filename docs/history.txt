@@ -4,6 +4,9 @@ The history order is reversed so that new features are at the top.
 	- Added a texture-less material (green_color) to flarge so that
 	  we can easily see if this still works or not. The skeletal
 	  spiny tree uses this color.
+	- Implemented caching of sprite normals (using SMOOTH()) option.
+	  This greatly speeds up load time of a sprite when the cached
+	  data is present.
 2-Apr-2002
 	- Eric Sunshine fixed a problem which caused a host of HTML pages in
 	  the user manual to be blank.  The culprit was a missing closing brace

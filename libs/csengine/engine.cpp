@@ -2195,19 +2195,12 @@ int csEngine::GetNearbyLights (
   float sqdist;
 
   // This is a static light array which is adapted to the
-
   // right size everytime it is used. In the beginning it means
-
   // that this array will grow a lot but finally it will
-
   // stabilize to a maximum size (not big). The advantage of
-
   // this approach is that we don't have a static array which can
-
   // overflow. And we don't have to do allocation every time we
-
   // come here. We register this memory to the 'cleanup' array
-
   // in csEngine so that it will be freed later.
   static csLightArray *light_array = NULL;
   if (!light_array)

@@ -172,7 +172,8 @@ void csTriangleVertex2::CalculateCost (csTriangleVertices2* vertices)
   cost = min_sq_dist;
 }
 
-csTriangleVertices2::csTriangleVertices2 (csTriangleMesh2* mesh, csVector3* verts, int num_verts)
+csTriangleVertices2::csTriangleVertices2 (csTriangleMesh2* mesh,
+	csVector3* verts, int num_verts)
 {
   vertices = new csTriangleVertex2 [num_verts];
   num_vertices = num_verts;
