@@ -73,7 +73,7 @@ class csPosixThread : public csThread
 class csPosixMutex : public csMutex
 {
  public:
-  csPosixMutex ();
+  csPosixMutex (bool needrecursive);
   virtual ~csPosixMutex ();
 
   virtual bool LockWait ();
@@ -87,6 +87,11 @@ class csPosixMutex : public csMutex
   bool Destroy ();
  protected:
   pthread_mutex_t mutex;
+#ifndef PTHREAD_HAS_RECURSIVE_NP
+  int count;
+  pthread_t owner;
+#endif
+  
   char const* lasterr;
   friend class csPosixCondition;
 };
