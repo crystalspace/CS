@@ -20,6 +20,10 @@ chronological order.
 	  back2front sorting. The sorting functions were casting the
 	  pointers wrong.
 	- Jorrit did some cleanups to glrender3d.
+	- Jorrit removed the assembly mmx routines for the Dynavis
+	  coverage buffer. They didn't appear to be working correctly
+	  anymore (at least with gcc 3.2) and the gain was minimal while
+	  complexity is a lot more.
 10-Sep-2003
 	- Philip Wyett made struct ShadowDrawVisCallback a friend to
 	  class csStencilShadowStep. This works round C2248 MSVC 6

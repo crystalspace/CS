@@ -2474,13 +2474,6 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	do_cull_ignoresmall ? "Enabled" : "Disabled");
     return true;
   }
-  else if (!strcmp (cmd, "toggle_mmx"))
-  {
-    csTiledCoverageBuffer::use_mmx = !csTiledCoverageBuffer::use_mmx;
-    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
-    	"%s mmx!", csTiledCoverageBuffer::use_mmx ? "Enabled" : "Disabled");
-    return true;
-  }
   else if (!strcmp (cmd, "toggle_frustum"))
   {
     do_cull_frustum = !do_cull_frustum;

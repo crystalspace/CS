@@ -246,138 +246,14 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
       tile_full = true;	// Assume full for now.
       csBits64* cc = coverage_cache;
       csBits64* c = coverage;
-#if defined(PROC_X86)
-      if (csTiledCoverageBuffer::use_mmx)
+      for (i = 0 ; i < 32 ; i++)
       {
-
-        csBits64 allOnes; allOnes.Full ();
-        // csBits64 temp;
-  #if defined(COMP_VC)
-        int i = (int) &this->tile_full;
-        __asm
-        {
-          // save state
-          push eax
-          push ecx
-          push esi
-          push edi
-
-          mov esi, [cc]
-          mov edi, [c]
-
-          mov ecx, 32
-
-          movq mm0, allOnes
-          mov eax, [fvalue]
-          movq mm1, [eax]
-          mov edx, ~0
-
-fillCol:
-
-          movq mm2, [edi] //1
-
-          movq mm3, mm2   //1
-          pxor mm1, [esi] // fvalue ^= *cc   //1
-          por mm3, mm1 // *c |= fvalue //1        
-          movq [edi], mm3 //1
-
-          pcmpeqd mm2, mm0 //1
-
-
-          movd eax, mm2 //1
-
-          psrlq mm2, 32 //1
-          and edx, eax //1
-
-          movd eax, mm2 //1
-          and edx, eax //1
-
-
-          add edi, 8
-          add esi, 8
-
-          loop fillCol
-
-          mov eax, [fvalue]
-          movq [eax], mm1
-          mov eax, [i] 
-          mov [eax], dl
-
-          // restore state
-          pop edi
-          pop esi
-          pop ecx
-          pop eax
-          emms
-        }
-  #endif // End of COMP_VC
-
-  #if defined(COMP_GCC)
-        csBits64 *fvalueTemp = &fvalue;
-        __asm__  (
-          "pushl %%eax                 \n"
-          "pushl %%ecx                 \n"
-          "pushl %%esi                 \n"
-          "pushl %%edi                 \n"
-          "movl %0, %%esi              \n"
-          "movl %1, %%edi              \n"
-          "movl $32, %%ecx             \n"
-
-          "movq %4, %%mm0              \n"
-          "movl %2, %%eax              \n"
-          "movq 0(%%eax), %%mm1        \n"
-          //"movq 0(%2), %%mm1           \n"
-          "movl $~0, %%edx             \n"
-          "fillCol:                    \n"
-          "movq 0(%%edi), %%mm2        \n" //1
-
-          "movq %%mm2,%%mm3            \n"   //1
-          "pxor 0(%%esi), %%mm1        \n" // fvalue ^= *cc   //1
-          
-          "por %%mm1, %%mm3            \n" // *c |= fvalue //1        
-          "movq %%mm3, 0(%%edi)        \n" //1
-          
-          "pcmpeqd %%mm0, %%mm2        \n" //1
-
-          "movd %%mm2, %%eax           \n" //1
-          "psrlq $32, %%mm2            \n" //1
-          "andl %%eax, %%edx           \n" //1
-          "movd %%mm2, %%eax           \n" //1
-          "andl %%eax, %%edx           \n" //1
-
-          "addl $8, %%edi              \n"
-          "addl $8, %%esi              \n"
-          "loop fillCol               \n"
-          "movl %2, %%eax              \n"
-          "movq %%mm1, 0(%%eax)        \n"
-          //"movq %%mm1, 0(%2)           \n"
-          "movb %%dl, %3               \n"
-
-          // restore state
-
-          "popl %%edi                  \n"
-          "popl %%esi                  \n"
-          "popl %%ecx                  \n"
-          "popl %%eax                  \n"
-          "emms                        \n"
-          : /* outputs */
-          : "g" (cc), "g" (c), "g" (fvalueTemp), "g" (tile_full), "g" (allOnes)
-          : "eax", "ecx", "esi", "edi", "edx");
-        //fvalue = fvalueTemp;
-  #endif // End of COMP_GCC
-      }
-      else
-#endif // End of PROC_X86
-      {
-        for (i = 0 ; i < 32 ; i++)
-        {
-          fvalue ^= *cc;
-          *c |= fvalue;
-          if (tile_full && !c->IsFull ())
-            tile_full = false;
-          cc++;
-          c++;
-        }
+        fvalue ^= *cc;
+        *c |= fvalue;
+        if (tile_full && !c->IsFull ())
+          tile_full = false;
+        cc++;
+        c++;
       }
     }
     else
@@ -394,142 +270,16 @@ fillCol:
       csBits64* cc = coverage_cache;
       csBits64* c = coverage;      
 
-#if defined(PROC_X86)
-      if (csTiledCoverageBuffer::use_mmx)
+      for (i = 0 ; i < 32 ; i++)
       {
-        
-        csBits64 allOnes; allOnes.Full ();
-        // csBits64 temp;
-  #if defined(COMP_VC)
-        int i = (int) &this->tile_full;
-        __asm
-        {
-          // save state
-          push eax
-          push ecx
-          push esi
-          push edi
-
-          mov esi, [cc]
-          mov edi, [c]
-
-          mov ecx, 32
-
-          movq mm0, allOnes
-          mov eax, [fvalue]
-          movq mm1, [eax]
-          mov edx, ~0
-
-fillCol2:
-
-          movq mm2, [edi] //1
-
-          movq mm3, mm2   //1
-          pxor mm1, [esi] // fvalue ^= *cc   //1
-          pandn mm2, mm1 // *cc = ~*c & fvalue //1
-          por mm3, mm1 // *c |= fvalue //1        
-          movq [edi], mm3 //1
-          movq [esi], mm2 //1
-
-          pcmpeqd mm2, mm0 //1
-
-
-          movd eax, mm2 //1
-
-          psrlq mm2, 32 //1
-          and edx, eax //1
-
-          movd eax, mm2 //1
-          and edx, eax //1
-
-
-          add edi, 8
-          add esi, 8
-
-          loop fillCol2
-
-          mov eax, [fvalue]
-          movq [eax], mm1
-          mov eax, i
-          mov [eax], dl
-
-          // restore state
-          pop edi
-          pop esi
-          pop ecx
-          pop eax
-          emms
-        }
-  #endif // End of COMP_VC
-
-  #if defined(COMP_GCC_disable)	// Disabled: doesn't work on linux in optimize mode!!! (Jorrit)
-        csBits64 *fvalueTemp = &fvalue;
-        __asm__  (
-          "pushl %%eax                 \n"
-          "pushl %%ecx                 \n"
-          "pushl %%esi                 \n"
-          "pushl %%edi                 \n"
-          "movl %0, %%esi              \n"
-          "movl %1, %%edi              \n"
-          "movl $32, %%ecx             \n"
-
-          "movq %4, %%mm0              \n"
-          "movl %2, %%eax              \n"
-          "movq 0(%%eax), %%mm1        \n"          
-          //"movq %2, %%mm1           \n"
-          "movl $~0, %%edx             \n"
-          "fillCol2:                   \n"
-          "movq 0(%%edi), %%mm2        \n" //1
-
-          "movq %%mm2,%%mm3            \n"   //1
-          "pxor 0(%%esi), %%mm1        \n" // fvalue ^= *cc   //1
-          "pandn %%mm1, %%mm2          \n" // *cc = ~*c & fvalue //1
-          "por %%mm1, %%mm3            \n" // *c |= fvalue //1        
-          "movq %%mm3, 0(%%edi)        \n" //1
-          "movq %%mm2, 0(%%esi)        \n" //1
-          "pcmpeqd %%mm0, %%mm2        \n" //1
-
-          "movd %%mm2, %%eax           \n" //1
-          "psrlq $32, %%mm2            \n" //1
-          "andl %%eax, %%edx           \n" //1
-          "movd %%mm2, %%eax           \n" //1
-          "andl %%eax, %%edx           \n" //1
-
-          "addl $8, %%edi              \n"
-          "addl $8, %%esi              \n"
-          "loop fillCol2               \n"
-          "movl %2, %%eax              \n"
-          "movq %%mm1, 0(%%eax)        \n"
-          //"movq %%mm1, 0(%2)           \n"
-          "movb %%dl, %3               \n"
-
-          // restore state
-
-          "popl %%edi                  \n"
-          "popl %%esi                  \n"
-          "popl %%ecx                  \n"
-          "popl %%eax                  \n"
-          "emms                        \n"
-          : /* outputs */
-          : "g" (cc), "g" (c), "g" (fvalueTemp), "g" (tile_full), "g" (allOnes)
-          : "eax", "ecx", "esi", "edi", "edx");
-          //fvalue = fvalueTemp;
-  #endif // End of COMP_GCC.
-      }
-      else
-#endif // End of PROC_X86
-      {  
-        for (i = 0 ; i < 32 ; i++)
-        {
-          fvalue ^= *cc;
-          *cc = fvalue;
-          cc->AndInverted (*c);
-          *c |= fvalue;
-          if (tile_full && !c->IsFull ())
-            tile_full = false;
-          cc++;
-          c++;
-        }
+        fvalue ^= *cc;
+        *cc = fvalue;
+        cc->AndInverted (*c);
+        *c |= fvalue;
+        if (tile_full && !c->IsFull ())
+          tile_full = false;
+        cc++;
+        c++;
       }
       // Now do the depth update. Here we will use the coverage_cache
       // to see where we need to update the depth buffer. The coverage_cache
@@ -926,8 +676,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csTiledCoverageBuffer::DebugHelper)
   SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-bool csTiledCoverageBuffer::use_mmx = false;
-
 csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -939,10 +687,6 @@ csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h)
   bugplug = 0;
 
   Setup (w, h);
-#if defined(PROC_X86)
-  use_mmx = csProcessorCapability::HasMMX ();
-  //printf ("use_mmx=%d\n", use_mmx); fflush (stdout);
-#endif // End of PROC_X86
 }
 
 csTiledCoverageBuffer::~csTiledCoverageBuffer ()
