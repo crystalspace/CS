@@ -458,13 +458,31 @@ public:
       return element < size || bucket < hash->Elements.Length ();
     }
 
+    /// Advance the iterator of one step
+    void Advance ()
+    {
+      element++;
+      FindItem ();
+    }
+
+    /// Get the next element's value, don't move the iterator.
+    const T& NextNoAdvance ()
+    {
+      return hash->Elements[bucket][element].value;
+    }
+
     /// Get the next element's value.
     const T& Next ()
     {
-      const T &ret = hash->Elements[bucket][element].value;
-      element++;
-      FindItem ();
+      const T &ret = NextNoAdvance ();
+      Advance ();
       return ret;
+    }
+
+    const T& NextNoAdvance (K &key)
+    {
+      key = hash->Elements[bucket][element].key;
+      return NextNoAdvance ();
     }
 
     /// Get the next element's value and key.
@@ -479,11 +497,21 @@ public:
   };
   friend class GlobalIterator;
 
+  /// Delete the element pointed by the iterator. This is safe for this
+  /// iterator, not for the others.
+  void DeleteElement (GlobalIterator iterator)
+  {
+    Elements[iterator.bucket].DeleteIndex(iterator.element);
+    Size--;
+    iterator.size--;
+    iterator.FindItem ();
+  }
+
   /**
    * Return an iterator for the hash, to iterate only over the elements
    * with the given key.
-   * Modifying the hash while you have open iterators
-   * will cause undefined behaviour.
+   * Modifying the hash (except with DeleteElement) while you have open 
+   * iterators will cause undefined behaviour.
    */
   Iterator GetIterator (const K& key) const
   {
@@ -492,8 +520,8 @@ public:
 
   /**
    * Return an iterator for the hash, to iterate over all elements.
-   * Modifying the hash while you have open iterators
-   * will cause undefined behaviour.
+   * Modifying the hash (except with DeleteElement) while you have open 
+   * iterators will cause undefined behaviour.
    */
   GlobalIterator GetIterator () const
   {
@@ -609,5 +637,6 @@ public:
     return GlobalIterator(this);
   }
 };
+
 
 #endif
