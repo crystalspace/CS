@@ -19,6 +19,7 @@ chronological order.
 	  result in failure on some platforms, such as Windows. Reported by
 	  Lukas Erlinghagen. (bug #1032928)
 	- Eric Sunshine updated URL for libmng in extlibs.txi.
+	- Jorrit propagated a fix to frustvis from res2k to dynavis too.
 22-Sep-2004
 	- Jorrit changed the loader so that it only prints certain
 	  notifications if -verbose is given on the commandline. These

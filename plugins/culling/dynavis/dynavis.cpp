@@ -113,7 +113,7 @@ public:
 
   virtual iVisibilityObject* Next()
   {
-    if (position < 0) return 0;
+    if (position == (size_t)-1) return 0;
     iVisibilityObject* vo = vector->Get (position);
     position++;
     if (position == vector->Length ())
