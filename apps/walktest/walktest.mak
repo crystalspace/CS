@@ -5,17 +5,18 @@ DESCRIPTION.walktest = Crystal Space WalkTest demo
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make walktest     Make the $(DESCRIPTION.walktest)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make walktest     Make the $(DESCRIPTION.walktest)$"
 
 PSEUDOHELP += $(NEWLINE) \
-  echo $"  make walkall      Make WalkTest and all plug-ins it requires$"
+  echo $"  make walkall      Make WalkTest and plugins it requires$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: walktest walktestclean
+.PHONY: walktest walktestclean walkall
 
 walkall: walktest vfs soft3d softcanvas csfont csconin simpcon perfstat \
   rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg csbmpimg reporter \
