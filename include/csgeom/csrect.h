@@ -90,7 +90,7 @@ public:
   void Exclude (int ixmin, int iymin, int ixmax, int iymax);
 
   /// Same but works on a csRect argument
-  inline void Exclude (csRect &other)
+  inline void Exclude (const csRect &other)
   { Exclude (other.xmin, other.ymin, other.xmax, other.ymax); }
 
   /**
