@@ -142,7 +142,7 @@ public:
     virtual void GetSettings(csVector3& a, csVector3& b) 
     {a=scfParent->min; b=scfParent->max;}
   } scfiHazeHullBox;
-  friend HazeHullBox;
+  friend class HazeHullBox;
 };
 
 /** cone haze hull */
@@ -167,7 +167,7 @@ public:
     {nr = scfParent->nr_sides; a=scfParent->start; b=scfParent->end;
      ra = scfParent->start_radius; rb = scfParent->end_radius;}
   } scfiHazeHullCone;
-  friend HazeHullCone;
+  friend class HazeHullCone;
 };
 
 

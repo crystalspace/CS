@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+17-Aug-2001
+	- Integrated a few patches from Matze Braun <matze@braunis.de>
+	  to make sure that CS compiles cleanly with gcc3.0. To enable
+	  one patch for timing you have to add -DCOMP_GCC3 to the
+	  commandline for compiling or else you have to edit
+	  libs/cssys/unix/utiming.cpp and make the define there.
+	  This should be done automatically by the makefile (configure
+	  time) but I don't know how to do this.
 16-Aug-2001
 	- Eric Sunshine made the following changes to the Texinfo user's
 	  manual:

@@ -21,15 +21,26 @@
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
 
+// Define this if we have GCC3.
+// @@@ We need to change the makefile to detect this automatically!
+#ifndef COMP_GCC3
+#define COMP_GCC3 0
+#endif
+
+#if COMP_GCC3
+extern "C"
+{
+  extern long int __sysconf (int);
+}
+#endif
+
 // This function should return milliseconds since some specific time
 csTicks csGetTicks ()
 {
-#if 0
-  struct timeval tv;
-  gettimeofday (&tv, NULL);
-  return tv.tv_sec * 1000 + tv.tv_usec / 1000;
-#else
   struct tms buf;
+#if COMP_GCC3
+  return times (&buf) * 1000 / ((__clock_t) __sysconf(2));
+#else
   return times (&buf) * 1000 / CLK_TCK;
 #endif
 }

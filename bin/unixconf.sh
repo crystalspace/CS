@@ -60,9 +60,9 @@ esac
 echo "PROC = ${PROC}"
 
 # Find the C++ compiler
+[ -z "${CXX}" ] && CXX=`which g++ 2>&1 | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which gcc 2>&1 | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which egcs 2>&1 | grep -v "[Nn]o"`
-[ -z "${CXX}" ] && CXX=`which g++ 2>&1 | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which c++ 2>&1 | grep -v "[Nn]o"`
 
 if [ -z "${CXX}" ]; then
@@ -79,8 +79,11 @@ echo "LINK = ${CXX}"
 echo "int main () {}" >conftest.cpp
 
 # Check for machine-specific C compiler flags
+(echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mcpu=pentiumpro -march=i686 conftest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentiumpro -march=i686") || \
 (echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mpentiumpro -march=i686 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentiumpro -march=i686") || \
+(echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mcpu=pentium -march=i586 conftest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentium -march=i586") || \
 (echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mpentium -march=i586 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentium -march=i586") || \
+(echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -mcpu=486 conftest.cpp && echo "CFLAGS.SYSTEM += -mcpu=486") || \
 (echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -m486 conftest.cpp && echo "CFLAGS.SYSTEM += -m486") || \
 (echo "$MACHINE" | grep -s alpha >/dev/null && ${CXX} -c -mieee conftest.cpp && echo "CFLAGS.SYSTEM += -mieee")
 
