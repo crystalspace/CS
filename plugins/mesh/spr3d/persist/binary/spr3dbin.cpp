@@ -339,6 +339,21 @@ iBase* csSprite3DBinFactoryLoader::Parse (const char* string,
     spr3dLook->AddTriangle (a, b, c);
   }
 
+  // Read the number of sockets
+  int socket_count = convert_endian(*((int32 *)p)); p += sizeof(int);
+
+  for(i=0; i<socket_count; i++)
+  {
+    char name[64];
+    strcpy(name, p);
+    p += strlen(name) + 1;
+    
+    int a = convert_endian(*((int32 *)p)); p += sizeof(int);
+    
+    iSpriteSocket* socket = spr3dLook->AddSocket();
+    socket->SetName(name);
+    socket->SetTriangleIndex(a);
+  }
 
   /// @@@ Cannot retrieve smoothing information.
   /// SMOOTH()
@@ -498,6 +513,21 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
     file->Write ((char *)&idx, 4);
   }
 
+  // Write out the number of sockets
+  int socket_count = state->GetSocketCount();
+  int sc = convert_endian((int32)socket_count);
+  file->Write ((char *)&sc, 4);
+
+  for (i=0; i<socket_count; i++)
+  {
+    name = state->GetSocket(i)->GetName();
+    file->Write (name, strlen(name) + 1);
+
+    int idx;
+    idx = convert_endian((int32)state->GetSocket(i)->GetTriangleIndex());
+    file->Write ((char *)&idx, 4);
+    
+  }
   /// @@@ Cannot retrieve smoothing information.
   /// SMOOTH()
   /// SMOOTH(baseframenr)
