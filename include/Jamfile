@@ -12,9 +12,9 @@ Recurse InstallHeader : .h .i .inc .fun ;
 
 # A list of headers which should not appear in any master-header, either
 # because they reference external resources (which causes build-time problems
-# if the preprocessor does not know where to find those resources), or because
+# if the preprocessor does not know where to find those resources), because
 # they are specialized polymorphic files intended for inclusion several times
-# under different contexts.
+# under different contexts, or because they are deprecated.
 CS_MASTER_HEADER_REJECTS =
   [ ConcatDirs cstool tokenlist.h ]
   [ ConcatDirs csutil archive.h ]
