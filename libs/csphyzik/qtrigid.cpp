@@ -109,13 +109,6 @@ void ctQuatRigidBody::Precalculate() {
   if(precalculated) return;
   quat.Normalize();
   R = quat.to_matrix();
-  static int ictr = 0;
-  ictr++;
-  if(!(ictr%50)) {
-    printf("R Matrix:\n");
-
-    printf("--------\n");
-  }
   Iinv = R * Ibodyinv * R.get_transpose();
   omega = Iinv * ang;
   precalculated = true;
