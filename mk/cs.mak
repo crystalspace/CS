@@ -185,7 +185,6 @@ api:
 		libs/csengine/polygon/polytext.h libs/csengine/polygon/polyplan.h \
 		libs/csengine/wirefrm.h \
 		libs/csengine/colldet/being.h libs/csengine/colldet/collider.h \
-		libs/csengine/colldet/collp.h \
 		libs/csutil/csvector.h \
 		$(wildcard include/csobject/*.h) \
 		$(wildcard include/csgeom/*.h)
