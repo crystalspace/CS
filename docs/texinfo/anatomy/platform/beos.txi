@@ -10,7 +10,7 @@
 
 @emph{Written by David Huen, @email{smh1008@@cus.cam.ac.uk}; heavily amended
 by Eric Sunshine, @email{sunshine@@sunshineco.com}, after Eric performed a
-major overhaul and re-engineering of the port.  Last updated 13 April 2000.}
+major overhaul and re-engineering of the port.  Last updated 12 May 2000.}
 
 This section attempts to explain some of the inner workings of the @BeOS{}
 port of Crystal Space.  Configuration, compilation, and installation
@@ -172,12 +172,6 @@ as time permits.
 
 @itemize @bullet
 @item
-The @BeOS{} system driver should determine the directory in which the
-application resides, and set that as the current working directory.  This
-would (presumably) allow the programs to be launched from the Tracker
-application by merely double-clicking on them.
-
-@item
 Add full-screen support for software mode.  Be careful about the resolution,
 since Crystal Space can use any arbitrary window dimension.
 
@@ -195,10 +189,6 @@ correctly even when paused.
 The various 2D graphics drivers (software, OpenGL, Glide) should all be
 derived from a common class rather than being nearly identical copies of one
 another.
-
-@item
-It is probably safe to remove @file{Crystal.rsrc} from @file{libs/cssys} since
-it is unused at this time.
 
 @item
 Consider using @samp{DirectWindow} rather than @samp{DirectBitmap} where

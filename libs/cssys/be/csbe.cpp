@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <time.h>
+#include <unistd.h>
 #include <sys/param.h>
 #include <Application.h>
 #include <Beep.h>
@@ -30,7 +31,7 @@
 #include "sysdef.h"
 #include "cssys/system.h"
 #include "csbe.h"
-#include "csutil/inifile.h"
+#include "csutil/util.h"
 
 #define CSBE_MOUSE_BUTTON_COUNT 3
 
@@ -318,6 +319,17 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver(), running(false)
 {
   app = new CrystApp (this);
 };
+
+bool SysSystemDriver::Initialize (int argc, const char* const argv[],
+    const char *iConfigName)
+{
+  char path[MAXPATHLEN];
+  char name[MAXPATHLEN];
+  splitpath(argv[0], path, sizeof(path), name, sizeof(name));
+  if (strlen(path) > 0)
+    chdir(path);
+  return superclass::Initialize(argc, argv, iConfigName);
+}
 
 static int32 begin_loop(void* data)
 {

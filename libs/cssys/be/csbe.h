@@ -30,13 +30,15 @@ class CrystApp;
 
 class SysSystemDriver : public csSystemDriver, public iBeLibSystemDriver
 {
+  typedef csSystemDriver superclass;
 protected:
   bool running;
   CrystApp* app;
 
 public:
   SysSystemDriver ();
-
+  virtual bool Initialize (int argc, const char* const argv[],
+    const char *iConfigName);
   DECLARE_IBASE_EXT (csSystemDriver);
 
   // Main event loop
