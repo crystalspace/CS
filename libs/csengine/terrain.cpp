@@ -292,21 +292,21 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
       continue;
     poly.num = rescount;
 
-    poly.vertices[0].z = p1->z;
+    poly.vertices[0].z = pz[0]; //p1->z;
     poly.vertices[0].u = t1[0];
     poly.vertices[0].v = t1[1];
     poly.vertices[0].r = 1;//c1[0];
     poly.vertices[0].g = 1;//c1[1];
     poly.vertices[0].b = 1;//c1[2];
 
-    poly.vertices[1].z = p2->z;
+    poly.vertices[1].z = pz[1]; //p2->z;
     poly.vertices[1].u = t2[0];
     poly.vertices[1].v = t2[1];
     poly.vertices[1].r = 1;//c2[0];
     poly.vertices[1].g = 1;//c2[1];
     poly.vertices[1].b = 1;//c2[2];
 
-    poly.vertices[2].z = p3->z;
+    poly.vertices[2].z = pz[2]; //p3->z;
     poly.vertices[2].u = t3[0];
     poly.vertices[2].v = t3[1];
     poly.vertices[2].r = 1;//c3[0];

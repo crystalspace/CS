@@ -12,6 +12,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+15-Mar-2000
+	- Fixed bug in terrain interface to terrain engine. Now passes
+	  1/z instead of z. This fixes the OpenGL clipping bug and also
+	  makes the terrain appear better now.
 14-Mar-2000
 	- Michael Dale Long did a major rewrite of the iEntityManager
 	  interface.  Replaced Entity and Render lists with "associative
@@ -30,6 +34,8 @@ Short-term cleanups that need to be done:
 	  the proper mapping parameters of the polys when user presses Ok
 	  button :-)
 	- Eric Sunshine eliminated several new compilation warnings.
+	- Eric also updated new documentation from Martin Geisse.
+	- Thomas Hieber fixed an exit-crash bug in the D3D 6.1 texture cache.
 13-Mar-2000
 	- Further implemented csSolidBsp.
 	- Added the new csSolidBsp as a new 2D culler next to the quadtree,
