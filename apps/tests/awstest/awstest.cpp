@@ -72,7 +72,7 @@ const int AWSTEST_MULTIPROC  = 0;
 const int AWSTEST_SINGLEPROC = 1;
 const int AWSTEST_SCREEN     = 2;
 
-const int AWSTEST_CANVAS=AWSTEST_SCREEN;
+const int AWSTEST_CANVAS=AWSTEST_SINGLEPROC;
 
 //-----------------------------------------------------------------------------
 
@@ -131,7 +131,7 @@ awsTest::~awsTest()
 {
   SCF_DEC_REF (vc);
   SCF_DEC_REF (view);
-  SCF_DEC_REF (wawview);
+  SCF_DEC_REF (wview);
   SCF_DEC_REF (font);
   SCF_DEC_REF (aws);
   SCF_DEC_REF (loader);
