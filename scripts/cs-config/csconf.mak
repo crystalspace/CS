@@ -47,7 +47,7 @@ $(CSCONFIG.EXE):
 	@echo $"# Note: automatically generated. $" >> out/csconfig.tmp
 	@echo $"EXE=$(EXE)$" >> out/csconfig.tmp
 	@echo $"DLL=$(DLL)$" >> out/csconfig.tmp
-	@echo $"LFLAGS.EXE=$(LFLAGS.EXE")$" >> out/csconfig.tmp
+	@echo $"LFLAGS.EXE=$(LFLAGS.EXE)$" >> out/csconfig.tmp
 	@echo $"DO.SHARED.PLUGIN.PREAMBLE=$(DO.SHARED.PLUGIN.PREAMBLE)$" >> out/csconfig.tmp
 	@echo $"DO.SHARED.PLUGIN.POSTAMBLE=$(DO.SHARED.PLUGIN.POSTAMBLE)$" >> out/csconfig.tmp
 	@echo $"LIBS.EXE.PLATFORM=$(LIBS.EXE.PLATFORM)$" >> out/csconfig.tmp
@@ -60,8 +60,8 @@ else
 endif
 	@echo $"PLUGIN.POSTFLAGS=$(PLUGIN.POSTFLAGS)$" >> out/csconfig.tmp
 
-	$(RUN_SCRIPT) scripts/cs-config/genscript.sh "$(INSTALL_DIR)" \
-	"$(CXXFLAGS)" "$(CFLAGS)" "$(LIBS.EXE)" scripts/cs-config
+	$(RUN_SCRIPT) scripts/cs-config/genscript.sh $"$(INSTALL_DIR)$" \
+	$"$(CXXFLAGS)$" $"$(CFLAGS)$" $"$(LIBS.EXE)$" scripts/cs-config
 	$(RM) out/csconfig.tmp
 
 csconfigclean:
