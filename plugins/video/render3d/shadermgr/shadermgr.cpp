@@ -446,7 +446,6 @@ bool csShader::Load(iDocumentNode* node)
         {
           csRef<iShaderTechnique> tech = CreateTechnique();
           tech->Load(child);
-          techniques->Push(tech);
         }
         break;
       case XMLTOKEN_DECLARE:
