@@ -123,7 +123,14 @@ IMPLEMENT_IBASE_END
 class csIsoFakeRenderView : public iRenderView {
   iCamera *fakecam;
   iIsoRenderView *isorview;
-
+  /**
+   * A callback function. If this is set then no drawing is done.
+   * Instead the callback function is called.
+   */
+  csDrawFunc* callback;
+  /// Userdata belonging to the callback.
+  void* callback_data;
+  
 public:
   DECLARE_IBASE;
   csIsoFakeRenderView() {}
@@ -196,6 +203,23 @@ public:
   virtual void DeleteRenderContextData (void* key)
   {
     (void)key;
+  }
+  virtual void SetCallback (csDrawFunc* cb, void* cbdata)
+  {
+    callback = cb;
+    callback_data = cbdata;
+  }
+  virtual csDrawFunc* GetCallback ()
+  {
+    return callback;
+  }
+  virtual void* GetCallbackData ()
+  {
+    return callback_data;
+  }
+  virtual void CallCallback (int type, void* data)
+  {
+    callback (this, type, data);
   }
 };
 
