@@ -5,8 +5,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 PLUGINHELP += \
-$(NEWLINE)echo $"  make partphys_ode$" \
-$(NEWLINE)echo $"                    Make the $(DESCRIPTION.partphys_ode)$"
+  $(NEWLINE)echo $"  make partphys_ode Make the $(DESCRIPTION.partphys_ode)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -37,7 +36,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(PARTPHYS_ODE)
 endif
 
-DIR.PARTPHYS_ODE = plugins/mesh/particles/physics/simple
+DIR.PARTPHYS_ODE = plugins/mesh/particles/physics/ode
 OUT.PARTPHYS_ODE = $(OUT)/$(DIR.PARTPHYS_ODE)
 INF.PARTPHYS_ODE = $(SRCDIR)/$(DIR.PARTPHYS_ODE)/partphys_ode.csplugin
 INC.PARTPHYS_ODE = $(wildcard $(SRCDIR)/$(DIR.PARTPHYS_ODE)/*.h)
