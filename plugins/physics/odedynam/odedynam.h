@@ -342,7 +342,7 @@ public:
     const csVector3 GetTorque () const
     { return scfParent->GetTorque (); }
     void AttachMesh (iMeshWrapper* mesh) 
-    { return scfParent->AttachMesh (mesh); }
+    { scfParent->AttachMesh (mesh); }
     csRef<iMeshWrapper> GetAttachedMesh () 
     { return scfParent->GetAttachedMesh (); }
     void AttachBone (iSkeletonBone* bone) 
