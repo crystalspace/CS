@@ -28,6 +28,10 @@ chronological order.
 	- Eric Sunshine enhanced snapshot.py so that it generates a checksum
 	  file for each archiver directory. The checksum file contains MD5
 	  checksums of all packages exported by that directory.
+	- Eric Sunshine added a StripCommon rule to helper.jam. Given two
+	  lists, it strips from the beginning of list-1 items which it has in
+	  common with the beginning of list-2 and returns what remains of
+	  list-1.
 22-Mar-2005
 	- Jorrit removed the slow RAPID and memory consuming collision
 	  detection plugin. OPCODE is now a lot better.

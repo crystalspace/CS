@@ -271,6 +271,17 @@ rule Sort
   return $(sorted) ;
 }
 
+##  StripCommon list1 : list2
+##    Strips from the beginning of list1 the items which it has in common with
+##    the beginning of list2 and returns what remains of list1.
+rule StripCommon
+{
+  local l = $(<) ;
+  local r = $(>) ;
+  FStripCommon l : r ;
+  return $(l) ;
+}
+
 ##  MasterHeader header [ : files [ : pre-boilerplate [ : post-boilerplate
 ##                      [ : options ]]]]
 ##    Given a list of 'files', construct a 'header' file which #includes those
