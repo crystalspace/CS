@@ -3,6 +3,8 @@
 #include "vossector.h"
 #include "vosobject3d.h"
 #include "voscube.h"
+#include "vostexture.h"
+#include "vosmaterial.h"
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
@@ -42,8 +44,13 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
 {
     Site::removeRemoteMetaObjectFactory("a3dl:object3D", &A3DL::Object3D::new_Object3D);
     Site::removeRemoteMetaObjectFactory("a3dl:object3D.cube", &A3DL::Cube::new_Cube);
+    Site::removeRemoteMetaObjectFactory("a3dl:texture", &A3DL::Texture::new_Texture);
+    Site::removeRemoteMetaObjectFactory("a3dl:material", &A3DL::Material::new_Material);
+
     Site::addRemoteMetaObjectFactory("a3dl:object3D", "a3dl:object3D", &csMetaObject3D::new_csMetaObject3D);
     Site::addRemoteMetaObjectFactory("a3dl:object3D.cube", "a3dl:object3D.cube", &csMetaCube::new_csMetaCube);
+    Site::addRemoteMetaObjectFactory("a3dl:texture", "a3dl:texture", &csMetaTexture::new_csMetaTexture);
+    Site::addRemoteMetaObjectFactory("a3dl:material", "a3dl:material", &csMetaMaterial::new_csMetaMaterial);
 
     objreg = o;
     eventq = CS_QUERY_REGISTRY (objreg, iEventQueue);

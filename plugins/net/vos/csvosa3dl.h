@@ -29,6 +29,8 @@ public:
     virtual csRef<iVosSector> GetSector(const char* s);
     virtual bool Initialize (iObjectRegistry *objreg);
     virtual bool HandleEvent (iEvent &ev);
+
+    csRef<iObjectRegistry> GetObjectRegistry() { return objreg; }
 };
 
 #endif

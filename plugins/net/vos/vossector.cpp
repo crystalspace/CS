@@ -16,13 +16,15 @@ class LoadSectorTask : public Task
 public:
     csVosA3DL* vosa3dl;
     char* url;
-    LoadSectorTask(csVosA3DL* va, char* u);
+    csRef<csVosSector> sector;
+
+    LoadSectorTask(csVosA3DL* va, char* u, csVosSector* vs);
     virtual ~LoadSectorTask();
     virtual void doTask();
 };
 
-LoadSectorTask::LoadSectorTask(csVosA3DL* va, char* u)
-    : vosa3dl(va)
+LoadSectorTask::LoadSectorTask(csVosA3DL* va, char* u, csVosSector* vs)
+    : vosa3dl(va), sector(vs)
 {
     url = strdup(u);
 }
@@ -39,8 +41,10 @@ void LoadSectorTask::doTask()
     {
         vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>((*ci)->getChild());
         std::cout << "looking at " << (*ci)->getChild()->getURLstr() << " " << obj3d.isValid() << std::endl;
-        if(obj3d.isValid())
-            obj3d->setup(vosa3dl);
+
+        if(obj3d.isValid()) {
+            obj3d->setup(vosa3dl, (csVosSector*)sector);
+        }
     }
 }
 
@@ -64,7 +68,7 @@ csVosSector::~csVosSector()
 
 void csVosSector::Load()
 {
-    TaskQueue::defaultTQ.addTask(new LoadSectorTask(vosa3dl, url));
+    TaskQueue::defaultTQ.addTask(new LoadSectorTask(vosa3dl, url, this));
 }
 
 csRef<iSector> csVosSector::GetSector()

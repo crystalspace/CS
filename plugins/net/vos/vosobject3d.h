@@ -5,6 +5,7 @@
 #include "inetwork/vosa3dl.h"
 #include "iengine/mesh.h"
 #include "csvosa3dl.h"
+#include "vossector.h"
 
 class csVosObject3D : public iVosObject3D
 {
@@ -28,12 +29,12 @@ protected:
     csVosObject3D* csvobj3d;
 public:
     csMetaObject3D(VOS::VobjectBase* superobject);
-    virtual csMetaObject3D();
+    virtual ~csMetaObject3D();
 
     static VOS::MetaObject* new_csMetaObject3D(VOS::VobjectBase* superobject, const std::string& type);
 
-    virtual void setup(csVosA3DL* vosa3dl);
-    csRef<iVosObject3D> getCSinterface();
+    virtual void setup(csVosA3DL* vosa3dl, csVosSector* sect);
+    csRef<csVosObject3D> getCSinterface();
 };
 
 #endif

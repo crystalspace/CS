@@ -2,10 +2,11 @@ SubDir TOP plugins net vos ;
 
 if $(VOS.AVAILABLE) = "yes"
 {
+
 Help csvosa3dl : "Virtual Object System abstract 3D layer" ;
 
 Plugin csvosa3dl : [ Wildcard *.cpp *.h ] ;
 
-LinkWith csvosa3dl : csutil ;
+LinkWith csvosa3dl : csutil csgeom ;
 ExternalLibs csvosa3dl : VOS  ;
 }
