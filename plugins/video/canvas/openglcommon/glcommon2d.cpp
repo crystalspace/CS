@@ -68,8 +68,7 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
 csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 {
   Close ();
-  if (EventOutlet)
-    EventOutlet->DecRef ();
+  
   delete statecache;
 }
 
