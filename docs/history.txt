@@ -1,7 +1,34 @@
 The history order has been reversed so that new features are at the top.
+
+5-Jun-2000
+	- Added a few const methods to csPoly2D as well.
+	- Added a speed improvement to PVS. Before considering an
+	  occluder (octree node) and the contents of that occluder we
+	  first cast a shadow from that occluder on the plane. If the
+	  shadow is non-existant (i.e. the plane is too far away from the
+	  node) then the node will not be considered as a potential
+	  occluder. If the shadow does exist then CS will also first test
+	  it against the c-buffer on the plane to see if that part of
+	  the c-buffer still contains unshadowed parts. If not then it
+	  makes no sense to consider this occluder either.
 4-Jun-2000
+	- Fixed serious bug with csPoly2D::Intersect() and csPoly2D::
+	  ClipPlane() that could cause clipping errors in some cases.
+	  This bug probably caused the bugs in the solid 2D BSP tree
+	  that I never managed to find in the past.
+	- Did an optimization reported to me by Norman Kramer with
+	  regards to backface culling polygons. This happens throughout
+	  CS and should increase performance a tiny bit (maybe not
+	  noticable).
+	- Removed a few unneeded methods in csPolyPlane. These methods
+	  are only shortcuts to csPlane3 and are a little confusing
+	  to have. Removed csPolyPlane::VisibleFromPoint(),
+	  csPolyPlane::Classify() and csPolyPlane::Distance().
+	- Concluded implementation of csPoly2D::ExtendConvex().
+	- Further work on adjacent polygon merging for PVS. Not
+	  finished.
 	- Samuel Humphreys has been busy with the opengl drivers:
-            - rewrote the ogl backbuffer dynamic texture implementation, it now
+            - Rewrote the ogl backbuffer dynamic texture implementation, it now
               inherits from csGraphics3DOGLCommon and implements a dummy 
               iGraphics2D which transforms vertex info to lower bottom left 
               subregion of back buffer, and reports correctly width and height
@@ -9,15 +36,39 @@ The history order has been reversed so that new features are at the top.
               ogl_g3dcom.* and ogl_g3d.* Also two new private functions are
               added SharedInitialize and SharedOpen which have the same 
               functionality as those in the software drivers.
-              The engine now renders to backbuffer 
-              textures, but they are still inverted and have corrupt colour 
-              information.
+              The engine now renders to backbuffer textures, but they are
+	      still inverted and have corrupt colour information.
             - Added verbose visual information reporting to glx. Now reports 
               about auxiliary buffers and properly fills in pfmt.
-            - The ogl texture manager now detects and deals with maximum texture
-              constraints i.e. my voodoo2's 256x256 :)
+            - The ogl texture manager now detects and deals with maximum
+	      texture constraints i.e. my voodoo2's 256x256 :)
             - Removed old software dynamic texture implementation.
-            - Small fixes for canvas/common & dtsimple
+            - Small fixes for canvas/common & dtsimple.
+	- Wouter Wijngaards contributed newest radiosity version. Works
+	  for portal levels. Now source patch size can be specified, say at
+	  16x16 lumels. It allows radiosity to work in 16x16 lightmapsize
+	  mode. Default is 2x2 lumels, but cryst.cfg has a 16x16 lumels.
+	  Note that the destination patch size is still 1x1 lumel, thus
+	  shadows are perfect, and lightmaps smooth.
+	- Gary Haussmann added a line to bin/unixconf.sh to compile on
+	  Linux/ia-64 platform.  Currently maps the ia64 to "PROC = UNKNOWN".
+3-Jun-2000
+	- Reworked the hashmap iterators. They didn't work that well in
+	  all circumstances.
+	- Added new csPolygonEdges class that takes a list of polygons
+	  and creates a set of indexed edges.
+	- Added 'const' to two csPolyIndexed methods.
+	- Split octree.cpp into octree.cpp and pvs.cpp.
+	- Added csPoly2D::ClipPlane() to clip a 2D polygon to a 2D
+	  plane (i.e. line) and return the right side of that polygon.
+	- Added csPoly2D::ExtendConvex() to extend a convex polygon
+	  with another polygon while keeping the resulting polygon convex
+	  again. This function is not fully implemented yet.
+	- Started work on optimization for PVS that will try to merge
+	  adjacent convex polygons into bigger occluders. Not finished
+	  yet.
+	- Burton Radonsxi commented out all traces of Unix in the allegro
+	  driver and added in the "main" symbol defragilator.
 2-Jun-2000
 	- Samuel Humphreys added some further options to dtsimple and fixed
 	  cleaning up. Dynamic textures clean up after themselves properly now.
@@ -29,6 +80,13 @@ The history order has been reversed so that new features are at the top.
 	      context.
 	    - Opengl: Converted back buffer dynamic texture vertex co-ordinates
               to render to the upper left subregion of the backbuffer.
+	- Samuel added some keys in dtsimple so that you can play with
+	  the warp transformation on the fly.
+	    ',' & '.' vary the x component of the before vector.
+	    'b' & 'n' vary the x component of the after vector.
+	    'v' flips the transformation matrix on the x-axis.
+	    The value of these parameters are reported on screen on the LHS.
+	    Added a frame around the portal to make things easier to see.
 	- Gary Haussmann added a workaround to allow Mac users to see text;
 	  apparently the current Mac drivers do not support a pure GL_ALPHA
 	  texture, so for the OS_MACOS platform we use GL_LUMENENCE textures
@@ -68,6 +126,13 @@ The history order has been reversed so that new features are at the top.
 	  was wrong. Should be ok now.
 	- Eric Sunshine fixed a crasher in csSystemDriver::Initialize() where
 	  it would try to dereference the null pointer when loading plugins.
+	- David Durant removed myapp functions in WalkTest and replaced them
+	  by chopping up several functions into finer details and making
+	  them virtual.
+	- Alex Pfaffe now clips blocks in terrain engine as needed. This
+	  speeds up terrain considerably for OpenGL (still not fully
+	  optimal but it is a lot better already).
+	- Alex also added top level visibility info for bintree.
 1-Jun-2000
 	- Experiment with new octree generation method. Instead of only
 	  favoring a center with few splits I also try to favor centers which

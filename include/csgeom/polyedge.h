@@ -135,7 +135,7 @@ public:
    * i.e. edges that are not adjacent.
    */
   void Intersect (const csPlane2& plane,
-  	csPoly2DEdges* left, csPoly2DEdges* right, bool& onplane);
+  	csPoly2DEdges& left, csPoly2DEdges& right, bool& onplane) const;
 };
 
 /**

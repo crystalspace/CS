@@ -453,8 +453,15 @@ bool csBspPolygon::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   if (cnt_vis == 0) return false;
 
   // Perform backface culling.
-  if (csMath3::Visible (v_w2c, plane) != cw && plane.Classify (v_w2c) != 0)
-    return false;
+  float cl = plane.Classify (v_w2c);
+  if (cw)
+  {
+    if (cl > 0) return false;
+  }
+  else
+  {
+    if (cl < 0) return false;
+  }
 
   // Copy the vertices to verts.
   int num_vertices = polygon.GetNumVertices ();

@@ -28,28 +28,44 @@ bool csHashIterator::HasNext ()
   return bucket != NULL;
 }
 
+void csHashIterator::GotoNextElement ()
+{
+  element_index++;
+  if (!bucket || element_index >= bucket->Length ())
+  {
+    // Next bucket.
+    bucket_index++;
+    while (bucket_index < hash->buckets.Length () &&
+    	!hash->buckets[bucket_index])
+      bucket_index++;
+    if (bucket_index >= hash->buckets.Length ())
+      bucket = NULL;	// The end
+    else
+    {
+      bucket = (csHashBucket*)(hash->buckets[bucket_index]);
+      element_index = 0;
+    }
+  }
+}
+
+void csHashIterator::GotoNextSameKey ()
+{
+  if (!bucket) return;
+  element_index++;
+  while (element_index < bucket->Length () &&
+  	((csHashElement*)(*bucket)[element_index])->key != key)
+  {
+    element_index++;
+  }
+  if (element_index >= bucket->Length ()) bucket = NULL;
+}
+
 csHashObject csHashIterator::Next ()
 {
   if (bucket == NULL) return NULL;
   csHashObject obj = ((csHashElement*)((*bucket)[element_index]))->object;
-  element_index++;
-  if (element_index >= bucket->Length ())
-  {
-    // Next bucket.
-    if (next_bucket_index == -1)
-      bucket = NULL;
-    else
-    {
-      bucket = (csHashBucket*)hash->buckets[next_bucket_index];
-      element_index = 0;
-      next_bucket_index++;
-      while (next_bucket_index < hash->buckets.Length () &&
-      		!hash->buckets[next_bucket_index])
-	next_bucket_index++;
-      if (next_bucket_index == hash->buckets.Length ())
-        next_bucket_index = -1;
-    }
-  }
+  if (do_iterate_key) GotoNextSameKey ();
+  else GotoNextElement ();
   return obj;
 }
 
@@ -71,6 +87,7 @@ csHashMap::csHashMap (int size)
 
 csHashMap::~csHashMap ()
 {
+  DeleteAll ();
 }
 
 void csHashMap::Put (csHashKey key, csHashObject object)
@@ -84,7 +101,7 @@ void csHashMap::Put (csHashKey key, csHashObject object)
   bucket.Push (element);
 }
 
-csHashObject csHashMap::Get (csHashKey key)
+csHashObject csHashMap::Get (csHashKey key) const
 {
   int idx = key % max_size;
   if (!buckets[idx]) return NULL;
@@ -100,46 +117,27 @@ csHashObject csHashMap::Get (csHashKey key)
 
 csHashIterator* csHashMap::GetIterator (csHashKey key)
 {
-  csHashIterator* iterator = new csHashIterator ();
-  iterator->hash = this;
-
   int idx = key % max_size;
 
-  iterator->bucket = (csHashBucket*)buckets[idx]; // Will be NULL if bucket is empty.
-  iterator->element_index = 0;
-  iterator->next_bucket_index = -1;
+  csHashIterator* iterator = new csHashIterator (this);
+  iterator->bucket = (csHashBucket*)buckets[idx]; // Will be NULL if bucket empty.
+  iterator->element_index = -1;
+  iterator->bucket_index = idx;
+  iterator->key = key;
+  iterator->do_iterate_key = true;
+  iterator->GotoNextSameKey ();
 
   return iterator;
 }
 
 csHashIterator* csHashMap::GetIterator ()
 {
-  csHashIterator* iterator = new csHashIterator ();
-  iterator->hash = this;
-
-  int i = 0;
-  while (i < buckets.Length ())
-  {
-    if (buckets[i]) break;
-    i++;
-  }
-  if (i >= buckets.Length ())
-  {
-    iterator->bucket = NULL;
-    return iterator;
-  }
-  iterator->bucket = (csHashBucket*)buckets[i];
+  csHashIterator* iterator = new csHashIterator (this);
+  iterator->bucket = NULL;
   iterator->element_index = 0;
-  i++;
-  while (i < buckets.Length ())
-  {
-    if (buckets[i]) break;
-    i++;
-  }
-  if (i >= buckets.Length ())
-    iterator->next_bucket_index = -1;
-  else
-    iterator->next_bucket_index = i;
+  iterator->bucket_index = -1;
+  iterator->do_iterate_key = false;
+  iterator->GotoNextElement ();
 
   return iterator;
 }

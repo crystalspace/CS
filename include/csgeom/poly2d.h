@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -70,6 +70,11 @@ public:
   int GetNumVertices () { return num_vertices; }
 
   /**
+   * Get the number of vertices.
+   */
+  int GetNumVertices () const { return num_vertices; }
+
+  /**
    * Get the array with all vertices.
    */
   csVector2* GetVertices () { return vertices; }
@@ -87,6 +92,14 @@ public:
    * Get the specified vertex.
    */
   csVector2& operator[] (int i)
+  {
+    return vertices[i];
+  }
+
+  /**
+   * Get the specified vertex.
+   */
+  const csVector2& operator[] (int i) const
   {
     return vertices[i];
   }
@@ -170,7 +183,23 @@ public:
    * polygon which already has most edges. i.e. you will not
    * get degenerate polygons.
    */
-  void Intersect (const csPlane2& plane, csPoly2D* left, csPoly2D* right);
+  void Intersect (const csPlane2& plane, csPoly2D& left, csPoly2D& right) const;
+
+  /**
+   * This routine is similar to Intersect but it only returns the
+   * polygon on the 'right' (positive) side of the plane.
+   */
+  void ClipPlane (const csPlane2& plane, csPoly2D& right) const;
+
+  /**
+   * Extend this polygon with another polygon so that the resulting
+   * polygon is: (a) still convex, (b) fully contains this polygon,
+   * and (c) contains as much as possible of the other polgon.
+   * 'this_edge' is the index of the common edge for this polygon.
+   * Edges are indexed with 0 being the edge from 0 to 1 and n-1 being
+   * the edge from n-1 to 0.
+   */
+  void ExtendConvex (const csPoly2D& other, int this_edge);
 
   /**
    * Calculate the signed area of this polygon.

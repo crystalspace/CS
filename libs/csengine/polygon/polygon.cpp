@@ -438,14 +438,12 @@ bool csPolygon3D::Overlaps (csPolygonInt* overlapped)
   int i;
   for (i = 0 ; i < totest->vertices.GetNumVertices () ; i++)
   {
-    if ((!csMath3::Visible (totest->Vwor (i), this_plane))
-    	&& ABS (this_plane.Classify (totest->Vwor (i))) >= SMALL_EPSILON)
+    if (this_plane.Classify (totest->Vwor (i)) >= SMALL_EPSILON)
     {
       int j;
       for (j = 0 ; j < vertices.GetNumVertices () ; j++)
       {
-        if ((csMath3::Visible (Vwor (j), test_plane))
-    	    && ABS (test_plane.Classify (Vwor (j))) >= SMALL_EPSILON)
+        if (test_plane.Classify (Vwor (j)) <= SMALL_EPSILON)
 	{
 	  return true;
 	}
@@ -962,9 +960,8 @@ bool csPolygon3D::ClipFrustum (csVector3& center, csVector3* frustum,
 	int num_frustum, bool mirror,
 	csVector3** new_frustum, int* new_num_frustum)
 {
-  //if (!plane->VisibleFromPoint (center)) return false;
-  if (!plane->VisibleFromPoint (center) ||
-  	ABS (plane->Classify (center)) < SMALL_EPSILON) return false;
+  const csPlane3& wplane = plane->GetWorldPlane ();
+  if (wplane.Classify (center) > -SMALL_EPSILON) return false;
   return ClipPoly (frustum, num_frustum, mirror, new_frustum, new_num_frustum);
 }
 
@@ -993,9 +990,17 @@ bool csPolygon3D::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
 
   // Perform backface culling.
   // Note! The plane normal needs to be correctly calculated for this
-  // to work! @@@ can be optimized
-  if (plane->VisibleFromPoint (v_w2c) != cw && plane->Classify (v_w2c) != 0)
-    return false;
+  // to work!
+  const csPlane3& wplane = plane->GetWorldPlane ();
+  float cl = wplane.Classify (v_w2c);
+  if (cw)
+  {
+    if (cl > 0) return false;
+  }
+  else
+  {
+    if (cl < 0) return false;
+  }
 
   // If there is no portal polygon then everything is ok.
   if (!portal_plane) {
@@ -1015,7 +1020,6 @@ bool csPolygon3D::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   cnt_vis = 0;
   for (i = 0 ; i < num_vertices ; i++)
   {
-    //vis[i] = csMath3::Visible (Vcam (i), *portal_plane);
     vis[i] = portal_plane->Classify (Vcam (i)) <= -SMALL_EPSILON;
     if (vis[i]) cnt_vis++;
   }
@@ -1630,7 +1634,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   csVector3& center = light_frustum->GetOrigin ();
 
   // If plane is not visible then return (backface culling).
-  if (!plane->VisibleFromPoint (center)) return;
+  if (!csMath3::Visible (center, plane->GetWorldPlane ())) return;
 
   // Compute the distance from the center of the light
   // to the plane of the polygon.

@@ -97,7 +97,7 @@ int csPoly2DEdges::AddEdge (const csVector2& v1, const csVector2& v2)
 #define ATRIGHTORPLANE(c) ((c) > -THICK)
 
 void csPoly2DEdges::Intersect (const csPlane2& plane,
-	csPoly2DEdges* left, csPoly2DEdges* right, bool& onplane)
+	csPoly2DEdges& left, csPoly2DEdges& right, bool& onplane) const
 {
   int i;
   float c1, c2;
@@ -106,8 +106,8 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
 
   onplane = false;
 
-  left->SetNumEdges (0);
-  right->SetNumEdges (0);
+  left.SetNumEdges (0);
+  right.SetNumEdges (0);
 
   for (i = 0 ; i < num_edges ; i++)
   {
@@ -123,30 +123,30 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
 	onplane = true;
       }
       else if (ATLEFT (c2))
-        left->AddEdge (edges[i]);
+        left.AddEdge (edges[i]);
       else
-        right->AddEdge (edges[i]);
+        right.AddEdge (edges[i]);
     }
     else if (ATLEFT (c1))
     {
       if (ATLEFTORPLANE (c2))
-        left->AddEdge (edges[i]);
+        left.AddEdge (edges[i]);
       else
       {
         csIntersect2::PlaneNoTest (edges[i], plane, isect, dist);
-	left->AddEdge (edges[i].Start (), isect);
-	right->AddEdge (isect, edges[i].End ());
+	left.AddEdge (edges[i].Start (), isect);
+	right.AddEdge (isect, edges[i].End ());
       }
     }
     else // ATRIGHT (c1)
     {
       if (ATRIGHTORPLANE (c2))
-        right->AddEdge (edges[i]);
+        right.AddEdge (edges[i]);
       else
       {
         csIntersect2::PlaneNoTest (edges[i], plane, isect, dist);
-	right->AddEdge (edges[i].Start (), isect);
-	left->AddEdge (isect, edges[i].End ());
+	right.AddEdge (edges[i].Start (), isect);
+	left.AddEdge (isect, edges[i].End ());
       }
     }
   }

@@ -81,32 +81,13 @@ public:
 	const csVector3& vertex1);
 
   /**
-   * Check if the plane in world space is visible from the given point.
-   * To do this it will only do back-face culling.
-   */
-  bool VisibleFromPoint (const csVector3& p) const
-  {
-    return csMath3::Visible (p, plane_wor);
-  }
-
-  /**
    * Return the minimum squared distance from the plane to
    * a point in 3D space (using world coordinates).
    */
   float SquaredDistance (csVector3& v) const
   {
-    float d = Distance (v);
+    float d = plane_wor.Distance (v);
     return d*d;
-  }
-
-  /**
-   * Return the minimum distance from the plane to
-   * a point in 3D space (using world coordinates).
-   */
-  float Distance (csVector3& v) const
-  {
-    // The normal is normalized so...
-    return plane_wor.Distance (v);
   }
 
   /**
@@ -117,14 +98,6 @@ public:
   bool NearlyEqual (csPolyPlane* plane) const
   {
     return csMath3::PlanesEqual (plane_wor, plane->plane_wor);
-  }
-
-  /**
-   * Classify a vector with regards to this plane in world space.
-   */
-  float Classify (const csVector3& pt) const
-  {
-    return plane_wor.Classify (pt);
   }
 
   /**
@@ -152,6 +125,11 @@ public:
    * Get the world version of the plane.
    */
   csPlane3& GetWorldPlane () { return plane_wor; }
+
+  /**
+   * Get the world version of the plane.
+   */
+  const csPlane3& GetWorldPlane () const { return plane_wor; }
 
   /**
    * Get the camera version of the plane.

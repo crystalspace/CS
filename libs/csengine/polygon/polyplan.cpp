@@ -82,7 +82,7 @@ void csPolyPlane::GetObjectNormal (float* p_A, float* p_B,
 
 void csPolyPlane::ClosestPoint (csVector3& v, csVector3& isect) const
 {
-  float r = Classify (v);
+  float r = plane_wor.Classify (v);
   isect.x = r*(-plane_wor.A ()-v.x)+v.x;
   isect.y = r*(-plane_wor.B ()-v.y)+v.y;
   isect.z = r*(-plane_wor.C ()-v.z)+v.z;

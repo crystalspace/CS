@@ -77,14 +77,30 @@ class csHashIterator
   friend csHashMap;
 
 private:
-  /// Bucket we are iterating over.
+  /// Current bucket we are iterating over. NULL if no more elements.
   csHashBucket* bucket;
   /// Current index in bucket.
   int element_index;
-  /// Next index in hashmap to test or -1 if at end.
-  int next_bucket_index;
+  /// Current bucket index in hashmap.
+  int bucket_index;
+  /// If true we are iterating over a key.
+  bool do_iterate_key;
+  /// Key to iterate over.
+  csHashKey key;
   /// Pointer to the hashmap.
   csHashMap* hash;
+
+private:
+  /// Go to next element with same key.
+  void GotoNextSameKey ();
+  /// Go to next element.
+  void GotoNextElement ();
+
+  /**
+   * Constructor is private. This object is only made
+   * by the friend csHashMap.
+   */
+  csHashIterator (csHashMap* hash) { this->hash = hash; }
 
 public:
   /// Is there a next element in this iterator?
@@ -138,7 +154,7 @@ public:
    * Use GetIterator() to iterate over all elements with
    * the same key.
    */
-  csHashObject Get (csHashKey key);
+  csHashObject Get (csHashKey key) const;
 
   /**
    * Get an iterator to iterate over all elements with the

@@ -300,6 +300,21 @@ private:
   /**
    * Help function for BoxCanSeeOccludee.
    */
+  bool CalculatePolygonsShadowArea (
+	const csBox3& occludee_box,
+	csPoly3D& poly1, const csPlane3& plane1, int edge1,
+	csPoly3D& poly2, const csPlane3& plane2,
+	csPoly2D& result_poly,
+	int plane_nr, float plane_pos);
+  /**
+   * Help function for BoxCanSeeOccludee.
+   */
+  void CalculatePolygonShadow (
+	csPoly2D& cur_poly, csPoly2D& result_poly, bool first_time);
+
+  /**
+   * Help function for BoxCanSeeOccludee.
+   */
   bool CalculatePolygonShadow (
 	const csVector3& corner,
 	csPoly3D& cur_poly,
@@ -309,8 +324,15 @@ private:
   /**
    * Help function for BoxCanSeeOccludee.
    */
-  void InsertShadowIntoCBuffer (csPoly2D& result_poly,
+  void InsertShadowIntoCBuffer (const csPoly2D& result_poly,
 	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift);
+
+  /**
+   * Help function for BoxCanSeeOccludee.
+   */
+  bool TestShadowIntoCBuffer (const csPoly2D& result_poly,
+	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift);
+
   /**
    * Help function for BoxCanSeeOccludee.
    * This function returns false if it couldn't do the test (because
@@ -318,9 +340,7 @@ private:
    */
   bool BoxOccludeeShadowOutline (const csBox3& occluder_box,
   	const csBox3& occludee,
-	csCBuffer* cbuffer,
-  	const csVector2& scale, const csVector2& shift,
-	int plane_nr, float plane_pos);
+	int plane_nr, float plane_pos, csPoly2D& result_poly);
 
   /**
    * Help function for BoxCanSeeOccludee.

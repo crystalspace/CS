@@ -825,8 +825,8 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   // if polygon not lightmapped / radiosity rendered, it can still be a portal.
 
   // check poly -- on right side of us?
-  if(!destpoly3d->GetPlane()->VisibleFromPoint( 
-    lview->light_frustum->GetOrigin() ))
+  const csPlane3& wplane = destpoly3d->GetPlane ()->GetWorldPlane ();
+  if (!csMath3::Visible (lview->light_frustum->GetOrigin (), wplane))
     return;
 
   csFrustumView new_lview = *lview;

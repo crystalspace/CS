@@ -157,7 +157,7 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     left_poly = poly_pool.Alloc ();
     right_poly = poly_pool.Alloc ();
     bool onplane;
-    poly->Intersect (node->splitter, left_poly, right_poly, onplane);
+    poly->Intersect (node->splitter, *left_poly, *right_poly, onplane);
     bool rc1, rc2;
 
     if (onplane)
@@ -286,7 +286,7 @@ if (ddd) printf ("%s   BRANCH: children\n", ddd_spaces);
     left_poly = poly_pool.Alloc ();
     right_poly = poly_pool.Alloc ();
     bool onplane;
-    poly->Intersect (node->splitter, left_poly, right_poly, onplane);
+    poly->Intersect (node->splitter, *left_poly, *right_poly, onplane);
     bool rc1, rc2;
 
     if (onplane)
@@ -502,7 +502,7 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     left_poly = poly_pool.Alloc ();
     right_poly = poly_pool.Alloc ();
     bool onplane;
-    poly->Intersect (node->splitter, left_poly, right_poly, onplane);
+    poly->Intersect (node->splitter, *left_poly, *right_poly, onplane);
 
     if (onplane)
     {
@@ -557,7 +557,7 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     left_poly = poly_pool.Alloc ();
     right_poly = poly_pool.Alloc ();
     bool onplane;
-    poly->Intersect (node->splitter, left_poly, right_poly, onplane);
+    poly->Intersect (node->splitter, *left_poly, *right_poly, onplane);
 
     if (onplane)
     {
@@ -767,7 +767,7 @@ void csSolidBsp::GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
   }
 
   csPoly2D poly_left, poly_right;
-  poly.Intersect (sp, &poly_left, &poly_right);
+  poly.Intersect (sp, poly_left, poly_right);
 
   GfxDump (node->left, ig2d, depth-1, poly_left);
   GfxDump (node->right, ig2d, depth-1, poly_right);

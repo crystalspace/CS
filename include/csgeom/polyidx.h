@@ -60,7 +60,7 @@ public:
   /**
    * Get the number of vertices.
    */
-  int GetNumVertices () { return num_vertices; }
+  int GetNumVertices () const { return num_vertices; }
 
   /**
    * Get the array with all vertex indices.
@@ -70,7 +70,7 @@ public:
   /**
    * Get the specified vertex index.
    */
-  int GetVertex (int i) 
+  int GetVertex (int i)  const
   {
     if (i<0 || i>=num_vertices) return -1;
     return vertices_idx[i];
@@ -79,10 +79,12 @@ public:
   /**
    * Get the specified vertex index.
    */
-  int& operator[] (int i)
-  {
-    return vertices_idx[i];
-  }
+  int& operator[] (int i) { return vertices_idx[i]; }
+
+  /**
+   * Get the specified vertex index.
+   */
+  int& operator[] (int i) const { return vertices_idx[i]; }
 
   /**
    * Make room for at least the specified number of vertices.

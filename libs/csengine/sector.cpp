@@ -417,19 +417,19 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
   int i;
   csPolygon3D* p, * min_p = NULL;
   csVector3 hit;
-  float A, B, C, D;
 
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     p = polygons.Get (i);
     const csPolyPlane* pl = p->GetPlane ();
-    d = pl->Distance (center);
-    if (d < min_d && pl->VisibleFromPoint (center))
+    const csPlane3& wpl = pl->GetWorldPlane ();
+    d = wpl.Distance (center);
+    if (d < min_d && csMath3::Visible (center, wpl))
     {
-      pl->GetWorldNormal (&A, &B, &C, &D);
-      hit.x = d*(-A-center.x)+center.x;
-      hit.y = d*(-B-center.y)+center.y;
-      hit.z = d*(-C-center.z)+center.z;
+      hit = -center;
+      hit -= wpl.GetNormal ();
+      hit *= d;
+      hit += center;
       if (p->IntersectRay (center, hit))
       {
         csPortal* po = p->GetPortal ();

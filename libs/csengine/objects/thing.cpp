@@ -133,21 +133,19 @@ csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius, float* p
   float d, min_d = radius;
   int i;
   csPolygon3D* p, * min_p = NULL;
-  csPolyPlane* pl;
   csVector3 hit;
-  float A, B, C, D;
 
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     p = GetPolygon3D (i);
-    pl = p->GetPlane ();
-    d = pl->Distance (center);
-    if (d < min_d && pl->VisibleFromPoint (center))
+    const csPlane3& wpl = p->GetPlane ()->GetWorldPlane ();
+    d = wpl.Distance (center);
+    if (d < min_d && csMath3::Visible (center, wpl))
     {
-      pl->GetWorldNormal (&A, &B, &C, &D);
-      hit.x = d*(-A-center.x)+center.x;
-      hit.y = d*(-B-center.y)+center.y;
-      hit.z = d*(-C-center.z)+center.z;
+      hit = -center;
+      hit -= wpl.GetNormal ();
+      hit *= d;
+      hit += center;
       if (p->IntersectRay (center, hit))
       {
   	min_d = d;
@@ -417,7 +415,8 @@ void csThing::DrawFoggy (csRenderView& d)
       p = GetPolygon3D (i);
       if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
       clip = (csPolygon2D*)(render_pool->Alloc ());
-      bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
+      const csPlane3& wplane = p->GetPlane ()->GetWorldPlane ();
+      bool front = csMath3::Visible (d.GetOrigin (), wplane);
 
       if (!front &&
         p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane3*)NULL, d.GetOrigin (),
@@ -446,7 +445,8 @@ void csThing::DrawFoggy (csRenderView& d)
       p = GetPolygon3D (i);
       if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
       clip = (csPolygon2D*)(render_pool->Alloc ());
-      bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
+      const csPlane3& wplane = p->GetPlane ()->GetWorldPlane ();
+      bool front = csMath3::Visible (d.GetOrigin (), wplane);
 
       if (front &&
         p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane3*)NULL,

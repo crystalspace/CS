@@ -1202,7 +1202,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   return true;
 }
 
-
 #if 1
 // moved this out of main() to make it easier for app developer
 // to override
