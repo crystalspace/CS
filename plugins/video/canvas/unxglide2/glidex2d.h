@@ -22,7 +22,8 @@
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/unix/iunix.h"
-#include "cs2d/glide2common2d/iglide2d.h"
+#include "cs2d/glide2common/iglide2d.h"
+#include "cs2d/glide2common/glide2common2d.h"
 
 #include <glide.h>
 
@@ -50,12 +51,6 @@ private:
   XImage* xim;
   GC gc;
   XVisualInfo *active_GLVisual;
-  short GraphicsReady;
-  bool bPalettized;
-  bool bPaletteChanged;
-  int glDrawMode;
-  GrLfbInfo_t lfbInfo;
-  bool m_DoGlideInWindow;
 
   // Window colormap
   Colormap cmap;
@@ -80,6 +75,7 @@ private:
   iUnixSystemDriver* UnixSystem;
 
 public:
+//  DECLARE_IBASE;
   csGraphics2DGlideX (iBase *iParent);
   virtual ~csGraphics2DGlideX ();
 
@@ -87,23 +83,12 @@ public:
   virtual bool Open (const char *Title);
   virtual void Close ();
   
-  virtual bool BeginDraw ();
-  virtual void FinishDraw ();
-  virtual void SetTMUPalette(int tmu);
   virtual void Print (csRect *area = NULL);
-  virtual void SetRGB (int i, int r, int g, int b);
 
   /// Set mouse cursor shape
-  virtual bool SetMouseCursor (csMouseCursorID iShape);
+  virtual bool SetMouseCursor (csMouseCursorID iShape, iTextureHandle *iBitmap);
 
-  virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
-  
-  static void DrawPixelGlide (int x, int y, int color);
-  static void WriteCharGlide (int x, int y, int fg, int bg, char c);
-  static void DrawSpriteGlide (iTextureHandle *hTex, int sx, int sy, 
-                        int sw, int sh, int tx, int ty, int tw, int th);
-  static unsigned char* GetPixelAtGlide (int x, int y);          
-
+    Display *GetDisplay(){ return dpy;}
 protected:
   /// This routine is called once per event loop
   static void ProcessEvents (void *Param);
@@ -111,8 +96,6 @@ protected:
   /// This method is used for GlideInWindow...
   void FXgetImage();
 
-  /// Is framebuffer locked?
-  bool locked;
 };
 
 #endif // __GLIDEX2D_H__

@@ -35,14 +35,21 @@ EXPORT_CLASS_TABLE (glidex2d)
     "Glide/X 2D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END
 
+/*
+IMPLEMENT_IBASE (csGraphics2DGlideX)
+    IMPLEMENTS_INTERFACE (iPlugIn)
+    IMPLEMENTS_INTERFACE (iGraphics2D)
+    IMPLEMENTS_INTERFACE (iGraphics2DGlide)
+IMPLEMENT_IBASE_END
+*/
+
 // replace this with config stuff...
-bool DoGlideInWindow=true; 
 
 csGraphics2DGlideX* thisPtr=NULL;
 
 // csGraphics2DGLX functions
 csGraphics2DGlideX::csGraphics2DGlideX(iBase *iParent) :
-  csGraphics2D (), xim (NULL), cmap (0)
+  csGraphics2DGlideCommon( iParent ), xim (NULL), cmap (0)
 {
   CONSTRUCT_IBASE (iParent);
 }
@@ -50,7 +57,7 @@ csGraphics2DGlideX::csGraphics2DGlideX(iBase *iParent) :
 bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
 {
   thisPtr=this;
-  if (!csGraphics2D::Initialize (pSystem))
+  if (!csGraphics2DGlideCommon::Initialize (pSystem))
     return false;
 
   UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
@@ -62,11 +69,6 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
   }
 
   Screen* screen_ptr;
-
-  // see if we need to go fullscreen or not...
-  csIniFile* config = new csIniFile("cryst.cfg");
-  m_DoGlideInWindow = (!config->GetYesNo("VideoDriver","FULL_SCREEN",FALSE));
-  CHK (delete config);
 
   // if we are going to do glide in an Xwindow, 
   // we need to set some environment vars first...
@@ -94,11 +96,6 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
   //Visual* visual = DefaultVisual (dpy, screen_num);
 
   
-  Depth=16;
-	  
-  _DrawPixel = DrawPixelGlide; _WriteChar = WriteCharGlide;
-  _GetPixelAt = GetPixelAt16;  _DrawSprite = DrawSpriteGlide;
-    
   // calculate CS's pixel format structure. 565
   pfmt.PixelBytes = 2;
   pfmt.PalEntries = 0;
@@ -145,12 +142,11 @@ bool csGraphics2DGlideX::Open(const char *Title)
 { 
 
   // Open your graphic interface
-  if (!csGraphics2D::Open (Title))
+  if (!csGraphics2DGlideCommon::Open (Title))
     return false;
 
   // Set loop callback
   UnixSystem->SetLoopCallback (ProcessEvents, this);
-
   // Open window
   if (m_DoGlideInWindow)
     window = XCreateSimpleWindow (dpy, DefaultRootWindow (dpy), 64, 16,
@@ -239,9 +235,6 @@ bool csGraphics2DGlideX::Open(const char *Title)
     }
   }
 
-  bPalettized = false;
-  bPaletteChanged = false;
-	
   return true;
 }
 
@@ -283,7 +276,7 @@ void csGraphics2DGlideX::Close(void)
   } 
 
   // Close your graphic interface
-  csGraphics2D::Close ();
+  csGraphics2DGlideCommon::Close ();
 }
 
 void csGraphics2DGlideX::Print (csRect *area)
@@ -292,49 +285,7 @@ void csGraphics2DGlideX::Print (csRect *area)
   {
     FXgetImage();
   }
-}
-
-
-#define GR_DRAWBUFFER GR_BUFFER_FRONTBUFFER
-
-bool csGraphics2DGlideX::BeginDraw(/*int Flag*/)
-{
-  csGraphics2D::BeginDraw ();
-  if (FrameBufferLocked != 1)
-    return true;
-
-  FxBool bret;
-  lfbInfo.size=sizeof(GrLfbInfo_t);
-  
-  glDrawMode=GR_LFB_WRITE_ONLY;
-
-  if(locked) FinishDraw();
-
-    
-  bret=GlideLib_grLfbLock(glDrawMode|GR_LFB_IDLE,
-                          GR_DRAWBUFFER,
-                          GR_LFBWRITEMODE_565,
-                          GR_ORIGIN_UPPER_LEFT,
-                          FXFALSE,
-                          &lfbInfo);
-  if(bret)
-    {
-      Memory=(unsigned char*)lfbInfo.lfbPtr;
-      if(lfbInfo.origin==GR_ORIGIN_UPPER_LEFT)
-        {
-          for(int i = 0; i < Height; i++)
-            LineAddress [i] = i * lfbInfo.strideInBytes;
-        }
-      else
-        {
-          int omi = Height-1;
-          for(int i = 0; i < Height; i++)
-            LineAddress [i] = (omi--) * lfbInfo.strideInBytes;
-        }
-      locked=true;
-    }
-  return bret;
-
+  csGraphics2DGlideCommon::Print( area );
 }
 
 
@@ -357,45 +308,7 @@ void csGraphics2DGlideX::FXgetImage()
 
 }
 
-
-void csGraphics2DGlideX::FinishDraw ()
-{
-  csGraphics2D::FinishDraw ();
-  if (FrameBufferLocked)
-    return;
-
-  Memory=NULL;
-  for (int i = 0; i < Height; i++) LineAddress [i] = 0;
-  if (locked) 
-    GlideLib_grLfbUnlock(glDrawMode,GR_DRAWBUFFER);
-  
-  locked = false;
-}
-
-
-void csGraphics2DGlideX::SetRGB(int i, int r, int g, int b)
-{
-  csGraphics2D::SetRGB (i, r, g, b);
-  bPaletteChanged = true;
-  SetTMUPalette(0);
-}
-
-
-void csGraphics2DGlideX::SetTMUPalette(int tmu)
-{
-  GuTexPalette p;
-  RGBpaletteEntry pal;
-  
-  for(int i=0; i<256; i++)
-  {
-    pal = Palette[i];
-    p.data[i]=0xFF<<24 | pal.red<<16 | pal.green<<8 | pal.blue;
-  }
-  
-  GlideLib_grTexDownloadTable(tmu, GR_TEXTABLE_PALETTE, &p);		
-}
-
-bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape)
+bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape, iTextureHandle* /*iBitmap*/)
 {
   if (do_hwmouse
    && (iShape >= 0)
@@ -410,88 +323,6 @@ bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape)
     XDefineCursor (dpy, window, EmptyMouseCursor);
     return (iShape == csmcNone);
   } /* endif */
-}
-
-void csGraphics2DGlideX::DrawLine (int x1, int y1, int x2, int y2, int color)
-{
-  // can't do this while framebuffer is locked...
-  if (locked) return;
- 
-  GrVertex a,b;
-  a.x=x1; a.y=y1;
-  b.x=x2; b.y=y2;
-
-  grConstantColorValue(color);
-  grDrawLine(&a,&b);
-}
-
-void csGraphics2DGlideX::DrawPixelGlide (int x, int y, int color)
-{
-  // can't do this while framebuffer is locked...
-  if (locked) return;
-
-  GrVertex p;
-  p.x=x; p.y=y;
-
-  grConstantColorValue(color);
-  grDrawPoint(&p);
-}
-
-void csGraphics2DGlideX::WriteCharGlide (int x, int y, int fg, int bg, char c)
-{
-  //if (!locked)
-//thisPtr->BeginDraw();
-//  if (locked) thisPtr->FinishDraw();
-//  thisPtr->BeginDraw();
-  thisPtr->WriteChar16(x,y,fg,bg,c);
-
-  // not implemented yet...
-}
-
-void csGraphics2DGlideX::DrawSpriteGlide (iTextureHandle *hTex, int sx, int sy,
-  int sw, int sh, int tx, int ty, int tw, int th)
-{
- // if (!locked) thisPtr->BeginDraw();
-//  if (locked) thisPtr->FinishDraw();
-  //thisPtr->BeginDraw();
-  thisPtr->DrawSprite16(hTex,sx,sy,sw,sh,tx,ty,tw,th);
-  // not implemented yet...
-}
-
-unsigned char* csGraphics2DGlideX::GetPixelAtGlide (int x, int y)
-{
-  // not implemented yet...
-   //static FxBool bret;
-//   static unsigned char ch;
-   //static GrLfbInfo_t lfbInfo;
-
-/*   if (!locked)
-   {
-     lfbInfo.size=sizeof(GrLfbInfo_t);
-
-
-     bret=GlideLib_grLfbLock(GR_LFB_READ_ONLY|GR_LFB_IDLE,
-                          GR_DRAWBUFFER,
-                          GR_LFBWRITEMODE_565,
-                          GR_ORIGIN_ANY,
-                          FXFALSE,
-                          &lfbInfo);
-     locked=bret;
-   }*/
-
-
-   if (!locked) thisPtr->BeginDraw();
-
-   return thisPtr->GetPixelAt16(x,y);
-/*   if(locked)
-   {
-     //Memory=(unsigned char*)lfbInfo.lfbPtr;
-     return (unsigned char *)thisPtr->Memory+(y*thisPtr->lfbInfo.strideInBytes+x);
-
-     //GlideLib_grLfbUnlock(GR_LFB_READ_ONLY,GR_DRAWBUFFER);
-   }
-
-   else return NULL;*/
 }
 
 static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
@@ -517,18 +348,18 @@ void csGraphics2DGlideX::ProcessEvents (void *Param)
     {
       case ButtonPress:
         state = ((XButtonEvent*)&event)->state;
-        Self->UnixSystem->MouseEvent (button_mapping [event.xbutton.button],
+        Self->System->QueueMouseEvent (button_mapping [event.xbutton.button],
           true, event.xbutton.x, event.xbutton.y,
           ((state & ShiftMask) ? CSMASK_SHIFT : 0) |
 	  ((state & Mod1Mask) ? CSMASK_ALT : 0) |
 	  ((state & ControlMask) ? CSMASK_CTRL : 0));
           break;
       case ButtonRelease:
-        Self->UnixSystem->MouseEvent (button_mapping [event.xbutton.button],
+        Self->System->QueueMouseEvent (button_mapping [event.xbutton.button],
           false, event.xbutton.x, event.xbutton.y, 0);
         break;
       case MotionNotify:
-        Self->UnixSystem->MouseEvent (0, false,
+        Self->System->QueueMouseEvent (0, false,
 	  event.xbutton.x, event.xbutton.y, 0);
         break;
       case KeyPress:
@@ -599,11 +430,11 @@ void csGraphics2DGlideX::ProcessEvents (void *Param)
           case XK_F12:        key = CSKEY_F12; break;
           default:            break;
         }
-	Self->UnixSystem->KeyboardEvent (key, down);
+	Self->System->QueueKeyEvent (key, down);
         break;
       case FocusIn:
       case FocusOut:
-        Self->UnixSystem->FocusEvent (event.type == FocusIn);
+        Self->System->QueueFocusEvent (event.type == FocusIn);
         break;
       case Expose:
       {
