@@ -72,6 +72,7 @@ chronological order.
 	- res made some small optimizations to csHash<>.
 	- res made some more small optimizations to csHash<> and fixed the
 	  GetAll() argument.
+	- duhprey fixed partphys_ode to compile.
 29-Jan-2004
 	- Eric Sunshine made the following changes to clean up after Matze
 	  changed the return type of csGetConfigDir(), csGetResourceDir(),
