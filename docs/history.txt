@@ -17,6 +17,11 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine ported the new halo implementation to NeXT.
 	- Eric Sunshine made csClear and cctest work on NextStep again by
 	  working around a multiple-inheritence compiler bug.
+	- Eric Sunshine removed obsolete COM junk from the Software Sound
+	  Renderer.
+	- Eric Sunshine fixes the OSS sound driver so that it compiles
+	  following Peter Donald's SCF conversion.  (Peter performed the
+	  conversion but was unable to test-compile it.)
 30-Nov-1999
 	- Andrew Zabolotny added new halo support. iHaloRasterizer is gone.
 	  iHalo objects are created instead. Added halo support to MazeD
