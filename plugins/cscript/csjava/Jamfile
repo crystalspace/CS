@@ -1,8 +1,23 @@
 SubDir TOP plugins cscript csjava ;
 
-# @@@ TODO
-# - Figure out how to determine correct shared library suffix on MacOS/X and
-#   utilize that suffix.
+if ! $(CSJAVA.MODULE.PREFIX) && ! $(CSJAVA.MODULE.SUFFIX)
+{
+  switch $(TARGET.OS)
+  {
+  case WIN32 :
+    CSJAVA.MODULE.PREFIX = ;
+    CSJAVA.MODULE.SUFFIX = .dll ;
+  case MACOS_X :
+    CSJAVA.MODULE.PREFIX = lib ;
+    CSJAVA.MODULE.SUFFIX = .jnilib ;
+  case UNIX :
+    CSJAVA.MODULE.PREFIX = lib ;
+    CSJAVA.MODULE.SUFFIX = .so ;
+  case * :
+    CSJAVA.MODULE.PREFIX = lib ;
+    CSJAVA.MODULE.SUFFIX = .so ;
+  }
+}
 
 if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
   ! [ Property build : projgen ]
@@ -33,8 +48,7 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
   Description csjava : $(desc) ;
   Help csjava : "Build the $(desc)" ;
 
-  # @@@FIXME: ConstructPluginTarget will return wrong suffix on MacOS/X.
-  local javamod = [ ConstructPluginTarget csjava ] ;
+  local javamod = "$(CSJAVA.MODULE.PREFIX)csjava$(CSJAVA.MODULE.SUFFIX)" ;
   local javamodsrc = $(common) [ Wildcard *.cpp ] ;
   local javamodobj = [ CompileObjects $(javamodsrc) ] ;
   javamod_TARGET = $(javamod) ;

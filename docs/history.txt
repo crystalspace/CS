@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Jul-2004
+	- Eric Sunshine fixed csjava/Jamfile so that it correctly constructs
+	  the shared-library name correctly on all supported platforms
+	    MacOS/X : libcsjava.jnilib
+	    Unix    : libcsjava.so
+	    Windows : csjava.dll
+	- Eric Sunshine fixed the Java SDK check in configure.ac so that it
+	  adds "-framework JavaVM" to JAVA.LFLAGS on MacOS/X.
 27-Jul-2004
 	- Peter Amstutz added the wxgl canvas (initially developed by
 	  Daniel Fryer) which makes it fairly easy to embed Crystal Space
