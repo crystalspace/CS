@@ -21,9 +21,7 @@
 
 #include <stdarg.h>
 #include "csutil/ref.h"
-#include "csgeom/vector3.h"
 
-struct iDynLight;
 struct iEngine;
 struct iLoader;
 struct iGraphics3D;
@@ -45,10 +43,6 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iView> view;
   iSector* room;
-  double mPosX;
-  double mPosZ;
-  csVector3 mCamPos;
-  csRef<iDynLight> csRefDynLight;
 
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
