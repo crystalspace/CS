@@ -94,10 +94,11 @@ class SysSystemDriver : public csSystemDriver
 public:
   SysSystemDriver ();
   
+  virtual void Close ();
   virtual void Loop ();
   virtual void SetSystemDefaults ();
-  virtual void Alert (char* s);
-  virtual void Warn (char* s);
+  virtual void Alert (const char* s);
+  virtual void Warn (const char* s);
 
   /// Implementation of IWin32SystemDriver interface.
   class XWin32SystemDriver : public IWin32SystemDriver

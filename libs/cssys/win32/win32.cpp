@@ -79,14 +79,40 @@ void SysSystemDriver::SetSystemDefaults ()
   System->FullScreen = 1; if (config) System->FullScreen = config->GetYesNo ("VideoDriver", "FULL_SCREEN", System->FullScreen);
 }
 
-void SysSystemDriver::Alert (char* s)
+void SysSystemDriver::Alert (const char* s)
 {
-  MessageBox(NULL, s, "Fatal Error", MB_OK | MB_ICONEXCLAMATION);
+  bool FullScreen = false;
+
+  if (piGI)
+  {
+    //Check if we are in Fullscreenmode.
+    piGI->GetIsFullScreen(FullScreen);
+  }
+
+  if (FullScreen)
+  {
+    //if fullscreen mode is active, we switch to default screen, because 
+    //otherwise this message will not be seen. 
+    ChangeDisplaySettings(NULL,0);
+  }
+
+  MessageBox(NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
+  debugprintf (true, s);
 }
 
-void SysSystemDriver::Warn (char* s)
+void SysSystemDriver::Warn (const char* s)
 {
-  MessageBox(NULL, s, "Warning", MB_OK | MB_ICONEXCLAMATION);
+  //In windows there is no safe way to display a messagebox and then continue work when
+  //you are in fullscreen mode. (If you know some way: You are welcome to change this)
+  //For the moment we will display Warning as console messages.
+  Printf(MSG_CONSOLE, "Warning:\n%s", s);
+  debugprintf (true, s);
+}
+
+void SysSystemDriver::Close(void)
+{
+  csSystemDriver::Close();
+  ChangeDisplaySettings(NULL,0);
 }
 
 ////The Keyboard Driver////////////////
