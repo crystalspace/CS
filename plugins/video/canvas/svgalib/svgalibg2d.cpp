@@ -103,11 +103,10 @@ void csGraphics2DSVGALib::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.canvas.svgalib", msg, arg);
-    rep->DecRef ();
   }
   else
   {
@@ -124,7 +123,7 @@ bool csGraphics2DSVGALib::Initialize (iObjectRegistry *object_reg)
 
   this->object_reg = object_reg;
   csConfigAccess Config(object_reg, "/config/video.cfg");
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
                                                    iCommandLineParser);
 
   do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
