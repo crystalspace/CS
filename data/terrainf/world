@@ -9,6 +9,8 @@
     <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
     <plugin name="ballFact">crystalspace.mesh.loader.factory.ball</plugin>
     <plugin name="ball">crystalspace.mesh.loader.ball</plugin>
+    <plugin name="foliageFact">crystalspace.mesh.loader.factory.foliage</plugin>
+    <plugin name="foliage">crystalspace.mesh.loader.foliage</plugin>
   </plugins>
 
   <textures>
@@ -156,6 +158,33 @@
       </sampleregion>
     </params>
   </meshfact>
+
+  <!--
+  <meshfact name="FoliageFact">
+    <plugin>foliageFact</plugin>
+    <params>
+      <terraformer>simple</terraformer>
+      <sampleregion>
+        <min x="-256" y="-256" />
+        <max x="256" y="256" />
+      </sampleregion>
+      <foliagepalette>
+	<palette index="0">
+	  <foliage name="oak" density="1" />
+	  <foliage name="grass" density="10" />
+	</palette>
+	<palette index="1">
+	  <foliage name="grass" density="10" />
+	</palette>
+	<palette index="2">
+	  <foliage name="oak" density="1" />
+	  <foliage name="pine" density="1" />
+	  <foliage name="grass" density="4" />
+	</palette>
+      </foliagepalette>
+    </params>
+  </meshfact>
+  -->
 
   <sector name="room">
      <light name="sun">

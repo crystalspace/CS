@@ -704,6 +704,8 @@ public:
   csTriangleMesh* mesh;
 
 public:
+  virtual ~csTriangleLODAlgoHM () { }
+
   virtual void CalculateCost (csTriangleVerticesCost* vertices,
   	csTriangleVertexCost* vertex)
   {

@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/util.h"
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
 #include "csgeom/frustum.h"
@@ -37,6 +38,94 @@
 
 CS_IMPLEMENT_PLUGIN
 
+//----------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csFoliageGeometry)
+  SCF_IMPLEMENTS_INTERFACE (iFoliageGeometry)
+SCF_IMPLEMENT_IBASE_END
+
+csFoliageGeometry::csFoliageGeometry ()
+{
+  SCF_CONSTRUCT_IBASE (0);
+}
+
+csFoliageGeometry::~csFoliageGeometry ()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
+size_t csFoliageGeometry::AddVertex (const csVector3& pos,
+    const csVector2& texel, const csColor& color, const csVector3& normal)
+{
+  csFoliageVertex vt;
+  vt.pos = pos;
+  vt.texel = texel;
+  vt.color = color;
+  vt.normal = normal;
+  return vertices.Push (vt);
+}
+
+size_t csFoliageGeometry::AddTriangle (const csTriangle& tri)
+{
+  return triangles.Push (tri);
+}
+
+void csFoliageGeometry::SetMaterialWrapper (iMaterialWrapper* material)
+{
+  csFoliageGeometry::material = material;
+}
+
+//----------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csFoliageObject)
+  SCF_IMPLEMENTS_INTERFACE (iFoliageObject)
+SCF_IMPLEMENT_IBASE_END
+
+csFoliageObject::csFoliageObject (const char* name)
+{
+  SCF_CONSTRUCT_IBASE (0);
+  csFoliageObject::name = csStrNew (name);
+}
+
+csFoliageObject::~csFoliageObject ()
+{
+  delete[] name;
+  SCF_DESTRUCT_IBASE ();
+}
+
+csPtr<iFoliageGeometry> csFoliageObject::CreateGeometry (size_t lodslot)
+{
+  csRef<iFoliageGeometry> geom;
+  geom.AttachNew (new csFoliageGeometry ());
+  geometry.Put (lodslot, geom);
+  return (csPtr<iFoliageGeometry> (geom));
+}
+
+csPtr<iFoliageGeometry> csFoliageObject::CreateGeometryLOD (size_t fromslot,
+      size_t toslot, float factory)
+{
+  // @@@ TODO
+  return 0;
+}
+
+iFoliageGeometry* csFoliageObject::GetGeometry (size_t lodslot)
+{
+  if (lodslot < 0 || lodslot >= geometry.Length ()) return 0;
+  return geometry[lodslot];
+}
+
+size_t csFoliageObject::GetMaxLodSlot () const
+{
+  size_t i = geometry.Length ()-1;
+  while (i != (size_t)~0)
+  {
+    if (geometry[i]) return i;
+  }
+  return (size_t)~0;
+}
+
+//----------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE (csFoliageMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iFoliageMeshState)
@@ -46,19 +135,15 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csFoliageMeshObject::FoliageMeshState)
   SCF_IMPLEMENTS_INTERFACE (iFoliageMeshState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-#ifdef CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_IBASE (csFoliageMeshObject::ShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
-#endif
 
 csFoliageMeshObject::csFoliageMeshObject (csFoliageMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFoliageMeshState);
-#ifdef CS_USE_NEW_RENDERER
   scfiShaderVariableAccessor = new ShaderVariableAccessor (this);
-#endif
 
   csFoliageMeshObject::factory = factory;
   logparent = 0;
@@ -81,9 +166,7 @@ csFoliageMeshObject::csFoliageMeshObject (csFoliageMeshObjectFactory* factory)
 
 csFoliageMeshObject::~csFoliageMeshObject ()
 {
-#ifdef CS_USE_NEW_RENDERER
   scfiShaderVariableAccessor->DecRef ();
-#endif
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiFoliageMeshState);
   SCF_DESTRUCT_IBASE ();
 }
@@ -96,7 +179,6 @@ bool csFoliageMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
 
 void csFoliageMeshObject::SetupShaderVariableContext ()
 {
-#ifdef CS_USE_NEW_RENDERER
   if (svcontext == 0)
     svcontext.AttachNew (new csShaderVariableContext ());
   csShaderVariable* sv;
@@ -136,7 +218,6 @@ void csFoliageMeshObject::SetupShaderVariableContext ()
   // base color to the static colors in the factory.
   sv = svcontext->GetVariableAdd (csFoliageMeshObjectFactory::color_name);
   sv->SetAccessor (scfiShaderVariableAccessor);
-#endif
 }
   
 void csFoliageMeshObject::SetupObject ()
@@ -160,7 +241,6 @@ csRenderMesh** csFoliageMeshObject::GetRenderMeshes (
 {
   n = 0;
 
-#ifdef CS_USE_NEW_RENDERER
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   SetupObject ();
@@ -218,9 +298,6 @@ csRenderMesh** csFoliageMeshObject::GetRenderMeshes (
  
   n = 1;
   return &meshPtr;
-#else
-  return 0;
-#endif
 }
 
 bool csFoliageMeshObject::HitBeamOutline (const csVector3& start,
@@ -290,7 +367,6 @@ iObjectModel* csFoliageMeshObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
-#ifdef CS_USE_NEW_RENDERER
 void csFoliageMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
 {
   if (var->Name == csFoliageMeshObjectFactory::color_name)
@@ -318,7 +394,6 @@ void csFoliageMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
     return;
   }
 }
-#endif
 
 //----------------------------------------------------------------------
 
@@ -336,11 +411,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csFoliageMeshObjectFactory::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-#ifdef CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_IBASE (csFoliageMeshObjectFactory::ShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
-#endif
 
 csStringID csFoliageMeshObjectFactory::vertex_name = csInvalidStringID;
 csStringID csFoliageMeshObjectFactory::texel_name = csInvalidStringID;
@@ -354,9 +427,7 @@ csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (iMeshObjectType *pParent
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFoliageFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-#ifdef CS_USE_NEW_RENDERER
   scfiShaderVariableAccessor = new ShaderVariableAccessor (this);
-#endif
   csFoliageMeshObjectFactory::object_reg = object_reg;
 
   scfiPolygonMesh.SetFactory (this);
@@ -374,7 +445,6 @@ csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (iMeshObjectType *pParent
   polygons = 0;
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#ifdef CS_USE_NEW_RENDERER
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
 
@@ -395,14 +465,11 @@ csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (iMeshObjectType *pParent
   mesh_texels_dirty_flag = true;
   mesh_normals_dirty_flag = true;
   mesh_triangle_dirty_flag = true;
-#endif
 }
 
 csFoliageMeshObjectFactory::~csFoliageMeshObjectFactory ()
 {
-#ifdef CS_USE_NEW_RENDERER
   scfiShaderVariableAccessor->DecRef ();
-#endif
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiFoliageFactoryState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_IBASE ();
@@ -454,7 +521,6 @@ void csFoliageMeshObjectFactory::SetupFactory ()
   }
 }
 
-#ifdef CS_USE_NEW_RENDERER
 void csFoliageMeshObjectFactory::PreGetShaderVariableValue (
   csShaderVariable* var)
 {
@@ -478,8 +544,6 @@ void csFoliageMeshObjectFactory::PreGetShaderVariableValue (
   }
 }
 
-#endif
-
 
 void csFoliageMeshObjectFactory::Invalidate ()
 {
@@ -487,18 +551,15 @@ void csFoliageMeshObjectFactory::Invalidate ()
   delete[] polygons;
   polygons = 0;
 
-#ifdef CS_USE_NEW_RENDERER
   mesh_vertices_dirty_flag = true;
   mesh_texels_dirty_flag = true;
   mesh_normals_dirty_flag = true;
   mesh_triangle_dirty_flag = true;
-#endif
   color_nr++;
 
   scfiObjectModel.ShapeChanged ();
 }
 
-#ifdef CS_USE_NEW_RENDERER
 void csFoliageMeshObjectFactory::PrepareBuffers ()
 {
   if (mesh_vertices_dirty_flag)
@@ -537,7 +598,6 @@ void csFoliageMeshObjectFactory::PrepareBuffers ()
     	sizeof(unsigned int)*PROTO_TRIS*3);
   }
 }
-#endif
 
 SCF_IMPLEMENT_IBASE (csFoliageMeshObjectFactory::PolyMesh)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
@@ -570,6 +630,30 @@ csMeshedPolygon* csFoliageMeshObjectFactory::GetPolygons ()
     }
   }
   return polygons;
+}
+
+csPtr<iFoliageObject> csFoliageMeshObjectFactory::CreateObject (
+    const char* name)
+{
+  csRef<iFoliageObject> obj;
+  obj.AttachNew (new csFoliageObject (name));
+  foliage_objects.Push (obj);
+  return csPtr<iFoliageObject> (obj);
+}
+
+iFoliageObject* csFoliageMeshObjectFactory::FindObject (
+    const char* name) const
+{
+  size_t i;
+  for (i = 0 ; i < foliage_objects.Length () ; i++)
+    if (!strcmp (name, foliage_objects[i]->GetName ()))
+      return foliage_objects[i];
+  return 0;
+}
+
+void csFoliageMeshObjectFactory::SetSamplerRegion (const csBox2& region)
+{
+  samplerRegion = region;
 }
 
 //----------------------------------------------------------------------

@@ -29,6 +29,7 @@
 #include "imesh/foliage.h"
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
+#include "ivaria/terraform.h"
 
 class csFoliageMeshObjectFactory;
 struct iObjectRegistry;
@@ -36,13 +37,68 @@ struct iObjectRegistry;
 #define PROTO_TRIS 12
 #define PROTO_VERTS 8
 
+class csFoliageGeometry : public iFoliageGeometry
+{
+private:
+  csRef<iMaterialWrapper> material;
+  csDirtyAccessArray<csFoliageVertex> vertices;
+  csDirtyAccessArray<csTriangle> triangles;
+
+public:
+  csFoliageGeometry ();
+  virtual ~csFoliageGeometry ();
+
+  //-------------------- iFoliageGeometry implementation -------------------
+
+  SCF_DECLARE_IBASE;
+
+  virtual size_t AddVertex (const csVector3& pos, const csVector2& texel,
+      	const csColor& color, const csVector3& normal);
+  virtual const csDirtyAccessArray<csFoliageVertex>& GetVertices () const
+  {
+    return vertices;
+  }
+  virtual size_t AddTriangle (const csTriangle& tri);
+  virtual const csDirtyAccessArray<csTriangle>& GetTriangles () const
+  {
+    return triangles;
+  }
+  virtual void SetMaterialWrapper (iMaterialWrapper* material);
+  virtual iMaterialWrapper* GetMaterialWrapper () const
+  {
+    return material;
+  }
+};
+
+class csFoliageObject : public iFoliageObject
+{
+private:
+  char* name;
+  csRefArray<iFoliageGeometry> geometry;
+
+public:
+  csFoliageObject (const char* name);
+  virtual ~csFoliageObject ();
+
+  //-------------------- iFoliageObject implementation -------------------
+
+  SCF_DECLARE_IBASE;
+
+  virtual const char* GetName () const { return name; }
+  virtual csPtr<iFoliageGeometry> CreateGeometry (size_t lodslot);
+  virtual csPtr<iFoliageGeometry> CreateGeometryLOD (size_t fromslot,
+      size_t toslot, float factory);
+  virtual iFoliageGeometry* GetGeometry (size_t lodslot);
+  virtual size_t GetMaxLodSlot () const;
+};
+
+
 /**
  * Foliage version of mesh object.
  */
 class csFoliageMeshObject : public iMeshObject
 {
 private:
-#ifdef CS_USE_NEW_RENDERER
   // The render mesh holder is used by GetRenderMeshes() to supply
   // render meshes that can be returned by that function.
   csRenderMeshHolderSingle rmHolder;
@@ -56,7 +112,6 @@ private:
   // the color buffer here. But we will use the basic colors
   // from the factory.
   csRef<iRenderBuffer> color_buffer;
-#endif
 
   // Setup the 'svcontext' to get the buffers and accessors
   // for all types of data we need.
@@ -191,7 +246,6 @@ public:
   } scfiFoliageMeshState;
 
   //------------------ iShaderVariableAccessor implementation ------------
-#ifdef CS_USE_NEW_RENDERER
   class ShaderVariableAccessor : public iShaderVariableAccessor
   {
   private:
@@ -216,7 +270,12 @@ public:
   friend class ShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
-#endif // CS_USE_NEW_RENDERER
+};
+
+/// Palette type.
+struct csFoliagePalette
+{
+  // @@@ TODO
 };
 
 /**
@@ -250,7 +309,6 @@ private:
   bool initialized;
   csWeakRef<iGraphics3D> g3d;
 
-#ifdef CS_USE_NEW_RENDERER
   // Buffers for the renderers.
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
@@ -260,7 +318,6 @@ private:
   // Prepare the buffers (check if they are dirty).
   // Mesh objects will call this before rendering.
   void PrepareBuffers ();
-#endif
 
   // Bounding box/sphere.
   csVector3 radius;
@@ -269,6 +326,12 @@ private:
 
   // For polygon mesh.
   csMeshedPolygon* polygons;
+
+  // Foliage data.
+  csRefArray<iFoliageObject> foliage_objects;
+  csRef<iTerraFormer> terraformer;
+  csBox2 samplerRegion;
+  csArray<csFoliagePalette> foliage_types;
 
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
@@ -309,6 +372,27 @@ public:
    */
   csMeshedPolygon* GetPolygons ();
 
+  csPtr<iFoliageObject> CreateObject (const char* name);
+  iFoliageObject* FindObject (const char* name) const;
+  const csRefArray<iFoliageObject>& GetObjects () const
+  {
+    return foliage_objects;
+  }
+  void SetTerraFormer (iTerraFormer *form) { terraformer = form; }
+  iTerraFormer *GetTerraFormer () { return terraformer; }
+  void SetSamplerRegion (const csBox2& region);
+  const csBox2& GetSamplerRegion () const
+  {
+    return samplerRegion;
+  }
+  void AddPaletteEntry (size_t typeidx, const char* objectname,
+      float relative_density) { }
+  void ClearPaletteType (size_t typeidx) { }
+  size_t GetPaletteTypeCount () const { return foliage_types.Length (); }
+  size_t GetPaletteEntryCount (size_t typeidx) const { return 0; }
+  const char* GetPaletteEntry (size_t typeidx, size_t entryidx,
+      float& relative_density) { return 0; }
+
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
@@ -329,6 +413,58 @@ public:
   class FoliageFactoryState : public iFoliageFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csFoliageMeshObjectFactory);
+    virtual csPtr<iFoliageObject> CreateObject (const char* name)
+    {
+      return scfParent->CreateObject (name);
+    }
+    virtual iFoliageObject* FindObject (const char* name) const
+    {
+      return scfParent->FindObject (name);
+    }
+    virtual const csRefArray<iFoliageObject>& GetObjects () const
+    {
+      return scfParent->GetObjects ();
+    }
+    virtual void SetTerraFormer (iTerraFormer* form)
+    {
+      scfParent->SetTerraFormer (form);
+    }
+    virtual iTerraFormer* GetTerraFormer ()
+    {
+      return scfParent->GetTerraFormer ();
+    }
+
+    virtual void AddPaletteEntry (size_t typeidx, const char* objectname,
+      float relative_density)
+    {
+      scfParent->AddPaletteEntry (typeidx, objectname, relative_density);
+    }
+    virtual void ClearPaletteType (size_t typeidx)
+    {
+      scfParent->ClearPaletteType (typeidx);
+    }
+    virtual size_t GetPaletteTypeCount () const
+    {
+      return scfParent->GetPaletteTypeCount ();
+    }
+    virtual size_t GetPaletteEntryCount (size_t typeidx) const
+    {
+      return scfParent->GetPaletteEntryCount (typeidx);
+    }
+    virtual const char* GetPaletteEntry (size_t typeidx, size_t entryidx,
+      float& relative_density)
+    {
+      return scfParent->GetPaletteEntry (typeidx, entryidx, relative_density);
+    }
+
+    virtual void SetSamplerRegion (const csBox2& region)
+    {
+      scfParent->SetSamplerRegion (region);
+    }
+    virtual const csBox2& GetSamplerRegion () const
+    {
+      return scfParent->GetSamplerRegion ();
+    }
   } scfiFoliageFactoryState;
 
   //------------------ iPolygonMesh interface implementation ----------------//
@@ -389,7 +525,6 @@ public:
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //------------------ iShaderVariableAccessor implementation ------------
-#ifdef CS_USE_NEW_RENDERER
   class ShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
@@ -412,7 +547,6 @@ public:
   friend class ShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
-#endif // CS_USE_NEW_RENDERER
 };
 
 /**
