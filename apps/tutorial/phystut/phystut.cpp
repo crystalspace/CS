@@ -165,7 +165,7 @@ bool Simple::HandleEvent (iEvent& ev)
   else if (ev.Type == csevKeyDown && ev.Key.Code == 'g')
   { // Toggle gravity.
     dynSys->SetGravity (dynSys->GetGravity () == 0 ?
-     csVector3 (0, -5, 0) : csVector3 (0));
+     csVector3 (0,-7,0) : csVector3 (0));
     return true;
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
@@ -386,7 +386,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
 
   view = new csView (engine, g3d);
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -4.9));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -4.5));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
@@ -441,7 +441,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  dynSys->SetGravity (csVector3 (0,-9.8,0));
+  dynSys->SetGravity (csVector3 (0,-7,0));
 
   CreateRoomSolids (csVector3 (0), csVector3 (5), 1);
 
@@ -468,12 +468,12 @@ void Simple::CreateBox (void)
   const csMatrix3 tm;
   const csVector3 tv (0);
   csOrthoTransform t (tm, tv);
-  csVector3 size (.5, 1, .5); // This should be the same size as the mesh.
-  rb->AttachColliderBox (size, t, 10, 1, 2);
+  csVector3 size (.4, .8, .4); // This should be the same size as the mesh.
+  rb->AttachColliderBox (size, t, 10, 1, 0);
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
-  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (0, 0, 1));
+  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
 }
 
 void Simple::CreateSphere (void)
@@ -506,11 +506,11 @@ void Simple::CreateSphere (void)
   mesh->DecRef ();
 
   // Create and attach a sphere collider.
-  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0), 10, 1, 2);
+  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0), 10, 1, .25);
 
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
-  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (0, 0, 1));
+  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
 }
 
 void Simple::CreateRoomSolids (const csVector3& center,
@@ -530,32 +530,32 @@ void Simple::CreateRoomSolids (const csVector3& center,
   // down
   t.SetOrigin (center + csVector3 (0, -radius.y - thickness/2, 0));
   rb->AttachColliderBox (
-   csVector3 (radius.x*2, thickness, radius.z*2), t, 50, 1000, 0);
+   csVector3 (radius.x*2, thickness, radius.z*2), t, 1, 1000, 0);
 
   // up
   t.SetOrigin (center + csVector3 (0, radius.y + thickness/2, 0));
   rb->AttachColliderBox (
-   csVector3 (radius.x*2, thickness, radius.z*2), t, 50, 1000, 0);
+   csVector3 (radius.x*2, thickness, radius.z*2), t, 1, 1000, 0);
 
   // forward
   t.SetOrigin (center + csVector3 (0, 0, radius.z + thickness/2));
   rb->AttachColliderBox (
-   csVector3 (radius.x*2, radius.y*2, thickness), t, 50, 1000, 0);
+   csVector3 (radius.x*2, radius.y*2, thickness), t, 1, 1000, 0);
 
   // right
   t.SetOrigin (center + csVector3 (radius.x + thickness/2, 0, 0));
   rb->AttachColliderBox (
-   csVector3 (thickness, radius.y*2, radius.z*2), t, 50, 1000, 0);
+   csVector3 (thickness, radius.y*2, radius.z*2), t, 1, 1000, 0);
 
   // left
   t.SetOrigin (center + csVector3 (-radius.x - thickness/2, 0, 0));
   rb->AttachColliderBox (
-   csVector3 (thickness, radius.y*2, radius.z*2), t, 50, 1000, 0);
+   csVector3 (thickness, radius.y*2, radius.z*2), t, 1, 1000, 0);
 
   // back
   t.SetOrigin (center + csVector3 (0, 0, -radius.z - thickness/2));
   rb->AttachColliderBox (
-   csVector3 (radius.x*2, radius.y*2, thickness), t, 50, 1000, 0);
+   csVector3 (radius.x*2, radius.y*2, thickness), t, 1, 1000, 0);
 
 }
 
