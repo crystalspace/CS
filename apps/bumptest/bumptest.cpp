@@ -275,6 +275,8 @@ static bool BumpEventHandler (iEvent& ev)
 bool BumpTest::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
+  (void)argc;
+  (void)argv;
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");

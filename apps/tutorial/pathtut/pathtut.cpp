@@ -142,6 +142,8 @@ bool PathTut::PathTutEventHandler (iEvent& ev)
 
 bool PathTut::Initialize (int argc, const char* const argv[])
 {
+  (void)argc;
+  (void)argv;
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,

@@ -504,6 +504,13 @@ void Cs2Xml::ParsePortal (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname, csRef<iDocumentNode>& portal_node)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
+  (void)portal_node;
   if (!portal_node)
   {
     portal_node = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
@@ -518,6 +525,13 @@ void Cs2Xml::ParseWarp (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname, csRef<iDocumentNode>& portal_node)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
+  (void)portal_node;
   if (!portal_node)
   {
     portal_node = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
@@ -597,6 +611,12 @@ void Cs2Xml::ParseMaterialGroup (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   int rangeStart, rangeEnd;
   char buf[512];
   csScanStr (params, "%s,%d,%d", buf, &rangeStart, &rangeEnd);
@@ -611,6 +631,12 @@ void Cs2Xml::ParseAmbient (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   if (!strcmp (parent_token, "settings"))
   {
     csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -637,6 +663,12 @@ void Cs2Xml::ParseColor (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -652,6 +684,12 @@ void Cs2Xml::ParsePolygon (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue ("p");
@@ -663,6 +701,12 @@ void Cs2Xml::ParseQ (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   float x, y, z, r;
   csScanStr (params, "%f,%f,%f,%f", &x, &y, &z, &r);
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -679,6 +723,12 @@ void Cs2Xml::ParseTimes (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   if (!strcmp (parent_token, "path"))
   {
     int n;
@@ -712,6 +762,12 @@ void Cs2Xml::ParseRotPart (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -729,6 +785,12 @@ void Cs2Xml::ParseAttach (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -768,6 +830,12 @@ void Cs2Xml::ParseSetupMesh(char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -792,6 +860,12 @@ void Cs2Xml::ParseFade (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -808,6 +882,12 @@ void Cs2Xml::ParseFarPlane (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -824,6 +904,12 @@ void Cs2Xml::ParseUVShift (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child;
   float u, v;
   csScanStr (params, "%f,%f", &u, &v);
@@ -869,6 +955,12 @@ void Cs2Xml::ParseCurveControl (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -886,6 +978,12 @@ void Cs2Xml::ParseDuration (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue ("duration");
@@ -897,6 +995,12 @@ void Cs2Xml::ParseAnimate (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -958,6 +1062,12 @@ void Cs2Xml::ParseVertex (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue ("v");
@@ -973,6 +1083,12 @@ void Cs2Xml::ParseV (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   if (strchr (params, ':'))
   {
     // For sprites or genmesh statement.
@@ -1023,6 +1139,12 @@ void Cs2Xml::ParseColors (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   int i;
   float list[300];
   int num;
@@ -1042,6 +1164,12 @@ void Cs2Xml::ParseUVA (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   int i;
   float list[300];
   int num;
@@ -1061,6 +1189,12 @@ void Cs2Xml::ParseUV (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   if (!strcmp (parent_token, "p"))
   {
     // UV inside polygon.
@@ -1126,6 +1260,12 @@ void Cs2Xml::ParseVertices (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   if (!strcmp (parent_token, "params") && strchr (params, ':'))
   {
     // In this case we have a VERTICES from a genmesh.
@@ -1181,6 +1321,12 @@ void Cs2Xml::ParseTriangles (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   if (!strcmp (parent_token, "params"))
   {
     // In this case we have a TRIANGLES from a genmesh.
@@ -1201,6 +1347,12 @@ void Cs2Xml::ParseTexture (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   if (!strcmp (parent_token, "p"))
   {
     csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -1249,6 +1401,12 @@ void Cs2Xml::ParseMatrix (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1260,6 +1418,12 @@ void Cs2Xml::ParseFilename (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   char filename[2048];
   csScanStr (params, "%s", filename);
   CreateValueNode (parent, "file", filename);
@@ -1269,6 +1433,12 @@ void Cs2Xml::ParseTriangle (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   int list[1000];
   int num;
   csScanStr (params, "%D", list, &num);
@@ -1285,6 +1455,12 @@ void Cs2Xml::ParseSingle (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1312,6 +1488,12 @@ void Cs2Xml::ParseSlope (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   if (!strcmp (parent_token, "params") && IsString (params) &&
       !strcmp (tokname, "heightmap"))
   {
@@ -1340,6 +1522,12 @@ void Cs2Xml::ParseGenerate (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1365,6 +1553,12 @@ void Cs2Xml::ParseHalo (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1425,6 +1619,12 @@ void Cs2Xml::ParseDoFlatten (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   bool t, r, d, l;
   csScanStr (params, "%b, %b, %b, %b", &t, &d, &l, &r);
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -1461,6 +1661,12 @@ void Cs2Xml::ParseFlatten (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   float t, r, d, l;
   csScanStr (params, "%f, %f, %f, %f", &t, &d, &l, &r);
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -1477,6 +1683,12 @@ void Cs2Xml::ParseFog (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   float r, g, b, density;
   csScanStr (params, "%f,%f,%f,%f", &r, &g, &b, &density);
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -1493,6 +1705,12 @@ void Cs2Xml::ParseKey (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   char Key  [256];
   char Value[10000];
   csScanStr (params, "%S,%S", Key, Value);
@@ -1507,6 +1725,12 @@ void Cs2Xml::ParseAging (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   int time;
   float r, g, b, alpha, swirl, rotspeed, scale;
   csScanStr (params, "%d,%f,%f,%f,%f,%f,%f,%f", &time,
@@ -1532,6 +1756,12 @@ void Cs2Xml::ParseRegularParticles (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1547,6 +1777,12 @@ void Cs2Xml::ParseIsoSpace (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   int minx=0,minz=0;
   float miny=0,maxy=0;
   csScanStr (params, "%d,%d,%f,%f", &minx, &minz, &miny, &maxy);
@@ -1609,6 +1845,12 @@ void Cs2Xml::ParseDropSize (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1623,6 +1865,12 @@ void Cs2Xml::ParseCorrectSeams (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1637,6 +1885,12 @@ void Cs2Xml::ParseBC (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1656,6 +1910,12 @@ void Cs2Xml::ParseBH (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1672,6 +1932,12 @@ void Cs2Xml::ParseSysDist (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1702,6 +1968,12 @@ void Cs2Xml::ParseBlocks (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1716,6 +1988,12 @@ void Cs2Xml::ParseEmitCylinder (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   float x1, y1, z1, x2, y2, z2, p, q;
   csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &x1, &y1, &z1,
       &x2, &y2, &z2, &p, &q);
@@ -1743,6 +2021,12 @@ void Cs2Xml::ParseHazeCone (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   int number;
   float x1, y1, z1, x2, y2, z2, p, q;
   csScanStr (params, "%d, %f,%f,%f,%f,%f,%f, %f, %f", &number,
@@ -1772,6 +2056,12 @@ void Cs2Xml::ParseBox (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   float x1, y1, z1, x2, y2, z2;
   csScanStr (params, "%f,%f,%f,%f,%f,%f", &x1, &y1, &z1,
       &x2, &y2, &z2);
@@ -1797,6 +2087,12 @@ void Cs2Xml::ParseEmitFixed (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   float x1, y1, z1;
   csScanStr (params, "%f,%f,%f", &x1, &y1, &z1);
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -1812,6 +2108,12 @@ void Cs2Xml::ParseEmitSphere (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   float x1, y1, z1, p, q;
   csScanStr (params, "%f,%f,%f,%f,%f", &x1, &y1, &z1, &p, &q);
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -1829,6 +2131,12 @@ void Cs2Xml::ParseF (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   char framename[256];
   int time;
   csScanStr (params, "%s,%d", framename, &time);
@@ -1843,6 +2151,12 @@ void Cs2Xml::ParseNum (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   if (strchr (params, ','))
   {
     // For genmesh.
@@ -1863,6 +2177,12 @@ void Cs2Xml::ParsePriority (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   if (!strcmp (parent_token, "renderpriorities"))
   {
     long pri;
@@ -1953,6 +2273,12 @@ void Cs2Xml::ParseLODDistance (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1968,6 +2294,12 @@ void Cs2Xml::ParseLODCost (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -1983,6 +2315,12 @@ void Cs2Xml::ParseDirLight (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -2009,6 +2347,12 @@ void Cs2Xml::ParseLight (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -2051,6 +2395,12 @@ void Cs2Xml::ParseTransparent (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
       CS_NODE_ELEMENT, NULL);
   child->SetValue (tokname);
@@ -2066,6 +2416,12 @@ void Cs2Xml::ParseScale (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   csRef<iDocumentNode> child;
   float x, y, z;
   int num = csScanStr (params, "%f,%f,%f", &x, &y, &z);
@@ -2098,6 +2454,12 @@ void Cs2Xml::ParseType (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   char buf[2048];
   csScanStr (params, "%s", buf);
   char* tt = ToLower (buf, true);
@@ -2109,6 +2471,12 @@ void Cs2Xml::ParseLibrary (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
 
   if (IsEmpty (params))
   {
@@ -2127,6 +2495,12 @@ void Cs2Xml::ParseOther (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
+  (void)parent_token;
+  (void)parser;
+  (void)parent;
+  (void)name;
+  (void)params;
+  (void)tokname;
   bool val;
   if (IsEmpty (params))
   {

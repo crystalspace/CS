@@ -65,6 +65,7 @@ static void Test (iBase* obj, const char* name)
   fflush (stdout);
 }
 
+#if 0
 static void Benchmark (iBase* obj, const char* name, int num_iterations)
 {
   if (!obj)
@@ -83,6 +84,7 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
     printf ("%s benchmark not performed (object doesn't support it).\n", name);
   fflush (stdout);
 }
+#endif
 
 static int DoStuff (iObjectRegistry* object_reg)
 {

@@ -64,7 +64,7 @@ const char* CustomComponent::Type ()
   return "Demo Component";
 }
 
-void CustomComponent::OnDraw (csRect clip)
+void CustomComponent::OnDraw (csRect /*clip*/)
 {
   // lets draw a black box
   // yeah its dull... I know
