@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node RPM
+@node RPM, , Unix, Unix
 @subsubsection Unix using RPM packages
 @cindex Rpm
 @cindex package
@@ -42,7 +42,8 @@ Extract the @file{CS/scripts/rpm/cs.spec} file, and put it in your
 
 @example
 cd /home/user/rpm/SPECS
-tar xvjf /home/user/rpm/SOURCES/cs-current-snapshot.tar.bz2 CS/scripts/rpm/cs.spec
+tar xvjf /home/user/rpm/SOURCES/cs-current-snapshot.tar.bz2 \
+     CS/scripts/rpm/cs.spec
 mv CS/scripts/rpm/cs.spec /home/user/rpm/SPECS
 rm -rf CS/
 @end example

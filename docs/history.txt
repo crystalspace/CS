@@ -30,6 +30,9 @@ chronological order.
 	- Luca fixed a loop in the file CS\libs\csutil\cseventq.cpp. The loop
 	  was behaving not properly after the change of the management of the
 	  index in the csArray class.
+	- Vincent Knecht modified rpm.txi to avoid an overfull hbox error,
+	  and unix.txi to not display package systems advertisement in "nottex"
+	  mode.
 10-Jul-2004
 	- res fixed the Win32 manifest resource generation code to not emit
 	  non-numerical characters when writing the version number - Windows

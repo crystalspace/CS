@@ -6,7 +6,9 @@
 This section covers all of the Unix-style platforms supported by Crystal Space,
 including Linux, FreeBSD, NetBSD, Solaris, etc.
 
+@ifnottex
 It is now possible to install Crystal Space using packaging systems:
+@end ifnottex
 
 @menu
 * RPM:: Unix using RPM packages
