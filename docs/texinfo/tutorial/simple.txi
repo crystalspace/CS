@@ -703,7 +703,7 @@ on smart pointers for a full info (@pxref{HOWTO Smart Pointers}).
 Now, this still isn't enough.  We have a camera but the camera is not used.
 We still have to write code that actually draws the screen. We will do this
 in the functions @code{SetupFrame()} and @code{FinishFrame()}. Note that
-Crystal Space is event driver so the actual drawing needs to be triggered
+Crystal Space is event driven so the actual drawing needs to be triggered
 by the event handler. Add the following code somewhere in the source file:
 
 @example
