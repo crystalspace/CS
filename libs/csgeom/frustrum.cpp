@@ -364,7 +364,7 @@ bool csFrustrum::Contains (csVector3* frustrum, int num_frust,
 bool csFrustrum::IsVisible (csVector3* frustrum, int num_frust,
   	csVector3* poly, int num_poly)
 {
-  int i1, j1, i, j;
+  int i;
 
   // If any of the polygon vertices is in the frustrum then
   // the polygon is visible.
