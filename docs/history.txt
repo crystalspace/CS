@@ -13,6 +13,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+10-Oct-1999
+	- Eric Sunshine fixed the MacOS/X Server, OpenStep, and NextStep ports
+	  so that applications once again link following Andrew's changes.
+	- Eric Sunshine fixed a few problems with the Crystal Clear makefiles.
 7-Oct-1999
 	- Eric Sunshine added apps/support/ezstatic.cpp.  This is a companion
 	  to static.cpp.  It provides COM initialization for applications

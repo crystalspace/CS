@@ -142,7 +142,8 @@ INHIBIT_DLL_LIBS=yes
 NASMFLAGS.SYSTEM=
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS)))
+SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS))) \
+  libs/cssys/general/printf.cpp
 
 # Where to put the dynamic libraries on this system?
 OUTDLL=
