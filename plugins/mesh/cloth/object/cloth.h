@@ -108,11 +108,11 @@ class ClothIntegrator
 		csVector3* shift;
 		   csBox3* object_bbox;
 		csVector3* aux;
-	      unsigned int nverts;
-	      unsigned int STRfields;
-	      unsigned int SHRfields;
-	      unsigned int Xsize;
-	      unsigned int Ysize;
+	      int nverts;
+	      int STRfields;
+	      int SHRfields;
+	      int Xsize;
+	      int Ysize;
 
 	             float dt;  //time interval
 

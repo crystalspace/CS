@@ -112,7 +112,7 @@ void csStuffObject::SetupMesh()
 	Ysize=40;
         num_vertices=( Xsize + 1 )*( Ysize + 1 );
 	num_triangles=4 * Xsize * Ysize;
-	int count;
+	int count = 0;
 	printf(" %u \n",count++);
 	if (vertices) delete[](vertices);
 	if (texels) delete[](texels);
