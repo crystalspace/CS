@@ -52,6 +52,10 @@ chronological order.
 	- Steven Geens cleaned up the fountain creation code in the socket
 	  test of viewmesh. You still have to move around a bit before you can
 	  see the fountain, probably a culling problem.
+	- Neil Mosafi added support to the csvosa3dl plugin for automatic 
+	  listening to movement and orientation changes of a3dl metaobjects
+	  Also fixed orientation which was incorrectly using degress instead
+	  of radians to set the CS angle
 16-Feb-2004
 	- Jorrit fixed rain mesh object so it now has a reasonably default
 	  box in case the user doesn't call SetBox().
