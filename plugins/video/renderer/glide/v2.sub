@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.glide3d2 = Crystal Space Glide V2 3D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make glide3d2      Make the $(DESCRIPTION.glide3d2)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make glide3d2      Make the $(DESCRIPTION.glide3d2)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: glide3d2
+.PHONY: glide3d2 glide3d2clean
 
 all plugins drivers drivers3d: glide3d2
 
@@ -26,7 +27,7 @@ glide3d2clean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 CFLAGS.GLIDE3D2+= $(GLIDE2_PATH) -DDO_GLIDE -DGLIDE24_ONLY
@@ -38,7 +39,7 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
   LIBS.GLIDE3D2=$(LIBS._GLIDE3D2)
   DEP.GLIDE3D2=$(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
-  GLIDE3D2=$(OUT)$(LIB_PREFIX)glide3d2$(LIB)
+  GLIDE3D2=$(OUT)$(LIB_PREFIX)gl3d2$(LIB)
   DEP.EXE+=$(GLIDE3D2)
   LIBS.EXE+=$(LIBS._GLIDE3D2)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDE3D2
@@ -47,11 +48,12 @@ DESCRIPTION.$(GLIDE3D2) = $(DESCRIPTION.glide3d2)
 SRC0.GLIDE3D2 = $(wildcard plugins/video/renderer/glide/*.cpp )
 SRC1.GLIDE3D2 = $(wildcard plugins/video/renderer/common/*.cpp)
 SRC.GLIDE3D2 = $(SRC0.GLIDE3D2) $(SRC1.GLIDE3D2)
-OBJ.GLIDE3D2 = $(addprefix $(OUT),$(notdir $(SRC1.GLIDE3D2:.cpp=$O) $(SRC0.GLIDE3D2:.cpp=2$O)))
+OBJ.GLIDE3D2 = $(addprefix $(OUT),$(notdir $(SRC1.GLIDE3D2:.cpp=$O) \
+  $(SRC0.GLIDE3D2:.cpp=2$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: glide3d2 glide3d2clean
@@ -71,7 +73,7 @@ $(GLIDE3D2): $(OBJ.GLIDE3D2) $(DEP.GLIDE3D2)
 	$(DO.PLUGIN) $(LIBS.GLIDE3D2)
 
 glide3d2clean:
-	$(RM) $(GLIDE3D2) $(OBJ.GLIDE3D2)
+	$(RM) $(GLIDE3D2) $(OBJ.GLIDE3D2) $(OUTOS)glide3d2.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)glide3d2.dep
