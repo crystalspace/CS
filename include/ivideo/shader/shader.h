@@ -1,7 +1,6 @@
 /*
     Copyright (C) 2002 by Mårten Svanfeldt
                           Anders Stenberg
-                          Mat Sutcliffe
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -36,124 +35,58 @@ struct iDocumentNode;
 class csSymbolTable;
 struct iMaterial;
 
+struct iShaderManager;
+struct iShaderRenderInterface;
 struct iShader;
 struct iShaderWrapper;
+struct iShaderVariable;
 struct iShaderTechnique;
 struct iShaderPass;
 struct iShaderProgram;
 struct iShaderProgramPlugin;
-struct iShaderRenderInterface;
-
-/**
- * A variable stored in any of the shader-related classes.
- */
-SCF_VERSION (iShaderVariable, 0, 1, 0);
-struct iShaderVariable : public iBase
-{
-  /// Types of variables
-  enum VariableType
-  {
-    INT = 1,
-    STRING,
-    FLOAT,
-    VECTOR3,
-    VECTOR4
-  };
-
-  /// Set the variable's type
-  virtual void SetType(VariableType) = 0;
-  /// Get the variable's type
-  virtual VariableType GetType() const = 0;
-
-  /// Set the variable's name
-  virtual void SetName(const char*) = 0;
-  /// Get the variable's name
-  virtual const char* GetName() const = 0;
-
-  /// Get an int value
-  virtual bool GetValue(int& value) const = 0;
-  /// Get a float value
-  virtual bool GetValue(float& value) const = 0;
-  /// Get a string value
-  virtual bool GetValue(iString*& value) const = 0;
-  /// Get a 3-vector value
-  virtual bool GetValue(csVector3& value) const = 0;
-  /// Get a 4-vector value
-  virtual bool GetValue(csVector4& value) const = 0;
-
-  /// Set an int value
-  virtual bool SetValue(int value) = 0;
-  /// Set a float value
-  virtual bool SetValue(float value) = 0;
-  /// Set a string value
-  virtual bool SetValue(iString* value) = 0;
-  /// Set a 3-vector value
-  virtual bool SetValue(const csVector3 &value) = 0;
-  /// Set a 4-vector value
-  virtual bool SetValue(const csVector4 &value) = 0;
-};
-
-SCF_VERSION (iShaderBranch, 0, 0, 1);
-/**
- * Any class that wants in on the shader variable system
- * must implement this interface.
- */
-struct iShaderBranch : public iBase
-{
-  /// Add a child to this branch
-  virtual void AddChild(iShaderBranch *child) = 0;
-
-  /// Add a variable to this context
-  virtual bool AddVariable(iShaderVariable* variable) = 0;
-
-  /// Get variable
-  virtual iShaderVariable* GetVariable(csStringID) = 0;
-
-  /// Get the symbol table (used by the implementation to store the variables)
-  virtual csSymbolTable* GetSymbolTable() = 0;
-
-  /// Select the current symbol table from the array of symbol tables.
-  /// If there is only one symbol table, this is a no-op.
-  virtual void SelectSymbolTable(int index) = 0;
-};
 
 SCF_VERSION (iShaderManager, 0, 1, 0);
 /**
  * A manager for all shaders. Will only be one at a given time
  */
-struct iShaderManager : public iShaderBranch
+struct iShaderManager : iBase
 {
   /// Create an empty shader
   virtual csPtr<iShader> CreateShader() = 0;
-
   /// Get a shader by name
-  virtual iShaderWrapper* GetShader(const char* name) = 0;
-
+  virtual iShader* GetShader(const char* name) = 0;
   /// Create a wrapper for a new shader
   virtual csPtr<iShaderWrapper> CreateWrapper(iShader* shader) = 0;
-
   /// Returns all shaders that have been created
   virtual const csRefArray<iShaderWrapper> &GetShaders () = 0;
 
+  /// Create variable
+  virtual csPtr<iShaderVariable> CreateVariable(const char* name) const = 0;
+  /// Add a variable to this context
+  virtual bool AddVariable(iShaderVariable* variable) = 0;
+  /// Get variable
+  virtual iShaderVariable* GetVariable(int namehash) = 0;
+  /// Get all variable names added to this context (used when creating them)
+  virtual csBasicVector GetAllVariableNames() const = 0; 
+  /// Get the symbol table (used by the implementation to store the variables)
+  virtual csSymbolTable* GetSymbolTable() = 0;
+
   /// Create a shaderprogram
   virtual csPtr<iShaderProgram> CreateShaderProgram(const char* type) = 0;
-
-  /// Create a shader variable
-  virtual csPtr<iShaderVariable> CreateVariable(const char* name) const = 0;
 };
 
-SCF_VERSION (iShaderRenderInterface, 0, 1, 0);
-struct iShaderRenderInterface : public iBase
+SCF_VERSION (iShaderRenderInterface, 0,0,1);
+struct iShaderRenderInterface : iBase
 {
   /// Get a implementationspecific object
   virtual void* GetPrivateObject(const char* name) = 0;
 };
 
-SCF_VERSION (iShader, 0, 1, 0);
+SCF_VERSION (iShader, 0,0,1);
 /**
  * Specific shader. Can/will be either render-specific or general
  */
-struct iShader : public iShaderBranch
+struct iShader : iBase
 {
   /// Set this shader's name
   virtual void SetName(const char* name) = 0;
@@ -169,6 +102,15 @@ struct iShader : public iShaderBranch
   /// Retrieve the best technique in this shader
   virtual iShaderTechnique* GetBestTechnique() = 0;
 
+  /// Add a variable to this context
+  virtual bool AddVariable(iShaderVariable* variable) = 0;
+  /// Get variable
+  virtual iShaderVariable* GetVariable(int namehash) = 0;
+  /// Get all variable names in this context (used when creating them)
+  virtual csBasicVector GetAllVariableNames() const = 0; 
+  /// Get the symbol table (used by the implementation to store the variables)
+  virtual csSymbolTable* GetSymbolTable() = 0;
+
   /// Check if valid (normaly a shader is valid if there is at least one valid technique)
   virtual bool IsValid() const = 0;
 
@@ -182,25 +124,62 @@ struct iShader : public iShaderBranch
   virtual bool Prepare() = 0;
 };
 
-SCF_VERSION (iShaderWrapper, 0, 1, 0);
+SCF_VERSION(iShaderWrapper, 0, 0, 1);
 /**
  * A thin wrapper over iShader to do dynamic selection of which iMaterial
  * the shader is acting on.
  */
-struct iShaderWrapper : public iShaderBranch
+struct iShaderWrapper : iBase
 {
   /// Get the wrapped shader.
   virtual iShader* GetShader() = 0;
 
   /// Select the material we are about to act on.
-  virtual void SelectMaterial(iMaterialHandle* mat) = 0;
+  virtual void SelectMaterial(iMaterial* mat) = 0;
+
+  /// Get the symbol table (used by the implementation to store the variables)
+  virtual csSymbolTable* GetSymbolTable() = 0;
 };
 
-SCF_VERSION (iShaderTechnique, 0, 1, 0);
+/**
+ * A variable stored in any of the shader-related classes.
+ */
+SCF_VERSION (iShaderVariable, 0,0,1);
+struct iShaderVariable : iBase
+{
+  enum VariableType
+  {
+    INT = 1,
+    STRING,
+    FLOAT,
+    VECTOR3,
+    VECTOR4
+  };
+
+  virtual VariableType GetType() const = 0;
+  virtual void SetType(VariableType) = 0;
+
+  virtual int GetHash() const = 0;
+
+  virtual void SetName(const char*) = 0;
+  virtual const char* GetName() const = 0;
+  virtual bool GetValue(int& value) const = 0;
+  virtual bool GetValue(float& value) const = 0;
+  virtual bool GetValue(iString*& value) const = 0;
+  virtual bool GetValue(csVector3& value) const = 0;
+  virtual bool GetValue(csVector4& value) const = 0;
+  virtual bool SetValue(int value) = 0;
+  virtual bool SetValue(float value) = 0;
+  virtual bool SetValue(iString* value) = 0;
+  virtual bool SetValue(const csVector3 &value) = 0;
+  virtual bool SetValue(const csVector4 &value) = 0;
+};
+
+SCF_VERSION (iShaderTechnique, 0,0,1);
 /**
  * One specific technique used by shader.
  */
-struct iShaderTechnique : public iShaderBranch
+struct iShaderTechnique : iBase
 {
   /**
    * Get technique priority. If there are several valid techniques
@@ -229,13 +208,22 @@ struct iShaderTechnique : public iShaderBranch
 
   /// Prepares the technique for usage.
   virtual bool Prepare() = 0;
+
+  /// Add a variable to this context
+  virtual bool AddVariable(iShaderVariable* variable) = 0;
+  /// Get variable
+  virtual iShaderVariable* GetVariable(int namehash) = 0;
+  /// Get all variable names added to this context (used when creating them)
+  virtual csBasicVector GetAllVariableNames() const = 0; 
+  /// Get the symbol table (used by the implementation to store the variables)
+  virtual csSymbolTable* GetSymbolTable() = 0;
 };
 
-SCF_VERSION (iShaderPass, 0, 1, 0);
+SCF_VERSION (iShaderPass, 0,0,1);
 /**
- * Description of a single pass in a shader
+ * Description of a single pass in  a shader
  */
-struct iShaderPass : public iShaderBranch
+struct iShaderPass : iBase
 {
   /// Add a stream mapping
   virtual void AddStreamMapping (csStringID name, csVertexAttrib attribute) = 0;
@@ -281,6 +269,15 @@ struct iShaderPass : public iShaderBranch
   /// Reset states to original
   virtual void ResetState () = 0;
 
+  /// Add a variable to this context
+  virtual bool AddVariable(iShaderVariable* variable) = 0;
+  /// Get variable
+  virtual iShaderVariable* GetVariable(int namehash) = 0;
+  /// Get all variable names added to this context (used when creating them)
+  virtual csBasicVector GetAllVariableNames() const = 0; 
+  /// Get the symbol table (used by the implementation to store the variables)
+  virtual csSymbolTable* GetSymbolTable() = 0;
+
   /// Loads pass from buffer
   virtual bool Load(iDataBuffer* program) = 0;
 
@@ -291,12 +288,12 @@ struct iShaderPass : public iShaderBranch
   virtual bool Prepare() = 0;
 };
 
-SCF_VERSION (iShaderProgram, 0, 1, 0);
+SCF_VERSION (iShaderProgram, 0,0,1);
 /** 
  * A shader-program is either a vertexprogram, fragmentprogram or any
  * other type of "program" utilizied by shader.
  */
-struct iShaderProgram : public iShaderBranch
+struct iShaderProgram : iBase
 {
   /// Get a programid for the current program
   virtual csPtr<iString> GetProgramID() = 0;
@@ -313,6 +310,31 @@ struct iShaderProgram : public iShaderBranch
   /// Reset states to original
   virtual void ResetState () = 0;
 
+  /* Propertybag - get property, return false if no such property found
+   * Which properties there is is implementation specific
+   */
+  virtual bool GetProperty(const char* name, iString* string) = 0;
+  virtual bool GetProperty(const char* name, int* string) = 0;
+  virtual bool GetProperty(const char* name, csVector3* string) = 0;
+//  virtual bool GetProperty(const char* name, csVector4* string) const = 0;
+
+  /* Propertybag - set property.
+   * Which properties there is is implementation specific
+   */
+  virtual bool SetProperty(const char* name, iString* string) = 0;
+  virtual bool SetProperty(const char* name, int* string) = 0;
+  virtual bool SetProperty(const char* name, csVector3* string) = 0;
+//  virtual bool SetProperty(const char* name, csVector4* string) = 0;
+
+  /// Add a variable to this context
+  virtual bool AddVariable(iShaderVariable* variable) = 0;
+  /// Get variable
+  virtual iShaderVariable* GetVariable(int namehash) = 0;
+  /// Get all variable names added to this context (used when creating them)
+  virtual csBasicVector GetAllVariableNames() = 0;
+  /// Get the symbol table (used by the implementation to store the variables)
+  virtual csSymbolTable* GetSymbolTable() = 0;
+
   /// Check if valid
   virtual bool IsValid() = 0;
 
@@ -327,20 +349,11 @@ struct iShaderProgram : public iShaderBranch
   virtual bool Prepare() = 0;
 };
 
-SCF_VERSION (iShaderProgramPlugin, 0, 0, 1);
-/**
- * A plugin containing shader programs must
- * export an implementation of this interface.
- */
-struct iShaderProgramPlugin : public iBase
+SCF_VERSION(iShaderProgramPlugin, 0,0,1);
+struct iShaderProgramPlugin : iBase
 {
-  /// Create a named program
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) = 0;
-
-  /// See if the plugin supports creation of the named type of shader program
   virtual bool SupportType(const char* type) = 0;
-
-  /// Activate the plugin
   virtual void Open() = 0;
 };
 

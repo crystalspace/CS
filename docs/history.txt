@@ -61,6 +61,9 @@ The history order is reversed so that new features are at the top.
 	  This should make metadata retrieval a bit faster.
 	- res fixed FR #759764 "Uninitialized members in partgen.cpp":
 	  alphapersecond/alpha_now are now initialized to 0.0f resp. 1.0f.
+	- Marten reverted Oktals addition of a new variablesystem to render3d.
+	  It have alot of serve compilation-errors which should be fixed before
+	  commiting.
 23-Jun-2003
         - Boyan did the following in AWS:
           - Added iAwsComponent->GetFirstFocusableChild

@@ -118,11 +118,6 @@ struct iTextureManager : public iBase
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags) = 0;
 #ifdef CS_USE_NEW_RENDERER
   virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image, int flags, int target) = 0;
-
-  /**
-   * Find the material's index in the manager's array of materials.
-   */
-  virtual int GetMaterialIndex (iMaterialHandle *) = 0;
 #endif
   /**
    * After all textures have been added, this function does all

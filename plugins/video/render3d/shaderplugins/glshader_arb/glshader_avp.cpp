@@ -36,6 +36,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
+//#include "ivideo/shader/shadervar.h"
 
 #include "video/canvas/openglcommon/glextmanager.h"
 
@@ -283,6 +284,36 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
 bool csShaderGLAVP::Prepare()
 {
   return LoadProgramStringToGL(programstring);
+}
+
+
+csBasicVector csShaderGLAVP::GetAllVariableNames()
+{
+  csBasicVector res;
+
+  csGlobalHashIterator c( &variables);
+  while(c.HasNext())
+  {
+    res.PushSmart( (void*)((iShaderVariable*)c.Next())->GetName());
+  }
+  return res;
+}
+
+csSymbolTable* csShaderGLAVP::GetSymbolTable()
+{
+  return 0;
+}
+
+iShaderVariable* csShaderGLAVP::GetVariable(int namehash)
+{
+  csHashIterator c(&variables, namehash);
+
+  if(c.HasNext())
+  {
+    return (iShaderVariable*)c.Next();
+  }
+
+  return 0;
 }
 
 csPtr<iString> csShaderGLAVP::GetProgramID()

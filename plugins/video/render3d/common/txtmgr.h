@@ -278,8 +278,6 @@ public:
   virtual iShader *GetShader (csStringID type) 
   { return material->GetShader(type)->GetShader(); }
 
-  virtual iShaderBranch* QueryShaderBranch () { return material; }
-
   /**
    * Get a texture from the material.
    */
@@ -399,9 +397,6 @@ public:
    * material system is actually working.
    */
   virtual void FreeMaterials ();
-
-  virtual int GetMaterialIndex (iMaterialHandle *m)
-    { return materials.Find (m); }
 };
 
 #endif // __CS_TXTMGR_H__
