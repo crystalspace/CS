@@ -284,7 +284,6 @@ subdirectories.
 This directory contains the common parts of the makefiles for many systems
 
     [CS/mk/system]        Systemspecific makefiles for most supported systems
-    [CS/mk/be_proj]       Makefiles for BeOS
     [CS/mk/mwcw]          Projectfiles for Macintosh CodeWarrior
     [CS/mk/visualc]       Projectfiles for Win32 using MSVC 5.0/ 6.0
 
