@@ -58,6 +58,7 @@ chronological order.
 	      they print the error.
 	    - Small tweak to fontplex.cfg; now contains standard Arial as well,
 	      not just Arial Unicode.
+	- res slightly changed a few doxygen comments for iPolygonMesh.
 12-Oct-2003
 	- Eric Sunshine clarified documentation for csGetResourceDir(),
 	  iCommandLineParser::GetResourceDir(), and

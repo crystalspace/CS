@@ -27,19 +27,22 @@
  * \addtogroup geom_utils
  * @{ */
  
-/** \name flags for iPolygonMesh.
+/** \name Flags for iPolygonMesh
  * @{ */
 
 /**
- * If this flag is set then the object is closed. With closed we mean
- * that if you run a beam of light through the object it will always
- * hit an even amount of faces (one going in, and one going out).
+ * The object is closed, if set. 
+ * With closed we mean that if you run a beam of light through the object 
+ * (through any point outside the mesh to another point outside) it will always
+ * hit an even amount of faces (one going in, and one going out). If you don't
+ * set CLOSED or NOTCLOSED then the state is not known and the engine may test 
+ * it if it wants.
  */
 #define CS_POLYMESH_CLOSED 1
 
 /**
- * If this flag is set then the object is not closed.
- * This is the opposite of CS_POLYMESH_CLOSED. Use this flag if you are
+ * The object is not closed, if set.
+ * This is the opposite of #CS_POLYMESH_CLOSED. Use this flag if you are
  * absolutely certain that the object is not closed. The engine will not
  * attempt to test if the object is really closed or not. If you don't
  * set CLOSED or NOTCLOSED then the state is not known and the engine
@@ -48,15 +51,18 @@
 #define CS_POLYMESH_NOTCLOSED 2
 
 /**
- * If this flag is set then the object is convex. With convex we mean
- * that if you run a beam of light through the object it will always
- * hit an two faces (one going in, and one going out).
+ * The object is convex, if set. 
+ * With convex we mean that if you run a beam of light through the object 
+ * (through any point outside the mesh to another point outside) it will always
+ * hit exactly two faces (one going in, and one going out). If you don't
+ * set CONVEX or NOTCONVEX then the state is not known and the engine may test 
+ * it if it wants.
  */
 #define CS_POLYMESH_CONVEX 4
 
 /**
- * If this flag is set then the object is not convex.
- * This is the opposite of CS_POLYMESH_CONVEX. Use this flag if you are
+ * The object is not convex, if set.
+ * This is the opposite of #CS_POLYMESH_CONVEX. Use this flag if you are
  * absolutely certain that the object is not convex. The engine will not
  * attempt to test if the object is really convex or not. If you don't
  * set CONVEX or NOTCONVEX then the state is not known and the engine
@@ -135,8 +141,8 @@ struct iPolygonMesh : public iBase
   virtual void Unlock () = 0;
 
   /**
-   * Get flags for this polygon mesh. This is zero or more of the
-   * following:
+   * Get flags for this polygon mesh. This is zero or a combination of the
+   * following flags:
    * <ul>
    * <li>#CS_POLYMESH_CLOSED: mesh is closed.
    * <li>#CS_POLYMESH_NOTCLOSED: mesh is not closed.
