@@ -76,7 +76,7 @@ if test "x$no_cs" = "x" ; then
 	cs_minor_version=`$CSCONF $cs_args --version | \
 	   sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
 
-	if test x$CRYSTAL_LIBS = x ; then
+	if test "x$CRYSTAL_LIBS" = "x" ; then
 		no_cs=yes
 	fi
 fi
