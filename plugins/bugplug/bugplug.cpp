@@ -1861,8 +1861,17 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       int fw, fh;
       fnt->GetMaxSize (fw, fh);
       int fgcolor = G2D->FindRGB (255, 255, 255);
-      GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "FPS=%.2f", fps_cur);
-      GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "FPS=%.2f", fps_cur);
+      if (fps_cur < 0.5)
+      {
+	const float spf = 1.0f/fps_cur;
+	GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "SPF=%.2f", spf);
+	GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "SPF=%.2f", spf);
+      }
+      else
+      {
+	GfxWrite (G2D, fnt, 11, sh - fh - 3, 0, -1, "FPS=%.2f", fps_cur);
+	GfxWrite (G2D, fnt, 10, sh - fh - 2, fgcolor, -1, "FPS=%.2f", fps_cur);
+      }
     }
     G3D->FinishDraw ();
   }

@@ -52,7 +52,7 @@ enum csLoaderDataType
 
 class csCommonImageFile;
 
-SCF_VERSION (iImageFileLoader, 0, 0, 1);
+SCF_VERSION (iImageFileLoader, 0, 0, 2);
 
 /**
  * An image file loader.
@@ -74,6 +74,10 @@ struct iImageFileLoader : public iBase
   virtual int GetFormat() = 0;
   /// Copy the image data into an image object.
   virtual void ApplyTo (csImageMemory* image) = 0;
+  /// Query whether a keycolor is set
+  virtual bool HasKeyColor() const = 0;
+  /// Query keycolor
+  virtual void GetKeyColor (int &r, int &g, int &b) const = 0;
 };
 
 /**
@@ -107,6 +111,11 @@ public:
   virtual int GetHeight() { return Height; }
   virtual int GetFormat() { return Format; }
   virtual void ApplyTo (csImageMemory* image);
+  virtual bool HasKeyColor() const { return hasKeycolor; }
+  virtual void GetKeyColor (int &r, int &g, int &b) const
+  { 
+    r = keycolor.red; g = keycolor.green; b = keycolor.blue; 
+  }
 };
 
 #define THREADED_LOADING
@@ -148,7 +157,8 @@ protected:
   /**
    * Create a loader object, which will handle the actual loading.
    * Note: the returned loader should have a proper width, height,
-   * format and data type already set.
+   * format, data type and keycolor flag (note not the actual color)
+   * already set.
    */
   virtual csRef<iImageFileLoader> InitLoader (csRef<iDataBuffer> source) = 0;
 
@@ -160,6 +170,31 @@ protected:
   virtual const void *GetImageData ();
   virtual const csRGBpixel* GetPalette ();
   virtual const uint8* GetAlpha ();
+
+  virtual bool HasKeyColor () const 
+  { 
+#ifdef THREADED_LOADING
+    if (loadJob)
+    {
+      return loadJob->currentLoader->HasKeyColor();
+    }
+#endif
+    return has_keycolour; 
+  }
+
+  virtual void GetKeyColor (int &r, int &g, int &b) const
+  { 
+#ifdef THREADED_LOADING
+    if (loadJob)
+    {
+      // Keycolor may only be available after loading...
+      WaitForJob();
+      loadJob->currentLoader->GetKeyColor (r, g, b);
+      return;
+    }
+#endif
+    r = keycolour.red; g = keycolour.green; b = keycolour.blue; 
+  }
 
   static const char* DataTypeString (csLoaderDataType dataType);
   virtual const char* GetRawFormat() const;

@@ -82,7 +82,6 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
   }
   G3D = iG3D;
   txtmgr = G3D->txtmgr;
-  //has_alpha = false;
   Handle = 0;
   textureClass = txtmgr->GetTextureClassID ("default");
 
@@ -95,13 +94,9 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
   else
     alphaType = csAlphaMode::alphaNone;
 
-  //mean_color.red = mean_color.green = mean_color.blue = 0;
-  if (image->HasKeyColor ())
-  {
-    int r,g,b;
-    image->GetKeyColor (r,g,b);
-    SetKeyColor (r, g, b);
-  }
+  if (image->HasKeyColor())
+    SetTransp (true);
+
   cachedata = 0;
 }
 
@@ -138,7 +133,16 @@ void csGLTextureHandle::Clear()
 
 void csGLTextureHandle::FreeImage ()
 {
-  if (image.IsValid()) origName = csStrNew (image->GetName());
+  if (image.IsValid()) 
+  {
+    origName = csStrNew (image->GetName());
+    if (IsTransp() && !IsTranspSet())
+    {
+      int r,g,b;
+      image->GetKeyColor (r,g,b);
+      SetKeyColor (r, g, b);
+    }						 
+  }
   image = 0;
 }
 
@@ -163,9 +167,8 @@ void csGLTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
   transp_color.green = green;
   transp_color.blue = blue;
   if (alphaType == csAlphaMode::alphaNone)
-    alphaType = csAlphaMode::alphaNone;
-  SetTransp (true);
-  SetTexupdateNeeded (true);
+    alphaType = csAlphaMode::alphaBinary;
+  texFlags.Set (flagTransp | flagTranspSet | flagTexupdateNeeded);
 }
 
 bool csGLTextureHandle::GetKeyColor () const
@@ -175,9 +178,18 @@ bool csGLTextureHandle::GetKeyColor () const
 
 void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) const
 {
-  red = transp_color.red;
-  green = transp_color.green;
-  blue = transp_color.blue;
+  if (image.IsValid() && image->HasKeyColor() && !IsTranspSet ())
+  {
+    int r,g,b;
+    image->GetKeyColor (r,g,b);
+    red = r; green = g; blue = b;
+  }
+  else
+  {
+    red = transp_color.red;
+    green = transp_color.green;
+    blue = transp_color.blue;
+  }
 }
 
 bool csGLTextureHandle::GetRendererDimensions (int &mw, int &mh)
@@ -273,6 +285,13 @@ void csGLTextureHandle::PrepareInt ()
   if (!image.IsValid()) return;
   if (IsPrepared ()) return;
   SetPrepared (true);
+
+  if (IsTransp() && !IsTranspSet())
+  {
+    int r,g,b;
+    image->GetKeyColor (r,g,b);
+    SetKeyColor (r, g, b);
+  }						 
 
   // In opengl all textures, even non-mipmapped textures are required
   // to be powers of 2.

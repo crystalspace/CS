@@ -231,7 +231,7 @@ void csStencilShadowCacheEntry::HandlePoly (const csVector3* vertices,
   e->a = vertices[polyVertices[numVerts - 1]];
   e->b = vertices[polyVertices[0]];
   e->ind_a = TriIndex - 1; /* TriIndex + 2 from previous triangle */
-  e->ind_b = TriIndex - 3; /* TriIndex + 0 from previous taiangle */
+  e->ind_b = TriIndex - 3; /* TriIndex + 0 from previous triangle */
   HandleEdge (e, edge_stack);
 }
 
@@ -299,7 +299,7 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
       new_triangle_count != triangle_count)
   {
     vertex_count = mesh->GetVertexCount ();
-	triangle_count = new_triangle_count;
+    triangle_count = new_triangle_count;
 
     shadow_vertex_buffer = csRenderBuffer::CreateRenderBuffer (
        new_triangle_count*3, CS_BUF_DYNAMIC,
@@ -370,9 +370,9 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
       face_normals[ind++] = normal;
     }
   }
-  memcpy (n, &face_normals[0], sizeof (csVector3) * new_triangle_count * 3);
+  memcpy (n, face_normals.GetArray(), sizeof (csVector3) * new_triangle_count * 3);
 
-  for (i = 0; i < triangle_count * 3; i ++) 
+  for (i = 0; i < edge_count; i ++) 
   {
     edge_normals[i] = face_normals[edge_indices[i * 3]];
   }

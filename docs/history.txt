@@ -10,6 +10,15 @@ chronological order.
 	- Fixed flarge so that the name of the 'fire' texture plugin
 	  no longer conflicts with the name of the 'fire' mesh loader plugin
 	  in partsys. That way flarge and partsys can be loaded together.
+	- res fixed a crash in the stencil shadow plugin that manifested 
+	  itself in e.g. r3dtest.
+	- res fixed a problem where keycolor information wasn't properly
+	  propagated from the PNG loader.
+	- res fixed added some code to pythpost.i that was accidentially lost
+	  when pyeventh.i was added.
+	- res added ability to gfxtest to apply the keycolor to an image's
+	  alpha channel.
+	- res made the Jamtemplate template app use csPrintf().
 9-Mar-2005
 	- Peter Amstutz changed the csvosa3ld plugin to automatically
 	  recalculate normals on loaded models (md2 and the like)

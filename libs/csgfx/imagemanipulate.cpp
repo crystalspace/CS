@@ -653,10 +653,10 @@ csRef<iImage> csImageManipulate::RenderKeycolorToAlpha (iImage* source,
 							const csRGBpixel& fillColor)
 {
   csRef<iImage> image;
-  if ((source->GetFormat() & CS_IMGFMT_MASK) != CS_IMGFMT_TRUECOLOR)
+  if (source->GetFormat() != (CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA))
   {
     image.AttachNew (new csImageMemory (source, 
-      (source->GetFormat() & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR));
+      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
   }
   else
     image = source;
@@ -669,19 +669,19 @@ csRef<iImage> csImageManipulate::RenderKeycolorToAlpha (iImage* source,
   {
     const int sizes[3] = {image->GetWidth(), image->GetHeight(), image->GetDepth()};
     KeycolorRenderer<3>::RenderToAlpha ((csRGBpixel*)result->GetImagePtr(), 
-      (csRGBpixel*)source->GetImageData(), transpColor, fillColor, 
+      (csRGBpixel*)image->GetImageData(), transpColor, fillColor, 
       sizes);
   }
   else
   {
     const int sizes[2] = {image->GetWidth(), image->GetHeight()};
     KeycolorRenderer<2>::RenderToAlpha ((csRGBpixel*)result->GetImagePtr(), 
-      (csRGBpixel*)source->GetImageData(), transpColor, fillColor, 
+      (csRGBpixel*)image->GetImageData(), transpColor, fillColor, 
       sizes);
   }
 
   if ((source->GetFormat() & CS_IMGFMT_MASK) != CS_IMGFMT_TRUECOLOR)
-    result->SetFormat ((source->GetFormat() & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR);
+    result->SetFormat ((source->GetFormat() & CS_IMGFMT_MASK) | CS_IMGFMT_ALPHA);
 
 #ifdef KEYCOLOR_DEBUG
   csDebugImageWriter::DebugImageWrite (result, "renderkeycolor_%p.png", source);

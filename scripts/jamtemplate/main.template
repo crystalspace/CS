@@ -6,12 +6,13 @@
 
 #include "#PROJECTNAME#.h"
 #include "app#PROJECTNAME#.h"
+#include <csutil/sysfunc.h> // Provides csPrintf()
 
 CS_IMPLEMENT_APPLICATION
 
 int main(int argc, char** argv)
 {
-  printf("#PROJECTNAME# version #VERSION# by #AUTHOR#.\n");
+  csPrintf ("#PROJECTNAME# version #VERSION# by #AUTHOR#.\n");
 
   // Create an application instance which will perform initialization and event
   // handling for the entire game.

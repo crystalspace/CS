@@ -109,6 +109,8 @@ private:
     flagForeignHandle = 1 << 28,
     flagWasRenderTarget = 1 << 27,
     flagSizeAdjusted = 1 << 26,
+    /// Is the color valid?
+    flagTranspSet = 1 << 25,
 
     flagLast,
     /// Mask to get only the "public" flags
@@ -127,6 +129,8 @@ private:
   void SetForeignHandle (bool b) { texFlags.SetBool (flagForeignHandle, b); }
   bool IsSizeAdjusted() const { return texFlags.Check (flagSizeAdjusted); }
   void SetSizeAdjusted (bool b) { texFlags.SetBool (flagSizeAdjusted, b); }
+  bool IsTranspSet() const { return texFlags.Check (flagTranspSet); }
+  void SetTranspSet (bool b) { texFlags.SetBool (flagTranspSet, b); }
 
   void *cachedata;
 

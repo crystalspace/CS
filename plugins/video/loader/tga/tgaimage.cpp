@@ -175,7 +175,9 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   hdr.flags = TGA_IL_None | TGA_Org_BL;
 
 
-  size_t size = w*h*hdr.PixelSize/8 + MAXCOLORS * hdr.CoSize / 8 + sizeof (TGAheader) + hdr.IDLength;
+  size_t size = w * h * hdr.PixelSize/8 
+    + 256/*MAXCOLORS*/ * hdr.CoSize / 8 
+    + sizeof (TGAheader) + hdr.IDLength;
 
   csDataBuffer *db = new csDataBuffer (size);
 
@@ -241,70 +243,6 @@ csRef<iImageFileLoader> ImageTgaFile::InitLoader (csRef<iDataBuffer> source)
   if (!loader->InitOk()) return 0;
   return loader;
 }
-
-#if 0
-bool ImageTgaFile::Load (uint8* iBuffer, size_t iSize)
-{
-  (void)iSize;
-  struct TGAheader tga_head;
-  int i;
-  unsigned int temp1, temp2;
-  int rows, cols, row, col, realrow, truerow, baserow;
-
-  /* If required, read the color map information. */
-  if (tga_head.CoMapType != 0)
-  {
-    temp1 = int (tga_head.Index_lo) + int (tga_head.Index_hi) * 256;
-    temp2 = int (tga_head.Length_lo) + int (tga_head.Length_hi) * 256;
-    if ((temp1 + temp2 + 1) >= MAXCOLORS)
-      return false;
-    for (i = temp1; i < int (temp1 + temp2); ++i)
-      get_map_entry (iBuffer, &(GetColorMap() [i]), (int) tga_head.CoSize,
-        Format & CS_IMGFMT_ALPHA);
-  }
-
-  /* Check run-length encoding. */
-  rlencoded = (tga_head.ImgType == TGA_RLEMap ||
-               tga_head.ImgType == TGA_RLERGB ||
-               tga_head.ImgType == TGA_RLEMono);
-
-  /* Read the Targa file body and convert to portable format. */
-  SetDimensions (cols, rows);
-
-  // @@todo: avoid converting colormapped images into RGB,
-  // instead pass a pointer to convert_pal8
-  csRGBpixel *pixels = new csRGBpixel [Width * Height];
-
-  truerow = 0;
-  baserow = 0;
-  for (row = 0; row < rows; ++row)
-  {
-    realrow = truerow;
-    if ((tga_head.flags & TGA_Org_MASK) == TGA_Org_BL)
-      realrow = rows - realrow - 1;
-
-    for (col = 0; col < cols; ++col)
-      get_pixel (iBuffer, &(pixels [realrow * cols + col]),
-        (int) tga_head.PixelSize, Format & CS_IMGFMT_ALPHA);
-    if ((tga_head.flags & TGA_IL_MASK) == TGA_IL_Four)
-      truerow += 4;
-    else if ((tga_head.flags & TGA_IL_MASK) == TGA_IL_Two)
-      truerow += 2;
-    else
-      ++truerow;
-    if (truerow >= rows)
-      truerow = ++baserow;
-  }
-
-  // Convert image from RGB to requested format
-  ConvertFromRGBA (pixels);
-
-  // Check if the alpha channel is valid
-  CheckAlpha ();
-
-  return true;
-}
-#endif
 
 void ImageTgaFile::TgaLoader::readtga (uint8*& iBuffer, TGAheader* tgaP)
 {

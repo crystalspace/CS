@@ -58,6 +58,7 @@ static struct option long_options[] =
   {"scale", required_argument, 0, 's'},
   {"mipmap", required_argument, 0, 'm'},
   {"transp", required_argument, 0, 't'},
+  {"applykey", no_argument, 0, 'T'},
   {"paletted", no_argument, 0, '8'},
   {"truecolor", no_argument, 0, 'c'},
   {"strip-alpha", no_argument, 0, 'a'},
@@ -82,6 +83,7 @@ static struct
   int displayW, displayH;
   int mipmap;
   bool transp;
+  bool applykey;
   int outputmode;
   float hmscale;
   bool info;
@@ -97,6 +99,7 @@ static struct
   0, 0,
   79, 24,
   -1,
+  false,
   false,
   0,
   1/500.0f,
@@ -126,6 +129,7 @@ static int display_help ()
   printf ("  -s   --scale=#[,#]   Re-scale the image to given size #\n");
   printf ("  -m   --mipmap=#      Create mipmap level # (>=0) from image\n");
   printf ("  -t   --transp=#,#,#  Treat color (R,G,B) as transparent\n");
+  printf ("  -T   --applykey      Apply key color into alpha channel\n");
   printf ("  -8   --paletted      Convert image to 8 bits-per-pixel paletted format\n");
   printf ("  -c   --truecolor     Convert image to truecolor format\n");
   printf ("  -a   --strip-alpha   Remove alpha channel, if present\n");
@@ -300,6 +304,21 @@ static bool process_file (const char *fname)
       (fmt & CS_IMGFMT_ALPHA) ? "present" : "not present");
   }
 
+  if (opt.applykey && (opt.transp || ifile->HasKeyColor()))
+  {
+    csRGBpixel transp;
+    if (opt.transp)
+      transp = transpcolor;
+    else
+    {
+      int kr, kg, kb;
+      ifile->GetKeyColor (kr, kg, kb);
+      transp.Set (kr, kg, kb);
+    }
+    csRGBpixel fill (transp);
+    ifile = csImageManipulate::RenderKeycolorToAlpha (ifile, transp, fill);
+  }
+
   char suffix [20];
   suffix [0] = 0;
 
@@ -417,7 +436,7 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cdaAs:m:t:p:D:S::M:O:P:U::H::IhvVF", long_options, 0)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cdaAs:m:t:p:D:S::M:O:P:U::H::IhvVFT", long_options, 0)) != EOF)
     switch (c)
     {
       case '?':
@@ -503,6 +522,11 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
         transpcolor.green = g > 255 ? 255 : g < 0 ? 0 : g;
         transpcolor.blue  = b > 255 ? 255 : b < 0 ? 0 : b;
         break;
+      }
+      case 'T':
+      {
+	opt.applykey = true;
+	break;
       }
       case 'm':
         if (sscanf (optarg, "%d", &opt.mipmap) != 1)
