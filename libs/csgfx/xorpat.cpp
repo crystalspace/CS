@@ -22,6 +22,7 @@
 #include "csgfx/memimage.h"
 #include "csgfx/rgbpixel.h"
 #include "qint.h"
+#include "csgfx/xorpat.h"
 
 csPtr<iImage> csCreateXORPatternImage(int width, int height, int recdepth,
 				      float red, float green, float blue)
