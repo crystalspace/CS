@@ -100,11 +100,11 @@ int csRenderMeshList::CompareMeshListInfo (void const* item1,
   return 0;
 }
 
-int SortMeshBack2Front (void const* item1,
+static int SortMeshBack2Front (void const* item1,
                         void const* item2)
 {
-  csRenderMesh* m1 = (csRenderMesh*) item1;
-  csRenderMesh* m2 = (csRenderMesh*) item2;
+  csRenderMesh* m1 = *(csRenderMesh**) item1;
+  csRenderMesh* m2 = *(csRenderMesh**) item2;
 
   if (m1->transform->GetOrigin ().z < m2->transform->GetOrigin().z)
     return -1;
@@ -113,11 +113,11 @@ int SortMeshBack2Front (void const* item1,
   return 0;
 }
 
-int SortMeshFront2Back (void const* item1,
+static int SortMeshFront2Back (void const* item1,
                         void const* item2)
 {
-  csRenderMesh* m1 = (csRenderMesh*) item1;
-  csRenderMesh* m2 = (csRenderMesh*) item2;
+  csRenderMesh* m1 = *(csRenderMesh**) item1;
+  csRenderMesh* m2 = *(csRenderMesh**) item2;
 
   if (m1->transform->GetOrigin ().z < m2->transform->GetOrigin().z)
     return 1;
