@@ -21,13 +21,16 @@
 #ifndef __CSUTIL_CSINPUTS_H__
 #define __CSUTIL_CSINPUTS_H__
 
+struct iEvent;
+class csEvent;
+
 /**
  * Convert a free-format string into an input event as understood by
  * the csinput library ("Ctrl+a", "alt+shift+mouse1" and so on).
  * Handy for supporting user-defined hot-keys, keyboard accelerators and so on.
  * Returns true if the name could be parsed correctly.
  */
-extern bool csParseInputDef (const char *name, iEvent *ev,
+bool csParseInputDef (const char *name, iEvent *ev,
 	bool use_modifiers = true);
 
 /**
@@ -36,7 +39,7 @@ extern bool csParseInputDef (const char *name, iEvent *ev,
  * Handy for supporting user-defined hot-keys, keyboard accelerators and so on.
  * Returns true if the name could be parsed correctly.
  */
-extern bool csParseInputDef (const char *name, csEvent &ev,
+bool csParseInputDef (const char *name, csEvent &ev,
 	bool use_modifiers = true);
 
 /**
@@ -45,7 +48,7 @@ extern bool csParseInputDef (const char *name, csEvent &ev,
  * human-understandable format. Returns true if the event could be
  * described.
  */
-extern bool csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true);
+bool csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true);
 
 /**
  * Performs the reverse conversion; given an event object
@@ -53,7 +56,7 @@ extern bool csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true);
  * human-understandable format. Returns true if the event could be
  * described.
  */
-extern bool csGetInputDesc (csEvent &ev, char *buf, bool use_modifiers = true);
+bool csGetInputDesc (csEvent &ev, char *buf, bool use_modifiers = true);
 
 #endif // __CSUTIL_CSINPUTS_H__
 

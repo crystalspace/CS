@@ -43,24 +43,28 @@
      ---1 ---- ---- ---- = IC_PROJECTIVE - -Inf == +Inf
 */
 
+#error useme
+
 static inline unsigned int csControl87(unsigned int newcw, unsigned int mask)
 {
   int oldcw;
   asm __volatile__
   (
         "       fclex                   \n"     // clear exceptions
-        "       fstcw   %0              \n"     // oldcw = FPU control word
-        "       andl    %0,%%eax        \n"     // eax &= oldcw;
-        "       andl    %1,%%ecx        \n"     // ecx &= newcw
+        "       fstcw   %3              \n"     // oldcw = FPU control word
+        "       andl    %3,%%eax        \n"     // eax &= oldcw;
+        "       andl    %0,%%ecx        \n"     // ecx &= newcw
         "       orl     %%ecx,%%eax     \n"     // eax |= ecx
-        "       movl    %%eax,%0        \n"     // tmpcw = ebx
-        "       fldcw   %0              \n"     // load FPU control word
-        : "=m" (oldcw)
-	: "g" (newcw), "a" (~mask), "c" (mask)
+        "       movl    %%eax,%3        \n"     // tmpcw = ebx
+        "       fldcw   %3              \n"     // load FPU control word
+	:
+	: "g" (newcw), "a" (~mask), "c" (mask), "m" (oldcw)
 	: "memory"
   );
+  // NOTE: oldcw is modified by the asm.  workaround for gcc 3.0
   return oldcw & 0xffff;
 }
+
 
 #else
 
