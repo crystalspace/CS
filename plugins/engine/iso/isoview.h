@@ -132,6 +132,8 @@ public:
   virtual void SetPerspectiveCenter(float, float) {}
   virtual csOrthoTransform& GetTransform ()
   { return trans; }
+  virtual void SetTransform (const csOrthoTransform& tr)
+  { trans = tr; }
   virtual void MoveWorld (const csVector3&, bool ) {}
   virtual void Move (const csVector3&, bool ) {}
   virtual void MoveWorldUnrestricted (const csVector3& ) {}
