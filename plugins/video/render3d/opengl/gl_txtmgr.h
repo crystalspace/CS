@@ -166,7 +166,7 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Retrieve the flags set for this texture
-  virtual int GetFlags ();
+  virtual int GetFlags () const;
 
   /// Enable key color
   virtual void SetKeyColor (bool Enable);
@@ -175,10 +175,10 @@ public:
   virtual void SetKeyColor (uint8 red, uint8 green, uint8 blue);
 
   /// Get the key color status (false if disabled, true if enabled).
-  virtual bool GetKeyColor ();
+  virtual bool GetKeyColor () const;
 
   /// Get the key color
-  virtual void GetKeyColor (uint8 &red, uint8 &green, uint8 &blue);
+  virtual void GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) const;
 
   /// Release the original image (iImage) as given by the engine.
   void FreeImage ();
@@ -237,18 +237,17 @@ public:
     unsigned char const* data);
 
   /**
-   *Sets Texture Target. 
-   *This can either be CS_TEXTURE_1D, CS_TEXTURE_2D, CS_TEXTURE_3D, 
-   *CS_TEXTURE_CUBEMAP etc.
-   *With CS_TEXTURE_CUBEMAP, the depth index specifies the side 
-   *of the cubemap (CS_TEXTURE_CUBE_POS_X, CS_TEXTURE_CUBE_NEG_X,
-   *CS_TEXTURE_CUBE_POS_Y, etc.
+   * Sets Texture Target. 
+   * This can either be CS_TEXTURE_1D, CS_TEXTURE_2D, CS_TEXTURE_3D, 
+   * CS_TEXTURE_CUBEMAP etc.
+   * With CS_TEXTURE_CUBEMAP, the depth index specifies the side 
+   * of the cubemap (CS_TEXTURE_CUBE_POS_X, CS_TEXTURE_CUBE_NEG_X,
+   * CS_TEXTURE_CUBE_POS_Y, etc.
    */
   virtual void SetTextureTarget(int target);
 
-
   /// Get the mean color.
-  virtual void GetMeanColor (uint8 &red, uint8 &green, uint8 &blue);
+  virtual void GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) const;
 
   /// Get data associated internally with this texture by texture cache
   virtual void *GetCacheData ();
@@ -267,7 +266,7 @@ public:
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
-  virtual bool GetAlphaMap ();
+  virtual bool GetAlphaMap () const;
 
   /**
    * Get a canvas instance which is suitable for rendering on this
@@ -276,7 +275,7 @@ public:
    */
   virtual iGraphics2D* GetCanvas ();
 
-  virtual csAlphaMode::AlphaType GetAlphaType ()
+  virtual csAlphaMode::AlphaType GetAlphaType () const
   { return alphaType; }
 
   virtual void Precache ();
@@ -335,13 +334,13 @@ public:
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor);
+  virtual void GetFlatColor (csRGBpixel &oColor) const;
 
   /**
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
-    float &oReflection);
+    float &oReflection) const;
 };
 
 class csGLSuperLightmap;

@@ -141,16 +141,16 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
   transp_color.red = transp_color.green = transp_color.blue = 0;
   if (image->GetFormat () & CS_IMGFMT_ALPHA)
     alphaType = csAlphaMode::alphaSmooth;
-  else if (image->HasKeycolor ())
+  else if (image->HasKeyColor ())
     alphaType = csAlphaMode::alphaBinary;
   else
     alphaType = csAlphaMode::alphaNone;
 
   //mean_color.red = mean_color.green = mean_color.blue = 0;
-  if (image->HasKeycolor ())
+  if (image->HasKeyColor ())
   {
     int r,g,b;
-    image->GetKeycolor (r,g,b);
+    image->GetKeyColor (r,g,b);
     SetKeyColor (r, g, b);
   }
   cachedata = 0;
@@ -180,15 +180,15 @@ csGLTextureHandle::csGLTextureHandle (iImageVector* image,
   transp_color.red = transp_color.green = transp_color.blue = 0;
   if (images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA)
     alphaType = csAlphaMode::alphaSmooth;
-  else if (images->GetImage (0)->HasKeycolor ())
+  else if (images->GetImage (0)->HasKeyColor ())
     alphaType = csAlphaMode::alphaBinary;
   else
     alphaType = csAlphaMode::alphaNone;
 
-  if (images->GetImage (0)->HasKeycolor ())
+  if (images->GetImage (0)->HasKeyColor ())
   {
     int r,g,b;
-    images->GetImage (0)->GetKeycolor (r,g,b);
+    images->GetImage (0)->GetKeyColor (r,g,b);
     SetKeyColor (r, g, b);
   }
   cachedata = 0;
@@ -242,7 +242,7 @@ void csGLTextureHandle::FreeImage ()
   images = 0;
 }
 
-int csGLTextureHandle::GetFlags ()
+int csGLTextureHandle::GetFlags () const
 {
   return flags;
 }
@@ -264,7 +264,7 @@ void csGLTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
   texupdate_needed = true;
 }
 
-bool csGLTextureHandle::GetKeyColor ()
+bool csGLTextureHandle::GetKeyColor () const
 {
   return (transp);
 }
@@ -369,7 +369,7 @@ bool csGLTextureHandle::FindFormatType ()
   return true;
 }
 
-void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue)
+void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) const
 {
   red = transp_color.red;
   green = transp_color.green;
@@ -436,6 +436,7 @@ void csGLTextureHandle::SetTextureTarget (int target)
 }
 
 void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, uint8 &blue)
+  const
 {
   red = green = blue = 0;
 }
@@ -455,7 +456,7 @@ void *csGLTextureHandle::GetPrivateObject ()
   return (csGLTextureHandle *)this;
 }
 
-bool csGLTextureHandle::GetAlphaMap ()
+bool csGLTextureHandle::GetAlphaMap () const
 {
   return (alphaType != csAlphaMode::alphaNone);
 }
@@ -1183,7 +1184,7 @@ iTextureHandle* csGLMaterialHandle::GetTexture ()
   }
 }
 
-void csGLMaterialHandle::GetFlatColor (csRGBpixel &oColor) 
+void csGLMaterialHandle::GetFlatColor (csRGBpixel &oColor) const
 { 
   if (material)
   {
@@ -1196,7 +1197,7 @@ void csGLMaterialHandle::GetFlatColor (csRGBpixel &oColor)
 }
 
 void csGLMaterialHandle::GetReflection (float &oDiffuse, float &oAmbient,
-  float &oReflection)
+  float &oReflection) const
 { 
   if (material)
   {

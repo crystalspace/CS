@@ -2514,7 +2514,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   SetZMode (mesh.z_buf_mode);
   csRenderMeshModes modes (rmesh);
 
-  size_t shaderTicket;
+  size_t shaderTicket = 0;
   size_t passCount = 1;
   if (mesh.shader != 0)
   {

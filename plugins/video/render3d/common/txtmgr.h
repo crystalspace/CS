@@ -82,7 +82,7 @@ public:
   virtual ~csTextureHandle ();
 
   /// Get texture usage flags
-  int GetFlags () { return flags; }
+  int GetFlags () const { return flags; }
 
   /// Release the original image (iImage) as given by the engine.
   void FreeImage ();
@@ -134,10 +134,10 @@ public:
    * Get the transparent status (false if no transparency, true if
    * transparency).
    */
-  virtual bool GetKeyColor ();
+  virtual bool GetKeyColor () const;
 
   /// Get the transparent color
-  virtual void GetKeyColor (uint8 &r, uint8 &g, uint8 &b);
+  virtual void GetKeyColor (uint8 &r, uint8 &g, uint8 &b) const;
 
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
@@ -151,7 +151,7 @@ public:
   }
 
   /// Get the mean color.
-  virtual void GetMeanColor (uint8 &r, uint8 &g, uint8 &b);
+  virtual void GetMeanColor (uint8 &r, uint8 &g, uint8 &b) const;
 
   /// Get data associated internally with this texture by texture cache
   virtual void *GetCacheData ()
@@ -169,7 +169,7 @@ public:
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
-  virtual bool GetAlphaMap ()
+  virtual bool GetAlphaMap () const
   { return false; }
 
   virtual iGraphics2D* GetCanvas () { return 0; }
@@ -183,7 +183,7 @@ public:
   static void CalculateNextBestPo2Size (const int width, const int height,
     int& newWidth, int& newHeigth);
 
-  virtual csAlphaMode::AlphaType GetAlphaType ()
+  virtual csAlphaMode::AlphaType GetAlphaType () const
   { return csAlphaMode::alphaNone; }
 
   virtual void Precache () {}
@@ -286,7 +286,7 @@ public:
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor) 
+  virtual void GetFlatColor (csRGBpixel &oColor) const
   { 
     material->GetFlatColor (oColor);
   }
@@ -295,7 +295,7 @@ public:
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
-    float &oReflection)
+    float &oReflection) const
   { 
     material->GetReflection (oDiffuse, oAmbient, oReflection);
   }

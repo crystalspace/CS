@@ -63,10 +63,10 @@ csTextureHandle::csTextureHandle (iImage* Image, int Flags)
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
 
-  if (image.IsValid() && image->HasKeycolor ())
+  if (image.IsValid() && image->HasKeyColor ())
   {
     int r,g,b;
-    image->GetKeycolor (r,g,b);
+    image->GetKeyColor (r,g,b);
     SetKeyColor (r, g, b);
   }
   cachedata = 0;
@@ -157,19 +157,19 @@ void csTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
 }
 
 /// Get the transparent color
-void csTextureHandle::GetKeyColor (uint8 &r, uint8 &g, uint8 &b)
+void csTextureHandle::GetKeyColor (uint8 &r, uint8 &g, uint8 &b) const
 {
   r = transp_color.red;
   g = transp_color.green;
   b = transp_color.blue;
 }
 
-bool csTextureHandle::GetKeyColor ()
+bool csTextureHandle::GetKeyColor () const
 {
   return transp;
 }
 
-void csTextureHandle::GetMeanColor (uint8 &r, uint8 &g, uint8 &b)
+void csTextureHandle::GetMeanColor (uint8 &r, uint8 &g, uint8 &b) const
 {
   r = mean_color.red;
   g = mean_color.green;

@@ -94,7 +94,7 @@ public:
   virtual ~csTextureHandle ();
 
   /// Get texture usage flags
-  int GetFlags () { return flags; }
+  int GetFlags () const { return flags; }
 
   /**
    * Merge this texture into current palette, compute mipmaps and so on.
@@ -144,10 +144,10 @@ public:
    * Get the transparent status (false if no transparency, true if
    * transparency).
    */
-  virtual bool GetKeyColor ();
+  virtual bool GetKeyColor () const;
 
   /// Get the transparent color
-  virtual void GetKeyColor (uint8 &r, uint8 &g, uint8 &b);
+  virtual void GetKeyColor (uint8 &r, uint8 &g, uint8 &b) const;
 
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
@@ -155,6 +155,8 @@ public:
    * for 3D usage.
    */
   virtual bool GetMipMapDimensions (int mm, int& w, int& h);
+
+  /// Get the dimensions of the original image.
   virtual void GetOriginalDimensions (int& w, int& h)
   {
     w = orig_w;
@@ -162,7 +164,7 @@ public:
   }
 
   /// Get the mean color.
-  virtual void GetMeanColor (uint8 &r, uint8 &g, uint8 &b);
+  virtual void GetMeanColor (uint8 &r, uint8 &g, uint8 &b) const;
 
   /// Get data associated internally with this texture by texture cache
   virtual void *GetCacheData ()
@@ -180,12 +182,12 @@ public:
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
-  virtual bool GetAlphaMap ()
+  virtual bool GetAlphaMap () const
   { return false; }
 
   virtual iGraphics2D* GetCanvas () { return 0; }
 
-  virtual csAlphaMode::AlphaType GetAlphaType ()
+  virtual csAlphaMode::AlphaType GetAlphaType () const
   { return csAlphaMode::alphaNone; }
 
   virtual void Precache () {}
@@ -227,22 +229,22 @@ public:
   /// Destroy the texture object
   virtual ~csTexture ();
 
-  ///
-  int get_width () { return w; }
-  ///
-  int get_height () { return h; }
-  ///
-  int get_w_shift () { return shf_w; }
-  ///
-  int get_h_shift () { return shf_h; }
-  ///
-  int get_w_mask () { return and_w; }
-  ///
-  int get_h_mask () { return and_h; }
+  /// Get width.
+  int get_width () const { return w; }
+  /// Get height.
+  int get_height () const { return h; }
+  /// Get w coordinate shift.
+  int get_w_shift () const { return shf_w; }
+  /// Get h coordinate shift.
+  int get_h_shift () const { return shf_h; }
+  /// Get w mask.
+  int get_w_mask () const { return and_w; }
+  /// Get h mask.
+  int get_h_mask () const { return and_h; }
   /// Query image size (alas we can't do (h << shf_w))
-  int get_size () { return w * h; }
-  ///
-  csTextureHandle *get_parent () { return parent; }
+  int get_size () const { return w * h; }
+  /// Get parent texture handle.
+  csTextureHandle *get_parent () const { return parent; }
 };
 
 /**
@@ -309,13 +311,14 @@ public:
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor) { oColor = flat_color; }
+  virtual void GetFlatColor (csRGBpixel &oColor) const
+  { oColor = flat_color; }
 
   /**
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
-    float &oReflection)
+    float &oReflection) const
   { oDiffuse = diffuse; oAmbient = ambient; oReflection = reflection; }
 
   /**
