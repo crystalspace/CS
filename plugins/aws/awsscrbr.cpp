@@ -153,6 +153,9 @@ awsScrollBar::GetProperty(char *name, void **parm)
 {
   if (awsComponent::GetProperty(name, parm)) return true;
 
+  if (strcmp("Value", name)==0)
+    *parm = (void *)&value;
+  
   return false;
 }
 

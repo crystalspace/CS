@@ -98,8 +98,8 @@ bkg(NULL), highlight(NULL),
 tree_collapsed(NULL), tree_expanded(NULL),
 tree_hline(NULL), tree_vline(NULL),
 frame_style(0), alpha_level(92), hi_alpha_level(128),
-control_type(0), ncolumns(1), sel(NULL)
-
+control_type(0), ncolumns(1), sel(NULL), map(NULL),
+map_size(0), map_dirty(true), scroll_start(0)
 {
   actions.Register("InsertItem", &InsertItem);
   actions.Register("DeleteItem", &DeleteItem);
@@ -212,7 +212,7 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   scrollbar->SetWindow(Window());
   scrollbar->SetParent(this);
   scrollbar->Setup(_wmgr, sbinfo.GetThisNode());
-  
+
   // Setup trigger
   sink = new awsSink(this);
 
@@ -245,8 +245,69 @@ void
 awsListBox::ScrollChanged(void *sk, iAwsSource *source)     
 {
   awsListBox *lb = (awsListBox *)lb;
-  
+  static float last_value=0;
+  float *curval=0;
 
+  source->GetComponent()->GetProperty("Value", (void **)&curval);
+
+  lb->UpdateMap();
+  lb->scroll_start=(int)*curval;
+  
+  lb->Invalidate();
+}
+
+void 
+awsListBox::UpdateMap()
+{
+  if (map_dirty)
+  { 
+    int start=0;
+    
+    map_dirty=false;
+    map_size=0;
+    if (map)
+      delete [] map;
+
+    // Traverse once for the count of visible items
+    map_size = CountVisibleItems(&rows);
+    map = new awsListRow *[map_size];
+
+    // Map out items
+    MapVisibleItems(&rows, start, map);
+  }
+}
+
+int
+awsListBox::CountVisibleItems(awsListRowVector *v)
+{
+  int i;
+  int count=0;
+  for (i=0; i<v->Length(); ++i)
+  {
+      awsListRow *r = (awsListRow *)((*v)[i]);
+
+      // count one for this item
+      ++count;
+      if (r->children && r->expanded)
+        count+=CountVisibleItems(r->children);
+  }
+
+  return count;
+}
+
+void
+awsListBox::MapVisibleItems(awsListRowVector *v, int &start, awsListRow **map)
+{
+  int i;
+  for (i=0; i<v->Length(); ++i)
+  {
+      awsListRow *r = (awsListRow *)((*v)[i]);
+
+      map[start++]=r;
+      
+      if (r->children && r->expanded)
+        MapVisibleItems(r->children, start, map);
+  }
 }
 
 static 
@@ -284,7 +345,7 @@ DoFindItem(awsListRowVector *v, iString *text, bool with_delete)
 static
 void
 DoRecursiveClearList(awsListRowVector *v)
-{ 
+{
   int i;
 
   for (i=0; i<v->Length(); ++i)
@@ -292,10 +353,10 @@ DoRecursiveClearList(awsListRowVector *v)
     awsListRow *r = (awsListRow *)((*v)[i]);
     if (r->children)
     {
-       DoRecursiveClearList(r->children);
-       delete r->children;
+      DoRecursiveClearList(r->children);
+      delete r->children;
     }
-     
+
   }
 
   v->DeleteAll(true);
@@ -384,7 +445,7 @@ awsListBox::DeleteItem(void *owner, iAwsParmList &parmlist)
   if (!parmlist.GetString("text", &str))
     if (!parmlist.GetString("id", &str))
       return;
- 
+
   i=DoFindItem(&lb->rows, str, true);
 
   // Pass back the result, in case they want it
@@ -398,27 +459,27 @@ awsListBox::GetSelectedItem(void *owner, iAwsParmList &parmlist)
   awsListBox *lb = (awsListBox *)owner;
   int i;
   char buf[50];
-  
+
   bool state[lb->ncolumns];
   iString *str[lb->ncolumns];
-  
+
   bool usedt[lb->ncolumns], useds[lb->ncolumns];
 
-  for(i=0; i<lb->ncolumns; ++i)
+  for (i=0; i<lb->ncolumns; ++i)
   {
-     usedt[i]=false;
-     useds[i]=false;
+    usedt[i]=false;
+    useds[i]=false;
   }
-   
-  
+
+
   // check if they want the text or state or what. then return those in the parmlist
   for (i=0; i<lb->ncolumns; ++i)
   {
     cs_snprintf(buf, 50, "text%d", i);
     if (parmlist.GetString(buf, &str[i]))
     {
-       str[i]=lb->sel->cols[i].text;
-       usedt[i]=true;
+      str[i]=lb->sel->cols[i].text;
+      usedt[i]=true;
     }
 
     cs_snprintf(buf, 50, "state%d", i);
@@ -605,7 +666,7 @@ awsListBox::OnDraw(csRect clip)
     border=1;
     break;
   }
-  
+
 
   int starty=Frame().ymin+border;
   int startx=Frame().xmin+border;
@@ -673,17 +734,70 @@ awsListBox::OnDraw(csRect clip)
   y+=hch+2;
 
   // Now begin to draw actual list
-  for (j=0; j<rows.Length(); ++j)
+  if (rows.Length())
   {
+    awsListRow *row;
+    awsListRow *start;
+
+    UpdateMap();
+    
+    if (map==NULL)
+      start = (awsListRow *)rows[0];
+    else
+      start = map[scroll_start];
+
+    row=start;
     x=startx;
-    awsListRow *row = (awsListRow *)rows[j];
 
-    if (DrawItemsRecursively(row, x, y, border, false, false))
-      break;
+    while (DrawItemsRecursively(row,x,y,border,false,false)==false)
+    {
+      // Reset row start point
+      x=startx;
 
-  } // end for j (number of rows)
+      // Find parent of current row.  If there is no parent, then go to the next row item.
+      awsListRow *parent=row->parent;
+
+      if (parent==NULL)
+      { // Get next item from main list
+        int i=rows.Find(row);
+
+        // This should never occur
+        if (i==-1)
+        {
+          printf("awslistbox: bug: couldn't find current row!\n");
+          return;
+        }
+        else
+          ++i;
+
+        // If we're done, leave
+        if (i==rows.Length())
+          return;
+        else
+          row=(awsListRow *)rows[i];
+
+      } // end if no parent.
+      else
+        row=parent;
+
+    } // end while draw items recursively
+
+
+    ///////////////////////////////////
+    /*for (j=0; j<rows.Length(); ++j)
+    {
+      x=startx;
+      awsListRow *row = (awsListRow *)rows[j];
+  
+      if (DrawItemsRecursively(row, x, y, border, false, false))
+        break;
+  
+    }*/ // end for j (number of rows)
+    //////////////////////////////////
+
+
+  }  // end if there are any rows to draw
 }
-
 bool
 awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, int depth, bool last_child)
 {
@@ -966,7 +1080,7 @@ bool
 awsListBox::OnMouseDown(int /*button*/,int x,int y)
 {
   int i;
-  
+
   for (i=0; i<hotspots.Length(); ++i)
   {
     awsListHotspot *hs = (awsListHotspot *)hotspots[i];
@@ -1082,7 +1196,7 @@ awsListBox::OnGainFocus()
 void 
 awsListBox::OnAdded()
 {
-    AddChild(scrollbar);
+  AddChild(scrollbar);
 }
 
 
@@ -1121,4 +1235,5 @@ awsListBoxFactory::Create()
 {
   return new awsListBox; 
 }
+
 

@@ -49,7 +49,7 @@ struct awsListItem
   /// Draws item
   void DrawItem(iAws *wmgr, csRect frame);
 
-  /// Tells what the minimum height of this item needs to be, taking into account children
+  /// Tells what the minimum height of this item needs to be
   int GetHeight(iAwsPrefManager *pm);
 
   /// Destroys this particular list item.
@@ -190,7 +190,19 @@ class awsListBox : public awsComponent
 
    /// Currently selected row
    awsListRow *sel;
-               
+
+   /// Row to item-number mapping
+   awsListRow **map;
+
+   /// Size of item-number map
+   int map_size;
+
+   /// True if item-number map needs refreshed
+   bool map_dirty;
+
+   /// Position of where we start drawing
+   int scroll_start;
+ 
 private:
    ///////////////////////////// Embedded items
 
@@ -223,7 +235,19 @@ private:
    /// Clears the entire list
    static void ClearList(void *owner, iAwsParmList &parmlist);
 
+   //////////////////////////// Static member helper functions
+
+   /// Counts the number of visible items recursively, given the starting vector.
+   static int CountVisibleItems(awsListRowVector *v);
+   
+   /// Maps the visible items in the list recursively onto a flat index.
+   static void MapVisibleItems(awsListRowVector *v, int &start, awsListRow **map);
+
+
 protected:
+   /// Updates the row-map if it's dirty
+   void UpdateMap();
+
    /// Used, but shouldn't be (remnant of radio-button code)
    void ClearGroup();
 
