@@ -47,7 +47,7 @@ really serious about things you can join discussions and develop for the
 engine. Jorrit will gladly add contributed code to Crystal Space provided he
 can use the code.
 
-Note that you also need to agree to the LGPL details but I don't think that
+Note that you also need to agree to the @sc{lgpl} details but I don't think that
 this is a real problem. @xref{License}.
 
 We are always interested in hearing what other people are doing with

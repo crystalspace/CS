@@ -16,12 +16,12 @@ important tutorial introduction (@pxref{Tutorial Introduction}). You should
 certainly read this if you want to have a good idea on some of the basic
 concepts of Crystal Space.
 
-The tutorial section also contains the HOWTO section (@pxref{HOWTO}).
-The HOWTO's are small documents explaining how to solve small problems. They
-usually contain example code. Most of the HOWTO's are related to solving
+The tutorial section also contains the @sc{howto} section (@pxref{HOWTO}).
+The @sc{howto}s are small documents explaining how to solve small problems. They
+usually contain example code. Most of the @sc{howto}s are related to solving
 problems with the Crystal Space engine (like collision detection, mesh lighting
 and animation, mesh movement, loading a level, etc), but there are also two
-HOWTO's that explain how you can set up your own application outside of the
+@sc{howto}s that explain how you can set up your own application outside of the
 Crystal Space application tree (one for Unix/MinGW and another for Microsoft
 Visual C++).
 
@@ -30,7 +30,7 @@ also very important. If you want to know how the 3D engine works internally
 (which is important if you want to build your own 3D worlds) then you should
 read the section explaining the world components (@pxref{World Components})
 and also the section explaining portals (@pxref{Portal Engine}). There is also
-a HOWTO about render priorities (@pxref{HOWTO Render Priorities}) which is
+a @sc{howto} about render priorities (@pxref{HOWTO Render Priorities}) which is
 also very helpful in that area.
 
 The section about the Map File Parser (@pxref{csParser}) is useful if you
@@ -39,5 +39,5 @@ want to create your map files manually.
 A very important section is the mesh object section (@pxref{MeshObject}).
 Mesh objects are objects that represent geometry in Crystal Space. If you
 want to display something in your world you will have to know how to use them.
-The tutorials and HOWTO's also contain information about mesh objects but this
+The tutorials and @sc{howto}s also contain information about mesh objects but this
 section contains the complete documentation.

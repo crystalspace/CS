@@ -26,7 +26,7 @@ specific implementation issues.  Jorrit's home address is Schoonstraat 11,
 Andon M. Coleman
 
 Andon patched 3ds2lev so it works correctly for
-non-texture mapped 3DS objects.
+non-texture mapped @sc{3ds} objects.
 
 @item
 Murat Demircioglu (@email{demircio@@boun.edu.tr})
@@ -109,8 +109,8 @@ Ang See contributed another set of textures.
 @item
 Jaison Lee (@email{jaison@@apk.net})
 
-Jaison gave me a new version of @file{police.fnt} which doesn't give an error
-on the Borland compiler.
+Jaison contributed a new version of @file{police.fnt} which doesn't give an
+error on the Borland compiler.
 
 @item
 Phil Harvey (@email{filrv@@syroxdev.co.uk})
@@ -135,23 +135,22 @@ also added @sc{jpg} support to Crystal Space and support for the mouse in
 @item
 Alessandro Russo (@email{alessandro.russo@@ntt.it})
 
-Alessandro gave me a patch for the X version of Crystal Space which
+Alessandro contributed a patch for the X11 version of Crystal Space which
 allows simultaneous keypresses and disables autorepeat.  This makes movement
-much more smoother.  Alessandro Russo presented me with a patch to fix the
-autorepeat problem (in X-windows).
+much more smoother.  He also contributed a patch to fix the autorepeat problem
+in X11.
 
 @item
 Gary Clark (@email{GaryC@@jeld-wen.com})
 
-Gary designed the basic framework of the Graphics3D class and I helped him
-start to implement this.  Gary also made an extension so that Crystal Space can
-now use accurate @sc{rgb} light sourcing.  Since this slows down the texture
-cache a bit I have made it optional (using @file{cryst.cfg}).  Also added a
-patch from Gary Clark to fix the problem with the X version of Crystal
-Space that Crystal Space would not immediately start drawing but only after
-an expose event was generated.  He gave me the @file{lin_joy.cpp} file (in the
-@file{contrib} directory) which is an example on how to use the joystick from
-within Linux.
+Gary designed the basic framework of the Graphics3D class.  Gary also made an
+extension so that Crystal Space can now use accurate @sc{rgb} light sourcing.
+Since this slows down the texture cache a bit, it was made optional (using
+@file{cryst.cfg}).  Also added a patch from Gary Clark to fix the problem with
+the X11 version of Crystal Space in that Crystal Space would not immediately
+start drawing until an expose event was generated.  He contributed the
+@file{lin_joy.cpp} file (in the @file{contrib} directory) which is an example
+of how to use the joystick from within Linux.
 
 @item
 Karlis Freivalds (@email{karlisf@@cclu.lv})
@@ -301,12 +300,12 @@ Slavik created the current Watcom port with 16-bit display support.
 @item
 Markus F.X.J. Oberhumer (@email{k3040e4@@wildsau.idv-edu.uni-linz.ac.at})
 
-Markus provided a small patch for the X-windows port.
+Markus provided a small patch for the X11 port.
 
 @item
 Trochu Xavier (@email{xtrochu@@yahoo.com})
 
-Trochu wrote the @emph{How-To} describing how to compile Crystal Space with
+Trochu wrote the @sc{howto} describing how to compile Crystal Space with
 Visual C++ for Windows 95 and also contributed a few small patches to the
 Windows 95 version.  He also contributed up-to-date project files for Visual
 C++.  He also ported Crystal Space to the Glide @sc{api} (together with
@@ -328,8 +327,7 @@ Space.
 @item
 Charles Vidal (@email{vidalc@@club-internet.fr})
 
-Charles gave contributed a @sc{tcl}/@sc{tk} script for launching Crystal
-Space.
+Charles contributed a @sc{tcl}/@sc{tk} script for launching Crystal Space.
 
 @item
 Olivier Langlois (@email{olanglois@@sympatico.ca})
@@ -340,7 +338,7 @@ also contributed the MemoryHeap class for the texture cache.  Olivier also
 ported the @sc{gcc} assembler functions to Visual C++ and implemented a few
 additional Visual C++ assembly functions.  He also implemented the @sc{bmp}
 loader class.  He also optimized and helped optimize several key-functions in
-the engine pipeline.  For example, he managed to nearly @emph{double}the speed
+the engine pipeline.  For example, he managed to nearly @emph{double} the speed
 of the assembler scanline drawers! Lightmap generation and math functions were
 also improved.
 
@@ -362,7 +360,7 @@ optimized away.
 @item
 Doug Rabson (@email{dfr@@nlsystems.com})
 
-Doug helped fixed a possible memory leak in the X port with @sc{shm}
+Doug helped fixed a possible memory leak in the X11 port with @sc{shm}
 extension.
 
 @item
@@ -498,11 +496,11 @@ creation.
 @item
 Matze Braun (@email{matze@@braunis.di})
 Matze  did various changes, fixes
-and enhancements to CS (too many to list). Some of the more important ones are: 
-cs-config scripting facility, documentation annotation system, several
-bug fixes, enhancements and fixes to Map2CS, new null canvas for the null3d
-renderer, cygwin port, viewmesh enhancements, VFS support for csFileDialog,
-@dots{}
+and enhancements to @sc{cs} (too many to list). Some of the more important
+ones are: cs-config scripting facility, documentation annotation system,
+several bug fixes, enhancements and fixes to Map2CS, new null canvas for the
+null3d renderer, cygwin port, viewmesh enhancements, @sc{vfs} support for
+csFileDialog, @dots{}
 
 @item
 Serguei ``Snaar'' Narojnyi (@email{snaar@@idirect.ca})
@@ -527,14 +525,14 @@ many of the image loaders, fixed the @sc{bmp} loader so that it is endian
 correct and added @sc{rle8} encoding to the @sc{bmp} loader. Norman also added
 the @code{csQuaternion} class and has been bringing the Glide drivers up to
 date. Norman contributed a FreeType font server plug-in.  Most recently, he
-added a grid-view to CSWS. He also added a sound renderer using the artsd
+added a grid-view to @sc{csws}. He also added a sound renderer using the artsd
 soundserver that comes with the aRts system (see www.arts-project.org). Norman
 added an export script for Blender. He added texture coordinate animation to
-2d sprites. He worked on the video file streamer. Norman also added the
+2D sprites. He worked on the video file streamer. Norman also added the
 (unused) @code{csCrystalBall} culler and the fancy console plugin.
 In addition he has also worked a lot on the OpenGL renderer (mostly support
-for extensions). Lately Norman worked on AWS and a convertor from QT to AWS.
-Norman also added several sound related modules like ogg.
+for extensions). Lately Norman worked on @sc{aws} and a convertor from @sc{qt}
+to @sc{aws}.  Norman also added several sound related modules like ogg.
 
 @item
 Nicholas Francis (@email{nicholasfrancis@@iname.com})
@@ -544,7 +542,7 @@ Nicholas made a few contributions to MazeD.
 @item
 Christian Bayle (@email{christian.bayle@@rd.francetelecom.com})
 
-Christian Bayle contributed scripts to make a Debian package for CS.
+Christian Bayle contributed scripts to make a Debian package for @sc{cs}.
 
 @item
 Tobias Brueckner (@email{tobias.brueckner@@gmx.net})
@@ -560,9 +558,9 @@ Markus fixed a bug with @file{unixconf.sh}.
 @item
 Michael Voase (@email{mvoase@@midcoast.com.au})
 
-Michael did various things in CS: changes to walktest, a lot of work on mesh
-objects (hitbeam, bounding boxes, @dots{}), lots of bug fixes, a lot of work
-on improving memory management for the texture managers, fixing memory
+Michael did various things in @sc{cs}: changes to walktest, a lot of work on
+mesh objects (hitbeam, bounding boxes, @dots{}), lots of bug fixes, a lot of
+work on improving memory management for the texture managers, fixing memory
 leaks, work on csObject, @dots{} 
 
 @item
@@ -579,10 +577,10 @@ Patrick rewrote the autoconf macro from scratch.
 @item
 Jorge Acereda (@email{al004046@@anubis.uji.es})
 
-Jorge did several things in CS: FreeBSD/NetBSD port, fixing MD2 importer so
-that it recognizes actions, fixing mdl2spr, fixing 3ds2lev, fixes to the
-engine, some memory leak fixes, dlopen fixes, bug fix in Blocks, some other
-smaller changes.
+Jorge did several things in @sc{cs}: FreeBSD/NetBSD port, fixing @file{.md2}
+importer so that it recognizes actions, fixing mdl2spr, fixing 3ds2lev, fixes
+to the engine, some memory leak fixes, dlopen fixes, bug fix in Blocks, some
+other smaller changes.
 
 @item
 Eric Sunshine (@email{sunshine@@sunshineco.com})
@@ -811,17 +809,17 @@ considerable number of bugs and other problems.
 @item
 res (@email{resqu@@gmx.ch})
 
-res did various things to CS: documentation changes, OpenGL and canvas
+res did various things to @sc{cs}: documentation changes, OpenGL and canvas
 related fixes, fixes on procedural textures, lots of other small changes,
-Windows Help files for CS, default image when texture cannot be found,
-fixes to AWS, fixes to image loaders, vfs enhancements, mouse pointer
+Windows Help files for @sc{cs}, default image when texture cannot be found,
+fixes to @sc{aws}, fixes to image loaders, @sc{vfs} enhancements, mouse pointer
 support in Windows canvases, @dots{}
 
 @item
 Peter Amstutz (@email{tetron@@student.umass.edu})
 
 Peter gave us a patch which speeds up loading of 3D sprites a lot.
-In addition it also speeds up CS in general a little. Peter also worked
+In addition it also speeds up @sc{cs} in general a little. Peter also worked
 together with Brendan Burns on the memory canvas. Also added two canvas
 related broadcast events. Peter also sent in a few smaller patches.
 
@@ -940,7 +938,7 @@ time. One of the first tasks he undertook was a reorganization of the
 @item
 Samuel Humphreys (@email{samuelh@@ntlworld.com})
 
-Samuel submitted some fixes for sprites and patched the X drivers so that
+Samuel submitted some fixes for sprites and patched the X11 drivers so that
 resizing windows works.  Samuel also added a procedural texture system to
 Crystal Space.  With this system it is possible to render on textures
 procedurally and use that texture on a polygon as usual. He also helped to
@@ -981,7 +979,7 @@ Crystal Space but ceased work on it:
 @item
 Bart van Langen (@email{bart.van.langen@@dyme.nl})
 
-Bart provided a few patches, a working Watcom/DOS makefile and Visual C++
+Bart provided a few patches, a working Watcom/@sc{dos} makefile and Visual C++
 project files.
 
 @item
@@ -996,7 +994,7 @@ Philip has done (and is doing) a great job maintaining the Windows ports,
 both the @sc{msvc} one and the @sc{gcc} one and also the documentation for
 the ports. He also creates installable packages for Windows from time to time
 and helps with maintenance in general.
-In general he did lots of small fixes in CS.
+In general he did lots of small fixes in @sc{cs}.
 
 @item
 Justin Miller (@email{dyad@@fuse.net})
@@ -1014,7 +1012,7 @@ on @code{3ds2lev}.
 @item
 Mike Bond (@email{mbond@@cox.rr.com})
 
-Mike added fullscreen support under X.
+Mike added fullscreen support under X11.
 
 @item
 Matthew Tang

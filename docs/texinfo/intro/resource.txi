@@ -37,6 +37,7 @@ sunsite.dk:
 
 @uref{ftp://sunsite.dk/pub/projects/crystal/cs094/}
 
+@noindent
 Older release data and separate packages may also be found one directory up
 at:
 
@@ -188,7 +189,7 @@ The Crystal Space developers are often available online for live chat via the
 Internet Relay Chat (@sc{irc}) system.  If you are unfamiliar with @sc{irc}, a
 good place to learn about it is @uref{http://irchelp.org/}.  The Crystal
 Space developers inhabit a channel named @code{#CrystalSpace} on the Open
-Projects Network (OPN). You can find more information about OPN at
+Projects Network (@sc{opn}). You can find more information about @sc{opn} at
 @uref{http://openprojects.net/}, including a list of servers. There are a few
 redirection servers that you should be able to connect to right away. Try
 connecting to one located close (geographically) to you for the least lag.

@@ -3,14 +3,15 @@
 @section Feature List
 @cindex Features
 
-@emph{Last updated by Chris Forno, @email{jcore@@arbornet.org}, on 2002-06-21.} 
-
-The first feature to mention here are that Crystal Space is an Open Source
+The first feature to mention here is that Crystal Space is an Open Source
 project (or a Free Software project, depending on your religion) that is
 freely available under the @sc{gnu} Lesser General Public License
-(@sc{gnu lgpl}). @xref{License}. The developers come from a wide range of
-backgrounds and as a result Crystal Space runs on a wide variety of platforms.
+(@sc{gnu lgpl}). @xref{License}. This means a number of things for developers,
+but perhaps most important is that any program you write may freely link to the
+Crystal Space libraries.
 
+The second important feature of Crystal Space is that it is written to run
+under a wide variety of hardware and software platforms. As of this writing
 Crystal Space has been known to run on the following systems. Note that if a
 system is listed here it does not necessarily mean that it is 100% supported:
 
@@ -37,6 +38,7 @@ OPENSTEP, NeXTSTEP
 @sc{os/2}
 @end itemize
 
+@noindent
 Here are some of just some of Crystal Space's features in no particular order:
 
 @c this used to be listed by library and plug-in, but I found that organization
@@ -60,7 +62,7 @@ splines
 2D and 3D matrices (and transforms)
 
 @item
-@sc{SCF} (the backbone of object-orientation in Crystal Space. @xref{SCF})
+@sc{scf} (the backbone of object-orientation in Crystal Space. @xref{SCF})
 
 @item
 plug-in system

@@ -29,8 +29,8 @@ Andrew Zabolotny (@email{bit@@eltech.ru})
 
 Andrew has contributed several sections to this manual which document the
 various large-scale contributions which he has made to the project.  They
-include the SCF and VFS systems, CSWS, MazeD, memory debugger, makefiles, and
-detailed information pertaining to the OS/2 port.
+include the @sc{scf} and @sc{vfs} systems, @sc{csws}, MazeD, memory debugger,
+makefiles, and detailed information pertaining to the @sc{os/2} port.
 
 @item
 Eric Sunshine (@email{sunshine@@sunshineco.com})
@@ -81,11 +81,18 @@ Desmond Fletcher (@email{desmond.fletcher@@usm.edu})
 Desmond updated map2cs documentation by adding new classnames and keys.
 
 @item
+Chris Forno (@email{jcore@@arbornet.org})
+
+Chris took on the challenge of bringing the Crystal Space documentation
+up-to-date in June of 2002. He is also actively working on editing and
+unifying the existing documentation in preparation for the 1.0 release.
+
+@item
 Seth Galbraith (@email{sgalbrai@@linknet.kitsap.lib.wa.us})
 
-Seth wrote the documentation for the DJGPP port of Crystal Space.  He also
+Seth wrote the documentation for the @sc{djgpp} port of Crystal Space.  He also
 provided a more organized entry-point to the old text-based documentation
-by creating an easily navigated HTML cover page.
+by creating an easily navigated @sc{html} cover page.
 
 @item
 Martin Geisse (@email{Hellwig.Geisse@@mni.fh-giessen.de})
@@ -137,7 +144,7 @@ Jesse wrote documentation explaining how to build Crystal Space on the Amiga
 platform.
 
 @item
-Frank O'Connor (<frank@@oconnors.org>)
+Frank O'Connor (@email{frank@@oconnors.org})
 
 Frank was the maintainer of the Windows port and created some of the
 instructions for building Crystal Space on Windows.
@@ -145,8 +152,8 @@ instructions for building Crystal Space on Windows.
 @item
 Dan Ogles (@email{dogles@@peachtree.com})
 
-Dan wrote the documentation for Crystal Space's now defunct COM implementation
-which he created.
+Dan wrote the documentation for Crystal Space's now defunct @sc{com}
+implementation which he created.
 
 @item
 Alex Pfaffe (@email{ddg@@oz.net})
