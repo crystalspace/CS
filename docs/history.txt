@@ -1,6 +1,36 @@
 The history order is reversed so that new features are at the top.
 
+29-Jan-2003
+	- Matthias Braun fixed ogg loader crash when sound hasn't been
+	  initialized.
+	- Matthias Braun also fixed the problem with streamed sounds getting
+	  looped regardless of their flags (software sound renderer).
+	- Marten Svanfeldt fixed the confusion in the contribution
+	  section of the documentation about who did what with the new
+	  renderer.
+	- Release of CS 0.96r001.
 28-Jan-2003
+	- Keith Fulton did the following:
+	    - Fixed opposite logic bug in binary sprite saver which was
+	      saving the opposite setting for tweening from what was
+	      actually set.
+	- Philip Wyett did the following:
+	    - Changed so release build is now the default one loaded
+	      when you open csall.dsw. This will hopefully help those
+	      who are unsure and build the for developers only
+	      extensive memory debug build.
+	      Note:
+	      Those who already have builds should be sure to delete
+	      csall.ncb and .opt from 'CS\mk\visualc' or the change will
+	      not take effect.
+	- Matthias Braun did the following:
+	    - Fixed make install rules I introduced yesterday.
+	    - Added message to make install.
+	    - Only build oss driver if soundcard.h is available.
+	    - Only build xfree86vm plugin if that extension has been
+	      detected.
+	- Philip Wyett did the following:
+	    - Fixed crasher in g2d.cpp under MSVC and Cygwin.
 	- Removed iGLStateCache. Instead csGLStateCache is used. This is
 	  possible because csGLStateCache doesn't do any memory allocation
 	  in any of its methods. This means that the functions of
@@ -70,6 +100,46 @@ The history order is reversed so that new features are at the top.
 	  and configure.ac (configure) in prepration for the 0.96 release.
 	  Also rebuilt the documentation with the new version number.
 27-Jan-2003
+	- 'res' did the following:
+	    - Some sequences reference themselves. Added comments to
+	      world file about that fact (and only those comments this
+	      time).
+	    - Fixed some leaks in genmesh and freefnt2.
+	    - Fixed mottest crash.
+	    - Updated todo.txt about that fact.
+	- Matthias Braun did the following:
+	    - Updated and fixed null 3d renderer and canvas.
+	    - Update to todo.txt about working null renderer.
+	    - Install phystut, csdemo, viewmesh and cslight.
+	    - Improved current make install process a bit by doing a
+	      cslight run on the installed levels.
+	    - Improved dependencies for cs-config.
+	    - Fixed cs-config .cex files handling when CS has been
+	      installed.
+	    - Don't install g2dtest and gfxtest.
+	    - Added a check for libmikmod to configure script.
+	    - Added tests for freetype2, openal, libogg, libode, and
+	      lib3ds.
+	    - Added a --enable switch for the linux joystick module.
+	- Norman Kramer did the following:
+	    - Added dependency on pythoncs.i in makefile.
+	    - cspace now includes the iDocumentSystem related interfaces.
+	    - Before you can query the iDocumentSystem interface you
+	      have to put it in the registry by
+	      csInitializer.RegisterDocumentSystem (object_reg).
+	- Philip Wyett did the following:
+	    - Changed simplecloth to use GL by default. With no way
+	      seemingly of getting it working correctly for 0.96 under
+	      software, will avoid alot of error reports for a problem
+	      we already know about.
+	    - Fixed some warnings in GL under MSVC release build.
+	    - Removed the extra ; from the ends of some lines of code
+	      in bcterr.h.
+	    - Wrapped up newly added 'shadowmat' code in genmesh for new
+	      renderer as a short term measure to fix crashers in
+	      default cvs tree i.e. isotest and isomap.
+	      Members of the team working here just search for @@@ to
+	      find where the temporary modifications have been made.
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find
 	  a better way to discover how many super lightmaps we can really
@@ -92,6 +162,39 @@ The history order is reversed so that new features are at the top.
 	  no longer needed. This change gives a small but noticable performance
 	  increase.
 26-Jan-2003
+	- Norman Kramer did the following added updates to cspython by
+	  Rene Jager <renej.frog@yucom.be>:
+	    - Attached a tgz file with include/ivaria/cspace.i which
+	      %include's at the end ivaria/pythoncs.i (ifdef SWIGPYTHON)
+	      or ivaria/perl5cs.i (ifdef SWIGPERL5); is extendible of
+	      course ;-)
+	      Most of the python specific stuff is now in
+	      ivaria/pythoncs.i, but some "#ifdef SWIGPYTHON" code
+	      remains, although very little. Result: 40% of previous
+	      cspace.i is now in pythoncs.i
+	      Also updates for cspython.mak and missing cspymod.cpp
+	      (needed for using CS as a python module).
+	      Update of scripts/python/pysimpcd.py (now sound on
+	      collision).
+	      Next thing to tackle is the duplicate list with
+	      interfaces...
+	    - I received the code from Mark Gossage and he states that
+	      the smart pointers (read csRef) cause extra (unneeded)
+	      code... he's right...  this resulted in preventing SWIG
+	      handling csRef by ysing appropriate typemaps; result:
+	      less generated code and clear usage in python (hence
+	      no __deref__) necessary ;-)
+	- Norman Kramer also did the following:
+	    - Changed +value in enums to value (without the '+' sign)
+	      this caused SWIG trouble (swig bug report has been filed)
+	      (this change is small enough to make it here than to write
+	      a dozen lines in swig to run around it).
+	    - Updates by Rene Jager <renej.frog@yucom.be>:
+	      Test examples for using CrystalSpace from within Python.
+	      simpcd.py now plays sound on collision.
+	- 'res' did the following:
+	    - Some sequences reference themselves. Added comments to
+	      world file about that fact.
 	- Added a missing call to SetMirrored() in the old OpenGL renderer
 	  in EffectDrawTriangleMesh(). This fixes a few problems with
 	  DrawPolygonMesh and DrawTriangleMesh in mirror mode.
@@ -108,7 +211,23 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine added missing `#ifdef CS_HAS_MEMORY_MAPPED_IO' to
 	  csutil/mmapio.cpp.  Problem reported by Robert Stewart
 	  (rmsgrey@users.sourceforge.net).
+25-Jan-2003
+	- Gregory Block did the following:
+	    - Added an alias for MacOS X to vfs.cfg.
+	- Philip Wyett did the following:
+	    - Added newline a end of file gfxtest.cpp.
+	- Matthias Braun did the following:
+	    - Changed name csconf target to cs-config to be conform with
+	      rest of CS and to fix install.
+	    - Removed scf.cfg from CSTOOL.CFG as it already was in CSUTIL.CFG
+	- 'res' did the following:
+	    - Fixed -1 bug in win32.cpp reported by Anders Stenberg.
 24-Jan-2003
+	- Philip Wyett did the following:
+	    - Fixed redefinition of i in for loops under MSVC 6 in
+	      shadermgr.cpp.
+	- Philipp Aumayr did the following:
+	    - Updated metaballs for new renderer.
 	- Added the notion of 'camera' flag to a render priority. When this
 	  flag is true the engine will scan all objects in this render
 	  priority to see if any of them has the CS_ENTITY_CAMERA flag set.
@@ -142,6 +261,19 @@ The history order is reversed so that new features are at the top.
 	  clobbering of other makefile special variables, such as $*, and
 	  special functions, such as $(notdir), $(basename), etc.
 23-Jan-2003
+	- Matthias Braun did the following:
+	    - Update about leaks in todo_1.0.txt.
+	- Daniel Duhprey did the following:
+	    - Fix in terrbig to improve compile option for mingw.
+	    - Optimization to volumes for new renderer.
+	    - Small change for transformations in genmesh (needed for
+	      the optimization).
+	- 'res' did the following:
+	    - Replaced ilogb() with csLog2() in terrbig.
+	    - Leaks fixed in terrbig.
+	    - Walktest now properly cleans up if initialization fails.
+	    - Put static vars from csDynaVis::UpdateCoverageBuffer() into 
+	      CS_IMPLEMENT_STATIC_VAR() to fix leaks
 	- Fixed genmesh so it compiles again.
 	- Fixed effects plugin so it compiles again.
 	- Fixed an initialization error with the new mesh_tri_normals in
@@ -193,6 +325,39 @@ The history order is reversed so that new features are at the top.
 	  from static libraries.  In this case, the SCF goop symbols from
 	  csengine library failed to make it into the engine plugin.
 22-Jan-2003
+	- Philip Wyett did the following:
+	    - Fixed delete vs. delete[] mismatch in aws.
+	    - Fixed CR/LF reading problem under Cygwin (engine.cfg).
+	- 'res' did the following:
+	    - Some line endings were messed up in loadlib.cpp.
+	    - Effects system now returns smart pointers in some cases.
+	    - Fixed some memory leaks in the effects system and GL state
+	      cache.
+	    - Removed PNM code from gfxtest.
+	    - Gfxtest can output a list of supported image formats.
+	    - Bmp loader now reports 32bit RGBA support.
+	    - Attempt to fix leak in csPolygonMeshTools::CalculateEdges().
+	    - Fixed leaks in DynaVis unit test.
+	    - Sequences which contained a 'recurse' kept a reference to
+	      themselves preventing proper clean-up.
+	- Matthias Braun did the following:
+	    - Marking the simpvs bug as fixed.
+	    - Some more updates and notes in todo_1.0.txt.
+	- Anders Stenberg did the following:
+	    - Working shadows for the new renderer. (Requires closed
+	      meshes for now.)
+	- Daniel Duhprey did the following:
+	    - Vertex Program to extrude shadow volumes to infinity.
+	    - Fixed some buffer issues with the dirty flags in genmesh
+	      (Could cause some problems if people arbitrarily change
+	      the triangle buffer without changing the others) Also
+	      fixed so trinormals is computed regardless of the
+	      autonormal flag.
+	    - Fixed a memory leak and a problem with open geometries
+	      in genmesh.
+	    - Compatibility fix with old renderer for genmesh.
+	    - Attempt to fix lighting in terrbig. Add some error
+	      checking on the input file.
 	- Made iEngine->CreateDynLight() a bit more efficient by avoiding
 	  the SCF_QUERY_INTERFACE.
 	- Lights (dynamic and static) now keep a real reference to the lighting
