@@ -28,6 +28,8 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/segment.h"
 #include "csgeom/box.h"
+#include "csgeom/pmtools.h"
+#include "igeom/polymesh.h"
 #include "csutil/scfstr.h"
 
 //---------------------------------------------------------------------------
@@ -862,6 +864,105 @@ csGeomDebugHelper::csGeomDebugHelper ()
     return rc; \
   }
 
+/**
+ * A cube mesh for unit testing.
+ */
+class UnitCubeMesh : public iPolygonMesh
+{
+private:
+  csVector3 verts[8];
+  csMeshedPolygon poly[6];
+  int vertices[4*6];
+  
+public:
+  UnitCubeMesh ();
+
+  ///---------------------- iPolygonMesh implementation ----------------------
+  SCF_DECLARE_IBASE;
+  /// Get the number of vertices for this mesh.
+  virtual int GetVertexCount () { return 8; }
+  /// Get the pointer to the array of vertices.
+  virtual csVector3* GetVertices () { return verts; }
+  /// Get the number of polygons for this mesh.
+  virtual int GetPolygonCount () { return 6; }
+  /// Get the pointer to the array of polygons.
+  virtual csMeshedPolygon* GetPolygons () { return poly; }
+  /// Cleanup.
+  virtual void Cleanup () { }
+};
+
+SCF_IMPLEMENT_IBASE (UnitCubeMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
+UnitCubeMesh::UnitCubeMesh ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  csVector3 dim (1, 1, 1);
+  csVector3 d = dim * .5;
+  verts[0].Set (-d.x, -d.y, -d.z);
+  verts[1].Set ( d.x, -d.y, -d.z);
+  verts[2].Set (-d.x, -d.y,  d.z);
+  verts[3].Set ( d.x, -d.y,  d.z);
+  verts[4].Set (-d.x,  d.y, -d.z);
+  verts[5].Set ( d.x,  d.y, -d.z);
+  verts[6].Set (-d.x,  d.y,  d.z);
+  verts[7].Set ( d.x,  d.y,  d.z);
+  int i;
+  for (i = 0 ; i < 6 ; i++)
+  {
+    poly[i].num_vertices = 4;
+    poly[i].vertices = &vertices[i*4];
+  }
+  vertices[0*4+0] = 4;
+  vertices[0*4+1] = 5;
+  vertices[0*4+2] = 1;
+  vertices[0*4+3] = 0;
+  vertices[1*4+0] = 5;
+  vertices[1*4+1] = 7;
+  vertices[1*4+2] = 3;
+  vertices[1*4+3] = 1;
+  vertices[2*4+0] = 7;
+  vertices[2*4+1] = 6;
+  vertices[2*4+2] = 2;
+  vertices[2*4+3] = 3;
+  vertices[3*4+0] = 6;
+  vertices[3*4+1] = 4;
+  vertices[3*4+2] = 0;
+  vertices[3*4+3] = 2;
+  vertices[4*4+0] = 6;
+  vertices[4*4+1] = 7;
+  vertices[4*4+2] = 5;
+  vertices[4*4+3] = 4;
+  vertices[5*4+0] = 0;
+  vertices[5*4+1] = 1;
+  vertices[5*4+2] = 3;
+  vertices[5*4+3] = 2;
+}
+
+static bool ContainsEdge (csPolygonMeshEdge* edges, int num_edges,
+	int vt1, int vt2)
+{
+  int i;
+  for (i = 0 ; i < num_edges ; i++)
+  {
+    if (edges[i].vt1 == vt1 && edges[i].vt2 == vt2) return true;
+  }
+  return false;
+}
+
+static bool ContainsTwoPoly (csPolygonMeshEdge* edges, int num_edges,
+	int poly1, int poly2)
+{
+  int i;
+  for (i = 0 ; i < num_edges ; i++)
+  {
+    if (edges[i].poly1 == poly1 && edges[i].poly2 == poly2) return true;
+    if (edges[i].poly2 == poly1 && edges[i].poly1 == poly2) return true;
+  }
+  return false;
+}
+
 iString* csGeomDebugHelper::UnitTest ()
 {
   scfString* rc = new scfString ();
@@ -876,6 +977,69 @@ iString* csGeomDebugHelper::UnitTest ()
   GEO_ASSERT (isect.x == 0 && isect.y == 0 && ABS (isect.z-50.0) < .00001,
   	"BoxSegment");
   GEO_ASSERT (ABS (r-.5) < .00001, "BoxSegment");
+
+  UnitCubeMesh* mesh = new UnitCubeMesh ();
+  int num_edges;
+  csPolygonMeshEdge* edges = csPolygonMeshTools::CalculateEdges (
+  	mesh, num_edges);
+  GEO_ASSERT (num_edges == 12, "edges");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 0, 1), "contains edge");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 0, 2), "contains edge");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 0, 4), "contains edge");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 1, 3), "contains edge");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 1, 5), "contains edge");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 2, 3), "contains edge");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 2, 6), "contains edge");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 3, 7), "contains edge");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 4, 5), "contains edge");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 4, 6), "contains edge");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 5, 7), "contains edge");
+  GEO_ASSERT (ContainsEdge (edges, num_edges, 6, 7), "contains edge");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 0, 1), "contains 2poly");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 1, 2), "contains 2poly");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 2, 3), "contains 2poly");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 3, 0), "contains 2poly");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 4, 0), "contains 2poly");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 4, 1), "contains 2poly");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 4, 2), "contains 2poly");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 4, 3), "contains 2poly");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 5, 0), "contains 2poly");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 5, 1), "contains 2poly");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 5, 2), "contains 2poly");
+  GEO_ASSERT (ContainsTwoPoly (edges, num_edges, 5, 3), "contains 2poly");
+
+  csPlane3 planes[6];
+  csPolygonMeshTools::CalculatePlanes (mesh, planes);
+  int aedge = csPolygonMeshTools::CheckActiveEdges (edges, num_edges, planes);
+  GEO_ASSERT (aedge == 12, "active edges");
+  GEO_ASSERT (edges[0].active == true, "active edge");
+  GEO_ASSERT (edges[1].active == true, "active edge");
+  GEO_ASSERT (edges[2].active == true, "active edge");
+  GEO_ASSERT (edges[3].active == true, "active edge");
+  GEO_ASSERT (edges[4].active == true, "active edge");
+  GEO_ASSERT (edges[5].active == true, "active edge");
+  GEO_ASSERT (edges[6].active == true, "active edge");
+  GEO_ASSERT (edges[7].active == true, "active edge");
+  GEO_ASSERT (edges[8].active == true, "active edge");
+  GEO_ASSERT (edges[9].active == true, "active edge");
+  GEO_ASSERT (edges[10].active == true, "active edge");
+  GEO_ASSERT (edges[11].active == true, "active edge");
+
+  int outline_edges[12];
+  int outline_verts[8];
+  int num_outline_edges, num_outline_verts;
+  float valid_radius;
+  csPolygonMeshTools::CalculateOutline (edges, num_edges,
+  	planes, mesh->GetVertexCount (),
+	csVector3 (0, 0, -10),
+	outline_edges, num_outline_edges,
+	outline_verts, num_outline_verts,
+	valid_radius);
+  GEO_ASSERT (num_outline_edges == 4, "outline edges");
+  GEO_ASSERT (num_outline_verts == 4, "outline verts");
+  
+  delete[] edges;
+  delete mesh;
 
   rc->DecRef ();
   return NULL;

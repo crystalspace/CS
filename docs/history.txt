@@ -5,6 +5,16 @@ The history order is reversed so that new features are at the top.
 	- Some minor code cleanup in the new csParser class. It was already
 	  formatted rather well though.
 	- Fixed python plugin.
+	- Added csPolygonMeshTools::CalculateEdges() which will calculate a
+	  table of edges for the mesh. Also added a unit tester for this
+	  routine to the csgeom unit tester.
+	- Added csPolygonMeshTools::CalculatePlanes() function to calculate
+	  planes for the mesh.
+	- Added csPolygonMeshTools::CheckActiveEdges() function to calculate
+	  the activity state of all edges.
+	- Added csPolygonMeshTools::CalculateOutline() to create an outline
+	  (expressed in 3D) for the given set of edges and planes. Added
+	  a unit test to the csgeom unit tester.
 21-May-2002
 	- Added include/igeom/polymesh.h to css.h.
 	- Fixed bug with csEvCord not calling SCF_CONSTRUCT_IBASE in
