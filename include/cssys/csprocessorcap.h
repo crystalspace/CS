@@ -50,7 +50,7 @@ public:
     if (isInitialized)
       return;
 
-#ifdef _X86_
+#ifdef PROC_X86
     CheckX86Processor ();
 #else
     mmxSupported = false;
@@ -79,7 +79,7 @@ private:
   /// Is 3dNow! supported
   static bool AMD3dnowSupported;
   
-  #ifdef _X86_
+  #ifdef PROC_X86
   /**
   * Check for x86 features. This function is written twice due to different
   * syntax for inline assembly on MSVC and GCC
@@ -215,9 +215,9 @@ end_detect:
     sseSupported = capFlags & (1<<25);
     //AMD3dnowSupported = capFlags & (1<<31);
   }
-  #else //_X86_
+  #else //PROC_X86
   void csProcessorCapability::CheckX86Processor () {}
-  #endif //_X86_
+  #endif //PROC_X86
 
 };
 
