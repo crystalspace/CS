@@ -147,6 +147,13 @@ public:
     return true;
   }
 
+  /// Test if this box contains the other box.
+  bool Contains (const csBox2& box) const
+  {
+    return (box.minbox.x >= minbox.x && box.maxbox.x <= maxbox.x) &&
+           (box.minbox.y >= minbox.y && box.maxbox.y <= maxbox.y);
+  }
+
   /// Test if this box is empty.
   bool Empty () const
   {
@@ -398,6 +405,14 @@ public:
     if (maxbox.y < box.minbox.y || minbox.y > box.maxbox.y) return false;
     if (maxbox.z < box.minbox.z || minbox.z > box.maxbox.z) return false;
     return true;
+  }
+
+  /// Test if this box contains the other box.
+  bool Contains (const csBox3& box) const
+  {
+    return (box.minbox.x >= minbox.x && box.maxbox.x <= maxbox.x) &&
+           (box.minbox.y >= minbox.y && box.maxbox.y <= maxbox.y) &&
+           (box.minbox.z >= minbox.z && box.maxbox.z <= maxbox.z);
   }
 
   /// Test if this box is empty.

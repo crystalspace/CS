@@ -1566,9 +1566,9 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   //}
   else if (occludee->GetBox ().In (leaf->GetCenter ()))
     visible = true;
-# if DO_PVS_ADJACENT_NODES
   else if ((adjacent_side = leaf->GetBox ().Adjacent (occludee->GetBox ())) != -1)
   {
+#   if DO_PVS_ADJACENT_NODES
     // Two sides are adjacent.
     csBox2 leaf_side = leaf->GetBox ().GetSide (adjacent_side);
     csBox2 occludee_side = occludee->GetBox ().GetSide (
@@ -1577,14 +1577,16 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
     // (i.e. the occludee is smaller) then we need to test if
     // that leaf side is solid to have no visibility.
     if (leaf->GetSolidMask (adjacent_side) == (UShort)~0 &&
-    	leaf_side.Overlap (occludee_side))
+    	leaf_side.Contains (occludee_side))
     {
       printf ("!");
       visible = false;
     }
     else visible = true;
+#   else
+    visible = true;
+#   endif // DO_PVS_ADJACENT_NODES
   }
-# endif // DO_PVS_ADJACENT_NODES
   else if (BoxCanSeeOccludee (leaf->GetBox (), occludee->GetBox ()))
     visible = true;
 

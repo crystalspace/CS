@@ -7,6 +7,39 @@ The history order has been reversed so that new features are at the top.
 	  yet since the new one depends on iunix.h. We're looking into that.
 	- Paul Garceau did another change to mingw.mak to accomodate
 	  auto-gen of include\volatile.h for Mingw.mak.
+	- Patch from Andrew Zabolotny:
+	    - Removed the unneeded VFS->IncRef in systemdriver::initialize.
+	      This removes the "1 unreleased instances" error at cleanup.
+	    - Fixed the vshell plugin (it was creating a second instance of VFS
+	      although VFS plugin is written such that it allows just one
+	      instance).
+	    - Slightly improved csFlags class. WARNING: The former Set(int)
+	      method is renamed to SetAll(int) now, Set(int) has a different
+	      meaning!
+	    - Moved bool csPolygon3D::dont_draw and bool
+	      csPolygon3D::delete_portal to csPolygon3D::flags. Another 8 byte
+	      win for csPolygon3D.
+	    - Added macro CS_ASSERT for system-independent assertions. It will
+	      fire a debug breakpoint if the assertion fails (rather than
+	      printing a error message which is useless in CS for many platforms).
+	    - There is also a DEBUG_BREAK macro (which is empty for non-debug
+	      mode).  You can use it if you want to fire a debug breakpoint
+	      under some complex conditions (for simple conditions you may
+	      use CS_ASSERT). Currently it is defined only for x86 processor.
+	    - Found and fixed a bug (that maybe the one reported by Jorrit in
+	      past) with VFS creating invalid archives. The problem was that
+	      the contents of "lazy" array were simply appended to "dir" array
+	      (after csArchive::Flush) while they should be InsertSort'ed.
+	    - Removed csFrustum::Intersect and csFrustum::IntersectFull methods.
+	      Added instead csFrustum::Classify() which is faster and less buggy.
+	      There is still a bug somewhere but its already better than the
+	      old one.
+	    - Caught and fixed a bug in software halo drawer introduced by Eric.
+	    - Many other small changes I don't remember now.
+	- Added csBox2 and csBox3::Contains() functions to test if some box
+	  contains another one.
+	- Fixed PVS test with adjacent nodes. It was not correctly testing
+	  if one box contained the other.
 30-May-2000
 	- Alex Pfaffe did some minor fixes and cleanup in the terrain
 	  engine. Alex also fixed a bug w.r.t. vertex reuse in buffers.
