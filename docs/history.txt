@@ -97,6 +97,8 @@ The history order is reversed so that new features are at the top.
 	  the expansion of $(SRC.SOFT3D), invoke "make show V=SRC.SOFT3D".
 	- Eric Sunshine eliminated a couple compilation warnings reported by
 	  MSVC in 3dsload.cpp.
+	- Eric Sunshine fixed the `drivers' makefile target so that it also
+	  builds the Socket network driver.
 13-Jun-2001
 	- Increased robustness of the Spider in BugPlug a little. If there
 	  are no sectors it will not start hunting. There is also a timeout

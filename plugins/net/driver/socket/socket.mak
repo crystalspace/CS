@@ -14,7 +14,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: socket socketclean
-all plugins netdrivers: socket
+all plugins drivers netdrivers: socket
 
 socket:
 	$(MAKE_TARGET) MAKE_DLL=yes
