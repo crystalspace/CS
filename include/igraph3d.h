@@ -376,7 +376,7 @@ struct G3DTriangleMesh
     /// Must apply transformation and perspective.
     VM_WORLDSPACE,
     /// Must apply perspective.
-    VM_VIEWSPACE,
+    VM_VIEWSPACE
   } vertex_mode;
 
   /// DrawPolygonFX flag.

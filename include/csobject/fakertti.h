@@ -63,13 +63,13 @@ public:
   {
     int depth = 0;
     for (const csIdType *c = Base; c; c = c->Base, depth++)
-      ;
+      {}
     return depth;
   }
 
 #define COMPARE_TYPE(startval,stopval)			\
   const csIdType *c;					\
-  for (c = startval; c && c != stopval; c = c->Base) ;	\
+  for (c = startval; c && c != stopval; c = c->Base) {}	\
   return (c != NULL);
 
   /// Compares whether one object's type is derived from the other.

@@ -121,9 +121,9 @@ struct csPixelFormat
 #define COMPUTE(comp)							\
     {									\
       unsigned long i, tmp = comp##Mask;				\
-      for (i = 0; tmp && !(tmp & 1); tmp >>= 1, i++) ;			\
+      for (i = 0; tmp && !(tmp & 1); tmp >>= 1, i++) {}			\
       comp##Shift = i;							\
-      for (i = 0; tmp & 1; tmp >>= 1, i++) ;				\
+      for (i = 0; tmp & 1; tmp >>= 1, i++) {}				\
       comp##Bits = i;							\
     }
     COMPUTE (Red);
