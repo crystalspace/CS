@@ -102,6 +102,27 @@ struct iSpriteCal3DFactoryState : public iBase
   virtual int LoadCoreMorphTarget(int mesh_index,const char *filename,const char *name) = 0;
   
   /**
+   * This adds a new morph animation.
+   *
+   * @param name The name of morph animation.
+   *
+   * @return The index of the morph animation.
+   */
+  virtual int AddMorphAnimation(const char *name) = 0;
+  
+  /**
+   * This adds a mesh and one of it's morph target to the given morph animation.
+   *
+   * @param morphanimation_index The index of the morph animation.
+   * @param mesh_index The index of the mesh.
+   * @param morphtarget_index The index of the morph target of the mesh.
+   *
+   * @return True if successfull.
+   */
+  virtual bool AddMorphTarget(int morphanimation_index,
+		              const char *mesh_name, const char *morphtarget_name) = 0;
+  
+  /**
    * This jams a CS material into a cal3d material struct.
    * Don't try this at home!
    */
@@ -119,6 +140,11 @@ struct iSpriteCal3DFactoryState : public iBase
    */
   virtual int  GetMeshCount() = 0;
 
+  /**
+   * Returns the count of all Morph animations of this core model.
+   */
+  virtual int GetMorphAnimationCount() = 0;
+  
   /**
    * Returns the number of morph targets of a mesh.
    *
@@ -138,6 +164,16 @@ struct iSpriteCal3DFactoryState : public iBase
    * Returns the index of the specified mesh name, or -1 if not found.
    */
   virtual int  FindMeshName(const char *meshName) = 0;
+
+  /**
+   * Returns the xml name of the morph animation at a certain index in the array.
+   */
+  virtual const char *GetMorphAnimationName(int idx) = 0;
+
+  /**
+   * Returns the index of the specified morph animation name, or -1 if not found.
+   */
+  virtual int  FindMorphAnimationName(const char *meshName) = 0;
 
   /**
    * Returns whether the mesh is a default mesh or not.
@@ -248,47 +284,24 @@ struct iSpriteCal3DState : public iBase
   /**
    * Blends the morph target.
    *
-   * @parm mesh_id The id of the mesh we want to blend.
-   * @parm morph_id The id of the morph target.
+   * @parm mesh_id The id of the morph animation we want to blend.
    * @parm weight The weight of the morph target.
    * @parm delay The delay untill the full weight is reached.
    *
    * @return False if something went wrong.
    */
-  virtual bool BlendMorphTarget(int mesh_id, int morph_id, float weight, float delay) = 0;
+  virtual bool BlendMorphTarget(int morph_animation_id, float weight, float delay) = 0;
 
   /**
    * Clears the morph target.
    *
-   * @parm mesh_id The id of the mesh we want to clear.
-   * @parm morph_id The id of the morph target.
+   * @parm mesh_id The id of the morph animation we want to clear.
    * @parm delay The delay untill the morph target is cleared.
    *
    * @return False if something went wrong.
    */
-  virtual bool ClearMorphTarget(int mesh_id, int morph_id, float delay) = 0;
+  virtual bool ClearMorphTarget(int morph_animation_id, float delay) = 0;
 
-  /**
-   * Blends the base vectors of a mesh.
-   *
-   * @parm mesh_id The id of the mesh we want to blend.
-   * @parm weight The weight of the morph target.
-   * @parm delay The delay untill the full weight is reached.
-   *
-   * @return False if something went wrong.
-   */
-  virtual bool BlendBase(int mesh_id, float weight, float delay) = 0;
-
-  /**
-   * Clears the base vectors of a mesh.
-   *
-   * @parm mesh_id The id of the mesh we want to clear.
-   * @parm delay The delay untill the morph target is cleared.
-   *
-   * @return False if something went wrong.
-   */
-  virtual bool ClearBase(int mesh_id, float delay) = 0;
-  
 };
 
 #endif// __CS_IMESH_SPRITECAL3D_H__

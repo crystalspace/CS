@@ -45,7 +45,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 // STL include required by cal3d
 #include <string>
 
-
 CS_IMPLEMENT_PLUGIN
 
 //--------------------------------------------------------------------------
@@ -230,6 +229,36 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget(int mesh_index,
     return morph_index;
 }
 
+int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
+{
+    int id = calCoreModel.addCoreMorphAnimation(new CalCoreMorphAnimation());
+    morph_animation_names.Push(name);
+    return id;
+}
+
+bool csSpriteCal3DMeshObjectFactory::AddMorphTarget(int morphanimation_index,
+                              const char *mesh_name, const char *morphtarget_name)
+{
+  int mesh_index = FindMeshName(mesh_name);
+  if(mesh_index == -1)
+  {
+     return false;
+  }
+  csArray<csString>& morph_target = submeshes[mesh_index]->morph_target_name;
+  int i;
+  for (i=0; i<morph_target.Length(); i++)
+  {
+    if (morph_target[i] == morphtarget_name)
+      break;
+  }
+  if(i==morph_target.Length())
+  {
+    return false;
+  }
+  CalCoreMorphAnimation* morph_animation = calCoreModel.getCoreMorphAnimation(morphanimation_index);
+  return morph_animation->addMorphTarget(mesh_index,i);
+}
+
 int csSpriteCal3DMeshObjectFactory::GetMorphTargetCount(int mesh_id)
 {
     if(mesh_id < 0|| submeshes.Length() <= mesh_id)
@@ -264,6 +293,25 @@ int  csSpriteCal3DMeshObjectFactory::FindMeshName(const char *meshName)
   }
   return -1;
 }
+
+const char *csSpriteCal3DMeshObjectFactory::GetMorphAnimationName(int idx)
+{
+  if (idx >= morph_animation_names.Length())
+    return 0;
+
+  return morph_animation_names[idx];
+}
+
+int  csSpriteCal3DMeshObjectFactory::FindMorphAnimationName(const char *meshName)
+{
+  for (int i=0; i<morph_animation_names.Length(); i++)
+  {
+    if (morph_animation_names[i] == meshName)
+      return i;
+  }
+  return -1;
+}
+
 
 bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
 {
@@ -1077,48 +1125,22 @@ bool csSpriteCal3DMeshObject::DetachCoreMesh (int mesh_id)
   return true;
 }
 
-bool csSpriteCal3DMeshObject::BlendMorphTarget(int mesh_id, int morph_id, float weight, float delay)
+bool csSpriteCal3DMeshObject::BlendMorphTarget(int morph_animation_id, float weight, float delay)
 {
-  if(mesh_id < 0|| factory->submeshes.Length() <= mesh_id)
+  if(morph_animation_id < 0|| factory->morph_animation_names.Length() <= morph_animation_id)
   {
     return false;
   }
-  if(morph_id < 0|| factory->submeshes[mesh_id]->morph_target_name.Length() <= morph_id)
-  {
-    return false;
-  }
-  return calModel.getMesh(mesh_id)->getMorphTargetMixer()->blend(morph_id,weight,delay);
+  return calModel.getMorphTargetMixer()->blend(morph_animation_id,weight,delay);
 }
 
-bool csSpriteCal3DMeshObject::ClearMorphTarget(int mesh_id, int morph_id, float delay)
+bool csSpriteCal3DMeshObject::ClearMorphTarget(int morph_animation_id, float delay)
 {
-  if(mesh_id < 0|| factory->submeshes.Length() <= mesh_id)
+  if(morph_animation_id < 0|| factory->morph_animation_names.Length() <= morph_animation_id)
   {
     return false;
   }
-  if(morph_id < 0|| factory->submeshes[mesh_id]->morph_target_name.Length() <= morph_id)
-  {
-    return false;
-  }
-  return calModel.getMesh(mesh_id)->getMorphTargetMixer()->clear(morph_id,delay);
-}
-
-bool csSpriteCal3DMeshObject::BlendBase(int mesh_id, float weight, float delay)
-{
-  if(mesh_id < 0|| factory->submeshes.Length() <= mesh_id)
-  {
-    return false;
-  }
-  return calModel.getMesh(mesh_id)->getMorphTargetMixer()->blendBase(weight,delay);
-}
-
-bool csSpriteCal3DMeshObject::ClearBase(int mesh_id, float delay)
-{
-  if(mesh_id < 0|| factory->submeshes.Length() <= mesh_id)
-  {
-    return false;
-  }
-  return calModel.getMesh(mesh_id)->getMorphTargetMixer()->clearBase(delay);
+  return calModel.getMorphTargetMixer()->clear(morph_animation_id,delay);
 }
 
 

@@ -54,7 +54,8 @@ enum
   XMLTOKEN_ANIMATION,
   XMLTOKEN_MESH,
   XMLTOKEN_MATERIAL,
-  XMLTOKEN_MORPHTARGET
+  XMLTOKEN_MORPHTARGET,
+  XMLTOKEN_MORPHANIMATION
 };
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DFactoryLoader)
@@ -115,13 +116,14 @@ bool csSpriteCal3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
-  xmltokens.Register ("path",        XMLTOKEN_PATH);
-  xmltokens.Register ("scale",       XMLTOKEN_SCALE);
-  xmltokens.Register ("skeleton",    XMLTOKEN_SKELETON);
-  xmltokens.Register ("animation",   XMLTOKEN_ANIMATION);
-  xmltokens.Register ("mesh",        XMLTOKEN_MESH);
-  xmltokens.Register ("material",    XMLTOKEN_MATERIAL);
-  xmltokens.Register ("morphtarget", XMLTOKEN_MORPHTARGET);
+  xmltokens.Register ("path",           XMLTOKEN_PATH);
+  xmltokens.Register ("scale",          XMLTOKEN_SCALE);
+  xmltokens.Register ("skeleton",       XMLTOKEN_SKELETON);
+  xmltokens.Register ("animation",      XMLTOKEN_ANIMATION);
+  xmltokens.Register ("mesh",           XMLTOKEN_MESH);
+  xmltokens.Register ("material",       XMLTOKEN_MATERIAL);
+  xmltokens.Register ("morphtarget",    XMLTOKEN_MORPHTARGET);
+  xmltokens.Register ("morphanimation", XMLTOKEN_MORPHANIMATION);
   return true;
 }
 
@@ -321,6 +323,29 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
 	break;
+      }
+    case XMLTOKEN_MORPHANIMATION:
+      {
+        const char *name = child->GetAttributeValue("name");
+        int morphanimationid = newspr->AddMorphAnimation(name);
+        csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
+        while (child_it->HasNext ())
+        {
+          csRef<iDocumentNode> childchild = child_it->Next ();
+          if (childchild->GetType () != CS_NODE_ELEMENT) continue;
+          const char* child_value = childchild->GetValue ();
+          csStringID child_id = xmltokens.Request (child_value);
+          switch (child_id)
+          {
+            case XMLTOKEN_MORPHTARGET:
+            {
+              const char *mesh_name = childchild->GetAttributeValue("mesh");
+              const char *morph_name = childchild->GetAttributeValue("morphtarget");
+              newspr->AddMorphTarget(morphanimationid,mesh_name,morph_name);
+            }
+          }
+        }
+        break;
       }
     case XMLTOKEN_MATERIAL:
       {

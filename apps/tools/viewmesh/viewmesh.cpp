@@ -84,6 +84,8 @@ CS_IMPLEMENT_APPLICATION
 #define VIEWMESH_COMMAND_MOVEANIMSLOWER 77715
 #define VIEWMESH_COMMAND_REVERSEACTION  77716
 #define VIEWMESH_COMMAND_FORWARDACTION  77717
+#define VIEWMESH_COMMAND_BLEND          78300
+#define VIEWMESH_COMMAND_CLEAR          78400
 
 //-----------------------------------------------------------------------------
 
@@ -388,6 +390,28 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	menu->Hide();
 	return true;
       }
+      if (ev.Command.Code >= VIEWMESH_COMMAND_BLEND &&
+          ev.Command.Code < VIEWMESH_COMMAND_BLEND + 100)
+      {
+        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+                iSpriteCal3DState));
+        if (cal3dstate)
+        {
+           int i = ev.Command.Code - VIEWMESH_COMMAND_BLEND;
+           cal3dstate->BlendMorphTarget(i,1.0f,10.0f);
+        }
+      }
+      if (ev.Command.Code >= VIEWMESH_COMMAND_CLEAR &&
+          ev.Command.Code < VIEWMESH_COMMAND_CLEAR + 100)
+      {
+        csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+                iSpriteCal3DState));
+        if (cal3dstate)
+        {
+           int i = ev.Command.Code - VIEWMESH_COMMAND_CLEAR;
+           cal3dstate->ClearMorphTarget(i,10.0f);
+        }
+      }
       break;
   }
 
@@ -483,6 +507,11 @@ bool ViewMesh::LoadSprite(const char *filename, float scale)
 	      push.Append(factstate->GetMeshName(i));
 	      meshlist.Push(push);
 	  }
+          int j;
+          for (j=0;j<factstate->GetMorphAnimationCount();j++)
+          {
+            morphanimationlist.Push(csStrNew (factstate->GetMorphAnimationName(j)));
+          }
       }
     }
   }
@@ -588,7 +617,22 @@ void ViewMesh::ConstructMenu()
 	  meshmenu->SetCheck(VIEWMESH_MESH_SELECT_START+i, true);
     }
     (void)new csMenuItem(menu, "Attach Meshes", meshmenu);
-   
+    //Blend morph animations
+    csMenu *blendmenu = new csMenu(0);
+    for(i=0;i<morphanimationlist.Length();i++)
+    {
+       (void)new csMenuItem(blendmenu, morphanimationlist.Get(i),
+                           VIEWMESH_COMMAND_BLEND+i);
+    }
+    (void)new csMenuItem(menu, "Blend Morph Animation", blendmenu);
+    //Clear morph animations
+    csMenu *clearmenu = new csMenu(0);
+    for(i=0;i<morphanimationlist.Length();i++)
+    {
+       (void)new csMenuItem(clearmenu, morphanimationlist.Get(i),
+                           VIEWMESH_COMMAND_CLEAR+i);
+    }
+    (void)new csMenuItem(menu, "Clear Morph Animation", clearmenu);
   }
   else
   {

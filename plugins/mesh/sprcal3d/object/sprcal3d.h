@@ -96,6 +96,7 @@ private:
   CalCoreModel calCoreModel;
   csArray<csCal3DAnimation*> anims;
   csArray<csCal3DMesh*>      submeshes;
+  csArray<csString>          morph_animation_names;
 
   csString     basePath;
   float	       renderScale;
@@ -130,13 +131,18 @@ public:
   int  LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel);
   int LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat);
   int LoadCoreMorphTarget(int mesh_index,const char *filename,const char *name);
+  int AddMorphAnimation(const char *name);
+  bool AddMorphTarget(int morphanimation_index,const char *mesh_name, const char *morphtarget_name);
   bool AddCoreMaterial(iMaterialWrapper *mat);
   void BindMaterials();
 
   int  GetMeshCount() { return submeshes.Length(); }
+  int GetMorphAnimationCount() { return morph_animation_names.Length(); }
   int GetMorphTargetCount(int mesh_id);
   const char *GetMeshName(int idx);
   int  FindMeshName(const char *meshName);
+  const char *GetMorphAnimationName(int idx);
+  int  FindMorphAnimationName(const char *meshName);
   bool IsMeshDefault(int idx);
 
   //------------------------ iMeshObjectFactory implementation --------------
@@ -261,6 +267,12 @@ public:
     virtual int LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat)
     { return scfParent->LoadCoreMesh(filename,name,attach,defmat); }
 
+    virtual int AddMorphAnimation(const char *name)
+    { return scfParent->AddMorphAnimation(name); }
+    
+    virtual bool AddMorphTarget(int morphanimation_index,const char *mesh_name, const char *morphtarget_name)
+    { return scfParent->AddMorphTarget(morphanimation_index,mesh_name, morphtarget_name); }
+ 
     virtual int LoadCoreMorphTarget(int mesh_index,const char *filename,const char *name)
     { return scfParent->LoadCoreMorphTarget(mesh_index,filename,name); }
 	    
@@ -273,6 +285,9 @@ public:
     virtual int  GetMeshCount()
     { return scfParent->GetMeshCount(); }
 
+    virtual int GetMorphAnimationCount()
+    { return scfParent->GetMorphAnimationCount();}
+
     virtual int GetMorphTargetCount(int mesh_id)
     { return scfParent->GetMorphTargetCount(mesh_id);}
 
@@ -281,6 +296,12 @@ public:
 
     virtual int  FindMeshName(const char *meshName)
     { return scfParent->FindMeshName(meshName); }
+    
+    virtual const char *GetMorphAnimationName(int idx)
+    { return scfParent->GetMorphAnimationName(idx); }
+
+    virtual int  FindMorphAnimationName(const char *meshName)
+    { return scfParent->FindMorphAnimationName(meshName); }
 
     virtual bool IsMeshDefault(int idx)
     { return scfParent->IsMeshDefault(idx); }
@@ -510,10 +531,8 @@ public:
   bool DetachCoreMesh(const char *meshname);
   bool DetachCoreMesh(int mesh_id);
 
-  bool BlendMorphTarget(int mesh_id, int morph_id, float weight, float delay);
-  bool ClearMorphTarget(int mesh_id, int morph_id, float delay);
-  bool BlendBase(int mesh_id, float weight, float delay);
-  bool ClearBase(int mesh_id, float delay);
+  bool BlendMorphTarget(int morph_animation_id, float weight, float delay);
+  bool ClearMorphTarget(int morph_animation_id, float delay);
 
   struct SpriteCal3DState : public iSpriteCal3DState
   {
@@ -576,17 +595,12 @@ public:
     virtual bool DetachCoreMesh(int mesh_id)
     {  return scfParent->DetachCoreMesh(mesh_id); }
 
-    virtual bool BlendMorphTarget(int mesh_id, int morph_id, float weight, float delay)
-    {  return scfParent->BlendMorphTarget(mesh_id, morph_id, weight, delay); }
+    virtual bool BlendMorphTarget(int morph_animation_id, float weight, float delay)
+    {  return scfParent->BlendMorphTarget(morph_animation_id, weight, delay); }
 
-    virtual bool ClearMorphTarget(int mesh_id, int morph_id, float delay)
-    { return scfParent->ClearMorphTarget(mesh_id, morph_id, delay); }
+    virtual bool ClearMorphTarget(int morph_animation_id, float delay)
+    { return scfParent->ClearMorphTarget(morph_animation_id, delay); }
 
-    virtual bool BlendBase(int mesh_id, float weight, float delay)
-    { return scfParent->BlendBase(mesh_id, weight, delay); }
-
-    virtual bool ClearBase(int mesh_id, float delay)
-    { return scfParent->ClearBase(mesh_id, delay); }
   } scfiSpriteCal3DState;
   friend struct SpriteCal3DState;
 
