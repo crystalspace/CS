@@ -105,7 +105,7 @@ public:
   /**
    * Get the warping transformation in object space.
    */
-  const csReversibleTransform& GetWarp () { return warp_obj; }
+  virtual const csReversibleTransform& GetWarp () { return warp_obj; }
 
   /**
    * Set the texture (used for filtering).

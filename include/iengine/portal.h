@@ -114,6 +114,9 @@ struct iPortal : public iBase
   /// Set warping transformation to mirror around given polygon
   virtual void SetMirror (iPolygon3D *iPoly) = 0;
 
+  /// Get the warping transformation
+  virtual const csReversibleTransform &GetWarp () = 0;
+
   /// Set the missing sector callback.
   virtual void SetPortalSectorCallback (csPortalSectorCallback cb,
   	void* cbData) = 0;
