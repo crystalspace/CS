@@ -24,6 +24,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/garray.h"
 #include "csutil/refarr.h"
+#include "csutil/hashmap.h"
 #include "csgeom/transfrm.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
@@ -77,6 +78,14 @@ public:
 };
 
 typedef csGrowingArray<dGeomID> csGeomList;
+
+struct ContactEntry {
+  dGeomID o1, o2;
+  csVector3 point;
+  csVector3 dir;
+};
+
+typedef csGrowingArray<ContactEntry> csContactList;
 
 /**
  * This is the implementation for the actual plugin.
@@ -143,6 +152,7 @@ class csODEDynamicSystem : public csObject
 private:
   dWorldID worldID;
   dSpaceID spaceID;
+  float roll_damp, lin_damp;
 
   csRef<iCollideSystem> collidesys;
   csRef<iDynamicsMoveCallback> move_cb;
@@ -162,6 +172,14 @@ public:
     { scfParent->SetGravity (v); }
     const csVector3 GetGravity () const 
     { return scfParent->GetGravity (); }
+    void SetLinearDampener (float d)
+    { scfParent->SetLinearDampener (d); }
+    float GetLinearDampener () const 
+    { return scfParent->GetLinearDampener (); }
+    void SetRollingDampener (float d)
+    { scfParent->SetRollingDampener (d); }
+    float GetRollingDampener () const 
+    { return scfParent->GetRollingDampener (); }
     void Step (float stepsize)
     { scfParent->Step (stepsize); }
     csPtr<iRigidBody> CreateBody ()
@@ -180,6 +198,21 @@ public:
     { scfParent->RemoveJoint (joint); }
     iDynamicsMoveCallback* GetDefaultMoveCallback ()
     { return scfParent->GetDefaultMoveCallback (); }
+	bool AttachColliderMesh (iMeshWrapper* mesh, const csOrthoTransform& trans,
+	    float friction, float elasticity)
+	{ return scfParent->AttachColliderMesh (mesh, trans, friction, elasticity); }
+	bool AttachColliderCylinder (float length, float radius,
+  	    const csOrthoTransform& trans, float friction, float elasticity)
+    { return scfParent->AttachColliderCylinder (length, radius, trans, friction, elasticity); }
+	bool AttachColliderBox (const csVector3 &size, const csOrthoTransform&
+	    trans, float friction, float elasticity)
+    { return scfParent->AttachColliderBox (size, trans, friction, elasticity); }
+    bool AttachColliderSphere (float radius, const csVector3 &offset,
+  	    float friction, float elasticity)
+    { return scfParent->AttachColliderSphere (radius, offset, friction, elasticity); }
+    bool AttachColliderPlane (const csPlane3 &plane, float friction,
+        float elasticity)
+    { return scfParent->AttachColliderPlane (plane, friction, elasticity); }
   } scfiDynamicSystem;
   friend struct DynamicSystem;
 
@@ -192,6 +225,10 @@ public:
 
   virtual void SetGravity (const csVector3& v);
   virtual const csVector3 GetGravity () const;
+  virtual void SetRollingDampener (float d) { roll_damp = (d > 1) ? 1.0 : d; }
+  virtual float GetRollingDampener () const { return roll_damp; }
+  virtual void SetLinearDampener (float d) { lin_damp = (d > 1) ? 1.0 : d; }
+  virtual float GetLinearDampener () const { return lin_damp; }
 
   virtual void Step (float stepsize);
 
@@ -206,6 +243,17 @@ public:
   virtual void RemoveJoint (iJoint* joint);
 
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () { return move_cb; }
+
+  virtual bool AttachColliderMesh (iMeshWrapper* mesh,
+  	const csOrthoTransform& trans, float friction, float elasticity);
+  virtual bool AttachColliderCylinder (float length, float radius,
+  	const csOrthoTransform& trans, float friction, float elasticity);
+  virtual bool AttachColliderBox (const csVector3 &size,
+  	const csOrthoTransform& trans, float friction, float elasticity);
+  virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
+  	float friction, float elasticity);
+  virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
+    float elasticity);
 };
 
 class csODERigidBody;
@@ -499,6 +547,7 @@ public:
 
   void Execute (iMeshWrapper* mesh, csOrthoTransform& t);
   void Execute (iSkeletonBone* bone, csOrthoTransform& t);
+  void Execute (csOrthoTransform& t);
 };
 
 #endif // __CS_ODEDYNAMICS_H__

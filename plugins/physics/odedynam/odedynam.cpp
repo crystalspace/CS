@@ -149,11 +149,17 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
     return;
   }
 
-  csODERigidBody *b1 = (csODERigidBody *)dBodyGetData (dGeomGetBody(o1));
-  csODERigidBody *b2 = (csODERigidBody *)dBodyGetData (dGeomGetBody(o2));
+  csODERigidBody *b1 = 0, *b2 = 0;
+  if (dGeomGetBody(o1)) {
+    b1 = (csODERigidBody *)dBodyGetData (dGeomGetBody(o1));
+  }
+  if (dGeomGetBody(o2)) {
+    b2 = (csODERigidBody *)dBodyGetData (dGeomGetBody(o2));
+  }
 
-  if (b1->IsStatic() && b2->IsStatic()) return;
-  if (b1->GetGroup() != 0 && (b1->GetGroup() == b2->GetGroup())) return;
+  if ((!b1 || b1->IsStatic()) && (!b2 || b2->IsStatic())) return;
+  if (b1 && b2 && b1->GetGroup() != 0 && b1->GetGroup() == b2->GetGroup()) 
+    return;
 
   dContact contact[10];
   int a = dCollide (o1, o2, 10, &(contact[0].geom), sizeof (dContact));
@@ -161,20 +167,23 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
   {
     /* there is only 1 actual body per set */
 
-    b1->Collision (&b2->scfiRigidBody);
-    b2->Collision (&b1->scfiRigidBody);
+    if (b1 && b2) {
+      b1->Collision (&b2->scfiRigidBody);
+      b2->Collision (&b1->scfiRigidBody);
+    }
 
     for( int i=0; i<a; i++ )
     {
       float *f1 = (float *)dGeomGetData (contact[i].geom.g1);
       float *f2 = (float *)dGeomGetData (contact[i].geom.g2);
 
-      contact[i].surface.mode = dContactBounce | dContactSoftCFM;
+      contact[i].surface.mode = dContactBounce | dContactSoftCFM | dContactSlip1 | dContactSlip2 | dContactApprox1;
       contact[i].surface.mu = f1[0]*f2[0];
-      contact[i].surface.mu2 = 0;
       contact[i].surface.bounce = f1[1]*f2[1];
       contact[i].surface.bounce_vel = 0.1;
-      contact[i].surface.soft_cfm = 0.01;
+	  contact[i].surface.slip1 = 0.3;
+	  contact[i].surface.slip2 = 0.3;
+      contact[i].surface.soft_cfm = 0.1;
 
       dJointID c = dJointCreateContact ( ((csODEDynamicSystem*)data)
           ->GetWorldID(), contactjoints,contact+i );
@@ -435,8 +444,8 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
       // make sure the point lies inside the polygon
       int vcount = polycollide[i].num_vertices;
       for (k = 0; k < vcount-1; k ++) {
-    int ind1 = polycollide[i].vertices[k];
-    int ind2 = polycollide[i].vertices[k+1];
+        int ind1 = polycollide[i].vertices[k];
+        int ind2 = polycollide[i].vertices[k+1];
         csVector3 v1 = vertex_table[ind1] / mesht;
         csVector3 v2 = vertex_table[ind2] / mesht;
         csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
@@ -487,10 +496,16 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
       aabb1[4] > aabb2[5] || aabb1[5] < aabb2[4]) {
     return 0;
   }
-  int N = flags & 0xFF;
+
   const dReal *pos = dGeomGetPosition (sphere);
   csVector3 center(pos[0], pos[1], pos[2]);
+  const dReal *vel = dBodyGetLinearVel (dGeomGetBody (sphere));
+  csVector3 velocity(vel[0], vel[1], vel[2]);
   dReal rad = dGeomSphereGetRadius (sphere);
+  csBox3 spherebox;
+  spherebox.AddBoundingVertex (csVector3 (rad, rad, rad));
+  spherebox.AddBoundingVertex (csVector3 (-rad, -rad, -rad));
+
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
   CS_ASSERT (m);
   csRef<iPolygonMesh> p (m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet());
@@ -500,48 +515,39 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   csReversibleTransform mesht = GetGeomTransform (mesh);
 
   int outcount = 0;
+  int priority = 10000000;
 
-  for (int i = 0; i < p->GetPolygonCount() && outcount < N; i ++) {
+  for (int i = 0; i < p->GetPolygonCount(); i ++) {
+    int j;
+    int vcount = polygon_list[i].num_vertices;
+    int test_priority = 1;
+
     csPlane3 plane(vertex_table[polygon_list[i].vertices[0]] / mesht,
       vertex_table[polygon_list[i].vertices[1]] / mesht,
       vertex_table[polygon_list[i].vertices[2]] / mesht);
     plane.Normalize();
-    if (plane.Classify (center) < 0) {
-      continue;
+
+    if ((plane.Normal() * velocity) > 0) {
+      test_priority --;
     }
-    float depth = rad - plane.Distance (center);
-    if (depth < 0) {
-      continue;
+
+    float classify = plane.Classify (center);
+    csVector3 cont_point = center - (plane.Normal() * classify);
+    if (classify > 0) {
+      test_priority --;
     }
-    int vcount = polygon_list[i].num_vertices;
-    for (int j = 0; j < vcount-1; j ++) {
+
+    for (j = 0; j < vcount-1; j ++) {
       int ind1 = polygon_list[i].vertices[j];
       int ind2 = polygon_list[i].vertices[j+1];
       csVector3 v1 = vertex_table[ind1] / mesht;
       csVector3 v2 = vertex_table[ind2] / mesht;
-      csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
+      csPlane3 edgeplane(v1, v2, v2 + plane.Normal());
       edgeplane.Normalize();
-      if (edgeplane.Classify (center) < 0) {
-        csVector3 line = v2 - v1;
-    float linelen = line.SquaredNorm();
-        line.Normalize();
-        float proj = center * line;
-        /* if the point projects on this edge, but outside the poly test
-         * for depth to this edge (especially important on sharp corners)
-         */
-        if ((proj >= (v1 * line)) && (proj <= (v2 * line))) {
-      float t = ((v1 - center) * (v2 - center)) / linelen;
-          csVector3 projpt = v1 + (line * t);
-          csVector3 newnorm = center - projpt;
-          float dist = newnorm.Norm();
-          depth = rad - dist;
-          newnorm /= dist;
-          plane.Set (newnorm.x, newnorm.y, newnorm.z, 0);
-      break;
-        } else {
-          /* this is an invalid the ball is outside the poly at this edge */
-          depth = -1;
-        }
+      float dist = edgeplane.Classify (cont_point);
+      if (dist > 0) {
+        cont_point = cont_point - (edgeplane.Normal () * dist);
+        test_priority ++;
       }
     }
     /* get the one last edge from END to 0 */
@@ -549,44 +555,47 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
     int ind2 = polygon_list[i].vertices[0];
     csVector3 v1 = vertex_table[ind1] / mesht;
     csVector3 v2 = vertex_table[ind2] / mesht;
-    csPlane3 edgeplane (v1, v2, v2 - plane.Normal());
+    csPlane3 edgeplane (v1, v2, v2 + plane.Normal());
     edgeplane.Normalize ();
-    if (edgeplane.Classify (center) < 0) {
-      csVector3 line = v2 - v1;
-      float linelen = line.SquaredNorm ();
-      line.Normalize();
-      float proj = center * line;
-      /* if the point projects on this edge, but outside the poly test
-       * for depth to this edge (especially important on sharp corners)
-       */
-      if ((proj >= (v1 * line)) && (proj <= (v2 * line))) {
-    float t = ((v1 - center) * (v2 - center)) / linelen;
-        csVector3 projpt = v1 + (line * t);
-        csVector3 newnorm = center - projpt;
-        float dist = newnorm.Norm();
-        depth = rad - dist;
-        newnorm /= dist;
-        plane.Set (newnorm.x, newnorm.y, newnorm.z, 0);
-      } else {
-        /* this is an invalid the ball is outside the poly at this edge */
-        depth = -1;
-      }
+    float dist = edgeplane.Classify (cont_point);
+    if (dist > 0) {
+      cont_point = cont_point - (edgeplane.Normal () * dist);
+      test_priority ++;
+    }
+    csVector3 cont_normal;
+    float depth;
+    if (classify > 0) {
+      cont_normal = center - cont_point;
+      float len = cont_normal.Norm();
+      depth = rad - len;
+      cont_normal /= len;
+    } else {
+      cont_normal = cont_point - center;
+      float len = cont_normal.Norm();
+      depth = rad + len;
+      cont_normal /= len;
     }
     if (depth < 0) {
       continue;
     }
-    dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
-    csVector3 cpos = center - (plane.Normal() * rad);
-    out->pos[0] = cpos.x;
-    out->pos[1] = cpos.y;
-    out->pos[2] = cpos.z;
-    out->normal[0] = -plane.Normal().x;
-    out->normal[1] = -plane.Normal().y;
-    out->normal[2] = -plane.Normal().z;
-    out->depth = depth;
-    out->g1 = mesh;
-    out->g2 = sphere;
-    outcount ++;
+    if (test_priority < priority) {
+      cont_normal.Normalize ();
+      dContactGeom *out = (dContactGeom *)((char *)outcontacts);
+      out->pos[0] = cont_point.x;
+      out->pos[1] = cont_point.y;
+      out->pos[2] = cont_point.z;
+      out->normal[0] = -cont_normal.x;
+      out->normal[1] = -cont_normal.y;
+      out->normal[2] = -cont_normal.z;
+      out->depth = depth;
+      out->g1 = mesh;
+      out->g2 = sphere;
+      priority = test_priority;
+      outcount = 1;
+    }
+    if (priority <= 0) {
+      break;
+    }
   }
   return outcount;
 }
@@ -626,6 +635,8 @@ csODEDynamicSystem::csODEDynamicSystem ()
   worldID = dWorldCreate ();
   spaceID = dHashSpaceCreate (0);
   dWorldSetCFM (worldID,1e-5);
+  roll_damp = 1.0;
+  lin_damp = 1.0;
   move_cb = (iDynamicsMoveCallback*)new csODEDefaultMoveCallback ();
 }
 
@@ -700,8 +711,109 @@ void csODEDynamicSystem::Step (float stepsize)
 {
   dSpaceCollide (spaceID, this, &csODEDynamics::NearCallback);
   dWorldStep (worldID, stepsize);
-  for (long i=0; i<bodies.Length(); i++)
-    bodies.Get (i)->Update ();
+
+  for (long i=0; i<bodies.Length(); i++) {
+    iRigidBody *b = bodies.Get(i);
+    b->Update ();
+    b->SetAngularVelocity (b->GetAngularVelocity () * roll_damp);
+    b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
+  }
+}
+
+bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
+  	const csOrthoTransform& trans, float friction, float elasticity)
+{
+  dGeomID id = dCreateGeom (csODEDynamics::GetGeomClassNum());
+  iMeshWrapper **gdata = (iMeshWrapper **)dGeomGetClassData (id);
+  *gdata = mesh;
+  dSpaceAdd (spaceID, id);
+
+  dMatrix3 mat;
+  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
+  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
+  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  dGeomSetRotation (id, mat);
+
+  dGeomSetPosition (id,
+    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+
+  float *f = new float[2];
+  f[0] = friction;
+  f[1] = elasticity;
+  dGeomSetData (id, (void*)f);
+
+  return true;
+}
+
+bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
+  	const csOrthoTransform& trans, float friction, float elasticity)
+{
+  dGeomID id = dCreateCCylinder (spaceID, radius, length);
+
+  dMatrix3 mat;
+  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
+  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
+  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  dGeomSetRotation (id, mat);
+
+  dGeomSetPosition (id,
+    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+
+  float *f = new float[2];
+  f[0] = friction;
+  f[1] = elasticity;
+  dGeomSetData (id, (void*)f);
+
+  return true;
+}
+
+bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
+  	const csOrthoTransform& trans, float friction, float elasticity)
+{
+  dGeomID id = dCreateBox (spaceID, size.x, size.y, size.z);
+
+  dMatrix3 mat;
+  mat[0] = trans.GetO2T().m11; mat[1] = trans.GetO2T().m12; mat[2] = trans.GetO2T().m13; mat[3] = 0;
+  mat[4] = trans.GetO2T().m21; mat[5] = trans.GetO2T().m22; mat[6] = trans.GetO2T().m23; mat[7] = 0;
+  mat[8] = trans.GetO2T().m31; mat[9] = trans.GetO2T().m32; mat[10] = trans.GetO2T().m33; mat[11] = 0;
+  dGeomSetRotation (id, mat);
+
+  dGeomSetPosition (id,
+    trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
+
+  float *f = new float[2];
+  f[0] = friction;
+  f[1] = elasticity;
+  dGeomSetData (id, (void*)f);
+
+  return true;
+}
+
+bool csODEDynamicSystem::AttachColliderSphere (float radius, 
+    const csVector3 &offset, float friction, float elasticity)
+{
+  dGeomID id = dCreateSphere (spaceID, radius);
+
+  dGeomSetPosition (id, offset.x, offset.y, offset.z);
+
+  float *f = new float[2];
+  f[0] = friction;
+  f[1] = elasticity;
+  dGeomSetData (id, (void*)f);
+
+  return true;
+}
+bool csODEDynamicSystem::AttachColliderPlane (const csPlane3 &plane, 
+    float friction, float elasticity)
+{
+  dGeomID id = dCreatePlane (spaceID, plane.A(), -plane.B(), plane.C(), plane.D());
+
+  float *f = new float[2];
+  f[0] = friction;
+  f[1] = elasticity;
+  dGeomSetData (id, (void*)f);
+
+  return true;
 }
 
 csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
@@ -1202,6 +1314,8 @@ void csODERigidBody::Update ()
 
     if (mesh) move_cb->Execute (mesh, trans);
     if (bone) move_cb->Execute (bone, trans);
+    /* remainder case for all other callbacks */
+    move_cb->Execute (trans);
   }
 }
 
@@ -1230,8 +1344,16 @@ csODEJoint::~csODEJoint ()
 
 void csODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
 {
-  bodyID[0] = ((csODERigidBody *)(b1->QueryObject()))->GetID();
-  bodyID[1] = ((csODERigidBody *)(b2->QueryObject()))->GetID();
+  if (b1) {
+    bodyID[0] = ((csODERigidBody *)(b1->QueryObject()))->GetID();
+  } else {
+    bodyID[0] = 0;
+  }
+  if (b2) { 
+    bodyID[1] = ((csODERigidBody *)(b2->QueryObject()))->GetID();
+  } else {
+    bodyID[1] = 0;
+  }
   body[0] = b1;
   body[1] = b2;
   BuildJoint ();
@@ -1355,7 +1477,7 @@ void csODEJoint::BuildSlider (const csVector3 &axis, float min, float max)
 
 void csODEJoint::BuildJoint ()
 {
-  if (!(bodyID[0] && bodyID[1])) {
+  if (!(bodyID[0] || bodyID[1])) {
     return;
   }
   if (jointID) {
@@ -1465,4 +1587,9 @@ void csODEDefaultMoveCallback::Execute (iSkeletonBone* bone,
   csOrthoTransform& t)
 {
   bone->SetTransformation (t);
+}
+
+void csODEDefaultMoveCallback::Execute (csOrthoTransform& t)
+{
+  /* do nothing by default */
 }
