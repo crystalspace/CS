@@ -5,6 +5,36 @@ The history order is reversed so that new features are at the top.
 	  - Shifted water and fire proctex down to the basement.
 	- Removed usage of cs_snprintf in cfgfile.cpp and
 	  plugldr.cpp because it causes linking errors.
+	- csInitializer::SetupConfigManager() will now first check the
+	  registry for iVFS. If that fails it will trey CS_QUERY_PLUGIN.
+	  If that fails it will try to load VFS and register it.
+	- Eliminated a few additional usages of CS_QUERY_PLUGIN and
+	  replaced them with CS_QUERY_REGISTRY. In a few places where
+	  CS_QUERY_PLUGIN was absolutely needed I replaced them with
+	  explicit calls to QueryInterface(). That way the define
+	  CS_QUERY_PLUGIN can be removed.
+	- Removed CS_QUERY_PLUGIN. Now only CS_QUERY_PLUGIN_CLASS remains.
+	  But that macro is safe and will stay there.
+	- Added iPluginManager::Clear(). This function will unload all
+	  loaded plugins from the plugin manager.
+	- csInitializer::DestroyApplication() now calls iPluginManager::Clear()
+	  to remove all plugins. This is needed because some plugins keep
+	  a reference to the plugin manager. As long as these plugins
+	  are in memory the plugin manager cannot be removed for that reason.
+	- The plugins vector in the plugin manager did not have a destructor
+	  calling DeleteAll(). This means that plugins would actually never
+	  get deleted.
+	- csInputDriver no longer keeps a reference to the iEventQueue.
+	  Keeping this reference prevented proper cleaning up of the
+	  event queue.
+	- The three fixes above fix the dangling references at exit (this
+	  bug was present since yesterday). The only remaining dangling
+	  references have to do with the reporter and reporter listener
+	  which keep references to each other. This has to be investigated.
+	- Moved eventqueue->DecRef() to before ImmediateBroadcast() in
+	  csCommandLineHelper.
+	- Fixed csView::SetEngine(), SetCamera(), and SetContext() which
+	  were doing IncRef()/DecRef() in wrong order.
 17-Oct-2001
 	- M Voase did the following
 	  - Small typo fix to data/walktest.cfg. This just fixes up

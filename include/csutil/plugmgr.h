@@ -59,6 +59,8 @@ private:
   public:
     // Create the vector
     csPluginsVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) {}
+    // Destroy the vector.
+    virtual ~csPluginsVector () { DeleteAll (); }
     // Find a plugin by its address
     virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
     {
@@ -130,6 +132,7 @@ public:
           iComponent *iObject);
   virtual int GetPluginCount ();
   virtual iBase* GetPlugin (int idx);
+  virtual void Clear ();
 };
 
 #endif // __CS_PLUGMGR_H__

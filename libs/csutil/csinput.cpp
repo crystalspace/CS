@@ -53,10 +53,9 @@ csInputDriver::~csInputDriver()
 {
   // Force a refetch of Queue in order to double check its validity since, at
   // shutdown time, the event queue might already have been destroyed.
-  if (Queue) { Queue->DecRef (); Queue = 0; }
+  Queue = NULL;
   GetEventQueue();
   StopListening();
-  if (Queue) Queue->DecRef ();
 }
 
 void csInputDriver::SetSCFParent(iBase* p)
@@ -70,6 +69,7 @@ iEventQueue* csInputDriver::GetEventQueue()
   if (Queue == 0)
   {
     Queue = CS_QUERY_REGISTRY(Registry, iEventQueue);
+    if (Queue) Queue->DecRef ();
   }
   return Queue;
 }
@@ -206,7 +206,7 @@ iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
   if (Keyboard == 0)
   {
     Keyboard = CS_QUERY_REGISTRY(Registry, iKeyboardDriver);
-    Keyboard->DecRef ();
+    if (Keyboard) Keyboard->DecRef ();
   }
   return Keyboard;
 }
@@ -300,7 +300,7 @@ iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
   if (Keyboard == 0)
   {
     Keyboard = CS_QUERY_REGISTRY(Registry, iKeyboardDriver);
-    Keyboard->DecRef ();
+    if (Keyboard) Keyboard->DecRef ();
   }
   return Keyboard;
 }

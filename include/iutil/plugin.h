@@ -25,14 +25,6 @@
 struct iComponent;
 
 /**
- * Query a pointer to some plugin through the Plugin Manager interface.
- * `Object' is a object that implements iPluginManager interface.
- * `Interface' is a interface name (iGraphics2D, iVFS and so on).
- */
-#define CS_QUERY_PLUGIN(Object,Interface)				\
-  (Interface *)((Object)->QueryPlugin (#Interface, VERSION_##Interface))
-
-/**
  * Find a plugin by his class ID. First the plugin
  * with requested class identifier is found,
  * and after this it is queried for the respective interface; if it does
@@ -59,7 +51,7 @@ struct iComponent;
 #define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)			\
   ((Object)->LoadPlugin (ClassID, NULL, 0))
 
-SCF_VERSION (iPluginManager, 0, 0, 2);
+SCF_VERSION (iPluginManager, 0, 0, 3);
 
 /**
  * This is the plugin manager.
@@ -67,21 +59,29 @@ SCF_VERSION (iPluginManager, 0, 0, 2);
 struct iPluginManager : public iBase
 {
   /// Load a plugin and initialize it.
-  virtual iBase *LoadPlugin (const char *iClassID,
+  virtual iBase *LoadPlugin (const char *classID,
     const char *iInterface = NULL, int iVersion = 0) = 0;
-  /// Get first of the loaded plugins that supports given interface ID.
+  /**
+   * Get first of the loaded plugins that supports given interface ID.
+   * Warning! Usage of this function is usually not safe since multiple
+   * plugins can implement the same interface and there is no way to know
+   * which one is the correct one. It is better to use the object registry
+   * to find about single loaded components.
+   */
   virtual iBase *QueryPlugin (const char *iInterface, int iVersion) = 0;
   /// Find a plugin given his class ID.
-  virtual iBase *QueryPlugin (const char* iClassID,
+  virtual iBase *QueryPlugin (const char* classID,
   	const char *iInterface, int iVersion) = 0;
   /// Remove a plugin from system driver's plugin list.
-  virtual bool UnloadPlugin (iComponent *iObject) = 0;
+  virtual bool UnloadPlugin (iComponent *obj) = 0;
   /// Register a object that implements the iComponent interface as a plugin.
-  virtual bool RegisterPlugin (const char *iClassID, iComponent *iObject) = 0;
+  virtual bool RegisterPlugin (const char *classID, iComponent *obj) = 0;
   /// Get the number of loaded plugins in the plugin manager.
   virtual int GetPluginCount () = 0;
   /// Get the specified plugin from the plugin manager.
   virtual iBase* GetPlugin (int idx) = 0;
+  /// Unload all plugins from this plugin manager.
+  virtual void Clear () = 0;
 };
 
 #endif // __IUTIL_PLUGIN_H__

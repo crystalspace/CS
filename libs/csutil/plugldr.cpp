@@ -307,9 +307,10 @@ bool csPluginLoader::LoadPlugins ()
     PluginList.Push (new csPluginLoadRec (tag, temp));
   }
 
+  CommandLine->DecRef (); CommandLine = NULL;
+
   // Now load and initialize all plugins
   iConfigManager* Config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iConfigIterator *plugin_list = Config->Enumerate ("System.Plugins.");
   if (plugin_list)
   {
@@ -326,18 +327,17 @@ bool csPluginLoader::LoadPlugins ()
     plugin_list->DecRef ();
   }
 
-  // Check if vfs is already there (@@@ ugly hack).
-  iVFS* VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
-  if (VFS) VFS->DecRef ();
+  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   // Sort all plugins by their dependency lists
   if (!PluginList.Sort (object_reg))
   {
-    CommandLine->DecRef ();
     Config->DecRef ();
-    plugin_mgr->DecRef ();
+    if (VFS) VFS->DecRef ();
     return false;
   }
+
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Load all plugins
   for (n = 0; n < PluginList.Length (); n++)
@@ -351,9 +351,9 @@ bool csPluginLoader::LoadPlugins ()
     {
       if (!object_reg->Register (plg, r.Tag))
       {
-        CommandLine->DecRef ();
         Config->DecRef ();
         plugin_mgr->DecRef ();
+        if (VFS) VFS->DecRef ();
         if (r.Tag)
           csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	    "crystalspace.pluginloader.loadplugins",
@@ -371,9 +371,9 @@ bool csPluginLoader::LoadPlugins ()
   // flush all removed config files
   Config->FlushRemoved();
 
-  CommandLine->DecRef ();
   Config->DecRef ();
   plugin_mgr->DecRef ();
+  if (VFS) VFS->DecRef ();
   return true;
 }
 

@@ -61,9 +61,9 @@ iEngine* csView::GetEngine ()
 
 void csView::SetEngine (iEngine* e)
 {
+  if (e) e->IncRef ();
   if (Engine) Engine->DecRef ();
   Engine = e;
-  if (Engine) Engine->IncRef ();
 }
 
 iCamera *csView::GetCamera ()
@@ -73,9 +73,9 @@ iCamera *csView::GetCamera ()
 
 void csView::SetCamera (iCamera* c)
 {
+  if (c) c->IncRef ();
   if (Camera) Camera->DecRef ();
   Camera = c;
-  if (Camera) Camera->IncRef ();
 }
 
 iGraphics3D* csView::GetContext ()
@@ -85,8 +85,9 @@ iGraphics3D* csView::GetContext ()
 
 void csView::SetContext (iGraphics3D *ig3d)
 {
-  G3D->DecRef ();
-  (G3D = ig3d)->IncRef ();
+  if (ig3d) ig3d->IncRef ();
+  if (G3D) G3D->DecRef ();
+  G3D = ig3d;
 }
 
 void csView::SetRectangle (int x, int y, int w, int h)

@@ -31,14 +31,15 @@
 
 //------------------------------------------------------ csPlugin class -----//
 
-csPluginManager::csPlugin::csPlugin (iComponent *iObject, const char *iClassID)
+csPluginManager::csPlugin::csPlugin (iComponent *obj, const char *classID)
 {
-  Plugin = iObject;
-  ClassID = csStrNew (iClassID);
+  Plugin = obj;
+  ClassID = csStrNew (classID);
 }
 
 csPluginManager::csPlugin::~csPlugin ()
 {
+//printf ("DecRef %08lx/'%s' ref=%d\n", Plugin, ClassID, Plugin->GetRefCount ()); fflush (stdout);
   delete [] ClassID;
   Plugin->DecRef ();
 }
@@ -53,31 +54,33 @@ csPluginManager::csPluginManager (iObjectRegistry* object_reg) :
   Plugins (8, 8), OptionList (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-
   csPluginManager::object_reg = object_reg;
 }
 
 csPluginManager::~csPluginManager ()
 {
+  Clear ();
+}
+
+void csPluginManager::Clear ()
+{
   OptionList.DeleteAll ();
 
   // Free all plugins.
-  int i;
-  for (i = Plugins.Length()-1 ; i >= 0 ; i--)
+  for (int i = Plugins.Length()-1 ; i >= 0 ; i--)
     UnloadPlugin ((iComponent *)Plugins.Get(i)->Plugin);
 }
 
-void csPluginManager::QueryOptions (iComponent *iObject)
+void csPluginManager::QueryOptions (iComponent *obj)
 {
   iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
-  iConfig *Config = SCF_QUERY_INTERFACE (iObject, iConfig);
+  iConfig *Config = SCF_QUERY_INTERFACE (obj, iConfig);
   if (Config)
   {
     int on = OptionList.Length ();
-	int i;
-    for (i = 0 ; ; i++)
+    for (int i = 0 ; ; i++)
     {
       csOptionDescription option;
       if (!Config->GetOptionDescription (i, &option))
@@ -92,7 +95,7 @@ void csPluginManager::QueryOptions (iComponent *iObject)
         OptionList.Push (new csPluginOption (buf, option.type, option.id,
           false, Config));
       }
-    } /* endfor */
+    }
 
     // Parse the command line for plugin options and pass them to plugin
     for (; on < OptionList.Length (); on++)
@@ -131,19 +134,19 @@ void csPluginManager::QueryOptions (iComponent *iObject)
   CommandLine->DecRef ();
 }
 
-iBase *csPluginManager::LoadPlugin (const char *iClassID,
+iBase *csPluginManager::LoadPlugin (const char *classID,
   const char *iInterface, int iVersion)
 {
-  iComponent *p = SCF_CREATE_INSTANCE (iClassID, iComponent);
+  iComponent *p = SCF_CREATE_INSTANCE (classID, iComponent);
   if (!p)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     	"crystalspace.pluginmgr.loadplugin",
-    	"WARNING: could not load plugin '%s'", iClassID);
+    	"WARNING: could not load plugin '%s'", classID);
   }
   else
   {
-    int index = Plugins.Push (new csPlugin (p, iClassID));
+    int index = Plugins.Push (new csPlugin (p, classID));
     if (p->Initialize (object_reg))
     {
       iBase *ret;
@@ -160,27 +163,27 @@ iBase *csPluginManager::LoadPlugin (const char *iClassID,
     }
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     	"crystalspace.pluginmgr.loadplugin",
-    	"WARNING: failed to initialize plugin '%s'", iClassID);
+    	"WARNING: failed to initialize plugin '%s'", classID);
     Plugins.Delete (index);
   }
   return NULL;
 }
 
-bool csPluginManager::RegisterPlugin (const char *iClassID,
-  iComponent *iObject)
+bool csPluginManager::RegisterPlugin (const char *classID,
+  iComponent *obj)
 {
-  int index = Plugins.Push (new csPlugin (iObject, iClassID));
-  if (iObject->Initialize (object_reg))
+  int index = Plugins.Push (new csPlugin (obj, classID));
+  if (obj->Initialize (object_reg))
   {
-    QueryOptions (iObject);
-    iObject->IncRef ();
+    QueryOptions (obj);
+    obj->IncRef ();
     return true;
   }
   else
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     	"crystalspace.pluginmgr.registerplugin",
-    	"WARNING: failed to initialize plugin '%s'", iClassID);
+    	"WARNING: failed to initialize plugin '%s'", classID);
     Plugins.Delete (index);
     return false;
   }
@@ -200,8 +203,7 @@ iBase* csPluginManager::GetPlugin (int idx)
 iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  int i;
-  for (i = 0; i < Plugins.Length (); i++)
+  for (int i = 0; i < Plugins.Length (); i++)
   {
     iBase *ret =
       (iBase *)Plugins.Get (i)->Plugin->QueryInterface (ifID, iVersion);
@@ -211,16 +213,15 @@ iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)
   return NULL;
 }
 
-iBase *csPluginManager::QueryPlugin (const char* iClassID,
+iBase *csPluginManager::QueryPlugin (const char* classID,
 				    const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  int i;
-  for (i = 0 ; i < Plugins.Length () ; i++)
+  for (int i = 0 ; i < Plugins.Length () ; i++)
   {
     csPlugin* pl = Plugins.Get (i);
     if (pl->ClassID)
-      if (pl->ClassID == iClassID || !strcmp (pl->ClassID, iClassID))
+      if (pl->ClassID == classID || !strcmp (pl->ClassID, classID))
       {
 	return (iBase*)Plugins.Get(i)->Plugin->QueryInterface(ifID,iVersion);
       }
@@ -228,13 +229,13 @@ iBase *csPluginManager::QueryPlugin (const char* iClassID,
   return NULL;
 }
 
-bool csPluginManager::UnloadPlugin (iComponent *iObject)
+bool csPluginManager::UnloadPlugin (iComponent* obj)
 {
-  int idx = Plugins.FindKey (iObject);
+  int idx = Plugins.FindKey (obj);
   if (idx < 0)
     return false;
 
-  iConfig *config = SCF_QUERY_INTERFACE (iObject, iConfig);
+  iConfig *config = SCF_QUERY_INTERFACE (obj, iConfig);
   if (config)
   {
     for (int i = OptionList.Length () - 1; i >= 0; i--) 
@@ -246,7 +247,7 @@ bool csPluginManager::UnloadPlugin (iComponent *iObject)
     config->DecRef ();
   }
 
-  object_reg->Unregister ((iBase *)iObject, NULL);
+  object_reg->Unregister ((iBase *)obj, NULL);
   return Plugins.Delete (idx);
 }
 

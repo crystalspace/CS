@@ -210,12 +210,18 @@ bool csInitializer::SetupConfigManager (
   // can be loaded. At the end, we make the user-and-application-specific
   // config file the dynamic one.
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (r, iPluginManager);
-  iVFS* VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
-  plugin_mgr->DecRef ();
+  iVFS* VFS = CS_QUERY_REGISTRY (r, iVFS);
   if (!VFS)
   {
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (r, iPluginManager);
+    VFS = (iVFS*)(plugin_mgr->QueryPlugin ("iVFS", VERSION_iVFS));
+    plugin_mgr->DecRef ();
+  }
+  if (!VFS)
+  {
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (r, iPluginManager);
     VFS = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.kernel.vfs", iVFS);
+    plugin_mgr->DecRef ();
     if (!VFS)
       return false;
     r->Register (VFS, "iVFS");
@@ -364,6 +370,16 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   }
   delete global_sys;
 
+  // Explicitly unload all plugins from the plugin manager because
+  // some plugins hold references to the plugin manager so the plugin
+  // manager will never get destructed if there are still plugins in memory.
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (r, iPluginManager);
+  if (plugin_mgr)
+  {
+    plugin_mgr->Clear ();
+    plugin_mgr->DecRef ();
+  }
+
   // Explicitly clear the object registry before its destruction since some
   // objects being cleared from it may need to query it for other objects, and
   // such queries can fail (depending upon the compiler) if they are made while
@@ -375,3 +391,4 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
 
   iSCF::SCF->Finish();
 }
+

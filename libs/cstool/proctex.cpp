@@ -89,10 +89,7 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   iImage *proc_image;
   proc_image = (iImage*) new csImageMemory (mat_w, mat_h);
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (
-  	object_reg, iPluginManager);
-  iEngine* engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
-  plugin_mgr->DecRef ();
+  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   tex = engine->GetTextureList ()->NewTexture (proc_image);
   engine->DecRef ();
   proc_image->DecRef ();

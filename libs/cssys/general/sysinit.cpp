@@ -27,3 +27,4 @@
 
 bool csPlatformStartup (iObjectRegistry*) { return true; }
 bool csPlatformShutdown(iObjectRegistry*) { return true; }
+

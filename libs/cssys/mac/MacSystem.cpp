@@ -278,8 +278,7 @@ void SysSystemDriver::Alert(const char* s)
     iGraphics2D *   theG2D = NULL;
     iMacGraphics *  theiG2D = NULL;
 
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-    theG2D = CS_QUERY_PLUGIN( plugin_mgr, iGraphics2D );
+    theG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
 
     if ( theG2D ) {
         theiG2D = SCF_QUERY_INTERFACE(theG2D, iMacGraphics);
@@ -303,7 +302,6 @@ void SysSystemDriver::Alert(const char* s)
     if ( theG2D ) {
         theG2D->DecRef();
     }
-    plugin_mgr->DecRef ();
 }
 
 
@@ -313,8 +311,7 @@ void SysSystemDriver::Warn(const char* s)
     iGraphics2D *   theG2D = NULL;
     iMacGraphics *  theiG2D = NULL;
 
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-    theG2D = CS_QUERY_PLUGIN( plugin_mgr, iGraphics2D );
+    theG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
 
     if ( theG2D ) {
         theiG2D = SCF_QUERY_INTERFACE(theG2D, iMacGraphics);
@@ -338,7 +335,6 @@ void SysSystemDriver::Warn(const char* s)
     if ( theG2D ) {
         theG2D->DecRef();
     }
-    plugin_mgr->DecRef ();
 }
 
 
@@ -458,8 +454,7 @@ that is called in the loop should move to a cscmdPreProcess event.
     }
   }
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  mG2D = CS_QUERY_PLUGIN( plugin_mgr, iGraphics2D );
+  mG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
 
   if ( mG2D ) {
     mIG2D = SCF_QUERY_INTERFACE(mG2D, iMacGraphics);
@@ -469,7 +464,6 @@ that is called in the loop should move to a cscmdPreProcess event.
     mDriverNeedsEvent = mIG2D->DoesDriverNeedEvent ();
     mIG2D->SetColorPalette ();
   }
-  plugin_mgr->DecRef ();
 
 #if ! SCAN_KEYBOARD
   SetEventMask( everyEvent );

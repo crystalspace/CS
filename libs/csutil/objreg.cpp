@@ -133,6 +133,7 @@ void csObjectRegistry::Clear ()
     // for it during its own destruction.
     iBase* b = (iBase*)registry[i];
     char* t = (char*)tags[i];
+//printf ("Unregister %08lx/'%s' ref=%d\n", b, t, b->GetRefCount ()); fflush (stdout);
     registry.Delete (i); // Remove from list before DecRef().
     tags.Delete (i);
     b->DecRef ();

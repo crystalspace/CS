@@ -85,12 +85,12 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
   if (evq)
   {
     iEventOutlet* evout = evq->GetEventOutlet ();
+    evq->DecRef ();
     CS_ASSERT (evout != NULL);
     // We use ImmediateBroadcast here because after processing commandline
     // help the application usually exits. This means there is no chance
     // to actually process the event in the queue.
     evout->ImmediateBroadcast (cscmdCommandLineHelp, NULL);
-    evq->DecRef ();
   }
 
   iPluginManager* plgmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
