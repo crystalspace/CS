@@ -98,10 +98,19 @@ rule ExternalLibs
   }
 }
 
-##  ExtraObjects target : objectfiles
-##    Link additional object files with a target
+##  ExtraObjects target : objectfiles [ : options ]
+##    Link additional object files with a target.
+##    Options:
+##      inheritcflags: The mentioned object files will inherit compiler flags
+##      assigned to target's normal object files (in addition to any flags
+##      already set manually).
 rule ExtraObjects
 {
+  CheckOptions inheritcflags : $(3) : $(<) ;
+  if [ IsElem inheritcflags : $(3) ]
+  {
+    $(<)_OBJECTS += $(>) ;
+  }
   EXTRAOBJECTS on $($(<)_TARGET) += $(>) ;
   Depends $($(<)_TARGET) : $(>) ;
   Clean $(<)clean : $(>) ;

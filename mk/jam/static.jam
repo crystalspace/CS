@@ -67,7 +67,7 @@ rule LinkStaticPlugins
 
   # construct initialization sourcefile
   local staticobject = [ BuildStaticFile $(>) ] ;
-  ExtraObjects $(<) : $(staticobject) ;
+  ExtraObjects $(<) : $(staticobject) : inheritcflags ;
 }
 
 #----------------------------------------------------------------------------

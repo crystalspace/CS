@@ -7,11 +7,23 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-Jul-2004
-	- Jorrit fixed a big bug in csSafeCopyArray. The problem was that
+	- Jorrit fixed a big bug in csSafeCopyArray.  The problem was that
 	  csArray was using 'memmove' but that function is illegal in the
-	  context of csSafeCopyArray. Solved this by adding a new MemMove()
-	  function to the memory allocator used by csArray.
-	  This fixes InsertSorted(), Insert(), DeleteRange(), and DeleteIndex().
+	  context of csSafeCopyArray.  Solved this by adding a new MemMove()
+	  function to the memory allocator used by csArray.  This fixes
+	  InsertSorted(), Insert(), DeleteRange(), and DeleteIndex().
+	- Eric Sunshine made the following changes to the Jam build system:
+	    - Added an `options' argument to the ExtraObjects rule (flags.jam),
+	      along with the new option "inheritcflags" which causes the added
+	      object files to inherit compiler flags set on the target's normal
+	      object files (in addition to whatever flags have already been set
+	      manually).
+	    - Augmented LinkStaticPlugins (static.jam) so that it employs the
+	      new "inheritcflags" option for the target's synthesized
+	      _static_init.cpp file.  This fixes a problem with use of static
+	      targets in external projects where _static_init.cpp was compiled
+	      without any special compiler flags, thus it was unable to locate
+	      header files, such as cssysdef.h, scf.h, etc.
 13-Jul-2004
 	- Eric Sunshine changed cspace.i so that it no longer exports any
 	  va_list functions, such as csPrintfV(), PerformExtensionV(),
@@ -71,7 +83,8 @@ chronological order.
 	  itself, but external projects may have versions with alphabetical
 	  characters.
 	- Keith completed commit of perf optimizations to sprcal3d loading.
-	  This is mostly through avoidance of redundant calls to slow functions.
+	  This is mostly through avoidance of redundant calls to slow
+	  functions.
 9-Jul-2004
 	- Jorrit fixed the engine so that before removing a sector, all
 	  objects in that sector are unlinked from it. Added an
