@@ -25,7 +25,7 @@
 // ctEntity.  The class is intended to act on point-masses and connectors.
 class ctPointForce {
  public:
-  void apply(ctPointObj* point) = 0;
+  virtual void apply(ctPointObj* point) = 0;
 };
 
 #endif // PHYZ_PTFORCE_H

@@ -158,6 +158,33 @@ public:
 
 };
 
+class ctPointObj;
+
+class ctLinkList_ctPointObj : public ctLinkList
+{
+public:
+  ctPointObj * get_first(){
+    return (ctPointObj *)ctLinkList::get_first();
+  }
+
+  ctPointObj * get_next(){
+    return (ctPointObj *)ctLinkList::get_next();
+  }
+
+  void add_link( ctPointObj * plink ){
+    ctLinkList::add_link( (void *)plink );
+  }
+
+  void remove_link( ctPointObj * plink ){
+    ctLinkList::remove_link( (void *)plink );
+  }
+
+  void delete_link( ctPointObj * plink ){
+    ctLinkList::delete_link( (void *)plink );
+  }
+
+};
+
 class ctForce;
 
 class ctLinkList_ctForce : public ctLinkList

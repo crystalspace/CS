@@ -31,10 +31,23 @@
 //
 class ctPointObj {
  public:
-  virtual ctVector3 pos();
-  virtual ctVector3 vel();  // The derivative of pos() wrt time
+  ctPointObj() {}
+  virtual ~ctPointObj() {}
+  virtual ctVector3 pos() = 0;
+  virtual ctVector3 vel() = 0;  // The derivative of pos() wrt time
 
-  virtual void apply_force(ctVector3 force);
+  virtual void apply_force(ctVector3 force) = 0;
+};
+
+class ctConstPoint : public ctPointObj {
+  ctVector3 x;
+ public:
+  ctConstPoint(ctVector3 pt) {x = pt;}
+  ~ctConstPoint() {}
+  ctVector3 pos() { return x; }
+  ctVector3 vel() { return ctVector3(0.0, 0.0, 0.0); }
+
+  void apply_force(ctVector3 force) {}
 };
 
 #endif
