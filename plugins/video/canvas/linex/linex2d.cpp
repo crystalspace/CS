@@ -26,7 +26,7 @@
 #include "csutil/csrect.h"
 #include "isystem.h"
 #include "icfgfile.h"
-#include "icfgnew.h"
+#include "icfgmgr.h"
 
 IMPLEMENT_FACTORY (csGraphics2DLineXLib)
 IMPLEMENT_FACTORY (csLineX2DFontServer)
