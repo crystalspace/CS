@@ -38,11 +38,13 @@ private:
   uint8 *costable;
 
   /// table indices;
-  uint8 anims[4];
+  uint8 anims0, anims1, anims2, anims3;
   /// offsets
-  uint8 offsets[2];
+  uint8 offsets0, offsets1;
   /// increments
-  int frameincr[4], lineincr[4], offsetincr[2];
+  int frameincr0, frameincr1, frameincr2, frameincr3;
+  int lineincr0, lineincr1, lineincr2, lineincr3;
+  int offsetincr0, offsetincr1;
 
   /// make my palette, max nr of colours
   void MakePalette (int max);

@@ -17,6 +17,11 @@ The history order is reversed so that new features are at the top.
 	- Optimized csReversibleTransform *= by inlining it.
 	- Eric Sunshine fixed the Apple/NeXT ports so that they are once again
 	  buildable following Philip's change to MAXPATHLEN.
+	- Did a big optimization in the plasma procedural textures
+	  (moved the Animate function from first place in profile to
+	  third place).
+	- Did an additional optimization to plasma procedural texture
+	  by avoiding array access and using normal variables.
 8-Dec-2001
 	- Fixed a closing brace in mapfmt.txi.
 7-Dec-2001

@@ -53,29 +53,30 @@ bool csProcPlasma::PrepareAnim ()
   memset (costable, 0, sizeof (uint8)*256);
   MakeTable ();
   MakePalette (256);
-  anims[0]= 0;
-  anims[1]= 0;
-  anims[2]= 0;
-  anims[3]= 0;
-  offsets[0]=0;
-  offsets[1]=1;
+  anims0= 0;
+  anims1= 0;
+  anims2= 0;
+  anims3= 0;
+  offsets0=0;
+  offsets1=1;
 
-  lineincr[0] = +3;
-  lineincr[1] = +4;
-  lineincr[2] = +1;
-  lineincr[3] = +2;
-  frameincr[0] = -4;
-  frameincr[1] = +3;
-  frameincr[2] = -2;
-  frameincr[3] = +1;
-  offsetincr[0] = +2;
-  offsetincr[1] = -3;
+  lineincr0 = +3;
+  lineincr1 = +4;
+  lineincr2 = +1;
+  lineincr3 = +2;
+  frameincr0 = -4;
+  frameincr1 = +3;
+  frameincr2 = -2;
+  frameincr3 = +1;
+  offsetincr0 = +2;
+  offsetincr1 = -3;
 
   if (mat_w<256)
   {
-    int i;
-    for (i=0 ; i<4 ; i++)
-      lineincr[i] = lineincr[i]*256/mat_w;
+    lineincr0 = lineincr0*256/mat_w;
+    lineincr1 = lineincr1*256/mat_w;
+    lineincr2 = lineincr2*256/mat_w;
+    lineincr3 = lineincr3*256/mat_w;
   }
   return true;
 }
@@ -136,40 +137,41 @@ void csProcPlasma::Animate (csTicks current_time)
 
   if (!ptG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
-  uint8 curanim[4];
+  uint8 curanim0, curanim1, curanim2, curanim3;
   /// draw texture
-  curanim[2] = anims[2];
-  curanim[3] = anims[3];
+  curanim2 = anims2;
+  curanim3 = anims3;
   for(y=0; y<mat_h; y++)
   {
-    curanim[0] = anims[0];
-    curanim[1] = anims[1];
+    curanim0 = anims0;
+    curanim1 = anims1;
+    int thex_cst = GetCos(y*256/mat_h+ offsets0)/(4*64/mat_w);
+    int col_cst = GetCos(curanim2) + GetCos(curanim3);
     for(x=0; x<mat_w;x++)
     {
-      int col= GetCos(curanim[0]) + GetCos(curanim[1]) + GetCos(curanim[2]) 
-        + GetCos(curanim[3]);
-      int thex = x+GetCos(y*256/mat_h+ offsets[0])/(4*64/mat_w);
-      int they = y+GetCos(thex*256/mat_w+ offsets[1])/(4*64/mat_h);
+      int col= GetCos(curanim0) + GetCos(curanim1) + col_cst;
+      int thex = x+thex_cst;
+      int they = y+GetCos(thex*256/mat_w+ offsets1)/(4*64/mat_h);
       thex %= mat_w;
       they %= mat_h;
 
       ptG2D->DrawPixel (thex, they, palette[col*palsize/256] );
 
-      curanim[0] += lineincr[0];
-      curanim[1] += lineincr[1];
+      curanim0 += lineincr0;
+      curanim1 += lineincr1;
     }
-    curanim[2] += lineincr[2]; 
-    curanim[3] += lineincr[3];
+    curanim2 += lineincr2;
+    curanim3 += lineincr3;
   }
 
   ptG3D->FinishDraw ();
   ptG3D->Print (NULL);
 
-  anims[0] += frameincr[0];
-  anims[1] += frameincr[1];
-  anims[2] += frameincr[2];
-  anims[3] += frameincr[3];
-  offsets[0] += offsetincr[0];
-  offsets[1] += offsetincr[1];
+  anims0 += frameincr0;
+  anims1 += frameincr1;
+  anims2 += frameincr2;
+  anims3 += frameincr3;
+  offsets0 += offsetincr0;
+  offsets1 += offsetincr1;
 }
 
