@@ -36,7 +36,7 @@ void csGraphics2DDDraw6::DRAWSPRITE_NAME (csGraphics2D *This, iTextureHandle *hT
   int bw, bh;
   hTex->GetMipMapDimensions (0, bw, bh);
 
-  DRAWSPRITE_PIXTYPE *bitmap = (DRAWSPRITE_PIXTYPE *)hTex->GetMipMapData (0);
+  DRAWSPRITE_PIXTYPE *bitmap = (DRAWSPRITE_PIXTYPE *)hTex->GetMipMapData (-2);
 
   int dx = (tw << 16) / sw;
   int dy = (th << 16) / sh;
