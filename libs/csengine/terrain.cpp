@@ -108,6 +108,7 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   // Update the wtoc.
   mesh->calculate ();
   // Render
+  unsigned int i = mesh->qs()->size ();
   mesh->qsi()->reset ();
   while (!mesh->qsi ()->end ())
   {
@@ -116,35 +117,30 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 
     if (!bt->tri (tvc)->vis ().flags.none)
     {
-      ddgVector3 p1, p2, p3;
-      unsigned int i1, i2, i3;
+      ddgVector3 *p1, *p2, *p3;
 
-      ddgTriIndex tva = bt->parent (tvc);
-      ddgTriIndex tv1 = bt->v0 (tvc);
-      ddgTriIndex tv0 = bt->v1 (tvc);
-      i1 = bt->vertex (tva, &p1);
-      i2 = bt->vertex (tv0, &p2);
-      i3 = bt->vertex (tv1, &p3);
-
+	  p1 =	bt->tri(bt->parent (tvc))->pos();
+	  p2 =	bt->tri(bt->v1 (tvc))->pos();
+	  p3 =	bt->tri(bt->v0 (tvc))->pos();
       // DDG vectors work with negative Z pointing forwards.
       float iz;
       float pz[3];
       csVector2 triangle[3];
-      if (p1.v[2] > SMALL_Z) goto not_vis;
-      pz[0] = 1 / -p1.v[2];
+      if (p1->v[2] > SMALL_Z) goto not_vis;
+      pz[0] = 1 / -p1->v[2];
       iz = rview.aspect * pz[0];
-      triangle[0].x = p1.v[0] * iz + rview.shift_x;
-      triangle[0].y = p1.v[1] * iz + rview.shift_x;
-      if (p2.v[2] > SMALL_Z) goto not_vis;
-      pz[1] = 1 / -p2.v[2];
+      triangle[0].x = p1->v[0] * iz + rview.shift_x;
+      triangle[0].y = 10*p1->v[1] * iz + rview.shift_x;
+      if (p2->v[2] > SMALL_Z) goto not_vis;
+      pz[1] = 1 / -p2->v[2];
       iz = rview.aspect * pz[1];
-      triangle[1].x = p2.v[0] * iz + rview.shift_x;
-      triangle[1].y = p2.v[1] * iz + rview.shift_x;
-      if (p3.v[2] > SMALL_Z) goto not_vis;
-      pz[2] = 1 / -p3.v[2];
+      triangle[1].x = p2->v[0] * iz + rview.shift_x;
+      triangle[1].y = 10*p2->v[1] * iz + rview.shift_x;
+      if (p3->v[2] > SMALL_Z) goto not_vis;
+      pz[2] = 1 / -p3->v[2];
       iz = rview.aspect * pz[2];
-      triangle[2].x = p3.v[0] * iz + rview.shift_x;
-      triangle[2].y = p3.v[1] * iz + rview.shift_x;
+      triangle[2].x = p3->v[0] * iz + rview.shift_x;
+      triangle[2].y = 10*p3->v[1] * iz + rview.shift_x;
 
       csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
       int rescount;
@@ -179,7 +175,49 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
     not_vis:
     mesh->qsi ()->next ();
   }
+	{
+	// Dummy triangle.
+      csVector2 triangle[3];
+      csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
+	  int rescount = 3;
 
+      triangle[0].x = 0;
+      triangle[0].y = 0;
+      clipped_triangle[0].x = 0;
+      clipped_triangle[0].y = 0;
+      poly.vertices[0].z = -1;
+      poly.vertices[0].u = 0;
+      poly.vertices[0].v = 0;
+      poly.vertices[0].r = 0;
+      poly.vertices[0].g = 0;
+      poly.vertices[0].b = 0;
+
+      triangle[1].x = 10;
+      triangle[1].y = 0;
+      clipped_triangle[1].x = 10;
+      clipped_triangle[1].y = 0;
+      poly.vertices[1].z = -1;
+      poly.vertices[1].u = 1;
+      poly.vertices[1].v = 0;
+      poly.vertices[1].r = 1;
+      poly.vertices[1].g = 0;
+      poly.vertices[1].b = 0;
+
+      triangle[2].x = 0;
+      triangle[2].y = 10;
+      clipped_triangle[2].x = 0;
+      clipped_triangle[2].y = 10;
+      poly.vertices[2].z = -1;
+      poly.vertices[2].u = 0;
+      poly.vertices[2].v = 1;
+      poly.vertices[2].r = 0;
+      poly.vertices[2].g = 0;
+      poly.vertices[2].b = 1;
+      
+      PreparePolygonFX (&poly, clipped_triangle, rescount, triangle,
+      	true);
+      rview.g3d->DrawPolygonFX (poly);
+	}
   rview.g3d->FinishPolygonFX ();
 }
 
