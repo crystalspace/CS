@@ -65,7 +65,7 @@ class csTriangleVertices2;
  * This is basicly used as a temporary structure to be able to
  * calculate the cost of collapsing this vertex more quickly.
  */
-class csTriangleVertex
+class csTriangleVertex2
 {
 public:
   /// Position of this vertex in 3D space.
@@ -93,10 +93,10 @@ public:
   int to_vertex;
 
   ///
-  csTriangleVertex () : deleted (false), con_triangles (NULL), num_con_triangles (0), max_con_triangles (0),
+  csTriangleVertex2 () : deleted (false), con_triangles (NULL), num_con_triangles (0), max_con_triangles (0),
   	con_vertices (NULL), num_con_vertices (0), max_con_vertices (0) { }
   ///
-  ~csTriangleVertex () { delete [] con_triangles; delete [] con_vertices; }
+  ~csTriangleVertex2 () { delete [] con_triangles; delete [] con_vertices; }
   ///
   void AddTriangle (int idx);
   ///
@@ -122,7 +122,7 @@ public:
 class csTriangleVertices2
 {
 private:
-  csTriangleVertex* vertices;
+  csTriangleVertex2* vertices;
   int num_vertices;
 
 public:
@@ -136,7 +136,7 @@ public:
   ///
   int GetNumVertices () { return num_vertices; }
   ///
-  csTriangleVertex& GetVertex (int idx) { return vertices[idx]; }
+  csTriangleVertex2& GetVertex (int idx) { return vertices[idx]; }
 
   /// Calculate the cost of all vertices.
   void CalculateCost ();

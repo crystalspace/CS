@@ -49,6 +49,9 @@ The history order has been reversed so that new features are at the top.
 	- 'listactions', 'setaction', and 'setmotion' use the new spr3d
 	  plugin system too. As a consequence, they no longer work for
 	  the old sprites.
+	- Changed name of csTriangleVertex to csTriangleVertex2 temporarily
+	  in spr3d plugin so that static build works again. After csSprite3D
+	  is removed this can be restored.
 7-Feb-2001
 	- Martin Geisse removed sound volume division by number of sources
 	  from software sound because it did not sound very good.

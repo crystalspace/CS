@@ -66,7 +66,7 @@ void csTriangleMesh2::AddTriangle (int a, int b, int c)
 
 //---------------------------------------------------------------------------
 
-void csTriangleVertex::AddTriangle (int idx)
+void csTriangleVertex2::AddTriangle (int idx)
 {
   int i;
   for (i = 0 ; i < num_con_triangles ; i++)
@@ -87,7 +87,7 @@ void csTriangleVertex::AddTriangle (int idx)
   num_con_triangles++;
 }
 
-void csTriangleVertex::AddVertex (int idx)
+void csTriangleVertex2::AddVertex (int idx)
 {
   int i;
   for (i = 0 ; i < num_con_vertices ; i++)
@@ -108,7 +108,7 @@ void csTriangleVertex::AddVertex (int idx)
   num_con_vertices++;
 }
 
-bool csTriangleVertex::DelVertex (int idx)
+bool csTriangleVertex2::DelVertex (int idx)
 {
   int i;
   for (i = 0 ; i < num_con_vertices ; i++)
@@ -121,12 +121,12 @@ bool csTriangleVertex::DelVertex (int idx)
   return false;
 }
 
-void csTriangleVertex::ReplaceVertex (int old, int replace)
+void csTriangleVertex2::ReplaceVertex (int old, int replace)
 {
   if (DelVertex (old)) AddVertex (replace);
 }
 
-void csTriangleVertex::CalculateCost (csTriangleVertices2* vertices)
+void csTriangleVertex2::CalculateCost (csTriangleVertices2* vertices)
 {
   int i;
   to_vertex = -1;
@@ -154,7 +154,7 @@ void csTriangleVertex::CalculateCost (csTriangleVertices2* vertices)
 
 csTriangleVertices2::csTriangleVertices2 (csTriangleMesh2* mesh, csVector3* verts, int num_verts)
 {
-  vertices = new csTriangleVertex [num_verts];
+  vertices = new csTriangleVertex2 [num_verts];
   num_vertices = num_verts;
 
   // Build connectivity information for all vertices in this mesh.
@@ -250,7 +250,7 @@ void csSpriteLOD::CalculateLOD (csTriangleMesh2* mesh, csTriangleVertices2* vert
   {
     from = verts->GetMinimalCostVertex ();
     from_vertices[col_idx] = from;
-    csTriangleVertex* vt_from = &verts->GetVertex (from);
+    csTriangleVertex2* vt_from = &verts->GetVertex (from);
 
     to = verts->GetVertex (from).to_vertex;
 
@@ -266,7 +266,7 @@ void csSpriteLOD::CalculateLOD (csTriangleMesh2* mesh, csTriangleVertices2* vert
     }
 
     to_vertices[col_idx] = to;
-    csTriangleVertex* vt_to = &verts->GetVertex (to);
+    csTriangleVertex2* vt_to = &verts->GetVertex (to);
     col_idx++;
 
     // Fix connectivity information after moving the 'from' vertex to 'to'.

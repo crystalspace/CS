@@ -386,7 +386,7 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
 
   for (i = 0; i < GetNumTexels(); i++)
   {
-    csTriangleVertex &vt = tri_verts->GetVertex (i);
+    csTriangleVertex2 &vt = tri_verts->GetVertex (i);
     if (vt.num_con_triangles)
     {
       csVector3 &n = GetNormal (frame_number, i);
@@ -488,7 +488,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   // calculate vertex normals, by averaging connected triangle normals
   for (i = 0; i < GetNumTexels(); i++)
   {
-    csTriangleVertex &vt = tv->GetVertex (i);
+    csTriangleVertex2 &vt = tv->GetVertex (i);
     if (vt.num_con_triangles)
     {
       csVector3 &n = GetNormal (frame, i);
