@@ -237,14 +237,14 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
   }
   else
   {
-    char cachefilename[256];
+    csStringFast<256> cachefilename;
     vRef<Site> site = imagedata->getSite();
-    /*sncsPrintf(cachefilename, sizeof(cachefilename), "/csvosa3dl_cache/%s/%s",
-      site->getURL().getHost().c_str(),
-      imagedata->getSiteName().c_str());*/
-    sncsPrintf(cachefilename, sizeof(cachefilename), "/tmp/%s_%s",
-             site->getURL().getHost().c_str(),
-             imagedata->getSiteName().c_str());
+#if 0
+    cachefilename << "/csvosa3dl_cache/" << site->getURL().getHost().c_str(),
+                  << '/' << imagedata->getSiteName().c_str();
+#endif
+    cachefilename << "/tmp/" << site->getURL().getHost().c_str() << "_"
+                  << imagedata->getSiteName().c_str();
 
     // VFS uses ':' as a seperator
     for (int i=0; cachefilename[i]; i++)
@@ -255,7 +255,7 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
 
     ConstructTextureTask* ctt = new ConstructTextureTask(
       vosa3dl->GetObjectRegistry(), getURLstr(),
-      cachefilename, this);
+      cachefilename.GetData(), this);
     imagedata->read(ctt->texturedata);
     ctt->needListener = &needListener;
     vosa3dl->mainThreadTasks.push(ctt);
