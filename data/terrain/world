@@ -155,8 +155,8 @@
   <meshfact name="TerrainFact">
     <plugin>terrainFact</plugin>
     <params>
-      <plugin>crystalspace.mesh.object.terrain.chunklod</plugin>
-      <!--<plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>-->
+	    <!--<plugin>crystalspace.mesh.object.terrain.chunklod</plugin>-->
+      <plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>
       <terraformer>simple</terraformer>
       <sampleregion>
         <min x="-128" y="-128" />
