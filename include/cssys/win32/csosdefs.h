@@ -304,22 +304,42 @@ char* __WindowsDirectory()
 // efficient as it could be ergo...heres a better solution.
 #ifdef COMP_VC
 #define memcpy fast_mem_copy
-static inline void* fast_mem_copy(void* dest, const void* src, int count)
+static inline void* fast_mem_copy (void *dest, const void *src, int count)
 {
-  __asm
-  {
-	mov		ecx, count
-	mov		esi, src
-	mov		edi, dest
-	mov     ebx, ecx
-	shr     ecx, 2
-	and     ebx, 3
-	rep     movsd
-	mov     ecx, ebx
-	rep     movsb
-  }
+    __asm
+    {
+      mov		eax, count
+      mov		esi, src
+      mov		edi, dest
+      xor		ecx, ecx
 
-  return dest;
+      // Check for 'short' moves
+      cmp		eax, 16
+      jl		do_short
+		
+      // Move enough bytes to align 'dest'
+      sub		ecx, edi
+      and		ecx, 3
+      je		skip
+      sub		eax, ecx
+      rep		movsb
+
+      skip:
+        mov		ecx, eax
+        and		eax, 3
+        shr		ecx, 2
+        rep		movsd
+        test	eax, eax
+        je		end
+
+      do_short:
+        mov		ecx, eax
+        rep		movsb
+
+      end:
+    }
+
+    return dest;
 }
 #endif
 
