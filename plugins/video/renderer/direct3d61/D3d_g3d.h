@@ -35,6 +35,7 @@
 #include "cs3d/direct3d61/d3d_txtcache.h"
 #include "cs3d/direct3d61/d3d_txtmgr.h"
 #include "cs3d/direct3d61/d3d_states.h"
+#include "cs3d/direct3d61/d3d_vertcache.h"
 #include "csutil/scf.h"
 #include "cssys/win32/IDDetect.h"
 #include "igraph3d.h"
@@ -137,6 +138,10 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
   bool  m_gouraud;
   UInt  m_mixmode;
   float m_alpha;
+  /// Integer alpha value for DrawPolygonFX
+  UInt  m_ialpha;
+  /// Should DrawPolygonFX use texture?
+  bool  m_textured;
 
   /// Capabilities of the renderer.
   G3D_CAPS m_Caps;
@@ -160,6 +165,22 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
   csIniFile *config;
 
   csStateCacheDirect3DDx6 m_States;
+  csVertexCacheDirect3D m_VertexCache;
+
+  /// do we batch up polygons for PolygonFX calls?
+  bool m_bBatchPolygonFX;
+  /// do we render as translucent when requested?
+  bool m_bRenderTransparent;
+  /// do we render lightmaps?
+  bool m_bRenderLightmap;
+  /// can we use multitexturing?
+  bool m_bMultiTexture;
+  /// type of texture blending for lightmaps in multitexture mode
+  D3DTEXTUREOP m_LightmapTextureOp;
+  /// type of texture blending for lightmaps in multipass mode
+  D3DBLEND m_LightmapSrcBlend, m_LightmapDstBlend;
+  /// type of transparency blending
+  D3DBLEND m_TransSrcBlend, m_TransDstBlend;
 
 public:
   DECLARE_IBASE;
@@ -297,6 +318,15 @@ private:
   inline void SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
     float& K1, float& K2, float& K3,
     float& M,  float& N,  float& O  );
+
+  void ConfigureRendering();
+
+  void MultitextureDrawPolygon(G3DPolygonDP & poly);
+
+  void BatchStartPolygonFX(iTextureHandle* handle, UInt mode);
+  void BatchFinishPolygonFX();
+  void BatchDrawPolygonFX(G3DPolygonDPFX& poly);
+
 };
 
 #endif // G3D_D3D_H
