@@ -33,6 +33,7 @@ SRC.DEMO = $(wildcard apps/demo/*.cpp)
 OBJ.DEMO = $(addprefix $(OUT),$(notdir $(SRC.DEMO:.cpp=$O)))
 DEP.DEMO = CSUTIL CSSYS CSGEOM CSOBJECT CSUTIL CSFX
 LIB.DEMO = $(foreach d,$(DEP.DEMO),$($d.LIB))
+CFG.DEMO = data/config/csdemo.cfg
 
 #TO_INSTALL.EXE += $(DEMO.EXE)
 
