@@ -114,17 +114,17 @@ struct csPixelFormat
    */
   void complete ()
   {
-    // Exercise caution in the for(;;) loops when computing "shift" and "bits"
-    // to prevent them from looping infinitely.  Some of the 2D drivers
-    // unnecessarily call this method at 8-bit depth with the "masks" set to
-    // zero, so take this special case into account.
-#define COMPUTE(comp)							\
-    {									\
-      unsigned long i, tmp = comp##Mask;				\
-      for (i = 0; tmp && !(tmp & 1); tmp >>= 1, i++) {}			\
-      comp##Shift = i;							\
-      for (i = 0; tmp & 1; tmp >>= 1, i++) {}				\
-      comp##Bits = i;							\
+	// Exercise caution in the for(;;) loops when computing "shift" and "bits"
+	// to prevent them from looping infinitely.  Some of the 2D drivers
+	// unnecessarily call this method at 8-bit depth with the "masks" set to
+	// zero, so take this special case into account.
+#define COMPUTE(comp)                                                   \
+    {                                                                   \
+      unsigned long i, tmp = comp##Mask;                                \
+      for (i = 0; tmp && !(tmp & 1); tmp >>= 1, i++) {}                 \
+      comp##Shift = i;                                                  \
+      for (i = 0; tmp & 1; tmp >>= 1, i++) {}                           \
+      comp##Bits = i;                                                   \
     }
     COMPUTE (Red);
     COMPUTE (Green);

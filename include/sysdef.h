@@ -17,9 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifdef __SYSDEFS_H__
-#error "Don't include sysdef.h from header files please!"
-#else
+#ifndef __SYSDEFS_H__
 #define __SYSDEFS_H__
 
 #define OK_TO_INCLUDE_DEFS_IM_A_FRIEND
@@ -79,8 +77,22 @@
 #  define SYSDEF_PATH
 #endif
 
+/*
+
+	The next #ifdef is only necessary for VC/C++ based builds
+	or those platforms that can use Dx 5 (Win9x or Win2k) or
+	later.
+
+*/
 #ifdef OS_WIN32
 #  include "cssys/win32/csosdefs.h"
+#endif
+
+/*
+	Next #ifdef is for Mingw build under NT4 OS
+*/
+#ifdef OS_NT4
+#  include "cssys/mingw/csosdefs.h"
 #endif
 
 #if defined (COMP_WCC) && defined (OS_DOS)
@@ -183,7 +195,7 @@
 #    if defined(OS_WIN32) || (defined(OS_DOS) && !defined(COMP_GCC))
 #      define MKDIR(path) _mkdir (path)
 #    else
-#      define MKDIR(path) mkdir (path, 0755)
+#      define MKDIR(path) mkdir (path, 0644)
 #    endif
 #  endif
 #endif // SYSDEF_MKDIR

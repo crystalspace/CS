@@ -58,6 +58,10 @@ vpath %.c support/gnu
 vpath %.cpp support/debug
 
 # Directory for object files
+ifeq ($(OS),NT4)
+  MKDIR = mkdir $(subst /,\,$(@:/=))
+endif
+
 OUTBASE=out/
 OUTOS=$(OUTBASE)$(OS)/
 OUTPROC=$(OUTOS)$(PROC)/

@@ -1,6 +1,10 @@
 #ifndef VERSION_H
 #define VERSION_H
 
+#ifndef __SYSDEFS_H__
+#include "sysdef.h"
+#endif
+
 #define CS_VERSION	"0.15"
 #define CS_SUBVERSION	"002"
 #define RELEASE_DATE	"Wed, 23-Feb-2000"
@@ -27,6 +31,8 @@
 #  define OS_VERSION "Amiga"
 #elif defined(OS_WIN32)
 #  define OS_VERSION "Win32"
+#elif defined(OS_Windows_NT)
+#  define OS_VERSION "WinNT4"
 #elif defined(OS_OS2)
 #  define OS_VERSION "OS/2"
 #elif defined(OS_UNKNOWN)
