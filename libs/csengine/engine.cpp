@@ -1834,6 +1834,7 @@ void csEngine::SelectRegion (const char *iName)
     region = &r->scfiRegion;
     r->SetName (iName);
     regions.Push (region);
+    r->DecRef ();
   }
 }
 

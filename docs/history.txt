@@ -8,6 +8,11 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bad bug in csDebuggingGraph where it would fail to
 	  properly unlink objects if objects were created and deleted
 	  and happened to get the same pointer (which is not too unlikely).
+	- Fixed a memory leak in csEngine::SelectRegion(). It did a new
+	  csRegion and then added this region to the regions vector. This
+	  made the ref count equal to 2 but it should be one as the only
+	  ref is the one from the regions vector. So added an additional
+	  DecRef().
 14-Nov-2001
 	- It is very hard to properly debug the huge graph or tree structures
 	  that are used a lot in Crystal Space. Using 'printf' just doesn't
