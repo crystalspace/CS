@@ -291,7 +291,7 @@
       </conditions>
       <applicable>
 	<usecfg>nolinearfog</usecfg>
-	<usecfg>emableIntensityBlendText</usecfg>
+	<usecfg>enableIntensityBlendText</usecfg>
       </applicable>
     </rule>
     <rule description="ATI: Can't handle GL_BLEND texenv for GL_INTENSITY textures">
