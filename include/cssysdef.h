@@ -341,10 +341,12 @@
 // the memory debugger is not the memory debugger will still provide the
 // needed overloaded operators so you can leave CS_EXTENSIVE_MEMDEBUG on in
 // that case and the only overhead will be a little more arguments to 'new'.
-#ifdef CS_DEBUG
-#  define CS_EXTENSIVE_MEMDEBUG 1
-#else
-#  define CS_EXTENSIVE_MEMDEBUG 0
+#ifndef CS_EXTENSIVE_MEMDEBUG
+#  ifdef CS_DEBUG
+#    define CS_EXTENSIVE_MEMDEBUG 1
+#  else
+#    define CS_EXTENSIVE_MEMDEBUG 0
+#  endif
 #endif
 #if CS_EXTENSIVE_MEMDEBUG
 extern void* operator new (size_t s, void* filename, int line);

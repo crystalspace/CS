@@ -70,4 +70,8 @@
 #  error "Please define a suitable CS_XXX_ENDIAN macro in be/csosdefs.h!"
 #endif
 
+// The "extensive debug" facility of cssysdef.h is incompatible with
+// overloaded `new' operators in the Be system headers.
+#define CS_EXTENSIVE_MEMDEBUG 0
+
 #endif // __CSOSDEFS_H__

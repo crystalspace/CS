@@ -20,6 +20,12 @@ The history order is reversed so that new features are at the top.
 	- Implemented a lot of new functionality from the new texture
 	  generation tool. Will write some documentation on this later.
 	  A new version of newsky.zip is required!
+	- Eric Sunshine applied an interim solution to the problem with the
+	  "extensive debug" facility breaking builds on certain platforms.
+	  In particular, this facility breaks compilation on platforms which
+	  define their own custom operator `new' overloads.  The extensive
+	  debug facility can now be disabled on a platform-by-platform basis
+	  and is now disabled, by default, on BeOS.
 16-May-2001
 	- Philip Wyett did a quick update to eliminate 3000 compiler warnings.
 	  Pragma'ed C4291 out, for time being, will come back to this.
