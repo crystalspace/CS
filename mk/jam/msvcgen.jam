@@ -30,7 +30,7 @@
 # - When PERL5.SDK.AVAILABLE is "yes", Jam reports that it doesn't know how to
 #   locate or create <grist>csperlxs.c.
 
-if $(MSVCGEN_CONFIG)
+if "$(MSVCGEN_CONFIG)"
 {
 
 MSVCGEN = "$(PERL) $(TOP)/mk/msvcgen/msvcgen.pl" ;

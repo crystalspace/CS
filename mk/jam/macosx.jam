@@ -54,7 +54,9 @@ rule SystemLinkApplication
         LinkApplicationConsole $(target) : $(>) ;
         Clean clean : $(target) ;
         Clean $(<)clean : $(target) ;
-    } else {
+    }
+    else
+    {
         CreateApplicationWrapper $(target) : $(>) ;
         CleanDir clean : [ Wrapper $(<) : app ] ;
         CleanDir $(<)clean : [ Wrapper $(<) : app ] ;
@@ -66,8 +68,10 @@ rule SystemInstallApplication
     if [ IsElem console : $(3) ]
     {
         Depends install_bin : [ DoInstall $(<) : $(bindir) $(2) ] ;
-    } else {
-        InstallApplicationGUI $(<) 
+    }
+    else
+    {
+        InstallApplicationGUI $(<) ;
     }
 }
 

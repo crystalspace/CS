@@ -40,6 +40,7 @@ chronological order.
 	      misbehave.
 	    - Generally cleaned up the code.  Also eliminated compilation
 	      errors and warnings.
+	- Eric Sunshine fixed several syntax errors in Cs/mk/jam/*.jam files.
 28-Jan-2004
 	- Eric Sunshine removed a slew of csengine library references from the
 	  project since the csengine library no longer exists.
