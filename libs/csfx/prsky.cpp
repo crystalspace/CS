@@ -153,7 +153,7 @@ void csProcSky::SetAnimated(bool anim, cs_time current_time)
     while(p)
     {
       p->ForceRerender(); 
-      //DrawToTexture(p, current_time);
+      DrawToTexture(p, current_time);
       p = p->GetNextSky();
     }
   }
