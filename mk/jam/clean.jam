@@ -28,6 +28,7 @@ actions DistClean
   rm -f config.mak
   rm -f config.status
   rm -f include/volatile.h
+  rm -f include/csperlxs.inc
   rm -f Makefile
   rm -f *.scf
   rm -rf out
