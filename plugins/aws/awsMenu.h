@@ -34,7 +34,7 @@ class awsPopupMenu;
  *         Selected -- Determines if the menu entry is the selected one. 
  *        PopupMenu -- Optional, but if present the popup it refers to will
  *                     be shown when the menu entry is selected.
- *         Caption  -- The text you would generally show.
+ *          Caption -- The text you would generally show.
  *        UserParam -- Just a a holder for any void* piece of data the user
  *                     wants to keep with this menu entry.
  *      CloseSignal -- A constant that should be the value of the close signal
