@@ -234,6 +234,7 @@ void PartEdit::FinishFrame ()
 
 bool PartEdit::HandleEvent (iEvent& ev)
 {
+
   if ((ev.Type == csevKeyboard) && 
     (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
     (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
@@ -243,13 +244,16 @@ bool PartEdit::HandleEvent (iEvent& ev)
       q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdSystemClose)
+  {
+      // System window closed, app shutting down
+      return true;
+  }
   return aws->HandleEvent(ev);
 }
 
 bool PartEdit::EventHandler (iEvent& ev)
 {
-  if (!(System->running))
-      return false;
 
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
@@ -260,12 +264,6 @@ bool PartEdit::EventHandler (iEvent& ev)
   {
     System->FinishFrame ();
     return true;
-  }
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdSystemClose)
-  {
-      // System window closed, app shutting down
-      System->running=false;
-      return true;
   }
   else
   {
@@ -921,7 +919,6 @@ bool PartEdit::Initialize ()
 
 void PartEdit::Start ()
 {
-  running=true;
   csDefaultRunLoop (object_reg);
 }
 

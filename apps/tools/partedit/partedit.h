@@ -111,13 +111,6 @@ private:
   bool ClearGen3D(EmitterList *elist);
   bool UpdateGen3D(EmitterList *elist,Emitter3DState *emitter_state);
 
-  /** Set to true on start.  Set to false when a quit event is received.
-   *  When false, normal events are not processed (such as aws events) since the underlying objects
-   *  needed to process the events may already be destructed.
-   */
-
-  bool running; 
-
 public:
   PartEdit (iObjectRegistry* object_reg);
   ~PartEdit ();
