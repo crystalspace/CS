@@ -45,6 +45,7 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   XVisualInfo *xvis;
   Colormap cmap;
   GLXContext active_GLContext;
+  bool hardwareaccelerated;
 
   // we are using a specific displaydriver
   csRef<iOpenGLDisp> dispdriver;
