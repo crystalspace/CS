@@ -13,8 +13,18 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+26-Aug-1999
+	- Eric Sunshine renamed docs/changes.old to changes.txt since Jorrit
+	  recently brought it up to date.  Previously it was extremely out of
+	  date, which accounted for the .old extension.
+	- Andrew Zabolotny applied Seth's "sleep 2" patch to the DOS build
+	  scripts.
+	- David Fox sent a patch to fix a precedence problem in the UDP macro
+	  in common.mak.
+	- Siu-Hang Or sent a patch to fix another crasher in MazeD which
+	  occurred when adding 3D volumes to an already-existing world.
 24-Aug-1999
-	- Fixed deletion of curve information in thing templates. It
+	- Jorrit fixed deletion of curve information in thing templates. It
 	  used the wrong type of 'delete []'.
 	- Eric Sunshine fixed CSWS and MazeD so that the desktop is correctly
 	  repainted in all cases after information has been printed to the
