@@ -67,8 +67,11 @@ bool csProcFire::PrepareAnim ()
   memset(fireline, 0, mat_w);
   
   int start = GetRandom (mat_w);
-  for (int i = start; i < start+5; i++)
+
+  int i;
+  for (i = start; i < start+5; i++)
     GetFireLine (i) = 255;
+
   return true;
 }
 

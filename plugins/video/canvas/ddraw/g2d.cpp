@@ -630,7 +630,8 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
   pfmt.complete ();
 
   m_lpddsBack->GetSurfaceDesc (&ddsd);
-  for (int i = 0; i < Height; i++)
+  int i;
+  for (i = 0; i < Height; i++)
     LineAddress [i] = i * ddsd.lPitch;
 
   m_bPalettized = (Depth == 8);
@@ -646,6 +647,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
 HRESULT csGraphics2DDDraw3::ChangeCoopLevel ()
 {
   HRESULT hRet;
+  int i;
 
   // First of all save the contents of backbuffer since it will be cleared
   char *oldBuffer = NULL;
@@ -653,7 +655,7 @@ HRESULT csGraphics2DDDraw3::ChangeCoopLevel ()
   {
     size_t BytesPerLine = Width * ((Depth + 7) / 8);
     oldBuffer = new char [Height * BytesPerLine];
-    for (int i = 0; i < Height; i++)
+    for (i = 0; i < Height; i++)
       memcpy (oldBuffer + i * BytesPerLine, Memory + LineAddress [i], BytesPerLine);
     FinishDraw ();
   }
@@ -675,11 +677,12 @@ HRESULT csGraphics2DDDraw3::ChangeCoopLevel ()
   hRet = InitSurfaces ();
 
   // Now restore the contents of backbuffer
-  for (int times = (m_bDoubleBuffer && FullScreen) ? 2 : 1; times; times--)
+  int times;
+  for (times = (m_bDoubleBuffer && FullScreen) ? 2 : 1; times; times--)
     if (BeginDraw ())
     {
       size_t BytesPerLine = Width * ((Depth + 7) / 8);
-      for (int i = 0; i < Height; i++)
+      for (i = 0; i < Height; i++)
         memcpy (Memory + LineAddress [i], oldBuffer + i * BytesPerLine, BytesPerLine);
       FinishDraw ();
       Print (NULL);
@@ -712,7 +715,8 @@ void csGraphics2DDDraw3::ClearSystemPalette ()
   Palette.palPalEntry [0].peFlags = 0;
   Palette.palPalEntry [255].peFlags = 0;
 
-  for (int c = 0; c < 256; c++)
+  int c;
+  for (c = 0; c < 256; c++)
   {
     Palette.palPalEntry [c].peRed = 0;
     Palette.palPalEntry [c].peGreen = 0;

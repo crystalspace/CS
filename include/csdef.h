@@ -36,44 +36,44 @@
 #include <assert.h>
 
 #ifndef TRUE
-#  define TRUE 1
+  #define TRUE 1
 #endif
 
 #ifndef FALSE
-#  define FALSE 0
+  #define FALSE 0
 #endif
 
 #ifndef MIN
-#  define MIN(a,b) ((a)<(b)?(a):(b))
+  #define MIN(a,b) ((a)<(b)?(a):(b))
 #endif
 
 #ifndef MAX
-#  define MAX(a,b) ((a)>(b)?(a):(b))
+  #define MAX(a,b) ((a)>(b)?(a):(b))
 #endif
 
 #ifndef ABS
-#  define ABS(x) ((x)<0?-(x):(x))
+ #define ABS(x) ((x)<0?-(x):(x))
 #endif
 
 #if !defined(SIGN)
-#  define SIGN(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
+  #define SIGN(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
 #endif
 
 #undef EPSILON
-#define EPSILON 0.001f			/* Small value */
+  #define EPSILON 0.001f			/* Small value */
 #undef SMALL_EPSILON
-#define SMALL_EPSILON 0.000001f		/* Very small value */
+  #define SMALL_EPSILON 0.000001f		/* Very small value */
 #undef SMALL_EPSILON_D
-#define SMALL_EPSILON_D 0.000000000001f	/* Very, very small value */
+  #define SMALL_EPSILON_D 0.000000000001f	/* Very, very small value */
 
 #ifndef PI
-#  define PI 3.14159265358979323
+  #define PI 3.1415926535897932385f
 #endif
 #ifndef M_PI
-#  define M_PI PI
+  #define M_PI PI
 #endif
 #ifndef M_PI_2
-#  define M_PI_2 1.57079632679489661923	/* PI/2 */
+  #define M_PI_2 1.57079632679489661925f	// PI / 2
 #endif
 
 // A macro for defining a constant static table.  The default expansion is
@@ -88,9 +88,9 @@
 // Platforms with compilers which only understand old-style C++ casting syntax
 // should define CS_USE_OLD_STYLE_CASTS.
 #if defined(CS_USE_OLD_STYLE_CASTS)
-#  define CS_CAST(C,T,V) ((T)(V))
+  #define CS_CAST(C,T,V) ((T)(V))
 #else
-#  define CS_CAST(C,T,V) (C<T>(V))
+  #define CS_CAST(C,T,V) (C<T>(V))
 #endif
 
 #define STATIC_CAST(T,V)      CS_CAST(static_cast,T,V)
@@ -101,11 +101,11 @@
 // Platforms with compilers which do not understand the new C++ keyword
 // `explicit' should define CS_USE_FAKE_EXPLICIT_KEYWORD.
 #if defined(CS_USE_FAKE_EXPLICIT_KEYWORD)
-#  define explicit /* nothing */
+  #define explicit /* nothing */
 #endif
 
 // The smallest Z at which 3D clipping occurs
-#define SMALL_Z .01
+#define SMALL_Z 0.01f
 
 // This macro causes a crash. Can be useful for debugging.
 #define CRASH { int* a=0; *a = 1; }

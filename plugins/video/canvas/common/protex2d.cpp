@@ -49,6 +49,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
   Height = height;
   FullScreen = false;
   Memory = (unsigned char*) buffer;
+  int i;
 
   // Three ways into this routine:
   // 1. via Opengl as a software renderer, but sharing texture handles..it has
@@ -79,7 +80,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
     pfmt.GreenMask = 0;
     pfmt.BlueMask = 0;
 
-    for (int i = 0; i < 256; i++)
+    for (i = 0; i < 256; i++)
       PaletteAlloc [i] = false;
 
     pfmt.complete ();
@@ -110,7 +111,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
       UShort bb = 8 - pfmt.BlueBits;
       UShort gb = 8 - pfmt.GreenBits;
       UShort rb = 8 - pfmt.RedBits;
-      for (int i = 0; i < width*height; i++, dst++)
+      for (i = 0; i < width*height; i++, dst++)
 	*dst = ((((UShort)image_buffer[i].blue >> bb) << pfmt.BlueShift) +
 		(((UShort)image_buffer[i].green >> gb) << pfmt.GreenShift) +
 		(((UShort)image_buffer[i].red >> rb) << pfmt.RedShift));
@@ -127,7 +128,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
       Memory = new unsigned char[width*height*4];
       image_buffer = (csRGBpixel*) buffer;
       ULong *dst = (ULong*) Memory;
-      for (int i = 0; i < width*height; i++, dst++)
+      for (i = 0; i < width*height; i++, dst++)
 	*dst = (image_buffer[i].red << pfmt.RedShift) +
 	  (image_buffer[i].green << pfmt.GreenShift) +
 	  (image_buffer[i].blue << pfmt.BlueShift);
@@ -155,6 +156,7 @@ void csProcTextureSoft2D::Close ()
 
 void csProcTextureSoft2D::Print (csRect *area)
 {
+  int i,j;
   if (image_buffer)
   {
     csRGBpixel *dst = image_buffer;
@@ -175,9 +177,9 @@ void csProcTextureSoft2D::Print (csRect *area)
 	int offset = area->ymin*Width + area->xmin;
 	src += offset;
 	dst += offset;
-	for (int i = area->ymin; i < (area->ymax+1); i++)
+	for (i = area->ymin; i < (area->ymax+1); i++)
 	{
-	  for (int j = area->xmin; j < area->xmax; j++, src++, dst++)
+	  for (j = area->xmin; j < area->xmax; j++, src++, dst++)
 	  {
 	    dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
 	    dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
@@ -189,7 +191,7 @@ void csProcTextureSoft2D::Print (csRect *area)
       }
       else
       {
-	for (int i = 0; i < Width*Height; i++, src++, dst++)
+	for (i = 0; i < Width*Height; i++, src++, dst++)
 	{
 	  dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
 	  dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
@@ -206,9 +208,9 @@ void csProcTextureSoft2D::Print (csRect *area)
 	int offset = area->ymin*Width + area->xmin;
 	src += offset;
 	dst += offset;
-	for (int i = area->ymin; i < (area->ymax+1); i++)
+	for (i = area->ymin; i < (area->ymax+1); i++)
 	{
-	  for (int j = area->xmin; j < area->xmax; j++, src++, dst++)
+	  for (j = area->xmin; j < area->xmax; j++, src++, dst++)
 	  {
 	    dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift);
 	    dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift);
@@ -220,7 +222,7 @@ void csProcTextureSoft2D::Print (csRect *area)
       }
       else
       {
-	for (int i = 0; i < Width*Height; i++, src++, dst++)
+	for (i = 0; i < Width*Height; i++, src++, dst++)
 	{
 	  dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift);
 	  dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift);

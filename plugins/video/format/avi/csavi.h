@@ -64,11 +64,11 @@ class csAVIFormat : public iStreamFormat
       ULong offset;
       ULong length;
       void Endian ()
-      { 
-	id = little_endian_long (id); 
-	flags = little_endian_long (flags); 
-	offset = little_endian_long (offset); 
-	length = little_endian_long (length); 
+      {
+		id = little_endian_long (id);
+		flags = little_endian_long (flags); 
+		offset = little_endian_long (offset); 
+		length = little_endian_long (length); 
       }
     };
 
