@@ -24,12 +24,12 @@ chronological order.
 	  for the waterdemo application.
 25-Jan-2004
         - Matze did some updates to the jam rules:
-          * I decided not to fight autoconf while using custom variable names.
-            This gives more trouble than necessary. So we're using bindir,
-            includedir, ... for installation directories now.
-          * Rewrote installation rules and used the ones from autojam
-          * fixed and simplified header install rules
-          * added new targets to install docu
+            - I decided not to fight autoconf while using custom variable names.
+              This gives more trouble than necessary. So we're using bindir,
+              includedir, ... for installation directories now.
+            - Rewrote installation rules and used the ones from autojam
+            - fixed and simplified header install rules
+            - added new targets to install docu
         - Matze changed the csGet*Dir functions to return csString and
           introduced CRYSTAL_PLUGIN and CRYSTAL_CONFIG in the unix variant and
           changed the order in the linux variant a slight bit.
