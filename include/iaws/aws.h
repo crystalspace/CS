@@ -404,6 +404,9 @@ struct iAwsComponent : public iAwsSource
   /// Returns the current state of the flags
   virtual unsigned int Flags()=0;
 
+  /** Should be used ONLY by this component, or an embedding object. */
+  virtual iAws *WindowManager ()=0;
+
   /// Gets the window that this component resides in.
   virtual iAwsWindow *Window()=0;
 

@@ -17,7 +17,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-#include "aws/aws.h"
+#include "iaws/aws.h"
+#include "iaws/awsparm.h"
 
 class awsEmbeddedComponent : public iAwsComponent
 {
@@ -90,11 +91,11 @@ public:
     { return comp->GetProperty(name, parm); }
 
     /// Sets the property specified, setting the proprty to whatever is in parm. Returns false if there's no such property.
-    virtual bool SetProperty(char *name, void *parm);
+    virtual bool SetProperty(char *name, void *parm)
     { return comp->SetProperty(name, parm); }
 
     /// Executes scriptable actions for this window
-    virtual bool Execute(char *action, awsParmList &parmlist)
+    virtual bool Execute(char *action, iAwsParmList &parmlist)
     { return comp->Execute(action, parmlist); }
 
     /// Sets the flag (can handle multiple simultaneous sets)
@@ -151,7 +152,7 @@ public:
 
     /// Recursively moves children (and all nested children) by relative amount given.
     virtual void MoveChildren(int delta_x, int delta_y)
-    { comp->MoveChildren(delta_x, delta_y);
+    { comp->MoveChildren(delta_x, delta_y); }
 
 public:
     /// Adds a child
@@ -178,7 +179,7 @@ public:
       * Should be used internally by the component ONLY,
       * or by embedding classes. */
     iAws *WindowManager()
-    { return comp->WindowManager(); }
+    { return comp->Window()->WindowManager(); }
 
     /// Get's the window that this component resides in.
     iAwsWindow *Window()
@@ -253,7 +254,7 @@ public:
     iAws *WindowManager() { return wmgr; }
 
     /// Registers this factory with the window manager
-    virtual void Register(char *type)
+    virtual void Register(char *type, char *name)
     {
       wmgr->RegisterComponentFactory(this, name);
     }
