@@ -344,15 +344,15 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   iStatLight* light;
   light = engine->CreateLight (NULL, csVector3(-3, 5, 0), 10,
   	csColor(1, 0, 0), false);
-  ll->AddLight (light->QueryLight ());
+  ll->Add (light->QueryLight ());
   light->DecRef ();
   light = engine->CreateLight (NULL, csVector3(3, 5, 0), 10,
   	csColor(0, 0, 1), false);
-  ll->AddLight (light->QueryLight ());
+  ll->Add (light->QueryLight ());
   light->DecRef ();
   light = engine->CreateLight (NULL, csVector3(0, 5, -3), 10,
   	csColor(0, 1, 0), false);
-  ll->AddLight (light->QueryLight ());
+  ll->Add (light->QueryLight ());
   light->DecRef ();
 }
 

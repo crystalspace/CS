@@ -80,8 +80,8 @@ void InitializeSprite (iMeshWrapper *SpriteWrapper)
 
   int i;
   iMeshList* ml = SpriteWrapper->GetChildren ();
-  for (i=0; i<ml->GetMeshCount (); i++)
-    InitializeSprite (ml->GetMesh (i));
+  for (i=0; i<ml->GetCount (); i++)
+    InitializeSprite (ml->Get (i));
 }
 
 iModelDataVertices *Simple::CreateDefaultModelVertexFrame ()

@@ -2133,9 +2133,9 @@ void Blocks::ChangePlaySize (int new_size)
   InitGameRoom ();
   int i;
   iMeshList* ml = room->GetMeshes ();
-  for (i = 0 ; i < ml->GetMeshCount () ; i++)
+  for (i = 0 ; i < ml->GetCount () ; i++)
   {
-    iMeshWrapper* mesh = ml->GetMesh (i);
+    iMeshWrapper* mesh = ml->Get (i);
     iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iLightingInfo);
     if (linfo)
@@ -2145,9 +2145,9 @@ void Blocks::ChangePlaySize (int new_size)
     }
   }
   room->ShineLights ();
-  for (i = 0 ; i < ml->GetMeshCount () ; i++)
+  for (i = 0 ; i < ml->GetCount () ; i++)
   {
-    iMeshWrapper* mesh = ml->GetMesh (i);
+    iMeshWrapper* mesh = ml->Get (i);
     iLightingInfo* linfo = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iLightingInfo);
     if (linfo)
@@ -2266,22 +2266,22 @@ void Blocks::InitGameRoom ()
 
   iLightList* ll = room->GetLights ();
   iLight *light;
-  ll->AddLight (light=engine->CreateLight (NULL,
+  ll->Add (light=engine->CreateLight (NULL,
     csVector3(-3, 5, 0), 10, csColor(.8, .4, .4), false)->QueryLight ());
   light->DecRef ();
-  ll->AddLight (light=engine->CreateLight (NULL,
+  ll->Add (light=engine->CreateLight (NULL,
     csVector3(3, 5, 0), 10, csColor(.4, .4, .8), false)->QueryLight ());
   light->DecRef ();
-  ll->AddLight (light=engine->CreateLight (NULL,
+  ll->Add (light=engine->CreateLight (NULL,
     csVector3(0, 5, -3), 10, csColor(.4, .8, .4), false)->QueryLight ());
   light->DecRef ();
-  ll->AddLight (light=engine->CreateLight (NULL,
+  ll->Add (light=engine->CreateLight (NULL,
     csVector3(0, 5, 3), 10, csColor(.8, .4, .8), false)->QueryLight ());
   light->DecRef ();
-  ll->AddLight (light=engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3-3) *
+  ll->Add (light=engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3-3) *
     CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false)->QueryLight ());
   light->DecRef ();
-  ll->AddLight (light=engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3+3) *
+  ll->Add (light=engine->CreateLight (NULL, csVector3(0, (ZONE_HEIGHT-3+3) *
     CUBE_DIM+1, 0), CUBE_DIM*10, csColor(.5, .5, .5), false)->QueryLight ());
   light->DecRef ();
 }
@@ -2307,7 +2307,7 @@ void Blocks::InitDemoRoom ()
   walls->DecRef ();
 
   iLight *light;
-  demo_room->GetLights ()->AddLight (
+  demo_room->GetLights ()->Add (
   	light=engine->CreateLight (NULL, csVector3 (0, 0, -2),
 	10, csColor (.4, .4, .4), false)->QueryLight ());
   light->DecRef ();
@@ -2417,12 +2417,12 @@ void Blocks::StartNewGame ()
   // First delete all cubes that may still be in the engine.
   int i = 0;
   iMeshList* ml = room->GetMeshes ();
-  while (i < ml->GetMeshCount ())
+  while (i < ml->GetCount ())
   {
-    iMeshWrapper* cube = ml->GetMesh (i);
+    iMeshWrapper* cube = ml->Get (i);
     if (!strncmp (cube->QueryObject ()->GetName (), "cube", 4))
     {
-      ml->RemoveMesh (cube);
+      ml->Remove (cube);
       cube->DecRef ();
     }
     else
