@@ -3,12 +3,11 @@ SubDir TOP plugins cscript cspython ;
 if $(PYTHON.AVAILABLE) = "yes"
 {
 
-Plugin cspymod :
-	cs_pyth.cpp cspymod.cpp
+Plugin pythmod :
+	cs_pyth.cpp pythmod.cpp
 ;
-LinkWith cspymod : $(dep.cspython) ;
-ExternalLibs cspymod : PYTHON ;
+LinkWith pythmod : $(dep.cspython) ;
+ExternalLibs pythmod : PYTHON ;
 
-Help cspymod : "Crystal Script Python plug-in" ;
+Help pythmod : "Crystal Script Python plug-in" ;
 }
-
