@@ -31,6 +31,7 @@
 #include "csgfx/normalmaptools.h"
 #include "csgfx/packrgb.h"
 #include "csgfx/quantize.h"
+#include "csgfx/renderbuffer.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/shaderexp.h"
 #include "csgfx/shadervar.h"
