@@ -13,10 +13,22 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+15-Oct-1999
+	- Fixes to integration of landscape engine from Alex Pfaffe.
+	  Still not working properly though.
+	- Michael Dale Long did some fixes on cctest and ndrvdemo for
+	  the terrain library.
 14-Oct-1999
 	- First try at integration of landscape engine. Note that the
 	  new code doesn't even TRY to be efficient :-)
 	  Needless to say it doesn't work yet.
+	- Fixed infinite maze for VFS.
+	- Fixed to Win/VC project files from Thomas Hieber (RelDeb target).
+	  Also added terrain.cpp.
+	- Thomas Hieber fixed texture scanning so that textures with no
+	  names don't cause a crash.
+	- Seth Galbraith udpated Squawk to switch view layouts at
+	  run-time.
 13-Oct-1999
 	- Andrew Zabolotny added keyboard support to CSWS scroll bars.
 	- Thomas Hieber updated the Win/VC project files.
