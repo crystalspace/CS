@@ -52,13 +52,13 @@ SubInclude TOP scripts ;
 
 # When build directory differs from source directory, also arrange for
 # 'distclean' to remove the $(BUILDDIR)/include directory created by
-# configure, and ensure that 'install' installs the generated
+# configure.  Also ensure that 'install' installs the generated
 # $(BUILDDIR)/include/volatile.h.
-buildheaders = [ GLOB include : * ] ;
-buildheaders = [ Filter $(buildheaders:BS) : . .. volatile.h ] ;
-if ! $(buildheaders)
+if [ Property build : standalone ]
 {
   CleanDir distclean : include ;
+
   SubDir BUILDTOP include ;
   Recurse InstallHeader : .h ;
+  SubDir TOP ;
 }

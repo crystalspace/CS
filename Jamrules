@@ -35,6 +35,17 @@ if $(TARGET.OS) = MACOS_X
   ApplicationIconDefaultOSX appicon.icns : $(TOP) libs csutil macosx ;
 }
 
+# Set up a property which clients can query to determine if the build directory
+# differs from source directory.  This allows clients to perform conditional
+# actions based upon this knowledge.  We safely detect if the two directories
+# differ by checking if 'cssysdef.h' is present in $(BUILDTOP)/include.  If it
+# is not, then the directories differ.
+buildheaders = [ GLOB [ ConcatDirs $(BUILDTOP) include ] : *.h ] ;
+if ! [ IsElem cssysdef.h : $(buildheaders:BS) ]
+{
+  SetProperty build : standalone ;
+}
+
 # List of plugins which should be linked in when building static.
 if $(USE_NEW_RENDERER) = "yes"
 {

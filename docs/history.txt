@@ -38,6 +38,13 @@ chronological order.
 	  locked normals render buffer. While this doesn't make a difference 
 	  on drivers that don't have VBO support, it improves performances 
 	  when VBO is available.
+	- Eric Sunshine augmented Jamrules so that it sets the property
+	  "standalone" in the container "build" when the build directory
+	  differs from the source directory.  Client Jamfiles can query this
+	  property to conditionalize behavior.  Changed Jamfile.in so that it
+	  utilzies this new property to determine if it should perform special
+	  processing for the configure-generated 'include/volatile.h', rather
+	  than performing the check manually.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.
