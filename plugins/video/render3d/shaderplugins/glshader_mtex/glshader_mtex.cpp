@@ -362,6 +362,9 @@ bool csShaderGLMTEX::Prepare()
   ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
   txtcache = (iGLTextureCache*) sri->GetPrivateObject("txtcache");
 
+  if (texlayers.Length () > GL_MAX_TEXTURE_UNITS_ARB)
+    return false;
+
   return true;
 }
 

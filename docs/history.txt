@@ -16,6 +16,8 @@ The history order is reversed so that new features are at the top.
 	    - Improved the csGLRender3D::ActivateTexture and 
 	      csGLRender3D::DeactivateTexture methods.
 	    - Reverted Duhpreys changes to genmesh as they don't work.
+	- Marten Svanfeldt fixed a bug in glshader_mtex which made a shader valid even
+	  if it had to many layers
 
 28-Feb-2003
 	- Eric Sunshine instructed Doxygen to ignore include/volatile.h.  Since
