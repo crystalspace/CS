@@ -25,5 +25,5 @@ PYTHON_TRASH = [ Wildcard *.pyc *.pyo ] ;
 if $(PYTHON_TRASH)
 {
   SEARCH on $(PYTHON_TRASH) = $(SEARCH_SOURCE) ;
-  Clean rainclean : $(PYTHON_TRASH) ;
+  Clean distclean : $(PYTHON_TRASH) ;
 }
