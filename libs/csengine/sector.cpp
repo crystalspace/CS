@@ -623,7 +623,7 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** p
   return NULL;
 }
 
-csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
+csThing** csSector::GetVisibleThings (csLightView& lview, int& num_things)
 {
   csFrustrum* lf = lview.light_frustrum;
   bool infinite = lf->IsInfinite ();
@@ -631,6 +631,7 @@ csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
   csThing* sp;
   csPolygonSetBBox* bbox;
   bool vis;
+  int i, i1;
 
   /**
    * First count all things to see how big we should allocate
@@ -648,43 +649,55 @@ csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
     // If the light frustrum is infinite then every thing
     // in this sector is of course visible.
     if (infinite) vis = true;
-    else if (sp->GetNumCurves () > 0)
-    {
-      //@@@ Currently the bounding box doesn't check curved
-      // surfaces. This means that we can't use
-      // the bounding box for any optimization if curves are present
-      vis = true;
-    }
     else
     {
       bbox = sp->GetBoundingBox ();
       if (bbox)
       {
-        // First we check if any of the vertices of the bounding
-        // box is in the frustrum. If so then it is certainly visible.
-        if (lf->Contains (sp->Vwor (bbox->i1)-center) ||
-            lf->Contains (sp->Vwor (bbox->i2)-center) ||
-            lf->Contains (sp->Vwor (bbox->i3)-center) ||
-            lf->Contains (sp->Vwor (bbox->i4)-center) ||
-            lf->Contains (sp->Vwor (bbox->i5)-center) ||
-            lf->Contains (sp->Vwor (bbox->i6)-center) ||
-            lf->Contains (sp->Vwor (bbox->i7)-center) ||
-            lf->Contains (sp->Vwor (bbox->i8)-center))
-          vis = true;
-        else
-        {
-          // None of the vertices of the bounding box is in the
-          // light frustrum. In this case it is still possible
-          // that the light frustrum passes through the bounding box.
-          // To test this we consider all six faces of the bounding
-          // box and see if a single ray from the light frustrum passes
-          // through any of those faces.
-          //csVector3& ray = lf->GetVertex (0);
-          // Unfinished!!! Here we need some more code but I'm not sure
-          // how to do this efficiently.
-          //@@@@@@@@@@@@@@@@@@
-          vis = true;
-        }
+        // If we have a bounding box then we can do a quick test to
+	// see if the bounding box is visible in the frustrum. This
+	// test is not complete in the sense that it will say that
+	// some bounding boxes are visible even if they are not. But
+	// it is correct in the sense that if it says a bounding box
+	// is invisible, then it certainly is invisible.
+	//
+	// It works by taking all vertices of the bounding box. If
+	// ALL of them are on the outside of the same plane from the
+	// frustrum then the object is certainly not visible.
+	vis = true;
+	i1 = lf->GetNumVertices ()-1;
+	for (i = 0 ; i < lf->GetNumVertices () ; i1 = i, i++)
+	{
+	  csVector3& v1 = lf->GetVertex (i);
+	  csVector3& v2 = lf->GetVertex (i1);
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i1)-center, v1, v2) < 0) continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i2)-center, v1, v2) < 0) continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i3)-center, v1, v2) < 0) continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i4)-center, v1, v2) < 0) continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i5)-center, v1, v2) < 0) continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i6)-center, v1, v2) < 0) continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i7)-center, v1, v2) < 0) continue;
+	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i8)-center, v1, v2) < 0) continue;
+	  // Here we have a case of all vertices of the bbox being on the
+	  // outside of the same plane.
+	  vis = false;
+	  break;
+	}
+	if (vis && lf->GetBackPlane ())
+	{
+	  // If still visible then we can also check the back plane.
+	  // @@@ NOTE THIS IS UNTESTED CODE. LIGHT_FRUSTRUMS CURRENTLY DON'T
+	  // HAVE A BACK PLANE YET.
+	  if (!csMath3::Visible (sp->Vwor (bbox->i1)-center, *lf->GetBackPlane ()) &&
+	      !csMath3::Visible (sp->Vwor (bbox->i2)-center, *lf->GetBackPlane ()) &&
+	      !csMath3::Visible (sp->Vwor (bbox->i3)-center, *lf->GetBackPlane ()) &&
+	      !csMath3::Visible (sp->Vwor (bbox->i4)-center, *lf->GetBackPlane ()) &&
+	      !csMath3::Visible (sp->Vwor (bbox->i5)-center, *lf->GetBackPlane ()) &&
+	      !csMath3::Visible (sp->Vwor (bbox->i6)-center, *lf->GetBackPlane ()) &&
+	      !csMath3::Visible (sp->Vwor (bbox->i7)-center, *lf->GetBackPlane ()) &&
+	      !csMath3::Visible (sp->Vwor (bbox->i8)-center, *lf->GetBackPlane ()))
+	    vis = false;
+	}
       }
       else
       {
@@ -726,7 +739,7 @@ void csSector::CalculateLighting (csLightView& lview)
   // First mark all things which are visible in the current
   // frustrum.
   int num_visible_things;
-  csThing** visible_things = MarkVisibleThings (lview, num_visible_things);
+  csThing** visible_things = GetVisibleThings (lview, num_visible_things);
 
   // If we are doing shadow casting for things then we also calculate
   // a list of all shadow frustrums which are going to be used
