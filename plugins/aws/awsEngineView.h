@@ -34,10 +34,10 @@ public:
   virtual void OnDraw (csRect clip);
 
   /// Gets properties.
-  bool GetProperty (const char *name, void **parm);
+  bool GetProperty (const char *name, intptr_t *parm);
 
   /// Sets properties.
-  bool SetProperty (const char *name, void *parm);
+  bool SetProperty (const char *name, intptr_t parm);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();

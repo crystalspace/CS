@@ -37,13 +37,13 @@ CS_IMPLEMENT_STATIC_VAR (GetTextBoxBlinkingCursorSlot, awsSlot,())
 
 static awsSlot *textbox_slot = 0;
 
-static void BlinkCursor (void *, iAwsSource *source)
+static void BlinkCursor (intptr_t, iAwsSource *source)
 {
   iAwsComponent *comp = source->GetComponent ();
 
   // Setting blink actually forces an inversion of blink's property, and if the
   // textbox is the focus then it will be Invalidated as well.
-  comp->SetProperty ("Blink", 0);
+  comp->SetProperty ("Blink", (intptr_t)0);
 }
 
 awsTextBox::awsTextBox () :
@@ -97,7 +97,7 @@ bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   // Setup blink event handling
   if (textbox_sink == 0)
   {
-    textbox_sink = WindowManager ()->GetSinkMgr ()->CreateSink (0);
+    textbox_sink = WindowManager ()->GetSinkMgr ()->CreateSink ((intptr_t)0);
     textbox_sink->RegisterTrigger ("Blink", &BlinkCursor);
   }
 
@@ -152,7 +152,7 @@ bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsTextBox::GetProperty (const char *name, void **parm)
+bool awsTextBox::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -163,7 +163,7 @@ bool awsTextBox::GetProperty (const char *name, void **parm)
     if (text) st = text->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   else if (strcmp ("Disallow", name) == 0)
@@ -173,14 +173,14 @@ bool awsTextBox::GetProperty (const char *name, void **parm)
     if (disallow) st = disallow->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
 
   return false;
 }
 
-bool awsTextBox::SetProperty (const char *name, void *parm)
+bool awsTextBox::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 

@@ -240,17 +240,17 @@ bool awsScrollBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   incVal->Setup (_wmgr, incinfo.GetThisNode ());
   knob->Setup (_wmgr, knobinfo.GetThisNode ());
 
-  decVal->SetProperty ("Image", decimg);
-  incVal->SetProperty ("Image", incimg);
+  decVal->SetProperty ("Image", (intptr_t)decimg);
+  incVal->SetProperty ("Image", (intptr_t)incimg);
 
 
   csTicks t = (csTicks) 10;
-  incVal->SetProperty ("TicksPerSecond", (void *) &t);
-  decVal->SetProperty ("TicksPerSecond", (void *) &t);
-  knob->SetProperty ("TicksPerSecond", (void *) &t);
+  incVal->SetProperty ("TicksPerSecond", (intptr_t)&t);
+  decVal->SetProperty ("TicksPerSecond", (intptr_t)&t);
+  knob->SetProperty ("TicksPerSecond", (intptr_t)&t);
 
   awsSink* _sink = new awsSink (w);
-  _sink->SetParm (this);
+  _sink->SetParm ((intptr_t)this);
   sink = _sink;
 
   sink->RegisterTrigger ("DecValue", &DecClicked);
@@ -288,45 +288,45 @@ bool awsScrollBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsScrollBar::GetProperty (const char *name, void **parm)
+bool awsScrollBar::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
   if (strcmp ("Value", name) == 0)
   {
-    *parm = (void *) &value;
+    *parm = (intptr_t)&value;
     return true;
   }
   else if (strcmp ("Change", name) == 0)
   {
-    *parm = (void*) &value_delta;
+    *parm = (intptr_t)&value_delta;
     return true;
   }
   else if (strcmp ("BigChange", name) == 0)
   {
-    *parm = (void*) &value_page_delta;
+    *parm = (intptr_t)&value_page_delta;
     return true;
   }
   else if (strcmp ("Max", name) == 0)
   {
-    *parm = (void*) &max;
+    *parm = (intptr_t)&max;
     return true;
   }
   else if (strcmp ("Min", name) == 0)
   {
-    *parm = (void*) &min;
+    *parm = (intptr_t)&min;
     return true;
   }
   else if (strcmp ("PageSize", name) == 0)
   {
-    *parm = (void*) &amntvis;
+    *parm = (intptr_t)&amntvis;
     return true;
   }
  
   return false;
 }
 
-bool awsScrollBar::SetProperty (const char *name, void *parm)
+bool awsScrollBar::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) 
     return true;
@@ -403,7 +403,7 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
 
 /*  This function handles at least mouse scrolling on the bar by "grabbing" the scroll "knob".
  */
-void awsScrollBar::KnobTick (void *sk, iAwsSource *)
+void awsScrollBar::KnobTick (intptr_t sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
   /* amntvis relates to "proportional scrollbars" which are probably broken
@@ -489,7 +489,7 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
   sb->Invalidate ();
 }
 
-void awsScrollBar::TickTock (void *sk, iAwsSource *)
+void awsScrollBar::TickTock (intptr_t sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
 
@@ -523,7 +523,7 @@ void awsScrollBar::TickTock (void *sk, iAwsSource *)
   sb->Invalidate ();
 }
 
-void awsScrollBar::IncClicked (void *sk, iAwsSource *)
+void awsScrollBar::IncClicked (intptr_t sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
 
@@ -540,7 +540,7 @@ void awsScrollBar::IncClicked (void *sk, iAwsSource *)
   sb->Invalidate ();
 }
 
-void awsScrollBar::DecClicked (void *sk, iAwsSource *)
+void awsScrollBar::DecClicked (intptr_t sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
 
@@ -855,7 +855,7 @@ bool awsSliderButton::Setup (iAws *wmgr, iAwsComponentNode *settings)
 
   timer = new awsTimer (WindowManager ()->GetObjectRegistry (), this);
   awsSink* _sink = new awsSink (WindowManager());
-  _sink->SetParm (this);
+  _sink->SetParm ((intptr_t)this);
   sink = _sink;
 
   sink->RegisterTrigger ("TickTock", &TickTock);
@@ -870,20 +870,20 @@ bool awsSliderButton::Setup (iAws *wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsSliderButton::GetProperty (const char *name, void **parm)
+bool awsSliderButton::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsCmdButton::GetProperty (name, parm)) return true;
 
   if (strcmp ("TicksPerSecond", name) == 0)
   {
-    *parm = (void *) &nTicks;
+    *parm = (intptr_t)&nTicks;
     return true;
   }
 
   return false;
 }
 
-bool awsSliderButton::SetProperty (const char *name, void *parm)
+bool awsSliderButton::SetProperty (const char *name, intptr_t parm)
 {
   if (awsCmdButton::SetProperty (name, parm)) return true;
 
@@ -907,7 +907,7 @@ const char *awsSliderButton::Type ()
   return "Slider Button";
 }
 
-void awsSliderButton::TickTock (void *sk, iAwsSource *)
+void awsSliderButton::TickTock (intptr_t sk, iAwsSource *)
 {
   awsSliderButton *sb = (awsSliderButton *)sk;
   sb->Broadcast (signalClicked);

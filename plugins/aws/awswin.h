@@ -189,10 +189,10 @@ public:
   virtual bool Setup (iAws *_wmgr, iAwsComponentNode *settings);
 
   /// Gets properties for this window.
-  bool GetProperty (const char *name, void **parm);
+  bool GetProperty (const char *name, intptr_t *parm);
 
   /// Sets properties for this window.
-  bool SetProperty (const char *name, void *parm);
+  bool SetProperty (const char *name, intptr_t parm);
 
   /// Executes scriptable actions for this window.
   bool Execute (const char *action, iAwsParmList* parmlist);
@@ -215,9 +215,9 @@ public:
   virtual void SetMenu (awsMenuBar* menu);
   virtual awsMenuBar* GetMenu ();
 
-  static void OnCloseClick (void* p, iAwsSource* source);
-  static void OnZoomClick (void* p, iAwsSource* source);
-  static void OnMinClick (void* p, iAwsSource* source);
+  static void OnCloseClick (intptr_t p, iAwsSource* source);
+  static void OnZoomClick (intptr_t p, iAwsSource* source);
+  static void OnMinClick (intptr_t p, iAwsSource* source);
 
   /// Event triggered when a window is about to be raised.
   virtual void OnRaise ();

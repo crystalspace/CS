@@ -78,7 +78,7 @@ awsMultiLineEdit::~awsMultiLineEdit ()
 bool awsMultiLineEdit::Execute (const char *action, iAwsParmList* parmlist)
 {
   if (awsComponent::Execute (action, parmlist)) return true;
-  actions->Execute (action, this, parmlist);
+  actions->Execute (action, (intptr_t)this, parmlist);
   return false;
 }
 
@@ -257,16 +257,16 @@ bool awsMultiLineEdit::Setup (iAws *wmgr, iAwsComponentNode *settings)
   pm->GetString (settings, "Font", fontname);
 
   if (fontname)
-    SetProperty ("Font", fontname);
+    SetProperty ("Font", (intptr_t)fontname);
   else
-    SetProperty ("iFont", pm->GetDefaultFont ());
+    SetProperty ("iFont", (intptr_t)pm->GetDefaultFont ());
 
   contentRect = Frame ();
 
   // Setup blink event handling
   if (textbox_sink == 0)
   {
-    textbox_sink = WindowManager ()->GetSinkMgr ()->CreateSink (0);
+    textbox_sink = WindowManager ()->GetSinkMgr ()->CreateSink ((intptr_t)0);
     textbox_sink->RegisterTrigger ("Blink", &BlinkCursor);
   }
 
@@ -283,14 +283,12 @@ bool awsMultiLineEdit::Setup (iAws *wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsMultiLineEdit::GetProperty (const char *name, void **parm)
+bool awsMultiLineEdit::GetProperty (const char *name, intptr_t *parm)
 {
-  if (awsComponent::GetProperty (name, parm)) return true;
-
-  return false;
+  return awsComponent::GetProperty (name, parm);
 }
 
-bool awsMultiLineEdit::SetProperty (const char *name, void *parm)
+bool awsMultiLineEdit::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 
@@ -1127,7 +1125,7 @@ void awsMultiLineEdit::CutToClipboard ()
 }
 
 
-void awsMultiLineEdit::actInsertRow (void *owner, iAwsParmList* parmlist)
+void awsMultiLineEdit::actInsertRow (intptr_t owner, iAwsParmList* parmlist)
 {
   if (!parmlist)
     return;
@@ -1145,7 +1143,7 @@ void awsMultiLineEdit::actInsertRow (void *owner, iAwsParmList* parmlist)
   }
 }
 
-void awsMultiLineEdit::actDeleteRow (void *owner, iAwsParmList* parmlist)
+void awsMultiLineEdit::actDeleteRow (intptr_t owner, iAwsParmList* parmlist)
 {
   if (parmlist)
     return;
@@ -1160,7 +1158,7 @@ void awsMultiLineEdit::actDeleteRow (void *owner, iAwsParmList* parmlist)
   }
 }
 
-void awsMultiLineEdit::actReplaceRow (void *owner, iAwsParmList* parmlist)
+void awsMultiLineEdit::actReplaceRow (intptr_t owner, iAwsParmList* parmlist)
 {
   if (!parmlist)
     return;
@@ -1179,7 +1177,7 @@ void awsMultiLineEdit::actReplaceRow (void *owner, iAwsParmList* parmlist)
   }
 }
 
-void awsMultiLineEdit::actGetRow (void *owner, iAwsParmList* parmlist)
+void awsMultiLineEdit::actGetRow (intptr_t owner, iAwsParmList* parmlist)
 {
   if (!parmlist)
     return;
@@ -1193,14 +1191,14 @@ void awsMultiLineEdit::actGetRow (void *owner, iAwsParmList* parmlist)
   }
 }
 
-void awsMultiLineEdit::actClear (void *owner, iAwsParmList* )
+void awsMultiLineEdit::actClear (intptr_t owner, iAwsParmList* )
 {
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
   me->vText.DeleteAll ();
   me->MoveCursor (me->row, me->col); // in case we removed the last line
 }
 
-void awsMultiLineEdit::actGetRowCount (void *owner, iAwsParmList* parmlist)
+void awsMultiLineEdit::actGetRowCount (intptr_t owner, iAwsParmList* parmlist)
 {
   if (!parmlist)
     return;
@@ -1209,7 +1207,7 @@ void awsMultiLineEdit::actGetRowCount (void *owner, iAwsParmList* parmlist)
   parmlist->AddInt ("count", me->vText.Length ());
 }
 
-void awsMultiLineEdit::actGetText (void *owner, iAwsParmList* parmlist)
+void awsMultiLineEdit::actGetText (intptr_t owner, iAwsParmList* parmlist)
 {
   if (!parmlist)
     return;
@@ -1225,7 +1223,7 @@ void awsMultiLineEdit::actGetText (void *owner, iAwsParmList* parmlist)
   parmlist->AddString ("text", text);
 }
 
-void awsMultiLineEdit::actSetText (void *owner, iAwsParmList* parmlist)
+void awsMultiLineEdit::actSetText (intptr_t owner, iAwsParmList* parmlist)
 {
   if (!parmlist)
     return;
@@ -1253,9 +1251,9 @@ void awsMultiLineEdit::actSetText (void *owner, iAwsParmList* parmlist)
   }
 }
 
-void awsMultiLineEdit::BlinkCursor (void *, iAwsSource *source)
+void awsMultiLineEdit::BlinkCursor (intptr_t, iAwsSource *source)
 {
-  awsMultiLineEdit*comp = (awsMultiLineEdit*)source->GetComponent ();
+  awsMultiLineEdit *comp = (awsMultiLineEdit*)source->GetComponent ();
   comp->bBlinkOn = !comp->bBlinkOn;
 }
 

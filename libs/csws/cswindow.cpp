@@ -155,7 +155,7 @@ bool csWindow::HandleEvent (iEvent &Event)
       switch (Event.Command.Code)
       {
         case cscmdButtonDown:
-          if (Event.Command.Info != (void *)GetChild (CSWID_BUTSYSMENU))
+          if (Event.Command.Info != (intptr_t)GetChild (CSWID_BUTSYSMENU))
 	  {
 	    Select ();
             return false;
@@ -233,7 +233,7 @@ bool csWindow::Maximize ()
       parent->bound.Width () + BorderWidth,
       parent->bound.Height () + BorderHeight);
     // give a chance to parent window to limit "maximize" bounds
-    parent->SendCommand (cscmdLimitMaximize, (void *)&newbound);
+    parent->SendCommand (cscmdLimitMaximize, (intptr_t)&newbound);
     csComponent::SetRect (newbound);
     SetState (CSS_MAXIMIZED, true);
     SKIN->SetState (*this, CSS_MAXIMIZED, true);

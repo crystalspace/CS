@@ -58,7 +58,7 @@ protected:
    * A parameter that the user can store with this tab. Often its helpful
    * as an identifier for which tab was pressed or what to do about it.
    */
-  void* user_param;
+  intptr_t user_param;
 
   // trigger event if needed
   bool HandleClick (int x, int y);
@@ -67,8 +67,8 @@ public:
   virtual ~awsTab ();
 
   virtual bool Setup (iAws *_wmgr, iAwsComponentNode *settings);
-  virtual bool GetProperty (const char *name, void **parm);
-  virtual bool SetProperty (const char *name, void *parm);
+  virtual bool GetProperty (const char *name, intptr_t *parm);
+  virtual bool SetProperty (const char *name, intptr_t parm);
 
   virtual void OnDraw (csRect clip);
   bool OnMouseDown (int, int, int);
@@ -155,7 +155,7 @@ protected:
   void DoLayout ();
 
   /// Finds the index of the first tab which uses this param.
-  int FindTab (void* user_param);
+  int FindTab (intptr_t user_param);
 public:
   awsTabCtrl ();
   virtual ~awsTabCtrl ();
@@ -173,7 +173,7 @@ public:
    * from the source component by querying it's "User Param" property. If
    * this component is the first that has been added becomes the active one.
    */
-  iAwsSource* AddTab (iString* caption, void* user_param = 0);
+  iAwsSource* AddTab (iString* caption, intptr_t user_param = 0);
 
   /**
    * This will remove the tab at index. The next tab will become active
@@ -191,21 +191,21 @@ public:
    * Remove the tab that has this user param. The next tab will become
    * active (or the prev if no next exist) if this was the active one.
    */
-  void RemoveTab (void* user_param);
+  void RemoveTab (intptr_t user_param);
 
   /// Activate the <idx>-th tab.
   void ActivateTab (int idx);
   /// Activate the tab that uses this src.
   void ActivateTab (iAwsSource* src);
   /// Activate the tab that uses this user_param.
-  void ActivateTab (void* param);
+  void ActivateTab (intptr_t param);
 
   /// Returns the source for the currently active tab.
   iAwsSource* GetActiveTab ();
   /// Returns the index of the currently active tab. 
   int GetActiveTabIndex ();
   /// Returns the user_param of the currently active tab.
-  void* GetActiveTabParam (); 
+  intptr_t GetActiveTabParam (); 
 
   /// Scroll list of button left.
   void ScrollLeft ();
@@ -217,10 +217,10 @@ public:
 
   virtual void OnResized ();
 
-  static void ActivateTabCallback (void *sk, iAwsSource *source);
+  static void ActivateTabCallback (intptr_t sk, iAwsSource *source);
 
-  static void PrevClicked (void *sk, iAwsSource *source);
-  static void NextClicked (void *sk, iAwsSource *source);
+  static void PrevClicked (intptr_t sk, iAwsSource *source);
+  static void NextClicked (intptr_t sk, iAwsSource *source);
 
   static const int HandleSize;
 

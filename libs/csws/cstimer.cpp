@@ -52,7 +52,7 @@ csTimer::csTimer (csComponent *iParent, unsigned iPeriod)
   Init (iPeriod);
 }
 
-csTimer::csTimer (iEventHandler *iEventH, unsigned iPeriod, void *iInfo)
+csTimer::csTimer (iEventHandler *iEventH, unsigned iPeriod, intptr_t iInfo)
   : csComponent (0)
 {
   Init (iPeriod);
@@ -60,7 +60,7 @@ csTimer::csTimer (iEventHandler *iEventH, unsigned iPeriod, void *iInfo)
   TimerEvent.Command.Info = iInfo;
 }
 
-csTimer::csTimer (iEventQueue *iEventQ, unsigned iPeriod, void *iInfo)
+csTimer::csTimer (iEventQueue *iEventQ, unsigned iPeriod, intptr_t iInfo)
   : csComponent (0)
 {
   Init (iPeriod);
@@ -82,7 +82,7 @@ bool csTimer::HandleEvent (iEvent &Event)
     if (delta >= timeout)
     {
       if (parent)
-        parent->SendCommand (cscmdTimerPulse, this);
+        parent->SendCommand (cscmdTimerPulse, (intptr_t)this);
       else if (eventh)
         eventh->HandleEvent (TimerEvent);
       else if (evento)

@@ -60,7 +60,7 @@ bool awsLabel::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsLabel::GetProperty (const char *name, void **parm)
+bool awsLabel::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -71,14 +71,14 @@ bool awsLabel::GetProperty (const char *name, void **parm)
     if (caption) st = caption->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
 
   return false;
 }
 
-bool awsLabel::SetProperty (const char *name, void *parm)
+bool awsLabel::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 

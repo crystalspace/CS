@@ -91,7 +91,7 @@ const char* awsMenuEntry::Type ()
   return "Menu Entry";
 }
 
-bool awsMenuEntry::GetProperty (const char* name, void **parm)
+bool awsMenuEntry::GetProperty (const char* name, intptr_t *parm)
 {
   if (awsPanel::GetProperty (name, parm)) return true;
 	
@@ -102,17 +102,17 @@ bool awsMenuEntry::GetProperty (const char* name, void **parm)
     if (caption) st = caption->GetData ();
     
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   else if (strcmp (name, "PopupMenu") == 0)
   {
-    *parm = (void *)popup;
+    *parm = (intptr_t)popup;
     return true;
   }
   else if (strcmp (name, "Selected") == 0)
   {
-    *parm = (void*)selected;
+    *parm = selected;
     return true;
   }
   else if (strcmp (name, "UserParam") == 0)
@@ -122,23 +122,23 @@ bool awsMenuEntry::GetProperty (const char* name, void **parm)
   }
   else if (strcmp (name, "CloseSignal") == 0)
   {
-    *parm = (void *)signalClicked;
+    *parm = signalClicked;
     return true;
   }
   else if (strcmp (name, "SelectSignal") == 0)
   {
-    *parm = (void *)signalSelected;
+    *parm = signalSelected;
     return true;
   }
   else if (strcmp (name, "Image") == 0)
   {
-    *parm = (void*) image;
+    *parm = (intptr_t) image;
     return true;
   }
   return false;
 }
 
-bool awsMenuEntry::SetProperty (const char *name, void *parm)
+bool awsMenuEntry::SetProperty (const char *name, intptr_t parm)
 {
   if (awsPanel::SetProperty (name, parm)) return true;
 	
@@ -380,7 +380,7 @@ const char* awsMenuBarEntry::Type ()
   return "Menu Bar Entry";
 }
 
-bool awsMenuBarEntry::GetProperty (const char* name, void **parm)
+bool awsMenuBarEntry::GetProperty (const char* name, intptr_t *parm)
 {
   if (awsCmdButton::GetProperty (name, parm)) return true;
 
@@ -391,12 +391,12 @@ bool awsMenuBarEntry::GetProperty (const char* name, void **parm)
     if (caption) st = caption->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   else if (strcmp (name, "PopupMenu") == 0)
   {
-    *parm = (void *)popup;
+    *parm = (intptr_t)popup;
     return true;
   }
   else if (strcmp (name, "Selected") == 0)
@@ -406,13 +406,13 @@ bool awsMenuBarEntry::GetProperty (const char* name, void **parm)
   }
   else if (strcmp (name, "SelectSignal") == 0)
   {
-    *parm = (void *)signalClicked;
+    *parm = signalClicked;
     return true;
   }
   return false;
 }
 
-bool awsMenuBarEntry::SetProperty (const char *name, void *parm)
+bool awsMenuBarEntry::SetProperty (const char *name, intptr_t parm)
 {
   if (awsCmdButton::SetProperty (name, parm)) return true;
 
@@ -437,10 +437,10 @@ bool awsMenuBarEntry::SetProperty (const char *name, void *parm)
 bool awsMenuBarEntry::OnMouseEnter ()
 {
   iAwsComponent* cmp = 0;
-  Parent ()->GetProperty ("Selected", (void**) &cmp);
+  Parent ()->GetProperty ("Selected", (intptr_t*)&cmp);
   if (cmp)
   {
-    SetProperty ("Selected", (void**)true);
+    SetProperty ("Selected", true);
 
     // Our selection signal.
     Broadcast (signalClicked);
@@ -491,7 +491,7 @@ bool awsMenu::Setup (iAws *wmgr, iAwsComponentNode *settings)
   if (!awsControlBar::Setup (wmgr, settings)) return false;
 
   sink = new awsSink(WindowManager());
-  sink->SetParm (this);
+  sink->SetParm ((intptr_t)this);
   sink->RegisterTrigger ("Select", &OnSelect);
   sink->RegisterTrigger ("Close", &OnClose);
 
@@ -501,12 +501,12 @@ bool awsMenu::Setup (iAws *wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsMenu::GetProperty (const char* name, void** parm)
+bool awsMenu::GetProperty (const char* name, intptr_t *parm)
 {
   if (awsControlBar::GetProperty (name, parm)) return true;
   else if (strcmp (name, "Selected") == 0)
   {
-    *parm = (void*) select;
+    *parm = (intptr_t)select;
     return true;
   }
   return false;
@@ -520,7 +520,7 @@ void awsMenu::SetMenuParent (awsMenu *_parent_menu)
 void awsMenu::AddChild (iAwsComponent* comp)
 {
   int selectSignal, closeSignal;
-  if (comp->GetProperty ("SelectSignal", (void**) &selectSignal))
+  if (comp->GetProperty ("SelectSignal", (intptr_t*)&selectSignal))
   {
     slot_select.Connect (
       comp,
@@ -528,7 +528,7 @@ void awsMenu::AddChild (iAwsComponent* comp)
       sink,
       sink->GetTriggerID ("Select"));
   }
-  if (comp->GetProperty ("CloseSignal", (void**) &closeSignal))
+  if (comp->GetProperty ("CloseSignal", (intptr_t*)&closeSignal))
   {
     slot_close.Connect (comp, closeSignal, sink, sink->GetTriggerID ("Close"));
   }
@@ -542,9 +542,9 @@ iAwsSource* awsMenu::AddChild (
 {
   iAwsComponent* child = GetNewDefaultEntry ();
   // XXX: Memory leak here, should delete the string later.
-  child->SetProperty ("Caption", csStrNew(caption));
-  child->SetProperty ("Image", image);
-  child->SetProperty ("PopupMenu", popup);
+  child->SetProperty ("Caption", (intptr_t)csStrNew(caption));
+  child->SetProperty ("Image", (intptr_t)image);
+  child->SetProperty ("PopupMenu", (intptr_t)popup);
 
   // Create will link the component to us.
   child->Create (WindowManager (), this, 0);
@@ -555,7 +555,7 @@ iAwsSource* awsMenu::AddChild (
 void awsMenu::RemoveChild (iAwsComponent* comp)
 {
   int selectSignal, closeSignal;
-  if (comp->GetProperty ("SelectionSignal", (void**) &selectSignal))
+  if (comp->GetProperty ("SelectionSignal", (intptr_t*)&selectSignal))
   {
     slot_select.Disconnect (
       comp,
@@ -563,7 +563,7 @@ void awsMenu::RemoveChild (iAwsComponent* comp)
       sink,
       sink->GetTriggerID ("Select"));
   }
-  if (comp->GetProperty ("CloseSignal", (void**) &closeSignal))
+  if (comp->GetProperty ("CloseSignal", (intptr_t*)&closeSignal))
   {
     slot_close.Disconnect (comp,
       closeSignal,
@@ -578,7 +578,8 @@ void awsMenu::RemoveChild (const char* caption)
   for (iAwsComponent* cmp = GetTopChild (); cmp; cmp = cmp->ComponentBelow ())
   {
     iString* temp_caption;
-    if (!cmp->GetProperty ("Caption", (void**)&temp_caption)) continue;
+    if (!cmp->GetProperty ("Caption", (intptr_t*)&temp_caption))
+      continue;
     if (!caption)
     {
       if (!temp_caption)
@@ -709,22 +710,22 @@ void awsMenu::Select (iAwsComponent* child)
 
   // First we deactivate the old active child.
   if (select)
-    select->SetProperty ("Selected", (void*)false);
+    select->SetProperty ("Selected", (intptr_t)false);
 
   select = child;
 
   if (select)
-    select->SetProperty ("Selected", (void*)true);
+    select->SetProperty ("Selected", (intptr_t)true);
 
   StartPopupChange ();
 }
 
-void awsMenu::OnSelect (void* p, iAwsSource* src)
+void awsMenu::OnSelect (intptr_t p, iAwsSource* src)
 {
   awsMenu* m = (awsMenu*)p;
   iAwsComponent* menu_entry = src->GetComponent ();
   bool selected = false;
-  menu_entry->GetProperty("Selected", (void**) &selected);
+  menu_entry->GetProperty("Selected", (intptr_t*)&selected);
   // An inactive entry is telling us its inactive.
   if (!selected && menu_entry != m->select) return;
 
@@ -734,7 +735,7 @@ void awsMenu::OnSelect (void* p, iAwsSource* src)
     m->Select (0);
 }
 
-void awsMenu::OnClose (void* p, iAwsSource* src)
+void awsMenu::OnClose (intptr_t p, iAwsSource* src)
 {
   awsMenu* m = (awsMenu*)p;
   m->HideAllPopups ();
@@ -770,7 +771,7 @@ void awsMenu::SwitchPopups ()
 
   // Get the new popup if any.
   if (select)
-    select->GetProperty ("PopupMenu", (void**) &child_menu);
+    select->GetProperty ("PopupMenu", (intptr_t*)&child_menu);
 
   // Display the new popup if necessary.
   if (child_menu)
@@ -842,7 +843,7 @@ bool awsMenuBar::Create (
 
   if (Parent ())
   {
-    if (!Parent ()->SetProperty ("Menu", this))
+    if (!Parent ()->SetProperty ("Menu", (intptr_t)this))
     {
       Parent ()->AddChild (this);
       
@@ -913,7 +914,7 @@ bool awsPopupMenu::Create (
   if (!Setup (wmgr, settings)) return false;
 
   if (parent)
-    return parent->SetProperty ("PopupMenu", this);
+    return parent->SetProperty ("PopupMenu", (intptr_t)this);
   else
   {
     // Link into the current hierarchy, at the top.
@@ -971,7 +972,7 @@ void awsPopupMenu::HideAllPopups ()
     Hide ();
 }
 
-void awsPopupMenu::OnTimer (void* param, iAwsSource* src)
+void awsPopupMenu::OnTimer (intptr_t param, iAwsSource* src)
 {
   awsPopupMenu* pm = (awsPopupMenu*)param;
   pm->SwitchPopups ();

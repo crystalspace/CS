@@ -36,34 +36,34 @@ private:
   iAws *wmgr;
 
   /// Hides the source component.
-  static void Hide (void *sink, iAwsSource *source);
+  static void Hide (intptr_t sink, iAwsSource *source);
 
   /// Shows the source component.
-  static void Show (void *sink, iAwsSource *source);
+  static void Show (intptr_t sink, iAwsSource *source);
 
   /// Hides the window that the source component belongs to.
-  static void HideWindow (void *sink, iAwsSource *source);
+  static void HideWindow (intptr_t sink, iAwsSource *source);
 
   /// Maximizes the window that the source component belongs to.
-  static void MaximizeWindow (void* sink, iAwsSource *source);
+  static void MaximizeWindow (intptr_t sink, iAwsSource *source);
 
   /// UnMaximizes the window that the source component belongs to.
-  static void UnMaximizeWindow (void* sink, iAwsSource *source);
+  static void UnMaximizeWindow (intptr_t sink, iAwsSource *source);
 
   /// Invalidates the source component.
-  static void Invalidate (void *sink, iAwsSource *source);
+  static void Invalidate (intptr_t sink, iAwsSource *source);
 
   /// Slides a window down and out.
-  static void WindowSlideOutDown (void *sink, iAwsSource *source);
+  static void WindowSlideOutDown (intptr_t sink, iAwsSource *source);
 
   /// Slides a window up and out.
-  static void WindowSlideOutUp (void *sink, iAwsSource *source);
+  static void WindowSlideOutUp (intptr_t sink, iAwsSource *source);
 
   /// Slides a window left and out.
-  static void WindowSlideOutLeft (void *sink, iAwsSource *source);
+  static void WindowSlideOutLeft (intptr_t sink, iAwsSource *source);
   
   /// Slides a window right and out.
-  static void WindowSlideOutRight (void *sink, iAwsSource *source);
+  static void WindowSlideOutRight (intptr_t sink, iAwsSource *source);
 public:
   awsStandardSink (iAws *_wmgr);
   virtual ~awsStandardSink ();

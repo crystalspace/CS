@@ -118,28 +118,28 @@ public:
   };
 
   /// Trigger called when inc button is clicked.
-  static void IncClicked (void *sk, iAwsSource *source);
+  static void IncClicked (intptr_t sk, iAwsSource *source);
 
   /// Trigger called when dec button is clicked.
-  static void DecClicked (void *sk, iAwsSource *source);
+  static void DecClicked (intptr_t sk, iAwsSource *source);
 
-  static void TickTock (void *sk, iAwsSource *source);
-  static void KnobTick (void *sk, iAwsSource *source);
+  static void TickTock (intptr_t sk, iAwsSource *source);
+  static void KnobTick (intptr_t sk, iAwsSource *source);
 
   /// Trigger called when area above/left of knob button is clicked.
-  static void DecPageClicked (void *sk, iAwsSource *source);
+  static void DecPageClicked (intptr_t sk, iAwsSource *source);
 
   /// Trigger called when area below/right of knob button is clicked.
-  static void IncPageClicked (void *sk, iAwsSource *source);
+  static void IncPageClicked (intptr_t sk, iAwsSource *source);
 
   /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Gets properties.
-  bool GetProperty (const char *name, void **parm);
+  bool GetProperty (const char *name, intptr_t *parm);
 
   /// Sets properties.
-  bool SetProperty (const char *name, void *parm);
+  bool SetProperty (const char *name, intptr_t parm);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();
@@ -212,7 +212,7 @@ protected:
   iAwsSink *sink;
   iAwsSlot *tick_slot;
 
-  static void TickTock (void *sk, iAwsSource *);
+  static void TickTock (intptr_t sk, iAwsSource *);
 public:
 
   awsSliderButton ();
@@ -222,10 +222,10 @@ public:
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Get properties.
-  bool GetProperty (const char *name, void **parm);
+  bool GetProperty (const char *name, intptr_t *parm);
 
   /// Set properties.
-  bool SetProperty (const char *name, void *parm);
+  bool SetProperty (const char *name, intptr_t parm);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();

@@ -103,7 +103,7 @@ protected:
   bool GetMarked (int theRow, int &from, int &to);
   void MoveCursor (int theRow, int theCol);
   void InsertChar (utf32_char c);
-  static void BlinkCursor (void *, iAwsSource *source);
+  static void BlinkCursor (intptr_t, iAwsSource *source);
 
   void SetDefaultHandler ();
   bool SetHandler (const char *action,  const char *event);
@@ -128,14 +128,14 @@ protected:
   void PasteClipboard ();
   void CutToClipboard ();
 
-  static void actInsertRow (void *owner, iAwsParmList* parmlist);
-  static void actDeleteRow (void *owner, iAwsParmList* parmlist);
-  static void actReplaceRow (void *owner, iAwsParmList* parmlist);
-  static void actGetRow (void *owner, iAwsParmList* parmlist);
-  static void actGetRowCount (void *owner, iAwsParmList* parmlist);
-  static void actGetText (void *owner, iAwsParmList* parmlist);
-  static void actSetText (void *owner, iAwsParmList* parmlist);
-  static void actClear (void *owner, iAwsParmList* parmlist);
+  static void actInsertRow (intptr_t owner, iAwsParmList* parmlist);
+  static void actDeleteRow (intptr_t owner, iAwsParmList* parmlist);
+  static void actReplaceRow (intptr_t owner, iAwsParmList* parmlist);
+  static void actGetRow (intptr_t owner, iAwsParmList* parmlist);
+  static void actGetRowCount (intptr_t owner, iAwsParmList* parmlist);
+  static void actGetText (intptr_t owner, iAwsParmList* parmlist);
+  static void actSetText (intptr_t owner, iAwsParmList* parmlist);
+  static void actClear (intptr_t owner, iAwsParmList* parmlist);
 
 public:
   /// Mark constants.
@@ -184,10 +184,10 @@ public:
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Get properties.
-  bool GetProperty (const char *name, void **parm);
+  bool GetProperty (const char *name, intptr_t *parm);
 
   /// Set properties.
-  bool SetProperty (const char *name, void *parm);
+  bool SetProperty (const char *name, intptr_t parm);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();

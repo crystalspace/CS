@@ -26,7 +26,7 @@ awsActionDispatcher::awsActionDispatcher(iAws* a) : strset(a->GetStringTable())
 }
 
 void awsActionDispatcher::Register (const char *name,
-  void (Action) (void *owner, iAwsParmList* parmlist))
+  void (Action) (intptr_t owner, iAwsParmList* parmlist))
 {
   awsActionMap *map = new awsActionMap ();
 
@@ -38,7 +38,7 @@ void awsActionDispatcher::Register (const char *name,
 
 void awsActionDispatcher::Execute (
   const char *action,
-  void *owner,
+  intptr_t owner,
   iAwsParmList* parmlist)
 {
   unsigned long name = strset->Request(action);

@@ -71,10 +71,21 @@ public:
   virtual iAwsSink *FindSink (const char *name);
 
   /**
-   * Create a new embeddable sink, with parm as the void * passed
+   * Create a new embeddable sink, with parm as the intptr_t passed
    * into the triggers.
    */
-  virtual iAwsSink *CreateSink (void *parm);
+  virtual iAwsSink *CreateSink (intptr_t parm);
+
+#ifndef AWS_VOIDP_IS_ERROR
+  /**
+   * Create a new embeddable sink, with parm as the void* passed into the
+   * triggers.
+   * \deprecated For proper 64-bit platform support, use the intptr_t version
+   *   of CreateSink().
+   */
+  virtual iAwsSink *CreateSink(void *parm)
+  { return CreateSink((intptr_t)parm); }
+#endif
 
   /// Create a new embeddable slot.
   virtual iAwsSlot *CreateSlot ();
@@ -90,9 +101,9 @@ private:
   struct TriggerMap
   {
     unsigned long name;
-    void (*trigger) (void *, iAwsSource *);
+    void (*trigger) (intptr_t, iAwsSource *);
 
-    TriggerMap (unsigned long n, void (*t) (void *, iAwsSource *))
+    TriggerMap (unsigned long n, void (*t) (intptr_t, iAwsSource *))
       : name(n), trigger(t) { };
   };
 
@@ -100,7 +111,7 @@ private:
   csPDelArray<TriggerMap> triggers;
 
   /// Parameter to pass to triggers.
-  void *parm;
+  intptr_t parm;
 
   /// Last error code.
   unsigned int sink_err;
@@ -117,9 +128,9 @@ public:
   awsSink (iStringSet*);
   virtual ~awsSink ();
 
-  void* GetParm () { return parm; }
+  intptr_t GetParm () { return parm; }
   /// P is the parm that is passed to triggers.
-  void SetParm (void* p) { parm = p; }
+  void SetParm (intptr_t p) { parm = p; }
 
   /// Maps a trigger name to a trigger id.
   virtual unsigned long GetTriggerID (const char *name);
@@ -128,9 +139,19 @@ public:
   virtual void HandleTrigger (int trigger, iAwsSource *source);
 
   /// A sink should call this to register trigger events.
-  virtual void RegisterTrigger (
-    const char *name,
-    void (*Trigger) (void *, iAwsSource *));
+  virtual void RegisterTrigger (const char *name,
+    void (*Trigger) (intptr_t, iAwsSource *));
+
+#ifndef AWS_VOIDP_IS_ERROR
+  /**
+   * A sink should call this to register trigger events
+   * \deprecated For proper 64-bit platform support, use the intptr_t version
+   *   of RegisterTrigger().
+   */
+  virtual void RegisterTrigger(const char *name,
+  	void (*Trigger)(void *, iAwsSource *))
+  { RegisterTrigger(name, (void(*)(intptr_t,iAwsSource*))Trigger); }
+#endif
 
   /// Gets the last error code.
   virtual unsigned int GetError () { return sink_err; }

@@ -203,7 +203,7 @@ bool csInputLine::HandleEvent (iEvent &Event)
       switch (Event.Command.Code)
       {
         case cscmdTimerPulse:
-          if ((Event.Command.Info == timer) && GetState (CSS_FOCUSED))
+          if ((Event.Command.Info == (intptr_t)timer) && GetState(CSS_FOCUSED))
           {
             cursorvis = !cursorvis;
             Invalidate (cursorrect);

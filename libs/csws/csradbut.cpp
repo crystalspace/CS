@@ -67,7 +67,7 @@ void csRadioButton::SetRadioButtonState (bool iNewState)
       RadioButtonState = iNewState;
       DeselectNeighbours ();
       if (parent)
-        parent->SendCommand (cscmdRadioButtonSelected, (void *)this);
+        parent->SendCommand (cscmdRadioButtonSelected, (intptr_t)this);
       break;
   } /* endswitch */
 }
@@ -89,7 +89,7 @@ bool csRadioButton::HandleEvent (iEvent &Event)
           SetRadioButtonState ((bool)Event.Command.Info);
           return true;
         case cscmdRadioButtonQuery:
-          Event.Command.Info = (void *)RadioButtonState;
+          Event.Command.Info = (intptr_t)RadioButtonState;
           return true;
       } /* endswitch */
       break;

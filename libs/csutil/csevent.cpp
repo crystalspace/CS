@@ -100,7 +100,7 @@ csEvent::csEvent (csTicks iTime, int eType, int jn, int jx, int jy,
   count = 0;
 }
 
-csEvent::csEvent (csTicks iTime, int eType, int cCode, void *cInfo) :
+csEvent::csEvent (csTicks iTime, int eType, int cCode, intptr_t cInfo) :
   attributes (53)
 {
   SCF_CONSTRUCT_IBASE (0);

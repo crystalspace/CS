@@ -163,7 +163,7 @@ protected:
   /// Adjust focused control by switching back or forth if it is disabled
   void AdjustFocused (bool forward);
   /// Used by SuggestSize
-  static bool do_topleft (csComponent *comp, void *param);
+  static bool do_topleft (csComponent *comp, intptr_t param);
   /// Place all dialog items in correspondence to GridX, GridY and SnapSizeToGrid
   bool PlaceItems ();
 };

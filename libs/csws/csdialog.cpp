@@ -39,7 +39,7 @@ csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
   GridX = GridY = -1;
   SnapSizeToGrid = false;
   if (parent)
-    parent->SendCommand (cscmdWindowSetClient, (void *)this);
+    parent->SendCommand (cscmdWindowSetClient, (intptr_t)this);
 
   // If our parent is a dialog as well, mark ourselves as transparent
   // to avoid untiled textures as backgrounds.
@@ -121,7 +121,7 @@ bool csDialog::HandleEvent (iEvent &Event)
 	      CSMASK_ALLSHIFTS) == 0)
 	    {
 	      csComponent *def = GetDefault ();
-	      if (def->SendCommand (cscmdActivate, 0) != def)
+	      if (def->SendCommand (cscmdActivate, 0) != (intptr_t)def)
 		if (def != focused)
 		  focused->SendCommand (cscmdActivate, 0);
 	      return true;
@@ -204,7 +204,7 @@ bool csDialog::SetRect (int xmin, int ymin, int xmax, int ymax)
   return false;
 }
 
-static bool do_checksize (csComponent *comp, void *param)
+static bool do_checksize (csComponent *comp, intptr_t param)
 {
   csRect *r = (csRect *)param;
   if (comp->bound.xmin < r->xmin)
@@ -218,7 +218,7 @@ static bool do_checksize (csComponent *comp, void *param)
   return false;
 }
 
-bool csDialog::do_topleft (csComponent *comp, void *param)
+bool csDialog::do_topleft (csComponent *comp, intptr_t param)
 {
   csDialog *self = (csDialog *)param;
   comp->SetPos (self->BorderWidth + self->GridX,
@@ -237,9 +237,9 @@ void csDialog::SuggestSize (int &w, int &h)
 
   /// If we never auto-placed the items, place them at top-left corner
   if ((GridX >= 0) && (GridY >= 0) && !first)
-    ForEach (do_topleft, this);
+    ForEach (do_topleft, (intptr_t)this);
   csRect rect (999999, 999999, 0, 0);
-  ForEach (do_checksize, &rect);
+  ForEach (do_checksize, (intptr_t)&rect);
   if (rect.xmin == 999999)
     rect.xmin = BorderWidth;
   if (rect.ymin == 999999)

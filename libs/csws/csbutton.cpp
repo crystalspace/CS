@@ -189,7 +189,7 @@ bool csButton::HandleEvent (iEvent &Event)
       {
         case cscmdAreYouDefault:
           if (GetState (CSS_FOCUSED) || (ButtonStyle & CSBS_DEFAULT))
-            Event.Command.Info = this;
+            Event.Command.Info = (intptr_t)this;
           return true;
         case cscmdButtonDeselect:
           if ((ButtonStyle & CSBS_MULTICHOOSE)
@@ -197,7 +197,7 @@ bool csButton::HandleEvent (iEvent &Event)
             SetPressed (false);
           return true;
         case cscmdActivate:
-          Event.Command.Info = this;
+          Event.Command.Info = (intptr_t)this;
           Press ();
           return true;
         case cscmdStaticHotKeyEvent:
@@ -244,7 +244,7 @@ bool csButton::HandleEvent (iEvent &Event)
           return true;
         case 2:
           if (parent && !GetState (CSS_DISABLED))
-            parent->SendCommand (cscmdButtonRightClick, (void *)this);
+            parent->SendCommand (cscmdButtonRightClick, (intptr_t)this);
           return true;
       }
       break;
@@ -356,13 +356,13 @@ void csButton::DeselectNeighbours ()
   csComponent *c = this;
   while (((c = c->next) != this)
      && !c->GetState (CSS_GROUP))
-    c->SendCommand (cscmdButtonDeselect, this);
+    c->SendCommand (cscmdButtonDeselect, (intptr_t)this);
   if ((c != this) && (!GetState (CSS_GROUP)))
   {
     c = this;
     while ((c = c->prev) != this)
     {
-      c->SendCommand (cscmdButtonDeselect, this);
+      c->SendCommand (cscmdButtonDeselect, (intptr_t)this);
       if (c->GetState (CSS_GROUP))
         break;
     } /* endwhile */
@@ -379,7 +379,7 @@ void csButton::SetPressed (bool state)
   if (parent)
   {
     parent->SendCommand (Pressed ? cscmdButtonDown : cscmdButtonUp,
-      (void *)this);
+      (intptr_t)this);
 
     if (GetState(CSS_TRANSPARENT)) parent->Invalidate(true);
 
@@ -395,7 +395,7 @@ void csButton::Press ()
   if (ButtonStyle & CSBS_DISMISS)
     app->Dismiss (CommandCode);
   else if (parent && CommandCode)
-    parent->SendCommand (CommandCode, (void *)this);
+    parent->SendCommand (CommandCode, (intptr_t)this);
 }
 
 void csButton::SetState (int mask, bool enable)

@@ -66,7 +66,7 @@ protected:
   /// Rebuild window list
   void RebuildList ();
   /// Used in RebuildList ()
-  static bool do_addtowindowlist (csComponent *child, void *param);
+  static bool do_addtowindowlist (csComponent *child, intptr_t param);
 };
 
 /**

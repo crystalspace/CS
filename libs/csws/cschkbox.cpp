@@ -92,7 +92,7 @@ void csCheckBox::SetCheckBoxState (csCheckBoxState iNewState)
       break;
   } /* endswitch */
   if (parent)
-    parent->SendCommand (cscmdCheckBoxSwitched, (void *)this);
+    parent->SendCommand (cscmdCheckBoxSwitched, (intptr_t)this);
 }
 
 bool csCheckBox::HandleEvent (iEvent &Event)
@@ -108,7 +108,7 @@ bool csCheckBox::HandleEvent (iEvent &Event)
           SetCheckBoxState ((csCheckBoxState)(int)Event.Command.Info);
           return true;
         case cscmdCheckBoxQuery:
-          Event.Command.Info = (void *)CheckBoxState;
+          Event.Command.Info = (intptr_t)CheckBoxState;
           return true;
       } /* endswitch */
       break;

@@ -83,13 +83,13 @@ void csWindowList::SetState (int mask, bool enable)
     shouldclose = true;
 }
 
-static bool do_sendcommand (csComponent *child, void *param)
+static bool do_sendcommand (csComponent *child, intptr_t param)
 {
   ((csComponent *)(child->id))->SendCommand (*((int*)param), 0);
   return false;
 }
 
-static bool do_select (csComponent *child, void *param)
+static bool do_select (csComponent *child, intptr_t param)
 {
   (void)param;
   ((csComponent *)(child->id))->Select ();
@@ -130,15 +130,15 @@ bool csWindowList::HandleEvent (iEvent &Event)
 	{
 	  case cscmdWindowListShow:
 	    cmd = cscmdHide;
-	    list->ForEachItem (do_sendcommand, &cmd);
+	    list->ForEachItem (do_sendcommand, (intptr_t)&cmd);
 	    return true;
 	  case cscmdWindowListMaximize:
 	    cmd = cscmdMaximize;
-	    list->ForEachItem (do_sendcommand, &cmd);
+	    list->ForEachItem (do_sendcommand, (intptr_t)&cmd);
 	    return true;
 	  case cscmdWindowListClose:
 	    cmd = cscmdClose;
-	    list->ForEachItem (do_sendcommand, &cmd);
+	    list->ForEachItem (do_sendcommand, (intptr_t)&cmd);
 	    return true;
 	  case cscmdListBoxItemDoubleClicked:
 	    list->ForEachItem (do_select);
@@ -151,7 +151,7 @@ bool csWindowList::HandleEvent (iEvent &Event)
   return csWindow::HandleEvent (Event);
 }
 
-bool csWindowList::do_addtowindowlist (csComponent *child, void *param)
+bool csWindowList::do_addtowindowlist (csComponent *child, intptr_t param)
 {
   csWindowList *windowlist = (csWindowList *)param;
   if (windowlist != child)
@@ -167,7 +167,7 @@ bool csWindowList::do_addtowindowlist (csComponent *child, void *param)
 void csWindowList::RebuildList ()
 {
   list->SendCommand (cscmdListBoxClear, 0);
-  app->ForEach (do_addtowindowlist, (void *)this, true);
+  app->ForEach (do_addtowindowlist, (intptr_t)this, true);
 }
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//- Utility functions --//--

@@ -33,7 +33,7 @@ awsEngineView::~awsEngineView ()
   if (view) view->DecRef ();
 }
 
-bool awsEngineView::SetProperty (const char* name, void* parm)
+bool awsEngineView::SetProperty (const char* name, intptr_t parm)
 {
   int i = strcmp (name, "view");
   printf ("%d", i);
@@ -50,11 +50,11 @@ bool awsEngineView::SetProperty (const char* name, void* parm)
     return awsComponent::SetProperty (name, parm);
 }
 
-bool awsEngineView::GetProperty (const char* name, void** parm)
+bool awsEngineView::GetProperty (const char* name, intptr_t *parm)
 {
   if (strcmp (name, "view") == 0)
   {
-    *parm = (void*) view;
+    *parm = (intptr_t) view;
     return true;
   }
   else

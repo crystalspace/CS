@@ -235,7 +235,7 @@ bool csStatic::HandleEvent (iEvent &Event)
       switch (Event.Command.Code)
       {
         case cscmdStaticGetBitmap:
-          Event.Command.Info = Bitmap;
+          Event.Command.Info = (intptr_t)Bitmap;
           break;
         case cscmdStaticSetBitmap:
           if (style == csscsBitmap)
@@ -263,7 +263,7 @@ bool csStatic::HandleEvent (iEvent &Event)
          && link)
         {
           app->CaptureMouse (this);
-          link->SendCommand (cscmdStaticMouseEvent, (void *)&Event);
+          link->SendCommand (cscmdStaticMouseEvent, (intptr_t)&Event);
           // if link did not captured the mouse, release it
           if (app->MouseOwner == this)
             app->CaptureMouse (0);
@@ -293,7 +293,7 @@ bool csStatic::PostHandleEvent (iEvent &Event)
 	  {
 	    link->Select ();
 	    oldKO = app->CaptureKeyboard (this);
-	    link->SendCommand (cscmdStaticHotKeyEvent, (void *)&Event);
+	    link->SendCommand (cscmdStaticHotKeyEvent, (intptr_t)&Event);
 	    CheckUp ();
 	    return true;
 	  }
@@ -304,7 +304,7 @@ bool csStatic::PostHandleEvent (iEvent &Event)
 	  && IsHotKey (Event)
 	  && link)
 	  {
-	    link->SendCommand (cscmdStaticHotKeyEvent, (void *)&Event);
+	    link->SendCommand (cscmdStaticHotKeyEvent, (intptr_t)&Event);
 	    app->CaptureKeyboard (oldKO);
 	    CheckUp ();
 	    return true;

@@ -42,7 +42,7 @@ int csSkin::Compare (csSkinSliceNonAbstr* const& Item1,
 
 void csSkin::Apply (csComponent *iComp)
 {
-  iComp->SendBroadcast (cscmdSkinChanged, this);
+  iComp->SendBroadcast (cscmdSkinChanged, (intptr_t)this);
 }
 
 void csSkin::Initialize (csApp *iApp)

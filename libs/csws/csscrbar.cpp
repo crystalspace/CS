@@ -171,7 +171,7 @@ pagescroll:
           app->CaptureMouse (this);
         // Emulate timeout
         timer->Pause (SCROLL_START_INTERVAL);
-        SendCommand (cscmdTimerPulse, timer);
+        SendCommand (cscmdTimerPulse, (intptr_t)timer);
         return true;
       } else
       {
@@ -204,7 +204,7 @@ pagescroll:
           Invalidate ();
           return true;
         case cscmdButtonDown:
-          if (Event.Command.Info == scroller)
+          if (Event.Command.Info == (intptr_t)scroller)
           {
             scroller->GetMousePosition (scrollerdx, scrollerdy);
             return true;
@@ -214,7 +214,7 @@ pagescroll:
           // fallback to timer pulse
           goto pulse;
         case cscmdTimerPulse:
-          if (Event.Command.Info == timer)
+          if (Event.Command.Info == (intptr_t)timer)
           {
 pulse:      if (active_button == SCROLL_UL)
               SetValue (status.value - status.step);
@@ -243,7 +243,7 @@ pulse:      if (active_button == SCROLL_UL)
           Event.Command.Info = 0;
           return true;
         case cscmdScrollBarQueryValue:
-          Event.Command.Info = (void *)status.value;
+          Event.Command.Info = status.value;
           return true;
         case cscmdScrollBarSetValue:
           SetValue (int (Event.Command.Info));
@@ -456,7 +456,7 @@ noscrollbut:
   } /* endif */
 
   if (parent)
-    parent->SendCommand (cscmdScrollBarValueChanged, (void *)this);
+    parent->SendCommand (cscmdScrollBarValueChanged, (intptr_t)this);
 }
 
 void csScrollBar::SetState (int mask, bool enable)

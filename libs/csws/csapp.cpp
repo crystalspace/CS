@@ -771,7 +771,7 @@ void csApp::StopModal (int iCode)
   csModalInfo* mi = ModalInfo[idx];
   mi->component->SetState (CSS_MODAL, false);
   CaptureFocus (mi->old_focus);
-  app->SendCommand (cscmdStopModal, (void*)iCode);
+  app->SendCommand (cscmdStopModal, (intptr_t)iCode);
   if (mi->userdata) mi->userdata->DecRef ();
   // Don't use Pop because the event handler might already add new
   // modal components.

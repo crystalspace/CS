@@ -850,7 +850,7 @@ bool csGraphics2DGLCommon::Resize (int width, int height)
   Height = height;
   SetClipRect (0, 0, Width, Height);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
+  EventOutlet->Broadcast (cscmdContextResize, (intptr_t)this);
   return true;
 }
 

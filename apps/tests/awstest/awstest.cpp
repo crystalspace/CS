@@ -285,8 +285,8 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   aws->SetupCanvas(0, myG2D, myG3D);
 
   // next, setup sinks before loading any preferences
-  awsTestSink *s    = new awsTestSink();
-  iAwsSink    *sink =aws->GetSinkMgr()->CreateSink(s);
+  awsTestSink *s = new awsTestSink();
+  iAwsSink *sink =aws->GetSinkMgr()->CreateSink((intptr_t)s);
 
   s->SetSink(sink);
   s->SetWindowManager(aws);
@@ -313,7 +313,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   {
     iAwsComponent* engine_view = test3->FindChild("Engine View");
     if(engine_view)
-      engine_view->SetProperty("view", wview);
+      engine_view->SetProperty("view", (intptr_t)(iView*)wview);
   }
 
   if (test)  test->Show();

@@ -64,8 +64,8 @@ public:
   virtual ~awsNotebookButton ();
 
   virtual bool Setup (iAws *_wmgr, iAwsComponentNode *settings);
-  virtual bool GetProperty (const char *name, void **parm);
-  virtual bool SetProperty (const char *name, void *parm);
+  virtual bool GetProperty (const char *name, intptr_t *parm);
+  virtual bool SetProperty (const char *name, intptr_t parm);
 
   virtual void OnDraw (csRect clip);
   bool OnMouseDown (int, int, int);
@@ -259,9 +259,9 @@ public:
   /// Activate the <idx>-th tab.
   void Activate (int idx);
 
-  static void ActivateTab (void *sk, iAwsSource *source);
-  static void PrevClicked (void *sk, iAwsSource *source);
-  static void NextClicked (void *sk, iAwsSource *source);
+  static void ActivateTab (intptr_t sk, iAwsSource *source);
+  static void PrevClicked (intptr_t sk, iAwsSource *source);
+  static void NextClicked (intptr_t sk, iAwsSource *source);
 
   static const int HandleSize;
 
@@ -296,10 +296,10 @@ public:
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Get properties.
-  bool GetProperty (const char *name, void **parm);
+  bool GetProperty (const char *name, intptr_t *parm);
 
   /// Set properties.
-  bool SetProperty (const char *name, void *parm);
+  bool SetProperty (const char *name, intptr_t parm);
 
   /// Returns the named TYPE of the component, like "Notebook Page", etc.
   virtual const char *Type ();
@@ -361,10 +361,10 @@ public:
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Get properties.
-  bool GetProperty (const char *name, void **parm);
+  bool GetProperty (const char *name, intptr_t *parm);
 
   /// Set properties.
-  bool SetProperty (const char *name, void *parm);
+  bool SetProperty (const char *name, intptr_t parm);
 
   /// Executres a scriptable action. Currently supported (on top of standard
   /// ones from awsComponent) : ActivateTab.
@@ -378,9 +378,8 @@ public:
 
   virtual void AddChild (iAwsComponent *child);
 
-  static void OnActivateTab(void* param, iAwsSource* src);
-  static void OnDeactivateTab(void* param, iAwsSource* src);
-
+  static void OnActivateTab(intptr_t param, iAwsSource* src);
+  static void OnDeactivateTab(intptr_t param, iAwsSource* src);
 };
 
 class awsNotebookFactory : public awsComponentFactory

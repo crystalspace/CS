@@ -35,9 +35,9 @@ private:
   csRef<iGraphics2D> myG2D;
   csRef<iVirtualClock> vc;
 
-  static void SetPass (void* awstut, iAwsSource *source);
-  static void SetUser (void* awstut, iAwsSource *source);
-  static void Login (void* awstut, iAwsSource *source);
+  static void SetPass (intptr_t awstut, iAwsSource *source);
+  static void SetUser (intptr_t awstut, iAwsSource *source);
+  static void Login (intptr_t awstut, iAwsSource *source);
 
 public:
   AwsTutorial();

@@ -35,7 +35,7 @@ class awsPopupMenu;
  *        PopupMenu -- Optional, but if present the popup it refers to will
  *                     be shown when the menu entry is selected.
  *          Caption -- The text you would generally show.
- *        UserParam -- Just a a holder for any void* piece of data the user
+ *        UserParam -- Just a a holder for any intptr_t piece of data the user
  *                     wants to keep with this menu entry.
  *      CloseSignal -- A constant that should be the value of the close signal
  *   SelectedSignal -- A constant that should be the value of the selected
@@ -58,7 +58,7 @@ private:
   bool selected;
   bool mouse_down;
   bool mouse_over;
-  void* user_param;
+  intptr_t user_param;
 
   /// An image which will displayed to the left of the caption.
   iTextureHandle* image;
@@ -92,8 +92,8 @@ public:
   virtual bool Setup (iAws* wmgr, iAwsComponentNode* settings);
   virtual const char* Type ();
 	
-  virtual bool GetProperty (const char* name, void **parm);
-  virtual bool SetProperty (const char* name, void *parm);
+  virtual bool GetProperty (const char* name, intptr_t *parm);
+  virtual bool SetProperty (const char* name, intptr_t parm);
 
   virtual void OnDraw (csRect clip);
 
@@ -126,8 +126,8 @@ public:
   virtual bool Setup (iAws* wmgr, iAwsComponentNode* settings);
   virtual const char* Type ();
 	
-  virtual bool GetProperty (const char* name, void **parm);
-  virtual bool SetProperty (const char* name, void *parm);
+  virtual bool GetProperty (const char* name, intptr_t *parm);
+  virtual bool SetProperty (const char* name, intptr_t parm);
 
   virtual bool OnMouseEnter ();
 };
@@ -184,7 +184,7 @@ public:
   virtual ~awsMenu ();
 
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
-  virtual bool GetProperty (const char* name, void** parm);
+  virtual bool GetProperty (const char* name, intptr_t *parm);
 
   /// These can be used to add/remove any type of menu entry to the menu.
   virtual void AddChild (iAwsComponent* comp);
@@ -223,7 +223,7 @@ public:
   virtual void Select (iAwsComponent* child);
 
   /// A callback.
-  //static void OnTimer(void* param, iAwsSource* src);
+  //static void OnTimer(intptr_t param, iAwsSource* src);
 
   /// Hides the component.
   virtual void Hide ();
@@ -234,8 +234,8 @@ public:
   virtual bool OnMouseExit ();
   virtual bool OnMouseMove (int button, int x, int y);
   virtual bool OnMouseDown (int button, int x, int y);
-  static void OnSelect (void* p, iAwsSource* src);
-  static void OnClose (void* p, iAwsSource* src);
+  static void OnSelect (intptr_t p, iAwsSource* src);
+  static void OnClose (intptr_t p, iAwsSource* src);
 
   /**
    * Closes all the popup windows. Called automatically when any menu
@@ -299,9 +299,9 @@ public:
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
   virtual const char* Type ();
 
-  static void OnTimer (void* param, iAwsSource* src);
+  static void OnTimer (intptr_t param, iAwsSource* src);
   virtual void StartPopupChange ();
-  virtual void PositionPopupMenu (iAwsComponent* showing_entry, awsMenu* popup);
+  virtual void PositionPopupMenu(iAwsComponent* showing_entry, awsMenu* popup);
   virtual void HideAllPopups ();
 
   virtual void SwitchPopups ();

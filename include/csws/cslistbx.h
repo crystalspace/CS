@@ -345,8 +345,8 @@ public:
    * For each listbox item call a function with a optional arg
    * Function returns the first child on which func returnes 'true'
    */
-  csComponent *ForEachItem (bool (*func) (csComponent *child, void *param),
-    void *param = 0, bool iSelected = true);
+  csComponent *ForEachItem (bool (*func) (csComponent *child, intptr_t param),
+    intptr_t param = 0, bool iSelected = true);
 
   /// Override SetState method to disable scroll bars as well
   virtual void SetState (int mask, bool enable);

@@ -296,25 +296,25 @@ bool awsComponent::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsComponent::GetProperty (const char *name, void **parm)
+bool awsComponent::GetProperty (const char *name, intptr_t *parm)
 {
   if (strcmp ("Frame", name) == 0)
   {
     csRect rect = self->Frame ();
     csRect *r = new csRect (rect);
-    *parm = (void *)r;
+    *parm = (intptr_t)r;
     return true;
   }
   else if (strcmp ("Type", name) == 0)
   {
     iString *s = new scfString (self->Type ());
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   return false;
 }
 
-bool awsComponent::SetProperty (const char *name, void *parm)
+bool awsComponent::SetProperty (const char *name, intptr_t parm)
 {
   if (strcmp ("Frame", name) == 0)
   {

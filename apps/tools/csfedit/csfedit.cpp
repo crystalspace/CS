@@ -63,7 +63,7 @@ void csEditCharView::Reevaluate() //// number of chars in font and so on.
     status.maxsize = scrhor->bound.Width();
     status.step = 1;
     status.pagestep = content.Width()/2;
-    scrhor->SendCommand(cscmdScrollBarSet, (void*)&status);
+    scrhor->SendCommand(cscmdScrollBarSet, (intptr_t)&status);
     scrvert->SetRect(content.xmax, content.ymin-inset,
       content.xmax+scrsize, content.ymax);
     status.value = (int)scrvert->SendCommand(cscmdScrollBarQueryValue, 0);
@@ -73,7 +73,7 @@ void csEditCharView::Reevaluate() //// number of chars in font and so on.
     status.maxsize = scrvert->bound.Height();
     status.step = 1;
     status.pagestep = content.Height()/2;
-    scrvert->SendCommand(cscmdScrollBarSet, (void*)&status);
+    scrvert->SendCommand(cscmdScrollBarSet, (intptr_t)&status);
 
   }
 
@@ -370,8 +370,8 @@ bool csEditCharView::HandleEvent(iEvent &Event)
     {
       int newoff = (int) ((csScrollBar*)Event.Command.Info)->SendCommand(
         cscmdScrollBarQueryValue, 0);
-      if(Event.Command.Info == scrhor) offx = newoff;
-      if(Event.Command.Info == scrvert) offy = newoff;
+      if(Event.Command.Info == (intptr_t)scrhor) offx = newoff;
+      if(Event.Command.Info == (intptr_t)scrvert) offy = newoff;
       Invalidate();
       return true;
     }
@@ -449,7 +449,7 @@ void csEditFontView::Reevaluate() //// number of chars in font and so on.
     status.maxsize = scrhor->bound.Width();
     status.step = 1;
     status.pagestep = content.Width()/2;
-    scrhor->SendCommand(cscmdScrollBarSet, (void*)&status);
+    scrhor->SendCommand(cscmdScrollBarSet, (intptr_t)&status);
     scrvert->SetRect(content.xmax, content.ymin-inset,
       content.xmax+scrsize, content.ymax);
     status.value = (int)scrvert->SendCommand(cscmdScrollBarQueryValue, 0);
@@ -459,7 +459,7 @@ void csEditFontView::Reevaluate() //// number of chars in font and so on.
     status.maxsize = scrvert->bound.Height();
     status.step = 1;
     status.pagestep = content.Height()/2;
-    scrvert->SendCommand(cscmdScrollBarSet, (void*)&status);
+    scrvert->SendCommand(cscmdScrollBarSet, (intptr_t)&status);
 
   }
 
@@ -761,8 +761,8 @@ bool csEditFontView::HandleEvent(iEvent &Event)
     {
       int newoff = (int) ((csScrollBar*)Event.Command.Info)->SendCommand(
         cscmdScrollBarQueryValue, 0);
-      if(Event.Command.Info == scrhor) offx = newoff;
-      if(Event.Command.Info == scrvert) offy = newoff;
+      if(Event.Command.Info == (intptr_t)scrhor) offx = newoff;
+      if(Event.Command.Info == (intptr_t)scrvert) offy = newoff;
       Invalidate();
       return true;
     }

@@ -294,8 +294,8 @@ static bool process_file (const char *fname)
 
   if (opt.verbose || opt.info)
   {
-    printf ("Image size: %d x %d pixels, %d bytes\n", ifile->GetWidth (),
-      ifile->GetHeight (), csImageTools::ComputeDataSize (ifile));
+    printf ("Image size: %d x %d pixels, %lu bytes\n", ifile->GetWidth (),
+      ifile->GetHeight (), (unsigned long)csImageTools::ComputeDataSize(ifile));
     int fmt = ifile->GetFormat ();
     printf ("Image format: %s, alpha channel: %s\n",
       (fmt & CS_IMGFMT_MASK) == CS_IMGFMT_NONE ? "none" :

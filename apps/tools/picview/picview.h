@@ -49,11 +49,11 @@ private:
   void CreateGui ();
   void LoadNextImage (int idx, int step);
 
-  static void ButtonFirst(void* app, iAwsSource *source);
-  static void ButtonPrev (void* app, iAwsSource *source);
-  static void ButtonNext (void* app, iAwsSource *source);
-  static void ButtonQuit (void* app, iAwsSource *source);
-  static void ButtonScale(void* app, iAwsSource *source);
+  static void ButtonFirst(intptr_t app, iAwsSource *source);
+  static void ButtonPrev (intptr_t app, iAwsSource *source);
+  static void ButtonNext (intptr_t app, iAwsSource *source);
+  static void ButtonQuit (intptr_t app, iAwsSource *source);
+  static void ButtonScale(intptr_t app, iAwsSource *source);
 
 public:
 

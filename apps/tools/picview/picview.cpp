@@ -76,23 +76,23 @@ bool PicView::OnKeyboard(iEvent& ev)
     utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
     if (code == CSKEY_ESC || code == 'q')
     {
-      ButtonQuit(this, 0);
+      ButtonQuit((intptr_t)this, 0);
     }
     else if (code == 'f')
     {
-      ButtonFirst(this, 0);
+      ButtonFirst((intptr_t)this, 0);
     }
     else if (code == 'p')
     {
-      ButtonPrev(this, 0);
+      ButtonPrev((intptr_t)this, 0);
     }
     else if (code == 'n')
     {
-      ButtonNext(this, 0);
+      ButtonNext((intptr_t)this, 0);
     }
     else if (code == 's')
     {
-      ButtonScale(this, 0);
+      ButtonScale((intptr_t)this, 0);
     }
   }
   return false;
@@ -170,7 +170,7 @@ void PicView::CreateGui ()
 {
   aws->SetupCanvas(0, g3d->GetDriver2D (), g3d);
 
-  iAwsSink* sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  iAwsSink* sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
   sink->RegisterTrigger ("First", &ButtonFirst);
   sink->RegisterTrigger ("Prev" , &ButtonPrev );
   sink->RegisterTrigger ("Next" , &ButtonNext );
@@ -217,31 +217,31 @@ void PicView::LoadNextImage (int idx, int step)
 
 //---------------------------------------------------------------------------
 
-void PicView::ButtonFirst(void* app, iAwsSource *source)
+void PicView::ButtonFirst(intptr_t app, iAwsSource *source)
 {
   PicView* picview = (PicView*)app;
   picview->LoadNextImage (1, -1);
 }
 
-void PicView::ButtonPrev (void* app, iAwsSource *source)
+void PicView::ButtonPrev (intptr_t app, iAwsSource *source)
 {
   PicView* picview = (PicView*)app;
   picview->LoadNextImage (0, -1);
 }
 
-void PicView::ButtonNext (void* app, iAwsSource *source)
+void PicView::ButtonNext (intptr_t app, iAwsSource *source)
 {
   PicView* picview = (PicView*)app;
   picview->LoadNextImage (0, 1);
 }
 
-void PicView::ButtonQuit (void* app, iAwsSource *source)
+void PicView::ButtonQuit (intptr_t app, iAwsSource *source)
 {
   csRef<iEventQueue> q = CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
   if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
 }
 
-void PicView::ButtonScale (void* app, iAwsSource *source)
+void PicView::ButtonScale (intptr_t app, iAwsSource *source)
 {
   PicView* picview = (PicView*)app;
   picview->scale ^= true;

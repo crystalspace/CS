@@ -120,13 +120,13 @@ void csEventOutlet::Joystick (int iNumber, int iButton,
   }
 }
 
-void csEventOutlet::Broadcast (int iCode, void *iInfo)
+void csEventOutlet::Broadcast (int iCode, intptr_t iInfo)
 {
   Queue->Post (csRef<iEvent> (csPtr<iEvent>
     (new csEvent (csGetTicks (), csevBroadcast, iCode, iInfo))));
 }
 
-void csEventOutlet::ImmediateBroadcast (int iCode, void *iInfo)
+void csEventOutlet::ImmediateBroadcast (int iCode, intptr_t iInfo)
 {
   csEvent Event (csGetTicks (), csevBroadcast, iCode, iInfo);
   Queue->Dispatch (Event);

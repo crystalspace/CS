@@ -187,7 +187,7 @@ struct csEventCommandData
   /** Command code. @see csCommandEventCode for common codes. */
   uint Code;
   /** Command info. Meaning depends on the particular command. */
-  void *Info;
+  intptr_t Info;
 };
 
 /**
@@ -501,7 +501,7 @@ struct iEventOutlet : public iBase
    * has been closed (cscmdContextClose), to finish the application
    * immediately (cscmdQuit) and so on.
    */
-  virtual void Broadcast (int iCode, void *iInfo = 0) = 0;
+  virtual void Broadcast (int iCode, intptr_t iInfo = 0) = 0;
 
   /**
    * This is a special routine which is called for example when the
@@ -518,7 +518,7 @@ struct iEventOutlet : public iBase
    * chance to process any events only after it will be resumed (which
    * is kind of too late to process this kind of events).
    */
-  virtual void ImmediateBroadcast (int iCode, void *iInfo) = 0;
+  virtual void ImmediateBroadcast (int iCode, intptr_t iInfo) = 0;
 };
 
 SCF_VERSION (iEventCord, 0, 0, 3);

@@ -1026,8 +1026,8 @@ bool PartEdit::Initialize ()
   aws->SetupCanvas (NULL,g2d,g3d);
 
   // Setup sink.  
-  s  = new awsSink();
-  iAwsSink* sink =aws->GetSinkMgr()->CreateSink(s);
+  s = new awsSink();
+  iAwsSink* sink = aws->GetSinkMgr()->CreateSink((intptr_t)s);
 
   s->SetSink(sink);
   s->SetWindowManager(aws);

@@ -520,7 +520,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
       case ClientMessage:
 	if (CS_STATIC_CAST(Atom, event.xclient.data.l[0]) == wm_delete_window)
 	{
-	  EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)this);
+	  EventOutlet->Broadcast (cscmdContextClose, (intptr_t)this);
 	  EventOutlet->Broadcast (cscmdQuit);
 	}
 	break;
@@ -701,8 +701,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
         break;
       case FocusIn:
 	{
-	  EventOutlet->Broadcast (cscmdFocusChanged,
-				  (void *)(event.type == FocusIn));
+	  EventOutlet->Broadcast (cscmdFocusChanged, (event.type == FocusIn));
 #ifndef CS_DEBUG
 #ifdef CS_XWIN_GRAB_KEYBOARD
 	  if (xf86vm && !keyboard_grabbed &&
@@ -722,8 +721,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	}
       case FocusOut:
 	{
-	  EventOutlet->Broadcast (cscmdFocusChanged,
-				  (void *)(event.type == FocusIn));
+	  EventOutlet->Broadcast (cscmdFocusChanged, (event.type == FocusIn));
 #ifndef CS_DEBUG
 #ifdef CS_XWIN_GRAB_KEYBOARD
 	  if (xf86vm && keyboard_grabbed && !--keyboard_grabbed)

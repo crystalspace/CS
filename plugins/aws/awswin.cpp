@@ -158,7 +158,7 @@ bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   // register triggers with our sink
   sink = new awsSink(WindowManager()->GetStringTable());
-  sink->SetParm (this);
+  sink->SetParm ((intptr_t)this);
 
   sink->RegisterTrigger("Close", &OnCloseClick);
   sink->RegisterTrigger("Zoom", &OnZoomClick);
@@ -250,7 +250,7 @@ bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsWindow::GetProperty (const char *name, void **parm)
+bool awsWindow::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsComponent::GetProperty (name, parm))
     return true;
@@ -261,29 +261,29 @@ bool awsWindow::GetProperty (const char *name, void **parm)
     if (title)
       st = title->GetData ();
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   else if( strcmp("Active", name) == 0)
   {
-    *parm = (void*) IsActiveWindow();
+    *parm = IsActiveWindow();
     return true;
   }
   else if( strcmp("PopupMenu", name) == 0)
   {
-    *parm = popup;
+    *parm = (intptr_t)popup;
     return true;
   }
   else if( strcmp("Menu", name) == 0)
   {
-    *parm = menu;
+    *parm = (intptr_t)menu;
     return true;
   }
 
   return false;
 }
 
-bool awsWindow::SetProperty (const char *name, void *parm)
+bool awsWindow::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm))
     return true;
@@ -362,7 +362,7 @@ bool awsWindow::IsActiveWindow()
   if (Parent())
   {
     bool active = false;
-    Parent()->Window()->GetProperty("Active", (void**) &active);
+    Parent()->Window()->GetProperty("Active", (intptr_t*)&active);
     return active;
   }
   return true;
@@ -701,12 +701,12 @@ bool awsWindow::IsMoving()
   return moving_mode;
 }
 
-void awsWindow::OnCloseClick(void *p, iAwsSource *)
+void awsWindow::OnCloseClick(intptr_t p, iAwsSource *)
 {
   ((iAwsComponent*)p)->Broadcast(sWindowClosed);
 }
 
-void awsWindow::OnZoomClick(void *p, iAwsSource *)
+void awsWindow::OnZoomClick(intptr_t p, iAwsSource *)
 {
   iAwsComponent* comp = (iAwsComponent*)p;
   if(comp->IsMaximized())
@@ -715,7 +715,7 @@ void awsWindow::OnZoomClick(void *p, iAwsSource *)
     comp->Maximize();
 }
 
-void awsWindow::OnMinClick(void *p, iAwsSource *)
+void awsWindow::OnMinClick(intptr_t p, iAwsSource *)
 {
   ((iAwsComponent*)p)->Broadcast(sWindowMinimized);
 }

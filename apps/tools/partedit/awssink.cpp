@@ -1,11 +1,28 @@
-#include "cssysdef.h"
-#include "iutil/vfs.h"
-#include "csutil/scfstr.h"
-#include "csutil/csstring.h"
-#include "iengine/engine.h"
-#include "awssink.h"
+/*
+    Copyright (C) 2004 by Andrew Mann
 
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "cssysdef.h"
+#include "csutil/csstring.h"
+#include "csutil/scfstr.h"
 #include "iaws/awsparm.h"
+#include "iengine/engine.h"
+#include "iutil/vfs.h"
+#include "awssink.h"
 
 #include <stdio.h>
 
@@ -33,7 +50,7 @@
 // This macro implements a static callback function which records the pointer to the iAwsComponent that calls the trigger
 // The function named here should be attached to the creation trigger of the aws component
 #define IMPLEMENT_REGISTER_FUNCTION(function,componentvar)  \
-void awsSink::function(void *sk, iAwsSource *source) \
+void awsSink::function(intptr_t sk, iAwsSource *source) \
 { \
   asink->componentvar=source->GetComponent(); \
 } 
@@ -43,17 +60,17 @@ void awsSink::function(void *sk, iAwsSource *source) \
 // converts it to a float, stores the float in a given variable beneath the global pointer 'asink'
 // and sets a boolean variable beneath 'asink' to true to signal that a data update has occurred
 #define IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(function,floatvar,invalidate_flag,update) \
-void awsSink::function(void *sk, iAwsSource *source) \
+void awsSink::function(intptr_t sk, iAwsSource *source) \
 { \
   iString *textvalue; \
-  if (source->GetComponent()->GetProperty("Text",(void **)&textvalue) && textvalue->Length()) \
+  if (source->GetComponent()->GetProperty("Text",(intptr_t*)&textvalue) && textvalue->Length()) \
   { \
     asink->floatvar=atof(textvalue->GetData()); \
     asink->invalidate_flag=true; \
   } \
   else \
     asink->update(); \
-  FreeScrollSetComponent(true,&(asink->floatvar),source->GetComponent(),&(asink->invalidate_flag)); \
+  FreeScrollSetComponent(true,(intptr_t)&(asink->floatvar),source->GetComponent(),&(asink->invalidate_flag)); \
 }
 
 
@@ -61,17 +78,17 @@ void awsSink::function(void *sk, iAwsSource *source) \
 // converts it to a integer, stores the integer in a given variable beneath the global pointer 'asink'
 // and sets a boolean variable beneath 'asink' to true to signal that a data update has occurred
 #define IMPLEMENT_COMPONENT_TEXTBOX_TO_INT(function,intvar,invalidate_flag,update) \
-void awsSink::function(void *sk, iAwsSource *source) \
+void awsSink::function(intptr_t sk, iAwsSource *source) \
 { \
   iString *textvalue; \
-  if (source->GetComponent()->GetProperty("Text",(void **)&textvalue) && textvalue->Length()) \
+  if (source->GetComponent()->GetProperty("Text",(intptr_t*)&textvalue) && textvalue->Length()) \
   { \
     asink->intvar=strtol(textvalue->GetData(),NULL,10); \
     asink->invalidate_flag=true; \
   } \
   else \
     asink->update(); \
-  FreeScrollSetComponent(false,&(asink->intvar),source->GetComponent(),&(asink->invalidate_flag)); \
+  FreeScrollSetComponent(false,(intptr_t)&(asink->intvar),source->GetComponent(),&(asink->invalidate_flag)); \
 }
 
 
@@ -79,10 +96,10 @@ void awsSink::function(void *sk, iAwsSource *source) \
 // and stores the result (on/off) in a given boolean variable beneath the global pointer 'asink'
 // It also sets a different boolean variable beneath 'asink' to true to signal that a data update has occurred.
 #define IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(function,boolvar,invalidate_flag,update) \
-void awsSink::function(void *sk, iAwsSource *source) \
+void awsSink::function(intptr_t sk, iAwsSource *source) \
 { \
   bool *p_bvalue; \
-  if (source->GetComponent()->GetProperty("State",(void **)&p_bvalue)) \
+  if (source->GetComponent()->GetProperty("State",(intptr_t*)&p_bvalue)) \
   { \
     if (*p_bvalue) \
       asink->boolvar=true; \
@@ -101,7 +118,7 @@ void awsSink::function(void *sk, iAwsSource *source) \
 #define SET_TEXTBOX_INT(component,intval) \
     value = csPtr<iString> (new scfString()); \
     value->Format("%d",intval); \
-    component->SetProperty("Text",value);
+    component->SetProperty("Text",(intptr_t)(iString*)value);
 
 // This macro can be used to set the contents of a textbox given the iAwsComponent * of the text box
 // and a float.  value must be defined as a csRef<iString> prior to this macro being used in a
@@ -109,7 +126,7 @@ void awsSink::function(void *sk, iAwsSource *source) \
 #define SET_TEXTBOX_FLOAT(component,floatval) \
     value = csPtr<iString> (new scfString()); \
     value->Format("%f",floatval); \
-    component->SetProperty("Text",value);
+    component->SetProperty("Text",(intptr_t)(iString*)value);
 
 // This macro can be used to set the contents of a checkbox or radio button given the iAwsComponent * 
 // of the checkbox or radio button and a statement that can evaluate to true/false.  
@@ -119,10 +136,7 @@ void awsSink::function(void *sk, iAwsSource *source) \
     bvalue=true; \
   else \
     bvalue=false; \
-  component->SetProperty("State",&bvalue);
-
-
-
+  component->SetProperty("State",(intptr_t)&bvalue);
 
 
 awsSink * awsSink::asink = NULL;
@@ -159,13 +173,11 @@ void awsSink::SetSink(iAwsSink *s)
 {
   sink = s;
 
-
   if (sink) 
   {
     sink->RegisterTrigger("RegisterSectionSelection",&RegisterSectionSelection);
     sink->RegisterTrigger("FillSectionList",&FillSectionList);
     sink->RegisterTrigger("SectionListSelectionChanged",&SectionListSelectionChanged);
-
 
     sink->RegisterTrigger("RegisterGraphicSelection",&RegisterGraphicSelection);
     sink->RegisterTrigger("RegisterGraphicFileList",&RegisterGraphicFileList);
@@ -269,8 +281,6 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("RegisterIPCYTMax",&RegisterIPCYTMax);
     sink->RegisterTrigger("RegisterIPCYTWeight",&RegisterIPCYTWeight);
 
-
-
     sink->RegisterTrigger("SetIPFPositionX",&AwsSetIPFPositionX);
     sink->RegisterTrigger("SetIPFPositionY",&AwsSetIPFPositionY);
     sink->RegisterTrigger("SetIPFPositionZ",&AwsSetIPFPositionZ);
@@ -329,8 +339,7 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetIPCYTMax",&AwsSetIPCYTMax);
     sink->RegisterTrigger("SetIPCYTWeight",&AwsSetIPCYTWeight);
 
-
-    // Initial Speed Options Callbacks
+     // Initial Speed Options Callbacks
     sink->RegisterTrigger("RegisterInitialSpeed",&RegisterInitialSpeed);
     sink->RegisterTrigger("RegisterISFPX",&RegisterISFPX);
     sink->RegisterTrigger("RegisterISFPY",&RegisterISFPY);
@@ -390,8 +399,6 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("RegisterISCYTMax",&RegisterISCYTMax);
     sink->RegisterTrigger("RegisterISCYTWeight",&RegisterISCYTWeight);
 
-
-
     sink->RegisterTrigger("SetISFPositionX",&AwsSetISFPositionX);
     sink->RegisterTrigger("SetISFPositionY",&AwsSetISFPositionY);
     sink->RegisterTrigger("SetISFPositionZ",&AwsSetISFPositionZ);
@@ -449,7 +456,6 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetISCYTMin",&AwsSetISCYTMin);
     sink->RegisterTrigger("SetISCYTMax",&AwsSetISCYTMax);
     sink->RegisterTrigger("SetISCYTWeight",&AwsSetISCYTWeight);
-
 
     // Initial Acceleration Options Callbacks
     sink->RegisterTrigger("RegisterInitialAcceleration",&RegisterInitialAcceleration);
@@ -511,8 +517,6 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("RegisterIACYTMax",&RegisterIACYTMax);
     sink->RegisterTrigger("RegisterIACYTWeight",&RegisterIACYTWeight);
 
-
-
     sink->RegisterTrigger("SetIAFPositionX",&AwsSetIAFPositionX);
     sink->RegisterTrigger("SetIAFPositionY",&AwsSetIAFPositionY);
     sink->RegisterTrigger("SetIAFPositionZ",&AwsSetIAFPositionZ);
@@ -570,7 +574,6 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetIACYTMin",&AwsSetIACYTMin);
     sink->RegisterTrigger("SetIACYTMax",&AwsSetIACYTMax);
     sink->RegisterTrigger("SetIACYTWeight",&AwsSetIACYTWeight);
-
 
     // Field Speed Options Callbacks
     sink->RegisterTrigger("RegisterFieldSpeed",&RegisterFieldSpeed);
@@ -633,8 +636,6 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("RegisterFSCYTMax",&RegisterFSCYTMax);
     sink->RegisterTrigger("RegisterFSCYTWeight",&RegisterFSCYTWeight);
 
-
-
     sink->RegisterTrigger("SetFSActive",&AwsSetFSActive);
     sink->RegisterTrigger("SetFSFPositionX",&AwsSetFSFPositionX);
     sink->RegisterTrigger("SetFSFPositionY",&AwsSetFSFPositionY);
@@ -693,8 +694,6 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetFSCYTMin",&AwsSetFSCYTMin);
     sink->RegisterTrigger("SetFSCYTMax",&AwsSetFSCYTMax);
     sink->RegisterTrigger("SetFSCYTWeight",&AwsSetFSCYTWeight);
-
-
 
     // Field Acceleration Options Callbacks
     sink->RegisterTrigger("RegisterFieldAccel",&RegisterFieldAccel);
@@ -757,8 +756,6 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("RegisterFACYTMax",&RegisterFACYTMax);
     sink->RegisterTrigger("RegisterFACYTWeight",&RegisterFACYTWeight);
 
-
-
     sink->RegisterTrigger("SetFAActive",&AwsSetFAActive);
     sink->RegisterTrigger("SetFAFPositionX",&AwsSetFAFPositionX);
     sink->RegisterTrigger("SetFAFPositionY",&AwsSetFAFPositionY);
@@ -817,8 +814,6 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetFACYTMin",&AwsSetFACYTMin);
     sink->RegisterTrigger("SetFACYTMax",&AwsSetFACYTMax);
     sink->RegisterTrigger("SetFACYTWeight",&AwsSetFACYTWeight);
-
-
 
     // Attractor Options Callbacks
     sink->RegisterTrigger("RegisterAttractor",&RegisterAttractor);
@@ -881,8 +876,6 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("RegisterATCYTMax",&RegisterATCYTMax);
     sink->RegisterTrigger("RegisterATCYTWeight",&RegisterATCYTWeight);
 
-
-
     sink->RegisterTrigger("SetATForce",&AwsSetATForce);
     sink->RegisterTrigger("SetATFPositionX",&AwsSetATFPositionX);
     sink->RegisterTrigger("SetATFPositionY",&AwsSetATFPositionY);
@@ -942,7 +935,6 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetATCYTMax",&AwsSetATCYTMax);
     sink->RegisterTrigger("SetATCYTWeight",&AwsSetATCYTWeight);
 
-
     sink->RegisterTrigger("RegisterFSWindow",&RegisterFSWindow);
     sink->RegisterTrigger("RegisterFSLabel",&RegisterFSLabel);
     sink->RegisterTrigger("RegisterFSTextBox",&RegisterFSTextBox);
@@ -950,11 +942,8 @@ void awsSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("SetFSScrollBar",&AwsSetFSScrollBar);
     sink->RegisterTrigger("SetFSTextBox",&AwsSetFSTextBox);
 
-
     sink->RegisterTrigger("RegisterAgingMoments",&RegisterAgingMoments);
     sink->RegisterTrigger("RegisterLoadSaveSelection",&RegisterLoadSave);
-
-
   }
   FreeScrollData.iawscomponent_AssociatedTextBox=NULL;
 }
@@ -966,14 +955,14 @@ void awsSink::SetWindowManager(iAws *_wmgr)
 
 
 
-void awsSink::RegisterSectionSelection(void *sk, iAwsSource *source)
+void awsSink::RegisterSectionSelection(intptr_t sk, iAwsSource *source)
 {
   asink->iawscomponent_SectionSelection = source->GetComponent();
   return;
 }
 
 
-void awsSink::FillSectionList(void *sk, iAwsSource *source)
+void awsSink::FillSectionList(intptr_t sk, iAwsSource *source)
 {
   asink->iawscomponent_SectionList = source->GetComponent();
   iAwsParmList *pl=0;
@@ -1054,7 +1043,7 @@ void awsSink::FillSectionList(void *sk, iAwsSource *source)
 
 }
 
-void awsSink::SectionListSelectionChanged(void *sk, iAwsSource *source)
+void awsSink::SectionListSelectionChanged(intptr_t sk, iAwsSource *source)
 {
   int i;
   iAwsParmList *pl=0;
@@ -1181,10 +1170,6 @@ void awsSink::SectionListSelectionChanged(void *sk, iAwsSource *source)
 }
 
 
-
-
-
-
 ////
 // Graphic Selection Functions
 ////
@@ -1193,9 +1178,6 @@ void awsSink::SectionListSelectionChanged(void *sk, iAwsSource *source)
 IMPLEMENT_REGISTER_FUNCTION(RegisterGraphicSelection,GraphicSelectionData.iawscomponent_GraphicSelection)
 IMPLEMENT_REGISTER_FUNCTION(RegisterGraphicFilter,GraphicSelectionData.iawscomponent_GraphicFilter)
 IMPLEMENT_REGISTER_FUNCTION(RegisterGraphicFileList,GraphicSelectionData.iawscomponent_GraphicFileList)
-
-
-
 
 
 const char *awsSink::GetGraphicCWD()
@@ -1236,13 +1218,13 @@ void awsSink::SetGraphicFilter(const char *filterstr)
 }
 
 /// Static callback to handle graphic file working directory change.
-void awsSink::AwsSetGraphicFilter(void *sk, iAwsSource *source)
+void awsSink::AwsSetGraphicFilter(intptr_t sk, iAwsSource *source)
 {
   iString *cwd;
   csRef<iString> path=new scfString();
   csRef<iString> filter=new scfString();
 
-  if (asink->GraphicSelectionData.iawscomponent_GraphicFilter->GetProperty("Text",(void **)&cwd) && cwd->Length())
+  if (asink->GraphicSelectionData.iawscomponent_GraphicFilter->GetProperty("Text",(intptr_t*)&cwd) && cwd->Length())
   {
     size_t position=cwd->FindLast('/');
     if (position != (size_t) -1)
@@ -1250,7 +1232,7 @@ void awsSink::AwsSetGraphicFilter(void *sk, iAwsSource *source)
       // Filter contains a path
       cwd->SubString(path,0,position+1);
       cwd->SubString(filter,position+1,cwd->Length()-position-1);
-      asink->GraphicSelectionData.iawscomponent_GraphicFilter->SetProperty("Text",filter);
+      asink->GraphicSelectionData.iawscomponent_GraphicFilter->SetProperty("Text",(intptr_t)(iString*)filter);
     }
     else
     {
@@ -1282,7 +1264,7 @@ void awsSink::AwsSetGraphicFilter(void *sk, iAwsSource *source)
 }
 
   /// Static callback to handle graphic file selection change
-void awsSink::AwsGraphicFileSelected(void *sk, iAwsSource *source)
+void awsSink::AwsGraphicFileSelected(intptr_t sk, iAwsSource *source)
 {
   // Read the selected value
   iString *filename;
@@ -1337,7 +1319,7 @@ void awsSink::FillGraphicFileList()
 
     // Update the path display
     GraphicSelectionData.iawscomponent_GraphicFileList->SetProperty 
-      ("Column0Caption", 
+      ("Column0Caption", (intptr_t)
       CS_CONST_CAST(char*, GraphicSelectionData.currentdirectory->GetData()));
 
     // Clear out list
@@ -1395,7 +1377,6 @@ void awsSink::FillGraphicFileList()
 }
 
 
-
 ////
 //  Emitter State functions
 ////
@@ -1421,8 +1402,6 @@ IMPLEMENT_REGISTER_FUNCTION(RegisterBBoxMaxY,EmitterStateData.iawscomponent_BBox
 IMPLEMENT_REGISTER_FUNCTION(RegisterBBoxMaxZ,EmitterStateData.iawscomponent_BBoxMaxZ)
 
 
-
-
 IMPLEMENT_COMPONENT_TEXTBOX_TO_INT(AwsSetParticleCount,
 								   EmitterStateData.state.particle_count,EmitterStateData.settings_changed,
 								   UpdateEmitterStateDisplay)
@@ -1442,10 +1421,10 @@ IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetAlphaBlend,
  * Although this is a radio button, it only has 2 options, so we can treat it like a checkbox if we 
  * only examine the state of one of the buttons.
  */
-void awsSink::AwsSetParticleType(void *sk, iAwsSource *source)
+void awsSink::AwsSetParticleType(intptr_t sk, iAwsSource *source)
 {
   bool *p_bvalue;
-  if (asink->EmitterStateData.iawscomponent_RectParticlesRadio->GetProperty("State",(void **)&p_bvalue))
+  if (asink->EmitterStateData.iawscomponent_RectParticlesRadio->GetProperty("State",(intptr_t*)&p_bvalue))
   {
     if (*p_bvalue)
       asink->EmitterStateData.state.rectangular_particles=true;
@@ -1492,10 +1471,6 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetBBoxMaxZ,
 									 UpdateEmitterStateDisplay)
 
 
-
-
-
-
 bool awsSink::EmitterStateChanged()
 {
   return EmitterStateData.settings_changed;
@@ -1513,14 +1488,10 @@ EmitterState *awsSink::GetEmitterState()
 
 void awsSink::SetEmitterState(EmitterState *source)
 {
-
   memcpy(&(EmitterStateData.state),source,sizeof(EmitterState));
   UpdateEmitterStateDisplay();
   ClearEmitterStateChanged();
 }
-
-
-
 
 
 void awsSink::UpdateEmitterStateDisplay()
@@ -1546,8 +1517,6 @@ void awsSink::UpdateEmitterStateDisplay()
   SET_TEXTBOX_FLOAT(EmitterStateData.iawscomponent_BBoxMaxY,EmitterStateData.state.bbox_maxy);
   SET_TEXTBOX_FLOAT(EmitterStateData.iawscomponent_BBoxMaxZ,EmitterStateData.state.bbox_maxz);
 }
-
-
 
 
 ////
@@ -1801,10 +1770,6 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIPCYTWeight,
 									 UpdateInitialPositionStateDisplay)
 
 
-
-
-
-
 bool awsSink::InitialPositionStateChanged()
 {
   return InitialPositionData.settings_changed;
@@ -1895,18 +1860,7 @@ void awsSink::UpdateInitialPositionStateDisplay()
   SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTMin,InitialPositionData.state.cylindertangent_min);
   SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTMax,InitialPositionData.state.cylindertangent_max);
   SET_TEXTBOX_FLOAT(InitialPositionData.iawscomponent_IPCYTWeight,InitialPositionData.state.cylindertangent_weight);
-
-
 }
-
-
-
-
-
-
-
-
-
 
 
 ////
@@ -1970,7 +1924,6 @@ IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTEZ,InitialSpeedData.iawscomponent_ISCYT
 IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTMin,InitialSpeedData.iawscomponent_ISCYTMin)
 IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTMax,InitialSpeedData.iawscomponent_ISCYTMax)
 IMPLEMENT_REGISTER_FUNCTION(RegisterISCYTWeight,InitialSpeedData.iawscomponent_ISCYTWeight)
-
 
 
 // Fixed Position
@@ -2160,10 +2113,6 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetISCYTWeight,
 									 UpdateInitialSpeedStateDisplay)
 
 
-
-
-
-
 bool awsSink::InitialSpeedStateChanged()
 {
   return InitialSpeedData.settings_changed;
@@ -2254,17 +2203,7 @@ void awsSink::UpdateInitialSpeedStateDisplay()
   SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTMin,InitialSpeedData.state.cylindertangent_min);
   SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTMax,InitialSpeedData.state.cylindertangent_max);
   SET_TEXTBOX_FLOAT(InitialSpeedData.iawscomponent_ISCYTWeight,InitialSpeedData.state.cylindertangent_weight);
-
-
 }
-
-
-
-
-
-
-
-
 
 
 ////
@@ -2518,10 +2457,6 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetIACYTWeight,
 									 UpdateInitialAccelerationStateDisplay)
 
 
-
-
-
-
 bool awsSink::InitialAccelerationStateChanged()
 {
   return InitialAccelerationData.settings_changed;
@@ -2612,17 +2547,7 @@ void awsSink::UpdateInitialAccelerationStateDisplay()
   SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTMin,InitialAccelerationData.state.cylindertangent_min);
   SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTMax,InitialAccelerationData.state.cylindertangent_max);
   SET_TEXTBOX_FLOAT(InitialAccelerationData.iawscomponent_IACYTWeight,InitialAccelerationData.state.cylindertangent_weight);
-
-
 }
-
-
-
-
-
-
-
-
 
 
 ////
@@ -2881,10 +2806,6 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFSCYTWeight,
 									 UpdateFieldSpeedStateDisplay)
 
 
-
-
-
-
 bool awsSink::FieldSpeedStateChanged()
 {
   return FieldSpeedData.settings_changed;
@@ -2978,11 +2899,7 @@ void awsSink::UpdateFieldSpeedStateDisplay()
   SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTMin,FieldSpeedData.state.e3d_state.cylindertangent_min);
   SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTMax,FieldSpeedData.state.e3d_state.cylindertangent_max);
   SET_TEXTBOX_FLOAT(FieldSpeedData.iawscomponent_FSCYTWeight,FieldSpeedData.state.e3d_state.cylindertangent_weight);
-
-
 }
-
-
 
 
 ////
@@ -3240,10 +3157,6 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetFACYTWeight,
 									 UpdateFieldAccelStateDisplay)
 
 
-
-
-
-
 bool awsSink::FieldAccelStateChanged()
 {
   return FieldAccelerationData.settings_changed;
@@ -3340,14 +3253,6 @@ void awsSink::UpdateFieldAccelStateDisplay()
 
 
 }
-
-
-
-
-
-
-
-
 
 
 ////
@@ -3607,10 +3512,6 @@ IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(AwsSetATCYTWeight,
 									 UpdateAttractorStateDisplay)
 
 
-
-
-
-
 bool awsSink::AttractorStateChanged()
 {
   return AttractorData.settings_changed;
@@ -3703,14 +3604,7 @@ void awsSink::UpdateAttractorStateDisplay()
   SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTMin,AttractorData.state.e3d_state.cylindertangent_min);
   SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTMax,AttractorData.state.e3d_state.cylindertangent_max);
   SET_TEXTBOX_FLOAT(AttractorData.iawscomponent_ATCYTWeight,AttractorData.state.e3d_state.cylindertangent_weight);
-
-
 }
-
-
-
-
-
 
 
 IMPLEMENT_REGISTER_FUNCTION(RegisterFSWindow,FreeScrollData.iawscomponent_FSWindow)
@@ -3722,7 +3616,7 @@ IMPLEMENT_REGISTER_FUNCTION(RegisterFSScrollBar,FreeScrollData.iawscomponent_FSS
 ////
 //  "Free Scroll" test
 ////
-void awsSink::FreeScrollSetComponent(bool floatval,void *value_pointer,iAwsComponent *associated,bool *invalidate_pointer)
+void awsSink::FreeScrollSetComponent(bool floatval,intptr_t value_pointer,iAwsComponent *associated,bool *invalidate_pointer)
 {
   csRef<iString> value;
   asink->FreeScrollData.iawscomponent_AssociatedTextBox=associated;
@@ -3806,11 +3700,11 @@ void awsSink::FreeScrollSetComponent(bool floatval,void *value_pointer,iAwsCompo
 
 
     // Set range
-    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Min",&min);
-    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Max",&max);
-    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Change",&change);
-    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("BigChange",&bigchange);
-    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Value",&value_pointer);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Min",(intptr_t)&min);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Max",(intptr_t)&max);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Change",(intptr_t)&change);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("BigChange",(intptr_t)&bigchange);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Value",(intptr_t)&value_pointer);
   }
   else
   {
@@ -3843,23 +3737,23 @@ void awsSink::FreeScrollSetComponent(bool floatval,void *value_pointer,iAwsCompo
     }
     max=-min;
 
-    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Min",&min);
-    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Max",&max);
-    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Change",&change);
-    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("BigChange",&bigchange);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Min",(intptr_t)&min);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Max",(intptr_t)&max);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Change",(intptr_t)&change);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("BigChange",(intptr_t)&bigchange);
     fvalue=(float)(*((int *)(value_pointer)));
-    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Value",&fvalue);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Value",(intptr_t)&fvalue);
   }
 }
 
-void awsSink::AwsSetFSScrollBar(void *sk, iAwsSource *source)
+void awsSink::AwsSetFSScrollBar(intptr_t sk, iAwsSource *source)
 {
   csRef<iString> value;
   float *value_as_float;
   if (asink->FreeScrollData.iawscomponent_AssociatedTextBox==NULL)
     return;
 
-  if (source->GetComponent()->GetProperty("Value",(void **)&value_as_float))
+  if (source->GetComponent()->GetProperty("Value",(intptr_t*)&value_as_float))
   {
     if (asink->FreeScrollData.floatval)
     {
@@ -3878,12 +3772,9 @@ void awsSink::AwsSetFSScrollBar(void *sk, iAwsSource *source)
     *(asink->FreeScrollData.invalidate_pointer)=true;
 
   }
-
-
-
 }
 
-void awsSink::AwsSetFSTextBox(void *sk, iAwsSource *source)
+void awsSink::AwsSetFSTextBox(intptr_t sk, iAwsSource *source)
 {
   iString *textvalue;
   csRef<iString> value;
@@ -3891,7 +3782,7 @@ void awsSink::AwsSetFSTextBox(void *sk, iAwsSource *source)
   if (asink->FreeScrollData.iawscomponent_AssociatedTextBox==NULL)
     return;
 
-  if (source->GetComponent()->GetProperty("Text",(void **)&textvalue) && textvalue->Length())
+  if (source->GetComponent()->GetProperty("Text",(intptr_t*)&textvalue) && textvalue->Length())
   {
     if (asink->FreeScrollData.floatval)
     {
@@ -3910,7 +3801,7 @@ void awsSink::AwsSetFSTextBox(void *sk, iAwsSource *source)
     *(asink->FreeScrollData.invalidate_pointer)=true;
 
     // Update the scroll bar
-    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Value",&value_as_float);
+    asink->FreeScrollData.iawscomponent_FSScrollBar->SetProperty("Value",(intptr_t)&value_as_float);
   }
 }
 
@@ -3929,11 +3820,3 @@ csRef<iVFS> awsSink::GetVFS()
 {
   return vfs;
 }
-
-
-
-
-
-
-
-

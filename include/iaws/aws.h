@@ -66,6 +66,25 @@ struct iView;
 
 const bool aws_debug = false;  // set to true to turn on debugging printf()'s
 
+// Use of (void*) to store opaque data is now discouraged in order to properly
+// support 64-bit platforms. For backward compatibility with existing client
+// software, we can still provide (void*) API in addition to the new (intptr_t)
+// API. Ideally, clients should convert away from (void*) usage, but doing so
+// may be a large task, so we enable support for the deprecated API for now.
+// In order to aid clients in the conversion, we provide two controls. If
+// AWS_OBSOLETE_VOIDP is defined by the client, then all methods dealing with
+// (void*) will be removed completely from the API. If AWS_DEPRECATE_VOIDP is
+// defined, then invocations of methods dealing with (void*) will emit warnings
+// (from compilers which support deprecation warnings).
+#ifdef AWS_OBSOLETE_VOIDP
+#define AWS_VOIDP_IS_ERROR
+#endif
+#ifdef AWS_DEPRECATE_VOIDP
+#define AWS_VOIDP_IS_WARNING CS_DEPRECATED_METHOD
+#else
+#define AWS_VOIDP_IS_WARNING
+#endif
+
 /**
  * \addtogroup aws_sys_flags
  * @{ */
@@ -589,7 +608,7 @@ public:
 };
 
 
-SCF_VERSION (iAwsSinkManager, 0, 0, 3);
+SCF_VERSION (iAwsSinkManager, 0, 1, 0);
 
 /// Interface for the sink manager
 struct iAwsSinkManager : public iBase
@@ -607,17 +626,28 @@ struct iAwsSinkManager : public iBase
   virtual iAwsSink* FindSink(const char *name)=0;
 
   /**
-   * Create a new embeddable sink, with parm as the void * passed into the
+   * Create a new embeddable sink, with parm as the intptr_t passed into the
    * triggers.
    */
+  virtual iAwsSink *CreateSink(intptr_t parm)=0;
+
+#ifndef AWS_VOIDP_IS_ERROR
+  /**
+   * Create a new embeddable sink, with parm as the void* passed into the
+   * triggers.
+   * \deprecated For proper 64-bit platform support, use the intptr_t version
+   *   of CreateSink().
+   */
+  AWS_VOIDP_IS_WARNING
   virtual iAwsSink *CreateSink(void *parm)=0;
+#endif
 
   /// Create a new embeddable slot
   virtual iAwsSlot *CreateSlot ()=0;
 };
 
 
-SCF_VERSION (iAwsSink, 0, 0, 2);
+SCF_VERSION (iAwsSink, 0, 1, 0);
 
 /// Interface for sinks
 struct iAwsSink : public iBase
@@ -630,7 +660,18 @@ struct iAwsSink : public iBase
 
   /// A sink should call this to register trigger events
   virtual void RegisterTrigger(const char *name,
+  	void (*Trigger)(intptr_t, iAwsSource *))=0;
+
+#ifndef AWS_VOIDP_IS_ERROR
+  /**
+   * A sink should call this to register trigger events
+   * \deprecated For proper 64-bit platform support, use the intptr_t version
+   *   of RegisterTrigger().
+   */
+  AWS_VOIDP_IS_WARNING
+  virtual void RegisterTrigger(const char *name,
   	void (*Trigger)(void *, iAwsSource *))=0;
+#endif
 
   /**
    * Returns the last error code set.  This code is good until the next
@@ -718,7 +759,7 @@ struct iAwsLayoutManager : public iBase
   virtual void LayoutComponents () = 0;
 };
 
-SCF_VERSION (iAwsComponent, 0, 1, 4);
+SCF_VERSION (iAwsComponent, 0, 2, 0);
 
 /// Interface that is the base of ALL components.
 struct iAwsComponent : public iAwsSource
@@ -752,13 +793,35 @@ struct iAwsComponent : public iAwsSource
    * Gets a copy of the property, put it in parm.  Returns false if the
    * property does not exist.
    */
+  virtual bool GetProperty(const char* name, intptr_t *parm)=0;
+
+#ifndef AWS_VOIDP_IS_ERROR
+  /**
+   * Gets a copy of the property, put it in parm.  Returns false if the
+   * property does not exist.
+   * \deprecated For proper 64-bit platform support, use the intptr_t version
+   *   of GetProperty().
+   */
+  AWS_VOIDP_IS_WARNING
   virtual bool GetProperty(const char* name, void **parm)=0;
+#endif
 
   /**
    * Sets the property specified to whatever is in parm. Returns false if
    * there's no such property.
    */
+  virtual bool SetProperty(const char* name, intptr_t parm)=0;
+
+#ifndef AWS_VOIDP_IS_ERROR
+  /**
+   * Sets the property specified to whatever is in parm. Returns false if
+   * there's no such property.
+   * \deprecated For proper 64-bit platform support, use the intptr_t version
+   *   of SetProperty().
+   */
+  AWS_VOIDP_IS_WARNING
   virtual bool SetProperty(const char* name, void *parm)=0;
+#endif
 
   /// Executes a scriptable action
   virtual bool Execute(const char* action, iAwsParmList* parmlist = 0) = 0;

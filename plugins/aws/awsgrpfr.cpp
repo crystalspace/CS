@@ -53,7 +53,7 @@ bool awsGroupFrame::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsGroupFrame::GetProperty (const char *name, void **parm)
+bool awsGroupFrame::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsPanel::GetProperty (name, parm)) return true;
 
@@ -64,13 +64,13 @@ bool awsGroupFrame::GetProperty (const char *name, void **parm)
     if (caption) st = caption->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   return false;
 }
 
-bool awsGroupFrame::SetProperty (const char *name, void *parm)
+bool awsGroupFrame::SetProperty (const char *name, intptr_t parm)
 {
   if (awsPanel::SetProperty (name, parm)) return true;
 

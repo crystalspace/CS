@@ -50,14 +50,14 @@ void csKeyboardAccelerator::Event (int iKey, int iShifts, csEvent &iEv)
 }
 
 void csKeyboardAccelerator::Command (int iKey, int iShifts, int iCommand,
-  void *iInfo)
+  intptr_t iInfo)
 {
   csEvent ev (0, csevCommand, iCommand, iInfo);
   Event (iKey, iShifts, ev);
 }
 
 void csKeyboardAccelerator::Broadcast (int iKey, int iShifts, int iCommand,
-  void *iInfo)
+  intptr_t iInfo)
 {
   csEvent ev (0, csevBroadcast, iCommand, iInfo);
   Event (iKey, iShifts, ev);

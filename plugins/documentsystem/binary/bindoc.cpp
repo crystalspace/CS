@@ -1696,7 +1696,7 @@ uint32 csBinaryDocument::GetOutStringID (const char* str)
   CS_ASSERT (outStrStorage);
   CS_ASSERT (outStrHash);
   if (str == 0) return BD_OFFSET_INVALID;
-  uint32 val;
+  csStringID val;
   val = outStrHash->Request (str);
   if (val == csInvalidStringID)
   {

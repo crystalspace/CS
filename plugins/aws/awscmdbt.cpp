@@ -107,7 +107,7 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsCmdButton::GetProperty (const char *name, void **parm)
+bool awsCmdButton::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -118,18 +118,18 @@ bool awsCmdButton::GetProperty (const char *name, void **parm)
     if (caption) st = caption->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   else if (strcmp ("State", name) == 0)
   {
-   *parm = (void*)is_down;
+   *parm = is_down;
     return true;
   }
   return false;
 }
 
-bool awsCmdButton::SetProperty (const char *name, void *parm)
+bool awsCmdButton::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 

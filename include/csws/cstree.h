@@ -221,7 +221,7 @@ enum
 /** @} */
 
 /// The magic answer that means that the component is indeed a tree item
-#define CS_TREEITEM_MAGIC	(void *)0xdeadface
+#define CS_TREEITEM_MAGIC	(intptr_t)0xdeadface
 
 /**
  * Tree items are divided into several subtypes which will be
@@ -319,12 +319,15 @@ public:
    * Optionally you can pass an "only for opened branches" flag,
    * so that only visible branches will be handled.
    */
-  csTreeItem *ForEachItem (bool (*func) (csTreeItem *child, void *param),
-    void *param = 0, bool iOnlyOpen = false);
+  csTreeItem *ForEachItem (bool (*func) (csTreeItem *child, intptr_t param),
+    intptr_t param = 0, bool iOnlyOpen = false);
 
   /// Force a reset of button size & position
   void ResetButton ()
-  { button->SetRect (0, 0, -1, -1); parent->SendCommand (cscmdTreeItemSizeChangeNotify, this); }
+  {
+    button->SetRect (0, 0, -1, -1);
+    parent->SendCommand (cscmdTreeItemSizeChangeNotify, (intptr_t)this);
+  }
 };
 
 /**
@@ -507,8 +510,8 @@ public:
    * For each tree item call a function with a optional arg
    * Function returns the first child on which func returnes 'true'
    */
-  csTreeItem *ForEachItem (bool (*func) (csTreeItem *child, void *param),
-    void *param = 0, bool iOnlyOpen = false);
+  csTreeItem *ForEachItem (bool (*func) (csTreeItem *child, intptr_t param),
+    intptr_t param = 0, bool iOnlyOpen = false);
 
   /// Override SetState method to toggle scrollbars together with CSS_SELECTED
   virtual void SetState (int mask, bool enable);

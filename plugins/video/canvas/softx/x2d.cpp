@@ -909,7 +909,7 @@ bool csGraphics2DXLib::Resize (int width, int height)
     return false;
 //    Clear (0);
 //    XSync (dpy, false);
-  EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
+  EventOutlet->Broadcast (cscmdContextResize, (intptr_t)this);
   return true;
 }
 

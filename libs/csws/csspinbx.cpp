@@ -101,12 +101,12 @@ bool csSpinBox::HandleEvent (iEvent &Event)
       switch (Event.Command.Code)
       {
         case cscmdTimerPulse:
-          if (Event.Command.Info != SpinTimer)
+          if (Event.Command.Info != (intptr_t)SpinTimer)
             break;
           Spin ();
           return true;
         case cscmdSpinBoxQueryValue:
-          Event.Command.Info = (void *)Value;
+          Event.Command.Info = (intptr_t)Value;
           return true;
         case cscmdSpinBoxSetValue:
           SetValue ((int)Event.Command.Info);
@@ -114,7 +114,7 @@ bool csSpinBox::HandleEvent (iEvent &Event)
         case cscmdSpinBoxInsertItem:
         {
           csSpinBoxItem *i = (csSpinBoxItem *)Event.Command.Info;
-          Event.Command.Info = (void *)InsertItem (i->Value, i->Position);
+          Event.Command.Info = (intptr_t)InsertItem (i->Value, i->Position);
           return true;
         }
         case cscmdSpinBoxSetLimits:
@@ -310,7 +310,7 @@ void csSpinBox::SetValue (int iValue)
   SetCursorPos (strlen (text), 0);
   Value = iValue;
   if (parent)
-    parent->SendCommand (cscmdSpinBoxValueChanged, (void *)this);
+    parent->SendCommand (cscmdSpinBoxValueChanged, (intptr_t)this);
   Invalidate ();
 }
 

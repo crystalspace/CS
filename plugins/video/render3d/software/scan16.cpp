@@ -67,7 +67,7 @@
     }                                                                   \
     while ((_dest <= _destend)&&!((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
     {									\
-      if ((((long)_dest) & csSoftwareGraphics3DCommon::filter_bf) != 0)				\
+      if ((((int32)(intptr_t)_dest) & csSoftwareGraphics3DCommon::filter_bf) != 0) \
       {									\
         if ((uu&0xffff) < 64*256) filter_du = -1;			\
         else if ((uu&0xffff) > 192*256) filter_du = 1;			\
@@ -337,7 +337,7 @@
     }                                                                   \
     while ((_dest <= _destend)&&!((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
     {									\
-      if ((((int32)_dest) & csSoftwareGraphics3DCommon::filter_bf) != 0)				\
+      if ((((int32)(intptr_t)_dest) & csSoftwareGraphics3DCommon::filter_bf) != 0) \
       {									\
         if ((uu&0xffff) < 64*256) filter_du = -1;			\
         else if ((uu&0xffff) > 192*256) filter_du = 1;			\

@@ -76,7 +76,7 @@ bool awsNotebook::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->GetInt (settings, "Mode", bb_style);
 
   sink = new awsSink(w);
-  sink->SetParm (this);
+  sink->SetParm ((intptr_t)this);
   sink->RegisterTrigger("ActivateTab", &OnActivateTab);
   sink->RegisterTrigger("DeactivateTab", &OnDeactivateTab);
 
@@ -95,22 +95,22 @@ bool awsNotebook::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsNotebook::GetProperty (const char *name, void **parm)
+bool awsNotebook::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsPanel::GetProperty (name, parm)) return true;
 
   if (strcmp ("Location", name) == 0)
-    *parm = (void *) &bb_location;
+    *parm = (intptr_t)&bb_location;
   else
   if (strcmp ("Mode", name) == 0)
-    *parm = (void *) &bb_style;
+    *parm = (intptr_t)&bb_style;
   else
     return false;
 
   return true;
 }
 
-bool awsNotebook::SetProperty (const char *name, void *parm)
+bool awsNotebook::SetProperty (const char *name, intptr_t parm)
 {
   if (awsPanel::SetProperty (name, parm)) return true;
 
@@ -159,7 +159,7 @@ bool awsNotebook::Execute (const char* action, iAwsParmList* parmlist)
     iAwsComponent* comp = FindChild (comp_name->GetData ());
     if (!comp) return false;
 
-    tab_ctrl.ActivateTab((void*) comp);
+    tab_ctrl.ActivateTab((intptr_t)comp);
 
     return true;
   }
@@ -190,8 +190,8 @@ void awsNotebook::AddChild (iAwsComponent *child)
   awsComponent::AddChild (child);
 
   iString *str = 0;
-  child->GetProperty ("Caption", (void**)&str);
-  iAwsSource* src = tab_ctrl.AddTab (str, (void*)child);
+  child->GetProperty ("Caption", (intptr_t*)&str);
+  iAwsSource* src = tab_ctrl.AddTab (str, (intptr_t)child);
 
   // hook up the source so we receive the signals
   slot.Connect(src, awsTab::signalActivateTab,
@@ -200,18 +200,18 @@ void awsNotebook::AddChild (iAwsComponent *child)
     sink, sink->GetTriggerID("DeactivateTab"));
 }
 
-void awsNotebook::OnActivateTab(void* param, iAwsSource* src)
+void awsNotebook::OnActivateTab(intptr_t param, iAwsSource* src)
 {
   iAwsComponent* child;
-  src->GetComponent()->GetProperty("User Param", (void**)&child);
+  src->GetComponent()->GetProperty("User Param", (intptr_t*)&child);
   child->Show();
   ((awsNotebook*)param)->Invalidate();
 }
 
-void awsNotebook::OnDeactivateTab(void* param, iAwsSource* src)
+void awsNotebook::OnDeactivateTab(intptr_t param, iAwsSource* src)
 {
   iAwsComponent* child;
-  src->GetComponent()->GetProperty("User Param", (void**)&child);
+  src->GetComponent()->GetProperty("User Param", (intptr_t*)&child);
   child->Hide();
   ((awsNotebook*)param)->Invalidate();
 }
@@ -272,7 +272,7 @@ bool awsNotebookPage::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsNotebookPage::GetProperty (const char *name, void **parm)
+bool awsNotebookPage::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -283,7 +283,7 @@ bool awsNotebookPage::GetProperty (const char *name, void **parm)
     if (caption) st = caption->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   else
@@ -294,7 +294,7 @@ bool awsNotebookPage::GetProperty (const char *name, void **parm)
     if (icon) st = icon->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   else
@@ -308,7 +308,7 @@ bool awsNotebookPage::GetProperty (const char *name, void **parm)
   return false;
 }
 
-bool awsNotebookPage::SetProperty (const char *name, void *parm)
+bool awsNotebookPage::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
   
@@ -543,7 +543,7 @@ void awsNotebookButton::OnDraw (csRect)
   }
 }
 
-bool awsNotebookButton::GetProperty (const char *name, void **parm)
+bool awsNotebookButton::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -554,13 +554,13 @@ bool awsNotebookButton::GetProperty (const char *name, void **parm)
     if (caption) st = caption->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   return false;
 }
 
-bool awsNotebookButton::SetProperty (const char *name, void *parm)
+bool awsNotebookButton::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
   
@@ -747,11 +747,11 @@ bool awsNotebookButtonBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   prev->Setup (_wmgr, previnfo.GetThisNode ());
   next->Setup (_wmgr, nextinfo.GetThisNode ());
 
-  prev->SetProperty ("Image", previmg);
-  next->SetProperty ("Image", nextimg);
+  prev->SetProperty ("Image", (intptr_t)previmg);
+  next->SetProperty ("Image", (intptr_t)nextimg);
 
   awsSink* _sink = new awsSink (w);
-  _sink->SetParm (this);
+  _sink->SetParm ((intptr_t)this);
   sink = _sink;
 
   sink->RegisterTrigger ("Prev", &PrevClicked);
@@ -880,7 +880,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   // determine caption of tab
   iString *str = 0;
 
-  comp->GetProperty ("Caption", (void**)&str);
+  comp->GetProperty ("Caption", (intptr_t*)&str);
   if (!str || !str->GetData ())
   {
     if (str) str->DecRef ();
@@ -900,17 +900,17 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
     "Frame", csRect (0, 0, Frame ().Width (), Frame ().Height ()));
 
   iString *icon = 0;
-  if (comp->GetProperty ("Icon", (void**)&icon) && icon && icon->Length ())
+  if (comp->GetProperty ("Icon", (intptr_t*)&icon) && icon && icon->Length ())
   {
     btninfo.AddStringKey ("Icon", icon ? icon->GetData() : "");
     int *iconalign;
-    if (comp->GetProperty ("IconAlign", (void**)&iconalign))
+    if (comp->GetProperty ("IconAlign", (intptr_t*)&iconalign))
       btninfo.AddIntKey ("IconAlign", *iconalign);
   }
 
   btn->SetParent (this);
   btn->Setup (WindowManager (), btninfo.GetThisNode ());
-  btn->SetProperty ("Caption", str);
+  btn->SetProperty ("Caption", (intptr_t)str);
 
   // resize button
   csRect r(btn->getPreferredSize ());
@@ -1100,7 +1100,7 @@ void awsNotebookButtonBar::Activate (int idx)
   active = idx;
 }
 
-void awsNotebookButtonBar::ActivateTab (void *sk, iAwsSource *source)
+void awsNotebookButtonBar::ActivateTab (intptr_t sk, iAwsSource *source)
 {
   awsNotebookButtonBar *bb = (awsNotebookButtonBar *)sk;
   int idx = bb->vTabs.FindKey (
@@ -1113,13 +1113,13 @@ void awsNotebookButtonBar::ActivateTab (void *sk, iAwsSource *source)
   }
 }
 
-void awsNotebookButtonBar::PrevClicked (void *sk, iAwsSource *)
+void awsNotebookButtonBar::PrevClicked (intptr_t sk, iAwsSource *)
 {
   awsNotebookButtonBar *bb = (awsNotebookButtonBar *)sk;
   bb->ScrollRight ();
 }
 
-void awsNotebookButtonBar::NextClicked (void *sk, iAwsSource *)
+void awsNotebookButtonBar::NextClicked (intptr_t sk, iAwsSource *)
 {
   awsNotebookButtonBar *bb = (awsNotebookButtonBar *)sk;
   bb->ScrollLeft ();

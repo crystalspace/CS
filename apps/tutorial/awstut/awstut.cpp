@@ -59,21 +59,21 @@ static bool AwsEventHandler (iEvent& ev)
   }
 }
 
-void AwsTutorial::SetPass (void* awst, iAwsSource *)
+void AwsTutorial::SetPass (intptr_t awst, iAwsSource *)
 {
   AwsTutorial* tut = (AwsTutorial*)awst;
   (void)tut; // @@@ TODO
   printf ("SetPass\n"); fflush (stdout);
 }
 
-void AwsTutorial::SetUser (void* awst, iAwsSource *)
+void AwsTutorial::SetUser (intptr_t awst, iAwsSource *)
 {
   AwsTutorial* tut = (AwsTutorial*)awst;
   (void)tut; // @@@ TODO
   printf ("SetUser\n"); fflush (stdout);
 }
 
-void AwsTutorial::Login (void* awst, iAwsSource *)
+void AwsTutorial::Login (intptr_t awst, iAwsSource *)
 {
   AwsTutorial* tut = (AwsTutorial*)awst;
   (void)tut; // @@@ TODO
@@ -146,7 +146,7 @@ bool AwsTutorial::Initialize (int argc, const char* const argv[])
   aws->SetupCanvas(0, myG2D, myG3D);
 
   // Setup sink.
-  iAwsSink* sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  iAwsSink* sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
   sink->RegisterTrigger ("SetUserName", &SetUser);
   sink->RegisterTrigger ("SetPassword", &SetPass);
   sink->RegisterTrigger ("Login", &Login);

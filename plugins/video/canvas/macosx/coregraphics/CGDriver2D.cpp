@@ -173,7 +173,7 @@ bool CGDriver2D::Resize(int w, int h)
         // Should CGDriver2D inherit from iEventPlug and get it's own outlet?
         csRef<iEventQueue> queue = CS_QUERY_REGISTRY(object_reg, iEventQueue);
         if (queue.IsValid())
-            queue->GetEventOutlet()->Broadcast(cscmdContextResize, (iGraphics2D *) this);
+            queue->GetEventOutlet()->Broadcast(cscmdContextResize, (intptr_t) this);
     }
 
     return success;

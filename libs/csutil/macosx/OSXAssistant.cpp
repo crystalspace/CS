@@ -195,7 +195,7 @@ void OSXAssistant::application_activated()
     if (c != 0)
       c->Resume();
   }
-  event_outlet->ImmediateBroadcast(cscmdFocusChanged,(void*)true);
+  event_outlet->ImmediateBroadcast(cscmdFocusChanged,true);
 }
 
 void OSXAssistant::application_deactivated()
@@ -206,17 +206,17 @@ void OSXAssistant::application_deactivated()
     if (c != 0)
       c->Suspend();
   }
-  event_outlet->ImmediateBroadcast(cscmdFocusChanged, (void*)false);
+  event_outlet->ImmediateBroadcast(cscmdFocusChanged, false);
 }
 
 void OSXAssistant::application_hidden()
 {
-  event_outlet->ImmediateBroadcast(cscmdCanvasHidden, (void*)false);
+  event_outlet->ImmediateBroadcast(cscmdCanvasHidden, false);
 }
 
 void OSXAssistant::application_unhidden()
 {
-  event_outlet->ImmediateBroadcast(cscmdCanvasExposed, (void*)false);
+  event_outlet->ImmediateBroadcast(cscmdCanvasExposed, false);
 }
 
 void OSXAssistant::flush_graphics_context()

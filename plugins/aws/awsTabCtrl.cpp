@@ -177,7 +177,7 @@ void awsTab::OnDraw (csRect clip)
   }
 }
 
-bool awsTab::GetProperty (const char *name, void **parm)
+bool awsTab::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -188,7 +188,7 @@ bool awsTab::GetProperty (const char *name, void **parm)
     if (caption) st = caption->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   else if (strcmp ("User Param", name) == 0)
@@ -199,7 +199,7 @@ bool awsTab::GetProperty (const char *name, void **parm)
   return false;
 }
 
-bool awsTab::SetProperty (const char *name, void *parm)
+bool awsTab::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
   
@@ -330,7 +330,7 @@ bool awsTabCtrl::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   iAws* const w = WindowManager();
 
   awsSink* _sink = new awsSink (w);
-  _sink->SetParm (this);
+  _sink->SetParm ((intptr_t)this);
   sink = _sink;
   sink->RegisterTrigger ("ActivateTab", &ActivateTabCallback);
 
@@ -465,7 +465,7 @@ csRect awsTabCtrl::getInsets ()
     return csRect (0, 0, 0, 0);
 }
 
-iAwsSource* awsTabCtrl::AddTab (iString* caption, void* user_param)
+iAwsSource* awsTabCtrl::AddTab (iString* caption, intptr_t user_param)
 {
   if (!caption || !caption->GetData ())
   {
@@ -486,7 +486,7 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, void* user_param)
 
   btn->SetParent (this);
   btn->Setup (WindowManager (), btninfo.GetThisNode ());
-  btn->SetProperty ("Caption", caption);
+  btn->SetProperty ("Caption", (intptr_t)caption);
   btn->SetProperty ("User Param", user_param);
 
   // Resize button.
@@ -522,7 +522,7 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, void* user_param)
   return (iAwsSource*)btn;
 }
 
-void awsTabCtrl::RemoveTab (void* user_param)
+void awsTabCtrl::RemoveTab (intptr_t user_param)
 {
   int idx = FindTab (user_param);
   if (idx >= 0) RemoveTab (idx);
@@ -650,12 +650,12 @@ void awsTabCtrl::MakeVisible (int idx)
   }
 }
 
-int awsTabCtrl::FindTab (void* user_param)
+int awsTabCtrl::FindTab (intptr_t user_param)
 {
   size_t i;
   for (i = 0; i < vTabs.Length (); i++)
   {
-    void* p;
+    intptr_t p;
     vTabs.Get (i)->GetProperty ("User Param", &p);
     if (p == user_param)
       return i;
@@ -663,7 +663,7 @@ int awsTabCtrl::FindTab (void* user_param)
   return -1;
 }
 
-void awsTabCtrl::ActivateTab (void* param)
+void awsTabCtrl::ActivateTab (intptr_t param)
 {
   int idx = FindTab (param);
   if (idx >= 0)
@@ -710,7 +710,7 @@ void awsTabCtrl::OnResized ()
   DoLayout ();
 }
 
-void awsTabCtrl::ActivateTabCallback (void *p, iAwsSource *source)
+void awsTabCtrl::ActivateTabCallback (intptr_t p, iAwsSource *source)
 {
   awsTabCtrl *tc = (awsTabCtrl *)p;
   int idx = tc->vTabs.Find ((awsTab*) source->GetComponent ());
@@ -722,13 +722,13 @@ void awsTabCtrl::ActivateTabCallback (void *p, iAwsSource *source)
   }
 }
 
-void awsTabCtrl::PrevClicked (void *p, iAwsSource *)
+void awsTabCtrl::PrevClicked (intptr_t p, iAwsSource *)
 {
   awsTabCtrl *tc = (awsTabCtrl *)p;
   tc->ScrollRight ();
 }
 
-void awsTabCtrl::NextClicked (void *p, iAwsSource *)
+void awsTabCtrl::NextClicked (intptr_t p, iAwsSource *)
 {
   awsTabCtrl *tc = (awsTabCtrl *)p;
   tc->ScrollLeft ();

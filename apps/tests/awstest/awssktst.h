@@ -15,16 +15,16 @@ class awsTestSink
   iAwsWindow *test;
 
 private:
-  static void RedClicked(void *sink,   iAwsSource *source);
-  static void BlueClicked(void *sink,  iAwsSource *source);
-  static void GreenClicked(void *sink, iAwsSource *source);
+  static void RedClicked(intptr_t sink,   iAwsSource *source);
+  static void BlueClicked(intptr_t sink,  iAwsSource *source);
+  static void GreenClicked(intptr_t sink, iAwsSource *source);
 
-  static void SetPass(void *sink, iAwsSource *source);
-  static void SetUser(void *sink, iAwsSource *source);
-  static void Login(void *sink, iAwsSource *source);
+  static void SetPass(intptr_t sink, iAwsSource *source);
+  static void SetUser(intptr_t sink, iAwsSource *source);
+  static void Login(intptr_t sink, iAwsSource *source);
 
-  static void FillListBox(void *sink, iAwsSource *source);
-  static void FillBarChart(void *sk, iAwsSource *source);
+  static void FillListBox(intptr_t sink, iAwsSource *source);
+  static void FillBarChart(intptr_t sk, iAwsSource *source);
 public:
   awsTestSink();
   virtual ~awsTestSink();

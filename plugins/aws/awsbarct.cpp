@@ -45,7 +45,7 @@ CS_IMPLEMENT_STATIC_VAR (GetChartSlot, awsSlot, ())
 
 static awsSlot *chart_slot = 0;
 
-static void DriveTimer (void *, iAwsSource *source)
+static void DriveTimer (intptr_t, iAwsSource *source)
 {
   iAwsComponent *comp = source->GetComponent ();
   comp->Broadcast (awsBarChart::signalTimer);
@@ -113,7 +113,7 @@ bool awsBarChart::Setup (iAws *_wmgr, iAwsComponentNode *settings)
     // Setup blink event handling.
     if (chart_sink == 0)
     {
-      chart_sink = WindowManager ()->GetSinkMgr ()->CreateSink (0);
+      chart_sink = WindowManager ()->GetSinkMgr ()->CreateSink ((intptr_t)0);
       chart_sink->RegisterTrigger ("Tick", &DriveTimer);
     }
 
@@ -136,7 +136,7 @@ bool awsBarChart::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsBarChart::GetProperty (const char *name, void **parm)
+bool awsBarChart::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -147,13 +147,13 @@ bool awsBarChart::GetProperty (const char *name, void **parm)
     if (caption) st = caption->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   return false;
 }
 
-bool awsBarChart::SetProperty (const char *name, void *parm)
+bool awsBarChart::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 

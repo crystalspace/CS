@@ -176,19 +176,42 @@ public:
    * Gets the property specified, setting the parameter to a COPY of the
    * property's value. Returns false if there's no such property.
    */
-  virtual bool GetProperty (const char* name, void **parm);
+  virtual bool GetProperty (const char* name, intptr_t *parm);
+
+#ifndef AWS_VOIDP_IS_ERROR
+  /**
+   * Gets a copy of the property, put it in parm.  Returns false if the
+   * property does not exist.
+   * \deprecated For proper 64-bit platform support, use the intptr_t version
+   *   of GetProperty().
+   */
+  virtual bool GetProperty(const char* name, void **parm)
+  { return GetProperty(name, (intptr_t*)parm); }
+#endif
 
   /**
    * Sets the property specified, setting the proprty to whatever is in parm.
    * Returns false if there's no such property.
    */
-  virtual bool SetProperty (const char* name, void *parm);
+  virtual bool SetProperty (const char* name, intptr_t parm);
+
+#ifndef AWS_VOIDP_IS_ERROR
+  /**
+   * Sets the property specified to whatever is in parm. Returns false if
+   * there's no such property.
+   * \deprecated For proper 64-bit platform support, use the intptr_t version
+   *   of SetProperty().
+   */
+  virtual bool SetProperty(const char* name, void *parm)
+  { return SetProperty(name, (intptr_t)parm); }
+#endif
 
   /// Executes a scriptable action.
   virtual bool Execute (const char* action, iAwsParmList* parmlist);
 
   /**
-   * Invalidation routine. Allow the component to be redrawn when you call this.
+   * Invalidation routine. Allow the component to be redrawn when you call
+   * this.
    */
   virtual void Invalidate ();
 

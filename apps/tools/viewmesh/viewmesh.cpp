@@ -40,12 +40,12 @@ struct vmAnimCallback : public CalAnimationCallback
 {
   vmAnimCallback() {}
 
-  virtual void AnimationUpdate (float anim_time, CalModel*, void*)
+  virtual void AnimationUpdate (float anim_time, CalModel*, intptr_t)
   {
     csPrintf ("Anim Update at time %.2f.\n",anim_time);
   }
 
-  virtual void AnimationComplete (CalModel*, void*)
+  virtual void AnimationComplete (CalModel*, intptr_t)
   {
     csPrintf ("Anim Completed!\n");
   }
@@ -447,7 +447,7 @@ void ViewMesh::CreateGui ()
   iAwsSink* sink;
 
   //GENERAL
-  sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
   sink->RegisterTrigger ("CameraMode", &CameraMode);
   sink->RegisterTrigger ("LoadButton", &LoadButton);
   sink->RegisterTrigger ("LoadLibButton", &LoadLibButton);
@@ -457,7 +457,7 @@ void ViewMesh::CreateGui ()
   aws->GetSinkMgr ()->RegisterSink ("General", sink);
 
   //ANIMATION
-  sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
   sink->RegisterTrigger ("ReversAnimation", &ReversAnimation);
   sink->RegisterTrigger ("StopAnimation", &StopAnimation);
   sink->RegisterTrigger ("SlowerAnimation", &SlowerAnimation);
@@ -470,7 +470,7 @@ void ViewMesh::CreateGui ()
   aws->GetSinkMgr ()->RegisterSink ("Anim", sink);
 
   //SOCKET
-  sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
   sink->RegisterTrigger ("SetMesh", &SetMesh);
   sink->RegisterTrigger ("SetSubMesh", &SetSubMesh);
   sink->RegisterTrigger ("SetTriangle", &SetTriangle);
@@ -486,14 +486,14 @@ void ViewMesh::CreateGui ()
   aws->GetSinkMgr ()->RegisterSink ("Socket", sink);
 
   //SOCKET
-  sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
   sink->RegisterTrigger ("SelMorph", &SelMorph);
   sink->RegisterTrigger ("BlendButton", &BlendButton);
   sink->RegisterTrigger ("ClearButton", &ClearButton);
   aws->GetSinkMgr ()->RegisterSink ("Morph", sink);
 
   //STDDLG
-  sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
   sink->RegisterTrigger ("OkButton", &StdDlgOkButton);
   sink->RegisterTrigger ("CancleButton", &StdDlgCancleButton);
   sink->RegisterTrigger ("FileSelect", &StdDlgFileSelect);
@@ -514,7 +514,7 @@ void ViewMesh::CreateGui ()
 
   iAwsComponent* InputPath = stddlg->FindChild("InputPath");
   csRef<iString> valuePath(new scfString(vfs->GetCwd()));
-  if (InputPath) InputPath->SetProperty("Text",valuePath);
+  if (InputPath) InputPath->SetProperty("Text",(intptr_t)(iString*)valuePath);
 
   StdDlgUpdateLists(valuePath->GetData());
 }
@@ -926,34 +926,34 @@ void ViewMesh::UpdateSocket ()
     iAwsComponent* InputName = form->FindChild("InputName");
     const char* name = selectedSocket->GetName();
     csRef<iString> valueName(new scfString(name));
-    InputName->SetProperty("Text",valueName);
+    InputName->SetProperty("Text",(intptr_t)(iString*)valueName);
 
     iAwsComponent* InputTriangle = form->FindChild("InputTriangle");
     csRef<iString> valueTriangle(new scfString());
     valueTriangle->Format("%d", selectedSocket->GetTriangleIndex());
-    InputTriangle->SetProperty("Text",valueTriangle);
+    InputTriangle->SetProperty("Text",(intptr_t)(iString*)valueTriangle);
   }
   else if (selectedCal3dSocket)
   {
     iAwsComponent* InputName = form->FindChild("InputName");
     const char* name = selectedCal3dSocket->GetName();
     csRef<iString> valueName(new scfString(name));
-    InputName->SetProperty("Text",valueName);
+    InputName->SetProperty("Text",(intptr_t)(iString*)valueName);
 
     iAwsComponent* InputMesh = form->FindChild("InputMesh");
     csRef<iString> valueMesh(new scfString());
     valueMesh->Format("%d", selectedCal3dSocket->GetMeshIndex());
-    InputMesh->SetProperty("Text",valueMesh);
+    InputMesh->SetProperty("Text",(intptr_t)(iString*)valueMesh);
 
     iAwsComponent* InputSubMesh = form->FindChild("InputSubMesh");
     csRef<iString> valueSubmesh(new scfString());
     valueSubmesh->Format("%d", selectedCal3dSocket->GetSubmeshIndex());
-    InputSubMesh->SetProperty("Text",valueSubmesh);
+    InputSubMesh->SetProperty("Text",(intptr_t)(iString*)valueSubmesh);
 
     iAwsComponent* InputTriangle = form->FindChild("InputTriangle");
     csRef<iString> valueTriangle(new scfString());
     valueTriangle->Format("%d", selectedCal3dSocket->GetTriangleIndex());
-    InputTriangle->SetProperty("Text",valueTriangle);
+    InputTriangle->SetProperty("Text",(intptr_t)(iString*)valueTriangle);
   }
 }
 
@@ -976,12 +976,12 @@ void ViewMesh::ScaleSprite (float newScale)
   iAwsComponent* InputMesh = form->FindChild("InputScale");
   csRef<iString> valueMesh(new scfString());
   valueMesh->Format("%.2f", scale);
-  InputMesh->SetProperty("Text",valueMesh);
+  InputMesh->SetProperty("Text",(intptr_t)(iString*)valueMesh);
 }
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::ReversAnimation (void* awst, iAwsSource *source)
+void ViewMesh::ReversAnimation (intptr_t awst, iAwsSource *source)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (tut->cal3dstate)
@@ -993,17 +993,17 @@ void ViewMesh::ReversAnimation (void* awst, iAwsSource *source)
     tut->state->SetReverseAction(tut->state->GetReverseAction()^true);
   }
 }
-void ViewMesh::StopAnimation (void* awst, iAwsSource *source)
+void ViewMesh::StopAnimation (intptr_t awst, iAwsSource *source)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->move_sprite_speed = 0;
 }
-void ViewMesh::SlowerAnimation (void* awst, iAwsSource *source)
+void ViewMesh::SlowerAnimation (intptr_t awst, iAwsSource *source)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->move_sprite_speed -= 0.5f;
 }
-void ViewMesh::AddAnimation (void* awst, iAwsSource *source)
+void ViewMesh::AddAnimation (intptr_t awst, iAwsSource *source)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (tut->cal3dstate)
@@ -1013,12 +1013,12 @@ void ViewMesh::AddAnimation (void* awst, iAwsSource *source)
     tut->cal3dstate->AddAnimCycle(anim,1,3);
   }
 }
-void ViewMesh::FasterAnimation (void* awst, iAwsSource *source)
+void ViewMesh::FasterAnimation (intptr_t awst, iAwsSource *source)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->move_sprite_speed += 0.5f;
 }
-void ViewMesh::SetAnimation (void* awst, iAwsSource *source)
+void ViewMesh::SetAnimation (intptr_t awst, iAwsSource *source)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (tut->cal3dstate)
@@ -1033,13 +1033,13 @@ void ViewMesh::SetAnimation (void* awst, iAwsSource *source)
     tut->state->SetAction(tut->selectedAnimation);
   }
 }
-void ViewMesh::RemoveAnimation (void* awst, iAwsSource *source)
+void ViewMesh::RemoveAnimation (intptr_t awst, iAwsSource *source)
 {
   //TODO: Implement it.
   ViewMesh* tut = (ViewMesh*)awst;
   tut->ReportWarning("Removal of Animation is not yet implemented");
 }
-void ViewMesh::ClearAnimation (void* awst, iAwsSource *source)
+void ViewMesh::ClearAnimation (intptr_t awst, iAwsSource *source)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (tut->cal3dstate)
@@ -1049,7 +1049,7 @@ void ViewMesh::ClearAnimation (void* awst, iAwsSource *source)
     tut->cal3dstate->ClearAnimCycle(anim,3);
   }
 }
-void ViewMesh::SelAnimation (void* awst, iAwsSource *source)
+void ViewMesh::SelAnimation (intptr_t awst, iAwsSource *source)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1069,14 +1069,14 @@ void ViewMesh::SelAnimation (void* awst, iAwsSource *source)
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::SetMesh (void* awst, iAwsSource *s)
+void ViewMesh::SetMesh (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
   if (!tut->selectedCal3dSocket) return;
 
   iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
 
   if (!text->GetData()) return;
 
@@ -1087,14 +1087,14 @@ void ViewMesh::SetMesh (void* awst, iAwsSource *s)
   tut->UpdateSocket();
 }
 
-void ViewMesh::SetSubMesh (void* awst, iAwsSource *s)
+void ViewMesh::SetSubMesh (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
   if (!tut->selectedCal3dSocket) return;
 
   iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
 
   if (!text->GetData()) return;
 
@@ -1105,12 +1105,12 @@ void ViewMesh::SetSubMesh (void* awst, iAwsSource *s)
   tut->UpdateSocket();
 }
 
-void ViewMesh::SetTriangle (void* awst, iAwsSource *s)
+void ViewMesh::SetTriangle (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
   iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
 
   if (!text->GetData()) return;
 
@@ -1125,12 +1125,12 @@ void ViewMesh::SetTriangle (void* awst, iAwsSource *s)
   tut->UpdateSocket();
 }
 
-void ViewMesh::SetRotX (void* awst, iAwsSource *s)
+void ViewMesh::SetRotX (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
   iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
 
   if (!text->GetData()) return;
 
@@ -1175,12 +1175,12 @@ void ViewMesh::SetRotX (void* awst, iAwsSource *s)
   }
 }
 
-void ViewMesh::SetRotY (void* awst, iAwsSource *s)
+void ViewMesh::SetRotY (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
   iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
 
   if (!text->GetData()) return;
 
@@ -1225,12 +1225,12 @@ void ViewMesh::SetRotY (void* awst, iAwsSource *s)
   }
 }
 
-void ViewMesh::SetRotZ (void* awst, iAwsSource *s)
+void ViewMesh::SetRotZ (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
   iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
 
   if (!text->GetData()) return;
 
@@ -1275,7 +1275,7 @@ void ViewMesh::SetRotZ (void* awst, iAwsSource *s)
   }
 }
 
-void ViewMesh::AttachButton (void* awst, iAwsSource *s)
+void ViewMesh::AttachButton (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->form->Hide();
@@ -1283,7 +1283,7 @@ void ViewMesh::AttachButton (void* awst, iAwsSource *s)
   tut->stddlgPurpose=attach;
 }
 
-void ViewMesh::DetachButton (void* awst, iAwsSource *s)
+void ViewMesh::DetachButton (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1306,7 +1306,7 @@ void ViewMesh::DetachButton (void* awst, iAwsSource *s)
     tut->selectedSocket->SetMeshWrapper( 0 );    
 }
 
-void ViewMesh::AddSocket (void* awst, iAwsSource *s)
+void ViewMesh::AddSocket (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1327,7 +1327,7 @@ void ViewMesh::AddSocket (void* awst, iAwsSource *s)
   tut->UpdateSocketList();
 }
 
-void ViewMesh::DelSocket (void* awst, iAwsSource *s)
+void ViewMesh::DelSocket (intptr_t awst, iAwsSource *s)
 {
   //Change API of iSpriteCal3DFactoryState to enable this!
   ViewMesh* tut = (ViewMesh*)awst;
@@ -1337,7 +1337,7 @@ void ViewMesh::DelSocket (void* awst, iAwsSource *s)
   tut->UpdateSocketList();
 }
 
-void ViewMesh::SelSocket (void* awst, iAwsSource *s)
+void ViewMesh::SelSocket (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1356,7 +1356,7 @@ void ViewMesh::SelSocket (void* awst, iAwsSource *s)
 }
 
 
-void ViewMesh::RenameSocket (void* awst, iAwsSource *s)
+void ViewMesh::RenameSocket (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1364,7 +1364,7 @@ void ViewMesh::RenameSocket (void* awst, iAwsSource *s)
   if (!textfield) return;
 
   iString* text;
-  if (!textfield->GetComponent()->GetProperty("Text",(void **)&text)) return;
+  if (!textfield->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
 
   if (!text->GetData()) return;
 
@@ -1385,17 +1385,17 @@ void ViewMesh::RenameSocket (void* awst, iAwsSource *s)
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::CameraMode (void* awst, iAwsSource *s)
+void ViewMesh::CameraMode (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
   bool* state;
-  if (!s->GetComponent()->GetProperty("State",(void **)&state)) return;
+  if (!s->GetComponent()->GetProperty("State",(intptr_t*)&state)) return;
 
   if (!state) return;
 
   iString* caption;
-  if (!s->GetComponent()->GetProperty("Caption",(void **)&caption)) return;
+  if (!s->GetComponent()->GetProperty("Caption",(intptr_t*)&caption)) return;
 
   if (!caption->GetData()) return;
 
@@ -1407,7 +1407,7 @@ void ViewMesh::CameraMode (void* awst, iAwsSource *s)
     tut->camMode = movenormal;
 }
 
-void ViewMesh::LoadButton (void* awst, iAwsSource *s)
+void ViewMesh::LoadButton (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->form->Hide();
@@ -1415,7 +1415,7 @@ void ViewMesh::LoadButton (void* awst, iAwsSource *s)
   tut->stddlgPurpose=load;
 }
 
-void ViewMesh::LoadLibButton (void* awst, iAwsSource *s)
+void ViewMesh::LoadLibButton (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->form->Hide();
@@ -1423,7 +1423,7 @@ void ViewMesh::LoadLibButton (void* awst, iAwsSource *s)
   tut->stddlgPurpose=loadlib;
 }
 
-void ViewMesh::SaveButton (void* awst, iAwsSource *s)
+void ViewMesh::SaveButton (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->form->Hide();
@@ -1431,7 +1431,7 @@ void ViewMesh::SaveButton (void* awst, iAwsSource *s)
   tut->stddlgPurpose=save;
 }
 
-void ViewMesh::SaveBinaryButton (void* awst, iAwsSource *s)
+void ViewMesh::SaveBinaryButton (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->form->Hide();
@@ -1439,12 +1439,12 @@ void ViewMesh::SaveBinaryButton (void* awst, iAwsSource *s)
   tut->stddlgPurpose=savebinary;
 }
 
-void ViewMesh::SetScaleSprite (void* awst, iAwsSource *s)
+void ViewMesh::SetScaleSprite (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
   iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(void **)&text)) return;
+  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
 
   if (!text->GetData()) return;
 
@@ -1455,7 +1455,7 @@ void ViewMesh::SetScaleSprite (void* awst, iAwsSource *s)
 }
 
 //---------------------------------------------------------------------------
-void ViewMesh::SelMorph (void* awst, iAwsSource *s)
+void ViewMesh::SelMorph (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1473,7 +1473,7 @@ void ViewMesh::SelMorph (void* awst, iAwsSource *s)
   tut->selectedMorphTarget = text->GetData();
 }
 
-void ViewMesh::BlendButton (void* awst, iAwsSource *s)
+void ViewMesh::BlendButton (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (!tut->cal3dstate) return;
@@ -1483,14 +1483,14 @@ void ViewMesh::BlendButton (void* awst, iAwsSource *s)
 
   iAwsComponent* component;
   component = tut->stddlg->FindChild("InputWeight");
-  if (component) component->GetProperty("Text",(void **)&Sweight);
+  if (component) component->GetProperty("Text",(intptr_t*)&Sweight);
   if (Sweight && Sweight->GetData())
   {
     if(sscanf(Sweight->GetData(), "%f", &weight) != 1) weight = 1;
   }
 
   component = tut->stddlg->FindChild("InputDelay");
-  if (component) component->GetProperty("Text",(void **)&Sdelay);
+  if (component) component->GetProperty("Text",(intptr_t*)&Sdelay);
   if (Sdelay && Sdelay->GetData())
   {
     if(sscanf(Sdelay->GetData(), "%f", &delay) != 1) delay = 1;
@@ -1504,7 +1504,7 @@ void ViewMesh::BlendButton (void* awst, iAwsSource *s)
   tut->cal3dstate->BlendMorphTarget(target, weight, delay);
 }
 
-void ViewMesh::ClearButton (void* awst, iAwsSource *s)
+void ViewMesh::ClearButton (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (!tut->cal3dstate) return;
@@ -1514,7 +1514,7 @@ void ViewMesh::ClearButton (void* awst, iAwsSource *s)
 
   iAwsComponent* component;
   component = tut->stddlg->FindChild("InputWeight");
-  if (component) component->GetProperty("Text",(void **)&Sweight);
+  if (component) component->GetProperty("Text",(intptr_t*)&Sweight);
   if (Sweight && Sweight->GetData())
   {
     if(sscanf(Sweight->GetData(), "%f", &weight) != 1) weight = 1;
@@ -1630,7 +1630,7 @@ void ViewMesh::StdDlgUpdateLists(const char* filename)
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::StdDlgOkButton (void* awst, iAwsSource *s)
+void ViewMesh::StdDlgOkButton (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1641,11 +1641,11 @@ void ViewMesh::StdDlgOkButton (void* awst, iAwsSource *s)
   tut->stddlg->Hide();
 
   iAwsComponent* inputpath = tut->stddlg->FindChild("InputPath");
-  if (inputpath) inputpath->GetProperty("Text",(void **)&path);
+  if (inputpath) inputpath->GetProperty("Text",(intptr_t*)&path);
   if (!path || !path->GetData()) return;
 
   iAwsComponent* inputfile = tut->stddlg->FindChild("InputFile");
-  if (inputfile) inputfile->GetProperty("Text",(void **)&file);
+  if (inputfile) inputfile->GetProperty("Text",(intptr_t*)&file);
   if (!file || !file->GetData()) return;
 
   switch (tut->stddlgPurpose)
@@ -1668,7 +1668,7 @@ void ViewMesh::StdDlgOkButton (void* awst, iAwsSource *s)
   }
 }
 
-void ViewMesh::StdDlgCancleButton (void* awst, iAwsSource *s)
+void ViewMesh::StdDlgCancleButton (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1676,7 +1676,7 @@ void ViewMesh::StdDlgCancleButton (void* awst, iAwsSource *s)
   tut->stddlg->Hide();
 }
 
-void ViewMesh::StdDlgFileSelect (void* awst, iAwsSource *s)
+void ViewMesh::StdDlgFileSelect (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1692,10 +1692,10 @@ void ViewMesh::StdDlgFileSelect (void* awst, iAwsSource *s)
   if (!text->GetData()) return;
 
   iAwsComponent* InputPath = tut->stddlg->FindChild("InputFile");
-  InputPath->SetProperty("Text",text);
+  InputPath->SetProperty("Text", (intptr_t)text);
 }
 
-void ViewMesh::StdDlgDirSelect (void* awst, iAwsSource *s)
+void ViewMesh::StdDlgDirSelect (intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1714,7 +1714,7 @@ void ViewMesh::StdDlgDirSelect (void* awst, iAwsSource *s)
 
   iString* path = 0;
   iAwsComponent* inputpath = tut->stddlg->FindChild("InputPath");
-  if (inputpath) inputpath->GetProperty("Text",(void **)&path);
+  if (inputpath) inputpath->GetProperty("Text",(intptr_t*)&path);
   if (!path || !path->GetData()) return;
 
   csRef<iString> newpath = path;
@@ -1736,7 +1736,7 @@ void ViewMesh::StdDlgDirSelect (void* awst, iAwsSource *s)
   tut->ParseDir(newpath->GetData());
 
   iAwsComponent* InputPath = tut->stddlg->FindChild("InputPath");
-  if (InputPath) InputPath->SetProperty("Text",newpath);
+  if (InputPath) InputPath->SetProperty("Text", (intptr_t)(iString*)newpath);
   tut->StdDlgUpdateLists(newpath->GetData());
 }
 

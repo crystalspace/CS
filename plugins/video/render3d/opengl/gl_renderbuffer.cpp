@@ -47,23 +47,28 @@ void csGLVBOBufferManager::ParseByteSize (const char* sizeStr, size_t& size)
   } 	 
   if (sizeFactor != 0) 	 
   { 	 
-    if (sscanf (sizeStr, "%d", &size) != 0) 	 
+    unsigned long tmp;
+    if (sscanf (sizeStr, "%lu", &tmp) != 0)
+    {
+      size = tmp;
       size *= sizeFactor; 	 
+    }
     else 	 
       Report (CS_REPORTER_SEVERITY_WARNING, 	 
         "Invalid buffer size '%s'.", sizeStr); 	 
   }
 }
 
-static csString ByteFormat (size_t size)
+static csString ByteFormat (size_t n)
 {
   csString str;
+  unsigned long size = (unsigned long)n;
   if (size >= 1024*1024)
-    str.Format ("%d MB", size / (1024*1024));
+    str.Format ("%lu MB", size / (1024*1024));
   else if (size >= 1024)
-    str.Format ("%d KB", size / (1024));
+    str.Format ("%lu KB", size / (1024));
   else
-    str.Format ("%d Byte", size);
+    str.Format ("%lu Byte", size);
   return str;
 }
 

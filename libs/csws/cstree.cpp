@@ -67,7 +67,7 @@ csTreeItem::~csTreeItem ()
   button = 0;
   DeleteAll ();
   // Now notify the parent to check if we're not the active item
-  treebox->SendCommand (cscmdTreeItemDeleteNotify, this);
+  treebox->SendCommand (cscmdTreeItemDeleteNotify, (intptr_t)this);
   // Forget user bitmaps, if any
   SetBitmap (0, 0, false);
 }
@@ -84,7 +84,7 @@ void csTreeItem::SetBitmap (csPixmap *iBitmap, csPixmap *iBitmapOpen, bool iDele
   DeleteBitmap = iDelete;
   Invalidate ();
   SetState (CSS_TREEITEM_PLACEITEMS, true);
-  parent->SendCommand (cscmdTreeItemSizeChangeNotify, this);
+  parent->SendCommand (cscmdTreeItemSizeChangeNotify, (intptr_t)this);
 }
 
 void csTreeItem::SuggestSize (int &w, int &h)
@@ -160,7 +160,7 @@ void csTreeItem::SuggestTotalSize (int &w, int &h, int &totw, int &toth)
     } while (cur != top);
 }
 
-static bool do_show_items (csComponent *child, void *param)
+static bool do_show_items (csComponent *child, intptr_t param)
 {
   if (child->SendCommand (cscmdTreeItemCheck) == CS_TREEITEM_MAGIC)
     child->SetState (CSS_VISIBLE, !!param);
@@ -175,9 +175,9 @@ void csTreeItem::SetState (int mask, bool enable)
   {
     treebox->PrepareButton (button, GetState (CSS_TREEITEM_OPEN));
     // Toggle visibility of all child items
-    ForEach (do_show_items, (void *)GetState (CSS_TREEITEM_OPEN));
+    ForEach (do_show_items, (intptr_t)GetState (CSS_TREEITEM_OPEN));
     // Tell parent to reposition all the items
-    parent->SendCommand (cscmdTreeItemSizeChangeNotify, this);
+    parent->SendCommand (cscmdTreeItemSizeChangeNotify, (intptr_t)this);
   } /* endif */
 }
 
@@ -189,7 +189,7 @@ void csTreeItem::Insert (csComponent *comp)
     button->SetState (CSS_VISIBLE, (button->next != button));
     SetState (CSS_TREEITEM_PLACEITEMS, true);
     ((csTreeItem *)comp)->treebox = treebox;
-    parent->SendCommand (cscmdTreeItemSizeChangeNotify, this);
+    parent->SendCommand (cscmdTreeItemSizeChangeNotify, (intptr_t)this);
   }
 }
 
@@ -200,7 +200,7 @@ void csTreeItem::Delete (csComponent *comp)
   {
     button->SetState (CSS_VISIBLE, (button->next != button));
     SetState (CSS_TREEITEM_PLACEITEMS, true);
-    parent->SendCommand (cscmdTreeItemSizeChangeNotify, this);
+    parent->SendCommand (cscmdTreeItemSizeChangeNotify, (intptr_t)this);
     if (button->next == button)
       Toggle (0);
   }
@@ -326,20 +326,20 @@ int csTreeItem::Toggle (int iAction)
     if (curstate && !canopen)
       return 0;
 
-    if (treebox->SendCommand (cscmdTreeItemToggleNotify, this) != CS_TREEITEM_MAGIC)
+    if (treebox->SendCommand (cscmdTreeItemToggleNotify, (intptr_t)this) != CS_TREEITEM_MAGIC)
     {
       SetState (CSS_TREEITEM_OPEN, curstate);
       if (curstate
        && !treebox->GetState (CSS_DISABLED)
        && (treebox->active == this))
-        treebox->SendCommand (cscmdTreeMakeBranchVisible, this);
+        treebox->SendCommand (cscmdTreeMakeBranchVisible, (intptr_t)this);
     }
   }
 
   return curstate;
 }
 
-static bool do_toggle (csTreeItem *iItem, void *iParam)
+static bool do_toggle (csTreeItem *iItem, intptr_t iParam)
 {
   iItem->Toggle (*((int*)iParam));
   return false;
@@ -368,15 +368,15 @@ bool csTreeItem::HandleEvent (iEvent &Event)
   {
     case csevMouseDown:
       if (ourmev && (Event.Mouse.Button == 1))
-        treebox->SendCommand (cscmdTreeStartTracking, this);
+        treebox->SendCommand (cscmdTreeStartTracking, (intptr_t)this);
       return true;
     case csevMouseMove:
       if (ourmev && app->MouseOwner == treebox)
-        treebox->SendCommand (cscmdTreeTrack, this);
+        treebox->SendCommand (cscmdTreeTrack, (intptr_t)this);
       return true;
     case csevMouseClick:
       if (Event.Mouse.Button == 2)
-        treebox->parent->SendCommand (cscmdTreeItemRightClick, this);
+        treebox->parent->SendCommand (cscmdTreeItemRightClick, (intptr_t)this);
       return true;
     case csevMouseDoubleClick:
       if (ourmev)
@@ -397,7 +397,7 @@ bool csTreeItem::HandleEvent (iEvent &Event)
 		Toggle (1);
 		return true;
 	      case CSMASK_SHIFT:
-		SendCommand (cscmdTreeItemToggleAll, (void *)1);
+		SendCommand (cscmdTreeItemToggleAll, 1);
 		return true;
 	      case CSMASK_CTRL:
 		treebox->ExpandAll ();
@@ -412,7 +412,7 @@ bool csTreeItem::HandleEvent (iEvent &Event)
 		Toggle (0);
 		return true;
 	      case CSMASK_SHIFT:
-		SendCommand (cscmdTreeItemToggleAll, (void *)0);
+		SendCommand (cscmdTreeItemToggleAll, 0);
 		return true;
 	      case CSMASK_CTRL:
 		treebox->CollapseAll ();
@@ -438,25 +438,25 @@ bool csTreeItem::HandleEvent (iEvent &Event)
           Event.Command.Info = CS_TREEITEM_MAGIC;
           return true;
         case cscmdTreeItemToggleAll:
-          ForEachItem (do_toggle, &Event.Command.Info, false);
+          ForEachItem (do_toggle, Event.Command.Info, false);
           // Fallback to cscmdTreeItemToggle
         case cscmdTreeItemToggle:
-          Event.Command.Info = (void *)Toggle ((int)Event.Command.Info);
+          Event.Command.Info = (intptr_t)Toggle ((int)Event.Command.Info);
           return true;
         case cscmdTreeItemSizeChangeNotify:
           SetState (CSS_TREEITEM_PLACEITEMS, true);
           return parent->HandleEvent (Event);
         case cscmdTreeItemGetPrev:
-          Event.Command.Info = PrevItem ();
+          Event.Command.Info = (intptr_t)PrevItem ();
           return true;
         case cscmdTreeItemGetNext:
-          Event.Command.Info = NextItem ();
+          Event.Command.Info = (intptr_t)NextItem ();
           return true;
         case cscmdTreeItemGetFirst:
-          Event.Command.Info = button && (button->next != button) ? button->next : 0;
+          Event.Command.Info = button && (button->next != button) ? (intptr_t)button->next : (intptr_t)0;
           return true;
         case cscmdTreeItemGetLast:
-          Event.Command.Info = button && (button->prev != button) ? button->prev : 0;
+          Event.Command.Info = button && (button->prev != button) ? (intptr_t)button->prev : (intptr_t)0;
           return true;
       } /* endswitch */
       break;
@@ -477,7 +477,7 @@ csTreeItem *csTreeItem::NextItem ()
 {
   if (GetState (CSS_TREEITEM_OPEN))
     return (csTreeItem *)button->next;
-  if (parent->SendCommand (cscmdTreeItemGetLast) != this)
+  if (parent->SendCommand (cscmdTreeItemGetLast) != (intptr_t)this)
     return (csTreeItem *)next;
 
   // Trick: temporarily fool parent to think it's closed, so that
@@ -503,7 +503,7 @@ csTreeItem *csTreeItem::PrevItem ()
 }
 
 csTreeItem *csTreeItem::ForEachItem (bool (*func) (csTreeItem *child,
-  void *param), void *param, bool iOnlyOpen)
+  intptr_t param), intptr_t param, bool iOnlyOpen)
 {
   csTreeItem *item = (csTreeItem *)button->next;
   if ((csComponent *)item == button)
@@ -567,7 +567,7 @@ csTreeBox::~csTreeBox ()
   }
 }
 
-static bool do_hide_buttons (csTreeItem *iItem, void *iParam)
+static bool do_hide_buttons (csTreeItem *iItem, intptr_t iParam)
 {
   (void)iParam;
   iItem->ResetButton ();
@@ -729,7 +729,7 @@ void csTreeBox::PlaceItems (int sbFlags)
       vsbstatus.maxvalue = maxdeltay - vsbstatus.size;
       vsbstatus.step = midh;
       vsbstatus.pagestep = vsbstatus.size;
-      vscroll->SendCommand (cscmdScrollBarSet, &vsbstatus);
+      vscroll->SendCommand (cscmdScrollBarSet, (intptr_t)&vsbstatus);
       if (TreeStyle & CSTS_AUTOSCROLLBAR)
       {
         bool state = vsbstatus.size < vsbstatus.maxsize;
@@ -752,7 +752,7 @@ void csTreeBox::PlaceItems (int sbFlags)
       hsbstatus.maxvalue = maxdeltax;
       hsbstatus.step = 1;
       hsbstatus.pagestep = TREE_HORIZONTAL_PAGESTEP;
-      hscroll->SendCommand (cscmdScrollBarSet, &hsbstatus);
+      hscroll->SendCommand (cscmdScrollBarSet, (intptr_t)&hsbstatus);
       if (TreeStyle & CSTS_AUTOSCROLLBAR)
       {
         bool state = hsbstatus.size < hsbstatus.maxsize;
@@ -805,7 +805,7 @@ void csTreeBox::PlaceScrollbars ()
   SetState (CSS_TREEBOX_PLACEITEMS, true);
 }
 
-static bool do_findtext (csTreeItem *child, void *param)
+static bool do_findtext (csTreeItem *child, intptr_t param)
 {
   return (strcmp (child->GetText (), (char *)param) == 0);
 }
@@ -975,7 +975,7 @@ bool csTreeBox::HandleEvent (iEvent &Event)
             MakeItemVisible ((csComponent *)Event.Command.Info, true);
           return true;
         case cscmdTreeQuerySelected:
-          Event.Command.Info = active;
+          Event.Command.Info = (intptr_t)active;
           return true;
         case cscmdTimerPulse:
           if (app && active && app->MouseOwner == this)
@@ -994,7 +994,7 @@ bool csTreeBox::HandleEvent (iEvent &Event)
         {
           csScrollBar *bar = (csScrollBar *)Event.Command.Info;
           csScrollBarStatus sbs;
-          if (!bar || bar->SendCommand (cscmdScrollBarGetStatus, &sbs))
+          if (!bar || bar->SendCommand (cscmdScrollBarGetStatus, (intptr_t)&sbs))
             return true;
 
           if (sbs.maxvalue <= 0)
@@ -1022,8 +1022,8 @@ bool csTreeBox::HandleEvent (iEvent &Event)
           return true;
         }
         case cscmdTreeSelectItem:
-          Event.Command.Info = ForEachItem (do_findtext,
-            (char *)Event.Command.Info, false);
+          Event.Command.Info = (intptr_t)ForEachItem (do_findtext,
+            Event.Command.Info, false);
           return true;
         case cscmdTreeItemToggleNotify:
           parent->HandleEvent (Event);
@@ -1048,13 +1048,13 @@ bool csTreeBox::HandleEvent (iEvent &Event)
           }
           return true;
         case cscmdTreeItemGetFirst:
-          Event.Command.Info = clipview->top;
+          Event.Command.Info = (intptr_t)clipview->top;
           return true;
         case cscmdTreeItemGetLast:
-          Event.Command.Info = clipview->top ? clipview->top->prev : 0;
+          Event.Command.Info = clipview->top ? (intptr_t)clipview->top->prev : (intptr_t)0;
           return true;
         case cscmdTreeItemDeleteNotify:
-          if (active == Event.Command.Info)
+          if ((intptr_t)active == Event.Command.Info)
           {
             csTreeItem *item = (csTreeItem *)active->SendCommand (cscmdTreeItemGetPrev);
             if (item && item->button)
@@ -1112,7 +1112,7 @@ void csTreeBox::VScroll (int iDelta, bool iMoveCaret)
 }
 
 csTreeItem *csTreeBox::ForEachItem (bool (*func) (csTreeItem *child,
-  void *param), void *param, bool iOnlyOpen)
+  intptr_t param), intptr_t param, bool iOnlyOpen)
 {
   csTreeItem *item = (csTreeItem *)clipview->top;
   if (!item)
@@ -1236,7 +1236,7 @@ void csTreeBox::FocusItem (csTreeItem *iItem)
     active->Invalidate ();
     active->Select ();
 
-    parent->SendCommand (cscmdTreeItemFocused, active);
+    parent->SendCommand (cscmdTreeItemFocused, (intptr_t)active);
   }
   MakeItemVisible (active);
 }
@@ -1245,7 +1245,7 @@ void csTreeBox::ExpandAll ()
 {
   int oldstate = GetState (CSS_TREEBOX_LOCKVISIBLE);
   SetState (CSS_TREEBOX_LOCKVISIBLE, true);
-  ForEachItem (do_toggle, (void *)1, false);
+  ForEachItem (do_toggle, 1, false);
   if (!oldstate)
     SetState (CSS_TREEBOX_LOCKVISIBLE, false);
 
@@ -1256,7 +1256,7 @@ void csTreeBox::CollapseAll ()
 {
   int oldstate = GetState (CSS_TREEBOX_LOCKVISIBLE);
   SetState (CSS_TREEBOX_LOCKVISIBLE, true);
-  ForEachItem (do_toggle, (void *)0, false);
+  ForEachItem (do_toggle, 0, false);
   if (!oldstate)
     SetState (CSS_TREEBOX_LOCKVISIBLE, false);
 

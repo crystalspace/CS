@@ -88,26 +88,26 @@ bool csListBoxItem::HandleEvent (iEvent &Event)
         return true;
       if (Event.Mouse.Button == 1)
       {
-        parent->SendCommand (cscmdListBoxStartTracking, this);
-        parent->SendCommand (cscmdListBoxItemClicked, this);
+        parent->SendCommand (cscmdListBoxStartTracking, (intptr_t)this);
+        parent->SendCommand (cscmdListBoxItemClicked, (intptr_t)this);
       }
       return true;
     case csevMouseMove:
       if ((app->MouseOwner == parent)
        && !GetState (CSS_FOCUSED))
-        parent->SendCommand (cscmdListBoxTrack, this);
+        parent->SendCommand (cscmdListBoxTrack, (intptr_t)this);
       return true;
     case csevMouseDoubleClick:
       if ((Event.Mouse.Button == 1) && parent)
-        parent->SendCommand (cscmdListBoxItemDoubleClicked, this);
+        parent->SendCommand (cscmdListBoxItemDoubleClicked, (intptr_t)this);
       return true;
     case csevCommand:
       switch (Event.Command.Code)
       {
         case cscmdListBoxItemCheck:
           Event.Command.Info = GetState (CSS_LISTBOXITEM_SELECTED)
-            ? (void *)CS_LISTBOXITEMCHECK_SELECTED
-            : (void *)CS_LISTBOXITEMCHECK_UNSELECTED;
+            ? CS_LISTBOXITEMCHECK_SELECTED
+            : CS_LISTBOXITEMCHECK_UNSELECTED;
           return true;
         case cscmdListBoxItemSet:
           if (Event.Command.Info)
@@ -116,13 +116,13 @@ bool csListBoxItem::HandleEvent (iEvent &Event)
           return true;
         case cscmdListBoxItemScrollVertically:
           if (bound.IsEmpty ())
-            Event.Command.Info = (void *)true;
+            Event.Command.Info = true;
           else
           {
             int w,h;
             SuggestSize (w, h);
             if (bound.Height () < h)
-              Event.Command.Info = (void *)true;
+              Event.Command.Info = true;
           } /* endif */
           return true;
         case cscmdListBoxItemSetHorizOffset:
@@ -156,7 +156,7 @@ void csListBoxItem::SetState (int mask, bool enable)
     }
     Invalidate ();
     parent->SendCommand (GetState (CSS_LISTBOXITEM_SELECTED) ?
-      cscmdListBoxItemSelected : cscmdListBoxItemDeselected, this);
+      cscmdListBoxItemSelected : cscmdListBoxItemDeselected, (intptr_t)this);
   } /* endif */
   if ((oldstate ^ state) & CSS_FOCUSED)
   {
@@ -167,7 +167,7 @@ void csListBoxItem::SetState (int mask, bool enable)
     }
     Invalidate ();
     if (GetState (CSS_FOCUSED))
-      parent->SendCommand (cscmdListBoxMakeVisible, this);
+      parent->SendCommand (cscmdListBoxMakeVisible, (intptr_t)this);
   } /* endif */
 }
 
@@ -320,7 +320,7 @@ void csListBox::PlaceItems (bool setscrollbars)
           vertcount++;
         cur->SetRect (itembound);
         cur->SetState (CSS_VISIBLE, true);
-        cur->SendCommand (cscmdListBoxItemSetHorizOffset, (void *)deltax);
+        cur->SendCommand (cscmdListBoxItemSetHorizOffset, (intptr_t)deltax);
         cury += h;
       } /* endif */
     }
@@ -345,7 +345,7 @@ void csListBox::PlaceItems (bool setscrollbars)
       vsbstatus.maxsize = itemcount;
       vsbstatus.step = 1;
       vsbstatus.pagestep = vertcount;
-      vscroll->SendCommand (cscmdScrollBarSet, &vsbstatus);
+      vscroll->SendCommand (cscmdScrollBarSet, (intptr_t)&vsbstatus);
     } /* endif */
 
     int maxw = maxdeltax;
@@ -359,7 +359,7 @@ void csListBox::PlaceItems (bool setscrollbars)
       hsbstatus.maxvalue = maxdeltax;
       hsbstatus.step = 1;
       hsbstatus.pagestep = LISTBOX_HORIZONTAL_PAGESTEP;
-      hscroll->SendCommand (cscmdScrollBarSet, &hsbstatus);
+      hscroll->SendCommand (cscmdScrollBarSet, (intptr_t)&hsbstatus);
     } /* endif */
   } /* endif */
 }
@@ -383,34 +383,34 @@ bool csListBox::SetRect (int xmin, int ymin, int xmax, int ymax)
     return false;
 }
 
-static bool do_select (csComponent *child, void *param)
+static bool do_select (csComponent *child, intptr_t param)
 {
   if (child != (csComponent *)param)
     child->SetState (CSS_LISTBOXITEM_SELECTED, true);
   return false;
 }
 
-static bool do_deselect (csComponent *child, void *param)
+static bool do_deselect (csComponent *child, intptr_t param)
 {
   if (child != (csComponent *)param)
     child->SetState (CSS_LISTBOXITEM_SELECTED, false);
   return false;
 }
 
-static bool do_deleteitem (csComponent *child, void *param)
+static bool do_deleteitem (csComponent *child, intptr_t param)
 {
   (void)param;
   delete child;
   return false;
 }
 
-static bool do_true (csComponent *child, void *param)
+static bool do_true (csComponent *child, intptr_t param)
 {
   (void)child; (void)param;
   return true;
 }
 
-static bool do_findtext (csComponent *child, void *param)
+static bool do_findtext (csComponent *child, intptr_t param)
 {
   return (strcmp (child->GetText (), (char *)param) == 0);
 }
@@ -441,7 +441,7 @@ bool csListBox::HandleEvent (iEvent &Event)
 	      csComponent *comp = focused->prev;
 	      while (mc && comp->GetState (CSS_LISTBOXITEM_SELECTED))
 		comp = comp->prev;
-	      SendCommand (cscmdListBoxTrack, (void *)comp);
+	      SendCommand (cscmdListBoxTrack, (intptr_t)comp);
 	      if (mc) app->CaptureMouse (0);
 	    } /* endif */
 	    return true;
@@ -455,7 +455,7 @@ bool csListBox::HandleEvent (iEvent &Event)
 	      csComponent *comp = focused->next;
 	      while (mc && comp->GetState (CSS_LISTBOXITEM_SELECTED))
 		comp = comp->next;
-	      SendCommand (cscmdListBoxTrack, (void *)comp);
+	      SendCommand (cscmdListBoxTrack, (intptr_t)comp);
 	      if (mc) app->CaptureMouse (0);
 	    } /* endif */
 	    return true;
@@ -496,26 +496,24 @@ bool csListBox::HandleEvent (iEvent &Event)
 	  case CSKEY_PGUP:
 	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
 	      CSMASK_ALLSHIFTS) == 0)
-		    {
-			  int i;
-	      for (i = 0; i < vertcount; i++)
-		SendCommand (cscmdListBoxTrack, (void *)focused->prev);
-		    }
+	    {
+	      for (int i = 0; i < vertcount; i++)
+		SendCommand (cscmdListBoxTrack, (intptr_t)focused->prev);
+	    }
 	    else if ((csKeyEventHelper::GetModifiersBits (&Event) & 
-	      CSMASK_ALLSHIFTS) == CSMASK_CTRL)
-	      SendCommand (cscmdListBoxTrack, (void *)NextChild (first));
+		      CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+	      SendCommand (cscmdListBoxTrack, (intptr_t)NextChild (first));
 	    return true;
 	  case CSKEY_PGDN:
 	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
-	      CSMASK_ALLSHIFTS) == 0)
-		    {
-			  int i;
-	      for (i = 0; i < vertcount; i++)
-		SendCommand (cscmdListBoxTrack, (void *)focused->next);
-		    }
+		 CSMASK_ALLSHIFTS) == 0)
+	    {
+	      for (int i = 0; i < vertcount; i++)
+		SendCommand (cscmdListBoxTrack, (intptr_t)focused->next);
+	    }
 	    else if ((csKeyEventHelper::GetModifiersBits (&Event) & 
 	      CSMASK_ALLSHIFTS) == CSMASK_CTRL)
-	      SendCommand (cscmdListBoxTrack, (void *)PrevChild (first));
+	      SendCommand (cscmdListBoxTrack, (intptr_t)PrevChild (first));
 	    return true;
 	  case CSKEY_HOME:
 	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
@@ -526,7 +524,7 @@ bool csListBox::HandleEvent (iEvent &Event)
 	    }
 	    else if ((csKeyEventHelper::GetModifiersBits (&Event) & 
 	      CSMASK_ALLSHIFTS) == 0)
-	      SendCommand (cscmdListBoxTrack, (void *)NextChild (first));
+	      SendCommand (cscmdListBoxTrack, (intptr_t)NextChild (first));
 	    return true;
 	  case CSKEY_END:
 	    if ((csKeyEventHelper::GetModifiersBits (&Event) & 
@@ -537,7 +535,7 @@ bool csListBox::HandleEvent (iEvent &Event)
 	    }
 	    else if ((csKeyEventHelper::GetModifiersBits (&Event) & 
 	      CSMASK_ALLSHIFTS) == 0)
-	      SendCommand (cscmdListBoxTrack, (void *)PrevChild (first));
+	      SendCommand (cscmdListBoxTrack, (intptr_t)PrevChild (first));
 	    return true;
 	  case '/':
 	    if ((ListBoxStyle & CSLBS_MULTIPLESEL)
@@ -564,7 +562,7 @@ bool csListBox::HandleEvent (iEvent &Event)
 		&& (toupper (cur->GetText () [0]) == 
 		toupper (csKeyEventHelper::GetCookedCode (&Event))))
 		{
-		  SendCommand (cscmdListBoxTrack, (void *)cur);
+		  SendCommand (cscmdListBoxTrack, (intptr_t)cur);
 		  return true;
 		}
 		else
@@ -608,7 +606,7 @@ bool csListBox::HandleEvent (iEvent &Event)
               item->SetState (CSS_LISTBOXITEM_SELECTED, selstate = !selstate);
             else
             {
-              ForEachItem (do_deselect, (void *)item);
+              ForEachItem (do_deselect, (intptr_t)item);
               item->SetState (CSS_LISTBOXITEM_SELECTED, selstate = true);
             } /* endif */
           } else
@@ -624,7 +622,7 @@ bool csListBox::HandleEvent (iEvent &Event)
            && item->SendCommand (cscmdListBoxItemCheck))
           {
             if (app->MouseOwner != this)
-              ForEachItem (do_deselect, (void *)item);
+              ForEachItem (do_deselect, (intptr_t)item);
             SetFocused (item);
             Select ();
             item->SetState (CSS_LISTBOXITEM_SELECTED, (ListBoxStyle & CSLBS_MULTIPLESEL)
@@ -636,25 +634,25 @@ bool csListBox::HandleEvent (iEvent &Event)
           MakeItemVisible ((csComponent *)Event.Command.Info);
           return true;
         case cscmdListBoxQueryFirstSelected:
-          Event.Command.Info = ForEachItem (do_true, 0, true);
+          Event.Command.Info = (intptr_t)ForEachItem (do_true, 0, true);
           return true;
         case cscmdTimerPulse:
           if (app && app->MouseOwner == this)
           {
             GetMousePosition (Event.Mouse.x, Event.Mouse.y);
             if (Event.Mouse.y < BorderHeight)
-              SendCommand (cscmdListBoxTrack, (void *)focused->prev);
+              SendCommand (cscmdListBoxTrack, (intptr_t)focused->prev);
             else if ((Event.Mouse.y > bound.Height () - BorderHeight)
                   || (hscroll
                    && (Event.Mouse.y >= hscroll->bound.ymin)))
-                   SendCommand (cscmdListBoxTrack, (void *)focused->next);
+                   SendCommand (cscmdListBoxTrack, (intptr_t)focused->next);
           } /* endif */
           return true;
         case cscmdScrollBarValueChanged:
         {
           csScrollBar *bar = (csScrollBar *)Event.Command.Info;
           csScrollBarStatus sbs;
-          if (!bar || bar->SendCommand (cscmdScrollBarGetStatus, &sbs))
+          if (!bar || bar->SendCommand (cscmdScrollBarGetStatus, (intptr_t)&sbs))
             return true;
 
           if (sbs.maxvalue <= 0)
@@ -693,7 +691,8 @@ bool csListBox::HandleEvent (iEvent &Event)
           return true;
         }
         case cscmdListBoxSelectItem:
-          Event.Command.Info = ForEachItem (do_findtext, (char *)Event.Command.Info);
+          Event.Command.Info =
+	    (intptr_t)ForEachItem (do_findtext, (intptr_t)Event.Command.Info);
           return true;
       } /* endswitch */
       break;
@@ -703,7 +702,7 @@ bool csListBox::HandleEvent (iEvent &Event)
 
 void csListBox::MakeItemVisible (csComponent *item)
 {
-  if (!item->SendCommand (cscmdListBoxItemScrollVertically, (void *)false))
+  if (!item->SendCommand (cscmdListBoxItemScrollVertically, false))
   {
     // item is already visible
     return;
@@ -737,7 +736,7 @@ void csListBox::MakeItemVisible (csComponent *item)
 }
 
 csComponent *csListBox::ForEachItem (bool (*func) (csComponent *child,
-  void *param), void *param, bool iSelected)
+  intptr_t param), intptr_t param, bool iSelected)
 {
   if (!func)
     return 0;
@@ -786,7 +785,7 @@ bool csListBox::SetFocused (csComponent *comp)
     unsigned rc = (unsigned)comp->SendCommand (cscmdListBoxItemCheck, 0);
     if (rc == CS_LISTBOXITEMCHECK_SELECTED
      || rc == CS_LISTBOXITEMCHECK_UNSELECTED)
-      parent->SendCommand (cscmdListBoxItemFocused, comp);
+      parent->SendCommand (cscmdListBoxItemFocused, (intptr_t)comp);
   }
   return true;
 }

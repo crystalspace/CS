@@ -89,7 +89,7 @@ bool awsStatusBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsStatusBar::GetProperty (const char *name, void **parm)
+bool awsStatusBar::GetProperty (const char *name, intptr_t*parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -103,7 +103,7 @@ bool awsStatusBar::GetProperty (const char *name, void **parm)
   return false;
 }
 
-bool awsStatusBar::SetProperty (const char *name, void *parm)
+bool awsStatusBar::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 

@@ -258,14 +258,14 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   scrollbar->SetParent (this);
   scrollbar->Setup (_wmgr, sbinfo.GetThisNode ());
 
-  scrollbar->SetProperty ("Change", &change);
-  scrollbar->SetProperty ("BigChange", &bigchange);
-  scrollbar->SetProperty ("Max", &max);
-  scrollbar->SetProperty ("Min", &min);
+  scrollbar->SetProperty ("Change", (intptr_t)&change);
+  scrollbar->SetProperty ("BigChange", (intptr_t)&bigchange);
+  scrollbar->SetProperty ("Max", (intptr_t)&max);
+  scrollbar->SetProperty ("Min", (intptr_t)&min);
 
   // Setup trigger
   awsSink* _sink = new awsSink (WindowManager());
-  _sink->SetParm (this);
+  _sink->SetParm ((intptr_t)this);
   sink = _sink;
 
   sink->RegisterTrigger ("ScrollChanged", &ScrollChanged);
@@ -281,22 +281,22 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsListBox::GetProperty (const char *name, void **parm)
+bool awsListBox::GetProperty (const char *name, intptr_t *parm)
 {
   return awsPanel::GetProperty (name, parm);
 }
 
-bool awsListBox::SetProperty (const char *name, void *parm)
+bool awsListBox::SetProperty (const char *name, intptr_t parm)
 {
   return awsPanel::SetProperty (name, parm);
 }
 
-void awsListBox::ScrollChanged (void *sk, iAwsSource *source)
+void awsListBox::ScrollChanged (intptr_t sk, iAwsSource *source)
 {
   awsListBox *lb = (awsListBox *)sk;
   float *curval = 0;
 
-  source->GetComponent ()->GetProperty ("Value", (void **) &curval);
+  source->GetComponent ()->GetProperty ("Value", (intptr_t*)&curval);
 
   lb->UpdateMap ();
   lb->scroll_start = (int) *curval;
@@ -329,7 +329,7 @@ void awsListBox::UpdateMap ()
     // and the current value of the scrollbar will be the topmost visible row.
     float max_scroll;
     max_scroll = map_size;
-    scrollbar->SetProperty ("Max", &max_scroll);
+    scrollbar->SetProperty ("Max", (intptr_t)&max_scroll);
 
     // Map out items
     MapVisibleItems (&rows, start, map);
@@ -420,7 +420,7 @@ static void DoRecursiveClearList (awsListRowVector *v)
 
 /////////////// Scripted Actions //////////////////////////////////////////////
 
-void awsListBox::InsertItem (void *owner, iAwsParmList* parmlist)
+void awsListBox::InsertItem (intptr_t owner, iAwsParmList* parmlist)
 {
   if (!parmlist)
     return;
@@ -439,7 +439,7 @@ void awsListBox::InsertItem (void *owner, iAwsParmList* parmlist)
   row->cols = new awsListItem[lb->ncolumns];
   memset (row->cols, 0, sizeof (awsListItem) * lb->ncolumns);
 
-  parmlist->GetOpaque ("parent", (void **) &(row->parent));
+  parmlist->GetOpaque ("parent", (intptr_t*)&row->parent);
   row->selectable = true;
   parmlist->GetBool ("selectable", &(row->selectable));
 
@@ -494,12 +494,12 @@ void awsListBox::InsertItem (void *owner, iAwsParmList* parmlist)
     lb->rows.Push (row);
 
   // Pass back the id of this row, in case they want it.
-  parmlist->AddOpaque ("id", (void *)row);
+  parmlist->AddOpaque ("id", (intptr_t)row);
 
   lb->map_dirty = true;
 }
 
-void awsListBox::DeleteItem (void *owner, iAwsParmList* parmlist)
+void awsListBox::DeleteItem (intptr_t owner, iAwsParmList* parmlist)
 {
   if (!parmlist)
     return;
@@ -546,7 +546,7 @@ void awsListBox::DeleteItem (void *owner, iAwsParmList* parmlist)
   lb->map_dirty = true;
 }
 
-void awsListBox::GetSelectedItem (void *owner, iAwsParmList* parmlist)
+void awsListBox::GetSelectedItem (intptr_t owner, iAwsParmList* parmlist)
 {
   if (!parmlist)
     return;
@@ -555,7 +555,7 @@ void awsListBox::GetSelectedItem (void *owner, iAwsParmList* parmlist)
   parmlist->AddBool ("success", lb->GetItems (lb->sel, parmlist));
 }
 
-void awsListBox::GetItem (void *owner, iAwsParmList* parmlist)
+void awsListBox::GetItem (intptr_t owner, iAwsParmList* parmlist)
 {
   if (!parmlist)
     return;
@@ -659,7 +659,7 @@ bool awsListBox::GetItems (awsListRow *row, iAwsParmList* parmlist)
   return succ;
 }
 
-void awsListBox::ClearList (void *owner, iAwsParmList* )
+void awsListBox::ClearList (intptr_t owner, iAwsParmList* )
 {
   awsListBox *lb = (awsListBox *)owner;
 
@@ -676,7 +676,7 @@ bool awsListBox::Execute (const char *action, iAwsParmList* parmlist)
 {
   if (awsPanel::Execute (action, parmlist)) return true;
 
-  actions->Execute (action, this, parmlist);
+  actions->Execute (action, (intptr_t)this, parmlist);
 
   return false;
 }
@@ -973,11 +973,10 @@ void awsListBox::OnDraw (csRect clip)
       }
     }   // end while draw items recursively
 
-	// Map to a float to set PageSize for scrollbar
-	float drawable_float=drawable_count;
-    scrollbar->SetProperty ("PageSize", &drawable_float);
-
-  }   // end if there are any rows to draw
+    // Map to a float to set PageSize for scrollbar
+    float drawable_float=drawable_count;
+    scrollbar->SetProperty ("PageSize", (intptr_t)&drawable_float);
+  } // end if there are any rows to draw
 }
 
 bool awsListBox::DrawItemsRecursively (
@@ -1056,7 +1055,7 @@ bool awsListBox::DrawItemsRecursively (
     // Create hot spot for expand/collapse
     awsListHotspot *hs = new awsListHotspot;
 
-    hs->obj = row;
+    hs->obj = (intptr_t)row;
     hs->type = hsTreeBox;
     hs->r.Set (
         x + 2 + (tbw * (depth + 1)),
@@ -1084,7 +1083,7 @@ bool awsListBox::DrawItemsRecursively (
     // Create hot spot for expand/collapse
     awsListHotspot *hs = new awsListHotspot;
 
-    hs->obj = row;
+    hs->obj = (intptr_t)row;
     hs->type = hsTreeBox;
     hs->r.Set (x + 2, y, x + 2 + tbw, y + tbh);
 
@@ -1300,7 +1299,7 @@ bool awsListBox::DrawItemsRecursively (
       // Create hot spot for expand/collapse
       awsListHotspot *hs = new awsListHotspot;
 
-      hs->obj = &(row->cols[i]);
+      hs->obj = (intptr_t)&(row->cols[i]);
       hs->type = hsState;
       hs->r.Set (x + tx, y, x + tx + iw, y + ih);
 
@@ -1314,7 +1313,7 @@ bool awsListBox::DrawItemsRecursively (
   // Create hot spot for this row
   awsListHotspot *hs = new awsListHotspot;
 
-  hs->obj = row;
+  hs->obj = (intptr_t)row;
   hs->type = hsRow;
   hs->r.Set (Frame ().xmin + border, y, Frame ().xmax - border, y + ith);
 
@@ -1465,7 +1464,7 @@ bool awsListBox::OnKeyboard (const csKeyEventData& eventData)
 	    row = map[drawable_count + scroll_start];
 
 	  if (sel == row)
-	    awsScrollBar::IncClicked (scrollbar, 0);
+	    awsScrollBar::IncClicked ((intptr_t)scrollbar, 0);
 
 	  ///@@@ END_HACK
 
@@ -1501,7 +1500,7 @@ bool awsListBox::OnKeyboard (const csKeyEventData& eventData)
 		  row = map[scroll_start -1];
 
 	  if (sel == row)
-		  awsScrollBar::DecClicked (scrollbar, 0);
+		  awsScrollBar::DecClicked ((intptr_t)scrollbar, 0);
 
 	  ///@@@ END_HACK
 

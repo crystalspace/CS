@@ -22,6 +22,46 @@ chronological order.
 	  3.4.x, which complains (possibly incorrectly?) that IEEEFloatMantissa
 	  is not a templated type.
 	- Jorrit improved the PVS debugging stuff a bit.
+	- Eric Sunshine eliminated some warnings in `consoletest' issued by gcc
+	  for csPrintf()-related formatting directives about which it knows
+	  nothing.
+	- Eric Sunshine converted csSkelAnimControlRunnable to use csHash<>
+	  rather than the long-deprecated csHashMap.
+	- Eric Sunshine fixed bugs in csSkelAnimControlRunnable where it was
+	  leaking all of the rotation and position transforms which it
+	  allocated.
+	- Eric Sunshine made the following 64-bit platform compatibility
+	  changes:
+	    - Converted AWS to deal with intptr_t rather than void* for all of
+	      its opaque data needs. iAwsSinkManager::CreateSink(),
+	      iAwsComponent::GetProperty(), iAwsComponent::SetProperty(),
+	      iAwsSink::RegisterTrigger(), iAwsParmList::AddOpaque(),
+	      iAwsParmList::GetOpaque(), and related callbacks all now expect
+	      intptr_t.  Since converting client AWS code to the new API can be
+	      rather onerous on account of the amount of repetitious manual
+	      labor involved, the old void* API is still present, though
+	      heavily deprecated. As an aid to clients in upgrading their code
+	      to the new API, one of two control macros can be defined.
+	      Defining AWS_OBSOLETE_VOIDP removes from the API all methods
+	      dealing with void*'s, thus invocations of any such methods will
+	      generate compilation errors. Alternately, defining
+	      AWS_DEPRECATE_VOIDP, will cause invocations of methods dealing
+	      with void*'s to generate compilation warnings when using
+	      compilers which support deprecation warnings.
+	    - Converted the event system to deal with intptr_t rather than
+	      void* for the opaque `info' member of csevCommand-type events.
+	      iEventOutlet::Broadcast(), iEventOutlet::ImmediateBroadcast(),
+	      csEvent::csEvent(), and csEventCommandData::Info all now expect
+	      intptr_t.
+	    - Converted CSWS to deal with intptr_t rather than void* for all of
+	      its opaque data needs. csComponent::SendCommand(),
+	      csComponent::SendBroadcast(), csComponent::ForEach(),
+	      csKeyboardAccelerator::Command(), csTimer::csTimer(),
+	      csKeyboardAccelerator::Broadcast(), csListBoxItem::ForEachItem(),
+	      csTreeItem::ForEachItem(), csTreeBox::ForEachItem(), and the
+	      related callbacks all now expect intptr_t.
+	    - Fixed a number of additional potential 64-bit problems reported
+	      by the compiler throughout the project.
 21-Mar-2005
 	- Eric Sunshine re-wrote crystal.m4 essentially from scratch since it
 	  was fragile, obfuscated, and unnecessarily complex.

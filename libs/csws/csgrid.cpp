@@ -398,7 +398,7 @@ void csGridView::PlaceItems ()
     hsbstatus.maxvalue = hsbstatus.maxsize - nRowCells;
     hsbstatus.size =
     hsbstatus.pagestep = MAX (nRowCells, 1);
-    hscroll->SendCommand (cscmdScrollBarSet, &hsbstatus);
+    hscroll->SendCommand (cscmdScrollBarSet, (intptr_t)&hsbstatus);
 
     vRegionList.DeleteAll ();
     i = 0; w1 = 0; w2 = 0;
@@ -438,11 +438,11 @@ void csGridView::PlaceItems ()
     vsbstatus.maxvalue = vsbstatus.maxsize - nColCells;
     vsbstatus.size =
     vsbstatus.pagestep = MAX (nColCells, 1);
-    vscroll->SendCommand (cscmdScrollBarSet, &vsbstatus);
+    vscroll->SendCommand (cscmdScrollBarSet, (intptr_t)&vsbstatus);
   }
 }
 
-static bool DrawCellComponents (csComponent *child, void *param)
+static bool DrawCellComponents (csComponent *child, intptr_t param)
 {
   (void)param;
   child->Draw ();
@@ -590,7 +590,7 @@ bool csGridView::HandleEvent (iEvent& Event)
         {
           csScrollBar *bar = (csScrollBar*)Event.Command.Info;
           csScrollBarStatus sbs;
-          if (!bar || bar->SendCommand (cscmdScrollBarGetStatus, &sbs))
+          if (!bar || bar->SendCommand (cscmdScrollBarGetStatus, (intptr_t)&sbs))
             return true;
           if (sbs.maxvalue <= 0)
             return true;
@@ -733,7 +733,7 @@ void csGrid::init (csComponent *pParent, csRect &rc, int iStyle, csGridCell *gc)
   if (iStyle & CSGS_VSPLIT)
     splitterY = new csSplitter (this);
   if (pParent)
-    pParent->SendCommand (cscmdWindowSetClient, (void *)this);
+    pParent->SendCommand (cscmdWindowSetClient, (intptr_t)this);
   SetActiveView (GetRootView ());
 }
 
@@ -1014,7 +1014,7 @@ void csGrid::SetCursorPos (int row, int col)
   {
     ycur = row;
     xcur = col;
-    if (parent) parent->SendCommand (cscmdGridCursorChanged, (void*)this);
+    if (parent) parent->SendCommand (cscmdGridCursorChanged, (intptr_t)this);
   }
 }
 

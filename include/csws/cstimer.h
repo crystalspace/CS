@@ -83,8 +83,8 @@ class CS_CSWS_EXPORT csTimer : public csComponent
 public:
   /// Create timer object: the timer is created in running state
   csTimer (csComponent *iParent, unsigned iPeriod);
-  csTimer (iEventHandler *iParent, unsigned iPeriod, void *iInfo = 0);
-  csTimer (iEventQueue *iParent, unsigned iPeriod, void *iInfo = 0);
+  csTimer (iEventHandler *iParent, unsigned iPeriod, intptr_t iInfo = 0);
+  csTimer (iEventQueue *iParent, unsigned iPeriod, intptr_t iInfo = 0);
 
   /// Handle external events and generate timeouts
   virtual bool HandleEvent (iEvent &Event);

@@ -112,7 +112,7 @@ bool csComponent::ApplySkin (csSkin *Skin)
   return true;
 }
 
-static bool do_delete (csComponent *child, void *param)
+static bool do_delete (csComponent *child, intptr_t param)
 {
   (void)param;
   delete child;
@@ -154,7 +154,7 @@ void csComponent::ResetPalette ()
   }
 }
 
-static bool set_app (csComponent *child, void *param)
+static bool set_app (csComponent *child, intptr_t param)
 {
   child->SetApp ((csApp *)param);
   return false;
@@ -163,7 +163,7 @@ static bool set_app (csComponent *child, void *param)
 void csComponent::SetApp (csApp *newapp)
 {
   app = newapp;
-  ForEach (set_app, (void *)newapp);
+  ForEach (set_app, (intptr_t)newapp);
 }
 
 void csComponent::InsertClipChild (csComponent *clipchild)
@@ -244,8 +244,8 @@ void csComponent::Delete (csComponent *comp)
   } /* endif */
 }
 
-csComponent *csComponent::ForEach (bool (*func) (csComponent *child, void *param),
-  void *param, bool Zorder)
+csComponent *csComponent::ForEach (bool (*func) (csComponent *child, intptr_t param),
+  intptr_t param, bool Zorder)
 {
   if (!func)
     return 0;
@@ -266,14 +266,14 @@ csComponent *csComponent::ForEach (bool (*func) (csComponent *child, void *param
   return 0;
 }
 
-static bool find_child_by_id (csComponent *child, void *find_id)
+static bool find_child_by_id (csComponent *child, intptr_t find_id)
 {
   return (child->id == (csComponent::ID)find_id);
 }
 
 csComponent *csComponent::GetChild (ID find_id) const
 {
-  return ((csComponent *)this)->ForEach (find_child_by_id, (void*)find_id);
+  return ((csComponent *)this)->ForEach (find_child_by_id, (intptr_t)find_id);
 }
 
 bool csComponent::SetFocused (csComponent *comp)
@@ -283,11 +283,11 @@ bool csComponent::SetFocused (csComponent *comp)
   if (focused != comp)
   {
     // Ask parent if it agrees to move focus away from currently focused child
-    if (focused && !SendCommand (cscmdLoseFocus, focused))
+    if (focused && !SendCommand (cscmdLoseFocus, (intptr_t)focused))
       return false;
 
     // Now ask parent if it agrees to focus given child component
-    if (comp && !SendCommand (cscmdReceiveFocus, comp))
+    if (comp && !SendCommand (cscmdReceiveFocus, (intptr_t)comp))
       return false;
 
     csComponent *oldfocused;
@@ -401,7 +401,7 @@ int csComponent::dragX;
 int csComponent::dragY;
 int csComponent::dragMode = 0;
 
-bool csComponent::do_handle_event (csComponent *child, void *param)
+bool csComponent::do_handle_event (csComponent *child, intptr_t param)
 {
   iEvent *Event = (iEvent *)param;
 
@@ -544,7 +544,7 @@ bool csComponent::HandleEvent (iEvent &Event)
 	  (csKeyEventHelper::GetCookedCode (&Event) != CSKEY_ESC))
           break;
         if (app->MouseOwner != this)
-          return (ForEach (do_handle_event, &Event, true) != 0);
+          return (ForEach (do_handle_event, (intptr_t)&Event, true) != 0);
 AbortDrag:
         SetRect (dragBound->xmin, dragBound->ymin, dragBound->xmax, dragBound->ymax);
         dragMode = 0;
@@ -629,7 +629,7 @@ AbortDrag:
       // For mouse events, proceed from Z-order top child,
       // for all other events proceed from focused child
       if (!ret)
-        ret = (ForEach (do_handle_event, &Event, CS_IS_MOUSE_EVENT (Event)) != 0);
+        ret = (ForEach (do_handle_event, (intptr_t)&Event, CS_IS_MOUSE_EVENT (Event)) != 0);
   } /* endif */
 
   if (ret)
@@ -682,7 +682,7 @@ AbortDrag:
   return false;
 }
 
-static bool do_prehandle_event (csComponent *child, void *param)
+static bool do_prehandle_event (csComponent *child, intptr_t param)
 {
   iEvent *Event = (iEvent *)param;
 
@@ -702,10 +702,10 @@ static bool do_prehandle_event (csComponent *child, void *param)
 
 bool csComponent::PreHandleEvent (iEvent &Event)
 {
-  return !!(ForEach (do_prehandle_event, &Event, CS_IS_MOUSE_EVENT (Event)));
+  return !!(ForEach (do_prehandle_event, (intptr_t)&Event, CS_IS_MOUSE_EVENT (Event)));
 }
 
-static bool do_posthandle_event (csComponent *child, void *param)
+static bool do_posthandle_event (csComponent *child, intptr_t param)
 {
   iEvent *Event = (iEvent *)param;
 
@@ -725,10 +725,10 @@ static bool do_posthandle_event (csComponent *child, void *param)
 
 bool csComponent::PostHandleEvent (iEvent &Event)
 {
-  return !!(ForEach (do_posthandle_event, &Event, CS_IS_MOUSE_EVENT (Event)));
+  return !!(ForEach (do_posthandle_event, (intptr_t)&Event, CS_IS_MOUSE_EVENT (Event)));
 }
 
-void *csComponent::SendCommand (int CommandCode, void *Info)
+intptr_t csComponent::SendCommand (int CommandCode, intptr_t Info)
 {
   if (this)
   {
@@ -740,7 +740,7 @@ void *csComponent::SendCommand (int CommandCode, void *Info)
     return Info;
 }
 
-void *csComponent::SendBroadcast (int CommandCode, void *Info)
+intptr_t csComponent::SendBroadcast (int CommandCode, intptr_t Info)
 {
   if (this)
   {
@@ -784,11 +784,11 @@ bool csComponent::Select ()
   return true;
 }
 
-static bool do_find_default (csComponent *child, void *param)
+static bool do_find_default (csComponent *child, intptr_t param)
 {
   (void)param;
   if (child->GetState (CSS_SELECTABLE))
-    return (child->SendCommand (cscmdAreYouDefault, 0) == child);
+    return (child->SendCommand (cscmdAreYouDefault, 0) == (intptr_t)child);
   else
     return false;
 }
@@ -1197,7 +1197,7 @@ bool csComponent::SetRect (int xmin, int ymin, int xmax, int ymax)
     delta [0] = inv.xmin - xmin;
     delta [1] = inv.ymin - ymin;
     if (delta [0] || delta [1])
-      SendBroadcast (cscmdMoveClipChildren, &delta);
+      SendBroadcast (cscmdMoveClipChildren, (intptr_t)&delta);
   }
 
   if (parent)
@@ -2124,7 +2124,7 @@ bool csComponent::Maximize ()
     OrgBound.Set (bound);
     csRect newbound (0, 0, parent->bound.Width (), parent->bound.Height ());
     // give a chance to parent window to limit "maximize" bounds
-    parent->SendCommand (cscmdLimitMaximize, (void *)&newbound);
+    parent->SendCommand (cscmdLimitMaximize, (intptr_t)&newbound);
     SetRect (newbound);
     SetState (CSS_MAXIMIZED, true);
     return true;

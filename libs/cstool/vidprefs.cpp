@@ -249,7 +249,7 @@ bool csVideoPreferences::SetupWindow ()
   aws->SetupCanvas (0, g2d, g3d);
 
   // Setup sink.
-  iAwsSink* sink = aws->GetSinkMgr ()->CreateSink ((void*)this);
+  iAwsSink* sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
   sink->RegisterTrigger ("Software", &SetSoftware);
   sink->RegisterTrigger ("OpenGL", &SetOpenGL);
   aws->GetSinkMgr ()->RegisterSink ("VidPrefsSink", sink);
@@ -317,13 +317,13 @@ void csVideoPreferences::SetOpenGLL (iAwsSource *)
   exit_loop = true;
 }
 
-void csVideoPreferences::SetSoftware (void* vp, iAwsSource* source)
+void csVideoPreferences::SetSoftware (intptr_t vp, iAwsSource* source)
 {
   csVideoPreferences* vidprefs = (csVideoPreferences*)vp;
   vidprefs->SetSoftwareL (source);
 }
 
-void csVideoPreferences::SetOpenGL (void* vp, iAwsSource* source)
+void csVideoPreferences::SetOpenGL (intptr_t vp, iAwsSource* source)
 {
   csVideoPreferences* vidprefs = (csVideoPreferences*)vp;
   vidprefs->SetOpenGLL (source);

@@ -318,8 +318,8 @@ void csWsTest::MiscDialog ()
         (void)new csMenuItem (subsubmenu, "~Close", cscmdClose);
         (void)new csMenuItem (subsubmenu);
         (void)new csMenuItem (subsubmenu, "~Quit\tCtrl+Q", cscmdQuit);
-        subsubmenu->GetChild (cscmdHide)->SendCommand (cscmdMenuItemCheck, (void *)true);
-        subsubmenu->GetChild (cscmdQuit)->SendCommand (cscmdMenuItemCheck, (void *)true);
+        subsubmenu->GetChild (cscmdHide)->SendCommand (cscmdMenuItemCheck, true);
+        subsubmenu->GetChild (cscmdQuit)->SendCommand (cscmdMenuItemCheck, true);
       (void)new csMenuItem (submenu, "~Six", cscmdNothing);
       (void)new csMenuItem (submenu, "~Seven", cscmdNothing);
 
@@ -334,7 +334,7 @@ void csWsTest::MiscDialog ()
       (void)new csMenuItem (submenu, "~Context\tF1", cscmdNothing);
       (void)new csMenuItem (submenu);
       (void)new csMenuItem (submenu, "~About", cscmdNothing);
-      submenu->GetChild (cscmdNothing)->SendCommand (cscmdDeactivateMenu, (void *)false);
+      submenu->GetChild (cscmdNothing)->SendCommand (cscmdDeactivateMenu, false);
   }
   csDialog *toolbar = (csDialog *)window->GetChild (CSWID_TOOLBAR);
   if (toolbar)
@@ -455,7 +455,7 @@ void csWsTest::TreeDialog ()
     CSWS_BUTMAXIMIZE);
 
   csTreeDialog *d = new csTreeDialog (window);
-  window->SendCommand (cscmdWindowSetClient, (void *)d);
+  window->SendCommand (cscmdWindowSetClient, (intptr_t)d);
 
   // Begin tree control creation
 
@@ -542,7 +542,7 @@ void csWsTest::TreeDialog ()
   y += 14;
   rb = new csRadioButton (d, 9901);
   rb->SetPos (5, y);
-  rb->SendCommand (cscmdRadioButtonSet, (void *)true);
+  rb->SendCommand (cscmdRadioButtonSet, true);
   st = new csStatic (d, rb, "cstfsThinRect");
   st->SetPos (21, y + 2);
 
@@ -555,14 +555,14 @@ void csWsTest::TreeDialog ()
   y = 10;
   csCheckBox *cb = new csCheckBox (d, 9910);
   cb->SetPos (165, y); cb->SetState (CSS_GROUP, true);
-  cb->SendCommand (cscmdCheckBoxSet, (void *)true);
+  cb->SendCommand (cscmdCheckBoxSet, true);
   st = new csStatic (d, cb, "CSTS_HSCROLL");
   st->SetPos (181, y + 2);
 
   y += 14;
   cb = new csCheckBox (d, 9911);
   cb->SetPos (165, y);
-  cb->SendCommand (cscmdCheckBoxSet, (void *)true);
+  cb->SendCommand (cscmdCheckBoxSet, true);
   st = new csStatic (d, cb, "CSTS_VSCROLL");
   st->SetPos (181, y + 2);
 
@@ -735,7 +735,7 @@ void csWsTest::NotebookDialog ()
 
   // Now create the notebook window
   csNotebook *nb = new csNotebook (window, CSNBS_TABPOS_TOP);
-  window->SendCommand (cscmdWindowSetClient, (void *)nb);
+  window->SendCommand (cscmdWindowSetClient, (intptr_t)nb);
 
   csComponent *page = new cspExtDialog (nb);
   nb->AddPrimaryTab (page, "~Style", "Change notebook style");
@@ -744,7 +744,7 @@ void csWsTest::NotebookDialog ()
   int y = 10;
   csRadioButton *rb = new csRadioButton (page, 9990);
   rb->SetPos (5, y); rb->SetState (CSS_GROUP, true);
-  rb->SendCommand (cscmdRadioButtonSet, (void *)true);
+  rb->SendCommand (cscmdRadioButtonSet, true);
   csStatic *st = new csStatic (page, rb, "CSNBS_TABPOS_TOP");
   st->SetPos (21, y + 2);
 

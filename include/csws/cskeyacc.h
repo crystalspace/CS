@@ -55,9 +55,9 @@ public:
   /// Insert a key->event conversion table element
   void Event (int iKey, int iShifts, csEvent &iEv);
   /// Insert a key->command event conversion table element
-  void Command (int iKey, int iShifts, int iCommand, void *iInfo = 0);
+  void Command (int iKey, int iShifts, int iCommand, intptr_t iInfo = 0);
   /// Insert a key->broadcast event conversion table element
-  void Broadcast (int iKey, int iShifts, int iCommand, void *iInfo = 0);
+  void Broadcast (int iKey, int iShifts, int iCommand, intptr_t iInfo = 0);
 
   /// The "core" function
   virtual bool PostHandleEvent (iEvent &Event);

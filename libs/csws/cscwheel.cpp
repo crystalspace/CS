@@ -77,7 +77,7 @@ bool csColorWheel::HandleEvent (iEvent &Event)
         if ((ns != s) || (nh != h))
         {
           s = ns; h = nh;
-          parent->SendCommand (cscmdColorWheelChanged, this);
+          parent->SendCommand (cscmdColorWheelChanged, (intptr_t)this);
         }
         return true;
       }

@@ -71,7 +71,7 @@ bool csSplitter::HandleEvent (iEvent &Event)
       {
         app->CaptureMouse (0);
         isSliding = false;
-        parent->SendCommand (cscmdSplitterPosSet, (void *)this);
+        parent->SendCommand (cscmdSplitterPosSet, (intptr_t)this);
         Invalidate ();
         return true;
       }
@@ -87,7 +87,7 @@ bool csSplitter::HandleEvent (iEvent &Event)
         else
           SetPos (bound.xmin, bound.ymin + mousey - mdy);
         if (parent)
-          parent->SendCommand (cscmdSplitterPosChanged, (void *)this);
+          parent->SendCommand (cscmdSplitterPosChanged, (intptr_t)this);
         return true;
       }
       break;

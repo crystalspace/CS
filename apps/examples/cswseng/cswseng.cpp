@@ -70,7 +70,7 @@ ceEngineView::ceEngineView (csComponent *iParent, iEngine *Engine,
   motion = 0;
   SetState (CSS_SELECTABLE, true);
   if (parent)
-    parent->SendCommand (cscmdWindowSetClient, (void *)this);
+    parent->SendCommand (cscmdWindowSetClient, (intptr_t)this);
 }
 
 ceEngineView::~ceEngineView ()
@@ -176,7 +176,7 @@ struct inv_struct
   csComponent *stop_at;
 };
 
-static bool do_invalidate (csComponent *child, void *param)
+static bool do_invalidate (csComponent *child, intptr_t param)
 {
   inv_struct *is = (inv_struct *)param;
 
@@ -209,7 +209,7 @@ void ceEngineView::Draw ()
   is.rect.Set (bound);
   parent->LocalToGlobal (is.rect.xmin, is.rect.ymin);
   parent->LocalToGlobal (is.rect.xmax, is.rect.ymax);
-  app->ForEach (do_invalidate, &is, true);
+  app->ForEach (do_invalidate, (intptr_t)&is, true);
 
   // Also tell the graphics pipeline to update this rectangle
   app->pplInvalidate (is.rect);

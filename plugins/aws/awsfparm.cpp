@@ -149,7 +149,7 @@ void awsParmList::AddPoint (const char *name, csPoint *value)
   parms.Push (pi);
 }
 
-void awsParmList::AddOpaque(const char *name, void *value)
+void awsParmList::AddOpaque(const char *name, intptr_t value)
 {
   parmItem *pi = new parmItem;
 
@@ -267,7 +267,7 @@ bool awsParmList::GetPoint (const char *name, csPoint **value) const
   return false;
 }
 
-bool awsParmList::GetOpaque (const char *name, void **value) const
+bool awsParmList::GetOpaque (const char *name, intptr_t *value) const
 {
   parmItem *pi = FindParm (name, VOPAQUE);
 

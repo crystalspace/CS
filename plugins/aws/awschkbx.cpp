@@ -69,7 +69,7 @@ bool awsCheckBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-bool awsCheckBox::GetProperty (const char *name, void **parm)
+bool awsCheckBox::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
@@ -80,7 +80,7 @@ bool awsCheckBox::GetProperty (const char *name, void **parm)
     if (caption) st = caption->GetData ();
 
     iString *s = new scfString (st);
-    *parm = (void *)s;
+    *parm = (intptr_t)s;
     return true;
   }
   else if (strcmp ("State", name) == 0)
@@ -94,7 +94,7 @@ bool awsCheckBox::GetProperty (const char *name, void **parm)
   return false;
 }
 
-bool awsCheckBox::SetProperty (const char *name, void *parm)
+bool awsCheckBox::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 

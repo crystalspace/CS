@@ -99,14 +99,14 @@ int awsImageView::GetColor()
   return color;
 }
 
-bool awsImageView::GetProperty (const char *name, void **parm)
+bool awsImageView::GetProperty (const char *name, intptr_t *parm)
 {
   if (awsComponent::GetProperty (name, parm)) return true;
 
   return false;
 }
 
-bool awsImageView::SetProperty (const char *name, void *parm)
+bool awsImageView::SetProperty (const char *name, intptr_t parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
 

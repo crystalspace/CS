@@ -684,8 +684,7 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       if ((GLOBAL_ASSISTANT != 0))
       {
 	iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-        outlet->Broadcast (cscmdFocusChanged,
-          (void *)(LOWORD (wParam) != WA_INACTIVE));
+        outlet->Broadcast (cscmdFocusChanged, LOWORD(wParam) != WA_INACTIVE);
       }
       break;
     case WM_CREATE:

@@ -236,7 +236,7 @@ bool csMenuItem::HandleEvent (iEvent &Event)
 	    && (focused->GetState (CSS_VISIBLE))
 	    && (!((csMenu *)parent)->IsMenuBar ()))
 	    {
-	      parent->SendCommand (cscmdMenuSetDropFlag, (void *)false);
+	      parent->SendCommand (cscmdMenuSetDropFlag, false);
 	      return true;
 	    };
 	    return false;
@@ -245,7 +245,7 @@ bool csMenuItem::HandleEvent (iEvent &Event)
 	    && (!focused->GetState (CSS_VISIBLE))
 	    && (!((csMenu *)parent)->IsMenuBar ()))
 	    {
-	      parent->SendCommand (cscmdMenuSetDropFlag, (void *)true);
+	      parent->SendCommand (cscmdMenuSetDropFlag, true);
 	      return true;
 	    };
 	    return false;
@@ -254,7 +254,7 @@ bool csMenuItem::HandleEvent (iEvent &Event)
       break;
     case csevMouseDown:
       if (Event.Mouse.Button == 2)
-        parent->SendCommand (cscmdDeactivateMenu, (void *)cscmdCancel);
+        parent->SendCommand (cscmdDeactivateMenu, cscmdCancel);
       break;
     case csevMouseUp:
       if ((Event.Mouse.Button == 1)
@@ -276,7 +276,7 @@ bool csMenuItem::HandleEvent (iEvent &Event)
             focused->SendCommand (cscmdMenuPlaceItems);
           return true;
         case cscmdMenuCaptureMouse:
-          parent->SendCommand (cscmdMenuCaptureMouse, this);
+          parent->SendCommand (cscmdMenuCaptureMouse, (intptr_t)this);
           Event.Command.Info = 0;
           return true;
         case cscmdActivate:
@@ -290,14 +290,14 @@ bool csMenuItem::HandleEvent (iEvent &Event)
           Invalidate ();
           return true;
         case cscmdMenuItemGetStyle:
-          Event.Command.Info = (void *)Style;
+          Event.Command.Info = Style;
           return true;
         case cscmdMenuItemFindId:
           if (focused)
-            Event.Command.Info = ((csMenu *)focused)->GetItem ((int)Event.Command.Info);
+            Event.Command.Info = (intptr_t)(((csMenu *)focused)->GetItem ((int)Event.Command.Info));
           else
             if (CommandCode == (int)Event.Command.Info)
-              Event.Command.Info = this;
+              Event.Command.Info = (intptr_t)this;
             else
               Event.Command.Info = 0;
           return true;
@@ -330,7 +330,7 @@ void csMenuItem::Draw ()
     }
     else if ((vis) && (selected) && (focused->GetState (CSS_VISIBLE) == 0))
     {
-      focused->SendCommand (cscmdMenuSetDropFlag, (void *)false);
+      focused->SendCommand (cscmdMenuSetDropFlag, false);
       focused->Show (true);
       // If no menu has captured the mouse, select last selected item
       if (!((csMenu *)focused)->current && app->MouseOwner == 0)
@@ -380,18 +380,18 @@ void csMenuItem::Press ()
 {
   // Drop the submenu if there is one
   if (focused)
-    parent->SendCommand (cscmdMenuSetDropFlag, (void *)true);
+    parent->SendCommand (cscmdMenuSetDropFlag, true);
   // Set parent's current item to this
-  parent->SendCommand (cscmdMenuSetItem, this);
+  parent->SendCommand (cscmdMenuSetItem, (intptr_t)this);
   // If parent is focused, deactivate it
   if (!focused
    && !(Style & CSMIS_NOCLOSE)
    && parent->GetState (CSS_FOCUSED))
     parent->SendCommand (cscmdDeactivateMenu,
-      (void *)(CommandCode ? CommandCode : (int)cscmdCancel));
+      CommandCode ? CommandCode : (int)cscmdCancel);
   // Send the command to parent
   if (CommandCode != cscmdNothing)
-    parent->SendCommand (CommandCode, this);
+    parent->SendCommand (CommandCode, (intptr_t)this);
 }
 
 csMenu::csMenu (csComponent *iParent, csMenuFrameStyle iFrameStyle,
@@ -630,7 +630,7 @@ bool csMenu::CurrentHandleEvent (iEvent &Event)
   return ret;
 }
 
-static bool do_findmouse (csComponent *child, void *param)
+static bool do_findmouse (csComponent *child, intptr_t param)
 {
   iEvent *Event = (iEvent *)param;
   if (child->GetState (CSS_SELECTABLE) == 0)
@@ -638,7 +638,7 @@ static bool do_findmouse (csComponent *child, void *param)
   return child->bound.Contains (Event->Mouse.x, Event->Mouse.y);
 }
 
-static bool do_forall (csComponent *child, void *param)
+static bool do_forall (csComponent *child, intptr_t param)
 {
   return child->HandleEvent (*((iEvent *)param));
 }
@@ -652,7 +652,7 @@ bool csMenu::HandleEvent (iEvent &Event)
       if (Event.Mouse.Button != 1)
         break;
 
-      csComponent *item = ForEach (do_findmouse, (void *)&Event, true);
+      csComponent *item = ForEach (do_findmouse, (intptr_t)&Event, true);
       if (item)
       {
         item->SendCommand (cscmdActivate);
@@ -669,7 +669,7 @@ bool csMenu::HandleEvent (iEvent &Event)
       if (Event.Mouse.Button != 1)
         break;
       Select ();
-      if (parent->SendCommand (cscmdMenuCaptureMouse, this))
+      if (parent->SendCommand (cscmdMenuCaptureMouse, (intptr_t)this))
         app->CaptureMouse (this);
       // fallback to MouseMove
     case csevMouseMove:
@@ -677,7 +677,7 @@ bool csMenu::HandleEvent (iEvent &Event)
       if (GetState (CSS_FOCUSED))
       {
         // Find the item under cursor
-        csComponent *item = (csComponent *)ForEach (do_findmouse, (void *)&Event, true);
+        csComponent *item = (csComponent *)ForEach (do_findmouse, (intptr_t)&Event, true);
         // If mouse is not captured, don't deselect items
         if (item || app->MouseOwner)
           // If menu item has a child menu, don't deselect it
@@ -700,7 +700,7 @@ bool csMenu::HandleEvent (iEvent &Event)
 	switch (csKeyEventHelper::GetCookedCode (&Event))
 	{
 	  case CSKEY_ESC:
-	    if (parent->SendCommand (cscmdMenuSetDropFlag, (void *)false) == 0)
+	    if (parent->SendCommand (cscmdMenuSetDropFlag, false) == 0)
 	    {
 	      Deactivate (cscmdCancel);
 	      return true;
@@ -726,13 +726,13 @@ bool csMenu::HandleEvent (iEvent &Event)
 	    {
 	      if (IsMenuBar () && !SubMenuOpened)
 	      {
-		SendCommand (cscmdMenuSetDropFlag, (void *)true);
+		SendCommand (cscmdMenuSetDropFlag, true);
 		return true;
 	      } /* endif */
 	      return false;
 	    } /* endif */
 	  default:
-	    return !!(ForEach (do_forall, &Event));
+	    return !!(ForEach (do_forall, (intptr_t)&Event));
 	} /* endswitch */
       }
       break;
@@ -749,7 +749,7 @@ bool csMenu::HandleEvent (iEvent &Event)
           PlaceItems ();
           return true;
         case cscmdMenuCaptureMouse:
-          if (parent->SendCommand (cscmdMenuCaptureMouse, this))
+          if (parent->SendCommand (cscmdMenuCaptureMouse, (intptr_t)this))
             app->CaptureMouse (this);
           Event.Command.Info = 0;
           return true;
@@ -764,7 +764,7 @@ bool csMenu::HandleEvent (iEvent &Event)
             SetCurrent (focused);
           return true;
         case cscmdMenuQueryDropFlag:
-          Event.Command.Info = (void *)SubMenuOpened;
+          Event.Command.Info = SubMenuOpened;
           return true;
         case cscmdMenuSetDropFlag:
           if (SubMenuOpened != (Event.Command.Info ? true : false))
@@ -772,7 +772,7 @@ bool csMenu::HandleEvent (iEvent &Event)
             SubMenuOpened = (Event.Command.Info ? true : false);
             if (current)
               current->Invalidate ();
-            Event.Command.Info = this;
+            Event.Command.Info = (intptr_t)this;
           } /* endif */
           return true;
         default:
@@ -803,7 +803,7 @@ bool csMenu::PreHandleEvent (iEvent &Event)
      || (csKeyEventHelper::GetModifiersBits (&Event) & CSMASK_CTRL))
       return false;
     // Cycle through all menu items, checking for hotkey
-    if (ForEach (do_forall, &Event))
+    if (ForEach (do_forall, (intptr_t)&Event))
     {
       // Activate this menu
       Select ();
@@ -816,7 +816,7 @@ bool csMenu::PreHandleEvent (iEvent &Event)
 void csMenu::Deactivate (int DismissCode)
 {
   // If parent didn't eat cscmdDeactivateMenu, we'll deactivate
-  if (parent->SendCommand (cscmdDeactivateMenu, (void *)DismissCode))
+  if (parent->SendCommand (cscmdDeactivateMenu, DismissCode))
   {
     // If we're Execute()'ing, dismiss
     if (app->FocusOwner == this)
@@ -855,7 +855,7 @@ void csMenu::SetItemWidth (csComponent *start, int count, int width)
   } /* endwhile */
 }
 
-static bool do_place_items (csComponent *child, void *param)
+static bool do_place_items (csComponent *child, intptr_t param)
 {
   (void)param;
   child->SendCommand (cscmdMenuPlaceItems);
@@ -996,10 +996,10 @@ struct finditem_rec
   csComponent *result;
 };
 
-static bool do_finditem (csComponent *child, void *param)
+static bool do_finditem (csComponent *child, intptr_t param)
 {
   csComponent *res = (csComponent *)child->SendCommand (cscmdMenuItemFindId,
-    (void *)((finditem_rec *)param)->id);
+    ((finditem_rec *)param)->id);
   if (res)
   {
     ((finditem_rec *)param)->result = res;
@@ -1014,7 +1014,7 @@ csComponent *csMenu::GetItem (int iCommandCode)
   finditem_rec fr;
   fr.id = iCommandCode;
   fr.result = 0;
-  ForEach (do_finditem, (void *)&fr);
+  ForEach (do_finditem, (intptr_t)&fr);
   return fr.result;
 }
 
@@ -1022,7 +1022,7 @@ void csMenu::SetCheck (int iCommandCode, bool iState)
 {
   csComponent *item = GetItem (iCommandCode);
   if (item)
-    item->SendCommand (cscmdMenuItemCheck, (void *)iState);
+    item->SendCommand (cscmdMenuItemCheck, iState);
 }
 
 bool csMenu::GetCheck (int iCommandCode)

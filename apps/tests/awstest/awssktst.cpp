@@ -44,7 +44,7 @@ void awsTestSink::SetWindowManager(iAws *_wmgr)
   wmgr=_wmgr;
 }
 
-void awsTestSink::FillBarChart(void *sk, iAwsSource *source)
+void awsTestSink::FillBarChart(intptr_t sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   iAwsComponent *comp = source->GetComponent();
@@ -77,13 +77,13 @@ void awsTestSink::FillBarChart(void *sk, iAwsSource *source)
 }
 
 
-void awsTestSink::FillListBox(void *sk, iAwsSource *source)
+void awsTestSink::FillListBox(intptr_t sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   iAwsComponent *comp = source->GetComponent();
 
   iAwsParmList *pl=0;
-  void * parent;
+  intptr_t  parent;
 
   printf("awstest: Filling list box.\n");
 
@@ -286,47 +286,47 @@ void awsTestSink::FillListBox(void *sk, iAwsSource *source)
   pl->DecRef();
 }
 
-void awsTestSink::RedClicked(void *sink,   iAwsSource *source)
+void awsTestSink::RedClicked(intptr_t sink, iAwsSource *source)
 {
-  printf("awstest: red button clicked, source: %p, owner: %p, component: %p\n", source, sink, source->GetComponent());
+  printf("awstest: red button clicked, source: %p, owner: %p, component: %p\n", source, (void*)sink, source->GetComponent());
 
   namec++;
   if (namec > 8) namec=0;
 
   iAwsComponent *comp = source->GetComponent();
-  comp->SetProperty("Caption", new scfString(names[namec]));
+  comp->SetProperty("Caption", (intptr_t)new scfString(names[namec]));
 }
 
-void awsTestSink::BlueClicked(void *sink,  iAwsSource *source)
+void awsTestSink::BlueClicked(intptr_t sink, iAwsSource *source)
 {
-  printf("awstest: blue button clicked, source: %p, owner: %p\n", source, sink);
+  printf("awstest: blue button clicked, source: %p, owner: %p\n", source, (void*)sink);
 }
 
 
-void awsTestSink::GreenClicked(void *sink, iAwsSource *source)
+void awsTestSink::GreenClicked(intptr_t sink, iAwsSource *source)
 {
-  printf("awstest: green button clicked, source: %p, owner: %p\n", source, sink);
+  printf("awstest: green button clicked, source: %p, owner: %p\n", source, (void*)sink);
 }
 
-void awsTestSink::SetPass(void *sk, iAwsSource *source)
+void awsTestSink::SetPass(intptr_t sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   if (sink->pass) sink->pass->DecRef();
 
   iAwsComponent *comp = source->GetComponent();
-  comp->GetProperty("Text", (void**)&sink->pass);
+  comp->GetProperty("Text", (intptr_t*)&sink->pass);
 }
 
-void awsTestSink::SetUser(void *sk, iAwsSource *source)
+void awsTestSink::SetUser(intptr_t sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   if (sink->user) sink->user->DecRef();
 
   iAwsComponent *comp = source->GetComponent();
-  comp->GetProperty("Text", (void**)&sink->user);
+  comp->GetProperty("Text", (intptr_t*)&sink->user);
 }
 
-void awsTestSink::Login(void *sk, iAwsSource *source)
+void awsTestSink::Login(intptr_t sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   if (sink->user==0 || sink->pass==0)

@@ -150,7 +150,7 @@ struct awsListHotspot
   csRect r;
 
   /// The owner of the hotspot (either an item or row).
-  void *obj;
+  intptr_t obj;
 
   /// The type of hotspot (tree box, stateful item, etc.).
   int type;
@@ -253,22 +253,22 @@ private:
   awsActionDispatcher* actions;
 
   /// Trigger for catching scroll signals.
-  static void ScrollChanged (void *sk, iAwsSource *source);
+  static void ScrollChanged (intptr_t sk, iAwsSource *source);
 
   /// Inserts an item.
-  static void InsertItem (void *owner, iAwsParmList* parmlist);
+  static void InsertItem (intptr_t owner, iAwsParmList* parmlist);
 
   /// Deletes an item.
-  static void DeleteItem (void *owner, iAwsParmList* parmlist);
+  static void DeleteItem (intptr_t owner, iAwsParmList* parmlist);
 
   /// Get the selected item.
-  static void GetSelectedItem (void *owner, iAwsParmList* parmlist);
+  static void GetSelectedItem (intptr_t owner, iAwsParmList* parmlist);
 
   /// Get an item by row number.
-  static void GetItem (void *owner, iAwsParmList* parmlist);
+  static void GetItem (intptr_t owner, iAwsParmList* parmlist);
 
   /// Clears the entire list.
-  static void ClearList (void *owner, iAwsParmList* parmlist);
+  static void ClearList (intptr_t owner, iAwsParmList* parmlist);
 
   /**
    * Counts the number of visible items recursively, given the starting vector.
@@ -342,10 +342,10 @@ public:
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Get properties.
-  bool GetProperty (const char *name, void **parm);
+  bool GetProperty (const char *name, intptr_t *parm);
 
   /// Set properties.
-  bool SetProperty (const char *name, void *parm);
+  bool SetProperty (const char *name, intptr_t parm);
 
   /// Executes some actions.
   bool Execute (const char *action, iAwsParmList* parmlist);

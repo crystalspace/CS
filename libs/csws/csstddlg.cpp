@@ -376,7 +376,7 @@ bool cspFileDialog::HandleEvent (iEvent &Event)
   return csDialog::HandleEvent (Event);
 }
 
-static bool is_checked (csComponent *child, void *param)
+static bool is_checked (csComponent *child, intptr_t param)
 {
   (void)child; (void)param;
   return true;
@@ -582,7 +582,7 @@ void cspFileDialog::Reread ()
   // Place listbox items
   // Activate current directory item
   if (activate)
-    activate->SendCommand (cscmdListBoxItemSet, (void *)true);
+    activate->SendCommand (cscmdListBoxItemSet, (intptr_t)true);
 }
 
 bool cspFileDialog::GetFileName(char *buf, size_t bufsize)
@@ -772,10 +772,10 @@ void cspColorDialog::UpdateInfo (bool UpdateSlider)
     csComponent *c = GetChild (wid);			\
     if (c)						\
     {							\
-      c->SendCommand (cscmdScrollBarGetStatus, &sbs);	\
+      c->SendCommand (cscmdScrollBarGetStatus, (intptr_t)&sbs);	\
       sbs.value = int ((val) * 255.9);			\
       if (UpdateSlider)					\
-        c->SendCommand (cscmdScrollBarSet, &sbs);	\
+        c->SendCommand (cscmdScrollBarSet, (intptr_t)&sbs);	\
       char buff [10];					\
       sprintf (buff, "%d", sbs.value);			\
       c = GetChild (wid##_NUM);				\
@@ -809,8 +809,8 @@ void cspColorDialog::SetRGB (float iR, float iG, float iB)
 void cspColorDialog::SetHLSmode (bool Enable)
 {
   hlsmode = Enable;
-  GetChild (CSWID_COLORHLS)->SendCommand (cscmdRadioButtonSet, (void *)Enable);
-  GetChild (CSWID_COLORRGB)->SendCommand (cscmdRadioButtonSet, (void *)!Enable);
+  GetChild (CSWID_COLORHLS)->SendCommand (cscmdRadioButtonSet, (intptr_t)Enable);
+  GetChild (CSWID_COLORRGB)->SendCommand (cscmdRadioButtonSet, (intptr_t)!Enable);
 
   csComponent *c = GetChild (CSWID_COLORHR_LABEL);
   if (c) c->SetText (hlsmode ? "~H" : "~R");
@@ -834,13 +834,13 @@ bool cspColorDialog::HandleEvent (iEvent &Event)
           app->Dismiss (Event.Command.Code);
           return true;
         case cscmdToggleHLS:
-          SetHLSmode (Event.Command.Info == GetChild (CSWID_COLORHLS));
+          SetHLSmode (Event.Command.Info == (intptr_t)GetChild (CSWID_COLORHLS));
           return true;
         case cscmdScrollBarValueChanged:
         {
           csScrollBarStatus sbs;
           csComponent *c = ((csComponent *)Event.Command.Info);
-          c->SendCommand (cscmdScrollBarGetStatus, &sbs);
+          c->SendCommand (cscmdScrollBarGetStatus, (intptr_t)&sbs);
           float val = float (sbs.value) / 255;
           if (GetChild (CSWID_COLORHR) == c)
             if (hlsmode) h = val; else r = val;
@@ -909,7 +909,7 @@ csWindow *csColorDialog (csComponent *iParent, const char *iTitle,
     sbs.maxsize = 10;							\
     sbs.step = 1;							\
     sbs.pagestep = 10;							\
-    sb->SendCommand (cscmdScrollBarSet, &sbs);				\
+    sb->SendCommand (cscmdScrollBarSet, (intptr_t)&sbs);		\
 									\
     st = new csStatic (d, 0, "@@@");					\
     st->SetPos (sb->bound.xmax + 4,					\

@@ -535,8 +535,8 @@ public:
    * Function can scan from top-Z child (Zorder == true) or from
    * focused child (Zorder == false).
    */
-  csComponent *ForEach (bool (*func) (csComponent *child, void *param),
-    void *param = 0, bool Zorder = false);
+  csComponent *ForEach (bool (*func) (csComponent *child, intptr_t param),
+    intptr_t param = 0, bool Zorder = false);
 
   /// Find a child component by its ID
   csComponent *GetChild (ID find_id) const;
@@ -559,9 +559,9 @@ public:
   virtual bool PostHandleEvent (iEvent &Event);
 
   /// Send a command to this window and returns the Info field of iEvent object
-  void *SendCommand (int CommandCode, void *Info = 0);
+  intptr_t SendCommand (int CommandCode, intptr_t Info = 0);
   /// Send a broadcast to this window and returns the Info field of iEvent object
-  void *SendBroadcast (int CommandCode, void *Info = 0);
+  intptr_t SendBroadcast (int CommandCode, intptr_t Info = 0);
 
   /// Find the 'default' child
   csComponent *GetDefault ();
@@ -887,7 +887,7 @@ protected:
   void CheckDirtyBU (csRect &ioR);
 
 private:
-  static bool do_handle_event (csComponent *child, void *param);
+  static bool do_handle_event (csComponent *child, intptr_t param);
 };
 
 /** @} */

@@ -51,10 +51,11 @@ struct iAwsParmList : public iBase
   virtual void AddPoint(const char *name, csPoint *value) = 0;
   /**
    * Adds an opaque, undefined value to the parm list. This is stored as a
-   * (void*), but should never be assumed to be anything at all, except some
-   * value that fits in sizeof(void*)
+   * (intptr_t), but should never be assumed to be anything at all, except some
+   * value that fits in sizeof(intptr_t), which is guaranteed to be large
+   * enough to store a number or a pointer.
    */
-  virtual void AddOpaque (const char *name, void *value) = 0;
+  virtual void AddOpaque (const char *name, intptr_t value) = 0;
 
   /**
    * Returns the int named "name" in value.  True if it was found, otherwise
@@ -113,7 +114,7 @@ struct iAwsParmList : public iBase
    * Returns the opaque value named "name" in value.  True if it was found,
    * otherwise false.
    */
-  virtual bool GetOpaque (const char *name, void **value) const = 0;
+  virtual bool GetOpaque (const char *name, intptr_t *value) const = 0;
 
   /// Clears the parameter list
   virtual void Clear() = 0;

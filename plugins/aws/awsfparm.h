@@ -61,7 +61,7 @@ public:
       iStringArray *sv;
       csRect *r;
       csPoint *p;
-      void *v;
+      intptr_t v;
     } parm;
 
     parmItem () : type (INT) { parm.i = 0; }
@@ -108,10 +108,10 @@ public:
 
   /**
    * Adds an opaque, undefined value to the parm list. This is stored as
-   * a void *, but should never be assumed to be anything at all, except
-   * some value that fits in sizeof(void *)
+   * an intptr_t, but should never be assumed to be anything at all, except
+   * some value that fits in sizeof(intptr_t).
    */
-  virtual void AddOpaque (const char *name, void *value);
+  virtual void AddOpaque (const char *name, intptr_t value);
 
   /**
    * Returns the int named "name" in value. True if it was found,
@@ -178,7 +178,7 @@ public:
    * Returns the opaque value named "name" in value.  True if it was found,
    * otherwise false.
    */
-  virtual bool GetOpaque (const char *name, void **value) const;
+  virtual bool GetOpaque (const char *name, intptr_t *value) const;
 
   /// Clears the parameter list.
   virtual void Clear ();

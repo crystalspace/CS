@@ -65,8 +65,8 @@ private:
 
   void SetSoftwareL (iAwsSource *source);
   void SetOpenGLL (iAwsSource *source);
-  static void SetSoftware (void* vidprefs, iAwsSource *source);
-  static void SetOpenGL (void* vidprefs, iAwsSource *source);
+  static void SetSoftware (intptr_t vidprefs, iAwsSource *source);
+  static void SetOpenGL (intptr_t vidprefs, iAwsSource *source);
 
 public:
   /**
