@@ -1909,6 +1909,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n)
   meshptr = &rendermesh;
   return &meshptr;
 #else
+  n = 0;
   return 0;
 #endif
 }

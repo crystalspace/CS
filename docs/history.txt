@@ -57,6 +57,26 @@ chronological order.
 	      - stars now compiles.
 	      - Disabled terrfunc and terrbig from the Jam build with
 	        new renderer enabled. There are a bit harder to fix right.
+	- Jorrit fixed the loader plugin so that it recognizes <layer> and
+	  <effect> again even with new renderer enabled. Just doesn't do
+	  anything at this moment.
+	- Jorrit changed Jamrules so that the list of static plugins is
+	  extended with the new renderer plugins if new renderer is selected.
+	- Jorrit fixed a bug with thing and the new renderer. FillRenderMeshes()
+	  did not properly call Prepare() which caused obj_normals not to be
+	  set in case smoothing was enabled.
+	- Jorrit fixed all GetRenderMeshes() calls in meshes that don't yet
+	  support the new renderer so that they at least set 'num' to 0
+	  correctly. That way they will work with the new renderer (but
+	  don't display anything).
+	- Jorrit changed the loader so that it will now automatically create
+	  and load ambient.xml and light.xml if the <shader> block is missing
+	  in the world file. This is to support old world files. Note that this
+	  is only really a temporary hack. We have to see what happens if
+	  we load multiple world files and those shaders are already loaded.
+	- Jorrit changed the loader so that a material will automatically use
+	  'light' as the diffuse shader and 'ambient' as the ambient shader
+	  if no shaders are otherwise mentioned.
 	- Eric Sunshine fixed xwindow.mak to use DO.PLUGIN.PREAMBLE, CORE,
 	  POSTAMBLE, rather than simply DO.PLUGIN.  This is necesary since it
 	  utilizes additional build flags.

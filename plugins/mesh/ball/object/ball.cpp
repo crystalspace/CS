@@ -695,6 +695,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
   num = 1;
   return &meshPtr;
 #else
+  num = 0;
   return 0;
 #endif
 }

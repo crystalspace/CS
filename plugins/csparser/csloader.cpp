@@ -973,6 +973,11 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
 {
   if (!Engine) return false;
 
+#ifdef CS_USE_NEW_RENDERER
+  // Will be set to true if we find a <shader> section.
+  bool shader_given = false;
+#endif
+
   csRef<iDocumentNode> sequences;
   csRef<iDocumentNode> triggers;
 
@@ -1051,6 +1056,23 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
             return false;
           break;
         case XMLTOKEN_MATERIALS:
+#ifdef CS_USE_NEW_RENDERER
+	  // If there was no <shader> section we create the default shaders here.
+	  if (!shader_given)
+	  {
+	    csRef<iShaderManager> shaderMgr =
+	      CS_QUERY_REGISTRY (object_reg, iShaderManager);
+	    csRef<iShader> shader_ambient = shaderMgr->CreateShader ();
+	    csRef<iDataBuffer> db_ambient = VFS->ReadFile (
+	    	"/shader/ambient.xml");
+	    shader_ambient->Load (db_ambient);
+
+	    csRef<iShader> shader_light = shaderMgr->CreateShader ();
+	    csRef<iDataBuffer> db_light = VFS->ReadFile ("/shader/light.xml");
+	    shader_light->Load (db_light);
+	  }
+#endif
+
           if (!ParseMaterialList (ldr_context, child))
             return false;
           break;
@@ -1091,6 +1113,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
           break;
         case XMLTOKEN_SHADERS:
 #ifdef CS_USE_NEW_RENDERER
+	  shader_given = true;
           ParseShaderList (child);
 #endif //CS_USE_NEW_RENDERER
           break;
@@ -4071,8 +4094,7 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
         csRef<iDocumentNode> fileChild = child->GetNode ("file");
         if (fileChild)
         {
-          csRef<iVFS> vfs (CS_QUERY_REGISTRY (csLoader::object_reg, iVFS));
-	  csRef<iDataBuffer> db = vfs->ReadFile (fileChild->GetContentsValue ());
+	  csRef<iDataBuffer> db = VFS->ReadFile (fileChild->GetContentsValue ());
           shader->Load (db);
         }
         else

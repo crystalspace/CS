@@ -744,7 +744,7 @@ public:
     {
       return scfParent->DrawTest (rview, movable);
     }
-    virtual csRenderMesh **GetRenderMeshes (int &) { return 0; }
+    virtual csRenderMesh **GetRenderMeshes (int &n) { n = 0; return 0; }
     virtual void UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
       	iMovable* /*movable*/) { }
     virtual bool Draw (iRenderView* rview, iMovable* movable,

@@ -750,6 +750,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
   n = 1;
   return &meshPtr;
 #else
+  n = 0;
   return 0;
 #endif
 }

@@ -1183,9 +1183,11 @@ iRenderBuffer* csThingStatic::GetRenderBuffer (csStringID name)
   }
 }
 
-void csThingStatic::FillRenderMeshes (csDirtyAccessArray<csRenderMesh*>& rmeshes,
-    const csArray<RepMaterial>& repMaterials)
+void csThingStatic::FillRenderMeshes (
+	csDirtyAccessArray<csRenderMesh*>& rmeshes,
+	const csArray<RepMaterial>& repMaterials)
 {
+  Prepare ();
   csHashMap material_polys;
   csHashSet materials;
 
@@ -1281,7 +1283,10 @@ void csThingStatic::FillRenderMeshes (csDirtyAccessArray<csRenderMesh*>& rmeshes
 	int vidx = *poly_indices++;
 	*vertices++ = obj_verts[vidx];
 	if (smoothed)
+	{
+	  CS_ASSERT (obj_normals != 0);
 	  *normals++ = obj_normals[vidx];
+	}
 	else
 	  *normals++ = polynormal;
 	csVector3 t = transform.Other2This (obj_verts[vidx]);

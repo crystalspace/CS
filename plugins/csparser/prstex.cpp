@@ -456,6 +456,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   
   csRef<iEffectDefinition> efdef ;
 #ifdef CS_USE_NEW_RENDERER
+  bool shaders_mentioned = false;	// If true there were shaders.
   csArray<csStringID> shadertypes;
   //csArray<iShader*> shaders;
   csArray<iShaderWrapper*> shaders;
@@ -506,8 +507,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
       case XMLTOKEN_REFLECTION:
 	reflection = child->GetContentsValueAsFloat ();
         break;
-#ifndef CS_USE_NEW_RENDERER
       case XMLTOKEN_EFFECT:
+        // @@@ TODO: add warning for deprecated with NR!!!
+#ifndef CS_USE_NEW_RENDERER
         {
           csRef<iEffectServer> efs = CS_QUERY_REGISTRY(object_reg, iEffectServer);
           if(!efs.IsValid())
@@ -524,8 +526,11 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
           }
 
         }
+#endif
         break;
       case XMLTOKEN_LAYER:
+        // @@@ TODO: add shortcut to support NR!
+#ifndef CS_USE_NEW_RENDERER
 	{
 	  if (num_txt_layer >= 4)
 	  {
@@ -595,12 +600,14 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	  }
 	  num_txt_layer++;
 	}
-        break;
 #endif
+        break;
       case XMLTOKEN_SHADER:
 #ifdef CS_USE_NEW_RENDERER
         {
-          csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+	  shaders_mentioned = true;
+          csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg,
+	  	iShaderManager);
           if (!shaderMgr)
           {
             ReportNotify ("iShaderManager not found, ignoring shader!");
@@ -610,13 +617,17 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
           iShaderWrapper* shader = shaderMgr->GetShader (shadername);
           if (!shader)
           {
-            ReportNotify ("Shader (%s) couldn't be found for material %s, ignoring it", shadername,matname);
+            ReportNotify (
+	    	"Shader (%s) couldn't be found for material %s, ignoring it",
+		shadername, matname);
             break;
           }
           const char* shadertype = child->GetAttributeValue ("type");
           if (!shadertype)
           {
-            ReportNotify ("No shadertype specified for shader %s in material %s, ignoring it", shadername, matname);
+            ReportNotify (
+	    	"No shadertype for shader %s in material %s, ignoring it",
+		shadername, matname);
             break;
           }
           shadertypes.Push (strings->Request(shadertype));
@@ -633,6 +644,29 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   }
 
 #ifdef CS_USE_NEW_RENDERER
+  // If we didn't have any shaders then we automatically use
+  // the default ambient and diffuse shader.
+  if (!shaders_mentioned)
+  {
+    csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg,
+	  	iShaderManager);
+    if (shaderMgr)
+    {
+      iShaderWrapper* shader_ambient = shaderMgr->GetShader ("ambient");
+      if (shader_ambient)
+      {
+        shadertypes.Push (strings->Request ("ambient"));
+	shaders.Push (shader_ambient);
+      }
+      iShaderWrapper* shader_light = shaderMgr->GetShader ("light");
+      if (shader_light)
+      {
+        shadertypes.Push (strings->Request ("diffuse"));
+	shaders.Push (shader_light);
+      }
+    }
+  }
+
   csRef<iMaterial> material = Engine->CreateBaseMaterial (texh);
 #else
   csRef<iMaterial> material = Engine->CreateBaseMaterial (texh,

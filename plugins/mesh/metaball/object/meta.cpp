@@ -289,6 +289,7 @@ csRenderMesh** csMetaBall::GetRenderMeshes (int &n)
   meshPtr = &mesh;
   return &meshPtr;
 #else
+  n = 0;
   return 0;
 #endif
 }
