@@ -60,12 +60,9 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
           break;
         }
         case pmcmdDestroyWindow:
-        {
           WinDestroyWindow (rqData->Parm.DestroyWindow.Handle);
           break;
-        }
         case pmcmdCreateGLctx:
-        {
           // Create a GL context
           CHK (rqData->Parm.CreateCtx.glW = new glWindow (rqData->Parm.CreateCtx.Width,
             rqData->Parm.CreateCtx.Height, rqData->Parm.CreateCtx.ContextFlags));
@@ -83,17 +80,13 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
             break;
           }
           break;
-        }
         case pmcmdDestroyGLctx:
-        {
           if (rqData->Parm.DestroyCtx.glW)
             CHKB (delete rqData->Parm.DestroyCtx.glW)
           else
             rc = pmrcNotInitialized;
           break;
-        }
         case pmcmdBindGLctx:
-        {
           if (!rqData->Parm.BindCtx.glW->Bind (rqData->Parm.BindCtx.Handle))
           {
             rc = pmrcBadWindow;
@@ -102,32 +95,53 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
           // If we have a *frame* window, we have full control of it
           if (rqData->Parm.BindCtx.glW->hwndFR)
           {
-            // Disable GL window accelerator table, if we want to use OS/2 reserved keys
+            int Scale, W, H;
+            // Disable window accelerator table, if we want to use OS/2 reserved keys
             rqData->Parm.BindCtx.glW->DisableAccelTable ();
-            // Center the window
-            rqData->Parm.BindCtx.glW->Command (cmdAlignCenter);
+
+            // Compute optimal window scale
+            Scale = rqData->Parm.BindCtx.DesktopW / rqData->Parm.BindCtx.glW->BufferWidth ();
+            int i = rqData->Parm.BindCtx.DesktopH / rqData->Parm.BindCtx.glW->BufferHeight ();
+            if (Scale > i)
+              Scale = i;
+            if (Scale == 0)
+            {
+              W = rqData->Parm.BindCtx.DesktopW;
+              H = rqData->Parm.BindCtx.DesktopH;
+            }
+            else
+            {
+              W = rqData->Parm.BindCtx.glW->BufferWidth () * Scale;
+              H = rqData->Parm.BindCtx.glW->BufferHeight () * Scale;
+            }
+            rqData->Parm.BindCtx.glW->Resize (W, H, true);
+            if ((W == rqData->Parm.BindCtx.DesktopW) && (H == rqData->Parm.BindCtx.DesktopH))
+              rqData->Parm.BindCtx.glW->FullScreen (true);
           }
           break;
-        }
         case pmcmdUnbindGLctx:
-        {
           if (!rqData->Parm.BindCtx.glW->Unbind (FALSE))
           {
             rc = pmrcNotBound;
             break;
           }
           break;
-        }
         case pmcmdShowWindow:
-        {
           rqData->Parm.ShowWin.glW->Show (rqData->Parm.ShowWin.State);
           break;
-        }
+        case pmcmdResizeWindow:
+          rqData->Parm.Resize.glW->Resize (rqData->Parm.Resize.Width,
+            rqData->Parm.Resize.Height, rqData->Parm.Resize.Center);
+          break;
         case pmcmdLocateWindow:
-        {
           rqData->Parm.Locate.glW->SetPos (rqData->Parm.Locate.x, rqData->Parm.Locate.y);
           break;
-        }
+        case pmcmdSelectWindow:
+          rqData->Parm.Locate.glW->Select ();
+          break;
+        case pmcmdResetWindow:
+          rqData->Parm.ResetWin.glW->Reset ();
+          break;
       }
       if (rqData)
       {

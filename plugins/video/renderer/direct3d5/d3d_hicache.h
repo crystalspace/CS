@@ -30,7 +30,7 @@ struct iTextureHandle;
 struct iPolygonTexture;
 
 ///
-struct csHighColorCacheData
+struct csD3DCacheData
 {
   /// size this takes up.
   long lSize;
@@ -39,7 +39,7 @@ struct csHighColorCacheData
   /// internal cache data
   void *pData;
   /// linked list
-  csHighColorCacheData *next, *prev;
+  csD3DCacheData *next, *prev;
 };
 
 ///
@@ -55,7 +55,7 @@ protected:
 
   HIGHCOLOR_TYPE type;
   /// the head and tail of the cache data
-  csHighColorCacheData *head, *tail;
+  csD3DCacheData *head, *tail;
 
 protected:
   /// the maximum size of the cache
@@ -86,9 +86,9 @@ protected:
   int bpp;
 
   ///
-  virtual void Load (csHighColorCacheData *d) = 0;
+  virtual void Load (csD3DCacheData *d) = 0;
   ///
-  virtual void Unload (csHighColorCacheData *d) = 0;
+  virtual void Unload (csD3DCacheData *d) = 0;
 };
 
 #endif

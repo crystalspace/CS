@@ -106,8 +106,8 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
   switch (txt)
   {
     case 0: tm = NULL; break;
-    case 1: tm = world->GetTextures ()->GetTextureMM ("txt"); break;
-    case 2: tm = world->GetTextures ()->GetTextureMM ("txt2"); break;
+    case 1: tm = world->GetTextures ()->FindByName ("txt"); break;
+    case 2: tm = world->GetTextures ()->FindByName ("txt2"); break;
   }
 
   CHK (csPolygon3D* p = new csPolygon3D (tm));

@@ -41,6 +41,9 @@ struct FontDef
 /// The array containing the definitions of all fonts
 extern FontDef FontList[];
 
+///
+#define CsPrintf System->Printf
+
 /**
  * This is the base class for 2D renderer. System-dependent ports
  * should derive their own SysGraphics2D class from this one and
@@ -250,16 +253,10 @@ public:
    */
   virtual bool PerformExtension (char* args);
 
+  /// Do a screenshot: return a new iImage object
+  virtual iImage *ScreenShot ();
+
 protected:
-  /// A replacement for ::CsPrintf() that works through system driver
-  void CsPrintf(int mode, const char* text, ...);
-
-  /**
-   * Little helper function to complete a csPixelFormat
-   * structure given that the masks are correctly filled in.
-   */
-  void complete_pixel_format ();
-
   /**
    * Default drawing routines for 8-bit and 16-bit modes
    * If a system port has its own routines, it should assign

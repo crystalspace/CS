@@ -25,6 +25,7 @@
 #include "sttest.h"
 
 #define SCAN32
+#define COLORMAP	((ULong *)Scan.PaletteTable)
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
@@ -36,163 +37,7 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//--//-- draw_scanline_XXXX --//--//
 
-#ifndef NO_draw_scanline_flat_zfil
-
-void csScan_32_draw_scanline_flat_zfil (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
-{
-  (void)u_div_z; (void)v_div_z;
-  int color = Scan.FlatColor;
-  long izz = QInt24 (inv_z);
-  long dzz = QInt24 (Scan.M);
-  ULong* _dest = (ULong*)d;
-  ULong* _destend = _dest + xx-1;
-  do
-  {
-    *_dest++ = color;
-    *z_buf++ = izz;
-    izz += dzz;
-  }
-  while (_dest <= _destend);
-}
-
-#endif // NO_draw_scanline_flat_zfil
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_flat_zuse
-
-void csScan_32_draw_scanline_flat_zuse (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
-{
-  (void)u_div_z; (void)v_div_z;
-  int color = Scan.FlatColor;
-  long izz = QInt24 (inv_z);
-  long dzz = QInt24 (Scan.M);
-  ULong* _dest = (ULong*)d;
-  ULong* _destend = _dest + xx-1;
-  do
-  {
-    if (izz >= (int)(*z_buf))
-    {
-      *_dest++ = color;
-      *z_buf++ = izz;
-    }
-    else
-    {
-      _dest++;
-      z_buf++;
-    }
-    izz += dzz;
-  }
-  while (_dest <= _destend);
-}
-
-#endif // NO_draw_scanline_flat_zuse
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_tex_zfil
-
-#define SCANFUNC csScan_32_draw_scanline_tex_zfil
-#define SCANLOOP \
-    do									\
-    {									\
-      *_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];\
-      uu += duu;							\
-      vv += dvv;							\
-    }									\
-    while (_dest <= _destend)
-#define SCANEND \
-    do									\
-    {									\
-      *z_buffer++ = izz;						\
-      izz += dzz;							\
-    }									\
-    while (z_buffer <= lastZbuf)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_tex_zfil
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_tex_zuse
-
-#define SCANFUNC csScan_32_draw_scanline_tex_zuse
-#define SCANLOOP \
-    do									\
-    {									\
-      if (izz >= (int)(*z_buffer))					\
-      {									\
-        *_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];\
-	*z_buffer++ = izz;						\
-      }									\
-      else								\
-      {									\
-        _dest++;							\
-        z_buffer++;							\
-      }									\
-      uu += duu;							\
-      vv += dvv;							\
-      izz += dzz;							\
-    }									\
-    while (_dest <= _destend)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_tex_zuse
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_map_zfil
-
-#define SCANFUNC csScan_32_draw_scanline_map_zfil
-#define SCANMAP 1
-#define SCANLOOP \
-    do									\
-    {									\
-      *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];		\
-      uu += duu;							\
-      vv += dvv;							\
-    }									\
-    while (_dest <= _destend)
-#define SCANEND \
-    do									\
-    {									\
-      *z_buffer++ = izz;						\
-      izz += dzz;							\
-    }									\
-    while (z_buffer <= lastZbuf)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_map_zfil
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_map_zuse
-
-#define SCANFUNC csScan_32_draw_scanline_map_zuse
-#define SCANMAP 1
-#define SCANLOOP \
-    do									\
-    {									\
-      if (izz >= (int)(*z_buffer))					\
-      {									\
-	*_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];		\
-	*z_buffer++ = izz;						\
-      }									\
-      else								\
-      {									\
-        _dest++;							\
-        z_buffer++;							\
-      }									\
-      uu += duu;							\
-      vv += dvv;							\
-      izz += dzz;							\
-    }									\
-    while (_dest <= _destend)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_map_zuse
+#include "scanxx.inc"
 
 //------------------------------------------------------------------
 
@@ -293,13 +138,13 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
 #ifndef NO_draw_scanline_map_alpha50
 
 #define SCANFUNC csScan_32_draw_scanline_map_alpha50
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     do									\
     {									\
       ULong a = *_dest;							\
-      ULong b = srcTex[((vv>>16)<<shifter) + (uu>>16)];			\
-      *_dest++ = ((a & 0xfefefe) >> 1) + ((b & 0xfefefe) >> 1);		\
+      ULong b = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
+      *_dest++ = ((a & 0xfefefefe) >> 1) + ((b & 0xfefefefe) >> 1);	\
       uu += duu;							\
       vv += dvv;							\
     }									\
@@ -317,7 +162,7 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
 // not because they will always contain respective values, but just
 // for cleaner understanding how the procedure works.
 #define SCANFUNC csScan_32_draw_scanline_map_alpha
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     do									\
     {									\

@@ -144,7 +144,7 @@ struc csScanSetup
   csTextureMMSoftware_P Texture;
 
   ; The lighted texture bitmap from the texture cache.
-  unsigned_char_P tmap2;
+  unsigned_char_P bitmap2;
   ; Width of the texture from the texture cache.
   int tw2;
   ; Height of the texture from the texture cache.
@@ -159,7 +159,7 @@ struc csScanSetup
   int th2fp;
 
   ; The unlighted texture bitmap.
-  unsigned_char_P tmap;
+  unsigned_char_P bitmap;
   ; Width of unlighted texture.
   int tw;
   ; Height of unlighted texture.
@@ -186,6 +186,8 @@ struc csScanSetup
 
   ; Mean color value.
   int FlatColor;
+  ; R/G/B components of flatcolor
+  unsigned_int FlatRGB;
 
   ; Alpha mask for 16-bit renderer.
   unsigned_int AlphaMask;
@@ -210,15 +212,18 @@ struc csScanSetup
   ; 1 << shf_h - 1
   int and_h;
 
-  ; Local texture palette -> global palette conversion table
-  unsigned_char_P PrivToGlobal;
-  ; 8-bit to 16-bit conversion table
-  unsigned_short_P PaletteTable;
+  ; Actual texture palette
+  unsigned_int_P TexturePalette;
+  ; 8-bit to native pixel format conversion table
+  unsigned_char_P PaletteTable;
   ; Set up by poly renderer to alpha blending table
   RGB8map_P AlphaMap;
 
   ; Current blending table
   unsigned_char_P BlendTable;
+
+  ; The inverse colormap (extracted from texture manager)
+  unsigned_char_P inv_cmap;
 
   ; table used for bilinear filtering
   int_P filter_mul_table;

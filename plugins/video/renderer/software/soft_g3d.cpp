@@ -24,15 +24,11 @@
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
-#include "cs3d/software/soft_g3d.h"
-#include "cs3d/software/scan.h"
-#include "cs3d/software/tcache.h"
-#include "cs3d/software/tcache16.h"
-#include "cs3d/software/tcache32.h"
-#include "cs3d/software/soft_txt.h"
-#include "cs3d/common/memheap.h"
 #include "csutil/inifile.h"
-#include "csutil/garray.h"
+#include "soft_g3d.h"
+#include "scan.h"
+#include "tcache.h"
+#include "soft_txt.h"
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"
@@ -41,6 +37,8 @@
 #if defined (DO_MMX)
 #  include "cs3d/software/i386/cpuid.h"
 #endif
+
+#define SysPrintf System->Printf
 
 int csGraphics3DSoftware::filter_bf = 1;
 
@@ -52,7 +50,7 @@ int csGraphics3DSoftware::filter_bf = 1;
  *  Square brackets denote enforced name components
  *  Everything outside brackets is a must
  *
- *  SCANPROC{Persp}{Gouraud}_{Source_{Smode_}}{Zmode_}
+ *  SCANPROC{Persp}{Gouraud}_{Source_{Smode_}}{Zmode}
  *
  *  Persp       = PI for perspective-incorrect routines
  *  Gouraud     = G for Gouraud-shading routines
@@ -67,9 +65,9 @@ int csGraphics3DSoftware::filter_bf = 1;
  *                ZFIL for polys that just fills Z-buffer without testing
  *
  *  Example:
- *      SCANPROC_TEX_ZFIL_PRIV
- *              scanline procedure for drawing a non-lightmapped texture
- *              with Z-fill and with a private palette table
+ *      SCANPROC_TEX_ZFIL
+ *              scanline procedure for drawing a non-lightmapped
+ *              texture with Z-fill
  *  Note:
  *      For easier runtime decisions odd indices use Z buffer
  *      while even indices fills Z-buffer (if appropiate)
@@ -153,7 +151,7 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
   config = new csIniFile ("soft3d.cfg");
 
   tcache = NULL;
-  txtmgr = NULL;
+  texman = NULL;
 
   clipper = NULL;
 
@@ -202,7 +200,7 @@ csGraphics3DSoftware::~csGraphics3DSoftware ()
 
   Close ();
   csScan_Finalize ();
-  CHK (delete txtmgr);
+  CHK (delete texman);
   CHK (delete [] z_buffer);
   CHK (delete [] smaller_buffer);
   if (G2D)
@@ -227,9 +225,7 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   if (!G2D)
     return false;
 
-  CHK (txtmgr = new csTextureManagerSoftware (System, G2D));
-  txtmgr->SetConfig (config);
-  txtmgr->Initialize ();
+  CHK (texman = new csTextureManagerSoftware (System, G2D, config));
 
 #ifdef DO_MMX
   do_mmx = config->GetYesNo ("Hardware", "MMX", true);
@@ -237,8 +233,6 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   do_smaller_rendering = config->GetYesNo ("Hardware", "SMALLER", false);
   SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE,
     config->GetYesNo ("Hardware", "INTERLACING", false));
-
-  SetCacheSize (config->GetInt ("TextureManager", "CACHE", DEFAULT_CACHE_SIZE));
 
   zdist_mipmap1 = config->GetFloat ("Mipmapping", "DMIPMAP1", 12.0);
   zdist_mipmap2 = config->GetFloat ("Mipmapping", "DMIPMAP2", 24.0);
@@ -256,7 +250,6 @@ void csGraphics3DSoftware::ScanSetup ()
   memset (&ScanProcPIFX, 0, sizeof (ScanProcPIFX));
   ScanProc_Alpha = NULL;
 
-  bool PrivTex = (txtmgr->txtMode == TXT_PRIVATE);
 #ifdef DO_MMX
   bool UseMMX = (cpu_mmx && do_mmx);
 #endif
@@ -270,15 +263,12 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProc [SCANPROC_FLAT_ZFIL] = csScan_8_draw_scanline_flat_zfil;
       ScanProc [SCANPROC_FLAT_ZUSE] = csScan_8_draw_scanline_flat_zuse;
 
-      ScanProc [SCANPROC_TEX_ZFIL] = PrivTex ?
-        csScan_8_draw_scanline_tex_priv_zfil :
+      ScanProc [SCANPROC_TEX_ZFIL] =
 #ifdef DO_MMX
         UseMMX ? csScan_8_mmx_draw_scanline_tex_zfil :
 #endif
         csScan_8_draw_scanline_tex_zfil;
-      ScanProc [SCANPROC_TEX_ZUSE] = PrivTex ?
-        csScan_8_draw_scanline_tex_priv_zuse :
-        csScan_8_draw_scanline_tex_zuse;
+      ScanProc [SCANPROC_TEX_ZUSE] = csScan_8_draw_scanline_tex_zuse;
 
       ScanProc [SCANPROC_MAP_ZFIL] =
 #ifdef DO_MMX
@@ -290,54 +280,43 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProc [SCANPROC_MAP_FILT_ZFIL] = csScan_8_draw_scanline_map_filt_zfil;
 //    ScanProc [SCANPROC_MAP_FILT_ZUSE] = csScan_8_draw_scanline_map_filt_zuse;
 
-      ScanProc [SCANPROC_TEX_KEY_ZFIL] = PrivTex ?
-        csScan_8_draw_scanline_tex_priv_key_zfil :
-        csScan_8_draw_scanline_tex_key_zfil;
-//    ScanProc [SCANPROC_TEX_KEY_ZUSE] = PrivTex ?
-//      csScan_8_draw_scanline_tex_priv_key_zuse :
-//      csScan_8_draw_scanline_tex_key_zuse;
+      ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_8_draw_scanline_tex_key_zfil;
+      ScanProc [SCANPROC_TEX_KEY_ZUSE] = csScan_8_draw_scanline_tex_key_zuse;
       ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_8_draw_scanline_map_key_zfil;
-//    ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_8_draw_scanline_map_key_zuse;
+      ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_8_draw_scanline_map_key_zuse;
 
       ScanProc [SCANPROC_FOG] = csScan_8_draw_scanline_fog;
       ScanProc [SCANPROC_FOG_VIEW] = csScan_8_draw_scanline_fog_view;
 
-//    ScanProcPI [SCANPROCPI_FLAT_ZFIL] = csScan_8_draw_pi_scanline_flat_zfil;
-//    ScanProcPI [SCANPROCPI_FLAT_ZUSE] = csScan_8_draw_pi_scanline_flat_zuse;
+      ScanProcPI [SCANPROCPI_FLAT_ZFIL] = csScan_8_draw_pi_scanline_flat_zfil;
+      ScanProcPI [SCANPROCPI_FLAT_ZUSE] = csScan_8_draw_pi_scanline_flat_zuse;
       ScanProcPI [SCANPROCPI_TEX_ZFIL] = csScan_8_draw_pi_scanline_tex_zfil;
-      ScanProcPI [SCANPROCPI_TEX_ZUSE] =
-#ifdef DO_MMX
-        UseMMX ? csScan_8_mmx_draw_pi_scanline_tex_zuse :
-#endif
-        csScan_8_draw_pi_scanline_tex_zuse;
+      ScanProcPI [SCANPROCPI_TEX_ZUSE] = csScan_8_draw_pi_scanline_tex_zuse;
 
-//    ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZFIL] = csScan_8_draw_pi_scanline_flat_gouraud_zfil;
-//    ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZUSE] = csScan_8_draw_pi_scanline_flat_gouraud_zuse;
-//    ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZFIL] = csScan_8_draw_pi_scanline_tex_gouraud_zfil;
-//    ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = csScan_8_draw_pi_scanline_tex_gouraud_zuse;
+      ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZFIL] = csScan_8_draw_pi_scanline_flat_gouraud_zfil;
+      ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZUSE] = csScan_8_draw_pi_scanline_flat_gouraud_zuse;
+      ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZFIL] = csScan_8_draw_pi_scanline_tex_gouraud_zfil;
+      ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = csScan_8_draw_pi_scanline_tex_gouraud_zuse;
 
       if (do_transp)
         ScanProc_Alpha = ScanProc_8_Alpha;
 
-//    ScanProcPIFX [SCANPROCPIFX_ZUSE] = ;
-//    ScanProcPIFX [SCANPROCPIFX_ZFIL] = ;
-//    ScanProcPIFX [SCANPROCPIFX_TRANSP_ZUSE] = ;
-//    ScanProcPIFX [SCANPROCPIFX_TRANSP_ZFIL] = ;
+      ScanProcPIFX [SCANPROCPIFX_ZUSE] = csScan_8_draw_pifx_scanline_zuse;
+      ScanProcPIFX [SCANPROCPIFX_ZFIL] = csScan_8_draw_pifx_scanline_zfil;
+      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZUSE] = csScan_8_draw_pifx_scanline_transp_zuse;
+      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZFIL] = csScan_8_draw_pifx_scanline_transp_zfil;
       break;
 
     case 2:
       ScanProc [SCANPROC_FLAT_ZFIL] = csScan_16_draw_scanline_flat_zfil;
       ScanProc [SCANPROC_FLAT_ZUSE] = csScan_16_draw_scanline_flat_zuse;
 
-      ScanProc [SCANPROC_TEX_ZFIL] = PrivTex ?
-        csScan_16_draw_scanline_tex_priv_zfil :
+      ScanProc [SCANPROC_TEX_ZFIL] =
 #ifdef DO_MMX
         UseMMX ? csScan_16_mmx_draw_scanline_tex_zfil :
 #endif
         csScan_16_draw_scanline_tex_zfil;
-      ScanProc [SCANPROC_TEX_ZUSE] = PrivTex ?
-        csScan_16_draw_scanline_tex_priv_zuse :
-        csScan_16_draw_scanline_tex_zuse;
+      ScanProc [SCANPROC_TEX_ZUSE] = csScan_16_draw_scanline_tex_zuse;
 
       ScanProc [SCANPROC_MAP_ZFIL] =
 #ifdef DO_MMX
@@ -353,14 +332,10 @@ void csGraphics3DSoftware::ScanSetup ()
 //      csScan_16_draw_scanline_map_filt2_zuse :
 //      csScan_16_draw_scanline_map_filt_zuse;
 
-//    ScanProc [SCANPROC_TEX_KEY_ZFIL] = PrivTex ?
-//      csScan_16_draw_scanline_tex_priv_key_zfil :
-//      csScan_16_draw_scanline_tex_key_zfil;
-//    ScanProc [SCANPROC_TEX_KEY_ZUSE] = PrivTex ?
-//      csScan_16_draw_scanline_tex_priv_key_zuse :
-//      csScan_16_draw_scanline_tex_key_zuse;
+      ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_16_draw_scanline_tex_key_zfil;
+      ScanProc [SCANPROC_TEX_KEY_ZUSE] = csScan_16_draw_scanline_tex_key_zuse;
       ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_16_draw_scanline_map_key_zfil;
-//    ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_16_draw_scanline_map_key_zuse;
+      ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_16_draw_scanline_map_key_zuse;
 
       ScanProc [SCANPROC_FOG] = (pfmt.GreenBits == 5) ?
         csScan_16_draw_scanline_fog_555 :
@@ -433,14 +408,10 @@ void csGraphics3DSoftware::ScanSetup ()
 //      csScan_32_draw_scanline_map_filt2_zuse :
 //      csScan_32_draw_scanline_map_filt_zuse;
 
-//    ScanProc [SCANPROC_TEX_KEY_ZFIL] = PrivTex ?
-//      csScan_32_draw_scanline_tex_priv_key_zfil :
-//      csScan_32_draw_scanline_tex_key_zfil;
-//    ScanProc [SCANPROC_TEX_KEY_ZUSE] = PrivTex ?
-//      csScan_32_draw_scanline_tex_priv_key_zuse :
-//      csScan_32_draw_scanline_tex_key_zuse;
-//    ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_32_draw_scanline_map_key_zfil;
-//    ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_32_draw_scanline_map_key_zuse;
+      ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_32_draw_scanline_tex_key_zfil;
+      ScanProc [SCANPROC_TEX_KEY_ZUSE] = csScan_32_draw_scanline_tex_key_zuse;
+      ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_32_draw_scanline_map_key_zfil;
+      ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_32_draw_scanline_map_key_zuse;
 
       ScanProc [SCANPROC_FOG] = csScan_32_draw_scanline_fog;
       ScanProc [SCANPROC_FOG_VIEW] = csScan_32_draw_scanline_fog_view;
@@ -476,23 +447,23 @@ void csGraphics3DSoftware::ScanSetup ()
 csDrawScanline* csGraphics3DSoftware::ScanProc_8_Alpha
   (csGraphics3DSoftware *This, int alpha)
 {
-  TextureTablesAlpha *lt_alpha = This->txtmgr->lt_alpha;
+  csAlphaTables *alpha_tables = This->texman->alpha_tables;
 
   if (alpha < 13)
     return NULL;
   if (alpha < 37)
   {
-    Scan.AlphaMap = lt_alpha->alpha_map25;
+    Scan.AlphaMap = alpha_tables->alpha_map25;
     return csScan_8_draw_scanline_map_alpha2;
   }
   if (alpha >= 37 && alpha < 63)
   {
-    Scan.AlphaMap = lt_alpha->alpha_map50;
+    Scan.AlphaMap = alpha_tables->alpha_map50;
     return csScan_8_draw_scanline_map_alpha1;
   }
   if (alpha >= 63 && alpha < 87)
   {
-    Scan.AlphaMap = lt_alpha->alpha_map25;
+    Scan.AlphaMap = alpha_tables->alpha_map25;
     return csScan_8_draw_scanline_map_alpha1;
   }
   // completely opaque
@@ -502,7 +473,7 @@ csDrawScanline* csGraphics3DSoftware::ScanProc_8_Alpha
 csDrawScanline* csGraphics3DSoftware::ScanProc_16_Alpha
   (csGraphics3DSoftware *This, int alpha)
 {
-  Scan.AlphaMask = This->txtmgr->alpha_mask;
+  Scan.AlphaMask = This->alpha_mask;
   Scan.AlphaFact = (alpha * 256) / 100;
 
   // completely transparent?
@@ -539,21 +510,13 @@ csDrawScanline* csGraphics3DSoftware::ScanProc_32_Alpha
   return csScan_32_draw_scanline_map_alpha;
 }
 
-void csGraphics3DSoftware::SetCacheSize (long size)
-{
-  if (tcache)
-    tcache->set_cache_size (size);
-  else
-    TextureCache::set_default_cache_size (size);
-}
-
 bool csGraphics3DSoftware::Open (const char *Title)
 {
   DrawMode = 0;
 
   if (!G2D->Open (Title))
   {
-      SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.");
+      SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
       // set "not opened" flag
       width = height = -1;
 
@@ -564,6 +527,22 @@ bool csGraphics3DSoftware::Open (const char *Title)
   int nHeight = G2D->GetHeight ();
   bool bFullScreen = G2D->GetFullScreen ();
   pfmt = *G2D->GetPixelFormat ();
+  if (pfmt.PalEntries)
+  {
+    // If we don't have truecolor we simulate 5:6:5 bits
+    // for R:G:B in the masks anyway because we still need the
+    // 16-bit format for our light mixing
+    pfmt.RedShift   = RGB2PAL_BITS_G + RGB2PAL_BITS_B;
+    pfmt.GreenShift = RGB2PAL_BITS_B;
+    pfmt.BlueShift  = 0;
+    pfmt.RedMask    = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.RedShift;
+    pfmt.GreenMask  = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.GreenShift;
+    pfmt.BlueMask   = ((1 << RGB2PAL_BITS_B) - 1);
+    pfmt.RedBits    = RGB2PAL_BITS_R;
+    pfmt.GreenBits  = RGB2PAL_BITS_G;
+    pfmt.BlueBits   = RGB2PAL_BITS_B;
+  }
+  texman->SetPixelFormat (pfmt);
 
   SetDimensions (nWidth, nHeight);
 
@@ -575,7 +554,6 @@ bool csGraphics3DSoftware::Open (const char *Title)
     SysPrintf (MSG_INITIALIZATION, "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
           pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
 
-    CHK (tcache = new TextureCache32 (&pfmt));
     pixel_shift = 2;
   }
   else if (pfmt.PixelBytes == 2)
@@ -583,16 +561,15 @@ bool csGraphics3DSoftware::Open (const char *Title)
     SysPrintf (MSG_INITIALIZATION, "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
           pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
 
-    CHK (tcache = new TextureCache16 (&pfmt));
     pixel_shift = 1;
   }
   else
   {
     SysPrintf (MSG_INITIALIZATION, "Using palette mode with 1 byte per pixel (256 colors).\n");
-    CHK (tcache = new TextureCache (&pfmt));
     pixel_shift = 0;
   }
-  tcache->set_cache_size (-1);
+  CHK (tcache = new csTextureCacheSoftware (texman));
+  tcache->set_cache_size (config->GetInt ("TextureManager", "CACHE", DEFAULT_CACHE_SIZE));
 
 #if defined (DO_MMX)
   int family, features;
@@ -605,6 +582,12 @@ bool csGraphics3DSoftware::Open (const char *Title)
     (features & CPUx86_FEATURE_MMX) ? "yes" : "no",
     (features & CPUx86_FEATURE_CMOV) ? "yes" : "no");
 #endif
+
+  alpha_mask = 0;
+  alpha_mask |= 1 << (pfmt.RedShift);
+  alpha_mask |= 1 << (pfmt.GreenShift);
+  alpha_mask |= 1 << (pfmt.BlueShift);
+  alpha_mask = ~alpha_mask;
 
   z_buf_mode = CS_ZBUF_NONE;
   fog_buffers = NULL;
@@ -910,58 +893,34 @@ void csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
     tex = poly.poly_texture[0];
     lm = tex->GetLightMap ();
   }
-  int mean_color_idx = poly.txt_handle->GetMeanColor ();
-  csTextureMMSoftware *tex_mm = (csTextureMMSoftware *)poly.txt_handle->GetPrivateObject ();
+
+  UByte mean_r, mean_g, mean_b;
+  poly.txt_handle->GetMeanColor (mean_r, mean_g, mean_b);
+
   if (lm)
   {
     // Lighted polygon
     int lr, lg, lb;
     lm->GetMeanLighting (lr, lg, lb);
+
+    // Make lighting a little bit brighter because average
+    // lighting is really dark otherwise.
+    lr = lr << 1; if (lr > 255) lr = 255;
+    lg = lg << 1; if (lg > 255) lg = 255;
+    lb = lb << 1; if (lb > 255) lb = 255;
+
     if (pfmt.PixelBytes >= 2)
-    {
-      // Make lighting a little bit brighter because average
-      // lighting is really dark otherwise.
-      lr = lr<<2; if (lr > 255) lr = 255;
-      lg = lg<<2; if (lg > 255) lg = 255;
-      lb = lb<<2; if (lb > 255) lb = 255;
-
-      int r, g, b;
-      r = (mean_color_idx&pfmt.RedMask)>>pfmt.RedShift;
-      g = (mean_color_idx&pfmt.GreenMask)>>pfmt.GreenShift;
-      b = (mean_color_idx&pfmt.BlueMask)>>pfmt.BlueShift;
-      r = (r*lr)>>8;
-      g = (g*lg)>>8;
-      b = (b*lb)>>8;
-      mean_color_idx = (r<<pfmt.RedShift) | (g<<pfmt.GreenShift) | (b<<pfmt.BlueShift);
-    }
+      Scan.FlatColor = texman->encode_rgb ((mean_r * lr) >> 8,
+        (mean_g * lg) >> 8, (mean_b * lb) >> 8);
     else
-    {
-      // Make lighting a little bit brighter because average
-      // lighting is really dark otherwise.
-      lr = lr<<1; if (lr > 255) lr = 255;
-      lg = lg<<1; if (lg > 255) lg = 255;
-      lb = lb<<1; if (lb > 255) lb = 255;
-
-      PalIdxLookup* lt_light = txtmgr->lt_light;
-      unsigned char* true_to_pal = txtmgr->lt_pal->true_to_pal;
-
-      if (txtmgr->txtMode == TXT_GLOBAL)
-      {
-        PalIdxLookup* pil = lt_light+mean_color_idx;
-        mean_color_idx = true_to_pal[pil->red[lr] | pil->green[lg] | pil->blue[lb]];
-      }
-      else
-      {
-        unsigned char *rgb, *rgb_values = tex_mm->GetPrivateColorMap ();
-        rgb = rgb_values + (mean_color_idx << 2);
-        mean_color_idx = true_to_pal[lt_light[*rgb].red[lr] |
-                   lt_light[*(rgb+1)].green[lg] |
-                   lt_light[*(rgb+2)].blue[lb]];
-      }
-    }
+      Scan.FlatColor = texman->find_rgb ((mean_r * lr) >> 8,
+        (mean_g * lg) >> 8, (mean_b * lb) >> 8);
   }
+  else if (pfmt.PixelBytes >= 2)
+    Scan.FlatColor = texman->encode_rgb (mean_r, mean_g, mean_b);
+  else
+    Scan.FlatColor = texman->find_rgb (mean_r, mean_g, mean_b);
 
-  Scan.FlatColor = mean_color_idx;
   Scan.M = M;
 
   // Select the right scanline drawing function.
@@ -1196,7 +1155,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
 
   // Mipmapping.
   int mipmap;
-  if (poly.uses_mipmaps == false ||  rstate_mipmap == 1)
+  if (poly.uses_mipmaps == false || rstate_mipmap == 1)
     mipmap = 0;
   else if (rstate_mipmap == 0)
   {
@@ -1211,13 +1170,19 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   csTextureMMSoftware *tex_mm = (csTextureMMSoftware *)poly.txt_handle->GetPrivateObject ();
   csTexture *txt_unl = tex_mm->get_texture (mipmap);
 
+  /// Check if polygon has a lightmap (i.e. if it is lighted)
+  bool has_lightmap = tex->GetLightMap ();
+
   // Initialize our static drawing information and cache
   // the texture in the texture cache (if this is not already the case).
   // If we are using the sub-texture optimization then we just allocate
   // the needed memory in the cache but don't do any calculations yet.
+#if 0
   int subtex_size = tex->GetSubtexSize ();
-  if (do_lighting)
+#endif
+  if (has_lightmap && do_lighting)
   {
+#if 0
     if (subtex_size)
     {
       // If the size of the lighted polygon is too small we don't
@@ -1229,9 +1194,10 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     }
 
     if (subtex_size)
-      CacheInitTexture (tex);
+      tcache->init_texture (tex);
     else
-      CacheTexture (tex);
+#endif
+      tcache->use_texture (tex);
   }
 
   csScan_InitDraw (this, tex, tex_mm, txt_unl);
@@ -1314,7 +1280,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   int  scan_index = -2;
   csDrawScanline* dscan = NULL;
 
-  if (Scan.tmap2)
+  if (Scan.bitmap2)
   {
     if (do_transp && tex_transp)
       scan_index = SCANPROC_MAP_KEY_ZFIL;
@@ -1327,10 +1293,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   }
   else
   {
-    int txtMode = txtmgr->txtMode;
-    Scan.PaletteTable = txtmgr->lt_pal->pal_to_true;
-    if (txtMode == TXT_PRIVATE)
-      Scan.PrivToGlobal = Scan.Texture->GetPrivateToGlobal ();
+    Scan.PaletteTable = Scan.Texture->GetPaletteToGlobal ();
     if (do_transp && tex_transp)
       scan_index = SCANPROC_TEX_KEY_ZFIL;
     else
@@ -1347,9 +1310,9 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   // needed sub-textures.
   // Note that we will not do this checking if there are no dirty sub-textures.
   // This is an optimization.
+#if 0
   int nDirty = tex->GetNumberDirtySubTex ();
-
-  if (do_lighting && subtex_size && nDirty)
+  if (has_lightmap && do_lighting && subtex_size && nDirty)
   {
     // To test if the idea is feasible I'll first implement a more naive
     // algorithm here. I will search the bounding box in texture space
@@ -1358,6 +1321,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     // @@@ When everything works this algorithm needs to be rewritten so
     // that only the visible shape is used. One way to do this would be
     // to triangulate and do this thing a triangle at a time.
+
     float min_u = 0, max_u = 0, min_v = 0, max_v = 0;
     for (int vertex = 0; vertex < poly.num; vertex++)
     {
@@ -1399,6 +1363,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
      && (max_v > 0))
       CacheRectTexture (tex, QInt (min_u), QInt (min_v), QInt (max_u), QInt (max_v));
   }
+#endif
 
   // Scan both sides of the polygon at once.
   // We start with two pointers at the top (as seen in y-inverted
@@ -1693,7 +1658,7 @@ void csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fog
     Scan.FogG = QRound (fb->green * 255);
     Scan.FogB = QRound (fb->blue * 255);
     Scan.Fog8 = BuildIndexedFogTable ();
-    Scan.FogPix = txtmgr->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
+    Scan.FogPix = texman->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
   }
 
   // Steps for interpolating horizontally accross a scanline.
@@ -1851,19 +1816,15 @@ inline long round16 (long f)
 // The static global variable that holds current PolygonQuick settings
 static struct
 {
-  int redFact;
-  int greenFact;
-  int blueFact;
-  int twfp;
-  int thfp;
-  float tw;
-  float th;
+  int redFact, greenFact, blueFact;
+  int max_r, max_g, max_b;
+  int twfp, thfp;
+  float tw, th;
   unsigned char *bm;
   int shf_w;
   bool transparent;
   bool textured;
   UInt mixmode;
-  float r, g, b;
   csDrawPIScanline *drawline;
   csDrawPIScanlineGouraud *drawline_gouraud;
 } pqinfo;
@@ -1873,7 +1834,6 @@ static struct
 void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
   UInt mode)
 {
-
   if (!rstate_gouraud || !do_lighting)
     mode &= ~CS_FX_GOURAUD;
 
@@ -1881,7 +1841,7 @@ void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
   {
     csTextureMMSoftware *tex_mm = (csTextureMMSoftware*)handle->GetPrivateObject ();
     csTexture *txt_unl = tex_mm->get_texture (0);
-    pqinfo.bm = txt_unl->get_bitmap ();
+    pqinfo.bm = (UByte *)txt_unl->get_bitmap ();
     pqinfo.tw = txt_unl->get_width ();
     pqinfo.th = txt_unl->get_height ();
     pqinfo.shf_w = txt_unl->get_w_shift ();
@@ -1889,13 +1849,15 @@ void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
     pqinfo.thfp = QInt16 (pqinfo.th) - 1;
     pqinfo.transparent = tex_mm->GetTransparent ();
     pqinfo.textured = do_textured;
+    Scan.PaletteTable = tex_mm->GetPaletteToGlobal ();
+    Scan.TexturePalette = tex_mm->GetColorMap ();
   }
   else
     pqinfo.textured = false;
-    
 
-  Scan.AlphaMask = txtmgr->alpha_mask;
-  Scan.PaletteTable = txtmgr->lt_pal->pal_to_true;
+  Scan.inv_cmap = texman->inv_cmap;
+
+  Scan.AlphaMask = alpha_mask;
 
   // Select draw scanline routine
   int scan_index = pqinfo.textured ? SCANPROCPI_TEX_ZFIL : SCANPROCPI_FLAT_ZFIL;
@@ -1913,6 +1875,7 @@ void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
     pqinfo.drawline_gouraud = ScanProcPIFX [scan_index];
   }
 
+  Scan.BlendTable = NULL;
   switch (mode & CS_FX_MASK_MIXMODE)
   {
     case CS_FX_ADD:
@@ -1959,24 +1922,24 @@ void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
 
   // Once again check for availability of gouraud procedure
   if (!pqinfo.drawline_gouraud)
+  {
     mode &= ~(CS_FX_GOURAUD | CS_FX_MASK_MIXMODE);
+    Scan.BlendTable = NULL;
+  }
 
   pqinfo.mixmode = mode;
-  if (pqinfo.textured)
-  {
-    // In textured modes we use 7.8 fixed-point format for R,G,B factors
-    pqinfo.redFact =
-    pqinfo.greenFact =
-    pqinfo.blueFact = 0x7F;
-  }
-  else
-  {
-    // In flat modes we use #.16 fixed-point format for R,G,B factors
-    // where # is the number of bits per component
-    pqinfo.redFact = (pfmt.RedMask >> pfmt.RedShift);
-    pqinfo.greenFact = (pfmt.GreenMask >> pfmt.GreenShift);
-    pqinfo.blueFact = (pfmt.BlueMask >> pfmt.BlueShift);
-  } /* endif */
+  // We use #.16 fixed-point format for R,G,B factors
+  // where # is the number of bits per component (with the exception of
+  // 32bpp modes/textured where we use (#-2).16 format).
+  int shift_amount =
+    ((pfmt.PixelBytes == 4) && (Scan.BlendTable || pqinfo.textured)) ? 6 : 8;
+  pqinfo.redFact   = (pfmt.RedMask >> pfmt.RedShift)     << shift_amount;
+  pqinfo.greenFact = (pfmt.GreenMask >> pfmt.GreenShift) << shift_amount;
+  pqinfo.blueFact  = (pfmt.BlueMask >> pfmt.BlueShift)   << shift_amount;
+
+  pqinfo.max_r = (1 << (pfmt.RedBits   + shift_amount + 8)) - 1;
+  pqinfo.max_g = (1 << (pfmt.GreenBits + shift_amount + 8)) - 1;
+  pqinfo.max_b = (1 << (pfmt.BlueBits  + shift_amount + 8)) - 1;
 }
 
 void csGraphics3DSoftware::FinishPolygonFX()
@@ -2012,19 +1975,16 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
   if ((last == poly.num) || (dd == 0))
     return;
 
-  float flat_r, flat_g, flat_b;
+  int flat_r, flat_g, flat_b;
   if (pqinfo.textured)
-    flat_r = flat_g = flat_b = 1;
+    flat_r = flat_g = flat_b = 255;
   else
   {
     flat_r = poly.flat_color_r;
     flat_g = poly.flat_color_g;
     flat_b = poly.flat_color_b;
   }
-  Scan.FlatColor =
-    (QRound (flat_r * pfmt.RedMask) & pfmt.RedMask)
-  | (QRound (flat_g * pfmt.GreenMask) & pfmt.GreenMask)
-  | (QRound (flat_b * pfmt.BlueMask) & pfmt.BlueMask);
+  Scan.FlatRGB = RGBPixel (flat_r, flat_g, flat_b);
 
   //-----
   // Get the values from the polygon for more conveniant local access.
@@ -2042,9 +2002,15 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
     uu[i] = pqinfo.tw * poly.vertices [i].u;
     vv[i] = pqinfo.th * poly.vertices [i].v;
     iz[i] = poly.vertices [i].z;
-    rr[i] = pqinfo.redFact * (flat_r * poly.vertices [i].r);
-    gg[i] = pqinfo.greenFact * (flat_g * poly.vertices [i].g);
-    bb[i] = pqinfo.blueFact * (flat_b * poly.vertices [i].b);
+    if (poly.vertices [i].r > 2.0) poly.vertices [i].r = 2.0;
+    if (poly.vertices [i].r < 0.0) poly.vertices [i].r = 0.0;
+    rr[i] = poly.vertices [i].r * pqinfo.redFact   * flat_r;
+    if (poly.vertices [i].g > 2.0) poly.vertices [i].g = 2.0;
+    if (poly.vertices [i].g < 0.0) poly.vertices [i].g = 0.0;
+    gg[i] = poly.vertices [i].g * pqinfo.greenFact * flat_g;
+    if (poly.vertices [i].b > 2.0) poly.vertices [i].b = 2.0;
+    if (poly.vertices [i].b < 0.0) poly.vertices [i].b = 0.0;
+    bb[i] = poly.vertices [i].b * pqinfo.blueFact  * flat_b;
     if (poly.vertices [i].sy > top_y)
       top_y = poly.vertices [top = i].sy;
     if (poly.vertices [i].sy < bot_y)
@@ -2052,49 +2018,25 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
   }
 
   float inv_dd = 1 / dd;
+  int dz = QInt24 (((iz [0] - iz [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                  - (iz [1] - iz [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
   int du = 0, dv = 0;
   if (pqinfo.textured)
   {
-    float uu0 = pqinfo.tw * poly.vertices [0].u;
-    float uu1 = pqinfo.tw * poly.vertices [1].u;
-    float uu2 = pqinfo.tw * poly.vertices [last].u;
-    du = QInt16 (((uu0 - uu2) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (uu1 - uu2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
-    float vv0 = pqinfo.th * poly.vertices [0].v;
-    float vv1 = pqinfo.th * poly.vertices [1].v;
-    float vv2 = pqinfo.th * poly.vertices [last].v;
-    dv = QInt16 (((vv0 - vv2) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (vv1 - vv2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    du = QInt16 (((uu [0] - uu [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (uu [1] - uu [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    dv = QInt16 (((vv [0] - vv [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (vv [1] - vv [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
   }
-  float iz0 = poly.vertices [0].z;
-  float iz1 = poly.vertices [1].z;
-  float iz2 = poly.vertices [last].z;
-  int dz = QInt24 (((iz0 - iz2) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                  - (iz1 - iz2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
   long dr = 0, dg = 0, db = 0;
   if (pqinfo.mixmode & CS_FX_GOURAUD)
   {
-    float rr0 = pqinfo.redFact * (flat_r * poly.vertices [0].r);
-    float rr1 = pqinfo.redFact * (flat_r * poly.vertices [1].r);
-    float rr2 = pqinfo.redFact * (flat_r * poly.vertices [last].r);
-    float _dr = ((rr0 - rr2) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (rr1 - rr2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd;
-    float gg0 = pqinfo.greenFact * (flat_g * poly.vertices [0].g);
-    float gg1 = pqinfo.greenFact * (flat_g * poly.vertices [1].g);
-    float gg2 = pqinfo.greenFact * (flat_g * poly.vertices [last].g);
-    float _dg = ((gg0 - gg2) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (gg1 - gg2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd;
-    float bb0 = pqinfo.blueFact * (flat_b * poly.vertices [0].b);
-    float bb1 = pqinfo.blueFact * (flat_b * poly.vertices [1].b);
-    float bb2 = pqinfo.blueFact * (flat_b * poly.vertices [last].b);
-    float _db = ((bb0 - bb2) * (poly.vertices [1].sy - poly.vertices [last].sy)
-                - (bb1 - bb2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd;
-
-    // For textures we keep R,G,B components and deltas in 7.8 format not in #.16
-    if (pqinfo.textured)
-      dr = QRound (_dr * 256), dg = QRound (_dg * 256), db = QRound (_db * 256);
-    else
-      dr = QInt16 (_dr), dg = QInt16 (_dg), db = QInt16 (_db);
+    dr = QRound (((rr [0] - rr [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (rr [1] - rr [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    dg = QRound (((gg [0] - gg [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (gg [1] - gg [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
+    db = QRound (((bb [0] - bb [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
+                - (bb [1] - bb [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
   }
 
   //-----
@@ -2112,24 +2054,16 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
   int sy, fyL, fyR;
   sy = fyL = fyR = QRound (poly.vertices [top].sy);
 
-  int max_r = ((pqinfo.redFact   + 1) << 16) - 1;
-  int max_g = ((pqinfo.greenFact + 1) << 16) - 1;
-  int max_b = ((pqinfo.blueFact  + 1) << 16) - 1;
-
   // Decide whenever we should use Gouraud or flat (faster) routines
   bool use_gouraud = (pqinfo.drawline_gouraud != NULL)
     && ((pqinfo.mixmode & CS_FX_GOURAUD)
      || (pqinfo.mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY);
   if (use_gouraud && !(pqinfo.mixmode & CS_FX_GOURAUD))
   {
-    int color_shift = pqinfo.textured ? 8 : 16;
-    rL = pqinfo.redFact << color_shift;
-    gL = pqinfo.greenFact << color_shift;
-    bL = pqinfo.blueFact << color_shift;
+    rL = pqinfo.redFact   << 8;
+    gL = pqinfo.greenFact << 8;
+    bL = pqinfo.blueFact  << 8;
   } /* endif */
-
-  if (pqinfo.textured)
-    max_r >>= 8, max_g >>= 8, max_b >>= 8;
 
   //-----
   // The loop.
@@ -2193,11 +2127,9 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
           dzdyL = QInt24 ((iz[scanL2] - iz[scanL1]) * inv_dyL);
           if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
-            drdyL = QInt16 ((rr[scanL2] - rr[scanL1]) * inv_dyL);
-            dgdyL = QInt16 ((gg[scanL2] - gg[scanL1]) * inv_dyL);
-            dbdyL = QInt16 ((bb[scanL2] - bb[scanL1]) * inv_dyL);
-            if (pqinfo.textured)
-              drdyL >>= 8, dgdyL >>= 8, dbdyL >>= 8;
+            drdyL = QRound ((rr [scanL2] - rr [scanL1]) * inv_dyL);
+            dgdyL = QRound ((gg [scanL2] - gg [scanL1]) * inv_dyL);
+            dbdyL = QRound ((bb [scanL2] - bb [scanL1]) * inv_dyL);
           }
           xL = QInt16 (poly.vertices [scanL1].sx);
 
@@ -2221,11 +2153,9 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
           zL = QInt24 (iz [scanL1] + (iz [scanL2] - iz [scanL1]) * Factor);
           if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
-            rL = QInt16 (rr [scanL1] + (rr [scanL2] - rr [scanL1]) * Factor);
-            gL = QInt16 (gg [scanL1] + (gg [scanL2] - gg [scanL1]) * Factor);
-            bL = QInt16 (bb [scanL1] + (bb [scanL2] - bb [scanL1]) * Factor);
-            if (pqinfo.textured)
-              rL >>= 8, gL >>= 8, bL >>= 8;
+            rL = QRound (rr [scanL1] + (rr [scanL2] - rr [scanL1]) * Factor);
+            gL = QRound (gg [scanL1] + (gg [scanL2] - gg [scanL1]) * Factor);
+            bL = QRound (bb [scanL1] + (bb [scanL2] - bb [scanL1]) * Factor);
           }
         } /* endif */
       } /* endif */
@@ -2292,13 +2222,13 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
 
             int tmp = rr + drr * l;
             if (tmp < 0) drr = - (rr / l);
-            clamp |= (rr > max_r) || (tmp > max_r);
+            clamp |= (rr > pqinfo.max_r) || (tmp > pqinfo.max_r);
             tmp = gg + dgg * l;
             if (tmp < 0) dgg = - (gg / l);
-            clamp |= (gg > max_g) || (tmp > max_g);
+            clamp |= (gg > pqinfo.max_g) || (tmp > pqinfo.max_g);
             tmp = bb + dbb * l;
             if (tmp < 0) dbb = - (bb / l);
-            clamp |= (bb > max_b) || (tmp > max_b);
+            clamp |= (bb > pqinfo.max_b) || (tmp > pqinfo.max_b);
           }
 
           unsigned long *zbuff = z_buffer + width * screenY + xl;
@@ -2325,38 +2255,6 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
   }
 }
 
-
-void csGraphics3DSoftware::CacheTexture (iPolygonTexture* texture)
-{
-  tcache->use_texture (texture, txtmgr);
-}
-
-void csGraphics3DSoftware::CacheInitTexture (iPolygonTexture* texture)
-{
-  tcache->init_texture (texture, txtmgr);
-}
-
-void csGraphics3DSoftware::CacheSubTexture (iPolygonTexture* texture, int u, int v)
-{
-  tcache->use_sub_texture (texture, txtmgr, u, v);
-}
-
-void csGraphics3DSoftware::CacheRectTexture (iPolygonTexture* tex,
-        int minu, int minv, int maxu, int maxv)
-{
-  int subtex_size = tex->GetSubtexSize ();
-
-  int iu, iv;
-  for (iu = minu ; iu < maxu ; iu += subtex_size)
-  {
-    for (iv = minv ; iv < maxv ; iv += subtex_size)
-        tcache->use_sub_texture (tex, txtmgr, iu, iv);
-    tcache->use_sub_texture (tex, txtmgr, iu, maxv);
-  }
-  for (iv = minv ; iv < maxv ; iv += subtex_size)
-      tcache->use_sub_texture (tex, txtmgr, maxu, iv);
-  tcache->use_sub_texture (tex, txtmgr, maxu, maxv);
-}
 
 unsigned char *csGraphics3DSoftware::BuildIndexedFogTable ()
 {
@@ -2399,11 +2297,11 @@ unsigned char *csGraphics3DSoftware::BuildIndexedFogTable ()
   unsigned char *dest = fog_tables [fi].table;
   for (i = 0; i < 256; i++)
   {
-    int r = txtmgr->get_palette () [i].red;
-    int g = txtmgr->get_palette () [i].green;
-    int b = txtmgr->get_palette () [i].blue;
+    int r = texman->cmap [i].red;
+    int g = texman->cmap [i].green;
+    int b = texman->cmap [i].blue;
     for (int j = 1; j <= 32; j++)
-      dest [(j - 1) * 256 + i] = txtmgr->find_rgb (
+      dest [(j - 1) * 256 + i] = texman->find_rgb (
         Scan.FogR + ((j * (r - Scan.FogR)) >> 5),
         Scan.FogG + ((j * (g - Scan.FogG)) >> 5),
         Scan.FogB + ((j * (b - Scan.FogB)) >> 5));
@@ -2411,11 +2309,6 @@ unsigned char *csGraphics3DSoftware::BuildIndexedFogTable ()
 
   fog_tables [fi].lastuse = usage;
   return fog_tables [fi].table;
-}
-
-void csGraphics3DSoftware::UncacheTexture (iPolygonTexture* texture)
-{
-  (void)texture;
 }
 
 bool csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
@@ -2600,12 +2493,12 @@ void csGraphics3DSoftware::GetCaps(G3D_CAPS *caps)
 
 void csGraphics3DSoftware::ClearCache()
 {
-  if (tcache) tcache->clear ();
+  if (tcache) tcache->Clear ();
 }
 
 void csGraphics3DSoftware::DumpCache()
 {
-  if (tcache) tcache->dump();
+  if (tcache) tcache->dump (this);
 }
 
 void csGraphics3DSoftware::DrawLine (csVector3& v1, csVector3& v2, float fov, int color)
@@ -2645,18 +2538,6 @@ void csGraphics3DSoftware::DrawLine (csVector3& v1, csVector3& v2, float fov, in
   int py2 = height - 1 - QInt (y2 * iz2 + (height/2));
 
   G2D->DrawLine (px1, py1, px2, py2, color);
-}
-
-void csGraphics3DSoftware::SysPrintf (int mode, char* szMsg, ...)
-{
-  char buf[1024];
-  va_list arg;
-
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-
-  System->Print (mode, buf);
 }
 
 float csGraphics3DSoftware::GetZbuffValue (int x, int y)
@@ -2707,13 +2588,13 @@ bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
 #ifdef DO_MMX
     case 6: scfParent->do_mmx = value->v.b; break;
 #endif
-    case 7: scfParent->txtmgr->Gamma = value->v.f; break;
+    case 7: scfParent->texman->Gamma = value->v.f; break;
     case 8: scfParent->zdist_mipmap1 = value->v.f; break;
     case 9: scfParent->zdist_mipmap2 = value->v.f; break;
     case 10: scfParent->zdist_mipmap3 = value->v.f; break;
     case 11: scfParent->rstate_gouraud = value->v.b; break;
     case 12: scfParent->do_smaller_rendering = value->v.b; break;
-    case 13: scfParent->txtmgr->do_lightmapgrid = value->v.b; break;
+    case 13: scfParent->texman->do_lightmapgrid = value->v.b; break;
     default: return false;
   }
   scfParent->ScanSetup ();
@@ -2734,13 +2615,13 @@ bool csGraphics3DSoftware::csSoftConfig::GetOption (int id, csVariant* value)
 #ifdef DO_MMX
     case 6: value->v.b = scfParent->do_mmx; break;
 #endif
-    case 7: value->v.f = scfParent->txtmgr->Gamma; break;
+    case 7: value->v.f = scfParent->texman->Gamma; break;
     case 8: value->v.f = scfParent->zdist_mipmap1; break;
     case 9: value->v.f = scfParent->zdist_mipmap2; break;
     case 10: value->v.f = scfParent->zdist_mipmap3; break;
     case 11: value->v.b = scfParent->rstate_gouraud; break;
     case 12: value->v.b = scfParent->do_smaller_rendering; break;
-    case 13: value->v.b = scfParent->txtmgr->do_lightmapgrid; break;
+    case 13: value->v.b = scfParent->texman->do_lightmapgrid; break;
     default: return false;
   }
   return true;

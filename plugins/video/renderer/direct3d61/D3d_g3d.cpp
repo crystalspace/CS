@@ -35,8 +35,8 @@
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
-#include "cs3d/direct3d61/d3d_g3d.h"
-#include "cs3d/direct3d61/d3d_txtcache.h"
+#include "d3d_g3d.h"
+#include "d3d_txtcache.h"
 #include "cs2d/ddraw61/IG2D.h"
 #include "cssys/win32/iDDetect.h"
 #include "csutil/inifile.h"
@@ -55,6 +55,8 @@
 // get rid of evil annoying "variable may be used without having been init'ed"
 #pragma warning(disable : 4701)
 #endif
+
+#define SysPrintf m_piSystem->Printf
 
 /***** File-scope variables *****/
 
@@ -241,7 +243,7 @@ HRESULT CALLBACK csGraphics3DDirect3DDx6::EnumPixelFormatsCallback(LPDDPIXELFORM
   return D3DENUMRET_OK; // keep on looking
 }
 
-csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6(iBase *iParent) : 
+csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6 (iBase *iParent) : 
   m_bIsHardware(false),
   m_bHaloEffect(false),
   m_dwDeviceBitDepth(0),
@@ -334,8 +336,7 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
   if (!m_piG2D)
     return false;
 
-  CHK (txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D));
-  txtmgr->Initialize ();
+  CHK (txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D, config));
 
   m_bVerbose = config->GetYesNo("Direct3DDX6", "VERBOSE", false);
 
@@ -594,14 +595,14 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   }
   else
   {
-    if(config->GetYesNo("Direct3DDX6","DISABLE_LIGHTMAP", false))
+    if (config->GetYesNo ("Direct3DDX6", "DISABLE_LIGHTMAP", false))
       SysPrintf (MSG_INITIALIZATION, " WARNING : Lightmapping disabled by user.\n");
     else
       SysPrintf (MSG_INITIALIZATION, " WARNING : Lightmapping not supported by hardware.\n");
     m_iTypeLightmap = 0;
   }
 
-  if(!m_iTypeLightmap)
+  if (!m_iTypeLightmap)
   {
     SysPrintf (MSG_INITIALIZATION, " WARNING : Lightmapping disabled.\n");
   }
@@ -756,9 +757,8 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   // Here is the "Assertion failed!"-bug I get on my machine
   if (m_iTypeLightmap != 0)
   {
-    CHK (m_pTextureCache = new D3DTextureCache(dwFree/2, m_bIsHardware, m_lpDD4, m_lpd3dDevice2, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps, m_MaxAspectRatio));
+    CHK (m_pTextureCache = new D3DTextureCache (dwFree/2, m_bIsHardware, m_lpDD4, m_lpd3dDevice2, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps, m_MaxAspectRatio));
     CHK (m_pLightmapCache = new D3DLightMapCache(dwFree/2, m_bIsHardware, m_lpDD4, m_lpd3dDevice2, m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount));
- 
   }
   else
   {
@@ -1135,11 +1135,6 @@ void csGraphics3DDirect3DDx6::SetZBufMode(G3DZBufMode mode)
 }
 
 
-G3D_COLORMAPFORMAT csGraphics3DDirect3DDx6::GetColormapFormat() 
-{
-  return G3DCOLORFORMAT_24BIT;
-}
-
 void csGraphics3DDirect3DDx6::DumpCache()
 {
   m_pTextureCache->Dump();
@@ -1158,16 +1153,16 @@ void csGraphics3DDirect3DDx6::ClearCache()
   }
 }
 
-void csGraphics3DDirect3DDx6::CacheTexture(iPolygonTexture *texture)
+void csGraphics3DDirect3DDx6::CacheTexture (iPolygonTexture *texture)
 {
   iTextureHandle* txt_handle = texture->GetTextureHandle ();
-  m_pTextureCache->Add (txt_handle);
-  m_pLightmapCache->Add (texture);
+  m_pTextureCache->cache_texture (txt_handle);
+  m_pLightmapCache->cache_lightmap (texture);
 }
 
-void csGraphics3DDirect3DDx6::UncacheTexture(iPolygonTexture *texture)
+void csGraphics3DDirect3DDx6::UncacheTexture (iTextureHandle *handle)
 {
-  (void)texture;
+  //@@guess what.... right, todo.
 }
 
 void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
@@ -1246,8 +1241,8 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
   float M, N, O;
   int i;
 
-  csHighColorCacheData* pTexCache   = NULL;
-  csHighColorCacheData* pLightCache = NULL;
+  csD3DCacheData* pTexCache   = NULL;
+  csD3DCacheData* pLightCache = NULL;
   D3DTLVERTEX2 vx;
 
   float z;
@@ -1276,7 +1271,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
 
   // retrieve the texture from the cache by handle.
   csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)poly.txt_handle->GetPrivateObject ();
-  pTexCache = txt_mm->GetHighColorCacheData ();
+  pTexCache = (csD3DCacheData *)txt_mm->GetCacheData ();
 
   bColorKeyed = txt_mm->GetTransparent ();
 
@@ -1285,7 +1280,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
 
   if ( piLM  && m_bRenderLightmap)
   {
-    pLightCache = piLM->GetHighColorCache ();
+    pLightCache = (csD3DCacheData *)piLM->GetCacheData ();
     if (!pLightCache)
     {
       bLightmapExists = false;
@@ -1319,7 +1314,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
     m_States.SetColorKeyEnable(false);
   }
 
-  D3DTextureCache_Data *pD3D_texcache = (D3DTextureCache_Data *)pTexCache->pData;
+  csD3DCacheData *pD3D_texcache = (csD3DCacheData *)pTexCache->pData;
 
   m_States.SetTexture(0, pD3D_texcache->lptex);
 
@@ -1344,7 +1339,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
     lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u), 
     lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
 
-    m_States.SetTexture(1, ((D3DLightCache_Data *)pLightCache->pData)->lptex);
+    m_States.SetTexture(1, ((csD3DCacheData *)pLightCache->pData)->lptex);
     m_States.SetStageState(1, D3DTSS_COLOROP, m_LightmapTextureOp);
   }
   else
@@ -1475,8 +1470,8 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   float M, N, O;
   int i;
 
-  csHighColorCacheData* pTexCache   = NULL;
-  csHighColorCacheData* pLightCache = NULL;
+  csD3DCacheData* pTexCache   = NULL;
+  csD3DCacheData* pLightCache = NULL;
   // NOTE : is it better to have this as a class member?
   //    or use d3d vertex buffers
   D3DTLVERTEX vx[100];
@@ -1507,7 +1502,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
 
   // retrieve the texture from the cache by handle.
   csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)poly.txt_handle->GetPrivateObject ();
-  pTexCache = txt_mm->GetHighColorCacheData ();
+  pTexCache = (csD3DCacheData *)txt_mm->GetCacheData ();
 
   bColorKeyed = txt_mm->GetTransparent ();
 
@@ -1516,7 +1511,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
 
   if ( piLM  && m_bRenderLightmap)
   {
-    pLightCache = piLM->GetHighColorCache ();
+    pLightCache = (csD3DCacheData *)piLM->GetCacheData ();
     if (!pLightCache)
     {
       bLightmapExists = false;
@@ -1527,7 +1522,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
     bLightmapExists=false;
   }
 
-  if(m_iTypeLightmap == 0)
+  if (m_iTypeLightmap == 0)
     bLightmapExists = false;
 
   if ( bTransparent )
@@ -1550,7 +1545,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
     m_States.SetColorKeyEnable(false);
   }
 
-  D3DTextureCache_Data *pD3D_texcache = (D3DTextureCache_Data *)pTexCache->pData;
+  csD3DCacheData *pD3D_texcache = (csD3DCacheData *)pTexCache->pData;
 
   m_States.SetTexture(0, pD3D_texcache->lptex);
 
@@ -1625,7 +1620,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
     lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u), 
     lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
 
-    m_States.SetTexture(0, ((D3DLightCache_Data *)pLightCache->pData)->lptex);
+    m_States.SetTexture(0, ((csD3DCacheData *)pLightCache->pData)->lptex);
 
     for (i=0; i < poly.num; i++)
     {
@@ -1675,13 +1670,13 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
 
 //  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, true);
 
-  csHighColorCacheData* pTexData;
+  csD3DCacheData* pTexData;
   if (handle)
   {
     csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)handle->GetPrivateObject ();
-    m_pTextureCache->Add (handle);
+    m_pTextureCache->cache_texture (handle);
 
-    pTexData = txt_mm->GetHighColorCacheData ();
+    pTexData = (csD3DCacheData *)txt_mm->GetCacheData ();
     m_States.SetColorKeyEnable(txt_mm->GetTransparent ());
 
     m_textured = true;
@@ -1751,7 +1746,7 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
   }
 
   if (m_textured)
-    m_States.SetTexture(0, ((D3DTextureCache_Data *)pTexData->pData)->lptex);
+    m_States.SetTexture(0, ((csD3DCacheData *)pTexData->pData)->lptex);
   else
     m_States.SetTexture(0, NULL);
 } // end of StartPolygonFX()
@@ -1783,9 +1778,9 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
   float flat_r = 1., flat_g = 1., flat_b = 1.;
   if (!m_textured)
   {
-    flat_r = poly.flat_color_r; 
-    flat_g = poly.flat_color_g;
-    flat_b = poly.flat_color_b;
+    flat_r = poly.flat_color_r / 255.; 
+    flat_g = poly.flat_color_g / 255.;
+    flat_b = poly.flat_color_b / 255.;
     CLAMP(flat_r, 1.0f);
     CLAMP(flat_g, 1.0f);
     CLAMP(flat_b, 1.0f);
@@ -1914,15 +1909,15 @@ void csGraphics3DDirect3DDx6::BatchDrawPolygonFX(G3DPolygonDPFX& poly)
   float flat_r = 1., flat_g = 1., flat_b = 1.;
   if (!m_textured)
   {
-    flat_r = poly.flat_color_r; 
-    flat_g = poly.flat_color_g;
-    flat_b = poly.flat_color_b;
+    flat_r = poly.flat_color_r / 255.;
+    flat_g = poly.flat_color_g / 255.;
+    flat_b = poly.flat_color_b / 255.;
     CLAMP(flat_r, 1.0f);
     CLAMP(flat_g, 1.0f);
     CLAMP(flat_b, 1.0f);
 
     if (!m_gouraud)
-    FlatColor = D3DRGBA_(flat_r, flat_g, flat_b, m_alpha);
+      FlatColor = D3DRGBA_(flat_r, flat_g, flat_b, m_alpha);
   }
 
 //-- make base vertex
@@ -2209,16 +2204,4 @@ void csGraphics3DDirect3DDx6::AddFogPolygon (CS_ID /*id*/,
 
 void csGraphics3DDirect3DDx6::CloseFogObject (CS_ID /*id*/)
 {
-}
-
-void csGraphics3DDirect3DDx6::SysPrintf(int mode, char* szMsg, ...)
-{
-  char buf[1024];
-  va_list arg;
-  
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-  
-  m_piSystem->Print(mode, buf);
 }

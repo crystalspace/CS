@@ -20,7 +20,6 @@
 #include "csgeom/frustrum.h"
 #include "csengine/quadcube.h"
 #include "csengine/covcube.h"
-#include "csengine/sysitf.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"

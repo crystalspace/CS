@@ -1786,7 +1786,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int
 
 void Blocks::CreateMenuEntry (const char* txt, int menu_nr)
 {
-  csTextureHandle* tm_front = world->GetTextures ()->GetTextureMM (txt);
+  csTextureHandle* tm_front = world->GetTextures ()->FindByName (txt);
   csThing* thing = new csThing ();
 
   thing->AddVertex (-1, .25, 0);
@@ -1817,7 +1817,7 @@ void Blocks::CreateMenuEntry (const char* txt, int menu_nr)
 
 csThing* Blocks::CreateMenuArrow (bool left)
 {
-  csTextureHandle* tm_front = world->GetTextures ()->GetTextureMM ("menu_back");
+  csTextureHandle* tm_front = world->GetTextures ()->FindByName ("menu_back");
   csThing* thing = new csThing ();
 
   float pointx;
@@ -1929,7 +1929,7 @@ void Blocks::StartKeyConfig ()
 
 void Blocks::InitGameRoom ()
 {
-  csTextureHandle* tm = world->GetTextures ()->GetTextureMM ("room");
+  csTextureHandle* tm = world->GetTextures ()->FindByName ("room");
   room = Sys->world->NewSector ();
   room->SetName ("room");
   Sys->set_cube_room (room);
@@ -2005,7 +2005,7 @@ void Blocks::InitGameRoom ()
 
 void Blocks::InitDemoRoom ()
 {
-  csTextureHandle* demo_tm = world->GetTextures ()->GetTextureMM ("clouds");
+  csTextureHandle* demo_tm = world->GetTextures ()->FindByName ("clouds");
   demo_room = Sys->world->NewSector ();
   demo_room->SetName ("room");
 
@@ -2710,7 +2710,7 @@ int main (int argc, char* argv[])
   Sys->ReadConfig ();
   Sys->InitWorld ();  
 
-  Sys->txtmgr->AllocPalette ();
+  Sys->txtmgr->SetPalette ();
   Sys->white = Sys->txtmgr->FindRGB (255, 255, 255);
   Sys->black = Sys->txtmgr->FindRGB (0, 0, 0);
   Sys->red = Sys->txtmgr->FindRGB (255, 0, 0);

@@ -46,7 +46,7 @@
 		mov	eax,%$dvv		; eax = dvv		; 0
 		mov	edx,%$duu		; edx = duu		; 0
 		sar	eax,16			; eax = dvv >> 16	; 1
-		mov	esi,tmap2		; esi = texture ptr	; 1
+		mov	esi,bitmap2		; esi = texture ptr	; 1
 		sar	edx,16			; edx = duu >> 16	; 2
 		mov	ecx,shf_u		; ecx = shifter		; 2
 		shl	eax,cl			; eax = (dvv >> 16) << s; 3/4
@@ -234,7 +234,7 @@
 		mov	eax,%$dvv		; eax = dvv >> 16	; 0
 		mov	edx,%$duu		; edx = duu >> 16	; 0
 		sar	eax,16						; 1
-		mov	esi,tmap2					; 1
+		mov	esi,bitmap2					; 1
 		sar	edx,16						; 2
 		mov	ecx,shf_u					; 2
 		shl	eax,cl						; 3/4
@@ -330,7 +330,7 @@
 		mov	eax,%$dvv		; eax = dvv		; 0
 		mov	edx,%$duu		; edx = duu		; 0
 		sar	eax,16			; eax = dvv >> 16	; 1
-		mov	esi,tmap2		; esi = texture ptr	; 1
+		mov	esi,bitmap2		; esi = texture ptr	; 1
 		sar	edx,16			; edx = duu >> 16	; 2
 		mov	ecx,shf_u		; ecx = shifter		; 2
 		shl	eax,cl			; eax = (dvv >> 16) << s; 3/4
@@ -519,7 +519,7 @@
 		mov	eax,%$dvv		; eax = dvv		; 0
 		mov	edx,%$duu		; edx = duu		; 0
 		sar	eax,16			; eax = dvv >> 16	; 1
-		mov	esi,tmap2		; esi = texture ptr	; 1
+		mov	esi,bitmap2		; esi = texture ptr	; 1
 		sar	edx,16			; edx = duu >> 16	; 2
 		mov	ecx,shf_u		; ecx = shifter		; 2
 		shl	eax,cl			; eax = (dvv >> 16) << s; 3/4
@@ -712,7 +712,7 @@
 	%ifdef PIC
 		push	ebx
 	%endif
-		mov	esi,tmap
+		mov	esi,bitmap
 		mov	ecx,shf_h
 		mov	eax,%$uu
 		mov	ebx,%$vv
@@ -865,214 +865,6 @@ proc		csScan_8_draw_pi_scanline_tex_zuse,20,ebx,esi,edi,ebp
 		inc	edi			; dest++		; 6
 		cmp	edi,%$destend		; dest < destend?	; 7
 		jb	%$sloop						; 7
-endproc
-
-;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-; Summary:
-;   Draw a perspective-incorrect texture mapped polygon scanline using MMX
-; Arguments:
-;   void *dest, int width, unsigned long *zbuff,
-;   long u, long du, long v, long dv, unsigned long z, long dz,
-;   unsigned char *bitmap, int bitmap_log2w
-;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-proc		csScan_8_mmx_draw_pi_scanline_tex_zuse,20,ebx,esi,edi,ebp
-		targ	%$dest		; void *dest
-		targ	%$width		; int width
-		targ	%$zbuff		; long *zbuff
-		targ	%$u		; long u
-		targ	%$du		; long du
-		targ	%$v		; long v
-		targ	%$dv		; long dv
-		targ	%$z		; long z
-		targ	%$dz		; long dz
-		targ	%$bitmap	; unsigned char *bitmap
-		targ	%$bitmap_log2w	; int bitmap_log2w
-
-		loc	%$dudvFP,8	; fixed-point value of (dv * tex_w + du)
-		tloc	%$duFP		; fixed-point duu
-		tloc	%$dvFP		; fixed-point dvv
-		tloc	%$destend
-; if (len <= 0)
-;   return;
-		mov	eax,%$width
-		mov	edi,%$dest
-		test	eax,eax
-		exit	le
-
-		add	eax,edi
-		mov	%$destend,eax
-
-; dudvInt[1] = ((dv >> 16) << bitmap_log2w) + (du >> 16);
-		mov	eax,%$dv		; eax = dv		; 0
-		mov	edx,%$du		; edx = du		; 0
-		sar	eax,16			; eax = dv >> 16	; 1
-		mov	esi,%$bitmap		; esi = texture ptr	; 1
-		sar	edx,16			; edx = du >> 16	; 2
-		mov	ecx,%$bitmap_log2w	; ecx = bitmap_log2w	; 2
-		shl	eax,cl			; eax = (dv >> 16) << s	; 3/4
-; dudvInt[0] = dudvInt [1] + (1 << bitmap_log2w);
-		mov	ebx,%$v			; ebx = v		; 3
-		add	eax,edx			; eax = dudvInt[1]	; 7
-		mov	edx,1			; edx = 1		; 7
-		shl	edx,cl			; edx = 1 << bitmap_l2w	; 8/4
-		mov	[%$dudvFP_+4],eax	; dudvInt[1] = eax	; 8
-		sar	ebx,16			; ebx = v >> 16		; 12
-		add	eax,edx			; eax = dudvInt[0]	; 12
-		mov	[%$dudvFP_+0],eax	; dudvInt[0] = eax	; 13
-; unsigned char *src = bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16);
-		mov	edx,%$u			; edx = u >> 16		; 13
-		sar	edx,16						; 14
-		mov	eax,%$u						; 14
-		shl	ebx,cl						; 15/4
-		test	[edi],al		; fetch dest into cache	; 15
-		add	esi,edx			; esi = source texture	; 19
-		add	esi,ebx						; 20
-
-; uFrac = u << 16;
-; vFrac = v << 16;
-		mov	ebx,%$v						; 20
-		shl	eax,16			; eax = uu << 16	; 21
-		mov	ebp,%$dv					; 21
-		shl	ebx,16			; ebx = vv << 16	; 22
-; duFrac = du << 16;
-; dvFrac = dv << 16;
-		mov	ecx,%$du					; 22
-		shl	ebp,16			; ebp = dvv << 16	; 23
-		shl	ecx,16			; ecx = duu << 16	; 24
-		mov	%$dvFP,ebp					; 25
-		add	edi,4						; 25
-		mov	%$duFP,ecx					; 26
-		mov	ebp,%$zbuff					; 26
-		mov	ecx,%$z						; 27
-
-		test	ebp,7						; 27
-		jz	%$zbufok					; 28
-
-; Align Z-buffer on 8 bound
-		cmp	ecx,[ebp]		; Check Z-buffer	; 29
-		jb	%$zbelow1		; We're below surface	; 29
-		mov	dl,[esi]		; Get texel		; 30
-		mov	[ebp],ecx		; *zbuff = z		; 30
-		mov	[edi-4],dl		; Put texel		; 31
-
-%$zbelow1:	add	ebx,%$dvFP		; v = v + dv		; 31
-		sbb	edx,edx						; 32
-		add	eax,%$duFP		; u = u + du		; 32/2
-		adc	esi,[%$dudvFP_+4+edx*4]	; Update texture ptr	; 34/2
-		add	ecx,%$dz		; z = z + dz		; 34/2
-		inc	edi			; dest++		; 36
-		add	ebp,4			; zbuff++		; 36
-
-%$zbufok:	cmp	edi,%$destend					; 37
-		jae	near %$sbyone					; 37
-
-; Load MMX registers
-		movd	mm1,%$dz		; mm1 = 0|dz
-		movd	mm0,ecx			; mm0 = 0|z0
-		punpckldq mm1,mm1		; mm1 = dz|dz
-		movq	mm2,mm0			; mm2 = 0|z0
-		paddd	mm2,mm1			; mm2 = dz|z1
-		punpckldq mm0,mm2		; mm0 = z1|z0
-		pslld	mm1,1			; mm1 = dz*2|dz*2
-
-; --------------// Register usage //--------------
-; EAX	u		ESI	source texture
-; EBX	v		EDI	dest video ram
-; ECX	--//scratch//--	EBP	Z-buffer
-; EDX	--//scratch//--
-
-; NOTE: The Z-buffer pointer MUST be 8-aligned otherwise MMX code
-; will execute 72 (!) clocks instead of just 12.
-
-%$sloop4:	movq	mm3,[ebp]		; mm3 = bz1|bz0		; 0
-		movq	mm5,mm0			; mm5 = z1|z0		; 0
-		movq	mm4,mm0			; mm4 = z1|z0		; 1
-		pcmpgtd	mm5,mm3			; mm5 = m1|m0		; 1
-		paddd	mm0,mm1			; mm0 = z3|z2		; 2
-		movq	mm6,mm5			; mm6 = m1|m0		; 2
-		pandn	mm5,mm3			; mm5 = ?bz1|?bz0	; 3
-		pand	mm4,mm6			; mm4 = ?z1|?z0		; 3
-		movq	mm3,[ebp+8]		; mm3 = bz3|bz2		; 4
-		movq	mm7,mm0			; mm7 = z3|z2		; 4
-		por	mm5,mm4			; mm5 = nz1|nz0		; 5
-		movq	mm4,mm0			; mm4 = z3|z2		; 5
-		pcmpgtd	mm7,mm3			; mm7 = m3|m2		; 6
-		paddd	mm0,mm1			; mm0 = z3|z2		; 6
-		movq	[ebp],mm5		; zbuff++ = nz1|nz0	; 7
-		movq	mm5,mm7			; mm5 = m3|m2		; 7
-		pandn	mm5,mm3			; mm5 = ?bz3|?bz2	; 8
-		pand	mm4,mm7			; mm4 = ?z3|?z2		; 8
-		packssdw mm7,mm6		; mm7 = m3|m2|m1|m0	; 9
-		por	mm5,mm4			; mm5 = nz3|nz2		; 9
-		packsswb mm7,mm7		; mm7 = 0|0|0|0|m3|m2|m1|m0; 10
-		movq	[ebp+8],mm5		; zbuff++ = nz3|nz2	; 11
-
-; There are LOTS of stalls in the following code
-; but I don't see any way to optimize it anymore :-(
-; The Intel CPU really sux since it has VERY little registers
-; If it would have ONE more register, the following code
-; could execute about 30% faster...
-		mov	edx,%$dvFP		; edx = dv		; 0
-		mov	cl,[esi]		; Get texel 0		; 0
-		add	ebx,edx			; v = v + dv		; 1
-		sbb	edx,edx			; edx = carry (v + dv)	; 2
-		add	eax,%$duFP		; u = u + du		; 3/2
-		adc	esi,[%$dudvFP_+4+edx*4]	; Update source		; 5/2
-		mov	edx,%$dvFP		; edx = dv		; 5
-		add	ebx,edx			; v = v + dv		; 7
-		sbb	edx,edx			; edx = carry (v + dv)	; 8
-		mov	ch,[esi]		; Get texel 1		; 8
-		shl	ecx,16			; ECX = p1|p0|0|0	; 9
-		add	eax,%$duFP		; u = u + du		; 9/2
-		adc	esi,[%$dudvFP_+4+edx*4]	; Update source		; 11/2
-		mov	edx,%$dvFP		; edx = dv		; 11
-		add	ebx,edx			; v = v + dv		; 13
-		sbb	edx,edx			; edx = carry (v + dv)	; 14
-		mov	cl,[esi]		; Get texel 2		; 14
-		add	eax,%$duFP		; u = u + du		; 15/2
-		lea	ebp,[ebp+16]		; Increment zbuf pointer; 15
-                adc	esi,[%$dudvFP_+4+edx*4]	; Update source		; 17/2
-		mov	edx,%$dvFP		; edx = dv		; 17
-		add	ebx,edx			; v = v + dv		; 19
-		sbb	edx,edx			; edx = carry (v + dv)	; 20
-		mov	ch,[esi]		; Get texel 3		; 20
-		rol	ecx,16			; ecx = p3|p2|p1|p0	; 21
-		add	eax,%$duFP		; u = u + du		; 21/2
-		adc	esi,[%$dudvFP_+4+edx*4]	; Update source		; 23/2
-		add	edi,4			; Increment dest pointer; 23
-
-		movd	edx,mm7			; EDX = m3|m2|m1|m0	; 24
-		and	ecx,edx			; Strip invisible texels; 25
-		not	edx			; Negate Z-mask		; 25
-		and	edx,[edi-8]		; Get on-screen pixels	; 26/2
-		or	edx,ecx			; Merge pixels/texels	; 28
-		mov	[edi-8],edx		; put pixels		; 29
-		cmp	edi,%$destend		; dest < destend?	; 29/2
-		jb	near %$sloop4					; 29
-
-		movd	ecx,mm0
-
-; Less than four pixels left
-%$sbyone:	sub	edi,4
-		cmp	edi,%$destend
-		jae	%$sexit
-
-%$sloop1:	cmp	ecx,[ebp]		; Check Z-buffer	; 0
-		jb	%$zbelow		; We're below surface	; 0
-		mov	dl,[esi]		; Get texel		; 1
-		mov	[ebp],ecx		; *zbuff = z		; 1
-		mov	[edi],dl		; Put texel		; 2
-
-%$zbelow:	add	ebx,%$dvFP		; v = v + dv		; 2
-		sbb	edx,edx						; 3
-		add	eax,%$duFP		; u = u + du		; 3/2
-		adc	esi,[%$dudvFP_+4+edx*4]	; Update texture ptr	; 5/2
-		add	ecx,%$dz		; z = z + dz		; 5/2
-		add	ebp,4			; zbuff++		; 6
-		inc	edi			; dest++		; 6
-		cmp	edi,%$destend		; dest < destend?	; 7
-		jb	%$sloop1					; 7
-%$sexit:	emms
 endproc
 
 ; Create the scanline routines using above defined macros

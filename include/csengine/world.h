@@ -26,6 +26,7 @@
 #include "csengine/tranman.h"
 #include "csengine/halo.h"
 #include "csobject/csobject.h"
+#include "isystem.h"
 #include "iworld.h"
 #include "iconfig.h"
 
@@ -613,5 +614,8 @@ public:
     virtual bool GetOption (int id, csVariant* value);
   } scfiConfig;
 };
+
+// This is a global replacement for printf ()
+#define CsPrintf csWorld::System->Printf
 
 #endif // __CS_WORLD_H__

@@ -19,7 +19,6 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "csutil/scf.h"
-#include "csengine/sysitf.h"
 #include "csengine/world.h"
 #include "csengine/dumper.h"
 #include "csengine/halo.h"
@@ -465,37 +464,14 @@ csThing* csWorld::GetThing (const char* name)
 void csWorld::PrepareTextures ()
 {
   iTextureManager* txtmgr = G3D->GetTextureManager ();
-  txtmgr->Initialize ();
+  txtmgr->ResetPalette ();
 
   // First register all textures to the texture manager.
-  for (int i = 0 ; i < textures->GetNumTextures () ; i++)
-  {
-    csTextureHandle* th = textures->GetTextureMM (i);
-    iImage *image = th->GetImageFile ();
-
-    // Now we check the size of the loaded image. Having an image, that
-    // is not a power of two will result in strange errors while
-    // rendering. It is by far better to check the format of all textures
-    // already while loading them.
-    if (th->for_3d)
-    {
-      int Width  = image->GetWidth ();
-      int Height = image->GetHeight ();
-
-      if (!IsPowerOf2(Width) || !IsPowerOf2(Height))
-        CsPrintf (MSG_WARNING,
-          "Inefficient texture image '%s' dimenstions!\n"
-          "The width (%d) and height (%d) should be a power of two.\n",
-          th->GetName (), Width, Height);
-    }
-
-    iTextureHandle* handle = txtmgr->RegisterTexture (th->GetImageFile (),
-      th->for_3d, th->for_2d);
-    th->SetTextureHandle (handle);
-  }
+  for (int i = 0; i < textures->Length (); i++)
+    textures->Get (i)->Register (txtmgr);
 
   // Prepare all the textures.
-  txtmgr->Prepare ();
+  txtmgr->PrepareTextures ();
 }
 
 void csWorld::PrepareSectors()

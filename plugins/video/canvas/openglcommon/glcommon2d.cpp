@@ -16,18 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdarg.h>
-
 #include "sysdef.h"
-#ifdef OS_WIN32
-#include <windows.h>
-#endif
-#include "csutil/scf.h"
 #include "cs2d/openglcommon/glcommon2d.h"
-#include "cs3d/opengl/ogl_txtmgr.h"
-#include "cs3d/opengl/ogl_txtcache.h"
-#include "csinput/csevent.h"
-#include "csinput/csinput.h"
+#include "cs2d/common/scrshot.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 
@@ -38,7 +29,6 @@ IMPLEMENT_IBASE_END
 
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   csGraphics2D (),
-  texture_cache (NULL),
   LocalFontServer (NULL)
 {
   CONSTRUCT_IBASE (iParent);
@@ -49,6 +39,20 @@ bool csGraphics2DGLCommon::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
+  // We don't really care about pixel format, except for ScreenShot ()
+#if defined (CS_BIG_ENDIAN)
+  pfmt.RedMask   = 0xff000000;
+  pfmt.GreenMask = 0x00ff0000;
+  pfmt.BlueMask  = 0x0000ff00;
+#else
+  pfmt.RedMask   = 0x000000ff;
+  pfmt.GreenMask = 0x0000ff00;
+  pfmt.BlueMask  = 0x00ff0000;
+#endif
+  pfmt.PixelBytes = 4;
+  pfmt.PalEntries = 0;
+  pfmt.complete ();
+
   return true;
 }
 
@@ -57,10 +61,10 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
   Close ();
 }
 
-bool csGraphics2DGLCommon::Open(const char *Title)
+bool csGraphics2DGLCommon::Open (const char *Title)
 {
   if (glGetString (GL_RENDERER))
-    CsPrintf (MSG_INITIALIZATION, "OpenGL renderer %s ", glGetString(GL_RENDERER) );
+    CsPrintf (MSG_INITIALIZATION, "OpenGL renderer %s ", glGetString (GL_RENDERER));
   if (glGetString (GL_VERSION))
     CsPrintf (MSG_INITIALIZATION, "Version %s", glGetString(GL_VERSION));
   CsPrintf (MSG_INITIALIZATION, "\n");
@@ -71,20 +75,9 @@ bool csGraphics2DGLCommon::Open(const char *Title)
   // load font 'server'
   if (LocalFontServer == NULL)
   {
-       LocalFontServer = new csGraphics2DOpenGLFontServer(&FontList[0]);
-       for (int fontindex=1; 
-       		fontindex < 8;
-		fontindex++)
-       {
-	   LocalFontServer->AddFont(FontList[fontindex]);
-       }
-       CsPrintf(MSG_INITIALIZATION,"\n");
-  }
-
-  // make our own local texture cache for 2D sprites
-  if (texture_cache == NULL)
-  {
-    CHK (texture_cache = new OpenGLTextureCache(1<<24,24));
+    LocalFontServer = new csGraphics2DOpenGLFontServer (8);
+    for (int fontindex = 0; fontindex < 8; fontindex++)
+      LocalFontServer->AddFont (FontList [fontindex]);
   }
 
   Clear (0);
@@ -96,50 +89,52 @@ void csGraphics2DGLCommon::Close(void)
   csGraphics2D::Close ();
   CHK (delete LocalFontServer);
   LocalFontServer = NULL;
-  CHK (delete texture_cache);
-  texture_cache = NULL;
 }
 
-void csGraphics2DGLCommon::Clear(int color)
+void csGraphics2DGLCommon::Clear (int color)
 {
+  float r, g, b;
   switch (pfmt.PixelBytes)
   {
-  case 1: // paletted colors
-    glClearColor(Palette[color].red,
-    		Palette[color].green,
-		Palette[color].blue,0.);
-    break;
-  case 2: // 16bit color
-  case 4: // truecolor
-    glClearColor( ( (color & pfmt.RedMask) >> pfmt.RedShift )     / (float)pfmt.RedBits,
-               ( (color & pfmt.GreenMask) >> pfmt.GreenShift ) / (float)pfmt.GreenBits,
-               ( (color & pfmt.BlueMask) >> pfmt.BlueShift )   / (float)pfmt.BlueBits,
-	       0. );
-    break;
+    case 1: // paletted colors
+      r = float (Palette [color].red  ) / 255;
+      g = float (Palette [color].green) / 255;
+      b = float (Palette [color].blue ) / 255;
+      break;
+    case 2: // 16bit color
+    case 4: // truecolor
+      r = float (color & pfmt.RedMask  ) / pfmt.RedMask;
+      g = float (color & pfmt.GreenMask) / pfmt.GreenMask;
+      b = float (color & pfmt.BlueMask ) / pfmt.BlueMask;
+      break;
+    default:
+      return;
   }
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClearColor (r, g, b, 0.0);
+  glClear (GL_COLOR_BUFFER_BIT);
 }
 
-void csGraphics2DGLCommon::SetRGB(int i, int r, int g, int b)
+void csGraphics2DGLCommon::SetRGB (int i, int r, int g, int b)
 {
   csGraphics2D::SetRGB (i, r, g, b);
 }
 
-void csGraphics2DGLCommon::setGLColorfromint(int color)
+void csGraphics2DGLCommon::setGLColorfromint (int color)
 {
   switch (pfmt.PixelBytes)
   {
-  case 1: // paletted colors
-    glColor3i(Palette[color].red,
-    		Palette[color].green,
-		Palette[color].blue);
-    break;
-  case 2: // 16bit color
-  case 4: // truecolor
-    glColor3f( ( (color & pfmt.RedMask) >> pfmt.RedShift )     / (float)pfmt.RedBits,
-               ( (color & pfmt.GreenMask) >> pfmt.GreenShift ) / (float)pfmt.GreenBits,
-               ( (color & pfmt.BlueMask) >> pfmt.BlueShift )   / (float)pfmt.BlueBits);
-    break;
+    case 1: // paletted colors
+      glColor3i (Palette [color].red, Palette [color].green, Palette [color].blue);
+      break;
+    case 2: // 16bit color
+    case 4: // truecolor
+      glColor3f (
+        float (color & pfmt.RedMask  ) / pfmt.RedMask,
+        float (color & pfmt.GreenMask) / pfmt.GreenMask,
+        float (color & pfmt.BlueMask ) / pfmt.BlueMask);
+      break;
+    default:
+      return;
   }
 }
 
@@ -150,11 +145,11 @@ void csGraphics2DGLCommon::DrawLine (
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
   glDisable (GL_DEPTH_TEST);
-  setGLColorfromint(color);
+  setGLColorfromint (color);
 
   glBegin (GL_LINES);
-  glVertex2i (GLint(x1), GLint(Height-y1-1));
-  glVertex2i (GLint(x2), GLint(Height-y2-1));
+  glVertex2i (GLint (x1), GLint (Height - y1 - 1));
+  glVertex2i (GLint (x2), GLint (Height - y2 - 1));
   glEnd ();
 }
 
@@ -164,7 +159,7 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
   glDisable (GL_DEPTH_TEST);
-  setGLColorfromint(color);
+  setGLColorfromint (color);
 
   glBegin (GL_QUADS);
   glVertex2i (x, Height - y - 1);
@@ -213,56 +208,80 @@ void csGraphics2DGLCommon::WriteChar (int x, int y, int fg, int /*bg*/, char c)
 void csGraphics2DGLCommon::DrawSprite (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
-  texture_cache->Add (hTex);
-
   // cache the texture if we haven't already.
-  csHighColorCacheData *cachedata;
-  cachedata = hTex->GetHighColorCacheData ();
-  GLuint texturehandle = *(GLuint *)cachedata->pData;
+  GLuint texturehandle = (GLuint)hTex->GetMipMapData (0);
 
   // as we are drawing in 2D, we disable some of the commonly used features
   // for fancy 3D drawing
-  glShadeModel(GL_FLAT);
+  glShadeModel (GL_FLAT);
   glDisable (GL_DEPTH_TEST);
+  glDepthMask (GL_FALSE);
 
   // if the texture has transparent bits, we have to tweak the
   // OpenGL blend mode so that it handles the transparent pixels correctly
   if (hTex->GetTransparent ())
   {
     glEnable (GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   }
   else
     glDisable (GL_BLEND);
 
-  glEnable(GL_TEXTURE_2D);
-  glColor4f(1.,1.,1.,1.);
-  glBindTexture(GL_TEXTURE_2D,texturehandle);
+  glEnable (GL_TEXTURE_2D);
+  glColor4f (1.,1.,1.,1.);
+  glBindTexture (GL_TEXTURE_2D, texturehandle);
   
-  int bitmapwidth=0, bitmapheight=0;
-  hTex->GetBitmapDimensions(bitmapwidth,bitmapheight);
+  int bitmapwidth = 0, bitmapheight = 0;
+  hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);
 
   // convert texture coords given above to normalized (0-1.0) texture coordinates
   float ntx1,nty1,ntx2,nty2;
-  ntx1 = tx/bitmapwidth;
-  ntx2 = (tx+tw)/bitmapwidth;
-  nty1 = ty/bitmapheight;
-  nty2 = (ty+th)/bitmapheight;
+  ntx1 = float (tx     ) / bitmapwidth;
+  ntx2 = float (tx + tw) / bitmapwidth;
+  nty1 = float (ty     ) / bitmapheight;
+  nty2 = float (ty + th) / bitmapheight;
 
-  // draw the bitmap - we could use GL_QUADS, but why?
-  glBegin(GL_TRIANGLE_FAN);
-  glTexCoord2f(ntx1,nty1);
-  glVertex2i(sx,Height-sy-1);
-  glTexCoord2f(ntx2,nty1);
-  glVertex2i(sx+sw,Height-sy-1);
-  glTexCoord2f(ntx2,nty2);
-  glVertex2i(sx+sw,Height-sy-sh-1);
-  glTexCoord2f(ntx1,nty2);
-  glVertex2i(sx,Height-sy-sh-1);
-  glEnd();
+  // draw the bitmap
+  glBegin (GL_QUADS);
+  glTexCoord2f (ntx1, nty1);
+  glVertex2i (sx, Height - sy - 1);
+  glTexCoord2f (ntx2, nty1);
+  glVertex2i (sx + sw, Height - sy - 1);
+  glTexCoord2f (ntx2, nty2);
+  glVertex2i (sx + sw, Height - sy - sh - 1);
+  glTexCoord2f (ntx1, nty2);
+  glVertex2i (sx, Height - sy - sh - 1);
+  glEnd ();
 }
 
-unsigned char* csGraphics2DGLCommon::GetPixelAt (int /*x*/, int /*y*/)
+// This variable is usually NULL except when doing a screen shot:
+// in this case it is a temporarily allocated buffer for glReadPixels ()
+static UByte *screen_shot = NULL;
+
+unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 {
-  return NULL;
+  return screen_shot ?
+    (screen_shot + pfmt.PixelBytes * ((Height - 1 - y) * Width + x)) : NULL;
+}
+
+iImage *csGraphics2DGLCommon::ScreenShot ()
+{
+  if (pfmt.PixelBytes != 1 && pfmt.PixelBytes != 4)
+    return NULL;
+
+  int screen_width = Width * pfmt.PixelBytes;
+  screen_shot = new UByte [screen_width * Height];
+  if (!screen_shot) return NULL;
+
+  //glPixelStore ()?
+  glReadPixels (0, 0, Width, Height,
+    pfmt.PixelBytes == 1 ? GL_COLOR_INDEX : GL_RGBA,
+    GL_UNSIGNED_BYTE, screen_shot);
+
+  csScreenShot *ss = new csScreenShot (this);
+
+  delete [] screen_shot;
+  screen_shot = NULL;
+
+  return ss;
 }

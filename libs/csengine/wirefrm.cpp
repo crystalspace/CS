@@ -20,7 +20,6 @@
 #include "types.h"
 #include "qint.h"
 #include "csgeom/math3d.h"
-#include "csengine/sysitf.h"
 #include "csengine/wirefrm.h"
 #include "csengine/world.h"
 #include "csengine/camera.h"

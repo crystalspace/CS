@@ -222,7 +222,6 @@ bool operator> (double f, const csDMatrix3& m)
          ABS(m.m31)<f && ABS(m.m32)<f && ABS(m.m33)<f;
 }
 
-
 //---------------------------------------------------------------------------
 
 void csDMath3::Between (const csDVector3& v1, const csDVector3& v2,
@@ -252,8 +251,8 @@ bool csDMath3::Visible (const csDVector3& p, const csDVector3& t1,
    double y3 = t3.y-p.y;
    double z3 = t3.z-p.z;
    double c = x3*((z1*y2)-(y1*z2))+
-             y3*((x1*z2)-(z1*x2))+
-             z3*((y1*x2)-(x1*y2));
+              y3*((x1*z2)-(z1*x2))+
+              z3*((y1*x2)-(x1*y2));
    return c > 0;
 }
 
@@ -415,7 +414,7 @@ bool csDIntersect3::Planes(const csDPlane& p1, const csDPlane& p2,
 }
 
 
-double csDIntersect3::Z0Plane(
+double csDIntersect3::Z0Plane (
   const csDVector3& u, const csDVector3& v, csDVector3& isect)
 {
   double r = u.z / (u.z-v.z);
@@ -425,7 +424,7 @@ double csDIntersect3::Z0Plane(
   return r;
 } 
 
-double csDIntersect3::ZPlane(
+double csDIntersect3::ZPlane (
   double zval, const csDVector3& u, const csDVector3& v, csDVector3& isect)
 {
   double r = (zval-u.z) / (v.z-u.z);
@@ -435,7 +434,7 @@ double csDIntersect3::ZPlane(
   return r;
 }
 
-double csDIntersect3::XFrustrum(
+double csDIntersect3::XFrustrum (
   double A, const csDVector3& u, const csDVector3& v, csDVector3& isect)
 {
   double r = (A*u.x+u.z) / ( A*(u.x-v.x) + u.z-v.z );
@@ -445,7 +444,7 @@ double csDIntersect3::XFrustrum(
   return r;
 }
 
-double csDIntersect3::YFrustrum(
+double csDIntersect3::YFrustrum (
   double B, const csDVector3& u, const csDVector3& v, csDVector3& isect)
 {
   double r = (B*u.y+u.z) / ( B*(u.y-v.y) + u.z-v.z );

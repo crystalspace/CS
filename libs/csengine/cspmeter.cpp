@@ -18,8 +18,8 @@
 */
 
 #include "sysdef.h"
+#include "csengine/world.h"
 #include "csengine/cspmeter.h"
-#include "csengine/sysitf.h"
 
 csProgressMeter::csProgressMeter(int n) :
   type(MSG_INITIALIZATION), total(n), current(0), anchor(0) {}

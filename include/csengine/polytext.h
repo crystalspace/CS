@@ -28,6 +28,7 @@ class Textures;
 class csPolyPlane;
 class csLightMap;
 class csLightPatch;
+class csBitSet;
 class Dumper;
 struct iTextureHandle;
 struct LightInfo;
@@ -54,13 +55,10 @@ class csPolyTexture : public iPolygonTexture
   friend class Dumper;
 
 private:
-  /// Private texture cache data.
-  void* tcache_data;
-
   /**
    * Dirty matrix used in combination with the sub-texture optimization.
    */
-  UByte* dirty_matrix;
+  csBitSet *dirty_matrix;
 
   /// Width of dirty matrix.
   UShort dirty_w;
@@ -139,6 +137,9 @@ private:
 
   /// If true, dynamic lighting needs to be recalculated.
   UByte dyn_dirty;
+
+  /// Internally used by (software) texture cache
+  void *cache_data;
 
 public:
   /// Option variable: do accurate lighting of things. This is much slower however.
@@ -253,11 +254,6 @@ public:
   virtual int GetSize ();
 
   ///
-  virtual void *GetTCacheData ();
-  ///
-  virtual void SetTCacheData (void *iCache);
-
-  ///
   virtual int GetNumPixels ();
   ///
   virtual int GetMipMapSize ();
@@ -282,8 +278,8 @@ public:
    */
   virtual bool RecalculateDynamicLights ();
   /**
-   * Create the dirty matrix if needed. This function will also check if the dirty
-   * matrix has the right size. If not it will recreate it.
+   * Create the dirty matrix if needed. This function will also check
+   * if the dirty matrix has the right size. If not it will recreate it.
    * The dirty matrix is used in combination with the sub-texture optimization.
    * If recreation of the dirty matrix was needed it will be made all dirty.
    */
@@ -292,8 +288,13 @@ public:
    * Make the dirty matrix completely dirty.
    */
   virtual void MakeAllDirty ();
-  ///
-  virtual bool CleanIfDirty (int lu, int lv);
+  /**
+   * Check if there are any dirty lightmap cells, and clean the dirty
+   * matrix in the corresponding places if so. Returns true if there are
+   * any coincident bits in both bit sets (and thus we need to compute
+   * any lightmap cells in texture cache).
+   */
+  virtual bool CleanIfDirty (csBitSet *bs);
 
   /// 
   virtual iLightMap *GetLightMap ();
@@ -304,6 +305,10 @@ public:
   virtual int GetSubtexSize ();
   ///
   virtual bool GetDynlightOpt ();
+  /// Get data used internally by texture cache
+  virtual void *GetCacheData ();
+  /// Set data used internally by texture cache
+  virtual void SetCacheData (void *d);
 };
 
 #endif /*POLYTEXT_H*/

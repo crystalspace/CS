@@ -382,14 +382,16 @@ void SysMouseDriver::Close()
 
 // The System driver ////////////////
 
-IMPLEMENT_IBASE(SysSystemDriver)
-    IMPLEMENTS_INTERFACE(iSystem)
-    IMPLEMENTS_INTERFACE(iWin32SystemDriver)
+IMPLEMENT_IBASE (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iSystem)
+  IMPLEMENTS_INTERFACE (iWin32SystemDriver)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
 IMPLEMENT_IBASE_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   CONSTRUCT_IBASE(NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
 
   WNDCLASS wc;
 

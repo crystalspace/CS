@@ -195,7 +195,9 @@ void csPortal::CalculateLighting (csLightView& lview)
       float fr, fg, fb;
       if (filter_texture)
       {
-        filter_texture->GetMeanColor (fr, fg, fb);
+        UByte mr, mg, mb;
+        filter_texture->GetMeanColor (mr, mg, mb);
+        fr = mr / 255.; fg = mg / 255.; fb = mb / 255.;
       }
       else
       {

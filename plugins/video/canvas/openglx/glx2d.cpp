@@ -16,7 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdarg.h>
 #include "sysdef.h"
 #include "cs2d/openglx/glx2d.h"
 #include "csutil/scf.h"
@@ -39,14 +38,13 @@ EXPORT_CLASS_TABLE_END
 
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
-  csGraphics2DGLCommon (iParent), xim (NULL), cmap (0)
+  csGraphics2DGLCommon (iParent), cmap (0)
 {
 
 }
 
 bool csGraphics2DGLX::Initialize (iSystem *pSystem)
 {
-
   if (!csGraphics2DGLCommon::Initialize (pSystem))
     return false;
 
@@ -62,22 +60,26 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   
   dispdriver = NULL;
   const char *strDriver;
-  if ( config ){  
-  if ( (strDriver = config->GetStr( "Display", "Driver", DEF_OGLDISP )) ){
-      dispdriver = LOAD_PLUGIN( pSystem, strDriver, iOpenGLDisp );
-      if ( !dispdriver ){
-          printf( "Could not create an instance of %s ! Using NULL instead. \n", strDriver );
-      }else{
-          if ( !dispdriver->open() ){
-	      printf( "open of displaydriver %s failed !\n", strDriver );
-	      return false;
-	  }
+  if (config)
+  {
+    if ((strDriver = config->GetStr ("Display", "Driver", DEF_OGLDISP)))
+    {
+      dispdriver = LOAD_PLUGIN (pSystem, strDriver, iOpenGLDisp);
+      if (!dispdriver)
+        CsPrintf (MSG_FATAL_ERROR, "Could not create an instance of %s ! Using NULL instead.\n", strDriver);
+      else
+      {
+        if (!dispdriver->open ())
+        {
+          printf ("open of displaydriver %s failed!\n", strDriver);
+          return false;
+        }
       }
+    }
+    CHK (delete config);
   }
-  CHK( delete config );
-  }else{
-   printf( "could not opengl.cfg, will use NULL as displaydriver\n" );
-  }
+  else
+    CsPrintf (MSG_FATAL_ERROR, "could not opengl.cfg, will use NULL as displaydriver\n");
   
   Screen* screen_ptr;
 
@@ -101,17 +103,19 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   // Determine visual information.
   Visual* visual = DefaultVisual (dpy, screen_num);
 
-  int desired_attributes[] = { 
-  	GLX_RGBA, 
-  	GLX_DOUBLEBUFFER, 
-	GLX_DEPTH_SIZE, 1, 
-	GLX_RED_SIZE, 4,
-	GLX_BLUE_SIZE, 4,
-	GLX_GREEN_SIZE, 4,
-	None };
+  int desired_attributes[] =
+  {
+    GLX_RGBA, 
+    GLX_DOUBLEBUFFER, 
+    GLX_DEPTH_SIZE, 1, 
+    GLX_RED_SIZE, 4,
+    GLX_BLUE_SIZE, 4,
+    GLX_GREEN_SIZE, 4,
+    None
+  };
  
   // find a visual that supports all the features we need
-  active_GLVisual = glXChooseVisual(dpy, screen_num, desired_attributes);
+  active_GLVisual = glXChooseVisual (dpy, screen_num, desired_attributes);
 
   // if a visual was found that we can use, make a graphics context which
   // will be bound to the application window.  If a visual was not
@@ -132,38 +136,34 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
     // trying each of the pieces and seeing if any single piece is not provided 
  
     // try to get a visual with 12 bit color
-    int color_attributes[] = { GLX_RGBA,GLX_RED_SIZE,4,GLX_BLUE_SIZE,4,GLX_GREEN_SIZE,4,None};
+    int color_attributes[] = { GLX_RGBA,GLX_RED_SIZE,4,GLX_BLUE_SIZE,4,GLX_GREEN_SIZE,4,None };
     if (!glXChooseVisual(dpy, screen_num, color_attributes) )
     {
       CsPrintf(MSG_FATAL_ERROR, "Graphics display does not support at least 12 bit color\n");
     }
 
     // try to get visual with a depth buffer
-    int depthbuffer_attributes[] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None};
+    int depthbuffer_attributes[] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None };
     if (!glXChooseVisual(dpy,screen_num,depthbuffer_attributes) )
     {
       CsPrintf(MSG_FATAL_ERROR,"Graphics display does not support a depth buffer\n");
     }
 
     // try to get a visual with double buffering
-    int doublebuffer_attributes[] = {GLX_RGBA, GLX_DOUBLEBUFFER, None};
+    int doublebuffer_attributes[] = {GLX_RGBA, GLX_DOUBLEBUFFER, None };
     if (!glXChooseVisual(dpy,screen_num,doublebuffer_attributes) )
-    {
       CsPrintf(MSG_FATAL_ERROR,"Graphics display does not provide double buffering\n");
-    }
+    return false;
   }
 
-  pfmt.RedMask = 0xf00;//visual->red_mask;
-  pfmt.GreenMask = 0xf0;//visual->green_mask;
-  pfmt.BlueMask = 0xf;//visual->blue_mask;
-  complete_pixel_format ();
-  pfmt.PalEntries = visual->map_entries;
   if (visual->c_class == TrueColor)
     pfmt.PalEntries = 0;
-  if (pfmt.PalEntries)
-    pfmt.PixelBytes = 1;		// Palette mode
   else
-    pfmt.PixelBytes = 2;		// Truecolor mode
+  {
+    // Palette mode
+    pfmt.PalEntries = visual->map_entries;
+    pfmt.PixelBytes = 1;
+  }
 
   return true;
 }
@@ -172,13 +172,10 @@ csGraphics2DGLX::~csGraphics2DGLX ()
 {
   // Destroy your graphic interface
   Close ();
-  if (UnixSystem){
+  if (UnixSystem)
     UnixSystem->DecRef ();
-  }
-  CHKB (delete [] Memory);
-  if ( dispdriver ){
-      dispdriver->DecRef();
-  }
+  if (dispdriver)
+    dispdriver->DecRef();
 }
 
 bool csGraphics2DGLX::Open(const char *Title)
@@ -186,10 +183,6 @@ bool csGraphics2DGLX::Open(const char *Title)
   CsPrintf (MSG_INITIALIZATION, "Video driver GL/X version ");
   if (glXIsDirect(dpy,active_GLContext))
     CsPrintf (MSG_INITIALIZATION, "(direct renderer) ");
-# ifdef DO_SHM
-  if (do_shm)
-    CsPrintf (MSG_INITIALIZATION, "(XSHM) ");
-# endif
 
   // Set loop callback
   UnixSystem->SetLoopCallback (ProcessEvents, this);
@@ -245,48 +238,12 @@ bool csGraphics2DGLX::Open(const char *Title)
       break;
   }
 
-  // Create backing store
-  if (!xim)
-  {
-    xim = XGetImage (dpy, window, 0, 0, Width, Height, AllPlanes, ZPixmap);
-#   ifdef DO_SHM
-    if (do_shm && !XShmQueryExtension (dpy))
-    {
-      do_shm = false;
-      //CsPrintf (MSG_INITIALIZATION, "Shm extension not available on display!\n");
-      printf ("Shm extension not available on display!\n");
-    }
-    if (do_shm)
-    {
-      shm_image = *xim;
-      shmi.shmid = shmget (IPC_PRIVATE, xim->bytes_per_line*xim->height,
-                               IPC_CREAT|0777);
-      shmi.shmaddr = (char*)shmat (shmi.shmid, 0, 0);
-      shmi.readOnly = FALSE;
-      XShmAttach (dpy, &shmi);
-
-      // Delete memory segment. The memory stays available until the last client
-      // detaches from it.
-      XSync (dpy, False);
-      shmctl (shmi.shmid, IPC_RMID, 0);
-
-      shm_image.data = shmi.shmaddr;
-      Memory = (unsigned char*)shmi.shmaddr;
-      shm_image.obdata = (char*)&shmi;
-    }
-    else
-#   endif /* DO_SHM */
-    {
-      CHK (Memory = new unsigned char[Width*Height*pfmt.PixelBytes]);
-    }
-  }
-
   // this makes the context we created in Initialize() the current
   // context, so that all subsequent OpenGL calls will set state and
   // draw stuff on this context.  You could of couse make
   // some more contexts and switch around between several of them...
   // but we use only one here.
-  glXMakeCurrent(dpy, window, active_GLContext);
+  glXMakeCurrent (dpy, window, active_GLContext);
 
   // Open your graphic interface
   if (!csGraphics2DGLCommon::Open (Title))
@@ -500,8 +457,5 @@ void csGraphics2DGLX::ProcessEvents (void *Param)
 	Self->Print (&rect);
         break;
       }
-      default:
-        //if (event.type == CompletionType) shm_busy = 0;
-        break;
     }
 }

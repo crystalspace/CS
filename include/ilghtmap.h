@@ -21,8 +21,6 @@
 
 #include "csutil/scf.h"
 
-struct csHighColorCacheData;
-
 SCF_VERSION (iLightMap, 0, 0, 1);
 
 /**
@@ -33,25 +31,21 @@ SCF_VERSION (iLightMap, 0, 0, 1);
  */
 struct iLightMap : public iBase
 {
-  ///
+  /// Get light map by index; 0 - red, 1 - green, 2 - blue
   virtual unsigned char *GetMap (int nMap) = 0;
-  ///
+  /// Get lightmap width (could be adjusted to power of two)
   virtual int GetWidth () = 0;
-  ///
+  /// Get lightmap height (could be adjusted to power of two)
   virtual int GetHeight () = 0;
-  ///
+  /// Get real lightmap width (could be less than returned by GetWidth())
   virtual int GetRealWidth () = 0;
-  ///
+  /// Get real lightmap height (could be less than returned by GetHeight())
   virtual int GetRealHeight () = 0;
-  ///
-  virtual bool IsCached () = 0;
-  ///
-  virtual csHighColorCacheData *GetHighColorCache () = 0;
-  ///
-  virtual void SetInCache (bool bVal) = 0;
-  ///
-  virtual void SetHighColorCache (csHighColorCacheData* pVal) = 0;
-  ///
+  /// Get data used internally by texture cache
+  virtual void *GetCacheData () = 0;
+  /// Set data used internally by texture cache
+  virtual void SetCacheData (void *d) = 0;
+  /// Get mean color for the lightmaps
   virtual void GetMeanLighting (int& r, int& g, int& b) = 0;
 };
 

@@ -149,7 +149,7 @@ bool csGraphics2DGlide2x::Initialize (iSystem *pSystem)
   pfmt.GreenMask = (1+2+4+8+16+32)<<5;
   pfmt.BlueMask = (1+2+4+8+16);
     
-  complete_pixel_format();
+  pfmt.complete ();
   GraphicsReady = 1;
   return true;
 }

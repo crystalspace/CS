@@ -20,245 +20,199 @@
 #include <math.h>
 
 #include "sysdef.h"
-#include "cs3d/direct3d61/d3d_txtmgr.h"
+#include "d3d_txtmgr.h"
+#include "d3d_g3d.h"
 #include "csutil/scanstr.h"
+#include "itexture.h"
+#include "ipolygon.h"
+#include "ilghtmap.h"
 #include "iimage.h"
 #include "isystem.h"
-#include "lightdef.h"
 
-#define RESERVED_COLOR(c) ((c == 0) || (c == 255))
+#define SysPrintf System->Printf
 
 //---------------------------------------------------------------------------
 
-csTextureManagerDirect3D::csTextureManagerDirect3D (iSystem* iSys, iGraphics2D* iG2D) :
-	csTextureManager (iSys, iG2D)
+csTextureMMDirect3D::csTextureMMDirect3D (iImage* image, int flags,
+  csGraphics3DDirect3DDx6 *iG3D) : csTextureMM (image, flags)
 {
+  G3D = iG3D;
+
+  // Resize the image to fullfill device requirements
+  int w = image->GetWidth ();
+  int h = image->GetHeight ();
+
+  if (w / h > G3D->m_MaxAspectRatio)
+    h = w / G3D->m_MaxAspectRatio;
+  if (h / w > G3D->m_MaxAspectRatio)
+    w = h / G3D->m_MaxAspectRatio;
+  if (w < G3D->m_Caps.minTexWidth)
+    w  = G3D->m_Caps.minTexWidth;
+  if (h < G3D->m_Caps.minTexHeight)
+    h = G3D->m_Caps.minTexHeight;
+  if (w > G3D->m_Caps.maxTexWidth)
+    w  = G3D->m_Caps.maxTexWidth;
+  if (h > G3D->m_Caps.maxTexHeight)
+    h = G3D->m_Caps.maxTexHeight;
+
+  // this is a NOP if size do not change
+  image->Rescale (w, h);
 }
 
-void csTextureManagerDirect3D::Initialize ()
+csTexture *csTextureMMDirect3D::new_texture (iImage *Image)
 {
-  csTextureManager::Initialize ();
-
-  num_red = (pfmt.RedMask >> pfmt.RedShift) + 1;
-  num_green = (pfmt.GreenMask >> pfmt.GreenShift) + 1;
-  num_blue = (pfmt.BlueMask >> pfmt.BlueShift) + 1;
-
-  clear ();
-  read_config ();
+  return new csTextureDirect3D (this, Image, G3D);
 }
 
-void csTextureManagerDirect3D::read_config ()
+void csTextureMMDirect3D::compute_mean_color ()
 {
-  const char* p;
-  iSystem* sys = System;
-  // @@@ WARNING! The following code only examines the
-  // main cryst.cfg file and not the one which overrides values
-  // in the world file. We need to support this someway in the iSystem
-  // interface as well.
-
-  do_blend_mipmap0 = sys->ConfigGetYesNo ("TextureMapper", "BLEND_MIPMAP", false);
-  prefered_dist     = sys->ConfigGetInt ("World", "RGB_DIST",     PREFERED_DIST);
-  prefered_col_dist = sys->ConfigGetInt ("World", "RGB_COL_DIST", PREFERED_COL_DIST);
-  p = sys->ConfigGetStr ("TextureMapper", "MIPMAP_MODE", "nice");
-  if (!strcmp (p, "nice"))
+  int pixels = image->GetWidth () * image->GetHeight ();
+  RGBPixel *src = (RGBPixel *)image->GetImageData ();
+  unsigned r = 0, g = 0, b = 0;
+  for (int count = pixels; count; count--)
   {
-    mipmap_mode = MIPMAP_NICE;
-    if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'nice'.\n");
+    RGBPixel pix = *src++;
+    r += pix.red;
+    g += pix.green;
+    b += pix.blue;
   }
-  else if (!strcmp (p, "verynice"))
+  mean_color.red   = r / pixels;
+  mean_color.green = g / pixels;
+  mean_color.blue  = b / pixels;
+}
+
+//---------------------------------------------------------------------------
+
+csTextureDirect3D::csTextureDirect3D (csTextureMM *Parent, iImage *Image,
+  csGraphics3DDirect3DDx6 *iG3D) : csTexture (Parent)
+{
+  w = Image->GetWidth ();
+  h = Image->GetHeight ();
+  compute_masks ();
+
+  // Convert the texture to the screen-dependent format
+  int rsl = G3D->txtmgr->rsl;
+  int rsr = G3D->txtmgr->rsr;
+  int gsl = G3D->txtmgr->gsl;
+  int gsr = G3D->txtmgr->gsr;
+  int bsl = G3D->txtmgr->bsl;
+  int bsr = G3D->txtmgr->bsr;
+
+  RGBPixel *src = (RGBPixel *)Image->GetData ();
+  int pixels = get_size ();
+  switch (G3D->m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount)
   {
-    if (false/*caps.SupportsArbitraryMipMapping*/)
+    case 16:
     {
-      mipmap_mode = MIPMAP_VERYNICE;
-      if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'verynice'\n  (Note: this is expensive for the texture cache)\n");
+      image = new UByte [pixels * sizeof (UShort)];
+      UShort *dst = (UShort *)image;
+      while (pixels--)
+      {
+        *dst = ((unsigned (src->red  ) >> rsr) << rsl) |
+               ((unsigned (src->green) >> gsr) << gsl) |
+               ((unsigned (src->blue ) >> bsr) << bsl);
+        src++;
+      }
+      break;
     }
-    else
+    case 32:
     {
-      mipmap_mode = MIPMAP_NICE;
-      if (verbose) SysPrintf (MSG_INITIALIZATION, "Mipmap calculation 'nice' ('verynice' not available for hardware accelerators).\n");
+      image = new UByte [pixels * sizeof (ULong)];
+      ULong *dst = (ULong *)image;
+      while (pixels--)
+      {
+        *dst = ((unsigned (src->red  ) >> rsr) << rsl) |
+               ((unsigned (src->green) >> gsr) << gsl) |
+               ((unsigned (src->blue ) >> bsr) << bsl);
+        src++;
+      }
+      break;
     }
   }
-  else
-  {
-    SysPrintf (MSG_FATAL_ERROR, "Bad value '%s' for MIPMAP_MODE!\n(Use 'verynice', 'nice', 'ugly', or 'default')\n", p);
-    exit (0);	//@@@
+
+  Image->DecRef ();
+}
+
+csTextureDirect3D::~csTextureDirect3D ()
+{
+  delete [] image;
+}
+
+void *csTextureDirect3D::get_bitmap ()
+{
+  csGraphics3DDirect3DDx6 *G3D = ((csTextureMMDirect3D *)parent)->G3D;
+  G3D->texture_cache->cache_texture (parent);
+  csD3DCacheData *cd = (csD3DCacheData *)parent->GetCacheData ();
+  return (void *)cd;
+}
+
+//---------------------------------------------------------------------------
+
+csTextureManagerDirect3D::csTextureManagerDirect3D (iSystem* iSys,
+  iGraphics2D* iG2D, csIniFile *config) : csTextureManager (iSys, iG2D)
+{
+  read_config (config);
+  Clear ();
+
+  // Compute the shift masks for converting R8G8B8 into texture format
+#define COMPUTE(sr, sl, mask)               \
+  sr = 8; sl = 0;                           \
+  {                                         \
+    unsigned m = mask;                      \
+    while ((m & 1) == 0) { sl++; m >>= 1; } \
+    while ((m & 1) == 1) { sr--; m >>= 1; } \
+    if (sr < 0) { sl -= sr; sr = 0; }       \
   }
 
-  if (pfmt.PixelBytes == 4)
-    { if (verbose) SysPrintf (MSG_INITIALIZATION, "Truecolor mode (32 bit).\n"); }
-  else
-    { if (verbose) SysPrintf (MSG_INITIALIZATION, "Truecolor mode (15/16 bit).\n"); }
-
-  if (verbose)
-    SysPrintf (MSG_INITIALIZATION, "Code all textures in 24-bit.\n");
+  COMPUTE (rsr, rsl, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRBitMask);
+  COMPUTE (gsr, gsl, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwGBitMask);
+  COMPUTE (bsr, bsl, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwBBitMask);
+#undef COMPUTE
 }
 
 csTextureManagerDirect3D::~csTextureManagerDirect3D ()
 {
-  clear ();
+  Clear ();
 }
 
-void csTextureManagerDirect3D::clear ()
+void csTextureManagerDirect3D::PrepareTextures ()
 {
-  csTextureManager::clear ();
-}
+  if (verbose) SysPrintf (MSG_INITIALIZATION, "Preparing textures...\n");
 
-csTextureMMDirect3D* csTextureManagerDirect3D::new_texture (iImage* image)
-{
-  CHK (csTextureMMDirect3D* tm = new csTextureMMDirect3D (image));
-  if (tm->loaded_correctly ())
-    textures.Push (tm);
-  else
+  if (verbose) SysPrintf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
+
+  // Create mipmaps for all textures
+  for (int i = 0; i < textures.Length (); i++)
   {
-    delete tm;
-    tm = NULL;
+    csTextureMM *txt = textures.Get (i);
+    txt->apply_gamma ();
+    txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
   }
-  return tm;
-}
-
-csTexture* csTextureManagerDirect3D::get_texture (int idx, int lev)
-{
-  return ((csTextureMMDirect3D*)textures[idx])->get_texture (lev);
-}
-
-ULong csTextureManagerDirect3D::encode_rgb (int r, int g, int b)
-{
-  return
-    ((r >> (8-pfmt.RedBits))   << pfmt.RedShift) |
-    ((g >> (8-pfmt.GreenBits)) << pfmt.GreenShift) |
-    ((b >> (8-pfmt.BlueBits))  << pfmt.BlueShift);
-}
-
-int csTextureManagerDirect3D::find_color (int r, int g, int b)
-{
-  if (r>255) r=255; else if (r<0) r=0;
-  if (g>255) g=255; else if (g<0) g=0;
-  if (b>255) b=255; else if (b<0) b=0;
-  return encode_rgb (r, g, b);
-}
-
-void csTextureManagerDirect3D::remap_textures ()
-{
-  int i;
-
-  // Remap all textures according to the new colormap.
-  
-  for (i = 0 ; i < textures.Length () ; i++)
-    ((csTextureMMDirect3D*)textures[i])->remap_texture (this);
-
-  black_color = 0;
-  white_color = encode_rgb (255, 255, 255);
-  red_color = encode_rgb (255, 0, 0);
-  blue_color = encode_rgb (0, 0, 255);
-  yellow_color = encode_rgb (255, 255, 0);
-  green_color = encode_rgb (0, 255, 0);
-}
-
-int csTextureManagerDirect3D::find_rgb_map (int r, int g, int b, int map_type, int l)
-{
-  int nr = r, ng = g, nb = b;
-
-  switch (map_type)
-  {
-    case TABLE_RED_HI:
-      nr = (NORMAL_LIGHT_LEVEL+l)*r / NORMAL_LIGHT_LEVEL;
-      break;
-    case TABLE_GREEN_HI:
-      ng = (NORMAL_LIGHT_LEVEL+l)*g / NORMAL_LIGHT_LEVEL;
-      break;
-    case TABLE_BLUE_HI:
-      nb = (NORMAL_LIGHT_LEVEL+l)*b / NORMAL_LIGHT_LEVEL;
-      break;
-    case TABLE_RED:
-      nr = l*r / NORMAL_LIGHT_LEVEL;
-      break;
-    case TABLE_GREEN:
-      ng = l*g / NORMAL_LIGHT_LEVEL;
-      break;
-    case TABLE_BLUE:
-      nb = l*b / NORMAL_LIGHT_LEVEL;
-      break;
-  }
-  return find_color (nr, ng, nb);
-}
-
-void csTextureManagerDirect3D::Prepare ()
-{
-  int i;
-
-  CHK (delete factory_3d); factory_3d = NULL;
-  CHK (delete factory_2d); factory_2d = NULL;
-  CHK (factory_3d = new csTextureFactory32 ());
-  if (pfmt.PixelBytes == 1)
-    { CHK (factory_2d = new csTextureFactory8 ()); }
-  else if (pfmt.PixelBytes == 2)
-    { CHK (factory_2d = new csTextureFactory16 ()); }
-  else
-    { CHK (factory_2d = new csTextureFactory32 ()); }
-
-  for (i = 0 ; i < textures.Length () ; i++)
-  {
-    csTextureMMDirect3D* txt = (csTextureMMDirect3D*)textures[i];
-    if (txt->for_3d ()) txt->alloc_mipmaps (this);
-    if (txt->for_2d ()) txt->alloc_2dtexture (this);
-  }
-
-  remap_textures ();
-
-  if (do_blend_mipmap0)
-  {
-    if (verbose) SysPrintf (MSG_INITIALIZATION, "Blend textures...\n");
-    for (i = 0 ; i < textures.Length () ; i++)
-    {
-      csTextureMMDirect3D* txt = (csTextureMMDirect3D*)textures[i];
-      if (txt->for_3d ()) txt->blend_mipmap0 (this);
-    }
-  }
-
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "Computing mipmapped textures...\n");
-  for (i = 0 ; i < textures.Length () ; i++)
-  {
-    csTextureMMDirect3D* txt = (csTextureMMDirect3D*)textures[i];
-    if (txt->for_3d ()) txt->create_mipmaps (this);
-    txt->free_usage_table ();
-  }
-  if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE!\n");
 }
 
 iTextureHandle *csTextureManagerDirect3D::RegisterTexture (iImage* image,
-  bool for3d, bool for2d)
+  int flags)
 {
-  csTextureMMDirect3D* txt = new_texture (image);
-  txt->set_3d2d (for3d, for2d);
+  if (!image) return NULL;
+
+  csTextureMMDirect3D* txt = new csTextureMMDirect3D (image, flags, G3D);
+  textures.Push (txt);
   return txt;
+}
+
+void csTextureManagerDirect3D::PrepareTexture (iTextureHandle *handle)
+{
+  if (!handle) return;
+
+  csTextureMMDirect3D *txt = (csTextureMMDirect3D *)handle->GetPrivateObject ();
+  txt->apply_gamma ();
+  txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
 }
 
 void csTextureManagerDirect3D::UnregisterTexture (iTextureHandle* handle)
 {
-  (void)handle;
-  //@@@ Not implemented yet.
-}
-
-void csTextureManagerDirect3D::MergeTexture (iTextureHandle* handle)
-{
-  (void)handle;
-  //@@@ Not implemented yet.
-}
-
-void csTextureManagerDirect3D::FreeImages ()
-{
-  int i;
-  for (i = 0 ; i < textures.Length () ; i++)
-  {
-    csTextureMMDirect3D* txt = (csTextureMMDirect3D*)textures[i];
-    txt->free_image ();
-  }
-}
-
-void csTextureManagerDirect3D::ReserveColor (int /*r*/, int /*g*/, int /*b*/)
-{
-}
-
-void csTextureManagerDirect3D::AllocPalette ()
-{
+  G3D->UncacheTexture (handle);
+  csTextureMMOpenGL *tex_mm = (csTextureMMOpenGL *)handle->GetPrivateObject ();
+  int idx = textures.Find (tex_mm);
+  if (idx >= 0) textures.Delete (idx);
 }

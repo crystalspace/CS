@@ -38,12 +38,14 @@
 #define CS_IMGFMT_TRUECOLOR	0x00000001
 /// 8-bit indexed paletted image
 #define CS_IMGFMT_PALETTED8	0x00000002
+/// Autodetect: use whatever format the file is in. Use ONLY for loading.
+#define CS_IMGFMT_ANY		CS_IMGFMT_MASK
 /// Do we need alpha channel or not
 #define CS_IMGFMT_ALPHA		0x00010000
 
 struct RGBPixel;
 
-SCF_VERSION (iImage, 1, 0, 0);
+SCF_VERSION (iImage, 1, 0, 1);
 
 /**
  * The iImage interface is used to work with image files
@@ -68,8 +70,8 @@ struct iImage : public iBase
   /// Query image size in bytes
   virtual int GetSize () = 0;
 
-  /// Resize the image to the given size
-  virtual void Resize (int NewWidth, int NewHeight) = 0;
+  /// Rescale the image to the given size
+  virtual void Rescale (int NewWidth, int NewHeight) = 0;
 
   /**
    * Create a new iImage which is a mipmapped version of this one.
@@ -98,6 +100,18 @@ struct iImage : public iBase
    * this function will return NULL.
    */
   virtual UByte *GetAlpha () = 0;
+  /**
+   * Convert the image to another format.
+   * This method will allocate a respective color component if
+   * it was not allocated before. For example, you can use this
+   * method to add alpha channel to paletted images, to allocate
+   * a image for CS_IMGFMT_NONE alphamaps or vice versa, to remove
+   * the image and leave alphamap alone.
+   */
+  virtual void SetFormat (int iFormat) = 0;
+
+  /// Create yet another image and copy this one into the new image.
+  virtual iImage *Clone () = 0;
 };
 
 #endif // __IIMAGE_H__

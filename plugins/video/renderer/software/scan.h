@@ -22,6 +22,7 @@
 
 #include "sysdef.h"
 #include "csutil/scf.h"
+#include "csgfxldr/rgbpixel.h"
 
 //---//---//---//---//---//---//---//---//---//---/ Forward declarations //---//
 
@@ -29,7 +30,6 @@ class csTexture;
 class csTextureMMSoftware;
 class csGraphics3DSoftware;
 struct iPolygonTexture;
-typedef unsigned char RGB8map[256];	// do we need entire soft_txt.h?
 
 //---//---//---//---//---//---//---//---//---//---//---//---// Constants //---//
 
@@ -109,7 +109,7 @@ struct csScanSetup
   csTextureMMSoftware *Texture;
 
   /// The lighted texture bitmap from the texture cache.
-  unsigned char *tmap2;
+  unsigned char *bitmap2;
   /// Width of the texture from the texture cache.
   int tw2;
   /// Height of the texture from the texture cache.
@@ -124,7 +124,7 @@ struct csScanSetup
   int th2fp;
 
   /// The unlighted texture bitmap.
-  unsigned char *tmap;
+  unsigned char *bitmap;
   /// Width of unlighted texture.
   int tw;
   /// Height of unlighted texture.
@@ -151,6 +151,8 @@ struct csScanSetup
 
   /// Mean color value.
   int FlatColor;
+  /// R/G/B components of flatcolor
+  RGBPixel FlatRGB;
 
   /// Alpha mask for 16-bit renderer.
   unsigned int AlphaMask;
@@ -175,15 +177,18 @@ struct csScanSetup
   /// 1 << shf_h - 1
   int and_h;
 
-  /// Local texture palette -> global palette conversion table
-  unsigned char *PrivToGlobal;
-  /// 8-bit to 16-bit conversion table
-  unsigned short *PaletteTable;
+  /// Actual texture palette
+  RGBPixel *TexturePalette;
+  /// 8-bit to native pixel format conversion table
+  void *PaletteTable;
   /// Set up by poly renderer to alpha blending table
-  RGB8map *AlphaMap;
+  unsigned char *AlphaMap;
 
   /// Current blending table
   unsigned char *BlendTable;
+
+  /// The inverse colormap (extracted from texture manager)
+  UByte *inv_cmap;
 
   /**
    * These tables are used for bilinear filtering. This feature is still
@@ -277,24 +282,22 @@ csDrawScanline csScan_8_draw_scanline_flat_zfil;
 csDrawScanline csScan_8_draw_scanline_flat_zuse;
 /// Draw one horizontal scanline (no lighting).
 csDrawScanline csScan_8_draw_scanline_tex_zfil;
-/// Draw one horizontal scanline (no lighting, private mode).
-csDrawScanline csScan_8_draw_scanline_tex_priv_zfil;
 /// Draw one horizontal scanline (Z buffer and no lighting).
 csDrawScanline csScan_8_draw_scanline_tex_zuse;
-/// Draw one horizontal scanline (Z buffer and no lighting, private mode).
-csDrawScanline csScan_8_draw_scanline_tex_priv_zuse;
 /// Draw one horizontal scanline (lighting).
 csDrawScanline csScan_8_draw_scanline_map_zfil;
 /// Draw one horizontal scanline (Z buffer and lighting).
 csDrawScanline csScan_8_draw_scanline_map_zuse;
 /// Draw one horizontal scanline (lighting and filtering).
 csDrawScanline csScan_8_draw_scanline_map_filt_zfil;
-/// Draw one horizontal scanline (transparent and no lighting).
+/// Draw one horizontal scanline (transparent and no lighting, with Z-fill).
 csDrawScanline csScan_8_draw_scanline_tex_key_zfil;
-/// Draw one horizontal scanline (transparent and no lighting, private mode).
-csDrawScanline csScan_8_draw_scanline_tex_priv_key_zfil;
-/// Draw one horizontal scanline (transparent with lighting).
+/// Draw one horizontal scanline (transparent and no lighting, with Z-check).
+csDrawScanline csScan_8_draw_scanline_tex_key_zuse;
+/// Draw one horizontal scanline (transparent with lighting, with Z-fill).
 csDrawScanline csScan_8_draw_scanline_map_key_zfil;
+/// Draw one horizontal scanline (transparent with lighting, with Z-check).
+csDrawScanline csScan_8_draw_scanline_map_key_zuse;
 
 /// Draw one horizontal scanline for fog.
 csDrawScanline csScan_8_draw_scanline_fog;
@@ -306,13 +309,6 @@ csDrawScanline csScan_8_draw_scanline_map_alpha1;
 /// Draw one horizontal scanline (lighting and alpha transparency).
 csDrawScanline csScan_8_draw_scanline_map_alpha2;
 
-#ifdef DO_MMX
-/// Draw one horizontal scanline (lighting) using MMX
-csDrawScanline csScan_8_mmx_draw_scanline_map_zfil;
-/// Draw one horizontal scanline (no lighting) using MMX
-csDrawScanline csScan_8_mmx_draw_scanline_tex_zfil;
-#endif
-
 /*
  * The following methods are used by DrawPolygonFX() and do not require
  * perspective-correct texture mapping. They do not require InitDraw ()
@@ -322,9 +318,34 @@ csDrawScanline csScan_8_mmx_draw_scanline_tex_zfil;
 csDrawPIScanline csScan_8_draw_pi_scanline_tex_zfil;
 /// Draw a perspective-incorrect texture mapped polygon scanline
 csDrawPIScanline csScan_8_draw_pi_scanline_tex_zuse;
+/// Draw a flat-lighted perspective-incorrect texture mapped polygon scanline
+csDrawPIScanline csScan_8_draw_pi_scanline_flat_zuse;
+/// Draw a flat-lighted perspective-incorrect textured scanline with Z-fill
+csDrawPIScanline csScan_8_draw_pi_scanline_flat_zfil;
+
+/// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading. Z fill only
+csDrawPIScanlineGouraud csScan_8_draw_pi_scanline_tex_gouraud_zfil;
+/// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading.
+csDrawPIScanlineGouraud csScan_8_draw_pi_scanline_tex_gouraud_zuse;
+/// Draw a single-color Gouraud-shaded polygon with Z-fill
+csDrawPIScanlineGouraud csScan_8_draw_pi_scanline_flat_gouraud_zfil;
+/// Draw a single-color Gouraud-shaded polygon
+csDrawPIScanlineGouraud csScan_8_draw_pi_scanline_flat_gouraud_zuse;
+
+/// Draw a perspective-incorrect polygon scanline with various effects Z fill only
+csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_zfil;
+/// Draw a perspective-incorrect polygon scanline with various effects
+csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_zuse;
+/// Draw a perspective-incorrect polygon scanline with various effects Z fill only (colorkeying)
+csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_transp_zfil;
+/// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
+csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_transp_zuse;
+
 #ifdef DO_MMX
-/// Draw a perspective-incorrect texture mapped polygon scanline using MMX
-csDrawPIScanline csScan_8_mmx_draw_pi_scanline_tex_zuse;
+/// Draw one horizontal scanline (lighting) using MMX
+csDrawScanline csScan_8_mmx_draw_scanline_map_zfil;
+/// Draw one horizontal scanline (no lighting) using MMX
+csDrawScanline csScan_8_mmx_draw_scanline_tex_zfil;
 #endif
 
 //---//---//---//---//---//---//---//---//---//- 16-bit drawing routines //---//
@@ -335,12 +356,8 @@ csDrawScanline csScan_16_draw_scanline_flat_zfil;
 csDrawScanline csScan_16_draw_scanline_flat_zuse;
 /// Draw one horizontal scanline (no lighting).
 csDrawScanline csScan_16_draw_scanline_tex_zfil;
-/// Draw one horizontal scanline (no lighting, private mode).
-csDrawScanline csScan_16_draw_scanline_tex_priv_zfil;
 /// Draw one horizontal scanline (Z buffer and no lighting).
 csDrawScanline csScan_16_draw_scanline_tex_zuse;
-/// Draw one horizontal scanline (no lighting, private mode).
-csDrawScanline csScan_16_draw_scanline_tex_priv_zuse;
 /// Draw one horizontal scanline (lighting).
 csDrawScanline csScan_16_draw_scanline_map_zfil;
 /// Draw one horizontal scanline (Z buffer and lighting).
@@ -349,8 +366,14 @@ csDrawScanline csScan_16_draw_scanline_map_zuse;
 csDrawScanline csScan_16_draw_scanline_map_filt_zfil;
 /// Draw one horizontal scanline (lighting and more filtering).
 csDrawScanline csScan_16_draw_scanline_map_filt2_zfil;
+/// Draw one horizontal scanline (transparent and no lighting, Z-fill).
+csDrawScanline csScan_16_draw_scanline_tex_key_zfil;
+/// Draw one horizontal scanline (transparent and no lighting, Z-check).
+csDrawScanline csScan_16_draw_scanline_tex_key_zuse;
 /// Draw one horizontal scanline (transparent with lighting).
 csDrawScanline csScan_16_draw_scanline_map_key_zfil;
+/// Draw one horizontal scanline (transparent with lighting, with Z-check).
+csDrawScanline csScan_16_draw_scanline_map_key_zuse;
 
 /// Draw one horizontal scanline for fog.
 csDrawScanline csScan_16_draw_scanline_fog_555;
@@ -368,30 +391,14 @@ csDrawScanline csScan_16_draw_scanline_map_alpha_555;
 /// Draw one horizontal scanline (lighting and alpha transparency). General case.
 csDrawScanline csScan_16_draw_scanline_map_alpha_565;
 
-#ifdef DO_MMX
-/// Draw one horizontal scanline (lighting) using MMX
-csDrawScanline csScan_16_mmx_draw_scanline_map_zfil;
-/// Draw one horizontal scanline (no lighting).
-csDrawScanline csScan_16_mmx_draw_scanline_tex_zfil;
-#endif
-
-
 /// Draw a perspective-incorrect texture mapped polygon scanline. Z fill only
 csDrawPIScanline csScan_16_draw_pi_scanline_tex_zfil;
-
 /// Draw a perspective-incorrect texture mapped polygon scanline
 csDrawPIScanline csScan_16_draw_pi_scanline_tex_zuse;
-
 /// Draw a flat-lighted perspective-incorrect texture mapped polygon scanline
 csDrawPIScanline csScan_16_draw_pi_scanline_flat_zuse;
-
 /// Draw a flat-lighted perspective-incorrect textured scanline with Z-fill
 csDrawPIScanline csScan_16_draw_pi_scanline_flat_zfil;
-
-#ifdef DO_MMX
-/// Draw a perspective-incorrect texture mapped polygon scanline
-csDrawPIScanline csScan_16_mmx_draw_pi_scanline_tex_zuse;
-#endif
 
 /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading. Z fill only
 csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_tex_gouraud_zfil_555;
@@ -428,6 +435,20 @@ csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_transp_zuse_555;
 /// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
 csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_transp_zuse_565;
 
+#if defined (DO_MMX) && !defined (DO_NASM)
+// There are no MMX perspective-incorrect routines for GAS and VC assembler
+#  define csScan_16_mmx_draw_pi_scanline_tex_zuse csScan_16_draw_pi_scanline_tex_zuse
+#endif
+
+#ifdef DO_MMX
+/// Draw one horizontal scanline (lighting) using MMX
+csDrawScanline csScan_16_mmx_draw_scanline_map_zfil;
+/// Draw one horizontal scanline (no lighting).
+csDrawScanline csScan_16_mmx_draw_scanline_tex_zfil;
+/// Draw a perspective-incorrect texture mapped polygon scanline
+csDrawPIScanline csScan_16_mmx_draw_pi_scanline_tex_zuse;
+#endif
+
 //---//---//---//---//---//---//---//---//---//- 32-bit scanline drawers //---//
 
 /// Draw one horizontal scanline (no texture mapping).
@@ -442,13 +463,14 @@ csDrawScanline csScan_32_draw_scanline_tex_zuse;
 csDrawScanline csScan_32_draw_scanline_map_zfil;
 /// Draw one horizontal scanline (Z buffer and lighting).
 csDrawScanline csScan_32_draw_scanline_map_zuse;
-
-#if defined (DO_MMX) && defined (DO_NASM)
-/// Draw a perspective-incorrect texture mapped polygon scanline using MMX
-csDrawScanline csScan_32_mmx_draw_scanline_map_zfil;
-/// Draw one horizontal scanline (no lighting) using MMX
-csDrawScanline csScan_32_mmx_draw_scanline_tex_zfil;
-#endif
+/// Draw one horizontal scanline (transparent and no lighting, Z-fill).
+csDrawScanline csScan_32_draw_scanline_tex_key_zfil;
+/// Draw one horizontal scanline (transparent and no lighting, Z-check).
+csDrawScanline csScan_32_draw_scanline_tex_key_zuse;
+/// Draw one horizontal scanline (transparent with lighting).
+csDrawScanline csScan_32_draw_scanline_map_key_zfil;
+/// Draw one horizontal scanline (transparent with lighting, with Z-check).
+csDrawScanline csScan_32_draw_scanline_map_key_zuse;
 
 /// Draw one horizontal scanline for fog
 csDrawScanline csScan_32_draw_scanline_fog;
@@ -461,40 +483,38 @@ csDrawScanline csScan_32_draw_scanline_map_alpha50;
 csDrawScanline csScan_32_draw_scanline_map_alpha;
 
 /// Draw a perspective-incorrect flat shaded polygon scanline with Z-fill
-csDrawPIScanline        csScan_32_draw_pi_scanline_flat_zfil;
-
+csDrawPIScanline csScan_32_draw_pi_scanline_flat_zfil;
 /// Draw a perspective-incorrect flat shaded polygon scanline
-csDrawPIScanline        csScan_32_draw_pi_scanline_flat_zuse;
-
+csDrawPIScanline csScan_32_draw_pi_scanline_flat_zuse;
 /// Draw a perspective-incorrect texture mapped polygon scanline. Z fill only
-csDrawPIScanline        csScan_32_draw_pi_scanline_tex_zfil;
-
+csDrawPIScanline csScan_32_draw_pi_scanline_tex_zfil;
 /// Draw a perspective-incorrect texture mapped polygon scanline
-csDrawPIScanline        csScan_32_draw_pi_scanline_tex_zuse;
+csDrawPIScanline csScan_32_draw_pi_scanline_tex_zuse;
 
 /// Draw a perspective-incorrect flat shaded polygon scanline with Gouraud and Z-fill
 csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_flat_gouraud_zfil;
-
 /// Draw a perspective-incorrect flat shaded polygon scanline with Gouraud shading
 csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_flat_gouraud_zuse;
-
 /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading.
 csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_tex_gouraud_zfil;
-
 /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading. Z fill only
 csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_tex_gouraud_zuse;
 
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only
 csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_zfil;
-
 /// Draw a perspective-incorrect polygon scanline with various effects
 csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_zuse;
-
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill (colorkeying)
 csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_transp_zfil;
-
 /// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
 csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_transp_zuse;
+
+#if defined (DO_MMX) && defined (DO_NASM)
+/// Draw a perspective-incorrect texture mapped polygon scanline using MMX
+csDrawScanline csScan_32_mmx_draw_scanline_map_zfil;
+/// Draw one horizontal scanline (no lighting) using MMX
+csDrawScanline csScan_32_mmx_draw_scanline_tex_zfil;
+#endif
 
 } // extern "C"
 

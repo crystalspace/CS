@@ -81,7 +81,7 @@ SysGraphics2D::SysGraphics2D(int argc, char* argv[]) : csGraphics2D()
 		pfmt.GreenMask = 0x1f<<5;
 		pfmt.BlueMask  = 0x1f;
 
-		complete_pixel_format();
+		pfmt.complete ();
 		CsPrintf(MSG_INITIALIZATION, "Direct 15 bit rendering\n");
 		if (pfmt.PixelBytes == 2) {
 			DrawPixel = DrawPixel16;

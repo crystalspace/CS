@@ -18,7 +18,6 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "csengine/sysitf.h"
 #include "csengine/dumper.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"

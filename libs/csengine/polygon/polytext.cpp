@@ -20,7 +20,7 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "csengine/sysitf.h"
+#include "csutil/bitset.h"
 #include "csengine/polytext.h"
 #include "csengine/polyplan.h"
 #include "csengine/polytmap.h"
@@ -51,18 +51,18 @@ csPolyTexture::csPolyTexture ()
   dyn_dirty = true;
   dirty_matrix = NULL;
   lm = NULL;
-  tcache_data = NULL;
   dirty_w = dirty_h = 0;
   dirty_cnt = 0;
   mipmap_level = 0;
   mipmap_size = 0;
   mipmap_shift = 0;
+  cache_data = NULL;
 }
 
 csPolyTexture::~csPolyTexture ()
 {
   if (lm) lm->DecRef ();
-  CHK (delete [] dirty_matrix);
+  CHK (delete dirty_matrix);
 }
 
 void csPolyTexture::SetMipmapSize (int mm)
@@ -155,7 +155,8 @@ bool csPolyTexture::RecalculateDynamicLights ()
   if (!lm) return false;
 
   dyn_dirty = false;
-  bool dm = csPolyTexture::subtex_size && csPolyTexture::subtex_dynlight && dirty_matrix;
+  bool dm = csPolyTexture::subtex_size
+    && csPolyTexture::subtex_dynlight && dirty_matrix;
 
   //---
   // First copy the static lightmap to the real lightmap.
@@ -171,9 +172,9 @@ bool csPolyTexture::RecalculateDynamicLights ()
   if (dm)
   {
     if (lm_size > oldmap.GetMaxSize ()) oldmap.Alloc (lm_size);
-    memcpy (oldmap.GetMap (), remap.GetMap (), (lm_size<<1)+lm_size);
+    memcpy (oldmap.GetMap (), remap.GetMap (), 3 * lm_size);
   }
-  memcpy (remap.GetMap (), stmap.GetMap (), (lm_size<<1)+lm_size);
+  memcpy (remap.GetMap (), stmap.GetMap (), 3 * lm_size);
 
   //---
   // Then add all pseudo-dynamic lights.
@@ -208,14 +209,11 @@ bool csPolyTexture::RecalculateDynamicLights ()
   	{
     	  s = *p++;
           l = *mapR + QRound (red * s);
-    	  if (l > 255) l = 255;
-          *mapR++ = l;
-          l = *mapG + QRound (green * s); if (l > 255) l = 255;
-    	  if (l > 255) l = 255;
-    	  *mapG++ = l;
-          l = *mapB + QRound (blue * s); if (l > 255) l = 255;
-    	  if (l > 255) l = 255;
-          *mapB++ = l;
+          *mapR++ = l < 255 ? l : 255;
+          l = *mapG + QRound (green * s);
+    	  *mapG++ = l < 255 ? l : 255;
+          l = *mapB + QRound (blue * s);
+          *mapB++ = l < 255 ? l : 255;
   	}
         while (p < last_p);
 
@@ -289,13 +287,15 @@ bool csPolyTexture::RecalculateDynamicLights ()
     {
       lv = (rv * csPolyTexture::subtex_size) >> mipmap_shift;
       luv_v = lv * lw;
-      if (lv+num >= lh) numv = lh-lv-1;
-      else numv = num;
+      if (lv+num >= lh)
+        numv = lh-lv-1;
+      else
+        numv = num;
 
       for (ru = 0 ; ru < dirty_w ; ru++, idx++)
       {
         // If already dirty we don't need to check.
-        if (!dirty_matrix[idx])
+        if (!dirty_matrix->Get (idx))
   	{
           lu = (ru * csPolyTexture::subtex_size) >> mipmap_shift;
     	  luv = luv_v + lu;
@@ -316,7 +316,7 @@ bool csPolyTexture::RecalculateDynamicLights ()
                   (old_mg && (old_mg[luv] != re_mg[luv])) ||
                   (old_mb && (old_mb[luv] != re_mb[luv])))
               {
-          	dirty_matrix[idx] = 1;
+          	dirty_matrix->Set (idx);
     		dirty_cnt++;
     		goto stop;
               }
@@ -324,7 +324,7 @@ bool csPolyTexture::RecalculateDynamicLights ()
             }
             luv += lw-num-1;
           }
-          stop: ;
+stop: ;
         }
       }
     }
@@ -895,8 +895,9 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 /* Modified by me to correct some lightmap's border problems -- D.D. */
 void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 {
-  int lw = (w>>mipmap_shift)+2;   // @@@ DON'T NEED TO GO TO 'W', 'W_ORIG' SHOULD BE SUFFICIENT!
-  int lh = (h>>mipmap_shift)+2;
+  // @@@ DON'T NEED TO GO TO 'W', 'W_ORIG' SHOULD BE SUFFICIENT!
+  int lw = 1 + (w_orig + mipmap_size - 1) >> mipmap_shift;
+  int lh = 1 + (h + mipmap_size - 1) >> mipmap_shift;
 
   int u, uv;
 
@@ -1062,22 +1063,20 @@ b:      if (scanL2 == MinIndex) goto finish;
     while (sy >= fin_y)
     {
       // Compute the rounded screen coordinates of horizontal strip
-      float _l=sxL,_r=sxR;
+      float _l = sxL, _r = sxR;
 
-      if(_r>_l) {float _=_r; _r=_l; _l=_;}
-    
-      xL = QRound (ceil(_l))+1;
-      xR = QRound (floor(_r));
+      if (_r > _l) { float _=_r; _r=_l; _l=_; }
 
-      //xL = QRound (sxL)+1;
-      //xR = QRound (sxR);
+      xL = 1 + QRound (ceil  (_l));
+      xR = QRound (floor (_r));
+
       //if (xR > xL) { int xswap = xR; xR = xL; xL = xswap; }
       if (xR < 0) xR = 0;
       if (xL > lw) xL = lw;
 
       for (u = xR; u < xL ; u++)
       {
-        uv = sy*new_lw+u;
+        uv = sy * new_lw + u;
 
 	//@@@ (Note from Jorrit): The following test should not be needed
 	// but it appears to be anyway. 'uv' can get both negative and too large.
@@ -1086,8 +1085,8 @@ b:      if (scanL2 == MinIndex) goto finish;
         ru = u  << mipmap_shift;
         rv = sy << mipmap_shift;
 
-        v1.x = (float)(ru+Imin_u)*invww;
-        v1.y = (float)(rv+Imin_v)*invhh;
+        v1.x = (float)(ru + Imin_u) * invww;
+        v1.y = (float)(rv + Imin_v) * invhh;
         if (ABS (txt_C) < SMALL_EPSILON)
           v1.z = 0;
         else
@@ -1177,13 +1176,13 @@ void csPolyTexture::CreateDirtyMatrix ()
   // Dirty matrix does not exist.
   dirty_w = dw;
   dirty_h = dh;
-  CHK (dirty_matrix = new UByte [dw*dh]);
+  CHK (dirty_matrix = new csBitSet (dw * dh));
   MakeAllDirty ();
 }
 
 void csPolyTexture::DestroyDirtyMatrix ()
 {
-  CHK (delete [] dirty_matrix);
+  CHK (delete dirty_matrix);
   dirty_matrix = NULL;
 }
 
@@ -1191,9 +1190,10 @@ void csPolyTexture::MakeAllDirty ()
 {
   if (dirty_matrix)
   {
-    dirty_cnt = dirty_w*dirty_h;
-    memset (dirty_matrix, 1, dirty_cnt);
+    dirty_matrix->Set ();
+    dirty_cnt = dirty_matrix->GetSize ();
   }
+  dyn_dirty = true;
 }
 
 void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV)
@@ -1208,16 +1208,50 @@ iPolygon3D *csPolyTexture::GetPolygon ()
   return polygon;
 }
 
-bool csPolyTexture::CleanIfDirty (int lu, int lv)
+static UByte bit_count [16] =
 {
-  int idx = dirty_w * lv + lu;
-  bool retval = (bool)(dirty_matrix [idx]);
-  if (retval)
+  0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4
+};
+
+#define COUNT_BITS(x)	bit_count [(x) & 0xf]
+
+bool csPolyTexture::CleanIfDirty (csBitSet *bs)
+{
+  if (!dirty_cnt)
+    return false;
+
+  int dc = dirty_cnt;
+  unsigned sz = MIN (bs->GetSize (), dirty_matrix->GetSize ());
+  ULong *src = (ULong *)bs->GetBits ();
+  ULong *dst = (ULong *)dirty_matrix->GetBits ();
+  while (sz >= sizeof (ULong))
   {
-    dirty_matrix [idx] = 0;
-    dirty_cnt--;
+    ULong s = *src;
+    ULong d = *dst;
+    s &= d; // leave in bs only the bits that are marked dirty in dirty_matrix
+    d ^= s; // drop the bits in dirty_matrix that are going to be refreshed
+    if (s)
+      dirty_cnt -= COUNT_BITS (s      ) - COUNT_BITS (s >> 4 ) -
+                   COUNT_BITS (s >> 8 ) - COUNT_BITS (s >> 12) -
+                   COUNT_BITS (s >> 16) - COUNT_BITS (s >> 20) -
+                   COUNT_BITS (s >> 24) - COUNT_BITS (s >> 28);
+    *src++ = s;
+    *dst++ = d;
+    sz -= sizeof (ULong);
   }
-  return retval;
+  while (sz--)
+  {
+    UByte s = *(UByte *)src;
+    UByte d = *(UByte *)dst;
+    if (s)
+      dirty_cnt -= COUNT_BITS (s) - COUNT_BITS (s >> 4);
+    s &= d; // leave in bs only the bits that are marked dirty in dirty_matrix
+    d ^= s; // drop the bits in dirty_matrix that are going to be refreshed
+    *((UByte *)src)++ = s;
+    *((UByte *)dst)++ = d;
+  }
+
+  return (dc != dirty_cnt);
 }
 
 iLightMap *csPolyTexture::GetLightMap () { return lm; }
@@ -1229,8 +1263,6 @@ float csPolyTexture::GetFDV () { return fdv; }
 int csPolyTexture::GetShiftU () { return shf_u; }
 int csPolyTexture::GetOriginalWidth () { return w_orig; }
 int csPolyTexture::GetSize () { return size; }
-void *csPolyTexture::GetTCacheData () { return tcache_data; }
-void csPolyTexture::SetTCacheData (void *iCache) { tcache_data = iCache; }
 int csPolyTexture::GetNumPixels () { return size; }
 int csPolyTexture::GetMipMapSize () { return mipmap_size; }
 int csPolyTexture::GetMipMapShift () { return mipmap_shift; }
@@ -1240,3 +1272,5 @@ int csPolyTexture::GetIMinV () { return Imin_v; }
 int csPolyTexture::GetNumberDirtySubTex (){ return dirty_cnt; }
 int csPolyTexture::GetSubtexSize () { return subtex_size; }
 bool csPolyTexture::GetDynlightOpt () { return subtex_dynlight; }
+void *csPolyTexture::GetCacheData () { return cache_data; }
+void csPolyTexture::SetCacheData (void *d) { cache_data = d; }

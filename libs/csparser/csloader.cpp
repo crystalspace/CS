@@ -21,7 +21,6 @@
 #include "qint.h"
 #include "csparser/csloader.h"
 #include "csparser/crossbld.h"
-#include "csengine/sysitf.h"
 #include "csengine/cscoll.h"
 #include "csengine/triangle.h"
 #include "csengine/sector.h"
@@ -838,7 +837,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info,
 
     case TOKEN_TEXNR:
       ScanStr (params, "%s", str);
-      info.default_texture = World->GetTextures ()->GetTextureMM (str);
+      info.default_texture = World->GetTextures ()->FindByName (str);
       if (info.default_texture == NULL)
       {
         CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -1019,7 +1018,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
         break;
       case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        texture = World->GetTextures ()->GetTextureMM (str);
+        texture = World->GetTextures ()->FindByName (str);
         if (texture == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -1440,7 +1439,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     {
       case TOKEN_TEXNR:
         ScanStr (params, "%s", str);
-        tex = World->GetTextures ()->GetTextureMM (str);
+        tex = World->GetTextures ()->FindByName (str);
         if (tex == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -1787,7 +1786,7 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
     {
       case TOKEN_TEXNR:
         ScanStr (params, "%s", str);
-        tex = World->GetTextures ()->GetTextureMM (str);
+        tex = World->GetTextures ()->FindByName (str);
         if (tex == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -2041,7 +2040,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
     {
       case TOKEN_TEXNR:
         ScanStr (params, "%s", str);
-        tex = World->GetTextures ()->GetTextureMM (str);
+        tex = World->GetTextures ()->FindByName (str);
         if (tex == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -2240,7 +2239,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
     {
       case TOKEN_TEXNR:
         ScanStr (params, "%s", str);
-        tex = World->GetTextures ()->GetTextureMM (str);
+        tex = World->GetTextures ()->FindByName (str);
         if (tex == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -2445,7 +2444,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
 
       case TOKEN_TEXNR:
         ScanStr (params, "%s", str);
-        default_texture = World->GetTextures ()->GetTextureMM (str);
+        default_texture = World->GetTextures ()->FindByName (str);
         if (default_texture == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -2575,7 +2574,7 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
         break;
       case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        texture = World->GetTextures ()->GetTextureMM (str);
+        texture = World->GetTextures ()->FindByName (str);
         if (texture == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -2864,7 +2863,7 @@ void load_tex (char** buf, Color* colors, int num_colors, char* name)
     {
       case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        colors[num_colors].texture = World->GetTextures ()->GetTextureMM (str);
+        colors[num_colors].texture = World->GetTextures ()->FindByName (str);
         if (colors[num_colors].texture == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -3014,7 +3013,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         break;
       case TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        texture = World->GetTextures ()->GetTextureMM (str);
+        texture = World->GetTextures ()->FindByName (str);
         if (texture == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -3030,7 +3029,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
       case TOKEN_CEIL_TEXTURE:
       case TOKEN_FLOOR_TEXTURE:
         ScanStr (params, "%s", str);
-        colors[num_colors].texture = World->GetTextures ()->GetTextureMM (str);
+        colors[num_colors].texture = World->GetTextures ()->FindByName (str);
         if (colors[num_colors].texture == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
@@ -3915,7 +3914,7 @@ bool csLoader::LoadWorld (char* buf)
           break;
         case TOKEN_TEXTURES:
           {
-            World->GetTextures ()->Clear ();
+            World->GetTextures ()->DeleteAll ();
             if (!LoadTextures (params))
               return false;
           }
@@ -4175,6 +4174,8 @@ csTextureHandle* csLoader::LoadTexture (csWorld* world, const char* name, const 
 {
   World = world;
   iImage *image = load_image (fname);
+  if (!image)
+    return NULL;
   csTextureHandle *th = world->GetTextures ()->NewTexture (image);
   th->SetName (name);
   // dereference image pointer since th already incremented it

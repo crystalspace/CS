@@ -39,7 +39,7 @@ csScanSetup Scan =
 #ifndef NO_draw_scanline_zfil
 
 void csScan_draw_scanline_zfil (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  ULong* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z; (void)inv_z; (void)d;
   ULong* lastZbuf = z_buf + xx-1;
@@ -227,31 +227,30 @@ void csScan_InitDraw (csGraphics3DSoftware* g3d, iPolygonTexture* tex,
   Scan.Texture = texture;
   Scan.tw = untxt->get_width ();
   Scan.th = untxt->get_height ();
-  Scan.tmap = untxt->get_bitmap ();
+  Scan.bitmap = (UByte *)untxt->get_bitmap ();
   Scan.shf_w = untxt->get_w_shift ();
   Scan.and_w = untxt->get_w_mask ();
   Scan.shf_h = untxt->get_h_shift ();
   Scan.and_h = untxt->get_h_mask ();
 
-  Scan.FlatColor = texture->GetMeanColor ();
+  UByte r, g, b;
+  texture->GetMeanColor (r, g, b);
+  Scan.FlatColor = g3d->texman->FindRGB (r, g, b);
 
   if (g3d->do_lighting)
   {
-    void* td = tex->GetTCacheData ();
-    if (td)
-    {
-      TCacheLightedTexture* tclt = (TCacheLightedTexture*)td;
-      Scan.tmap2 = tclt->get_tmap8 ();
-    }
+    SoftwareCachedTexture *tclt = (SoftwareCachedTexture *)tex->GetCacheData ();
+    if (tclt)
+      Scan.bitmap2 = tclt->get_bitmap ();
     else
-      Scan.tmap2 = NULL;	// Not a lighted texture.
+      Scan.bitmap2 = NULL;	// Not a lighted texture.
 
     Scan.fdu = tex->GetFDU ();
     Scan.fdv = tex->GetFDV ();
   }
   else
   {
-    Scan.tmap2 = NULL;
+    Scan.bitmap2 = NULL;
     Scan.fdu = Scan.fdv = 0;
   }
   Scan.tw2 = tex->GetWidth ();
@@ -267,22 +266,24 @@ void csScan_InitDraw (csGraphics3DSoftware* g3d, iPolygonTexture* tex,
   Scan.shf_h = 16 - Scan.shf_w;
 }
 
+#define SysPrintf pG3D->System->Printf
+
 void csScan_dump (csGraphics3DSoftware* pG3D)
 {
-  pG3D->SysPrintf (MSG_DEBUG_0, "------------------------------------------------\n");
-  if (Scan.tmap2)
+  SysPrintf (MSG_DEBUG_0, "------------------------------------------------\n");
+  if (Scan.bitmap2)
   {
-    pG3D->SysPrintf (MSG_DEBUG_0, "Using a texture from the texture cache.\n");
-    pG3D->SysPrintf (MSG_DEBUG_0, "  Width=%d, height=%d\n", Scan.tw2, Scan.th2);
-    pG3D->SysPrintf (MSG_DEBUG_0, "  fdu=%f, fdv=%f\n", Scan.fdu, Scan.fdv);
+    SysPrintf (MSG_DEBUG_0, "Using a texture from the texture cache.\n");
+    SysPrintf (MSG_DEBUG_0, "  Width=%d, height=%d\n", Scan.tw2, Scan.th2);
+    SysPrintf (MSG_DEBUG_0, "  fdu=%f, fdv=%f\n", Scan.fdu, Scan.fdv);
   }
-  pG3D->SysPrintf (MSG_DEBUG_0, "The original unlighted texture:\n");
-  pG3D->SysPrintf (MSG_DEBUG_0, "  Width=%d, height=%d\n", Scan.tw, Scan.th);
-  pG3D->SysPrintf (MSG_DEBUG_0, "\n");
-  pG3D->SysPrintf (MSG_DEBUG_0, "shf_u=%d, shf_w=%d, shf_h=%d\n", Scan.shf_u, Scan.shf_w, Scan.shf_h);
-  pG3D->SysPrintf (MSG_DEBUG_0, "and_w=%d, and_h=%d\n", Scan.and_w, Scan.and_h);
-  pG3D->SysPrintf (MSG_DEBUG_0, "\n");
-  pG3D->SysPrintf (MSG_DEBUG_0, "M=%f, J1=%f, K1=%f\n", Scan.M, Scan.J1, Scan.K1);
-  pG3D->SysPrintf (MSG_DEBUG_0, "dM=%f, dJ1=%f, dK1=%f\n", Scan.dM, Scan.dJ1, Scan.dK1);
-  pG3D->SysPrintf (MSG_DEBUG_0, "------------------------------------------------\n");
+  SysPrintf (MSG_DEBUG_0, "The original unlighted texture:\n");
+  SysPrintf (MSG_DEBUG_0, "  Width=%d, height=%d\n", Scan.tw, Scan.th);
+  SysPrintf (MSG_DEBUG_0, "\n");
+  SysPrintf (MSG_DEBUG_0, "shf_u=%d, shf_w=%d, shf_h=%d\n", Scan.shf_u, Scan.shf_w, Scan.shf_h);
+  SysPrintf (MSG_DEBUG_0, "and_w=%d, and_h=%d\n", Scan.and_w, Scan.and_h);
+  SysPrintf (MSG_DEBUG_0, "\n");
+  SysPrintf (MSG_DEBUG_0, "M=%f, J1=%f, K1=%f\n", Scan.M, Scan.J1, Scan.K1);
+  SysPrintf (MSG_DEBUG_0, "dM=%f, dJ1=%f, dK1=%f\n", Scan.dM, Scan.dJ1, Scan.dK1);
+  SysPrintf (MSG_DEBUG_0, "------------------------------------------------\n");
 }

@@ -22,145 +22,76 @@
 #include "csutil/scf.h"
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
+#include "iimage.h"
 
-struct iImage;
-
-// Colors are encoded in a 16-bit short using the following
-// distribution (only for 8-bit mode):
-#define BITS_RED	6
-#define BITS_GREEN	6
-#define BITS_BLUE	4
-#define MASK_RED	((1 << BITS_RED)   - 1)
-#define MASK_GREEN	((1 << BITS_GREEN) - 1)
-#define MASK_BLUE	((1 << BITS_BLUE)  - 1)
-#define NUM_RED		(1 << BITS_RED)
-#define NUM_GREEN	(1 << BITS_GREEN)
-#define NUM_BLUE	(1 << BITS_BLUE)
-
-#define TABLE_RED	0
-#define TABLE_GREEN	1
-#define TABLE_BLUE	2
-#define TABLE_RED_HI	3
-#define TABLE_GREEN_HI	4
-#define TABLE_BLUE_HI	5
-
-typedef UShort RGB16map[256];
-typedef unsigned char RGB8map[256];
-
-/// The prefered distances to use for the color matching.
-#define PREFERED_DIST 16333
-#define PREFERED_COL_DIST 133333
-
-#define R24(rgb) (((rgb)>>16)&0xff)
-#define G24(rgb) (((rgb)>>8)&0xff)
-#define B24(rgb) ((rgb)&0xff)
+class csGraphics3DOpenGL;
 
 /**
- * Lookup table entry corresponding to one palette entry.
- * 'red', 'green', and 'blue' are tables giving the red, green,
- * and blue components for all light levels of that palette index.
+ * This is a class derived from csTextureMM that performs additional
+ * functions required for texture management with OpenGL renderer.
  */
-struct PalIdxLookup
-{
-  RGB16map red;
-  RGB16map green;
-  RGB16map blue;
-};
-
-#define R24(rgb) (((rgb)>>16)&0xff)
-#define G24(rgb) (((rgb)>>8)&0xff)
-#define B24(rgb) ((rgb)&0xff)
-
-class csTextureMMOpenGL : public csHardwareAcceleratedTextureMM
+class csTextureMMOpenGL : public csTextureMM
 {
 public:
-  csTextureMMOpenGL(iImage* image) 
-   : csHardwareAcceleratedTextureMM (image) {}
-  ///
-  virtual void remap_texture(csTextureManager *texman) 
-  { 
-    remap_palette_24bit(texman); 
-  }
+  /// A pointer to the 3D driver object
+  csGraphics3DOpenGL *G3D;
+
+  /// Initialize the object
+  csTextureMMOpenGL (iImage *image, int flags, csGraphics3DOpenGL *iG3D);
+  /// Create a new texture object
+  virtual csTexture *new_texture (iImage *Image);
+  /// Compute the mean color for the just-created texture
+  virtual void compute_mean_color ();
 };
 
 /**
- * OpenGL version of the texture manager. This
+ * csTextureOpenGL is a class derived from csTexture that implements
+ * all the additional functionality required by the OpenGL renderer.
+ * Every csTextureOpenGL is a RGBA paletted image.
+ */
+class csTextureOpenGL : public csTexture
+{
+  /// The actual image
+  iImage *image;
+
+public:
+  /// Create a csTexture object
+  csTextureOpenGL (csTextureMM *Parent, iImage *Image);
+  /// Destroy the texture
+  virtual ~csTextureOpenGL ();
+  /// Return a pointer to texture data
+  virtual void *get_bitmap ();
+  /// Get image data
+  RGBPixel *get_image_data ()
+  { return (RGBPixel *)image->GetImageData (); }
+  /// Get the image object
+  iImage *get_image ()
+  { return image; }
+};
+
+/**
+ * OpenGL version of the texture manager.
  */
 class csTextureManagerOpenGL : public csTextureManager
 {
-private:
-  int num_red, num_green, num_blue;
-  /// The configuration file (duplicate! should not be freed)
-  csIniFile* config;
-
-  /// Configuration values for color matching.
-  int prefered_dist;
-  /// Configuration values for color matching.
-  int prefered_col_dist;
-
-  /// Read configuration values from config file.
-  void read_config ();
-
-  /**
-   * Encode RGB values to a 16-bit word (for 16-bit mode).
-   */
-  ULong encode_rgb (int r, int g, int b);
-
-  ///
-  csTexture* get_texture (int idx, int lev);
-
-  /**
-   * Find rgb for a specific map type and apply an intensity.
-   * 'map_type' is one of TABLE_....
-   */
-  int find_rgb_map (int r, int g, int b, int map_type, int l);
-
 public:
+  /// A pointer to the 3D driver object
+  csGraphics3DOpenGL *G3D;
+
   ///
-  csTextureManagerOpenGL (iSystem* iSys, iGraphics2D* iG2D);
+  csTextureManagerOpenGL (iSystem* iSys, iGraphics2D* iG2D, csIniFile *config,
+    csGraphics3DOpenGL *iG3D);
   ///
   virtual ~csTextureManagerOpenGL ();
-  ///
-  virtual void Initialize ();
 
   ///
-  virtual void clear ();
-
+  virtual void PrepareTextures ();
   ///
-  virtual void Prepare ();
+  virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
   ///
-  virtual iTextureHandle *RegisterTexture (iImage* image, bool for3d, bool for2d);
+  virtual void PrepareTexture (iTextureHandle *handle);
   ///
   virtual void UnregisterTexture (iTextureHandle* handle);
-  ///
-  virtual void MergeTexture (iTextureHandle* handle);
-  ///
-  virtual void FreeImages ();
-  ///
-  virtual void ReserveColor (int r, int g, int b);
-  ///
-  virtual void AllocPalette ();
-
-  /// Create a new texture.
-  csTextureMMOpenGL* new_texture (iImage* image);
-
-  /**
-   * Return the index for some color. This works in 8-bit
-   * (returns an index in the 256-color table) and in 15/16-bit
-   * (returns a 15/16-bit encoded RGB value).
-   */
-  virtual int find_color (int r, int g, int b);
-
-  /**
-   * Remap all textures.
-   */
-  void remap_textures ();
-
-  /// Set configuration file for use inside Initialize () call
-  void SetConfig (csIniFile* newconfig)
-  {
-    config = newconfig;
-  }
 };
 
 #endif // TXTMGR_OPENGL_H

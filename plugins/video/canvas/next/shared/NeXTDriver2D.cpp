@@ -109,7 +109,7 @@ bool NeXTDriver2D::init_driver( int simulate_depth )
 	pfmt.BlueMask   = frame_buffer->blue_mask();
 	pfmt.PixelBytes = frame_buffer->bytes_per_pixel();
 	pfmt.PalEntries = frame_buffer->palette_entries();
-	complete_pixel_format();
+	pfmt.complete ();
 	switch (Depth)
 	    {
 	    case 15: setup_rgb_15(); break;

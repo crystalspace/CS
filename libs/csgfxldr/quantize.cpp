@@ -59,12 +59,12 @@
  */
 #define HIST_R_BITS	5
 #define HIST_G_BITS	6
-#define HIST_B_BITS	4
+#define HIST_B_BITS	5
 
 // Amount to shift left R value to get max (hist_r, hist_g, hist_b)
 #define HIST_SHIFT_R	1
 #define HIST_SHIFT_G	0
-#define HIST_SHIFT_B	2
+#define HIST_SHIFT_B	1
 
 #define HIST_R_MAX	(1 << HIST_R_BITS)
 #define HIST_G_MAX	(1 << HIST_G_BITS)
@@ -80,11 +80,12 @@
 #  define B_BIT		8
 #endif
 
-// The algorithm itself could handle any size of Palette, but we would need to
-// dynamically allocate the memory for this. If we use a fixes size, we can
-// use a local array while quantising the image. (It seems like gcc can handle
-// local arrays of variable sizes, but MSVC 6.0 can't)
-#define PALSIZE 256
+// The mask for extracting just R/G/B from an ULong or RGBPixel
+#ifdef CS_BIG_ENDIAN
+#  define RGB_MASK 0xffffff00
+#else
+#  define RGB_MASK 0x00ffffff
+#endif
 
 // Compute masks for effectively separating R,G and B components from a ULong.
 // For a little-endian machine they are respectively
@@ -102,7 +103,10 @@
 // Calculate index into histogram for given R,G,B components
 #define INDEX(r,g,b)	(r + (g << HIST_R_BITS) + (b << (HIST_R_BITS + HIST_G_BITS)))
 
-static UShort *hist;
+// The storage for color usage histogram
+static UShort *hist = NULL;
+// Total number of colors that were used to create the histogram
+static unsigned hist_pixels;
 
 /*
  * A box in color space.
@@ -283,47 +287,133 @@ struct csColorBox
   }
 };
 
-static csColorBox *box;
+// The storage for color space boxes
+static csColorBox *box = NULL;
+// Number of valid color boxes
+static int boxcount;
+// The storage for color indices
+static UByte *index = NULL;
 
 static int compare_boxes (const void *i1, const void *i2)
 {
   int count1 = box [*(UByte *)i1].PixelCount;
   int count2 = box [*(UByte *)i2].PixelCount;
-  return (count1 < count2) ? -1 : (count1 == count2) ? 0 : +1;
+  return (count1 > count2) ? -1 : (count1 == count2) ? 0 : +1;
 }
 
-void csQuantizeRGB (RGBPixel *image, int pixels, 
-  UByte *&outimage, RGBPixel *&outpalette)
+//------------------------------------------------------------- The API ------//
+
+// The state of quantization variables
+static enum
 {
-  // Sanity check
-  if (!pixels)
-    return;
+  // Uninitialized: initial state
+  qsNone,
+  // Counting color frequencies
+  qsCount,
+  // Remapping input images to output
+  qsRemap
+} qState = qsNone;
+
+void csQuantizeBegin ()
+{
+  // Clean up, if previous quantization sequence was not finished
+  csQuantizeEnd ();
 
   // First, allocate the histogram
   hist = new UShort [HIST_R_MAX * HIST_G_MAX * HIST_B_MAX];
-  memset (hist, 0, HIST_R_MAX * HIST_G_MAX * HIST_B_MAX);
+  memset (hist, 0, HIST_R_MAX * HIST_G_MAX * HIST_B_MAX * sizeof (UShort));
+
+  hist_pixels = 0;
+  qState = qsCount;
+}
+
+void csQuantizeEnd ()
+{
+  delete [] index; index = NULL;
+  delete [] box; box = NULL;
+  delete [] hist; hist = NULL;
+}
+
+void csQuantizeCount (RGBPixel *image, int pixels, RGBPixel *transp)
+{
+  // Sanity check
+  if (!pixels || qState != qsCount)
+    return;
+
+  hist_pixels += pixels;
 
   // Now, count all colors in image
   ULong *src = (ULong *)image;
-  int count = pixels;
+  if (transp)
+  {
+    ULong tc = (*(ULong *)transp) & RGB_MASK;
+    while (pixels--)
+    {
+      ULong pix = *src++;
+      if (tc != (pix & RGB_MASK))
+      {
+        UShort &pa = hist [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
+        // do not permit overflow here; stick to MAX_USHORT
+        if (!++pa) --pa;
+      }
+    }
+  }
+  else
+    while (pixels--)
+    {
+      ULong pix = *src++;
+      UShort &pa = hist [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
+      // do not permit overflow here; stick to MAX_USHORT
+      if (!++pa) --pa;
+    }
+}
+
+void csQuantizeBias (RGBPixel *colors, int count, int weight)
+{
+  // Sanity check
+  if (!count || qState != qsCount)
+    return;
+
+  unsigned delta;
+  if (hist_pixels < (0xffffffff / 100))
+    delta = ((hist_pixels + 1) * weight / (100 * count));
+  else
+    delta = ((hist_pixels / count + 1) * weight) / 100;
+  if (delta > 0xffff)
+    delta = 0xffff;
+  else if (!delta)
+    return;
+
+  // Now, count all colors in image
+  ULong *src = (ULong *)colors;
   while (count--)
   {
     ULong pix = *src++;
     UShort &pa = hist [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
     // do not permit overflow here; stick to MAX_USHORT
-    if (!++pa) --pa;
+    if (unsigned (pa) + delta > 0xffff) pa = 0xffff; else pa += delta;
   }
+}
+
+void csQuantizePalette (RGBPixel *&outpalette, int &maxcolors, RGBPixel *transp)
+{
+  // Sanity check
+  if (qState != qsCount || !maxcolors)
+    return;
 
   // Good. Now we create the array of color space boxes.
-  box = new csColorBox [PALSIZE];
-  int boxcount = 1;
+  box = new csColorBox [maxcolors];
   box [0].Set (0, HIST_R_MAX - 1, 0, HIST_G_MAX - 1, 0, HIST_B_MAX - 1);
   box [0].Shrink ();
   box [0].ComputeVolume ();
   box [0].CountPixels ();
+  boxcount = 1;
+
+  if (transp)
+    maxcolors--;
 
   // Loop until we have enough boxes (or we're out of pixels)
-  while (boxcount < PALSIZE)
+  while (boxcount < maxcolors)
   {
     // Find the box that should be split
     // We're making this decision the following way:
@@ -332,7 +422,7 @@ void csQuantizeRGB (RGBPixel *image, int pixels,
     // - the rest of palette we prefer to split largest boxes.
     int bi, bestbox = -1;
     unsigned bestrating = 0;
-    if (boxcount < PALSIZE / 2)
+    if (boxcount < maxcolors / 2)
     {
       for (bi = 0; bi < boxcount; bi++)
         if (bestrating < box [bi].ColorCount)
@@ -447,22 +537,44 @@ void csQuantizeRGB (RGBPixel *image, int pixels,
   // Either we're out of splittable boxes, or we have palsize boxes.
 
   // Assign successive palette indices to all boxes
-  UByte Index [256];
+  int count, delta = transp ? 1 : 0;
+  index = new UByte [boxcount + delta];
   for (count = 0; count < boxcount; count++)
-    Index [count] = count;
+    index [count] = count;
   // Sort palette indices by usage (a side bonus to quantization)
-  qsort (Index, boxcount, sizeof (UByte), compare_boxes);
+  qsort (index, boxcount, sizeof (UByte), compare_boxes);
 
-  // Allocate the picture and the palette
-  if (!outimage) outimage = new UByte [pixels];
-  if (!outpalette) outpalette = new RGBPixel [PALSIZE];
+  // Allocate the palette, if not already allocated
+  if (!outpalette)
+    outpalette = new RGBPixel [maxcolors + delta];
+
+  // Fill the unused colormap entries with zeros
+  memset (&outpalette [boxcount + delta], 0,
+    (maxcolors - boxcount) * sizeof (RGBPixel));
 
   // Now compute the mean color for each box
   for (count = 0; count < boxcount; count++)
-    box [count].GetMeanColor (outpalette [Index [count]]);
+    box [index [count]].GetMeanColor (outpalette [count + delta]);
 
-  // Fill the unused colormap entries with zeros
-  memset (&outpalette [boxcount], 0, (PALSIZE - boxcount) * sizeof (RGBPixel));
+  // If we have a transparent color, set colormap entry 0 to it
+  if (delta)
+  {
+    for (count = boxcount; count; count--)
+      index [count] = index [count - 1] + 1;
+    index [0] = 0;
+    outpalette [0] = RGBPixel (0, 0, 0);
+  }
+
+  maxcolors = boxcount + delta;
+}
+
+void csQuantizeRemap (RGBPixel *image, int pixels, UByte *&outimage, RGBPixel *transp)
+{
+  // Sanity check
+  if (qState != qsCount && qState != qsRemap)
+    return;
+
+  int count;
 
   // We will re-use the histogram memory for a inverse colormap. However, we
   // will need just a byte per element, so we'll assign the address of
@@ -470,19 +582,50 @@ void csQuantizeRGB (RGBPixel *image, int pixels,
   // half of histogram storage remains unused.
   UByte *icmap = (UByte *)hist;
 
-  // Now, fill inverse colormap with color indices
-  for (count = 0; count < boxcount; count++)
-    box [count].FillInverseCMap (icmap, Index [count]);
-
-  src = (ULong *)image;
-  UByte *dst = outimage;
-  count = pixels;
-  while (count--)
+  int delta = transp ? 1 : 0;
+  if (qState == qsCount)
   {
-    ULong pix = *src++;
-    *dst++ = icmap [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
+    // Now, fill inverse colormap with color indices
+    for (count = 0; count < boxcount; count++)
+      box [index [count + delta] - delta].FillInverseCMap (icmap, count + delta);
+    qState = qsRemap;
   }
 
-  delete [] box;
-  delete [] hist;
+  // Allocate the picture and the palette
+  if (!outimage) outimage = new UByte [pixels];
+
+  ULong *src = (ULong *)image;
+  UByte *dst = outimage;
+  count = pixels;
+
+  if (transp)
+  {
+    ULong tc = (*(ULong *)transp) & RGB_MASK;
+    while (count--)
+    {
+      ULong pix = *src++;
+      if (tc == (pix & RGB_MASK))
+        *dst++ = 0;
+      else
+        *dst++ = icmap [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
+    }
+  }
+  else
+    while (count--)
+    {
+      ULong pix = *src++;
+      *dst++ = icmap [INDEX_R (pix) + INDEX_G (pix) + INDEX_B (pix)];
+    }
+}
+
+void csQuantizeRGB (RGBPixel *image, int pixels,
+  UByte *&outimage, RGBPixel *&outpalette, int maxcolors)
+{
+  csQuantizeBegin ();
+
+  csQuantizeCount (image, pixels);
+  csQuantizePalette (outpalette, maxcolors);
+  csQuantizeRemap (image, pixels, outimage);
+
+  csQuantizeEnd ();
 }

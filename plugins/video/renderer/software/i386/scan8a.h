@@ -29,6 +29,5 @@
 #define NO_draw_scanline_tex_zfil
 #define NO_mmx_draw_scanline_tex_zfil
 #define NO_draw_pi_scanline_tex_zuse
-#define NO_mmx_draw_pi_scanline_tex_zuse
 
 #endif // __SCAN8A_H__

@@ -47,7 +47,7 @@ extern "C" void csDetectCPU (int *Family, char Vendor[13], int *Features);
 #elif defined (COMP_VC) || defined (COMP_WCC)
 
 #if _MSC_VER < 1200     // If compiler version is below 6
-#define cpuid __asm _emit 0x0F __asm _emit 0xA2
+#  define cpuid __asm _emit 0x0F __asm _emit 0xA2
 #endif
 
 /**
@@ -136,17 +136,6 @@ static inline void csDetectCPU (int *Family, char Vendor[13], int *Features)
   : "m" (Family), "S" (Vendor), "m" (Features)
   : "ebx", "ecx", "edx");
 }
-
-// Temporary trick: since there is no csScan_16_mmx_draw_pi_scanline_tex_zuse
-// routine in GAS mode and since this file is included only by soft_g3d.cpp,
-// we define it to non-MMX version here so that it gets replaced.
-#ifdef DO_MMX
-
-// There are no MMX perspective-incorrect routines for GAS and VC assembler
-#define NO_mmx_draw_pi_scanline_tex_zuse
-#define csScan_16_mmx_draw_pi_scanline_tex_zuse csScan_16_draw_pi_scanline_tex_zuse
-
-#endif // DO_MMX
 
 #endif
 

@@ -37,6 +37,79 @@
  * the size of resulting palette is palsize colors).
  */
 extern void csQuantizeRGB (RGBPixel *image, int pixels, 
-  UByte *&outimage, RGBPixel *&outpalette);
+  UByte *&outimage, RGBPixel *&outpalette, int maxcolors = 256);
+
+/**
+ * The following routines can be used to split the quantization process
+ * into small steps. First, you should call csQuantizeBegin(). This will
+ * allocate some memory for color histogram and also do some other
+ * maintenance work. Then you call csQuantizeCount () as much times as
+ * you want, to count the frequencies of colors. This is a quite fast
+ * operation, thus you can use it, for example, to compute a optimal
+ * palette for a large number of images (for example, software 3D renderer
+ * uses it for computing the optimal palette in paletted modes, by passing
+ * every texture to csQuantizeCount()).
+ * <p>
+ * When you're finished with images, call csQuantizePalette(). This will
+ * compute the optimal palette. If you need just that, you can call
+ * csQuantizeEnd() and you're done. If you need to remap all those textures
+ * to the optimal palette, you can call csQuantizeRemap() as much times
+ * as you wish. Finally you anyway should call csQuantizeEnd() to free
+ * all the memory used by quantizer.
+ * <p>
+ * Now, a typical quantization sequence could look like this:
+ * <pre>
+ * csQuantizeBegin ();
+ *
+ *   csQuantizeCount (image, pixels);
+ *   csQuantizeCount (...);
+ *   ...
+ *
+ *   int maxcolors = 256;
+ *   csQuantizePalette (outpalette, maxcolors);
+ *   // now maxcolors contains the actual number of palette entries
+ *
+ *   csQuantizeRemap (image, pixels, outimage);
+ *   csQuantizeRemap (...);
+ *   ...
+ *
+ * csQuantizeEnd ();
+ * </pre>
+ * The quantizer itself keeps track of its current state, and will silently
+ * ignore invalid calls. For example, if you call csQuantizeRemap() right
+ * after calling csQuantizeBegin() nothing will happen. You still can call
+ * csQuantizePalette() right after csQuantizeBegin(), and you will get the
+ * expected black (or let's call it `empty') palette.
+ *<p>
+ * The csQuantizeBias routine can be used to introduce a bias inside the
+ * currently open color histogram towards given colors. The "weight" parameter
+ * shows how important those colors are (0 - not at all, 100 - very). This
+ * can be used to bias the resulting palette towards some hard-coded values,
+ * for example you may want to use it to create a relatively uniform palette
+ * that is somewhat biased towards the colors contained in some picture(s).
+ *<p>
+ * Some routines accept an additional parameter (RGBPixel *transp). If it is
+ * NULL, nothing special is performed. If it is non-NULL, it should point
+ * to an valid RGBPixel object; the color of that pixel will be treated in
+ * a special way: csQuantizeCount() will ignore pixels of that color,
+ * csQuantizePalette() will allocate color index 0 for that color, and
+ * csQuantizeRemap will map all such pixel values to index 0.
+ */
+
+/// Begin quantization
+extern void csQuantizeBegin ();
+/// Finish quantization
+extern void csQuantizeEnd ();
+/// Count the colors in a image and update the color histogram
+extern void csQuantizeCount (RGBPixel *image, int pixels,
+  RGBPixel *transp = NULL);
+/// Bias the color histogram towards given colors (weight = 0..100)
+extern void csQuantizeBias (RGBPixel *colors, int count, int weight);
+/// Compute the optimal palette for all images passed to QuantizeCount()
+extern void csQuantizePalette (RGBPixel *&outpalette, int &maxcolors,
+  RGBPixel *transp = NULL);
+/// Remap a image to the palette computed by csQuantizePalette()
+extern void csQuantizeRemap (RGBPixel *image, int pixels, UByte *&outimage,
+  RGBPixel *transp = NULL);
 
 #endif // __QUANTIZE_H__

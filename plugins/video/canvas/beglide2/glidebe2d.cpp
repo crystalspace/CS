@@ -272,7 +272,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   		pfmt.GreenMask  = GreenMask;
   		pfmt.BlueMask   = BlueMask;
   		
-  		complete_pixel_format();
+  		pfmt.complete ();
   		break;
   	case B_RGB16:
 //			defer bitmap creation
@@ -293,7 +293,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   		pfmt.GreenMask  = GreenMask;
   		pfmt.BlueMask   = BlueMask;
   		
-  		complete_pixel_format();
+  		pfmt.complete ();
   		break;
   	case B_RGB32:
   	case B_RGBA32:
@@ -315,7 +315,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   		pfmt.GreenMask  = GreenMask;
   		pfmt.BlueMask   = BlueMask;
   		
-  		complete_pixel_format();
+  		pfmt.complete ();
   		break;
   	default:
   	// an unimplemented colorspace, give up and die

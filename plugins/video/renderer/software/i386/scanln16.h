@@ -154,7 +154,7 @@
 #undef SCANMAP
 #define NO_draw_scanline_map_zfil
 #define SCANFUNC csScan_16_draw_scanline_map_zfil
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND \
     do									\
@@ -171,7 +171,7 @@
 #undef SCANMAP
 #define NO_draw_scanline_map_zuse
 #define SCANFUNC csScan_16_draw_scanline_map_zuse
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     int uFrac, duFrac, vFrac, dvFrac;					\
     static unsigned int oldEBP;						\
@@ -345,7 +345,7 @@
 #undef SCANMAP
 #define NO_draw_scanline_map_alpha50
 #define SCANFUNC csScan_16_draw_scanline_map_alpha50
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
 #include "cs3d/software/scanln.inc"
 
@@ -357,7 +357,7 @@
 #undef SCANMAP
 #define NO_mmx_draw_scanline_map_zfil
 #define SCANFUNC csScan_16_mmx_draw_scanline_map_zfil
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanln.inc"
@@ -371,7 +371,8 @@
 #define SCANLOOP \
     do									\
     {									\
-      *_dest++ = Scan.PaletteTable[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];\
+      *_dest++ = COLORMAP [srcTex [((uu >> 16) & ander_w) +		\
+        ((vv >> shifter_h) & ander_h)]];				\
       uu += duu;							\
       vv += dvv;							\
     }									\
@@ -411,9 +412,10 @@ void csScan_16_draw_pi_scanline_tex_zuse (void *dest, int len,
 
 0:		cmpl	(%%ebp), %%ecx
 		jb	1f
-		movl	%8, %%edx		# edx = pal_table
 		movl	%%ecx, (%%ebp)		# *zbuff = z
-		movzbl	(%%esi), %%ecx		# Get texel
+		xorl	%%ecx,%%ecx		# ecx = 0
+		movl	%8, %%edx		# edx = pal_table
+		movb	(%%esi), %%cl		# Get texel
 		movw	(%%edx,%%ecx,2), %%dx	# Translate into RGB
 		movl	(%%ebp), %%ecx		# Get Z back (from CPU cache)
 		movw	%%dx, (%%edi)		# Put texel

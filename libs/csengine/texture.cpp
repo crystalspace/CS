@@ -20,6 +20,7 @@
 
 #include "sysdef.h"
 #include "csengine/texture.h"
+#include "csengine/world.h"
 #include "iimage.h"
 #include "itxtmgr.h"
 
@@ -27,121 +28,82 @@
 
 IMPLEMENT_CSOBJTYPE (csTextureHandle,csObject);
 
-csTextureHandle::csTextureHandle (iImage* image) :
-  csObject (), txt_handle (NULL), for_2d (false), for_3d (true)
+csTextureHandle::csTextureHandle (iImage* Image) :
+  csObject (), handle (NULL), flags (CS_TEXTURE_3D)
 {
-  (ifile = image)->IncRef ();
+  (image = Image)->IncRef ();
   transp_r = -1;
 }
 
 csTextureHandle::csTextureHandle (csTextureHandle &th) :
-  csObject (), txt_handle (NULL)
+  csObject (), handle (NULL)
 {
-  for_2d = th.for_2d;
-  for_3d = th.for_3d;
-  (ifile = th.ifile)->IncRef ();
+  flags = th.flags;
+  (image = th.image)->IncRef ();
   transp_r = th.transp_r;
   transp_g = th.transp_g;
   transp_b = th.transp_b;
-  SetTextureHandle (th.GetTextureHandle ());
+  handle = th.GetTextureHandle ();
   SetName (th.GetName ());
+  if (handle)
+    SetTransparent (transp_r, transp_g, transp_b);
 }
 
 csTextureHandle::~csTextureHandle ()
 {
-  SetTextureHandle (NULL);
-  if (ifile)
-    ifile->DecRef ();
-}
-
-void csTextureHandle::SetTextureHandle (iTextureHandle* h)
-{
-  if (txt_handle)
-    txt_handle->DecRef ();
-  if ((txt_handle = h))
-  {
-    txt_handle->IncRef ();
-    if (transp_r != -1)
-      txt_handle->SetTransparent (transp_r, transp_g, transp_b);
-  }
+  if (handle)
+    handle->DecRef ();
+  if (image)
+    image->DecRef ();
 }
 
 void csTextureHandle::SetTransparent (int red, int green, int blue)
 {
-  if (txt_handle)
-    txt_handle->SetTransparent (red, green, blue);
+  if (handle)
+    if (red >= 0)
+      handle->SetTransparent (red, green, blue);
+    else
+      handle->SetTransparent (false);
   transp_r = red;
   transp_g = green;
   transp_b = blue;
 }
 
-//---------------------------------------------------------------------------
-
-csTextureList::csTextureList ()
+void csTextureHandle::Register (iTextureManager *txtmgr)
 {
-  max_textures = 10;
-  num_textures = 0;
-  CHK (textures = new csTextureHandle* [10]);
+  if (handle) handle->DecRef ();
+
+  // Now we check the size of the loaded image. Having an image, that
+  // is not a power of two will result in strange errors while
+  // rendering. It is by far better to check the format of all textures
+  // already while loading them.
+  if (flags & CS_TEXTURE_3D)
+  {
+    int Width  = image->GetWidth ();
+    int Height = image->GetHeight ();
+
+    if (!IsPowerOf2 (Width) || !IsPowerOf2 (Height))
+      CsPrintf (MSG_WARNING,
+        "Inefficient texture image '%s' dimenstions!\n"
+        "The width (%d) and height (%d) should be a power of two.\n",
+        GetName (), Width, Height);
+  }
+
+  handle = txtmgr->RegisterTexture (image, flags);
+  if (handle)
+    SetTransparent (transp_r, transp_g, transp_b);
 }
+
+//-------------------------------------------------------- csTextureList -----//
 
 csTextureList::~csTextureList ()
 {
-  Clear ();
-  CHK (delete [] textures);
+  DeleteAll ();
 }
 
-void csTextureList::Clear ()
+csTextureHandle *csTextureList::NewTexture (iImage *image)
 {
-  if (textures)
-    for (int i = 0; i < num_textures; i++)
-      CHKB (delete textures[i]);
-  CHK (delete [] textures);
-  max_textures = 10;
-  num_textures = 0;
-  CHK (textures = new csTextureHandle* [10]);
-}
-
-csTextureHandle* csTextureList::NewTexture (iImage* image)
-{
-  CHK (csTextureHandle* tm = new csTextureHandle (image));
-  //if (tm->loaded_correctly ())
-    AddTexture (tm);
+  CHK (csTextureHandle *tm = new csTextureHandle (image));
+  Push (tm);
   return tm;
 }
-
-void csTextureList::AddTexture (csTextureHandle* tm)
-{
-  if (num_textures >= max_textures)
-  {
-    int max_textures = num_textures + 8;
-    CHK (csTextureHandle** newtextures = new csTextureHandle* [max_textures]);
-    if (textures)
-    {
-      memcpy (newtextures, textures, num_textures * sizeof (csTextureHandle*));
-      CHK (delete [] textures);
-    }
-    textures = newtextures;
-  }
-  textures [num_textures++] = tm;
-}
-
-int csTextureList::GetTextureIdx (const char* name)
-{
-  int i;
-  const char* texture_name;
-  for (i = 0 ; i < num_textures ; i++)
-  {
-    texture_name = textures[i]->GetName ();
-    if (texture_name && !strcmp (texture_name, name)) return i;
-  }
-  return -1;
-}
-
-csTextureHandle* csTextureList::GetTextureMM (const char* name)
-{
-  int idx = GetTextureIdx (name);
-  if (idx == -1) return NULL;
-  else return textures[idx];
-}
-
-//---------------------------------------------------------------------------

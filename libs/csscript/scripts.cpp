@@ -17,10 +17,10 @@
 */
 
 #include "sysdef.h"
+#include "cssys/system.h"
 #include "csscript/scripts.h"
 #include "csscript/intscri.h"
 #include "csscript/primscri.h"
-#include "csengine/sysitf.h"
 #include "csobject/nobjvec.h"
 
 //---------------------------------------------------------------------------
@@ -44,13 +44,13 @@ void csScriptList::NewScript (LanguageLayer* layer, char* name, char* params)
   char* par = strchr (params, ':');
   if (!par)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Missing language qualifier for script '%s'!\n", name);
+    System->Printf (MSG_FATAL_ERROR, "Missing language qualifier for script '%s'!\n", name);
     fatal_exit (0, false);
   }
 
   if (Get_Script_List().FindByName (name))
   {
-    CsPrintf (MSG_FATAL_ERROR, "A script with the name '%s' is already defined!\n", name);
+    System->Printf (MSG_FATAL_ERROR, "A script with the name '%s' is already defined!\n", name);
     fatal_exit (0, false);
   }
 
@@ -73,7 +73,7 @@ void csScriptList::NewScript (LanguageLayer* layer, char* name, char* params)
   }
   else
   {
-    CsPrintf (MSG_FATAL_ERROR, "Unknown script qualifier for script '%s'!\n", name);
+    System->Printf (MSG_FATAL_ERROR, "Unknown script qualifier for script '%s'!\n", name);
     fatal_exit (0, false);
     return;
   }

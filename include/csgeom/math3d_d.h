@@ -21,15 +21,11 @@
 #ifndef ___CS_MATH3D_D_H__
 #define ___CS_MATH3D_D_H__
 
-#include <float.h>
 #include "types.h"
 
 #ifndef ABS
 #define ABS(x) ((x)<0?-(x):(x))
 #endif
-
-#undef SMALL_EPSILON
-#define SMALL_EPSILON DBL_EPSILON			/* Very small value */
 
 class csDVector3;
 class csDMatrix3;

@@ -49,8 +49,6 @@ public:
 
   virtual void SetRGB(int i, int r, int g, int b);
 
-  virtual bool BeginDraw ();
-
 private:
   void FillEvents ();
   void printf_Enable (bool Enable);

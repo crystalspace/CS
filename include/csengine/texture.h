@@ -16,13 +16,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#ifndef __TEXTURE_H__
+#define __TEXTURE_H__
 
 #include "types.h"
 #include "csobject/csobject.h"
+#include "csobject/nobjvec.h"
 #include "igraph2d.h"
 
+struct iTextureManager;
 struct iTextureHandle;
 struct iImage;
 
@@ -34,33 +36,28 @@ class csTextureHandle : public csObject
 {
 private:
   /// The corresponding iImage.
-  iImage* ifile;
+  iImage* image;
   /// The handle as returned by iTextureManager.
-  iTextureHandle* txt_handle;
+  iTextureHandle* handle;
   // Transparent color
   int transp_r, transp_g, transp_b;
 
 public:
-  /// On texture registration: register for 2D operations?
-  bool for_2d;
-  /// On texture registration: register for 3D operations?
-  bool for_3d;
+  /// Texture registration flags
+  int flags;
 
   /// Construct a texture handle given a image file
-  csTextureHandle (iImage* image);
+  csTextureHandle (iImage* Image);
   /// Copy contstructor
   csTextureHandle (csTextureHandle &th);
   /// Release texture handle
   virtual ~csTextureHandle ();
 
   /// Get the texture handle.
-  iTextureHandle* GetTextureHandle () { return txt_handle; }
-
-  /// Set the texture handle.
-  void SetTextureHandle (iTextureHandle* h);
+  iTextureHandle* GetTextureHandle () { return handle; }
 
   /// Get the iImage.
-  iImage* GetImageFile () { return ifile; }
+  iImage* GetImageFile () { return image; }
 
   /// Set the transparent color.
   void SetTransparent (int red, int green, int blue);
@@ -69,54 +66,34 @@ public:
   void GetTransparent (int &red, int &green, int &blue)
   { red = transp_r; green = transp_g; blue = transp_b; }
 
+  /// Register the texture with the texture manager
+  void Register (iTextureManager *txtmng);
+
   CSOBJTYPE;
 };
 
-
 /**
- * This class maintains all named textures and their
- * corresponding handles.
+ * This class is used to hold a list of textures.
  */
-class csTextureList
+class csTextureList : public csNamedObjVector
 {
-private:
-  /// List of textures.
-  csTextureHandle** textures;
-  ///
-  int num_textures;
-  ///
-  int max_textures;
-  
-private:
-  ///
-  int GetTextureIdx (const char* name);
-
 public:
-  /// Add a texture
-  void AddTexture (csTextureHandle* tm);
-
-public:
-  ///
-  csTextureList ();
-  ///
+  /// Initialize the array
+  csTextureList () : csNamedObjVector (16, 16)
+  { }
+  /// Destroy every texture in the list
   virtual ~csTextureList ();
 
-  ///
-  void Clear ();
-
   /// Create a new texture.
-  csTextureHandle* NewTexture (iImage* image);
-
-  /// Return number of textures
-  int GetNumTextures () { return num_textures; }
+  csTextureHandle *NewTexture (iImage *image);
 
   /// Return texture by index
-  csTextureHandle* GetTextureMM (int idx) { return textures[idx]; }
+  csTextureHandle *Get (int idx)
+  { return (csTextureHandle *)csNamedObjVector::Get (idx); }
 
-  /// Find a texture given a name.
-  csTextureHandle* GetTextureMM (const char* name);
-  
+  /// Find a texture by name
+  csTextureHandle *FindByName (const char* iName)
+  { return (csTextureHandle *)csNamedObjVector::FindByName (iName); }
 };
 
-
-#endif /*TEXTURE_H*/
+#endif // __TEXTURE_H__

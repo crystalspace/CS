@@ -30,7 +30,7 @@
 #include "ilghtmap.h"
 
 ///
-struct csHighColorCacheData
+struct csGlideCacheData
 {
   /// size this takes up.
   long lSize;
@@ -39,7 +39,7 @@ struct csHighColorCacheData
   /// internal cache data
   void *pData;
   /// linked list
-  csHighColorCacheData *next, *prev;
+  csGlideCacheData *next, *prev;
 };
 
 ///
@@ -55,7 +55,7 @@ protected:
 
   HIGHCOLOR_TYPE type;
   /// the head and tail of the cache data
-  csHighColorCacheData *head, *tail;
+  csGlideCacheData *head, *tail;
 
 protected:
   /// the maximum size of the cache
@@ -86,9 +86,9 @@ protected:
   int bpp;
 
   ///
-  virtual void Load (csHighColorCacheData *d) = 0;
+  virtual void Load (csGlideCacheData *d) = 0;
   ///
-  virtual void Unload (csHighColorCacheData *d) = 0;
+  virtual void Unload (csGlideCacheData *d) = 0;
 };
 
 #endif

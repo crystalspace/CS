@@ -27,6 +27,7 @@
 #include "itexture.h"
 
 class csRect;
+struct iImage;
 
 enum FontType
 {
@@ -106,6 +107,30 @@ struct csPixelFormat
    * </ul>
    */
   int PixelBytes;
+
+  /**
+   * Little helper function to complete a csPixelFormat
+   * structure given that the masks are correctly filled in.
+   */
+  void complete ()
+  {
+    // Exercise caution in the for(;;) loops when computing "shift" and "bits"
+    // to prevent them from looping infinitely.  Some of the 2D drivers
+    // unnecessarily call this method at 8-bit depth with the "masks" set to
+    // zero, so take this special case into account.
+#define COMPUTE(comp)							\
+    {									\
+      unsigned long i, tmp = comp##Mask;				\
+      for (i = 0; tmp && !(tmp & 1); tmp >>= 1, i++) ;			\
+      comp##Shift = i;							\
+      for (i = 0; tmp & 1; tmp >>= 1, i++) ;				\
+      comp##Bits = i;							\
+    }
+    COMPUTE (Red);
+    COMPUTE (Green);
+    COMPUTE (Blue);
+#undef COMPUTE
+  }
 };
 
 /// This structure is used for saving/restoring areas of screen
@@ -118,7 +143,7 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
-SCF_VERSION (iGraphics2D, 0, 0, 3);
+SCF_VERSION (iGraphics2D, 0, 0, 4);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -258,6 +283,9 @@ struct iGraphics2D : public iPlugIn
 
   /// Query pixel R,G,B at given screen location
   virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB) = 0;
+
+  /// Do a screenshot: return a new iImage object
+  virtual iImage *ScreenShot () = 0;
 };
 
 #endif // __IGRAPH2D_H__

@@ -38,7 +38,7 @@ class csWSTexture
   // texture image
   iImage *Image;
   // Will be this texture used for 3D and/or for 2D operations?
-  bool for2D, for3D;
+  int Flags;
   // Red,Green and Blue components of transparent color
   int tr, tg, tb;
   // has texture transparent areas?
@@ -56,7 +56,7 @@ class csWSTexture
 
 public:
   /// Create the 2D texture
-  csWSTexture (const char *iName, iImage *Image, bool i2D, bool i3D);
+  csWSTexture (const char *iName, iImage *Image, int iFlags);
   /// Destroy the texture object
   ~csWSTexture ();
   /// Set texture transparent color
@@ -73,7 +73,7 @@ public:
   void Register (iTextureManager *iTexMan);
   /// Unregister the texture
   void Unregister ();
-  /// Refresh the texture in video memory (do iTexMan->MergeTexture ())
+  /// Refresh the texture in video memory (do iTexMan->PrepareTexture ())
   void Refresh ();
   /// Define texture name
   void SetName (const char *iName);

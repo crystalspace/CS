@@ -18,7 +18,6 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "csengine/sysitf.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
@@ -1653,9 +1652,9 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
 	  csPortal mirror;
 	  mirror.SetSector (GetSector ());
 	  mirror.SetAlpha (10);
-	  float r, g, b;
+	  UByte r, g, b;
 	  GetTextureHandle ()->GetMeanColor (r, g, b);
-	  mirror.SetFilter (r/4, g/4, b/4);
+	  mirror.SetFilter (r/1000., g/1000., b/1000.);
 	  mirror.SetWarp (csTransform::GetReflect ( *(GetPolyPlane ()) ));
 	  mirror.CalculateLighting (new_lview);
         }

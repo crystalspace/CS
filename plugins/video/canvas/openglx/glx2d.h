@@ -33,12 +33,6 @@
 #include <X11/keysymdef.h>
 #include <X11/cursorfont.h>
 
-#ifdef DO_SHM
-#  include <X11/extensions/XShm.h>
-#  include <sys/ipc.h>
-#  include <sys/shm.h>
-#endif /* DO_SHM */
-
 /// XLIB version.
 class csGraphics2DGLX : public csGraphics2DGLCommon
 {
@@ -47,7 +41,6 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   int screen_num;
   int display_width, display_height;
   Window window;
-  XImage* xim;
   GC gc;
   XVisualInfo *active_GLVisual;
   GLXContext active_GLContext;
@@ -60,13 +53,6 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   
   // Window colormap
   Colormap cmap;
-
-  // Use SHM or not?
-  bool do_shm;
-#ifdef DO_SHM
-  XShmSegmentInfo shmi;
-  XImage shm_image;
-#endif
 
   // Hardware mouse cursor or software emulation?
   bool do_hwmouse;
@@ -88,11 +74,7 @@ public:
   virtual bool Open (const char *Title);
   virtual void Close ();
 
-  virtual bool BeginDraw () { return (Memory != NULL); }
-
   virtual void Print (csRect *area = NULL);
-
-  // All graphics functions are inherited from csGraphics2DGLCommon
 
   /// Set mouse position.
   virtual bool SetMousePosition (int x, int y);

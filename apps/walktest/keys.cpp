@@ -147,7 +147,7 @@ void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
 void load_sprite (char *filename, char *templatename, char* txtname)
 {
   // First check if the texture exists.
-  if (!Sys->view->GetWorld ()->GetTextures ()->GetTextureMM (txtname))
+  if (!Sys->view->GetWorld ()->GetTextures ()->FindByName (txtname))
   {
     Sys->Printf (MSG_CONSOLE, "Couldn't find texture '%s' in memory!\n", txtname);
     return;

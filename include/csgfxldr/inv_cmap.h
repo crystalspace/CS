@@ -33,6 +33,8 @@
 #ifndef __INV_CMAP_H__
 #define __INV_CMAP_H__
 
+#include "rgbpixel.h"
+
 /**
  * <pre>
  * Compute an inverse colormap efficiently.
@@ -42,14 +44,16 @@
  *      rbits, gbits, bbits:
  * 			Number of quantization bits.  The inverse
  * 			colormap will have N=(2^rbits)*(2^gbits)*(2^bbits)
- *                       entries.
- * 	dist_buf:	An array of N long integers to be
- * 			used as scratch space.
+ *                      entries.
+ * 	dist_buf:	An array of N long integers to be used as scratch
+ * 			space. If NULL, the dist_buff will be allocated
+ *                      and freed before exiting the routine.
  * Outputs:
  * 	rgbmap:		The output inverse colormap.  The entry
  * 			rgbmap[(r<<(gbits+bbits)) + (g<<bbits) + b]
  * 			is the colormap entry that is closest to the
- * 			(quantized) color (r,g,b).
+ * 			(quantized) color (r,g,b). If NULL, it will be
+ *                      allocated with "new UByte * []"
  * Assumptions:
  * 	Quantization is performed by right shift (low order bits are
  * 	truncated).  Thus, the distance to a quantized color is
@@ -73,8 +77,14 @@
  * 	where K = colors, and N = 2^bits.
  * </pre>
  */
-extern void inv_cmap (int colors, unsigned char *colormap[3],
-  int rbits, int gbits, int bbits, unsigned long *dist_buf,
-  unsigned char *rgbmap);
+/**
+ * BUGBUG: For some unknown reason the routine generates colormaps shifted
+ * towards red if green is bigger than red (and vice versa, shifted to green
+ * if red is bigger). Thus it is adviced to use same resolution for R and G.
+ * If someone can find out why it happens, he is free to do it -- A.Z.
+ */
+extern void csInverseColormap (int colors, RGBPixel *colormap,
+  int rbits, int gbits, int bbits, UByte *&rgbmap,
+  ULong *dist_buf = NULL);
 
 #endif // __INV_CMAP_H__

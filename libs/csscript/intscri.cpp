@@ -17,9 +17,9 @@
 */
 
 #include "sysdef.h"
-#include "csengine/sysitf.h"
 #include "csscript/intscri.h"
 #include "csutil/scanstr.h"
+#include "cssys/system.h"
 
 //---------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ void IntScriptRegister::reg (char* name, IntScriptFunc* func)
 {
   if (find_function (name))
   {
-    CsPrintf (MSG_FATAL_ERROR, "There is already a function registered with the name '%s'!\n", name);
+    System->Printf (MSG_FATAL_ERROR, "There is already a function registered with the name '%s'!\n", name);
     fatal_exit (0, true);
     return; // if fatal_exit returns
   }
@@ -91,7 +91,7 @@ void IntScript::load (char* buf)
   func = int_script_reg.find_function (str);
   if (!func)
   {
-    CsPrintf (MSG_FATAL_ERROR, "There is no registered function with the name '%s'!\n", str);
+    System->Printf (MSG_FATAL_ERROR, "There is no registered function with the name '%s'!\n", str);
     fatal_exit (0, true);
     return; // if fatal_exit returns
   }

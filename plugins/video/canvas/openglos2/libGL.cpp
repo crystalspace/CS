@@ -71,23 +71,24 @@ bool glApp::ProcessQueuedMessages ()
 
 HWND glApp::CreateWindow (const char *Title, HMODULE ModID, ULONG ResID, ULONG Flags)
 {
-#define GL_WINDOW_CLASS	(PSZ)"OpenGLview"
+  const PSZ gl_window_class = (PSZ)"OpenGLview";
   ULONG flStyle;
   HWND hwndFR, hwndCL;
 
-  if (!WinRegisterClass (AB, GL_WINDOW_CLASS, NULL, CS_MOVENOTIFY, sizeof (void *)))
+  if (!WinRegisterClass (AB, gl_window_class, NULL,
+         CS_SIZEREDRAW | CS_MOVENOTIFY, sizeof (void *)))
     return 0;
 
-  flStyle = Flags | FCF_DLGBORDER | FCF_AUTOICON;
+  flStyle = Flags | FCF_SIZEBORDER | FCF_AUTOICON;
   if (flStyle & FCF_SYSMENU)
     flStyle = flStyle | FCF_MENU;
   if (flStyle & FCF_TITLEBAR)
-    flStyle = flStyle | FCF_SYSMENU | FCF_MINBUTTON;
+    flStyle = flStyle | FCF_SYSMENU | FCF_MINBUTTON | FCF_MAXBUTTON;
   if (Title)
     flStyle = flStyle | FCF_TASKLIST;
 
   hwndFR = WinCreateStdWindow (HWND_DESKTOP, FS_NOBYTEALIGN, &flStyle,
-    GL_WINDOW_CLASS, (PSZ)Title, 0, ModID, ResID, &hwndCL);
+    gl_window_class, (PSZ)Title, 0, ModID, ResID, &hwndCL);
   if (hwndFR)
   {
     // Keep track of all windows we created
@@ -139,8 +140,10 @@ glWindow::glWindow (long Width, long Height, long ContextFlags)
 {
   lastError = glerOK;
   fMinimized = false;
+  fAspect = false;
   fPause = true;
   fMouseVisible = true;
+  fFullScreen = false;
   MouseCursorID = SPTR_ARROW;
   ActiveBuffer = 0;
   MouseButtonMask = 0;
@@ -160,8 +163,9 @@ glWindow::glWindow (long Width, long Height, long ContextFlags)
   hFocus = NULL;
   fSwapBuffers = false;
   fRedrawDisabled = false;
-  RedrawFailedCount = 9999;
   hpal = NULLHANDLE;
+  ScreenW = WinQuerySysValue (HWND_DESKTOP, SV_CXSCREEN);
+  ScreenH = WinQuerySysValue (HWND_DESKTOP, SV_CYSCREEN);
 
   if (DosCreateEventSem (NULLHANDLE, &sRedrawComplete, 0, FALSE))
   {
@@ -211,9 +215,6 @@ bool glWindow::Bind (HWND winHandle)
 
   OldClientWindowProc = WinSubclassWindow (hwndCL, &ClientHandler);
   OldFrameWindowProc = WinSubclassWindow (hwndFR, &FrameHandler);
-
-  // Set window to any size - client window handler will resize it as needed
-  WinSetWindowPos (hwndFR, HWND_TOP, 0, 0, 300, 300, SWP_SIZE);
 
   // Find a suitable visual
   int attributes [20];
@@ -303,6 +304,19 @@ bool glWindow::Show (bool Visible)
     Visible ? SWP_SHOW | SWP_ACTIVATE : SWP_HIDE);
 }
 
+// Black magic: shake window a bit so that OpenGL can catch its size/position
+bool glWindow::Reset ()
+{
+  SWP swp;
+  if (!WinQueryWindowPos (hwndFR, &swp))
+    return false;
+  if (!WinSetWindowPos (hwndFR, HWND_TOP, swp.x - 1, swp.y, swp.cx, swp.cy,
+    SWP_SIZE | SWP_MOVE))
+    return false;
+  return WinSetWindowPos (hwndFR, HWND_TOP, swp.x, swp.y, swp.cx, swp.cy,
+    SWP_SIZE | SWP_MOVE);
+}
+
 bool glWindow::SetPos (long X, long Y)
 {
   SWP swp;
@@ -367,48 +381,19 @@ MRESULT glWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2
   switch (Message)
   {
     case WM_PAINT:
-      if (!fRedrawDisabled)
-        if (fSwapBuffers)
-        {
-          RedrawFailedCount = 0;
-          fSwapBuffers = false;
-          FrameCount++;
-          glFlush ();
-          pglWaitGL (glAB);
-          pglWaitPM (glAB);
-          if (viscfg->doubleBuffer)
-          {
-            pglSwapBuffers (glAB, hwndCL);
-            ActiveBuffer ^= 1;
-          }
-          DosPostEventSem (sRedrawComplete);
-          return OldClientWindowProc (hwndCL, Message, MsgParm1, MsgParm2);
-        }
-        else
-        {
-          RedrawFailedCount++;
-          if (RedrawFailedCount > 10)
-          {
-            HPS hps = WinBeginPaint (hwndCL, NULLHANDLE, NULL);
-            GpiSetBackColor (hps, CLR_BLACK);
-            POINTL p;
-            p.x = 0; p.y = 0;
-            GpiMove (hps, &p);
-            p.x = 9999; p.y = 9999;
-            GpiBox (hps, DRO_FILL, &p, 0, 0);
-            WinEndPaint (hps);
-            return (MRESULT)TRUE;
-          }
-        }
-      return OldClientWindowProc (hwndCL, Message, MsgParm1, MsgParm2);
-    case WM_VRNDISABLED:
-      fRedrawDisabled = true;
-      return 0;
-    case WM_VRNENABLED:
-      fRedrawDisabled = false;
+      FrameCount++;
+      glFlush ();
       if (fSwapBuffers)
-        WinInvalidateRect (hwndCL, NULL, FALSE);
-      return 0;
+      {
+        fSwapBuffers = false;
+        if (viscfg->doubleBuffer)
+        {
+          pglSwapBuffers (glAB, hwndCL);
+          ActiveBuffer ^= 1;
+        }
+      }
+      DosPostEventSem (sRedrawComplete);
+      return OldClientWindowProc (hwndCL, Message, MsgParm1, MsgParm2);
     case WM_COMMAND:
       switch ((USHORT) MsgParm1)
       {
@@ -429,14 +414,22 @@ MRESULT glWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2
             WinSetWindowPos (hwndFR, HWND_TOP, swp.x, DesktopH - swp.cy, 0, 0, SWP_MOVE);
           return 0;
         case cmdAlignCenter:
-          if (WinQueryWindowPos (hwndFR, &swp))
-            WinSetWindowPos (hwndFR, HWND_TOP, (DesktopW - swp.cx) / 2, (DesktopH - swp.cy) / 2, 0, 0, SWP_MOVE);
+          Resize (-1, -1, true);
           return 0;
         case cmdPause:
           Pause (!fPause);
           return 0;
         case cmdToggleMouse:
           MouseVisible (!fMouseVisible);
+          return 0;
+        case cmdFullScreen:
+          FullScreen (!fFullScreen);
+          return 0;
+        case cmdToggleAspect:
+          MaintainAspectRatio (!fAspect);
+          if (fAspect)
+            if (WinQueryWindowPos (hwndCL, &swp))
+              Resize (swp.cx, swp.cy, false);
           return 0;
         default:
           return OldClientWindowProc (hwndCL, Message, MsgParm1, MsgParm2);
@@ -523,27 +516,130 @@ MRESULT glWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2)
     case WM_ADJUSTWINDOWPOS:
     {
       PSWP swp;
+      SWP oldpos;
+      MRESULT res;
+      bool cLS, cRS, cBS, cTS;
+      RECTL r;
 
       swp = (PSWP) MsgParm1;
-      // don't allow window to be resized or maximized
-      if (swp->fl & SWP_MAXIMIZE)
-        swp->fl &= ~SWP_MAXIMIZE;
-      if (swp->fl & SWP_SIZE)
+
+      if (swp->fl & (SWP_MAXIMIZE | SWP_MINIMIZE | SWP_RESTORE))
+        FullScreen (false);
+
+      if (fFullScreen)
       {
-        RECTL r;
-        r.xLeft = 0; r.xRight = BufferW;
-        r.yBottom = 0; r.yTop = BufferH;
-        WinCalcFrameRect (hwndCL, &r, FALSE);
-        swp->cx = r.xRight - r.xLeft;
-        swp->cy = r.yTop - r.yBottom;
+        r.xLeft = 0;
+        r.xRight = ScreenW;
+        r.yBottom = 0;
+        r.yTop = ScreenH;
+        if (WinCalcFrameRect (hwndFR, &r, FALSE))
+        {
+          if (swp->fl & SWP_SIZE)
+          {
+            swp->cx = r.xRight - r.xLeft;
+            swp->cy = r.yTop - r.yBottom;
+          }
+          if (swp->fl & SWP_MOVE)
+          {
+            swp->x = r.xLeft;
+            swp->y = r.yBottom;
+          }
+        }
+      }
+      if ((swp->fl & SWP_SIZE) && !fMinimized)
+      {
+        WinQueryWindowPos (hwndFR, &oldpos);
+        cLS = (oldpos.x == swp->x);
+        cRS = ((oldpos.x + oldpos.cx) == (swp->x + swp->cx));
+        cBS = (oldpos.y == swp->y);
+        cTS = ((oldpos.y + oldpos.cy) == (swp->y + swp->cy));
+      } else
+      {
+        cLS = false;
+        cRS = false;
+        cBS = false;
+        cTS = false;
       }
 
-      MRESULT res = OldFrameWindowProc (hwndFR, Message, MsgParm1, MsgParm2);
+      res = OldFrameWindowProc (hwndFR, Message, MsgParm1, MsgParm2);
 
-      if ((long) res & AWP_MINIMIZED)
-        fMinimized = true;
-      if ((long) res & AWP_RESTORED)
+      if ((long) res & AWP_MAXIMIZED)
+      {
         fMinimized = false;
+        cLS = false;
+        cRS = false;
+        cBS = false;
+        cTS = false;
+      }
+      if ((long) res & AWP_MINIMIZED)
+      {
+        fMinimized = true;
+        cLS = false;
+        cRS = false;
+        cBS = false;
+        cTS = false;
+      }
+      if ((long) res & AWP_RESTORED)
+      {
+        fMinimized = false;
+        cLS = false;
+        cRS = false;
+        cBS = false;
+        cTS = false;
+      }
+      if ((swp->fl & SWP_SIZE) && !fMinimized)
+      {
+        // Adjust window aspect ratio
+        if (fAspect && !fFullScreen)
+        {
+          r.xLeft = 0;
+          r.xRight = swp->cx;
+          r.yBottom = 0;
+          r.yTop = swp->cy;
+          WinCalcFrameRect (hwndFR, &r, TRUE);
+          r.xRight -= r.xLeft;
+          r.yTop -= r.yBottom;
+          AdjustAspectRatio (&r.xRight, &r.yTop);
+          r.xLeft = 0;
+          r.yBottom = 0;
+          WinCalcFrameRect (hwndFR, &r, false);
+          swp->cx = r.xRight - r.xLeft;
+          swp->cy = r.yTop - r.yBottom;
+        }
+        // Check for lowest size limit
+        r.xLeft = swp->x;
+        r.xRight = swp->x + swp->cx;
+        r.yBottom = swp->y;
+        r.yTop = swp->y + swp->cy;
+        WinCalcFrameRect (hwndFR, &r, TRUE);
+
+        r.xRight -= r.xLeft;
+        if (r.xRight < BufferW / 2 && r.xRight > 0)
+          r.xRight = BufferW / 2;
+        r.xRight += r.xLeft;
+
+        r.yTop -= r.yBottom;
+        if (r.yTop < BufferH / 2 && r.yTop > 0)
+          r.yTop = BufferH / 2;
+        r.yTop += r.yBottom;
+
+        WinCalcFrameRect (hwndFR, &r, FALSE);
+        swp->x = r.xLeft;
+        swp->cx = r.xRight - r.xLeft;
+        swp->y = r.yBottom;
+        swp->cy = r.yTop - r.yBottom;
+
+        // Check for unmovable bounds
+        if (cLS)
+          swp->x = oldpos.x;
+        else if (cRS)
+          swp->x = oldpos.x + oldpos.cx - swp->cx;
+
+        if (cBS)
+          swp->y = oldpos.y;
+        else if (cTS)
+          swp->y = oldpos.y + oldpos.cy - swp->cy;
+      }
       return res;
     }
     case WM_ACTIVATE:
@@ -562,6 +658,85 @@ MRESULT glWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2)
     default:
       return OldFrameWindowProc (hwndFR, Message, MsgParm1, MsgParm2);
   }
+}
+
+bool glWindow::Resize (long Width, long Height, bool Center)
+{
+  SWP swp;
+  RECTL r;
+
+  if (!WinQueryWindowPos (hwndFR, &swp))
+    return false;
+  r.xLeft = swp.x;
+  r.xRight = swp.x + swp.cx;
+  r.yBottom = swp.y;
+  r.yTop = swp.y + swp.cy;
+  if (!WinCalcFrameRect (hwndFR, &r, TRUE))
+    memset (&r, 0, sizeof (r));
+
+  if (!fFullScreen)
+  {
+    if ((Width >= 0) && (Height >= 0))
+    {
+      AdjustAspectRatio (&Width, &Height);
+      r.xRight = r.xLeft + Width;
+      r.yTop = r.yBottom + Height;
+    }
+    if (Center)
+    {
+      swp.cx = r.xRight - r.xLeft;
+      swp.cy = r.yTop - r.yBottom;
+      r.xLeft = (ScreenW - swp.cx) / 2;
+      r.yBottom = (ScreenH - swp.cy) / 2;
+      r.xRight = r.xLeft + swp.cx;
+      r.yTop = r.yBottom + swp.cy;
+    }
+    if (!WinCalcFrameRect (hwndFR, &r, FALSE))
+      return false;
+  }
+  return WinSetWindowPos (hwndFR, NULLHANDLE, r.xLeft, r.yBottom,
+    r.xRight - r.xLeft, r.yTop - r.yBottom,
+    SWP_SIZE | SWP_MOVE);
+}
+
+bool glWindow::AdjustAspectRatio (long *Width, long *Height)
+{
+  if (!fAspect || fFullScreen)
+    return true;
+  ULONG K = ((*Width << 16) / BufferW + (*Height << 16) / BufferH) / 2;
+
+  *Width = (BufferW * K) >> 16;
+  *Height = (BufferH * K) >> 16;
+  if (*Width > ScreenW)
+  {
+    *Height = (*Height * ScreenW) / *Width;
+    *Width = ScreenW;
+  }
+  if (*Height > ScreenH)
+  {
+    *Width = (*Width * ScreenH) / *Height;
+    *Height = ScreenH;
+  }
+  return true;
+}
+
+bool glWindow::FullScreen (bool State)
+{
+  if (fFullScreen != State)
+    switch (State)
+    {
+      case false:
+        fFullScreen = false;
+        WinSetWindowPos (hwndFR, NULLHANDLE, swpFullScreen.x, swpFullScreen.y,
+          swpFullScreen.cx, swpFullScreen.cy, SWP_MOVE | SWP_SIZE);
+        break;
+      case true:
+        WinQueryWindowPos (hwndFR, &swpFullScreen);
+        fFullScreen = true;
+        Resize (-1, -1, false);
+        break;
+    }
+  return true;
 }
 
 bool glWindow::DisableAccelTable ()

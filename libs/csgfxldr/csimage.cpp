@@ -221,8 +221,11 @@ void csImageFile::free_image ()
   Image = NULL; Palette = NULL; Alpha = NULL;
 }
 
-void csImageFile::Resize (int newwidth, int newheight)
+void csImageFile::Rescale (int newwidth, int newheight)
 {
+  if (newwidth == Width && newheight == Height)
+    return;
+
   // This is a quick and dirty algorithm and it doesn't do funny things
   // such as blending multiple pixels together or bilinear filtering,
   // just a rough scale. It could be improved by someone in the future.
@@ -347,7 +350,7 @@ iImage *csImageFile::MipMap (int steps, RGBPixel *transp)
       break;
   }
 
-  nimg->convert_rgb (mipmap);
+  nimg->convert_rgba (mipmap);
 
   return nimg;
 }
@@ -381,9 +384,13 @@ int csImageFile::closest_index (RGBPixel *iColor)
   return closest_idx;
 }
 
-void csImageFile::convert_rgb (RGBPixel *iImage)
+void csImageFile::convert_rgba (RGBPixel *iImage)
 {
   int pixels = Width * Height;
+
+  if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
+    Format = (Format & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR;
+
   switch (Format & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_NONE:
@@ -410,8 +417,15 @@ void csImageFile::convert_rgb (RGBPixel *iImage)
   }
 }
 
-void csImageFile::convert_8bit(UByte *iImage, RGBPixel *iPalette, int /*npal*/)
+void csImageFile::convert_pal8 (UByte *iImage, RGBPixel *iPalette,
+  int /*nPalColors*/)
 {
+  if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
+    Format = (Format & ~CS_IMGFMT_MASK) | CS_IMGFMT_PALETTED8;
+
+  if ((Format & CS_IMGFMT_ALPHA) && !Alpha)
+    Format &= ~CS_IMGFMT_ALPHA;
+
   int pixels = Width * Height;
   switch (Format & CS_IMGFMT_MASK)
   {
@@ -431,8 +445,21 @@ void csImageFile::convert_8bit(UByte *iImage, RGBPixel *iPalette, int /*npal*/)
         out = (RGBPixel *)Image;
       else
         Image = out = new RGBPixel [pixels];
-      while (pixels--)
-        *out++ = iPalette [*in++];
+
+      if (Format & CS_IMGFMT_ALPHA)
+      {
+        UByte *a = Alpha;
+        while (pixels--)
+        {
+          *out = iPalette [*in++];
+          out->alpha = *a++;
+          out++;
+        }
+      }
+      else
+        while (pixels--)
+          *out++ = iPalette [*in++];
+      delete [] Alpha; Alpha = NULL;
       delete [] iImage;
       delete [] iPalette;
       break;
@@ -441,19 +468,84 @@ void csImageFile::convert_8bit(UByte *iImage, RGBPixel *iPalette, int /*npal*/)
   if ((Format & CS_IMGFMT_ALPHA)
    && ((Format & CS_IMGFMT_MASK) != CS_IMGFMT_TRUECOLOR)
    && !Alpha)
-  {
-    // Allocate an dummy alpha channel
-    int pixels = Width * Height;
-    if (!Alpha)
-      Alpha = new UByte [pixels];
-    memset (Alpha, 255, pixels * sizeof (UByte));
-  } /* endif */
+    Format &= ~CS_IMGFMT_ALPHA;
 }
 
-void csImageFile::convert_8bit(UByte *iImage,RGBcolor *iPalette,int nPalColors)
+void csImageFile::convert_pal8 (UByte *iImage, RGBcolor *iPalette, int nPalColors)
 {
   RGBPixel *newpal = new RGBPixel [256];
   for (int i = 0; i < nPalColors; i++) // Default RGBPixel constructor ensures
     newpal [i] = iPalette [i];         // palette past nPalColors is sane.
-  convert_8bit (iImage, newpal);
+  convert_pal8 (iImage, newpal);
+}
+
+void csImageFile::SetFormat (int iFormat)
+{
+  int pixels = Width * Height;
+  int oldformat = Format;
+  void *oldimage = Image;
+  Image = NULL;
+  Format = iFormat;
+
+  if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+    convert_rgba ((RGBPixel *)oldimage);
+  else if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+  {
+    if ((Format & CS_IMGFMT_ALPHA) && !Alpha)
+      Alpha = new UByte [pixels];
+    convert_pal8 ((UByte *)oldimage, Palette);
+  }
+  else if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_NONE)
+  {
+    if ((Format & CS_IMGFMT_ALPHA) && !Alpha)
+      Alpha = new UByte [pixels];
+    if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+      Image = new UByte [pixels];
+    else if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+      Image = new RGBPixel [pixels];
+  }
+}
+
+iImage *csImageFile::Clone ()
+{
+  CHK (csImageFile* nimg = new csImageFile (Format));
+  nimg->Width = Width;
+  nimg->Height = Height;
+  nimg->fName = NULL;
+  nimg->Format = Format;
+  nimg->Image = NULL;
+  nimg->Palette = NULL;
+  nimg->Alpha = NULL;
+
+  int pixels = Width * Height;
+  if (Alpha)
+  {
+    nimg->Alpha = new UByte [pixels];
+    memcpy (nimg->Alpha, Alpha, pixels);
+  }
+
+  if (Palette)
+  {
+    nimg->Palette = new RGBPixel [256];
+    memcpy (nimg->Palette, Palette, 256 * sizeof (RGBPixel));
+  }
+
+  if (Image)
+  {
+    switch (Format & CS_IMGFMT_MASK)
+    {
+      case CS_IMGFMT_NONE:
+        break;
+      case CS_IMGFMT_PALETTED8:
+        nimg->Image = new UByte [pixels];
+        memcpy (nimg->Image, Image, pixels);
+        break;
+      case CS_IMGFMT_TRUECOLOR:
+        nimg->Image = new RGBPixel [pixels];
+        memcpy (nimg->Image, Image, pixels * sizeof (RGBPixel));
+        break;
+    }
+  }
+
+  return nimg;
 }

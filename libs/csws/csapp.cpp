@@ -187,7 +187,7 @@ void csApp::Update ()
 }
 
 bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
-  bool i2D, bool i3D)
+  int iFlags)
 {
   TOKEN_TABLE_START (texcommands)
     TOKEN_TABLE (FILE)
@@ -234,7 +234,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
     txtmgr->GetTextureFormat ());
   CHK (delete [] fbuffer);
 
-  csWSTexture *tex = new csWSTexture (iTexName, image, i2D, i3D);
+  csWSTexture *tex = new csWSTexture (iTexName, image, iFlags);
   image->DecRef ();
   if (transp)
     tex->SetTransparent (QInt (tr * 255.), QInt (tg * 255.), QInt (tb * 255.));
@@ -291,7 +291,7 @@ void csApp::LoadConfig ()
         break;
       }
       case TOKEN_TEXTURE:
-        LoadTexture (name, params, true, false);
+        LoadTexture (name, params, CS_TEXTURE_2D);
         break;
       default:
         printf (MSG_FATAL_ERROR, "Unknown token in csws.cfg! (%s)\n", cfg);
@@ -305,7 +305,7 @@ void csApp::PrepareTextures ()
   iTextureManager *txtmgr = System->G3D->GetTextureManager ();
 
   // Clear all textures from texture manager
-  txtmgr->Initialize ();
+  txtmgr->ResetPalette ();
 
   // Create a uniform palette: r(3)g(3)b(2)
   int r,g,b;
@@ -319,9 +319,9 @@ void csApp::PrepareTextures ()
     Textures.Get (i)->Register (txtmgr);
 
   // Prepare all the textures.
-  txtmgr->Prepare ();
-  // Allocate a common palette for texture (256-color mode)
-  txtmgr->AllocPalette ();
+  txtmgr->PrepareTextures ();
+  // Set the palette (256-color mode)
+  txtmgr->SetPalette ();
   // Look in palette for colors we need for windowing system
   SetupPalette ();
   // Finally, set up mouse pointer images

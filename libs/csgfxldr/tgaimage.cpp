@@ -203,7 +203,7 @@ bool ImageTgaFile::Load (UByte* iBuffer, ULong iSize)
   set_dimensions (cols, rows);
 
   // @@todo: avoid converting colormapped images into RGB,
-  // instead pass a pointer to convert_8bit
+  // instead pass a pointer to convert_pal8
   RGBPixel *pixels = new RGBPixel [Width * Height];
 
   truerow = 0;
@@ -228,7 +228,7 @@ bool ImageTgaFile::Load (UByte* iBuffer, ULong iSize)
   }
 
   // Convert image from RGB to requested format
-  convert_rgb (pixels);
+  convert_rgba (pixels);
   return true;
 }
 

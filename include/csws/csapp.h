@@ -131,7 +131,7 @@ public:
 
   /// Add a single texture to application's texture list
   bool LoadTexture (const char *iTexName, const char *iTexParams,
-    bool i2D, bool i3D);
+    int iFlags);
 
   /// Prepare textures for usage (register them with the graphics driver)
   virtual void PrepareTextures ();

@@ -19,7 +19,6 @@
 #include "sysdef.h"
 #include "csscript/csscript.h"
 #include "csscript/trigger.h"
-#include "csengine/sysitf.h"
 #include "csengine/cscoll.h"
 #include "csengine/thing.h"
 #include "csengine/light.h"

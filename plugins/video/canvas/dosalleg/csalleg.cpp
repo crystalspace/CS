@@ -95,7 +95,7 @@ bool csGraphics2DDOSAlleg::Initialize (iSystem *pSystem)
       pfmt.PixelBytes = 4;
       break;
   }
-  complete_pixel_format();
+  pfmt.complete ();
   return true;
 }
 
@@ -198,9 +198,4 @@ void csGraphics2DDOSAlleg::SetRGB (int i, int r, int g, int b)
 {
   csGraphics2D::SetRGB (i, r, g, b);
   PaletteChanged = true;
-}
-
-bool csGraphics2DDOSAlleg::BeginDraw ()
-{
-  return csGraphics2D::BeginDraw ();
 }

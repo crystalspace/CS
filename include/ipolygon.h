@@ -27,6 +27,7 @@ struct iPolygonTexture;
 struct iTextureContainer;
 struct iTextureMap;
 struct iTextureHandle;
+class csBitSet;
 
 // forward declarations
 struct iPolygon3D;
@@ -41,7 +42,7 @@ struct iPolygonSet : public iBase
   virtual const char *GetObjectName () = 0;
 };
 
-SCF_VERSION (iPolygon3D, 0, 0, 1);
+SCF_VERSION (iPolygon3D, 0, 0, 2);
 
 /// temporary - subject to change
 struct iPolygon3D : public iBase
@@ -67,7 +68,7 @@ SCF_VERSION (iPolygonTexture, 0, 0, 1);
 /// temporary - subject to change
 struct iPolygonTexture : public iBase
 {
-  ///
+  /// Get the texture handle associated with this polygon
   virtual iTextureHandle *GetTextureHandle () = 0;
   ///
   virtual float GetFDU () = 0;
@@ -83,11 +84,6 @@ struct iPolygonTexture : public iBase
   virtual int GetShiftU () = 0;
   ///
   virtual int GetSize () = 0;
-
-  ///
-  virtual void *GetTCacheData () = 0;
-  ///
-  virtual void SetTCacheData (void *iCache) = 0;
 
   ///
   virtual int GetNumPixels () = 0;
@@ -106,14 +102,31 @@ struct iPolygonTexture : public iBase
 
   ///
   virtual iPolygon3D *GetPolygon () = 0;
-  ///
+  /**
+   * Recalculate all pseudo and real dynamic lights if the
+   * texture is dirty. The function returns true if there
+   * was a recalculation (then the texture needs to be removed
+   * from the texture cache).
+   */
   virtual bool RecalculateDynamicLights () = 0;
-  ///
+  /**
+   * Create the dirty matrix if needed. This function will also check
+   * if the dirty matrix has the right size. If not it will recreate it.
+   * The dirty matrix is used in combination with the sub-texture optimization.
+   * If recreation of the dirty matrix was needed it will be made all dirty.
+   */
   virtual void CreateDirtyMatrix () = 0;
-  ///
+  /**
+   * Make the dirty matrix completely dirty.
+   */
   virtual void MakeAllDirty () = 0;
-  ///
-  virtual bool CleanIfDirty (int lu, int lv) = 0;
+  /**
+   * Check if there are any dirty lightmap cells, and clean the dirty
+   * matrix in the corresponding places if so. Returns true if there are
+   * any coincident bits in both bit sets (and thus we need to compute
+   * any lightmap cells in texture cache).
+   */
+  virtual bool CleanIfDirty (csBitSet *bs) = 0;
 
   /// 
   virtual iLightMap *GetLightMap () = 0;
@@ -124,6 +137,10 @@ struct iPolygonTexture : public iBase
   virtual int GetSubtexSize () = 0;
   ///
   virtual bool GetDynlightOpt () = 0;
+  /// Get data used internally by texture cache
+  virtual void *GetCacheData () = 0;
+  /// Set data used internally by texture cache
+  virtual void SetCacheData (void *d) = 0;
 };
 
 #endif

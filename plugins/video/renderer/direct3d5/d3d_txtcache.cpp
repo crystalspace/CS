@@ -78,7 +78,7 @@ else mean = total_size/num;
   CsPrintf (MSG_CONSOLE, "Bytes per texture: %d\n", mean);*/
 }
 
-void D3DTextureCache::Load(csHighColorCacheData *d)
+void D3DTextureCache::Load(csD3DCacheData *d)
 {
   D3DTextureCache_Data* cached_texture;
   DDSCAPS ddsCaps;
@@ -376,7 +376,7 @@ void D3DTextureCache::LoadIntoVRAM(D3DTextureCache_Data *tex)
   tex->htex = htex;
 }
 
-void D3DTextureCache::Unload(csHighColorCacheData *d)
+void D3DTextureCache::Unload(csD3DCacheData *d)
 {
   D3DTextureCache_Data *t = (D3DTextureCache_Data *)d->pData;
   if (!t) return;
@@ -427,7 +427,7 @@ else mean = total_size/num;
   CsPrintf (MSG_CONSOLE, "Bytes per lightmap: %d\n", mean);*/
 }
 
-void D3DLightMapCache::Load(csHighColorCacheData *d)
+void D3DLightMapCache::Load(csD3DCacheData *d)
 {
   CHK (D3DLightCache_Data *cached_texture = new D3DLightCache_Data);
   d->pData = cached_texture;
@@ -617,7 +617,7 @@ void D3DLightMapCache::LoadIntoVRAM(D3DLightCache_Data *tex)
   tex->htex = htex;
 }
 
-void D3DLightMapCache::Unload(csHighColorCacheData *d)
+void D3DLightMapCache::Unload(csD3DCacheData *d)
 {
   D3DTextureCache_Data *t = (D3DTextureCache_Data *)d->pData;
   if (!d->pData)

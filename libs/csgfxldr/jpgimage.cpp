@@ -190,13 +190,14 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
   jerr.pub.error_exit = my_error_exit;
   if (setjmp (jerr.setjmp_buffer))
   {
-#if 0
+#if 1
     // We dont actually need this as we want to know
     // just whenever a error occured or not
     char errmsg [256];
-    (*cinfo->err->format_message) (cinfo,errmsg);
+    cinfo.err->format_message ((jpeg_common_struct *)&cinfo, errmsg);
+    fprintf (stderr, "%s\n", errmsg);
 #endif
-    jpeg_destroy_decompress(&cinfo);
+    jpeg_destroy_decompress (&cinfo);
     return false;
   }
 
@@ -216,10 +217,11 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
     cinfo.two_pass_quantize = TRUE;
     cinfo.dither_mode = JDITHER_NONE; /* JDITHER_FS? transparency problems */
     cinfo.quantize_colors = TRUE;
-    cinfo.desired_number_of_colors = 255;
+    cinfo.desired_number_of_colors = 256;
   }
-  // We always want RGB output (no grayscale, yuv etc)
-  cinfo.out_color_space = JCS_RGB;
+  // We almost always want RGB output (no grayscale, yuv etc)
+  if (cinfo.jpeg_color_space != JCS_GRAYSCALE)
+    cinfo.out_color_space = JCS_RGB;
 
   // Recalculate output image dimensions
   jpeg_calc_output_dimensions (&cinfo);
@@ -235,14 +237,12 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
    */
 
   set_dimensions (cinfo.output_width, cinfo.output_height);
-  // We allocate a little more memory than is actually needed, because 
-  // the jpeg lib will write a little further than it is supposed to.
-  // (At least on Win32) In theory w*h would be enough!
-  int pixelcount = (Width + 1) * (Height + 1);
-  if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
-    CHKB (Image = new RGBPixel [pixelcount])
+
+  int pixelcount = Width * Height;
+  if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+    CHKB (Image = new UByte [pixelcount])
   else
-    CHKB (Image = new UByte [pixelcount]);
+    CHKB (Image = new RGBPixel [pixelcount]);
 
   /* JSAMPLEs per row in output buffer */
   row_stride = cinfo.output_width * cinfo.output_components;
@@ -266,8 +266,18 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
     (void) jpeg_read_scanlines (&cinfo, buffer, 1);
 
     if (cinfo.output_components == 1)
-      /* paletted image */
-      memcpy (((UByte *)Image) + bufp, buffer [0], row_stride);
+      if (cinfo.quantize_colors)
+        /* paletted image */
+        memcpy (((UByte *)Image) + bufp, buffer [0], row_stride);
+      else
+      { /* Grayscale image */
+        RGBPixel *out = ((RGBPixel *)Image) + bufp;
+        for (i = 0; i < (int)cinfo.output_width; i++)
+        {
+          out->red = out->green = out->blue = buffer [0][i];
+          out++;
+        }
+      }
     else
     { /* rgb triplets */
       RGBPixel *out = ((RGBPixel *)Image) + bufp;
@@ -278,17 +288,26 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
   }
 
   /* Get palette */
-  if (cinfo.output_components == 1)
+  if (cinfo.quantize_colors)
   {
     Palette = new RGBPixel [256];
     int cshift = 8 - cinfo.data_precision;
     for (i = 0; i < cinfo.actual_number_of_colors; i++)
     {
       Palette [i].red   = cinfo.colormap [0] [i] << cshift;
-      Palette [i].green = cinfo.colormap [1] [i] << cshift;
-      Palette [i].blue  = cinfo.colormap [2] [i] << cshift;
+      if (cinfo.jpeg_color_space != JCS_GRAYSCALE)
+      {
+        Palette [i].green = cinfo.colormap [1] [i] << cshift;
+        Palette [i].blue  = cinfo.colormap [2] [i] << cshift;
+      }
+      else
+        Palette [i].green = Palette [i].blue = Palette [i].red;
     }
   }
+
+  if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
+    Format = (Format & ~CS_IMGFMT_MASK) |
+      (cinfo.quantize_colors ? CS_IMGFMT_PALETTED8 : CS_IMGFMT_TRUECOLOR);
 
   /* ==== Step 7: Finish decompression */
 

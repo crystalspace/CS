@@ -38,9 +38,6 @@ class OpenGLTextureCache;
  */
 class csGraphics2DGLCommon : public csGraphics2D
 {
-  /// my own private texture cache--for 2D sprites!
-  OpenGLTextureCache *texture_cache; 
-
   /// hold the CS fonts in an OpenGL-friendly format
   csGraphics2DOpenGLFontServer *LocalFontServer;
 
@@ -50,7 +47,7 @@ public:
   /// Constructor does little, most initialization stuff happens in Initialize()
   csGraphics2DGLCommon (iBase *iParent);
 
-  /// Destructor deletes texture_cache and LocalFontServer
+  /// Destructor deletes LocalFontServer
   virtual ~csGraphics2DGLCommon ();
 
   /* You must supply all the functions not supplied here, such
@@ -98,9 +95,13 @@ public:
 
   /**
    * Get address of video RAM at given x,y coordinates.
-   * The OpenGL version of this function just returns NULL.
+   * The OpenGL version of this function just returns NULL
+   * if not doing a screenshot.
    */
   virtual unsigned char* GetPixelAt (int x, int y);
+
+  /// Do a screenshot: return a new iImage object
+  virtual iImage *ScreenShot ();
 };
 
 #endif

@@ -75,11 +75,13 @@ static unsigned short ScanCodeToChar[128] =
 IMPLEMENT_IBASE (SysSystemDriver)
   IMPLEMENTS_INTERFACE (iSystem)
   IMPLEMENTS_INTERFACE (iDosSystemDriver)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
 IMPLEMENT_IBASE_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
   // Sanity check
   if (sizeof (event_queue [0]) != 12)
   {

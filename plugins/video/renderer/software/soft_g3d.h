@@ -41,12 +41,10 @@
 // This is maximal number of instantly visible fogs without noticeable slowdowns
 #define MAX_INDEXED_FOG_TABLES	8
 
-class TextureCache;
-class TextureCache16;
 class csClipper;
-
-struct iGraphics2D;
 class csIniFile;
+class csTextureCacheSoftware;
+struct iGraphics2D;
 
 /// This structure is used to hold references to all current fog objects.
 struct FogBuffer
@@ -96,6 +94,9 @@ class csGraphics3DSoftware : public iGraphics3D
 
   /// Z Buffer mode to use while rendering next polygon.
   G3DZBufMode z_buf_mode;
+
+  /// Alpha mask used for 16-bit mode.
+  UShort alpha_mask;
 
   /// Fog buffers.
   FogBuffer* fog_buffers;
@@ -181,9 +182,6 @@ class csGraphics3DSoftware : public iGraphics3D
   /// Build the table used for fog in paletted modes
   unsigned char *BuildIndexedFogTable ();
 
-  /// Set the texture cache size.
-  void SetCacheSize (long size);
-
 public:
   DECLARE_IBASE;
 
@@ -197,10 +195,10 @@ public:
   csIniFile* config;
 
   /// The texture manager.
-  csTextureManagerSoftware* txtmgr;
+  csTextureManagerSoftware* texman;
 
   /// The texture cache.
-  TextureCache* tcache;
+  csTextureCacheSoftware *tcache;
 
   /// The System interface.
   iSystem* System;
@@ -323,28 +321,6 @@ public:
   /// Draw a polygon with special effects.
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
-  /// Give a texture to csGraphics3DSoftware to cache it.
-  virtual void CacheTexture (iPolygonTexture* texture);
-
-  /**
-   * Give a texture to csGraphics3DSoftware to initialize the cache for it.
-   * This is used together with the sub-texture optimization and is meant
-   * to allocate the space in the cache but not do any actual calculations yet.
-   */
-  void CacheInitTexture (iPolygonTexture* texture);
-
-  /// Give a sub-texture to csGraphics3DSoftware to cache it.
-  void CacheSubTexture (iPolygonTexture* texture, int u, int v);
-
-  /**
-   * Give a rectangle to csGraphics3DSoftware so that all sub-textures
-   * in this rectangle are cached.
-   */
-  void CacheRectTexture (iPolygonTexture* texture, int minu, int minv, int maxu, int maxv);
-
-  /// Release a texture from the cache.
-  virtual void UncacheTexture (iPolygonTexture* texture);
-
   /// Set a renderstate boolean.
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
 
@@ -406,7 +382,7 @@ public:
 
   /// Get the ITextureManager.
   virtual iTextureManager *GetTextureManager ()
-  { return txtmgr; }
+  { return texman; }
 
   /// Returns true if this driver requires all maps to be PO2.
   virtual bool NeedsPO2Maps () { return false; }
@@ -414,22 +390,12 @@ public:
   virtual int GetMaximumAspectRatio ()
   { return 32768; }
 
-  /// Get the colorformat you want.
-  virtual G3D_COLORMAPFORMAT GetColormapFormat()
-  { return G3DCOLORFORMAT_ANY; }
-
-  /// Use to printf through system driver
-  void SysPrintf (int mode, char* str, ...);
-
   /// Get Z-buffer value at given X,Y position
   virtual float GetZbuffValue (int x, int y);
 
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
     unsigned char *iAlpha, int iWidth, int iHeight);
-
-  /// Do a screenshot: return a new iImage object
-  virtual iImage *ScreenShot ();
 
   ///------------------- iConfig interface implementation -------------------
   struct csSoftConfig : public iConfig

@@ -34,9 +34,10 @@ void csGraphics2D::DRAWSPRITE_NAME (csGraphics2D *This, iTextureHandle *hTex,
   bool transp = hTex->GetTransparent ();
 
   int bw, bh;
-  hTex->GetBitmapDimensions (bw, bh);
+  hTex->GetMipMapDimensions (0, bw, bh);
 
-  DRAWSPRITE_PIXTYPE *bitmap = (DRAWSPRITE_PIXTYPE *)hTex->GetBitmapData ();
+  UByte *bitmap = (UByte *)hTex->GetMipMapData (0);
+  DRAWSPRITE_PIXTYPE *palette = (DRAWSPRITE_PIXTYPE *)hTex->GetMipMapData (-1);
 
   int dx = (tw << 16) / sw;
   int dy = (th << 16) / sh;
@@ -79,39 +80,39 @@ void csGraphics2D::DRAWSPRITE_NAME (csGraphics2D *This, iTextureHandle *hTex,
     for (; sh > 0; sh--, ty += dy, sy++)
     {
       DRAWSPRITE_PIXTYPE *VRAM = (DRAWSPRITE_PIXTYPE *)This->GetPixelAt (sx, sy);
-      DRAWSPRITE_PIXTYPE *data = bitmap + (ty >> 16) * bw;
+      UByte *data = bitmap + (ty >> 16) * bw;
       if (transp)
         for (int w = sw; w; w--)
         {
-          DRAWSPRITE_PIXTYPE pixel = *data;
+          UByte pixel = *data;
           if (pixel)
-            *VRAM = pixel;
+            *VRAM = palette [pixel];
           VRAM++;
           data++;
         } /* endfor */
       else
-        memcpy (VRAM, data, sw * sizeof (DRAWSPRITE_PIXTYPE));
+        for (int w = sw; w; w--)
+          *VRAM++ = palette [*data++];
     } /* endfor */
   else
     for (; sh > 0; sh--, ty += dy, sy++)
     {
       DRAWSPRITE_PIXTYPE *VRAM = (DRAWSPRITE_PIXTYPE *)This->GetPixelAt (sx, sy);
-      DRAWSPRITE_PIXTYPE *data = bitmap + (ty >> 16) * bw;
+      UByte *data = bitmap + (ty >> 16) * bw;
       int tx = 0;
       if (transp)
         for (int w = sw; w; w--)
         {
-          DRAWSPRITE_PIXTYPE pixel = data [tx >> 16];
+          UByte pixel = data [tx >> 16];
           if (pixel)
-            *VRAM = pixel;
+            *VRAM = palette [pixel];
           VRAM++;
           tx += dx;
         } /* endfor */
       else
         for (int w = sw; w; w--)
         {
-          *VRAM = data [tx >> 16];
-          VRAM++;
+          *VRAM++ = palette [data [tx >> 16]];
           tx += dx;
         } /* endfor */
     } /* endfor */

@@ -29,9 +29,9 @@
 #include <GL/gl.h>
 
 #include "csutil/scf.h"
-#include "cs3d/opengl/ogl_txtmgr.h"
 #include "cs3d/common/dtmesh.h"
 #include "csgeom/transfrm.h"
+#include "ogl_txtmgr.h"
 #include "igraph3d.h"
 #include "iplugin.h"
 
@@ -179,13 +179,14 @@ protected:
   /// The texture manager
   csTextureManagerOpenGL* txtmgr;
 
+public:
+  DECLARE_IBASE;
+
   /// The texture cache.
   OpenGLTextureCache* texture_cache;
 
   /// The lightmap cache.
   OpenGLLightmapCache* lightmap_cache;
-public:
-  DECLARE_IBASE;
 
   /**
    * Low-level 2D graphics layer.
@@ -250,23 +251,10 @@ public:
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
   /// Give a texture to csGraphics3DOpenGL to cache it.
-  virtual void CacheTexture (iPolygonTexture *texture);
+  void CacheTexture (iPolygonTexture *texture);
 
-  /**
-   * Give a texture to csGraphics3DOpenGL to initialize the cache for it.
-   * This is used together with the sub-texture optimization and is meant
-   * to allocate the space in the cache but not do any actual calculations yet.
-   */
-  void CacheInitTexture (iPolygonTexture* texture);
-
-  /// Give a sub-texture to csGraphics3DOpenGL to cache it.
-  void CacheSubTexture (iPolygonTexture* texture, int u, int v);
-
-  /**
-   * Give a rectangle to csGraphics3DOpenGL so that all sub-textures
-   * in this rectangle are cached.
-   */
-  void CacheRectTexture (iPolygonTexture* texture, int minu, int minv, int maxu, int maxv);
+  /// Remove a texture from cache (perhaps because it's being unregistered)
+  void UncacheTexture (iTextureHandle *handle);
 
   /**
    * Allocate a 'lighted texture' in which the base texture and lightmap
@@ -274,10 +262,7 @@ public:
    * This emulates multi-texturing which is needed for transparent
    * lighted portals
    */
-  void CacheLightedTexture(iPolygonTexture *texture);
-
-  /// Release a texture from the cache.
-  virtual void UncacheTexture (iPolygonTexture* texture);
+  void CacheLightedTexture (iPolygonTexture *texture);
 
   /// Set a renderstate boolean.
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
@@ -393,12 +378,6 @@ public:
    */
   virtual void CloseFogObject (CS_ID id);
 	  
-  /// Get the colorformat you want.  The OpenGL driver only supports 24 bit color.
-  virtual G3D_COLORMAPFORMAT GetColormapFormat ()
-  { return G3DCOLORFORMAT_24BIT; }
-
-  void SysPrintf (int mode, char* str, ...);
-
   /// Get Z-buffer value at given X,Y position
   virtual float GetZbuffValue (int x, int y);
 

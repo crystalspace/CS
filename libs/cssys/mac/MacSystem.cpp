@@ -63,8 +63,9 @@ static AEEventHandlerUPP AppleEventHandlerUPP = NULL;
 static SysSystemDriver * gSysSystemDriver = NULL;
 
 
-IMPLEMENT_IBASE(SysSystemDriver)
-    IMPLEMENTS_INTERFACE(iSystem)
+IMPLEMENT_IBASE (SysSystemDriver)
+  IMPLEMENTS_INTERFACE (iSystem)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
 IMPLEMENT_IBASE_END
 
 SysSystemDriver::SysSystemDriver()
@@ -74,7 +75,8 @@ SysSystemDriver::SysSystemDriver()
 	ProcessSerialNumber	theCurrentProcess;
 	ProcessInfoRec		theInfo;
 
-	CONSTRUCT_IBASE(NULL);
+	CONSTRUCT_IBASE (NULL);
+        CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
 
 	gSysSystemDriver = this;
 

@@ -35,6 +35,8 @@
 #define cmdAlignCenter  32106
 #define cmdPause        32107
 #define cmdToggleMouse  32108
+#define cmdToggleAspect	32109
+#define cmdFullScreen	32110
 
 #ifndef RC_INVOKED
 
@@ -131,7 +133,9 @@ private:
   long BufferW, BufferH;                // Image buffers parameters
   long ActiveBuffer;                    // ID of active image buffer
   HEV sRedrawComplete;                  // Redraw complete event semaphore
+  bool fAspect;				// Maintain window aspect ratio
   bool fPause;                          // Set to TRUE will freeze drawing
+  bool fFullScreen;                     // true if we`re in full-screen
   bool fMouseVisible;                   // If FALSE mouse pointer will be hidden
   ULONG MouseCursorID;			// Mouse cursor shape ID (SPTR_ARROW ...)
   bool fMinimized;                      // This is TRUE when window is minimized
@@ -140,7 +144,6 @@ private:
   bool fRedrawDisabled;			// Set between VRN_DISABLED and VRN_ENABLED
   long MouseButtonMask;			// Current mouse button states
   bool MouseCaptured;			// Mouse captured flag
-  int RedrawFailedCount;		// Times we failed to swap buffers during WM_PAINT
 
   tKeyboardHandler hKeyboard;           // Keyboard handler if not NULL
   void *paramKeyboard;                  // Parameter passed to keyboard handler
@@ -152,6 +155,8 @@ private:
   void *paramMouse;                     // Parameter passed to mouse handler
   HPAL hpal;				// GPI palette handle
   HGC hgc;				// GL PM context
+  int ScreenW, ScreenH;			// Screen size
+  SWP swpFullScreen;			// Saved window position
 
 public:
   HAB glAB;				// Application anchor block
@@ -190,6 +195,18 @@ public:
 
   /// Set OpenGL palette for color index modes
   void SetPalette (u_long *palette, int count);
+
+  /// Switch to/from full-screen mode
+  bool FullScreen (bool State);
+
+  /// Resize *client* window, compute and set new frame window size
+  bool Resize (long Width, long Height, bool Center);
+
+  /// Adjust these variables so that Width/Height == BufferWidth/BufferHeight
+  bool AdjustAspectRatio (long *Width, long *Height);
+
+  /// Reset size/position
+  bool Reset ();
 
   /// Pause window: application should check IsPaused() itself
   inline void Pause (bool State)
@@ -291,6 +308,16 @@ public:
   inline long BufferHeight ()
   {
     return BufferH;
+  }
+
+  /// Enable or disable constant aspect ratio of window
+  inline void MaintainAspectRatio (bool State)
+  {
+    if (!fFullScreen)
+    {
+      fAspect = State;
+      WinCheckMenuItem (glMN, cmdToggleAspect, fAspect);
+    }
   }
 
 private:

@@ -17,7 +17,6 @@
 */
 
 #include "sysdef.h"
-#include "csengine/sysitf.h"
 #include "csengine/cscoll.h"
 #include "csengine/thing.h"
 #include "csengine/world.h"

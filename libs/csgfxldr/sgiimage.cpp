@@ -145,7 +145,7 @@ bool ImageSGIFile::Load (UByte* iBuffer, ULong iSize)
     return false;
   }
 
-  convert_rgb (buffer);
+  convert_rgba (buffer);
   return true;
 }
 

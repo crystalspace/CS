@@ -18,7 +18,6 @@
 
 #include "sysdef.h"
 #include "cssys/csendian.h"
-#include "csengine/sysitf.h"
 #include "csengine/lghtmap.h"
 #include "csengine/polygon.h"
 #include "csengine/sector.h"
@@ -40,45 +39,45 @@ csShadowMap::~csShadowMap ()
 
 void csShadowMap::Alloc (csLight*, int w, int h, int lms)
 {
-  int i;
   CHK (delete [] map); map = NULL;
 
-  int lw = w/lms+2;
-  int lh = h/lms+2;
-  long lm_size = lw*lh;
+  int lw = 1 + (w + lms - 1) / lms;
+  int lh = 1 + (h + lms - 1) / lms;
+  long lm_size = lw * lh;
   CHK (map = new unsigned char [lm_size]);
-  for (i = 0 ; i < lm_size ; i++) map[i] = 0;
+  memset (map, 0, lm_size);
 }
 
 void csShadowMap::MipmapLightMap (int w, int h, int lms, csShadowMap* source,
-	int w2, int h2, int lms2)
+  int w2, int h2, int lms2)
 {
-  int lw = w/lms+2;
-  int lh = h/lms+2;
-  int lw2 = w2/lms2+2;
-  int lh2 = h2/lms2+2;
+  int lw = 1 + (w + lms - 1) / lms;
+  int lh = 1 + (h + lms - 1) / lms;
+  int lw2 = (w2 + lms2 - 1) / lms2;
+  int lh2 = (h2 + lms2 - 1) / lms2;
   int u, v, uv, uv2;
 
-  uv2 = 0;
-  for (v = 0 ; v < lh ; v++)
-    for (u = 0 ; u < lw ; u++)
+  uv = 0;
+  for (v = 0; v < lh; v++)
+    for (u = 0; u < lw; u++)
     {
-      uv = v*lw + u;
-
-      if (u+u >= lw2 || v+v >= lh2)
+      if (2 * u >= lw2 || 2 * v >= lh2)
       {
-	if (u+u >= lw2) uv2 = (v+v)*lw2 + lw2-1;
-	else if (v+v >= lh2) uv2 = (lh2-1)*lw2 + u+u;
+	if (2 * u >= lw2)
+          uv2 = 2 * v * lw2 + lw2 - 1;
+	else if (2 * v >= lh2)
+          uv2 = (lh2 - 1) * lw2 + 2 * u;
       }
-      else uv2 = (v+v)*lw2 + u+u;
+      else
+        uv2 = 2 * v * lw2 + 2 * u;
 
-      map[uv] = source->map[uv2];
+      map [uv++] = source->map [uv2];
     }
 
   light = source->light;
 }
 
-void csShadowMap::CopyLightMap (csShadowMap* source, int size)
+void csShadowMap::CopyLightMap (csShadowMap *source, int size)
 {
   if (map) CHKB (delete [] map);
   CHK (map = new unsigned char [size]);
@@ -96,15 +95,14 @@ csLightMap::csLightMap ()
 {
   CONSTRUCT_IBASE (NULL);
   first_smap = NULL;
-  hicolorcache = NULL;
-  in_memory = false;
+  cachedata = NULL;
 }
 
 csLightMap::~csLightMap ()
 {
   while (first_smap)
   {
-    csShadowMap* smap = first_smap->next;
+    csShadowMap *smap = first_smap->next;
     CHK (delete first_smap);
     first_smap = smap;
   }
@@ -120,7 +118,7 @@ void csLightMap::DelShadowMap (csShadowMap* smap)
 
 csShadowMap* csLightMap::NewShadowMap (csLight* light, int w, int h, int lms)
 {
-  CHK (csShadowMap* smap = new csShadowMap ());
+  CHK (csShadowMap *smap = new csShadowMap ());
   smap->light = light;
   smap->next = first_smap;
   first_smap = smap;
@@ -143,49 +141,33 @@ csShadowMap* csLightMap::FindShadowMap (csLight* light)
 
 void csLightMap::SetSize (int w, int h, int lms)
 {
-  size = w*h;
-  lwidth = w/lms+2;
-  lheight = h/lms+2;
-  lm_size = lwidth*lheight;
-  rwidth = lwidth;
+  size = w * h;
+  lwidth  = 1 + (w + lms - 1) / lms;
+  lheight = 1 + (h + lms - 1) / lms;
+  lm_size = lwidth * lheight;
+  rwidth  = lwidth;
   rheight = lheight;
 }
 
 void csLightMap::Alloc (int w, int h, int lms, int r, int g, int b)
 {
   SetSize (w, h, lms);
-  int i;
   static_lm.Clear ();
   real_lm.Clear ();
 
-//@@@
-#if 0
-  if (Textures::mixing == MIX_NOCOLOR)
-  {
-    static_lm.AllocRed (lm_size);
-    real_lm.AllocRed (lm_size);
-  }
-  else
-#endif
-  {
-    static_lm.Alloc (lm_size);
-    real_lm.Alloc (lm_size);
-  }
+  static_lm.Alloc (lm_size);
+  real_lm.Alloc (lm_size);
 
-  unsigned char* mr, * mg, * mb;
-  mr = static_lm.GetRed ();
-  mg = static_lm.GetGreen ();
-  mb = static_lm.GetBlue ();
-  for (i = 0 ; i < lm_size ; i++)
-  {
-    mr[i] = r;
-    if (mg) mg[i] = g;
-    if (mb) mb[i] = b;
-  }
+  UByte *mr = static_lm.GetRed ();
+  memset (mr, r, lm_size);
+  UByte *mg = static_lm.GetGreen ();
+  memset (mg, g, lm_size);
+  UByte *mb = static_lm.GetBlue ();
+  memset (mb, b, lm_size);
 }
 
 void csLightMap::MipmapLightMap (int w, int h, int lms, csLightMap* source,
-	int w2, int h2, int lms2)
+  int w2, int h2, int lms2)
 {
   Alloc (w, h, lms, 0, 0, 0);
 
@@ -193,34 +175,37 @@ void csLightMap::MipmapLightMap (int w, int h, int lms, csLightMap* source,
   int lh2 = source->GetHeight ();
   int u, v, uv, uv2;
 
-  unsigned char* mr, * mg, * mb;
+  unsigned char *mr, *mg, *mb;
   mr = static_lm.GetRed ();
   mg = static_lm.GetGreen ();
   mb = static_lm.GetBlue ();
-  unsigned char* src_mr, * src_mg, * src_mb;
+  unsigned char *src_mr, *src_mg, *src_mb;
   src_mr = source->static_lm.GetRed ();
   src_mg = source->static_lm.GetGreen ();
   src_mb = source->static_lm.GetBlue ();
 
+  uv = 0;
   uv2 = 0;
-  for (v = 0 ; v < lheight ; v++)
-    for (u = 0 ; u < lwidth ; u++)
+  for (v = 0; v < lheight; v++)
+    for (u = 0; u < lwidth; u++)
     {
-      uv = v*lwidth + u;
-
-      if (u+u >= lw2 || v+v >= lh2)
+      if (2 * u >= lw2 || 2 * v >= lh2)
       {
-	if (u+u >= lw2) uv2 = (v+v)*lw2 + lw2-1;
-	else if (v+v >= lh2) uv2 = (lh2-1)*lw2 + u+u;
+	if (2 * u >= lw2)
+          uv2 = 2 * v * lw2 + lw2 - 1;
+	else if (v+v >= lh2)
+          uv2 = (lh2 - 1) * lw2 + 2 * u;
       }
-      else uv2 = (v+v)*lw2 + u+u;
+      else
+        uv2 = 2 * v * lw2 + 2 * u;
 
-      mr[uv] = src_mr[uv2];
-      if (mg) mg[uv] = src_mg[uv2];
-      if (mb) mb[uv] = src_mb[uv2];
+      mr [uv] = src_mr [uv2];
+      if (mg) mg [uv] = src_mg [uv2];
+      if (mb) mb [uv] = src_mb [uv2];
+      uv++;
     }
 
-  csShadowMap* smap, * smap2;
+  csShadowMap *smap, *smap2;
   while (first_smap)
   {
     smap = first_smap->next;
@@ -248,7 +233,7 @@ void csLightMap::CopyLightMap (csLightMap* source)
   rwidth = source->rwidth;
   rheight = source->rheight;
 
-  csShadowMap* smap, * smap2;
+  csShadowMap *smap, *smap2;
   while (first_smap)
   {
     smap = first_smap->next;
@@ -275,22 +260,19 @@ struct PolySave
   long lm_size;		// Size of lightmap
   long lm_cnt;		// Number of non-dynamic lightmaps (normally 3)
 };
-#define POLYSAVE_LEN (4*9)
 
 struct LightSave
 {
   float x, y, z, dist;
 };
-#define LIGHTSAVE_LEN (4*4)
 
 struct LightHeader
 {
   char header[4];
   long dyn_cnt;		// Number of dynamic maps
 };
-#define LIGHTHDR_LEN (4*2)
 
-void CacheName (char* buf, csPolygonSet* owner, int index, char* suffix)
+void CacheName (char *buf, csPolygonSet *owner, int index, char *suffix)
 {
   const char* name = owner->GetName ();
   if (!name)
@@ -308,7 +290,7 @@ void CacheName (char* buf, csPolygonSet* owner, int index, char* suffix)
 }
 
 bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner,
-	csPolygon3D* poly, int index, csWorld* world)
+  csPolygon3D* poly, int index, csWorld* world)
 {
   char buf[200];
   PolySave ps;
@@ -347,14 +329,14 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner,
   //-------------------------------
   // Check if cached item is still valid.
   //-------------------------------
-  if (  poly &&
-       (ABS (ps.x1 - poly->Vobj (0).x) > EPSILON ||
-  	ABS (ps.y1 - poly->Vobj (0).y) > EPSILON ||
-  	ABS (ps.z1 - poly->Vobj (0).z) > EPSILON ||
-  	ABS (ps.x2 - poly->Vobj (1).x) > EPSILON ||
-  	ABS (ps.y2 - poly->Vobj (1).y) > EPSILON ||
-  	ABS (ps.z2 - poly->Vobj (1).z) > EPSILON ||
-	ps.lm_size != lm_size))
+  if (poly &&
+     (ABS (ps.x1 - poly->Vobj (0).x) > EPSILON ||
+      ABS (ps.y1 - poly->Vobj (0).y) > EPSILON ||
+      ABS (ps.z1 - poly->Vobj (0).z) > EPSILON ||
+      ABS (ps.x2 - poly->Vobj (1).x) > EPSILON ||
+      ABS (ps.y2 - poly->Vobj (1).y) > EPSILON ||
+      ABS (ps.z2 - poly->Vobj (1).z) > EPSILON ||
+      ps.lm_size != lm_size))
   {
     // Invalid.
     CHK (delete [] data);
@@ -367,8 +349,8 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner,
   static_lm.Clear ();
 
   static_lm.Alloc (lm_size);
-  memcpy (static_lm.GetMap (), d, (lm_size<<1)+lm_size);
-  d += (lm_size<<1)+lm_size;
+  memcpy (static_lm.GetMap (), d, (lm_size << 1) + lm_size);
+  d += (lm_size << 1) + lm_size;
 
   CHK (delete [] data);
 
@@ -709,7 +691,7 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   o_real.SetMap (real_lm.GetMap ()); real_lm.SetMap (NULL);
   o_real.SetMaxSize (real_lm.GetMaxSize ());
 
-  lm_size = lwidth*lheight;
+  lm_size = lwidth * lheight;
  
   // Allocate new data and transform old to new.
   static_lm.Alloc (lm_size);
@@ -749,49 +731,4 @@ unsigned char *csLightMap::GetMap (int nMap)
       break;
   }
   return NULL;
-}
-
-int csLightMap::GetWidth ()
-{
-  return lwidth;
-}
-
-int csLightMap::GetHeight ()
-{
-  return lheight;
-}
-
-int csLightMap::GetRealWidth ()
-{
-  return rwidth;
-}
-
-int csLightMap::GetRealHeight ()
-{
-  return rheight;
-}
-
-bool csLightMap::IsCached ()
-{
-  return in_memory;
-}
-
-void csLightMap::SetInCache (bool bVal)
-{
-  in_memory = bVal;
-}
-
-csHighColorCacheData *csLightMap::GetHighColorCache ()
-{
-  return hicolorcache;
-}
-
-void csLightMap::SetHighColorCache (csHighColorCacheData* pVal)
-{
-  hicolorcache = pVal;
-}
-
-void csLightMap::GetMeanLighting (int& r, int& g, int& b)
-{
-  r = mean_r; g = mean_g; b = mean_b;
 }

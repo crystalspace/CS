@@ -16,215 +16,117 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TCACHE_H
-#define TCACHE_H
+#ifndef __TCACHE_H__
+#define __TCACHE_H__
 
 #include "types.h"
 #include "csutil/scf.h"
+#include "csutil/bitset.h"
+#include "ipolygon.h"
 
-class csGraphics2D;
-class MemoryHeap;
-class TextureCache;
+class csGraphics3DSoftware;
 class csTextureManagerSoftware;
-class csTextureMMSoftware;
-class csTexture;
-
-struct iPolygonTexture;
-struct iLightMap;
 struct csPixelFormat;
 
-/// Structure used by the texture cache routines.
-struct TCacheData
-{
-  int mipmap_shift, mipmap_size;
-  // The coordinates (in lightmap space) of the block that we want
-  // to recalculate (lu2 and lv2 are NOT included).
-  int lu1, lv1, lu2, lv2;
-  // Offset to use to go to the next line afer recreating one line.
-  int d_lw;
-  // Total width of the lightmap.
-  int lw;
-  // The lightmap data.
-  UByte* mapR, * mapG, * mapB;
-  // Dimensions of lighted texture.
-  int width, height;
-  // Offsets in lighted texture.
-  int Imin_u, Imin_v;
-
-  // Unlighted texture.
-  csTextureMMSoftware* txt_mm;
-  // Unlighted texture data.
-  UByte* tdata;
-  // Unlighted texture shifts.
-  int shf_w, and_w, and_h;
-
-  // Some global settings.
-  int txtmode;
-  bool lm_grid;
-};
+/// The default texture cache size.
+#define DEFAULT_CACHE_SIZE	8*1024*1024
 
 /**
  * This structure represents a lighted texture as used
  * by the software texture cache.
  */
-class TCacheLightedTexture
+class SoftwareCachedTexture
 {
-  friend class TextureCache;
+  friend class csTextureCacheSoftware;
 
-private:
   /// Linked in the texture cache.
-  TCacheLightedTexture* next;
-  /// Linked in the texture cache.
-  TCacheLightedTexture* prev;
+  SoftwareCachedTexture *next, *prev;
 
-  /// True if in the cache.
-  bool in_cache;
-
-  /// Size (in texels).
+  /// Size (in bytes).
   long size;
 
   /// The lighted texture data.
-  UByte* tmap;
+  UByte *data;
 
   /**
-   * tmap_m points to the real data inside 'tmap' (thus skipping the
+   * bitmap points to the real data inside 'data' (thus skipping the
    * H_MARGIN pixel border at the top of the texture map).
    */
-  UByte* tmap_m;
+  UByte *bitmap;
+
+  /// The original polygon texture
+  iPolygonTexture *source;
 
 public:
-  ///
-  TCacheLightedTexture () { tmap = tmap_m = NULL; next = prev = NULL; in_cache = false; }
-  ///
-  ~TCacheLightedTexture () { }
+  /// Initialize the lighted texture object
+  SoftwareCachedTexture (iPolygonTexture *Source)
+  {
+    data = bitmap = NULL; next = prev = NULL;
+    (source = Source)->SetCacheData (this);
+  }
+  /// Destroy the lighted texture
+  ~SoftwareCachedTexture ()
+  {
+    source->SetCacheData (NULL);
+    delete [] data;
+  }
 
-  ///
-  UByte* get_tmap8 () { return tmap_m; }
-  ///
-  UShort* get_tmap16 () { return (UShort*)tmap_m; }
-  ///
-  ULong* get_tmap32 () { return (ULong*)tmap_m; }
-
-  /// Unlink from list (set next and prev to NULL)
-  void unlink_list () { next = prev = NULL; }
+  /// Get the pointer to the bitmap
+  inline UByte *get_bitmap ()
+  { return bitmap; }
 };
 
 /**
  * This class implements the software texture cache
  * for 8-bit modes (16-bit mode overrides this class).
  */
-class TextureCache
+class csTextureCacheSoftware
 {
 private:
-  /// Total size of the cache (expressed in pixels).
-  static int cache_size;
-  /// The size that we finally used.
-  int real_cache_size;
-
-private:
-  /// This is the first texture in the cache.
-  TCacheLightedTexture* first;
-  /// This is the last texture in the cache.
-  TCacheLightedTexture* last;
-  /// Total size of all textures in the cache.
+  /// Total size of the cache (in pixels)
+  int cache_size;
+  /// Total size of all textures in the cache (in pixels)
   long total_size;
   /// Total number of textures in the cache.
   int total_textures;
+  /// Bytes per texel
+  int bytes_per_texel;
 
-  /**
-   * The cache itself. This is a private pool of memory
-   * used only for lighted textures.
-   */
-  MemoryHeap* memory;
-
-  /**
-   * Pointer to first free entry in pool.
-   */
-  //UByte* first_free;
-
-  /**
-   * Create a texture in the texture cache.
-   * This routine will automatically select the right create_lighted_???
-   * depending on the mode Crystal Space is in.
-   */
-  virtual void create_lighted_texture (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
-
-  /// Create a texture in the texture cache
-  void create_lighted_true_rgb (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
-  /// Create a texture in the texture cache (private colormap textures)
-  void create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
-
-  /**
-   * Initialize the memory pool.
-   */
-  void init_pool ();
-
-  /**
-   * Destroy the memory pool.
-   */
-  void destroy_pool ();
+  /// This is the first texture in the cache.
+  SoftwareCachedTexture *head;
+  /// This is the last texture in the cache.
+  SoftwareCachedTexture *tail;
 
 protected:
-  /// The number of bytes per pixel.
-  int gi_pixelbytes;
+  /// The texture manager
+  csTextureManagerSoftware *texman;
 
-  /**
-   * Allocate memory from the pool.
-   * Returns NULL if no memory available.
-   */
-  void* alloc_pool (int size);
-
-  /**
-   * Delete memory from the pool.
-   */
-  void free_pool (void* mem, int size);
-
-  /**
-   * Initialize the TCacheData structure for create_lighted_...
-   * If u and v are given (not equal to -1) then the cache filler will only
-   * update the texture in the texture cache for the given sub-texture containing
-   * that (u,v) coordinate.
-   * (u and v are in sub-texture space: blocks of subtex_size*subtex_size)
-   */
-  void init_cache_filler (TCacheData& tcd, iPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int u = -1, int v = -1);
-
-  /**
-   * For debugging: overlay the lightmap grid on the lighted texture. This function should
-   * be called after calling create_lighted_texture ().
-   */
-  virtual void show_lightmap_grid (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
+  /// Debugging: show the lightmap without the texture
+  void show_lightmap_grid (csBitSet *dirty, iPolygonTexture *pt,
+    void *dst, csTextureManagerSoftware *texman);
 
 public:
-  ///
-  TextureCache (csPixelFormat* pfmt);
-  ///
-  virtual ~TextureCache ();
+  /// Initialize the texture cache
+  csTextureCacheSoftware (csTextureManagerSoftware *TexMan);
+  /// Destroy all lightmaps
+  virtual ~csTextureCacheSoftware ();
 
   /// Clear the texture cache completely.
-  void clear ();
+  void Clear ();
 
   /**
-   * Set the size of the texture cache.
-   * If -1 this will simply initialize the texture cache. Note that
-   * you should call 'set_cache_size' at least once.
+   * Set the size of the texture cache and allocate the memory.
+   * Note that you should call 'set_cache_size' at least once.
    */
   void set_cache_size (long size);
 
-  /// Set the default size of the texture cache.
-  static void set_default_cache_size (long size) { cache_size = size; }
-
   /**
-   * Check if the given texture is in the cache and possibly
-   * add it if not.
+   * Add a texture to the texture cache. If the texture is already
+   * there, just move it to the head of texture list (MRU). If the
+   * overall size of all textures exceeds maximal cache size, the
+   * least used texture is discarded.
    */
-  void use_texture (iPolygonTexture* pt, csTextureManagerSoftware* txtmgr);
-
-  /**
-   * Check if the given sub-texture is in the cache and possibly
-   * add it if not. WARNING! This function assumes that the texture is
-   * already in the cache (put there with init_texture possibly).
-   */
-  void use_sub_texture (iPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int u, int v);
+  SoftwareCachedTexture *cache_texture (iPolygonTexture* pt);
 
   /**
    * Load a texture in the texture cache but do not do any calculations yet.
@@ -233,12 +135,27 @@ public:
    * and has the right size. If changes need to be made here it will set
    * the dirty matrix to all dirty.
    */
-  void init_texture (iPolygonTexture* pt, csTextureManagerSoftware* txtmgr);
+  void init_texture (iPolygonTexture* pt);
+
+  /**
+   * Check if the given texture is in the cache and possibly
+   * add it if not.
+   */
+  void use_texture (iPolygonTexture* pt);
+
+  /**
+   * Check if the given sub-texture is in the cache and possibly
+   * add it if not. WARNING! This function assumes that the texture is
+   * already in the cache (put there with init_texture possibly).
+   * The bit set contains a bit matrix with "1" in the positions that
+   * should be updated.
+   */
+  void use_sub_texture (iPolygonTexture* pt, csBitSet *dirty);
 
   /**
    * Do a debugging dump.
    */
-  void dump ();
+  void dump (csGraphics3DSoftware *iG3D);
 };
 
-#endif /*TCACHE_H*/
+#endif // __TCACHE_H__

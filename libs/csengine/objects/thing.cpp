@@ -18,7 +18,6 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "csengine/sysitf.h"
 #include "csengine/thing.h"
 #include "csengine/thingtpl.h"
 #include "csengine/polygon.h"
@@ -610,28 +609,29 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
   CHK (delete [] merge_vertices);
 }
 
-void csThing::MergeTemplate (csThingTemplate* tpl, csTextureList* txtList, const char* prefix,
-  csTextureHandle* default_texture, float default_texlen,
-  CLights* default_lightx,
-  csVector3* shift, csMatrix3* transform)
+void csThing::MergeTemplate (csThingTemplate* tpl, csTextureList* txtList,
+  const char* prefix, csTextureHandle* default_texture, float default_texlen,
+  CLights* default_lightx, csVector3* shift, csMatrix3* transform)
 {
-    int i;
-    const char *txtname;
-    char *newname=NULL;
+  int i;
+  const char *txtname;
+  char *newname=NULL;
     
-    MergeTemplate( tpl, default_texture, default_texlen, default_lightx, shift, transform );
+  MergeTemplate (tpl, default_texture, default_texlen, default_lightx,
+    shift, transform);
     
-    // now replace the textures
-    for (i = 0 ; i < GetNumPolygons() ; i++){
-	csPolygon3D* p = GetPolygon3D( i );
-	txtname = p->GetTexture()->GetName();
-	newname = new char[ strlen( prefix ) + strlen( txtname ) + 2 ];
-	sprintf( newname, "%s_%s", prefix, txtname );
-	csTextureHandle *th = txtList->GetTextureMM( newname );
-	if ( th != NULL )
-	    p->SetTexture( th );
-	delete [] newname;
-    }
-    
+  // now replace the textures
+  for (i = 0; i < GetNumPolygons (); i++)
+  {
+    csPolygon3D *p = GetPolygon3D (i);
+    txtname = p->GetTexture ()->GetName ();
+    newname = new char [strlen (prefix) + strlen (txtname) + 2];
+    sprintf (newname, "%s_%s", prefix, txtname);
+    csTextureHandle *th = txtList->FindByName (newname);
+    if (th != NULL)
+      p->SetTexture (th);
+    delete [] newname;
+  }
 }
+
 //---------------------------------------------------------------------------

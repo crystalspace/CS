@@ -46,8 +46,6 @@ public:
   
   virtual void SetRGB(int i, int r, int g, int b);
  
-  virtual bool BeginDraw();
-  virtual void FinishDraw();
   virtual HRESULT SetColorPalette();
   
   virtual bool SetMouseCursor (csMouseCursorID iShape);

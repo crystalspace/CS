@@ -158,7 +158,7 @@ bool csGraphics2DGGI::Initialize (iSystem *pSystem)
       break;
   }
 
-  complete_pixel_format();
+  pfmt.complete ();
   return true;
 }
 

@@ -24,12 +24,13 @@
 #include "csgeom/math3d.h"
 #include "cs3d/line/line_g3d.h"
 #include "cs3d/line/line_txt.h"
-#include "cs3d/common/memheap.h"
 #include "csutil/inifile.h"
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"
 #include "ilghtmap.h"
+
+#define SysPrintf System->Printf
 
 ///---------------------------------------------------------------------------
 
@@ -74,13 +75,13 @@ csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 
   config = new csIniFile ("line3d.cfg");
 
-  txtmgr = NULL;
+  texman = NULL;
 }
 
 csGraphics3DLine::~csGraphics3DLine ()
 {
   Close ();
-  CHK (delete txtmgr);
+  CHK (delete texman);
   if (G2D)
     G2D->DecRef ();
   CHK (delete config;)
@@ -100,9 +101,7 @@ bool csGraphics3DLine::Initialize (iSystem *iSys)
   if (!G2D)
     return false;
 
-  CHK (txtmgr = new csTextureManagerLine (System, G2D));
-  txtmgr->SetConfig (config);
-  txtmgr->Initialize ();
+  CHK (texman = new csTextureManagerLine (System, G2D, config));
 
   return true;
 }
@@ -113,7 +112,7 @@ bool csGraphics3DLine::Open (const char *Title)
 
   if (!G2D->Open (Title))
   {
-    SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.");
+    SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
     // set "not opened" flag
     width = height = -1;
 
@@ -123,6 +122,24 @@ bool csGraphics3DLine::Open (const char *Title)
   int nWidth = G2D->GetWidth ();
   int nHeight = G2D->GetHeight ();
   bool bFullScreen = G2D->GetFullScreen ();
+
+  csPixelFormat pfmt = *G2D->GetPixelFormat ();
+  if (pfmt.PalEntries)
+  {
+    // If we don't have truecolor we simulate 5:6:5 bits
+    // for R:G:B in the masks anyway because we still need the
+    // 16-bit format for our light mixing
+    pfmt.RedShift   = RGB2PAL_BITS_G + RGB2PAL_BITS_B;
+    pfmt.GreenShift = RGB2PAL_BITS_B;
+    pfmt.BlueShift  = 0;
+    pfmt.RedMask    = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.RedShift;
+    pfmt.GreenMask  = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.GreenShift;
+    pfmt.BlueMask   = ((1 << RGB2PAL_BITS_B) - 1);
+    pfmt.RedBits    = RGB2PAL_BITS_R;
+    pfmt.GreenBits  = RGB2PAL_BITS_G;
+    pfmt.BlueBits   = RGB2PAL_BITS_B;
+  }
+  texman->SetPixelFormat (pfmt);
 
   SetDimensions (nWidth, nHeight);
 
@@ -205,10 +222,15 @@ void csGraphics3DLine::DrawPolygon (G3DPolygonDP& poly)
   if (poly.num < 3)
     return;
   int i, color;
-  if (poly.flat_color_r < .2 && poly.flat_color_g < .2 && poly.flat_color_b < .2)
-    color = txtmgr->FindRGB (255, 255, 255);
-  else color = txtmgr->FindRGB (QInt (poly.flat_color_r*512),
-  	QInt (poly.flat_color_g*512), QInt (poly.flat_color_b*512));
+
+  UByte flat_r, flat_g, flat_b;
+  poly.txt_handle->GetMeanColor (flat_r, flat_g, flat_b);
+
+  if (flat_r < 50 && flat_g < 50 && flat_b < 50)
+    color = texman->FindRGB (50, 50, 50);
+  else
+    color = texman->FindRGB (flat_r, flat_g, flat_b);
+
   for (i = 0 ; i < poly.num ; i++)
   {
     G2D->DrawLine (poly.vertices[i].sx, height-poly.vertices[i].sy,
@@ -222,10 +244,22 @@ void csGraphics3DLine::DrawPolygonFX (G3DPolygonDPFX& poly)
   if (poly.num < 3)
     return;
   int i, color;
-  if (poly.flat_color_r < .2 && poly.flat_color_g < .2 && poly.flat_color_b < .2)
-    color = txtmgr->FindRGB (255, 255, 255);
-  else color = txtmgr->FindRGB (QInt (poly.flat_color_r*512),
-  	QInt (poly.flat_color_g*512), QInt (poly.flat_color_b*512));
+
+  UByte flat_r, flat_g, flat_b;
+  if (poly.txt_handle)
+    poly.txt_handle->GetMeanColor (flat_r, flat_g, flat_b);
+  else
+  {
+    flat_r = poly.flat_color_r;
+    flat_g = poly.flat_color_g;
+    flat_b = poly.flat_color_b;
+  }
+
+  if (flat_r < 50 && flat_g < 50 && flat_b < 50)
+    color = texman->FindRGB (50, 50, 50);
+  else
+    color = texman->FindRGB (flat_r, flat_g, flat_b);
+
   for (i = 0 ; i < poly.num ; i++)
   {
     G2D->DrawLine (poly.vertices[i].sx, height-poly.vertices[i].sy,
@@ -364,18 +398,6 @@ void csGraphics3DLine::DrawLine (csVector3& v1, csVector3& v2, float fov, int co
   G2D->DrawLine (px1, py1, px2, py2, color);
 }
 
-void csGraphics3DLine::SysPrintf (int mode, char* szMsg, ...)
-{
-  char buf[1024];
-  va_list arg;
-
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-
-  System->Print (mode, buf);
-}
-
 //---------------------------------------------------------------------------
 
 IMPLEMENT_EMBEDDED_IBASE (csGraphics3DLine::csLineConfig)
@@ -420,4 +442,3 @@ bool csGraphics3DLine::csLineConfig::GetOptionDescription
   *option = config_options[idx];
   return true;
 }
-

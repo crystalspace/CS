@@ -36,6 +36,8 @@ BEGIN
       MENUITEM "~Center\tCtrl+Alt+`", cmdAlignCenter
     END
     MENUITEM SEPARATOR
+    MENUITEM "~Full screen\tAlt+Home", cmdFullScreen
+    MENUITEM "~Keep aspect ratio", cmdToggleAspect
     MENUITEM "~Pause\tPause", cmdPause,,MIA_NODISMISS
     MENUITEM "~Mouse Cursor", cmdToggleMouse,,MIA_NODISMISS
   END
@@ -45,5 +47,6 @@ END
 ACCELTABLE idGL DISCARDABLE
 BEGIN
   "`",      cmdAlignCenter, ALT, CONTROL
+  VK_HOME,  cmdFullScreen,  VIRTUALKEY, ALT
   VK_PAUSE, cmdPause,       VIRTUALKEY
 END

@@ -18,7 +18,6 @@
 */
 
 #include "sysdef.h"
-#include "csengine/sysitf.h"
 #include "csengine/being.h"
 #include "csengine/cdobj.h"
 

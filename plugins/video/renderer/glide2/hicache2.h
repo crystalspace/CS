@@ -22,7 +22,7 @@
 #include "cs3d/common/texmem.h"
 
 ///
-struct HighColorCacheAndManage_Data : public csHighColorCacheData
+struct HighColorCacheAndManage_Data : public csGlideCacheData
 {
   /// texture memory position
   textMemSpace mempos;
@@ -55,11 +55,11 @@ protected:
   ///
   virtual void Unload (HighColorCacheAndManage_Data *d) = 0;
   ///
-  virtual void Load (csHighColorCacheData *d) {
+  virtual void Load (csGlideCacheData *d) {
 	  Load ((HighColorCacheAndManage_Data *)d);
   }
   ///
-  virtual void Unload (csHighColorCacheData *d) {
+  virtual void Unload (csGlideCacheData *d) {
 	  Unload ((HighColorCacheAndManage_Data *)d);
   }
 };

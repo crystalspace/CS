@@ -194,7 +194,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
     Scan.FogG = QRound (G * 255);
     Scan.FogB = QRound (B * 255);
     Scan.Fog8 = G3D->BuildIndexedFogTable ();
-    Scan.FogPix = G3D->txtmgr->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
+    Scan.FogPix = G3D->texman->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
     // halo intensity (0..31)
     Scan.FogDensity = QRound (iIntensity * 32);
   }
@@ -292,7 +292,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   sy = fyL = fyR = QRound (iVertices [scanL2].y);
 
   // Shift amount to get pixel address
-  int pixel_shift = log2 (G3D->pfmt.PixelBytes);
+  int pixel_shift = csLog2 (G3D->pfmt.PixelBytes);
   // Compute halo X and Y scale
   float scaleX = w / Width;
   float scaleY = h / Height;

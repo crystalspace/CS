@@ -63,7 +63,7 @@ void Scan::draw_scanline_map_zfil (int xx, unsigned char* d,
                               float inv_z, float u_div_z, float v_div_z)
 {
   (void)z_buf;
-  DRAW_SL_MAP_M68K (xx, Scan::tw2, Scan::th2, shf_u, d,Scan::tmap2, inv_z,
+  DRAW_SL_MAP_M68K (xx, Scan::tw2, Scan::th2, shf_u, d,Scan::bitmap2, inv_z,
 		    u_div_z, v_div_z, M, J1, K1);
 }
 

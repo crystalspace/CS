@@ -316,7 +316,7 @@ void csGraphics2DDDraw6::SecondaryInit()
     pfmt.GreenMask  = ddpf.dwGBitMask;
     pfmt.BlueMask   = ddpf.dwBBitMask;
     
-    complete_pixel_format();
+    pfmt.complete ();
   }
 
   // set 32-bpp-mode up
@@ -346,7 +346,7 @@ void csGraphics2DDDraw6::SecondaryInit()
   pfmt.GreenMask = GreenMask;
   pfmt.BlueMask  = BlueMask;
     
-    complete_pixel_format();
+    pfmt.complete ();
   }
 
   // release the temporary surface

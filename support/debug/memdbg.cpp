@@ -673,14 +673,21 @@ char *mdbLocation (address addr)
   return buff;
 }
 
-static bool memovw (void *p, size_t size)
+static bool memchk (void *p, size_t size, bool bounds)
 {
   char *c = (char *)p;
+
+  if (bounds)
+  {
+    c -= MDB_FENCE_SIZE;
+    size += MDB_FENCE_SIZE * 2;
+  }
+
   uint32 fc = MDB_FILL_CHAR | (MDB_FILL_CHAR << 8) |
     (MDB_FILL_CHAR << 16) | (MDB_FILL_CHAR << 24);
   while (size)
   {
-    if (size > 16)
+    if (size > sizeof (uint32) * 4)
     {
       if (*(uint32 *)c != fc)
         return true;
@@ -694,10 +701,14 @@ static bool memovw (void *p, size_t size)
       if (*(uint32 *)c != fc)
         return true;
       c += sizeof (uint32);
+      size -= sizeof (uint32) * 4;
     }
     else
+    {
       if (*c++ != MDB_FILL_CHAR)
         return true;
+      size--;
+    }
   }
   return false;
 }
@@ -712,7 +723,7 @@ void mdbFinish ()
     for (i = 0; i < mdbChainLen; i++)
     {
       c = &mdbChain [i];
-      if (c->free && memovw (c->mem, c->size + ((mdbFlags & MDF_CHECKBOUNDS) ? MDB_FENCE_SIZE * 2 : 0)))
+      if (c->free && memchk (c->mem, c->size, mdbFlags & MDF_CHECKBOUNDS))
       {
         output ("MEMDBG: Memory has been overwritten after being freed! Details:\n");
         output ("size:%8lu allocated at %s\n", c->size, mdbLocation (c->alloc_addr));

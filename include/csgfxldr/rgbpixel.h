@@ -75,6 +75,13 @@ struct RGBcolor
   { return RGBcolor (c.red + red, c.green + green, c.blue + blue); }
 };
 
+// For optimized performance, we sometimes handle all R/G/B values simultaneously
+#ifdef CS_BIG_ENDIAN
+#  define RGB_MASK 0xffffff00
+#else
+#  define RGB_MASK 0x00ffffff
+#endif
+
 /**
  * An RGB pixel. Besides R,G,B color components this structure also
  * contains the Alpha channel component, which is used in images
@@ -82,23 +89,44 @@ struct RGBcolor
  */
 struct RGBPixel
 {
+  /// The red, green, blue and alpha components
   unsigned char red, green, blue, alpha;
-  RGBPixel () : red(0), green(0), blue(0), alpha(255) {}
+  /// Constructor (initialize to zero, alpha to 255)
+  RGBPixel () /* : red(0), green(0), blue(0), alpha(255) {} */
+  { *(ULong *)this = ~RGB_MASK; }
+  /// Copy constructor
+  RGBPixel (const RGBPixel& p)
+  /* : red (p.red), green (p.green), blue (p.blue), alpha (p.alpha) {} */
+  { *(ULong *)this = *(ULong *)&p; }
+  /// Yet another copy constructor
   RGBPixel (const RGBcolor& c) :
     red (c.red), green (c.green), blue (c.blue), alpha (255) {}
-  RGBPixel (const RGBPixel& p) :
-    red (p.red), green (p.green), blue (p.blue), alpha (p.alpha) {}
+  /// Initialize the pixel with some R/G/B value
+  RGBPixel (int r, int g, int b) :
+    red (r), green (g), blue (b), alpha (255) {}
+  /// Compare with an RGBcolor
   bool operator == (const RGBcolor& c) const
   { return (c.red == red) && (c.green == green) && (c.blue == blue); }
+  /// Compare with an RGBPixel (including alpha value)
   bool operator == (const RGBPixel& p) const
-  { return (p.red == red) && (p.green == green) && (p.blue == blue); }
+  /* { return (p.red == red) && (p.green == green) && (p.blue == blue); } */
+  { return *(ULong *)this == *(ULong *)&p; }
+  /// Check if the RGBPixel is not equal to an RGBcolor
   bool operator != (const RGBcolor& c) const
   { return !operator == (c); }
+  /// Check if the RGBPixel is not equal to another RGBPixel (including alpha)
   bool operator != (const RGBPixel& p) const
   { return !operator == (p); }
+  /// Construct an RGBcolor from this RGBPixel
   operator RGBcolor () const
   { return RGBcolor (red, green, blue); }
+  /// Compare with another RGBPixel, but don't take alpha into account
+  bool eq (const RGBPixel& p) const
+  { return ((*(ULong *)this) & RGB_MASK) == ((*(ULong *)&p) & RGB_MASK); }
 };
+
+// We don't need RGB_MASK anymore
+#undef RGB_MASK
 
 /**
  * Eye sensivity to different color components, from NTSC grayscale equation.

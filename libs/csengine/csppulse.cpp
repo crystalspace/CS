@@ -18,8 +18,8 @@
 */
 
 #include "sysdef.h"
+#include "csengine/world.h"
 #include "csengine/csppulse.h"
-#include "csengine/sysitf.h"
 
 static char const ANIMATION[] = "-\\|/";
 int const ANIMATION_COUNT = sizeof(ANIMATION) / sizeof(ANIMATION[0]) - 1;

@@ -16,64 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdarg.h>
-
 #include "sysdef.h"
-#include "cs3d/software/soft_g3d.h"
-#include "igraph2d.h"
-#include "iimage.h"
-
-class csScreenShot : public iImage
-{
-  int Format;
-  void *Data;
-  RGBPixel *Palette;
-  int Width, Height;
-public:
-  DECLARE_IBASE;
-  /// Initialize the screenshot object
-  csScreenShot (iGraphics2D *G2D);
-  /// Destroy the screenshot object
-  virtual ~csScreenShot ()
-  {
-    if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
-      delete [] (RGBPixel *)Data;
-    else
-      delete [] (UByte *)Data;
-  }
-  ///
-  virtual void *GetImageData ()
-  { return Data; }
-  /// Query image width
-  virtual int GetWidth ()
-  { return Width; }
-  /// Query image height
-  virtual int GetHeight ()
-  { return Height; }
-  /// Query image size in bytes
-  virtual int GetSize () { return 0; }
-  /// Resize the image to the given size
-  virtual void Resize (int NewWidth, int NewHeight)
-  { (void) NewWidth; (void) NewHeight; }
-  /// Create a new iImage which is a mipmapped version of this one.
-  virtual iImage *MipMap (int step, RGBPixel *transp)
-  { (void)step; (void)transp; return NULL; }
-  /// Set image file name
-  virtual void SetName (const char *iName)
-  { (void) iName; }
-  /// Get image file name
-  virtual const char *GetName ()
-  { return "dummy"; }
-  /// Qyery image format (see CS_IMGFMT_XXX above)
-  virtual int GetFormat ()
-  { return Format; }
-  /// Get image palette (or NULL if no palette)
-  virtual RGBPixel *GetPalette ()
-  { return Palette; }
-  /// Get alpha map for 8-bit paletted image.
-  virtual UByte *GetAlpha ()
-  { return NULL; }
-};
+#include "scrshot.h"
 
 IMPLEMENT_IBASE (csScreenShot)
   IMPLEMENTS_INTERFACE (iImage)
@@ -90,9 +34,16 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
   if (pfmt->PalEntries)
   {
     Format = CS_IMGFMT_PALETTED8;
-    Data = new UByte [Width * Height];
     Palette = G2D->GetPalette ();
-    memcpy (Data, G2D->GetPixelAt (0, 0), Width * Height * sizeof (UByte));
+    Data = new UByte [Width * Height];
+    UByte *dst = (UByte *)Data;
+    for (int y = 0; y < Height; y++)
+    {
+      UByte *src = (UByte *)G2D->GetPixelAt (0, y);
+      if (!src) continue;
+      memcpy (dst, src, Width * sizeof (UByte));
+      dst += Width;
+    }
   }
   else
   {
@@ -109,6 +60,7 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
         case 2:
         {
           UShort *src = (UShort *)G2D->GetPixelAt (0, y);
+          if (!src) continue;
           for (int x = Width; x; x--)
           {
             UShort pix = *src++;
@@ -122,6 +74,7 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
         case 4:
         {
           ULong *src = (ULong *)G2D->GetPixelAt (0, y);
+          if (!src) continue;
           for (int x = Width; x; x--)
           {
             ULong pix = *src++;
@@ -136,11 +89,10 @@ csScreenShot::csScreenShot (iGraphics2D *G2D)
   }
 }
 
-iImage *csGraphics3DSoftware::ScreenShot ()
+csScreenShot::~csScreenShot ()
 {
-  bool locked = !!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS));
-  if (!locked) BeginDraw (CSDRAW_2DGRAPHICS);
-  csScreenShot *ss = new csScreenShot (G2D);
-  if (!locked) FinishDraw ();
-  return ss;
+  if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+    delete [] (RGBPixel *)Data;
+  else
+    delete [] (UByte *)Data;
 }

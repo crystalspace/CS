@@ -192,9 +192,9 @@ void *PackDPFX (G3DPolygonDPFX &poly)
   PUT (bool, poly.use_fog);
   PUT (float, poly.inv_aspect);
   PUT (iTextureHandle *, poly.txt_handle);
-  PUT (float, poly.flat_color_r);
-  PUT (float, poly.flat_color_g);
-  PUT (float, poly.flat_color_b);
+  PUT (UByte, poly.flat_color_r);
+  PUT (UByte, poly.flat_color_g);
+  PUT (UByte, poly.flat_color_b);
 
 #undef PUT
 
@@ -217,9 +217,9 @@ void UnpackDPFX (void *Packed, G3DPolygonDPFX &poly)
   GET (bool, poly.use_fog);
   GET (float, poly.inv_aspect);
   GET (iTextureHandle *, poly.txt_handle);
-  GET (float, poly.flat_color_r);
-  GET (float, poly.flat_color_g);
-  GET (float, poly.flat_color_b);
+  GET (UByte, poly.flat_color_r);
+  GET (UByte, poly.flat_color_g);
+  GET (UByte, poly.flat_color_b);
 
 #undef GET
 

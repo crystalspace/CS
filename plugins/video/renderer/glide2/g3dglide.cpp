@@ -70,6 +70,7 @@
 // Interface table definition
 //
 
+#define SysPrintf System->Printf
 
 IMPLEMENT_FACTORY (csGraphics3DGlide2x)
 
@@ -462,8 +463,7 @@ bool csGraphics3DGlide2x::Initialize (iSystem *iSys)
   if (!m_piG2D)
     return false;
 
-  CHK (txtmgr = new csTextureManagerGlide (m_piSystem, m_piG2D));
-  txtmgr->Initialize ();
+  CHK (txtmgr = new csTextureManagerGlide (m_piSystem, m_piG2D, config));
 
   m_bVRetrace = config->GetYesNo("Glide2x","VRETRACE",FALSE);
   // tell the 2D driver whether to wait for VRETRACE
@@ -573,7 +573,7 @@ bool csGraphics3DGlide2x::Open(const char* Title)
   
   m_nHeight = m_piG2D->GetHeight();
   m_nHalfHeight = m_nHeight/2;
-  
+
   if(/*config->GetYesNo("VideoDriver","FULL_SCREEN", true)*/true)
     {
       iRes=::getResolutionIndex(m_nWidth, m_nHeight);
@@ -671,16 +671,6 @@ void csGraphics3DGlide2x::Close()
   ClearCache();
 
   GlideLib_grSstWinClose();
-}
-
-G3D_COLORMAPFORMAT csGraphics3DGlide2x::GetColormapFormat() 
-{
-  G3D_COLORMAPFORMAT g3dFormat;
-  if (use16BitTexture)
-    g3dFormat = G3DCOLORFORMAT_PRIVATE;
-  else
-    g3dFormat = G3DCOLORFORMAT_GLOBAL;
-  return g3dFormat;
 }
 
 void csGraphics3DGlide2x::SetDimensions (int width, int height)
@@ -927,7 +917,6 @@ void csGraphics3DGlide2x::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2
 
 void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 {
-
   if (poly.num < 3) return;
 
   bool lm_exists=true;
@@ -988,11 +977,11 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   }
         
 
-  csHighColorCacheData* tcache = NULL;
-  csHighColorCacheData* lcache = NULL;
+  csGlideCacheData* tcache = NULL;
+  csGlideCacheData* lcache = NULL;
   
   // retrieve the cached texture handle.
-  tcache = txt_mm->GetHighColorCacheData ();
+  tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
 //  ASSERT( tcache );
         
   // retrieve the lightmap from the cache.
@@ -1000,7 +989,7 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   
   if ( piLM )
   {
-    lcache = piLM->GetHighColorCache ();
+    lcache = (csGlideCacheData *)piLM->GetCacheData ();
     if (lcache==NULL)
     {
       lm_exists = false;
@@ -1116,11 +1105,11 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 
 void csGraphics3DGlide2x::StartPolygonFX(iTextureHandle *handle,  UInt mode)
 {
-  csHighColorCacheData* tcache=NULL;
+  csGlideCacheData* tcache = NULL;
   csTextureMMGlide* txt_mm = (csTextureMMGlide*)handle->GetPrivateObject ();
 
-  m_pTextureCache->Add(handle);
-  tcache = txt_mm->GetHighColorCacheData();
+  m_pTextureCache->Add (handle);
+  tcache = (csGlideCacheData *)txt_mm->GetCacheData ();
 
 //  ASSERT( tcache );
   m_thTex = (TextureHandler *)tcache->pData;
@@ -1217,12 +1206,6 @@ void csGraphics3DGlide2x::CacheTexture (iPolygonTexture *texture)
   iTextureHandle* txt_handle = texture->GetTextureHandle ();
   m_pTextureCache->Add (txt_handle);
   m_pLightmapCache->Add (texture);
-}
-
-/// Release a texture from the cache.
-void csGraphics3DGlide2x::UncacheTexture (iPolygonTexture *piPT)
-{
-  (void)piPT;
 }
 
 /// Dump the texture cache.
@@ -1399,18 +1382,6 @@ void csGraphics3DGlide2x::CloseFogObject (CS_ID /*id*/)
 {
 }
 
-
-void csGraphics3DGlide2x::SysPrintf(int mode, char* szMsg, ...)
-{
-  char buf[1024];
-  va_list arg;
-
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-
-  m_piSystem->Print(mode, buf);
-}
 
 iHalo *csGraphics3DGlide2x::CreateHalo(float r, float g, float b, unsigned char *alpha, int width, int height)
 {

@@ -17,7 +17,6 @@
 */
 
 #include "sysdef.h"
-#include "csengine/sysitf.h"
 #include "csengine/pol2d.h"
 #include "csengine/cssprite.h"
 #include "csengine/skeleton.h"
@@ -326,7 +325,7 @@ void csSpriteTemplate::SetTexture (csTextureList* textures, const char *texname)
     fatal_exit (0, true);
     return;
   }
-  csTextureHandle* texture = textures->GetTextureMM (texname);
+  csTextureHandle* texture = textures->FindByName (texname);
   if (texture == NULL)
   {
     CsPrintf (MSG_FATAL_ERROR, "Couldn't find texture named '%s'!\n", texname);
@@ -368,7 +367,7 @@ void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
       csVector3 &n = GetNormal (frame_number, i);
       n = csVector3 (0,0,0);
       for (j = 0; j < vt.num_con_triangles; j++)
-        n += tri_normals[vt.con_triangles[j]];
+        n += tri_normals [vt.con_triangles[j]];
       float norm = n.Norm ();
       if (norm)
         n /= norm;
@@ -754,7 +753,7 @@ void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
 void csSprite3D::SetTexture (const char* name, csTextureList* textures)
 {
   force_otherskin = true;
-  csTextureHandle* texture = textures->GetTextureMM (name);
+  csTextureHandle* texture = textures->FindByName (name);
   if (texture == NULL)
   {
     CsPrintf (MSG_FATAL_ERROR, "Couldn't find texture named '%s'!\n", name);

@@ -108,7 +108,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   pfmt.GreenMask = vinfo.green_mask;
   pfmt.BlueMask = vinfo.blue_mask;
 
-  complete_pixel_format ();
+  pfmt.complete ();
   pfmt.PalEntries = vinfo.colormap_size;
   if (vclass == TrueColor)
     pfmt.PalEntries = 0;
@@ -324,6 +324,7 @@ int find_rgb_palent (palent* pe, int r, int g, int b)
 
 bool csGraphics2DLineXLib::BeginDraw ()
 {
+  csGraphics2D::BeginDraw ();
   nr_segments = 0;
   seg_color = 0;
   return true;

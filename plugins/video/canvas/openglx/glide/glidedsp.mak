@@ -82,17 +82,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-
-#------------------------------------------------------------------- config ---#
-ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
-
-# Default value for DO_SHM
-ifndef DO_SHM
-  DO_SHM = yes
-endif
-
-ifeq ($(DO_SHM)$(findstring DO_SHM,$(MAKE_VOLATILE_H)),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SHM$">>volatile.tmp
-endif
-
-endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)

@@ -1,7 +1,6 @@
 /*
     OS/2 DIVE class library: PM related functions
-    Copyright (C) 1997 by FRIENDS software
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1997 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

@@ -136,7 +136,7 @@
 #undef SCANMAP
 #define NO_draw_scanline_map_zfil
 #define SCANFUNC csScan_8_draw_scanline_map_zfil
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP8
 #define SCANEND \
     do								\
@@ -153,7 +153,7 @@
 #undef SCANMAP
 #define NO_draw_scanline_map_zuse
 #define SCANFUNC csScan_8_draw_scanline_map_zuse
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     int uFrac, duFrac, vFrac, dvFrac;					\
     static unsigned int oldEBP;						\
@@ -206,7 +206,7 @@
 #undef SCANMAP
 #define NO_draw_scanline_map_alpha1
 #define SCANFUNC csScan_8_draw_scanline_map_alpha1
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     int uFrac, duFrac, vFrac, dvFrac;					\
     static unsigned int oldEBP;						\
@@ -333,7 +333,7 @@
 #undef SCANMAP
 #define NO_draw_scanline_map_alpha2
 #define SCANFUNC csScan_8_draw_scanline_map_alpha2
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     int uFrac, duFrac, vFrac, dvFrac;					\
     static unsigned int oldEBP;						\
@@ -463,7 +463,7 @@
 #undef SCANMAP
 #define NO_mmx_draw_scanline_map_zfil
 #define SCANFUNC csScan_8_mmx_draw_scanline_map_zfil
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP8
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanln.inc"
@@ -477,7 +477,8 @@
 #define SCANLOOP \
     do									\
     {									\
-      *_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];	\
+      *_dest++ = COLORMAP [srcTex [((uu >> 16) & ander_w) +		\
+        ((vv >> shifter_h) & ander_h)]];				\
       uu += duu;							\
       vv += dvv;							\
     }									\
@@ -517,8 +518,13 @@ void csScan_8_draw_pi_scanline_tex_zuse (void *dest, int len, unsigned long *zbu
 
 0:		cmpl	(%%ebp), %%ecx		# Check Z-buffer
 		jb	1f			# We're below surface
-		movb	(%%esi), %%dl		# Get texel
+
 		movl	%%ecx, (%%ebp)		# *zbuff = z
+		xorl	%%ecx, %%ecx		# ecx = 0
+		movl	%8, %%edx		# edx = pal_table
+		movb	(%%esi), %%cl		# Get texel
+		movb	(%%edx,%%ecx), %%dl	# Translate into RGB
+		movl	(%%ebp), %%ecx		# Get Z back (from CPU cache)
 		movb	%%dl, (%%edi)		# Put texel
 
 1:		addl	%2, %%ebx		# v = v + dv
@@ -533,146 +539,8 @@ void csScan_8_draw_pi_scanline_tex_zuse (void *dest, int len, unsigned long *zbu
 		movl	%4, %%ebp"
   : "=D" (dest)
   : "m" (duFrac), "m" (dvFrac), "m" (destend), "m" (oldEBP),
-    "m" (dudvInt[1]), "m" (dz), "m" (zbuff)
-  : "eax", "%ebx", "ecx", "edx", "esi" );
+    "m" (dudvInt[1]), "m" (dz), "m" (zbuff), "m" (Scan.PaletteTable)
+  : "eax", "%ebx", "ecx", "edx", "esi");
 }
-
-#ifdef DO_MMX
-
-#define NO_mmx_draw_pi_scanline_tex_zuse
-void csScan_8_mmx_draw_pi_scanline_tex_zuse (void *dest, int len, unsigned long *zbuff,
-  long u, long du, long v, long dv, unsigned long z, long dz,
-  unsigned char *bitmap, int bitmap_log2w)
-{
-  if (len <= 0)
-    return;
-
-  int uFrac, duFrac, vFrac, dvFrac;
-  static unsigned int oldEBP;
-  static int dudvInt[2];
-  char *destend = ((char *)dest) + len;
-  unsigned char *src = bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16);
-
-  dudvInt[1] = ((dv >> 16) << bitmap_log2w) + (du >> 16);
-  dudvInt[0] = dudvInt [1] + (1 << bitmap_log2w);
-  uFrac = u << 16;
-  vFrac = v << 16;
-  duFrac = du << 16;
-  dvFrac = dv << 16;
-  asm __volatile__ ("" : : "a" (uFrac), "b" (vFrac), "S" (src), "D" (dest));
-  asm __volatile__ ("
-		movl	%%ebp, %4		# Save EBP
-		addl	$4, %%edi		# Increment edi
-		movl	%8, %%ebp		# EBP = zbuff
-                movl	%6, %%ecx		# ECX = z
-
-		cmpl	%3, %%edi		# Less than 4 pixels left?
-		ja	5f			# Go by one
-
-		# Load MMX registers
-		movd	%7, %%mm1		# mm1 = 0 | dz
-		movd	%%ecx, %%mm0		# mm0 = 0 | z0
-		punpckldq %%mm1, %%mm1		# mm1 = dz | dz
-		movq	%%mm0, %%mm2		# mm2 = 0 | z0
-		paddd	%%mm1, %%mm2		# mm2 = dz | z1
-		punpckldq %%mm2, %%mm0		# mm0 = z1 | z0
-		pslld	$1, %%mm1		# mm1 = dz*2 | dz*2
-
-# The following is somewhat hard to understand, especially without my proprietary
-# GAS syntax highlight {tm} {R} :-) I've interleaved MMX instructions with
-# non-MMX instructions to achieve maximal percent of paired commands; even
-# commands are MMX, odd commands are non-MMX. Since MMX commands never affects
-# flags register, we shouldn't care about flags and so on.
-0:		movq	(%%ebp), %%mm3		# mm3 = bz1 | bz0
-		movb	(%%esi), %%cl		# Get texel 0
-		movq	%%mm0, %%mm5		# mm5 = z1 | z0
-		addl	%2, %%ebx		# v = v + dv
-		movq	%%mm0, %%mm4		# mm4 = z1 | z0
-		sbbl	%%edx, %%edx
-		pcmpgtd	%%mm3, %%mm5		# mm5 = m1 | m0
-		addl	%1, %%eax		# u = u + du
-		paddd	%%mm1, %%mm0		# mm0 = z3 | z2
-		adcl	%5(,%%edx,4), %%esi	# Update source texture pointer
-		movq	%%mm5, %%mm6		# mm6 = m1 | m0
-		movb	(%%esi), %%ch		# Get texel 1
-		pandn	%%mm3, %%mm5		# mm5 = ?bz1 | ?bz0
-		addl	%2, %%ebx		# v = v + dv
-		movq	8(%%ebp), %%mm3		# mm3 = bz3 | bz2
-		sbbl	%%edx, %%edx
-		pand	%%mm6, %%mm4		# mm4 = ?z1 | ?z0
-		shll	$16, %%ecx		# ECX = p1 | p0 | 0 | 0
-		movq	%%mm0, %%mm7		# mm7 = z3 | z2
-		addl	%1, %%eax		# u = u + du
-		por	%%mm4, %%mm5		# mm5 = nz1 | nz0
-		adcl	%5(,%%edx,4), %%esi	# Update source texture pointer
-		movq	%%mm0, %%mm4		# mm4 = z3 | z2
-		movb	(%%esi), %%cl		# Get texel 2
-		movq	%%mm5, (%%ebp)		# put nz1 | nz0 into z-buffer
-		addl	%2, %%ebx		# v = v + dv
-		pcmpgtd	%%mm3, %%mm7		# mm7 = m3 | m2
-		sbbl	%%edx, %%edx
-		movq	%%mm7, %%mm5		# mm5 = m3 | m2
-		addl	%1, %%eax		# u = u + du
-		paddd	%%mm1, %%mm0		# mm0 = z3 | z2
-		adcl	%5(,%%edx,4), %%esi	# Update source texture pointer
-		pandn	%%mm3, %%mm5		# mm5 = ?bz3 | ?bz2
-		movb	(%%esi), %%ch		# Get texel 3
-		pand	%%mm7, %%mm4		# mm4 = ?z3 | ?z2
-                addl	%2, %%ebx		# v = v + dv
-		packssdw %%mm6, %%mm7		# mm7 = m3 | m2 | m1 | m0
-		sbbl	%%edx, %%edx
-		por	%%mm4, %%mm5		# mm5 = nz3 | nz2
-                roll	$16, %%ecx		# ECX = p3 | p2 | p1 | p0
-		packsswb %%mm7, %%mm7		# mm7 = 0 | 0 | 0 | 0 | m3 | m2 | m1 | m0
-		addl	%1, %%eax		# u = u + du
-		movq	%%mm5, 8(%%ebp)		# put nz3 | nz2 into z-buffer
-                adcl	%5(,%%edx,4), %%esi	# Update source texture pointer
-
-#----- end of interleaved code
-
-		addl	$16, %%ebp		# Increment zbuf pointer
-
-		movd	%%mm7, %%edx		# EDX = m3 | m2 | m1 | m0
-		andl	%%edx, %%ecx		# Leave only visible texels
-		notl	%%edx			# Negate Z-mask
-		andl	-4(%%edi), %%edx	# Get on-screen pixels
-		orl	%%ecx, %%edx		# Merge two sets of pixels together
-		addl	$4, %%edi		# Increment dest pointer
-		movl	%%edx, -8(%%edi)	# Put pixels into framebuffer
-		cmpl	%3, %%edi		# dest < _destend?
-		jbe	0b
-
-                # Less than four pixels left
-		movd	%%mm0, %%ecx
-
-5:              subl	$4, %%edi
-		cmpl	%3, %%edi		# dest >=_destend?
-		jae	8f
-
-6:		cmpl	(%%ebp), %%ecx
-		jb	7f
-		movb	(%%esi), %%dl		# Get texel
-		movl	%%ecx, (%%ebp)		# *zbuff = z
-		movb	%%dl, (%%edi)		# Put texel
-
-7:		addl	%2, %%ebx		# v = v + dv
-		sbbl	%%edx, %%edx
-		addl	%1, %%eax		# u = u + du
-		adcl	%5(,%%edx,4), %%esi	# Update source texture pointer
-		addl	%7, %%ecx		# z = z + dz
-		incl	%%edi			# dest++
-		addl	$4, %%ebp		# zbuff++
-		cmpl	%3, %%edi		# dest < _destend?
-		jb	6b
-
-8:		movl	%4, %%ebp
-                emms"
-  : "=D" (dest)
-  : "m" (duFrac), "m" (dvFrac), "m" (destend), "m" (oldEBP),
-    "m" (dudvInt[1]), "m" (z), "m" (dz), "m" (zbuff)
-  : "eax", "%ebx", "ecx", "edx", "esi" );
-}
-
-#endif // DO_MMX
 
 #endif // __SCANLN8_H__

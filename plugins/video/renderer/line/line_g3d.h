@@ -63,7 +63,7 @@ public:
   csIniFile* config;
 
   /// The texture manager.
-  csTextureManagerLine* txtmgr;
+  csTextureManagerLine* texman;
 
   /// The System interface.
   iSystem* System;
@@ -129,7 +129,7 @@ public:
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
   ///
-  virtual void CacheTexture (iPolygonTexture*) { }
+  void CacheTexture (iPolygonTexture*) { }
 
   ///
   void CacheInitTexture (iPolygonTexture*) { }
@@ -139,9 +139,6 @@ public:
 
   ///
   void CacheRectTexture (iPolygonTexture*, int, int, int, int) { }
-
-  ///
-  virtual void UncacheTexture (iPolygonTexture*) { }
 
   /// Set a renderstate boolean.
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
@@ -185,20 +182,13 @@ public:
 
   /// Get the ITextureManager.
   virtual iTextureManager *GetTextureManager ()
-  { return txtmgr; }
+  { return texman; }
 
   /// Returns true if this driver requires all maps to be PO2.
   virtual bool NeedsPO2Maps () { return false; }
   /// Returns the maximum aspect ratio of maps.
   virtual int GetMaximumAspectRatio ()
   { return 32768; }
-
-  /// Get the colorformat you want.
-  virtual G3D_COLORMAPFORMAT GetColormapFormat()
-  { return G3DCOLORFORMAT_ANY; }
-
-  /// Use to printf through system driver
-  void SysPrintf (int mode, char* str, ...);
 
   /// Get Z-buffer value at given X,Y position
   virtual float GetZbuffValue (int, int) { return 0; }

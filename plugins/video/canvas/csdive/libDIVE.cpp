@@ -1,7 +1,6 @@
 /*
     OS/2 DIVE class library
-    Copyright (C) 1997 by FRIENDS software
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1997 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -72,7 +71,8 @@ HWND diveApp::CreateWindow (PSZ Title, HMODULE ModID, ULONG ResID, ULONG Flags)
   ULONG flStyle;
   HWND diveFR, diveCL;
 
-  if (!WinRegisterClass (AB, DIVE_WINDOW_CLASS, NULL, 0, sizeof (void *)))
+  if (!WinRegisterClass (AB, DIVE_WINDOW_CLASS, NULL,
+         CS_SIZEREDRAW | CS_MOVENOTIFY, sizeof (void *)))
     return 0;
 
   flStyle = Flags | FCF_SIZEBORDER | FCF_AUTOICON;

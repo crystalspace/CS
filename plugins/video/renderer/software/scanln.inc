@@ -48,7 +48,7 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
 
   float u1, v1, z, z1, u, v;
   int uu1, vv1, duu, dvv, uu, vv;
-  long izz, dzz;
+  unsigned long izz, dzz;
 
   z = 1 / inv_z;
   u = u_div_z * z;
@@ -60,20 +60,16 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
   // Some optimizations for processors with many registers (PowerPC, 680x0).
   // Get global variables into registers.
 # ifdef SCANMAP
-  unsigned long shifter = Scan.shf_u;
-  PIXTYPE *srcTex = (PIXTYPE *)Scan.tmap2;
+  ULong shifter = Scan.shf_u;
+  PIXTYPE *srcTex = (PIXTYPE *)Scan.bitmap2;
 # else
-  unsigned long shifter_h = Scan.shf_h;
-  unsigned long ander_w = Scan.and_w;
-  unsigned long ander_h = Scan.and_h;
-  #ifdef SCAN16
-  unsigned char *srcTex = (unsigned char *)Scan.tmap;
-  #else
-  PIXTYPE *srcTex = (PIXTYPE *)Scan.tmap;
-  #endif // SCAN16
+  ULong shifter_h = Scan.shf_h;
+  ULong ander_w = Scan.and_w;
+  ULong ander_h = Scan.and_h;
+  UByte *srcTex = Scan.bitmap;
 # endif // SCANMAP
-  unsigned long *z_buffer = z_buf; (void)z_buffer;
-  unsigned long *lastZbuf = z_buffer + xx-1; (void)lastZbuf;
+  ULong *z_buffer = z_buf; (void)z_buffer;
+  ULong *lastZbuf = z_buffer + xx-1; (void)lastZbuf;
   PIXTYPE *_destend;
   PIXTYPE *_dest = (PIXTYPE *)d;
 
@@ -85,7 +81,7 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
 
   dzz = QInt24 (Scan.M);
 
-# if STUPID_TEST && SCANMAP
+# if defined (STUPID_TEST) && defined (SCANMAP)
   if (uu < 0) uu = 0; else if (uu > Scan.tw2fp) uu = Scan.tw2fp;
   if (vv < 0) vv = 0; else if (vv > Scan.th2fp) vv = Scan.th2fp;
 # endif
@@ -103,7 +99,7 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
       v1 = v_div_z * z1;
       uu1 = QInt16 (u1);
       vv1 = QInt16 (v1);
-#     if STUPID_TEST && SCANMAP
+#     if defined (STUPID_TEST) && defined (SCANMAP)
       if (uu1 < 0) uu1 = 0; else if (uu1 > Scan.tw2fp) uu1 = Scan.tw2fp;
       if (vv1 < 0) vv1 = 0; else if (vv1 > Scan.th2fp) vv1 = Scan.th2fp;
 #     endif
@@ -125,7 +121,7 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
       v1 = v_div_z * z1;
       uu1 = QInt16 (u1);
       vv1 = QInt16 (v1);
-#     if STUPID_TEST && SCANMAP
+#     if defined (STUPID_TEST) && defined (SCANMAP)
       if (uu1 < 0) uu1 = 0; else if (uu1 > Scan.tw2fp) uu1 = Scan.tw2fp;
       if (vv1 < 0) vv1 = 0; else if (vv1 > Scan.th2fp) vv1 = Scan.th2fp;
 #     endif
@@ -155,7 +151,7 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
 
     SCANLOOP;
 
-#   if STUPID_TEST && SCANMAP
+#   if defined (STUPID_TEST) && defined (SCANMAP)
     // This almost definitively removes texture overflows
     uu = uu1;
     vv = vv1;

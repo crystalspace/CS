@@ -105,7 +105,7 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   pfmt.GreenMask = vinfo.green_mask;
   pfmt.BlueMask = vinfo.blue_mask;
 
-  complete_pixel_format ();
+  pfmt.complete ();
   pfmt.PalEntries = vinfo.colormap_size;
   if (vclass == TrueColor)
     pfmt.PalEntries = 0;
@@ -157,7 +157,7 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
 	pfmt.PixelBytes = 4;
 	break;
     }
-    complete_pixel_format ();
+    pfmt.complete ();
   }
 
   // Allocate the palette if not truecolor or if simulating truecolor on 8-bit display.

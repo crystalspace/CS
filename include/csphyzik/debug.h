@@ -10,7 +10,7 @@
 
 #ifdef __CRYSTALSPACE__
 #include "sysdef.h"
-#include "cssys/system.h"
+#include "csengine/world.h"
 //class csSystemDriver;
 #endif
 //#include <string>
@@ -31,13 +31,13 @@
 
 #ifdef __CRYSTALSPACE__
 #define CT_DEBUG_LEVEL MSG_DEBUG_1
-#define Debug csSystemDriver
-#define logf Printf
-#define log Printf
+#define Debug csWorld
+#define logf System->Printf
+#define log System->Printf
 // only takes two args....
-#define DEBUGLOGF2( A, B, C )  csSystemDriver::Printf( MSG_DEBUG_1, A, B, C )
-#define DEBUGLOGF( A, B )  csSystemDriver::Printf( MSG_DEBUG_1, A, B )
-#define DEBUGLOG( A )  csSystemDriver::Printf( MSG_DEBUG_1, A )
+#define DEBUGLOGF2( A, B, C )  CsPrintf ( MSG_DEBUG_1, A, B, C )
+#define DEBUGLOGF( A, B )  CsPrintf ( MSG_DEBUG_1, A, B )
+#define DEBUGLOG( A )  CsPrintf ( MSG_DEBUG_1, A )
 #else
 #define CT_DEBUG_LEVEL 1
 //!me broken

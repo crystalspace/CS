@@ -24,14 +24,17 @@
 /*----------------------------------------------- PM worker thread interface -*/
 enum
 {
-  pmcmdCreateWindow,                    // PM thread command: Create a window
-  pmcmdDestroyWindow,                   // PM thread command: Destroy the window
-  pmcmdCreateGLctx,                     // PM thread command: Create GL context
-  pmcmdDestroyGLctx,                    // PM thread command: Destroy GL context
-  pmcmdBindGLctx,                       // PM thread command: Bind GL ctx to a window
-  pmcmdUnbindGLctx,                     // PM thread command: Unbind GL ctx from window
-  pmcmdShowWindow,                      // PM thread command: Show/hide GL window
-  pmcmdLocateWindow                     // PM thread command: Set GL window position
+  pmcmdCreateWindow,                    // Create a window
+  pmcmdDestroyWindow,                   // Destroy the window
+  pmcmdCreateGLctx,                     // Create GL context
+  pmcmdDestroyGLctx,                    // Destroy GL context
+  pmcmdBindGLctx,                       // Bind GL ctx to a window
+  pmcmdUnbindGLctx,                     // Unbind GL ctx from window
+  pmcmdShowWindow,                      // Show/hide GL window
+  pmcmdLocateWindow,                    // Set GL window position
+  pmcmdResizeWindow,                    // Resize GL window
+  pmcmdSelectWindow,			// Select context associated with window
+  pmcmdResetWindow			// Reset window size/position
 };
 
 enum
@@ -73,6 +76,8 @@ struct PMrq
     {
       glWindow *glW;
       HWND Handle;
+      long DesktopW;
+      long DesktopH;
     } BindCtx;
     struct
     {
@@ -90,6 +95,10 @@ struct PMrq
       glWindow *glW;
       int x, y;
     } Locate;
+    struct
+    {
+      glWindow *glW;
+    } ResetWin;
   } Parm;
 };
 

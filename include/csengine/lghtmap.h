@@ -29,8 +29,6 @@ class csLight;
 class csWorld;
 class Dumper;
 
-struct csHighColorCacheData;
-
 /**
  * This is a shadow-map for a pseudo-dynamic light.
  */
@@ -162,9 +160,6 @@ private:
   /// Original lightmap dims (non-po2 possibly).
   int rwidth, rheight;
   
-  /// The hicolor cache ptr.
-  csHighColorCacheData *hicolorcache;
-
   /**
    * Mean lighting value of this lightmap.
    * (only for static lighting currently).
@@ -172,6 +167,9 @@ private:
   unsigned char mean_r;
   unsigned char mean_g;
   unsigned char mean_b;
+
+  /// The hicolor cache ptr.
+  void *cachedata;
 
   /**
    * Convert three lightmap tables to the right mixing mode.
@@ -203,13 +201,6 @@ public:
 
   ///
   long GetSize () { return lm_size; }
-
-  // DAN: High color cache specific stuff
-  bool in_memory;
-  ///
-  csHighColorCacheData* GetHighColorCacheData () { return hicolorcache; }
-  ///
-  void SetHighColorCacheData (csHighColorCacheData *d) { hicolorcache = d; }
 
   /**
    * Allocate the lightmap. 'w' and 'h' are the size of the
@@ -288,23 +279,26 @@ public:
   ///
   virtual unsigned char *GetMap (int nMap);
   ///
-  virtual int GetWidth ();
+  virtual int GetWidth ()
+  { return lwidth; }
   ///
-  virtual int GetHeight ();
+  virtual int GetHeight ()
+  { return lheight; }
   ///
-  virtual int GetRealWidth ();
+  virtual int GetRealWidth ()
+  { return rwidth; }
   ///
-  virtual int GetRealHeight ();
+  virtual int GetRealHeight ()
+  { return rheight; }
   ///
-  virtual bool IsCached ();
+  virtual void *GetCacheData ()
+  { return cachedata; }
   ///
-  virtual csHighColorCacheData *GetHighColorCache ();
+  virtual void SetCacheData (void *d)
+  { cachedata = d; }
   ///
-  virtual void SetInCache (bool bVal);
-  ///
-  virtual void SetHighColorCache (csHighColorCacheData* pVal);
-  ///
-  virtual void GetMeanLighting (int& r, int& g, int& b);
+  virtual void GetMeanLighting (int &r, int &g, int &b)
+  { r = mean_r; g = mean_g; b = mean_b; }
 };
 
-#endif /*LIGHTMAP_H*/
+#endif // LIGHTMAP_H

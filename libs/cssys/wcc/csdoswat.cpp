@@ -95,7 +95,7 @@ SysGraphics2D::SysGraphics2D(int argc, char *argv[]) : csGraphics2D ()
 
   } /* endswitch */
 
-  complete_pixel_format ();
+  pfmt.complete ();
 
   if ((Memory=(unsigned char *)malloc(FRAME_WIDTH*FRAME_HEIGHT*pfmt.PixelBytes))==NULL)
   {

@@ -22,6 +22,7 @@
 #include "sysdef.h"
 #include "cs2d/common/graph2d.h"
 #include "qint.h"
+#include "scrshot.h"
 #include "isystem.h"
 #include "igraph3d.h"
 #include "itexture.h"
@@ -54,10 +55,10 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   // Mark all slots in palette as free
   for (int i = 0; i < 256; i++)
   {
-    PaletteAlloc[i] = false;
-    Palette[i].red = 0;
-    Palette[i].green = 0;
-    Palette[i].blue = 0;
+    PaletteAlloc [i] = false;
+    Palette [i].red = 0;
+    Palette [i].green = 0;
+    Palette [i].blue = 0;
   }
 
   // Now try to register ourselves with system driver as being the 2D driver
@@ -92,25 +93,6 @@ void csGraphics2D::Close ()
 {
   if (LineAddress)
   { CHK (delete [] LineAddress); LineAddress = NULL; }
-}
-
-void csGraphics2D::complete_pixel_format ()
-{
-  // Exercise caution in the for(;;) loops when computing "shift" and "bits"
-  // to prevent them from looping infinitely.  Some of the 2D drivers
-  // unnecessarily call this method at 8-bit depth with the "masks" set to
-  // zero, so take this special case into account.
-#define COMPUTE(comp)							\
-  {									\
-    unsigned long i, tmp = pfmt.comp##Mask;				\
-    for (i = 0; tmp && !(tmp & 1); tmp >>= 1, i++) ;			\
-    pfmt.comp##Shift = i;						\
-    for (i = 0; tmp & 1; tmp >>= 1, i++) ;				\
-    pfmt.comp##Bits = i;						\
-  }
-  COMPUTE (Red);
-  COMPUTE (Green);
-  COMPUTE (Blue);
 }
 
 bool csGraphics2D::BeginDraw ()
@@ -530,18 +512,6 @@ int csGraphics2D::GetTextHeight (int Font)
   return FontList [Font].Height;
 }
 
-void csGraphics2D::CsPrintf (int mode, const char* text, ...)
-{
-  char buf [1024];
-  va_list arg;
-	
-  va_start (arg, text);
-  vsprintf (buf, text, arg);
-  va_end (arg);
-	
-  System->Print (mode, buf);
-}
-
 void csGraphics2D::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
 {
   oR = oG = oB = 0;
@@ -567,10 +537,18 @@ void csGraphics2D::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
     {
       case 1: pix = *vram; break;
       case 2: pix = *(UShort *)vram; break;
-      case 3: pix = *(ULong *)vram; break;
+      case 4: pix = *(ULong *)vram; break;
     }
     oR = ((pix & pfmt.RedMask)   >> pfmt.RedShift)   << (8 - pfmt.RedBits);
     oG = ((pix & pfmt.GreenMask) >> pfmt.GreenShift) << (8 - pfmt.GreenBits);
     oB = ((pix & pfmt.BlueMask)  >> pfmt.BlueShift)  << (8 - pfmt.BlueBits);
   }
+}
+
+iImage *csGraphics2D::ScreenShot ()
+{
+  BeginDraw ();
+  csScreenShot *ss = new csScreenShot (this);
+  FinishDraw ();
+  return ss;
 }

@@ -342,5 +342,7 @@ int main (int argc, char* argv[])
   if (app->InitialSetup (argc, argv, "MazeD.cfg", "/lib/MazeD"))
     app->Loop ();
 
+  delete app;
+
   return (0);
 }

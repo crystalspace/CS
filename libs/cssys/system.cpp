@@ -283,8 +283,6 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), OptionList (16, 16),
   EventQueue = NULL;
   Console = NULL;
   ConfigName = NULL;
-
-  scf=NULL;
 }
 
 csSystemDriver::~csSystemDriver ()
@@ -303,26 +301,13 @@ csSystemDriver::~csSystemDriver ()
   System = NULL;
 
   // Deregister all known drivers
-#define DEREGISTER_DRIVER(Object, Interface)			\
-  if (Object)							\
-  {								\
-    iPlugIn *plugin = QUERY_INTERFACE (Object, iPlugIn);	\
-    if (plugin)							\
-    {								\
-      DeregisterDriver (#Interface, plugin);			\
-      plugin->DecRef ();					\
-    }								\
-  }
-
-  DEREGISTER_DRIVER (VFS, iVFS);
-  DEREGISTER_DRIVER (G3D, iGraphics3D);
-  DEREGISTER_DRIVER (G2D, iGraphics2D);
-  DEREGISTER_DRIVER (Sound, iSoundRender);
-  DEREGISTER_DRIVER (NetDrv, iNetworkDriver);
-  DEREGISTER_DRIVER (NetMan, iNetworkManager);
-  DEREGISTER_DRIVER (Console, iConsole);
-
-#undef DEREGISTER_DRIVER
+  DeregisterDriver ("iVFS", VFS);
+  DeregisterDriver ("iGraphics3D", G3D);
+  DeregisterDriver ("iGraphics2D", G2D);
+  DeregisterDriver ("iSoundRender", Sound);
+  DeregisterDriver ("iNetworkDriver", NetDrv);
+  DeregisterDriver ("iNetworkManager", NetMan);
+  DeregisterDriver ("iConsole", Console);
 
   // Free all plugins
   PlugIns.DeleteAll ();
@@ -330,10 +315,6 @@ csSystemDriver::~csSystemDriver ()
   CHK (delete Mouse);
   CHK (delete Keyboard);
   CHK (delete EventQueue);
-
-//TODO Azverkan this should be a scf->Release()
-  if(scf)
-    CHK(delete scf);
 
   scfFinish ();
   console_close ();
@@ -485,7 +466,24 @@ void csSystemDriver::Close ()
 
 bool csSystemDriver::CheckDrivers ()
 {
-  return (VFS && G2D && G3D);
+  bool rc = true;
+  if (!VFS)
+  {
+    Printf (MSG_FATAL_ERROR, "FATAL: No iVFS plug-in loaded!\n");
+    rc = false;
+  }
+  if (!G3D)
+  {
+    Printf (MSG_FATAL_ERROR, "FATAL: No iGraphics3D plug-in loaded!\n");
+    rc = false;
+  }
+  if (!G2D)
+  {
+    Printf (MSG_FATAL_ERROR, "FATAL: No iGraphics2D plug-in loaded!\n");
+    rc = false;
+  }
+
+  return rc;
 }
 
 bool csSystemDriver::InitKeyboard ()
@@ -661,13 +659,13 @@ void csSystemDriver::Warn (const char* msg)
   debug_out (true, msg);
 }
 
-void csSystemDriver::Printf (int mode, const char* str, ...)
+void csSystemDriver::Printf (int mode, const char *format, ...)
 {
   char buf[1024];
   va_list arg;
 
-  va_start (arg, str);
-  vsprintf (buf, str, arg);
+  va_start (arg, format);
+  vsprintf (buf, format, arg);
   va_end (arg);
 
   switch (mode)
@@ -741,7 +739,7 @@ void csSystemDriver::Printf (int mode, const char* str, ...)
   } /* endswitch */
 }
 
-void csSystemDriver::DemoWrite (const char* buf)
+void csSystemDriver::DemoWrite (const char *buf)
 {
   if (Console)
   {
@@ -865,6 +863,9 @@ bool csSystemDriver::RegisterDriver (const char *iInterface, iPlugIn *iObject)
 
 bool csSystemDriver::DeregisterDriver (const char *iInterface, iPlugIn *iObject)
 {
+  if (!iObject)
+    return false;
+
 #define CHECK(Else, Object, Interface)					\
   Else if (strcmp (iInterface, #Interface) == 0)			\
   {									\
@@ -951,11 +952,6 @@ bool csSystemDriver::CallOnEvents (iPlugIn *iObject, unsigned int iEventMask)
   csPlugIn *plugin = (csPlugIn *)PlugIns.Get (idx);
   plugin->EventMask = iEventMask;
   return true;
-}
-
-void csSystemDriver::Print (int mode, const char *string)
-{
-  Printf (mode, "%s", string);
 }
 
 time_t csSystemDriver::GetTime ()
@@ -1107,8 +1103,50 @@ void csSystemDriver::AddNameCL (const char *iName)
   CommandLineNames.Push (strnew (iName));
 }
 
-iSCF* csSystemDriver::GetSCF() {
-  if(!scf)
-    CHK(scf=new csSCF());
-  return scf;
+//------------------------------------------ iSCF interface implementation ---//
+
+IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::csSCF)
+  IMPLEMENTS_INTERFACE (iSCF)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+bool csSystemDriver::csSCF::ClassRegistered (const char *iClassID)
+{
+  return scfClassRegistered (iClassID);
+}
+
+void *csSystemDriver::csSCF::CreateInstance (const char *iClassID,
+  const char *iInterfaceID, int iVersion)
+{
+  return scfCreateInstance (iClassID, iInterfaceID, iVersion);
+}
+
+const char *csSystemDriver::csSCF::GetClassDescription (const char *iClassID)
+{
+  return scfGetClassDescription (iClassID);
+}
+
+const char *csSystemDriver::csSCF::GetClassDependencies (const char *iClassID)
+{
+  return scfGetClassDependencies (iClassID);
+}
+
+bool csSystemDriver::csSCF::RegisterClass (const char *iClassID,
+  const char *iLibraryName, const char *Dependencies)
+{
+  return scfRegisterClass (iClassID, iLibraryName, Dependencies);
+}
+
+bool csSystemDriver::csSCF::RegisterStaticClass (scfClassInfo *iClassInfo)
+{
+  return scfRegisterStaticClass (iClassInfo);
+}
+
+bool csSystemDriver::csSCF::RegisterClassList (scfClassInfo *iClassInfo)
+{
+  return scfRegisterClassList (iClassInfo);
+}
+
+bool csSystemDriver::csSCF::UnregisterClass (char *iClassID)
+{
+  return scfUnregisterClass (iClassID);
 }

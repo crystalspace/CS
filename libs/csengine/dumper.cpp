@@ -17,6 +17,7 @@
 */
 
 #include "sysdef.h"
+#include "csutil/bitset.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/polyclip.h"
@@ -27,7 +28,6 @@
 #include "csengine/octree.h"
 #include "csengine/quadtree.h"
 #include "csengine/quadcube.h"
-#include "csengine/sysitf.h"
 #include "csengine/lppool.h"
 #include "csengine/camera.h"
 #include "csengine/polytmap.h"
@@ -244,7 +244,7 @@ void Dumper::dump (csPolyTexture* p, char* name)
     {
       CsPrintf (MSG_DEBUG_0, "        ");
       for (j = 0 ; j < p->dirty_w ; j++)
-        CsPrintf (MSG_DEBUG_0, "%d ", p->dirty_matrix[p->dirty_w*i + j]);
+        CsPrintf (MSG_DEBUG_0, "%d ", p->dirty_matrix [p->dirty_w*i + j]);
       CsPrintf (MSG_DEBUG_0, "\n");
     }
     CsPrintf (MSG_DEBUG_0, "    ]\n");

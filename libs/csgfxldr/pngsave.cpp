@@ -149,7 +149,7 @@ error2:
    */
   if (((format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
    && !(format & CS_IMGFMT_ALPHA))
-    png_set_filler (png, 0, PNG_FILLER_AFTER);
+    png_set_filler (png, 0xff, PNG_FILLER_AFTER);
 
   /* The easiest way to write the image (you may have a different memory
    * layout, however, so choose what fits your needs best).  You need to

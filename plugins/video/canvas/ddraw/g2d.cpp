@@ -328,7 +328,7 @@ void csGraphics2DDDraw3::SecondaryInit()
     pfmt.GreenMask = GreenMask;
     pfmt.BlueMask = BlueMask;
 
-    complete_pixel_format ();
+    pfmt.complete ();
   }
   else if (Depth == 32)
   {
@@ -343,7 +343,7 @@ void csGraphics2DDDraw3::SecondaryInit()
     pfmt.GreenMask = GreenMask;
     pfmt.BlueMask = BlueMask;
     
-    complete_pixel_format();
+    pfmt.complete ();
   }
 }
 

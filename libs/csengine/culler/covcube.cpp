@@ -21,7 +21,6 @@
 #include "csengine/covcube.h"
 #include "csengine/world.h"
 #include "csengine/dumper.h"
-#include "csengine/sysitf.h"
 
 bool csCoverageMaskTreePersp::DoPerspective (csVector3* verts, int num_verts,
 	csPolygon2D& persp)

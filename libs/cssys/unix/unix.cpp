@@ -83,11 +83,13 @@ void init_sig ()
 IMPLEMENT_IBASE (SysSystemDriver)
   IMPLEMENTS_INTERFACE (iSystem)
   IMPLEMENTS_INTERFACE (iUnixSystemDriver)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
 IMPLEMENT_IBASE_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver (), Callback (NULL)
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
   // Initialize signal handler for clean shutdown
   init_sig ();
 }

@@ -87,39 +87,19 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
   OS2System->GetExtSettings (WindowX, WindowY, WindowWidth, WindowHeight, HardwareCursor);
 
   PixelFormat = GLCF_DBLBUFF | (1 << GLCF_DEPTH_SHFT);
-  switch (Depth)
+  if (Depth > 8)
+    PixelFormat |= GLCF_RGBA;
+  else
   {
-    case 8:
-      pfmt.PalEntries = 256;
-      pfmt.PixelBytes = 1;
-      pfmt.RedMask    = 0xff;
-      pfmt.GreenMask  = 0xff;
-      pfmt.BlueMask   = 0xff;
-      break;
-    case 15:
-    case 16:
-    case 32:
-      PixelFormat |= GLCF_RGBA;
-      pfmt.PalEntries = 0;
-      pfmt.PixelBytes = 2;
-      pfmt.RedMask    = 0x0000000f;
-      pfmt.GreenMask  = 0x000000f0;
-      pfmt.BlueMask   = 0x00000f00;
-      break;
-    default:
-      CsPrintf (MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
-      break;
-  } /* endswitch */
-  complete_pixel_format ();
+    pfmt.PixelBytes = 1;
+    pfmt.PalEntries = 256;
+  }
 
   return true;
 }
 
 bool csGraphics2DOS2GL::Open (const char *Title)
 {
-  // Create backing store
-  CHK (Memory = new unsigned char [Width * Height * pfmt.PixelBytes]);
-
   PMrq rq;
   u_int rc;
 
@@ -153,6 +133,8 @@ bool csGraphics2DOS2GL::Open (const char *Title)
   // Bind OpenGL context to window
   rq.Parm.BindCtx.glW = glW;
   rq.Parm.BindCtx.Handle = WinHandle;
+  rq.Parm.BindCtx.DesktopW = DesktopW;
+  rq.Parm.BindCtx.DesktopH = DesktopH;
   if ((rc = PMcall (pmcmdBindGLctx, &rq)) != pmrcOK)
   {
     CsPrintf (MSG_FATAL_ERROR, "Cannot bind OpenGL context to window!\n");
@@ -179,7 +161,18 @@ bool csGraphics2DOS2GL::Open (const char *Title)
   if ((rc = PMcall (pmcmdShowWindow, &rq)) != pmrcOK)
     return false;
 
-  glW->Select ();
+  // Select window for drawing
+  rq.Parm.ShowWin.glW = glW;
+  if ((rc = PMcall (pmcmdSelectWindow, &rq)) != pmrcOK)
+    return false;
+
+  // Black magic: without this we'll get weird results, at least with
+  // OpenGL 1.1 "gold" beta release.
+  rq.Parm.ResetWin.glW = glW;
+  PMcall (pmcmdResetWindow, &rq);
+
+  if (FullScreen)
+    glW->Command (cmdFullScreen);
 
   UpdatePalette = FALSE;
 

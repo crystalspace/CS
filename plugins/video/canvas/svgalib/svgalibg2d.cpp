@@ -135,7 +135,7 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
       break;
   }
 
-  complete_pixel_format();
+  pfmt.complete ();
 
   mouse_x = mouse_y = -1;
   memset (mouse_button , 0, sizeof (mouse_button));

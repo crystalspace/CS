@@ -23,125 +23,74 @@
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
 
-class csTextureManagerDirect3D;
+class csGraphics3DDirect3DDx6;
 struct iImage;
 
-// Colors are encoded in a 16-bit short using the following
-// distribution (only for 8-bit mode):
-#define BITS_RED 6
-#define BITS_GREEN 6
-#define BITS_BLUE 4
-#define MASK_RED ((1<<BITS_RED)-1)
-#define MASK_GREEN ((1<<BITS_GREEN)-1)
-#define MASK_BLUE ((1<<BITS_BLUE)-1)
-#define NUM_RED (1<<BITS_RED)
-#define NUM_GREEN (1<<BITS_GREEN)
-#define NUM_BLUE (1<<BITS_BLUE)
-
-#define TABLE_RED	0
-#define TABLE_GREEN	1
-#define TABLE_BLUE	2
-#define TABLE_RED_HI	3
-#define TABLE_GREEN_HI	4
-#define TABLE_BLUE_HI	5
-
-typedef UShort RGB16map[256];
-typedef unsigned char RGB8map[256];
-
-/// The prefered distances to use for the color matching.
-#define PREFERED_DIST 16333
-#define PREFERED_COL_DIST 133333
-
 /**
- * Lookup table entry corresponding to one palette entry.
- * 'red', 'green', and 'blue' are tables giving the red, green,
- * and blue components for all light levels of that palette index.
+ * A mipmapped texture for Direct3D.
  */
-struct PalIdxLookup
+class csTextureMMDirect3D : public csTextureMM
 {
-  RGB16map red;
-  RGB16map green;
-  RGB16map blue;
+public:
+  /// A pointer to the 3D driver object
+  csGraphics3DDirect3DDx6 *G3D;
+
+  /// Initialize the object
+  csTextureMMDirect3D (iImage* image, int flags, csGraphics3DDirect3DDx6 *iG3D);
+  /// Create a new texture object
+  virtual csTexture *new_texture (iImage *Image);
+  /// Compute the mean color for the just-created texture
+  virtual void compute_mean_color ();
 };
 
-#define R24(rgb) (((rgb)>>16)&0xff)
-#define G24(rgb) (((rgb)>>8)&0xff)
-#define B24(rgb) ((rgb)&0xff)
+/**
+ * csTextureDirect3D is a class derived from csTexture that implements
+ * all the additional functionality required by the Direct3D renderer.
+ * Every csTextureDirect3D is converted into the internal device format
+ * during initialization.
+ */
+class csTextureDirect3D : public csTexture
+{
+  // The actual image (in device-dependent format)
+  UByte *image;
 
-typedef csHardwareAcceleratedTextureMM csTextureMMDirect3D;
+public:
+  /// Create a csTexture object
+  csTextureDirect3D (csTextureMM *Parent, iImage *Image, csGraphics3DDirect3DDx6 *iG3D);
+  /// Destroy the texture
+  virtual ~csTextureDirect3D ();
+  /// Return a pointer to texture data
+  virtual void *get_bitmap ();
+  /// Get image data
+  UByte *get_image_data ()
+  { return image; }
+};
 
 /**
- * OpenGL version of the texture manager. This
+ * Texture manager for Direct3D driver.
  */
 class csTextureManagerDirect3D : public csTextureManager
 {
-private:
-  int num_red, num_green, num_blue;
-
-  /// Configuration values for color matching.
-  int prefered_dist;
-  /// Configuration values for color matching.
-  int prefered_col_dist;
-
-  /// Read configuration values from config file.
-  void read_config ();
-
-  /**
-   * Encode RGB values to a 16-bit word (for 16-bit mode).
-   */
-  ULong encode_rgb (int r, int g, int b);
-
-  ///
-  csTexture* get_texture (int idx, int lev);
-
-  /**
-   * Find rgb for a specific map type and apply an intensity.
-   * 'map_type' is one of TABLE_....
-   */
-  int find_rgb_map (int r, int g, int b, int map_type, int l);
-
 public:
+  /// Shift counters for converting R8G8B8 to internal texture format
+  rsr, rsl, gsr, gsl, bsr, bsl;
+
   ///
-  csTextureManagerDirect3D (iSystem* iSys, iGraphics2D* iG2D);
+  csTextureManagerDirect3D (iSystem* iSys, iGraphics2D* iG2D, csIniFile *config);
   ///
   virtual ~csTextureManagerDirect3D ();
-  ///
-  virtual void Initialize ();
 
   ///
-  virtual void clear ();
+  virtual void Clear ();
 
   ///
-  virtual void Prepare ();
+  virtual void PrepareTextures ();
   ///
-  virtual iTextureHandle *RegisterTexture (iImage* image, bool for3d, bool for2d);
+  virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
+  ///
+  virtual void PrepareTexture (iTextureHandle *handle);
   ///
   virtual void UnregisterTexture (iTextureHandle* handle);
-  ///
-  virtual void MergeTexture (iTextureHandle* handle);
-  ///
-  virtual void FreeImages ();
-  ///
-  virtual void ReserveColor (int r, int g, int b);
-  ///
-  virtual void AllocPalette ();
-
-  /// Create a new texture.
-  csTextureMMDirect3D* new_texture (iImage* image);
-
-  /**
-   * Return the index for some color. This works in 8-bit
-   * (returns an index in the 256-color table) and in 15/16-bit
-   * (returns a 15/16-bit encoded RGB value).
-   */
-  virtual int find_color (int r, int g, int b);
-
-  /**
-   * Remap all textures.
-   */
-  void remap_textures ();
 };
 
-
 #endif // TXTMGR_DIRECT3D_H
-

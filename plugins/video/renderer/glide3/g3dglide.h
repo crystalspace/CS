@@ -146,19 +146,13 @@ public:
   virtual void DrawPolygonQuick (G3DPolygonDPQ& poly);
 
   /// Give a texture to Graphics3D to cache it.
-  virtual CacheTexture (iPolygonTexture *texture);
+  void CacheTexture (iPolygonTexture *texture);
   
-  /// Release a texture from the cache.
-  virtual void UncacheTexture (iPolygonTexture *piPT);
-      
   /// Dump the texture cache.
   virtual void DumpCache ();
   
   /// Clear the texture cache.
   virtual void ClearCache ();
-
-  ///
-  virtual G3D_COLORMAPFORMAT GetColormapFormat ();
 
   /// Print the screen.
   virtual void Print (csRect* rect);
@@ -220,9 +214,6 @@ public:
   virtual void CloseFogObject (CS_ID id) { }
 
 private:
-  // print to the system's device
-  void SysPrintf(int mode, char* str, ...);
-
   /// board selected
   int board;
 

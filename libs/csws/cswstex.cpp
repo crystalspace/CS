@@ -25,13 +25,10 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//-- Windowing system texture --//--
 
-csWSTexture::csWSTexture (const char *iName, iImage *inImage,
-  bool i2D, bool i3D)
+csWSTexture::csWSTexture (const char *iName, iImage *inImage, int iFlags)
 {
-  Image = inImage;
-  Image->IncRef ();
-  for2D = i2D;
-  for3D = i3D;
+  (Image = inImage)->IncRef ();
+  Flags = iFlags;
   IsTransp = false;
   Name = strnew (iName);
   FileName = strnew (Image->GetName ());
@@ -116,10 +113,9 @@ void csWSTexture::Register (iTextureManager *iTexMan)
 {
   Unregister ();
   TexMan = iTexMan;
-  Handle = iTexMan->RegisterTexture (Image, for3D, for2D);
+  Handle = iTexMan->RegisterTexture (Image, Flags);
   if (IsTransp)
     Handle->SetTransparent (tr, tg, tb);
-  Handle->IncRef ();
 }
 
 void csWSTexture::Unregister ()
@@ -142,7 +138,7 @@ void csWSTexture::Refresh ()
     Handle->SetTransparent (tr, tg, tb);
   else
     Handle->SetTransparent (-1, -1, -1);
-  TexMan->MergeTexture (Handle);
+  TexMan->PrepareTexture (Handle);
 }
 
 void csWSTexture::SetName (const char *iName)
@@ -164,7 +160,7 @@ int csWSTexture::GetWidth ()
   else if (Handle)
   {
     int bw, bh;
-    Handle->GetBitmapDimensions (bw, bh);
+    Handle->GetMipMapDimensions (0, bw, bh);
     return bw;
   }
   return 0;
@@ -177,7 +173,7 @@ int csWSTexture::GetHeight ()
   else if (Handle)
   {
     int bw, bh;
-    Handle->GetBitmapDimensions (bw, bh);
+    Handle->GetMipMapDimensions (0, bw, bh);
     return bh;
   }
   return 0;

@@ -85,7 +85,7 @@ bool csGraphics2DDOSRAW::Initialize (iSystem *pSystem)
   pfmt.GreenMask = (ULong)gm;
   pfmt.BlueMask = (ULong)bm;
   pfmt.PixelBytes = (Depth + 7) / 8;
-  complete_pixel_format();
+  pfmt.complete ();
   return true;
 }
 

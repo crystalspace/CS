@@ -34,11 +34,13 @@
 IMPLEMENT_IBASE (SysSystemDriver)
   IMPLEMENTS_INTERFACE (iSystem)
   IMPLEMENTS_INTERFACE (iOS2SystemDriver)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
 IMPLEMENT_IBASE_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
   CONSTRUCT_IBASE (NULL)
+  CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
   // Lower the priority of the main thread
   DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0);
 }

@@ -18,7 +18,6 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "csengine/sysitf.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
@@ -625,8 +624,6 @@ void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
   }
 }
 
-
-
 //---------------------------------------------------------------------------
 
 void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
@@ -725,17 +722,14 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
       g3dpolyfx.vertices[1].v = gs->GetUVCoords ()[1].y;
       g3dpolyfx.vertices[2].u = gs->GetUVCoords ()[2].x;
       g3dpolyfx.vertices[2].v = gs->GetUVCoords ()[2].y;
-      float r, g, b;
-      g3dpolyfx.txt_handle->GetMeanColor (r, g, b);
-      g3dpolyfx.flat_color_r = r;
-      g3dpolyfx.flat_color_g = g;
-      g3dpolyfx.flat_color_b = b;
+      g3dpolyfx.txt_handle->GetMeanColor (g3dpolyfx.flat_color_r,
+        g3dpolyfx.flat_color_g, g3dpolyfx.flat_color_b);
     }
     else
     {
-      g3dpolyfx.flat_color_r = poly->GetFlatColor ().red;
-      g3dpolyfx.flat_color_g = poly->GetFlatColor ().green;
-      g3dpolyfx.flat_color_b = poly->GetFlatColor ().blue;
+      g3dpolyfx.flat_color_r = QRound (255 * poly->GetFlatColor ().red);
+      g3dpolyfx.flat_color_g = QRound (255 * poly->GetFlatColor ().green);
+      g3dpolyfx.flat_color_b = QRound (255 * poly->GetFlatColor ().blue);
     }
     if (po_colors)
     {
@@ -764,11 +758,6 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     g3dpoly.num = num_vertices;
     g3dpoly.txt_handle = poly->GetTextureHandle ();
     g3dpoly.inv_aspect = rview->inv_aspect;
-    float r, g, b;
-    g3dpoly.txt_handle->GetMeanColor (r, g, b);
-    g3dpoly.flat_color_r = r;
-    g3dpoly.flat_color_g = g;
-    g3dpoly.flat_color_b = b;
 
     // We are going to use DrawPolygon.
     if (mirror)

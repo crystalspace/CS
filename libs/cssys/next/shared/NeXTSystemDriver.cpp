@@ -25,9 +25,10 @@
 //-----------------------------------------------------------------------------
 // SCF interface to NeXT-specific csSystemDriver.
 //-----------------------------------------------------------------------------
-IMPLEMENT_IBASE(NeXTSystemDriver)
-    IMPLEMENTS_INTERFACE(iSystem)
-    IMPLEMENTS_EMBEDDED_INTERFACE(iNeXTSystemDriver)
+IMPLEMENT_IBASE (NeXTSystemDriver)
+  IMPLEMENTS_INTERFACE (iSystem)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iNeXTSystemDriver)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE(NeXTSystemDriver::NeXTSystemInterface)
@@ -42,6 +43,7 @@ NeXTSystemDriver::NeXTSystemDriver() : csSystemDriver(), initialized(false),
     controller(0), ticks(0), simulated_depth(0), next_config(0)
     {
     CONSTRUCT_IBASE(0);
+    CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
     CONSTRUCT_EMBEDDED_IBASE(scfiNeXTSystemDriver);
     printf("Crystal Space for " OS_NEXT_DESCRIPTION " " VERSION "\nPorted to "
 	OS_NEXT_DESCRIPTION " by Eric Sunshine <sunshine@sunshineco.com>\n\n");

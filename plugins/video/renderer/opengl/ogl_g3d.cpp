@@ -21,16 +21,13 @@
 #include <stdio.h>
 
 #include "sysdef.h"
-#ifdef OS_WIN32
-#include <windows.h>
-#endif
 #include "qint.h"
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
-#include "cs3d/opengl/ogl_g3d.h"
-#include "cs3d/opengl/ogl_txtcache.h"
+#include "ogl_g3d.h"
+#include "ogl_txtcache.h"
 #include "csutil/inifile.h"
 #include "isystem.h"
 #include "igraph3d.h"
@@ -43,6 +40,8 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+#define SysPrintf System->Printf
 
 // uncomment the 'USE_MULTITEXTURE 1' define to enable code for
 // multitexture support - this is independent of the extension detection,
@@ -161,9 +160,7 @@ bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
   if (!G2D)
     return 0;
 
-  CHK (txtmgr = new csTextureManagerOpenGL (System, G2D));
-  txtmgr->SetConfig (config);
-  txtmgr->Initialize ();
+  CHK (txtmgr = new csTextureManagerOpenGL (System, G2D, config, this));
 
   m_renderstate.dither = config->GetYesNo ("OpenGL", "ENABLE_DITHER", false);
   z_buf_mode = CS_ZBUF_NONE;
@@ -191,7 +188,7 @@ bool csGraphics3DOpenGL::Open (const char *Title)
 
   if (!G2D->Open (Title))
   {
-    SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.");
+    SysPrintf (MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
     // set "not opened" flag
     width = height = -1;
     return false;
@@ -339,7 +336,7 @@ bool csGraphics3DOpenGL::Open (const char *Title)
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, FOGTABLE_SIZE, 1, 0,
+  glTexImage2D (GL_TEXTURE_2D, 0, 4, FOGTABLE_SIZE, 1, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, transientfogdata);
   CHK (delete[]transientfogdata);
 
@@ -617,10 +614,10 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   bool tex_transp;
   int poly_alpha = poly.alpha;
 
-  csHighColorCacheData *texturecache_data;
-  texturecache_data = txt_mm->GetHighColorCacheData ();
+  csGLCacheData *texturecache_data;
+  texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
   tex_transp = txt_mm->GetTransparent ();
-  GLuint texturehandle = *((GLuint *) (texturecache_data->pData));
+  GLuint texturehandle = texturecache_data->Handle;
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
 
@@ -630,7 +627,11 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   else
   {
     glDisable (GL_TEXTURE_2D);
-    poly.txt_handle->GetMeanColor (flat_r, flat_g, flat_b);
+    UByte r, g, b;
+    poly.txt_handle->GetMeanColor (r, g, b);
+    flat_r = float (r) / 255.;
+    flat_g = float (g) / 255.;
+    flat_b = float (b) / 255.;
   }
 
   SetGLZBufferFlags ();
@@ -685,8 +686,8 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   // texture coordinate bounds)
   if (thelightmap && m_renderstate.lighting)
   {
-    csHighColorCacheData *lightmapcache_data = thelightmap->GetHighColorCache ();
-    GLuint lightmaphandle = *((GLuint *) (lightmapcache_data->pData));
+    csGLCacheData *lightmapcache_data = (csGLCacheData *)thelightmap->GetCacheData ();
+    GLuint lightmaphandle = lightmapcache_data->Handle;
 
     // Jorrit: this code was added to scale the lightmap.
     // @@@ Note that many calculations in this routine are not very
@@ -876,11 +877,9 @@ void csGraphics3DOpenGL::StartPolygonFX (iTextureHandle * handle, UInt mode)
   if (handle && m_renderstate.textured)
   {
     csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) handle->GetPrivateObject ();
-    texture_cache->Add (handle);
-
-    csHighColorCacheData *cachedata;
-    cachedata = txt_mm->GetHighColorCacheData ();
-    texturehandle = *((GLuint *) (cachedata->pData));
+    texture_cache->cache_texture (handle);
+    csGLCacheData *cachedata = (csGLCacheData *)txt_mm->GetCacheData ();
+    texturehandle = cachedata->Handle;
   }
   if ((mode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
     m_gouraud = true;
@@ -972,9 +971,9 @@ void csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX & poly)
   float flat_r = 1., flat_g = 1., flat_b = 1.;
   if (!m_textured)
   {
-    flat_r = poly.flat_color_r;
-    flat_g = poly.flat_color_g;
-    flat_b = poly.flat_color_b;
+    flat_r = poly.flat_color_r / 255.;
+    flat_g = poly.flat_color_g / 255.;
+    flat_b = poly.flat_color_b / 255.;
   }
   glBegin (GL_TRIANGLE_FAN);
   float sx, sy;
@@ -1053,95 +1052,35 @@ void csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX & poly)
   }
 }
 
-/**
- * Initiate a volumetric fog object. This function will be called
- * before front-facing and back-facing fog polygons are added to
- * the object. The fog object will be convex but not necesarily
- *         closed.
- * The given CS_ID can be used to identify multiple fog
- * objects when
- * multiple objects are started.
- */
-void csGraphics3DOpenGL::OpenFogObject (CS_ID /* id */ , csFog * /* fog */ )
+void csGraphics3DOpenGL::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
 {
+  // OpenGL driver implements vertex-based fog ...
 }
 
-/**
- * Add a front or back-facing fog polygon in the current fog object.
- * Note that it is guaranteed that all back-facing fog polygons
- * will have been added before the first front-facing polygon.
- * fogtype can be:
- *    CS_FOG_FRONT:   a front-facing polygon
- *    CS_FOG_BACK:    a back-facing polygon
- *    CS_FOG_VIEW:    the view-plane
- */
-void csGraphics3DOpenGL::AddFogPolygon (CS_ID	/* id */ , G3DPolygonAFP & /* poly */ ,
-				int /* fogtype */ )
+void csGraphics3DOpenGL::AddFogPolygon (CS_ID /*id*/, G3DPolygonAFP &/*poly*/, int /*fogtype*/)
 {
+  // OpenGL driver implements vertex-based fog ...
 }
 
-/**
- * Close a volumetric fog object. After the volumetric object is
- * closed it should be rendered on screen (whether you do it here
- * or in DrawFrontFog/DrawBackFog is not important).
- */
-void csGraphics3DOpenGL::CloseFogObject (CS_ID		/* id */ )
+void csGraphics3DOpenGL::CloseFogObject (CS_ID /*id*/)
 {
+  // OpenGL driver implements vertex-based fog ...
 }
 
-void csGraphics3DOpenGL::CacheTexture (iPolygonTexture * texture)
+void csGraphics3DOpenGL::CacheTexture (iPolygonTexture *texture)
 {
-  iTextureHandle *txt_handle = texture->GetTextureHandle ();
-  texture_cache->Add (txt_handle);
-  lightmap_cache->Add (texture);
+  iTextureHandle* txt_handle = texture->GetTextureHandle ();
+  texture_cache->cache_texture (txt_handle);
+  lightmap_cache->cache_lightmap (texture);
 }
-
-void csGraphics3DOpenGL::CacheLightedTexture (iPolygonTexture *	/* texture */ )
+  
+void csGraphics3DOpenGL::UncacheTexture (iTextureHandle */*handle*/)
 {
+  //@@todo
 }
-
-void csGraphics3DOpenGL::CacheInitTexture (iPolygonTexture *	/* texture */ )
+  
+void csGraphics3DOpenGL::CacheLightedTexture (iPolygonTexture */*texture*/)
 {
-#if 0
-  iTextureContainer *piTC = world->GetTextures ();
-  tcache->init_texture (texture, piTC);
-#endif
-}
-
-void csGraphics3DOpenGL::CacheSubTexture (iPolygonTexture *	/* texture */ , int
-				/* u */ , int /* v */ )
-{
-#if 0
-  iTextureContainer *piTC = world->GetTextures ();
-  tcache->use_sub_texture (texture, piTC, u, v);
-#endif
-}
-
-void csGraphics3DOpenGL::CacheRectTexture (iPolygonTexture *	/* tex */ ,
-		  int /* minu */ , int /* minv */ , int /* maxu */ , 
-		  int /* maxv */ )
-{
-#if 0
-  iTextureContainer *piTC = world->GetTextures ();
-  int subtex_size;
-  tex->GetSubtexSize (subtex_size);
-
-  int iu, iv;
-  for (iu = minu; iu < maxu; iu += subtex_size)
-  {
-    for (iv = minv; iv < maxv; iv += subtex_size)
-      tcache->use_sub_texture (tex, piTC, iu, iv);
-    tcache->use_sub_texture (tex, piTC, iu, maxv);
-  }
-  for (iv = minv; iv < maxv; iv += subtex_size)
-    tcache->use_sub_texture (tex, piTC, maxu, iv);
-  tcache->use_sub_texture (tex, piTC, maxu, maxv);
-#endif
-}
-
-void csGraphics3DOpenGL::UncacheTexture (iPolygonTexture * texture)
-{
-  (void) texture;
 }
 
 bool csGraphics3DOpenGL::SetRenderState (G3D_RENDERSTATEOPTION op, long value)
@@ -1378,19 +1317,7 @@ void csGraphics3DOpenGL::SetGLZBufferFlags ()
   }
 }
 
-void csGraphics3DOpenGL::SysPrintf (int mode, char *szMsg,...)
-{
-  char buf[1024];
-  va_list arg;
-
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-
-  System->Print (mode, buf);
-}
-
-// / Shortcut to override standard polygon drawing when we have
+// Shortcut to override standard polygon drawing when we have
 // multitexture
 bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 {
@@ -1544,10 +1471,10 @@ bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   bool tex_transp;
   int poly_alpha = poly.alpha;
 
-  csHighColorCacheData *texturecache_data;
-  texturecache_data = txt_mm->GetHighColorCacheData ();
+  csGLCacheData *texturecache_data;
+  texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
   tex_transp = txt_mm->GetTransparent ();
-  GLuint texturehandle = *((GLuint *) (texturecache_data->pData));
+  GLuint texturehandle = texturecache_data->Handle;
 
   // configure base texture for texure unit 0
   float flat_r = 1.0, flat_g = 1.0, flat_b = 1.0;
@@ -1570,8 +1497,8 @@ bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     glColor4f (flat_r, flat_g, flat_b, 0.);
   }
 
-  csHighColorCacheData *lightmapcache_data = thelightmap->GetHighColorCache ();
-  GLuint lightmaphandle = *((GLuint *) (lightmapcache_data->pData));
+  csGLCacheData *lightmapcache_data = (csGLCacheData *)thelightmap->GetCacheData ();
+  GLuint lightmaphandle = lightmapcache_data->Handle;
 
   // configure lightmap for texture unit 1
   glActiveTextureARB (GL_TEXTURE1_ARB);

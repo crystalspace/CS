@@ -110,15 +110,13 @@ int FindNearestPowerOf2 (int n);
 /// returns true if n is a power of two
 bool IsPowerOf2 (int n);
 
-#ifndef __cmath_macos__
 /// Find the log2 of argument
-static inline int log2 (int n)
+static inline int csLog2 (int n)
 {
   int l = 31; unsigned x = 0x80000000;
   while (x && !(n & x))
     l--, x >>= 1;
   return l;
 }
-#endif // __cmath_macos__
 
 #endif // __UTIL_H__

@@ -32,10 +32,10 @@
 #include "d3d.h"
 #include "d3dcaps.h"
 
-#include "cs3d/direct3d61/d3d_txtcache.h"
-#include "cs3d/direct3d61/d3d_txtmgr.h"
-#include "cs3d/direct3d61/d3d_states.h"
-#include "cs3d/direct3d61/d3d_vertcache.h"
+#include "d3d_txtcache.h"
+#include "d3d_txtmgr.h"
+#include "d3d_states.h"
+#include "d3d_vertcache.h"
 #include "cs3d/common/dtmesh.h"
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
@@ -97,9 +97,6 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
   /// the globally unique identifier for this device.
   GUID m_Guid;
   
-  /// The texture manager
-  csTextureManagerDirect3D* txtmgr;
-
   /// the texture cache.
   D3DTextureCache* m_pTextureCache;
   /// the lightmap cache.
@@ -196,6 +193,9 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
 public:
   DECLARE_IBASE;
 
+  /// The texture manager
+  csTextureManagerDirect3D* txtmgr;
+
   static DDSURFACEDESC2 m_ddsdLightmapSurfDesc;
   static DDSURFACEDESC2 m_ddsdTextureSurfDesc;
   static DDSURFACEDESC2 m_ddsdHaloSurfDesc;
@@ -243,10 +243,10 @@ public:
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
   /// Give a texture to Graphics3D to cache it.
-  virtual void CacheTexture (iPolygonTexture* texture);
-  
-  /// Release a texture from the cache.
-  virtual void UncacheTexture (iPolygonTexture* texture);
+  void CacheTexture (iPolygonTexture *handle);
+
+  /// Remove a texture from cache (perhaps because it's being unregistered)
+  void UncacheTexture (iTextureHandle *texture);
   
   /// Get the capabilities of this driver: NOT IMPLEMENTED.
   virtual void GetCaps(G3D_CAPS *caps);
@@ -256,8 +256,6 @@ public:
   
   /// Clear the texture cache.
   virtual void ClearCache(void);
-  ///
-  virtual G3D_COLORMAPFORMAT GetColormapFormat ();
 
   /// Print the screen.
   virtual void Print (csRect* rect) { m_piG2D->Print(rect); }
@@ -335,9 +333,6 @@ public:
 
 private:
   
-  // print to the system's device
-  void SysPrintf(int mode, char* str, ...);
-
   // Z-Buffer enumeration callback  
   static HRESULT CALLBACK EnumZBufferFormatsCallback(LPDDPIXELFORMAT lpddpf, LPVOID lpUserArg);
 

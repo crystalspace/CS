@@ -40,6 +40,8 @@
 #include "cs3d/glide3/g3dglide.h"
 #include "cs2d/glide2common/iglide2d.h"
 
+#define SysPrintf System->Printf
+
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
 #if defined(OS_WIN32)
@@ -528,14 +530,6 @@ void csGraphics3DGlide3x::Close()
     grSstWinClose(grcontext);
 }
 
-void csGraphics3DGlide3x::GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat ) 
-{
-  if (use16BitTexture)
-    g3dFormat = G3DCOLORFORMAT_PRIVATE;
-  else
-    g3dFormat = G3DCOLORFORMAT_GLOBAL;
-}
-
 void csGraphics3DGlide3x::SetDimensions (int width, int height)
 {
   m_nWidth = width;
@@ -619,7 +613,7 @@ void csGraphics3DGlide3x::FinishDraw ()
 }
 
 /// do the page swap.
-void csGraphics3DGlide3x::Print(csRect* rect)
+void csGraphics3DGlide3x::Print (csRect* rect)
 {
   m_piG2D->Print( rect );
 }
@@ -797,7 +791,7 @@ void csGraphics3DGlide3x::DrawPolygon(G3DPolygonDP& poly)
   HighColorCacheAndManage_Data* lcache;
   
   // retrieve the cached texture handle.
-  tcache = piMMC->GetHighColorCache (); 
+  tcache = (csGlideCacheData *)piMMC->GetCacheData (); 
   ASSERT( tcache );
   
   // retrieve the lightmap from the cache.
@@ -805,7 +799,7 @@ void csGraphics3DGlide3x::DrawPolygon(G3DPolygonDP& poly)
   
   if ( piLM )
   {
-    lcache = piLM->GetHighColorCache ();
+    lcache = (csGlideCacheData *)piLM->GetCacheData ();
     if (!lcache)
     {
       lm_exists = false;
@@ -916,7 +910,7 @@ void csGraphics3DGlide3x::DrawPolygonQuick (G3DPolygonDPQ& poly)
   }
   
   m_pTextureCache->Add(poly.pi_texture);
-  tcache = poly.pi_texture->GetHighColorCache (); 
+  tcache = (csGlideCacheData *)poly.pi_texture->GetCacheData (); 
   ASSERT( tcache );
   
   TextureHandler *thTex = (TextureHandler *)tcache->pData;
@@ -948,12 +942,6 @@ void csGraphics3DGlide3x::CacheTexture (iPolygonTexture *piPT)
   {
     m_pLightmapCache->Add(piPT);
   } 
-}
-
-/// Release a texture from the cache.
-void csGraphics3DGlide3x::UncacheTexture (iPolygonTexture *piPT)
-{
-  (void)piPT;
 }
 
 /// Dump the texture cache.
@@ -1045,16 +1033,4 @@ void csGraphics3DGlide3x::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
   default:
     return E_NOTIMPL;
   }
-}
-
-void csGraphics3DGlide3x::SysPrintf(int mode, char* szMsg, ...)
-{
-  char buf[1024];
-  va_list arg;
-
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-
-  m_piSystem->Print(mode, buf);
 }

@@ -19,19 +19,80 @@
 #ifndef __GL_TEXTURECACHE_H__
 #define __GL_TEXTURECACHE_H__
 
-#include "cs3d/opengl/ogl_hicache.h"
+#include "csutil/scf.h"
+#include <GL/gl.h>
+
+struct iLightMap;
+struct iTextureHandle;
+struct iPolygonTexture;
 
 ///
-class OpenGLTextureCache: public HighColorCache
+struct csGLCacheData
+{
+  /// the size of this texture/lightmap
+  long Size;
+  /// iTextureHandle if texture, iLightMap if lightmap.
+  void *Source;
+  /// GL texture handle
+  GLuint Handle;
+  /// linked list
+  csGLCacheData *next, *prev;
+};
+
+///
+enum csCacheType
+{
+  CS_TEXTURE, CS_LIGHTMAP
+};
+
+///
+class OpenGLCache
 {
 private:
+  ///
+  csCacheType type;
+  /// the head and tail of the cache data
+  csGLCacheData *head, *tail;
+
+protected:
+  /// the maximum size of the cache
+  long cache_size;
+  /// number of items
+  int num;
+  /// the total size of the cache
+  long total_size;
+
+public:
+  /// takes the maximum size of the cache
+  OpenGLCache (int max_size, csCacheType type, int bpp);
+  ///
+  virtual ~OpenGLCache ();
+
+  ///
+  void cache_texture (iTextureHandle *texture);
+  ///
+  void cache_lightmap (iPolygonTexture *polytex);
+  ///
+  void Clear ();
+
+protected:
+  ///
+  int bpp;
+
+  ///
+  virtual void Load (csGLCacheData *d) = 0;
+  ///
+  virtual void Unload (csGLCacheData *d) = 0;
+};
+
+///
+class OpenGLTextureCache : public OpenGLCache
+{
   bool rstate_bilinearmap;
 
 public:
   ///
-  virtual void Dump();
-  ///
-  OpenGLTextureCache(int size, int bitdepth);
+  OpenGLTextureCache (int size, int bitdepth);
   ///
   virtual ~OpenGLTextureCache ();
 
@@ -42,28 +103,25 @@ public:
 
 protected:
   ///
-  virtual void Load(csHighColorCacheData *d);
+  virtual void Load (csGLCacheData *d);
   ///
-  virtual void Unload(csHighColorCacheData *d);
+  virtual void Unload (csGLCacheData *d);
 };
 
 ///
-class OpenGLLightmapCache: public HighColorCache
+class OpenGLLightmapCache : public OpenGLCache
 {
-private:
 public:
   ///
   OpenGLLightmapCache (int size, int bitdepth);
   ///
   virtual ~OpenGLLightmapCache ();
-  ///
-  virtual void Dump ();
 
 protected:
   ///
-  virtual void Load (csHighColorCacheData *d);
+  virtual void Load (csGLCacheData *d);
   ///
-  virtual void Unload (csHighColorCacheData *d);
+  virtual void Unload (csGLCacheData *d);
 };
 
 #endif // __GL_TEXTURECACHE_H__

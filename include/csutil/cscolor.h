@@ -16,11 +16,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CSCOLOR_H
-#define CSCOLOR_H
+#ifndef __CSCOLOR_H__
+#define __CSCOLOR_H__
 
 /**
  * A class used to represent a color in RGB space.
+ * This class is similar to RGBPixel and RGBcolor except that
+ * it uses floating-point values to store R,G,B values.
  */
 class csColor
 {
@@ -37,32 +39,34 @@ public:
   csColor () { }
   /// Initialize a color object with given R,G,B components
   csColor (float r, float g, float b)
-    { red = r; green = g; blue = b; }
+  { red = r; green = g; blue = b; }
   /// Initialize a color object with an existing color
   csColor (const csColor& c)
-    { red = c.red; green = c.green; blue = c.blue; }
+  { red = c.red; green = c.green; blue = c.blue; }
   /// Set color to given R,G,B components
   void Set (float r, float g, float b)
-    { red = r; green = g; blue = b; }
+  { red = r; green = g; blue = b; }
   /// Clamp color to given R,G,B values
   void Clamp (float r, float g, float b)
-    { if (red > r) red = r;
-      if (green > g) green = g;
-      if (blue > b) blue = b; }
+  { 
+    if (red > r) red = r;
+    if (green > g) green = g;
+    if (blue > b) blue = b;
+  }
   /// Assign one color object to another
   csColor& operator= (const csColor& c)
-    { red = c.red; green = c.green; blue = c.blue; return *this; }
+  { red = c.red; green = c.green; blue = c.blue; return *this; }
   /// Multiply this color by a scalar value
   csColor& operator*= (float f)
-    { red *= f; green *= f; blue *= f; return *this; }
+  { red *= f; green *= f; blue *= f; return *this; }
 };
 
 /// Multiply a color by a scalar value
 inline csColor operator* (const csColor& s, float f)
-  { csColor c(s); c *= f; return c; }
+{ csColor c (s); c *= f; return c; }
 
 /// Multiply a scalar value by a color
 inline csColor operator* (float f, const csColor& s)
-  { csColor c(s); c *= f; return c; }
+{ csColor c (s); c *= f; return c; }
 
-#endif /*CSCOLOR_H*/
+#endif // __CSCOLOR_H__

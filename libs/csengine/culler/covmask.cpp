@@ -19,8 +19,8 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "csgeom/math2d.h"
+#include "csengine/world.h"
 #include "csengine/covmask.h"
-#include "csengine/sysitf.h"
 #include "igraph2d.h"
 
 void csCovMask::Dump () const

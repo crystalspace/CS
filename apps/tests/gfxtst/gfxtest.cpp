@@ -46,6 +46,7 @@ static struct option long_options[] =
   {"mipmap", required_argument, 0, 'm'},
   {"transp", required_argument, 0, 't'},
   {"paletted", no_argument, 0, '8'},
+  {"truecolor", no_argument, 0, 'c'},
   {"verbose", no_argument, 0, 'v'},
   {"version", no_argument, 0, 'V'},
   {0, no_argument, 0, 0}
@@ -57,6 +58,7 @@ static struct
   bool save;
   bool display;
   bool paletted;
+  bool truecolor;
   int scaleX, scaleY;
   int displayW, displayH;
   int mipmap;
@@ -65,6 +67,7 @@ static struct
 {
   false,
   true,
+  false,
   false,
   false,
   0, 0,
@@ -84,7 +87,8 @@ static int display_help ()
   printf ("  -s   --scale=#,#     Re-scale the image to given size #\n");
   printf ("  -m   --mipmap=#      Create mipmap level # (=0,1,2,3) from image\n");
   printf ("  -t   --transp=#,#,#  Treat color (R,G,B) as transparent\n");
-  printf ("  -8   --paletted      Load/handle/save image in paletted format\n");
+  printf ("  -8   --paletted      Convert image to 8 bits-per-pixel paletted format\n");
+  printf ("  -c   --truecolor     Convert image to truecolor format\n");
   printf ("  -h   --help          Display this help text\n");
   printf ("  -v   --verbose       Comment on what's happening\n");
   printf ("  -V   --version       Display program version\n");
@@ -145,8 +149,15 @@ static bool process_file (const char *fname)
 
   fclose (f);
 
-  iImage *ifile = csImageLoader::Load (buffer, fsize,
-    opt.paletted ? CS_IMGFMT_PALETTED8 : CS_IMGFMT_TRUECOLOR);
+  int fmt;
+  if (opt.paletted)
+    fmt = CS_IMGFMT_PALETTED8;
+  else if (opt.truecolor)
+    fmt = CS_IMGFMT_TRUECOLOR;
+  else
+    fmt = CS_IMGFMT_ANY;
+
+  iImage *ifile = csImageLoader::Load (buffer, fsize, fmt | CS_IMGFMT_ALPHA);
   delete [] buffer;
   if (!ifile)
   {
@@ -172,7 +183,7 @@ static bool process_file (const char *fname)
   if (opt.scaleX > 0 && opt.scaleY > 0)
   {
     printf ("Rescaling image to %d x %d\n", opt.scaleX, opt.scaleY);
-    ifile->Resize (opt.scaleX, opt.scaleY);
+    ifile->Rescale (opt.scaleX, opt.scaleY);
     sprintf (strchr (suffix, 0), "-s%dx%d", opt.scaleX, opt.scaleY);
   }
 
@@ -210,7 +221,7 @@ static bool process_file (const char *fname)
   if (opt.display)
   {
     static char imgchr [] = " .,;+*oO";
-    ifile->Resize (opt.displayW, opt.displayH);
+    ifile->Rescale (opt.displayW, opt.displayH);
     RGBPixel *rgb;
     UByte *idx = NULL;
     bool truecolor = (ifile->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR;
@@ -249,7 +260,7 @@ int main (int argc, char **argv)
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8d::s:m:t:hvV", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cd::s:m:t:hvV", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
@@ -257,6 +268,9 @@ int main (int argc, char **argv)
         return -1;
       case '8':
         opt.paletted = true;
+        break;
+      case 'c':
+        opt.truecolor = true;
         break;
       case 'd':
         opt.save = false;

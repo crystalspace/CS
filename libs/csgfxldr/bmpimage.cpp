@@ -211,7 +211,7 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
       }
     }
     // Now transform the image data to target format
-    convert_8bit (buffer, palette);
+    convert_pal8 (buffer, palette);
     return true;
   }
   else if (!(*BICLRUSED(iBuffer)) && (*BITCOUNT(iBuffer)) == TRUECOLOR24)
@@ -232,7 +232,7 @@ bool ImageBMPFile::LoadWindowsBitmap (UByte* iBuffer, ULong iSize)
       buffer_y -= Width;
     }
     // Now transform the image data to target format
-    convert_rgb (buffer);
+    convert_rgba (buffer);
     return true;
   }
 

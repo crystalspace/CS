@@ -35,7 +35,6 @@ struct iPolygonTexture;
 struct iTextureManager;
 struct iTextureHandle;
 struct iHalo;
-struct iImage;
 
 #define CS_FOG_FRONT		0
 #define CS_FOG_BACK		1
@@ -137,9 +136,9 @@ struct G3DPolygonDPFX
   iTextureHandle* txt_handle;
 
   /// Use this color for drawing (if txt_handle == NULL) instead of a texture.
-  float flat_color_r;
-  float flat_color_g;
-  float flat_color_b;
+  UByte flat_color_r;
+  UByte flat_color_g;
+  UByte flat_color_b;
 };
 
 /// Structure containing all info needed by DrawPolygon (DP)
@@ -165,11 +164,6 @@ struct G3DPolygonDP
   G3DTexturePlane plane;
   /// The plane equation in camera space of this polygon. @@@ BAD NAME
   G3DPolyNormal normal;
-
-  /// Use this color for drawing (if txt_handle == NULL) instead of a texture.
-  float flat_color_r;
-  float flat_color_g;
-  float flat_color_b;
 
   /// Handle to lighted textures (texture+lightmap) (for all mipmap levels).
   iPolygonTexture* poly_texture[4];
@@ -319,14 +313,6 @@ struct G3D_CAPS
   G3D_FOGMETHOD fog;
 };
 
-enum G3D_COLORMAPFORMAT
-{
-  G3DCOLORFORMAT_ANY,             // can use either private color maps or global color maps
-  G3DCOLORFORMAT_PRIVATE,         // only uses private color maps.
-  G3DCOLORFORMAT_GLOBAL,          // only uses global color maps.
-  G3DCOLORFORMAT_24BIT            // only uses 24 bit textures
-};
-
 /**
  * A triangle. Note that this structure is only valid if used
  * in combination with a vertex or edge table. 'a', 'b', and 'c' are then
@@ -424,7 +410,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 0, 0, 3);
+SCF_VERSION (iGraphics3D, 1, 0, 0);
 
 /**
  * This is the standard 3D graphics interface.
@@ -554,12 +540,6 @@ struct iGraphics3D : public iPlugIn
    */
   virtual void CloseFogObject (CS_ID id) = 0;
 
-  /// Give a texture to csGraphics3D to cache it.
-  virtual void CacheTexture (iPolygonTexture* texture) = 0;
-
-  /// Release a texture from the cache.
-  virtual void UncacheTexture (iPolygonTexture* texture) = 0;
-
   /// Set a renderstate value.
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val) = 0;
 
@@ -610,9 +590,6 @@ struct iGraphics3D : public iPlugIn
    */
   virtual void SetClipper (csVector2* vertices, int num_vertices) = 0;
 
-  /// Get the texture representation scheme.
-  virtual G3D_COLORMAPFORMAT GetColormapFormat () = 0;
-
   /// Returns true if the driver needs PO2 lightmaps and texture maps
   virtual bool NeedsPO2Maps () = 0;
 
@@ -631,9 +608,6 @@ struct iGraphics3D : public iPlugIn
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
     unsigned char *iAlpha, int iWidth, int iHeight) = 0;
-
-  /// Do a screenshot: return a new iImage object
-  virtual iImage *ScreenShot () { return NULL; }
 };
 
 #endif // __IGRAPH3D_H__

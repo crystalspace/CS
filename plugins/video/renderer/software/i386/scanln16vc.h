@@ -160,7 +160,7 @@ __asm   mov     _dest,edi                   \
 #undef SCANMAP
 #define NO_draw_scanline_map_zfil
 #define SCANFUNC draw_scanline_map_zfil
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND \
     do                              \
@@ -178,7 +178,7 @@ __asm   mov     _dest,edi                   \
 #undef SCANMAP
 #define NO_draw_scanline_map_zuse
 #define SCANFUNC draw_scanline_map_zuse
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP                                            \
     s = srcTex + ((vv >> 16) << shifter) + (uu >> 16);      \
                                                             \
@@ -205,8 +205,8 @@ __asm   mov     ebp,sz_buffer               \
 __asm   label0:                     \
 __asm   cmp     ecx,DWORD PTR[ebp]      /* Check Z-buffer*/ \
 __asm   jb      label1          /* We're below surface*/    \
-__asm   mov     dx, WORD PTR [esi]      /* Get texel*/      \
 __asm   mov     DWORD PTR [ebp], ecx    /* *zbuff = z*/     \
+__asm   mov     dx, WORD PTR [esi]      /* Get texel*/      \
 __asm   mov     WORD PTR [edi],dx       /* Put texel*/      \
                                     \
 __asm   label1:                     \
@@ -412,7 +412,7 @@ __asm   mov     _dest, edi         }                \
 #pragma message( "draw_scanline_map_alpha50" )
 #define NO_draw_scanline_map_alpha50
 #define SCANFUNC draw_scanline_map_alpha50
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
 #include "cs3d/software/scanln.inc"
 
@@ -424,7 +424,7 @@ __asm   mov     _dest, edi         }                \
 #undef SCANMAP
 #define NO_mmx_draw_scanline_map_zfil
 #define SCANFUNC mmx_draw_scanline_map_zfil
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanln.inc"
@@ -436,12 +436,13 @@ __asm   mov     _dest, edi         }                \
 #define NO_mmx_draw_scanline_tex_zfil
 #define SCANFUNC mmx_draw_scanline_tex_zfil
 #define SCANLOOP \
-    do                                  \
-    {                                   \
-      *_dest++ = pal_table[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];\
-      uu += duu;                            \
-      vv += dvv;                            \
-    }                                   \
+    do									\
+    {									\
+      *_dest++ = COLORMAP [srcTex [((uu >> 16) & ander_w) +		\
+        ((vv >> shifter_h) & ander_h)]];				\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
     while (_dest <= _destend)
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanln.inc"

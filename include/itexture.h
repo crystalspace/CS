@@ -4,72 +4,55 @@
 #ifndef ITEXTURE_H
 #define ITEXTURE_H
 
-struct csHighColorCacheData;
-
-SCF_VERSION (iTextureHandle, 1, 0, 0);
+SCF_VERSION (iTextureHandle, 2, 0, 0);
 
 /** 
  * A texture handle as returned by iTextureManager.
  */
 struct iTextureHandle : public iBase
 {
+  /// Enable transparent color
+  virtual void SetTransparent (bool Enable) = 0;
+
   /// Set the transparent color.
-  virtual void SetTransparent (int red, int green, int blue) = 0;
+  virtual void SetTransparent (UByte red, UByte green, UByte blue) = 0;
 
   /// Get the transparent status (false if no transparency, true if transparency).
   virtual bool GetTransparent () = 0;
 
   /// Get the transparent color
-  virtual void GetTransparent (int &red, int &green, int &blue) = 0;
+  virtual void GetTransparent (UByte &red, UByte &green, UByte &blue) = 0;
 
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
-   * This function is only valid if the texture has been registered
-   * for 3D usage.
+   * If the texture was registered just for 2D usage, mipmap levels above
+   * 0 will return false.
    */
-  virtual void GetMipMapDimensions (int mm, int& w, int& h) = 0;
+  virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh) = 0;
 
   /**
    * Get the bitmap data for the given mipmap.
-   * This function is not always available: it depends on implementation.
+   *<p>
+   * Note that the value returned is NOT neccessarily the address
+   * of pixel data. The actual meaning depends of the 3D driver.
+   * It could be a texture handle, for example, with some hardware
+   * renderers. The interpretation of the returned value depends
+   * just of the 2D driver.
    */
-  virtual void *GetMipMapData (int mm) = 0;
-
-  /**
-   * Get the dimensions for the 2D texture.
-   * This function is only valid if the texture has been registered
-   * for 2D usage.
-   */
-  virtual void GetBitmapDimensions (int& bw, int& bh) = 0;
-
-  /**
-   * Get the bitmap data for the 2D texture.
-   * This function is only valid if the texture has been registered
-   * for 2D usage.
-   */
-  virtual void *GetBitmapData () = 0;
+  virtual void *GetMipMapData (int mipmap) = 0;
 
   /// Get the mean color.
-  virtual void GetMeanColor (float& r, float& g, float& b) = 0;
+  virtual void GetMeanColor (UByte &red, UByte &green, UByte &blue) = 0;
 
-  /// Get the mean color index
-  virtual int GetMeanColor () = 0;
+  /// Get data associated internally with this texture by texture cache
+  virtual void *GetCacheData () = 0;
 
-  /// Used internally by the 2D driver
-  virtual csHighColorCacheData *GetHighColorCacheData () = 0;
-
-  ///
-  virtual void SetHighColorCacheData (csHighColorCacheData *d) = 0;
-
-  /// Query whenever the texture is in texture cache
-  virtual bool IsCached () = 0;
-
-  /// Set "in-cache" state
-  virtual void SetInCache (bool InCache) = 0;
+  /// Set data associated internally with this texture by texture cache
+  virtual void SetCacheData (void *d) = 0;
 
   /**
-   * Query the private object (3D driver internal use) associated with
-   * this handle. This is somewhat ugly, how do you think?
+   * Query the private object associated with this handle.
+   * For internal usage by the 3D driver.
    */
   virtual void *GetPrivateObject () = 0;
 };

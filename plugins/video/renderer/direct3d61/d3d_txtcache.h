@@ -24,31 +24,88 @@
 #include "d3d.h"
 #include "d3dcaps.h"
 
-#include "IGraph3d.h"
-
-#include "cs3d/direct3d61/d3d_g3d.h"
-#include "cs3d/direct3d61/d3d_hicache.h"
+#include "d3d_g3d.h"
 
 ///
-struct D3DTextureCache_Data 
+struct csD3DCacheData
 {
-  LPDIRECTDRAWSURFACE4 lpsurf;		// texture data surface
-  LPDIRECT3DTEXTURE2 lptex;		// texture interface
-  
-  LPDIRECTDRAWPALETTE lpddpal;	// texture palette
+  /// size this takes up.
+  long lSize;
+  /// The source iTextureHandle/iLightMap
+  void *Source;
+  /// Internal texture cache data
+  union
+  {
+    ///
+    struct
+    {
+      LPDIRECTDRAWSURFACE4 lpsurf;	// texture data surface
+      LPDIRECT3DTEXTURE2 lptex;		// texture interface
+      LPDIRECTDRAWPALETTE lpddpal;	// texture palette
+    } Texture;
+    ///
+    struct
+    {
+      LPDIRECTDRAWSURFACE4 lpsurf;	// texture data surface
+      LPDIRECT3DTEXTURE2 lptex;		// texture interface
+      float ratio_width;
+      float ratio_height;
+    } LightMap;
+  };
+  /// linked list
+  csD3DCacheData *next, *prev;
 };
 
 ///
-struct D3DLightCache_Data
+enum csCacheType
 {
-  LPDIRECTDRAWSURFACE4 lpsurf;		// texture data surface
-  LPDIRECT3DTEXTURE2 lptex;		// texture interface
-  float ratio_width;
-  float ratio_height;
+  CS_TEXTURE, CS_LIGHTMAP
 };
 
 ///
-class D3DTextureCache: public HighColorCache
+class D3DCache
+{
+protected:
+  csCacheType type;
+  /// the head and tail of the cache data
+  csD3DCacheData *head, *tail;
+
+protected:
+  /// the maximum size of the cache
+  long cache_size;
+  /// number of items
+  int num;
+  /// the total size of the cache
+  long total_size;
+
+public:
+  /// takes the maximum size of the cache
+  D3DCache (int max_size, csCacheType type, int bpp);
+  ///
+  virtual ~D3DCache();
+
+  ///
+  void cache_texture (iTextureHandle *texture);
+  ///
+  void cache_lightmap (iPolygonTexture *polytex);
+  ///
+  void Clear ();
+
+  ///
+  virtual void Dump () = 0;
+
+protected:
+  ///
+  int bpp;
+
+  ///
+  virtual void Load (csD3DCacheData *d) = 0;
+  ///
+  virtual void Unload (csD3DCacheData *d) = 0;
+};
+
+///
+class D3DTextureCache: public D3DCache
 {
 private:
   ///
@@ -72,18 +129,17 @@ public:
   
 protected:
   ///
-  virtual void Load(csHighColorCacheData *d);
+  virtual void Load(csD3DCacheData *cached_texture);
   ///
-  virtual void Unload(csHighColorCacheData *d);
+  virtual void Unload(csD3DCacheData *cached_texture);
 
-  unsigned char m_GammaCorrect[256];
 private:
   ///
-  void LoadIntoVRAM(D3DTextureCache_Data *tex);
+  void LoadIntoVRAM(csD3DCacheData *cached_texture);
 };
 
 ///
-class D3DLightMapCache: public HighColorCache
+class D3DLightMapCache: public D3DCache
 {
 private:
   ///
@@ -102,14 +158,12 @@ public:
   
 protected:
   ///
-  virtual void Load(csHighColorCacheData *d);
+  virtual void Load(csD3DCacheData *cached_lightmap);
   ///
-  virtual void Unload(csHighColorCacheData *d);
-
-  unsigned char m_GammaCorrect[256];
+  virtual void Unload(csD3DCacheData *cached_lightmap);
 private:
   ///
-  void LoadIntoVRAM(D3DLightCache_Data *tex);
+  void LoadIntoVRAM(csD3DCacheData *cached_lightmap);
 };
 
 #endif

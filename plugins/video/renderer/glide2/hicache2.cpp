@@ -39,7 +39,6 @@ void HighColorCacheAndManage::Add(iTextureHandle *texture)
 {
   // gsteenss: original dataptr...
   //HighColorCacheAndManage_Data *cached_texture;
-  csHighColorCacheData *cached_texture;
   int size = 0;
   
   if(type!=HIGHCOLOR_TEXCACHE) return;
@@ -47,8 +46,8 @@ void HighColorCacheAndManage::Add(iTextureHandle *texture)
   for (int c =0; c<4; c++)
   {
     int width, height;
-    texture->GetMipMapDimensions( c, width, height );    
-    size += width * height;
+    if (texture->GetMipMapDimensions( c, width, height ))
+      size += width * height;
   }
 
   size *= bpp/8;
@@ -56,16 +55,11 @@ void HighColorCacheAndManage::Add(iTextureHandle *texture)
   bool bIsInVideoMemory;
   
   csTextureMMGlide* txt_mm = (csTextureMMGlide*)texture->GetPrivateObject ();
-  bIsInVideoMemory = txt_mm->IsCached ();
+  csGlideCacheData *cached_texture = (csGlideCacheData *)txt_mm->GetCacheData ();
   
-  if (bIsInVideoMemory)
+  if (cached_texture)
   {
     // move unit to front (MRU)
-
-    
-    cached_texture = txt_mm->GetHighColorCacheData ();
-    if(!cached_texture) return;
-
     if(cached_texture != head)
     {
       if(cached_texture->prev) cached_texture->prev->next = cached_texture->next;
@@ -82,30 +76,27 @@ void HighColorCacheAndManage::Add(iTextureHandle *texture)
   }
   else
   {
-        
     // unit is not in memory. load it into the cache
     while((total_size + size >= cache_size)&&(manager->hasFreeSpace(size)))
     {
       // out of memory. remove units from bottom of list.
-                        iTextureHandle* piMMC;
-                        HighColorCacheAndManage_Data* l = (HighColorCacheAndManage_Data*)tail;
+      cached_texture = tail;
 
-                        piMMC = QUERY_INTERFACE( l->pSource, iTextureHandle );
+      iTextureHandle *texh = (iTextureHandle *)cached_texture->pSource;
 
       tail = tail->prev;
       if(tail) tail->next = NULL;
       else head = NULL;
-      l->prev = NULL;
+      cached_texture->prev = NULL;
 
-                        csTextureMMGlide* txt_mm2 = (csTextureMMGlide*)piMMC->GetPrivateObject ();
-                        txt_mm2->SetInCache(false);
-                        txt_mm2->SetHighColorCacheData (NULL);
-                        Unload(l);          // unload it.
-//      manager->freeSpaceMem(l->mempos);
-      delete l->mempos;
-      l->mempos=0;
+      csTextureMMGlide* txt_mm2 = (csTextureMMGlide*)texh->GetPrivateObject ();
+      txt_mm2->SetCacheData (NULL);
+      Unload(cached_texture);          // unload it.
+//      manager->freeSpaceMem(cached_texture->mempos);
+      delete cached_texture->mempos;
+      cached_texture->mempos=0;
       num--;
-      total_size -= l->lSize;
+      total_size -= cached_texture->lSize;
     }
     
     // now load the unit.
@@ -122,8 +113,7 @@ void HighColorCacheAndManage::Add(iTextureHandle *texture)
     cached_texture->pSource = texture;
     cached_texture->lSize = size;
 
-                txt_mm->SetInCache(true);
-                txt_mm->SetHighColorCacheData (cached_texture);
+                txt_mm->SetCacheData (cached_texture);
 
 //    cached_texture->mempos=manager->allocSpaceMem(size);
     Load(cached_texture);       // load it.
@@ -132,46 +122,38 @@ void HighColorCacheAndManage::Add(iTextureHandle *texture)
 
 void HighColorCacheAndManage::Add(iPolygonTexture *polytex)
 {
-  HighColorCacheAndManage_Data *cached_texture=NULL;
-  HighColorCacheAndManage_Data* l=NULL;
-
   iLightMap *piLM = polytex->GetLightMap ();
   if (!piLM) return;
 
-  if(type!=HIGHCOLOR_LITCACHE) return;
+  if (type != HIGHCOLOR_LITCACHE) return;
 
   int width = piLM->GetWidth();
   int height = piLM->GetHeight();
   int size = width*height*(bpp/8);
+
+  csGlideCacheData *cached_texture = (csGlideCacheData *)piLM->GetCacheData ();
     
-  if (polytex->RecalculateDynamicLights() && piLM->IsCached())
+  if (polytex->RecalculateDynamicLights() && cached_texture)
   {
-    l = (HighColorCacheAndManage_Data*)piLM->GetHighColorCache ();
+    if(cached_texture->next)
+      cached_texture->next->prev = cached_texture->prev;
+    if(cached_texture->prev)
+      cached_texture->prev->next = cached_texture->next;
     
-    if(l->next)
-      l->next->prev = l->prev;
-    if(l->prev)
-      l->prev->next = l->next;
+    piLM->SetCacheData (NULL);
     
-    piLM->SetInCache(false);
-    piLM->SetHighColorCache(NULL);
-    
-    Unload(l);          // unload it.
-    //      manager->freeSpaceMem(l->mempos);
-    delete l->mempos;
-    l->mempos=0;            
+    Unload(cached_texture);          // unload it.
+    // manager->freeSpaceMem(cached_texture->mempos);
+    delete cached_texture->mempos;
+    cached_texture->mempos=0;            
     num--;
-    total_size -= l->lSize;
+    total_size -= cached_texture->lSize;
+    cached_texture = NULL;
   }
 
-  if (piLM->IsCached())
+  if (cached_texture)
   {
     // move unit to front (MRU)
-
-    cached_texture = (HighColorCacheAndManage_Data*)piLM->GetHighColorCache ();
-
-    if(!cached_texture) return;
-
     if(cached_texture != head)
     {
       if(cached_texture->prev) cached_texture->prev->next = cached_texture->next;
@@ -188,33 +170,30 @@ void HighColorCacheAndManage::Add(iPolygonTexture *polytex)
   }
   else
   {
-        
     // unit is not in memory. load it into the cache
     while(total_size + size >= cache_size)
     {
       // out of memory. remove units from bottom of list.
-      iLightMap* ilm;
-      
-      ilm = QUERY_INTERFACE( l->pSource, iLightMap );
+      cached_texture = tail;
+      iLightMap *ilm = (iLightMap *)cached_texture->pSource;
       assert( ilm );
 
       tail = tail->prev;
-      if(tail) tail->next = NULL;
-      else head = NULL;
-      l->prev = NULL;
+      if (tail)
+        tail->next = NULL;
+      else
+        head = NULL;
+      cached_texture->prev = NULL;
 
-      ilm->SetInCache(false);
-      ilm->SetHighColorCache(NULL);
+      ilm->SetCacheData(NULL);
 
-      Unload(l);          // unload it.
+      Unload(cached_texture);          // unload it.
 //      manager->freeSpaceMem(l->mempos);
-      delete l->mempos;
-      l->mempos=0;            
+      delete cached_texture->mempos;
+      cached_texture->mempos=0;            
             
       num--;
-      total_size -= l->lSize;
-
-      ilm->DecRef();
+      total_size -= cached_texture->lSize;
     }
     
     // now load the unit.
@@ -231,8 +210,7 @@ void HighColorCacheAndManage::Add(iPolygonTexture *polytex)
     cached_texture->pSource = piLM;
     cached_texture->lSize = size;
     
-    piLM->SetInCache(true);
-    piLM->SetHighColorCache(cached_texture);
+    piLM->SetCacheData(cached_texture);
     
     cached_texture->pData = NULL;
 //    cached_texture->mempos=manager->allocSpaceMem(size);
@@ -255,15 +233,12 @@ void HighColorCacheAndManage::Clear()
 
     if(type==HIGHCOLOR_TEXCACHE) 
     {
-      IMipMapContainer* piMMC = NULL;
+      IMipMapContainer* texh = NULL;
       
-      head->pSource->QueryInterface( IID_IMipMapContainer, (void**)piMMC );
-      assert( piMMC );
+      head->pSource->QueryInterface( IID_IMipMapContainer, (void**)texh );
+      assert( texh );
       
-      piMMC->SetHighColorCache(NULL);
-      piMMC->SetInCache(false);
-        
-      piMMC->DecRef();
+      texh->SetCacheData(NULL);
     }
     else if(type==HIGHCOLOR_LITCACHE)
     {
@@ -272,10 +247,7 @@ void HighColorCacheAndManage::Clear()
       head->pSource->QueryInterface( IID_iLightMap, (void**)piLM );
       assert( piLM );
       
-      piLM->SetHighColorCache(NULL);
-      piLM->SetInCache(false);
-        
-      piLM->DecRef();
+      piLM->SetCacheData(NULL);
     }
     head = n;
   }

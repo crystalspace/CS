@@ -21,9 +21,7 @@
 
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cs2d/openglwin/oglg2d.h"
-#include "cs3d/opengl/ogl_txtcache.h"
-#include "cs3d/opengl/ogl_txtmgr.h"
+#include "oglg2d.h"
 #include "isystem.h"
 
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
@@ -188,38 +186,11 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
 
   System->GetSettings(Width, Height, Depth, FullScreen);
     
-  if (Depth==8)
+  if (Depth == 8)
   {
-    // calculate CS's pixel format structure.
-    pfmt.RedMask = pfmt.GreenMask = pfmt.BlueMask = 0;
-    pfmt.PalEntries = 256; pfmt.PixelBytes = 1;
-    
-    complete_pixel_format();
+    pfmt.PalEntries = 256;
+    pfmt.PixelBytes = 1;
   }
-  else if (Depth==16)
-  {
-    // calculate CS's pixel format structure.
-    pfmt.PixelBytes = 2;
-    pfmt.PalEntries = 0;
-    pfmt.RedMask   = 0x1f << 11;
-    pfmt.GreenMask = 0x3f << 5;
-    pfmt.BlueMask  = 0x1f;
-    
-    complete_pixel_format();
-  }
-  else if (Depth==32)
-  {
-    // calculate CS's pixel format structure.
-    pfmt.PixelBytes = 4;
-    pfmt.PalEntries = 0;
-    pfmt.RedMask   = 0xff << 16;
-    pfmt.GreenMask = 0xff << 8;
-    pfmt.BlueMask  = 0xff;
-    
-    complete_pixel_format();
-  }
-  else
-    sys_fatalerror("Only support 8, 16 or 32 bits color depth");
   
   CsPrintf (MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
   return true;
@@ -392,19 +363,6 @@ void csGraphics2DOpenGL::Print (csRect* /*area*/)
 {
   SwapBuffers(hDC);
   glFlush();
-}
-
-bool csGraphics2DOpenGL::BeginDraw()
-{
-  return csGraphics2D::BeginDraw ();
-}
-
-void csGraphics2DOpenGL::FinishDraw ()
-{
-  csGraphics2D::FinishDraw ();
-  if (FrameBufferLocked)
-    return;
-
   if (m_nActivePage == 0)
     m_nActivePage = 1;
   else

@@ -372,7 +372,7 @@ int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
     code = gptr.nextcode(code_size);
   }
 
-  convert_8bit (optr.get_image (), palette.get_palette ());
+  convert_pal8 (optr.get_image (), palette.get_palette ());
 
   return 0;
 }

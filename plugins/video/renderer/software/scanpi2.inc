@@ -12,11 +12,7 @@
 #endif
     {
 #ifndef PI_FLAT
-  #ifdef PI_R8G8B8
-      register UInt texel = *(((ULong*)bitmap) + ((v >> 16) << bitmap_log2w) + (u >> 16));
-  #else
-      register UInt texel = Scan.PaletteTable [*(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16))];
-  #endif
+      UByte texel = bitmap [((v >> 16) << bitmap_log2w) + (u >> 16)];
   #ifdef PI_COLORKEY
       // if colorkeying is enabled, we will ignore texels with the value 0.
       if (texel)
@@ -26,41 +22,64 @@
 #if defined (PI_ZUSE) || defined (PI_ZFILL)
         *zbuff = z;
 #endif
+#if (defined (PI_GOURAUD) || defined (PI_BLEND)) && !defined (PI_FLAT)
+        RGBPixel rgbtexel = Scan.TexturePalette [texel];
+#endif
 #if defined (PI_BLEND)
         // The color of the source texel (SRC)
   #if defined (PI_GOURAUD)
-    #if PI_RS >= 15
-        register UInt rs = ShiftToPos ((texel >> PI_RS_BLEND) * r, 15, PI_RBB) & ((PI_RM2 >> PI_RS) << PI_RBB);
-    #else
-        register UInt rs = ShiftToPos ((texel & PI_RM_BLEND) * r, PI_RS_BLEND + 15, PI_RBB) & ((PI_RM2 >> PI_RS) << PI_RBB);
-    #endif
-        register UInt gs = ShiftToPos ((texel & PI_GM_BLEND) * g, PI_GS_BLEND + 15, PI_GBB) & ((PI_GM2 >> PI_GS) << PI_GBB);
-        register UInt bs = ShiftToPos ((texel & PI_BM_BLEND) * b, PI_BS_BLEND + 15, PI_BBB) & ((PI_BM2 >> PI_BS) << PI_BBB);
+        // This works as follows (for example let's take the case when red
+        // component is 5 bits wide). The `r' variable is in 5.16 format in
+        // this case, so after multiplication we have something in 5.24 format
+        // (the rgbtexel variable has 8 bits for every of red, green and blue).
+        // Now we should shrink those .24 bits to .5 (i.e. >> 5.5 format
+        // (actually 6.5 format since we allow 2*SRC lighting)).
+        // For this we use the formula: shift_amount = (24 - X) where
+        // X is the number of bits. In the above example we'll get 24+5=19.
+        // Thus, 24 - 19 = 5. For 8-bit modes we use 6.16 format, since
+        // otherwise the tables grow quite big.
+        unsigned rs = ((r * rgbtexel.red  ) >> (24 - PI_RB_BLEND)) & PI_RM_BLEND;
+        unsigned gs = ((g * rgbtexel.green) >> (24 - PI_GB_BLEND)) & PI_GM_BLEND;
+        unsigned bs = ((b * rgbtexel.blue ) >> (24 - PI_BB_BLEND)) & PI_BM_BLEND;
   #else
-        register UInt rs = ShiftToPos (texel & PI_RM_BLEND, PI_RS_BLEND, PI_RBB);
-        register UInt gs = ShiftToPos (texel & PI_GM_BLEND, PI_GS_BLEND, PI_GBB);
-        register UInt bs = ShiftToPos (texel & PI_BM_BLEND, PI_BS_BLEND, PI_BBB);
+        // Flat lighting. Here we use the following formula: since we need
+        // to convert the 8-bit r, g and b values from rgbtexel to X.X format,
+        // thus we shift the 8-bit value (X + X - 8) times. For the example
+        // above (5 bits) this turns into 5 + 5 - 8 = 2 times. After this we're
+        // AND'ing the result with some mask to strip off unused lower bits.
+        unsigned rs = (rgbtexel.red   << (PI_RB_BLEND * 2 - 8)) & PI_RM_BLEND;
+        unsigned gs = (rgbtexel.green << (PI_GB_BLEND * 2 - 8)) & PI_GM_BLEND;
+        unsigned bs = (rgbtexel.blue  << (PI_BB_BLEND * 2 - 8)) & PI_BM_BLEND;
   #endif
 
         // The color of the screen pixel (DST)
-        UInt pixel = *_dest;
-        register UInt rd = (pixel              ) >> PI_RS_BLEND;
-        register UInt gd = (pixel & PI_GM_BLEND) >> PI_GS_BLEND;
-        register UInt bd = (pixel & PI_BM_BLEND) >> PI_BS_BLEND;
+        // The DST is in screen format, thus we AND and shift the corresponding
+        // subvalues to get just the lower X bits from them (where X is the
+        // number of bits per color component except in 32bpp modes where we
+        // use 6 bit values).
+        unsigned pixel = *_dest;
+        unsigned rd = (pixel & PI_RM) >> PI_RS_DST_BLEND;
+        unsigned gd = (pixel & PI_GM) >> PI_GS_DST_BLEND;
+        unsigned bd = (pixel & PI_BM) >> PI_BS_DST_BLEND;
 
-        rs = UInt (Scan.BlendTable [PI_RBT_OFS + rs + rd]);
-        gs = UInt (Scan.BlendTable [PI_GBT_OFS + gs + gd]);
-        bs = UInt (Scan.BlendTable [PI_BBT_OFS + bs + bd]);
+        rs = unsigned (Scan.BlendTable [PI_RBT_OFS + rs + rd]);
+        gs = unsigned (Scan.BlendTable [PI_GBT_OFS + gs + gd]);
+        bs = unsigned (Scan.BlendTable [PI_BBT_OFS + bs + bd]);
 
-        texel = (rs << PI_RS) | (gs << PI_GS) | (bs << PI_BS);
+        pixel = INV_COLORMAP ((rs << PI_RS) | (gs << PI_GS) | (bs << PI_BS));
 #elif defined (PI_GOURAUD)
         // The color of the source texel (SRC)
-        register UInt rs, gs, bs;
+        unsigned rs, gs, bs;
   #ifdef PI_FLAT
     #ifdef PI_CLAMP_RGB
         if (r >= ((PI_RM >> PI_RS) << 16)) rs = PI_RM; else
     #endif
+        // Separate case for TOP8BITS_R8G8B8_USED (NeXT)
+    #if (PI_RS > 16)
+        rs = (r << (PI_RS - 16)) & PI_RM;
+    #else
         rs = (r >> (16 - PI_RS)) & PI_RM;
+    #endif
     #ifdef PI_CLAMP_RGB
         if (g >= ((PI_GM >> PI_GS) << 16)) gs = PI_GM; else
     #endif
@@ -68,37 +87,46 @@
     #ifdef PI_CLAMP_RGB
         if (b >= ((PI_BM >> PI_BS) << 16)) bs = PI_BM; else
     #endif
-        bs = (b >> (16 - PI_BS))/* & PI_BM*/;
-        register UInt texel = (rs | gs | bs);
+        bs = (b >> (16 - PI_BS)) & PI_BM;
+        unsigned pixel = INV_COLORMAP (rs | gs | bs);
   #else
-    #if PI_RS >= 15
-        rs = (((texel & PI_RM) >> 15) * r) & (PI_RM | (PI_RM << 1));
-    #else
-        rs = ((texel & PI_RM) * r) & ((PI_RM << 15) | (PI_RM << 16));
-    #endif
-        gs = ((texel & PI_GM) * g) & ((PI_GM << 15) | (PI_GM << 16));
-        bs = ((texel & PI_BM) * b) & ((PI_BM << 15) | (PI_BM << 16));
-
         // If in textured Gouraud but not in blending mode, we should normalize
-        // R,G,B components as they were multiplied with 7.15 light components
+        // R,G,B components as they were multiplied with #.16 light components
+        rs = (rgbtexel.red * r);
+        // Separate case for TOP8BITS_R8G8B8_USED (NeXT)
     #ifdef PI_CLAMP_RGB
-      #if PI_RS >= 15
-        if (rs > PI_RM) rs = PI_RM;
-      #else
-        if (rs > PI_RM << 15) rs = PI_RM << 15;
-      #endif
-        if (gs > PI_GM << 15) gs = PI_GM << 15;
-        if (bs > PI_BM << 15) bs = PI_BM << 15;
+        if (rs > PI_RM_GOUTEX) rs = PI_RM_GOUTEX;
     #endif
-    #if PI_RS >= 15
-        texel = rs | ((gs | bs) >> 15);
+    #if (PI_RS_GOUTEX >= PI_RS)
+        rs = (rs >> (PI_RS_GOUTEX - PI_RS)) & PI_RM;
     #else
-        texel = (rs | gs | bs) >> 15;
+        rs = (rs << (PI_RS - PI_RS_GOUTEX)) & PI_RM;
     #endif
+        gs = (rgbtexel.green * g);
+    #ifdef PI_CLAMP_RGB
+        if (gs > PI_GM_GOUTEX) gs = PI_GM_GOUTEX;
+    #endif
+    #if (PI_GS_GOUTEX >= PI_GS)
+        gs = (gs >> (PI_GS_GOUTEX - PI_GS)) & PI_GM;
+    #else
+        gs = (gs << (PI_GS - PI_GS_GOUTEX)) & PI_GM;
+    #endif
+        bs = (rgbtexel.blue * b);
+    #ifdef PI_CLAMP_RGB
+        if (bs > PI_BM_GOUTEX) bs = PI_BM_GOUTEX;
+    #endif
+    #if (PI_BS_GOUTEX >= PI_BS)
+        bs = (bs >> (PI_BS_GOUTEX - PI_BS)) & PI_BM;
+    #else
+        bs = (bs << (PI_BS - PI_BS_GOUTEX)) & PI_BM;
+    #endif
+        unsigned pixel = INV_COLORMAP (rs | gs | bs);
   #endif
+#elif !defined (PI_FLAT)
+        unsigned pixel = COLORMAP [texel];
 #endif
 
-        *_dest = texel;
+        *_dest = pixel;
       }
     }
     _dest++;

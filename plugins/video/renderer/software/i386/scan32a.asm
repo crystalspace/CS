@@ -46,7 +46,7 @@
 		mov	eax,%$dvv		; eax = dvv		; 0
 		mov	edx,%$duu		; edx = duu		; 0
 		sar	eax,16			; eax = dvv >> 16	; 1
-		mov	esi,tmap2		; esi = texture ptr	; 1
+		mov	esi,bitmap2		; esi = texture ptr	; 1
 		sar	edx,16			; edx = duu >> 16	; 2
 		mov	ecx,shf_u		; ecx = shifter		; 2
 		add	ecx,2			; ecx += log2(pixsize)	; 3
@@ -235,7 +235,7 @@
 		mov	eax,%$dvv		; eax = dvv		; 0
 		mov	edx,%$duu		; edx = duu		; 0
 		sar	eax,16			; eax = dvv >> 16	; 1
-		mov	esi,tmap2		; esi = texture ptr	; 1
+		mov	esi,bitmap2		; esi = texture ptr	; 1
 		sar	edx,16			; edx = duu >> 16	; 2
 		mov	ecx,shf_u		; ecx = shifter		; 2
 		add	ecx,2			; ecx += log2(pixsize)	; 3
@@ -336,7 +336,7 @@
 		mov	eax,%$dvv		; eax = dvv		; 0
 		mov	edx,%$duu		; edx = duu		; 0
 		sar	eax,16			; eax = dvv >> 16	; 1
-		mov	esi,tmap2		; esi = texture ptr	; 1
+		mov	esi,bitmap2		; esi = texture ptr	; 1
 		sar	edx,16			; edx = duu >> 16	; 2
 		mov	ecx,shf_u		; ecx = shifter		; 2
 		add	ecx,2			; ecx += log2(pixsize)	; 3
@@ -515,7 +515,7 @@
 	%ifdef PIC
 		push	ebx
 	%endif
-		mov	esi,tmap
+		mov	esi,bitmap
 		mov	ecx,shf_h
 		mov	eax,%$uu
 		mov	ebx,%$vv

@@ -462,26 +462,34 @@ static inline bool scfCompatibleVersion (int iVersion, int iItfVersion)
       && ((iVersion & 0x00ffffff) <= (iItfVersion & 0x00ffffff));
 }
 
-//***** iSCF
+SCF_VERSION (iSCF, 0, 0, 1);
 
-SCF_VERSION(iSCF, 0, 0, 1);
-
-//Wrapper for use by DLL's to use SCF
-struct iSCF:public iBase {
+/**
+ * iSCF is the interface that allows using SCF functions from shared classes.
+ * Since there should be just one instance of SCF kernel, the shared classes
+ * should not use scfXXX functions directly; instead they should obtain a
+ * pointer to an iSCF object and work through that pointer.
+ */
+struct iSCF : public iBase
+{
+  /// Wrapper for scfClassRegistered ()
+  virtual bool ClassRegistered (const char *iClassID) = 0;
+  /// Wrapper for scfCreateInstance ()
   virtual void *CreateInstance (const char *iClassID, const char *iInterfaceID,
-    int iVersion)=0;
-};
-
-//Class that implements iSCF
-class csSCF:public iSCF {
-public:
-  csSCF(iBase* iParent=NULL);
-  virtual ~csSCF();
-
-  void *CreateInstance (const char *iClassID, const char *iInterfaceID,
-    int iVersion);
-
-  DECLARE_IBASE;
+    int iVersion) = 0;
+  /// Wrapper for scfGetClassDescription ()
+  virtual const char *GetClassDescription (const char *iClassID) = 0;
+  /// Wrapper for scfGetClassDependencies ()
+  virtual const char *GetClassDependencies (const char *iClassID) = 0;
+  /// Wrapper for scfRegisterClass ()
+  virtual bool RegisterClass (const char *iClassID, const char *iLibraryName,
+    const char *Dependencies = NULL) = 0;
+  /// Wrapper for scfRegisterStaticClass ()
+  virtual bool RegisterStaticClass (scfClassInfo *iClassInfo) = 0;
+  /// Wrapper for scfRegisterClassList ()
+  virtual bool RegisterClassList (scfClassInfo *iClassInfo) = 0;
+  /// Wrapper for scfUnregisterClass ()
+  virtual bool UnregisterClass (char *iClassID) = 0;
 };
 
 //--------------------------------------------- System-dependent defines -----//

@@ -116,7 +116,7 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   pfmt.RedMask    = 0xff;
   pfmt.GreenMask  = 0xff;
   pfmt.BlueMask   = 0xff;
-  complete_pixel_format ();
+  pfmt.complete ();
   return true;
 }
 

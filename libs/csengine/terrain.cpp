@@ -112,9 +112,9 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
  
   memset (&poly, 0, sizeof(poly));
   poly.inv_aspect = rview.inv_aspect;
-  poly.flat_color_r = 1;
-  poly.flat_color_g = 1;
-  poly.flat_color_b = 1;
+  poly.flat_color_r = 255;
+  poly.flat_color_g = 255;
+  poly.flat_color_b = 255;
   poly.txt_handle = _textureMap->GetTextureHandle ();
   // We are going to get texture coords from the terrain engine
   // ranging from 0 to rows and 0 to cols.

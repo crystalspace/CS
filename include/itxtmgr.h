@@ -30,7 +30,25 @@ class csRect;
 struct iImage;
 struct iTextureHandle;
 
-SCF_VERSION (iTextureManager, 0, 0, 2);
+/**
+ * Texture registration flags. During texture registration you should tell
+ * the manager which way you're going to use the texture: whenever you're
+ * going to use it for 2D (DrawSprite ()), for 3D (DrawPolygon ()), whenever
+ * the texture will be dynamically modified.
+ */
+/// You're going to yse the texture for 2D drawing
+#define CS_TEXTURE_2D		0x00000001
+/// You're going to yse the texture for 3D drawing
+#define CS_TEXTURE_3D		0x00000002
+/**
+ * The texture manager should be able to hand you a pointer to some buffer
+ * containing texture image and a format description. You can change the
+ * contents of that buffer and then hand it back to the texture manager.
+ * Then texture manager recompute that texture from the image buffer.
+ */
+#define CS_TEXTURE_DYNAMIC	0x00000004
+
+SCF_VERSION (iTextureManager, 1, 0, 0);
 
 /**
  * This is the standard texture manager interface.
@@ -45,57 +63,52 @@ SCF_VERSION (iTextureManager, 0, 0, 2);
 struct iTextureManager : public iBase
 {
   /**
-   * Initialize the texture system. This function must be called
-   * at least once and everytime we want to start all over using the textures.
+   * Register a texture. The given input image is IncRef'd and DecRef'ed
+   * later when FreeImages () is called. If you want to keep the input image
+   * make sure you have called IncRef yourselves.
+   *<p>
+   * The texture is not converted immediately. Instead, you can make
+   * intermediate calls to iTextureHandle::SetTransparent (). Finally,
+   * if you want to merge the texture into the current environment, you
+   * should call PrepareTexture (). Alternatively you can call the
+   * PrepareTextures () method to compute a optimal palette and convert
+   * all the textures into the internal format.
+   *<p>
+   * This function returns a handle which should be given
+   * to the 3D rasterizer or 2D driver when drawing or otherwise using
+   * the texture.
+   *<p>
+   * The `flags' contains one or several of CS_TEXTURE_XXX flags OR'ed
+   * together. They define the mode texture is going to be used in.
+   *<p>
+   * The texture manager will reject the texture if it is an inappropiate
+   * format (see GetTextureFormat () method).
    */
-  virtual void Initialize () = 0;
+  virtual iTextureHandle *RegisterTexture (iImage *image, int flags) = 0;
+
+  /**
+   * Unregister a texture. Note that this will have no effect on the
+   * possible palette and lookup tables until after PrepareTextures ()
+   * is called again. Note that the texture will be deleted only when
+   * you will remove all references to this texture (i.e. you will do
+   * DecRef () as much times as you did IncRef () plus one)
+   */
+  virtual void UnregisterTexture (iTextureHandle *handle) = 0;
+
+  /**
+   * Merge this texture into current palette, compute mipmaps and so on.
+   * You should call either PrepareTexture() or PrepareTextures() before
+   * using any texture.
+   */
+  virtual void PrepareTexture (iTextureHandle *handle) = 0;
 
   /**
    * After all textures have been added, this function does all
    * needed calculations (palette, lookup tables, mipmaps, ...).
-   * Prepare() must be able to handle being called twice or more
-   * without ill effects.
+   * PrepareTextures () must be able to handle being called twice
+   * or more without ill effects.
    */
-  virtual void Prepare () = 0;
-
-  /**
-   * Register a texture. In this function, the texture will be converted
-   * to an internal format. The given input image is AddRef'd and Released later
-   * when no longer useful. If you want to keep the input image make sure you
-   * have called AddRef yourselves.<p>
-   *
-   * This function returns a handle which should be given
-   * to the 3D rasterizer or 2D driver when drawing or otherwise using
-   * the texture. Note that the newly added texture will not be valid
-   * until Prepare() or MergeTexture() is called.<p>
-   * 
-   * If 'for3d' is true then the texture is prepared for the 3D rasterizer.
-   * If 'for2d' is true then the texture is prepared for the 2D driver.
-   * Both can be true at the same time.
-   *
-   * The texture manager will reject the texture if it is an inappropiate
-   * format (see GetTextureFormat () method).
-   */
-  virtual iTextureHandle *RegisterTexture (iImage* image, bool for3d, bool for2d) = 0;
-
-  /**
-   * Unregister a texture. Note that this will have no effect on the
-   * possible palette and lookup tables until after Prepare() is called
-   * again. Note that the texture will be deleted only when you will
-   * remove all references to this texture (i.e. you will do DecRef()
-   * as much times as you did IncRef ())
-   */
-  virtual void UnregisterTexture (iTextureHandle* handle) = 0;
-
-  /**
-   * Merge a texture. If you just registered a texture with RegisterTexture()
-   * then you can use this function to merge it to the current palette and
-   * lookup tables. After calling this function you can use the texture as
-   * if Prepare() has been called. This function will not actually recalculate
-   * the palette and lookup tables but instead convert the given texture so
-   * to the current palette.
-   */
-  virtual void MergeTexture (iTextureHandle *handle) = 0;
+  virtual void PrepareTextures () = 0;
 
   /**
    * Call this function if you want to release all iImage's as
@@ -108,32 +121,40 @@ struct iTextureManager : public iBase
   virtual void FreeImages () = 0;
 
   /**
+   * Reset all reserved colors in palette. This function should be called
+   * if you want to reverse the effect of all ReserveColor() calls.
+   * The function will have effect on next call to PrepareTextures ().
+   */
+  virtual void ResetPalette () = 0;
+
+  /**
    * Reserve RGB. Call this function to reserve a color
    * from the palette (if any). This function only takes effect after
-   * the next call to Prepare(). Note that black and white are already
-   * preallocated colors.
+   * the next call to Prepare (). Note that black (0) and white (255)
+   * are already preallocated colors.
    */
   virtual void ReserveColor (int r, int g, int b) = 0;
 
   /**
-   * After calling Prepare() you can call this function to allocate
-   * the palette to the 2D driver. @@@ Is this the right place for this function?
-   */
-  virtual void AllocPalette () = 0;
-
-  /**
-   * Return a color.
+   * Return a color. Find the color in palette and return the palette
+   * index that contains the nearest color. For 15-, 16- and 32-bit modes
+   * this returns a encoded RGB color as needed by both 2D and 3D drivers.
    */
   virtual int FindRGB (int r, int g, int b) = 0;
 
   /**
-   * Return true if VERYNICE mipmap mode is used. This is an
-   * ugly way to get this value. We need better user-config capabilities for this.@@@
+   * Switch to the new palette. This function should be called
+   * after you called the PrepareTextures() method which will compute
+   * a optimal palette for all textures. Of course, it is not neccessarily
+   * to call it directly after PrepareTextures() but you should call it before
+   * using any texture, otherwise they will look garbled.
    */
-  virtual bool GetVeryNice () = 0;
+  virtual void SetPalette () = 0;
 
   /**
-   * Set verbose mode on/off.
+   * Set verbose mode on/off. In verbose mode, texture manager will
+   * Printf() through the system driver during all initialization and
+   * preparation operations.
    */
   virtual void SetVerbose (bool vb) = 0;
 
@@ -145,6 +166,13 @@ struct iTextureManager : public iBase
    * bits that fit the CS_IMGFMT_MASK mask matters.
    */
   virtual int GetTextureFormat () = 0;
+
+  /**
+   * Return true if VERYNICE mipmap mode is used. This is an
+   * ugly way to get this value. We need better user-config
+   * capabilities for this.@@@
+   */
+  virtual bool GetVeryNice () = 0;
 };
 
 #endif // __ITXTMGR_H__

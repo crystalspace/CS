@@ -150,7 +150,7 @@ void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)
       pfmt.BlueMask   = BlueMask;
       pfmt.PalEntries = 0;
 
-      complete_pixel_format();
+      pfmt.complete ();
       break;
     case B_RGB16:
       Depth	= 16;
@@ -165,7 +165,7 @@ void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)
       pfmt.BlueMask   = BlueMask;
       pfmt.PalEntries = 0;
   		
-      complete_pixel_format();
+      pfmt.complete ();
       break;
     case B_RGB32:
     case B_RGBA32:
@@ -181,7 +181,7 @@ void csGraphics2DGLBe::ApplyDepthInfo(color_space cs)
       pfmt.BlueMask   = BlueMask;
       pfmt.PalEntries = 0;
 
-      complete_pixel_format();
+      pfmt.complete ();
       break;
     default:
       printf("Unimplemented color depth in Be 2D OpenGL driver (depth=%i)\n",

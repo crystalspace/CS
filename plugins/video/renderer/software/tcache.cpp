@@ -16,641 +16,202 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <math.h>
-
 #include "sysdef.h"
-#include "cs3d/software/tcache.h"
-#include "cs3d/software/soft_txt.h"
-#include "cs3d/common/memheap.h"
-#include "ipolygon.h"
+#include "tcache.h"
+#include "soft_g3d.h"
+#include "soft_txt.h"
 #include "ilghtmap.h"
-#include "igraph2d.h"
-#include "igraph3d.h"
+#include "isystem.h"
 
-//---------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-int TextureCache::cache_size = DEFAULT_CACHE_SIZE;
+#define LM_NAME		create_lighted_texture_8
+#define PI_INDEX8
+#include "lightmap.inc"
 
-void TextureCache::init_pool ()
+#define LM_NAME		create_lighted_texture_555
+#define PI_R5G5B5
+#include "lightmap.inc"
+
+#define LM_NAME		create_lighted_texture_565
+#define PI_R5G6B5
+#include "lightmap.inc"
+
+#define LM_NAME		create_lighted_texture_888
+#define PI_R8G8B8
+#include "lightmap.inc"
+
+//------------------------------------------------- csTextureCacheSoftware ---//
+
+static void (*create_lighted_texture) (csBitSet *dirty, iPolygonTexture *pt,
+  void *dst, csTextureManagerSoftware *texman);
+
+csTextureCacheSoftware::csTextureCacheSoftware (csTextureManagerSoftware *TexMan)
 {
-  destroy_pool ();
-  real_cache_size = cache_size*gi_pixelbytes;
-  real_cache_size = (real_cache_size+7)&~7;		// Round to higher multiple of 8
-  CHK (memory = new MemoryHeap (real_cache_size));
+  head = tail = NULL;
+  texman = TexMan;
+  Clear ();
+  bytes_per_texel = texman->pfmt.PixelBytes;
+  if (texman->pfmt.PixelBytes == 1)
+    create_lighted_texture = create_lighted_texture_8;
+  else if (texman->pfmt.PixelBytes == 2)
+    if (texman->pfmt.GreenBits == 5)
+      create_lighted_texture = create_lighted_texture_555;
+    else
+      create_lighted_texture = create_lighted_texture_565;
+  else if (texman->pfmt.PixelBytes == 4)
+    create_lighted_texture = create_lighted_texture_888;
+  else
+    abort (); // huh???
 }
 
-void TextureCache::destroy_pool ()
+csTextureCacheSoftware::~csTextureCacheSoftware ()
 {
-  CHK (delete memory); memory = NULL;
+  Clear ();
 }
 
-void TextureCache::set_cache_size (long size)
+void csTextureCacheSoftware::set_cache_size (long size)
 {
-  if (size != -1) cache_size = size;
-  init_pool ();
-  clear ();
+  Clear ();
+  cache_size = size;
 }
 
-void dump_pool (MemoryHeap *h)
+void csTextureCacheSoftware::Clear ()
 {
-  (void)h;
-//@@@TEMPORARILY DISABLED
-#if 0
-  ULong totsize = sizeof(heap);
-  ULong cur;
- 
-  CsPrintf (MSG_STDOUT,"\nStart      : %-8d\n", ((heap *)h->memory)->start);
-  CsPrintf (MSG_STDOUT,  "First free : %-8d\n", ((heap *)h->memory)->first_free);
-  CsPrintf (MSG_STDOUT,  "End        : %-8d\n", ((heap *)h->memory)->end);
-  CsPrintf (MSG_STDOUT,  "Size       : %d\n",   h->cache_size);
- 
-  CsPrintf (MSG_STDOUT, "\nSTATE   SIZE    OFFSET  ADDRESS\n");
-  for (cur = ((heap *)h->memory)->start;
-       cur <= ((heap *)h->memory)->end;
-       cur = (ULong)(cur + ((bufhd *)(h->memory + (ULong)(cur)))->size))
+  while (head)
   {
-    CsPrintf (MSG_STDOUT, "%-6d  %-6d  %-6d  %-8X\n",
-              ((bufhd *)(h->memory + (ULong)(cur)))->full,
-              ((bufhd *)(h->memory + (ULong)(cur)))->size, cur,
-              ((char *)h->memory + (ULong)(cur) + sizeof(bufhd)));
-    totsize += ((bufhd *)(h->memory + (ULong)(cur)))->size;
-    if (!((bufhd *)(h->memory + (ULong)(cur)))->size) break;
-  }
- 
-  CsPrintf (MSG_STDOUT, "\nTotal size : %d\n", totsize);
-  CsPrintf (MSG_STDOUT,   "Missing    : %d\n", h->cache_size-totsize);
-#endif
-}
-
-void* TextureCache::alloc_pool (int size)
-{
-  return memory->alloc (size);
-}
-
-void TextureCache::free_pool (void* mem, int /*dummy*/)
-{
-  memory->free (mem);
-}
-
-TextureCache::TextureCache (csPixelFormat* /*pfmt*/)
-{
-  first = last = NULL;
-  memory = NULL;
-  gi_pixelbytes = 1;
-}
-
-TextureCache::~TextureCache ()
-{
-  destroy_pool ();
-}
-
-void TextureCache::clear ()
-{
-  while (first)
-  {
-    TCacheLightedTexture* n = first->next;
-    first->unlink_list ();
-    first->in_cache = false;
-    if (first->tmap)
-    {
-      free_pool ((void*)(first->tmap), first->size * gi_pixelbytes);
-      first->tmap = first->tmap_m = NULL;
-    }
-    //@@@
-    //if (first->dirty_matrix)
-    //{
-      //CHK (delete [] first->dirty_matrix);
-      //first->dirty_matrix = NULL;
-    //}
-    first = n;
+    SoftwareCachedTexture *n = head->next;
+    delete head;
+    head = n;
   }
 
-  first = last = NULL;
+  head = tail = NULL;
   total_size = 0;
   total_textures = 0;
 }
 
-void TextureCache::dump ()
+SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (iPolygonTexture* pt)
 {
-//@@@
-  //CsPrintf (MSG_CONSOLE, "Textures in the cache: %d\n", total_textures);
-  //CsPrintf (MSG_CONSOLE, "Total size: %ld bytes\n", total_size);
-  int mean;
-  if (total_textures == 0) mean = 0;
-  else mean = total_size/total_textures;
-  //CsPrintf (MSG_CONSOLE, "Bytes per texture: %d\n", mean);
-  //int cnt_dirty = 0, cnt_clean = 0;
-  //@@@
-  //PolyTexture* pt = first;
-  //while (pt)
-  //{
-    //cnt_dirty += pt->count_dirty_subtextures ();
-    //cnt_clean += pt->count_clean_subtextures ();
-    //pt = pt->get_next ();
-  //}
-  //CsPrintf (MSG_CONSOLE, "Sub-textures: dirty=%d clean=%d\n", cnt_dirty, cnt_clean);
-}
+  SoftwareCachedTexture *cached_texture =
+    (SoftwareCachedTexture *)pt->GetCacheData ();
 
-void TextureCache::init_texture (iPolygonTexture* pt, csTextureManagerSoftware* /*txtmgr*/)
-{
-  iPolygon3D* i_pol = pt->GetPolygon ();
-  iLightMap* i_lm = i_pol->GetLightMap ();
-  if (!i_lm) return;	// @@@ See if this test can be avoided.
-
-  pt->CreateDirtyMatrix ();
-
-  void* rc = pt->GetTCacheData ();
-  TCacheLightedTexture* tclt = (TCacheLightedTexture*)rc;
-  if (!tclt)
-  {
-    CHK (tclt = new TCacheLightedTexture ()); //@@@ Memory leak: there is no cleanup yet!
-    pt->SetTCacheData ((void*)tclt);
-  }
-
-  if (pt->RecalculateDynamicLights () && tclt->in_cache)
-  {
-    // Texture is in cache and we just recalculated the dynamic lighting
-    // information. Just return.
-    if (!pt->GetDynlightOpt ())
-      pt->MakeAllDirty ();
-    return;
-  }
-
-  if (tclt->in_cache)
+  if (cached_texture)
   {
     // Texture is already in the cache.
-
     // Unlink texture and put it in front (MRU).
-    if (tclt != first)
+    if (cached_texture != head)
     {
-      if (tclt->prev) tclt->prev->next = tclt->next;
-      else first = tclt->next;
-      if (tclt->next) tclt->next->prev = tclt->prev;
-      else last = tclt->prev;
+      if (cached_texture->prev)
+        cached_texture->prev->next = cached_texture->next;
+      else
+        head = cached_texture->next;
+      if (cached_texture->next)
+        cached_texture->next->prev = cached_texture->prev;
+      else
+        tail = cached_texture->prev;
 
-      tclt->prev = NULL;
-      tclt->next = first;
-      if (first) first->prev = tclt;
-      else last = tclt;
-      first = tclt;
+      cached_texture->prev = NULL;
+      cached_texture->next = head;
+      if (head)
+        head->prev = cached_texture;
+      else
+        tail = cached_texture;
+      head = cached_texture;
     }
   }
   else
   {
     // Texture is not in the cache.
-    int pt_size = pt->GetSize ();
-    int w = pt->GetWidth ();
-    int size = pt_size * gi_pixelbytes;
-    UByte* map;
-    while ((map = (UByte*)alloc_pool (size)) == NULL)
+    int bitmap_size = pt->GetSize () * bytes_per_texel;
+
+    total_textures++;
+    total_size += bitmap_size;
+
+    // Free lightmaps until we have less than cache_size bytes for the cache
+    while (tail && (total_size > cache_size))
     {
       // Total size of textures in cache is too high. Remove the last one.
-      TCacheLightedTexture* l = last;
-      last = last->prev;
-      if (last) last->next = NULL;
-      else first = NULL;
-      l->prev = NULL;
-      l->in_cache = false;
-      if (l->tmap)
-      {        
-        free_pool ((void*)(l->tmap), l->size * gi_pixelbytes);
-	l->tmap = NULL;
-	l->tmap_m = NULL;
-      }
+      cached_texture = tail;
+      tail = tail->prev;
+      if (tail)
+        tail->next = NULL;
+      else
+        head = NULL;
+
       total_textures--;
-      total_size -= size;
+      total_size -= cached_texture->size;
+
+      delete cached_texture;
     }
-    tclt->tmap = map;
-    tclt->tmap_m = map+H_MARGIN*w*gi_pixelbytes; // Skip margin.
-    tclt->size = pt_size;
-    total_textures++;
-    total_size += size;
+
+    CHK (cached_texture = new SoftwareCachedTexture (pt));
+
+    int margin_size = H_MARGIN * pt->GetWidth () * bytes_per_texel;
+    UByte *bitmap = new UByte [bitmap_size];
+    memset (bitmap, 0, margin_size);
+    memset (bitmap + bitmap_size - margin_size, 0, margin_size);
+    cached_texture->data = bitmap;
+    cached_texture->bitmap = bitmap + margin_size; // Skip margin.
+    cached_texture->size = bitmap_size;
     pt->MakeAllDirty ();
 
     // Add new texture to cache.
-    tclt->next = first;
-    tclt->prev = NULL;
-    if (first) first->prev = tclt;
-    else last = tclt;
-    first = tclt;
-    tclt->in_cache = true;
+    cached_texture->next = head;
+    cached_texture->prev = NULL;
+    if (head)
+      head->prev = cached_texture;
+    else
+      tail = cached_texture;
+    head = cached_texture;
+  }
+  return cached_texture;
+}
+
+void csTextureCacheSoftware::init_texture (iPolygonTexture *pt)
+{
+  pt->CreateDirtyMatrix ();
+
+  cache_texture (pt);
+
+  if (pt->RecalculateDynamicLights ())
+  {
+    // Texture is in cache and we just recalculated
+    // the dynamic lighting information.
+    if (!pt->GetDynlightOpt ())
+      pt->MakeAllDirty ();
   }
 }
 
-void TextureCache::use_sub_texture (iPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int u, int v)
+void csTextureCacheSoftware::use_sub_texture (iPolygonTexture *pt,
+  csBitSet *dirty)
 {
-  iPolygon3D* i_pol = pt->GetPolygon ();
-  iLightMap* i_lm = i_pol->GetLightMap ();
-  if (!i_lm) return;	// @@@ See if this test can be avoided.
-
-  int w = pt->GetWidth ();
-  int h = pt->GetHeight ();
-
-  if (u < 0) u = 0; else if (u >= w) u = w-1;
-  if (v < 0) v = 0; else if (v >= h) v = h-1;
-  int subtex_size = pt->GetSubtexSize ();
-  int lu = u / subtex_size;
-  int lv = v / subtex_size;
-  if (pt->CleanIfDirty (lu, lv))
+  if (pt->CleanIfDirty (dirty))
   {
-    TCacheData tcd;
-    init_cache_filler (tcd, pt, txtmgr, lu, lv);
-    void* rc = pt->GetTCacheData ();
-    create_lighted_texture (tcd, (TCacheLightedTexture*)rc, txtmgr);
+    SoftwareCachedTexture *cached_texture = (SoftwareCachedTexture *)pt->GetCacheData ();
+    if (texman->do_lightmapgrid)
+      show_lightmap_grid (dirty, pt, cached_texture->bitmap, texman);
+    else
+      create_lighted_texture (dirty, pt, cached_texture->bitmap, texman);
   }
 }
 
-void TextureCache::use_texture (iPolygonTexture* pt, csTextureManagerSoftware* txtmgr)
+void csTextureCacheSoftware::use_texture (iPolygonTexture* pt)
 {
-  iPolygon3D* i_pol = pt->GetPolygon ();
-  iLightMap* i_lm = i_pol->GetLightMap ();
-  if (!i_lm) return;	// @@@ See if this test can be avoided.
+  SoftwareCachedTexture *cached_texture = cache_texture (pt);
 
-  void* rc = pt->GetTCacheData ();
-  TCacheLightedTexture* tclt = (TCacheLightedTexture*)rc;
-  if (!tclt)
-  {
-    CHK (tclt = new TCacheLightedTexture ()); //@@@ Memory leak: there is no cleanup yet!
-    pt->SetTCacheData ((void*)tclt);
-  }
-
-  if (pt->RecalculateDynamicLights () && tclt->in_cache)
-  {
-    // Just recalculate the texture.
-    TCacheData tcd;
-    init_cache_filler (tcd, pt, txtmgr);
-    create_lighted_texture (tcd, tclt, txtmgr);
-    return;
-  }
-
-  if (tclt->in_cache)
-  {
-    // Texture is already in the cache.
-
-    // Unlink texture and put it in front (MRU).
-    if (tclt != first)
-    {
-      if (tclt->prev) tclt->prev->next = tclt->next;
-      else first = tclt->next;
-      if (tclt->next) tclt->next->prev = tclt->prev;
-      else last = tclt->prev;
-
-      tclt->prev = NULL;
-      tclt->next = first;
-      if (first) first->prev = tclt;
-      else last = tclt;
-      first = tclt;
-    }
-  }
-  else
-  {
-    // Texture is not in the cache.
-    int pt_size = pt->GetSize ();
-    int w = pt->GetWidth ();
-    int size = pt_size * gi_pixelbytes;
-    UByte* map;
-    while ((map = (UByte*)alloc_pool (size)) == NULL)
-    {
-      // Total size of textures in cache is too high. Remove the last one.
-      TCacheLightedTexture* l = last;
-      last = last->prev;
-      if (last) last->next = NULL;
-      else first = NULL;
-      l->prev = NULL;
-      l->in_cache = false;
-      if (l->tmap)
-      {
-        free_pool ((void*)(l->tmap), l->size * gi_pixelbytes);
-	l->tmap = NULL;
-	l->tmap_m = NULL;
-      }
-      total_textures--;
-      total_size -= size;
-    }
-    tclt->tmap = map;
-    tclt->tmap_m = map+H_MARGIN*w*gi_pixelbytes; // Skip margin.
-    tclt->size = pt_size;
-    total_textures++;
-    total_size += size;
-
-    // Add new texture to cache.
-    tclt->next = first;
-    tclt->prev = NULL;
-    if (first) first->prev = tclt;
-    else last = tclt;
-    first = tclt;
-    tclt->in_cache = true;
-
-    TCacheData tcd;
-    init_cache_filler (tcd, pt, txtmgr);
-    create_lighted_texture (tcd, tclt, txtmgr);
-  }
+  if (pt->RecalculateDynamicLights ())
+    if (texman->do_lightmapgrid)
+      show_lightmap_grid (NULL, pt, cached_texture->bitmap, texman);
+    else
+      create_lighted_texture (NULL, pt, cached_texture->bitmap, texman);
 }
 
-void TextureCache::create_lighted_texture (TCacheData& tcd, TCacheLightedTexture* tclt,
-	csTextureManagerSoftware* txtmgr)
+void csTextureCacheSoftware::show_lightmap_grid (csBitSet *dirty,
+  iPolygonTexture *pt, void *dst, csTextureManagerSoftware *texman)
 {
-  if (tcd.txtmode == TXT_PRIVATE)
-    create_lighted_true_rgb_priv (tcd, tclt, txtmgr);
-  else
-    create_lighted_true_rgb (tcd, tclt, txtmgr);
-  if (tcd.lm_grid)
-    show_lightmap_grid (tcd, tclt, txtmgr);
-}
+#if 0
+  // not converted yet
 
-void TextureCache::init_cache_filler (TCacheData& tcd, iPolygonTexture* pt, csTextureManagerSoftware* txtmgr, int stu, int stv)
-{
-  tcd.txtmode = txtmgr->txtMode;
-  tcd.lm_grid = txtmgr->do_lightmapgrid;
-
-  iLightMap* i_lm = pt->GetLightMap ();
-  tcd.width = pt->GetWidth ();
-  tcd.height = pt->GetHeight ();
-  tcd.mipmap_size = pt->GetMipMapSize ();
-  tcd.mipmap_shift = pt->GetMipMapShift ();
-  tcd.Imin_u = pt->GetIMinU ();
-  tcd.Imin_v = pt->GetIMinV ();
-
-  //@@@ CAN BE MORE OPTIMAL?
-  iTextureHandle* handle = pt->GetTextureHandle ();
-  tcd.txt_mm = (csTextureMMSoftware*)handle->GetPrivateObject ();
-  int mm = pt->GetMipmapLevel ();
-
-  csTexture* txt_unl = tcd.txt_mm->get_texture (mm);
-  tcd.tdata = txt_unl->get_bitmap ();
-  int uw, uh;
-  uw = txt_unl->get_width ();
-  uh = txt_unl->get_height ();
-  tcd.shf_w = txt_unl->get_w_shift ();
-  tcd.and_w = txt_unl->get_w_mask ();
-  tcd.and_h = txt_unl->get_h_mask ();
-
-  tcd.lw = i_lm->GetWidth ();
-  int lh = i_lm->GetHeight ();
-  tcd.mapR = i_lm->GetMap (0);
-  tcd.mapG = i_lm->GetMap (1);
-  tcd.mapB = i_lm->GetMap (2);
-  int lw_orig = pt->GetOriginalWidth ();
-  lw_orig = (lw_orig>>tcd.mipmap_shift)+2;
-
-  if (stu == -1 || stv == -1)
-  {
-    // Just calculate everything.
-    tcd.lu1 = 0;
-    tcd.lv1 = 0;
-    tcd.lu2 = lw_orig-1;
-    tcd.lv2 = lh-1;
-  }
-  else
-  {
-    // Calculate only one sub-texture.
-    int subtex_size = pt->GetSubtexSize ();
-    int lu = (stu*subtex_size) >> tcd.mipmap_shift;
-    int lv = (stv*subtex_size) >> tcd.mipmap_shift;
-    tcd.lu1 = lu;
-    tcd.lv1 = lv;
-    tcd.lu2 = lu+(subtex_size>>tcd.mipmap_shift);
-    tcd.lv2 = lv+(subtex_size>>tcd.mipmap_shift);
-    if (tcd.lu2 > lw_orig-1) tcd.lu2 = lw_orig-1;
-    if (tcd.lu2 > tcd.lw-1) tcd.lu2 = tcd.lw-1;
-    if (tcd.lv2 > lh-1) tcd.lv2 = lh-1;
-  }
-  tcd.d_lw = tcd.lw-(tcd.lu2-tcd.lu1);
-}
-
-void TextureCache::create_lighted_true_rgb (TCacheData& tcd, TCacheLightedTexture* tclt,
-  csTextureManagerSoftware* txtmgr)
-{
-  //LightMap* lm = tcd.lm;
-  int w = tcd.width;
-  int h = tcd.height;
-  int Imin_u = tcd.Imin_u;
-  int Imin_v = tcd.Imin_v;
-
-  unsigned char* mapR = tcd.mapR;
-  unsigned char* mapG = tcd.mapG;
-  unsigned char* mapB = tcd.mapB;
-
-  unsigned char* otmap = tcd.tdata;
-  int shf_w = tcd.shf_w;
-  int and_w = tcd.and_w;
-  int and_h = tcd.and_h;
-  and_h <<= shf_w;
-
-  unsigned char* tm, * tm2;
-  int u, v, end_u, uu;
-
-  int ov_idx;
-
-  int red_00, gre_00, blu_00;
-  int red_10, gre_10, blu_10;
-  int red_01, gre_01, blu_01;
-  int red_11, gre_11, blu_11;
-  int red_0, red_1, red_d, red_0d, red_1d;
-  int gre_0, gre_1, gre_d, gre_0d, gre_1d;
-  int blu_0, blu_1, blu_d, blu_0d, blu_1d;
-  int red, gre, blu;
-
-  PalIdxLookup *lt_light, *pil;
-  lt_light = txtmgr->lt_light;
-
-  TextureTablesPalette* lt_pal = txtmgr->lt_pal;
-  unsigned char* true_to_pal = lt_pal->true_to_pal;
-
-  int lu, lv, luv, dv;
-  luv = tcd.lv1 * tcd.lw + tcd.lu1;
-  for (lv = tcd.lv1 ; lv < tcd.lv2 ; lv++)
-  {
-    for (lu = tcd.lu1 ; lu < tcd.lu2 ; lu++)
-    {
-      red_00 = mapR[luv];
-      red_10 = mapR[luv+1];
-      red_01 = mapR[luv+tcd.lw];
-      red_11 = mapR[luv+tcd.lw+1];
-      gre_00 = mapG[luv];
-      gre_10 = mapG[luv+1];
-      gre_01 = mapG[luv+tcd.lw];
-      gre_11 = mapG[luv+tcd.lw+1];
-      blu_00 = mapB[luv];
-      blu_10 = mapB[luv+1];
-      blu_01 = mapB[luv+tcd.lw];
-      blu_11 = mapB[luv+tcd.lw+1];
-
-      u = lu << tcd.mipmap_shift;
-      v = lv << tcd.mipmap_shift;
-      tm = &tclt->get_tmap8 ()[w*v+u];	//@@@
-
-      //*****
-      // Most general case: varying levels of red, green, and blue light.
-      //*****
-
-      red_0 = red_00 << 16; red_0d = ((red_01-red_00)<<16) >> tcd.mipmap_shift;
-      red_1 = red_10 << 16; red_1d = ((red_11-red_10)<<16) >> tcd.mipmap_shift;
-      gre_0 = gre_00 << 16; gre_0d = ((gre_01-gre_00)<<16) >> tcd.mipmap_shift;
-      gre_1 = gre_10 << 16; gre_1d = ((gre_11-gre_10)<<16) >> tcd.mipmap_shift;
-      blu_0 = blu_00 << 16; blu_0d = ((blu_01-blu_00)<<16) >> tcd.mipmap_shift;
-      blu_1 = blu_10 << 16; blu_1d = ((blu_11-blu_10)<<16) >> tcd.mipmap_shift;
-
-      for (dv = 0 ; dv < tcd.mipmap_size ; dv++, tm += w-tcd.mipmap_size)
-	if (v+dv < h)
-        {
-	  ov_idx = ((v+dv+Imin_v)<<shf_w) & and_h;
-
-	  red = red_0; red_d = (red_1-red_0) >> tcd.mipmap_shift;
-	  gre = gre_0; gre_d = (gre_1-gre_0) >> tcd.mipmap_shift;
-	  blu = blu_0; blu_d = (blu_1-blu_0) >> tcd.mipmap_shift;
-
-	  end_u = u+tcd.mipmap_size;
-	  if (end_u > w) end_u = w;
-	  end_u += Imin_u;
-	  tm2 = tm + tcd.mipmap_size;
-	  for (uu = u+Imin_u ; uu < end_u ; uu++)
-	  {
-	    //*tm++ = i_tc->mix_lights(red, gre, blu, otmap[ov_idx + (uu & and_w)]);
-	    pil = lt_light+otmap[ov_idx + (uu & and_w)];
-	    *tm++ = true_to_pal[pil->red[red>>16] | pil->green[gre>>16] | pil->blue[blu>>16]];
-	    red += red_d;
-	    gre += gre_d;
-	    blu += blu_d;
-	  }
-	  tm = tm2;
-
-	  red_0 += red_0d;
-	  red_1 += red_1d;
-	  gre_0 += gre_0d;
-	  gre_1 += gre_1d;
-	  blu_0 += blu_0d;
-	  blu_1 += blu_1d;
-	}
-	else break;
-
-      luv++;
-    }
-    luv += tcd.d_lw;
-  }
-}
-
-void TextureCache::create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* tclt,
-	csTextureManagerSoftware* txtmgr)
-{
-  //LightMap* lm = tcd.lm;
-  int w = tcd.width;
-  int h = tcd.height;
-  int Imin_u = tcd.Imin_u;
-  int Imin_v = tcd.Imin_v;
-
-  unsigned char* mapR = tcd.mapR;
-  unsigned char* mapG = tcd.mapG;
-  unsigned char* mapB = tcd.mapB;
-
-  unsigned char* otmap = tcd.tdata;
-  int shf_w = tcd.shf_w;
-  int and_w = tcd.and_w;
-  int and_h = tcd.and_h;
-  and_h <<= shf_w;
-
-  unsigned char* tm, * tm2;
-  int u, v, end_u, uu;
-
-  int ov_idx;
-
-  int red_00, gre_00, blu_00;
-  int red_10, gre_10, blu_10;
-  int red_01, gre_01, blu_01;
-  int red_11, gre_11, blu_11;
-  int red_0, red_1, red_d, red_0d, red_1d;
-  int gre_0, gre_1, gre_d, gre_0d, gre_1d;
-  int blu_0, blu_1, blu_d, blu_0d, blu_1d;
-  int red, gre, blu;
-
-  unsigned char* rgb_values = tcd.txt_mm->GetPrivateColorMap ();
-  unsigned char* rgb;
-
-  TextureTablesPalette* lt_pal = txtmgr->lt_pal;
-  unsigned char* palt = lt_pal->true_to_pal;
-
-  PalIdxLookup* lt_light = txtmgr->lt_light;
-
-  int lu, lv, luv, dv;
-  luv = tcd.lv1 * tcd.lw + tcd.lu1;
-  for (lv = tcd.lv1 ; lv < tcd.lv2 ; lv++)
-  {
-    for (lu = tcd.lu1 ; lu < tcd.lu2 ; lu++)
-    {
-      red_00 = mapR[luv];
-      red_10 = mapR[luv+1];
-      red_01 = mapR[luv+tcd.lw];
-      red_11 = mapR[luv+tcd.lw+1];
-      gre_00 = mapG[luv];
-      gre_10 = mapG[luv+1];
-      gre_01 = mapG[luv+tcd.lw];
-      gre_11 = mapG[luv+tcd.lw+1];
-      blu_00 = mapB[luv];
-      blu_10 = mapB[luv+1];
-      blu_01 = mapB[luv+tcd.lw];
-      blu_11 = mapB[luv+tcd.lw+1];
-
-      u = lu << tcd.mipmap_shift;
-      v = lv << tcd.mipmap_shift;
-      tm = &tclt->get_tmap8 ()[w*v+u];
-
-      //*****
-      // Most general case: varying levels of red, green, and blue light.
-      //*****
-
-      red_0 = red_00 << 16; red_0d = ((red_01-red_00)<<16) >> tcd.mipmap_shift;
-      red_1 = red_10 << 16; red_1d = ((red_11-red_10)<<16) >> tcd.mipmap_shift;
-      gre_0 = gre_00 << 16; gre_0d = ((gre_01-gre_00)<<16) >> tcd.mipmap_shift;
-      gre_1 = gre_10 << 16; gre_1d = ((gre_11-gre_10)<<16) >> tcd.mipmap_shift;
-      blu_0 = blu_00 << 16; blu_0d = ((blu_01-blu_00)<<16) >> tcd.mipmap_shift;
-      blu_1 = blu_10 << 16; blu_1d = ((blu_11-blu_10)<<16) >> tcd.mipmap_shift;
-
-      for (dv = 0 ; dv < tcd.mipmap_size ; dv++, tm += w-tcd.mipmap_size)
-	if (v+dv < h)
-        {
-	  ov_idx = ((v+dv+Imin_v)<<shf_w) & and_h;
-
-	  red = red_0; red_d = (red_1-red_0) >> tcd.mipmap_shift;
-	  gre = gre_0; gre_d = (gre_1-gre_0) >> tcd.mipmap_shift;
-	  blu = blu_0; blu_d = (blu_1-blu_0) >> tcd.mipmap_shift;
-
-	  end_u = u+tcd.mipmap_size;
-	  if (end_u > w) end_u = w;
-	  end_u += Imin_u;
-	  tm2 = tm + tcd.mipmap_size;
-	  for (uu = u+Imin_u ; uu < end_u ; uu++)
-	  {
-	    rgb = rgb_values + ((otmap[ov_idx + (uu & and_w)]) << 2);
-	    //*tm++ = palt[i_tc->add_light_red_private (*rgb, red) |
-	    //		i_tc->add_light_green_private (*(rgb+1), gre) |
-	    //		i_tc->add_light_blue_private (*(rgb+2), blu)];
-	    *tm++ = palt[lt_light[*rgb].red[red>>16] |
-			 lt_light[*(rgb+1)].green[gre>>16] |
-			 lt_light[*(rgb+2)].blue[blu>>16]];
-	    red += red_d;
-	    gre += gre_d;
-	    blu += blu_d;
-	  }
-	  tm = tm2;
-
-	  red_0 += red_0d;
-	  red_1 += red_1d;
-	  gre_0 += gre_0d;
-	  gre_1 += gre_1d;
-	  blu_0 += blu_0d;
-	  blu_1 += blu_1d;
-	}
-	else break;
-
-      luv++;
-    }
-    luv += tcd.d_lw;
-  }
-}
-
-void TextureCache::show_lightmap_grid (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr)
-{
-  //LightMap* lm = tcd.lm;
   int w = tcd.width;
 
   unsigned char* mapR = tcd.mapR;
@@ -668,11 +229,22 @@ void TextureCache::show_lightmap_grid (TCacheData& tcd, TCacheLightedTexture* tc
     {
       u = lu << tcd.mipmap_shift;
       v = lv << tcd.mipmap_shift;
-      tm = &tclt->get_tmap8 ()[w*v+u];	//@@@
+      tm = &cached_texture->bitmap [w*v+u];	//@@@
       //@@@ This is NOT optimal but luckily it is a debug function only.
-      *tm = txtmgr->find_rgb (mapR[luv], mapG[luv], mapB[luv]);
+      *tm = texman->find_rgb (mapR[luv], mapG[luv], mapB[luv]);
       luv++;
     }
     luv += tcd.d_lw;
   }
+#endif
+}
+
+#define SysPrintf iG3D->System->Printf
+
+void csTextureCacheSoftware::dump (csGraphics3DSoftware *iG3D)
+{
+  SysPrintf (MSG_CONSOLE, "Textures in the cache: %d\n", total_textures);
+  SysPrintf (MSG_CONSOLE, "Total size: %ld bytes\n", total_size);
+  int mean = (total_textures == 0) ? 0 : total_size / total_textures;
+  SysPrintf (MSG_CONSOLE, "Bytes per texture: %d\n", mean);
 }

@@ -533,10 +533,9 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 
     if (cslogo)
     {
-      int w = cslogo->Width()  * FRAME_WIDTH  / 640;
-      int h = cslogo->Height() * FRAME_HEIGHT / 480;
-      int x = FRAME_WIDTH - 2 - w*152/256;
-      cslogo->Draw(Gfx2D, x,2,w,h);
+      unsigned w = cslogo->Width()  * FRAME_WIDTH  / 640;
+      unsigned h = cslogo->Height() * FRAME_HEIGHT / 480;
+      cslogo->Draw (Gfx2D, FRAME_WIDTH - 2 - (w * 151) / 256 , 2, w, h);
     }
 
     // White-board for debugging purposes.
@@ -1037,14 +1036,14 @@ void CaptureScreen ()
     return;
   }
 
-  iImage *img = System->G3D->ScreenShot ();
+  iImage *img = System->G2D->ScreenShot ();
   if (!img)
   {
-    Sys->Printf (MSG_CONSOLE, "Current 3D driver does not support screen shots\n");
+    Sys->Printf (MSG_CONSOLE, "The 2D graphics driver does not support screen shots\n");
     return;
   }
 
-  Sys->Printf (MSG_CONSOLE, "Screenshot: %s", name);
+  Sys->Printf (MSG_CONSOLE, "Screenshot: %s\n", name);
   if (!csSavePNG (name, img))
     Sys->Printf (MSG_CONSOLE, "There was an error while writing screen shot\n");
   img->DecRef ();
@@ -1095,7 +1094,7 @@ void start_console ()
   iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
 
   // Initialize the texture manager
-  txtmgr->Initialize ();
+  txtmgr->ResetPalette ();
 
   // Allocate a uniformly distributed in R,G,B space palette for console
   int r,g,b;
@@ -1104,15 +1103,13 @@ void start_console ()
       for (b = 0; b < 4; b++)
         txtmgr->ReserveColor (r * 32, g * 32, b * 64);
 
-  txtmgr->Prepare ();
-  txtmgr->AllocPalette ();
+  txtmgr->SetPalette ();
 
   ((csSimpleConsole *)System->Console)->SetupColors (txtmgr);
   ((csSimpleConsole *)System->Console)->SetMaxLines (1000);       // Some arbitrary high value.
   ((csSimpleConsole *)System->Console)->SetTransparent (0);
 
   System->ConsoleReady = true;
-
 }
 
 void WalkTest::EndWorld ()
@@ -1359,12 +1356,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
     // the use in the 2D part.
     csTextureList *texlist = world->GetTextures ();
-    csTextureHandle *texh = texlist->GetTextureMM ("cslogo.gif");
-    if (texh)
-    {
-      texh->for_2d = true;
-      texh->for_3d = false;
-    }
+    csTextureHandle *texh = texlist->FindByName ("cslogo.gif");
+    if (texh) texh->flags = CS_TEXTURE_2D;
 
     // Prepare the world. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
@@ -1375,7 +1368,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     {
       int w, h;
       iTextureHandle* phTex = texh->GetTextureHandle();
-      phTex->GetBitmapDimensions (w,h);
+      phTex->GetMipMapDimensions (0, w, h);
       CHK (cslogo = new csSprite2D (phTex, 0, 0, w, h));
     }
 
@@ -1394,9 +1387,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   // Initialize collision detection system (even if disabled so that we can enable it later).
   InitWorld (world, view->GetCamera ());
 
-  // Allocate the palette as calculated by the texture manager.
-  txtmgr->AllocPalette ();
-
   // Create a wireframe object which will be used for debugging.
   CHK (wf = new csWireFrameCam (txtmgr));
 
@@ -1414,6 +1404,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   // Wait one second before starting.
   long t = Sys->Time ()+1000;
   while (Sys->Time () < t) ;
+
+  // Allocate the palette as calculated by the texture manager.
+  txtmgr->SetPalette ();
 
   // Reinit console object for 3D engine use.
   ((csSimpleConsole *)System->Console)->SetupColors (txtmgr);

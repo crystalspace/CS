@@ -27,6 +27,7 @@
 #include "sttest.h"
 
 #define SCAN8
+#define COLORMAP	((UByte *)Scan.PaletteTable)
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
@@ -52,35 +53,14 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//--//-- draw_scanline_XXXX --//--//
 
-#ifndef NO_draw_scanline_map_zfil
-
-#define SCANFUNC csScan_8_draw_scanline_map_zfil
-#define SCANMAP 1
-#define SCANLOOP \
-    do									\
-    {									\
-      *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];		\
-      uu += duu;							\
-      vv += dvv;							\
-    }									\
-    while (_dest <= _destend)
-#define SCANEND \
-    do									\
-    {									\
-      *z_buffer++ = izz;						\
-      izz += dzz;							\
-    }									\
-    while (z_buffer <= lastZbuf)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_map_zfil
+#include "scanxx.inc"
 
 //------------------------------------------------------------------
 
 #ifndef NO_draw_scanline_map_filt_zfil
 
 #define SCANFUNC csScan_8_draw_scanline_map_filt_zfil
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     int filter_bf_shifted=csGraphics3DSoftware::filter_bf>>1,filter_du, filter_dv;            \
     while(_dest<=_destend&&((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
@@ -125,62 +105,15 @@
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_scanline_tex_zfil
-
-#define SCANFUNC csScan_8_draw_scanline_tex_zfil
-#define SCANLOOP \
-    do                                                                  \
-    {                                                                   \
-      *_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];\
-      uu += duu;                                                        \
-      vv += dvv;                                                        \
-    }                                                                   \
-    while (_dest <= _destend)
-#define SCANEND \
-    do                                                                  \
-    {                                                                   \
-      *z_buffer++ = izz;                                                \
-      izz += dzz;                                                       \
-    }                                                                   \
-    while (z_buffer <= lastZbuf)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_tex_zfil
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_tex_priv_zfil
-
-#define SCANFUNC csScan_8_draw_scanline_tex_priv_zfil
-#define SCANLOOP \
-    do                                                                  \
-    {                                                                   \
-      *_dest++ = Scan.PrivToGlobal[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];        \
-      uu += duu;                                                        \
-      vv += dvv;                                                        \
-    }                                                                   \
-    while (_dest <= _destend)
-#define SCANEND \
-    do                                                                  \
-    {                                                                   \
-      *z_buffer++ = izz;							\
-      izz += dzz;                                                       \
-    }                                                                   \
-    while (z_buffer <= lastZbuf)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_tex_priv_zfil
-
-//------------------------------------------------------------------
-
 #ifndef NO_draw_scanline_map_alpha1
 
 #define SCANFUNC csScan_8_draw_scanline_map_alpha1
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     do                                                                  \
     {                                                                   \
-      *_dest = Scan.AlphaMap[*_dest][srcTex[((vv>>16)<<shifter) + (uu>>16)]];\
+      *_dest = Scan.AlphaMap [(unsigned (*_dest) << 8) +		\
+        srcTex [((vv >> 16) << shifter) + (uu >> 16)]];			\
       _dest++;                                                          \
       uu += duu;                                                        \
       vv += dvv;                                                        \
@@ -195,11 +128,12 @@
 #ifndef NO_draw_scanline_map_alpha2
 
 #define SCANFUNC csScan_8_draw_scanline_map_alpha2
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     do                                                                  \
     {                                                                   \
-      *_dest = Scan.AlphaMap[srcTex[((vv>>16)<<shifter) + (uu>>16)]][*_dest];\
+      *_dest = Scan.AlphaMap [*_dest + unsigned (			\
+        srcTex [((vv >> 16) << shifter) + (uu >> 16)]) << 8];		\
       _dest++;                                                          \
       uu += duu;                                                        \
       vv += dvv;                                                        \
@@ -208,231 +142,6 @@
 #include "scanln.inc"
 
 #endif // NO_draw_scanline_map_alpha2
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_tex_key_zfil
-
-#define SCANFUNC csScan_8_draw_scanline_tex_key_zfil
-#define SCANLOOP \
-    unsigned char c;                                                    \
-    do                                                                  \
-    {                                                                   \
-      c = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];	\
-      if (c)                                                            \
-      {                                                                 \
-        *_dest++ = c;                                                   \
-        *z_buffer++ = izz;						\
-      }                                                                 \
-      else                                                              \
-      {                                                                 \
-        _dest++;                                                        \
-        z_buffer++;							\
-      }                                                                 \
-      uu += duu;                                                        \
-      vv += dvv;                                                        \
-      izz += dzz;                                                       \
-    }                                                                   \
-    while (_dest <= _destend)
-#include "scanln.inc"
-
-#endif // draw_scanline_tex_key_zfil
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_tex_priv_key_zfil
-
-#define SCANFUNC csScan_8_draw_scanline_tex_priv_key_zfil
-#define SCANLOOP \
-    do                                                                  \
-    {                                                                   \
-      unsigned char c = srcTex[((uu>>16)&ander_w) +                     \
-        ((vv>>shifter_h)&ander_h)];                                     \
-      if (c)                                                            \
-      {                                                                 \
-        *_dest++ = Scan.PrivToGlobal[c];				\
-        *z_buffer++ = izz;						\
-      }                                                                 \
-      else                                                              \
-      {                                                                 \
-        _dest++;                                                        \
-        z_buffer++;							\
-      }                                                                 \
-      uu += duu;                                                        \
-      vv += dvv;                                                        \
-      izz += dzz;                                                       \
-    }                                                                   \
-    while (_dest <= _destend)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_tex_priv_key_zfil
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_map_key_zfil
-
-#define SCANFUNC csScan_8_draw_scanline_map_key_zfil
-#define SCANMAP 1
-#define SCANLOOP \
-    do                                                                  \
-    {                                                                   \
-      unsigned char c = srcTex[((vv>>16)<<shifter) + (uu>>16)];         \
-      if (c)                                                            \
-      {                                                                 \
-        *_dest++ = c;                                                   \
-        *z_buffer++ = izz;						\
-      }                                                                 \
-      else                                                              \
-      {                                                                 \
-        _dest++;                                                        \
-        z_buffer++;							\
-      }                                                                 \
-      uu += duu;                                                        \
-      vv += dvv;                                                        \
-      izz += dzz;                                                       \
-    }                                                                   \
-    while (_dest <= _destend)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_map_key_zfil
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_tex_zuse
-
-#define SCANFUNC csScan_8_draw_scanline_tex_zuse
-#define SCANLOOP \
-    do                                                                  \
-    {                                                                   \
-      if (izz >= (int)(*z_buffer))					\
-      {                                                                 \
-        *_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];\
-        *z_buffer++ = izz;						\
-      }                                                                 \
-      else                                                              \
-      {                                                                 \
-        _dest++;                                                        \
-        z_buffer++;							\
-      }                                                                 \
-      uu += duu;                                                        \
-      vv += dvv;                                                        \
-      izz += dzz;                                                       \
-    }                                                                   \
-    while (_dest <= _destend)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_tex_zuse
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_tex_priv_zuse
-
-#define SCANFUNC csScan_8_draw_scanline_tex_priv_zuse
-#define SCANLOOP \
-    do                                                                  \
-    {                                                                   \
-      if (izz >= (int)(*z_buffer))					\
-      {                                                                 \
-        *_dest++ = Scan.PrivToGlobal[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];      \
-        *z_buffer++ = izz;						\
-      }                                                                 \
-      else                                                              \
-      {                                                                 \
-        _dest++;                                                        \
-        z_buffer++;							\
-      }                                                                 \
-      uu += duu;                                                        \
-      vv += dvv;                                                        \
-      izz += dzz;                                                       \
-    }                                                                   \
-    while (_dest <= _destend)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_tex_priv_zuse
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_map_zuse
-
-#define SCANFUNC csScan_8_draw_scanline_map_zuse
-#define SCANMAP 1
-#define SCANLOOP \
-    do                                                                  \
-    {                                                                   \
-      if (izz >= (int)(*z_buffer))					\
-      {                                                                 \
-        *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];              \
-        *z_buffer++ = izz;						\
-      }                                                                 \
-      else                                                              \
-      {                                                                 \
-        _dest++;                                                        \
-        z_buffer++;							\
-      }                                                                 \
-      uu += duu;                                                        \
-      vv += dvv;                                                        \
-      izz += dzz;                                                       \
-    }                                                                   \
-    while (_dest <= _destend)
-#include "scanln.inc"
-
-#endif // NO_draw_scanline_map_zuse
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_flat_zfil
-
-void csScan_8_draw_scanline_flat_zfil (int xx, unsigned char* d,
-  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z)
-{
-  (void)u_div_z; (void)v_div_z;
-  int color = Scan.FlatColor;
-  long izz = QInt24 (inv_z);
-  long dzz = QInt24 (Scan.M);
-  UByte* _dest = (UByte*)d;
-  UByte* _destend = _dest + xx-1;
-  do
-  {
-    *_dest++ = color;
-    *z_buf++ = izz;
-    izz += dzz;
-  }
-  while (_dest <= _destend);
-}
-
-#endif // NO_draw_scanline_flat_zfil
-
-//------------------------------------------------------------------
-
-#ifndef NO_draw_scanline_flat_zuse
-
-void csScan_8_draw_scanline_flat_zuse (int xx, unsigned char* d,
-  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z)
-{
-  (void)u_div_z; (void)v_div_z;
-  int color = Scan.FlatColor;
-  long izz = QInt24 (inv_z);
-  long dzz = QInt24 (Scan.M);
-  UByte* _dest = (UByte*)d;
-  UByte* _destend = _dest + xx-1;
-  do
-  {
-    if (izz >= (int)(*z_buf))
-    {
-      *_dest++ = color;
-      *z_buf++ = izz;
-    }
-    else
-    {
-      _dest++;
-      z_buf++;
-    }
-    izz += dzz;
-  }
-  while (_dest <= _destend);
-}
-
-#endif // NO_draw_scanline_flat_zuse
 
 //------------------------------------------------------------------
 
@@ -446,7 +155,7 @@ void csScan_8_draw_scanline_fog (int xx, unsigned char* d,
   unsigned char *_dest = (unsigned char *)d;
   unsigned char *_destend = _dest + xx;
   unsigned long izz = QInt24 (inv_z);
-  int dzz = QInt24 (Scan.M);
+  unsigned long dzz = QInt24 (Scan.M);
   ULong fog_dens = Scan.FogDensity;
   unsigned char fog_pix = Scan.FogPix;
 
@@ -518,77 +227,12 @@ void csScan_8_draw_scanline_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#if 0
-void csScan_8_light_scanline (int xx, int uu, int vv, unsigned char* d,
-  float d1, float d2, float dd1, float dd2, float dd_u, float da_u,
-  float dd_v, float da_v, int lu, int lv, int sq_rad)
-{
-  int i;
-  float r, u1, v1;
-  int uu1, vv1, duu, dvv;
-  int sqd;
-  unsigned char* lt;
-
-  while (xx > 0)
-  {
-    d1 -= dd1;
-    d2 += dd2;
-    r = d1 / d2;
-
-    i = Scan.InterpolStep;
-    if (xx < i) i = xx;
-    xx -= i;
-
-    u1 = r*dd_u + da_u;
-    v1 = r*dd_v + da_v;
-
-    uu1 = QInt16 (u1);
-    vv1 = QInt16 (v1);
-
-    duu = (uu1-uu)/Scan.InterpolStep;
-    dvv = (vv1-vv)/Scan.InterpolStep;
-
-    while (i-- > 0)
-    {
-      sqd = ((uu>>16)-lu)*((uu>>16)-lu) + ((vv>>16)-lv)*((vv>>16)-lv);
-      sqd = sq_rad-sqd;
-      if (sqd > 0)
-      {
-        if (sqd > (255-NORMAL_LIGHT_LEVEL)) sqd = 255-NORMAL_LIGHT_LEVEL;
-        lt = textures->get_light_table (NORMAL_LIGHT_LEVEL+sqd);
-        *d++ = lt[*d];
-      }
-      uu += duu;
-      vv += dvv;
-    }
-  }
-}
-#endif
-
-//------------------------------------------------------------------
-
 #ifndef NO_draw_pi_scanline_tex_zuse
 
-void csScan_8_draw_pi_scanline_tex_zuse (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
-{
-  unsigned char *_dest = (unsigned char *)dest;
-  unsigned char *_destend = _dest + len;
-  while (_dest < _destend)
-  {
-    if (z >= *zbuff)
-    {
-      *_dest = *(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16));
-      *zbuff = z;
-    }
-    _dest++;
-    zbuff++;
-    u += du;
-    v += dv;
-    z += dz;
-  } /* endwhile */
-}
+#define PI_SCANFUNC csScan_8_draw_pi_scanline_tex_zuse
+#define PI_ZUSE
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_draw_pi_scanline_tex_zuse
 
@@ -596,20 +240,139 @@ void csScan_8_draw_pi_scanline_tex_zuse (void *dest, int len,
 
 #ifndef NO_draw_pi_scanline_tex_zfil
 
-void csScan_8_draw_pi_scanline_tex_zfil (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
-{
-  unsigned char *_dest = (unsigned char *)dest;
-  unsigned char *_destend = _dest + len;
-  while (_dest < _destend)
-  {
-    *_dest++ = *(bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16));
-    *zbuff++ = z;
-    u += du;
-    v += dv;
-    z += dz;
-  } /* endwhile */
-}
+#define PI_SCANFUNC csScan_8_draw_pi_scanline_tex_zfil
+#define PI_ZFILL
+#define PI_INDEX8
+#include "scanpi.inc"
 
 #endif // NO_draw_pi_scanline_tex_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_tex_gouraud_zfil
+
+#define PI_SCANFUNC csScan_8_draw_pi_scanline_tex_gouraud_zfil
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_INDEX8
+#include "scanpi.inc"
+
+#endif // NO_draw_pi_scanline_tex_gouraud_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_tex_gouraud_zuse
+
+#define PI_SCANFUNC csScan_8_draw_pi_scanline_tex_gouraud_zuse
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_INDEX8
+#include "scanpi.inc"
+
+#endif // NO_draw_pi_scanline_tex_gouraud_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_zuse
+
+#define PI_SCANFUNC csScan_8_draw_pi_scanline_flat_zuse
+#define PI_ZUSE
+#define PI_FLAT
+#define PI_INDEX8
+#include "scanpi.inc"
+
+#endif // NO_draw_pi_scanline_flat_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_zfil
+
+#define PI_SCANFUNC csScan_8_draw_pi_scanline_flat_zfil
+#define PI_ZFILL
+#define PI_FLAT
+#define PI_INDEX8
+#include "scanpi.inc"
+
+#endif // NO_draw_pi_scanline_flat_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud_zfil
+
+#define PI_SCANFUNC csScan_8_draw_pi_scanline_flat_gouraud_zfil
+#define PI_ZFILL
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_INDEX8
+#include "scanpi.inc"
+
+#endif // NO_draw_pi_scanline_flat_gouraud_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pi_scanline_flat_gouraud_zuse
+
+#define PI_SCANFUNC csScan_8_draw_pi_scanline_flat_gouraud_zuse
+#define PI_ZUSE
+#define PI_FLAT
+#define PI_GOURAUD
+#define PI_INDEX8
+#include "scanpi.inc"
+
+#endif // NO_draw_pi_scanline_flat_gouraud_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_zfil
+
+#define PI_SCANFUNC csScan_8_draw_pifx_scanline_zfil
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_INDEX8
+#define PI_BLEND
+#include "scanpi.inc"
+
+#endif // NO_draw_pifx_scanline_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_zuse
+
+#define PI_SCANFUNC csScan_8_draw_pifx_scanline_zuse
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_INDEX8
+#define PI_BLEND
+#include "scanpi.inc"
+
+#endif // NO_draw_pifx_scanline_zuse
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_transp_zfil
+
+#define PI_SCANFUNC csScan_8_draw_pifx_scanline_transp_zfil
+#define PI_ZFILL
+#define PI_GOURAUD
+#define PI_INDEX8
+#define PI_COLORKEY
+#define PI_BLEND
+#include "scanpi.inc"
+
+#endif // NO_draw_pifx_scanline_transp_zfil
+
+//------------------------------------------------------------------
+
+#ifndef NO_draw_pifx_scanline_transp_zuse
+
+#define PI_SCANFUNC csScan_8_draw_pifx_scanline_transp_zuse
+#define PI_ZUSE
+#define PI_GOURAUD
+#define PI_INDEX8
+#define PI_COLORKEY
+#define PI_BLEND
+#include "scanpi.inc"
+
+#endif // NO_draw_pifx_scanline_transp_zuse
+
+//------------------------------------------------------------------

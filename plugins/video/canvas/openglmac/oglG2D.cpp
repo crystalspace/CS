@@ -178,7 +178,7 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
   		pfmt.RedMask = 0xFF << 16;
   		pfmt.GreenMask = 0xFF << 8;
   		pfmt.BlueMask = 0xFF;
-  		complete_pixel_format();
+  		pfmt.complete ();
 	} else if ( Depth == 16 ) {
 		mColorTable = NULL;			// No color table needed
 		pfmt.PalEntries = 0;
@@ -186,7 +186,7 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
   		pfmt.RedMask = 0x1F << 10;
   		pfmt.GreenMask = 0x1F << 5;
   		pfmt.BlueMask = 0x1F;
-  		complete_pixel_format();
+  		pfmt.complete ();
 	} else {
 		/*
 		 *	The 8 bit pixel data was filled in by csGraphics2D
@@ -203,7 +203,7 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
 		pfmt.GreenMask = 0;
 		pfmt.BlueMask = 0;
 
-  		complete_pixel_format();
+  		pfmt.complete ();
 	}
   
 	CsPrintf (MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);

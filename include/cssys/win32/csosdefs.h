@@ -77,20 +77,25 @@
 #  endif
 #endif
 
-#ifdef COMP_BC
-  #define strcasecmp(s1,s2)    stricmp(s1,s2)
-  #define strncasecmp(s1,s2,n) strnicmp(s1,s2,n)
+#if defined (COMP_WCC) || defined (COMP_BC)
+#  define strcasecmp stricmp
+#  define strncasecmp strnicmp
 #endif
 
+#if defined(COMP_VC)
+#  define strcasecmp _stricmp
+#  define strncasecmp _strnicmp
+#endif
+
+// Maximal path length
 #ifdef SYSDEF_PATH
-  // Maximal path length
-  #ifndef MAXPATHLEN
-    #ifdef _MAX_FNAME
-      #define MAXPATHLEN _MAX_FNAME
-    #else
-      #define MAXPATHLEN 260		// and not 256!
-    #endif
-  #endif
+#  ifndef MAXPATHLEN
+#    ifdef _MAX_FNAME
+#      define MAXPATHLEN _MAX_FNAME
+#    else
+#      define MAXPATHLEN 260		// and not 256!
+#    endif
+#  endif
 #endif
 
 #if defined(SYSDEF_DIR) || defined(SYSDEF_PATH)
@@ -102,22 +107,22 @@
     /// Directory entry
     struct dirent
     {
-     char d_name [MAXPATHLEN + 1];	/* File name, 0 terminated */
-     long d_size;			/* File size (bytes) */
-     unsigned d_attr;			/* File attributes (Windows-specific) */
+      char d_name [MAXPATHLEN + 1];	/* File name, 0 terminated */
+      long d_size;			/* File size (bytes) */
+      unsigned d_attr;			/* File attributes (Windows-specific) */
     };
     /// Directory handle
     struct DIR
     {
-     bool valid;
-     long handle;
-     dirent de;
-     _finddata_t fd;
+      bool valid;
+      long handle;
+      dirent de;
+      _finddata_t fd;
     };
     static inline bool isdir (const char *path, dirent *de)
     {
-     (void)path;
-     return !!(de->d_attr & _A_SUBDIR);
+      (void)path;
+      return !!(de->d_attr & _A_SUBDIR);
     }
 
     extern "C" DIR *opendir (const char *name);

@@ -147,7 +147,7 @@ __asm   mov     _dest, edi                  \
 #pragma message( "draw_scanline_map_zfil" )
 #define NO_draw_scanline_map_zfil
 #define SCANFUNC draw_scanline_map_zfil
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP8
 #define SCANEND \
     do                              \
@@ -166,7 +166,7 @@ __asm   mov     _dest, edi                  \
 #pragma message( "draw_scanline_map_zuse" )
 #define NO_draw_scanline_map_zuse
 #define SCANFUNC draw_scanline_map_zuse
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     s = srcTex + ((vv >> 16) << shifter) + (uu >> 16);  \
                                                         \
@@ -223,7 +223,7 @@ __asm   mov     izz, ebx  }             \
 #pragma message( "draw_scanline_map_alpha1" )
 #define NO_draw_scanline_map_alpha1
 #define SCANFUNC draw_scanline_map_alpha1
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     s = srcTex + ((vv >> 16) << shifter) + (uu >> 16);  \
                                     \
@@ -354,7 +354,7 @@ __asm   mov     _dest, edi }    \
 #pragma message( "draw_scanline_map_alpha2" )
 #define NO_draw_scanline_map_alpha2
 #define SCANFUNC draw_scanline_map_alpha2
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP \
     s = srcTex + ((vv >> 16) << shifter) + (uu >> 16);  \
                                     \
@@ -486,7 +486,7 @@ __asm   mov     _dest, edi }    \
 #pragma message( "mmx_draw_scanline_map_zfil" )
 #define NO_mmx_draw_scanline_map_zfil
 #define SCANFUNC mmx_draw_scanline_map_zfil
-#define SCANMAP 1
+#define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP8
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanline.inc"
@@ -500,12 +500,13 @@ __asm   mov     _dest, edi }    \
 #define NO_mmx_draw_scanline_tex_zfil
 #define SCANFUNC mmx_draw_scanline_tex_zfil
 #define SCANLOOP \
-    do                                  \
-    {                                   \
-      *_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];   \
-      uu += duu;                            \
-      vv += dvv;                            \
-    }                                   \
+    do									\
+    {									\
+      *_dest++ = COLORMAP [srcTex [((uu >> 16) & ander_w) +		\
+        ((vv >> shifter_h) & ander_h)]];				\
+      uu += duu;							\
+      vv += dvv;							\
+    }									\
     while (_dest <= _destend)
 #define SCANEND MMX_FILLZBUFFER
 #include "cs3d/software/scanline.inc"
@@ -562,142 +563,5 @@ label1: add     ax, dvFrac                  ; v = v + dv
         mov     ebp, oldEBP
         }
 }
-
-#ifdef DO_MMX
-
-#define NO_mmx_draw_pi_scanline_tex_zuse
-void csScan_8_mmx_draw_pi_scanline_tex_zuse (void *dest, int len,
-  unsigned long *zbuff, long u, long du, long v, long dv,
-  unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w)
-{
-  if (len <= 0)
-    return;
-
-  s_destend = ((unsigned char *)dest) + len;
-  s = bitmap + ((v >> 16) << bitmap_log2w) + (u >> 16);
-
-  dudvInt[1] = ((dv >> 16) << bitmap_log2w) + (du >> 16);
-  dudvInt[0] = dudvInt [1] + (1 << bitmap_log2w);
-  uFrac = (short)u;
-  vFrac = (short)v;
-  duFrac = (short)du;
-  dvFrac = (short)dv;
-  sz_buffer = (unsigned long *)zbuff;
-  sdzz = dz;
-
-  __asm {
-        mov     oldEBP, ebp     ; Save EBP
-        mov     ecx, z          ; ECX = z
-        mov     edi, dest
-        mov     esi, s
-        mov      ax, vFrac
-        mov      bx, uFrac
-        add     edi, 4          ; Increment edi
-        mov     ebp, sz_buffer  ; EBP = zbuff
-
-        cmp     edi, s_destend     ; Less than 4 pixels left?
-        ja  label5              ; Go by one
-
-        ; Load MMX registers
-        movd    mm1, sdzz           ; mm1 = 0 | dz
-        movd    mm0, ecx            ; mm0 = 0 | z0
-        punpckldq mm1, mm1          ; mm1 = dz | dz
-        movq    mm2, mm0            ; mm2 = 0 | z0
-        paddd   mm2, mm1            ; mm2 = dz | z1
-        punpckldq mm0, mm2          ; mm0 = z1 | z0
-        pslld   mm1, 1              ; mm1 = dz*2 | dz*2
-
-; The following is somewhat hard to understand, especially without my proprietary
-; GAS syntax highlight {tm} {R} :-) I've interleaved MMX instructions with
-; non-MMX instructions to achieve maximal percent of paired commands; even
-; commands are MMX, odd commands are non-MMX. Since MMX commands never affects
-; flags register, we shouldn't care about flags and so on.
-label0: movq    mm3, DWORD PTR [ebp]    ; mm3 = bz1 | bz0
-        mov     ch, BYTE PTR [esi]  ; Get texel 0
-        movq    mm5, mm0                ; mm5 = z1 | z0
-        add     ax, dvFrac          ; v = v + dv
-        movq    mm4, mm0                ; mm4 = z1 | z0
-        sbb     edx, edx
-        pcmpgtd mm5, mm3                ; mm5 = m1 | m0
-        add     bx, duFrac          ; u = u + du
-        paddd   mm0, mm1                ; mm0 = z3 | z2
-        adc     esi, DWORD PTR [edx*4+dudvInt+4]  ; update texture ptr
-        movq    mm6, mm5                ; mm6 = m1 | m0
-        mov     cl, BYTE PTR [esi]  ; Get texel 1
-        pandn   mm5, mm3                ; mm5 = ?bz1 | ?bz0
-        add     ax, dvFrac          ; v = v + dv
-        movq    mm3, QWORD PTR [ebp+8]  ; mm3 = bz3 | bz2
-        sbb     edx, edx
-        pand    mm4, mm6                ; mm4 = ?z1 | ?z0
-        shl     ecx, 16             ; ECX = p1 | p0 | 0 | 0
-        movq    mm7, mm0                ; mm7 = z3 | z2
-        add     bx, duFrac          ; u = u + du
-        por     mm5, mm4                ; mm5 = nz1 | nz0
-        adc     esi, DWORD PTR [edx*4+dudvInt+4]  ; update texture ptr
-        movq    mm4, mm0                ; mm4 = z3 | z2
-        mov     cl, BYTE PTR [esi]  ; Get texel 2
-        movq    QWORD PTR [ebp], mm5    ; put nz1 | nz0 into z-buffer
-        add     ax, dvFrac          ; v = v + dv
-        pcmpgtd mm7, mm3                ; mm7 = m3 | m2
-        sbb     edx, edx
-        movq    mm5, mm7                ; mm5 = m3 | m2
-        add     bx, duFrac          ; u = u + du
-        paddd   mm0, mm1                ; mm0 = z5 | z4
-        adc     esi, DWORD PTR [edx*4+dudvInt+4]  ; update texture ptr
-        pandn   mm5, mm3                ; mm5 = ?bz3 | ?bz2
-        mov     ch, BYTE PTR [esi]  ; Get texel 3
-        pand    mm4, mm7                ; mm4 = ?z3 | ?z2
-        add     ax, dvFrac          ; v = v + dv
-        packssdw mm7, mm6               ; mm7 = m3 | m2 | m1 | m0
-        sbb     edx, edx
-        por     mm5, mm4                ; mm5 = nz3 | nz2
-        add     bx, duFrac          ; u = u + du
-        packsswb mm7, mm7               ; mm7 = 0 | 0 | 0 | 0 | m3 | m2 | m1 | m0
-        adc     esi, DWORD PTR [edx*4+dudvInt+4]  ; update texture ptr
-        movq    QWORD PTR [ebp+8], mm5  ; put nz3 | nz2 into z-buffer
-        rol     ecx, 16             ; ECX = p3 | p2 | p1 | p0
-
-;----- end of interleaved code
-
-        add     ebp, 16         ; Increment zbuf pointer
-
-        movd    edx, mm7        ; EDX = m3 | m2 | m1 | m0
-        and     ecx, edx        ; Leave only visible texels
-        not     edx             ; Negate Z-mask
-        and     edx, DWORD PTR [edi-4]  ; Get on-screen pixels
-        or      edx, ecx        ; Merge two sets of pixels together
-        add     edi, 4          ; Increment dest pointer
-        mov     DWORD PTR [edi-8], edx  ; Put pixels into framebuffer
-        cmp     edi, s_destend     ; dest < _destend?
-        jbe label0
-
-        ; Less than four pixels left
-        movd    ecx, mm0
-
-label5: sub     edi, 4
-        cmp     edi, s_destend     ; dest >=_destend?
-        jae label8
-
-label6: cmp     ecx, DWORD PTR [ebp]
-        jb  label7
-        mov     dl, BYTE PTR [esi]  ; Get texel
-        mov     DWORD PTR [ebp], ecx    ; *zbuff = z
-        mov     BYTE PTR [edi], dl      ; Put texel
-
-label7: add     ax, dvFrac          ; v = v + dv
-        sbb     edx, edx
-        add     bx, duFrac          ; u = u + du
-        adc     esi, DWORD PTR [edx*4+dudvInt+4]  ; update texture ptr
-        add     ecx, sdzz           ; z = z + dz
-        inc     edi             ; dest++
-        add     ebp, 4          ; zbuff++
-        cmp     edi, s_destend     ; dest < _destend?
-        jb  label6
-
-label8: mov     ebp, oldEBP
-        emms }
-}
-
-#endif // DO_MMX
 
 #endif // __SCANLN8_H__

@@ -132,6 +132,8 @@ nomem2:
       {
         if (color_type & PNG_COLOR_MASK_ALPHA)
           ImageType = imgPALALPHA;
+        else
+          Format &= ~CS_IMGFMT_ALPHA;
       }
       else if (color_type & PNG_COLOR_MASK_ALPHA)
         png_set_strip_alpha (png);
@@ -139,7 +141,7 @@ nomem2:
     case PNG_COLOR_TYPE_RGB:
     case PNG_COLOR_TYPE_RGB_ALPHA:
       ImageType = imgRGB;
-      // If there is no alpha information, fill with zeros
+      // If there is no alpha information, fill with 0xff
       if (!(color_type & PNG_COLOR_MASK_ALPHA))
       {
         // Expand paletted or RGB images with transparency to full alpha
@@ -147,7 +149,10 @@ nomem2:
         if (png_get_valid (png, info, PNG_INFO_tRNS))
           png_set_expand (png);
         else
+        {
           png_set_filler (png, 0xff, PNG_FILLER_AFTER);
+          Format &= ~CS_IMGFMT_ALPHA;
+        }
       }
       break;
     default:
@@ -198,7 +203,7 @@ nomem2:
   png_read_end (png, (png_infop)NULL);
 
   if (ImageType == imgRGB)
-    convert_rgb ((RGBPixel *)NewImage);
+    convert_rgba ((RGBPixel *)NewImage);
   else if (ImageType == imgPAL)
   {
     RGBcolor graypal [256];
@@ -214,7 +219,7 @@ nomem2:
         palette [i].red = palette [i].green = palette [i].blue =
           (i * 255) / entries;
     }
-    convert_8bit ((UByte *)NewImage, palette, colors);
+    convert_pal8 ((UByte *)NewImage, palette, colors);
   }
   else // grayscale + alpha
   {
@@ -235,7 +240,7 @@ nomem2:
       Alpha [i] = *src++;
     }
     delete [] (UByte *)NewImage;
-    convert_8bit (image, palette);
+    convert_pal8 (image, palette);
   }
 
   // clean up after the read, and free any memory allocated

@@ -26,69 +26,58 @@
     God Of Optimization :-(
 */
 
-#ifndef __SCANPI_INC__
-#define __SCANPI_INC__
-
-static inline UInt ShiftToPos (UInt val, int lsb, int pos)
-{
-  if (lsb >= pos)
-    return (pos >= 0) ? val >> (lsb - pos) : val >> lsb;
-  else
-    return val << (pos - lsb);
-}
-
-#endif // __SCANPI_INC__
-
 #include "pixtype.inc"
 
 // Masks for accessing blending table. Since blending table expects a different
 // number of bits per color component (for example, in 32bpp mode we have
 // 6 bits per color component blending tables) we should strip off
-// unused bits from color component.
+// unused bits from color component. Since we allow 2*SRC lighting, we actually
+// use one more bit per each component (to allow multiplication overflows).
 #undef PI_RM_BLEND
-#undef PI_RM2
-#undef PI_RS_BLEND
 #undef PI_GM_BLEND
-#undef PI_GM2
-#undef PI_GS_BLEND
 #undef PI_BM_BLEND
-#undef PI_BM2
-#undef PI_BS_BLEND
+#undef PI_RS_GOUTEX
+#undef PI_GS_GOUTEX
+#undef PI_BS_GOUTEX
+#undef PI_RM_GOUTEX
+#undef PI_GM_GOUTEX
+#undef PI_BM_GOUTEX
 #undef PI_RBB
 #undef PI_GBB
 #undef PI_BBB
-
-#ifdef PI_R8G8B8
-#  define PI_RS_BLEND	18
-#  define PI_RM_BLEND	0x00FC0000
-#  define PI_RBB	6
-#  define PI_GS_BLEND	10
-#  define PI_GM_BLEND	0x0000FC00
-#  define PI_GBB	6
-#  define PI_BS_BLEND	2
-#  define PI_BM_BLEND	0x000000FC
-#  define PI_BBB	6
-#else
-#  define PI_RS_BLEND	PI_RS
-#  define PI_RM_BLEND	PI_RM
-#  define PI_RBB	PI_RB
-#  define PI_GS_BLEND	PI_GS
-#  define PI_GM_BLEND	PI_GM
-#  define PI_GBB	PI_GB
-#  define PI_BS_BLEND	PI_BS
-#  define PI_BM_BLEND	PI_BM
-#  define PI_BBB	PI_BB
-#endif
-
-#define PI_RM2		(PI_RM | (PI_RM << 1))
-#define PI_GM2		(PI_GM | (PI_GM << 1))
-#define PI_BM2		(PI_BM | (PI_BM << 1))
-
 #undef PI_RBT_OFS
 #undef PI_GBT_OFS
 #undef PI_BBT_OFS
 
-#ifdef PI_R5G6B5
+#ifdef PI_R8G8B8
+#  define PI_RB_BLEND	6
+#  define PI_GB_BLEND	6
+#  define PI_BB_BLEND	6
+#else
+#  define PI_RB_BLEND	PI_RB
+#  define PI_GB_BLEND	PI_GB
+#  define PI_BB_BLEND	PI_BB
+#endif
+
+#define PI_RM_BLEND	(((2 << PI_RB_BLEND) - 1) << PI_RB_BLEND)
+#define PI_GM_BLEND	(((2 << PI_GB_BLEND) - 1) << PI_GB_BLEND)
+#define PI_BM_BLEND	(((2 << PI_BB_BLEND) - 1) << PI_BB_BLEND)
+
+#define PI_RS_DST_BLEND	(PI_RS + (PI_RB - PI_RB_BLEND))
+#define PI_GS_DST_BLEND	(PI_GS + (PI_GB - PI_GB_BLEND))
+#define PI_BS_DST_BLEND	(PI_BS + (PI_BB - PI_BB_BLEND))
+
+#define PI_RM_GOUTEX	((PI_RM >> PI_RS) << (24 - (PI_RB - PI_RB_BLEND)))
+#define PI_GM_GOUTEX	((PI_GM >> PI_GS) << (24 - (PI_GB - PI_GB_BLEND)))
+#define PI_BM_GOUTEX	((PI_BM >> PI_BS) << (24 - (PI_BB - PI_BB_BLEND)))
+
+#define PI_RS_GOUTEX	(24 - (PI_RB - PI_RB_BLEND))
+#define PI_GS_GOUTEX	(24 - (PI_GB - PI_GB_BLEND))
+#define PI_BS_GOUTEX	(24 - (PI_BB - PI_BB_BLEND))
+
+// In 5-6-5 and 8-bit indexed modes we'll need two blending tables:
+// one for 5-bit transformations and second for 6-bit transformations
+#if (PI_GB == 6)
 #  define PI_RBT_OFS	0
 #  define PI_GBT_OFS	32*64
 #  define PI_BBT_OFS	0
@@ -98,13 +87,18 @@ static inline UInt ShiftToPos (UInt val, int lsb, int pos)
 #  define PI_BBT_OFS	0
 #endif
 
+#if defined (PI_INDEX8)
+#  define INV_COLORMAP(x) Scan.inv_cmap [x]
+#else
+#  define INV_COLORMAP(x) x
+#endif
+
 /*
     For Gouraud-shaded polys additional parameters r,g,b and deltas
-    dr,dg,db are passed to the routine. They are in 7.15 fixed-point
-    format (i.e. 1.0 == 0x8000, 2.0 == 0x10000) and in #.16 fixed-point
-    format for non-textured models, where # is equal to the number of
+    dr,dg,db are passed to the routine. They are in #.8 fixed-point
+    format for all lighting models, where # is equal to the number of
     bits for the respective color component (i.e. if "r" component
-    has 5 bits then 1.0 == 0x200000, 1/32 == 0x10000 and so on)
+    has 5 bits then 1.0 == 0x2000, 1/32 == 0x100 and so on)
 */
 void PI_SCANFUNC (void *dest, int len, unsigned long *zbuff,
   long u, long du, long v, long dv, unsigned long z, long dz,
@@ -124,28 +118,27 @@ void PI_SCANFUNC (void *dest, int len, unsigned long *zbuff,
 #ifdef PI_FLAT
   // if flat shading is desired, we will just use one color
   (void)u; (void)v; (void)du; (void)dv; (void)bitmap; (void)bitmap_log2w;
-#  ifndef PI_GOURAUD
-  register UInt texel = Scan.FlatColor;
-#  endif
+  #ifndef PI_GOURAUD
+  unsigned pixel = Scan.FlatColor;
+  #endif
 #endif
 
 #if defined (PI_GOURAUD) && !defined (PI_BLEND)
   // Check for overflow (in the case the light source is brighter than 128)
   if (!clamp)
-#  include "scanpi2.inc"
+  #include "scanpi2.inc"
   // If either r,g,b is going to overflow past 1.0 we should clamp it to 1.0
   else
-#  define PI_CLAMP_RGB
-#  include "scanpi2.inc"
-#else
-#  include "scanpi2.inc"
+  #define PI_CLAMP_RGB
 #endif
+#include "scanpi2.inc"
 }
 
 #undef PI_SCANFUNC
 #undef PI_ZUSE
 #undef PI_ZFILL
 #undef PI_GOURAUD
+#undef PI_INDEX8
 #undef PI_R5G5B5
 #undef PI_R5G6B5
 #undef PI_R8G8B8

@@ -599,7 +599,7 @@ static inline void XFmove (unsigned char *src, unsigned char *dest, int count)
 4:              movl    %3, %%ebp"
     :
     : "D" (dest), "S" (src), "m" (count), "m" (oldebp)
-    : "%eax", "%ecx", "%ebx", "%edx", "%esi", "%edi");
+    : "%eax", "%ecx", "%ebx", "%edx");
 }
 
 // Move "count" bytes from src to dest in X-mode
@@ -665,7 +665,7 @@ static inline void Xmove (unsigned char *src, unsigned char *dest, int count)
 4:              movl    %3, %%ebp"
     :
     : "D" (dest), "S" (src), "m" (count), "m" (oldebp)
-    : "%eax", "%ecx", "%ebx", "%edx", "%esi", "%edi");
+    : "%eax", "%ecx", "%ebx", "%edx");
 }
 
 // Move bytes from src to (far *)dest until src >= last
@@ -717,7 +717,7 @@ static inline void VESAFmove (unsigned char *src, unsigned char *dest,
                 jnz     3b
 4:" :
     : "S" (src), "D" (dest), "m" (last)
-    : "%eax", "%ebx", "%ecx", "%edx", "%esi", "%edi");
+    : "%eax", "%ebx", "%ecx", "%edx");
 }
 
 // Move bytes from src to dest until src >= last
@@ -760,7 +760,7 @@ static inline void VESAmove (unsigned char *src, unsigned char *dest,
                 jnz     3b
 4:" :
     : "S" (src), "D" (dest), "m" (last)
-    : "%eax", "%ebx", "%ecx", "%edx", "%esi", "%edi");
+    : "%eax", "%ebx", "%ecx", "%edx");
 }
 
 void VideoSystem::Flush (int x, int y, int w, int h)

@@ -219,10 +219,7 @@ public:
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
   /// Give a texture to Graphics3D to cache it.
-  virtual void CacheTexture (iPolygonTexture* texture);
-  
-  /// Release a texture from the cache.
-  virtual void UncacheTexture (iPolygonTexture* texture);
+  void CacheTexture (iPolygonTexture* texture);
   
   /// Get the capabilities of this driver: NOT IMPLEMENTED.
   virtual void GetCaps (G3D_CAPS *caps);
@@ -232,8 +229,6 @@ public:
   
   /// Clear the texture cache.
   virtual void ClearCache ();
-  ///
-  virtual G3D_COLORMAPFORMAT GetColormapFormat ();
 
   /// Print the screen.
   virtual void Print (csRect* rect)
@@ -313,9 +308,6 @@ public:
   virtual void CloseFogObject (CS_ID id);
 
 private:
-  
-  // print to the system's device
-  void SysPrintf(int mode, char* str, ...);
   
   // texture format enumeration callback function :: static member function.
   static HRESULT CALLBACK EnumTextFormatsCallback(LPDDSURFACEDESC lpddsd, LPVOID lpUserArg);

@@ -129,8 +129,8 @@ InfRoomData* InfiniteMaze::create_six_room (csWorld* world, int x, int y, int z)
   dx = 2.0*(float)x;
   dy = 2.0*(float)y;
   dz = 2.0*(float)z;
-  csTextureHandle* t = world->GetTextures ()->GetTextureMM ("txt");
-  csTextureHandle* t2 = world->GetTextures ()->GetTextureMM ("txt2");
+  csTextureHandle* t = world->GetTextures ()->FindByName ("txt");
+  csTextureHandle* t2 = world->GetTextures ()->FindByName ("txt2");
   float s = 1;
 
   create_one_side (room, "n", t, t2, dx-s,dy+s,dz+s,  dx+s,dy+s,dz+s,  dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);

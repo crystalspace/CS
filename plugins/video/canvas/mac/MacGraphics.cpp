@@ -291,7 +291,7 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
   		pfmt.RedMask = 0xFF << 16;
   		pfmt.GreenMask = 0xFF << 8;
   		pfmt.BlueMask = 0xFF;
-  		complete_pixel_format();
+  		pfmt.complete ();
 
 		_DrawPixel = DrawPixel32;
 		_WriteChar = WriteChar32;
@@ -304,7 +304,7 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
   		pfmt.RedMask = 0x1F << 10;
   		pfmt.GreenMask = 0x1F << 5;
   		pfmt.BlueMask = 0x1F;
-  		complete_pixel_format();
+  		pfmt.complete ();
 
 		_DrawPixel = DrawPixel16;
 		_WriteChar = WriteChar16;
@@ -549,7 +549,8 @@ void csGraphics2DMac::GetColorfromInt( int color, RGBColor *outColor )
 ----------------------------------------------------------------*/
 bool csGraphics2DMac::BeginDraw()
 {
-	if ( mDrawSprocketsEnabled ) {
+	csGraphics2D::BeginDraw ();
+	if (FrameBufferLocked == 1 && mDrawSprocketsEnabled) {
 		CGrafPtr port;
 		int		 i;
 		int		 theOffset;
@@ -572,10 +573,7 @@ bool csGraphics2DMac::BeginDraw()
 ----------------------------------------------------------------*/
 void csGraphics2DMac::FinishDraw()
 {
-	if ( mActivePage == 0 )
-		mActivePage = 1;
-	else
-		mActivePage = 0;
+	csGraphics2D::FinishDraw ();
 }
 
 
@@ -643,6 +641,10 @@ void csGraphics2DMac::Print( csRect * area )
 			SetGWorld( thePort, theGDHandle );
 		}
 	}
+	if ( mActivePage == 0 )
+		mActivePage = 1;
+	else
+		mActivePage = 0;
 }
 
 

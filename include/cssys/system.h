@@ -278,14 +278,6 @@ public:
    */
   static long Time ();
 
-  /**
-   * General printf routine. This routine should eventually
-   * replace all other variants of printf that exist in
-   * Crystal Space. 'mode' is any of the MSG_... fields
-   * as defined above.
-   */
-  static void Printf (int mode, const char* str, ...);
-
   /// Print a string into debug.txt
   static void debug_out (bool flush, const char* str);
 
@@ -332,10 +324,8 @@ protected:
    */
   void SetMode (const char* mode);
 
-  /// Remote SCF interface
-  iSCF* scf;
-  
 public:
+
   /**************************** iSystem interface ****************************/
 
   /// returns the configuration.
@@ -351,7 +341,7 @@ public:
   /// Remove a plugin from system driver's plugin list
   virtual bool UnloadPlugIn (iPlugIn *iObject);
   /// print a string to the specified device.
-  virtual void Print (int mode, const char *string);
+  virtual void Printf (int mode, const char *format, ...);
   /// get the time in milliseconds.
   virtual time_t GetTime ();
   /// quit the system.
@@ -396,8 +386,33 @@ public:
   virtual void AddOptionCL (const char *iName, const char *iValue);
   /// Add a command-line name to the command-line names array
   virtual void AddNameCL (const char *iName);
-  /// Remove SCF interface
-  iSCF* GetSCF();
+
+  /****************************** iSCF interface ******************************/
+
+  class csSCF : public iSCF
+  {
+  public:
+    DECLARE_EMBEDDED_IBASE (csSystemDriver);
+
+    /// Wrapper for scfClassRegistered ()
+    virtual bool ClassRegistered (const char *iClassID);
+    /// Wrapper for scfCreateInstance ()
+    virtual void *CreateInstance (const char *iClassID, const char *iInterfaceID,
+      int iVersion);
+    /// Wrapper for scfGetClassDescription ()
+    virtual const char *GetClassDescription (const char *iClassID);
+    /// Wrapper for scfGetClassDependencies ()
+    virtual const char *GetClassDependencies (const char *iClassID);
+    /// Wrapper for scfRegisterClass ()
+    virtual bool RegisterClass (const char *iClassID, const char *iLibraryName,
+      const char *Dependencies = NULL);
+    /// Wrapper for scfRegisterStaticClass ()
+    virtual bool RegisterStaticClass (scfClassInfo *iClassInfo);
+    /// Wrapper for scfRegisterClassList ()
+    virtual bool RegisterClassList (scfClassInfo *iClassInfo);
+    /// Wrapper for scfUnregisterClass ()
+    virtual bool UnregisterClass (char *iClassID);
+  } scfiSCF;
 };
 
 // Shortcuts for compatibility
@@ -405,9 +420,6 @@ public:
 
 // CrystalSpace global variables
 extern csSystemDriver *System;
-
-// Most used routine used for console/debug/etc output ...
-void CsPrintf (int mode, const char* str, ...);
 
 // Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);

@@ -204,7 +204,7 @@ csTextureHandle *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,cha
 /*
       iTextureManager *txtmgr = System->G3D->GetTextureManager ();
       iTextureHandle *th = txtmgr->RegisterTexture(defaulttexture->GetImageFile(),
-        defaulttexture->for_3d, defaulttexture->for_2d);
+        defaulttexture->flags, false);
       defaulttexture->SetTextureHandle(th);
       */
 
@@ -431,12 +431,8 @@ csTextureHandle *csCrossBuild_Quake2Importer::Import_Quake2Textures (
       CHK (delete [] imagedata);
 
       //if (!defaulttexture)
-      defaulttexture = importdestination->GetTextures()->NewTexture(newskin);
-
-      iTextureManager *txtmgr = System->G3D->GetTextureManager ();
-      iTextureHandle *th = txtmgr->RegisterTexture (defaulttexture->GetImageFile (),
-        defaulttexture->for_3d, defaulttexture->for_2d);
-      defaulttexture->SetTextureHandle (th);
+      defaulttexture = importdestination->GetTextures()->NewTexture (newskin);
+      defaulttexture->Register (System->G3D->GetTextureManager ());
 
       printf("added texture %s...\n",skinfilename);
 

@@ -22,7 +22,6 @@
 #include "csutil/scf.h"
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
-#include "cs3d/common/imgtools.h"
 
 class csTextureMMGlide;
 class csTextureManagerGlide;
@@ -78,7 +77,7 @@ struct PalIdxLookup
  * csTextureMMGlide represents a texture and all its mipmapped
  * variants.
  */
-class csTextureMMGlide : public csHardwareAcceleratedTextureMM
+class csTextureMMGlide : public csTextureMM
 {
 private:
   /// Convert ImageFile to internal format.
@@ -86,7 +85,7 @@ private:
 
 public:
   ///
-  csTextureMMGlide (iImage* image);
+  csTextureMMGlide (iImage* image, int flags);
   ///
   virtual ~csTextureMMGlide ();
 
@@ -104,65 +103,25 @@ public:
 class csTextureManagerGlide : public csTextureManager
 {
 private:
-  int num_red, num_green, num_blue;
-
-  /// Configuration values for color matching.
-  int prefered_dist;
-  /// Configuration values for color matching.
-  int prefered_col_dist;
-
-  /// Read configuration values from config file.
-  void read_config ();
-
   /**
    * Encode RGB values to a 16-bit word (for 16-bit mode).
    */
   ULong encode_rgb (int r, int g, int b);
 
-  ///
-  csTexture* get_texture (int idx, int lev);
-
-  /**
-   * Find rgb for a specific map type and apply an intensity.
-   * 'map_type' is one of TABLE_....
-   */
-  int find_rgb_map (int r, int g, int b, int map_type, int l);
-
 public:
   ///
-  csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D);
+  csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D, csIniFile *config);
   ///
   virtual ~csTextureManagerGlide ();
-  ///
-  virtual void Initialize ();
 
   ///
-  virtual void clear ();
-
+  virtual void PrepareTextures ();
   ///
-  virtual void Prepare ();
+  virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
   ///
-  virtual iTextureHandle *RegisterTexture (iImage* image, bool for3d, bool for2d);
+  virtual void PrepareTexture (iTextureHandle *handle);
   ///
   virtual void UnregisterTexture (iTextureHandle* handle);
-  ///
-  virtual void MergeTexture (iTextureHandle* handle);
-  ///
-  virtual void FreeImages ();
-  ///
-  virtual void ReserveColor (int r, int g, int b);
-  ///
-  virtual void AllocPalette ();
-
-  /// Create a new texture.
-  csTextureMMGlide* new_texture (iImage* image);
-
-  /**
-   * Return the index for some color. This works in 8-bit
-   * (returns an index in the 256-color table) and in 15/16-bit
-   * (returns a 15/16-bit encoded RGB value).
-   */
-  virtual int find_color (int r, int g, int b);
 
   /**
    * Remap all textures.

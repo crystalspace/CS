@@ -103,14 +103,14 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
   pfmt.GreenMask = (1+2+4+8+16+32)<<5;
   pfmt.BlueMask = (1+2+4+8+16);
     
-  complete_pixel_format();
+  pfmt.complete ();
 
 
 	/* 
   pfmt.RedMask = 0xf00;//visual->red_mask;
   pfmt.GreenMask = 0xf0;//visual->green_mask;
   pfmt.BlueMask = 0xf;//visual->blue_mask;
-  complete_pixel_format ();
+  pfmt.complete ();
   pfmt.PalEntries = visual->map_entries;
   if (visual->c_class == TrueColor)
     pfmt.PalEntries = 0;

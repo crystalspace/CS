@@ -77,7 +77,7 @@ protected:
    * the buffer itself if it is appropiate (or wont if the buffer
    * size/contents are appropiate for target format).
    */
-  void convert_rgb (RGBPixel *iImage);
+  void convert_rgba (RGBPixel *iImage);
 
   /**
    * Used to convert an 8-bit indexed image into requested format.
@@ -87,14 +87,14 @@ protected:
    * the buffer itself if it is appropiate (or wont if the buffer
    * size/contents are appropiate for target format). Same about palette.
    */
-  void convert_8bit (UByte *iImage, RGBPixel *iPalette, int nPalColors = 256);
+  void convert_pal8 (UByte *iImage, RGBPixel *iPalette, int nPalColors = 256);
 
   /**
    * Same as above but accepts an array of RGBcolor's as palette.
    * The RGBcolor array is never freed, so its your responsability
    * if you did it.
    */
-  void convert_8bit (UByte *iImage, RGBcolor *iPalette, int nPalColors = 256);
+  void convert_pal8 (UByte *iImage, RGBcolor *iPalette, int nPalColors = 256);
 
   /**
    * Free all image data: pixels and palette. Takes care of image data format.
@@ -126,8 +126,8 @@ public:
   /// Query image size in bytes
   virtual int GetSize ();
 
-  /// Resize the image to the given size
-  virtual void Resize (int newwidth, int newheight);
+  /// Rescale the image to the given size
+  virtual void Rescale (int newwidth, int newheight);
 
   /**
    * Create a new csImageFile which is a mipmapped version of this one.
@@ -150,6 +150,10 @@ public:
   virtual RGBPixel *GetPalette ();
   /// Get alpha map for image
   virtual UByte *GetAlpha ();
+  /// Convert the image to another format
+  virtual void SetFormat (int iFormat);
+  /// Create yet another image and copy this one into the new image.
+  virtual iImage *Clone ();
 };
 
 /**
@@ -189,7 +193,11 @@ public:
    * This routine will read from the buffer buf of length size, try to
    * recognize the type of image contained within, and return an csImageFile
    * of the appropriate type.  Returns a pointer to the iImage on
-   * success, or NULL on failure.
+   * success, or NULL on failure. The bits that fit the CS_IMGFMT_MASK
+   * mask are mandatory: the image always will be loaded in the
+   * appropiate format; the bits outside that mask (i.e. CS_IMGFMT_ALPHA)
+   * are optional: if the image does not contain alpha mask, the GetFormat()
+   * method of the image will return a value without that bit set.
    */
   static iImage *Load (UByte* iBuffer, ULong iSize, int iFormat);
 };

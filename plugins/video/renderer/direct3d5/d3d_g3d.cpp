@@ -50,6 +50,8 @@
 #include "ilghtmap.h"
 #include "igraph2d.h"
 
+#define SysPrintf m_piSystem->Printf
+
 /***** File-scope variables *****/
 
 static bool bGotTexDesc=false, bGotLitDesc=false, bGotHaloDesc=false;
@@ -232,8 +234,7 @@ bool csGraphics3DDirect3DDx5::Initialize (iSystem *iSys)
   if (!m_piG2D)
     return false;
 
-  CHK (txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D));
-  txtmgr->Initialize ();
+  CHK (txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D, config));
 
   m_bVerbose = config->GetYesNo ("Direct3DDX5", "VERBOSE", false);
 
@@ -289,7 +290,7 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
   
   m_nHeight = m_piG2D->GetHeight();
   m_nHalfHeight = m_nHeight/2;
-  
+
   // get the amount of texture memory on the video card.
   hRes = m_lpDD->QueryInterface(IID_IDirectDraw2, (LPVOID*)&lpDD2);
   if ( FAILED(hRes) )
@@ -752,11 +753,6 @@ void csGraphics3DDirect3DDx5::SetZBufMode(G3DZBufMode mode)
     VERIFY_RESULT( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL), DD_OK );
 }
 
-G3D_COLORMAPFORMAT csGraphics3DDirect3DDx5::GetColormapFormat ()
-{
-  return G3DCOLORFORMAT_24BIT;
-}
-
 void csGraphics3DDirect3DDx5::DumpCache()
 {
   m_pTextureCache->Dump();
@@ -776,11 +772,6 @@ void csGraphics3DDirect3DDx5::CacheTexture(iPolygonTexture *texture)
   iTextureHandle* txt_handle = texture->GetTextureHandle ();
   m_pTextureCache->Add (txt_handle);
   m_pLightmapCache->Add (texture);
-}
-
-void csGraphics3DDirect3DDx5::UncacheTexture(iPolygonTexture *texture)
-{
-  (void)texture;
 }
 
 void csGraphics3DDirect3DDx5::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
@@ -859,8 +850,8 @@ void csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   float M, N, O;
   int i;
   
-  csHighColorCacheData* pTexCache   = NULL;
-  csHighColorCacheData* pLightCache = NULL;
+  csD3DCacheData* pTexCache   = NULL;
+  csD3DCacheData* pLightCache = NULL;
   D3DTLVERTEX vx;
   
   float z;
@@ -888,7 +879,7 @@ void csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
 
   // retrieve the texture from the cache by handle.
   csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)poly.txt_handle->GetPrivateObject ();
-  pTexCache = txt_mm->GetHighColorCacheData ();
+  pTexCache = (csD3DCacheData *)txt_mm->GetCacheData ();
   
   bColorKeyed = txt_mm->GetTransparent ();
  
@@ -897,7 +888,7 @@ void csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   
   if ( piLM )
   {
-    pLightCache = piLM->GetHighColorCache ();
+    pLightCache = (csD3DCacheData *)piLM->GetCacheData ();
     if (!pLightCache)
     {
       bLightmapExists = false;
@@ -1157,7 +1148,7 @@ void csGraphics3DDirect3DDx5::StartPolygonFX (iTextureHandle* handle,
 
   m_pTextureCache->Add (handle);
 
-  csHighColorCacheData* pTexData = txt_mm->GetHighColorCacheData ();
+  csD3DCacheData* pTexData = (csD3DCacheData *)txt_mm->GetCacheData ();
 
   if (txt_mm->GetTransparent ())
     VERIFY_RESULT (m_lpd3dDevice->SetRenderState (D3DRENDERSTATE_COLORKEYENABLE, TRUE), DD_OK);
@@ -1484,16 +1475,4 @@ void csGraphics3DDirect3DDx5::AddFogPolygon (CS_ID /*id*/,
 
 void csGraphics3DDirect3DDx5::CloseFogObject (CS_ID /*id*/)
 {
-}
-
-void csGraphics3DDirect3DDx5::SysPrintf(int mode, char* szMsg, ...)
-{
-  char buf[1024];
-  va_list arg;
-  
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-  
-  m_piSystem->Print(mode, buf);
 }
