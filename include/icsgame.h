@@ -66,7 +66,7 @@ struct iPosition : public iBase
    * (Of course that could be possible in classes that extend the 
    * current iPosition interface.)
    */
-  virtual SetPosition (iSector*         pSector, 
+  virtual void SetPosition (iSector*         pSector, 
                        const csVector3& Pos, 
                        const csVector3& Orientation) = 0;
   
@@ -75,7 +75,7 @@ struct iPosition : public iBase
    * will only be copied by this call. This call will not create a link
    * between these objects
    */
-  virtual SetPosition (iPosition* pPos) = 0;
+  virtual void SetPosition (iPosition* pPos) = 0;
 
   /// Gets the current sector.
   virtual csSector* GetSector () = 0;
