@@ -1659,9 +1659,6 @@ bool csDynaVis::VisTest (iRenderView* rview,
   if (do_state_dump)
   {
     printf ("=============================================================\n");
-    printf ("origin %g,%g,%g lx=%g rx=%g ty=%g by=%g\n",
-    	trans.GetOrigin ().x, trans.GetOrigin ().y, trans.GetOrigin ().z,
-	lx, rx, ty, by);
     uint32 mk = frustum_mask;
     int i;
     i = 0;
