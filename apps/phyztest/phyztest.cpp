@@ -341,10 +341,13 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   iLightList* ll = room->GetLights ();
   light = engine->CreateLight (NULL, csVector3 (-3, -4, 0), 10, csColor (1, 0, 0), false);
   ll->AddLight (light->QueryLight ());
+  light->DecRef ();
   light = engine->CreateLight (NULL, csVector3 (3, -4, 0), 10, csColor (0, 0, 1), false);
   ll->AddLight (light->QueryLight ());
+  light->DecRef ();
   light = engine->CreateLight (NULL, csVector3 (0, -4, -3), 10, csColor (0, 1, 0), false);
   ll->AddLight (light->QueryLight ());
+  light->DecRef ();
 
   iMeshWrapper *mw = room->GetMeshes ()->GetMesh (0);
   iPolygonMesh* mesh = SCF_QUERY_INTERFACE (mw->GetMeshObject (), iPolygonMesh);

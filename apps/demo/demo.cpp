@@ -516,6 +516,7 @@ void Demo::SetupSector ()
 
   il->DecRef ();
   room->GetLights ()->AddLight (light->QueryLight ());
+  light->DecRef ();
 }
 
 void Demo::SetupObjects ()

@@ -236,6 +236,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   light = engine->CreateLight (NULL, csVector3 (0, 5, 0), 10,
   	csColor (1, 0, 0), false);
   room->GetLights ()->AddLight (light->QueryLight ());
+  light->DecRef ();
 
   engine->Prepare ();
 

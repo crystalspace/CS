@@ -254,6 +254,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   light = engine->CreateLight (NULL, csVector3 (0, 0, 0), 20,
   	csColor (1, 1, 1), false);
   room->GetLights ()->AddLight (light->QueryLight ());
+  light->DecRef ();
 
   engine->Prepare ();
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,

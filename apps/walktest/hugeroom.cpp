@@ -418,6 +418,7 @@ iSector* HugeRoom::create_huge_world (iEngine* engine)
 			+sector_light_min_blue),
 	false);
     room->GetLights ()->AddLight (light->QueryLight ());
+    light->DecRef ();
   }
 
 #if defined(ROOM_CITY)
