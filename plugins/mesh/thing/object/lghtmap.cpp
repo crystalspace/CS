@@ -317,7 +317,7 @@ const char* csLightMap::ReadFromCache (
       sprintf (error_buf, "Cached lightmap first vertex mismatch!");
     else if (ps.x2 != pswanted.x2 || ps.y2 != pswanted.y2
     		|| ps.z2 != pswanted.z2)
-      sprintf (error_buf, "Cached lightmap first vertex mismatch!");
+      sprintf (error_buf, "Cached lightmap second vertex mismatch!");
   }
   if (*error_buf)
   {
