@@ -51,7 +51,4 @@
   #define CS_PLATFORM_IS_64BITS
 #endif
 
-// Experimental.
-#undef CS_USE_NEW_RENDERER
-
 #endif // __CS_WIN32_VOLATILE_H__

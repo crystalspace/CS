@@ -48,6 +48,15 @@ chronological order.
 	    USE_XFREE86VM --> XFREE86VM.AVAILABLE
 	    HAS_CAL3D     --> CAL3D.AVAILABLE
 	- Jorrit fixed awstest and awstut so they no longer use /this.
+	- Eric Sunshine fixed the following problems related to the new MSVC
+	  workspaces (reported by Jonathan Tarbox):
+	    - Template files accidentally #defined USE_NEW_RENDERER instead of
+	      CS_USE_NEW_RENDERER.
+	    - win32/volatile.h contained `#undef CS_USE_NEW_RENDERER', thus
+	      effectively undoing #define in the project files.
+	    - When the new Release_NR and Debug_NR build modes were added,
+	      missed configuration in msvcgen/template7/wscfg.tpi which needed
+	      to be updated to reflect the new modes.
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
 	  which manifested when running 'msvcgen' targets.
