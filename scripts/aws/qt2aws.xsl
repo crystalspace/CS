@@ -44,6 +44,7 @@
   <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QSlider' or text()='QButtonGroup' or text()='QGroupBox' or text()='QFrame' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel']]">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
+    <xsl:call-template name="layout"/>
     <xsl:apply-templates/>
     <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
   </xsl:template>
@@ -53,13 +54,32 @@
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <!-- configure a awslistbox with a single column -->
-    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Type: lbtList</xsl:text>
-    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Highlight: "/aws/lbhi.png"</xsl:text>
-    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Columns: 1</xsl:text>
-    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>DefaultSortCol: 0</xsl:text>
-    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Column0Width: </xsl:text><xsl:value-of select="property/rect/width"/>
-    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Column0Caption: "Column 0"</xsl:text>
+    <xsl:call-template name="spacer">
+      <xsl:with-param name="here" select="class"/>
+    </xsl:call-template>
+    <xsl:text>Type: lbtList</xsl:text>
+    <xsl:call-template name="spacer">
+      <xsl:with-param name="here" select="class"/>
+    </xsl:call-template>
+    <xsl:text>Highlight: "/aws/lbhi.png"</xsl:text>
+    <xsl:call-template name="spacer">
+      <xsl:with-param name="here" select="class"/>
+    </xsl:call-template>
+    <xsl:text>Columns: 1</xsl:text>
+    <xsl:call-template name="spacer">
+      <xsl:with-param name="here" select="class"/>
+    </xsl:call-template>
+    <xsl:text>DefaultSortCol: 0</xsl:text>
+    <xsl:call-template name="spacer">
+      <xsl:with-param name="here" select="class"/>
+    </xsl:call-template>
+    <xsl:text>Column0Width: </xsl:text><xsl:value-of select="property/rect/width"/>
+    <xsl:call-template name="spacer">
+      <xsl:with-param name="here" select="class"/>
+    </xsl:call-template>
+    <xsl:text>Column0Caption: "Column 0"</xsl:text>
     <!-- we ignore scrollbar stuff since aws always creates a vertical one (currently) -->
+    <xsl:call-template name="layout"/>
     <xsl:apply-templates/>
     <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
   </xsl:template>
@@ -67,17 +87,31 @@
   <xsl:template match="widget[class[text()='QListView']]">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
-    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Highlight: "/aws/lbhi.png"</xsl:text>
-    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Columns: </xsl:text><xsl:value-of select="count(column)"/>
-    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>DefaultSortCol: 0</xsl:text>
+    <xsl:call-template name="spacer">
+      <xsl:with-param name="here" select="class"/>
+    </xsl:call-template>
+    <xsl:text>Highlight: "/aws/lbhi.png"</xsl:text>
+    <xsl:call-template name="spacer">
+      <xsl:with-param name="here" select="class"/>
+    </xsl:call-template>
+    <xsl:text>Columns: </xsl:text><xsl:value-of select="count(column)"/>
+    <xsl:call-template name="spacer">
+      <xsl:with-param name="here" select="class"/>
+    </xsl:call-template>
+    <xsl:text>DefaultSortCol: 0</xsl:text>
     <!-- we ignore scrollbar stuff since aws always creates a vertical one (currently) -->
+    <xsl:call-template name="layout"/>
     <xsl:apply-templates/>
     <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
   </xsl:template>
 
   <xsl:template match="column">
-    <xsl:call-template name="spacer"/><xsl:value-of select="concat('Column',count(preceding-sibling::node()[self::column]),'Width: ')"/><xsl:value-of select="round(number(../property/rect/width) div count(../column))"/>
-    <xsl:call-template name="spacer"/><xsl:value-of select="concat('Column',count(preceding-sibling::node()[self::column]),'Caption: ')"/><xsl:text>"</xsl:text><xsl:value-of select="property[name='text']/string"/><xsl:text>"</xsl:text>
+    <xsl:call-template name="spacer"/>
+    <xsl:value-of select="concat('Column',count(preceding-sibling::node()[self::column]),'Width: ')"/>
+    <xsl:value-of select="round(number(../property/rect/width) div count(../column))"/>
+    <xsl:call-template name="spacer"/>
+    <xsl:value-of select="concat('Column',count(preceding-sibling::node()[self::column]),'Caption: ')"/>
+    <xsl:text>"</xsl:text><xsl:value-of select="property[name='text']/string"/><xsl:text>"</xsl:text>
   </xsl:template>
   
   <xsl:template match="property[name[text()='caption']]">
@@ -99,7 +133,11 @@
   </xsl:template>
 
   <xsl:template match="property[name[text()='geometry']]">
-    <xsl:call-template name="spacer"/><xsl:text>Frame: (</xsl:text><xsl:value-of select="rect/x"/><xsl:text>,</xsl:text><xsl:value-of select="rect/y"/><xsl:text>) - (</xsl:text><xsl:value-of select="number(rect/x)+number(rect/width)"/><xsl:text>,</xsl:text><xsl:value-of select="number(rect/y)+number(rect/height)"/><xsl:text>)</xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>Frame: (</xsl:text>
+    <xsl:value-of select="rect/x"/><xsl:text>,</xsl:text><xsl:value-of select="rect/y"/>
+    <xsl:text>) - (</xsl:text>
+    <xsl:value-of select="number(rect/x)+number(rect/width)"/><xsl:text>,</xsl:text>
+    <xsl:value-of select="number(rect/y)+number(rect/height)"/><xsl:text>)</xsl:text>
   </xsl:template>
 
   <xsl:template match="property[name[text()='minValue']]">
@@ -171,7 +209,50 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
-    
+
+  <xsl:template match="grid">
+    <xsl:call-template name="spacer"/><xsl:text>Layout: "GridBag"</xsl:text>
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="property[name[text()='sizePolicy']]">
+    <xsl:choose>
+      <xsl:when test="sizepolicy/hsizetype=0 and sizepolicy/vsizetype=0">
+        <xsl:call-template name="spacer"/><xsl:text>Fill: gbcNone</xsl:text>
+      </xsl:when>
+      <xsl:when test="not(sizepolicy/hsizetype=0) and sizepolicy/vsizetype=0">
+        <xsl:call-template name="spacer"/><xsl:text>Fill: gbcHorizontal</xsl:text>
+      </xsl:when>
+      <xsl:when test="sizepolicy/hsizetype=0 and not(sizepolicy/vsizetype=0)">
+        <xsl:call-template name="spacer"/><xsl:text>Fill: gbcVertical</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="spacer"/><xsl:text>Fill: gbcBoth</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="layout">
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
+    <xsl:text>Anchor: gbcCenter</xsl:text>
+    <xsl:if test="@column">
+      <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
+      <xsl:text>GridX: </xsl:text><xsl:value-of select="number(@column)"/>
+    </xsl:if>
+    <xsl:if test="@row">
+      <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
+      <xsl:text>GridY: </xsl:text><xsl:value-of select="number(@row)"/>
+    </xsl:if>
+    <xsl:if test="@colspan">
+      <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
+      <xsl:text>GridWidth: </xsl:text><xsl:value-of select="number(@colspan)"/>
+    </xsl:if>
+    <xsl:if test="@rowspan">
+      <xsl:call-template name="spacer"><xsl:with-param name="here" select="./property"/></xsl:call-template>
+      <xsl:text>GridHeight: </xsl:text><xsl:value-of select="number(@rowspan)"/>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template name="style">
     <xsl:call-template name="spacer"><xsl:with-param name="here" select="./class"/></xsl:call-template>
     <xsl:text>Style: </xsl:text><xsl:call-template name="prefix"/><xsl:text>fsNormal</xsl:text>
@@ -190,7 +271,9 @@
   </xsl:template>
 
   <xsl:template name="component_header">
-    <xsl:text>component "</xsl:text><xsl:value-of select="property[name[text()='name']]/cstring"/><xsl:text>" is </xsl:text><xsl:call-template name="get_classname"/>
+    <xsl:text>component "</xsl:text>
+    <xsl:value-of select="property[name[text()='name']]/cstring"/>
+    <xsl:text>" is </xsl:text><xsl:call-template name="get_classname"/>
   </xsl:template>
 
   <xsl:template name="get_classname">
@@ -231,7 +314,9 @@
     <xsl:param name="prefix"><xsl:text>&#10;</xsl:text></xsl:param>
     <xsl:value-of select="$prefix"/>
     <xsl:if test="$here/../../..">
-      <xsl:value-of select="$tabwidth"/>
+      <xsl:if test="not(name($here/..) = 'grid')">
+        <xsl:value-of select="$tabwidth"/>
+      </xsl:if>
       <xsl:call-template name="spacer">
         <xsl:with-param name="here" select="$here/.."/>
         <xsl:with-param name="prefix"></xsl:with-param>
