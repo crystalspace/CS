@@ -515,7 +515,7 @@ static bool execute (char *command)
 int main (int argc, char *argv [])
 {
   csSystemDriver sys;
-  sys.Initialize (argc, argv, NULL);
+  sys.Initialize (argc, argv);
   iObjectRegistry* object_reg = sys.GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
