@@ -55,6 +55,13 @@ converter::~converter()
     CHK (delete frame_builder);
 }
 
+void converter::ProcessConfig (csIniFile* config)
+{
+  if ( config->SectionExists ("converter"))
+  {
+  }
+}
+
 int converter::set_animation_frame(int frame_number)
 {
   // no frame management? then there are no frames!

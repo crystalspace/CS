@@ -36,6 +36,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "def.h"
+#include "csutil/inifile.h"
 
 
 #if _MSC_VER > 1000
@@ -124,6 +125,7 @@ public:
 	int ivcon( const char* input_filename, bool keep_log = true,
 	  bool create_output_file = true, const char* output_filename = NULL );
 
+        void ProcessConfig( csIniFile* config );
 	void set_reverse_normals( int yesno );
 
 	// set the current 'frame' of animation; the converter
