@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "mdldata.h"
+#include "cstool/mdldata.h"
 
 #define IMPLEMENT_ARRAY_INTERFACE_NONUM(clname,type,sing_name,mult_name) \
   type clname::Get##sing_name (int n) const				\
@@ -27,7 +27,7 @@
 
 #define IMPLEMENT_ARRAY_INTERFACE(clname,type,sing_name,mult_name)	\
   IMPLEMENT_ARRAY_INTERFACE_NONUM (clname, type, sing_name, mult_name)	\
-  int clname::GetNum##mult_name () const				\
+  int clname::Get##sing_name##Count () const				\
   { return mult_name.Length (); }					\
   void clname::Add##sing_name (type v)					\
   { mult_name.Push (v); }

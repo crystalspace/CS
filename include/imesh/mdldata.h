@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVARIA_MDLDATA_H__
-#define __IVARIA_MDLDATA_H__
+#ifndef __IMESH_MDLDATA_H__
+#define __IMESH_MDLDATA_H__
 
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
@@ -191,4 +191,4 @@ struct iModelData : public iBase
   virtual iObject* QueryObject () = 0;
 };
 
-#endif // __IVARIA_MDLDATA_H__
+#endif // __IMESH_MDLDATA_H__

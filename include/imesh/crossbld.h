@@ -16,30 +16,32 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_MDLCONV_H__
-#define __IMESH_MDLCONV_H__
+#ifndef __IMESH_CROSSBLD_H__
+#define __IMESH_CROSSBLD_H__
 
 #include "csutil/scf.h"
 
 struct iModelData;
-struct iDataBuffer;
+struct iThingState;
+struct iSprite3DFactoryState;
+struct iMaterialWrapper;
 
-SCF_VERSION (iModelConverter, 0, 0, 1);
 
-struct iModelConverter
+SCF_VERSION (iCrossBuilder, 0, 0, 1);
+
+/**
+ * The crossbuilder can be used to build things and sprite factories from
+ * imported model files (iModelData).
+ */
+struct iCrossBuilder : public iBase
 {
-  /// Return the number of supported formats
-  virtual int GetFormatCount () = 0;
-  /// Return the description of a supported format
-  virtual const char *GetFormat (int idx) = 0;
-  /// Check whether the given format is supported
-  virtual bool SupportsFormat (const char *Format) = 0;
+  /// Build a thing from a model file
+  virtual bool BuildThing (iModelData *Data, iThingState *tgt,
+	iMaterialWrapper *DefaultMaterial = NULL) const = 0;
 
-  /// Read a model file
-  virtual iModelData* Load (UByte* Buffer, ULong Size) = 0;
-
-  /// Write data to a file
-  virtual iDataBuffer* Save (iModelData*, const char *Format) = 0;
+  /// Build a sprite factory from a model file
+  virtual bool BuildSpriteFactory (iModelData *Data,
+	iSprite3DFactoryState *tgt) const = 0;
 };
 
-#endif // __IMESH_MDLCONV_H__
+#endif // __IMESH_CROSSBLD_H__

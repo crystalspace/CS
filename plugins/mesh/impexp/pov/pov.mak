@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(POVIE)
 endif
 
-INC.POVIE = $(wildcard plugins/mesh/impexp/pov/*.h plugins/mesh/impexp/common/*.h)
-SRC.POVIE = $(wildcard plugins/mesh/impexp/pov/*.cpp plugins/mesh/impexp/common/*.cpp)
+INC.POVIE = $(wildcard plugins/mesh/impexp/pov/*.h)
+SRC.POVIE = $(wildcard plugins/mesh/impexp/pov/*.cpp)
 OBJ.POVIE = $(addprefix $(OUT),$(notdir $(SRC.POVIE:.cpp=$O)))
 DEP.POVIE = CSGEOM CSUTIL CSSYS CSUTIL
 
