@@ -259,7 +259,8 @@ public:
   const csNamedObjVector& GetChildren () const { return children; }
 
   /// Get the radius of this mesh (ignoring children).
-  csVector3 GetRadius () const { return mesh->GetRadius (); }
+  void GetRadius (csVector3& rad, csVector3& cent) const 
+	{ mesh->GetRadius (rad,cent); }
 
   /**
    * Do a hard transform of this object.
@@ -411,7 +412,8 @@ public:
       return scfParent->GetChildren ().Length ();
     }
     virtual iMeshWrapper* GetChild (int idx) const;
-    virtual csVector3 GetRadius () const { return scfParent->GetRadius (); }
+    virtual void GetRadius (csVector3& rad, csVector3 &cent) const 
+	  { scfParent->GetRadius (rad,cent); }
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 

@@ -70,9 +70,17 @@ public:
   int gridx, gridy;
   csVector3 topleft;
   csVector3 scale;
+  csVector3 radius;
+  csVector3 rad_center;
   csTerrBlock* blocks;
   bool block_dim_invalid;
   csBox3 global_bbox;
+  float grid_stepx;
+  float grid_stepy;
+  float inv_block_stepx;
+  float inv_block_stepy;
+  float inv_grid_stepx;
+  float inv_grid_stepy;
 
 private:
   iSystem* pSystem;
@@ -215,11 +223,15 @@ public:
   /// Get the base color.
   csColor GetColor () const { return base_color; }
   /// Set the function to use for the terrain.
-  void SetHeightFunction (csTerrainHeightFunction* func, void* d)
-  { height_func = func; height_func_data = d; initialized = false; }
+  void SetHeightFunction (csTerrainHeightFunction* func, void* d);
   /// Set the normal function to use for the terrain.
   void SetNormalFunction (csTerrainNormalFunction* func, void* d)
-  { normal_func = func; normal_func_data = d; initialized = false; }
+  { 
+	normal_func = func;
+	if (normal_func_data) delete normal_func_data;
+	normal_func_data = d; 
+	initialized = false; 
+  }
   void SetHeightMap (iImage* im, float hscale, float hshift);
 
   /// Setup the number of blocks in the terrain.
@@ -362,6 +374,43 @@ public:
 
   int CollisionDetect (csTransform *p);
 
+// Take a block index value and convert it to an x,y value
+  inline void Index2Block( int index, int &x, int& y)
+	{ x = index % blockxy; y = index / blockxy; }
+// Take a block x,y vaue and convert it to an index
+  inline void Block2Index( int x, int y, int& index )
+	{ index = y * blockxy + x; }
+// Find the nearest top left block to point p. 
+  void Object2Block( csVector3 p, int& x, int& y) 
+	{
+	  x = int ( inv_block_stepx * ( p.x - topleft.x));
+	  y = int ( inv_block_stepy * ( p.z - topleft.z));
+	}
+// Find the nearest top left grid to point p.
+  void Object2Grid( csVector3 p, int& block_index, int& x, int& y) 
+	{ 
+	  csVector3 block_corner;
+	  Object2Block(p, x, y);
+	  Block2Object(x, y, block_corner);
+	  Block2Index(x, y, block_index);
+	  x = int ( inv_grid_stepx * ( p.x - block_corner.x ));
+	  y = int ( inv_grid_stepy * ( p.z - block_corner.z ));
+	}
+// Find the top left corner of grid x,y in block bx,by 
+  void Grid2Object( int bx, int by, int x, int y, csVector3& p) 
+	{
+	  Block2Object(bx, by, p);
+	  p.x += x * grid_stepx;
+	  p.z += y * grid_stepy;
+	}
+// Find the top left corner of block x,y 
+  void Block2Object( int x, int y, csVector3& p) 
+	{
+	  p.x = x * scale.x + topleft.x;
+	  p.y = topleft.y;
+	  p.z = y * scale.z + topleft.z;
+	}
+
   ///--------------------- iMeshObject implementation ---------------------
   SCF_DECLARE_IBASE;
 
@@ -385,7 +434,7 @@ public:
   }
 
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual csVector3 GetRadius ();
+  virtual void GetRadius (csVector3& rad, csVector3& cent);
 
   virtual void NextFrame (csTime) { }
   virtual bool WantToDie () const { return false; }

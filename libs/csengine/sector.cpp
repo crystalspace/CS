@@ -410,7 +410,7 @@ bool IntersectSegmentCull (csPolygonTree* /*tree*/,
   ISectData* idata = (ISectData*)data;
   csOctreeNode* onode = (csOctreeNode*)node;
   csVector3 isect;
-  if (csIntersect3::BoxSegment (onode->GetBox (), idata->seg, isect))
+  if (csIntersect3::BoxSegment (onode->GetBox (), idata->seg, isect) > -1)
     return true;
   // Segment does not intersect with node so we return false here.
   return false;

@@ -156,7 +156,7 @@ public:
   /// Colliders for "legs" and "body". Intersections are handled differently.
   csColliderWrapper *legs;
   csColliderWrapper *body;
-  csVector3 body_radius, legs_radius;
+  csVector3 body_radius, body_center, legs_radius, legs_center;
 
   /// A list with all busy entities.
   csVector busy_entities;

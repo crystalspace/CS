@@ -37,6 +37,9 @@
 #include "terrfunc.h"
 #include "terrvis.h"
 #include "qint.h"
+#include "qsqrt.h"
+
+#define TERR_DEBUG
 
 CS_IMPLEMENT_PLUGIN
 
@@ -127,7 +130,7 @@ static float HeightMapFunc (void* data, float x, float y)
 
 void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift)
 {
-  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
+  HeightMapData* data = new HeightMapData ();
   data->im = im;
   data->iw = im->GetWidth ();
   data->ih = im->GetHeight ();
@@ -140,6 +143,22 @@ void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift)
   SetHeightFunction (HeightMapFunc, (void*)data);
 }
 
+void csTerrFuncObject::SetHeightFunction (csTerrainHeightFunction* func, void* d)
+{ 
+  height_func = func; 
+  if (height_func_data) 
+  {
+	HeightMapData *h = (HeightMapData *)height_func_data;
+    h->im->DecRef();
+	delete h->p;
+    delete h;
+	height_func_data = NULL;
+  }
+  height_func_data = d; 
+  initialized = false; 
+}
+
+
 csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
 	iMeshObjectFactory *pFactory)
 {
@@ -150,6 +169,10 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   initialized = false;
   blockxy = 4;
   gridx = 8; gridy = 8;
+  inv_block_stepx = 1.;
+  inv_block_stepy = 1.;
+  grid_stepx = grid_stepy = 1/8;
+  inv_grid_stepx = inv_grid_stepy = 8.;
   topleft.Set (0, 0, 0);
   scale.Set (1, 1, 1);
   blocks = NULL;
@@ -161,6 +184,8 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   base_color.blue = 0;
   height_func = TerrFunc;
   normal_func = NULL;
+  height_func_data = NULL;
+  normal_func_data = NULL;
   lod_sqdist[0] = 100*100;
   lod_sqdist[1] = 400*400;
   lod_sqdist[2] = 800*800;
@@ -178,6 +203,8 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
 csTerrFuncObject::~csTerrFuncObject ()
 {
   delete[] blocks;
+  if (height_func_data) delete height_func_data;
+  if (normal_func_data) delete normal_func_data;
   if (vis_cb) vis_cb->DecRef ();
 }
 
@@ -215,16 +242,15 @@ void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
     blocks = new csTerrBlock [blockxy*blockxy];
     block_dim_invalid = false;
   }
-  int i;
+  int i, bx, by, newi;
   char pMatName[256];
 
   for (i = iStart ; i <= iEnd ; i++)
   {
     sprintf (pMatName, pName, i);
     iMaterialWrapper* mat = engine->FindMaterial (pMatName);
-    int bx = i % blockxy;
-    int by = i / blockxy;
-    int newi = bx*blockxy + by;
+	Index2Block(i, bx, by);
+    Block2Index(bx, by, newi);
     blocks[newi].material = mat;
   }
 }
@@ -876,6 +902,8 @@ void csTerrFuncObject::ComputeBBoxes ()
   global_bbox.StartBoundingBox ();
   int lod;
   int bx, by;
+  csVector3 v;
+  float t;
   for (by = 0 ; by < blockxy ; by++)
     for (bx = 0 ; bx < blockxy ; bx++)
     {
@@ -889,6 +917,12 @@ void csTerrFuncObject::ComputeBBoxes ()
       }
       global_bbox += blocks[blidx].bbox;
     }
+  rad_center = global_bbox.GetCenter(); v = global_bbox.Max();
+  t = (v.x - rad_center.x)*(v.x - rad_center.x) +
+      (v.y - rad_center.y)*(v.y - rad_center.y) +
+	  (v.z - rad_center.z)*(v.z - rad_center.z);
+  t = qsqrt(t);
+  radius = csVector3(t,t,t);
 }
 
 void csTerrFuncObject::InitMesh (G3DTriangleMesh& mesh)
@@ -1080,7 +1114,13 @@ void csTerrFuncObject::SetupObject ()
       delete[] blocks;
       blocks = new csTerrBlock [blockxy*blockxy];
     }
-
+	inv_block_stepx = 1/scale.x;
+	inv_block_stepy = 1/scale.z;
+	grid_stepx = scale.x / gridx;
+	grid_stepy = scale.z / gridy;
+	inv_grid_stepx = 1 / grid_stepx;
+	inv_grid_stepy = 1 / grid_stepy;
+	 
     int bx, by;
     int blidx = 0;
     for (by = 0 ; by < blockxy ; by++)
@@ -1308,10 +1348,9 @@ void csTerrFuncObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
   bbox = global_bbox;
 }
 
-csVector3 csTerrFuncObject::GetRadius ()
+void csTerrFuncObject::GetRadius (csVector3& rad, csVector3& cent)
 {
-  // @@@ IMPLEMENT ME!
-  return csVector3 (0);
+  rad = radius; cent = global_bbox.GetCenter();
 }
 
 int csTerrFuncObject::CollisionDetect (csTransform* transform)
@@ -1335,12 +1374,85 @@ int csTerrFuncObject::CollisionDetect (csTransform* transform)
   return 1;
 }
 
-bool csTerrFuncObject::HitBeamObject (const csVector3& /*start*/,
-	const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
+// Notes: The terrain func mesh area consists of a number of blocks which
+// are encompassed by an overall bounding box. 
+//
+
+bool csTerrFuncObject::HitBeamObject (const csVector3& start,
+	const csVector3& end, csVector3& isect, float* pr)
 {
-//@@@ MHV: Im working on this at the moment. Please check back shortly.
+#ifdef TERR_DEBUG
+  printf("Terrain:Hit Beam Object\n");
+  printf("Debug:\n");
+  printf("Segment: (%f,%f,%f) to (%f,%f,%f)\n", start.x,
+	start.y, start.z, end.x, end.y, end.z);
+  printf("BBox: (%f,%f,%f) to (%f,%f,%f)\n",
+	global_bbox.Min().x,
+	global_bbox.Min().y,
+	global_bbox.Min().z,
+	global_bbox.Max().x,
+	global_bbox.Max().y,
+	global_bbox.Max().z);
+#endif
+  csSegment3 seg (start, end);
+  csVector3 st;
+  if (csIntersect3::BoxSegment (global_bbox, seg, st, pr) < 0)
+    return false;
+
+// Box walk. Not really fast as the name suggests. It works by stepping its way forward
+// through the terrain field. Its not very robust yet, but it goes ( sort of )
+
+  csVector3 inc = end - start;
+  inc.Normalize(); 
+  inc.x *= 0.1; // Tiny little increment ammount to nudge the ray over a box boundary
+
+#ifdef TERR_DEBUG
+  printf("Entering box crawl\n");
+  printf("Start :(%f,%f,%f)\n",st.x,st.y,st.z);
+  printf("Inc :(%f,%f,%f)\n",inc.x,inc.y,inc.z);
+#endif
+
+  st += inc;
+  csSegment3 rev ( end, st );
+  int x,y, index, i, max;
+  while (1)
+  {
+	Object2Block( st, x, y );
+	Block2Index( x, y, index);
+#ifdef TERR_DEBUG
+	printf("Index :%d x,y :(%d,%d)\n",index, x, y);
+	printf("New Start :(%f,%f,%f)\n",st.x,st.y,st.z);
+#endif
+	max = blocks[index].mesh[0].num_triangles;
+	csVector3 *vrt = blocks[index].mesh[0].vertices[0];
+	csTriangle *tr = blocks[index].mesh[0].triangles;
+	for (i = 0 ; i < max ; i++)
+	{
+  	  if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
+    	vrt[tr[i].c], seg, st))
+      {
+        if (pr)
+        {
+          *pr = qsqrt (csSquaredDist::PointPoint (start, st) /
+		  csSquaredDist::PointPoint (start, end));
+        }
+#ifdef TERR_DEBUG
+  printf("Terrain:Hit Beam Object: HIT! intersect : at (%f,%f,%f)\n",
+    st.x, st.y, st.z);
+#endif
+		isect = st;
+		return true;
+	  }
+	}
+	if (csIntersect3::BoxSegment (blocks[index].bbox, rev, st, NULL) < 0) break;
+	st += inc;
+	rev.SetEnd(st);
+
+  }
   return false;
+
 }
+
 
 //----------------------------------------------------------------------
 

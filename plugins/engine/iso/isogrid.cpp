@@ -436,7 +436,7 @@ bool csIsoGroundMap::HitBeam(const csVector3& gsrc, const csVector3& gdest)
   csVector3 isect;
   csSegment3 seg(src, dest);
   if(!box.In(src))
-    if(csIntersect3::BoxSegment(box, seg, isect))
+    if(csIntersect3::BoxSegment(box, seg, isect) > -1)
     {
       src = isect;
       seg.SetStart(isect + 0.001*(dest-src)); // avoid 2nd hit on src

@@ -161,7 +161,8 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual csVector3 GetRadius () { return max_radius; }
+  virtual void GetRadius (csVector3& rad, csVector3& cent)
+	{ rad =  max_radius; cent = object_bbox.GetCenter(); }
   virtual void NextFrame (csTime /*current_time*/) { }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);

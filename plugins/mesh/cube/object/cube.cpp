@@ -358,7 +358,7 @@ bool csCubeMeshObject::HitBeamObject(const csVector3& start,
   // This function is not very fast if the bounding box test succeeds.
   // Plagarism notice: Ripped form Sprite3D.
   csSegment3 seg (start, end);
-  if (!csIntersect3::BoxSegment (object_bbox, seg, isect, pr))
+  if (csIntersect3::BoxSegment (object_bbox, seg, isect, pr) < 0)
     return false;
   int i;
   csVector3 *vrt = mesh.vertices[0];

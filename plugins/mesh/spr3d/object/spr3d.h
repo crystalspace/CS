@@ -1155,7 +1155,7 @@ public:
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  virtual csVector3 GetRadius ();
+  virtual void GetRadius (csVector3& rad, csVector3 &cent);
   virtual void NextFrame (csTime current_time)
   {
     OldNextFrame (current_time);

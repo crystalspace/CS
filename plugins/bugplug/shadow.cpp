@@ -106,9 +106,9 @@ bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
   if (do_rad)
   {
     int rad_color = G3D->GetTextureManager ()->FindRGB (0, 255, 0);
-    csVector3 radius, r;
-    radius = shadow_mesh->GetMeshObject ()->GetRadius ();
-    csVector3 trans_o = tr_o2c * csVector3 (0);
+    csVector3 radius, r, center;
+    shadow_mesh->GetMeshObject ()->GetRadius (radius,center);
+    csVector3 trans_o = tr_o2c * center;
     r.Set (radius.x, 0, 0);
     G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
     r.Set (0, radius.y, 0);

@@ -326,9 +326,8 @@ bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
   // @@@ We might consider checking to a lower LOD version only.
   // This function is not very fast if the bounding box test succeeds.
   // Plagarism notice: Ripped form Sprite3D.
-  printf("Hit beam\n");
   csSegment3 seg (start, end);
-  if (!csIntersect3::BoxSegment (object_bbox, seg, isect, pr))
+  if (csIntersect3::BoxSegment (object_bbox, seg, isect, pr) < 0)
     return false;
   int i, max = int(vertices_tesselated/3);
   for (i = 0 ; i < max ; i++)
@@ -341,7 +340,6 @@ bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
         *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
 		csSquaredDist::PointPoint (start, end));
       }
-	  printf("Hit beam succesful\n");
       return true;
     }
   }

@@ -240,7 +240,8 @@ public:
     SetupObject ();
     bbox = csParticleSystem::bbox;
   }
-  virtual csVector3 GetRadius () { return radius; }
+  virtual void GetRadius (csVector3& rad, csVector3& cent) 
+	{ rad = radius; cent = bbox.GetCenter(); }
   virtual void NextFrame (csTime current_time)
   {
     csTime elaps = 0;

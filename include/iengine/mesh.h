@@ -278,7 +278,7 @@ struct iMeshWrapper : public iBase
    */
   virtual iBase* GetParentContainer () = 0;
   /// Get the radius of this mesh (ignoring children).
-  virtual csVector3 GetRadius () const = 0;
+  virtual void GetRadius ( csVector3& rad, csVector3& cent) const = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 0, 5);

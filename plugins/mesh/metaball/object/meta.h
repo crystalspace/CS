@@ -141,7 +141,8 @@ public:
   virtual bool HitBeamObject( const csVector3&, const csVector3&,
     csVector3 &, float *);
   virtual long GetShapeNumber() const { return shape_num; }
-  virtual csVector3 GetRadius() { return rad; }
+  virtual void GetRadius(csVector3& radius, csVector3& cent) 
+	{ radius =  rad; cent = object_bbox.GetCenter(); }
   virtual UInt GetMixMode() { return MixMode; }
   virtual void SetMixMode(UInt mode) { MixMode = mode; }
   virtual bool IsLighting() { return do_lighting; }

@@ -374,6 +374,7 @@ public:
 #define BOX_SIDE_Y 3
 #define BOX_SIDE_z 4
 #define BOX_SIDE_Z 5
+#define BOX_INSIDE 6
 
 /**
  * Indices of edges for cxBox3.

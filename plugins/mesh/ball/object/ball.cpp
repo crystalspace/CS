@@ -599,7 +599,7 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
 	);
 #endif
   csSegment3 seg (start, end);
-  if (!csIntersect3::BoxSegment (object_bbox, seg, isect, pr))
+  if (csIntersect3::BoxSegment (object_bbox, seg, isect, pr) < 0)
     return false;
   int i, max = top_mesh.num_triangles;
   csVector3 *vrt = top_mesh.vertices[0];

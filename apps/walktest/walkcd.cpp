@@ -118,7 +118,7 @@ void WalkTest::CreateColliders ()
 
   mesh = SCF_QUERY_INTERFACE (mesh_obj, iPolygonMesh);
   body = new csColliderWrapper (plbody->QueryObject (), collide_system, mesh);
-  body_radius = plbody->GetRadius ();
+  plbody->GetRadius (body_radius, body_center);
   mesh->DecRef ();
   thing_state->DecRef ();
 
@@ -170,7 +170,7 @@ void WalkTest::CreateColliders ()
 
   mesh = SCF_QUERY_INTERFACE (mesh_obj, iPolygonMesh);
   legs = new csColliderWrapper (pllegs->QueryObject (), collide_system, mesh);
-  legs_radius = pllegs->GetRadius ();
+  pllegs->GetRadius ( legs_radius, legs_center);
   mesh->DecRef ();
   thing_state->DecRef ();
 

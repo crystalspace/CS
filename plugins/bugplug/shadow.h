@@ -111,9 +111,10 @@ public:
     bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
     return;
   }
-  virtual csVector3 GetRadius ()
+  virtual void GetRadius (csVector3& rad, csVector3& cent)
   {
-    return csVector3 (200000, 200000, 200000);
+     rad.Set(200000, 200000, 200000);
+	 cent.Set(0,0,0);
   }
   virtual void NextFrame (csTime) { }
   virtual bool WantToDie () const { return false; }

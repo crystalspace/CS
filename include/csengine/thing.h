@@ -550,7 +550,7 @@ public:
   /**
    * Get the radius in object space for this polygon set.
    */
-  const csVector3& GetRadius ();
+  void GetRadius ( csVector3& rad, csVector3& cent);
 
   //----------------------------------------------------------------------
   // Visibility culler
@@ -944,7 +944,8 @@ public:
     {
       scfParent->GetBoundingBox (bbox);
     }
-    virtual csVector3 GetRadius () { return scfParent->GetRadius (); }
+    virtual void GetRadius ( csVector3& rad, csVector3& cent) 
+	  { scfParent->GetRadius (rad,cent); }
     virtual void NextFrame (csTime /*current_time*/) { }
     virtual bool WantToDie () const { return false; }
     virtual void HardTransform (const csReversibleTransform& t)

@@ -568,7 +568,7 @@ float csIntersect3::YFrustum(
   return r;
 }
 
-bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
+int csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
 	csVector3& isect, float* pr)
 {
   const csVector3& u = seg.Start ();
@@ -578,7 +578,7 @@ bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
   int num_sides = box.GetVisibleSides (u, sides);
   int i;
   // If there are no sides then we're in the box so we can return true.
-  if (num_sides == 0) { isect = u; if (pr) *pr = 0; return true; }
+  if (num_sides == 0) { isect = u; if (pr) *pr = 0; return BOX_INSIDE; }
   for (i = 0 ; i < num_sides ; i++)
   {
     switch (sides[i])
@@ -599,7 +599,7 @@ bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
     	      isect.z >= box.MinZ () && isect.z <= box.MaxZ ())
 	  {
 	    if (pr) *pr = r;
-            return true;
+            return sides[i];
 	  }
 	}
 	break;
@@ -619,7 +619,7 @@ bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
     	      isect.z >= box.MinZ () && isect.z <= box.MaxZ ())
 	  {
 	    if (pr) *pr = r;
-            return true;
+            return sides[i];
 	  }
 	}
 	break;
@@ -639,13 +639,13 @@ bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
     	      isect.y >= box.MinY () && isect.y <= box.MaxY ())
 	  {
 	    if (pr) *pr = r;
-            return true;
+            return sides[i];
 	  }
 	}
 	break;
     }
   }
-  return false;
+  return -1;
 }
 
 

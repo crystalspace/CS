@@ -1041,14 +1041,15 @@ void csThing::CreateBoundingBox ()
   bbox->i2 = AddVertex (maxx, maxy, maxz);
 }
 
-const csVector3& csThing::GetRadius ()
+void csThing::GetRadius (csVector3& rad, csVector3& cent)
 {
+  csBox3 b;
   if (!obj_bbox_valid)
   {
-    csBox3 b;
     GetBoundingBox (b);
   }
-  return obj_radius;
+  rad = obj_radius;
+  cent = b.GetCenter();
 }
 
 void csThing::GetBoundingBox (csBox3& box)

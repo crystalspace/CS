@@ -438,7 +438,7 @@ public:
    * this this function will also return true. In this case 'isect' will
    * be set to the start of the segment and *pr to 0.
    */
-  static bool BoxSegment (const csBox3& box, const csSegment3& segment,
+  static int BoxSegment (const csBox3& box, const csSegment3& segment,
   	csVector3& isect, float* pr = NULL);
 };
 

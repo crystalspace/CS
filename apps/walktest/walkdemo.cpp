@@ -840,6 +840,7 @@ extern int num_our_cd;
 
 void move_ghost (iMeshWrapper* spr)
 {
+  printf("Moving ghost\n");
   csColliderWrapper* col = csColliderWrapper::GetColliderWrapper (
   	spr->QueryObject ());
   iSector* first_sector = spr->GetMovable ()->GetSector (0);
@@ -847,7 +848,7 @@ void move_ghost (iMeshWrapper* spr)
   // Create a transformation 'test' which indicates where the ghost
   // is moving too.
   const csVector3& pos = spr->GetMovable ()->GetPosition ();
-  csVector3 vel (0, 0, .1);
+  csVector3 vel (0, 0, .1), rad, cent;
   vel = spr->GetMovable ()->GetTransform ().GetO2T () * vel;
   csVector3 new_pos = pos+vel;
   csMatrix3 m;
@@ -855,8 +856,8 @@ void move_ghost (iMeshWrapper* spr)
 
   // Find all sectors that the ghost will occupy on the new position.
   iSector *n[MAXSECTORSOCCUPIED];
-  int num_sectors = FindSectors (new_pos, 4.0f*spr->GetRadius(),
-  	first_sector, n);
+  spr->GetRadius(rad,cent);
+  int num_sectors = FindSectors (new_pos, 4.0f * rad, first_sector, n);
 
   // Start collision detection.
   Sys->collide_system->ResetCollisionPairs ();

@@ -152,9 +152,9 @@ struct iMeshObject : public iBase
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)=0;
 
   /**
-   * Get the radius of this object in object space.
+   * Get the radius and center of this object in object space.
    */
-  virtual csVector3 GetRadius () = 0;
+  virtual void GetRadius ( csVector3& radius, csVector3& center) = 0;
 
   /**
    * Control animation of this object.
