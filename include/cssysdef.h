@@ -491,13 +491,15 @@ CS_DECLARE_STATIC_VARIABLE_REGISTRATION                                 \
 extern "C" {                                                            \
 static Type* getterFunc ();                                             \
 static void getterFunc ## _kill ();                                     \
+static void getterFunc ## _kill_array ();                               \
 void getterFunc ## _kill ()                                             \
 {                                                                       \
+  (void)getterFunc ## _kill_array;                                      \
   delete getterFunc ();                                                 \
 }                                                                       \
-static void getterFunc ## _kill_array ();                               \
 void getterFunc ## _kill_array ()                                       \
 {                                                                       \
+  (void)getterFunc ## _kill;                                            \
   delete [] getterFunc ();                                              \
 }                                                                       \
 Type* getterFunc ()                                                     \
@@ -554,13 +556,15 @@ static Type &getterFunc ();
 Type *Class::var = 0;                                                                    \
 extern "C" {                                                                             \
 static void Class ## _ ## getterFunc ## _kill ();                                        \
+static void Class ## _ ## getterFunc ## _kill_array ();                                  \
 void Class ## _ ## getterFunc ## _kill ()                                                \
 {                                                                                        \
+  (void) Class ## _ ## getterFunc ## _kill_array;                                        \
   delete Class::getterFunc ();                                                           \
 }                                                                                        \
-static void Class ## _ ## getterFunc ## _kill_array ();                                  \
 void Class ## _ ## getterFunc ## _kill_array ()                                          \
 {                                                                                        \
+  (void) Class ## _ ## getterFunc ## _kill;                                              \
   delete [] Class::getterFunc ();                                                        \
 }                                                                                        \
 }                                                                                        \
@@ -591,13 +595,15 @@ Type* Class::getterFunc ()                                                      
 Type *Class::var = 0;                                                                        \
 extern "C" {                                                                                 \
 static void Class ## _ ## getterFunc ## _kill ();                                            \
+static void Class ## _ ## getterFunc ## _kill_array ();                                      \
 void Class ## _ ## getterFunc ## _kill ()                                                    \
 {                                                                                            \
+  (void) Class ## _ ## getterFunc ## _kill_array;                                            \
   delete &Class::getterFunc ();                                                              \
 }                                                                                            \
-static void Class ## _ ## getterFunc ## _kill_array ();                                      \
 void Class ## _ ## getterFunc ## _kill_array ()                                              \
 {                                                                                            \
+  (void) Class ## _ ## getterFunc ## _kill;                                                  \
   delete [] &Class::getterFunc ();                                                           \
 }                                                                                            \
 }                                                                                            \
