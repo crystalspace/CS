@@ -157,7 +157,8 @@ struct iPolygon3D : public iBase
    * I hope this explanation is clear since I can't seem to make it
    * any clearer :-)
    */
-  virtual void SetTextureSpace (csVector3& v_orig, csVector3& v1, float l1) = 0;
+  virtual void SetTextureSpace (const csVector3& v_orig, 
+    const csVector3& v1, float l1) = 0;
 
   /**
    * Calculate the matrix using 'v1' and 'len1' for the u-axis and

@@ -882,7 +882,8 @@ public:
    * I hope this explanation is clear since I can't seem to make it
    * any clearer :-)
    */
-  void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1);
+  void SetTextureSpace (const csVector3& v_orig, 
+    const csVector3& v1, float len1);
 
   /**
    * Calculate the matrix using two vertices (which are preferably on the
@@ -1298,7 +1299,8 @@ public:
     {
       scfParent->SetTextureSpace (p1, uv1, p2, uv2, p3, uv3);
     }
-    virtual void SetTextureSpace (csVector3& v_orig, csVector3& v1, float l1)
+    virtual void SetTextureSpace (const csVector3& v_orig, 
+      const csVector3& v1, float l1)
     {
       scfParent->SetTextureSpace (v_orig, v1, l1);
     }
