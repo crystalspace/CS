@@ -1,0 +1,73 @@
+Crystal Space CVS Etiquette Guidelines
+
+Since Crystal Space has enough developers to warrant the use of CVS to
+manage it's code base, there are some rules you need to keep in mind if
+you are going to be making changes of ANY sort to the CVS source tree.
+
+First of all, here's how to access the repository.  The CVSROOT is
+:pserver:anonymous@207.225.208.168:/usr/cvs
+
+Once you've logged in, checkout the module "crystal" to download the
+source code to the CS directory.  See the documentation for your CVS
+client on how to do this.
+
+If you do not have a developer account, just use anonymous for your
+password.  You will be able to check out files, but will not be able to
+commit files, that is, make any changes.  So the rest of this document
+doesn't really apply to you.
+
+If you do have an account, replace anonymous in the CVSROOT with your
+account name, and you will have full access.  That implies you will be
+able to make changes to the code.  You should read the rest of this
+document before you make any changes.
+
+Here are some steps you should go through before committing files:
+
+- Always do an update before committing new or changed files.
+- Rebuild everything after updating. (Do not rely on dependencies!)
+- If everything compiles, run walktest using large.zip and take a look at
+	the donut and the fog corridor, just to ensure you didn't break
+	something else.
+- If it works, commit _everything_ you have modified, not just parts of your
+	modifications.
+- Do another update after checking in everything. Take a look at the
+	output, to see if you really checked in everything.
+- Do another rebuild the ensure your changes didn't collide with somebody
+	others recent changes.
+- Post a description of your changes to crystal@list.linux.it, so other
+	developers will not have to _guess_ what you did.  CVS is no
+	replacement for developer communication.
+
+This might look overdone to some people, but you will have to remember that
+we are all working together with the same source. A bug in your code can
+stop the whole project!
+
+Another thing to remember is that Crystal Space is a cross platform
+system.  As such, there are some considerable subtleties that _will_ pop
+up.  Here are some snags to keep in mind.
+
+- Some OS's have case sensitive filenames, some don't.  Bad things happen
+	if you capitalize a file one way in the code and and another way
+	in the actual filename.  This may not even show up on your system,
+	if you are using a case-insensitive file system (e.g. DOS/Windows).
+	NOTE:  WinCVS does strange things to capitalization of files.
+	This is being investigated.
+- There are multiple makefile systems for the various compiler systems
+	used.  If you change one makefile and change the code so that it
+	depends on this change, other systems will probably break.  This
+	may be unavoidable to some extent, but try to minimize the
+	breakage.  For example, wrap the dependent code in an #ifdef and
+	check for OS's that DO support the change.  This will allow other
+	systems to still work without your change.
+- All cross-platform files must be restricted the 8.3 filename convention.
+	Files which are not needed by the DOS/DJGPP port are not subject
+	to this restriction.
+
+One final thing to remember is that you should _never_ commit files that
+you _know_ will stop other developers progress.  The CVS is the place to
+commit completed code, not code that needs debugging because you can't
+find a certain bug etc. etc.  Other developers should not have to stop and
+track down your bugs, just so they can proceed with their own coding.
+When you've committed code, please monitor the mailing list regularly for
+any signs that you've caused a problem somewhere.  This is part of the
+responsibility that goes with the ability to commit code.
