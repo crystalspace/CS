@@ -222,7 +222,7 @@ int csKDTree::FindObject (csKDTreeChild* obj)
   return -1;
 }
 
-int csKDTree::FindBestSplitLocation (int axis, float& split_loc)
+float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
 {
   int i, j;
 
@@ -239,7 +239,7 @@ int csKDTree::FindBestSplitLocation (int axis, float& split_loc)
       split_loc = max0 + (min1-max0) * 0.5;
       CS_ASSERT (split_loc > max0);
       CS_ASSERT (split_loc < min1);
-      return 32768;	// Good quality split.
+      return 10.0;	// Good quality split.
     }
     float min0 = bbox0.Min (axis);
     float max1 = bbox1.Max (axis);
@@ -248,9 +248,9 @@ int csKDTree::FindBestSplitLocation (int axis, float& split_loc)
       split_loc = max1 + (min0-max1) * 0.5;
       CS_ASSERT (split_loc > max1);
       CS_ASSERT (split_loc < min0);
-      return 32768;	// Good quality split.
+      return 10.0;	// Good quality split.
     }
-    return -1;		// Very bad quality split.
+    return -1.0;		// Very bad quality split.
   }
 
   // Calculate minimum and maximum value along the axis.
@@ -270,9 +270,10 @@ int csKDTree::FindBestSplitLocation (int axis, float& split_loc)
   // probably be a configurable parameter.
 
   // @@@ Is the routine below very efficient?
-# define FBSL_ATTEMPTS 10
+# define FBSL_ATTEMPTS 20
   float a;
-  int best_qual = -2;
+  float best_qual = -2.0;
+  float inv_num_objects = 1.0 / float (num_objects);
   for (i = 0 ; i < FBSL_ATTEMPTS ; i++)
   {
     // Calculate a possible split location.
@@ -292,18 +293,16 @@ int csKDTree::FindBestSplitLocation (int axis, float& split_loc)
     int cut = num_objects-left-right;
     // If we have no object on the left or right then this is a bad
     // split which we should never take.
-    int qual;
+    float qual;
     if (left == 0 || right == 0)
     {
-      qual = -1;
+      qual = -1.0;
     }
     else
     {
-      uint32 qual_cut = 32768 - ((cut << 15) / num_objects);
-      uint32 qual_balance = 32768 - ((ABS (left-right) << 15) / num_objects);
-      // Currently we just give 'cut' and 'balance' quality an equal share.
-      // We should consider if that is a good measure.
-      qual = int ((qual_cut * qual_balance) >> 15);
+      float qual_cut = 1.0 - (float (cut) * inv_num_objects);
+      float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
+      qual = 3.0 * qual_cut + qual_balance;
     }
     if (qual > best_qual)
     {
@@ -517,9 +516,9 @@ void csKDTree::Distribute ()
     // We use FindBestSplitLocation() to see how we can best split this
     // node.
     float split_loc_x, split_loc_y, split_loc_z;
-    int qual_x = FindBestSplitLocation (CS_KDTREE_AXISX, split_loc_x);
-    int qual_y = FindBestSplitLocation (CS_KDTREE_AXISY, split_loc_y);
-    int qual_z = FindBestSplitLocation (CS_KDTREE_AXISZ, split_loc_z);
+    float qual_x = FindBestSplitLocation (CS_KDTREE_AXISX, split_loc_x);
+    float qual_y = FindBestSplitLocation (CS_KDTREE_AXISY, split_loc_y);
+    float qual_z = FindBestSplitLocation (CS_KDTREE_AXISZ, split_loc_z);
     if (qual_x >= 0 && qual_x >= qual_y && qual_x >= qual_z)
     {
       split_axis = CS_KDTREE_AXISX;

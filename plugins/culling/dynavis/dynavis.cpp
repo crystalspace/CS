@@ -402,7 +402,8 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
   iMovable* movable = visobj->GetMovable ();
   model_mgr->CheckObjectModel (visobj_wrap->model, visobj_wrap->mesh);
   visobj_wrap->use_outline_filler = (visobj_wrap->hint_closed
-  	|| visobj_wrap->model->CanUseOutlineFiller ()) && !visobj_wrap->hint_goodoccluder;
+  	|| visobj_wrap->model->CanUseOutlineFiller ())
+	&& !visobj_wrap->hint_goodoccluder;
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
   kdtree->MoveObject (visobj_wrap->child, bbox);

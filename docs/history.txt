@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Nov-2003
+	- Jorrit optimized the kdtree a bit so that it now does 20 attempts
+	  instead of 10 to find the best split location. Also the cost is
+	  now calculated based on a measure that looks more at number of
+	  cut objects as opposed to balanced tree.
 4-Nov-2003
 	- Jorrit fixed a bug in Dynavis history culling. In some cases objects
 	  could remain visible for longer then expected because the history

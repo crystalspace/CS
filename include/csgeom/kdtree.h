@@ -183,7 +183,7 @@ private:
    * If this function returns a negative quality this means the
    * split should not be performed at all.
    */
-  int FindBestSplitLocation (int axis, float& split_loc);
+  float FindBestSplitLocation (int axis, float& split_loc);
 
   /**
    * If this node is a leaf then we will split the objects currently
