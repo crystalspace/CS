@@ -111,6 +111,10 @@ SCF_INTERFACE (iSystem, 0, 0, 1) : public iBase
   virtual bool GetMouseButton (int button) = 0;
   /// Query current (last known) mouse position
   virtual void GetMousePosition (int &x, int &y) = 0;
+  /// Query a specific commandline option (you can query second etc such option)
+  virtual const char *GetOptionCL (const char *iName, int iIndex = 0) = 0;
+  /// Query a filename specified on the commandline (that is, without leading '-')
+  virtual const char *GetNameCL (int iIndex = 0) = 0;
 };
 
 #endif

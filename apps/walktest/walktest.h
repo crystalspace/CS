@@ -202,8 +202,6 @@ public:
 
   /// Override SetSystemDefaults to handle additional configuration defaults.
   virtual void SetSystemDefaults (csIniFile*);
-  /// Override ParseArg to handle additional arguments
-  virtual bool ParseArg (int argc, char* argv[], int& i);
   /// Override Help to show additional arguments help
   virtual void Help ();
 

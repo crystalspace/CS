@@ -1585,93 +1585,83 @@ void WalkTest::SetSystemDefaults (csIniFile *Config)
   do_stats = Config->GetYesNo ("WalkTest", "STATS", false);
   do_cd = Config->GetYesNo ("WalkTest", "COLLDET", true);
   sprintf (world_dir, "/lev/%s", Config->GetStr ("World", "WORLDFILE", "world"));
-}
 
-bool WalkTest::ParseArg (int argc, char* argv[], int& i)
-{
-  if (argv[i][0] != '-')
-  {
-    sprintf (world_dir, "/lev/%s", argv[i]);
-  }
-  if (strcasecmp ("-clear", argv[i]) == 0)
+  const char *val;
+  if ((val = GetNameCL ()))
+    sprintf (world_dir, "/lev/%s", val);
+
+  if (GetOptionCL ("clear"))
   {
     do_clear = true;
     Sys->Printf (MSG_INITIALIZATION, "Screen will be cleared every frame.\n");
   }
-  else if (strcasecmp ("-noclear", argv[i]) == 0)
+  else if (GetOptionCL ("noclear"))
   {
     do_clear = false;
     Sys->Printf (MSG_INITIALIZATION, "Screen will not be cleared every frame.\n");
   }
-  else if (strcasecmp ("-stats", argv[i]) == 0)
+
+  if (GetOptionCL ("stats"))
   {
     do_stats = true;
     Sys->Printf (MSG_INITIALIZATION, "Statistics enabled.\n");
   }
-  else if (strcasecmp ("-nostats", argv[i]) == 0)
+  else if (GetOptionCL ("nostats"))
   {
     do_stats = false;
     Sys->Printf (MSG_INITIALIZATION, "Statistics disabled.\n");
   }
-  else if (strcasecmp ("-fps", argv[i]) == 0)
+
+  if (GetOptionCL ("fps"))
   {
     do_fps = true;
     Sys->Printf (MSG_INITIALIZATION, "Frame Per Second enabled.\n");
   }
-  else if (strcasecmp ("-nofps", argv[i]) == 0)
+  else if (GetOptionCL ("nofps"))
   {
     do_fps = false;
     Sys->Printf (MSG_INITIALIZATION, "Frame Per Second disabled.\n");
   }
-  else if (strcasecmp ("-infinite", argv[i]) == 0)
-  {
+
+  if (GetOptionCL ("infinite"))
     do_infinite = true;
-  }
-  else if (strcasecmp ("-huge", argv[i]) == 0)
-  {
+
+  if (GetOptionCL ("huge"))
     do_huge = true;
-  }
-  else if (strcasecmp ("-bots", argv[i]) == 0)
-  {
+
+  if (GetOptionCL ("bots"))
     do_bots = true;
-  }
-  else if (strcasecmp ("-colldet", argv[i]) == 0)
+
+  if (GetOptionCL ("colldet"))
   {
     do_cd = true;
     Sys->Printf (MSG_INITIALIZATION, "Enabled collision detection system.\n");
   }
-  else if (strcasecmp ("-nocolldet", argv[i]) == 0)
+  else if (GetOptionCL ("nocolldet"))
   {
     do_cd = false;
     Sys->Printf (MSG_INITIALIZATION, "Disabled collision detection system.\n");
   }
-  else if (strcasecmp ("-exec", argv[i]) == 0)
+
+  if ((val = GetOptionCL ("exec")))
   {
-    i++;
-    if (i < argc)
-    {
-      CHK (delete [] auto_script);
-      CHK (auto_script = new char [strlen (argv[i])+1]);
-      strcpy (auto_script, argv[i]);
-    }
+    CHK (delete [] auto_script);
+    CHK (auto_script = strnew (val));
   }
-  else
-    return SysSystemDriver::ParseArg (argc, argv, i);
-  return true;
 }
 
 void WalkTest::Help ()
 {
   SysSystemDriver::Help ();
-  Sys->Printf (MSG_STDOUT, "  -exec <filename>   execute given script at startup\n");
-  Sys->Printf (MSG_STDOUT, "  -clear/noclear     clear display every frame (default '%sclear')\n", do_clear ? "" : "no");
-  Sys->Printf (MSG_STDOUT, "  -stats/nostats     statistics (default '%sstats')\n", do_stats ? "" : "no");
-  Sys->Printf (MSG_STDOUT, "  -fps/nofps         frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
-  Sys->Printf (MSG_STDOUT, "  -colldet/nocolldet collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
+  Sys->Printf (MSG_STDOUT, "  -exec=<script>     execute given script at startup\n");
+  Sys->Printf (MSG_STDOUT, "  -[no]clear         clear display every frame (default '%sclear')\n", do_clear ? "" : "no");
+  Sys->Printf (MSG_STDOUT, "  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
+  Sys->Printf (MSG_STDOUT, "  -[no]fps           frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
+  Sys->Printf (MSG_STDOUT, "  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
   Sys->Printf (MSG_STDOUT, "  -infinite          special infinite level generation (ignores world file!)\n");
   Sys->Printf (MSG_STDOUT, "  -huge              special huge level generation (ignores world file!)\n");
   Sys->Printf (MSG_STDOUT, "  -bots              allow random generation of bots\n");
-  Sys->Printf (MSG_STDOUT, "  <name>             load world file from VFS directory <name> (default '%s')\n", world_dir);
+  Sys->Printf (MSG_STDOUT, "  <path>             load world from VFS <path> (default '%s')\n", world_dir);
 }
 
 /*------------------------------------------------------------------

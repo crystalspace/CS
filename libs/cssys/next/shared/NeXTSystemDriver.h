@@ -43,9 +43,6 @@ private:
     NeXTSystemProxy* proxy; // Interface to Objective-C world; see README.NeXT.
     int simulated_depth;
 
-protected:
-    virtual bool ParseArg( int argc, char* argv[], int& i );
-
 public:
     SysSystemDriver();
     virtual ~SysSystemDriver();

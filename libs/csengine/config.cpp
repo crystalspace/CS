@@ -45,14 +45,14 @@ bool csWorld::SetOption (int id, csVariant* value)
 {
   switch (id)
   {
-    case 0: csCamera::SetDefaultFOV (value->v.lVal); break;
-    case 1: csSector::do_radiosity = value->v.bVal; break;
-    case 2: csPolyTexture::do_accurate_things = value->v.bVal; break;
-    case 3: csPolyTexture::cfg_cosinus_factor = value->v.fVal; break;
-    case 4: csSector::cfg_reflections = value->v.lVal; break;
-    case 5: csPolygon3D::do_force_recalc = value->v.bVal; break;
-    case 6: csPolygon3D::do_not_force_recalc = value->v.bVal; break;
-    case 7: csPolygon3D::do_cache_lightmaps = value->v.bVal; break;
+    case 0: csCamera::SetDefaultFOV (value->v.l); break;
+    case 1: csSector::do_radiosity = value->v.b; break;
+    case 2: csPolyTexture::do_accurate_things = value->v.b; break;
+    case 3: csPolyTexture::cfg_cosinus_factor = value->v.f; break;
+    case 4: csSector::cfg_reflections = value->v.l; break;
+    case 5: csPolygon3D::do_force_recalc = value->v.b; break;
+    case 6: csPolygon3D::do_not_force_recalc = value->v.b; break;
+    case 7: csPolygon3D::do_cache_lightmaps = value->v.b; break;
     default: return false;
   }
   return true;
@@ -63,14 +63,14 @@ bool csWorld::GetOption (int id, csVariant* value)
   value->type = config_options[id].type;
   switch (id)
   {
-    case 0: value->v.lVal = csCamera::GetDefaultFOV (); break;
-    case 1: value->v.bVal = csSector::do_radiosity; break;
-    case 2: value->v.bVal = csPolyTexture::do_accurate_things; break;
-    case 3: value->v.fVal = csPolyTexture::cfg_cosinus_factor; break;
-    case 4: value->v.lVal = csSector::cfg_reflections; break;
-    case 5: value->v.bVal = csPolygon3D::do_force_recalc; break;
-    case 6: value->v.bVal = csPolygon3D::do_not_force_recalc; break;
-    case 7: value->v.bVal = csPolygon3D::do_cache_lightmaps; break;
+    case 0: value->v.l = csCamera::GetDefaultFOV (); break;
+    case 1: value->v.b = csSector::do_radiosity; break;
+    case 2: value->v.b = csPolyTexture::do_accurate_things; break;
+    case 3: value->v.f = csPolyTexture::cfg_cosinus_factor; break;
+    case 4: value->v.l = csSector::cfg_reflections; break;
+    case 5: value->v.b = csPolygon3D::do_force_recalc; break;
+    case 6: value->v.b = csPolygon3D::do_not_force_recalc; break;
+    case 7: value->v.b = csPolygon3D::do_cache_lightmaps; break;
     default: return false;
   }
   return true;

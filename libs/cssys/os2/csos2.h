@@ -70,15 +70,6 @@ public:
     int &oWindowWidth, int &oWindowHeight, bool &oHardwareCursor);
   /// Put a keyboard event into event queue
   virtual void KeyboardEvent (int ScanCode, bool Down);
-
-protected:
-  /**
-   * This is a system-dependent function which eats a single
-   * command-line option (like -help, ...). If system-dependent
-   * part does not recognize the option, it should pass it to
-   * its parent class method.
-   */
-  virtual bool ParseArg (int argc, char* argv[], int& i);
 };
 
 /**

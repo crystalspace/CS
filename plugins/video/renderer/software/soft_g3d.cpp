@@ -3176,23 +3176,23 @@ bool csGraphics3DSoftware::SetOption (int id, csVariant* value)
     return false;
   switch (id)
   {
-    case 0: do_interlaced = value->v.bVal ? 0 : -1; break;
-    case 1: do_lighting = value->v.bVal; break;
-    case 2: do_transp = value->v.bVal; break;
-    case 3: do_textured = value->v.bVal; break;
-    case 4: do_texel_filt = value->v.bVal; break;
-    case 5: do_bilin_filt = value->v.bVal; break;
+    case 0: do_interlaced = value->v.b ? 0 : -1; break;
+    case 1: do_lighting = value->v.b; break;
+    case 2: do_transp = value->v.b; break;
+    case 3: do_textured = value->v.b; break;
+    case 4: do_texel_filt = value->v.b; break;
+    case 5: do_bilin_filt = value->v.b; break;
 #ifdef DO_MMX
-    case 6: do_mmx = value->v.bVal; break;
+    case 6: do_mmx = value->v.b; break;
 #endif
-    case 7: txtmgr->Gamma = value->v.fVal; break;
-    case 8: zdist_mipmap1 = value->v.fVal; break;
-    case 9: zdist_mipmap2 = value->v.fVal; break;
-    case 10: zdist_mipmap3 = value->v.fVal; break;
-    case 11: rstate_gouraud = value->v.bVal; break;
-    case 12: do_smaller_rendering = value->v.bVal; break;
-    case 13: txtmgr->do_lightmapgrid = value->v.bVal; break;
-    case 14: txtmgr->do_lightmaponly = value->v.bVal; break;
+    case 7: txtmgr->Gamma = value->v.f; break;
+    case 8: zdist_mipmap1 = value->v.f; break;
+    case 9: zdist_mipmap2 = value->v.f; break;
+    case 10: zdist_mipmap3 = value->v.f; break;
+    case 11: rstate_gouraud = value->v.b; break;
+    case 12: do_smaller_rendering = value->v.b; break;
+    case 13: txtmgr->do_lightmapgrid = value->v.b; break;
+    case 14: txtmgr->do_lightmaponly = value->v.b; break;
     default: return false;
   }
   ScanSetup ();
@@ -3204,23 +3204,23 @@ bool csGraphics3DSoftware::GetOption (int id, csVariant* value)
   value->type = config_options[id].type;
   switch (id)
   {
-    case 0: value->v.bVal = do_interlaced != -1; break;
-    case 1: value->v.bVal = do_lighting; break;
-    case 2: value->v.bVal = do_transp; break;
-    case 3: value->v.bVal = do_textured; break;
-    case 4: value->v.bVal = do_texel_filt; break;
-    case 5: value->v.bVal = do_bilin_filt; break;
+    case 0: value->v.b = do_interlaced != -1; break;
+    case 1: value->v.b = do_lighting; break;
+    case 2: value->v.b = do_transp; break;
+    case 3: value->v.b = do_textured; break;
+    case 4: value->v.b = do_texel_filt; break;
+    case 5: value->v.b = do_bilin_filt; break;
 #ifdef DO_MMX
-    case 6: value->v.bVal = do_mmx; break;
+    case 6: value->v.b = do_mmx; break;
 #endif
-    case 7: value->v.fVal = txtmgr->Gamma; break;
-    case 8: value->v.fVal = zdist_mipmap1; break;
-    case 9: value->v.fVal = zdist_mipmap2; break;
-    case 10: value->v.fVal = zdist_mipmap3; break;
-    case 11: value->v.bVal = rstate_gouraud; break;
-    case 12: value->v.bVal = do_smaller_rendering; break;
-    case 13: value->v.bVal = txtmgr->do_lightmapgrid; break;
-    case 14: value->v.bVal = txtmgr->do_lightmaponly; break;
+    case 7: value->v.f = txtmgr->Gamma; break;
+    case 8: value->v.f = zdist_mipmap1; break;
+    case 9: value->v.f = zdist_mipmap2; break;
+    case 10: value->v.f = zdist_mipmap3; break;
+    case 11: value->v.b = rstate_gouraud; break;
+    case 12: value->v.b = do_smaller_rendering; break;
+    case 13: value->v.b = txtmgr->do_lightmapgrid; break;
+    case 14: value->v.b = txtmgr->do_lightmaponly; break;
     default: return false;
   }
   return true;

@@ -32,7 +32,7 @@ public:
 	~SysSystemDriver ();
 
 	virtual void Loop ();
-	virtual bool ParseArg(int argc, char* argv[], int& i);
+	virtual void SetSystemDefaults (csIniFile *config);
 	virtual void Help ();
 };
 

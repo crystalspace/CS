@@ -72,23 +72,10 @@ void SysSystemDriver::SetSystemDefaults( csIniFile* config )
     {
     superclass::SetSystemDefaults(config);
     simulated_depth = config->GetInt( "VideoDriver", "SIMULATE_DEPTH", 0 );
-    }
 
-
-//-----------------------------------------------------------------------------
-// ParseArg
-//-----------------------------------------------------------------------------
-bool SysSystemDriver::ParseArg( int argc, char* argv[], int& i )
-    {
-    bool okay = true;
-    if (strcasecmp( "-simdepth", argv[i] ) == 0)
-	{
-	if (++i < argc)
-	    simulated_depth = atoi( argv[i] );
-	}
-    else
-	okay = superclass::ParseArg( argc, argv, i );
-    return okay;
+    const char *val;
+    if ((val = GetOptionCL ( "simdepth" )))
+        simulated_depth = atoi( val );
     }
 
 
@@ -99,7 +86,7 @@ void SysSystemDriver::Help()
     {
     superclass::Help();
     Printf( MSG_STDOUT,
-	"  -simdepth <depth>  simulate depth (15 or 32) (default=none)\n" );
+	"  -simdepth=<depth>  simulate depth (15 or 32) (default=none)\n" );
     }
 
 

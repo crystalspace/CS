@@ -222,26 +222,6 @@ bool SysSystemDriver::Initialize (int argc, char *argv[], const char *iConfigNam
 }
 
 
-bool SysSystemDriver::ParseArg(int argc, char* argv[], int& i)
-{
-    if (strcasecmp ("-mode", argv[i]) == 0)
-    {
-      i++;
-      if (i < argc)
-        SetMode (argv[i]);
-    }
-    else return csSystemDriver::ParseArg (argc, argv, i);
-    return true;
-}
-
-
-void SysSystemDriver::SystemHelp()
-{
-//	Printf (MSG_STDOUT, "   -mode <w>x<y>      set resolution (default=%dx%d)\n",
-//	  FRAME_WIDTH, FRAME_HEIGHT);
-}
-
-
 void SysSystemDriver::Loop(void)
 {
     long prev_time;

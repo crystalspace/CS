@@ -80,6 +80,8 @@ public:
   inline csSome Pop ();
   /// Delete element number 'n' from vector
   bool Delete (int n);
+  /// Replace n-th item with another (free previous value)
+  bool Replace (int n, csSome what);
   /// Delete all elements
   void DeleteAll ();
   /// Insert element 'Item' before element 'n'

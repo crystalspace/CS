@@ -129,39 +129,36 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver()
   CONSTRUCT_IBASE (NULL);
 }
 
-bool SysSystemDriver::ParseArg(int argc, char* argv[], int& i)
+void SysSystemDriver::SetSystemDefaults (csIniFile *config)
 {
-	if (strcasecmp("-warp", argv[i]) == 0) {
-		i++;
-		if (i<argc) {
-			if (strcasecmp(argv[i],"on") == 0) {
-				WarpMode = true;
-			} else {
-				WarpMode = false;
-			}
+	csSystemDriver::SetSystemDefaults (config);
+	const char *val;
+	if ((val = GetOptionCL ("warp"))) {
+		if (strcasecmp(val, "on") == 0) {
+			WarpMode = true;
+		} else {
+			WarpMode = false;
 		}
-	} else if (strcasecmp("-depth", argv[i]) == 0) {
-		i++;
-		if (i<argc) {
-			Depth = atoi(argv[i]);
-			if (Depth != 8 && Depth != 15) {
-				Printf(MSG_INITIALIZATION, "Only 8 or 15 bits supported. Using 8 bits\n");
-				Depth = 8;
-			} else {
-				Printf(MSG_INITIALIZATION, "Using %d bits\n", Depth);
-			}
+	}
+	if ((val = GetOptionCL ("depth"))) {
+		Depth = atoi(val);
+		if (Depth != 8 && Depth != 15) {
+			Printf(MSG_INITIALIZATION, "Only 8 or 15 bits supported. Using 8 bits\n");
+			Depth = 8;
+		} else {
+			Printf(MSG_INITIALIZATION, "Using %d bits\n", Depth);
 		}
-	} else if (strcasecmp("-direct", argv[i]) == 0) {
-		directgfx = true; i++;
-	} else return csSystemDriver::ParseArg(argc, argv, i);
-  return true;
+	}
+	if ((val = GetOptionCL ("direct"))) {
+		directgfx = true;
+	}
 }
 
 void SysSystemDriver::Help()
 {
 	csSystemDriver::Help();
-	Printf(MSG_STDOUT, "  -warp <on|off>     use Warp3D (default %s)\n", WarpMode == true ? "on" : "off");
-	Printf(MSG_STDOUT, "  -depth <8|15>      display depth (default: %d)\n", Depth);
+	Printf(MSG_STDOUT, "  -warp=<on|off>     use Warp3D (default %s)\n", WarpMode == true ? "on" : "off");
+	Printf(MSG_STDOUT, "  -depth=<8|15>      display depth (default: %d)\n", Depth);
 	Printf(MSG_STDOUT, "  -directgfx         use direct writes to the display\n");
 }
 

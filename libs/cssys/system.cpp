@@ -46,9 +46,6 @@ bool csSystemDriver::Shutdown = false;
 bool csSystemDriver::ExitLoop = false;
 bool csSystemDriver::ConsoleReady = false;
 
-// Forced driver name.
-csStrVector extra_plugins (8, 8);
-
 // Global debugging level.
 int csSystemDriver::debug_level = 0;
 
@@ -82,7 +79,8 @@ csSystemDriver::csPlugIn::~csPlugIn ()
 
 //---------------------------------------------------- The System Driver -----//
 
-csSystemDriver::csSystemDriver () : PlugIns (8, 8)
+csSystemDriver::csSystemDriver () : PlugIns (8, 8), OptionList (16, 16),
+  CommandLine (16, 16), CommandLineNames (16, 16)
 {
   console_open ();
   System = this;
@@ -99,7 +97,6 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8)
 
   EventQueue = NULL;
   Console = NULL;
-  OptionList = NULL;
   ConfigName = NULL;
 }
 
@@ -117,8 +114,6 @@ csSystemDriver::~csSystemDriver ()
     CHKB (delete [] ConfigName);
 
   System = NULL;
-
-  CHK (delete OptionList);
 
   // NOTE: We should not decrement reference count for known drivers
   // since we suppose they will deregister themself during their
@@ -156,42 +151,63 @@ bool csSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName
   // Create the Event Queue
   CHK (EventQueue = new csEventQueue ());
 
-  SetSystemDefaults (Config);
-  if (!ParseCmdLineDriver (argc, argv))
-    return false;
-
-  // Now load and initialize all plugins
-  csStrVector PluginList (8, 8);
-  Config->EnumData ("PlugIns", &PluginList);
-  while (extra_plugins.Length () || PluginList.Length ())
-  {
-    char *classID;
-    if (extra_plugins.Length ())
-      classID = (char *)extra_plugins.Get (0);
-    else
-      classID = Config->GetStr ("PlugIns", (char *)PluginList.Get (0));
-
-    LoadPlugIn (classID, NULL, 0);
-
-    if (extra_plugins.Length ())
-      extra_plugins.Delete (0);
-    else
-      PluginList.Delete (0);
-  }
-
+  // Initialize keyboard and mouse
   InitKeyboard ();
   InitMouse ();
+
+  // Collect all options from command line
+  CollectOptions (argc, argv);
+
+  // Analyse config and command line
+  SetSystemDefaults (Config);
+
+  // The list of plugins
+  csStrVector PluginList (8, 8);
+
+  // Now eat all common-for-plugins command-line switches
+  const char *val;
+  if ((val = GetOptionCL ("video")))
+  {
+    // Alternate videodriver
+    char temp [100];
+    sprintf (temp, "crystalspace.graphics3d.%s", val);
+    Printf (MSG_INITIALIZATION, "Using alternative 3D driver: %s\n", temp);
+    PluginList.Push (strnew (temp));
+  }
+
+  // Now load and initialize all plugins
+  int n = PluginList.Length ();
+  Config->EnumData ("PlugIns", &PluginList);
+  while (n < PluginList.Length ())
+  {
+    const char *classID = Config->GetStr ("PlugIns", (char *)PluginList.Get (n));
+    PluginList.Replace (n, strnew (classID));
+    n++;
+  }
+
+  // Eat all --plugin switches specified on the command line
+  n = 0;
+  while ((val = GetOptionCL ("plugin", n++)))
+  {
+    Printf (MSG_INITIALIZATION, "User requested for plugin: %s\n", val);
+    PluginList.Push (strnew (val));
+  }
+
+  // Load all plugins
+  for (n = 0; n < PluginList.Length (); n++)
+    LoadPlugIn ((char *)PluginList.Get (n), NULL, 0);
+
+  // See if user wants help
+  if ((val = GetOptionCL ("help")))
+  {
+    Help ();
+    exit (0);
+  }
 
   // Check if the minimal required drivers are loaded
   if (!CheckDrivers ())
     return false;
 
-  if (!ParseCmdLine (argc, argv))
-  {
-    Close ();
-    return false;
-  }
-  
   return true;
 }
 
@@ -227,7 +243,7 @@ bool csSystemDriver::Open (const char *Title)
   return true;
 }
 
-void csSystemDriver::Close(void)
+void csSystemDriver::Close ()
 {
   // Warn all plugins the system is going down
   csEvent e (GetTime (), csevBroadcast, cscmdSystemClose);
@@ -254,7 +270,7 @@ bool csSystemDriver::CheckDrivers ()
 
 bool csSystemDriver::InitKeyboard ()
 {
-  CHK (Keyboard = new SysKeyboardDriver());
+  CHK (Keyboard = new SysKeyboardDriver ());
   return (Keyboard != NULL);
 }
 
@@ -308,193 +324,68 @@ bool csSystemDriver::HandleEvent (csEvent &Event)
   return false;
 }
 
+void csSystemDriver::CollectOptions (int argc, char *argv[])
+{
+  for (int i = 1; i < argc; i++)
+  {
+    char *opt = argv [i];
+    if (*opt == '-')
+    {
+      while (*opt == '-') opt++;
+      opt = strnew (opt);
+      char *arg = strchr (opt, '=');
+      if (arg) *arg++ = 0; else arg = opt + strlen (opt);
+      CommandLine.Push (new csCommandLineOption (opt, arg));
+    }
+    else
+      CommandLineNames.Push (strnew (opt));
+  }
+}
+
 void csSystemDriver::SetSystemDefaults (csIniFile *Config)
 {
+  // First look in .cfg file
   FrameWidth = Config->GetInt ("VideoDriver", "Width", 640);
   FrameHeight = Config->GetInt ("VideoDriver", "Height", 480);
   Depth = Config->GetInt ("VideoDriver", "Depth", 16);
   FullScreen = Config->GetYesNo ("VideoDriver", "FullScreen", false);
+
+  // Now analyze command line
+  const char *val;
+  if ((val = GetOptionCL ("mode")))
+    SetMode (val);
+
+  if ((val = GetOptionCL ("depth")))
+    Depth = atoi (val);
 }
 
-bool csSystemDriver::ParseCmdLineDriver (int argc, char* argv[])
+void csSystemDriver::Help (iConfig* Config)
 {
-  int i;
-
-  for (i = 1; i < argc; i++)
-    if (!ParseArgDriver (argc, argv, i))
-      return false;
-  return true;
-}
-
-bool csSystemDriver::ParseArgDriver (int argc, char* argv[], int& i)
-{
-  if (strcasecmp ("-driver", argv[i]) == 0)
-  {
-    i++;
-    if (i < argc)
-    {
-      char temp [100];
-      if (strchr (argv [i], '.'))
-      {
-        strcpy (temp, argv [i]);
-        Printf (MSG_INITIALIZATION, "Loading additional plug-in '%s'.\n", temp);
-      }
-      else
-      {
-        sprintf (temp, "crystalspace.graphics3d.%s", argv [i]);
-        Printf (MSG_INITIALIZATION, "Using 3D driver '%s'.\n", temp);
-      }
-      extra_plugins.Push (strnew (temp));
-    }
-  }
-  return true;
-}
-
-void csSystemDriver::CollectOptions (iConfig* Config, csColOption* already_collected)
-{
-  char buf[100];
   csOptionDescription option;
   int num = Config->GetOptionCount ();
   for (int i = 0 ; i < num ; i++)
   {
-    Config->GetOptionDescription (i, &option);
-    switch (option.type)
-    {
-      case CSVAR_BOOL:
-        CHK (already_collected = new csColOption (already_collected, option.type,
-          option.id, option.name, true, Config));
-	strcpy (buf, "no");
-	strcat (buf, option.name);
-        CHK (already_collected = new csColOption (already_collected, option.type,
-          option.id, buf, false, Config));
-	break;
-      case CSVAR_CMD:
-        CHK (already_collected = new csColOption (already_collected, option.type,
-          option.id, option.name, true, Config));
-	break;
-      case CSVAR_LONG:
-      case CSVAR_FLOAT:
-        CHK (already_collected = new csColOption (already_collected, option.type,
-          option.id, option.name, false, Config));
-	break;
-    }
-  }
-}
-
-bool csSystemDriver::ParseCmdLine (int argc, char* argv[])
-{
-  CHK (delete OptionList);
-  OptionList = NULL;
-  int i;
-
-  for (i = 0; i < PlugIns.Length (); i++)
-  {
-    csPlugIn *plugin = (csPlugIn *)PlugIns.Get (i);
-    iConfig *cfg = QUERY_INTERFACE (plugin->PlugIn, iConfig);
-    if (cfg)
-    {
-      CollectOptions (cfg, OptionList);
-      cfg->DecRef ();
-    }
-  }
-
-  bool retcode = true;
-
-  for (i = 1; i < argc; i++)
-    if (!ParseArg (argc, argv, i))
-    {
-      retcode = false;
-      break;
-    }
-
-  CHK (delete OptionList);
-  OptionList = NULL;
-  return retcode;
-}
-
-bool csSystemDriver::ParseArg (int argc, char* argv[], int& i)
-{
-  if (strcasecmp ("-help", argv[i]) == 0)
-  {
-    Help ();
-    exit (0);
-  }
-  else if (strcasecmp ("-mode", argv[i]) == 0)
-  {
-    if (++i < argc) SetMode (argv[i]);
-  }
-  else if (strcasecmp ("-depth", argv[i]) == 0)
-  {
-    if (++i < argc) Depth = atoi (argv[i]);
-  }
-  else if (strcasecmp ("-driver", argv[i]) == 0)
-  {
-    i++;
-  }
-  else if (argv[i][0] == '-')
-  {
-    csVariant val;
-    csColOption* opt = OptionList;
-    while (opt)
-    {
-      if (strcasecmp (opt->option_name, argv[i]+1) == 0)
-      {
-	val.type = opt->type;
-        switch (opt->type)
-	{
-	  case CSVAR_BOOL:
-	  case CSVAR_CMD:
-	    val.v.bVal = opt->option_value;
-	    break;
-	  case CSVAR_LONG:
-    	    if (++i < argc) val.v.lVal = atol (argv[i]);
-	    break;
-	  case CSVAR_FLOAT:
-    	    if (++i < argc) val.v.fVal = atof (argv[i]);
-	    break;
-	}
-	opt->config->SetOption (opt->id, &val);
-	break;
-      }
-      opt = opt->next;
-    }
-    if (!opt)
-    {
-      Printf (MSG_FATAL_ERROR, "Unknown commandline parameter '%s'!\n\
-        (Use '-help' to get a list of options)\n", argv[i]);
-      fatal_exit (0, false);
-    }
-  }
-  return true;
-}
-
-void csSystemDriver::Help (iConfig* piConf)
-{
-  csOptionDescription option;
-  int num = piConf->GetOptionCount ();
-  for (int i = 0 ; i < num ; i++)
-  {
     csVariant def;
-    piConf->GetOptionDescription (i, &option);
+    Config->GetOptionDescription (i, &option);
     char opt [30], desc [80];
-    piConf->GetOption (i, &def);
+    Config->GetOption (i, &def);
     switch (option.type)
     {
       case CSVAR_BOOL:
-        sprintf (opt, "  -%s/no%s", option.name, option.name);
-	sprintf (desc, "%s (%s) ", option.description, def.v.bVal ? "yes" : "no");
+        sprintf (opt, "  -[no]%s", option.name);
+	sprintf (desc, "%s (%s) ", option.description, def.v.b ? "yes" : "no");
 	break;
       case CSVAR_CMD:
         sprintf (opt, "  -%s", option.name);
 	strcpy (desc, option.description);
 	break;
       case CSVAR_FLOAT:
-        sprintf (opt, "  -%s <val>", option.name);
-	sprintf (desc, "%s (%f)", option.description, def.v.fVal);
+        sprintf (opt, "  -%s=<val>", option.name);
+	sprintf (desc, "%s (%f)", option.description, def.v.f);
 	break;
       case CSVAR_LONG:
-        sprintf (opt, "  -%s <val>", option.name);
-	sprintf (desc, "%s (%ld)", option.description, def.v.lVal);
+        sprintf (opt, "  -%s=<val>", option.name);
+	sprintf (desc, "%s (%ld)", option.description, def.v.l);
 	break;
     }
     Printf (MSG_STDOUT, "%-21s%s\n", opt, desc);
@@ -506,20 +397,21 @@ void csSystemDriver::Help ()
   for (int i = 0; i < PlugIns.Length (); i++)
   {
     csPlugIn *plugin = (csPlugIn *)PlugIns [i];
-    iConfig *cfg = QUERY_INTERFACE (plugin->PlugIn, iConfig);
-    if (cfg)
+    iConfig *Config = QUERY_INTERFACE (plugin->PlugIn, iConfig);
+    if (Config)
     {
       Printf (MSG_STDOUT, "Options for %s:\n", scfGetClassDescription (plugin->ClassID));
-      Help (cfg);
-      cfg->DecRef ();
+      Help (Config);
+      Config->DecRef ();
     }
   }
 
   Printf (MSG_STDOUT, "General options:\n");
   Printf (MSG_STDOUT, "  -help              this help\n");
-  Printf (MSG_STDOUT, "  -mode <w>x<y>      set resolution (default=%dx%d)\n", FrameWidth, FrameHeight);
-  Printf (MSG_STDOUT, "  -depth <d>         set depth (default=%d bpp)\n", Depth);
-  Printf (MSG_STDOUT, "  -driver <s>        the 3D driver (opengl, glide, software, ...)\n");
+  Printf (MSG_STDOUT, "  -mode=<w>x<y>      set resolution (default=%dx%d)\n", FrameWidth, FrameHeight);
+  Printf (MSG_STDOUT, "  -depth=<d>         set depth (default=%d bpp)\n", Depth);
+  Printf (MSG_STDOUT, "  -video=<s>         the 3D driver (opengl, glide, software, ...)\n");
+  Printf (MSG_STDOUT, "  -plugin=<s>        load the plugin after all others\n");
 }
 
 void csSystemDriver::SetMode (const char* mode)
@@ -667,6 +559,59 @@ void csSystemDriver::debug_out (bool flush, const char *str)
   }
 }
 
+void csSystemDriver::QueryOptions (iPlugIn *iObject)
+{
+  iConfig *Config = QUERY_INTERFACE (iObject, iConfig);
+  if (Config)
+  {
+    int on = OptionList.Length (), num = Config->GetOptionCount ();
+    for (int i = 0 ; i < num ; i++)
+    {
+      csOptionDescription option;
+      Config->GetOptionDescription (i, &option);
+      OptionList.Push (new csPluginOption (option.name, option.type, option.id,
+        (option.type == CSVAR_BOOL) || (option.type == CSVAR_CMD), Config));
+      if (option.type == CSVAR_BOOL)
+      {
+        char buf[100];
+        strcpy (buf, "no");
+        strcpy (buf + 2, option.name);
+        OptionList.Push (new csPluginOption (buf, option.type, option.id,
+          false, Config));
+      }
+    } /* endfor */
+
+    // Parse the command line for plugin options and pass them to plugin
+    for (; on < OptionList.Length (); on++)
+    {
+      csPluginOption *pio = (csPluginOption *)OptionList.Get (on);
+      const char *val;
+      if ((val = GetOptionCL (pio->Name)))
+      {
+        csVariant optval;
+        optval.type = pio->Type;
+        switch (pio->Type)
+        {
+          case CSVAR_BOOL:
+          case CSVAR_CMD:
+            optval.v.b = pio->Value;
+            break;
+          case CSVAR_LONG:
+            if (!val) continue;
+            optval.v.l = atol (val);
+            break;
+          case CSVAR_FLOAT:
+            if (!val) continue;
+            optval.v.f = atof (val);
+            break;
+        }
+        pio->Config->SetOption (pio->ID, &optval);
+      }
+    }
+    Config->DecRef ();
+  }
+}
+
 //--------------------------------- iSystem interface for csSystemDriver -----//
 
 void csSystemDriver::GetSettings (int &oWidth, int &oHeight, int &oDepth,
@@ -735,7 +680,10 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iInterface,
       else
         ret = p;
       if (ret)
+      {
+        QueryOptions (p);
         return p;
+      }
     }
     Printf (MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);
     PlugIns.Delete (PlugIns.Length () - 1);
@@ -899,4 +847,29 @@ void csSystemDriver::GetMousePosition (int &x, int &y)
 {
   x = Mouse->GetLastX ();
   y = Mouse->GetLastY ();
+}
+
+const char *csSystemDriver::GetOptionCL (const char *iName, int iIndex)
+{
+  int idx = CommandLine.FindKey (iName);
+  if (idx >= 0)
+  {
+    while (iIndex)
+    {
+      idx++; 
+      if (idx >= CommandLine.Length ())
+        return NULL;
+      if (CommandLine.CompareKey (CommandLine.Get (idx), iName, 0) == 0)
+        iIndex--;
+    }
+    return ((csCommandLineOption *)CommandLine.Get (idx))->Value;
+  }
+  return NULL;
+}
+
+const char *csSystemDriver::GetNameCL (int iIndex)
+{
+  if ((iIndex >= 0) && (iIndex < CommandLineNames.Length ()))
+    return (const char *)CommandLineNames.Get (iIndex);
+  return NULL;
 }

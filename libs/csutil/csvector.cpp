@@ -79,6 +79,19 @@ bool csVector::Delete (int n)
     return false;
 }
 
+bool csVector::Replace (int n, csSome what)
+{
+  if (n < count)
+  {
+    if (!FreeItem (root [n]))
+      return false;
+    root [n] = what;
+    return true;
+  }
+  else
+    return false;
+}
+
 bool csVector::Insert (int n, csSome Item)
 {
   if (n <= count)

@@ -54,7 +54,7 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   if (!UnixSystem)
   {
     CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the IUnixSystemDriver interface\n");
+                               "the iUnixSystemDriver interface\n");
     return false;
   }
 

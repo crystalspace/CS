@@ -34,9 +34,9 @@ struct csVariant
   csVariantType type;
   union value
   {
-    long lVal;
-    bool bVal;
-    float fVal;
+    long l;
+    bool b;
+    float f;
   } v;
 };
 

@@ -51,48 +51,34 @@ void SysSystemDriver::SetSystemDefaults (csIniFile *config)
   WindowWidth = config->GetInt ("VideoDriver", "WINDOWWIDTH", -1);
   WindowHeight = config->GetInt ("VideoDriver", "WINDOWHEIGHT", -1);
   HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", true);
+
+  const char *val;
+  if ((val = GetOptionCL ("winsize")))
+  {
+    int wres, hres;
+    if (sscanf (val, "%d,%d", &wres, &hres) == 2)
+    {
+      WindowWidth = wres;
+      WindowHeight = hres;
+    }
+  }
+
+  if ((val = GetOptionCL ("winpos")))
+  {
+    int xpos, ypos;
+    if (sscanf (val, "%d,%d", &xpos, &ypos) == 2)
+    {
+      WindowX = xpos;
+      WindowY = ypos;
+    }
+  }
 }
 
 void SysSystemDriver::Help ()
 {
   csSystemDriver::Help ();
-  Printf (MSG_STDOUT, "  -winsize <w>,<y>   set window size (default=max fit mode multiple)\n");
-  Printf (MSG_STDOUT, "  -winpos <w>,<y>    set window position in percent of screen (default=center)\n");
-}
-
-bool SysSystemDriver::ParseArg (int argc, char* argv[], int &i)
-{
-  if (stricmp ("-winsize", argv[i]) == 0)
-  {
-    i++;
-    if (i < argc)
-    {
-      int wres, hres;
-
-      if (sscanf (argv[i], "%d,%d", &wres, &hres) == 2)
-      {
-        WindowWidth = wres;
-        WindowHeight = hres;
-      }
-    }
-  }
-  else if (stricmp ("-winpos", argv[i]) == 0)
-  {
-    i++;
-    if (i < argc)
-    {
-      int xpos, ypos;
-
-      if (sscanf (argv[i], "%d,%d", &xpos, &ypos) == 2)
-      {
-        WindowX = xpos;
-        WindowY = ypos;
-      }
-    }
-  }
-  else
-    return csSystemDriver::ParseArg (argc, argv, i);
-  return true;
+  Printf (MSG_STDOUT, "  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
+  Printf (MSG_STDOUT, "  -winsize=<w>,<h>   set window size (default=max fit mode multiple)\n");
 }
 
 void SysSystemDriver::Loop ()

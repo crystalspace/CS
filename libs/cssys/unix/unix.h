@@ -49,8 +49,6 @@ public:
   virtual void SetSystemDefaults (csIniFile *config);
   // Main event loop
   virtual void Loop ();
-  // Parse an unknown argument on command-line
-  virtual bool ParseArg (int argc, char* argv [], int& i);
   // Display system-specific help
   virtual void Help ();
   // Sleep for given number of 1/1000 seconds
@@ -59,7 +57,7 @@ public:
   /// Implementation of iUnixSystemDriver
 
   /// Get user settings
-  virtual void GetExtSettings (int &SimDepth, bool &UseSHM, bool &HardwareCursor);
+  virtual void GetExtSettings (int &oSimDepth, bool &oUseSHM, bool &oHardwareCursor);
   /// Set a callback that gets called from inside the main event loop
   virtual void SetLoopCallback (LoopCallback Callback, void *Param);
 };

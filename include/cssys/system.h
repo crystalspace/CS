@@ -22,6 +22,8 @@
 #include <stdio.h>
 
 #include "csutil/scf.h"
+#include "csutil/util.h"
+#include "csutil/csstrvec.h"
 #include "csutil/csobjvec.h"
 #include "iconfig.h"
 #include "isystem.h"
@@ -39,34 +41,6 @@ scfInterface iNetworkDriver;
 scfInterface iNetworkManager;
 scfInterface iSoundRender;
 scfInterface iConfig;
-
-/// Class to collect all options for all plug-in modules in the system.
-class csColOption
-{
-public:
-  csColOption* next;
-  csVariantType type;
-  int id;
-  char* option_name;
-  bool option_value;	// If type is CSVAR_BOOL
-  iConfig* config;
-
-  csColOption (csColOption* next, csVariantType type, int id, char* option_name, bool option_value, iConfig* config)
-  {
-    csColOption::next = next;
-    csColOption::type = type;
-    csColOption::id = id;
-    CHK (csColOption::option_name = new char [strlen (option_name)+1]);
-    strcpy (csColOption::option_name, option_name);
-    csColOption::option_value = option_value;
-    csColOption::config = config;
-  }
-  ~csColOption ()
-  {
-    CHK (delete next);
-    CHK (delete [] option_name);
-  }
-};
 
 /**
  * This is the interface to operating system.<p>
@@ -111,6 +85,55 @@ class csSystemDriver : public iSystem
     // Compare a vector element against a iPlugIn pointer
     virtual int CompareKey (csSome Item, csConstSome Key, int) const
     { return ((csPlugIn *)Item)->PlugIn == Key ? 0 : -1; }
+  };
+
+  /// Class to collect all options for all plug-in modules in the system.
+  class csPluginOption : public csBase
+  {
+  public:
+    char *Name;
+    csVariantType Type;
+    int ID;
+    bool Value;				// If Type is CSVAR_BOOL
+    iConfig *Config;
+
+    csPluginOption (char *iName, csVariantType iType, int iID, bool iValue, iConfig* iConfig)
+    {
+      Name = strnew (iName);
+      Type = iType;
+      ID = iID;
+      Value = iValue;
+      (Config = iConfig)->IncRef ();
+    }
+    virtual ~csPluginOption ()
+    {
+      Config->DecRef ();
+      CHK (delete [] Name);
+    }
+  };
+
+  struct csCommandLineOption
+  {
+    /// Option name
+    char *Name;
+    /// Option value
+    char *Value;
+    /// Name and Value should be in same array (optimization)
+    csCommandLineOption (char *iName, char *iValue)
+    { Name = iName; Value = iValue; }
+    /// Destructor: assume that "delete [] Name" will remove also Value
+    ~csCommandLineOption ()
+    { CHK (delete [] Name); }
+  };
+
+  class csCommandLineOptions : public csVector
+  {
+  public:
+    csCommandLineOptions (int iLength, int iDelta) : csVector (iLength, iDelta) {}
+    virtual bool FreeItem (csSome Item)
+    { CHK (delete (csCommandLineOption *)Item); return true; }
+    virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+    { return strcmp (((csCommandLineOption *)Item)->Name, (char *)Key); }
   };
 
 public:
@@ -159,7 +182,11 @@ public:
   /// true if CrystalSpace visual is active (focused)
   bool IsFocused;
   /// List of all options for all plug-in modules.
-  csColOption* OptionList;
+  csObjVector OptionList;
+  /// The collection of all options specified on command line
+  csCommandLineOptions CommandLine;
+  /// The list of raw filenames on the command line (i.e. without any switches)
+  csStrVector CommandLineNames;
   /// System configuration file name
   char *ConfigName;
 
@@ -170,6 +197,12 @@ public:
 
   /// This is usually called right after object creation.
   virtual bool Initialize (int argc, char *argv[], const char *iConfigName);
+
+  /// Collect all options from command line
+  virtual void CollectOptions (int argc, char *argv[]);
+
+  /// Query all options supported by given plugin and place into OptionList
+  void QueryOptions (iPlugIn *iObject);
 
   /// Check if all required drivers are loaded
   virtual bool CheckDrivers ();
@@ -217,24 +250,18 @@ public:
    * This routine can also make use of the config file to get
    * the defaults from there (so instead of having to specify
    * -mode 640x480 everytime you can set this in the config file
-   * and this routine should read that).
+   * and this routine should read that).<p>
+   * The routine can use GetOptionCL method as well to override
+   * values that can be overrided from command line.<p>
+   * System driver should implement only those options that are
+   * common for absolutely all drivers of one kind. For example,
+   * if your system does not support running in full screen, the
+   * system driver can take care of the -windowpos <x>,<y> switch.
+   * If at least for one driver this option is not applicable, you 
+   * should implement the option inside each driver (call GetOptionCL
+   * from plugin's Initialize() method).
    */
   virtual void SetSystemDefaults (csIniFile *config);
-
-  /**
-   * This is a system-independent function used to parse a
-   * commandline. It will iterate all command-line arguments
-   * through system-dependent ParsArg() method.
-   */
-  bool ParseCmdLine (int argc, char* argv[]);
-
-  /**
-   * This version is supposed to be called first and will
-   * search all driver options on the commandline. This
-   * allows the system to open the drivers first and only then
-   * start parsing the rest of the options.
-   */
-  bool ParseCmdLineDriver (int argc, char* argv[]);
 
   /**
    * This is a function that prints the commandline help text.
@@ -272,28 +299,9 @@ public:
 
 protected:
   /**
-   * This is a system-dependent function which eats a single
-   * command-line option (like -help, ...). If system-dependent
-   * part does not recognize the option, it should pass it to
-   * its parent class method. Return false if error detected.
-   */
-  virtual bool ParseArg (int argc, char* argv[], int& i);
-
-  /**
-   * This is a system-dependent function which eats a single
-   * command-line option for drivers.
-   */
-  virtual bool ParseArgDriver (int argc, char* argv[], int& i);
-
-  /**
    * Print help for an iConfig interface.
    */
-  void Help (iConfig* piConf);
-
-  /**
-   * Collect all options for a iConfig interface.
-   */
-  void CollectOptions (iConfig* config, csColOption* already_collected);
+  void Help (iConfig* Config);
 
   /**
    * Show an alert. This function is called by CsPrintf and
@@ -377,6 +385,10 @@ public:
   virtual bool GetMouseButton (int button);
   /// Query current (last known) mouse position
   virtual void GetMousePosition (int &x, int &y);
+  /// Query a specific commandline option (you can query second etc such option)
+  virtual const char *GetOptionCL (const char *iName, int iIndex = 0);
+  /// Query a filename specified on the commandline (that is, without leading '-')
+  virtual const char *GetNameCL (int iIndex = 0);
 };
 
 // Shortcuts for compatibility

@@ -26,7 +26,7 @@ typedef void (*LoopCallback) (void *param);
 SCF_INTERFACE (iUnixSystemDriver, 0, 0, 1) : public iBase
 {
   /// Get user settings
-  virtual void GetExtSettings (int &SimDepth, bool &UseSHM, bool &HardwareCursor) = 0;
+  virtual void GetExtSettings (int &oSimDepth, bool &oUseSHM, bool &oHardwareCursor) = 0;
   /// Set a callback that gets called from inside the main event loop
   virtual void SetLoopCallback (LoopCallback Callback, void *Param) = 0;
 };
