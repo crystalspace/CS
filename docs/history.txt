@@ -4,6 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 3-Apr-2003
+        - Jonathan Tarbox fixed a bug in csEventQueue with incref/decref
 	- Applied the fix that res did to the TinyXML parser (with CDATA)
 	  also to xmlread.
 	- Added 'xmlread' to 'make walkall'.

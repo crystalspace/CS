@@ -103,6 +103,7 @@ again:
   }
 
   EventQueue [evqHead] = Event;
+  Event->IncRef();
   evqHead = newHead;
   Unlock ();
 }
@@ -210,6 +211,7 @@ void csEventQueue::Process ()
   {
     iEvent& e = *ev;
     Dispatch (e);
+    ev->DecRef();
   }
 
   notification.Command.Code = cscmdProcess;
