@@ -466,9 +466,10 @@ void SysSystemDriver::Loop ()
     else
     {
       static long prev_time = -1;
-      long elapsed = (prev_time == -1) ? 0 : Time () - prev_time;
-      prev_time = Time ();
-      NextFrame (elapsed, Time ());
+      long now     = Time ();
+      long elapsed = (prev_time == -1) ? 0 : now - prev_time;
+      prev_time = now;
+      NextFrame (elapsed, now);
     }
   }
 }
