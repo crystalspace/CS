@@ -113,6 +113,30 @@ The history order is reversed so that new features are at the top.
 	  makefiles (*.mak) in the CVS repository, you will need to manually
 	  refresh the makefile cache by invoking "make recache" after updating
 	  from CVS.
+	- Eric Sunshine fixed the new makefile caching facility so that it
+	  works correctly with the DOS `echo' command which had trouble with
+	  the emitted backslashes and which also printed its own status
+	  information ("ECHO is on") instead of merely emitting a blank line as
+	  desired.
+	- Philip Wyett attempted to fix a problem where the automated MSVC
+	  generation procedure was not interacting well with the new makefile
+	  caching facility.
+	- Eric Sunshine made the following changes to the project:
+	    - Fixed a problem where the MSVC generation mechanism was not
+	      properly interacting with the new makefile caching facility.  The
+	      problem was that the `msvcgen' makefile target temporarily
+	      augments the PLUGINS variable on-the-fly, but the makefile
+	      caching facility knew nothing about this augmentation, thus it
+	      assumed that the cache was up-to-date.
+	    - Reverted Philip's change to jobber.pl in which he attempted to
+	      fix this same problem.  Unfortunately, Philip's change attempted
+	      only to address the problem for the automated MSVC generation
+	      phase, but did nothing to fix it for manual runs invoked via the
+	      `msvcgen' makefile target.  The correct fix which Eric applied
+	      handles all such cases.  (Also, although Philip altered the
+	      jobber.pl script in the CVS repository, he neglected to update
+	      the actual live script on the SourceForge shell machine which
+	      gets invoked by `cron'.)
 26-Aug-2001
 	- Removed G3DVertex class since this is equivalent to using
 	  csVector2 instead.
