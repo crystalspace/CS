@@ -396,7 +396,7 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   mesh->object2camera = tr_o2c;
   mesh->indexstart = 0;
   mesh->indexend = vertnum;
-  mesh->dynDomain = dynDomain;
+  mesh->dynDomain = (iShaderVariableContext*)dynDomain; // Cast for gcc 2.95.x.
   if (point_sprites)
     mesh->meshtype = CS_MESHTYPE_POINT_SPRITES;
   else
