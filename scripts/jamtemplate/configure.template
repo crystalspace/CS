@@ -95,6 +95,6 @@ AC_OUTPUT
                                                                                 
 AC_MSG_NOTICE([
                                                                                 
-Please note that this project uses Jam as it build tool,
+Please note that this project uses Jam as its build tool,
 therefore you must type 'jam' to build the project.
 ])
