@@ -125,6 +125,7 @@ void funConsole::Draw3D (csRect *)
   poly.vertices[2].sy = height-size.ymax;
   poly.vertices[3].sx = size.xmin;
   poly.vertices[3].sy = height-size.ymax;
+  poly.use_fog = false;
 
   float u_stretch=1.0, v_stretch=1.0;
 
@@ -155,7 +156,6 @@ void funConsole::Draw3D (csRect *)
   }
 
   poly.txt_handle = deco.bgnd.txt;
-
   if (with_color)
     G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, false);
   
@@ -232,6 +232,7 @@ void funConsole::DrawBorder ( int x, int y, int width, int height, ConDecoBorder
     }
 
     poly.num=4;
+    poly.use_fog = false;
     poly.vertices[0].u = 0;
     poly.vertices[0].v = 0;
     poly.vertices[1].u = u_stretch;
@@ -254,6 +255,9 @@ void funConsole::DrawBorder ( int x, int y, int width, int height, ConDecoBorder
       poly.vertices[i].sx -= border.offx;
       poly.vertices[i].sy += border.offy;
       poly.vertices[i].z=1;
+      poly.vertices[i].r=1;
+      poly.vertices[i].g=1;
+      poly.vertices[i].b=1;
     }
 
     poly.txt_handle = border.txt;
@@ -389,10 +393,10 @@ void funConsole::PrepPix( csIniFile *ini, const char *sect, ConDecoBorder &borde
     border.alpha = ini->GetFloat( sect, "alpha", 0.0 );
   }
   
-  if (bgnd && !border.txt){
+  if (bgnd){
     int r,g,b;
     border.do_keycolor = ini->GetYesNo( sect, "do_keycolor", false );
-    const char *kc = ini->GetStr( sect, "keycolor", "0,0,0" );
+    const char *kc = ini->GetStr( sect, "keycolor", "1,1,1" );
     sscanf( kc, "%d,%d,%d", &r, &g, &b );
     border.kr=r; border.kg=g; border.kb=b;
   }
