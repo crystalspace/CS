@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- chunkldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.terrain</name>
+        <implementation>csTerrainFactoryLoader</implementation>
+        <description>Crystal Space Terrain Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.terrain</name>
+        <implementation>csTerrainObjectLoader</implementation>
+        <description>Crystal Space Terrain Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.terrain</name>
+        <implementation>csTerrainFactorySaver</implementation>
+        <description>Crystal Space Terrain Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.terrain</name>
+        <implementation>csTerrainObjectSaver</implementation>
+        <description>Crystal Space Terrain Mesh Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
