@@ -189,6 +189,9 @@ protected:
                 
     /// Redraws all children recursively, but only if they have an part in dirty area
     void RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea);
+
+    /// Recursively broadcasts events to children, but only if they deserve it.
+    bool RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &event);
     
     /// Recursively creates child components and adds them into a parent.  Used internally.
     void CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponentNode *settings);

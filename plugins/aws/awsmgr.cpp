@@ -516,6 +516,7 @@ awsManager::ReleaseMouse()
 bool 
 awsManager::HandleEvent(iEvent& Event)
 {
+  
   // Find out what kind of event it is
   switch(Event.Type)
   {
@@ -529,12 +530,20 @@ awsManager::HandleEvent(iEvent& Event)
     {
       // If the mouse is locked into the top window, keep it there
       if (mouse_captured) 
-        return GetTopWindow()->HandleEvent(Event);
-      
+      {
+        if (GetTopWindow()->HandleEvent(Event)) return true;
+        else return RecursiveBroadcastToChildren(GetTopWindow(), Event);
 
+        break;
+      }
+      
       // If the top window still contains the mouse, it stays on top
       if (GetTopWindow()->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
-        return GetTopWindow()->HandleEvent(Event);
+      {
+        if (GetTopWindow()->HandleEvent(Event)) return true;
+        else return RecursiveBroadcastToChildren(GetTopWindow(), Event);
+        break;
+      }
       
       else
       {
@@ -551,7 +560,9 @@ awsManager::HandleEvent(iEvent& Event)
           if (win->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
           {
             win->Raise();
-            return win->HandleEvent(Event);
+            if (win->HandleEvent(Event)) return true;
+            else return RecursiveBroadcastToChildren(win, Event);
+            break;
           }
           else
             win = win->WindowBelow();
@@ -562,12 +573,61 @@ awsManager::HandleEvent(iEvent& Event)
   break;
 
   case csevKeyDown:
-    if (GetTopWindow()) return GetTopWindow()->HandleEvent(Event);
+    if (GetTopWindow()) 
+    {
+      if (GetTopWindow()->HandleEvent(Event)) return true;
+      else return RecursiveBroadcastToChildren(GetTopWindow(), Event);
+    }
+
   break;
   }
-  
+    
   return false;
 }
+
+bool 
+awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
+{
+
+  awsComponent *child = cmp->GetFirstChild();
+
+  while (child) 
+   {
+   
+    switch(Event.Type)
+    {
+      case csevMouseMove:
+      case csevMouseUp:
+      case csevMouseDown:
+      case csevMouseClick:
+
+        // Only give to child if it contains the mouse.
+        if (child->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
+          if (child->HandleEvent(Event)) return true;
+        
+      break;
+
+
+      case csevKeyDown:
+        
+        if (child->HandleEvent(Event)) return true;
+      
+      break;
+    }  // End switch
+
+    // If it has children, broadcast to them
+    if (child->HasChildren()) 
+      if (RecursiveBroadcastToChildren(child, Event))
+        return true;
+       
+    child = cmp->GetNextChild();
+
+    } // End while
+
+  return false;
+
+}
+    
 
 //// Canvas stuff  //////////////////////////////////////////////////////////////////////////////////
 
