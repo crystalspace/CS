@@ -21,7 +21,7 @@ Short-term cleanups that need to be done:
 	  to creating a link to the most recent package.  (This feature was
 	  requested by a user.)
 	- Fixed bug in the destructor of csPolygon3D. After freeing some
-	  of the internal resources functions were called that still depended
+	  of the internal resources functions were called that still dependent
 	  on those resources. Solved this by setting the pointer to the
 	  resources to NULL so that those functions can detect that case.
 	  This fixes the bug when CS is exited while a dynamic light
@@ -31,6 +31,14 @@ Short-term cleanups that need to be done:
 	- Also moved quadtree.cpp from csgeom to csengine/culler.
 	- Created new csengine/polytree and moved BSP and octree stuff
 	  from csgeom to csengine.
+	- Thomas Hieber did some changes to Map2CS. Polygons are
+	  only added to sector walls that are part of 'worldspawn'.
+	  Some other additional fixes and changes.
+	- Thomas also added documentation for map2cs.
+	- Thomas also fixed a crash on exit related to the console.
+	- Michael Ewert did some changes to csphyzik. He added body_a
+	  and a 'work in progress' class.
+	  Also added get_I_inv and get_angular_P.
 7-Jan-2000
 	- Fixed colored static lighting for OpenGL and Direct3D.
 	- Some fixes on lightmap deallocation. Now use DecRef()
@@ -43,6 +51,10 @@ Short-term cleanups that need to be done:
 	  will continue to work as before.
 	- Eric Sunshine fixed several minor problems which cropped up with
 	  the introduction of the new iConsole and cscon.
+	- Robert Bate updated the Macintosh project.
+	- Norman Kramer updated documentation for the new world file
+	  features he added (TEX_SET, TEX_SET_SELECT).
+	- Small fix to new console from Seth Galbraith.
 6-Jan-2000
 	- Thomas Hieber added iterators for nodes and keys.
 	  Added simplified access to keys and node by name and classname.
