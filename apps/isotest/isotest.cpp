@@ -210,7 +210,7 @@ bool IsoTest::LoadMap ()
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
 
   iLightList* ll = room->GetLights ();
-  actor_light = engine->CreateLight (0, csVector3 (-3, 5, 0), 50,
+  actor_light = engine->CreateLight (0, csVector3 (-3, 5, 0), 5,
     csColor (1, 1, 1));
   ll->Add (actor_light);
 
