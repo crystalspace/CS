@@ -841,6 +841,46 @@ const csString& operator = (TYPE s) { return Replace (s); }
   bool operator == (const char* Str) const
   { return Compare (Str); }
   /**
+   * Check if another string is less than this one.
+   * \param Str Other string.
+   * \return True if the string is 'lesser' than \a Str, false
+   *   otherwise.
+   */
+  bool operator < (const csString& Str) const
+  {
+    return strcmp (GetDataSafe (), Str.GetDataSafe ()) < 0;
+  }
+  /**
+   * Check if another string is less than this one.
+   * \param Str Other string.
+   * \return True if the string is 'lesser' than \a Str, false
+   *   otherwise.
+   */
+  bool operator < (const char* Str) const
+  {
+    return strcmp (GetDataSafe (), Str) < 0;
+  }
+  /**
+   * Check to see if a string is greater than this one.
+   * \param Str Other string.
+   * \return True if the string is 'greater' than \a Str, false
+   *   otherwise.
+   */
+  bool operator > (const csString& Str) const
+  {
+    return strcmp (GetDataSafe (), Str.GetDataSafe ()) > 0;
+  }
+  /**
+   * Check to see if a string is greater than this one.
+   * \param Str Other string.
+   * \return True if the string is 'greater' than \a Str, false
+   *   otherwise.
+   */
+  bool operator > (const char* Str) const
+  {
+    return strcmp (GetDataSafe (), Str) > 0;
+  }
+  /**
    * Check if another string is not equal to this one.
    * \param Str Other string.
    * \return False if they are equal; true if not.
