@@ -62,6 +62,11 @@
  * <panos@alumni.cs.colorado.edu> for xinetd.
  */
 
+// This MUST go before the ctype includes!
+#ifdef WIN32
+#define _CTYPE_DISABLE_MACROS
+#endif
+
 #include <stdio.h>
 #include "csutil/csctype.h"
 #ifndef NETWARE
@@ -73,8 +78,6 @@
 #include <math.h>
 #ifdef WIN32
 #include <float.h>
-  int __mb_cur_max;
-  unsigned short* _pctype;
 #endif
 
 typedef enum {
