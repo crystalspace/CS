@@ -23,6 +23,7 @@
 #include "csextern.h"
 
 #include "ivideo/shader/shader.h"
+#include "ivideo/shader/shader.h"
 #include "shadervar.h"
 
 /**\file
@@ -33,6 +34,8 @@ class CS_CSGFX_EXPORT csShaderVariableContext : public iShaderVariableContext
 {
   csRefArray<csShaderVariable> variables;
 public:
+  CS_LEAKGUARD_DECLARE (csShaderVariableContext);
+  
   SCF_DECLARE_IBASE;
 
   csShaderVariableContext ();

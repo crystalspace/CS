@@ -23,6 +23,7 @@
 #include "csgfx/rgbpixel.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
+#include "csutil/leakguard.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
 
@@ -83,6 +84,8 @@ private:
   csShaderVariableContext svcontext;
 
 public:
+  CS_LEAKGUARD_DECLARE (csMaterial);
+
   /**
    * @@@ Slight hack: when the engine creates a material, it implicitly sets
    * the "OR compatibility" shader. When later a shader is set and 
@@ -259,6 +262,8 @@ private:
   virtual ~csMaterialWrapper ();
 
 public:
+  CS_LEAKGUARD_DECLARE (csMaterialWrapper);
+
   /// Construct a material handle given a material.
   csMaterialWrapper (iMaterial* Image);
   /// Construct a csMaterialWrapper from a pre-registered material handle.

@@ -20,6 +20,8 @@
 #include "cssysdef.h"
 #include "csgfx/shadervarcontext.h"
 
+CS_LEAKGUARD_IMPLEMENT (csShaderVariableContext)
+
 SCF_IMPLEMENT_IBASE(csShaderVariableContext)
   SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
 SCF_IMPLEMENT_IBASE_END
