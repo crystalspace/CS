@@ -403,8 +403,6 @@ void csThing::CalculateNormals()
   int polyCount = polygons.Length();
   int i, j, k;
   int* vertIndices;
-  int* quantify;
- 
 
   obj_normals = new csVector3[num_vertices];
 	csVector3** normals = new csVector3*[num_vertices];
