@@ -24,6 +24,7 @@
 
 const char *kWhiteSpace = " \t\n\r";
 static char last_offender[255];
+int parser_line;
 
 char* csGetLastOffender ()
 {
@@ -38,6 +39,7 @@ long csGetObject (char **buf, csTokenDesc * tokens, char **name, char **data)
   while (**buf == ';')
   {
     *buf = strchr (*buf, '\n');
+    parser_line++;
     SkipCharacters (buf, kWhiteSpace);
   }
 
@@ -92,6 +94,7 @@ void SkipCharacters (char **buf, const char *toSkip)
   char ch;
   while ((ch = **buf) != 0)
   {
+    if (ch == '\n') parser_line++;
     if (strchr (toSkip, ch) == NULL)
       return;
     ++*buf;                     // skip this character

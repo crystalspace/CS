@@ -92,6 +92,7 @@ typedef struct
 
 /// A string containing white spaces (' ', '\t', '\n', '\r')
 extern const char *kWhiteSpace;
+extern int parser_line;
 
 #define PARSERR_EOF -2
 #define PARSERR_TOKENNOTFOUND -1
