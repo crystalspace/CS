@@ -65,7 +65,7 @@ public:
   // write a block of data
   virtual size_t Write (const char *Data, size_t DataSize);
   // check for EOF
-  virtual bool AtEOF ();
+  virtual bool EOF ();
   /// Query current file pointer
   virtual size_t GetPos ();
   /// Clear file error after queriyng status
@@ -103,7 +103,7 @@ public:
   // write a block of data
   virtual size_t Write (const char *Data, size_t DataSize);
   // check for EOF
-  virtual bool AtEOF ();
+  virtual bool EOF ();
   /// Query current file pointer
   virtual size_t GetPos ();
 
@@ -455,7 +455,7 @@ size_t DiskFile::Write (const char *Data, size_t DataSize)
   return rc;
 }
 
-bool DiskFile::AtEOF ()
+bool DiskFile::EOF ()
 {
   return feof (file);
 }
@@ -537,7 +537,7 @@ size_t ArchiveFile::Write (const char *Data, size_t DataSize)
   return DataSize;
 }
 
-bool ArchiveFile::AtEOF ()
+bool ArchiveFile::EOF ()
 {
   if (data)
     return fpos + 1 >= Size;
