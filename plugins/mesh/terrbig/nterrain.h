@@ -310,6 +310,8 @@ public:
 	{ scfParent->SetErrorTolerance (tolerance); }
     virtual bool ConvertImageToMapFile (iFile *input, iImageIO *imageio, const char *hm)
     { return scfParent->ConvertImageToMapFile (input, imageio, hm); }
+    virtual bool ConvertArrayToMapFile (float *data, int width, const char *hm)
+    { return scfParent->ConvertArrayToMapFile (data, width, hm); }
     virtual void SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
     { scfParent->SetMaterialsList(matlist, nMaterials); }
   } scfiTerrBigState;
@@ -369,6 +371,7 @@ public:
   virtual void SetScaleFactor (const csVector3 &scale);
   virtual void SetErrorTolerance (float tolerance);
   virtual bool ConvertImageToMapFile (iFile *input, iImageIO *imageio, const char *hm);
+  virtual bool ConvertArrayToMapFile (float *data, int width, const char *hm);
   virtual void ComputeLod (nBlock *heightmap, int i, int j, int di, int dj, int n, int width);
 
   /// Returns a pointer to the factory that made this.

@@ -622,6 +622,84 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   return true;
 }
 
+bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *hm)
+{
+  if (w != ((1 << csLog2 (w)) + 1)) {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	"crystalspace.mesh.object.terrbig",
+	"Unable to process image, must square and width 2^n+1");
+    return false;
+  }
+  FILE *hmfp = fopen (hm, "wb");
+  if (!hmfp) {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
+	"crystalspace.mesh.object.terrbig", 
+	"Unable to open %s for writing\n", hm);
+    return false;
+  }
+  int size = w * w;
+
+  nBlock *heightmap = new nBlock[size];
+
+  for (int i = 0; i < size; i ++) {
+    heightmap[i].pos.x = (i % w - w/2) * scale.x;
+    heightmap[i].pos.y = data[i] * scale.y;
+    heightmap[i].pos.z = (w/2 - i/w) * scale.z;
+    heightmap[i].error = 0.0;
+    heightmap[i].radius = 0.0;
+  }
+
+  for  (int k = 0; k < size; k ++) {
+    csVector3 up = (k-w < 0) ? 
+	  csVector3(0,0,0) : heightmap[k-w].pos - heightmap[k].pos;
+    csVector3 dn = (k+w >= size) ?  
+	  csVector3 (0,0,0) : heightmap[k+w].pos - heightmap[k].pos;
+    csVector3 lt = (k%w - (k-1)%w != 1) ? 
+	  csVector3 (0,0,0) : heightmap[k-1].pos - heightmap[k].pos;
+    csVector3 rt = ((k+1)%w - k%w != 1) ? 
+	  csVector3 (0,0,0) : heightmap[k+1].pos - heightmap[k].pos;
+
+    heightmap[k].norm = (up + dn + lt + rt) / 4.0;
+    heightmap[k].norm.Normalize ();
+  }
+
+  int a, b, c, s, i, j;
+  for (a = c = 1, b = 2, s = 0; a != w-1; a = c = b, b *= 2, s = w) {
+    for (j = a; j < w-1; j += b) {
+	  for (i = 0; i < w; i += b) {
+	    ComputeLod (heightmap, i, j, 0, a, s, w);
+	    ComputeLod (heightmap, j, i, a, 0, s, w);
+	  }
+	}
+
+    for (j = a; j < w-1; c = -c, j += b) {
+	  for (i = a; i < w-1; c = -c, i += b) {
+	    ComputeLod (heightmap, i, j, a, c, w, w);
+	  }
+	}
+  }
+
+  heightmap[(w-1)*w].error = 0.0;
+  heightmap[(w-1)*w].radius = w;
+  heightmap[w-1+(w-1)*w].error = 0.0;
+  heightmap[w-1+(w-1)*w].radius = w;
+  heightmap[w-1].error = 0.0;
+  heightmap[w-1].radius = w;
+  heightmap[0].error = 0.0;
+  heightmap[0].radius = w;
+
+  if (!terrain) {
+    terrain = new nTerrain;
+  }
+  terrain->BuildTree (hmfp, heightmap, w);
+  delete [] heightmap;
+  fclose (hmfp);
+
+  terrain->SetHeightMapFile (hm);
+  InitMesh (info);
+  return true;
+}
+
 void csBigTerrainObject::ComputeLod (nBlock *heightmap, int i, int j, int di, int dj, int n, int width)
 {
   nBlock *b = &heightmap[i + j * width];
