@@ -65,6 +65,19 @@ The history order has been reversed so that new features are at the top.
 	  plug-in which were reported by George Yohng <cspace@mmts.nsys.by>,
 	  though the bulk of them had already been fixed by Eric even before
 	  receiving the problem report.
+	- Eric Sunshine made a pass through the makefiles for all plug-in
+	  modules to ensure that every plug-in defines an SCL_* flag and
+	  defines the correct parameters for use with static linking.
+	- Eric Sunshine made a pass through the makefiles for all applications
+	  to ensure that each one which uses plug-in modules also links with
+	  static.cpp.
+	- Eric Sunshine added a lot of missing entries to static.cpp.  All
+	  plug-in modules which can be built with the CS makefile system now
+	  have entries in static.cpp.  Also fixed several incorrect or out-of-
+	  date entries.
+	- Eric Sunshine fixed the 'clean' target in all application and
+	  plug-in makefiles.  He also fixed several other errors and problems
+	  found throughout the makefile system.
 19-Jun-2000
 	- Martin Geisse fixed a number of compiler warnings all over
 	  the place.
