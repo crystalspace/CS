@@ -68,7 +68,7 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	break;
       case CSKEY_BACKSPACE:
 	{
-	  int cx, cy, diff;
+	  int cx, cy, diff = 0;
 	  line = buffer->WriteLine();
 	  /* Backspace will only handle deleting last character if it can't
 	   * retrieve the cursor position from the console!!! */
