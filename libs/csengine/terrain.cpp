@@ -181,21 +181,21 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
       if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) goto not_vis;
       poly.num = rescount;
 
-      poly.vertices[0].z = pz[0];
+      poly.vertices[0].z = 1.0/pz[0];
       poly.vertices[0].u = 0;
       poly.vertices[0].v = 0;
       poly.vertices[0].r = 1;
       poly.vertices[0].g = 1;
       poly.vertices[0].b = 1;
 
-      poly.vertices[1].z = pz[1];
+      poly.vertices[1].z = 1.0/pz[1];
       poly.vertices[1].u = 1;
       poly.vertices[1].v = 0;
       poly.vertices[1].r = 1;
       poly.vertices[1].g = 0;
       poly.vertices[1].b = 0;
 
-      poly.vertices[2].z = pz[2];
+      poly.vertices[2].z = 1.0/pz[2];
       poly.vertices[2].u = 0;
       poly.vertices[2].v = 1;
       poly.vertices[2].r = 0;
