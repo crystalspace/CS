@@ -557,7 +557,7 @@ static bool CheckRow(int plane_start, int start_nr, int w,
     /// if bytepos>0, check using lead_check[bytepos]
     //// These values depend of CS_QUAD_FULL==3
     const int lead_check[4] = {0xFF, 0x3F, 0x0F, 0x03};
-    if( states[offset]&lead_check[bytepos] != lead_check[bytepos] )
+    if( (states[offset] & lead_check[bytepos]) != lead_check[bytepos] )
       return false;
     w -= 4-bytepos; // checked this many nodes.
     // update values to get correct start position.
@@ -577,7 +577,7 @@ static bool CheckRow(int plane_start, int start_nr, int w,
   const int trail_check[5] = {0x00, 0xC0, 0xF0, 0xFC, 0xFF};
   int trail_amt = w%4;
   if(trail_amt != 0) // have to check, prevents array overflow
-    if( states[offset] & trail_check[trail_amt] != trail_check[trail_amt] )
+    if( (states[offset] & trail_check[trail_amt]) != trail_check[trail_amt] )
       return false;
   // passed all tests
   return true;
