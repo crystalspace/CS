@@ -14,6 +14,7 @@ chronological order.
 	  modules in $prefix/lib/crystal, but csGetPluginPaths() was never
 	  referencing that location, so SCF would not find those installed
 	  plugins.
+	- res fixed csdemo after the csSpline constness changes.
 17-Jun-2004
 	- Jorrit changed g3d->ClosePortal() to also have a new use_zfill_portal
 	  flag. When this flag is set the renderer will zfill the portal area.

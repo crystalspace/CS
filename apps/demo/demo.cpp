@@ -990,7 +990,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	    {
 	      int i, num = np->GetPointCount ();
 	      FileWrite (fp, "    NUM (%d)\n", num);
-	      float* t = np->GetTimeValues ();
+	      const float* t = np->GetTimeValues ();
 	      FileWrite (fp, "    TIMES (%g", t[0]);
 	      for (i = 1 ; i < num ; i++)
 	        FileWrite (fp, ",%g", t[i]);
@@ -1116,7 +1116,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
 	  if (np)
 	  {
 	    int num = np->GetPointCount ();
-	    float* xv, * yv, * zv;
+	    const float* xv, * yv, * zv;
 	    xv = np->GetDimensionValues (0);
 	    yv = np->GetDimensionValues (1);
 	    zv = np->GetDimensionValues (2);

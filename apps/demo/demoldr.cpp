@@ -581,7 +581,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	}
 
 	// Get the path.
-	float* xv, * yv, * zv;
+	const float* xv, * yv, * zv;
 	xv = np->GetDimensionValues (0);
 	yv = np->GetDimensionValues (1);
 	zv = np->GetDimensionValues (2);
@@ -619,7 +619,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	  	"First use NUM, POS in path '%s'!", pName);
 	  exit (0);
 	}
-	float* xv, * yv, * zv;
+	const float* xv, * yv, * zv;
 	xv = np->GetDimensionValues (0);
 	yv = np->GetDimensionValues (1);
 	zv = np->GetDimensionValues (2);

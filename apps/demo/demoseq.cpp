@@ -382,11 +382,11 @@ void DemoSequenceManager::DebugDrawPath (csNamedPath* np, bool hi,
     if (x > 0 && x < dim && y > 0 && y < dim)
       demo->myG2D->DrawPixel (x, y, col);
   }
-  float* px, * py, * pz;
+  const float* px, * py, * pz;
   px = np->GetDimensionValues (0);
   py = np->GetDimensionValues (1);
   pz = np->GetDimensionValues (2);
-  float* fx, * fy, * fz;
+  const float* fx, * fy, * fz;
   fx = np->GetDimensionValues (6);
   fy = np->GetDimensionValues (7);
   fz = np->GetDimensionValues (8);
