@@ -4,6 +4,23 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett added the new cslexan to global build process.
 	  Philip also changed MSVC project file generation process to create
 	  project files with a higher internal VC compiler warning flag.
+	- Added some code to cssysdef.h which will enable a memory debugger
+	  to get more information (file name and line number). Enabling
+	  this requires that operator new (and new[]) are overloaded with
+	  two additional parameters. csutil/memdebug.cpp contains such
+	  operators. The memory debugger can be enabled with
+	  CS_EXTENSIVE_MEMDEBUG. This flag is disabled by default in
+	  optimize mode and enabled in debug mode. If CS_EXTENSIVE_MEMDEBUG
+	  is enabled while the memory debugger is not, the memory debugger
+	  will still provide the needed overloaded operators so you can
+	  leave CS_EXTENSIVE_MEMDEBUG on safely.
+	- Greatly extended the memory debugger. It now keeps track
+	  of much more information and it can also (optionally) keep track
+	  of deleted memory to see if it is later used again. Of course this
+	  slows down CS a huge amount.
+	- Fixed a potential memory overwrite bug in csThing with the cam_verts
+	  array. I think that this might be THE bug I have been hunting for
+	  a few days. Thanks to the new memory debugger! :-)
 14-May-2001
 	- Fixed a bug in csShadowBlock, why doesn't a compiler warn on stupid
 	  assignments like 'a=a'? There is a very small chance that this

@@ -116,6 +116,8 @@ private:
   csVector3* wor_verts;
   /// Vertices in camera space.
   csVector3* cam_verts;
+  /// Number of vertices for cam_verts.
+  int num_cam_verts;
   /// Camera number for which the above camera vertices are valid.
   long cameranr;
 

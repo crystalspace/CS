@@ -332,6 +332,27 @@
 #  include <sys/select.h>
 #endif
 
+// The following define should only be enabled if you have defined
+// a special version of overloaded new that accepts two additional
+// parameters: a (void*) pointing to the filename and an int with the
+// line number. This is typically used for memory debugging.
+// In csutil/memdebug.cpp there is a memory debugger which can (optionally)
+// use this feature. Note that if CS_EXTENSIVE_MEMDEBUG is enabled while
+// the memory debugger is not the memory debugger will still provide the
+// needed overloaded operators so you can leave CS_EXTENSIVE_MEMDEBUG on in
+// that case and the only overhead will be a little more arguments to 'new'.
+#ifdef CS_DEBUG
+#  define CS_EXTENSIVE_MEMDEBUG 1
+#else
+#  define CS_EXTENSIVE_MEMDEBUG 0
+#endif
+#if CS_EXTENSIVE_MEMDEBUG
+extern void* operator new (size_t s, void* filename, int line);
+extern void* operator new[] (size_t s, void* filename, int line);
+#define NEW new ((void*)__FILE__, __LINE__)
+#define new NEW
+#endif
+
 #ifdef CS_DEBUG
 #  if !defined (DEBUG_BREAK)
 #    if defined (PROC_X86)

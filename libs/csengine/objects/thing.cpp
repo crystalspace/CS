@@ -114,6 +114,7 @@ csThing::csThing () : csPObject (), polygons (64, 64), curves (16, 16)
   wor_verts = NULL;
   obj_verts = NULL;
   cam_verts = NULL;
+  num_cam_verts = 0;
 
   draw_busy = 0;
   fog.enabled = false;
@@ -219,9 +220,11 @@ void csThing::WorUpdate ()
 
 void csThing::UpdateTransformation (const csTransform& c, long cam_cameranr)
 {
-  if (!cam_verts)
+  if (!cam_verts || num_vertices != num_cam_verts)
   {
+    delete[] cam_verts;
     cam_verts = new csVector3[num_vertices];
+    num_cam_verts = num_vertices;
     cameranr = cam_cameranr-1; // To make sure we will transform.
   }
   if (cameranr != cam_cameranr)
