@@ -23,6 +23,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug with collision detection and HardTransform of a thing
 	  mesh object. This is a new bug introduced with my changes yesterday
 	  and it was visible in the partsys level (when traversing a portal).
+	- Philip Wyett fixed glut detection in Jam configure process.
 	- Wouter Wijngaards fixed a problem with the software sound
 	  renderer, where it would malfunction if multiple sounds caused 
 	  the maximum volume for samples to be exceeded. The results are 

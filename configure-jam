@@ -865,100 +865,80 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-cpu-specific-instructions
                           enable CPU-specific code generation (default YES);
-                          use with caution
- since code for one CPU will not
+                          use with caution since code for one CPU will not
                           work with earlier CPUs (for example,
                           Pentium-specific code will not run on an Intel 486)
   --disable-freetypetest  Do not try to compile and run
                           a test FreeType program
   --enable-linux-joystick enable Linux joystick support (default NO)
-  --enable-optimize       build with optimizations enabled (default YES);
-                          same as --enable-mode=optimize
-  --enable-debug          build with debugging information (default NO);
- same
+  --enable-optimize       build with optimizations enabled (default YES); same
+                          as --enable-mode=optimize
+  --enable-debug          build with debugging information (default NO); same
                           as --enable-mode=debug
-  --enable-profile        build with profiling information (default NO);
- same
+  --enable-profile        build with profiling information (default NO); same
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
-                          `debug', `profile'
- (default OPTIMIZE)
+                          `debug', `profile' (default OPTIMIZE)
   --enable-plugins        create plugin modules instead of static link
                           libraries (default YES)
   --enable-strict-smart-pointers
                           enable strict smart pointers (default YES); when
-                          enabled, csPtr<T>
- returned from functions can only
-                          be assigned to csRef<T>; when
- disabled, csPtr<T>
-                          can also be assigned to T*, but client is then
+                          enabled, csPtr<T> returned from functions can only
+                          be assigned to csRef<T>; when disabled, csPtr<T> can
+                          also be assigned to T*, but client is then
                           responsible for invoking DecRef()
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
-                          common memory
- management mistakes (default NO)
+                          common memory management mistakes (default NO)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-x                use the X Window System
   --with-libXxf86vm=dir   specify location of libXxf86vm if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-mesa             use Mesa OpenGL library if available (default YES)
   --with-libz=dir         specify location of libz if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libpng=dir       specify location of libpng if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libjpeg=dir      specify location of libjpeg if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libmng=dir       specify location of libmng if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libmikmod=dir    specify location of libmikmod if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libogg=dir       specify location of libogg if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libvorbis=dir    specify location of libvorbis if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libvorbisfile=dir
                           specify location of libvorbisfile if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-lib3ds=dir       specify location of lib3ds if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libode=dir       specify location of libode if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-ft-prefix=PREFIX
                           Prefix where FreeType is installed (optional)
   --with-ft-exec-prefix=PREFIX
                           Exec prefix where FreeType is installed (optional)
   --with-libvga=dir       specify location of libvga if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
   --with-libcal3d=dir     specify location of libcal3d if not detected
-                          automatically; searches dir,
- dir/include, and
+                          automatically; searches dir, dir/include, and
                           dir/lib
 
 Some influential environment variables:
@@ -10406,10 +10386,10 @@ else
 fi
 
 
-    # Check for glut.
+    # Check for GLUT.
     if test "" != yes; then
-  echo "$as_me:$LINENO: checking for glut" >&5
-echo $ECHO_N "checking for glut... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for GLUT" >&5
+echo $ECHO_N "checking for GLUT... $ECHO_C" >&6
 if test "${cs_cv_libglut+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -10424,8 +10404,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lglut32 | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+	`echo @@@-lglut32 | sed 'y% %#%'` \
 	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'` \
+	`echo @@@-lGLUT | sed 'y% %#%'` \
 	`echo @@@-lglut | sed 'y% %#%'`
     do
 
@@ -10482,9 +10464,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_gl_plat_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_gl_plat_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_gl_plat_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -10548,9 +10530,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_gl_plat_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_gl_plat_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_gl_plat_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libglut=yes
 		cs_cv_libglut_cflags=$cs_build_cflags
 		cs_cv_libglut_lflags=$cs_build_lflags
@@ -10563,8 +10545,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_libglut" >&5
 echo "${ECHO_T}$cs_cv_libglut" >&6
 else
-  echo "$as_me:$LINENO: checking for glut" >&5
-echo $ECHO_N "checking for glut... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for GLUT" >&5
+echo $ECHO_N "checking for GLUT... $ECHO_C" >&6
 	    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -10576,8 +10558,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lglut32 | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+	`echo @@@-lglut32 | sed 'y% %#%'` \
 	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'` \
+	`echo @@@-lGLUT | sed 'y% %#%'` \
 	`echo @@@-lglut | sed 'y% %#%'`
     do
 
@@ -10634,9 +10618,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_gl_plat_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_gl_plat_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_gl_plat_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -10700,9 +10684,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_gl_plat_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_gl_plat_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_gl_plat_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libglut=yes
 		cs_cv_libglut_cflags=$cs_build_cflags
 		cs_cv_libglut_lflags=$cs_build_lflags
@@ -19256,13 +19240,6 @@ fi
 
 
 
-
-
-
-
-
-
-
 for ac_header in unistd.h \
     sys/types.h \
     sys/socket.h \
@@ -20347,11 +20324,9 @@ if test "${enable_mode+set}" = set; then
   enableval="$enable_mode"
   case $enableval in
 	optimize|debug|profile) cs_build_mode=$enableval ;;
-	*) { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval;
- use
+	*) { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval; use
     \`optimize', \`debug', or \`profile'" >&5
-echo "$as_me: error: unrecognized mode --enable-mode=$enableval;
- use
+echo "$as_me: error: unrecognized mode --enable-mode=$enableval; use
     \`optimize', \`debug', or \`profile'" >&2;}
    { (exit 1); exit 1; }; } ;;
     esac

@@ -1124,15 +1124,17 @@ AS_IF([test $cs_cv_libgl = yes],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglu], [GLU])], [], [],
 	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
 
-    # Check for glut.
-    CS_CHECK_BUILD([for glut], [cs_cv_libglut],
+    # Check for GLUT.
+    CS_CHECK_BUILD([for GLUT], [cs_cv_libglut],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GLUT_PATH],[GL],[glut.h])], [glutSwapBuffers])],
-	[CS_CREATE_TUPLE([],[],[-lglut32]) \
+	[CS_CREATE_TUPLE() \
+	CS_CREATE_TUPLE([],[],[-lglut32]) \
 	CS_CREATE_TUPLE([-DCS_GLUT_PATH=GLUT],[],[-framework GLUT]) \
+	CS_CREATE_TUPLE([],[],[-lGLUT]) \
 	CS_CREATE_TUPLE([],[],[-lglut])], [],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglut], [GLUT])], [], [],
-	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
+	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
 
     # Check for GLX.
     CS_CHECK_BUILD([for GLX], [cs_cv_libglx],
