@@ -62,7 +62,7 @@ csCamera::csCamera (csCamera* c) : csOrthoTransform ()
   cameranr = cur_cameranr++;
 }
 
-csCamera::csCamera (const csCamera& c) : csOrthoTransform ()
+csCamera::csCamera (const csCamera& c) : csOrthoTransform (), iBase ()
 {
   *this = c;
   CONSTRUCT_IBASE (NULL);
