@@ -28,6 +28,13 @@
 #include "cssys/mac/MacRSRCS.h"
 #include "isystem.h"
 
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
+#define GetWindowPort(n) ( (CGrafPtr)(n) )
+#define GetPortBounds(m,n) ( *(n) = ((CGrafPtr)(m))->portRect )
+#define GetPortPixMap(m) ( (m)->portPixMap )
+#define GetPortBitMapForCopyBits(m) (&(((GrafPtr)(m))->portBits))
+#endif
+
 /////The 2D Graphics Driver//////////////
 
 IMPLEMENT_FACTORY (csGraphics2DOpenGL)
@@ -274,7 +281,7 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 
 	aglDestroyPixelFormat( fmt );
 
-	aglSetDrawable( mGLContext, mMainWindow );
+	aglSetDrawable( mGLContext, GetWindowPort(mMainWindow) );
 	aglSetCurrentContext( mGLContext );
 
 	csGraphics2DGLCommon::Open( Title );
@@ -353,8 +360,9 @@ void csGraphics2DOpenGL::SetColorPalette()
 
 void csGraphics2DOpenGL::SetRGB(int i, int r, int g, int b)
 {
-	CTabHandle	theCTable;
-	ColorSpec	theColor;
+	CTabHandle		theCTable;
+	ColorSpec		theColor;
+	PixMapHandle	thePortPixMap;
 
 	if (( i < 0 ) || ( i >= pfmt.PalEntries ))
 		return;
@@ -363,7 +371,8 @@ void csGraphics2DOpenGL::SetRGB(int i, int r, int g, int b)
 	theColor.rgb.green = g | (g << 8);
 	theColor.rgb.blue = b | (b << 8);
 
-	theCTable = (**(mMainWindow->portPixMap)).pmTable;
+	thePortPixMap = GetPortPixMap( GetWindowPort( mMainWindow ));
+	theCTable = (**(thePortPixMap)).pmTable;
 	(*theCTable)->ctTable[i].value = i;
 	(*theCTable)->ctTable[i].rgb = theColor.rgb;
 	CTabChanged( theCTable );
@@ -437,7 +446,8 @@ bool csGraphics2DOpenGL::PointInWindow( Point *thePoint )
 	GrafPtr	thePort;
 	bool	inWindow = false;
 
-	if ( PtInRgn( *thePoint, ((WindowPeek)mMainWindow)->strucRgn )) {
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
+	if ( mMainWindow && PtInRgn( *thePoint, ((WindowPeek)mMainWindow)->strucRgn )) {
 		::GetPort( &thePort );
 		::SetPort( (WindowPtr)mMainWindow );
 		::GlobalToLocal( thePoint );
@@ -445,6 +455,22 @@ bool csGraphics2DOpenGL::PointInWindow( Point *thePoint )
 
 		inWindow = true;
 	}
+#else
+	RgnHandle	theRgn;
+
+	if ( mMainWindow ) {
+		theRgn = NewRgn();
+		GetWindowRegion( mMainWindow, kWindowStructureRgn, theRgn );
+		if ( PtInRgn( *thePoint, theRgn )) {
+			::GetPort( &thePort );
+			::SetPort( GetWindowPort( mMainWindow ));
+			::GlobalToLocal( thePoint );
+			::SetPort( thePort );
+
+			inWindow = true;
+		}
+	}
+#endif
 
 	return inWindow;
 }
