@@ -1,0 +1,37 @@
+@node csSys
+@section System Library (@code{csSys})
+@cindex csSys
+@cindex Libraries,csSys
+@cindex System Library
+
+The system library is the basic module in every Crystal Space application. It
+helps in several ways:
+@itemize @bullet
+@item
+It handles the main system-specific operations, like loading dynamic
+libraries for @sc{scf}. So using it will make most of your application
+system-independent.
+
+@item
+It tries to find global installations of the CS run-time libraries.
+
+@item
+It provides the input drivers, so you can access mouse, keyboard and
+joystick.
+
+@item
+It loads and initializes the plug-ins (using @sc{scf}) and sends them their
+private and broadcast events.
+
+@item
+It keeps a log file and provides functions for printing debug messages,
+warnings and errors.
+
+@item
+It keeps track of the application's config file and automatically reads
+all options required by the system or any plug-in.
+
+@item
+It processes the command-line parameters and also allows plug-ins to react
+to the parameters.
+@end itemize

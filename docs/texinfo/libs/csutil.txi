@@ -1,0 +1,10 @@
+@node csUtil
+@section Utility Library (@code{csUtil})
+@cindex csUtil
+@cindex Libraries,csUtil
+@cindex Utility Library
+
+The utility library consists of many smaller modules that are too small to
+live as a separate library. The biggest part of it is the @sc{scf} library.
+@xref{SCF}.
+

@@ -176,10 +176,10 @@ by the plug-in system.
 
 @item
 Dynamic-size arrays (csVector).
-
-@item
-Virtual file system.
 @end itemize
+
+@item @sc{vfs}
+Virtual file system.
 
 @item csSndDrv / csSndRdr
 General sound system. Currently drivers are made for Linux, Macintosh,

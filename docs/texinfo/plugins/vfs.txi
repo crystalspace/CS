@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node VFS, csParser, SCF, Libraries
+@node VFS
 @section Virtual File System (@sc{vfs})
 @cindex Virtual File System (@sc{vfs})
 @cindex @sc{vfs}, Virtual File System

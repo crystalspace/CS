@@ -11,6 +11,11 @@ bundled with Crystal Space.  In some cases, more detailed information for a
 particular application may be found in subsequent sections.
 
 @table @code
+@cindex @file{3ds2lev}
+@cindex Applications, @file{3ds2lev}
+@item 3ds2lev
+A @sc{3ds} to Crystal Space map converter.
+
 @cindex @file{blocks}
 @cindex Applications, @file{blocks}
 @item blocks
@@ -22,6 +27,11 @@ A falling blocks game.  (Think 3D Tetris.).
 A test application for the Crystal Clear library and plug-in module.
 @xref{CCtest}.
 
+@cindex @file{csfgen}
+@cindex Applications, @file{csfgen}
+@item csfgen
+A @emph{TrueType} to Crystal Space font converter.
+
 @cindex @file{cswstest}
 @cindex Applications, @file{cswstest}
 @item cswstest
@@ -29,6 +39,33 @@ This application tests the Crystal Space Windowing System (@sc{csws}), which
 is designed to provide a clean, effective and cross-platform base for creating
 CrystalSpace-related utilites.  Currently there is only one such utility under
 development, the CrystalSpace maze editor (MazeD).  @xref{CSWS}.
+
+@cindex @file{demonets}
+@cindex Applications, @file{demonets}
+@item demonets
+The Crystal Space Networking demo.
+
+@cindex @file{dnapp}
+@cindex Applications, @file{dnapp}
+@item dnapp
+A test application for the dungeon plug-in module, the random level generator.
+It allows to set the output options for the plug-in via command-line
+parameters.
+
+@cindex @file{g2dtest}
+@cindex Applications, @file{g2dtest}
+@item g2dtest
+The Crystal Space canvas plugin test application.
+
+@cindex @file{gfxtest}
+@cindex Applications, @file{gfxtest}
+@item gfxtest
+The Crystal Space image manipulator.
+
+@cindex @file{levtool}
+@cindex Applications, @file{levtool}
+@item levtool
+A level maintenance tool.
 
 @cindex @file{makedep}
 @cindex Applications, @file{makedep}
@@ -66,16 +103,36 @@ free-form, dynamic blob.
 @item ndrvdemo
 An example demonstrating use of the Crystal Space network driver.
 
+@cindex @file{nstp}
+@cindex Applications, @file{nstp}
+@item nstp
+The Netspace test application.
+
+@cindex @file{perftest}
+@cindex Applications, @file{perftest}
+@item perftest
+This is a tool to test graphics performance.
+
 @cindex @file{phyztest}
 @cindex Applications, @file{phyztest}
 @item phyztest
 This application tests the physics library for proper operation.
 @xref{csPhyziks}.
 
+@cindex @file{ptlab}
+@cindex Applications, @file{ptlab}
+@item ptlab
+A test application for procedural textures.
+
 @cindex @file{pysimp}
 @cindex Applications, @file{pysimp}
 @item pysimp
 An extremely simple example demonstrating use of the Python plug-in module.
+
+@cindex @file{pytest}
+@cindex Applications, @file{pytest}
+@item pytest
+A test application for the Python plug-in module.
 
 @cindex @file{scfreg}
 @cindex Applications, @file{scfreg}
@@ -89,6 +146,13 @@ hardware renderers, with Crystal Space's @sc{scf} mechanism.
 An tutorial demonstrating the ins and outs of Crystal Space's @sc{scf} system.
 @xref{SCF}.
 
+@cindex @file{shooter}
+@cindex Applications, @file{shooter}
+@item shooter
+Crystal Shooter.  An application that is intended to grow into a classic
+@dfn{First Person Shooter}.  Right now it is more some sort of feasability
+study.  It is also a demo application of the @file{csgame} gaming library.
+
 @cindex @file{simple}
 @cindex Applications, @file{simple}
 @item simple
@@ -98,18 +162,37 @@ makes proper use of various modules in the engine.  The @file{simple}
 application is the subject of a Crystal Space programming tutorial,
 @ref{Tutorials}.
 
-@cindex @file{shooter}
-@cindex Applications, @file{shooter}
-@item shooter
-Crystal Shooter.  An application that is intended to grow into a classic
-@dfn{First Person Shooter}.  Right now it is more some sort of feasability
-study.  It is also a demo application of the @file{csgame} gaming library.
+@cindex @file{simplep}
+@cindex Applications, @file{simplep}
+@item simplep
+A simple plug-in example.
 
 @cindex @file{squawk}
 @cindex Applications, @file{squawk}
 @item squawk
 A demonstration of a @dfn{sky box} and the use of creative camera and view
 systems.  @xref{Squawk}.
+
+@cindex @file{t3d2cs}
+@cindex Applications, @file{t3d2cs}
+@item t3d2cs
+This is a utility to convert Unreal maps (@file{t3d}) to CS maps.
+
+@cindex @file{textconv}
+@cindex Applications, @file{textconv}
+@item textconv
+A @sc{dos}/Unix line termination conversion tool.
+
+@cindex @file{uninst}
+@cindex Applications, @file{uninst}
+@item uninst
+An uninstall program.
+
+@cindex @file{vsh}
+@cindex Applications, @file{vsh}
+@item vsh
+This is the test application for the Virtual File System (@sc{vfs}).  It works
+very similar to the standard Unix shell programs.  @xref{VFS}.
 
 @cindex @file{walktest}
 @cindex Applications, @file{walktest}
@@ -119,12 +202,6 @@ harness for most of the features which get added to the engine.  It is not
 necessarily a good programming example, but if you are interested in seeing
 an engine feature in action, this is probably the place to look.
 @xref{Walktest}.
-
-@cindex @file{vsh}
-@cindex Applications, @file{vsh}
-@item vsh
-This is the test application for the Virtual File System (@sc{vfs}).  It works
-very similar to the standard Unix shell programs.  @xref{VFS}.
 
 @cindex @file{vfstest}
 @cindex Applications, @file{vfstest}

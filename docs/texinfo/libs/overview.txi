@@ -17,22 +17,17 @@ the engine, have a look at @ref{csEngine}.
 This library contains various utilities. There is an Archive class which can
 read/write @sc{zip} archives. There is a vector class, a sparse matrix class
 and some other useful goodies. This library requires the use of the external
-ZLib library which is used to read/write @sc{zip} archives. Two modules from
-this library are explained in separate chapters: @sc{scf} and @sc{vfs}.
+ZLib library which is used to read/write @sc{zip} archives. One modules from
+this library is explained in a separate section: @sc{scf}.
 
 @item SCF (Shared Class Facility)
 The @sc{scf} is actually part of the @code{csUtil} library. It is explained
 in a separate section as it is both complex (compared to the rest of
 @code{csUtil}) and fundamental to the understanding of plug-ins. @xref{SCF}.
 
-@item VFS (Virtual File System)
-The VFS is actually part of the @code{csUtil} library. It is explained in a
-separate library because it serves as the basic module for file access for
-all parts of Crystal Space, so it is very important. @xref{VFS}.
-
 @item csGeom
 A library for 3d geometry operations. It provides 2d and 3d vectors, polygons
-and bounding boxes, 3d matrices and some other useful things.
+and bounding boxes, 3d matrices and some other useful things. @xref{csGeom}.
 
 @item csGfxldr
 Routines to support loading various graphic file formats and put them

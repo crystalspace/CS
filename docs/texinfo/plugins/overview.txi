@@ -8,6 +8,12 @@ Space. More detailed descriptions of these facilities may be found in later
 sections.
 
 @table @code
+@item VFS (Virtual File System)
+The @sc{vfs} serves as the basic module for file access for all parts of
+Crystal Space. It allows to map ``virtual'' directories to ``real'' ones,
+to map several real directories together and to treat @file{.zip} files like
+subdirectories. @xref{VFS}.
+
 @item Graphics Drivers
 The graphics modules provide ``low-level'' graphics output. This includes
 drawing pixels, lines and text, but also drawing polygons and polygon meshes

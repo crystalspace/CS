@@ -204,7 +204,7 @@ Macintosh.
 
 When programming you should always use Unix-style pathname syntax in your
 @code{#include} directives; that is, always use the forward slash @samp{/}, as
-in @code{#include "csutil/vfs.h"}.  The forward slash is understood by
+in @code{#include "csutil/scf.h"}.  The forward slash is understood by
 compilers on all platforms including Unix, Windows, and Macintosh.  Never use
 @samp{\} or @samp{:} in filenames mentioned by an @code{#include} directive.
 Even though your Windows or Macintosh compiler might accept these characters,

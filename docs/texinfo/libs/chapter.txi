@@ -12,7 +12,7 @@ graph.  @xref{Dependencies}.
 @menu
 * Lib Overview:: Quick Overview
 * SCF:: Shared Class Facility (@sc{scf})
-* VFS:: Virtual File System (@sc{vfs})
+* csGeom:: Geometry Library (@code{csGeom})
 * csParser:: World File Parser (@code{csParser})
 * CSWS:: Crystal Space Windowing System (@sc{csws})
 * csPhyziks:: csPhyziks Library (@code{csphyzik})
@@ -20,7 +20,7 @@ graph.  @xref{Dependencies}.
 
 @imports{libs,overview.txi}
 @imports{libs,scf.txi}
-@imports{libs,vfs.txi}
+@imports{libs,csgeom.txi}
 @imports{libs,csparser.txi}
 @imports{libs,csws.txi}
 @imports{libs,phyziks.txi}
