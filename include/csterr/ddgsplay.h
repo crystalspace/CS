@@ -164,9 +164,9 @@ public:
 	inline ddgSplayIndex find( ddgSplayKey k, ddgSplayIndex n )
     { return ddgSplay( k, n ); }
     /// Find the minimum value in the tree.
-    inline ddgSplayIndex findMin( ddgSplayIndex n );
+	ddgSplayIndex findMin( ddgSplayIndex n );
 	/// Find the maximum value in the tree.
-    inline ddgSplayIndex findMax( ddgSplayIndex n );
+	ddgSplayIndex findMax( ddgSplayIndex n );
 	/// Insert a node.
 	ddgSplayIndex insert( ddgSplayKey k, ddgSplayIndex n );
 	/// Remove a node.
