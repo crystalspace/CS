@@ -80,6 +80,20 @@ void csKeyboardDriver::do_key (int key, bool down)
     down ? csevKeyDown : csevKeyUp, key, smask));
 }
 
+void csKeyboardDriver::do_key_extended (int key, int keytranslated, bool down)
+{
+  int smask = (GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
+            | (GetKeyState (CSKEY_CTRL) ? CSMASK_CTRL : 0)
+            | (GetKeyState (CSKEY_ALT) ? CSMASK_ALT : 0);
+
+  if (down && !GetKeyState (key))
+    smask |= CSMASK_FIRST;
+
+  SetKeyState (key, down);
+  System->EventQueue.Put (new csEvent (System->GetTime (),
+    down ? csevKeyDown : csevKeyUp, keytranslated, smask));
+}
+
 void csKeyboardDriver::SetKeyState (int key, bool state)
 {
   int idx = (key < 256) ? key : (256 + key - CSKEY_FIRST);

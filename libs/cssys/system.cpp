@@ -1003,6 +1003,12 @@ void csSystemDriver::QueueKeyEvent (int iKeyCode, bool iDown)
     Keyboard.do_key (iKeyCode, iDown);
 }
 
+void csSystemDriver::QueueExtendedKeyEvent (int iKeyCode, int iKeyCodeTranslated, bool iDown)
+{
+  if (iKeyCode)
+    Keyboard.do_key_extended (iKeyCode, iKeyCodeTranslated, iDown);
+}
+
 void csSystemDriver::QueueMouseEvent (int iButton, bool iDown, int x, int y)
 {
   if (iButton == 0)
