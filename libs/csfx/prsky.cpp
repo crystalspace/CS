@@ -92,7 +92,7 @@ csProcSky::csProcSky()
   sunpos += center;
   suncolor.Set(1.0,1.0,0.6);
 
-  nr_octaves = 4;
+  nr_octaves = 5;
   octsize = 32; // octave is octsize x octsize
   octaves = new uint8 [octsize*octsize*nr_octaves];
 
