@@ -5,7 +5,7 @@
 @noindent
 @emph{Written by Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated 6 May 2003.}
+@emph{Last updated 13 May 2003.}
 
 This @sc{howto} is a step by step guide for creating a basic Crystal Space
 application with @sc{msvc} 6 outside the Crystal Space source tree.
@@ -13,9 +13,40 @@ application with @sc{msvc} 6 outside the Crystal Space source tree.
 @sc{important}: This tutorial assumes you have a basic familiarity with
 @sc{msvc} and it's inner workings. This tutorial also assumes you have a fully
 compiled (both release and debug) version of Crystal Space somewhere on your
-computer. 
+computer.
+
+In addition to this written tutorial. You can download zip archive(s)
+containing video (in avi format) of each step in the tutorial. You can download each
+video with every step as you progress or download all the videos in a
+single zip archive via the link below.
+
+All Steps Videos - 4.5Mb zip archive download.
+
+@noindent
+@ifnottex
+@uref{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/msvc6_ext_app/all_steps.zip}
+@end ifnottex
+@iftex
+@code{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/}@*
+@code{msvc6_ext_app/all_steps.zip}
+@end iftex
+
+@sc{note}: In the videos you will see red and blue stars appear. These are to
+indicate mouse clicks. Red for a left mouse button click or double click. A
+blue star appearing indicates a right mouse button click.
 
 @subsubheading Step 1 - Creating a basic project workspace.
+
+Step 1 Video - 0.4Mb zip archive download.
+
+@noindent
+@ifnottex
+@uref{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/msvc6_ext_app/step_01.zip}
+@end ifnottex
+@iftex
+@code{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/}@*
+@code{msvc6_ext_app/step_01.zip}
+@end iftex
 
 Start @sc{msvc} 6 and then click on @emph{New} from the @emph{File} menu.  You
 will now be presented with a dialog box (see image below) for creating a new
@@ -61,6 +92,17 @@ Environment), with the @emph{simple1} project workspace loaded.  Lets move on...
 
 @subsubheading Step 2 - Adding files/code to the workspace.
 
+Step 2 Video - 0.4Mb zip archive download.
+
+@noindent
+@ifnottex
+@uref{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/msvc6_ext_app/step_02.zip}
+@end ifnottex
+@iftex
+@code{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/}@*
+@code{msvc6_ext_app/step_02.zip}
+@end iftex
+
 Rather than create code for this tutorial and keeping inline with time honored
 tradition - We are now going to cheat and use existing Crystal Space code. :-)
 
@@ -99,7 +141,18 @@ should have a @emph{Workspace} window which looks like the image below.
 @picturesss{tutorial,howto,msvcproj,snap5}
 @end ifnotinfo
 
-@subsubheading Step 3 - Setting Crystal Space @sc{paths} inside @sc{msvc}. 
+@subsubheading Step 3 - Setting Crystal Space @sc{paths} inside @sc{msvc}.
+
+Step 3 Video - 1.02Mb zip archive download.
+
+@noindent
+@ifnottex
+@uref{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/msvc6_ext_app/step_03.zip}
+@end ifnottex
+@iftex
+@code{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/}@*
+@code{msvc6_ext_app/step_03.zip}
+@end iftex
 
 First thing we need todo is point @sc{msvc} to both Crystal Spaces
 @file{include} and both the release and debug build @file{libs} directories, so
@@ -144,6 +197,17 @@ See image below for an example of these set.
 Once done, click on the @emph{@sc{ok}} button and return to the @sc{msvc ide}.
 
 @subsubheading Step 4 - Setting Crystal Space preprocessor definitions inside @sc{msvc}.
+
+Step 4 Video - 0.9Mb zip archive download.
+
+@noindent
+@ifnottex
+@uref{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/msvc6_ext_app/step_04.zip}
+@end ifnottex
+@iftex
+@code{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/}@*
+@code{msvc6_ext_app/step_04.zip}
+@end iftex
 
 Crystal Space essentially has three preprocessor definitions which @sc{must} be
 set in-order to successfully compile and link your application. They are
@@ -194,6 +258,17 @@ Once done, click on the @emph{@sc{ok}} button and return to the @sc{msvc ide}.
 
 @subsubheading Step 5 - Setting the run-time library we need to use with Crystal Space applications.
 
+Step 5 Video - 0.5Mb zip archive download.
+
+@noindent
+@ifnottex
+@uref{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/msvc6_ext_app/step_05.zip}
+@end ifnottex
+@iftex
+@code{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/}@*
+@code{msvc6_ext_app/step_05.zip}
+@end iftex
+
 As in step 4 we need to change one or more project settings. Select your project
 in the @emph{Workspace} window. See area highlighted in blue in the image below.  
 Now, from the @emph{File} menu select @emph{Projects} then @emph{Settings...}.  
@@ -228,6 +303,17 @@ For release builds you need to select @emph{Multithreaded DLL} from the
 Once done, click on the @emph{@sc{ok}} button and return to the @sc{msvc ide}.
 
 @subsubheading Step 6 - Setting the Crystal Space static libs to link with.
+
+Step 6 Video - 1.4Mb zip archive download.
+
+@noindent
+@ifnottex
+@uref{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/msvc6_ext_app/step_06.zip}
+@end ifnottex
+@iftex
+@code{ftp://sunsite.dk/projects/crystal/support/msvc/howtos/}@*
+@code{msvc6_ext_app/step_06.zip}
+@end iftex
 
 When compiling Crystal Space in release and debug mode, you will end up with the
 following static libs, some of which you may require at some point in your own
