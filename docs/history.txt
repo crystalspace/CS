@@ -13,6 +13,8 @@ The history order has been reversed so that new features are at the top.
 	  now emulates the model used by other platforms.
 	- Eric Sunshine eliminated 'underfull hbox' warnings in the detailed
 	  "anatomy" portion of the documentation for the BeOS port.
+	- Eric Sunshine eliminated compilation warnings about */ used outside
+	  of comment in the network manager source code.
 18-May-2000
 	- Frank O'Connor added __CRYSTAL_SPACE__ define to VC project file.
 	- Another small terrain update from Alex Pfaffe.
