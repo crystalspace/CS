@@ -37,6 +37,8 @@ class csProcSkyTexture : public csProcTexture {
   csVector3 txtorig, txtu, txtv;
   /// the cached intersection points
   csVector3 *isect;
+  /// must be rerendered next frame
+  bool forcerender;
 
 public:
   /// create, given a sky it belongs to.
@@ -66,6 +68,13 @@ public:
   void SetIntersect(csVector3 *icache) {isect = icache;}
   /// get cached isects cache array
   csVector3 *GetIntersect() const {return isect;}
+
+  /// force the texture to be re-rendered next frame (by the prSky)
+  void ForceRerender() {forcerender = true;}
+  /// see if the texture must be re-rendered
+  bool MustRender() const {return forcerender;}
+  /// unset the forced rendering.
+  void UnsetForceRender() {forcerender = false;}
 
   /** 
    * Set the texturemapping of the sky onto this texture
@@ -111,8 +120,6 @@ class csProcSky {
 
   /// is it animation (if not - no recalculation is performed)
   bool animated;
-  /// force (re)rendering of the next frame
-  bool rerender;
   /// periods for each octave - total new random after this many msec
   int *periods;
   /// current time position (in msec) per octaves
@@ -169,10 +176,6 @@ public:
   void SetAnimated(bool anim=true) {animated=anim;}
   /// See if the prsky is animated
   bool GetAnimated() const {return animated;}
-  /// Force a re-render (only once) of the sky, in the next frame.
-  void ForceRerender() {rerender = true;}
-  /// no longer force a rerender (undo a ForceRerender call)
-  void DonotRerender() {rerender = false;}
 };
 
 #endif // __PROCSKYTEX_H__

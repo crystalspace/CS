@@ -34,6 +34,7 @@ csProcSkyTexture::csProcSkyTexture(csProcSky *par) : csProcTexture()
   mat_w = 256;
   mat_h = 256;
   isect = NULL;
+  forcerender = false;
 
   if(0)
   {
@@ -104,7 +105,6 @@ csProcSky::csProcSky()
   }
 
   animated= true;
-  rerender= true;
   old_time = 0;
   startoctaves = new uint8 [octsize*octsize*nr_octaves];
   endoctaves = new uint8 [octsize*octsize*nr_octaves];
@@ -467,7 +467,7 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex, cs_time current_time)
   /// if it already has a texture cache (it has been drawn to in the past)
   /// and we do not animate, and no rerender is forced, 
   /// then nothing needs to be done
-  if(!rerender && skytex->GetIntersect() && !animated) return;
+  if(!skytex->MustRender() && skytex->GetIntersect() && !animated) return;
 
   // if the texture has no cache, make one
   if(!skytex->GetIntersect()) MakeIntersectCache(skytex);
@@ -541,7 +541,7 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex, cs_time current_time)
   skytex->GetG3D()->Print(NULL);
 
   /// did a rendering
-  rerender = false;
+  skytex->UnsetForceRender();
 }
 
 
