@@ -98,7 +98,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
     }
     else
     {
-      for (uint i = 0; i < (csMin(lights.Length (), numLights)); i++)
+      for (size_t i = 0; i < (csMin(lights.Length (), numLights)); i++)
       {
         light = lights.Get (i);
         iVertexLightCalculator *calc = shaderPlugin->GetLightCalculator (light, useAttenuation);
@@ -121,6 +121,8 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
               tmpColor);
             break;
           }
+        case LIGHTMIXMODE_NONE:
+	  break;
         }
       }
     }

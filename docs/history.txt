@@ -12,9 +12,9 @@ chronological order.
 	- Marten added a "vertex preprocessor" (vproc) shader program plugin
 	  type.
 	- Marten removed chunklod terrain engine. Instead use bruteblock.
-	- Eric Sunshine cleaned up a small bit of fallout from today's earlier
-	  changes. Also removed some remaining references to the retired
-	  chunklod plugin.
+	- Eric Sunshine fixed a slew of build errors and warnings from today's
+	  earlier changes. Also removed some remaining references to the
+	  retired chunklod plugin.
 	- Eric Sunshine relocated the bruteblock implementation from
 	  CS/plugins/mesh/terrain_brute to mesh/terrain/brute so that it
 	  resides alongside the terrain loader.

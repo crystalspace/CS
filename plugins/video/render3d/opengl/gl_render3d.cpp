@@ -1345,7 +1345,7 @@ void csGLGraphics3D::Print (csRect const* area)
 
 const csReversibleTransform& csGLGraphics3D::GetObjectToCamera()
 {
-  return csReversibleTransform();
+  return other2cam;
 }
 
 /*void csGLGraphics3D::SetObjectToCameraInternal (

@@ -23,7 +23,7 @@
 #include "csplugincommon/shader/shaderprogram.h"
 #include "vproc_std.h"
 
-class csVProcStandardProgram : csShaderProgram
+class csVProcStandardProgram : public csShaderProgram
 {
 public:
   SCF_DECLARE_IBASE_EXT (csShaderProgram);
@@ -85,8 +85,9 @@ private:
   } lightMixMode;
 
   float finalLightFactor;
-  uint numLights;
+  size_t numLights;
   bool useAttenuation;
 };
 
 #endif //__CS_VPROC_VPROC_PROGRAM_H__
+

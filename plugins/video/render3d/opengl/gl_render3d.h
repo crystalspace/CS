@@ -145,6 +145,10 @@ private:
   csPoly3D frustum;
   bool frustum_valid;
 
+  // Not actually used, but we need a real object, rather than a temporary, for
+  // GetObjectToCamera() because it returns a `const&'.
+  csReversibleTransform other2cam;
+
   // Structure used for maintaining a stack of clipper portals.
   struct csClipPortal
   {
