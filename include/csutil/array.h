@@ -26,6 +26,9 @@
  * A templated array class. The objects in this class are constructed via
  * copy-constructor and are delete when they're removed from the array or the
  * array goes.
+ * Note: If you want to store iSomething*, then you should look at csRefArray
+ * instead of this class! csRefArray additionally takes care of the
+ * refcounting.
  */
 template <class T>
 class csArray
