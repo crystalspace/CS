@@ -234,7 +234,7 @@ public:
    * position is the end of the string. If the character cannot be found, this
    * function returns (size_t)-1
    */
-  size_t FindLast (char c, size_t p = 0) const;
+  size_t FindLast (char c, size_t p = (size_t)-1) const;
 
 #define STR_APPEND(TYPE,FMT,SZ) csString& Append(TYPE n) \
   { char s[SZ]; cs_snprintf(s, SZ, #FMT, n); return Append(s); }

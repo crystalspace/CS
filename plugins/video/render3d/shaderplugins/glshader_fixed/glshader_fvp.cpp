@@ -168,9 +168,7 @@ void csGLShaderFVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
     glEnable(GL_TEXTURE_GEN_R);
 
     csReversibleTransform *t = &mesh->object2camera;
-
     const csMatrix3 &orientation = t->GetO2T();
-    const csVector3 &translation = t->GetO2TTranslation();
 
     float mAutoTextureMatrix[16];
     // Transpose 3x3 in order to invert matrix (rotation)
