@@ -50,12 +50,11 @@
 	      <?if !vars."tex lightmap".texture ?>
 		<colorsource num="1" source="primary color" modifier="color"/>
 		<coloroperation operation="modulate" />
-		<alphasource num="1" source="primary color" modifier="alpha"/>
-		<alphaoperation operation="modulate" />
 	      <?else?>
 		<coloroperation operation="replace" />
-		<alphaoperation operation="replace" />
 	      <?endif?>
+	      <alphasource num="1" source="primary color" modifier="alpha"/>
+	      <alphaoperation operation="modulate" />
 	    </layer>
 	    <?if vars."tex lightmap".texture ?>
 	      <layer name="lightmap">
