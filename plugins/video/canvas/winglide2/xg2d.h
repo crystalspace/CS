@@ -6,11 +6,11 @@
 #define __XG2XG2D_H__
 
 /// csGraphics2DGlide's implementation of IGlide2xGraphicsInfo
-class IXGlide2xGraphicsInfo : public IGlide2xGraphicsInfo
+interface IXGlide2xGraphicsInfo : public IGlide2xGraphicsInfo
 {
   DECLARE_IUNKNOWN()
   ///
-  STDMETHOD(Open)(char* szTitle);
+  STDMETHOD(Open)(const char* szTitle);	
   ///
   STDMETHOD(Close)();
 #if defined(OS_WIN32)

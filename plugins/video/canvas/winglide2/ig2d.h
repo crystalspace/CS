@@ -16,7 +16,7 @@ extern const IID IID_IGlide2xGraphicsInfo;
 interface IGlide2xGraphicsInfo : public IUnknown
 {
   ///
-  STDMETHOD(Open)(char* szTitle) = 0;
+  STDMETHOD(Open)(const char* szTitle) = 0;
   ///
   STDMETHOD(Close)() = 0;
 #if defined(OS_WIN32)
