@@ -3978,6 +3978,8 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   //@@@EXPERIMENTAL!!
   //CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Mårten Svanfeldt
 
+  SetMirrorMode (mesh.do_mirror);
+
   int maxlayers = 0;
   for (int p=0 ; p<technique->GetPassCount () ; p++)
   {
@@ -4189,6 +4191,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       statecache->DisableState (GL_VERTEX_PROGRAM_ARB);
   }
 
+  SetMirrorMode (false);
 
 
   if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))

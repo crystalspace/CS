@@ -432,7 +432,7 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
   s->slId = index;
   for (i = 0; i < numLightmaps; i++)
   {
-    lmArray[i]->RecalculateDynamicLights();
+    if (dirty) lmArray[i]->RecalculateDynamicLights();
     iLightMap* lm = lmArray[i]->GetLightMap();
     int lmwidth = lm->GetWidth ();
     int lmheigth = lm->GetHeight ();

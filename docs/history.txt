@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+26-Jan-2003
+	- Added a missing call to SetMirrored() in the old OpenGL renderer
+	  in EffectDrawTriangleMesh(). This fixes a few problems with
+	  DrawPolygonMesh and DrawTriangleMesh in mirror mode.
+	- Optimization in DrawPolygonMesh so that RecalculateDynamicLights
+	  is only called when the polygon buffer is marked as dirty.
 24-Jan-2003
 	- Added the notion of 'camera' flag to a render priority. When this
 	  flag is true the engine will scan all objects in this render
