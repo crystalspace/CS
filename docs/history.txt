@@ -38,6 +38,8 @@ The history order is reversed so that new features are at the top.
 	  for the mesh objects since the iso engine does not have an
 	  iMeshWrapper implementation. Now the plugin loaders no longer
 	  depend on iMeshWrapper.
+	- Fixed a bug with closing brackets on 3ds2lev. This is untested
+	  though.
 11-Dec-2001
 	- Thanks to Matze we finally got debugging to work properly with
 	  cygwin and mingw ports. In the past there was no useful debug

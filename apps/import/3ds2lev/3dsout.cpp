@@ -104,21 +104,24 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
   if (flags & FLAG_SPRITE)
   {
     fprintf (o, "  ; '%s'\n", p3dsMesh->name);
-  } else {
-
+  }
+  else
+  {
     // count meshes
     int numMeshes = 0;
     int n;
-    while (p3dsMesh) {
-         numMeshes++;
-         p3dsMesh = p3dsMesh->next;
+    while (p3dsMesh)
+    {
+      numMeshes++;
+      p3dsMesh = p3dsMesh->next;
     }
     // build an array with all meshes
     Lib3dsMesh* p3dsMeshArray = new Lib3dsMesh[numMeshes];
     p3dsMesh = p3dsFile->meshes;
-    for (n=0; n<numMeshes; n++) {
-         p3dsMeshArray[n] = *p3dsMesh;
-         p3dsMesh = p3dsMesh->next;
+    for (n=0; n<numMeshes; n++)
+    {
+      p3dsMeshArray[n] = *p3dsMesh;
+      p3dsMesh = p3dsMesh->next;
     }
 
     // Reorder the objects to have all "_s_" first.
@@ -126,10 +129,13 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
     for (n=0; n<numMeshes; n++)
     {
         // if not static...
-        if (!strstr( ((Lib3dsMesh *)&p3dsMeshArray[n])->name, "_s_")) {
+        if (!strstr( ((Lib3dsMesh *)&p3dsMeshArray[n])->name, "_s_"))
+	{
           // search a static and swap
-          for (int j=n+1; j<numMeshes; j++) {
-             if (strstr( ((Lib3dsMesh *)&p3dsMeshArray[j])->name, "_s_")) {
+          for (int j=n+1; j<numMeshes; j++)
+	  {
+             if (strstr( ((Lib3dsMesh *)&p3dsMeshArray[j])->name, "_s_"))
+	     {
                 Lib3dsMesh tmp = p3dsMeshArray[j];
                 p3dsMeshArray[j] = p3dsMeshArray[n];
                 p3dsMeshArray[n] = tmp;
@@ -158,12 +164,16 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
   while (p3dsMesh)
   {
 
-    if (flags & FLAG_SPRITE) {
+    if (flags & FLAG_SPRITE)
+    {
     }
-    else {
+    else
+    {
         // on "_s_" decide if MESHOBJ or PART
-        if (strstr(p3dsMesh->name, "_s_")) {
-            if (!staticObj) {
+        if (strstr(p3dsMesh->name, "_s_"))
+	{
+            if (!staticObj)
+	    {
                 fprintf (o, "    MESHOBJ 'static' (\n");
                 fprintf (o, "      PLUGIN ('thing')\n");
                 fprintf (o, "      ZFILL ()\n");
@@ -175,14 +185,18 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
                 fprintf (o, "      PART '%s' (\n", p3dsMesh->name);
                 staticObj = true;
             }
-            else  {
+            else
+	    {
                 fprintf (o, "      PART '%s' (\n", p3dsMesh->name);
             }
             part = true;
         // else always MESHOBJ
-        } else {
+        }
+	else
+	{
             // close previous PART and MESHOBJ if present
-            if (part) {
+            if (part)
+	    {
                 fprintf (o, "      )\n\n");
                 fprintf (o, "    )\n\n");
                 part = false;
@@ -194,9 +208,12 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
             fprintf (o, "      PLUGIN ('thing')\n");
             fprintf (o, "      ZUSE ()\n");
             // handles transparent objects
-            if (strstr(p3dsMesh->name, "_t_")) {
+            if (strstr(p3dsMesh->name, "_t_"))
+	    {
                 fprintf (o, "      PRIORITY('alpha')\n");
-            } else {
+            }
+	    else
+	    {
                 fprintf (o, "      PRIORITY('object')\n");
             }
             fprintf (o, "      PARAMS (\n");
@@ -291,11 +308,15 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
       // go to next face
       pCurFace++;
     }
+
+    // close last PART
+    fprintf (o, "      )\n\n");
+
     // close PARAMS tag
     fprintf (o, "      )\n\n");
 
     // close MESHOBJ tag
-    if (!part)
+    if (part)
         fprintf (o, "    )\n\n");
 
     // increment mesh count
