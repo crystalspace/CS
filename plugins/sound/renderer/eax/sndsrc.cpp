@@ -198,11 +198,19 @@ STDMETHODIMP csSoundSourceEAX::SetPosition(float x, float y, float z)
 {
   info.fPosX = x; info.fPosY = y; info.fPosZ = z;
 
+  if (m_pDS3DBuffer3D)
+    m_pDS3DBuffer3D->SetPosition(x, y ,z, DS3D_IMMEDIATE);
+
   return S_OK;
 }
 
 STDMETHODIMP csSoundSourceEAX::SetVelocity(float x, float y, float z)
 {
+  info.fVelX = x; info.fVelY = y; info.fVelZ = z;
+
+  if (m_pDS3DBuffer3D)
+    m_pDS3DBuffer3D->SetVelocity(x, y ,z, DS3D_IMMEDIATE);
+
   return S_OK;
 }
 
