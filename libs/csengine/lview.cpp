@@ -43,7 +43,7 @@ csFrustumView::csFrustumView () :
 csFrustumView::~csFrustumView ()
 {
   delete ctxt;
-  SCF_DESTRUCT_IBASE (0);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csFrustumView::StartNewShadowBlock ()
