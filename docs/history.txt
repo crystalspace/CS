@@ -29,6 +29,10 @@ The history order is reversed so that new features are at the top.
 	  create some. )
         - Philip Wyett changed an ASSERT () call to CS_ASSERT () in
           'gl_renderbuffer.h'.
+        - Philip Wyett added a note to disable 'Video.OpenGL.Caps.Stencil'
+          in 'opengl.cfg' if not supported by the users hardware or they
+          are experiencing crashes. Also added the ATI Radeon (r100) owners
+          running Linux (DRI) as a known case where this should be done.
 15-Jul-2003
 	- Christopher Nelson removed the procedural texture support from
 	  AWS entirely.  This means that a user must do all the construction
