@@ -583,7 +583,7 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
 {
   // @@@ We might consider checking to a lower LOD version only.
   // This function is not very fast if the bounding box test succeeds.
-  // Plagarism notice: Ripped form Sprite3D.
+
 #ifdef BALL_DEBUG
   printf("Ball:Hit Beam Object\n");
   printf("Debug:\n");
@@ -602,26 +602,32 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
   if (csIntersect3::BoxSegment (object_bbox, seg, isect, pr) < 0)
     return false;
   int i, max = top_mesh.num_triangles;
-  csVector3 *vrt = top_mesh.vertices[0];
+  float dist = 1.0, dist2;
+  csVector3 *vrt = top_mesh.vertices[0], tmp;
   csTriangle *tr = top_mesh.triangles;
   for (i = 0 ; i < max ; i++)
   {
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
-    	vrt[tr[i].c], seg, isect))
+    	vrt[tr[i].c], seg, tmp))
     {
-      if (pr)
-      {
-        *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+      dist2 = qsqrt (csSquaredDist::PointPoint (start, tmp) /
 		csSquaredDist::PointPoint (start, end));
+      if ( dist2 < dist )
+      {
+          isect = tmp;
+	  dist = dist2;
+          if (pr) *pr = dist;
       }
+    }
+  }
+  if ( dist == 1.0 )
+      return false;
+
 #ifdef BALL_DEBUG
       printf("Ball:Hit Beam Object: HIT! intersect : (%f,%f,%f)\n",
         isect.x, isect.y, isect.z);
 #endif
-      return true;
-    }
-  }
-  return false;
+  return true;
 }
 
 //----------------------------------------------------------------------

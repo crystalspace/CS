@@ -169,10 +169,12 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   initialized = false;
   blockxy = 4;
   gridx = 8; gridy = 8;
+  
+  grid_stepx = grid_stepy = 1/8;
   inv_block_stepx = 1.;
   inv_block_stepy = 1.;
-  grid_stepx = grid_stepy = 1/8;
   inv_grid_stepx = inv_grid_stepy = 8.;
+
   topleft.Set (0, 0, 0);
   scale.Set (1, 1, 1);
   blocks = NULL;
@@ -1114,12 +1116,12 @@ void csTerrFuncObject::SetupObject ()
       delete[] blocks;
       blocks = new csTerrBlock [blockxy*blockxy];
     }
-	inv_block_stepx = 1/scale.x;
-	inv_block_stepy = 1/scale.z;
-	grid_stepx = scale.x / gridx;
-	grid_stepy = scale.z / gridy;
-	inv_grid_stepx = 1 / grid_stepx;
-	inv_grid_stepy = 1 / grid_stepy;
+    grid_stepx = scale.x / gridx;
+    grid_stepy = scale.z / gridy;
+    inv_block_stepx = 1 / scale.x;
+    inv_block_stepy = 1 / scale.z;
+    inv_grid_stepx = 1 / grid_stepx;
+    inv_grid_stepy = 1 / grid_stepy;	
 	 
     int bx, by;
     int blidx = 0;
@@ -1396,29 +1398,33 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
 #endif
   csSegment3 seg (start, end);
   csVector3 st;
-  if (csIntersect3::BoxSegment (global_bbox, seg, st, pr) < 0)
+  int ret;
+  if (( ret = csIntersect3::BoxSegment (global_bbox, seg, st, pr)) < 0)
     return false;
 
 // Box walk. Not really fast as the name suggests. It works by stepping its way forward
 // through the terrain field. Its not very robust yet, but it goes ( sort of )
 
-  csVector3 inc = end - start;
+  csVector3 inc = end - start, v;
   inc.Normalize(); 
-  inc.x *= 0.1; // Tiny little increment ammount to nudge the ray over a box boundary
+  inc *= EPSILON; // Tiny little increment ammount to nudge the ray over a box boundary
+  float max_y = global_bbox.MaxY();
+  csBox3 tbox;
+  float dist = 1.0, dist2 = 1.0;
 
 #ifdef TERR_DEBUG
-  printf("Entering box crawl\n");
+  printf("Entering box crawl face: %d\n",ret);
   printf("Start :(%f,%f,%f)\n",st.x,st.y,st.z);
   printf("Inc :(%f,%f,%f)\n",inc.x,inc.y,inc.z);
 #endif
 
   st += inc;
   csSegment3 rev ( end, st );
-  int x,y, index, i, max;
+  int x, y, index, i, max;
   while (1)
   {
-	Object2Block( st, x, y );
-	Block2Index( x, y, index);
+    Object2Block( st, x, y );
+    Block2Index( x, y, index);
 #ifdef TERR_DEBUG
 	printf("Index :%d x,y :(%d,%d)\n",index, x, y);
 	printf("New Start :(%f,%f,%f)\n",st.x,st.y,st.z);
@@ -1431,26 +1437,36 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
   	  if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
     	vrt[tr[i].c], seg, st))
       {
-        if (pr)
-        {
-          *pr = qsqrt (csSquaredDist::PointPoint (start, st) /
+          dist2 = qsqrt (csSquaredDist::PointPoint (start, st) /
 		  csSquaredDist::PointPoint (start, end));
-        }
+	  if ( dist2 < dist )
+	  {
+	    isect = st;
+	    dist = dist2;
+            if (pr) *pr = dist;
+	  }
 #ifdef TERR_DEBUG
   printf("Terrain:Hit Beam Object: HIT! intersect : at (%f,%f,%f)\n",
     st.x, st.y, st.z);
 #endif
-		isect = st;
-		return true;
 	  }
 	}
-	if (csIntersect3::BoxSegment (blocks[index].bbox, rev, st, NULL) < 0) break;
+	tbox = blocks[index].bbox; v = tbox.Max();
+	tbox.AddBoundingVertex(v.x, max_y, v.z);
+	ret = csIntersect3::BoxSegment (tbox, rev, st, NULL); 
+
+// Note: The BOX_INSIDE check here terminates the search since the endpoint
+// of the beam is inside the bounding box. This shouldnt occur as the beam
+// should not end inside an object.
+	if ((ret == -1) || (ret == BOX_INSIDE) || (ret == BOX_SIDE_y) 
+	    || (ret == BOX_SIDE_Y)) break;	
 	st += inc;
 	rev.SetEnd(st);
 
   }
-  return false;
-
+  if (dist == 1.0)
+      return false;
+  return true;
 }
 
 

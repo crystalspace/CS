@@ -354,29 +354,17 @@ void csCubeMeshObject::HardTransform (const csReversibleTransform& t)
 bool csCubeMeshObject::HitBeamObject(const csVector3& start,
   const csVector3& end, csVector3& isect, float *pr)
 {
-  // @@@ We might consider checking to a lower LOD version only.
-  // This function is not very fast if the bounding box test succeeds.
-  // Plagarism notice: Ripped form Sprite3D.
+  // This function relies purely on the csBox collision test
+  // since the object being tested is a box ;).
+  
   csSegment3 seg (start, end);
   if (csIntersect3::BoxSegment (object_bbox, seg, isect, pr) < 0)
     return false;
-  int i;
-  csVector3 *vrt = mesh.vertices[0];
-  csTriangle *tr = mesh.triangles;
-  for (i = 0 ; i < 12 ; i++)
-  {
-    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
-    	vrt[tr[i].c], seg, isect))
-    {
-      if (pr)
-      {
-        *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
-		csSquaredDist::PointPoint (start, end));
-      }
-      return true;
-    }
-  }
-  return false;
+
+  if (pr)
+    *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+	csSquaredDist::PointPoint (start, end));
+  return true;
 }
 
 
