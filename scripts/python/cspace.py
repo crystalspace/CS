@@ -91,6 +91,8 @@ class iBasePtr(iBase):
         if not hasattr(self,"thisown"): _swig_setattr(self, iBase, 'thisown', 0)
         _swig_setattr(self, iBase,self.__class__,iBase)
 _cspace.iBase_swigregister(iBasePtr)
+cvar = _cspace.cvar
+csArrayItemNotFound = cvar.csArrayItemNotFound
 
 iBase_QueryInterfaceSafe = _cspace.iBase_QueryInterfaceSafe
 
@@ -171,7 +173,6 @@ class iSCFPtr(iSCF):
 _cspace.iSCF_swigregister(iSCFPtr)
 
 scfInitialize = _cspace.scfInitialize
-cvar = _cspace.cvar
 
 iSCF_scfGetVersion = _cspace.iSCF_scfGetVersion
 
@@ -4633,6 +4634,7 @@ class iRegion(iBase):
         return "<C iRegion instance at %s>" % (self.this,)
     def QueryObject(*args): return _cspace.iRegion_QueryObject(*args)
     def Add(*args): return _cspace.iRegion_Add(*args)
+    def Remove(*args): return _cspace.iRegion_Remove(*args)
     def Clear(*args): return _cspace.iRegion_Clear(*args)
     def DeleteAll(*args): return _cspace.iRegion_DeleteAll(*args)
     def PrepareTextures(*args): return _cspace.iRegion_PrepareTextures(*args)
