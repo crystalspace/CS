@@ -710,8 +710,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   {
     mat->QueryObject()->SetName (matname);
   }
-#ifdef CS_USE_NEW_RENDERER
+  
   size_t i;
+#ifdef CS_USE_NEW_RENDERER
   for (i=0; i<shaders.Length (); i++)
     //if (shaders[i]->Prepare ())
       material->SetShader (shadertypes[i], shaders[i]);
