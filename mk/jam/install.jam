@@ -3,8 +3,8 @@
 #============================================================================
 
 # override crappy jam defaults
-EXEMODE = 0755
-FILEMODE = 0644
+EXEMODE = 0755 ;
+FILEMODE = 0644 ;
 
 ##  InstallApplication applicationname [ : subdir ]
 ##    Install an application into the bindir directory. A subdirectory
