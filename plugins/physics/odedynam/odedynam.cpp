@@ -704,7 +704,7 @@ int csODEDynamics::CollideMeshPlane (dGeomID mesh, dGeomID plane, int flags,
   //Fast Check
   
   csVector3 current;
-  int i,j;
+  int i,j,k;
   bool planecut = false;
   current = box.GetCorner(0);
   float last = dGeomPlanePointDepth(plane,current.x,current.y,current.z);
@@ -770,24 +770,39 @@ int csODEDynamics::CollideMeshPlane (dGeomID mesh, dGeomID plane, int flags,
         if(count==1)
         {
           dContactGeom *c = &tempcontacts[0];
-          dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
-          out->pos[0] = c->pos[0];
-          out->pos[1] = c->pos[1];
-          out->pos[2] = c->pos[2];
-          out->normal[0] = result[0];
-          out->normal[1] = result[1];
-          out->normal[2] = result[2];
-          float depth1 = dGeomPlanePointDepth(plane,v1.x,v1.y,v1.z);
-          float depth2 = dGeomPlanePointDepth(plane,v2.x,v2.y,v2.z);
-          if(depth1>0.0f)
-            out->depth = depth1;
-          else if (depth2 > 0.0f)
-            out->depth = depth2;
-          else
-            out->depth = 0.0f;
-          out->g1 = mesh;
-          out->g2 = plane;
-          outcount ++;
+          bool doubles = false;
+          for(k=0;k<outcount;k++)
+          {
+            dContactGeom *kc = (dContactGeom *)((char *)outcontacts + skip * k);
+            if(kc->pos[0] == c->pos[0] &&
+               kc->pos[1] == c->pos[1] &&
+               kc->pos[2] == c->pos[2])
+            {
+              doubles = true;
+              break;
+            }
+          }
+          if(!doubles)
+          {
+            dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
+            out->pos[0] = c->pos[0];
+            out->pos[1] = c->pos[1];
+            out->pos[2] = c->pos[2];
+            out->normal[0] = result[0];
+            out->normal[1] = result[1];
+            out->normal[2] = result[2];
+            float depth1 = dGeomPlanePointDepth(plane,v1.x,v1.y,v1.z);
+            float depth2 = dGeomPlanePointDepth(plane,v2.x,v2.y,v2.z);
+            if(depth1>0.0f)
+              out->depth = depth1;
+            else if (depth2 > 0.0f)
+              out->depth = depth2;
+            else
+              out->depth = 0.0f;
+            out->g1 = mesh;
+            out->g2 = plane;
+            outcount ++;
+          }
         }
       }
     }
