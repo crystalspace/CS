@@ -21,7 +21,7 @@
 
 #include "iutil/document.h"
 
-class csTinyXmlNode;
+struct csTinyXmlNode;
 class TiDocumentNode;
 
 /**
@@ -30,7 +30,7 @@ class TiDocumentNode;
 class csTinyDocumentSystem : public iDocumentSystem
 {
 private:
-  friend class csTinyXmlNode;
+  friend struct csTinyXmlNode;
   csTinyXmlNode* pool;
 
 public:
