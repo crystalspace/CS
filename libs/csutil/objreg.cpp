@@ -112,6 +112,8 @@ csObjectRegistry::csObjectRegistry () : clearing (false)
   // We need a recursive mutex.
   mutex = csMutex::Create (true);
 #if defined(CS_DEBUG) || defined (CS_MEMORY_TRACKER)
+  if (iSCF::SCF == 0)
+    scfInitialize (0); // Make sure we've got an iSCF::SCF
   iSCF::SCF->object_reg = this;
 #endif
 }

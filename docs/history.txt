@@ -23,6 +23,9 @@ chronological order.
 	  into the texture size limit.
 	- res added some more per-texture-class options for downsampling and
 	  mip sharpening.
+	- res made the object registry call scfInitialize() in debug mode if 
+	  needed and undid the addition of scfInitialize() to the object 
+	  registry test.
 14-Jan-2004
 	- Eric Sunshine added a new automated and highly dynamic unit testing
 	  framework which employs CppUnit (http://cppunit.sourceforge.net/).
