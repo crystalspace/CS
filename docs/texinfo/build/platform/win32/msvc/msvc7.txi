@@ -6,10 +6,10 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated 25 June 2003.}
+@emph{Last updated 19 January 2004.}
 
-In order to successfully compile the Crystal Space 3D Software Development
-Kit (@sc{sdk}), you will need a copy of @emph{Microsoft Developer Studio .NET}
+In order to successfully compile the Crystal Space 3D Software Development Kit
+(@sc{sdk}), you will need a copy of @emph{Microsoft Developer Studio @sc{.net}}
 or the stand alone version of @emph{Microsoft Visual C++ 7}.
 
 @subsubheading Getting Extra Help
@@ -80,15 +80,15 @@ obtained from:
 
 Crystal Space contains support for a Simple Direct Media Layer 2D canvas which
 can be used as an alternative to the default Direct Draw canvas for use with
-the Crystal Space software 3D renderer.  To compile the SDL2D canvas you must
-have the supported 1.2.3 development runtime for your version of @sc{msvc} be
-it 5 or 6.  Please remember to add the @file{include} and @file{lib} directories
-to the global MSVC options, so @sc{msvc} can see them.
+the Crystal Space software 3D renderer.  To compile the @sc{sdl2d} canvas you
+must have the supported 1.2.3 development runtime for your version of @sc{msvc}
+be it 5 or 6.  Please remember to add the @file{include} and @file{lib}
+directories to the global @sc{msvc} options, so @sc{msvc} can see them.
 
 @uref{http://www.libsdl.org}
 
 Also remember to copy the @file{sdl.dll} into the @file{CS\} root directory
-or add it to your systems path before using the SDL2D canvas.
+or add it to your systems path before using the @sc{sdl2d} canvas.
 
 For instructions on using a specific canvas including
 the @sc{sdl2d} canvas @ref{Common Command Line Options}
@@ -96,10 +96,10 @@ the @sc{sdl2d} canvas @ref{Common Command Line Options}
 @subsubheading Python
 
 Crystal Space contains support for Python scripting and thus has projects
-within it requires that Python be installed on your system. Make sure you add the
-Python @emph{include} and @emph{libs} directories to @sc{msvc} so that the compiler
-can see those files. If you wish to compile with Python support you must install
-Python 2.2 or later, which can be obtained from:
+within it requires that Python be installed on your system.  Make sure you add
+the Python @emph{include} and @emph{libs} directories to @sc{msvc} so that the
+compiler can see those files.  If you wish to compile with Python support you
+must install Python 2.2 or later, which can be obtained from:
 
 @uref{http://www.python.org}
 
@@ -108,14 +108,35 @@ full advantage of the debug elements - you should have Python 2.2.3 or 2.3.0
 installed on your system. Whichever version you decide to use, make sure you
 download the comparable msvc_libs.
 
-@subsubheading Creative EAX 2.0
+@subsubheading Creative @sc{eax} 2.0
 
-In order to build the CS EAX 2.0 environmental audio plugin (@emph{plgsndrdreax}), requires
-you have the EAX 2.0 SDK on your system. The SDK can be obtained from the following website.
+In order to build the Crystal Space @sc{eax} 2.0 environmental audio plugin
+(@emph{plgsndrdreax}), requires you have the @sc{eax} 2.0 @sc{sdk} on your
+system.  The @sc{sdk} can be obtained from the following location:
 
-@uref{http://developer.creative.com/LEFTMENU/DC_LM_Downloads.asp}
+@noindent
+@ifnottex
+@uref{http://developer.creative.com/articles/article.asp?cat=1&sbcat=31&top=37&aid=61&file=EAX20SDK.exe}
+@end ifnottex
+@iftex
+@code{http://developer.creative.com/articles/article.asp?}@*
+@code{cat=1&sbcat=31&top=37&aid=61&file=EAX20SDK.exe}
+@end iftex
 
-After installation you will need to point MSVC to the SDK's include and lib paths.
+@noindent
+Developer documentation for @sc{eax} 2.0 can be found here:
+
+@noindent
+@ifnottex
+@uref{http://developer.creative.com/articles/article.asp?cat=1&sbcat=31&top=37&aid=62&file=EAX20ext.pdf}
+@end ifnottex
+@iftex
+@code{http://developer.creative.com/articles/article.asp?}@*
+@code{cat=1&sbcat=31&top=37&aid=62&file=EAX20ext.pdf}
+@end iftex
+
+After installation you will need to point @sc{msvc} to the @sc{sdk}'s include
+and lib paths.
 
 @subsubheading Compiling Crystal Space
 
@@ -209,8 +230,8 @@ produce @file{.exe} files.
 Q. @emph{I get "Errors in post link" and later "file not found" errors.}
 
 A. Some problems with non-latin directory names have been reported (e.g.
-Hebrew). If your CS directory is under such a directory, try to move it to
-a directory which name has only Latin characters in it.
+Hebrew).  If your @file{CS} directory is under such a directory, try to move it
+to a directory which name has only Latin characters in it.
 @end itemize
 
 @subsubheading Miscellaneous

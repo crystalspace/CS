@@ -19,6 +19,11 @@ chronological order.
 	  generation.  If you need to generate render3d shader project files,
 	  it should be sufficient to invoke mk/msvcgen/msvcgen.sh with the
 	  argument "-sUSE_NEW_RENDERER=yes".
+	- Eric Sunshine updated EAX URLs in msvc6.txi and msvc7.txi since the
+	  old ones were out of date.  New URLs provided by David Calkins
+	  <dcalk@dejazzd.com>.
+	- Eric Sunshine fixed a bunch of Texinfo mark-up problems in msvc6.txi
+	  and msvc7.txi.
 18-Jan-2004
 	- Jorrit removed unused 'next'/'prev' fields in csLight. These
 	  are no longer needed after the redesign of two days ago.

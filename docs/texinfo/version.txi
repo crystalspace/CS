@@ -1,4 +1,4 @@
 @c -*-texinfo-*-
-@set UPDATED 16 Jan 2004
-@set EDITION 97.dev.33
+@set UPDATED 19 Jan 2004
+@set EDITION 97.dev.34
 @set VERSION 97.dev
