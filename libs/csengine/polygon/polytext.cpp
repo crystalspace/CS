@@ -55,6 +55,7 @@ csPolyTexture::csPolyTexture ()
   polygon = NULL;
   ipolygon = NULL;
   shadow_bitmap = NULL;
+  ambient_version = 0;
 }
 
 csPolyTexture::~csPolyTexture ()
@@ -153,7 +154,14 @@ bool csPolyTexture::RecalculateDynamicLights ()
   if (!lm) return false;
 
   // first combine the static and pseudo-dynamic lights
-  if (!lm->UpdateRealLightMap ()) return false;
+  csColor amb = polygon->GetParent()->GetDynamicAmbientLight();
+
+  if (!lm->UpdateRealLightMap (amb.red,
+                               amb.green,
+                               amb.blue,
+                               polygon->GetParent()->GetDynamicAmbientVersion()>ambient_version )) return false;
+
+  ambient_version = polygon->GetParent()->GetDynamicAmbientVersion();
 
   //---
   // Now add all dynamic lights.

@@ -151,6 +151,9 @@ csThing::csThing (iBase *parent) :
   obj_bbox_valid = false;
   light_frame_number = -1;
 
+  dynamic_ambient.Set(0,0,0);
+  ambient_version = 0;
+
   center_idx = -1;
   ParentTemplate = NULL;
 

@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+20-Sep-2002 (Keith Fulton)
+	- Added Dynamic Ambient Lighting capability to all Things.
+	- Added sector convenience function to set Dyn Ambient for all things in sector.
+
 20-Sep-2002
 	- Fixed XML parsing for <scale> and <shift> for material layers.
 	  Thanks to Brandon for spotting this.

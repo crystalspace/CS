@@ -279,6 +279,11 @@ private:
   /// Fog information.
   csFog fog;
 
+  /// Dynamic ambient light assigned to this thing.
+  csColor dynamic_ambient;
+  /// Version number of ambient light color determines whether recalc is necessary in poly.
+  int ambient_version;
+
   /**
    * Vector with visibility objects. Only useful if this thing has a
    * static tree and thus can do visibility testing.
@@ -993,6 +998,23 @@ public:
   /// Disable fog.
   void DisableFog () { fog.enabled = false; }
 
+  /// Sets dynamic ambient light for this thing
+  void SetDynamicAmbientLight(const csColor& color)
+  {
+      dynamic_ambient = color;
+      ambient_version++;
+  }
+  /// Gets dynamic ambient light for this thing
+  const csColor& GetDynamicAmbientLight()
+  {
+      return dynamic_ambient;
+  }
+
+  /// Get dynamic ambient light version to test if needs to be recalculated
+  int GetDynamicAmbientVersion()
+  {   return ambient_version; }
+
+
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //------------------------- iThingState interface -------------------------
@@ -1101,6 +1123,16 @@ public:
     { return scfParent->HasFog (); }
     virtual csFog *GetFog () const
     { return &scfParent->GetFog (); }
+
+    /// Sets dynamic ambient light for this thing
+    virtual void SetDynamicAmbientLight (const csColor& color)
+    { scfParent->SetDynamicAmbientLight (color); }
+    /// Returns the dynamic ambient light color
+    virtual const csColor& GetDynamicAmbientLight ()
+    { return scfParent->GetDynamicAmbientLight (); }
+    /// Get dynamic ambient light version to test if needs to be recalculated
+    virtual int GetDynamicAmbientVersion () const
+    { return scfParent->GetDynamicAmbientVersion (); }
 
     virtual iPolygon3D* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,

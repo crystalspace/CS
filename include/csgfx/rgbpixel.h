@@ -139,6 +139,12 @@ struct csRGBpixel
   void Set (const csRGBpixel& p)
   /* : red (p.red), green (p.green), blue (p.blue), alpha (p.alpha) {} */
   { *(uint32*)this = *(uint32*)&p; }
+  void operator += (const csRGBcolor& c)
+  {
+      red   += c.red;
+      green += c.green;
+      blue  += c.blue;
+  }
 };
 
 // We don't need RGB_MASK anymore

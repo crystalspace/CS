@@ -510,9 +510,12 @@ void csLightMap::Cache (
   }
 }
 
-bool csLightMap::UpdateRealLightMap ()
+bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
+                                     float dyn_ambient_g,
+                                     float dyn_ambient_b,
+                                     bool  amb_dirty)
 {
-  if (!dyn_dirty) return false;
+  if (!dyn_dirty && !amb_dirty) return false;
 
   dyn_dirty = false;
   mean_recalc = true;
@@ -522,7 +525,25 @@ bool csLightMap::UpdateRealLightMap ()
   // Remember the real lightmap first so that we can see if
   // there were any changes.
   //---
-  memcpy (real_lm.GetArray (), static_lm.GetArray (), 4 * lm_size);
+  if (dyn_ambient_r || dyn_ambient_g || dyn_ambient_b)
+  {
+    csRGBcolor ambient;
+    ambient.Set (dyn_ambient_r * (255/1.5),
+                 dyn_ambient_g * (255/1.5),
+                 dyn_ambient_b * (255/1.5)  );
+    for (int i=0; i<lm_size; i++)
+    {
+        real_lm[i] = static_lm[i];
+        int color = ambient.red+real_lm[i].red;
+        real_lm[i].red = (color > 255) ? 255 : color;
+        color = ambient.green+real_lm[i].green;
+        real_lm[i].green= (color > 255) ? 255 : color;
+        color = ambient.blue+real_lm[i].blue;
+        real_lm[i].blue = (color > 255) ? 255 : color;
+    }
+  }
+  else
+    memcpy (real_lm.GetArray (), static_lm.GetArray (), 4 * lm_size);
 
   //---
   // Then add all pseudo-dynamic lights.

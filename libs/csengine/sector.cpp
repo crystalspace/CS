@@ -889,6 +889,19 @@ void csSector::ShineLights (iMeshWrapper *mesh, csProgressPulse *pulse)
   }
 }
 
+void csSector::SetDynamicAmbientLight(const csColor& color)
+{
+  iMeshList* ml = GetMeshes ();
+  for (int i = 0 ; i < ml->GetCount () ; i++)
+  {
+    iMeshWrapper* mesh = ml->Get (i);
+    csRef<iThingState> thing (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iThingState));
+    if (thing)
+      thing->SetDynamicAmbientLight(color);
+  }
+}
+
 void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
 {
   bbox.StartBoundingBox ();

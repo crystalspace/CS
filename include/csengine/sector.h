@@ -376,6 +376,9 @@ public:
   /// Version of shine_lights() which only affects one mesh object.
   void ShineLights (iMeshWrapper*, csProgressPulse* = 0);
 
+  /// Sets dynamic ambient light for all things in the sector
+  void SetDynamicAmbientLight(const csColor& color);
+
   //----------------------------------------------------------------------
   // Various
   //----------------------------------------------------------------------
@@ -438,6 +441,8 @@ public:
       { scfParent->ShineLights (); }
     virtual void ShineLights (iMeshWrapper* mesh)
       { scfParent->ShineLights (mesh); }
+    virtual void SetDynamicAmbientLight(const csColor& color)
+      { scfParent->SetDynamicAmbientLight(color); }  
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const
       { scfParent->CalculateSectorBBox (bbox, do_meshes); }
     virtual bool HasFog () const

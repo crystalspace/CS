@@ -271,6 +271,11 @@ struct iThingState : public iBase
   /// Return the fog structure (even if fog is disabled).
   virtual csFog* GetFog () const = 0;
 
+  /// Sets dynamic ambient light for this thing
+  virtual void SetDynamicAmbientLight(const csColor& color) = 0;
+  /// Get dynamic ambient light version to test if needs to be recalculated
+  virtual int GetDynamicAmbientVersion() const = 0;
+
   /**
    * Intersect a segment with this thing and return the first
    * polygon that is hit. If only_portals == true then only portals

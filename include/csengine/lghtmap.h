@@ -154,7 +154,11 @@ public:
   /// set the dirty flag for this lightmap
   void MakeDirtyDynamicLights () { dyn_dirty = true; mean_recalc = true; }
 
-  bool UpdateRealLightMap ();
+  /// Rebuilds the lightmap for the poly from all the lightmaps + the ambient light if specified
+  bool UpdateRealLightMap (float dyn_ambient_r=0,
+                           float dyn_ambient_g=0,
+                           float dyn_ambient_b=0, 
+                           bool  amb_dirty=false);
 
   ///
   csRGBMap& GetStaticMap () { return static_lm; }

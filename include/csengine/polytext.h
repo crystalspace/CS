@@ -321,6 +321,9 @@ private:
   /// Internally used by (software) texture cache
   void *cache_data [4];
 
+  /// Compared against csThing ambient version to know whether lightmap needs updating.
+  int  ambient_version;
+
 public:
   /**
    * Option variable: control how much the angle of the light with the polygon
