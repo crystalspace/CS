@@ -509,9 +509,9 @@ bool csBezierSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
     }
 
     //Writedown Curve tag
-    for (int i=0; i< fact->GetCurveCount(); i++)
+    for (int j=0; j< fact->GetCurveCount(); j++)
     {
-      iCurve* curve = fact->GetCurve(i);
+      iCurve* curve = fact->GetCurve(j);
       csRef<iDocumentNode> curveNode = 
         parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       curveNode->SetValue("curve");

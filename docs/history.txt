@@ -24,6 +24,7 @@ chronological order.
 	  attenuation (sound attenuation is normally not linear).
 	  See documentation on SetMinimumDistance in iSoundSource interface
 	  for details (or the OpenAL sound guide, or the DirectSound help)
+	- PK fixed a msvc6 bug in bezierdlr.
 30-Sep-2004
 	- Jorrit added a new 'copy' flag to CreateRenderBuffer() and
 	  CreateIndexRenderBuffer() which is default to true. Meshes can
