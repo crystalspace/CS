@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+03-Dec-2003
+	- res did a bunch of changes and fixes. He attempted to get the r3dtest
+	  map functional, but hadn't too much success.
 30-Nov-2003
 	- res changed the buffer anf texture mapping specification in shader
 	  files for consistency to be like:

@@ -119,6 +119,9 @@
       MOV lightFactors.w, materialReflection.x;
       # poof, the lighting coefficients
       LIT lightFactors, lightFactors;
+      # apply distance-based attenuation
+      MUL lightFactors.y, lightFactors.y, lightAtnFinal.x;
+      MUL lightFactors.z, lightFactors.z, lightAtnFinal.x;
       
       #MUL ambient, materialAmbient, lightAmbient;
       # next line can be omitted; lightFactors.x is always 1.0 per spec
@@ -128,9 +131,9 @@
       #MUL specular, specular, lightFactors.z;
       
       MUL diffuse, materialFlatColor, lightDiffuse;
-      MUL diffuse, lightDiffuse, lightFactors.y;
+      MUL oCol0.xyz, lightDiffuse, lightFactors.y;
       #MOV oCol0.xyz, diffuse;
-      MUL oCol0.xyz, diffuse, lightAtnFinal.w;
+      #MUL oCol0.xyz, diffuse, lightAtnFinal.w;
       #MUL oCol0.xyz, lightAtnFinal.x, 10;
       MOV oCol0.w, lightDiffuse.w;
       

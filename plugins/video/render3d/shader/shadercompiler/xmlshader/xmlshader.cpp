@@ -19,11 +19,13 @@
 #include "cssysdef.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
+#include "iutil/vfs.h"
 #include "imap/services.h"
 #include "ivideo/rendermesh.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstrset.h"
+#include "csutil/xmltiny.h"
 #include "xmlshader.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -46,7 +48,7 @@ SCF_IMPLEMENT_IBASE_END
 csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
-  BuildTokens();
+  init_token_table (xmltokens);
 }
 
 csXMLShaderCompiler::~csXMLShaderCompiler()
@@ -67,23 +69,9 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   }
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  synldr = CS_QUERY_REGISTRY (objectreg, iSyntaxService);
 
   return true;
-}
-
-void csXMLShaderCompiler::BuildTokens ()
-{
-  xmltokens.Register("shader", XMLTOKEN_SHADER);
-  xmltokens.Register("technique", XMLTOKEN_TECHNIQUE);
-  xmltokens.Register("xmlshader", XMLTOKEN_XMLSHADER);
-  xmltokens.Register("pass", XMLTOKEN_PASS);
-  xmltokens.Register("shadervar", XMLTOKEN_SHADERVARIABLE);
-  xmltokens.Register("vp", XMLTOKEN_VERTEXPROGRAM);
-  xmltokens.Register("fp", XMLTOKEN_FRAGMENTPROGRAM);
-  xmltokens.Register("buffer", XMLTOKEN_BUFFERMAPPING);
-  xmltokens.Register("texture", XMLTOKEN_TEXTUREMAPPING);
-  xmltokens.Register("mixmode", XMLTOKEN_MIXMODE);
-  xmltokens.Register("alphamode", XMLTOKEN_ALPHAMODE);
 }
 
 int csXMLShaderCompiler::CompareTechniqueKeeper(void const* item1, void const* item2)
@@ -92,15 +80,15 @@ int csXMLShaderCompiler::CompareTechniqueKeeper(void const* item1, void const* i
   t1 = (techniqueKeeper*) item1;
   t2 = (techniqueKeeper*) item2;
   if (t1->priority < t2->priority)
-    return -1;
-  else if (t1->priority > t2->priority)
     return 1;
+  else if (t1->priority > t2->priority)
+    return -1;
   return 0;
 }
 
-csPtr<iShader> csXMLShaderCompiler::CompileShader(iDocumentNode *templ)
+csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
 {
-  if (!ValidateTemplate(templ))
+  if (!ValidateTemplate (templ))
     return csPtr<iShader> (0);
 
   csRef<iDocumentNodeIterator> it = templ->GetNodes();
@@ -108,9 +96,10 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader(iDocumentNode *templ)
   csArray<techniqueKeeper> techniquesTmp;
 
   //read in the techniques
-  while(it->HasNext ()){
+  while(it->HasNext ())
+  {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType ()==CS_NODE_ELEMENT &&
+    if (child->GetType () == CS_NODE_ELEMENT &&
       xmltokens.Request (child->GetValue ()) == XMLTOKEN_TECHNIQUE)
     {
       //save it
@@ -124,24 +113,25 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader(iDocumentNode *templ)
   //now try to load them one in a time, until we are successful
   csXMLShader* shader;
   csArray<techniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
-  while (techIt.HasNext()){
+  while (techIt.HasNext())
+  {
     techniqueKeeper tk = techIt.Next();
     shader = CompileTechnique (tk.node, templ);
-    if (shader!=0) break;
+    if (shader != 0) break;
   }
 
   if (shader != 0)
-    shader->name = csStrNew((const char*)templ->GetAttributeValue("name"));
+    shader->name = csStrNew ((const char*)templ->GetAttributeValue("name"));
 
   return shader;
 }
 
-csXMLShader* csXMLShaderCompiler::CompileTechnique (iDocumentNode *node, 
-                                                iDocumentNode *parentSV)
+csXMLShader* csXMLShaderCompiler::CompileTechnique (iDocumentNode *node,
+						    iDocumentNode *parentSV)
 {
   //check nodetype
   if (node->GetType()!=CS_NODE_ELEMENT || 
-    xmltokens.Request (node->GetValue())!=XMLTOKEN_TECHNIQUE)
+    xmltokens.Request (node->GetValue()) != XMLTOKEN_TECHNIQUE)
     return 0;
 
   csXMLShader* newShader = new csXMLShader (g3d);
@@ -157,10 +147,15 @@ csXMLShader* csXMLShaderCompiler::CompileTechnique (iDocumentNode *node,
 
   //load shadervariable definitions
   if (parentSV)
-    LoadSVBlock (parentSV, &newShader->staticVariables, &newShader->dynamicVariables);
+  {
+    csRef<iDocumentNode> varNode = parentSV->GetNode(
+      xmltokens.Request (XMLTOKEN_SHADERVAR));
+    if (varNode)
+      LoadSVBlock (varNode, &newShader->staticVariables, &newShader->dynamicVariables);
+  }
 
   csRef<iDocumentNode> varNode = node->GetNode(
-    xmltokens.Request (XMLTOKEN_SHADERVARIABLE));
+    xmltokens.Request (XMLTOKEN_SHADERVAR));
 
   if (varNode)
     LoadSVBlock (varNode, &newShader->staticVariables, &newShader->dynamicVariables);
@@ -182,7 +177,7 @@ csXMLShader* csXMLShaderCompiler::CompileTechnique (iDocumentNode *node,
   //fail the whole technique
   int currentPassNr = 0;
   it = node->GetNodes(xmltokens.Request (XMLTOKEN_PASS));
-  while(it->HasNext ())
+  while (it->HasNext ())
   {
     csRef<iDocumentNode> passNode = it->Next ();
     newShader->passes[currentPassNr].owner = newShader;
@@ -197,11 +192,12 @@ csXMLShader* csXMLShaderCompiler::CompileTechnique (iDocumentNode *node,
   return newShader;
 }
 
-bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass *pass)
+bool csXMLShaderCompiler::LoadPass (iDocumentNode *node, 
+				    csXMLShader::shaderPass *pass)
 {
   //Load shadervar block
   csRef<iDocumentNode> varNode = node->GetNode(
-    xmltokens.Request (XMLTOKEN_SHADERVARIABLE));
+    xmltokens.Request (XMLTOKEN_SHADERVAR));
  
   if (varNode)
     LoadSVBlock (varNode, &pass->staticVariables, &pass->dynamicVariables);
@@ -209,11 +205,11 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
   //load vp
   csRef<iDocumentNode> programNode;
   csRef<iShaderProgram> program;
-  programNode = node->GetNode(xmltokens.Request (XMLTOKEN_VERTEXPROGRAM));
+  programNode = node->GetNode(xmltokens.Request (XMLTOKEN_VP));
 
   if (programNode)
   {
-    program = LoadProgram(programNode, pass);
+    program = LoadProgram (programNode, pass);
     if (program)
       pass->vp = program;
     else
@@ -223,11 +219,11 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
     }
   }
 
-  programNode = node->GetNode(xmltokens.Request (XMLTOKEN_FRAGMENTPROGRAM));
+  programNode = node->GetNode(xmltokens.Request (XMLTOKEN_FP));
 
   if (programNode)
   {
-    program = LoadProgram(programNode, pass);
+    program = LoadProgram (programNode, pass);
     if (program)
       pass->fp = program;
     else
@@ -238,9 +234,6 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
   }
 
   {
-    csRef<iSyntaxService> synldr = 
-      CS_QUERY_REGISTRY (objectreg, iSyntaxService);
-
     csRef<iDocumentNode> nodeMixMode = node->GetNode ("mixmode");
     if (nodeMixMode != 0)
     {
@@ -281,12 +274,12 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
 
   //if we got this far, load buffermappings
   csRef<iDocumentNodeIterator> it;
-  it = node->GetNodes(xmltokens.Request (XMLTOKEN_BUFFERMAPPING));
+  it = node->GetNodes(xmltokens.Request (XMLTOKEN_BUFFER));
   pass->bufferCount = 0;
   while(it->HasNext ())
   {
     csRef<iDocumentNode> mapping = it->Next ();
-    if (mapping->GetType ()!=CS_NODE_ELEMENT) continue;
+    if (mapping->GetType () != CS_NODE_ELEMENT) continue;
     
     const char* dest = mapping->GetAttributeValue ("destination");
     csVertexAttrib attrib = CS_VATTRIB_0;
@@ -383,7 +376,7 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
 
   //get texturemappings
   pass->textureCount = 0;
-  it = node->GetNodes (xmltokens.Request (XMLTOKEN_TEXTUREMAPPING));
+  it = node->GetNodes (xmltokens.Request (XMLTOKEN_TEXTURE));
   while(it->HasNext ())
   {
     csRef<iDocumentNode> mapping = it->Next ();
@@ -439,33 +432,31 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
   (void)dynamicVariables;
   csRef<csShaderVariable> svVar;
   
-  csRef<iDocumentNodeIterator> it = node->GetNodes("define");
-  while(it->HasNext ())
+  csRef<iDocumentNodeIterator> it = node->GetNodes ("define");
+  while (it->HasNext ())
   {
     csRef<iDocumentNode> var = it->Next ();
     svVar.AttachNew (
       new csShaderVariable(strings->Request(var->GetAttributeValue ("name"))));
 
-    csStringID idtype = xmltokens.Request (var->GetAttributeValue("type"));
-    idtype -= 100;
-    svVar->SetType( (csShaderVariable::VariableType) idtype);
-    switch(idtype)
+    csStringID idtype = xmltokens.Request (var->GetAttributeValue ("type"));
+    switch (idtype)
     {
-    case csShaderVariable::INT:
-      svVar->SetValue (var->GetAttributeValueAsInt("default"));
-      break;
-    case csShaderVariable::FLOAT:
-      svVar->SetValue (var->GetAttributeValueAsFloat("default"));
-      break;
-    case csShaderVariable::STRING:
-      svVar->SetValue (new scfString( var->GetAttributeValue("default")) );
-      break;
-    case csShaderVariable::VECTOR3:
-      const char* def = var->GetAttributeValue("default");
-      csVector3 v;
-      sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
-      svVar->SetValue (v);
-      break;
+      case XMLTOKEN_INT:
+	svVar->SetValue (var->GetAttributeValueAsInt("default"));
+	break;
+      case XMLTOKEN_FLOAT:
+	svVar->SetValue (var->GetAttributeValueAsFloat("default"));
+	break;
+      case XMLTOKEN_STRING:
+	svVar->SetValue (new scfString( var->GetAttributeValue("default")) );
+	break;
+      case XMLTOKEN_VECTOR3:
+	const char* def = var->GetAttributeValue("default");
+	csVector3 v;
+	sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
+	svVar->SetValue (v);
+	break;
     }
     staticVariables->AddVariable(svVar);
   }
@@ -476,18 +467,21 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
 csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
   iDocumentNode *node, csXMLShader::shaderPass *pass)
 {
+  if (node->GetAttributeValue("plugin") == 0)
+    // @@@ Report
+    return 0;
+
   csRef<iShaderProgram> program;
 
   const char *pluginprefix = "crystalspace.graphics3d.shader.";
   char *plugin = new char[strlen(pluginprefix) + 255 + 1];
   strcpy (plugin, pluginprefix);
-  
+
   strncat (plugin, node->GetAttributeValue("plugin"), 255);
   
   //load the plugin
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,
     iPluginManager);
-  
 
   csRef<iShaderProgramPlugin> plg;
   plg = CS_QUERY_PLUGIN_CLASS(plugin_mgr, plugin, iShaderProgramPlugin);
@@ -504,7 +498,32 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
   program = plg->CreateProgram (programType);
   if (program == 0)
     return 0;
-  program->Load (node);
+  csRef<iDocumentNode> programNode;
+  if (node->GetAttributeValue ("file") != 0)
+  {
+    csRef<iVFS> VFS = CS_QUERY_REGISTRY(objectreg, iVFS);
+    csRef<iFile> programFile = VFS->Open (node->GetAttributeValue ("file"),
+      VFS_FILE_READ);
+    csRef<iDocumentSystem> docsys (
+      CS_QUERY_REGISTRY(objectreg, iDocumentSystem));
+    if (docsys == 0)
+      docsys.AttachNew (new csTinyDocumentSystem ());
+
+    csRef<iDocument> programDoc = docsys->CreateDocument ();
+    programDoc->Parse (programFile);
+    /*csRef<iDocumentNodeIterator> it = programDoc->GetRoot ()->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      programNode = child;
+      break;
+    }*/
+    programNode = programDoc->GetRoot ();
+  }
+  else
+    programNode = node;
+  program->Load (programNode);
 
   csArray<iShaderVariableContext*> staticDomains;
   staticDomains.Push (pass);
@@ -536,7 +555,8 @@ bool csXMLShaderCompiler::IsTemplateToCompiler(iDocumentNode *templ)
   if (xmltokens.Request (templ->GetValue())!=XMLTOKEN_SHADER) return false;
 
   //Check the type-string in <shader>
-  if (xmltokens.Request (templ->GetAttributeValue("type"))!=XMLTOKEN_XMLSHADER)
+  if ((templ->GetAttributeValue ("type") == 0) || (xmltokens.Request (
+    templ->GetAttributeValue ("type")) != XMLTOKEN_XMLSHADER))
     return false;
 
   //Check that we have children, no children == not a template to this one at least

@@ -1,12 +1,11 @@
 <shader type="xmlshader" name="water">
-<declare name="STANDARD_LIGHT_AMBIENT" type="vector3" default="1, 1, 1" />
+  <define>
+      <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3" default="1, 1, 1" />
+  </define>
   <technique priority="50">
     <pass>
       <mixmode><copy/></mixmode>
-      <!--<streammapping stream="vertices" destination="position" />-->
       <buffer name="vertices" destination="position" />
-      <!--<streammapping stream="texture coordinates" destination="texture coordinate" />-->
-      <!--<streammapping stream="normals" destination="normal"/>-->
       <buffer name="normals" destination="normal"/>
       <vp plugin="glfixed">
         <fixedvp>  
@@ -14,7 +13,6 @@
           <!--<ambient/>-->
         </fixedvp>
       </vp>
-      <!--<texturemapping unit="0" name="tex diffuse" />-->
       <texture name="tex diffuse" destination="unit 0" />
       <fp plugin="glfixed">
         <fixedfp>

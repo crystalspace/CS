@@ -40,6 +40,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "video/canvas/openglcommon/glextmanager.h"
 
+#include "glshader_arb.h"
 #include "glshader_avp.h"
 
 SCF_IMPLEMENT_IBASE(csShaderGLAVP)
@@ -50,16 +51,16 @@ void csShaderGLAVP::Report (int severity, const char* msg, ...)
 {
   va_list args;
   va_start (args, msg);
-  csReportV (object_reg, severity, 
+  csReportV (shaderPlug->object_reg, severity, 
     "crystalspace.graphics3d.shader.glarb", msg, args);
   va_end (args);
 }
 
-void csShaderGLAVP::Activate(csRenderMesh* mesh)
+void csShaderGLAVP::Activate ()
 {
   //enable it
   glEnable(GL_VERTEX_PROGRAM_ARB);
-  ext->glBindProgramARB(GL_VERTEX_PROGRAM_ARB, program_num);
+  shaderPlug->ext->glBindProgramARB (GL_VERTEX_PROGRAM_ARB, program_num);
 }
 
 void csShaderGLAVP::Deactivate()
@@ -71,6 +72,7 @@ void csShaderGLAVP::SetupState ( csRenderMesh *mesh,
                                 csArray<iShaderVariableContext*> &dynamicDomains)
 {
   int i;
+  const csGLExtensionManager* ext = shaderPlug->ext;
 
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
@@ -106,7 +108,7 @@ void csShaderGLAVP::SetupState ( csRenderMesh *mesh,
       if (lvar->GetValue (v4))
       {
         ext->glProgramLocalParameter4fvARB (GL_VERTEX_PROGRAM_ARB, 
-          dynamicVars.Get(i).userData, &v4.x);
+          (int)dynamicVars.Get(i).userData, &v4.x);
       }
       dynamicVars.Get (i).shaderVariable = 0;
     }
@@ -119,8 +121,10 @@ void csShaderGLAVP::ResetState ()
 
 bool csShaderGLAVP::LoadProgramStringToGL (const char* programstring)
 {
-  if(!ext)
+  if (!shaderPlug->ext)
     return false;
+
+  const csGLExtensionManager* ext = shaderPlug->ext;
 
   if(!ext->CS_GL_ARB_vertex_program)
     return false;
@@ -210,10 +214,8 @@ bool csShaderGLAVP::Load (iDocumentNode* program)
 
   BuildTokenHash();
 
-  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(object_reg,
-  	iShaderManager);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	object_reg, "crystalspace.renderer.stringset", iStringSet);
+    shaderPlug->object_reg, "crystalspace.renderer.stringset", iStringSet);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("arbvp");
   if (variablesnode)
@@ -328,6 +330,8 @@ bool csShaderGLAVP::Prepare (iShaderPass *pass)
 
 bool csShaderGLAVP::Compile(csArray<iShaderVariableContext*> &staticDomains)
 {
+  shaderPlug->Open ();
+
   variablemapentry tempEntry;
   csShaderVariableProxy tempProx;
   csArray<variablemapentry> newStat;
@@ -356,12 +360,12 @@ bool csShaderGLAVP::Compile(csArray<iShaderVariableContext*> &staticDomains)
     {
       //dynamic
       tempProx.Name = variablemap[i].name;
-      tempProx.userData = variablemap[i].registernum;
+      tempProx.userData = (void*)variablemap[i].registernum;
       dynamicVars.InsertSorted (tempProx);
     }
   }
   variablemap.Empty ();
   newStat.TransferTo (variablemap);
 
-  return LoadProgramStringToGL(programstring);
+  return LoadProgramStringToGL (programstring);
 }

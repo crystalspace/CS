@@ -175,9 +175,10 @@ bool csShaderManager::HandleEvent(iEvent& event)
 }
 
 
-void csShaderManager::RegisterShader(iShader* shader)
+void csShaderManager::RegisterShader (iShader* shader)
 {
-  shaders.Push(shader);
+  if (shader != 0)
+    shaders.Push(shader);
 }
 
 iShader* csShaderManager::GetShader(const char* name)

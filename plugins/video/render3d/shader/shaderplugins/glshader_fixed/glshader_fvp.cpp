@@ -35,6 +35,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
+#include "ivideo/rendermesh.h"
 #include "ivideo/shader/shader.h"
 //#include "ivideo/shader/shadervar.h"
 
@@ -80,7 +81,7 @@ void csGLShaderFVP::SetupState (csRenderMesh *mesh,
   {
     for(i=0;i<dynamicDomains.Length();i++)
     {
-      dynamicDomains[i]->FillVariableList(&dynamicVars);
+      dynamicDomains[i]->FillVariableList (&dynamicVars);
     }
   }
 
@@ -94,12 +95,12 @@ void csGLShaderFVP::SetupState (csRenderMesh *mesh,
     {
 
       //fix vars for this light
-      for(j = 0; j < lights[i].dynVars.Length (); j++)
+      /*for(j = 0; j < lights[i].dynVars.Length (); j++)
       {
         *((csRef<csShaderVariable>*)lights[i].dynVars.Get(j).userData) = 
           lights[i].dynVars.Get(j).shaderVariable;
         lights[i].dynVars.Get(j).shaderVariable = 0;
-      }
+      }*/
 
       int l = lights[i].lightnum;
       glEnable (GL_LIGHT0+l);
@@ -163,7 +164,7 @@ void csGLShaderFVP::SetupState (csRenderMesh *mesh,
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, (float*)&v);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, (float*)&v);
 
-    if (ambientvar != csInvalidStringID)
+    if (ambientVarRef)
       ambientVarRef->GetValue (v);
     else
       v = csVector4 (0, 0, 0, 1);
@@ -252,7 +253,7 @@ void csGLShaderFVP::BuildTokenHash()
 
 bool csGLShaderFVP::Load(iDocumentNode* program)
 {
-  if(!program)
+  if (!program)
     return false;
 
   do_lighting = false;
@@ -386,8 +387,8 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
     }
   }
   if (!ambientVarRef)
-    dynamicVars.InsertSorted (csShaderVariableProxy(ambientvar, 
-    (void*)&ambientVarRef));
+    dynamicVars.InsertSorted (csShaderVariableProxy (ambientvar, 0,
+    &ambientVarRef));
 
   for (i = 0; i < lights.Length (); i++)
   {
@@ -403,8 +404,8 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
       }
     }
     if(!ent.positionVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.positionvar, 
-      (void*)&ent.positionVarRef));
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.positionvar, 0,
+      &ent.positionVarRef));
 
     ent.diffuseVarRef = svContextHelper.GetVariable (ent.diffusevar);
     if(!ent.diffuseVarRef)
@@ -416,8 +417,8 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
       }
     }
     if(!ent.diffuseVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.diffusevar, 
-      (void*)&ent.diffuseVarRef));
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.diffusevar, 0,
+      &ent.diffuseVarRef));
 
     ent.specularVarRef = svContextHelper.GetVariable (ent.specularvar);
     if(!ent.specularVarRef)
@@ -429,8 +430,8 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
       }
     }
     if(!ent.specularVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.specularvar, 
-      (void*)&ent.specularVarRef));
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.specularvar, 0,
+      &ent.specularVarRef));
 
     ent.attenuationVarRef = svContextHelper.GetVariable (ent.attenuationvar);
     if(!ent.attenuationVarRef)
@@ -442,8 +443,8 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
       }
     }
     if(!ent.attenuationVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.attenuationvar, 
-      (void*)&ent.attenuationVarRef));
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.attenuationvar, 0,
+      &ent.attenuationVarRef));
   }
 
   return true;

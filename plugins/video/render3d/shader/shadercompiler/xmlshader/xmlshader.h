@@ -241,26 +241,15 @@ private:
 
   /// XML Token and management
   csStringHash xmltokens;
-  void BuildTokens();
-
-  enum {
-    XMLTOKEN_SHADER=1,
-    XMLTOKEN_TECHNIQUE,
-    XMLTOKEN_XMLSHADER,
-    XMLTOKEN_PASS,
-    XMLTOKEN_SHADERVARIABLE,
-    XMLTOKEN_VERTEXPROGRAM,
-    XMLTOKEN_FRAGMENTPROGRAM,
-    XMLTOKEN_BUFFERMAPPING,
-    XMLTOKEN_TEXTUREMAPPING,
-    XMLTOKEN_MIXMODE,
-    XMLTOKEN_ALPHAMODE
-  };
+#define CS_TOKEN_ITEM_FILE \
+  "video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"
+#include "cstool/tokenlist.h"
 
   //Standard vars
   csRef<iObjectRegistry> objectreg;
   csRef<iStringSet> strings;
   csRef<iGraphics3D> g3d;
+  csRef<iSyntaxService> synldr;
 };
 
 #endif

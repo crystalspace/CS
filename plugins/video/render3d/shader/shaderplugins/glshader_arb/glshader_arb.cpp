@@ -61,6 +61,7 @@ csGLShader_ARB::csGLShader_ARB(iBase* parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
   enable = false;
+  isOpen = false;
 }
 
 csGLShader_ARB::~csGLShader_ARB()
@@ -75,25 +76,26 @@ bool csGLShader_ARB::SupportType(const char* type)
 {
   if (!enable)
     return false;
-  else if( strcasecmp(type, "gl_arb_vp") == 0)
+  else if (strcasecmp (type, "vp") == 0)
     return true;
-  else if( strcasecmp(type, "gl_arb_fp") == 0)
+  else if (strcasecmp (type, "fp") == 0)
     return true;
   return false;
 }
 
-csPtr<iShaderProgram> csGLShader_ARB::CreateProgram(const char* type)
+csPtr<iShaderProgram> csGLShader_ARB::CreateProgram (const char* type)
 {
-  if (strcasecmp(type, "gl_arb_vp") == 0)
-    return csPtr<iShaderProgram> (new csShaderGLAVP(object_reg, ext));
-  if (strcasecmp(type, "gl_arb_fp") == 0)
-    return csPtr<iShaderProgram> (new csShaderGLAFP(object_reg, ext));
+  if (strcasecmp (type, "vp") == 0)
+    return csPtr<iShaderProgram> (new csShaderGLAVP (this));
+  if (strcasecmp (type, "fp") == 0)
+    return csPtr<iShaderProgram> (new csShaderGLAFP (this));
   else
     return 0;
 }
 
 void csGLShader_ARB::Open()
 {
+  if (isOpen) return;
   if(!object_reg)
     return;
 
@@ -114,6 +116,7 @@ void csGLShader_ARB::Open()
     ext->InitGL_ARB_vertex_program ();
     ext->InitGL_ARB_fragment_program ();
   }
+  isOpen = true;
 }
 
 ////////////////////////////////////////////////////////////////////

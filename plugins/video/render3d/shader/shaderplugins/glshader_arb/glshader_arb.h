@@ -20,18 +20,20 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_ARB_H__
 #define __GLSHADER_ARB_H__
 
+#include "iutil/comp.h"
 #include "../../common/shaderplugin.h"
 #include "ivideo/shader/shader.h"
 
 class csGLShader_ARB : public iShaderProgramPlugin
 {
 private:
+  bool enable;
+  bool isOpen;
+
+public:
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 
-  bool enable;
-
-public:
   SCF_DECLARE_IBASE;
   
   csGLShader_ARB (iBase *parent);
@@ -45,7 +47,7 @@ public:
 
   virtual bool SupportType(const char* type);
 
-  virtual void Open();
+  void Open();
 
 
   ////////////////////////////////////////////////////////////////////

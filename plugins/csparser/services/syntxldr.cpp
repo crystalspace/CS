@@ -634,7 +634,7 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 }
 
 bool csTextSyntaxService::ParseShaderParam (iDocumentNode* node,
-                       csShaderVariable* var)
+					    csShaderVariable* var)
 {
   const char *type = node->GetAttributeValue("type");
   if (!type)
