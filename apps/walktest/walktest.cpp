@@ -275,23 +275,23 @@ void WalkTest::SetDefaults ()
   if (cmdline->GetOption ("stats"))
   {
     do_stats = true;
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Statistics enabled.");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Statistics enabled.");
   }
   else if (cmdline->GetOption ("nostats"))
   {
     do_stats = false;
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Statistics disabled.");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Statistics disabled.");
   }
 
   if (cmdline->GetOption ("fps"))
   {
     do_fps = true;
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Frame Per Second enabled.");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Frame Per Second enabled.");
   }
   else if (cmdline->GetOption ("nofps"))
   {
     do_fps = false;
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Frame Per Second disabled.");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Frame Per Second disabled.");
   }
 
   if (cmdline->GetOption ("infinite"))
@@ -307,12 +307,12 @@ void WalkTest::SetDefaults ()
   if (cmdline->GetOption ("colldet"))
   {
     do_cd = true;
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Enabled collision detection system.");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Enabled collision detection system.");
   }
   else if (cmdline->GetOption ("nocolldet"))
   {
     do_cd = false;
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Disabled collision detection system.");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Disabled collision detection system.");
   }
 
   if ((val = cmdline->GetOption ("exec")))
@@ -324,12 +324,12 @@ void WalkTest::SetDefaults ()
   if (cmdline->GetOption ("logo"))
   {
     do_logo = true;
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo enabled.");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo enabled.");
   }
   else if (cmdline->GetOption ("nologo"))
   {
     do_logo = false;
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo disabled.");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo disabled.");
   }
   cmdline->DecRef ();
   Config->DecRef ();
@@ -384,8 +384,8 @@ void WalkTest::SetupFrame ()
     if (perf_stats) perf_stats->Pause (true);
 
   // Update the Motion Manager
-  if (Sys->myMotionMan)
-    Sys->myMotionMan->UpdateAll ();
+  if (myMotionMan)
+    myMotionMan->UpdateAll ();
 
   MoveSystems (elapsed_time, current_time);
   PrepareFrame (elapsed_time, current_time);
@@ -516,9 +516,9 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     step (0,1);
     rotate (0,1);
 
-    if (Sys->mySound)
+    if (mySound)
     {
-      iSoundListener *sndListener = Sys->mySound->GetListener();
+      iSoundListener *sndListener = mySound->GetListener();
       if(sndListener)
       {
         // take position/direction from view->GetCamera ()
@@ -905,7 +905,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
       reccam->vec = v;
       reccam->mirror = c->IsMirrored ();
       reccam->sector = c->GetSector ();
-      reccam->angle = Sys->angle;
+      reccam->angle = angle;
       reccam->cmd = recorded_cmd;
       reccam->arg = recorded_arg;
       recorded_cmd = recorded_arg = NULL;
@@ -926,12 +926,12 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 	  cfg_playrecording = -1;
 	  if (perf_stats) perf_stats->FinishSubsection ();
 	  recorded_perf_stats = NULL;
-	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Demo '%s' finished",
+	  Report (CS_REPORTER_SEVERITY_NOTIFY, "Demo '%s' finished",
 		       recorded_perf_stats_name);
 	}
       }
       iCamera* c = view->GetCamera ();
-      Sys->angle = reccam->angle;
+      angle = reccam->angle;
       c->SetSector (reccam->sector);
       c->SetMirrored (reccam->mirror);
       c->GetTransform ().SetO2T (reccam->mat);
@@ -1151,7 +1151,7 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 {
   if (do_cd)
   {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
 
     iPolygonMesh* mesh;
     /*
@@ -1446,7 +1446,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Initialize the command processor with the engine and camera.
   csCommandProcessor::Initialize (Engine, view->GetCamera (),
-    Gfx3D, Sys->myConsole, object_reg);
+    Gfx3D, myConsole, object_reg);
 
   // Now we have two choices. Either we create an infinite
   // maze (random). This happens when the '-infinite' commandline

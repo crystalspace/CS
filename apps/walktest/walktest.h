@@ -154,7 +154,6 @@ public:
 
   /// Player position, orientation, and velocity
   csVector3 pos;
-  csMatrix3 orient;
   csVector3 velocity;
 
   /// Camera angles. X and Y are user controllable, Z is not.
@@ -521,7 +520,7 @@ public:
   void imm_rot_right_xaxis (float speed, bool slow, bool fast);
   void imm_rot_left_zaxis (float speed, bool slow, bool fast);
   void imm_rot_right_zaxis (float speed, bool slow, bool fast);
-
+  
   ///
   void handle_key_forward (float speed, bool shift, bool alt, bool ctrl);
   ///
