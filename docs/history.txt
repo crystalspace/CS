@@ -111,6 +111,7 @@ The history order is reversed so that new features are at the top.
 	  shutdown-time crashes.
 	- Matze fixed a bug in csObjectIterator pointed out by groton and also
 	  cleaned the code up there.
+	- acraig fixed the csList<T>::Delete() to use pre-increment.
 4-June-2003
 	- Jorrit fixed a bug in the AWS engine view where it would not set the
 	  FOV of the camera based on the height of the frame. This caused the

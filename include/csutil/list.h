@@ -262,9 +262,9 @@ template <class T> void csList<T>::Delete (Iterator &it)
 
   // Advance the iterator so we can delete the data its using
   if (it.IsReverse())
-      it--;
+      --it;
   else
-      it++;
+      ++it;
 
   Delete(el);
 }
