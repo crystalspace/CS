@@ -257,9 +257,8 @@ public:
   void SetParticleCount (int num)
   {
     initialized = false;
-    shapenr++;
     number = num;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get the number of particles
   int GetParticleCount () const { return number; }

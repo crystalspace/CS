@@ -68,7 +68,6 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   MixMode = factory->GetMixMode ();
   initialized = false;
   vis_cb = NULL;
-  shapenr = 0;
   current_lod = 1;
   current_features = 0;
   uvani = NULL;
@@ -105,26 +104,6 @@ void csSprite2DMeshObject::SetupObject ()
     float max_dist = qsqrt (max_sq_dist);
     radius.Set (max_dist, max_dist, max_dist);
   }
-}
-
-void csSprite2DMeshObject::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csSprite2DMeshObject::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csSprite2DMeshObject::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
 }
 
 static csVector3 cam;
@@ -433,8 +412,7 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
     vertices [i].color.Set (1, 1, 1);
     vertices [i].color_init.Set (1, 1, 1);
   }
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csSprite2DMeshObject::NextFrame (csTicks current_time, const csVector3& /*pos*/)
@@ -490,8 +468,7 @@ void csSprite2DMeshObject::Particle::ScaleBy (float factor)
   int i;
   for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos *= factor;
-  scfParent->shapenr++;
-  scfParent->FireListeners ();
+  scfParent->scfiObjectModel.ShapeChanged ();
 }
 
 void csSprite2DMeshObject::Particle::Rotate (float angle)
@@ -500,8 +477,7 @@ void csSprite2DMeshObject::Particle::Rotate (float angle)
   int i;
   for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos.Rotate (angle);
-  scfParent->shapenr++;
-  scfParent->FireListeners ();
+  scfParent->scfiObjectModel.ShapeChanged ();
 }
 
 void csSprite2DMeshObject::Sprite2DState::SetUVAnimation (const char *name,

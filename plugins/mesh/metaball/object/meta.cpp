@@ -98,7 +98,6 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   vis_cb = NULL;
   do_lighting = false;
   initialize = false;
-  shape_num = 0;
   cur_camera_num = 0;
   cur_movable_num = 0;
   MixMode = 0;
@@ -269,25 +268,6 @@ static void LitVertex( const csVector3 &n, csColor &c )
 }
 #endif
 
-void csMetaBall::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csMetaBall::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csMetaBall::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
-}
 #ifdef CS_USE_NEW_RENDERER
 bool csMetaBall::DrawZ (iRenderView* rview, iMovable* movable, csZBufMode zbufMode)
 {
@@ -566,8 +546,7 @@ void csMetaBall::CreateBoundingBox()
   bb.AddBoundingVertexSmart( csVector3(maxx,maxy,maxz));
   if ( !object_bbox.Contains(bb))
   {
-    shape_num++;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   object_bbox = bb;
   rad.Set(object_bbox.Max() - object_bbox.GetCenter());

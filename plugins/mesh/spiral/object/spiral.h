@@ -52,9 +52,8 @@ public:
   void SetParticleCount (int num)
   {
     initialized = false;
-    shapenr++;
     max = num;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get the number of particles.
   int GetParticleCount () const { return max; }
@@ -63,9 +62,8 @@ public:
   void SetSource (const csVector3& source)
   {
     initialized = false;
-    shapenr++;
     csSpiralMeshObject::source = source;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get the source.
   const csVector3& GetSource () const { return source; }

@@ -65,7 +65,6 @@ csLightningMeshObject::csLightningMeshObject (csLightningMeshObjectFactory* fact
 
   initialized = false;
   vis_cb = NULL;
-  shapenr = 0;
   origin.Set(0,0,0);  
 
   CS_ASSERT(factory);
@@ -106,26 +105,6 @@ void csLightningMeshObject::SetupObject ()
   }
 }
 
-
-void csLightningMeshObject::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csLightningMeshObject::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csLightningMeshObject::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
-}
 
 bool csLightningMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {

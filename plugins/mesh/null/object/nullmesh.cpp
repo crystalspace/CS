@@ -65,33 +65,12 @@ csNullmeshMeshObject::csNullmeshMeshObject (iMeshObjectFactory* factory)
   csNullmeshMeshObject::factory = factory;
   logparent = NULL;
   vis_cb = NULL;
-  shapenr = 0;
   radius = .1;
 }
 
 csNullmeshMeshObject::~csNullmeshMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
-}
-
-void csNullmeshMeshObject::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csNullmeshMeshObject::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csNullmeshMeshObject::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
 }
 
 bool csNullmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)

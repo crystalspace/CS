@@ -31,7 +31,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshObject::eiObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csMeshObject::csMeshObject (iEngine *eng)
-  : VisCallback (NULL), LogParent (NULL), Engine (eng), ShapeNumber (0)
+  : VisCallback (NULL), LogParent (NULL), Engine (eng)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
@@ -126,21 +126,6 @@ iMaterialWrapper* csMeshObject::GetMaterialWrapper () const
   return NULL;
 }
 
-iPolygonMesh* csMeshObject::GetPolygonMeshColldet ()
-{
-  return NULL;
-}
-
-iPolygonMesh* csMeshObject::GetPolygonMeshViscull ()
-{
-  return NULL;
-}
-
-csPtr<iPolygonMesh> csMeshObject::CreateLowerDetailPolygonMesh (float detail)
-{
-  return NULL;
-}
-
 void csMeshObject::GetObjectBoundingBox (csBox3& bbox, int type)
 {
   bbox.SetCenter (csVector3 (0, 0, 0));
@@ -155,28 +140,10 @@ void csMeshObject::GetRadius (csVector3& radius, csVector3& center)
   center = csVector3 (0, 0, 0);
 }
 
-void csMeshObject::FireObjectModelListeners ()
-{
-  for (int i=0; i<ObjectModelListeners.Length (); i++)
-    ObjectModelListeners.Get (i)->ObjectModelChanged (&scfiObjectModel);
-}
-
-long csMeshObject::eiObjectModel::GetShapeNumber () const
-{ return scfParent->ShapeNumber; }
-iPolygonMesh* csMeshObject::eiObjectModel::GetPolygonMeshColldet ()
-{ return scfParent->GetPolygonMeshColldet (); }
-iPolygonMesh* csMeshObject::eiObjectModel::GetPolygonMeshViscull ()
-{ return scfParent->GetPolygonMeshViscull (); }
-csPtr<iPolygonMesh> csMeshObject::eiObjectModel::CreateLowerDetailPolygonMesh (float detail)
-{ return scfParent->CreateLowerDetailPolygonMesh (detail); }
 void csMeshObject::eiObjectModel::GetObjectBoundingBox (csBox3& bbox, int type)
 { scfParent->GetObjectBoundingBox (bbox, type); }
 void csMeshObject::eiObjectModel::GetRadius (csVector3& radius, csVector3& center)
 { scfParent->GetRadius (radius, center); }
-void csMeshObject::eiObjectModel::AddListener (iObjectModelListener* listener)
-{ scfParent->ObjectModelListeners.Push (listener); }
-void csMeshObject::eiObjectModel::RemoveListener (iObjectModelListener* listener)
-{ scfParent->ObjectModelListeners.Delete (listener); }
 
 // ------------------
 

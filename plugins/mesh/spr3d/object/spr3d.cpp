@@ -244,6 +244,11 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
+
+  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshViscull (NULL);
+
   logparent = NULL;
   cstxt = NULL;
   emerge_from = NULL;
@@ -263,7 +268,6 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   current_features = ALL_LOD_FEATURES;
 
   initialized = false;
-  shapenr = 0;
 }
 
 csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
@@ -861,27 +865,6 @@ iSkeleton* csSprite3DMeshObjectFactory::Sprite3DFactoryState::GetSkeleton ()
   return iskel;	// DecRef is ok here.
 }
 
-void csSprite3DMeshObjectFactory::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csSprite3DMeshObjectFactory::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csSprite3DMeshObjectFactory::RemoveListener (
-	iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
-}
-
 void csSprite3DMeshObjectFactory::GetObjectBoundingBox (csBox3& b, int /*type*/)
 {
   if (skeleton)
@@ -1011,7 +994,6 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   MixMode = CS_FX_COPY;
   base_color.Set (0, 0, 0);
   initialized = false;
-  shapenr = 0;
   local_lod_level = 1;
   current_features = ALL_LOD_FEATURES;
   speedfactor = 1;

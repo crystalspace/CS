@@ -25,10 +25,10 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/tesselat.h"
+#include "csgeom/objmodel.h"
 #include "csutil/refarr.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "igeom/objmodel.h"
 #include "imesh/object.h"
 #include "imesh/metaball.h"
 
@@ -114,8 +114,6 @@ class csMetaBall : public iMeshObject
   iMeshObjectDrawCallback* vis_cb;
   bool do_lighting;
   bool initialize;
-  long shape_num;
-  csRefArray<iObjectModelListener> listeners;
   long cur_camera_num;
   long cur_movable_num;
   uint MixMode;
@@ -182,9 +180,6 @@ public:
   void GetObjectBoundingBox ( csBox3& bbox, int type = CS_BBOX_NORMAL );
   void GetRadius (csVector3& radius, csVector3& cent)
   { radius =  rad; cent = object_bbox.GetCenter(); }
-  void FireListeners ();
-  void AddListener (iObjectModelListener* listener);
-  void RemoveListener (iObjectModelListener* listener);
 
 #ifdef CS_USE_NEW_RENDERER
   virtual bool DrawZ (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
@@ -246,14 +241,9 @@ public:
   virtual iMaterialWrapper *GetMaterial() { return th; }
 
   //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
+  class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMetaBall);
-    virtual long GetShapeNumber () const { return scfParent->shape_num; }
-    virtual iPolygonMesh* GetPolygonMeshColldet () { return NULL; }
-    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
     {
       scfParent->GetObjectBoundingBox (bbox, type);
@@ -261,14 +251,6 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
-    }
-    virtual void AddListener (iObjectModelListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iObjectModelListener* listener)
-    {
-      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;

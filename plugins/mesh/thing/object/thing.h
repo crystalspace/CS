@@ -20,6 +20,7 @@
 #define __CS_THING_H__
 
 #include "csgeom/transfrm.h"
+#include "csgeom/objmodel.h"
 #include "parrays.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
@@ -31,8 +32,6 @@
 #include "csutil/refarr.h"
 #include "csutil/array.h"
 #include "csutil/blockallocator.h"
-#include "igeom/polymesh.h"
-#include "igeom/objmodel.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
@@ -173,15 +172,6 @@ public:
 
   /// If true then this thing has been prepared (Prepare() function).
   bool prepared;
-  /**
-   * Static data identifier. Mesh instances can compare their copy of this
-   * number to see if they need to update local data when the static
-   * data has changed.
-   */
-  uint32 static_data_nr;
-
-  /// Object model listeners.
-  csRefArray<iObjectModelListener> listeners;
 
   /**
    * This field describes how the light hitting polygons of this thing is
@@ -216,14 +206,12 @@ public:
   void CalculateNormals ();
 
   /**
-   * Called if static data in some polygon has changed.
-   */
-  void StaticDataChanged ();
-
-  /**
    * Get the static data number.
    */
-  uint32 GetStaticDataNumber () const { return static_data_nr; }
+  uint32 GetStaticDataNumber () const
+  {
+    return scfiObjectModel.GetShapeNumber ();
+  }
 
   /// Get the specified polygon from this set.
   csPolygon3DStatic *GetPolygon3DStatic (int idx)
@@ -343,10 +331,6 @@ public:
   virtual float GetCosinusFactor () const { return cosinus_factor; }
   virtual void SetCosinusFactor (float c) { cosinus_factor = c; }
 
-  void FireListeners ();
-  void AddListener (iObjectModelListener* listener);
-  void RemoveListener (iObjectModelListener* listener);
-
   //-------------------- iMeshObjectFactory interface implementation ---------
 
   virtual csPtr<iMeshObject> NewInstance ();
@@ -372,20 +356,9 @@ public:
   } scfiPolygonMeshLOD;
 
   //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
+  class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThingStatic);
-    virtual long GetShapeNumber () const { return scfParent->static_data_nr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet ()
-    {
-      return &(scfParent->scfiPolygonMesh);
-    }
-    virtual iPolygonMesh* GetPolygonMeshViscull ()
-    {
-      return &(scfParent->scfiPolygonMeshLOD);
-    }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return 0; }
     virtual void GetObjectBoundingBox (csBox3& bbox,
     	int /*type = CS_BBOX_NORMAL*/)
     {
@@ -394,14 +367,6 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
-    }
-    virtual void AddListener (iObjectModelListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iObjectModelListener* listener)
-    {
-      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;
@@ -453,9 +418,6 @@ private:
 
   /// Camera number for which the above camera vertices are valid.
   long cameranr;
-
-  /// Shape number.
-  long shapenr;
 
   /**
    * This number indicates the last value of the movable number.

@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
 #include "iengine/mesh.h"
@@ -31,7 +32,6 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/vbufmgr.h"
-#include "igeom/objmodel.h"
 #include "qsqrt.h"
 #include "quadtree.h"
 
@@ -409,13 +409,25 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBCTerrObject);
     virtual long GetShapeNumber () const { return 1; }
+    virtual iPolygonMesh* GetPolygonMeshBase ()
+    {
+      return (iPolygonMesh*)&scfParent->culling_mesh;
+    }
     virtual iPolygonMesh* GetPolygonMeshColldet ()
     {
       return (iPolygonMesh*)&scfParent->culling_mesh;
     }
+    virtual void SetPolygonMeshColldet (iPolygonMesh*)
+    {
+      // @@@ TODO: implement me!
+    }
     virtual iPolygonMesh* GetPolygonMeshViscull ()
     {
       return (iPolygonMesh*)&scfParent->culling_mesh;
+    }
+    virtual void SetPolygonMeshViscull (iPolygonMesh*)
+    {
+      // @@@ TODO: implement me!
     }
     virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float /*detail*/)
     { return NULL; }

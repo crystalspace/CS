@@ -184,7 +184,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       x1, y1, z1,
       len1,
       A, B, C);
-  thing_static->StaticDataChanged ();
+  thing_static->scfiObjectModel.ShapeChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -199,7 +199,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       v_orig, v1,
       len1, v2,
       len2);
-  thing_static->StaticDataChanged ();
+  thing_static->scfiObjectModel.ShapeChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -213,7 +213,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       v_orig,
       v_u,
       v_v);
-  thing_static->StaticDataChanged ();
+  thing_static->scfiObjectModel.ShapeChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -226,7 +226,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   const csVector3 v (xv, yv, zv);
   csTextureTrans::compute_texture_space (mapping->m_obj2tex,
   	mapping->v_obj2tex, o, u, v);
-  thing_static->StaticDataChanged ();
+  thing_static->scfiObjectModel.ShapeChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -241,7 +241,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       xu, yu, zu,
       xv, yv, zv,
       xw, yw, zw);
-  thing_static->StaticDataChanged ();
+  thing_static->scfiObjectModel.ShapeChanged ();
 }
 
 void csPolygon3DStatic::MappingSetTextureSpace (
@@ -250,7 +250,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
 {
   mapping->m_obj2tex = tx_matrix;
   mapping->v_obj2tex = tx_vector;
-  thing_static->StaticDataChanged ();
+  thing_static->scfiObjectModel.ShapeChanged ();
 }
 
 void csPolygon3DStatic::MappingGetTextureSpace (
@@ -271,7 +271,7 @@ void csPolygon3DStatic::EnableTextureMapping (bool enable)
   if (enable && mapping != NULL) return;
   if (!enable && mapping == NULL) return;
 
-  if (thing_static) thing_static->StaticDataChanged ();
+  if (thing_static) thing_static->scfiObjectModel.ShapeChanged ();
   if (enable)
   {
     mapping = thing_static->thing_type->blk_lightmapmapping.Alloc ();
@@ -502,7 +502,7 @@ void csPolygon3DStatic::ComputeNormal ()
 
   // By default the world space normal is equal to the object space normal.
   plane_obj.Set (A, B, C, D);
-  thing_static->StaticDataChanged ();
+  thing_static->scfiObjectModel.ShapeChanged ();
 }
 
 void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
@@ -511,7 +511,7 @@ void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
   csPlane3 new_plane;
   t.This2Other (GetObjectPlane (), Vobj (0), new_plane);
   GetObjectPlane () = new_plane;
-  thing_static->StaticDataChanged ();
+  thing_static->scfiObjectModel.ShapeChanged ();
   if (mapping)
   {
     mapping->m_obj2tex *= t.GetO2T ();

@@ -70,6 +70,11 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   csBallMeshObject::factory = factory;
+
+  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshViscull (NULL);
+
   logparent = NULL;
   initialized = false;
   cur_cameranr = -1;
@@ -87,7 +92,6 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   ball_texels = NULL;
   top_mesh.triangles = NULL;
   top_mesh.vertex_fog = NULL;
-  shapenr = 0;
   reversed = false;
   toponly = false;
   cyl_mapping = false;
@@ -160,8 +164,7 @@ void csBallMeshObject::SetRadius (float radiusx, float radiusy, float radiusz)
   csBallMeshObject::radiusy = radiusy;
   csBallMeshObject::radiusz = radiusz;
   max_radius.Set (radiusx, radiusy, radiusz);
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 float csBallMeshObject::GetScreenBoundingBox (long cameranr,
@@ -478,26 +481,6 @@ void csBallMeshObject::SetupVertexBuffer ()
  }
 }
 
-void csBallMeshObject::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csBallMeshObject::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csBallMeshObject::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
-}
-
 bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
@@ -676,8 +659,7 @@ void csBallMeshObject::HardTransform (const csReversibleTransform& t)
 {
   shift = t.This2Other (shift);
   initialized = false;
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 bool csBallMeshObject::HitBeamOutline (const csVector3& start,

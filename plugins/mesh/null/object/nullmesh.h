@@ -21,6 +21,7 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/objmodel.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
 #include "imesh/object.h"
@@ -29,8 +30,6 @@
 #include "iutil/comp.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
-#include "igeom/objmodel.h"
-#include "igeom/polymesh.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -45,8 +44,6 @@ private:
   iBase* logparent;
   iMeshObjectDrawCallback* vis_cb;
   float radius;
-  long shapenr;
-  csRefArray<iObjectModelListener> listeners;
 
 public:
   /// Constructor.
@@ -61,13 +58,9 @@ public:
   void SetRadius (float radius)
   {
     csNullmeshMeshObject::radius = radius;
-    shapenr++;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   float GetRadius () const { return radius; }
-  void FireListeners ();
-  void AddListener (iObjectModelListener* listener);
-  void RemoveListener (iObjectModelListener* listener);
 
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -101,14 +94,9 @@ public:
   virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
+  class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csNullmeshMeshObject);
-    virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet () { return NULL; }
-    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
     {
       scfParent->GetObjectBoundingBox (bbox, type);
@@ -116,14 +104,6 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
-    }
-    virtual void AddListener (iObjectModelListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iObjectModelListener* listener)
-    {
-      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;
@@ -149,7 +129,7 @@ public:
   } scfiNullMeshState;
   friend class NullMeshState;
 
-  //------------------ iMeshObjectFactory interface implementation ----------------//
+  //---------------- iMeshObjectFactory interface implementation --------------
   struct MeshObjectFactory : public iMeshObjectFactory
   {
     SCF_DECLARE_EMBEDDED_IBASE (csNullmeshMeshObject);

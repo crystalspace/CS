@@ -81,7 +81,6 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   if (!type) type = CS_LOAD_PLUGIN (plugin_mgr,
   	"crystalspace.mesh.object.sprite.2d", iMeshObjectType);
   spr_factory = type->NewFactory ();
-  shapenr = 0;
   current_lod = 1;
   current_features = 0;
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -103,8 +102,7 @@ void csParticleSystem::RemoveParticles ()
     if (particles[i])
       GetParticle (i)->DecRef ();
   particles.DeleteAll ();
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csParticleSystem::AppendRectSprite (float width, float height,
@@ -129,8 +127,7 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   part->SetColor (csColor (1.0, 1.0, 1.0));
   state->SetMaterialWrapper (mat);
   AppendParticle (part);
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 
@@ -147,8 +144,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   part->SetColor (csColor (1.0, 1.0, 1.0));
 
   AppendParticle (part);
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 
@@ -195,8 +191,7 @@ void csParticleSystem::ScaleBy (float factor)
   int i;
   for (i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->ScaleBy (factor);
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 
@@ -205,8 +200,7 @@ void csParticleSystem::Rotate (float angle)
   int i;
   for (i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->Rotate (angle);
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 
@@ -243,26 +237,6 @@ void csParticleSystem::Update (csTicks elapsed_time)
   }
   if (change_rotation)
     Rotate (anglepersecond * elapsed_seconds);
-}
-
-void csParticleSystem::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csParticleSystem::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csParticleSystem::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
 }
 
 bool csParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)

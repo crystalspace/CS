@@ -59,7 +59,6 @@ csStarsMeshObject::csStarsMeshObject (iMeshObjectFactory* factory)
   initialized = false;
   box.Set (csVector3 (-10, -10, -10), csVector3 (10, 10, 10));
   vis_cb = NULL;
-  shapenr = 0;
   color.red = 1;
   color.green = 1;
   color.blue = 1;
@@ -83,26 +82,6 @@ void csStarsMeshObject::SetupObject ()
   {
     initialized = true;
   }
-}
-
-void csStarsMeshObject::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csStarsMeshObject::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csStarsMeshObject::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
 }
 
 bool csStarsMeshObject::DrawTest (iRenderView*, iMovable*)

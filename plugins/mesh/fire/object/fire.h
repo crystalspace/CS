@@ -112,9 +112,8 @@ public:
   void SetParticleCount (int num)
   {
     initialized = false;
-    shapenr++;
     number = num;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get the number of particles.
   int GetParticleCount () const { return number; }
@@ -122,10 +121,9 @@ public:
   void SetDropSize (float dropwidth, float dropheight)
   {
     initialized = false;
-    shapenr++;
     drop_width = dropwidth;
     drop_height = dropheight;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get the size of the fire drops.
   void GetDropSize (float& dropwidth, float& dropheight) const
@@ -134,9 +132,8 @@ public:
   void SetOrigin (const csBox3& origin)
   {
     initialized = false;
-    shapenr++;
     csFireMeshObject::origin = origin;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get origin of the fire.
   const csBox3& GetOrigin () const
@@ -145,9 +142,8 @@ public:
   void SetDirection (const csVector3& direction)
   {
     initialized = false;
-    shapenr++;
     csFireMeshObject::direction = direction;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get direction of the fire.
   const csVector3& GetDirection () const
@@ -165,9 +161,8 @@ public:
   void SetSwirl (float swirl)
   {
     initialized = false;
-    shapenr++;
     csFireMeshObject::swirl = swirl;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get swirl.
   float GetSwirl () const

@@ -21,6 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
+#include "csgeom/objmodel.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
 #include "iengine/mesh.h"
@@ -28,7 +29,6 @@
 #include "imesh/terrfunc.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "igeom/objmodel.h"
 #include "ivideo/vbufmgr.h"
 #include "qsqrt.h"
 
@@ -529,14 +529,9 @@ public:
   	csVector3& isect, float* pr);
 
   //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
+  class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csTerrFuncObject);
-    virtual long GetShapeNumber () const { return 1; }
-    virtual iPolygonMesh* GetPolygonMeshColldet () { return NULL; }
-    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
     {
       scfParent->GetObjectBoundingBox (bbox, type);
@@ -544,14 +539,6 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
-    }
-    virtual void AddListener (iObjectModelListener*)
-    {
-      // @@@ TODO
-    }
-    virtual void RemoveListener (iObjectModelListener*)
-    {
-      // @@@ TODO
     }
   } scfiObjectModel;
   friend class ObjectModel;

@@ -439,7 +439,6 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
   MixMode = factory->GetMixMode ();
   initialized = false;
   vis_cb = NULL;
-  shapenr = 0;
   current_lod = 1;
   current_features = 0;
   origin.Set(0,0,0);
@@ -551,26 +550,6 @@ float csHazeMeshObject::GetScreenBoundingBox (long cameranr,
   return cbox.MaxZ ();
 }
 
-
-void csHazeMeshObject::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csHazeMeshObject::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csHazeMeshObject::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
-}
 
 bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {

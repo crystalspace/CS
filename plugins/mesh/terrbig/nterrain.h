@@ -4,6 +4,7 @@
 #include "csutil/scf.h"
 #include "csgeom/sphere.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/objmodel.h"
 #include "csutil/mmapio.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
@@ -14,7 +15,6 @@
 #include "iutil/comp.h"
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
-#include "igeom/objmodel.h"
 #include "imesh/terrbig.h"
 #include <string.h>
 #include <stdio.h>
@@ -320,17 +320,9 @@ public:
 
   ////////////////////////////// iObjectModel implementation ///////////////////////////
 
-	struct eiObjectModel : public	iObjectModel
+	struct eiObjectModel : public	csObjectModel
 	{
 		SCF_DECLARE_EMBEDDED_IBASE (csBigTerrainObject);
-		virtual	long GetShapeNumber()	const	
-		{	
-			return scfParent->GetShapeNumber(); 
-		}
-		virtual	iPolygonMesh*	GetPolygonMeshColldet() { return	NULL;	}
-		virtual	iPolygonMesh*	GetPolygonMeshViscull()	{	return NULL; }
-		virtual	csPtr<iPolygonMesh>	CreateLowerDetailPolygonMesh(	float	)
-		{	return NULL; }
 		virtual	void GetObjectBoundingBox( csBox3& bBBox,	int	iType	=	CS_BBOX_NORMAL )
 		{
 			scfParent->GetObjectBoundingBox(	bBBox, iType );
@@ -338,14 +330,6 @@ public:
 		virtual	void GetRadius(	csVector3& rad,	csVector3& cent	)
 		{
 			scfParent->GetRadius( rad, cent );
-		}
-		virtual void AddListener (iObjectModelListener*)
-		{
-			// @@@ TODO
-		}
-		virtual void RemoveListener (iObjectModelListener*)
-		{
-			// @@@ TODO
 		}
 	}	scfiObjectModel;
   friend struct eiObjectModel;
@@ -435,9 +419,6 @@ public:
 
   /// Check exactly where the hit is.
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end, csVector3& isect, float* pr);
-
-  /// This may eventually return a changing number.
-  virtual long GetShapeNumber () const { return 1; }
 
   ///////////////////////////////////////////////////////////////////
 

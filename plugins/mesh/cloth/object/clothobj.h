@@ -23,12 +23,12 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/tesselat.h"
+#include "csgeom/objmodel.h"
 #include "csutil/refarr.h"
 #include "imesh/object.h"
 #include "imesh/clothmesh.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "igeom/objmodel.h"
 #include "ivideo/vbufmgr.h"
 
 class           csMaterialHandle;
@@ -153,40 +153,27 @@ class           csStuffObject:public iMeshObject
 
     // -------------------| BEGIN iObjectModel implementation
     // |----------------------//
-class           ObjectModel:public iObjectModel 
-{
-  SCF_DECLARE_EMBEDDED_IBASE(csStuffObject);
-  virtual long    GetShapeNumber() const { return 0; }
-  virtual iPolygonMesh *GetPolygonMeshColldet() { return NULL; }
-  virtual iPolygonMesh *GetPolygonMeshViscull() { return NULL; }
-  virtual csPtr < iPolygonMesh > CreateLowerDetailPolygonMesh(float) { return NULL; }
-  virtual void    GetObjectBoundingBox(csBox3 & bbox, int type =
+  class ObjectModel : public csObjectModel 
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csStuffObject);
+    virtual void    GetObjectBoundingBox(csBox3 & bbox, int type =
 					     CS_BBOX_NORMAL) 
-  { scfParent->GetObjectBoundingBox(bbox, type); }
-  virtual void    GetRadius(csVector3 & rad, csVector3 & cent) 
-  {
-    rad = scfParent->max_radius;
-    cent.Set(scfParent->shift);
-  }
-  virtual void AddListener (iObjectModelListener*)
-  {
-    // @@@ TODO
-  }
-  virtual void RemoveListener (iObjectModelListener*)
-  {
-    // @@@ TODO
-  }
+    { scfParent->GetObjectBoundingBox(bbox, type); }
+    virtual void    GetRadius(csVector3 & rad, csVector3 & cent) 
+    {
+      rad = scfParent->max_radius;
+      cent.Set(scfParent->shift);
+    }
+  } scfiObjectModel;
+  friend class    ObjectModel;
 
-} scfiObjectModel;
-friend class    ObjectModel;
+  virtual iObjectModel *GetObjectModel() { return &scfiObjectModel; };
 
-virtual iObjectModel *GetObjectModel() { return &scfiObjectModel; };
-
-virtual bool SetColor(const csColor &) { return false; }
-virtual bool GetColor(csColor &) const { return false; }
-virtual bool SetMaterialWrapper(iMaterialWrapper * mat)
+  virtual bool SetColor(const csColor &) { return false; }
+  virtual bool GetColor(csColor &) const { return false; }
+  virtual bool SetMaterialWrapper(iMaterialWrapper * mat)
        { material = mat; return true; }
-virtual iMaterialWrapper *GetMaterialWrapper() const { return material; }
+  virtual iMaterialWrapper *GetMaterialWrapper() const { return material; }
 
 // --------------------| BEGIN iClothMeshState implementation// |----------------// 
 bool LightsEnabled;

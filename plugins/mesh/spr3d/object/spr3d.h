@@ -30,6 +30,7 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/box.h"
+#include "csgeom/objmodel.h"
 #include "plugins/mesh/spr3d/object/sprtri.h"
 #include "plugins/mesh/spr3d/object/skel3d.h"
 #include "imesh/sprite3d.h"
@@ -40,8 +41,6 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
-#include "igeom/polymesh.h"
-#include "igeom/objmodel.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 #include "ivideo/material.h"
@@ -378,8 +377,6 @@ private:
 
   /// If true then this factory has been initialized.
   bool initialized;
-  long shapenr;
-  csRefArray<iObjectModelListener> listeners;
 
   void GenerateCacheName ();
   const char* GetCacheName ();
@@ -624,9 +621,6 @@ public:
 
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3 &cent);
-  void FireListeners ();
-  void AddListener (iObjectModelListener* listener);
-  void RemoveListener (iObjectModelListener* listener);
 
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
@@ -675,17 +669,9 @@ public:
   friend struct PolyMesh;
 
   //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
+  class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
-    virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet ()
-    {
-      return &(scfParent->scfiPolygonMesh);
-    }
-    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
     {
       scfParent->GetObjectBoundingBox (bbox, type);
@@ -693,14 +679,6 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
-    }
-    virtual void AddListener (iObjectModelListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iObjectModelListener* listener)
-    {
-      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;
@@ -1267,7 +1245,6 @@ private:
   csSkelState* skeleton_state;
 
   iMeshObjectDrawCallback* vis_cb;
-  long shapenr;
 
   /**
    * Camera space bounding box is cached here.

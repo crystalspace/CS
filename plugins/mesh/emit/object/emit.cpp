@@ -542,7 +542,6 @@ void csEmitMeshObject::SetupObject ()
 {
   if (!initialized)
   {
-    shapenr++;
     initialized = true;
     RemoveParticles ();
     delete[] ages;
@@ -574,6 +573,7 @@ void csEmitMeshObject::SetupObject ()
     }
     SetupColor ();
     SetupMixMode ();
+    scfiObjectModel.ShapeChanged ();
   }
 }
 

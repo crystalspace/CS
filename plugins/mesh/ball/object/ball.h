@@ -27,7 +27,7 @@
 #include "imesh/ball.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "igeom/objmodel.h"
+#include "csgeom/objmodel.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 #include "igeom/polymesh.h"
@@ -74,8 +74,6 @@ private:
   csVector3* top_normals;
   bool initialized;
   csBox3 object_bbox;
-  long shapenr;
-  csRefArray<iObjectModelListener> listeners;
 
   /**
    * Camera space bounding box is cached here.
@@ -142,8 +140,7 @@ public:
   {
     initialized = false;
     shift.Set (shiftx, shifty, shiftz);
-    shapenr++;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   const csVector3& GetShift () const {return shift;}
   void SetRimVertices (int num)
@@ -159,8 +156,7 @@ public:
   {
     reversed = r;
     initialized = false;
-    shapenr++;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get reversed mode.
   bool IsReversed () const
@@ -172,8 +168,7 @@ public:
   {
     toponly = t;
     initialized = false;
-    shapenr++;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Only top half.
   bool IsTopOnly () const
@@ -207,9 +202,6 @@ public:
   void PaintSky(float time, float **dayvert, float **nightvert,
     float **topsun, float **sunset);
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  void FireListeners ();
-  void AddListener (iObjectModelListener* listener);
-  void RemoveListener (iObjectModelListener* listener);
 
   /**
    * Calculate polygons for iPolygonMesh.
@@ -250,16 +242,10 @@ public:
   virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
+  class ObjectModel : public csObjectModel
   {
+  public:
     SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
-    virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet () {
-      return &(scfParent->scfiPolygonMesh);
-    }
-    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
     {
       scfParent->GetObjectBoundingBox (bbox, type);
@@ -268,14 +254,6 @@ public:
     {
       rad = scfParent->max_radius;
       cent.Set (scfParent->shift);
-    }
-    virtual void AddListener (iObjectModelListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iObjectModelListener* listener)
-    {
-      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;

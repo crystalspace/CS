@@ -178,8 +178,7 @@ void csFountainMeshObject::HardTransform (const csReversibleTransform& t)
 {
   origin = t.This2Other (origin);
   initialized = false;
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 //----------------------------------------------------------------------

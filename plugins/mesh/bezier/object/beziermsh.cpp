@@ -170,6 +170,9 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
 
   scfiPolygonMesh.SetThing (this);
   scfiPolygonMeshLOD.SetThing (this);
+  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMeshLOD);
 
   last_thing_id++;
   thing_id = last_thing_id;
@@ -182,7 +185,6 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
 
   cameranr = -1;
   movablenr = -1;
-  shapenr = -1;
   wor_bbox_movablenr = -1;
   cached_movable = NULL;
 
@@ -309,7 +311,6 @@ void csBezierMesh::Prepare ()
   static_data->Prepare ();
 
   prepared = true;
-  shapenr++;
 
   scfiPolygonMeshLOD.Cleanup ();
   scfiPolygonMesh.Cleanup ();
@@ -319,7 +320,7 @@ void csBezierMesh::Prepare ()
   if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
   else movablenr--;
 
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 int csBezierMesh::AddCurveVertex (const csVector3 &v, const csVector2 &t)
@@ -386,10 +387,9 @@ void csBezierMesh::InvalidateThing ()
   prepared = false;
   static_data->obj_bbox_valid = false;
 
-  shapenr++;
   scfiPolygonMeshLOD.Cleanup ();
   scfiPolygonMesh.Cleanup ();
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 iPolygonMesh* csBezierMesh::GetWriteObject ()
@@ -550,10 +550,11 @@ void csBezierMesh::AppendShadows (
 
   iShadowBlock *list = shadows->NewShadowBlock (0);
       //@@@polygons.Length ());
+(void)list;
+#if 0
   csFrustum *frust;
   int i, j;
   bool cw = true;                   //@@@ Use mirroring parameter here!
-#if 0
   for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
     sp = static_data->static_polygons.Get (i);
@@ -669,8 +670,6 @@ csBezierMesh::PolyMeshLOD::PolyMeshLOD () : BezierPolyMeshHelper ()
 
 void BezierPolyMeshHelper::Setup ()
 {
-  csBezierMeshStatic* static_data = thing->static_data;
-
   if (polygons)
   {
     // Already set up.
@@ -909,26 +908,6 @@ bool csBezierMesh::DrawCurves (
 }
 #endif // CS_USE_NEW_RENDERER
 
-void csBezierMesh::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csBezierMesh::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csBezierMesh::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
-}
-
 bool csBezierMesh::DrawTest (iRenderView *rview, iMovable *movable)
 {
   Prepare ();
@@ -956,7 +935,6 @@ bool csBezierMesh::DrawTest (iRenderView *rview, iMovable *movable)
 bool csBezierMesh::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 {
   iCamera *icam = rview->GetCamera ();
-  const csReversibleTransform &camtrans = icam->GetTransform ();
   DrawCurves (rview, movable, zMode);
   return true;                                  // @@@@ RETURN correct vis info
 }

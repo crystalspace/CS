@@ -30,7 +30,7 @@
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "igeom/polymesh.h"
-#include "igeom/objmodel.h"
+#include "csgeom/objmodel.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
@@ -248,11 +248,6 @@ private:
   /// Camera number for which the above camera vertices are valid.
   long cameranr;
 
-  /// Shape number.
-  long shapenr;
-  /// Object model listeners.
-  csRefArray<iObjectModelListener> listeners;
-
   /**
    * This number indicates the last value of the movable number.
    * This thing can use this to check if the world space coordinates
@@ -420,10 +415,6 @@ public:
   /// Query parent template.
   csBezierMesh *GetTemplate () const
   { return ParentTemplate; }
-
-  void FireListeners ();
-  void AddListener (iObjectModelListener* listener);
-  void RemoveListener (iObjectModelListener* listener);
 
   //----------------------------------------------------------------------
   // Bounding information
@@ -726,20 +717,9 @@ public:
   friend struct ShadowReceiver;
 
   //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
+  class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet ()
-    {
-      return &(scfParent->scfiPolygonMesh);
-    }
-    virtual iPolygonMesh* GetPolygonMeshViscull ()
-    {
-      return &(scfParent->scfiPolygonMeshLOD);
-    }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return 0; }
     virtual void GetObjectBoundingBox (csBox3& bbox,
     	int /*type = CS_BBOX_NORMAL*/)
     {
@@ -748,14 +728,6 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
-    }
-    virtual void AddListener (iObjectModelListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iObjectModelListener* listener)
-    {
-      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;

@@ -71,7 +71,7 @@ struct iObjectModelListener : public iBase
   virtual void ObjectModelChanged (iObjectModel* model) = 0;
 };
 
-SCF_VERSION (iObjectModel, 0, 1, 0);
+SCF_VERSION (iObjectModel, 0, 2, 0);
 
 /**
  * This interface represents data related to some geometry in object
@@ -89,11 +89,28 @@ struct iObjectModel : public iBase
   virtual long GetShapeNumber () const = 0;
 
   /**
+   * Get a polygon mesh representing the basic geometry of the object.
+   * Can return NULL if this object model doesn't support that.
+   */
+  virtual iPolygonMesh* GetPolygonMeshBase () = 0;
+
+  /**
    * Get a polygon mesh representing the geometry of the object.
    * This mesh is useful for collision detection.
    * Can return NULL if this object model doesn't support that.
    */
   virtual iPolygonMesh* GetPolygonMeshColldet () = 0;
+
+  /**
+   * Set a polygon mesh representing the geometry of the object.
+   * This mesh is useful for collision detection.
+   * This can be used to replace the default polygon mesh returned
+   * by GetPolygonMeshColldet() with one that has less detail or
+   * even to support polygon mesh for mesh objects that otherwise don't
+   * support it. The object model will keep a reference to the
+   * given polymesh.
+   */
+  virtual void SetPolygonMeshColldet (iPolygonMesh* polymesh) = 0;
 
   /**
    * Get a polygon mesh specifically for visibility culling (to be used
@@ -106,6 +123,17 @@ struct iObjectModel : public iBase
    * case the object will not be used for visibility culling.
    */
   virtual iPolygonMesh* GetPolygonMeshViscull () = 0;
+
+  /**
+   * Set a polygon mesh representing the geometry of the object.
+   * This mesh is useful for visibility culling.
+   * This can be used to replace the default polygon mesh returned
+   * by GetPolygonMeshViscull() with one that has less detail or
+   * even to support polygon mesh for mesh objects that otherwise don't
+   * support it. The object model will keep a reference to the
+   * given polymesh.
+   */
+  virtual void SetPolygonMeshViscull (iPolygonMesh* polymesh) = 0;
 
   /**
    * Create a polygon mesh representing a lower detail version of the

@@ -72,9 +72,8 @@ public:
   void SetParticleCount (int num)
   {
     initialized = false;
-    shapenr++;
     number = num;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get the number of particles
   int GetParticleCount () const { return number; }
@@ -82,10 +81,9 @@ public:
   void SetDropSize (float dropwidth, float dropheight)
   {
     initialized = false;
-    shapenr++;
     drop_width = dropwidth;
     drop_height = dropheight;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get the size of the drops.
   void GetDropSize (float& dropwidth, float& dropheight) const
@@ -94,9 +92,8 @@ public:
   void SetBox (const csVector3& minbox, const csVector3& maxbox)
   {
     initialized = false;
-    shapenr++;
     rainbox.Set (minbox, maxbox);
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get box.
   void GetBox (csVector3& minbox, csVector3& maxbox) const
@@ -114,9 +111,8 @@ public:
   void SetFallSpeed (const csVector3& fspeed)
   {
     initialized = false;
-    shapenr++;
     rain_dir = fspeed;
-    FireListeners ();
+    scfiObjectModel.ShapeChanged ();
   }
   /// Get fall speed.
   const csVector3& GetFallSpeed () const

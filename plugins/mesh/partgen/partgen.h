@@ -22,6 +22,7 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
+#include "csgeom/objmodel.h"
 #include "csutil/refarr.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
@@ -29,7 +30,6 @@
 #include "imesh/object.h"
 #include "imesh/partsys.h"
 #include "imesh/particle.h"
-#include "igeom/objmodel.h"
 
 struct iMeshObjectFactory;
 struct iMaterialWrapper;
@@ -83,8 +83,6 @@ protected:
   csRef<iMeshObjectFactory> spr_factory;
   /// Previous time.
   csTicks prev_time;
-  long shapenr;
-  csRefArray<iObjectModelListener> listeners;
   float current_lod;
   uint32 current_features;
 
@@ -223,9 +221,6 @@ public:
     rad = radius;
     cent = bbox.GetCenter();
   }
-  void FireListeners ();
-  void AddListener (iObjectModelListener* listener);
-  void RemoveListener (iObjectModelListener* listener);
 
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -264,14 +259,9 @@ public:
   virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
+  class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csParticleSystem);
-    virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet () { return NULL; }
-    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
     {
       scfParent->GetObjectBoundingBox (bbox, type);
@@ -279,14 +269,6 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
-    }
-    virtual void AddListener (iObjectModelListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iObjectModelListener* listener)
-    {
-      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;

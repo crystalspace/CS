@@ -118,7 +118,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   vis_cb = NULL;
   lit_mesh_colors = NULL;
   num_lit_mesh_colors = 0;
-  shapenr = 0;
   do_lighting = true;
   do_manual_colors = false;
   color.red = 0;
@@ -1167,7 +1166,6 @@ void csGenmeshMeshObject::HardTransform (const csReversibleTransform& t)
   // Force recomputation of bbox.
   delete hard_bbox;
   hard_bbox = NULL;
-  shapenr++;
 }
 
 iObjectModel* csGenmeshMeshObject::GetObjectModel ()
@@ -1229,9 +1227,13 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
   csGenmeshMeshObjectFactory::object_reg = object_reg;
+
+  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshViscull (NULL);
+
   logparent = NULL;
   initialized = false;
-  shapenr = 0;
   object_bbox_valid = false;
   mesh_tri_normals = NULL;
 #ifndef CS_USE_NEW_RENDERER
@@ -1834,8 +1836,7 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
   top_mesh.vertex_fog = new G3DFogInfo [num_mesh_vertices];
 #endif
 
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
@@ -1851,8 +1852,7 @@ void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
 #endif
 
   initialized = false;
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 struct CompressVertex
@@ -2268,8 +2268,7 @@ void csGenmeshMeshObjectFactory::HardTransform (
   mesh_vertices_dirty_flag = true;
 #endif  
   initialized = false;
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
@@ -2314,26 +2313,6 @@ csMeshedPolygon* csGenmeshMeshObjectFactory::GetPolygons ()
     }
   }
   return polygons;
-}
-
-void csGenmeshMeshObjectFactory::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csGenmeshMeshObjectFactory::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csGenmeshMeshObjectFactory::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
 }
 
 //----------------------------------------------------------------------

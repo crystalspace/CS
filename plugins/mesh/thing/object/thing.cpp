@@ -128,6 +128,9 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
 
   scfiPolygonMesh.SetThing (this);
   scfiPolygonMeshLOD.SetThing (this);
+  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMeshLOD);
 
   max_vertices = num_vertices = 0;
   obj_verts = NULL;
@@ -136,7 +139,6 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
 
   obj_bbox_valid = false;
 
-  static_data_nr = 1;
   prepared = false;
   cosinus_factor = -1;
 }
@@ -219,7 +221,7 @@ int csThingStatic::AddVertex (float x, float y, float z)
 
   obj_verts[num_vertices].Set (x, y, z);
   num_vertices++;
-  StaticDataChanged ();
+  scfiObjectModel.ShapeChanged ();
   return num_vertices - 1;
 }
 
@@ -227,7 +229,7 @@ void csThingStatic::SetVertex (int idx, const csVector3 &vt)
 {
   CS_ASSERT (idx >= 0 && idx < num_vertices);
   obj_verts[idx] = vt;
-  StaticDataChanged ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csThingStatic::DeleteVertex (int idx)
@@ -236,7 +238,7 @@ void csThingStatic::DeleteVertex (int idx)
 
   int copysize = sizeof (csVector3) * (num_vertices - idx - 1);
   memmove (obj_verts + idx, obj_verts + idx + 1, copysize);
-  StaticDataChanged ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csThingStatic::DeleteVertices (int from, int to)
@@ -260,7 +262,7 @@ void csThingStatic::DeleteVertices (int from, int to)
     num_vertices -= rangelen;
   }
 
-  StaticDataChanged ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 struct CompressVertex
@@ -387,7 +389,7 @@ void csThingStatic::CompressVertices ()
   }
 
   delete[] vt;
-  StaticDataChanged ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csThingStatic::RemoveUnusedVertices ()
@@ -457,7 +459,7 @@ void csThingStatic::RemoveUnusedVertices ()
   delete[] used;
 
   obj_bbox_valid = false;
-  StaticDataChanged ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 struct PolygonsForVertex
@@ -527,7 +529,7 @@ void csThingStatic::AddPolygon (csPolygon3DStatic* spoly)
   spoly->SetParent (this);
   spoly->EnableTextureMapping (true);
   static_polygons.Push (spoly);
-  StaticDataChanged ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 iPolygon3DStatic *csThingStatic::CreatePolygon (const char *name)
@@ -541,14 +543,14 @@ iPolygon3DStatic *csThingStatic::CreatePolygon (const char *name)
 void csThingStatic::RemovePolygon (int idx)
 {
   static_polygons.Delete (idx);
-  StaticDataChanged ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csThingStatic::RemovePolygons ()
 {
   static_polygons.DeleteAll ();
   portal_polygons.DeleteAll ();
-  StaticDataChanged ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 iPortal *csThingStatic::GetPortal (int idx) const
@@ -639,7 +641,7 @@ csPtr<csThingStatic> csThingStatic::Clone ()
   clone->obj_radius = obj_radius;
   clone->max_obj_radius = max_obj_radius;
   clone->prepared = prepared;
-  clone->static_data_nr = static_data_nr;
+  clone->scfiObjectModel.SetShapeNumber (scfiObjectModel.GetShapeNumber ());
   clone->cosinus_factor = cosinus_factor;
 
   clone->num_vertices = num_vertices;
@@ -694,7 +696,7 @@ void csThingStatic::HardTransform (const csReversibleTransform &t)
     p->HardTransform (t);
   }
 
-  StaticDataChanged ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 csPtr<iMeshObject> csThingStatic::NewInstance ()
@@ -745,32 +747,6 @@ void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
   cent = b.GetCenter ();
 }
 
-void csThingStatic::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csThingStatic::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csThingStatic::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
-}
-
-void csThingStatic::StaticDataChanged ()
-{
-  static_data_nr++;
-  FireListeners ();
-}
-
 //----------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(csThingStatic::PolyMeshLOD)
@@ -818,14 +794,13 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64)
 
   cameranr = -1;
   movablenr = -1;
-  shapenr = -1;
   wor_bbox_movablenr = -1;
   cached_movable = NULL;
 
   cfg_moving = CS_THING_MOVE_NEVER;
 
   prepared = false;
-  static_data_nr = 0;
+  static_data_nr = 0xfffffffd;	// (static_nr of csThingStatic is init to -1)
 
   current_lod = 1;
   current_features = 0;
@@ -1045,9 +1020,9 @@ void csThing::Prepare ()
 
   if (prepared)
   {
-    if (static_data_nr != static_data->static_data_nr)
+    if (static_data_nr != static_data->scfiObjectModel.GetShapeNumber ())
     {
-      static_data_nr = static_data->static_data_nr;
+      static_data_nr = static_data->scfiObjectModel.GetShapeNumber ();
 
       if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
       {
@@ -1077,15 +1052,13 @@ void csThing::Prepare ()
 	p->RefreshFromStaticData ();
 	p->Finish ();
       }
-      shapenr++;
     }
     return;
   }
 
   prepared = true;
-  shapenr++;
 
-  static_data_nr = static_data->static_data_nr;
+  static_data_nr = static_data->scfiObjectModel.GetShapeNumber ();
 
   if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
   {
@@ -1179,9 +1152,8 @@ void csThing::InvalidateThing ()
   prepared = false;
   static_data->obj_bbox_valid = false;
 
-  shapenr++;
   delete [] static_data->obj_normals; static_data->obj_normals = NULL;
-  static_data->StaticDataChanged ();
+  static_data->scfiObjectModel.ShapeChanged ();
 }
 
 iPolygonMesh* csThing::GetWriteObject ()

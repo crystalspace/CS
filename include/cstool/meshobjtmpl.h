@@ -24,7 +24,7 @@
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "imesh/object.h"
-#include "igeom/objmodel.h"
+#include "csgeom/objmodel.h"
 
 /// Declare a simple mesh factory class
 #define CS_DECLARE_SIMPLE_MESH_FACTORY(name,meshclass)                      \
@@ -68,12 +68,6 @@ protected:
 
   /// pointer to the engine if available (@@@ temporary)
   iEngine *Engine;
-
-  /// Array of object model listeners
-  csRefArray<iObjectModelListener> ObjectModelListeners;
-
-  /// Current shape number
-  int ShapeNumber;
 
   /// Tell the engine that this object wants to be deleted
   void WantToDie ();
@@ -217,24 +211,6 @@ public:
 
   /**
    * See igeom/objmodel.h for specification. The default implementation
-   * returns NULL.
-   */
-  iPolygonMesh* GetPolygonMeshColldet ();
-
-  /**
-   * See igeom/objmodel.h for specification. The default implementation
-   * returns NULL.
-   */
-  iPolygonMesh* GetPolygonMeshViscull ();
-
-  /**
-   * See igeom/objmodel.h for specification. The default implementation
-   * returns NULL.
-   */
-  csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float detail);
-
-  /**
-   * See igeom/objmodel.h for specification. The default implementation
    * returns an infinite bounding box.
    */
   void GetObjectBoundingBox (csBox3& bbox, int type);
@@ -245,23 +221,12 @@ public:
    */
   void GetRadius (csVector3& radius, csVector3& center);
 
-  /**
-   * Notify the object model listeners of a change.
-   */
-  void FireObjectModelListeners ();
-
   // implementation of iObjectModel
-  struct eiObjectModel : public iObjectModel
+  struct eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshObject);
-    virtual long GetShapeNumber () const;
-    virtual iPolygonMesh* GetPolygonMeshColldet ();
-    virtual iPolygonMesh* GetPolygonMeshViscull ();
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float detail);
     virtual void GetObjectBoundingBox (csBox3& bbox, int type);
     virtual void GetRadius (csVector3& radius, csVector3& center);
-    virtual void AddListener (iObjectModelListener* listener);
-    virtual void RemoveListener (iObjectModelListener* listener);
   } scfiObjectModel;
   friend struct eiObjectModel;
 };

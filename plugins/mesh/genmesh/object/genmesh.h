@@ -33,7 +33,7 @@
 #include "iutil/comp.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
-#include "igeom/objmodel.h"
+#include "csgeom/objmodel.h"
 #include "igeom/polymesh.h"
 #include "iengine/shadcast.h"
 #ifdef CS_USE_NEW_RENDERER
@@ -138,7 +138,6 @@ private:
   bool shadow_caps;
 
   bool initialized;
-  long shapenr;
 
   /**
    * Camera space bounding box is cached here.
@@ -464,8 +463,6 @@ private:
   csBox3 object_bbox;
   bool object_bbox_valid;
   bool initialized;
-  long shapenr;
-  csRefArray<iObjectModelListener> listeners;
 
   csMeshedPolygon* polygons;
 
@@ -563,10 +560,6 @@ public:
 #endif
   const csBox3& GetObjectBoundingBox ();
   const csVector3& GetRadius ();
-
-  void FireListeners ();
-  void AddListener (iObjectModelListener* listener);
-  void RemoveListener (iObjectModelListener* listener);
 
   /**
    * Calculate polygons for iPolygonMesh.
@@ -715,17 +708,9 @@ public:
   friend struct PolyMesh;
 
   //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
+  class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
-    virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet ()
-    {
-      return &(scfParent->scfiPolygonMesh);
-    }
-    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
     {
       bbox = scfParent->GetObjectBoundingBox ();
@@ -734,14 +719,6 @@ public:
     {
       rad = scfParent->GetRadius ();
       cent.Set (0);
-    }
-    virtual void AddListener (iObjectModelListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iObjectModelListener* listener)
-    {
-      scfParent->RemoveListener (listener);
     }
   } scfiObjectModel;
   friend class ObjectModel;

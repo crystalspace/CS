@@ -163,8 +163,7 @@ void csExploMeshObject::HardTransform (const csReversibleTransform& t)
 {
   center = t.This2Other (center);
   initialized = false;
-  shapenr++;
-  FireListeners ();
+  scfiObjectModel.ShapeChanged ();
 }
 
 //----------------------------------------------------------------------
