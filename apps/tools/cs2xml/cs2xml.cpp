@@ -63,15 +63,23 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (CURVECONTROL)
   CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (COLORS)
+  CS_TOKEN_DEF (DIRECTION)
+  CS_TOKEN_DEF (DIRECTIONAL)
   CS_TOKEN_DEF (DROPSIZE)
   CS_TOKEN_DEF (EMITBOX)
+  CS_TOKEN_DEF (EMITLINE)
   CS_TOKEN_DEF (EMITFIXED)
+  CS_TOKEN_DEF (EMITSPHERE)
+  CS_TOKEN_DEF (EMITCYLINDER)
+  CS_TOKEN_DEF (EMITCYLINDERTANGENT)
   CS_TOKEN_DEF (F)
   CS_TOKEN_DEF (FALLSPEED)
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FIRST)
   CS_TOKEN_DEF (FOG)
   CS_TOKEN_DEF (HALO)
+  CS_TOKEN_DEF (HAZEBOX)
+  CS_TOKEN_DEF (HAZECONE)
   CS_TOKEN_DEF (IDENTITY)
   CS_TOKEN_DEF (KEY)
   CS_TOKEN_DEF (LIGHT)
@@ -85,6 +93,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (PRIORITY)
   CS_TOKEN_DEF (RADIUS)
   CS_TOKEN_DEF (RECTPARTICLES)
+  CS_TOKEN_DEF (REGULARPARTICLES)
   CS_TOKEN_DEF (ROT)
   CS_TOKEN_DEF (ROT_X)
   CS_TOKEN_DEF (ROT_Y)
@@ -95,6 +104,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SCALE_Z)
   CS_TOKEN_DEF (SECOND)
   CS_TOKEN_DEF (SHIFT)
+  CS_TOKEN_DEF (SOURCE)
   CS_TOKEN_DEF (T)
   CS_TOKEN_DEF (TEXTURE)
   CS_TOKEN_DEF (TRANSPARENT)
@@ -178,7 +188,8 @@ bool Cs2Xml::IsString (const char* in)
       while (*in && !isspace (*in))
       {
         if ((*in >= 'a' && *in <= 'z') || (*in >= 'A' && *in <= 'Z') ||
-    	    (*in == '_' || *in == '$') || (*in >= '0' && *in <= '9'))
+    	    (*in == '-' || *in == '_' || *in == '$') ||
+	    (*in >= '0' && *in <= '9'))
           in++;
         else break;
       }
@@ -443,15 +454,23 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (CURVECONTROL)
     CS_TOKEN_TABLE (COLOR)
     CS_TOKEN_TABLE (COLORS)
+    CS_TOKEN_TABLE (DIRECTION)
+    CS_TOKEN_TABLE (DIRECTIONAL)
     CS_TOKEN_TABLE (DROPSIZE)
     CS_TOKEN_TABLE (EMITBOX)
+    CS_TOKEN_TABLE (EMITLINE)
     CS_TOKEN_TABLE (EMITFIXED)
+    CS_TOKEN_TABLE (EMITSPHERE)
+    CS_TOKEN_TABLE (EMITCYLINDER)
+    CS_TOKEN_TABLE (EMITCYLINDERTANGENT)
     CS_TOKEN_TABLE (F)
     CS_TOKEN_TABLE (FALLSPEED)
     CS_TOKEN_TABLE (FILE)
     CS_TOKEN_TABLE (FIRST)
     CS_TOKEN_TABLE (FOG)
     CS_TOKEN_TABLE (HALO)
+    CS_TOKEN_TABLE (HAZEBOX)
+    CS_TOKEN_TABLE (HAZECONE)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (MATRIX)
@@ -465,10 +484,12 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (PRIORITY)
     CS_TOKEN_TABLE (RADIUS)
     CS_TOKEN_TABLE (RECTPARTICLES)
+    CS_TOKEN_TABLE (REGULARPARTICLES)
     CS_TOKEN_TABLE (ROT)
     CS_TOKEN_TABLE (SCALE)
     CS_TOKEN_TABLE (SECOND)
     CS_TOKEN_TABLE (SHIFT)
+    CS_TOKEN_TABLE (SOURCE)
     CS_TOKEN_TABLE (T)
     CS_TOKEN_TABLE (TEXTURE)
     CS_TOKEN_TABLE (TRANSPARENT)
@@ -491,6 +512,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
   	!= CS_PARSERR_EOF)
   {
     char* tokname = ToLower (parser->GetUnknownToken (), true);
+    printf ("%s\n", tokname); fflush (stdout);
       switch (cmd)
       {
         case CS_TOKEN_PORTAL:
@@ -538,6 +560,9 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	  }
 	  break;
         case CS_TOKEN_W:
+        case CS_TOKEN_DIRECTION:
+        case CS_TOKEN_DIRECTIONAL:
+        case CS_TOKEN_SOURCE:
         case CS_TOKEN_RADIUS:
         case CS_TOKEN_CENTER:
         case CS_TOKEN_ACCEL:
@@ -968,6 +993,19 @@ defaulthalo:
 	    CreateValueNodeAsFloat (child, "scale", scale);
 	  }
 	  break;
+        case CS_TOKEN_REGULARPARTICLES:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	  	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name) child->SetAttribute ("name", name);
+	    int sides;
+	    float radius;
+	    csScanStr (params, "%d,%f", &sides, &radius);
+	    child->SetAttributeAsInt ("sides", sides);
+	    child->SetAttributeAsFloat ("radius", radius);
+	  }
+	  break;
         case CS_TOKEN_RECTPARTICLES:
         case CS_TOKEN_DROPSIZE:
 	  {
@@ -981,9 +1019,64 @@ defaulthalo:
 	    child->SetAttributeAsFloat ("h", h);
 	  }
 	  break;
+        case CS_TOKEN_EMITCYLINDER:
+        case CS_TOKEN_EMITCYLINDERTANGENT:
+	  {
+	    float x1, y1, z1, x2, y2, z2, p, q;
+	    csScanStr (params, "%f,%f,%f,%f,%f,%f,&f,&f", &x1, &y1, &z1,
+	    	&x2, &y2, &z2, &p, &q);
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	  	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name) child->SetAttribute ("name", name);
+	    csRef<iDocumentNode> minnode = child->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    minnode->SetValue ("min");
+	    minnode->SetAttributeAsFloat ("x", x1);
+	    minnode->SetAttributeAsFloat ("y", y1);
+	    minnode->SetAttributeAsFloat ("z", z1);
+	    csRef<iDocumentNode> maxnode = child->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    maxnode->SetValue ("max");
+	    maxnode->SetAttributeAsFloat ("x", x2);
+	    maxnode->SetAttributeAsFloat ("y", y2);
+	    maxnode->SetAttributeAsFloat ("z", z2);
+	    child->SetAttributeAsFloat ("p", p);
+	    child->SetAttributeAsFloat ("q", q);
+	  }
+	  break;
+        case CS_TOKEN_HAZECONE:
+	  {
+	    int number;
+	    float x1, y1, z1, x2, y2, z2, p, q;
+            csScanStr (params, "%d, %f,%f,%f,%f,%f,%f, %f, %f", &number,
+	      &x1, &y1, &z1, &x2, &y2, &z2, &p, &q);
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	  	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name) child->SetAttribute ("name", name);
+	    csRef<iDocumentNode> minnode = child->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    minnode->SetValue ("min");
+	    minnode->SetAttributeAsFloat ("x", x1);
+	    minnode->SetAttributeAsFloat ("y", y1);
+	    minnode->SetAttributeAsFloat ("z", z1);
+	    csRef<iDocumentNode> maxnode = child->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    maxnode->SetValue ("max");
+	    maxnode->SetAttributeAsFloat ("x", x2);
+	    maxnode->SetAttributeAsFloat ("y", y2);
+	    maxnode->SetAttributeAsFloat ("z", z2);
+	    child->SetAttributeAsFloat ("p", p);
+	    child->SetAttributeAsFloat ("q", q);
+	    child->SetAttributeAsInt ("number", number);
+	  }
+	  break;
+        case CS_TOKEN_HAZEBOX:
         case CS_TOKEN_BOX:
         case CS_TOKEN_ORIGINBOX:
         case CS_TOKEN_EMITBOX:
+        case CS_TOKEN_EMITLINE:
 	  {
 	    float x1, y1, z1, x2, y2, z2;
 	    csScanStr (params, "%f,%f,%f,%f,%f,%f", &x1, &y1, &z1,
@@ -1017,6 +1110,21 @@ defaulthalo:
 	    child->SetAttributeAsFloat ("x", x1);
 	    child->SetAttributeAsFloat ("y", y1);
 	    child->SetAttributeAsFloat ("z", z1);
+	  }
+	  break;
+        case CS_TOKEN_EMITSPHERE:
+	  {
+	    float x1, y1, z1, p, q;
+            csScanStr (params, "%f,%f,%f,%f,%f", &x1, &y1, &z1, &p, &q);
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	  	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name) child->SetAttribute ("name", name);
+	    child->SetAttributeAsFloat ("x", x1);
+	    child->SetAttributeAsFloat ("y", y1);
+	    child->SetAttributeAsFloat ("z", z1);
+	    child->SetAttributeAsFloat ("p", p);
+	    child->SetAttributeAsFloat ("q", q);
 	  }
 	  break;
         case CS_TOKEN_F:

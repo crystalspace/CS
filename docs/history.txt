@@ -49,6 +49,15 @@ The history order is reversed so that new features are at the top.
 	  the XML loading itself. The XML loader seems a little bit slower
 	  compared to the old lower although the difference isn't much.
 	  There is still a lot of room for optimization though.
+	- Cs2Xml correctly converts EMITSPHERE, EMITCYLINDER, EMITLINE, and
+	  EMITCYLINDERTANGENT.
+	- Cs2Xml correctly converts REGULARPARTICLES.
+	- Cs2Xml correctly converts DIRECTION and DIRECTIONAL.
+	- Cs2Xml correctly converts SOURCE.
+	- Cs2Xml correctly converts HAZEBOX and HAZECONE.
+	- Implemented XML version of the haze loader.
+	- Cs2Xml now considers '-' as a valid token in a string without
+	  quotes.
 19-Aug-2002
 	- Implemented XML version of the ball mesh object loader.
 	- Fixed a memory leak in SKELETON statement of spr3d loader.
