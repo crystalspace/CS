@@ -49,10 +49,10 @@ extern "C"
 
 #define MNG_NO_CMS
 #define MNG_USE_DLL
-#include "libmng.h"
+#include <libmng.h>
 
 #include "jng.h"
-#include "zlib.h"
+#include <zlib.h>
 
 CS_IMPLEMENT_PLUGIN
 
