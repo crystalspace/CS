@@ -50,13 +50,12 @@ void csGraphics2D::WRITECHAR_NAME (csGraphics2D *This, int x, int y,
     int rX = x + charW >= This->ClipX2 ? This->ClipX2 - x : charW;
     int lBytes = lX >> 3;
     int shiftX = lX & 7;
-    int bbl = (charW+7)/8; // bytes per line
+    int bbl = (charW + 7) / 8; // bytes per line
     x += lX;
-    unsigned char *p=CharImage;
-    p-=bbl;
+    unsigned char *p = CharImage - bbl;
     for (int i = 0; i < charH; i++, y++)
     {
-      p+=bbl;
+      p += bbl;
       if ((y < This->ClipY1) || (y >= This->ClipY2)) continue;
       CharImage = p + lBytes;
       register char CharLine = (*CharImage) << shiftX;
@@ -69,40 +68,48 @@ void csGraphics2D::WRITECHAR_NAME (csGraphics2D *This, int x, int y,
           *VRAM++ = bg;
         else
           VRAM++;
-	// (j&7)==7 equiv. (j+1)%8 == 0
-	if ((j&7) == 7) CharLine = (*++CharImage);
-        else CharLine <<= 1;
+        if ((j & 7) == 7)
+          CharLine = (*++CharImage);
+        else
+          CharLine <<= 1;
       } /* endfor */
     } /* endfor */
-  }else{
-  register char CharLine = *CharImage;
-  bool CharNotOnByteBound = charW&7;
-  for (int i = 0; i < charH; i++, y++)
+  }
+  else
   {
-    register WRITECHAR_PIXTYPE *VRAM = (WRITECHAR_PIXTYPE *)This->GetPixelAt (x, y);
-    if (bg < 0)
-      for (int j = 0; j < charW; j++)
-      {
-        if (CharLine & 0x80)
-          *VRAM++ = fg;
-        else
-          VRAM++;
-	if ((j&7) == 7) CharLine = *++CharImage;
-        else CharLine <<= 1;
-      } 
-    else
-      for (int j = 0; j < charW; j++)
-      {
-        if (CharLine & 0x80)
-          *VRAM++ = fg;
-        else
-          *VRAM++ = bg;
-	if ((j&7) == 7) CharLine = *++CharImage;
-        else CharLine <<= 1;
-      } /* endfor */
-    if (CharNotOnByteBound) CharLine = *++CharImage;
-  } /* endfor */
-  } /* else */
+    register char CharLine = *CharImage;
+    bool CharNotOnByteBound = charW & 7;
+    for (int i = 0; i < charH; i++, y++)
+    {
+      register WRITECHAR_PIXTYPE *VRAM = (WRITECHAR_PIXTYPE *)This->GetPixelAt (x, y);
+      if (bg < 0)
+        for (int j = 0; j < charW; j++)
+        {
+          if (CharLine & 0x80)
+            *VRAM++ = fg;
+          else
+            VRAM++;
+          if ((j & 7) == 7)
+            CharLine = *++CharImage;
+          else
+            CharLine <<= 1;
+        }
+      else
+        for (int j = 0; j < charW; j++)
+        {
+          if (CharLine & 0x80)
+            *VRAM++ = fg;
+          else
+            *VRAM++ = bg;
+          if ((j & 7) == 7)
+            CharLine = *++CharImage;
+          else
+            CharLine <<= 1;
+        } /* endfor */
+      if (CharNotOnByteBound)
+        CharLine = *++CharImage;
+    } /* endfor */
+  } /* endif */
 }
 
 #undef WRITECHAR_NAME

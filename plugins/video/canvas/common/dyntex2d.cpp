@@ -26,7 +26,6 @@
 #include "csutil/csrect.h"
 #include "isystem.h"
 
-
 IMPLEMENT_IBASE (csDynamicTexture2D)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
@@ -111,7 +110,6 @@ iGraphics2D *csDynamicTexture2D::CreateOffScreenCanvas (int width, int height,
   return (iGraphics2D*)this;
 }
 
-
 bool csDynamicTexture2D::Open(const char *Title)
 {
   CsPrintf (MSG_INITIALIZATION, "Crystal Space X windows texture buffer");
@@ -132,8 +130,6 @@ void csDynamicTexture2D::Close ()
 
   csGraphics2D::Close ();
 }
-
-
 
 void csDynamicTexture2D::Print (csRect */*area*/)
 {
