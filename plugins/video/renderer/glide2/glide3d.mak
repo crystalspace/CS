@@ -31,6 +31,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 CFLAGS.GLIDE3D+=-I/usr/local/glide/include -DDO_GLIDE -DGLIDE24_ONLY
 LIBS._GLIDE3D+=-lglide2x
+CFLAGS.MAKEDEP += CFLAGS.GLIDE3D
 
 # The Glide driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
