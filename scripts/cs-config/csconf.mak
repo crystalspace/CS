@@ -47,14 +47,14 @@ TO_INSTALL.EXE	+= $(CSCONFIG.EXE)
 ifeq ($(DO_CREATE_CSCONFIG),yes)
 
 CSCONFIG.VERFILE := $(SRCDIR)/include/csver.h
-CSCONFIG.VMAJOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e 's/\#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
-CSCONFIG.VMINOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e 's/\#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
-CSCONFIG.RDATE   := $(shell sed -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/!d'  -e 's/\#define[ 	][ 	]*CS_RELEASE_DATE[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
+CSCONFIG.VMAJOR  := $(shell $(SED) -e '/\#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e 's/\#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
+CSCONFIG.VMINOR  := $(shell $(SED) -e '/\#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e 's/\#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
+CSCONFIG.RDATE   := $(shell $(SED) -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/!d'  -e 's/\#define[ 	][ 	]*CS_RELEASE_DATE[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < $(CSCONFIG.VERFILE))
 
 # Extract needed makefile fragments directly from target makefile.
 CSCONFIG.MAKEFRAG = \
   cat $(wildcard $(SRCDIR)/mk/*.mak) $(SRCDIR)/$(TARGET_MAKEFILE) | \
-  sed '/<cs-config>/,/<\/cs-config>/!d;/<cs-config>/d;/<\/cs-config>/d'
+  $(SED) '/<cs-config>/,/<\/cs-config>/!d;/<cs-config>/d;/<\/cs-config>/d'
 
 endif # ifeq ($(DO_CREATE_CSCONFIG),yes)
 

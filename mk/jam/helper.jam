@@ -2,6 +2,10 @@
 # Helper rules
 #============================================================================
 
+SED ?= sed ;
+DEEPCOPY ?= "cp -R" ;
+DELTREE ?= "rm -rf" ;
+
 ##  IncludeDir [target : ] directories
 ##    Description: Is used to specify the location of header files for a
 ##    target or the whole project if no target is given.

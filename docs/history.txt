@@ -15,6 +15,23 @@ chronological order.
 	- Keith Fulton updated for more accurate bounding box calculations in
 	  very latest cal3d cvs, and attempted to update ./configure to check
 	  for new cal3d API.
+	- Eric Sunshine changed the Flex rules in Jam files and makefiles so
+	  that they no longer insist upon using a custom skeleton file since
+	  several users report "flex: fatal internal error, bad line in
+	  skeleton file" when using the custom skeleton file.  Instead of using
+	  a custom skeleton file, the build rules now pass the generated file
+	  through 'sed' to massage it into not including <unistd.h> on Windows.
+	- Eric Sunshine changed Flex rule in Jam so that it uses -L always to
+	  suppress #line directives, rather than only using it if gcc is being
+	  used.  We must suppress #line directives always because the generated
+	  file might get checked into CVS, and then it would be used by MSVC
+	  users whose compiler dislikes these directives.
+	- Eric Sunshine fixed several Jam file and makefiles which were
+	  hard-coding 'sed' rather than using $(SED).
+	- Eric Sunshine fixed aws.mak to use $(FLEXBIN) and $(BISONBIN) rather
+	  than hard-coding 'flex' and 'bison'.
+	- Eric Sunshine relocated default definitions of SED, DEEPCOPY, and
+	  DELTREE into helper.jam from various other Jam files.
 1-Feb-2004
 	- Eric Sunshine applied a couple small patches from Randall Foreman
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration

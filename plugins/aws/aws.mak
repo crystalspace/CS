@@ -25,6 +25,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+FLEX.SED = $(OUTDERIVED)/flex.sed
+
 ifeq ($(USE_PLUGINS),yes)
   AWS = $(OUTDLL)/aws$(DLL)
   LIB.AWS = $(foreach d,$(DEP.AWS),$($d.LIB))
@@ -93,15 +95,29 @@ $(AWS): $(OBJ.AWS) $(LIB.AWS)
 ifneq (,$(FLEXBIN))
 ifneq (,$(BISONBIN))
 
+# Some versions of Flex-generated files want to include <unistd.h> which is not
+# normally available on Windows, so we need to protect it.  We also filter out
+# CVS `Header' keywords in order to prevent CVS from thinking that the file has
+# changed simply because the Header information is different.
+# @@@ This macro and Flex generation could be moved to a separate utility file
+# since it is not specific to AWS but this is the only client for now.
+$(FLEX.SED):
+	echo $"s/\([ 	]*#[ 	]*include[ 	][ 	]*<unistd.h>\)/\$">$@
+	echo $"#ifndef WIN32\$">>$@
+	echo $"\1\$">>$@
+	echo $"#endif/$">>$@
+	echo $"/$(BUCK)Header:/d$">>$@
+
 $(SRCDIR)/$(DIR.AWS)/skinlex.cpp: \
   $(SRCDIR)/$(DIR.AWS)/skinpars.hpp \
   $(SRCDIR)/$(DIR.AWS)/skinlex.ll \
-  $(SRCDIR)/$(DIR.AWS)/skinpars.cpp
-	flex -L -S$(SRCDIR)/$(DIR.AWS)/flex.skl \
-	-t $(SRCDIR)/$(DIR.AWS)/skinlex.ll > $(SRCDIR)/$(DIR.AWS)/skinlex.cpp
+  $(SRCDIR)/$(DIR.AWS)/skinpars.cpp \
+  $(FLEX.SED)
+	$(FLEXBIN) -L -t $(SRCDIR)/$(DIR.AWS)/skinlex.ll | \
+	$(SED) -f $(FLEX.SED) > $(SRCDIR)/$(DIR.AWS)/skinlex.cpp
 
 $(SRCDIR)/$(DIR.AWS)/skinpars.cpp: $(SRCDIR)/$(DIR.AWS)/skinpars.yy
-	bison --no-lines -d -p aws -o $@ $(<)
+	$(BISONBIN) --no-lines -d -p aws -o $@ $(<)
 
 $(SRCDIR)/$(DIR.AWS)/skinpars.hpp: $(SRCDIR)/$(DIR.AWS)/skinpars.cpp
 	@if [ -f "$(SRCDIR)/$(DIR.AWS)/skinpars.cpp.hpp" ]; then \
@@ -112,7 +128,7 @@ endif
 endif
 clean: awsclean
 awsclean:
-	-$(RMDIR) $(AWS) $(OBJ.AWS) $(OUTDLL)/$(notdir $(INF.AWS))
+	-$(RMDIR) $(AWS) $(OBJ.AWS) $(OUTDLL)/$(notdir $(INF.AWS)) $(FLEX.SED)
 
 cleandep: awscleandep
 awscleandep:

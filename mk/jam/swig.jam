@@ -4,8 +4,6 @@
 
 if $(CMD.SWIG)
 {
-  SED ?= sed ;
-
   # The sed commands/script with which the generated Swig file will be
   # post-processed.  We filter out CVS `Header' keywords in order to prevent
   # CVS from thinking that the file has changed simply because the Header

@@ -73,7 +73,7 @@ actions GenerateWin32MetadataRc
 {
 __EOF__
 
-    cat $(>) | sed "s:\":\"\":g" | sed "s:\(.*\):  \"\1\",:g" >> $(<)
+    cat $(>) | $(SED) "s:\":\"\":g" | $(SED) "s:\(.*\):  \"\1\",:g" >> $(<)
 
     cat >> $(<) << __EOF__
   "\0"
@@ -122,7 +122,7 @@ actions GenerateExportDefs
 {
   echo "EXPORTS" > $(<)
   echo "  plugin_compiler" >> $(<)
-  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize:;p;s:_scfInitialize:_scfFinalize:;p;s:_scfFinalize:_Create:' < $(>) >> $(<)
+  $(SED) '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize:;p;s:_scfInitialize:_scfFinalize:;p;s:_scfFinalize:_Create:' < $(>) >> $(<)
 }
 }
 
