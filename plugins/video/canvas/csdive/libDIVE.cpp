@@ -1015,7 +1015,7 @@ bool diveWindow::ResizeBuffer (long Width, long Height, FOURCC Format)
     if (DiveAllocImageBuffer (hDive, &hBuffer[i], BufferF,
         BufferW, BufferH, 0, NULL) != DIVE_SUCCESS)
     {
-      for (; i > 0; i--)
+      for (i--; i >= 0; i--)
         DiveFreeImageBuffer (hDive, hBuffer[i]);
       return false;
     }

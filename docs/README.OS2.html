@@ -60,6 +60,7 @@
            <LI> FOURCC_R565
            <LI> FOURCC_R664
            <LI> FOURCC_R555
+           <LI> FOURCC_BGR4
          </UL>
          If you use <TT>DEPTH=8</TT> in CrystalSpace configuration file, or use
          <TT>-depth 8</TT> command-line parameter, CrystalSpace will start with
@@ -67,17 +68,39 @@
          If you use <TT>DEPTH=16</TT> config option or <TT>-depth 16</TT>
          parameter, the format will be choosed as follows:
          <UL>
+           <LI> If you selected 32-bit mode, <B>and current screen depth is 32 bits</B>
+                current pixel format is used. <B><I>*SEE NOTE BELOW*</I></B>
            <LI> If screen pixel depth is FOURCC_R565, FOURCC_R664, FOURCC_R555,
-                that pixel format is used. Note that there is no <TT>-depth 15</TT>
-                or <TT>DEPTH=15</TT> option, however 32K color modes are supported
-                through 16-bit switches (but only if your screen is set up
-                with this mode).
+                that pixel format is used.
+           <LI> If you use -depth 15 or DEPTH=15 parameters, FOURCC_R555 pixel
+                format will be used.
            <LI> Otherwise the list of DIVE supported pixel formats is scanned.
                 The most wanted mode is R5-G6-B5 mode, if it is not available
                 R6-G6-B4 mode is choosen, if it is not available, R5-G5-B5 mode
                 is choosen. If no 16- or 15-bit mode is available, code falls
                 back to 256-color mode.
          </UL>
+         <B>NOTE:</B> Due to a bug (or a misimplemented feature, to say so) in
+         OS/2 DIVE library, you can't use 32-bit modes with the stock DIVE.DLL
+         library. You have to patch it first so that it won't reject BGR4
+         pixel format when creating image buffers.
+         <P>
+         <B>WARNING:</B> This is a Bad Fix {tm} however I didn't had other
+         choice. It works for me with Matrox Mystique and Matrox Millenium ][
+         video cards, but I don't guarantee it will work for you.
+         <P>
+         Go to \MMOS2\DLL. Take the DIVE.DLL library. Unpack it, if it is
+         packed (lxlite /x dive.dll). Now find the following sequence of
+         bytes inside it:
+         <CODE>
+83 C2 08 41 83 F9 [10]
+         </CODE>
+         This sequence happens only once in my DIVE.DLL; I hope this is true
+         for your DIVE.DLL as well. Now change the "10" that I took into square
+         brackets with "16". That's all.
+         <P>
+         Note that you will likely get wrong results if your current pixel
+         format is NOT low-endian 32-bit (i.e. BGR4). That's not my fault.
     <LI> DIVE windows can be rescaled to arbitrary sizes. Rescaling is done
          automatically by DIVE, as well as color conversion. Note that if
          EnDIVE is available, you better use the same pixel format as your PM
@@ -154,10 +177,11 @@
 <H1>Misterious crashes</H1>
 If you just compiled WALKTEST or MAZED or some other executable (or even
 CSREGSVR), run it and get misterious exits or crashes during startup, it could
-be caused by the following problem:<B>
+be caused by the following problem:
+<P>
 I had a precompiled version of the JPEG and PNG dynamic libraries that were
-compiled with -Zcrtdll. And compiled Crystal Space with -Zsys, i.e. no EMX
-C runtime DLLs. For some reason this combination doesn't work until C/C++
+compiled with -Zcrtdll. And compiled Crystal Space with -Zsys, i.e. without
+EMX C runtime DLLs. For some reason this combination doesn't work until C/C++
 compilers and company are resident in memory (if you're using "set GCCLOAD").
 So you should either recompile everything with -Zsys, or recompile everything
 with -Zcrtdll, or do a "emxload -q" before running such executables.

@@ -216,23 +216,44 @@ static bool QueryDIVE ()
 
   DesktopW = DiveCaps.ulHorizontalResolution;
   DesktopH = DiveCaps.ulVerticalResolution;
+  bool native;
   for (u_int t = 0; t < 2; t++)
   {
     if (t > 0)
       vmList = (FGVideoMode *) malloc (vmCount * sizeof (FGVideoMode));
     vmCount = 0;
+    native = false;
     for (u_int i = 0; i < DiveCaps.ulInputFormats; i++)
     {
+      FOURCC fcc = ((FOURCC *) DiveCaps.pFormatData)[i];
       if (t == 1)
       {
-        FOURCC fcc = ((FOURCC *) DiveCaps.pFormatData)[i];
-        FGVideoMode *Mode = &vmList[vmCount];
+        FGVideoMode *Mode = &vmList [vmCount];
 
         Mode->Width = DesktopW;
         Mode->Height = DesktopH;
         Mode->PixelFormat = fcc;
         Mode->Buffers = DIVE_MAXBUFFERS;
         Mode->Flags = vmfWindowed | vmfHardware2D | (DiveCaps.fccColorEncoding == fcc ? vmfNative : 0);
+        Mode->IndexBits = 0;
+      }
+      if (DiveCaps.fccColorEncoding == fcc)
+        native = true;
+      vmCount++;
+    }
+
+    // If native color format is not in supported list, add it anyway
+    if (!native)
+    {
+      if (t == 1)
+      {
+        FGVideoMode *Mode = &vmList [vmCount];
+
+        Mode->Width = DesktopW;
+        Mode->Height = DesktopH;
+        Mode->PixelFormat = DiveCaps.fccColorEncoding;
+        Mode->Buffers = DIVE_MAXBUFFERS;
+        Mode->Flags = vmfWindowed | vmfHardware2D | vmfNative;
         Mode->IndexBits = 0;
       }
       vmCount++;

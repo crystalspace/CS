@@ -68,7 +68,7 @@ void TextureCache32::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture
 
   unsigned char *mapR, *mapG, *mapB;
 
-  if (pixmode)
+  if (pixmode == PIX_RGB)
     mapR = tcd.mapR, mapG = tcd.mapG, mapB = tcd.mapB;
   else
     mapR = tcd.mapB, mapG = tcd.mapG, mapB = tcd.mapR;
