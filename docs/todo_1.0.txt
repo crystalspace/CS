@@ -96,6 +96,8 @@ API and Small Feature Additions:
 	  loading/reloading of worlds.
 	- Support iPolygonMesh (for collision detection) in more
 	  mesh objects (like ball, cube, ...).
+	- Use MD5 calculation on thing geometry to automatically generate
+	  a name for the lightmap cache (instead of using LMCACHE).
 
 Global Additions and Stuff:
 	- Direct3D8 Renderer.
