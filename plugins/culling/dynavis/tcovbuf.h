@@ -84,6 +84,10 @@ private:
   // For every block a depth value (4 blocks on every row, ordered
   // by rows).
   float depth[32];
+  // Minimum depth of all blocks.
+  float tile_min_depth;
+  // Maximum depth of all blocks.
+  float tile_max_depth;
 
   // For every 8x8 block a bit indicating if full.
   uint32 blocks_full;
@@ -137,6 +141,8 @@ public:
     tile_full = false; queue_tile_empty = false;
     memset (coverage, 0, sizeof (csBits64)*32);
     memset (depth, 0, sizeof (float)*32);
+    tile_min_depth = 999999999.0;
+    tile_max_depth = 0;
     blocks_full = 0;
     blocks_partial = 0;
   }

@@ -63,12 +63,12 @@ public:
     b1 = ~b1;
     b2 = ~b2;
   }
-  inline bool TestInvertedMask (const csBits64& b)
+  inline bool TestInvertedMask (const csBits64& b) const
   {
     if (b1 & ~b.b1) return true;
     return b2 & ~b.b2;
   }
-  inline bool TestMask (const csBits64& b)
+  inline bool TestMask (const csBits64& b) const
   {
     if (b1 & b.b1) return true;
     return b2 & b.b2;

@@ -250,9 +250,11 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
       c++;
     }
 
+//@@@ Special cases for tile_empty and tile_full???
     // Now do the depth update. Here we will use the coverage_cache
     // to see where we need to update the depth buffer. The coverage_cache
     // will now contain true wherever the coverage buffer was modified.
+    bool recheck_min_depth = false;
     for (i = 0 ; i < 4 ; i++)
     {
       float* ldepth = &depth[i];
@@ -269,44 +271,90 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
         if (mods.CheckByte0 ())
         {
           float& d = ldepth[0];
-	  if (maxdepth > d) d = maxdepth;
+	  if (maxdepth > d)
+	  {
+	    d = maxdepth;
+	    if (d > tile_max_depth) tile_max_depth = d;
+	    recheck_min_depth = true;
+	  }
         }
         if (mods.CheckByte1 ())
         {
           float& d = ldepth[4];
-	  if (maxdepth > d) d = maxdepth;
+	  if (maxdepth > d)
+	  {
+	    d = maxdepth;
+	    if (d > tile_max_depth) tile_max_depth = d;
+	    recheck_min_depth = true;
+	  }
         }
         if (mods.CheckByte2 ())
         {
           float& d = ldepth[8];
-	  if (maxdepth > d) d = maxdepth;
+	  if (maxdepth > d)
+	  {
+	    d = maxdepth;
+	    if (d > tile_max_depth) tile_max_depth = d;
+	    recheck_min_depth = true;
+	  }
         }
         if (mods.CheckByte3 ())
         {
           float& d = ldepth[12];
-	  if (maxdepth > d) d = maxdepth;
+	  if (maxdepth > d)
+	  {
+	    d = maxdepth;
+	    if (d > tile_max_depth) tile_max_depth = d;
+	    recheck_min_depth = true;
+	  }
         }
         if (mods.CheckByte4 ())
         {
           float& d = ldepth[16];
-	  if (maxdepth > d) d = maxdepth;
+	  if (maxdepth > d)
+	  {
+	    d = maxdepth;
+	    if (d > tile_max_depth) tile_max_depth = d;
+	    recheck_min_depth = true;
+	  }
         }
         if (mods.CheckByte5 ())
         {
           float& d = ldepth[20];
-	  if (maxdepth > d) d = maxdepth;
+	  if (maxdepth > d)
+	  {
+	    d = maxdepth;
+	    if (d > tile_max_depth) tile_max_depth = d;
+	    recheck_min_depth = true;
+	  }
         }
         if (mods.CheckByte6 ())
         {
           float& d = ldepth[24];
-	  if (maxdepth > d) d = maxdepth;
+	  if (maxdepth > d)
+	  {
+	    d = maxdepth;
+	    if (d > tile_max_depth) tile_max_depth = d;
+	    recheck_min_depth = true;
+	  }
         }
         if (mods.CheckByte7 ())
         {
           float& d = ldepth[28];
-	  if (maxdepth > d) d = maxdepth;
+	  if (maxdepth > d)
+	  {
+	    d = maxdepth;
+	    if (d > tile_max_depth) tile_max_depth = d;
+	    recheck_min_depth = true;
+	  }
         }
       }
+    }
+    if (recheck_min_depth)
+    {
+      tile_min_depth = depth[0];
+      for (i = 1 ; i < 32 ; i++)
+        if (depth[i] < tile_min_depth) tile_min_depth = depth[i];
     }
   }
 }
@@ -332,17 +380,17 @@ bool csCoverageTile::TestFullRect (float testdepth)
 
 bool csCoverageTile::TestRect (int start, int end, float testdepth)
 {
+  // If the depth of this rectangle is smaller than the minimum depth
+  // of this tile then this rectangle is automatically visible.
+  if (testdepth <= tile_min_depth) return true;
+
   int i;
-  for (i = 0 ; i < start ; i++) coverage_cache[i].Empty ();
-  for (i = start ; i <= end ; i++) coverage_cache[i].Full ();
-  for (i = end ; i < 32 ; i++) coverage_cache[i].Empty ();
 
   //@@@@@@@@@@@ This routine can be optimized considerably!
 
   if (!tile_full)
   {
-    // Tile is not full which means we only have to test depth wherever
-    // the global coverage buffer is filled.
+    // Tile is not full which means we test coverage first.
     csBits64* c = coverage+start;
     for (i = start ; i <= end ; i++)
     {
@@ -351,6 +399,15 @@ bool csCoverageTile::TestRect (int start, int end, float testdepth)
       c++;
     }
   }
+
+  // If the depth of this rectangle is greater than the maximum depth
+  // of this tile then this rectangle cannot be visible.
+  if (testdepth > tile_max_depth) return false;
+
+  // Initialize the coverage cache.
+  for (i = 0 ; i < start ; i++) coverage_cache[i].Empty ();
+  for (i = start ; i <= end ; i++) coverage_cache[i].Full ();
+  for (i = end ; i < 32 ; i++) coverage_cache[i].Empty ();
 
   // Test depth where appropriate.
   for (i = (start>>3) ; i <= (end>>3) ; i++)
@@ -390,28 +447,34 @@ bool csCoverageTile::TestRect (int start, int end, float testdepth)
 bool csCoverageTile::TestRect (const csBits64& vermask, int start, int end,
   	float testdepth)
 {
+  // If the depth of this rectangle is smaller than the minimum depth
+  // of this tile then this rectangle is automatically visible.
+  if (testdepth <= tile_min_depth) return true;
+
   int i;
-  for (i = 0 ; i < start ; i++) coverage_cache[i].Empty ();
-  for (i = start ; i <= end ; i++) coverage_cache[i] = vermask;
-  for (i = end ; i < 32 ; i++) coverage_cache[i].Empty ();
 
   //@@@@@@@@@@@ This routine can be optimized considerably!
 
   if (!tile_full)
   {
-    // Tile is not full which means we only have to test depth wherever
-    // the global coverage buffer is filled.
-    csBits64* cc = coverage_cache+start;
+    // Tile is not full which means we first test coverage.
     csBits64* c = coverage+start;
     for (i = start ; i <= end ; i++)
     {
-      if (cc->TestInvertedMask (*c))
+      if (vermask.TestInvertedMask (*c))
         return true;
-      *cc &= *c;
-      cc++;
       c++;
     }
   }
+
+  // If the depth of this rectangle is greater than the maximum depth
+  // of this tile then this rectangle cannot be visible.
+  if (testdepth > tile_max_depth) return false;
+
+  // Initialize the coverage cache.
+  for (i = 0 ; i < start ; i++) coverage_cache[i].Empty ();
+  for (i = start ; i <= end ; i++) coverage_cache[i] = vermask;
+  for (i = end ; i < 32 ; i++) coverage_cache[i].Empty ();
 
   // Test depth where appropriate.
   for (i = (start>>3) ; i <= (end>>3) ; i++)
