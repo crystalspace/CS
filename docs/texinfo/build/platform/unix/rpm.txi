@@ -42,7 +42,7 @@ Extract the @file{CS/scripts/rpm/cs.spec} file, and put it in your
 
 @example
 cd /home/user/rpm/SPECS
-tar xvjf /home/user/rpm/SOURCES/cs-current-snapshot.tar.bz2 \
+tar xvjf /home/user/rpm/SOURCES/cs98_003.tar.bz2 \
      CS/scripts/rpm/cs.spec
 mv CS/scripts/rpm/cs.spec /home/user/rpm/SPECS
 rm -rf CS/
