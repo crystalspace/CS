@@ -88,7 +88,8 @@ install_include: $(INSTALL_DIR)/include $(INSTALL_INCLUDE.DIR) \
 
 # install docs/html into INSTALL_DIR/docs/html,
 #  docs/pubapi to INSTALL_DIR/docs/pubapi and copy docs/README.htm as well.
-INSTALL_DOCS.FILES = docs/README.htm $(wildcard docs/html/*htm \
+INSTALL_DOCS.FILES = docs/README.htm docs/history.txt docs/history.old \
+  $(wildcard docs/html/*htm \
   docs/html/*/*jpg docs/html/*/*gif docs/html/*/*png  \
   docs/html/*/*/*jpg docs/html/*/*/*gif docs/html/*/*/*png \
   docs/pubapi/*htm docs/pubapi/*gif docs/pubapi/*css )
