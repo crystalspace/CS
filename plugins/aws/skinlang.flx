@@ -1,0 +1,48 @@
+
+/*******
+  Flex definition for the .skn file parser.
+ *********/
+ 
+%{
+ 
+#include "cssysdef.h"
+#include "csgeom/csrect.h"
+
+#include <stdlib.h>
+#include <string.h>
+
+
+typedef union {
+  char   *str;    /* For returning titles and handles to items. */
+  int     val;    /* For returning numbers                      */
+  csRect *rect;   /* For returning rectangular regions          */
+} YYSTYPE;
+
+#define	TOKEN_NUM	257
+#define	TOKEN_STR	258
+#define	TOKEN_ATTR	259
+#define	TOKEN_SKIN	260
+#define	TOKEN_FOR	261
+#define	TOKEN_WINDOW	262
+#define	TOKEN_FROM	263
+#define	NEG             264
+
+%}
+
+%option noyywrap
+%option outfile="sllex.cpp"
+%option prefix="aws"
+
+ 
+%%
+[:digit:]+              awslval->val = atoi(awstext);   return TOKEN_NUM;
+[:alpha:]+[:alnum:]*    awslval->str = strdup(awstext); return TOKEN_ATTR;
+\"[^\n"]*\"             awslval->str = strdup(awstext+1); return TOKEN_STR;
+[Ss]kin                 return TOKEN_SKIN;
+[Ww]indow               return TOKEN_WINDOW;
+[Ff]or                  return TOKEN_FOR;
+[Ff]rom                 return TOKEN_FROM;
+
+
+
+%%
