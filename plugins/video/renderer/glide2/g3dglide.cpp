@@ -1473,8 +1473,6 @@ bool csGraphics3DGlide2x::SetRenderState (G3D_RENDERSTATEOPTION option, long val
   case G3DRENDERSTATE_LIGHTINGENABLE :
     m_renderstate.lighting = value;
     break;
-  case G3DRENDERSTATE_FILTERINGENABLE :
-  case G3DRENDERSTATE_PERFECTMAPPINGENABLE :
   case G3DRENDERSTATE_INTERLACINGENABLE :
   case G3DRENDERSTATE_MMXENABLE :
     break;

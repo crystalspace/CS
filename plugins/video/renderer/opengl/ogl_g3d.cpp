@@ -168,8 +168,6 @@ bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
   m_renderstate.gouraud = true;
   m_renderstate.lighting = true;
   m_renderstate.textured = true;
-  m_renderstate.texel_filt = false;
-  m_renderstate.perfect = false;
 
   m_config_options.do_multitexture_level = 0;
   m_config_options.do_extra_bright = false;
@@ -1145,12 +1143,6 @@ bool csGraphics3DOpenGL::SetRenderState (G3D_RENDERSTATEOPTION op, long value)
     return false;
   case G3DRENDERSTATE_INTERLACINGENABLE:
     return false;
-  case G3DRENDERSTATE_FILTERINGENABLE:
-    m_renderstate.texel_filt = value;
-    break;
-  case G3DRENDERSTATE_PERFECTMAPPINGENABLE:
-    m_renderstate.perfect = value;
-    break;
   case G3DRENDERSTATE_LIGHTINGENABLE:
     m_renderstate.lighting = value;
     break;
@@ -1197,10 +1189,6 @@ long csGraphics3DOpenGL::GetRenderState (G3D_RENDERSTATEOPTION op)
     return 0;
   case G3DRENDERSTATE_INTERLACINGENABLE:
     return false;
-  case G3DRENDERSTATE_FILTERINGENABLE:
-    return m_renderstate.texel_filt;
-  case G3DRENDERSTATE_PERFECTMAPPINGENABLE:
-    return m_renderstate.perfect;
   case G3DRENDERSTATE_LIGHTINGENABLE:
     return m_renderstate.lighting;
   case G3DRENDERSTATE_GOURAUDENABLE:

@@ -212,12 +212,8 @@ public:
   bool do_transp;
   /// Option variable: render textures?
   bool do_textured;
-  /// Option variable: do expensive texel filtering?
-  bool do_texel_filt;
-  /// Option variable: do very expensive bilinear filtering?
-  bool do_bilin_filt;
-  /// Option variable: do perfect texture mapping?
-  bool do_perfect;
+  /// Option variable: do very expensive bilinear filtering? (0/1/2)
+  unsigned char do_bilin_filt;
   /// Do we want Gouraud Shaded polygons?
   bool rstate_gouraud;
 

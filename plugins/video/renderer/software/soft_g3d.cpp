@@ -59,7 +59,6 @@ int csGraphics3DSoftware::filter_bf = 1;
  *                FLAT for flat-shaded
  *                FOG for drawing fog
  *  SMode       = KEY for "key-color" source pixel removal
- *                FILT for filtered texture (possibly bi-linear)
  *                GOURAUD for Gouraud-shading applied to the texture
  *  Zmode       = ZUSE for polys that are tested against Z-buffer (and fills)
  *                ZFIL for polys that just fills Z-buffer without testing
@@ -78,12 +77,10 @@ int csGraphics3DSoftware::filter_bf = 1;
 #define SCANPROC_TEX_ZUSE               0x03
 #define SCANPROC_MAP_ZFIL               0x04
 #define SCANPROC_MAP_ZUSE               0x05
-#define SCANPROC_MAP_FILT_ZFIL          0x06
-#define SCANPROC_MAP_FILT_ZUSE          0x07
-#define SCANPROC_TEX_KEY_ZFIL           0x08
-#define SCANPROC_TEX_KEY_ZUSE           0x09
-#define SCANPROC_MAP_KEY_ZFIL           0x0A
-#define SCANPROC_MAP_KEY_ZUSE           0x0B
+#define SCANPROC_TEX_KEY_ZFIL           0x06
+#define SCANPROC_TEX_KEY_ZUSE           0x07
+#define SCANPROC_MAP_KEY_ZFIL           0x08
+#define SCANPROC_MAP_KEY_ZUSE           0x09
 // these do not have "zuse" counterparts
 #define SCANPROC_ZFIL                   0x10
 #define SCANPROC_FOG                    0x11
@@ -163,8 +160,7 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
   do_textured = true;
   do_interlaced = -1;
   ilace_fastmove = false;
-  do_texel_filt = false;
-  do_bilin_filt = false;
+  do_bilin_filt = 0;
   do_transp = true;
   do_textured = true;
   do_smaller_rendering = false;
@@ -258,14 +254,12 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProc [SCANPROC_TEX_ZUSE] = csScan_8_draw_scanline_tex_zuse;
 
       ScanProc [SCANPROC_MAP_ZFIL] =
+        do_bilin_filt ? csScan_8_draw_scanline_map_filt_zfil :
 #ifdef DO_MMX
         UseMMX ? csScan_8_mmx_draw_scanline_map_zfil :
 #endif
         csScan_8_draw_scanline_map_zfil;
       ScanProc [SCANPROC_MAP_ZUSE] = csScan_8_draw_scanline_map_zuse;
-
-      ScanProc [SCANPROC_MAP_FILT_ZFIL] = csScan_8_draw_scanline_map_filt_zfil;
-//    ScanProc [SCANPROC_MAP_FILT_ZUSE] = csScan_8_draw_scanline_map_filt_zuse;
 
       ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_8_draw_scanline_tex_key_zfil;
       ScanProc [SCANPROC_TEX_KEY_ZUSE] = csScan_8_draw_scanline_tex_key_zuse;
@@ -306,18 +300,13 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProc [SCANPROC_TEX_ZUSE] = csScan_16_draw_scanline_tex_zuse;
 
       ScanProc [SCANPROC_MAP_ZFIL] =
+        do_bilin_filt == 2 ? csScan_16_draw_scanline_map_filt2_zfil :
+        do_bilin_filt == 1 ? csScan_16_draw_scanline_map_filt_zfil :
 #ifdef DO_MMX
         UseMMX ? csScan_16_mmx_draw_scanline_map_zfil :
 #endif
         csScan_16_draw_scanline_map_zfil;
       ScanProc [SCANPROC_MAP_ZUSE] = csScan_16_draw_scanline_map_zuse;
-
-      ScanProc [SCANPROC_MAP_FILT_ZFIL] = do_bilin_filt ?
-        csScan_16_draw_scanline_map_filt2_zfil :
-        csScan_16_draw_scanline_map_filt_zfil;
-//    ScanProc [SCANPROC_MAP_FILT_ZUSE] = do_bilin_filt ?
-//      csScan_16_draw_scanline_map_filt2_zuse :
-//      csScan_16_draw_scanline_map_filt_zuse;
 
       ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_16_draw_scanline_tex_key_zfil;
       ScanProc [SCANPROC_TEX_KEY_ZUSE] = csScan_16_draw_scanline_tex_key_zuse;
@@ -387,13 +376,6 @@ void csGraphics3DSoftware::ScanSetup ()
 #endif
         csScan_32_draw_scanline_map_zfil;
       ScanProc [SCANPROC_MAP_ZUSE] = csScan_32_draw_scanline_map_zuse;
-
-//    ScanProc [SCANPROC_MAP_FILT_ZFIL] = do_bilin_filt ?
-//      csScan_32_draw_scanline_map_filt2_zfil :
-//      csScan_32_draw_scanline_map_filt_zfil;
-//    ScanProc [SCANPROC_MAP_FILT_ZUSE] = do_bilin_filt ?
-//      csScan_32_draw_scanline_map_filt2_zuse :
-//      csScan_32_draw_scanline_map_filt_zuse;
 
       ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_32_draw_scanline_tex_key_zfil;
       ScanProc [SCANPROC_TEX_KEY_ZUSE] = csScan_32_draw_scanline_tex_key_zuse;
@@ -1501,8 +1483,6 @@ texr_done:
       scan_index = SCANPROC_MAP_KEY_ZFIL;
     else if (ScanProc_Alpha && poly.alpha)
       dscan = ScanProc_Alpha (this, poly.alpha);
-    else if ((do_texel_filt || do_bilin_filt) && mipmap == 0)
-      scan_index = SCANPROC_MAP_FILT_ZFIL;
     else
       scan_index = SCANPROC_MAP_ZFIL;
   }
@@ -2496,11 +2476,11 @@ bool csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       ScanSetup ();
       break;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-      do_bilin_filt = value;
+      do_bilin_filt = value ? 1 : 0;
       ScanSetup ();
       break;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-      do_bilin_filt = value;
+      do_bilin_filt = value ? 2 : 0;
       ScanSetup ();
       break;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
@@ -2529,10 +2509,6 @@ bool csGraphics3DSoftware::SetRenderState (G3D_RENDERSTATEOPTION op,
       break;
     case G3DRENDERSTATE_INTERPOLATIONSTEP:
       Scan.InterpolMode = value;
-      break;
-    case G3DRENDERSTATE_FILTERINGENABLE:
-      do_texel_filt = value;
-      ScanSetup ();
       break;
     case G3DRENDERSTATE_LIGHTINGENABLE:
       do_lighting = value;
@@ -2566,9 +2542,9 @@ long csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op)
     case G3DRENDERSTATE_SPECULARENABLE:
       return rstate_specular;
     case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-      return do_texel_filt;
+      return do_bilin_filt == 1 ? 1 : 0;
     case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-      return do_bilin_filt;
+      return do_bilin_filt == 2 ? 1 : 0;
     case G3DRENDERSTATE_TRANSPARENCYENABLE:
       return do_transp;
     case G3DRENDERSTATE_MIPMAPENABLE:
@@ -2585,8 +2561,6 @@ long csGraphics3DSoftware::GetRenderState(G3D_RENDERSTATEOPTION op)
       return do_interlaced == -1 ? false : true;
     case G3DRENDERSTATE_INTERPOLATIONSTEP:
       return Scan.InterpolMode;
-    case G3DRENDERSTATE_FILTERINGENABLE:
-      return do_texel_filt;
     case G3DRENDERSTATE_LIGHTINGENABLE:
       return do_lighting;
     case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
@@ -2693,7 +2667,7 @@ IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftware::csSoftConfig)
   IMPLEMENTS_INTERFACE (iConfig)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-#define NUM_OPTIONS 10
+#define NUM_OPTIONS 8
 
 static const csOptionDescription config_options [NUM_OPTIONS] =
 {
@@ -2701,12 +2675,10 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 1, "light", "Texture lighting", CSVAR_BOOL },
   { 2, "transp", "Transparent textures", CSVAR_BOOL },
   { 3, "txtmap", "Texture mapping", CSVAR_BOOL },
-  { 4, "txtfilt", "Texture filtering", CSVAR_BOOL },
-  { 5, "bifilt", "Bilinear filtering", CSVAR_BOOL },
-  { 6, "mmx", "MMX support", CSVAR_BOOL },
-  { 7, "gamma", "Gamma value", CSVAR_FLOAT },
-  { 8, "gouraud", "Gouraud shading", CSVAR_BOOL },
-  { 9, "smaller", "Smaller rendering", CSVAR_BOOL },
+  { 4, "mmx", "MMX support", CSVAR_BOOL },
+  { 5, "gamma", "Gamma value", CSVAR_FLOAT },
+  { 6, "gouraud", "Gouraud shading", CSVAR_BOOL },
+  { 7, "smaller", "Smaller rendering", CSVAR_BOOL },
 };
 
 bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
@@ -2719,14 +2691,12 @@ bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
     case 1: scfParent->do_lighting = value->v.b; break;
     case 2: scfParent->do_transp = value->v.b; break;
     case 3: scfParent->do_textured = value->v.b; break;
-    case 4: scfParent->do_texel_filt = value->v.b; break;
-    case 5: scfParent->do_bilin_filt = value->v.b; break;
 #ifdef DO_MMX
-    case 6: scfParent->do_mmx = value->v.b; break;
+    case 4: scfParent->do_mmx = value->v.b; break;
 #endif
-    case 7: scfParent->texman->Gamma = value->v.f; break;
-    case 8: scfParent->rstate_gouraud = value->v.b; break;
-    case 9: scfParent->do_smaller_rendering = value->v.b; break;
+    case 5: scfParent->texman->Gamma = value->v.f; break;
+    case 6: scfParent->rstate_gouraud = value->v.b; break;
+    case 7: scfParent->do_smaller_rendering = value->v.b; break;
     default: return false;
   }
   scfParent->ScanSetup ();
@@ -2742,14 +2712,12 @@ bool csGraphics3DSoftware::csSoftConfig::GetOption (int id, csVariant* value)
     case 1: value->v.b = scfParent->do_lighting; break;
     case 2: value->v.b = scfParent->do_transp; break;
     case 3: value->v.b = scfParent->do_textured; break;
-    case 4: value->v.b = scfParent->do_texel_filt; break;
-    case 5: value->v.b = scfParent->do_bilin_filt; break;
 #ifdef DO_MMX
-    case 6: value->v.b = scfParent->do_mmx; break;
+    case 4: value->v.b = scfParent->do_mmx; break;
 #endif
-    case 7: value->v.f = scfParent->texman->Gamma; break;
-    case 8: value->v.b = scfParent->rstate_gouraud; break;
-    case 9: value->v.b = scfParent->do_smaller_rendering; break;
+    case 5: value->v.f = scfParent->texman->Gamma; break;
+    case 6: value->v.b = scfParent->rstate_gouraud; break;
+    case 7: value->v.b = scfParent->do_smaller_rendering; break;
     default: return false;
   }
   return true;

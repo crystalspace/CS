@@ -131,8 +131,6 @@ protected:
     int  mipmap;    // enable mipmapping?
     bool lighting; // Option variable: do texture lighting? (lightmaps)
     bool textured; // Option variable: render textures?
-    bool texel_filt; // Option variable: do expensive texel filtering?
-    bool perfect; // Option variable: do perfect texture mapping?
   } m_renderstate;
 
   /// Should DrawPolygonFX use Gouraud shading?
