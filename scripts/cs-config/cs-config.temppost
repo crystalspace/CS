@@ -21,17 +21,24 @@ depends()
     esac
 }
 
-#is it a source distribution?
-if test -r "$prefix/Makefile"; then
-#  look for the lib files...
-#  a more or less dirty hack...
-  if test -r "$prefix/lib/libcssys.a"; then
-    libdir="$prefix/lib"
-  else
-    if test -r "$prefix/$makeout/libcssys.a"; then
-      libdir="$prefix/$makeout"
-    fi
-  fi
+# Detect type of the installation and the directories where the library files
+# reside in.
+lflags=""
+
+#A standard installation
+if test -r "${exec_prefix}/lib/libcssys.a"; then
+    lflags="-L${exec_prefix}/lib"
+fi
+#is it an old make type build?
+if test -z "$libdir" -a -r "$prefix/Makefile" \
+     -a -r "$prefix/$makeout/libcssys.a"; then
+    lflags="-L$prefix/$makeout"
+fi
+#new style jam build?
+if test -z "$libdir" -a -r "$prefix/Jamfile" \
+     -a -r "$prefix/$makeout/libs/cssys/libcssys.a"; then
+    libd=$prefix/$makeout/libs
+    lflags="-L$libd/cssys -L$libd/csutil -L$libd/cstool -L$libd/csengine -L$libd/csgfx -L$libd/csgeom -L$libd/csws"
 fi
 
 usage()
@@ -64,15 +71,6 @@ Note that the Crystal Space directory is detect by looking at the CRYSTAL
 environment variable. Make sure this variable is set correctly.
 EOF
 }
-
-if test $# -eq 0; then
-	usage 1>&2
-	exit 1
-fi
-
-cflags=false
-libs_L=false
-libs_l=false
 
 includedeps()
 {
@@ -180,6 +178,11 @@ show_libs=""
 show_cflags=""
 show_cxxflags=""
 
+if test $# -eq 0; then
+	usage 1>&2
+	exit 1
+fi
+
 while test $# -gt 0; do
   case $1 in
     --prefix)
@@ -261,7 +264,7 @@ while test $# -gt 0; do
   shift
 done
 
-if test -z "$libdir"; then
+if test -z "$lflags"; then
   cat 1>&2 <<EOF
 Couldn't detect dir with lib files, aborting!
 Did you already compile CS? Did you set CRYSTAL environment variable
@@ -291,7 +294,7 @@ if test -n "$show_libs"; then
         addlib "-lcsutil"
         addlib "-lcssys"
     fi
-    the_libs="-L${libdir} $the_libs ${syslibs}"
+    the_libs="${lflags} $the_libs ${syslibs}"
 
     echo "$the_libs"
 fi
