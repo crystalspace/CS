@@ -39,7 +39,7 @@
 #include "cssys/system.h"
 #include "cssys/sysdriv.h"
 #include "csutil/inifile.h"
-#include "ISysG2D.h"
+#include "IMacGraphics.h"
 #include "igraph3d.h"
 #include "igraph2d.h"
 
@@ -235,11 +235,11 @@ void SysSystemDriver::Loop(void)
     long prev_time;
     time_t current_time;
 	EventRecord anEvent;
-	iMacGraphicsInfo* piG2D = NULL;
+	iMacGraphics* piG2D = NULL;
 	bool outEventWasProcessed;
 	bool	driverNeedsEvent = false;
 
-	piG2D = QUERY_INTERFACE(System, iMacGraphicsInfo);
+	piG2D = QUERY_INTERFACE(System, iMacGraphics);
 
 	if (piG2D) {
 		piG2D->DoesDriverNeedEvent( &driverNeedsEvent );
@@ -285,7 +285,7 @@ void SysSystemDriver::Loop(void)
 }
 
 
-void SysSystemDriver::DispatchEvent( time_t current_time, EventRecord *theEvent, iMacGraphicsInfo* piG2D )
+void SysSystemDriver::DispatchEvent( time_t current_time, EventRecord *theEvent, iMacGraphics* piG2D )
 {
 	// dispatch the event according to its type and location
 	
@@ -348,7 +348,7 @@ void SysSystemDriver::DispatchEvent( time_t current_time, EventRecord *theEvent,
 }
 
 
-void SysSystemDriver::HandleMouseEvent( time_t current_time, EventRecord *theEvent, iMacGraphicsInfo* piG2D )
+void SysSystemDriver::HandleMouseEvent( time_t current_time, EventRecord *theEvent, iMacGraphics* piG2D )
 {
 	WindowPtr	targetWindow;
 	short		partCode;
@@ -877,7 +877,7 @@ void SysSystemDriver::HandleKey( time_t current_time, const char key, const char
 }
 
 
-void SysSystemDriver::HandleOSEvent( time_t current_time, EventRecord *theEvent, iMacGraphicsInfo* piG2D )
+void SysSystemDriver::HandleOSEvent( time_t current_time, EventRecord *theEvent, iMacGraphics* piG2D )
 {
 	unsigned char	osEvtFlag;
 
