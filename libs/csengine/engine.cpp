@@ -38,6 +38,7 @@
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
 #include "csgfx/csimage.h"
+#include "csgfx/memimage.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
 #include "csutil/debug.h"
@@ -2330,6 +2331,36 @@ iTextureWrapper *csEngine::CreateTexture (
 
   tex->SetFlags (iFlags);
   tex->QueryObject ()->SetName (iName);
+
+  if (iTransp)
+    tex->SetKeyColor (
+        QInt (iTransp->red * 255.2),
+        QInt (iTransp->green * 255.2),
+        QInt (iTransp->blue * 255.2));
+
+  return tex;
+}
+
+iTextureWrapper *csEngine::CreateBlackTexture (
+  const char *name,
+  int w, int h,
+  csColor *iTransp,
+  int iFlags)
+{
+  if (!ImageLoader) return NULL;
+
+  csImageMemory* ifile = new csImageMemory (w, h);
+  ifile->SetName (name);
+
+  // Okay, now create the respective texture handle object
+  iTextureWrapper *tex = GetTextures ()->FindByName (name);
+  if (tex)
+    tex->SetImageFile (ifile);
+  else
+    tex = GetTextures ()->NewTexture (ifile);
+
+  tex->SetFlags (iFlags);
+  tex->QueryObject ()->SetName (name);
 
   if (iTransp)
     tex->SetKeyColor (

@@ -1027,10 +1027,13 @@ public:
   virtual void DeleteAll ();
 
   /// Register a texture to be loaded during Prepare()
-  virtual iTextureWrapper* CreateTexture (const char *iName, const char *iFileName,
-    csColor *iTransp, int iFlags);
+  virtual iTextureWrapper* CreateTexture (const char *iName,
+  	const char *iFileName, csColor *iTransp, int iFlags);
+  virtual iTextureWrapper* CreateBlackTexture (const char *name,
+	int w, int h, csColor *iTransp, int iFlags);
   /// Register a material to be loaded during Prepare()
-  virtual iMaterialWrapper* CreateMaterial (const char *iName, iTextureWrapper* texture);
+  virtual iMaterialWrapper* CreateMaterial (const char *iName,
+  	iTextureWrapper* texture);
 
   /// Create a empty sector with given name.
   virtual iSector *CreateSector (const char *iName);

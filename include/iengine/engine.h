@@ -191,7 +191,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 7, 12);
+SCF_VERSION (iEngine, 0, 8, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -312,9 +312,13 @@ struct iEngine : public iBase
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt,
   	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers) = 0;
 
-  /// Register a texture to be loaded during Prepare()
+  /// Create a texture from a file.
   virtual iTextureWrapper* CreateTexture (const char *name,
   	const char *fileName, csColor *transp, int flags) = 0;
+  /// Create a black texture. This is mostly useful for procedural textures.
+  virtual iTextureWrapper* CreateBlackTexture (const char *name,
+	int w, int h, csColor *iTransp, int iFlags) = 0;
+
   /// Register a material to be loaded during Prepare()
   virtual iMaterialWrapper* CreateMaterial (const char *name,
   	iTextureWrapper* texture) = 0;

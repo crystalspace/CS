@@ -8,6 +8,10 @@ The history order is reversed so that new features are at the top.
 	    - Removed hard-coded -Wall, -Wmost and -Wno-unknown-pragmas
 	      directives from makefiles.
 	    - Eliminated several compilation warnings from the project.
+	- Added iEngine->CreateBlackTexture(). This function is similar
+	  to iEngine->CreateTexture(). Instead of creating a texture from
+	  a file it will create a black texture with the given dimensions.
+	  This is mainly useful for procedural textures.
 11-Nov-2002
 	- Genmesh factories now support HardTransform().
 10-Nov-2002

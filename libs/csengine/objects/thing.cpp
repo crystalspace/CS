@@ -225,7 +225,7 @@ csThing::~csThing ()
   CleanupThingEdgeTable ();
   delete[] cachename;
 
-  if (obj_normals) delete [] obj_normals;
+  delete [] obj_normals;
 }
 
 void csThing::GenerateCacheName ()
@@ -422,6 +422,7 @@ void csThing::CalculateNormals()
   int i, j, k;
   int* vertIndices;
 
+  delete[] obj_normals;
   obj_normals = new csVector3[num_vertices];
 	csVector3** normals = new csVector3*[num_vertices];
 
@@ -518,6 +519,47 @@ void csThing::Prepare ()
     p->Finish ();
   }
   FireListeners ();
+
+
+  {
+static int total_size = 0;
+static int total_cnt = 0;
+    int size = sizeof (csThing);
+    size += cachename ? strlen (cachename)+3 : 0;
+    int vtsize = sizeof (csVector3);
+    size += vtsize * max_vertices;	// obj_verts;
+    size += vtsize * num_cam_verts;	// cam_verts;
+    if (obj_verts != wor_verts)
+      size += vtsize * max_vertices;
+    if (obj_normals)
+      size += vtsize * num_vertices;
+    size += sizeof (csThingBBox);
+    size += 4 * polygons.Limit ();
+    size += GetName () ? strlen (GetName ())+3 : 0;
+    int polsize = sizeof (csPolygon3D) + sizeof (csPolyTexture)
+    	+ sizeof (csPolyTexLightMap) + sizeof (csPolyTxtPlane)
+	+ sizeof (csPolyPlane) + sizeof (csLightMap);
+    polsize *= polygons.Length ();
+    int lm_size = 0;
+    int i;
+    for (i = 0 ; i < polygons.Length () ; i++)
+    {
+      csPolygon3D *p = polygons.Get (i);
+      polsize += 4*4;	// Average indexes.
+      csPolyTexLightMap *lmi = p->GetLightMapInfo ();
+      if (lmi)
+      {
+        csLightMap* lm = lmi->GetPolyTex ()->GetCSLightMap ();
+	if (lm)
+	  polsize += lm->GetSize () * sizeof (csRGBpixel) * 2;
+      }
+    }
+
+    total_size += size+polsize;
+    total_cnt++;
+    printf ("thing size=%d polysize=%d total=%d total_size=%d average_size=%d count=%d\n", size, polsize, size + polsize, total_size, total_size / total_cnt, total_cnt);
+  }
+
 }
 
 int csThing::AddCurveVertex (const csVector3 &v, const csVector2 &t)
@@ -1052,7 +1094,7 @@ void csThing::InvalidateThing ()
   shapenr++;
   scfiPolygonMeshLOD.Cleanup ();
   scfiPolygonMesh.Cleanup ();
-  if(obj_normals) delete [] obj_normals;
+  delete [] obj_normals; obj_normals = NULL;
   FireListeners ();
 }
 
