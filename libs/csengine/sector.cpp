@@ -154,6 +154,8 @@ csSector::csSector (csEngine *engine) :
   shmgr = CS_QUERY_REGISTRY (csEngine::object_reg, iShaderManager);
   virtual_clock = CS_QUERY_REGISTRY (csEngine::object_reg, iVirtualClock);
 #endif // CS_USE_NEW_RENDERER
+
+  current_visnr = 1;
 }
 
 csSector::~csSector ()

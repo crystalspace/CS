@@ -13,6 +13,9 @@ chronological order.
 	- Jorrit fixed an initialization error of last_visible_vistest_nr
 	  with both dynavis and frustvis. With a bit of bad luck this could
 	  cause culling errors.
+	- Jorrit fixed another initialization error with current_visnr in
+	  csSector. Please people! Don't forget to initialize variables
+	  in the constructor!
 30-Aug-2003
 	- Old_Belge added the morph target support to sprcal3d.
 	- Eric Sunshine augmented configure.ac so that it emits the appropriate
