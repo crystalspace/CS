@@ -212,11 +212,11 @@ Step 4 Video - 0.9Mb zip archive download.
 
 Crystal Space essentially has three preprocessor definitions which @sc{must} be
 set in-order to successfully compile and link your application. They are
-@emph{@sc{win32_volatile}}, which is added whether the build is release or
-debug.  @emph{@sc{__crystal_space__}}, which is also set whether the build is
-release or debug. And finally @emph{@sc{cs_release}} or @emph{@sc{cs_debug}},
-which is added as you may guess @emph{@sc{cs_release}} in the settings for
-release builds and @emph{@sc{cs_debug}} in the settings for debug builds.
+@samp{CS_WIN32_CSCONFIG}, which is added whether the build is release or
+debug.  @samp{__CRYSTAL_SPACE__}, which is also set whether the build is
+release or debug. And finally @samp{CS_RELEASE} or @samp{CS_DEBUG},
+which is added as you may guess @samp{CS_RELEASE} in the settings for
+release builds and @samp{CS_DEBUG} in the settings for debug builds.
 
 To set the preprocessor definitions for your project. Select your project in the
 @emph{Workspace} window. See area highlighted in blue in the image below.  Now,
@@ -237,8 +237,8 @@ Once you have clicked on @emph{Settings...}. You will then be presented with the
 
 Select the @emph{C/C++} tab and insert the appropriate definitions in the
 @emph{Preprocessor definitions} text box i.e. for a debug build
-@emph{@sc{win32_volatile}},  @emph{@sc{__crystal_space__}} and
-@emph{@sc{cs_debug}}, making sure to separate with commas.  An example the
+@samp{CS_WIN32_CSCONFIG},  @samp{__CRYSTAL_SPACE__} and
+@samp{CS_DEBUG}, making sure to separate with commas.  An example the
 ones entered for a debug build can be seen in the image below.
 
 @ifnotinfo
@@ -247,8 +247,8 @@ ones entered for a debug build can be seen in the image below.
 
 Select the @emph{C/C++} tab and insert the appropriate definitions in the
 @emph{Preprocessor definitions} text box i.e. for a release build
-@emph{@sc{win32_volatile}},  @emph{@sc{__crystal_space__}} and
-@emph{@sc{cs_release}}, making sure to separate with commas.  An example the
+@samp{CS_WIN32_CSCONFIG},  @samp{__CRYSTAL_SPACE__} and
+@samp{CS_RELEASE}, making sure to separate with commas.  An example the
 ones entered for a release build can be seen in the image below.
 
 @ifnotinfo
