@@ -5219,9 +5219,9 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	{
 	  const char* att = child->GetContentsValue ();
           if (!strcasecmp (att, "none")     ) attenuation = CS_ATTN_NONE;
-          if (!strcasecmp (att, "linear")   ) attenuation = CS_ATTN_LINEAR;
-          if (!strcasecmp (att, "inverse")  ) attenuation = CS_ATTN_INVERSE;
-          if (!strcasecmp (att, "realistic")) attenuation = CS_ATTN_REALISTIC;
+          else if (!strcasecmp (att, "linear")   ) attenuation = CS_ATTN_LINEAR;
+          else if (!strcasecmp (att, "inverse")  ) attenuation = CS_ATTN_INVERSE;
+          else if (!strcasecmp (att, "realistic")) attenuation = CS_ATTN_REALISTIC;
 	  else
 	  {
 	    SyntaxService->ReportBadToken (child);
