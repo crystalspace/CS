@@ -156,7 +156,7 @@ public:
    * Note! This doesn't update the bounding box!
    */
   void SetVertices (csVector2 const* v, int num)
-  { memcpy (vertices, v, (num_vertices = num) * sizeof (csVector2)); }
+  { MakeRoom (num); memcpy (vertices, v, (num_vertices = num) * sizeof (csVector2)); }
 
   /// Update the bounding box (useful after SetVertices).
   void UpdateBoundingBox ();
