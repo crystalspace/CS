@@ -32,6 +32,7 @@ class csColor;
 class csTransform;
 class csSharedLODMesh;
 class csBCTerrBlock;
+class csBox3;
 
 
 
@@ -51,7 +52,17 @@ struct iBCTerrState : public iBase
   	iMaterialWrapper* mat) = 0;
   /// Used to create control points, needs size to be set.
   virtual void SetHeightMap (iImage* im) = 0;
+  /// Test the height at point, returns y + 2.0f.
   virtual int HeightTest (csVector3 *point) = 0;
+  /// Set Block Material by grid number 0 = start 
+  virtual void SetBlockMaterialNum (int num, iMaterialWrapper* mat) = 0;
+  /// CameraHeightTest should return a point that a camera can use
+  virtual int CameraHeightTest (csVector3 *point) = 0;
+  /// Test a Bounding Box's path against the terrain
+  virtual void CollideBBox (const csBox3 bbox, const csVector3 start,
+      csVector3 &end) = 0;
+  /// Test a ray against the mesh
+  virtual void CollideRay (const csVector3 start, csVector3 &end) = 0;
 };
 
 SCF_VERSION (iBCTerrFactoryState, 0, 0, 2);
