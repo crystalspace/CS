@@ -224,8 +224,7 @@ public:
   int max_curve_vertices;
 
   /**
-   * Construct a csPolygonSet. 'type' is the csObject type and should
-   * be one of CS_THING or CS_SECTOR.
+   * Construct a csPolygonSet.
    */
   csPolygonSet ();
 
