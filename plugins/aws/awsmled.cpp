@@ -1076,7 +1076,7 @@ void awsMultiLineEdit::DeleteMarked ()
         }
         else
         {
-          if (from <= to)
+          if (from < to)
             s->DeleteAt (from, to-from);
         }
       }
@@ -1085,7 +1085,7 @@ void awsMultiLineEdit::DeleteMarked ()
       {
         csString *s = (csString*)vText.Get(i);
         int from = fromCol, to = MIN (toCol, (int)s->Length ());
-        if (from <= to)
+        if (from < to)
           s->DeleteAt (from, to-from);
       }
     else if (nMarkMode == MARK_ROW)
