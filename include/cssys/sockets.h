@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Matze Braun
+    Copyright (C) 2002 by Matze Braun
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -35,15 +35,16 @@
 #include <sys/types.h>
 
 #if defined(OS_WIN32)
-#if !defined(__CYGWIN__)
 #  include <winsock.h>
-#  endif
 #  ifndef socklen_t
      typedef int socklen_t;
 #  endif
 #  define CS_NET_SOCKET_INVALID INVALID_SOCKET
 #  define CS_IOCTLSOCKET ioctlsocket
 #  define CS_CLOSESOCKET closesocket
+#  if defined(__CYGWIN__) && defined(EWOULDBLOCK)
+#   undef EWOULDBLOCK
+#  endif
 #  define EWOULDBLOCK WSAEWOULDBLOCK
 #  define CS_GETSOCKETERROR ::WSAGetLastError()
 #  undef CS_SYSDEF_PROVIDE_SOCKETS
