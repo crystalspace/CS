@@ -19,6 +19,12 @@ The history order is reversed so that new features are at the top.
 	    - 100000 almost sorted numbers: radix roughly 3 times faster.
 	    - 100000 almost equal numbers: radix roughly 2 times slower.
 	  So in almost all cases radix clearly beats qsort.
+	- Jorrit reverted a change Peter Amstutz did 7-July. He then changed
+	  the thing plugin so that the normal is automatically recomputed
+	  when needed. However it seems that that is not working properly
+	  for some reason. With that fix enabled the rotating cubes in the
+	  mirrored room (flarge) no longer work properly. Need to further
+	  investigate for a good fix.
 17-Jul-2003
         - Philip Wyett fixed broken glrender3d makefile. OBJ.GLRENDER3D should
           have had OUT.GLRENDER3D not DIR.GLRENDER3D.
