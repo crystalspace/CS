@@ -93,6 +93,8 @@ char *GetTypeName(attribute::Type t)
 csEvent::csEvent ()
 {
   SCF_CONSTRUCT_IBASE (0);
+  
+  count = 0;
 }
 
 csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
@@ -106,6 +108,8 @@ csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
   Mouse.y = my;
   Mouse.Button = mButton;
   Mouse.Modifiers = mModifiers;
+
+  count = 0;
 }
 
 csEvent::csEvent (csTicks iTime, int eType, int jn, int jx, int jy,
@@ -120,6 +124,8 @@ csEvent::csEvent (csTicks iTime, int eType, int jn, int jx, int jy,
   Joystick.y = jy;
   Joystick.Button = jButton;
   Joystick.Modifiers = jModifiers;
+
+  count = 0;
 }
 
 csEvent::csEvent (csTicks iTime, int eType, int cCode, void *cInfo) :
@@ -133,6 +139,8 @@ csEvent::csEvent (csTicks iTime, int eType, int cCode, void *cInfo) :
   Command.Info = cInfo;
   if (eType == csevBroadcast)
     Flags = CSEF_BROADCAST;
+
+  count = 0;
 }
 
 csEvent::csEvent (csEvent const& e) : iEvent(), attributes (53)
@@ -164,6 +172,8 @@ csEvent::csEvent (csEvent const& e) : iEvent(), attributes (53)
     Command.Code = e.Command.Code;
     Command.Info = e.Command.Info;
   }
+
+  count = 0;
 }
 
 csEvent::~csEvent ()

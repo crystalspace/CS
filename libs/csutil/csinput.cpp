@@ -563,16 +563,21 @@ void csMouseDriver::DoButton (int button, bool down, int x, int y)
   Button [button - 1] = down;
 
   csTicks evtime = csGetTicks ();
-  Post(new csEvent
-    (evtime, down ? csevMouseDown : csevMouseUp, x, y, button, smask));
+  
+  csRef<iEvent> ev;
+  ev.AttachNew (new csEvent (evtime, down ? csevMouseDown : csevMouseUp, 
+    x, y, button, smask));
+  Post(ev);
 
   if ((button == LastClickButton)
    && (evtime - LastClickTime <= DoubleClickTime)
    && (unsigned (ABS (x - LastClickX)) <= DoubleClickDist)
    && (unsigned (ABS (y - LastClickY)) <= DoubleClickDist))
   {
-    Post(new csEvent(evtime,
+    csRef<iEvent> ev;
+    ev.AttachNew (new csEvent (evtime,
       down ? csevMouseDoubleClick : csevMouseClick, x, y, button, smask));
+    Post (ev);
     // Don't allow for sequential double click events
     if (down)
       LastClickButton = -1;
@@ -597,10 +602,10 @@ void csMouseDriver::DoMotion (int x, int y)
               | (k->GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0);
     LastX = x;
     LastY = y;
-    iEvent* event = new csEvent (csGetTicks (), csevMouseMove, x, y, 0, smask);
+    csRef<iEvent> event;
+    event.AttachNew (new csEvent (csGetTicks (), 
+      csevMouseMove, x, y, 0, smask));
     Post (event);
-    // Post() IncRef()s event
-    event->DecRef ();
   }
 }
 
@@ -672,8 +677,11 @@ void csJoystickDriver::DoButton (int number, int button, bool down,
             | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
 
   Button [number] [button - 1] = down;
-  Post(new csEvent (csGetTicks (),
+  csRef<iEvent> ev;
+  ev.AttachNew (new csEvent (csGetTicks (),
     down ? csevJoystickDown : csevJoystickUp, number, x, y, button, smask));
+  Post(ev);
+
 }
 
 void csJoystickDriver::DoMotion (int number, int x, int y)
@@ -689,6 +697,11 @@ void csJoystickDriver::DoMotion (int number, int x, int y)
               | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
     LastX [number] = x;
     LastY [number] = y;
-    Post(new csEvent(csGetTicks(), csevJoystickMove, number, x, y, 0, smask));
+
+    csRef<iEvent> ev;
+    ev.AttachNew (new csEvent(csGetTicks(), csevJoystickMove, 
+      number, x, y, 0, smask));
+    Post(ev);
+
   }
 }

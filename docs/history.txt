@@ -13,6 +13,8 @@ chronological order.
 	  which was causing SECONDS of lag the first time any sprcal3d was created
 	  and made visible.  Now it happens more or less instantly.
 	- Keith also fixed compiler errors in Null Renderer for NR settings.
+	- Luca fixed some uninitialized stuff in csEvent class (ie 'count').
+	- Luca fixed some memory leaks in csMouseDriver and csJoystickDriver.
 6-Feb-2004
 	- Jorrit clarified the comment for iEngine->CreateBaseMaterial().
 	- Jorrit corrected the howto on creating a thing. It was still
