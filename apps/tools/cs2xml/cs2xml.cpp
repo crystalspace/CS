@@ -116,6 +116,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MATRIX)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MAXCOLOR)
+  CS_TOKEN_DEF (MOVE)
   CS_TOKEN_DEF (MULT)
   CS_TOKEN_DEF (MULTIPLY)
   CS_TOKEN_DEF (NUM)
@@ -2490,6 +2491,7 @@ void Cs2Xml::ParseGeneral1 (long cmd, char const* parent_token,
   {
     case CS_TOKEN_ANIMATE:
       ParseAnimate (parent_token, parser, parent, name, params, tokname);
+      break;
     case CS_TOKEN_EMITCYLINDER:
     case CS_TOKEN_EMITCYLINDERTANGENT:
       ParseEmitCylinder (parent_token, parser, parent, name, params, tokname);
