@@ -1,6 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
 2-Apr-2001
+	- Norman Kramer did the following to CSWS:
+	    - csGrid now has a cursor (3 types: row, column or cell cursor).
+	    - csGrid notifies its parent if the cursor changed.
+	    - csGridView has a new border that is colored differently
+	      based on the active state of the gridview.
+	    - Added added GetStringAt() to grid.
 	- Michael Voase did the following:
 	    - Added iBase parameter to iLoaderPlugIn::Parse() command.
 	    - Added factory passing between LoadMeshObjectFactory()
