@@ -16,6 +16,9 @@ The history order is reversed so that new features are at the top.
 	- Jorrit reverted a fix from res to the sequence manager which was
 	  done about two weeks ago. This fix unfortunatelly makes csdemo
 	  crash so I had to remove it.
+	- Matze added a workaround for jam 2.4 which contained a bug which
+	  made the recently changed HeaderRule have strange side effects. As
+	  soon as jam 2.5 is out we can remove all these hacks.
 26-May-2003
 	- Eric Sunshine eliminated compilation warning about implicit
 	  conversion of (int*) to (GLint*) in glcommon2d.cpp.
