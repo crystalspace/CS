@@ -254,6 +254,8 @@ public:
   static iSystem* System;
   /// Current world.
   static csWorld* current_world;
+  /// Need to render using newradiosity?
+  static bool use_new_radiosity;
   /// An object pool for 2D polygons used by the rendering process.
   csPoly2DPool* render_pol2d_pool;
   /// An object pool for lightpatches.

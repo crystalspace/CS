@@ -48,6 +48,7 @@
 #include "csengine/lppool.h"
 #include "csengine/covtree.h"
 #include "csengine/particle.h"
+#include "csengine/radiosty.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
 #include "csinput/csevent.h"
@@ -180,6 +181,7 @@ int csWorld::frame_width;
 int csWorld::frame_height;
 iSystem* csWorld::System = NULL;
 csWorld* csWorld::current_world = NULL;
+bool csWorld::use_new_radiosity = false;
 int csWorld::max_process_polygons = 2000000000;
 int csWorld::cur_process_polygons = 0;
 
@@ -726,6 +728,18 @@ void csWorld::ShineLights ()
     }
   }
 
+  // Render radiosity
+  // -- could put his before scaling to have high quality radiosity
+  if(use_new_radiosity)
+  {
+    start = System->GetTime ();
+    csRadiosity *rad = new csRadiosity(this);
+    rad->DoRadiosity();
+    delete rad;
+    stop = System->GetTime ();
+    CsPrintf (MSG_INITIALIZATION, "(%.4f seconds)", (float)(stop-start)/1000.);
+  }
+
   CsPrintf (MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors):\n  ", num_sectors);
   meter.SetTotal (num_sectors);
   meter.Restart ();
@@ -1250,6 +1264,8 @@ void csWorld::ReadConfig ()
 
   csSector::cfg_reflections = System->ConfigGetInt ("Lighting", "REFLECT", csSector::cfg_reflections);
   csSector::do_radiosity = System->ConfigGetYesNo ("Lighting", "RADIOSITY", csSector::do_radiosity);
+  csWorld::use_new_radiosity = System->ConfigGetYesNo ("Lighting", "NEWRADIOSITY", csWorld::use_new_radiosity);
+  csPolyTexture::do_accurate_things = System->ConfigGetYesNo ("Lighting", "ACCURATE_THINGS", csPolyTexture::do_accurate_things);
   csPolyTexture::do_accurate_things = System->ConfigGetYesNo ("Lighting", "ACCURATE_THINGS", csPolyTexture::do_accurate_things);
   csPolyTexture::cfg_cosinus_factor = System->ConfigGetFloat ("Lighting", "COSINUS_FACTOR", csPolyTexture::cfg_cosinus_factor);
   csSprite3D::do_quality_lighting = System->ConfigGetYesNo ("Lighting", "SPRITE_HIGHQUAL", csSprite3D::do_quality_lighting);
