@@ -6,7 +6,7 @@
 This section documents the major changes between versions 0.16 and 0.17 of of
 Crystal Space.
 
-@subheading Signature Change: @code{NextFrame(elapsed_time/current_time)}
+@subheading Signature Change: NextFrame(elapsed_time/current_time)
 @cindex @code{NextFrame()} Changes
 @cindex @code{elapsed_time} Changes
 @cindex @code{current_time} Changes
@@ -25,7 +25,7 @@ void MySubclass::NextFrame()
   @dots{}
 @end example
 
-@subheading Signature Change: @code{HandleEvent(csEvent)}
+@subheading Signature Change: HandleEvent(csEvent)
 @cindex @code{HandleEvent()} Changes
 @cindex @code{csEvent} Changes
 @cindex @code{iEvent} Changes
@@ -84,7 +84,7 @@ csMaterialWrapper* m =
   world->GetMaterials()->FindByName("myTexture");
 @end example
 
-@subheading Collision Detection Plug-In
+@subheading Collision Detection Plugin
 @cindex Collision Detection Changes
 @cindex @sc{rapid} Changes
 
@@ -330,7 +330,7 @@ move.UpdateMove();
 @noindent
 Especially note the new call to @code{UpdateMove()}.
 
-@subheading @sc{api} Changes: @code{csCamera}
+@subheading @sc{api} Changes: csCamera
 @cindex @code{csCamera} Changes
 
 The function @code{SetFOV()} now needs an extra parameter which is the width
@@ -339,7 +339,7 @@ of the display.  This is needed for calculating the angle of the @sc{fov}
 and @code{GetFOVAngle()} functions.  @code{GetFOVAngle()} used to be in
 @code{csRenderView()}.
 
-@subheading @sc{api} Changes: @code{csWorld}
+@subheading @sc{api} Changes: csWorld
 @cindex @code{csWorld} Changes
 
 Here is a list of the more significant @sc{api} changes to @samp{csWorld}.

@@ -6,10 +6,34 @@
 This section documents the major changes between versions 0.94 and 0.96 of of
 Crystal Space.
 
+@subheading Reference Counting Utilities
+
+The new template class @code{csRef<>} automates reference count manipulation,
+thus freeing programmers from the task of manipulating reference counts
+manually.  When assigned, @code{csRef<>} increments the reference count of the
+target object by invoking the object's @code{IncRef()} method.  When the
+@code{csRef<>} is destroyed, or when it is re-assigned, it decrements the
+object's reference count via @code{DecRef()}.  This frees clients from having
+to invoke @code{IncRef()} and @code{DecRef()} manually, thus helping to
+alleviate a potential source of resource leaks.  The companion template
+@code{csPtr<>} has also been added as a micro-optimization for certain cases
+when it is desirable to avoid reference count manipulation during assignment.
+See the smart pointer @sc{howto} for additional information,
+@ref{HOWTO Smart Pointers}.  Also see the @sc{api} documentation for
+@code{csRef<>} and @code{csPtr<>}.
+
+The Crystal Space @sc{api} has been largely updated to return @code{csRef<>}
+and @code{csPtr<>} from functions which transfer ownership of an object to the
+caller of the function.  Client code which used to assign results of such
+function calls to a normal pointer and invoke @code{IncRef()} on that pointer
+should now instead simply assign the result to a @code{csRef<>}, and allow the
+reference count to be managed automatically.  See the smart pointer @sc{howto}
+for complete details.  @xref{HOWTO Smart Pointers}.
+
 @subheading iPolygonMesh changes
 @cindex @code{iPolygonMesh}
 
-The header for @code{iPolygonMesh} has moved from @file{include/ivaria}
+The header for @samp{iPolygonMesh} has moved from @file{include/ivaria}
 to @file{include/igeom}.
 
 @subheading iMeshObject changes
@@ -17,9 +41,7 @@ to @file{include/igeom}.
 @cindex @code{iVisibilityObject}
 @cindex @code{iObjectModel}
 
-The following functions have been removed.  Instead there is now a new routine
-called @code{iMeshObject::GetObjectModel()} which will return an instance of
-@code{iObjectModel}.  The functions can be called from that instance.
+The following functions have been removed:
 
 @itemize @bullet
 @item
@@ -30,9 +52,13 @@ called @code{iMeshObject::GetObjectModel()} which will return an instance of
 @code{iMeshObject::GetRadius()}
 @end itemize
 
-A similar change has happened in the @code{iVisibilityObject} interface.
+Instead there is now a new routine called
+@code{iMeshObject::GetObjectModel()} which will return an instance of
+@samp{iObjectModel}.  The functions can be called from that instance.
 
-@subheading XML
+A similar change has taken place in the @samp{iVisibilityObject} interface.
+
+@subheading @sc{xml}
 @cindex @sc{xml}
 
 The map format has changed to @sc{xml}. Use the @file{cs2xml} tool to
@@ -78,28 +104,28 @@ The following macros have been removed:
 Fast interfaces are now default. Just use the
 normal query versions instead of the ones above.
 
-@subheading Internal @sc{scf} changes
+@subheading Internal @sc{scf} Changes
 
 For Interfaces the @code{scfGetID_Interfacename} and the
 @code{VERSION_Interfacename} have been renamed to
 @code{Interfacename_scfGetID} and @code{Interfacename_VERSION} for making
 namespaces working nicely with them.
 
-@subheading @code{make} Targets 
+@subheading Make Targets 
 
-Some targets for the @code{make} process (all applications, some plugins) have
+Some targets for the @samp{make} facility (all applications, some plugins) have
 changed.  In general, the name of a target is now the same as the name of the
 resulting binary (without suffix).  For example, @file{walktest} is now built
 with @samp{make -k walktest} instead of @samp{make -k walk}.  However, the
 composite target names have not been changed.  To build @file{walktest} and all
 required plugins, one still invokes @samp{make -k walkall}.
 
-@subheading Ref count changes
+@subheading Sound Loader Changes
 The @code{iLoader::LoadSound()} that returns an @code{iSoundWrapper}
-now returns a pointer that is increffed (one ref count more compared
-to before).
+now returns a pointer that has a reference count of one more compared
+to before.
 
-@subheading iTextureManager changes
+@subheading iTextureManager Changes
 
 The following methods have moved:
 
@@ -108,7 +134,7 @@ The following methods have moved:
 @code{iTextureManager::FindRGB()} @result{} @code{iGraphics2D::FindRGB()}
 @end itemize
 
-The following methods were removed:
+The following methods were eliminated:
 
 @itemize @bullet
 @item

@@ -59,7 +59,7 @@ SCF_IMPLEMENT_IBASE_QUERY()
 This decomposition makes it easier to replace iBase methods individually in a
 particular implementation.
 
-@subheading @code{csObject}, @sc{rtti}
+@subheading csObject and @sc{rtti}
 
 The pseudo-@sc{rtti} system has been removed from @code{csObject}.  Instead,
 @sc{scf} functions are now used to identify an object's type.  As an example of
@@ -146,34 +146,26 @@ These macros alleviate the need to link applications with specially prepared
 object files or libraries.  The summary below explains what this means for
 various platforms.
 
-@itemize @bullet
-@item
-Unix
-
+@table @asis
+@item Unix
 No longer required to link plugin modules against the @file{dummy.o} file.
 
-@item
-Visual-C++
-
+@item Visual-C++
 No longer required to link applications against Crystal Space's
 @file{win32exe.lib} library.  No longer required to link plugin modules
 (@sc{dll}'s) against the @file{win32dll.lib} library.  Also, the
 @file{libwin32exe.dsp} and @file{libwin32dll.dsp} project files have been
 removed.
 
-@item
-Mingw
-
+@item Mingw
 No longer required to link applications with the @file{exeentry.o} object file.
 No longer required to link plugin modules (@sc{dll}'s) with the
 @file{dllentry.o} object file.
 
-@item
-@sc{os/2}
-
+@item @sc{os/2}
 No longer required to link plugin modules with the @file{dllentry.o} object
 file.
-@end itemize
+@end table
 
 @subheading System Driver Removal and Application Structure
 @cindex @code{SysSystemDriver}
@@ -189,7 +181,7 @@ The classes @code{SysSystemDriver}, and @code{csSystemDriver}, and
 the interface @code{iSystem} have been removed. All the functionality
 that used to be present in the system driver has moved to smaller
 components (plugin manager, event queue, config manager, commandline parser,
-virtual clock, ...).
+virtual clock, etc.).
 
 There is now a new concept called the @dfn{object registry} which is
 the central repository where all objects can register themselves.
@@ -202,7 +194,7 @@ initialization of an application. Check out the simple tutorial
 (@pxref{Tutorial Simple}) to see how this works. This tutorial also explains
 all the new concepts very clearly.
 
-@subheading Removal of Function ID's
+@subheading Removal of Function @sc{id}'s
 
 Function ID's (a concept of the old plugin system) have been removed.
 This has an effect on config files where you now must replace things
@@ -226,7 +218,7 @@ tag with which the loaded plugin is registered in the object registry.
 @cindex @code{iImageIO}
 
 @samp{csImageLoader} is gone and has now become a plugin which implements
-the @code{iImageIO} interface. To use it you typically use the following
+the @samp{iImageIO} interface. To use it you typically use the following
 code:
 
 @example
@@ -240,7 +232,7 @@ txtmgr->GetTextureFormat ());
 imgldr->DecRef ();
 @end example
 
-@subheading Level Loading (csLoader)
+@subheading Map Loading (csLoader)
 @cindex @code{csLoader}
 @cindex @code{iLoader}
 @cindex Level Loading
@@ -253,15 +245,9 @@ System.PlugIns.iLoader = crystalspace.level.loader
 @end example
 
 @noindent
-Or you can add the following line to the call to
-@code{csInitializer::RequestPlugins()} in your @code{main()} function:
-
-@example
-CS_REQUEST_LEVELLOADER,
-@end example
-
-@noindent
-Then you can get the level loader with:
+Or you can add @samp{CS_REQUEST_LEVELLOADER} to the list of requested pluging
+in the call to @code{csInitializer::RequestPlugins()}.  Then you can get the
+level loader with:
 
 @example
 iLoader* level_loader = CS_QUERY_REGISTRY (object_reg, iLoader);
@@ -286,6 +272,8 @@ about this.
 
 @subheading Map File Changes
 
+The following map file elements have changed:
+
 @itemize @bullet
 @item
 @code{PLANE} @result{} @code{ADDON}
@@ -305,7 +293,7 @@ about this.
 @code{PLUGINS}
 @end itemize
 
-@subheading Sky Objects Gone
+@subheading Sky Objects Removed
 
 Sky objects must now be created the same as normal mesh objects
 but you need to give them a low render priority (i.e. 'sky' render
@@ -324,8 +312,9 @@ instead of linking to the @file{csengine} library.  You can do this with:
 
 @example
 csInitializer::RequestPlugins (object_reg,
-CS_REQUEST_ENGINE,
-@dots{}
+  CS_REQUEST_ENGINE,
+  @dots{},
+  CS_REQUEST_END);
 iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 @end example
 
@@ -366,7 +355,7 @@ iMeshWrapper* mesh =
   engine->CreateSectorWallsMesh (sector, "walls");
 @end example
 
-@subheading Include Directory Changes
+@subheading Header Directory Changes
 @cindex @sc{scf}
 
 All @sc{scf} interfaces (class names starting with the letter @samp{i} such as
@@ -771,20 +760,20 @@ names were also normalized.
 @code{strnew()} @result{} @code{csStrNew()}
 @end itemize
 
-@subheading @code{csfx} Library Renamed
+@subheading Library Renamed: csfx
 @cindex @code{csfx} Library
 @cindex @code{cstool} Library
 
 The @samp{csfx} library was renamed to @samp{cstool}.
 
-@subheading @code{csobject} library removed
+@subheading Library Removed: csobject
 @cindex @code{csutil} Library
 @cindex @code{csobject} Library
 
 The @file{csobject} library has been removed. All files in that
 library have moved to @file{csutil}.
 
-@subheading @code{csCollider}
+@subheading csCollider
 @cindex @code{csCollider}
 @cindex @code{csColliderWrapper}
 
@@ -797,7 +786,7 @@ was renamed to @samp{csColliderWrapper}.
 The @samp{csKeyValuePair} and @samp{csMapNode} classes moved from
 @file{csengine} to @file{cstool}.
 
-@subheading @code{csView}
+@subheading csView
 @cindex @code{csView}
 
 The @samp{csView} class moved from @samp{csengine} to @samp{cstool}.
@@ -870,45 +859,46 @@ bool MyApp::HandleEvent (iEvent &Event)
     case csevCommand:
       switch (Event.Command.Code)
       @{
-	case APP_OPEN_FILE:
-	@{ // Allow user to select a file with csFileDialog.
+        case APP_OPEN_FILE:
+        @{ // Allow user to select a file with csFileDialog.
           csWindow* d = csFileDialog (this, "test file dialog");
-	  ModalData* data = new ModalData ();
-	  @dots{}
-	  StartModal (d, data);
-	  data->DecRef ();
+          ModalData* data = new ModalData ();
+          @dots{}
+          StartModal (d, data);
+          data->DecRef ();
           return true;
-	@}
+        @}
         case cscmdStopModal:
-	@{
-	  csComponent* d = GetTopModalComponent ();
-	  int rc = (int)Event.Command.Info;
-	  if (rc == 0 || rc == cscmdCancel)
-	  @{
-	    delete d;
-	    return true;
-	  @}
-	  iMessageBoxData* mbd =
-	    SCF_QUERY_INTERFACE (d, iMessageBoxData);
-	  if (mbd)
-	  @{
-	    mbd->DecRef ();
-	    delete d;
-	    return true;
-	  @}
-	  ModalData* md = (ModalData*)GetTopModalUserdata ();
-	  @dots{} // csFileDialog was closed.
-	  return true;
-	@}
-	@dots{}
+        @{
+          csComponent* d = GetTopModalComponent ();
+          int rc = (int)Event.Command.Info;
+          if (rc == 0 || rc == cscmdCancel)
+          @{
+            delete d;
+            return true;
+          @}
+          iMessageBoxData* mbd =
+            SCF_QUERY_INTERFACE (d, iMessageBoxData);
+          if (mbd)
+          @{
+            mbd->DecRef ();
+            delete d;
+            return true;
+          @}
+          ModalData* md = (ModalData*)GetTopModalUserdata ();
+          @dots{} // csFileDialog was closed.
+          return true;
+        @}
+        @dots{}
 @}
 @end example
 
-@subheading 3d Sprite Factories
+@subheading 3D Sprite Factories
 @cindex @code{iSprite3DFactory}
 
-The interface has been modified to show the restrictions of 3d sprites and
-to clean it up:
+The sprite factory interface has been modified to show the restrictions of 3D
+sprites and to clean it up:
+
 @itemize @bullet
 @item
 @code{GetNormalCount()} and @code{GetTexelCount()} have been removed. Sprites
@@ -935,10 +925,10 @@ passing the parameter at all makes no sense.
 @cindex @code{csFilenameMatches()}
 @cindex @code{csGlobMatches()}
 
-The @sc{scf} name of the 3D engine changed from:@*
-@code{crystalspace.engine.core}@*
-To:
-@code{crystalspace.engine.3d}
+The @sc{scf} name of the 3D engine changed:
+
+@noindent
+@code{crystalspace.engine.core} @result{} @code{crystalspace.engine.3d}
 
 @code{csEngine::NextFrame()} and @code{iEngine::NextFrame()} are removed.
 This is now done automatically in @code{csEngine::Draw()}.
@@ -975,7 +965,7 @@ They were replaced by these methods:
 @code{GetLightingCacheMode()}
 @end itemize
 
-@code{FrameWidth} and @code{FrameHeight} are no longer available
-in @code{SysSystemDriver} (entire system driver is gone in fact). Instead
+@samp{FrameWidth} and @samp{FrameHeight} are no longer available
+in @samp{SysSystemDriver} (entire system driver is gone, in fact). Instead
 you have to call @code{GetWidth()} and @code{GetHeight()} on the pointer
-to the canvas (@code{iGraphics2D}).
+to the canvas (@samp{iGraphics2D}).

@@ -6,11 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Oct-2003
+	- Eric Sunshine performed additional cleanup of the various "Release
+	  Notes" sections of the user manual.  Repaired some Texinfo mark-up
+	  problems.  Converted tabs to spaces in apimod*.txi in order to fix
+	  formatting problems in generated output for @example blocks.  Minor
+	  formatting changes and typographical corrections.  Added a section to
+	  apimod96.txi mentioning the introduction of csRef<> and csPtr<> and
+	  related API changes (which, amazingly, had not been mentioned in that
+	  document even though it was a significant change).
 30-Oct-2003
 	- Jorrit performed some additional minor optimizations to Dynavis
 	  TestObjectVisibility.
 	- res fixed a lock-up in the OpenAL plugin: a Delete() was errorneously
-	  used instead of DeleteRange() in a loop, causing it to go round and 
+	  used instead of DeleteRange() in a loop, causing it to go round and
 	  round infinitely.
 	- Marten Svanfeldt fixed a few bugs in csShaderVariableContextHelper::
 	  FillVariableList(). A more complete rewrite of shadersys is about any
@@ -67,9 +76,9 @@ chronological order.
 	  warning messages when this warning is enabled.
 	- Eric Sunshine removed the obsolete CS/include/ivaria/cs.i.
         - Old_Belge added support for the newest cvs of CAL3D.
-        - Old_Belge added a menu to viewmesh for using the morph animations 
+        - Old_Belge added a menu to viewmesh for using the morph animations
           of CAL3D.
-        - Old_Belge changed configure.ac and configure to detect if a 
+        - Old_Belge changed configure.ac and configure to detect if a
           sufficiently recent version of CAL3D is used.
 26-Oct-2003
 	- Eric Sunshine updated `simple1' tutorial in the user manual to
@@ -80,7 +89,7 @@ chronological order.
 	- Marten Svanfeldt changed the ways shader variables work in new
           renderer.  The current way works, but is somewhat messy code and
           unclean design.  It should be fixed in the following week(s).
-	- Rhad added a call to broadcast signalTextBoxFocused when a textbox 
+	- Rhad added a call to broadcast signalTextBoxFocused when a textbox
 	  gains focus by any means - not just when it's set programatically.
 25-Oct-2003
 	- Rhad moved emitter list initialization into the

@@ -23,7 +23,7 @@
 This section documents the major changes between versions 0.17 and 0.18 of of
 Crystal Space.
 
-@subheading Name Change: @code{csWorld} to @code{csEngine}
+@subheading Name Change: csWorld @result{} csEngine
 @cindex @code{csWorld}
 @cindex @code{csEngine}
 @cindex @code{iWorld}
@@ -49,7 +49,7 @@ summary of all the changes which result from this:
 @code{world.h} becomes @code{engine.h}
 @end itemize
 
-@subheading @code{csThingTemplate} Removed
+@subheading csThingTemplate Removed
 @cindex @code{csThingTemplate}
 
 The class @samp{csThingTemplate} has been removed.  Instead you use normal
@@ -151,8 +151,8 @@ implementation of the @samp{iConfigFileNew} interface is probably not able
 to implement this method. Also, it was never used.
 @end itemize
 
-@subheading Mesh Object Plug-ins
-@cindex Mesh Object Plug-ins
+@subheading Mesh Object Plugins
+@cindex Mesh Object Plugins
 @cindex csSprite3D
 @cindex csSprite2D
 @cindex Particle Systems
@@ -384,7 +384,7 @@ Note that the new @samp{spr3d} can not work with textures. It needs materials.
 So add a definition to the @samp{MATERIALS} section.
 @end itemize
 
-@subheading @code{csPixmap} Moved and Renamed
+@subheading csPixmap Moved and Renamed
 @cindex @code{csPixmap}
 @cindex @code{csSimplePixmap}
 
@@ -450,38 +450,28 @@ with default orientation.
 
 @subheading Miscellaneous Changes
 
-@itemize @bullet
-@item
 @code{iGraphics2D::WriteChar()} has been removed. Use @code{Write()} instead.
 
-@item
 All @code{UpdateLighting()} calls now accept @samp{iLight} pointers intead
 of @samp{csLight} pointers. In addition @code{csEngine::GetNearbyLights()}
 returns an array of @samp{iLight} pointers.
 
-@item
 The obsolete @samp{CLights} class (for uniform dynamic lighting) has been
 removed. It was not working properly anyway.
 
-@item
 The @code{csEngine::PrepareParticleSystems()} method has been removed.
 Instead, use the new @code{csEngine::PrepareMeshes()} method.
 
-@item
 The @code{csEngine::AdvanceSpriteFrames()} method has been renamed to
 @code{NextFrame()}.  In addition @code{UpdateParticleSystems()} has been
 removed and is now also handled by @code{csEngine::NextFrame()}.
 
-@item
 With the new mesh object plugin system the @samp{iParticle} interface
 also changed a little. Check out the header to see the changes.
 
-@item
 @code{FastSqrt()} is gone. Use @code{qsqrt()} instead. If you want
 to calculate @code{1/sqrt()} then use @code{qisqrt()}.
 
-@item
 @samp{csRenderView} has no public members anymore.  You need to access
 everything through @code{GetFoo()} and @code{SetFoo()} methods Check out the
 header for more details.
-@end itemize

@@ -12,14 +12,15 @@
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.  Updated and expanded
 significantly by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
-Smart pointers were introduced in Crystal Space version 0.95.  The purpose of
-smart pointers is to make it easier to manage reference counting.  Instead of
-manually calling @code{IncRef()} and @code{DecRef()} on an object, you use
-a smart pointer (@code{csRef<>}) and let it manage the reference count
-automatically.  The @code{csRef<>} smart pointer template works with any
-class which provides @code{IncRef()} and @code{DecRef()} methods, such as
-@samp{csRefCount}, as well as all @sc{scf} classes.  The @code{csRef<>}
-template is defined in @file{CS/include/csutil/ref.h}.
+Smart pointers were introduced in Crystal Space stable version 0.96
+(developmental version 0.95).  The purpose of smart pointers is to make it
+easier to manage reference counting.  Instead of manually calling
+@code{IncRef()} and @code{DecRef()} on an object, you use a smart pointer
+(@code{csRef<>}) and let it manage the reference count automatically.  The
+@code{csRef<>} smart pointer template works with any class which provides
+@code{IncRef()} and @code{DecRef()} methods, such as @samp{csRefCount}, as well
+as all @sc{scf} classes.  The @code{csRef<>} template is defined in
+@file{CS/include/csutil/ref.h}.
 
 @subsubheading How to Use Smart Pointers
 

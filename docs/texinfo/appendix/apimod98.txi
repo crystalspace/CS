@@ -233,9 +233,9 @@ New code:
   poly.AddVertex (csVector3 (@dots{}));
   iPortal* portal;
   csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
-  	"my_portal", sourceSector, csVector3 (0, 0, 0),
-	destSector, poly.GetVertices (), poly.GetVertexCount (),
-	portal);
+        "my_portal", sourceSector, csVector3 (0, 0, 0),
+        destSector, poly.GetVertices (), poly.GetVertexCount (),
+        portal);
 @end example
 
 In map files the old way to create portals in a polygon is still supported.
@@ -1026,7 +1026,7 @@ At initialization time, @sc{vfs} now searches for its configuration file,
 (@code{csGetAppDir()}), and finally in the Crystal Space installation directory
 (@code{csGetConfigPath()}).  The first @file{vfs.cfg} file found during this
 search is the one used to initialize the facility.  In the past, @sc{vfs}
-searched for @file{vfs.cfg} only in the Crystal Space installation diretory.
+searched for @file{vfs.cfg} only in the Crystal Space installation directory.
 
 @subheading Internationalization
 
@@ -1046,14 +1046,43 @@ strings. These include:
 
 @itemize @bullet
 @item
-@code{csPrintf()}, @code{csPrintfV()}, @code{csFPutErr()} for console output.
+Console
+@itemize @bullet
 @item
-@code{iGraphics2D::Write()}, @code{iGraphics2D::WriteBaseline()}.
+@code{csPrintf()}
 @item
-@code{csReport()}, @code{csReportV()}, @code{iReporter::Report()},
-@code{iReporter::ReportV()}.
+@code{csPrintfV()}
+@item @code{csFPutErr()}
+@end itemize
 @item
-@code{iNativeWindowManager->Alert[V]},@code{iNativeWindow->SetTitle}.
+Canvas
+@itemize @bullet
+@item
+@code{iGraphics2D::Write()}
+@item @code{iGraphics2D::WriteBaseline()}
+@end itemize
+@item
+Reporter
+@itemize @bullet
+@item
+@code{csReport()}
+@item
+@code{csReportV()}
+@item
+@code{iReporter::Report()}
+@item
+@code{iReporter::ReportV()}
+@end itemize
+@item
+Native Window
+@itemize @bullet
+@item
+@code{iNativeWindowManager->Alert()}
+@item
+@code{iNativeWindowManager->AlertV()}
+@item
+@code{iNativeWindow->SetTitle()}
+@end itemize
 @end itemize
 
 @subheading Keyboard Events
@@ -1100,7 +1129,7 @@ Change to:
 if (e.Type == csevKeyboard &&
     csKeyEventHelper::GetEventType(&e) == csKeyEventTypeDown) &&
     csKeyEventHelper::GetCookedCode(&e) == CSKEY_ESC))
-  @{
+@{
 @end example
 
 Another example:
@@ -1124,7 +1153,7 @@ Change to:
 switch (e.Type)
 @{
   case csevKeyboard:
-    if (csKeyEventHelper::GetEventType (&e) == csKeyEventTypeDown)
+    if (csKeyEventHelper::GetEventType(&e) == csKeyEventTypeDown)
       Foo();
     else
       Bar();
