@@ -12,6 +12,11 @@ chronological order.
 	  canvas is built.
 	- Eric Sunshine added a `fontservers' compile group to the build
 	  system.
+	- Eric Sunshine updated the OpenDivX check in configure.ac to utilize
+	  the result of the `-lm' check since libm.a is needed by OpenDivX on
+	  some platforms. Also changed the check to look for <divx/decore.h>
+	  rather than <decore.h> since ${prefix}/divx is the default
+	  installation location.
 13-Oct-2004
 	- Eric Sunshine removed invocation of the non-portable
 	  CS_ALLOC_STACK_ARRAY() from isdir() in cssysdef.h since this is a

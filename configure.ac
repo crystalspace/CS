@@ -1684,19 +1684,21 @@ CS_CHECK_BUILD([for DivX4], [cs_cv_libdivxdecore4],
 	[[#include <divx4/decore.h>]],
 	[DEC_MEM_REQS r; decore(0, DEC_OPT_MEMORY_REQS, 0, &r);])],
     [CS_CREATE_TUPLE([],[],[-ldivxdecore])], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libdivxdecore4], [DIVX4])])
+    [CS_EMIT_BUILD_RESULT([cs_cv_libdivxdecore4], [DIVX4])], [], [],
+    [$cs_cv_libm_cflags], [$cs_cv_libm_lflags], [$cs_cv_libm_libs])
 
 AS_IF([test $cs_cv_libdivxdecore4 != yes],
     [CS_CHECK_BUILD([for OpenDivX], [cs_cv_libdivxdecore],
 	[AC_LANG_PROGRAM(
-	    [[#include <decore.h>]],
+	    [[#include <divx/decore.h>]],
 	    [decore(0, DEC_OPT_RELEASE, 0, 0);])],
-	[CS_CREATE_TUPLE([],[],[-ldivxdecore])])
+	[CS_CREATE_TUPLE([],[],[-ldivxdecore])], [], [], [], [],
+	[$cs_cv_libm_cflags], [$cs_cv_libm_lflags], [$cs_cv_libm_libs])
     AS_IF([test $cs_cv_libdivxdecore = yes],
 	[CS_CHECK_BUILD([is OpenDivX is sufficiently recent],
 	    [cs_cv_libdivxdecore_recent],
 	    [AC_LANG_PROGRAM(
-		[[#include <decore.h>]],
+		[[#include <divx/decore.h>]],
 		[DEC_PARAM d; d.color_depth = 0;])],
 	    [], [],
 	    [CS_EMIT_BUILD_RESULT([cs_cv_libdivxdecore], [OPENDIVX])], [], [],
