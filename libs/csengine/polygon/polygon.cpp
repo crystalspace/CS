@@ -36,6 +36,7 @@
 #include "csutil/debug.h"
 #include "csutil/memfile.h"
 #include "iutil/vfs.h"
+#include "iutil/cache.h"
 #include "csgeom/matrix2.h"
 #include "qint.h"
 #include "qsqrt.h"
