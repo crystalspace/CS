@@ -17,13 +17,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSTRING_H__
-#define __CSSTRING_H__
+#ifndef __CS_CSSTRING_H__
+#define __CS_CSSTRING_H__
 
-#define STR_FATAL(s)							\
-{									\
-  printf s;								\
-  abort ();								\
+#define STR_FATAL(s) \
+{ \
+  printf s; \
+  abort (); \
 }
 
 /**
@@ -38,24 +38,6 @@ class csString
   size_t Size, MaxSize;
 
 public:
-  /// Create an empty csString object
-  csString () : Data (NULL), Size (0), MaxSize (0) {}
-
-  /// Create an csString object and reserve space for iLength characters
-  csString (int iLength) : Data (NULL), Size (0), MaxSize (0)
-  { SetSize (iLength); }
-
-  /// Copy constructor
-  csString (const csString &copy) : Data (NULL), Size (0), MaxSize (0)
-  { Append (copy); }
-
-  /// Yet another copy constructor
-  csString (const char *copy) : Data (NULL), Size (0), MaxSize (0)
-  { Append (copy); }
-
-  /// Destroy a csString object
-  virtual ~csString ();
-
   /// Set string capacity to NewSize characters (plus one for ending NULL)
   void SetSize (size_t NewSize);
 
@@ -81,10 +63,6 @@ public:
     return *this;
   }
 
-  /// Get a copy of this string
-  csString Clone () const
-  { return csString (*this); }
-
   /// Get a pointer to ASCIIZ string
   char *GetData () const
   { return Data; }
@@ -102,7 +80,7 @@ public:
   {
 #ifdef DEBUG
     if (iPos > Size)
-      STR_FATAL (("Trying to access string `%s' at position %ld\n", Data, iPos))
+      STR_FATAL(("Trying to access string `%s' at position %ld\n", Data, iPos))
 #endif
     return Data [iPos];
   }
@@ -133,7 +111,8 @@ public:
   /// Overlay another string onto a part of this string
   csString &Overwrite (size_t iPos, const csString &iStr);
 
-  /// Append an ASCIIZ string to this one (possibly iCount characters from the string)
+  /// Append an ASCIIZ string to this one
+  /// (possibly iCount characters from the string)
   csString &Append (const char *iStr, size_t iCount = (size_t)-1);
 
   /// Append a string to this one (possibly iCount characters from the string)
@@ -172,6 +151,28 @@ public:
   bool CompareNoCase (const char *iStr) const
   { return (strncasecmp (Data, iStr, Size) == 0); }
 
+  /// Create an empty csString object
+  csString () : Data (NULL), Size (0), MaxSize (0) {}
+
+  /// Create an csString object and reserve space for iLength characters
+  csString (int iLength) : Data (NULL), Size (0), MaxSize (0)
+  { SetSize (iLength); }
+
+  /// Copy constructor
+  csString (const csString &copy) : Data (NULL), Size (0), MaxSize (0)
+  { Append (copy); }
+
+  /// Yet another copy constructor
+  csString (const char *copy) : Data (NULL), Size (0), MaxSize (0)
+  { Append (copy); }
+
+  /// Destroy a csString object
+  virtual ~csString ();
+
+  /// Get a copy of this string
+  csString Clone () const
+  { return csString (*this); }
+
   /// Assign a string to another
   csString &operator = (const csString &iStr)
   { return Replace (iStr); }
@@ -189,7 +190,7 @@ public:
   { return Clone ().Append (iStr); }
 
   /// Convert csString into ASCIIZ
-  operator char * () const
+  operator char * ()
   { return Data; }
 
   /// Return a const reference to this string in ASCIIZ format
@@ -213,4 +214,4 @@ inline csString operator + (const csString &iStr1, const char* iStr2)
   return iStr1.Clone ().Append (iStr2);
 }
 
-#endif // __CSSTRING_H__
+#endif // __CS_CSSTRING_H__

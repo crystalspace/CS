@@ -36,6 +36,10 @@ private:
   int tx, ty, tw, th;
 
 public:
+  /// Set new location of sprite image on texture
+  void SetTextureRectangle (int x, int y, int w, int h)
+  { tx = x; ty = y; tw = w; th = h; }
+
   /// Initialize the sprite from a texture.
   csSprite2D (iTextureHandle *hTexture, int x, int y, int w, int h)
   {
@@ -51,10 +55,6 @@ public:
   /// Return true if sprite has been initialized okay
   bool ok ()
   { return hTex != NULL; }
-
-  /// Set new location of sprite image on texture
-  void SetTextureRectangle (int x, int y, int w, int h)
-  { tx = x; ty = y; tw = w; th = h; }
 
   /// Draw the sprite given the screen position and new size
   virtual void Draw (iGraphics2D* g2d, int sx, int sy, int sw, int sh)
