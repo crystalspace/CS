@@ -20,6 +20,8 @@
 // csGraphics3DGlide2x implementation file
 // Written by xtrochu and Nathaniel
 
+#include "sysdef.h"
+
 #if defined(OS_WIN32)
 #include <windows.h>
 #endif
@@ -27,13 +29,11 @@
 #include <Dialogs.h>
 #include <TextUtils.h>
 #define GLIDE24_ONLY
-#define SYSDEF_2DDRIVER_DEFS
 #endif
 #include <stdlib.h>
 #include <stdarg.h>
 #include <glide.h>
 
-#include "sysdef.h"
 #include "isystem.h"
 #include "ipolygon.h"
 #include "icamera.h"
@@ -53,6 +53,7 @@
 #elif defined (OS_MACOS)
 #include "cs2d/macglide2/g2d.h"
 #include "cs2d/macglide2/ig2d.h"
+#include "cssys/mac/MacRSRCS.h"
 #else //Is there another platform Glide runs on?
 //#include "cs2d/unxglide2/g2d.h"
 //#include "cs2d/unxglide2/ig2d.h"
