@@ -3,7 +3,7 @@ Changes to Crystal Space to support collision detection
 Changed files in last patch:
 src/colldet/collider.h
 src/colldet/build.cpp
-READMECD.txt
+collide.txt
 
 General Notes and TODO List
 
