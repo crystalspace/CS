@@ -2,7 +2,7 @@
 #define __NeXT_csosdefs_h
 //=============================================================================
 //
-//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2002 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -72,10 +72,18 @@
 // The 2D graphics driver used by the software renderer on this platform.
 //-----------------------------------------------------------------------------
 #undef  CS_SOFTWARE_2D_DRIVER
-#define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
+#ifdef __APPLE__
+#  define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.coregraphics"
+#else
+#  define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
+#endif
 
 #undef  CS_OPENGL_2D_DRIVER
-#define CS_OPENGL_2D_DRIVER   "crystalspace.graphics2d.glnext"
+#define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glosx"
+
+#undef  CS_SOUND_DRIVER
+#define CS_SOUND_DRIVER "crystalspace.sound.driver.coreaudio"
+
 
 //-----------------------------------------------------------------------------
 // NeXT does not supply strdup() so fake one up.
@@ -221,9 +229,12 @@ static inline char* getcwd(char* p, size_t size)
 
 
 //-----------------------------------------------------------------------------
-// The special assembly version of qsqrt() (from CS/include/qsqrt.h) fails to
-// compile on NeXT.
+// The special Intel assembly version of qsqrt() (from CS/include/qsqrt.h)
+// fails to compile on NeXT.  However, Matthew Reda <mreda@mac.com> added a
+// PowerPC version which works well for Macintosh and MacOS/X using GCC.
 //-----------------------------------------------------------------------------
-#define CS_NO_QSQRT
+#if !defined(PROC_POWERPC)
+#  define CS_NO_QSQRT
+#endif
 
 #endif // __NeXT_csosdefs_h

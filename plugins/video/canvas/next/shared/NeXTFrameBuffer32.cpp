@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2002 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -41,21 +41,12 @@
 #include "NeXTMemory.h"
 #include <string.h>
 
-#if defined(__LITTLE_ENDIAN__)
 #define RED_MASK     0x00ff0000
 #define GREEN_MASK   0x0000ff00
 #define BLUE_MASK    0x000000ff
-#define RED_OFFSET   2
-#define GREEN_OFFSET 1
-#define BLUE_OFFSET  0
-#else
-#define RED_MASK     0x000000ff
-#define GREEN_MASK   0x0000ff00
-#define BLUE_MASK    0x00ff0000
-#define RED_OFFSET   3
+#define RED_OFFSET   1
 #define GREEN_OFFSET 2
-#define BLUE_OFFSET  1
-#endif
+#define BLUE_OFFSET  3
 
 int const CS_NEXT_DEPTH = 32;
 int const CS_NEXT_BPS = 8;

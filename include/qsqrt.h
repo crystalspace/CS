@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2000 by Andrew Zabolotny
+    Copyright (C) 2000 by Andrew Zabolotny (Intel version)
+    Copyright (C) 2002 by Matthew Reda <reda@mac.com> (PowerPC version)
     Fast computation of sqrt(x) and 1/sqrt(x)
   
     This library is free software; you can redistribute it and/or
@@ -122,6 +123,48 @@ static inline float qisqrt (float x)
   );
   return ret;
 }
+
+#elif (!defined (CS_NO_QSQRT)) && defined (PROC_POWERPC) && defined (COMP_GCC)
+
+/**
+ * Use the PowerPC fsqrte to get an estimate of 1/sqrt(x) Then apply two
+ * Newton-Rhaphson refinement steps to get a more accurate response Finally
+ * multiply by x to get x/sqrt(x) = sqrt(x).  Add additional refinement steps
+ * to get a more accurate result.  Zero is treated as a special case, otherwise
+ * we end up returning NaN (Not a Number).
+ */
+static inline float qsqrt(float x)
+{
+  float y0 = 0.0;
+
+  if (x != 0.0)
+  {
+    float x0 = x * 0.5f;
+
+    asm ("frsqrte %0,%1" : "=f" (y0) : "f" (x));
+    
+    y0 = y0 * (1.5f - x0 * y0 * y0);
+    y0 = (y0 * (1.5f - x0 * y0 * y0)) * x;
+  };
+    
+  return y0;
+};
+
+/**
+ * Similar to qsqrt() above, except we do not multiply by x at the end, and
+ * return 1/sqrt(x).
+ */
+static inline float qisqrt(float x)
+{
+  float x0 = x * 0.5f;
+  float y0;
+  asm ("frsqrte %0,%1" : "=f" (y0) : "f" (x));
+    
+  y0 = y0 * (1.5f - x0 * y0 * y0);
+  y0 = y0 * (1.5f - x0 * y0 * y0);
+
+  return y0;
+};
 
 #else
 

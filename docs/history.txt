@@ -1,5 +1,23 @@
 he history order is reversed so that new features are at the top.
 
+14-Jan-2002
+	- Eric Sunshine committed the following changes on behalf of Matthew
+	  Reda <mreda@mac.com>:
+	    - Augmented csosdefs.h, macosx.mak, NeXTFrameBuffer32.cpp,
+	      next.mak, pixtype.inc, scf.cfg, and sof3d.mak in preparation for
+	      brand new OpenGL, CoreGraphics, and CoreAudio drivers Matthew
+	      wrote for MacOS/X.
+	    - Added CS_SOFT3D_24BIT_PIXEL_LAYOUT which allows platforms to
+	      manually specify the pixel layout used by the software renderer,
+	      rather than making the decision based upon endianess.  Platforms
+	      which do not specify this fallback to the old behavior of pixel
+	      layout being determined by endianess.  Apple/NeXT uses this new
+	      capability to specify a uniform pixel layout regardless of
+	      architecture.  This change allows a nice speed increase in the
+	      CoreGraphics driver by eliminating the need to post-process the
+	      pixel data.
+	    - Added PowerPC-specific versions of qsqrt() and qisqrt() for use
+	      by Macintosh (and any other PowerPC-based computers).
 13-Jan-2002
 	- Matze changed cs-config --version to only output major number, the
 	  --longversion outputs all
@@ -10,8 +28,9 @@ he history order is reversed so that new features are at the top.
 	- Matze added an autoconf macro for CS to scripts/cs-config, no
 	  documentation on usage yet, but I think it should be clear how to use
 	  it if you know autoconf.
-	- Matze fixed a strange compiler warning in csobject.cpp (I had to add a iObject() to
-	  the initializer list in the copy constructor, anyone knows why this is needed?)
+	- Matze fixed a strange compiler warning in csobject.cpp (I had to add
+	  a iObject() to the initializer list in the copy constructor, anyone
+	  knows why this is needed?)
 9-Jan-2002
 	- Eric Sunshine applied a much saner patch to the makefiles to combat
 	  the breakage caused by AndyZ's makefile change.  Reverted a patch

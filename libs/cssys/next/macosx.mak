@@ -1,6 +1,6 @@
 #==============================================================================
 #
-#	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
+#	Copyright (C)1999-2002 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # The contents of this file are copyrighted by Eric Sunshine.  This work is
 # distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -24,7 +24,7 @@ NEXT.DESCRIPTION.OS=MacOS/X
 NEXT.ARCHS=ppc
 NEXT.SOURCE_DIRS=macosx openstep
 NEXT.INCLUDE_DIRS=
-NEXT.CFLAGS.GENERAL=-Wmost
+NEXT.CFLAGS.GENERAL=-Wmost -force_cpusubtype_ALL
 NEXT.CFLAGS.OPTIMIZE=-O3 -finline-functions
 NEXT.CFLAGS.DEBUG=-finline-functions
 NEXT.CFLAGS.DLL=
@@ -33,7 +33,11 @@ NEXT.LFLAGS.GENERAL=
 NEXT.LFLAGS.EXE=-framework AppKit -framework Foundation
 NEXT.LFLAGS.EXE.CONSOLE=-framework AppKit -framework Foundation
 NEXT.LFLAGS.DLL=-bundle -framework AppKit -framework Foundation
-NEXT.PLUGINS=video/renderer/opengl
+NEXT.PLUGINS+=video/renderer/opengl
+#NEXT.PLUGINS+=video/canvas/macosx/glosx
+#NEXT.PLUGINS+=video/canvas/macosx/coregraphics
+NEXT.PLUGINS+=sound/renderer/software
+#NEXT.PLUGINS+=sound/driver/coreaudio
 NEXT.SYSCONFIG=$(NEWLINE)sh libs/cssys/next/macosx.sh cc>>config.tmp
 
 NEXT.FRIEND=yes

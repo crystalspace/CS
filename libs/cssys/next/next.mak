@@ -124,6 +124,10 @@ CFLAGS.INCLUDE = $(NEXT.INCLUDE_DIRS) \
 CFLAGS.GENERAL = $(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) \
   -Wno-precomp -fno-common -pipe
 
+# Special option for the software 3D renderer to force it to ARGB mode
+CFLAGS.SOFT3D.PIXEL_LAYOUT=\
+  -DCS_SOFT3D_24BIT_PIXEL_LAYOUT=CS_SOFT3D_24BIT_PIXEL_ARGB
+
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize = $(NEXT.CFLAGS.OPTIMIZE)
 
@@ -167,11 +171,11 @@ NASMFLAGS.SYSTEM =
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = $(wildcard \
   $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS)) \
-  $(addsuffix /*.c,$(NEXT.SOURCE_PATHS))) \
+  $(addsuffix /*.c,$(NEXT.SOURCE_PATHS)) \
   $(addsuffix /*.m,$(NEXT.SOURCE_PATHS))) \
   libs/cssys/general/findlib.cpp \
-  libs/cssys/general/instpath.cpp \
   libs/cssys/general/getopt.cpp \
+  libs/cssys/general/instpath.cpp \
   libs/cssys/general/printf.cpp
 
 # Where to put dynamic libraries on this system?
