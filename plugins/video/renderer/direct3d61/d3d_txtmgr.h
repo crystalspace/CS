@@ -44,9 +44,12 @@ public:
   /// Delete all members
   ~csTextureMMDirect3D();
   /// Create a new texture object
-  virtual csTexture *new_texture (iImage *Image);
+  virtual csTexture *NewTexture (iImage *Image);
   /// Compute the mean color for the just-created texture
-  virtual void compute_mean_color ();
+  virtual void ComputeMeanColor ();
+
+  /// Create all mipmapped bitmaps from the first level.
+  virtual void CreateMipmaps (bool verynice, bool blend_mipmap0);
 
   /// Override GetMipMapData() to return 2d texture if (mm == -2)
   virtual void *GetMipMapData (int mm);

@@ -1321,7 +1321,7 @@ void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
   // retrieve the lightmap from the cache.
   iLightMap* piLM = pTex->GetLightMap ();
 
-  if ( piLM  && m_bRenderLightmap) //THFIXME
+  if ( piLM  && m_bRenderLightmap) 
   {
     pLightCache = (csD3DCacheData *)piLM->GetCacheData ();
     if (!pLightCache)

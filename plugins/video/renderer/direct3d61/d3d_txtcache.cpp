@@ -309,12 +309,12 @@ void D3DTextureCache::Load (csD3DCacheData* cached_texture)
   txt_handle->IncRef();
 
   bool transp = txt_handle->GetTransparent ();
-  DDCOLORKEY key;
+  //DDCOLORKEY key;
   if (transp)
   {
-    UByte r, g, b;
-    txt_handle->GetTransparent (r, g, b);
-    key.dwColorSpaceLowValue = key.dwColorSpaceHighValue = D3DRGB (r, g, b);
+    //UByte r, g, b;
+    //txt_handle->GetTransparent (r, g, b);
+    //key.dwColorSpaceLowValue = key.dwColorSpaceHighValue = D3DRGB (r, g, b);
   }
 
   ASSERT (m_lpDD);
@@ -378,8 +378,8 @@ void D3DTextureCache::Load (csD3DCacheData* cached_texture)
 
     lpDDLevel->Unlock (NULL);
 
-    if (transp)
-      lpDDLevel->SetColorKey (DDCKEY_SRCBLT, &key);
+    //if (transp)
+    //  lpDDLevel->SetColorKey (DDCKEY_SRCBLT, &key);
 
     IDirectDrawSurface4 *lpDDNextLevel;
     lpDDLevel->GetAttachedSurface (&ddsCaps, &lpDDNextLevel);

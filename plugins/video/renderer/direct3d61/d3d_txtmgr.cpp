@@ -55,18 +55,52 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
   RGBPixel* pPixels   = (RGBPixel *)Image->GetImageData();
   int       NumPixels = get_size ();
 
+  bool transp = Parent->GetTransparent () || For2d;
+  UByte Transp_Red   = 0;
+  UByte Transp_Green = 0;
+  UByte Transp_Blue  = 0;
+  if (transp)
+  {
+    Parent->GetTransparent(Transp_Red, Transp_Green, Transp_Blue);
+  }
+
   switch (iG3D->m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount)
   {
     case 16:
     {
       image = new UByte [NumPixels * sizeof (UShort)];
       UShort *dst = (UShort *)image;
-      while (NumPixels--)
+      UShort NearBlack = 1 << bsl;
+
+      if (transp)
       {
-        *dst++ = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
-                 ((unsigned (pPixels->green) >> gsr) << gsl) |
-                 ((unsigned (pPixels->blue ) >> bsr) << bsl);
-        pPixels++;
+        while (NumPixels--)
+        {
+          if ((pPixels->red   == Transp_Red) &&
+              (pPixels->green == Transp_Green) &&
+              (pPixels->blue  == Transp_Blue))
+          {
+            *dst++ = 0;
+          }
+          else
+          {
+            UShort c = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
+                       ((unsigned (pPixels->green) >> gsr) << gsl) |
+                       ((unsigned (pPixels->blue ) >> bsr) << bsl);
+            *dst++ = c ? c : NearBlack;
+          }
+          pPixels++;
+        }
+      }
+      else
+      {
+        while (NumPixels--)
+        {
+          *dst++ = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
+                   ((unsigned (pPixels->green) >> gsr) << gsl) |
+                   ((unsigned (pPixels->blue ) >> bsr) << bsl);
+          pPixels++;
+        }
       }
       break;
     }
@@ -74,12 +108,37 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
     {
       image = new UByte [NumPixels * sizeof (ULong)];
       ULong *dst = (ULong *)image;
-      while (NumPixels--)
+      ULong NearBlack = 1 << bsl;
+
+      if (transp)
       {
-        *dst++ = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
-                 ((unsigned (pPixels->green) >> gsr) << gsl) |
-                 ((unsigned (pPixels->blue ) >> bsr) << bsl);
-        pPixels++;
+        while (NumPixels--)
+        {
+          if ((pPixels->red   == Transp_Red) &&
+              (pPixels->green == Transp_Green) &&
+              (pPixels->blue  == Transp_Blue))
+          {
+            *dst++ = 0;
+          }
+          else
+          {
+            ULong c = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
+                      ((unsigned (pPixels->green) >> gsr) << gsl) |
+                      ((unsigned (pPixels->blue ) >> bsr) << bsl);
+            *dst++ = c ? c : NearBlack;
+          }
+          pPixels++;
+        }
+      }
+      else
+      {
+        while (NumPixels--)
+        {
+          *dst++ = ((unsigned (pPixels->red  ) >> rsr) << rsl) |
+                   ((unsigned (pPixels->green) >> gsr) << gsl) |
+                   ((unsigned (pPixels->blue ) >> bsr) << bsl);
+          pPixels++;
+        }
       }
       break;
     }
@@ -106,11 +165,6 @@ csTextureMMDirect3D::csTextureMMDirect3D (iImage* image, int flags,
   G3D          = iG3D;
   m_pTexture2d = NULL;
 
-  if (flags & CS_TEXTURE_2D)
-  {
-    m_pTexture2d = new csTextureDirect3D(this, image, iG3D, true);
-  }
-
   // Resize the image to fullfill device requirements
   int w = image->GetWidth ();
   int h = image->GetHeight ();
@@ -126,12 +180,13 @@ csTextureMMDirect3D::~csTextureMMDirect3D()
   delete m_pTexture2d;
 }
 
-csTexture *csTextureMMDirect3D::new_texture (iImage *Image)
+
+csTexture *csTextureMMDirect3D::NewTexture (iImage *Image)
 {
   return new csTextureDirect3D (this, Image, G3D, false);
 }
 
-void csTextureMMDirect3D::compute_mean_color ()
+void csTextureMMDirect3D::ComputeMeanColor ()
 {
   int pixels = image->GetWidth () * image->GetHeight ();
   RGBPixel *src = (RGBPixel *)image->GetImageData ();
@@ -146,6 +201,54 @@ void csTextureMMDirect3D::compute_mean_color ()
   mean_color.red   = r / pixels;
   mean_color.green = g / pixels;
   mean_color.blue  = b / pixels;
+}
+
+void csTextureMMDirect3D::CreateMipmaps (bool verynice, bool blend_mipmap0)
+{
+  (void) verynice;
+  (void) blend_mipmap0;
+
+  if (!image) return;
+
+  // Delete existing mipmaps, if any
+  for (int i = 0; i < 4; i++)
+    CHKB (delete tex [i]);
+
+  delete m_pTexture2d;
+
+  if (flags & CS_TEXTURE_2D)
+  {
+    m_pTexture2d = new csTextureDirect3D(this, image, G3D, true);
+  }
+  else
+  {
+    m_pTexture2d = NULL;
+  }
+
+  RGBPixel *tc = transp ? &transp_color : (RGBPixel *)NULL;
+
+  if (flags & CS_TEXTURE_3D)
+  {
+    image->IncRef();
+
+    iImage *i0 = image;
+    iImage *i1 = i0->MipMap (1, tc);
+    iImage *i2 = i1->MipMap (1, tc);
+    iImage *i3 = i2->MipMap (1, tc);
+
+    tex [0] = NewTexture (i0);
+    tex [1] = NewTexture (i1);
+    tex [2] = NewTexture (i2);
+    tex [3] = NewTexture (i3);
+  }
+  else
+  {
+    // 2D textures uses just the top-level mipmap
+    image->IncRef ();
+    tex [0] = NewTexture (image);
+  }
+
+  ComputeMeanColor ();
 }
 
 void* csTextureMMDirect3D::GetMipMapData(int mm)
@@ -206,8 +309,8 @@ void csTextureManagerDirect3D::PrepareTextures ()
   for (int i = 0; i < textures.Length (); i++)
   {
     csTextureMM *txt = textures.Get (i);
-    txt->apply_gamma ();
-    txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+    txt->ApplyGamma ();
+    txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
   }
 }
 
@@ -226,8 +329,8 @@ void csTextureManagerDirect3D::PrepareTexture (iTextureHandle *handle)
   if (!handle) return;
 
   csTextureMMDirect3D *txt = (csTextureMMDirect3D *)handle->GetPrivateObject ();
-  txt->apply_gamma ();
-  txt->create_mipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
+  txt->ApplyGamma ();
+  txt->CreateMipmaps (mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
 }
 
 void csTextureManagerDirect3D::UnregisterTexture (iTextureHandle* handle)
