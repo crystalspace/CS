@@ -13,6 +13,12 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+8-Nov-1999
+	- Eric Sunshine reverse-engineered Andrew Zabolotny's SCF changes and
+	  was able to recreate some missing files which Andrew forgot to
+	  commit to the CVS repository.  Eric's recreations are minimal, yet
+	  sufficient to allow the project to compile.  Hopefully Andrew will
+	  check in the "real" files when he has the opportunity to do so.
 7-Nov-1999
 	- Eric Sunshine re-engineered the Python detection code in haspyth.sh
 	  so that it deals gracefully with the case where multiple Python
