@@ -1806,10 +1806,15 @@ AS_IF([test $cs_cv_libdivxdecore4 != yes],
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
     [AC_LANG_PROGRAM(
-	[[#include <regex.h>]],
+	[[#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <regex.h>]],
 	[regex_t re; regcomp (&re, 0, 0); regexec (&re, 0, 0, 0, 0);])],
     [], [],
-    [CS_HEADER_PROPERTY([CS_HAS_REGEX])])
+    [CS_HEADER_PROPERTY([CS_HAS_REGEX])
+    CS_BUILD_PROPERTY([REGEX.AVAILABLE], [yes])])
+
 
 
 #------------------------------------------------------------------------------
@@ -2365,6 +2370,8 @@ AS_IF([test $enable_new_renderer = yes],
 AS_IF([test $prefix = NONE],
     [cs_install_dir="$ac_default_prefix/crystal"], [cs_install_dir=$prefix])
 CS_MAKEFILE_PROPERTY([INSTALL_DIR], [$cs_install_dir])
+CS_MAKEFILE_PROPERTY([CS_CONFIGDIR], [AS_ESCAPE([$(INSTALL_DIR)])])
+CS_MAKEFILE_PROPERTY([CS_PLUGINDIR], [AS_ESCAPE([$(INSTALL_DIR)/lib])])
 
 
 

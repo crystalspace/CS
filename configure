@@ -28613,7 +28613,10 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <regex.h>
+#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <regex.h>
 int
 main ()
 {
@@ -28764,7 +28767,10 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <regex.h>
+#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <regex.h>
 int
 main ()
 {
@@ -28839,12 +28845,21 @@ fi
     if test $cs_cv_regexp = yes; then
   cs_header_text="${cs_header_text}#define CS_HAS_REGEX
 "
+    cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}REGEX.AVAILABLE = $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}REGEX.AVAILABLE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
 else
   cs_cv_regexp_cflags=''
 	cs_cv_regexp_lflags=''
 	cs_cv_regexp_libs=''
 
 fi
+
 
 
 
@@ -34085,6 +34100,10 @@ else
 fi
 
 cs_makefile_text="${cs_makefile_text}INSTALL_DIR = $cs_install_dir
+"
+cs_makefile_text="${cs_makefile_text}CS_CONFIGDIR = \$(INSTALL_DIR)
+"
+cs_makefile_text="${cs_makefile_text}CS_PLUGINDIR = \$(INSTALL_DIR)/lib
 "
 
 

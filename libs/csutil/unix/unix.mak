@@ -105,4 +105,9 @@ ifeq ($(EMBED_META)$(LIBBFD.AVAILABLE)$(OBJCOPY.AVAILABLE),yesyesyes)
   endef
 endif
 
+$(OUT)/instpath$O: $(SRCDIR)/libs/csutil/unix/instpath.cpp
+	$(DO.COMPILE.CPP) \
+	$(CFLAGS.D)CS_CONFIGDIR='"$(CS_CONFIGDIR)"' \
+	$(CFLAGS.D)CS_PLUGINDIR='"$(CS_PLUGINDIR)"'
+
 endif # ifeq ($(MAKESECTION),postdefines)

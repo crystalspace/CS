@@ -21,6 +21,19 @@ chronological order.
 	  check so that it tests for DEC_PARAM::color_depth rather than just
 	  checking for DEC_PARAM.  Apparently, the color_depth member was added
 	  to OpenDivX some time after DEC_PARAM was introduced.
+	- Eric Sunshine fixed 'regexp' check in configure.ac so that it
+	  actually works.  It needed to include <sys/types.h> before <regex.h>
+	  as mandated by POSIX.
+	- Eric Sunshine refactored csRegExpMatcher in order to avoid duplicated
+	  code.  Also improved robustness of error handling.
+	- Eric Sunshine privatized CS's copy of glibc's "regex" implementation.
+	  It now resides in libs/csutil/generic, including regex.h which had
+	  been in include/csutil.
+	- Eric Sunshine restored csutil.mak and csutil/Jamfile so that they
+	  once again perform wildcard on *.c.
+	- Eric Sunshine eliminated compilation complaint from unix/instpath.cpp
+	  about CS_CONFIGDIR and CS_PLUGINDIR being undefined when building
+	  with GNU make.
 29-Feb-2004
 	- Eric Sunshine augmented the configure.ac Python check so that it can
 	  detect a working Python installation on MacOS/X despite the fact that

@@ -42,9 +42,10 @@ CSUTIL.LIB = $(OUT)/$(LIB_PREFIX)csutil$(LIB_SUFFIX)
 INC.CSUTIL = $(INC.SYS_CSUTIL) \
   $(wildcard $(addprefix $(SRCDIR)/,include/csutil/*.h))
 
-SRC.CSUTIL.LOCAL = \
-  $(wildcard $(addprefix $(SRCDIR)/,libs/csutil/*.cpp)) \
-  $(addprefix $(SRCDIR)/,libs/csutil/regexp_impl.c)
+SRC.CSUTIL.LOCAL = $(wildcard $(addprefix $(SRCDIR)/libs/csutil/,*.cpp *.c))
+ifneq ($(REGEX.AVAILABLE),yes)
+  SRC.CSUTIL.LOCAL += $(SRCDIR)/libs/csutil/generic/regex.c
+endif
 SRC.CSUTIL = $(SRC.SYS_CSUTIL) $(SRC.CSUTIL.LOCAL)
 
 # Platform-specific makefiles may want to provide their own value for
@@ -90,7 +91,11 @@ csutilclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/csutil.dep
 $(OUTOS)/csutil.dep: $(SRC.CSUTIL)
-	$(DO.DEP1) $(ZLIB.CFLAGS) $(DO.DEP2)
+	$(DO.DEP1) \
+	$(ZLIB.CFLAGS) \
+	$(CFLAGS.D)CS_CONFIGDIR='"$(CS_CONFIGDIR)"' \
+	$(CFLAGS.D)CS_PLUGINDIR'"=$(CS_PLUGINDIR)"' \
+	$(DO.DEP2)
 else
 -include $(OUTOS)/csutil.dep
 endif

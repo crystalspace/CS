@@ -7,7 +7,7 @@ CSSYS_SRC = ;
 switch $(TARGET.OS)
 {
 case WIN32 :					# Windows 
-  CSSYS_SRC += [ Wildcard win32 : *.cpp *.h ] 
+  CSSYS_SRC += [ Wildcard win32 : *.cpp *.cc *.c *.h ]
 		generic/appdir.cpp
 		generic/csprocessorcap.cpp
 		generic/findlib.cpp
@@ -16,7 +16,7 @@ case WIN32 :					# Windows
 		generic/resdir.cpp
 		generic/runloop.cpp ;
 case MACOS_X :					# MacOS/X
-  CSSYS_SRC += [ Wildcard macosx : *.cpp *.cc *.m *.M *.mm *.h ] 
+  CSSYS_SRC += [ Wildcard macosx : *.cpp *.cc *.c *.m *.M *.mm *.h ]
 		generic/apppath.cpp
 		generic/csprocessorcap.cpp
 		generic/cspthrd.cpp 
@@ -29,7 +29,8 @@ case MACOS_X :					# MacOS/X
 		generic/scanplugins.cpp
 		generic/sysroot.cpp ;
 case * :					# Posix, Unix, Linux, etc.
-  CSSYS_SRC += [ Filter [ Wildcard unix : *.cpp *.h ] : unix/bfdplugins.cpp ]
+  CSSYS_SRC += [ Filter [ Wildcard unix : *.cpp *.cc *.c *.h ] :
+			unix/bfdplugins.cpp ]
 		generic/appdir.cpp
 		generic/apppath.cpp
 		generic/csprocessorcap.cpp
@@ -54,9 +55,13 @@ case * :					# Posix, Unix, Linux, etc.
   }
 }
 
+if $(REGEX.AVAILABLE) != "yes"
+{
+  CSSYS_SRC += generic/regex.c ;
+}
+
 Library csutil
-	: [ Wildcard *.cpp *.h ] $(CSSYS_SRC)
-	  regexp_impl.c
+	: [ Wildcard *.cpp *.cc *.c *.h ] $(CSSYS_SRC)
           [ Wildcard ../../include/csutil : *.h ]
           [ Wildcard ../../include/csutil/macosx : *.h ]
           [ Wildcard ../../include/csutil/win32 : *.h ]
@@ -67,4 +72,3 @@ Library csutil
 CFlags csutil :
   -DCS_CONFIGDIR='\"$(appconfdir)\"' 
   -DCS_PLUGINDIR='\"$(plugindir)\"' ;
-

@@ -45,7 +45,7 @@
    <regex.h>.  */
 #include <stdlib.h>
 #include <sys/types.h>
-#include "csutil/regex.h"
+#include "../regex_wrapper.h"
 #include "regex_internal.h"
 
 #include "regex_internal.c"

@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2004 by Jorrit Tyberghein
-	      (C) 2004 by Frank Richter
+    Copyright (C) 2004 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,24 +19,38 @@
 #include "cssysdef.h"
 #include "csutil/regexp.h"
 #include "csutil/util.h"
+#include "regex_wrapper.h"
 
-bool csRegExpMatcher::Compile (int needFlags)
+static int exec_flags(int flags)
 {
+  int execflags = 0;
+  if (flags & NotBOL) execflags |= REG_NOTBOL;
+  if (flags & NotEOL) execflags |= REG_NOTEOL;
+  return execflags;
+}
+
+bool csRegExpMatcher::Compile (int flags, bool nosub)
+{
+  int needFlags = 0;
+  if (extendedRE) needFlags |= REG_EXTENDED;
+  if (nosub) needFlags |= REG_NOSUB;
+  if (flags & IgnoreCase) needFlags |= REG_ICASE;
+  if (flags & NewLine) needFlags |= REG_NEWLINE;
+
   if ((regex == 0) || 
     ((needFlags & ~REG_NOSUB) != (compiledFlags & ~REG_NOSUB)) ||
     ((needFlags & REG_NOSUB) && !(compiledFlags & REG_NOSUB)))
   {
     if (regex != 0)
-      regfree (regex);
+      regfree ((regex_t*)regex);
     else
       regex = new regex_t;
 
-    int res = regcomp (regex, pattern, 
-      needFlags | (extendedRE ? REG_EXTENDED : 0));
+    int res = regcomp ((regex_t*)regex, pattern, needFlags);
 
     switch (res)
     {
-      case 0:		  compileError = NoError;	  break;
+      case REG_NOERROR:	  compileError = NoError;	  break;
       case REG_BADBR:	  compileError = BadBraces;	  break;
       case REG_BADPAT:	  compileError = BadPattern;	  break;
       case REG_BADRPT:	  compileError = BadRepetition;	  break;
@@ -50,6 +63,7 @@ bool csRegExpMatcher::Compile (int needFlags)
       case REG_EBRACE:	  compileError = ErrBraces;	  break;
       case REG_ERANGE:	  compileError = ErrRange;	  break;
       case REG_ESPACE:	  compileError = ErrSpace;	  break;
+      default:            compileError = ErrUnknown;      break;
     }
   }
   return (compileError == NoError);
@@ -66,53 +80,40 @@ csRegExpMatcher::~csRegExpMatcher ()
 {
   if (regex)
   {
-    regfree (regex);
-    delete regex;
+    regfree ((regex_t*)regex);
+    delete (regex_t*)regex;
   }
   delete[] pattern;
 }
 
 csRegExpMatchError csRegExpMatcher::Match (const char* string, int flags)
 {
-  int compileFlags = REG_NOSUB;
-  if (flags & IgnoreCase) compileFlags |= REG_ICASE;
-  if (flags & NewLine) compileFlags |= REG_NEWLINE;
-
-  if (!Compile (compileFlags)) return compileError;
-
-  int execflags = 0;
-  if (flags & NotBOL) execflags |= REG_NOTBOL;
-  if (flags & NotEOL) execflags |= REG_NOTEOL;
-
-  return (regexec (regex, string, 0, 0, execflags) == 0) ? NoError : NoMatch;
+  if (!Compile (flags, true))
+    return compileError;
+  return (regexec ((regex_t*)regex, string, 0, 0, exec_flags(flags)) == 0) ?
+    NoError : NoMatch;
 }
 
 csRegExpMatchError csRegExpMatcher::Match (const char* string, 
 					   csArray<csRegExpMatch>& matches, 
 					   int flags)
 {
-  int compileFlags = 0;
-  if (flags & IgnoreCase) compileFlags |= REG_ICASE;
-  if (flags & NewLine) compileFlags |= REG_NEWLINE;
+  matches.Empty();
+  if (!Compile (flags, false))
+    return compileError;
 
-  if (!Compile (compileFlags)) return compileError;
-
-  int execflags = 0;
-  if (flags & NotBOL) execflags |= REG_NOTBOL;
-  if (flags & NotEOL) execflags |= REG_NOTEOL;
-
-  CS_ALLOC_STACK_ARRAY(regmatch_t, re_matches, regex->re_nsub);
-  if (regexec (regex, string, regex->re_nsub, re_matches, execflags) != 0)
+  CS_ALLOC_STACK_ARRAY(regmatch_t, re_matches, ((regex_t*)regex)->re_nsub);
+  if (regexec ((regex_t*)regex, string, ((regex_t*)regex)->re_nsub,
+      re_matches, exec_flags(flags)) != 0)
     return NoMatch;
 
-  for (size_t i = 0; i < regex->re_nsub; i++)
+  for (size_t i = 0; i < ((regex_t*)regex)->re_nsub; i++)
   {
     csRegExpMatch match;
     match.startOffset = re_matches[i].rm_so;
     match.endOffset = re_matches[i].rm_eo;
     matches.Push (match);
   }
-
   return NoError;
 }
 

@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2004 by Jorrit Tyberghein
-	      (C) 2004 by Frank Richter
+    Copyright (C) 2004 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,19 +24,6 @@
  */
 
 #include "csutil/array.h"
-
-#ifdef CS_HAS_REGEX
-  #include <regex.h>
-#else
-  #if defined(COMP_VC) && !defined(__STDC__)
-    #define __STDC__  1
-    #define __STDC__DEFINED
-  #endif
-  #include "regex.h"
-  #ifdef __STDC__DEFINED
-    #undef __STDC__
-  #endif
-#endif
 
 /**
  * Possible errors that can occur during matching.
@@ -100,7 +86,11 @@ enum csRegExpMatchError
   /**
    * Out of memory.
    */
-  ErrSpace
+  ErrSpace,
+  /**
+   * Unknown error.
+   */
+  ErrUnknown
 };
 
 /**
@@ -161,13 +151,14 @@ struct csRegExpMatch
  */
 class csRegExpMatcher
 {
-  regex_t* regex;
+  void* regex;
   char* pattern;
   int compiledFlags;
   csRegExpMatchError compileError;
   bool extendedRE;
   
-  bool Compile (int needFlags);
+  bool Compile (int flags, bool nosub);
+
 public:
   /**
    * Create a new RE matcher.
