@@ -433,17 +433,18 @@ public:
   }
 
   /**
-   * Initialize object to have initial capacity of \c capacity elements, and to
-   * increase storage by \c threshold each time the upper bound is exceeded.
+   * Initialize object to have initial capacity of \c in_capacity elements, and
+   * to increase storage by \c in_threshold each time the upper bound is
+   * exceeded.
    */
-  csArray (size_t capacity = 0, size_t threshold = 0)
+  csArray (size_t in_capacity = 0, size_t in_threshold = 0)
   {
 #ifdef CS_MEMORY_TRACKER
     mti = 0;
 #endif
     count = 0;
-    capacity = (capacity > 0 ? capacity : 0);
-    threshold = (threshold > 0 ? threshold : 16);
+    capacity = (in_capacity > 0 ? in_capacity : 0);
+    threshold = (in_threshold > 0 ? in_threshold : 16);
     if (capacity != 0)
     {
       root = MemoryAllocator::Alloc (capacity);
