@@ -52,7 +52,6 @@ public:
 
 private:
   iObjectRegistry* objreg;
-  csRef<iLoader> loader;
   csRef<iSyntaxService> synldr;
   csRef<iPluginManager> pluginmgr;
   csRef<iEngine> engine;

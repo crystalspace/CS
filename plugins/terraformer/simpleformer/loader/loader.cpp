@@ -70,7 +70,6 @@ csSimpleFormerLoader::~csSimpleFormerLoader ()
 bool csSimpleFormerLoader::Initialize (iObjectRegistry* object_reg)
 {
   objreg = object_reg;
-  loader = CS_QUERY_REGISTRY (objreg, iLoader);
   synldr = CS_QUERY_REGISTRY (objreg, iSyntaxService);
   pluginmgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
 
@@ -114,6 +113,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_HEIGHTMAP: 
       {
         const char *image = child->GetContentsValue ();
+	csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
         csRef<iImage> map = loader->LoadImage (image);
         if (map == 0) 
         {

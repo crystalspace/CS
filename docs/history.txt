@@ -82,6 +82,8 @@ chronological order.
 	  is equivalent to the problem with embedded event handlers. In this
 	  case the embedded struct was an iShaderVariableAccessor. By having
 	  this as an embedded struct there was a circular reference.
+	- Jorrit fixed circular ref between simpleformerloader and loader.
+	  This fixes the remaining ref leaks in terrain and terrainf levels.
 18-Aug-2004
 	- Jorrit fixed the NR null renderer so that it also returns a
 	  valid iPolygonRenderer instance on calling
