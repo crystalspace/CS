@@ -21,6 +21,7 @@
 #include "csgfx/csimgvec.h"
 #include "csgfx/csrgbvct.h"
 #include "csgfx/gradient.h"
+#include "csgfx/imagebase.h"
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/imagetools.h"
 #include "csgfx/inv_cmap.h"
