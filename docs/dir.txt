@@ -32,13 +32,20 @@ Here go all applications developed, using Crystal Space.
     A simple Hello-World like aplication, to show the use of the Crystal Space
     Windowing System. (short: CSWS)
 
+    [CS/apps/makedep]
+    A portable dependency generation tool which can be used on platforms which
+    do not use GCC.
+
     [CS/apps/mazed]
     MazeD a simple 3D world and sprite editor.  Pretty advanced, but not
     completly usable yet.
 
-    [CS/apps/primedit]
-    A simple 3D editor.  Usefull only as example for some code.  (Not sure, if
-    it even still compiles)
+    [CS/apps/metademo]
+    A cool demo showing some metaballs.  Balls that look like quicksilver.
+    Really cool.
+
+    [CS/apps/ndrvdemo]
+    Demo application for the networkdriver library.
 
     [CS/apps/simple]
     A kind of Hello World app using Crystal Space.  See tutorial.html for
@@ -55,13 +62,6 @@ Here go all applications developed, using Crystal Space.
     [CS/apps/walktest]
     Walktest.  _The_ reference application for Crystal Space.  If this
     application wont work, probably no other application will.
-
-    [CS/apps/ndrvdemo]
-    Demo application for the networkdriver library.
-
-    [CS/apps/metademo]
-    A cool demo showing some metaballs.  Balls that look like quicksilver.
-    Really cool.
 
 [CS/bin]
 Some scripts to support the build process on various platforms.
@@ -97,25 +97,29 @@ subdirectories.
     (for example, the OpenGL 3D Rasterizer on Unix requires the OpenGL 2D XLib
     Driver).
 
-        [CS/libs/cs2d/common]     common code for all 2D drivers
-        [CS/libs/cs2d/be]         BeOS version
-        [CS/libs/cs2d/csdive]     OS/2 version
-        [CS/libs/cs2d/ddraw]      Win32 using Direct Draw
-        [CS/libs/cs2d/ddraw6]     Win32 using Direct Draw (DirectX 6)
-        [CS/libs/cs2d/dosraw]     DOS
-        [CS/libs/cs2d/ggi]        Unix, using ggi
-        [CS/libs/cs2d/softx]      Unix, using X
-        [CS/libs/cs2d/svgalib]    Unix, using SVGAlib
-        [CS/libs/cs2d/mac]        Macintosh
-        [CS/libs/cs2d/next]       MacOS/X Server, OpenStep, NextStep
-        [CS/libs/cs2d/macglide2]  Glide2x 2D driver for Mac
-        [CS/libs/cs2d/unxglide2]  Glide2x 2D driver for Unix
-        [CS/libs/cs2d/winglide2]  Glide2x 2D driver for Win32
-        [CS/libs/cs2d/winglide3]  Glide3x 2D driver for Win32
-        [CS/libs/cs2d/openglbe]   OpenGL 2D driver for BeOS
-        [CS/libs/cs2d/openglmac]  OpenGL 2D driver for Max
-        [CS/libs/cs2d/openglwin]  OpenGL 2D driver for Win32
-        [CS/libs/cs2d/openglx]    OpenGL 2D driver for Unix/X Windows
+        [CS/libs/cs2d/common]       Common code for all 2D drivers
+        [CS/libs/cs2d/be]           BeOS version
+        [CS/libs/cs2d/csdive]       OS/2 version
+        [CS/libs/cs2d/ddraw]        Win32 using Direct Draw
+        [CS/libs/cs2d/ddraw6]       Win32 using Direct Draw (DirectX 6)
+        [CS/libs/cs2d/dosraw]       DOS
+        [CS/libs/cs2d/ggi]          Unix, using ggi
+        [CS/libs/cs2d/softx]        Unix, using X
+        [CS/libs/cs2d/svgalib]      Unix, using SVGAlib
+        [CS/libs/cs2d/mac]          Macintosh
+        [CS/libs/cs2d/next]         MacOS/X Server, OpenStep, NextStep
+        [CS/libs/cs2d/glid2dcommon] Common code for all Glide2 drivers
+        [CS/libs/cs2d/beglide2]     Glide2X 2D driver for BeOS
+        [CS/libs/cs2d/macglide2]    Glide2x 2D driver for Mac
+        [CS/libs/cs2d/unxglide2]    Glide2x 2D driver for Unix
+        [CS/libs/cs2d/winglide2]    Glide2x 2D driver for Win32
+        [CS/libs/cs2d/winglide3]    Glide3x 2D driver for Win32
+        [CS/libs/cs2d/openglcommon] Common code for all OpenGL 2D drivers
+        [CS/libs/cs2d/openglbe]     OpenGL 2D driver for BeOS
+        [CS/libs/cs2d/openglmac]    OpenGL 2D driver for Max
+        [CS/libs/cs2d/openglos2]    OpenGL 2D driver for OS/2
+        [CS/libs/cs2d/openglwin]    OpenGL 2D driver for Win32
+        [CS/libs/cs2d/openglx]      OpenGL 2D driver for Unix/X Windows
 
     [CS/libs/cs3d]
     3D Rasterizer
