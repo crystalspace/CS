@@ -1144,10 +1144,10 @@ AS_IF([test $cs_cv_libgl = yes],
     [# Check for GLU.
     CS_CHECK_BUILD([for GLU], [cs_cv_libglu],
 	[AC_LANG_PROGRAM(
-	    [CS_GL_INCLUDE([CS_GL_PATH],[GL],[glu.h])], [gluNewQuadric()])],
+	    [CS_GL_INCLUDE([CS_GLU_PATH],[GL],[glu.h])], [gluNewQuadric()])],
 	[CS_CREATE_TUPLE() \
 	$cs_win32_glu \
-	CS_CREATE_TUPLE([-DCS_GL_PATH=OpenGL],[],[-framework OpenGL]) \
+	CS_CREATE_TUPLE([-DCS_GLU_PATH=OpenGL],[],[-framework OpenGL]) \
 	CS_CREATE_TUPLE([],[],[-lGLU]) \
 	CS_CREATE_TUPLE([],[],[-lglu]) \
 	$cs_mesa_glu], [],

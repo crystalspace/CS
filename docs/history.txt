@@ -32,6 +32,8 @@ chronological order.
 	  both "gcc -shared" and dllwrap, so we might as well use the more
 	  well-supported option (gcc -shared) rather than the deprecated one
 	  (dllwrap).
+	- Eric Sunshine fixed a typographical error in configure.ac:
+	  CS_GL_PATH --> CS_GLU_PATH
 16-Sep-2003
 	- Jorrit fixed the thing plugin so that it now actually registers
 	  leaving portals to the sector.

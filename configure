@@ -11960,7 +11960,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
 	$cs_win32_glu \
-	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+	`echo @-DCS_GLU_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
 	`echo @@@-lGLU | sed 'y% %#%'` \
 	`echo @@@-lglu | sed 'y% %#%'` \
 	$cs_mesa_glu
@@ -12040,8 +12040,8 @@ cat >>conftest.$ac_ext <<_ACEOF
     #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
     #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
     #endif
-    #ifdef CS_GL_PATH
-    #include CS_HEADER_GLOBAL(CS_GL_PATH,glu.h)
+    #ifdef CS_GLU_PATH
+    #include CS_HEADER_GLOBAL(CS_GLU_PATH,glu.h)
     #else
     #include <GL/glu.h>
     #endif
@@ -12116,7 +12116,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
 	$cs_win32_glu \
-	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+	`echo @-DCS_GLU_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
 	`echo @@@-lGLU | sed 'y% %#%'` \
 	`echo @@@-lglu | sed 'y% %#%'` \
 	$cs_mesa_glu
@@ -12196,8 +12196,8 @@ cat >>conftest.$ac_ext <<_ACEOF
     #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
     #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
     #endif
-    #ifdef CS_GL_PATH
-    #include CS_HEADER_GLOBAL(CS_GL_PATH,glu.h)
+    #ifdef CS_GLU_PATH
+    #include CS_HEADER_GLOBAL(CS_GLU_PATH,glu.h)
     #else
     #include <GL/glu.h>
     #endif
