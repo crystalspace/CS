@@ -466,28 +466,29 @@ CS_EMIT_CHECK_PYTHON([], [Python scripting interface])
 # needed.  Also check if Ant build tool, which is commonly used to build Java
 # projects, is available.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_JAVA_HEADER_PATH],
+AC_DEFUN([CS_JAVA_FLAGS],
     [AC_REQUIRE([AC_CANONICAL_HOST])
     AC_REQUIRE([CS_CHECK_HOST])
     AS_IF([test x$cs_host_macosx = xyes && # Not cross-building for Darwin.
 	test -r /System/Library/Frameworks/JavaVM.framework/Headers],
-	[cs_java_inc="-I/System/Library/Frameworks/JavaVM.framework/Headers"],
+	[$1_cflags="-I/System/Library/Frameworks/JavaVM.framework/Headers"
+	$1_libs="-framework JavaVM"],
 	[AS_IF([test -n "$JAVA_HOME"],
-	    [cs_java_dir="$JAVA_HOME"],
-	    [AS_IF([test -n "$1"],
-		[cs_java_dir=`AS_DIRNAME([$1])`
-		cs_java_dir=`AS_DIRNAME([$cs_java_dir])`],
-		[cs_java_dir=''])])
-	AS_IF([test -n "$cs_java_dir"],
-	    [cs_java_inc="-I$cs_java_dir/include"
+	    [$1_dir="$JAVA_HOME"],
+	    [AS_IF([test -n "$2"],
+		[$1_dir=`AS_DIRNAME([$2])`
+		$1_dir=`AS_DIRNAME([$$1_dir])`],
+		[$1_dir=''])])
+	AS_IF([test -n "$$1_dir"],
+	    [$1_cflags="-I$$1_dir/include"
 	    case $host_os in
 		mingw*|cygwin*) cs_java_platform=win32 ;;
 		*) cs_java_platform=`echo $host_os |
 		    sed 's/^\([[^-]]*\).*$/\1/'` ;;
 	    esac
 	    AS_IF([test -n "$cs_java_platform"],
-		[cs_java_inc="$cs_java_inc
-		    $cs_java_inc/$cs_java_platform"])])])])
+		[$1_cflags="$$1_cflags
+		    $$1_cflags/$cs_java_platform"])])])])
 
 AC_PATH_PROGS([JAVA], [java], [],
     [$PATH$PATH_SEPARATOR$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin])
@@ -502,13 +503,14 @@ AC_ARG_WITH([java], [AC_HELP_STRING([--with-java],
 AS_IF([test -z "$with_java"], [with_java=yes])
 
 AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
-    [CS_JAVA_HEADER_PATH([$JAVAC])
+    [CS_JAVA_FLAGS([cs_java], [$JAVAC])
     CS_CHECK_BUILD([if Java2 SDK is usable], [cs_cv_java],
 	[AC_LANG_PROGRAM(
 	    [[#include <jni.h>
 	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);]])],
-	[CS_CREATE_TUPLE() CS_CREATE_TUPLE([$cs_java_inc])], [],
-	[CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
+	[CS_CREATE_TUPLE() \
+        CS_CREATE_TUPLE([$cs_java_cflags],[$cs_java_lflags],[$cs_java_libs])],
+	[], [CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
 
 AC_PATH_PROGS([ANT], [ant], [], [$PATH$PATH_SEPARATOR$ANT_HOME/bin])
 CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
