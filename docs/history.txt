@@ -84,6 +84,12 @@ The history order is reversed so that new features are at the top.
 	    iPolyTexFlat     -> csPolyTexFlat
 	    iPolyTexGouraud  -> csPolyTexGouraud
 	    iPolyTexLightMap -> csPolyTexLightMap
+	- Eric Sunshine fixed a nasty bug in csEngine where a call to
+	  QUERY_INTERFACE(engine,iObject) would fail even though csEngine
+	  inherits from csObject which implements iObject.  For the technically
+	  inclined, the problem was that csEngine was using DECLARE_IBASE and
+	  IMPLEMENT_IBASE when it should have been using DECLARE_IBASE_EXT and
+	  IMPLEMENT_IBASE_EXT.
 31-May-2001
 	- In an effort to understand how the keyframer section in 3DS
 	  works I extended 3ds2lev verbose option to also list the contents

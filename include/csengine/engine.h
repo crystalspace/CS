@@ -1027,7 +1027,7 @@ public:
   }
 
   CSOBJTYPE;
-  DECLARE_IBASE;
+  DECLARE_IBASE_EXT(csObject);
 
   //--------------------- iPlugIn interface implementation --------------------
 
