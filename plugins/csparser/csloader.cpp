@@ -1359,8 +1359,21 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_DISTANCE:
-	lodm = child->GetAttributeValueAsFloat ("m");
-	loda = child->GetAttributeValueAsFloat ("a");
+	{
+	  csRef<iDocumentAttribute> at = child->GetAttribute ("m");
+	  if (at)
+	  {
+	    lodm = child->GetAttributeValueAsFloat ("m");
+	    loda = child->GetAttributeValueAsFloat ("a");
+	  }
+	  else
+	  {
+	    float d0 = child->GetAttributeValueAsFloat ("d0");
+	    float d1 = child->GetAttributeValueAsFloat ("d1");
+	    lodm = -1.0 / (d1-d0);
+	    loda = -lodm * d0;
+	  }
+	}
         break;
       default:
 	SyntaxService->ReportBadToken (child);

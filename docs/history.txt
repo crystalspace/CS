@@ -17,6 +17,13 @@ chronological order.
 	  from the factory.
 	- Jorrit added the ability to use <lodlevel> and <staticlod> for
 	  factories too. Forgot that in the previous commit.
+	- Jorrit added the ability to also set LOD distance with the following
+	  notation:
+	      <distance d0="..." d1="..." />
+	  Internally this will still compute the 'm' and 'a' values. The
+	  meaning of 'd0' is the distance at which lod will be 0 (lowest
+	  detail possible) and 'd1' is the distance at which lod will be 1
+	  (highest detail possible).
 12-Aug-2003
 	- Jorrit fixed a compile error in the OpenGL Windows canvas after the
 	  changes from res yesterday.
