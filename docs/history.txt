@@ -44,6 +44,11 @@ chronological order.
 	  to reduce the likelihood of over- and underfull hbox warnings.
 	- DeSigna patched in jsquare's changes to the msvc7 external
 	  project howto, and added jpeg images for the HTML version.
+	- res added EPS versions of the new images for the VC7 external 
+	  project HOWTO.
+	- res changed the EPS images from the Cygwin setup guide to be wrapped
+	  versions of the JPEG images and reduced their size in the document a
+	  bit.
 21-Sep-2003
 	- Jorrit added iEngine->CreatePortalContainer() and CreatePortal().
 	  With these functions it is possible to create portal container
