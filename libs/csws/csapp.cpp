@@ -124,9 +124,12 @@ void csApp::SetWorld (csWorld *AppWorld)
 }
 
 bool csApp::InitialSetup (int argc, char *argv[],
-  const char *ConfigName, const char *VfsConfigName)
+  const char *ConfigName, const char *VfsConfigName, const char* dataDir)
 {
   System->Initialize (argc, argv, ConfigName, VfsConfigName, World->GetEngineConfigCOM ());
+
+  // Change to the directory on VFS where we keep our data
+  System->Vfs->ChDir (dataDir);
 
   EventQueue = System->EventQueue;
 
