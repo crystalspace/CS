@@ -56,7 +56,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDLOAD
 endif
 
-TO_INSTALL.CONFIG += data/config/sndload.cfg
+TO_INSTALL.CONFIG += data/config/sound.cfg
 DESCRIPTION.$(SNDLOAD) = $(DESCRIPTION.sndload)
 
 SRC.SNDLOAD = $(wildcard plugins/sound/loader/*.cpp)
