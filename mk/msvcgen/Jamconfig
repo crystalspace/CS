@@ -1,14 +1,14 @@
 # This is a Jamconfig which contains definitions for msvcgen
 
 # @@@ This is duplicated from $(TOP)/Jamconfig ...
-PACKAGE.NAME ?= "crystal" ;
-PACKAGE.VERSION ?= "0.97" ;
-PACKAGE.STRING ?= "crystal 0.97" ;
-PACKAGE.BUGREPORT ?= "crystal-main@lists.sourceforge.net" ;
-PACKAGE.LONGNAME ?= "Crystal Space" ;
-PACKAGE.HOMEPAGE ?= "http://crystal.sourceforge.net/" ;
-PACKAGE.COPYRIGHT ?= "Copyright (C)1998-2003 Jorrit Tyberghein and others" ;
-PACKAGE.VERSION.LIST ?= 0 97 ;
+PACKAGE_NAME ?= "crystal" ;
+PACKAGE_VERSION ?= "0.97" ;
+PACKAGE_STRING ?= "crystal 0.97" ;
+PACKAGE_BUGREPORT ?= "crystal-main@lists.sourceforge.net" ;
+PACKAGE_LONGNAME ?= "Crystal Space" ;
+PACKAGE_HOMEPAGE ?= "http://crystal.sourceforge.net/" ;
+PACKAGE_COPYRIGHT ?= "Copyright (C)1998-2003 Jorrit Tyberghein and others" ;
+PACKAGE_VERSION_LIST ?= 0 97 ;
 
 # Target
 PERL = "perl" ;

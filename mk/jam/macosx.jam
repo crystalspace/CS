@@ -232,8 +232,8 @@ actions AppInfoPlistStrings
 {
   cat << EOT > $(<)
 CFBundleName = "$(BASENAME)";
-CFBundleShortVersionString = "$(PACKAGE.VERSION)";
-CFBundleGetInfoString = "$(BASENAME), $(PACKAGE.VERSION)";
+CFBundleShortVersionString = "$(PACKAGE_VERSION)";
+CFBundleGetInfoString = "$(BASENAME), $(PACKAGE_VERSION)";
 EOT
 }
 
@@ -246,9 +246,9 @@ actions AppVersionPlist
 <plist version="0.9">
   <dict>
     <key>CFBundleShortVersionString</key>
-    <string>$(PACKAGE.VERSION)</string>
+    <string>$(PACKAGE_VERSION)</string>
     <key>CFBundleVersion</key>
-    <string>$(PACKAGE.VERSION)</string>
+    <string>$(PACKAGE_VERSION)</string>
     <key>ProjectName</key>
     <string>$(BASENAME)</string>
   </dict>
@@ -299,7 +299,7 @@ actions AppInfoPlist
     <key>CFBundleVersion</key>
     <string>0</string>
     <key>CFBundleShortVersionString</key>
-    <string>$(PACKAGE.VERSION)</string>
+    <string>$(PACKAGE_VERSION)</string>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
   </dict>
