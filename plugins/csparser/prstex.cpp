@@ -19,9 +19,10 @@
 
 #include "cssysdef.h"
 #include "qint.h"
-#include "csloader.h"
 #include "csutil/parser.h"
+#include "csloader.h"
 #include "csutil/scanstr.h"
+#include "iutil/xml.h"
 #include "cstool/proctex.h"
 #include "cstool/prdots.h"
 #include "cstool/prfire.h"
@@ -485,3 +486,18 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 
   return mat;
 }
+
+// XML versions -------------------------------------------------------------
+
+bool csLoader::ParseMaterialList (iXmlNode* node, const char* prefix)
+{
+  if (!Engine) return false;
+  return true;
+}
+
+bool csLoader::ParseTextureList (iXmlNode* node)
+{
+  if (!Engine || !ImageLoader) return false;
+  return true;
+}
+

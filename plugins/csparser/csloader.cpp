@@ -247,6 +247,74 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ZTEST)
 CS_TOKEN_DEF_END
 
+enum
+{
+  XMLTOKEN_AMBIENT = 1,
+  XMLTOKEN_ADDON,
+  XMLTOKEN_ATTENUATION,
+  XMLTOKEN_CAMERA,
+  XMLTOKEN_CENTER,
+  XMLTOKEN_CLEARZBUF,
+  XMLTOKEN_CLEARSCREEN,
+  XMLTOKEN_COLLECTION,
+  XMLTOKEN_COLOR,
+  XMLTOKEN_CONVEX,
+  XMLTOKEN_CULLER,
+  XMLTOKEN_CULLERP,
+  XMLTOKEN_DETAIL,
+  XMLTOKEN_DYNAMIC,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_FARPLANE,
+  XMLTOKEN_FILE,
+  XMLTOKEN_FOG,
+  XMLTOKEN_FORWARD,
+  XMLTOKEN_HALO,
+  XMLTOKEN_HARDMOVE,
+  XMLTOKEN_INVISIBLE,
+  XMLTOKEN_KEY,
+  XMLTOKEN_LEVEL,
+  XMLTOKEN_LIBRARY,
+  XMLTOKEN_LIGHT,
+  XMLTOKEN_LIGHTMAPCELLSIZE,
+  XMLTOKEN_LMCACHE,
+  XMLTOKEN_LOD,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_MATERIALS,
+  XMLTOKEN_MATRIX,
+  XMLTOKEN_MAXLIGHTMAPSIZE,
+  XMLTOKEN_MESHFACT,
+  XMLTOKEN_MESHLIB,
+  XMLTOKEN_MESHOBJ,
+  XMLTOKEN_MESHREF,
+  XMLTOKEN_MOVE,
+  XMLTOKEN_NODE,
+  XMLTOKEN_NOLIGHTING,
+  XMLTOKEN_NOSHADOWS,
+  XMLTOKEN_PARAMS,
+  XMLTOKEN_PARAMSFILE,
+  XMLTOKEN_PLUGIN,
+  XMLTOKEN_PLUGINS,
+  XMLTOKEN_POSITION,
+  XMLTOKEN_PRIORITY,
+  XMLTOKEN_RADIUS,
+  XMLTOKEN_REGION,
+  XMLTOKEN_RENDERPRIORITIES,
+  XMLTOKEN_SECTOR,
+  XMLTOKEN_SETTINGS,
+  XMLTOKEN_SOUND,
+  XMLTOKEN_SOUNDS,
+  XMLTOKEN_START,
+  XMLTOKEN_TEXTURES,
+  XMLTOKEN_MATSET,
+  XMLTOKEN_UP,
+  XMLTOKEN_V,
+  XMLTOKEN_WORLD,
+  XMLTOKEN_ZFILL,
+  XMLTOKEN_ZNONE,
+  XMLTOKEN_ZUSE,
+  XMLTOKEN_ZTEST
+};
+
 //---------------------------------------------------------------------------
 
 void csLoader::ReportError (const char* id, const char* description, ...)
@@ -2362,6 +2430,71 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   GET_PLUGIN (ModelConverter, iModelConverter, "model converter");
   GET_PLUGIN (CrossBuilder, iCrossBuilder, "model crossbuilder");
 
+  xmltokens.Register ("ambient", XMLTOKEN_AMBIENT);
+  xmltokens.Register ("addon", XMLTOKEN_ADDON);
+  xmltokens.Register ("attenuation", XMLTOKEN_ATTENUATION);
+  xmltokens.Register ("camera", XMLTOKEN_CAMERA);
+  xmltokens.Register ("center", XMLTOKEN_CENTER);
+  xmltokens.Register ("clearzbuf", XMLTOKEN_CLEARZBUF);
+  xmltokens.Register ("clearscreen", XMLTOKEN_CLEARSCREEN);
+  xmltokens.Register ("collection", XMLTOKEN_COLLECTION);
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
+  xmltokens.Register ("convex", XMLTOKEN_CONVEX);
+  xmltokens.Register ("culler", XMLTOKEN_CULLER);
+  xmltokens.Register ("cullerp", XMLTOKEN_CULLERP);
+  xmltokens.Register ("detail", XMLTOKEN_DETAIL);
+  xmltokens.Register ("dynamic", XMLTOKEN_DYNAMIC);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("farplane", XMLTOKEN_FARPLANE);
+  xmltokens.Register ("file", XMLTOKEN_FILE);
+  xmltokens.Register ("fog", XMLTOKEN_FOG);
+  xmltokens.Register ("forward", XMLTOKEN_FORWARD);
+  xmltokens.Register ("halo", XMLTOKEN_HALO);
+  xmltokens.Register ("hardmove", XMLTOKEN_HARDMOVE);
+  xmltokens.Register ("invisible", XMLTOKEN_INVISIBLE);
+  xmltokens.Register ("key", XMLTOKEN_KEY);
+  xmltokens.Register ("level", XMLTOKEN_LEVEL);
+  xmltokens.Register ("library", XMLTOKEN_LIBRARY);
+  xmltokens.Register ("light", XMLTOKEN_LIGHT);
+  xmltokens.Register ("lightmapcellsize", XMLTOKEN_LIGHTMAPCELLSIZE);
+  xmltokens.Register ("lmcache", XMLTOKEN_LMCACHE);
+  xmltokens.Register ("lod", XMLTOKEN_LOD);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("materials", XMLTOKEN_MATERIALS);
+  xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
+  xmltokens.Register ("maxlightmapsize", XMLTOKEN_MAXLIGHTMAPSIZE);
+  xmltokens.Register ("meshfact", XMLTOKEN_MESHFACT);
+  xmltokens.Register ("meshlib", XMLTOKEN_MESHLIB);
+  xmltokens.Register ("meshobj", XMLTOKEN_MESHOBJ);
+  xmltokens.Register ("meshref", XMLTOKEN_MESHREF);
+  xmltokens.Register ("move", XMLTOKEN_MOVE);
+  xmltokens.Register ("node", XMLTOKEN_NODE);
+  xmltokens.Register ("nolighting", XMLTOKEN_NOLIGHTING);
+  xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
+  xmltokens.Register ("params", XMLTOKEN_PARAMS);
+  xmltokens.Register ("paramsfile", XMLTOKEN_PARAMSFILE);
+  xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
+  xmltokens.Register ("plugins", XMLTOKEN_PLUGINS);
+  xmltokens.Register ("position", XMLTOKEN_POSITION);
+  xmltokens.Register ("priority", XMLTOKEN_PRIORITY);
+  xmltokens.Register ("radius", XMLTOKEN_RADIUS);
+  xmltokens.Register ("region", XMLTOKEN_REGION);
+  xmltokens.Register ("renderpriorities", XMLTOKEN_RENDERPRIORITIES);
+  xmltokens.Register ("sector", XMLTOKEN_SECTOR);
+  xmltokens.Register ("settings", XMLTOKEN_SETTINGS);
+  xmltokens.Register ("sound", XMLTOKEN_SOUND);
+  xmltokens.Register ("sounds", XMLTOKEN_SOUNDS);
+  xmltokens.Register ("start", XMLTOKEN_START);
+  xmltokens.Register ("textures", XMLTOKEN_TEXTURES);
+  xmltokens.Register ("matset", XMLTOKEN_MATSET);
+  xmltokens.Register ("up", XMLTOKEN_UP);
+  xmltokens.Register ("v", XMLTOKEN_V);
+  xmltokens.Register ("world", XMLTOKEN_WORLD);
+  xmltokens.Register ("zfill", XMLTOKEN_ZFILL);
+  xmltokens.Register ("znone", XMLTOKEN_ZNONE);
+  xmltokens.Register ("zuse", XMLTOKEN_ZUSE);
+  xmltokens.Register ("ztest", XMLTOKEN_ZTEST);
+
   return true;
 }
 
@@ -2376,6 +2509,14 @@ void csLoader::TokenError (const char *Object)
     "crystalspace.maploader.parse.badtoken",
     "Token '%s' not recognized while parsing %s!",
     parser.GetLastOffender (), Object);
+}
+
+void csLoader::TokenError (const char *Object, const char* Token)
+{
+  ReportError (
+    "crystalspace.maploader.parse.badtoken",
+    "Token '%s' not recognized while parsing %s!",
+    Token, Object);
 }
 
 //--- Parsing of Engine Objects ---------------------------------------------
@@ -3133,6 +3274,120 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 bool csLoader::LoadMap (iXmlNode* node)
 {
   if (!Engine) return false;
+
+  csRef<iXmlNode> worldnode = node->GetNode ("world");
+  if (worldnode)
+  {
+    csRef<iXmlNodeIterator> it = worldnode->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iXmlNode> child = it->Next ();
+      if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+        case XMLTOKEN_SETTINGS:
+	  if (!LoadSettings (child))
+	    return false;
+	  break;
+        case XMLTOKEN_RENDERPRIORITIES:
+	  Engine->ClearRenderPriorities ();
+	  if (!LoadRenderPriorities (child))
+	    return false;
+	  break;
+        case XMLTOKEN_ADDON:
+	  if (!LoadAddOn (child, (iEngine*)Engine))
+	    return false;
+      	  break;
+        case XMLTOKEN_MESHFACT:
+          {
+	    const char* name = child->GetAttributeValue ("name");
+            csRef<iMeshFactoryWrapper> t;
+	    t.Take (Engine->CreateMeshFactory (name));
+	    if (!t || !LoadMeshObjectFactory (t, child))
+	    {
+	      ReportError (
+			   "crystalspace.maploader.load.meshfactory",
+			   "Could not load mesh object factory '%s'!",
+			   name);
+	      return false;
+	    }
+          }
+	  break;
+        case XMLTOKEN_REGION:
+	  {
+	    const char* regname = child->GetContentsValue ();
+	    if (regname)
+	      Engine->SelectRegion (regname);
+	    else
+	      Engine->SelectRegion ((iRegion*)NULL);
+	  }
+	  break;
+        case XMLTOKEN_SECTOR:
+          if (!ParseSector (child))
+	    return false;
+          break;
+        case XMLTOKEN_COLLECTION:
+          if (!ParseCollection (child))
+	    return false;
+          break;
+	case XMLTOKEN_MATSET:
+          if (!ParseMaterialList (child))
+            return false;
+          break;
+	case XMLTOKEN_PLUGINS:
+	  if (!LoadPlugins (child))
+	    return false;
+	  break;
+        case XMLTOKEN_TEXTURES:
+          if (!ParseTextureList (child))
+            return false;
+          break;
+        case XMLTOKEN_MATERIALS:
+          if (!ParseMaterialList (child))
+            return false;
+          break;
+        case XMLTOKEN_SOUNDS:
+          if (!LoadSounds (child))
+            return false;
+          break;
+        case XMLTOKEN_LIBRARY:
+          if (!LoadLibraryFile (child->GetContentsValue ()))
+	    return false;
+          break;
+        case XMLTOKEN_START:
+        {
+	  const char* name = child->GetAttributeValue ("name");
+	  iCameraPosition* campos = Engine->GetCameraPositions ()->
+	  	NewCameraPosition (name ? name : "Start");
+	  if (!ParseStart (child, campos))
+	    return false;
+          break;
+        }
+        case XMLTOKEN_KEY:
+	  {
+            iKeyValuePair* kvp = ParseKey (child, Engine->QueryObject());
+	    if (kvp)
+	      kvp->DecRef ();
+	    else
+	      return false;
+	  }
+          break;
+	default:
+	  TokenError ("a map", value);
+	  return false;
+      }
+    }
+  }
+  else
+  {
+    ReportError (
+      "crystalspace.maploader.parse.expectedworld",
+      "Expected 'world' token!");
+    return false;
+  }
+
   return true;
 }
 
@@ -3187,7 +3442,7 @@ bool csLoader::LoadRenderPriorities (iXmlNode* node)
   return true;
 }
 
-iCollection* csLoader::ParseCollection (char* name, iXmlNode* node)
+iCollection* csLoader::ParseCollection (iXmlNode* node)
 {
   return NULL;
 }
@@ -3197,9 +3452,269 @@ bool csLoader::ParseStart (iXmlNode* node, iCameraPosition* campos)
   return true;
 }
 
-iStatLight* csLoader::ParseStatlight (char* name, iXmlNode* node)
+iStatLight* csLoader::ParseStatlight (iXmlNode* node)
 {
-  return NULL;
+  const char* lightname = node->GetAttributeValue ("name");
+
+  Stats->lights_loaded++;
+  csVector3 pos;
+  csColor color;
+  float dist = 0;
+  int cnt;
+  bool dyn;
+  int attenuation = CS_ATTN_LINEAR;
+  struct csHaloDef
+  {
+    int type;
+    union
+    {
+      struct
+      {
+        float Intensity;
+        float Cross;
+      } cross;
+      struct
+      {
+        int Seed;
+        int NumSpokes;
+        float Roundness;
+      } nova;
+      struct
+      {
+        iMaterialWrapper* mat_center;
+        iMaterialWrapper* mat_spark1;
+        iMaterialWrapper* mat_spark2;
+        iMaterialWrapper* mat_spark3;
+        iMaterialWrapper* mat_spark4;
+        iMaterialWrapper* mat_spark5;
+      } flare;
+    };
+  } halo;
+
+  // This csObject will contain all key-value pairs as children
+  csObject Keys;
+
+  memset (&halo, 0, sizeof (halo));
+
+  // New format.
+  pos.x = pos.y = pos.z = 0;
+  dist = 1;
+  color.red = color.green = color.blue = 1;
+  dyn = false;
+
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_RADIUS:
+	dist = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_CENTER:
+	if (!SyntaxService->ParseVector (child, pos))
+	  return NULL;
+        break;
+      case XMLTOKEN_COLOR:
+	if (!SyntaxService->ParseColor (child, color))
+	  return NULL;
+        break;
+      case XMLTOKEN_DYNAMIC:
+	if (!SyntaxService->ParseBool (child, dyn, true))
+	  return NULL;
+        break;
+      case XMLTOKEN_KEY:
+	{
+          iKeyValuePair* kvp = ParseKey (child, &Keys);
+          if (kvp)
+	    kvp->DecRef ();
+	  else
+	    return NULL;
+	}
+        break;
+#if 0
+	//@@@@@@@@@@@@ TODO
+      case CS_TOKEN_HALO:
+	str[0] = 0;
+        cnt = csScanStr (params, "%s", str);
+        if (cnt == 0 || !strcmp (str, "CROSS"))
+        {
+          params = strchr (params, ',');
+          if (params) params++;
+defaulthalo:
+          halo.type = 1;
+          halo.cross.Intensity = 2.0; halo.cross.Cross = 0.45;
+          if (params)
+            csScanStr (params, "%f,%f", &halo.cross.Intensity,
+	    	&halo.cross.Cross);
+        }
+        else if (!strcmp (str, "NOVA"))
+        {
+          params = strchr (params, ',');
+          if (params) params++;
+          halo.type = 2;
+          halo.nova.Seed = 0; halo.nova.NumSpokes = 100;
+	  halo.nova.Roundness = 0.5;
+          if (params)
+            csScanStr (params, "%d,%d,%f", &halo.nova.Seed,
+	    	&halo.nova.NumSpokes, &halo.nova.Roundness);
+        }
+        else if (!strcmp (str, "FLARE"))
+        {
+          params = strchr (params, ',');
+          if (params) params++;
+          halo.type = 3;
+	  char mat_names[8][255];
+	  int cur_idx = 0;
+	  while (params && cur_idx < 6)
+	  {
+	    char* end = strchr (params, ',');
+	    int l;
+	    if (end) l = end-params;
+	    else l = strlen (params);
+	    strncpy (mat_names[cur_idx], params, l);
+	    mat_names[cur_idx][l] = 0;
+	    cur_idx++;
+	    params = end+1;
+	  }
+	  iLoaderContext* lc = GetLoaderContext ();
+	  halo.flare.mat_center = lc->FindMaterial (mat_names[0]);
+	  if (!halo.flare.mat_center)
+	  {
+	    ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	    return NULL;
+	  }
+	  halo.flare.mat_spark1 = lc->FindMaterial (mat_names[1]);
+	  if (!halo.flare.mat_spark1)
+	  {
+	    ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	    return NULL;
+	  }
+	  halo.flare.mat_spark2 = lc->FindMaterial (mat_names[2]);
+	  if (!halo.flare.mat_spark2)
+	  {
+	    ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	    return NULL;
+	  }
+	  halo.flare.mat_spark3 = lc->FindMaterial (mat_names[3]);
+	  if (!halo.flare.mat_spark3)
+	  {
+	    ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	    return NULL;
+	  }
+	  halo.flare.mat_spark4 = lc->FindMaterial (mat_names[4]);
+	  if (!halo.flare.mat_spark4)
+	  {
+	    ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	    return NULL;
+	  }
+	  halo.flare.mat_spark5 = lc->FindMaterial (mat_names[5]);
+	  if (!halo.flare.mat_spark5)
+	  {
+	    ReportError (
+		"crystalspace.maploader.parse.light",
+    	        "Can't find material for flare!");
+	    return NULL;
+	  }
+        }
+        else
+          goto defaulthalo;
+        break;
+#endif
+      case XMLTOKEN_ATTENUATION:
+	{
+	  const char* att = child->GetContentsValue ();
+          if (!strcasecmp (att, "none")     ) attenuation = CS_ATTN_NONE;
+          if (!strcasecmp (att, "linear")   ) attenuation = CS_ATTN_LINEAR;
+          if (!strcasecmp (att, "inverse")  ) attenuation = CS_ATTN_INVERSE;
+          if (!strcasecmp (att, "realistic")) attenuation = CS_ATTN_REALISTIC;
+	  else
+	  {
+	    TokenError ("attenuation", att);
+	    return NULL;
+	  }
+	}
+	break;
+      default:
+	TokenError ("a light", value);
+	return NULL;
+    }
+  }
+
+  // implicit radius
+  if (dist == 0)
+  {
+    if (color.red > color.green && color.red > color.blue) dist = color.red;
+    else if (color.green > color.blue) dist = color.green;
+    else dist = color.blue;
+    switch (attenuation)
+    {
+      case CS_ATTN_NONE      : dist = 100000000; break;
+      case CS_ATTN_LINEAR    : break;
+      case CS_ATTN_INVERSE   : dist = 16.0f * qsqrt (dist); break;
+      case CS_ATTN_REALISTIC : dist = 256.0f * dist; break;
+    }
+  }
+
+  iStatLight* l = Engine->CreateLight (lightname, pos,
+  	dist, color, dyn);
+  switch (halo.type)
+  {
+    case 1:
+      l->QueryLight ()->CreateCrossHalo (halo.cross.Intensity,
+      	halo.cross.Cross);
+      break;
+    case 2:
+      l->QueryLight ()->CreateNovaHalo (halo.nova.Seed, halo.nova.NumSpokes,
+      	halo.nova.Roundness);
+      break;
+    case 3:
+      {
+	iMaterialWrapper* ifmc = halo.flare.mat_center;
+	iMaterialWrapper* ifm1 = halo.flare.mat_spark1;
+	iMaterialWrapper* ifm2 = halo.flare.mat_spark2;
+	iMaterialWrapper* ifm3 = halo.flare.mat_spark3;
+	iMaterialWrapper* ifm4 = halo.flare.mat_spark4;
+	iMaterialWrapper* ifm5 = halo.flare.mat_spark5;
+        iFlareHalo* flare = l->QueryLight ()->CreateFlareHalo ();
+	flare->AddComponent (0.0, 1.2, 1.2, CS_FX_ADD, ifmc);
+	flare->AddComponent (0.3, 0.1, 0.1, CS_FX_ADD, ifm3);
+	flare->AddComponent (0.6, 0.4, 0.4, CS_FX_ADD, ifm4);
+	flare->AddComponent (0.8, .05, .05, CS_FX_ADD, ifm5);
+	flare->AddComponent (1.0, 0.7, 0.7, CS_FX_ADD, ifm1);
+	flare->AddComponent (1.3, 0.1, 0.1, CS_FX_ADD, ifm3);
+	flare->AddComponent (1.5, 0.3, 0.3, CS_FX_ADD, ifm4);
+	flare->AddComponent (1.8, 0.1, 0.1, CS_FX_ADD, ifm5);
+	flare->AddComponent (2.0, 0.5, 0.5, CS_FX_ADD, ifm2);
+	flare->AddComponent (2.1, .15, .15, CS_FX_ADD, ifm3);
+	flare->AddComponent (2.5, 0.2, 0.2, CS_FX_ADD, ifm3);
+	flare->AddComponent (2.8, 0.4, 0.4, CS_FX_ADD, ifm4);
+	flare->AddComponent (3.0, 3.0, 3.0, CS_FX_ADD, ifm1);
+	flare->AddComponent (3.1, 0.05, 0.05, CS_FX_ADD, ifm5);
+	flare->AddComponent (3.3, .15, .15, CS_FX_ADD, ifm2);
+      }
+      break;
+  }
+  l->QueryLight ()->SetAttenuation (attenuation);
+
+  // Move the key-value pairs from 'Keys' to the light object
+  l->QueryObject ()->ObjAddChildren (&Keys);
+  Keys.ObjRemoveAll ();
+
+  return l;
 }
 
 iKeyValuePair* csLoader::ParseKey (iXmlNode* node, iObject* pParent)
@@ -3207,14 +3722,233 @@ iKeyValuePair* csLoader::ParseKey (iXmlNode* node, iObject* pParent)
   return NULL;
 }
 
-iMapNode* csLoader::ParseNode (char* name, iXmlNode* node, iSector* sec)
+iMapNode* csLoader::ParseNode (iXmlNode* node, iSector* sec)
 {
   return NULL;
 }
 
-iSector* csLoader::ParseSector (char* secname, iXmlNode* node)
+iSector* csLoader::ParseSector (iXmlNode* node)
 {
-  return NULL;
+  const char* secname = node->GetAttributeValue ("name");
+
+  bool do_culler = false;
+  const char* bspname = NULL;
+  const char* culplugname = NULL;
+
+  iSector* sector = GetLoaderContext ()->FindSector (secname);
+  if (sector == NULL)
+  {
+    sector = Engine->CreateSector (secname);
+    Stats->sectors_loaded++;
+  }
+
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_ADDON:
+	if (!LoadAddOn (child, sector))
+	{
+	  return NULL;
+	}
+      	break;
+      case XMLTOKEN_CULLER:
+	bspname = child->GetContentsValue ();
+	if (!bspname)
+	{
+	  ReportError (
+		"crystalspace.maploader.parse.sector",
+	  	"CULLER expects the name of a mesh object!");
+	  return NULL;
+	}
+	else
+	{
+          do_culler = true;
+	  culplugname = NULL;
+	}
+        break;
+      case XMLTOKEN_CULLERP:
+	culplugname = child->GetContentsValue ();
+	if (!culplugname)
+	{
+	  ReportError (
+		"crystalspace.maploader.parse.sector",
+	  	"CULLERP expects the name of a visibility culling plugin!");
+	  return NULL;
+	}
+	else
+	{
+          do_culler = true;
+	  bspname = NULL;
+	}
+        break;
+      case XMLTOKEN_MESHREF:
+        {
+	  const char* meshname = child->GetAttributeValue ("name");
+	  if (!meshname)
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"'meshref' requires a name in sector '%s'!",
+		secname ? secname : "<noname>");
+	    return NULL; // @@@ Leak
+	  }
+          iMeshWrapper* mesh = LoadMeshObjectFromFactory (child);
+          if (!mesh)
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not load mesh object '%s' in sector '%s'!",
+		meshname, secname ? secname : "<noname>");
+	    return NULL; // @@@ Leak
+	  }
+	  mesh->QueryObject ()->SetName (meshname);
+	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+          mesh->GetMovable ()->SetSector (sector);
+	  mesh->GetMovable ()->UpdateMove ();
+	  Engine->GetMeshes ()->Add (mesh);
+	  mesh->DecRef ();
+        }
+        break;
+      case XMLTOKEN_MESHOBJ:
+        {
+	  const char* meshname = child->GetAttributeValue ("name");
+	  if (!meshname)
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"'meshobj' requires a name in sector '%s'!",
+		secname ? secname : "<noname>");
+	    return NULL; // @@@ Leak
+	  }
+	  iMeshWrapper* mesh = Engine->CreateMeshWrapper (meshname);
+          if (!LoadMeshObject (mesh, child))
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not load mesh object '%s' in sector '%s'!",
+		meshname, secname ? secname : "<noname>");
+	    mesh->DecRef ();
+	    return NULL; // @@@ Leak
+	  }
+	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+          mesh->GetMovable ()->SetSector (sector);
+	  mesh->GetMovable ()->UpdateMove ();
+	  mesh->DecRef ();
+        }
+        break;
+      case XMLTOKEN_MESHLIB:
+        {
+	  const char* meshname = child->GetAttributeValue ("name");
+	  if (!meshname)
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"'meshlib' requires a name in sector '%s'!",
+		secname ? secname : "<noname>");
+	    return NULL; // @@@ Leak
+	  }
+	  iMeshWrapper* mesh = Engine->GetMeshes ()->FindByName (meshname);
+	  if (!mesh)
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not find mesh object '%s' in sector '%s' for MESHLIB!",
+		meshname, secname ? secname : "<noname>");
+	    return NULL;
+	  }
+	  if (mesh->GetMovable ()->GetSectors ()->GetCount () > 0)
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Mesh '%s' is already in another sector in sector '%s'!",
+		meshname, secname ? secname : "<noname>");
+	    return NULL;
+	  }
+          if (!LoadMeshObject (mesh, child))
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not load mesh object '%s' in sector '%s'!",
+		meshname, secname ? secname : "<noname>");
+	    return NULL;
+	  }
+	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+          mesh->GetMovable ()->SetSector (sector);
+	  mesh->GetMovable ()->UpdateMove ();
+        }
+        break;
+      case XMLTOKEN_LIGHT:
+        {
+	  iStatLight* sl = ParseStatlight (child);
+	  if (!sl)
+	  {
+	    return NULL; // @@@ Leak
+	  }
+          sector->GetLights ()->Add (sl->QueryLight ());
+	  sl->DecRef ();
+	}
+        break;
+      case XMLTOKEN_NODE:
+        {
+          iMapNode *n = ParseNode (child, sector);
+	  if (n)
+	  {
+	    n->DecRef ();
+	  }
+	  else
+	  {
+	    return NULL; // @@@ Leak
+	  }
+	}
+        break;
+      case XMLTOKEN_FOG:
+        {
+          csFog *f = sector->GetFog ();
+          f->enabled = true;
+	  f->red = child->GetAttributeValueAsFloat ("red");
+	  f->green = child->GetAttributeValueAsFloat ("green");
+	  f->blue = child->GetAttributeValueAsFloat ("blue");
+	  f->density = child->GetAttributeValueAsFloat ("density");
+        }
+        break;
+      case XMLTOKEN_KEY:
+        {
+          iKeyValuePair* kvp = ParseKey (child, sector->QueryObject());
+	  if (kvp)
+	    kvp->DecRef ();
+	  else
+	    return NULL;
+        }
+        break;
+      default:
+	TokenError ("a sector", value);
+	return NULL;
+    }
+  }
+  if (!(flags & CS_LOADER_NOBSP))
+    if (do_culler)
+    {
+      bool rc;
+      if (bspname)
+        rc = sector->SetVisibilityCuller (bspname);
+      else
+        rc = sector->SetVisibilityCullerPlugin (culplugname);
+      if (!rc)
+      {
+	ReportError (
+	      	"crystalspace.maploader.load.sector",
+		"Could not load visibility culler for sector '%s'!",
+		secname ? secname : "<noname>");
+	return NULL;
+      }
+    }
+  return sector;
 }
 
 

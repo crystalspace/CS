@@ -113,6 +113,7 @@ public:
   virtual bool ParseBool (iXmlNode* node, bool& result, bool def_result);
   virtual bool ParseMatrix (iXmlNode* node, csMatrix3 &m);
   virtual bool ParseVector (iXmlNode* node, csVector3 &v);
+  virtual bool ParseColor (iXmlNode* node, csColor &c);
   virtual bool ParseMixmode (iXmlNode* node, uint &mixmode);
   virtual bool ParseTextureMapping (iXmlNode* node,
   			     const csVector3* vref, uint &texspec,

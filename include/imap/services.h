@@ -27,6 +27,7 @@ class csVector3;
 class csVector2;
 class csVector;
 class csParser;
+class csColor;
 struct iPolygon3D;
 struct iEngine;
 struct iSector;
@@ -40,7 +41,7 @@ struct iXmlNode;
 #define CSTEX_V2 4  // vector2 is given in texture description
 #define CSTEX_UV_SHIFT 8 // explicit (u,v) <-> vertex mapping is given in texture description
 
-SCF_VERSION (iSyntaxService, 1, 1, 0);
+SCF_VERSION (iSyntaxService, 1, 1, 1);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -198,6 +199,11 @@ struct iSyntaxService : public iBase
    * Parse a vector description. Returns true if successful.
    */
   virtual bool ParseVector (iXmlNode* node, csVector3 &v) = 0;
+
+  /**
+   * Parse a color description. Returns true if successful.
+   */
+  virtual bool ParseColor (iXmlNode* node, csColor &c) = 0;
 
   /**
    * Parse a mixmode description. Returns true if successful.

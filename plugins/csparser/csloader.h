@@ -25,9 +25,10 @@
 #include "iutil/comp.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
+#include "csutil/strhash.h"
+#include "csutil/parser.h"
 #include "csgeom/quaterni.h"
 #include "iutil/plugin.h"
-#include "csutil/parser.h"
 #include "imap/services.h"
 
 class csGenerateImageTexture;
@@ -73,6 +74,7 @@ class csLoader : public iLoader
 private:
   iLoaderContext* ldr_context;
   iLoaderContext* GetLoaderContext ();
+  csStringHash xmltokens;
 
   /// the current parser
   csParser parser;
@@ -258,23 +260,23 @@ private:
    */
   bool ParseMaterialList (iXmlNode* node, const char* prefix = NULL);
   /// Parse a texture definition and add the texture to the engine
-  iTextureWrapper* ParseTexture (char *name, iXmlNode* node);
+  iTextureWrapper* ParseTexture (iXmlNode* node);
   /// Parse a proc texture definition and add the texture to the engine
-  iTextureWrapper* ParseProcTex (char *name, iXmlNode* node);
+  iTextureWrapper* ParseProcTex (iXmlNode* node);
   /// Parse a material definition and add the material to the engine
-  iMaterialWrapper* ParseMaterial (char *name, iXmlNode* node, const char* prefix = NULL);
+  iMaterialWrapper* ParseMaterial (iXmlNode* node, const char* prefix = NULL);
   /// Parse a collection definition and add the collection to the engine
-  iCollection* ParseCollection (char* name, iXmlNode* node);
+  iCollection* ParseCollection (iXmlNode* node);
   /// Parse a camera position.
   bool ParseStart (iXmlNode* node, iCameraPosition* campos);
   /// Parse a static light definition and add the light to the engine
-  iStatLight* ParseStatlight (char* name, iXmlNode* node);
+  iStatLight* ParseStatlight (iXmlNode* node);
   /// Parse a key definition and add the key to the given object
   iKeyValuePair* ParseKey (iXmlNode* node, iObject* pParent);
   /// Parse a map node definition and add the node to the given sector
-  iMapNode* ParseNode (char* name, iXmlNode* node, iSector* sec);
+  iMapNode* ParseNode (iXmlNode* node, iSector* sec);
   /// Parse a sector definition and add the sector to the engine
-  iSector* ParseSector (char* name, iXmlNode* node);
+  iSector* ParseSector (iXmlNode* node);
 
   /// -----------------------------------------------------------------------
 
@@ -358,6 +360,13 @@ private:
    * the unknown token from csGetLastOffender ().
    */
   void TokenError (const char *Object);
+
+  /**
+   * Print an error about an unknown token. 'object' is the type of object
+   * that was just being parsed, e.g. "a sector". This function will get
+   * the unknown token from 'Token'.
+   */
+  void TokenError (const char *Object, const char* Token);
 
   /// Report any error.
   void ReportError (const char* id, const char* description, ...);

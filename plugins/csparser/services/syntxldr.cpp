@@ -1532,6 +1532,14 @@ bool csTextSyntaxService::ParseVector (iXmlNode* node, csVector3 &v)
   return true;
 }
 
+bool csTextSyntaxService::ParseColor (iXmlNode* node, csColor &c)
+{
+  c.red = node->GetAttributeValueAsFloat ("red");
+  c.green = node->GetAttributeValueAsFloat ("green");
+  c.blue = node->GetAttributeValueAsFloat ("blue");
+  return true;
+}
+
 bool csTextSyntaxService::ParseMixmode (iXmlNode* node, uint &mixmode)
 {
   mixmode = 0;

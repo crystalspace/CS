@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+13-Aug-2002
+	- Implemented XML versions of LoadMap() and LoadSector() in the
+	  main loader.
+	- Added XML version of ParseColor() to syntax services.
+	- Added XML version of ParseStatLight() to the loader.
 12-Aug-2002
 	- Renamed the XML version of ParseTexture() to ParseTextureMapping()
 	  as that more accuratelly reflects what happens (in syntax
