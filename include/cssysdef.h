@@ -642,6 +642,17 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  define CS_GNUC_SCANF( format_idx, arg_idx )
 #endif
 
+// Support for alignment and packing of structures.
+#if !defined(CS_STRUCT_ALIGN_4BYTE_BEGIN)
+#  if defined(__GNUC__) && defined(CS_STRICT_ALIGNMENT)
+#    define CS_STRUCT_ALIGN_4BYTE_BEGIN
+#    define CS_STRUCT_ALIGN_4BYTE_END __attribute__ ((aligned(4)))
+#  else
+#    define CS_STRUCT_ALIGN_4BYTE_BEGIN
+#    define CS_STRUCT_ALIGN_4BYTE_END
+#  endif
+#endif
+
 /// Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
 

@@ -58,6 +58,7 @@
  * An RGB color. This class is used whenever we need just R, G and B
  * information, such as when defining a color palette.
  */
+CS_STRUCT_ALIGN_4BYTE_BEGIN
 struct csRGBcolor
 {
   unsigned char red, green, blue;
@@ -72,7 +73,7 @@ struct csRGBcolor
   { return !operator == (c); }
   csRGBcolor operator + (const csRGBcolor& c) const
   { return csRGBcolor (c.red + red, c.green + green, c.blue + blue); }
-};
+} CS_STRUCT_ALIGN_4BYTE_END;
 
 // As an optimization, we sometimes handle R/G/B values simultaneously.
 #ifdef CS_BIG_ENDIAN
@@ -86,6 +87,7 @@ struct csRGBcolor
  * contains the Alpha channel component, which is used in images
  * (that potentially have an alpha channel).
  */
+CS_STRUCT_ALIGN_4BYTE_BEGIN
 struct csRGBpixel
 {
   /// The red, green, blue and alpha components
@@ -147,7 +149,7 @@ struct csRGBpixel
   }
   void UnsafeAdd(const csRGBcolor&c)
   { *(uint32*)this += *(uint32*)&c; }
-};
+} CS_STRUCT_ALIGN_4BYTE_END;
 
 // We don't need RGB_MASK anymore
 #undef RGB_MASK

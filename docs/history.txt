@@ -23,6 +23,13 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed the -fno-rtti check from djgpp/dosconf.bat
 	  since CS should no longer employ that flag.  (The Unix and Unix-like
 	  ports stopped using it quite some time ago.)
+	- Eric Sunshine added CS_STRUCT_ALIGN_4BYTE_BEGIN and
+	  CS_STRUCT_ALIGN_4BYTE_END to cssysdef.h to support strict packing of
+	  structures.  This is needed on some platforms (such as Sparc) for a
+	  couple structures used by the project.  Augmented csRGBcolor and
+	  csRGBpixel to employ the 4-byte packing macros.  Thanks to Ferris
+	  McCormick <fmccor@inforead.com> for reporting the packing problem
+	  afflicting Sparc.
 12-Oct-2002
 	- Jonathan Tarbox eliminated some MSVC warnings from the opcode plugin.
 11-Oct-2002
