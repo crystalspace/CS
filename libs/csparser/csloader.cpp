@@ -818,7 +818,7 @@ bool csLoader::LoadMap (char* buf)
       // @@@ But it would be better if we could even limit this loop
       // to the sectors that were loaded here.
       iRegion* region = Engine->GetCurrentRegion ();
-      if (!region->IsInRegion (Sector->QueryObject ()))
+      if (region && !region->IsInRegion (Sector->QueryObject ()))
       {
         continue;
       }
