@@ -69,10 +69,10 @@ echo "CXX = ${CXX}"
 echo "int main () {}" >conftest.cpp
 
 # Check for machine-specific C compiler flags
-(echo "$CPU" | grep -q 686 && ${CXX} -c -mpentiumpro -march=i686 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentiumpro -march=i686") || \
-(echo "$CPU" | grep -q [5-6]86 && ${CXX} -c -mpentium -march=i586 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentium -march=i586") || \
-(echo "$CPU" | grep -q [3-9]86 && ${CXX} -c -m486 conftest.cpp && echo "CFLAGS.SYSTEM += -m486") || \
-(echo "$MACHINE" | grep -q alpha && ${CXX} -c -mieee conftest.cpp && echo "CFLAGS.SYSTEM += -mieee")
+(echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mpentiumpro -march=i686 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentiumpro -march=i686") || \
+(echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mpentium -march=i586 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentium -march=i586") || \
+(echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -m486 conftest.cpp && echo "CFLAGS.SYSTEM += -m486") || \
+(echo "$MACHINE" | grep -s alpha >/dev/null && ${CXX} -c -mieee conftest.cpp && echo "CFLAGS.SYSTEM += -mieee")
 
 # Check for GCC-version-specific command-line options
 ${CXX} -c -fno-exceptions conftest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-exceptions"
