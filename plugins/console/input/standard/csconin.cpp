@@ -75,6 +75,8 @@ csConsoleInput::~csConsoleInput ()
     Console->DecRef ();
   }
   if (Callback) Callback->DecRef ();
+
+  delete [] line;
 }
 
 bool csConsoleInput::Initialize (iObjectRegistry *object_reg)
