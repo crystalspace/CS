@@ -82,8 +82,10 @@ private:
   uint8  *buffer, *bufptr;
   uint32 bufferSize;
   
-  csRGBpixel *NewImage;
+  uint8 *NewImage;
   iObjectRegistry* object_reg;
+
+  bool ignoreTimer;
 
   /// stream read callback for libmng
   static mng_bool MNG_DECL cb_readdata(mng_handle hHandle, mng_ptr pBuf,

@@ -25,26 +25,18 @@
 #include "csutil/scf.h"
 #include "cssys/sysfunc.h"
 #include "csgfx/rgbpixel.h"
+#include "csgfx/packrgb.h"
 #include "csutil/databuf.h"
 #include "ivaria/reporter.h"
 
 extern "C"
 {
 #define jpeg_boolean boolean
-/*#if defined (OS_WIN32)
-#if !defined (COMP_GCC) // Avoid defining "boolean" in libjpeg headers
-#  define HAVE_BOOLEAN	// we need int booleans, not Windows unsigned char bools
-#  define boolean int
-#  undef jpeg_boolean 
-#  define jpeg_boolean int
-#endif
-#endif*/
 #define JDCT_DEFAULT JDCT_FLOAT	// use floating-point for decompression
+#define INT32 JPEG_INT32
 #include <jpeglib.h>
 #include <jerror.h>
-#if defined (OS_WIN32)
-#undef boolean
-#endif
+#undef INT32
 }
 
 #if !defined(__CYGWIN__)
@@ -319,8 +311,11 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image,
   switch (Image->GetFormat() & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_PALETTED8:
-      imgRGBA = Image->Clone ();
-      imgRGBA->SetFormat (CS_IMGFMT_TRUECOLOR | (Image->GetFormat() & CS_IMGFMT_ALPHA));
+      //imgRGBA = Image->Clone ();
+      //imgRGBA->SetFormat (CS_IMGFMT_TRUECOLOR | (Image->GetFormat() & CS_IMGFMT_ALPHA));
+      // act like JPEG plugin; reject paletted image so no
+      // unwanted/unnoticed conversions take place.
+      return NULL;
       break;
     case CS_IMGFMT_TRUECOLOR:
       imgRGBA = csRef<iImage>(Image);
@@ -655,13 +650,15 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image,
   jpeg_start_compress (&cinfo, true);
 
   JSAMPROW row_pointer[1];
-  csRGBpixel *image = (csRGBpixel*)imgRGBA->GetImageData ();
+  JSAMPLE *image = (JSAMPLE*)csPackRGBpixelToRGB
+    ((csRGBpixel*)Image->GetImageData (),
+    Image->GetWidth () * Image->GetHeight ());
   row_pointer[0] = (JSAMPLE*)&row[0];
 
   while (cinfo.next_scanline < cinfo.image_height)
   {
-    for (size_t i=0; i < cinfo.image_width; i++)
-      row[i] = image[cinfo.next_scanline * cinfo.image_width + i];
+    row_pointer[0] = 
+      (JSAMPLE*)&image[cinfo.next_scanline * cinfo.image_width * 3];
     jpeg_write_scanlines (&cinfo, row_pointer, 1);
   }
 
@@ -718,7 +715,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, const char *mime,
 //---------------------------------------------------------------------------
 
 /*
- * A small wor don how everything works:
+ * A small word on how everything works:
  * Basically, libmng is made to read & display animated stuff and
  * requires to have some timing stuff set up, thus the getticks and
  * settimer callbacks, although they seem to be a bit weird when loading
@@ -767,7 +764,7 @@ mng_bool ImageJngFile::cb_processheader (mng_handle hHandle,
    
   this_->Width = iWidth;
   this_->Height = iHeight;
-  this_->NewImage = new csRGBpixel [iWidth * iHeight];
+  this_->NewImage = new uint8 [iWidth * iHeight * 4];
 
   return MNG_TRUE;
 }
@@ -778,7 +775,7 @@ mng_ptr ImageJngFile::cb_getcanvasline (mng_handle hHandle, mng_uint32 iLineNr)
 
   this_ = (ImageJngFile *)mng_get_userdata (hHandle);
 
-  return this_->NewImage + (iLineNr * this_->Width);
+  return this_->NewImage + (iLineNr * this_->Width * 4);
 }
 
 mng_bool ImageJngFile::cb_imagerefresh (mng_handle hHandle,
@@ -795,6 +792,10 @@ mng_uint32 ImageJngFile::cb_gettickcount (mng_handle hHandle)
 
 mng_bool ImageJngFile::cb_settimer (mng_handle hHandle, mng_uint32 iMsecs)
 {
+  ImageJngFile *this_ = (ImageJngFile *)mng_get_userdata (hHandle);
+
+  this_->ignoreTimer = iMsecs > 1;
+
   return MNG_TRUE;
 }
 
@@ -804,7 +805,7 @@ bool ImageJngFile::Load (uint8 *iBuffer, uint32 iSize)
   mng_retcode retcode;
 
   const int magicSize = 8;
-  const char magicMNG[] = "\x8aJNG\x0d\x0a\x1a\x0a";
+  const char magicMNG[] = "\x8aMNG\x0d\x0a\x1a\x0a";
   const char magicJNG[] = "\x8bJNG\x0d\x0a\x1a\x0a";
 
   // check for magic JNG/MNG bytes. If not correct, we can skip
@@ -860,12 +861,31 @@ bool ImageJngFile::Load (uint8 *iBuffer, uint32 iSize)
     return false;
   }
 
-  mng_display (handle);
+  // Even on still images, libmng issues timer requests.
+  // so, as long as the requests are 'immediate' we continue
+  // displaying. If a delay is requested we end loading.
+  ignoreTimer = false;
+  retcode = mng_display (handle);
+  while ((retcode == MNG_NEEDTIMERWAIT) && !ignoreTimer)
+  {
+    retcode = mng_display_resume (handle);
+  }
+  if ((retcode != MNG_NOERROR) && (retcode != MNG_NEEDTIMERWAIT))
+  {
+    ReportLibmngError (object_reg, handle, "failed to display data");
+    mng_cleanup (&handle);
+    return false;
+  }
 
   if (NewImage)
-    convert_rgba (NewImage);
+  {
+    csRGBpixel *rgbImage = csCopyUnpackRGBAtoRGBpixel (NewImage, Width*Height);
+    delete[] NewImage;
+    convert_rgba (rgbImage);
+    CheckAlpha();
+  }
 
   mng_cleanup (&handle);
 
-  return NewImage;
+  return true;
 }

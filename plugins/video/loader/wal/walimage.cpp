@@ -33,6 +33,8 @@
 
 #include "cssysdef.h"
 #include "cssys/csendian.h"
+#include "csgfx/packrgb.h"
+
 #include "walimage.h"
 #include "walpal.h"
 
@@ -146,7 +148,9 @@ bool ImageWALFile::Load (uint8* iBuffer, uint32 iSize)
   uint8 *buffer = new uint8 [Width * Height];
 
   memcpy (buffer, iBuffer + head.offsets[0], Width * Height);
-  convert_pal8 (buffer, (csRGBcolor *)&WALpalette);
+  const csRGBcolor *WALpal = csUnpackRGBtoRGBcolor (WALpalette, 256);
+  convert_pal8 (buffer, WALpal);
+  csDiscardUnpackedRGBcolor (WALpal);
 
   return true;
 }

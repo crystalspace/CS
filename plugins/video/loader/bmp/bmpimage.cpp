@@ -208,7 +208,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   // alpha channel?
   bool hasAlpha = format & CS_IMGFMT_ALPHA;
   // number of bytes per pixel in truecolor mode
-  int bytesPerPixel = hasAlpha?4:3;
+  int bytesPerPixel = palette?1:(hasAlpha?4:3);
 
   if (palette && !Image->GetPalette ())
     return NULL;
@@ -216,7 +216,9 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   // calc size
   int w = Image->GetWidth ();
   int h = Image->GetHeight ();
-  size_t len = sizeof (bmpHeader)-2 + w*h*(palette?1:bytesPerPixel) + 256*(palette?4:0);
+  // BMPs need 4-byte alignment.
+  int pad = (4 - (w * bytesPerPixel) & 0x3) & 0x3;
+  size_t len = sizeof (bmpHeader)-2 + h*(w*bytesPerPixel+pad) + 256*(palette?4:0);
   bmpHeader hdr;
   hdr.bfTypeLo = 'B';
   hdr.bfTypeHi = 'M';
@@ -228,14 +230,13 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   hdr.biWidth = little_endian_long (w);
   hdr.biHeight = little_endian_long (h);
   hdr.biPlanes = little_endian_short (1);
-  hdr.biBitCount = little_endian_short ((palette?1:bytesPerPixel)*8);
+  hdr.biBitCount = little_endian_short (bytesPerPixel*8);
   hdr.biCompression = little_endian_long (0);
   hdr.biSizeImage = little_endian_long (0);
   hdr.biXPelsPerMeter = little_endian_long (0);
   hdr.biYPelsPerMeter = little_endian_long (0);
   hdr.biClrUsed = little_endian_long (0);
   hdr.biClrImportant = little_endian_long (0);
-
 
   csDataBuffer *db = new csDataBuffer (len);
   unsigned char *p = (unsigned char *)db->GetData ();
@@ -257,8 +258,11 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 
     unsigned char *data = (unsigned char *)Image->GetImageData ();
     for (y=h-1; y >= 0; y--)
+    {
       for (x=0; x < w; x++)
 	*p++ = data[y*w+x];
+      p += pad;
+    }
   }
   else
   {
@@ -274,6 +278,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 	if (hasAlpha) *p++ = line->alpha;
 	line++;
       }
+      p += pad;
     }
   }
 
@@ -310,7 +315,51 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
   int  buffer_y = Width * (Height - 1);
   bool blip     = false;
 
-  if (BITCOUNT(iBuffer) == _256Color)
+  if (BITCOUNT(iBuffer) == _16Color)
+  {
+    uint8    *buffer  = new uint8 [bmp_size];
+    csRGBpixel *palette = new csRGBpixel [16];
+    csRGBpixel *pwork   = palette;
+    uint8    *inpal   = BIPALETTE(iBuffer);
+    int scanlinewidth = 4 * ((Width+6) / 8);
+    int color;
+    for (color = 0; color < 16; color++, pwork++)
+    {
+      // Whacky BMP palette is in BGR order.
+      pwork->blue  = *inpal++;
+      pwork->green = *inpal++;
+      pwork->red   = *inpal++;
+      inpal++; // Skip unused byte.
+    }
+
+    if (BICOMP(iBuffer) == BI_RGB)
+    {
+      // Read the pixels from "top" to "bottom"
+      while (iPtr < iBuffer + iSize && buffer_y >= 0)
+      {
+	uint8 *bufptr = buffer + buffer_y;
+	for (int x = 0; x < Width; x++)
+	{
+	  if (x & 0x1)
+	  {
+	    *bufptr++ = (*(iPtr + (x >> 1))) & 0xf;
+	  }
+	  else
+	  {
+	    *bufptr++ = (*(iPtr + (x >> 1))) >> 4;
+	  }
+	}
+        iPtr += scanlinewidth;
+        buffer_y -= Width;
+      } /* endwhile */
+    }
+    else
+      return false;
+
+    convert_pal8 (buffer, palette, 16);
+    return true;
+  }
+  else if (BITCOUNT(iBuffer) == _256Color)
   {
     uint8    *buffer  = new uint8 [bmp_size];
     csRGBpixel *palette = new csRGBpixel [256];
@@ -399,6 +448,8 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
     csRGBpixel *buffer = new csRGBpixel [bmp_size];
 
     int x;
+    // BMPs need 4-byte alignment.
+    int pad = (4 - (Width*3) & 0x3) & 0x3;
 
     while (iPtr < iBuffer + iSize && buffer_y >= 0)
     {
@@ -410,6 +461,8 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, uint32 iSize)
         d->red     = *iPtr++;
         d++;
       } /* endfor */
+
+      iPtr += pad;
 
       buffer_y -= Width;
     }

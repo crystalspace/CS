@@ -34,6 +34,7 @@
 #include "cssysdef.h"
 #include "tgaimage.h"
 #include "csgfx/rgbpixel.h"
+#include "csgfx/packrgb.h"
 #include "csutil/databuf.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -67,10 +68,10 @@ struct TGAheader
   unsigned char Width_lo, Width_hi;	/* width of image */
   unsigned char Height_lo, Height_hi;	/* height of image */
   unsigned char PixelSize;		/* pixel size (8,16,24,32) */
-  unsigned char AttBits;		/* 4 bits, number of attribute bits per pixel */
-  unsigned char Rsrvd;			/* 1 bit, reserved */
-  unsigned char OrgBit;			/* 1 bit, origin: 0=lower left, 1=upper left */
-  unsigned char IntrLve;		/* 2 bits, interleaving flag */
+  unsigned char AttBits : 4;		/* 4 bits, number of attribute bits per pixel */
+  unsigned char Rsrvd : 1;		/* 1 bit, reserved */
+  unsigned char OrgBit : 1;		/* 1 bit, origin: 0=lower left, 1=upper left */
+  unsigned char IntrLve : 2;		/* 2 bits, interleaving flag */
 };
 
 typedef char ImageIDField[256];
@@ -177,8 +178,9 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   TGAheader hdr;
   int w = Image->GetWidth ();
   int h = Image->GetHeight ();
+  bool has_alpha = Image->GetFormat() & CS_IMGFMT_ALPHA;
 
-  hdr.IDLength  = strlen (CSTGA_ID);
+  hdr.IDLength  = 0;//strlen (CSTGA_ID);
   hdr.CoMapType = (palette ? 1 : 0);
   hdr.ImgType = (palette ? TGA_Map : TGA_RGB);
   hdr.Index_lo = hdr.Index_hi = 0;
@@ -191,7 +193,7 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   hdr.Width_hi = (w/256);
   hdr.Height_lo = h%256;
   hdr.Height_hi = h/256;
-  hdr.PixelSize = (palette ? 8 : 24);
+  hdr.PixelSize = (palette ? 8 : (has_alpha?32:24));
   hdr.AttBits = 0;
   hdr.Rsrvd = 0;
   hdr.OrgBit = 0;
@@ -216,9 +218,9 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
     csRGBpixel *pal = Image->GetPalette ();
     for (i= 0; i < 256; i++)
     {
-      csRGBcolor color = pal[i];
-      memcpy (p, &color, sizeof (csRGBcolor));
-      p += sizeof (csRGBcolor);
+      *(p++) = pal[i].blue;
+      *(p++) = pal[i].green;
+      *(p++) = pal[i].red;
     }
 
     unsigned char *data = (unsigned char *)Image->GetImageData ();
@@ -230,13 +232,17 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   {
     csRGBpixel *pixel = (csRGBpixel *)Image->GetImageData ();
     for (y=h-1; y >= 0; y--)
+    {
+      csRGBpixel *c = &pixel[y*w];
       for (x=0; x < w; x++)
       {
-	unsigned char *c = (unsigned char *)&pixel[y*w+x];
-	*p++ = *(c+2);
-	*p++ = *(c+1);
-	*p++ = *c;
+	*p++ = c->blue;
+	*p++ = c->green;
+	*p++ = c->red;
+	if (has_alpha) *p++ = c->alpha;
+	c++;
       }
+    }
   }
 
   return csPtr<iDataBuffer> (db);

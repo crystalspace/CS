@@ -84,6 +84,7 @@ static struct
   float hmscale;
   bool info;
   bool stripalpha;
+  bool addalpha;
   int sharpen;
 } opt =
 {
@@ -126,6 +127,7 @@ static int display_help ()
   printf ("  -8   --paletted      Convert image to 8 bits-per-pixel paletted format\n");
   printf ("  -c   --truecolor     Convert image to truecolor format\n");
   printf ("  -a   --strip-alpha   Remove alpha channel, if present\n");
+  printf ("  -A   --add-alpha     Add alpha channel, if not present\n");
   printf ("  -p   --sharpen=#     Sharpen the image, strength #\n");
   printf ("------------------ Output options (-S, -D, -H are exclusive):  -----------------\n");
   printf ("  -S   --save[=#]      Output an image (default)\n");
@@ -197,7 +199,7 @@ static bool output_picture (const char *fname, const char *suffix, iImage *ifile
   if (suffix_name[0])
   {
     strcat (eol, suffix_name);
-  }
+  }		 
 
   printf ("Saving output file %s\n", outname);
 
@@ -457,6 +459,57 @@ static bool process_file (const char *fname)
     }
   }
 
+  if (opt.addalpha)
+  {
+    int format = ifile->GetFormat ();
+    if (!(format & CS_IMGFMT_ALPHA))
+    {
+      printf ("Adding alpha channel from image\n");
+      ifile->SetFormat (format | CS_IMGFMT_ALPHA);
+
+      // merge keycolor into alpha
+      if (ifile->HasKeycolor())
+      {
+	int pixels = ifile->GetWidth() * ifile->GetHeight();
+
+	int key_r, key_g, key_b;
+	ifile->GetKeycolor (key_r, key_g, key_b);
+	csRGBcolor key (key_r, key_g, key_b);
+
+	int i;
+	switch (format & CS_IMGFMT_MASK)
+	{
+	case CS_IMGFMT_PALETTED8:
+	  {
+	    uint8 *data = (uint8*)ifile->GetImageData();
+	    csRGBpixel *pal = ifile->GetPalette();
+	    uint8 *alphamap = (uint8*)ifile->GetAlpha();
+	    for (i = 0; i < pixels; i++)
+	    {
+	      if (pal[data[i]] == key)
+	      {
+		alphamap[i] = 0;
+	      }
+	    }
+	  }
+	  break;
+	case CS_IMGFMT_TRUECOLOR:
+	  {
+	    csRGBpixel *data = (csRGBpixel*)ifile->GetImageData();
+	    for (i = 0; i < pixels; i++)
+	    {
+	      if (data[i] == key)
+	      {
+		data[i].alpha = 0;
+	      }
+	    }
+	  }
+	  break;
+	}
+      }
+    }
+  }
+
   if (opt.sharpen)
   {
     printf ("Sharpening image with strength %d\n", opt.sharpen);
@@ -492,7 +545,7 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cdas:m:t:p:D:S::M:O:P:U::H::IhvVF", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cdaAs:m:t:p:D:S::M:O:P:U::H::IhvVF", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
@@ -509,6 +562,9 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
         break;
       case 'a':
         opt.stripalpha = true;
+        break;
+      case 'A':
+        opt.addalpha = true;
         break;
       case 'P':
 	if (optarg && sscanf (optarg, "%s", prefix_name) != 1)

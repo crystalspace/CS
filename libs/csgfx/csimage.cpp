@@ -448,7 +448,9 @@ void csImageFile::CheckAlpha ()
   if (noalpha)
   {
     if (Alpha)
-    { delete [] Alpha; Alpha = NULL; }
+    { 
+      delete [] Alpha; Alpha = NULL; 
+    }
     Format &= ~CS_IMGFMT_ALPHA;
   }
 }
@@ -503,9 +505,20 @@ void csImageFile::convert_rgba (csRGBpixel *iImage)
 }
 
 void csImageFile::convert_pal8 (uint8 *iImage, csRGBpixel *iPalette,
-  int /*nPalColors*/)
+  int nPalColors)
 {
   int pixels = Width * Height;
+
+  // ensure the palette has at least 256 entries.
+  if (nPalColors < 256)
+  {
+    csRGBpixel *newPal = new csRGBpixel [256];
+    memcpy ((void*)newPal, (const void*)iPalette, 
+      nPalColors * sizeof(csRGBpixel));
+    delete[] iPalette;
+    iPalette = newPal;
+  }
+
 
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
     Format = (Format & ~CS_IMGFMT_MASK) | CS_IMGFMT_PALETTED8;
@@ -554,7 +567,8 @@ void csImageFile::convert_pal8 (uint8 *iImage, csRGBpixel *iPalette,
     Format &= ~CS_IMGFMT_ALPHA;
 }
 
-void csImageFile::convert_pal8 (uint8 *iImage, csRGBcolor *iPalette, int nPalColors)
+void csImageFile::convert_pal8 (uint8 *iImage, const csRGBcolor *iPalette, 
+  int nPalColors)
 {
   csRGBpixel *newpal = new csRGBpixel [256];
   int i;
@@ -576,7 +590,10 @@ void csImageFile::SetFormat (int iFormat)
   else if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
   {
     if ((Format & CS_IMGFMT_ALPHA) && !Alpha)
+    {
       Alpha = new uint8 [pixels];
+      memset ((void*)Alpha, 0xff, pixels);
+    }
     convert_pal8 ((uint8 *)oldimage, Palette);
   }
   else if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_NONE)
