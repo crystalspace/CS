@@ -15,7 +15,9 @@ ifeq ($(X11.AVAILABLE),yes)
   # Shared Memory Plugin
   PLUGINS += video/canvas/xextshm
   # Video Modes Plugin
+  ifeq ($(USE_XFREE86VM),yes)
   PLUGINS += video/canvas/xextf86vm
+  endif
 
   ifeq ($(GL.AVAILABLE),yes)
     PLUGINS += video/canvas/openglx
