@@ -15,6 +15,13 @@ The history order has been reversed so that new features are at the top.
 	  logically.
 	- Andrew Zabolotny fixed the Software renderer makefile that
 	  Paul broke a little.
+	- Eric Sunshine fixed a bug in iNetCmd.  The Push() method was not
+	  declared abstract.
+	- Eric Sunshine added a very ugly patch to the csnsmgr makefile to
+	  allow it to link.  For some reason, this plugin is including files
+	  from the nstp plugin and uses its classes directly instead of
+	  going through the SCF interface.
+	- Eric Sunshine fixed a bug in the 'depend' target of for BeOS OpenGL.
 11-May-2000
 	- Changes from Michael Dale Long:
 	    - Added a CHK_DECREF() macro to cctest.h that checks if an
