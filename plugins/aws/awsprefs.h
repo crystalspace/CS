@@ -142,7 +142,10 @@ public:
 
   /// Looks up a key based on it's ID.
   awsKey *Find(unsigned long id);
-
+    
+  csDLinkList &Children()
+  { return children; }
+ 
   /// Adds an item to the container
   void Add(awsKey *key) 
   { children.AddItem(key); }
@@ -187,12 +190,24 @@ class awsComponentNode : public awsKey, awsKeyContainer
   iString *comp_type;
 
 public:  
-    awsComponentNode(iString *name, iString *component_type):awsKey(name), comp_type(component_type) {};
-    virtual ~awsComponentNode() {};
+  awsComponentNode(iString *name, iString *component_type):awsKey(name), comp_type(component_type) {};
+  virtual ~awsComponentNode() {};
     
-    /// So that we know this is a skin node
-    virtual unsigned char Type() 
-    { return KEY_COMPONENT; }
+  /// So that we know this is a component node
+  virtual unsigned char Type() 
+  { return KEY_COMPONENT; }
+    
+  /// So that we can find out what sort of component type this should be
+  iString *ComponentTypeName()
+  { return comp_type; }
+    
+  /// Exposes csDLinkList GetFirst for iteration initiation
+  awsKey *GetFirst()
+  { return (awsKey *)Children().GetFirstItem(); }
+  
+  /// Exposes csDLinkList GetNext for continuing iteration
+  awsKey *GetNext()
+  { return (awsKey *)Children().GetNextItem();  }
 };
 
 //////////////////////////////////  Preference Manager ////////////////////////////////////////////////////////////////
@@ -255,6 +270,9 @@ public:
 
     /// Get the value of an integer from a given component node
     virtual bool GetString(awsComponentNode *node, char *name, iString *&val);
+    
+    /// Find window definition and return the component node holding it, Null otherwise
+    virtual awsComponentNode *FindWindowDef(char *name);
 
 public:
     /// Called by internal code to add a parsed out tree of window components.

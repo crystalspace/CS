@@ -24,7 +24,7 @@ awsManager::Initialize(iSystem *sys)
 iAwsPrefs *
 awsManager::GetPrefMgr()
 {
-   return prefmgr;
+  return prefmgr;
 }
  
 void
@@ -33,13 +33,13 @@ awsManager::SetPrefMgr(iAwsPrefs *pmgr)
    if (prefmgr && pmgr)
    {
       prefmgr->DecRef();
+      pmgr->IncRef();
       prefmgr=pmgr;
-      prefmgr->IncRef();
    }
    else if (pmgr)
    {
+      pmgr->IncRef();
       prefmgr=pmgr;
-      prefmgr->IncRef();
    }
 }
 
@@ -55,6 +55,25 @@ awsManager::RegisterComponentFactory(awsComponentFactory *factory, char *name)
 
 
    component_factories.AddItem(cfm);
+}
+
+awsComponentFactory *
+awsManager::FindComponentFactory(char *name)
+{
+  void *p = component_factories.GetFirstItem();
+  unsigned long id = prefmgr->NameToId(name);
+  
+  while(p)
+  {
+    awsComponentFactoryMap *cfm = (awsComponentFactoryMap *)p;
+    
+    if (cfm->id == id)
+      return cfm->factory;
+      
+    p = component_factories.GetNextItem();
+  }
+  
+  return NULL;
 }
 
 awsWindow *
@@ -228,6 +247,64 @@ awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
    }
 
 }
+
+awsWindow *
+awsManager::CreateWindowFrom(char *defname)
+{
+   // Find the window definition
+   awsComponentNode *winnode = GetPrefMgr()->FindWindowDef(defname);
+   
+   // If we couldn't find it, abort
+   if (winnode==NULL) return NULL;
+   
+   // Create a new window
+   awsWindow *win = new awsWindow();
+   
+   // Tell the window to set itself up
+   win->Setup(this, winnode);
+   
+   /* Now recurse through all of the child nodes, creating them and setting them
+   up.  Nodes are created via their factory functions.  If a factory cannot be 
+   found, then that node and all of it's children are ignored. */
+   
+   CreateChildrenFromDef(this, win, winnode);
+     
+   return win;
+}
+
+void
+awsManager::CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponentNode *settings)
+{
+  awsKey *key = settings->GetFirst();
+   
+  while(key)
+  {
+    if (key->Type() == KEY_COMPONENT)
+    {
+      awsComponentNode *comp_node = (awsComponentNode *)key;
+      awsComponentFactory *factory = FindComponentFactory(comp_node->ComponentTypeName()->GetData());
+      
+      // If we have a factory for this component, then create it and set it up.
+      if (factory)
+      {
+	awsComponent *comp = factory->Create();
+		
+	// Prepare the component, and add it into it's parent
+	comp->Setup(wmgr, comp_node);
+	parent->AddChild(comp);
+	
+	// Process all subcomponents of this component.
+	CreateChildrenFromDef(wmgr, comp, comp_node);
+      }
+      
+    }
+   
+   key = settings->GetNext();
+  }
+  
+  
+}
+
 
  //// Canvas stuff  //////////////////////////////////////////////////////////////////////////////////
 

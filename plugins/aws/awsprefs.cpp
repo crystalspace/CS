@@ -212,6 +212,27 @@ awsPrefManager::GetString(awsComponentNode *node, char *name, iString *&val)
   return false;
 }
 
+awsComponentNode *
+awsPrefManager::FindWindowDef(char *name)
+{
+  void *p = win_defs.GetFirstItem();
+  unsigned long id = NameToId(name);
+  
+  while(p)
+  {
+    awsComponentNode *win = (awsComponentNode *)p;
+    
+    if (win->Name() == id)
+      return win;
+    else
+      p=win_defs.GetNextItem();
+    
+  }
+  
+  return NULL;
+ 
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* adler32.c -- compute the Adler-32 checksum of a data stream

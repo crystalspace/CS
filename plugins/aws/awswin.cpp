@@ -8,6 +8,10 @@ const unsigned long awsWindow::sWindowHidden  = 0x4;
 const unsigned long awsWindow::sWindowClosed  = 0x5;
 
 
+SCF_IMPLEMENT_IBASE(awsWindow)
+  SCF_IMPLEMENTS_INTERFACE(awsComponent)
+SCF_IMPLEMENT_IBASE_END
+
 void 
 awsWindow::SetRedrawTag(unsigned int tag)
 {

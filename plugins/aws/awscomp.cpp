@@ -3,6 +3,7 @@
 #include "awscomp.h"
 #include "awsslot.h"
 
+
 awsComponent::awsComponent():children(NULL)
 {
 }
@@ -94,6 +95,9 @@ awsComponent::AddChild(awsComponent *child, bool owner=true)
      children = new csDLinkList();
    
    children->AddItem(child);
+   
+   // Modify the child's rectangle to be inside and relative to the parent's rectangle.
+   child->frame.Move(frame.xmin, frame.ymin);
 }
 
 void 

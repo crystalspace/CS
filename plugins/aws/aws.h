@@ -26,7 +26,7 @@
 #include "awscomp.h"
 #include "awswin.h"
 
-const int awsNumRectBuckets = 16;
+const int awsNumRectBuckets = 32;
 
 /**
  *
@@ -125,6 +125,9 @@ public:
 
     /// Register a component factory
     virtual void       RegisterComponentFactory(awsComponentFactory *factory, char *name);
+    
+    /// Find a component factory
+    virtual awsComponentFactory *FindComponentFactory(char *name);
 
     /// Get the top window
     virtual awsWindow *GetTopWindow();
@@ -142,11 +145,18 @@ public:
     virtual void       Mark(csRect &rect);
 
 protected:
-     /// Redraws a window only if it has areas in the dirtyarea
-    void          RedrawWindow(awsWindow *win, csRect &dirtyarea);
+    /// Redraws a window only if it has areas in the dirtyarea
+    void RedrawWindow(awsWindow *win, csRect &dirtyarea);
                 
-    ///  Redraws all children recursively, but only if they have an part in dirty area
-    void          RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea);
+    /// Redraws all children recursively, but only if they have an part in dirty area
+    void RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea);
+    
+    /// Recursively creates child components and adds them into a parent.  Used internally.
+    void CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponentNode *settings);
+    
+public:
+    /// Instantiates a window based on a window definition.
+    awsWindow *CreateWindowFrom(char *defname);
 
 public:
     /// Set the contexts however you want

@@ -62,6 +62,8 @@ public:
    static const unsigned long sWindowShown;
    static const unsigned long sWindowClosed;
    
+   SCF_DECLARE_IBASE;
+   
    /// This is a component of type window
    virtual char *Type()
    {

@@ -25,6 +25,8 @@
 
 class awsCanvas;
 
+SCF_VERSION (awsComponent, 0, 0, 1);
+
 /** ************************************************************************************************************************
 *   The general idea for a component's initialization stage is like this:                                                 *
 *       1. construction - any internal structures should be created and intialized.                                       *
@@ -65,6 +67,7 @@ class awsComponent : public awsSigSrc
 public:
     awsComponent();
     virtual ~awsComponent();
+        
     
 public:
     /**
