@@ -26,6 +26,7 @@
 #include "csutil/util.h"
 #include "csutil/parray.h"
 #include "csutil/cfgacc.h"
+#include "csutil/weakref.h"
 #include "iutil/plugin.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
@@ -102,7 +103,7 @@ class csShadow;
 #define DEBUGCMD_FOVANGLE	1020	// Set fov in angles
 #define DEBUGCMD_TERRVIS	1021	// Enable/disable terrain visibility
 #define DEBUGCMD_MESHBBOX	1022	// Show BBOX of selected mesh
-#define DEBUGCMD_MESHRAD	1023	// How RADIUS of selected mesh
+#define DEBUGCMD_MESHRAD	1023	// SHow RADIUS of selected mesh
 #define DEBUGCMD_DEBUGGRAPH	1024	// Do a dump of the debug graph
 #define DEBUGCMD_ENGINECMD	1025	// General engine DebugCommand() (arg)
 #define DEBUGCMD_ENGINESTATE	1026	// Test engine state.
@@ -130,6 +131,19 @@ class csShadow;
 #define DEBUGCMD_MEMORYDUMP   	1048	// Memory dump
 #define DEBUGCMD_UNPREPARE   	1049	// Unprepare all things
 #define DEBUGCMD_COLORSECTORS  	1050	// Give all sectors a different color
+#define DEBUGCMD_SWITCHCULLER  	1051	// Switch to culler
+#define DEBUGCMD_SELECTMESH  	1052	// Select a mesh by name
+#define DEBUGCMD_MESHCDMESH	1053	// Show CD polymesh of selected mesh
+#define DEBUGCMD_MESHVISMESH	1054	// Show viscul polymesh of selected mesh
+#define DEBUGCMD_MESHSHADMESH	1055	// Show shadow polymesh of selected mesh
+#define DEBUGCMD_MESHBASEMESH	1056	// Show base polymesh of selected mesh
+
+// For showing of polygon meshes.
+#define BUGPLUG_POLYMESH_NO	0
+#define BUGPLUG_POLYMESH_CD	1
+#define BUGPLUG_POLYMESH_VIS	2
+#define BUGPLUG_POLYMESH_SHAD	3
+#define BUGPLUG_POLYMESH_BASE	4
 
 /**
  * For key mappings.
@@ -200,6 +214,9 @@ private:
   // If true the counters are frozen but still displayed.
   bool counter_freeze;
 
+  // Show polygon mesh for current selected mesh.
+  int show_polymesh;
+
   // For fps
   bool do_fps;
   int fps_frame_count;
@@ -232,9 +249,9 @@ private:
   void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
 
   // The selected mesh.
-  iMeshWrapper* selected_mesh;
+  csWeakRef<iMeshWrapper> selected_mesh;
   // Previous selected mesh (after DEBUGCMD_HIDESELECTED).
-  iMeshWrapper* prev_selected_mesh;
+  csWeakRef<iMeshWrapper> prev_selected_mesh;
   int mesh_num_sectors;
   iSector* mesh_sectors[10];
 
@@ -252,10 +269,12 @@ private:
   int spider_timeout;
   // Command to execute when spider found a camera.
   int spider_command;
+  // Arguments for spider command.
+  char* spider_args;
   // Mouse x and y for the command (if a selection command).
   int mouse_x, mouse_y;
   // Send the Spider on a hunt.
-  void UnleashSpider (int cmd);
+  void UnleashSpider (int cmd, const char* args = 0);
   /*
    * The Spider has done its job. Send him back to his hiding place.
    * Also perform the Spider command on the camera we found (only if
@@ -276,7 +295,7 @@ private:
   void CaptureScreen ();
 
   /// Current visibility culler we are monitoring.
-  iVisibilityCuller* visculler;
+  csWeakRef<iVisibilityCuller> visculler;
 
   /// The Debug Sector.
   struct
@@ -309,6 +328,10 @@ private:
   void VisculView (iCamera* camera);
   /// Call viscull command.
   void VisculCmd (const char* cmd);
+  /// Switch culler for current sector.
+  void SwitchCuller (iSector* sector, const char* culler);
+  /// Select the named mesh if possible.
+  void SelectMesh (iSector* sector, const char* meshname);
 
   //------------------------------------------------------------------
 

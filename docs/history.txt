@@ -6,6 +6,23 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Jun-2004
+	- Jorrit added a new bugplug command to switch visibility culler of
+	  the current sector. ctrl-shift-1 is assigned to switch to frustvis
+	  and ctrl-shift-2 is assigned to switch to dynavis.
+	- Jorrit added a new bugplug command to select a mesh by name.
+	  Assigned to ctrl-alt-m.
+	- Jorrit changed bugplug to use a weak reference to point to the
+	  currently selected mesh. That avoids a crash at exit when
+	  selecting meshes.
+	- Jorrit also changed bugplug to use a weak reference for the
+	  visibility culler.
+	- Jorrit fixed bounding box and bounding radius drawing for bugplug
+	  with the new renderer.
+	- Jorrit added four new commands to bugplug to display the base,
+	  colldet, viscull, or shadow polygon mesh for the selected mesh.
+	  Commands are assigned to ctrl-alt-c, ctrl-alt-v, ctrl-alt-s,
+	  or ctrl-alt-b.
 25-Jun-2004
 	- res removed a small but unnecessary condition statement from
 	  particles.cpp.

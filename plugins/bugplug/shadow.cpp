@@ -44,8 +44,6 @@ csShadow::csShadow ()
   shadow_mesh = 0;
   do_bbox = true;
   do_rad = true;
-  do_beam = true;
-  beam[0] = beam[1] = isec = csVector3();
   logparent = 0;
 }
 
@@ -77,68 +75,16 @@ bool csShadow::DrawTest (iRenderView* rview, iMovable*, uint32)
 bool csShadow::Draw (iRenderView* rview, iMovable*, csZBufMode)
 {
   if (!shadow_mesh) return false;
-  iMovable* shadow_movable = shadow_mesh->GetMovable ();
-
-  iGraphics3D* G3D = rview->GetGraphics3D ();
-  G3D->BeginDraw (CSDRAW_2DGRAPHICS);
-
-  csTransform tr_w2c = rview->GetCamera ()->GetTransform ();
-  csReversibleTransform tr_o2c = tr_w2c / shadow_movable->GetFullTransform ();
-  float fov = G3D->GetPerspectiveAspect ();
-  if (do_bbox)
-  {
-    int bbox_color = G3D->GetDriver2D ()->FindRGB (0, 255, 255);
-    csBox3 bbox;
-    shadow_mesh->GetMeshObject ()->GetObjectModel ()->
-    	GetObjectBoundingBox (bbox);
-    csVector3 vxyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyz);
-    csVector3 vXyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_Xyz);
-    csVector3 vxYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYz);
-    csVector3 vxyZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyZ);
-    csVector3 vXYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XYz);
-    csVector3 vXyZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XyZ);
-    csVector3 vxYZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYZ);
-    csVector3 vXYZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XYZ);
-    G3D->DrawLine (vxyz, vXyz, fov, bbox_color);
-    G3D->DrawLine (vXyz, vXYz, fov, bbox_color);
-    G3D->DrawLine (vXYz, vxYz, fov, bbox_color);
-    G3D->DrawLine (vxYz, vxyz, fov, bbox_color);
-    G3D->DrawLine (vxyZ, vXyZ, fov, bbox_color);
-    G3D->DrawLine (vXyZ, vXYZ, fov, bbox_color);
-    G3D->DrawLine (vXYZ, vxYZ, fov, bbox_color);
-    G3D->DrawLine (vxYZ, vxyZ, fov, bbox_color);
-    G3D->DrawLine (vxyz, vxyZ, fov, bbox_color);
-    G3D->DrawLine (vxYz, vxYZ, fov, bbox_color);
-    G3D->DrawLine (vXyz, vXyZ, fov, bbox_color);
-    G3D->DrawLine (vXYz, vXYZ, fov, bbox_color);
-  }
-  if (do_rad)
-  {
-    int rad_color = G3D->GetDriver2D ()->FindRGB (0, 255, 0);
-    csVector3 radius, r, center;
-    shadow_mesh->GetMeshObject ()->GetObjectModel ()->GetRadius (radius,center);
-    csVector3 trans_o = tr_o2c * center;
-    r.Set (radius.x, 0, 0);
-    G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
-    r.Set (0, radius.y, 0);
-    G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
-    r.Set (0, 0, radius.z);
-    G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
-  }
-  if (do_beam)
-  {
-    iGraphics2D* G2D = G3D->GetDriver2D ();
-    int beam_color = G2D->FindRGB (0, 255, 0);
-    int isec_color = G2D->FindRGB (255, 255, 0);
-    int isec2_color = G2D->FindRGB (255, 0, 0);
-    csVector3 st = tr_w2c * beam[0], fin = tr_w2c * beam[1],
-	  isc = tr_w2c * isec;
-    G3D->DrawLine (st, isc, fov, isec_color);
-    G3D->DrawLine (st, fin, fov, beam_color);
-    G3D->DrawLine (isc, fin, fov, isec2_color);
-  }
-  G3D->BeginDraw (CSDRAW_3DGRAPHICS);
+  keep_camera = rview->GetOriginalCamera ();
   return true;
+}
+
+csRenderMesh** csShadow::GetRenderMeshes (int& n, iRenderView* rview,
+    iMovable*, uint32)
+{
+  keep_camera = rview->GetOriginalCamera ();
+  n = 0;
+  return 0;
 }
 
 void csShadow::SetShadowMesh (iMeshWrapper* sh)

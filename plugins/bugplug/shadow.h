@@ -25,6 +25,7 @@
 
 struct iEngine;
 struct iMeshWrapper;
+struct iCamera;
 
 /**
  * BugPlug is the hiding place for many dark creatures. While Spider only
@@ -50,15 +51,23 @@ private:
   iMeshWrapper* shadow_mesh;
   bool do_bbox;	// Show bounding box.
   bool do_rad;	// Show bounding sphere.
-  bool do_beam; // Show the intersection beam.
-  csVector3 beam[2];
-  csVector3 isec;
   csFlags flags;
+  iCamera* keep_camera;
 
 public:
 
   csShadow ();
   virtual ~csShadow ();
+
+  /**
+   * Get renderview found when rendering the shadow mesh.
+   */
+  iCamera* GetCamera () const { return keep_camera; }
+
+  /**
+   * Clear renderview.
+   */
+  void ClearCamera () { keep_camera = 0; }
 
   /**
    * Add Shadow to the engine.
@@ -78,28 +87,19 @@ public:
   /**
    * Set what we are showing.
    */
-  void SetShowOptions (bool bbox, bool rad, bool beam)
+  void SetShowOptions (bool bbox, bool rad)
   {
     do_bbox = bbox;
     do_rad = rad;
-    do_beam = beam;
   }
 
   /**
    * Get what we are showing.
    */
-  void GetShowOptions (bool& bbox, bool& rad, bool& beam) const
+  void GetShowOptions (bool& bbox, bool& rad) const
   {
     bbox = do_bbox;
     rad = do_rad;
-    beam = do_beam;
-  }
-
-  void SetBeam (csVector3& start, csVector3& finish, csVector3& intersect)
-  {
-    beam[0] = start;
-    beam[1] = finish;
-    isec = intersect;
   }
 
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
@@ -122,7 +122,7 @@ public:
   virtual bool DrawTest (iRenderView* rview, iMovable* movable, uint32);
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode);
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
-    iMovable* movable, uint32) { n = 0; return 0; }
+    iMovable* movable, uint32);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return 0; }
   virtual void NextFrame (csTicks, const csVector3& /*pos*/) { }

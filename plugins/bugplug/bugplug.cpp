@@ -69,6 +69,7 @@
 #include "iengine/light.h"
 #include "iengine/region.h"
 #include "iengine/material.h"
+#include "iengine/rview.h"
 #include "cstool/csview.h"
 #include "qint.h"
 
@@ -121,6 +122,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   selected_mesh = 0;
   shadow->SetShadowMesh (selected_mesh);
   spider_hunting = false;
+  spider_args = 0;
   prev_selected_mesh = 0;
   scfiEventHandler = 0;
 
@@ -130,6 +132,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   fps_cur = -1;
   counter_frames = 0;
   counter_freeze = false;
+  show_polymesh = BUGPLUG_POLYMESH_NO;
 
   debug_sector.sector = 0;
   debug_sector.view = 0;
@@ -159,7 +162,6 @@ csBugPlug::~csBugPlug ()
   CleanDebugSector ();
   CleanDebugView ();
 
-  if (selected_mesh) selected_mesh->DecRef ();
   if (spider)
   {
     if (Engine) spider->UnweaveWeb (Engine);
@@ -185,6 +187,7 @@ csBugPlug::~csBugPlug ()
     scfiEventHandler->DecRef ();
   }
   delete[] captureFormat;
+  delete[] spider_args;
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiBugPlug);
   SCF_DESTRUCT_IBASE ();
@@ -344,7 +347,7 @@ void csBugPlug::SetupPlugin ()
   do_clear = false;
 }
 
-void csBugPlug::UnleashSpider (int cmd)
+void csBugPlug::UnleashSpider (int cmd, const char* args)
 {
   if (Engine)
   {
@@ -354,6 +357,8 @@ void csBugPlug::UnleashSpider (int cmd)
       spider_command = cmd;
       spider_hunting = true;
       spider_timeout = 20;
+      delete[] spider_args;
+      spider_args = csStrNew (args);
     }
     else
     {
@@ -365,6 +370,38 @@ void csBugPlug::UnleashSpider (int cmd)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Spider could not weave its web (No engine)!");
+  }
+}
+
+void csBugPlug::SwitchCuller (iSector* sector, const char* culler)
+{
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Switching to visibility culler '%s'.", culler);
+  sector->SetVisibilityCullerPlugin (culler);
+}
+
+void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
+{
+  iMeshList* ml = sector->GetMeshes ();
+  iMeshWrapper* mesh = ml->FindByName (meshname);
+  if (mesh)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Selecting mesh '%s'.", meshname);
+    selected_mesh = mesh;
+    bool bbox, rad;
+    shadow->GetShowOptions (bbox, rad);
+    shadow->SetShadowMesh (selected_mesh);
+
+    if (bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
+      shadow->AddToEngine (Engine);
+    else
+      shadow->RemoveFromEngine (Engine);
+  }
+  else
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Couldn't find mesh '%s'.", meshname);
   }
 }
 
@@ -464,6 +501,12 @@ void csBugPlug::HideSpider (iCamera* camera)
       case DEBUGCMD_VISCULVIEW:
         VisculView (camera);
         break;
+      case DEBUGCMD_SWITCHCULLER:
+        SwitchCuller (camera->GetSector (), spider_args);
+        break;
+      case DEBUGCMD_SELECTMESH:
+        SelectMesh (camera->GetSector (), spider_args);
+        break;
     }
   }
 }
@@ -534,25 +577,15 @@ void csBugPlug::MouseButton3 (iCamera* camera)
 
   if (sel)
   {
-    // First release the ref to the previous selected_mesh.
-    if (selected_mesh) selected_mesh->DecRef ();
-
-    // Here we incref our mesh.
-    sel->IncRef ();
-    // But of course we have to make sure that it will actually get
-    // deleted when the app/engine wants it deleted. So BugPlug will
-    // monitor the ref count of this mesh and decrease its own reference
-    // as soon as the ref count reaches one.
     selected_mesh = sel;
     const char* n = selected_mesh->QueryObject ()->GetName ();
     Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug found mesh '%s'!",
       	n ? n : "<noname>");
-    bool bbox, rad, bm;
-    shadow->GetShowOptions (bbox, rad, bm);
+    bool bbox, rad;
+    shadow->GetShowOptions (bbox, rad);
     shadow->SetShadowMesh (selected_mesh);
 
-    shadow->SetBeam (origin, end, isect);
-    if (bbox || rad || bm)
+    if (bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
       shadow->AddToEngine (Engine);
     else
       shadow->RemoveFromEngine (Engine);
@@ -969,6 +1002,9 @@ bool csBugPlug::EatKey (iEvent& event)
           EnterEditMode (cmd, "Enter new gamma:", buf);
 	}
         break;
+      case DEBUGCMD_SELECTMESH:
+        EnterEditMode (cmd, "Enter mesh name:", "");
+        break;
       case DEBUGCMD_DBLBUFF:
         {
 	  bool state = G2D->GetDoubleBufferState ();
@@ -1029,16 +1065,80 @@ bool csBugPlug::EatKey (iEvent& event)
 	    	"BugPlug has no engine to work on!");
 	}
         break;
+      case DEBUGCMD_MESHBASEMESH:
+	{
+	  if (show_polymesh == BUGPLUG_POLYMESH_BASE)
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_NO;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug disabled showing BASE polygonmesh.");
+	  }
+	  else
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_BASE;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug is showing BASE polygonmesh.");
+	  }
+	}
+        break;
+      case DEBUGCMD_MESHSHADMESH:
+	{
+	  if (show_polymesh == BUGPLUG_POLYMESH_SHAD)
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_NO;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug disabled showing SHAD polygonmesh.");
+	  }
+	  else
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_SHAD;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug is showing SHAD polygonmesh.");
+	  }
+	}
+        break;
+      case DEBUGCMD_MESHVISMESH:
+	{
+	  if (show_polymesh == BUGPLUG_POLYMESH_VIS)
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_NO;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug disabled showing VIS polygonmesh.");
+	  }
+	  else
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_VIS;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug is showing VIS polygonmesh.");
+	  }
+	}
+        break;
+      case DEBUGCMD_MESHCDMESH:
+	{
+	  if (show_polymesh == BUGPLUG_POLYMESH_CD)
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_NO;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug disabled showing CD polygonmesh.");
+	  }
+	  else
+	  {
+	    show_polymesh = BUGPLUG_POLYMESH_CD;
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug is showing CD polygonmesh.");
+	  }
+	}
+        break;
       case DEBUGCMD_MESHBBOX:
 	{
-	  bool bbox, rad, bm;
-	  shadow->GetShowOptions (bbox, rad, bm);
+	  bool bbox, rad;
+	  shadow->GetShowOptions (bbox, rad);
           bbox = !bbox;
 	  Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    	"BugPlug %s bounding box display.",
 		bbox ? "enabled" : "disabled");
-	  shadow->SetShowOptions (bbox, rad, bm);
-	  if ((bbox || rad || bm) && selected_mesh)
+	  shadow->SetShowOptions (bbox, rad);
+	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO) && selected_mesh)
 	    shadow->AddToEngine (Engine);
 	  else
 	    shadow->RemoveFromEngine (Engine);
@@ -1046,14 +1146,14 @@ bool csBugPlug::EatKey (iEvent& event)
         break;
       case DEBUGCMD_MESHRAD:
         {
-	  bool bbox, rad, bm;
-	  shadow->GetShowOptions (bbox, rad, bm);
+	  bool bbox, rad;
+	  shadow->GetShowOptions (bbox, rad);
           rad = !rad;
 	  Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    	"BugPlug %s bounding sphere display.",
 		rad ? "enabled" : "disabled");
-	  shadow->SetShowOptions (bbox, rad, bm);
-	  if ((bbox || rad || bm) && selected_mesh)
+	  shadow->SetShowOptions (bbox, rad);
+	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO) && selected_mesh)
 	    shadow->AddToEngine (Engine);
 	  else
 	    shadow->RemoveFromEngine (Engine);
@@ -1062,6 +1162,7 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_DEBUGVIEW:
 	SwitchDebugView ();
         break;
+      case DEBUGCMD_SWITCHCULLER:
       case DEBUGCMD_VISCULVIEW:
       case DEBUGCMD_DUMPCAM:
       case DEBUGCMD_FOV:
@@ -1069,7 +1170,7 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_DEBUGSECTOR:
       case DEBUGCMD_SCRSHOT:
         // Set spider on a hunt.
-	UnleashSpider (cmd);
+	UnleashSpider (cmd, args);
         break;
       case DEBUGCMD_DS_LEFT:
         if (debug_sector.show)
@@ -1336,24 +1437,13 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
   SetupPlugin ();
   if (!G3D) return false;
 
+  if (shadow) shadow->ClearCamera ();
+  
   if (do_clear)
   {
     G3D->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARZBUFFER);
     int bgcolor_clear = G2D->FindRGB (0, 255, 255);
     G2D->Clear (bgcolor_clear);
-  }
-  if (selected_mesh)
-  {
-    // Here we see if we have the last ref count to the selected mesh.
-    // In that case we also release it.
-    if (selected_mesh->GetRefCount () == 1)
-    {
-      shadow->SetShadowMesh (0);
-      shadow->RemoveFromEngine (Engine);
-      selected_mesh->DecRef ();
-      selected_mesh = 0;
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Selected mesh is deleted!");
-    }
   }
   return false;
 }
@@ -1451,6 +1541,107 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       float y = debug_view.points[i].y;
       G2D->DrawLine (x-5, y-5, x+5, y+5, pointcol);
       G2D->DrawLine (x-5, y+5, x+5, y-5, pointcol);
+    }
+  }
+
+  if (selected_mesh && shadow && shadow->GetCamera () &&
+		  !debug_view.show && !debug_sector.show)
+  {
+    iMovable* mov = selected_mesh->GetMovable ();
+    iCamera* cam = shadow->GetCamera ();
+    G3D->BeginDraw (CSDRAW_2DGRAPHICS);
+
+    csTransform tr_w2c = cam->GetTransform ();
+    csReversibleTransform tr_o2c = tr_w2c / mov->GetFullTransform ();
+    float fov = G3D->GetPerspectiveAspect ();
+    bool do_bbox, do_rad;
+    shadow->GetShowOptions (do_bbox, do_rad);
+    if (do_bbox)
+    {
+      int bbox_color = G3D->GetDriver2D ()->FindRGB (0, 255, 255);
+      csBox3 bbox;
+      selected_mesh->GetMeshObject ()->GetObjectModel ()->
+    	  GetObjectBoundingBox (bbox);
+      csVector3 vxyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyz);
+      csVector3 vXyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_Xyz);
+      csVector3 vxYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYz);
+      csVector3 vxyZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyZ);
+      csVector3 vXYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XYz);
+      csVector3 vXyZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XyZ);
+      csVector3 vxYZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYZ);
+      csVector3 vXYZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XYZ);
+      G3D->DrawLine (vxyz, vXyz, fov, bbox_color);
+      G3D->DrawLine (vXyz, vXYz, fov, bbox_color);
+      G3D->DrawLine (vXYz, vxYz, fov, bbox_color);
+      G3D->DrawLine (vxYz, vxyz, fov, bbox_color);
+      G3D->DrawLine (vxyZ, vXyZ, fov, bbox_color);
+      G3D->DrawLine (vXyZ, vXYZ, fov, bbox_color);
+      G3D->DrawLine (vXYZ, vxYZ, fov, bbox_color);
+      G3D->DrawLine (vxYZ, vxyZ, fov, bbox_color);
+      G3D->DrawLine (vxyz, vxyZ, fov, bbox_color);
+      G3D->DrawLine (vxYz, vxYZ, fov, bbox_color);
+      G3D->DrawLine (vXyz, vXyZ, fov, bbox_color);
+      G3D->DrawLine (vXYz, vXYZ, fov, bbox_color);
+    }
+    if (do_rad)
+    {
+      int rad_color = G3D->GetDriver2D ()->FindRGB (0, 255, 0);
+      csVector3 radius, r, center;
+      selected_mesh->GetMeshObject ()->GetObjectModel ()->GetRadius (radius,center);
+      csVector3 trans_o = tr_o2c * center;
+      r.Set (radius.x, 0, 0);
+      G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
+      r.Set (0, radius.y, 0);
+      G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
+      r.Set (0, 0, radius.z);
+      G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
+    }
+    if (show_polymesh != BUGPLUG_POLYMESH_NO)
+    {
+      iPolygonMesh* pm = 0;
+      switch (show_polymesh)
+      {
+	case BUGPLUG_POLYMESH_CD:
+	  pm = selected_mesh->GetMeshObject ()->GetObjectModel ()->
+		  GetPolygonMeshColldet ();
+	  break;
+	case BUGPLUG_POLYMESH_VIS:
+	  pm = selected_mesh->GetMeshObject ()->GetObjectModel ()->
+		  GetPolygonMeshViscull ();
+	  break;
+	case BUGPLUG_POLYMESH_SHAD:
+	  pm = selected_mesh->GetMeshObject ()->GetObjectModel ()->
+		  GetPolygonMeshShadows ();
+	  break;
+	case BUGPLUG_POLYMESH_BASE:
+	  pm = selected_mesh->GetMeshObject ()->GetObjectModel ()->
+		  GetPolygonMeshBase ();
+	  break;
+      }
+      if (pm)
+      {
+        int pm_color = G3D->GetDriver2D ()->FindRGB (255, 255, 128);
+	int vtcount = pm->GetVertexCount ();
+	csVector3* vt = pm->GetVertices ();
+	int pocount = pm->GetPolygonCount ();
+	csMeshedPolygon* po = pm->GetPolygons ();
+	csVector3* vtt = new csVector3[vtcount];
+	int i;
+	for (i = 0 ; i < vtcount ; i++)
+	  vtt[i] = tr_o2c * vt[i];
+	for (i = 0 ; i < pocount ; i++)
+	{
+	  csMeshedPolygon& pol = po[i];
+	  int j, j1;
+	  j1 = pol.num_vertices - 1;
+	  for (j = 0 ; j < pol.num_vertices ; j++)
+	  {
+            G3D->DrawLine (vtt[pol.vertices[j]], vtt[pol.vertices[j1]], fov, pm_color);
+	    j1 = j;
+	  }
+	}
+        delete[] vtt;
+      }
     }
   }
 
@@ -1588,6 +1779,9 @@ void csBugPlug::ExitEditMode ()
     case DEBUGCMD_FOVANGLE:
       csScanStr (edit_string, "%f", &f);
       spider->GetCamera ()->SetFOVAngle (f, G3D->GetWidth ());
+      break;
+    case DEBUGCMD_SELECTMESH:
+      UnleashSpider (edit_command, edit_string);
       break;
   }
 }
@@ -1748,6 +1942,10 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
   if (!strcmp (cmd, "terrvis"))		return DEBUGCMD_TERRVIS;
   if (!strcmp (cmd, "meshbbox"))	return DEBUGCMD_MESHBBOX;
   if (!strcmp (cmd, "meshrad"))		return DEBUGCMD_MESHRAD;
+  if (!strcmp (cmd, "meshcd"))		return DEBUGCMD_MESHCDMESH;
+  if (!strcmp (cmd, "meshvis"))		return DEBUGCMD_MESHVISMESH;
+  if (!strcmp (cmd, "meshshad"))	return DEBUGCMD_MESHSHADMESH;
+  if (!strcmp (cmd, "meshbase"))	return DEBUGCMD_MESHBASEMESH;
   if (!strcmp (cmd, "debuggraph"))	return DEBUGCMD_DEBUGGRAPH;
   if (!strcmp (cmd, "enginecmd"))	return DEBUGCMD_ENGINECMD;
   if (!strcmp (cmd, "enginestate"))	return DEBUGCMD_ENGINESTATE;
@@ -1775,6 +1973,8 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
   if (!strcmp (cmd, "memorydump"))	return DEBUGCMD_MEMORYDUMP;
   if (!strcmp (cmd, "unprepare"))	return DEBUGCMD_UNPREPARE;
   if (!strcmp (cmd, "colorsectors"))	return DEBUGCMD_COLORSECTORS;
+  if (!strcmp (cmd, "switchculler"))	return DEBUGCMD_SWITCHCULLER;
+  if (!strcmp (cmd, "selectmesh"))	return DEBUGCMD_SELECTMESH;
 
   return DEBUGCMD_UNKNOWN;
 }
