@@ -27,17 +27,26 @@
 class csTreeNode
 {
  public:
-  bool IsLeaf () { return children.Length () == 0; }
-  void RemoveChild (csTreeNode *child) { int idx = children.Find (child); if (idx != -1) children.Delete (idx); }
-  void AddChild (csTreeNode *child) { children.Push (child); child->parent = this; }
 
-  csTreeNode (csTreeNode *theParent=NULL) { parent=theParent; if (parent) parent->children.Push (this); }
+  bool IsLeaf () 
+  { return children.Length () == 0; }
+
+  void RemoveChild (csTreeNode *child) 
+  { int idx = children.Find (child); if (idx != -1) children.Delete (idx); }
+
+  void AddChild (csTreeNode *child) 
+  { children.Push (child); child->parent = this; }
+
+  csTreeNode (csTreeNode *theParent=NULL) 
+  { parent=theParent; if (parent) parent->children.Push (this); }
 
   virtual ~csTreeNode () 
-    { 
-      for(int i=0; i<children.Length (); i++) delete (csTreeNode*)children.Get (i); 
-      if (parent) parent->RemoveChild (this);
-    }
+  { 
+    for(int i=0; i<children.Length (); i++) 
+      delete (csTreeNode*)children.Get (i); 
+    if (parent) 
+      parent->RemoveChild (this);
+  }
 
   /**
    * Execute a function on this node and its children. Do this in "DepthSearchFirst" order, that is check a childs children
@@ -48,20 +57,22 @@ class csTreeNode
    */
   csTreeNode *DSF (bool (*TreeFunc)(csTreeNode *node, csSome param, bool stopOnSuccess), 
 		   bool (*SelBranch)(csTreeNode *node), csSome param, bool stopOnSuccess)
+  {
+    csTreeNode *foundNode = NULL;
+    int i=0;
+    bool dive;
+    if (TreeFunc (this, param, stopOnSuccess))
+      foundNode = this;
+    while (i<children.Length () && !(foundNode && stopOnSuccess))
     {
-      csTreeNode *foundNode = NULL;
-      int i=0;
-      bool dive;
-      if (TreeFunc (this, param, stopOnSuccess))
-	foundNode = this;
-      while (i<children.Length () && !(foundNode && stopOnSuccess)){
-	dive = (SelBranch == NULL) || SelBranch ((csTreeNode*)children.Get (i));
-	if (dive)
-	  foundNode = ((csTreeNode*)children.Get (i))->DSF (TreeFunc, SelBranch, param, stopOnSuccess);
+      dive = (SelBranch == NULL) || SelBranch ((csTreeNode*)children.Get (i));
+      if (dive)
+        foundNode = ((csTreeNode*)children.Get (i))->DSF (TreeFunc, SelBranch, 
+	                                                  param, stopOnSuccess);
 	i++;
-      }
-      return foundNode;
     }
+    return foundNode;
+  }
 
   /**
    * Execute a function on this node and its children. Do this in "BreadthSearchFirst" order, that is check first all
@@ -72,22 +83,23 @@ class csTreeNode
    */
   csTreeNode *BSF (bool (*TreeFunc)(csTreeNode *node, csSome param, bool stopOnSuccess), 
 		   bool (*SelBranch)(csTreeNode *node), csSome param, bool stopOnSuccess)
-    {
-      csTreeNode *node, *foundNode = NULL;
-      csVector fifo;
+  {
+    csTreeNode *node, *foundNode = NULL;
+    csVector fifo;
 
-      fifo.Push (this);
-      while (fifo.Length () > 0 && !(foundNode && stopOnSuccess)){
-	node = (csTreeNode*)fifo.Get (0); fifo.Delete (0);
-	if (TreeFunc (node, param, stopOnSuccess))
-	  foundNode = node;
-	if (!node->IsLeaf () && (SelBranch==NULL || SelBranch(node)))
-	  for (int i=0; i < node->children.Length (); i++ ) 
-	    fifo.Push (node->children.Get (i));
-      }
-      fifo.DeleteAll ();
-      return foundNode;
+    fifo.Push (this);
+    while (fifo.Length () > 0 && !(foundNode && stopOnSuccess))
+    {
+      node = (csTreeNode*)fifo.Get (0); fifo.Delete (0);
+      if (TreeFunc (node, param, stopOnSuccess))
+        foundNode = node;
+      if (!node->IsLeaf () && (SelBranch==NULL || SelBranch (node)))
+      for (int i=0; i < node->children.Length (); i++ ) 
+        fifo.Push (node->children.Get (i));
     }
+    fifo.DeleteAll ();
+    return foundNode;
+  }
 
  public:
   csTreeNode *parent; // parent node or NULL if toplevel
