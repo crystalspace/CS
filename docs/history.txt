@@ -20,6 +20,8 @@ The history order is reversed so that new features are at the top.
 	- res added interfaces for texture factories.
 	- res removed an unnecessary cut'n'paste leftover from ptanimimg.
 	- res added a base class for texture factories.
+	- Jorrit fixed compile errors in proctex (access to private or
+	  protected members from within subclasses).
 	- Philip Wyett added virtual desctructor to 'TextureLoaderContext'
           and aslo a newline to the end of the file.
 14-May-2003

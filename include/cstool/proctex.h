@@ -105,6 +105,7 @@ protected:
     virtual void SetKeepImage (bool k);
     virtual bool KeepImage () const;
   } scfiTextureWrapper;
+  friend struct eiTextureWrapper;
 
   struct eiProcTexture : public iProcTexture
   {
@@ -113,6 +114,7 @@ protected:
     virtual bool GetAlwaysAnimate ();
     virtual void SetAlwaysAnimate (bool enable);
   } scfiProcTexture;
+  friend struct eiProcTexture;
 
 public:
   // The current time the previous time the callback was called.
