@@ -12,6 +12,8 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+24-Feb-2000
+	- Martin Geisse contributed more updates to the Texinfo documentation.
 23-Feb-2000
 	- Michael Dale Long did the following changes to Crystal Clear:
 	    - More csConsole bugfixes.
@@ -35,7 +37,8 @@ Short-term cleanups that need to be done:
 	  renderers built on BeOS.
 	- Eric Sunshine fixed bug in parsing of submenu from next.cfg which
 	  prevented application menu from displaying on MacOS/X Server.
-	- Fixed a memory leak in csVector::SetLength() reported by Denis Dmitriev.
+	- Fixed a memory leak in csVector::SetLength() reported by Denis
+	  Dmitriev.
 22-Feb-2000
 	- Gary Haussmann fixed another mipmap bug in the OpenGL rasterizer.
 	  The problem was that the maximum mipmap level required is actually
