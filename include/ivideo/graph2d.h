@@ -220,7 +220,10 @@ struct iGraphics2D : public iBase
   /// Free storage allocated for a subarea of screen
   virtual void FreeArea (csImageArea *Area) = 0;
 
-  /// Write a text string into the back buffer
+  /**
+   * Write a text string into the back buffer. A negative value for bg
+   * color will not draw the background.
+   */
   virtual void Write (iFont *font, int x, int y, int fg, int bg,
     const char *str) = 0;
 
