@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Mar-2005
+	- Wouter Wijngaards changed csBitArrayHashKeyHandler::ComputeHash
+	  in bitarray.h, int to size_t to remove signed/unsigned warning.
 24-Mar-2005
 	- res removed a >= 0 comparison with an unsigned var from array.h.
 	- res fixed some wrong ref counting caused by iLoader->LoadTexture()

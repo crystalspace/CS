@@ -423,7 +423,7 @@ class csBitArrayHashKeyHandler
 public:
   static unsigned int ComputeHash (const csBitArray& key)
   {
-    const int uintCount = sizeof (csBitArray::store_type) / sizeof (uint);
+    const size_t uintCount = sizeof (csBitArray::store_type) / sizeof (uint);
     union
     {
       csBitArray::store_type store;
