@@ -84,6 +84,11 @@
 #  include "cssys/win32/csosdefs.h"
 #endif
 
+// For GCC/Mingw32 or GCC/Cygnus/Win32 (Cygwin32) based builds
+#if defined(OS_WIN32) && defined(COMP_GCC)
+#  include "cssys/win32/csosdefs.h"
+#endif
+
 #if defined (COMP_WCC) && defined (OS_DOS)
 #  include "cssys/wcc/csosdefs.h"
 #endif
