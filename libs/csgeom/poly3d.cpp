@@ -457,7 +457,7 @@ int csVector3Array::AddVertexSmart (float x, float y, float z)
   return num_vertices-1;
 }
 
-csVector3 csPoly3D::ComputeNormal ()
+csVector3 csPoly3D::ComputeNormal () const
 {
   float ayz = 0;
   float azx = 0;
@@ -465,8 +465,8 @@ csVector3 csPoly3D::ComputeNormal ()
   int i, i1;
   float x1, y1, z1, x, y, z;
 
-  i1 = GetNumVertices ()-1;
-  for (i = 0 ; i < GetNumVertices () ; i++)
+  i1 = num_vertices-1;
+  for (i = 0 ; i < num_vertices ; i++)
   {
     x = vertices[i].x;
     y = vertices[i].y;
@@ -487,7 +487,7 @@ csVector3 csPoly3D::ComputeNormal ()
   return csVector3 (ayz / d, azx / d, axy / d);
 }
 
-csPlane3 csPoly3D::ComputePlane ()
+csPlane3 csPoly3D::ComputePlane () const
 {
   float D;
   csVector3 pl = ComputeNormal ();
@@ -495,13 +495,23 @@ csPlane3 csPoly3D::ComputePlane ()
   return csPlane3 (pl, D);
 }
 
-float csPoly3D::GetSignedArea ()
+float csPoly3D::GetSignedArea () const
 {
   float area = 0.0;
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
-  for (int i=0 ; i < GetNumVertices()-2 ; i++)
+  for (int i=0 ; i < num_vertices-2 ; i++)
     area += csMath3::Area3 ( vertices[0], vertices[i+1], vertices[i+2] );
   return area / 2.0;
+}
+
+csVector3 csPoly3D::GetCenter () const
+{
+  int i;
+  csBox3 bbox;
+  bbox.StartBoundingBox (vertices[0]);
+  for (i = 1 ; i < num_vertices ; i++)
+    bbox.AddBoundingVertexSmart (vertices[i]);
+  return bbox.GetCenter ();
 }
 
 

@@ -227,15 +227,20 @@ public:
   void SplitWithPlaneZ (csPoly3D& front, csPoly3D& back, float z) const;
 
   /// Compute the normal of this polygon.
-  csVector3 ComputeNormal ();
+  csVector3 ComputeNormal () const;
 
   /// Compute the plane of this polygon.
-  csPlane3 ComputePlane ();
+  csPlane3 ComputePlane () const;
 
   /**
    * Calculate the signed area of this polygon.
    */
-  float GetSignedArea();
+  float GetSignedArea() const;
+  
+  /**
+   * Compute and get the central vertex of this polygon.
+   */
+  csVector3 GetCenter () const;
 };
 
 /**

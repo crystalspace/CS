@@ -437,6 +437,8 @@ void csOctree::Build ()
 
   delete [] polygons;
 
+  Dumper::dump (this);
+
   CalculateSolidMasks ((csOctreeNode*)root);
 }
 
@@ -449,6 +451,8 @@ void csOctree::Build (csPolygonInt** polygons, int num)
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), new_polygons, num);
   delete [] new_polygons;
+
+  Dumper::dump (this);
 
   CalculateSolidMasks ((csOctreeNode*)root);
 }
@@ -849,7 +853,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   int splits, best_splits = 2000000000;
   for (i = 0 ; i < num_x ; i++)
   {
-    x = xarray[i]+.1;
+    x = xarray[i];
     splits = 0;
     for (j = 0 ; j < num ; j++)
       if (polygons[j]->ClassifyX (x) == POL_SPLIT_NEEDED) splits++;
@@ -862,7 +866,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   best_splits = 2000000000;
   for (i = 0 ; i < num_y ; i++)
   {
-    y = yarray[i]+.1;
+    y = yarray[i];
     splits = 0;
     for (j = 0 ; j < num ; j++)
       if (polygons[j]->ClassifyY (y) == POL_SPLIT_NEEDED) splits++;
@@ -875,7 +879,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   best_splits = 2000000000;
   for (i = 0 ; i < num_z ; i++)
   {
-    z = zarray[i]+.1;
+    z = zarray[i];
     splits = 0;
     for (j = 0 ; j < num ; j++)
       if (polygons[j]->ClassifyZ (z) == POL_SPLIT_NEEDED) splits++;
@@ -1887,15 +1891,13 @@ int csOctree::ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly)
     int rc = bsp->ClassifyPolygon (poly);
     if (rc == 1)
     {
-      // @@@ Should we test all points of the polygon here?
-      if (!ClassifyPoint (poly[0])) rc = 0;
+      if (!ClassifyPoint (poly.GetCenter ())) rc = 0;
     }
     return rc;
   }
   if (node->IsLeaf ())
   {
-    // @@@ Should we test all points of the polygon here?
-    if (ClassifyPoint (poly[0])) return 1;
+    if (ClassifyPoint (poly.GetCenter ())) return 1;
     else return 0;
   }
 
@@ -1951,6 +1953,7 @@ UShort csOctree::ClassifyRectangle (int plane_nr, float plane_pos,
   poly.AddVertex (GetVector3 (plane_nr, plane_pos, cor_Xy));
   poly.AddVertex (GetVector3 (plane_nr, plane_pos, cor_XY));
   poly.AddVertex (GetVector3 (plane_nr, plane_pos, cor_xY));
+
   int rc = ClassifyPolygon (poly);
   if (rc == 0) return 0;
   if (rc == 1) return (UShort)~0;
@@ -2018,18 +2021,29 @@ void csOctree::CalculateSolidMasks (csOctreeNode* node)
   // polygons that are exactly on the node boundary but actually belong
   // to the neighbour node.
   // @@@ Maybe there are better solutions for this?
+
+CsPrintf (MSG_DEBUG_0, "Solid masks for node %.2f,%.2f,%.2f - %.2f,%.2f,%.2f\n",
+node->GetBox ().MinX (), node->GetBox ().MinY (), node->GetBox ().MinZ (),
+node->GetBox ().MaxX (), node->GetBox ().MaxY (), node->GetBox ().MaxZ ());
+
   node->solid_masks[BOX_SIDE_x] = ClassifyRectangle (PLANE_X,
   	node->GetBox ().MinX ()+.01, GetSideBox (BOX_SIDE_x, node->GetBox ()));
+CsPrintf (MSG_DEBUG_0, "  x: %04x\n", node->solid_masks[BOX_SIDE_x]);
   node->solid_masks[BOX_SIDE_X] = ClassifyRectangle (PLANE_X,
   	node->GetBox ().MaxX ()-.01, GetSideBox (BOX_SIDE_X, node->GetBox ()));
+CsPrintf (MSG_DEBUG_0, "  X: %04x\n", node->solid_masks[BOX_SIDE_X]);
   node->solid_masks[BOX_SIDE_y] = ClassifyRectangle (PLANE_Y,
   	node->GetBox ().MinY ()+.01, GetSideBox (BOX_SIDE_y, node->GetBox ()));
+CsPrintf (MSG_DEBUG_0, "  y: %04x\n", node->solid_masks[BOX_SIDE_y]);
   node->solid_masks[BOX_SIDE_Y] = ClassifyRectangle (PLANE_Y,
   	node->GetBox ().MaxY ()-.01, GetSideBox (BOX_SIDE_Y, node->GetBox ()));
+CsPrintf (MSG_DEBUG_0, "  Y: %04x\n", node->solid_masks[BOX_SIDE_Y]);
   node->solid_masks[BOX_SIDE_z] = ClassifyRectangle (PLANE_Z,
   	node->GetBox ().MinZ ()+.01, GetSideBox (BOX_SIDE_z, node->GetBox ()));
+CsPrintf (MSG_DEBUG_0, "  z: %04x\n", node->solid_masks[BOX_SIDE_z]);
   node->solid_masks[BOX_SIDE_Z] = ClassifyRectangle (PLANE_Z,
   	node->GetBox ().MaxZ ()-.01, GetSideBox (BOX_SIDE_Z, node->GetBox ()));
+CsPrintf (MSG_DEBUG_0, "  Z: %04x\n", node->solid_masks[BOX_SIDE_Z]);
   int i;
 
   for (i = 0 ; i < 8 ; i++)

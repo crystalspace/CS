@@ -644,8 +644,7 @@ int csBspTree::ClassifyPolygon (csBspNode* node, const csPoly3D& poly)
 {
   if (!node)
   {
-    // @@@ Should we test all points here?
-    if (ClassifyPoint (poly[0]))
+    if (ClassifyPoint (poly.GetCenter ()))
       return 1;
     else
       return 0;
@@ -657,8 +656,7 @@ int csBspTree::ClassifyPolygon (csBspNode* node, const csPoly3D& poly)
     // If we come here then we know that the entire polygon is in
     // this node. In that case we test one of the vertices to see if
     // it is solid or not.
-    // @@@ Should we test all points here?
-    if (ClassifyPoint (poly[0]))
+    if (ClassifyPoint (poly.GetCenter ()))
       return 1;
     else
       return 0;
@@ -667,8 +665,7 @@ int csBspTree::ClassifyPolygon (csBspNode* node, const csPoly3D& poly)
   switch (c)
   {
     case POL_SAME_PLANE:
-      //@@@ Should we test all points here?
-      if (ClassifyPoint (poly[0]))
+      if (ClassifyPoint (poly.GetCenter ()))
         return 1;
       else
         return 0;
@@ -678,6 +675,16 @@ int csBspTree::ClassifyPolygon (csBspNode* node, const csPoly3D& poly)
     case POL_BACK:
       return ClassifyPolygon (node->back, poly);
     case POL_SPLIT_NEEDED:
+      {
+        csPoly3D front, back;
+	poly.SplitWithPlane (front, back, node->splitter);
+        int rc1 = ClassifyPolygon (node->front, front);
+	if (rc1 == -1) return -1;
+        int rc2 = ClassifyPolygon (node->back, back);
+	if (rc2 == -1) return -1;
+	if (rc1 != rc2) return -1;
+	return rc1;
+      }
       return -1;
   }
   return -1;

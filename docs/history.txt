@@ -1,5 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+28-May-2000
+	- Changed the way csPolyTree::ClassifyPoint() works. Instead
+	  of assuming space is open and testing six directions to prove
+	  it is solid (all six directions must be solid) we now
+	  assume space is solid if we find only one direction for
+	  which space is solid.
+	- Added csPoly3D::GetCenter() which computes the center of the
+	  polygon and returns it.
+	- Improved the solid space generator so that it is now much more
+	  likely to say that a node boundary is solid. This should improve
+	  PVS considerably.
+27-May-2000
+	- Worked a bit more on 'perftest'.
 26-May-2000
 	- Fixed bug in PVS building. The selection of the plane for the
 	  c-buffer could fail with nodes that are close together.
@@ -31,6 +44,9 @@ The history order has been reversed so that new features are at the top.
 	- Paul Garceau did some changes to terrain renderer to set default
 	  for P-III to zero (for the SIMD code that is in the terrain engine).
 	- Wouter Wijngaards did some further debugging on radiosity.
+	- Created new 'perftest' application to test the performance
+	  of a 3D renderer. This application will try various tests to
+	  see how fast the 3D renderer is.
 	- Eric Sunshine reverted Paul's change to ddgUtil::DetectSIMD() since
 	  it broke Alex's DDG.  Re-implemented it in a fashion which should
 	  work for everyone.

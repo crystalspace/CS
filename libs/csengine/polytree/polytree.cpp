@@ -249,7 +249,6 @@ static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
     if (p->PointOnPolygon (data->pos))
     {
       data->is_solid = true;
-      data->num_polygon_was_hit = 6;
       return (void*)1;
     }
     for (j = 0 ; j < 6 ; j++)
@@ -260,11 +259,11 @@ static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
         {
           data->polygon_was_hit[j] = true;
 	  data->num_polygon_was_hit++;
-          if (p->IntersectRay (data->pos, data->test_points[j]))
+          if (!p->IntersectRay (data->pos, data->test_points[j]))
 	  {
-	    // We can see the polygon from 'pos'. So we are in open
+	    // We can not see the polygon from 'pos'. So we are in solid
 	    // space.
-	    data->is_solid = false;
+	    data->is_solid = true;
 	    return (void*)1;
 	  }
 	  // We tested all points.
@@ -278,7 +277,7 @@ static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
 bool csPolygonTree::ClassifyPoint (const csVector3& p)
 {
   CPTraverseData data;
-  data.is_solid = true;
+  data.is_solid = false;
   data.pos = p;
   data.test_points[0] = p+csVector3 (1, 0, 0);
   data.test_points[1] = p+csVector3 (-1, 0, 0);
@@ -290,15 +289,15 @@ bool csPolygonTree::ClassifyPoint (const csVector3& p)
   for (i = 0 ; i < 6 ; i++) data.polygon_was_hit[i] = false;
   data.num_polygon_was_hit = 0;
   Front2Back (p, ClassifyPointTraverse, (void*)&data, NULL, NULL);
-  if (data.num_polygon_was_hit < 6)
-    for (i = 0 ; i < 6 ; i++)
-      if (!data.polygon_was_hit[i])
-      {
-        // This ray never hit a polygon. That means we will hit a sector
-        // wall and thus we are in open space.
-        data.is_solid = false;
-        break;
-      }
+  //if (data.num_polygon_was_hit < 6)
+    //for (i = 0 ; i < 6 ; i++)
+      //if (!data.polygon_was_hit[i])
+      //{
+        //// This ray never hit a polygon. That means we will hit a sector
+        //// wall and thus we are in open space.
+        //data.is_solid = false;
+        //break;
+      //}
   return data.is_solid;
 }
 
