@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- cacacanvas.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.cacacanvas</name>
+        <implementation>csGraphics2DCaca</implementation>
+        <description>Colour Ascii Art 2D graphics driver for Crystal Space</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -1807,6 +1807,16 @@ CS_CHECK_LIB_WITH([aa],
 
 
 #------------------------------------------------------------------------------
+# Check for Colour Ascii Art library (libcaca).
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([caca],
+    [AC_LANG_PROGRAM([[#include <caca.h>]], [caca_init(); caca_end();])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [LIBCACA])], [], [], [], [],
+    [libcaca])
+
+
+
+#------------------------------------------------------------------------------
 # Check if regular expressions are available.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
