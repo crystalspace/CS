@@ -39,7 +39,6 @@ struct iEngine;
 struct iVFS;
 struct iGraphics3D;
 struct iSoundRender;
-struct iMotionManager;
 struct iLoaderPlugin;
 struct iObjectRegistry;
 struct iPluginManager;
@@ -259,8 +258,6 @@ public:
   iGraphics3D *G3D;
   // sound renderer
   iSoundRender *SoundRender;
-  // motion manager
-  iMotionManager *MotionManager;
   // model converter
   iModelConverter *ModelConverter;
   // crossbuilder

@@ -257,6 +257,8 @@ bool csLoader::ResolvePortalSectors (iThingState *th)
 
 bool csLoader::LoadMap (char* buf)
 {
+  if (!Engine) return false;
+
   CS_TOKEN_TABLE_START (tokens)
     CS_TOKEN_TABLE (WORLD)
   CS_TOKEN_TABLE_END
@@ -524,6 +526,8 @@ bool csLoader::LoadPlugins (char* buf)
 
 bool csLoader::LoadLibrary (char* buf)
 {
+  if (!Engine) return false;
+
   CS_TOKEN_TABLE_START (tokens)
     CS_TOKEN_TABLE (LIBRARY)
   CS_TOKEN_TABLE_END
@@ -688,6 +692,8 @@ bool csLoader::LoadSounds (char* buf)
 
 iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
 {
+  if (!Engine) return false;
+
   iDataBuffer *databuff = VFS->ReadFile (fname);
 
   if (!databuff || !databuff->GetSize ())
@@ -833,6 +839,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 
       case CS_TOKEN_FILE:
         {
+          if (!ModelConverter || !CrossBuilder) return false;
+
           csScanStr (params, "%s", str);
           iDataBuffer *buf = VFS->ReadFile (str);
 	  if (!buf)
@@ -947,6 +955,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 
 iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
 {
+  if (!Engine) return false;
+
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)
     CS_TOKEN_TABLE (ADDON)
@@ -1270,6 +1280,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
 
 bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 {
+  if (!Engine) return false;
+
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (KEY)
@@ -1648,6 +1660,8 @@ bool csLoader::LoadRenderPriorities (char* buf)
 
 iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
 {
+  if (!Engine) return false;
+
   iDataBuffer *databuff = VFS->ReadFile (fname);
   iMeshWrapper* mesh = NULL;
 
@@ -1732,7 +1746,6 @@ csLoader::csLoader(iBase *p)
   Engine = NULL;
   G3D = NULL;
   SoundRender = NULL;
-  MotionManager = NULL;
   ModelConverter = NULL;
   CrossBuilder = NULL;
 
@@ -1751,7 +1764,6 @@ csLoader::~csLoader()
   SCF_DEC_REF(Engine);
   SCF_DEC_REF(G3D);
   SCF_DEC_REF(SoundRender);
-  SCF_DEC_REF(MotionManager);
   SCF_DEC_REF(ModelConverter);
   SCF_DEC_REF(CrossBuilder);
   delete Stats;
@@ -1785,7 +1797,6 @@ bool csLoader::Initialize(iObjectRegistry *object_Reg)
   GET_PLUGIN (Engine, CS_FUNCID_ENGINE, iEngine, "engine");
   GET_PLUGIN (G3D, CS_FUNCID_VIDEO, iGraphics3D, "video-driver");
   GET_PLUGIN (SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound-driver");
-  GET_PLUGIN (MotionManager, CS_FUNCID_MOTION, iMotionManager, "motion-manager");
   GET_PLUGIN (ModelConverter, CS_FUNCID_CONVERTER, iModelConverter, "model-converter");
   GET_PLUGIN (CrossBuilder, CS_FUNCID_CROSSBUILDER, iCrossBuilder, "model-crossbuilder");
 

@@ -369,6 +369,9 @@ bool csLoader::ParseHeightgen (char* buf)
 	break;
       case CS_TOKEN_GENERATE:
         {
+          if (!Engine || !G3D)
+	    break;
+
 	  int startx, starty;
 	  csScanStr (params, "%d,%d", &startx, &starty);
 	  iImage* img = gen->Generate (totalw, totalh, startx*mw, starty*mh,
