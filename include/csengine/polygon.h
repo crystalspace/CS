@@ -1043,9 +1043,19 @@ public:
    * Intersect world-space ray with this polygon. This function
    * is similar to intersect_segment except that it doesn't keep the lenght
    * of the ray in account. It just tests if the ray intersects with the
-   * interior of the polygon.
+   * interior of the polygon. Note that this function also does back-face
+   * culling.
    */
   bool IntersectRay (const csVector3& start, const csVector3& end);
+
+  /**
+   * Intersect world-space ray with this polygon. This function
+   * is similar to intersect_segment except that it doesn't keep the lenght
+   * of the ray in account. It just tests if the ray intersects with the
+   * interior of the polygon. Note that this function doesn't do
+   * back-face culling.
+   */
+  bool IntersectRayNoBackFace (const csVector3& start, const csVector3& end);
 
   /// Get the alpha transparency value for this polygon.
   virtual int GetAlpha ()

@@ -1348,6 +1348,45 @@ bool csPolygon3D::IntersectRay (const csVector3& start, const csVector3& end)
   return true;
 }
 
+bool csPolygon3D::IntersectRayNoBackFace (const csVector3& start, const csVector3& end)
+{
+
+  // If this vector is perpendicular to the plane of the polygon we
+  // need to catch this case here.
+  csPlane3& pl = plane->GetWorldPlane ();
+  float dot1 = pl.D () + pl.A ()*start.x + pl.B ()*start.y + pl.C ()*start.z;
+  float dot2 = pl.D () + pl.A ()*end.x + pl.B ()*end.y + pl.C ()*end.z;
+  if (ABS (dot1-dot2) < SMALL_EPSILON) return false;
+
+  // If dot1 > 0 the polygon would have been backface culled.
+  // In this case we just use the result of this test to reverse
+  // the test below.
+
+  // Now we generate a plane between the starting point of the ray and
+  // every edge of the polygon. With the plane normal of that plane we
+  // can then check if the end of the ray is on the same side for all
+  // these planes.
+  csVector3 normal;
+  csVector3 relend = end;
+  relend -= start;
+
+  int i, i1;
+  i1 = GetVertices ().GetNumVertices ()-1;
+  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
+  {
+    csMath3::CalcNormal (normal, start, Vwor (i1), Vwor (i));
+    if (dot1 > 0)
+    {
+      if ( (relend * normal) < 0) return false;
+    }
+    else
+      if ( (relend * normal) > 0) return false;
+    i1 = i;
+  }
+
+  return true;
+}
+
 bool csPolygon3D::IntersectSegment (const csVector3& start, const csVector3& end,
                                    csVector3& isect, float* pr)
 {
