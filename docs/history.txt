@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Feb-2005
+	- Peter Amstutz reorganized loading in the csVosA3DL plugin so
+	  that texture, material or geometry changes to 3D objects are
+	  propagated to the CS engine on the fly, instead of only being
+	  loaded once in the initial setup.
 11-Feb-2005
 	- Jorrit changed csBox3::ProjectOutline() to work with
 	  csPoly2DUnbounded instead of csPoly2D.
