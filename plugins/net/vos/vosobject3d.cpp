@@ -118,7 +118,9 @@ void ConstructObject3DTask::doTask()
 {
   csRef<iMeshWrapper> mw = obj->GetCSinterface()->GetMeshWrapper();
   LOG("vosobject3d", 2, "setting position of " << obj->getURLstr()
-  	<< " to " << pos.x << " " << pos.y << " " << pos.z);
+    << " to " << pos.x << " " << pos.y << " " << pos.z);
+  LOG("vosobject3d", 2, "setting hard position of " << obj->getURLstr()
+    << " to " << hardpos.x << " " << hardpos.y << " " << hardpos.z);
   if(mw.IsValid())
   {
     csReversibleTransform ht(hardtrans, hardpos);

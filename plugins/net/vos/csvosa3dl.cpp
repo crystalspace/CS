@@ -75,25 +75,25 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   LOG("csVosA3DL", 2, "Initializing");
 
   Site::removeRemoteMetaObjectFactory("a3dl:object3D",
-  				      &A3DL::Object3D::new_Object3D);
+                &A3DL::Object3D::new_Object3D);
   Site::removeRemoteMetaObjectFactory("a3dl:object3D.cube",
-  				      &A3DL::Cube::new_Cube);
+                &A3DL::Cube::new_Cube);
   Site::removeRemoteMetaObjectFactory("a3dl:object3D.cone",
-  				      &A3DL::Cone::new_Cone);
+                &A3DL::Cone::new_Cone);
   Site::removeRemoteMetaObjectFactory("a3dl:object3D.polygonmesh",
-  				      &A3DL::PolygonMesh::new_PolygonMesh);
+                &A3DL::PolygonMesh::new_PolygonMesh);
   Site::removeRemoteMetaObjectFactory("a3dl:object3D.billboard",
-  				      &A3DL::Billboard::new_Billboard);
+                &A3DL::Billboard::new_Billboard);
   Site::removeRemoteMetaObjectFactory("a3dl:object3D.model",
-  				      &A3DL::Billboard::new_Billboard);
+                &A3DL::Billboard::new_Billboard);
   Site::removeRemoteMetaObjectFactory("a3dl:object3D.clone",
-  				      &A3DL::Clone::new_Clone);
+                &A3DL::Clone::new_Clone);
   Site::removeRemoteMetaObjectFactory("a3dl:texture",
-  				      &A3DL::Texture::new_Texture);
+                &A3DL::Texture::new_Texture);
   Site::removeRemoteMetaObjectFactory("a3dl:material",
-  				      &A3DL::Material::new_Material);
+                &A3DL::Material::new_Material);
   Site::removeRemoteMetaObjectFactory("a3dl:light",
-  				      &A3DL::Light::new_Light);
+                &A3DL::Light::new_Light);
 
   Site::addRemoteMetaObjectFactory("a3dl:object3D", "a3dl:object3D",
                                    &csMetaObject3D::new_csMetaObject3D);
@@ -102,13 +102,13 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   Site::addRemoteMetaObjectFactory("a3dl:object3D.cone", "a3dl:object3D.cone",
                                    &csMetaCone::new_csMetaCone);
   Site::addRemoteMetaObjectFactory("a3dl:object3D.clone",
-  				   "a3dl:object3D.clone",
+             "a3dl:object3D.clone",
                                    &csMetaClone::new_csMetaClone);
   Site::addRemoteMetaObjectFactory("a3dl:object3D.polygonmesh",
-  				   "a3dl:object3D.polygonmesh",
+             "a3dl:object3D.polygonmesh",
                                    &csMetaPolygonMesh::new_csMetaPolygonMesh);
   Site::addRemoteMetaObjectFactory("a3dl:object3D.billboard",
-  			           "a3dl:object3D.billboard",
+                   "a3dl:object3D.billboard",
                                    &csMetaBillboard::new_csMetaBillboard);
   Site::addRemoteMetaObjectFactory("a3dl:object3D.model", "a3dl:object3D.model",
                                    &csMetaModel::new_csMetaModel);

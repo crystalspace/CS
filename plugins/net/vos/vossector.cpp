@@ -52,18 +52,18 @@ public:
 RelightTask::RelightTask(csVosA3DL* va, csVosSector* vs, int o, int l)
   : vosa3dl(va), sector(vs)
 {
-	numObjs = o;
-	numLights = l;
+  numObjs = o;
+  numLights = l;
 }
 
 void RelightTask::doTask()
 {
   if (sector->isLit) return;
 
-  LOG ("RelightTask", 2, "Checking status OBJ = " << numObjs << 
-			 " LIGHTS = " << numLights << ". Engine OBJ = " <<
-			 sector->GetSector()->GetMeshes()->GetCount() << " LIGHTS = " <<
-			  sector->GetSector()->GetLights()->GetCount());
+  LOG ("RelightTask", 2, "Checking status OBJ = " << numObjs <<
+       " LIGHTS = " << numLights << ". Engine OBJ = " <<
+       sector->GetSector()->GetMeshes()->GetCount() << " LIGHTS = " <<
+        sector->GetSector()->GetLights()->GetCount());
 
   if (numLights == sector->GetSector()->GetLights()->GetCount() &&
       numObjs == sector->GetSector()->GetMeshes()->GetCount())
@@ -72,7 +72,7 @@ void RelightTask::doTask()
     csRef<iEngine> engine = CS_QUERY_REGISTRY(objreg, iEngine);
 
     LOG ("RelightTask", 2, "Performing relight");
-	sector->isLit = true;
+  sector->isLit = true;
     engine->ForceRelight();
   }
 }
@@ -103,9 +103,9 @@ void RelightCheckerTask::doTask()
 
   while (1) // TODO: have a condition that can exit the loop
   {
-	sleep(1); // Is this needed
+  sleep(1); // Is this needed
 
-	if (nexttime > VOS::getRealTime()) continue;
+  if (nexttime > VOS::getRealTime()) continue;
 
     LOG ("RelightCheckerTask", 3, "Counting objects");
     int numObjs = 0, numLights = 0;
@@ -114,24 +114,24 @@ void RelightCheckerTask::doTask()
     {
       vRef<A3DL::Object3D> obj = meta_cast<A3DL::Object3D> ((*ci)->getChild());
       if (obj.isValid())
-	  {
-		// Check it's not a sphere or snow (we can't make those)
-		vRef<A3DL::Sphere> sphere = meta_cast<A3DL::Sphere> (obj);
-		vRef<A3DL::Snow> snow = meta_cast<A3DL::Snow> (obj);
-		if (sphere.isValid() || snow.isValid()) continue;
-		else numObjs++;
-	  }
+    {
+    // Check it's not a sphere or snow (we can't make those)
+    vRef<A3DL::Sphere> sphere = meta_cast<A3DL::Sphere> (obj);
+    vRef<A3DL::Snow> snow = meta_cast<A3DL::Snow> (obj);
+    if (sphere.isValid() || snow.isValid()) continue;
+    else numObjs++;
+    }
       else
       {
         vRef<A3DL::Light> light = meta_cast<A3DL::Light> ((*ci)->getChild());
         if (light.isValid()) numLights++;
       }
     }
-  
+
     LOG ("RelightCheckerTask", 2, "Pushing task");
-    vosa3dl->mainThreadTasks.push(new RelightTask(vosa3dl, sector, 
-												  numObjs, numLights));
-	nexttime = VOS::getRealTime() + 20;
+    vosa3dl->mainThreadTasks.push(new RelightTask(vosa3dl, sector,
+                          numObjs, numLights));
+  nexttime = VOS::getRealTime() + 20;
   }
 }
 
@@ -187,36 +187,36 @@ void LoadObjectTask::doTask()
   csRef<iMeshWrapper> wrapper = obj3d->GetCSinterface()->GetMeshWrapper();
   if (wrapper)
   {
-	if (toRemove)
-	{
-	  wrapper->GetMovable()->GetSectors()->Remove (sector->GetSector());
+  if (toRemove)
+  {
+    wrapper->GetMovable()->GetSectors()->Remove (sector->GetSector());
     }
     else
-	{
+  {
       if (wrapper->GetMovable()->GetSectors()->Find (sector->GetSector()))
       {
         LOG("LoadObjectTask", 3, "Object already setup and in sector");
       }
       else
-	  {
+    {
         LOG("LoadObjectTask", 3, "Object already setup, setting sector");
         wrapper->GetMovable()->GetSectors()->Add(sector->GetSector());
         wrapper->GetMovable()->UpdateMove();
       }
-	}
+  }
   }
   else
   {
     if (toRemove)
     {
-	  LOG("LoadObjectTask", 2, "Attempting to remove empty meshwrapper!")
-	}
-  
-	else
-	{
-	  LOG("LoadObjectTask", 2, "Setting up object3D")
+    LOG("LoadObjectTask", 2, "Attempting to remove empty meshwrapper!")
+  }
+
+  else
+  {
+    LOG("LoadObjectTask", 2, "Setting up object3D")
       obj3d->Setup(vosa3dl, sector);
-	}
+  }
   }
 }
 
@@ -294,7 +294,7 @@ void LoadSectorTask::doTask()
 }
 
 /// csVosSector ///
-    
+
 csVosSector::csVosSector(iObjectRegistry *o, csVosA3DL* va, const char* s)
 {
   SCF_CONSTRUCT_IBASE(0);
@@ -327,15 +327,15 @@ void csVosSector::notifyChildInserted (VobjectEvent &event)
 
   if(obj3d.isValid())
   {
-    vosa3dl->mainThreadTasks.push(new LoadObjectTask( vosa3dl, &obj3d, 
-				                                      this, false));
+    vosa3dl->mainThreadTasks.push(new LoadObjectTask( vosa3dl, obj3d,
+                                              this, false));
   }
   else
   {
     vRef<csMetaLight> light = meta_cast<csMetaLight>(event.getChild());
     if(light.isValid())
     {
-      vosa3dl->mainThreadTasks.push(new LoadLightTask( vosa3dl, &light, this));
+      vosa3dl->mainThreadTasks.push(new LoadLightTask( vosa3dl, light, this));
     }
   }
   LOG("csVosSector", 2, "leaving notifyChildInserted");
@@ -348,8 +348,8 @@ void csVosSector::notifyChildRemoved (VobjectEvent &event)
   vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>(event.getChild());
   if(obj3d.isValid())
   {
-    vosa3dl->mainThreadTasks.push(new LoadObjectTask( vosa3dl, &obj3d, 
-				                                      this, true));
+    vosa3dl->mainThreadTasks.push(new LoadObjectTask( vosa3dl, obj3d,
+                                              this, true));
   }
   else
   {

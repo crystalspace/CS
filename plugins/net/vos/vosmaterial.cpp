@@ -222,7 +222,7 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
   {
           mt->Setup(vosa3dl);
           mt->acquire();
-          cmt->layers.push_back(&mt);
+          cmt->layers.push_back(mt);
           try
           {
             mt->getUVScaleAndShift(uscale, vscale, ushift, vshift);
