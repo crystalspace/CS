@@ -288,4 +288,22 @@ the octree.
 Debug command to find the octree leaf where the camera is located and
 then show the dimensions of this leaf on standard output.
 
+@item record
+Start/stop recording camera movement. If you have a previous recording in
+memory then a the new camera movements will be appended.
+
+@item play
+Play a recording (if there is one). Note that a recording is only valid
+when played in the same (or VERY similar) level.
+
+@item clrrec
+Clear a recording.
+
+@item loadrec
+Load a recording from /this/record. Note that a recording is only valid
+when played in the same (or VERY similar) level.
+
+@item saverec
+Save a recording to /this/record.
+
 @end table
