@@ -919,58 +919,58 @@ Optional Packages:
   --with-java             use Java scripting interface (default YES)
   --with-x                use the X Window System
   --with-libXxf86vm=dir   specify location of libXxf86vm if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-mesa             use Mesa OpenGL library if available (default YES)
   --with-libz=dir         specify location of libz if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libpng=dir       specify location of libpng if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libjpeg=dir      specify location of libjpeg if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libmng=dir       specify location of libmng if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libmikmod=dir    specify location of libmikmod if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libogg=dir       specify location of libogg if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libvorbis=dir    specify location of libvorbis if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libvorbisfile=dir
                           specify location of libvorbisfile if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-lib3ds=dir       specify location of lib3ds if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libode=dir       specify location of libode if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libvga=dir       specify location of libvga if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libcal3d=dir     specify location of libcal3d if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libCg=dir        specify location of libCg if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libCgGL=dir      specify location of libCgGL if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libasound=dir    specify location of libasound if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
   --with-libbfd=dir       specify location of libbfd if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
+                          automatically; searches dir/include, dir/lib, and
+                          dir
 
 Some influential environment variables:
   CC          C compiler command
@@ -15540,14 +15540,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -15559,14 +15559,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -18756,14 +18756,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -18775,14 +18775,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -19302,14 +19302,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -19321,14 +19321,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -19787,14 +19787,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -19806,14 +19806,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -20275,14 +20275,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -20294,14 +20294,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -20760,14 +20760,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -20779,14 +20779,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -21244,14 +21244,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -21263,14 +21263,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -21722,14 +21722,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -21741,14 +21741,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -22202,14 +22202,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -22221,14 +22221,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -22693,14 +22693,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -22712,14 +22712,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -23493,14 +23493,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -23512,14 +23512,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -25341,14 +25341,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -25360,14 +25360,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -25825,14 +25825,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -25844,14 +25844,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -27335,14 +27335,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -27354,14 +27354,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -27784,14 +27784,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -27803,14 +27803,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -28724,14 +28724,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -28743,14 +28743,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi
@@ -34825,14 +34825,14 @@ fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
+	    *)  if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
 else
   cs_check_lib_lflag=''
 fi
@@ -34844,14 +34844,14 @@ else
 fi
 
     cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+		if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
 else
   cs_check_lib_cflag=''
 fi
 
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
 else
   cs_check_lib_lflag=''
 fi

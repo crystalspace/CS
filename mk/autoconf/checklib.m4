@@ -1,6 +1,6 @@
 # checklib.m4                                                  -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003,2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -25,10 +25,10 @@ AC_PREREQ([2.56])
 #	default, for external libraries.  Each list item can specify an
 #	include|library directory tuple (for example, "/usr/include|/usr/lib"),
 #	or a single directory (for example, "/usr").  If the second form is
-#	used, then the directory itself is searched first.  If the external
-#	resource is not found, then "include" and "lib" subdirectories of the
-#	directory are searched.  Thus, specifying "/proj" is shorthand for
-#	"/proj|/proj /proj/include|/proj/lib".
+#	used, then "include" and "lib" subdirectories of the directory are
+#	searched.  If the library resources are not found, then the directory
+#	itself is searched.  Thus, "/proj" is shorthand for
+#	"/proj/include|/proj/lib /proj|/proj".
 #
 #	By default this list is empty, but may be overridden in configure.ac.
 #------------------------------------------------------------------------------
@@ -52,25 +52,25 @@ m4_define([cs_lib_paths_default], [])
 #	those referenced by the cs_lib_paths_default macro.  Each list item can
 #	specify an include|library directory tuple (for example,
 #	"/usr/include|/usr/lib"), or a single directory (for example, "/usr").
-#	If the second form is used, then the directory itself is searched
-#	first.  If the library resources are not found, then "include" and
-#	"lib" subdirectories of the directory are searched.  Thus, specifying
-#	"/proj" is shorthand for "/proj|/proj /proj/include|/proj/lib".  Items
-#	in the search list can include wildcards.  SEARCH-LIST can be overriden
-#	by the user with the --with-libLIBRARY=dir option, in which case only
-#	"dir" and "dir/include|dir/lib" are searched.  If SEARCH-LIST is
-#	omitted and the user did not override the search list via
-#	--with-libLIBRARY=dir, then only the directories normally searched by
-#	the compiler and the directories mentioned via cs_lib_paths_default are
-#	searched.  LANGUAGE is typically either C or C++ and specifies which
-#	compiler to use for the test.  If LANGUAGE is omitted, C is used.
-#	OTHER-CFLAGS, OTHER-LFLAGS, and OTHER-LIBS can specify additional
-#	compiler flags, linker flags, and libraries needed to successfully link
-#	with LIBRARY.  The optional ALIASES is a whitespace-delimited list of
-#	library names to search for in case LIBRARY is not located (for example
-#	"sdl1.2 sdl12" for libsdl1.2.a and libsdl12.a).  If the library or one
-#	of its aliases is found and can be successfully linked into a program,
-#	then the shell cache variable cs_cv_libLIBRARY is set to "yes";
+#	If the second form is used, then "include" and "lib" subdirectories of
+#	the directory are searched.  If the library resources are not found,
+#	then the directory itself is searched.  Thus, "/proj" is shorthand for
+#	"/proj/include|/proj/lib /proj|/proj".  Items in the search list can
+#	include wildcards.  SEARCH-LIST can be overriden by the user with the
+#	--with-libLIBRARY=dir option, in which case only "dir/include|dir/lib"
+#	and "dir|dir" are searched.  If SEARCH-LIST is omitted and the user did
+#	not override the search list via --with-libLIBRARY=dir, then only the
+#	directories normally searched by the compiler and the directories
+#	mentioned via cs_lib_paths_default are searched.  LANGUAGE is typically
+#	either C or C++ and specifies which compiler to use for the test.  If
+#	LANGUAGE is omitted, C is used.  OTHER-CFLAGS, OTHER-LFLAGS, and
+#	OTHER-LIBS can specify additional compiler flags, linker flags, and
+#	libraries needed to successfully link with LIBRARY.  The optional
+#	ALIASES is a whitespace-delimited list of library names to search for
+#	in case LIBRARY is not located (for example "sdl1.2 sdl12" for
+#	libsdl1.2.a and libsdl12.a).  If the library or one of its aliases is
+#	found and can be successfully linked into a program, then the shell
+#	cache variable cs_cv_libLIBRARY is set to "yes";
 #	cs_cv_libLIBRARY_cflags, cs_cv_libLIBRARY_lflags, and
 #	cs_cv_libLIBRARY_libs are set, respectively, to the compiler flags
 #	(including OTHER-CFLAGS), linker flags (including OTHER-LFLAGS), and
@@ -85,8 +85,8 @@ m4_define([cs_lib_paths_default], [])
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_LIB_WITH],
     [AC_ARG_WITH([lib$1], [AC_HELP_STRING([--with-lib$1=dir],
-	[specify location of lib$1 if not detected automatically; searches dir,
-	dir/include, and dir/lib])])
+	[specify location of lib$1 if not detected automatically; searches
+	dir/include, dir/lib, and dir])])
 
     AS_IF([test -z "$with_lib$1"], [with_lib$1=yes])
     AS_IF([test "$with_lib$1" != no],
@@ -131,10 +131,10 @@ AC_DEFUN([_CS_CHECK_LIB_CREATE_FLAGS],
 		_CS_CHECK_LIB_CREATE_FLAG([$1],
 		    [$cs_check_incdir], [$cs_check_libdir], [$2])
 		;;
-	    *)  _CS_CHECK_LIB_CREATE_FLAG(
-		    [$1], [$cs_lib_item], [$cs_lib_item], [$2])
-		_CS_CHECK_LIB_CREATE_FLAG([$1],
+	    *)  _CS_CHECK_LIB_CREATE_FLAG([$1],
 		    [$cs_lib_item/include], [$cs_lib_item/lib], [$2])
+		_CS_CHECK_LIB_CREATE_FLAG(
+		    [$1], [$cs_lib_item], [$cs_lib_item], [$2])
 		;;
 	esac
     done])

@@ -26,6 +26,15 @@ chronological order.
 	      they also remove the Swig-generated files.
 	    - Fixed generation of perl5.cex by cspython.mak. The script it
 	      created was entirely dysfunctional and completely useless.
+	- Eric Sunshine resolved a precedence issue with CS_CHECK_LIB_WITH()
+	  (checklib.m4) in which it could be fooled into ignoring the path
+	  given via --lib-withfoo=path if 'foo' was also installed in one of
+	  the standard locations searched by the compiler and linker.
+	  Specifically, it would check "path" first before checking
+	  "path/include" and "path/lib", however if a version of 'foo' was also
+	  installed in a standard location (other than "path"), then it would
+	  never get around to trying "path/include" and "path/lib" because it
+	  would find the installation at the standard location.
 22-Apr-2004
 	- Jorrit removed motion and motldr from Jamrules for static
 	  compilation.
