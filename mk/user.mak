@@ -81,7 +81,7 @@ DO_MMX=yes
 
 # If "yes", then in UNIX create core dumps on crash.
 # Be warned, they are large (> 20MB)!
-DO_COREDUMP=yes
+DO_COREDUMP=no
 
 # Uncomment the following line(s) if you want to enable the memory debugger
 # that is built in.  This is only recommended for debugging purposes as it
@@ -102,9 +102,9 @@ MEM=$(MEM.$(MODE))
 USE_MESA=1
 
 # The tool used to build dependencies. The possible values are:
-# none	- Cannot build dependencies on this platform
-# cc	- Use the C compiler (gcc -MM) for this
-# mkdep	- Use the makedep tool provided in the apps/makedep directory
+# none  - Cannot build dependencies on this platform
+# cc    - Use the C compiler (gcc -MM) for this
+# mkdep - Use the makedep tool provided in the apps/makedep directory
 ifndef DEPEND_TOOL
   DEPEND_TOOL=cc
 endif
