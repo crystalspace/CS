@@ -586,20 +586,34 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
   }
   else
   {
-    el->recurse_marker = true;
     el->marker = true;
     printf (" (%s,%d) #p=%d #c=%d\n",
     	el->file, el->linenr, el->num_parents, el->num_children);
-    int i;
-    for (i = 0 ; i < el->num_parents ; i++)
+    if (el->num_parents + el->num_children > 0)
     {
-      DumpSubTree (indent+2, "P", el->p_stamps[i], el->parents[i]);
+      bool use_brackets = true;
+      if (el->num_children == 0 && el->num_parents == 1)
+      {
+        // If we have only one parent and no children we check
+	// if we already visited that parent in this recursion.
+	// In that case we don't print the brackets.
+	if (el->parents[0]->recurse_marker) use_brackets = false;
+      }
+
+      if (use_brackets) printf ("%s{\n", spaces);
+      el->recurse_marker = true;
+      int i;
+      for (i = 0 ; i < el->num_parents ; i++)
+      {
+        DumpSubTree (indent+2, "P", el->p_stamps[i], el->parents[i]);
+      }
+      for (i = 0 ; i < el->num_children ; i++)
+      {
+        DumpSubTree (indent+2, "C", el->c_stamps[i], el->children[i]);
+      }
+      el->recurse_marker = false;
+      if (use_brackets) printf ("%s}\n", spaces);
     }
-    for (i = 0 ; i < el->num_children ; i++)
-    {
-      DumpSubTree (indent+2, "C", el->c_stamps[i], el->children[i]);
-    }
-    el->recurse_marker = false;
   }
   fflush (stdout);
 }

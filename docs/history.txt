@@ -46,6 +46,8 @@ The history order is reversed so that new features are at the top.
 	  mentioned in this recursion level. In this case we simply print
 	  out the pointer and the timestamp of the link and add '<-' to
 	  indicate the information can be found upwards.
+	- More cleanup of the output of csDebuggingGraph::Dump(). Added
+	  curly brackets for the children to group children more clearly.
 15-Nov-2001
 	- Added DG_ADDI and csDebuggingGraph::AddInterface() with which you
 	  can add an SCF interface (instance of iBase) to the debug graph.
