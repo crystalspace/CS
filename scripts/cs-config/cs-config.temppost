@@ -2,11 +2,11 @@
 if test -e "$prefix"; then
 #	look for the lib files...
 #	a more or less dirty hack...
-#	FIXME: what if there are multiple libcssys.a???
 	if test -e "$prefix/lib/libcssys.a"; then
 	    libdir="$prefix/lib"
 	else
-	    libdir=`find "$CRYSTAL" -name "libcssys.a" -printf "%h"`
+	    #Thanks go to Jorge for this script magic...
+	    libdir=`find "$CRYSTAL" -name "libcssys.a"  | sed -e "s~\(.*\)/.*~\1~" -e "1q"`
 	    if test -z "$libdir"; then
 	        echo "Couldn't detect dir with lib files, aborting!"
 		echo "  Did you already compile CS?"
