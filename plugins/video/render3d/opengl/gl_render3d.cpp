@@ -360,7 +360,6 @@ void csGLGraphics3D::SetAlphaType (csAlphaMode::AlphaType alphaType)
 
 void csGLGraphics3D::SetMirrorMode (bool mirror)
 {
-  if (render_target) mirror = !mirror;
   if (mirror)
     statecache->SetCullFace (GL_BACK);
   else
@@ -697,10 +696,10 @@ void csGLGraphics3D::SetupProjection ()
   statecache->SetMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
   SetGlOrtho (render_target);
-  /*if (render_target)
+  if (render_target)
   {
     int txt_w, txt_h;
-    render_target->GetMipMapDimensions (0, txt_w, txt_h);*/
+    render_target->GetMipMapDimensions (0, txt_w, txt_h);
 
     /*
       Need a different translation for PTs, they are in the upper left.
@@ -709,9 +708,9 @@ void csGLGraphics3D::SetupProjection ()
           hardcoded
      */
 
-    /*glTranslatef ((txt_w / 2), (txt_h / 2), 0);
+    glTranslatef ((txt_w / 2), (txt_h / 2), 0);
   }
-  else*/
+  else
     glTranslatef (asp_center_x, asp_center_y, 0);
 
   GLfloat matrixholder[16];
@@ -1219,7 +1218,6 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     }
   }
 
-  glClearColor (1, 0, 0, 0);
   if (drawflags & CSDRAW_CLEARZBUFFER)
   {
     const GLbitfield stencilFlag = 
@@ -1300,7 +1298,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
 void csGLGraphics3D::FinishDraw ()
 {
-  SetMirrorMode (render_target != 0);
+  SetMirrorMode (false);
 
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
@@ -1311,10 +1309,10 @@ void csGLGraphics3D::FinishDraw ()
     {
       rt_cliprectset = false;
       G2D->SetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
-      /*statecache->SetMatrixMode (GL_PROJECTION);
+      statecache->SetMatrixMode (GL_PROJECTION);
       glLoadIdentity ();
       glOrtho (0., viewwidth, 0., viewheight, -1.0, 10.0);
-      glViewport (0, 0, viewwidth, viewheight);*/
+      glViewport (0, 0, viewwidth, viewheight);
     }
 
     if ((current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)) == 
@@ -2495,8 +2493,8 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     {
       rmesh.object2camera.SetO2T (
         csMatrix3 (1.0f, 0.0f, 0.0f,
-        0.0f, -1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f));
+                   0.0f, -1.0f, 0.0f,
+                   0.0f, 0.0f, 1.0f));
       rmesh.object2camera.SetO2TTranslation (csVector3 (0, viewheight, 0));
       // Try to be compatible with 2D drawing mode
       G2D->PerformExtension ("glflushtext");
@@ -2506,8 +2504,8 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
 
       rmesh.object2camera.SetO2T (
       csMatrix3 (1.0f, 0.0f, 0.0f,
-      0.0f, -1.0f, 0.0f,
-      0.0f, 0.0f, 1.0f));
+                 0.0f, -1.0f, 0.0f,
+                 0.0f, 0.0f, 1.0f));
       rmesh.object2camera.SetO2TTranslation (csVector3 (
       vwf / 2.0f, vhf / 2.0f, -aspect));
     }
