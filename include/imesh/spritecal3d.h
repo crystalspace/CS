@@ -229,6 +229,12 @@ struct iSpriteCal3DFactoryState : public iBase
    */
   virtual int  FindMeshName(const char *meshName) = 0;
 
+  /** 
+   * Returns the name of the default material that should go on this mesh.
+   */
+  virtual const char* GetDefaultMaterial( const char* meshName ) = 0;
+  
+  
   /**
    * Returns the xml name of the morph animation at a certain index in the array.
    */
