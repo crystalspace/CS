@@ -227,6 +227,8 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
       glTexImage2D (GL_TEXTURE_2D, 0, GL_ALPHA, texSize, texSize, 0, 
         GL_ALPHA, GL_UNSIGNED_BYTE, texImage);
     }
+    else
+      textures[tex].mirrorHandle = 0;
     delete[] texImage;
 
     statecache->SetTexture (GL_TEXTURE_2D, 0);

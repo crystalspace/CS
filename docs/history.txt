@@ -20,6 +20,7 @@ chronological order.
 	  in order to detect problems specific to 64-bit platforms. (For
 	  instance, on Intel 64-bit, csQint() gives incorrect results for
 	  negative numbers.)
+	- res fixed an unit var in the OpenGL font cache.
 20-Feb-2005
 	- res made the following changes:
 	    - Added a flag that is set via a variable indicating whether the
