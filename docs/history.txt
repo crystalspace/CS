@@ -71,6 +71,8 @@ The history order is reversed so that new features are at the top.
 	  csengine classes.  I also moved loadinfo.h to the CVS Attic since it
 	  is no longer used.
 	- Philip fixed some warnings in the python plugin.
+	- Eric Sunshine disabled CS_EXTENSIVE_MEMDEBUG for the Apple/NeXT ports
+	  since some of the Apple/NeXT compilers can't properly grok it.
 31-May-2001
 	- In an effort to understand how the keyframer section in 3DS
 	  works I extended 3ds2lev verbose option to also list the contents

@@ -210,10 +210,18 @@ static inline char* getcwd( char* p, size_t size )
 #  define CS_NO_IEEE_OPTIMIZATIONS
 #endif
 
+
 //-----------------------------------------------------------------------------
 // The special assembly version of qsqrt() (from CS/include/qsqrt.h) fails to
 // compile on NeXT.
 //-----------------------------------------------------------------------------
 #define CS_NO_QSQRT
+
+
+//-----------------------------------------------------------------------------
+// The "extensive debug" facility of cssysdef.h is incompatible with some of
+// the Apple/NeXT compilers.
+//-----------------------------------------------------------------------------
+#define CS_EXTENSIVE_MEMDEBUG 0
 
 #endif // __NeXT_csosdefs_h
