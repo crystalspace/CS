@@ -22,6 +22,11 @@ The history order is reversed so that new features are at the top.
 	  especially when it is opening (move close to the door).
 	- Matze added support for 64 bit integers to Crystal Space. You can
 	  use the int64 and uint64 type now.
+	- Mårten Svanfeldt fixed:
+	    - Rendering in new renderer after Jorrits changes to thing
+	    - Made some performance-increases by caching and reducing state-
+	      changes in new opengl renderer.
+	    - Fixed some codingstandard issues in render3d.
 24-Mar-2003
 	- Cleaned up indentation in new event code. Note to Jonathan:
 	  a tab == 8 spaces. Indentation == 2 spaces.
