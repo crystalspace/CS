@@ -27,6 +27,8 @@ chronological order.
 	- res fixed halos on GL.
 	- res replaced some glTexEnvf()s with glTexEnvi()s and vice versa at
 	  some places.
+	- res added a dependency on crystalspace.graphic.image.io. to the
+	  cscursor plugin.
 8-Jan-2005
 	- Marten completly rewrote the way renderbuffers are sent from the
 	  mesh into renderer. Also changed the syntax of buffermappings a bit.
