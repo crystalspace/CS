@@ -7,7 +7,7 @@ if $(X11.AVAILABLE) = "yes"
 
   if $(XAW.AVAILABLE) = "yes"
   {
-    XWIN_XALERT = [ Wildcard xalert_xaw : *.cpp *.h ] ;
+    XWIN_XALERT = [ Wildcard xalert_xaw : *.cpp *.h *.c ] ;
     XWIN_EXTERN = XAW ;
   }
   else

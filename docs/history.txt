@@ -49,6 +49,7 @@ chronological order.
 	  udword).
 	- res fixed the use of int<->iMaterialWrapper* casts in sprcal3d.
 	- res fixed a wrong #include in the asciiart canvas.
+	- res fixed missing files in xwindow plugin.
 23-Feb-2005
 	- res moved the code from the various "common" libraries into a
 	  library "csplugincommon" (and libraries with Win32, OpenGL and
