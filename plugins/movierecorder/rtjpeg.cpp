@@ -24,7 +24,7 @@
 
 #include "cssysdef.h"
 
-#if defined(DO_MMX) && defined(COMP_GCC) && __GNUC__ >= 3
+#if defined(DO_MMX) && defined(COMP_GCC)
 # define MMX
 # include "mmx.h"
 #endif
@@ -639,7 +639,6 @@ static mmx_t RTjpeg_C6   =(mmx_t)(long long)0x187E187E187E187ELL;
 static mmx_t RTjpeg_C2mC6=(mmx_t)(long long)0x22A322A322A322A3LL;
 static mmx_t RTjpeg_C2pC6=(mmx_t)(long long)0x539F539F539F539FLL;
 static mmx_t RTjpeg_zero =(mmx_t)(long long)0x0000000000000000LL;
-
 #else
 
 #define FIX_0_382683433  ((int32)   98)		/* FIX(0.382683433) */

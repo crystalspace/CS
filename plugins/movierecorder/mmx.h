@@ -43,7 +43,12 @@
 	 by LL and unsigned long long values by ULL, lest
 	 they be truncated by the compiler)
 */
-typedef	union {
+typedef	union mmx_t {
+	mmx_t () {}
+	mmx_t (long long v)
+	  : q(v)
+	{}
+  
 	long long		q;	/* Quadword (64-bit) value */
 	unsigned long long	uq;	/* Unsigned Quadword */
 	int			d[2];	/* 2 Doubleword (32-bit) values */
@@ -53,7 +58,7 @@ typedef	union {
 	char			b[8];	/* 8 Byte (8-bit) values */
 	unsigned char		ub[8];	/* 8 Unsigned Byte */
 	float			s[2];	/* Single-precision (32-bit) value */
-} __attribute__ ((aligned (8))) mmx_t;	/* On an 8-byte (64-bit) boundary */
+} __attribute__ ((aligned (8)));	/* On an 8-byte (64-bit) boundary */
 
 
 
