@@ -10,7 +10,6 @@ PLUGINS+= cscript/cslua
 PLUGINS+= sound/renderer/software
 PLUGINS+= video/canvas/ddraw
 PLUGINS+= video/canvas/ddraw8
-#PLUGINS+= cscript/cslua
 
 # if u have the following line uncommented make sure one  
 # LIBS.OPENGL.SYSTEM is set below or you have a custom 
