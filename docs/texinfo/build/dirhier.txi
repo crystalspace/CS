@@ -115,10 +115,6 @@ formats (through plugins) and put them internally in the same format.
 Through this library you can get at @sc{jpg}, @sc{gif}, @sc{tga}, @sc{png},
 and @sc{bmp} files.
 
-@item CS/libs/csparser
-A library which parses @sc{ascii} map files and imports the map into the
-3D engine. In the future this library will be removed in favor of a plugin.
-
 @item CS/libs/cssys
 All system dependent stuff (non-graphics and non-sound related) is in this
 library.
@@ -169,6 +165,10 @@ Project files for Win32 using @sc{msvc} 5.0/ 6.0
 @item CS/plugins
 Plug-in, dynamically loaded modules.  Communication with these modules is
 performed strictly via @sc{scf} interfaces.  @xref{SCF}.
+
+@item CS/plugins/csparser
+A plugin which parses @sc{ascii} map files and imports the map into the
+3D engine.
 
 @item CS/plugins/video/canvas
 The 2D driver component which manages creation of the Crystal Space window
