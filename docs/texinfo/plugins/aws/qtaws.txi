@@ -27,6 +27,8 @@ java org.apache.xalan.xslt.Process \
     -XSL path/to/CS/scripts/aws/qt2aws.xsl
 @end example
 
+If you use Designer 1.1 (that comes with QT2) you use qt2aws.xsl. The new Designer version 2.0 (which comes with QT3) changed it's .ui DTD slightly. In case you use Designer2.0 use qt3aws.xsl.
+
 Append the output to a file containing skin definitions.
 
 @subsubheading What controls are converted ?
