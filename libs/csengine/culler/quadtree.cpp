@@ -44,6 +44,35 @@ static int Pow2(int x)
 }
 
 
+csQuadTree :: node_pos_info :: node_pos_info(void)
+{
+  set_root();
+}
+
+void csQuadTree :: node_pos_info :: set_root(void)
+{
+  // init to point to root state.
+  offset = -1;
+  bytepos = 0;
+  depth = 1;
+  plane_size = 1;
+  plane_start = 0;
+  node_x = 0;
+  node_y = 0;
+}
+
+csQuadTree :: node_pos_info :: node_pos_info(const node_pos_info &copy)
+{
+  offset = copy.offset;
+  bytepos = copy.bytepos;
+  depth = copy.depth;
+  plane_size = copy.plane_size;
+  plane_start = copy.plane_start;
+  node_x = copy.node_x;
+  node_y = copy.node_y;
+}
+
+
 csQuadTree :: csQuadTree (const csBox2& the_box, int the_depth)
 {
   bbox = the_box;
@@ -84,27 +113,14 @@ csQuadTree :: ~csQuadTree ()
 
 
 void csQuadTree :: CallChildren(quad_traverse_func* func, csQuadTree* pObj, 
-  const csBox2& box, int depth, int offset, int node_nr, void *data)
+  const csBox2& box, node_pos_info *parent_pos, void *data)
 {
   int retval[4];
-  pObj->CallChildren(func, pObj, box, depth, offset, node_nr, data, retval);
+  pObj->CallChildren(func, pObj, box, parent_pos, data, retval);
 }
 
-void csQuadTree :: CallChildren(quad_traverse_func* func, csQuadTree* pObj,  
-  const csBox2& box, int depth, int offset, int node_nr, 
-  void *data, int retval[4])
-{
-  if(depth >= pObj->max_depth)
-  {
-    CsPrintf(MSG_INTERNAL_ERROR, "QuadTree: leaf trying to recurse.\n");
-    return;
-  }
-  // call func for each child of parent node with (offset, node_nr)
-  csBox2 childbox;
-  csVector2 center = box.GetCenter();
-  int childstate, childoffset, childnr;
-
   /*
+   * OLD:
    * states are ordered like this:
    * root has children in byte 0.
    * nodes in byte 0 have children in byte 0+node_nr+1(1,2,3,4).
@@ -112,36 +128,104 @@ void csQuadTree :: CallChildren(quad_traverse_func* func, csQuadTree* pObj,
    * nodes in byte n have children in byte 4*n+node_nr+1
    * So for byte n, take 4*n + node_nr+1 as the new byte
    * that new byte has the states of it's four children.
+   * BUT: finding node at x,y is too hard.
+   *
+   * NEW:
+   * states orderd like this:
+   * node at depth 1, then all nodes at depth 2, ...
+   * nodes at a depth are stored in y*width + x ordering.
+   * width at depth d is: 2 ** (d-1)
+   * nodes at depth d start after: (4 ** (d-1) -1) /3 nodes in the array.
+   * 
+   * To find children of a node, do the following.
+   * a position is offset*4 + node_nr.
+   * parent node, position pos, coords px, py, depth pd.
+   * pos = 2**(pd-1) * py + px + (4**(pd-1) -1 ) / 3
+   *
+   * The topleft child is at 4*pos - 2*px + 1.
+   * is has coords 2*px, 2*py, depth pd+1, width 2**(pd+1-1)
+   * childpos = 2**(pd+1-1) * 2*py + 2*px + (4**(pd+1-1) -1)/3
+   *
+   * but since:
+   * 4 * pos = 4* 2**(pd-1)*py + 4*px + 4* (4**(pd-1) -1)/3
+   *   = 2**(pd+1-1) * 2*py + 2* 2*px + (4**(pd+1-1))/3 - 4/3
+   *   = 2**(pd+1-1) * 2*py + 2* 2*px + (4**(pd+1-1))/3 - 1/3 - 1
+   *   = 2**(pd+1-1) * 2*py + 2* 2*px + (4**(pd+1-1) - 1)/3 - 1
+   *   = childpos + 2*px - 1
+   * Thus childpos = 4*pos - 2*px + 1
+   * 
+   * This is not yet used. Because I am not sure if the above will
+   * work, first the simple version.
   */
-  if(offset == -1)
-    childoffset = 0; // root node's children
-  else childoffset = 4 * offset + node_nr + 1;
-  for(childnr=0; childnr<4; childnr++)
+void csQuadTree :: CallChildren(quad_traverse_func* func, csQuadTree* pObj,  
+  const csBox2& box, node_pos_info *parent_pos, void *data, int retval[4])
+{
+  if(parent_pos->depth >= pObj->max_depth)
   {
-    // compute new bounding box.
-    switch(childnr)
+    CsPrintf(MSG_INTERNAL_ERROR, "QuadTree: leaf trying to recurse.\n");
+    return;
+  }
+  // call func for each child of parent node with (offset, node_nr)
+  csBox2 childbox;
+  csVector2 center = box.GetCenter();
+  // make a copy of parent position, and adjust values.
+  // during recursion only depth times will there be a node_pos_info on stack.
+  // say 20 deep, times 28 bytes -> only 560 bytes.
+  node_pos_info child_pos(*parent_pos);
+  child_pos.depth = parent_pos->depth+1;
+  child_pos.plane_size = parent_pos->plane_size << 1;
+  child_pos.plane_start = parent_pos->plane_start + 
+    (parent_pos->plane_size * parent_pos->plane_size) / 4;
+  int child_x = parent_pos->node_x << 1;
+  int child_y = parent_pos->node_y << 1;
+
+  /// counted in nr of nodes, how manyeth node is the topleft node
+  /// of the children from it's plane_start
+  int nodenr = child_pos.plane_size * child_pos.node_y + child_pos.node_x;
+  int childnr = 0;
+
+  for(int y = 0; y < 2; y++)
+  {
+    for(int x = 0; x < 2; x++)
     {
-      case 0 /*topleft*/ : 
-        childbox.Set(box.Min(), center); break;
-      case 1 /*topright*/ : 
-        childbox.Set(center.x, box.MinY(), box.MaxX(), center.y); break;
-      case 2 /*bottomleft*/ : 
-        childbox.Set(box.MinX(), center.y, center.x, box.MaxY()); break;
-      case 3 /*bottomright*/ : 
-        childbox.Set(center, box.Max()); break;
-      default: CsPrintf(MSG_FATAL_ERROR, "QuadTree: Unknown child\n");
+      // compute array position
+      child_pos.node_x = child_x + x;
+      child_pos.node_y = child_y + y;
+      child_pos.offset = child_pos.plane_start + (nodenr >> 2);
+      child_pos.bytepos = nodenr & 0x3;
+
+      // compute new bounding box.
+      switch(childnr)
+      {
+        case 0 /*topleft*/ : 
+          childbox.Set(box.Min(), center); break;
+        case 1 /*topright*/ : 
+          childbox.Set(center.x, box.MinY(), box.MaxX(), center.y); break;
+        case 2 /*bottomleft*/ : 
+          childbox.Set(box.MinX(), center.y, center.x, box.MaxY()); break;
+        case 3 /*bottomright*/ : 
+          childbox.Set(center, box.Max()); break;
+        default: CsPrintf(MSG_FATAL_ERROR, "QuadTree: Unknown child\n");
+      }
+      int childstate = pObj->GetNodeState(&child_pos);
+      retval[childnr] = func(pObj, childbox, childstate, &child_pos, data);
+
+      nodenr += 1; // next node in this row
+      childnr++; // next child.
     }
-    childstate = pObj->GetNodeState(childoffset, childnr);
-    retval[childnr] = func(pObj, childbox, depth+1, childstate, childoffset,
-      childnr, data);
+    // done all in the row
+    // go down a row. that is plane_size bytes, subtract what was
+    // added while processing the row.
+    nodenr += child_pos.plane_size - 2;
   }
 }
+
 
 /// masks and shifts for GetNodeState and SetNodeState
 static const int node_masks[4] = {0xC0, 0x30, 0x0C, 0x03};
 static const int node_shifts[4] = {6, 4, 2, 0};
 
-int csQuadTree :: GetNodeState(int offset, int nodenr)
+int csQuadTree :: GetNodeState(int offset, int bytepos)
 {
   if(offset > state_size)
   {
@@ -151,13 +235,13 @@ int csQuadTree :: GetNodeState(int offset, int nodenr)
   if(offset == -1)
     return root_state;
   unsigned char bits = states[offset];
-  bits &= node_masks[nodenr];
-  bits >>= node_shifts[nodenr];
+  bits &= node_masks[bytepos];
+  bits >>= node_shifts[bytepos];
   return bits;
 }
 
 
-void csQuadTree :: SetNodeState(int offset, int nodenr, int newstate)
+void csQuadTree :: SetNodeState(int offset, int bytepos, int newstate)
 {
   if(offset > state_size)
   {
@@ -169,10 +253,10 @@ void csQuadTree :: SetNodeState(int offset, int nodenr, int newstate)
     root_state = newstate;
     return;
   }
-  unsigned char bits = states[offset];     // get all bits
-  bits &= ~node_masks[nodenr];             // purge this node's bits
-  bits |= newstate << node_shifts[nodenr]; // insert new bits
-  states[offset] = bits;                   // store bits
+  unsigned char bits = states[offset];      // get all bits
+  bits &= ~node_masks[bytepos];             // purge this node's bits
+  bits |= newstate << node_shifts[bytepos]; // insert new bits
+  states[offset] = bits;                    // store bits
 }
 
 
@@ -185,18 +269,17 @@ void csQuadTree :: MakeEmpty()
 
 
 int csQuadTree :: mark_node_func (csQuadTree* pObj, const csBox2& node_bbox,
-  int node_depth, int node_state, int offset, int node_nr, void* data)
+  int node_state, node_pos_info *node_pos, void* data)
 {
   (void)node_bbox;
-  (void)node_depth;
   (void)node_state;
-  pObj->SetNodeState(offset, node_nr, (int)data);
+  pObj->SetNodeState(node_pos, (int)data);
   return (int)data;
 }
 
 
-int csQuadTree :: insert_polygon_func (csQuadTree* pObj, const csBox2& node_bbox,
-  int node_depth, int node_state, int offset, int node_nr, void* data)
+int csQuadTree :: insert_polygon_func (csQuadTree* pObj, 
+  const csBox2& node_bbox, int node_state, node_pos_info *node_pos, void* data)
 {
   struct poly_info& info = *(struct poly_info*)data;
   if(node_state == CS_QUAD_UNKNOWN)
@@ -215,8 +298,9 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj, const csBox2& node_bbox
   /// So, the polygon bbox overlaps this node. How much?
   ///----------------------------------------------------
 
-  printf("Depth %d Checking node %d,%d(%d)\n", node_depth, offset, 
-    node_nr, node_state);
+  printf("Depth %d Checking node %d+%d %d,%d (%d)\n", node_pos->depth, 
+    node_pos->offset, node_pos->bytepos, node_pos->node_x, node_pos->node_y,
+    node_state);
 
   /// is the whole node covered?
   /// first check bounding boxes then precisely.
@@ -224,11 +308,11 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj, const csBox2& node_bbox
     BoxEntirelyInPolygon(info.verts, info.num_verts, node_bbox))
   {
     if(!info.test_only)
-      pObj->SetNodeState(offset, node_nr, CS_QUAD_FULL);
+      pObj->SetNodeState(node_pos, CS_QUAD_FULL);
     /// mark children (if any) as unknown, since they should not be reached.
-    if(node_depth < pObj->max_depth)
-      pObj->CallChildren(csQuadTree::mark_node_func, pObj, node_bbox, node_depth, 
-        offset, node_nr, (void*)CS_QUAD_UNKNOWN);
+    if(node_pos->depth < pObj->max_depth)
+      pObj->CallChildren(csQuadTree::mark_node_func, pObj, node_bbox, 
+        node_pos, (void*)CS_QUAD_UNKNOWN);
     return CS_QUAD_CERTAINCHANGE;
   }
   
@@ -241,23 +325,23 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj, const csBox2& node_bbox
   { 
     int old_node_state = node_state;
     // so it overlaps a bit.
-    if(node_state == CS_QUAD_EMPTY && node_depth < pObj->max_depth)
+    if(node_state == CS_QUAD_EMPTY && node_pos->depth < pObj->max_depth)
     {
       // mark children as empty now, since they should be empty, and
       // can be reached now...
-      pObj->CallChildren(&csQuadTree::mark_node_func, pObj, node_bbox, node_depth, 
-        offset, node_nr, (void*)CS_QUAD_EMPTY);
+      pObj->CallChildren(&csQuadTree::mark_node_func, pObj, node_bbox, 
+        node_pos, (void*)CS_QUAD_EMPTY);
     }
     // this node is partially covered.
     if(!info.test_only)
-      pObj->SetNodeState(offset, node_nr, CS_QUAD_PARTIAL);
+      pObj->SetNodeState(node_pos, CS_QUAD_PARTIAL);
     // if any children they can process the polygon too. And they determine
     // the return value.
-    if(node_depth < pObj->max_depth)
+    if(node_pos->depth < pObj->max_depth)
     {
       int retval[4];
-      pObj->CallChildren(&csQuadTree::insert_polygon_func, pObj, node_bbox, node_depth, 
-        offset, node_nr, data, retval);
+      pObj->CallChildren(&csQuadTree::insert_polygon_func, pObj, node_bbox, 
+        node_pos, data, retval);
       return pObj->GetPolygonResult(retval);
     }
     /// no children, return value for change, either 
@@ -293,7 +377,9 @@ int csQuadTree :: InsertPolygon (csVector2* verts, int num_verts,
   info.num_verts = num_verts;
   info.pol_bbox = &pol_bbox;
   info.test_only = false;
-  return insert_polygon_func(this, bbox, 1, root_state, -1, 0, (void*)&info);
+  node_pos_info start_pos;
+  start_pos.set_root();
+  return insert_polygon_func(this, bbox, root_state, &start_pos, (void*)&info);
 }
 
 
@@ -305,7 +391,9 @@ int csQuadTree :: TestPolygon (csVector2* verts, int num_verts,
   info.num_verts = num_verts;
   info.pol_bbox = &pol_bbox;
   info.test_only = true;
-  return insert_polygon_func(this, bbox, 1, root_state, -1, 0, (void*)&info);
+  node_pos_info start_pos;
+  start_pos.set_root();
+  return insert_polygon_func(this, bbox, root_state, &start_pos, (void*)&info);
 }
 
 
@@ -333,7 +421,7 @@ int csQuadTree :: GetTestPointResult(int retval[4])
 
 
 int csQuadTree :: test_point_func (csQuadTree* pObj, const csBox2& node_bbox,
-  int node_depth, int node_state, int offset, int node_nr, void* data)
+  int node_state, node_pos_info *node_pos, void* data)
 {
   if(node_state == CS_QUAD_UNKNOWN)
   {
@@ -342,19 +430,21 @@ int csQuadTree :: test_point_func (csQuadTree* pObj, const csBox2& node_bbox,
   }
   if(!node_bbox.In(*(csVector2*)data))
     return CS_QUAD_UNKNOWN;
-  if(node_state != CS_QUAD_PARTIAL || node_depth == pObj->max_depth)
+  if(node_state != CS_QUAD_PARTIAL || node_pos->depth == pObj->max_depth)
     return node_state;
   // for a partial covered node with children, call the children
   int retval[4];
-  CallChildren(&csQuadTree::test_point_func, pObj, node_bbox, node_depth, offset, 
-    node_nr, data, retval);
+  CallChildren(&csQuadTree::test_point_func, pObj, node_bbox, node_pos,
+    data, retval);
   return pObj->GetTestPointResult(retval);
 }
 
 
 int csQuadTree :: TestPoint (const csVector2& point)
 {
-  return test_point_func(this, bbox, 1, root_state, -1, 0, (void*)&point);
+  node_pos_info start_pos;
+  start_pos.set_root();
+  return test_point_func(this, bbox, root_state, &start_pos, (void*)&point);
 }
 
 
@@ -362,22 +452,37 @@ void csQuadTree :: Print(void)
 {
   printf("csQuadTree depth %d, statesize %d, root_state %d\n", 
     max_depth, state_size, root_state);
-#if 0
-  if(states)
+  if(!states)
+    return;
   for(int i=0; i<state_size; i++)
     printf("%2.2x ", states[i]);
   printf("\n");
+  // characters to represent the node states.
+  char *display = "./?X"; // EMPTY, PARTIAL, UNKOWN, FULL
   for(int dep=1; dep<max_depth; dep++)
   {
-    int dep_offset = ( Pow2( 2*(dep-1) ) - 1 ) / 3;
-    // dep_offset is the number of nodes in dep-1 tree.
-    int side = Pow2( (max_depth-1) ); // is sqrt(nr_leaves)
-    for(int y=0;x<side;x++)
-      for(int x=0;x<side;x++)
-       ;
+    int dep_prevnodes = ( Pow2( 2*(dep-1) ) - 1 ) / 3;
+    // dep_prevnodes is the number of nodes in dep-1 tree.
+    int plane_start = dep_prevnodes / 4; // offset of start of plane in array
+    int plane_size = Pow2( (dep-1) ); // is sqrt(nr_leaves)
+    int nodenr = 0; // nr of nodes after plane_start
+    printf("Depth %d (size %d, start %d)\n", dep, plane_size, plane_start);
+    for(int y=0;y<plane_size;y++)
+    {
+      for(int x=0;x<plane_size;x++,nodenr++)
+      {
+        int offset = plane_start + (nodenr >> 2);
+	int bytepos = nodenr & 0x3;
+	int state = GetNodeState(offset, bytepos);
+	printf("%c", display[state]);
+      }
+      printf("\n");
+    }
+    // did depth dep.
   }
-#endif
 }
+
+
 
 /*
  * 2 bytes form a 4x4 rectangle.

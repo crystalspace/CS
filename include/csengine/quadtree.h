@@ -24,9 +24,13 @@
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
 
-// A quadtree node can be in three states: empty, full, or partial.
-// If empty or full the state of the children does not matter.
-// The unknown state is an error.
+/**
+ * A quadtree node can be in three states: empty, full, or partial.
+ * If empty or full the state of the children does not matter.
+ * The unknown state is an error.
+ *  4 child node states are stored in one byte.
+ *  2 bits per node, in sequence. 
+ */
 #define CS_QUAD_EMPTY 0
 #define CS_QUAD_PARTIAL 1
 #define CS_QUAD_UNKNOWN 2
@@ -37,11 +41,6 @@
 class csQuadTree;
 class Dumper;
 
-/**
- *  4 child node states are stored in one byte.
- *  2 bits per node, in sequence. topleft, topright, botright, botleft
- *  nodenrs are: 0 = topleft, 1=topright, 2=bottomleft, 3=bottomright.
- */
 
 /**
  * values denoting if the tree changed.
@@ -52,6 +51,8 @@ class Dumper;
 #define CS_QUAD_CERTAINCHANGE 2
 
 class csQuadTree;
+class node_pos_info;
+
 
 /**
  *  QuadTree
@@ -69,57 +70,96 @@ private:
 
   /** state of all children, and their children.
    *  they are ordered like this:
-   *  root has children in byte 0.
-   *  nodes in byte 0 have children in byte 0+node_nr+1(1,2,3,4).
-   *  nodes in byte 1 have children in byte 4+node_nr+1.
-   *  nodes in byte n have children in byte 4*n+node_nr+1
-   *  So for byte n, take 4*n + node_nr+1 as the new byte
+   *  /// Old style:
+   *  ///root has children in byte 0.
+   *  ///nodes in byte 0 have children in byte 0+node_nr+1(1,2,3,4).
+   *  ///nodes in byte 1 have children in byte 4+node_nr+1.
+   *  ///nodes in byte n have children in byte 4*n+node_nr+1
+   *  ///So for byte n, take 4*n + node_nr+1 as the new byte
+   *  New style:
+   *  nodes of depth 2, then all nodes of depth 3, etc.
+   *  nodes are sequentially stored (bytepacked) in the ordering
+   *  y*plane_size+x. The root node in depth 1 is stored in variable 
+   *  root_state.
    */
   unsigned char* states;
+
   /// convenience variable: how many bytes alloced in states
   int state_size;
 
+  /// This contains the info that designates thr position of a particular node.
+  class node_pos_info { 
+   public:
+    int offset; // index into states array
+                // the offset -1 denotes the root node.
+    int bytepos; // index into byte. [0..3]
+    int depth; // depth into tree 1==root
+    int plane_size; // width and height of square plane of nodes.
+    int plane_start; // index in array where the node's at depth are located
+    int node_x, node_y; // coordinates of the node in it's plane.
+                        // integer in the plane of leaves at node_depth.
+    // note that above values are redundant.
+    //  offset = plane_start + (node_y * plane_size + node_x) / 4
+    //  bytepos = (node_y * plane_size + node_x) % 4
+    //  plane_size = 2**(depth-1)
+    //  plane_start = (4**(depth-1) -1 ) / 3
+    // but it is easier to pass these values along.
+  
+    /// construct a pos info pointing to the root node.
+    node_pos_info(void); 
+    /// clear the node_pos_info, to point to root node.
+    void set_root(void);
+    /// copy constructor
+    node_pos_info(const node_pos_info &copy);
+  };
+
   /** this function is used for traversing the quadtree.
-   *  it will get the nodes bounding box, state, byte offset and node_nr,
+   *  it will get the nodes bounding box, state, and node_pos
    *  all these are this node's values.
    *  and custom clientdata.
    *  It can return an integer.
    *  node_depth==1 means you are the root, and so on,
    *  if the node_depth == max_depth you are a leaf.
    */
-  typedef int (quad_traverse_func)(csQuadTree* pObj, 
-    const csBox2& node_bbox, int node_depth, int node_state, 
-    int offset, int node_nr, void* data);
+  typedef int (csQuadTree::quad_traverse_func)(csQuadTree* pObj, 
+    const csBox2& node_bbox, int node_state, node_pos_info *node_pos,
+    void* data);
 
   /** private functions to help dealing with quadtree
-   *  call all four children. Of the node with it's state at offset and node_nr
-   *  box is the bounding box of the node, depth is its depth.
-   *  each will be passed the data.
+   *  call all four children. Of the node at parent_pos,
+   *  box is the bounding box of the parent node.
+   *  each child will be passed the data.
    *  returns return values of children in retval.
+   *  in order 0=topleft, 1=topright, 2=bottomleft, 3=bottomright.
    *  note that theoretically the state of the caller could be changed.
-   *  also: the offset -1 denotes the root node is calling.
    *  func is of type quad_traverse_func.
    */
-  static void CallChildren(quad_traverse_func* func, 
-    csQuadTree* pObj, const csBox2& box, int depth, int offset, int node_nr, 
-    void *data, int retval[4]);
+  static void CallChildren(quad_traverse_func* func, csQuadTree* pObj, 
+    const csBox2& box, node_pos_info *parent_pos, void *data, int retval[4]);
 
   /** Convenience version, the retval argument is omitted, return values
    * are discarded.
    */
-  static void CallChildren(quad_traverse_func* func, 
-    csQuadTree* pObj, const csBox2& box, int depth, int offset, int node_nr, 
-    void *data);
+  static void CallChildren(quad_traverse_func* func, csQuadTree* pObj, 
+    const csBox2& box, node_pos_info *parent_pos, void *data);
 
   /** Get the state of a node, in byte offset , nodenr given.
    *  offset -1 means root node.
    */
   int GetNodeState(int offset, int nodenr);
 
+  /// convenience function to GetNodeState at node_pos_info
+  inline int GetNodeState(node_pos_info *pos) 
+    {return GetNodeState(pos->offset, pos->bytepos);}
+
   /** Set the state of a node, in byte offset , nodenr given.
    *  offset -1 means root node.
    */
   void SetNodeState(int offset, int nodenr, int newstate);
+
+  /// convenience function to set a node state
+  inline void SetNodeState(node_pos_info *pos, int newstate)
+    {SetNodeState(pos->offset, pos->bytepos, newstate);}
 
   /** for a node, check if data (a csVector2 * )
    * is in this node, possibly recursing.
@@ -216,7 +256,18 @@ public:
    *  depth3 quadtree->4x4 array (partial -> empty)
    */
 
-  /** a TestRectangle function that will test on leaf-coordinates, for full */
+  /** a TestRectangle function that will test on leaf-coordinates, for full. 
+   *  Give depth of the node-plane to test on, the x and y integer node coords
+   *  of the topleft corner of the rectangle, and it's width and height.
+   *  Returns true if and only if all nodes at that spot are CS_QUAD_FULL.
+   *  NOTE: not implemented, since the tree may not be correct at a depth.
+   *    since higher level FULL nodes do not propagate this down.
+   */
+  //bool TestRectangle(int depth, int x, int y, int w, int h);
+  //propagate down() function?
+  //sift_up() function?
+  
+
   
   /** This function will print the quadtree...
    */
