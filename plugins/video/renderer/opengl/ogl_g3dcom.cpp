@@ -3771,7 +3771,7 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   glActiveTextureARB (GL_TEXTURE0_ARB);
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-  if (txt_mm->GetKeyColor())
+  if (txt_mm && txt_mm->GetKeyColor())
   {
     glDisable (GL_ALPHA_TEST);
   }
