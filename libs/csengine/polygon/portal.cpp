@@ -123,7 +123,7 @@ bool csPortal::CompleteSector (iBase* context)
     return true;
   else if (sector_cb)
   {
-    return sector_cb ((iPortal*)this, context, sector_cbData);
+    return sector_cb (&(this->scfiPortal), context, sector_cbData);
   }
   return false;
 }
