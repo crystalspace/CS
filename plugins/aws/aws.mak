@@ -44,6 +44,8 @@ SRC.AWS = $(filter-out plugins/aws/sllex.cpp plugins/aws/slp.cpp, $(wildcard plu
 OBJ.AWS = $(addprefix $(OUT),$(notdir $(SRC.AWS:.cpp=$O)))
 DEP.AWS = CSUTIL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
 
+TO_INSTALL.DATA += data/awsdef.zip
+
 MSVC.DSP += AWS
 DSP.AWS.NAME = aws
 DSP.AWS.TYPE = plugin

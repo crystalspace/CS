@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+26-Jul-2002
+	- Eric Sunshine fixed problem reported by Reed Hedges
+	  <reed@zerohour.net> where aws.mak neglected to install awsdef.zip.
 25-Jul-2002
 	- Fixed a bug in FORWARD/UPWARD (START command in map files) so
 	  that this now actually works. Keep in mind that both FORWARD
