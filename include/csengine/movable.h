@@ -266,7 +266,7 @@ public:
       scfParent->UpdateMove ();
     }
   } scfiMovable;
-  friend class eiMovable;
+  friend struct eiMovable;
 };
 
 #endif // __CS_MOVABLE_H__
