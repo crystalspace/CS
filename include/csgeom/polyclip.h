@@ -88,6 +88,9 @@ protected:
   UByte mrClipping;
   
 public:
+  /// Destructor.
+  virtual ~csClipper () { }
+
   /**
    * Clip a set of 2D points and return in 'OutPolygon' which is expected
    * to contain space at least for MAX_OUTPUT_VERTICES elements.

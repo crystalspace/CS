@@ -1136,6 +1136,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   return true;
 }
 
+
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/

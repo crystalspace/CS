@@ -59,6 +59,7 @@ csPoly2D& csPoly2D::operator= (const csPoly2D& other)
     if (num_vertices)
       memcpy (vertices, other.vertices, sizeof (csVector2)*num_vertices);
   }
+  bbox = other.bbox;
   return *this;
 }
 

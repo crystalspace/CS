@@ -847,7 +847,8 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& box,
 	  csBox2 bbox;
 	  UByte rc = clipper->Clip (result_poly.GetVertices (), num_verts, bbox);
 	  CHK (delete clipper);
-	  if (rc == CS_CLIP_OUTSIDE) num_verts = 0;
+	  if (rc == CS_CLIP_OUTSIDE)
+	    num_verts = 0;
 	  result_poly.SetNumVertices (num_verts);
 	  if (num_verts == 0) break;
 	}
@@ -875,6 +876,7 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& box,
 	  result_poly.SetNumVertices (num_verts);
 	  cbuffer->InsertPolygon (result_poly.GetVertices (),
 	  	result_poly.GetNumVertices ());
+	  if (cbuffer->IsFull ()) return;
 	}
 	CHK (delete clipper);
       }
@@ -888,6 +890,7 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
 	csVector3& box_center, csVector3& occludee_center)
 {
   if (!occluder) return;
+  if (cbuffer->IsFull ()) return;
   int i;
   const csBox3& occluder_box = occluder->GetBox ();
   if (occluder_box.In (box_center) || occluder_box.In (occludee_center))
@@ -1044,6 +1047,7 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
     csPVS& pvs = leaf->GetPVS ();
     csOctreeVisible* ovis = pvs.Add ();
     ovis->SetOctreeNode (occludee);
+
     //@@@ PVS NOT YET IMPLEMENTED FOR POLYGONS
     //if (occludee->IsLeaf ())
       //BuildPVSForLeafPolygons (occludee, ovis, ...);

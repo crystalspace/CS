@@ -49,6 +49,10 @@ The history order has been reversed so that new features are at the top.
 	    - Added IsDirty() and ClearDirty() for finer control by client.
 	- Andrew Zabolotny fixed the first of the many lighting bugs that
 	  are left after his changes.
+	- Andrew Zabolotny fixed the second of the many lighting bugs that
+	  are left after his changes.
+	- Fixed a memory leak in csClipper. The destructor was not virtual.
+	- Some further fixes on PVS.
 2-May-2000
 	- Added csPoly3D::ProjectAxisPlane() which is similar to
 	  ProjectXPlane() but for a general axis aligned plane.
