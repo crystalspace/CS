@@ -7,6 +7,16 @@ The history order has been reversed so that new features are at the top.
 	- Added support for HardTransform() to curved surfaces but it doesn't
 	  work yet. The curve in flarge is thus currently not looking very
 	  well.
+	- Martin Geisse did another small optimization to the config manager.
+3-Mar-2001
+	- Martin Geisse added a speed optimization to the config manager.
+	  If the same config file is used several times, it is now only
+	  loaded once and IncRef'ed every time.
+2-Mar-2001
+	- Martin Geisse added a new domain in the configuration hierarchy
+	  that can be used for user-specific configuration on multi-user
+	  systems. Martin also added documentation for the user config
+	  domain.
 1-Mar-2001
 	- Brandon Ehle added modifications for Lua scripting language:
 	  The SWIGLua modifications were fairly easy, so here's the "goop."
