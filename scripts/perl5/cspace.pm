@@ -511,6 +511,7 @@ sub DESTROY {
 }
 
 *Request = *cspacec::csStringSet_Request;
+*Contains = *cspacec::csStringSet_Contains;
 *Clear = *cspacec::csStringSet_Clear;
 sub DISOWN {
     my $self = shift;
