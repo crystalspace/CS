@@ -169,6 +169,48 @@ void TiXmlString::append( const char* str, int len )
      }
 }
 
+// append a single char
+void TiXmlString::append( char single )
+{
+    char * new_string;
+    unsigned new_alloc, new_size;
+
+    new_size = length () + 1 + 1;
+    // check if we need to expand
+    if (new_size > allocated)
+    {
+        // compute new size
+        new_alloc = assign_new_size (new_size);
+
+        // allocate new buffer
+        new_string = new char [new_alloc];        
+
+        // copy the previous allocated buffer into this one
+        if (allocated && cstring)
+            strcpy (new_string, cstring);
+
+        // append the suffix. It does exist, otherwize we wouldn't be expanding 
+	new_string [new_size - 2] = single;
+	new_string [new_size - 1] = 0;
+
+        // return previsously allocated buffer if any
+        if (allocated && cstring)
+            delete [] cstring;
+
+        // update member variables
+        cstring = new_string;
+	clength = new_size - 1;
+        allocated = new_alloc;
+    }
+    else
+    {
+        // we know we can safely append the new string
+	cstring [clength] = single;
+	clength++;
+	cstring [clength] = 0;
+     }
+}
+
 
 // Check for TiXmlString equuivalence
 //bool TiXmlString::operator == (const TiXmlString & compare) const
@@ -197,8 +239,8 @@ bool TiXmlString::operator == (const TiXmlString & compare) const
 		return true;
 	if ( allocated && compare.allocated )
 	{
-		assert( cstring );
-		assert( compare.cstring );
+		//assert( cstring );
+		//assert( compare.cstring );
 		return ( strcmp( cstring, compare.cstring ) == 0 );
  	}
 	return false;
@@ -211,8 +253,8 @@ bool TiXmlString::operator < (const TiXmlString & compare) const
 		return false;
 	if ( allocated && compare.allocated )
 	{
-		assert( cstring );
-		assert( compare.cstring );
+		//assert( cstring );
+		//assert( compare.cstring );
 		return ( strcmp( cstring, compare.cstring ) > 0 );
  	}
 	if ( length() == 0 && compare.length() != 0 )
@@ -227,8 +269,8 @@ bool TiXmlString::operator > (const TiXmlString & compare) const
 		return false;
 	if ( allocated && compare.allocated )
 	{
-		assert( cstring );
-		assert( compare.cstring );
+		//assert( cstring );
+		//assert( compare.cstring );
 		return ( strcmp( cstring, compare.cstring ) < 0 );
  	}
 	if ( length() != 0 )

@@ -194,10 +194,9 @@ protected:
 		Wickedly complex options, but it keeps the (sensitive) code in one place.
 	*/
 	static const char* ReadText(	const char* in,				// where to start
-									TIXML_STRING* text,			// the string read
-									bool ignoreWhiteSpace,		// whether to keep the white space
-									const char* endTag,			// what ends this text
-									bool ignoreCase );			// whether to ignore case in the end tag
+					TIXML_STRING* text,			// the string read
+					bool ignoreWhiteSpace,		// whether to keep the white space
+					const char* endTag);			// what ends this text
 	virtual const char* Parse( const char* p ) = 0;
 
 	// If an entity has been found, transform it into a character.
@@ -225,9 +224,10 @@ protected:
 	static void PutString( const TIXML_STRING& str, TIXML_STRING* out );
 
 	// Return true if the next characters in the stream are any of the endTag sequences.
-	static bool StringEqual(	const char* p,
-								const char* endTag,
-								bool ignoreCase );
+	static bool StringEqual(const char* p,
+					const char* endTag);
+	static bool StringEqualIgnoreCase(const char* p,
+					const char* endTag);
 
 
 	enum

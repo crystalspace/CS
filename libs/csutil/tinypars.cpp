@@ -90,7 +90,7 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p )
 const char* TiXmlBase::ReadName( const char* p, TIXML_STRING * name )
 {
 	*name = "";
-	assert( p );
+	//assert( p );
 
 	// Names start with letters or underscores.
 	// After that, they can be letters, underscores, numbers,
@@ -140,7 +140,7 @@ const char* TiXmlBase::GetEntity( const char* p, char* value )
 	{
 		if ( strncmp( entity[i].str, p, entity[i].strLength ) == 0 )
 		{
-			assert( strlen( entity[i].str ) == entity[i].strLength );
+			//assert( strlen( entity[i].str ) == entity[i].strLength );
 			*value = entity[i].chr;
 			return ( p + entity[i].strLength );
 		}
@@ -152,64 +152,63 @@ const char* TiXmlBase::GetEntity( const char* p, char* value )
 }
 
 
-bool TiXmlBase::StringEqual( const char* p,
-							 const char* tag,
-							 bool ignoreCase )
+bool TiXmlBase::StringEqual( const char* p, const char* tag)
 {
-	assert( p );
-	if ( !p || !*p )
+	//assert( p );
+	if ( !p)
 	{
-		assert( 0 );
+		//assert( 0 );
 		return false;
 	}
 
-    if ( tolower( *p ) == tolower( *tag ) )
+	while ( *p == *tag && *p )
 	{
-		const char* q = p;
+		++p;
+		++tag;
+	}
 
-		if (ignoreCase)
-		{
-			while ( *q && *tag && *q == *tag )
-			{
-				++q;
-				++tag;
-			}
+	if ( *tag == 0 )		// Have we found the end of the tag, and everything equal?
+	{
+		return true;
+	}
+	return false;
+}
 
-			if ( *tag == 0 )		// Have we found the end of the tag, and everything equal?
-			{
-				return true;
-			}
-		}
-		else
-		{
-			while ( *q && *tag && tolower( *q ) == tolower( *tag ) )
-			{
-				++q;
-				++tag;
-			}
+bool TiXmlBase::StringEqualIgnoreCase( const char* p,
+				 const char* tag)
+{
+	//assert( p );
+	if ( !p)
+	{
+		//assert( 0 );
+		return false;
+	}
 
-			if ( *tag == 0 )
-			{
-				return true;
-			}
-		}
+	while ( && tolower( *p ) == tolower( *tag ) && *p )
+	{
+		++p;
+		++tag;
+	}
+
+	if ( *tag == 0 )
+	{
+		return true;
 	}
 	return false;
 }
 
 const char* TiXmlBase::ReadText(	const char* p, 
-									TIXML_STRING * text, 
-									bool trimWhiteSpace, 
-									const char* endTag, 
-									bool caseInsensitive )
+					TIXML_STRING * text, 
+					bool trimWhiteSpace, 
+					const char* endTag)
 {
     *text = "";
-	if (    !trimWhiteSpace			// certain tags always keep whitespace
-		 || !condenseWhiteSpace )	// if true, whitespace is always kept
+	if (!trimWhiteSpace		// certain tags always keep whitespace
+	    || !condenseWhiteSpace )	// if true, whitespace is always kept
 	{
 		// Keep all the white space.
 		while (	   p && *p
-				&& !StringEqual( p, endTag, caseInsensitive )
+				&& !StringEqual ( p, endTag)
 			  )
 		{
 			char c;
@@ -224,7 +223,7 @@ const char* TiXmlBase::ReadText(	const char* p,
 		// Remove leading white space:
 		p = SkipWhiteSpace( p );
 		while (	   p && *p
-				&& !StringEqual( p, endTag, caseInsensitive ) )
+				&& !StringEqual ( p, endTag) )
 		{
 			if ( *p == '\r' || *p == '\n' )
 			{
@@ -384,7 +383,7 @@ TiDocumentNode* TiDocumentNode::Identify( const char* p )
 	const char* xmlHeader = { "<?xml" };
 	const char* commentHeader = { "<!--" };
 
-	if ( StringEqual( p, xmlHeader, true ) )
+	if ( StringEqual( p, xmlHeader) )
 	{
 		#ifdef DEBUG_PARSER
 			TIXML_LOG( "XML parsing Declaration\n" );
@@ -399,7 +398,7 @@ TiDocumentNode* TiDocumentNode::Identify( const char* p )
 		#endif
 		returnNode = new TiXmlElement( "" );
 	}
-	else if ( StringEqual( p, commentHeader, false ) )
+	else if ( StringEqual ( p, commentHeader) )
 	{
 		#ifdef DEBUG_PARSER
 			TIXML_LOG( "XML parsing Comment\n" );
@@ -479,7 +478,7 @@ void TiXmlElement::StreamIn (TIXML_ISTREAM * in, TIXML_STRING * tag)
 			// We now have either a closing tag...or another node.
 			// We should be at a "<", regardless.
 			if ( !in->good() ) return;
-			assert( in->peek() == '<' );
+			//assert( in->peek() == '<' );
 			int tagIndex = tag->length();
 
 			bool closingTag = false;
@@ -510,7 +509,7 @@ void TiXmlElement::StreamIn (TIXML_ISTREAM * in, TIXML_STRING * tag)
 			if ( closingTag )
 			{
 				int c = in->get();
-				assert( c == '>' );
+				//assert( c == '>' );
 				*tag += c;
 
 				// We are done, once we've found our closing tag.
@@ -591,7 +590,7 @@ const char* TiXmlElement::Parse( const char* p )
 				return 0;
 
 			// We should find the end tag now
-			if ( StringEqual( p, endTag.c_str(), false ) )
+			if ( StringEqualIgnoreCase( p, endTag.c_str()) )
 			{
 				p += endTag.length();
 				return p;
@@ -647,7 +646,7 @@ const char* TiXmlElement::ReadValue( const char* p )
 			else
 				delete textNode;
 		} 
-                else if ( StringEqual(p, "<![CDATA[", true) )
+                else if ( StringEqual(p, "<![CDATA[") )
                 {
                         TiXmlCData* cdataNode = new TiXmlCData( "" );
 
@@ -668,7 +667,7 @@ const char* TiXmlElement::ReadValue( const char* p )
 		{
 			// We hit a '<'
 			// Have we hit a new element or an end tag?
-			if ( StringEqual( p, "</", false ) )
+			if ( StringEqual ( p, "</") )
 			{
 				return p;
 			}
@@ -771,13 +770,13 @@ const char* TiXmlComment::Parse( const char* p )
 	const char* startTag = "<!--";
 	const char* endTag   = "-->";
 
-	if ( !StringEqual( p, startTag, false ) )
+	if ( !StringEqual ( p, startTag) )
 	{
 		document->SetError( TIXML_ERROR_PARSING_COMMENT );
 		return 0;
 	}
 	p += strlen( startTag );
-	p = ReadText( p, &value, false, endTag, false );
+	p = ReadText( p, &value, false, endTag);
 	return p;
 }
 
@@ -815,13 +814,13 @@ const char* TiDocumentAttribute::Parse( const char* p )
 	{
 		++p;
 		end = "\'";
-		p = ReadText( p, &value, false, end, false );
+		p = ReadText( p, &value, false, end);
 	}
 	else if ( *p == '"' )
 	{
 		++p;
 		end = "\"";
-		p = ReadText( p, &value, false, end, false );
+		p = ReadText( p, &value, false, end);
 	}
 	else
 	{
@@ -864,7 +863,7 @@ const char* TiXmlText::Parse( const char* p )
 //	if ( doc && !doc->IgnoreWhiteSpace() ) ignoreWhite = false;
 
 	const char* end = "<";
-	p = ReadText( p, &value, ignoreWhite, end, false );
+	p = ReadText( p, &value, ignoreWhite, end);
 	if ( p )
 		return p-1;	// don't truncate the '<'
 	return 0;
@@ -880,7 +879,7 @@ const char* TiXmlCData::Parse( const char* p )
         //skip the <![CDATA[ 
         p += 9;
 	const char* end = "]]>";
-	p = ReadText( p, &value, ignoreWhite, end, false );
+	p = ReadText( p, &value, ignoreWhite, end);
 	if ( p )
 		return p;
 	return 0;
@@ -909,7 +908,7 @@ const char* TiXmlDeclaration::Parse( const char* p )
 	// Find the beginning, find the end, and look for
 	// the stuff in-between.
 	TiDocument* document = GetDocument();
-	if ( !p || !*p || !StringEqual( p, "<?xml", true ) )
+	if ( !p || !*p || !StringEqual( p, "<?xml") )
 	{
 		if ( document ) document->SetError( TIXML_ERROR_PARSING_DECLARATION );
 		return 0;
@@ -932,21 +931,21 @@ const char* TiXmlDeclaration::Parse( const char* p )
 		}
 
 		p = SkipWhiteSpace( p );
-		if ( StringEqual( p, "version", true ) )
+		if ( StringEqual( p, "version") )
 		{
 //			p += 7;
 			TiDocumentAttribute attrib;
 			p = attrib.Parse( p );		
 			version = attrib.Value();
 		}
-		else if ( StringEqual( p, "encoding", true ) )
+		else if ( StringEqual( p, "encoding") )
 		{
 //			p += 8;
 			TiDocumentAttribute attrib;
 			p = attrib.Parse( p );		
 			encoding = attrib.Value();
 		}
-		else if ( StringEqual( p, "standalone", true ) )
+		else if ( StringEqual( p, "standalone") )
 		{
 //			p += 10;
 			TiDocumentAttribute attrib;

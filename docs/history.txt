@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+12-Feb-2003
+	- Performed several optimizations on the tinyxml parser. Hopefully
+	  it is now a little faster.
 11-Feb-2003
 	- Fixed lightning command in walktest to also work if there is no light
 	  called 'l1'.

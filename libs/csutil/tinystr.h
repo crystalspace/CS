@@ -121,7 +121,7 @@ class TiXmlString
     // single char extraction
     const char& at (unsigned index) const
     {
-        assert( index < length ());
+        //assert( index < length ());
         return cstring [index];
     }
 
@@ -151,7 +151,7 @@ class TiXmlString
     // [] operator 
     char& operator [] (unsigned index) const
     {
-        assert( index < length ());
+        //assert( index < length ());
         return cstring [index];
     }
 
@@ -198,14 +198,8 @@ class TiXmlString
         append (suffix . c_str ());
     }
 
-    // append for a single char. This could be improved a lot if needed
-    void append (char single)
-    {
-        char smallstr [2];
-        smallstr [0] = single;
-        smallstr [1] = 0;
-        append (smallstr);
-    }
+    // append for a single char.
+    void append (char single);
 
 } ;
 
