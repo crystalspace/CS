@@ -373,9 +373,8 @@ bool csGraphics2DOpenGL::Open ()
   hGLRC = wglCreateContext (hDC);
   wglMakeCurrent (hDC, hGLRC);
 
-  ShowWindow (m_hWnd, m_nCmdShow); // @@@ this does weird things when starting
-				   // the app windowed and "maximized"
   UpdateWindow (m_hWnd);
+  ShowWindow (m_hWnd, m_nCmdShow);
   SetForegroundWindow (m_hWnd);
   SetFocus (m_hWnd);
 
@@ -594,7 +593,7 @@ void csGraphics2DOpenGL::Activate (bool activated)
     {
       ShowWindow (m_hWnd, SW_SHOWMINIMIZED);
       SetWindowPos (m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE |
-	SWP_NOSIZE | SWP_NOACTIVATE);
+        SWP_NOSIZE | SWP_NOACTIVATE);
       ChangeDisplaySettings (NULL, 0);
     }
   }
