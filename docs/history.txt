@@ -22,6 +22,8 @@ Short-term cleanups that need to be done:
 	  all 3D renderers but only tested software and OpenGL.
 	- Fixed DOS port so that colors are back. Problem was caused
 	  by change from Long to ULong in pfmt.
+	- Added doc on how to use new octree system.
+	- Fix from Seth Galbraith on the DOS port.
 20-Sep-1999
 	- Eric Sunshine fixed an accidental sign-extension problem in
 	  csPixelFormat.
