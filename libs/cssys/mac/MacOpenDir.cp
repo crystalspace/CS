@@ -2,7 +2,6 @@
 #define SYSDEF_PATH
 #define SYSDEF_DIR
 #include "sysdef.h"
-#include "system.h"
 #include "sysdriv.h"
 
 struct directory_scan {
