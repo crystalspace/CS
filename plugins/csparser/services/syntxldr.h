@@ -30,6 +30,10 @@
 #include "csutil/csstring.h"
 
 struct iObjectRegistry;
+struct iPolygon3D;
+struct iThingState;
+struct iEngine;
+struct iMaterialWrapper;
 
 class csTextSyntaxService : public iSyntaxService
 {
@@ -41,6 +45,7 @@ class csTextSyntaxService : public iSyntaxService
   csString text;
 
   void SetError (const char *msg, ...);
+  void OptimizePolygon (iPolygon3D *p);
 
  public:
 
@@ -55,6 +60,21 @@ class csTextSyntaxService : public iSyntaxService
   virtual bool ParseVector (char *buffer, csVector3 &v);
   virtual bool ParseMixmode (char *buffer, UInt &mixmode);
   virtual bool ParseShading (char *buf, int &shading);
+  virtual bool ParseTexture (char *buf, const csVector3* vref, UInt &texspec, 
+			     csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
+			     csMatrix3 &tx_m, csVector3 &tx_v,
+			     csVector2 &uv_shift,
+			     int &idx1, csVector2 &uv1,
+			     int &idx2, csVector2 &uv2,
+			     int &idx3, csVector2 &uv3,
+			     char *plane, const char *polyname);
+
+  virtual  bool ParseWarp (char *buf, csVector &flags, bool &mirror, 
+			   csMatrix3 &m, csVector3 &before, csVector3 &after);
+
+  virtual bool ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char* buf,
+			    float default_texlen,
+			    iThingState* thing_state, int vt_offset);
 
 
   virtual const char* MatrixToText (const csMatrix3 &m, int indent, bool newline=true);
@@ -70,7 +90,6 @@ class csTextSyntaxService : public iSyntaxService
   virtual const char* BoolToText (const char *vname, bool b, int indent, bool newline=true);
 
   virtual const char* MixmodeToText (UInt mixmode, int indent, bool newline = true);
-
 
  private:
   /// make it plugable

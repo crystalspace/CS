@@ -19,14 +19,26 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "syntxldr.h"
+#include "csutil/cscolor.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/util.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"
+#include "csgeom/transfrm.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/texture.h"
+#include "iengine/engine.h"
+#include "iengine/material.h"
+#include "ivideo/material.h"
+#include "imesh/thing/thing.h"
 #include "imesh/thing/ptextype.h"
+#include "imesh/thing/polytmap.h"
+#include "imesh/thing/portal.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/object.h"
+#include "iutil/object.h"
 
 CS_IMPLEMENT_PLUGIN;
 
@@ -68,6 +80,36 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FLAT)
   CS_TOKEN_DEF (GOURAUD)
   CS_TOKEN_DEF (LIGHTMAP)
+  CS_TOKEN_DEF (MATERIAL)
+  CS_TOKEN_DEF (LIGHTING)
+  CS_TOKEN_DEF (PORTAL)
+  CS_TOKEN_DEF (WARP)
+  CS_TOKEN_DEF (TEXTURE)
+  CS_TOKEN_DEF (SHADING)
+  CS_TOKEN_DEF (VERTICES)
+  CS_TOKEN_DEF (UVA)
+  CS_TOKEN_DEF (UV)
+  CS_TOKEN_DEF (COLORS)
+  CS_TOKEN_DEF (COLLDET)
+  CS_TOKEN_DEF (COSFACT)
+  CS_TOKEN_DEF (MIXMODE)
+  CS_TOKEN_DEF (LEN)
+  CS_TOKEN_DEF (V)
+  CS_TOKEN_DEF (ORIG)
+  CS_TOKEN_DEF (FIRST_LEN)
+  CS_TOKEN_DEF (FIRST)
+  CS_TOKEN_DEF (SECOND_LEN)
+  CS_TOKEN_DEF (SECOND)
+  CS_TOKEN_DEF (UVEC)
+  CS_TOKEN_DEF (VVEC)
+  CS_TOKEN_DEF (MATRIX)
+  CS_TOKEN_DEF (PLANE)
+  CS_TOKEN_DEF (UV_SHIFT)
+  CS_TOKEN_DEF (W)
+  CS_TOKEN_DEF (MIRROR)
+  CS_TOKEN_DEF (STATIC)
+  CS_TOKEN_DEF (ZFILL)
+  CS_TOKEN_DEF (CLIP)
 CS_TOKEN_DEF_END
 
 csTextSyntaxService::csTextSyntaxService (iBase *parent)
@@ -295,6 +337,695 @@ bool csTextSyntaxService::ParseShading (char *buf, int &shading)
   return success;
 }
 
+bool csTextSyntaxService::ParseTexture (char *buf, const csVector3* vref, UInt &texspec, 
+					csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
+					csMatrix3 &tx_m, csVector3 &tx_v,
+					csVector2 &uv_shift,
+					int &idx1, csVector2 &uv1,
+					int &idx2, csVector2 &uv2,
+					int &idx3, csVector2 &uv3,
+					char *plane, const char *polyname)
+{
+  CS_TOKEN_TABLE_START (tex_commands)
+    CS_TOKEN_TABLE (ORIG)
+    CS_TOKEN_TABLE (FIRST_LEN)
+    CS_TOKEN_TABLE (FIRST)
+    CS_TOKEN_TABLE (SECOND_LEN)
+    CS_TOKEN_TABLE (SECOND)
+    CS_TOKEN_TABLE (UVEC)
+    CS_TOKEN_TABLE (VVEC)
+    CS_TOKEN_TABLE (LEN)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (PLANE)
+    CS_TOKEN_TABLE (V)
+    CS_TOKEN_TABLE (UV_SHIFT)
+    CS_TOKEN_TABLE (UV)
+  CS_TOKEN_TABLE_END
+
+  long cmd;
+  char *name, *params;
+  char str[100];
+
+  float flist[100];
+  int num;
+
+  success = true;
+
+  while ((cmd = csGetObject(&buf, tex_commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      SetError ("Expected parameters instead of '%s'!\n", buf);
+      return false;
+    }
+    switch (cmd)
+    {
+    case CS_TOKEN_ORIG:
+      texspec &= ~CSTEX_UV;
+      texspec |= CSTEX_V1;
+      csScanStr (params, "%F", flist, &num);
+      if (num == 1) tx_orig = vref[(int)flist[0]];
+      if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
+      break;
+    case CS_TOKEN_FIRST:
+      texspec &= ~CSTEX_UV;
+      texspec |= CSTEX_V1;
+      csScanStr (params, "%F", flist, &num);
+      if (num == 1) tx1 = vref [(int)flist[0]];
+      if (num == 3) tx1 = csVector3(flist[0],flist[1],flist[2]);
+      break;
+    case CS_TOKEN_FIRST_LEN:
+      texspec &= ~CSTEX_UV;
+      texspec |= CSTEX_V1;
+      csScanStr (params, "%f", &len.y);
+      break;
+    case CS_TOKEN_SECOND:
+      texspec &= ~CSTEX_UV;
+      texspec |= CSTEX_V2;
+      csScanStr (params, "%F", flist, &num);
+      if (num == 1) tx2 = vref[(int)flist[0]];
+      if (num == 3) tx2 = csVector3(flist[0],flist[1],flist[2]);
+      break;
+    case CS_TOKEN_SECOND_LEN:
+      texspec &= ~CSTEX_UV;
+      texspec |= CSTEX_V2;
+      csScanStr (params, "%f", &len.z);
+      break;
+    case CS_TOKEN_LEN:
+      texspec &= ~CSTEX_UV;
+      csScanStr (params, "%f", &len.x);
+      break;
+    case CS_TOKEN_MATRIX:
+      texspec &= ~CSTEX_UV;
+      ParseMatrix (params, tx_m);
+      len.x = 0;
+      break;
+    case CS_TOKEN_V:
+      texspec &= ~CSTEX_UV;
+      ParseVector (params, tx_v);
+      len.x = 0;
+      break;
+    case CS_TOKEN_PLANE:
+      texspec &= ~CSTEX_UV;
+      csScanStr (params, "%s", str);
+      strcpy (plane, str);
+      len.x = 0;
+      break;
+    case CS_TOKEN_UV_SHIFT:
+      texspec |= CSTEX_UV_SHIFT;
+      csScanStr (params, "%f,%f", &uv_shift.x, &uv_shift.y);
+      break;
+    case CS_TOKEN_UVEC:
+      texspec &= ~CSTEX_UV;
+      texspec |= CSTEX_V1;
+      ParseVector (params, tx1);
+      len.y = tx1.Norm ();
+      tx1 += tx_orig;
+      break;
+    case CS_TOKEN_VVEC:
+      texspec &= ~CSTEX_UV;
+      texspec |= CSTEX_V2;
+      ParseVector (params, tx2);
+      len.z = tx2.Norm ();
+      tx2 += tx_orig;
+      break;
+    case CS_TOKEN_UV:
+      texspec |= CSTEX_UV;
+      csScanStr (params, "%d,%f,%f,%d,%f,%f,%d,%f,%f",
+		 &idx1, &uv1.x, &uv1.y,
+		 &idx2, &uv2.x, &uv2.y,
+		 &idx3, &uv3.x, &uv3.y);
+      break;
+    }
+  }
+
+  if (texspec & CSTEX_V2)
+  {
+    if (!len.y)
+    {
+      printf ("Bad texture specification for POLYGON '%s'\n", polyname);
+      len.y = 1;
+    }
+    if (!len.z)
+    {
+      printf ("Bad texture specification for POLYGON '%s'\n", polyname);
+      len.z = 1;
+    }
+  }
+  else
+  {
+    if (!len.y)
+    {
+      printf ("Bad texture specification for POLYGON '%s'\n", polyname);
+      len.y = 1;
+    }
+  }
+
+  return success;
+}
+
+bool csTextSyntaxService::ParseWarp (char *buf, csVector &flags, bool &mirror, 
+				     csMatrix3 &m, csVector3 &before, csVector3 &after)
+{
+
+  CS_TOKEN_TABLE_START (portal_commands)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
+    CS_TOKEN_TABLE (W)
+    CS_TOKEN_TABLE (MIRROR)
+    CS_TOKEN_TABLE (STATIC)
+    CS_TOKEN_TABLE (ZFILL)
+    CS_TOKEN_TABLE (CLIP)
+  CS_TOKEN_TABLE_END
+
+
+  char *params, *name;
+  long cmd;
+
+  success = true;
+  while ((cmd = csGetObject (&buf, portal_commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      SetError ("Expected parameters instead of '%s'!\n", buf);
+      return false;
+    }
+    switch (cmd)
+    {
+    case CS_TOKEN_MATRIX:
+      ParseMatrix (params, m);
+      mirror = false;
+      break;
+    case CS_TOKEN_V:
+      ParseVector (params, before);
+      after = before;
+      mirror = false;
+      break;
+    case CS_TOKEN_W:
+      ParseVector (params, after);
+      mirror = false;
+      break;
+    case CS_TOKEN_MIRROR:
+      mirror = true;
+      break;
+    case CS_TOKEN_STATIC:
+      flags.Push ((csSome)CS_PORTAL_STATICDEST);
+      break;
+    case CS_TOKEN_ZFILL:
+      flags.Push ((csSome)CS_PORTAL_ZFILL);
+      break;
+    case CS_TOKEN_CLIP:
+      flags.Push ((csSome)CS_PORTAL_CLIPDEST);
+      break;
+    }
+  }
+
+  return success;
+}
+
+void csTextSyntaxService::OptimizePolygon (iPolygon3D *p)
+{
+  if (!p->GetPortal () || p->GetAlpha ()
+  	|| p->GetPolyTexType ()->GetMixMode () != 0)
+    return;
+
+  iMaterialWrapper *mat = p->GetMaterial ();
+  if (mat)
+  {
+    iMaterial *m = mat->GetMaterial ();
+    iTextureHandle *th = m ? m->GetTexture () : NULL;
+    if (th && th->GetKeyColor ())
+      return;
+  }
+
+  p->SetTextureType (POLYTXT_NONE);
+}
+
+bool csTextSyntaxService::ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char* buf,
+				       float default_texlen,
+				       iThingState* thing_state, int vt_offset)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (MATERIAL)
+    CS_TOKEN_TABLE (LIGHTING)
+    CS_TOKEN_TABLE (PORTAL)
+    CS_TOKEN_TABLE (WARP)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (SHADING)
+    CS_TOKEN_TABLE (VERTICES)
+    CS_TOKEN_TABLE (UVA)
+    CS_TOKEN_TABLE (UV)
+    CS_TOKEN_TABLE (COLORS)
+    CS_TOKEN_TABLE (COLLDET)
+    CS_TOKEN_TABLE (ALPHA)
+    CS_TOKEN_TABLE (COSFACT)
+    CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (LEN)
+    CS_TOKEN_TABLE (PLANE)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  int i;
+  long cmd;
+  char *params;
+
+  iMaterialWrapper* mat = NULL;
+  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+					       iThingEnvironment);
+
+  UInt texspec = 0;
+
+  int tx_uv_i1 = 0;
+  int tx_uv_i2 = 0;
+  int tx_uv_i3 = 0;
+  csVector2 tx_uv1;
+  csVector2 tx_uv2;
+  csVector2 tx_uv3;
+
+  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
+  csVector3 tx_len (default_texlen, default_texlen, default_texlen);
+
+  csMatrix3 tx_matrix;
+  csVector3 tx_vector (0, 0, 0);
+  char plane_name[100];
+  plane_name[0] = 0;
+  csVector2 uv_shift (0, 0);
+
+  bool do_mirror = false;
+  int set_colldet = 0; // If 1 then set, if -1 then reset, else default.
+
+  char str[255];
+
+  success = true;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      printf ("Expected parameters instead of '%s'!\n", buf);
+      te->DecRef ();
+      return false;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_MATERIAL:
+        csScanStr (params, "%s", str);
+	//@@@ REGION SUPPORT? (below)
+        mat = engine->GetMaterialList ()->
+		FindByName (str/*@@@, onlyRegion*/);
+        if (mat == NULL)
+        {
+          printf ("Couldn't find material named '%s'!\n", str);
+          te->DecRef ();
+          return false;
+        }
+        poly3d->SetMaterial (mat);
+        break;
+      case CS_TOKEN_LIGHTING:
+        {
+          bool do_lighting;
+          csScanStr (params, "%b", &do_lighting);
+          poly3d->GetFlags ().Set (CS_POLY_LIGHTING,
+	  	do_lighting ? CS_POLY_LIGHTING : 0);
+        }
+        break;
+      case CS_TOKEN_COSFACT:
+        {
+          float cosfact;
+          csScanStr (params, "%f", &cosfact);
+          poly3d->SetCosinusFactor (cosfact);
+        }
+        break;
+      case CS_TOKEN_ALPHA:
+        {
+          int alpha;
+          csScanStr (params, "%d", &alpha);
+          poly3d->SetAlpha (alpha * 655 / 256);
+        }
+        break;
+      case CS_TOKEN_COLLDET:
+        {
+          bool do_colldet;
+          csScanStr (params, "%b", &do_colldet);
+	  if (do_colldet) set_colldet = 1;
+	  else set_colldet = -1;
+        }
+        break;
+      case CS_TOKEN_PORTAL:
+        {
+          csScanStr (params, "%s", str);
+          iSector* s = engine->CreateSector (str, false);
+          poly3d->CreatePortal (s);
+        }
+        break;
+      case CS_TOKEN_WARP:
+        if (poly3d->GetPortal ())
+        {
+          csMatrix3 m_w; m_w.Identity ();
+          csVector3 v_w_before (0, 0, 0);
+          csVector3 v_w_after (0, 0, 0);
+	  csVector flags;
+
+	  if (ParseWarp (params, flags, do_mirror, m_w, v_w_before, v_w_after))
+	  {
+	    for (int i=0; i < flags.Length (); i++)
+	      poly3d->GetPortal ()->GetFlags ().Set ((UInt)flags.Get (i));
+
+	    if (do_mirror)
+	    {
+	      if (!set_colldet) set_colldet = 1;
+	    }
+	    else
+	      poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
+	  }
+	  else
+	  {
+	    te->DecRef ();
+	    return false;
+	  }
+        }
+        break;
+      case CS_TOKEN_PLANE:
+	texspec &= ~CSTEX_UV;
+        csScanStr (params, "%s", str);
+        strcpy (plane_name, str);
+        tx_len.x = 0;
+        break;
+      case CS_TOKEN_LEN:
+	texspec &= ~CSTEX_UV;
+	csScanStr (params, "%f", &tx_len.x);
+	break;
+      case CS_TOKEN_TEXTURE:
+	if (!ParseTexture (params, thing_state->GetVertices (), texspec, 
+			   tx_orig, tx1, tx2, tx_len,
+			   tx_matrix, tx_vector,
+			   uv_shift,
+			   tx_uv_i1, tx_uv1,
+			   tx_uv_i2, tx_uv2,
+			   tx_uv_i3, tx_uv3,
+			   plane_name, poly3d->QueryObject ()->GetName ()))
+	{
+	  te->DecRef ();
+	  return false;
+	}
+        break;
+      case CS_TOKEN_V:
+      case CS_TOKEN_VERTICES:
+        {
+	  char* p = params;
+	  while (*p && *p == ' ') p++;
+	  if (*p < '0' || *p > '9')
+	  {
+	    // We have a special vertex selection depending on
+	    // a VBLOCK or VROOM command previously generated.
+	    int vtidx;
+	    if (*(p+1) == ',')
+	    {
+	      csScanStr (p+2, "%d", &vtidx);
+	      vtidx += vt_offset;
+	    }
+	    else
+	      vtidx = thing_state->GetVertexCount ()-8;
+	    switch (*p)
+	    {
+	      case 'w':
+	        poly3d->CreateVertex (vtidx+6);
+	        poly3d->CreateVertex (vtidx+4);
+	        poly3d->CreateVertex (vtidx+0);
+	        poly3d->CreateVertex (vtidx+2);
+		break;
+	      case 'e':
+	        poly3d->CreateVertex (vtidx+5);
+	        poly3d->CreateVertex (vtidx+7);
+	        poly3d->CreateVertex (vtidx+3);
+	        poly3d->CreateVertex (vtidx+1);
+		break;
+	      case 'n':
+	        poly3d->CreateVertex (vtidx+7);
+	        poly3d->CreateVertex (vtidx+6);
+	        poly3d->CreateVertex (vtidx+2);
+	        poly3d->CreateVertex (vtidx+3);
+		break;
+	      case 's':
+	        poly3d->CreateVertex (vtidx+4);
+	        poly3d->CreateVertex (vtidx+5);
+	        poly3d->CreateVertex (vtidx+1);
+	        poly3d->CreateVertex (vtidx+0);
+		break;
+	      case 'u':
+	        poly3d->CreateVertex (vtidx+6);
+	        poly3d->CreateVertex (vtidx+7);
+	        poly3d->CreateVertex (vtidx+5);
+	        poly3d->CreateVertex (vtidx+4);
+		break;
+	      case 'd':
+	        poly3d->CreateVertex (vtidx+0);
+	        poly3d->CreateVertex (vtidx+1);
+	        poly3d->CreateVertex (vtidx+3);
+	        poly3d->CreateVertex (vtidx+2);
+		break;
+	    }
+	  }
+	  else
+	  {
+            int list[100], num;
+            csScanStr (params, "%D", list, &num);
+            for (i = 0 ; i < num ; i++)
+	    {
+	      if (list[i] == list[(i-1+num)%num])
+	        printf ("Duplicate vertex-index found! Ignored...\n");
+	      else
+	        poly3d->CreateVertex (list[i]+vt_offset);
+	    }
+	  }
+        }
+        break;
+      case CS_TOKEN_SHADING:
+	{
+	  int shading;
+	  if (ParseShading (params, shading))
+              poly3d->SetTextureType (shading);
+	  else
+	  {
+	    te->DecRef ();
+	    return false;
+	  }
+	}
+        break;
+      case CS_TOKEN_MIXMODE:
+        {
+          UInt mixmode;
+	  if (ParseMixmode (params, mixmode))
+	  {
+	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	    ptt->SetMixMode (mixmode);
+	    if (mixmode & CS_FX_MASK_ALPHA)
+	      poly3d->SetAlpha (mixmode & CS_FX_MASK_ALPHA);
+	  }
+          break;
+	}
+      case CS_TOKEN_UV:
+        {
+          poly3d->SetTextureType (POLYTXT_GOURAUD);
+	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
+          int num, nv = poly3d->GetVertexCount ();
+	  fs->Setup (poly3d);
+          float list [2 * 100];
+          csScanStr (params, "%F", list, &num);
+          if (num > nv) num = nv;
+	  int j;
+          for (j = 0; j < num; j++)
+            fs->SetUV (j, list [j * 2], list [j * 2 + 1]);
+	  fs->DecRef ();
+        }
+        break;
+      case CS_TOKEN_COLORS:
+        {
+          poly3d->SetTextureType (POLYTXT_GOURAUD);
+	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	  iPolyTexGouraud* gs = SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud);
+          int num, nv = poly3d->GetVertexCount ();
+	  gs->Setup (poly3d);
+          float list [3 * 100];
+          csScanStr (params, "%F", list, &num);
+          if (num > nv) num = nv;
+	  int j;
+          for (j = 0; j < num; j++)
+            gs->SetColor (j, csColor (list [j * 3], list [j * 3 + 1],
+				      list [j * 3 + 2]));
+	  gs->DecRef ();
+        }
+        break;
+      case CS_TOKEN_UVA:
+        {
+          poly3d->SetTextureType (POLYTXT_GOURAUD);
+	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
+          int num, nv = poly3d->GetVertexCount ();
+	  fs->Setup (poly3d);
+          float list [3 * 100];
+          csScanStr (params, "%F", list, &num);
+          if (num > nv) num = nv;
+	  int j;
+          for (j = 0; j < num; j++)
+          {
+            float a = list [j * 3] * 2 * M_PI / 360.;
+            fs->SetUV (j, cos (a) * list [j * 3 + 1] + list [j * 3 + 2],
+                          sin (a) * list [j * 3 + 1] + list [j * 3 + 2]);
+          }
+	  fs->DecRef ();
+        }
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    SetError ("Token '%s' not found while parsing a polygon!\n",
+	      csGetLastOffender ());
+    te->DecRef ();
+    return false;
+  }
+
+  if (poly3d->GetVertexCount () < 3)
+  {
+    SetError ("Polygon in line %d contains just %d vertices!\n",
+	      csGetParserLine (), poly3d->GetVertexCount ());
+    te->DecRef ();
+    return false;
+  }
+
+  if (set_colldet == 1)
+    poly3d->GetFlags ().Set (CS_POLY_COLLDET);
+  else if (set_colldet == -1)
+    poly3d->GetFlags ().Reset (CS_POLY_COLLDET);
+
+  if (texspec & CSTEX_UV)
+  {
+    poly3d->SetTextureSpace (
+			     poly3d->GetVertex (tx_uv_i1), tx_uv1,
+			     poly3d->GetVertex (tx_uv_i2), tx_uv2,
+			     poly3d->GetVertex (tx_uv_i3), tx_uv3);
+  }
+  else if (texspec & CSTEX_V1)
+  {
+    if (texspec & CSTEX_V2)
+    {
+      if ((tx1-tx_orig) < SMALL_EPSILON)
+        printf ("Bad texture specification for PLANE '%s'\n", name);
+      else if ((tx2-tx_orig) < SMALL_EPSILON)
+        printf ("Bad texture specification for PLANE '%s'\n", name);
+      else poly3d->SetTextureSpace (tx_orig, tx1, tx_len.y, tx2, tx_len.z);
+    }
+    else
+    {
+      if ((tx1-tx_orig) < SMALL_EPSILON)
+        printf ("Bad texture specification for PLANE '%s'\n", name);
+      else poly3d->SetTextureSpace (tx_orig, tx1, tx_len.x);
+    }
+  }
+  else if (plane_name[0])
+  {
+    iPolyTxtPlane* pl = te->FindPolyTxtPlane (plane_name);
+    if (!pl)
+    {
+      printf ("Can't find plane '%s' for polygon '%s'\n", plane_name, poly3d->QueryObject ()->GetName ());
+    }
+    poly3d->SetTextureSpace (pl);
+  }
+  else if (tx_len.x)
+  {
+    // If a length is given (with 'LEN') we will first see if the polygon
+    // is coplanar with the X, Y, or Z plane. In that case we will use
+    // a standard plane. Otherwise we will just create a plane specific
+    // for this case given the first two vertices.
+    int i;
+    bool same_x = true, same_y = true, same_z = true;
+    const csVector3& v = poly3d->GetVertex (0);
+    for (i = 1 ; i < poly3d->GetVertexCount () ; i++)
+    {
+      const csVector3& v2 = poly3d->GetVertex (i);
+      if (same_x && ABS (v.x-v2.x) >= SMALL_EPSILON) same_x = false;
+      if (same_y && ABS (v.y-v2.y) >= SMALL_EPSILON) same_y = false;
+      if (same_z && ABS (v.z-v2.z) >= SMALL_EPSILON) same_z = false;
+    }
+    if (same_x)
+    {
+      char buf[200];
+      sprintf (buf, "__X_%g,%g__", v.x, tx_len.x);
+      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      if (!pl)
+      {
+        pl = te->CreatePolyTxtPlane ();
+        pl->QueryObject()->SetName (buf);
+        pl->SetTextureSpace (csVector3 (v.x, 0, 0), csVector3 (v.x, 0, 1),
+			     tx_len.x, csVector3 (v.x, 1, 0), tx_len.x);
+      }
+      poly3d->SetTextureSpace (pl);
+    }
+    else if (same_y)
+    {
+      char buf[200];
+      sprintf (buf, "__Y_%g,%g__", v.y, tx_len.x);
+      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      if (!pl)
+      {
+        pl = te->CreatePolyTxtPlane ();
+        pl->QueryObject()->SetName (buf);
+        pl->SetTextureSpace (csVector3 (0, v.y, 0), csVector3 (1, v.y, 0),
+			     tx_len.x, csVector3 (0, v.y, 1), tx_len.x);
+      }
+      poly3d->SetTextureSpace (pl);
+    }
+    else if (same_z)
+    {
+      char buf[200];
+      sprintf (buf, "__Z_%g,%g__", v.z, tx_len.x);
+      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      if (!pl)
+      {
+        pl = te->CreatePolyTxtPlane ();
+        pl->QueryObject()->SetName (buf);
+        pl->SetTextureSpace (csVector3 (0, 0, v.z), csVector3 (1, 0, v.z),
+			     tx_len.x, csVector3 (0, 1, v.z), tx_len.x);
+      }
+      poly3d->SetTextureSpace (pl);
+    }
+    else
+      poly3d->SetTextureSpace (poly3d->GetVertex (0), poly3d->GetVertex (1),
+			       tx_len.x);
+  }
+  else
+    poly3d->SetTextureSpace (tx_matrix, tx_vector);
+
+  if (texspec & CSTEX_UV_SHIFT)
+  {
+    iPolyTexType* ptt = poly3d->GetPolyTexType ();
+    iPolyTexLightMap* plm = SCF_QUERY_INTERFACE (ptt, iPolyTexLightMap);
+    if (plm)
+    {
+      plm->GetPolyTxtPlane ()->GetTextureSpace (tx_matrix, tx_vector);
+      // T = Mot * (O - Vot)
+      // T = Mot * (O - Vot) + Vuv      ; Add shift Vuv to final texture map
+      // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv
+      // T = Mot * (O - Vot + Mot-1 * Vuv)
+      csVector3 shift (uv_shift.x, uv_shift.y, 0);
+      tx_vector -= tx_matrix.GetInverse () * shift;
+      poly3d->SetTextureSpace (tx_matrix, tx_vector);
+      plm->DecRef ();
+    }
+  }
+
+  if (do_mirror)
+    poly3d->GetPortal ()->SetWarp (csTransform::GetReflect (
+    	poly3d->GetWorldPlane () ));
+
+  OptimizePolygon (poly3d);
+
+  te->DecRef ();
+  return true;
+}
 
 const char* csTextSyntaxService::MatrixToText (const csMatrix3 &m, int indent, bool newline)
 {
