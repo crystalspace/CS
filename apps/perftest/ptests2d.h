@@ -25,6 +25,7 @@
 
 struct iGraphics3D;
 struct iGraphics2D;
+struct iFont;
 
 class Tester2D : public Tester
 {
