@@ -153,6 +153,7 @@ csEvent::csEvent (csEvent const& e) : iEvent(), attributes (53)
   SubCategory = e.SubCategory;
   Flags = e.Flags;
   Time = e.Time;
+  attributes = e.attributes;
 
   if ((Type & CSMASK_Mouse) != 0)
   {

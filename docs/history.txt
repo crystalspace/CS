@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Jun-2004
+	- Jorrit added an assignement operator to csHashMapReversible.
+	  This actually fixes the crash at exit bug for some of the CSWS
+	  apps.
+	- Jorrit also added fixed the csEvent assignement operator so that
+	  it copies the 'attributes' field too.
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.
@@ -40,7 +46,7 @@ chronological order.
 	  with '='s (e.g. --set=%cflags%='/D foo=bar').
 	- Neil Mosafi changed the csvosa3dl plugin
 	    - Fixed some confusing log messages
-		- Plugin-wide relight system which should _almost_ work perfectly
+	    - Plugin-wide relight system which should _almost_ work perfectly
 5-Jun-2004
 	- res made the following changes:
 	    - Added the *f versions of floor and ceil to csdef.h.

@@ -33,6 +33,17 @@ csHashMapReversible::csHashMapReversible (const csHashMapReversible& m) :
   HalfReverse = new csHashMap (*m.HalfReverse);
 }
 
+csHashMapReversible& csHashMapReversible::operator= (
+		const csHashMapReversible& other)
+{
+  if (this == &other) return *this;
+  delete Reverse;
+  delete HalfReverse;
+  Reverse = new csHashMap (*other.Reverse);
+  HalfReverse = new csHashMap (*other.HalfReverse);
+  return *this;
+}
+
 csHashMapReversible::~csHashMapReversible ()
 {
   delete Reverse;

@@ -37,6 +37,8 @@ public:
   csHashMapReversible (uint32 size = 211);
   csHashMapReversible (const csHashMapReversible& m);
 
+  csHashMapReversible& operator= (const csHashMapReversible& other);
+
   virtual ~csHashMapReversible ();
 
   /// Put element into hash while implementing reversible features.
