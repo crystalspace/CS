@@ -74,6 +74,7 @@ static inline float qsqrt (float x)
 		"fmulp	%%st(1)\n"		// x a
 		"fmulp	%%st(1)\n"		// a
 	: "=&t" (ret), "+m" (x) : "m" (0.5F), "m" (1.5F)
+	: "eax", "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)"
   );
   return ret;
 }
@@ -110,6 +111,7 @@ static inline float qisqrt (float x)
 		"fsubrp	%%st(2)\n"		// 1.5-a*a*h a
 		"fmulp	%%st(1)\n"		// a
 	: "=t" (ret), "+m" (x) : "m" (0.5F), "m" (1.5F)
+	: "eax", "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)"
   );
   return ret;
 }
