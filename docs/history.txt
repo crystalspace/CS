@@ -60,6 +60,62 @@ The history order is reversed so that new features are at the top.
 	      first function get overwritten.  Therefore, functions must cache
 	      input arguments before invoking other functions, assuming that
 	      they want to continue referring to those arguments.
+	- Martin Geisse did the following:
+	    - Added RelinkMesh() to iSector.
+	    - Added GetFactory(), MarkVisible(), MarkInvisible() and
+	      IsVisible() to csMeshWrapper.
+	    - Removed the unused and obviously non-working Rotate() and
+	      ScaleBy() methods from csMeshWrapper.
+	    - Removed the custom DecRef implementation from csMeshWrapper.
+	    - Added SetParentContainer() to csMeshFactoryWrapper.
+	    - Removed GetPrivateObject() from csMeshFactoryWrapper.
+	    - Cleaned the code, mainly in csMeshList (and subclasses),
+	      csMeshWrapper, csMeshFactoryList (and subclasses) and
+	      csMeshFactoryWrapper.
+	- Christopher Nelson did the following:
+	    - Fixed hierarchical drawing code so that it properly offsets
+	      children with children.
+	    - Added another nested level to test children with children.
+	    - Added image drawing capabilities to the list box. This is
+	      currently untested, but it should work reasonably well. It's
+	      supposed to also check to see if there's in case they're both
+	      aligned the same, that way they don't write each other badly.
+	      Whether or not this works correctly is unknown at this time.  
+	      Note: although items and images can be independently aligned in
+	      a single item, and they can coexist with the tree boxes in the
+	      same column with alignment, it is recommended that you not try
+	      to right or center align images and text if they will be in the
+	      zeroth column of a tree control. It won't look right, and
+	      trying to make it look right is silly, since the tree controls
+	      are all left aligned and center or right aligning them doesn't
+	      make any sense at all.  
+	    - Made listbox now understand mouse clicks. For the moment you can
+	      only collapse and expand the tree, but I will next attempt the
+	      state buttons. This is also the code that will eventually allow
+	      lines to be selected.  It works by registering hotspots during
+	      the draw (since drawing is recursive), that way you don't have
+	      to worry about calculating offsets and depths and worrying
+	      about height stuff.
+	    - Made a couple of fixes to the listbox hotspot code.
+	    - Fixed the expand and collapse images to look prettier.
+	    - Made state items work correctly. They now switch on and off,
+	      and group items also work correctly. As per my standards,
+	      grouping is controled by container level. Therefore, all
+	      containers on the same level will be grouped together.
+	    - Made selection work. The listbox is now almost 100% functional.
+	      Visually I haven't tested images, I also haven't tested column
+	      header images. Other than that, I think that it's visually
+	      complete.  On the functional side, I have to add in two actions:
+		"GetSelectedItem" that lets you retrieve the currently
+		selected item's properties.
+		Second, "GetFirstItem" and "GetNextItem" which let you iterate
+		through the whole list.
+	      "GetFirstItem" and "GetNextItem" will let you specify a boolean
+	      parameter "IterateWholeList". If you specify that as true,
+	      then the iterator mechanism will descend into all branches.
+	      Otherwise, it will only descend into visible branches.  
+	- 'res' fixed win32 port so that disabling console via commandline
+	  works now. Moved csSleep() to timing32.cpp.
 5-Nov-2001
 	- Fixed a bug in bin/chkheadr.sh which caused that test to always
 	  fail with the result that CS_USE_FAKE_SOCKLEN_TYPE would always
@@ -84,6 +140,43 @@ The history order is reversed so that new features are at the top.
 	  temporary measure to address the nasty monolithic nature of scf.cfg.
 	  Plans are already laid, for the near future, for eliminating scf.cfg
 	  entirely, thus this patch will cease to exist at that time.
+	- Matze Braun did some small cleanup of cs-config.
+	- Wouter Wijngaards modified cs-config to work with mingw and cygwin
+	  ports.
+	- Matze Braun fixed a bug in csFileDialog for DOS/Win like platforms.
+	- Jorge Acereda fixed a memory leak with window title in
+	  xwindow.cpp.
+	- Christopher Nelson did the following:
+	    - Moved aws include files to include/iaws.
+	    - Updated the csRectRegion code to fix the bug noticed by Mike
+	      Handverger. Moved the ++j out of the loop code since it needs to
+	      be incremented irregardless of whether there are free
+	      fragments. If it doesn't find a free one, those fragments are
+	      discarded.
+	    - Fixed a compilation bug that got introduced.
+	    - Fixed dumb error on his part when he introduced awsParmList.
+	      Forgot that it would have to be derived from iBase so that users
+	      could get to it in other modules. This class is now
+	      instantiatable from the WindowManager using CreateParmList.
+	    - Fixed more dumb errors introduced by this change.
+	    - Fixed awstest to work properly with flexible parameter lists.
+	    - Fixed more compile errors introduced by iAwsParmList.
+	    - Did lots of work on the listbox. It now can actually draw
+	      headers and non-hierarchical tree items. It doesn't know how to
+	      draw group buttons yet, nor can it draw images.
+	    - Modified parser so that it works with attributes with numbers
+	      in them.
+	    - Added Clear() method to Flexible Parameter List.
+	    - Updated test app so that it adds list items.
+	    - Did some more work on the list box. It now understands group
+	      buttons and can draw items hierarchically. The hierarchical
+	      drawing needs some work still, but overall it's pretty decent.
+	    - Fixed the little tree-vline image to make it look right.
+	    - Fixed tree code so that it now draws properly and doesn't leave
+	      little danglies at the end of a child list.
+	- 'res' corrected wrong interface in iaws.h.
+	- Matze Braun made nasm test stronger again - older nasms which
+	  didn't work with CS passed before.
 4-Nov-2001
 	- Matze Braun cleaned up config scripts for Unix and cygwin.
 	- Eric Sunshine made the following changes:
@@ -98,15 +191,53 @@ The history order is reversed so that new features are at the top.
 	    - Made the BeOS port a bit more robust for the makefile
 	      configuration phase.  No longer assumes that the scripts in the
 	      CS/bin directory have execute-permission.
+	- 'res' fixed demo.mak which he modified yesterday.
+	- Wouter Wijngaards did the following with regards to cs-config:
+	    - Added --makevars option to cs-config, this will echo a portion
+	      of a makefile with settings that the user can use. With these
+	      settings more platforms should be supported by the cs-config
+	      makefiles, such as linux, mingw, next, without making any changes.
+	    - Updated the Template makefile in scripts/cs-config so that it
+	      supports compiling shared plugins as well.
+	    - Small fixes to the template makefile as well.
+	    - Added variables to cygwin and win32gcc ports that communicate
+	      their flavors of shared plugin linking to be used cs-config
+	      creation.
 3-Nov-2001
 	- Jorge Acereda changed csLoadLibrary() in unix.cpp to call dlopen()
 	  always, so that csPrintLibraryError() can get the correct error
 	  message with dlerror().  Also fixed an unaccuracy in csGetTicks() and
 	  changed it to use sysconf() correctly.
+	- Martin Geisse did the following:
+	    - Simplified csSector::Draw() a lot by removing duplicate code.
+	    - Split csLightList into two parts. There is now a basic light
+	      list, called csLightList, which is simply a vector with an SCF
+	      interface. csSector uses csSectorLightList, a subclass of
+	      csLightList, which adds sector-specific functionality.
+	    - Continued to cleanup the sector code:
+		- Removed FindLight (x,y,z,r) since it was not clear what
+		  exactly the function does, nor was it used anywhere.
+		- Moved FindLight (id) to iLightList.
+		- The culler mesh is now stored as an iMeshWrapper.
+	    - Cosmetic cleanup work.
+	- 'res' reports that disabling windows mouse cursors works now.
+	- 'res' added support for native console in windows port and
+	  also added application-specific icon support (apps/win32).
+	- Matze Braun did a small viewmesh fix/cleanup.
 2-Nov-2001
-	- The new viemesh is ready: you can now select state and rotate around
-	  and the possibility to load material/texture libs and meshes with
-	  GUI.
+	- Matze Braun reports: The new viewmesh is ready: you can now select
+	  state and rotate around and the possibility to load material/texture
+	  libs and meshes with GUI.
+	- Christopher Nelson did the following:
+	    - Fixed a couple of bugs in aws listbox.
+	    - Continued work on the uberListBox.
+	- Martin Geisse did the following:
+	    - Fixed some problems with CS_DECLARE_OBJECT_POOL.
+	    - Reimplemented csLightPatchPool with the above macro.
+	    - Moved priority queue functionality out of csSector and into its
+	      own class.
+	    - Fixed a bug that I introduced in my latest changes and continued
+	      to cleanup the sector code.
 1-Nov-2001
 	- Fixed a bug in csRenderView::ClipBSphere.  The bug was actually a
 	  false CS_ASSERT based on a wrong assumption that TestBSphere() is
@@ -122,12 +253,47 @@ The history order is reversed so that new features are at the top.
 	  have access to GCC3.
 	- Luca Pancallo improved 3ds2lev so that textures are now correctly
 	  uv mapped when the -tl option is used.
+	- Matze Braun fixed csFileDialog again.
+	- Matze also did various fixes to static linking and static install.
+	- Matze fixed a bug in csApp::Printf.
+	- Matze added menu for state selection to viewmesh.
+	- Martin Geisse did the following:
+	    - Added Clone() to iCamera, iCameraPosition, iMaterialWrapper and
+	      iTextureWrapper. This is the interface version of a copy
+	      constructor. It creates a clone of the object, which contains
+	      the same characteristics and has all original child objects
+	      from the csObject hierarchy linked to it. However, it is not
+	      added to the csObject parent nor to any engine object list
+	      automatically.
+	    - Added a copy constructor to csObject.
+	    - Added GetHit() and a 'const' GetTransform() to iCamera.
+	    - Added missing comments to iCameraPosition.
+	    - Continued to remove GetPrivateObject() from engine interfaces.
+	    - Performed interface cleanup in iCameraPosition.
+	    - Added missing comments to iCamera, iCameraPosition, csBox2
+	      and csBox3.
+	- Christopher Nelson did the following:
+	    - Added new component, "List Box". This component is a work in
+	      progress, but it supports:
+		1. Multicolumn lists (with headers)
+		2. Tree-like lists (hierarchical)
+		3. Aligned images and or text in every column and the header
+		4. Stateful items (check boxes/radio buttons)
+		5. Fully skinnable (background, header backgrounds,
+		   highlights, stateful images, tree boxes and lines)
+	    - Created a new csVector subclass for the listbox so that rows
+	      can be sorted by column, and can be quickly searched.
 31-Oct-2001
 	- Removed the windows pen support added by 'res'.  I don't have the
 	  needed include files on mingw.
-	- Matze added VFS support to csFileDialog.
+	- Matze added VFS support to csFileDialog and also did some small
+	  changes to viewmesh.
+	- 'res' fixed pen support in windows port.
+	- 'res' fixed csFileDialog so that it compiles on MSVC.
 	- Jorge Acereda fixed infinite renderer. It failed to overload
 	  iGraphics2D::Write() because it had a different argument list.
+	- Martin Geisse removed GetPrivateObject() from iCollection.
+	- Norman Kramer defined GLX_GLXEXT_PROTOTYPES to please MESA 4.0.
 30-Oct-2001
 	- Matze changed code structure of viewmesh a bit. I'll add csws
 	  interfaces tomorrow.
