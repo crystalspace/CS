@@ -471,6 +471,7 @@ void csTextureHandleOpenGL::Clear ()
 
 csTexture *csTextureHandleOpenGL::NewTexture (iImage *Image, bool ismipmap)
 {
+  ismipmap = false;
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC)
     return new csTextureProcOpenGL (this, Image);
   else

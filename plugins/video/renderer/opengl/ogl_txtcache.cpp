@@ -608,8 +608,9 @@ int OpenGLLightmapCache::FindFreeSuperLightmap()
  * lightmap
  */
 void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
-                                bool* modified)
+  bool* modified)
 {
+  modified = false;
   //First: Try to find a free superlightmap
   //Check if the superLightmap is already in the cache
 
