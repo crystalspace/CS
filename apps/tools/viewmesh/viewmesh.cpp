@@ -451,12 +451,12 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	    if (!fountainState)
               printf ("No fountain state plug-in found!\n");
 	    fountainState->SetParticleCount (50);
-	    fountainState->SetDropSize (0.05,0.05);
+	    fountainState->SetDropSize (0.05f,0.05f);
 	    fountainState->SetSpeed(1);
-	    fountainState->SetOpening(0.2);
+	    fountainState->SetOpening(0.2f);
 	    iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
 	    partState->SetMaterialWrapper (mat);
-	    partState->SetColor(csColor(0.7,0.9,1));
+	    partState->SetColor(csColor(0.7f,0.9f,1));
 	    partState->SetMixMode (CS_FX_ADD);
 
 	    csRef<iMeshWrapper> meshwrap = engine->CreateMeshWrapper(

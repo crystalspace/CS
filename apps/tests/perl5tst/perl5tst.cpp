@@ -89,7 +89,7 @@ int main (int argc, char *argv[])
     printf ("new csVector3 (1.0f, 2.0f, 3.0f)\n");
 
     printf ("Testing Get:\n");
-    float x, y, z;
+    float x = 0.0f, y = 0.0f, z = 0.0f;
     printf ("csVector3 = (%f, %f, %f)\n", x, y, z);
     obj->Get ("x", x);
     obj->Get ("y", y);

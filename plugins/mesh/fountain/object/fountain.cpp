@@ -75,7 +75,7 @@ csFountainMeshObject::csFountainMeshObject (iEngine* engine,
   azimuth = 1;
   elevation = 1;
   SetCount (50);
-  SetDropSize (0.1, 0.1);
+  SetDropSize (0.1f, 0.1f);
 }
 
 csFountainMeshObject::~csFountainMeshObject()
