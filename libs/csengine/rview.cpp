@@ -521,7 +521,7 @@ void csRenderView::DeleteRenderContextData (csRenderContext* rc)
 
 void csRenderView::DeleteRenderContextData (void* key)
 {
-  csRenderContextData** prev = &(csRenderContextData*)(ctxt->rcdata);
+  csRenderContextData** prev = (csRenderContextData**)&(ctxt->rcdata);
   csRenderContextData* cd = (csRenderContextData*)(ctxt->rcdata);
   while (cd)
   {
