@@ -11,8 +11,10 @@
 
 SYSTYPE=$1
 
+# Find the directory where script is located
 SCRIPT_NAME=`basename $0`
 SCRIPT_DIR=`expr $0 : "\(.*\)/${SCRIPT_NAME}"`
+[ -z "${SCRIPT_DIR}" ] && SCRIPT_DIR="./"
 SCRIPT_DIR=`(cd ${SCRIPT_DIR}; pwd)`	# Convert to absolute path.
 
 # First get a string describing current machine and processor types
@@ -91,6 +93,16 @@ fi
 
 # Remove dummy remains
 rm -f conftest.asm conftest.o
+
+# Check if makedep is installed and is the right version
+[ -z "${MAKEDEP}" ] && MAKEDEP=`which makedep | grep -v "no makedep"`
+if [ -n "${MAKEDEP}" ]; then
+  echo "DEPEND_TOOL = mkdep"
+  MAKEDEP_VERSION=`makedep -V | sed -e "s/.*Version *//"`
+  if [ "${MAKEDEP_VERSION}" ">" "0.0.0" ]; then
+    echo "DEPEND_TOOL.INSTALLED = yes"
+  fi
+fi
 
 # Look where is X11 directory
 # lib/ or include/ ? (Dmitry)
