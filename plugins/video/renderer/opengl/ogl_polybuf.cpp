@@ -275,7 +275,8 @@ void csTriangleArrayPolygonBuffer::ProcessLmQueue (
   float lm_low_u, lm_low_v, lm_high_u, lm_high_v;
   float lm_scale_u, lm_scale_v, lm_offset_u, lm_offset_v;
 
-  poly_texture->GetTextureBox (lm_low_u,lm_low_v,lm_high_u,lm_high_v);
+  const csLightMapMapping& mapping = poly_texture->GetMapping ();
+  mapping.GetTextureBox (lm_low_u,lm_low_v,lm_high_u,lm_high_v);
   if (lm_high_u <= lm_low_u)
     lm_scale_u = 1.;       // @@@ Is this right?
   else

@@ -201,16 +201,17 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   }
   else
     Scan.bitmap2 = NULL;
-  Scan.tw2 = tex->GetWidth () >> MipMap;
-  Scan.th2 = tex->GetHeight () >> MipMap;
-  Scan.min_u = (tex->GetIMinU () >> MipMap) << 16;
-  Scan.min_v = (tex->GetIMinV () >> MipMap) << 16;
+  const csLightMapMapping& mapping = tex->GetMapping ();
+  Scan.tw2 = mapping.GetWidth () >> MipMap;
+  Scan.th2 = mapping.GetHeight () >> MipMap;
+  Scan.min_u = (mapping.GetIMinU () >> MipMap) << 16;
+  Scan.min_v = (mapping.GetIMinV () >> MipMap) << 16;
 
 #ifdef STUPID_TEST
   Scan.tw2fp = (Scan.tw2 << 16) - 1;
   Scan.th2fp = (Scan.th2 << 16) - 1;
 #endif
-  Scan.shf_u = tex->GetShiftU () - MipMap;
+  Scan.shf_u = mapping.GetShiftU () - MipMap;
 
   Scan.and_h <<= Scan.shf_w;
   Scan.shf_h = 16 - Scan.shf_w;

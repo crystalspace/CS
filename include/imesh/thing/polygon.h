@@ -271,7 +271,77 @@ struct iPolygon3D : public iBase
   virtual bool PointOnPolygon (const csVector3& v) = 0;
 };
 
-SCF_VERSION (iPolygonTexture, 1, 0, 1);
+/**
+ * This structure holds mapping information to map the lightmap on
+ * a polygon. You can get it from the iPolygonTexture below.
+ */
+struct csLightMapMapping
+{
+  float fdu, fdv;
+
+  /**
+   * Bounding box of corresponding polygon in 2D texture space.
+   * Note that the u-axis of this bounding box is made a power of 2 for
+   * efficiency reasons.
+   */
+  int Imin_u, Imin_v;
+
+  /// fp bounding box (0..1 texture space)
+  float Fmin_u, Fmin_v, Fmax_u, Fmax_v;
+
+  ///
+  uint16 shf_u;
+
+  /*
+   * New texture data with lighting added. This is an untiled texture
+   * so it is more efficient to draw. This texture data is allocated
+   * and maintained by the texture cache. If a PolyTexture is in the
+   * cache it will be allocated, otherwise it won't.
+   */
+
+  /// Width of lighted texture ('w' is a power of 2).
+  int w;
+
+  /// Height of lighted texture.
+  int h;
+
+  /// Original width (not a power of 2) (w_orig <= w).
+  int w_orig;
+
+  /// Get the u-value of the textures bounding box' lower left corner.
+  float GetFDU () const { return fdu; }
+  /// Get the v-value of the textures bounding box' lower left corner.
+  float GetFDV () const { return fdv; }
+  /// Get width of lit texture (power of 2).
+  int GetWidth () const { return w; }
+  /// Get height of lit texture.
+  int GetHeight () const { return h; }
+  /**
+   * Get the power of the lowest power of 2 that is not smaller than the
+   * texture bounding box' width.
+   * that is: 2^shift_u >= texbbox-width > 2^(shift_u-1)
+   */
+  int GetShiftU () const { return shf_u; }
+
+  /// Get the rounded u-value of the textures bounding box' lower left corner.
+  int GetIMinU () const { return Imin_u; }
+  /// Get the rounded v-value of the textures bounding box' lower left corner.
+  int GetIMinV () const { return Imin_v; }
+  /// Get texture box.
+  void GetTextureBox (float& fMinU, float& fMinV,
+    float& fMaxU, float& fMaxV) const
+  {
+    fMinU = Fmin_u;
+    fMaxU = Fmax_u;
+    fMinV = Fmin_v;
+    fMaxV = Fmax_v;
+  }
+
+  /// Get original width.
+  int GetOriginalWidth () const { return w_orig; }
+};
+
+SCF_VERSION (iPolygonTexture, 1, 1, 0);
 
 /**
  * This is a interface to an object responsible for containing
@@ -281,27 +351,8 @@ struct iPolygonTexture : public iBase
 {
   /// Get the material handle associated with this polygon
   virtual iMaterialHandle *GetMaterialHandle () = 0;
-  /// Get the u-value of the textures bounding box' lower left corner
-  virtual float GetFDU () = 0;
-  /// Get the v-value of the textures bounding box' lower left corner
-  virtual float GetFDV () = 0;
-  /// Get width of lighted texture (power of 2)
-  virtual int GetWidth () = 0;
-  /// Get height of lighted texture.
-  virtual int GetHeight () = 0;
-  /// Get the power of the lowest power of 2 that is not smaller than the texture bounding box' width
-  /// that is: 2^shift_u >= texbbox-width > 2^(shift_u-1)
-  virtual int GetShiftU () = 0;
-
-  /// Get the rounded u-value of the textures bounding box' lower left corner
-  virtual int GetIMinU () = 0;
-  /// Get the rounded v-value of the textures bounding box' lower left corner
-  virtual int GetIMinV () = 0;
-  /// Get texture box.
-  virtual void GetTextureBox (float& fMinU, float& fMinV,
-    float& fMaxU, float& fMaxV) = 0;
-  /// Get original width.
-  virtual int GetOriginalWidth () = 0;
+  /// Get the mapping to use for this lightmap.
+  virtual const csLightMapMapping& GetMapping () const = 0;
 
   /// Check if dynamic lighting information should be recalculated
   virtual bool DynamicLightsDirty () = 0;
@@ -327,3 +378,4 @@ struct iPolygonTexture : public iBase
 };
 
 #endif // __CS_THING_POLYGON_H__
+

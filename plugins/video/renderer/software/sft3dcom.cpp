@@ -1838,6 +1838,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
         + Q3 * poly.plane.v_cam2tex->z);
 
   iPolygonTexture *tex = poly.poly_texture;
+  const csLightMapMapping& mapping = tex->GetMapping ();
   csTextureHandleSoftware *tex_mm =
     (csTextureHandleSoftware *)poly.mat_handle->GetTexture ()
     	->GetPrivateObject ();
@@ -1845,8 +1846,8 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   float fdu, fdv;
   if (tex)
   {
-    fdu = tex->GetFDU ();
-    fdv = tex->GetFDV ();
+    fdu = mapping.GetFDU ();
+    fdv = mapping.GetFDV ();
   }
   else
   {
@@ -1950,7 +1951,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 
   // If mipmap is too small or not available, use the mipmap level
   // that is still visible or available ...
-  int shf_u = tex->GetShiftU () - mipmap;
+  int shf_u = mapping.GetShiftU () - mipmap;
   if (shf_u < 0) mipmap += shf_u;
   if (mipmap < 0) mipmap = 0;
   while (mipmap && !tex_mm->get_texture (mipmap))
@@ -1974,7 +1975,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
     // If there is a lightmap we check if the size of the lighted
     // texture would not exceed MAX_LIGHTMAP_SIZE pixels. In that case we
     // revert to unlighted texture mapping.
-    long size = tex->GetWidth () * tex->GetHeight ();
+    long size = mapping.GetWidth () * mapping.GetHeight ();
     if (size > MAX_LIGHTMAP_SIZE) has_lightmap = false;
   }
 
@@ -2228,8 +2229,8 @@ texr_done:
   if (do_alpha) 
   {
     // cached texture has different coords than original tex.
-    Scan.amap_uofs = tex->GetIMinU() >> mipmap; 
-    Scan.amap_vofs = tex->GetIMinV() >> mipmap; 
+    Scan.amap_uofs = mapping.GetIMinU() >> mipmap; 
+    Scan.amap_vofs = mapping.GetIMinV() >> mipmap; 
   }
 
   for ( ; ; )
@@ -3352,7 +3353,8 @@ float csGraphics3DSoftwareCommon::GetZBuffValue (int x, int y)
 
 bool csGraphics3DSoftwareCommon::IsLightmapOK (iPolygonTexture* poly_texture)
 {
-  return ((poly_texture->GetWidth () * poly_texture->GetHeight ()) < MAX_LIGHTMAP_SIZE);
+  const csLightMapMapping& mapping = poly_texture->GetMapping ();
+  return ((mapping.GetWidth () * mapping.GetHeight ()) < MAX_LIGHTMAP_SIZE);
 }
 
 void csGraphics3DSoftwareCommon::SetRenderTarget (iTextureHandle* handle,

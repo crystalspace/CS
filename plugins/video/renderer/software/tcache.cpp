@@ -197,8 +197,9 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture
   {
     // Texture is not in the cache.
     int lightmap_size = pt->GetLightMap ()->GetSize () * sizeof (uint32);
-    int bitmap_w = (pt->GetWidth () >> MipMap);
-    int bitmap_h = ((pt->GetHeight () + (1 << MipMap) - 1) >> MipMap);
+    const csLightMapMapping& mapping = pt->GetMapping ();
+    int bitmap_w = (mapping.GetWidth () >> MipMap);
+    int bitmap_h = ((mapping.GetHeight () + (1 << MipMap) - 1) >> MipMap);
     int bitmap_size = lightmap_size + bytes_per_texel * bitmap_w
     	* (H_MARGIN * 2 + bitmap_h);
 

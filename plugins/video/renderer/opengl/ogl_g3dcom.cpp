@@ -2516,7 +2516,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 
     float lm_offset_u, lm_offset_v, lm_high_u, lm_high_v;
     float lm_scale_u, lm_scale_v;
-    tex->GetTextureBox (lm_offset_u, lm_offset_v, lm_high_u, lm_high_v);
+    const csLightMapMapping& mapping = tex->GetMapping ();
+    mapping.GetTextureBox (lm_offset_u, lm_offset_v, lm_high_u, lm_high_v);
 
     // lightmap fudge factor
     if (lm_high_u <= lm_offset_u)
@@ -2975,7 +2976,8 @@ void csGraphics3DOGLCommon::DrawPolygonLightmapOnly (G3DPolygonDP& poly)
 
     float lm_offset_u, lm_offset_v, lm_high_u, lm_high_v;
     float lm_scale_u, lm_scale_v;
-    tex->GetTextureBox (lm_offset_u, lm_offset_v, lm_high_u, lm_high_v);
+    const csLightMapMapping& mapping = tex->GetMapping ();
+    mapping.GetTextureBox (lm_offset_u, lm_offset_v, lm_high_u, lm_high_v);
 
     // lightmap fudge factor
     if (lm_high_u <= lm_offset_u)

@@ -534,10 +534,11 @@ void csPolygon3D::Finish ()
   if (portal)
     portal->SetFilter (material->GetMaterialHandle ()->GetTexture ());
 
+  const csLightMapMapping& mapping = txt_info->tex->mapping;
   if (flags.Check (CS_POLY_LIGHTING))
   {
-    int lmw = csLightMap::CalcLightMapWidth (txt_info->tex->w_orig);
-    int lmh = csLightMap::CalcLightMapHeight (txt_info->tex->h);
+    int lmw = csLightMap::CalcLightMapWidth (mapping.w_orig);
+    int lmh = csLightMap::CalcLightMapHeight (mapping.h);
     int max_lmw, max_lmh;
     thing->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
     if ((lmw > max_lmw) || (lmh > max_lmh))
@@ -553,7 +554,7 @@ void csPolygon3D::Finish ()
 
       csColor ambient;
       thing->thing_type->engine->GetAmbientLight (ambient);
-      lm->Alloc (txt_info->tex->w_orig, txt_info->tex->h,
+      lm->Alloc (mapping.w_orig, mapping.h,
       	int(ambient.red * 255.0f),
       	int(ambient.green * 255.0f),
       	int(ambient.blue * 255.0f));
@@ -1599,8 +1600,8 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
     if (txt_info->tex->lm == NULL) return NULL;
     const char* error = txt_info->tex->lm->ReadFromCache (
           file,
-          txt_info->tex->w_orig,
-          txt_info->tex->h,
+          txt_info->tex->mapping.w_orig,
+          txt_info->tex->mapping.h,
           this,
 	  NULL,
 	  thing->thing_type->engine);

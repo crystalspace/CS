@@ -73,6 +73,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
   int pt_cell_size = pt->GetLightCellSize () >> mipmap;
   
+  const csLightMapMapping& mapping = pt->GetMapping ();
   if (!pt_cell_size)
   {
   // this happens when the lightcell size is <8
@@ -81,11 +82,11 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   // so we need a different algorithm:
   // multiple lightmap texels are averaged
   
-    int pt_min_u = pt->GetIMinU () >> mipmap;
-    int pt_min_v = pt->GetIMinV () >> mipmap;
+    int pt_min_u = mapping.GetIMinU () >> mipmap;
+    int pt_min_v = mapping.GetIMinV () >> mipmap;
 	int pt_cell_shift = -pt->GetLightCellShift () + mipmap;
 	pt_cell_size = 1 << pt_cell_shift;
-	int pt_shfw = pt->GetShiftU () - mipmap;
+	int pt_shfw = mapping.GetShiftU () - mipmap;
 	int pt_w = 1 << pt_shfw;
 	
 	int lm_color_shift = 6 - pt_cell_shift*2;
@@ -118,7 +119,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 	if (min_lu >= max_lu) return;
 	if (min_lv >= max_lv) return;
 
-	int max_lu2 = ((pt->GetOriginalWidth () + mipmap_delta) >> mipmap);
+	int max_lu2 = ((mapping.GetOriginalWidth () + mipmap_delta) >> mipmap);
 	if (max_lu > max_lu2) max_lu = max_lu2;
 
 	int max_lv2 = (lm->GetHeight ()) >> pt_cell_shift;
@@ -183,12 +184,12 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   }
   else
   {
-    int pt_min_u = pt->GetIMinU () >> mipmap;
-    int pt_min_v = pt->GetIMinV () >> mipmap;
+    int pt_min_u = mapping.GetIMinU () >> mipmap;
+    int pt_min_v = mapping.GetIMinV () >> mipmap;
 	int pt_cell_shift = pt->GetLightCellShift () - mipmap;
-	int pt_shfw = pt->GetShiftU () - mipmap;
+	int pt_shfw = mapping.GetShiftU () - mipmap;
 	int pt_w = 1 << pt_shfw;
-	int pt_h = (pt->GetHeight () + mipmap_delta) >> mipmap;
+	int pt_h = (mapping.GetHeight () + mipmap_delta) >> mipmap;
 
 	iLightMap *lm = pt->GetLightMap ();
 	int lm_w = lm->GetWidth ();
@@ -234,8 +235,8 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 	if (min_lu >= max_lu) return;
 	if (min_lv >= max_lv) return;
 
-	int max_lu2 = ((((pt->GetOriginalWidth () + mipmap_delta) >> mipmap) +
-		pt_cell_size - 1) >> pt_cell_shift);
+	int max_lu2 = ((((mapping.GetOriginalWidth () + mipmap_delta)
+		>> mipmap) + pt_cell_size - 1) >> pt_cell_shift);
 	if (max_lu > max_lu2) max_lu = max_lu2;
 
 	int max_lv2 = lm->GetHeight ();

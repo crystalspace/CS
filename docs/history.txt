@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+19-Mar-2003
+	- Removed a few unused flags from csPolygon3D.
+	- In order to be able to make real thing factories (that don't use
+	  up enourmous amounts of memory) I started redesiging the API of
+	  things a bit. The first step is the creation of a csLightMapMapping
+	  structure which defines the static mapping of the lightmap on the
+	  polygon. iPolygonTexture uses that now instead of the direct
+	  values. This should improve efficiency a bit as well as there
+	  are less virtual function calls needed now.
 18-Mar-2003
 	- Added two entries to the faq about scaled objects.
 	- Some Doxygen improvements on iMovable and iMeshWrapper.

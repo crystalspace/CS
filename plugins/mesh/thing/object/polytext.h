@@ -241,39 +241,8 @@ private:
   /// The corresponding polygon.
   csPolygon3D* polygon;
 
-  /**
-   * Bounding box of corresponding polygon in 2D texture space.
-   * Note that the u-axis of this bounding box is made a power of 2 for
-   * efficiency reasons.
-   */
-  int Imin_u, Imin_v;
-
-  /// fp bounding box (0..1 texture space)
-  float Fmin_u, Fmin_v, Fmax_u, Fmax_v;
-
-  ///
-  uint16 shf_u;
-
-  /*
-   * New texture data with lighting added. This is an untiled texture
-   * so it is more efficient to draw. This texture data is allocated
-   * and maintained by the texture cache. If a PolyTexture is in the
-   * cache it will be allocated, otherwise it won't.
-   */
-
-  /// Width of lighted texture ('w' is a power of 2).
-  int w;
-
-  /// Height of lighted texture.
-  int h;
-
-  /// Original width (not a power of 2) (w_orig <= w).
-  int w_orig;
-
-  ///
-  float fdu;
-  ///
-  float fdv;
+  /// How to map the lightmap on the polygon.
+  csLightMapMapping mapping;
 
   /// LightMap.
   csLightMap* lm;
@@ -360,27 +329,11 @@ public:
 
   //--------------------- iPolygonTexture implementation ---------------------
   SCF_DECLARE_IBASE;
-  ///
   virtual iMaterialHandle *GetMaterialHandle ();
-  ///
-  virtual float GetFDU () { return fdu; }
-  ///
-  virtual float GetFDV () { return fdv; }
-  /// Get width of lighted texture (power of 2)
-  virtual int GetWidth () { return w; }
-  /// Get height of lighted texture.
-  virtual int GetHeight () { return h; }
-  ///
-  virtual int GetShiftU () { return shf_u; }
-  ///
-  virtual int GetIMinU () { return Imin_u; }
-  ///
-  virtual int GetIMinV () { return Imin_v; }
-  ///
-  virtual void GetTextureBox (float& fMinU, float& fMinV,
-  	float& fMaxU, float& fMaxV);
-  ///
-  virtual int GetOriginalWidth () { return w_orig; }
+  virtual const csLightMapMapping& GetMapping () const
+  {
+    return mapping;
+  }
 
   /// Check if dynamic lighting information should be recalculated
   virtual bool DynamicLightsDirty ();

@@ -150,22 +150,6 @@ public:
 #define CS_POLY_DELETE_PORTAL	0x80000000
 
 /**
- * If this flag is true then this polygon will never be drawn.
- * This is useful for polygons which have been split. The original
- * unsplit polygon is still kept because it holds the shared
- * information about the lighted texture and lightmaps (all split
- * children refer to the original polygon for that).
- */
-#define CS_POLY_NO_DRAW		0x40000000
-
-/**
- * If this flag is set then this polygon has been split (BSP tree
- * or other reason). Depending on the engine mode this polygon will
- * not be used anymore for rendering.
- */
-#define CS_POLY_SPLIT		0x20000000
-
-/**
  * This flag is set if the renderer can't handle the lightmap.
  * Lighting is still calculated, but the lightmap isn't passed to the
  * renderer.

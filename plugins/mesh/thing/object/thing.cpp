@@ -1356,7 +1356,6 @@ void csThing::DrawPolygonArray (
   for (i = 0; i < num; i++)
   {
     p = polygon[i];
-    if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
     p->UpdateTransformation (camtrans, icam->GetCameraNumber ());
     if (p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts))  //@@@Pool for verts?
     {
@@ -2434,7 +2433,6 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
     for (i = 0; i < polygons.Length (); i++)
     {
       p = GetPolygon3D (i);
-      if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
       clip = (csPolygon2D *) (render_pool->Alloc ());
 
       const csPlane3 &wplane = p->GetWorldPlane ();
@@ -2475,7 +2473,6 @@ bool csThing::DrawFoggy (iRenderView *d, iMovable *)
     for (i = 0; i < polygons.Length (); i++)
     {
       p = GetPolygon3D (i);
-      if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
       clip = (csPolygon2D *) (render_pool->Alloc ());
 
       const csPlane3 &wplane = p->GetWorldPlane ();
