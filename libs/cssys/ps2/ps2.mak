@@ -9,7 +9,7 @@ DESCRIPTION.ps2 = PS2
 #PLUGINS+=video/renderer/opengl video/canvas/openglx
 #PLUGINS+=video/canvas/linex
 #PLUGINS+=video/renderer/null 
-PLUGINS+=video/renderer/software
+#PLUGINS+=video/renderer/software
 PLUGINS+=video/renderer/opengl video/canvas/ps2d
 
 # uncomment the following to build SVGALIB and/or GGI 2D drivers
@@ -52,17 +52,17 @@ NEED_SOCKET_LIB=no
 
 # Extra libraries needed on this system.
 DEP.EXE += /code/peed/ps2/libGL.a
-LIBS.EXE+=-nostartfiles -L/usr/local/sce/ee/lib -L/code/peed/ps2 -T/usr/local/sce/ee/lib/app.cmd crt0.o -lm -lgraph -ldev -ldma -lpkt -lpeed -lSDL -lGL -lcdvd -lvu0 -lpad
-LIBS.SORT+=-lpeed -lSDL -lGL -lvu0 -lgraph -ldma -lcdvd -lpad
+LIBS.EXE+=-nostartfiles -L/usr/local/sce/ee/lib -L/code/peed/ps2 -T/usr/local/sce/ee/lib/app.cmd crt0.o -L.. -lpng -lz -ljpeg -lm -lgraph -ldev -ldma -lpkt -lpeed -lSDL -lGL -lcdvd -lvu0 -lpad -lmc -lmtap
+LIBS.SORT+=-lpeed -lSDL -lGL -lvu0 -lgraph -ldma -lcdvd -lpad -lmc -lmtap
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-L../zlib -lz
+Z_LIBS=
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-L../libpng -lpng
+PNG_LIBS=
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-L../libjpeg -ljpeg
+JPG_LIBS=
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -124,9 +124,6 @@ CXX=ee-g++ -c
 # The linker.
 LINK=ee-g++
 
-DO_JPG=yes
-DO_PNG=yes
-DO_GIF=yes
 EXE=.elf
 
 endif # ifeq ($(MAKESECTION),defines)
