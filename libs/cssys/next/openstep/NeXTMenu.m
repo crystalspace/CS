@@ -85,7 +85,7 @@ static void item_scan(NeXTConfigHandle config, char const* section,
   char const* inherit = NeXTConfigFile_lookup(config, k_inherit, 0);
   if (inherit != 0)
   {
-    char const* parent = STR_APPENDD("Item.", inherit, ".");
+    char const* parent = STR_APPENDD("NeXT.Item.", inherit, ".");
     item_scan(config, parent, type, title, shortcut, action, target);
   }
   
@@ -118,7 +118,7 @@ static void menu_add_item(NSMenu* menu, char const* key,
   char const* action   = 0;
   char const* target   = 0;
   
-  char const* section = STR_APPENDD("Item.", key, ".");
+  char const* section = STR_APPENDD("NeXT.Item.", key, ".");
   item_scan(config, section, &type, &title, &shortcut, &action, &target);
   
   if (type != 0 && strcmp(type, "separator") == 0)
@@ -163,7 +163,7 @@ static void menu_add_submenu(NSMenu* menu, char const* name,
   NSMenu* const sub = build_menu(name, config);
   if (sub != 0)
   {
-    char const* key = STR_APPENDD("Menu.", name, ".type");
+    char const* key = STR_APPENDD("NeXT.Menu.", name, ".type");
     char const* type = NeXTConfigFile_lookup(config, key, 0);
   
     NSMenuItem* const item =
@@ -218,7 +218,7 @@ static void menu_add(NSMenu* menu, char const* key, char const* value,
 static NSMenu* build_menu(char const* key, NeXTConfigHandle config)
 {
   NSMenu* m = 0;
-  char const* section = STR_APPENDD("Menu.", key, ".");
+  char const* section = STR_APPENDD("NeXT.Menu.", key, ".");
   if (NeXTConfigFile_exists(config, section))
   {
     NeXTConfigIterator iterator =

@@ -97,6 +97,11 @@ The history order is reversed so that new features are at the top.
 	  iConfigFile.  This allows application, plugin module, and
 	  user-specific configuration options to override options from
 	  `next.cfg'.
+	- Eric Sunshine added a "NeXT." prefix to keys in `next.cfg' in order
+	  to distinguish them from keys in other configuration files.  This was
+	  necessary since the Apple/NeXT ports now access configuration
+	  information from `next.cfg' via iConfigManager, rather than
+	  iConfigFile,
 24-Jun-2001
 	- 'Fixed' the lightmap overflow bug in software renderer. It is
 	  not really an elegant bug fix as I simply test for overflow

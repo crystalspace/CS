@@ -66,7 +66,7 @@ static void item_scan(NeXTConfigHandle config, char const* section,
   char const* inherit = NeXTConfigFile_lookup(config, k_inherit, 0);
   if (inherit != 0)
   {
-    char* parent = str_append("Item.", inherit, ".");
+    char* parent = str_append("NeXT.Item.", inherit, ".");
     item_scan(config, parent, title, shortcut, action, target);
     free(parent);
   }
@@ -105,7 +105,7 @@ static void menu_add_item(Menu* menu, char const* key, NeXTConfigHandle config)
   char const* action   = 0;
   char const* target   = 0;
   
-  char* section = str_append("Item.", key, ".");
+  char* section = str_append("NeXT.Item.", key, ".");
   item_scan(config, section, &title, &shortcut, &action, &target);
   free(section);
   
@@ -140,7 +140,7 @@ static void menu_add_submenu(Menu* menu, char const* name,
   Menu* const sub = build_menu(name, config);
   if (sub != 0)
   {
-    char* key = str_append("Menu.", name, ".type");
+    char* key = str_append("NeXT.Menu.", name, ".type");
     char const* type = NeXTConfigFile_lookup(config, key, 0);
   
     MenuCell* item = [menu addItem:[sub title] action:0 keyEquivalent:0];
@@ -193,7 +193,7 @@ static void menu_add(Menu* menu, char const* key, char const* value,
 static Menu* build_menu(char const* key, NeXTConfigHandle config)
 {
   Menu* m = 0;
-  char* section = str_append("Menu.", key, ".");
+  char* section = str_append("NeXT.Menu.", key, ".");
   if (NeXTConfigFile_exists(config, section))
   {
     NeXTConfigIterator iterator =

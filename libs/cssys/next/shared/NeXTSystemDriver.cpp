@@ -101,7 +101,7 @@ bool NeXTSystemDriver::Initialize(int argc, char const* const argv[],
 void NeXTSystemDriver::init_menu(iConfigFile* next_config)
 {
   char const* style =
-    next_config->GetStr("Platform." OS_NEXT_DESCRIPTION ".menu", 0);
+    next_config->GetStr("NeXT.Platform." OS_NEXT_DESCRIPTION ".menu", 0);
   if (style != 0)
     NeXTDelegate_init_app_menu(controller, next_config, style);
 }
