@@ -122,10 +122,6 @@ interpolation modes.  For more info on the @samp{inter} command,
 @item m
 Toggle @samp{map} mode.
 
-@item @key{ALT}-a
-Make a screenshot in PCX format. This currently only seems to work in the
-DJGPP port.
-
 @item g
 Increase gamma level of display.
 

@@ -42,7 +42,7 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 #PROC=SPARC
 
 # Operating system. Can be one of:
-# NEXT, SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, WIN32, OS2, BE
+# MACOSX, SOLARIS, LINUX, IRIX, BSD, UNIX, WIN32
 OS=SOLARIS
 
 # Operating system family: UNIX (for Unix or Unix-like platforms), WIN32, etc.

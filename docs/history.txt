@@ -17,6 +17,16 @@ The history order is reversed so that new features are at the top.
 	    libs/cssys/next
 	    plugins/video/canvas/next
 	- Eric Sunshine eliminated compilation warnings from the Thing plugin.
+	- Eric Sunshine renamed plugins/net/netman to plugins/net/manager.
+	- Eric Sunshine removed the unmaintained DJGPP port.  Tagged the
+	  following files and directories with "DJGPP_OBSOLETE" in order to
+	  simplify the task of recovering them from the Attic if necessary.
+	    docs/texinfo/build/platform/msdos.txi
+	    include/cssys/djgpp
+	    libs/cssys/djgpp
+	    plugins/video/canvas/allegro
+	    plugins/video/canvas/common/pc-keys.cpp
+	    plugins/video/canvas/dosraw
 20-Dec-2002
 	- Clarified a few Doxygen comments in the engine.
 	- Added iLightingInfo->StaticLightChanged() to notify a mesh
@@ -69,7 +79,8 @@ The history order is reversed so that new features are at the top.
 	  simplify the task of recovering them from the Attic if necessary.
 	    docs/texinfo/build/platform/os2.txi
 	    docs/texinfo/internal/platform/os2.txi
-	    include/cssys/os2 libs/cssys/os2
+	    include/cssys/os2
+	    libs/cssys/os2
 	    plugins/video/canvas/common/os2-keys.h
 	    plugins/video/canvas/csdive
 	    plugins/video/canvas/openglos2

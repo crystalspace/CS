@@ -77,9 +77,6 @@ libraries.
 @item crystalspace.graphics3d.line
 This is a variant of the software renderer.
 @end table
-
-@item
-
 @end table
 
 @subsubheading Other System Driver Options
@@ -96,12 +93,6 @@ two mouse clicks to recognize a double-click. Default is @code{300}.
 The maximal distance (given in pixels) that the mouse can move between clicks
 for double click to occur. Default is @code{2}.
 
-@item MouseDriver.MouseSensivity = <float>
-This defines the mouse sensitivity, i.e. the speed of all mouse movement.
-Default is @code{1.0}.
-@emph{Note:} For now this is used only in the DOS/DJGPP port.
-
 @item System.Win32.DebugConsole = <yes/no>
 Default is @code{yes}. @@@@@@ FIXME: What does this option control?
 @end table
-

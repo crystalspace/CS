@@ -21,10 +21,8 @@ find a reference to it from within the instructions in this section.
 * MinGW:: Windows using MinGW
 * Cygwin:: Windows using Cygwin
 * NeXT:: MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, NextStep
-* MS-DOS:: @sc{ms-dos} - Using @sc{djgpp} Compiler
 @end menu
 
 @importss{build,platform,unix.txi}
 @importsss{build,platform,win32,win32.txi}
 @importss{build,platform,next.txi}
-@importss{build,platform,msdos.txi}

@@ -155,7 +155,7 @@ SRC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.cpp) \
 # Note that directories will have forward slashes. Please
 # make sure that this command accepts that (or use 'subst' first).
 # If we are using a Unix-like shell, then use Unix-like paths, otherwise
-# sipmly inherit these settings from CS/mk/dos.mak.
+# simply inherit these settings from CS/mk/dos.mak.
 ifeq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
   MKDIR=$(CMD.MKDIR) $(patsubst %/,%,$@)
   MKDIRS=$(CMD.MKDIRS) $(patsubst %/,%,$@)

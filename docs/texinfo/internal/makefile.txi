@@ -325,11 +325,10 @@ DEP.PINGPONG = $(CSSYS.LIB) $(CSUTIL.LIB)
 
 Another issue is that several types of files use different extensions on
 different platforms.  For example, executable files on Unix typically have no
-extension, whereas on @sc{dos}, @sc{os}/2 and Windows they typically have an
-@file{.exe} extension.  As another example, object files have an @file{.o}
-extension on Unix and an @file{.obj} extension on Windows.  To accommodate
-these differences, several variables are used where appropriate, as summarized
-below.
+extension, whereas on Windows they typically have an @file{.exe} extension.  As
+another example, object files have an @file{.o} extension on Unix and an
+@file{.obj} extension on Windows.  To accommodate these differences, several
+variables are used where appropriate, as summarized below.
 
 @table @code
 @item EXE

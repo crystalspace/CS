@@ -35,7 +35,7 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 #PROC=MIPS
 
 # Operating system. Can be one of:
-# NEXT, SOLARIS, LINUX, IRIX, BSD, UNIX, DOS, MACOS, WIN32, OS2, BE
+# MACOSX, SOLARIS, LINUX, IRIX, BSD, UNIX, WIN32
 OS=IRIX
 
 # Operating system family: UNIX (for Unix or Unix-like platforms), WIN32, etc.

@@ -5,7 +5,7 @@
 @sc{n}e@sc{xt}
 @end macro
 
-@node NeXT, MS-DOS, Cygwin, Platform Instructions
+@node NeXT, , Cygwin, Platform Instructions
 @subsection MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, NextStep
 @cindex @sc{n}e@sc{xt}
 @cindex MacOS/X

@@ -110,8 +110,6 @@ Collections, movable sector list, polygon edges
 Lighting system
 @item CS/libs/csengine/objects
 Things and mesh objects
-@item CS/libs/csengine/polygon
-Polygons and portals
 @end table
 
 @item CS/libs/csgeom
@@ -130,10 +128,8 @@ are located here.
 @table @code
 @item CS/libs/cssys/general
 Code which may be shared between system drivers that can make use of it.
-@item CS/libs/cssys/djgpp
-@sc{dos} using the @sc{djgpp} compiler
-@item CS/libs/cssys/next
-MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep
+@item CS/libs/cssys/macosx
+MacOS/X
 @item CS/libs/cssys/unix
 Unix, Linux, FreeBSD, NetBSD, Solaris, Irix, etc.
 @item CS/libs/cssys/win32
@@ -203,6 +199,9 @@ interact with the Crystal Space engine in a scripting language.
 @table @code
 @item CS/plugins/cscript/cslua
 Lua @sc{swig} interface
+
+@item CS/plugins/cscript/csperl5
+Perl5 interface
 
 @item CS/plugins/cscript/cspython
 Python @sc{swig} interface
@@ -323,7 +322,7 @@ CoreAudio Sound Driver (MacOS/X)
 @item CS/plugins/sound/driver/oss
 Open Sound System (@sc{oss}) Sound Driver (@sc{unix})
 @item CS/plugins/sound/driver/waveoutsd
-WaveOut Sound Driver (win32)
+WaveOut Sound Driver (Win32)
 @end table
 
 @item CS/plugins/sound/loader
@@ -364,18 +363,6 @@ used for rendering and also supports limited 2D drawing capabilities
 limited and not very useful (this may change in the future).
 
 @table @code
-@item CS/plugins/video/canvas/allegro
-Allegro Game driver
-
-@noindent
-@iftex
-@code{http://www.talula.demon.co.uk/}@*
-@code{allegro/}
-@end iftex
-@ifnottex
-@url{http://www.talula.demon.co.uk/allegro/}
-@end ifnottex
-
 @item CS/plugins/video/canvas/asciiart
 @sc{ascii} Art driver
 
@@ -391,20 +378,14 @@ Windows DirectDraw (version 8) driver
 @item CS/plugins/video/canvas/directxcommon
 Common DirectX (Win32) code
 
-@item CS/plugins/video/canvas/dosraw
-@sc{dos} graphics (@sc{bios}-level)
-
 @item CS/plugins/video/canvas/linex
-X11 Line3D Driver
+X11 Line3D driver
 
 @item CS/plugins/video/canvas/macosx
-MacOS/X CoreGraphics and OpenGL
+MacOS/X Cocoa, CoreGraphics, and OpenGL drivers
 
 @item CS/plugins/video/canvas/memory
 Memory driver (render a scene directly to memory)
-
-@item CS/plugins/video/canvas/next
-MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep drivers
 
 @item CS/plugins/video/canvas/null2d
 @sc{null} 2D driver

@@ -110,11 +110,10 @@ sprite building
 two different windowing systems
 
 @item
-2D canvases (null, memory, OpenGL, DirectDraw, X11, Allegro, @sc{dos},
-@sc{dive})
+2D canvases (OpenGL, DirectDraw, X11, CoreGraphics, Cocoa, null, memory, line)
 
 @item
-3D renderers (null, software, OpenGL, Line 3D)
+3D renderers (OpenGL, software, null, line)
 
 @item
 @sc{avi} streams (@sc{rle}, DivX 4, OpenDivX)

@@ -27,8 +27,6 @@
 #  include "cssys/unix/unix.h"
 #elif defined(OS_WIN32)
 #  include "cssys/win32/win32.h"
-#elif defined(OS_DOS) && defined(COMP_GCC)
-#  include "cssys/djgpp/djgpp.h"
 #else
 #  error Unable to locate platform-specific driver interface.
 #endif

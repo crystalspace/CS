@@ -43,9 +43,9 @@ A compiled executable program such as @file{walktest} or @file{blocks}, for
 example.  These are demo programs included in the main source archive.
 
 Note that there exist two types of executables: statically linked and
-dynamically linked.  If you have a statically linked executable (for example,
-the @sc{dos} executable will always be static) then you don't need any of the
-following drivers.  Otherwise you will need the remaining items.
+dynamically linked.  If you have a statically linked executable then you don't
+need any of the following drivers.  Otherwise you will need the remaining
+items.
 
 @item
 A 3D rasterizer plug-in.  You can choose either the software renderer or else
@@ -96,10 +96,10 @@ MacOS/X Server, OpenStep, and NextStep ports of Crystal Space are not subject
 to this limitation.
 
 @strong{A3}: If you are using a dynamically linked executable then the required
-plug-in modules, such as 3D renderer, 2D driver, etc.  usually must reside in
-the same directory.  On BeOS, the plug-in modules must be located in an
-@file{add-ons} subdirectory.  Most ports of Crystal Space use plug-in modules,
-with the notable exception of the @sc{dos} port which is statically linked.
+plug-in modules, such as 3D renderer, 2D driver, etc., usually must reside in
+the same directory.  On MacOS/X, the plug-in modules can reside in a
+@file{components} subdirectory.  Most ports of Crystal Space use plug-in
+modules by default.
 
 @strong{A4}: Are you certain that you are trying to load the correct map file?
 If you are running the application from the command-line, then you can try
