@@ -772,6 +772,7 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   csFrustumView new_lview = *lview;
   new_lview.light_frustum = NULL;
   csVector3 poly[40];
+  csVector3& center = lview->light_frustum->GetOrigin ();
   int num_vert = 4;
   int num_vertices = destpoly3d->GetVertices ().GetNumVertices ();
   int j;
@@ -801,7 +802,6 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   // uses polygon3d of *base* polygon...
   csPortal *po = destpoly3d->GetPortal();
 
-  csVector3& center = lview->light_frustum->GetOrigin ();
   csPlane3 poly_plane = *destpoly3d->GetPolyPlane ();
   // First translate plane to center of frustum.
   poly_plane.DD += poly_plane.norm * center;
