@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node ProcTextures, Platform Details, Memory Debugger, Anatomy
+@node ProcTextures, , Graphics Drivers, Graphics Drivers
 @subsection Procedural Texture System
 @cindex Procedural Texture System
 

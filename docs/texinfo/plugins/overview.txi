@@ -1,4 +1,4 @@
-@node Plug-In Overview
+@node Plug-In Overview, Graphics Drivers, Plug-In Drivers, Plug-In Drivers
 @section Quick Overview
 @cindex Plugin List
 @cindex Plugin Overview

@@ -1,4 +1,4 @@
-@node SCF, VFS, Libraries, Libraries
+@node SCF, VFS, Lib Overview, Libraries
 @section Shared Class Facility (@sc{scf})
 @cindex @sc{scf}, Shared Class Facility
 @cindex Shared Class Facility (@sc{scf})

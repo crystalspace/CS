@@ -1,4 +1,4 @@
-@node csParser
+@node csParser, CSWS, VFS, Libraries
 @section World File Parser (@code{csParser})
 @cindex World File Parser
 @cindex csParser
@@ -88,7 +88,7 @@ there is only a section describing the format of the world files.
 @token{)}
 @end macro
 
-@node World File Format, Memory Debugger, Directory Hierarchy, Anatomy
+@node World File Format, , csParser, csParser
 @subsection Format of World File
 @cindex Format of World File
 @cindex World File Format

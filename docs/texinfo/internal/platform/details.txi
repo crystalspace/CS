@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Platform Details, , ProcTextures, Anatomy
+@node Platform Details, , Makefile How-To, Internals
 @section Platform-Specific Details
 @cindex Platform-Specific Details
 @cindex Details, Platform-Specific

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Memory Debugger, ProcTextures, World File Format, Anatomy
+@node Memory Debugger, , Quick Start, Building
 @section Crystal Space Memory Debugger
 @cindex Memory Debugger
 

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Dependencies, Directory Hierarchy, Library List, Anatomy
+@node Dependencies, Makefile How-To, Internals, Internals
 @section Dependencies
 @cindex Dependencies
 @cindex Dependency Graph

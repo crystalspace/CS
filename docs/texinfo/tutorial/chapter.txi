@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Tutorials, Anatomy, Applications, Top
+@node Tutorials, Libraries, Applications, Top
 @chapter Tutorials
 @cindex Tutorials
 

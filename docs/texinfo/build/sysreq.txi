@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Requirements, External Libraries, Building, Building
+@node Requirements, External Libraries, Directory Hierarchy, Building
 @section Requirements
 @cindex Requirements
 
