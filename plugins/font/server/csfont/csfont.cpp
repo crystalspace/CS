@@ -77,12 +77,10 @@ csDefaultFontServer::csDefaultFontServer (iBase *pParent) : object_reg(0)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csDefaultFontServer::~csDefaultFontServer()
 {
-  if (plugin_mgr) plugin_mgr->DecRef ();
 }
 
 iFont *csDefaultFontServer::LoadFont (const char *filename)
@@ -430,8 +428,6 @@ bool csDefaultFont::RemoveDeleteCallback (iFontDeleteNotify* func)
 bool csDefaultFontServer::eiComponent::Initialize (iObjectRegistry* p)
 {
   scfParent->object_reg = p;
-  scfParent->plugin_mgr = CS_QUERY_REGISTRY (scfParent->object_reg,
-  	iPluginManager);
   return true;
 }
 

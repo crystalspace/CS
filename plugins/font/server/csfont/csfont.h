@@ -120,7 +120,6 @@ class csDefaultFontServer : public iFontServer
 {
 private:
   iObjectRegistry* object_reg;
-  iPluginManager* plugin_mgr;
 
   // A list of csDefaultFont pointers.
   CS_DECLARE_TYPED_VECTOR (csFontList, csDefaultFont) fonts;

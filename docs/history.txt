@@ -36,6 +36,7 @@ The history order is reversed so that new features are at the top.
 	  of the application so that you know you'll at least get the
 	  software 3D renderer if there is no config file and nothing
 	  specified on the commandline.
+	- Removed unneeded reference to plugin manager in csfont.
 18-Oct-2001
 	- Michael Voase shifted water and fire proctex down to the basement.
 	- Removed usage of cs_snprintf in cfgfile.cpp and
