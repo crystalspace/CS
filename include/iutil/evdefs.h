@@ -37,7 +37,7 @@ enum
   csevMouseDown,		// A mouse button has been pressed
   csevMouseUp,			// A mouse button has been released
   csevMouseClick,		// A mouse button has been clicked
-  csevMouseDoubleClick,		// A mouse button has been clicked twice
+  csevMouseDoubleClick, // A mouse button has been clicked twice
   csevJoystickMove,		// A joystick axis has been moved
   csevJoystickDown,		// A joystick button has been pressed
   csevJoystickUp,		// A joystick button has been released
@@ -46,11 +46,11 @@ enum
   csevNetwork	,		// Something has arrived on network.
   csevMouseEnter,		// The mouse has entered a component
   csevMouseExit,		// The mouse has exited a component
-  csevLostFocus,                // The component has lost keyboard focus
-  csevGainFocus,                // The component has gained keyboard focus
-  csevGroupOff,                  // A component in a group has been selected, 
-                                //  everyone else should go to their off state.
-  csevFrameStart
+  csevLostFocus,        // The component has lost keyboard focus
+  csevGainFocus,        // The component has gained keyboard focus
+  csevGroupOff,         // A component in a group has been selected, 
+                        //  everyone else should go to their off state.
+  csevFrameStart        // The frame is about to draw.
 };
 
 /*
