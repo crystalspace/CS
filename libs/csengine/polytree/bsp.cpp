@@ -629,6 +629,15 @@ bool csBspTree::ReadFromCache (iFile* cf,
 
 int csBspTree::ClassifyPolygon (csBspNode* node, const csPoly3D& poly)
 {
+  if (!node)
+  {
+    // @@@ Should we test all points here?
+    if (ClassifyPoint (poly[0]))
+      return 1;
+    else
+      return 0;
+  }
+
   if (!node->front && !node->back)
   {
     // Leaf.

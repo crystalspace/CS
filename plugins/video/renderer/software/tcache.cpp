@@ -248,6 +248,9 @@ void csTextureCacheSoftware::fill_texture (int MipMap, iPolygonTexture* pt,
   float u_min, float v_min, float u_max, float v_max)
 {
   // Recalculate the lightmaps
+  // @@@ Note for Andrew: this function returns true if something
+  // has changed with regards to the dynamic lights. It seems a bit
+  // wasteful not to use this result. Or isn't it?
   pt->RecalculateDynamicLights ();
 
   // Now cache the texture

@@ -42,7 +42,8 @@ debugging purposes.
 @item db_octree
 Set/get the level of the octree to show on screen. This is useful to see
 where octree nodes are. If 0 then nothing will be shown (default). If
-1 then the root level will be shown. And so on.
+1 then the root level will be shown. And so on. If -1 is given then all
+leaves will be shown.
 
 @item gamma
 Control the gamma value of the display. A gamma of 1.00 is neutral. 2.00

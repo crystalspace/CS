@@ -438,15 +438,12 @@ void DrawLineDepth (const csVector3& v1, const csVector3& v2,
   Gfx2D->DrawLine (px1, py1, px2, py2, color);
 }
 
-
-
-
 void DrawOctreeBoxes (csOctreeNode* node,
 	int level, int draw_level)
 {
   if (!node) return;
-  if (level > draw_level) return;
-  if (level == draw_level)
+  if (draw_level != -1 && level > draw_level) return;
+  if (level == draw_level || (draw_level == -1 && node->IsLeaf ()))
   {
     csCamera* cam = Sys->view->GetCamera ();
     const csBox3& box = node->GetBox ();

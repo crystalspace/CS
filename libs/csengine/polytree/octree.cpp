@@ -158,6 +158,8 @@ void csOctree::Build ()
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), polygons, num);
 
   delete [] polygons;
+
+  CalculateSolidMasks ((csOctreeNode*)root);
 }
 
 void csOctree::Build (csPolygonInt** polygons, int num)
@@ -169,6 +171,8 @@ void csOctree::Build (csPolygonInt** polygons, int num)
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), new_polygons, num);
   delete [] new_polygons;
+
+  CalculateSolidMasks ((csOctreeNode*)root);
 }
 
 void csOctree::ProcessTodo (csOctreeNode* node)
@@ -283,12 +287,12 @@ static void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** 
   }
 }
 
+#if 0
 static float randflt ()
 {
   return ((float)rand ()) / (float)RAND_MAX;
 }
 
-#if 0
 static void AddPolygonTo2DBSP (const csPlane3& plane, csBspTree2D* bsp2d,
 	csPolygon3D* p)
 {
@@ -1337,7 +1341,7 @@ int csOctree::ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly)
   int i;
   bool found_open = false, found_solid = false;
   for (i = 0 ; i < 8 ; i++)
-    if (node->children[i])
+    if (node->children[i] && nps[i])
     {
       int rc = ClassifyPolygon ((csOctreeNode*)node->children[i], *nps[i]);
       if (rc == -1) return rc;
@@ -1347,6 +1351,118 @@ int csOctree::ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly)
     }
   if (found_solid) return 1;
   return 0;
+}
+
+static csVector3 GetVector3 (int plane_nr, float plane_pos,
+	const csVector2& p)
+{
+  csVector3 v;
+  switch (plane_nr)
+  {
+    case PLANE_X: v.Set (plane_pos, p.x, p.y); break;
+    case PLANE_Y: v.Set (p.x, plane_pos, p.y); break;
+    case PLANE_Z: v.Set (p.x, p.y, plane_pos); break;
+  }
+  return v;
+}
+
+/*
+ *  0123
+ *  4567
+ *  89AB  -> UShort: FEDCBA9876543210
+ *  CDEF
+ */
+UShort csOctree::ClassifyRectangle (int plane_nr, float plane_pos,
+  	const csBox2& box)
+{
+  csVector2 cor_xy = box.GetCorner (BOX_CORNER_xy);
+  csVector2 cor_Xy = box.GetCorner (BOX_CORNER_Xy);
+  csVector2 cor_xY = box.GetCorner (BOX_CORNER_xY);
+  csVector2 cor_XY = box.GetCorner (BOX_CORNER_XY);
+  csPoly3D poly;
+  poly.AddVertex (GetVector3 (plane_nr, plane_pos, cor_xy));
+  poly.AddVertex (GetVector3 (plane_nr, plane_pos, cor_Xy));
+  poly.AddVertex (GetVector3 (plane_nr, plane_pos, cor_XY));
+  poly.AddVertex (GetVector3 (plane_nr, plane_pos, cor_xY));
+  int rc = ClassifyPolygon (poly);
+  if (rc == 0) return 0;
+  if (rc == 1) return (UShort)~0;
+  // Most general case. Here we will test every individual bit.
+  int x, y;
+  int bitnr = 0;
+  csVector2 v;
+  UShort result = 0;
+  for (y = 0 ; y < 4 ; y++)
+    for (x = 0 ; x < 4 ; x++)
+    {
+      poly.MakeEmpty ();
+      v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + y*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + (x+1)*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + y*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + (x+1)*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + (y+1)*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4;
+      v.y = cor_xy.y + (y+1)*(cor_XY.y-cor_xy.y)/4;
+      poly.AddVertex (GetVector3 (plane_nr, plane_pos, v));
+      rc = ClassifyPolygon (poly);
+      if (rc == 1) result |= 1<<bitnr;
+      bitnr++;
+    }
+  return result;
+}
+
+static csBox2 GetSideBox (int octree_side, const csBox3& box)
+{
+  csBox2 box2;
+  switch (octree_side)
+  {
+    case OCTREE_SIDE_x:
+    case OCTREE_SIDE_X: 
+      box2.Set (box.MinY (), box.MinZ (), box.MaxY (), box.MaxZ ());
+      break;
+    case OCTREE_SIDE_y:
+    case OCTREE_SIDE_Y: 
+      box2.Set (box.MinX (), box.MinZ (), box.MaxX (), box.MaxZ ());
+      break;
+    case OCTREE_SIDE_z:
+    case OCTREE_SIDE_Z: 
+      box2.Set (box.MinX (), box.MinY (), box.MaxX (), box.MaxY ());
+      break;
+  }
+  return box2;
+}
+
+void csOctree::CalculateSolidMasks (csOctreeNode* node)
+{
+  if (!node) return;
+
+  node->solid_masks[OCTREE_SIDE_x] = ClassifyRectangle (PLANE_X,
+  	node->GetBox ().MinX (), GetSideBox (OCTREE_SIDE_x, node->GetBox ()));
+  node->solid_masks[OCTREE_SIDE_X] = ClassifyRectangle (PLANE_X,
+  	node->GetBox ().MaxX (), GetSideBox (OCTREE_SIDE_X, node->GetBox ()));
+  node->solid_masks[OCTREE_SIDE_y] = ClassifyRectangle (PLANE_Y,
+  	node->GetBox ().MinY (), GetSideBox (OCTREE_SIDE_y, node->GetBox ()));
+  node->solid_masks[OCTREE_SIDE_Y] = ClassifyRectangle (PLANE_Y,
+  	node->GetBox ().MaxY (), GetSideBox (OCTREE_SIDE_Y, node->GetBox ()));
+  node->solid_masks[OCTREE_SIDE_z] = ClassifyRectangle (PLANE_Z,
+  	node->GetBox ().MinZ (), GetSideBox (OCTREE_SIDE_z, node->GetBox ()));
+  node->solid_masks[OCTREE_SIDE_Z] = ClassifyRectangle (PLANE_Z,
+  	node->GetBox ().MaxZ (), GetSideBox (OCTREE_SIDE_Z, node->GetBox ()));
+  int i;
+
+printf ("-----\n");
+printf ("%f,%f,%f %f,%f,%f\n",
+node->GetBox ().MinX (), node->GetBox ().MinY (), node->GetBox ().MinZ (),
+node->GetBox ().MaxX (), node->GetBox ().MaxY (), node->GetBox ().MaxZ ());
+for (i = 0 ; i < 6 ; i++)
+printf ("%d %04x\n", i, node->solid_masks[i]);
+
+  for (i = 0 ; i < 8 ; i++)
+    CalculateSolidMasks ((csOctreeNode*)node->children[i]);
 }
 
 void csOctree::Statistics ()
@@ -1437,6 +1553,12 @@ void csOctree::Cache (csOctreeNode* node, iFile* cf)
   // Consistency check
   WriteLong (cf, node->unsplit_polygons.GetNumPolygons ());
   WriteVector3 (cf, node->GetCenter ());
+  WriteUShort (cf, node->solid_masks[0]);
+  WriteUShort (cf, node->solid_masks[1]);
+  WriteUShort (cf, node->solid_masks[2]);
+  WriteUShort (cf, node->solid_masks[3]);
+  WriteUShort (cf, node->solid_masks[4]);
+  WriteUShort (cf, node->solid_masks[5]);
   WriteBool (cf, node->leaf);
   WriteBool (cf, node->minibsp != NULL);
   if (node->minibsp)
@@ -1460,7 +1582,7 @@ void csOctree::Cache (iVFS* vfs, const char* name)
   iFile* cf = vfs->Open (name, VFS_FILE_WRITE);
   WriteString (cf, "OCTR", 4);
   // Version number.
-  WriteLong (cf, 100001);
+  WriteLong (cf, 100002);
   WriteBox3 (cf, bbox);
   WriteLong (cf, (long)bsp_num);
   WriteLong (cf, (long)mode);
@@ -1480,6 +1602,12 @@ bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
 
   node->SetBox (bmin, bmax);
   ReadVector3 (cf, node->center);
+  node->solid_masks[0] = ReadUShort (cf);
+  node->solid_masks[1] = ReadUShort (cf);
+  node->solid_masks[2] = ReadUShort (cf);
+  node->solid_masks[3] = ReadUShort (cf);
+  node->solid_masks[4] = ReadUShort (cf);
+  node->solid_masks[5] = ReadUShort (cf);
   node->leaf = ReadBool (cf);
   bool do_minibsp = ReadBool (cf);
 
@@ -1594,9 +1722,10 @@ bool csOctree::ReadFromCache (iVFS* vfs, const char* name,
     return false;	// Bad format!
   }
   long format_version = ReadLong (cf);
-  if (format_version != 100001)
+  if (format_version != 100002)
   {
-    CsPrintf (MSG_WARNING, "Unknown format version (%ld)!\n", format_version);
+    CsPrintf (MSG_WARNING, "Mismatched format version. Expected %ld, got %ld!\n",
+    	100002, format_version);
     cf->DecRef ();
     return false;
   }

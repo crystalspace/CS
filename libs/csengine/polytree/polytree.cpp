@@ -147,6 +147,11 @@ void csPolygonTree::WriteLong (iFile* cf, long l)
   l = convert_endian (l); cf->Write ((char*)&l, 4);
 }
 
+void csPolygonTree::WriteUShort (iFile* cf, UShort l)
+{
+  l = convert_endian (l); cf->Write ((char*)&l, 2);
+}
+
 void csPolygonTree::WriteByte (iFile* cf, unsigned char b)
 {
   cf->Write ((char*)&b, 1);
@@ -200,6 +205,13 @@ long csPolygonTree::ReadLong (iFile* cf)
   return convert_endian (l);
 }
 
+UShort csPolygonTree::ReadUShort (iFile* cf)
+{
+  UShort l;
+  cf->Read ((char*)&l, 2);
+  return convert_endian (l);
+}
+
 unsigned char csPolygonTree::ReadByte (iFile* cf)
 {
   unsigned char b;
@@ -223,37 +235,49 @@ struct CPTraverseData
   int num_tested;
 };
 
-void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
-	int /*num*/, void* vdata)
+static void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
+	int num, void* vdata)
 {
   // Only for csPolygon3D.
-  if (polygons[0]->GetType () != 1) return (void*)1;
+  if (polygons[0]->GetType () != 1) return NULL;
   csPolygon3D* p = (csPolygon3D*)polygons[0];
   csPlane3* wplane = p->GetPolyPlane ();
+
+//printf ("  polygons %d\n", num);
 
   CPTraverseData* data = (CPTraverseData*)vdata;
   int i;
   for (i = 0 ; i < 6 ; i++)
     if (!data->tested[i])
     {
-      bool is = p->IntersectRay (data->pos, data->test_points[i]);
+//printf ("  %f,%f,%f -> %f,%f,%f\n", data->pos.x, data->pos.y, data->pos.z,
+//data->test_points[i].x, data->test_points[i].y, data->test_points[i].z);
+//{
+//int k;
+//for (k = 0 ; k < p->GetNumVertices () ; k++)
+//printf ("    %d: %f,%f,%f\n", k, p->Vwor (k).x, p->Vwor (k).y, p->Vwor (k).z);
+//}
+      bool is = p->IntersectRayNoBackFace (data->pos, data->test_points[i]);
+//printf ("  test %d -> %d\n", i, is);
       if (is)
       {
         data->tested[i] = true;
 	data->num_tested++;
-	if (!csMath3::Visible (data->pos, *wplane) &&
-                ABS (wplane->Classify (data->pos)) >= SMALL_EPSILON)
+        if (p->IntersectRay (data->pos, data->test_points[i]))
+	//if (!csMath3::Visible (data->pos, *wplane) &&
+                //ABS (wplane->Classify (data->pos)) >= SMALL_EPSILON)
 	{
+//printf ("  solid=false\n");
 	  // We can see the polygon from 'pos'. So we are in open
 	  // space.
 	  data->is_solid = false;
-	  return NULL;
+	  return (void*)1;
 	}
 	// We tested all points.
-	if (data->num_tested >= 6) return NULL;
+	if (data->num_tested >= 6) return (void*)1;
       }
     }
-  return (void*)1;
+  return NULL;
 }
 
 bool csPolygonTree::ClassifyPoint (const csVector3& p)
@@ -270,7 +294,9 @@ bool csPolygonTree::ClassifyPoint (const csVector3& p)
   int i;
   for (i = 0 ; i < 6 ; i++) data.tested[i] = false;
   data.num_tested = 0;
+printf ("START TEST pos=%f,%f,%f\n", p.x, p.y, p.z);
   Front2Back (p, ClassifyPointTraverse, (void*)&data, NULL, NULL);
+printf ("END TEST %d\n", data.is_solid);
   return data.is_solid;
 }
 
