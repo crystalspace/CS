@@ -626,9 +626,12 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
       Sys->selected_polygon = sel;
 
     iThingState* ps = sel->GetParent ();
-    csRef<iObject> psobj (SCF_QUERY_INTERFACE (ps, iObject));
+    csRef<iMeshObject> obj = SCF_QUERY_INTERFACE (ps, iMeshObject);
+    csRef<iObject> psobj (SCF_QUERY_INTERFACE (obj->GetLogicalParent (),
+    	iObject));
     Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit polygon '%s/%s'",
-    	psobj->GetName (), sel->GetStaticData ()->GetName ());
+    	psobj ? psobj->GetName () : "<null>",
+	sel->GetStaticData ()->GetName ());
     //Dumper::dump (sel);
   }
 
