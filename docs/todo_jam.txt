@@ -24,6 +24,10 @@ W - Wishlist (the build also works without this feature)
 [H] Write complete documentation about the Jam build system for the CS user
     manual.
 
+[M] Make handling of files in subdirs more robust (this is a about handling
+    files for a single target): It should be possible to reference files in
+    parent subdirs (ie. ../bla/blup.cpp). Also it should be possible to have
+    several files with same name in different subdirs.
 [M] The current install strategy for configuration and map files is not very
     robust as you have to first mark them as config/mapfile and then run an
     install rule in another Jamfile.  We should make this simpler with only one
