@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed a memory overwrite bug in the tiled coverage buffer of
 	  Dynavis. This could cause crashes at exit or even during running.
 	  Added an assert to protect for future equivalent bugs.
+	- Fixed a bad bug in cs2xml which I introduced yesterday.
+	- The parsing of LEN now actually works with cs2xml.
 7-Feb-2003
 	- Fixed levtool so that by default it now gives usage information
 	  instead of the -list option. That way people will not forget

@@ -1392,7 +1392,7 @@ void Cs2Xml::ParseTexture (char const* parent_token, csParser* parser,
     csRef<iDocumentNode> child = parent->GetNode ("texmap");
     if (!child)
     {
-      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+      child = parent->CreateNodeBefore (
         CS_NODE_ELEMENT, NULL);
       child->SetValue ("texmap");
     }
@@ -2633,6 +2633,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (HAZECONE)
     CS_TOKEN_TABLE (HEIGHTMAP)
     CS_TOKEN_TABLE (KEY)
+    CS_TOKEN_TABLE (LEN)
     CS_TOKEN_TABLE (LIBRARY)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (LOD)
