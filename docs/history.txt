@@ -1,12 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
 7-Sep-2000
+	- Continued work on saver in levtool. The saved world file works
+	  very well already. But a few important things are still missing
+	  (like things, sprites, ...).
 	- Eric Sunshine updated the documentation-related URLs in the User's
 	  Manual Texinfo files.  Also added several new links to resource.txi.
 6-Sep-2000
 	- Patch from Mark Welch to fix a compile error on MSVC.
 	- Small fix to OpenGL canvas from Nicholas Blumire.
 	- Removed an assertion error from curve.cpp
+	- Started work on world saver for levtool.
 	- Eric Sunshine made the following changes to the API documentation
 	  generation procedure:
 	    - Changed the 'pubapi' and 'devapi' makefile targets to use
@@ -76,6 +80,7 @@ The history order has been reversed so that new features are at the top.
 	  this way if problems arise with the automated tasks, other people
 	  may be able to address the problems in the event that Eric is
 	  unavilable.
+>>>>>>> 1.912
 5-Sep-2000
 	- Norman Kramer corrected writestring function signature in glide
 	  canvas.
