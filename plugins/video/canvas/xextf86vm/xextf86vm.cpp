@@ -199,7 +199,7 @@ void csXExtF86VM::FindBestMode (int ctx_width, int ctx_height)
 {
   XF86VidModeModeLine mode;
   XF86VidModeModeInfo **modes;
-  int i, nModes, best_mode;
+  int i, nModes, best_mode = 0;
   bool valid = false;
   unsigned int diff;
   unsigned int best_diff = (unsigned int) -1;
