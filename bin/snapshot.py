@@ -28,13 +28,10 @@
 #    Author's note: This script can certainly be improved.  Better error
 #    handling, more options (such as --verbose, --quiet, etc.), better
 #    abstraction and generalization, are all future possibilities.  There is
-#    a lot of room for improvement.
-#
-# TODO
-#    Possibly generate bz2 and zip archives in addition to gz.
+#    room for improvement.
 #
 #------------------------------------------------------------------------------
-import commands, glob, grp, os, string, sys, tempfile, time
+import commands, glob, grp, os, re, string, sys, tempfile, time
 
 #------------------------------------------------------------------------------
 # Configuration Section
@@ -55,6 +52,19 @@ import commands, glob, grp, os, string, sys, tempfile, time
 #        prefix-YYYY-MM-DD-*.ext".
 #    snapdir - Directory where snapshot packages will be placed.
 #    keepsnaps - Number of recent packages to retain.
+#    archivers - A tuple of archivers used to generate the project packages.
+#        Each tuple is a dictionary with the following keys.  The key "name"
+#        specifies the name of the directory under "snapdir" into which this
+#        archived package will be placed.  The key "dir" is a dictionary
+#        describing how to archive a directory into a single package.  The
+#        key "file" is a dictionary describing how to archive a single file
+#        into a package.  The "dir" and "file" dictionaries contain the
+#        following keys.  The key "ext" is the file extension for the
+#        generated file.  The key "cmd" is the actual command template which
+#        describes how to generate the given archive.  It may contain the
+#        meta-tokens @S and @D.  The token @S is replaced with the name of
+#        the source directory or file which is being archived, and @D is
+#        replaced with the final destination package name.
 #------------------------------------------------------------------------------
 
 cvsroot = ":pserver:anonymous@cvs1:/cvsroot/crystal"
@@ -66,28 +76,55 @@ packprefix = "cs-"
 snapdir = "/home/groups/ftp/pub/crystal/cvs-snapshots"
 keepsnaps = 4
 
+archivers = (
+    {"name": "gzip",
+     "dir": {"ext": "tgz", "cmd": "tar --create --file=- @S | gzip > @D"},
+     "file": {"ext": "gz", "cmd": "gzip --stdout @S > @D"}},
+    {"name": "bzip2",
+     "dir": {"ext": "tar.bz2", "cmd": "tar --create --file=- @S | bzip2 > @D"},
+     "file": {"ext": "bz2", "cmd": "bzip2 --stdout @S > @D"}},
+    {"name": "zip",
+     "dir": {"ext": "zip", "cmd": "zip -q -r @D @S"},
+     "file": {"ext": "zip", "cmd": "zip -q @D @S"}})
+
+#------------------------------------------------------------------------------
+# Directory Stack Class
+#------------------------------------------------------------------------------
+class DirStack:
+    stack = []
+
+    def pushdir(self, dir):
+        self.stack.append(os.getcwd())
+        os.chdir(dir)
+
+    def popdir(self):
+        os.chdir(self.stack[-1])
+        del self.stack[-1]
+
 #------------------------------------------------------------------------------
 # Snapshot Class
 #------------------------------------------------------------------------------
 class Snapshot:
+    def timenow(self):
+        return time.asctime(time.gmtime(time.time())) + " UTC"
+
     def __init__(self):
-        template = packprefix + "????-??-??.*"
+        self.packtemplate = packprefix + "????-??-??.??????"
         self.packbase = packprefix + time.strftime(
             "%Y-%m-%d.%H%M%S", time.gmtime(time.time()))
+        self.linkbase = packprefix + "current-snapshot"
         self.workdir = os.path.join(snapdir, "transient")
+        self.diffext = ".diff"
+        self.diffname = self.packbase + self.diffext
         self.logdir  = os.path.join(snapdir, "logs")
         self.logext = ".log"
         self.logname = self.packbase + self.logext
         self.logpath = os.path.join(self.logdir, self.logname)
         self.logfile = None
-        self.packext = ".tgz"
-        self.packname = self.packbase + self.packext
-        self.packtemplate = template + self.packext
-        self.packlinkname = packprefix + "current-snapshot" + self.packext
-        self.diffext = ".diff.gz"
-        self.diffname = self.packbase + self.diffext
-        self.difftemplate = template + self.diffext
-        self.difflinkname = packprefix + "current-snapshot" + self.diffext
+        self.stamppath = os.path.join(self.logdir, "lastrun.timestamp")
+        self.timestamp = self.timenow()
+        self.hasdiff = None
+        self.dirstack = DirStack()
 
     def log(self, msg):
         s = msg + "\n"
@@ -95,14 +132,15 @@ class Snapshot:
         if self.logfile:
             self.logfile.write(s)
 
-    def timestamp(self):
-        return time.asctime(time.gmtime(time.time())) + " UTC"
-
     def run(self, cmd):
         rc = commands.getstatusoutput(cmd)
         if len(rc[1]) > 0:
             self.log(rc[1])
         return (rc[0] == 0)
+
+    def removefile(self, path):
+        if os.path.exists(path):
+            os.remove(path)
 
     def makedirectory(self, path):
         if not os.path.exists(path) :
@@ -119,48 +157,6 @@ class Snapshot:
                 self.log('Error setting group ownership "' + ownergroup +
                          '" on ' + path + '; reason: ' + str(e))
 
-    def gendiff(self):
-        # Must call this before installing new package in snapshot directory.
-        files = glob.glob(os.path.join(snapdir, self.packtemplate))
-        if len(files) > 0:
-            files.sort()
-            files.reverse()
-            prev = files[0]
-            self.log("Generating diff against: " + os.path.basename(prev))
-            savedir = os.getcwd()
-            olddir = "old"
-            oldpath = os.path.join(self.builddir, "old")
-            self.makedirectory(oldpath)
-            os.chdir(oldpath)
-            rc = self.run("tar xfz " + prev)
-            os.chdir(savedir)
-            if rc:
-                self.run("diff -crN " + os.path.join(olddir, moduledir) +
-                         " " + moduledir + " | gzip > " + self.diffname)
-
-    def patchcvsroot(self):
-        if fixcvsroot:
-            rc = commands.getstatusoutput(
-                "find " + os.path.join(self.builddir, moduledir) +
-                " -type d -name CVS -print -prune")
-            if rc[0] == 0:
-                dirs = string.split(rc[1])
-                if len(dirs) > 0:
-                    self.log("Patching CVS/Root entries")
-                    newroot = fixcvsroot + "\n"
-                    for dir in dirs:
-                        try:
-                            file = open(os.path.join(dir, "Root"), "w")
-                            file.write(newroot)
-                            file.close()
-                            file = None
-                        except IOError, e:
-                            self.log("Error patching Root in " + dir + " " +
-                                     repr(e.args))
-            else: # 'find' command returned error.
-                if len(rc[1]) > 0:
-                    self.log(rc[1])
-
     def openlog(self):
         if not self.logfile:
             try:
@@ -174,6 +170,18 @@ class Snapshot:
             self.logfile.close()
             self.logfile = None
 
+    def writetimestamp(self):
+        file = open(self.stamppath, "w")
+        file.write(self.timestamp + "\n")
+        file.close()
+
+    def readtimestamp(self):
+        stamp = None
+        if os.path.exists(self.stamppath):
+            file = open(self.stamppath, "r")
+            stamp = string.strip(file.readline())
+        return stamp
+
     def purge(self, pattern):
         files = glob.glob(pattern)
         blast = len(files) - keepsnaps
@@ -184,13 +192,15 @@ class Snapshot:
                 os.remove(files[i])
 
     def purgeold(self):
-        self.purge(os.path.join(self.logdir, packprefix + "*" + self.logext))
-        self.purge(os.path.join(snapdir, self.difftemplate))
-        self.purge(os.path.join(snapdir, self.packtemplate))
+        self.purge(os.path.join(self.logdir, self.packtemplate + self.logext))
+        for dict in archivers:
+            self.purge(os.path.join(snapdir, dict["name"], self.packtemplate +
+                                    "." + dict["dir"]["ext"]))
+            self.purge(os.path.join(snapdir, dict["name"], self.packtemplate +
+                                    self.diffext + "." + dict["file"]["ext"]))
 
     def purgetransient(self):
-        savedir = os.getcwd()
-        os.chdir(snapdir)
+        self.dirstack.pushdir(snapdir)
         self.log("Purging working directory: " + self.builddir)
         # Remove our local work directory.
         self.run("rm -rf " + self.builddir)
@@ -198,8 +208,9 @@ class Snapshot:
         # it is empty (i.e. no other snapshots are in progress).
         try:
             os.rmdir(self.workdir)
-            os.chdir(savedir)
+            self.dirstack.popdir()
         except Exception:
+            self.dirstack.popdir()
             pass
 
     def preparetransient(self):
@@ -209,35 +220,124 @@ class Snapshot:
         self.makedirectory(self.workdir)
         self.makedirectory(self.builddir)
 
-    def makelink(self, desc, source, linkname):
-        savedir = os.getcwd()
-        os.chdir(snapdir)
-        self.log("Linking current " + desc + " to: " + linkname)
-        if os.path.exists(linkname):
-            os.remove(linkname)
-        os.symlink(source, linkname)
-        os.chdir(savedir)
+    def findcvsdirs(self, dir):
+        dirs = []
+        rc = commands.getstatusoutput(
+            "find " + dir + " -type d -name CVS -print -prune")
+        if rc[0] == 0:
+            dirs = string.split(rc[1])
+        else: # 'find' command returned error.
+            if len(rc[1]) > 0:
+                self.log(rc[1])
+        return dirs
+
+    def stripstickyinfo(self, path): # Strip trailing sticky date or tag.
+        file = open(path, "r")
+        data = file.read()
+        file.close()
+        file = open(path, "w")
+        file.write(re.sub("(?m)(^/.+)(/[TD].+?)$", "\g<1>/", data))
+        file.close()
+
+    def purgestickytags(self, dirs):
+        self.log("Removing CVS sticky tags")
+        for dir in dirs:
+            self.removefile(os.path.join(dir, "Tag"))
+            self.removefile(os.path.join(dir, "Entries.Static"))
+            self.stripstickyinfo(os.path.join(dir, "Entries"))
+
+    def patchcvsroot(self, dirs):
+        if fixcvsroot:
+            self.log("Patching CVS/Root entries")
+            newroot = fixcvsroot + "\n"
+            for dir in dirs:
+                try:
+                    file = open(os.path.join(dir, "Root"), "w")
+                    file.write(newroot)
+                    file.close()
+                    file = None
+                except IOError, e:
+                    self.log("Error patching Root in " + dir + " " +
+                             repr(e.args))
+
+    def checkout(self, datewanted, outdir):
+        self.log("Retrieving module " + cvsmodule + " for " + datewanted)
+        self.makedirectory(outdir)
+        self.dirstack.pushdir(outdir)
+        rc = self.run("cvs -Q -d " + cvsroot + " checkout -D '" + datewanted +
+                      "' " + cvsmodule)
+        self.dirstack.popdir()
+        if rc:
+            dirs = self.findcvsdirs(os.path.join(outdir, moduledir))
+            if len(dirs) > 0:
+                self.patchcvsroot(dirs)
+                self.purgestickytags(dirs)
+        return rc
+
+    def gendiff(self):
+        oldstamp = self.readtimestamp()
+        if oldstamp:
+            olddir = "old"
+            oldpath = os.path.join(self.builddir, "old")
+            if self.checkout(oldstamp, oldpath):
+                self.log("Generating diff of " + oldstamp + " & " +
+                         self.timestamp)
+                self.dirstack.pushdir(self.builddir)
+                self.run("diff -crN " + os.path.join(olddir, moduledir) +
+                         " " + moduledir + " > " + self.diffname)
+                self.dirstack.popdir()
+                self.hasdiff = 1
+
+    def genpackage(self, dirname, dict, src, dst):
+        outdir = os.path.join(snapdir, dirname)
+        self.makedirectory(outdir)
+        target = os.path.join(outdir, dst + "." + dict["ext"])
+        cmd = string.replace(
+            string.replace(dict["cmd"], "@S", src), "@D", target)
+        return self.run(cmd)
+
+    def genpackages(self):
+        self.dirstack.pushdir(self.builddir)
+        for dict in archivers:
+            name = dict["name"]
+            self.log("Generating '" + name + "' packages")
+            if self.genpackage(name, dict["dir"], moduledir, self.packbase):
+                if self.hasdiff:
+                    self.genpackage(name, dict["file"], self.diffname,
+                                    self.diffname)
+        self.dirstack.popdir()
+        self.writetimestamp()
+        
+    def makelink(self, ext, src, linkname):
+        src = src + "." + ext
+        linkname = linkname + "." + ext
+        self.removefile(linkname)
+        os.symlink(src, linkname)
                             
+    def makelinks(self):
+        for dict in archivers:
+            name = dict["name"]
+            self.log("Linking to current '" + name + "' packages")
+            self.dirstack.pushdir(os.path.join(snapdir, name))
+            self.makelink(dict["dir"]["ext"], self.packbase, self.linkbase)
+            if self.hasdiff:
+                self.makelink(dict["file"]["ext"],
+                              self.packbase + self.diffext,
+                              self.linkbase + self.diffext)
+            self.dirstack.popdir()
+
     def dobulk(self):
-        self.log("Retrieving module: " + cvsmodule)
-        if self.run("cvs -Q -d " + cvsroot + " checkout " + cvsmodule):
-            self.patchcvsroot()
+        if self.checkout(self.timestamp, self.builddir):
             self.gendiff()
-            self.log("Creating package: " + self.packname)
-            if self.run("tar cfz " + self.packname + " " + moduledir):
-                self.log("Installing package into: " + snapdir)
-                if self.run("mv " + self.packname + " " + snapdir):
-                    if os.path.exists(self.diffname):
-                        self.run("mv " + self.diffname + " " + snapdir)
-                        self.makelink("diff", self.diffname, self.difflinkname)
-                    self.makelink("package", self.packname, self.packlinkname)
-                    self.purgeold()
+            self.genpackages()
+            self.makelinks()
+            self.purgeold()
 
     def doall(self):
         self.makedirectory(snapdir)
         self.makedirectory(self.logdir)
         self.openlog()
-        self.log("BEGIN: " + self.timestamp())
+        self.log("BEGIN: " + self.timenow())
         try:
             self.preparetransient()
             os.chdir(self.builddir)
@@ -248,7 +348,7 @@ class Snapshot:
             os.chdir(snapdir)
             self.purgetransient()
         finally:
-            self.log("END: " + self.timestamp())
+            self.log("END: " + self.timenow())
             self.closelog()
 
 tool = Snapshot()
