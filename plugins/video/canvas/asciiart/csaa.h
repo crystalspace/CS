@@ -30,16 +30,16 @@
  * implements drawing using characters and (depending on platform)
  * different intensities.
  */
-class csGraphics2DAA : public csGraphics2D
+class csGraphics2DAA : public csGraphics2D, public iEventPlug
 {
-  /// The configuration file
-  csIniFile* config;
   /// Use native mouse cursor, if possible?
   bool HardwareCursor;
   /// The AAlib context
   aa_context *context;
   /// The palette
   aa_palette palette;
+  /// The event outlet
+  iEventOutlet *EventOutlet;
 
 public:
   DECLARE_IBASE;
@@ -65,6 +65,13 @@ public:
   virtual iGraphics2D *CreateOffScreenCanvas (int /*width*/, int /*height*/, 
      csPixelFormat */*pfmt*/, void */*buffer*/, csRGBpixel */*palette*/, int /*pal_size*/)
   { return NULL; }
+
+  //------------------------- iEventPlug interface ---------------------------//
+
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 1; }
 };
 
 #endif // __CSAA_H__

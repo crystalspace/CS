@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/memfile.h"
+#include "csutil/databuf.h"
 #include <stdlib.h>
 
 IMPLEMENT_IBASE (csMemFile)
@@ -97,19 +98,20 @@ size_t csMemFile::Write(const char* Data, size_t DataSize)
   return written;
 }
 
-char* csMemFile::GetAllData()
+iDataBuffer *csMemFile::GetAllData()
 {
-  char* data = buffer;
-  if (buffer != 0 && disposition == DISPOSITION_FREE)
+  char *data = buffer;
+  if (buffer && disposition == DISPOSITION_FREE)
   {
-    data = new char[size];
-    memcpy(data, buffer, size);
-    free(buffer);
+    data = new char [size];
+    memcpy (data, buffer, size);
+    free (buffer);
   }
-  disposition = DISPOSITION_DELETE;
-  buffer = 0;
+  iDataBuffer *db = new csDataBuffer (buffer, size);
+  disposition = DISPOSITION_IGNORE;
+  buffer = NULL;
   capacity = 0;
   size = 0;
   cursor = 0;
-  return data;
+  return db;
 }

@@ -31,67 +31,13 @@
 #include "vfs.h"
 #include "csutil/archive.h"
 #include "csutil/util.h"
-#include "csutil/inifile.h"
 #include "csutil/scfstrv.h"
+#include "csutil/databuf.h"
 #include "isystem.h"
-#include "istring.h"
+#include "icfgfile.h"
 
 // Characters ignored in VFS paths (except in middle)
 #define CS_VFSSPACE		" \t"
-
-// A pretty dump iString class ...
-class _vfs_string : public iString
-{
-  char *s;
-public:
-  DECLARE_IBASE;
-
-  _vfs_string (char *is)
-  { CONSTRUCT_IBASE (NULL); s = is; }
-  virtual ~_vfs_string ()
-  { delete [] s; }
-
-  virtual void SetCapacity (size_t)
-  { /* not implemented */ }
-  virtual void Truncate (size_t)
-  { /* not implemented */ }
-  virtual void Reclaim ()
-  { /* not implemented */ }
-  inline void Clear ()
-  { /* not implemented */ }
-  virtual iString *Clone () const
-  { return NULL; }
-  virtual char *GetData () const
-  { return s; }
-  virtual size_t Length () const
-  { return strlen (s); }
-  inline bool IsEmpty () const
-  { return !*s; }
-  virtual inline char& operator [] (size_t iPos)
-  { return s [iPos]; }
-  virtual void SetAt (size_t iPos, char iChar)
-  { s [iPos] = iChar; }
-  virtual char GetAt (size_t iPos) const
-  { return s [iPos]; }
-  virtual void Insert (size_t, iString *)
-  { /* not implemented */ }
-  virtual void Overwrite (size_t, iString *)
-  { /* not implemented */ }
-  virtual iString &Append (const char *, size_t)
-  { return *(iString *)NULL; }
-  virtual iString &Append (const iString *, size_t)
-  { return *(iString *)NULL; }
-  virtual void Replace (const iString *, size_t)
-  { /* not implemented */ }
-  virtual bool Compare (const iString *iStr) const
-  { return false; }
-  virtual bool CompareNoCase (const iString *iStr) const
-  { return false; }
-};
-
-IMPLEMENT_IBASE (_vfs_string)
-  IMPLEMENTS_INTERFACE (iString);
-IMPLEMENT_IBASE_END
 
 //***********************************************************
 // NOTE on naming convention: public classes begin with "cs"
@@ -166,9 +112,8 @@ public:
   virtual bool AtEOF ();
   /// Query current file pointer
   virtual size_t GetPos ();
-
-protected:
-  virtual char *GetAllData ();
+  /// Get all the data at once
+  virtual iDataBuffer *GetAllData ();
 };
 
 class VfsArchive : public csArchive
@@ -344,7 +289,7 @@ int csFile::GetStatus ()
   return rc;
 }
 
-char *csFile::GetAllData ()
+iDataBuffer *csFile::GetAllData ()
 {
   return NULL;
 }
@@ -608,7 +553,7 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
   }
   else if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
   {
-    if ((fh = Archive->NewFile(NameSuffix,0,!(Mode & VFS_FILE_UNCOMPRESSED))))
+    if ((fh = Archive->NewFile (NameSuffix, 0, !(Mode & VFS_FILE_UNCOMPRESSED))))
     {
       Error = VFS_STATUS_OK;
       Archive->Writing++;
@@ -662,11 +607,13 @@ size_t ArchiveFile::GetPos ()
   return fpos;
 }
 
-char *ArchiveFile::GetAllData ()
+iDataBuffer *ArchiveFile::GetAllData ()
 {
-  char *ret = data;
+  iDataBuffer *db = new csDataBuffer (data, Size);
   data = NULL;
-  return ret;
+  fpos = 0;
+  Size = 0;
+  return db;
 }
 
 // ------------------------------------------------------------- VfsNode --- //
@@ -788,7 +735,7 @@ const char *VfsNode::GetValue (const csVFS *Parent, const char *VarName)
   if (value)
     return value;
 
-  csIniFile *Config = Parent->config;
+  iConfigFile *Config = Parent->config;
 
   // Now look in "VFS.Solaris" section, for example
   value = Config->GetStr ("VFS." OS_VERSION, VarName, NULL);
@@ -1172,7 +1119,7 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 
 csVFS::~csVFS ()
 {
-  delete config;
+  if (config) config->DecRef ();
   delete [] cwd;
   delete [] basedir;
   CS_ASSERT (ArchiveCache);
@@ -1188,18 +1135,21 @@ bool csVFS::Initialize (iSystem *iSys)
   iSys->GetInstallPath (vfsconfigpath, sizeof (vfsconfigpath));
   basedir = strnew (vfsconfigpath);
   strcat (vfsconfigpath, "vfs.cfg");
-  csIniFile *vfsconfig = new csIniFile (System->ConfigGetStr ("VFS.Options", 
-    "Config", vfsconfigpath));
-  bool retval = ReadConfig (vfsconfig);
+  const char *path = System->GetConfig ()->GetStr ("VFS.Options", 
+    "Config", vfsconfigpath);
+  config = System->CreateConfig (path, false);
+  if (!config)
+    return false;
+  bool retval = ReadConfig ();
   return retval;
 }
 
-bool csVFS::ReadConfig (csIniFile *Config)
+bool csVFS::ReadConfig ()
 {
-  config = Config;
-  csIniFile::DataIterator iterator (config->EnumData ("VFS"));
-  while (iterator.NextItem())
-    AddLink (iterator.GetName(), (const char*)iterator.GetData());
+  iConfigDataIterator *iterator = config->EnumData ("VFS");
+  while (iterator->Next ())
+    AddLink (iterator->GetKey (), (const char *)iterator->GetData ());
+  iterator->DecRef ();
   NodeList.QuickSort (0);
   return true;
 }
@@ -1283,10 +1233,10 @@ char *csVFS::_ExpandPath (const char *Path, bool IsDir) const
   return ret;
 }
 
-iString *csVFS::ExpandPath (const char *Path, bool IsDir) const
+iDataBuffer *csVFS::ExpandPath (const char *Path, bool IsDir) const
 {
   char *xp = _ExpandPath (Path, IsDir);
-  return new _vfs_string (xp);
+  return new csDataBuffer (xp, strlen (xp) + 1);
 }
 
 VfsNode *csVFS::GetNode (const char *Path, char *NodePrefix,
@@ -1477,38 +1427,38 @@ bool csVFS::Sync ()
   return (ArchiveCache->Length () == 0);
 }
 
-char *csVFS::ReadFile (const char *FileName, size_t &Size)
+iDataBuffer *csVFS::ReadFile (const char *FileName)
 {
   iFile *F = Open (FileName, VFS_FILE_READ);
   if (!F)
     return NULL;
 
-  Size = F->GetSize ();
-  char *data = F->GetAllData ();
+  size_t Size = F->GetSize ();
+  iDataBuffer *data = F->GetAllData ();
   if (data)
   {
     F->DecRef ();
     return data;
   }
 
-  data = new char [Size + 1];
-  if (!data)
+  char *buff = new char [Size + 1];
+  if (!buff)
   {
     F->DecRef ();
     return NULL;
   }
 
   // Make the file zero-terminated in the case we'll use it as an ASCIIZ string
-  data [Size] = 0;
-  if (F->Read (data, Size) != Size)
+  buff [Size] = 0;
+  if (F->Read (buff, Size) != Size)
   {
-    delete [] data;
+    delete [] buff;
     F->DecRef ();
     return NULL;
   }
 
   F->DecRef ();
-  return data;
+  return new csDataBuffer (buff, Size);
 }
 
 bool csVFS::WriteFile (const char *FileName, const char *Data, size_t Size)
@@ -1585,7 +1535,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
 
   if (node->RPathV.Length () == 0)
   {
-    config->Delete ("VFS", node->ConfigKey);
+    config->DeleteKey ("VFS", node->ConfigKey);
     int idx = NodeList.Find (node);
     if (idx >= 0)
       NodeList.Delete (idx);

@@ -141,7 +141,7 @@ struct iEventOutlet;
 struct iEventPlug;
 struct iStrVector;
 
-SCF_VERSION (iSystem, 3, 0, 0);
+SCF_VERSION (iSystem, 4, 0, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -247,28 +247,14 @@ struct iSystem : public iBase
   virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID,
     iPlugIn *iObject) = 0;
 
-  //--------------------- System configuration file access -------------------//
+  //----------------------- Configuration file interface ---------------------//
 
-  /// Get a integer configuration value
-  virtual int ConfigGetInt (const char *Section, const char *Key, int Default = 0) = 0;
-  /// Get a string configuration value
-  virtual const char *ConfigGetStr (const char *Section, const char *Key, const char *Default = NULL) = 0;
-  /// Get a string configuration value
-  virtual bool ConfigGetYesNo (const char *Section, const char *Key, bool Default = false) = 0;
-  /// Get a float configuration value
-  virtual float ConfigGetFloat (const char *Section, const char *Key, float Default = 0) = 0;
-  /// Set an integer configuration value
-  virtual bool ConfigSetInt (const char *Section, const char *Key, int Value) = 0;
-  /// Set an string configuration value
-  virtual bool ConfigSetStr (const char *Section, const char *Key, const char *Value) = 0;
-  /// Set an float configuration value
-  virtual bool ConfigSetFloat (const char *Section, const char *Key, float Value) = 0;
-  /// Query whenever a config section exists
-  virtual bool ConfigSectionExists (const char *Section) = 0;
-  /// Enumerate all keys in a section
-  virtual bool ConfigEnumData (const char *Section, iStrVector *KeyList) = 0;
-  /// Save system configuration file
-  virtual bool ConfigSave () = 0;
+  /// Get the system configuration file: this does NOT IncRef the object
+  virtual iConfigFile *GetConfig () = 0;
+  /// Create a new configuration file object which resides on VFS
+  virtual iConfigFile *CreateConfig (const char *iFileName, bool iVFS = true) = 0;
+  /// Save system configuration file if it was changed
+  virtual bool SaveConfig () = 0;
 
   //------------------------------ Event manager -----------------------------//
 
@@ -304,6 +290,9 @@ struct iSystem : public iBase
    * cases when you just need to post one event from time to time; in these
    * cases it is easier to post it without the bulk of creating your own
    * iEventPlug interface.
+   *<p>
+   * Note that the returned object is NOT IncRef'd, thus you should NOT
+   * DecRef it after usage.
    */
   virtual iEventOutlet *GetSystemEventOutlet () = 0;
 

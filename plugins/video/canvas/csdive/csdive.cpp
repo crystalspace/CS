@@ -25,6 +25,7 @@
 #include "video/canvas/common/scancode.h"
 #include "video/canvas/common/os2-keys.h"
 #include "isystem.h"
+#include "icfgfile.h"
 #include "csdive.h"
 #include "libDIVE.h"
 #include "libDIVEprv.h"
@@ -113,11 +114,12 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
     return false;
   }
 
-  WindowX = System->ConfigGetInt ("VideoDriver", "WindowX", INT_MIN);
-  WindowY = System->ConfigGetInt ("VideoDriver", "WindowY", INT_MIN);
-  WindowWidth = System->ConfigGetInt ("VideoDriver", "WindowW", -1);
-  WindowHeight = System->ConfigGetInt ("VideoDriver", "WindowH", -1);
-  HardwareCursor = System->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);
+  iConfigFile *Config = System->GetConfig ();
+  WindowX = Config->GetInt ("VideoDriver", "WindowX", INT_MIN);
+  WindowY = Config->GetInt ("VideoDriver", "WindowY", INT_MIN);
+  WindowWidth = Config->GetInt ("VideoDriver", "WindowW", -1);
+  WindowHeight = Config->GetInt ("VideoDriver", "WindowH", -1);
+  HardwareCursor = Config->GetYesNo ("VideoDriver", "SystemMouseCursor", true);
 
   const char *val;
   if ((val = System->GetOptionCL ("winsize")))

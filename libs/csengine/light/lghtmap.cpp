@@ -250,11 +250,10 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
 
   CacheName (buf, owner, index, "");
 
-  size_t size;
-  char* data = world->VFS->ReadFile (buf, size);
+  iDataBuffer* data = world->VFS->ReadFile (buf);
   if (!data) return false;
 
-  char *d = data;
+  char *d = **data;
   memcpy (ps.header, d, 4); d += 4;
   memcpy (&ps.x1, d, sizeof (ps.x1)); d += sizeof (ps.x1);
   memcpy (&ps.y1, d, sizeof (ps.x1)); d += sizeof (ps.x1);
@@ -279,7 +278,7 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
         ps.lm_size != pswanted.lm_size)))
   {
     // Invalid.
-    delete [] data;
+    data->DecRef ();
     return false;
   }
 
@@ -292,16 +291,16 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
   memcpy (static_lm.GetMap (), d, lm_size * 3);
   d += lm_size * 3;
 
-  delete [] data;
+  data->DecRef ();
 
   //-------------------------------
   // Now load the dynamic data.
   //-------------------------------
   CacheName (buf, owner, index, "_d");
-  data = world->VFS->ReadFile (buf, size);
+  data = world->VFS->ReadFile (buf);
   if (!data) return true;	// No dynamic data. @@@ Recalculate dynamic data?
 
-  d = data;
+  d = **data;
   memcpy (lh.header, d, 4); d += 4;
   memcpy (&lh.dyn_cnt, d, 4); d += 4;
   lh.dyn_cnt = convert_endian (lh.dyn_cnt);

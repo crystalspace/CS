@@ -23,16 +23,30 @@
 #include <signal.h>
 #include <string.h>
 #include "cssysdef.h"
-#include "csutil/inifile.h"
 #include "cssys/unix/unix.h"
 #include "cssys/system.h"
 #include "igraph3d.h"
+
+// Put an #ifndef OS_XXX around this if your system does not support locale.
+// In a long-term perspective, if we find such a system, we should add the
+// detection of locale to unixconf.sh
+#define I18N
+
+#ifdef I18N
+#  include <locale.h>
+#endif
 
 //------------------------------------------------------ The System driver ---//
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
-  // Pretty complex system driver, don't you think?
+#ifdef I18N
+  // Never do "LC_ALL" because this will break some things like numeric format
+  setlocale (LC_COLLATE, "");
+  setlocale (LC_CTYPE, "");
+  setlocale (LC_MESSAGES, "");
+  setlocale (LC_TIME, "");
+#endif
 }
 
 #ifdef OS_SOLARIS
@@ -47,35 +61,31 @@ void SysSystemDriver::Sleep (int SleepTime)
 bool SysSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
 {
   char *path = getenv ("CRYSTAL");
-  if(!path || !*path)
+  if (!path)
   {
     // no setting, use the default.
     // is the current dir a possible install? try opening vfs.cfg,
-    FILE *test = fopen("vfs.cfg", "r");
-    if(test!=0)
+    if (!access ("vfs.cfg", F_OK))
     {
-      // use current directory ""
-      fclose(test);
-      strncpy(oInstallPath, "", iBufferSize);
+      strncpy (oInstallPath, "", iBufferSize);
       return true;
     }
-    /// default.
-    strncpy(oInstallPath, "/usr/local/crystal/", iBufferSize);
+    // default.
+    strncpy (oInstallPath, "/usr/local/crystal/", iBufferSize);
     return true;
   }
-  strncpy(oInstallPath, path, iBufferSize);
+
+  // Well, we won't check for brain-damaged cases here such as iBufferSize < 3
+  // since we presume user has even a little brains...
+
+  strncpy (oInstallPath, path, iBufferSize);
   // check for ending '/'
-  int len = strlen(oInstallPath);
-  if(len == 0) return false;
-  if( oInstallPath[len-1] == '/' )
-    return true;
-  if(len+1 >= (int) iBufferSize)
-  {
-    strncpy(oInstallPath, "", iBufferSize); //make empty if possible
-    return false;
-  }
-  oInstallPath[len] = '/';
-  oInstallPath[len+1] = 0;
+  size_t len = strlen (oInstallPath);
+  // empty stands for current directory
+  if (!len)
+    oInstallPath [len++] = '.';
+  if (oInstallPath [len - 1] != '/')
+    oInstallPath [len++] = '/';
+  oInstallPath [len] = 0;
   return true;
 }
-

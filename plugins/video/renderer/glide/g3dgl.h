@@ -154,7 +154,7 @@ private:
   bool m_bHaloEffect;
 
   /// Our private config file
-  csIniFile *config;
+  iConfigFile *config;
 
   /// fogtable
   GrFog_t *fogtable;

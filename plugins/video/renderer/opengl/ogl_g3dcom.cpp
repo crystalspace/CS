@@ -214,9 +214,9 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
 {
   (System = iSys)->IncRef ();
 
-  iVFS* v = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
-  config = new csIniFile (v, "/config/opengl.cfg");
-  v->DecRef(); v = NULL;
+  config = System->CreateConfig ("/config/opengl.cfg");
+  if (!config)
+    return false;
 
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)
@@ -224,7 +224,7 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
 
   G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)
-    return 0;
+    return false;
 
   txtmgr = new csTextureManagerOpenGL (System, G2D, config, this);
 

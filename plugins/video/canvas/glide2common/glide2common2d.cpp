@@ -24,7 +24,6 @@
 #if defined(OS_BE)	// dh: is this OS-dependence necessary? 
 #include "cssys/be/beitf.h"
 #endif
-#include "csutil/inifile.h"
 #include "video/renderer/glide/gllib.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
@@ -59,13 +58,11 @@ bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
     return false;
+
   // see if we need to go fullscreen or not...
-  iVFS* v = QUERY_PLUGIN_ID (pSystem, CS_FUNCID_VFS, iVFS);
-  csIniFile* config = new csIniFile(v, "/config/cryst.cfg");
-  v->DecRef(); v = NULL;
-  m_DoGlideInWindow = (!config->GetYesNo("VideoDriver","FullScreen",FALSE));
-  delete config;
-  
+  int w, h;
+  pSystem->GetSettings (w, h, Depth, m_DoGlideInWindow);
+  m_DoGlideInWindow = !m_DoGlideInWindow;
   Depth = 16;
 
   _WriteString = WriteStringGlide;

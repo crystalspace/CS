@@ -369,8 +369,8 @@ struct iFactory : public iBase
 
 //----------------------------------------------- Client-side functions -----//
 
-// We'll use csIniFile to read SCF.CFG
-class csIniFile;
+// We'll use iConfigFile to read SCF.CFG
+struct iConfigFile;
 
 /**
  * Handy macro to create an instance of a shared class.
@@ -393,7 +393,7 @@ class csIniFile;
  * (possibly providing a different iConfig object each time). If you
  * don't specify this parameter, this argument is ignored.
  */
-extern void scfInitialize (csIniFile *iConfig = 0);
+extern void scfInitialize (iConfigFile *iConfig = 0);
 
 /**
  * This function should be called to finish working with SCF.

@@ -51,7 +51,7 @@
 #include "cssys/system.h"
 #include "csgfxldr/csimage.h"
 #include "ivfs.h"
-#include "istring.h"
+#include "idatabuf.h"
 #include "isndldr.h"
 #include "isnddata.h"
 #include "isndrdr.h"
@@ -2412,18 +2412,18 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 
 iImage* csLoader::load_image (const char* name)
 {
-  size_t size;
   iImage *ifile = NULL;
-  char *buf = System->VFS->ReadFile (name, size);
+  iDataBuffer *buf = System->VFS->ReadFile (name);
 
-  if (!buf || !size)
+  if (!buf || !buf->GetSize ())
   {
+    if (buf) buf->DecRef ();
     CsPrintf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", name);
     return NULL;
   }
 
-  ifile = csImageLoader::Load ((UByte *)buf, size, World->GetTextureFormat ());
-  delete [] buf;
+  ifile = csImageLoader::Load (buf->_uint8 (), buf->GetSize (), World->GetTextureFormat ());
+  buf->DecRef ();
 
   if (!ifile)
   {
@@ -2431,8 +2431,8 @@ iImage* csLoader::load_image (const char* name)
     return NULL;
   }
 
-  iString *xname = System->VFS->ExpandPath (name);
-  ifile->SetName (*xname);
+  iDataBuffer *xname = System->VFS->ExpandPath (name);
+  ifile->SetName (**xname);
   xname->DecRef ();
 
   return ifile;
@@ -3857,9 +3857,8 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
     fatal_exit (0, false);
   }
 
-  size_t heightmapsize = 257;
-  char* heightmap = System->VFS->ReadFile (heightmapname, heightmapsize);
-  if (heightmap == NULL)
+  iDataBuffer *heightmap = System->VFS->ReadFile (heightmapname);
+  if (!heightmap)
   {
     CsPrintf (MSG_FATAL_ERROR, "Error loading height field: %s\n", heightmapname);
     fatal_exit (0, false);
@@ -3873,9 +3872,9 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
   terr->SetName (name);
 
   // Otherwise read file, if that fails generate a random map.
-  if (!terr->Initialize (heightmap, heightmapsize))
+  if (!terr->Initialize (**heightmap, heightmap->GetSize ()))
   {
-    delete[] heightmap;
+    heightmap->DecRef ();
     CsPrintf (MSG_FATAL_ERROR, "Error creating height field from: %s\n", heightmapname);
     fatal_exit (0, false);
   }
@@ -3896,7 +3895,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
   }
   terr->SetDetail (detail);
 
-  delete[] heightmap;
+  heightmap->DecRef ();
   sector.terrains.Push (terr);
 }
 
@@ -3919,9 +3918,10 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
   /* ### */SoundRender->DecRef();
 
   /* read the file data */
-  size_t size;
-  char* buf = System->VFS->ReadFile (filename, size);
-  if (!buf || !size) {
+  iDataBuffer *buf = System->VFS->ReadFile (filename);
+  if (!buf || !buf->GetSize ())
+  {
+    if (buf) buf->DecRef ();
     CsPrintf (MSG_WARNING,
       "Cannot open sound file \"%s\" from VFS\n", filename);
     return NULL;
@@ -3940,8 +3940,8 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
   }
 
   /* load the sound */
-  iSoundData *Sound = SoundLoader->LoadSound((UByte*)buf, size, Format);
-  delete [] buf;
+  iSoundData *Sound = SoundLoader->LoadSound(buf->_uint8 (), buf->GetSize (), Format);
+  buf->DecRef ();
   /* ### */SoundLoader->DecRef();
 
   /* check for valid sound data */
@@ -4143,16 +4143,16 @@ bool csLoader::LoadWorldFile (csWorld* world, const char* file)
   world->StartWorld ();
   csLoaderStat::Init ();
 
-  size_t size;
-  char *buf = System->VFS->ReadFile (file, size);
+  iDataBuffer *buf = System->VFS->ReadFile (file);
 
-  if (!buf || !size)
+  if (!buf || !buf->GetSize ())
   {
+    if (buf) buf->DecRef ();
     CsPrintf (MSG_FATAL_ERROR, "Could not open world file \"%s\" on VFS!\n", file);
     return false;
   }
 
-  csIniFile* cfg = new csIniFile (System->VFS, "world.cfg");
+  csIniFile* cfg = new csIniFile ("world.cfg", System->VFS);
   if (cfg)
   {
     csLightMap::SetLightCellSize (cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",
@@ -4162,7 +4162,7 @@ bool csLoader::LoadWorldFile (csWorld* world, const char* file)
   CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d.\n",
       csLightMap::lightcell_size, csLightMap::lightcell_size);
 
-  if (!LoadWorld (buf))
+  if (!LoadWorld (**buf))
     return false;
 
   if (csLoaderStat::polygons_loaded)
@@ -4176,7 +4176,7 @@ bool csLoader::LoadWorldFile (csWorld* world, const char* file)
       csLoaderStat::lights_loaded, csLoaderStat::sounds_loaded);
   } /* endif */
 
-  delete [] buf;
+  buf->DecRef ();
 
   return true;
 }
@@ -4337,19 +4337,19 @@ bool csLoader::LoadLibrary (char* buf)
 
 bool csLoader::LoadLibraryFile (csWorld* world, const char* fname)
 {
-  size_t size;
-  char *buf = System->VFS->ReadFile (fname, size);
+  iDataBuffer *buf = System->VFS->ReadFile (fname);
 
-  if (!buf || !size)
+  if (!buf || !buf->GetSize ())
   {
+    if (buf) buf->DecRef ();
     CsPrintf (MSG_FATAL_ERROR, "Could not open library file \"%s\" on VFS!\n", fname);
     return false;
   }
 
   World = world;
-  bool retcode = LoadLibrary (buf);
+  bool retcode = LoadLibrary (**buf);
 
-  delete [] buf;
+  buf->DecRef ();
 
   return retcode;
 }
@@ -4529,11 +4529,11 @@ csSpriteTemplate* csLoader::LoadSpriteTemplate (csWorld* world,
 {
   World = world;
 
-  size_t size;
-  char *buf = System->VFS->ReadFile (fname, size);
+  iDataBuffer *databuff = System->VFS->ReadFile (fname);
 
-  if (!buf || !size)
+  if (!databuff || !databuff->GetSize ())
   {
+    if (databuff) databuff->DecRef ();
     CsPrintf (MSG_FATAL_ERROR, "Could not open sprite template file \"%s\" on VFS!\n", fname);
     return NULL;
   }
@@ -4543,6 +4543,7 @@ csSpriteTemplate* csLoader::LoadSpriteTemplate (csWorld* world,
   CS_TOKEN_TABLE_END
 
   char *name, *data;
+  char *buf = **databuff;
 
   if (csGetObject (&buf, tokens, &name, &data))
   {
@@ -4557,14 +4558,17 @@ csSpriteTemplate* csLoader::LoadSpriteTemplate (csWorld* world,
     if (LoadSpriteTemplate (tmpl, data))
     {
       World->sprite_templates.Push (tmpl);
+      databuff->DecRef ();
       return tmpl;
     }
     else
     {
       delete tmpl;
+      databuff->DecRef ();
       return NULL;
     }
   }
+  databuff->DecRef ();
   return NULL;
 }
 

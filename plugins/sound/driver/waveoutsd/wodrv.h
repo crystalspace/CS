@@ -58,7 +58,7 @@ protected:
   iSystem* m_piSystem;
 
   // config file
-  csIniFile *Config;
+  iConfigFile *Config;
 
   // sound renderer
   iSoundRender *m_piSoundRender;

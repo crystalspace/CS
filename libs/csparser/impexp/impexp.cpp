@@ -57,7 +57,7 @@ converter::~converter()
   delete frame_builder;
 }
 
-void converter::ProcessConfig (csIniFile* config)
+void converter::ProcessConfig (iConfigFile* config)
 {
   if ( config->SectionExists ("converter"))
   {
@@ -107,20 +107,19 @@ int converter::ivcon ( const char* input_filename, bool keep_log,
     result = comline (input_filename, create_output_file, output_filename);
   else
   {
-    size_t size;
-    char* buf = vfs->ReadFile (input_filename, size);
+    iDataBuffer* buf = vfs->ReadFile (input_filename);
     csString tmp_file ("convtemp.");
     tmp_file += file_ext ((char*)input_filename);
     csString tmp_path ("/this/");
     tmp_path += tmp_file;
-    if (vfs->WriteFile (tmp_path, buf, size))
+    if (vfs->WriteFile (tmp_path, **buf, buf->GetSize ()))
     {
       result = comline (tmp_file, create_output_file, output_filename);
       vfs->DeleteFile (tmp_path);
     }
     else
       fprintf ( logfile,  "VFS_CONVERSION - Error!\n" );
-    delete buf;
+    buf->DecRef ();
   }
 
   if (keep_log)

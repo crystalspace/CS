@@ -35,7 +35,7 @@
 
 class csClipper;
 struct iGraphics2D;
-class csIniFile;
+struct iConfigFile;
 
 ///
 class csGraphics3DInfinite : public iGraphics3D
@@ -100,7 +100,7 @@ public:
   iGraphics2D* G2D;
 
   /// The configuration file
-  csIniFile* config;
+  iConfigFile* config;
 
   /// The texture manager.
   csTextureManagerInfinite* texman;

@@ -21,7 +21,6 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "cssys/csinput.h"
-#include "csutil/inifile.h"
 #include "isystem.h"
 
 // This array defines first 32..128 character codes with SHIFT key applied

@@ -1,6 +1,6 @@
 /*
-    OS/2 support for Crystal Space 3D library
-    Copyright (C) 1998 by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space Data Buffer class
+    Copyright (C) 2000 by Andrew Zabolotny
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,25 +17,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <limits.h>
-#include <stdarg.h>
 #include "cssysdef.h"
-#include "cssys/os2/csos2.h"
-#include "isystem.h"
+#include "csutil/databuf.h"
 
-#undef SEVERITY_ERROR
-#define INCL_DOS
-#include <os2.h>
+IMPLEMENT_IBASE (csDataBuffer)
+  IMPLEMENTS_INTERFACE (iDataBuffer);
+IMPLEMENT_IBASE_END
 
-//== class SysSystemDriver =====================================================
-
-SysSystemDriver::SysSystemDriver () : csSystemDriver ()
+csDataBuffer::~csDataBuffer ()
 {
-  // Lower the priority of the main thread
-  DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0);
-}
-
-void SysSystemDriver::Sleep (int SleepTime)
-{
-  DosSleep (SleepTime);
+  delete [] Data;
 }

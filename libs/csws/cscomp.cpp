@@ -1328,9 +1328,9 @@ void csComponent::Sprite2DTiledShifted (csPixmap *s2d, int x, int y, int w, int 
   bool restoreclip = false;
   for (int i = rect.Length () - 1; i >= 0; i--)
   {
-    csRect *cur = (csRect *)rect[i];
+    csRect *cur = (csRect *)rect [i];
     app->pplSetClipRect (*cur); restoreclip = true;
-    s2d->DrawTiledShifted(app->GetG3D(),x,y,w,h,shiftx,shifty);
+    s2d->DrawTiledShifted (app->GetG3D (), x, y, w, h, shiftx, shifty);
   } /* endfor */
   if (restoreclip)
     app->pplRestoreClipRect ();

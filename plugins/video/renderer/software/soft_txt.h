@@ -304,7 +304,7 @@ public:
 
   ///
   csTextureManagerSoftware (iSystem *iSys, csGraphics3DSoftwareCommon *iG3D, 
-			    csIniFile *config);
+			    iConfigFile *config);
   ///
   virtual ~csTextureManagerSoftware ();
 
@@ -338,7 +338,7 @@ public:
   void SetGamma (float iGamma);
 
   /// Read configuration values from config file.
-  virtual void read_config (csIniFile *config);
+  virtual void read_config (iConfigFile *config);
 
   ///
   virtual void Clear ();

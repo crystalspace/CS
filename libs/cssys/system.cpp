@@ -40,8 +40,6 @@
 #include "igraph3d.h"
 #include "igraph2d.h"
 
-#define VFS_ID "VFS:"
-
 // The global system variable
 csSystemDriver *System = NULL;
 
@@ -309,7 +307,6 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   Sound = NULL;
 
   Console = NULL;
-  ConfigName = NULL;
 
   debug_level = 0;
   Shutdown = false;
@@ -326,23 +323,22 @@ csSystemDriver::~csSystemDriver ()
 
   Close ();
 
-  delete Config;
-  delete [] ConfigName;
   // Free all plugin options (also decrefs their iConfig interfaces)
   OptionList.DeleteAll ();
 
   System = NULL;
 
-  // Deregister all known drivers
-  if (VFS) VFS->DecRef ();
-  if (G3D) G3D->DecRef ();
-  if (G2D) G2D->DecRef ();
-  if (Sound) Sound->DecRef ();
-  if (NetDrv) NetDrv->DecRef ();
-  if (NetMan) NetMan->DecRef ();
-  if (NetProtocol) NetProtocol->DecRef ();
-  if (CmdManager) CmdManager->DecRef();
+  // Deregister all known drivers and plugins
   if (Console) Console->DecRef ();
+  if (CmdManager) CmdManager->DecRef();
+  if (NetProtocol) NetProtocol->DecRef ();
+  if (NetMan) NetMan->DecRef ();
+  if (NetDrv) NetDrv->DecRef ();
+  if (Sound) Sound->DecRef ();
+  if (G2D) G2D->DecRef ();
+  if (G3D) G3D->DecRef ();
+  if (VFS) VFS->DecRef ();
+  if (Config) Config->DecRef ();;
 
   // Free all plugins
   PlugIns.DeleteAll ();
@@ -352,7 +348,8 @@ csSystemDriver::~csSystemDriver ()
   scfFinish ();
 }
 
-bool csSystemDriver::Initialize (int argc, const char* const argv[], const char *iConfigName)
+bool csSystemDriver::Initialize (int argc, const char* const argv[],
+  const char *iConfigName)
 {
   // Initialize Shared Class Facility|
   char scfconfigpath [MAXPATHLEN + 1];
@@ -386,21 +383,9 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
 
   // Initialize configuration file
   if (iConfigName)
-  {
-    const char* vol = NULL;
-    if (VFS && Config->Load (VFS, iConfigName))
-      vol = VFS_ID;
-    else if (Config->Load (iConfigName))
-      vol = "";
-    if (vol != NULL)
-    {
-      ConfigName = new char [strlen (iConfigName) + strlen (vol) + 1];
-      sprintf(ConfigName, "%s%s", vol, iConfigName);
-    }
-    else
+    if (!Config->Load (iConfigName, VFS))
       Printf (MSG_WARNING,
 	"WARNING: Failed to load configuration file `%s'\n", iConfigName);
-  }
 
   // Collect all options from command line
   CollectOptions (argc, argv);
@@ -448,19 +433,18 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   }
 
   // Now load and initialize all plugins
-  csStrVector ConfigList;
-  Config->EnumData ("PlugIns", &ConfigList);
-  for (n = 0; n < ConfigList.Length (); n++)
+  iConfigDataIterator *plugin_list = Config->EnumData ("PlugIns");
+  while (plugin_list->Next ())
   {
-    const char *funcID = ConfigList.Get (n);
+    const char *funcID = plugin_list->GetKey ();
     // If -video was used to override 3D driver, then respect it.
     if (g3d_override && strcmp (funcID, CS_FUNCID_VIDEO) == 0)
       continue;
-    const char *classID = Config->GetStr ("PlugIns", funcID);
+    const char *classID = (const char *)plugin_list->GetData ();
     if (classID)
       PluginList.Push (new csPluginLoadRec (funcID, classID));
   }
-  ConfigList.DeleteAll ();
+  plugin_list->DecRef ();
 
   // Sort all plugins by their dependency lists
   if (!PluginList.Sort (this))
@@ -704,7 +688,7 @@ void csSystemDriver::CollectOptions (int argc, const char* const argv[])
   }
 }
 
-void csSystemDriver::SetSystemDefaults (csIniFile *Config)
+void csSystemDriver::SetSystemDefaults (iConfigFile *Config)
 {
   // First look in .cfg file
   FrameWidth = Config->GetInt ("VideoDriver", "Width", 640);
@@ -1097,58 +1081,20 @@ bool csSystemDriver::UnloadPlugIn (iPlugIn *iObject)
   return PlugIns.Delete (idx);
 }
 
-int csSystemDriver::ConfigGetInt (const char *Section, const char *Key, int Default)
+iConfigFile *csSystemDriver::GetConfig ()
 {
-  return Config->GetInt (Section, Key, Default);
+  return Config;
 }
 
-const char *csSystemDriver::ConfigGetStr (const char *Section, const char *Key, const char *Default)
+iConfigFile *csSystemDriver::CreateConfig (const char *iFileName, bool iVFS)
 {
-  return Config->GetStr (Section, Key, Default);
+  return new csIniFile (iFileName, iVFS ? VFS : NULL);
 }
 
-bool csSystemDriver::ConfigGetYesNo (const char *Section, const char *Key, bool Default)
+bool csSystemDriver::SaveConfig ()
 {
-  return Config->GetYesNo (Section, Key, Default);
-}
-
-float csSystemDriver::ConfigGetFloat (const char *Section, const char *Key, float Default)
-{
-  return Config->GetFloat (Section, Key, Default);
-}
-
-bool csSystemDriver::ConfigSetInt (const char *Section, const char *Key, int Value)
-{
-  return Config->SetInt (Section, Key, Value);
-}
-
-bool csSystemDriver::ConfigSetStr (const char *Section, const char *Key, const char *Value)
-{
-  return Config->SetStr (Section, Key, Value);
-}
-
-bool csSystemDriver::ConfigSetFloat (const char *Section, const char *Key, float Value)
-{
-  return Config->SetFloat (Section, Key, Value);
-}
-
-bool csSystemDriver::ConfigSectionExists (const char *Section)
-{
-  return Config->SectionExists (Section);
-}
-
-bool csSystemDriver::ConfigEnumData (const char *Section, iStrVector *KeyList)
-{
-  return Config->EnumData (Section, KeyList);
-}
-
-bool csSystemDriver::ConfigSave ()
-{
-  if (!ConfigName) return false;
-  if (strncmp (VFS_ID, ConfigName, sizeof (VFS_ID) - 1) == 0)
-    return Config->SaveIfDirty (VFS, ConfigName + sizeof(VFS_ID) - 1);
-  else
-    return Config->SaveIfDirty (ConfigName);
+  if (!Config->IsDirty ()) return true;
+  return Config->Save ();
 }
 
 bool csSystemDriver::CallOnEvents (iPlugIn *iObject, unsigned int iEventMask)

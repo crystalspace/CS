@@ -86,13 +86,13 @@ SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/utiming.cpp \
 SRC.SYS_CSSYS_DLL = libs/cssys/unix/dummy.cpp
 
 # The C compiler.
-CC=gcc -c
+#CC=gcc -c
 
 # The C++ compiler.
-CXX=g++ -c
+#CXX=g++ -c
 
 # The linker.
-LINK=g++
+#LINK=gcc
 
 endif # ifeq ($(MAKESECTION),defines)
 

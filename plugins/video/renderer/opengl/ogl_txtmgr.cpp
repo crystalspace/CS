@@ -180,7 +180,7 @@ iGraphics3D *csTextureMMOpenGL::GetProcTextureInterface ()
 //---------------------------------------------------------------------------
 
 csTextureManagerOpenGL::csTextureManagerOpenGL (iSystem* iSys,
-  iGraphics2D* iG2D, csIniFile *config, csGraphics3DOGLCommon *iG3D)
+  iGraphics2D* iG2D, iConfigFile *config, csGraphics3DOGLCommon *iG3D)
   : csTextureManager (iSys, iG2D)
 {
   G3D = iG3D;
@@ -194,7 +194,7 @@ csTextureManagerOpenGL::~csTextureManagerOpenGL ()
   Clear ();
 }
 
-void csTextureManagerOpenGL::read_config (csIniFile *config)
+void csTextureManagerOpenGL::read_config (iConfigFile *config)
 {
   const char *proc_texture_type = 
     config->GetStr ("OpenGL", "PROCEDURAL_TEXTURE");

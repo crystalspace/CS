@@ -22,7 +22,6 @@
 #include "NeXTSystemDriver.h"
 #include "NeXTDelegate.h"
 #include "NeXTMenu.h"
-#include "csutil/inifile.h"
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSDPSContext.h>

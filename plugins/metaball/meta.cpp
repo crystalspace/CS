@@ -115,7 +115,7 @@ void csMetaBalls::SetEnvironmentMappingFactor (float env_mult)
   InitTables ();
 }
 
-void csMetaBalls::SetMetaBallDefaults (csIniFile *Config)
+void csMetaBalls::SetMetaBallDefaults (iConfigFile *Config)
 {
   this->Config = Config;
 

@@ -55,11 +55,11 @@
 #include "csutil/util.h"
 #include "iimage.h"
 #include "ivfs.h"
-#include "istring.h"
 #include "ihalo.h"
 #include "itxtmgr.h"
 #include "igraph3d.h"
 #include "ievent.h"
+#include "icfgfile.h"
 
 //---------------------------------------------------------------------------
 
@@ -637,10 +637,10 @@ bool csWorld::Initialize (iSystem* sys)
 
   (System = sys)->IncRef ();
 
-  if (!(G3D = QUERY_PLUGIN (sys, iGraphics3D)))
+  if (!(G3D = QUERY_PLUGIN_ID (sys, CS_FUNCID_VIDEO, iGraphics3D)))
     return false;
 
-  if (!(VFS = QUERY_PLUGIN (sys, iVFS)))
+  if (!(VFS = QUERY_PLUGIN_ID (sys, CS_FUNCID_VFS, iVFS)))
     return false;
 
   G2D = G3D->GetDriver2D ();
@@ -719,12 +719,9 @@ void csWorld::Clear ()
   if (G3D) G3D->ClearCache ();
   halos.DeleteAll ();
   collections.DeleteAll ();
-  while (sprites.Length () > 0)
-    delete (csSprite*)sprites[0];
-  while (things.Length () > 0)
-    delete (csThing*)things[0];
-  while (skies.Length () > 0)
-    delete (csThing*)skies[0];
+  sprites.DeleteAll ();
+  things.DeleteAll ();
+  skies.DeleteAll ();
   sprite_templates.DeleteAll ();
   thing_templates.DeleteAll ();
   sectors.DeleteAll ();
@@ -967,9 +964,8 @@ void csWorld::ShineLights ()
     current.lightmap_size = csLightMap::lightcell_size;
     char *reason = NULL;
 
-    size_t size;
-    char *data = VFS->ReadFile ("precalc_info", size);
-    char *input = data;
+    iDataBuffer *data = VFS->ReadFile ("precalc_info");
+    char *input = **data;
     if (!data)
       reason = "no 'precalc_info' found";
     else
@@ -995,7 +991,7 @@ void csWorld::ShineLights ()
 
 #undef CHECK
       }
-    delete [] data;
+    if (data) data->DecRef ();
 
     if (reason)
     {
@@ -1533,12 +1529,13 @@ void csWorld::AdvanceSpriteFrames (cs_time current_time)
 void csWorld::ReadConfig ()
 {
   if (!System) return;
-  csLightMap::SetLightCellSize (System->ConfigGetInt ("Lighting", "LightmapSize", 16));
+  iConfigFile *Config = System->GetConfig ();
+  csLightMap::SetLightCellSize (Config->GetInt ("Lighting", "LightmapSize", 16));
 
-  csLight::ambient_red = System->ConfigGetInt ("Lighting", "Ambient.Red", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_green = System->ConfigGetInt ("Lighting", "Ambient.Green", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_blue = System->ConfigGetInt ("Lighting", "Ambient.Blue", DEFAULT_LIGHT_LEVEL);
-  int ambient_white = System->ConfigGetInt ("Lighting", "Ambient.White", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_red = Config->GetInt ("Lighting", "Ambient.Red", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_green = Config->GetInt ("Lighting", "Ambient.Green", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_blue = Config->GetInt ("Lighting", "Ambient.Blue", DEFAULT_LIGHT_LEVEL);
+  int ambient_white = Config->GetInt ("Lighting", "Ambient.White", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_red += ambient_white;
   csLight::ambient_green += ambient_white;
   csLight::ambient_blue += ambient_white;
@@ -1547,29 +1544,29 @@ void csWorld::ReadConfig ()
   if (csLight::ambient_red + csLight::ambient_green + csLight::ambient_blue < 6)
     csLight::ambient_red = csLight::ambient_green = csLight::ambient_blue = 2;
 
-  csSector::cfg_reflections = System->ConfigGetInt ("Lighting", "Reflections", csSector::cfg_reflections);
-  csPolyTexture::cfg_cosinus_factor = System->ConfigGetFloat ("Lighting", "CosinusFactor", csPolyTexture::cfg_cosinus_factor);
-  csSprite3D::do_quality_lighting = System->ConfigGetYesNo ("Lighting", "SpriteHighQual", csSprite3D::do_quality_lighting);
-  csSector::do_radiosity = System->ConfigGetYesNo ("Lighting", "Radiosity", csSector::do_radiosity);
+  csSector::cfg_reflections = Config->GetInt ("Lighting", "Reflections", csSector::cfg_reflections);
+  csPolyTexture::cfg_cosinus_factor = Config->GetFloat ("Lighting", "CosinusFactor", csPolyTexture::cfg_cosinus_factor);
+  csSprite3D::do_quality_lighting = Config->GetYesNo ("Lighting", "SpriteHighQual", csSprite3D::do_quality_lighting);
+  csSector::do_radiosity = Config->GetYesNo ("Lighting", "Radiosity", csSector::do_radiosity);
 
   // radiosity options
-  csWorld::use_new_radiosity = System->ConfigGetYesNo ("Lighting",
+  csWorld::use_new_radiosity = Config->GetYesNo ("Lighting",
     "Radiosity.Enable", csWorld::use_new_radiosity);
-  csRadiosity::do_static_specular = System->ConfigGetYesNo ("Lighting",
+  csRadiosity::do_static_specular = Config->GetYesNo ("Lighting",
     "Radiosity.DoStaticSpecular", csRadiosity::do_static_specular);
-  csRadiosity::static_specular_amount = System->ConfigGetFloat ("Lighting",
+  csRadiosity::static_specular_amount = Config->GetFloat ("Lighting",
     "Radiosity.StaticSpecularAmount", csRadiosity::static_specular_amount);
-  csRadiosity::static_specular_tightness = System->ConfigGetInt ("Lighting",
+  csRadiosity::static_specular_tightness = Config->GetInt ("Lighting",
     "Radiosity.StaticSpecularTightness", csRadiosity::static_specular_tightness);
-  csRadiosity::colour_bleed = System->ConfigGetFloat ("Lighting",
+  csRadiosity::colour_bleed = Config->GetFloat ("Lighting",
     "Radiosity.ColourBleed", csRadiosity::colour_bleed);
-  csRadiosity::stop_priority = System->ConfigGetFloat ("Lighting",
+  csRadiosity::stop_priority = Config->GetFloat ("Lighting",
     "Radiosity.StopPriority", csRadiosity::stop_priority);
-  csRadiosity::stop_improvement = System->ConfigGetFloat ("Lighting",
+  csRadiosity::stop_improvement = Config->GetFloat ("Lighting",
     "Radiosity.StopImprovement", csRadiosity::stop_improvement);
-  csRadiosity::stop_iterations = System->ConfigGetInt ("Lighting",
+  csRadiosity::stop_iterations = Config->GetInt ("Lighting",
     "Radiosity.StopIterations", csRadiosity::stop_iterations);
-  csRadiosity::source_patch_size = System->ConfigGetInt ("Lighting",
+  csRadiosity::source_patch_size = Config->GetInt ("Lighting",
     "Radiosity.SourcePatchSize", csRadiosity::source_patch_size);
 }
 
@@ -1854,18 +1851,18 @@ bool csWorld::CreateTexture (const char *iName, const char *iFileName,
   csColor *iTransp, int iFlags)
 {
   // First of all, load the image file
-  size_t size;
-  char *data = VFS->ReadFile (iFileName, size);
-  if (!data || !size)
+  iDataBuffer *data = VFS->ReadFile (iFileName);
+  if (!data || !data->GetSize ())
   {
+    if (data) data->DecRef ();
     CsPrintf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n",
       iFileName);
     return false;
   }
 
-  iImage *ifile = csImageLoader::Load ((UByte *)data, size,
+  iImage *ifile = csImageLoader::Load (data->_uint8 (), data->GetSize (),
     CS_IMGFMT_TRUECOLOR);// GetTextureFormat ());
-  delete [] data;
+  data->DecRef ();
 
   if (!ifile)
   {
@@ -1873,8 +1870,8 @@ bool csWorld::CreateTexture (const char *iName, const char *iFileName,
     return false;
   }
 
-  iString *xname = VFS->ExpandPath (iFileName);
-  ifile->SetName (*xname);
+  iDataBuffer *xname = VFS->ExpandPath (iFileName);
+  ifile->SetName (**xname);
   xname->DecRef ();
 
   // Okay, now create the respective texture handle object

@@ -193,24 +193,26 @@ bool csStandardLoader::Load (const char *iName)
   }
 
   char *data;
-  size_t size;
+  iDataBuffer *databuffer = NULL;
   if (csw_valid)
   {
-    data = vfs->ReadFile (fnw, size);
-    if (!data
+    databuffer = vfs->ReadFile (fnw);
+    if (!databuffer
+     || !(data = **databuffer)
      || get_le_long (data) != PARSER_VERSION)
       csw_valid = false;
   }
   if (!csw_valid)
   {
-    char *src = vfs->ReadFile (iName, size);
-    if (!src)
+    databuffer = vfs->ReadFile (iName);
+    if (!databuffer)
     {
       system->Printf (MSG_FATAL_ERROR, "Cannot read geometry file '%s'!\n", iName);
       return false;
     }
-    data = Tokenize (src, size);
-    delete [] src;
+    data = Tokenize (**databuffer, src->GetSize ());
+    databuffer->DecRef ();
+    databuffer = NULL;
     // Save the pre-tokenized version
     vfs->WriteFile (fnw, data, size);
   }
@@ -226,7 +228,7 @@ bool csStandardLoader::Load (const char *iName)
 
   // Free the token data
   if (csw_valid)
-    delete [] data;
+    databuffer->DecRef ();
   else
   {
     free (data);

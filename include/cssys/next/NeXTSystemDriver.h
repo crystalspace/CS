@@ -21,7 +21,6 @@
 #include "cssys/csinput.h"
 #include "NeXTSystemInterface.h"
 @class NeXTDelegate;
-class csIniFile;
 
 
 //-----------------------------------------------------------------------------
@@ -36,7 +35,7 @@ private:
     NeXTDelegate* controller;	// Application & Window delegate.
     long ticks;			// Time of previous call to step_frame().
     int simulated_depth;	// Simulated depth, either 15, 16, or 32.
-    csIniFile* next_config;	// Platform-specific configuration options.
+    iConfigFile* next_config;	// Platform-specific configuration options.
 
     void init_ticks() { ticks = Time(); }
     void init_menu();

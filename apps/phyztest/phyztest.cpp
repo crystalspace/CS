@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "cssys/system.h"
-#include "csutil/inifile.h"
 #include "apps/phyztest/phyztest.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"

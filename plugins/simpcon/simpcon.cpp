@@ -30,6 +30,7 @@
 #include "igraph2d.h"
 #include "itxtmgr.h"
 #include "isystem.h"
+#include "icfgfile.h"
 
 #define SIZE_LINE	256
 
@@ -90,13 +91,14 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   FrameWidth = G2D->GetWidth ();
   FrameHeight = G2D->GetHeight ();
 
-  console_transparent_bg = System->ConfigGetYesNo ("SimpleConsole", "TRANSPBG", false);
-  console_transparent_bg = System->ConfigGetYesNo ("SimpleConsole", "TRANSPBG", 1);
-  const char *buf = System->ConfigGetStr ("SimpleConsole", "CONFG", "255,255,255");
+  iConfigFile *Config = System->GetConfig ();
+  console_transparent_bg = Config->GetYesNo ("SimpleConsole", "TRANSPBG", false);
+  console_transparent_bg = Config->GetYesNo ("SimpleConsole", "TRANSPBG", 1);
+  const char *buf = Config->GetStr ("SimpleConsole", "CONFG", "255,255,255");
   sscanf (buf, "%d,%d,%d", &console_fg_r, &console_fg_g, &console_fg_b);
-  buf = System->ConfigGetStr ("SimpleConsole", "CONBG", "0,0,0");
+  buf = Config->GetStr ("SimpleConsole", "CONBG", "0,0,0");
   sscanf (buf, "%d,%d,%d", &console_bg_r, &console_bg_g, &console_bg_b);
-  buf = System->ConfigGetStr ("SimpleConsole", "CONFONT", "auto");
+  buf = Config->GetStr ("SimpleConsole", "CONFONT", "auto");
   if (!strcasecmp (buf, "auto"))
   {
     // choose a font that allows at least 80 columns of text
@@ -123,7 +125,7 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   int i = G2D->GetTextHeight (console_font) + 2;
   LineSize = (FrameWidth / 4) + 1;
   SetBufferSize ((FrameHeight / i) - 2);
-  SetLineMessages (System->ConfigGetInt ("SimpleConsole", "LINEMAX", 4));
+  SetLineMessages (Config->GetInt ("SimpleConsole", "LINEMAX", 4));
 
   LineTime = System->GetTime ();
   CursorTime = System->GetTime ();

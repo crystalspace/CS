@@ -2651,7 +2651,7 @@ const char* Blocks::KeyName (const KeyMapping& map)
 
 void Blocks::ReadConfig ()
 {
-  csIniFile keys (Sys->VFS, "/config/blocks.cfg");
+  csIniFile keys ("/config/blocks.cfg", Sys->VFS);
   NamedKey (keys.GetStr ("Keys", "UP", "up"), key_up);
   NamedKey (keys.GetStr ("Keys", "DOWN", "down"), key_down);
   NamedKey (keys.GetStr ("Keys", "LEFT", "left"), key_left);
@@ -2694,7 +2694,7 @@ void Blocks::ReadConfig ()
 
 void Blocks::WriteConfig ()
 {
-  csIniFile keys (Sys->VFS, "/config/blocks.cfg");
+  csIniFile keys ("/config/blocks.cfg", Sys->VFS);
   keys.SetStr ("Keys", "UP", KeyName (key_up));
   keys.SetStr ("Keys", "DOWN", KeyName (key_down));
   keys.SetStr ("Keys", "LEFT", KeyName (key_left));

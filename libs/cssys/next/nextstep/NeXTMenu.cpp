@@ -24,7 +24,7 @@ extern "Objective-C" {
 #import <appkit/MenuCell.h>
 }
 
-static Menu* build_menu( char const* section, csIniFile const& );
+static Menu* build_menu( char const* section, iConfigFile const* );
 
 #define STR_SWITCH(X) { char const* switched_str__=(X); if (0) {}
 #define STR_CASE(X) else if (strcmp(switched_str__,(#X)) == 0)
@@ -44,7 +44,7 @@ static char* str_append( char const* prefix, char const* suffix )
 
 //-----------------------------------------------------------------------------
 // menu_add_item
-//	Looks up the named section in csIniFile.  Pays particular attention to
+//	Looks up the named section in iConfigFile.  Pays particular attention to
 //	keys "title", "shortcut", "action", & "target".  Adds a menu item to
 //	the menu based upon the attributes of these keys.  "title",
 //	"shortcut", & "action" are used to generate the new menu item.
@@ -54,13 +54,13 @@ static char* str_append( char const* prefix, char const* suffix )
 //	first-responder.
 //-----------------------------------------------------------------------------
 static void menu_add_item( Menu* menu, char const* key,
-    csIniFile const& config )
+    iConfigFile const* config )
     {
     char* section = str_append( "Item.", key );
 
-    char const* title    = config.GetStr( section, "title",    "" );
-    char const* shortcut = config.GetStr( section, "shortcut", "" );
-    char const* action   = config.GetStr( section, "action",   0  );
+    char const* title    = config->GetStr( section, "title",    "" );
+    char const* shortcut = config->GetStr( section, "shortcut", "" );
+    char const* action   = config->GetStr( section, "action",   0  );
 
     SEL cmd = 0;
     if (action != 0)
@@ -69,7 +69,7 @@ static void menu_add_item( Menu* menu, char const* key,
     MenuCell* const item = [menu addItem:title action:cmd
 	keyEquivalent:shortcut[0]];
 
-    char const* target = config.GetStr( section, "target", 0 );
+    char const* target = config->GetStr( section, "target", 0 );
     if (target != 0)
 	{
 	STR_SWITCH (target)
@@ -86,14 +86,14 @@ static void menu_add_item( Menu* menu, char const* key,
 
 //-----------------------------------------------------------------------------
 // menu_add_submenu
-//	Looks up the named section in csIniFile.  Recursively calls
+//	Looks up the named section in iConfigFile.  Recursively calls
 //	build_menu() to generate the submenu.  Pays particular attention to
 //	key "type" which, if present, may be either "window", or "services".
 //	A "type" qualification means that the menu should be configured as the
 //	Application's Windows, or Services menu, respectively.
 //-----------------------------------------------------------------------------
 static void menu_add_submenu( Menu* menu, char const* key,
-    csIniFile const& config )
+    iConfigFile const* config )
     {
     char* section = str_append( "Menu.", key );
     Menu* const sub = build_menu( section, config );
@@ -102,7 +102,7 @@ static void menu_add_submenu( Menu* menu, char const* key,
 	MenuCell* item = [menu addItem:[sub title] action:0 keyEquivalent:0];
 	[menu setSubmenu:sub forItem:item];
 
-	char const* type = config.GetStr( section, "type", 0 );
+	char const* type = config->GetStr( section, "type", 0 );
 	if (type != 0)
 	    {
 	    STR_SWITCH (type)
@@ -124,7 +124,7 @@ static void menu_add_submenu( Menu* menu, char const* key,
 //	parent menu.  For each "item", adds a new menu item.
 //-----------------------------------------------------------------------------
 static void menu_add( Menu* menu, char const* key, char const* value,
-    csIniFile const& config )
+    iConfigFile const* config )
     {
     STR_SWITCH (key)
 	STR_CASE (menu)
@@ -137,22 +137,23 @@ static void menu_add( Menu* menu, char const* key, char const* value,
 
 //-----------------------------------------------------------------------------
 // build_menu
-//	Looks up the named section in csIniFile.  Enumerates over each entry
+//	Looks up the named section in iConfigFile.  Enumerates over each entry
 //	in the section to build the menu.  Pays particular attention to key
 //	"title" which is used to set the menu's title.
 //-----------------------------------------------------------------------------
-static Menu* build_menu( char const* key, csIniFile const& config )
+static Menu* build_menu( char const* key, iConfigFile const* config )
     {
     Menu* m = 0;
     char* section = str_append( "Menu.", key );
-    if (config.SectionExists( section ))
+    if (config->SectionExists( section ))
 	{
-	char const* title = config.GetStr( section, "title", "" );
+	char const* title = config->GetStr( section, "title", "" );
 	m = [[Menu alloc] initTitle:title];
-	csIniFile::DataIterator iterator( config.EnumData(section) );
+	iConfigDataIterator *iterator = config.EnumData(section);
 	while (iterator.NextItem())
-	    menu_add( m, iterator.GetName(),
-		(const char*)iterator.GetData(), config);
+	    menu_add( m, iterator->GetKey(),
+		(const char*)iterator->GetData(), config);
+	iterator->DecRef ();
 	}
     free( section );
     return m;
@@ -163,7 +164,7 @@ static Menu* build_menu( char const* key, csIniFile const& config )
 // NeXTMenuGenerate
 //	Generate a menu from the configuration information in NeXTMenu.cfg.
 //-----------------------------------------------------------------------------
-Menu* NeXTMenuGenerate( char const* menu_ident, csIniFile const& config )
+Menu* NeXTMenuGenerate( char const* menu_ident, iConfigFile const* config )
     {
     return build_menu( menu_ident, config );
     }

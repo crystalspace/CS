@@ -239,7 +239,7 @@ static UByte *GenLightmapTable (int bits)
 }
 
 csTextureManagerLine::csTextureManagerLine (iSystem *iSys,
-  iGraphics2D *iG2D, csIniFile *config) : csTextureManager (iSys, iG2D)
+  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
 {
   alpha_tables = NULL;
   ResetPalette ();
@@ -270,7 +270,7 @@ void csTextureManagerLine::SetPixelFormat (csPixelFormat &PixelFormat)
     lightmap_tables [2] = GenLightmapTable (pfmt.BlueBits);
 }
 
-void csTextureManagerLine::read_config (csIniFile *config)
+void csTextureManagerLine::read_config (iConfigFile *config)
 {
   csTextureManager::read_config (config);
   prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);

@@ -238,9 +238,8 @@ bool LoadCamera (iVFS* vfs, const char *fName)
     return false;
   }
 
-  size_t size;
-  char* data = vfs->ReadFile(fName, size);
-  if (data == NULL)
+  iDataBuffer *data = vfs->ReadFile(fName);
+  if (!data)
   {
     CsPrintf (MSG_FATAL_ERROR, "Could not read coordinate file '%s'!\n", fName);
     return false;
@@ -249,9 +248,9 @@ bool LoadCamera (iVFS* vfs, const char *fName)
   csMatrix3 m;
   csVector3 v;
   int imirror = false;
-  char* sector_name = new char [size];
+  char* sector_name = new char [data->GetSize ()];
 
-  ScanStr (data,
+  ScanStr (**data,
     "%f %f %f\n"
     "%f %f %f\n"
     "%f %f %f\n"
@@ -269,7 +268,7 @@ bool LoadCamera (iVFS* vfs, const char *fName)
 
   csSector* s = (csSector*)Sys->world->sectors.FindByName (sector_name);
   delete[] sector_name;
-  delete[] data;
+  data->DecRef ();
   if (!s)
   {
     CsPrintf (MSG_FATAL_ERROR, "Sector `%s' in coordinate file does not "

@@ -76,7 +76,7 @@ public:
 	
 private:
   // the config file
-  csIniFile *Config;
+  iConfigFile *Config;
 
   // all active sound sources
   csVector Sources;

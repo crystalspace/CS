@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "cssys/system.h"
-#include "csutil/inifile.h"
 #include "csutil/scanstr.h"
 #include "pysimp.h"
 #include "csengine/sector.h"

@@ -263,7 +263,7 @@ csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6 (iBase *iParent) :
 csGraphics3DDirect3DDx6::~csGraphics3DDirect3DDx6()
 {
   if (config)
-    delete config;
+    config->DecRef ();
   if (m_piG2D)
     m_piG2D->DecRef ();
   if (m_piSystem)
@@ -275,9 +275,9 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
   m_piSystem = iSys;
   m_piSystem->IncRef ();
 
-  iVFS* v = QUERY_PLUGIN_ID (m_piSystem, CS_FUNCID_VFS, iVFS);
-  config = new csIniFile(v, "/config/direct3ddx6.cfg");
-  v->DecRef(); v = NULL;
+  config = m_piSystem->CreateConfig ("/config/direct3ddx6.cfg");
+  if (!config)
+    return false;
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, "crystalspace.graphics2d.direct3d.dx61", NULL, iGraphics2D);
   if (!m_piG2D)

@@ -245,7 +245,7 @@ void csTextureMMDirect3D::CreateMipmaps ()
 //---------------------------------------------------------------------------
 
 csTextureManagerDirect3D::csTextureManagerDirect3D (iSystem *iSys,
-  iGraphics2D *iG2D, csIniFile *config, csGraphics3DDirect3DDx6 *iG3D) :
+  iGraphics2D *iG2D, iConfigFile *config, csGraphics3DDirect3DDx6 *iG3D) :
   csTextureManager (iSys, iG2D)
 {
   m_pG2D = iG2D;

@@ -23,9 +23,9 @@
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
 #include "csutil/csrect.h"
-#include "csutil/inifile.h"
 #include "isystem.h"
 #include "itexture.h"
+#include "icfgfile.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGLX)
 
@@ -47,10 +47,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   if (!csGraphics2DGLCommon::Initialize (pSystem))
     return false;
 
-  iVFS* v = QUERY_PLUGIN_ID (pSystem, CS_FUNCID_VFS, iVFS);
-  csIniFile *config = new csIniFile(v,  "/config/opengl.cfg" );
-  v->DecRef(); 
-  v = NULL;
+  iConfigFile *config = pSystem->CreateConfig ("/config/opengl.cfg" );
   
   dispdriver = NULL;
   const char *strDriver;
@@ -70,7 +67,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
         }
       }
     }
-    delete config;
+    config->DecRef ();
   }
   else
     CsPrintf (MSG_FATAL_ERROR, "could not opengl.cfg, will use NULL as displaydriver\n");
@@ -88,6 +85,10 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
     CsPrintf (MSG_FATAL_ERROR, "FATAL: Cannot open X display\n");
     exit (-1);
   }
+
+  // Set user locale for national character support
+  if (XSupportsLocale ())
+    XSetLocaleModifiers ("");
 
   screen_num = DefaultScreen (dpy);
   root_window = RootWindow (dpy, screen_num);

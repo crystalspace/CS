@@ -31,7 +31,7 @@
 #include "csutil/csstring.h"
 #include "funcon.h"
 #include "conbuffr.h"
-#include "csutil/inifile.h"
+#include "icfgfile.h"
 #include "csgfxldr/csimage.h"
 
 IMPLEMENT_IBASE(funConsole)
@@ -335,7 +335,7 @@ void funConsole::GetPosition (int &x, int &y, int &width, int &height) const
 
 void funConsole::LoadPix ()
 {
-  csIniFile *ini = new csIniFile (VFS, "/config/funcon.cfg");
+  iConfigFile *ini = System->CreateConfig ("/config/funcon.cfg");
   const char* dir = ini->GetStr ("funcon", "zip");
   const char* mountdir = ini->GetStr ("funcon", "mount");
   if (VFS->Mount (mountdir, dir))
@@ -370,10 +370,10 @@ void funConsole::LoadPix ()
   else
     printf ("Couldn't mount %s on %s\n", dir, mountdir);
 
-  delete ini;
+  ini->DecRef ();
 }
 
-void funConsole::PrepPix (csIniFile *ini, const char *sect,
+void funConsole::PrepPix (iConfigFile *ini, const char *sect,
   ConDecoBorder &border, bool bgnd)
 {
   const char* pix = ini->GetStr (sect, "pic", "");

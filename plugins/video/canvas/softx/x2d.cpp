@@ -65,6 +65,10 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
     exit (-1);
   }
 
+  // Set user locale for national character support
+  if (XSupportsLocale ())
+    XSetLocaleModifiers ("");
+
   // Query system settings
   GetX11Settings (System, sim_depth, do_shm, do_hwmouse);
 

@@ -22,6 +22,7 @@
 #ifndef __CS_INIFILE_H__
 #define __CS_INIFILE_H__
 
+#include "icfgfile.h"
 #include "csutil/csstring.h"
 #include "csutil/csvector.h"
 #include "ivfs.h"
@@ -29,7 +30,7 @@
 class csStrVector;
 struct iStrVector;
 
-class csIniFile
+class csIniFile : public iConfigFile
 {
 private:
   // Branch types
@@ -73,29 +74,159 @@ private:
   class Iterator
   {
   protected:
-    const csIniFile& Source;
+    const csIniFile *Source;
     const PrvINIbranch* Branch;
     BranchType Type;
     const PrvINInode* Node;
     int Current;
     int Limit;
-    Iterator(const csIniFile& s, const PrvINIbranch* b, BranchType t) :
-      Source(s), Branch(b), Type(t), Node(NULL), Current(-1),
-      Limit(b ? b->Length():0) {}
-    void Clone(const Iterator&);
-    void RemoveItem();
-    const PrvINIbranch* GetComments() const { return Node->Comments; }
+
+    // Constructor
+    Iterator (const csIniFile *s, const PrvINIbranch* b, BranchType t) :
+      Source (s), Branch (b), Type (t), Node (NULL), Current (-1),
+      Limit (b ? b->Length () : 0) {}
+
+    // Remove the item we are currently pointing to
+    void RemoveItem ();
+    // Get the comments assocuated with current item
+    const PrvINIbranch* GetComments () const { return Node->Comments; }
+
   public:
-    /// Copy constructor
-    Iterator(const Iterator& i) : Source(i.Source) { Clone(i); }
-    /// Assignment operator
-    Iterator& operator=(const Iterator& i) { Clone(i); return *this; }
-    /// Returns true if another item exists; must call at least once
-    bool NextItem();
-    /// Returns the INI file over which this object iterates
-    const csIniFile& GetSource() const { return Source; }
+    /// Rewind the iterator (points to nowhere after this)
+    void Rewind ()
+    { Current = -1; Node = NULL; }
+    /// Move to next item and return true if the position is valid
+    bool Next ();
+    /// Move to previous item and return true if the position is valid
+    bool Prev ();
   };
-  friend class csIniFile::Iterator;
+
+  /// Section iterator
+  class SectionIterator : public iConfigSectionIterator, public Iterator
+  {
+    typedef Iterator superclass;
+  protected:
+    friend class csIniFile;
+
+    // Constructor
+    SectionIterator (const csIniFile *s, const PrvINIbranch* b) :
+      Iterator (s, b, TYPE_SECTION) { CONSTRUCT_IBASE (NULL); }
+    // Destructor
+    virtual ~SectionIterator();
+
+  public:
+    DECLARE_IBASE;
+
+    /// Query a pointer to the config file we're navigating: it is NOT IncRef'd.
+    virtual iConfigFile *GetSource () const
+    { return (iConfigFile *)Source; }
+    /// Rewind the iterator (points to nowhere after this)
+    virtual void Rewind ()
+    { superclass::Rewind (); }
+    /// Move to next item and return true if the position is valid
+    virtual bool Next ()
+    { return superclass::Next (); }
+    /// Move to previous item and return true if the position is valid
+    virtual bool Prev ()
+    { return superclass::Prev (); }
+    /// Return the name of the current section
+    virtual const char *GetSection () const
+    { return Node->Section.Name; }
+  };
+  friend class csIniFile::SectionIterator;
+
+  /// A data iterator
+  class DataIterator : public iConfigDataIterator, public Iterator
+  {
+    typedef Iterator superclass;
+  protected:
+    friend class csIniFile;
+    const char *Section;
+
+    DataIterator(const csIniFile *s, const PrvINInode *n) :
+      Iterator (s, n->Section.Vector, TYPE_DATA)
+    { CONSTRUCT_IBASE (NULL); Section = n->Section.Name; }
+    // Destructor
+    virtual ~DataIterator();
+
+  public:
+    DECLARE_IBASE;
+
+    /// Query a pointer to the config file we're navigating: it is NOT IncRef'd.
+    virtual iConfigFile *GetSource () const
+    { return (iConfigFile *)Source; }
+    /// Rewind the iterator (points to nowhere after this)
+    virtual void Rewind ()
+    { superclass::Rewind (); }
+    /// Move to next item and return true if the position is valid
+    virtual bool Next ()
+    { return superclass::Next (); }
+    /// Move to previous item and return true if the position is valid
+    virtual bool Prev ()
+    { return superclass::Prev (); }
+    /// Return the name of the current section
+    virtual const char *GetSection () const
+    { return Section; }
+    /// Return the current key name
+    virtual const char *GetKey () const
+    { return Node->Data.Name; }
+    /// Return the current key data
+    virtual csSome GetData () const
+    { return Node->Data.Pointer; }
+    /// Return the current data size
+    virtual size_t GetDataSize () const
+    { return Node->Data.Size; }
+  };
+  friend class csIniFile::DataIterator;
+
+  /// A comment iterator
+  class CommentIterator : public iConfigCommentIterator, public Iterator
+  {
+    typedef Iterator superclass;
+  protected:
+    friend class csIniFile;
+    const char *Section;
+    const char *Key;
+
+    CommentIterator (const csIniFile *s, const PrvINIbranch *b,
+      const char *iSection, const char *iKey) : Iterator (s, b, TYPE_COMMENT)
+    { CONSTRUCT_IBASE (NULL); Section = iSection; Key = iKey; }
+    virtual ~CommentIterator ();
+
+  public:
+    DECLARE_IBASE;
+
+    /// Query a pointer to the config file we're navigating: it is NOT IncRef'd.
+    virtual iConfigFile *GetSource () const
+    { return (iConfigFile *)Source; }
+    /// Rewind the iterator (points to nowhere after this)
+    virtual void Rewind ()
+    { superclass::Rewind (); }
+    /// Move to next item and return true if the position is valid
+    virtual bool Next ()
+    { return superclass::Next (); }
+    /// Move to previous item and return true if the position is valid
+    virtual bool Prev ()
+    { return superclass::Prev (); }
+    /// Return the section this data iterator acts on
+    virtual const char *GetSection () const
+    { return Section; }
+    /// Return the current key name
+    virtual const char *GetKey () const
+    { return Key; }
+    /// Return the current key data
+    virtual const char *GetComment () const
+    { return Node->Comment.Text; }
+  };
+  friend class csIniFile::CommentIterator;
+
+  /// Returns a section iterator; sets Found to true if any sections exist
+  SectionIterator *_EnumSections () const;
+  /// Returns a data iterator or NULL if no data.
+  DataIterator *_EnumData (const char* iSection) const;
+  /// Returns a comment iterator or NULL if no comments; iKey can be NULL
+  CommentIterator *_EnumComments (const char* iSection,
+    const char* iKey) const;
 
   /// The root of INI file
   PrvINIbranch Root;
@@ -103,203 +234,116 @@ private:
   char CommentChar;
   /// Is object content syncronised to disk?
   bool Dirty;
+  /// File name it was loaded from. If NULL, it was loaded from memory.
+  char *FileName;
+  /// A pointer to VFS volume, if config file was read from VFS or NULL
+  iVFS *VFS;
 
 public:
-  /// Initialize INI file object
-  csIniFile (char Comment = ';') : CommentChar(Comment), Dirty(false) {}
+  DECLARE_IBASE;
+
+  /// Initialize an empty INI file object
+  csIniFile (char iCommentChar = ';') : CommentChar (iCommentChar),
+    Dirty (false), FileName (NULL), VFS (NULL)
+  { CONSTRUCT_IBASE (NULL); }
   /// Initialize INI file object and load it from a physical file
-  csIniFile (const char* path, char Comment = ';');
+  csIniFile (const char* fName, char iCommentChar = ';');
   /// Initialize INI file object and load it from a file on VFS volume
-  csIniFile (iVFS*, const char* path, char iCommentChar = ';');
-  /// Initialize INI file object and load it from an iFile
-  csIniFile (iFile*, char iCommentChar = ';');
+  csIniFile (const char* fName, iVFS *vfs, char iCommentChar = ';');
   /// Destroy the object
   virtual ~csIniFile ();
 
-  /// Load INI from physical file
-  bool Load (const char *fName);
-  /// Load INI from a file on a VFS volume
-  bool Load (iVFS*, const char* fName);
-  /// Load INI from iFile
-  bool Load (iFile*);
-  /// Load INI from a string buffer
-  bool Load (const csString& buffer);
-  /// Load INI from memory buffer
-  bool Load (const char *Data, size_t DataSize);
+  /// Load INI from a file on a VFS volume or from a physical file
+  virtual bool Load (const char* fName, iVFS *vfs = NULL);
 
-  /// Save INI to physical file
-  bool Save (const char *fName) const;
-  /// Save INI to VFS volume
-  bool Save (iVFS*, const char* fName) const;
-  /// Save INI to iFile
-  bool Save (iFile*) const;
-  /// Save INI to string buffer
-  csString Save () const;
+  /// Save INI to the same place it was loaded from.
+  virtual bool Save () const;
+  /// Save INI into the given file (on VFS or on physical filesystem)
+  virtual bool Save (const char *iFileName, iVFS *vfs = NULL) const;
 
-  /// Save INI to physical file if dirty (and clear dirty flag)
-  bool SaveIfDirty (const char *fName);
-  /// Save INI to VFS volume if dirty (and clear dirty flag)
-  bool SaveIfDirty (iVFS*, const char* fName);
-  /// Save INI to iFile if dirty (and clear dirty flag)
-  bool SaveIfDirty (iFile*);
-  /// Save INI to string buffer if dirty (and clear dirty flag)
-  csString SaveIfDirty ();
-
-  bool IsDirty () const { return Dirty; }
+  /// Check if the config file is dirty
+  virtual bool IsDirty () const { return Dirty; }
+  /// Clear dirty flag (is this safe to expose to user?)
   void ClearDirty() { Dirty = false; }
 
   /// Override to type your own parsing error messages
   virtual bool Error (int LineNo, const char *Line, int Pos);
 
-  /// A section iterator
-  class SectionIterator : public Iterator
-  {
-    typedef Iterator superclass;
-  protected:
-    friend class csIniFile;
-    SectionIterator(const csIniFile& s, const PrvINIbranch* b) :
-      Iterator (s, b, TYPE_SECTION) {}
-  public:
-    /// Returns the section's name
-    const char* GetName() const { return Node->Section.Name; }
-  };
-  friend class csIniFile::SectionIterator;
+  /**
+   * Get config file name. It is recommended that all files
+   * be loaded from VFS, thus no special means to determine
+   * whenever the path is on VFS or not is provided.
+   */
+  virtual const char *GetFileName ()
+  { return FileName; }
 
-  /// Returns a section iterator; sets Found to true if any sections exist
-  SectionIterator EnumSections(bool& Found) const;
-  /// Returns a section iterator
-  SectionIterator EnumSections() const { bool b; return EnumSections(b); }
-  /// Enumerate sections and put section names into a string vector
-  bool EnumSections (csStrVector *oList) const;
-
-  /// A data iterator
-  class DataIterator : public Iterator
-  {
-    typedef Iterator superclass;
-  protected:
-    friend class csIniFile;
-    char* Section;
-    DataIterator(const csIniFile&, const PrvINIbranch*, const char* Section);
-    void Clone(const DataIterator&);
-  public:
-    /// Copy constructor
-    DataIterator(const DataIterator& i) : Iterator(i), Section(NULL)
-      { Clone(i); }
-    /// Destructor
-    ~DataIterator();
-    /// Assignment operator
-    DataIterator& operator=(const DataIterator& i) { Clone(i); return *this; }
-    /// Returns section name over which this object iterates data
-    const char* GetSection() const { return Section; }
-    /// Returns name of item
-    const char* GetName() const { return Node->Data.Name; }
-    /// Returns value of item
-    csSome GetData() const { return Node->Data.Pointer; }
-    /// Returns size of value of item
-    size_t GetDataSize() const { return Node->Data.Size; }
-  };
-  friend class csIniFile::DataIterator;
-
-  /// Returns a data iterator; sets Found to true if SectionPath is found
-  DataIterator EnumData (const char* SectionPath, bool& Found) const;
-  /// Returns a data iterator
-  DataIterator EnumData (const char* SectionPath) const
-    { bool b; return EnumData (SectionPath, b); }
-  /// Enumerate data entries and put their names into a string vector
-  bool EnumData (const char *SectionPath, csStrVector *oList) const;
-  /// Enumerate data entries and put their names into a string vector
-  bool EnumData (const char *SectionPath, iStrVector *oList) const;
-
-  /// A comment iterator
-  class CommentIterator : public Iterator
-  {
-    typedef Iterator superclass;
-  protected:
-    friend class csIniFile;
-    char* Section;
-    char* Key;
-    CommentIterator(const csIniFile&, const PrvINIbranch*,
-      const char* SectionPath, const char* KeyName);
-    void Clone(const CommentIterator&);
-  public:
-    /// Copy constructor
-    CommentIterator(const CommentIterator& i) :
-      Iterator(i), Section(NULL), Key(NULL) { Clone(i); }
-    /// Assignment operator
-    CommentIterator& operator=(const CommentIterator& i)
-      { Clone(i); return *this; }
-    /// Destructor
-    ~CommentIterator();
-    /// Returns section name over which this object iterates comments
-    const char* GetSection () const { return Section; }
-    /// Returns key name (if specified) over which this object iterates
-    const char* GetKey () const { return Key; }
-    /// Returns text of comment
-    const char* GetText () const { return Node->Comment.Text; }
-  };
-  friend class csIniFile::CommentIterator;
-
-  /// Returns a comment iterator; sets Found to true if comments are found
-  CommentIterator EnumComments (const char* SectionPath, const char* KeyName,
-    bool& Found) const;
-  /// Returns a comment iterator; KeyName may be NULL
-  CommentIterator EnumComments (const char* SectionPath, const char* KeyName)
-    const { bool b; return EnumComments (SectionPath, KeyName, b); }
-  /// Enumerate comments bound to a entry; KeyName may be NULL
-  bool EnumComments (const char* SectionPath, const char* KeyName,
-    csStrVector *oList) const;
+  /// Returns a section iterator or NULL if no sections
+  virtual iConfigSectionIterator *EnumSections () const
+  { return _EnumSections (); }
+  /// Returns a data iterator or NULL if no data.
+  virtual iConfigDataIterator *EnumData (const char* iSection) const
+  { return _EnumData (iSection); }
+  /// Returns a comment iterator or NULL if no comments; iKey can be NULL
+  virtual iConfigCommentIterator *EnumComments (const char* iSection,
+    const char* iKey) const
+  { return _EnumComments (iSection, iKey); }
 
   /// Query if a specific section exists
-  bool SectionExists (const char *SectionPath) const;
+  virtual bool SectionExists (const char *iSection) const;
   /// Query if a specific key exists
-  bool KeyExists (const char *SectionPath, const char *KeyName) const;
+  virtual bool KeyExists (const char *iSection, const char *iKey) const;
 
   /// Get data indexed by section name and key name
-  bool GetData (const char *SectionPath, const char *KeyName, csSome &Data,
+  virtual bool GetData (const char *iSection, const char *iKey, csSome &Data,
     size_t &DataSize) const;
   /// Get an integer value from the configuration instance.
-  int GetInt (const char *SectionPath, const char *KeyName, int def = 0) const;
+  virtual int GetInt (const char *iSection, const char *iKey, int def = 0) const;
   /// Get a real value from the configuration instance.
-  float GetFloat (const char *SectionPath, const char *KeyName,
+  virtual float GetFloat (const char *iSection, const char *iKey,
     float def = 0.0) const;
   /// Get a string value from the configuration instance.
-  const char *GetStr (const char *SectionPath, const char *KeyName,
+  virtual const char *GetStr (const char *iSection, const char *iKey,
     const char *def = "") const;
   /// Get a boolean value from the configuration instance.
-  bool GetYesNo (const char *SectionPath, const char *KeyName,
+  virtual bool GetYesNo (const char *iSection, const char *iKey,
     bool def = false) const;
 
   /// Set data: if Data is NULL, delete entry
-  bool SetData (const char *SectionPath, const char *KeyName, csConstSome Data,
-    size_t DataSize);
+  virtual bool SetData (const char *iSection, const char *iKey,
+    csConstSome Data, size_t DataSize);
   /// Set an asciiz value (shortcut for SetData)
-  bool SetStr (const char *SectionPath, const char *KeyName, const char *Val);
+  virtual bool SetStr (const char *iSection, const char *iKey, const char *Val);
   /// Set an integer value (shortcut for SetData)
-  bool SetInt (const char *SectionPath, const char *KeyName, int Value);
+  virtual bool SetInt (const char *iSection, const char *iKey, int Value);
   /// Set an floating-point value (shortcut for SetData)
-  bool SetFloat (const char *SectionPath, const char *KeyName, float Value);
+  virtual bool SetFloat (const char *iSection, const char *iKey, float Value);
   /// Set comment for given section/entry
-  bool SetComment (const char *SectionPath, const char *KeyName,
+  virtual bool SetComment (const char *iSection, const char *iKey,
     const char *Text);
 
   /// Delete an entry
-  bool Delete (const char *SectionPath, const char *KeyName);
-  /// Delete all comments for a key or section (if KeyName == NULL)
-  bool DeleteComment (const char *SectionPath, const char *KeyName);
+  bool DeleteKey (const char *iSection, const char *iKey)
+  { return SetData (iSection, iKey, NULL, 0); }
+  /// Delete all comments for a key or section (if iKey == NULL)
+  bool DeleteComment (const char *iSection, const char *iKey);
 
 private:
-  /// Find node by given path
-  PrvINInode* FindNode (const char *SectionPath, const char* KeyName) const;
-  /// Set the data for a given node
+  // Load INI from memory buffer
+  bool _Load (const char *Data, size_t DataSize);
+  /// Save INI to a string (common wrapper for all Save()'s)
+  csString _Save () const;
+  // Find node by given path
+  PrvINInode* FindNode (const char *iSection, const char* iKey) const;
+  // Set the data for a given node
   void SetData (PrvINInode*, csConstSome Data, size_t DataSize);
-  /// Save a comment
+  // Save a comment
   void SaveComment (const char* Text, csString&) const;
-  /// Save comments for a section or key
+  // Save comments for a section or key
   void SaveComments (const PrvINIbranch*, csString&) const;
-  /// Save all the keys within a section
+  // Save all the keys within a section
   void SaveData (const char* Name, csSome Data, size_t DataSize,
     const PrvINIbranch* comments, csString&) const;
-  /// Save all the data in a section
+  // Save all the data in a section
   void SaveSection (const PrvINInode*, csString&) const;
 };
 

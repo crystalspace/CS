@@ -227,7 +227,7 @@ void csTextureMMNull::remap_texture (csTextureManager *texman)
 //----------------------------------------------- csTextureManagerLine ---//
 
 csTextureManagerLine::csTextureManagerLine (iSystem *iSys,
-  iGraphics2D *iG2D, csIniFile *config) : csTextureManager (iSys, iG2D)
+  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
 {
   ResetPalette ();
   read_config (config);
@@ -242,7 +242,7 @@ void csTextureManagerLine::SetPixelFormat (csPixelFormat &PixelFormat)
   truecolor = (pfmt.PalEntries == 0);
 }
 
-void csTextureManagerLine::read_config (csIniFile *config)
+void csTextureManagerLine::read_config (iConfigFile *config)
 {
   csTextureManager::read_config (config);
   prefered_dist = config->GetInt ("TextureManager", "RGB_DIST", PREFERED_DIST);

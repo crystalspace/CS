@@ -22,10 +22,10 @@
 
 #include "csutil/scf.h"
 #include "iplugin.h"
+#include "idatabuf.h"
 
 // forward declarations
 struct iStrVector;
-struct iString;
 
 /**
  * File time structure - used to query and set
@@ -104,7 +104,7 @@ struct iFile : public iBase
    * This function is intended for VFS internal use only. It is not guaranteed
    * to work for all file types (currently it works only for archive files)
    */
-  virtual char *GetAllData () = 0;
+  virtual iDataBuffer *GetAllData () = 0;
 };
 
 
@@ -154,7 +154,7 @@ struct iVFS : public iPlugIn
    * 'currend virtual directory'. Return a new iString object.
    * If IsDir is true, expanded path ends in an '/', otherwise no.
    */
-  virtual iString *ExpandPath (const char *Path, bool IsDir = false) const = 0;
+  virtual iDataBuffer *ExpandPath (const char *Path, bool IsDir = false) const = 0;
 
   /// Check whenever a file exists
   virtual bool Exists (const char *Path) const = 0;
@@ -170,7 +170,7 @@ struct iVFS : public iPlugIn
    * terminated (so that it can be conveniently used with string functions)
    * but the extra null-terminator is not counted as part of the returned size.
    */
-  virtual char *ReadFile (const char *FileName, size_t &Size) = 0;
+  virtual iDataBuffer *ReadFile (const char *FileName) = 0;
   /// Write an entire file in one pass.
   virtual bool WriteFile (const char *FileName, const char *Data, size_t Size) = 0;
 

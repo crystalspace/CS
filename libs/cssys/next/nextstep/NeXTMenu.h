@@ -18,8 +18,7 @@
 //
 //-----------------------------------------------------------------------------
 @class Menu;
-class csIniFile;
 
-Menu* NeXTMenuGenerate( char const* menu_ident, csIniFile const& );
+Menu* NeXTMenuGenerate( char const* menu_ident, iConfigFile const* );
 
 #endif // __NeXT_NeXTMenu_h

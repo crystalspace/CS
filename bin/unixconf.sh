@@ -66,7 +66,8 @@ if [ -z "${CXX}" ]; then
 fi
 
 CXX=`basename ${CXX}`
-echo "CXX = ${CXX}"
+echo "CXX = ${CXX} -c"
+echo "LINK = ${CXX}"
 
 # Create a dummy C++ program
 echo "int main () {}" >conftest.cpp

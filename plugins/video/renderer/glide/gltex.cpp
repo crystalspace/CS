@@ -143,8 +143,8 @@ void csTextureMMGlide::remap_mm ()
 
 //---------------------------------------------------------------------------
 
-csTextureManagerGlide::csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D, csGraphics3DGlide* iG3D, 
-					      csIniFile *config)
+csTextureManagerGlide::csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D,
+  csGraphics3DGlide* iG3D, iConfigFile *config)
   : csTextureManager (iSys, iG2D)
 {
   g3d = iG3D;

@@ -36,6 +36,7 @@
 #include "ivfs.h"
 #include "itxtmgr.h"
 #include "ievent.h"
+#include "icfgfile.h"
 
 // Archive path of CSWS.CFG
 #define CSWS_CFG "csws.cfg"
@@ -151,7 +152,7 @@ bool csApp::InitialSetup ()
     return false;
 
   // Change to the directory on VFS where we keep our data
-  const char *DataDir = System->ConfigGetStr ("CSWS", "Library", NULL);
+  const char *DataDir = System->GetConfig ()->GetStr ("CSWS", "Library", NULL);
   if (DataDir)
     VFS->ChDir (DataDir);
 
@@ -247,19 +248,18 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   }
 
   // Now load the texture
-  size_t size;
-  char *fbuffer = VFS->ReadFile (filename, size);
+  iDataBuffer *fbuffer = VFS->ReadFile (filename);
   delete [] buffer;
-  if (!fbuffer || !size)
+  if (!fbuffer || !fbuffer->GetSize ())
   {
     printf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", filename);
     return false;
   }
 
   iTextureManager *txtmgr = GfxPpl->G3D->GetTextureManager ();
-  iImage *image = csImageLoader::Load ((UByte *)fbuffer, size,
+  iImage *image = csImageLoader::Load (fbuffer->_uint8 (), fbuffer->GetSize (),
     txtmgr->GetTextureFormat ());
-  delete [] fbuffer;
+  fbuffer->DecRef ();
 
   csWSTexture *tex = new csWSTexture (iTexName, image, iFlags);
   image->DecRef ();
@@ -285,7 +285,7 @@ void csApp::LoadConfig ()
     dialogdefs = new csStrVector (16, 16);
 
   size_t cswscfglen;
-  char *cswscfg = VFS->ReadFile (CSWS_CFG, cswscfglen);
+  iDataBuffer *cswscfg = VFS->ReadFile (CSWS_CFG, cswscfglen);
   if (!cswscfg)
   {
     printf (MSG_FATAL_ERROR, "ERROR: CSWS config file `%s' not found\n", CSWS_CFG);
@@ -294,7 +294,7 @@ void csApp::LoadConfig ()
   }
 
   int cmd;
-  char *cfg = cswscfg, *name, *params;
+  char *cfg = **cswscfg, *name, *params;
   while ((cmd = csGetObject (&cfg, commands, &name, &params)) > 0)
     switch (cmd)
     {
@@ -324,7 +324,7 @@ void csApp::LoadConfig ()
         printf (MSG_FATAL_ERROR, "Unknown token in "CSWS_CFG"! (%s)\n", cfg);
         fatal_exit (0, false);			// Unknown token
     }
-  delete[] cswscfg;
+  cswscfg->DecRef ();
 }
 
 void csApp::PrepareTextures ()

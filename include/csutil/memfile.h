@@ -68,11 +68,10 @@ public:
   virtual void SetPos(size_t);
 
   /**
-   * Re-assigns ownership of data buffer to caller.  Caller must free buffer
-   * with delete[].  May return NULL if memory file is empty.  Effectively 
-   * empties csMemFile instance since ownership is lost.
+   * Get entire file data in one go.
+   * When you're done call DecRef().
    */
-  virtual char* GetAllData();
+  virtual iDataBuffer* GetAllData();
   /**
    * Returns a pointer to the memory buffer.  May return NULL if memory file
    * is empty.  Use GetSize() for size info.

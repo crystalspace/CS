@@ -17,8 +17,10 @@
  */
 
 #include <stdarg.h>
-
 #include <stdio.h>
+
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
@@ -41,9 +43,6 @@
 #include "igraph2d.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
-
-#include <GL/gl.h>
-#include <GL/glu.h>
 
 #define SysPrintf System->Printf
 

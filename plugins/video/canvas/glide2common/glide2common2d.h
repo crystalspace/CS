@@ -24,7 +24,6 @@
 #if defined(OS_BE)	// dh: is this OS-dependence necessary? 
 #include "cssys/be/beitf.h"
 #endif
-#include "csutil/inifile.h"
 #include "csutil/csrect.h"
 #include "iglide2d.h"
 #include <glide.h>

@@ -22,7 +22,7 @@
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
 #include "cssys/win32/win32.h"
-#include "csutil/inifile.h"
+#include "icfgfile.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
 
@@ -749,7 +749,7 @@ void SysSystemDriver::Sleep (int SleepTime)
   ::Sleep (SleepTime);
 }
 
-void SysSystemDriver::SetSystemDefaults (csIniFile *Config)
+void SysSystemDriver::SetSystemDefaults (iConfigFile *Config)
 {
   csSystemDriver::SetSystemDefaults (Config);
   need_console = Config->GetYesNo ("Microsoft Windows", "DebugConsole", false);

@@ -26,6 +26,7 @@
 #include "video/canvas/common/scancode.h"
 #include "video/canvas/common/os2-keys.h"
 #include "isystem.h"
+#include "icfgfile.h"
 
 // shit ...
 #undef SEVERITY_ERROR
@@ -100,9 +101,10 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
     pfmt.PalEntries = 256;
   }
 
-  WindowX = System->ConfigGetInt ("VideoDriver", "WindowX", INT_MIN);
-  WindowY = System->ConfigGetInt ("VideoDriver", "WindowY", INT_MIN);
-  HardwareCursor = System->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);
+  iConfigFile *Config = System->GetConfig ();
+  WindowX = Config->GetInt ("VideoDriver", "WindowX", INT_MIN);
+  WindowY = Config->GetInt ("VideoDriver", "WindowY", INT_MIN);
+  HardwareCursor = Config->GetYesNo ("VideoDriver", "SystemMouseCursor", true);
 
   const char *val;
   if ((val = System->GetOptionCL ("winpos")))

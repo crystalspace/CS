@@ -25,7 +25,7 @@
 #include "iplugin.h"
 
 class VfsNode;
-class csIniFile;
+struct iConfigFile;
 
 /// A replacement for standard-C FILE type in the virtual file space
 class csFile : public iFile
@@ -65,7 +65,7 @@ public:
   /// Query current file pointer
   virtual size_t GetPos () = 0;
   /// Get entire file data at once, if possible, or NULL
-  virtual char *GetAllData ();
+  virtual iDataBuffer *GetAllData ();
 
 protected:
   friend class csVFS;
@@ -120,7 +120,7 @@ class csVFS : public iVFS
   // The current directory minus current node (cnode suffix)
   char cnsufx [VFS_MAX_PATH_LEN + 1];
   // The initialization file
-  csIniFile *config;
+  iConfigFile *config;
   // Directory stack (used in PushDir () and PopDir ())
   csStrVector dirstack;
   // The pointer to system driver interface
@@ -150,7 +150,7 @@ public:
    * 'currend virtual directory'. Return a new iString object.
    * If IsDir is true, expanded path ends in an '/', otherwise no.
    */
-  virtual iString *ExpandPath (const char *Path, bool IsDir = false) const;
+  virtual iDataBuffer *ExpandPath (const char *Path, bool IsDir = false) const;
 
   /// Check whenever a file exists
   virtual bool Exists (const char *Path) const;
@@ -166,7 +166,7 @@ public:
    * terminated (so that it can be conveniently used with string functions)
    * but the extra null-terminator is not counted as part of the returned size.
    */
-  virtual char *ReadFile (const char *FileName, size_t &Size);
+  virtual iDataBuffer *ReadFile (const char *FileName);
   /// Write an entire file in one pass.
   virtual bool WriteFile (const char *FileName, const char *Data, size_t Size);
 
@@ -200,7 +200,7 @@ private:
   char *_ExpandPath (const char *Path, bool IsDir = false) const;
 
   /// Read and set the VFS config file
-  bool ReadConfig (csIniFile *Config);
+  bool ReadConfig ();
 
   /// Add a virtual link: real path can contain $(...) macros
   virtual bool AddLink (const char *VirtualPath, const char *RealPath);

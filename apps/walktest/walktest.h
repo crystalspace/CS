@@ -26,7 +26,6 @@
 #include "cssys/sysdriv.h"
 #include "csengine/collider.h"
 #include "csengine/light.h"
-#include "csutil/inifile.h"
 #include "walktest/wentity.h"
 #include "iworld.h"
 #include "iconsole.h"
@@ -46,6 +45,7 @@ class csPolygonSet;
 struct iSoundData;
 struct iCollideSystem;
 struct iPerfStats;
+struct iConfigFile;
 
 // Several map modes.
 #define MAP_OFF 0
@@ -383,7 +383,7 @@ public:
   virtual bool HandleEvent (iEvent &Event);
 
   /// Override SetSystemDefaults to handle additional configuration defaults.
-  virtual void SetSystemDefaults (csIniFile*);
+  virtual void SetSystemDefaults (iConfigFile*);
   /// Override Help to show additional arguments help
   virtual void Help ();
 

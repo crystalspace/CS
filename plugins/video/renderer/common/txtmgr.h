@@ -27,9 +27,9 @@
 #include "igraph2d.h"
 #include "csgfxldr/rgbpixel.h"
 
-class csIniFile;
 class csTexture;
 struct iImage;
+struct iConfigFile;
 
 /**
  * This class is the top-level representation of a texture.
@@ -326,7 +326,7 @@ protected:
   bool verbose;
 
   /// Read configuration values from config file.
-  virtual void read_config (csIniFile *config);
+  virtual void read_config (iConfigFile *config);
 
 public:
   /// Pixel format.

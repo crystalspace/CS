@@ -82,16 +82,16 @@ csGraphics3DNull::~csGraphics3DNull ()
   delete texman;
   if (G2D)
     G2D->DecRef ();
-  delete config;
+  if (config)
+    config->DecRef ();
 }
 
 bool csGraphics3DNull::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  iVFS* v = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
-  config = new csIniFile (v, "/config/null3d.cfg");
-  v->DecRef(); v = NULL;
+  config = System->CreateConfig ("/config/null3d.cfg");
+  if (!config) return false;
 
   width = height = -1;
 

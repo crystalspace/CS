@@ -23,9 +23,6 @@
 #include "csbase.h"
 #include "cstypes.h"
 
-typedef void *csSome;
-typedef const void *csConstSome;
-
 /**
  * Thomas Hieber, 2000-08-03
  * This class was introduced, to make a more lightweight base class

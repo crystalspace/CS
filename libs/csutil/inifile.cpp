@@ -54,14 +54,14 @@ bool csIniFile::PrvINIbranch::FreeItem (csSome Item)
     {
       case TYPE_SECTION:
         delete (((PrvINInode *)Item)->Section.Vector);
-        free (((PrvINInode *)Item)->Section.Name);
+        delete [] ((PrvINInode *)Item)->Section.Name;
         break;
       case TYPE_DATA:
-        free (((PrvINInode *)Item)->Data.Pointer);
-        free (((PrvINInode *)Item)->Data.Name);
+        delete [] (char *)((PrvINInode *)Item)->Data.Pointer;
+        delete [] ((PrvINInode *)Item)->Data.Name;
         break;
       case TYPE_COMMENT:
-        free (((PrvINInode *)Item)->Comment.Text);
+        delete [] ((PrvINInode *)Item)->Comment.Text;
         break;
     }
     if (((PrvINInode *)Item)->Comments)
@@ -73,7 +73,7 @@ bool csIniFile::PrvINIbranch::FreeItem (csSome Item)
 
 //--------------------------------------------------------------- Iterators ---
 
-bool csIniFile::Iterator::NextItem()
+bool csIniFile::Iterator::Next ()
 {
   if (Current < Limit)
     for (Current++; Current < Limit; Current++)
@@ -86,74 +86,72 @@ bool csIniFile::Iterator::NextItem()
   return false;
 }
 
-void csIniFile::Iterator::Clone(const Iterator& i)
+bool csIniFile::Iterator::Prev ()
 {
-  if (this != &i)
-  {
-    Branch = i.Branch;
-    Type = i.Type;
-    Node = NULL;
-    Current = -1;
-    Limit = (Branch ? Branch->Length() : 0);
-  }
+  if (Current >= 0)
+    for (Current--; Current >= 0; Current--)
+    {
+      Node = (PrvINInode*)Branch->Get(Current);
+      if (Type == Node->Type)
+        return true;
+    }
+  Node = NULL;
+  return false;
 }
 
-void csIniFile::Iterator::RemoveItem()
+void csIniFile::Iterator::RemoveItem ()
 {
   if (Current >= 0 && Current < Limit)
   {
-    (CONST_CAST(PrvINIbranch*)(Branch))->Delete(Current);
+    (CONST_CAST(PrvINIbranch*)(Branch))->Delete (Current);
     Node = NULL;
     Limit--;
   }
 }
 
-csIniFile::DataIterator::~DataIterator() { free (Section); }
-csIniFile::DataIterator::DataIterator(const csIniFile& s,
-  const PrvINIbranch* b, const char* sec) : Iterator(s, b, TYPE_DATA)
-{
-  Section = strdup (sec);
-}
-void csIniFile::DataIterator::Clone(const DataIterator& i)
-{
-  if (this != &i)
-  {
-    if (Section != NULL) free (Section);
-    Section = strdup (i.Section);
-  }
-}
+IMPLEMENT_IBASE (csIniFile::SectionIterator)
+  IMPLEMENTS_INTERFACE (iConfigSectionIterator);
+IMPLEMENT_IBASE_END
 
-csIniFile::CommentIterator::~CommentIterator() { free (Section); free (Key); }
-csIniFile::CommentIterator::CommentIterator(const csIniFile& s,
-  const PrvINIbranch* b, const char* SectionPath, const char* KeyName) :
-  Iterator(s, b, TYPE_COMMENT)
-{
-  Section = strdup (SectionPath);
-  Key = strdup (KeyName);
-}
-void csIniFile::CommentIterator::Clone(const CommentIterator& i)
-{
-  if (this != &i)
-  {
-    if (Section != NULL) free (Section);
-    if (Key != NULL) free (Key);
-    Section = strdup (i.Section);
-    Key = strdup (i.Key);
-  }
-}
+IMPLEMENT_IBASE (csIniFile::DataIterator)
+  IMPLEMENTS_INTERFACE (iConfigDataIterator);
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_IBASE (csIniFile::CommentIterator)
+  IMPLEMENTS_INTERFACE (iConfigCommentIterator);
+IMPLEMENT_IBASE_END
+
+// Place destructors for all kinds of iterators here so that
+// virtual method table will reside in this object file
+csIniFile::SectionIterator::~SectionIterator () {}
+csIniFile::DataIterator::~DataIterator() {}
+csIniFile::CommentIterator::~CommentIterator() {}
 
 //------------------------------------------------------------ Constructors ---
 
-csIniFile::csIniFile (const char* path, char Comment) :
-  CommentChar(Comment), Dirty(false) { Load (path); }
+IMPLEMENT_IBASE (csIniFile)
+  IMPLEMENTS_INTERFACE (iConfigFile);
+IMPLEMENT_IBASE_END
 
-csIniFile::csIniFile (iVFS *vfs, const char* path, char Comment) :
-  CommentChar(Comment), Dirty(false) { Load (vfs, path); }
+csIniFile::csIniFile (const char* iFileName, char iCommentChar) :
+  CommentChar (iCommentChar), Dirty (false), FileName (NULL), VFS (NULL)
+{
+  CONSTRUCT_IBASE (NULL);
+  Load (iFileName);
+}
 
-csIniFile::csIniFile (iFile* f, char Comment) :
-  CommentChar(Comment), Dirty(false) { Load (f); }
+csIniFile::csIniFile (const char* iFileName, iVFS *vfs, char iCommentChar) :
+  CommentChar (iCommentChar), Dirty (false), FileName (NULL), VFS (NULL)
+{
+  CONSTRUCT_IBASE (NULL);
+  Load (iFileName, vfs);
+}
 
-csIniFile::~csIniFile () {}
+csIniFile::~csIniFile ()
+{
+  delete [] FileName;
+  if (VFS) VFS->DecRef ();
+}
 
 //--------------------------------------------------------- csIniFile::Load ---
 
@@ -162,10 +160,12 @@ static bool NextLine (csString& line, const char*& source, const char* limit)
   line.Clear();
   if (source >= limit) return false;
   const char* const start = source;
-  while (source < limit && *source != '\n' && *source != '\r') source++;
+  while (source < limit && *source != '\n' && *source != '\r')
+    source++;
   line.Append (start, source - start);
   if (source < limit)
-  {  // Strip line terminator (handles DOS:CRLF, Unix:LF, Macintosh:CR)
+  {
+    // Strip line terminator (handles DOS:CRLF, Unix:LF, Macintosh:CR)
     source++;   // Strip initial LF or CR
     if (*(source - 1) == '\r' && source < limit && *source == '\n')
       source++; // Strip CRLF.
@@ -173,71 +173,57 @@ static bool NextLine (csString& line, const char*& source, const char* limit)
   return true;
 }
 
-bool csIniFile::Load (const char* path)
-{
-  bool rc = false;
-  FILE* f = fopen (path, "rb");
-  if (f)
-  {
-    size_t size = 0;
-    if (fseek (f, 0, SEEK_END) == 0 && (size = ftell(f)) != size_t(-1) &&
-        fseek (f, 0, SEEK_SET) == 0)
-    {
-      if (size == 0)
-        rc = true; // Empty file, but not an error.
-      else
-      {
-        char* data = new char[size];
-        if (fread (data, size, 1, f) == 1)
-          rc = Load (data, size);
-        delete[] data;
-      }
-    }
-    fclose (f);
-  }
-  return rc;
-}
-
-bool csIniFile::Load (const csString& s)
-{
-  return Load (s.GetData(), s.Length());
-}
-
-bool csIniFile::Load (iVFS* vfs, const char* path)
+bool csIniFile::Load (const char *iFileName, iVFS *vfs)
 {
   bool rc = false;
   if (vfs)
   {
-    iFile* file = vfs->Open (path, VFS_FILE_READ);
-    if (file)
+    iDataBuffer *data = vfs->ReadFile (iFileName);
+    if (data)
     {
-      rc = Load (file);
-      file->DecRef();
+      rc = data->GetSize () ? _Load (**data, data->GetSize ()) : true;
+      data->DecRef ();
     }
   }
-  return rc;
-}
-
-bool csIniFile::Load (iFile* file)
-{
-  bool rc = false;
-  if (file)
+  else
   {
-    const size_t size = file->GetSize();
-    if (size == 0)
-      rc = true; // Empty file, but not an error.
-    else
+    FILE* f = fopen (iFileName, "rb");
+    if (f)
     {
-      char* data = new char[size];
-      if (file->Read (data, size) == size)
-        rc = Load (data, size);
-      delete[] data;
+      size_t size = 0;
+      if (fseek (f, 0, SEEK_END) == 0
+       && (size = ftell(f)) != size_t(-1)
+       && fseek (f, 0, SEEK_SET) == 0)
+      {
+        if (size == 0)
+          rc = true; // Empty file, but not an error.
+        else
+        {
+          char *data = new char [size];
+          if (fread (data, size, 1, f) == 1)
+            rc = _Load (data, size);
+          delete [] data;
+        }
+      }
+      fclose (f);
     }
+  }
+
+  delete [] FileName;
+  FileName = NULL;
+  if (VFS) VFS->DecRef ();
+  VFS = NULL;
+
+  if (rc)
+  {
+    FileName = strnew (iFileName);
+    if ((VFS = vfs))
+      vfs->IncRef ();
   }
   return rc;
 }
 
-bool csIniFile::Load (const char *Data, size_t DataSize)
+bool csIniFile::_Load (const char *Data, size_t DataSize)
 {
   csString record;
   const char* const DataEnd = Data + DataSize;
@@ -343,7 +329,7 @@ plain:
         branch->Type = TYPE_COMMENT;
         branch->Comments = NULL;
         if (*cur)
-          branch->Comment.Text = strdup (cur + 1);
+          branch->Comment.Text = strnew (cur + 1);
         else
           branch->Comment.Text = NULL;
         if (!Comments)
@@ -369,7 +355,7 @@ plain:
         branch = new PrvINInode;
         branch->Type = TYPE_SECTION;
         branch->Comments = Comments;
-        branch->Section.Name = strdup (tmp);
+        branch->Section.Name = strnew (tmp);
         branch->Section.Vector = CurBranch = new PrvINIbranch ();
         Root.Push (branch);
         Comments = NULL;
@@ -395,7 +381,7 @@ error:    if (Error (LineNo, buff, int (cur - buff)))
         branch = new PrvINInode;
         branch->Type = TYPE_DATA;
         branch->Comments = Comments;
-        branch->Data.Name = strdup (tmp);
+        branch->Data.Name = strnew (tmp);
 
         cur = eq + 1;
         cur += strspn (cur, CS_INISPACE);
@@ -407,8 +393,8 @@ error:    if (Error (LineNo, buff, int (cur - buff)))
           while (i && strchr (CS_INISPACE, tmp[i - 1]))
             i--;
           tmp[i] = 0;
-          branch->Data.Pointer = malloc ((branch->Data.Size = i) + 1);
-          strcpy ((char *) branch->Data.Pointer, tmp);
+	  branch->Data.Size = i;
+          branch->Data.Pointer = strnew (tmp);
         }
         else
         {
@@ -420,7 +406,7 @@ error:    if (Error (LineNo, buff, int (cur - buff)))
         CurBranch->Push (branch);
         Comments = NULL;
       } // Key = Value
-    } // else if (b64mode)
+    } // if (b64mode)
   } // for (;;)
 
 out:
@@ -429,7 +415,6 @@ out:
     while (Comments->Length ())
       Root.Push (Comments->Pop ());
     delete Comments;
-//    Comments = NULL;    // not needed but left for clarity
   }
   return true;
 }
@@ -445,9 +430,9 @@ void csIniFile::SaveComment (const char* Text, csString& s) const
 
 void csIniFile::SaveComments (const PrvINIbranch* branch, csString& s) const
 {
-  CommentIterator iterator (*this, branch, "", "");
-  while (iterator.NextItem())
-    SaveComment (iterator.GetText(), s);
+  CommentIterator iterator (this, branch, "", "");
+  while (iterator.Next())
+    SaveComment (iterator.GetComment (), s);
 }
 
 void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
@@ -536,68 +521,47 @@ void csIniFile::SaveSection (const PrvINInode* node, csString& s) const
   SaveComments (node->Comments, s);
   s << '[' << node->Section.Name << "]\n";
 
-  DataIterator iterator (*this, node->Section.Vector, node->Section.Name);
-  while (iterator.NextItem())
-    SaveData (iterator.GetName(), iterator.GetData(), iterator.GetDataSize(),
-      iterator.GetComments(), s);
+  DataIterator iterator (this, node);
+  while (iterator.Next ())
+    SaveData (iterator.GetKey (), iterator.GetData (), iterator.GetDataSize (),
+      iterator.GetComments (), s);
 }
 
-bool csIniFile::Save (const char* path) const
+bool csIniFile::Save () const
+{
+  return FileName ? Save (FileName, VFS) : false;
+}
+
+bool csIniFile::Save (const char *iFileName, iVFS *vfs) const
 {
   bool ok = false;
-  FILE* file = fopen (path, "w");
-  if (file)
-  {
-    csString s(Save());
-    const size_t n = s.Length();
-    ok = (n == 0 || fwrite (s.GetData(), 1, n, file) > 0);
-    fclose (file);
-  }
+  if (iFileName)
+    if (vfs)
+    {
+      csString s (_Save ());
+      ok = vfs->WriteFile (iFileName, s.GetData (), s.Length ());
+    }
+    else
+    {
+      FILE* file = fopen (iFileName, "w");
+      if (file)
+      {
+        csString s (_Save ());
+        const size_t n = s.Length ();
+        ok = (n == 0 || fwrite (s.GetData (), 1, n, file) > 0);
+        fclose (file);
+      }
+    }
   return ok;
 }
 
-bool csIniFile::Save (iVFS* vfs, const char* path) const
-{
-  bool ok = false;
-  if (vfs && path)
-  {
-    csString s(Save());
-    ok = vfs->WriteFile (path, s.GetData(), s.Length());
-  }
-  return ok;
-}
-
-bool csIniFile::Save (iFile* file) const
-{
-  bool ok = false;
-  if (file)
-  {
-    csString s(Save());
-    ok = (file->Write (s.GetData(), s.Length()) == s.Length());
-  }
-  return ok;
-}
-
-csString csIniFile::Save () const
+csString csIniFile::_Save () const
 {
   csString s;
-  SectionIterator iterator (EnumSections());
-  while (iterator.NextItem())
+  SectionIterator iterator (this, &Root);
+  while (iterator.Next ())
     SaveSection (iterator.Node, s);
   return s;
-}
-
-#define SAVE_IF_DIRTY(P,A) \
-bool csIniFile::SaveIfDirty P { if (Dirty) Dirty = !Save A; return !Dirty; }
-SAVE_IF_DIRTY((const char* path), (path))
-SAVE_IF_DIRTY((iVFS* vfs, const char* path), (vfs, path))
-SAVE_IF_DIRTY((iFile* file), (file))
-#undef SAVE_IF_DIRTY
-
-csString csIniFile::SaveIfDirty ()
-{
-  ClearDirty();
-  return Save();
 }
 
 bool csIniFile::Error (int LineNo, const char *Line, int Pos)
@@ -608,163 +572,101 @@ bool csIniFile::Error (int LineNo, const char *Line, int Pos)
 
 //-----------------------------------------------------------------------------
 
-csIniFile::SectionIterator csIniFile::EnumSections(bool& Found) const
+csIniFile::SectionIterator *csIniFile::_EnumSections () const
 {
-  Found = (Root.Length() != 0);
-  return SectionIterator (*this, &Root);
+  return Root.Length () ? new SectionIterator (this, &Root) : NULL;
 }
 
-bool csIniFile::EnumSections (csStrVector *oList) const
+csIniFile::DataIterator *csIniFile::_EnumData (const char* iSection) const
 {
-  bool Found;
-  SectionIterator iterator (EnumSections(Found));
-  while (iterator.NextItem())
-    oList->Push (strnew(iterator.GetName()));
-  return Found;
+  PrvINInode *Sec = FindNode (iSection, NULL);
+  return Sec ? new DataIterator (this, Sec) : NULL;
 }
 
-csIniFile::DataIterator csIniFile::EnumData (const char* SectionPath,
-  bool& Found) const
+csIniFile::CommentIterator *csIniFile::_EnumComments(const char* iSection,
+  const char* iKey) const
 {
-  PrvINInode* Sec = FindNode (SectionPath, NULL);
-  Found = (Sec != NULL);
-  return DataIterator (*this, (Sec ? Sec->Section.Vector : 0), SectionPath);
+  PrvINInode *Sec = FindNode (iSection, iKey);
+  return Sec ? new CommentIterator (this, Sec->Comments, iSection, iKey) : NULL;
 }
 
-bool csIniFile::EnumData (const char *SectionPath, csStrVector *oList) const
+csIniFile::PrvINInode *csIniFile::FindNode (const char* iSection,
+  const char* iKey) const
 {
-  bool Found;
-  DataIterator iterator (EnumData(SectionPath, Found));
-  while (iterator.NextItem())
-    oList->Push (strnew(iterator.GetName()));
-  return Found;
-}
-
-bool csIniFile::EnumData (const char *SectionPath, iStrVector *oList) const
-{
-  bool Found;
-  DataIterator iterator (EnumData(SectionPath, Found));
-  while (iterator.NextItem())
-    oList->Push (strnew(iterator.GetName()));
-  return Found;
-}
-
-csIniFile::CommentIterator csIniFile::EnumComments(const char* SectionPath,
-  const char* KeyName, bool& Found) const
-{
-  const PrvINIbranch* Comments = NULL;
-
-  if (KeyName)
+  SectionIterator sections (this, &Root);
+  while (sections.Next ())
   {
-    DataIterator iterator (EnumData(SectionPath));
-    while (iterator.NextItem())
-      if (strcmp (KeyName, iterator.GetName()) == 0)
-      {
-        Comments = iterator.GetComments();
-	break;
-      }
-  }
-  else
-  {
-    SectionIterator iterator (EnumSections());
-    while (iterator.NextItem())
-      if (strcmp (SectionPath, iterator.GetName()) == 0)
-      {
-        Comments = iterator.GetComments();
-	break;
-      }
-  }
-
-  Found = (Comments != NULL);
-  return CommentIterator (*this, Comments, SectionPath, KeyName);
-}
-
-bool csIniFile::EnumComments (const char *SectionPath, const char *KeyName,
-  csStrVector *oList) const
-{
-  bool Found;
-  CommentIterator iterator (EnumComments(SectionPath, KeyName, Found));
-  while (iterator.NextItem())
-    oList->Push (strnew(iterator.GetText()));
-  return Found;
-}
-
-csIniFile::PrvINInode* csIniFile::FindNode (const char* SectionPath,
-  const char* KeyName) const
-{
-  SectionIterator sections (EnumSections());
-  while (sections.NextItem())
-  {
-    if (strcmp (SectionPath, sections.GetName()) == 0)
+    if (!strcmp (iSection, sections.GetSection ()))
     {
-      if (KeyName == 0)
-        return CONST_CAST(PrvINInode*)(sections.Node);
+      if (iKey == 0)
+        return CONST_CAST(PrvINInode *)(sections.Node);
       else
       {
-        DataIterator data (*this, sections.Node->Section.Vector, SectionPath);
-	while (data.NextItem())
-	  if (strcmp (KeyName, data.GetName()) == 0)
-	    return CONST_CAST(PrvINInode*)(data.Node);
+        DataIterator data (this, sections.Node);
+	while (data.Next ())
+	  if (!strcmp (iKey, data.GetKey ()))
+	    return CONST_CAST(PrvINInode *)(data.Node);
       }
     }
   }
   return NULL;
 }
 
-bool csIniFile::GetData (const char *SectionPath, const char *KeyName,
+bool csIniFile::GetData (const char *iSection, const char *iKey,
   csSome &Data, size_t &DataSize) const
 {
-  DataIterator iterator (EnumData(SectionPath));
-  while (iterator.NextItem())
-    if (strcmp (KeyName, iterator.GetName()) == 0)
-    {
-    Data = iterator.GetData();
-    DataSize = iterator.GetDataSize();
+  PrvINInode *Sec = FindNode (iSection, iKey);
+  if (Sec && Sec->Type == TYPE_DATA)
+  {
+    Data = Sec->Data.Pointer;
+    DataSize = Sec->Data.Size;
     return true;
-    }
+  }
+
   Data = NULL;
   DataSize = 0;
-  return (false);
+  return false;
 }
 
 void csIniFile::SetData (PrvINInode* node, csConstSome Data, size_t DataSize)
 {
   node->Data.Size = DataSize;
-  node->Data.Pointer = malloc (DataSize + 1);
+  node->Data.Pointer = new char [DataSize + 1];
   memcpy (node->Data.Pointer, Data, DataSize);
   ((char*)node->Data.Pointer)[DataSize] = '\0';
 }
 
-bool csIniFile::SetData (const char *SectionPath, const char *KeyName,
+bool csIniFile::SetData (const char *iSection, const char *iKey,
   csConstSome Data, size_t DataSize)
 {
-  PrvINInode* Sec = FindNode (SectionPath, NULL);
-  PrvINIbranch* Vec;
+  PrvINInode *Sec = FindNode (iSection, NULL);
+  PrvINIbranch *Vec;
   if (Sec)
     Vec = Sec->Section.Vector;
   else
   {
+    // Create a new section if it does not exist
     Dirty = true;
     Vec = new PrvINIbranch();
-    PrvINInode* branch = new PrvINInode;
-    branch->Type = TYPE_SECTION;
-    branch->Comments = NULL;
-    branch->Section.Name = strdup (SectionPath);
-    branch->Section.Vector = Vec;
-    Root.Push (branch);
+    Sec = new PrvINInode;
+    Sec->Type = TYPE_SECTION;
+    Sec->Comments = NULL;
+    Sec->Section.Name = strnew (iSection);
+    Sec->Section.Vector = Vec;
+    Root.Push (Sec);
     if (Root.Length () > 1) // Add a empty line before section
-      SetComment (SectionPath, NULL, NULL);
+      SetComment (iSection, NULL, NULL);
   }
 
-  DataIterator iterator (*this, Vec, SectionPath);
-  while (iterator.NextItem())
-    if (strcmp (KeyName, iterator.GetName()) == 0)
+  DataIterator iterator (this, Sec);
+  while (iterator.Next ())
+    if (!strcmp (iKey, iterator.GetKey ()))
     {
       if (Data == NULL || DataSize == 0)
-        iterator.RemoveItem();
+        iterator.RemoveItem ();
       else
       {
-        free (iterator.Node->Data.Pointer);
+        delete [] (char *)iterator.Node->Data.Pointer;
 	SetData (CONST_CAST(PrvINInode*)(iterator.Node), Data, DataSize);
       }
       Dirty = true;
@@ -773,62 +675,62 @@ bool csIniFile::SetData (const char *SectionPath, const char *KeyName,
 
   if (Data && DataSize != 0)
   {
-    PrvINInode* branch = new PrvINInode;
+    PrvINInode *branch = new PrvINInode;
     Vec->Push (branch);
     branch->Type = TYPE_DATA;
     branch->Comments = NULL;
-    branch->Data.Name = strdup (KeyName);
+    branch->Data.Name = strnew (iKey);
     SetData (branch, Data, DataSize);
     Dirty = true;
   }
   return true;
 }
 
-bool csIniFile::SetStr (const char *SectionPath, const char *KeyName,
+bool csIniFile::SetStr (const char *iSection, const char *iKey,
   const char *Value)
 {
-  return (SetData (SectionPath, KeyName, Value, Value ? strlen (Value) : 0));
+  return (SetData (iSection, iKey, Value, Value ? strlen (Value) : 0));
 }
 
-bool csIniFile::SetInt(const char *SectionPath, const char *KeyName, int Value)
+bool csIniFile::SetInt(const char *iSection, const char *iKey, int Value)
 {
   char output [20];
   sprintf (output, "%d", Value);
-  return SetStr (SectionPath, KeyName, output);
+  return SetStr (iSection, iKey, output);
 }
 
-bool csIniFile::SetFloat (const char *SectionPath, const char *KeyName,
+bool csIniFile::SetFloat (const char *iSection, const char *iKey,
   float Value)
 {
   char output [20];
   sprintf (output, "%g", Value);
-  return SetStr (SectionPath, KeyName, output);
+  return SetStr (iSection, iKey, output);
 }
 
-bool csIniFile::SetComment (const char *SectionPath, const char *KeyName,
+bool csIniFile::SetComment (const char *iSection, const char *iKey,
   const char *Text)
 {
-  PrvINInode* node = FindNode (SectionPath, KeyName);
-  if (node != NULL)
+  PrvINInode *node = FindNode (iSection, iKey);
+  if (node)
   {
     Dirty = true;
     if (node->Comments == NULL)
-      node->Comments = new PrvINIbranch();
+      node->Comments = new PrvINIbranch ();
 
-    PrvINInode* branch = new PrvINInode;
+    PrvINInode *branch = new PrvINInode;
     branch->Type = TYPE_COMMENT;
     branch->Comments = NULL;
-    branch->Comment.Text = (Text ? strdup(Text) : NULL);
+    branch->Comment.Text = strnew (Text);
     node->Comments->Push (branch);
     return true;
   }
   return false;
 }
 
-bool csIniFile::DeleteComment (const char *SectionPath, const char *KeyName)
+bool csIniFile::DeleteComment (const char *iSection, const char *iKey)
 {
-  PrvINInode* node = FindNode (SectionPath, KeyName);
-  if (node != NULL && node->Comments != NULL)
+  PrvINInode *node = FindNode (iSection, iKey);
+  if (node && node->Comments)
   {
     Dirty = true;
     delete node->Comments;
@@ -838,34 +740,29 @@ bool csIniFile::DeleteComment (const char *SectionPath, const char *KeyName)
   return false;
 }
 
-bool csIniFile::Delete (const char *SectionPath, const char *KeyName)
+bool csIniFile::SectionExists (const char *iSection) const
 {
-  return SetData (SectionPath, KeyName, NULL, 0);
+  return (FindNode(iSection, NULL) != NULL);
 }
 
-bool csIniFile::SectionExists (const char *SectionPath) const
+bool csIniFile::KeyExists (const char *iSection, const char *iKey) const
 {
-  return (FindNode(SectionPath, NULL) != NULL);
+  return (FindNode (iSection, iKey) != NULL);
 }
 
-bool csIniFile::KeyExists (const char *SectionPath, const char *KeyName) const
-{
-  return (FindNode (SectionPath, KeyName) != NULL);
-}
-
-const char *csIniFile::GetStr (const char *SectionPath, const char *KeyName,
+const char *csIniFile::GetStr (const char *iSection, const char *iKey,
   const char *def) const
 {
   csSome c;
   size_t s;
-  GetData (SectionPath, KeyName, c, s);
+  GetData (iSection, iKey, c, s);
   return (c ? (const char*)c : def);
 }
 
-float csIniFile::GetFloat (const char *SectionPath, const char *KeyName,
+float csIniFile::GetFloat (const char *iSection, const char *iKey,
   float def) const
 {
-  const char *s = GetStr (SectionPath, KeyName, NULL);
+  const char *s = GetStr (iSection, iKey, NULL);
   if (!s)
     return def;
   float rc;
@@ -873,10 +770,10 @@ float csIniFile::GetFloat (const char *SectionPath, const char *KeyName,
   return rc;
 }
 
-int csIniFile::GetInt (const char *SectionPath, const char *KeyName,
+int csIniFile::GetInt (const char *iSection, const char *iKey,
   int def) const
 {
-  const char *s = GetStr (SectionPath, KeyName, NULL);
+  const char *s = GetStr (iSection, iKey, NULL);
   if (!s)
     return def;
   int rc;
@@ -884,10 +781,10 @@ int csIniFile::GetInt (const char *SectionPath, const char *KeyName,
   return rc;
 }
 
-bool csIniFile::GetYesNo (const char *SectionPath, const char *KeyName,
+bool csIniFile::GetYesNo (const char *iSection, const char *iKey,
   bool def) const
 {
-  const char *s = GetStr (SectionPath, KeyName, NULL);
+  const char *s = GetStr (iSection, iKey, NULL);
   if (!s)
     return def;
   return !strcasecmp(s,"yes") || !strcasecmp(s,"true") || !strcasecmp(s,"on");

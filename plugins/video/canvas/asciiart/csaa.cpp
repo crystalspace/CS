@@ -23,9 +23,9 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
-#include "csutil/inifile.h"
 #include "isystem.h"
 #include "ievent.h"
+#include "icfgfile.h"
 #include "qint.h"
 
 #include "csaa.h"
@@ -42,21 +42,22 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics2DAA)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
+  IMPLEMENTS_INTERFACE (iEventPlug)
 IMPLEMENT_IBASE_END
 
 csGraphics2DAA::csGraphics2DAA (iBase *iParent) :
   csGraphics2D ()
 {
   CONSTRUCT_IBASE (iParent);
-  config = NULL;
   context = NULL;
+  EventOutlet = NULL;
 }
 
 csGraphics2DAA::~csGraphics2DAA (void)
 {
   Close ();
-  if (config)
-    delete config;
+  if (EventOutlet)
+    EventOutlet->DecRef ();
 }
 
 bool csGraphics2DAA::Initialize (iSystem *pSystem)
@@ -64,12 +65,13 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  iVFS* v = QUERY_PLUGIN_ID (pSystem, CS_FUNCID_VFS, iVFS);
-  config = new csIniFile (v, "/config/asciiart.cfg");
-  v->DecRef(); v = NULL;
+  iConfigFile *config = pSystem->CreateConfig ("/config/asciiart.cfg");
+  if (!config)
+    return false;
 
   // Load settings from config file and setup the aa_defparams structure
-  HardwareCursor = System->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);
+  HardwareCursor = System->GetConfig ()->GetYesNo ("VideoDriver",
+    "SystemMouseCursor", true);
 
   aa_defparams.width =
   aa_defparams.recwidth = config->GetInt ("Console", "Width", 80);
@@ -119,6 +121,11 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   pfmt.GreenMask  = 0xff;
   pfmt.BlueMask   = 0xff;
   pfmt.complete ();
+
+  config->DecRef ();
+
+  EventOutlet = System->CreateEventOutlet (this);
+
   return true;
 }
 
@@ -194,7 +201,7 @@ void csGraphics2DAA::Print (csRect *area)
         if ((oldmousex != x)
          || (oldmousey != y))
         {
-          System->QueueMouseEvent (0, 0, x, y);
+          EventOutlet->Mouse (0, 0, x, y);
           oldmousex = x; oldmousey = y;
         }
         if (oldmousebut != b)
@@ -202,7 +209,7 @@ void csGraphics2DAA::Print (csRect *area)
           static int but [3] = { 1, 3, 2 };
           for (int i = 0; i <= 2; i++)
             if ((oldmousebut ^ b) & (1 << i))
-              System->QueueMouseEvent (but [i], (b & (1 << i)) != 0, x, y);
+              EventOutlet->Mouse (but [i], (b & (1 << i)) != 0, x, y);
           oldmousebut = b;
         }
         break;
@@ -251,7 +258,7 @@ void csGraphics2DAA::Print (csRect *area)
           alt_state = down;
         if (event == CSKEY_CTRL)
           ctrl_state = down;
-        System->QueueKeyEvent (event, down);
+        EventOutlet->Key (event, -1, down);
       }
     }
 }

@@ -80,4 +80,9 @@ typedef unsigned long ulong;
 // Time in milli (1/1000) seconds
 typedef unsigned long cs_time;
 
+// A pointer to something
+typedef void *csSome;
+// A pointer to some constant
+typedef const void *csConstSome;
+
 #endif // __CS_CSTYPES_H__

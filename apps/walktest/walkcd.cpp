@@ -43,7 +43,6 @@
 #include "csengine/cssprite.h"
 #include "csengine/terrain.h"
 #include "csparser/impexp.h"
-#include "csutil/inifile.h"
 #include "csutil/csrect.h"
 #include "csobject/dataobj.h"
 #include "icollide.h"

@@ -52,7 +52,6 @@
 #include "csengine/terrain.h"
 #include "csengine/cssprite.h"
 #include "csparser/impexp.h"
-#include "csutil/inifile.h"
 #include "csutil/csrect.h"
 #include "csutil/scanstr.h"
 #include "csobject/dataobj.h"
@@ -61,6 +60,7 @@
 #include "isnddata.h"
 #include "csgfxldr/pngsave.h"
 #include "csparser/snddatao.h"
+#include "icfgfile.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "isndsrc.h"
@@ -183,7 +183,7 @@ WalkTest::~WalkTest ()
   if (World) World->DecRef ();
 }
 
-void WalkTest::SetSystemDefaults (csIniFile *Config)
+void WalkTest::SetSystemDefaults (iConfigFile *Config)
 {
   superclass::SetSystemDefaults (Config);
   do_fps = Config->GetYesNo ("WalkTest", "FPS", true);

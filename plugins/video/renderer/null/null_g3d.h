@@ -30,9 +30,9 @@
 #include "iplugin.h"
 
 class csClipper;
-struct iGraphics2D;
-class csIniFile;
 class csReversibleTransform;
+struct iGraphics2D;
+struct iConfigFile;
 
 ///
 class csGraphics3DNull : public iGraphics3D
@@ -73,7 +73,7 @@ public:
   iGraphics2D* G2D;
 
   /// The configuration file
-  csIniFile* config;
+  iConfigFile* config;
 
   /// The texture manager.
   csTextureManagerLine* texman;

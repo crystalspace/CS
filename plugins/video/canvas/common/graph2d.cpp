@@ -27,6 +27,7 @@
 #include "isystem.h"
 #include "igraph3d.h"
 #include "itexture.h"
+#include "icfgfile.h"
 
 #if defined(PROC_INTEL) && !defined(NO_ASSEMBLER)
 #  if defined(COMP_VC)
@@ -49,7 +50,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   System->GetSettings (Width, Height, Depth, FullScreen);
 
   // Get the font server
-  const char *p = pSystem->ConfigGetStr (
+  const char *p = pSystem->GetConfig ()->GetStr (
     "FontServer", CS_FUNCID_FONT, "crystalspace.font.server.csfont");
   FontServer = LOAD_PLUGIN (pSystem, p, CS_FUNCID_FONT, iFontServer);
   Font = 0;

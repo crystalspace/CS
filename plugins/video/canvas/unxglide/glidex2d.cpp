@@ -21,7 +21,6 @@
 #include "glidex2d.h"
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
-#include "csutil/inifile.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 #include "video/canvas/common/x11comm.h"
@@ -83,6 +82,10 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
   GetX11Settings (pSystem, sim_depth, do_shm, do_hwmouse);
 
   dpy = XOpenDisplay (NULL);
+
+  // Set user locale for national character support
+  if (XSupportsLocale ())
+    XSetLocaleModifiers ("");
 
   screen_num = DefaultScreen (dpy);
   display_width = DisplayWidth (dpy, screen_num);

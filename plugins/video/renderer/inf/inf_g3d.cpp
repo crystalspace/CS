@@ -99,9 +99,9 @@ bool csGraphics3DInfinite::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  iVFS* v = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
-  config = new csIniFile (v, "/config/inf3d.cfg");
-  v->DecRef(); v = NULL;
+  config = System->CreateConfig ("/config/inf3d.cfg");
+  if (!config)
+    return false;
 
   width = height = -1;
 

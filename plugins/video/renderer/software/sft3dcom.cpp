@@ -26,7 +26,6 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/plane3.h"
-#include "csutil/inifile.h"
 #include "scan.h"
 #include "tcache.h"
 #include "soft_txt.h"
@@ -35,6 +34,7 @@
 #include "igraph2d.h"
 #include "ilghtmap.h"
 #include "sft3dcom.h"
+#include "icfgfile.h"
 
 #if defined (DO_MMX)
 #  include "video/renderer/software/i386/cpuid.h"
@@ -194,7 +194,7 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
 csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 {
   Close ();
-  delete config;
+  if (config) config->DecRef ();
   if (G2D) G2D->DecRef ();
   if (System) System->DecRef ();
   if (partner) partner->DecRef ();
@@ -202,10 +202,7 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 
 void csGraphics3DSoftwareCommon::NewInitialize ()
 {
-  iVFS* v = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
-  config = new csIniFile (v, "/config/soft3d.cfg");
-  v->DecRef(); v = NULL;
-
+  config = System->CreateConfig ("/config/soft3d.cfg");
   do_smaller_rendering = config->GetYesNo ("Hardware", "SMALLER", false);
   mipmap_coef = config->GetFloat ("TextureManager", "MIPMAP_COEF", 1.3);
   do_interlaced = config->GetYesNo ("Hardware", "INTERLACING", false) ? 0 : -1;

@@ -91,7 +91,7 @@ void csTextureMMInfinite::ComputeMeanColor ()
 //----------------------------------------------- csTextureManagerInfinite ---//
 
 csTextureManagerInfinite::csTextureManagerInfinite (iSystem *iSys,
-  iGraphics2D *iG2D, csIniFile *config) : csTextureManager (iSys, iG2D)
+  iGraphics2D *iG2D, iConfigFile *config) : csTextureManager (iSys, iG2D)
 {
   read_config (config);
   G2D = iG2D;

@@ -323,7 +323,7 @@ static scfClassRegistry *ClassRegistry = NULL;
 // If this bool is true, we should sort the registery
 static bool SortClassRegistry = false;
 
-void scfInitialize (csIniFile *iConfig)
+void scfInitialize (iConfigFile *iConfig)
 {
   if (!ClassRegistry)
     ClassRegistry = new scfClassRegistry ();
@@ -332,16 +332,17 @@ void scfInitialize (csIniFile *iConfig)
     LibraryRegistry = new scfLibraryVector ();
   if (iConfig)
   {
-    csIniFile::DataIterator iterator (iConfig->EnumData ("SCF.Registry"));
-    while (iterator.NextItem ())
+    iConfigDataIterator *iterator = iConfig->EnumData ("SCF.Registry");
+    while (iterator->Next ())
     {
-      const char *data = (char *)iterator.GetData();
+      const char *data = (const char *)iterator->GetData ();
       char *val = (char *)alloca (strlen (data) + 1);
       strcpy (val, data);
       char *depend = strchr (val, ':');
       if (depend) *depend++ = 0;
-      scfRegisterClass (iterator.GetName (), val, depend);
+      scfRegisterClass (iterator->GetKey (), val, depend);
     }
+    iterator->DecRef ();
   }
 #else
   (void)iConfig;

@@ -23,7 +23,6 @@
 
 #include "cssysdef.h"
 #include "qint.h"
-#include "csutil/inifile.h"
 #include "srdrcom.h"
 #include "srdrlst.h"
 #include "srdrsrc.h"
@@ -31,6 +30,7 @@
 #include "isnddrv.h"
 #include "isndldr.h"
 #include "isnddata.h"
+#include "icfgfile.h"
 
 IMPLEMENT_FACTORY (csSoundRenderSoftware)
 
@@ -67,7 +67,7 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   if (!VFS) return false;
 
   // read the config file
-  Config = new csIniFile(VFS,"config/sound.cfg");
+  Config = System->CreateConfig ("config/sound.cfg");
 
   // load the sound driver plug-in
   char *drv;

@@ -95,9 +95,7 @@ bool csGraphics3DLine::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  iVFS* v = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
-  config = new csIniFile (v, "/config/line3d.cfg");
-  v->DecRef(); v = NULL;
+  config = System->CreateConfig ("/config/line3d.cfg");
 
   width = height = -1;
 

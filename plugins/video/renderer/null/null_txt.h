@@ -190,7 +190,7 @@ public:
   UByte *inv_cmap;
 
   ///
-  csTextureManagerLine (iSystem *iSys, iGraphics2D *iG2D, csIniFile *config);
+  csTextureManagerLine (iSystem *iSys, iGraphics2D *iG2D, iConfigFile *config);
   ///
   virtual ~csTextureManagerLine ();
 
@@ -218,7 +218,7 @@ public:
   void compute_palette ();
 
   /// Read configuration values from config file.
-  virtual void read_config (csIniFile *config);
+  virtual void read_config (iConfigFile *config);
 
   ///
   virtual void Clear ();

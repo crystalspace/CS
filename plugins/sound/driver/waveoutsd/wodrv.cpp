@@ -23,9 +23,9 @@
 #include <mmsystem.h>
 
 #include "csutil/scf.h"
-#include "csutil/inifile.h"
 #include "isystem.h"
 #include "isndrdr.h"
+#include "icfgfile.h"
 #include "wodrv.h"
 
 #define MYMMSYSERR_NOCREATETHREAD 12
@@ -97,9 +97,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   m_piSoundRender = render;
   m_piSoundRender->IncRef();
 
-  iVFS* v = QUERY_PLUGIN(m_piSystem, iVFS);
-  Config = new csIniFile (v, "/config/sound.cfg");
-  v->DecRef(); v = NULL;
+  Config = m_piSystem->CreateConfig ("/config/sound.cfg");
 
   MMRESULT res;
   WAVEFORMATEX format;

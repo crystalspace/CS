@@ -87,9 +87,8 @@ bool csDefaultFontServer::ReadFntFile(const char *file, csFontDef *&fontdef)
 {
   /// read a .fnt file, originally meant for use as #include into CS.
   /// read entire file for speed
-  size_t fsize = 0;
   iVFS *VFS = QUERY_PLUGIN(System, iVFS);
-  char *fntfile = VFS->ReadFile(file, fsize);
+  iDataBuffer *fntfile = VFS->ReadFile(file);
   if(!fntfile)
   {
     System->Printf(MSG_FATAL_ERROR, "Could not read file %s.\n", file);
@@ -107,7 +106,7 @@ bool csDefaultFontServer::ReadFntFile(const char *file, csFontDef *&fontdef)
 
   /// parse file
   int skip = 0; 
-  char *cp = fntfile;
+  char *cp = **fntfile;
   int val = 0;
   int FontSize = 10;
   /// find the //XX parts
@@ -165,42 +164,42 @@ bool csDefaultFontServer::ReadFntFile(const char *file, csFontDef *&fontdef)
   int bitmaplen = 256*fontdef->BytesPerChar;
 
   /// if this is a binary fnt file we can do it faster
-  if(strncmp(fntfile, "FNTBINARY", 9) == 0)
+  if (strncmp (**fntfile, "FNTBINARY", 9) == 0)
   {
     const char * startstr = "STARTBINARY";
-    cp = fntfile;
+    cp = **fntfile;
     cp = strstr(cp, startstr);
     if(!cp)
     {
       System->Printf(MSG_FATAL_ERROR, "File %s has no binary part.\n", file);
-      delete[] fntfile;
+      fntfile->DecRef ();
       return false;
     }
     cp += strlen(startstr) +1; /// also skip \n
-    if( fsize - (cp-fntfile) < (unsigned int)( bitmaplen + 256 ) )
+    if( fntfile->GetSize () - (cp - **fntfile) < (unsigned int)( bitmaplen + 256 ) )
     {
       System->Printf(MSG_FATAL_ERROR, "File %s is too short.\n", file);
-      delete[] fntfile;
+      fntfile->DecRef ();
       return false;
     }
     memcpy(fontdef->FontBitmap, cp, bitmaplen);
     cp += bitmaplen;
     for(i=0; i<256; i++)
       fontdef->IndividualWidth[i] = cp[i];
-    delete[] fntfile;
+    fntfile->DecRef ();
     return true;
   }
 
   /// read fontbitmaps
   /// find first 'unsigned char' then the '{' after that.
-  cp = fntfile;
+  cp = **fntfile;
   cp = strstr(cp, "unsigned char");
   if(cp)
     cp = strchr(cp, '{');
   if(!cp) 
   {
     System->Printf(MSG_FATAL_ERROR, "File %s has no font bitmap.\n", file);
-    delete[] fntfile;
+    fntfile->DecRef ();
     return false;
   }
   cp++; /// skip the {
@@ -216,7 +215,7 @@ bool csDefaultFontServer::ReadFntFile(const char *file, csFontDef *&fontdef)
     {
       //printf("i = %d, cp %c%c%c%c\n", i, cp[0], cp[1], cp[2], cp[3]);
       printf("Could not read font bitmap byte\n");
-      delete[] fntfile;
+      fntfile->DecRef ();
       return false;
     }
     cp++; // go one further, to skip the ','
@@ -229,7 +228,7 @@ bool csDefaultFontServer::ReadFntFile(const char *file, csFontDef *&fontdef)
   if(!cp) 
   {
     System->Printf(MSG_FATAL_ERROR, "File %s has no font bitmap.\n", file);
-    delete[] fntfile;
+    fntfile->DecRef ();
     return false;
   }
   cp++;
@@ -247,7 +246,7 @@ bool csDefaultFontServer::ReadFntFile(const char *file, csFontDef *&fontdef)
       {
         //printf("i = %d, cp %c%c%c%c\n", i, cp[0], cp[1], cp[2], cp[3]);
         printf("Could not read font character width\n");
-        delete[] fntfile;
+        fntfile->DecRef ();
         return false;
       }
       cp ++; /// skip ,
@@ -256,7 +255,7 @@ bool csDefaultFontServer::ReadFntFile(const char *file, csFontDef *&fontdef)
     cp = strchr(cp, '\n');
   }
 
-  delete[] fntfile;
+  fntfile->DecRef ();
   return true;
 }
 

@@ -24,6 +24,7 @@
 #include "video/canvas/common/scancode.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
+#include "icfgfile.h"
 
 IMPLEMENT_FACTORY (csGraphics2DLineXLib)
 
@@ -64,7 +65,11 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
     exit (-1);
   }
 
-  do_hwmouse = System->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);
+  // Set user locale for national character support
+  if (XSupportsLocale ())
+    XSetLocaleModifiers ("");
+
+  do_hwmouse = System->GetConfig ()->GetYesNo ("VideoDriver", "SystemMouseCursor", true);
   if (System->GetOptionCL ("sysmouse"))
     do_hwmouse = true;
   if (System->GetOptionCL ("nosysmouse"))
@@ -500,7 +505,7 @@ void csGraphics2DLineXLib::Write (int x, int y, int fg, int bg, const char *text
   XDrawString (dpy, back, gc_back, x, y + xfont->ascent, text, strlen (text));
 }
 
-int csGraphics2DLineXLib::GetTextWidth (int Font, const char *text)
+int csGraphics2DLineXLib::GetTextWidth (int /*Font*/, const char *text)
 {
   return XTextWidth (xfont, text, strlen (text));
 }

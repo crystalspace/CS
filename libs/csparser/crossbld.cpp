@@ -426,13 +426,12 @@ csTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
 	|| (strcasecmp("bmp",fileextension) == 0)
        )
     {
-      size_t imagefilesize;
-      char *imagedata = localVFS.ReadFile(skinfilename,imagefilesize);
+      iDataBuffer *imagedata = localVFS.ReadFile(skinfilename);
 
-      iImage *newskin = csImageLoader::Load((unsigned char *)imagedata,
-        imagefilesize, importdestination->GetTextureFormat ());
+      iImage *newskin = csImageLoader::Load(imagedata->_uint8 (),
+        imagedata->GetSize (), importdestination->GetTextureFormat ());
 
-      delete [] imagedata;
+      imagedata->DecRef ();
 
       //if (!defaulttexture)
       defaulttexture = importdestination->GetTextures()->NewTexture (newskin);

@@ -89,7 +89,8 @@ class csTextureManagerGlide : public csTextureManager
 
 public:
   ///
-  csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D, csGraphics3DGlide* iG3D, csIniFile *config);
+  csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D,
+    csGraphics3DGlide* iG3D, iConfigFile *config);
   ///
   virtual ~csTextureManagerGlide ();
 

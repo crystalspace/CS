@@ -21,7 +21,6 @@
 #include "cssysdef.h"
 #include "NeXTSystemDriver.h"
 #include "version.h"
-#include "csutil/inifile.h"
 
 IMPLEMENT_EMBEDDED_IBASE(NeXTSystemDriver::NeXTSystemInterface)
   IMPLEMENTS_INTERFACE(iNeXTSystemDriver)
@@ -84,7 +83,7 @@ bool NeXTSystemDriver::Initialize( int argc, char const* const argv[],
 //-----------------------------------------------------------------------------
 #if 0
     This one should move to the corresponding canvas driver
-void NeXTSystemDriver::SetSystemDefaults( csIniFile* config )
+void NeXTSystemDriver::SetSystemDefaults( iConfigFile* config )
     {
     superclass::SetSystemDefaults( config );
     char const* const s = GetOptionCL( "simdepth" );

@@ -228,9 +228,8 @@ bool csGraphics3DGlide::Initialize (iSystem *iSys)
 
   SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide selected\n");
 
-  iVFS* v = QUERY_PLUGIN_ID (m_piSystem, CS_FUNCID_VFS, iVFS);
-  config = new csIniFile (v, "/config/glide.cfg");
-  v->DecRef(); v = NULL;
+  config = m_piSystem->CreateConfig ("/config/glide.cfg");
+  if (!config) return false;
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D, NULL, iGraphics2D);
   if (!m_piG2D) return false;

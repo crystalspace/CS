@@ -100,13 +100,13 @@ SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/utiming.cpp \
 SRC.SYS_CSSYS_DLL = libs/cssys/unix/dummy.cpp
 
 # The C compiler.
-CC=g++ -c
+#CC=g++ -c
 
 # The C++ compiler.
-CXX=g++ -c
+#CXX=g++ -c
 
 # The linker.
-LINK=g++
+#LINK=gcc
 
 # The library (archive) manager
 AR=ar

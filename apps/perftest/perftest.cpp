@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "cssys/system.h"
-#include "csutil/inifile.h"
 #include "apps/perftest/perftest.h"
 #include "apps/perftest/ptests3d.h"
 #include "apps/perftest/ptests2d.h"
@@ -49,18 +48,16 @@ void cleanup ()
 iMaterialHandle* PerfTest::LoadMaterial (char* file)
 {
   iTextureManager* txtmgr = G3D->GetTextureManager ();
-  size_t size;
-  char* buf;
   iImage* image;
-  buf = VFS->ReadFile (file, size);
-  if (!buf || !size)
+  iDataBuffer *buf = VFS->ReadFile (file);
+  if (!buf || !data->GetSize ())
   {
     Printf (MSG_FATAL_ERROR, "Error loading texture '%s'!\n", file);
     exit (-1);
   }
-  image = csImageLoader::Load ((UByte*)buf, size,
+  image = csImageLoader::Load (buf->_uint8 (), buf->GetSize (),
   	txtmgr->GetTextureFormat ());
-  delete [] buf;
+  buf->DecRef ();
   if (!image) exit (-1);
   iTextureHandle* texture = txtmgr->RegisterTexture (image, CS_TEXTURE_3D);
   if (!texture) exit (-1);

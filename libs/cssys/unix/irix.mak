@@ -86,13 +86,13 @@ SRC.SYS_CSSYS=libs/cssys/unix/unix.cpp libs/cssys/unix/utiming.cpp \
   libs/cssys/general/printf.cpp libs/cssys/general/getopt.cpp
 
 # The C compiler.
-CC=gcc -c
+#CC=gcc -c
 
 # The C++ compiler.
-CXX=gcc -c
+#CXX=gcc -c
 
 # The linker.
-LINK=gcc
+#LINK=gcc
 
 endif # ifeq ($(MAKESECTION),defines)
 

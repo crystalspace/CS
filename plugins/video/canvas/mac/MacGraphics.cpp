@@ -50,7 +50,6 @@
 
 #include "MacGraphics.h"
 
-#include "csutil/inifile.h"
 #include <stdarg.h>
 #include "cssys/mac/MacRSRCS.h"
 

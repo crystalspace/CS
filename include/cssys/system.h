@@ -35,7 +35,6 @@
 
 class csKeyboardDriver;
 class csMouseDriver;
-class csIniFile;
 
 struct iGraphics3D;
 struct iGraphics2D;
@@ -44,6 +43,7 @@ struct iNetworkManager;
 struct iSoundRender;
 struct iConfig;
 struct iConsole;
+struct iConfigFile;
 
 /**
  * This is the interface to operating system.<p>
@@ -228,6 +228,8 @@ public:
   /// -------------------------- plug-ins --------------------------
   /// The list of all plug-ins
   csPlugInsVector PlugIns;
+  /// The main configuration file
+  iConfigFile *Config;
   /// The Virtual File System object
   iVFS *VFS;
   /// 3D Graphics context
@@ -265,8 +267,6 @@ public:
   csMouseDriver Mouse;
   /// Joystick driver
   csJoystickDriver Joystick;
-  /// The Configuration File object
-  csIniFile *Config;
   /// Set to non-zero to exit csSystemDriver::Loop()
   bool Shutdown;
   /// Same as Shutdown but set manually by windowing system
@@ -279,8 +279,6 @@ public:
   csCommandLineOptions CommandLine;
   /// The list of raw filenames on the command line (i.e. without any switches)
   csStrVector CommandLineNames;
-  /// System configuration file name
-  char *ConfigName;
 
   /// Initialize system-dependent data
   csSystemDriver ();
@@ -379,7 +377,7 @@ protected:
    * Query default width/height/depth from config file
    * and from command-line parameters.
    */
-  virtual void SetSystemDefaults (csIniFile *config);
+  virtual void SetSystemDefaults (iConfigFile *config);
 
 public:
   DECLARE_IBASE;
@@ -413,26 +411,12 @@ public:
   /// Register a object that implements the iPlugIn interface as a plugin
   virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID, iPlugIn *iObject);
 
-  /// Get a integer configuration value
-  virtual int ConfigGetInt (const char *Section, const char *Key, int Default = 0);
-  /// Get a string configuration value
-  virtual const char *ConfigGetStr (const char *Section, const char *Key, const char *Default = NULL);
-  /// Get a string configuration value
-  virtual bool ConfigGetYesNo (const char *Section, const char *Key, bool Default = false);
-  /// Get a float configuration value
-  virtual float ConfigGetFloat (const char *Section, const char *Key, float Default = 0);
-  /// Set an integer configuration value
-  virtual bool ConfigSetInt (const char *Section, const char *Key, int Value);
-  /// Set an string configuration value
-  virtual bool ConfigSetStr (const char *Section, const char *Key, const char *Value);
-  /// Set an float configuration value
-  virtual bool ConfigSetFloat (const char *Section, const char *Key, float Value);
-  /// Query whenever a config section exists
-  virtual bool ConfigSectionExists (const char *Section);
-  /// Enumerate all keys in a section
-  virtual bool ConfigEnumData (const char *Section, iStrVector *KeyList);
-  /// Save system configuration file
-  virtual bool ConfigSave ();
+  /// Get the system configuration file: this does NOT IncRef the object
+  virtual iConfigFile *GetConfig ();
+  /// Create a new configuration file object which resides on VFS
+  virtual iConfigFile *CreateConfig (const char *iFileName, bool iVFS = true);
+  /// Save system configuration file if it was changed
+  virtual bool SaveConfig ();
 
   /// Register the plugin to receive specific events
   virtual bool CallOnEvents (iPlugIn *iObject, unsigned int iEventMask);
