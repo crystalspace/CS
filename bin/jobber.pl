@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    Automated Processing, Publishing, and CVS Update Script
-#    Copyright (C) 2000-2003 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -87,10 +87,10 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '25';
+my $PROG_VERSION = '26';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
-my $COPYRIGHT = "Copyright (C) 2000-2003 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
+my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 #------------------------------------------------------------------------------
 # Configuration Section
@@ -312,7 +312,7 @@ my $CONFIGURE = "cat << EOF > config.mak\n" .
     "OS = UNIX\n" .
     "COMP = GCC\n" .
     "MODE = optimize\n" .
-    "SWIGBIN = swig\n" .
+    "CMD.SWIG = swig\n" .
     "PERL = perl\n" .
     "PERL5.AVAILABLE = yes\n" .
     "PYTHON.AVAILABLE = yes\n" .
