@@ -54,10 +54,22 @@ AC_CANONICAL_HOST
 
 #------------------------------------------------------------------------------
 # Check for compilers and common tools.
+#
+# IMPLEMENTATION NOTES
+#
+# Note that AC_PROG_CC and AC_PROC_CXX insist upon adding both optimization
+# (-O2) and debug (-g) flags to CFLAGS and CXXFLAGS if these variables have not
+# been set explicitly. Unfortunately, this is not suitable for Crystal Space's
+# build system which makes a distinction between `optimize' and `debug' builds.
+# To work around this problem, we ensure that both of these variables are set
+# (either with empty values or with a user-supplied values) in order to
+# override Autoconf's undesirable behavior.
 #------------------------------------------------------------------------------
+CFLAGS="$CFLAGS" # See above note.
 AC_PROG_CC
 CS_EMIT_BUILD_PROPERTY([CMD.CC], [$CC])
 
+CXXFLAGS="$CXXFLAGS" # See above note.
 AC_PROG_CXX
 CS_EMIT_BUILD_PROPERTY([CMD.C++], [$CXX])
 
@@ -521,14 +533,7 @@ CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
 
 #------------------------------------------------------------------------------
 # Use the CPPFLAGS, CXXFLAGS, CFLAGS, and LDFLAGS passed to configure.
-# Further, Autoconf insists upon issuing optimization flags (-O) and debug
-# flags (-g) at one and the same time, but this is not suitable for Crystal
-# Space's build system, which makes a distinction between `optimize' and
-# `debug' builds, so we must filter out these flags.
 #------------------------------------------------------------------------------
-CFLAGS=`echo "$CFLAGS" | sed 's/-O.//g;s/-g.//g'`
-CXXFLAGS=`echo "$CXXFLAGS" | sed 's/-O.//g;s/-g.//g'`
-
 CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$CPPFLAGS $CFLAGS], [+])
 CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])
 CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
@@ -1062,7 +1067,15 @@ CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
     [$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
 
 AS_IF([test $cs_cv_libgl = yes],
-    [# Check for GLU.
+    [# Check for GLhandleARB.
+    CS_CHECK_BUILD([for GLhandleARB], [cs_cv_libgl_glhandlearb],
+	[AC_LANG_PROGRAM(
+	    [CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],
+	    [GLhandleARB x; (void)x;])],
+	[], [],	[CS_HEADER_PROPERTY([CS_HAS_GLHANDLEARB_T])], [], [],
+	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
+
+    # Check for GLU.
     CS_CHECK_BUILD([for GLU], [cs_cv_libglu],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GLU_PATH],[GL],[glu.h])], [gluNewQuadric()])],
