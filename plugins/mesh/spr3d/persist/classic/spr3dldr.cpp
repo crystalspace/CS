@@ -82,6 +82,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SMOOTH)
   CS_TOKEN_DEF (TRANSFORM)
   CS_TOKEN_DEF (TRIANGLE)
+  CS_TOKEN_DEF (SOCKET)
   CS_TOKEN_DEF (TWEEN)
   CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (VERTICES)
@@ -331,6 +332,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
     CS_TOKEN_TABLE (ACTION)
     CS_TOKEN_TABLE (SMOOTH)
     CS_TOKEN_TABLE (TRIANGLE)
+    CS_TOKEN_TABLE (SOCKET)
     CS_TOKEN_TABLE (SKELETON)
     CS_TOKEN_TABLE (TWEEN)
   CS_TOKEN_TABLE_END
@@ -389,8 +391,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
     if (!params)
     {
       ReportError (reporter,
-		"crystalspace.sprite3dfactoryloader.parse.badformat",
-		"Bad format while parsing sprite3d factory!");
+		    "crystalspace.sprite3dfactoryloader.parse.badformat",
+		    "Bad format while parsing sprite3d factory!");
       fact->DecRef ();
       spr3dLook->DecRef ();
       return NULL;
@@ -398,179 +400,194 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
     switch (cmd)
     {
       case CS_TOKEN_MATERIAL:
-	{
-          csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	  if (!mat)
-	  {
-	    ReportError (reporter,
-		"crystalspace.sprite3dfactoryloader.parse.unknownmaterial",
-		"Couldn't find material named '%s'", str);
-	    spr3dLook->DecRef ();
-            fact->DecRef ();
-            return NULL;
-	  }
-	  spr3dLook->SetMaterialWrapper (mat);
-	}
-	break;
+	    {
+        csScanStr (params, "%s", str);
+        iMaterialWrapper* mat = ldr_context->FindMaterial (str);
+	      if (!mat)
+	      {
+	        ReportError (reporter,
+		        "crystalspace.sprite3dfactoryloader.parse.unknownmaterial",
+		        "Couldn't find material named '%s'", str);
+	        spr3dLook->DecRef ();
+          fact->DecRef ();
+          return NULL;
+	      }
+	      spr3dLook->SetMaterialWrapper (mat);
+	    }
+	    break;
+      
       case CS_TOKEN_SKELETON:
-	{
-	  spr3dLook->EnableSkeletalAnimation ();
-	  iSkeleton* skeleton = spr3dLook->GetSkeleton ();
-	  iSkeletonLimb* skellimb = SCF_QUERY_INTERFACE (skeleton,
-	  	iSkeletonLimb);
-	  if (name) skellimb->SetName (name);
-	  if (!LoadSkeleton (parser, reporter, skellimb, params))
-	  {
-	    spr3dLook->DecRef ();
-	    fact->DecRef ();
-	    return NULL;
-	  }
-	}
-        break;
+	    {
+        spr3dLook->EnableSkeletalAnimation ();
+        iSkeleton* skeleton = spr3dLook->GetSkeleton ();
+        iSkeletonLimb* skellimb = SCF_QUERY_INTERFACE (skeleton,
+	        iSkeletonLimb);
+        if (name) skellimb->SetName (name);
+        if (!LoadSkeleton (parser, reporter, skellimb, params))
+        {
+	        spr3dLook->DecRef ();
+	        fact->DecRef ();
+	        return NULL;
+        }
+      }
+      break;
 
       case CS_TOKEN_ACTION:
+      {
+        iSpriteAction* act = spr3dLook->AddAction ();
+        act->SetName (name);
+        int d;
+        char fn[64];
+        while ((cmd = parser->GetObject (
+          &params, tok_frameset, &name, &params2)) > 0)
         {
-          iSpriteAction* act = spr3dLook->AddAction ();
-          act->SetName (name);
-          int d;
-          char fn[64];
-          while ((cmd = parser->GetObject (&params, tok_frameset, &name,
-	  	&params2)) > 0)
+          if (!params2)
           {
-            if (!params2)
-            {
-	      ReportError (reporter,
-		"crystalspace.sprite3dfactoryloader.parse.action.badformat",
-		"Bad format while parsing ACTION!");
-	      spr3dLook->DecRef ();
-	      fact->DecRef ();
-	      return NULL;
-            }
-            switch (cmd)
-            {
-              case CS_TOKEN_F:
-                csScanStr (params2, "%s,%d", fn, &d);
-                iSpriteFrame* ff = spr3dLook->FindFrame (fn);
-                if (!ff)
-                {
 	          ReportError (reporter,
-		    "crystalspace.sprite3dfactoryloader.parse.action.badframe",
-		    "Trying to add unknown frame '%s' to action '%s'!",
-		    fn, act->GetName ());
-		  spr3dLook->DecRef ();
-		  fact->DecRef ();
+		          "crystalspace.sprite3dfactoryloader.parse.action.badformat",
+		          "Bad format while parsing ACTION!");
+	          spr3dLook->DecRef ();
+	          fact->DecRef ();
+	          return NULL;
+          }
+          switch (cmd)
+          {
+            case CS_TOKEN_F:
+              csScanStr (params2, "%s,%d", fn, &d);
+              iSpriteFrame* ff = spr3dLook->FindFrame (fn);
+              if (!ff)
+              {
+	              ReportError (reporter,
+		              "crystalspace.sprite3dfactoryloader."
+                  "parse.action.badframe",
+		              "Trying to add unknown frame '%s' to action '%s'!",
+		            fn, act->GetName ());
+		            spr3dLook->DecRef ();
+		            fact->DecRef ();
                   return NULL;
-                }
-                act->AddFrame (ff, d);
-                break;
-            }
+              }
+              act->AddFrame (ff, d);
+            break;
           }
         }
-        break;
+      }
+      break;
 
       case CS_TOKEN_FRAME:
+      {
+        iSpriteFrame* fr = spr3dLook->AddFrame ();
+        fr->SetName (name);
+        int anm_idx = fr->GetAnmIndex ();
+        int tex_idx = fr->GetTexIndex ();
+        int i = 0;
+        float x, y, z, u, v;
+        while ((cmd = parser->GetObject (&params, tok_frame, &name, &params2)) > 0)
         {
-          iSpriteFrame* fr = spr3dLook->AddFrame ();
-          fr->SetName (name);
-          int anm_idx = fr->GetAnmIndex ();
-          int tex_idx = fr->GetTexIndex ();
-          int i = 0;
-          float x, y, z, u, v;
-          while ((cmd = parser->GetObject (&params, tok_frame, &name, &params2)) > 0)
+          if (!params2)
           {
-            if (!params2)
-            {
-	      ReportError (reporter,
-		"crystalspace.sprite3dfactoryloader.parse.frame.badformat",
-		"Bad format while parsing FRAME!");
-	      spr3dLook->DecRef ();
-	      fact->DecRef ();
-	      return NULL;
-            }
-            switch (cmd)
-            {
-              case CS_TOKEN_V:
-                csScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
-                // check if it's the first frame
-                if (spr3dLook->GetFrameCount () == 1)
-                {
-                  spr3dLook->AddVertices (1);
-                }
-                else if (i >= spr3dLook->GetVertexCount ())
-                {
 	          ReportError (reporter,
-		    "crystalspace.sprite3dfactoryloader.parse.frame.vertices",
-		    "Trying to add too many vertices to frame '%s'!",
-		    fr->GetName ());
-		  spr3dLook->DecRef ();
-		  fact->DecRef ();
-		  return NULL;
-                }
-                spr3dLook->SetVertex (anm_idx, i, csVector3 (x, y, z));
-                spr3dLook->SetTexel  (tex_idx, i, csVector2 (u, v));
-                i++;
-                break;
+		          "crystalspace.sprite3dfactoryloader.parse.frame.badformat",
+              "Bad format while parsing FRAME!");
+	          spr3dLook->DecRef ();
+	          fact->DecRef ();
+	          return NULL;
+          }
+          switch (cmd)
+          {
+            case CS_TOKEN_V:
+            csScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
+            // check if it's the first frame
+            if (spr3dLook->GetFrameCount () == 1)
+            {
+              spr3dLook->AddVertices (1);
             }
-          }
-          if (cmd == CS_PARSERR_TOKENNOTFOUND)
-          {
-	    ReportError (reporter,
-		"crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
-		"Token '%s' not found while parsing frame '%s'!",
-		parser->GetLastOffender (), fr->GetName ());
-	    spr3dLook->DecRef ();
-	    fact->DecRef ();
-	    return NULL;
-          }
-          if (i < spr3dLook->GetVertexCount ())
-          {
-	    ReportError (reporter,
-		"crystalspace.sprite3dfactoryloader.parse.frame.vertices",
-		"Too few vertices in frame '%s'!",
-		fr->GetName ());
-	    spr3dLook->DecRef ();
-	    fact->DecRef ();
-	    return NULL;
+            else if (i >= spr3dLook->GetVertexCount ())
+            {
+	            ReportError (reporter,
+		            "crystalspace.sprite3dfactoryloader."
+                "parse.frame.vertices",
+		            "Trying to add too many vertices to frame '%s'!",
+		            fr->GetName ());
+		            spr3dLook->DecRef ();
+		            fact->DecRef ();
+		            return NULL;
+            }
+            spr3dLook->SetVertex (anm_idx, i, csVector3 (x, y, z));
+            spr3dLook->SetTexel  (tex_idx, i, csVector2 (u, v));
+            i++;
+            break;
           }
         }
-        break;
+        if (cmd == CS_PARSERR_TOKENNOTFOUND)
+        {
+	        ReportError (reporter,
+		        "crystalspace.sprite3dfactoryloader.parse.frame.badtoken",
+		        "Token '%s' not found while parsing frame '%s'!",
+		      parser->GetLastOffender (), fr->GetName ());
+	        spr3dLook->DecRef ();
+	        fact->DecRef ();
+	        return NULL;
+        }
+        if (i < spr3dLook->GetVertexCount ())
+        {
+	        ReportError (reporter,
+		        "crystalspace.sprite3dfactoryloader.parse.frame.vertices",
+		        "Too few vertices in frame '%s'!",
+		      fr->GetName ());
+	        spr3dLook->DecRef ();
+	        fact->DecRef ();
+	        return NULL;
+        }
+      }
+      break;
 
       case CS_TOKEN_TRIANGLE:
-        {
-          int a, b, c;
-          csScanStr (params, "%d,%d,%d", &a, &b, &c);
-          spr3dLook->AddTriangle (a, b, c);
-        }
-        break;
+      {
+        int a, b, c;
+        csScanStr (params, "%d,%d,%d", &a, &b, &c);
+        spr3dLook->AddTriangle (a, b, c);
+      }
+      break;
 
+      case CS_TOKEN_SOCKET:
+      {
+        int a;
+        csScanStr (params, "%d", &a);
+        iSpriteSocket* sprite_socket = spr3dLook->AddSocket();
+        sprite_socket->SetName(name);
+        sprite_socket->SetTriangleIndex(a);
+
+      }
+      break;
+      
       case CS_TOKEN_SMOOTH:
+      {
+        int num, list[30];
+        csScanStr (params, "%D", list, &num);
+        switch (num)
         {
-          int num, list[30];
-          csScanStr (params, "%D", list, &num);
-          switch (num)
-          {
-            case 0  :  spr3dLook->MergeNormals ();                  break;
-            case 1  :  spr3dLook->MergeNormals (list[0]);           break;
-            case 2  :  spr3dLook->MergeNormals (list[0], list[1]);  break;
-	    default:
-	      ReportError (reporter,
-		"crystalspace.sprite3dfactoryloader.parse.badsmooth",
-		"Bad smooth option '%s', use 0, 1, or 2 parameters!", params);
-	      spr3dLook->DecRef ();
-	      fact->DecRef ();
-	      return NULL;
-          }
+          case 0  :  spr3dLook->MergeNormals ();                  break;
+          case 1  :  spr3dLook->MergeNormals (list[0]);           break;
+          case 2  :  spr3dLook->MergeNormals (list[0], list[1]);  break;
+	        default:
+	          ReportError (reporter,
+		          "crystalspace.sprite3dfactoryloader.parse.badsmooth",
+		          "Bad smooth option '%s', use 0, 1, or 2 parameters!", 
+              params);
+	          spr3dLook->DecRef ();
+	          fact->DecRef ();
+	          return NULL;
         }
-        break;
+      }
+      break;
 
       case CS_TOKEN_TWEEN:
-	{
-	  bool do_tween;
-          csScanStr (params, "%b", &do_tween);
-          spr3dLook->EnableTweening (do_tween);
-	}
-	break;
+	    {
+	      bool do_tween;
+        csScanStr (params, "%b", &do_tween);
+        spr3dLook->EnableTweening (do_tween);
+	    }
+	    break;
     }
   }
   spr3dLook->DecRef ();
@@ -685,6 +702,14 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iFile * file)
   {
     sprintf(buf, "TRIANGLE (%d,%d,%d)\n", state->GetTriangle(i).a,
       state->GetTriangle(i).b, state->GetTriangle(i).c);
+    str.Append(buf);
+  }
+
+  for(i=0; i<state->GetSocketCount(); i++)
+  {
+    sprintf(buf, "SOCKET '%s' (%d)\n", 
+      state->GetSocket(i)->GetName(),
+      state->GetSocket(i)->GetTriangleIndex());
     str.Append(buf);
   }
 
