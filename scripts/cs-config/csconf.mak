@@ -41,32 +41,60 @@ all: $(CSCONFIG.EXE)
 csconfig: $(OUTDIRS) $(CSCONFIG.EXE)
 clean: csconfigclean
 
+verfile:=include/csver.h
+vmajor:=`sed -e '/\#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e '/\#define[ 	][ 	]*CS_VERSION_MAJOR/s/\(\#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*"\)\([^\"]*\)"\(.*\)/\2/' < $(verfile)`
+vminor:=`sed -e '/\#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e '/\#define[ 	][ 	]*CS_VERSION_MINOR/s/\(\#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*"\)\([^\"]*\)"\(.*\)/\2/' < $(verfile)`
+rdate:=`sed -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/!d' -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/s/\(\#define[ 	][ 	]*CS_RELEASE_DATE[ 	][ 	]*"\)\([^\"]*\)"\(.*\)/\2/' < $(verfile)`
+
 # Create csconfig.tmp for the make variables that need to be transferred.
 $(CSCONFIG.EXE):
 	@echo Generating cs-config script...
-	@echo $"# Crystal Space config make variables for $(DESCRIPTION.$(TARGET)).$" > $(CSCONFIG.TMP)
-	@echo $"# Note: automatically generated. $" >> $(CSCONFIG.TMP)
-	@echo $"EXE=$(EXE)$" >> $(CSCONFIG.TMP)
-	@echo $"DLL=$(DLL)$" >> $(CSCONFIG.TMP)
-	@echo $"LFLAGS.EXE=$(LFLAGS.EXE)$" >> $(CSCONFIG.TMP)
-	@echo $"DO.SHARED.PLUGIN.PREAMBLE=$(DO.SHARED.PLUGIN.PREAMBLE)$" >> $(CSCONFIG.TMP)
-	@echo $"DO.SHARED.PLUGIN.POSTAMBLE=$(DO.SHARED.PLUGIN.POSTAMBLE)$" >> $(CSCONFIG.TMP)
-	@echo $"LIBS.EXE.PLATFORM=$(LIBS.EXE.PLATFORM)$" >> $(CSCONFIG.TMP)
+	@if test -x cs-config; then rm cs-config; fi
+
+	@cat scripts/cs-config/cs-config.temppre > cs-config
+	@echo "#	WARNING: This script is generated automatically! " >> cs-config
+	@echo ""			>> cs-config
+	@echo "CRYSTAL=\$${CRYSTAL-$(INSTALL_DIR)}"	>> cs-config
+	@echo "prefix=\$${CRYSTAL}"			>> cs-config
+	@echo "makeout=\"$(OUT)\""			>> cs-config
+	@echo "exec_prefix=\$${prefix}"			>> cs-config
+	@echo "version='$(vmajor)'"			>> cs-config
+	@echo "longversion='$(vmajor).$(vminor) ($(rdate))'"	>> cs-config
+	@echo "includedir=\$${prefix}/include"		>> cs-config
+	@echo "if test -r \$${prefix}/lib; then"	>> cs-config
+	@echo "  libdir=\$${prefix}/lib"		>> cs-config
+	@echo "fi"					>> cs-config
+	@echo "syslibs=\"$(LIBS.EXE)\""			>> cs-config
+	@echo "common_cflags=\"$(CFLAGS)\""		>> cs-config
+	@echo "common_cxxflags=\"$(CXXFLAGS)\""		>> cs-config
+	@echo ""					>> cs-config
+	@echo "makevars()"				>> cs-config
+	@echo "{"					>> cs-config
+	@echo "	cat <<EOF"				>> cs-config
+	@echo $"# Crystal Space config make variables for $(DESCRIPTION.$(TARGET)).$" >> cs-config
+	@echo $"# Note: automatically generated. $" 	>> cs-config
+	@echo $"EXE=$(EXE)$" 				>> cs-config
+	@echo $"DLL=$(DLL)$" 				>> cs-config
+	@echo $"LFLAGS.EXE=$(LFLAGS.EXE)$" 		>> cs-config
+	@echo $"DO.SHARED.PLUGIN.PREAMBLE=$(DO.SHARED.PLUGIN.PREAMBLE)$" >> cs-config
+	@echo $"DO.SHARED.PLUGIN.POSTAMBLE=$(DO.SHARED.PLUGIN.POSTAMBLE)$" >> cs-config
+	@echo $"LIBS.EXE.PLATFORM=$(LIBS.EXE.PLATFORM)$" >> cs-config
 ifneq ($(LINK.PLUGIN),)
-	@echo $"LINK.PLUGIN=$(LINK.PLUGIN)$" >> $(CSCONFIG.TMP)
-	@echo $"LFLAGS.DLL=$(LFLAGS.DLL) \$$@$" >> $(CSCONFIG.TMP)
+	@echo $"LINK.PLUGIN=$(LINK.PLUGIN)$" 		>> cs-config
+	@echo $"LFLAGS.DLL=$(LFLAGS.DLL) \$$@$" 	>> cs-config
 else
-	@echo $"LINK.PLUGIN=$" >> $(CSCONFIG.TMP)
-	@echo $"LFLAGS.DLL=$(LFLAGS.DLL)$" >> $(CSCONFIG.TMP)
+	@echo $"LINK.PLUGIN=$" 				>> cs-config
+	@echo "LFLAGS.DLL=`echo $(LFLAGS.DLL) | sed -e "s/cs-config/\\\\\\\\$$\\@/"`" 		>> cs-config
 endif
-	@echo $"PLUGIN.POSTFLAGS=$(PLUGIN.POSTFLAGS)$" >> $(CSCONFIG.TMP)
+	@echo $"PLUGIN.POSTFLAGS=$(PLUGIN.POSTFLAGS)$"	>> cs-config
+	@echo "EOF"					>> cs-config
+	@echo "}"					>> cs-config
+	@echo						>> cs-config
+	@cat scripts/cs-config/cs-config.temppost	>> cs-config
 
-	$(RUN_SCRIPT) scripts/cs-config/genscript.sh $"$(INSTALL_DIR)$" \
-	$"$(CXXFLAGS)$" $"$(CFLAGS)$" $"$(LIBS.EXE)$" scripts/cs-config \
-	$"$(CSCONFIG.TMP)$"
-	$(RM) $(CSCONFIG.TMP)
-
+	@chmod +x cs-config
+	
 csconfigclean:
-	-$(RM) $(CSCONFIG.EXE) $(CSCONFIG.TMP)
+	-$(RM) $(CSCONFIG.EXE) 
 
 endif

@@ -28,8 +28,9 @@ if test -r "$prefix/Makefile"; then
   if test -r "$prefix/lib/libcssys.a"; then
     libdir="$prefix/lib"
   else
-    #Thanks go to Jorge for this script magic...
-    libdir=`ls -1d ${CRYSTAL}/out/*/*/*/libcssys.a | sed -e "s~\(.*\)/.*~\1~" -e "1q"`
+    if test -r "$prefix/$makeout/libcssys.a"; then
+      libdir="$prefix/$makeout"
+    fi
   fi
 fi
 if test -z "$libdir"; then
