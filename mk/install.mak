@@ -15,13 +15,13 @@
 #                   to include/. (max 3 levels deep now)
 
 .PHONY: install_config install_data install_dynamiclibs install_staticlibs \
-  install_exe install_include install_root install_logfile
+  install_exe install_include install_root install_logfile install_docs
 
 INSTALL_LOG=$(INSTALL_DIR)/install.log
 
 # the $(INSTALL_DIR)/include dir is done later
 $(INSTALL_DIR) $(INSTALL_DIR)/data $(INSTALL_DIR)/bin $(INSTALL_DIR)/lib \
-$(INSTALL_DIR)/data/config:
+$(INSTALL_DIR)/docs $(INSTALL_DIR)/data/config:
 	$(MKDIR)
 
 # list the install.log in the install.log to be deleted.
@@ -79,4 +79,24 @@ $(INSTALL_INCLUDE.DESTFILES): $(INSTALL_DIR)/% : %
 install_include: $(INSTALL_DIR)/include $(INSTALL_INCLUDE.DIR) \
   $(INSTALL_INCLUDE.DESTFILES)
 
+
+# install docs/html into INSTALL_DIR/docs
+INSTALL_DOCS.FILES = $(wildcard docs/html/*htm \
+  docs/html/*/*jpg docs/html/*/*gif docs/html/*/*png  \
+  docs/html/*/*/*jpg docs/html/*/*/*gif docs/html/*/*/*png)
+INSTALL_DOCS.DIR = $(addprefix $(INSTALL_DIR)/,  \
+  $(patsubst %/, %, \
+  $(patsubst docs/html/%, docs/%, $(sort $(dir $(INSTALL_DOCS.FILES))))))
+INSTALL_DOCS.DESTFILES = $(addprefix $(INSTALL_DIR)/,  \
+  $(patsubst docs/html/%, docs/%,$(sort $(INSTALL_DOCS.FILES))))
+
+$(INSTALL_DOCS.DIR):
+	$(MKDIR)
+
+$(INSTALL_DOCS.DESTFILES): $(INSTALL_DIR)/docs/% : docs/html/%
+	$(CP) $< $@
+	@echo $@ >> $(INSTALL_LOG)
+
+install_docs: $(INSTALL_DIR)/docs $(INSTALL_DOCS.DIR) \
+  $(INSTALL_DOCS.DESTFILES)
 
