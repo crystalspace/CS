@@ -22,6 +22,10 @@ The history order is reversed so that new features are at the top.
 	  reported by Don Lavelle <dll4@lehigh.edu>.
 	- Eric Sunshine eliminated compilation warnings.
 	- Eric Sunshine fixed problems with the gl_render3d.mak makefile.
+	- Eric Sunshine eliminated several thousand preprocessor warnings
+	  from glextmanager.h.
+	- Eric Sunshine fixed a problem in glsysbufmgr.h where it was applying
+	  delete[] to a void*.  This is a big No-No.
 31-Oct-2002
 	- Optimized frustvis and dynavis by removing some SCF_QUERY_INTERFACE
 	  calls.
