@@ -495,6 +495,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     memcpy (temp, val, sl); temp [sl] = 0;
     char *func = strchr (temp, ':');
     if (func) *func++ = 0;
+    if (g3d_override && !strcmp (CS_FUNCID_VIDEO, func)) continue;
     PluginList.Push (new csPluginLoadRec (func, temp));
   }
 
